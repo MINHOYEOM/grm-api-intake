@@ -145,20 +145,24 @@ class CollectionStats:
     fr_fetched: int = 0
     fr_inserted: int = 0
     fr_skipped_dup: int = 0
+    fr_failed: int = 0  # Notion insert failures (Codex must-fix #2)
     fr_error: bool = False
     fr_error_msg: str = ""
     recall_fetched: int = 0
     recall_inserted: int = 0
     recall_skipped_dup: int = 0
+    recall_failed: int = 0  # Notion insert failures (Codex must-fix #2)
     recall_error: bool = False
     recall_error_msg: str = ""
 
     def summary(self) -> str:
         return (
             f"FR  fetched={self.fr_fetched}  inserted={self.fr_inserted}  "
-            f"skip_dup={self.fr_skipped_dup}  error={self.fr_error}\n"
+            f"skip_dup={self.fr_skipped_dup}  failed={self.fr_failed}  "
+            f"error={self.fr_error}\n"
             f"REC fetched={self.recall_fetched}  inserted={self.recall_inserted}  "
-            f"skip_dup={self.recall_skipped_dup}  error={self.recall_error}"
+            f"skip_dup={self.recall_skipped_dup}  failed={self.recall_failed}  "
+            f"error={self.recall_error}"
         )
 
 
@@ -203,6 +207,20 @@ def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
 
 def http_get_json(url: str, *, params: dict[str, Any] | None = None,
                   timeout: int = 30, retries: int = 2) -> dict[str, Any]:
+    """
+    GET JSON with masked-URL logging and retry policy split by status class.
+
+    Codex review fixes:
+    - Always log a redacted URL (mask api_key) on every code path, including
+      retries and final failure. The original code logged the raw URL on retry,
+      leaking the OpenFDA key when present.
+    - Retry only 408, 429, and 5xx. 4xx (400/401/403/404/etc.) are permanent and
+      raise immediately as requests.HTTPError so callers can branch on
+      response.status_code.
+    - Never include str(exception) in log lines because requests embeds the raw
+      URL there.
+    """
+    safe_url = _mask_api_key(url)
     last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
@@ -210,12 +228,30 @@ def http_get_json(url: str, *, params: dict[str, Any] | None = None,
                                 headers={"User-Agent": "GRS-Intake/1.0 (+github-actions)"})
             resp.raise_for_status()
             return resp.json()
-        except requests.RequestException as e:  # noqa: PERF203
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response is not None else None
             last_err = e
-            log("WARN", f"GET 실패 ({attempt + 1}/{retries + 1}) url={url} err={e}")
-            if attempt < retries:
-                time.sleep(2 ** attempt)
-    raise RuntimeError(f"HTTP GET 최종 실패: {url} ({last_err})")
+            # Permanent 4xx (except retryable 408/429) — raise immediately.
+            # Reconstruct HTTPError with masked URL message and suppress the
+            # original chain ("from None") so the raw URL does not leak via
+            # __cause__ traceback rendering.
+            if status is not None and 400 <= status < 500 and status not in (408, 429):
+                masked = requests.HTTPError(
+                    f"HTTP {status} for {safe_url}", response=e.response,
+                )
+                raise masked from None
+            log("WARN", f"GET 실패 ({attempt + 1}/{retries + 1}) "
+                       f"url={safe_url} status={status} (retryable)")
+        except requests.RequestException as e:
+            # Network errors (timeout, connection refused, DNS, etc.).
+            # Do NOT include str(e) — requests embeds the raw URL there.
+            last_err = e
+            log("WARN", f"GET 실패 ({attempt + 1}/{retries + 1}) "
+                       f"url={safe_url} err={type(e).__name__}")
+        if attempt < retries:
+            time.sleep(2 ** attempt)
+    raise RuntimeError(f"HTTP GET 최종 실패: {safe_url} "
+                       f"(last_error_type={type(last_err).__name__ if last_err else 'None'})")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -266,8 +302,12 @@ def collect_federal_register(start: date, end: date) -> tuple[list[IntakeItem], 
         while next_url:
             page_count += 1
             if page_count > 10:
+                # Hitting the safety cap with results still pending is partial-success
+                # but should not be silent: surface as an error so the workflow's stats
+                # callout reflects it (Codex review nice-to-have #14).
                 log("WARN", "FR pagination 10 페이지 초과 — 안전 중단")
-                break
+                return items, ("FR pagination cap (10 pages) reached "
+                               "with next_page_url still set — possible partial data")
             data = http_get_json(next_url)
             results = data.get("results", []) or []
             log("INFO", f"FR page {page_count}: {len(results)} 건")
@@ -276,8 +316,9 @@ def collect_federal_register(start: date, end: date) -> tuple[list[IntakeItem], 
             next_url = data.get("next_page_url")
         return items, None
     except Exception as e:
-        log("ERROR", f"FR 수집 실패: {e}")
-        return items, str(e)
+        safe_msg = _mask_api_key(str(e))
+        log("ERROR", f"FR 수집 실패: {type(e).__name__}: {safe_msg}")
+        return items, f"{type(e).__name__}: {safe_msg}"
 
 
 def _fr_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
@@ -334,10 +375,11 @@ def collect_openfda_recalls(start: date, end: date,
                 log("INFO", f"OpenFDA 호출: {api_query_url_for_log}")
             try:
                 data = http_get_json(url)
-            except RuntimeError as e:
-                # HTTP 404 가 0 건일 때 정상 응답으로도 옴 (OpenFDA 관행)
-                msg = str(e)
-                if "404" in msg:
+            except requests.HTTPError as e:
+                # OpenFDA returns HTTP 404 when the result set is empty
+                # (documented at open.fda.gov/apis/responses/).
+                # Treat as a successful zero-row response.
+                if e.response is not None and e.response.status_code == 404:
                     log("INFO", "OpenFDA 404 (해당 기간 결과 0건) — 정상 종료")
                     return items, None
                 raise
@@ -345,14 +387,16 @@ def collect_openfda_recalls(start: date, end: date,
             meta_total = (data.get("meta", {}).get("results", {}) or {}).get("total", 0)
             log("INFO", f"OpenFDA skip={skip}: {len(results)} 건 (total {meta_total})")
             for r in results:
-                items.append(_recall_to_item(r, api_query_url_for_log or url))
+                items.append(_recall_to_item(r, api_query_url_for_log or _mask_api_key(url)))
             skip += len(results)
             if not results or skip >= meta_total or skip >= OPENFDA_MAX_TOTAL:
                 break
         return items, None
     except Exception as e:
-        log("ERROR", f"OpenFDA 수집 실패: {e}")
-        return items, str(e)
+        # Mask any URL embedded in the exception string before logging / surfacing.
+        safe_msg = _mask_api_key(str(e))
+        log("ERROR", f"OpenFDA 수집 실패: {type(e).__name__}: {safe_msg}")
+        return items, f"{type(e).__name__}: {safe_msg}"
 
 
 def _mask_api_key(url: str) -> str:
@@ -440,8 +484,14 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date) -> set
                 break
             start_cursor = data.get("next_cursor")
     except requests.RequestException as e:
-        log("WARN", f"Notion 중복 조회 실패 — 중복 검사 건너뜀: {e}")
-        return set()
+        # Codex must-fix: fail closed instead of returning an empty set.
+        # If we proceed without knowing existing Document IDs, we may insert
+        # duplicates for every row on the same Run Date, polluting the DB.
+        # Raise so main() exits non-zero and the workflow's failure handler runs.
+        raise RuntimeError(
+            f"Notion dedup query failed ({type(e).__name__}) — aborting to "
+            f"prevent duplicate inserts. Re-run after Notion connectivity is restored."
+        ) from e
     log("INFO", f"Notion 기존 row {len(existing)} 건 (RunDate={run_date})")
     return existing
 
@@ -575,9 +625,16 @@ def notion_create_page(token: str, db_id: str, item: IntakeItem,
 
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
-                 existing_ids: set[str], dry_run: bool) -> tuple[int, int]:
+                 existing_ids: set[str], dry_run: bool) -> tuple[int, int, int]:
+    """
+    Returns (inserted, skipped_dup, failed).
+
+    Codex must-fix #2: track Notion insert failures separately so main() can
+    fail the workflow if every insert fails.
+    """
     inserted = 0
     skipped = 0
+    failed = 0
     for item in items:
         if not item.document_id:
             log("WARN", f"document_id 없음 — skip (source={item.source})")
@@ -596,8 +653,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             inserted += 1
             existing_ids.add(item.document_id)
         else:
+            failed += 1
             log("WARN", f"insert 실패 — 다음 항목으로 진행 doc={item.document_id}")
-    return inserted, skipped
+    return inserted, skipped, failed
 
 
 def main() -> int:
@@ -640,24 +698,32 @@ def main() -> int:
 
     log("INFO", f"수집 완료: FR={stats.fr_fetched}건 · Recall={stats.recall_fetched}건")
 
-    # 3) Notion 기존 row (중복 제거)
+    # 3) Notion 기존 row (중복 제거).
+    #    Codex must-fix #3: notion_query_existing_doc_ids now fails closed.
+    #    If it raises, we MUST stop before any insert so we don't duplicate rows.
     if args.dry_run:
         existing: set[str] = set()
     else:
-        existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date)
+        try:
+            existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date)
+        except RuntimeError as e:
+            log("ERROR", str(e))
+            return 1
 
     collected_at = now_k
 
     # 4) 삽입
-    fr_in, fr_sk = insert_items(notion_token, notion_db, fr_items,
-                                run_date, collected_at, existing, args.dry_run)
+    fr_in, fr_sk, fr_fa = insert_items(notion_token, notion_db, fr_items,
+                                       run_date, collected_at, existing, args.dry_run)
     stats.fr_inserted = fr_in
     stats.fr_skipped_dup = fr_sk
+    stats.fr_failed = fr_fa
 
-    rec_in, rec_sk = insert_items(notion_token, notion_db, recall_items,
-                                  run_date, collected_at, existing, args.dry_run)
+    rec_in, rec_sk, rec_fa = insert_items(notion_token, notion_db, recall_items,
+                                          run_date, collected_at, existing, args.dry_run)
     stats.recall_inserted = rec_in
     stats.recall_skipped_dup = rec_sk
+    stats.recall_failed = rec_fa
 
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
@@ -671,21 +737,32 @@ def main() -> int:
                 f.write(f"- Window: `{start.isoformat()}` ~ `{end.isoformat()}`\n")
                 f.write(f"- Federal Register: fetched {stats.fr_fetched} · "
                         f"inserted {stats.fr_inserted} · skip-dup {stats.fr_skipped_dup} · "
+                        f"failed {stats.fr_failed} · "
                         f"error `{stats.fr_error_msg or 'none'}`\n")
                 f.write(f"- OpenFDA Recall: fetched {stats.recall_fetched} · "
                         f"inserted {stats.recall_inserted} · skip-dup {stats.recall_skipped_dup} · "
+                        f"failed {stats.recall_failed} · "
                         f"error `{stats.recall_error_msg or 'none'}`\n")
                 f.write(f"- Dry run: `{args.dry_run}`\n")
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
-    # 종료 코드:
-    # - 둘 다 실패 → exit 1 (workflow fail)
-    # - 한쪽만 실패 → exit 0 (graceful degradation, WARN log 만)
-    # - 둘 다 성공 (결과 0건 포함) → exit 0
+    # 종료 코드 (Codex review 반영):
+    #
+    # - 두 소스 API 모두 실패 → exit 1
+    # - Notion sink 가 시도된 모든 insert 에서 실패 (즉 sink 100% down) → exit 1
+    #   (must-fix #2: 이전엔 한쪽 API 만 성공해도 sink 전부 실패해도 exit 0)
+    # - 그 외 (부분 성공, 결과 0건 포함) → exit 0
     if stats.fr_error and stats.recall_error:
-        log("ERROR", "두 API 모두 실패 — workflow fail")
+        log("ERROR", "두 소스 API 모두 실패 — workflow fail")
         return 1
+
+    total_attempts = fr_in + fr_fa + rec_in + rec_fa
+    total_failed = fr_fa + rec_fa
+    if not args.dry_run and total_attempts > 0 and total_failed == total_attempts:
+        log("ERROR", f"Notion 적재 100% 실패 ({total_failed} attempts, 0 success) — workflow fail")
+        return 1
+
     return 0
 
 

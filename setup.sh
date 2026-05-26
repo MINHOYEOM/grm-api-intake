@@ -179,18 +179,29 @@ if [ -z "$(git config user.name || true)" ]; then
 fi
 
 git add .
-if git diff --cached --quiet; then
+# Codex: distinguish git diff --cached --quiet exit codes (0=no-change, 1=change, >1=error).
+set +e
+git diff --cached --quiet
+diff_exit=$?
+set -e
+if [ "$diff_exit" -eq 0 ]; then
   warn "커밋할 변경이 없습니다. (이미 push 됐을 수 있음)"
-else
+elif [ "$diff_exit" -eq 1 ]; then
   git commit -m "Initial v15.0 Phase 1 — intake collector + workflow + Routine prompt" >/dev/null
   ok "커밋 완료"
+else
+  err "git diff --cached 가 예기치 않은 exit $diff_exit 로 종료. 저장소 손상 가능."
+  exit 1
 fi
 
 git branch -M main 2>/dev/null || true
-if git push -u origin main 2>/dev/null; then
-  ok "push 완료"
-else
-  warn "push 실패 또는 빈 push. 'git push -u origin main' 을 수동으로 시도해 주세요."
+
+# Codex: push 실패는 setup 전체를 실패로 만든다. 이전엔 warn 만 출력하고
+# 마지막에 "전체 성공" 이라고 잘못 표시됐다.
+push_success=true
+if ! git push -u origin main 2>&1; then
+  push_success=false
+  warn "push 실패. Secrets 등록은 계속 진행 (idempotent) — setup 은 비정상 종료."
 fi
 
 # ─── 5. Secrets 등록 ─────────────────────────────────────────────────────
@@ -220,6 +231,18 @@ NOTION_TOKEN="" OPENFDA_API_KEY=""
 # ─── 6. 완료 ─────────────────────────────────────────────────────────────
 title "6. 셋업 완료"
 
+# Codex: push 실패면 "전체 성공" 으로 잘못 보고하지 않는다.
+if [ "$push_success" != "true" ]; then
+  err "Setup 종료 — git push 실패."
+  echo "  'git push -u origin main' 을 수동 실행해 해결 후 재시도."
+  echo "  Secrets 는 이미 등록됐으므로 (idempotent) push 만 해결하면 됨."
+  echo
+  info "Repo URL: ${REPO_URL}"
+  info "Actions:  ${REPO_URL}/actions"
+  info "Secrets:  ${REPO_URL}/settings/secrets/actions"
+  exit 1
+fi
+
 ok "모든 단계 성공."
 echo
 echo "다음 단계 (수동):"
@@ -232,10 +255,9 @@ echo "     → Run workflow → dry_run: true"
 echo
 echo "  3) dry-run 성공 시 dry_run: false 로 한 번 더 실행 → 실제 Notion 적재"
 echo
-echo "  4) GRS_Prompt_v15.0_patch.md 의 2개 치환을 GRS_Prompt_v15.0.md 에 적용 후"
-echo "     Claude Code Routine 설정에 통째로 붙여넣기"
+echo "  4) GRS_Prompt_v15.0.md 본문(B 섹션 코드블록)을 Claude Code Routine 설정에 통째로 붙여넣기"
 echo
-echo "  5) 매주 일요일 22:00 UTC (월요일 07:00 KST) 자동 실행"
+echo "  5) 매주 일요일 22:07 UTC (월요일 07:07 KST) 자동 실행"
 echo
 info "Repo URL: ${REPO_URL}"
 info "Actions:  ${REPO_URL}/actions"

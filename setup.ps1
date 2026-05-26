@@ -230,47 +230,66 @@ if (-not $cfgName)  { Invoke-Native { git config user.name "$ghUser" } -IgnoreSt
 
 Invoke-Native { git add . } -IgnoreStderr | Out-Null
 
-# git diff --cached --quiet returns: 0 = no staged changes, 1 = staged changes present
+# Codex nice-to-have: distinguish git diff --cached exit codes.
+#   0  = no staged changes (nothing to commit)
+#   1  = staged changes present (proceed to commit)
+#   >1 = unexpected git error (corrupted repo, bad refs, etc.) - fail loudly
 Invoke-Native { git diff --cached --quiet } -IgnoreStderr | Out-Null
-$hasStaged = ($script:LastNativeExit -ne 0)
+$diffExit = $script:LastNativeExit
 
-if (-not $hasStaged) {
+if ($diffExit -eq 0) {
     Write-Warn "Nothing to commit (already pushed?)."
-} else {
+} elseif ($diffExit -eq 1) {
     Invoke-Native { git commit -m "Initial v15.0 Phase 1 - intake collector + workflow + Routine prompt" } -IgnoreStderr | Out-Null
     if ($script:LastNativeExit -ne 0) {
-        Fail-And-Exit "git commit failed."
+        Fail-And-Exit "git commit failed (exit $($script:LastNativeExit))."
     }
     Write-Ok "Commit created"
+} else {
+    Fail-And-Exit "git diff --cached failed with unexpected exit code $diffExit. Repository may be corrupted."
 }
 
 Invoke-Native { git branch -M main } -IgnoreStderr | Out-Null
 
+# Codex should-fix: push failure must propagate to setup exit code; previously
+# we printed a warning and then claimed success at the end.
 $pushOut = Invoke-Native { git push -u origin main }
-if ($script:LastNativeExit -eq 0) {
+$script:PushSuccess = ($script:LastNativeExit -eq 0)
+if ($script:PushSuccess) {
     Write-Ok "push complete"
 } else {
     Write-Warn "push failed:"
     Write-Host ($pushOut -join "`n")
-    Write-Warn "Try 'git push -u origin main' manually after fixing the cause."
+    Write-Warn "Continuing with secret registration (idempotent), but setup will exit non-zero."
 }
 
 # ---- 5. Register secrets ----
 Write-Title "5. Register GitHub Secrets"
 
 function Set-RepoSecret($name, $value) {
-    # Write secret to a 0-permission temp file, pass to gh via stdin redirection,
-    # delete immediately. Avoids leaking to process list (cmd args) or log files.
+    # Codex should-fix #3: previously this passed the secret as `--body $content`,
+    # which puts the secret in the gh process's argv (visible in OS process listings
+    # for the lifetime of the gh call). Switch to `--body-file <path>` so only the
+    # temp file path appears in argv; the secret never enters the command line.
+    #
+    # WriteAllBytes writes raw UTF-8 bytes with no BOM and no trailing newline, so
+    # gh stores exactly the bytes we intend (a CRLF would corrupt the token value).
     $tmp = New-TemporaryFile
     try {
-        [System.IO.File]::WriteAllText($tmp.FullName, $value, [System.Text.UTF8Encoding]::new($false))
-        $content = Get-Content -Raw -LiteralPath $tmp.FullName
-        Invoke-Native { gh secret set $name --repo "$ghUser/$RepoName" --body $content } | Out-Null
+        [System.IO.File]::WriteAllBytes(
+            $tmp.FullName,
+            [System.Text.Encoding]::UTF8.GetBytes($value)
+        )
+        Invoke-Native {
+            gh secret set $name --repo "$ghUser/$RepoName" --body-file $tmp.FullName
+        } | Out-Null
         if ($script:LastNativeExit -ne 0) {
             throw "gh secret set $name failed (exit $($script:LastNativeExit))"
         }
     } finally {
-        if (Test-Path -LiteralPath $tmp.FullName) { Remove-Item -Force -LiteralPath $tmp.FullName }
+        if (Test-Path -LiteralPath $tmp.FullName) {
+            Remove-Item -Force -LiteralPath $tmp.FullName
+        }
     }
 }
 
@@ -304,6 +323,18 @@ $OpenfdaKey = $null
 # ---- 6. Done ----
 Write-Title "6. Setup complete"
 
+# Codex should-fix: don't claim success if git push failed earlier.
+if (-not $script:PushSuccess) {
+    Write-Err "Setup completed with errors: git push failed."
+    Write-Host "Resolve the push issue and re-run 'git push -u origin main' manually."
+    Write-Host "Secrets were still registered (idempotent), so on retry you only need to push."
+    Write-Host ""
+    Write-Info "Repo URL: $repoUrl"
+    Write-Info "Actions:  $repoUrl/actions"
+    Write-Info "Secrets:  $repoUrl/settings/secrets/actions"
+    exit 1
+}
+
 Write-Ok "All steps succeeded."
 Write-Host ""
 Write-Host "Next steps (manual):"
@@ -318,7 +349,7 @@ Write-Host "  3) If dry-run is OK, run again with dry_run: false to write to Not
 Write-Host ""
 Write-Host "  4) Paste the contents of GRS_Prompt_v15.0.md into your Claude Code Routine"
 Write-Host ""
-Write-Host "  5) Cron schedule: every Sunday 22:00 UTC (Monday 07:00 KST)"
+Write-Host "  5) Cron schedule: every Sunday 22:07 UTC (Monday 07:07 KST)"
 Write-Host ""
 Write-Info "Repo URL: $repoUrl"
 Write-Info "Actions:  $repoUrl/actions"

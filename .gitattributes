@@ -1,0 +1,16 @@
+# Normalize all text files to LF in the repository.
+# This eliminates the "LF will be replaced by CRLF" warnings on Windows
+# and keeps shell scripts, YAML, and Python source consistent across platforms.
+* text=auto eol=lf
+
+# PowerShell scripts must be CRLF on Windows runtime, but committed as LF.
+# The line above already covers them. Explicit override not needed.
+
+# Binary files - never normalize.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary

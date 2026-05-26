@@ -19,6 +19,10 @@
 
 [CmdletBinding()]
 param(
+    # Codex Pass 3 should-fix: validate $RepoName at parameter binding to prevent
+    # quote/space injection into the gh secret set ProcessStartInfo Arguments string.
+    # GitHub repository name rules allow [A-Za-z0-9._-] only.
+    [ValidatePattern('^[A-Za-z0-9._-]+$')]
     [string]$RepoName = "grs-api-intake",
     [ValidateSet("public","private")][string]$Visibility = "public",
     [string]$NotionDatabaseId = "7784c71fb7b343749b2bee5d04db7926"
@@ -125,9 +129,17 @@ Write-Title "2. Inputs"
 
 $tmp = Read-Host "Repo name [$RepoName]"
 if ($tmp) { $RepoName = $tmp }
+# Codex Pass 3 should-fix: parameter ValidatePattern doesn't catch values
+# assigned interactively. Re-validate.
+if ($RepoName -notmatch '^[A-Za-z0-9._-]+$') {
+    Fail-And-Exit "Invalid repo name '$RepoName'. Allowed characters: A-Z a-z 0-9 . _ -"
+}
 
 $tmp = Read-Host "Visibility public/private [$Visibility]"
 if ($tmp) { $Visibility = $tmp }
+if ($Visibility -notin @("public","private")) {
+    Fail-And-Exit "Invalid visibility '$Visibility'. Must be 'public' or 'private'."
+}
 
 $tmp = Read-Host "Notion Database ID [$NotionDatabaseId]"
 if ($tmp) { $NotionDatabaseId = $tmp }

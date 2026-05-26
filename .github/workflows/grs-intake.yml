@@ -76,9 +76,10 @@ jobs:
               ARGS="$ARGS --dry-run"
             fi
             if [ -n "${INPUT_WINDOW_DAYS:-}" ]; then
-              # Defense-in-depth: only allow digits. Refuse anything else.
-              if ! [[ "${INPUT_WINDOW_DAYS}" =~ ^[0-9]+$ ]]; then
-                echo "ERROR: window_days must be a positive integer (got '${INPUT_WINDOW_DAYS}')" >&2
+              # Defense-in-depth: only allow positive integers (not zero).
+              # Codex Pass 3: '^[0-9]+$' allowed 0, which yields an empty window.
+              if ! [[ "${INPUT_WINDOW_DAYS}" =~ ^[1-9][0-9]*$ ]]; then
+                echo "ERROR: window_days must be a positive integer >= 1 (got '${INPUT_WINDOW_DAYS}')" >&2
                 exit 1
               fi
               ARGS="$ARGS --window-days ${INPUT_WINDOW_DAYS}"

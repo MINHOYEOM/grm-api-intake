@@ -74,20 +74,39 @@
 - sterile, Annex 1
 - supplier qualification
 
-## Routine 측 읽기 쿼리
+## Routine 측 읽기 쿼리 (Notion MCP 한계 보완)
 
-v15.0 Routine 은 Notion MCP `notion-fetch` 또는 데이터소스 query 로 다음 필터를 적용한다:
+⚠️ Notion MCP 는 사용자 property 기반 server-side 필터 도구를 제공하지 않는다.
+`notion-search` 는 의미 기반 ranking, `notion-fetch` 는 단일 entity 조회. 따라서 v15.0
+Routine 은 다음 3 단계 client-side filter 흐름으로 동작한다:
 
 ```
 Database ID: 7784c71fb7b343749b2bee5d04db7926
 Data Source: collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288
 
-Source: any of [Federal Register, OpenFDA Recall]
-Run Date (KST): equals 오늘(KST 자정)
-Status: any of [New, Processed]
+논리적 필터 (client-side 검증 대상):
+  Source: any of [Federal Register, OpenFDA Recall]
+  Run Date (KST): equals 오늘(KST 자정)
+  Status: any of [New, Processed]
 ```
 
-`Run Date (KST)` 가 오늘과 정확히 일치하는 row 가 0건이면 Routine 은 v14.5 WebSearch-only 모드로 graceful degradation.
+실행 흐름:
+
+1. `notion-search(data_source_url, query="Run Date {YYYY-MM-DD}", page_size=25)` 로
+   candidates 획득. 의미 기반 ranking 이라 미래·과거 Run Date row 가 섞일 수 있다.
+2. 각 candidate 의 `id` 로 `notion-fetch` 호출해 properties 조회.
+   - 단일 fetch 실패 (404/permission/timeout) → 그 candidate 만 skip + M2 에 기록 + 다음 진행.
+   - 전체 fetch 실패 → "Intake read failure" 로 WebSearch-only fallback.
+3. fetch 성공한 row 들 중 위 3 가지 조건 **모두** 만족하는 row 만 accepted, 나머지 discarded.
+4. accepted row 의 properties + 페이지 본문 (raw JSON code block) 을 흡수.
+
+`notion-search` 가 candidates 0건 또는 client-side filter 결과 accepted 0건이면 Routine 은
+v14.5 WebSearch-only 모드로 graceful degradation 한다.
+
+Status 갱신:
+- 본문 카드 작성 완료한 row 의 `Status` 는 **다이제스트 페이지 생성 완료 후** 에만
+  `Processed` 로 갱신한다 (Notion API `notion-update-page`).
+- 다이제스트 생성 성공 + 일부 Status 갱신 실패 → row 는 그대로 (`New` 유지), M2 에 실패 기록.
 
 ## 운영 주의
 

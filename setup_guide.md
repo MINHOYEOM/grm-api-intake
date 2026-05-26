@@ -110,11 +110,11 @@ $env:OPENFDA_API_KEY = 'your_openfda_key_here'
 2. 약 2분 후 Job Summary 확인 — `Federal Register: fetched N` 처럼 보여야 정상
 3. 같은 절차로 `dry_run: false` 실행 → Notion `GRS API Intake` DB 에 row 생김
 
-이 두 검증이 통과하면 매주 일요일 22:00 UTC (월요일 07:00 KST) 부터 자동 실행됩니다.
+이 두 검증이 통과하면 매주 일요일 22:07 UTC (월요일 07:07 KST) 부터 자동 실행됩니다.
 
 ## 보안 메모
 
-- 스크립트는 `NOTION_TOKEN` 을 **stdin → gh secret set --body -** 방식으로 전달합니다. 명령행 인자 (process list 노출) · 임시 파일 (PowerShell 은 1회용 임시파일 후 즉시 삭제) 에 평문 토큰을 남기지 않습니다.
+- 스크립트는 `NOTION_TOKEN` 을 **stdin 으로만** `gh secret set` 에 전달합니다. bash 는 `printf '%s' "$value" | gh secret set ... --body -`, PowerShell 은 `System.Diagnostics.ProcessStartInfo` + `RedirectStandardInput` + `StandardInput.Write($value)` 을 사용해 명령행 인자 (process list 노출) · 임시 파일 · pipeline newline 변환 어느 경로로도 평문 토큰이 새지 않습니다.
 - `gh secret set` 은 GitHub 의 공개키 암호화 (libsodium sealed box) 를 사용해 전송합니다. 토큰은 GitHub Actions 런타임 외에는 평문으로 복호화되지 않습니다.
 - 작업 종료 시 스크립트가 메모리 변수를 비웁니다.
 - 그래도 채팅에 노출된 기존 토큰이 걱정되면 Notion → Integrations → `Rotate token` 권장.

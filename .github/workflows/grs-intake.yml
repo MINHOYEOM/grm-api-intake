@@ -1,14 +1,16 @@
 name: GRS API Intake (Weekly)
 
-# 매주 일요일 22:00 UTC = 월요일 07:00 KST
-# Claude Code Routine (월 07:30 KST) 30분 전에 수집 완료
+# 매주 일요일 20:17 UTC = 월요일 05:17 KST
+# Claude Code Routine (월 07:30 KST) 2시간 전에 수집 완료 목표
+# (GitHub Actions cron 최대 60분 지연 공식 고지 → 여유 2시간 확보)
+# 비정각(:17) 사용 — GitHub Actions :00 부하 분산 권장사항 반영
 #
 # cron 표기:
 # minute hour day(month) month day(week)
-#  0      22    *           *      0       → 일요일 22:00 UTC
+#  17     20    *           *      0       → 일요일 20:17 UTC
 on:
   schedule:
-    - cron: '0 22 * * 0'
+    - cron: '17 20 * * 0'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -59,13 +61,31 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+          # workflow_dispatch 입력을 env 변수로만 받아 shell 본문에 직접 삽입 금지
+          GRS_DRY_RUN: ${{ inputs.dry_run }}
+          GRS_WINDOW_DAYS: ${{ inputs.window_days }}
+          # github.event_name을 env로 노출 — shell 본문 ${{ }} 직접 삽입 방지 (W2)
+          GRS_EVENT_NAME: ${{ github.event_name }}
         run: |
-          ARGS=""
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
-            if [ -n "${{ inputs.window_days }}" ]; then ARGS="$ARGS --window-days ${{ inputs.window_days }}"; fi
+          # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
+          args=()
+          if [ "$GRS_EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ "$GRS_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+
+            # W1: 범위 검증 — 비정수 입력 시 경고 후 기본값 7; 범위(1-90) 초과 시 exit 1
+            if printf '%s' "$GRS_WINDOW_DAYS" | grep -qE '^[0-9]+$'; then
+              WINDOW_DAYS_VAL="$GRS_WINDOW_DAYS"
+            else
+              echo "::warning ::window_days '$GRS_WINDOW_DAYS' is not an integer — using default 7"
+              WINDOW_DAYS_VAL="7"
+            fi
+            if (( WINDOW_DAYS_VAL < 1 || WINDOW_DAYS_VAL > 90 )); then
+              echo "::error ::window_days=$WINDOW_DAYS_VAL out of range [1, 90]"
+              exit 1
+            fi
+            args+=(--window-days "$WINDOW_DAYS_VAL")
           fi
-          python collect_intake.py $ARGS
+          python collect_intake.py "${args[@]}"
 
       - name: Open issue on failure
         if: failure() && github.event_name == 'schedule'

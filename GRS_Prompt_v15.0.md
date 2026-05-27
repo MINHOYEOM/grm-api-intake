@@ -39,14 +39,16 @@
 4. 번역 충실성: 정확성 우선, 자연스러운 QA 실무 톤.
 5. 듀얼 링크 의무: 모든 항목에 정보 출처(📰) + 공식 원본(📎) 두 링크.
 6. 운영 모델 (v15.0 — Intake-first cloud routine):
-   외부 GitHub Actions 수집기가 매주 일요일 22:00 UTC (월요일 07:00 KST) 에
+   외부 GitHub Actions 수집기가 매주 일요일 20:17 UTC (월요일 05:17 KST) 에
    Federal Register API + OpenFDA Drug Enforcement API 를 호출해 결과를
    Notion "GRS API Intake" 데이터베이스에 raw 필드로 적재한다.
    Routine 은 매주 월요일 07:30 KST 에 Notion Intake 를 0단계에서 읽고,
    이어서 v14.5 와 동일한 WebSearch · WebFetch 단계를 수행해 병합·중복 제거한다.
    Intake row 가 0건이면 Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 한다.
-   Routine 내부에서의 공식 API 직접 호출 · WebFetch · 공식 사이트 직접 fetch 는
-   클라우드 인프라 egress 차단으로 403 이 정상이며 best-effort 1 회 시도 후 진행한다.
+   Routine 내부에서의 공식 API 직접 호출 · 공식 사이트 직접 fetch 는
+   클라우드 인프라 egress 차단으로 403 이 정상이며 시도하지 않는다 ([0순위] 참조).
+   단, [3순위 — Deep Dive Fetch Block] 의 사전 지정된 보조 출처 5개 URL 은
+   best-effort 1회 시도 허용 (403 전부 정상 — 재시도·대체 검색 없이 다음 URL 진행).
 7. Evidence Level 의무: 모든 카드에 A/B/C 배지 표시. quote 블록은 A에만 허용.
 8. 도구 역할 분리: Notion MCP 는 Intake 읽기 + 다이제스트 페이지 쓰기.
    WebSearch 는 이벤트 탐지 (Core 8 + Deep Dive 1).
@@ -116,18 +118,45 @@ DB URL: https://www.notion.so/7784c71fb7b343749b2bee5d04db7926
 Data Source: collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288
 필터:
 - Run Date (KST) equals 오늘(KST 실행일)
-- Status any of [New, Processed]
+- Status equals New
 - Source any of [Federal Register, OpenFDA Recall]
+
+※ 재실행 중복 방지: Status=Processed 를 필터에서 제외한다.
+  같은 날 Routine 을 두 번 실행해도 이미 처리된 row 를 다시 카드화하지 않는다.
+
+페이지네이션 처리 (v15.1):
+Notion MCP 는 기본적으로 최대 100건을 한 번에 반환한다.
+응답에 `has_more: true` 가 포함된 경우 `start_cursor` 파라미터를 사용해 다음 페이지를 계속 조회한다.
+`has_more: false` 가 될 때까지 반복 조회 후 하나의 통합 목록으로 처리한다.
+MCP 가 `has_more` / `next_cursor` / `start_cursor` 를 지원하지 않는 경우:
+  반환된 최초 페이지 row 만 처리하고
+  M3 에 "Intake pagination 미지원 — 최초 반환 {N}건만 처리" 로 기록한다.
+중간 페이지 조회 실패 시 그때까지 수집된 row 로 계속 진행하고
+  M2 에 "Intake 부분 조회 ({N}건 수집 후 오류)" 로 기록. 미처리 row 는 Status 변경하지 않는다.
 
 조회 결과 처리:
 1. row 가 1건 이상 발견 → "Intake 모드" 진입
    · 각 row 의 Source · Document ID · Date · Headline · Official URL · Type/Class · Firm ·
-     Body · Distribution · Comments Close · QA Relevance 속성과 페이지 본문의 Raw API
-     payload code block 을 함께 흡수한다.
+     Body · Distribution · Comments Close · QA Relevance · OSD Relevance 속성과 페이지 본문의
+     Raw API payload code block 을 함께 흡수한다.
    · 13개 카테고리 필터를 재적용한다 (QA Relevance 가 Pending/Possible/Likely 인 항목 우선).
    · 이 항목들은 Evidence A 후보 — 단, [Evidence A 조건 — v15.0] 충족 확인 후 부여.
-2. row 가 0건 → "WebSearch-only 모드" (v14.5 와 동일하게 진행)
-   · 메타 M2 에 "Intake row 0건 — v14.5 graceful degradation" 명시.
+   · [Status 갱신 — v15.1] 다이제스트 페이지 생성 완료 후 아래 순서로 Notion MCP 갱신:
+     - Tier 3 카드화 row: Status → "Processed"
+     - Tier 2 Recall 요약 표에 기재된 row: Status → "Processed"
+     - 🔮 Watch item 으로 반영된 row: Status → "Processed"
+     - 13개 카테고리 필터에서 제외된 row: Status → "Skipped"
+     - 필수 필드 누락·Raw payload 없음·JSON 파싱 실패·Tier 판단 불가 row:
+       Status → "Error", M2 에 doc_id 와 사유 기록
+     - Status 갱신 도구가 없거나 갱신 실패 시: WARN 로그만 남기고 계속 진행
+       (갱신 실패가 다이제스트 생성을 중단하지 않음)
+     ※ Notion MCP update-page 도구명이 환경에 따라 다를 수 있으므로
+       사용 가능한 page-update 계열 도구를 사용한다.
+       update 도구 자체가 없으면 Status 변경을 생략하고 M2 에 "Status update 미지원"으로 기록.
+2. row 가 0건 → 두 가지 경우를 구분해 M2에 기록:
+   · Notion MCP 조회 자체가 정상 응답(결과 없음): "Intake row 0건 — v14.5 graceful degradation"
+   · Notion MCP 조회 API 에러: "Intake 조회 실패 (API 에러) — v14.5 graceful degradation"
+   어느 경우든 WebSearch-only 모드로 계속 진행.
 
 Notion MCP 가 사용 불가 / 데이터베이스 조회 실패 시에도 WebSearch-only 모드로 진행한다.
 
@@ -183,8 +212,11 @@ fallback 단계:
 [0순위 — 공식 API · 외부 위임 (v15.0)]
 v15.0 부터 Routine 은 공식 API 를 직접 호출하지 않는다. 대신 GitHub Actions 수집기가
 사전 호출한 결과를 Notion Intake DB 에서 읽는다 ([0단계 — Notion Intake 읽기] 참조).
-Routine 내부의 공식 API 직접 호출 · WebFetch 는 클라우드 egress 차단으로 403 이 정상이며
-시도하지 않는다. (이전 v14.4 의 best-effort 1회 시도 항목도 v15.0 에서는 제거.)
+Routine 내부에서 공식 API 직접 호출 또는 공식 사이트 specific URL 직접 fetch 는
+클라우드 egress 차단으로 403 이 정상이며 시도하지 않는다.
+단, [3순위 — Deep Dive Fetch Block] 에 명시된 보조 출처 5개 URL 은
+콘텐츠 흡수 목적으로 best-effort 1회 WebFetch 를 허용한다.
+(이전 v14.4 의 공식 사이트 best-effort 1회 시도 항목은 v15.0 에서 제거됨.)
 M3 메타의 "공식 API 호출" 라인은 "외부 수집기 위임 — 직접 호출 없음"으로 기록한다.
 
 [1순위 — Core 8] (매주 고정 기본 검색 8슬롯; fallback은 hard stop 범위 내에서만 수행)
@@ -288,6 +320,11 @@ A — Intake direct (공식 API 외부 수집)
    다음 조건을 모두 충족:
    1. Notion Intake row 에서 흡수한 항목일 것
    2. row 페이지 본문의 Raw API payload 가 보존돼 있을 것
+      ※ Raw payload 확인 절차: DB query 로 얻은 properties 만으로 Evidence A 를 부여하지 않는다.
+         각 Intake page 의 block children 을 조회해 "Raw API payload" heading 아래
+         code block 을 확인한다. code block 이 여러 조각으로 분할된 경우 순서대로 이어 붙여
+         JSON 으로 파싱한다. block children 조회 불가 또는 JSON 파싱 실패 시 Evidence A 불가
+         — 해당 row 는 Evidence B 로 강등하고 Status → "Needs Review" 로 기록한다.
    3. Source 가 Federal Register 인 경우 `document_number` · `html_url` · `publication_date` ·
       `title` 가 모두 비어있지 않을 것
    4. Source 가 OpenFDA Recall 인 경우 `recall_number` · `recalling_firm` · `reason_for_recall` ·
@@ -341,7 +378,10 @@ D — Watch item (예정·진행 중)
 L1: 항목별 specific URL → "FDA WL 722591"
     ⚠️ L1 추측 금지. WebSearch 결과 또는 공식 API에서 URL을 명시적으로
     확인한 경우에만 L1 사용. URL 패턴 유추로 가짜 링크 생성 절대 금지.
-    (v15.0) Intake 의 `Official URL` 은 raw API 가 직접 제공한 값이므로 L1 로 인정.
+    (v15.0) Federal Register Intake 의 `Official URL` (`html_url`) 은 raw API 가
+   직접 제공한 항목별 URL 이므로 L1 로 인정.
+   OpenFDA Recall Intake 의 `Official URL` 은 항목별 URL 이 없어 수집기가
+   FDA Recalls/Enforcement 인덱스 URL 로 고정하므로 L2 로 취급한다.
 L2: 카테고리 인덱스 페이지 → "FDA Warning Letters 인덱스 ⚠️"
     ⚠️ 다음 하드코딩 인덱스 URL 사용 (Claude 가 새로 검색·생성 금지):
     [L2 인덱스 URL 하드코딩]
@@ -409,7 +449,9 @@ Intake 흡수 항목과 WebSearch 결과를 통합한 경우:
 
 [필터 — 제외]
 - 임상시험/임상약리, 원료의약품(API; Active Pharmaceutical Ingredient) 단독 (제제 영향 없음)
-- 백신/세포/유전자치료제 (GMP 학습 가치 시 카테고리 12로 포함)
+- 백신/세포/유전자치료제: 기본 제외.
+  단, 해당 문서가 무균 제조 공정·Annex 1 개정·GMP 제조 시스템 변경을 다루는 경우에 한해
+  카테고리 12 (Sterile / Annex 1) 로 포함 가능 (제품 카테고리가 아닌 GMP 내용 기준).
 - 의료기기/화장품/식품, 단순 행정 변경
 
 [변경 유형]
@@ -424,6 +466,46 @@ Intake 흡수 항목과 WebSearch 결과를 통합한 경우:
 
 [H3 카테고리 prefix]
 (v14.5 와 동일: 🟧 / 🟦 / 🟫 / ⬜)
+(v15.1) Recall 카드 헤더에 "[Recall · Class {I/II/III} · {route}]" 텍스트 라벨 추가.
+이모지 prefix 신규 추가 없음 — 🟧 유지.
+
+[Recall 3-tier 처리 규칙 — v15.1]
+Recall 은 "규제 변화와 제조/품질 학습" 목적에 따라 3단계로 처리한다.
+카드화 기준을 높여 Recall 이 본문을 희석하지 않도록 한다.
+
+Tier 1 — 모니터링 (전체 recall):
+  M2 메타 "OpenFDA Recall: {N}건 (Run Date=...)" 한 줄로만 표기. 추가 처리 없음.
+
+Tier 2 — 학습 (관련 recall):
+  조건: route=ORAL 또는 dosage_form=TABLET/CAPSULE/EXTENDED-RELEASE TABLET 해당 항목.
+  처리: Tier 3 카드화 기준 미달 시 → 블록 5-R Recall 요약 표에만 기재. 카드 작성 금지.
+
+Tier 3 — 카드화 (핵심 recall):
+  다음 조건 중 하나 충족 시에만 본문 학습 카드 (블록 9~) 로 작성:
+  (a) Class I — 경구/비경구 무관하게 무조건 카드화
+  (b) Class II/III + (route=ORAL 또는 dosage_form=TABLET/CAPSULE/ER TABLET) +
+      reason_for_recall 에 다음 중 하나 포함:
+      dissolution · assay failure · impurity · nitrosamine · particulate ·
+      stability · out-of-specification · OOS · sterility
+  기준 미달 ORAL recall → Tier 2 표로 강등.
+  Non-ORAL recall → Tier 1 메타만.
+
+[우선순위 규칙 — v15.1]
+Class I recall 은 13개 카테고리 필터(QA Relevance) 판정과 무관하게 무조건 Tier 3 카드화한다.
+QA Relevance=Unrelated 이더라도 Class I 이면 카드화 기준이 적용됨.
+13개 카테고리 필터는 Class II/III recall 의 Tier 분류 판단에만 적용한다.
+
+[route · dosage_form 소재 — v15.1]
+Tier 2/3 분류에 필요한 route · dosage_form 은 다음 순서로 확인한다:
+  1. Intake row 의 `OSD Relevance` 속성 우선:
+     · Direct  → route=ORAL 또는 dosage_form=TABLET/CAPSULE/ER TABLET 해당 → Tier 2/3 후보
+     · N/A     → 해당 없음 → Tier 1 메타만
+     · Indirect → 경계 항목. 아래 2번 재확인 권장.
+  2. `OSD Relevance` 가 Indirect 이거나 속성이 없는 경우:
+     페이지 본문 Raw API payload 코드 블록의 `openfda.route` · `openfda.dosage_form` 배열을
+     직접 파싱해 route/form 해당 여부를 결정한다.
+`reason_for_recall` 은 Intake row `Body` 속성 또는 Raw API payload 의
+`reason_for_recall` 필드(동일 값)를 사용한다.
 
 [페이지 icon — 자동 매핑]
 (v14.5 와 동일)
@@ -440,7 +522,11 @@ Intake 흡수 항목과 WebSearch 결과를 통합한 경우:
 
 블록 순서:
 블록 1. Paragraph (헤더 메타라인) — v14.5 와 동일
-블록 2. Callout (blue_bg, 📌) — TL;DR 헤드라인 — v14.5 와 동일
+블록 2. Callout (blue_bg, 📌) — TL;DR 헤드라인 — v14.5 기준 + (v15.1) Tier 3 recall 우선 포함
+(v15.1) Recall 항목 TL;DR 포함 기준:
+- Class I Recall → 무조건 포함
+- Class II/III Recall + Tier 3 카드화 기준 충족 (ORAL + 공정 관련 failure mode) → 우선 포함
+- Tier 2 표 기재 항목 (카드화 미달) → TL;DR 포함 금지
 블록 3. Callout (default, 🗂) — 목차 (TOC) — v14.5 와 동일
 블록 4. Divider "---"
 블록 5. Callout (gray_bg, 🔍) — 검색 커버리지 (v15.0 신규 포맷)
@@ -451,10 +537,24 @@ Intake 흡수 항목과 WebSearch 결과를 통합한 경우:
 - "공식 API 직접호출 0/2 (외부 수집기 위임)" 는 고정 표기. Routine 측에서는 호출하지 않음.
 - 그 외 항목 형식은 v14.5 와 동일.
 
+블록 5-R. Callout (gray_bg, 📋) — Recall 요약 표 (v15.1 신규)
+출력 조건: 당주 Tier 2 해당 항목 (ORAL/TABLET/CAPSULE recall 중 Tier 3 카드화 기준 미달) 이 1건 이상일 때만 출력. 0건이면 블록 전체 생략.
+형식:
+"📋  이번 주 Recall 참고 ({N}건 — 모니터링)"
+표:
+| Firm | Product | Failure Mode | Class | Route |
+|---|---|---|---|---|
+| {recalling_firm} | {product_description 핵심 약칭} | {reason_for_recall 핵심어} | {classification} | {route} |
+규칙:
+- Tier 3 카드화 항목은 이 표에 중복 기재 금지 (카드에만 등장).
+- 표 하단: "📎  FDA Recalls/Enforcement ⚠️  https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" (L2 링크 고정).
+- 이 블록은 학습 카드가 아님. 시사점 callout 작성 금지.
+
 블록 6. Heading 2 — "## 📑  이번 주 한눈에 ({N}건)"
 블록 7. Callout (default, 📑) — 한눈에 표 — v14.5 와 동일
 블록 8. Divider "---"
 블록 9~. Heading 2 + 사례 카드 — v14.5 와 동일 구조 (W1~W9 / 가이드라인 카드)
+(v15.1) Recall 은 [Recall 3-tier 처리 규칙 — v15.1] Tier 3 기준 충족 항목만 카드화. 기준 미달 Recall 카드 작성 금지.
 
 블록 W2 (메타 표) — Evidence A 셀 예시:
 | **🔍  Evidence Level** | A — Intake direct (API raw) |
@@ -504,7 +604,7 @@ Intake 흡수 항목과 WebSearch 결과를 통합한 경우:
 "WebSearch fallback 적용 슬롯: {슬롯 번호 · 적용 단계}"
 "WebFetch 횟수: {N}개 / 한도 5개 (접근 성공 {N} / 실패 {N} / 유효항목 {M})"
 "Intake 읽기 — 실행일(KST) 필터: Run Date={YYYY-MM-DD} · 조회 결과 {N}건 (FR {N} · Recall {N}) · Notion DB `GRS API Intake` (ID 7784c71fb7b343749b2bee5d04db7926)"
-"공식 API 호출: 외부 수집기 위임 (Routine 직접 호출 없음 — GitHub Actions 일요일 22:00 UTC)"
+"공식 API 호출: 외부 수집기 위임 (Routine 직접 호출 없음 — GitHub Actions 일요일 20:17 UTC / 월요일 05:17 KST)"
 "TGA 임시 가중치: Core 8 슬롯 (실사 임박, 종료 후 Deep Dive로 이동 예정)"
 "API-WebSearch 불일치: {기록 또는 '없음'}"
    (v15.0) 이제 'Intake-WebSearch 불일치' 가 주요 점검 대상.

@@ -259,18 +259,32 @@ if ($script:LastNativeExit -eq 0) {
 Write-Title "5. Register GitHub Secrets"
 
 function Set-RepoSecret($name, $value) {
-    # Write secret to a 0-permission temp file, pass to gh via stdin redirection,
-    # delete immediately. Avoids leaking to process list (cmd args) or log files.
+    # Write secret to a temp file with restricted ACL, pass path via --body-file,
+    # then delete immediately. Prevents secret from appearing in process list (argv).
     $tmp = New-TemporaryFile
     try {
+        # Restrict temp file to current user only before writing
+        $acl = Get-Acl -LiteralPath $tmp.FullName
+        $acl.SetAccessRuleProtection($true, $false)
+        $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
+            [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
+            'FullControl', 'Allow')
+        $acl.SetAccessRule($rule)
+        Set-Acl -LiteralPath $tmp.FullName -AclObject $acl
+
         [System.IO.File]::WriteAllText($tmp.FullName, $value, [System.Text.UTF8Encoding]::new($false))
-        $content = Get-Content -Raw -LiteralPath $tmp.FullName
-        Invoke-Native { gh secret set $name --repo "$ghUser/$RepoName" --body $content } | Out-Null
+        # --body-file passes the secret via file path, not argv
+        Invoke-Native { gh secret set $name --repo "$ghUser/$RepoName" --body-file $tmp.FullName } | Out-Null
         if ($script:LastNativeExit -ne 0) {
             throw "gh secret set $name failed (exit $($script:LastNativeExit))"
         }
     } finally {
-        if (Test-Path -LiteralPath $tmp.FullName) { Remove-Item -Force -LiteralPath $tmp.FullName }
+        if (Test-Path -LiteralPath $tmp.FullName) {
+            # Overwrite with zeros before deletion to reduce forensic recovery risk
+            [System.IO.File]::WriteAllText($tmp.FullName, ("`0" * $value.Length),
+                [System.Text.UTF8Encoding]::new($false))
+            Remove-Item -Force -LiteralPath $tmp.FullName
+        }
     }
 }
 

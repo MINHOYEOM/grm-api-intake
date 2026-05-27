@@ -75,13 +75,15 @@ PROP_STATUS = "Status"
 SOURCE_FR = "Federal Register"
 SOURCE_RECALL = "OpenFDA Recall"
 
-# 13 개 카테고리 휴리스틱 키워드 (lowercase 비교)
+# 13 개 카테고리 휴리스틱 키워드 (lowercase 비교, 단어 경계 매칭)
+# 주의: 단독 약어("csv", "oos" 등)는 \b 경계 매칭으로 오탐 방지됨
 QA_CATEGORY_KEYWORDS = [
     "gmp", "cgmp", "manufacturing practice",
     "pharmaceutical quality system", "pqs", "ich q10",
     "quality risk management", "qrm", "ich q9",
     "data integrity", "alcoa", "part 11", "annex 11",
-    "computer system validation", "csv", "artificial intelligence",
+    "computer system validation", "artificial intelligence",
+    # "csv" 단독 제거 → "computer system validation" 으로 대체 (CSV 파일 형식 오탐 방지)
     "process validation", "cleaning validation",
     "analytical procedure", "ich q2", "ich q14",
     "post-approval", "cmc change", "ich q12",
@@ -90,6 +92,16 @@ QA_CATEGORY_KEYWORDS = [
     "deviation", "capa", "change control",
     "sterile", "annex 1",
     "supplier qualification",
+    # OpenFDA Recall 특화 — 경구 고형제 failure mode (v15.1 추가)
+    "dissolution", "assay failure", "out of specification",
+    "particulate matter", "particulate contamination",
+    "subpotent", "superpotent", "mislabeling", "mislabelled",
+    "endotoxin",
+    # Nitrosamine 계열 (FDA hot topic)
+    "nitrosamine", "ndma", "ndea", "n-nitroso",
+    # 주요 generic 제조사 (경쟁사 학습 가치)
+    "alkem", "aurobindo", "lupin", "zydus",
+    "dr. reddy", "dr reddy",
 ]
 
 # Likely 가산 키워드 (경구 고형제 · 정제 직접 연관)
@@ -97,9 +109,14 @@ QA_LIKELY_BOOST = [
     "tablet", "capsule", "oral solid", "solid dosage",
     "warning letter", "dissolution", "uniformity of dosage",
     "data integrity", "annex 1", "cgmp",
+    # Recall 고신호 failure mode (v15.1 추가)
+    "dissolution failure", "failed dissolution",
+    "nitrosamine impurity", "ndma impurity",
 ]
 
 # 명시 제외 (medical device · 화장품 · 식품 · 백신 단독 등)
+# 주의: "food safety" 는 단어 경계 매칭이므로 "food safety" + "drug GMP" 동시 포함 문서는
+# 아래 강력 키워드 로직으로 Possible 로 살아남음
 QA_EXCLUDE_KEYWORDS = [
     "medical device", "device only",
     "cosmetic", "cosmetics",
@@ -109,6 +126,15 @@ QA_EXCLUDE_KEYWORDS = [
 
 # 13 개 카테고리 통과를 위한 최소 매칭 키워드 수
 QA_MIN_MATCH = 1
+
+# OSD (경구 고형제) Relevance 분류 기준 (v15.1 추가)
+PROP_OSD_RELEVANCE = "OSD Relevance"   # Notion select: Direct / Indirect / N/A
+OSD_ROUTES = {"oral"}
+OSD_FORMS = {
+    "tablet", "capsule", "extended-release tablet", "er tablet",
+    "delayed-release tablet", "chewable tablet", "orally disintegrating tablet",
+    "powder for oral solution", "oral solution", "oral suspension",
+}
 
 FR_PER_PAGE = 100  # API 최대치
 OPENFDA_LIMIT = 100  # no-key 한도, key 있어도 안전치
@@ -137,6 +163,7 @@ class IntakeItem:
     comments_close_iso: str = ""
     api_query: str = ""
     qa_relevance: str = "Pending"
+    osd_relevance: str = "N/A"   # "Direct" | "Indirect" | "N/A" — Recall 전용, FR 은 N/A
     raw_payload: dict[str, Any] = field(default_factory=dict)
 
 
@@ -145,20 +172,31 @@ class CollectionStats:
     fr_fetched: int = 0
     fr_inserted: int = 0
     fr_skipped_dup: int = 0
+    fr_insert_failed: int = 0       # Notion 삽입 최종 실패 건수
+    fr_truncated: bool = False      # FR pagination 안전 상한 초과 여부
     fr_error: bool = False
     fr_error_msg: str = ""
     recall_fetched: int = 0
     recall_inserted: int = 0
     recall_skipped_dup: int = 0
+    recall_insert_failed: int = 0   # Notion 삽입 최종 실패 건수
+    recall_truncated: bool = False  # OPENFDA_MAX_TOTAL 상한 초과 여부 (v15.1)
     recall_error: bool = False
     recall_error_msg: str = ""
 
+    def has_insert_failures(self) -> bool:
+        return self.fr_insert_failed > 0 or self.recall_insert_failed > 0
+
     def summary(self) -> str:
+        fr_warn = " ⚠️ TRUNCATED" if self.fr_truncated else ""
+        rec_warn = " ⚠️ TRUNCATED" if self.recall_truncated else ""
         return (
             f"FR  fetched={self.fr_fetched}  inserted={self.fr_inserted}  "
-            f"skip_dup={self.fr_skipped_dup}  error={self.fr_error}\n"
+            f"skip_dup={self.fr_skipped_dup}  failed={self.fr_insert_failed}  "
+            f"error={self.fr_error}{fr_warn}\n"
             f"REC fetched={self.recall_fetched}  inserted={self.recall_inserted}  "
-            f"skip_dup={self.recall_skipped_dup}  error={self.recall_error}"
+            f"skip_dup={self.recall_skipped_dup}  failed={self.recall_insert_failed}  "
+            f"error={self.recall_error}{rec_warn}"
         )
 
 
@@ -201,15 +239,29 @@ def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
     return [text[i : i + size] for i in range(0, len(text), size)]
 
 
+class HTTPClientError(RuntimeError):
+    """4xx HTTP 에러 전용 예외 — status_code 속성으로 정확한 판별 가능."""
+    def __init__(self, status_code: int, url: str, msg: str = "") -> None:
+        super().__init__(msg or f"HTTP {status_code} for {url}")
+        self.status_code = status_code
+
+
 def http_get_json(url: str, *, params: dict[str, Any] | None = None,
                   timeout: int = 30, retries: int = 2) -> dict[str, Any]:
+    """JSON GET 요청. 4xx 는 HTTPClientError (재시도 없음), 5xx/네트워크 오류는 지수 백오프 재시도."""
     last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
             resp = requests.get(url, params=params, timeout=timeout,
                                 headers={"User-Agent": "GRS-Intake/1.0 (+github-actions)"})
+            if 400 <= resp.status_code < 500:
+                # 4xx 는 재시도해도 동일 결과 — 즉시 HTTPClientError 발생
+                raise HTTPClientError(resp.status_code, url,
+                                      f"HTTP {resp.status_code} for {url}")
             resp.raise_for_status()
             return resp.json()
+        except HTTPClientError:
+            raise  # 재시도 없이 전파
         except requests.RequestException as e:  # noqa: PERF203
             last_err = e
             log("WARN", f"GET 실패 ({attempt + 1}/{retries + 1}) url={url} err={e}")
@@ -223,20 +275,37 @@ def http_get_json(url: str, *, params: dict[str, Any] | None = None,
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def _kw_match(blob: str, keywords: list[str]) -> int:
+    """단어 경계(\b) 기반 키워드 매칭 카운트.
+    복합어("manufacturing practice")는 전체 구문을 단어 경계로 감쌈.
+    단독 약어("oos", "oot", "pqs") 오탐 방지.
+    """
+    count = 0
+    for kw in keywords:
+        pattern = r"\b" + re.escape(kw) + r"\b"
+        if re.search(pattern, blob):
+            count += 1
+    return count
+
+
+def _kw_any(blob: str, keywords: list[str]) -> bool:
+    return _kw_match(blob, keywords) > 0
+
+
 def compute_relevance(*text_parts: str) -> str:
     blob = " ".join(t for t in text_parts if t).lower()
     if not blob.strip():
         return "Pending"
-    if any(ex in blob for ex in QA_EXCLUDE_KEYWORDS):
-        # 단, 명시 제외 키워드가 있어도 GMP/CGMP/data integrity 가 강하게 들어있으면 Possible
-        strong = sum(1 for kw in QA_LIKELY_BOOST if kw in blob)
+    if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
+        # 명시 제외 키워드가 있어도 Likely 가산 키워드 2개 이상이면 Possible 로 구제
+        strong = _kw_match(blob, QA_LIKELY_BOOST)
         if strong >= 2:
             return "Possible"
         return "Unrelated"
-    matches = sum(1 for kw in QA_CATEGORY_KEYWORDS if kw in blob)
+    matches = _kw_match(blob, QA_CATEGORY_KEYWORDS)
     if matches < QA_MIN_MATCH:
         return "Pending"
-    boosts = sum(1 for kw in QA_LIKELY_BOOST if kw in blob)
+    boosts = _kw_match(blob, QA_LIKELY_BOOST)
     if boosts >= 1:
         return "Likely"
     return "Possible"
@@ -244,6 +313,94 @@ def compute_relevance(*text_parts: str) -> str:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Federal Register 수집
+# ─────────────────────────────────────────────────────────────────────────────
+# OSD Relevance 분류 (v15.1)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def _as_lower_set(value: Any) -> set[str]:
+    """openfda.route / dosage_form 필드를 안전하게 소문자 set으로 변환.
+
+    OpenFDA API 는 list[str] 를 반환하는 것이 정상이지만,
+    string / None / 기타 타입이 오더라도 예외 없이 처리한다.
+    """
+    if value is None:
+        return set()
+    if isinstance(value, str):
+        return {value.lower()}
+    if isinstance(value, list):
+        return {str(v).lower() for v in value if v}
+    return {str(value).lower()}
+
+
+# 경구 고형제 판정에 사용하는 부분문자열 토큰 (exact set 매칭 대신)
+OSD_SOLID_TERMS = [
+    "tablet", "capsule", "oral solid", "solid dosage",
+    "extended-release", "delayed-release",
+    "orally disintegrating", "chewable",
+]
+
+
+def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
+    """OpenFDA raw payload 에서 경구 고형제(OSD) 직접 관련성 판정.
+
+    분류 기준 (v15.1 개선):
+        "Direct"   — dosage_form 에 tablet/capsule/oral solid 계열 단어 포함
+                     (exact match 가 아닌 부분문자열 매칭으로 복합 형태 처리)
+        "Indirect" — tablet/capsule 확인 안 됐지만 route=oral 이거나
+                     product_description 에 경구 단서 있음
+        "N/A"      — 경구/고형제 근거 없음
+
+    설계 의도:
+        시스템 목표가 "경구 고형제(정제) 중심"이므로
+        oral solution/suspension 은 route=oral 이더라도 Direct 가 아닌 Indirect 로 분류.
+        Recall Tier 분류에서 Direct → Tier 2/3 후보, Indirect → 경계 항목으로 재확인.
+    """
+    openfda = raw_payload.get("openfda") or {}
+    routes = _as_lower_set(openfda.get("route"))
+    forms = _as_lower_set(openfda.get("dosage_form"))
+
+    # 1순위: dosage_form 에 고형제 토큰 포함 여부 (부분문자열)
+    if any(term in f for f in forms for term in OSD_SOLID_TERMS):
+        return "Direct"
+
+    # 2순위: route=oral 이면 경구 투여 확인 → Indirect (oral solution/suspension 포함)
+    if "oral" in routes:
+        return "Indirect"
+
+    # 3순위: openfda 필드 없거나 미제공 시 product_description 에서 단서 탐색
+    product = (raw_payload.get("product_description") or "").lower()
+    if re.search(r"\b(tablets?|capsules?|oral)\b", product):
+        return "Indirect"
+
+    return "N/A"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 날짜 유틸
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def _safe_date_iso(value: str, context: str = "") -> str:
+    """날짜 문자열 검증 후 YYYY-MM-DD 반환. 실패 시 "" 반환 + WARN 로그.
+
+    지원 포맷:
+        - YYYY-MM-DD (ISO 8601)
+        - YYYYMMDD   (OpenFDA report_date 형식) → 자동 변환
+    """
+    if not value:
+        return ""
+    # YYYYMMDD → YYYY-MM-DD
+    if len(value) == 8 and value.isdigit():
+        value = f"{value[0:4]}-{value[4:6]}-{value[6:8]}"
+    try:
+        datetime.fromisoformat(value)
+        return value
+    except ValueError:
+        log("WARN", f"날짜 파싱 실패 (context={context}): {value!r} → 빈 문자열 처리")
+        return ""
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -266,8 +423,10 @@ def collect_federal_register(start: date, end: date) -> tuple[list[IntakeItem], 
         while next_url:
             page_count += 1
             if page_count > 10:
-                log("WARN", "FR pagination 10 페이지 초과 — 안전 중단")
-                break
+                msg = (f"FR pagination 10페이지 상한 초과 — truncated "
+                       f"(수집 {len(items)}건, 이후 항목 누락 가능)")
+                log("WARN", msg)
+                return items, msg   # fr_error=True 로 집계됨
             data = http_get_json(next_url)
             results = data.get("results", []) or []
             log("INFO", f"FR page {page_count}: {len(results)} 건")
@@ -283,11 +442,13 @@ def collect_federal_register(start: date, end: date) -> tuple[list[IntakeItem], 
 def _fr_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
     doc_id = str(r.get("document_number") or "").strip()
     title = (r.get("title") or "").strip()
-    pub = (r.get("publication_date") or "").strip()
+    pub = _safe_date_iso((r.get("publication_date") or "").strip(),
+                         context=f"FR/{doc_id}")
     html_url = (r.get("html_url") or "").strip()
     doc_type = (r.get("type") or "").strip()
     abstract = (r.get("abstract") or "").strip()
-    comments_close = (r.get("comments_close_on") or "").strip()
+    comments_close = _safe_date_iso((r.get("comments_close_on") or "").strip(),
+                                    context=f"FR/{doc_id}/comments_close")
 
     relevance = compute_relevance(title, abstract, doc_type)
 
@@ -302,6 +463,8 @@ def _fr_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
         comments_close_iso=comments_close,
         api_query=api_query_url,
         qa_relevance=relevance,
+        # FR 항목은 OSD Relevance 분류 대상 아님
+        osd_relevance="N/A",
         raw_payload=r,
     )
 
@@ -334,21 +497,26 @@ def collect_openfda_recalls(start: date, end: date,
                 log("INFO", f"OpenFDA 호출: {api_query_url_for_log}")
             try:
                 data = http_get_json(url)
-            except RuntimeError as e:
-                # HTTP 404 가 0 건일 때 정상 응답으로도 옴 (OpenFDA 관행)
-                msg = str(e)
-                if "404" in msg:
+            except HTTPClientError as e:
+                # OpenFDA 는 해당 기간 결과 0건일 때 404 를 반환하는 것이 관행
+                if e.status_code == 404:
                     log("INFO", "OpenFDA 404 (해당 기간 결과 0건) — 정상 종료")
                     return items, None
-                raise
+                # 404 외 4xx (401, 403 등) 는 실제 에러로 처리
+                raise RuntimeError(str(e)) from e
             results = data.get("results", []) or []
             meta_total = (data.get("meta", {}).get("results", {}) or {}).get("total", 0)
             log("INFO", f"OpenFDA skip={skip}: {len(results)} 건 (total {meta_total})")
             for r in results:
                 items.append(_recall_to_item(r, api_query_url_for_log or url))
             skip += len(results)
-            if not results or skip >= meta_total or skip >= OPENFDA_MAX_TOTAL:
+            if not results or skip >= meta_total:
                 break
+            if skip >= OPENFDA_MAX_TOTAL:
+                msg = (f"OpenFDA OPENFDA_MAX_TOTAL({OPENFDA_MAX_TOTAL}) 상한 초과 — truncated "
+                       f"(수집 {len(items)}건, meta.total={meta_total}, 이후 항목 누락 가능)")
+                log("WARN", msg)
+                return items, msg   # recall_truncated=True 로 집계됨
         return items, None
     except Exception as e:
         log("ERROR", f"OpenFDA 수집 실패: {e}")
@@ -369,15 +537,12 @@ def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
     report_date_raw = (r.get("report_date") or "").strip()  # YYYYMMDD
     product_type = (r.get("product_type") or "").strip()
 
-    # report_date YYYYMMDD → YYYY-MM-DD
-    date_iso = ""
-    if len(report_date_raw) == 8 and report_date_raw.isdigit():
-        date_iso = f"{report_date_raw[0:4]}-{report_date_raw[4:6]}-{report_date_raw[6:8]}"
-    else:
-        date_iso = report_date_raw  # fallback
+    # report_date YYYYMMDD → YYYY-MM-DD (_safe_date_iso 가 변환 + 검증 처리)
+    date_iso = _safe_date_iso(report_date_raw, context=f"Recall/{recall_number}")
 
     headline = product or firm or recall_number
     relevance = compute_relevance(product, reason, firm, distribution, product_type)
+    osd_rel = compute_osd_relevance(r)
 
     return IntakeItem(
         source=SOURCE_RECALL,
@@ -391,6 +556,7 @@ def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
         distribution=distribution,
         api_query=api_query_url,
         qa_relevance=relevance,
+        osd_relevance=osd_rel,
         raw_payload=r,
     )
 
@@ -408,8 +574,20 @@ def notion_headers(token: str) -> dict[str, str]:
     }
 
 
+class NotionDedupeQueryError(RuntimeError):
+    """Notion 중복 조회 실패 전용 예외 — insert 중단 판단에 사용."""
+    pass
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date) -> set[str]:
-    """오늘(KST) 분 Run Date 와 일치하는 row 의 Document ID set 반환 — 중복 방지."""
+    """오늘(KST) Run Date 와 일치하는 row 의 'source::document_id' key set 반환.
+
+    dedupe key 형식: "{SOURCE_FR}::{doc_id}" 또는 "{SOURCE_RECALL}::{doc_id}"
+    Source 를 포함해 Federal Register 와 OpenFDA Recall 간 ID 충돌을 방지한다.
+
+    Raises:
+        NotionDedupeQueryError: 조회 실패 시 — caller 가 insert 중단 여부를 결정.
+    """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     existing: set[str] = set()
     body: dict[str, Any] = {
@@ -431,17 +609,22 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date) -> set
             data = resp.json()
             for pg in data.get("results", []):
                 props = pg.get("properties", {})
+                # Source
+                src = (props.get(PROP_SOURCE, {}).get("select") or {}).get("name", "")
+                # Document ID
                 doc_id_arr = props.get(PROP_DOC_ID, {}).get("rich_text", [])
-                if doc_id_arr:
-                    txt = "".join(rt.get("plain_text", "") for rt in doc_id_arr).strip()
-                    if txt:
-                        existing.add(txt)
+                doc_id = "".join(rt.get("plain_text", "") for rt in doc_id_arr).strip()
+                if src and doc_id:
+                    existing.add(f"{src}::{doc_id}")
             if not data.get("has_more"):
                 break
             start_cursor = data.get("next_cursor")
     except requests.RequestException as e:
-        log("WARN", f"Notion 중복 조회 실패 — 중복 검사 건너뜀: {e}")
-        return set()
+        # 중복 조회 실패 시 빈 set을 반환하면 모든 item을 신규로 판단해 대량 중복 insert 위험.
+        # 안전하게 예외를 던져 caller 가 insert 중단 여부를 결정하도록 한다.
+        raise NotionDedupeQueryError(
+            f"Notion 중복 조회 실패 (RunDate={run_date}): {e}"
+        ) from e
     log("INFO", f"Notion 기존 row {len(existing)} 건 (RunDate={run_date})")
     return existing
 
@@ -491,6 +674,7 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         PROP_COLLECTED_AT: _datetime_iso(collected_at),
         PROP_RUN_DATE: {"date": {"start": run_date.isoformat()}},
         PROP_QA_RELEVANCE: _select(item.qa_relevance),
+        PROP_OSD_RELEVANCE: _select(item.osd_relevance),
         PROP_STATUS: _select("New"),
     }
 
@@ -549,23 +733,64 @@ def build_notion_children(item: IntakeItem) -> list[dict[str, Any]]:
 
 
 def notion_create_page(token: str, db_id: str, item: IntakeItem,
-                       run_date: date, collected_at: datetime) -> bool:
+                       run_date: date, collected_at: datetime,
+                       retries: int = 2) -> bool:
+    """Notion 페이지 생성. 429/5xx 는 재시도, 4xx(429 제외)는 즉시 실패."""
     body = {
         "parent": {"database_id": db_id},
         "properties": build_notion_properties(item, run_date, collected_at),
         "children": build_notion_children(item),
     }
-    try:
-        resp = requests.post(NOTION_PAGES_URL, json=body,
-                             headers=notion_headers(token), timeout=30)
-        if resp.status_code >= 400:
-            log("ERROR", f"Notion 페이지 생성 실패 ({resp.status_code}) "
-                        f"doc={item.document_id} body={resp.text[:300]}")
+    # 재시도 불필요 상태 코드 (클라이언트 에러 — 재시도해도 동일 결과)
+    _NO_RETRY_CODES = {400, 401, 403, 404, 409}
+
+    last_err: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(NOTION_PAGES_URL, json=body,
+                                 headers=notion_headers(token), timeout=30)
+            if resp.status_code < 400:
+                return True
+            if resp.status_code in _NO_RETRY_CODES:
+                log("ERROR", f"Notion 페이지 생성 실패 ({resp.status_code}, 재시도 없음) "
+                            f"doc={item.document_id} body={resp.text[:300]}")
+                return False
+            if resp.status_code == 429:
+                # Retry-After 파싱: 정수/소수/빈 헤더 모두 안전 처리, 상한 30s 적용
+                _MAX_RETRY_SLEEP = 30
+                raw_ra = resp.headers.get("Retry-After", "")
+                try:
+                    retry_after = min(int(float(raw_ra)), _MAX_RETRY_SLEEP)
+                except (ValueError, TypeError):
+                    retry_after = min(2 ** attempt, _MAX_RETRY_SLEEP)
+                # 마지막 attempt 직전에는 sleep 후 재시도해도 의미 없으므로 생략
+                if attempt < retries:
+                    log("WARN", f"Notion 429 rate-limit doc={item.document_id} "
+                                f"— {retry_after}s 후 재시도 ({attempt + 1}/{retries + 1})")
+                    time.sleep(retry_after)
+                continue
+            # 500/502/503/504 등 서버 에러 — 지수 백오프 재시도
+            log("WARN", f"Notion 페이지 생성 실패 ({resp.status_code}) "
+                        f"doc={item.document_id} attempt={attempt + 1}/{retries + 1} "
+                        f"body={resp.text[:200]}")
+            if attempt < retries:
+                time.sleep(2 ** attempt)
+        except requests.Timeout as e:
+            # Timeout: Notion이 서버 측에서 이미 row를 생성했을 수 있으므로 retry 금지.
+            # retry 시 duplicate row 위험. 즉시 실패 처리 후 상위에서 insert_failed 집계.
+            log("ERROR", f"Notion 페이지 생성 timeout — retry 금지 (duplicate 방지) "
+                         f"doc={item.document_id} err={e}")
             return False
-        return True
-    except requests.RequestException as e:
-        log("ERROR", f"Notion 페이지 생성 예외 doc={item.document_id} err={e}")
-        return False
+        except requests.RequestException as e:
+            # 그 외 네트워크 오류 (ConnectionError 등): 서버 미수신 가능성 높으므로 재시도
+            last_err = e
+            log("WARN", f"Notion 페이지 생성 네트워크 오류 doc={item.document_id} "
+                        f"attempt={attempt + 1}/{retries + 1} err={e}")
+            if attempt < retries:
+                time.sleep(2 ** attempt)
+
+    log("ERROR", f"Notion 페이지 생성 최종 실패 doc={item.document_id} last_err={last_err}")
+    return False
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -575,29 +800,36 @@ def notion_create_page(token: str, db_id: str, item: IntakeItem,
 
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
-                 existing_ids: set[str], dry_run: bool) -> tuple[int, int]:
+                 existing_ids: set[str], dry_run: bool) -> tuple[int, int, int]:
+    """삽입 실행. 반환: (inserted, skipped, failed)"""
     inserted = 0
     skipped = 0
+    failed = 0
     for item in items:
         if not item.document_id:
             log("WARN", f"document_id 없음 — skip (source={item.source})")
             continue
-        if item.document_id in existing_ids:
+        # dedupe key = "source::document_id" (source 포함으로 FR/Recall ID 충돌 방지)
+        dedup_key = f"{item.source}::{item.document_id}"
+        if dedup_key in existing_ids:
             skipped += 1
             continue
         if dry_run:
             log("INFO", f"[DRY] insert source={item.source} id={item.document_id} "
                        f"date={item.date_iso} rel={item.qa_relevance} head={truncate(item.headline, 60)}")
             inserted += 1
-            existing_ids.add(item.document_id)
+            existing_ids.add(dedup_key)
             continue
+        # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
+        time.sleep(0.34)
         ok = notion_create_page(token, db_id, item, run_date, collected_at)
         if ok:
             inserted += 1
-            existing_ids.add(item.document_id)
+            existing_ids.add(dedup_key)
         else:
-            log("WARN", f"insert 실패 — 다음 항목으로 진행 doc={item.document_id}")
-    return inserted, skipped
+            failed += 1
+            log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id}")
+    return inserted, skipped, failed
 
 
 def main() -> int:
@@ -605,7 +837,8 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true",
                         help="Notion 호출 없이 stdout 만 출력")
     parser.add_argument("--window-days", type=int, default=7,
-                        help="수집 윈도우 (default 7)")
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="수집 윈도우 일수 1~90 (default 7)")
     args = parser.parse_args()
 
     notion_token = os.environ.get("NOTION_TOKEN", "").strip()
@@ -630,6 +863,8 @@ def main() -> int:
     if fr_err:
         stats.fr_error = True
         stats.fr_error_msg = fr_err
+        if "truncated" in fr_err:
+            stats.fr_truncated = True
 
     # 2) OpenFDA Recall
     recall_items, rec_err = collect_openfda_recalls(start, end, openfda_key)
@@ -637,6 +872,8 @@ def main() -> int:
     if rec_err:
         stats.recall_error = True
         stats.recall_error_msg = rec_err
+        if "truncated" in rec_err:
+            stats.recall_truncated = True
 
     log("INFO", f"수집 완료: FR={stats.fr_fetched}건 · Recall={stats.recall_fetched}건")
 
@@ -644,20 +881,27 @@ def main() -> int:
     if args.dry_run:
         existing: set[str] = set()
     else:
-        existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date)
+        try:
+            existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date)
+        except NotionDedupeQueryError as e:
+            # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
+            log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
+            return 1
 
     collected_at = now_k
 
-    # 4) 삽입
-    fr_in, fr_sk = insert_items(notion_token, notion_db, fr_items,
-                                run_date, collected_at, existing, args.dry_run)
+    # 4) 삽입 (반환: inserted, skipped, failed)
+    fr_in, fr_sk, fr_fail = insert_items(notion_token, notion_db, fr_items,
+                                         run_date, collected_at, existing, args.dry_run)
     stats.fr_inserted = fr_in
     stats.fr_skipped_dup = fr_sk
+    stats.fr_insert_failed = fr_fail
 
-    rec_in, rec_sk = insert_items(notion_token, notion_db, recall_items,
-                                  run_date, collected_at, existing, args.dry_run)
+    rec_in, rec_sk, rec_fail = insert_items(notion_token, notion_db, recall_items,
+                                            run_date, collected_at, existing, args.dry_run)
     stats.recall_inserted = rec_in
     stats.recall_skipped_dup = rec_sk
+    stats.recall_insert_failed = rec_fail
 
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
@@ -669,13 +913,26 @@ def main() -> int:
                 f.write("## GRS Intake Collection Summary\n\n")
                 f.write(f"- Run date (KST): `{run_date.isoformat()}`\n")
                 f.write(f"- Window: `{start.isoformat()}` ~ `{end.isoformat()}`\n")
-                f.write(f"- Federal Register: fetched {stats.fr_fetched} · "
+                fr_prefix = "⚠️ " if (stats.fr_error or stats.fr_insert_failed > 0
+                                       or stats.fr_truncated) else ""
+                f.write(f"- {fr_prefix}Federal Register: fetched {stats.fr_fetched} · "
                         f"inserted {stats.fr_inserted} · skip-dup {stats.fr_skipped_dup} · "
-                        f"error `{stats.fr_error_msg or 'none'}`\n")
-                f.write(f"- OpenFDA Recall: fetched {stats.recall_fetched} · "
+                        f"failed {stats.fr_insert_failed} · "
+                        f"error `{stats.fr_error_msg or 'none'}`"
+                        f"{' · ⚠️ TRUNCATED' if stats.fr_truncated else ''}\n")
+                rec_prefix = "⚠️ " if (stats.recall_error or stats.recall_insert_failed > 0
+                                        or stats.recall_truncated) else ""
+                f.write(f"- {rec_prefix}OpenFDA Recall: fetched {stats.recall_fetched} · "
                         f"inserted {stats.recall_inserted} · skip-dup {stats.recall_skipped_dup} · "
-                        f"error `{stats.recall_error_msg or 'none'}`\n")
+                        f"failed {stats.recall_insert_failed} · "
+                        f"error `{stats.recall_error_msg or 'none'}`"
+                        f"{' · ⚠️ TRUNCATED' if stats.recall_truncated else ''}\n")
                 f.write(f"- Dry run: `{args.dry_run}`\n")
+                if stats.has_insert_failures():
+                    total_fail = stats.fr_insert_failed + stats.recall_insert_failed
+                    f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "
+                            f"해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다. "
+                            f"Actions 로그에서 doc ID 확인 후 필요 시 수동 재실행.\n")
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 

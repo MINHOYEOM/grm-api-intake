@@ -38,7 +38,8 @@
 | `Collected At` | Date | ✓ | 수집 실행 timestamp (with time) | 동일 | 감사 추적용 |
 | `API Query` | URL | ✓ | 호출한 FR API URL | 호출한 OpenFDA API URL | Evidence A 정보 출처 |
 | `QA Relevance` | Select |  | `Likely / Possible / Unrelated / Pending` | 동일 | 4개 옵션 사전 등록됨 |
-| `Status` | Select |  | `New / Processed / Skipped / Error` | 동일 | 4개 옵션 사전 등록됨, Routine 이 갱신 |
+| `OSD Relevance` | Select |  | `N/A` (FR 항목) | `Direct / Indirect / N/A` | **v15.1 신규** — Notion에 수동 추가 필요. 옵션 3개: Direct, Indirect, N/A |
+| `Status` | Select |  | `New / Processed / Skipped / Error` | 동일 | 4개 옵션 사전 등록됨, Routine 이 갱신 (v15.1: Processed/Skipped 실제 갱신 지시 추가됨) |
 
 ## 페이지 본문(children)
 
@@ -59,20 +60,28 @@
 | `Unrelated` | 명시 제외 키워드 (medical device only, cosmetics, food safety, vaccine only 등) |
 | `Pending` | 휴리스틱으로 판정 불가 (Routine 판정 대기) |
 
-13개 카테고리 키워드 (수집기 코드와 일치):
+13개 카테고리 키워드 (단일 진실 공급원: `collect_intake.py`의 `QA_CATEGORY_KEYWORDS` 상수):
+
+> **주의**: 이 목록은 참고용입니다. 코드 변경 시 이 섹션도 함께 갱신하세요.
+> 실제 매칭은 단어 경계(`\b`) 기반으로 수행합니다 (v15.1 개선).
+
 - GMP, CGMP, manufacturing practice
 - Pharmaceutical Quality System, PQS, ICH Q10
 - Quality Risk Management, QRM, ICH Q9
 - data integrity, ALCOA, Part 11, Annex 11
-- computer system validation, CSV, artificial intelligence pharma
+- computer system validation, artificial intelligence
+  *(주의: "CSV" 단독 약어는 파일 형식과 혼동 가능하여 제거됨. "computer system validation" 전체 구문 사용)*
 - process validation, cleaning validation
-- analytical procedure, ICH Q2, ICH Q14, QC laboratory
+- analytical procedure, ICH Q2, ICH Q14
 - post-approval, CMC change, ICH Q12
 - continuous manufacturing
 - stability, ICH Q1, OOS, OOT
 - deviation, CAPA, change control
 - sterile, Annex 1
 - supplier qualification
+- **v15.1 추가 (OpenFDA Recall 특화)**: dissolution, assay failure, out of specification, particulate matter, particulate contamination, subpotent, superpotent, mislabeling, endotoxin
+- **v15.1 추가 (Nitrosamine)**: nitrosamine, NDMA, NDEA, n-nitroso
+- **v15.1 추가 (주요 제조사)**: Alkem, Aurobindo, Lupin, Zydus, Dr. Reddy
 
 ## Routine 측 읽기 쿼리
 

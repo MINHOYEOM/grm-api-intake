@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
-GRS API Intake Collector — v15.0 Phase 1
+GRS API Intake Collector — v15.1 Phase 2
 
-Federal Register API + OpenFDA Drug Enforcement API 를 호출해 지난 7일 (KST 기준)
-항목을 수집하고, Notion "GRS API Intake" 데이터베이스에 raw API 필드를 그대로 저장한다.
+Federal Register API + OpenFDA Drug Enforcement API + RSS 피드 (EMA · MHRA · PIC/S · ECA)
++ FDA Warning Letters 를 호출해 지난 7일 (KST 기준) 항목을 수집하고,
+Notion "GRS API Intake" 데이터베이스에 raw 필드를 저장한다.
 
 설계 원칙:
 1. KST 기준 7일 윈도우 — 모든 날짜는 Asia/Seoul 로 계산
 2. raw API 필드 보존 — Evidence A 조건 충족을 위해 원문 JSON 도 페이지 본문에 보관
-3. graceful degradation — 한쪽 API 실패해도 다른 쪽 계속 진행
-4. 중복 제거 — 같은 Run Date + Document ID 는 skip
+3. graceful degradation — 한 소스 실패해도 다른 소스 계속 진행
+4. 중복 제거 — source::document_id 키로 Run Date 내 중복 skip
 5. QA relevance 1 차 휴리스틱만 부여, 최종 판정은 Routine 위임
+6. Source Type 분류 — Official API / Official Regulatory Page / Official Regulator Blog
+                      / Expert Secondary
 
 환경 변수 (GitHub Secrets):
 - NOTION_TOKEN       : Notion Integration token (secret_…)
@@ -20,19 +23,24 @@ Federal Register API + OpenFDA Drug Enforcement API 를 호출해 지난 7일 (K
 CLI 옵션:
 - --dry-run : Notion 호출 없이 stdout 에 요약만 출력
 - --window-days N : 기본 7. 백필 테스트 시 변경
+- --sources : 수집 소스 선택 (기본: all). 예: --sources fr recall ema mhra pics eca wl
 """
 
 from __future__ import annotations
 
 import argparse
+import email.utils
+import hashlib
 import json
 import os
 import re
 import sys
 import time
 import urllib.parse
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from html.parser import HTMLParser
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
@@ -74,6 +82,50 @@ PROP_STATUS = "Status"
 
 SOURCE_FR = "Federal Register"
 SOURCE_RECALL = "OpenFDA Recall"
+# v15.1 Phase 2 — RSS / HTML 소스
+SOURCE_EMA = "EMA"
+SOURCE_MHRA = "MHRA Inspectorate"
+SOURCE_PICS = "PIC/S"
+SOURCE_ECA = "ECA Academy"
+SOURCE_FDA_WL = "FDA Warning Letter"
+
+# Source Type 분류 값 (Notion Select 옵션과 1:1 대응)
+PROP_SOURCE_TYPE = "Source Type"
+SRC_TYPE_OFFICIAL_API = "Official API"          # FR, OpenFDA Recall, EMA RSS
+SRC_TYPE_OFFICIAL_PAGE = "Official Regulatory Page"   # PIC/S, FDA WL
+SRC_TYPE_OFFICIAL_BLOG = "Official Regulator Blog"    # MHRA Inspectorate
+SRC_TYPE_EXPERT_SECONDARY = "Expert Secondary"        # ECA Academy
+
+# 소스별 Source Type 매핑
+SOURCE_TYPE_MAP: dict[str, str] = {
+    SOURCE_FR:      SRC_TYPE_OFFICIAL_API,
+    SOURCE_RECALL:  SRC_TYPE_OFFICIAL_API,
+    SOURCE_EMA:     SRC_TYPE_OFFICIAL_API,
+    SOURCE_MHRA:    SRC_TYPE_OFFICIAL_BLOG,
+    SOURCE_PICS:    SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_ECA:     SRC_TYPE_EXPERT_SECONDARY,
+    SOURCE_FDA_WL:  SRC_TYPE_OFFICIAL_PAGE,
+}
+
+# RSS / HTML 엔드포인트 (v15.1 추가)
+EMA_RSS_FEEDS: dict[str, str] = {
+    # 올바른 EMA RSS URL 형식: https://www.ema.europa.eu/en/{feed}.xml
+    # (https://www.ema.europa.eu/en/news-events/rss-feeds 에서 확인)
+    "scientific-guidelines":  "https://www.ema.europa.eu/en/scientific-guidelines.xml",
+    "inspections":            "https://www.ema.europa.eu/en/inspections.xml",
+    "news":                   "https://www.ema.europa.eu/en/news.xml",
+    "regulatory-guidelines":  "https://www.ema.europa.eu/en/regulatory-and-procedural-guideline.xml",
+}
+MHRA_RSS_URL = "https://mhrainspectorate.blog.gov.uk/feed/"   # Atom 형식
+PICS_RSS_URL = "https://picscheme.org/rss/general_en.rss"
+ECA_RSS_URL  = "https://app.gxp-services.net/eca_newsfeed.xml"
+FDA_WL_URL   = (
+    "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations"
+    "/compliance-actions-and-activities/warning-letters"
+)
+FDA_WL_SEARCH_API = (
+    "https://api.fda.gov/other/warning_letters.json"   # 미공개 엔드포인트 — 폴백용
+)
 
 # 13 개 카테고리 휴리스틱 키워드 (lowercase 비교, 단어 경계 매칭)
 # 주의: 단독 약어("csv", "oos" 등)는 \b 경계 매칭으로 오탐 방지됨
@@ -151,7 +203,7 @@ NOTION_CODE_BLOCK_CHUNK = 1900
 
 @dataclass
 class IntakeItem:
-    source: str  # SOURCE_FR | SOURCE_RECALL
+    source: str  # SOURCE_FR | SOURCE_RECALL | SOURCE_EMA | SOURCE_MHRA | SOURCE_PICS | SOURCE_ECA | SOURCE_FDA_WL
     document_id: str
     date_iso: str  # YYYY-MM-DD
     headline: str
@@ -163,12 +215,14 @@ class IntakeItem:
     comments_close_iso: str = ""
     api_query: str = ""
     qa_relevance: str = "Pending"
-    osd_relevance: str = "N/A"   # "Direct" | "Indirect" | "N/A" — Recall 전용, FR 은 N/A
+    osd_relevance: str = "N/A"   # "Direct" | "Indirect" | "N/A" — Recall 전용, 기타 N/A
+    source_type: str = SRC_TYPE_OFFICIAL_API  # Source Type 분류 (v15.1)
     raw_payload: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class CollectionStats:
+    # ── Phase 1 (Official API) ───────────────────────────────────────────────
     fr_fetched: int = 0
     fr_inserted: int = 0
     fr_skipped_dup: int = 0
@@ -183,21 +237,73 @@ class CollectionStats:
     recall_truncated: bool = False  # OPENFDA_MAX_TOTAL 상한 초과 여부 (v15.1)
     recall_error: bool = False
     recall_error_msg: str = ""
+    # ── Phase 2 (RSS / HTML) ────────────────────────────────────────────────
+    ema_fetched: int = 0
+    ema_inserted: int = 0
+    ema_skipped_dup: int = 0
+    ema_insert_failed: int = 0
+    ema_error: bool = False
+    ema_error_msg: str = ""
+    mhra_fetched: int = 0
+    mhra_inserted: int = 0
+    mhra_skipped_dup: int = 0
+    mhra_insert_failed: int = 0
+    mhra_error: bool = False
+    mhra_error_msg: str = ""
+    pics_fetched: int = 0
+    pics_inserted: int = 0
+    pics_skipped_dup: int = 0
+    pics_insert_failed: int = 0
+    pics_error: bool = False
+    pics_error_msg: str = ""
+    eca_fetched: int = 0
+    eca_inserted: int = 0
+    eca_skipped_dup: int = 0
+    eca_insert_failed: int = 0
+    eca_error: bool = False
+    eca_error_msg: str = ""
+    wl_fetched: int = 0
+    wl_inserted: int = 0
+    wl_skipped_dup: int = 0
+    wl_insert_failed: int = 0
+    wl_error: bool = False
+    wl_error_msg: str = ""
 
     def has_insert_failures(self) -> bool:
-        return self.fr_insert_failed > 0 or self.recall_insert_failed > 0
+        return (
+            self.fr_insert_failed > 0 or self.recall_insert_failed > 0
+            or self.ema_insert_failed > 0 or self.mhra_insert_failed > 0
+            or self.pics_insert_failed > 0 or self.eca_insert_failed > 0
+            or self.wl_insert_failed > 0
+        )
 
     def summary(self) -> str:
         fr_warn = " ⚠️ TRUNCATED" if self.fr_truncated else ""
         rec_warn = " ⚠️ TRUNCATED" if self.recall_truncated else ""
-        return (
-            f"FR  fetched={self.fr_fetched}  inserted={self.fr_inserted}  "
+        lines = [
+            f"FR   fetched={self.fr_fetched}  inserted={self.fr_inserted}  "
             f"skip_dup={self.fr_skipped_dup}  failed={self.fr_insert_failed}  "
-            f"error={self.fr_error}{fr_warn}\n"
-            f"REC fetched={self.recall_fetched}  inserted={self.recall_inserted}  "
+            f"error={self.fr_error}{fr_warn}",
+            f"REC  fetched={self.recall_fetched}  inserted={self.recall_inserted}  "
             f"skip_dup={self.recall_skipped_dup}  failed={self.recall_insert_failed}  "
-            f"error={self.recall_error}{rec_warn}"
-        )
+            f"error={self.recall_error}{rec_warn}",
+            f"EMA  fetched={self.ema_fetched}  inserted={self.ema_inserted}  "
+            f"skip_dup={self.ema_skipped_dup}  failed={self.ema_insert_failed}  "
+            f"error={self.ema_error}",
+            f"MHRA fetched={self.mhra_fetched}  inserted={self.mhra_inserted}  "
+            f"skip_dup={self.mhra_skipped_dup}  failed={self.mhra_insert_failed}  "
+            f"error={self.mhra_error}",
+            f"PICS fetched={self.pics_fetched}  inserted={self.pics_inserted}  "
+            f"skip_dup={self.pics_skipped_dup}  failed={self.pics_insert_failed}  "
+            f"error={self.pics_error}",
+            f"ECA  fetched={self.eca_fetched}  inserted={self.eca_inserted}  "
+            f"skip_dup={self.eca_skipped_dup}  failed={self.eca_insert_failed}  "
+            f"error={self.eca_error}",
+            f"WL   fetched={self.wl_fetched}  inserted={self.wl_inserted}  "
+            f"skip_dup={self.wl_skipped_dup}  failed={self.wl_insert_failed}  "
+            f"error={self.wl_error}",
+        ]
+        return "\n".join(lines)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -268,6 +374,159 @@ def http_get_json(url: str, *, params: dict[str, Any] | None = None,
             if attempt < retries:
                 time.sleep(2 ** attempt)
     raise RuntimeError(f"HTTP GET 최종 실패: {url} ({last_err})")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RSS / Atom / HTML 헬퍼
+# ─────────────────────────────────────────────────────────────────────────────
+
+_RSS_HEADERS = {
+    "User-Agent": "GRS-Intake/1.1 (+github-actions)",
+    "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
+}
+
+# XML 네임스페이스
+_NS_ATOM  = "http://www.w3.org/2005/Atom"
+_NS_DC    = "http://purl.org/dc/elements/1.1/"
+_NS_DCTERMS = "http://purl.org/dc/terms/"
+_NS_CONTENT = "http://purl.org/rss/1.0/modules/content/"
+
+
+def http_get_xml(url: str, *, timeout: int = 30, retries: int = 2) -> ET.Element:
+    """XML GET 요청 → ElementTree root 반환. 4xx=HTTPClientError, 5xx 재시도."""
+    last_err: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.get(url, timeout=timeout, headers=_RSS_HEADERS)
+            if 400 <= resp.status_code < 500:
+                raise HTTPClientError(resp.status_code, url)
+            resp.raise_for_status()
+            return ET.fromstring(resp.content)
+        except HTTPClientError:
+            raise
+        except ET.ParseError as e:
+            raise RuntimeError(f"XML 파싱 실패: {url} — {e}") from e
+        except requests.RequestException as e:
+            last_err = e
+            log("WARN", f"XML GET 실패 ({attempt + 1}/{retries + 1}) url={url} err={e}")
+            if attempt < retries:
+                time.sleep(2 ** attempt)
+    raise RuntimeError(f"HTTP XML GET 최종 실패: {url} ({last_err})")
+
+
+def _rss_text(el: ET.Element | None) -> str:
+    """ElementTree 텍스트 안전 추출."""
+    if el is None:
+        return ""
+    return (el.text or "").strip()
+
+
+def _rss_find(parent: ET.Element, *tags: str) -> ET.Element | None:
+    """네임스페이스 없는 태그 및 네임스페이스 조합 순차 탐색."""
+    for tag in tags:
+        el = parent.find(tag)
+        if el is not None:
+            return el
+    return None
+
+
+def _parse_rss2_date(raw: str) -> str:
+    """RFC 2822 (RSS 2.0) 날짜 → YYYY-MM-DD. 실패 시 "" 반환."""
+    try:
+        dt = email.utils.parsedate_to_datetime(raw)
+        return dt.date().isoformat()
+    except Exception:
+        pass
+    # 일부 피드가 ISO 8601 을 쓰는 경우 폴백
+    return _parse_atom_date(raw)
+
+
+def _parse_atom_date(raw: str) -> str:
+    """Atom/ISO 8601 날짜 → YYYY-MM-DD. 실패 시 "" 반환."""
+    if not raw:
+        return ""
+    # 공통 패턴: 2024-03-15T12:00:00Z / 2024-03-15T12:00:00+00:00 / 2024-03-15
+    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw[:25], fmt).date().isoformat()
+        except ValueError:
+            continue
+    # fromisoformat (Python 3.11+) 폴백
+    try:
+        return datetime.fromisoformat(raw[:25].rstrip("Z")).date().isoformat()
+    except ValueError:
+        pass
+    log("WARN", f"날짜 파싱 실패 (atom): {raw!r}")
+    return ""
+
+
+def _stable_doc_id(source: str, title: str, url: str, date_iso: str) -> str:
+    """RSS 항목에 고유 document_id 가 없을 경우 콘텐츠 기반 안정 ID 생성.
+
+    SHA-1 상위 12자리 사용 — URL+제목+날짜 조합이므로 동일 항목은 동일 ID 를 가진다.
+    dedupe 목적에 충분한 고유성을 제공한다.
+    """
+    key = f"{source}|{url}|{title}|{date_iso}"
+    return hashlib.sha1(key.encode()).hexdigest()[:12]
+
+
+def _within_window(date_iso: str, start: date, end: date) -> bool:
+    """date_iso (YYYY-MM-DD) 가 [start, end] 구간에 포함 여부."""
+    if not date_iso:
+        return False
+    try:
+        d = date.fromisoformat(date_iso)
+        return start <= d <= end
+    except ValueError:
+        return False
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RSS 수집 공통 파서
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def _rss2_items_from_root(root: ET.Element) -> list[ET.Element]:
+    """RSS 2.0 channel → item 리스트. RDF(rss/1.0) 도 처리."""
+    channel = root.find("channel")
+    if channel is not None:
+        return channel.findall("item")
+    return root.findall("item")
+
+
+def _atom_entries_from_root(root: ET.Element) -> list[ET.Element]:
+    """Atom feed → entry 리스트. 네임스페이스 있는 경우 처리."""
+    entries = root.findall(f"{{{_NS_ATOM}}}entry")
+    if entries:
+        return entries
+    return root.findall("entry")
+
+
+def _atom_text(entry: ET.Element, tag: str) -> str:
+    """Atom 네임스페이스 포함 텍스트 추출 (네임스페이스 있는 버전, 없는 버전 모두)."""
+    el = entry.find(f"{{{_NS_ATOM}}}{tag}") or entry.find(tag)
+    if el is None:
+        return ""
+    # <content> / <summary> 등의 type="html" 처리
+    text = (el.text or "").strip()
+    # HTML 태그 간단 제거
+    return re.sub(r"<[^>]+>", " ", text).strip()
+
+
+def _atom_link(entry: ET.Element) -> str:
+    """Atom <link href="..."> 추출."""
+    # href 속성을 가진 link 먼저
+    for link in entry.findall(f"{{{_NS_ATOM}}}link"):
+        href = link.get("href", "")
+        if href and link.get("rel", "alternate") == "alternate":
+            return href
+    for link in entry.findall(f"{{{_NS_ATOM}}}link"):
+        href = link.get("href", "")
+        if href:
+            return href
+    # 네임스페이스 없는 버전
+    el = entry.find("link")
+    return _rss_text(el)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -562,6 +821,485 @@ def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# EMA RSS 수집 (v15.1)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """EMA 공식 RSS 피드 4개 (scientific-guidelines · inspections · news ·
+    regulatory-guidelines) 를 수집해 날짜 필터링 후 반환.
+
+    Source Type: Official API (EMA 공식 RSS 피드).
+    Evidence Level: A 불가 — RSS 요약이므로 B (Official direct identified) 이상.
+    """
+    items: list[IntakeItem] = []
+    errors: list[str] = []
+
+    for feed_name, feed_url in EMA_RSS_FEEDS.items():
+        log("INFO", f"EMA RSS 수집: {feed_name} ({feed_url})")
+        try:
+            root = http_get_xml(feed_url)
+        except Exception as e:
+            msg = f"EMA RSS '{feed_name}' 실패: {e}"
+            log("WARN", msg)
+            errors.append(msg)
+            continue
+
+        # RSS 2.0 형식 확인
+        rss_items = _rss2_items_from_root(root)
+        for el in rss_items:
+            title = _rss_text(el.find("title"))
+            link  = _rss_text(el.find("link"))
+            # <link> 가 CDATA 로 감싸진 경우 텍스트에 없고 tail 에 있을 수 있음
+            if not link:
+                link_el = el.find("link")
+                if link_el is not None:
+                    link = (link_el.tail or "").strip()
+            pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+            # EMA 피드에 따라 dc:date 를 fallback 으로 사용
+            if not pub_raw:
+                dc_date = el.find(f"{{{_NS_DC}}}date") or el.find(f"{{{_NS_DCTERMS}}}modified")
+                pub_raw = _rss_text(dc_date)
+            date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+            # dc:date 가 Atom 형식인 경우 재시도
+            if not date_iso and pub_raw:
+                date_iso = _parse_atom_date(pub_raw)
+
+            description = _rss_text(el.find("description"))
+            category_el = el.find("category")
+            category = _rss_text(category_el)
+            guid_el = el.find("guid")
+            guid = _rss_text(guid_el) or link
+
+            if not _within_window(date_iso, start, end):
+                continue
+
+            doc_id = _stable_doc_id(SOURCE_EMA, title, link, date_iso)
+            relevance = compute_relevance(title, description, category)
+
+            items.append(IntakeItem(
+                source=SOURCE_EMA,
+                document_id=doc_id,
+                date_iso=date_iso,
+                headline=title,
+                official_url=link,
+                type_or_class=category or feed_name,
+                body=description,
+                api_query=feed_url,
+                qa_relevance=relevance,
+                osd_relevance="N/A",
+                source_type=SRC_TYPE_OFFICIAL_API,
+                raw_payload={
+                    "feed": feed_name,
+                    "title": title,
+                    "link": link,
+                    "pubDate": pub_raw,
+                    "description": description,
+                    "category": category,
+                    "guid": guid,
+                },
+            ))
+
+    err_msg = "; ".join(errors) if errors else None
+    # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
+    log("INFO", f"EMA RSS 수집 완료: {len(items)}건 (errors={len(errors)})")
+    return items, err_msg if errors else None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MHRA Inspectorate RSS 수집 (v15.1) — Atom 형식
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """MHRA Inspectorate Blog RSS (Atom 형식) 수집.
+
+    Source Type: Official Regulator Blog.
+    URL: https://mhrainspectorate.blog.gov.uk/feed/
+    """
+    log("INFO", f"MHRA RSS 수집: {MHRA_RSS_URL}")
+    try:
+        root = http_get_xml(MHRA_RSS_URL)
+    except Exception as e:
+        log("WARN", f"MHRA RSS 실패: {e}")
+        return [], str(e)
+
+    items: list[IntakeItem] = []
+    entries = _atom_entries_from_root(root)
+
+    for entry in entries:
+        title   = _atom_text(entry, "title")
+        link    = _atom_link(entry)
+        # Atom: <updated> 또는 <published>
+        pub_raw = (
+            _rss_text(entry.find(f"{{{_NS_ATOM}}}published"))
+            or _rss_text(entry.find(f"{{{_NS_ATOM}}}updated"))
+            or _rss_text(entry.find("published"))
+            or _rss_text(entry.find("updated"))
+        )
+        date_iso = _parse_atom_date(pub_raw)
+        summary  = _atom_text(entry, "summary") or _atom_text(entry, "content")
+
+        # category
+        cat_el = entry.find(f"{{{_NS_ATOM}}}category") or entry.find("category")
+        category = (cat_el.get("term", "") if cat_el is not None else "").strip()
+
+        # Atom id 를 document_id 로 사용
+        id_el = entry.find(f"{{{_NS_ATOM}}}id") or entry.find("id")
+        guid  = _rss_text(id_el) or link
+
+        if not _within_window(date_iso, start, end):
+            continue
+
+        doc_id    = _stable_doc_id(SOURCE_MHRA, title, link, date_iso)
+        relevance = compute_relevance(title, summary, category)
+
+        items.append(IntakeItem(
+            source=SOURCE_MHRA,
+            document_id=doc_id,
+            date_iso=date_iso,
+            headline=title,
+            official_url=link,
+            type_or_class=category or "Blog",
+            body=summary,
+            api_query=MHRA_RSS_URL,
+            qa_relevance=relevance,
+            osd_relevance="N/A",
+            source_type=SRC_TYPE_OFFICIAL_BLOG,
+            raw_payload={
+                "title": title, "link": link,
+                "published": pub_raw, "summary": summary,
+                "category": category, "id": guid,
+            },
+        ))
+
+    log("INFO", f"MHRA RSS 수집 완료: {len(items)}건")
+    return items, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PIC/S RSS 수집 (v15.1)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """PIC/S 공식 RSS 수집.
+
+    Source Type: Official Regulatory Page.
+    URL: https://picscheme.org/rss/general_en.rss
+    """
+    log("INFO", f"PIC/S RSS 수집: {PICS_RSS_URL}")
+    try:
+        root = http_get_xml(PICS_RSS_URL)
+    except Exception as e:
+        log("WARN", f"PIC/S RSS 실패: {e}")
+        return [], str(e)
+
+    items: list[IntakeItem] = []
+    rss_items = _rss2_items_from_root(root)
+
+    for el in rss_items:
+        title   = _rss_text(el.find("title"))
+        link    = _rss_text(el.find("link"))
+        pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+        date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+        description = _rss_text(el.find("description"))
+        guid_el = el.find("guid")
+        guid    = _rss_text(guid_el) or link
+
+        if not _within_window(date_iso, start, end):
+            continue
+
+        doc_id    = _stable_doc_id(SOURCE_PICS, title, link, date_iso)
+        relevance = compute_relevance(title, description)
+
+        items.append(IntakeItem(
+            source=SOURCE_PICS,
+            document_id=doc_id,
+            date_iso=date_iso,
+            headline=title,
+            official_url=link,
+            type_or_class="PIC/S",
+            body=description,
+            api_query=PICS_RSS_URL,
+            qa_relevance=relevance,
+            osd_relevance="N/A",
+            source_type=SRC_TYPE_OFFICIAL_PAGE,
+            raw_payload={
+                "title": title, "link": link,
+                "pubDate": pub_raw, "description": description, "guid": guid,
+            },
+        ))
+
+    log("INFO", f"PIC/S RSS 수집 완료: {len(items)}건")
+    return items, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ECA Academy RSS 수집 (v15.1) — Expert Secondary
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """ECA Academy (gmp-compliance.org) RSS 수집.
+
+    Source Type: Expert Secondary — FDA·EMA·MHRA·TGA·PIC/S·ICH 전문 GMP 뉴스 큐레이션.
+    URL: https://app.gxp-services.net/eca_newsfeed.xml
+    403 발생 시 운영 경고 없이 진행 (Expert Secondary 허용 정책).
+    """
+    log("INFO", f"ECA RSS 수집: {ECA_RSS_URL}")
+    try:
+        root = http_get_xml(ECA_RSS_URL)
+    except HTTPClientError as e:
+        # Expert Secondary: 403/404 는 경고 없이 넘어감
+        log("INFO", f"ECA RSS HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
+        return [], None
+    except Exception as e:
+        log("WARN", f"ECA RSS 실패: {e}")
+        return [], str(e)
+
+    items: list[IntakeItem] = []
+    # ECA 피드는 RSS 2.0 또는 Atom 모두 가능 — 두 방향 시도
+    rss_items = _rss2_items_from_root(root)
+    if not rss_items:
+        rss_items = _atom_entries_from_root(root)  # type: ignore[assignment]
+
+    for el in rss_items:
+        # RSS 2.0 태그 우선, Atom 폴백
+        title = (
+            _rss_text(el.find("title"))
+            or _atom_text(el, "title")
+        )
+        link = (
+            _rss_text(el.find("link"))
+            or _atom_link(el)
+        )
+        pub_raw = (
+            _rss_text(el.find("pubDate"))
+            or _rss_text(el.find("pubdate"))
+            or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
+            or _rss_text(el.find("published"))
+        )
+        date_iso = (
+            _parse_rss2_date(pub_raw) if pub_raw
+            else _parse_atom_date(pub_raw)
+        )
+        description = (
+            _rss_text(el.find("description"))
+            or _atom_text(el, "summary")
+        )
+        guid_el = el.find("guid")
+        guid    = _rss_text(guid_el) or link
+
+        if not _within_window(date_iso, start, end):
+            continue
+
+        doc_id    = _stable_doc_id(SOURCE_ECA, title, link, date_iso)
+        relevance = compute_relevance(title, description)
+
+        items.append(IntakeItem(
+            source=SOURCE_ECA,
+            document_id=doc_id,
+            date_iso=date_iso,
+            headline=title,
+            official_url=link,
+            type_or_class="GMP News",
+            body=description,
+            api_query=ECA_RSS_URL,
+            qa_relevance=relevance,
+            osd_relevance="N/A",
+            source_type=SRC_TYPE_EXPERT_SECONDARY,
+            raw_payload={
+                "title": title, "link": link,
+                "pubDate": pub_raw, "description": description, "guid": guid,
+            },
+        ))
+
+    log("INFO", f"ECA RSS 수집 완료: {len(items)}건")
+    return items, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FDA Warning Letters 수집 (v15.1) — HTML 파싱
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class _FDAWLTableParser(HTMLParser):
+    """FDA Warning Letters 페이지 HTML 에서 테이블 행을 파싱.
+
+    대상 테이블은 class="table" 이며 열 순서:
+      Posted Date | Recipient | Letter Issue Date | Issuing Office | Subject (or close match)
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._in_table: bool = False
+        self._in_row: bool = False
+        self._in_cell: bool = False
+        self._cell_depth: int = 0
+        self._current_row: list[str] = []
+        self._current_cell: list[str] = []
+        self._current_href: str = ""
+        self.rows: list[dict[str, str]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attr_dict = dict(attrs)
+        if tag == "table" and "table" in (attr_dict.get("class") or ""):
+            self._in_table = True
+        if not self._in_table:
+            return
+        if tag == "tr":
+            self._in_row = True
+            self._current_row = []
+        if tag in ("td", "th") and self._in_row:
+            self._in_cell = True
+            self._cell_depth = 1
+            self._current_cell = []
+            self._current_href = ""
+        elif tag == "a" and self._in_cell:
+            href = attr_dict.get("href") or ""
+            if href and not self._current_href:
+                self._current_href = href
+        elif tag in ("td", "th") and self._in_cell:
+            self._cell_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if not self._in_table:
+            return
+        if tag in ("td", "th") and self._in_cell:
+            self._cell_depth -= 1
+            if self._cell_depth <= 0:
+                cell_text = " ".join(self._current_cell).strip()
+                # href 와 함께 저장
+                self._current_row.append(
+                    f"{cell_text}|HREF:{self._current_href}" if self._current_href else cell_text
+                )
+                self._in_cell = False
+        if tag == "tr" and self._in_row:
+            self._in_row = False
+            if len(self._current_row) >= 4:
+                self.rows.append({"_cols": self._current_row})
+        if tag == "table":
+            self._in_table = False
+
+    def handle_data(self, data: str) -> None:
+        if self._in_cell:
+            stripped = data.strip()
+            if stripped:
+                self._current_cell.append(stripped)
+
+
+def _parse_wl_date(raw: str) -> str:
+    """FDA WL 날짜 형식 (MM/DD/YYYY 또는 YYYY-MM-DD) → YYYY-MM-DD."""
+    raw = raw.strip()
+    if re.match(r"^\d{2}/\d{2}/\d{4}$", raw):
+        try:
+            return datetime.strptime(raw, "%m/%d/%Y").date().isoformat()
+        except ValueError:
+            pass
+    return _safe_date_iso(raw, context="FDA_WL")
+
+
+def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """FDA Warning Letters 페이지 HTML 테이블 파싱 수집.
+
+    Source Type: Official Regulatory Page.
+    페이지: https://www.fda.gov/.../warning-letters
+
+    FDA WL 페이지는 정적 HTML 테이블을 포함하므로 WebFetch 가능.
+    JS-heavy 인 경우 content 부재 → 빈 결과 반환 (fail-silent).
+    403/timeout 시 WARN 로그 후 빈 결과 반환.
+    """
+    log("INFO", f"FDA WL 수집: {FDA_WL_URL}")
+    try:
+        resp = requests.get(FDA_WL_URL, timeout=30, headers={
+            "User-Agent": "GRS-Intake/1.1 (+github-actions)",
+            "Accept": "text/html",
+        })
+        if resp.status_code == 403:
+            log("WARN", "FDA WL 403 — HTML 수집 불가, 이번 주 WL 슬롯 건너뜀")
+            return [], "HTTP 403"
+        resp.raise_for_status()
+        html_text = resp.text
+    except requests.RequestException as e:
+        log("WARN", f"FDA WL HTTP 실패: {e}")
+        return [], str(e)
+
+    parser = _FDAWLTableParser()
+    parser.feed(html_text)
+
+    if not parser.rows:
+        log("INFO", "FDA WL HTML 테이블 미발견 — JS-rendered 가능성 (건너뜀)")
+        return [], None
+
+    items: list[IntakeItem] = []
+    for row in parser.rows:
+        cols = row.get("_cols", [])
+        if len(cols) < 4:
+            continue
+        # 실제 FDA WL 테이블 열 순서 (2026년 5월 확인):
+        # [0] Posted Date  [1] Letter Issue Date  [2] Company Name(+href)
+        # [3] Issuing Office  [4] Subject  [5] Response Letter  [6+] 기타
+        posted_raw = cols[0].split("|HREF:")[0].strip()
+
+        # 헤더 행 건너뜀 (col[0]이 날짜 패턴이 아닌 텍스트)
+        if not re.match(r"^\d", posted_raw):
+            continue
+
+        letter_date_raw = cols[1].split("|HREF:")[0].strip() if len(cols) > 1 else ""
+
+        # Company Name — href 포함 가능
+        recipient_raw = cols[2] if len(cols) > 2 else ""
+        wl_href = ""
+        if "|HREF:" in recipient_raw:
+            parts = recipient_raw.split("|HREF:", 1)
+            recipient_raw = parts[0].strip()
+            wl_href = parts[1].strip()
+
+        issuing_office = cols[3].split("|HREF:")[0].strip() if len(cols) > 3 else ""
+        subject = cols[4].split("|HREF:")[0].strip() if len(cols) > 4 else ""
+
+        # Posted date 가 주 우선 날짜
+        date_iso = _parse_wl_date(posted_raw) or _parse_wl_date(letter_date_raw)
+
+        if not _within_window(date_iso, start, end):
+            continue
+
+        # URL 정규화
+        if wl_href and wl_href.startswith("/"):
+            wl_href = "https://www.fda.gov" + wl_href
+
+        firm = recipient_raw
+        headline = subject or firm or "FDA Warning Letter"
+        doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
+        relevance = compute_relevance(headline, subject, issuing_office)
+
+        items.append(IntakeItem(
+            source=SOURCE_FDA_WL,
+            document_id=doc_id,
+            date_iso=date_iso,
+            headline=headline,
+            official_url=wl_href or FDA_WL_URL,
+            type_or_class=issuing_office or "Warning Letter",
+            firm=firm,
+            body=subject,
+            api_query=FDA_WL_URL,
+            qa_relevance=relevance,
+            osd_relevance="N/A",
+            source_type=SRC_TYPE_OFFICIAL_PAGE,
+            raw_payload={
+                "firm": firm, "posted_date": posted_raw,
+                "letter_date": letter_date_raw,
+                "issuing_office": issuing_office,
+                "subject": subject, "url": wl_href,
+            },
+        ))
+
+    log("INFO", f"FDA WL 수집 완료: {len(items)}건")
+    return items, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Notion 헬퍼
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -660,11 +1398,21 @@ def _url(value: str) -> dict[str, Any] | None:
 
 def build_notion_properties(item: IntakeItem, run_date: date,
                             collected_at: datetime) -> dict[str, Any]:
-    # Name 타이틀
-    if item.source == SOURCE_FR:
-        name = f"FR {item.document_id} — {truncate(item.headline, 100)}"
+    # Name 타이틀 — 소스별 프리픽스
+    _prefix_map = {
+        SOURCE_FR:      "FR",
+        SOURCE_RECALL:  "Recall",
+        SOURCE_EMA:     "EMA",
+        SOURCE_MHRA:    "MHRA",
+        SOURCE_PICS:    "PICS",
+        SOURCE_ECA:     "ECA",
+        SOURCE_FDA_WL:  "WL",
+    }
+    prefix = _prefix_map.get(item.source, item.source)
+    if item.source in (SOURCE_RECALL, SOURCE_FDA_WL):
+        name = f"{prefix} {item.document_id} — {truncate(item.firm or item.headline, 100)}"
     else:
-        name = f"Recall {item.document_id} — {truncate(item.firm or item.headline, 100)}"
+        name = f"{prefix} {item.document_id} — {truncate(item.headline, 100)}"
 
     props: dict[str, Any] = {
         PROP_NAME: {"title": _rich_text(name)},
@@ -675,6 +1423,7 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         PROP_RUN_DATE: {"date": {"start": run_date.isoformat()}},
         PROP_QA_RELEVANCE: _select(item.qa_relevance),
         PROP_OSD_RELEVANCE: _select(item.osd_relevance),
+        PROP_SOURCE_TYPE: _select(item.source_type),
         PROP_STATUS: _select("New"),
     }
 
@@ -832,14 +1581,21 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
     return inserted, skipped, failed
 
 
+_ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="GRS API Intake Collector v15.0")
+    parser = argparse.ArgumentParser(description="GRS API Intake Collector v15.1")
     parser.add_argument("--dry-run", action="store_true",
                         help="Notion 호출 없이 stdout 만 출력")
     parser.add_argument("--window-days", type=int, default=7,
                         choices=range(1, 91), metavar="N(1-90)",
                         help="수집 윈도우 일수 1~90 (default 7)")
+    parser.add_argument("--sources", nargs="+", choices=_ALL_SOURCES,
+                        default=_ALL_SOURCES,
+                        help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema")
     args = parser.parse_args()
+    active = set(args.sources)
 
     notion_token = os.environ.get("NOTION_TOKEN", "").strip()
     notion_db = os.environ.get("NOTION_DATABASE_ID", "").strip()
@@ -857,25 +1613,77 @@ def main() -> int:
 
     stats = CollectionStats()
 
-    # 1) Federal Register
-    fr_items, fr_err = collect_federal_register(start, end)
-    stats.fr_fetched = len(fr_items)
-    if fr_err:
-        stats.fr_error = True
-        stats.fr_error_msg = fr_err
-        if "truncated" in fr_err:
-            stats.fr_truncated = True
+    # ── Phase 1: Official API ──────────────────────────────────────────────
+    fr_items: list[IntakeItem] = []
+    if "fr" in active:
+        fr_items, fr_err = collect_federal_register(start, end)
+        stats.fr_fetched = len(fr_items)
+        if fr_err:
+            stats.fr_error = True
+            stats.fr_error_msg = fr_err
+            if "truncated" in fr_err:
+                stats.fr_truncated = True
 
-    # 2) OpenFDA Recall
-    recall_items, rec_err = collect_openfda_recalls(start, end, openfda_key)
-    stats.recall_fetched = len(recall_items)
-    if rec_err:
-        stats.recall_error = True
-        stats.recall_error_msg = rec_err
-        if "truncated" in rec_err:
-            stats.recall_truncated = True
+    recall_items: list[IntakeItem] = []
+    if "recall" in active:
+        recall_items, rec_err = collect_openfda_recalls(start, end, openfda_key)
+        stats.recall_fetched = len(recall_items)
+        if rec_err:
+            stats.recall_error = True
+            stats.recall_error_msg = rec_err
+            if "truncated" in rec_err:
+                stats.recall_truncated = True
 
-    log("INFO", f"수집 완료: FR={stats.fr_fetched}건 · Recall={stats.recall_fetched}건")
+    # ── Phase 2: RSS / HTML (v15.1) ───────────────────────────────────────
+    ema_items: list[IntakeItem] = []
+    if "ema" in active:
+        ema_items, ema_err = collect_ema_rss(start, end)
+        stats.ema_fetched = len(ema_items)
+        if ema_err:
+            stats.ema_error = True
+            stats.ema_error_msg = ema_err
+
+    mhra_items: list[IntakeItem] = []
+    if "mhra" in active:
+        mhra_items, mhra_err = collect_mhra_rss(start, end)
+        stats.mhra_fetched = len(mhra_items)
+        if mhra_err:
+            stats.mhra_error = True
+            stats.mhra_error_msg = mhra_err
+
+    pics_items: list[IntakeItem] = []
+    if "pics" in active:
+        pics_items, pics_err = collect_pics_rss(start, end)
+        stats.pics_fetched = len(pics_items)
+        if pics_err:
+            stats.pics_error = True
+            stats.pics_error_msg = pics_err
+
+    eca_items: list[IntakeItem] = []
+    if "eca" in active:
+        eca_items, eca_err = collect_eca_rss(start, end)
+        stats.eca_fetched = len(eca_items)
+        if eca_err:
+            stats.eca_error = True
+            stats.eca_error_msg = eca_err
+
+    wl_items: list[IntakeItem] = []
+    if "wl" in active:
+        wl_items, wl_err = collect_fda_warning_letters(start, end)
+        stats.wl_fetched = len(wl_items)
+        if wl_err:
+            stats.wl_error = True
+            stats.wl_error_msg = wl_err
+
+    total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
+                     + stats.mhra_fetched + stats.pics_fetched
+                     + stats.eca_fetched + stats.wl_fetched)
+    log("INFO", (
+        f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
+        f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
+        f"PICS={stats.pics_fetched} · ECA={stats.eca_fetched} · "
+        f"WL={stats.wl_fetched} · 합계={total_fetched}건"
+    ))
 
     # 3) Notion 기존 row (중복 제거)
     if args.dry_run:
@@ -903,6 +1711,37 @@ def main() -> int:
     stats.recall_skipped_dup = rec_sk
     stats.recall_insert_failed = rec_fail
 
+    # Phase 2 삽입
+    ema_in, ema_sk, ema_fail = insert_items(notion_token, notion_db, ema_items,
+                                             run_date, collected_at, existing, args.dry_run)
+    stats.ema_inserted = ema_in
+    stats.ema_skipped_dup = ema_sk
+    stats.ema_insert_failed = ema_fail
+
+    mhra_in, mhra_sk, mhra_fail = insert_items(notion_token, notion_db, mhra_items,
+                                                run_date, collected_at, existing, args.dry_run)
+    stats.mhra_inserted = mhra_in
+    stats.mhra_skipped_dup = mhra_sk
+    stats.mhra_insert_failed = mhra_fail
+
+    pics_in, pics_sk, pics_fail = insert_items(notion_token, notion_db, pics_items,
+                                                run_date, collected_at, existing, args.dry_run)
+    stats.pics_inserted = pics_in
+    stats.pics_skipped_dup = pics_sk
+    stats.pics_insert_failed = pics_fail
+
+    eca_in, eca_sk, eca_fail = insert_items(notion_token, notion_db, eca_items,
+                                             run_date, collected_at, existing, args.dry_run)
+    stats.eca_inserted = eca_in
+    stats.eca_skipped_dup = eca_sk
+    stats.eca_insert_failed = eca_fail
+
+    wl_in, wl_sk, wl_fail = insert_items(notion_token, notion_db, wl_items,
+                                          run_date, collected_at, existing, args.dry_run)
+    stats.wl_inserted = wl_in
+    stats.wl_skipped_dup = wl_sk
+    stats.wl_insert_failed = wl_fail
+
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
@@ -913,20 +1752,36 @@ def main() -> int:
                 f.write("## GRS Intake Collection Summary\n\n")
                 f.write(f"- Run date (KST): `{run_date.isoformat()}`\n")
                 f.write(f"- Window: `{start.isoformat()}` ~ `{end.isoformat()}`\n")
-                fr_prefix = "⚠️ " if (stats.fr_error or stats.fr_insert_failed > 0
-                                       or stats.fr_truncated) else ""
-                f.write(f"- {fr_prefix}Federal Register: fetched {stats.fr_fetched} · "
-                        f"inserted {stats.fr_inserted} · skip-dup {stats.fr_skipped_dup} · "
-                        f"failed {stats.fr_insert_failed} · "
-                        f"error `{stats.fr_error_msg or 'none'}`"
-                        f"{' · ⚠️ TRUNCATED' if stats.fr_truncated else ''}\n")
-                rec_prefix = "⚠️ " if (stats.recall_error or stats.recall_insert_failed > 0
-                                        or stats.recall_truncated) else ""
-                f.write(f"- {rec_prefix}OpenFDA Recall: fetched {stats.recall_fetched} · "
-                        f"inserted {stats.recall_inserted} · skip-dup {stats.recall_skipped_dup} · "
-                        f"failed {stats.recall_insert_failed} · "
-                        f"error `{stats.recall_error_msg or 'none'}`"
-                        f"{' · ⚠️ TRUNCATED' if stats.recall_truncated else ''}\n")
+                def _src_line(label: str, fetched: int, inserted: int,
+                              skipped: int, failed: int, error: bool,
+                              err_msg: str, truncated: bool = False) -> str:
+                    prefix = "⚠️ " if (error or failed > 0 or truncated) else ""
+                    trunc  = " · ⚠️ TRUNCATED" if truncated else ""
+                    return (f"- {prefix}{label}: fetched {fetched} · "
+                            f"inserted {inserted} · skip-dup {skipped} · "
+                            f"failed {failed} · error `{err_msg or 'none'}`{trunc}\n")
+
+                f.write(_src_line("Federal Register", stats.fr_fetched, stats.fr_inserted,
+                                  stats.fr_skipped_dup, stats.fr_insert_failed,
+                                  stats.fr_error, stats.fr_error_msg, stats.fr_truncated))
+                f.write(_src_line("OpenFDA Recall", stats.recall_fetched, stats.recall_inserted,
+                                  stats.recall_skipped_dup, stats.recall_insert_failed,
+                                  stats.recall_error, stats.recall_error_msg, stats.recall_truncated))
+                f.write(_src_line("EMA RSS", stats.ema_fetched, stats.ema_inserted,
+                                  stats.ema_skipped_dup, stats.ema_insert_failed,
+                                  stats.ema_error, stats.ema_error_msg))
+                f.write(_src_line("MHRA RSS", stats.mhra_fetched, stats.mhra_inserted,
+                                  stats.mhra_skipped_dup, stats.mhra_insert_failed,
+                                  stats.mhra_error, stats.mhra_error_msg))
+                f.write(_src_line("PIC/S RSS", stats.pics_fetched, stats.pics_inserted,
+                                  stats.pics_skipped_dup, stats.pics_insert_failed,
+                                  stats.pics_error, stats.pics_error_msg))
+                f.write(_src_line("ECA Academy RSS", stats.eca_fetched, stats.eca_inserted,
+                                  stats.eca_skipped_dup, stats.eca_insert_failed,
+                                  stats.eca_error, stats.eca_error_msg))
+                f.write(_src_line("FDA Warning Letters", stats.wl_fetched, stats.wl_inserted,
+                                  stats.wl_skipped_dup, stats.wl_insert_failed,
+                                  stats.wl_error, stats.wl_error_msg))
                 f.write(f"- Dry run: `{args.dry_run}`\n")
                 if stats.has_insert_failures():
                     total_fail = stats.fr_insert_failed + stats.recall_insert_failed
@@ -937,12 +1792,28 @@ def main() -> int:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
     # 종료 코드:
-    # - 둘 다 실패 → exit 1 (workflow fail)
-    # - 한쪽만 실패 → exit 0 (graceful degradation, WARN log 만)
-    # - 둘 다 성공 (결과 0건 포함) → exit 0
-    if stats.fr_error and stats.recall_error:
-        log("ERROR", "두 API 모두 실패 — workflow fail")
+    # - Phase 1 (FR + Recall) 모두 실패 → exit 1 (workflow fail)
+    # - Phase 1 한쪽 실패 또는 Phase 2 전체 실패 → exit 0 (graceful degradation)
+    # - Phase 2 는 개별 소스 실패가 있어도 다른 소스 계속 진행 (graceful)
+    phase1_fr_active     = "fr" in active
+    phase1_recall_active = "recall" in active
+    fr_failed     = phase1_fr_active and stats.fr_error
+    recall_failed = phase1_recall_active and stats.recall_error
+    if fr_failed and recall_failed:
+        log("ERROR", "Phase 1 두 API 모두 실패 — workflow fail")
         return 1
+    if not phase1_fr_active and not phase1_recall_active:
+        # Phase 1 소스가 모두 비활성화된 경우 Phase 2 결과만으로 판단
+        phase2_all_error = all([
+            ("ema" not in active or stats.ema_error),
+            ("mhra" not in active or stats.mhra_error),
+            ("pics" not in active or stats.pics_error),
+            ("eca" not in active or stats.eca_error),
+            ("wl" not in active or stats.wl_error),
+        ])
+        if phase2_all_error:
+            log("ERROR", "모든 활성 소스 실패 — workflow fail")
+            return 1
     return 0
 
 

@@ -57,12 +57,12 @@
 [색 사용 원칙]
 색은 의미가 있을 때만, 최소한으로 사용.
 1. 기능 색축 (Notion callout 색)
-   · blue_bg     : TL;DR 헤드라인 + 핵심 사실 + **카드 한 줄 요약 (v15.2 신규)**
-   · gray_bg     : 한국어 번역/요약 + 출처 푸터 + 검색 메타 + 검색 커버리지 + **AI 면책 안내 (v15.2 신규)**
-   · yellow_bg   : 시사점 (AI 해석, 카드당 1개)
-   · green_bg    : **점검 사항 / Action (v15.2 신규)** — 사용자 행동 항목 강조
-   · default(흰색): 원문 인용 + 표 + TOC + 🔮 표
-   다른 색 callout 금지.
+   · blue_bg     : TL;DR + 핵심 사실 + 카드 한 줄 요약 → <callout icon="📌" color="blue_bg">
+   · gray_bg     : 한국어 번역 + 출처 푸터 + 검색 메타 + 커버리지 + AI 면책 → <callout icon="..." color="gray_bg">
+   · yellow_bg   : 시사점 (AI 해석) → <callout icon="💡" color="yellow_bg">
+   · green_bg    : 점검 사항 / Action → <callout icon="✅" color="green_bg">
+   · default     : 원문 인용 라벨 + 한눈에 표 + TOC + 🔮 표 → <callout icon="..."> (color 생략)
+   다른 색 callout 금지. > 마크다운은 영문 원문 인용에만 사용.
 2. 카테고리 색은 H3 prefix 이모지(🟧/🟦/🟫/⬜)에만 한정.
 3. 컬러 텍스트는 D-30 미만 일정 셀 amber에만. 그 외 default 검정.
 4. 페이지 cover image 미적용.
@@ -90,21 +90,47 @@
 · " · "    (공백 1칸) — 표 셀 내 나열, 그룹 내부, inline code 사이, D-Day와 날짜 사이
 · "·"      (공백 없음) — 짧은 약자 나열 (기관·부서 짧은 나열)
 
-[Toggle 구문]
-toggle 허용 위치 (v15.2 갱신):
-1. 페이지 끝 메타 영역 (M2·M3 상세) — 기존과 동일.
-2. 각 사례 카드 내 Raw API payload — Evidence A 추적성 보존하되 시각 노이즈 제거.
-이 2곳 외에는 toggle 사용 금지.
-⚠️  <toggle> 태그 금지. ✅  <details><summary>요약</summary>내용</details> 사용.
+[Notion 마크다운 문법 — 필수 준수 (v15.2)]
+Notion MCP enhanced markdown 정확한 문법. 이 문법만 사용한다.
 
-[Quote 블록 규칙 — v15.2 신규]
-> 블록은 반드시 텍스트 내용으로 시작한다. 빈 줄로 시작하는 > 블록 금지.
-잘못된 예 (Notion 에서 "비어 있는 인용" 표시되어 오류처럼 보임):
-> 
-> "원문 텍스트"
-올바른 예:
-> "원문 텍스트"
-callout 내부에서도 동일 규칙 적용. 빈 quote 블록 생성 절대 금지.
+1. Callout (색상 박스 — 페이지의 주요 시각 블록):
+<callout icon="📌" color="blue_bg">
+	내용 (반드시 탭 1개로 들여쓰기)
+	두 번째 줄도 탭 들여쓰기
+</callout>
+사용 가능 색상: blue_bg · gray_bg · yellow_bg · green_bg · default(색상 속성 생략)
+사용 가능 아이콘: 이모지 1개 (📌 📋 🔍 💡 ✅ ℹ️ 📭 🔖 📑 🗂 🔮 📜 🌐 📚 등)
+
+2. Quote (인용 — 좌측에 회색 세로선):
+> 인용 텍스트
+용도: 원문 영문 인용에만 사용. Evidence A 카드의 raw 필드값 인용.
+⚠️ 이 외의 모든 곳에서 > 사용 금지. 일반 텍스트·요약·번역·사실·점검 사항은 callout 또는 paragraph 로 작성.
+⚠️ 빈 줄로 시작하는 > 블록 절대 금지 (Notion 에서 "비어 있는 인용" 표시).
+⚠️ callout 내부에서 > 사용 금지 (이중 들여쓰기 발생).
+
+3. Toggle (접기):
+<details>
+<summary>제목</summary>
+	내용 (탭 들여쓰기)
+</details>
+허용 위치: 페이지 끝 메타 영역 (M2·M3), 카드 내 Raw API payload.
+
+4. 표:
+<table header-row="true">
+<tr><td>**헤더1**</td><td>**헤더2**</td></tr>
+<tr><td>값1</td><td>값2</td></tr>
+</table>
+
+5. 일반 단락: > 없이 텍스트를 그냥 쓴다.
+6. 구분선: ---
+7. 제목: ## H2, ### H3
+8. 목차: <table_of_contents/>
+9. 체크박스: - [ ] 항목
+
+⚠️ 절대 금지 문법 (Notion 에서 raw 텍스트로 노출됨):
+- [!NOTE], [!WARNING], [!IMPORTANT], [!TIP] — Obsidian 전용, Notion 미지원
+- > 를 callout 대용으로 사용하면 좌측 세로선 quote 블록이 되어 위계 소멸
+- <toggle> 태그 — Notion 미지원
 
 [한국어 번역]
 - 회사명은 원문 그대로 (예: JW Nutritional, LLC)
@@ -568,156 +594,182 @@ Tier 2/3 분류에 필요한 route · dosage_form 은 다음 순서로 확인한
   · 카테고리: Warning Letter / Guidance / Guideline / Other
   · 발행일: 가장 최신 항목 발행일 (date)
 
-블록 순서:
-블록 1. Paragraph (헤더 메타라인) — v14.5 와 동일
-블록 2. Callout (blue_bg, 📌) — TL;DR 헤드라인 — v14.5 기준 + (v15.1) Tier 3 recall 우선 포함
+블록 순서 (v15.2 — Notion enhanced markdown 태그 명시):
+⚠️ 아래 블록 정의에서 <callout> 태그를 정확히 사용한다. > 마크다운은 원문 인용에만.
+
+블록 1. Paragraph (헤더 메타라인) — v14.5 와 동일. 일반 텍스트로 작성 (callout 아님).
+
+블록 2. TL;DR — 정확한 Notion 마크다운:
+<callout icon="📌" color="blue_bg">
+	- **{핵심 1}**
+	- **{핵심 2}**
+	- **{핵심 3}**
+	{2~3줄 요약 단락}
+</callout>
 (v15.1) Recall 항목 TL;DR 포함 기준:
 - Class I Recall → 무조건 포함
 - Class II/III Recall + Tier 3 카드화 기준 충족 (ORAL + 공정 관련 failure mode) → 우선 포함
 - Tier 2 표 기재 항목 (카드화 미달) → TL;DR 포함 금지
-블록 3. Callout (default, 🗂) — 목차 (TOC) — v14.5 와 동일
-블록 4. Divider "---"
-블록 5. Callout (gray_bg, 🔍) — 검색 커버리지 (v15.0 신규 포맷)
-한 줄 형식:
-"🔍  커버리지: Intake row {N}건 (FR {N} · Recall {N}) · 공식 API 직접호출 0/2 (외부 수집기 위임) · WebSearch {N}/9 (Core {N} + Deep Dive {N}) · WebFetch 접근 {N}/5 · 실패 {5-N}건 · 유효항목 {M}건 · Evidence A {N} / B {N} / C {N} · 미확인 {기관·카테고리}"
-규칙:
-- "Intake row {N}건 (FR {N} · Recall {N})" 라인은 v15.0 신규. 0건이어도 명시.
-- "공식 API 직접호출 0/2 (외부 수집기 위임)" 는 고정 표기. Routine 측에서는 호출하지 않음.
-- 그 외 항목 형식은 v14.5 와 동일.
 
-블록 5-R. Callout (gray_bg, 📋) — Recall 요약 표 (v15.1 신규)
-출력 조건: 당주 Tier 2 해당 항목 (ORAL/TABLET/CAPSULE recall 중 Tier 3 카드화 기준 미달) 이 1건 이상일 때만 출력. 0건이면 블록 전체 생략.
-형식:
-"📋  이번 주 Recall 참고 ({N}건 — 모니터링)"
-표:
-| Firm | Product | Failure Mode | Class | Route |
-|---|---|---|---|---|
-| {recalling_firm} | {product_description 핵심 약칭} | {reason_for_recall 핵심어} | {classification} | {route} |
-규칙:
-- Tier 3 카드화 항목은 이 표에 중복 기재 금지 (카드에만 등장).
-- 표 하단: "📎  FDA Recalls/Enforcement ⚠️  https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" (L2 링크 고정).
-- 이 블록은 학습 카드가 아님. 시사점 callout 작성 금지.
+블록 3. 목차 — 정확한 Notion 마크다운:
+<callout icon="🗂">
+	<table_of_contents/>
+</callout>
+
+블록 4. Divider:
+---
+
+블록 5. 검색 커버리지 — 정확한 Notion 마크다운:
+<callout icon="🔍" color="gray_bg">
+	🔍  커버리지: Intake row {N}건 (FR {N} · Recall {N}) · 공식 API 직접호출 0/2 (외부 수집기 위임) · WebSearch {N}/9 (Core {N} + Deep Dive {N}) · WebFetch 접근 {N}/5 · 실패 {5-N}건 · 유효항목 {M}건 · Evidence A {N} / B {N} / C {N} · 미확인 {기관·카테고리}
+</callout>
+
+블록 5-R. Recall 요약 표 (v15.1 신규):
+<callout icon="📋" color="gray_bg">
+	📋  이번 주 Recall 참고 ({N}건 — 모니터링)
+	<table header-row="true">
+	<tr><td>**Firm**</td><td>**Product**</td><td>**Failure Mode**</td><td>**Class**</td><td>**Route**</td></tr>
+	<tr><td>{firm}</td><td>{product}</td><td>{reason}</td><td>{class}</td><td>{route}</td></tr>
+	</table>
+	📎  FDA Recalls/Enforcement ⚠️  https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts
+</callout>
+출력 조건: Tier 2 해당 1건 이상일 때만. 0건이면 전체 생략.
 
 블록 6. Heading 2 — "## 📑  이번 주 한눈에 ({N}건)"
-블록 7. Callout (default, 📑) — 한눈에 표 — v14.5 와 동일
-블록 8. Divider "---"
-블록 9~. Heading 2 + 사례 카드 — v15.2 갱신 구조 (W1~W9 / 가이드라인 카드)
-(v15.1) Recall 은 [Recall 3-tier 처리 규칙 — v15.1] Tier 3 기준 충족 항목만 카드화. 기준 미달 Recall 카드 작성 금지.
 
-— 사례 카드 블록 순서 (v15.2 갱신) —
+블록 7. 한눈에 표:
+<callout icon="📑">
+	<table header-row="true">
+	<tr><td>**#**</td><td>**카테고리**</td><td>**기관**</td><td>**사안**</td><td>**발행일**</td><td>**Evidence**</td></tr>
+	<tr><td>1</td><td>{cat}</td><td>{agency}</td><td>{title}</td><td>{date}</td><td>{ev}</td></tr>
+	</table>
+</callout>
 
-블록 W1 (한 줄 요약 — v15.2 신규):
-Callout (blue_bg, 💡). 카드 H2 바로 아래, 메타 표 위에 배치.
-해당 사례의 핵심을 1~2문장으로 요약. 스크롤 없이 "무슨 일인지" 파악 가능하게.
-형식 예:
-"💡  Metoprolol Succinate ER Tablets 25mg 용출 시험 규격 부적합 — 17,304병 전국 회수. 인도 CMO(Alkem) 제조 lot. ER 제형 공정 변동성 의심."
-규칙:
-- 제품명·사유·규모·핵심 맥락만. 3줄 이하.
-- Evidence 배지, Classification, Route 는 이 요약 아래에 인라인 표기:
-  `Evidence A` · `ORAL` · `Class II` (bold 없이 간결하게)
+블록 8. Divider:
+---
 
-블록 W2 (메타 표) — 기존과 동일. Evidence A 셀 예시:
-| **🔍  Evidence Level** | A — Intake direct (API raw) |
-| **🔍  Evidence Level** | B — 인덱스+보조                |
+블록 9~. 사례 카드 (v15.2 갱신 — <callout> 태그 명시):
+(v15.1) Recall 은 Tier 3 기준 충족 항목만 카드화.
 
-블록 W3 (원문/요약) — Evidence A Intake 모드일 때:
-"**원문 인용** — {기관명} 발표 (Intake: API raw)"
-이어서 raw payload 의 영문 필드값을 quote(>) 블록으로 인용.
-⚠️  quote 블록은 반드시 텍스트로 시작. 빈 줄 시작 금지 ([Quote 블록 규칙] 참조).
+— 사례 카드 블록 순서 —
 
-블록 W4 (한국어 번역) — 기존과 동일하되 빈 quote 금지.
-번역 대상 텍스트가 없으면 quote 블록 자체를 생략하고 "(해당 없음)" 한 줄만 표기.
+블록 W1 (한 줄 요약 — v15.2):
+<callout icon="💡" color="blue_bg">
+	{핵심 1~2문장: 제품명·사유·규모·맥락}
+	Evidence A · ORAL · Class II (plain text, 코드 블록 아님)
+</callout>
 
-블록 W5~W6 (핵심 사실 + 기존 내용) — 기존과 동일.
+블록 W2 (메타 표):
+<table header-row="true">
+<tr><td>**항목**</td><td>**내용**</td></tr>
+<tr><td>**📅 원본 발행일**</td><td>{날짜}</td></tr>
+<tr><td>**🔍 Evidence Level**</td><td>A — Intake direct (API raw)</td></tr>
+... (기존 메타 항목 동일)
+</table>
 
-블록 W7 (AI 면책 안내 — v15.2 신규):
-Callout (gray_bg, ℹ️). 시사점·점검 사항 바로 위에 배치.
-고정 문구:
-"ℹ️  **AI Generated Content** — 본 요약 및 분석은 AI가 자동 생성한 내용입니다. 참고 자료이며 공식 견해가 아니므로, 반드시 원문 자료와 대조·확인해 주시기 바랍니다."
-규칙:
-- 카드당 1회만 표기 (시사점 + 점검 사항을 함께 커버).
-- 이 블록 아래에 시사점(yellow_bg) → 점검 사항(green_bg) 순서.
+블록 W3 (원문 인용) — Evidence A 일 때:
+<callout icon="📜">
+	**원문 인용** — {기관명} 발표 (Intake: API raw)
+</callout>
+이어서 원문만 > 블록:
+> "{영문 원문 텍스트}"
+⚠️ > 는 여기서만 사용. 빈 줄 시작 금지.
 
-블록 W7-a (시사점) — 기존 yellow_bg callout 과 동일.
+블록 W4 (한국어 번역):
+<callout icon="🌐" color="gray_bg">
+	**한국어 번역**
+	"{번역 텍스트}"
+</callout>
+번역 대상이 없으면 이 callout 자체를 생략.
 
-블록 W7-b (점검 사항 — v15.2 강조 변경):
-Callout (green_bg, ✅). 기존 default 에서 green_bg 로 변경.
-형식 예:
-"✅  **점검 사항**"
-- 자사 ER/MR 정제 최근 1년 용출 트렌드 검토 (OOT/OOS 여부)
-- 위탁 제조업체 용출 방법 밸리데이션 자료 확보 여부 점검
-- Alkem Laboratories Ltd. 자사 공급업체 리스트 해당 여부 확인
-규칙:
-- 각 항목은 구체적 행동으로 작성 (명사형 나열 아닌 "~검토", "~확인" 동사 포함).
-- 3~5개 항목. 과도하게 많으면 우선순위 상위 3개만 기재.
+블록 W5 (핵심 사실):
+<callout icon="✓" color="blue_bg">
+	**핵심 사실**
+	- **{라벨}**: {내용}
+	- **{라벨}**: {내용}
+</callout>
 
-블록 W8 (Raw API payload toggle — v15.2 이동):
-Evidence A 카드에 한해 raw API JSON 을 toggle 안에 보존.
-형식:
-<details><summary>📦 Raw API payload (JSON)</summary>
-```json
-{전체 payload}
-```
+블록 W6 (AI 면책 + 시사점 + 점검 사항):
+<callout icon="ℹ️" color="gray_bg">
+	**AI Generated Content** — 본 요약 및 분석은 AI가 자동 생성한 내용입니다. 참고 자료이며 공식 견해가 아니므로, 반드시 원문 자료와 대조·확인해 주시기 바랍니다.
+</callout>
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{사실 기반 해석. 톤 가드레일 준수.}
+</callout>
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	- {구체적 행동 1 (~검토, ~확인)}
+	- {구체적 행동 2}
+	- {구체적 행동 3}
+</callout>
+점검 사항 규칙: 3~5개, 구체적 동사 포함.
+
+블록 W7 (Raw API payload — toggle):
+<details>
+<summary>📦 Raw API payload (JSON)</summary>
+	```json
+	{전체 payload}
+	```
 </details>
-기존에는 카드 본문에 코드 블록으로 노출했으나, v15.2 부터 toggle 으로 접어서
-추적성은 유지하되 기본 상태에서는 숨긴다.
+Evidence A 카드에만 포함. 기본 접힌 상태.
 
-블록 W9 (출처 푸터) — Intake 흡수 항목일 때:
-"📰  [Intake API Query]({URL}) · [WebSearch]({URL})   ·   📎  [{Official URL}]({URL})"
+블록 W8 (출처 푸터):
+<callout icon="📚" color="gray_bg">
+	📰  [Intake API Query]({URL}) · [WebSearch]({URL})   ·   📎  [{Official URL}]({URL})
+</callout>
 
 블록 11. Heading 2 — "## 🔮  발행 예정·진행 중인 변경 ({N}건)"
-블록 12. Callout (default, 🔮) — 🔮 단일 통합 표 — v14.5 와 동일
-   (v15.0) Intake FR 항목 중 `Comments Close` 가 있는 consultation/Draft 는 자동으로 🔮 후보.
 
-블록 13. <details> 토글 — v14.5 와 동일
+블록 12. 🔮 표:
+<callout icon="🔮">
+	{설명 1줄}
+	<table header-row="true">
+	<tr><td>**이벤트**</td><td>**단계**</td><td>**일정**</td><td>**카테고리**</td><td>**출처**</td></tr>
+	...
+	</table>
+</callout>
+(v15.0) Intake FR 항목 중 `Comments Close` 가 있는 consultation/Draft 는 자동으로 🔮 후보.
 
-블록 M2. Callout (gray_bg, 📭) — 점검 출처 + 미확인 카테고리 (v15.0 갱신)
-"점검 완료: Intake DB 조회 1회 + WebSearch {N}회 + WebFetch {N}개 + 보조 출처 자연 도달 {N}개"
-
-빈 줄
-"Intake 결과:"
-- Federal Register: {N}건 (Run Date={YYYY-MM-DD})
-- OpenFDA Recall: {N}건 (Run Date={YYYY-MM-DD})
-- 또는 "Intake row 0건 — v14.5 graceful degradation 모드"
-
-빈 줄
-"WebFetch 결과:"
-(v14.5 와 동일 형식)
-
-빈 줄
-"신규 항목 미확인 카테고리:"
-- {카테고리명} (#번호)
-- {기관·블로그} — 이번 주 관련 항목 없음
+블록 13. M2·M3 메타 — <details> toggle 안에 전부 접기:
+<details>
+<summary>🔖 검색 메타데이터 · 미확인 카테고리 (펼쳐 보기)</summary>
+	<callout icon="📭" color="gray_bg">
+		점검 완료: Intake DB 조회 1회 + WebSearch {N}회 + WebFetch {N}개 + 보조 출처 자연 도달 {N}개
+		Intake 결과:
+		- Federal Register: {N}건 (Run Date={YYYY-MM-DD})
+		- OpenFDA Recall: {N}건 (Run Date={YYYY-MM-DD})
+		WebFetch 결과:
+		- {URL} — HTTP {status}
+		신규 항목 미확인 카테고리:
+		- {카테고리명} (#번호)
+	</callout>
+	<callout icon="🔖" color="gray_bg">
+		검색 실행일시 · 기간 · TZ · Deep Dive 주차 · WebSearch/WebFetch 횟수 등 (M3 내용)
+	</callout>
+</details>
+⚠️ M2·M3 는 운영자용 디버깅 정보. 반드시 <details> 안에 접어서 기본 숨김 상태.
 (v15.0) 열거형 출처(FR · Recall)가 미확인인 경우:
 - FDA Federal Register — Intake 적재 0건. 외부 수집기 KPI 확인 필요.
 - FDA Recalls/Enforcement — Intake 적재 0건. 외부 수집기 KPI 확인 필요.
 (Intake 가 정상 실행됐는데 0건이면 "해당 주 조용함" 일 수 있음 — 위 문구는 4주 연속 0건일 때만)
 
-블록 M3. Callout (gray_bg, 🔖) — 검색 실행 메타 (v15.0 갱신)
-"검색 실행일시: {YYYY-MM-DD HH:MM} (KST)"
-"검색 기간: {YYYY-MM-DD} ~ {YYYY-MM-DD} (KST)"
-"TZ: Asia/Seoul 기준 산정 (UTC 아님)"
-"Deep Dive Search 주차: {1주차/2주차/3주차/4주차/5주차}"
-"WebSearch 횟수: {N}회 / 한도 9회 (Core {N} + Deep Dive Search {N})"
-"WebSearch fallback 적용 슬롯: {슬롯 번호 · 적용 단계}"
-"WebFetch 횟수: {N}개 / 한도 5개 (접근 성공 {N} / 실패 {N} / 유효항목 {M})"
-"Intake 읽기 — 실행일(KST) 필터: Run Date={YYYY-MM-DD} · 조회 결과 {N}건 (FR {N} · Recall {N}) · Notion DB `GRM API Intake` (ID 7784c71fb7b343749b2bee5d04db7926)"
-"공식 API 호출: 외부 수집기 위임 (Routine 직접 호출 없음 — GitHub Actions 일요일 20:17 UTC / 월요일 05:17 KST)"
-"TGA 임시 가중치: Core 8 슬롯 (실사 임박, 종료 후 Deep Dive로 이동 예정)"
-"API-WebSearch 불일치: {기록 또는 '없음'}"
-   (v15.0) 이제 'Intake-WebSearch 불일치' 가 주요 점검 대상.
-   · Intake 가 적재 0 건인데 WebSearch 가 FR 문서 또는 OpenFDA Recall 발견 →
-     "Intake-WebSearch 불일치: Intake 적재 0건 · WebSearch 가 `FR 2026-xxxxx` 식별, Evidence B 분류"
-   · 양쪽에서 동일 발견 → "Intake-WebSearch 일치 (FR {N}건 cross-confirmed)"
-   · 불일치 없음 → "Intake-WebSearch 불일치: 없음"
-"공식 원본 링크 분포: L1 {N}건 · L2 {N}건 · L3 {N}건"
-"생성: Claude (Anthropic) / GRM Automated Routine v15.0 Intake-first cloud mode"
-"※ AI Generated Content — 본 요약 및 분석은 AI가 자동 생성한 내용입니다. 참고 자료이며 공식 견해가 아니므로, 반드시 원문 자료와 대조·확인해 주시기 바랍니다."
+⚠️ 블록 M3 내용 (M2 callout 바로 뒤, 같은 <details> 내부에 배치):
+M3 항목 — 모두 <callout icon="🔖" color="gray_bg"> 안에 탭 들여쓰기:
+검색 실행일시 · 검색 기간 · TZ · Deep Dive 주차 · WebSearch 횟수 ·
+WebFetch 횟수 · Intake 읽기 · 공식 API 호출 · TGA 가중치 ·
+Intake-WebSearch 불일치 · 공식 원본 링크 분포 · 생성 라벨 · AI 면책.
+(v15.0) Intake-WebSearch 불일치 점검:
+   · Intake 적재 0건 + WebSearch FR 발견 → 불일치 기록
+   · 양쪽 동일 → 일치 기록
+   · 없음 → "없음"
+생성 라벨: "생성: Claude (Anthropic) / GRM Automated Routine v15.0 Intake-first cloud mode"
+면책 라벨: "※ AI Generated Content — 본 요약 및 분석은 AI가 자동 생성한 내용입니다. 참고 자료이며 공식 견해가 아니므로, 반드시 원문 자료와 대조·확인해 주시기 바랍니다."
 
 [톤 가드레일 — '시사점' 영역]
 지시·권고 표현, 사내 절차 메타 언급 금지. 사실 기반 추론과 명사형 항목만.
 (v14.4.1 와 동일)
-(v15.2 추가) 시사점·점검 사항 앞에는 반드시 AI 면책 안내 callout 을 1회 배치한다.
+(v15.2) 시사점·점검 사항 앞에는 반드시 <callout icon="ℹ️" color="gray_bg"> AI 면책 안내를 1회 배치.
 면책 안내 없이 시사점/점검 사항을 출력하지 않는다.
 
 [발송]

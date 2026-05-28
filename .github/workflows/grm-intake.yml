@@ -1,16 +1,16 @@
-name: GRM API Intake (Weekly)
+name: GRM API Intake (Daily)
 
-# 매주 일요일 20:17 UTC = 월요일 05:17 KST
-# Claude Code Routine (월 07:30 KST) 2시간 전에 수집 완료 목표
-# (GitHub Actions cron 최대 60분 지연 공식 고지 → 여유 2시간 확보)
+# 매일 20:17 UTC = 익일 05:17 KST
+# Claude Routine (매주 월 07:30 KST) 전에 7일치 수집 완료 보장
+# (GitHub Actions cron 최대 60분 지연 공식 고지)
 # 비정각(:17) 사용 — GitHub Actions :00 부하 분산 권장사항 반영
 #
 # cron 표기:
 # minute hour day(month) month day(week)
-#  17     20    *           *      0       → 일요일 20:17 UTC
+#  17     20    *           *      *       → 매일 20:17 UTC
 on:
   schedule:
-    - cron: '17 20 * * 0'
+    - cron: '17 20 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   collect:
-    name: Collect FR + OpenFDA → Notion Intake
+    name: Collect 7 sources → Notion Intake
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -99,7 +99,7 @@ jobs:
               repo: context.repo.repo,
               title: `GRM Intake 실패 — ${today}`,
               body: [
-                '주간 GRM API Intake 수집기가 실패했습니다.',
+                'GRM API Intake 수집기(Daily)가 실패했습니다.',
                 '',
                 `- Run: ${runUrl}`,
                 `- Trigger: ${context.eventName}`,
@@ -107,7 +107,7 @@ jobs:
                 '점검 항목:',
                 '1. Notion Integration 토큰 유효성',
                 '2. Notion DB 스키마 (속성 이름·타입)',
-                '3. Federal Register / OpenFDA API 상태',
+                '3. Federal Register / OpenFDA / RSS / FDA WL 상태',
                 '4. GitHub Secrets 값',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',

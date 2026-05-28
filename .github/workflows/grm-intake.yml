@@ -21,6 +21,14 @@ on:
         description: '수집 윈도우 일수 (기본 7)'
         type: string
         default: '7'
+      enable_search:
+        description: 'Brave Search 수집 활성화 (기본: vars.ENABLE_SEARCH 또는 false)'
+        type: boolean
+        default: false
+      enable_scrape:
+        description: 'Web Scrape 수집 활성화 (기본: vars.ENABLE_SCRAPE 또는 false)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -32,9 +40,9 @@ concurrency:
 
 jobs:
   collect:
-    name: Collect 7 sources → Notion Intake
+    name: Collect sources → Notion Intake
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -61,11 +69,19 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           # workflow_dispatch 입력을 env 변수로만 받아 shell 본문에 직접 삽입 금지
           GRM_DRY_RUN: ${{ inputs.dry_run }}
           GRM_WINDOW_DAYS: ${{ inputs.window_days }}
           # github.event_name을 env로 노출 — shell 본문 ${{ }} 직접 삽입 방지 (W2)
           GRM_EVENT_NAME: ${{ github.event_name }}
+          # Phase 2a feature flags:
+          # workflow_dispatch: (event_name == 'workflow_dispatch') && format('{0}', inputs.*) 로
+          #   boolean false를 "false" 문자열(non-empty=truthy)로 변환 후 short-circuit
+          #   → 사용자가 명시적으로 false 설정 시 vars.ENABLE_* 로 override되는 버그 방지
+          # schedule: event_name != 'workflow_dispatch' → false → vars.* || 'false' fallback
+          ENABLE_SEARCH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_search) || vars.ENABLE_SEARCH || 'false' }}
+          ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()
@@ -108,7 +124,8 @@ jobs:
                 '1. Notion Integration 토큰 유효성',
                 '2. Notion DB 스키마 (속성 이름·타입)',
                 '3. Federal Register / OpenFDA / RSS / FDA WL 상태',
-                '4. GitHub Secrets 값',
+                '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY)',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_SCRAPE) 설정 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',
               ].join('\n'),

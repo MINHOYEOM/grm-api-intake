@@ -81,6 +81,12 @@ PROP_QA_RELEVANCE = "QA Relevance"
 PROP_STATUS = "Status"
 PROP_SIGNAL_TIER = "Signal Tier"
 
+# Phase 2a 신규 Notion 필드
+PROP_SOURCE_URL         = "Source URL"
+PROP_RAW_EXCERPT        = "Raw Excerpt"
+PROP_SEARCH_QUERY       = "Search Query"
+PROP_EVIDENCE_CANDIDATE = "Evidence Candidate"
+
 SOURCE_FR = "Federal Register"
 SOURCE_RECALL = "OpenFDA Recall"
 # v15.1 Phase 2 — RSS / HTML 소스
@@ -90,15 +96,23 @@ SOURCE_PICS = "PIC/S"
 SOURCE_ECA = "ECA Academy"
 SOURCE_FDA_WL = "FDA Warning Letter"
 
+# ── Phase 2a: Search / Scrape 소스 ──────────────────────────────────────────
+SOURCE_BRAVE = "Brave Search"
+SOURCE_RAPS  = "RAPS"
+SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
+
 # Source Type 분류 값 (Notion Select 옵션과 1:1 대응)
 PROP_SOURCE_TYPE = "Source Type"
-SRC_TYPE_OFFICIAL_API = "Official API"          # FR, OpenFDA Recall, EMA RSS
-SRC_TYPE_OFFICIAL_PAGE = "Official Regulatory Page"   # PIC/S, FDA WL
-SRC_TYPE_OFFICIAL_BLOG = "Official Regulator Blog"    # MHRA Inspectorate
-SRC_TYPE_EXPERT_SECONDARY = "Expert Secondary"        # ECA Academy
+SRC_TYPE_OFFICIAL_API     = "Official API"              # FR, OpenFDA Recall, EMA RSS
+SRC_TYPE_OFFICIAL_PAGE    = "Official Regulatory Page"  # PIC/S, FDA WL
+SRC_TYPE_OFFICIAL_BLOG    = "Official Regulator Blog"   # MHRA Inspectorate
+SRC_TYPE_EXPERT_SECONDARY = "Expert Secondary"          # ECA Academy
+SRC_TYPE_SEARCH_RESULT    = "Search Result"             # Phase 2a: Brave Search
+SRC_TYPE_OFFICIAL_SCRAPE  = "Official Page Scrape"      # Phase 2a: scrape 수집
 
 # 소스별 Source Type 매핑
 SOURCE_TYPE_MAP: dict[str, str] = {
+    # 기존 7개
     SOURCE_FR:      SRC_TYPE_OFFICIAL_API,
     SOURCE_RECALL:  SRC_TYPE_OFFICIAL_API,
     SOURCE_EMA:     SRC_TYPE_OFFICIAL_API,
@@ -106,6 +120,10 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_PICS:    SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_ECA:     SRC_TYPE_EXPERT_SECONDARY,
     SOURCE_FDA_WL:  SRC_TYPE_OFFICIAL_PAGE,
+    # Phase 2a 신규
+    SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
+    SOURCE_RAPS:    SRC_TYPE_EXPERT_SECONDARY,
+    SOURCE_EPR:     SRC_TYPE_EXPERT_SECONDARY,
 }
 
 # RSS / HTML 엔드포인트 (v15.1 추가)
@@ -235,6 +253,12 @@ class IntakeItem:
     source_type: str = SRC_TYPE_OFFICIAL_API  # Source Type 분류 (v15.1)
     signal_tier: str = "Tier 1"  # "Tier 1" | "Tier 2" | "Tier 3" — compute_signal_tier 자동 분류
     raw_payload: dict[str, Any] = field(default_factory=dict)
+    # ── Phase 2a 신규 필드 ────────────────────────────────────────────────────
+    # 모두 default="" — 기존 FR/Recall 등 코드는 건드리지 않아도 됨
+    source_url: str = ""           # 실제 수집/발견 페이지 URL (Search/Scrape 전용)
+    raw_excerpt: str = ""          # ≤200자 snippet/excerpt
+    search_query: str = ""         # Brave Search 실행 쿼리 (Search 전용)
+    evidence_candidate: str = ""   # "A"/"B"/"C"/"D" — 수집기 후보, Routine 최종 판정
 
 
 @dataclass
@@ -285,6 +309,13 @@ class CollectionStats:
     wl_insert_failed: int = 0
     wl_error: bool = False
     wl_error_msg: str = ""
+    # ── Phase 2a: Search ────────────────────────────────────────────────────
+    search_fetched: int = 0
+    search_inserted: int = 0
+    search_skipped_dup: int = 0
+    search_insert_failed: int = 0
+    search_error: bool = False
+    search_error_msg: str = ""
 
     def has_insert_failures(self) -> bool:
         return (
@@ -292,6 +323,19 @@ class CollectionStats:
             or self.ema_insert_failed > 0 or self.mhra_insert_failed > 0
             or self.pics_insert_failed > 0 or self.eca_insert_failed > 0
             or self.wl_insert_failed > 0
+            or self.search_insert_failed > 0   # Phase 2a 신규
+        )
+
+    def has_source_errors(self) -> bool:
+        """수집기 레벨 오류 여부 (insert 실패와 별개).
+        ENABLE_SEARCH=true + BRAVE_API_KEY 누락 같은 misconfiguration도 포함.
+        workflow issue 생성 / exit code 판정에 이 메서드를 사용할 것.
+        """
+        return (
+            self.fr_error or self.recall_error or self.ema_error
+            or self.mhra_error or self.pics_error or self.eca_error
+            or self.wl_error
+            or self.search_error   # Phase 2a 신규 — misconfiguration 포함
         )
 
     def summary(self) -> str:
@@ -319,6 +363,9 @@ class CollectionStats:
             f"WL   fetched={self.wl_fetched}  inserted={self.wl_inserted}  "
             f"skip_dup={self.wl_skipped_dup}  failed={self.wl_insert_failed}  "
             f"error={self.wl_error}",
+            f"SRC  fetched={self.search_fetched}  inserted={self.search_inserted}  "
+            f"skip_dup={self.search_skipped_dup}  failed={self.search_insert_failed}  "
+            f"error={self.search_error}",
         ]
         return "\n".join(lines)
 
@@ -1520,6 +1567,10 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         SOURCE_PICS:    "PICS",
         SOURCE_ECA:     "ECA",
         SOURCE_FDA_WL:  "WL",
+        # Phase 2a 신규 ("SRC" 아님 — 모호함 방지)
+        SOURCE_BRAVE:   "BRV",
+        SOURCE_RAPS:    "RAPS",
+        SOURCE_EPR:     "EPR",
     }
     prefix = _prefix_map.get(item.source, item.source)
     if item.source in (SOURCE_RECALL, SOURCE_FDA_WL):
@@ -1566,6 +1617,22 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         u = _url(item.api_query)
         if u:
             props[PROP_API_QUERY] = u
+
+    # ── Phase 2a 신규 필드 매핑 ─────────────────────────────────────────────
+    if item.source_url:
+        u = _url(item.source_url)
+        if u:
+            props[PROP_SOURCE_URL] = u
+    if item.raw_excerpt:
+        props[PROP_RAW_EXCERPT] = {
+            "rich_text": _rich_text(truncate(item.raw_excerpt, 200))
+        }
+    if item.search_query:
+        props[PROP_SEARCH_QUERY] = {
+            "rich_text": _rich_text(truncate(item.search_query, NOTION_RICH_TEXT_CHUNK))
+        }
+    if item.evidence_candidate:
+        props[PROP_EVIDENCE_CANDIDATE] = _select(item.evidence_candidate)
 
     return props
 
@@ -1857,6 +1924,33 @@ def main() -> int:
     stats.wl_skipped_dup = wl_sk
     stats.wl_insert_failed = wl_fail
 
+    # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
+    enable_search = os.environ.get("ENABLE_SEARCH", "false").lower() == "true"
+    if enable_search:
+        brave_api_key = os.environ.get("BRAVE_API_KEY", "")
+        log("INFO", "=== Brave Search 수집 시작 ===")
+        try:
+            from collect_search import collect_brave_search
+            search_items, search_err = collect_brave_search(brave_api_key)
+        except Exception as e:
+            search_items, search_err = [], str(e)
+
+        stats.search_fetched = len(search_items)
+        if search_err:
+            stats.search_error = True
+            stats.search_error_msg = search_err
+            log("WARN", f"Brave Search 오류: {search_err}")
+
+        src_in, src_sk, src_fail = insert_items(
+            notion_token, notion_db, search_items,
+            run_date, collected_at, existing, args.dry_run,
+        )
+        stats.search_inserted = src_in
+        stats.search_skipped_dup = src_sk
+        stats.search_insert_failed = src_fail
+    else:
+        log("INFO", "ENABLE_SEARCH=false — Brave Search 건너뜀")
+
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
@@ -1897,12 +1991,23 @@ def main() -> int:
                 f.write(_src_line("FDA Warning Letters", stats.wl_fetched, stats.wl_inserted,
                                   stats.wl_skipped_dup, stats.wl_insert_failed,
                                   stats.wl_error, stats.wl_error_msg))
+                if enable_search:
+                    f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
+                                      stats.search_skipped_dup, stats.search_insert_failed,
+                                      stats.search_error, stats.search_error_msg))
                 f.write(f"- Dry run: `{args.dry_run}`\n")
                 if stats.has_insert_failures():
-                    total_fail = stats.fr_insert_failed + stats.recall_insert_failed
+                    total_fail = (stats.fr_insert_failed + stats.recall_insert_failed
+                                  + stats.search_insert_failed)
                     f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "
                             f"해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다. "
                             f"Actions 로그에서 doc ID 확인 후 필요 시 수동 재실행.\n")
+                if stats.has_source_errors():
+                    f.write("\n> ❌ **수집기 오류 발생** — "
+                            "Actions 로그에서 source별 error 메시지를 확인하세요.\n")
+                    if stats.search_error:
+                        f.write(f"> Brave Search error: `{stats.search_error_msg[:120] or 'none'}` "
+                                f"— BRAVE_API_KEY 및 ENABLE_SEARCH 설정 확인.\n")
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
@@ -1929,6 +2034,13 @@ def main() -> int:
         if phase2_all_error:
             log("ERROR", "모든 활성 소스 실패 — workflow fail")
             return 1
+    # Phase 2a: ENABLE_SEARCH=true 상태에서 Brave Search 전체 실패 / misconfiguration
+    # search_error=True는 전체 슬롯 실패 또는 API key 누락 두 경우에만 발생하므로
+    # exit 1은 과도하지 않다. 일부 슬롯 실패(graceful degradation)는 False 유지.
+    if enable_search and stats.search_error:
+        log("ERROR", f"ENABLE_SEARCH=true 상태에서 Brave Search 오류 — workflow fail "
+                     f"({stats.search_error_msg[:80]})")
+        return 1
     return 0
 
 

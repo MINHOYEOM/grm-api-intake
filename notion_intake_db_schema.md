@@ -30,7 +30,7 @@
 | `Headline` | Rich text | ✓ | 제목/제품명/게시글 제목 | 표시용 |
 | `Official URL` | URL |  | 공식 원문 URL | Search Evidence C는 비울 수 있음 |
 | `Source URL` | URL |  | Search/Scrape가 발견한 실제 URL | Phase 2a 신규 |
-| `Type or Class` | Select |  | `Rule` / `Proposed Rule` / `Notice` / `Class I` / `Class II` / `Class III` / `legislative-notice` / `gmp-guideline` / `gmp-inspection` / `regulation-final` / `notice-final` / `guidance-industry` / `guidance-internal` / `safety-letter` 등 | MFDS는 사람용 번역 없이 기계용 영문 키 사용 |
+| `Type or Class` | Select |  | `Rule` / `Proposed Rule` / `Notice` / `Class I` / `Class II` / `Class III` / `legislative-notice` / `gmp-guideline` / `gmp-inspection` / `regulation-final` / `notice-final` / `guidance-industry` / `guidance-internal` / `safety-letter` / `recall-quality` 등 | MFDS는 사람용 번역 없이 기계용 영문 키 사용 |
 | `Firm` | Rich text |  | 업체명 | Recall/WL 중심 |
 | `Body` | Rich text |  | 요약/본문 일부 | 한국어 원문은 그대로 저장 |
 | `Distribution` | Rich text |  | `distribution_pattern` | Recall 전용 |
@@ -47,6 +47,7 @@
 | `Signal Tier` | Select |  | `Tier 1` / `Tier 2` / `Tier 3` | 수집기 1차 우선순위 |
 | `Language` | Select |  | `KO` / `EN` | Phase 2b MFDS 권고 필드 |
 | `Region/Jurisdiction` | Select |  | `Korea (MFDS)` 등 | 글로벌 확장용 선택 필드 |
+| `Self-Check Required` | Select |  | `Yes` / `Review` / `No` | Phase 2c 자가점검 트리거. 회수·안전성서한·실태조사 고신호에 사용 |
 | `Status` | Select |  | `New` / `Processed` / `Skipped` / `Error` | Routine 이 갱신 |
 
 ## 페이지 본문(children)

@@ -90,6 +90,7 @@ PROP_STATUS = "Status"
 PROP_SIGNAL_TIER = "Signal Tier"
 PROP_LANGUAGE = "Language"
 PROP_REGION_JURISDICTION = "Region/Jurisdiction"
+PROP_SELF_CHECK = "Self-Check Required"
 
 # Phase 2a 신규 Notion 필드
 PROP_SOURCE_URL         = "Source URL"
@@ -273,6 +274,7 @@ class IntakeItem:
     evidence_candidate: str = ""   # "A"/"B"/"C"/"D" — 수집기 후보, Routine 최종 판정
     language: str = ""             # KO / EN 등. MFDS Phase 2b부터 사용
     region_jurisdiction: str = ""  # 예: Korea (MFDS)
+    self_check_required: str = ""   # Yes / Review / No — Phase 2c self-check trigger
 
 
 @dataclass
@@ -337,6 +339,13 @@ class CollectionStats:
     mfds_insert_failed: int = 0
     mfds_error: bool = False
     mfds_error_msg: str = ""
+    # ── Phase 2c: MFDS Recall / Self-Check ────────────────────────────────
+    mfds_recall_fetched: int = 0
+    mfds_recall_inserted: int = 0
+    mfds_recall_skipped_dup: int = 0
+    mfds_recall_insert_failed: int = 0
+    mfds_recall_error: bool = False
+    mfds_recall_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -344,7 +353,7 @@ class CollectionStats:
             + self.ema_insert_failed + self.mhra_insert_failed
             + self.pics_insert_failed + self.eca_insert_failed
             + self.wl_insert_failed + self.search_insert_failed
-            + self.mfds_insert_failed
+            + self.mfds_insert_failed + self.mfds_recall_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -361,6 +370,7 @@ class CollectionStats:
             or self.wl_error
             or self.search_error   # Phase 2a 신규 — misconfiguration 포함
             or self.mfds_error
+            or self.mfds_recall_error
         )
 
     def summary(self) -> str:
@@ -394,6 +404,9 @@ class CollectionStats:
             f"MFDS fetched={self.mfds_fetched}  inserted={self.mfds_inserted}  "
             f"skip_dup={self.mfds_skipped_dup}  failed={self.mfds_insert_failed}  "
             f"error={self.mfds_error}",
+            f"MFR  fetched={self.mfds_recall_fetched}  inserted={self.mfds_recall_inserted}  "
+            f"skip_dup={self.mfds_recall_skipped_dup}  failed={self.mfds_recall_insert_failed}  "
+            f"error={self.mfds_recall_error}",
         ]
         return "\n".join(lines)
 
@@ -1624,6 +1637,8 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         props[PROP_LANGUAGE] = _select(item.language)
     if item.region_jurisdiction:
         props[PROP_REGION_JURISDICTION] = _select(item.region_jurisdiction)
+    if item.self_check_required:
+        props[PROP_SELF_CHECK] = _select(item.self_check_required)
 
     return props
 
@@ -1767,8 +1782,10 @@ def main() -> int:
     notion_db = os.environ.get("NOTION_DATABASE_ID", "").strip()
     openfda_key = os.environ.get("OPENFDA_API_KEY", "").strip() or None
     data_go_kr_key = os.environ.get("DATA_GO_KR_KEY", "").strip()
+    data_go_kr_service_key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
     enable_search = os.environ.get("ENABLE_SEARCH", "false").lower() == "true"
     enable_mfds = os.environ.get("ENABLE_MFDS", "false").lower() == "true"
+    enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
     if enable_scrape:
@@ -1868,15 +1885,38 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_MFDS=false — MFDS 수집 건너뜀")
 
+    # ── Phase 2c: MFDS Recall / Self-Check (ENABLE_MFDS_RECALL=true 시 실행) ─
+    mfds_recall_items: list[IntakeItem] = []
+    if enable_mfds_recall:
+        log("INFO", "=== MFDS 회수·판매중지 수집 시작 ===")
+        if not data_go_kr_service_key:
+            mfds_recall_err = "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
+            mfds_recall_items = []
+        else:
+            try:
+                from collect_mfds_recall import collect_mfds_recall
+                mfds_recall_items, mfds_recall_err = collect_mfds_recall(
+                    start, end, data_go_kr_service_key)
+            except Exception as e:
+                mfds_recall_items, mfds_recall_err = [], str(e)
+        stats.mfds_recall_fetched = len(mfds_recall_items)
+        if mfds_recall_err:
+            stats.mfds_recall_error = True
+            stats.mfds_recall_error_msg = mfds_recall_err
+            log("WARN", f"MFDS Recall 오류: {mfds_recall_err}")
+    else:
+        log("INFO", "ENABLE_MFDS_RECALL=false — MFDS 회수·판매중지 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
-                     + stats.mfds_fetched)
+                     + stats.mfds_fetched + stats.mfds_recall_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
         f"PICS={stats.pics_fetched} · ECA={stats.eca_fetched} · "
-        f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · 합계={total_fetched}건"
+        f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
+        f"MFDS-Recall={stats.mfds_recall_fetched} · 합계={total_fetched}건"
     ))
 
     # 3) Notion 기존 row (중복 제거)
@@ -1949,6 +1989,13 @@ def main() -> int:
     stats.mfds_skipped_dup = mfds_sk
     stats.mfds_insert_failed = mfds_fail
 
+    mfds_rec_in, mfds_rec_sk, mfds_rec_fail = insert_items(
+        notion_token, notion_db, mfds_recall_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.mfds_recall_inserted = mfds_rec_in
+    stats.mfds_recall_skipped_dup = mfds_rec_sk
+    stats.mfds_recall_insert_failed = mfds_rec_fail
+
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
     if enable_search:
@@ -2020,6 +2067,13 @@ def main() -> int:
                     f.write(_src_line("MFDS", stats.mfds_fetched, stats.mfds_inserted,
                                       stats.mfds_skipped_dup, stats.mfds_insert_failed,
                                       stats.mfds_error, stats.mfds_error_msg))
+                if enable_mfds_recall:
+                    f.write(_src_line("MFDS Recall", stats.mfds_recall_fetched,
+                                      stats.mfds_recall_inserted,
+                                      stats.mfds_recall_skipped_dup,
+                                      stats.mfds_recall_insert_failed,
+                                      stats.mfds_recall_error,
+                                      stats.mfds_recall_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -2039,6 +2093,9 @@ def main() -> int:
                     if stats.mfds_error:
                         f.write(f"> MFDS error: `{stats.mfds_error_msg[:120] or 'none'}` "
                                 f"— ENABLE_MFDS 및 DATA_GO_KR_KEY 설정 확인.\n")
+                    if stats.mfds_recall_error:
+                        f.write(f"> MFDS Recall error: `{stats.mfds_recall_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS_RECALL 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
@@ -2066,6 +2123,8 @@ def main() -> int:
             ("pics" not in active or stats.pics_error),
             ("eca" not in active or stats.eca_error),
             ("wl" not in active or stats.wl_error),
+            (not enable_mfds or stats.mfds_error),
+            (not enable_mfds_recall or stats.mfds_recall_error),
         ])
         if phase2_all_error:
             log("ERROR", "모든 활성 소스 실패 — workflow fail")
@@ -2080,6 +2139,10 @@ def main() -> int:
     if enable_mfds and stats.mfds_error:
         log("ERROR", f"ENABLE_MFDS=true 상태에서 MFDS 오류 — workflow fail "
                      f"({stats.mfds_error_msg[:80]})")
+        return 1
+    if enable_mfds_recall and stats.mfds_recall_error:
+        log("ERROR", f"ENABLE_MFDS_RECALL=true 상태에서 MFDS Recall 오류 — workflow fail "
+                     f"({stats.mfds_recall_error_msg[:80]})")
         return 1
     return 0
 

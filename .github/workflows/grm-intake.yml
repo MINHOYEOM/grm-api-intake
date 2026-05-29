@@ -30,9 +30,9 @@ on:
         type: boolean
         default: false
       enable_mfds:
-        description: 'MFDS 수집 활성화 (기본: vars.ENABLE_MFDS 또는 false)'
+        description: 'MFDS 수집 활성화 (기본: vars.ENABLE_MFDS 또는 true)'
         type: boolean
-        default: false
+        default: true
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -95,7 +95,7 @@ jobs:
           #   → 사용자가 명시적으로 false 설정 시 vars.ENABLE_* 로 override되는 버그 방지
           # schedule: event_name != 'workflow_dispatch' → false → vars.* || 'false' fallback
           ENABLE_SEARCH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_search) || vars.ENABLE_SEARCH || 'false' }}
-          ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'false' }}
+          ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'true' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |

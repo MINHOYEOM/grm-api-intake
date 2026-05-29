@@ -152,6 +152,18 @@ SEARCH_SLOTS: list[tuple[str, str]] = [
         "DEEP_DIVE_GLOBAL",
         "(site:pmda.go.jp OR site:hsa.gov.sg OR site:edqm.eu OR site:swissmedic.ch) pharmaceutical GMP guidance",
     ),
+    # ── Phase 2a 확장: 전문 2차 소스 (Evidence C) ────────────────────────────
+    (
+        # RAPS (Regulatory Affairs Professionals Society): FDA/EMA/ICH 규제 동향 전문지
+        # /news-and-articles 와 /regulatory-focus 양쪽 포함하기 위해 경로 고정 않음
+        "RAPS_NEWS",
+        "site:raps.org GMP pharmaceutical manufacturing quality guidance FDA EMA ICH",
+    ),
+    (
+        # European Pharmaceutical Review: EU GMP/QA 전문 2차 소스
+        "EPR_NEWS",
+        "site:europeanpharmaceuticalreview.com pharmaceutical GMP manufacturing quality regulatory",
+    ),
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -442,7 +454,7 @@ def collect_brave_search(
     slots: list[tuple[str, str]] | None = None,
     request_delay: float = 1.0,
 ) -> tuple[list[IntakeItem], str | None]:
-    """Brave Search API로 9개 슬롯을 실행하고 IntakeItem 리스트로 반환.
+    """Brave Search API로 SEARCH_SLOTS 슬롯을 실행하고 IntakeItem 리스트로 반환.
 
     collect_intake.py 패턴과 동일: tuple[list[IntakeItem], str | None] 반환.
     두 번째 원소는 오류 메시지 (성공 시 None).

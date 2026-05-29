@@ -105,6 +105,21 @@ jobs:
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |
+          if [ "$GRM_EVENT_NAME" = "workflow_dispatch" ] && [ "$GRM_SOURCES" = "__probe_admin_gmpcert__" ]; then
+            if [ -z "$DATA_GO_KR_SERVICE_KEY" ]; then
+              echo "::error ::DATA_GO_KR_SERVICE_KEY secret is missing"
+              exit 1
+            fi
+            status=0
+            python probe_datago.py \
+              "https://apis.data.go.kr/1471000/MdcinExaathrService04" \
+              "getMdcinExaathrList04,getMdcinExaathrList,getMdcinExaathrInq04" || status=$?
+            python probe_datago.py \
+              "https://apis.data.go.kr/1471000/DrugGmpStbltJgmtIssuStusService" \
+              "getDrugGmpStbltJgmtIssuStusInq,getDrugGmpStbltJgmtIssuStusList,getDrugGmpStbltJgmtIssuStusInq04" || status=$?
+            exit "$status"
+          fi
+
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()
           if [ "$GRM_EVENT_NAME" = "workflow_dispatch" ]; then

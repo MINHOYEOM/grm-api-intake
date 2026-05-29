@@ -34,9 +34,9 @@ on:
         type: boolean
         default: true
       enable_mfds_recall:
-        description: 'MFDS 회수·판매중지 API 수집 활성화 (기본: vars.ENABLE_MFDS_RECALL 또는 false)'
+        description: 'MFDS 회수·판매중지 API 수집 활성화 (기본: vars.ENABLE_MFDS_RECALL 또는 true)'
         type: boolean
-        default: false
+        default: true
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -101,7 +101,7 @@ jobs:
           # schedule: event_name != 'workflow_dispatch' → false → vars.* || 'false' fallback
           ENABLE_SEARCH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_search) || vars.ENABLE_SEARCH || 'false' }}
           ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'true' }}
-          ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'false' }}
+          ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'true' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |

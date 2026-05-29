@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-GRM Brave Search Collector — v1.2 Phase 2a
+GRM Brave Search Collector — v1.3 Phase 2a
 
-Brave Search API로 9개 쿼리 슬롯을 실행해 GRM 관련 규제 신호를 수집하고
+Brave Search API로 11개 쿼리 슬롯을 실행해 GRM 관련 규제 신호를 수집하고
 IntakeItem 리스트로 반환한다.
 
 설계 원칙:
@@ -67,7 +67,7 @@ SRC_TYPE_SEARCH_RESULT = "Search Result"
 
 BRAVE_API_URL = "https://api.search.brave.com/res/v1/web/search"
 
-# 쿼리당 최대 결과 수: 9 slots × 5 = 최대 45 rows/run
+# 쿼리당 최대 결과 수: 11 slots × 5 = 최대 55 rows/run
 MAX_RESULTS_PER_QUERY = 5
 
 # Brave Search freshness 파라미터: pw = past week (7일)
@@ -155,14 +155,15 @@ SEARCH_SLOTS: list[tuple[str, str]] = [
     # ── Phase 2a 확장: 전문 2차 소스 (Evidence C) ────────────────────────────
     (
         # RAPS (Regulatory Affairs Professionals Society): FDA/EMA/ICH 규제 동향 전문지
-        # /news-and-articles 와 /regulatory-focus 양쪽 포함하기 위해 경로 고정 않음
+        # /resource 경로로 좁혀 뉴스·분석 기사 집중 수집; OR 그룹핑으로 매칭률 향상
         "RAPS_NEWS",
-        "site:raps.org GMP pharmaceutical manufacturing quality guidance FDA EMA ICH",
+        'site:raps.org/resource (GMP OR CGMP) (FDA OR EMA OR ICH OR "warning letter")',
     ),
     (
         # European Pharmaceutical Review: EU GMP/QA 전문 2차 소스
+        # /news 경로로 이벤트/스폰서 페이지 제외; OR 그룹핑으로 정밀도 유지
         "EPR_NEWS",
-        "site:europeanpharmaceuticalreview.com pharmaceutical GMP manufacturing quality regulatory",
+        'site:europeanpharmaceuticalreview.com/news (GMP OR CGMP OR "pharmaceutical quality") (EMA OR MHRA OR EDQM OR FDA OR Annex)',
     ),
 ]
 
@@ -434,8 +435,8 @@ def _result_to_intake_item(
             "brave_title": title,
             "brave_description": result.get("description", ""),
             "brave_date_source": (
-                "published" if result.get("published") else
-                "page_fetched" if result.get("page_fetched") else
+                "page_age" if result.get("page_age") else
+                "age" if result.get("age") else
                 "unknown"
             ),
         },
@@ -504,11 +505,13 @@ def collect_brave_search(
             if normalized in seen_urls:
                 log("DEBUG", f"슬롯 간 중복 URL skip — {url[:80]}")
                 continue
-            seen_urls.add(normalized)
 
             item = _result_to_intake_item(result, query, slot_name, rank=rank)
             if item is None:
+                # 변환 실패(날짜 없음 등) — seen_urls에 추가하지 않음
+                # 다른 슬롯에서 같은 URL을 더 나은 메타데이터로 재수집할 수 있게 허용
                 continue
+            seen_urls.add(normalized)  # 변환 성공 후에만 seen 처리
             slot_items.append(item)
 
         log(

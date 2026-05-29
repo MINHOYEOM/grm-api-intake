@@ -83,6 +83,7 @@ jobs:
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           # workflow_dispatch 입력을 env 변수로만 받아 shell 본문에 직접 삽입 금지
           GRM_DRY_RUN: ${{ inputs.dry_run }}
           GRM_WINDOW_DAYS: ${{ inputs.window_days }}
@@ -101,6 +102,10 @@ jobs:
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()
+          if [ "$GRM_EVENT_NAME" = "workflow_dispatch" ] && [ "$GRM_SOURCES" = "__probe_recall__" ]; then
+            python probe_recall.py
+            exit 0
+          fi
           if [ "$GRM_EVENT_NAME" = "workflow_dispatch" ]; then
             if [ "$GRM_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
 

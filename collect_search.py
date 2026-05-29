@@ -10,7 +10,7 @@ IntakeItem 리스트로 반환한다.
 2. Evidence Candidate: 공식 규제기관 도메인 → B, 그 외 → C
    A는 Search 결과에서 절대 부여하지 않음 (API raw data만 A 자격)
    D는 Routine 최종 판정 위임
-3. freshness=pw (최근 7일) 필터로 윈도우 일치
+3. freshness: 기본 pw(7일), 전문 trade press(RAPS/EPR)는 pm(30일) 개별 적용
 4. _stable_doc_id(source, url, url, date_iso) URL 기반 dedupe
 5. 본문 fetch / 링크 추적 없음 — snippet + URL만 저장 (Phase 2a 범위 외)
 
@@ -72,6 +72,14 @@ MAX_RESULTS_PER_QUERY = 5
 
 # Brave Search freshness 파라미터: pw = past week (7일)
 BRAVE_FRESHNESS = "pw"
+
+# 슬롯별 freshness 개별 설정 (미지정 슬롯은 BRAVE_FRESHNESS 기본값 사용)
+# 공식 규제기관 소스: pw (7일 — 발행 빈도 높음)
+# 전문 2차 trade press: pm (30일 — 발행 빈도 낮음, pw 시 항상 0)
+SLOT_FRESHNESS_OVERRIDE: dict[str, str] = {
+    "RAPS_NEWS": "pm",  # RAPS 발행 빈도 ~주 1~2회 → 7일 윈도우에서 결과 없음
+    "EPR_NEWS":  "pm",  # EPR 동일
+}
 
 # Evidence Candidate: 공식 규제기관 도메인 → B, 그 외 → C
 # 서브도메인 포함 (endswith 매칭)
@@ -484,9 +492,10 @@ def collect_brave_search(
     total_raw = 0
 
     for slot_name, query in target_slots:
-        log("INFO", f"Brave Search slot={slot_name} q='{query[:60]}'")
+        slot_freshness = SLOT_FRESHNESS_OVERRIDE.get(slot_name, BRAVE_FRESHNESS)
+        log("INFO", f"Brave Search slot={slot_name} freshness={slot_freshness} q='{query[:60]}'")
         try:
-            results = brave_search(query, api_key=api_key, count=max_results)
+            results = brave_search(query, api_key=api_key, count=max_results, freshness=slot_freshness)
         except Exception as e:
             msg = f"slot={slot_name} 예외: {e}"
             log("WARN", f"Brave Search 슬롯 실패 — {msg}")

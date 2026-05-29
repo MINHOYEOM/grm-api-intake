@@ -203,14 +203,29 @@ def _extract_date_iso(result: dict) -> str:
     날짜를 알 수 없는 결과를 '오늘 발행'처럼 오판하면 Routine이 잘못 처리할 수 있다.
     날짜 없는 결과는 호출부에서 skip 처리한다.
 
-    Brave Web Search 결과의 날짜 필드 우선순위:
-      published (ISO datetime) > page_fetched (ISO datetime)
+    Brave Web Search API 실제 응답 필드 우선순위:
+      1. page_age  — ISO 8601 datetime ("2026-05-22T10:30:00"), 가장 신뢰도 높음
+      2. age       — human-readable ("May 27, 2026" / "2 days ago" 등)
+                     절대 날짜 형식만 파싱; 상대 표현("N days ago")은 skip
     """
-    for key in ("published", "page_fetched"):
-        val = result.get(key, "")
-        if val and len(val) >= 10:
-            # ISO datetime → YYYY-MM-DD
-            return val[:10]
+    # 1. page_age: ISO datetime (Brave Web Search API 공식 필드)
+    page_age = result.get("page_age", "")
+    if page_age and len(page_age) >= 10:
+        return page_age[:10]  # "2026-05-22T..." → "2026-05-22"
+
+    # 2. age: human-readable 절대 날짜만 파싱
+    age = result.get("age", "").strip()
+    if age:
+        # "Month DD, YYYY" 형식 (예: "May 27, 2026")
+        try:
+            from datetime import datetime as _dt
+            return _dt.strptime(age, "%B %d, %Y").strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+        # "YYYY-MM-DD" 형식
+        if len(age) >= 10 and age[:4].isdigit() and age[4] == "-":
+            return age[:10]
+
     return ""  # 날짜 없음 — 호출부에서 skip
 
 

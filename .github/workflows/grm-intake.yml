@@ -42,9 +42,9 @@ on:
         type: boolean
         default: true
       enable_mfds_gmp_inspection:
-        description: 'MFDS GMP 실태조사 결과 수집 활성화 (기본: vars.ENABLE_MFDS_GMP_INSPECTION 또는 false)'
+        description: 'MFDS GMP 실태조사 결과 수집 활성화 (기본: vars.ENABLE_MFDS_GMP_INSPECTION 또는 true)'
         type: boolean
-        default: false
+        default: true
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -111,7 +111,7 @@ jobs:
           ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'true' }}
           ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'true' }}
           ENABLE_MFDS_ADMIN: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_admin) || vars.ENABLE_MFDS_ADMIN || 'true' }}
-          ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_inspection) || vars.ENABLE_MFDS_GMP_INSPECTION || 'false' }}
+          ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_inspection) || vars.ENABLE_MFDS_GMP_INSPECTION || 'true' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |

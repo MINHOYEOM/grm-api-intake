@@ -41,6 +41,10 @@ on:
         description: 'MFDS 행정처분 API 수집 활성화 (기본: vars.ENABLE_MFDS_ADMIN 또는 true)'
         type: boolean
         default: true
+      enable_mfds_gmp_inspection:
+        description: 'MFDS GMP 실태조사 결과 수집 활성화 (기본: vars.ENABLE_MFDS_GMP_INSPECTION 또는 false)'
+        type: boolean
+        default: false
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -107,6 +111,7 @@ jobs:
           ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'true' }}
           ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'true' }}
           ENABLE_MFDS_ADMIN: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_admin) || vars.ENABLE_MFDS_ADMIN || 'true' }}
+          ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_inspection) || vars.ENABLE_MFDS_GMP_INSPECTION || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |
@@ -173,7 +178,7 @@ jobs:
                 '2. Notion DB 스키마 (속성 이름·타입)',
                 '3. Federal Register / OpenFDA / RSS / FDA WL 상태',
                 '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY)',
-                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MOLEG_API, ENABLE_SCRAPE) 설정 확인',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_INSPECTION, ENABLE_MOLEG_API, ENABLE_SCRAPE) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',

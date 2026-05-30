@@ -352,6 +352,12 @@ class CollectionStats:
     mfds_admin_insert_failed: int = 0
     mfds_admin_error: bool = False
     mfds_admin_error_msg: str = ""
+    mfds_gmp_inspection_fetched: int = 0
+    mfds_gmp_inspection_inserted: int = 0
+    mfds_gmp_inspection_skipped_dup: int = 0
+    mfds_gmp_inspection_insert_failed: int = 0
+    mfds_gmp_inspection_error: bool = False
+    mfds_gmp_inspection_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -361,6 +367,7 @@ class CollectionStats:
             + self.wl_insert_failed + self.search_insert_failed
             + self.mfds_insert_failed + self.mfds_recall_insert_failed
             + self.mfds_admin_insert_failed
+            + self.mfds_gmp_inspection_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -379,6 +386,7 @@ class CollectionStats:
             or self.mfds_error
             or self.mfds_recall_error
             or self.mfds_admin_error
+            or self.mfds_gmp_inspection_error
         )
 
     def summary(self) -> str:
@@ -418,6 +426,11 @@ class CollectionStats:
             f"MFA  fetched={self.mfds_admin_fetched}  inserted={self.mfds_admin_inserted}  "
             f"skip_dup={self.mfds_admin_skipped_dup}  failed={self.mfds_admin_insert_failed}  "
             f"error={self.mfds_admin_error}",
+            f"MFG  fetched={self.mfds_gmp_inspection_fetched}  "
+            f"inserted={self.mfds_gmp_inspection_inserted}  "
+            f"skip_dup={self.mfds_gmp_inspection_skipped_dup}  "
+            f"failed={self.mfds_gmp_inspection_insert_failed}  "
+            f"error={self.mfds_gmp_inspection_error}",
         ]
         return "\n".join(lines)
 
@@ -1800,6 +1813,7 @@ def main() -> int:
     enable_mfds = os.environ.get("ENABLE_MFDS", "false").lower() == "true"
     enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
     enable_mfds_admin = os.environ.get("ENABLE_MFDS_ADMIN", "false").lower() == "true"
+    enable_mfds_gmp_inspection = os.environ.get("ENABLE_MFDS_GMP_INSPECTION", "false").lower() == "true"
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
     if enable_scrape:
@@ -1943,18 +1957,38 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_MFDS_ADMIN=false — MFDS 행정처분 수집 건너뜀")
 
+    # ── Phase 2d: MFDS GMP Inspection Results (ENABLE_MFDS_GMP_INSPECTION=true 시 실행) ─
+    mfds_gmp_inspection_items: list[IntakeItem] = []
+    if enable_mfds_gmp_inspection:
+        log("INFO", "=== MFDS GMP 실태조사 결과 수집 시작 ===")
+        try:
+            from collect_mfds_gmp_inspection import collect_mfds_gmp_inspections
+            mfds_gmp_inspection_items, mfds_gmp_inspection_err = collect_mfds_gmp_inspections(
+                start, end)
+        except Exception as e:
+            mfds_gmp_inspection_items, mfds_gmp_inspection_err = [], str(e)
+        stats.mfds_gmp_inspection_fetched = len(mfds_gmp_inspection_items)
+        if mfds_gmp_inspection_err:
+            stats.mfds_gmp_inspection_error = True
+            stats.mfds_gmp_inspection_error_msg = mfds_gmp_inspection_err
+            log("WARN", f"MFDS GMP Inspection 오류: {mfds_gmp_inspection_err}")
+    else:
+        log("INFO", "ENABLE_MFDS_GMP_INSPECTION=false — MFDS GMP 실태조사 결과 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
                      + stats.mfds_fetched + stats.mfds_recall_fetched
-                     + stats.mfds_admin_fetched)
+                     + stats.mfds_admin_fetched
+                     + stats.mfds_gmp_inspection_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
         f"PICS={stats.pics_fetched} · ECA={stats.eca_fetched} · "
         f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
         f"MFDS-Recall={stats.mfds_recall_fetched} · "
-        f"MFDS-Admin={stats.mfds_admin_fetched} · 합계={total_fetched}건"
+        f"MFDS-Admin={stats.mfds_admin_fetched} · "
+        f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · 합계={total_fetched}건"
     ))
 
     # 3) Notion 기존 row (중복 제거)
@@ -2041,6 +2075,13 @@ def main() -> int:
     stats.mfds_admin_skipped_dup = mfds_admin_sk
     stats.mfds_admin_insert_failed = mfds_admin_fail
 
+    mfds_gmp_insp_in, mfds_gmp_insp_sk, mfds_gmp_insp_fail = insert_items(
+        notion_token, notion_db, mfds_gmp_inspection_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.mfds_gmp_inspection_inserted = mfds_gmp_insp_in
+    stats.mfds_gmp_inspection_skipped_dup = mfds_gmp_insp_sk
+    stats.mfds_gmp_inspection_insert_failed = mfds_gmp_insp_fail
+
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
     if enable_search:
@@ -2126,6 +2167,14 @@ def main() -> int:
                                       stats.mfds_admin_insert_failed,
                                       stats.mfds_admin_error,
                                       stats.mfds_admin_error_msg))
+                if enable_mfds_gmp_inspection:
+                    f.write(_src_line("MFDS GMP Inspection",
+                                      stats.mfds_gmp_inspection_fetched,
+                                      stats.mfds_gmp_inspection_inserted,
+                                      stats.mfds_gmp_inspection_skipped_dup,
+                                      stats.mfds_gmp_inspection_insert_failed,
+                                      stats.mfds_gmp_inspection_error,
+                                      stats.mfds_gmp_inspection_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -2151,6 +2200,10 @@ def main() -> int:
                     if stats.mfds_admin_error:
                         f.write(f"> MFDS Admin error: `{stats.mfds_admin_error_msg[:120] or 'none'}` "
                                 f"— ENABLE_MFDS_ADMIN 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
+                    if stats.mfds_gmp_inspection_error:
+                        f.write(f"> MFDS GMP Inspection error: "
+                                f"`{stats.mfds_gmp_inspection_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS_GMP_INSPECTION 및 nedrug HTML 구조 확인.\n")
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
@@ -2181,6 +2234,7 @@ def main() -> int:
             (not enable_mfds or stats.mfds_error),
             (not enable_mfds_recall or stats.mfds_recall_error),
             (not enable_mfds_admin or stats.mfds_admin_error),
+            (not enable_mfds_gmp_inspection or stats.mfds_gmp_inspection_error),
         ])
         if phase2_all_error:
             log("ERROR", "모든 활성 소스 실패 — workflow fail")
@@ -2203,6 +2257,10 @@ def main() -> int:
     if enable_mfds_admin and stats.mfds_admin_error:
         log("ERROR", f"ENABLE_MFDS_ADMIN=true 상태에서 MFDS Admin 오류 — workflow fail "
                      f"({stats.mfds_admin_error_msg[:80]})")
+        return 1
+    if enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error:
+        log("ERROR", f"ENABLE_MFDS_GMP_INSPECTION=true 상태에서 MFDS GMP Inspection 오류 — workflow fail "
+                     f"({stats.mfds_gmp_inspection_error_msg[:80]})")
         return 1
     return 0
 

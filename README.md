@@ -8,7 +8,7 @@ Federal Register + OpenFDA Drug Enforcement API 를 매주 1회 호출해 Notion
 |---|---|
 | `collect_intake.py` | FR + OpenFDA 호출 → Notion 적재 (Python 3.12) |
 | `.github/workflows/grm-intake.yml` | 매주 일요일 22:00 UTC (월요일 07:00 KST) 자동 실행 |
-| `requirements.txt` | Python 의존성 (`requests` 만) |
+| `requirements.txt` | Python 의존성 (`requests`, `PyMuPDF`) |
 | `notion_intake_db_schema.md` | Notion DB 스키마 정의 |
 | `GRM_Prompt_v15.0.md` | v14.5 → v15.0 수정된 Routine 프롬프트 |
 | `.env.example` | 로컬 dry-run 용 환경변수 예시 |

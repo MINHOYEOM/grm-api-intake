@@ -2,13 +2,17 @@
 """GRM MFDS GMP Inspection Result Collector - Phase 2d.
 
 Collects metadata from nedrug's public "의약품등 GMP 실사 결과공개"
-HTML board. Attachment body parsing (PDF/HWP) is intentionally deferred.
+HTML board, then best-effort extracts public attachment text.
 """
 
 from __future__ import annotations
 
+import io
 import re
+import time
 import urllib.parse
+import xml.etree.ElementTree as ET
+import zipfile
 from dataclasses import dataclass
 from datetime import date
 from html.parser import HTMLParser
@@ -16,7 +20,7 @@ from typing import Any
 
 import requests
 
-from grm_common import DEFAULT_USER_AGENT, log
+from grm_common import DEFAULT_USER_AGENT, log, retry_after_seconds
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -35,12 +39,37 @@ REGION_MFDS = "Korea (MFDS)"
 
 PAGE_SIZE = 100
 MAX_PAGES = 10
+ATTACHMENT_REQUEST_DELAY_SECONDS = 1.0
+MAX_ATTACHMENT_TEXT_CHARS = 12000
+MAX_ATTACHMENT_BODY_CHARS = 6000
+HTTP_RETRIES = 3
+
+_NO_DEFICIENCY_RE = re.compile(
+    r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*없음|"
+    r"지적\s*사항\s*없음|보완\s*사항\s*없음|이상\s*없음)"
+)
+_DEFICIENCY_PRESENT_RE = re.compile(
+    r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*있음|"
+    r"지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?.{0,80}"
+    r"(품질경영|시설장비|제조|시험실|원자재|포장표시|허가관리|위탁|밸리데이션))",
+    re.S,
+)
 
 
 @dataclass
 class _Cell:
     text: str = ""
     doc_id: str = ""
+
+
+@dataclass
+class _AttachmentParse:
+    status: str
+    file_format: str = ""
+    text: str = ""
+    deficiency: str = "unknown"
+    bytes_downloaded: int = 0
+    error: str = ""
 
 
 class _InspectionTableParser(HTMLParser):
@@ -136,6 +165,150 @@ def _clean_cell_text(raw: str) -> str:
     return re.sub(r"\s+", " ", raw or "").strip()
 
 
+def _normalize_extracted_text(raw: str) -> str:
+    text = (raw or "").replace("\x00", " ")
+    text = re.sub(r"[ \t\r\f\v]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r" *\n *", "\n", text)
+    return text.strip()
+
+
+def _detect_attachment_format(data: bytes) -> str:
+    if data.startswith(b"%PDF"):
+        return "pdf"
+    if data.startswith(b"PK\x03\x04"):
+        return "zip"
+    if data.startswith(bytes.fromhex("d0cf11e0a1b11ae1")):
+        return "hwp-ole"
+    return "unknown"
+
+
+def _get_bytes(url: str, *, timeout: int = 30, accept: str = "*/*") -> bytes:
+    last_err: Exception | None = None
+    for attempt in range(HTTP_RETRIES + 1):
+        try:
+            resp = requests.get(
+                url,
+                timeout=timeout,
+                headers={
+                    "User-Agent": DEFAULT_USER_AGENT,
+                    "Accept": accept,
+                    "Referer": BOARD_URL,
+                },
+            )
+            if resp.status_code == 429 and attempt < HTTP_RETRIES:
+                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
+                log("WARN", f"MFDS GMP inspection 429 url={url} sleep={sleep_s}s")
+                time.sleep(sleep_s)
+                continue
+            resp.raise_for_status()
+            return resp.content or b""
+        except requests.RequestException as e:
+            last_err = e
+            if attempt < HTTP_RETRIES:
+                log(
+                    "WARN",
+                    f"MFDS GMP inspection GET retry {attempt + 1}/{HTTP_RETRIES + 1} "
+                    f"url={url} err={e}",
+                )
+                time.sleep(2 ** attempt)
+                continue
+            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
+
+
+def _assess_deficiency(text: str) -> str:
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    if not compact:
+        return "unknown"
+    if _NO_DEFICIENCY_RE.search(compact):
+        return "none"
+    if _DEFICIENCY_PRESENT_RE.search(compact):
+        return "present"
+    if "Deficiencies" in compact and "없음" not in compact:
+        return "present"
+    return "unknown"
+
+
+def _extract_pdf_text(data: bytes) -> tuple[str, str]:
+    try:
+        import fitz  # type: ignore[import-not-found]
+    except ImportError:
+        return "", "pdf-parser-missing"
+    try:
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            text = "\n".join(page.get_text("text") for page in doc)
+    except Exception as e:
+        return "", f"pdf-parse-fail:{type(e).__name__}"
+    text = _normalize_extracted_text(text)
+    if not text:
+        return "", "scan-no-text"
+    return text[:MAX_ATTACHMENT_TEXT_CHARS], "pdf-ok"
+
+
+def _extract_hwpx_text(data: bytes) -> tuple[str, str]:
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            names = sorted(
+                name
+                for name in zf.namelist()
+                if name.startswith("Contents/section") and name.endswith(".xml")
+            )
+            if not names:
+                return "", "zip-not-hwpx"
+
+            parts: list[str] = []
+            for name in names:
+                try:
+                    root = ET.fromstring(zf.read(name))
+                except ET.ParseError:
+                    continue
+                for elem in root.iter():
+                    local = elem.tag.rsplit("}", 1)[-1]
+                    if local == "t" and elem.text:
+                        parts.append(elem.text)
+            text = _normalize_extracted_text(" ".join(parts))
+            if not text:
+                return "", "hwpx-no-text"
+            return text[:MAX_ATTACHMENT_TEXT_CHARS], "hwpx-ok"
+    except zipfile.BadZipFile:
+        return "", "zip-bad"
+    except Exception as e:
+        return "", f"hwpx-parse-fail:{type(e).__name__}"
+
+
+def _parse_attachment(doc_id: str) -> _AttachmentParse:
+    if not doc_id:
+        return _AttachmentParse(status="missing-doc-id")
+
+    url = _download_url(doc_id)
+    try:
+        time.sleep(ATTACHMENT_REQUEST_DELAY_SECONDS)
+        data = _get_bytes(url, timeout=45, accept="*/*")
+    except RuntimeError as e:
+        return _AttachmentParse(status="download-fail", error=str(e)[:200])
+
+    file_format = _detect_attachment_format(data)
+    if file_format == "pdf":
+        text, status = _extract_pdf_text(data)
+    elif file_format == "zip":
+        text, status = _extract_hwpx_text(data)
+        if status == "hwpx-ok":
+            file_format = "hwpx"
+    elif file_format == "hwp-ole":
+        text, status = "", "hwp-skip"
+    else:
+        text, status = "", "unknown-format"
+
+    deficiency = _assess_deficiency(text)
+    return _AttachmentParse(
+        status=status,
+        file_format=file_format,
+        text=text,
+        deficiency=deficiency,
+        bytes_downloaded=len(data),
+    )
+
+
 def _row_to_raw(row: list[_Cell]) -> dict[str, str] | None:
     if len(row) < 10:
         return None
@@ -170,7 +343,7 @@ def _parse_rows(html_text: str) -> list[dict[str, str]]:
     return rows
 
 
-def _body(raw: dict[str, str]) -> str:
+def _body(raw: dict[str, str], attachment: _AttachmentParse) -> str:
     parts = [
         f"제조소명: {raw.get('manufacturer', '')}",
         f"소재지: {raw.get('address', '')}",
@@ -179,7 +352,20 @@ def _body(raw: dict[str, str]) -> str:
         f"실사일자: {raw.get('inspection_start', '')} ~ {raw.get('inspection_end', '')}",
         f"등록일: {raw.get('registered_date', '')}",
         f"실사결과 다운로드: {_download_url(raw.get('doc_id', ''))}",
+        f"첨부 본문 추출 상태: {attachment.status}",
     ]
+    if attachment.file_format:
+        parts.append(f"첨부 포맷: {attachment.file_format}")
+    if attachment.deficiency != "unknown":
+        parts.append(f"지적사항 판정: {attachment.deficiency}")
+    if attachment.text:
+        parts.extend([
+            "",
+            "실사 결과/지적(보완)사항 원문:",
+            attachment.text[:MAX_ATTACHMENT_BODY_CHARS],
+        ])
+    elif attachment.error:
+        parts.append(f"첨부 본문 추출 오류: {attachment.error}")
     return "\n".join(part for part in parts if not part.endswith(": "))
 
 
@@ -201,6 +387,24 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         headline += f" - {detail}"
 
     download_url = _download_url(doc_id)
+    attachment = _parse_attachment(doc_id)
+    qa_relevance = "Likely" if attachment.deficiency == "present" else "Possible"
+    signal_tier = "Tier 3" if attachment.deficiency == "present" else "Tier 2"
+
+    raw_payload: dict[str, Any] = {
+        "source": "nedrug CCBBD03",
+        **raw,
+        "download_url": download_url,
+        "attachment_parse_status": attachment.status,
+        "attachment_file_format": attachment.file_format,
+        "attachment_bytes": attachment.bytes_downloaded,
+        "attachment_deficiency_assessment": attachment.deficiency,
+    }
+    if attachment.error:
+        raw_payload["attachment_parse_error"] = attachment.error
+    if attachment.text:
+        raw_payload["attachment_text"] = attachment.text
+
     return IntakeItem(
         source=SOURCE_MFDS,
         document_id=f"gmpinspect-{doc_id}",
@@ -209,13 +413,13 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         official_url=BOARD_URL,
         type_or_class=TYPE_GMP_INSPECTION,
         firm=manufacturer,
-        body=_body(raw),
+        body=_body(raw, attachment),
         api_query=api_query_url,
-        qa_relevance="Possible",
+        qa_relevance=qa_relevance,
         osd_relevance="N/A",
         source_type=SRC_TYPE_OFFICIAL_SCRAPE,
-        signal_tier="Tier 2",
-        raw_payload={"source": "nedrug CCBBD03", **raw, "download_url": download_url},
+        signal_tier=signal_tier,
+        raw_payload=raw_payload,
         source_url=download_url,
         language=LANGUAGE_KO,
         region_jurisdiction=REGION_MFDS,
@@ -231,27 +435,18 @@ def collect_mfds_gmp_inspections(
     seen_ids: set[str] = set()
     page_no = 1
     total_seen_rows = 0
+    parse_status_counts: dict[str, int] = {}
+    deficiency_counts: dict[str, int] = {}
 
     while page_no <= MAX_PAGES:
         url = _request_url(page_no)
         try:
-            resp = requests.get(
+            html_bytes = _get_bytes(
                 url,
                 timeout=30,
-                headers={
-                    "User-Agent": DEFAULT_USER_AGENT,
-                    "Accept": "text/html,application/xhtml+xml",
-                },
+                accept="text/html,application/xhtml+xml",
             )
-            if resp.status_code == 403:
-                raise RuntimeError("HTTP 403")
-            resp.raise_for_status()
-        except requests.RequestException as e:
-            msg = f"MFDS GMP inspection HTML page={page_no} 실패: {e}"
-            if items:
-                log("WARN", msg)
-                return items, None
-            return [], msg
+            html_text = html_bytes.decode("utf-8", errors="replace")
         except RuntimeError as e:
             msg = f"MFDS GMP inspection HTML page={page_no} 실패: {e}"
             if items:
@@ -259,7 +454,7 @@ def collect_mfds_gmp_inspections(
                 return items, None
             return [], msg
 
-        rows = _parse_rows(resp.text)
+        rows = _parse_rows(html_text)
         total_seen_rows += len(rows)
         if not rows:
             msg = "MFDS GMP inspection HTML 테이블 행 미발견 — 구조 변경 가능성"
@@ -283,6 +478,10 @@ def collect_mfds_gmp_inspections(
                 continue
             seen_ids.add(item.document_id)
             items.append(item)
+            parse_status = str(item.raw_payload.get("attachment_parse_status") or "unknown")
+            deficiency = str(item.raw_payload.get("attachment_deficiency_assessment") or "unknown")
+            parse_status_counts[parse_status] = parse_status_counts.get(parse_status, 0) + 1
+            deficiency_counts[deficiency] = deficiency_counts.get(deficiency, 0) + 1
 
         if page_dates and max(page_dates) < start:
             break
@@ -296,4 +495,10 @@ def collect_mfds_gmp_inspections(
         "MFDS GMP inspection 수집 완료: "
         f"{len(items)}건 (parsed_rows={total_seen_rows})",
     )
+    if items:
+        log(
+            "INFO",
+            "MFDS GMP inspection attachment parse: "
+            f"status={parse_status_counts} deficiency={deficiency_counts}",
+        )
     return items, None

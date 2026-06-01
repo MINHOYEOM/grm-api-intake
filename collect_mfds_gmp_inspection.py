@@ -423,6 +423,7 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         source_url=download_url,
         language=LANGUAGE_KO,
         region_jurisdiction=REGION_MFDS,
+        site_country=country,
     )
 
 

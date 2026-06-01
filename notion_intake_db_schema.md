@@ -46,8 +46,9 @@
 | `Source Type` | Select |  | `Official API` / `Official Regulatory Page` / `Official Regulator Blog` / `Expert Secondary` / `Search Result` / `Official Page Scrape` | Phase 2 분류 |
 | `Signal Tier` | Select |  | `Tier 1` / `Tier 2` / `Tier 3` | 수집기 1차 우선순위 |
 | `Language` | Select |  | `KO` / `EN` | Phase 2b MFDS 권고 필드 |
-| `Region/Jurisdiction` | Select |  | `Korea (MFDS)` 등 | 글로벌 확장용 선택 필드 |
-| `Self-Check Required` | Select |  | `Yes` / `Review` / `No` | Phase 2c 자가점검 트리거. 회수·안전성서한·실태조사 고신호에 사용 |
+| `Region/Jurisdiction` | Select |  | `Korea (MFDS)` 등 | 규제 관할. MFDS 해외 실사 제조소 소재국으로 사용하지 않음 |
+| `Site Country` | Rich text |  | 예: `대한민국`, `프랑스`, `일본` | GMP 실태조사 제조소 소재국. `Region/Jurisdiction`과 분리 |
+| `Self-Check Required` | Select |  | `Yes` / `Review` / `No` | 휴면 필드. 신규 수집기는 자동 산정·기입하지 않음 |
 | `Status` | Select |  | `New` / `Processed` / `Skipped` / `Error` | Routine 이 갱신 |
 
 ## 페이지 본문(children)

@@ -90,7 +90,8 @@ PROP_STATUS = "Status"
 PROP_SIGNAL_TIER = "Signal Tier"
 PROP_LANGUAGE = "Language"
 PROP_REGION_JURISDICTION = "Region/Jurisdiction"
-PROP_SELF_CHECK = "Self-Check Required"
+PROP_SITE_COUNTRY = "Site Country"
+PROP_SELF_CHECK = "Self-Check Required"  # retained in Notion, no longer written by collectors
 
 # Phase 2a 신규 Notion 필드
 PROP_SOURCE_URL         = "Source URL"
@@ -274,7 +275,7 @@ class IntakeItem:
     evidence_candidate: str = ""   # "A"/"B"/"C"/"D" — 수집기 후보, Routine 최종 판정
     language: str = ""             # KO / EN 등. MFDS Phase 2b부터 사용
     region_jurisdiction: str = ""  # 예: Korea (MFDS)
-    self_check_required: str = ""   # Yes / Review / No — Phase 2c self-check trigger
+    site_country: str = ""          # 제조소 소재국. Region/Jurisdiction은 관할기관으로 유지.
 
 
 @dataclass
@@ -1661,8 +1662,8 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         props[PROP_LANGUAGE] = _select(item.language)
     if item.region_jurisdiction:
         props[PROP_REGION_JURISDICTION] = _select(item.region_jurisdiction)
-    if item.self_check_required:
-        props[PROP_SELF_CHECK] = _select(item.self_check_required)
+    if item.site_country:
+        props[PROP_SITE_COUNTRY] = {"rich_text": _rich_text(truncate(item.site_country, NOTION_RICH_TEXT_CHUNK))}
 
     return props
 

@@ -2,7 +2,7 @@
 """GRM MFDS Recall Collector - Phase 2c.
 
 Collects data.go.kr service 15059114 (MFDS medicinal recall/sales-stop
-records) as high-signal self-check intake rows.
+records) as high-signal intake rows.
 """
 
 from __future__ import annotations
@@ -31,28 +31,9 @@ DATASET_URL = "https://www.data.go.kr/data/15059114/openapi.do"
 TYPE_RECALL_QUALITY = "recall-quality"
 LANGUAGE_KO = "KO"
 REGION_MFDS = "Korea (MFDS)"
-SELF_CHECK_YES = "Yes"
-SELF_CHECK_REVIEW = "Review"
 
 PAGE_SIZE = 100
 MAX_PAGES = 25
-
-QUALITY_SELF_CHECK_TERMS = [
-    "품질부적합",
-    "함량",
-    "함량부족",
-    "용출",
-    "안정성",
-    "미생물",
-    "무균",
-    "이물",
-    "오염",
-    "제조공정",
-    "시험성적",
-    "기준일탈",
-    "불순물",
-    "니트로사민",
-]
 
 
 def _mask_service_key(url: str) -> str:
@@ -138,10 +119,6 @@ def _document_id(raw: dict[str, Any]) -> str:
     return f"recall-{digest}"
 
 
-def _self_check_required(reason: str) -> str:
-    return SELF_CHECK_YES if any(term in reason for term in QUALITY_SELF_CHECK_TERMS) else SELF_CHECK_REVIEW
-
-
 def _body(raw: dict[str, Any]) -> str:
     parts = [
         _text(raw, "RTRVL_RESN"),
@@ -163,7 +140,6 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
     if not product or not date_iso:
         return None
 
-    self_check = _self_check_required(reason)
     headline = f"[회수·판매중지] {product}"
     if firm:
         headline = f"{headline} — {firm}"
@@ -178,14 +154,13 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
         firm=firm,
         body=_body(raw),
         api_query=api_query_url,
-        qa_relevance="Likely" if self_check == SELF_CHECK_YES else "Possible",
+        qa_relevance="Likely",
         osd_relevance="N/A",
         source_type=SRC_TYPE_OFFICIAL_API,
         signal_tier="Tier 3",
         raw_payload={"api": "data.go.kr 15059114", "endpoint": RECALL_API_ENDPOINT, **raw},
         language=LANGUAGE_KO,
         region_jurisdiction=REGION_MFDS,
-        self_check_required=self_check,
     )
 
 
@@ -204,8 +179,6 @@ def collect_mfds_recall(
 
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
-    yes_count = 0
-    review_count = 0
     page_no = 1
     total_count = 0
 
@@ -247,10 +220,6 @@ def collect_mfds_recall(
                 continue
             seen_ids.add(item.document_id)
             items.append(item)
-            if item.self_check_required == SELF_CHECK_YES:
-                yes_count += 1
-            else:
-                review_count += 1
 
         if page_dates and max(page_dates) < start:
             break
@@ -264,6 +233,6 @@ def collect_mfds_recall(
     log(
         "INFO",
         "MFDS recall 수집 완료: "
-        f"{len(items)}건 (Self-Check Yes={yes_count}, Review={review_count}, totalCount={total_count})",
+        f"{len(items)}건 (totalCount={total_count})",
     )
     return items, None

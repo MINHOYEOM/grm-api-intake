@@ -13,6 +13,11 @@ Federal Register + OpenFDA Drug Enforcement API 를 매주 1회 호출해 Notion
 | `GRM_Prompt_v15.0.md` | v14.5 → v15.0 수정된 Routine 프롬프트 |
 | `.env.example` | 로컬 dry-run 용 환경변수 예시 |
 
+v15.6.3부터 수집기는 Notion API 속성 필터로 `Status=New` row만 모아
+`OPEN GRM Routine Handoff {YYYY-MM-DD}` 페이지를 생성합니다. Routine은 이 handoff의
+JSON `rows[]`만 읽고, 원 Intake DB를 Status 미필터 검색으로 다시 뒤지지 않습니다.
+이 구조가 같은 날 재실행 시 Processed row 중복 카드화를 막는 멱등성 게이트입니다.
+
 ## ✓ 셋업 진행 상황
 
 | 단계 | 상태 | 비고 |
@@ -100,6 +105,8 @@ python collect_intake.py --dry-run
 ```
 
 `--dry-run` 은 Notion API 호출 없이 stdout 에 fetch 결과만 출력합니다.
+실제 운영 workflow는 dry-run이 아닐 때 `--emit-routine-handoff`를 자동으로 붙여
+Routine용 New-only handoff를 생성합니다.
 
 ## 운영 시나리오
 
@@ -142,9 +149,10 @@ python collect_intake.py --dry-run
 
 `GRM_Prompt_v15.0.md` 의 `[0단계 — Notion Intake 읽기]` 섹션이 이 수집기 출력을 어떻게 소비하는지 정의합니다. 핵심:
 
-1. Routine 시작 시 Notion MCP 로 `GRM API Intake` (`7784c71fb7b343749b2bee5d04db7926`) 를 `Run Date (KST) = 오늘` 필터로 조회
-2. row 가 있으면 FR · Recall 전수 목록 확보 → Evidence A 부여
-3. row 가 0건이면 v14.5 WebSearch-only 모드로 fallback
+1. 수집기가 `Status=New` + 7일 Run Date window를 Notion API로 필터링해 handoff row 생성
+2. Routine 시작 시 `OPEN GRM Routine Handoff {YYYY-MM-DD}`를 fetch하고 JSON `rows[]`만 Intake 입력으로 사용
+3. 발행 완료 후 handoff를 `CONSUMED ...` / `Status=Processed`로 바꿔 같은 날 2회차 중복 발행 억제
+4. handoff가 없거나 row가 0건이면 v14.5 WebSearch-only 모드로 fallback
 
 ## 라이선스 · 책임
 

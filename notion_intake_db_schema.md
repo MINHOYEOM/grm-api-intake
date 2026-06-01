@@ -24,13 +24,13 @@
 | 이름 | 타입 | 필수 | 값/옵션 | 비고 |
 |---|---|---|---|---|
 | `Name` | Title | ✓ | `{source-prefix} {document_id} — {headline}` | 자동 생성 |
-| `Source` | Select | ✓ | `Federal Register` / `OpenFDA Recall` / `EMA` / `MHRA Inspectorate` / `PIC/S` / `ECA Academy` / `FDA Warning Letter` / `Brave Search` / `RAPS` / `European Pharma Review` / `MFDS` | `MFDS` 추가 완료 |
+| `Source` | Select | ✓ | `Federal Register` / `OpenFDA Recall` / `EMA` / `MHRA Inspectorate` / `PIC/S` / `ECA Academy` / `FDA Warning Letter` / `Brave Search` / `RAPS` / `European Pharma Review` / `MFDS` / `GRM Handoff` | `GRM Handoff`는 Routine 입력 큐용 |
 | `Document ID` | Rich text | ✓ | 소스별 고유 ID 또는 stable hash | 검색·중복 제거 키 |
 | `Date` | Date | ✓ | 문서 발행일/게시일 | 수집 윈도우 필터용 |
 | `Headline` | Rich text | ✓ | 제목/제품명/게시글 제목 | 표시용 |
 | `Official URL` | URL |  | 공식 원문 URL | Search Evidence C는 비울 수 있음 |
 | `Source URL` | URL |  | Search/Scrape가 발견한 실제 URL | Phase 2a 신규 |
-| `Type or Class` | Select |  | `Rule` / `Proposed Rule` / `Notice` / `Class I` / `Class II` / `Class III` / `legislative-notice` / `gmp-guideline` / `gmp-inspection` / `regulation-final` / `notice-final` / `guidance-industry` / `guidance-internal` / `safety-letter` / `recall-quality` / `admin-action` / `gmp-certificate` 등 | MFDS는 사람용 번역 없이 기계용 영문 키 사용 |
+| `Type or Class` | Select |  | `Rule` / `Proposed Rule` / `Notice` / `Class I` / `Class II` / `Class III` / `legislative-notice` / `gmp-guideline` / `gmp-inspection` / `regulation-final` / `notice-final` / `guidance-industry` / `guidance-internal` / `safety-letter` / `recall-quality` / `admin-action` / `gmp-certificate` / `routine-handoff` 등 | MFDS는 사람용 번역 없이 기계용 영문 키 사용. `routine-handoff`는 Routine 입력 큐 |
 | `Firm` | Rich text |  | 업체명 | Recall/WL 중심 |
 | `Body` | Rich text |  | 요약/본문 일부 | 한국어 원문은 그대로 저장 |
 | `Distribution` | Rich text |  | `distribution_pattern` | Recall 전용 |
@@ -95,7 +95,24 @@
 
 ## Routine 측 읽기 쿼리
 
-v15.0 Routine 은 Notion MCP `notion-fetch` 또는 데이터소스 query 로 다음 필터를 적용한다:
+v15.6.3 이후 Routine 은 원 Intake DB를 직접 broad search 하지 않고, 수집기가 생성한 New-only handoff row를 먼저 읽는다:
+
+```
+Database ID: 7784c71fb7b343749b2bee5d04db7926
+Data Source: collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288
+
+Source: GRM Handoff
+Type or Class: routine-handoff
+Document ID: routine-handoff::{YYYY-MM-DD}
+Title: OPEN GRM Routine Handoff {YYYY-MM-DD}
+Body: JSON code block (schema_version = grm-routine-handoff/v1)
+```
+
+handoff JSON 의 `rows[]` 만 Routine 의 Intake 입력이다. 수집기는 이 handoff 를 만들 때 Notion API 속성 필터로 `Status=New` + `Run Date (KST)` window 를 적용하고, 동일 `Source::Document ID` 는 최신 row만 남긴다.
+
+Routine 1회차 종료 시 handoff row 는 `Status=Processed`, title 은 `CONSUMED GRM Routine Handoff {YYYY-MM-DD}` 로 바꾼다. 같은 날 2회차 실행에서 `OPEN` handoff 가 없으면 빈 브리프/특이사항 없음으로 처리해 중복 발행을 막는다.
+
+legacy(v15.0~v15.6.2) Routine 은 Notion MCP `notion-fetch` 또는 데이터소스 query 로 다음 필터를 적용했다:
 
 ```
 Database ID: 7784c71fb7b343749b2bee5d04db7926
@@ -107,6 +124,7 @@ Status: any of [New, Processed]
 ```
 
 `Run Date (KST)` 가 오늘과 정확히 일치하는 row 가 0건이면 Routine 은 v14.5 WebSearch-only 모드로 graceful degradation.
+이 legacy 경로는 PL-10 이후 기본 운영 경로에서 사용하지 않는다.
 
 ## 운영 주의
 

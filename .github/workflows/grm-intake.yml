@@ -22,7 +22,11 @@ on:
         type: string
         default: '7'
       sources:
-        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl none). 비우면 전체'
+        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds none). 비우면 전체'
+        type: string
+        default: ''
+      handoff_doc_ids:
+        description: '선택: Routine handoff에 포함할 Document ID 목록(공백/쉼표 구분). PL-10 검증용'
         type: string
         default: ''
       enable_search:
@@ -100,6 +104,7 @@ jobs:
           GRM_DRY_RUN: ${{ inputs.dry_run }}
           GRM_WINDOW_DAYS: ${{ inputs.window_days }}
           GRM_SOURCES: ${{ inputs.sources }}
+          GRM_HANDOFF_DOC_IDS: ${{ inputs.handoff_doc_ids }}
           # github.event_name을 env로 노출 — shell 본문 ${{ }} 직접 삽입 방지 (W2)
           GRM_EVENT_NAME: ${{ github.event_name }}
           # Phase 2a feature flags:
@@ -136,7 +141,7 @@ jobs:
             if [ -n "$GRM_SOURCES" ]; then
               # 쉼표도 공백으로 처리. 허용된 source 토큰만 --sources 인자로 전달.
               read -r -a SOURCE_TOKENS <<< "$(printf '%s' "$GRM_SOURCES" | tr ',' ' ')"
-              valid_sources=(fr recall ema mhra pics eca wl none)
+              valid_sources=(fr recall ema mhra pics eca wl mfds none)
               source_args=()
               for src in "${SOURCE_TOKENS[@]}"; do
                 ok=false
@@ -153,6 +158,23 @@ jobs:
                 args+=(--sources "${source_args[@]}")
               fi
             fi
+            if [ -n "$GRM_HANDOFF_DOC_IDS" ]; then
+              read -r -a HANDOFF_DOC_ID_TOKENS <<< "$(printf '%s' "$GRM_HANDOFF_DOC_IDS" | tr ',' ' ')"
+              handoff_doc_id_args=()
+              for doc_id in "${HANDOFF_DOC_ID_TOKENS[@]}"; do
+                if ! printf '%s' "$doc_id" | grep -qE '^[A-Za-z0-9_.:-]+$'; then
+                  echo "::error ::invalid handoff document id token"
+                  exit 1
+                fi
+                handoff_doc_id_args+=("$doc_id")
+              done
+              if [ "${#handoff_doc_id_args[@]}" -gt 0 ]; then
+                args+=(--handoff-doc-ids "${handoff_doc_id_args[@]}")
+              fi
+            fi
+          fi
+          if [ "$GRM_DRY_RUN" != "true" ]; then
+            args+=(--emit-routine-handoff)
           fi
           python collect_intake.py "${args[@]}"
 

@@ -65,7 +65,9 @@ FR_API_BASE = "https://www.federalregister.gov/api/v1/documents.json"
 OPENFDA_API_BASE = "https://api.fda.gov/drug/enforcement.json"
 NOTION_API_VERSION = "2022-06-28"
 NOTION_PAGES_URL = "https://api.notion.com/v1/pages"
+NOTION_PAGE_URL_TPL = "https://api.notion.com/v1/pages/{page_id}"
 NOTION_DB_QUERY_URL_TPL = "https://api.notion.com/v1/databases/{db_id}/query"
+NOTION_BLOCK_CHILDREN_URL_TPL = "https://api.notion.com/v1/blocks/{block_id}/children"
 
 # FDA Recalls/Enforcement L2 (OpenFDA 는 항목별 사용자 친화 URL 이 없음)
 FDA_RECALLS_L2 = "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
@@ -108,6 +110,9 @@ SOURCE_PICS = "PIC/S"
 SOURCE_ECA = "ECA Academy"
 SOURCE_FDA_WL = "FDA Warning Letter"
 SOURCE_MFDS = "MFDS"
+SOURCE_HANDOFF = "GRM Handoff"
+TYPE_ROUTINE_HANDOFF = "routine-handoff"
+HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
 
 # ── Phase 2a: Search / Scrape 소스 ──────────────────────────────────────────
 SOURCE_BRAVE = "Brave Search"
@@ -134,6 +139,7 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_ECA:     SRC_TYPE_EXPERT_SECONDARY,
     SOURCE_FDA_WL:  SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_MFDS:    SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_HANDOFF: SRC_TYPE_OFFICIAL_PAGE,
     # Phase 2a 신규
     SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
     SOURCE_RAPS:    SRC_TYPE_EXPERT_SECONDARY,
@@ -1465,6 +1471,52 @@ class NotionDedupeQueryError(RuntimeError):
     pass
 
 
+class NotionHandoffError(RuntimeError):
+    """Routine handoff 생성/갱신 실패 전용 예외."""
+    pass
+
+
+def notion_api_request(method: str, url: str, token: str, *,
+                       body: dict[str, Any] | None = None,
+                       retries: int = 2) -> dict[str, Any]:
+    """Notion JSON API 호출 공통 래퍼. 429/5xx 는 짧게 재시도한다."""
+    last_err: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.request(method, url, json=body,
+                                    headers=notion_headers(token), timeout=30)
+            if resp.status_code == 429 and attempt < retries:
+                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
+                log("WARN", f"Notion API 429 rate-limit — {sleep_s}s 후 재시도 "
+                            f"({attempt + 1}/{retries + 1})")
+                time.sleep(sleep_s)
+                continue
+            if resp.status_code >= 500 and attempt < retries:
+                log("WARN", f"Notion API {resp.status_code} — 재시도 "
+                            f"({attempt + 1}/{retries + 1}) body={resp.text[:200]}")
+                time.sleep(2 ** attempt)
+                continue
+            if resp.status_code >= 400:
+                raise NotionHandoffError(
+                    f"Notion API {method} {url} 실패 ({resp.status_code}): "
+                    f"{resp.text[:300]}"
+                )
+            if not resp.text:
+                return {}
+            return resp.json()
+        except requests.RequestException as e:
+            last_err = e
+            if attempt < retries:
+                log("WARN", f"Notion API 네트워크 오류 — 재시도 "
+                            f"({attempt + 1}/{retries + 1}) err={e}")
+                time.sleep(2 ** attempt)
+                continue
+            break
+        except ValueError as e:
+            raise NotionHandoffError(f"Notion API JSON 파싱 실패: {e}") from e
+    raise NotionHandoffError(f"Notion API {method} {url} 실패: {last_err}")
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                                   window_days: int = 7) -> set[str]:
     """최근 window_days 일(KST Run Date 기준) row 의 'source::document_id' key set 반환.
@@ -1578,6 +1630,321 @@ def _url(value: str) -> dict[str, Any] | None:
     if not value:
         return None
     return {"url": value}
+
+
+def _plain_text(parts: list[dict[str, Any]] | None) -> str:
+    if not parts:
+        return ""
+    return "".join(p.get("plain_text", "") for p in parts).strip()
+
+
+def _prop_title(props: dict[str, Any], name: str) -> str:
+    return _plain_text(props.get(name, {}).get("title", []))
+
+
+def _prop_rich_text(props: dict[str, Any], name: str) -> str:
+    return _plain_text(props.get(name, {}).get("rich_text", []))
+
+
+def _prop_select(props: dict[str, Any], name: str) -> str:
+    return (props.get(name, {}).get("select") or {}).get("name", "") or ""
+
+
+def _prop_date(props: dict[str, Any], name: str) -> str:
+    return (props.get(name, {}).get("date") or {}).get("start", "") or ""
+
+
+def _prop_url(props: dict[str, Any], name: str) -> str:
+    return props.get(name, {}).get("url") or ""
+
+
+def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
+    props = page.get("properties", {})
+    return {
+        "page_id": page.get("id", ""),
+        "page_url": page.get("url", ""),
+        "title": _prop_title(props, PROP_NAME),
+        "source": _prop_select(props, PROP_SOURCE),
+        "document_id": _prop_rich_text(props, PROP_DOC_ID),
+        "date": _prop_date(props, PROP_DATE),
+        "headline": _prop_rich_text(props, PROP_HEADLINE),
+        "official_url": _prop_url(props, PROP_OFFICIAL_URL),
+        "source_url": _prop_url(props, PROP_SOURCE_URL),
+        "type_or_class": _prop_select(props, PROP_TYPE_CLASS),
+        "firm": _prop_rich_text(props, PROP_FIRM),
+        "body": _prop_rich_text(props, PROP_BODY),
+        "distribution": _prop_rich_text(props, PROP_DISTRIBUTION),
+        "comments_close": _prop_date(props, PROP_COMMENTS_CLOSE),
+        "run_date": _prop_date(props, PROP_RUN_DATE),
+        "collected_at": _prop_date(props, PROP_COLLECTED_AT),
+        "api_query": _prop_url(props, PROP_API_QUERY),
+        "search_query": _prop_rich_text(props, PROP_SEARCH_QUERY),
+        "raw_excerpt": _prop_rich_text(props, PROP_RAW_EXCERPT),
+        "qa_relevance": _prop_select(props, PROP_QA_RELEVANCE),
+        "osd_relevance": _prop_select(props, PROP_OSD_RELEVANCE),
+        "source_type": _prop_select(props, PROP_SOURCE_TYPE),
+        "signal_tier": _prop_select(props, PROP_SIGNAL_TIER),
+        "evidence_candidate": _prop_select(props, PROP_EVIDENCE_CANDIDATE),
+        "language": _prop_select(props, PROP_LANGUAGE),
+        "region_jurisdiction": _prop_select(props, PROP_REGION_JURISDICTION),
+        "site_country": _prop_rich_text(props, PROP_SITE_COUNTRY),
+        "status": _prop_select(props, PROP_STATUS),
+    }
+
+
+def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
+                                 window_days: int = 7,
+                                 source_names: set[str] | None = None,
+                                 doc_ids: set[str] | None = None) -> list[dict[str, Any]]:
+    """Routine 에 넘길 Status=New row 를 Notion API 속성 필터로 조회한다."""
+    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
+    window_start = (run_date - timedelta(days=window_days)).isoformat()
+    body: dict[str, Any] = {
+        "filter": {
+            "and": [
+                {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
+                {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
+                {"property": PROP_STATUS, "select": {"equals": "New"}},
+            ]
+        },
+        "page_size": 100,
+    }
+    snapshots: list[dict[str, Any]] = []
+    start_cursor: str | None = None
+    for page_no in range(50):
+        if start_cursor:
+            body["start_cursor"] = start_cursor
+        elif "start_cursor" in body:
+            del body["start_cursor"]
+        data = notion_api_request("POST", url, token, body=body)
+        for page in data.get("results", []):
+            snap = _intake_page_snapshot(page)
+            if snap["source"] == SOURCE_HANDOFF or snap["type_or_class"] == TYPE_ROUTINE_HANDOFF:
+                continue
+            if source_names and snap["source"] not in source_names:
+                continue
+            if doc_ids and snap["document_id"] not in doc_ids:
+                continue
+            if not snap["source"] or not snap["document_id"]:
+                log("WARN", f"handoff 후보 row 필수 키 누락 — skip page={snap['page_id']}")
+                continue
+            snapshots.append(snap)
+        if not data.get("has_more"):
+            break
+        start_cursor = data.get("next_cursor")
+    else:
+        log("WARN", "Routine handoff New row 조회 50페이지 상한 도달 — 일부 row 누락 가능")
+
+    log("INFO", f"Routine handoff 후보 New row {len(snapshots)}건 "
+                f"(Run Date {window_start}~{run_date.isoformat()})")
+    return snapshots
+
+
+def _dedupe_latest_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    latest: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        key = f"{row.get('source', '')}::{row.get('document_id', '')}"
+        current = latest.get(key)
+        freshness = (row.get("run_date", ""), row.get("collected_at", ""), row.get("page_id", ""))
+        if current is None:
+            latest[key] = row
+            continue
+        current_freshness = (
+            current.get("run_date", ""),
+            current.get("collected_at", ""),
+            current.get("page_id", ""),
+        )
+        if freshness > current_freshness:
+            latest[key] = row
+
+    tier_order = {"Tier 3": 0, "Tier 2": 1, "Tier 1": 2}
+    return sorted(
+        latest.values(),
+        key=lambda r: (
+            tier_order.get(r.get("signal_tier", ""), 9),
+            r.get("source", ""),
+            r.get("document_id", ""),
+        ),
+    )
+
+
+def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
+                                  window_days: int,
+                                  generated_at: datetime) -> dict[str, Any]:
+    start = run_date - timedelta(days=window_days)
+    deduped = _dedupe_latest_rows(rows)
+    source_counts: dict[str, int] = {}
+    for row in deduped:
+        source_counts[row["source"]] = source_counts.get(row["source"], 0) + 1
+    return {
+        "schema_version": HANDOFF_SCHEMA_VERSION,
+        "handoff_id": f"routine-handoff::{run_date.isoformat()}",
+        "run_date_kst": run_date.isoformat(),
+        "window_start": start.isoformat(),
+        "window_end": run_date.isoformat(),
+        "generated_at_kst": generated_at.isoformat(),
+        "row_count": len(deduped),
+        "source_counts": source_counts,
+        "rows": deduped,
+    }
+
+
+def _handoff_page_properties(payload: dict[str, Any],
+                             generated_at: datetime) -> dict[str, Any]:
+    run_date = payload["run_date_kst"]
+    row_count = payload["row_count"]
+    title = f"OPEN GRM Routine Handoff {run_date}"
+    body = (
+        f"New-only Routine handoff. rows={row_count}; "
+        f"window={payload['window_start']}~{payload['window_end']}; "
+        f"generated_at={payload['generated_at_kst']}"
+    )
+    return {
+        PROP_NAME: {"title": _rich_text(title)},
+        PROP_SOURCE: _select(SOURCE_HANDOFF),
+        PROP_DOC_ID: {"rich_text": _rich_text(payload["handoff_id"])},
+        PROP_DATE: {"date": {"start": run_date}},
+        PROP_HEADLINE: {"rich_text": _rich_text(f"Routine New-only handoff ({row_count} rows)")},
+        PROP_TYPE_CLASS: _select(TYPE_ROUTINE_HANDOFF),
+        PROP_BODY: {"rich_text": _rich_text(body)},
+        PROP_RUN_DATE: {"date": {"start": run_date}},
+        PROP_COLLECTED_AT: _datetime_iso(generated_at),
+        PROP_STATUS: _select("New"),
+    }
+
+
+def _handoff_blocks(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    json_payload = json.dumps(payload, ensure_ascii=False, indent=2)
+    blocks: list[dict[str, Any]] = [
+        {
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {"rich_text": _rich_text("GRM Routine Handoff")},
+        },
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {"rich_text": _rich_text(
+                f"HANDOFF_ID: {payload['handoff_id']} | "
+                f"SCHEMA: {payload['schema_version']} | "
+                f"ROW_COUNT: {payload['row_count']}"
+            )},
+        },
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {"rich_text": _rich_text(
+                f"WINDOW: {payload['window_start']}~{payload['window_end']} | "
+                f"GENERATED_AT_KST: {payload['generated_at_kst']}"
+            )},
+        },
+        {
+            "object": "block",
+            "type": "heading_3",
+            "heading_3": {"rich_text": _rich_text("Payload JSON")},
+        },
+    ]
+    for chunk in chunk_text(json_payload, NOTION_CODE_BLOCK_CHUNK):
+        blocks.append({
+            "object": "block",
+            "type": "code",
+            "code": {
+                "language": "json",
+                "rich_text": [{"type": "text", "text": {"content": chunk}}],
+            },
+        })
+    return blocks
+
+
+def notion_find_handoff_page(token: str, db_id: str,
+                             handoff_id: str) -> dict[str, Any] | None:
+    body = {
+        "filter": {
+            "property": PROP_DOC_ID,
+            "rich_text": {"equals": handoff_id},
+        },
+        "page_size": 5,
+    }
+    data = notion_api_request("POST", NOTION_DB_QUERY_URL_TPL.format(db_id=db_id),
+                              token, body=body)
+    results = data.get("results", [])
+    if not results:
+        return None
+    results.sort(key=lambda p: p.get("last_edited_time", ""), reverse=True)
+    return results[0]
+
+
+def notion_archive_page_children(token: str, page_id: str) -> None:
+    url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
+    start_cursor: str | None = None
+    archived = 0
+    while True:
+        req_url = url
+        if start_cursor:
+            req_url = f"{url}?start_cursor={urllib.parse.quote(start_cursor)}"
+        data = notion_api_request("GET", req_url, token)
+        for block in data.get("results", []):
+            block_id = block.get("id")
+            if not block_id:
+                continue
+            notion_api_request("PATCH", f"https://api.notion.com/v1/blocks/{block_id}",
+                               token, body={"archived": True})
+            archived += 1
+            time.sleep(0.34)
+        if not data.get("has_more"):
+            break
+        start_cursor = data.get("next_cursor")
+    log("INFO", f"Routine handoff 기존 blocks archive 완료: {archived}개")
+
+
+def notion_append_page_children(token: str, page_id: str,
+                                blocks: list[dict[str, Any]]) -> None:
+    url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
+    for i in range(0, len(blocks), 90):
+        notion_api_request("PATCH", url, token, body={"children": blocks[i:i + 90]})
+        time.sleep(0.34)
+
+
+def notion_upsert_routine_handoff(token: str, db_id: str,
+                                  payload: dict[str, Any],
+                                  generated_at: datetime) -> tuple[str, str]:
+    """New-only handoff page 를 생성/갱신하고 (page_id, page_url) 반환."""
+    props = _handoff_page_properties(payload, generated_at)
+    blocks = _handoff_blocks(payload)
+    existing = notion_find_handoff_page(token, db_id, payload["handoff_id"])
+    if existing:
+        page_id = existing["id"]
+        notion_archive_page_children(token, page_id)
+        notion_append_page_children(token, page_id, blocks)
+        notion_api_request("PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id),
+                           token, body={"properties": props})
+        page_url = existing.get("url", "")
+        log("INFO", f"Routine handoff 갱신 완료: {page_url or page_id}")
+        return page_id, page_url
+
+    body = {
+        "parent": {"database_id": db_id},
+        "properties": props,
+        "children": blocks,
+    }
+    created = notion_api_request("POST", NOTION_PAGES_URL, token, body=body)
+    page_id = created.get("id", "")
+    page_url = created.get("url", "")
+    log("INFO", f"Routine handoff 생성 완료: {page_url or page_id}")
+    return page_id, page_url
+
+
+def emit_routine_handoff(token: str, db_id: str, run_date: date,
+                         window_days: int,
+                         generated_at: datetime,
+                         source_names: set[str] | None = None,
+                         doc_ids: set[str] | None = None) -> tuple[int, str]:
+    rows = notion_query_new_intake_rows(token, db_id, run_date, window_days,
+                                        source_names=source_names,
+                                        doc_ids=doc_ids)
+    payload = build_routine_handoff_payload(rows, run_date, window_days, generated_at)
+    _page_id, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
+    return payload["row_count"], page_url
 
 
 def build_notion_properties(item: IntakeItem, run_date: date,
@@ -1788,7 +2155,17 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
-_SOURCE_CHOICES = _ALL_SOURCES + ["none"]
+_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "none"]
+_SOURCE_TOKEN_TO_NOTION = {
+    "fr": SOURCE_FR,
+    "recall": SOURCE_RECALL,
+    "ema": SOURCE_EMA,
+    "mhra": SOURCE_MHRA,
+    "pics": SOURCE_PICS,
+    "eca": SOURCE_ECA,
+    "wl": SOURCE_FDA_WL,
+    "mfds": SOURCE_MFDS,
+}
 
 
 def main() -> int:
@@ -1799,11 +2176,20 @@ def main() -> int:
                         choices=range(1, 91), metavar="N(1-90)",
                         help="수집 윈도우 일수 1~90 (default 7)")
     parser.add_argument("--sources", nargs="+", choices=_SOURCE_CHOICES,
-                        default=_ALL_SOURCES,
+                        default=None,
                         help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema. "
                              "none은 feature-flag collector만 단독 실행")
+    parser.add_argument("--emit-routine-handoff", action="store_true",
+                        help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
+    parser.add_argument("--handoff-window-days", type=int, default=None,
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="Routine handoff 조회 윈도우. 기본값은 --window-days와 동일")
+    parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
+                        help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
     args = parser.parse_args()
-    active = set() if "none" in args.sources else set(args.sources)
+    requested_sources = args.sources or _ALL_SOURCES
+    explicit_sources = args.sources is not None
+    active = set() if "none" in requested_sources else set(requested_sources)
 
     notion_token = os.environ.get("NOTION_TOKEN", "").strip()
     notion_db = os.environ.get("NOTION_DATABASE_ID", "").strip()
@@ -2110,6 +2496,38 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_SEARCH=false — Brave Search 건너뜀")
 
+    handoff_emitted = False
+    handoff_failed = False
+    handoff_row_count = 0
+    handoff_url = ""
+    handoff_error_msg = ""
+    if args.emit_routine_handoff:
+        if args.dry_run:
+            log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
+        elif stats.has_insert_failures():
+            handoff_failed = True
+            handoff_error_msg = "insert failure가 있어 partial handoff 생성 생략"
+            log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
+        else:
+            try:
+                handoff_window_days = args.handoff_window_days or args.window_days
+                handoff_sources = None
+                if explicit_sources and "none" not in requested_sources:
+                    handoff_sources = {
+                        _SOURCE_TOKEN_TO_NOTION[src]
+                        for src in requested_sources
+                        if src in _SOURCE_TOKEN_TO_NOTION
+                    }
+                handoff_doc_ids = set(args.handoff_doc_ids or []) or None
+                handoff_row_count, handoff_url = emit_routine_handoff(
+                    notion_token, notion_db, run_date, handoff_window_days, collected_at,
+                    source_names=handoff_sources, doc_ids=handoff_doc_ids)
+                handoff_emitted = True
+            except NotionHandoffError as e:
+                handoff_failed = True
+                handoff_error_msg = str(e)
+                log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
+
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
@@ -2180,6 +2598,15 @@ def main() -> int:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
                                       stats.search_error, stats.search_error_msg))
+                if args.emit_routine_handoff:
+                    if handoff_emitted:
+                        f.write(f"- Routine handoff: `{handoff_row_count}` New rows · "
+                                f"{handoff_url or 'url unavailable'}\n")
+                    elif handoff_failed:
+                        f.write(f"- ⚠️ Routine handoff: failed/skipped · "
+                                f"`{handoff_error_msg[:160]}`\n")
+                    else:
+                        f.write("- Routine handoff: not emitted (dry-run)\n")
                 f.write(f"- Dry run: `{args.dry_run}`\n")
                 if stats.has_insert_failures():
                     total_fail = stats.total_insert_failures()
@@ -2216,6 +2643,18 @@ def main() -> int:
     if stats.has_insert_failures():
         log("ERROR", f"Notion insert 최종 실패 {stats.total_insert_failures()}건 — workflow fail")
         return 1
+    if handoff_failed:
+        log("ERROR", "Routine handoff 생성 실패 — workflow fail")
+        return 1
+    if args.emit_routine_handoff and handoff_emitted and (not active or active == {"mfds"}) and not any([
+        enable_mfds,
+        enable_mfds_recall,
+        enable_mfds_admin,
+        enable_mfds_gmp_inspection,
+        enable_search,
+    ]):
+        log("INFO", "handoff-only 실행 완료 — source fetch 비활성 상태를 성공으로 처리")
+        return 0
 
     phase1_fr_active     = "fr" in active
     phase1_recall_active = "recall" in active

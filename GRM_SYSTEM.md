@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.0` (최초 작성) |
+| 문서 버전 | `v1.1` (저장소 폴더 구조 섹션 추가) |
 | 최종 수정일 | 2026-06-02 |
 | 기준 시스템 버전 | `origin/main` `34ffe3b` (PL-10 handoff 멱등성 머지 반영) · Routine 프롬프트 `v15.6.3` |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -21,6 +21,7 @@
 - **큰 틀 위주로 갱신한다.** 자잘한 버그 수정·문구 변경은 코드 커밋/프롬프트 버전으로 충분합니다. 이 문서는 **구조·소스·단계가 바뀌는 "큰 변경"** 만 반영합니다. (예: 새 규제 소스 추가, 새 Phase 진입, 데이터 흐름 변경)
 - **변경은 해당 섹션 안에 기록한다.** 각 섹션 끝의 `📝 변경 이력` 표에 한 줄 추가합니다. 별도의 통합 changelog는 두지 않습니다.
 - **상단 "문서 메타" 의 버전·수정일·기준 버전** 을 같이 갱신합니다.
+- **파일·폴더가 추가·이동·삭제되면 `4.1 저장소 폴더 구조` 트리를 함께 갱신합니다.** (이 문서가 폴더 구조의 단일 기준)
 - 변경 이력 한 줄 형식: `날짜 · 무엇이 어떻게 바뀌었나 · (연관 커밋/프롬프트 버전)`
 
 > 이 문서의 목적은 ① 개발 중 기준점, ② 다음 작업 때 진행 정도 확인, ③ 추후 최종 사용자 안내문 제작의 토대입니다.
@@ -171,7 +172,46 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 
 ## 4. 구성 요소 레퍼런스 (개발용)
 
-### 4.1 코드 파일 (저장소)
+### 4.1 저장소 폴더 구조
+
+> 파일·폴더가 추가/이동/삭제되면 이 트리를 갱신한다. (구조의 단일 기준)
+
+```
+v15.0-implementation/
+├─ GRM_SYSTEM.md          # 시스템 대표 문서(이 파일, README 대체)
+│
+├─ collect_intake.py      # 메인 수집기 = 오케스트레이터(워크플로우가 호출하는 단일 진입점)
+├─ collect_mfds.py        # 식약처 RSS 게시판
+├─ collect_mfds_admin_action.py     # 식약처 행정처분
+├─ collect_mfds_gmp_inspection.py   # 식약처 GMP 실태조사
+├─ collect_mfds_recall.py           # 식약처 회수·판매중지
+├─ collect_search.py      # Brave 보조 검색
+├─ grm_common.py          # 공통 HTTP/재시도 헬퍼
+├─ probe_*.py             # 개발용 탐침 스크립트(운영 무관)
+│
+├─ setup.sh / setup.ps1   # 최초 셋업 스크립트
+├─ requirements.txt       # 파이썬 의존성
+├─ .env.example           # 환경변수 예시
+├─ .gitignore             # git 제외 목록(/archive/ 포함)
+├─ .github/workflows/grm-intake.yml   # 매일 자동 수집 워크플로우
+│
+├─ docs/                  # 현행 문서 (git 추적)
+│  ├─ notion_intake_db_schema.md      # Intake DB 스키마
+│  ├─ setup_guide.md                  # 셋업 가이드
+│  ├─ GRM_session_decisions.md        # 의사결정 로그
+│  ├─ GRM_점검_통합punchlist_….md      # 최신 점검 목록
+│  ├─ prompts/            # 현행 Routine 프롬프트·카드포맷 표준·검증 프롬프트
+│  └─ specs/              # 구현된 수집기 스펙
+│
+└─ archive/               # 옛/완료 문서 (로컬·git 히스토리에 보존, 추적 제외)
+   ├─ prompts-old/        # 옛 버전 프롬프트(v15.0/v15.5/patch)
+   ├─ handoffs-done/      # 완료된 의뢰·핸드오프
+   └─ point-in-time/      # 1회성 산출물
+```
+
+구조 원칙: **코드(`.py`)는 루트에 평면 유지**(같은 폴더 import 의존 → 이동 금지). 문서만 폴더로 분류. **git은 현행(루트 + `docs/`)만 추적**하고 `archive/`는 로컬·히스토리에만 보존. `__pycache__`(파이썬 캐시)·`.claude`(설정)는 git 대상이 아닌 로컬 전용.
+
+### 4.2 코드 파일
 | 파일 | 역할 |
 |---|---|
 | `collect_intake.py` | **오케스트레이터 겸 메인 수집기.** FR + OpenFDA + RSS 4종(EMA·MHRA·PIC/S·ECA) + FDA WL을 직접 수집하고, `ENABLE_*` 플래그에 따라 MFDS·Brave 하위 수집기를 import·실행. Intake 적재 + Handoff 생성까지 담당 (워크플로우는 이 파일 하나만 호출) |
@@ -186,7 +226,7 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 | `notion_intake_db_schema.md` | Intake DB 스키마 문서 |
 | `GRM_Prompt_v15.6.md` 등 | Routine 프롬프트 (Claude가 사용) |
 
-### 4.2 비밀값(Secrets) · 기능 플래그(Variables)
+### 4.3 비밀값(Secrets) · 기능 플래그(Variables)
 
 **Secrets (값):** `NOTION_TOKEN` · `NOTION_DATABASE_ID` · `OPENFDA_API_KEY`(선택) · `BRAVE_API_KEY`(검색용) · `DATA_GO_KR_SERVICE_KEY`(식약처 회수 `15059114`·행정처분 `15058457` API) · `DATA_GO_KR_KEY`(법제처 ogLmPp).
 
@@ -199,13 +239,14 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 
 > 운영 기본값은 워크플로우 `grm-intake.yml` 의 `vars.* || 'true/false'` fallback으로 정해집니다. 로컬 dry-run용 `.env.example` 은 모두 `false` 로 시작합니다(샘플).
 
-### 4.3 Intake DB 주요 속성 (라이브 확인 2026-06-02)
+### 4.4 Intake DB 주요 속성 (라이브 확인 2026-06-02)
 `Source`(12종, MFDS·GRM Handoff 포함) · `Type or Class`(약 29종) · `Signal Tier` · `QA Relevance` · `OSD Relevance` · `Evidence Candidate` · `Language`(KO/EN) · `Region/Jurisdiction` · `Site Country`(제조소 소재국, 관할과 분리) · `Status`(New/Processed/Skipped/Error) · `Run Date (KST)` · `API Query` 등. 페이지 본문에 원본 JSON 보존.
 
 #### 📝 변경 이력 — 구성 요소
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-06-02 | 최초 작성. 코드 파일·Secrets·DB 속성 라이브 검증 반영 |
+| 2026-06-02 | `4.1 저장소 폴더 구조` 트리 추가(docs/·archive/ 분류 반영) + 유지 규칙에 "구조 변경 시 트리 갱신" 추가 |
 
 ---
 

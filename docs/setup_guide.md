@@ -101,16 +101,16 @@ $env:OPENFDA_API_KEY = 'your_openfda_key_here'
 스크립트 마지막 출력의 3개 URL 확인:
 
 1. **Repo URL** → 파일 8개가 push 됐는지
-2. **Actions** → `GRM API Intake (Weekly)` 워크플로가 보이는지
+2. **Actions** → `GRM API Intake (Daily)` 워크플로가 보이는지
 3. **Secrets** → 3개 (또는 2개) Secret 이름이 보이는지
 
 그 다음 Actions 페이지에서:
 
-1. `GRM API Intake (Weekly)` 선택 → `Run workflow` 버튼 → `dry_run: true` 선택 → 실행
+1. `GRM API Intake (Daily)` 선택 → `Run workflow` 버튼 → `dry_run: true` 선택 → 실행
 2. 약 2분 후 Job Summary 확인 — `Federal Register: fetched N` 처럼 보여야 정상
 3. 같은 절차로 `dry_run: false` 실행 → Notion `GRM API Intake` DB 에 row 생김
 
-이 두 검증이 통과하면 매주 일요일 22:00 UTC (월요일 07:00 KST) 부터 자동 실행됩니다.
+이 두 검증이 통과하면 매일 20:17 UTC (익일 05:17 KST) 에 자동 실행됩니다. (수집기는 매일 실행, Routine 다이제스트 발행은 매주 월요일 07:30 KST)
 
 ## 보안 메모
 

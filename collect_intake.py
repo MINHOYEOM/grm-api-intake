@@ -110,6 +110,9 @@ SOURCE_PICS = "PIC/S"
 SOURCE_ECA = "ECA Academy"
 SOURCE_FDA_WL = "FDA Warning Letter"
 SOURCE_MFDS = "MFDS"
+SOURCE_ICH = "ICH"
+SOURCE_WHO = "WHO"
+SOURCE_HC = "Health Canada"
 SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
@@ -139,6 +142,9 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_ECA:     SRC_TYPE_EXPERT_SECONDARY,
     SOURCE_FDA_WL:  SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_MFDS:    SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_ICH:     SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_WHO:     SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_HC:      SRC_TYPE_OFFICIAL_API,
     SOURCE_HANDOFF: SRC_TYPE_OFFICIAL_PAGE,
     # Phase 2a 신규
     SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
@@ -365,6 +371,27 @@ class CollectionStats:
     mfds_gmp_inspection_insert_failed: int = 0
     mfds_gmp_inspection_error: bool = False
     mfds_gmp_inspection_error_msg: str = ""
+    # ── P1: ICH (직접 모니터링) ────────────────────────────────────────────
+    ich_fetched: int = 0
+    ich_inserted: int = 0
+    ich_skipped_dup: int = 0
+    ich_insert_failed: int = 0
+    ich_error: bool = False
+    ich_error_msg: str = ""
+    # ── P1: WHO Prequalification ───────────────────────────────────────────
+    who_fetched: int = 0
+    who_inserted: int = 0
+    who_skipped_dup: int = 0
+    who_insert_failed: int = 0
+    who_error: bool = False
+    who_error_msg: str = ""
+    # ── P1: Health Canada ──────────────────────────────────────────────────
+    hc_fetched: int = 0
+    hc_inserted: int = 0
+    hc_skipped_dup: int = 0
+    hc_insert_failed: int = 0
+    hc_error: bool = False
+    hc_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -375,6 +402,9 @@ class CollectionStats:
             + self.mfds_insert_failed + self.mfds_recall_insert_failed
             + self.mfds_admin_insert_failed
             + self.mfds_gmp_inspection_insert_failed
+            + self.ich_insert_failed
+            + self.who_insert_failed
+            + self.hc_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -394,6 +424,9 @@ class CollectionStats:
             or self.mfds_recall_error
             or self.mfds_admin_error
             or self.mfds_gmp_inspection_error
+            or self.ich_error
+            or self.who_error
+            or self.hc_error
         )
 
     def summary(self) -> str:
@@ -438,6 +471,15 @@ class CollectionStats:
             f"skip_dup={self.mfds_gmp_inspection_skipped_dup}  "
             f"failed={self.mfds_gmp_inspection_insert_failed}  "
             f"error={self.mfds_gmp_inspection_error}",
+            f"ICH  fetched={self.ich_fetched}  inserted={self.ich_inserted}  "
+            f"skip_dup={self.ich_skipped_dup}  failed={self.ich_insert_failed}  "
+            f"error={self.ich_error}",
+            f"WHO  fetched={self.who_fetched}  inserted={self.who_inserted}  "
+            f"skip_dup={self.who_skipped_dup}  failed={self.who_insert_failed}  "
+            f"error={self.who_error}",
+            f"HC   fetched={self.hc_fetched}  inserted={self.hc_inserted}  "
+            f"skip_dup={self.hc_skipped_dup}  failed={self.hc_insert_failed}  "
+            f"error={self.hc_error}",
         ]
         return "\n".join(lines)
 
@@ -474,6 +516,16 @@ def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
     if not text:
         return [""]
     return [text[i : i + size] for i in range(0, len(text), size)]
+
+
+def _env_int(name: str, default: int) -> int:
+    """환경변수를 정수로 안전 파싱. 비정상 값이면 WARN 후 default 사용 (graceful degradation)."""
+    raw = os.getenv(name, str(default)).strip()
+    try:
+        return int(raw)
+    except ValueError:
+        log("WARN", f"{name}={raw!r} 정수 파싱 실패 — default {default} 사용")
+        return default
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1518,7 +1570,8 @@ def notion_api_request(method: str, url: str, token: str, *,
 
 
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
-                                  window_days: int = 7) -> set[str]:
+                                  window_days: int = 7,
+                                  source_names: set[str] | None = None) -> set[str]:
     """최근 window_days 일(KST Run Date 기준) row 의 'source::document_id' key set 반환.
 
     daily 수집 전환(Phase 1)으로 dedupe 윈도우를 '당일' → '최근 window_days 일'로 확장.
@@ -1535,21 +1588,27 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     existing: set[str] = set()
     window_start = (run_date - timedelta(days=window_days)).isoformat()
+    and_filters: list[dict[str, Any]] = [
+        {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
+        {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
+    ]
+    # source_names 지정 시 Source 한정(snapshot 소스 long-horizon dedup용).
+    if source_names:
+        and_filters.append({
+            "or": [{"property": PROP_SOURCE, "select": {"equals": s}}
+                   for s in sorted(source_names)]
+        })
     body: dict[str, Any] = {
-        "filter": {
-            "and": [
-                {"property": PROP_RUN_DATE,
-                 "date": {"on_or_after": window_start}},
-                {"property": PROP_RUN_DATE,
-                 "date": {"on_or_before": run_date.isoformat()}},
-            ]
-        },
+        "filter": {"and": and_filters},
         "page_size": 100,
     }
     start_cursor: str | None = None
     page_count = 0
+    # P2 개선: dedup 윈도우가 enforcement(최대 30일)×전 소스로 넓어졌으므로 상한을 상향한다.
+    # 100p × 100 = 10,000 row 헤드룸. 그래도 초과하면 partial 반환 대신 예외(아래 for-else).
+    _DEDUP_MAX_PAGES = 100
     try:
-        for _ in range(20):  # 안전 페이지 상한
+        for _ in range(_DEDUP_MAX_PAGES):  # 안전 페이지 상한
             page_count += 1
             if start_cursor:
                 body["start_cursor"] = start_cursor
@@ -1589,10 +1648,13 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                 break
             start_cursor = data.get("next_cursor")
         else:
-            # for-else: 20 페이지를 모두 소진했는데 break 되지 않음 = has_more 잔존 = 상한 도달
-            if page_count >= 20:
-                log("WARN", f"Notion dedupe 조회 20페이지 상한 도달 — "
-                            f"일부 기존 row 누락 가능 (existing={len(existing)}건)")
+            # for-else: 상한을 모두 소진했는데 break 되지 않음 = has_more 잔존 = 상한 도달.
+            # P2 개선: 일부 기존 row를 놓친 채 진행하면 중복 삽입 방어가 깨지므로,
+            # WARN 후 partial 반환 대신 예외를 던져 caller(main)가 insert를 중단하게 한다.
+            raise NotionDedupeQueryError(
+                f"Notion 중복 조회 {_DEDUP_MAX_PAGES}페이지 상한 도달 — "
+                f"dedup set 불완전(existing={len(existing)}건), 중복 삽입 방지 위해 중단"
+            )
     except (requests.RequestException, ValueError) as e:
         # 중복 조회 실패 시 빈 set을 반환하면 모든 item을 신규로 판단해 대량 중복 insert 위험.
         # 안전하게 예외를 던져 caller 가 insert 중단 여부를 결정하도록 한다.
@@ -2155,7 +2217,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
-_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "none"]
+# ich/mfds 는 opt-in feature flag 소스라 _ALL_SOURCES(기본 all)엔 넣지 않되,
+# --sources 선택지와 handoff source 매핑에는 포함한다.
+_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "none"]
 _SOURCE_TOKEN_TO_NOTION = {
     "fr": SOURCE_FR,
     "recall": SOURCE_RECALL,
@@ -2165,6 +2229,9 @@ _SOURCE_TOKEN_TO_NOTION = {
     "eca": SOURCE_ECA,
     "wl": SOURCE_FDA_WL,
     "mfds": SOURCE_MFDS,
+    "ich": SOURCE_ICH,
+    "who": SOURCE_WHO,
+    "hc": SOURCE_HC,
 }
 
 
@@ -2201,6 +2268,12 @@ def main() -> int:
     enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
     enable_mfds_admin = os.environ.get("ENABLE_MFDS_ADMIN", "false").lower() == "true"
     enable_mfds_gmp_inspection = os.environ.get("ENABLE_MFDS_GMP_INSPECTION", "false").lower() == "true"
+    enable_ich = (os.environ.get("ENABLE_ICH", "false").lower() == "true"
+                  or "ich" in active)
+    enable_who = (os.environ.get("ENABLE_WHO", "false").lower() == "true"
+                  or "who" in active)
+    enable_hc = (os.environ.get("ENABLE_HC", "false").lower() == "true"
+                 or "hc" in active)
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
     if enable_scrape:
@@ -2215,6 +2288,19 @@ def main() -> int:
     run_date = kst_run_date(now_k)
     start, end = date_window(run_date, args.window_days)
     log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
+
+    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
+    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
+    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
+    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
+    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
+    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
+    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
+    mfds_enforcement_window_days = max(
+        args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30))
+    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
+    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
+                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
 
     stats = CollectionStats()
 
@@ -2310,8 +2396,9 @@ def main() -> int:
         else:
             try:
                 from collect_mfds_recall import collect_mfds_recall
+                # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
                 mfds_recall_items, mfds_recall_err = collect_mfds_recall(
-                    start, end, data_go_kr_service_key)
+                    enf_start, end, data_go_kr_service_key)
             except Exception as e:
                 mfds_recall_items, mfds_recall_err = [], str(e)
         stats.mfds_recall_fetched = len(mfds_recall_items)
@@ -2332,8 +2419,9 @@ def main() -> int:
         else:
             try:
                 from collect_mfds_admin_action import collect_mfds_admin_actions
+                # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
                 mfds_admin_items, mfds_admin_err = collect_mfds_admin_actions(
-                    start, end, data_go_kr_service_key)
+                    enf_start, end, data_go_kr_service_key)
             except Exception as e:
                 mfds_admin_items, mfds_admin_err = [], str(e)
         stats.mfds_admin_fetched = len(mfds_admin_items)
@@ -2362,12 +2450,67 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_MFDS_GMP_INSPECTION=false — MFDS GMP 실태조사 결과 수집 건너뜀")
 
+    # ── P1: ICH 직접 모니터링 (ENABLE_ICH=true 시 실행) ──────────────────────
+    ich_items: list[IntakeItem] = []
+    if enable_ich:
+        log("INFO", "=== ICH 수집 시작 ===")
+        try:
+            from collect_ich import collect_ich
+            ich_items, ich_err = collect_ich(run_date)
+        except Exception as e:  # noqa: BLE001
+            ich_items, ich_err = [], str(e)
+        stats.ich_fetched = len(ich_items)
+        if ich_err:
+            stats.ich_error = True
+            stats.ich_error_msg = ich_err
+            log("WARN", f"ICH 오류: {ich_err}")
+    else:
+        log("INFO", "ENABLE_ICH=false — ICH 수집 건너뜀")
+
+    # ── P1: WHO Prequalification (ENABLE_WHO=true 또는 --sources who) ─────────
+    who_items: list[IntakeItem] = []
+    if enable_who:
+        log("INFO", "=== WHO 수집 시작 ===")
+        try:
+            from collect_who import collect_who
+            who_items, who_err = collect_who(start, end)
+        except Exception as e:  # noqa: BLE001
+            who_items, who_err = [], str(e)
+        stats.who_fetched = len(who_items)
+        if who_err:
+            stats.who_error = True
+            stats.who_error_msg = who_err
+            log("WARN", f"WHO 오류: {who_err}")
+    else:
+        log("INFO", "ENABLE_WHO=false — WHO 수집 건너뜀")
+
+    # ── P1: Health Canada (ENABLE_HC=true 또는 --sources hc) ─────────────────
+    hc_items: list[IntakeItem] = []
+    if enable_hc:
+        log("INFO", "=== Health Canada 수집 시작 ===")
+        try:
+            from collect_hc import collect_hc
+            # recall/advisory 이므로 지연공개 대비 enforcement 윈도우 사용
+            hc_items, hc_err = collect_hc(enf_start, end)
+        except Exception as e:  # noqa: BLE001
+            hc_items, hc_err = [], str(e)
+        stats.hc_fetched = len(hc_items)
+        if hc_err:
+            stats.hc_error = True
+            stats.hc_error_msg = hc_err
+            log("WARN", f"HC 오류: {hc_err}")
+    else:
+        log("INFO", "ENABLE_HC=false — Health Canada 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
                      + stats.mfds_fetched + stats.mfds_recall_fetched
                      + stats.mfds_admin_fetched
-                     + stats.mfds_gmp_inspection_fetched)
+                     + stats.mfds_gmp_inspection_fetched
+                     + stats.ich_fetched
+                     + stats.who_fetched
+                     + stats.hc_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
@@ -2375,15 +2518,30 @@ def main() -> int:
         f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
         f"MFDS-Recall={stats.mfds_recall_fetched} · "
         f"MFDS-Admin={stats.mfds_admin_fetched} · "
-        f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · 합계={total_fetched}건"
+        f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · "
+        f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
+        f"HC={stats.hc_fetched} · 합계={total_fetched}건"
     ))
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
     # (7일 윈도우 시 8일 전 RAPS URL이 누락되어 재삽입될 수 있음 — Task #13)
     _SEARCH_DEDUP_WINDOW_DAYS = 35  # pm(31일) + 여유 4일
-    dedup_window_days = max(args.window_days, _SEARCH_DEDUP_WINDOW_DAYS) if enable_search else args.window_days
+    # P0: dedup 윈도우는 가장 넓은 수집 윈도우(enforcement 30일)를 반드시 덮어야 한다.
+    # 그래야 enforcement 윈도우로 backfill된 과거 일자 항목이 다음 실행에서 중복 재삽입되지 않는다.
+    dedup_window_days = max(
+        args.window_days,
+        mfds_enforcement_window_days,
+        _SEARCH_DEDUP_WINDOW_DAYS if enable_search else 0,
+    )
     log("INFO", f"dedupe window={dedup_window_days}일 (window_days={args.window_days}, enable_search={enable_search})")
+
+    # P1: snapshot 소스(ICH·WHO)는 날짜 미단언/URL 기반 안정 스냅샷이라 매 실행 동일 항목을 재수집한다.
+    # 기본 dedup 윈도우(≤30일)를 넘으면 같은 항목이 다시 New로 들어오므로(월간 중복 삽입),
+    # 이들 소스만 별도로 장기(3년) Source-한정 dedup을 조회해 합친다.
+    # (전체 윈도우를 3년으로 늘리면 Notion 페이지 cap에 걸릴 수 있어 Source 필터로 한정.)
+    _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
+    _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
 
     if args.dry_run:
         existing: set[str] = set()
@@ -2395,6 +2553,19 @@ def main() -> int:
             # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
             log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
             return 1
+        snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
+        if snapshot_active:
+            try:
+                snap_existing = notion_query_existing_doc_ids(
+                    notion_token, notion_db, run_date,
+                    window_days=_SNAPSHOT_DEDUP_WINDOW_DAYS,
+                    source_names=snapshot_active)
+                existing |= snap_existing
+                log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
+                            f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
+            except NotionDedupeQueryError as e:
+                log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
+                return 1
 
     collected_at = now_k
 
@@ -2468,6 +2639,27 @@ def main() -> int:
     stats.mfds_gmp_inspection_inserted = mfds_gmp_insp_in
     stats.mfds_gmp_inspection_skipped_dup = mfds_gmp_insp_sk
     stats.mfds_gmp_inspection_insert_failed = mfds_gmp_insp_fail
+
+    ich_in, ich_sk, ich_fail = insert_items(
+        notion_token, notion_db, ich_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.ich_inserted = ich_in
+    stats.ich_skipped_dup = ich_sk
+    stats.ich_insert_failed = ich_fail
+
+    who_in, who_sk, who_fail = insert_items(
+        notion_token, notion_db, who_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.who_inserted = who_in
+    stats.who_skipped_dup = who_sk
+    stats.who_insert_failed = who_fail
+
+    hc_in, hc_sk, hc_fail = insert_items(
+        notion_token, notion_db, hc_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.hc_inserted = hc_in
+    stats.hc_skipped_dup = hc_sk
+    stats.hc_insert_failed = hc_fail
 
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
@@ -2594,6 +2786,18 @@ def main() -> int:
                                       stats.mfds_gmp_inspection_insert_failed,
                                       stats.mfds_gmp_inspection_error,
                                       stats.mfds_gmp_inspection_error_msg))
+                if enable_ich:
+                    f.write(_src_line("ICH", stats.ich_fetched, stats.ich_inserted,
+                                      stats.ich_skipped_dup, stats.ich_insert_failed,
+                                      stats.ich_error, stats.ich_error_msg))
+                if enable_who:
+                    f.write(_src_line("WHO", stats.who_fetched, stats.who_inserted,
+                                      stats.who_skipped_dup, stats.who_insert_failed,
+                                      stats.who_error, stats.who_error_msg))
+                if enable_hc:
+                    f.write(_src_line("Health Canada", stats.hc_fetched, stats.hc_inserted,
+                                      stats.hc_skipped_dup, stats.hc_insert_failed,
+                                      stats.hc_error, stats.hc_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -2651,6 +2855,9 @@ def main() -> int:
         enable_mfds_recall,
         enable_mfds_admin,
         enable_mfds_gmp_inspection,
+        enable_ich,
+        enable_who,
+        enable_hc,
         enable_search,
     ]):
         log("INFO", "handoff-only 실행 완료 — source fetch 비활성 상태를 성공으로 처리")
@@ -2675,6 +2882,9 @@ def main() -> int:
             (not enable_mfds_recall or stats.mfds_recall_error),
             (not enable_mfds_admin or stats.mfds_admin_error),
             (not enable_mfds_gmp_inspection or stats.mfds_gmp_inspection_error),
+            (not enable_ich or stats.ich_error),
+            (not enable_who or stats.who_error),
+            (not enable_hc or stats.hc_error),
         ])
         if phase2_all_error:
             log("ERROR", "모든 활성 소스 실패 — workflow fail")
@@ -2701,6 +2911,18 @@ def main() -> int:
     if enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error:
         log("ERROR", f"ENABLE_MFDS_GMP_INSPECTION=true 상태에서 MFDS GMP Inspection 오류 — workflow fail "
                      f"({stats.mfds_gmp_inspection_error_msg[:80]})")
+        return 1
+    if enable_ich and stats.ich_error:
+        log("ERROR", f"ENABLE_ICH=true 상태에서 ICH 오류 — workflow fail "
+                     f"({stats.ich_error_msg[:80]})")
+        return 1
+    if enable_who and stats.who_error:
+        log("ERROR", f"ENABLE_WHO=true 상태에서 WHO 오류 — workflow fail "
+                     f"({stats.who_error_msg[:80]})")
+        return 1
+    if enable_hc and stats.hc_error:
+        log("ERROR", f"ENABLE_HC=true 상태에서 Health Canada 오류 — workflow fail "
+                     f"({stats.hc_error_msg[:80]})")
         return 1
     return 0
 

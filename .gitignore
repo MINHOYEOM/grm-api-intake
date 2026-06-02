@@ -26,3 +26,6 @@ dist/
 tmp/
 output/
 *.local.json
+
+# 로컬 보관용 — git 추적 제외
+/archive/

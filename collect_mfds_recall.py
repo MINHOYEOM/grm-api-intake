@@ -144,6 +144,23 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
     if firm:
         headline = f"{headline} — {firm}"
 
+    # P0 개선: 듀얼 링크 추적성 보강. data.go.kr 회수 API는 항목별 공식 URL이 없어
+    # official_url은 데이터셋 페이지(L2)로 유지하되, 품목기준코드(ITEM_SEQ)가 있으면
+    # nedrug 품목 상세 '후보(미검증)' URL을 raw에 남겨 Routine이 검증·인용할 수 있게 한다.
+    # (검증 안 된 링크를 official_url로 단언하지 않는다 — 신뢰성 원칙)
+    raw_payload: dict[str, Any] = {
+        "api": "data.go.kr 15059114",
+        "endpoint": RECALL_API_ENDPOINT,
+        **raw,
+    }
+    item_seq = _text(raw, "ITEM_SEQ")
+    if item_seq:
+        raw_payload["nedrug_item_candidate_url"] = (
+            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail"
+            f"?itemSeq={urllib.parse.quote(item_seq, safe='')}"
+        )
+        raw_payload["nedrug_item_candidate_note"] = "Routine 검증 후 인용 (미검증 후보 URL)"
+
     return IntakeItem(
         source=SOURCE_MFDS,
         document_id=_document_id(raw),
@@ -158,7 +175,7 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
         osd_relevance="N/A",
         source_type=SRC_TYPE_OFFICIAL_API,
         signal_tier="Tier 3",
-        raw_payload={"api": "data.go.kr 15059114", "endpoint": RECALL_API_ENDPOINT, **raw},
+        raw_payload=raw_payload,
         language=LANGUAGE_KO,
         region_jurisdiction=REGION_MFDS,
     )
@@ -227,12 +244,17 @@ def collect_mfds_recall(
             break
         page_no += 1
 
+    # P2 개선: page cap 도달은 WARN-only로 묻지 않고 truncated 에러로 올려
+    # collect_intake summary/error에 드러나게 한다(scheduled run이 green으로 끝나는 것 방지).
+    truncated_msg: str | None = None
     if page_no > MAX_PAGES:
-        log("WARN", f"MFDS recall API max_pages={MAX_PAGES} 도달 — 이후 항목 누락 가능")
+        truncated_msg = (f"MFDS recall API max_pages={MAX_PAGES} 도달 — truncated "
+                         f"(수집 {len(items)}건, totalCount={total_count}, 이후 항목 누락 가능)")
+        log("WARN", truncated_msg)
 
     log(
         "INFO",
         "MFDS recall 수집 완료: "
         f"{len(items)}건 (totalCount={total_count})",
     )
-    return items, None
+    return items, truncated_msg

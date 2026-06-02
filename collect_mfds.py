@@ -213,6 +213,10 @@ def _build_item(*, brd_id: str, type_or_class: str, feed_url: str,
     link = (link or "").strip()
     body = (body or "").strip()
     relevance = _mfds_relevance(title, body)
+    # P0 개선: 안전성 서한은 정의상 즉시성 안전 신호다. 관련성 게이트(Pending)로
+    # 떨어뜨리지 않고 최소 Possible로 올려, 아래 _mfds_tier의 Tier 3 floor까지 보낸다.
+    if relevance == "Pending" and type_or_class == TYPE_SAFETY_LETTER:
+        relevance = "Possible"
     tier = _mfds_tier(type_or_class, relevance, title, body)
     return IntakeItem(
         source=SOURCE_MFDS,
@@ -421,7 +425,8 @@ def _collect_rss_feed(type_or_class: str, brd_id: str,
                 skipped_no_date += 1
             continue
         relevance = _mfds_relevance(title, desc)
-        if relevance == "Pending":
+        # P0 개선: 안전성 서한 보드는 Pending이어도 드롭하지 않는다(_build_item에서 floor 처리).
+        if relevance == "Pending" and type_or_class != TYPE_SAFETY_LETTER:
             skipped_out_of_scope += 1
             continue
         items.append(_build_item(

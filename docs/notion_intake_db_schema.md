@@ -1,6 +1,6 @@
 # GRM API Intake — Notion Database 스키마
 
-이 문서는 GitHub Actions 수집기가 데이터를 기록하고, Claude Code Routine v15.0이 읽어가는 **Intake staging DB** 의 속성 구조를 정의한다.
+이 문서는 GitHub Actions 수집기가 데이터를 기록하고, Claude Code Routine(현행 v15.6.3)이 읽어가는 **Intake staging DB** 의 속성 구조를 정의한다.
 
 ## ✓ DB 생성 완료 (2026-05-26)
 

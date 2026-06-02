@@ -343,8 +343,13 @@ def _parse_rows(html_text: str) -> list[dict[str, str]]:
     return rows
 
 
-def _body(raw: dict[str, str], attachment: _AttachmentParse) -> str:
-    parts = [
+def _body(raw: dict[str, str], attachment: _AttachmentParse,
+          manual_review: bool = False) -> str:
+    parts = []
+    if manual_review:
+        parts.append("⚠️ 첨부 자동판독 불가 — 지적사항 유무 수동 확인 필요 "
+                     f"(상태: {attachment.status}). 아래 다운로드 링크에서 직접 확인할 것.")
+    parts += [
         f"제조소명: {raw.get('manufacturer', '')}",
         f"소재지: {raw.get('address', '')}",
         f"국가: {raw.get('country', '')}",
@@ -391,6 +396,13 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     qa_relevance = "Likely" if attachment.deficiency == "present" else "Possible"
     signal_tier = "Tier 3" if attachment.deficiency == "present" else "Tier 2"
 
+    # P0 개선: 첨부를 자동판독하지 못해 지적사항 유무를 확정 못한 경우(주로 구형 .hwp/OLE,
+    # 다운로드 실패, 스캔본 등)에는 침묵 강등되지 않도록 '수동확인 필요' 플래그를 남긴다.
+    # 무차별 Tier 3 승격은 노이즈가 크므로 Tier 2는 유지하되, Routine이 사람 확인을 큐잉하도록 표시.
+    manual_review = attachment.deficiency == "unknown" and attachment.status not in (
+        "pdf-ok", "hwpx-ok",
+    )
+
     raw_payload: dict[str, Any] = {
         "source": "nedrug CCBBD03",
         **raw,
@@ -399,6 +411,7 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         "attachment_file_format": attachment.file_format,
         "attachment_bytes": attachment.bytes_downloaded,
         "attachment_deficiency_assessment": attachment.deficiency,
+        "manual_review_required": manual_review,
     }
     if attachment.error:
         raw_payload["attachment_parse_error"] = attachment.error
@@ -413,7 +426,7 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         official_url=BOARD_URL,
         type_or_class=TYPE_GMP_INSPECTION,
         firm=manufacturer,
-        body=_body(raw, attachment),
+        body=_body(raw, attachment, manual_review),
         api_query=api_query_url,
         qa_relevance=qa_relevance,
         osd_relevance="N/A",

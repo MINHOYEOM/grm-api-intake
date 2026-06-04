@@ -1,8 +1,9 @@
-"""제형(Modality) 분류 회귀 테스트 (제형 확장).
+"""제품군(Modality) 분류 회귀 테스트 (제품군 확장).
 
-compute_modality 가 회사 생산 제형(경구 고형제·경구 액상·무균 주사제·
-바이오/바이오시밀러)을 의도대로 분류하고, 무균·바이오 신호가 QA 관련성에서
-누락(Unrelated)되지 않는지 확인한다.
+compute_modality 가 '큰 틀'(원료 성격) 3분류 — 화학합성의약품(Chemical) /
+생물의약품(Biologic) / 기타(Other) — 로 분류하는지, 그리고 무균·바이오 품질
+신호가 QA 관련성에서 누락(Unrelated)되지 않는지 확인한다.
+특정 제품 단위가 아닌 클래스 단위 분류임에 유의.
 """
 import os
 import sys
@@ -14,63 +15,63 @@ import collect_intake as ci
 
 
 class TestComputeModality(unittest.TestCase):
-    def test_osd_from_dosage_form(self):
-        payload = {"openfda": {"dosage_form": ["TABLET"], "route": ["ORAL"]}}
-        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_OSD)
+    # ── 생물의약품(Biologic) ──────────────────────────────────────────────
+    def test_biologic_product_type(self):
+        payload = {"openfda": {"product_type": ["BIOLOGIC"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
 
-    def test_capsule_text(self):
-        self.assertEqual(
-            ci.compute_modality({}, "Extended-release capsule recall"),
-            ci.MODALITY_OSD,
-        )
-
-    def test_oral_liquid(self):
-        payload = {"openfda": {"dosage_form": ["ORAL SOLUTION"], "route": ["ORAL"]}}
-        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_ORAL_LIQUID)
-
-    def test_oral_suspension_text(self):
-        self.assertEqual(
-            ci.compute_modality({}, "Oral suspension subpotent assay"),
-            ci.MODALITY_ORAL_LIQUID,
-        )
-
-    def test_sterile_injectable_route(self):
-        payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["INTRAVENOUS"]}}
-        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_STERILE)
-
-    def test_sterile_injectable_text(self):
-        self.assertEqual(
-            ci.compute_modality({}, "Lack of sterility assurance in vial filling line"),
-            ci.MODALITY_STERILE,
-        )
-
-    def test_biologic_biosimilar(self):
+    def test_biologic_biosimilar_text(self):
         self.assertEqual(
             ci.compute_modality({}, "Biosimilar monoclonal antibody comparability"),
             ci.MODALITY_BIOLOGIC,
         )
 
-    def test_biologic_growth_hormone(self):
-        # 성장호르몬(somatropin) 은 주사제이지만 바이오로 우선 분류
-        payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["SUBCUTANEOUS"]}}
+    def test_biologic_vaccine_text(self):
         self.assertEqual(
-            ci.compute_modality(payload, "Somatropin growth hormone for injection"),
+            ci.compute_modality({}, "Recombinant vaccine aseptic filling deficiency"),
             ci.MODALITY_BIOLOGIC,
         )
 
-    def test_biologic_product_type(self):
-        payload = {"openfda": {"product_type": ["BIOLOGIC"]}}
-        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
-
-    def test_guidance_unspecified(self):
+    def test_biologic_injectable_still_biologic(self):
+        # 생물의약품은 주사제여도 'Biologic' (제형이 아닌 원료 성격 우선)
+        payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["SUBCUTANEOUS"]}}
         self.assertEqual(
-            ci.compute_modality({}, "ICH Q9 quality risk management guideline"),
-            ci.MODALITY_UNSPECIFIED,
+            ci.compute_modality(payload, "Recombinant therapeutic protein for injection"),
+            ci.MODALITY_BIOLOGIC,
         )
 
-    def test_other_topical(self):
+    # ── 화학합성의약품(Chemical) ─────────────────────────────────────────
+    def test_chemical_tablet(self):
+        payload = {"openfda": {"dosage_form": ["TABLET"], "route": ["ORAL"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_chemical_injection_small_molecule(self):
+        # 생물 단서 없는 주사제 → 화학합성으로 분류
+        payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["INTRAVENOUS"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_chemical_oral_liquid_text(self):
         self.assertEqual(
-            ci.compute_modality({}, "Topical cream ointment manufacturing"),
+            ci.compute_modality({}, "Oral solution subpotent assay failure"),
+            ci.MODALITY_CHEMICAL,
+        )
+
+    def test_chemical_capsule_text(self):
+        self.assertEqual(
+            ci.compute_modality({}, "Extended-release capsule dissolution recall"),
+            ci.MODALITY_CHEMICAL,
+        )
+
+    # ── 기타(Other) ──────────────────────────────────────────────────────
+    def test_other_guidance(self):
+        self.assertEqual(
+            ci.compute_modality({}, "ICH Q9 quality risk management guideline"),
+            ci.MODALITY_OTHER,
+        )
+
+    def test_other_general_gmp(self):
+        self.assertEqual(
+            ci.compute_modality({}, "Data integrity inspection observation"),
             ci.MODALITY_OTHER,
         )
 
@@ -78,7 +79,7 @@ class TestComputeModality(unittest.TestCase):
 class TestModalityRelevanceNotDropped(unittest.TestCase):
     """무균·바이오 신호가 QA 관련성에서 Unrelated 로 떨어지지 않아야 한다."""
 
-    def test_sterile_injectable_not_unrelated(self):
+    def test_sterile_not_unrelated(self):
         rel = ci.compute_relevance(
             "Warning letter: sterility failure and aseptic processing deficiency",
         )
@@ -91,7 +92,7 @@ class TestModalityRelevanceNotDropped(unittest.TestCase):
         )
         self.assertNotEqual(rel, "Unrelated")
 
-    def test_injectable_boosts_tier(self):
+    def test_injectable_quality_boosts_tier(self):
         tier = ci.compute_signal_tier(
             ci.SOURCE_RECALL, "Class II", "Likely", "N/A",
             "container closure integrity failure in injectable vial",

@@ -194,14 +194,14 @@ QA_CATEGORY_KEYWORDS = [
     "particulate matter", "particulate contamination",
     "subpotent", "superpotent", "mislabeling", "mislabelled",
     "endotoxin",
-    # 무균·주사제 / 바이오 확장 (제형 확장 — 회사 생산 제형: 무균주사·바이오시밀러·항암주사·성장호르몬)
+    # 제품군 확장 — 무균·주사 품질사유 및 생물의약품(클래스 단위, 특정 제품 아님)
     "sterility", "sterility failure", "aseptic", "aseptic processing",
     "media fill", "container closure integrity", "container closure",
     "lyophilization", "lyophilized", "visible particulate", "glass delamination",
     "cold chain", "temperature excursion", "bioburden", "pyrogen",
     "biosimilar", "monoclonal antibody", "comparability", "ich q5",
     "immunogenicity", "viral safety", "viral clearance", "cell bank",
-    "somatropin", "growth hormone", "prefilled syringe", "parenteral",
+    "parenteral",
     # Nitrosamine 계열 (FDA hot topic)
     "nitrosamine", "ndma", "ndea", "n-nitroso",
     # 주요 generic 제조사 (경쟁사 학습 가치)
@@ -217,7 +217,7 @@ QA_LIKELY_BOOST = [
     # Recall 고신호 failure mode (v15.1 추가)
     "dissolution failure", "failed dissolution",
     "nitrosamine impurity", "ndma impurity",
-    # 무균·주사·바이오 직접 연관 (제형 확장)
+    # 무균·주사·바이오 직접 연관 (제품군 확장)
     "injectable", "injection", "sterile", "aseptic",
     "biosimilar", "monoclonal antibody", "container closure integrity",
     "media fill", "non-sterility", "lack of sterility assurance",
@@ -269,7 +269,7 @@ SIGNAL_TIER3_KEYWORDS = [
     "warning letter", "consent decree", "import alert",
     "annex 1", "ich q12", "ich q13",
     "nitrosamine", "ndma", "ndea", "n-nitroso",
-    # 무균·바이오 고신호 (제형 확장)
+    # 무균·바이오 고신호 (제품군 확장)
     "sterility failure", "non-sterility", "lack of sterility assurance",
     "viral contamination",
 ]
@@ -278,7 +278,7 @@ SIGNAL_TIER2_KEYWORDS = [
     "process validation", "cleaning validation", "dissolution",
     "out of specification", "oos", "stability", "capa", "deviation",
     "sterile", "aseptic", "supplier qualification", "recall", "class ii",
-    # 무균·바이오 GMP/품질 신호 (제형 확장)
+    # 무균·바이오 GMP/품질 신호 (제품군 확장)
     "media fill", "container closure integrity", "biosimilar",
     "comparability", "immunogenicity", "lyophilized", "bioburden",
     "cold chain", "visible particulate",
@@ -293,37 +293,32 @@ OSD_FORMS = {
     "powder for oral solution", "oral solution", "oral suspension",
 }
 
-# ── 제형(Modality) 분류 (제형 확장) ───────────────────────────────────────────
-# OSD Relevance(경구 고형제 전용)를 일반화한 제형 태그. 회사 생산 제형
-# (경구 고형제·경구 액상·무균 주사제·바이오/바이오시밀러)을 제형별 섹션 발행에 사용.
+# ── 제품군(Modality) 분류 (제품군 확장) ───────────────────────────────────────
+# 원료(active) 성격을 기준으로 한 '큰 틀' 제품군 태그. 특정 제품이 아닌 클래스 단위.
+#   Chemical  = 화학합성(케미컬)의약품   Biologic = 생물의약품   Other = 기타·판별 곤란
+# OSD Relevance(경구 고형제 전용)를 제품군 단위로 일반화한 것. 발행 섹션 그룹핑에 사용.
 # Notion 의 'Modality' select 속성에 기록(ENABLE_MODALITY_TAG=true 일 때).
 PROP_MODALITY = "Modality"
-MODALITY_OSD = "OSD"                      # 경구 고형제 (정제·캡슐)
-MODALITY_ORAL_LIQUID = "Oral-Liquid"     # 경구 액상 (시럽·현탁·내용액)
-MODALITY_STERILE = "Sterile-Injectable"  # 무균 주사제 (주사·수액·바이알)
-MODALITY_BIOLOGIC = "Biologic"           # 바이오/바이오시밀러·항체·성장호르몬 등
-MODALITY_OTHER = "Other"                 # 흡입·국소 등 기타 제형 근거 있음
-MODALITY_UNSPECIFIED = "Unspecified"     # 제형 단서 없음(가이드라인·정책 등)
+MODALITY_CHEMICAL = "Chemical"   # 화학합성(케미컬)의약품 — 제형 무관
+MODALITY_BIOLOGIC = "Biologic"   # 생물의약품(생물학적제제) — 제형 무관
+MODALITY_OTHER = "Other"         # 기타·판별 곤란(제품군 단서 없음: 일반 가이드라인·정책 등)
 
-# 바이오(생물학적제제) 단서 — route/dosage_form 보다 우선 판정
+# 생물의약품(생물학적제제) 판별 지표 — 특정 제품이 아닌 '클래스' 단위 신호
 MODALITY_BIOLOGIC_TERMS = [
-    "biosimilar", "biologic", "biological product", "monoclonal", "mab",
-    "antibody", "recombinant", "fusion protein", "peptide hormone",
-    "somatropin", "growth hormone", "insulin", "erythropoietin", "epoetin",
-    "filgrastim", "interferon", "vaccine", "cell therapy", "gene therapy",
-    "blood product", "plasma-derived", "immunoglobulin",
+    "biologic", "biological product", "biosimilar", "biotherapeutic",
+    "monoclonal", "mab", "antibody", "recombinant", "fusion protein",
+    "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
+    "blood product", "plasma-derived", "plasma derived", "immunoglobulin",
+    "ich q5",
 ]
-# 무균·주사제 단서
-MODALITY_STERILE_TERMS = [
-    "injection", "injectable", "for injection", "parenteral", "intravenous",
-    "intramuscular", "subcutaneous", "infusion", "vial", "ampoule", "ampul",
-    "prefilled syringe", "pre-filled syringe", "lyophilized", "lyophilised",
-    "powder for solution for injection", "sterile",
-]
-# 경구 액상 단서
-MODALITY_ORAL_LIQUID_TERMS = [
+# 의약품(제품) 일반 단서 — 제형/투여경로 등으로 '약'임을 식별(화학·생물 공통 1차 신호)
+MODALITY_DRUG_PRODUCT_TERMS = [
+    "tablet", "capsule", "oral solid", "solid dosage",
     "oral solution", "oral suspension", "syrup", "oral liquid",
-    "powder for oral solution", "oral drops",
+    "injection", "injectable", "for injection", "parenteral", "infusion",
+    "vial", "ampoule", "prefilled syringe", "inhalation", "topical",
+    "ophthalmic", "cream", "ointment", "suppository",
+    "drug product", "finished pharmaceutical", "dosage form",
 ]
 
 FR_PER_PAGE = 100  # API 최대치
@@ -947,76 +942,53 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 제형(Modality) 분류 (제형 확장)
+# 제품군(Modality) 분류 (제품군 확장)
 # ─────────────────────────────────────────────────────────────────────────────
 
 
 def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
-    """수집 항목의 제형(Modality)을 1차 자동 분류한다.
+    """수집 항목의 제품군(Modality)을 '큰 틀'(원료 성격)로 1차 자동 분류한다.
 
-    compute_osd_relevance(경구 고형제 전용)를 모든 제형으로 일반화한 것.
-    OpenFDA Recall 의 구조화 필드(dosage_form/route)가 있으면 우선 사용하고,
+    특정 제품(예: 성장호르몬·항암주사)이 아니라 클래스 단위로만 본다.
+    OpenFDA 의 구조화 필드(product_type/dosage_form/route)가 있으면 우선 사용하고,
     없으면 제목·본문·분류 텍스트의 키워드로 판정한다.
 
     반환값:
-        "Biologic"           — 바이오/바이오시밀러·항체·성장호르몬·백신 등 생물학적제제
-        "Sterile-Injectable" — 무균 주사제(주사·수액·바이알·동결건조 등)
-        "Oral-Liquid"        — 경구 액상(시럽·현탁·내용액)
-        "OSD"                — 경구 고형제(정제·캡슐)
-        "Other"              — 흡입·국소 등 기타 제형 근거 있음
-        "Unspecified"        — 제형 단서 없음(가이드라인·정책·실태조사 일반 등)
+        "Biologic" — 생물의약품(생물학적제제): 재조합 단백질·항체·백신·세포/유전자
+                     치료제·바이오시밀러·혈장분획제제 등 (제형 무관)
+        "Chemical" — 화학합성(케미컬)의약품: 생물 단서 없이 의약품(제형/투여경로)
+                     단서가 있는 합성 저분자 의약품 (제형 무관)
+        "Other"    — 제품군 단서 없음(일반 가이드라인·정책·실태조사 일반 등)
 
-    설계 의도(우선순위):
-        바이오 > 무균주사 > 경구액상 > 경구고형 > 기타.
-        대부분의 바이오의약품은 주사제이기도 하므로, triage 가치가 큰
-        '바이오' 를 먼저 판정한다(발행 시 바이오 섹션 우선 배치).
+    설계 의도:
+        제형을 잘게 나누면 오분류가 늘어나므로 원료 성격 3분류로만 단순화한다.
+        생물 단서가 우선(생물의약품은 그 자체로 하나의 군), 그 외 의약품 단서는
+        화학합성으로 본다. 세부 제형(정제/주사/액상)은 카드 본문 route/form 으로 표기.
     """
     openfda = raw_payload.get("openfda") or {}
+    product_type = _as_lower_set(openfda.get("product_type"))
     forms = _as_lower_set(openfda.get("dosage_form"))
     routes = _as_lower_set(openfda.get("route"))
-    product_type = _as_lower_set(openfda.get("product_type"))
-    blob = " ".join(t for t in text_parts if t).lower()
-    forms_blob = " ".join(forms)
     product = (raw_payload.get("product_description") or "").lower()
-    haystack = " ".join([blob, forms_blob, " ".join(routes), product])
+    blob = " ".join(t for t in text_parts if t).lower()
+    haystack = " ".join(
+        [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
+    )
 
-    # 1순위: 바이오(생물학적제제)
-    if any(pt for pt in product_type if "biolog" in pt):
+    # 1순위: 생물의약품(생물학적제제)
+    if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
         return MODALITY_BIOLOGIC
 
-    # 2순위: 경구 고형제 (구조화 dosage_form 우선 — OSD 판정 일관성 유지)
-    if any(term in f for f in forms for term in OSD_SOLID_TERMS):
-        return MODALITY_OSD
+    # 2순위: 화학합성의약품 — 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
+    if forms or routes:
+        return MODALITY_CHEMICAL
+    if _phrase_any(haystack, MODALITY_DRUG_PRODUCT_TERMS):
+        return MODALITY_CHEMICAL
 
-    # 3순위: 무균·주사제
-    if "oral" not in routes and (routes & {
-            "intravenous", "intramuscular", "subcutaneous",
-            "parenteral", "infusion", "injection"}):
-        return MODALITY_STERILE
-    if _phrase_any(haystack, MODALITY_STERILE_TERMS):
-        return MODALITY_STERILE
-
-    # 4순위: 경구 액상
-    if _phrase_any(haystack, MODALITY_ORAL_LIQUID_TERMS):
-        return MODALITY_ORAL_LIQUID
-
-    # 5순위: 경구 고형제 (텍스트 단서)
-    if _phrase_any(haystack, OSD_SOLID_TERMS):
-        return MODALITY_OSD
-    if "oral" in routes:
-        # 경구이지만 고형/액상 미확정 → 보수적으로 OSD(기존 시스템 1차 사용자)
-        return MODALITY_OSD
-
-    # 6순위: 기타 제형 근거(흡입·국소·점안 등)
-    if _phrase_any(haystack, [
-            "inhalation", "inhaler", "nebuliz", "topical", "transdermal",
-            "ophthalmic", "eye drop", "cream", "ointment", "patch",
-            "suppository", "nasal spray"]):
-        return MODALITY_OTHER
-
-    return MODALITY_UNSPECIFIED
+    # 3순위: 기타·판별 곤란(제품군 단서 없음)
+    return MODALITY_OTHER
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2310,7 +2282,7 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         PROP_STATUS: _select("New"),
     }
 
-    # ── 제형(Modality) 태그 (제형 확장) ─────────────────────────────────────
+    # ── 제품군(Modality) 태그 (제품군 확장) ─────────────────────────────────────
     # ENABLE_MODALITY_TAG=true 이고 Notion 에 'Modality' select 속성이 있을 때만 기록.
     # (기본 false — 속성 미생성 상태로 운영에 머지돼도 insert 가 깨지지 않도록 안전 게이트)
     if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":

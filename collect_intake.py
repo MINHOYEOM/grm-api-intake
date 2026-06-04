@@ -3069,6 +3069,7 @@ def main() -> int:
     # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
     modality_requested = os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true"
     modality_preflight_disabled = False
+    modality_preflight_skipped = False
     if modality_requested and notion_token and notion_db:
         if not notion_verify_modality_property(notion_token, notion_db):
             modality_preflight_disabled = True
@@ -3076,10 +3077,13 @@ def main() -> int:
             log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
                         "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
     elif modality_requested:
-        # 토큰/DB 없이 요청만 된 경우(예: dry-run 자격증명 미설정)
+        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
+        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
+        modality_preflight_skipped = True
         log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
-                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작.")
-    modality_effective = modality_requested and not modality_preflight_disabled
+                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
+    modality_effective = (modality_requested and not modality_preflight_disabled
+                          and not modality_preflight_skipped)
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)
@@ -3536,6 +3540,7 @@ def main() -> int:
         "ENABLE_SCRAPE": enable_scrape,
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
         "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
+        "ENABLE_MODALITY_TAG_PREFLIGHT_SKIPPED": modality_preflight_skipped,
     }
     health = _evaluate_health(
         modality_preflight_disabled=modality_preflight_disabled,

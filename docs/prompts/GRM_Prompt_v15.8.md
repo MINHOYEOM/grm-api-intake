@@ -2,7 +2,7 @@
 
 > **v15.7 → v15.8 변경(2026-06-04, 제품군 확장):** 모니터링 범위를 경구 고형제 중심에서 **의약품 전반(의료기기 제외)** 으로 확장하되, 특정 제품이 아니라 **원료 성격 기준 '큰 틀' 3분류 — 화학합성(케미컬)의약품 · 생물의약품 · 기타** 로 본다. ① **역할** 을 제품군 전반의 QA 큐레이터로 수정. ② **제외 필터** 재설계 — **생물의약품은 하나의 제품군으로 정식 포함**(세부 제품으로 좁히지 않음), 화학합성의약품도 제형 무관 포함, 순수 예방 백신·세포/유전자치료제(CGT)만 GMP/무균 제조 내용 위주로 신중 포함. ③ **Recall Tier 2/3** 를 경구뿐 아니라 무균·바이오 품질사유(sterility·container closure·particulate·endotoxin 등)까지 확장. ④ **제품군(Modality) 배지** 신설 — 카드 헤더에 제품군 라벨(💊화학합성 · 🧬생물 · ▫️기타)을 달고, 글로벌 섹션을 제품군별로 그룹핑. ⑤ Intake `Modality` 속성(`ENABLE_MODALITY_TAG=true`)을 제품군 판정 근거로 사용(없으면 Raw payload product_type/route/dosage_form 파싱으로 폴백).
 
-> v15.5 대비 변경 사항만 본 문서 상단에 정리하고, 이어서 새 채팅에 그대로 붙여넣을 **v15.7 완성 프롬프트** 본문을 제공합니다.
+> v15.5 대비 변경 사항만 본 문서 상단에 정리하고, 이어서 새 채팅에 그대로 붙여넣을 **v15.8 완성 프롬프트** 본문을 제공합니다.
 > 생성: 2026-06-01 · v15.5 + GRM_Prompt_v15.6_patch.md(P1~P9, Codex 5건 반영) 적용본.
 > v15.7 갱신: 2026-06-04 · self-contained화(v14.x 참조 인라인) · ICH/WHO/HC 처리 추가 · 주간 재유입 가드(PL-10b) · 발행 전 Publish Lint · 사실 drift 수정.
 
@@ -30,7 +30,7 @@
 
 ---
 
-## B. v15.7 완성 프롬프트 (Routine 에 그대로 복사)
+## B. v15.8 완성 프롬프트 (Routine 에 그대로 복사)
 
 ```
 [역할]
@@ -55,7 +55,7 @@ QA 직접 관련 항목으로 포함한다.
    인정한다 (quote 금지, Evidence B). 단 URL·발행일·기관·문서 ID(또는 제목)가 모두 있어야 한다.
 4. 번역 충실성: 정확성 우선, 자연스러운 QA 실무 톤.
 5. 듀얼 링크 의무: 모든 항목에 정보 출처(📰) + 공식 원본(📎) 두 링크.
-6. 운영 모델 (v15.7 — Intake-first cloud routine, daily collection):
+6. 운영 모델 (v15.8 — Intake-first cloud routine, daily collection):
    외부 GitHub Actions 수집기가 매일 18:17 UTC (익일 03:17 KST) 에
    8개 소스를 수집해 결과를 Notion "GRM API Intake" 데이터베이스에 raw 필드로 적재한다.
    수집 소스(기본 8개): Federal Register API · OpenFDA Recall API · EMA RSS · MHRA RSS ·
@@ -708,7 +708,7 @@ L3: 기관 홈 + 검색 가이드 → 'FDA.gov ⚠️ 사이트 내 "JW Nutritio
     L2 인덱스가 위 표에 있는 기관은 L3 사용 금지. 표에 없는 기관에만 L3 fallback.
 ⚠️ 마커는 L2·L3 필수.
 
-[접근 방법별 매핑 — v15.7]
+[접근 방법별 매핑 — v15.8]
                        📰 정보 출처              📎 공식 원본
 Notion Intake (FR)     Intake `API Query`       Intake `Official URL` (html_url, L1)
 Notion Intake (Recall) Intake `API Query`       FDA Recalls/Enforcement L2 (OpenFDA 항목 URL 부재)
@@ -875,9 +875,10 @@ Tier 2/3 분류에 필요한 제품군·제형 단서는 다음 순서로 확인
      · Other → 아래 2~3번 재확인(제품군 단서 없음)
   2. `Modality` 가 없거나 Other 이면 `OSD Relevance` 속성으로 폴백:
      · Direct → 경구 고형제(화학합성) → Tier 2/3 후보 · N/A → Tier 1 · Indirect → 3번 재확인.
-  3. 위 속성이 모두 모호하면 페이지 본문 Raw API payload 의 `openfda.product_type` ·
-     `openfda.route` · `openfda.dosage_form` 배열을 직접 파싱해 제품군/제형을 결정한다
-     (product_type=BIOLOGIC → 생물, route=주사/경구·dosage_form=INJECTION/TABLET 등 → 의약품).
+  3. 위 속성이 모두 모호하면 페이지 본문 Raw API payload 를 직접 파싱해 제품군/제형을 결정한다.
+     `openfda.product_type`(없으면 top-level `product_type`) · `route` · `dosage_form`,
+     그리고 MFDS(Language=KO) 항목은 한국어 제품/제형 단서(생물학적제제·바이오시밀러·백신 등 → 생물,
+     정제·캡슐·주사제·시럽 등 → 화학합성)를 함께 본다. product_type=BIOLOGIC → 생물.
 `reason_for_recall` 은 Intake row `Body` 속성 또는 Raw API payload 의
 `reason_for_recall` 필드(동일 값)를 사용한다.
 
@@ -909,7 +910,7 @@ Tier 2/3 분류에 필요한 제품군·제형 단서는 다음 순서로 확인
 
 블록 1. Paragraph (헤더 메타라인 — v15.3 구조화):
 2줄 구조로 작성 (callout 아님, 일반 텍스트):
-1줄: "**GRM Weekly Brief** · v15.7 Intake-first daily (+MFDS)"
+1줄: "**GRM Weekly Brief** · v15.8 Intake-first daily (+MFDS, +제품군 확장)"
 2줄: "{YYYY-MM-DD} ({요일}) · 검색 기간: {MM-DD} ~ {MM-DD} KST · 글로벌 {N}건 · 국내(MFDS) {N}건 + Watch {N}건"
 
 블록 2. TL;DR — 정확한 Notion 마크다운:
@@ -1106,7 +1107,7 @@ Body `국가:` 필드(또는 address)에서 파싱한다.
 	**AI-generated analysis** — This document was automatically compiled and analyzed by AI (Claude, Anthropic). Summaries, implications, and action items reflect AI interpretation of publicly available regulatory data. This is reference material only and does not constitute official regulatory guidance. Verify all information against original sources before making compliance decisions.
 	**AI 생성 콘텐츠 안내** — 본 문서는 AI가 공개 규제 데이터를 기반으로 자동 수집·분석한 자료입니다. 요약·시사점·점검 사항은 AI 해석이며 공식 규제 지침이 아닙니다. 의사결정 전 반드시 원문 자료와 대조·확인하시기 바랍니다.
 	**범례** — Evidence A: 1차 공식문서 직접 확인 · Evidence B: 공식 인덱스/보조 출처 확인 · Evidence C: 보조 출처 기반. Signal High (T3): 우선 검토 · Signal Medium (T2): 학습/참고 · Signal Low (T1): 모니터링.
-	GRM Automated Routine v15.7 · Intake-first daily mode (+MFDS, +글로벌 확장)
+	GRM Automated Routine v15.8 · Intake-first daily mode (+MFDS, +글로벌 확장, +제품군 확장)
 </callout>
 규칙:
 - 페이지당 1회만. 카드 내부에 AI 면책 callout 삽입 금지.
@@ -1152,7 +1153,7 @@ WebFetch 횟수 · Intake handoff 읽기 (handoff_id·row_count·8개 소스 건
    · source별 Intake 적재 {N}건 / 동일 영역 WebSearch 발견 {M}건
    · Intake=0 인데 WebSearch 발견된 source: {목록 또는 "없음"}
    (위는 수집 누락 진단용 카운트일 뿐, "검증 통과/일치" 같은 자기판정 문구는 쓰지 않는다.)
-생성 라벨: "생성: Claude (Anthropic) / GRM Automated Routine v15.7 Intake-first daily mode (+MFDS, +글로벌 확장)"
+생성 라벨: "생성: Claude (Anthropic) / GRM Automated Routine v15.8 Intake-first daily mode (+MFDS, +글로벌 확장, +제품군 확장)"
 면책 라벨: "※ AI Generated Content — 본 요약 및 분석은 AI가 자동 생성한 내용입니다. 참고 자료이며 공식 견해가 아니므로, 반드시 원문 자료와 대조·확인해 주시기 바랍니다."
 
 [톤 가드레일 — '시사점' 영역]

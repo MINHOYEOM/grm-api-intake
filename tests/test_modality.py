@@ -75,6 +75,54 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_OTHER,
         )
 
+    # ── MFDS 한국어 단서 (Language=KO) ──────────────────────────────────
+    def test_biologic_korean(self):
+        self.assertEqual(
+            ci.compute_modality({}, "생물학적제제 제조소 GMP 실태조사 결과"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_biosimilar_korean(self):
+        self.assertEqual(
+            ci.compute_modality({}, "바이오시밀러 품목 회수·판매중지"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_chemical_korean_tablet(self):
+        self.assertEqual(
+            ci.compute_modality({}, "정제 함량 부적합 행정처분"),
+            ci.MODALITY_CHEMICAL,
+        )
+
+    def test_chemical_korean_injection(self):
+        self.assertEqual(
+            ci.compute_modality({}, "주사제 무균 공정 지적사항"),
+            ci.MODALITY_CHEMICAL,
+        )
+
+    # ── top-level product_type 폴백 (openfda 구조 없는 소스) ────────────
+    def test_biologic_toplevel_product_type(self):
+        payload = {"product_type": ["BIOLOGIC"]}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
+
+
+class TestSterileBioTier3Floor(unittest.TestCase):
+    """무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor) 여야 한다."""
+
+    def test_sterility_failure_single_is_tier3(self):
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_EMA, "news", "Pending", "N/A",
+            "sterility failure observed in manufacturing line",
+        )
+        self.assertEqual(tier, "Tier 3")
+
+    def test_viral_contamination_single_is_tier3(self):
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_EMA, "news", "Pending", "N/A",
+            "viral contamination of cell culture",
+        )
+        self.assertEqual(tier, "Tier 3")
+
 
 class TestModalityRelevanceNotDropped(unittest.TestCase):
     """무균·바이오 신호가 QA 관련성에서 Unrelated 로 떨어지지 않아야 한다."""

@@ -194,6 +194,14 @@ QA_CATEGORY_KEYWORDS = [
     "particulate matter", "particulate contamination",
     "subpotent", "superpotent", "mislabeling", "mislabelled",
     "endotoxin",
+    # 무균·주사제 / 바이오 확장 (제형 확장 — 회사 생산 제형: 무균주사·바이오시밀러·항암주사·성장호르몬)
+    "sterility", "sterility failure", "aseptic", "aseptic processing",
+    "media fill", "container closure integrity", "container closure",
+    "lyophilization", "lyophilized", "visible particulate", "glass delamination",
+    "cold chain", "temperature excursion", "bioburden", "pyrogen",
+    "biosimilar", "monoclonal antibody", "comparability", "ich q5",
+    "immunogenicity", "viral safety", "viral clearance", "cell bank",
+    "somatropin", "growth hormone", "prefilled syringe", "parenteral",
     # Nitrosamine 계열 (FDA hot topic)
     "nitrosamine", "ndma", "ndea", "n-nitroso",
     # 주요 generic 제조사 (경쟁사 학습 가치)
@@ -209,6 +217,10 @@ QA_LIKELY_BOOST = [
     # Recall 고신호 failure mode (v15.1 추가)
     "dissolution failure", "failed dissolution",
     "nitrosamine impurity", "ndma impurity",
+    # 무균·주사·바이오 직접 연관 (제형 확장)
+    "injectable", "injection", "sterile", "aseptic",
+    "biosimilar", "monoclonal antibody", "container closure integrity",
+    "media fill", "non-sterility", "lack of sterility assurance",
 ]
 
 # 명시 제외 (medical device · 화장품 · 식품 · 백신 단독 등)
@@ -257,12 +269,19 @@ SIGNAL_TIER3_KEYWORDS = [
     "warning letter", "consent decree", "import alert",
     "annex 1", "ich q12", "ich q13",
     "nitrosamine", "ndma", "ndea", "n-nitroso",
+    # 무균·바이오 고신호 (제형 확장)
+    "sterility failure", "non-sterility", "lack of sterility assurance",
+    "viral contamination",
 ]
 SIGNAL_TIER2_KEYWORDS = [
     "gmp", "manufacturing practice", "data integrity", "alcoa",
     "process validation", "cleaning validation", "dissolution",
     "out of specification", "oos", "stability", "capa", "deviation",
     "sterile", "aseptic", "supplier qualification", "recall", "class ii",
+    # 무균·바이오 GMP/품질 신호 (제형 확장)
+    "media fill", "container closure integrity", "biosimilar",
+    "comparability", "immunogenicity", "lyophilized", "bioburden",
+    "cold chain", "visible particulate",
 ]
 
 # OSD (경구 고형제) Relevance 분류 기준 (v15.1 추가)
@@ -273,6 +292,39 @@ OSD_FORMS = {
     "delayed-release tablet", "chewable tablet", "orally disintegrating tablet",
     "powder for oral solution", "oral solution", "oral suspension",
 }
+
+# ── 제형(Modality) 분류 (제형 확장) ───────────────────────────────────────────
+# OSD Relevance(경구 고형제 전용)를 일반화한 제형 태그. 회사 생산 제형
+# (경구 고형제·경구 액상·무균 주사제·바이오/바이오시밀러)을 제형별 섹션 발행에 사용.
+# Notion 의 'Modality' select 속성에 기록(ENABLE_MODALITY_TAG=true 일 때).
+PROP_MODALITY = "Modality"
+MODALITY_OSD = "OSD"                      # 경구 고형제 (정제·캡슐)
+MODALITY_ORAL_LIQUID = "Oral-Liquid"     # 경구 액상 (시럽·현탁·내용액)
+MODALITY_STERILE = "Sterile-Injectable"  # 무균 주사제 (주사·수액·바이알)
+MODALITY_BIOLOGIC = "Biologic"           # 바이오/바이오시밀러·항체·성장호르몬 등
+MODALITY_OTHER = "Other"                 # 흡입·국소 등 기타 제형 근거 있음
+MODALITY_UNSPECIFIED = "Unspecified"     # 제형 단서 없음(가이드라인·정책 등)
+
+# 바이오(생물학적제제) 단서 — route/dosage_form 보다 우선 판정
+MODALITY_BIOLOGIC_TERMS = [
+    "biosimilar", "biologic", "biological product", "monoclonal", "mab",
+    "antibody", "recombinant", "fusion protein", "peptide hormone",
+    "somatropin", "growth hormone", "insulin", "erythropoietin", "epoetin",
+    "filgrastim", "interferon", "vaccine", "cell therapy", "gene therapy",
+    "blood product", "plasma-derived", "immunoglobulin",
+]
+# 무균·주사제 단서
+MODALITY_STERILE_TERMS = [
+    "injection", "injectable", "for injection", "parenteral", "intravenous",
+    "intramuscular", "subcutaneous", "infusion", "vial", "ampoule", "ampul",
+    "prefilled syringe", "pre-filled syringe", "lyophilized", "lyophilised",
+    "powder for solution for injection", "sterile",
+]
+# 경구 액상 단서
+MODALITY_ORAL_LIQUID_TERMS = [
+    "oral solution", "oral suspension", "syrup", "oral liquid",
+    "powder for oral solution", "oral drops",
+]
 
 FR_PER_PAGE = 100  # API 최대치
 OPENFDA_LIMIT = 100  # no-key 한도, key 있어도 안전치
@@ -892,6 +944,79 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
         return "Indirect"
 
     return "N/A"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 제형(Modality) 분류 (제형 확장)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
+    """수집 항목의 제형(Modality)을 1차 자동 분류한다.
+
+    compute_osd_relevance(경구 고형제 전용)를 모든 제형으로 일반화한 것.
+    OpenFDA Recall 의 구조화 필드(dosage_form/route)가 있으면 우선 사용하고,
+    없으면 제목·본문·분류 텍스트의 키워드로 판정한다.
+
+    반환값:
+        "Biologic"           — 바이오/바이오시밀러·항체·성장호르몬·백신 등 생물학적제제
+        "Sterile-Injectable" — 무균 주사제(주사·수액·바이알·동결건조 등)
+        "Oral-Liquid"        — 경구 액상(시럽·현탁·내용액)
+        "OSD"                — 경구 고형제(정제·캡슐)
+        "Other"              — 흡입·국소 등 기타 제형 근거 있음
+        "Unspecified"        — 제형 단서 없음(가이드라인·정책·실태조사 일반 등)
+
+    설계 의도(우선순위):
+        바이오 > 무균주사 > 경구액상 > 경구고형 > 기타.
+        대부분의 바이오의약품은 주사제이기도 하므로, triage 가치가 큰
+        '바이오' 를 먼저 판정한다(발행 시 바이오 섹션 우선 배치).
+    """
+    openfda = raw_payload.get("openfda") or {}
+    forms = _as_lower_set(openfda.get("dosage_form"))
+    routes = _as_lower_set(openfda.get("route"))
+    product_type = _as_lower_set(openfda.get("product_type"))
+    blob = " ".join(t for t in text_parts if t).lower()
+    forms_blob = " ".join(forms)
+    product = (raw_payload.get("product_description") or "").lower()
+    haystack = " ".join([blob, forms_blob, " ".join(routes), product])
+
+    # 1순위: 바이오(생물학적제제)
+    if any(pt for pt in product_type if "biolog" in pt):
+        return MODALITY_BIOLOGIC
+    if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
+        return MODALITY_BIOLOGIC
+
+    # 2순위: 경구 고형제 (구조화 dosage_form 우선 — OSD 판정 일관성 유지)
+    if any(term in f for f in forms for term in OSD_SOLID_TERMS):
+        return MODALITY_OSD
+
+    # 3순위: 무균·주사제
+    if "oral" not in routes and (routes & {
+            "intravenous", "intramuscular", "subcutaneous",
+            "parenteral", "infusion", "injection"}):
+        return MODALITY_STERILE
+    if _phrase_any(haystack, MODALITY_STERILE_TERMS):
+        return MODALITY_STERILE
+
+    # 4순위: 경구 액상
+    if _phrase_any(haystack, MODALITY_ORAL_LIQUID_TERMS):
+        return MODALITY_ORAL_LIQUID
+
+    # 5순위: 경구 고형제 (텍스트 단서)
+    if _phrase_any(haystack, OSD_SOLID_TERMS):
+        return MODALITY_OSD
+    if "oral" in routes:
+        # 경구이지만 고형/액상 미확정 → 보수적으로 OSD(기존 시스템 1차 사용자)
+        return MODALITY_OSD
+
+    # 6순위: 기타 제형 근거(흡입·국소·점안 등)
+    if _phrase_any(haystack, [
+            "inhalation", "inhaler", "nebuliz", "topical", "transdermal",
+            "ophthalmic", "eye drop", "cream", "ointment", "patch",
+            "suppository", "nasal spray"]):
+        return MODALITY_OTHER
+
+    return MODALITY_UNSPECIFIED
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1882,6 +2007,7 @@ def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
         "raw_excerpt": _prop_rich_text(props, PROP_RAW_EXCERPT),
         "qa_relevance": _prop_select(props, PROP_QA_RELEVANCE),
         "osd_relevance": _prop_select(props, PROP_OSD_RELEVANCE),
+        "modality": _prop_select(props, PROP_MODALITY),
         "source_type": _prop_select(props, PROP_SOURCE_TYPE),
         "signal_tier": _prop_select(props, PROP_SIGNAL_TIER),
         "evidence_candidate": _prop_select(props, PROP_EVIDENCE_CANDIDATE),
@@ -2183,6 +2309,16 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         PROP_SIGNAL_TIER: _select(item.signal_tier),
         PROP_STATUS: _select("New"),
     }
+
+    # ── 제형(Modality) 태그 (제형 확장) ─────────────────────────────────────
+    # ENABLE_MODALITY_TAG=true 이고 Notion 에 'Modality' select 속성이 있을 때만 기록.
+    # (기본 false — 속성 미생성 상태로 운영에 머지돼도 insert 가 깨지지 않도록 안전 게이트)
+    if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":
+        modality = compute_modality(
+            item.raw_payload, item.headline, item.body,
+            item.type_or_class, item.firm,
+        )
+        props[PROP_MODALITY] = _select(modality)
 
     if item.date_iso:
         d = _date_iso(item.date_iso)

@@ -6,9 +6,12 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.1` (저장소 폴더 구조 섹션 추가) |
-| 최종 수정일 | 2026-06-02 |
-| 기준 시스템 버전 | `origin/main` `34ffe3b` (PL-10 handoff 멱등성 머지 반영) · Routine 프롬프트 `v15.6.3` |
+| 문서 버전 | `v1.6` (cron 2h 앞당김 17 18 UTC + transient 마커 보강) |
+| 최종 수정일 | 2026-06-04 |
+| 현재 상태 | 매일 수집/Notion 적재 동작, GitHub Actions 내부 health check P1 구현, P1 글로벌 3종은 기본 off 상태로 라이브 검증 대기 |
+| Active phase | Phase 3(P1) 글로벌 확장 검증 + 운영 모니터링 P1 |
+| 주요 enabled flags | 운영 기본: `ENABLE_MFDS/RECALL/ADMIN/GMP_INSPECTION=true`, `ENABLE_ICH/WHO/HC=false`, `ENABLE_SEARCH/SCRAPE/MOLEG_API=false` |
+| 기준 시스템 버전 | `codex/pl10-handoff-idempotency` `1f3aef4` 기반 + 로컬 작업(운영 health JSON·warning Issue·P1 flag wiring·MFDS transient warning) · Routine 프롬프트 `v15.6.3` |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 발행 위치 | Notion `Global Regulatory Monitor` 부모 페이지 하위 |
 
@@ -58,7 +61,7 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 
 | 계층 | 역할 | 사용 기술 / 위치 |
 |---|---|---|
-| ① 수집(Collector) | 8개 규제 소스에서 원시 데이터를 가져옴 | Python 3.12 (`requests`, `PyMuPDF`) |
+| ① 수집(Collector) | 11개 규제 소스에서 원시 데이터를 가져옴 (기본 8 + 글로벌 확장 ICH·WHO·HC, opt-in) | Python 3.12 (`requests`, `PyMuPDF`) |
 | ② 실행·스케줄(Runtime) | 수집기를 정해진 시각에 자동 실행 | GitHub Actions (`ubuntu-latest`, cron) |
 | ③ 저장(Staging) | 수집한 raw 데이터 + 분류 태그를 저장 | Notion DB — `GRM API Intake` |
 | ④ 분석·생성(Routine) | 저장된 신호를 읽어 카드형 다이제스트로 가공 | Claude (Anthropic) + MCP 도구 |
@@ -70,7 +73,7 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 순수 Python 스크립트 묶음입니다. 외부 의존성은 HTTP 클라이언트 `requests` 와 PDF 파서 `PyMuPDF`(식약처 실태조사 결과 PDF용) 둘뿐으로 가볍게 유지합니다. 공통 HTTP 로직(재시도, 429 Retry-After 백오프, JSON/XML 파싱)은 `grm_common.py` 로 분리되어 모든 수집기가 공유합니다.
 
 **② 실행·스케줄 — GitHub Actions**
-서버를 직접 운영하지 않고 GitHub의 무료 러너에서 주기 실행합니다. 워크플로우(`grm-intake.yml`, 이름 `GRM API Intake (Daily)`)는 **매일 20:17 UTC(= 매일 05:17 KST, cron `17 20 * * *`)** 에 자동 실행되며, 수동 실행(`workflow_dispatch`)으로 dry-run·수집 윈도우·소스별 활성화(`ENABLE_*`) 조정도 가능합니다. 실패하면 자동으로 GitHub Issue를 생성합니다. 비밀값(Notion 토큰 등)은 GitHub Secrets에만 보관합니다.
+서버를 직접 운영하지 않고 GitHub의 무료 러너에서 주기 실행합니다. 워크플로우(`grm-intake.yml`, 이름 `GRM API Intake (Daily)`)는 **매일 18:17 UTC(= 매일 03:17 KST, cron `17 18 * * *`)** 에 자동 실행되며, 수동 실행(`workflow_dispatch`)으로 dry-run·수집 윈도우·소스별 활성화(`ENABLE_*`) 조정도 가능합니다. 수집기는 실행 말미에 `grm-health.json` 과 `GITHUB_STEP_SUMMARY` health 섹션을 생성합니다. 실패(failure)는 workflow exit 1과 KST 실행일 기준 GitHub Issue로, 경고(warning)는 exit 0을 유지하면서 고정 제목 `GRM Intake 운영 경고` Issue에 누적 comment로 남깁니다. 비밀값(Notion 토큰 등)은 GitHub Secrets에만 보관합니다.
 
 **③ 저장 — Notion `GRM API Intake` DB (Staging)**
 수집기가 가져온 모든 항목이 1차로 쌓이는 **임시 적재(staging) 데이터베이스** 입니다. 각 행(row)에는 분류 태그(Source, Signal Tier, QA Relevance, Evidence Candidate 등)가 붙고, 페이지 본문에는 **원본 API 응답 JSON 전체** 가 보존됩니다(Evidence A 재검증용). 별도의 외부 DB(Postgres 등) 없이 Notion 자체를 DB로 사용하는 것이 이 시스템의 특징입니다.
@@ -89,13 +92,16 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 | `GRM API Intake` | 수집 staging (기계가 적재) | `7784c71fb7b343749b2bee5d04db7926` |
 | `🌐 GRM Weekly Brief` | 주간 발행물 (사람이 읽음) | `3653142f-dc11-8049-806d-e0a779cafd90` |
 
-`🌐 GRM Weekly Brief` DB의 속성은 `이름`(제목) · `검색 기간`(text) · `발행일`(date) · `출처 기관`(멀티셀렉트) · `카테고리`(멀티셀렉트: Warning Letter / Guidance / Guideline / Other)이며, 갤러리·테이블·카테고리별·기관별 뷰를 제공합니다. ⚠️ 현재 `출처 기관` 옵션은 FDA·EMA·MHRA·PIC/S·ICH·WHO·Health Canada 7종으로, **MFDS(식약처) 옵션이 없습니다** — 국내 카드 발행 시 기관 태그가 비게 되는 경미한 갭(개선 후보).
+`🌐 GRM Weekly Brief` DB의 속성은 `이름`(제목) · `검색 기간`(text) · `발행일`(date) · `출처 기관`(멀티셀렉트) · `카테고리`(멀티셀렉트: Warning Letter / Guidance / Guideline / Other)이며, 갤러리·테이블·카테고리별·기관별 뷰를 제공합니다. `출처 기관` 옵션은 FDA·EMA·MHRA·PIC/S·ICH·WHO·Health Canada 7종 — 이 중 **ICH·WHO·Health Canada는 P1에서 전용 수집기가 추가되어 이제 실제로 채워집니다**(이전엔 옵션만 존재). ⚠️ 다만 **MFDS(식약처) 옵션은 여전히 없어** 국내 카드 발행 시 기관 태그가 비는 경미한 갭(개선 후보).
 
 #### 📝 변경 이력 — 풀스택
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-06-02 | 최초 작성. 5계층(수집/실행/저장/분석/발행) 구조 정리 |
 | 2026-06-02 | 실행 계층 정정: 워크플로우가 **매일(Daily, cron `17 20 * * *`)** 실행임을 `origin/main` 으로 확인·반영 |
+| 2026-06-02 | 수집 계층 소스 8개 → 11개(글로벌 확장 ICH·WHO·HC, opt-in). Weekly Brief `출처 기관`의 ICH·WHO·HC 옵션이 실제 수집기로 채워짐을 §2.2에 명시 |
+| 2026-06-04 | 실행 계층에 운영 health check 추가: `grm-health.json`, step summary health 섹션, 실패 Issue 보강(KST 실행일·label 보장), warning Issue 누적 comment 방식 반영 |
+| 2026-06-04 | cron `17 20` → `17 18 * * *`(03:17 KST)로 2h 앞당김 — scheduled run 실측 ~2.5h 지연(06-02/03)으로 월요일 Routine(07:30 KST)과 역전 위험 해소 |
 
 ---
 
@@ -105,14 +111,15 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 
 ```mermaid
 flowchart TD
-    A[GitHub Actions<br/>매일 20:17 UTC<br/>= 매일 05:17 KST] --> B[Python 수집기 실행]
-    B --> C{8개 규제 소스 수집}
+    A[GitHub Actions<br/>매일 18:17 UTC<br/>= 매일 03:17 KST] --> B[Python 수집기 실행]
+    B --> C{규제 소스 수집<br/>기본 8 + 글로벌 확장 3}
     C --> C1[Federal Register API]
     C --> C2[OpenFDA Recall API]
     C --> C3[EMA / MHRA / PIC/S / ECA RSS]
     C --> C4[FDA Warning Letters 스크래핑]
     C --> C5[MFDS 식약처<br/>RSS + data.go.kr + nedrug]
-    C1 & C2 & C3 & C4 & C5 --> D[(Notion: GRM API Intake DB<br/>raw 적재 + 태그 분류<br/>Signal Tier / QA Relevance)]
+    C --> C6[글로벌 확장 opt-in<br/>ICH·WHO·Health Canada]
+    C1 & C2 & C3 & C4 & C5 & C6 --> D[(Notion: GRM API Intake DB<br/>raw 적재 + 태그 분류<br/>Signal Tier / QA Relevance)]
     D --> E[수집기가 Status=New row만 모아<br/>OPEN Handoff 페이지 생성<br/>JSON rows]
     E --> F[Claude Routine<br/>매주 월 07:30 KST]
     F --> G[0단계: Handoff 읽기]
@@ -125,7 +132,7 @@ flowchart TD
 
 ### 3.2 단계별 설명
 
-**1단계 — 수집 (매일 05:17 KST, GitHub Actions)**
+**1단계 — 수집 (매일 03:17 KST, GitHub Actions)**
 수집기가 **매일** 8개 소스를 호출해 최근 항목을 가져옵니다(기본 윈도우 7일). 각 항목에 대해 수집기가 1차로 **Signal Tier(1~3)** 와 **QA Relevance(Likely/Possible/Unrelated/Pending)** 를 휴리스틱으로 자동 분류해 Notion `GRM API Intake` DB에 `Status=New` 로 적재합니다. 페이지 본문에는 원본 JSON 전체를 보존합니다. (수집은 매일, 발행은 주간이므로 한 주간 쌓인 New 항목이 누적되었다가 월요일 Routine이 한 번에 처리합니다.)
 
 **2단계 — Handoff 생성 (멱등성 게이트)**
@@ -147,7 +154,7 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 - **듀얼 링크:** 모든 카드에 📰 정보 출처(실제로 콘텐츠를 가져온 URL) + 📎 공식 원본(규제기관 사이트 URL)을 함께 표기. 공식 원본은 L1(개별 직링크)→L2(인덱스)→L3(기관 홈) 순으로 fallback.
 - **Graceful degradation:** 수집기/Notion 장애로 handoff가 없거나 0건이면, Routine은 WebSearch 단독(v14.5) 모드로 자동 강등해 계속 동작합니다.
 
-### 3.4 수집 대상 8개 소스
+### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3)
 
 | # | 소스 | 채널 | 수집기 |
 |---|---|---|---|
@@ -159,14 +166,32 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 | 6 | ECA Academy | RSS | `collect_intake.py` |
 | 7 | FDA Warning Letters | 웹 스크래핑 | `collect_intake.py` |
 | 8 | MFDS 식약처 (지침·고시·입법예고·안전성서한·행정처분·회수·GMP 실태조사) | RSS + data.go.kr API + nedrug 스크래핑 | `collect_mfds*.py` |
+| 9 | **ICH** (Quality·Multidisciplinary 가이드라인·Public Consultations) | admin.ich.org 섹션 제목 스냅샷 | `collect_ich.py` (`ENABLE_ICH`, 기본 off) |
+| 10 | **WHO Prequalification** (RSS 뉴스 + WHOPIR 공개 실사보고서 + NOC GMP 비순응) | RSS + extranet.who.int Drupal 페이지 | `collect_who.py` (`ENABLE_WHO`, 기본 off) |
+| 11 | **Health Canada** (약품 recall·safety alert) | 오픈데이터 JSON | `collect_hc.py` (`ENABLE_HC`, 기본 off) |
 
 > 보조: `collect_search.py` 가 Brave Search 기반 보충 탐지를 담당(특정 슬롯 한정, `ENABLE_SEARCH` 기본 비활성). MFDS는 RSS 외에 회수·행정처분·GMP 실태조사 하위 수집기(`collect_mfds_recall/admin_action/gmp_inspection.py`, `ENABLE_MFDS_*` 기본 활성)로 세분화되어 있습니다.
+> 글로벌 확장(ICH·WHO·HC)은 모두 **기본 off**이며 `ENABLE_*` 또는 `--sources {ich,who,hc}` 로 단독 실행됩니다. ICH는 페이지가 정적 토픽 목록이라 Step/Revision 등 동적 정보는 Routine이 보강(하이브리드)합니다.
+> **TGA(호주)는 검토 후 제외:** www.tga.gov.au가 비브라우저 fetch를 차단(WAF)하고 공식 API가 없으며, TGA가 **PIC/S를 따르므로 PIC/S 수집기로 상당 부분 커버**되어 가치 대비 비용이 낮음.
+
+### 3.5 운영 모니터링 health check
+
+운영 모니터링의 P1 기준은 **GitHub Actions 내부 health check** 입니다. 장기 운영의 핵심 알림은 수집 직후 같은 workflow에서 판정해야 하므로, Codex heartbeat는 보조 요약자(P2)로 둡니다.
+
+- **단일 판정 지점:** `collect_intake.py` 의 `_evaluate_health()` 가 exit code·step summary·`grm-health.json`·Issue 본문이 공유하는 단일 health 판정 기준입니다. 기존 insert 실패/활성 소스 오류/핵심 소스 전부 실패/handoff 실패 판정을 중복 계층으로 만들지 않고 이 함수에 모았습니다.
+- **Failure:** Notion insert 최종 실패, Routine handoff 실패, Federal Register+OpenFDA 동시 실패, Phase 1 비활성 실행에서 활성 소스 전체가 비일시 오류로 실패, `ENABLE_SEARCH=true` Brave 전체 오류, 활성 MFDS/ICH/WHO/HC 소스의 설정 오류·구조 변경·비일시 오류는 exit 1입니다. scheduled run에서는 날짜별 `GRM Intake 실패 — YYYY-MM-DD` Issue가 생성되며 health JSON의 failure finding이 본문에 들어갑니다.
+- **Warning:** scheduled run에서 `ENABLE_MOLEG_API=true` 감지, MFDS RSS/nedrug GMP 실태조사 공개 endpoint의 timeout·connection reset·429·5xx·공개 페이지 403 같은 transient 오류, GMP 실태조사 첨부 manual-review 필요, GMP 페이지네이션 경고, FR/OpenFDA truncation, 미구현 `ENABLE_SCRAPE=true` 는 exit 0 warning입니다. scheduled run에서는 고정 제목 `GRM Intake 운영 경고` Issue를 찾고, 열려 있으면 comment를 누적합니다.
+- **0건 판정:** MHRA/PIC/S 등 저빈도 소스는 일일 0건이 정상일 수 있습니다. MFDS Recall/Admin/GMP Inspection도 하루 0건은 정상 가능성이 있으므로 P1에서는 failure로 보지 않습니다. “연속 7일 0건” 같은 상태 저장이 필요한 판정은 P2 Codex heartbeat 또는 Actions/Notion 이력 조회 설계로 넘깁니다.
+- **GMP 첨부 상태:** `collect_mfds_gmp_inspection.py` 는 `attachment_parse_status`, `attachment_deficiency_assessment`, `manual_review_required`, 중간 페이지 경고를 health 메타로 노출합니다. 사람이 직접 봐야 할 첨부가 생기면 warning으로 남겨 조용히 묻히지 않게 합니다.
 
 #### 📝 변경 이력 — 작동 방식·데이터 흐름
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-06-02 | 최초 작성. Intake-first + Handoff 멱등성 흐름(v15.6.3) 기준 |
 | 2026-06-02 | "매일 수집 / 주간 발행" 모델로 1단계 정정(매일 New 누적 → 월요일 Routine 일괄 처리). 다이어그램·소스 표 반영 |
+| 2026-06-02 | P1 글로벌 확장: ICH·WHO·Health Canada 수집기 추가(기본 off). 소스 표·흐름도 갱신. TGA는 WAF 차단·PIC/S 중복으로 제외 |
+| 2026-06-04 | §3.5 운영 모니터링 health check 신설. GitHub Actions 내부 판정(P1)과 Codex heartbeat 보조 요약(P2), failure/warning 기준, 0건 판정 원칙, GMP 첨부 parse warning 표면화 기준 명시 |
+| 2026-06-04 | MFDS RSS/nedrug GMP 공개 endpoint의 일시 네트워크·WAF성 오류를 failure에서 warning으로 강등. 설정 오류·구조 변경·Notion/handoff 실패는 failure 유지 |
 
 ---
 
@@ -179,12 +204,16 @@ Claude가 handoff의 `rows[]` 만 읽어(0단계), 이어서 WebSearch(Core 8개
 ```
 v15.0-implementation/
 ├─ GRM_SYSTEM.md          # 시스템 대표 문서(이 파일, README 대체)
+├─ CLAUDE.md              # 새 세션이 자동으로 읽는 작업 지침(유지 규칙·구조 원칙 요약)
 │
 ├─ collect_intake.py      # 메인 수집기 = 오케스트레이터(워크플로우가 호출하는 단일 진입점)
 ├─ collect_mfds.py        # 식약처 RSS 게시판
 ├─ collect_mfds_admin_action.py     # 식약처 행정처분
 ├─ collect_mfds_gmp_inspection.py   # 식약처 GMP 실태조사
 ├─ collect_mfds_recall.py           # 식약처 회수·판매중지
+├─ collect_ich.py         # [P1] ICH 가이드라인 섹션 스냅샷 (ENABLE_ICH, off)
+├─ collect_who.py         # [P1] WHO PQ: RSS+WHOPIR+NOC (ENABLE_WHO, off)
+├─ collect_hc.py          # [P1] Health Canada 약품 recall JSON (ENABLE_HC, off)
 ├─ collect_search.py      # Brave 보조 검색
 ├─ grm_common.py          # 공통 HTTP/재시도 헬퍼
 ├─ probe_*.py             # 개발용 탐침 스크립트(운영 무관)
@@ -192,8 +221,9 @@ v15.0-implementation/
 ├─ setup.sh / setup.ps1   # 최초 셋업 스크립트
 ├─ requirements.txt       # 파이썬 의존성
 ├─ .env.example           # 환경변수 예시
-├─ .gitignore             # git 제외 목록(/archive/ 포함)
-├─ .github/workflows/grm-intake.yml   # 매일 자동 수집 워크플로우
+├─ .gitattributes         # 줄끝 정책(eol=lf) — CRLF 회귀 방지
+├─ .gitignore             # git 제외 목록(/archive/, grm-health.json, scheduled_*.log 포함)
+├─ .github/workflows/grm-intake.yml   # 매일 자동 수집 + health check/Issue 워크플로우
 │
 ├─ docs/                  # 현행 문서 (git 추적)
 │  ├─ notion_intake_db_schema.md      # Intake DB 스키마
@@ -214,15 +244,18 @@ v15.0-implementation/
 ### 4.2 코드 파일
 | 파일 | 역할 |
 |---|---|
-| `collect_intake.py` | **오케스트레이터 겸 메인 수집기.** FR + OpenFDA + RSS 4종(EMA·MHRA·PIC/S·ECA) + FDA WL을 직접 수집하고, `ENABLE_*` 플래그에 따라 MFDS·Brave 하위 수집기를 import·실행. Intake 적재 + Handoff 생성까지 담당 (워크플로우는 이 파일 하나만 호출) |
+| `collect_intake.py` | **오케스트레이터 겸 메인 수집기.** FR + OpenFDA + RSS 4종(EMA·MHRA·PIC/S·ECA) + FDA WL을 직접 수집하고, `ENABLE_*`(또는 `--sources`) 플래그에 따라 MFDS·ICH·WHO·HC·Brave 하위 수집기를 import·실행. Intake 적재 + Handoff 생성 + `_evaluate_health()` 운영 판정 + `grm-health.json` 생성까지 담당 (워크플로우는 이 파일 하나만 호출) |
 | `collect_mfds.py` | 식약처 RSS 7개 게시판 수집 (지침·고시·입법예고·안전성서한 등) |
 | `collect_mfds_admin_action.py` | 식약처 행정처분 (data.go.kr) |
-| `collect_mfds_gmp_inspection.py` | 식약처 GMP 실태조사 결과 (nedrug, PDF 본문 파싱) |
+| `collect_mfds_gmp_inspection.py` | 식약처 GMP 실태조사 결과 (nedrug, PDF/HWPX 본문 파싱; 미파싱 첨부는 manual-review 플래그). 첨부 parse status와 페이지 경고를 `LAST_HEALTH` 메타로 노출해 운영 warning에 반영 |
 | `collect_mfds_recall.py` | 식약처 회수·판매중지 |
+| `collect_ich.py` | **[P1]** ICH Quality·Multidisciplinary·Public Consultations 섹션 제목 스냅샷 (admin.ich.org, 코드패턴 기반). Step/PDF/마감일은 Routine 보강 |
+| `collect_who.py` | **[P1]** WHO Prequalification — RSS(`/prequal/rss.xml`) + WHOPIR 공개 실사보고서 + NOC(GMP 비순응) |
+| `collect_hc.py` | **[P1]** Health Canada 오픈데이터 JSON — `Organization=Drugs and health products` 약품 recall/advisory (수의약품·기기 category denylist, Recall class→Tier) |
 | `collect_search.py` | Brave Search 보조 탐지 |
 | `grm_common.py` | 공통 HTTP/429/재시도/XML·JSON 파싱 헬퍼 |
 | `probe_*.py` | 개발용 소스 탐침 스크립트 (운영 무관) |
-| `.github/workflows/grm-intake.yml` | 스케줄·실행 워크플로우 |
+| `.github/workflows/grm-intake.yml` | 스케줄·실행·운영 health Issue 워크플로우 |
 | `notion_intake_db_schema.md` | Intake DB 스키마 문서 |
 | `GRM_Prompt_v15.6.md` 등 | Routine 프롬프트 (Claude가 사용) |
 
@@ -235,24 +268,30 @@ v15.0-implementation/
 | 플래그 | 운영(GitHub Actions) 기본 | 로컬 `.env.example` 기본 |
 |---|---|---|
 | `ENABLE_MFDS` / `ENABLE_MFDS_RECALL` / `ENABLE_MFDS_ADMIN` / `ENABLE_MFDS_GMP_INSPECTION` | `true` (활성) | `false` |
+| `ENABLE_ICH` / `ENABLE_WHO` / `ENABLE_HC` (P1 글로벌 확장) | `false` (CI 검증 후 활성 예정) | `false` |
 | `ENABLE_SEARCH` (Brave) · `ENABLE_SCRAPE` · `ENABLE_MOLEG_API` | `false` (비활성) | `false` |
 
-> 운영 기본값은 워크플로우 `grm-intake.yml` 의 `vars.* || 'true/false'` fallback으로 정해집니다. 로컬 dry-run용 `.env.example` 은 모두 `false` 로 시작합니다(샘플).
+> 운영 기본값은 워크플로우 `grm-intake.yml` 의 `vars.* || 'true/false'` fallback으로 정해집니다. `workflow_dispatch` 입력도 `ENABLE_ICH/ENABLE_WHO/ENABLE_HC` 와 `--sources ich/who/hc` 를 지원합니다. 로컬 dry-run용 `.env.example` 은 모두 `false` 로 시작합니다(샘플).
+> **`MFDS_ENFORCEMENT_WINDOW_DAYS`**(기본 30): 회수·행정처분·Health Canada 등 지연공개형 enforcement 소스의 backfill 윈도우(일). data.go.kr/HC가 과거 일자로 늦게 공개해도 누락되지 않도록 기본 7일 윈도우 대신 사용(dedup이 중복 흡수).
 
 ### 4.4 Intake DB 주요 속성 (라이브 확인 2026-06-02)
-`Source`(12종, MFDS·GRM Handoff 포함) · `Type or Class`(약 29종) · `Signal Tier` · `QA Relevance` · `OSD Relevance` · `Evidence Candidate` · `Language`(KO/EN) · `Region/Jurisdiction` · `Site Country`(제조소 소재국, 관할과 분리) · `Status`(New/Processed/Skipped/Error) · `Run Date (KST)` · `API Query` 등. 페이지 본문에 원본 JSON 보존.
+`Source`(MFDS·ICH·WHO·Health Canada·GRM Handoff 등 포함) · `Type or Class`(ich-guideline·who-noc·hc-recall 등 추가) · `Signal Tier` · `QA Relevance` · `OSD Relevance` · `Evidence Candidate` · `Language`(KO/EN) · `Region/Jurisdiction` · `Site Country`(제조소 소재국, 관할과 분리) · `Status`(New/Processed/Skipped/Error) · `Run Date (KST)` · `API Query` 등. 페이지 본문에 원본 JSON 보존.
 
 #### 📝 변경 이력 — 구성 요소
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-06-02 | 최초 작성. 코드 파일·Secrets·DB 속성 라이브 검증 반영 |
 | 2026-06-02 | `4.1 저장소 폴더 구조` 트리 추가(docs/·archive/ 분류 반영) + 유지 규칙에 "구조 변경 시 트리 갱신" 추가 |
+| 2026-06-02 | `CLAUDE.md` 추가(새 세션이 자동으로 유지 규칙을 읽도록) + 트리에 반영 |
+| 2026-06-02 | P1 글로벌 수집기 `collect_ich/who/hc.py` 추가(트리·코드표·플래그표 반영), `.gitattributes`(eol=lf) 추가, `MFDS_ENFORCEMENT_WINDOW_DAYS` 문서화. Source/Type 옵션에 ICH·WHO·HC 반영 |
+| 2026-06-02 | P1 라이브 점검 수정 2건(CODEX): ① `http_get_xml`이 XML 선언 앞 잡음(WHO Drupal 디버그 주석·BOM) 제거 후 파싱 ② ICH·WHO 스냅샷 소스용 Source-한정 장기(1095일) dedup 추가(`notion_query_existing_doc_ids(source_names=...)`) — 30일 후 재삽입 방지. CODEX 최종 GO |
+| 2026-06-04 | `collect_intake.py` health JSON/단일 판정 함수 추가, GMP 실태조사 parse status 운영 warning 노출, workflow `ENABLE_ICH/WHO/HC` env·dispatch·source token wiring 보강, `.gitignore`에 generated health/log 산출물 반영 |
 
 ---
 
 ## 5. 로드맵 (단계별 구성 이력 + 현재 + 향후)
 
-GRM은 "단순 수집 → 다소스 확대 → 국내 식약처 → 자가점검"으로 단계적으로 확장해 왔습니다. 큰 틀에서의 진행 단계는 아래와 같습니다.
+GRM은 "단순 수집 → 다소스 확대 → 국내 식약처 → 글로벌 규제기관 심화"로 단계적으로 확장해 왔습니다. 큰 틀에서의 진행 단계는 아래와 같습니다.
 
 | Phase | 목표 | 상태 | 핵심 내용 |
 |---|---|---|---|
@@ -260,10 +299,10 @@ GRM은 "단순 수집 → 다소스 확대 → 국내 식약처 → 자가점검
 | **Phase 2a** | 글로벌 다소스 확대 | ✅ 완료 | EMA·MHRA·PIC/S·ECA RSS + FDA Warning Letters 스크래핑 + Brave Search 보조. Evidence/Source Type 태깅 도입 |
 | **Phase 2b-1** | 국내(MFDS) 진입 | ✅ 완료 | 식약처 RSS 7개 게시판(지침·고시·입법예고·안전성서한 등). `collect_mfds.py` 분리, 한국어 휴리스틱, Language/Region 필드 |
 | **Phase 2b-2** | 국내 제조/품질 심화 | ✅ 완료(운영 기본 활성) | 행정처분·회수·GMP 실태조사(지적사항 본문 요약). 국내/글로벌 2단 섹션, Site Country 분리. 매일 워크플로우에 하위 수집기 기본 on |
-| **Phase 2c** | 자가점검(차별화) | 🔜 일부 착수 | "이 규제 신호가 우리 공정/SOP에 해당하는가" 자가점검. `Self-Check Required` 필드 도입(현재 휴면), Applicability 트리거 설계 예정 |
+| **Phase 3 (P1)** | 글로벌 규제기관 심화 | ✅ 코드 완료(기본 off) | **ICH**(가이드라인 섹션 스냅샷)·**WHO PQ**(RSS+WHOPIR+NOC)·**Health Canada**(약품 recall JSON) 수집기 추가. CODEX 점검 통과, CI 검증 후 운영 활성 예정. TGA는 WAF 차단·PIC/S 중복으로 제외 |
 
-### 5.1 현재 개발 단계 (2026-06-02 기준)
-수집과 카드 생성은 **동작하는 상태** 이며, 2026-06-01 라이브 실행에서 국내 섹션·소재국 fallback·지적사항 요약·듀얼 링크가 정상 렌더됨을 확인했습니다. 카드 포맷 표준 자체는 `v15.6.2` 에서 확정되었고, 남은 것은 **카드 내용의 완성도와 일부 오류를 다듬는** 상용화 전 마감 작업입니다.
+### 5.1 현재 개발 단계 (2026-06-04 기준)
+수집과 카드 생성은 **동작하는 상태** 이며, 2026-06-01 라이브 실행에서 국내 섹션·소재국 fallback·지적사항 요약·듀얼 링크가 정상 렌더됨을 확인했습니다. 카드 포맷 표준 자체는 `v15.6.2` 에서 확정되었습니다. **P0(국내 MFDS) 신호 누락·강등 보강**(지연공개 윈도우·안전성서한 게이트·.hwp 미파싱 플래그·항목별 URL 후보)과 **P1 글로벌 확장(ICH·WHO·HC 수집기)** 은 코드 완료 상태입니다. 이번 운영 모니터링 작업으로 GitHub Actions 내부 health check와 P1 글로벌 3종 workflow flag wiring이 보강됐습니다. 남은 것은 **카드 내용 완성도 다듬기 + 글로벌 3종 CI 라이브 검증 후 운영 활성 + P2 Codex heartbeat 요약 설계**입니다.
 
 ### 5.2 알려진 이슈 / 잔여 작업
 | ID | 내용 | 상태 |
@@ -272,13 +311,21 @@ GRM은 "단순 수집 → 다소스 확대 → 국내 식약처 → 자가점검
 | PL-7 | 수집기 부재 소스(품목허가 변경·제조방법/규격, DMF 등 A축 확장) | 🔲 별도 트랙 |
 | PL-8 | 보조 출처 WebFetch 403 상시 발생(PIC/S·MHRA·ECA·RAPS·EPR) | 🔲 별도 트랙 |
 | Q5 | 카드 포맷 표준 — `v15.6.2` 에서 확정(번호 없는 헤더·규제기관 배지·Signal 방향 표기) | ✅ 완료 |
+| P0 | 국내 MFDS 신호 보강: 회수·행정처분 지연공개 윈도우(30일), 안전성서한 게이트 우회(Tier 3 floor), GMP실사 .hwp 미파싱 manual-review 플래그, 회수·행정처분 항목별 URL 후보 | ✅ 완료 |
+| P1 | 글로벌 확장 수집기 ICH·WHO·Health Canada(기본 off) — CODEX 점검 통과 | ✅ 코드 완료 |
+| P1-검증 | 글로벌 3종 CI 라이브 검증 후 `ENABLE_*=true` 운영 활성. workflow dispatch/env/source token wiring은 완료 | 🟡 wiring 완료·라이브 검증 대기 |
+| MON-P1 | GitHub Actions 내부 health check 강화: 단일 판정 함수, `grm-health.json`, failure Issue 보강, warning Issue 누적 comment, GMP attachment parse status warning | ✅ 완료 |
+| MON-P2 | Codex heartbeat 보조 요약: 최근 7일 Actions/Issue/health 결과를 요약하고 연속 0건 같은 상태 저장형 이상 징후를 보고 | 🔲 별도 트랙 |
 | — | 카드 내용 완성도·잔여 오류 다듬기(상용화 전 마감 작업) | 🟡 진행 |
 | — | Weekly Brief DB `출처 기관` 멀티셀렉트에 MFDS 옵션 부재 → 국내 카드 기관 태그 누락 | 🔲 경미·개선 후보 |
+| — | ICH 하이브리드 ②: Step/Revision/마감일 확인용 Routine WebSearch/WebFetch 슬롯(프롬프트에 추가) | 🔲 별도 트랙 |
 
 ### 5.3 향후 방향
-- **Phase 2c 완성** 이 핵심 차별점: 수집을 넘어 "우리 SOP/공정 해당 여부"까지 짚어주는 자가점검(`Self-Check Required`·Applicability).
+- **P1 글로벌 3종 운영 활성화:** CI 라이브 검증 통과 후 `ENABLE_ICH/WHO/HC=true`. workflow flag wiring은 완료됐고, ICH는 하이브리드 ②(Routine WebSearch/WebFetch 슬롯)까지 붙여야 Step/Revision 변화 추적이 완성됨.
+- **P2 운영 관찰:** Codex heartbeat는 Actions 내부 health check의 대체가 아니라 보조 요약자로 둔다. 최근 7일 성공/실패/warning Issue와 소스별 0건 추세를 요약하는 방식으로 설계한다.
 - 카드 내용 완성도 안정화 + PL-10 멱등성 2주 연속 검증 통과 후 상용화 준비.
-- 수집 부재 소스(PL-7) 점진적 확장, Weekly Brief DB `출처 기관` MFDS 옵션 추가.
+- 수집 부재 소스(PL-7: 품목허가 변경·제조방법/규격·DMF) 점진적 확장, Weekly Brief DB `출처 기관` MFDS 옵션 추가.
+- (자가점검/Self-Check 아이디어는 현재 기능에 없어 로드맵에서 제외)
 
 #### 📝 변경 이력 — 로드맵
 | 날짜 | 변경 내용 |
@@ -286,3 +333,5 @@ GRM은 "단순 수집 → 다소스 확대 → 국내 식약처 → 자가점검
 | 2026-06-02 | 최초 작성. Phase 1~2c 히스토리 + 현재 단계·잔여 이슈 정리 |
 | 2026-06-02 | Phase 2b-2 "완료(운영 기본 활성)"로 갱신, PL-10 "main 머지 완료(검증 진행)"로 갱신 |
 | 2026-06-02 | 폴더·`origin/main` 정밀 재검토 반영: 수집 주기 매일 확정, 단일 오케스트레이터 구조, 플래그 기본값, Weekly Brief DB 속성·MFDS 태그 갭, Q5(카드 포맷 v15.6.2) 완료 |
+| 2026-06-02 | **자가점검(Phase 2c) 삭제**(현재 기능에 없음). Phase 3(P1 글로벌 심화: ICH·WHO·HC) 신설, P0 보강·P1·TGA 제외를 §5.2/5.3에 반영 |
+| 2026-06-04 | 운영 모니터링 P1(MON-P1) 완료 반영. P1 글로벌 3종 workflow flag wiring 완료·라이브 검증 대기 상태로 정정하고, Codex heartbeat는 P2 보조 요약 트랙으로 분리 |

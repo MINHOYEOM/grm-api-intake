@@ -55,6 +55,7 @@ ADMIN_TIER3_TERMS = [
     "무균",
     "미생물",
     "불순물",
+    "니트로사민",
     "자료",
     "데이터",
     "실태조사",
@@ -260,6 +261,21 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
         headline = f"{headline} — {firm}"
     signal_tier = _signal_tier(raw)
 
+    # P0 개선: 듀얼 링크 추적성 보강. 항목별 공식 URL이 없어 official_url은 데이터셋(L2)을
+    # 유지하되, 품목기준코드(ITEM_SEQ)가 있으면 nedrug 품목 상세 '후보(미검증)' URL을 raw에 남긴다.
+    raw_payload: dict[str, Any] = {
+        "api": "data.go.kr 15058457",
+        "endpoint": ADMIN_API_ENDPOINT,
+        **raw,
+    }
+    item_seq = _text(raw, "ITEM_SEQ")
+    if item_seq:
+        raw_payload["nedrug_item_candidate_url"] = (
+            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail"
+            f"?itemSeq={urllib.parse.quote(item_seq, safe='')}"
+        )
+        raw_payload["nedrug_item_candidate_note"] = "Routine 검증 후 인용 (미검증 후보 URL)"
+
     return IntakeItem(
         source=SOURCE_MFDS,
         document_id=_document_id(raw),
@@ -274,7 +290,7 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
         osd_relevance="N/A",
         source_type=SRC_TYPE_OFFICIAL_API,
         signal_tier=signal_tier,
-        raw_payload={"api": "data.go.kr 15058457", "endpoint": ADMIN_API_ENDPOINT, **raw},
+        raw_payload=raw_payload,
         language=LANGUAGE_KO,
         region_jurisdiction=REGION_MFDS,
     )
@@ -342,8 +358,12 @@ def collect_mfds_admin_actions(
             break
         page_no += 1
 
+    # P2 개선: page cap 도달을 WARN-only가 아니라 truncated 에러로 승격 (loud failure).
+    truncated_msg: str | None = None
     if page_no > MAX_PAGES:
-        log("WARN", f"MFDS admin-action API max_pages={MAX_PAGES} 도달 — 이후 항목 누락 가능")
+        truncated_msg = (f"MFDS admin-action API max_pages={MAX_PAGES} 도달 — truncated "
+                         f"(수집 {len(items)}건, totalCount={total_count}, 이후 항목 누락 가능)")
+        log("WARN", truncated_msg)
 
     log(
         "INFO",
@@ -351,4 +371,4 @@ def collect_mfds_admin_actions(
         f"{len(items)}건 (Tier 3={tier3_count}, Tier 2={tier2_count}, "
         f"filtered={filtered_count}, totalCount={total_count})",
     )
-    return items, None
+    return items, truncated_msg

@@ -110,6 +110,9 @@ SOURCE_PICS = "PIC/S"
 SOURCE_ECA = "ECA Academy"
 SOURCE_FDA_WL = "FDA Warning Letter"
 SOURCE_MFDS = "MFDS"
+SOURCE_ICH = "ICH"
+SOURCE_WHO = "WHO"
+SOURCE_HC = "Health Canada"
 SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
@@ -139,6 +142,9 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_ECA:     SRC_TYPE_EXPERT_SECONDARY,
     SOURCE_FDA_WL:  SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_MFDS:    SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_ICH:     SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_WHO:     SRC_TYPE_OFFICIAL_PAGE,
+    SOURCE_HC:      SRC_TYPE_OFFICIAL_API,
     SOURCE_HANDOFF: SRC_TYPE_OFFICIAL_PAGE,
     # Phase 2a 신규
     SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
@@ -365,6 +371,31 @@ class CollectionStats:
     mfds_gmp_inspection_insert_failed: int = 0
     mfds_gmp_inspection_error: bool = False
     mfds_gmp_inspection_error_msg: str = ""
+    mfds_gmp_inspection_parse_status: dict[str, int] = field(default_factory=dict)
+    mfds_gmp_inspection_deficiency: dict[str, int] = field(default_factory=dict)
+    mfds_gmp_inspection_manual_review: int = 0
+    mfds_gmp_inspection_page_warnings: list[str] = field(default_factory=list)
+    # ── P1: ICH (직접 모니터링) ────────────────────────────────────────────
+    ich_fetched: int = 0
+    ich_inserted: int = 0
+    ich_skipped_dup: int = 0
+    ich_insert_failed: int = 0
+    ich_error: bool = False
+    ich_error_msg: str = ""
+    # ── P1: WHO Prequalification ───────────────────────────────────────────
+    who_fetched: int = 0
+    who_inserted: int = 0
+    who_skipped_dup: int = 0
+    who_insert_failed: int = 0
+    who_error: bool = False
+    who_error_msg: str = ""
+    # ── P1: Health Canada ──────────────────────────────────────────────────
+    hc_fetched: int = 0
+    hc_inserted: int = 0
+    hc_skipped_dup: int = 0
+    hc_insert_failed: int = 0
+    hc_error: bool = False
+    hc_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -375,6 +406,9 @@ class CollectionStats:
             + self.mfds_insert_failed + self.mfds_recall_insert_failed
             + self.mfds_admin_insert_failed
             + self.mfds_gmp_inspection_insert_failed
+            + self.ich_insert_failed
+            + self.who_insert_failed
+            + self.hc_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -394,6 +428,9 @@ class CollectionStats:
             or self.mfds_recall_error
             or self.mfds_admin_error
             or self.mfds_gmp_inspection_error
+            or self.ich_error
+            or self.who_error
+            or self.hc_error
         )
 
     def summary(self) -> str:
@@ -437,9 +474,111 @@ class CollectionStats:
             f"inserted={self.mfds_gmp_inspection_inserted}  "
             f"skip_dup={self.mfds_gmp_inspection_skipped_dup}  "
             f"failed={self.mfds_gmp_inspection_insert_failed}  "
-            f"error={self.mfds_gmp_inspection_error}",
+            f"error={self.mfds_gmp_inspection_error}  "
+            f"parse={self.mfds_gmp_inspection_parse_status}  "
+            f"manual_review={self.mfds_gmp_inspection_manual_review}",
+            f"ICH  fetched={self.ich_fetched}  inserted={self.ich_inserted}  "
+            f"skip_dup={self.ich_skipped_dup}  failed={self.ich_insert_failed}  "
+            f"error={self.ich_error}",
+            f"WHO  fetched={self.who_fetched}  inserted={self.who_inserted}  "
+            f"skip_dup={self.who_skipped_dup}  failed={self.who_insert_failed}  "
+            f"error={self.who_error}",
+            f"HC   fetched={self.hc_fetched}  inserted={self.hc_inserted}  "
+            f"skip_dup={self.hc_skipped_dup}  failed={self.hc_insert_failed}  "
+            f"error={self.hc_error}",
         ]
         return "\n".join(lines)
+
+
+@dataclass
+class HealthFinding:
+    level: str
+    code: str
+    source: str
+    message: str
+    detail: str = ""
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "level": self.level,
+            "code": self.code,
+            "source": self.source,
+            "message": self.message,
+            "detail": self.detail,
+        }
+
+
+@dataclass
+class HealthCheckResult:
+    status: str = "ok"
+    exit_code: int = 0
+    failures: list[HealthFinding] = field(default_factory=list)
+    warnings: list[HealthFinding] = field(default_factory=list)
+    infos: list[HealthFinding] = field(default_factory=list)
+
+    def add_failure(self, code: str, source: str, message: str, detail: str = "") -> None:
+        self.failures.append(HealthFinding("failure", code, source, message, detail))
+
+    def add_warning(self, code: str, source: str, message: str, detail: str = "") -> None:
+        self.warnings.append(HealthFinding("warning", code, source, message, detail))
+
+    def add_info(self, code: str, source: str, message: str, detail: str = "") -> None:
+        self.infos.append(HealthFinding("info", code, source, message, detail))
+
+    def finalize(self) -> "HealthCheckResult":
+        if self.failures:
+            self.status = "failure"
+            self.exit_code = 1
+        elif self.warnings:
+            self.status = "warning"
+            self.exit_code = 0
+        else:
+            self.status = "ok"
+            self.exit_code = 0
+        return self
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "status": self.status,
+            "exit_code": self.exit_code,
+            "failure_count": len(self.failures),
+            "warning_count": len(self.warnings),
+            "info_count": len(self.infos),
+            "failures": [finding.to_dict() for finding in self.failures],
+            "warnings": [finding.to_dict() for finding in self.warnings],
+            "infos": [finding.to_dict() for finding in self.infos],
+        }
+
+
+_TRANSIENT_ERROR_MARKERS = [
+    "timeout", "timed out", "connecttimeouterror", "readtimeouterror",
+    "connectionreseterror", "connection reset", "connection aborted",
+    "remotedisconnected", "max retries exceeded", "temporary failure",
+    "name resolution", "nameresolutionerror", "http 429", "rate-limit",
+    "429 client error", "too many requests",
+    "http 502", "http 503", "http 504", "bad gateway",
+    "service unavailable", "gateway timeout",
+]
+_MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
+_MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {"mfds-recall", "mfds-admin"}
+
+
+def _is_transient_source_error(code: str, detail: str) -> bool:
+    """Return True for temporary network/WAF-like source failures."""
+    text = (detail or "").lower()
+    if not text or "환경변수 필요" in text or "api key" in text or "service_key" in text:
+        return False
+    if code not in _MFDS_FEATURE_SOURCE_CODES:
+        return False
+    if any(marker in text for marker in _TRANSIENT_ERROR_MARKERS):
+        return True
+    # MFDS/nedrug public HTML/RSS endpoints can intermittently block GitHub-hosted IPs.
+    # Keep data.go.kr API 403s as failures because they usually mean key/service permission.
+    if code in _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES and (
+        "http 403" in text or "403 forbidden" in text or "403 client error" in text
+    ):
+        return True
+    return False
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -474,6 +613,16 @@ def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
     if not text:
         return [""]
     return [text[i : i + size] for i in range(0, len(text), size)]
+
+
+def _env_int(name: str, default: int) -> int:
+    """환경변수를 정수로 안전 파싱. 비정상 값이면 WARN 후 default 사용 (graceful degradation)."""
+    raw = os.getenv(name, str(default)).strip()
+    try:
+        return int(raw)
+    except ValueError:
+        log("WARN", f"{name}={raw!r} 정수 파싱 실패 — default {default} 사용")
+        return default
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1518,7 +1667,8 @@ def notion_api_request(method: str, url: str, token: str, *,
 
 
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
-                                  window_days: int = 7) -> set[str]:
+                                  window_days: int = 7,
+                                  source_names: set[str] | None = None) -> set[str]:
     """최근 window_days 일(KST Run Date 기준) row 의 'source::document_id' key set 반환.
 
     daily 수집 전환(Phase 1)으로 dedupe 윈도우를 '당일' → '최근 window_days 일'로 확장.
@@ -1535,21 +1685,27 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     existing: set[str] = set()
     window_start = (run_date - timedelta(days=window_days)).isoformat()
+    and_filters: list[dict[str, Any]] = [
+        {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
+        {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
+    ]
+    # source_names 지정 시 Source 한정(snapshot 소스 long-horizon dedup용).
+    if source_names:
+        and_filters.append({
+            "or": [{"property": PROP_SOURCE, "select": {"equals": s}}
+                   for s in sorted(source_names)]
+        })
     body: dict[str, Any] = {
-        "filter": {
-            "and": [
-                {"property": PROP_RUN_DATE,
-                 "date": {"on_or_after": window_start}},
-                {"property": PROP_RUN_DATE,
-                 "date": {"on_or_before": run_date.isoformat()}},
-            ]
-        },
+        "filter": {"and": and_filters},
         "page_size": 100,
     }
     start_cursor: str | None = None
     page_count = 0
+    # P2 개선: dedup 윈도우가 enforcement(최대 30일)×전 소스로 넓어졌으므로 상한을 상향한다.
+    # 100p × 100 = 10,000 row 헤드룸. 그래도 초과하면 partial 반환 대신 예외(아래 for-else).
+    _DEDUP_MAX_PAGES = 100
     try:
-        for _ in range(20):  # 안전 페이지 상한
+        for _ in range(_DEDUP_MAX_PAGES):  # 안전 페이지 상한
             page_count += 1
             if start_cursor:
                 body["start_cursor"] = start_cursor
@@ -1589,10 +1745,13 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                 break
             start_cursor = data.get("next_cursor")
         else:
-            # for-else: 20 페이지를 모두 소진했는데 break 되지 않음 = has_more 잔존 = 상한 도달
-            if page_count >= 20:
-                log("WARN", f"Notion dedupe 조회 20페이지 상한 도달 — "
-                            f"일부 기존 row 누락 가능 (existing={len(existing)}건)")
+            # for-else: 상한을 모두 소진했는데 break 되지 않음 = has_more 잔존 = 상한 도달.
+            # P2 개선: 일부 기존 row를 놓친 채 진행하면 중복 삽입 방어가 깨지므로,
+            # WARN 후 partial 반환 대신 예외를 던져 caller(main)가 insert를 중단하게 한다.
+            raise NotionDedupeQueryError(
+                f"Notion 중복 조회 {_DEDUP_MAX_PAGES}페이지 상한 도달 — "
+                f"dedup set 불완전(existing={len(existing)}건), 중복 삽입 방지 위해 중단"
+            )
     except (requests.RequestException, ValueError) as e:
         # 중복 조회 실패 시 빈 set을 반환하면 모든 item을 신규로 판단해 대량 중복 insert 위험.
         # 안전하게 예외를 던져 caller 가 insert 중단 여부를 결정하도록 한다.
@@ -2155,7 +2314,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
-_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "none"]
+# ich/mfds 는 opt-in feature flag 소스라 _ALL_SOURCES(기본 all)엔 넣지 않되,
+# --sources 선택지와 handoff source 매핑에는 포함한다.
+_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "none"]
 _SOURCE_TOKEN_TO_NOTION = {
     "fr": SOURCE_FR,
     "recall": SOURCE_RECALL,
@@ -2165,7 +2326,431 @@ _SOURCE_TOKEN_TO_NOTION = {
     "eca": SOURCE_ECA,
     "wl": SOURCE_FDA_WL,
     "mfds": SOURCE_MFDS,
+    "ich": SOURCE_ICH,
+    "who": SOURCE_WHO,
+    "hc": SOURCE_HC,
 }
+
+
+def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
+    return [
+        {
+            "key": "fr",
+            "label": "Federal Register",
+            "fetched": stats.fr_fetched,
+            "inserted": stats.fr_inserted,
+            "skip_dup": stats.fr_skipped_dup,
+            "failed": stats.fr_insert_failed,
+            "error": stats.fr_error,
+            "error_msg": stats.fr_error_msg,
+            "truncated": stats.fr_truncated,
+        },
+        {
+            "key": "recall",
+            "label": "OpenFDA Recall",
+            "fetched": stats.recall_fetched,
+            "inserted": stats.recall_inserted,
+            "skip_dup": stats.recall_skipped_dup,
+            "failed": stats.recall_insert_failed,
+            "error": stats.recall_error,
+            "error_msg": stats.recall_error_msg,
+            "truncated": stats.recall_truncated,
+        },
+        {
+            "key": "ema",
+            "label": "EMA RSS",
+            "fetched": stats.ema_fetched,
+            "inserted": stats.ema_inserted,
+            "skip_dup": stats.ema_skipped_dup,
+            "failed": stats.ema_insert_failed,
+            "error": stats.ema_error,
+            "error_msg": stats.ema_error_msg,
+        },
+        {
+            "key": "mhra",
+            "label": "MHRA RSS",
+            "fetched": stats.mhra_fetched,
+            "inserted": stats.mhra_inserted,
+            "skip_dup": stats.mhra_skipped_dup,
+            "failed": stats.mhra_insert_failed,
+            "error": stats.mhra_error,
+            "error_msg": stats.mhra_error_msg,
+        },
+        {
+            "key": "pics",
+            "label": "PIC/S RSS",
+            "fetched": stats.pics_fetched,
+            "inserted": stats.pics_inserted,
+            "skip_dup": stats.pics_skipped_dup,
+            "failed": stats.pics_insert_failed,
+            "error": stats.pics_error,
+            "error_msg": stats.pics_error_msg,
+        },
+        {
+            "key": "eca",
+            "label": "ECA Academy RSS",
+            "fetched": stats.eca_fetched,
+            "inserted": stats.eca_inserted,
+            "skip_dup": stats.eca_skipped_dup,
+            "failed": stats.eca_insert_failed,
+            "error": stats.eca_error,
+            "error_msg": stats.eca_error_msg,
+        },
+        {
+            "key": "wl",
+            "label": "FDA Warning Letters",
+            "fetched": stats.wl_fetched,
+            "inserted": stats.wl_inserted,
+            "skip_dup": stats.wl_skipped_dup,
+            "failed": stats.wl_insert_failed,
+            "error": stats.wl_error,
+            "error_msg": stats.wl_error_msg,
+        },
+        {
+            "key": "mfds",
+            "label": "MFDS RSS",
+            "fetched": stats.mfds_fetched,
+            "inserted": stats.mfds_inserted,
+            "skip_dup": stats.mfds_skipped_dup,
+            "failed": stats.mfds_insert_failed,
+            "error": stats.mfds_error,
+            "error_msg": stats.mfds_error_msg,
+        },
+        {
+            "key": "mfds_recall",
+            "label": "MFDS Recall",
+            "fetched": stats.mfds_recall_fetched,
+            "inserted": stats.mfds_recall_inserted,
+            "skip_dup": stats.mfds_recall_skipped_dup,
+            "failed": stats.mfds_recall_insert_failed,
+            "error": stats.mfds_recall_error,
+            "error_msg": stats.mfds_recall_error_msg,
+        },
+        {
+            "key": "mfds_admin",
+            "label": "MFDS Admin",
+            "fetched": stats.mfds_admin_fetched,
+            "inserted": stats.mfds_admin_inserted,
+            "skip_dup": stats.mfds_admin_skipped_dup,
+            "failed": stats.mfds_admin_insert_failed,
+            "error": stats.mfds_admin_error,
+            "error_msg": stats.mfds_admin_error_msg,
+        },
+        {
+            "key": "mfds_gmp_inspection",
+            "label": "MFDS GMP Inspection",
+            "fetched": stats.mfds_gmp_inspection_fetched,
+            "inserted": stats.mfds_gmp_inspection_inserted,
+            "skip_dup": stats.mfds_gmp_inspection_skipped_dup,
+            "failed": stats.mfds_gmp_inspection_insert_failed,
+            "error": stats.mfds_gmp_inspection_error,
+            "error_msg": stats.mfds_gmp_inspection_error_msg,
+            "parse_status": dict(stats.mfds_gmp_inspection_parse_status),
+            "deficiency": dict(stats.mfds_gmp_inspection_deficiency),
+            "manual_review": stats.mfds_gmp_inspection_manual_review,
+            "page_warnings": list(stats.mfds_gmp_inspection_page_warnings),
+        },
+        {
+            "key": "ich",
+            "label": "ICH",
+            "fetched": stats.ich_fetched,
+            "inserted": stats.ich_inserted,
+            "skip_dup": stats.ich_skipped_dup,
+            "failed": stats.ich_insert_failed,
+            "error": stats.ich_error,
+            "error_msg": stats.ich_error_msg,
+        },
+        {
+            "key": "who",
+            "label": "WHO",
+            "fetched": stats.who_fetched,
+            "inserted": stats.who_inserted,
+            "skip_dup": stats.who_skipped_dup,
+            "failed": stats.who_insert_failed,
+            "error": stats.who_error,
+            "error_msg": stats.who_error_msg,
+        },
+        {
+            "key": "hc",
+            "label": "Health Canada",
+            "fetched": stats.hc_fetched,
+            "inserted": stats.hc_inserted,
+            "skip_dup": stats.hc_skipped_dup,
+            "failed": stats.hc_insert_failed,
+            "error": stats.hc_error,
+            "error_msg": stats.hc_error_msg,
+        },
+        {
+            "key": "search",
+            "label": "Brave Search",
+            "fetched": stats.search_fetched,
+            "inserted": stats.search_inserted,
+            "skip_dup": stats.search_skipped_dup,
+            "failed": stats.search_insert_failed,
+            "error": stats.search_error,
+            "error_msg": stats.search_error_msg,
+        },
+    ]
+
+
+def _evaluate_health(
+    *,
+    stats: CollectionStats,
+    active: set[str],
+    enable_search: bool,
+    enable_mfds: bool,
+    enable_mfds_recall: bool,
+    enable_mfds_admin: bool,
+    enable_mfds_gmp_inspection: bool,
+    enable_ich: bool,
+    enable_who: bool,
+    enable_hc: bool,
+    enable_moleg_api: bool,
+    enable_scrape: bool,
+    event_name: str,
+    emit_routine_handoff: bool,
+    handoff_emitted: bool,
+    handoff_failed: bool,
+    handoff_error_msg: str,
+) -> HealthCheckResult:
+    health = HealthCheckResult()
+
+    if stats.has_insert_failures():
+        health.add_failure(
+            "notion-insert-failed",
+            "Notion",
+            f"Notion insert 최종 실패 {stats.total_insert_failures()}건",
+            "해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다.",
+        )
+    if handoff_failed:
+        health.add_failure(
+            "handoff-failed",
+            "GRM Handoff",
+            "Routine handoff 생성 실패",
+            handoff_error_msg[:240],
+        )
+
+    handoff_only_success = (
+        emit_routine_handoff and handoff_emitted and
+        (not active or active == {"mfds"}) and not any([
+            enable_mfds,
+            enable_mfds_recall,
+            enable_mfds_admin,
+            enable_mfds_gmp_inspection,
+            enable_ich,
+            enable_who,
+            enable_hc,
+            enable_search,
+        ])
+    )
+    if handoff_only_success:
+        health.add_info(
+            "handoff-only",
+            "GRM Handoff",
+            "handoff-only 실행 완료",
+            "source fetch 비활성 상태를 성공으로 처리",
+        )
+    else:
+        phase1_fr_active = "fr" in active
+        phase1_recall_active = "recall" in active
+        if phase1_fr_active and phase1_recall_active and stats.fr_error and stats.recall_error:
+            health.add_failure(
+                "phase1-all-failed",
+                "Phase 1",
+                "Federal Register와 OpenFDA Recall이 모두 실패",
+                "핵심 공식 API 2개가 모두 실패해 workflow fail로 처리합니다.",
+            )
+
+        enabled_source_failures = [
+            (enable_search and stats.search_error, "brave-search", "Brave Search", stats.search_error_msg),
+            (enable_mfds and stats.mfds_error, "mfds-rss", "MFDS RSS", stats.mfds_error_msg),
+            (enable_mfds_recall and stats.mfds_recall_error, "mfds-recall", "MFDS Recall", stats.mfds_recall_error_msg),
+            (enable_mfds_admin and stats.mfds_admin_error, "mfds-admin", "MFDS Admin", stats.mfds_admin_error_msg),
+            (
+                enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error,
+                "mfds-gmp-inspection",
+                "MFDS GMP Inspection",
+                stats.mfds_gmp_inspection_error_msg,
+            ),
+            (enable_ich and stats.ich_error, "ich", "ICH", stats.ich_error_msg),
+            (enable_who and stats.who_error, "who", "WHO", stats.who_error_msg),
+            (enable_hc and stats.hc_error, "health-canada", "Health Canada", stats.hc_error_msg),
+        ]
+
+        if not phase1_fr_active and not phase1_recall_active:
+            phase2_source_states = [
+                ("ema" in active, "ema", "EMA RSS", stats.ema_error, stats.ema_error_msg),
+                ("mhra" in active, "mhra", "MHRA RSS", stats.mhra_error, stats.mhra_error_msg),
+                ("pics" in active, "pics", "PIC/S RSS", stats.pics_error, stats.pics_error_msg),
+                ("eca" in active, "eca", "ECA Academy RSS", stats.eca_error, stats.eca_error_msg),
+                ("wl" in active, "wl", "FDA Warning Letters", stats.wl_error, stats.wl_error_msg),
+                (enable_mfds, "mfds-rss", "MFDS RSS", stats.mfds_error, stats.mfds_error_msg),
+                (enable_mfds_recall, "mfds-recall", "MFDS Recall", stats.mfds_recall_error, stats.mfds_recall_error_msg),
+                (enable_mfds_admin, "mfds-admin", "MFDS Admin", stats.mfds_admin_error, stats.mfds_admin_error_msg),
+                (
+                    enable_mfds_gmp_inspection,
+                    "mfds-gmp-inspection",
+                    "MFDS GMP Inspection",
+                    stats.mfds_gmp_inspection_error,
+                    stats.mfds_gmp_inspection_error_msg,
+                ),
+                (enable_ich, "ich", "ICH", stats.ich_error, stats.ich_error_msg),
+                (enable_who, "who", "WHO", stats.who_error, stats.who_error_msg),
+                (enable_hc, "health-canada", "Health Canada", stats.hc_error, stats.hc_error_msg),
+            ]
+            active_phase2_sources = [row for row in phase2_source_states if row[0]]
+            if active_phase2_sources and all(row[3] for row in active_phase2_sources):
+                non_transient = [
+                    row for row in active_phase2_sources
+                    if not _is_transient_source_error(row[1], row[4])
+                ]
+                if non_transient:
+                    health.add_failure(
+                        "all-active-sources-failed",
+                        "Collector",
+                        "모든 활성 소스가 실패",
+                        "Phase 1 소스가 비활성인 실행에서 활성 소스가 모두 error 상태입니다.",
+                    )
+                else:
+                    health.add_warning(
+                        "all-active-sources-transient",
+                        "Collector",
+                        "모든 활성 소스가 일시 네트워크 오류로 실패",
+                        "Phase 1 소스가 비활성인 단독 실행이므로 workflow는 warning으로 처리합니다.",
+                    )
+
+        for failed, code, source, detail in enabled_source_failures:
+            if failed:
+                if _is_transient_source_error(code, detail):
+                    health.add_warning(
+                        f"transient-source-error:{code}",
+                        source,
+                        f"{source} 일시 수집 오류",
+                        detail[:240],
+                    )
+                else:
+                    health.add_failure(
+                        f"enabled-source-error:{code}",
+                        source,
+                        f"{source} 활성 상태에서 수집 오류",
+                        detail[:240],
+                    )
+
+    if event_name == "schedule" and enable_moleg_api:
+        health.add_warning(
+            "moleg-enabled-on-schedule",
+            "MFDS ogLmPp",
+            "scheduled run에서 ENABLE_MOLEG_API=true 감지",
+            "운영 원칙은 ENABLE_MOLEG_API=false 유지입니다. workflow_dispatch opt-in은 허용됩니다.",
+        )
+    if enable_scrape:
+        health.add_warning(
+            "scrape-enabled-unimplemented",
+            "Web Scrape",
+            "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현",
+            "현재 실행에서는 건너뜁니다.",
+        )
+    if stats.fr_truncated:
+        health.add_warning(
+            "fr-truncated",
+            "Federal Register",
+            "Federal Register pagination 안전 상한 도달",
+            "일부 항목 누락 가능성이 있어 수동 확인이 필요합니다.",
+        )
+    if stats.recall_truncated:
+        health.add_warning(
+            "recall-truncated",
+            "OpenFDA Recall",
+            "OpenFDA Recall pagination 안전 상한 도달",
+            "일부 항목 누락 가능성이 있어 수동 확인이 필요합니다.",
+        )
+    if enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_manual_review:
+        health.add_warning(
+            "gmp-attachment-manual-review",
+            "MFDS GMP Inspection",
+            f"GMP 실태조사 첨부 {stats.mfds_gmp_inspection_manual_review}건 수동 확인 필요",
+            f"parse_status={stats.mfds_gmp_inspection_parse_status}",
+        )
+    for warning in stats.mfds_gmp_inspection_page_warnings:
+        health.add_warning(
+            "gmp-pagination-warning",
+            "MFDS GMP Inspection",
+            "GMP 실태조사 페이지네이션 경고",
+            warning[:240],
+        )
+
+    return health.finalize()
+
+
+def _health_payload(
+    *,
+    health: HealthCheckResult,
+    stats: CollectionStats,
+    run_date: date,
+    start: date,
+    end: date,
+    event_name: str,
+    dry_run: bool,
+    requested_sources: list[str],
+    active: set[str],
+    flags: dict[str, bool],
+    handoff_emitted: bool,
+    handoff_failed: bool,
+    handoff_row_count: int,
+    handoff_url: str,
+    handoff_error_msg: str,
+) -> dict[str, Any]:
+    return {
+        "schema_version": "grm-health/v1",
+        "generated_at_kst": now_kst().isoformat(),
+        "run_date_kst": run_date.isoformat(),
+        "window_start": start.isoformat(),
+        "window_end": end.isoformat(),
+        "event_name": event_name,
+        "dry_run": dry_run,
+        "requested_sources": requested_sources,
+        "active_sources": sorted(active),
+        "flags": flags,
+        "health": health.to_dict(),
+        "sources": _source_health_rows(stats),
+        "handoff": {
+            "emitted": handoff_emitted,
+            "failed": handoff_failed,
+            "row_count": handoff_row_count,
+            "url": handoff_url,
+            "error_msg": handoff_error_msg,
+        },
+    }
+
+
+def _write_health_json(path: str, payload: dict[str, Any]) -> None:
+    if not path:
+        return
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2, sort_keys=True)
+            f.write("\n")
+    except OSError as e:
+        log("WARN", f"health JSON 쓰기 실패: {e}")
+
+
+def _write_health_summary(f: Any, health: HealthCheckResult, health_path: str) -> None:
+    f.write("\n## GRM Intake Health Check\n\n")
+    f.write(f"- Status: `{health.status}`\n")
+    f.write(f"- Exit code: `{health.exit_code}`\n")
+    if health_path:
+        f.write(f"- Health JSON: `{health_path}`\n")
+    for title, findings in [
+        ("Failures", health.failures),
+        ("Warnings", health.warnings),
+        ("Info", health.infos),
+    ]:
+        if not findings:
+            continue
+        f.write(f"\n### {title}\n")
+        for finding in findings:
+            detail = f" — {finding.detail}" if finding.detail else ""
+            f.write(f"- `{finding.code}` · {finding.source}: {finding.message}{detail}\n")
 
 
 def main() -> int:
@@ -2201,8 +2786,16 @@ def main() -> int:
     enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
     enable_mfds_admin = os.environ.get("ENABLE_MFDS_ADMIN", "false").lower() == "true"
     enable_mfds_gmp_inspection = os.environ.get("ENABLE_MFDS_GMP_INSPECTION", "false").lower() == "true"
+    enable_ich = (os.environ.get("ENABLE_ICH", "false").lower() == "true"
+                  or "ich" in active)
+    enable_who = (os.environ.get("ENABLE_WHO", "false").lower() == "true"
+                  or "who" in active)
+    enable_hc = (os.environ.get("ENABLE_HC", "false").lower() == "true"
+                 or "hc" in active)
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
+    event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
+    health_json_path = os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip()
     if enable_scrape:
         log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
 
@@ -2215,6 +2808,19 @@ def main() -> int:
     run_date = kst_run_date(now_k)
     start, end = date_window(run_date, args.window_days)
     log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
+
+    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
+    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
+    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
+    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
+    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
+    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
+    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
+    mfds_enforcement_window_days = max(
+        args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30))
+    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
+    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
+                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
 
     stats = CollectionStats()
 
@@ -2310,8 +2916,9 @@ def main() -> int:
         else:
             try:
                 from collect_mfds_recall import collect_mfds_recall
+                # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
                 mfds_recall_items, mfds_recall_err = collect_mfds_recall(
-                    start, end, data_go_kr_service_key)
+                    enf_start, end, data_go_kr_service_key)
             except Exception as e:
                 mfds_recall_items, mfds_recall_err = [], str(e)
         stats.mfds_recall_fetched = len(mfds_recall_items)
@@ -2332,8 +2939,9 @@ def main() -> int:
         else:
             try:
                 from collect_mfds_admin_action import collect_mfds_admin_actions
+                # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
                 mfds_admin_items, mfds_admin_err = collect_mfds_admin_actions(
-                    start, end, data_go_kr_service_key)
+                    enf_start, end, data_go_kr_service_key)
             except Exception as e:
                 mfds_admin_items, mfds_admin_err = [], str(e)
         stats.mfds_admin_fetched = len(mfds_admin_items)
@@ -2349,12 +2957,18 @@ def main() -> int:
     if enable_mfds_gmp_inspection:
         log("INFO", "=== MFDS GMP 실태조사 결과 수집 시작 ===")
         try:
-            from collect_mfds_gmp_inspection import collect_mfds_gmp_inspections
-            mfds_gmp_inspection_items, mfds_gmp_inspection_err = collect_mfds_gmp_inspections(
+            import collect_mfds_gmp_inspection as mfds_gmp_module
+            mfds_gmp_inspection_items, mfds_gmp_inspection_err = mfds_gmp_module.collect_mfds_gmp_inspections(
                 start, end)
+            gmp_health = getattr(mfds_gmp_module, "LAST_HEALTH", {}) or {}
         except Exception as e:
             mfds_gmp_inspection_items, mfds_gmp_inspection_err = [], str(e)
+            gmp_health = {}
         stats.mfds_gmp_inspection_fetched = len(mfds_gmp_inspection_items)
+        stats.mfds_gmp_inspection_parse_status = dict(gmp_health.get("parse_status_counts") or {})
+        stats.mfds_gmp_inspection_deficiency = dict(gmp_health.get("deficiency_counts") or {})
+        stats.mfds_gmp_inspection_manual_review = int(gmp_health.get("manual_review_count") or 0)
+        stats.mfds_gmp_inspection_page_warnings = list(gmp_health.get("page_warnings") or [])
         if mfds_gmp_inspection_err:
             stats.mfds_gmp_inspection_error = True
             stats.mfds_gmp_inspection_error_msg = mfds_gmp_inspection_err
@@ -2362,12 +2976,67 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_MFDS_GMP_INSPECTION=false — MFDS GMP 실태조사 결과 수집 건너뜀")
 
+    # ── P1: ICH 직접 모니터링 (ENABLE_ICH=true 시 실행) ──────────────────────
+    ich_items: list[IntakeItem] = []
+    if enable_ich:
+        log("INFO", "=== ICH 수집 시작 ===")
+        try:
+            from collect_ich import collect_ich
+            ich_items, ich_err = collect_ich(run_date)
+        except Exception as e:  # noqa: BLE001
+            ich_items, ich_err = [], str(e)
+        stats.ich_fetched = len(ich_items)
+        if ich_err:
+            stats.ich_error = True
+            stats.ich_error_msg = ich_err
+            log("WARN", f"ICH 오류: {ich_err}")
+    else:
+        log("INFO", "ENABLE_ICH=false — ICH 수집 건너뜀")
+
+    # ── P1: WHO Prequalification (ENABLE_WHO=true 또는 --sources who) ─────────
+    who_items: list[IntakeItem] = []
+    if enable_who:
+        log("INFO", "=== WHO 수집 시작 ===")
+        try:
+            from collect_who import collect_who
+            who_items, who_err = collect_who(start, end)
+        except Exception as e:  # noqa: BLE001
+            who_items, who_err = [], str(e)
+        stats.who_fetched = len(who_items)
+        if who_err:
+            stats.who_error = True
+            stats.who_error_msg = who_err
+            log("WARN", f"WHO 오류: {who_err}")
+    else:
+        log("INFO", "ENABLE_WHO=false — WHO 수집 건너뜀")
+
+    # ── P1: Health Canada (ENABLE_HC=true 또는 --sources hc) ─────────────────
+    hc_items: list[IntakeItem] = []
+    if enable_hc:
+        log("INFO", "=== Health Canada 수집 시작 ===")
+        try:
+            from collect_hc import collect_hc
+            # recall/advisory 이므로 지연공개 대비 enforcement 윈도우 사용
+            hc_items, hc_err = collect_hc(enf_start, end)
+        except Exception as e:  # noqa: BLE001
+            hc_items, hc_err = [], str(e)
+        stats.hc_fetched = len(hc_items)
+        if hc_err:
+            stats.hc_error = True
+            stats.hc_error_msg = hc_err
+            log("WARN", f"HC 오류: {hc_err}")
+    else:
+        log("INFO", "ENABLE_HC=false — Health Canada 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
                      + stats.mfds_fetched + stats.mfds_recall_fetched
                      + stats.mfds_admin_fetched
-                     + stats.mfds_gmp_inspection_fetched)
+                     + stats.mfds_gmp_inspection_fetched
+                     + stats.ich_fetched
+                     + stats.who_fetched
+                     + stats.hc_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
@@ -2375,15 +3044,30 @@ def main() -> int:
         f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
         f"MFDS-Recall={stats.mfds_recall_fetched} · "
         f"MFDS-Admin={stats.mfds_admin_fetched} · "
-        f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · 합계={total_fetched}건"
+        f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · "
+        f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
+        f"HC={stats.hc_fetched} · 합계={total_fetched}건"
     ))
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
     # (7일 윈도우 시 8일 전 RAPS URL이 누락되어 재삽입될 수 있음 — Task #13)
     _SEARCH_DEDUP_WINDOW_DAYS = 35  # pm(31일) + 여유 4일
-    dedup_window_days = max(args.window_days, _SEARCH_DEDUP_WINDOW_DAYS) if enable_search else args.window_days
+    # P0: dedup 윈도우는 가장 넓은 수집 윈도우(enforcement 30일)를 반드시 덮어야 한다.
+    # 그래야 enforcement 윈도우로 backfill된 과거 일자 항목이 다음 실행에서 중복 재삽입되지 않는다.
+    dedup_window_days = max(
+        args.window_days,
+        mfds_enforcement_window_days,
+        _SEARCH_DEDUP_WINDOW_DAYS if enable_search else 0,
+    )
     log("INFO", f"dedupe window={dedup_window_days}일 (window_days={args.window_days}, enable_search={enable_search})")
+
+    # P1: snapshot 소스(ICH·WHO)는 날짜 미단언/URL 기반 안정 스냅샷이라 매 실행 동일 항목을 재수집한다.
+    # 기본 dedup 윈도우(≤30일)를 넘으면 같은 항목이 다시 New로 들어오므로(월간 중복 삽입),
+    # 이들 소스만 별도로 장기(3년) Source-한정 dedup을 조회해 합친다.
+    # (전체 윈도우를 3년으로 늘리면 Notion 페이지 cap에 걸릴 수 있어 Source 필터로 한정.)
+    _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
+    _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
 
     if args.dry_run:
         existing: set[str] = set()
@@ -2395,6 +3079,19 @@ def main() -> int:
             # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
             log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
             return 1
+        snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
+        if snapshot_active:
+            try:
+                snap_existing = notion_query_existing_doc_ids(
+                    notion_token, notion_db, run_date,
+                    window_days=_SNAPSHOT_DEDUP_WINDOW_DAYS,
+                    source_names=snapshot_active)
+                existing |= snap_existing
+                log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
+                            f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
+            except NotionDedupeQueryError as e:
+                log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
+                return 1
 
     collected_at = now_k
 
@@ -2469,6 +3166,27 @@ def main() -> int:
     stats.mfds_gmp_inspection_skipped_dup = mfds_gmp_insp_sk
     stats.mfds_gmp_inspection_insert_failed = mfds_gmp_insp_fail
 
+    ich_in, ich_sk, ich_fail = insert_items(
+        notion_token, notion_db, ich_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.ich_inserted = ich_in
+    stats.ich_skipped_dup = ich_sk
+    stats.ich_insert_failed = ich_fail
+
+    who_in, who_sk, who_fail = insert_items(
+        notion_token, notion_db, who_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.who_inserted = who_in
+    stats.who_skipped_dup = who_sk
+    stats.who_insert_failed = who_fail
+
+    hc_in, hc_sk, hc_fail = insert_items(
+        notion_token, notion_db, hc_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.hc_inserted = hc_in
+    stats.hc_skipped_dup = hc_sk
+    stats.hc_insert_failed = hc_fail
+
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
     if enable_search:
@@ -2527,6 +3245,56 @@ def main() -> int:
                 handoff_failed = True
                 handoff_error_msg = str(e)
                 log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
+
+    flags = {
+        "ENABLE_SEARCH": enable_search,
+        "ENABLE_MFDS": enable_mfds,
+        "ENABLE_MFDS_RECALL": enable_mfds_recall,
+        "ENABLE_MFDS_ADMIN": enable_mfds_admin,
+        "ENABLE_MFDS_GMP_INSPECTION": enable_mfds_gmp_inspection,
+        "ENABLE_ICH": enable_ich,
+        "ENABLE_WHO": enable_who,
+        "ENABLE_HC": enable_hc,
+        "ENABLE_MOLEG_API": enable_moleg_api,
+        "ENABLE_SCRAPE": enable_scrape,
+    }
+    health = _evaluate_health(
+        stats=stats,
+        active=active,
+        enable_search=enable_search,
+        enable_mfds=enable_mfds,
+        enable_mfds_recall=enable_mfds_recall,
+        enable_mfds_admin=enable_mfds_admin,
+        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+        enable_ich=enable_ich,
+        enable_who=enable_who,
+        enable_hc=enable_hc,
+        enable_moleg_api=enable_moleg_api,
+        enable_scrape=enable_scrape,
+        event_name=event_name,
+        emit_routine_handoff=args.emit_routine_handoff,
+        handoff_emitted=handoff_emitted,
+        handoff_failed=handoff_failed,
+        handoff_error_msg=handoff_error_msg,
+    )
+    health_payload = _health_payload(
+        health=health,
+        stats=stats,
+        run_date=run_date,
+        start=start,
+        end=end,
+        event_name=event_name,
+        dry_run=args.dry_run,
+        requested_sources=list(requested_sources),
+        active=active,
+        flags=flags,
+        handoff_emitted=handoff_emitted,
+        handoff_failed=handoff_failed,
+        handoff_row_count=handoff_row_count,
+        handoff_url=handoff_url,
+        handoff_error_msg=handoff_error_msg,
+    )
+    _write_health_json(health_json_path, health_payload)
 
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
@@ -2594,6 +3362,18 @@ def main() -> int:
                                       stats.mfds_gmp_inspection_insert_failed,
                                       stats.mfds_gmp_inspection_error,
                                       stats.mfds_gmp_inspection_error_msg))
+                if enable_ich:
+                    f.write(_src_line("ICH", stats.ich_fetched, stats.ich_inserted,
+                                      stats.ich_skipped_dup, stats.ich_insert_failed,
+                                      stats.ich_error, stats.ich_error_msg))
+                if enable_who:
+                    f.write(_src_line("WHO", stats.who_fetched, stats.who_inserted,
+                                      stats.who_skipped_dup, stats.who_insert_failed,
+                                      stats.who_error, stats.who_error_msg))
+                if enable_hc:
+                    f.write(_src_line("Health Canada", stats.hc_fetched, stats.hc_inserted,
+                                      stats.hc_skipped_dup, stats.hc_insert_failed,
+                                      stats.hc_error, stats.hc_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -2632,77 +3412,19 @@ def main() -> int:
                         f.write(f"> MFDS GMP Inspection error: "
                                 f"`{stats.mfds_gmp_inspection_error_msg[:120] or 'none'}` "
                                 f"— ENABLE_MFDS_GMP_INSPECTION 및 nedrug HTML 구조 확인.\n")
+                _write_health_summary(f, health, health_json_path)
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
 
-    # 종료 코드:
-    # - Phase 1 (FR + Recall) 모두 실패 → exit 1 (workflow fail)
-    # - Phase 1 한쪽 실패 또는 Phase 2 전체 실패 → exit 0 (graceful degradation)
-    # - Phase 2 는 개별 소스 실패가 있어도 다른 소스 계속 진행 (graceful)
-    # - Notion insert 최종 실패는 실제 데이터 유실이므로 exit 1
-    if stats.has_insert_failures():
-        log("ERROR", f"Notion insert 최종 실패 {stats.total_insert_failures()}건 — workflow fail")
-        return 1
-    if handoff_failed:
-        log("ERROR", "Routine handoff 생성 실패 — workflow fail")
-        return 1
-    if args.emit_routine_handoff and handoff_emitted and (not active or active == {"mfds"}) and not any([
-        enable_mfds,
-        enable_mfds_recall,
-        enable_mfds_admin,
-        enable_mfds_gmp_inspection,
-        enable_search,
-    ]):
-        log("INFO", "handoff-only 실행 완료 — source fetch 비활성 상태를 성공으로 처리")
-        return 0
-
-    phase1_fr_active     = "fr" in active
-    phase1_recall_active = "recall" in active
-    fr_failed     = phase1_fr_active and stats.fr_error
-    recall_failed = phase1_recall_active and stats.recall_error
-    if fr_failed and recall_failed:
-        log("ERROR", "Phase 1 두 API 모두 실패 — workflow fail")
-        return 1
-    if not phase1_fr_active and not phase1_recall_active:
-        # Phase 1 소스가 모두 비활성화된 경우 Phase 2 결과만으로 판단
-        phase2_all_error = all([
-            ("ema" not in active or stats.ema_error),
-            ("mhra" not in active or stats.mhra_error),
-            ("pics" not in active or stats.pics_error),
-            ("eca" not in active or stats.eca_error),
-            ("wl" not in active or stats.wl_error),
-            (not enable_mfds or stats.mfds_error),
-            (not enable_mfds_recall or stats.mfds_recall_error),
-            (not enable_mfds_admin or stats.mfds_admin_error),
-            (not enable_mfds_gmp_inspection or stats.mfds_gmp_inspection_error),
-        ])
-        if phase2_all_error:
-            log("ERROR", "모든 활성 소스 실패 — workflow fail")
-            return 1
-    # Phase 2a: ENABLE_SEARCH=true 상태에서 Brave Search 전체 실패 / misconfiguration
-    # search_error=True는 전체 슬롯 실패 또는 API key 누락 두 경우에만 발생하므로
-    # exit 1은 과도하지 않다. 일부 슬롯 실패(graceful degradation)는 False 유지.
-    if enable_search and stats.search_error:
-        log("ERROR", f"ENABLE_SEARCH=true 상태에서 Brave Search 오류 — workflow fail "
-                     f"({stats.search_error_msg[:80]})")
-        return 1
-    if enable_mfds and stats.mfds_error:
-        log("ERROR", f"ENABLE_MFDS=true 상태에서 MFDS 오류 — workflow fail "
-                     f"({stats.mfds_error_msg[:80]})")
-        return 1
-    if enable_mfds_recall and stats.mfds_recall_error:
-        log("ERROR", f"ENABLE_MFDS_RECALL=true 상태에서 MFDS Recall 오류 — workflow fail "
-                     f"({stats.mfds_recall_error_msg[:80]})")
-        return 1
-    if enable_mfds_admin and stats.mfds_admin_error:
-        log("ERROR", f"ENABLE_MFDS_ADMIN=true 상태에서 MFDS Admin 오류 — workflow fail "
-                     f"({stats.mfds_admin_error_msg[:80]})")
-        return 1
-    if enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error:
-        log("ERROR", f"ENABLE_MFDS_GMP_INSPECTION=true 상태에서 MFDS GMP Inspection 오류 — workflow fail "
-                     f"({stats.mfds_gmp_inspection_error_msg[:80]})")
-        return 1
-    return 0
+    # 종료 코드는 _evaluate_health() 하나만 기준으로 삼는다.
+    # - failure → exit 1 (workflow failure Issue)
+    # - warning → exit 0 (warning Issue/summary)
+    # - ok      → exit 0
+    for finding in health.failures:
+        log("ERROR", f"health failure [{finding.code}] {finding.source}: {finding.message}")
+    for finding in health.warnings:
+        log("WARN", f"health warning [{finding.code}] {finding.source}: {finding.message}")
+    return health.exit_code
 
 
 if __name__ == "__main__":

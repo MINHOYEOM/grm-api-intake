@@ -114,8 +114,19 @@ def http_get_xml(
             if 400 <= resp.status_code < 500:
                 raise HTTPClientError(resp.status_code, url, f"HTTP {resp.status_code} for {url}")
             resp.raise_for_status()
+            # 일부 피드(예: WHO Drupal RSS)는 XML 선언 앞에 theme debug 주석/BOM 등 잡음이 붙어
+            # "XML or text declaration not at start of entity" 로 파싱 실패한다.
+            # XML 시작 토큰(<?xml / <rss / <feed) 이전 바이트를 잘라낸 뒤 파싱한다.
+            content = resp.content
+            for marker in (b"<?xml", b"<rss", b"<feed"):
+                idx = content.find(marker)
+                if idx > 0:
+                    content = content[idx:]
+                    break
+            else:
+                content = content.lstrip()
             try:
-                return ET.fromstring(resp.content)
+                return ET.fromstring(content)
             except ET.ParseError as e:
                 raise RuntimeError(f"XML parse failed: {url} - {e}") from e
         except HTTPClientError:

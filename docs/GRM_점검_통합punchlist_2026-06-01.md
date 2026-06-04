@@ -10,7 +10,8 @@
 - 🔲 **잔여:** PL-7(수집기 부재 소스 — 품목허가 변경·DMF 등, A축 확장) · PL-8(보조출처 403). 둘 다 별도 트랙, 배포와 무관.
 - ✅ **배포 게이트 ①②③ 닫힘:** ①MFDS 조회 실측(프로덕션 데이터 (B)경로 ✓) ②Self-Check 코드+출력 동시 커밋(`de7af3b` ✓) ③국내 섹션 실렌더(검증 렌더 `GRM_게이트3_국내섹션_검증렌더_2026-06-01.md`, 로직 전부 pass ✓ — 프로덕션 페이지 미발행).
 - ✅ **게이트④ Routine 연결 완료:** 운영자(MINO)가 주간 Routine에 v15.6.1 반영. 2026-06-01 라이브 실행 2회로 🇰🇷 국내 섹션·소재국 fallback·지적사항 요약·듀얼링크(Q4) 모두 정상 렌더 확인.
-- 🛠 **PL-10 반영(로컬, 2026-06-01):** (B) fallback 중복 발행 결함에 대해 수집기 측 New-only handoff 경로 추가. Actions가 `OPEN GRM Routine Handoff {date}` row를 생성하고, Routine v15.6.3은 이 큐만 읽도록 변경. 남은 게이트: 실제 Actions run에서 handoff 생성 확인 + Routine 2회 연속 실행(1회차 full → 2회차 empty) 재검증.
+- ✅ **PL-10 해결·검증완료(2026-06-01):** (B) fallback 중복 발행 결함 → 수집기 New-only handoff 경로(v15.6.3, commit `4ab32a5`). **Claude 라이브 검증 통과** — 1회차 풀브리프+handoff CONSUMED 전환 / 2회차 빈브리프+broad fallback 미실행 / 원본 5건 Processed. **멱등성 확보, 운영 정기발행 차단 해제.** 테스트본 2건 `[TEST]` 라벨 완료.
+- 🟢 **현 상태: 배포 차단 전부 해제.** 9개 PL 중 PL-1~6·9·10 반영완료(7+PL-10). 잔여 PL-7(수집기 부재 소스 A축 확장)·PL-8(403)은 정기발행과 무관한 별도 트랙. Q4(원본링크) 해결, Q5(카드포맷) 별도 세션 미결.
 - **테스트본 정리:** 06-01 중복 페이지 2건에 `[TEST]` 라벨 부착 완료(삭제 안 함, 기록 보존). 정식 05-31 브리프와 구분됨.
 - 🟡 **Q4(원본 링크):** v15.6.1로 해결 — 라이브 06-01 브리프 국내 카드에 📎 MFDS 행정처분 상세/실사 PDF 직링크 정상 출력 확인.
 - ⏸ **Q5(카드 포맷):** 별도 세션(`GRM_Q5_카드포맷_논의_2026-06-01.md`). 미결.
@@ -38,7 +39,7 @@
 | **PL-7** | A | P2 | 수집기 부재 소스 | 스키마 Type 옵션에도 없음 | Codex(수집기)+Claude(Type신설) | 상: 품목허가 변경(제조방법/규격)·DMF / 중: 허가/취하·수입해외제조소·위수탁 / 하: DUR | 없음 |
 | **PL-8** | D | P3 | 보조출처 403 상시 | 05-31 브리프 WebFetch 5/5 403 (PIC/S·MHRA·gmp-compliance·RAPS·EPR) | Codex | UA/캐시/대체경로 또는 Evidence C 강등 명시 | 없음 |
 | **PL-9** | D·B | **P1근저** | Claude 실행환경에 query_data_sources 부재 → MFDS 누락 | **2026-06-01 실측**: Claude 환경에 query_data_sources 없음. Codex 환경도 `_notion_query_data_sources` 호출 시 `Tool notion-query-data-sources not found` 실패. `search`+data_source_url+created_date_range fallback은 작동(MFDS row 반환)하나 25건컷·커서없음·createdTime필터(Status/RunDate 아님). v15.5 프롬프트(L152-178)는 정상 — **실행능력 문제** | Codex(환경)+Claude(fallback) | **반영됨(2026-06-01)**: v15.6 P3에 필터드 쿼리 단발검증 + 실패 시 fallback(B경로) 생략 금지 + 배포게이트① 추가 | **PL-1 실효의 전제 · 배포 게이트** |
-| **PL-10** | D·B | **P1 (검증 대기)** | **(B) fallback이 Status=New를 못 걸러 중복 발행** | **2026-06-01 라이브 재현**: 2회차 테스트 실행이 1회차에서 이미 Processed된 항목을 다시 카드화 → 06-01 브리프 중복(거의 동일 6건). 매 실행마다 GMP실사 대상이 바뀜(보령↔엘앤씨…) = Q2 우려("abc/def") 실증. 멱등성 깨짐. 근본=PL-9(속성필터 도구 부재). v15.6 P3의 "fetch로 Status 재확인" fallback을 실행 LLM이 건너뜀(신뢰성 부족) | **Codex(수집기 측 — 사용자 결정)** | **반영됨(로컬, v15.6.3):** `collect_intake.py`가 Notion API 속성 필터로 `Status=New` + Run Date window row를 조회해 `GRM Handoff`/`routine-handoff` page(JSON rows[]) 생성. Workflow는 dry-run이 아닐 때 `--emit-routine-handoff` 자동 지정. Routine은 handoff-first로 전환하고 원 DB broad fallback 기본 금지. | **실측 필요:** Actions handoff 생성 + Routine 2회차 empty 확인 |
+| **PL-10** | D·B | ~~P1~~ **해결·검증완료** | (B) fallback이 Status=New를 못 걸러 중복 발행 | **2026-06-01 라이브 재현 후 해결.** 근본=PL-9(속성필터 도구 부재). | Codex(수집기)+Claude(라이브검증) | **반영(v15.6.3, commit `4ab32a5` / branch `codex/pl10-handoff-idempotency`):** `collect_intake.py`가 Notion API 속성필터로 `Status=New`+window 조회 → `OPEN GRM Routine Handoff` JSON 큐 생성(workflow non-dry시 `--emit-routine-handoff`). Routine handoff-first, broad fallback 코드 차단, 1회차 후 handoff→`CONSUMED`/Processed. | **✅ Claude 라이브 검증(2026-06-01):** STEP1 handoff row_count=5 / 1회차 5건 풀브리프+직링크+handoff CONSUMED 전환 / 2회차 빈브리프+`duplicate run suppressed`+broad fallback 미실행+재카드화 0 / 원본 5건 Processed 확정. **운영 차단 해제.** |
 
 ---
 

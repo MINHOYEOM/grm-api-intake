@@ -49,7 +49,7 @@
 4. 번역 충실성: 정확성 우선, 자연스러운 QA 실무 톤.
 5. 듀얼 링크 의무: 모든 항목에 정보 출처(📰) + 공식 원본(📎) 두 링크.
 6. 운영 모델 (v15.6.3 — Intake-first cloud routine, daily collection):
-   외부 GitHub Actions 수집기가 매일 20:17 UTC (익일 05:17 KST) 에
+   외부 GitHub Actions 수집기가 매일 18:17 UTC (익일 03:17 KST) 에
    8개 소스를 수집해 결과를 Notion "GRM API Intake" 데이터베이스에 raw 필드로 적재한다.
    수집 소스: Federal Register API · OpenFDA Recall API · EMA RSS · MHRA RSS ·
    PIC/S RSS · ECA RSS · FDA Warning Letters scrape · MFDS(식약처: RSS 다보드 +

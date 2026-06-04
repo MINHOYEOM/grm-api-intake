@@ -26,6 +26,8 @@ dist/
 tmp/
 output/
 *.local.json
+grm-health.json
+scheduled_*.log
 
-# 옛/완료 문서 — 로컬 보관, git 추적 제외
+# 로컬 보관용 — git 추적 제외
 /archive/

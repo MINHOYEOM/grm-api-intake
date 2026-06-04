@@ -1,0 +1,9 @@
+# GRM 저장소 줄끝 정책 — core.autocrlf 환경차로 인한 LF/CRLF 회귀 방지
+# (CODEX 점검 권고, 2026-06-02)
+* text=auto eol=lf
+*.py  text eol=lf
+*.sh  text eol=lf
+*.md  text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf

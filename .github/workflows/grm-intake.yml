@@ -1,16 +1,17 @@
 name: GRM API Intake (Daily)
 
-# 매일 20:17 UTC = 익일 05:17 KST
+# 매일 18:17 UTC = 익일 03:17 KST
 # Claude Routine (매주 월 07:30 KST) 전에 7일치 수집 완료 보장
-# (GitHub Actions cron 최대 60분 지연 공식 고지)
+# (공식 고지는 최대 60분 지연이나, 2026-06-02/03 실측 ~2.5h 지연 관찰
+#  → 2시간 앞당겨 지연 포함 06시 이전 완료 확보)
 # 비정각(:17) 사용 — GitHub Actions :00 부하 분산 권장사항 반영
 #
 # cron 표기:
 # minute hour day(month) month day(week)
-#  17     20    *           *      *       → 매일 20:17 UTC
+#  17     18    *           *      *       → 매일 18:17 UTC
 on:
   schedule:
-    - cron: '17 20 * * *'
+    - cron: '17 18 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -22,7 +23,7 @@ on:
         type: string
         default: '7'
       sources:
-        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds none). 비우면 전체'
+        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds ich who hc none). 비우면 전체'
         type: string
         default: ''
       handoff_doc_ids:
@@ -49,6 +50,18 @@ on:
         description: 'MFDS GMP 실태조사 결과 수집 활성화 (기본: vars.ENABLE_MFDS_GMP_INSPECTION 또는 true)'
         type: boolean
         default: true
+      enable_ich:
+        description: 'ICH 수집 활성화 (기본: vars.ENABLE_ICH 또는 false)'
+        type: boolean
+        default: false
+      enable_who:
+        description: 'WHO Prequalification 수집 활성화 (기본: vars.ENABLE_WHO 또는 false)'
+        type: boolean
+        default: false
+      enable_hc:
+        description: 'Health Canada 수집 활성화 (기본: vars.ENABLE_HC 또는 false)'
+        type: boolean
+        default: false
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -71,6 +84,8 @@ jobs:
     name: Collect sources → Notion Intake
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      GRM_HEALTH_JSON: grm-health.json
 
     steps:
       - name: Checkout
@@ -117,6 +132,9 @@ jobs:
           ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'true' }}
           ENABLE_MFDS_ADMIN: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_admin) || vars.ENABLE_MFDS_ADMIN || 'true' }}
           ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_inspection) || vars.ENABLE_MFDS_GMP_INSPECTION || 'true' }}
+          ENABLE_ICH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_ich) || vars.ENABLE_ICH || 'false' }}
+          ENABLE_WHO: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_who) || vars.ENABLE_WHO || 'false' }}
+          ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_hc) || vars.ENABLE_HC || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
         run: |
@@ -141,7 +159,7 @@ jobs:
             if [ -n "$GRM_SOURCES" ]; then
               # 쉼표도 공백으로 처리. 허용된 source 토큰만 --sources 인자로 전달.
               read -r -a SOURCE_TOKENS <<< "$(printf '%s' "$GRM_SOURCES" | tr ',' ' ')"
-              valid_sources=(fr recall ema mhra pics eca wl mfds none)
+              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc none)
               source_args=()
               for src in "${SOURCE_TOKENS[@]}"; do
                 ok=false
@@ -183,27 +201,149 @@ jobs:
         uses: actions/github-script@v9.0.0
         with:
           script: |
+            const fs = require('fs');
+            const path = require('path');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-            const today = new Date().toISOString().slice(0, 10);
+            const fallbackDate = new Date().toISOString().slice(0, 10);
+            const healthPath = path.join(process.env.GITHUB_WORKSPACE, process.env.GRM_HEALTH_JSON || 'grm-health.json');
+            let health = null;
+            if (fs.existsSync(healthPath)) {
+              try {
+                health = JSON.parse(fs.readFileSync(healthPath, 'utf8'));
+              } catch (error) {
+                health = { parse_error: String(error) };
+              }
+            }
+            const findings = health?.health?.failures || [];
+            const warnings = health?.health?.warnings || [];
+            const findingLines = findings.length
+              ? findings.map((item) => `- [${item.code}] ${item.source}: ${item.message}${item.detail ? ` — ${item.detail}` : ''}`)
+              : ['- health JSON 없음 또는 failure finding 없음. Actions 로그와 step summary를 확인하세요.'];
+            const warningLines = warnings.length
+              ? ['', '경고:', ...warnings.map((item) => `- [${item.code}] ${item.source}: ${item.message}${item.detail ? ` — ${item.detail}` : ''}`)]
+              : [];
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+
+            await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
+            await ensureLabel('automation-failure', 'b60205', 'GRM automation failure');
+
+            const runDate = health?.run_date_kst || fallbackDate;
             await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `GRM Intake 실패 — ${today}`,
+              owner,
+              repo,
+              title: `GRM Intake 실패 — ${runDate}`,
               body: [
                 'GRM API Intake 수집기(Daily)가 실패했습니다.',
                 '',
                 `- Run: ${runUrl}`,
                 `- Trigger: ${context.eventName}`,
+                `- Run date (KST): ${runDate}`,
+                `- Health status: ${health?.health?.status || 'unavailable'}`,
+                '',
+                '실패 판정:',
+                ...findingLines,
+                ...warningLines,
                 '',
                 '점검 항목:',
                 '1. Notion Integration 토큰 유효성',
                 '2. Notion DB 스키마 (속성 이름·타입)',
-                '3. Federal Register / OpenFDA / RSS / FDA WL 상태',
+                '3. Federal Register / OpenFDA / RSS / FDA WL / MFDS / ICH / WHO / Health Canada 상태',
                 '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY)',
-                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_INSPECTION, ENABLE_MOLEG_API, ENABLE_SCRAPE) 설정 확인',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_INSPECTION, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_MOLEG_API, ENABLE_SCRAPE) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',
               ].join('\n'),
               labels: ['grm-intake', 'automation-failure'],
+            });
+
+      - name: Open or update warning issue
+        if: success() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const healthPath = path.join(process.env.GITHUB_WORKSPACE, process.env.GRM_HEALTH_JSON || 'grm-health.json');
+            if (!fs.existsSync(healthPath)) {
+              console.log('health JSON not found; skipping warning issue');
+              return;
+            }
+
+            let health;
+            try {
+              health = JSON.parse(fs.readFileSync(healthPath, 'utf8'));
+            } catch (error) {
+              console.log(`health JSON parse failed: ${error}`);
+              return;
+            }
+
+            const warnings = health?.health?.warnings || [];
+            if (!warnings.length) {
+              console.log('no health warnings; skipping warning issue');
+              return;
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+
+            await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
+            await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
+
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const title = 'GRM Intake 운영 경고';
+            const lines = [
+              `GRM Intake scheduled run에서 warning이 감지되었습니다.`,
+              '',
+              `- Run: ${runUrl}`,
+              `- Run date (KST): ${health.run_date_kst || 'unknown'}`,
+              `- Health status: ${health?.health?.status || 'warning'}`,
+              '',
+              '경고:',
+              ...warnings.map((item) => `- [${item.code}] ${item.source}: ${item.message}${item.detail ? ` — ${item.detail}` : ''}`),
+            ];
+            const body = lines.join('\n');
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: 'automation-warning',
+              per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              });
+              return;
+            }
+
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body,
+              labels: ['grm-intake', 'automation-warning'],
             });

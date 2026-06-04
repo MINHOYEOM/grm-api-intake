@@ -110,7 +110,7 @@ $env:OPENFDA_API_KEY = 'your_openfda_key_here'
 2. 약 2분 후 Job Summary 확인 — `Federal Register: fetched N` 처럼 보여야 정상
 3. 같은 절차로 `dry_run: false` 실행 → Notion `GRM API Intake` DB 에 row 생김
 
-이 두 검증이 통과하면 매일 20:17 UTC (익일 05:17 KST) 에 자동 실행됩니다. (수집기는 매일 실행, Routine 다이제스트 발행은 매주 월요일 07:30 KST)
+이 두 검증이 통과하면 매일 18:17 UTC (익일 03:17 KST) 에 자동 실행됩니다. (수집기는 매일 실행, Routine 다이제스트 발행은 매주 월요일 07:30 KST)
 
 ## 보안 메모
 

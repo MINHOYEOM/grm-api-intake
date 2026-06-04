@@ -44,6 +44,8 @@ MAX_ATTACHMENT_TEXT_CHARS = 12000
 MAX_ATTACHMENT_BODY_CHARS = 6000
 HTTP_RETRIES = 3
 
+LAST_HEALTH: dict[str, Any] = {}
+
 _NO_DEFICIENCY_RE = re.compile(
     r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*없음|"
     r"지적\s*사항\s*없음|보완\s*사항\s*없음|이상\s*없음)"
@@ -343,6 +345,30 @@ def _parse_rows(html_text: str) -> list[dict[str, str]]:
     return rows
 
 
+def _set_last_health(
+    *,
+    item_count: int,
+    parsed_rows: int,
+    parse_status_counts: dict[str, int],
+    deficiency_counts: dict[str, int],
+    manual_review_count: int,
+    page_warnings: list[str],
+    pages_seen: int,
+    max_pages_reached: bool = False,
+) -> None:
+    global LAST_HEALTH
+    LAST_HEALTH = {
+        "item_count": item_count,
+        "parsed_rows": parsed_rows,
+        "parse_status_counts": dict(parse_status_counts),
+        "deficiency_counts": dict(deficiency_counts),
+        "manual_review_count": manual_review_count,
+        "page_warnings": list(page_warnings),
+        "pages_seen": pages_seen,
+        "max_pages_reached": max_pages_reached,
+    }
+
+
 def _body(raw: dict[str, str], attachment: _AttachmentParse,
           manual_review: bool = False) -> str:
     parts = []
@@ -448,9 +474,21 @@ def collect_mfds_gmp_inspections(
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
     page_no = 1
+    pages_fetched = 0
     total_seen_rows = 0
     parse_status_counts: dict[str, int] = {}
     deficiency_counts: dict[str, int] = {}
+    manual_review_count = 0
+    page_warnings: list[str] = []
+    _set_last_health(
+        item_count=0,
+        parsed_rows=0,
+        parse_status_counts=parse_status_counts,
+        deficiency_counts=deficiency_counts,
+        manual_review_count=0,
+        page_warnings=page_warnings,
+        pages_seen=0,
+    )
 
     while page_no <= MAX_PAGES:
         url = _request_url(page_no)
@@ -465,7 +503,26 @@ def collect_mfds_gmp_inspections(
             msg = f"MFDS GMP inspection HTML page={page_no} 실패: {e}"
             if items:
                 log("WARN", msg)
+                page_warnings.append(msg)
+                _set_last_health(
+                    item_count=len(items),
+                    parsed_rows=total_seen_rows,
+                    parse_status_counts=parse_status_counts,
+                    deficiency_counts=deficiency_counts,
+                    manual_review_count=manual_review_count,
+                    page_warnings=page_warnings,
+                    pages_seen=pages_fetched,
+                )
                 return items, None
+            _set_last_health(
+                item_count=0,
+                parsed_rows=total_seen_rows,
+                parse_status_counts=parse_status_counts,
+                deficiency_counts=deficiency_counts,
+                manual_review_count=manual_review_count,
+                page_warnings=[msg],
+                pages_seen=pages_fetched,
+            )
             return [], msg
 
         rows = _parse_rows(html_text)
@@ -474,9 +531,29 @@ def collect_mfds_gmp_inspections(
             msg = "MFDS GMP inspection HTML 테이블 행 미발견 — 구조 변경 가능성"
             if items or page_no > 1:
                 log("WARN", msg)
+                page_warnings.append(f"page={page_no}: {msg}")
+                _set_last_health(
+                    item_count=len(items),
+                    parsed_rows=total_seen_rows,
+                    parse_status_counts=parse_status_counts,
+                    deficiency_counts=deficiency_counts,
+                    manual_review_count=manual_review_count,
+                    page_warnings=page_warnings,
+                    pages_seen=pages_fetched,
+                )
                 return items, None
+            _set_last_health(
+                item_count=0,
+                parsed_rows=0,
+                parse_status_counts=parse_status_counts,
+                deficiency_counts=deficiency_counts,
+                manual_review_count=manual_review_count,
+                page_warnings=[msg],
+                pages_seen=pages_fetched,
+            )
             return [], msg
 
+        pages_fetched += 1
         page_dates: list[date] = []
         for raw in rows:
             date_iso = _parse_date(raw.get("registered_date", ""))
@@ -496,13 +573,17 @@ def collect_mfds_gmp_inspections(
             deficiency = str(item.raw_payload.get("attachment_deficiency_assessment") or "unknown")
             parse_status_counts[parse_status] = parse_status_counts.get(parse_status, 0) + 1
             deficiency_counts[deficiency] = deficiency_counts.get(deficiency, 0) + 1
+            if item.raw_payload.get("manual_review_required"):
+                manual_review_count += 1
 
         if page_dates and max(page_dates) < start:
             break
         page_no += 1
 
     if page_no > MAX_PAGES:
-        log("WARN", f"MFDS GMP inspection max_pages={MAX_PAGES} 도달 — 이후 항목 누락 가능")
+        msg = f"MFDS GMP inspection max_pages={MAX_PAGES} 도달 — 이후 항목 누락 가능"
+        log("WARN", msg)
+        page_warnings.append(msg)
 
     log(
         "INFO",
@@ -515,4 +596,14 @@ def collect_mfds_gmp_inspections(
             "MFDS GMP inspection attachment parse: "
             f"status={parse_status_counts} deficiency={deficiency_counts}",
         )
+    _set_last_health(
+        item_count=len(items),
+        parsed_rows=total_seen_rows,
+        parse_status_counts=parse_status_counts,
+        deficiency_counts=deficiency_counts,
+        manual_review_count=manual_review_count,
+        page_warnings=page_warnings,
+        pages_seen=pages_fetched,
+        max_pages_reached=page_no > MAX_PAGES,
+    )
     return items, None

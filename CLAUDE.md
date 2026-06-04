@@ -19,6 +19,6 @@
 ## 핵심 위치
 - 수집기 단일 진입점(오케스트레이터): `collect_intake.py` (워크플로우가 호출하는 유일 파일)
 - 식약처 수집기: `collect_mfds*.py` / 공통 헬퍼: `grm_common.py`
-- 자동 실행: `.github/workflows/grm-intake.yml` (매일 20:17 UTC = 익일 05:17 KST 수집, Routine 발행은 매주 월 07:30 KST)
+- 자동 실행: `.github/workflows/grm-intake.yml` (매일 18:17 UTC = 익일 03:17 KST 수집, Routine 발행은 매주 월 07:30 KST)
 - 현행 Routine 프롬프트: `docs/prompts/GRM_Prompt_v15.6.md` (내부 버전 v15.6.3)
 - Notion: `GRM API Intake`(staging) → `🌐 GRM Weekly Brief`(발행)

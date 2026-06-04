@@ -7,7 +7,7 @@
 GRM(Global Regulatory Monitor)에서 **국내 제조/품질 관련 식약처(MFDS) 정보가 (a) 빠짐없이 수집되는지, (b) 명확히 분석·태깅되는지** 전방위 점검하고 개선·보완점을 도출한다. 추가로 **Weekly Brief Routine이 현재 구조를 반영하는지** 점검한다. 이 단계는 **점검·제안**이며 코드 변경은 제안만(구현은 별도 단계).
 
 ## 1. 시스템 컨텍스트 (ground truth — 중복 구축 방지)
-- 흐름: GitHub Actions가 매일 05:17 KST 수집 → Notion "GRM API Intake" DB 적재 → 매주 Claude Weekly Brief가 읽어 QA팀 요약.
+- 흐름: GitHub Actions가 매일 03:17 KST 수집 → Notion "GRM API Intake" DB 적재 → 매주 Claude Weekly Brief가 읽어 QA팀 요약.
 - repo: `MINHOYEOM/grm-api-intake`(main). 핵심 파일: `collect_intake.py`, `collect_search.py`, `collect_mfds.py`(RSS 7보드), `collect_mfds_recall.py`, `collect_mfds_admin_action.py`, `collect_mfds_gmp_inspection.py`, `grm_common.py`, `.github/workflows/grm-intake.yml`, `GRM_session_decisions.md`, `Phase2*_*spec.md`.
 - Notion: DB `7784c71fb7b343749b2bee5d04db7926`, data source `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
 - **현재 라이브(MFDS) — 중복 구축 금지**: ① GMP 지침·안내서·민원인안내서·공무원지침(RSS data0013/0011/0010) ② 입법예고(data0009)·개정법령(data0008)·고시(data0005) ③ 안전성서한(seohan001) ④ 회수·판매중지(data.go.kr 15059114) ⑤ 행정처분(15058457) ⑥ GMP 실사결과 목록+지적사항 본문(nedrug `/pbp/CCBBD03` 스크래핑+PDF/HWPX 추출).

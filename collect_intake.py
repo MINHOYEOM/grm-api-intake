@@ -339,9 +339,12 @@ MODALITY_BIOLOGIC_TERMS = [
     "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
     "blood product", "plasma-derived", "plasma derived", "immunoglobulin",
     "ich q5",
-    # MFDS 한국어 단서
+    # MFDS 한국어 단서 (클래스 + 대표 생물 원료 — 라이브 실데이터로 보강)
     "생물학적제제", "생물의약품", "바이오의약품", "바이오시밀러", "동등생물의약품",
     "세포치료제", "유전자치료제", "백신", "혈장분획제제", "항체", "재조합",
+    "자하거", "태반추출물", "인슐린", "인터페론", "에리트로포이에틴", "에포에틴",
+    "필그라스팀", "면역글로불린", "면역혈청", "톡소이드", "항독소", "보툴리눔",
+    "줄기세포", "단클론",
 ]
 # 의약품(제품) 일반 단서 — 제형/투여경로 등으로 '약'임을 식별(화학·생물 공통 1차 신호)
 MODALITY_DRUG_PRODUCT_TERMS = [
@@ -355,6 +358,18 @@ MODALITY_DRUG_PRODUCT_TERMS = [
     "정제", "캡슐", "주사제", "주사", "시럽", "내용액제", "현탁액",
     "점안액", "연고", "크림", "흡입제", "완제의약품", "원료의약품",
 ]
+
+# MFDS 제품명 제형 단서 — 한국 의약품 명명규칙(XX정/XX주/XX캡슐 등).
+# ⚠️ 제품명 필드(PRDUCT/ITEM_NAME 등)에만 적용한다. haystack 전체에 적용하면
+#    '개정·규정·지정·결정·공정·행정처분' 같은 일반어가 정제로 오탐된다.
+MODALITY_PRODUCT_NAME_KEYS = ("PRDUCT", "ITEM_NAME", "product_description")
+MODALITY_KOREAN_FORM_TERMS = [
+    "캡슐", "시럽", "과립", "산제", "액제", "내용액", "점안", "점이", "점비",
+    "연고", "크림", "겔", "좌제", "수액", "식염수", "주사제", "주사액",
+    "흡입제", "분무", "에어로졸", "패치", "트로키", "환제", "현탁",
+]
+# 제품명 끝의 '정'(정제)/'주'(주사제) 접미사. 뒤에 한글이 오면(안정성·행정 등) 제외.
+_KOREAN_FORM_SUFFIX_RE = re.compile(r"[가-힣A-Za-z0-9][정주](?![가-힣])")
 
 FR_PER_PAGE = 100  # API 최대치
 OPENFDA_LIMIT = 100  # no-key 한도, key 있어도 안전치
@@ -1043,6 +1058,20 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     haystack_dp = haystack.replace("정제수", "")
     if _phrase_any(haystack_dp, MODALITY_DRUG_PRODUCT_TERMS):
         return MODALITY_CHEMICAL
+    #  (d) MFDS 한국어 제품명 제형 단서 — 제품명 필드에만 적용(개정/규정 등 일반어 오탐 방지).
+    #      한국 의약품은 XX정(정제)/XX주(주사제)/XX캡슐 처럼 본문에 '정제'라는 단어 없이
+    #      제품명 접미사로만 제형이 드러나는 경우가 많다(라이브 검증에서 ~40% 누락 확인).
+    product_name = ""
+    for k in MODALITY_PRODUCT_NAME_KEYS:
+        v = raw_payload.get(k)
+        if v:
+            product_name = str(v)
+            break
+    if product_name:
+        pn = product_name.replace("정제수", "")
+        if (_phrase_any(pn, MODALITY_KOREAN_FORM_TERMS)
+                or _KOREAN_FORM_SUFFIX_RE.search(pn)):
+            return MODALITY_CHEMICAL
 
     # 3순위: 기타·판별 곤란(제품군 단서 없음)
     return MODALITY_OTHER

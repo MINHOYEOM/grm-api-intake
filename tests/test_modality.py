@@ -262,6 +262,55 @@ class TestModalityRelevanceNotDropped(unittest.TestCase):
         self.assertIn(tier, ("Tier 2", "Tier 3"))
 
 
+class TestKoreanMfdsModality(unittest.TestCase):
+    """MFDS 한국어 제품명 제형 분류 (라이브 검증에서 발견한 실데이터 회귀).
+
+    한국 의약품 명명규칙: 정제=XX정, 주사제=XX주, 캡슐=XX캡슐. 본문에 '정제'라는
+    단어 없이 제품명 접미사로만 제형이 드러난다. 단, 접미사 매칭은 제품명 필드에만
+    적용해 '개정/규정/행정처분' 같은 일반어 오탐을 막아야 한다.
+    """
+
+    def test_korean_tablet_suffix_chemical(self):
+        for name in ["리치정", "노텍정", "마그스타에프정", "트라마펜세미정",
+                     "노바스크정5밀리그램"]:
+            self.assertEqual(
+                ci.compute_modality({"PRDUCT": name}, f"[회수·판매중지] {name}"),
+                ci.MODALITY_CHEMICAL, msg=name)
+
+    def test_korean_injection_suffix_chemical(self):
+        for name in ["예나스테론주", "멀티플렉스페리주"]:
+            self.assertEqual(
+                ci.compute_modality({"PRDUCT": name}, f"[회수·판매중지] {name}"),
+                ci.MODALITY_CHEMICAL, msg=name)
+
+    def test_korean_admin_item_name_field(self):
+        self.assertEqual(
+            ci.compute_modality({"ITEM_NAME": "하이펜에스정"}, "[행정처분] 하이펜에스정"),
+            ci.MODALITY_CHEMICAL)
+
+    def test_korean_biologic_ingredient_text_wins(self):
+        # 생물 원료가 텍스트에 있으면 주 접미사보다 우선 → Biologic
+        self.assertEqual(
+            ci.compute_modality({"PRDUCT": "자닥신주"}, "자닥신주 자하거추출물 회수"),
+            ci.MODALITY_BIOLOGIC)
+        self.assertEqual(
+            ci.compute_modality({"PRDUCT": "휴마로그주"}, "인슐린 제제 회수"),
+            ci.MODALITY_BIOLOGIC)
+
+    def test_korean_herbal_dental_other(self):
+        # 한약·생약·치약은 제형 접미사 없음 → Other (의약품 누수 없어야)
+        for name in ["갈근탕", "쌍화탕", "죽염치약"]:
+            self.assertEqual(
+                ci.compute_modality({"PRDUCT": name}, f"[회수] {name}"),
+                ci.MODALITY_OTHER, msg=name)
+
+    def test_suffix_not_applied_to_general_text(self):
+        # 제품명 필드가 없는 일반 규제 문서의 '개정/규정/행정처분'은 정제로 오탐 금지 → Other
+        for txt in ["OO에 관한 규정 일부개정고시 행정예고",
+                    "[행정처분] 업무정지 3개월", "제조방법 변경 결정 공정 개선"]:
+            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_OTHER, msg=txt)
+
+
 class TestVetHardExclude(unittest.TestCase):
     """수의/동물용은 boost 키워드가 있어도 hard exclude → Unrelated (구제 없음)."""
 

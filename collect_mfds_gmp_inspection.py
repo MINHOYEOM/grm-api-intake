@@ -59,14 +59,21 @@ _DEFICIENCY_PRESENT_RE = re.compile(
 
 # 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
+# 한국어 단서는 substring, 영문 브랜드는 단어 경계(\b) 매칭 — "linde"가
+# "Lindenberg Pharma" 같은 무관 업체명에 오탐하는 것을 방지.
+# 단독 "수소"/"밀성산업"/"대성산업"은 제거: "가스"·전체 상호("한국수소" 등)로 충분하며
+# 부분 일치 시 무관 제약사 오탐 위험이 더 크다.
 _MEDICAL_GAS_COMPANY_TERMS = [
-    "가스", "산업가스", "고압가스",
-    "에어퍼스트", "air first",
-    "밀성산업", "한국수소", "수소",
-    "린데", "linde",
-    "대성산업", "에어프로덕츠", "air products",
-    "프렉스에어", "praxair",
+    "가스",  # 산업가스·고압가스 등 포함
+    "에어퍼스트",
+    "한국수소",
+    "린데코리아",
+    "에어프로덕츠",
+    "프렉스에어",
 ]
+_MEDICAL_GAS_COMPANY_WORD_RE = re.compile(
+    r"\b(?:linde|praxair|air\s+first|air\s+products|air\s+liquide)\b"
+)
 _MEDICAL_GAS_CONTEXT_TERMS = [
     "의료용 고압가스", "의료용가스", "의료용 가스",
     "고압가스", "액화산소", "액화질소",
@@ -185,7 +192,10 @@ def _clean_cell_text(raw: str) -> str:
 
 def _is_medical_gas_gmp_noise(raw: dict[str, str]) -> bool:
     manufacturer = _clean_cell_text(raw.get("manufacturer", "")).lower()
-    if manufacturer and any(term in manufacturer for term in _MEDICAL_GAS_COMPANY_TERMS):
+    if manufacturer and (
+        any(term in manufacturer for term in _MEDICAL_GAS_COMPANY_TERMS)
+        or _MEDICAL_GAS_COMPANY_WORD_RE.search(manufacturer)
+    ):
         return True
 
     context = " ".join(

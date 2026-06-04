@@ -70,6 +70,10 @@ on:
         description: 'Web Scrape 수집 활성화 (기본: vars.ENABLE_SCRAPE 또는 false)'
         type: boolean
         default: false
+      enable_modality_tag:
+        description: '제품군(Modality) 태그 기록 — Notion에 Modality 속성 생성 후 켤 것 (기본: vars.ENABLE_MODALITY_TAG 또는 false)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -137,6 +141,9 @@ jobs:
           ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_hc) || vars.ENABLE_HC || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
+          # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
+          # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
+          ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()
@@ -259,7 +266,7 @@ jobs:
                 '2. Notion DB 스키마 (속성 이름·타입)',
                 '3. Federal Register / OpenFDA / RSS / FDA WL / MFDS / ICH / WHO / Health Canada 상태',
                 '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY)',
-                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_INSPECTION, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_MOLEG_API, ENABLE_SCRAPE) 설정 확인',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_INSPECTION, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_MODALITY_TAG) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',

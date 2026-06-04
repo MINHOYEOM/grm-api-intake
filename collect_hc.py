@@ -145,7 +145,12 @@ def _to_item(rec: dict[str, Any], start: date, end: date) -> IntakeItem | None:
         osd_relevance=_osd_relevance(product),
         source_type=SRC_TYPE_OFFICIAL_API,
         signal_tier=tier,
-        raw_payload={"api": "HC RSAM OpenData", "nid": nid, **rec},
+        # product_type/product_description 를 정규화해 compute_modality(제품군 분류)가
+        # HC drug recall 을 인식하도록 한다(Category=Drugs → Chemical, 제품명 생물단서 → Biologic).
+        raw_payload={
+            "api": "HC RSAM OpenData", "nid": nid, **rec,
+            "product_type": category, "product_description": product,
+        },
         language=LANGUAGE_EN,
         region_jurisdiction=REGION_HC,
     )

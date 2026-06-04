@@ -194,6 +194,14 @@ QA_CATEGORY_KEYWORDS = [
     "particulate matter", "particulate contamination",
     "subpotent", "superpotent", "mislabeling", "mislabelled",
     "endotoxin",
+    # 제품군 확장 — 무균·주사 품질사유 및 생물의약품(클래스 단위, 특정 제품 아님)
+    "sterility", "sterility failure", "aseptic", "aseptic processing",
+    "media fill", "container closure integrity", "ccit", "container closure",
+    "lyophilization", "lyophilized", "visible particulate", "glass delamination",
+    "cold chain", "temperature excursion", "bioburden", "pyrogen",
+    "biosimilar", "monoclonal antibody", "comparability", "ich q5",
+    "immunogenicity", "viral safety", "viral clearance", "cell bank",
+    "parenteral",
     # Nitrosamine 계열 (FDA hot topic)
     "nitrosamine", "ndma", "ndea", "n-nitroso",
     # 주요 generic 제조사 (경쟁사 학습 가치)
@@ -209,6 +217,10 @@ QA_LIKELY_BOOST = [
     # Recall 고신호 failure mode (v15.1 추가)
     "dissolution failure", "failed dissolution",
     "nitrosamine impurity", "ndma impurity",
+    # 무균·주사·바이오 직접 연관 (제품군 확장)
+    "injectable", "injection", "sterile", "aseptic",
+    "biosimilar", "monoclonal antibody", "container closure integrity",
+    "media fill", "non-sterility", "lack of sterility assurance",
 ]
 
 # 명시 제외 (medical device · 화장품 · 식품 · 백신 단독 등)
@@ -223,7 +235,18 @@ QA_EXCLUDE_KEYWORDS = [
     "human foods program", "preventive controls for food",
     "risk-based preventive controls for food", "hazard analysis/risk-based",
     "hazard analysis/risk based",
-    "veterinary only", "animal drug only",
+    "veterinary only", "animal drug only", "animal drug",
+    "veterinary drug", "veterinary medicine", "animal health product",
+    "medicated feed",
+]
+
+# 강한 제외(hard exclude) — boost 키워드 구제 없이 무조건 Unrelated.
+# 수의/동물용은 인체 의약품과 GMP 가 겹치는 정당한 dual 사례가 없으므로 hard 로 둔다.
+# (식품/의료기기-복합제/화장품-OTC 는 dual 가능성이 있어 기존 soft 구제 유지)
+QA_HARD_EXCLUDE_TERMS = [
+    "veterinary only", "animal drug only", "animal drug",
+    "veterinary drug", "veterinary medicine", "veterinary product",
+    "animal health product", "medicated feed",
 ]
 
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
@@ -257,12 +280,26 @@ SIGNAL_TIER3_KEYWORDS = [
     "warning letter", "consent decree", "import alert",
     "annex 1", "ich q12", "ich q13",
     "nitrosamine", "ndma", "ndea", "n-nitroso",
+    # 무균·바이오 고신호 (제품군 확장)
+    "sterility failure", "non-sterility", "lack of sterility assurance",
+    "viral contamination",
 ]
 SIGNAL_TIER2_KEYWORDS = [
     "gmp", "manufacturing practice", "data integrity", "alcoa",
     "process validation", "cleaning validation", "dissolution",
     "out of specification", "oos", "stability", "capa", "deviation",
     "sterile", "aseptic", "supplier qualification", "recall", "class ii",
+    # 무균·바이오 GMP/품질 신호 (제품군 확장)
+    "media fill", "container closure integrity", "ccit", "biosimilar",
+    "comparability", "immunogenicity", "lyophilized", "bioburden",
+    "cold chain", "visible particulate",
+]
+
+# 무균·바이오 '치명적' 단일 신호 — 1개만 출현해도 Tier 3 floor 적용 (제품군 확장)
+# (SIGNAL_TIER3_KEYWORDS 는 2개 매칭을 요구하므로, 단독 출현 시 누락되는 문제 보완)
+STERILE_BIO_TIER3_FLOOR = [
+    "sterility failure", "non-sterility", "lack of sterility assurance",
+    "viral contamination", "media fill failure",
 ]
 
 # OSD (경구 고형제) Relevance 분류 기준 (v15.1 추가)
@@ -273,6 +310,66 @@ OSD_FORMS = {
     "delayed-release tablet", "chewable tablet", "orally disintegrating tablet",
     "powder for oral solution", "oral solution", "oral suspension",
 }
+
+# ── 제품군(Modality) 분류 (제품군 확장) ───────────────────────────────────────
+# 원료(active) 성격을 기준으로 한 '큰 틀' 제품군 태그. 특정 제품이 아닌 클래스 단위.
+#   Chemical  = 화학합성(케미컬)의약품   Biologic = 생물의약품   Other = 기타·판별 곤란
+# OSD Relevance(경구 고형제 전용)를 제품군 단위로 일반화한 것. 발행 섹션 그룹핑에 사용.
+# Notion 의 'Modality' select 속성에 기록(ENABLE_MODALITY_TAG=true 일 때).
+PROP_MODALITY = "Modality"
+MODALITY_CHEMICAL = "Chemical"   # 화학합성(케미컬)의약품 — 제형 무관
+MODALITY_BIOLOGIC = "Biologic"   # 생물의약품(생물학적제제) — 제형 무관
+MODALITY_OTHER = "Other"         # 기타·판별 곤란(제품군 단서 없음: 일반 가이드라인·정책 등)
+MODALITY_OPTIONS = (MODALITY_CHEMICAL, MODALITY_BIOLOGIC, MODALITY_OTHER)
+
+# 수의/동물용 텍스트 단서 — 인체 의약품 범위 밖 → 분류 전에 하드 제외(Other).
+# 구조화 product_type 가 없는 소스(FR/RSS/Search/MFDS 등) 대비. 'animal-derived' 같은
+# 인체 바이오 표현을 오제외하지 않도록 '명시적 구(phrase)'만 둔다(bare 'animal' 금지).
+MODALITY_VET_EXCLUDE_TERMS = [
+    "veterinary drug", "veterinary medicine", "veterinary product",
+    "animal drug", "animal health product", "animal-only",
+    "medicated feed", "동물용의약품", "동물용 의약품", "동물약품",
+]
+
+# 생물의약품(생물학적제제) 판별 지표 — 특정 제품이 아닌 '클래스' 단위 신호
+# 영문 + MFDS 한국어 단서(MFDS row 는 Language=KO 한글 원문)
+MODALITY_BIOLOGIC_TERMS = [
+    "biologic", "biological product", "biosimilar", "biotherapeutic",
+    "monoclonal", "antibody", "recombinant", "fusion protein",
+    "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
+    "blood product", "plasma-derived", "plasma derived", "immunoglobulin",
+    "ich q5",
+    # MFDS 한국어 단서 (클래스 + 대표 생물 원료 — 라이브 실데이터로 보강)
+    "생물학적제제", "생물의약품", "바이오의약품", "바이오시밀러", "동등생물의약품",
+    "세포치료제", "유전자치료제", "백신", "혈장분획제제", "항체", "재조합",
+    "자하거", "태반추출물", "인슐린", "인터페론", "에리트로포이에틴", "에포에틴",
+    "필그라스팀", "면역글로불린", "면역혈청", "톡소이드", "항독소", "보툴리눔",
+    "줄기세포", "단클론",
+]
+# 의약품(제품) 일반 단서 — 제형/투여경로 등으로 '약'임을 식별(화학·생물 공통 1차 신호)
+MODALITY_DRUG_PRODUCT_TERMS = [
+    "tablet", "capsule", "oral solid", "solid dosage",
+    "oral solution", "oral suspension", "syrup", "oral liquid",
+    "injection", "injectable", "for injection", "parenteral", "infusion",
+    "vial", "ampoule", "prefilled syringe", "inhalation", "topical",
+    "ophthalmic", "cream", "ointment", "suppository",
+    "drug product", "finished pharmaceutical", "dosage form",
+    # MFDS 한국어 단서
+    "정제", "캡슐", "주사제", "주사", "시럽", "내용액제", "현탁액",
+    "점안액", "연고", "크림", "흡입제", "완제의약품", "원료의약품",
+]
+
+# MFDS 제품명 제형 단서 — 한국 의약품 명명규칙(XX정/XX주/XX캡슐 등).
+# ⚠️ 제품명 필드(PRDUCT/ITEM_NAME 등)에만 적용한다. haystack 전체에 적용하면
+#    '개정·규정·지정·결정·공정·행정처분' 같은 일반어가 정제로 오탐된다.
+MODALITY_PRODUCT_NAME_KEYS = ("PRDUCT", "ITEM_NAME", "product_description")
+MODALITY_KOREAN_FORM_TERMS = [
+    "캡슐", "시럽", "과립", "산제", "액제", "내용액", "점안", "점이", "점비",
+    "연고", "크림", "겔", "좌제", "수액", "식염수", "주사제", "주사액",
+    "흡입제", "분무", "에어로졸", "패치", "트로키", "환제", "현탁",
+]
+# 제품명 끝의 '정'(정제)/'주'(주사제) 접미사. 뒤에 한글이 오면(안정성·행정 등) 제외.
+_KOREAN_FORM_SUFFIX_RE = re.compile(r"[가-힣A-Za-z0-9][정주](?![가-힣])")
 
 FR_PER_PAGE = 100  # API 최대치
 OPENFDA_LIMIT = 100  # no-key 한도, key 있어도 안전치
@@ -814,6 +911,9 @@ def compute_relevance(*text_parts: str) -> str:
     blob = " ".join(t for t in text_parts if t).lower()
     if not blob.strip():
         return "Pending"
+    # 수의/동물용 등 hard exclude 는 boost 구제 없이 무조건 Unrelated
+    if _kw_any(blob, QA_HARD_EXCLUDE_TERMS):
+        return "Unrelated"
     if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
         # 명시 제외 키워드가 있어도 Likely 가산 키워드 2개 이상이면 Possible 로 구제
         strong = _kw_match(blob, QA_LIKELY_BOOST)
@@ -895,6 +995,89 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 제품군(Modality) 분류 (제품군 확장)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
+    """수집 항목의 제품군(Modality)을 '큰 틀'(원료 성격)로 1차 자동 분류한다.
+
+    특정 제품(예: 성장호르몬·항암주사)이 아니라 클래스 단위로만 본다.
+    OpenFDA 의 구조화 필드(product_type/dosage_form/route)가 있으면 우선 사용하고,
+    없으면 제목·본문·분류 텍스트의 키워드로 판정한다.
+
+    반환값:
+        "Biologic" — 생물의약품(생물학적제제): 재조합 단백질·항체·백신·세포/유전자
+                     치료제·바이오시밀러·혈장분획제제 등 (제형 무관)
+        "Chemical" — 화학합성(케미컬)의약품: 생물 단서 없이 의약품(제형/투여경로)
+                     단서가 있는 합성 저분자 의약품 (제형 무관)
+        "Other"    — 제품군 단서 없음(일반 가이드라인·정책·실태조사 일반 등)
+
+    설계 의도:
+        제형을 잘게 나누면 오분류가 늘어나므로 원료 성격 3분류로만 단순화한다.
+        생물 단서가 우선(생물의약품은 그 자체로 하나의 군), 그 외 의약품 단서는
+        화학합성으로 본다. 세부 제형(정제/주사/액상)은 카드 본문 route/form 으로 표기.
+    """
+    openfda = raw_payload.get("openfda") or {}
+    # product_type 은 openfda.product_type 우선, 없으면 top-level product_type 폴백
+    # (HC 등 openfda 구조가 없는 소스 대응)
+    product_type = _as_lower_set(openfda.get("product_type") or raw_payload.get("product_type"))
+    forms = _as_lower_set(openfda.get("dosage_form") or raw_payload.get("dosage_form"))
+    routes = _as_lower_set(openfda.get("route") or raw_payload.get("route"))
+    product = (raw_payload.get("product_description") or "").lower()
+    blob = " ".join(t for t in text_parts if t).lower()
+    haystack = " ".join(
+        [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
+    )
+
+    # 수의/동물용은 인체 의약품 범위 밖 → 모든 분류 이전에 하드 제외(Other).
+    #  (a) 구조화 product_type 기준  (b) 명시적 텍스트 구(phrase) 기준 — 둘 다 early-return.
+    if any(("veterin" in pt or "animal" in pt) for pt in product_type):
+        return MODALITY_OTHER
+    if _phrase_any(haystack, MODALITY_VET_EXCLUDE_TERMS):
+        return MODALITY_OTHER
+
+    # 1순위: 생물의약품(생물학적제제)
+    if any("biolog" in pt for pt in product_type):
+        return MODALITY_BIOLOGIC
+    if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
+        return MODALITY_BIOLOGIC
+    # 단클론항체 INN 접미사 '-mab'(adalimumab·rituximab 등)만 단어 끝에서 매칭.
+    # (bare "mab" 부분문자열은 'Mabel' 류 오탐을 내므로 접미사 정규식으로 한정)
+    if re.search(r"\b[a-z]{3,}mab\b", haystack):
+        return MODALITY_BIOLOGIC
+
+    # 2순위: 화학합성의약품
+    #  (a) product_type 이 'drug' 계열(예: Drugs / Human prescription drug)
+    if any("drug" in pt for pt in product_type):
+        return MODALITY_CHEMICAL
+    #  (b) 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
+    if forms or routes:
+        return MODALITY_CHEMICAL
+    #  (c) 텍스트 제형 단서 — 단, '정제수'(purified water) 는 '정제'(tablet) 오탐이므로 제거
+    haystack_dp = haystack.replace("정제수", "")
+    if _phrase_any(haystack_dp, MODALITY_DRUG_PRODUCT_TERMS):
+        return MODALITY_CHEMICAL
+    #  (d) MFDS 한국어 제품명 제형 단서 — 제품명 필드에만 적용(개정/규정 등 일반어 오탐 방지).
+    #      한국 의약품은 XX정(정제)/XX주(주사제)/XX캡슐 처럼 본문에 '정제'라는 단어 없이
+    #      제품명 접미사로만 제형이 드러나는 경우가 많다(라이브 검증에서 ~40% 누락 확인).
+    product_name = ""
+    for k in MODALITY_PRODUCT_NAME_KEYS:
+        v = raw_payload.get(k)
+        if v:
+            product_name = str(v)
+            break
+    if product_name:
+        pn = product_name.replace("정제수", "")
+        if (_phrase_any(pn, MODALITY_KOREAN_FORM_TERMS)
+                or _KOREAN_FORM_SUFFIX_RE.search(pn)):
+            return MODALITY_CHEMICAL
+
+    # 3순위: 기타·판별 곤란(제품군 단서 없음)
+    return MODALITY_OTHER
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Signal Tier 자동 분류 (v15.x Phase 1)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -932,8 +1115,16 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
         return "Tier 3"
     if is_class_i:
         return "Tier 3"
+    # 제외 도메인(QA Unrelated: 의료기기·식품·화장품·수의 등)은 위 강제 예외(Class I·FDA WL cGMP)
+    # 외에는 키워드로 Tier 2/3 승격하지 않고 Tier 1 로 고정(handoff·통계 노이즈 방지).
+    if qa_relevance == "Unrelated":
+        return "Tier 1"
     if osd_relevance == "Direct" and _kw_any(
             blob, ["dissolution", "nitrosamine", "subpotent"]):
+        return "Tier 3"
+    # 무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor)
+    # 단, QA 관련성이 Unrelated(의료기기·식품 등 제외 도메인)인 항목은 승격하지 않는다.
+    if qa_relevance != "Unrelated" and _kw_any(blob, STERILE_BIO_TIER3_FLOOR):
         return "Tier 3"
     if t3_matches >= 2:
         return "Tier 3"
@@ -1707,6 +1898,42 @@ def notion_api_request(method: str, url: str, token: str, *,
     raise NotionHandoffError(f"Notion API {method} {url} 실패: {last_err}")
 
 
+def notion_verify_modality_property(token: str, db_id: str) -> bool:
+    """ENABLE_MODALITY_TAG=true 활성화 시 Notion 'Modality' 속성 사전 점검(preflight).
+
+    DB 에 'Modality' 가 Select 타입으로 존재하는지 확인한다. 없거나 타입이 다르면
+    첫 insert 부터 전부 실패하므로, 그 전에 깨끗하게 False 를 반환해 호출부가
+    'N건 insert 실패' 대신 '스키마 불일치'로 한 번에 알리고 graceful degrade 하도록 한다.
+
+    반환: True = 기록 진행 OK / False = 스키마 불일치(이번 실행 Modality 기록 건너뜀).
+    (Select 옵션 Chemical/Biologic/Other 누락은 insert 시 자동 생성되므로 경고만.)
+    """
+    url = f"https://api.notion.com/v1/databases/{db_id}"
+    try:
+        data = notion_api_request("GET", url, token)
+    except NotionHandoffError as e:
+        log("WARN", f"Modality preflight: DB 조회 실패 — {e}")
+        return False
+    prop = (data.get("properties", {}) or {}).get(PROP_MODALITY)
+    if not prop:
+        log("ERROR", f"Modality preflight 실패: Notion DB 에 '{PROP_MODALITY}' 속성이 없습니다. "
+                     f"Select 속성(옵션 {', '.join(MODALITY_OPTIONS)})을 먼저 생성하세요.")
+        return False
+    ptype = prop.get("type")
+    if ptype != "select":
+        log("ERROR", f"Modality preflight 실패: '{PROP_MODALITY}' 속성 타입이 '{ptype}' — "
+                     f"'select' 여야 합니다.")
+        return False
+    options = {o.get("name") for o in (prop.get("select", {}).get("options") or [])}
+    missing = set(MODALITY_OPTIONS) - options
+    if missing:
+        log("WARN", f"Modality preflight: select 옵션 {sorted(missing)} 미존재 "
+                    f"— insert 시 자동 생성됨(스키마 의도 확인 권장).")
+    else:
+        log("INFO", f"Modality preflight OK — '{PROP_MODALITY}' select 옵션 {sorted(options)}")
+    return True
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                                   window_days: int = 7,
                                   source_names: set[str] | None = None) -> set[str]:
@@ -1882,6 +2109,7 @@ def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
         "raw_excerpt": _prop_rich_text(props, PROP_RAW_EXCERPT),
         "qa_relevance": _prop_select(props, PROP_QA_RELEVANCE),
         "osd_relevance": _prop_select(props, PROP_OSD_RELEVANCE),
+        "modality": _prop_select(props, PROP_MODALITY),
         "source_type": _prop_select(props, PROP_SOURCE_TYPE),
         "signal_tier": _prop_select(props, PROP_SIGNAL_TIER),
         "evidence_candidate": _prop_select(props, PROP_EVIDENCE_CANDIDATE),
@@ -2183,6 +2411,16 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         PROP_SIGNAL_TIER: _select(item.signal_tier),
         PROP_STATUS: _select("New"),
     }
+
+    # ── 제품군(Modality) 태그 (제품군 확장) ─────────────────────────────────────
+    # ENABLE_MODALITY_TAG=true 이고 Notion 에 'Modality' select 속성이 있을 때만 기록.
+    # (기본 false — 속성 미생성 상태로 운영에 머지돼도 insert 가 깨지지 않도록 안전 게이트)
+    if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":
+        modality = compute_modality(
+            item.raw_payload, item.headline, item.body,
+            item.type_or_class, item.firm,
+        )
+        props[PROP_MODALITY] = _select(modality)
 
     if item.date_iso:
         d = _date_iso(item.date_iso)
@@ -2553,8 +2791,18 @@ def _evaluate_health(
     handoff_emitted: bool,
     handoff_failed: bool,
     handoff_error_msg: str,
+    modality_preflight_disabled: bool = False,
 ) -> HealthCheckResult:
     health = HealthCheckResult()
+
+    if modality_preflight_disabled:
+        health.add_warning(
+            "modality-preflight-degraded",
+            "Notion",
+            "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치로 태그 기록 자동 비활성화",
+            "Notion Intake DB 에 'Modality'(Select: Chemical/Biologic/Other) 속성을 생성하세요. "
+            "수집은 정상 진행됨.",
+        )
 
     if stats.has_insert_failures():
         health.add_failure(
@@ -2844,6 +3092,27 @@ def main() -> int:
         if not notion_token or not notion_db:
             log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
             return 2
+
+    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
+    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
+    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
+    modality_requested = os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true"
+    modality_preflight_disabled = False
+    modality_preflight_skipped = False
+    if modality_requested and notion_token and notion_db:
+        if not notion_verify_modality_property(notion_token, notion_db):
+            modality_preflight_disabled = True
+            os.environ["ENABLE_MODALITY_TAG"] = "false"
+            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
+                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
+    elif modality_requested:
+        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
+        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
+        modality_preflight_skipped = True
+        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
+                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
+    modality_effective = (modality_requested and not modality_preflight_disabled
+                          and not modality_preflight_skipped)
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)
@@ -3298,8 +3567,12 @@ def main() -> int:
         "ENABLE_HC": enable_hc,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
+        "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
+        "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
+        "ENABLE_MODALITY_TAG_PREFLIGHT_SKIPPED": modality_preflight_skipped,
     }
     health = _evaluate_health(
+        modality_preflight_disabled=modality_preflight_disabled,
         stats=stats,
         active=active,
         enable_search=enable_search,

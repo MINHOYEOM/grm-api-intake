@@ -240,6 +240,15 @@ QA_EXCLUDE_KEYWORDS = [
     "medicated feed",
 ]
 
+# 강한 제외(hard exclude) — boost 키워드 구제 없이 무조건 Unrelated.
+# 수의/동물용은 인체 의약품과 GMP 가 겹치는 정당한 dual 사례가 없으므로 hard 로 둔다.
+# (식품/의료기기-복합제/화장품-OTC 는 dual 가능성이 있어 기존 soft 구제 유지)
+QA_HARD_EXCLUDE_TERMS = [
+    "veterinary only", "animal drug only", "animal drug",
+    "veterinary drug", "veterinary medicine", "veterinary product",
+    "animal health product", "medicated feed",
+]
+
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
 # GRM의 1차 사용자는 경구 고형제 중심 제약 QA이므로, 명시적 식품/보충제 도메인은
 # Intake 단계에서 제외한다. 단, CDER/OPQ/finished pharmaceutical 등 human drug 단서가
@@ -887,6 +896,9 @@ def compute_relevance(*text_parts: str) -> str:
     blob = " ".join(t for t in text_parts if t).lower()
     if not blob.strip():
         return "Pending"
+    # 수의/동물용 등 hard exclude 는 boost 구제 없이 무조건 Unrelated
+    if _kw_any(blob, QA_HARD_EXCLUDE_TERMS):
+        return "Unrelated"
     if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
         # 명시 제외 키워드가 있어도 Likely 가산 키워드 2개 이상이면 Possible 로 구제
         strong = _kw_match(blob, QA_LIKELY_BOOST)
@@ -2750,8 +2762,18 @@ def _evaluate_health(
     handoff_emitted: bool,
     handoff_failed: bool,
     handoff_error_msg: str,
+    modality_preflight_disabled: bool = False,
 ) -> HealthCheckResult:
     health = HealthCheckResult()
+
+    if modality_preflight_disabled:
+        health.add_warning(
+            "modality-preflight-degraded",
+            "Notion",
+            "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치로 태그 기록 자동 비활성화",
+            "Notion Intake DB 에 'Modality'(Select: Chemical/Biologic/Other) 속성을 생성하세요. "
+            "수집은 정상 진행됨.",
+        )
 
     if stats.has_insert_failures():
         health.add_failure(
@@ -3041,13 +3063,23 @@ def main() -> int:
         if not notion_token or not notion_db:
             log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
             return 2
-        # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면
-        # 이번 실행은 Modality 기록만 끄고 수집은 계속(graceful degrade).
-        if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":
-            if not notion_verify_modality_property(notion_token, notion_db):
-                log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
-                            "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
-                os.environ["ENABLE_MODALITY_TAG"] = "false"
+
+    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
+    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
+    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
+    modality_requested = os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true"
+    modality_preflight_disabled = False
+    if modality_requested and notion_token and notion_db:
+        if not notion_verify_modality_property(notion_token, notion_db):
+            modality_preflight_disabled = True
+            os.environ["ENABLE_MODALITY_TAG"] = "false"
+            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
+                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
+    elif modality_requested:
+        # 토큰/DB 없이 요청만 된 경우(예: dry-run 자격증명 미설정)
+        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
+                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작.")
+    modality_effective = modality_requested and not modality_preflight_disabled
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)
@@ -3502,8 +3534,11 @@ def main() -> int:
         "ENABLE_HC": enable_hc,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
+        "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
+        "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
     }
     health = _evaluate_health(
+        modality_preflight_disabled=modality_preflight_disabled,
         stats=stats,
         active=active,
         enable_search=enable_search,

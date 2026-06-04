@@ -141,7 +141,8 @@ jobs:
           ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_hc) || vars.ENABLE_HC || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
-          # 제품군 확장: Notion 'Modality' 속성 생성 전까지 false 유지 (켜면 insert 실패)
+          # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
+          # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

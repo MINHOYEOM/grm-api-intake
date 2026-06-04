@@ -262,6 +262,28 @@ class TestModalityRelevanceNotDropped(unittest.TestCase):
         self.assertIn(tier, ("Tier 2", "Tier 3"))
 
 
+class TestVetHardExclude(unittest.TestCase):
+    """수의/동물용은 boost 키워드가 있어도 hard exclude → Unrelated (구제 없음)."""
+
+    def test_vet_with_two_boosts_still_unrelated(self):
+        # 'tablet'+'sterile' 2 boost 가 있어도 'animal drug' 면 Unrelated 고정
+        rel = ci.compute_relevance("animal drug oral tablet recall sterile")
+        self.assertEqual(rel, "Unrelated")
+
+    def test_vet_then_tier1(self):
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_RECALL, "Class II",
+            ci.compute_relevance("animal drug oral tablet recall sterile"),
+            "N/A", "animal drug oral tablet recall sterile",
+        )
+        self.assertEqual(tier, "Tier 1")
+
+    def test_food_dual_still_rescuable(self):
+        # 식품은 hard 가 아니므로 강한 boost 2개면 Possible 로 구제 유지(기존 동작 보존)
+        rel = ci.compute_relevance("food safety and cgmp tablet dissolution data integrity")
+        self.assertEqual(rel, "Possible")
+
+
 class TestModalityPreflight(unittest.TestCase):
     """Notion 'Modality' 스키마 preflight — 네트워크 없이 notion_api_request 를 대체."""
 

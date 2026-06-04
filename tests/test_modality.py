@@ -32,6 +32,20 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_BIOLOGIC,
         )
 
+    def test_biologic_mab_inn_suffix(self):
+        # 단클론항체 INN 접미사 -mab (adalimumab 등)
+        self.assertEqual(
+            ci.compute_modality({}, "adalimumab injection lot recall"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_mab_substring_no_false_positive(self):
+        # 'Mabel' 같은 단어의 'mab' 부분문자열로 오탐하지 않아야 함 (정제는 화학합성)
+        self.assertEqual(
+            ci.compute_modality({}, "Mabel Labs tablet recall"),
+            ci.MODALITY_CHEMICAL,
+        )
+
     def test_biologic_injectable_still_biologic(self):
         # 생물의약품은 주사제여도 'Biologic' (제형이 아닌 원료 성격 우선)
         payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["SUBCUTANEOUS"]}}
@@ -105,6 +119,31 @@ class TestComputeModality(unittest.TestCase):
         payload = {"product_type": ["BIOLOGIC"]}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
 
+    def test_chemical_toplevel_product_type_drugs(self):
+        # OpenFDA enforcement product_type=Drugs (문자열) → 화학합성
+        self.assertEqual(ci.compute_modality({"product_type": "Drugs"}), ci.MODALITY_CHEMICAL)
+
+    def test_chemical_human_prescription_drug(self):
+        payload = {"openfda": {"product_type": ["HUMAN PRESCRIPTION DRUG"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_veterinary_not_chemical(self):
+        # 수의/동물용은 의약품 분류 대상 아님 → Other
+        self.assertEqual(
+            ci.compute_modality({"product_type": "Veterinary Drugs"}),
+            ci.MODALITY_OTHER,
+        )
+
+    # ── Health Canada 정규화(raw_payload product_type/description) ───────
+    def test_hc_drug_recall_chemical(self):
+        # collect_hc 가 product_type=Category, product_description=Product 를 넣음
+        payload = {"product_type": "Drugs", "product_description": "Some Brand 10 mg"}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_hc_biologic_recall(self):
+        payload = {"product_type": "Drugs", "product_description": "Recombinant vaccine lot"}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
+
 
 class TestSterileBioTier3Floor(unittest.TestCase):
     """무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor) 여야 한다."""
@@ -122,6 +161,21 @@ class TestSterileBioTier3Floor(unittest.TestCase):
             "viral contamination of cell culture",
         )
         self.assertEqual(tier, "Tier 3")
+
+    def test_floor_does_not_override_unrelated(self):
+        # 제외 도메인(의료기기·식품 등) = QA Unrelated 이면 floor 로 Tier 3 승격 금지
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_FDA_WL, "Warning Letter", "Unrelated", "N/A",
+            "medical device sterility failure",
+        )
+        self.assertNotEqual(tier, "Tier 3")
+
+    def test_floor_does_not_override_unrelated_food(self):
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_FDA_WL, "Warning Letter", "Unrelated", "N/A",
+            "food safety sterility failure",
+        )
+        self.assertNotEqual(tier, "Tier 3")
 
 
 class TestModalityRelevanceNotDropped(unittest.TestCase):

@@ -849,8 +849,9 @@ Tier 3 — 카드화 (핵심 recall):
       reason_for_recall 에 다음 중 하나 포함:
       dissolution · assay failure · impurity · nitrosamine · particulate ·
       stability · out-of-specification · OOS · sterility · non-sterility ·
-      lack of sterility assurance · container closure · endotoxin · bioburden ·
-      visible particulate · glass delamination · potency · immunogenicity
+      lack of sterility assurance · container closure integrity(CCIT) ·
+      endotoxin · bioburden · visible particulate · glass delamination ·
+      potency · immunogenicity · viral contamination
   기준 미달 의약품 recall → Tier 2 표로 강등.
   비의약품 recall(기기·수의약품 등) → Tier 1 메타만.
 ※ MFDS recall-quality 는 OpenFDA 3-tier 와 별개로 Signal Tier(수집기 부여) + 품질사유로 판단해

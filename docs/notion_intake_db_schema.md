@@ -43,6 +43,7 @@
 | `Evidence Candidate` | Select |  | `A` / `B` / `C` / `D` | 수집기 후보, Routine 최종 판정 |
 | `QA Relevance` | Select |  | `Likely` / `Possible` / `Unrelated` / `Pending` | 수집기 휴리스틱 |
 | `OSD Relevance` | Select |  | `Direct` / `Indirect` / `N/A` | OpenFDA Recall 중심 |
+| `Modality` | Select |  | `Chemical` / `Biologic` / `Other` | **(제품군 확장)** 원료 성격 '큰 틀' 3분류. `compute_modality()` 부여. `ENABLE_MODALITY_TAG=true` 일 때만 기록되므로 **이 속성을 Notion DB 에 먼저 생성**해야 함(미생성 시 insert 실패) |
 | `Source Type` | Select |  | `Official API` / `Official Regulatory Page` / `Official Regulator Blog` / `Expert Secondary` / `Search Result` / `Official Page Scrape` | Phase 2 분류 |
 | `Signal Tier` | Select |  | `Tier 1` / `Tier 2` / `Tier 3` | 수집기 1차 우선순위 |
 | `Language` | Select |  | `KO` / `EN` | Phase 2b MFDS 권고 필드 |

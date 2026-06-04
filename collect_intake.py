@@ -314,7 +314,7 @@ MODALITY_OTHER = "Other"         # 기타·판별 곤란(제품군 단서 없음
 # 영문 + MFDS 한국어 단서(MFDS row 는 Language=KO 한글 원문)
 MODALITY_BIOLOGIC_TERMS = [
     "biologic", "biological product", "biosimilar", "biotherapeutic",
-    "monoclonal", "mab", "antibody", "recombinant", "fusion protein",
+    "monoclonal", "antibody", "recombinant", "fusion protein",
     "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
     "blood product", "plasma-derived", "plasma derived", "immunoglobulin",
     "ich q5",
@@ -991,13 +991,24 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
         [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
     )
 
+    # 수의/동물용은 의약품 분류 대상에서 제외(QA_EXCLUDE 와 일관) → Other
+    is_vet = any(("veterin" in pt or "animal" in pt) for pt in product_type)
+
     # 1순위: 생물의약품(생물학적제제)
-    if any("biolog" in pt for pt in product_type):
+    if not is_vet and any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
         return MODALITY_BIOLOGIC
+    # 단클론항체 INN 접미사 '-mab'(adalimumab·rituximab 등)만 단어 끝에서 매칭.
+    # (bare "mab" 부분문자열은 'Mabel' 류 오탐을 내므로 접미사 정규식으로 한정)
+    if re.search(r"\b[a-z]{3,}mab\b", haystack):
+        return MODALITY_BIOLOGIC
 
-    # 2순위: 화학합성의약품 — 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
+    # 2순위: 화학합성의약품
+    #  (a) product_type 이 'drug' 계열(예: Drugs / Human prescription drug) — 수의용 제외
+    if not is_vet and any("drug" in pt for pt in product_type):
+        return MODALITY_CHEMICAL
+    #  (b) 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
     if forms or routes:
         return MODALITY_CHEMICAL
     if _phrase_any(haystack, MODALITY_DRUG_PRODUCT_TERMS):
@@ -1049,7 +1060,8 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
             blob, ["dissolution", "nitrosamine", "subpotent"]):
         return "Tier 3"
     # 무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor)
-    if _kw_any(blob, STERILE_BIO_TIER3_FLOOR):
+    # 단, QA 관련성이 Unrelated(의료기기·식품 등 제외 도메인)인 항목은 승격하지 않는다.
+    if qa_relevance != "Unrelated" and _kw_any(blob, STERILE_BIO_TIER3_FLOOR):
         return "Tier 3"
     if t3_matches >= 2:
         return "Tier 3"

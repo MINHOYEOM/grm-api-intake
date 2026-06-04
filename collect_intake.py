@@ -218,9 +218,35 @@ QA_EXCLUDE_KEYWORDS = [
     "medical device", "device only",
     "cosmetic", "cosmetics",
     "food safety", "dietary supplement label",
+    "dietary supplement", "haccp", "fsvp",
+    "foreign supplier verification", "seafood haccp", "juice haccp",
+    "human foods program", "preventive controls for food",
+    "risk-based preventive controls for food", "hazard analysis/risk-based",
+    "hazard analysis/risk based",
     "veterinary only", "animal drug only",
 ]
 
+# FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
+# GRM의 1차 사용자는 경구 고형제 중심 제약 QA이므로, 명시적 식품/보충제 도메인은
+# Intake 단계에서 제외한다. 단, CDER/OPQ/finished pharmaceutical 등 human drug 단서가
+# 있더라도, 식품/건기식 단서가 명시되면 제외한다.
+FDA_WL_LOW_VALUE_KEYWORDS = [
+    "center for food safety", "cfsan",
+    "human foods program",
+    "office of human and animal food", "human and animal food",
+    "center for veterinary medicine",
+    "foreign supplier verification", "fsvp",
+    "seafood haccp", "juice haccp", "haccp",
+    "hazard analysis/risk-based", "hazard analysis/risk based",
+    "hazard analysis and risk-based preventive controls",
+    "risk-based preventive controls for food",
+    "preventive controls for food",
+    "preventive controls for human food",
+    "food facility", "food allergen", "produce safety",
+    "low-acid canned food", "acidified food", "acidified foods",
+    "infant formula", "dietary supplement", "conventional food",
+    "seafood processor", "juice processor", "animal food", "medicated feed",
+]
 # 13 개 카테고리 통과를 위한 최소 매칭 키워드 수
 QA_MIN_MATCH = 1
 
@@ -771,6 +797,17 @@ def _kw_match(blob: str, keywords: list[str]) -> int:
 
 def _kw_any(blob: str, keywords: list[str]) -> bool:
     return _kw_match(blob, keywords) > 0
+
+
+def _phrase_any(blob: str, keywords: list[str]) -> bool:
+    return any(kw in blob for kw in keywords)
+
+
+def _is_low_value_fda_warning_letter(*text_parts: str) -> bool:
+    blob = " ".join(t for t in text_parts if t).lower()
+    if not blob.strip():
+        return False
+    return _phrase_any(blob, FDA_WL_LOW_VALUE_KEYWORDS)
 
 
 def compute_relevance(*text_parts: str) -> str:
@@ -1571,6 +1608,10 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
         firm = recipient_raw
         headline = subject or firm or "FDA Warning Letter"
+        if _is_low_value_fda_warning_letter(headline, subject, issuing_office, firm):
+            log("INFO", f"FDA WL 저가치 식품/보충제 항목 제외: {truncate(firm or headline, 80)}")
+            continue
+
         doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
         relevance = compute_relevance(headline, subject, issuing_office)
         tier = compute_signal_tier(SOURCE_FDA_WL, issuing_office or "Warning Letter",

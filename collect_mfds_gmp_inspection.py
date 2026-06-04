@@ -57,6 +57,22 @@ _DEFICIENCY_PRESENT_RE = re.compile(
     re.S,
 )
 
+# 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
+# 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
+_MEDICAL_GAS_COMPANY_TERMS = [
+    "가스", "산업가스", "고압가스",
+    "에어퍼스트", "air first",
+    "밀성산업", "한국수소", "수소",
+    "린데", "linde",
+    "대성산업", "에어프로덕츠", "air products",
+    "프렉스에어", "praxair",
+]
+_MEDICAL_GAS_CONTEXT_TERMS = [
+    "의료용 고압가스", "의료용가스", "의료용 가스",
+    "고압가스", "액화산소", "액화질소",
+    "산소가스", "질소가스", "아산화질소", "혼합가스",
+]
+
 
 @dataclass
 class _Cell:
@@ -165,6 +181,18 @@ def _request_url(page_no: int) -> str:
 
 def _clean_cell_text(raw: str) -> str:
     return re.sub(r"\s+", " ", raw or "").strip()
+
+
+def _is_medical_gas_gmp_noise(raw: dict[str, str]) -> bool:
+    manufacturer = _clean_cell_text(raw.get("manufacturer", "")).lower()
+    if manufacturer and any(term in manufacturer for term in _MEDICAL_GAS_COMPANY_TERMS):
+        return True
+
+    context = " ".join(
+        _clean_cell_text(raw.get(key, ""))
+        for key in ("manufacturer", "address", "product_type")
+    ).lower()
+    return any(term in context for term in _MEDICAL_GAS_CONTEXT_TERMS)
 
 
 def _normalize_extracted_text(raw: str) -> str:
@@ -405,6 +433,9 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     manufacturer = raw.get("manufacturer", "").strip()
     registered_date = _parse_date(raw.get("registered_date", ""))
     if not doc_id or not manufacturer or not registered_date:
+        return None
+    if _is_medical_gas_gmp_noise(raw):
+        log("INFO", f"MFDS GMP 실태조사 의료용 가스 항목 제외: {manufacturer}")
         return None
 
     country = raw.get("country", "").strip()

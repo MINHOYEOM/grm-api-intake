@@ -6,12 +6,12 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.6` (cron 2h 앞당김 17 18 UTC + transient 마커 보강) |
+| 문서 버전 | `v1.7` (CI 회귀 게이트 grm-ci.yml + 가스 필터 단어경계 수정) |
 | 최종 수정일 | 2026-06-04 |
 | 현재 상태 | 매일 수집/Notion 적재 동작, GitHub Actions 내부 health check P1 구현, P1 글로벌 3종은 기본 off 상태로 라이브 검증 대기 |
 | Active phase | Phase 3(P1) 글로벌 확장 검증 + 운영 모니터링 P1 |
 | 주요 enabled flags | 운영 기본: `ENABLE_MFDS/RECALL/ADMIN/GMP_INSPECTION=true`, `ENABLE_ICH/WHO/HC=false`, `ENABLE_SEARCH/SCRAPE/MOLEG_API=false` |
-| 기준 시스템 버전 | `codex/pl10-handoff-idempotency` `1f3aef4` 기반 + 로컬 작업(운영 health JSON·warning Issue·P1 flag wiring·MFDS transient warning) · Routine 프롬프트 `v15.6.3` |
+| 기준 시스템 버전 | `origin/main` `705ec60`(setup 갱신·노이즈 필터·테스트 머지) + 로컬 작업(grm-ci.yml·가스 필터 오탐 수정) · Routine 프롬프트 `v15.6.3` |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 발행 위치 | Notion `Global Regulatory Monitor` 부모 페이지 하위 |
 
@@ -221,12 +221,16 @@ v15.0-implementation/
 ├─ grm_common.py          # 공통 HTTP/재시도 헬퍼
 ├─ probe_*.py             # 개발용 탐침 스크립트(운영 무관)
 │
+├─ tests/                 # 회귀 테스트 (unittest)
+│  └─ test_noise_filters.py           # WL 식품/건기식·MFDS 가스 필터 회귀
+│
 ├─ setup.sh / setup.ps1   # 최초 셋업 스크립트
 ├─ requirements.txt       # 파이썬 의존성
 ├─ .env.example           # 환경변수 예시
 ├─ .gitattributes         # 줄끝 정책(eol=lf) — CRLF 회귀 방지
 ├─ .gitignore             # git 제외 목록(/archive/, grm-health.json, scheduled_*.log 포함)
 ├─ .github/workflows/grm-intake.yml   # 매일 자동 수집 + health check/Issue 워크플로우
+├─ .github/workflows/grm-ci.yml       # push/PR 시 py_compile + unittest 회귀 게이트
 │
 ├─ docs/                  # 현행 문서 (git 추적)
 │  ├─ notion_intake_db_schema.md      # Intake DB 스키마
@@ -290,6 +294,7 @@ v15.0-implementation/
 | 2026-06-02 | P1 라이브 점검 수정 2건(CODEX): ① `http_get_xml`이 XML 선언 앞 잡음(WHO Drupal 디버그 주석·BOM) 제거 후 파싱 ② ICH·WHO 스냅샷 소스용 Source-한정 장기(1095일) dedup 추가(`notion_query_existing_doc_ids(source_names=...)`) — 30일 후 재삽입 방지. CODEX 최종 GO |
 | 2026-06-04 | `collect_intake.py` health JSON/단일 판정 함수 추가, GMP 실태조사 parse status 운영 warning 노출, workflow `ENABLE_ICH/WHO/HC` env·dispatch·source token wiring 보강, `.gitignore`에 generated health/log 산출물 반영 |
 | 2026-06-04 | `collect_intake.py` FDA WL 저가치 식품/HACCP/FSVP/건기식 필터 및 `collect_mfds_gmp_inspection.py` 의료용 고압가스 업체 필터 추가. `tests/test_noise_filters.py` 회귀 테스트 신설 |
+| 2026-06-04 | 가스 필터 오탐 수정: 영문 브랜드 단어경계(`\b`) 매칭, 단독 "수소"·"밀성산업"·"대성산업" 제거("Lindenberg Pharma"류 오탐 방지, 회귀 테스트 추가). `.github/workflows/grm-ci.yml` 신설 — push/PR 시 py_compile+unittest 자동 실행 |
 
 ---
 

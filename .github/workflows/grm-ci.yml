@@ -1,0 +1,31 @@
+name: GRM CI (compile + tests)
+
+# push/PR 마다 py_compile + unittest 실행 — 회귀 게이트.
+# 수집/Notion 호출 없음(네트워크 불필요), 1분 내 종료.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: py_compile all collectors
+        run: |
+          python -m py_compile collect_intake.py collect_mfds.py \
+            collect_mfds_admin_action.py collect_mfds_gmp_inspection.py \
+            collect_mfds_recall.py collect_ich.py collect_who.py \
+            collect_hc.py collect_search.py grm_common.py
+      - name: unittest
+        run: python -m unittest discover -s tests -v

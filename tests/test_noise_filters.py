@@ -72,15 +72,36 @@ class MfdsGmpNoiseFilterTest(unittest.TestCase):
                 )
 
     def test_non_gas_pharma_manufacturer_is_not_filtered(self) -> None:
-        self.assertFalse(
-            _is_medical_gas_gmp_noise(
-                {
-                    "manufacturer": "Bora Pharmaceutical Services Inc.",
-                    "address": "Canada",
-                    "product_type": "완제",
-                }
-            )
-        )
+        for manufacturer in (
+            "Bora Pharmaceutical Services Inc.",
+            # 회귀: "linde" substring 오탐 방지 (단어 경계 매칭)
+            "Lindenberg Pharma GmbH",
+            # 회귀: 단독 "수소" substring 오탐 방지
+            "수소문제약(주)",
+        ):
+            with self.subTest(manufacturer=manufacturer):
+                self.assertFalse(
+                    _is_medical_gas_gmp_noise(
+                        {
+                            "manufacturer": manufacturer,
+                            "address": "Canada",
+                            "product_type": "완제",
+                        }
+                    )
+                )
+
+    def test_english_gas_brands_match_on_word_boundary(self) -> None:
+        for manufacturer in ("Linde Korea Co., Ltd.", "Praxair Inc.", "Air Products Korea"):
+            with self.subTest(manufacturer=manufacturer):
+                self.assertTrue(
+                    _is_medical_gas_gmp_noise(
+                        {
+                            "manufacturer": manufacturer,
+                            "address": "Korea",
+                            "product_type": "완제",
+                        }
+                    )
+                )
 
 
 if __name__ == "__main__":

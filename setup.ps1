@@ -1,21 +1,30 @@
-﻿# GRM v15.0 Phase 1 - GitHub one-shot setup (PowerShell, Windows native)
+# GRM current release - GitHub one-shot setup (PowerShell, Windows native)
 #
 # Runs:
 #   1) Check gh CLI + git installed and authenticated
-#   2) Create GitHub repo (gh repo create)
-#   3) Push 8 files from this folder
-#   4) Register 3 secrets (NOTION_TOKEN, NOTION_DATABASE_ID, OPENFDA_API_KEY)
-#   5) Print verification URLs
+#   2) Create or reuse the GitHub repo
+#   3) Push the current GRM implementation from this folder
+#   4) Register required and optional GitHub Actions secrets
+#   5) Print verification URLs and manual next steps
 #
-# Token is read via SecureString prompt (hidden input + memory protection).
-# Never echoed to terminal, git history, or log files.
+# Required secrets for the default scheduled workflow:
+#   NOTION_TOKEN, NOTION_DATABASE_ID, DATA_GO_KR_SERVICE_KEY
+#
+# Optional secrets:
+#   OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_KEY
+#
+# Token values are read via SecureString prompt when not provided as env vars.
+# They are never echoed to terminal, git history, or log files.
 #
 # Usage:
-#   cd "C:\Users\user\Desktop\Global Regulatory Monitor\v15.0-implementation"
+#   cd "C:\Users\user\Desktop\Global Regulatory Sweep\v15.0-implementation"
 #   powershell -ExecutionPolicy Bypass -File .\setup.ps1
 #
 # Pre-set env vars (optional):
-#   $env:NOTION_TOKEN='ntn_...'; $env:NOTION_DATABASE_ID='7784...'; .\setup.ps1
+#   $env:NOTION_TOKEN='ntn_...'
+#   $env:NOTION_DATABASE_ID='7784...'
+#   $env:DATA_GO_KR_SERVICE_KEY='...'
+#   .\setup.ps1
 
 [CmdletBinding()]
 param(
@@ -25,22 +34,28 @@ param(
 )
 
 # NOTE: We intentionally do NOT set $ErrorActionPreference = "Stop" globally.
-# Reason: native commands (gh, git) write to stderr in normal operation
-# (e.g. "Could not resolve to a Repository" when checking if a repo exists),
-# and EAP=Stop turns those into script-terminating NativeCommandError exceptions.
-# Instead we use explicit $LASTEXITCODE checks and try/catch only where needed.
-
+# Native commands (gh, git) may write to stderr in normal operation. We use
+# explicit $LASTEXITCODE checks instead.
 $ErrorActionPreference = "Continue"
 
 # ---- Constants ----
 $RequiredFiles = @(
     "collect_intake.py",
+    "collect_mfds.py",
+    "collect_mfds_recall.py",
+    "collect_mfds_admin_action.py",
+    "collect_mfds_gmp_inspection.py",
+    "collect_search.py",
+    "collect_ich.py",
+    "collect_who.py",
+    "collect_hc.py",
+    "grm_common.py",
     "requirements.txt",
     ".gitignore",
     ".env.example",
-    "README.md",
-    "notion_intake_db_schema.md",
-    "GRM_Prompt_v15.0.md",
+    "GRM_SYSTEM.md",
+    "docs/notion_intake_db_schema.md",
+    "docs/prompts/GRM_Prompt_v15.6.md",
     ".github/workflows/grm-intake.yml"
 )
 
@@ -61,6 +76,29 @@ function Read-SecretInput($prompt) {
     $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($ss)
     try { return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
     finally { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+}
+
+function Get-SecretValue($name, [switch]$Required, [string]$HelpText = "") {
+    $value = [Environment]::GetEnvironmentVariable($name)
+    if (-not $value) {
+        if ($HelpText) { Write-Host $HelpText }
+        $suffix = if ($Required) { "" } else { " (optional - press Enter to skip)" }
+        $value = Read-SecretInput "$name$suffix"
+    }
+    if ($Required -and -not $value) {
+        Fail-And-Exit "$name is empty. Aborting."
+    }
+    return $value
+}
+
+function Write-SecretSummary($label, $value, [switch]$Required) {
+    if ($value) {
+        Write-Host ("  - {0,-23}: ({1} chars)" -f $label, $value.Length)
+    } elseif ($Required) {
+        Write-Host ("  - {0,-23}: missing" -f $label)
+    } else {
+        Write-Host ("  - {0,-23}: not provided - secret skipped" -f $label)
+    }
 }
 
 # Run a native command, capture stdout, return exit code in $script:LastNativeExit.
@@ -118,7 +156,7 @@ if ($missing.Count -gt 0) {
     Write-Err ("Missing files in current folder: " + ($missing -join ", "))
     Fail-And-Exit "Run this script from the v15.0-implementation folder."
 }
-Write-Ok "All 8 required files present"
+Write-Ok ("Core GRM files present ({0} checked)" -f $RequiredFiles.Count)
 
 # ---- 2. Collect inputs ----
 Write-Title "2. Inputs"
@@ -129,35 +167,31 @@ if ($tmp) { $RepoName = $tmp }
 $tmp = Read-Host "Visibility public/private [$Visibility]"
 if ($tmp) { $Visibility = $tmp }
 
+$envDbId = [Environment]::GetEnvironmentVariable("NOTION_DATABASE_ID")
+if ($envDbId) { $NotionDatabaseId = $envDbId }
 $tmp = Read-Host "Notion Database ID [$NotionDatabaseId]"
 if ($tmp) { $NotionDatabaseId = $tmp }
-
-$NotionToken = if ($env:NOTION_TOKEN) { $env:NOTION_TOKEN } else { "" }
-if (-not $NotionToken) {
-    Write-Host "Paste your Notion Integration token. (Input is hidden.)"
-    $NotionToken = Read-SecretInput "NOTION_TOKEN"
-}
-if (-not $NotionToken) {
-    Fail-And-Exit "NOTION_TOKEN is empty. Aborting."
+if (-not $NotionDatabaseId) {
+    Fail-And-Exit "NOTION_DATABASE_ID is empty. Aborting."
 }
 
-$OpenfdaKey = if ($env:OPENFDA_API_KEY) { $env:OPENFDA_API_KEY } else { "" }
-if (-not $OpenfdaKey) {
-    Write-Host "OpenFDA API key (optional - press Enter to skip)"
-    $OpenfdaKey = Read-SecretInput "OPENFDA_API_KEY"
-}
+$NotionToken = Get-SecretValue "NOTION_TOKEN" -Required -HelpText "Paste your Notion Integration token. Input is hidden."
+$DataGoServiceKey = Get-SecretValue "DATA_GO_KR_SERVICE_KEY" -Required -HelpText "Paste your data.go.kr service key for MFDS Recall/Admin API. Input is hidden."
+$OpenfdaKey = Get-SecretValue "OPENFDA_API_KEY" -HelpText "OpenFDA API key is optional. Leave empty for no-key mode."
+$BraveKey = Get-SecretValue "BRAVE_API_KEY" -HelpText "Brave Search API key is optional and used only when ENABLE_SEARCH=true."
+$DataGoKey = Get-SecretValue "DATA_GO_KR_KEY" -HelpText "DATA_GO_KR_KEY is optional and used only when ENABLE_MOLEG_API=true."
 
 Write-Host ""
 Write-Info "Summary:"
-Write-Host "  - Repo            : $ghUser/$RepoName ($Visibility)"
-Write-Host "  - Notion DB ID    : $NotionDatabaseId"
-$tokPreview = $NotionToken.Substring(0, [Math]::Min(4, $NotionToken.Length))
-Write-Host ("  - NOTION_TOKEN    : ({0} chars, starts with {1}***)" -f $NotionToken.Length, $tokPreview)
-if ($OpenfdaKey) {
-    Write-Host ("  - OpenFDA key     : ({0} chars) - will register" -f $OpenfdaKey.Length)
-} else {
-    Write-Host "  - OpenFDA key     : not provided - secret skipped (collector runs in no-key mode)"
-}
+Write-Host "  - Repo                   : $ghUser/$RepoName ($Visibility)"
+Write-Host "  - Notion DB ID           : $NotionDatabaseId"
+Write-SecretSummary "NOTION_TOKEN" $NotionToken -Required
+Write-SecretSummary "DATA_GO_KR_SERVICE_KEY" $DataGoServiceKey -Required
+Write-SecretSummary "OPENFDA_API_KEY" $OpenfdaKey
+Write-SecretSummary "BRAVE_API_KEY" $BraveKey
+Write-SecretSummary "DATA_GO_KR_KEY" $DataGoKey
+Write-Host ""
+Write-Info "Default scheduled runs enable MFDS Recall/Admin/GMP, so DATA_GO_KR_SERVICE_KEY is required."
 Write-Host ""
 $confirm = Read-Host "Proceed? [y/N]"
 if ($confirm -notmatch "^[Yy]$") {
@@ -182,7 +216,7 @@ if ($exists) {
     $visFlag = "--$Visibility"
     $createOut = Invoke-Native {
         gh repo create $RepoName $visFlag `
-            --description "GRM API Intake - Federal Register + OpenFDA weekly collector for Claude Routine v15.0" `
+            --description "GRM API Intake - daily regulatory collector for Notion and Claude Routine" `
             --disable-wiki
     }
     if ($script:LastNativeExit -ne 0) {
@@ -198,7 +232,6 @@ Write-Title "4. git push"
 if (-not (Test-Path -LiteralPath ".git")) {
     Invoke-Native { git init -b main } -IgnoreStderr | Out-Null
     if ($script:LastNativeExit -ne 0) {
-        # Older git may not support -b on init; fall back
         Invoke-Native { git init } -IgnoreStderr | Out-Null
         Invoke-Native { git checkout -b main } -IgnoreStderr | Out-Null
     }
@@ -222,22 +255,19 @@ if ($currentOrigin) {
     Write-Ok "origin added"
 }
 
-# Git identity (set if missing)
 $cfgEmail = Invoke-Native { git config user.email } -IgnoreStderr
 $cfgName  = Invoke-Native { git config user.name } -IgnoreStderr
 if (-not $cfgEmail) { Invoke-Native { git config user.email "$ghUser@users.noreply.github.com" } -IgnoreStderr | Out-Null }
 if (-not $cfgName)  { Invoke-Native { git config user.name "$ghUser" } -IgnoreStderr | Out-Null }
 
 Invoke-Native { git add . } -IgnoreStderr | Out-Null
-
-# git diff --cached --quiet returns: 0 = no staged changes, 1 = staged changes present
 Invoke-Native { git diff --cached --quiet } -IgnoreStderr | Out-Null
 $hasStaged = ($script:LastNativeExit -ne 0)
 
 if (-not $hasStaged) {
     Write-Warn "Nothing to commit (already pushed?)."
 } else {
-    Invoke-Native { git commit -m "Initial v15.0 Phase 1 - intake collector + workflow + Routine prompt" } -IgnoreStderr | Out-Null
+    Invoke-Native { git commit -m "Initial GRM daily intake setup" } -IgnoreStderr | Out-Null
     if ($script:LastNativeExit -ne 0) {
         Fail-And-Exit "git commit failed."
     }
@@ -259,11 +289,8 @@ if ($script:LastNativeExit -eq 0) {
 Write-Title "5. Register GitHub Secrets"
 
 function Set-RepoSecret($name, $value) {
-    # Write secret to a temp file with restricted ACL, pass path via --body-file,
-    # then delete immediately. Prevents secret from appearing in process list (argv).
     $tmp = New-TemporaryFile
     try {
-        # Restrict temp file to current user only before writing
         $acl = Get-Acl -LiteralPath $tmp.FullName
         $acl.SetAccessRuleProtection($true, $false)
         $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
@@ -273,14 +300,12 @@ function Set-RepoSecret($name, $value) {
         Set-Acl -LiteralPath $tmp.FullName -AclObject $acl
 
         [System.IO.File]::WriteAllText($tmp.FullName, $value, [System.Text.UTF8Encoding]::new($false))
-        # --body-file passes the secret via file path, not argv
         Invoke-Native { gh secret set $name --repo "$ghUser/$RepoName" --body-file $tmp.FullName } | Out-Null
         if ($script:LastNativeExit -ne 0) {
             throw "gh secret set $name failed (exit $($script:LastNativeExit))"
         }
     } finally {
         if (Test-Path -LiteralPath $tmp.FullName) {
-            # Overwrite with zeros before deletion to reduce forensic recovery risk
             [System.IO.File]::WriteAllText($tmp.FullName, ("`0" * $value.Length),
                 [System.Text.UTF8Encoding]::new($false))
             Remove-Item -Force -LiteralPath $tmp.FullName
@@ -295,11 +320,28 @@ try {
     Set-RepoSecret "NOTION_DATABASE_ID" $NotionDatabaseId
     Write-Ok "NOTION_DATABASE_ID registered"
 
+    Set-RepoSecret "DATA_GO_KR_SERVICE_KEY" $DataGoServiceKey
+    Write-Ok "DATA_GO_KR_SERVICE_KEY registered"
+
     if ($OpenfdaKey) {
         Set-RepoSecret "OPENFDA_API_KEY" $OpenfdaKey
         Write-Ok "OPENFDA_API_KEY registered"
     } else {
         Write-Info "OPENFDA_API_KEY skipped (collector runs in no-key mode)"
+    }
+
+    if ($BraveKey) {
+        Set-RepoSecret "BRAVE_API_KEY" $BraveKey
+        Write-Ok "BRAVE_API_KEY registered"
+    } else {
+        Write-Info "BRAVE_API_KEY skipped (ENABLE_SEARCH=false by default)"
+    }
+
+    if ($DataGoKey) {
+        Set-RepoSecret "DATA_GO_KR_KEY" $DataGoKey
+        Write-Ok "DATA_GO_KR_KEY registered"
+    } else {
+        Write-Info "DATA_GO_KR_KEY skipped (ENABLE_MOLEG_API=false by default)"
     }
 } catch {
     Write-Err $_.Exception.Message
@@ -310,9 +352,11 @@ Write-Host ""
 Write-Info "Current secrets:"
 Invoke-Native { gh secret list --repo "$ghUser/$RepoName" } | Out-Host
 
-# Wipe tokens from memory
 $NotionToken = $null
+$DataGoServiceKey = $null
 $OpenfdaKey = $null
+$BraveKey = $null
+$DataGoKey = $null
 [System.GC]::Collect()
 
 # ---- 6. Done ----
@@ -330,9 +374,10 @@ Write-Host "     -> Run workflow -> dry_run: true"
 Write-Host ""
 Write-Host "  3) If dry-run is OK, run again with dry_run: false to write to Notion"
 Write-Host ""
-Write-Host "  4) Paste the contents of GRM_Prompt_v15.0.md into your Claude Code Routine"
+Write-Host "  4) Paste docs/prompts/GRM_Prompt_v15.6.md into your Claude Code Routine"
 Write-Host ""
-Write-Host "  5) Cron schedule: every Sunday 22:00 UTC (Monday 07:00 KST)"
+Write-Host "  5) Cron schedule: daily 18:17 UTC (03:17 KST next day)"
+Write-Host "     Routine digest: Monday 07:30 KST"
 Write-Host ""
 Write-Info "Repo URL: $repoUrl"
 Write-Info "Actions:  $repoUrl/actions"

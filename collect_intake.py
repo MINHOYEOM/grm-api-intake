@@ -991,11 +991,14 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
         [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
     )
 
-    # 수의/동물용은 의약품 분류 대상에서 제외(QA_EXCLUDE 와 일관) → Other
-    is_vet = any(("veterin" in pt or "animal" in pt) for pt in product_type)
+    # 수의/동물용(product_type 기준)은 인체 의약품 범위 밖 → 모든 분류 이전에 하드 제외(Other).
+    # (QA_EXCLUDE 의 'veterinary only/animal drug only' 와 일관. biologic/drug/form/route
+    #  폴백이 뒤따라 타지 않도록 early-return 으로 둔다.)
+    if any(("veterin" in pt or "animal" in pt) for pt in product_type):
+        return MODALITY_OTHER
 
     # 1순위: 생물의약품(생물학적제제)
-    if not is_vet and any("biolog" in pt for pt in product_type):
+    if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
         return MODALITY_BIOLOGIC
@@ -1005,8 +1008,8 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
         return MODALITY_BIOLOGIC
 
     # 2순위: 화학합성의약품
-    #  (a) product_type 이 'drug' 계열(예: Drugs / Human prescription drug) — 수의용 제외
-    if not is_vet and any("drug" in pt for pt in product_type):
+    #  (a) product_type 이 'drug' 계열(예: Drugs / Human prescription drug)
+    if any("drug" in pt for pt in product_type):
         return MODALITY_CHEMICAL
     #  (b) 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
     if forms or routes:
@@ -1056,6 +1059,10 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
         return "Tier 3"
     if is_class_i:
         return "Tier 3"
+    # 제외 도메인(QA Unrelated: 의료기기·식품·화장품·수의 등)은 위 강제 예외(Class I·FDA WL cGMP)
+    # 외에는 키워드로 Tier 2/3 승격하지 않고 Tier 1 로 고정(handoff·통계 노이즈 방지).
+    if qa_relevance == "Unrelated":
+        return "Tier 1"
     if osd_relevance == "Direct" and _kw_any(
             blob, ["dissolution", "nitrosamine", "subpotent"]):
         return "Tier 3"

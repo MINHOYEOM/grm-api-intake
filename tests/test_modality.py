@@ -134,6 +134,20 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_OTHER,
         )
 
+    def test_veterinary_with_route_still_other(self):
+        # product_type 이 수의용이면 route/form 폴백이 타지 않고 Other 고정
+        payload = {"openfda": {"product_type": ["VETERINARY DRUGS"], "route": ["ORAL"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_OTHER)
+
+    def test_animal_drug_with_dosage_form_still_other(self):
+        payload = {"openfda": {"product_type": ["ANIMAL DRUG"], "dosage_form": ["TABLET"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_OTHER)
+
+    def test_veterinary_vaccine_text_still_other(self):
+        # 수의용 product_type 이면 제품명 'vaccine' 생물 단서가 있어도 Other (인체 범위 밖)
+        payload = {"product_type": "Veterinary Drugs", "product_description": "animal vaccine"}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_OTHER)
+
     # ── Health Canada 정규화(raw_payload product_type/description) ───────
     def test_hc_drug_recall_chemical(self):
         # collect_hc 가 product_type=Category, product_description=Product 를 넣음
@@ -176,6 +190,22 @@ class TestSterileBioTier3Floor(unittest.TestCase):
             "food safety sterility failure",
         )
         self.assertNotEqual(tier, "Tier 3")
+
+    def test_unrelated_not_promoted_to_tier2(self):
+        # Tier 2 키워드(sterile)가 있어도 Unrelated 면 Tier 1 고정
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_RECALL, "Class III", "Unrelated", "N/A",
+            "medical device sterile package recall",
+        )
+        self.assertEqual(tier, "Tier 1")
+
+    def test_unrelated_classI_still_tier3(self):
+        # 강제 예외(Class I)는 Unrelated 여도 카드화 위해 Tier 3 유지
+        tier = ci.compute_signal_tier(
+            ci.SOURCE_RECALL, "Class I", "Unrelated", "N/A",
+            "some recall",
+        )
+        self.assertEqual(tier, "Tier 3")
 
 
 class TestModalityRelevanceNotDropped(unittest.TestCase):

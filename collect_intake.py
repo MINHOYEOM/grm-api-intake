@@ -235,7 +235,9 @@ QA_EXCLUDE_KEYWORDS = [
     "human foods program", "preventive controls for food",
     "risk-based preventive controls for food", "hazard analysis/risk-based",
     "hazard analysis/risk based",
-    "veterinary only", "animal drug only",
+    "veterinary only", "animal drug only", "animal drug",
+    "veterinary drug", "veterinary medicine", "animal health product",
+    "medicated feed",
 ]
 
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
@@ -309,6 +311,16 @@ PROP_MODALITY = "Modality"
 MODALITY_CHEMICAL = "Chemical"   # 화학합성(케미컬)의약품 — 제형 무관
 MODALITY_BIOLOGIC = "Biologic"   # 생물의약품(생물학적제제) — 제형 무관
 MODALITY_OTHER = "Other"         # 기타·판별 곤란(제품군 단서 없음: 일반 가이드라인·정책 등)
+MODALITY_OPTIONS = (MODALITY_CHEMICAL, MODALITY_BIOLOGIC, MODALITY_OTHER)
+
+# 수의/동물용 텍스트 단서 — 인체 의약품 범위 밖 → 분류 전에 하드 제외(Other).
+# 구조화 product_type 가 없는 소스(FR/RSS/Search/MFDS 등) 대비. 'animal-derived' 같은
+# 인체 바이오 표현을 오제외하지 않도록 '명시적 구(phrase)'만 둔다(bare 'animal' 금지).
+MODALITY_VET_EXCLUDE_TERMS = [
+    "veterinary drug", "veterinary medicine", "veterinary product",
+    "animal drug", "animal health product", "animal-only",
+    "medicated feed", "동물용의약품", "동물용 의약품", "동물약품",
+]
 
 # 생물의약품(생물학적제제) 판별 지표 — 특정 제품이 아닌 '클래스' 단위 신호
 # 영문 + MFDS 한국어 단서(MFDS row 는 Language=KO 한글 원문)
@@ -991,10 +1003,11 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
         [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
     )
 
-    # 수의/동물용(product_type 기준)은 인체 의약품 범위 밖 → 모든 분류 이전에 하드 제외(Other).
-    # (QA_EXCLUDE 의 'veterinary only/animal drug only' 와 일관. biologic/drug/form/route
-    #  폴백이 뒤따라 타지 않도록 early-return 으로 둔다.)
+    # 수의/동물용은 인체 의약품 범위 밖 → 모든 분류 이전에 하드 제외(Other).
+    #  (a) 구조화 product_type 기준  (b) 명시적 텍스트 구(phrase) 기준 — 둘 다 early-return.
     if any(("veterin" in pt or "animal" in pt) for pt in product_type):
+        return MODALITY_OTHER
+    if _phrase_any(haystack, MODALITY_VET_EXCLUDE_TERMS):
         return MODALITY_OTHER
 
     # 1순위: 생물의약품(생물학적제제)
@@ -1014,7 +1027,9 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     #  (b) 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
     if forms or routes:
         return MODALITY_CHEMICAL
-    if _phrase_any(haystack, MODALITY_DRUG_PRODUCT_TERMS):
+    #  (c) 텍스트 제형 단서 — 단, '정제수'(purified water) 는 '정제'(tablet) 오탐이므로 제거
+    haystack_dp = haystack.replace("정제수", "")
+    if _phrase_any(haystack_dp, MODALITY_DRUG_PRODUCT_TERMS):
         return MODALITY_CHEMICAL
 
     # 3순위: 기타·판별 곤란(제품군 단서 없음)
@@ -1840,6 +1855,42 @@ def notion_api_request(method: str, url: str, token: str, *,
         except ValueError as e:
             raise NotionHandoffError(f"Notion API JSON 파싱 실패: {e}") from e
     raise NotionHandoffError(f"Notion API {method} {url} 실패: {last_err}")
+
+
+def notion_verify_modality_property(token: str, db_id: str) -> bool:
+    """ENABLE_MODALITY_TAG=true 활성화 시 Notion 'Modality' 속성 사전 점검(preflight).
+
+    DB 에 'Modality' 가 Select 타입으로 존재하는지 확인한다. 없거나 타입이 다르면
+    첫 insert 부터 전부 실패하므로, 그 전에 깨끗하게 False 를 반환해 호출부가
+    'N건 insert 실패' 대신 '스키마 불일치'로 한 번에 알리고 graceful degrade 하도록 한다.
+
+    반환: True = 기록 진행 OK / False = 스키마 불일치(이번 실행 Modality 기록 건너뜀).
+    (Select 옵션 Chemical/Biologic/Other 누락은 insert 시 자동 생성되므로 경고만.)
+    """
+    url = f"https://api.notion.com/v1/databases/{db_id}"
+    try:
+        data = notion_api_request("GET", url, token)
+    except NotionHandoffError as e:
+        log("WARN", f"Modality preflight: DB 조회 실패 — {e}")
+        return False
+    prop = (data.get("properties", {}) or {}).get(PROP_MODALITY)
+    if not prop:
+        log("ERROR", f"Modality preflight 실패: Notion DB 에 '{PROP_MODALITY}' 속성이 없습니다. "
+                     f"Select 속성(옵션 {', '.join(MODALITY_OPTIONS)})을 먼저 생성하세요.")
+        return False
+    ptype = prop.get("type")
+    if ptype != "select":
+        log("ERROR", f"Modality preflight 실패: '{PROP_MODALITY}' 속성 타입이 '{ptype}' — "
+                     f"'select' 여야 합니다.")
+        return False
+    options = {o.get("name") for o in (prop.get("select", {}).get("options") or [])}
+    missing = set(MODALITY_OPTIONS) - options
+    if missing:
+        log("WARN", f"Modality preflight: select 옵션 {sorted(missing)} 미존재 "
+                    f"— insert 시 자동 생성됨(스키마 의도 확인 권장).")
+    else:
+        log("INFO", f"Modality preflight OK — '{PROP_MODALITY}' select 옵션 {sorted(options)}")
+    return True
 
 
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
@@ -2990,6 +3041,13 @@ def main() -> int:
         if not notion_token or not notion_db:
             log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
             return 2
+        # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면
+        # 이번 실행은 Modality 기록만 끄고 수집은 계속(graceful degrade).
+        if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":
+            if not notion_verify_modality_property(notion_token, notion_db):
+                log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
+                            "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
+                os.environ["ENABLE_MODALITY_TAG"] = "false"
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)

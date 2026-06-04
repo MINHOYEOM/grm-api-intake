@@ -781,6 +781,10 @@ WebSearch·WebFetch 로 새로 탐지한 항목은 다음 둘 중 하나가 7일
 - 순수 예방 백신·세포/유전자치료제(CGT) 제품 자체: 기본 제외하되, 해당 문서가
   **무균 제조 공정·Annex 1·바이오 GMP 제조 시스템**을 다루면 포함(제품이 아닌 GMP 내용 기준).
 - 의료기기/화장품/식품, 단순 행정 변경: 제외 유지.
+
+⚠️ **Modality 는 분류일 뿐 '포함 결정'이 아니다.** `Modality=Biologic` 이라고 자동 카드화하지 말 것.
+  포함 여부는 항상 위 [필터 — 제외] 규칙을 우선 적용한다 — 예: 순수 예방 백신/CGT 제품은
+  Modality 가 Biologic 이어도 GMP/무균 제조 내용이 없으면 제외한다. (배지는 포함된 카드의 라벨일 뿐)
 - ⚠️ 단 MFDS gmp-inspection·admin-action·recall-quality 는 제조소/품질 직접 관련이면
   위 제외와 무관하게 국내 섹션 포함(임상시험 단독 행정처분 등 비제조 항목만 Tier 판단으로 강등).
 
@@ -923,7 +927,8 @@ Tier 2/3 분류에 필요한 제품군·제형 단서는 다음 순서로 확인
 </callout>
 (v15.1) Recall 항목 TL;DR 포함 기준:
 - Class I Recall → 무조건 포함
-- Class II/III Recall + Tier 3 카드화 기준 충족 (ORAL + 공정 관련 failure mode) → 우선 포함
+- Class II/III Recall + Tier 3 카드화 기준 충족 (의약품 Modality[Chemical/Biologic] 또는 route/dosage_form + 품질 failure mode) → 우선 포함
+  ※ 무균 주사제·생물의약품의 sterility·CCIT·viral·particulate 등도 동등하게 우선 포함(경구에 한정하지 않음)
 - Tier 2 표 기재 항목 (카드화 미달) → TL;DR 포함 금지
 (v15.6) 국내(MFDS) Tier 3 항목(품질 행정처분·품질 회수·지적 있는 GMP 실사)은 TL;DR 포함 우선.
 
@@ -1202,7 +1207,7 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90)
 py_compile/diff 통과 예정).
 남은 것은 stage/commit 과 아래 게이트 실측뿐.
 
-v15.6.3 을 프로덕션 Routine 에 넣기 전 아래 3개를 충족해야 한다(미충족 시 배포 보류):
+현행(v15.8) 프롬프트를 프로덕션 Routine 에 넣기 전 아래 3개를 충족해야 한다(미충족 시 배포 보류):
 1. **Routine handoff 생성 검증** — 최신 Actions Job Summary 에
    `Routine handoff: {N} New rows` 라인이 있고, Notion Intake DB 에
    `OPEN GRM Routine Handoff {실행일}` row(Source=`GRM Handoff`, Type=`routine-handoff`)가 생성됨을 확인.

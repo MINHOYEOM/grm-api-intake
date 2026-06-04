@@ -148,6 +148,36 @@ class TestComputeModality(unittest.TestCase):
         payload = {"product_type": "Veterinary Drugs", "product_description": "animal vaccine"}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_OTHER)
 
+    def test_veterinary_text_only_other(self):
+        # 구조화 product_type 없이 텍스트 'animal drug'/'veterinary drug' 만 있어도 Other
+        self.assertEqual(
+            ci.compute_modality({}, "animal drug oral tablet recall"),
+            ci.MODALITY_OTHER,
+        )
+        self.assertEqual(
+            ci.compute_modality({}, "veterinary drug for injection"),
+            ci.MODALITY_OTHER,
+        )
+
+    def test_animal_derived_human_biologic_not_excluded(self):
+        # 인체 바이오의 'animal-derived' 표현은 수의 제외 대상이 아님 → Biologic 유지
+        self.assertEqual(
+            ci.compute_modality({}, "monoclonal antibody with animal-derived component"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_purified_water_not_tablet(self):
+        # '정제수'(purified water) 는 '정제'(tablet) 오탐 금지 → Other
+        self.assertEqual(
+            ci.compute_modality({}, "정제수 제조설비 점검 지침"),
+            ci.MODALITY_OTHER,
+        )
+        # 진짜 '정제'(tablet) 는 Chemical 유지
+        self.assertEqual(
+            ci.compute_modality({}, "정제 함량 부적합"),
+            ci.MODALITY_CHEMICAL,
+        )
+
     # ── Health Canada 정규화(raw_payload product_type/description) ───────
     def test_hc_drug_recall_chemical(self):
         # collect_hc 가 product_type=Category, product_description=Product 를 넣음
@@ -230,6 +260,44 @@ class TestModalityRelevanceNotDropped(unittest.TestCase):
             "container closure integrity failure in injectable vial",
         )
         self.assertIn(tier, ("Tier 2", "Tier 3"))
+
+
+class TestModalityPreflight(unittest.TestCase):
+    """Notion 'Modality' 스키마 preflight — 네트워크 없이 notion_api_request 를 대체."""
+
+    def tearDown(self):
+        if hasattr(self, "_orig"):
+            ci.notion_api_request = self._orig
+
+    def _patch(self, fake):
+        self._orig = ci.notion_api_request
+        ci.notion_api_request = fake
+
+    def test_ok_select_with_all_options(self):
+        self._patch(lambda *a, **k: {"properties": {"Modality": {
+            "type": "select", "select": {"options": [
+                {"name": "Chemical"}, {"name": "Biologic"}, {"name": "Other"}]}}}})
+        self.assertTrue(ci.notion_verify_modality_property("t", "db"))
+
+    def test_missing_property_returns_false(self):
+        self._patch(lambda *a, **k: {"properties": {}})
+        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
+
+    def test_wrong_type_returns_false(self):
+        self._patch(lambda *a, **k: {"properties": {"Modality": {"type": "rich_text"}}})
+        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
+
+    def test_missing_options_still_ok(self):
+        # select 옵션은 insert 시 자동 생성되므로 일부 누락은 True(경고만)
+        self._patch(lambda *a, **k: {"properties": {"Modality": {
+            "type": "select", "select": {"options": [{"name": "Chemical"}]}}}})
+        self.assertTrue(ci.notion_verify_modality_property("t", "db"))
+
+    def test_db_query_error_returns_false(self):
+        def boom(*a, **k):
+            raise ci.NotionHandoffError("boom")
+        self._patch(boom)
+        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
 
 
 if __name__ == "__main__":

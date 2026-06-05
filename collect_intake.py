@@ -270,6 +270,40 @@ FDA_WL_LOW_VALUE_KEYWORDS = [
     "infant formula", "dietary supplement", "conventional food",
     "seafood processor", "juice processor", "animal food", "medicated feed",
 ]
+
+# ── M0: FDA WL 발행 부서(issuing_office) 1차 게이트 (redesign §7) ──────────────
+# v1.7 필터는 본문 키워드만 봐서 식품 WL 이 샜다(LV-15.7b). 발행 부서를 1차 신호로
+# 추가한다. 부서는 인체 의약품(CDER/CBER)만 유지, 식품·수의·담배·기기 부서는 무조건
+# 제외. OII(구 ORA)는 식품·의약품 양쪽 실사를 담당 → 본문 맥락으로 분기.
+# 매칭은 _kw_any(단어경계) 기준이라 약어("cvm","oii" 등)도 substring 오탐 없음.
+#
+# 무조건 제외 부서 — 인체 의약품 WL 을 발행하지 않는 센터.
+FDA_WL_OFFICE_EXCLUDE = {
+    "cfsan": ["center for food safety and applied nutrition", "cfsan"],
+    "hfp": ["human foods program", "office of human and animal food",
+            "human and animal food"],
+    "cvm": ["center for veterinary medicine", "cvm"],
+    "ctp": ["center for tobacco products", "ctp"],
+    "cdrh": ["center for devices and radiological health", "cdrh"],
+}
+# 유지 부서 — 인체 의약품/바이오 (CBER 유지, 제형 2차 판단은 v15.8 범위).
+FDA_WL_OFFICE_KEEP = {
+    "cder": ["center for drug evaluation and research", "cder"],
+    "cber": ["center for biologics evaluation and research", "cber"],
+}
+# 맥락 의존 부서 — OII(Office of Inspections and Investigations, 구 ORA).
+# 식품·수산·HACCP 맥락이면 제외, 약품 cGMP 맥락이면 유지(또는 Needs Review).
+FDA_WL_OFFICE_CONTEXTUAL = {
+    "oii": ["office of inspections and investigations", "oii"],
+}
+# OII 맥락 분기용 약품(유지) 단서. 식품 단서는 FDA_WL_LOW_VALUE_KEYWORDS 재사용.
+FDA_WL_DRUG_CONTEXT_KEYWORDS = [
+    "finished pharmaceutical", "finished pharmaceuticals",
+    "current good manufacturing practice", "cgmp",
+    "active pharmaceutical ingredient", "drug product", "drug substance",
+    "sterile drug", "aseptic", "compounding", "unapproved new drug",
+]
+
 # 13 개 카테고리 통과를 위한 최소 매칭 키워드 수
 QA_MIN_MATCH = 1
 
@@ -905,6 +939,39 @@ def _is_low_value_fda_warning_letter(*text_parts: str) -> bool:
     if not blob.strip():
         return False
     return _phrase_any(blob, FDA_WL_LOW_VALUE_KEYWORDS)
+
+
+def _fda_wl_office_gate(issuing_office: str, *context_parts: str) -> str:
+    """FDA WL 발행 부서(issuing_office) 기반 1차 게이트 (M0, redesign §7).
+
+    반환:
+      - "exclude": 무조건 제외 부서(식품/수의/담배/기기) 또는 OII+식품맥락 → 드롭.
+      - "keep":    인체 의약품 부서(CDER/CBER) 또는 OII+약품 cGMP 맥락 → 유지.
+      - "review":  OII 인데 맥락이 모호(약품·식품 단서 모두 없음) → Needs Review(비-드롭).
+      - "unknown": 부서 결측/미매핑 → 호출부에서 본문 키워드 폴백(회귀 방지).
+    """
+    office = (issuing_office or "").lower().strip()
+    if not office:
+        return "unknown"
+    # 1) 무조건 제외 부서 — 인체 의약품 WL 을 발행하지 않는 센터.
+    for tokens in FDA_WL_OFFICE_EXCLUDE.values():
+        if _kw_any(office, tokens):
+            return "exclude"
+    # 2) 유지 부서 — 인체 의약품/바이오.
+    for tokens in FDA_WL_OFFICE_KEEP.values():
+        if _kw_any(office, tokens):
+            return "keep"
+    # 3) 맥락 의존 부서(OII) — 본문 맥락으로 분기.
+    for tokens in FDA_WL_OFFICE_CONTEXTUAL.values():
+        if _kw_any(office, tokens):
+            ctx = " ".join(p for p in context_parts if p).lower()
+            if _phrase_any(ctx, FDA_WL_DRUG_CONTEXT_KEYWORDS):
+                return "keep"          # 약품 cGMP/무균/조제 맥락 → 유지
+            if _phrase_any(ctx, FDA_WL_LOW_VALUE_KEYWORDS):
+                return "exclude"       # 식품/수산/HACCP/FSVP 맥락 → 제외
+            return "review"            # 모호 → Needs Review (약품 WL 오삭제 방지)
+    # 4) 미매핑 부서 → 본문 키워드 폴백.
+    return "unknown"
 
 
 def compute_relevance(*text_parts: str) -> str:
@@ -1799,9 +1866,20 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
         firm = recipient_raw
         headline = subject or firm or "FDA Warning Letter"
-        if _is_low_value_fda_warning_letter(headline, subject, issuing_office, firm):
+
+        # M0: 발행 부서 1차 게이트 (redesign §7). 부서 결측/미매핑은 본문 키워드 폴백.
+        office_verdict = _fda_wl_office_gate(issuing_office, headline, subject, firm)
+        if office_verdict == "exclude":
+            log("INFO", f"FDA WL 부서 게이트 제외({truncate(issuing_office, 40)}): "
+                        f"{truncate(firm or headline, 60)}")
+            continue
+        if office_verdict == "unknown" and _is_low_value_fda_warning_letter(
+            headline, subject, issuing_office, firm
+        ):
             log("INFO", f"FDA WL 저가치 식품/보충제 항목 제외: {truncate(firm or headline, 80)}")
             continue
+        # keep / review → 유지. review(OII 맥락 모호)는 보수적 비-드롭(약품 WL
+        # 오삭제 방지). Needs Review 상태 마킹(Notion Status)은 인프라 부재로 K4 이월.
 
         doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
         relevance = compute_relevance(headline, subject, issuing_office)

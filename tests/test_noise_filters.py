@@ -1,6 +1,7 @@
 import unittest
 
 from collect_intake import (
+    _fda_wl_office_gate,
     _is_low_value_fda_warning_letter,
     compute_relevance,
 )
@@ -54,6 +55,111 @@ class FdaWarningLetterNoiseFilterTest(unittest.TestCase):
         self.assertEqual(
             compute_relevance("cGMP Current Good Manufacturing Practice finished pharmaceuticals"),
             "Likely",
+        )
+
+
+class FdaWarningLetterOfficeGateTest(unittest.TestCase):
+    """M0: 발행 부서(issuing_office) 1차 게이트 (redesign §7)."""
+
+    def test_food_centers_are_excluded_unconditionally(self) -> None:
+        # HFP/CFSAN — 식품 부서는 본문 맥락과 무관하게 제외.
+        cases = [
+            ("Human Foods Program", "CGMP/Hazard Analysis/Risk-Based Preventive "
+                                    "Controls for Food", "Example Bakery"),
+            ("Center for Food Safety and Applied Nutrition (CFSAN)",
+             "Seafood HACCP and FSVP violations", "Example Seafood Importer"),
+        ]
+        for office, subject, firm in cases:
+            with self.subTest(office=office):
+                self.assertEqual(
+                    _fda_wl_office_gate(office, subject, subject, firm), "exclude"
+                )
+
+    def test_veterinary_tobacco_device_centers_are_excluded(self) -> None:
+        # CVM(수의)/CTP(담배)/CDRH(기기) — 무조건 제외 (약어·풀네임 모두).
+        for office in (
+            "CVM", "Center for Veterinary Medicine (CVM)",
+            "CTP", "Center for Tobacco Products",
+            "CDRH", "Center for Devices and Radiological Health (CDRH)",
+        ):
+            with self.subTest(office=office):
+                self.assertEqual(_fda_wl_office_gate(office, "", "", ""), "exclude")
+
+    def test_cder_finished_pharma_is_kept(self) -> None:
+        # CDER + finished pharmaceuticals/cGMP → 유지.
+        for office in ("CDER", "Center for Drug Evaluation and Research (CDER)"):
+            with self.subTest(office=office):
+                self.assertEqual(
+                    _fda_wl_office_gate(
+                        office,
+                        "CGMP violations",
+                        "Current Good Manufacturing Practice for finished "
+                        "pharmaceuticals",
+                        "Example Pharma",
+                    ),
+                    "keep",
+                )
+
+    def test_cber_biologics_aseptic_is_kept(self) -> None:
+        # CBER + biologics/aseptic → 유지.
+        for office in ("CBER", "Center for Biologics Evaluation and Research (CBER)"):
+            with self.subTest(office=office):
+                self.assertEqual(
+                    _fda_wl_office_gate(
+                        office,
+                        "Sterility assurance / aseptic processing deficiencies",
+                        "biologics aseptic processing",
+                        "Example Biologics Inc.",
+                    ),
+                    "keep",
+                )
+
+    def test_oii_food_context_is_excluded(self) -> None:
+        # OII(구 ORA) + 수산/HACCP 맥락 → 제외.
+        self.assertEqual(
+            _fda_wl_office_gate(
+                "Office of Inspections and Investigations (OII)",
+                "Seafood HACCP violations",
+                "Seafood HACCP and FSVP violations",
+                "Example Seafood Co.",
+            ),
+            "exclude",
+        )
+
+    def test_oii_drug_context_is_kept(self) -> None:
+        # OII + finished pharmaceuticals/cGMP 맥락 → 유지(약품 WL 오삭제 방지).
+        self.assertEqual(
+            _fda_wl_office_gate(
+                "Office of Inspections and Investigations (OII)",
+                "CGMP violations",
+                "Current Good Manufacturing Practice for finished pharmaceuticals",
+                "Example Pharma",
+            ),
+            "keep",
+        )
+
+    def test_oii_ambiguous_context_is_review(self) -> None:
+        # OII 인데 식품·약품 단서 모두 없음 → Needs Review(비-드롭).
+        self.assertEqual(
+            _fda_wl_office_gate(
+                "Office of Inspections and Investigations (OII)",
+                "Unapproved misbranded product", "", "Example Co."
+            ),
+            "review",
+        )
+
+    def test_missing_office_falls_back_to_keyword_filter(self) -> None:
+        # 부서 결측 → "unknown" (호출부 본문 키워드 폴백).
+        self.assertEqual(_fda_wl_office_gate("", "FSVP violations", "", ""), "unknown")
+        self.assertEqual(
+            _fda_wl_office_gate("", "finished pharmaceuticals cGMP", "", ""), "unknown"
+        )
+        # 결측+FSVP → 본문 폴백으로 제외, 결측+finished/cGMP → 유지.
+        self.assertTrue(_is_low_value_fda_warning_letter("FSVP violations"))
+        self.assertFalse(
+            _is_low_value_fda_warning_letter(
+                "Current Good Manufacturing Practice for finished pharmaceuticals"
+            )
         )
 
 

@@ -96,14 +96,21 @@ Title=`OPEN GRM Routine Handoff {실행일 YYYY-MM-DD}` · 본문 code block JSO
    · `status_hint='Error'` row = raw 파싱 실패 graceful degrade 분 — scaffold 가 Evidence B 로
      이미 강등돼 있다. 정상 처리하되 Status 갱신 시 Error 로 기록한다.
 
-PL-10 멱등성: 발행 종료 시 handoff page 를 Status→Processed, Title→`CONSUMED GRM Routine
-Handoff {실행일}` 로 바꾼다. 2회차 실행이 OPEN handoff 를 못 찾으면 빈 브리프 없이 종료.
+PL-10 멱등성(마감): 발행 종료 시 handoff page 를 Status→Processed, Title→`CONSUMED GRM Routine
+Handoff {실행일}` 로 바꾼다. **보류(Status 미변경) row 가 있으면 같은 handoff 페이지 본문 끝에
+`DEFERRED {N}: source::doc_id, ...` 한 블록을 append** 한다(다음 주 PL-10b 제외 목록의 유일
+원천). append 1회 실패 시 1회 재시도, 그래도 실패면 M2 에 "DEFERRED 기록 실패 — 다음 주
+보류분 {목록} 이 PL-10b 에 오인될 위험" WARN 을 남긴다. 2회차 실행이 OPEN handoff 를 못
+찾으면 빈 브리프 없이 종료.
 
 PL-10b 주간 재유입 가드: 카드화 전에 직전 `CONSUMED GRM Routine Handoff {지난 실행일}` 1건을
 조회해 본문 rows[] 의 **`source`+`document_id` 쌍 집합**과 대조한다(`document_id` 단독 금지 —
-안정 식별자는 `source::document_id`이며 병합 멤버 row 에는 `card_id` 가 없다). 일치 row 는
-카드화하지 않고 Status→Processed 만 수행, M2 에 "주간 재유입 가드: {source}::{doc_id} 지난주
-처리분 — 카드 생략" 기록. (직전 CONSUMED 를 못 찾으면 가드 생략하고 그 사실을 M2 에 기록.)
+안정 식별자는 `source::document_id`이며 병합 멤버 row 에는 `card_id` 가 없다).
+**제외: 그 CONSUMED 페이지의 `DEFERRED` 블록에 기재된 id 는 대조 집합에서 뺀다** — 지난주
+보류분(Status 미변경 재유입)은 "처리분"이 아니라 이번 주 정식 카드화 대상이다(C-1 보완).
+일치 row(=DEFERRED 아닌 진짜 처리분)는 카드화하지 않고 Status→Processed 만 수행, M2 에
+"주간 재유입 가드: {source}::{doc_id} 지난주 처리분 — 카드 생략" 기록. (직전 CONSUMED 를
+못 찾으면 가드 생략하고 그 사실을 M2 에 기록.)
 
 Tier 처리(카드 채택 — v15.8 의미론 유지):
 - Tier 3: 반드시 채택(최우선). 13개 카테고리 미매칭이어도 채택.
@@ -113,6 +120,17 @@ Tier 처리(카드 채택 — v15.8 의미론 유지):
   사안이 발견되면 채택 재검토.
 생략된 row 의 `render_order` 자리는 공백으로 둔다(순서 재배열 금지 — 남은 카드를 render_order
 오름차순 그대로 나열).
+
+⛔ **불건(不健) 해소 불변식 — 조용한 유실 절대 금지(G4 dry-run C-1 반영, Codex 보완):**
+모든 row 의 최종 조치는 다음 **넷** 중 하나로만 끝난다 — ①카드/표에 렌더(→Processed)
+②명시적 생략(Tier 1·Unrelated → Skipped, M2 기록) ③오류(→Error) ④**보류(Status 미변경 →
+다음 주 handoff 재유입)**. **"카드 없이 Processed"는 금지**한다. Tier 2 를 임의로 축약·표본
+추출(예: 동일 기관 대량 항목을 대표 N장만 내고 나머지 보류)하지 않는다 — 양이 많아도 전수
+채택이 기본이다. 부득이 한 페이지에 다 못 실으면 ④보류로 처리하되, **보류 row 의
+`source::document_id` 목록을 handoff 마감 시 영속 기록**한다([PL-10 마감] DEFERRED 블록 —
+다음 주 PL-10b 가 이 목록을 재유입 차단 대상에서 제외해야 재처리가 성립한다). M2 에도
+"용량 초과 보류 {N}건 — Status 미변경(다음 주 재처리)" 기록. 어떤 경우에도 카드화되지 않은
+row 를 Processed 로 소비하지 않는다(소비=영구 누락).
 
 Notion MCP 사용 불가·handoff 부재 시: WebSearch-only graceful degradation(v14.5 모드)로
 진행하되 M2 에 사유를 기록한다. 비상 legacy fallback 은 운영자가 명시 요청한 경우에만.
@@ -327,6 +345,8 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 - 병합 멤버(merged_into) row: **전원** Status → "Processed" (카드는 대표 1장이지만 멤버도 처리분)
 - 🔮 표 반영 row: Status → "Processed"
 - Tier 1/카테고리 제외로 생략한 row: Status → "Skipped"
+- ⛔ 카드화도 표/Watch 반영도 안 됐고 Skipped/Error 도 아닌 row(용량 초과 보류 등): **Status 미변경**
+  (Processed 금지 — 다음 주 handoff 재유입으로 재처리). M2 "보류 {N}건 — Status 미변경" 기록.
 - status_hint='Error'·필수 필드 누락·파싱 실패 row: Status → "Error" + M2 doc_id·사유.
   ⚠️ `status_hint='Error'` 는 카드가 렌더됐어도(Evidence B 강등 카드) **최종 Status 는 Error 가
   우선**한다 — "카드화 row → Processed" 규칙보다 앞선다(Codex G3 P2).
@@ -343,7 +363,12 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 5. 페이지 단일 블록: TL;DR·커버리지·🔮 표·AI 면책·메타 toggle 각 1회. 카드 내부 면책 없음.
 6. 기관 태그: `출처 기관` 에 그 주 등장 기관 전부(국내 카드 있으면 MFDS).
 7. Tier 3 누락 0: 0단계 표의 Tier 3 row(재유입 제외) 전부가 카드 또는 🔮 표에 있다.
-8. Status 체크리스트 준비: 0단계 page_id 표의 전 row 에 예정 Status 가 배정돼 있다(멤버 포함).
+8. 조치 체크리스트 준비: 0단계 page_id 표의 전 row 에 **예정 조치**(Processed/Skipped/Error/
+   보류=Status 미변경 중 하나)가 배정돼 있다(멤버 포함).
+9. 불건 해소(C-1): "카드 없이 Processed" 인 row 가 0 이다 — Processed 예정 row 는 전부 카드/표/
+   멤버에 실제 반영됐다. 용량 초과 보류분은 Processed 가 아니라 보류(Status 미변경)로 배정됐고,
+   보류가 1건이라도 있으면 DEFERRED 블록 기록이 [PL-10 마감] 에 예정돼 있다.
+   (예정 Processed 수 == 렌더 카드+표+병합 멤버 수. 불일치 시 보류분을 미변경으로 재배정.)
 위반 발견 시 발행 전에 고친다. 고칠 수 없는 구조적 한계만 M2 에 사실로 기록.
 
 [발송]
@@ -372,3 +397,5 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 |---|---|
 | 2026-06-05 | G3 초안 작성(Cowork). 카드별 6슬롯 루프 + A안 조립(render_order/group_label) + 검색 카드 미니 템플릿 + 🔮 표 비카드 전용 + K4 경계 고지. 검색/Fetch 기계는 v15.8 이관. Codex 판정 플래그 F-1(Tier 1 생략)·F-2(Watch 비중복) |
 | 2026-06-05 | **동결** — Codex G3 조건부 GO 반영: P1 PL-10b 대조 키 `source`+`document_id`(0단계 표에 source 포함), P2 검색 카드 Signal 라벨 `Signal Med (T2)`(scaffold 동형), P2 `status_hint='Error'` 최종 Status 우선 명시. F-1·F-2 초안 채택 확정, card_spec §6 문구 정정 동반(P3) |
+| 2026-06-05 | **G4 dry-run C-1 반영(불건 해소 불변식)**: WHO Tier 2 임의 축약→보류 162건이 예정 Status=Processed 로 배정돼 조용한 유실 위험 발견. ⛔ 불변식 추가: 카드/표/멤버 미반영 row 를 Processed 로 소비 금지, 용량 초과 보류분은 Status 미변경(다음 주 재유입). Tier 2 임의 표본추출 금지·전수 채택 기본. [Status 갱신]·[Publish Lint 9] 동반 추가. (C-2 노이즈 카드는 원인 진단 중 — 별도) |
+| 2026-06-05 | **C-1 Codex HOLD 보완(PL-10b 충돌 해소)**: 보류분이 직전 CONSUMED rows[] 에 남아 다음 주 PL-10b 가 "처리분"으로 오인→1주 지연 유실 가능성 지적. ① [PL-10 마감] 에 `DEFERRED {N}: source::doc_id,...` 블록 append(실패 시 WARN) ② PL-10b 대조 집합에서 DEFERRED 목록 제외 ③ 최종 처분 3종→**조치 4종**(Processed/Skipped/Error/보류) 정정, Lint 8 "예정 Status"→"예정 조치" |

@@ -226,11 +226,21 @@ QA_LIKELY_BOOST = [
     "media fill", "non-sterility", "lack of sterility assurance",
 ]
 
+# 의료기기 분류 Rule 단서 (단수·복수). FR 의 "Medical Devices; Orthopedic Devices;"
+# 분류고시(Rule)가 Intake 에 카드로 유입되던 갭(C-2) 차단용. 단수 단서는 복수형
+# FR 제목("Medical Devices")에 단어경계로 안 걸려 누수했다(LV-C2). 단어경계 매칭이라
+# 'device(s)' 가 약물전달기기·combination product 같은 정당 항목을 오배제하지 않도록,
+# compute_relevance 에서 QA_DEVICE_DRUG_GUARD 가 함께 있으면 제외를 보류한다.
+QA_DEVICE_EXCLUDE_TERMS = [
+    "medical device", "medical devices",
+    "orthopedic devices", "device only",
+]
+
 # 명시 제외 (medical device · 화장품 · 식품 · 백신 단독 등)
 # 주의: "food safety" 는 단어 경계 매칭이므로 "food safety" + "drug GMP" 동시 포함 문서는
 # 아래 강력 키워드 로직으로 Possible 로 살아남음
 QA_EXCLUDE_KEYWORDS = [
-    "medical device", "device only",
+    *QA_DEVICE_EXCLUDE_TERMS,
     "cosmetic", "cosmetics",
     "food safety", "dietary supplement label",
     "dietary supplement", "haccp", "fsvp",
@@ -241,6 +251,17 @@ QA_EXCLUDE_KEYWORDS = [
     "veterinary only", "animal drug only", "animal drug",
     "veterinary drug", "veterinary medicine", "animal health product",
     "medicated feed",
+]
+
+# 의료기기 단서가 있어도 약물/복합제 단서가 함께면 약물전달기기·combination product
+# 정당 항목으로 보고 Unrelated 로 배제하지 않는다(오배제 가드, C-2 G4).
+# ⚠️ bare "drug" 금지 — FR 초록 상용구 "Food and Drug Administration" 에 항상 걸려
+#    순수 기기 Rule 을 오통과시킨다(실증: bone filler). 약물전달기기·복합제를 가리키는
+#    '복합 구(phrase)'만 둔다.
+QA_DEVICE_DRUG_GUARD = [
+    "drug product", "drug substance", "drug constituent",
+    "drug delivery", "drug-eluting", "drug-coated", "drug-device",
+    "biologic", "biologics", "combination product",
 ]
 
 # 강한 제외(hard exclude) — boost 키워드 구제 없이 무조건 Unrelated.
@@ -994,11 +1015,16 @@ def compute_relevance(*text_parts: str) -> str:
     if _kw_any(blob, QA_HARD_EXCLUDE_TERMS):
         return "Unrelated"
     if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
-        # 명시 제외 키워드가 있어도 Likely 가산 키워드 2개 이상이면 Possible 로 구제
-        strong = _kw_match(blob, QA_LIKELY_BOOST)
-        if strong >= 2:
-            return "Possible"
-        return "Unrelated"
+        # 가드: 의료기기 단서로 인한 제외라도 약물/복합제 단서가 함께면 약물전달기기·
+        # combination product 정당 항목으로 보고 일반 분류로 진행(오배제 방지, C-2 G4).
+        device_guarded = (_kw_any(blob, QA_DEVICE_EXCLUDE_TERMS)
+                          and _kw_any(blob, QA_DEVICE_DRUG_GUARD))
+        if not device_guarded:
+            # 명시 제외 키워드가 있어도 Likely 가산 키워드 2개 이상이면 Possible 로 구제
+            strong = _kw_match(blob, QA_LIKELY_BOOST)
+            if strong >= 2:
+                return "Possible"
+            return "Unrelated"
     matches = _kw_match(blob, QA_CATEGORY_KEYWORDS)
     if matches < QA_MIN_MATCH:
         return "Pending"

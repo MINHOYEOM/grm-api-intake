@@ -1,9 +1,11 @@
 import unittest
 
 from collect_intake import (
+    SOURCE_FR,
     _fda_wl_office_gate,
     _is_low_value_fda_warning_letter,
     compute_relevance,
+    compute_signal_tier,
 )
 from collect_mfds_gmp_inspection import _is_medical_gas_gmp_noise
 
@@ -186,6 +188,84 @@ class FdaWarningLetterOfficeGateTest(unittest.TestCase):
                 "Current Good Manufacturing Practice for finished pharmaceuticals"
             )
         )
+
+
+class FederalRegisterDeviceNoiseFilterTest(unittest.TestCase):
+    """C-2 G4: FR 의료기기 분류 Rule("Medical Devices; Orthopedic Devices;…")이
+    Intake 에 카드로 유입되던 갭. 복수형 단서로 Unrelated → Tier 1 고정해 차단.
+    단, 약물전달기기·combination product 정당 항목은 오배제하지 않는다."""
+
+    # 실제 누수 3건 raw (2026-11308 · 11306 · 11302) — 순수 기기 분류 Rule.
+    REAL_DEVICE_RULES = [
+        (
+            "Medical Devices; Orthopedic Devices; Classification of the Resorbable "
+            "Calcium Salt Bone Void Filler Containing a Single Approved "
+            "Aminoglycoside Antibacterial",
+            "The Food and Drug Administration (FDA) is classifying the resorbable "
+            "calcium salt bone void filler containing a single approved aminoglycoside "
+            "antibacterial into class II (special controls). The special controls that "
+            "apply to the product type are identified in this order and will be part of "
+            "the codified language for classification of the resorbable calcium salt "
+            "bone void filler containing a single approved aminoglycoside antibacterial.",
+        ),
+        (
+            "Medical Devices; Orthopedic Devices; Classification of the Shoulder Joint "
+            "Humeral (Hemi-Shoulder) Ceramic Head/Metallic Stem Cemented or "
+            "Uncemented Prosthesis",
+            "The Food and Drug Administration (FDA) is classifying the shoulder joint "
+            "humeral (hemi-shoulder) ceramic head/metallic stem cemented or uncemented "
+            "prosthesis into class II (special controls). The special controls that "
+            "apply to the device type are identified in this order.",
+        ),
+        (
+            "Medical Devices; Orthopedic Devices; Classification of the Absorbable "
+            "Metallic Bone Fixation Fastener",
+            "The Food and Drug Administration (FDA) is classifying the absorbable "
+            "metallic bone fixation fastener into class II (special controls). The "
+            "special controls that apply to the device type are identified in this order.",
+        ),
+    ]
+
+    def test_real_device_classification_rules_are_unrelated_tier1(self) -> None:
+        # compute_relevance=Unrelated → compute_signal_tier 가 Tier 1 로 고정(카드 미렌더).
+        for title, abstract in self.REAL_DEVICE_RULES:
+            with self.subTest(title=title[:48]):
+                rel = compute_relevance(title, abstract, "Rule")
+                self.assertEqual(rel, "Unrelated")
+                tier = compute_signal_tier(
+                    SOURCE_FR, "Rule", rel, "N/A", title, abstract, "Rule"
+                )
+                self.assertEqual(tier, "Tier 1")
+
+    def test_plural_device_terms_match_on_word_boundary(self) -> None:
+        # 단수 단서는 복수형 FR 제목에 안 걸렸던 누수 경로 — 복수형도 Unrelated.
+        self.assertEqual(
+            compute_relevance("Medical Devices; Orthopedic Devices; Classification"),
+            "Unrelated",
+        )
+
+    def test_drug_delivery_combination_device_is_not_over_excluded(self) -> None:
+        # 오배제 0: 기기 단서가 있어도 약물/복합제 단서가 함께면 Unrelated 가 아니어야 한다
+        # (약물전달기기·combination product 정당 포함).
+        combo_cases = [
+            (
+                "Medical Devices; Cardiovascular Devices; Classification of the "
+                "Drug-Eluting Coronary Stent",
+                "The drug-eluting coronary stent is a combination product containing "
+                "a drug constituent intended to reduce restenosis.",
+            ),
+            (
+                "Medical Devices; General Hospital Devices; Drug-Device Combination "
+                "Infusion Pump",
+                "This combination product delivers a biologic drug product via an "
+                "implanted device constituent.",
+            ),
+        ]
+        for title, abstract in combo_cases:
+            with self.subTest(title=title[:48]):
+                self.assertNotEqual(
+                    compute_relevance(title, abstract, "Rule"), "Unrelated"
+                )
 
 
 class MfdsGmpNoiseFilterTest(unittest.TestCase):

@@ -126,8 +126,22 @@ class FdaWarningLetterOfficeGateTest(unittest.TestCase):
             "exclude",
         )
 
+    def test_oii_food_cgmp_for_foods_is_excluded(self) -> None:
+        # P1 회귀: 식품 WL 제목의 단독 "CGMP for Foods" 가 약품으로 오인돼 관통하던 갭.
+        # 식품 단서가 있고 약품 '전용' 단서가 없으므로 제외돼야 한다(Codex: Stavis Seafoods).
+        self.assertEqual(
+            _fda_wl_office_gate(
+                "Office of Inspections and Investigations (OII)",
+                "Seafood HACCP/CGMP for Foods",
+                "Seafood HACCP/CGMP for Foods/Adulterated",
+                "Stavis Seafoods, Inc.",
+            ),
+            "exclude",
+        )
+
     def test_oii_drug_context_is_kept(self) -> None:
-        # OII + finished pharmaceuticals/cGMP 맥락 → 유지(약품 WL 오삭제 방지).
+        # OII + 약품 '전용' 단서(finished pharmaceuticals) → 유지(약품 WL 오삭제 방지).
+        # 단독 cgmp 가 아니라 약품 전용 단서가 keep 을 결정해야 한다.
         self.assertEqual(
             _fda_wl_office_gate(
                 "Office of Inspections and Investigations (OII)",
@@ -138,8 +152,19 @@ class FdaWarningLetterOfficeGateTest(unittest.TestCase):
             "keep",
         )
 
+    def test_oii_bare_cgmp_without_drug_only_clue_is_review(self) -> None:
+        # P1: 단독 cgmp 는 더 이상 keep 단서가 아니다. 식품·약품전용 단서 모두 없으면
+        # review(보수적 유지) — keep 으로 단정하지 않는다.
+        self.assertEqual(
+            _fda_wl_office_gate(
+                "Office of Inspections and Investigations (OII)",
+                "CGMP violations", "current good manufacturing practice", "Example Co."
+            ),
+            "review",
+        )
+
     def test_oii_ambiguous_context_is_review(self) -> None:
-        # OII 인데 식품·약품 단서 모두 없음 → Needs Review(비-드롭).
+        # OII 인데 식품·약품 단서 모두 없음 → review(비-드롭).
         self.assertEqual(
             _fda_wl_office_gate(
                 "Office of Inspections and Investigations (OII)",

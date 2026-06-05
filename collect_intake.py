@@ -53,6 +53,8 @@ from grm_common import (
     log,
     retry_after_seconds,
 )
+# K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
+from card_scaffold import build_card_scaffold
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -116,6 +118,7 @@ SOURCE_HC = "Health Canada"
 SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
+HANDOFF_SCHEMA_VERSION_V2 = "grm-routine-handoff/v2"  # K2 단계 D (additive)
 
 # ── Phase 2a: Search / Scrape 소스 ──────────────────────────────────────────
 SOURCE_BRAVE = "Brave Search"
@@ -2431,6 +2434,53 @@ def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
     }
 
 
+def _enable_handoff_v2() -> bool:
+    """handoff v2 feature flag (기본 off, vars fallback 패턴). 운영 전환은 K3 와 함께."""
+    return os.environ.get("ENABLE_HANDOFF_V2", "false").lower() == "true"
+
+
+# v2 row 에서 제외할 큰/내부 필드 — raw 전체는 절대 미포함(크기 폭증·children 한도, 단계 D).
+_HANDOFF_V2_ROW_DROP = ("raw",)
+
+
+def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
+                                     window_days: int,
+                                     generated_at: datetime) -> dict[str, Any]:
+    """handoff v2(additive) payload. 순수 함수 — 네트워크 없음(scaffold 조립만).
+
+    `rows` 는 K2-prep(`enrich_rows_with_raw`)로 **dedupe·raw 부착**된 상태여야 한다.
+    각 row 에 `card_scaffold`·`prose_input`·`section`·`card_id`·`recall_group_key`(해당
+    시)를 additive 로 붙이고, **raw 전체는 제외**한다. v1 필드는 보존(하위호환).
+    """
+    start = run_date - timedelta(days=window_days)
+    out_rows: list[dict[str, Any]] = []
+    source_counts: dict[str, int] = {}
+    for row in rows:
+        raw = row.get("raw")
+        card = build_card_scaffold(row, raw)
+        v2row = {k: v for k, v in row.items() if k not in _HANDOFF_V2_ROW_DROP}
+        v2row["card_id"] = card.card_id
+        v2row["section"] = card.section
+        v2row["card_scaffold"] = card.markdown
+        v2row["prose_input"] = card.prose_input
+        v2row["needs_llm_slots"] = list(card.needs_llm_slots)
+        if card.recall_group_key:
+            v2row["recall_group_key"] = card.recall_group_key
+        out_rows.append(v2row)
+        source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
+    return {
+        "schema_version": HANDOFF_SCHEMA_VERSION_V2,
+        "handoff_id": f"routine-handoff::{run_date.isoformat()}",
+        "run_date_kst": run_date.isoformat(),
+        "window_start": start.isoformat(),
+        "window_end": run_date.isoformat(),
+        "generated_at_kst": generated_at.isoformat(),
+        "row_count": len(out_rows),
+        "source_counts": source_counts,
+        "rows": out_rows,
+    }
+
+
 def _handoff_page_properties(payload: dict[str, Any],
                              generated_at: datetime) -> dict[str, Any]:
     run_date = payload["run_date_kst"]
@@ -2455,8 +2505,13 @@ def _handoff_page_properties(payload: dict[str, Any],
     }
 
 
-def _handoff_blocks(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    json_payload = json.dumps(payload, ensure_ascii=False, indent=2)
+def _handoff_blocks(payload: dict[str, Any], compact: bool = False) -> list[dict[str, Any]]:
+    # v2(compact=True): sort_keys 결정론 + 공백 제거(크기 절감, §12G). v1: 기존 indent=2 유지(바이트 동일).
+    if compact:
+        json_payload = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                                  separators=(",", ":"))
+    else:
+        json_payload = json.dumps(payload, ensure_ascii=False, indent=2)
     blocks: list[dict[str, Any]] = [
         {
             "object": "block",
@@ -2547,32 +2602,41 @@ def notion_append_page_children(token: str, page_id: str,
         time.sleep(0.34)
 
 
+_NOTION_CHILDREN_CREATE_LIMIT = 90  # 요청당 100 한도 방어(단계 D, Codex P2)
+
+
 def notion_upsert_routine_handoff(token: str, db_id: str,
                                   payload: dict[str, Any],
-                                  generated_at: datetime) -> tuple[str, str]:
-    """New-only handoff page 를 생성/갱신하고 (page_id, page_url) 반환."""
+                                  generated_at: datetime,
+                                  compact: bool = False) -> tuple[str, str]:
+    """New-only handoff page 를 생성/갱신하고 (page_id, page_url) 반환.
+
+    compact=True(v2) 면 payload JSON 을 compact 직렬화한다. children 이 한도(90)를
+    넘으면 페이지 생성 후 append chunk 경로로 분할 전송(create 한 번에 100 초과 방지).
+    """
     props = _handoff_page_properties(payload, generated_at)
-    blocks = _handoff_blocks(payload)
+    blocks = _handoff_blocks(payload, compact=compact)
     existing = notion_find_handoff_page(token, db_id, payload["handoff_id"])
     if existing:
         page_id = existing["id"]
         notion_archive_page_children(token, page_id)
-        notion_append_page_children(token, page_id, blocks)
+        notion_append_page_children(token, page_id, blocks)  # 이미 90 단위 분할
         notion_api_request("PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id),
                            token, body={"properties": props})
         page_url = existing.get("url", "")
         log("INFO", f"Routine handoff 갱신 완료: {page_url or page_id}")
         return page_id, page_url
 
-    body = {
-        "parent": {"database_id": db_id},
-        "properties": props,
-        "children": blocks,
-    }
+    # 생성: children ≤90 이면 한 번에(v1 기존 동작 유지), >90 이면 첫 90 + 나머지 append.
+    head = blocks[:_NOTION_CHILDREN_CREATE_LIMIT]
+    tail = blocks[_NOTION_CHILDREN_CREATE_LIMIT:]
+    body = {"parent": {"database_id": db_id}, "properties": props, "children": head}
     created = notion_api_request("POST", NOTION_PAGES_URL, token, body=body)
     page_id = created.get("id", "")
     page_url = created.get("url", "")
-    log("INFO", f"Routine handoff 생성 완료: {page_url or page_id}")
+    if tail:
+        notion_append_page_children(token, page_id, tail)
+    log("INFO", f"Routine handoff 생성 완료: {page_url or page_id} (blocks={len(blocks)})")
     return page_id, page_url
 
 
@@ -2580,12 +2644,23 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          window_days: int,
                          generated_at: datetime,
                          source_names: set[str] | None = None,
-                         doc_ids: set[str] | None = None) -> tuple[int, str]:
+                         doc_ids: set[str] | None = None,
+                         inmemory_raw: dict[str, dict[str, Any]] | None = None
+                         ) -> tuple[int, str]:
     rows = notion_query_new_intake_rows(token, db_id, run_date, window_days,
                                         source_names=source_names,
                                         doc_ids=doc_ids)
-    payload = build_routine_handoff_payload(rows, run_date, window_days, generated_at)
-    _page_id, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
+    if _enable_handoff_v2():
+        # K2-prep: dedupe → 하이브리드 raw 부착(메모리 우선) → scaffold v2 payload.
+        enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
+        payload = build_routine_handoff_payload_v2(enriched, run_date, window_days, generated_at)
+        _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
+                                                       generated_at, compact=True)
+        log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")
+    else:
+        # 기존 v1 경로 — scheduled 운영 기본. 바이트 동일 보장(변경 없음).
+        payload = build_routine_handoff_payload(rows, run_date, window_days, generated_at)
+        _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
     return payload["row_count"], page_url
 
 

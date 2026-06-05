@@ -113,7 +113,9 @@ LLM 이 채우는 칸은 단 6종: **제목 핵심이슈 · W1문장 · W4번역
 | guidance/regulatory-change | 위 분기 + W5 를 변경내용·시행/의견기한·영향대상 중심 |
 
 Evidence 판정(Python): Intake raw payload 보존 + 유형별 필수필드 충족 → A. 인덱스+보조 → B. 보조 단독 → C.
-예정·진행중(Comments Close/consultation/입법예고) → D(🔮 표, 카드 아님).
+예정·진행중 D 의 처리(정정 2026-06-05, Codex G3 P3·F-2): **검색/Fetch 신규 Watch item = 🔮 표(카드 아님)**,
+단 **Intake watch scaffold row(입법예고 등 §12 C-확장 legislative, section=watch)는 카드로 렌더 가능** —
+golden(legislative 카드)·v16 프롬프트와 정합. 🔮 표는 비카드 Watch 전용(카드로 렌더된 항목 중복 등재 금지).
 
 ## 7. 섹션 배치 · 그룹핑 (Python)
 
@@ -322,4 +324,5 @@ K3 프롬프트는 v15.8 방식대로 멤버 전원 갱신을 명시). v1 경로
 | 2026-06-05 | **K1+K2 종합점검(조건부 GO) 반영 — 동결본 정리(P1-3)**: 문서 상태 초안→동결본(§12·§13.1 우선 명시), §0 prefix/제목 행 §13.1 기준 정정, §3 공통 5행 구기준 표시, §11 결정완료 처리. P2-1 이모지 문구 정밀화(콜아웃 헤더+📰📎 허용·제목/W2 라벨 금지), P2-2 그룹핑 소제목=페이지 구조(카드 내부 원칙과 비충돌) 명문화. **K2.5 보강 트랙 신설**: 활성 전 유형 W2/quote/evidence 분기 + prose_input whitelist 확장 + golden 전 유형 확장(P1-1·P1-2) |
 | 2026-06-05 | **K2.5 매핑 동결(§12 C-확장)**: 전 16 유형 × (W2 유형행·quote 소스·Evidence) 표 + A⟺quote 불변식 + prose_input 공통/유형별 필드 기록. golden 16종·134 테스트가 이 표의 기대 출력. Codex 재확인 대기 |
 | 2026-06-05 | **K3 착수 — §14 recall 다품목 병합 렌더 초안 신설**(결정 #6 "규칙+구현" 채택): MFDS recall 한정·`merge_recall_cards()` 순수함수(스캐폴드 1:1 불변)·대표 card_id 오름차순·W2 toggle 품목목록·멤버 row `merged_into` 마킹(Status 갱신 목록 유지). Codex 게이트 통과 시 동결 |
+| 2026-06-05 | **§6 D-처리 정정(Codex G3 P3·F-2)**: 검색/Fetch 신규 Watch = 🔮 표 전용, Intake watch scaffold(legislative)는 카드 렌더 — golden·v16 프롬프트 정합, 표/카드 중복 등재 금지 |
 | 2026-06-05 | **§14 동결** — Codex R1 반영: (E) 병합 `product` 300자 가드 최종 문자열 기준, (F) 멤버 row = v1 호환 필드 + `merged_into` 만(자체 `card_id` 포함 v2 additive 전부 생략). 구현 G1+R1 4커밋 Codex GO·사람 승인·main 머지. fork A안(`render_order`+`group_label`, `_ordered_cards_with_groups()` 단일 진실원) 동반 확정 |

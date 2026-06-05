@@ -1,8 +1,9 @@
 # GRM Routine Prompt — v16 (Python-thick / Routine-thin · handoff v2 슬롯 치환)
 
-> **상태: ✅ 동결 (2026-06-05)** — Codex G3 조건부 GO → P1(PL-10b `source`+`document_id` 키)·
-> P2×2(Signal Med (T2)·status_hint Error 우선) 반영, F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 초안 채택.
-> 변경은 이 문서 + card_spec 갱신으로만. 운영 투입은 G4 전환과 함께.
+> **상태: ✅ 동결 · 🟢 운영 중 (2026-06-06 전환)** — Codex G3 조건부 GO → P1(PL-10b `source`+`document_id` 키)·
+> P2×2(Signal Med (T2)·status_hint Error 우선) + G4 dry-run C-1(불건 해소 불변식·DEFERRED, HOLD→GO) 반영.
+> F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
+> 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
 > 운영 투입은 `ENABLE_HANDOFF_V2=true` 전환(G4)과 함께. 그 전까지 운영은 v15.8 + v1 handoff.
 

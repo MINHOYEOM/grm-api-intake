@@ -137,11 +137,11 @@ class MergeRecallV2SerializationTest(unittest.TestCase):
         self.assertEqual(rep["prose_input"]["merged_count"], 3)
 
     def test_members_marked_and_stripped(self) -> None:
-        members = [r for r in self.payload["rows"]
-                   if r["card_id"] != "MFDS::recall-2026003474"]
+        members = [r for r in self.payload["rows"] if "merged_into" in r]
         self.assertEqual(len(members), 2)
         for m in members:
             self.assertEqual(m["merged_into"], "MFDS::recall-2026003474")
+            self.assertNotIn("card_id", m)              # R1-a: 멤버 자체 card_id 제거
             self.assertNotIn("card_scaffold", m)        # 렌더 제외
             self.assertNotIn("prose_input", m)
             self.assertNotIn("needs_llm_slots", m)

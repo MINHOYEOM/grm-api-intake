@@ -709,6 +709,20 @@ def _merge_w2_product(table_block: str, rep_product: str, n: int) -> str:
     return "\n".join(out)
 
 
+def _merged_product_field(items: list[str], rep_product: str, n: int) -> str:
+    """§14(E) 병합 prose_input.product — **최종 문자열**에 300자 가드 재적용(Codex R1-b).
+
+    품목 전체 나열이 300자 이하면 그대로, 초과하면 `{대표 PRDUCT} 외 N품목` 축약.
+    축약 결과(대표 품목명 자체가 길 때)도 300자를 넘으면 299자+'…'(=300)로 강제 절단해
+    어떤 경우에도 ≤300자를 보장한다.
+    """
+    joined = ", ".join(it for it in items if it)
+    candidate = joined if len(joined) <= 300 else f"{rep_product} 외 {n}품목"
+    if len(candidate) > 300:
+        candidate = candidate[:299].rstrip() + "…"
+    return candidate
+
+
 def _merge_items_toggle(items: list[str], total: int) -> str:
     """§14(D): W2 직후 toggle `전체 품목 (N+1)` 에 품목명 bullet 나열(v15.8 <details> 양식)."""
     bullets = "\n".join(f"- {it}" for it in items if it)
@@ -755,8 +769,7 @@ def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
         entrps = rep.prose_input.get("firm_or_product", "")
         merged_md = _render_merged_recall(rep.markdown, entrps, rep_product, items, n)
         new_prose = dict(rep.prose_input)
-        joined = ", ".join(it for it in items if it)
-        new_prose["product"] = joined if len(joined) <= 300 else f"{rep_product} 외 {n}품목"
+        new_prose["product"] = _merged_product_field(items, rep_product, n)
         new_prose["merged_count"] = n + 1
         out[rep_idx] = replace(rep, markdown=merged_md, prose_input=new_prose)
         for i in members[1:]:

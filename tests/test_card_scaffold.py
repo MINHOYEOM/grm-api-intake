@@ -206,6 +206,21 @@ def _build_cards_from_rows(rows: list[dict]) -> list:
     return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
 
 
+def _recall_rows(entrps: str, reason: str, pub: str,
+                 products: list[str]) -> list[dict]:
+    """동일 키(병합 대상) recall 3요소 + 품목별 row 생성 — card_id 오름차순 = 입력 순서."""
+    out = []
+    for i, prd in enumerate(products):
+        out.append({
+            "row": {"date": pub, "document_id": f"recall-{i:04d}", "firm": entrps,
+                    "headline": "회수", "language": "KO", "modality": "Chemical",
+                    "raw_fetch_ok": True, "signal_tier": "Tier 2", "source": "MFDS",
+                    "type_or_class": "recall-quality"},
+            "raw": {"ENTRPS": entrps, "PRDUCT": prd, "RTRVL_RESN": reason},
+        })
+    return out
+
+
 class MergeRecallCardsTest(unittest.TestCase):
     """card_spec §14 — recall 다품목 1카드 병합 렌더 (K3 G1)."""
 
@@ -298,6 +313,32 @@ class MergeRecallCardsTest(unittest.TestCase):
         merged = cs.merge_recall_cards(cards)
         self.assertEqual([c.markdown for c in merged], [c.markdown for c in cards])
         self.assertTrue(all(not c.merged_into for c in merged))
+
+    def test_merged_product_guard_caps_300_chars(self) -> None:
+        # R1-b: 대표 품목명 자체가 길어 `외 N품목` fallback 도 300자 초과 → 최종 ≤300자.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["가" * 300, "나정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        product = rep.prose_input["product"]
+        self.assertLessEqual(len(product), 300)
+        self.assertTrue(product.endswith("…"))
+
+    def test_merged_product_joined_when_under_limit(self) -> None:
+        # R1-b 경계: 나열이 300자 이하면 전체 나열 그대로(축약 안 함).
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["가정", "나정", "다정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        self.assertEqual(rep.prose_input["product"], "가정, 나정, 다정")
+
+    def test_merged_title_truncates_at_60(self) -> None:
+        # R1-c: 구두점 없는 60자 초과 핵심대상 — _truncate_at_sentence 경계 동작 스냅샷.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["아세트아미노펜정" * 10, "나정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        title = rep.markdown.splitlines()[0]
+        target = title.partition("] ")[2].partition(" — ")[0]
+        self.assertTrue(target.endswith("…"))      # 절단 마커
+        self.assertLessEqual(len(target), 61)       # 60자 + '…'
 
     def test_assemble_skeleton_excludes_merged_members(self) -> None:
         # §14(F): 페이지 렌더는 대표 1카드만(멤버 markdown 미포함).

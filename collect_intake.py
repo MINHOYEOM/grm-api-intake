@@ -2481,8 +2481,8 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     `card_id`·`evidence`·`recall_group_key`(해당 시)·`status_hint`(degrade 시) additive.
     **raw 전체·Stage B bookkeeping 은 제외**(크기 폭증·내부필드 누출 방지).
     recall 다품목은 `merge_recall_cards()`(§14)로 대표 1카드 + 멤버 `merged_into` 직렬화:
-    멤버 row 는 v1 호환 필드 + `merged_into` 만 유지(card_scaffold·prose_input·needs_llm_slots
-    생략 → Routine 렌더 제외, page_id 보존으로 Status 갱신 목록에는 잔존).
+    멤버 row 는 v1 호환 필드 + `merged_into` 만 유지(자체 card_id 포함 v2 additive 필드 전부
+    생략 → Routine 렌더 제외, page_id 보존으로 Status 갱신 목록에는 잔존, Codex R1-a).
     """
     start = run_date - timedelta(days=window_days)
     cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
@@ -2490,13 +2490,13 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     source_counts: dict[str, int] = {}
     for row, card in zip(rows, cards):
         v2row = {k: row[k] for k in _HANDOFF_V2_ROW_KEEP if k in row}
-        v2row["card_id"] = card.card_id
         if card.merged_into:
-            # §14(F) 멤버: v1 호환 필드 + merged_into 만(card_scaffold/prose_input/
-            # needs_llm_slots/section/evidence/recall_group_key 생략). 렌더 제외, page_id
-            # 보존으로 Status 갱신 목록에만 잔존. 그룹 식별은 대표 card_id(merged_into)로.
+            # §14(F)·R1-a 멤버: v1 호환 필드 + merged_into 만(자체 card_id·card_scaffold·
+            # prose_input·needs_llm_slots·section·evidence·recall_group_key 생략).
+            # 렌더 제외, page_id 보존으로 Status 갱신 목록에만 잔존. 그룹 식별은 merged_into 로.
             v2row["merged_into"] = card.merged_into
         else:
+            v2row["card_id"] = card.card_id
             v2row["section"] = card.section
             v2row["evidence"] = card.evidence
             v2row["card_scaffold"] = card.markdown

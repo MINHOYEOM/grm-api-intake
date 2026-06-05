@@ -2264,6 +2264,90 @@ def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
     return snapshots
 
 
+# ── K2-prep: page_id 로 원 row raw API JSON 복원 → rows 에 부착 (card_spec §12(A)) ──
+# v1 handoff snapshot 에는 raw 가 없다(원본 API 응답 JSON 전체는 Intake row 본문
+# code block 에만 있고, `raw_excerpt` 속성은 잘린 발췌라 불충분). raw 의존 칸(W3 인용·
+# MFDS W2·Modality 폴백)은 이 보강 후에만 결정론적이다(redesign §4, card_spec §12(A)).
+# ⚠️ 이 단계는 네트워크 호출이므로 build_card_scaffold() 안에 두지 않는다(§12(G) 순수성).
+_INTAKE_RAW_MAX_PAGES = 25  # children 100/page · raw 는 ≤2KB 청크라 1페이지로 충분(안전 상한)
+
+
+def fetch_intake_raw_payload(token: str, page_id: str) -> dict[str, Any] | None:
+    """Intake row(page_id) 본문의 JSON code block 들을 순서대로 이어붙여 raw dict 복원.
+
+    `build_notion_children()` 이 저장한 'Raw API payload' code block(language=json,
+    NOTION_CODE_BLOCK_CHUNK 청크)을 역으로 재조립한다. fetch/파싱 실패 시 None 반환
+    (호출부 graceful degrade — 예외를 던지지 않아 전체 handoff 를 중단시키지 않는다).
+    """
+    if not page_id:
+        return None
+    url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
+    code_chunks: list[str] = []
+    start_cursor: str | None = None
+    try:
+        for _ in range(_INTAKE_RAW_MAX_PAGES):
+            req_url = url
+            if start_cursor:
+                req_url = f"{url}?start_cursor={urllib.parse.quote(start_cursor)}"
+            data = notion_api_request("GET", req_url, token)
+            for block in data.get("results", []):
+                if block.get("type") != "code":
+                    continue
+                code = block.get("code", {})
+                if (code.get("language") or "") not in ("json", "plain text", ""):
+                    continue
+                for rt in code.get("rich_text", []):
+                    code_chunks.append(
+                        rt.get("plain_text")
+                        or rt.get("text", {}).get("content", "")
+                        or ""
+                    )
+            if not data.get("has_more"):
+                break
+            start_cursor = data.get("next_cursor")
+    except (NotionHandoffError, requests.RequestException) as e:
+        log("WARN", f"K2-prep children fetch 실패 page={page_id}: {truncate(str(e), 120)}")
+        return None
+    if not code_chunks:
+        return None
+    raw_text = "".join(code_chunks)
+    try:
+        parsed = json.loads(raw_text)
+    except (ValueError, TypeError):
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def attach_raw_to_rows(token: str, rows: list[dict[str, Any]],
+                       sleep_s: float = 0.34) -> dict[str, int]:
+    """각 row 에 page_id 로 raw API JSON 을 fetch 해 row['raw'] 로 부착한다.
+
+    실패 row 는 graceful degrade(card_spec §8, Codex 정정): raw=None ·
+    raw_fetch_ok=False · evidence_hint='B'(A 불가) · status_hint='Error'(기존 DB
+    옵션; 전용 'Needs Review' 옵션 신설은 K4 이월). 전체 중단 금지. 반환 통계 dict.
+    """
+    ok = failed = 0
+    for row in rows:
+        page_id = row.get("page_id", "")
+        raw = fetch_intake_raw_payload(token, page_id)
+        if raw is None:
+            row["raw"] = None
+            row["raw_fetch_ok"] = False
+            row["evidence_hint"] = "B"
+            row["status_hint"] = "Error"
+            failed += 1
+            log("WARN", "K2-prep raw 부착 실패 → graceful degrade(Evidence B·Status Error): "
+                        f"{row.get('source', '')}::{row.get('document_id', '')} page={page_id}")
+        else:
+            row["raw"] = raw
+            row["raw_fetch_ok"] = True
+            ok += 1
+        if sleep_s:
+            time.sleep(sleep_s)
+    log("INFO", f"K2-prep raw 부착 완료: 성공 {ok}건 / 실패 {failed}건 (총 {len(rows)})")
+    return {"ok": ok, "failed": failed, "total": len(rows)}
+
+
 def _dedupe_latest_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     latest: dict[str, dict[str, Any]] = {}
     for row in rows:

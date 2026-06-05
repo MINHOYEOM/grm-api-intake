@@ -97,6 +97,61 @@ class BuildV2PayloadTest(unittest.TestCase):
         self.assertEqual(sa, sb)
 
 
+def _recall_group_rows() -> list[dict]:
+    """동일 ENTRPS/사유/발행일 3품목(병합 대상) — card_id 오름차순 대표 = 3474."""
+    base = {
+        "source": "MFDS", "date": "2026-06-02", "type_or_class": "recall-quality",
+        "firm": "한국제약", "headline": "정제 회수", "signal_tier": "Tier 2",
+        "modality": "Chemical", "language": "KO", "raw_fetch_ok": True,
+    }
+    reason = "함량부적합 자진 회수"
+    out = []
+    for did, page, prd in (("recall-2026003474", "page-r1", "정제 500mg"),
+                           ("recall-2026003475", "page-r2", "정제 325mg"),
+                           ("recall-2026003476", "page-r3", "정제 200mg")):
+        out.append({**base, "document_id": did, "page_id": page,
+                    "raw": {"ENTRPS": "한국제약(주)", "PRDUCT": prd, "RTRVL_RESN": reason}})
+    return out
+
+
+class MergeRecallV2SerializationTest(unittest.TestCase):
+    """§14(F) — handoff v2 직렬화: 대표 1카드 + 멤버 merged_into(렌더 제외·Status 유지)."""
+
+    def setUp(self) -> None:
+        self.payload = ci.build_routine_handoff_payload_v2(
+            _recall_group_rows(), RUN_DATE, 7, GEN_AT)
+
+    def test_all_three_rows_retained(self) -> None:
+        # row_count 는 멤버 포함 3건 유지(Status 갱신 목록 보존).
+        self.assertEqual(self.payload["row_count"], 3)
+        self.assertEqual({r["page_id"] for r in self.payload["rows"]},
+                         {"page-r1", "page-r2", "page-r3"})
+
+    def test_representative_has_merged_scaffold(self) -> None:
+        rep = next(r for r in self.payload["rows"]
+                   if r["card_id"] == "MFDS::recall-2026003474")
+        self.assertNotIn("merged_into", rep)
+        self.assertIn("card_scaffold", rep)
+        self.assertIn("외 2품목", rep["card_scaffold"])
+        self.assertIn("<details>", rep["card_scaffold"])
+        self.assertEqual(rep["prose_input"]["merged_count"], 3)
+
+    def test_members_marked_and_stripped(self) -> None:
+        members = [r for r in self.payload["rows"]
+                   if r["card_id"] != "MFDS::recall-2026003474"]
+        self.assertEqual(len(members), 2)
+        for m in members:
+            self.assertEqual(m["merged_into"], "MFDS::recall-2026003474")
+            self.assertNotIn("card_scaffold", m)        # 렌더 제외
+            self.assertNotIn("prose_input", m)
+            self.assertNotIn("needs_llm_slots", m)
+            self.assertIn("page_id", m)                  # Status 갱신용 보존
+
+    def test_no_raw_leak(self) -> None:
+        blob = json.dumps(self.payload, ensure_ascii=False)
+        self.assertNotIn("RTRVL_RESN", blob)
+
+
 class EmitBranchTest(unittest.TestCase):
     def _run_emit(self, flag: str | None):
         captured = {}

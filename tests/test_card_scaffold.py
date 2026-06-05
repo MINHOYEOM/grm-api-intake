@@ -202,6 +202,112 @@ class BriefSkeletonTest(unittest.TestCase):
         self.assertFalse(any(ln.startswith("## ") for ln in md.splitlines()))
 
 
+def _build_cards_from_rows(rows: list[dict]) -> list:
+    return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
+
+
+class MergeRecallCardsTest(unittest.TestCase):
+    """card_spec §14 — recall 다품목 1카드 병합 렌더 (K3 G1)."""
+
+    def _merged_fixture(self) -> dict:
+        return json.loads(_read(os.path.join(GOLDEN, "recall_merged.input.json")))
+
+    def _merged_cards(self) -> list:
+        return cs.merge_recall_cards(_build_cards_from_rows(self._merged_fixture()["rows"]))
+
+    def test_representative_byte_identical(self) -> None:
+        # 대표(card_id 오름차순 첫) = 3품목 1카드 병합 렌더, golden 과 바이트 동일.
+        merged = self._merged_cards()
+        rep = merged[0]
+        self.assertEqual(rep.card_id, "MFDS::recall-2026003474")
+        self.assertFalse(rep.merged_into)
+        got_json_str = json.dumps(rep.to_dict(), ensure_ascii=False, indent=2, sort_keys=True)
+        if _UPDATE:
+            _write(os.path.join(GOLDEN, "recall_merged.expected.md"), rep.markdown)
+            _write(os.path.join(GOLDEN, "recall_merged.expected.json"), got_json_str)
+            return
+        expected_md = _read(os.path.join(GOLDEN, "recall_merged.expected.md"))
+        self.assertEqual(rep.markdown, expected_md)
+        expected_json = json.loads(_read(os.path.join(GOLDEN, "recall_merged.expected.json")))
+        self.assertEqual(json.loads(got_json_str), expected_json)
+
+    def test_members_marked_merged_into(self) -> None:
+        # §14(F): 멤버(나머지 2건)는 merged_into=대표 card_id 마킹.
+        merged = self._merged_cards()
+        self.assertEqual([c.merged_into for c in merged],
+                         ["", "MFDS::recall-2026003474", "MFDS::recall-2026003474"])
+
+    def test_merge_preserves_order_and_length(self) -> None:
+        cards = _build_cards_from_rows(self._merged_fixture()["rows"])
+        merged = cs.merge_recall_cards(cards)
+        self.assertEqual(len(merged), len(cards))
+        self.assertEqual([c.card_id for c in merged], [c.card_id for c in cards])
+
+    def test_merged_prose_input_enumerates_items(self) -> None:
+        # §14(E): 대표 prose_input.product = 품목 전체 나열 · merged_count = N+1.
+        rep = self._merged_cards()[0]
+        self.assertEqual(rep.prose_input["product"],
+                         "아세트아미노펜정 500mg, 아세트아미노펜정 325mg, 이부프로펜정 200mg")
+        self.assertEqual(rep.prose_input["merged_count"], 3)
+
+    def test_merged_render_has_toggle_and_count(self) -> None:
+        rep = self._merged_cards()[0]
+        self.assertIn("<details>", rep.markdown)
+        self.assertIn("<summary>전체 품목 (3)</summary>", rep.markdown)
+        self.assertIn("외 2품목", rep.markdown)
+        # W3/W5/W6/W7/W8 슬롯·인용은 대표 그대로 보존
+        self.assertIn("{{W5}}", rep.markdown)
+        self.assertIn("\n> 함량부적합", rep.markdown)
+        self.assertEqual(cs.assert_no_forbidden_markdown(rep.markdown), [])
+
+    def test_empty_key_not_merged(self) -> None:
+        # 빈 recall_group_key(ENTRPS/사유/발행일 결측)는 병합 금지.
+        rows = self._merged_fixture()["rows"]
+        rows2 = [dict(item, raw=dict(item["raw"])) for item in rows]
+        for item in rows2:
+            item["raw"].pop("RTRVL_RESN")  # 사유 결측(폴백 없음) → recall_group_key=""
+        cards = _build_cards_from_rows(rows2)
+        merged = cs.merge_recall_cards(cards)
+        self.assertTrue(all(not c.merged_into for c in merged))
+        self.assertEqual([c.markdown for c in merged], [c.markdown for c in cards])
+
+    def test_single_member_group_unchanged(self) -> None:
+        # 단독 멤버(그룹 1건)는 무변화 — 기존 build 출력과 바이트 동일.
+        fx = _load_input("recall_quality_chemical")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        merged = cs.merge_recall_cards([card])
+        self.assertEqual(merged[0].markdown, card.markdown)
+        self.assertFalse(merged[0].merged_into)
+
+    def test_distinct_reasons_form_separate_groups(self) -> None:
+        # 이종 사유(다른 RTRVL_RESN) = 다른 키 → 병합 금지.
+        rows = self._merged_fixture()["rows"]
+        rows2 = [dict(item, raw=dict(item["raw"])) for item in rows]
+        rows2[1]["raw"]["RTRVL_RESN"] = "성상 변화(변색) 확인에 따른 회수"
+        cards = _build_cards_from_rows(rows2)
+        merged = cs.merge_recall_cards(cards)
+        # 동일 사유 2건(0·2)만 병합, 이종 사유(1)는 단독 → 무병합
+        self.assertEqual(merged[0].card_id, "MFDS::recall-2026003474")
+        self.assertFalse(merged[0].merged_into)
+        self.assertFalse(merged[1].merged_into)            # 다른 사유 → 단독
+        self.assertEqual(merged[2].merged_into, "MFDS::recall-2026003474")
+
+    def test_non_recall_cards_untouched(self) -> None:
+        cards = [cs.build_card_scaffold(_load_input(n)["row"], _load_input(n)["raw"])
+                 for n in ("guidance_fr", "warning_letter_chemical", "who_noc")]
+        merged = cs.merge_recall_cards(cards)
+        self.assertEqual([c.markdown for c in merged], [c.markdown for c in cards])
+        self.assertTrue(all(not c.merged_into for c in merged))
+
+    def test_assemble_skeleton_excludes_merged_members(self) -> None:
+        # §14(F): 페이지 렌더는 대표 1카드만(멤버 markdown 미포함).
+        merged = self._merged_cards()
+        page = cs.assemble_brief_skeleton(merged)
+        self.assertIn("외 2품목", page)
+        self.assertNotIn("아세트아미노펜정 325mg</td>", page)  # 멤버 W2 미렌더
+        self.assertEqual(page.count("<details>"), 1)             # 병합 toggle 1회
+
+
 def _callout_colors(md: str) -> list[str]:
     import re
     return re.findall(r'color="([a-z_]+)"', md)

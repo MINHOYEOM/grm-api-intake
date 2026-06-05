@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -142,6 +142,7 @@ class CardScaffold:
     recall_group_key: str = ""   # §12(E) — recall 다품목 통합 키(해당 시)
     status_hint: str = ""        # graceful degrade 시 'Error'
     needs_llm_slots: tuple[str, ...] = ()  # 이 카드가 비운 슬롯 토큰
+    merged_into: str = ""        # §14(F) — 병합 멤버는 대표 card_id 로 마킹(렌더 제외, Status 유지)
 
     def to_dict(self) -> dict[str, Any]:
         """handoff v2 직렬화용(결정론 — prose_input 은 sort_keys 로). raw 미포함."""
@@ -161,6 +162,8 @@ class CardScaffold:
             d["recall_group_key"] = self.recall_group_key
         if self.status_hint:
             d["status_hint"] = self.status_hint
+        if self.merged_into:
+            d["merged_into"] = self.merged_into
         return d
 
 
@@ -671,6 +674,97 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 14b. merge_recall_cards — recall 다품목 1카드 병합 렌더 (card_spec §14, K3 G1)
+# ─────────────────────────────────────────────────────────────────────────────
+def _merge_title_target(title_line: str, entrps: str, rep_product: str, n: int) -> str:
+    """제목 §14(D): 핵심대상 → `{ENTRPS} {대표 PRDUCT} 외 N품목`(60자 문장경계 절단).
+
+    제목 라인 형식(§13.1-1): `### [유형 · 기관] {핵심대상} — **{{TITLE_ISSUE}}**`.
+    `[...] ` 머리와 ` — **...**` 꼬리는 보존하고 가운데 핵심대상만 교체(결정론).
+    """
+    head, sep, rest = title_line.partition("] ")
+    _old_target, dash, tail = rest.partition(" — ")
+    base = " ".join(p for p in (entrps, rep_product) if p)
+    new_target = _truncate_at_sentence(f"{base} 외 {n}품목".strip(), 60)
+    return f"{head}{sep}{new_target}{dash}{tail}"
+
+
+def _merge_w2_product(table_block: str, rep_product: str, n: int) -> str:
+    """W2 §14(D): `제품` 행 값을 `{대표 PRDUCT} 외 N품목` 으로 교체(없으면 행 추가)."""
+    val = f"{rep_product} 외 {n}품목" if rep_product else f"외 {n}품목"
+    new_row = f"<tr><td>**제품**</td><td>{val}</td></tr>"
+    lines = table_block.split("\n")
+    out: list[str] = []
+    replaced = False
+    for ln in lines:
+        if ln.startswith("<tr><td>**제품**</td>"):
+            out.append(new_row)
+            replaced = True
+        elif ln == "</table>" and not replaced:
+            out.append(new_row)         # 제품 행 부재 시 표 끝에 추가
+            out.append(ln)
+            replaced = True
+        else:
+            out.append(ln)
+    return "\n".join(out)
+
+
+def _merge_items_toggle(items: list[str], total: int) -> str:
+    """§14(D): W2 직후 toggle `전체 품목 (N+1)` 에 품목명 bullet 나열(v15.8 <details> 양식)."""
+    bullets = "\n".join(f"- {it}" for it in items if it)
+    return f"<details>\n<summary>전체 품목 ({total})</summary>\n{bullets}\n</details>"
+
+
+def _render_merged_recall(rep_markdown: str, entrps: str, rep_product: str,
+                          items: list[str], n: int) -> str:
+    """대표 카드 markdown 을 병합 렌더로 변형(§14 D). W3/W5/W6/W7/W8 은 대표 그대로."""
+    blocks = rep_markdown.split("\n\n")
+    blocks[0] = _merge_title_target(blocks[0], entrps, rep_product, n)
+    for i, blk in enumerate(blocks):
+        if blk.startswith("<table>"):
+            blocks[i] = _merge_w2_product(blk, rep_product, n)
+            blocks.insert(i + 1, _merge_items_toggle(items, n + 1))
+            break
+    return "\n\n".join(blocks)
+
+
+def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
+    """recall 다품목을 1카드로 접는다(card_spec §14, 순수 함수 — 입력 순서·길이 보존).
+
+    적용 범위(§14A): `kind=="recall-quality"` & 비어있지 않은 `recall_group_key` 동일군,
+    멤버 2건 이상. 대표(§14C) = 그룹 내 `card_id` 사전식 오름차순 첫 카드.
+    대표 = 병합 markdown + 통합 prose_input(§14E). 멤버 = `merged_into`=대표 card_id 마킹
+    (렌더 제외·Status 유지). 빈 키·단독 멤버·이종 사유(다른 키)는 무변화.
+    `build_card_scaffold()` 결과를 받아 `assemble_brief_skeleton()`/직렬화 직전에 적용.
+    """
+    groups: dict[str, list[int]] = {}
+    for i, c in enumerate(cards):
+        if c.kind == "recall-quality" and c.recall_group_key:
+            groups.setdefault(c.recall_group_key, []).append(i)
+
+    out = list(cards)
+    for idxs in groups.values():
+        if len(idxs) < 2:
+            continue  # 단독 멤버는 병합 금지(§14A)
+        members = sorted(idxs, key=lambda i: cards[i].card_id)  # 대표 = card_id 오름차순 첫
+        rep_idx = members[0]
+        rep = cards[rep_idx]
+        n = len(members) - 1
+        items = [cards[i].prose_input.get("product", "") for i in members]
+        rep_product = rep.prose_input.get("product", "")
+        entrps = rep.prose_input.get("firm_or_product", "")
+        merged_md = _render_merged_recall(rep.markdown, entrps, rep_product, items, n)
+        new_prose = dict(rep.prose_input)
+        joined = ", ".join(it for it in items if it)
+        new_prose["product"] = joined if len(joined) <= 300 else f"{rep_product} 외 {n}품목"
+        new_prose["merged_count"] = n + 1
+        out[rep_idx] = replace(rep, markdown=merged_md, prose_input=new_prose)
+        for i in members[1:]:
+            out[i] = replace(cards[i], merged_into=rep.card_id)
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 15. assemble_brief_skeleton — 페이지 수준(목차·섹션·그룹핑·면책). 별도 순수 함수.
 # ─────────────────────────────────────────────────────────────────────────────
 _TIER_ORDER = {"Tier 3": 0, "Tier 2": 1, "Tier 1": 2}
@@ -694,6 +788,9 @@ def assemble_brief_skeleton(cards: list[CardScaffold],
     순수 함수. build_card_scaffold() 결과 리스트를 받아 페이지 마크다운 1개를 만든다.
     카드 1장 조립과 분리(단계 D/K3 재사용 단위가 다름).
     """
+    # §14(F): 병합 멤버(merged_into)는 렌더에서 제외(대표 1카드만). 호출부에서
+    # merge_recall_cards() 적용 후 넘어오는 것을 전제하되, 미적용 입력도 무영향.
+    cards = [c for c in cards if not c.merged_into]
     out: list[str] = ["<table_of_contents/>"]
     for sec in _SECTION_ORDER:
         sec_cards = sorted([c for c in cards if c.section == sec], key=_sort_key)

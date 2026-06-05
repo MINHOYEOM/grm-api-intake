@@ -54,7 +54,7 @@ from grm_common import (
     retry_after_seconds,
 )
 # K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
-from card_scaffold import build_card_scaffold
+from card_scaffold import build_card_scaffold, merge_recall_cards
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2461,24 +2461,32 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     각 row 는 v1 호환 필드 whitelist 복사 + `card_scaffold`·`prose_input`·`section`·
     `card_id`·`evidence`·`recall_group_key`(해당 시)·`status_hint`(degrade 시) additive.
     **raw 전체·Stage B bookkeeping 은 제외**(크기 폭증·내부필드 누출 방지).
+    recall 다품목은 `merge_recall_cards()`(§14)로 대표 1카드 + 멤버 `merged_into` 직렬화:
+    멤버 row 는 v1 호환 필드 + `merged_into` 만 유지(card_scaffold·prose_input·needs_llm_slots
+    생략 → Routine 렌더 제외, page_id 보존으로 Status 갱신 목록에는 잔존).
     """
     start = run_date - timedelta(days=window_days)
+    cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
     out_rows: list[dict[str, Any]] = []
     source_counts: dict[str, int] = {}
-    for row in rows:
-        raw = row.get("raw")
-        card = build_card_scaffold(row, raw)
+    for row, card in zip(rows, cards):
         v2row = {k: row[k] for k in _HANDOFF_V2_ROW_KEEP if k in row}
         v2row["card_id"] = card.card_id
-        v2row["section"] = card.section
-        v2row["evidence"] = card.evidence
-        v2row["card_scaffold"] = card.markdown
-        v2row["prose_input"] = card.prose_input
-        v2row["needs_llm_slots"] = list(card.needs_llm_slots)
-        if card.recall_group_key:
-            v2row["recall_group_key"] = card.recall_group_key
-        if card.status_hint:
-            v2row["status_hint"] = card.status_hint
+        if card.merged_into:
+            # §14(F) 멤버: v1 호환 필드 + merged_into 만(card_scaffold/prose_input/
+            # needs_llm_slots/section/evidence/recall_group_key 생략). 렌더 제외, page_id
+            # 보존으로 Status 갱신 목록에만 잔존. 그룹 식별은 대표 card_id(merged_into)로.
+            v2row["merged_into"] = card.merged_into
+        else:
+            v2row["section"] = card.section
+            v2row["evidence"] = card.evidence
+            v2row["card_scaffold"] = card.markdown
+            v2row["prose_input"] = card.prose_input
+            v2row["needs_llm_slots"] = list(card.needs_llm_slots)
+            if card.recall_group_key:
+                v2row["recall_group_key"] = card.recall_group_key
+            if card.status_hint:
+                v2row["status_hint"] = card.status_hint
         out_rows.append(v2row)
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
     return {

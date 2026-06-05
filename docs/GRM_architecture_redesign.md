@@ -54,6 +54,11 @@
 핸드오프 `rows[]` 각 행은 page_id·official_url·tier·modality(조건부)를 보유한다(Codex 검증).
 ⚠️ **정정**: v1 rows 에 `raw` 는 없다 — raw 는 원 row 본문 code block 에만 있다. 따라서 v2 생성 시
 **page_id 로 원 row children 을 fetch 해 raw JSON 을 각 row 에 붙이는 단계가 선행**돼야 한다(raw 의존 칸의 전제).
+**보정(2026-06-05, Codex 사전검증)**: ① fetch 는 **하이브리드** — 당일 수집분은 메모리 `raw_payload` 사용,
+과거 누적 New row 만 children fetch(사전에 `_dedupe_latest_rows()` 적용해 중복 fetch 제거). ② **raw 는 메모리
+enriched row 에만 부착하고, 최종 handoff v2 JSON 에는 raw 전체를 넣지 않는다**(scaffold·prose_input 만 —
+크기·children 100개 한도 방지). ③ v2 는 `ENABLE_HANDOFF_V2`(기본 off) 뒤에 두고 **운영 활성은 K3 와 함께**
+(v15.8 이 schema v1 을 명시하므로 즉시 투입 시 하위호환 불완전).
 그 위에서 수집기가 추가로 산출:
 - `card_scaffold`: 카드별로 Python 이 완성한 W2 메타표·듀얼링크·raw 인용(W3)·배지·제형 라벨 마크다운 + 비워둔 산문 슬롯 토큰 `{{W1}}`·`{{W6}}`·`{{W7}}`.
 - `prose_input`: LLM 이 그 슬롯을 채우는 데 필요한 최소 컨텍스트(제품/사유/제형/조항/결론 핵심 필드만, raw 전체 아님).
@@ -102,6 +107,11 @@
 - **무조건 제외**: `CVM`, `CTP`, `CDRH`, `CFSAN`, `Human Foods Program`.
 - **맥락 제외(주의)**: `Office of Inspections and Investigations` 는 **식품/수산/HACCP/FSVP 맥락일 때만** 제외.
   OII + finished pharmaceuticals/cGMP 는 유지(또는 Needs Review) — 약품 CGMP WL 오삭제 방지.
+  **보정(2026-06-05, Codex Stage A 검토 HOLD)**: OII 분기는 ① **식품 맥락(food/seafood/HACCP/FSVP/"for foods")
+  검사를 약품 맥락보다 먼저** 수행하고, ② 약품 keep 단서에서 **단독 `cgmp` 를 제외**한다 — 식품 WL 제목에
+  "CGMP for Foods" 가 그대로 들어와 bare cgmp 가 게이트를 뚫음(실증: Stavis Seafoods dry-run 잔존·Tier 3 승격).
+  약품 전용 단서만 사용: `finished pharmaceutical(s)`·`drug product`·`drug substance`·`sterile drug`·`aseptic`·
+  `active pharmaceutical ingredient`.
 - **유지**: `CDER`. `CBER` 는 유지(또는 제형/카테고리 2차판단).
 - 부서 결측 시 기존 본문 keyword(FSVP/HACCP→제외, finished pharmaceuticals/cGMP→유지) 폴백.
 - alias normalize 필요: `CDER` ↔ `Center for Drug Evaluation and Research (CDER)` 등 약어·괄호·대소문자.
@@ -134,3 +144,5 @@
 |---|---|
 | 2026-06-04 | 최초 작성. v15.7 라이브 폭주(LV-15.7a)·노이즈필터 갭(LV-15.7b) 대응 목표 아키텍처. Python-thick/Routine-thin 책임분리·handoff v2 계약·카드별 산문 루프·마이그레이션 M0~M5 |
 | 2026-06-05 | §9 미해결 1건 결정: scaffold 저장 위치 = **핸드오프 JSON 본문 `rows[]` 포함(additive v2)**. K2 착수(별도 채팅): M0 부서게이트 → K2-prep raw fetch → `build_card_scaffold()` 순수함수 + golden → handoff v2 단계 게이트. 지시문 `archive/point-in-time/GRM_Keystone_K2_ClaudeCode_지시.md` |
+| 2026-06-05 | Codex K2 사전검증(조건부 GO) 반영 — §4 보정: raw fetch 하이브리드(당일=메모리·과거만 fetch·dedupe 선적용), handoff v2 JSON 에 raw 전체 미포함, `ENABLE_HANDOFF_V2` 플래그(기본 off, 운영 활성은 K3 와 함께). Status 는 `Error` 사용(card_spec §8 정정)·recall 통합은 group_key 산출까지(card_spec §12(E) 범위 확정) |
+| 2026-06-05 | Codex Stage A 코드 검토 HOLD 반영 — §7 보정: OII 분기 식품 맥락 우선 + 약품 keep 단서에서 단독 `cgmp` 제외(식품 WL "CGMP for Foods" 관통 실증). 설계 문구 자체의 결함 정정 |

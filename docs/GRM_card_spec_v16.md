@@ -273,6 +273,43 @@ URL 인코딩·block chunk 재조립 순서를 고정.
 견본 반영: 위 1~12를 Notion 견본 3카드에 적용 후 사용자 검토 → **2026-06-05 동결**. 견본 페이지는 동결 후 삭제.
 **다음 단계: K2(Python 카드 조립기 코드화)** — 본 §13.1 + §12(필드 보정) + §0~§9(책임 매핑)가 `build_card_scaffold()` 의 구현 기준.
 
+## 14. recall 다품목 병합 렌더 (K3, 결정 #6 — ✅ 동결 2026-06-05)
+
+> §12(E)의 K3 연계분. `recall_group_key` 산출(K2 완료) 위에 **다품목 1카드 병합 렌더**를 정의한다.
+> 상태: **동결** — Codex G1 조건부 GO → R1 보정(R1-a/b/c) → 재확인 GO + 사람 승인·main 머지(2026-06-05).
+> 구현: `merge_recall_cards()`(card_scaffold.py) + golden `recall_merged`. 변경은 본 §14 + golden 갱신으로만.
+
+**(A) 적용 범위.** `kind == "recall-quality"`(MFDS 회수)만. openfda-recall·hc-recall 은 키 부재로 제외
+(필요 시 별도 키 정의 후 확장 — K3 범위 아님). 빈 `recall_group_key` 는 병합 금지(현행 키 규칙:
+`ENTRPS|RTRVL_RESN|발행일` 3요소 모두 존재 시에만 키 산출).
+
+**(B) 병합 시점·함수.** `build_card_scaffold()` 는 그대로 row 1:1 유지(순수성·golden 불변).
+신규 순수함수 `merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]` 가
+`assemble_brief_skeleton()` 직전에 동일 키 그룹을 1카드로 접는다. 같은 입력 → 바이트 동일 출력(§12G).
+
+**(C) 대표 선정(결정론).** 그룹 내 `card_id` 사전식 오름차순 첫 카드 = 대표. 키 정의상
+업체·사유·발행일이 동일하므로 Tier 동률 — 추가 tie-break 불요.
+
+**(D) 병합 카드 렌더 규칙.**
+- 제목 핵심대상: `{ENTRPS} {대표 PRDUCT} 외 N품목`(N = 멤버수−1). 기존 60자 문장경계 절단 적용.
+- W2 `제품` 행: `대표 PRDUCT 외 N품목`. 직후 **toggle `전체 품목 (N+1)`** 에 품목명 bullet 나열(§13.1-12 — 긴 목록은 toggle).
+- W3: `RTRVL_RESN` 1회 인용(키 정의상 그룹 내 동일).
+- W5/W6/W7: 카드 1장 분량 유지 — 품목 나열 금지, 공통 사유·조치 중심.
+- W8: 대표 듀얼링크만(MFDS recall 은 📎 CCBAH01 인덱스 L2 로 그룹 내 동일).
+
+**(E) prose_input 통합(대표 카드).** `product` = 품목 전체 나열(300자 가드, 초과 시 `외 N품목` 축약 —
+**최종 문자열 기준 재적용**: 대표 품목명 자체가 길어도 축약 결과가 300자를 넘지 않게, Codex R1 P2) ·
+`merged_count` = N+1 신규 필드. 나머지 공통 필드는 대표 row 기준.
+
+**(F) handoff v2 직렬화(additive 유지).** 대표 row = 병합 scaffold·prose_input·needs_llm_slots.
+멤버 row = **v1 호환 필드(page_id·source·document_id·status 등) + `merged_into: <대표 card_id>` 만** —
+자체 `card_id` 포함 v2 additive 필드 전부 생략(Codex R1 P-1 확정) → Routine 은 렌더에서 제외하되
+**Status 갱신 목록(page_id)에는 멤버 전원 포함**(실제 Status 전이의 Python 마감은 K4 —
+K3 프롬프트는 v15.8 방식대로 멤버 전원 갱신을 명시). v1 경로(`ENABLE_HANDOFF_V2` off)는 바이트 동일 무영향.
+
+**(G) golden·회귀.** 신규 golden `recall-merged`(3품목 1카드) + 비병합 회귀(빈 키·단독 멤버·이종 사유 그룹 분리).
+기존 16종 golden 바이트 불변이 합격 조건.
+
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
@@ -284,3 +321,5 @@ URL 인코딩·block chunk 재조립 순서를 고정.
 | 2026-06-05 | Codex B~D 일괄검토(HOLD) 반영: §1 에 "§13.1-1·8 이 최종(제목에서 prefix·소재국·DocID 제거)" 대체 명시(P1-1 혼동 뿌리 제거) · §8 `Status=Error`→`status_hint='Error'` 용어 정정(실제 Status 전이는 K4, P2-4) |
 | 2026-06-05 | **K1+K2 종합점검(조건부 GO) 반영 — 동결본 정리(P1-3)**: 문서 상태 초안→동결본(§12·§13.1 우선 명시), §0 prefix/제목 행 §13.1 기준 정정, §3 공통 5행 구기준 표시, §11 결정완료 처리. P2-1 이모지 문구 정밀화(콜아웃 헤더+📰📎 허용·제목/W2 라벨 금지), P2-2 그룹핑 소제목=페이지 구조(카드 내부 원칙과 비충돌) 명문화. **K2.5 보강 트랙 신설**: 활성 전 유형 W2/quote/evidence 분기 + prose_input whitelist 확장 + golden 전 유형 확장(P1-1·P1-2) |
 | 2026-06-05 | **K2.5 매핑 동결(§12 C-확장)**: 전 16 유형 × (W2 유형행·quote 소스·Evidence) 표 + A⟺quote 불변식 + prose_input 공통/유형별 필드 기록. golden 16종·134 테스트가 이 표의 기대 출력. Codex 재확인 대기 |
+| 2026-06-05 | **K3 착수 — §14 recall 다품목 병합 렌더 초안 신설**(결정 #6 "규칙+구현" 채택): MFDS recall 한정·`merge_recall_cards()` 순수함수(스캐폴드 1:1 불변)·대표 card_id 오름차순·W2 toggle 품목목록·멤버 row `merged_into` 마킹(Status 갱신 목록 유지). Codex 게이트 통과 시 동결 |
+| 2026-06-05 | **§14 동결** — Codex R1 반영: (E) 병합 `product` 300자 가드 최종 문자열 기준, (F) 멤버 row = v1 호환 필드 + `merged_into` 만(자체 `card_id` 포함 v2 additive 전부 생략). 구현 G1+R1 4커밋 Codex GO·사람 승인·main 머지. fork A안(`render_order`+`group_label`, `_ordered_cards_with_groups()` 단일 진실원) 동반 확정 |

@@ -1,0 +1,43 @@
+{
+  "card_id": "Health Canada::hc-rsam-88421",
+  "card_scaffold": "### [Recall(HC) · Health Canada] Nitrosamine impurity recall — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence A` · `Health Canada` · `Signal Med (T2)` · `💊 합성의약품` · `Recall`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-10</td></tr>\n<tr><td>**문서번호**</td><td>`hc-rsam-88421`</td></tr>\n<tr><td>**업체**</td><td>PharmaCo Ltd.</td></tr>\n<tr><td>**제품**</td><td>Drug X 50 mg tablets</td></tr>\n<tr><td>**Class**</td><td>Type II</td></tr>\n</table>\n\n**원문 및 번역**\n> The product may contain a nitrosamine impurity above the acceptable intake limit.\n{{W4}}\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: Intake raw`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://recalls-rappels.canada.ca/en/alert-recall/88421)\n</callout>",
+  "date": "2026-05-10",
+  "evidence": "A",
+  "kind": "hc-recall",
+  "modality": "Chemical",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}",
+    "{{W4}}"
+  ],
+  "prose_input": {
+    "action": "Stop using the affected lots and consult your pharmacist.",
+    "body_excerpt": "",
+    "deadline": "",
+    "evidence": "A",
+    "firm_or_product": "PharmaCo Ltd.",
+    "headline": "Nitrosamine impurity recall",
+    "issue_or_reason": "The product may contain a nitrosamine impurity above the acceptable intake limit.",
+    "kind": "hc-recall",
+    "language": "EN",
+    "modality": "Chemical",
+    "product": "Drug X 50 mg tablets",
+    "quote_lines": [
+      "The product may contain a nitrosamine impurity above the acceptable intake limit."
+    ],
+    "regulator": "Health Canada",
+    "signal": "Tier 2",
+    "w2_facts": {
+      "Class": "Type II",
+      "문서번호": "`hc-rsam-88421`",
+      "발행일": "2026-05-10",
+      "업체": "PharmaCo Ltd.",
+      "제품": "Drug X 50 mg tablets"
+    }
+  },
+  "section": "recall_table",
+  "signal_tier": "Tier 2"
+}

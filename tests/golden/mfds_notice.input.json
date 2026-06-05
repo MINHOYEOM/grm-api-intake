@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "brdId": "guidance",
+    "description": "제조·품질 데이터 완전성 평가 절차 안내.",
+    "format": "atom",
+    "title": "데이터 완전성(Data Integrity) 평가 가이드라인"
+  },
+  "row": {
+    "date": "2026-05-09",
+    "document_id": "mfds-guide-204",
+    "headline": "데이터 완전성 평가 가이드라인",
+    "language": "KO",
+    "modality": "",
+    "official_url": "https://nedrug.mfds.go.kr/guide/204",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MFDS",
+    "type_or_class": "guidance-industry"
+  }
+}

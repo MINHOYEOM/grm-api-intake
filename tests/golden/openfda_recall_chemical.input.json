@@ -1,0 +1,22 @@
+{
+  "raw": {
+    "classification": "Class II",
+    "product_description": "Lisinopril Tablets USP 10 mg, 100-count bottle",
+    "product_type": "Drug",
+    "reason_for_recall": "Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+    "recall_number": "Z-1234-2026",
+    "recalling_firm": "Acme Pharmaceuticals, Inc.",
+    "report_date": "20260515"
+  },
+  "row": {
+    "api_query": "https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026",
+    "date": "2026-05-15",
+    "document_id": "Z-1234-2026",
+    "headline": "Subpotent tablets recall",
+    "language": "",
+    "modality": "Chemical",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "OpenFDA Recall"
+  }
+}

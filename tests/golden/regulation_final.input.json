@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "brdId": "regulation",
+    "description": "Annex 1 무균공정 관련 조항 정비.",
+    "format": "rss2",
+    "title": "의약품 제조 및 품질관리 기준 고시 개정"
+  },
+  "row": {
+    "date": "2026-05-07",
+    "document_id": "mfds-reg-2026-7",
+    "headline": "의약품 GMP 고시 개정",
+    "language": "KO",
+    "modality": "",
+    "official_url": "https://www.mfds.go.kr/regulation/2026-7",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MFDS",
+    "type_or_class": "regulation-final"
+  }
+}

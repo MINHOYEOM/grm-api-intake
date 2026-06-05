@@ -1,0 +1,19 @@
+{
+  "raw": {
+    "channel": "rss",
+    "link": "https://extranet.who.int/pqweb/news/update-31",
+    "pubDate": "2026-05-05",
+    "title": "WHO PQ news update"
+  },
+  "row": {
+    "date": "2026-05-05",
+    "document_id": "who-news-2026-31",
+    "headline": "WHO PQ news update",
+    "language": "EN",
+    "official_url": "https://extranet.who.int/pqweb/news/update-31",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 1",
+    "source": "WHO",
+    "type_or_class": "who-news"
+  }
+}

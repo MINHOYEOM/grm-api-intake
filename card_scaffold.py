@@ -111,6 +111,8 @@ def _kind_meta(kind: str) -> tuple[str, str, str]:
         "admin-action":     ("🟦", "행정처분", "행정처분"),
         "gmp-inspection":   ("🟦", "GMP실사", "GMP실사"),
         "guidance":         ("🟫", "지침·안내서", "Guidance"),
+        "mfds-notice":      ("🟫", "지침·안내서", "Guidance"),
+        "rss-news":         ("🟫", "규제 소식", "GMP News"),
         "regulation":       ("🟫", "고시·개정법령", "규정"),
         "legislative":      ("🟫", "입법예고", "입법예고"),
         "safety-letter":    ("🟦", "안전성서한", "안전성"),
@@ -270,41 +272,50 @@ def resolve_kind(row: dict[str, Any]) -> str:
             return "safety-letter"
         if "regulation" in toc or "notice-final" in toc:
             return "regulation"
-        return "guidance"
+        return "mfds-notice"          # MFDS guidance-industry/internal RSS → Evidence B
     if source == SOURCE_FR:
-        return "guidance"
+        return "guidance"             # FR(abstract) → Evidence A 가능
     if source in (SOURCE_EMA, SOURCE_MHRA, SOURCE_PICS, SOURCE_ECA):
-        return "guidance"
-    return "guidance"
+        return "rss-news"             # RSS 요약만 → Evidence B
+    return "rss-news"
 
 
 # 규범 문서(특정 제품군에 매이지 않음) — 제품군 배지 생략 (§4)
-_NORMATIVE_KINDS = {"guidance", "regulation", "legislative", "ich", "who-news"}
+_NORMATIVE_KINDS = {
+    "guidance", "mfds-notice", "rss-news", "regulation", "legislative",
+    "ich", "who-noc", "who-inspection", "who-news",
+}
+
+# Evidence A 가능 유형 — 결정론적으로 인용 가능한 공식 raw 필드를 가진 유형만.
+# 그 외(RSS·WHO·ICH §12H)는 항상 B. determine_evidence 와 _quote_source 가 함께 보장:
+# "A 인데 quote 없음" 조합이 한 유형도 없도록(최종 정합 가드).
+_A_ELIGIBLE_KINDS = {
+    "admin-action", "recall-quality", "gmp-inspection",
+    "openfda-recall", "hc-recall", "guidance",
+}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 6. Evidence 판정 (§6 + §12(D)/(H))
 # ─────────────────────────────────────────────────────────────────────────────
 def determine_evidence(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> str:
+    """Evidence 판정(§6·§12D/H). 불변식: A ⟺ 인용 가능한 raw 필드 존재(_quote_source)."""
     # graceful degrade(단계 B): raw fetch 실패 → B 강등
     if row.get("raw_fetch_ok") is False or row.get("evidence_hint") == "B":
         return "B"
-    # search 단계가 기록한 힌트 우선
+    quote = _quote_source(kind, raw)
+    # search 단계가 기록한 힌트 우선(있으면), 없으면 유형 A-eligible + quote 존재 시 A.
     hint = (row.get("evidence_candidate") or row.get("evidence_hint") or "").upper()
     if hint in ("A", "B", "C"):
-        return hint
-    # 유형별 기본값 (§12)
-    if kind in ("warning-letter",):           # WL 본문 미수집 → B (§12B/C)
-        return "B"
-    if kind in ("ich", "who-news"):           # §12(H), RSS 뉴스
-        return "B"
-    if kind in ("guidance", "regulation", "legislative"):
-        # FR/MFDS 지침: raw 에 본문/abstract 있으면 A, 아니면 B
-        if raw and (raw.get("abstract") or raw.get("body") or raw.get("EXPOSE_CONT")):
-            return "A"
-        return "B"
-    # admin/recall/gmp/openfda-recall: raw 보존 시 A
-    return "A" if raw else "B"
+        ev = hint
+    elif kind in _A_ELIGIBLE_KINDS and raw and quote:
+        ev = "A"
+    else:
+        ev = "B"
+    # 정합 가드: Evidence A 는 반드시 W3 인용이 가능해야 한다(§6 — A→W3). 아니면 B.
+    if ev == "A" and not quote:
+        ev = "B"
+    return ev
 
 
 def _language(row: dict[str, Any], kind: str) -> str:
@@ -321,6 +332,12 @@ def _language(row: dict[str, Any], kind: str) -> str:
 # 7. W3 원문 인용 소스 필드 (§12(C))
 # ─────────────────────────────────────────────────────────────────────────────
 def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
+    """유형별 W3 인용 소스 필드(§12C). 실제 수집기 raw 키 기준. 없으면 "" → Evidence B.
+
+    A-eligible 만 인용 가능: admin(EXPOSE_CONT)·recall(RTRVL_RESN)·gmp(attachment_text)·
+    openfda-recall(reason_for_recall)·hc-recall(Issue)·guidance/FR(abstract). 그 외(RSS·
+    WHO·ICH §12H·WL 본문 미수집)는 "".
+    """
     if not raw:
         return ""
     if kind == "admin-action":
@@ -329,9 +346,14 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
         return _first(raw.get("RTRVL_RESN"))
     if kind == "gmp-inspection":
         return _truncate_at_sentence(raw.get("attachment_text", ""), 250)
-    if kind in ("guidance", "regulation", "legislative"):
+    if kind == "openfda-recall":
+        return _truncate_at_sentence(raw.get("reason_for_recall", ""), 250)
+    if kind == "hc-recall":
+        return _truncate_at_sentence(_first(raw.get("Issue"), raw.get("What you should do")), 250)
+    if kind == "guidance":  # FR 전용 — abstract(없으면 title)
         return _truncate_at_sentence(_first(raw.get("abstract"), raw.get("title")), 250)
-    return ""  # WL·EMA/MHRA/PIC/S/ECA(Evidence B) → quote 없음
+    # mfds-notice·rss-news·safety-letter·legislative·regulation·ich·who-*·WL → quote 없음
+    return ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -359,9 +381,14 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
     elif kind == "recall-quality":
         official = "https://nedrug.mfds.go.kr/pbp/CCBAH01"  # L2 인덱스(§12B)
         fallback = True
+    elif kind == "openfda-recall":
+        # 항목별 L1 없음 → FDA Recalls 인덱스 L2(§5). 패턴 유추 금지.
+        official = _first(row.get("official_url"),
+                          "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts")
+        fallback = not row.get("official_url")
     elif kind == "gmp-inspection":
         official = _first(row.get("source_url"), row.get("official_url"))
-    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO/HC/ICH 등 RSS·페이지 L1
+    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
         official = _first(row.get("official_url"))
     return info, official, fallback
 
@@ -422,12 +449,36 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
             rows.append(("실사기간", period))
         elif raw.get("product_type"):
             rows.append(("대상 제형", raw["product_type"]))
-    else:  # guidance/regulation/etc
-        rows.append(("발행기관", row.get("source", "") or "원문 미기재"))
+    elif kind == "openfda-recall":
+        rows.append(("업체", _first(raw.get("recalling_firm"), row.get("firm")) or "원문 미기재"))
+        if raw.get("product_description"):
+            rows.append(("제품", _truncate_at_sentence(str(raw["product_description"]), 80)))
+        if raw.get("classification"):
+            rows.append(("Class", str(raw["classification"])))
+    elif kind == "hc-recall":
+        rows.append(("업체", _first(raw.get("Organization"), row.get("firm")) or "원문 미기재"))
+        product = _first(raw.get("Product"), raw.get("product_description"))
+        if product:
+            rows.append(("제품", _truncate_at_sentence(str(product), 80)))
+        if raw.get("Recall class"):
+            rows.append(("Class", str(raw["Recall class"])))
+    elif kind in ("who-noc", "who-inspection", "who-news"):
+        topic = _first(raw.get("anchor_text"), row.get("headline"))
+        if topic:
+            rows.append(("주제", _truncate_at_sentence(topic, 80)))
+        rows.append(("발행기관", "WHO"))
+    elif kind == "ich":
+        if raw.get("section_title"):
+            rows.append(("주제", _truncate_at_sentence(raw["section_title"], 80)))
+        rows.append(("발행기관", "ICH"))
+    else:  # guidance(FR)·rss-news·mfds-notice·safety-letter·legislative·regulation
+        rows.append(("발행기관", _regulator(row.get("source", "")) or "원문 미기재"))
         if row.get("comments_close"):
             rows.append(("의견기한", row["comments_close"]))
-        elif raw.get("title"):
-            rows.append(("주제", _truncate_at_sentence(raw["title"], 80)))
+        else:
+            topic = _first(raw.get("title"), row.get("headline"))
+            if topic:
+                rows.append(("주제", _truncate_at_sentence(topic, 80)))
     return rows[:5]
 
 
@@ -579,21 +630,43 @@ def _footer_block(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
 
 def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
                  evidence: str, modality: str, language: str) -> dict[str, Any]:
-    """§9 — 카드 1장치 최소 컨텍스트(raw 전체 아님). LLM 산문 슬롯 입력."""
+    """§9 — 카드 1장치 최소 컨텍스트(raw 전체 아님). LLM 산문 슬롯 입력.
+
+    공통(w2_facts·quote_lines·issue_or_reason·product·action·deadline·body_excerpt) +
+    유형별 텍스트를 실제 raw 키 기준으로 채운다. 300자 truncation 가드 유지.
+    """
     raw = raw or {}
-    reason = _first(raw.get("RTRVL_RESN"), raw.get("EXPOSE_CONT"),
-                    raw.get("ADM_DISPS_NAME"), raw.get("subject"), raw.get("abstract"))
+    quote = _quote_source(kind, raw)
+    # 사유/핵심 텍스트 — 모든 유형의 실제 raw 키 폴백(gmp=attachment_text 누락 버그 수정).
+    issue_or_reason = _first(
+        raw.get("RTRVL_RESN"), raw.get("reason_for_recall"), raw.get("Issue"),
+        raw.get("EXPOSE_CONT"), raw.get("attachment_text"), raw.get("ADM_DISPS_NAME"),
+        raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
+        raw.get("anchor_text"), raw.get("description"),
+    )
     return {
         "kind": kind,
         "modality": modality,
-        "firm_or_product": _first(raw.get("ENTRPS"), raw.get("firm"),
-                                  raw.get("manufacturer"), row.get("firm")),
-        "reason_summary": _truncate_at_sentence(reason, 300),
         "regulator": row.get("source", ""),
         "evidence": evidence,
         "signal": row.get("signal_tier", ""),
         "language": language,
         "headline": row.get("headline", ""),
+        # 공통 확장(P1-2)
+        "firm_or_product": _first(raw.get("ENTRPS"), raw.get("recalling_firm"),
+                                  raw.get("Organization"), raw.get("firm"),
+                                  raw.get("manufacturer"), row.get("firm")),
+        "product": _first(raw.get("PRDUCT"), raw.get("product_description"),
+                          raw.get("Product"), raw.get("product_type")),
+        "issue_or_reason": _truncate_at_sentence(issue_or_reason, 300),
+        "action": _truncate_at_sentence(
+            _first(raw.get("ADM_DISPS_NAME"), raw.get("What you should do")), 200),
+        "deadline": _first(row.get("comments_close"), raw.get("comments_close_on"),
+                           raw.get("edYd")),
+        "quote_lines": _split_sentences(quote) if quote else [],
+        "w2_facts": {label: value for label, value in _w2_rows(kind, row, raw)},
+        "body_excerpt": _truncate_at_sentence(
+            _first(raw.get("description"), raw.get("summary"), row.get("body")), 300),
     }
 
 

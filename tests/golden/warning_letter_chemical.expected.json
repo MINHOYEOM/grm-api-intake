@@ -13,15 +13,26 @@
     "{{W7}}"
   ],
   "prose_input": {
+    "action": "",
+    "body_excerpt": "",
+    "deadline": "",
     "evidence": "B",
     "firm_or_product": "Acme Pharmaceuticals, LLC",
     "headline": "CGMP for finished pharmaceuticals",
+    "issue_or_reason": "CGMP/Finished Pharmaceuticals/Adulterated",
     "kind": "warning-letter",
     "language": "EN",
     "modality": "Chemical",
-    "reason_summary": "CGMP/Finished Pharmaceuticals/Adulterated",
+    "product": "",
+    "quote_lines": [],
     "regulator": "FDA Warning Letter",
-    "signal": "Tier 3"
+    "signal": "Tier 3",
+    "w2_facts": {
+      "문서번호": "`WL-CMS-660123`",
+      "발행 부서/일자": "Center for Drug Evaluation and Research (CDER) · 05/15/2026",
+      "발행일": "2026-05-20",
+      "업체/제조소": "Acme Pharmaceuticals, LLC"
+    }
   },
   "section": "global",
   "signal_tier": "Tier 3"

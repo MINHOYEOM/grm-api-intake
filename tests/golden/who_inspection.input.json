@@ -1,0 +1,19 @@
+{
+  "raw": {
+    "anchor_text": "WHOPIR: Site Z, India (FPP)",
+    "channel": "whopir",
+    "list_page": "https://extranet.who.int/pqweb/inspection-services/whopir",
+    "pdf_url": "https://extranet.who.int/pqweb/sites/default/files/whopir-z.pdf"
+  },
+  "row": {
+    "date": "2026-05-06",
+    "document_id": "who-whopir-2026-11",
+    "headline": "WHOPIR — Site Z",
+    "language": "EN",
+    "official_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "WHO",
+    "type_or_class": "who-inspection"
+  }
+}

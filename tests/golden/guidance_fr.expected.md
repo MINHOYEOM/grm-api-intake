@@ -8,7 +8,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-05-22</td></tr>
 <tr><td>**문서번호**</td><td>`FR-2026-04578`</td></tr>
-<tr><td>**발행기관**</td><td>Federal Register</td></tr>
+<tr><td>**발행기관**</td><td>FDA</td></tr>
 <tr><td>**의견기한**</td><td>2026-07-21</td></tr>
 </table>
 

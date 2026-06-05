@@ -1,0 +1,21 @@
+{
+  "raw": {
+    "category": "GMP",
+    "id": "mhra-blog-512",
+    "published": "2026-05-03",
+    "summary": "An MHRA Inspectorate blog on data integrity expectations.",
+    "title": "Data integrity expectations in 2026"
+  },
+  "row": {
+    "date": "2026-05-03",
+    "document_id": "mhra-blog-512",
+    "headline": "Data integrity expectations",
+    "language": "",
+    "modality": "",
+    "official_url": "https://mhrainspectorate.blog.gov.uk/2026/05/03/data-integrity/",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MHRA Inspectorate",
+    "type_or_class": "Blog"
+  }
+}

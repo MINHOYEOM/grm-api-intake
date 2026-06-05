@@ -2,6 +2,8 @@
 
 ## 🌐 글로벌
 
+### 💊 합성의약품
+
 ### [Warning Letter · FDA] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
@@ -35,6 +37,76 @@
 	**출처**  📰 정보출처 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters)   ·   📎 공식원본 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660123)
 </callout>
 
+### 🧬 바이오의약품
+
+### [ICH · ICH] ICH Q5A(R2) Viral Safety — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `ICH` · `Signal Med (T2)` · `ICH`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-01</td></tr>
+<tr><td>**문서번호**</td><td>`ich-q5a-r2`</td></tr>
+<tr><td>**주제**</td><td>Q5A(R2) Viral Safety Evaluation of Biotechnology Products</td></tr>
+<tr><td>**발행기관**</td><td>ICH</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://www.ich.org/page/quality-guidelines)
+</callout>
+
+### ▫️ 기타
+
+### [WHO · WHO] Notice of Concern — Firm Y — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `WHO` · `Signal High (T3)` · `WHO`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-08</td></tr>
+<tr><td>**문서번호**</td><td>`who-noc-2026-04`</td></tr>
+<tr><td>**주제**</td><td>Notice of Concern: Firm Y (API site)</td></tr>
+<tr><td>**발행기관**</td><td>WHO</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/notice-of-concern/firm-y)
+</callout>
+
 ### [지침·안내서 · FDA] Guidance on Elemental Impurities in Drug Products — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
@@ -45,7 +117,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-05-22</td></tr>
 <tr><td>**문서번호**</td><td>`FR-2026-04578`</td></tr>
-<tr><td>**발행기관**</td><td>Federal Register</td></tr>
+<tr><td>**발행기관**</td><td>FDA</td></tr>
 <tr><td>**의견기한**</td><td>2026-07-21</td></tr>
 </table>
 
@@ -72,6 +144,105 @@
 
 <callout icon="🔖" color="gray_bg">
 	**출처**  📰 정보출처 [링크](https://www.federalregister.gov/api/v1/documents/2026-04578)   ·   📎 공식원본 [링크](https://www.federalregister.gov/documents/2026/05/22/2026-04578)
+</callout>
+
+### [WHO · WHO] WHOPIR — Site Z — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `WHO` · `Signal Med (T2)` · `WHO`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-06</td></tr>
+<tr><td>**문서번호**</td><td>`who-whopir-2026-11`</td></tr>
+<tr><td>**주제**</td><td>WHOPIR: Site Z, India (FPP)</td></tr>
+<tr><td>**발행기관**</td><td>WHO</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/inspection/whopir-site-z)
+</callout>
+
+### [규제 소식 · MHRA] Data integrity expectations — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `MHRA Inspectorate` · `Signal Med (T2)` · `GMP News`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-03</td></tr>
+<tr><td>**문서번호**</td><td>`mhra-blog-512`</td></tr>
+<tr><td>**발행기관**</td><td>MHRA</td></tr>
+<tr><td>**주제**</td><td>Data integrity expectations in 2026</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://mhrainspectorate.blog.gov.uk/2026/05/03/data-integrity/)
+</callout>
+
+### [WHO · WHO] WHO PQ news update — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `WHO` · `Signal Low (T1)` · `WHO`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-05</td></tr>
+<tr><td>**문서번호**</td><td>`who-news-2026-31`</td></tr>
+<tr><td>**주제**</td><td>WHO PQ news update</td></tr>
+<tr><td>**발행기관**</td><td>WHO</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/news/update-31)
 </callout>
 
 ## 🇰🇷 국내 (식약처)
@@ -150,6 +321,140 @@
 	**출처**  출처 링크 원문 미기재
 </callout>
 
+### [지침·안내서 · MFDS] 데이터 완전성 평가 가이드라인 — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `MFDS` · `Signal Med (T2)` · `Guidance`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-09</td></tr>
+<tr><td>**문서번호**</td><td>`mfds-guide-204`</td></tr>
+<tr><td>**발행기관**</td><td>MFDS</td></tr>
+<tr><td>**주제**</td><td>데이터 완전성(Data Integrity) 평가 가이드라인</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://nedrug.mfds.go.kr/guide/204)
+</callout>
+
+### [고시·개정법령 · MFDS] 의약품 GMP 고시 개정 — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `MFDS` · `Signal Med (T2)` · `규정`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-07</td></tr>
+<tr><td>**문서번호**</td><td>`mfds-reg-2026-7`</td></tr>
+<tr><td>**발행기관**</td><td>MFDS</td></tr>
+<tr><td>**주제**</td><td>의약품 제조 및 품질관리 기준 고시 개정</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://www.mfds.go.kr/regulation/2026-7)
+</callout>
+
+### [안전성서한 · MFDS] 의약품 안전성서한 — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `MFDS` · `Signal Med (T2)` · `💊 합성의약품` · `안전성`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-02</td></tr>
+<tr><td>**문서번호**</td><td>`mfds-safety-77`</td></tr>
+<tr><td>**발행기관**</td><td>MFDS</td></tr>
+<tr><td>**주제**</td><td>OO성분 의약품 안전성서한</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://nedrug.mfds.go.kr/safety/77)
+</callout>
+
+## 🔮 Watch
+
+### [입법예고 · MFDS] 의약품 등의 안전에 관한 규칙 일부개정령(안) — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence B` · `MFDS` · `Signal Low (T1)` · `입법예고`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-04</td></tr>
+<tr><td>**문서번호**</td><td>`mfds-leg-2026-19`</td></tr>
+<tr><td>**발행기관**</td><td>MFDS</td></tr>
+<tr><td>**의견기한**</td><td>2026-06-30</td></tr>
+</table>
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://www.law.go.kr/...)
+</callout>
+
 ## 📋 Recall 모니터링
 
 ### [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}**
@@ -186,6 +491,82 @@
 
 <callout icon="🔖" color="gray_bg">
 	**출처**  📎 공식원본 [링크](https://nedrug.mfds.go.kr/pbp/CCBAH01) ⚠️
+</callout>
+
+### [Recall · FDA] Subpotent tablets recall — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence A` · `OpenFDA Recall` · `Signal Med (T2)` · `💊 합성의약품` · `Recall`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-15</td></tr>
+<tr><td>**문서번호**</td><td>`Z-1234-2026`</td></tr>
+<tr><td>**업체**</td><td>Acme Pharmaceuticals, Inc.</td></tr>
+<tr><td>**제품**</td><td>Lisinopril Tablets USP 10 mg, 100-count bottle</td></tr>
+<tr><td>**Class**</td><td>Class II</td></tr>
+</table>
+
+**원문 및 번역**
+> Subpotent (out-of-specification) assay results at the 12-month stability time point.
+{{W4}}
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: Intake raw`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본 [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️
+</callout>
+
+### [Recall(HC) · Health Canada] Nitrosamine impurity recall — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence A` · `Health Canada` · `Signal Med (T2)` · `💊 합성의약품` · `Recall`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-05-10</td></tr>
+<tr><td>**문서번호**</td><td>`hc-rsam-88421`</td></tr>
+<tr><td>**업체**</td><td>PharmaCo Ltd.</td></tr>
+<tr><td>**제품**</td><td>Drug X 50 mg tablets</td></tr>
+<tr><td>**Class**</td><td>Type II</td></tr>
+</table>
+
+**원문 및 번역**
+> The product may contain a nitrosamine impurity above the acceptable intake limit.
+{{W4}}
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: Intake raw`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://recalls-rappels.canada.ca/en/alert-recall/88421)
 </callout>
 
 ---

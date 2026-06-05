@@ -1,0 +1,39 @@
+{
+  "card_id": "MFDS::mfds-reg-2026-7",
+  "card_scaffold": "### [고시·개정법령 · MFDS] 의약품 GMP 고시 개정 — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `MFDS` · `Signal Med (T2)` · `규정`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-07</td></tr>\n<tr><td>**문서번호**</td><td>`mfds-reg-2026-7`</td></tr>\n<tr><td>**발행기관**</td><td>MFDS</td></tr>\n<tr><td>**주제**</td><td>의약품 제조 및 품질관리 기준 고시 개정</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://www.mfds.go.kr/regulation/2026-7)\n</callout>",
+  "date": "2026-05-07",
+  "evidence": "B",
+  "kind": "regulation",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "Annex 1 무균공정 관련 조항 정비.",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "",
+    "headline": "의약품 GMP 고시 개정",
+    "issue_or_reason": "Annex 1 무균공정 관련 조항 정비.",
+    "kind": "regulation",
+    "language": "KO",
+    "modality": "",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "MFDS",
+    "signal": "Tier 2",
+    "w2_facts": {
+      "문서번호": "`mfds-reg-2026-7`",
+      "발행기관": "MFDS",
+      "발행일": "2026-05-07",
+      "주제": "의약품 제조 및 품질관리 기준 고시 개정"
+    }
+  },
+  "section": "domestic",
+  "signal_tier": "Tier 2"
+}

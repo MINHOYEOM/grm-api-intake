@@ -1,0 +1,39 @@
+{
+  "card_id": "MHRA Inspectorate::mhra-blog-512",
+  "card_scaffold": "### [규제 소식 · MHRA] Data integrity expectations — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `MHRA Inspectorate` · `Signal Med (T2)` · `GMP News`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-03</td></tr>\n<tr><td>**문서번호**</td><td>`mhra-blog-512`</td></tr>\n<tr><td>**발행기관**</td><td>MHRA</td></tr>\n<tr><td>**주제**</td><td>Data integrity expectations in 2026</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://mhrainspectorate.blog.gov.uk/2026/05/03/data-integrity/)\n</callout>",
+  "date": "2026-05-03",
+  "evidence": "B",
+  "kind": "rss-news",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "An MHRA Inspectorate blog on data integrity expectations.",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "",
+    "headline": "Data integrity expectations",
+    "issue_or_reason": "",
+    "kind": "rss-news",
+    "language": "EN",
+    "modality": "",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "MHRA Inspectorate",
+    "signal": "Tier 2",
+    "w2_facts": {
+      "문서번호": "`mhra-blog-512`",
+      "발행기관": "MHRA",
+      "발행일": "2026-05-03",
+      "주제": "Data integrity expectations in 2026"
+    }
+  },
+  "section": "global",
+  "signal_tier": "Tier 2"
+}

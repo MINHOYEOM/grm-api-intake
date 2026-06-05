@@ -13,15 +13,28 @@
     "{{W7}}"
   ],
   "prose_input": {
+    "action": "",
+    "body_excerpt": "",
+    "deadline": "",
     "evidence": "A",
     "firm_or_product": "한국제약(주)",
     "headline": "정제 자진 회수",
+    "issue_or_reason": "함량부적합(98% 미만) 확인에 따른 자진 회수",
     "kind": "recall-quality",
     "language": "KO",
     "modality": "Chemical",
-    "reason_summary": "함량부적합(98% 미만) 확인에 따른 자진 회수",
+    "product": "아세트아미노펜정 500mg",
+    "quote_lines": [
+      "함량부적합(98% 미만) 확인에 따른 자진 회수"
+    ],
     "regulator": "MFDS",
-    "signal": "Tier 2"
+    "signal": "Tier 2",
+    "w2_facts": {
+      "문서번호": "`recall-2026003474`",
+      "발행일": "2026-06-02",
+      "업체": "한국제약(주)",
+      "제품": "아세트아미노펜정 500mg"
+    }
   },
   "recall_group_key": "한국제약(주)|함량부적합(98% 미만) 확인에 따른 자진 회수|2026-06-02",
   "section": "recall_table",

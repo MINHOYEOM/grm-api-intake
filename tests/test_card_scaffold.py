@@ -18,11 +18,24 @@ import card_scaffold as cs
 _UPDATE = bool(os.environ.get("GRM_GOLDEN_UPDATE"))
 GOLDEN = os.path.join(os.path.dirname(__file__), "golden")
 FIXTURES = [
+    # 기존 5종
     "admin_action_chemical",
     "recall_quality_chemical",
     "gmp_inspection_biologic",
     "warning_letter_chemical",
     "guidance_fr",
+    # K2.5 — 활성 소스 전 유형 확장(openfda·HC·WHO 3종·ICH·RSS·MFDS RSS 4종)
+    "openfda_recall_chemical",
+    "hc_recall_chemical",
+    "who_noc",
+    "who_inspection",
+    "who_news",
+    "ich_guideline",
+    "rss_news_mhra",
+    "safety_letter",
+    "legislative_notice",
+    "regulation_final",
+    "mfds_notice",
 ]
 
 
@@ -81,6 +94,16 @@ class GoldenScaffoldTest(unittest.TestCase):
             with self.subTest(fixture=name):
                 md = _read(os.path.join(GOLDEN, f"{name}.expected.md"))
                 self.assertIn("**문서번호**", md)
+
+    def test_evidence_quote_consistency(self) -> None:
+        # P1-1 불변식: Evidence A ⟺ W3 원문 인용(`> `) 존재. "A 인데 quote 없음" 0건.
+        for name in FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                has_quote = "\n> " in card.markdown
+                self.assertEqual(card.evidence == "A", has_quote,
+                                 f"{name}: evidence={card.evidence}, has_quote={has_quote}")
 
     def test_title_follows_frozen_index_form(self) -> None:
         # P1-1 / §13.1-1·8: 제목 = "### [유형 · 기관] 핵심대상 — **{{TITLE_ISSUE}}**".

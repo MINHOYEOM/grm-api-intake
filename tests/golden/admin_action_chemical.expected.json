@@ -13,15 +13,29 @@
     "{{W7}}"
   ],
   "prose_input": {
+    "action": "제조업무정지 1개월",
+    "body_excerpt": "",
+    "deadline": "",
     "evidence": "A",
     "firm_or_product": "대한약품공업",
     "headline": "제조업무정지 행정처분",
+    "issue_or_reason": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함. 제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨.",
     "kind": "admin-action",
     "language": "KO",
     "modality": "Chemical",
-    "reason_summary": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함. 제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨.",
+    "product": "",
+    "quote_lines": [
+      "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함.",
+      "제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨."
+    ],
     "regulator": "MFDS",
-    "signal": "Tier 2"
+    "signal": "Tier 2",
+    "w2_facts": {
+      "문서번호": "`admin-2026003474`",
+      "발행일": "2026-05-30",
+      "업체": "대한약품공업 (대한민국)",
+      "처분": "제조업무정지 1개월"
+    }
   },
   "section": "domestic",
   "signal_tier": "Tier 2"

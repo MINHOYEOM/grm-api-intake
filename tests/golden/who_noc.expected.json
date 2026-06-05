@@ -1,0 +1,39 @@
+{
+  "card_id": "WHO::who-noc-2026-04",
+  "card_scaffold": "### [WHO · WHO] Notice of Concern — Firm Y — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `WHO` · `Signal High (T3)` · `WHO`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-08</td></tr>\n<tr><td>**문서번호**</td><td>`who-noc-2026-04`</td></tr>\n<tr><td>**주제**</td><td>Notice of Concern: Firm Y (API site)</td></tr>\n<tr><td>**발행기관**</td><td>WHO</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/notice-of-concern/firm-y)\n</callout>",
+  "date": "2026-05-08",
+  "evidence": "B",
+  "kind": "who-noc",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "",
+    "headline": "Notice of Concern — Firm Y",
+    "issue_or_reason": "Notice of Concern: Firm Y (API site)",
+    "kind": "who-noc",
+    "language": "EN",
+    "modality": "",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "WHO",
+    "signal": "Tier 3",
+    "w2_facts": {
+      "문서번호": "`who-noc-2026-04`",
+      "발행기관": "WHO",
+      "발행일": "2026-05-08",
+      "주제": "Notice of Concern: Firm Y (API site)"
+    }
+  },
+  "section": "global",
+  "signal_tier": "Tier 3"
+}

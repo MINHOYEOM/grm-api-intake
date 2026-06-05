@@ -1,0 +1,21 @@
+{
+  "raw": {
+    "detection": "section-title snapshot (Routine verification required)",
+    "page_slug": "quality-guidelines",
+    "public_page": "https://www.ich.org/page/quality-guidelines",
+    "section_title": "Q5A(R2) Viral Safety Evaluation of Biotechnology Products",
+    "source_page": "https://admin.ich.org/..."
+  },
+  "row": {
+    "date": "2026-05-01",
+    "document_id": "ich-q5a-r2",
+    "headline": "ICH Q5A(R2) Viral Safety",
+    "language": "EN",
+    "modality": "Biologic",
+    "official_url": "https://www.ich.org/page/quality-guidelines",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "ICH",
+    "type_or_class": "ich-guideline"
+  }
+}

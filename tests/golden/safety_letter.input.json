@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "brdId": "safety",
+    "description": "OO성분 함유 의약품의 이상사례 보고 관련 안전성 정보.",
+    "format": "rss2",
+    "title": "OO성분 의약품 안전성서한"
+  },
+  "row": {
+    "date": "2026-05-02",
+    "document_id": "mfds-safety-77",
+    "headline": "의약품 안전성서한",
+    "language": "KO",
+    "modality": "Chemical",
+    "official_url": "https://nedrug.mfds.go.kr/safety/77",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MFDS",
+    "type_or_class": "safety-letter"
+  }
+}

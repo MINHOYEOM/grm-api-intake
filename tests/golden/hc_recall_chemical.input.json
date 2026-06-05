@@ -1,0 +1,24 @@
+{
+  "raw": {
+    "Issue": "The product may contain a nitrosamine impurity above the acceptable intake limit.",
+    "Organization": "PharmaCo Ltd.",
+    "Product": "Drug X 50 mg tablets",
+    "Recall class": "Type II",
+    "Title": "Drug X recall",
+    "What you should do": "Stop using the affected lots and consult your pharmacist.",
+    "api": "HC RSAM OpenData",
+    "nid": "88421"
+  },
+  "row": {
+    "date": "2026-05-10",
+    "document_id": "hc-rsam-88421",
+    "headline": "Nitrosamine impurity recall",
+    "language": "EN",
+    "modality": "Chemical",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/88421",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "Health Canada",
+    "type_or_class": "hc-recall"
+  }
+}

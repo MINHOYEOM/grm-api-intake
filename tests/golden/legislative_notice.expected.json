@@ -1,0 +1,39 @@
+{
+  "card_id": "MFDS::mfds-leg-2026-19",
+  "card_scaffold": "### [입법예고 · MFDS] 의약품 등의 안전에 관한 규칙 일부개정령(안) — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `MFDS` · `Signal Low (T1)` · `입법예고`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-04</td></tr>\n<tr><td>**문서번호**</td><td>`mfds-leg-2026-19`</td></tr>\n<tr><td>**발행기관**</td><td>MFDS</td></tr>\n<tr><td>**의견기한**</td><td>2026-06-30</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://www.law.go.kr/...)\n</callout>",
+  "date": "2026-05-04",
+  "evidence": "B",
+  "kind": "legislative",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "",
+    "deadline": "2026-06-30",
+    "evidence": "B",
+    "firm_or_product": "",
+    "headline": "의약품 등의 안전에 관한 규칙 일부개정령(안)",
+    "issue_or_reason": "",
+    "kind": "legislative",
+    "language": "KO",
+    "modality": "",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "MFDS",
+    "signal": "Tier 1",
+    "w2_facts": {
+      "문서번호": "`mfds-leg-2026-19`",
+      "발행기관": "MFDS",
+      "발행일": "2026-05-04",
+      "의견기한": "2026-06-30"
+    }
+  },
+  "section": "watch",
+  "signal_tier": "Tier 1"
+}

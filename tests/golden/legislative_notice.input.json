@@ -1,0 +1,24 @@
+{
+  "raw": {
+    "api": "ogLmPp",
+    "asndOfiNm": "식품의약품안전처",
+    "edYd": "2026-06-30",
+    "lsClsNm": "총리령",
+    "lsNm": "의약품 등의 안전에 관한 규칙",
+    "pntcNo": "2026-19",
+    "stYd": "2026-05-04"
+  },
+  "row": {
+    "comments_close": "2026-06-30",
+    "date": "2026-05-04",
+    "document_id": "mfds-leg-2026-19",
+    "headline": "의약품 등의 안전에 관한 규칙 일부개정령(안)",
+    "language": "KO",
+    "modality": "",
+    "official_url": "https://www.law.go.kr/...",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 1",
+    "source": "MFDS",
+    "type_or_class": "legislative-notice"
+  }
+}

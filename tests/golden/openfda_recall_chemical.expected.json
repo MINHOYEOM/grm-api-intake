@@ -1,0 +1,43 @@
+{
+  "card_id": "OpenFDA Recall::Z-1234-2026",
+  "card_scaffold": "### [Recall · FDA] Subpotent tablets recall — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence A` · `OpenFDA Recall` · `Signal Med (T2)` · `💊 합성의약품` · `Recall`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-15</td></tr>\n<tr><td>**문서번호**</td><td>`Z-1234-2026`</td></tr>\n<tr><td>**업체**</td><td>Acme Pharmaceuticals, Inc.</td></tr>\n<tr><td>**제품**</td><td>Lisinopril Tablets USP 10 mg, 100-count bottle</td></tr>\n<tr><td>**Class**</td><td>Class II</td></tr>\n</table>\n\n**원문 및 번역**\n> Subpotent (out-of-specification) assay results at the 12-month stability time point.\n{{W4}}\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: Intake raw`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본 [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️\n</callout>",
+  "date": "2026-05-15",
+  "evidence": "A",
+  "kind": "openfda-recall",
+  "modality": "Chemical",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}",
+    "{{W4}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "",
+    "deadline": "",
+    "evidence": "A",
+    "firm_or_product": "Acme Pharmaceuticals, Inc.",
+    "headline": "Subpotent tablets recall",
+    "issue_or_reason": "Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+    "kind": "openfda-recall",
+    "language": "EN",
+    "modality": "Chemical",
+    "product": "Lisinopril Tablets USP 10 mg, 100-count bottle",
+    "quote_lines": [
+      "Subpotent (out-of-specification) assay results at the 12-month stability time point."
+    ],
+    "regulator": "OpenFDA Recall",
+    "signal": "Tier 2",
+    "w2_facts": {
+      "Class": "Class II",
+      "문서번호": "`Z-1234-2026`",
+      "발행일": "2026-05-15",
+      "업체": "Acme Pharmaceuticals, Inc.",
+      "제품": "Lisinopril Tablets USP 10 mg, 100-count bottle"
+    }
+  },
+  "section": "recall_table",
+  "signal_tier": "Tier 2"
+}

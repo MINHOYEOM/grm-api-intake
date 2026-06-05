@@ -1,4 +1,4 @@
-### 🟦 [GMP실사 · 독일] 지엔바이오로직스 — **{{TITLE_ISSUE}}** `gmp-2026-0007`
+### [GMP실사 · MFDS] 지엔바이오로직스 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

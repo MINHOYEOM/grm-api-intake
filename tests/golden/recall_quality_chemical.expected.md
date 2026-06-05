@@ -1,4 +1,4 @@
-### 🟦 [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}** `recall-2026003474`
+### [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

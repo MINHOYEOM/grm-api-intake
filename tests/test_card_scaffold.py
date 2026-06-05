@@ -82,6 +82,24 @@ class GoldenScaffoldTest(unittest.TestCase):
                 md = _read(os.path.join(GOLDEN, f"{name}.expected.md"))
                 self.assertIn("**문서번호**", md)
 
+    def test_title_follows_frozen_index_form(self) -> None:
+        # P1-1 / §13.1-1·8: 제목 = "### [유형 · 기관] 핵심대상 — **{{TITLE_ISSUE}}**".
+        # 제목 라인에 prefix 색사각형 이모지·DocID·site_country 부재.
+        prefix_emojis = ("🟧", "🟦", "🟫", "⬜")
+        for name in FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                title = card.markdown.splitlines()[0]
+                self.assertTrue(title.startswith("### ["), f"{name}: 제목 인덱스 형식")
+                self.assertIn("**{{TITLE_ISSUE}}**", title)
+                for e in prefix_emojis:
+                    self.assertNotIn(e, title, f"{name}: 제목에 prefix 이모지 잔존")
+                self.assertNotIn(fx["row"]["document_id"], title)  # DocID 부재
+                sc = fx["row"].get("site_country")
+                if sc:
+                    self.assertNotIn(sc, title)  # site_country 부재
+
     def test_uses_only_notion_callout_and_quote_syntax(self) -> None:
         # 제약 1 보강: 색 callout 은 허용 색만, > 는 원문 인용에만
         allowed_colors = {"blue_bg", "gray_bg", "yellow_bg", "green_bg"}

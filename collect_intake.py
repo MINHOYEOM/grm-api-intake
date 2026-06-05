@@ -2439,8 +2439,17 @@ def _enable_handoff_v2() -> bool:
     return os.environ.get("ENABLE_HANDOFF_V2", "false").lower() == "true"
 
 
-# v2 row 에서 제외할 큰/내부 필드 — raw 전체는 절대 미포함(크기 폭증·children 한도, 단계 D).
-_HANDOFF_V2_ROW_DROP = ("raw",)
+# v2 row 에 보존할 v1 호환 필드(whitelist) — _intake_page_snapshot() 스키마.
+# blacklist 대신 whitelist 로(Codex P2): raw·Stage B 부착 bookkeeping(raw_fetch_ok·
+# raw_source·status_hint·evidence_hint) 같은 내부/대형 필드가 새지 않도록 보장.
+_HANDOFF_V2_ROW_KEEP = (
+    "page_id", "page_url", "title", "source", "document_id", "date", "headline",
+    "official_url", "source_url", "type_or_class", "firm", "body", "distribution",
+    "comments_close", "run_date", "collected_at", "api_query", "search_query",
+    "raw_excerpt", "qa_relevance", "osd_relevance", "modality", "source_type",
+    "signal_tier", "evidence_candidate", "language", "region_jurisdiction",
+    "site_country", "status",
+)
 
 
 def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
@@ -2449,8 +2458,9 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     """handoff v2(additive) payload. 순수 함수 — 네트워크 없음(scaffold 조립만).
 
     `rows` 는 K2-prep(`enrich_rows_with_raw`)로 **dedupe·raw 부착**된 상태여야 한다.
-    각 row 에 `card_scaffold`·`prose_input`·`section`·`card_id`·`recall_group_key`(해당
-    시)를 additive 로 붙이고, **raw 전체는 제외**한다. v1 필드는 보존(하위호환).
+    각 row 는 v1 호환 필드 whitelist 복사 + `card_scaffold`·`prose_input`·`section`·
+    `card_id`·`evidence`·`recall_group_key`(해당 시)·`status_hint`(degrade 시) additive.
+    **raw 전체·Stage B bookkeeping 은 제외**(크기 폭증·내부필드 누출 방지).
     """
     start = run_date - timedelta(days=window_days)
     out_rows: list[dict[str, Any]] = []
@@ -2458,14 +2468,17 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     for row in rows:
         raw = row.get("raw")
         card = build_card_scaffold(row, raw)
-        v2row = {k: v for k, v in row.items() if k not in _HANDOFF_V2_ROW_DROP}
+        v2row = {k: row[k] for k in _HANDOFF_V2_ROW_KEEP if k in row}
         v2row["card_id"] = card.card_id
         v2row["section"] = card.section
+        v2row["evidence"] = card.evidence
         v2row["card_scaffold"] = card.markdown
         v2row["prose_input"] = card.prose_input
         v2row["needs_llm_slots"] = list(card.needs_llm_slots)
         if card.recall_group_key:
             v2row["recall_group_key"] = card.recall_group_key
+        if card.status_hint:
+            v2row["status_hint"] = card.status_hint
         out_rows.append(v2row)
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
     return {
@@ -2652,6 +2665,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                                         doc_ids=doc_ids)
     if _enable_handoff_v2():
         # K2-prep: dedupe → 하이브리드 raw 부착(메모리 우선) → scaffold v2 payload.
+        # ⚠️ inmemory_raw 의 main() 와이어링(당일 수집 IntakeItem.raw_payload 전달)은 K3
+        #    운영 전환 시 추가 예정 — 현재는 None 이라 전 row 를 page children fetch 한다.
         enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
         payload = build_routine_handoff_payload_v2(enriched, run_date, window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,

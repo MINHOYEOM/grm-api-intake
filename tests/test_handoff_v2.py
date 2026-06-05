@@ -1,4 +1,5 @@
 """handoff v2(단계 D) 단위 테스트 — additive·플래그·raw 미포함·children 분할·v1 보존."""
+import io
 import json
 import os
 import unittest
@@ -7,7 +8,8 @@ from unittest import mock
 
 import collect_intake as ci
 
-
+GOLDEN = os.path.join(os.path.dirname(__file__), "golden")
+_UPDATE = bool(os.environ.get("GRM_GOLDEN_UPDATE"))
 RUN_DATE = date(2026, 6, 5)
 GEN_AT = datetime(2026, 6, 5, 3, 17)
 
@@ -169,6 +171,53 @@ class ChildrenChunkTest(unittest.TestCase):
             ci.notion_upsert_routine_handoff("tok", "db", {"handoff_id": "h"}, GEN_AT)
         self.assertEqual(create_children["count"], 10)
         append.assert_not_called()  # ≤90 이면 분할 없음(v1 기존 동작 유지)
+
+
+_V1_ROWS = [
+    {"source": "MFDS", "document_id": "admin-1", "date": "2026-05-30",
+     "run_date": "2026-06-04", "collected_at": "2026-06-04T03:17:00", "page_id": "p1",
+     "signal_tier": "Tier 2", "headline": "행정처분 x", "type_or_class": "admin-action"},
+    {"source": "FDA Warning Letter", "document_id": "WL-1", "date": "2026-05-20",
+     "run_date": "2026-06-03", "collected_at": "2026-06-03T03:17:00", "page_id": "p2",
+     "signal_tier": "Tier 3", "headline": "CGMP y", "type_or_class": "CDER"},
+]
+
+
+class V1FrozenSnapshotTest(unittest.TestCase):
+    """플래그 off(v1) 경로 회귀 잠금 — 고정 입력 → payload·블록 구조 바이트 스냅샷."""
+
+    def _v1_payload(self) -> dict:
+        return ci.build_routine_handoff_payload(
+            [dict(r) for r in _V1_ROWS], RUN_DATE, 7, GEN_AT)
+
+    def test_v1_payload_byte_snapshot(self) -> None:
+        serialized = json.dumps(self._v1_payload(), ensure_ascii=False, indent=2)
+        path = os.path.join(GOLDEN, "handoff_v1_snapshot.json")
+        if _UPDATE:
+            with io.open(path, "w", encoding="utf-8") as f:
+                f.write(serialized)
+            return
+        with io.open(path, encoding="utf-8") as f:
+            expected = f.read()
+        self.assertEqual(serialized, expected)
+
+    def test_v1_blocks_structure_unchanged(self) -> None:
+        # 업서트 직렬화 경로 회귀: 헤더 4블록 + code 블록, v1 은 indent=2(compact 아님)
+        blocks = ci._handoff_blocks(self._v1_payload())
+        types = [b["type"] for b in blocks]
+        self.assertEqual(types[:4], ["heading_2", "paragraph", "paragraph", "heading_3"])
+        self.assertTrue(all(t == "code" for t in types[4:]))
+        self.assertEqual(blocks[0]["heading_2"]["rich_text"][0]["text"]["content"],
+                         "GRM Routine Handoff")
+        code_text = blocks[4]["code"]["rich_text"][0]["text"]["content"]
+        self.assertIn('\n  "', code_text)  # indent 2칸 존재(v1 직렬화)
+
+    def test_v1_has_no_v2_fields(self) -> None:
+        payload = self._v1_payload()
+        self.assertEqual(payload["schema_version"], "grm-routine-handoff/v1")
+        for r in payload["rows"]:
+            self.assertNotIn("card_scaffold", r)
+            self.assertNotIn("prose_input", r)
 
 
 if __name__ == "__main__":

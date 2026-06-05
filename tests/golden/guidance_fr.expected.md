@@ -1,4 +1,4 @@
-### 🟫 [지침·안내서 · Federal Register] Guidance on Elemental Impurities in Drug Products — **{{TITLE_ISSUE}}** `FR-2026-04578`
+### [지침·안내서 · FDA] Guidance on Elemental Impurities in Drug Products — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

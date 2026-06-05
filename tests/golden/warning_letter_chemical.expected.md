@@ -1,4 +1,4 @@
-### 🟧 [Warning Letter · FDA Warning Letter] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}** `WL-CMS-660123`
+### [Warning Letter · FDA] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

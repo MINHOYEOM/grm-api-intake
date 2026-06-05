@@ -468,19 +468,29 @@ def recall_group_key(row: dict[str, Any], raw: dict[str, Any] | None) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 13. 제목 (§1 + §13.1-1): [유형 · 기관] 핵심대상 — **{{TITLE_ISSUE}}** `DocID`
 # ─────────────────────────────────────────────────────────────────────────────
+# 기관 라벨 — 규제기관 short (제목 §13.1-1). source 기준(MFDS 카드도 소재국 아닌 Source).
+_REGULATOR_LABEL = {
+    SOURCE_FR: "FDA", SOURCE_RECALL: "FDA", SOURCE_FDA_WL: "FDA",
+    SOURCE_EMA: "EMA", SOURCE_MHRA: "MHRA", SOURCE_PICS: "PIC/S",
+    SOURCE_ECA: "ECA", SOURCE_MFDS: "MFDS", SOURCE_ICH: "ICH",
+    SOURCE_WHO: "WHO", SOURCE_HC: "Health Canada",
+}
+
+
+def _regulator(source: str) -> str:
+    return _REGULATOR_LABEL.get(source, source or "")
+
+
 def _title(kind: str, row: dict[str, Any]) -> str:
-    prefix, label, _ = _kind_meta(kind)
-    # 기관/소재국: 글로벌=규제기관, MFDS=소재국
-    if row.get("source") == SOURCE_MFDS:
-        org = _first(row.get("site_country"), "MFDS")
-    else:
-        org = row.get("source", "")
+    """제목(§13.1-1·8 동결): ### [유형 · 기관] 핵심대상 — **{{TITLE_ISSUE}}**.
+
+    제목에서 제거: prefix 색사각형 이모지·소재국·DocID(→ W2 문서번호 행·W1 배지로).
+    기관은 Source 기준 규제기관(MFDS 도 소재국 아님). 핵심대상=업체/제품/문서명.
+    """
+    _, label, _ = _kind_meta(kind)
+    org = _regulator(row.get("source", ""))
     target = _truncate_at_sentence(_first(row.get("firm"), row.get("headline")), 60)
-    docid = row.get("document_id", "")
-    head = f"{prefix} [{label} · {org}] {target} — **{SLOT_TITLE_ISSUE}**"
-    if docid:
-        head += f" {_code(docid)}"
-    return _h3(head)
+    return _h3(f"[{label} · {org}] {target} — **{SLOT_TITLE_ISSUE}**")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 
 ## 🌐 글로벌
 
-### 🟧 [Warning Letter · FDA Warning Letter] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}** `WL-CMS-660123`
+### [Warning Letter · FDA] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}
@@ -35,7 +35,7 @@
 	**출처**  📰 정보출처 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters)   ·   📎 공식원본 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660123)
 </callout>
 
-### 🟫 [지침·안내서 · Federal Register] Guidance on Elemental Impurities in Drug Products — **{{TITLE_ISSUE}}** `FR-2026-04578`
+### [지침·안내서 · FDA] Guidance on Elemental Impurities in Drug Products — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}
@@ -76,7 +76,7 @@
 
 ## 🇰🇷 국내 (식약처)
 
-### 🟦 [행정처분 · 대한민국] 대한약품공업 — **{{TITLE_ISSUE}}** `admin-2026003474`
+### [행정처분 · MFDS] 대한약품공업 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}
@@ -113,7 +113,7 @@
 	**출처**  📎 공식원본 [링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=123456)
 </callout>
 
-### 🟦 [GMP실사 · 독일] 지엔바이오로직스 — **{{TITLE_ISSUE}}** `gmp-2026-0007`
+### [GMP실사 · MFDS] 지엔바이오로직스 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}
@@ -152,7 +152,7 @@
 
 ## 📋 Recall 모니터링
 
-### 🟦 [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}** `recall-2026003474`
+### [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

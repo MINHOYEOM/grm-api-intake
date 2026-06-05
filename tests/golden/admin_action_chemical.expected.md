@@ -1,4 +1,4 @@
-### 🟦 [행정처분 · 대한민국] 대한약품공업 — **{{TITLE_ISSUE}}** `admin-2026003474`
+### [행정처분 · MFDS] 대한약품공업 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}

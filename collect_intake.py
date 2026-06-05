@@ -54,7 +54,7 @@ from grm_common import (
     retry_after_seconds,
 )
 # K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
-from card_scaffold import build_card_scaffold, merge_recall_cards
+from card_scaffold import build_card_scaffold, compute_render_plan, merge_recall_cards
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2483,16 +2483,19 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     recall 다품목은 `merge_recall_cards()`(§14)로 대표 1카드 + 멤버 `merged_into` 직렬화:
     멤버 row 는 v1 호환 필드 + `merged_into` 만 유지(자체 card_id 포함 v2 additive 필드 전부
     생략 → Routine 렌더 제외, page_id 보존으로 Status 갱신 목록에는 잔존, Codex R1-a).
+    대표/단독 row 는 `render_order`·`group_label`(A안, R1-d)로 §7 정렬·그룹핑 결과를 받아
+    Routine 이 정렬을 재현하지 않게 한다(`compute_render_plan` = assemble_brief_skeleton 공유).
     """
     start = run_date - timedelta(days=window_days)
     cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
+    render_plan = compute_render_plan(cards)
     out_rows: list[dict[str, Any]] = []
     source_counts: dict[str, int] = {}
     for row, card in zip(rows, cards):
         v2row = {k: row[k] for k in _HANDOFF_V2_ROW_KEEP if k in row}
         if card.merged_into:
             # §14(F)·R1-a 멤버: v1 호환 필드 + merged_into 만(자체 card_id·card_scaffold·
-            # prose_input·needs_llm_slots·section·evidence·recall_group_key 생략).
+            # prose_input·needs_llm_slots·section·evidence·recall_group_key·render_order 생략).
             # 렌더 제외, page_id 보존으로 Status 갱신 목록에만 잔존. 그룹 식별은 merged_into 로.
             v2row["merged_into"] = card.merged_into
         else:
@@ -2502,6 +2505,11 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
             v2row["card_scaffold"] = card.markdown
             v2row["prose_input"] = card.prose_input
             v2row["needs_llm_slots"] = list(card.needs_llm_slots)
+            plan = render_plan.get(card.card_id)
+            if plan is not None:
+                v2row["render_order"] = plan["render_order"]
+                if plan["group_label"]:
+                    v2row["group_label"] = plan["group_label"]
             if card.recall_group_key:
                 v2row["recall_group_key"] = card.recall_group_key
             if card.status_hint:

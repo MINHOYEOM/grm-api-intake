@@ -794,32 +794,63 @@ def _neg_date(d: str) -> str:
     return "".join(chr(255 - ord(ch)) for ch in d) if d else "\xff"
 
 
+def _ordered_cards_with_groups(
+        cards: list[CardScaffold],
+        cfg: FixedConfig = DEFAULT_CONFIG) -> list[tuple[CardScaffold, str]]:
+    """§7 정렬·그룹핑을 페이지 전역 순서의 `(card, group_label)` 시퀀스로 산출.
+
+    **단일 진실원**: `assemble_brief_skeleton()`(렌더)과 `compute_render_plan()`(A안
+    render_order/group_label, Codex R1-d)이 이 함수를 공유한다(정렬 로직 중복 금지).
+    순서: 섹션 global→domestic→watch→recall_table · Tier 3→2→1 · 동급 발행일 desc.
+    `group_label` = 글로벌 ≥임계 시 제품군 소제목, 그 외 "". 병합 멤버(merged_into) 제외.
+    """
+    visible = [c for c in cards if not c.merged_into]
+    seq: list[tuple[CardScaffold, str]] = []
+    for sec in _SECTION_ORDER:
+        sec_cards = sorted([c for c in visible if c.section == sec], key=_sort_key)
+        if not sec_cards:
+            continue
+        if sec == "global" and len(sec_cards) >= cfg.grouping_threshold:
+            for mod in ("Chemical", "Biologic", "Other"):
+                label = cfg.modality_badge.get(mod, mod)
+                seq.extend((c, label) for c in sec_cards if (c.modality or "Other") == mod)
+        else:
+            seq.extend((c, "") for c in sec_cards)
+    return seq
+
+
+def compute_render_plan(cards: list[CardScaffold],
+                        cfg: FixedConfig = DEFAULT_CONFIG) -> dict[str, dict[str, Any]]:
+    """A안(Codex R1-d): `{card_id: {render_order:int, group_label:str}}`.
+
+    `assemble_brief_skeleton()` 과 동일 순서(`_ordered_cards_with_groups` 공유)이므로
+    Routine 은 §7 정렬·그룹핑을 재현하지 않고 render_order 순 나열 + section 전환 H2 +
+    group_label 전환 H3 만 한다. 병합 멤버는 시퀀스에서 빠지므로 부여되지 않는다.
+    """
+    return {c.card_id: {"render_order": i, "group_label": label}
+            for i, (c, label) in enumerate(_ordered_cards_with_groups(cards, cfg))}
+
+
 def assemble_brief_skeleton(cards: list[CardScaffold],
                             cfg: FixedConfig = DEFAULT_CONFIG) -> str:
     """카드들을 페이지 골격(목차·섹션 H2·§7 그룹핑/정렬·면책 푸터)으로 조립.
 
     순수 함수. build_card_scaffold() 결과 리스트를 받아 페이지 마크다운 1개를 만든다.
-    카드 1장 조립과 분리(단계 D/K3 재사용 단위가 다름).
+    카드 1장 조립과 분리(단계 D/K3 재사용 단위가 다름). 정렬·그룹핑은
+    `_ordered_cards_with_groups()` 를 `compute_render_plan()` 과 공유(R1-d 순서 일치).
     """
-    # §14(F): 병합 멤버(merged_into)는 렌더에서 제외(대표 1카드만). 호출부에서
-    # merge_recall_cards() 적용 후 넘어오는 것을 전제하되, 미적용 입력도 무영향.
-    cards = [c for c in cards if not c.merged_into]
     out: list[str] = ["<table_of_contents/>"]
-    for sec in _SECTION_ORDER:
-        sec_cards = sorted([c for c in cards if c.section == sec], key=_sort_key)
-        if not sec_cards:
-            continue
-        out.append(f"## {cfg.section_titles.get(sec, sec)}")
-        # 글로벌 ≥임계면 제품군 그룹핑(§7), 아니면 평면
-        if sec == "global" and len(sec_cards) >= cfg.grouping_threshold:
-            for mod in ("Chemical", "Biologic", "Other"):
-                grp = [c for c in sec_cards if (c.modality or "Other") == mod]
-                if not grp:
-                    continue
-                out.append(f"### {cfg.modality_badge.get(mod, mod)}")
-                out.extend(c.markdown for c in grp)
-        else:
-            out.extend(c.markdown for c in sec_cards)
+    cur_section: str | None = None
+    cur_label: str | None = None
+    for card, label in _ordered_cards_with_groups(cards, cfg):
+        if card.section != cur_section:
+            out.append(f"## {cfg.section_titles.get(card.section, card.section)}")
+            cur_section = card.section
+            cur_label = None  # 섹션 전환 시 그룹 소제목 리셋
+        if label and label != cur_label:
+            out.append(f"### {label}")
+            cur_label = label
+        out.append(card.markdown)
     # 면책 푸터(§13.1-11) — 페이지 끝
     out.append("---")
     disc = list(cfg.disclaimer_ko) + [cfg.disclaimer_en]

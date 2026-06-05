@@ -84,6 +84,12 @@ class BuildV2PayloadTest(unittest.TestCase):
         # card_id 는 source::document_id 유지(§12E)
         self.assertEqual(recall["card_id"], "MFDS::recall-2026003474")
 
+    def test_render_order_assigned_to_visible_rows(self) -> None:
+        # R1-d: 대표/단독 row 에 render_order 부여(0..N-1). <4 글로벌이라 group_label 없음.
+        orders = sorted(r["render_order"] for r in self.payload["rows"])
+        self.assertEqual(orders, [0, 1])
+        self.assertTrue(all("group_label" not in r for r in self.payload["rows"]))
+
     def test_card_scaffold_is_markdown_with_slots(self) -> None:
         r = self.payload["rows"][0]
         self.assertIn("{{W1}}", r["card_scaffold"])
@@ -145,6 +151,7 @@ class MergeRecallV2SerializationTest(unittest.TestCase):
             self.assertNotIn("card_scaffold", m)        # 렌더 제외
             self.assertNotIn("prose_input", m)
             self.assertNotIn("needs_llm_slots", m)
+            self.assertNotIn("render_order", m)         # R1-d: 멤버 미부여
             self.assertIn("page_id", m)                  # Status 갱신용 보존
 
     def test_no_raw_leak(self) -> None:

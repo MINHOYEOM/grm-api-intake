@@ -206,6 +206,11 @@ def _build_cards_from_rows(rows: list[dict]) -> list:
     return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
 
 
+def _all_fixture_cards() -> list:
+    return [cs.build_card_scaffold(_load_input(n)["row"], _load_input(n)["raw"])
+            for n in FIXTURES]
+
+
 def _recall_rows(entrps: str, reason: str, pub: str,
                  products: list[str]) -> list[dict]:
     """동일 키(병합 대상) recall 3요소 + 품목별 row 생성 — card_id 오름차순 = 입력 순서."""
@@ -347,6 +352,47 @@ class MergeRecallCardsTest(unittest.TestCase):
         self.assertIn("외 2품목", page)
         self.assertNotIn("아세트아미노펜정 325mg</td>", page)  # 멤버 W2 미렌더
         self.assertEqual(page.count("<details>"), 1)             # 병합 toggle 1회
+
+
+class RenderPlanTest(unittest.TestCase):
+    """R1-d(fork A안): compute_render_plan == assemble_brief_skeleton 순서 공유."""
+
+    def test_render_order_matches_page_card_order(self) -> None:
+        cards = cs.merge_recall_cards(_all_fixture_cards())
+        plan = cs.compute_render_plan(cards)
+        page = cs.assemble_brief_skeleton(cards)
+        visible = [c for c in cards if not c.merged_into]
+        # render_order 는 0..N-1 연속, 가시 카드 전원에 부여(멤버 제외).
+        self.assertEqual(sorted(p["render_order"] for p in plan.values()),
+                         list(range(len(visible))))
+        # render_order 오름차순 == 페이지 등장 순서(동일 정렬 helper 공유 검증).
+        by_order = sorted(visible, key=lambda c: plan[c.card_id]["render_order"])
+        positions = [page.index(c.markdown) for c in by_order]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_members_get_no_render_order(self) -> None:
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["가정", "나정", "다정"])
+        cards = cs.merge_recall_cards(_build_cards_from_rows(rows))
+        plan = cs.compute_render_plan(cards)
+        member_ids = [c.card_id for c in cards if c.merged_into]
+        self.assertEqual(len(member_ids), 2)
+        for mid in member_ids:
+            self.assertNotIn(mid, plan)
+
+    def test_group_label_threshold_on_off(self) -> None:
+        # 글로벌 ≥4 → 제품군 group_label 부여, ≤3 → 전부 빈 라벨(평면).
+        glob = [n for n in FIXTURES
+                if cs.build_card_scaffold(_load_input(n)["row"],
+                                          _load_input(n)["raw"]).section == "global"]
+        self.assertGreaterEqual(len(glob), 4)
+        many = [cs.build_card_scaffold(_load_input(n)["row"], _load_input(n)["raw"])
+                for n in glob]
+        plan_many = cs.compute_render_plan(many)
+        self.assertTrue(any(p["group_label"] for p in plan_many.values()))
+        few = many[:3]
+        plan_few = cs.compute_render_plan(few)
+        self.assertTrue(all(not p["group_label"] for p in plan_few.values()))
 
 
 def _callout_colors(md: str) -> list[str]:

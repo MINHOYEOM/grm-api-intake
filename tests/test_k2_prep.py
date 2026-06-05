@@ -9,8 +9,14 @@ from unittest import mock
 
 import collect_intake
 from collect_intake import (
-    attach_raw_to_rows, enrich_rows_with_raw, fetch_intake_raw_payload,
+    IntakeItem, attach_raw_to_rows, build_inmemory_raw, enrich_rows_with_raw,
+    fetch_intake_raw_payload,
 )
+
+
+def _item(source: str, document_id: str, raw: dict | None) -> IntakeItem:
+    return IntakeItem(source=source, document_id=document_id, date_iso="2026-06-05",
+                      headline="h", official_url="", raw_payload=raw or {})
 
 
 def _code_block(content: str, language: str = "json") -> dict:
@@ -172,6 +178,57 @@ class EnrichRowsWithRawTest(unittest.TestCase):
         self.assertEqual(len(deduped), 1)
         self.assertEqual(stats["total"], 1)
         self.assertEqual(fetch.call_count, 1)  # 중복 fetch 제거됨
+
+
+class BuildInmemoryRawTest(unittest.TestCase):
+    """G2 와이어링: 당일 수집 IntakeItem → {card_id: raw_payload} 집계."""
+
+    def test_maps_card_id_to_raw_across_lists(self) -> None:
+        recall = [_item("MFDS", "recall-1", {"RTRVL_RESN": "사유"})]
+        fr = [_item("Federal Register", "FR-1", {"abstract": "x"})]
+        cache = build_inmemory_raw(recall, fr)
+        self.assertEqual(cache, {
+            "MFDS::recall-1": {"RTRVL_RESN": "사유"},
+            "Federal Register::FR-1": {"abstract": "x"},
+        })
+
+    def test_empty_raw_payload_excluded(self) -> None:
+        # 빈 raw_payload 는 제외 — attach 의 fetch 폴백/graceful degrade 를 가로채지 않게.
+        cache = build_inmemory_raw([_item("WHO", "who-1", None),
+                                    _item("MFDS", "admin-1", {"EXPOSE_CONT": "내용"})])
+        self.assertEqual(cache, {"MFDS::admin-1": {"EXPOSE_CONT": "내용"}})
+
+    def test_duplicate_card_id_first_wins(self) -> None:
+        cache = build_inmemory_raw([_item("MFDS", "d", {"v": 1})],
+                                   [_item("MFDS", "d", {"v": 2})])
+        self.assertEqual(cache["MFDS::d"], {"v": 1})
+
+    def test_no_items(self) -> None:
+        self.assertEqual(build_inmemory_raw([], []), {})
+
+
+class MixedMemoryFetchEnrichTest(unittest.TestCase):
+    """혼합 케이스: 당일분(from_memory) + 과거 누적 New row(fetch 폴백) 동시 처리."""
+
+    def test_memory_hit_and_fetch_fallback(self) -> None:
+        today = _item("MFDS", "today-1", {"RTRVL_RESN": "당일 raw"})
+        cache = build_inmemory_raw([today])
+        rows = [
+            {"source": "MFDS", "document_id": "today-1", "page_id": "p-today",
+             "run_date": "2026-06-05", "signal_tier": "Tier 2"},      # 메모리 적중
+            {"source": "MFDS", "document_id": "past-1", "page_id": "p-past",
+             "run_date": "2026-06-01", "signal_tier": "Tier 2"},      # fetch 폴백
+        ]
+        with mock.patch.object(collect_intake, "fetch_intake_raw_payload",
+                               return_value={"RTRVL_RESN": "과거 raw"}) as fetch:
+            deduped, stats = enrich_rows_with_raw("tok", rows, inmemory_raw=cache, sleep_s=0)
+        self.assertEqual(stats, {"ok": 2, "failed": 0, "from_memory": 1, "total": 2})
+        fetch.assert_called_once_with("tok", "p-past")  # 당일분은 fetch 안 함
+        by_id = {r["document_id"]: r for r in deduped}
+        self.assertEqual(by_id["today-1"]["raw_source"], "memory")
+        self.assertEqual(by_id["today-1"]["raw"]["RTRVL_RESN"], "당일 raw")
+        self.assertEqual(by_id["past-1"]["raw_source"], "fetch")
+        self.assertEqual(by_id["past-1"]["raw"]["RTRVL_RESN"], "과거 raw")
 
 
 if __name__ == "__main__":

@@ -2385,6 +2385,25 @@ def enrich_rows_with_raw(token: str, rows: list[dict[str, Any]],
     return deduped, stats
 
 
+def build_inmemory_raw(*item_lists: list["IntakeItem"]) -> dict[str, dict[str, Any]]:
+    """당일 수집 IntakeItem 들을 `{card_id: raw_payload}` 로 모은다(K3 G2 와이어링).
+
+    key = `source::document_id`(handoff row·`attach_raw_to_rows` 와 동일 규약). 이 dict 를
+    `emit_routine_handoff(inmemory_raw=...)` 로 넘기면 당일 수집분은 children fetch 없이
+    메모리에서 raw 를 부착하고, 과거 누적 New row 만 fetch 폴백한다(혼합 케이스).
+    raw_payload 가 비어 있으면 제외 — `attach_raw_to_rows` 는 `get(card_id) is not None`
+    으로 적중 판정하므로 빈 dict 가 들어가면 fetch 폴백을 가로채 graceful degrade 를 막는다.
+    중복 card_id 는 첫 항목 우선(수집 순서 결정론).
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for items in item_lists:
+        for it in items:
+            if not it.raw_payload:
+                continue
+            out.setdefault(f"{it.source}::{it.document_id}", it.raw_payload)
+    return out
+
+
 def _dedupe_latest_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     latest: dict[str, dict[str, Any]] = {}
     for row in rows:
@@ -2673,8 +2692,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                                         doc_ids=doc_ids)
     if _enable_handoff_v2():
         # K2-prep: dedupe → 하이브리드 raw 부착(메모리 우선) → scaffold v2 payload.
-        # ⚠️ inmemory_raw 의 main() 와이어링(당일 수집 IntakeItem.raw_payload 전달)은 K3
-        #    운영 전환 시 추가 예정 — 현재는 None 이라 전 row 를 page children fetch 한다.
+        # inmemory_raw 는 main() 가 당일 수집 IntakeItem.raw_payload 로 전달(K3 G2 와이어링).
+        # 당일분은 메모리 적중(fetch 0), 과거 누적 New row 만 page children fetch 폴백.
         enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
         payload = build_routine_handoff_payload_v2(enriched, run_date, window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
@@ -3811,6 +3830,7 @@ def main() -> int:
 
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
+    search_items: list[IntakeItem] = []  # G2: inmemory_raw 집계에서 항상 참조 가능하게 선초기화
     if enable_search:
         brave_api_key = os.environ.get("BRAVE_API_KEY", "")
         log("INFO", "=== Brave Search 수집 시작 ===")
@@ -3859,9 +3879,16 @@ def main() -> int:
                         if src in _SOURCE_TOKEN_TO_NOTION
                     }
                 handoff_doc_ids = set(args.handoff_doc_ids or []) or None
+                # G2 와이어링: 당일 수집분 raw 를 메모리로 전달(과거 New row 만 fetch 폴백).
+                # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
+                inmemory_raw = build_inmemory_raw(
+                    fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
+                    wl_items, mfds_items, mfds_recall_items, mfds_admin_items,
+                    mfds_gmp_inspection_items, ich_items, who_items, hc_items, search_items)
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
-                    source_names=handoff_sources, doc_ids=handoff_doc_ids)
+                    source_names=handoff_sources, doc_ids=handoff_doc_ids,
+                    inmemory_raw=inmemory_raw)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True

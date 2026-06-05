@@ -1,0 +1,243 @@
+# GRM Card Spec v16 — 고정 카드 템플릿 명세 (틀)
+
+> 작성: 2026-06-04 · 상태: **틀(초안)** — 유형별 대표 카드 견본 렌더 + 디자인 리뷰로 동결 예정
+> 목적: 카드를 "지시문(LLM이 매번 다시 그림)"이 아니라 "코드 템플릿(같은 입력→같은 출력)"으로
+> 고정하기 위한 단일 기준. Python `build_card_scaffold()`(K2)가 이 문서를 그대로 구현한다.
+> 근거: v15.8 프롬프트 W1~W8 카드 표준 + 제품군(Modality) 배지/그룹핑.
+> ⚠️ 이 문서가 동결되면 카드 양식의 단일 진실원이며, 변경은 이 문서 수정 + golden 테스트 갱신으로만.
+
+---
+
+## 0. 핵심 원칙 — 칸별 책임 (Python = 결정론 / LLM = 판단)
+
+각 카드 칸을 **누가 채우는지** 못 박는다. Python 칸은 필드 복사·규칙 분기뿐(판단 0).
+LLM 칸은 판단 산문뿐(데이터 생성·링크 금지). 이 경계가 Keystone 의 전부다.
+
+| 카드 칸 | 채움 주체 | 소스 / 규칙 |
+|---|---|---|
+| H3 prefix 이모지(🟧/🟦/🟫/⬜) | **Python** | section + 유형 규칙(§2) |
+| 카드 제목 뼈대 `[유형·기관/소재국] 업체/제품 — … \`DocID\`` | **Python** | Notion 필드 조합 |
+| 카드 제목 `{핵심 이슈}` 구절 | **LLM** | 짧은 판단 구절(≤12자 권장) |
+| 제품군 배지 💊/🧬/▫️ | **Python** | Modality 필드/폴백(§4) |
+| W1 한 줄 요약 — 문장 | **LLM** | prose_input |
+| W1 배지(Evidence·기관·Signal·태그) | **Python** | 필드(유형 핵심 태그는 유형 고정값) |
+| W2 메타 표 (전체) | **Python** | 100% 필드 매핑(§3) |
+| W3 원문 인용(라벨+`>`인용) | **Python** | raw 필드 **그대로 복사**(생성 금지) |
+| W4 한국어 번역 | **LLM** | 비KO Evidence A 만 |
+| W5 핵심 사실 bullet | **LLM** | prose_input(유형별 강조 라벨은 §3 고정) |
+| W6 시사점 | **LLM** | prose_input |
+| W7 점검 사항 | **LLM** | prose_input |
+| W8 출처 푸터(듀얼링크) | **Python** | official_url/api_query 필드(§5) |
+| Raw support toggle | **Python** | raw payload 보존(선택) |
+| 출력 매트릭스(어느 W를 낼지) | **Python** | Evidence/언어 분기(§6) |
+| 섹션 배치·제품군 그룹핑 | **Python** | section + 건수 규칙(§7) |
+
+LLM 이 채우는 칸은 단 6종: **제목 핵심이슈 · W1문장 · W4번역 · W5 · W6 · W7.** 나머지 전부 Python.
+
+## 1. 카드 제목 (Python 뼈대 + LLM 1구절)
+
+형식(v15.8 유지):
+`### {prefix} [{유형 · 규제기관 또는 소재국}{ · 제품군배지}] {업체/제품/문서명} — {핵심 이슈} \`{DocID}\``
+
+- `{prefix}`: §2 표. `{유형}`: 유형 한글 라벨(§2). `{규제기관/소재국}`: 글로벌=규제기관, MFDS=소재국(`Site Country`).
+- `{제품군배지}`: §4(규범문서는 생략/▫️).
+- `{업체/제품/문서명}`·`{DocID}`: 필드 직매핑.
+- `{핵심 이슈}`: **LLM** 짧은 구절(예: "B. cereus 검출·청소절차 이탈"). 국가코드 단독 금지.
+
+## 2. 유형 → prefix · 라벨 · 핵심태그 (Python 고정표)
+
+| Type or Class | prefix | 유형 라벨 | W1 유형 핵심 태그(고정 후보) |
+|---|---|---|---|
+| warning-letter | 🟧 | Warning Letter | CGMP · 지적분야 |
+| recall-quality(MFDS) | 🟦 | 회수·판매중지 | 회수 · 품질사유 |
+| OpenFDA Recall(글로벌) | 🟧 | Recall · Class {I/II/III} · {route} | Recall · failure mode |
+| admin-action | 🟦 | 행정처분 | 행정처분 · 위반분야 |
+| gmp-inspection | 🟦 | GMP실사 | GMP실사 · 결론 |
+| guidance-industry/internal · gmp-guideline | 🟫 | 지침·안내서 | Guidance · 단계 |
+| regulation-final/notice-final | 🟫 | 고시·개정법령 | 규정 · 시행 |
+| legislative-notice | 🟫 | 입법예고 | 입법예고(→🔮 후보) |
+| safety-letter | 🟦 | 안전성서한 | 안전성 |
+| ich-guideline/consultation | 🟫 | ICH | ICH · Step |
+| who-noc/inspection/news | 🟧/🟫 | WHO | WHO |
+| hc-recall | 🟧 | Recall(HC) | Recall |
+| (미매핑 Type) | ⬜ | {Type 원문} | — |
+
+## 3. W2 메타 표 — 유형별 필드 매핑 (Python 100%)
+
+공통 5행(모든 카드): 📅 원본 발행일=`Date` · 🔍 Evidence Level=판정(§6) · 🏷 Signal=`Signal Tier`→방향표기 ·
+🏛 규제기관=`Source`/center · 🌐 원문 언어=`Language`.
+유형별 추가 행(빈 필드는 §8 규칙):
+
+| 유형 | 추가 행 (라벨 = 필드) |
+|---|---|
+| admin-action | 업체(+소재국)=`firm`/`Site Country` · 처분=`ADM_DISPS_NAME` · 근거조항=raw 법령 · 품목/공정=`ITEM_NAME`(있을 때) |
+| recall-quality | 업체=`ENTRPS`/`firm` · 제품=product · Class=class(있으면) · route/dosage=Modality 폴백 · 회수사유=`RTRVL_RESN` · 범위/유통(있을 때) |
+| gmp-inspection | 제조소/업체=`manufacturer` · 소재국=`Site Country` · 실사구분=before_after · 실사기간=inspection_start~end · 대상 제형/제품=product_type · 결론=judgment |
+| warning-letter | 업체/제조소=`firm` · 소재국=`Site Country` · 실사일/발행일=`issue_date` · 주요 CFR/CGMP 조항=raw · 지적 분야=center/keyword |
+| guidance/regulatory-change | 발행기관=`Source` · 문서 단계=draft/final/consultation · 주제/범위=title · 시행일/의견기한=`Comments Close` · 영향 대상 |
+| (공통, 제품군) | 제품군=Modality(§4) — 표에 1행 추가 권장 |
+
+권장 5~7행. 긴 조항·긴 사유는 표에 넣지 말고 W5 로 내린다.
+
+## 4. 제품군(Modality) 배지 (Python)
+
+판정 순서(v15.8): `Modality` 속성 → `OSD Relevance` → Raw payload(product_type/route/dosage_form) →
+(MFDS) 한국어 단서. 배지: 💊 화학합성 · 🧬 생물 · ▫️ 기타. 규범 문서(특정 제품군에 매이지 않음)는 배지 생략 또는 ▫️.
+⚠️ **Modality 는 분류일 뿐 포함 결정이 아니다** — Biologic 이라고 자동 카드화 금지(포함 판단은 GMP/품질 내용 기준).
+배지 위치·디자인(제목 라벨 안 vs 별도): **디자인 리뷰에서 동결**(현재 v15.8 = 제목 라벨 안).
+
+## 5. W8 듀얼링크 (Python)
+
+📰 정보출처 = `API Query`(Intake) / WebSearch URL. 📎 공식원본 = 항목별 L1 우선:
+- FR=`html_url`(L1) · EMA/MHRA/PIC/S/ECA RSS=`link`(L1) · FDA WL=`wl_url`(L1) ·
+  OpenFDA Recall=FDA Recalls 인덱스(L2) · WHO=`official_url`(L1) · HC=`official_url`(L1) ·
+  MFDS admin=`CCBAO01/getItem?dispsApplySeq={seq}`(L1) · MFDS gmp=`Source URL` PDF(L1) ·
+  MFDS recall=`CCBAH01` 인덱스(L2) · 기타 MFDS=`Official URL`(L1) · ICH=ich.org/page(L2).
+⚠️ L1 은 필드에 실제 존재할 때만. 패턴 유추 생성 금지(L2 인덱스로 폴백, ⚠️ 마커).
+
+## 6. 출력 매트릭스 — 어느 W를 내는가 (Python 분기)
+
+| 조건 | 출력 블록 |
+|---|---|
+| Evidence A + 비KO | 제목·W1·W2·W3·W4·W5·W6·W7·W8 |
+| Evidence A + KO(MFDS) | 제목·W1·W2·W3·W5·W6·W7·W8 (W4 생략) |
+| Evidence B/C | 제목·W1·W2·W5·W6·W7·W8 (W3/W4 생략, quote 금지) |
+| guidance/regulatory-change | 위 분기 + W5 를 변경내용·시행/의견기한·영향대상 중심 |
+
+Evidence 판정(Python): Intake raw payload 보존 + 유형별 필수필드 충족 → A. 인덱스+보조 → B. 보조 단독 → C.
+예정·진행중(Comments Close/consultation/입법예고) → D(🔮 표, 카드 아님).
+
+## 7. 섹션 배치 · 그룹핑 (Python)
+
+- 섹션: 글로벌(🌐) / 국내 MFDS(🇰🇷) / 🔮 Watch / Recall 모니터링 표 — `section` 필드로 사전 분류.
+- 글로벌 카드 ≥4건이면 제품군별(💊/🧬/▫️) 소제목 그룹핑, ≤3건이면 평면 나열(과분할 방지).
+- 정렬: Signal Tier 3→2→1, 동급 발행일 desc.
+
+## 8. 빈 필드 · 결측 표기 (Python 규칙)
+
+- 필드 없음 → 해당 행/구절 생략(빈 callout·빈 표행 금지) 또는 "원문 미기재".
+- L1 URL 없음 → L2 인덱스 + ⚠️. 둘 다 없음 → L3 기관 홈 + ⚠️.
+- raw payload 파싱 실패 → Evidence A 불가 → B 강등 + `Status=Needs Review`.
+
+## 9. LLM 입력 계약 (prose_input) — 카드별 최소 컨텍스트
+
+LLM 산문 슬롯을 채울 때 **카드 1장치 최소 정보만** 전달(raw 전체 금지). 필드:
+`type · modality · firm/product · 핵심사유(reason/EXPOSE_CONT/지적요약) · 조항/결론 · route/dosage(있으면) ·
+규제기관 · evidence · signal`. LLM 출력 = `{핵심이슈, W1문장, W5_bullets, W6, W7, (비KO)W4}` JSON.
+LLM 은 이 입력에 없는 사실을 만들지 않는다("원문 미기재"/"확인 불가" 사용).
+
+## 10. golden 견본 + 디자인 리뷰 방법론 (K1 동결 절차)
+
+1. 유형별 대표 1장씩(행정처분·회수·WL·가이던스·gmp-inspection, +제품군 💊/🧬 각 1) 실데이터로 선정.
+2. 본 스펙대로 Notion 에 견본 카드 렌더(수동 또는 임시 스크립트).
+3. **디자인 리뷰**(사용자와): 스캔 속도·정보 위계·색 의미·제품군 배지 가독성·모바일 폭 확인.
+4. 합의 시 각 견본을 `tests/golden/{type}.md` 로 동결 → K2 `build_card_scaffold()` 의 기대 출력.
+5. 이후 양식 변경은 이 문서 + golden 갱신으로만(우연한 변형 불가).
+
+## 11. 미확정 (디자인 리뷰에서 결정 — Codex 의견 포함)
+
+| # | 항목 | Codex 권장 | 상태 |
+|---|---|---|---|
+| ① | 제품군 배지 위치 | 섹션 **또는** W2 중 하나만(제목·W2·섹션 3중 반복은 피로). 제목엔 유형·기관·핵심대상만 | 사용자 결정 |
+| ② | 색 사용 강도 | W1만 파랑, W5/W6 무채색·회색, 점검(W7)만 초록 유지 — 규제문서답게 차분하게 | 사용자 결정 |
+| ③ | W2 표 행수 | 기본 5행(발행일·Evidence·Signal·기관·제품군) + 유형별 1행. `원문 언어`는 메타 하단으로 | 사용자 결정 |
+| ④ | 글로벌 그룹핑 임계(≥4) | 유지 가능 | 사용자 확인 |
+| ⑤ | Raw support toggle 기본 노출 | 기본 숨김 | 사용자 확인 |
+
+## 12. Codex 검토 반영 — 필드 보정 · 결정론 규칙 (2026-06-04, K1 보정)
+
+⚠️ 아래는 §2~§9의 **정정·우선 적용 규칙**이다(Codex 코드 검증 근거). 충돌 시 §12 우선.
+
+**(A) handoff 에 raw 가 없다 → K2 전 필수 보강.**
+v1 handoff `rows[]` 는 page_id·official_url·tier·modality(조건부)만 보유하고 **raw 는 없다**(raw 는 원 row
+본문 code block 에만 존재). 따라서 `build_card_scaffold()` 전에 **page_id 로 원 row children 을 fetch 해
+raw JSON 을 rows 에 붙이는 단계**가 선행돼야 한다(redesign §4 v2 = additive). raw 의존 칸(W3 인용·MFDS
+W2·Modality 폴백)은 이 보강 후에만 결정론적이다.
+
+**(B) 실제 raw 키 기준 필드명 정정.**
+- FDA WL: `Source=FDA Warning Letter`, `Type or Class=issuing_office`. raw 키 = `posted_date·letter_date·
+  issuing_office·subject·url`. **`Site Country` 없음**, **`issue_date` 없음**(→ `letter_date` 사용),
+  **CFR/CGMP 조항 없음**(letter 본문 미수집 → W2 조항행 생략 또는 "상세 본문 미수집", LLM 도 단언 금지).
+- MFDS admin: raw `ADM_DISPS_NAME·ITEM_NAME·EXPOSE_CONT·ADM_DISPS_SEQ`. `official_url` 은 data.go.kr
+  dataset(L2) → 📰. 📎 는 `CCBAO01/getItem?dispsApplySeq={ADM_DISPS_SEQ}`(L1, seq 로 결정론적 생성).
+- MFDS recall: raw `RTRVL_RESN·ENTRPS·PRDUCT`. 스펙 `product`→**`PRDUCT`**. **`class` 없음**(행 생략).
+  `official_url`=data.go.kr(L2)→📰. 📎=`CCBAH01` 인덱스(L2).
+- MFDS gmp-inspection: raw `manufacturer·Site Country·before_after·inspection_start/end·product_type·
+  attachment_text·attachment_deficiency_assessment`. 스펙 `judgment` **없음** → 결론은 Python 이 아니라
+  **LLM 이 attachment_text 에서 도출**(W5). Python 은 `attachment_deficiency_assessment`(none/present/unknown)
+  플래그만 제공.
+- `Language` 기본값: MFDS·ICH·WHO·HC 만 채워짐. FR·Recall·EMA·MHRA·PIC/S·ECA·FDA WL 은 비면 **기본 `EN`**.
+
+**(C) W3 원문 인용 — 유형별 인용 필드·길이 고정(결정론).**
+| 유형 | quote 소스 필드 | 규칙 |
+|---|---|---|
+| admin-action | `EXPOSE_CONT` | 핵심 1~3줄(≤250자), 앞에서 자르되 문장 경계 |
+| recall-quality | `RTRVL_RESN` | 사유 1줄 |
+| gmp-inspection | `attachment_text` | 주요 지적/결론 핵심 1~3줄 |
+| FR(guidance) | `abstract`(없으면 `title`) | 1~3줄 |
+| EMA/MHRA/PIC/S/ECA RSS | (Evidence B → quote 없음) | — |
+| FDA WL | (Evidence B → quote 없음) | — |
+※ Evidence A 만 W3 생성. 길이 초과분은 Raw support toggle 로.
+
+**(D) Evidence 판정 — 결정론 한계.**
+- A(Python 가능): raw 보존 + 유형별 필수필드 충족.
+- B/C(입력 플래그 필요): "공식 인덱스+보조" vs "보조 단독" 은 WebSearch/검증 성공 여부가 **구조화된 입력**으로
+  들어와야 결정론. 그 플래그가 없으면 LLM 판단이 끼므로, search 단계가 `evidence_hint(B/C)` 를 row 에 기록한다.
+
+**(E) MFDS recall 다품목 1카드 통합 키.**
+현재 `_dedupe_latest_rows()` 는 `source::document_id` 1건 dedupe 뿐. 6품목→1카드 통합은
+**`ENTRPS + 사유(RTRVL_RESN) + 발행일` 동일군 묶음 키**를 collector(또는 scaffold)가 산출해야 함(신규).
+
+**(F) WHO prefix 고정.** `who-noc`·`who-inspection` = 🟧, `who-news` = 🟫.
+
+**(G) golden 테스트 순수성.** `build_card_scaffold(row, raw, fixed_config)` 는 외부 fetch·현재시각·LLM·
+Notion API 호출 없는 순수 함수. raw 출력 시 `json.dumps(sort_keys=True)`. generated_at·source_counts·
+URL 인코딩·block chunk 재조립 순서를 고정.
+
+**(H) ICH 한계.** 날짜·Step·Revision 을 수집기가 단언하지 않음 → ICH 는 Evidence B 기본, W2 Step 자동화 제한.
+
+## 13. 디자인 방향 (✅ 동결됨 2026-06-05 — 사용자+Codex 합의)
+
+> 2026-06-04 사용자 디자인 의견 + Claude 개선안. Codex 디자인 검토(`GRM_Keystone_Codex_design_review_prompt.md`)
+> 후 동결 예정. 목표 컨셉: **전문성 + 스캔성 + 정보 위계**(화려함 아님).
+
+| # | 방향 | 출처 | 상태 |
+|---|---|---|---|
+| D1 | 글로벌(영문) 항목: **영문 핵심문장 인용(W3) + 한글 번역(W4) 각각**. 문장 2개면 ①② 짝 번호로 1:1 매핑 | 사용자 | 채택 |
+| D2 | **AI 면책 문구**를 페이지 끝에 반드시. 전문 버전 확정: "1차 자료 기반 AI 자동 생성 · 사실 항목 출처/원본 병기로 추적 가능 · 시사점/점검은 AI 해석으로 공식 견해·법적 자문 아님 · 의사결정 전 원문 확인" (국·영문 병기) | 사용자 | **확정**(견본 하단) |
+| D9 | **클릭형 목차** 페이지 상단에 배치(`<table_of_contents/>`). 섹션(H2) 아래 카드 제목(H3)이 들여쓰기 나열, 클릭 시 해당 카드로 점프. 따라서 카드 제목은 짧고 핵심이 분명해야 함(D10 연동) | 사용자 | **채택**(견본 상단) |
+| D10 | **제목 핵심 강조**: 제목 = `유형 · 기관 · 소재국 — **핵심 대상·이슈**(bold) \`ID\``. 유형·기관은 일반, 실제 무슨 일인지(업체+이슈)를 bold 로 묶어 스캔 시 즉시 인지. 제품군 배지는 제목에서 빼고 W2 로 | 사용자 | **채택**(견본 반영) |
+| D11 | **메타표(W2) 경량화 확정**: 이모지 라벨 제거 · Evidence/Signal/원문언어 행 제거(W1 배지와 중복) · 제품군 행 추가. 유형별 사실 행 위주 4~5행 | 사용자+Codex | **채택**(견본 반영) |
+| D3 | **이모지 절제**: 박스 헤더 1개만 허용. **메타표(W2) 라벨 이모지 제거**. 제목 색사각형(🟧/🟦) 제거 검토(섹션 헤더와 중복) | 사용자+Claude | 채택(색사각형은 검토) |
+| D4 | **W2 표에서 Evidence·Signal·원문언어 행 제거** — Evidence/Signal 은 W1 배지와 중복. W2 는 유형별 사실 행 위주로 경량화 | 사용자 | 채택 |
+| D5 | **제품군 명칭(한글 확정)**: 💊 `합성의약품` · 🧬 `바이오의약품` · ▫️ `기타` | 사용자 | **확정** |
+| D6 | **제목 간소화**: 정보 과다 → 유형·기관·핵심대상·DocID 만. 색사각형·제품군 배지는 제목에서 제거 | 사용자+Claude | 채택 |
+| D7 | **색은 행동 박스에 집중**: 점검사항(초록)은 유일한 실행 박스라 강조 유지. 핵심사실·출처는 무채색/회색 | Claude | 후보 |
+| D8 | 긴 카드 축소: 긴 표·Raw 는 toggle 로, 카드 1장이 한 화면 목표 | Claude | 후보 |
+
+## 13.1 디자인 동결안 (✅ 동결 2026-06-05 — 사용자+Codex 합의)
+
+> 아래 12개 원칙은 **동결됨**. 변경은 이 문서 수정 + golden 테스트 갱신으로만. (견본 Notion 페이지는 동결 후 삭제됨)
+
+1. **제목 = 인덱스**: `### [유형 · 기관] 핵심대상 — **핵심이슈**(bold)`. 소재국·DocID·제품군은 제목에서 빼고 W2/배지로. 핵심이슈만 bold 로 스캔성 확보.
+2. **W1 = 3초 스캔 영역**: 사건 1~2문장 + 배지(Evidence · 기관 · Signal · **제품군**(`합성의약품`) · 유형태그) 최대 5개. 제품군은 여기 한 곳에만.
+3. **W2 = 사실 표(경량)**: 발행일 · 문서번호(`MARCS`·`admin-…`·`FR …`) · 유형별 핵심 행 = 4행. 라벨 이모지 없음. Evidence/Signal/원문언어/제품군 행 없음(중복).
+4. **원문·번역 인터리브**: 헤더 "원문 및 번역", `> ① 원문` 바로 다음 줄 `① 번역`, 이어서 `> ② …` `② …`. 별도 회색 번역 박스 폐지(색 박스 1개 절감). KO 항목은 번역 없이 한글 원문 quote.
+5. **W5 라벨 통일**: Evidence A/B 모두 "**핵심 사실**", 같은 줄에 작게 `근거: Intake raw` 또는 `근거: 공식 인덱스 + 보조 출처`.
+6. **블록 순서(현행 유지)**: 제목 → W1 → W2 → W3/W4 → W5 → **W6 시사점 → W7 점검** → W8. (점검이 카드 마지막 실행 박스로 닫힘)
+7. **색(현행 유지)**: W1 파랑 · **W6 시사점 노랑(AI 해석 분리 원칙 유지)** · W7 점검 초록 · W8 출처 회색. 핵심사실(W5)·원문(W3)은 무채색.
+8. **이모지 절제**: 박스 헤더 아이콘만(카드당 2~3개). 제목 색사각형·메타표 라벨 이모지 없음.
+9. **W8 = 푸터**: `정보출처 … · 공식원본 [링크]`. 정보출처=공식원본이면 `정보출처/공식원본 [링크]` 한 줄.
+10. **목차(D9)**: 페이지 상단 `<table_of_contents/>`. 섹션(H2) 아래 카드 제목(H3) 들여쓰기 나열, 클릭 시 점프.
+11. **면책(D2 확정)**: 페이지 끝, 이모지 없이 국문 2줄 + 영문 1줄. "1차 자료 기반 AI 자동 작성 · 시사점/점검은 AI 해석으로 공식 견해·법적 자문 아님 · 의사결정 전 원문 확인". ("다이제스트" 표현 미사용 → "규제 정보 요약 자료").
+12. **길이 한도**: W2 4~5행 · W5 3(최대4) · W7 2~3 · W6 2문장. 긴 조항·raw·첨부 전문은 toggle. Evidence B/C 는 원문/번역 생략. 카드 1장 = 데스크톱 1~1.5화면.
+
+견본 반영: 위 1~12를 Notion 견본 3카드에 적용 후 사용자 검토 → **2026-06-05 동결**. 견본 페이지는 동결 후 삭제.
+**다음 단계: K2(Python 카드 조립기 코드화)** — 본 §13.1 + §12(필드 보정) + §0~§9(책임 매핑)가 `build_card_scaffold()` 의 구현 기준.
+
+## 📝 변경 이력
+| 날짜 | 변경 내용 |
+|---|---|
+| 2026-06-04 | 최초 작성(틀). 칸별 Python/LLM 책임표·유형별 필드매핑·제품군 배지·출력매트릭스·prose_input 계약·golden 방법론. v15.8 카드 표준 기준. 디자인 리뷰로 §11 동결 예정 |
+| 2026-06-04 | Codex 구현 검토 반영(§12): raw fetch 선행·실제 필드명 정정·Evidence/quote/grouping 결정론화·MFDS recall 통합 키·golden 순수성. |
+| 2026-06-05 | 디자인 리뷰 완료(§13.1 동결안 12개 원칙): 제목 인덱스화·제품군 W1 배지·W2 경량 4행·원문번역 인터리브·W5 라벨 통일·시사점 노랑/순서 현행 유지·면책 간소화(다이제스트 제외)·목차. 사용자+Codex 합의, 견본 3카드 반영. 사용자 최종 확인 시 동결 |

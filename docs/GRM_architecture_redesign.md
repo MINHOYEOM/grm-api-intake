@@ -51,7 +51,10 @@
 
 수집기가 만드는 핸드오프를 "New-only 큐"에서 **"조립된 브리프 초안(scaffold)"**으로 격상한다.
 
-핸드오프 `rows[]` 각 행은 이미 page_id·official_url·raw·modality·tier 를 보유한다(확인됨). 수집기가 추가로 산출:
+핸드오프 `rows[]` 각 행은 page_id·official_url·tier·modality(조건부)를 보유한다(Codex 검증).
+⚠️ **정정**: v1 rows 에 `raw` 는 없다 — raw 는 원 row 본문 code block 에만 있다. 따라서 v2 생성 시
+**page_id 로 원 row children 을 fetch 해 raw JSON 을 각 row 에 붙이는 단계가 선행**돼야 한다(raw 의존 칸의 전제).
+그 위에서 수집기가 추가로 산출:
 - `card_scaffold`: 카드별로 Python 이 완성한 W2 메타표·듀얼링크·raw 인용(W3)·배지·제형 라벨 마크다운 + 비워둔 산문 슬롯 토큰 `{{W1}}`·`{{W6}}`·`{{W7}}`.
 - `prose_input`: LLM 이 그 슬롯을 채우는 데 필요한 최소 컨텍스트(제품/사유/제형/조항/결론 핵심 필드만, raw 전체 아님).
 - `section`: `global` / `domestic(MFDS)` / `watch` / `recall_table` 사전 분류.
@@ -92,12 +95,20 @@
 
 증상(2026-06-04): FDA WL Intake 11건 중 다수가 식품 WL(베이커리·수산·보바)인데 차단 안 되고 Tier 3/1 로 적재.
 원인: v1.7 필터가 본문 키워드만 보고 **WL 발행 부서(center/office)**를 안 봄.
-수정: `collect_intake.py` 의 FDA WL 파서에서 항목의 발행 주체 분류로 1차 게이트.
-- **제외**: `Human Foods Program`, `Office of Inspections and Investigations`(식품·수산 맥락), `Center for Veterinary Medicine(CVM)`, `Center for Tobacco Products(CTP)`, `Center for Devices and Radiological Health(CDRH)`, `Center for Food Safety and Applied Nutrition(CFSAN)`.
-- **유지**: `Center for Drug Evaluation and Research(CDER)`. `CBER(Biologics)`는 유지하되 제형/카테고리 필터로 2차 판단(바이오 제형은 회사 범위에 포함됨 — v15.8).
-- 발행 부서 필드가 비면 기존 본문 키워드 필터로 폴백.
-- **unittest**: `tests/test_noise_filters.py` 에 부서 기반 케이스 추가(식품 WL 제외, CDER 약품 WL 유지, 부서 결측 폴백).
-- 효과: Intake 오염·오티어링·handoff 노이즈가 입구에서 제거 → Routine 이 매주 LLM 으로 거를 필요 없음(컨텍스트 절약).
+근거(Codex): FDA WL 파서가 실제 `issuing_office` 를 파싱·raw 저장한다(collect_intake.py ~1787/1825).
+현재 필터는 부서 전용 게이트가 아니라 keyword list 이고 `Human Foods Program·CFSAN·CVM` 만 있고
+`Office of Inspections and Investigations(OII)·CTP·CDRH` 는 빠져 있다(~256).
+수정: `issuing_office` 기반 게이트로 보강.
+- **무조건 제외**: `CVM`, `CTP`, `CDRH`, `CFSAN`, `Human Foods Program`.
+- **맥락 제외(주의)**: `Office of Inspections and Investigations` 는 **식품/수산/HACCP/FSVP 맥락일 때만** 제외.
+  OII + finished pharmaceuticals/cGMP 는 유지(또는 Needs Review) — 약품 CGMP WL 오삭제 방지.
+- **유지**: `CDER`. `CBER` 는 유지(또는 제형/카테고리 2차판단).
+- 부서 결측 시 기존 본문 keyword(FSVP/HACCP→제외, finished pharmaceuticals/cGMP→유지) 폴백.
+- alias normalize 필요: `CDER` ↔ `Center for Drug Evaluation and Research (CDER)` 등 약어·괄호·대소문자.
+- **unittest(Codex 제안)**: HFP/CFSAN+HACCP→제외 · CVM/CTP/CDRH→제외 · CDER+finished/cGMP→유지 ·
+  CBER+biologics/aseptic→유지 · OII+seafood/HACCP→제외 · OII+finished/cGMP→유지(또는 Needs Review) ·
+  office 결측+FSVP→제외 · office 결측+finished/cGMP→유지.
+- 효과: Intake 오염·오티어링·handoff 노이즈가 입구에서 제거 → Routine 이 매주 LLM 으로 거를 필요 없음.
 
 ## 8. 마이그레이션 (비파괴 단계)
 
@@ -115,10 +126,11 @@
 ## 9. 결정 필요 / 미해결
 
 - M5(수집기 내 Haiku 발행) 채택 여부 — 산문 품질 vs 완전 자동화. M3 후 A/B.
-- scaffold 를 핸드오프 본문(JSON)에 넣을지, 별도 "draft brief" Notion 페이지로 만들지(후자가 사람이 중간 점검 쉬움).
+- ~~scaffold 를 핸드오프 본문(JSON)에 넣을지, 별도 "draft brief" Notion 페이지로~~ → **결정(2026-06-05): 핸드오프 JSON 본문 `rows[]` 에 `card_scaffold` 필드로 포함(additive v2).** 구조 단순·Routine 단일 입력·v1 하위호환 용이. (별도 draft 페이지는 페이지 1개 증가 + Routine 이 두 곳을 봐야 함.)
 - 멀티 사용자 배포 시 발행 주체(수집기 vs Routine) 일원화.
 
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-06-04 | 최초 작성. v15.7 라이브 폭주(LV-15.7a)·노이즈필터 갭(LV-15.7b) 대응 목표 아키텍처. Python-thick/Routine-thin 책임분리·handoff v2 계약·카드별 산문 루프·마이그레이션 M0~M5 |
+| 2026-06-05 | §9 미해결 1건 결정: scaffold 저장 위치 = **핸드오프 JSON 본문 `rows[]` 포함(additive v2)**. K2 착수(별도 채팅): M0 부서게이트 → K2-prep raw fetch → `build_card_scaffold()` 순수함수 + golden → handoff v2 단계 게이트. 지시문 `archive/point-in-time/GRM_Keystone_K2_ClaudeCode_지시.md` |

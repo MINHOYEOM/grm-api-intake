@@ -8,7 +8,9 @@ import unittest
 from unittest import mock
 
 import collect_intake
-from collect_intake import attach_raw_to_rows, fetch_intake_raw_payload
+from collect_intake import (
+    attach_raw_to_rows, enrich_rows_with_raw, fetch_intake_raw_payload,
+)
 
 
 def _code_block(content: str, language: str = "json") -> dict:
@@ -127,10 +129,11 @@ class AttachRawToRowsTest(unittest.TestCase):
                                side_effect=fake_fetch):
             stats = attach_raw_to_rows("tok", rows, sleep_s=0)
 
-        self.assertEqual(stats, {"ok": 1, "failed": 1, "total": 2})
+        self.assertEqual(stats, {"ok": 1, "failed": 1, "from_memory": 0, "total": 2})
         ok_row, fail_row = rows
         self.assertTrue(ok_row["raw_fetch_ok"])
         self.assertEqual(ok_row["raw"]["ENTRPS"], "회사")
+        self.assertEqual(ok_row["raw_source"], "fetch")
         self.assertNotIn("status_hint", ok_row)
 
         self.assertFalse(fail_row["raw_fetch_ok"])
@@ -138,9 +141,37 @@ class AttachRawToRowsTest(unittest.TestCase):
         self.assertEqual(fail_row["evidence_hint"], "B")
         self.assertEqual(fail_row["status_hint"], "Error")
 
+    def test_inmemory_raw_skips_fetch(self) -> None:
+        # 당일 수집분: inmemory_raw 에 있으면 page children fetch 를 호출하지 않는다.
+        rows = [{"source": "MFDS", "document_id": "today-1", "page_id": "p-x"}]
+        cache = {"MFDS::today-1": {"RTRVL_RESN": "메모리 raw"}}
+        with mock.patch.object(collect_intake, "fetch_intake_raw_payload") as fetch:
+            stats = attach_raw_to_rows("tok", rows, inmemory_raw=cache, sleep_s=0)
+        fetch.assert_not_called()
+        self.assertEqual(stats, {"ok": 1, "failed": 0, "from_memory": 1, "total": 1})
+        self.assertEqual(rows[0]["raw_source"], "memory")
+        self.assertEqual(rows[0]["raw"]["RTRVL_RESN"], "메모리 raw")
+
     def test_empty_rows(self) -> None:
         self.assertEqual(attach_raw_to_rows("tok", [], sleep_s=0),
-                         {"ok": 0, "failed": 0, "total": 0})
+                         {"ok": 0, "failed": 0, "from_memory": 0, "total": 0})
+
+
+class EnrichRowsWithRawTest(unittest.TestCase):
+    def test_dedupe_before_attach(self) -> None:
+        # 같은 source::document_id 중복 2건 → dedupe 로 1건만 fetch 대상.
+        rows = [
+            {"source": "MFDS", "document_id": "dup", "page_id": "p1",
+             "run_date": "2026-06-01", "signal_tier": "Tier 2"},
+            {"source": "MFDS", "document_id": "dup", "page_id": "p2",
+             "run_date": "2026-06-04", "signal_tier": "Tier 2"},
+        ]
+        with mock.patch.object(collect_intake, "fetch_intake_raw_payload",
+                               return_value={"k": "v"}) as fetch:
+            deduped, stats = enrich_rows_with_raw("tok", rows, sleep_s=0)
+        self.assertEqual(len(deduped), 1)
+        self.assertEqual(stats["total"], 1)
+        self.assertEqual(fetch.call_count, 1)  # 중복 fetch 제거됨
 
 
 if __name__ == "__main__":

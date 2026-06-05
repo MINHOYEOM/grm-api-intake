@@ -2319,33 +2319,67 @@ def fetch_intake_raw_payload(token: str, page_id: str) -> dict[str, Any] | None:
 
 
 def attach_raw_to_rows(token: str, rows: list[dict[str, Any]],
+                       inmemory_raw: dict[str, dict[str, Any]] | None = None,
                        sleep_s: float = 0.34) -> dict[str, int]:
-    """각 row 에 page_id 로 raw API JSON 을 fetch 해 row['raw'] 로 부착한다.
+    """각 row 에 raw API JSON 을 부착한다(하이브리드 — 지시문 단계 B).
 
+    `inmemory_raw`(당일 수집분 raw_payload, key = `source::document_id`)에 있으면
+    네트워크 없이 그대로 사용하고, 없으면(과거 누적 New row) page children 을 fetch 한다.
     실패 row 는 graceful degrade(card_spec §8, Codex 정정): raw=None ·
     raw_fetch_ok=False · evidence_hint='B'(A 불가) · status_hint='Error'(기존 DB
-    옵션; 전용 'Needs Review' 옵션 신설은 K4 이월). 전체 중단 금지. 반환 통계 dict.
+    옵션; 전용 'Needs Review' 옵션 신설은 K4 이월). 전체 중단 금지.
+
+    ⚠️ raw 는 메모리 상 enriched row 에만 부착한다 — 최종 handoff v2 JSON 에는 넣지
+    않는다(scaffold·prose_input 만; 크기 폭증·Notion children 한도 방지, 단계 B 보정).
+    반환: {'ok','failed','from_memory','total'} 통계.
     """
-    ok = failed = 0
+    inmemory_raw = inmemory_raw or {}
+    ok = failed = from_memory = 0
     for row in rows:
+        card_id = f"{row.get('source', '')}::{row.get('document_id', '')}"
+        cached = inmemory_raw.get(card_id)
+        if cached is not None:
+            row["raw"] = cached
+            row["raw_fetch_ok"] = True
+            row["raw_source"] = "memory"
+            ok += 1
+            from_memory += 1
+            continue
         page_id = row.get("page_id", "")
         raw = fetch_intake_raw_payload(token, page_id)
         if raw is None:
             row["raw"] = None
             row["raw_fetch_ok"] = False
+            row["raw_source"] = "fetch"
             row["evidence_hint"] = "B"
             row["status_hint"] = "Error"
             failed += 1
             log("WARN", "K2-prep raw 부착 실패 → graceful degrade(Evidence B·Status Error): "
-                        f"{row.get('source', '')}::{row.get('document_id', '')} page={page_id}")
+                        f"{card_id} page={page_id}")
         else:
             row["raw"] = raw
             row["raw_fetch_ok"] = True
+            row["raw_source"] = "fetch"
             ok += 1
         if sleep_s:
-            time.sleep(sleep_s)
-    log("INFO", f"K2-prep raw 부착 완료: 성공 {ok}건 / 실패 {failed}건 (총 {len(rows)})")
-    return {"ok": ok, "failed": failed, "total": len(rows)}
+            time.sleep(sleep_s)  # 실제 fetch 한 경우만 rate-limit 대기
+    log("INFO", f"K2-prep raw 부착 완료: 성공 {ok}건(메모리 {from_memory}·fetch {ok - from_memory}) "
+                f"/ 실패 {failed}건 (총 {len(rows)})")
+    return {"ok": ok, "failed": failed, "from_memory": from_memory, "total": len(rows)}
+
+
+def enrich_rows_with_raw(token: str, rows: list[dict[str, Any]],
+                         inmemory_raw: dict[str, dict[str, Any]] | None = None,
+                         sleep_s: float = 0.34
+                         ) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """K2-prep 진입점: `_dedupe_latest_rows()` 선적용(중복 fetch 제거) → 하이브리드 raw 부착.
+
+    handoff v2 생성 직전 단계. 반환 (deduped_rows, stats). v2 payload 빌더가 이 결과를
+    소비하되 raw 는 JSON 직렬화에서 제외한다(단계 B·D 보정).
+    """
+    deduped = _dedupe_latest_rows(rows)
+    stats = attach_raw_to_rows(token, deduped, inmemory_raw=inmemory_raw, sleep_s=sleep_s)
+    return deduped, stats
 
 
 def _dedupe_latest_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:

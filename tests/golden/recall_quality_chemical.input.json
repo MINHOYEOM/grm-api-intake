@@ -1,0 +1,19 @@
+{
+  "raw": {
+    "ENTRPS": "한국제약(주)",
+    "PRDUCT": "아세트아미노펜정 500mg",
+    "RTRVL_RESN": "함량부적합(98% 미만) 확인에 따른 자진 회수"
+  },
+  "row": {
+    "date": "2026-06-02",
+    "document_id": "recall-2026003474",
+    "firm": "한국제약",
+    "headline": "정제 자진 회수",
+    "language": "KO",
+    "modality": "Chemical",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MFDS",
+    "type_or_class": "recall-quality"
+  }
+}

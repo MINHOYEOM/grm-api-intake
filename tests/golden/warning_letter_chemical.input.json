@@ -1,0 +1,24 @@
+{
+  "raw": {
+    "firm": "Acme Pharmaceuticals, LLC",
+    "issuing_office": "Center for Drug Evaluation and Research (CDER)",
+    "letter_date": "05/15/2026",
+    "posted_date": "05/20/2026",
+    "subject": "CGMP/Finished Pharmaceuticals/Adulterated",
+    "url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660123"
+  },
+  "row": {
+    "api_query": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "date": "2026-05-20",
+    "document_id": "WL-CMS-660123",
+    "firm": "Acme Pharmaceuticals, LLC",
+    "headline": "CGMP for finished pharmaceuticals",
+    "language": "",
+    "modality": "Chemical",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660123",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 3",
+    "source": "FDA Warning Letter",
+    "type_or_class": "Center for Drug Evaluation and Research (CDER)"
+  }
+}

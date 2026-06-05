@@ -1,0 +1,22 @@
+{
+  "raw": {
+    "ADM_DISPS_NAME": "제조업무정지 1개월",
+    "ADM_DISPS_SEQ": "123456",
+    "EXPOSE_CONT": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함. 제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨.",
+    "ITEM_NAME": "리도카인염산염주사액"
+  },
+  "row": {
+    "date": "2026-05-30",
+    "document_id": "admin-2026003474",
+    "evidence_candidate": "A",
+    "firm": "대한약품공업",
+    "headline": "제조업무정지 행정처분",
+    "language": "KO",
+    "modality": "Chemical",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "site_country": "대한민국",
+    "source": "MFDS",
+    "type_or_class": "admin-action"
+  }
+}

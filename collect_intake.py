@@ -334,7 +334,7 @@ MODALITY_VET_EXCLUDE_TERMS = [
 # 생물의약품(생물학적제제) 판별 지표 — 특정 제품이 아닌 '클래스' 단위 신호
 # 영문 + MFDS 한국어 단서(MFDS row 는 Language=KO 한글 원문)
 MODALITY_BIOLOGIC_TERMS = [
-    "biologic", "biological product", "biosimilar", "biotherapeutic",
+    "biologic", "biological product", "biotechnological", "biosimilar", "biotherapeutic",
     "monoclonal", "antibody", "recombinant", "fusion protein",
     "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
     "blood product", "plasma-derived", "plasma derived", "immunoglobulin",

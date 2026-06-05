@@ -32,6 +32,14 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_BIOLOGIC,
         )
 
+    def test_biologic_ich_q5_biotechnological(self):
+        # ICH Q5A-E "Quality of Biotechnological Products" 가 Biologic 으로 잡혀야 함
+        # (라이브 검증 발견 GAP-1: 'biological product' 만으로는 'biotechnological' 미매칭)
+        self.assertEqual(
+            ci.compute_modality({}, "Quality of Biotechnological Products (ICH Q5)"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
     def test_biologic_mab_inn_suffix(self):
         # 단클론항체 INN 접미사 -mab (adalimumab 등)
         self.assertEqual(

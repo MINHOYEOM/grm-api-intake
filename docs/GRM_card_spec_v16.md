@@ -192,6 +192,29 @@ W2·Modality 폴백)은 이 보강 후에만 결정론적이다.
 | FDA WL | (Evidence B → quote 없음) | — |
 ※ Evidence A 만 W3 생성. 길이 초과분은 Raw support toggle 로.
 
+**(C-확장) 전 유형 매핑 동결 (2026-06-05, K2.5 — 이 표가 §12(C)·§6 의 최종 기준).**
+핵심 불변식: **Evidence A ⟺ 인용 가능한 raw 필드 존재**("A 인데 quote 없음" 조합 금지 — 코드 정합 가드 + `test_evidence_quote_consistency` 로 강제).
+
+| kind | source · type_or_class | W2 유형행 | quote 소스(raw 키) | Evidence |
+|---|---|---|---|---|
+| warning-letter | FDA WL | 업체/제조소 · 발행부서·`letter_date` | — (본문 미수집) | **B** |
+| admin-action | MFDS · admin-action | 업체(+소재국) · 처분 `ADM_DISPS_NAME`/`ITEM_NAME` | `EXPOSE_CONT`(≤250) | **A** |
+| recall-quality | MFDS · recall-quality | 업체 `ENTRPS` · 제품 `PRDUCT` | `RTRVL_RESN` | **A** |
+| gmp-inspection | MFDS · gmp-inspection | 제조소 · 실사기간/`product_type` | `attachment_text`(≤250) | **A**(파싱 실패 시 quote 없음 → B 강등) |
+| openfda-recall | OpenFDA Recall | 업체 `recalling_firm` · 제품 `product_description` · Class `classification` | `reason_for_recall` | **A** |
+| hc-recall | Health Canada · hc-recall | 업체 `Organization` · 제품 `Product` · Class `Recall class` | `Issue`(→`What you should do`) | **A** |
+| guidance(FR) | Federal Register | 발행기관 FDA · 의견기한/주제 | `abstract`(→`title`) | **A** |
+| who-noc/-inspection/-news | WHO · who-* | 주제 `anchor_text` · 기관 WHO | — | **B** |
+| ich | ICH · ich-guideline/consultation | 주제 `section_title` · 기관 ICH | — (§12H) | **B** |
+| rss-news | EMA/MHRA/PIC/S/ECA | 발행기관 · 주제 `title` | — (RSS 요약) | **B** |
+| mfds-notice | MFDS · guidance-industry/internal | 발행기관 MFDS · 주제 | — (RSS) | **B** |
+| safety-letter | MFDS · safety-letter | 발행기관 MFDS · 주제 | — (RSS) | **B** |
+| legislative | MFDS · legislative-notice | 발행기관 · 의견기한 | — | **B**(section=watch) |
+| regulation | MFDS · regulation-final/notice-final | 발행기관 · 주제 | — | **B** |
+
+듀얼링크 보강: openfda-recall = 📰 API query + 📎 FDA Recalls 인덱스 L2(⚠️, 패턴 유추 금지).
+prose_input 공통 필드(P1-2 확장): `w2_facts · quote_lines · issue_or_reason · product · action · deadline · body_excerpt` + 기존(kind·modality·regulator·evidence·signal·language·firm_or_product·headline). 유형별 raw 폴백(gmp `attachment_text`·openfda `reason_for_recall`·HC `Issue`/`What you should do`·ICH/WHO `section_title`/`anchor_text`), 300자 가드.
+
 **(D) Evidence 판정 — 결정론 한계.**
 - A(Python 가능): raw 보존 + 유형별 필수필드 충족.
 - B/C(입력 플래그 필요): "공식 인덱스+보조" vs "보조 단독" 은 WebSearch/검증 성공 여부가 **구조화된 입력**으로
@@ -260,3 +283,4 @@ URL 인코딩·block chunk 재조립 순서를 고정.
 | 2026-06-05 | K2 Stage C 구현 확정 반영(§9): W4 토큰 인덱싱(`{{W4_n}}`, 다중 인용 1:1 매핑 모호성 제거). 구현 = `card_scaffold.py`(build_card_scaffold + assemble_brief_skeleton 분리) + golden 5종, 금지 문법 부재·문서번호 행·결정론을 테스트로 강제 |
 | 2026-06-05 | Codex B~D 일괄검토(HOLD) 반영: §1 에 "§13.1-1·8 이 최종(제목에서 prefix·소재국·DocID 제거)" 대체 명시(P1-1 혼동 뿌리 제거) · §8 `Status=Error`→`status_hint='Error'` 용어 정정(실제 Status 전이는 K4, P2-4) |
 | 2026-06-05 | **K1+K2 종합점검(조건부 GO) 반영 — 동결본 정리(P1-3)**: 문서 상태 초안→동결본(§12·§13.1 우선 명시), §0 prefix/제목 행 §13.1 기준 정정, §3 공통 5행 구기준 표시, §11 결정완료 처리. P2-1 이모지 문구 정밀화(콜아웃 헤더+📰📎 허용·제목/W2 라벨 금지), P2-2 그룹핑 소제목=페이지 구조(카드 내부 원칙과 비충돌) 명문화. **K2.5 보강 트랙 신설**: 활성 전 유형 W2/quote/evidence 분기 + prose_input whitelist 확장 + golden 전 유형 확장(P1-1·P1-2) |
+| 2026-06-05 | **K2.5 매핑 동결(§12 C-확장)**: 전 16 유형 × (W2 유형행·quote 소스·Evidence) 표 + A⟺quote 불변식 + prose_input 공통/유형별 필드 기록. golden 16종·134 테스트가 이 표의 기대 출력. Codex 재확인 대기 |

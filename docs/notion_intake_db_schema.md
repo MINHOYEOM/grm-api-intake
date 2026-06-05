@@ -24,7 +24,7 @@
 | 이름 | 타입 | 필수 | 값/옵션 | 비고 |
 |---|---|---|---|---|
 | `Name` | Title | ✓ | `{source-prefix} {document_id} — {headline}` | 자동 생성 |
-| `Source` | Select | ✓ | `Federal Register` / `OpenFDA Recall` / `EMA` / `MHRA Inspectorate` / `PIC/S` / `ECA Academy` / `FDA Warning Letter` / `Brave Search` / `RAPS` / `European Pharma Review` / `MFDS` / `GRM Handoff` | `GRM Handoff`는 Routine 입력 큐용 |
+| `Source` | Select | ✓ | `Federal Register` / `OpenFDA Recall` / `EMA` / `MHRA Inspectorate` / `PIC/S` / `ECA Academy` / `FDA Warning Letter` / `Brave Search` / `RAPS` / `European Pharma Review` / `MFDS` / **`ICH` / `WHO` / `Health Canada`** / `GRM Handoff` | `GRM Handoff`는 Routine 입력 큐용. `ICH`·`WHO`·`Health Canada`는 2026-06-05 바이오 1단계 활성 직전 사전등록(이들 소스의 1095일 source-scoped dedup `select.equals` 가 미존재 옵션에서 400 반환하는 Notion 거동 회피). 신규 소스 추가 시에도 활성화 전 옵션 사전등록을 권장 |
 | `Document ID` | Rich text | ✓ | 소스별 고유 ID 또는 stable hash | 검색·중복 제거 키 |
 | `Date` | Date | ✓ | 문서 발행일/게시일 | 수집 윈도우 필터용 |
 | `Headline` | Rich text | ✓ | 제목/제품명/게시글 제목 | 표시용 |

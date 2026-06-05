@@ -74,6 +74,10 @@ on:
         description: '제품군(Modality) 태그 기록 — Notion에 Modality 속성 생성 후 켤 것 (기본: vars.ENABLE_MODALITY_TAG 또는 false)'
         type: boolean
         default: false
+      enable_handoff_v2:
+        description: 'handoff v2 생성 (K3 — scaffold/slots)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -144,6 +148,8 @@ jobs:
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
+          # K3 handoff v2 (scaffold/slots). 기본 off — schedule는 vars 미설정 시 v1 경로 유지.
+          ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_v2) || vars.ENABLE_HANDOFF_V2 || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()

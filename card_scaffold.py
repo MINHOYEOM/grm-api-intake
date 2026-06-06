@@ -404,6 +404,8 @@ def resolve_section(kind: str, row: dict[str, Any]) -> str:
         return "recall_table"
     if kind == "legislative":
         return "watch"
+    if kind == "ich" and "consultation" in (row.get("type_or_class", "") or "").lower():
+        return "watch"
     if row.get("source") == SOURCE_MFDS:
         return "domestic"
     return "global"

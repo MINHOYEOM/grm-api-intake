@@ -1,7 +1,9 @@
 # GRM Routine Prompt — v16 (Python-thick / Routine-thin · handoff v2 슬롯 치환)
 
-> **상태: ✅ 동결 · 🟢 운영 중 (2026-06-06 전환)** — Codex G3 조건부 GO → P1(PL-10b `source`+`document_id` 키)·
+> **상태: ✅ 동결 · 🟢 운영 중 (2026-06-06 전환 · 카드내용 패치 v4 + ICH 이벤트 보강 적용 2026-06-06)** — Codex G3 조건부 GO → P1(PL-10b `source`+`document_id` 키)·
 > P2×2(Signal Med (T2)·status_hint Error 우선) + G4 dry-run C-1(불건 해소 불변식·DEFERRED, HOLD→GO) 반영.
+> **카드내용 패치(2026-06-06, §B [2단계] 슬롯 규칙만)**: P1 복붙 제거·P2 사실격리·P3 제목 명사형·P4 다품목 처분 중복 방지 + thin/과확장 가드. scaffold 출력 불변(golden·163 green 무관). Codex 교차검토·노션점검 GO. 상세 = `GRM_Prompt_v16_패치초안_카드내용_2026-06-06.md`(v4).
+> **ICH 변동추적 보강(2026-06-06, §B [1단계] 슬롯 7만)**: 정적 guideline snapshot 은 Tier 1/Skipped 기본, 실제 변동은 ICH 공식 news/press-release WebSearch + 공식 URL WebFetch 로 Step 4·Step 2b·총회 보도자료만 카드/🔮 후보화.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -136,11 +138,13 @@ row 를 Processed 로 소비하지 않는다(소비=영구 누락).
 Notion MCP 사용 불가·handoff 부재 시: WebSearch-only graceful degradation(v14.5 모드)로
 진행하되 M2 에 사유를 기록한다. 비상 legacy fallback 은 운영자가 명시 요청한 경우에만.
 
-[1단계 — 탐지 보강: WebSearch/WebFetch (v15.8 동일)]
+[1단계 — 탐지 보강: WebSearch/WebFetch (v15.8 동일 + ICH 이벤트 보강 2026-06-06)]
 검색 대상 기간: 실행일 기준 지난 7일. WebSearch 한도 총 9회(hard stop). WebFetch 5 URL.
 
 0순위 — 공식 API 외부 위임: Routine 은 공식 API 를 직접 호출하지 않는다(FR·OpenFDA·RSS·
-MFDS data.go.kr·nedrug 전부 수집기 위임). 허용된 WebFetch 는 아래 5 URL 뿐.
+MFDS data.go.kr·nedrug 전부 수집기 위임). 허용된 WebFetch 는 아래 Deep Dive 5 URL +
+슬롯 7 에서 발견한 ICH 공식 news/press-release URL 1개뿐이며, 전체 WebFetch 5회 한도 안에서
+배정한다(ICH 공식 URL을 쓰면 Deep Dive URL 하나를 생략).
 
 1순위 — Core 8 (고정 슬롯, Intake 가 커버하는 슬롯 1~6 은 "Intake 흡수로 대체" 기록 허용,
 슬롯 7(ICH)·8(TGA)은 생략 금지 — TGA 는 Intake 경로가 없어 이 슬롯이 유일 탐지 경로):
@@ -151,7 +155,14 @@ MFDS data.go.kr·nedrug 전부 수집기 위임). 허용된 WebFetch 는 아래 
 4. FDA Recall/Enforcement: site:fda.gov inurl:enforcement OR "Class I" OR "Class II" recall after:{date}
 5. EMA: site:ema.europa.eu "guideline" OR "consultation" GMP after:{date}
 6. PIC/S: site:picscheme.org "GMP" OR "Annex" after:{date}
-7. ICH Q: site:ich.org "Step" OR "adopted" Q1 OR Q2 OR Q9 OR Q10 OR Q12 OR Q14
+7. ICH event: site:ich.org/news ("Step 4" OR "adopted as final" OR "public consultation" OR
+   "Step 2b" OR "Biannual ICH Assembly") after:{date}
+   · ICH 정적 guideline 페이지(`quality-guidelines`, `multidisciplinary-guidelines`)는 존재 신호일 뿐
+     변동 카드가 아니다. Intake 의 ICH guideline snapshot(Tier 1)은 M2 로그/Skipped 가 기본.
+   · 공식 ICH news/press-release 결과가 있으면 해당 URL(필요 시 `admin.ich.org/news/...` mirror)을
+     WebFetch 해 Step 4 채택·Step 2b 공개협의·총회 보도자료의 실제 변동만 카드/🔮 표 후보로 삼는다.
+   · QA/CMC 관련성은 Q1/Q2/Q3/Q5/Q6/Q7/Q8/Q9/Q10/Q11/Q12/Q13/Q14/M4Q/M7/M9/M13/M16 중심으로
+     판정하되, 보도자료에 단순 진행상황만 있고 Step/채택/협의 변동이 없으면 M3 대조 기록만 남긴다.
 8. TGA: site:tga.gov.au "GMP" OR "manufacturing" OR "inspection" after:{date} (0건 정상·저빈도)
 MFDS 는 Core 슬롯이 없다 — Intake 흡수가 유일 경로(누락 시 보강 검색 금지, handoff 상태 재확인).
 
@@ -201,19 +212,41 @@ Modality 는 분류일 뿐 포함 결정이 아니다(Biologic 이어도 GMP 내
 출력: needs_llm_slots 에 나열된 토큰 전부의 값 — 하나도 빠뜨리지 않는다.
 
 슬롯 작성 규칙:
-· {{TITLE_ISSUE}} — 제목의 bold 핵심이슈 1구절(≤25자, 명사형). 무슨 일이 일어났는지가
-  즉시 읽히게(예: "무균공정 일탈로 Class II 회수", "Annex 1 개정 초안 의견조회").
+· {{TITLE_ISSUE}} — 제목의 bold 핵심이슈 1구절(≤25자, 명사형 요약). prose_input 의 처분문·사유문
+  원문을 그대로 복사하지 않는다 — 긴 원문을 잘라 넣으면 "…과징금 금82," 처럼 숫자·문장 중간이
+  끊긴다(금지). 금액·기간·전체 사유는 W2 에 있으니 제목엔 압축 명사구만: 행정처분=위반유형
+  ("출하시험 미실시 과징금") · 회수=사유("벤조피렌 부적합 회수") · 가이드라인/ICH=주제("Q13 의견조회").
 · {{W1}} — 사건 요약 1~2문장. 누가·무엇을·왜. prose_input 의 headline/issue_or_reason 기반.
+  동일 처분·사유가 다품목에 공통 적용되면 품목별로 처분문을 반복하지 말고 1회만 요약한다
+  (같은 문구 중복 나열 금지 — ADM_DISPS_NAME 은 단일 문장이다).
 · {{W4}} 또는 {{W4_1}}{{W4_2}}... — scaffold 의 바로 윗줄 > 원문(①② 번호 일치)의 한국어 번역.
   [한국어 번역] 규칙 적용. 원문에 없는 내용을 더하지 않는다.
 · {{W5}} — 핵심 사실 bullet 3개(최대 4): "- **{라벨}**: {사실}" 형식. prose_input 의
   w2_facts/quote_lines/issue_or_reason/product/action/deadline/body_excerpt 에 있는 사실만.
-  guidance/규정 카드는 변경 내용·시행/의견기한·영향 대상 중심. gmp-inspection 은
-  attachment_text 기반 주요 지적/결론(없으면 "첨부 미파싱 — 수동 확인 필요").
+  그 카드의 사실만(다른 카드·TL;DR·타 업체 위반유형 차용 금지). 위반내용·사유는 포괄어
+  ("GMP/약사법 위반") 대신 quote 의 실제 행위("확인·순도시험 미실시")로 구체화하되, 입력에 없는
+  행위·날짜·조항은 만들지 않는다. 동일 처분 다품목 공통이면 1회만. guidance/규정 카드는 변경
+  내용·시행/의견기한·영향 대상 중심. gmp-inspection 은 attachment_text 기반 주요 지적/결론
+  (없으면 "첨부 미파싱 — 수동 확인 필요").
 · {{W6}} — 시사점 2문장(yellow callout 안). 톤: "규제가 이렇게 바뀌고 있다/집행 방향이
   보인다 → 우리 QA·RA 가 무엇을 봐야 한다". 지시·권고 명령형, 사내 절차 메타 언급 금지.
-  modality(합성/바이오)·무균 여부를 반영한 관점으로.
-· {{W7}} — 점검 사항 2~3개 명사형 bullet. 실행 가능한 확인 항목만(원문에 근거).
+  [카드별 차별화] 같은 유형이라도 그 카드의 구체 사실(회수/처분 사유·위반유형·ICH 주제·모달리티)을
+  반영해 카드마다 다르게 쓴다. 유형 공통 일반론 복붙 금지(사유 달라도 같은 문구 반복=위반).
+  [사실 격리] 그 카드 prose_input 사실만. 타 카드·TL;DR·타 업체 위반유형 차용 금지("거짓작성"
+  없는 카드에 "거짓작성" 금지).
+  [thin 가드] 입력이 주제명·요약뿐이면(ICH·WHO·RSS) 원인·위반·조치·날짜를 만들지 않고 차별화는
+  주제명·기관·제품군 수준까지, "원문 확인 필요" 허용.
+  [과확장 가드] 사유 기전은 사유어에서 한 단계만 해석한다. 원문에 없는 공정·원인(건조·훈증·토양
+  흡수·API/공정/보관 중 반응 등)은 "일반적으로 …와 연관될 수 있다"로 쓰고 "이번 회수는 …결함을
+  시사/…가 원인"처럼 단정하지 않는다. 사유에 없는 등급어("기준초과") 미첨가(raw 에 있을 때만).
+  제형 추정은 명시 텍스트까지만("…키트주사"→주사제; 무균·바이오·SC 는 근거 없으면 금지). 검색
+  보강 사실은 "(검색 확인)" 표기 + 근거를 M3 에.
+  [유형 앵커] 회수=사유 기전 / 행정처분=위반유형(미실시=출하판정·거짓작성=데이터무결성 ALCOA+·
+  기준서 미준수=문서통제) / ICH=section_title 주제어만(Step/마감일은 검색 보강 없으면 단정 금지) /
+  gmp=결론·제형. [길이 우선] 2문장 안에서 핵심 앵커 1개만.
+· {{W7}} — 점검 사항 2~3개 명사형 bullet. 실행 가능한 확인 항목만(원문에 근거). 그 카드의 사유·
+  위반유형에 직접 연결된 항목으로 — 사유가 다르면 점검도 달라야 한다(유형 공통 문구 반복 금지).
+  각 bullet 1개 점검축만(길이 우선). thin 카드는 "원문·최신 Step 확인" 수준 허용(없는 점검축 생성 금지).
 병합 카드(§14): prose_input 에 `merged_count`·통합 product 가 있다 — W1/W5 에서 "동일 사유
 N품목 일괄 회수"임을 드러내고, 품목 나열은 하지 않는다(전체 목록은 scaffold 의 toggle 에 이미 있음).
 산문 어디에도 새 링크·새 표·새 인용을 만들지 않는다.
@@ -269,7 +302,8 @@ Intake 밖 이벤트만 이 양식으로 작성한다(Evidence B/C — W3/W4 없
 </callout>
 규칙: > 인용 금지(paraphrase만) · 링크는 실제 확인한 URL 만(패턴 유추 금지, L1→L2 인덱스→L3
 기관 홈 fallback + ⚠️) · 유형 라벨은 scaffold 어휘를 따른다(Warning Letter·Recall·지침·안내서·
-규제 소식·고시·개정법령 등).
+규제 소식·고시·개정법령 등) · 시사점·점검은 [2단계] W6/W7 규칙(카드별 차별화·thin 가드·과확장
+가드·길이 우선)을 동일 적용한다(검색 카드도 일반론 복붙·과확장 금지).
 
 [🔮 표 — 발행 예정·진행 중(구방식, 비카드 항목 전용)]
 대상: 검색/Fetch 에서 발견된 초안·공개협의·코멘트 마감·시행 예정 + Intake 카드 중 의견기한이
@@ -400,3 +434,5 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 | 2026-06-05 | **동결** — Codex G3 조건부 GO 반영: P1 PL-10b 대조 키 `source`+`document_id`(0단계 표에 source 포함), P2 검색 카드 Signal 라벨 `Signal Med (T2)`(scaffold 동형), P2 `status_hint='Error'` 최종 Status 우선 명시. F-1·F-2 초안 채택 확정, card_spec §6 문구 정정 동반(P3) |
 | 2026-06-05 | **G4 dry-run C-1 반영(불건 해소 불변식)**: WHO Tier 2 임의 축약→보류 162건이 예정 Status=Processed 로 배정돼 조용한 유실 위험 발견. ⛔ 불변식 추가: 카드/표/멤버 미반영 row 를 Processed 로 소비 금지, 용량 초과 보류분은 Status 미변경(다음 주 재유입). Tier 2 임의 표본추출 금지·전수 채택 기본. [Status 갱신]·[Publish Lint 9] 동반 추가. (C-2 노이즈 카드는 원인 진단 중 — 별도) |
 | 2026-06-05 | **C-1 Codex HOLD 보완(PL-10b 충돌 해소)**: 보류분이 직전 CONSUMED rows[] 에 남아 다음 주 PL-10b 가 "처리분"으로 오인→1주 지연 유실 가능성 지적. ① [PL-10 마감] 에 `DEFERRED {N}: source::doc_id,...` 블록 append(실패 시 WARN) ② PL-10b 대조 집합에서 DEFERRED 목록 제외 ③ 최종 처분 3종→**조치 4종**(Processed/Skipped/Error/보류) 정정, Lint 8 "예정 Status"→"예정 조치" |
+| 2026-06-06 | **카드내용 패치(§B [2단계] 슬롯 규칙만, scaffold·golden 불변)**: P1 시사점·점검 유형내 복붙 제거(카드별 차별화·유형 앵커) · P2 사실 격리(타 카드·TL;DR 위반유형 차용 금지) · P3 제목 raw 처분문 복사·절단 금지(명사형 요약) · P4 다품목 공통 처분 반복확장 방지(1회 요약). thin 가드(주제명뿐 카드 단정 금지)·과확장 가드(사유 한 단계 해석·"일반적으로 …연관"·등급어 미첨가·제형추정 명시텍스트 한정·검색근거 M3 추적성) 추가. 검색 카드 미니 템플릿에도 동일 적용. Codex 교차검토(조건부 GO 보정 5건)·게이트 2차(2건)·노션점검(과확장 가드)·사람 승인 후 동결본 반영. 진단 `GRM_card_content_진단_2026-06-06.md`·패치 `GRM_Prompt_v16_패치초안_카드내용_2026-06-06.md`(v4) |
+| 2026-06-06 | **ICH 변동추적 보강(별도 구조 배치)**: Core 슬롯 7 을 정적 ICH 토픽 검색에서 공식 news/press-release 이벤트 검색으로 전환. 슬롯 7 공식 ICH URL 은 전체 WebFetch 5회 한도 안에서 허용하고, Step 4 채택·Step 2b 공개협의·총회 보도자료의 실제 변동만 카드/🔮 후보화. Intake ICH guideline snapshot 은 Tier 1/Skipped 기본으로 명시 |

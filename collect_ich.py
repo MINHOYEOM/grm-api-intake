@@ -14,6 +14,8 @@ ENABLE_ICH=true 또는 --sources ich 일 때 collect_intake.main() 에서 호출
   "확정 발행 자동 카드화" 가 아니라 **"공식 원문 기반 후보 감지 + Routine 검증"**.
   - admin.ich.org 페이지에서 ICH 토픽 섹션 제목을 스냅샷으로 수집(구조 비의존: 코드 패턴 기반).
   - document_id = hash(page_slug + 제목) → 새 토픽 등장/제목·범위 변경이 새 후보로 표면화.
+  - Quality/Multidisciplinary 섹션 스냅샷은 정적 카탈로그이므로 Signal Tier 1 고정
+    (Routine v16: 모니터링 로그/Skipped, 단독 카드화 금지).
   - official_url 은 사람이 보는 공식 공개 페이지(www.ich.org/page/<slug>), 스크래핑 출처는 admin.
   - 날짜를 단언하지 않는다 → date_iso="" (Notion Date 비움, Run Date 만 사용).
   - Step/Revision/PDF/마감일 등 AJAX 동적 정보는 Routine(WebFetch/WebSearch)이 확인한다.
@@ -130,6 +132,19 @@ def _signal_tier(blob: str, relevance: str) -> str:
     return "Tier 2" if relevance == "Likely" else "Tier 1"
 
 
+def _ich_tier(type_or_class: str, title: str, relevance: str) -> str:
+    """ICH 스냅샷의 운영 tier.
+
+    Guideline 페이지는 정적 토픽 카탈로그라 "존재" 신호일 뿐 "이번 변동"이 아니다.
+    따라서 Tier 1 로 내려 Routine 카드화를 막고, 실제 Step/채택/협의 이벤트는
+    WebSearch/보도자료 보강이 담당한다. Public Consultation 이 서버 HTML 에 실제 항목으로
+    노출되는 경우에는 이벤트성 후보이므로 기존 신호 산정을 유지한다.
+    """
+    if type_or_class == TYPE_ICH_GUIDELINE:
+        return "Tier 1"
+    return _signal_tier(title, relevance)
+
+
 def _document_id(slug: str, title: str) -> str:
     key = f"{slug}|{_clean(title).lower()}"
     return "ich-" + hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
@@ -180,7 +195,7 @@ def _collect_page(slug: str, type_or_class: str, required: bool,
     items: list[IntakeItem] = []
     for title in titles:
         relevance = _relevance(title)
-        tier = _signal_tier(title, relevance)
+        tier = _ich_tier(type_or_class, title, relevance)
         headline = (title if type_or_class == TYPE_ICH_GUIDELINE
                     else f"[Public Consultation] {title}")
         items.append(IntakeItem(
@@ -192,8 +207,9 @@ def _collect_page(slug: str, type_or_class: str, required: bool,
             type_or_class=type_or_class,
             body=(f"ICH 공식 페이지 '{slug}' 에서 감지된 섹션/토픽 후보.\n"
                   f"섹션 제목: {title}\n"
-                  f"※ Step/Revision/PDF/의견마감일 등 동적 정보는 Routine이 "
-                  f"공식 페이지에서 최종 확인할 것 (후보 감지 단계)."),
+                  f"※ Quality/Multidisciplinary 스냅샷은 정적 카탈로그이므로 "
+                  f"단독 카드화하지 않는다. Step/Revision/PDF/의견마감일 등 변동 정보는 "
+                  f"Routine WebSearch/공식 보도자료에서 최종 확인할 것."),
             api_query=admin_url,
             qa_relevance=relevance,
             osd_relevance="N/A",
@@ -204,7 +220,10 @@ def _collect_page(slug: str, type_or_class: str, required: bool,
                 "public_page": public_url,
                 "page_slug": slug,
                 "section_title": title,
-                "detection": "section-title snapshot (Routine verification required)",
+                "detection": (
+                    "section-title snapshot; static guideline pages are Tier 1 "
+                    "(Routine verification/event search required)"
+                ),
             },
             source_url=admin_url,
             language=LANGUAGE_EN,

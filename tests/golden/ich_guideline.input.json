@@ -14,7 +14,7 @@
     "modality": "Biologic",
     "official_url": "https://www.ich.org/page/quality-guidelines",
     "raw_fetch_ok": true,
-    "signal_tier": "Tier 2",
+    "signal_tier": "Tier 1",
     "source": "ICH",
     "type_or_class": "ich-guideline"
   }

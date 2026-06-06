@@ -120,6 +120,9 @@ golden(legislative 카드)·v16 프롬프트와 정합. 🔮 표는 비카드 Wa
 ## 7. 섹션 배치 · 그룹핑 (Python)
 
 - 섹션: 글로벌(🌐) / 국내 MFDS(🇰🇷) / 🔮 Watch / Recall 모니터링 표 — `section` 필드로 사전 분류.
+- ICH: `ich-guideline` 은 정적 guideline 토픽 스냅샷이므로 Tier 1 모니터링/Skipped 기본(단독 카드화 금지).
+  실제 Step 4 채택·Step 2b 공개협의·총회 보도자료는 Routine WebSearch/WebFetch 이벤트로 카드/🔮 후보화한다.
+  `ich-consultation` 이 Intake 에 실제 항목으로 들어오면 `section=watch`.
 - 글로벌 카드 ≥4건이면 제품군별(💊/🧬/▫️) 소제목 그룹핑, ≤3건이면 평면 나열(과분할 방지).
   (명문화 2026-06-05, Codex P2-2: 제품군 소제목은 **페이지 구조 요소**로, §13.1-2 "제품군은 W1 한 곳"
   원칙(=**카드 내부** 기준)과 충돌하지 않음.)

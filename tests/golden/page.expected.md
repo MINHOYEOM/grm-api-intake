@@ -43,7 +43,7 @@
 
 <callout icon="📌" color="blue_bg">
 	{{W1}}
-	`Evidence B` · `ICH` · `Signal Med (T2)` · `ICH`
+	`Evidence B` · `ICH` · `Signal Low (T1)` · `ICH`
 </callout>
 
 <table>

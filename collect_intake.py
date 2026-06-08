@@ -2646,6 +2646,64 @@ def notion_find_handoff_page(token: str, db_id: str,
     return results[0]
 
 
+def notion_stale_prior_open_handoffs(token: str, db_id: str,
+                                     keep_handoff_id: str,
+                                     superseded_by: str) -> int:
+    """새 OPEN handoff emit 전, 직전 미소비 OPEN handoff 를 STALE 로 봉인한다(K4-1).
+
+    Type or Class=`routine-handoff` 이고 Status=`New`(=OPEN) 인 handoff page 중
+    handoff_id 가 `keep_handoff_id` 와 다른 것을 전부 찾아 Title→`STALE GRM Routine
+    Handoff {날짜} (superseded by {superseded_by})`, Status→`Skipped` 로 바꾼다.
+    → '항상 OPEN 1개' 불변식: 일일 emit 누적·주간 소비 오선택(6/8 근본원인) 차단.
+
+    ⚠️ 불가침: handoff page **자신의** Name·Status 두 속성만 PATCH 한다. 그 page 의
+    rows[] 가 가리키는 **개별 Intake row page 의 Status 는 절대 건드리지 않는다**
+    (handoff 의 children 은 JSON code block 일 뿐 — row page 가 아니다). 반환=봉인 건수.
+    """
+    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
+    body: dict[str, Any] = {
+        "filter": {
+            "and": [
+                {"property": PROP_TYPE_CLASS, "select": {"equals": TYPE_ROUTINE_HANDOFF}},
+                {"property": PROP_STATUS, "select": {"equals": "New"}},
+            ]
+        },
+        "page_size": 100,
+    }
+    staled = 0
+    start_cursor: str | None = None
+    for _ in range(25):  # handoff page 는 소수 — 안전 상한
+        if start_cursor:
+            body["start_cursor"] = start_cursor
+        elif "start_cursor" in body:
+            del body["start_cursor"]
+        data = notion_api_request("POST", url, token, body=body)
+        for page in data.get("results", []):
+            snap = _intake_page_snapshot(page)
+            prior_id = snap["document_id"]
+            if not prior_id or prior_id == keep_handoff_id:
+                continue  # 오늘 emit 본인(keep)·식별 불가 page 는 봉인 금지
+            prior_date = prior_id.split("::", 1)[-1] or snap["run_date"] or "?"
+            new_title = (f"STALE GRM Routine Handoff {prior_date} "
+                         f"(superseded by {superseded_by})")
+            notion_api_request(
+                "PATCH", NOTION_PAGE_URL_TPL.format(page_id=snap["page_id"]), token,
+                body={"properties": {
+                    PROP_NAME: {"title": _rich_text(new_title)},
+                    PROP_STATUS: _select("Skipped"),
+                }},
+            )
+            staled += 1
+            time.sleep(0.34)
+        if not data.get("has_more"):
+            break
+        start_cursor = data.get("next_cursor")
+    if staled:
+        log("INFO", f"직전 미소비 OPEN handoff {staled}건 STALE 봉인 "
+                    f"(keep={keep_handoff_id})")
+    return staled
+
+
 def notion_archive_page_children(token: str, page_id: str) -> None:
     url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
     start_cursor: str | None = None
@@ -2691,6 +2749,13 @@ def notion_upsert_routine_handoff(token: str, db_id: str,
     """
     props = _handoff_page_properties(payload, generated_at)
     blocks = _handoff_blocks(payload, compact=compact)
+    # K4-1: 새 OPEN 생성/갱신 전, 직전 미소비 OPEN handoff 를 STALE 봉인('항상 OPEN 1개').
+    # 개별 Intake row Status 는 불변 — handoff page 자신의 Name·Status 만 바꾼다.
+    notion_stale_prior_open_handoffs(
+        token, db_id,
+        keep_handoff_id=payload["handoff_id"],
+        superseded_by=payload.get("run_date_kst") or payload["handoff_id"].split("::", 1)[-1],
+    )
     existing = notion_find_handoff_page(token, db_id, payload["handoff_id"])
     if existing:
         page_id = existing["id"]

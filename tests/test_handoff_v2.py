@@ -282,5 +282,108 @@ class V1FrozenSnapshotTest(unittest.TestCase):
             self.assertNotIn("prose_input", r)
 
 
+def _handoff_page(handoff_id: str, run_date: str, status: str, pid: str) -> dict:
+    """OPEN/STALE handoff page 의 Notion query 결과 형태(snapshot 가 읽는 최소 props)."""
+    return {
+        "id": pid, "url": f"https://app.notion.com/p/{pid}",
+        "properties": {
+            "Name": {"title": [{"plain_text": f"OPEN GRM Routine Handoff {run_date}"}]},
+            "Source": {"select": {"name": "GRM Handoff"}},
+            "Document ID": {"rich_text": [{"plain_text": handoff_id}]},
+            "Type or Class": {"select": {"name": "routine-handoff"}},
+            "Status": {"select": {"name": status}},
+            "Run Date (KST)": {"date": {"start": run_date}},
+        },
+    }
+
+
+class StalePriorOpenHandoffTest(unittest.TestCase):
+    """B1 (K4-1): 새 OPEN emit 전 직전 OPEN → STALE+Skipped · 개별 row 불변 · OPEN 1개만."""
+
+    def test_prior_open_staled_rows_untouched(self) -> None:
+        calls = []
+
+        def fake_api(method, url, token, body=None, **kw):
+            calls.append((method, url, body))
+            if method == "POST" and "/query" in url:
+                return {"results": [_handoff_page(
+                    "routine-handoff::2026-06-07", "2026-06-07", "New", "prior-page")],
+                    "has_more": False}
+            return {}
+
+        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+            staled = ci.notion_stale_prior_open_handoffs(
+                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
+                superseded_by="2026-06-08")
+
+        self.assertEqual(staled, 1)
+        patches = [c for c in calls if c[0] == "PATCH"]
+        self.assertEqual(len(patches), 1)                      # 직전 OPEN 1건만 PATCH
+        _, purl, pbody = patches[0]
+        self.assertIn("prior-page", purl)                      # handoff page 자신
+        props = pbody["properties"]
+        self.assertEqual(set(props.keys()), {"Name", "Status"})  # 불가침: 두 속성만
+        self.assertEqual(props["Status"]["select"]["name"], "Skipped")
+        title = props["Name"]["title"][0]["text"]["content"]
+        self.assertIn("STALE GRM Routine Handoff 2026-06-07", title)
+        self.assertIn("superseded by 2026-06-08", title)
+
+    def test_current_open_not_self_staled(self) -> None:
+        # 오늘(keep) handoff 만 OPEN 이면 STALE 0건 — 자기 자신 봉인 금지.
+        def fake_api(method, url, token, body=None, **kw):
+            if method == "POST" and "/query" in url:
+                return {"results": [_handoff_page(
+                    "routine-handoff::2026-06-08", "2026-06-08", "New", "today-page")],
+                    "has_more": False}
+            raise AssertionError("PATCH 호출되면 안 됨(자기 봉인 금지)")
+
+        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+            staled = ci.notion_stale_prior_open_handoffs(
+                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
+                superseded_by="2026-06-08")
+        self.assertEqual(staled, 0)
+
+    def test_multiple_prior_opens_all_staled_single_remains(self) -> None:
+        # OPEN 다수(06-06·06-07) + 오늘(06-08) → 직전 2건 STALE, 오늘만 OPEN 유지.
+        patched_ids = []
+
+        def fake_api(method, url, token, body=None, **kw):
+            if method == "POST" and "/query" in url:
+                return {"results": [
+                    _handoff_page("routine-handoff::2026-06-06", "2026-06-06", "New", "p6"),
+                    _handoff_page("routine-handoff::2026-06-07", "2026-06-07", "New", "p7"),
+                    _handoff_page("routine-handoff::2026-06-08", "2026-06-08", "New", "p8"),
+                ], "has_more": False}
+            if method == "PATCH":
+                patched_ids.append(url)
+            return {}
+
+        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+            staled = ci.notion_stale_prior_open_handoffs(
+                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
+                superseded_by="2026-06-08")
+        self.assertEqual(staled, 2)
+        self.assertTrue(any("p6" in u for u in patched_ids))
+        self.assertTrue(any("p7" in u for u in patched_ids))
+        self.assertFalse(any("p8" in u for u in patched_ids))  # 오늘(keep)은 불변
+
+    def test_upsert_invokes_stale_guard_before_write(self) -> None:
+        # 와이어링: notion_upsert_routine_handoff 가 emit 전 STALE 가드를 호출한다.
+        with mock.patch.object(ci, "notion_stale_prior_open_handoffs", return_value=0) as guard, \
+             mock.patch.object(ci, "_handoff_blocks", return_value=[]), \
+             mock.patch.object(ci, "_handoff_page_properties", return_value={}), \
+             mock.patch.object(ci, "notion_find_handoff_page", return_value=None), \
+             mock.patch.object(ci, "notion_api_request",
+                               side_effect=lambda *a, **k: {"id": "p", "url": "u"}):
+            ci.notion_upsert_routine_handoff(
+                "tok", "db",
+                {"handoff_id": "routine-handoff::2026-06-08", "run_date_kst": "2026-06-08"},
+                GEN_AT)
+        guard.assert_called_once()
+        self.assertEqual(guard.call_args.kwargs["keep_handoff_id"],
+                         "routine-handoff::2026-06-08")
+        self.assertEqual(guard.call_args.kwargs["superseded_by"], "2026-06-08")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -299,7 +299,7 @@
 </table>
 
 **원문**
-> ① 무균공정 배지충전(media fill) 검증 자료가 미흡하고 환경모니터링 일탈에 대한 조사 기록이 불완전함.
+> ① 평가 결과 지적(보완)사항(Deficiencies) 무균공정 배지충전(media fill) 검증 자료가 미흡하고 환경모니터링 일탈에 대한 조사 기록이 불완전함.
 > ② 작업자 무균조작 적격성 재평가가 필요함.
 
 <callout icon="🔍">
@@ -457,6 +457,44 @@
 
 ## 📋 Recall 모니터링
 
+### [Recall(HC) · Health Canada] Hizentra: out of specification — **{{TITLE_ISSUE}}**
+
+<callout icon="📌" color="blue_bg">
+	{{W1}}
+	`Evidence A` · `Health Canada` · `Signal Med (T2)` · `🧬 바이오의약품` · `Recall`
+</callout>
+
+<table>
+<tr><td>**발행일**</td><td>2026-06-03</td></tr>
+<tr><td>**문서번호**</td><td>`hc-82142`</td></tr>
+<tr><td>**업체**</td><td>원문 미기재</td></tr>
+<tr><td>**제품**</td><td>Hizentra</td></tr>
+<tr><td>**Class**</td><td>Type II</td></tr>
+</table>
+
+**원문 및 번역**
+> The appearance is out of specification in the affected lot.
+{{W4}}
+
+<callout icon="🔍">
+	**핵심 사실**  `근거: Intake raw`
+	{{W5}}
+</callout>
+
+<callout icon="💡" color="yellow_bg">
+	**시사점**
+	{{W6}}
+</callout>
+
+<callout icon="✅" color="green_bg">
+	**점검 사항**
+	{{W7}}
+</callout>
+
+<callout icon="🔖" color="gray_bg">
+	**출처**  정보출처/공식원본 [링크](https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos)
+</callout>
+
 ### [회수·판매중지 · MFDS] 한국제약 — **{{TITLE_ISSUE}}**
 
 <callout icon="📌" color="blue_bg">
@@ -541,7 +579,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-05-10</td></tr>
 <tr><td>**문서번호**</td><td>`hc-rsam-88421`</td></tr>
-<tr><td>**업체**</td><td>PharmaCo Ltd.</td></tr>
+<tr><td>**업체**</td><td>원문 미기재</td></tr>
 <tr><td>**제품**</td><td>Drug X 50 mg tablets</td></tr>
 <tr><td>**Class**</td><td>Type II</td></tr>
 </table>

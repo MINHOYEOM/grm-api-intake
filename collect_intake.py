@@ -398,7 +398,8 @@ MODALITY_BIOLOGIC_TERMS = [
     "biologic", "biological product", "biotechnological", "biosimilar", "biotherapeutic",
     "monoclonal", "antibody", "recombinant", "fusion protein",
     "vaccine", "cell therapy", "gene therapy", "advanced therapy", "atmp",
-    "blood product", "plasma-derived", "plasma derived", "immunoglobulin",
+    "blood product", "plasma-derived", "plasma derived",
+    "immunoglobulin", "immune globulin", "immune serum globulin",
     "ich q5",
     # MFDS 한국어 단서 (클래스 + 대표 생물 원료 — 라이브 실데이터로 보강)
     "생물학적제제", "생물의약품", "바이오의약품", "바이오시밀러", "동등생물의약품",

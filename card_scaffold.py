@@ -348,7 +348,10 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
     if kind == "recall-quality":
         return _first(raw.get("RTRVL_RESN"))
     if kind == "gmp-inspection":
-        return _truncate_at_sentence(raw.get("attachment_text", ""), 250)
+        # 표지 너머 결론(지적/보완사항) 우선 — 없으면 전체 본문 폴백(P6).
+        return _truncate_at_sentence(
+            _first(raw.get("attachment_deficiency_excerpt"),
+                   raw.get("attachment_text")), 250)
     if kind == "openfda-recall":
         return _truncate_at_sentence(raw.get("reason_for_recall", ""), 250)
     if kind == "hc-recall":
@@ -461,7 +464,9 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
         if raw.get("classification"):
             rows.append(("Class", str(raw["classification"])))
     elif kind == "hc-recall":
-        rows.append(("업체", _first(raw.get("Organization"), row.get("firm")) or "원문 미기재"))
+        # Organization 은 HC 부서명("Drugs and health products")이라 회사가 아님 → 사용 금지.
+        # 실제 회사는 collect_hc 가 상세 페이지에서 끌어와 firm/company 에 채운다(P8).
+        rows.append(("업체", _first(raw.get("company"), row.get("firm")) or "원문 미기재"))
         product = _first(raw.get("Product"), raw.get("product_description"))
         if product:
             rows.append(("제품", _truncate_at_sentence(str(product), 80)))
@@ -645,7 +650,9 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
     # 사유/핵심 텍스트 — 모든 유형의 실제 raw 키 폴백(gmp=attachment_text 누락 버그 수정).
     issue_or_reason = _first(
         raw.get("RTRVL_RESN"), raw.get("reason_for_recall"), raw.get("Issue"),
-        raw.get("EXPOSE_CONT"), raw.get("attachment_text"), raw.get("ADM_DISPS_NAME"),
+        raw.get("EXPOSE_CONT"),
+        raw.get("attachment_deficiency_excerpt"), raw.get("attachment_text"),
+        raw.get("ADM_DISPS_NAME"),
         raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
         raw.get("anchor_text"), raw.get("description"),
     )
@@ -659,7 +666,7 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "headline": row.get("headline", ""),
         # 공통 확장(P1-2)
         "firm_or_product": _first(raw.get("ENTRPS"), raw.get("recalling_firm"),
-                                  raw.get("Organization"), raw.get("firm"),
+                                  raw.get("company"), raw.get("firm"),
                                   raw.get("manufacturer"), row.get("firm")),
         "product": _first(raw.get("PRDUCT"), raw.get("product_description"),
                           raw.get("Product"), raw.get("product_type")),

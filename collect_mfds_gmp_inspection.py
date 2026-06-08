@@ -56,6 +56,15 @@ _DEFICIENCY_PRESENT_RE = re.compile(
     r"(품질경영|시설장비|제조|시험실|원자재|포장표시|허가관리|위탁|밸리데이션))",
     re.S,
 )
+# 표지·개요(제조소 현황·실사 개요)를 건너뛰고 '평가 결과 지적(보완)사항' 결론
+# 섹션부터 잘라내기 위한 앵커(우선순위 순). PDF 본문은
+# [표지 → 제조소 현황 → 실태조사 개요 → 실태조사 결과 → 평가 결과 지적(보완)사항(Deficiencies)]
+# 순서라, 카드 인용이 표지 보일러플레이트가 아니라 실제 지적/결론을 가리키게 한다.
+_DEFICIENCY_EXCERPT_PATTERNS = (
+    r"평가\s*결과\s*지적\s*\(?\s*보완\s*\)?\s*사항",
+    r"지적\s*\(?\s*보완\s*\)?\s*사항\s*\(\s*Deficiencies\s*\)",
+    r"지적\s*\(?\s*보완\s*\)?\s*사항",
+)
 
 # 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
@@ -93,6 +102,7 @@ class _AttachmentParse:
     file_format: str = ""
     text: str = ""
     deficiency: str = "unknown"
+    deficiency_excerpt: str = ""   # 표지 너머 '지적(보완)사항' 결론 섹션(카드 인용용)
     bytes_downloaded: int = 0
     error: str = ""
 
@@ -256,6 +266,23 @@ def _get_bytes(url: str, *, timeout: int = 30, accept: str = "*/*") -> bytes:
             raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
 
 
+def _extract_deficiency_excerpt(text: str) -> str:
+    """표지·개요를 건너뛰고 '평가 결과 지적(보완)사항' 결론 섹션부터 반환(없으면 "").
+
+    카드 W3 인용/요약이 표지(제조소명·실사목적 보일러플레이트)가 아니라 실제
+    지적/결론을 가리키게 하기 위한 추출. 마커가 전혀 없으면 "" → 호출부가 전체
+    본문으로 폴백한다.
+    """
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    if not compact:
+        return ""
+    for pat in _DEFICIENCY_EXCERPT_PATTERNS:
+        m = re.search(pat, compact)
+        if m:
+            return compact[m.start():][:MAX_ATTACHMENT_BODY_CHARS].strip()
+    return ""
+
+
 def _assess_deficiency(text: str) -> str:
     compact = re.sub(r"\s+", " ", text or "").strip()
     if not compact:
@@ -345,6 +372,7 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
         file_format=file_format,
         text=text,
         deficiency=deficiency,
+        deficiency_excerpt=_extract_deficiency_excerpt(text),
         bytes_downloaded=len(data),
     )
 
@@ -427,6 +455,14 @@ def _body(raw: dict[str, str], attachment: _AttachmentParse,
         parts.append(f"첨부 포맷: {attachment.file_format}")
     if attachment.deficiency != "unknown":
         parts.append(f"지적사항 판정: {attachment.deficiency}")
+    if attachment.deficiency_excerpt:
+        # 표지 너머 핵심(지적/결론)을 먼저 노출 — 사람·Routine 이 보일러플레이트를
+        # 건너뛰지 않아도 되게 한다(전체 원문은 아래에 그대로 보존).
+        parts.extend([
+            "",
+            "주요 지적/결론:",
+            attachment.deficiency_excerpt[:600],
+        ])
     if attachment.text:
         parts.extend([
             "",
@@ -484,6 +520,8 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         raw_payload["attachment_parse_error"] = attachment.error
     if attachment.text:
         raw_payload["attachment_text"] = attachment.text
+    if attachment.deficiency_excerpt:
+        raw_payload["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
 
     return IntakeItem(
         source=SOURCE_MFDS,

@@ -196,6 +196,26 @@ class TestComputeModality(unittest.TestCase):
         payload = {"product_type": "Drugs", "product_description": "Recombinant vaccine lot"}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
 
+    def test_hc_immune_globulin_space_form_biologic(self):
+        # 'immune globulin'(공백형) 도 immunoglobulin 과 동일하게 Biologic (용어 보강)
+        payload = {"product_type": "Drugs",
+                   "product_description": "Octagam (Immune globulin intravenous, Human)"}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
+
+    def test_hc_brand_only_drugs_with_generic_in_text_biologic(self):
+        # Category=Drugs 단독이면 Chemical 이지만, 텍스트(상세 유효성분)에 생물 원료가
+        # 주입되면 Biologic 이 우선한다(Hizentra 류: collect_hc 가 body 에 유효성분 주입).
+        payload = {"product_type": "Drugs", "product_description": "Hizentra"}
+        self.assertEqual(
+            ci.compute_modality(payload, "유효성분/함량: IMMUNOGLOBULIN (HUMAN) 200 mg/mL"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_hc_brand_only_drugs_without_generic_chemical(self):
+        # 유효성분 단서가 없으면(상세 fetch 실패) Category=Drugs → Chemical (graceful 반례)
+        payload = {"product_type": "Drugs", "product_description": "Hizentra"}
+        self.assertEqual(ci.compute_modality(payload, "Hizentra"), ci.MODALITY_CHEMICAL)
+
 
 class TestSterileBioTier3Floor(unittest.TestCase):
     """무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor) 여야 한다."""

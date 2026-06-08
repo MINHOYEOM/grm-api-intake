@@ -27,6 +27,7 @@ FIXTURES = [
     # K2.5 — 활성 소스 전 유형 확장(openfda·HC·WHO 3종·ICH·RSS·MFDS RSS 4종)
     "openfda_recall_chemical",
     "hc_recall_chemical",
+    "hc_recall_biologic",
     "who_noc",
     "who_inspection",
     "who_news",

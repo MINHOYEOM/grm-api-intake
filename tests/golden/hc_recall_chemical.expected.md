@@ -8,7 +8,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-05-10</td></tr>
 <tr><td>**문서번호**</td><td>`hc-rsam-88421`</td></tr>
-<tr><td>**업체**</td><td>PharmaCo Ltd.</td></tr>
+<tr><td>**업체**</td><td>원문 미기재</td></tr>
 <tr><td>**제품**</td><td>Drug X 50 mg tablets</td></tr>
 <tr><td>**Class**</td><td>Type II</td></tr>
 </table>

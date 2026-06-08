@@ -1,0 +1,28 @@
+{
+  "raw": {
+    "Issue": "The appearance is out of specification in the affected lot.",
+    "Organization": "Drugs and health products",
+    "Product": "Hizentra",
+    "Recall class": "Type II",
+    "Title": "Hizentra: out of specification",
+    "What you should do": "Contact the recalling firm if you have any questions about the recall.",
+    "api": "HC RSAM OpenData",
+    "dosage_form_detail": "Solution",
+    "medicinal_ingredient": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL",
+    "nid": "82142",
+    "product_description": "Hizentra",
+    "product_type": "Drugs"
+  },
+  "row": {
+    "date": "2026-06-03",
+    "document_id": "hc-82142",
+    "headline": "Hizentra: out of specification",
+    "language": "EN",
+    "modality": "Biologic",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "Health Canada",
+    "type_or_class": "hc-recall"
+  }
+}

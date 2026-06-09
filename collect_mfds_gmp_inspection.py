@@ -262,12 +262,14 @@ def _assess_deficiency(text: str) -> str:
     compact = re.sub(r"\s+", " ", text or "").strip()
     if not compact:
         return "unknown"
-    has_present = _DEFICIENCY_PRESENT_RE.search(compact)
-    has_none = _NO_DEFICIENCY_RE.search(compact)
-    if has_present:
-        return "present"
-    if has_none:
+    # none 우선: _NO_DEFICIENCY_RE 는 '지적/보완 사항 없음' 앵커 형태만 매칭하므로
+    # (단독 '이상 없음'은 A1 에서 제거됨) 부수적 '없음'이 실제 지적을 가리지 않는다.
+    # present 우선이면 결론 '없음' 뒤 '제조소 (일반)현황' 헤더의 '제조' 가
+    # _DEFICIENCY_PRESENT_RE 의 .{0,80} 창에 걸려 정상 보고서가 오승격된다(B3).
+    if _NO_DEFICIENCY_RE.search(compact):
         return "none"
+    if _DEFICIENCY_PRESENT_RE.search(compact):
+        return "present"
     if "Deficiencies" in compact and "없음" not in compact:
         return "present"
     return "unknown"

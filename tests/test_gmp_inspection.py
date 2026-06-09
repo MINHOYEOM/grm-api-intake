@@ -86,6 +86,22 @@ class TestDeficiencyExcerpt(unittest.TestCase):
         )
         self.assertEqual(g._assess_deficiency(text), "none")
 
+    def test_b3_none_then_header_stays_none(self):
+        """결론 '없음' 뒤 '제조소 현황' 헤더의 '제조' 오승격 차단 (B3 잠금)."""
+        text = (
+            "평가 결과 지적(보완)사항(Deficiencies) 없음 "
+            "제조소 현황 제조소명: 정상제약(주)"
+        )
+        self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_b3_none_then_general_header_stays_none(self):
+        """결론 '없음' 뒤 '제조소 일반현황' 헤더 변형도 none 유지 (B3 잠금)."""
+        text = (
+            "평가 결과 지적(보완)사항(Deficiencies) 없음 "
+            "제조소 일반현황 제조소명: 정상제약(주)"
+        )
+        self.assertEqual(g._assess_deficiency(text), "none")
+
 
 if __name__ == "__main__":
     unittest.main()

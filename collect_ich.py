@@ -36,9 +36,7 @@ import re
 import time
 from datetime import date
 
-import requests
-
-from grm_common import DEFAULT_USER_AGENT, log, retry_after_seconds
+from grm_common import http_get_html, log
 from collect_intake import (
     IntakeItem,
     SOURCE_ICH,
@@ -151,31 +149,7 @@ def _document_id(slug: str, title: str) -> str:
 
 
 def _get_html(url: str, *, timeout: int = 30) -> str:
-    last_err: Exception | None = None
-    for attempt in range(HTTP_RETRIES + 1):
-        try:
-            resp = requests.get(
-                url,
-                timeout=timeout,
-                headers={
-                    "User-Agent": DEFAULT_USER_AGENT,
-                    "Accept": "text/html,application/xhtml+xml",
-                },
-            )
-            if resp.status_code == 429 and attempt < HTTP_RETRIES:
-                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                log("WARN", f"ICH 429 url={url} sleep={sleep_s}s")
-                time.sleep(sleep_s)
-                continue
-            resp.raise_for_status()
-            return resp.text or ""
-        except requests.RequestException as e:
-            last_err = e
-            if attempt < HTTP_RETRIES:
-                log("WARN", f"ICH GET retry {attempt + 1}/{HTTP_RETRIES + 1} url={url} err={e}")
-                time.sleep(2 ** attempt)
-                continue
-            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
+    return http_get_html(url, timeout=timeout, retries=HTTP_RETRIES, label="ICH")
 
 
 def _collect_page(slug: str, type_or_class: str, required: bool,

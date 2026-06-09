@@ -13,7 +13,15 @@ import urllib.parse
 from datetime import date
 from typing import Any
 
-from grm_common import http_get_json, log
+from grm_common import (
+    http_get_json,
+    log,
+    parse_datago_date,
+    parse_int_safe,
+    text_field,
+    datago_normalize_items,
+    datago_extract_items,
+)
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -112,58 +120,17 @@ def _api_query(params: dict[str, Any]) -> str:
     return _mask_service_key(_request_url(params))
 
 
-def _parse_int(value: Any, default: int = 0) -> int:
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
-def _text(raw: dict[str, Any], key: str) -> str:
-    return str(raw.get(key) or "").strip()
-
-
-def _parse_api_date(raw: str) -> str:
-    raw = (raw or "").strip()
-    if len(raw) >= 8 and raw[:8].isdigit():
-        y, m, d = raw[:4], raw[4:6], raw[6:8]
-        try:
-            return date(int(y), int(m), int(d)).isoformat()
-        except ValueError:
-            return ""
-    return ""
+_parse_int = parse_int_safe
+_text = text_field
+_parse_api_date = parse_datago_date
 
 
 def _item_date(raw: dict[str, Any]) -> str:
     return _parse_api_date(_text(raw, "LAST_SETTLE_DATE"))
 
 
-def _normalize_items(raw_items: Any) -> list[dict[str, Any]]:
-    """Normalize data.go.kr's item wrapper across list/dict shapes."""
-    if raw_items is None:
-        return []
-    if isinstance(raw_items, list):
-        out: list[dict[str, Any]] = []
-        for item in raw_items:
-            out.extend(_normalize_items(item))
-        return out
-    if isinstance(raw_items, dict):
-        if "item" in raw_items:
-            return _normalize_items(raw_items.get("item"))
-        return [raw_items]
-    return []
-
-
 def _extract_items(data: dict[str, Any]) -> tuple[list[dict[str, Any]], int, int, int, str]:
-    header = data.get("header") if isinstance(data.get("header"), dict) else {}
-    result_code = str(header.get("resultCode") or "").strip()
-    result_msg = str(header.get("resultMsg") or "").strip()
-    body = data.get("body") if isinstance(data.get("body"), dict) else {}
-    page_no = _parse_int(body.get("pageNo"), 1)
-    num_rows = _parse_int(body.get("numOfRows"), PAGE_SIZE)
-    total_count = _parse_int(body.get("totalCount"), 0)
-    items = _normalize_items(body.get("items"))
-    return items, page_no, num_rows, total_count, f"{result_code}:{result_msg}"
+    return datago_extract_items(data, default_page_size=PAGE_SIZE)
 
 
 def _document_id(raw: dict[str, Any]) -> str:

@@ -18,9 +18,7 @@ from datetime import date
 from html.parser import HTMLParser
 from typing import Any
 
-import requests
-
-from grm_common import DEFAULT_USER_AGENT, log, retry_after_seconds
+from grm_common import http_get_bytes, log
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -234,36 +232,13 @@ def _detect_attachment_format(data: bytes) -> str:
 
 
 def _get_bytes(url: str, *, timeout: int = 30, accept: str = "*/*") -> bytes:
-    last_err: Exception | None = None
-    for attempt in range(HTTP_RETRIES + 1):
-        try:
-            resp = requests.get(
-                url,
-                timeout=timeout,
-                headers={
-                    "User-Agent": DEFAULT_USER_AGENT,
-                    "Accept": accept,
-                    "Referer": BOARD_URL,
-                },
-            )
-            if resp.status_code == 429 and attempt < HTTP_RETRIES:
-                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                log("WARN", f"MFDS GMP inspection 429 url={url} sleep={sleep_s}s")
-                time.sleep(sleep_s)
-                continue
-            resp.raise_for_status()
-            return resp.content or b""
-        except requests.RequestException as e:
-            last_err = e
-            if attempt < HTTP_RETRIES:
-                log(
-                    "WARN",
-                    f"MFDS GMP inspection GET retry {attempt + 1}/{HTTP_RETRIES + 1} "
-                    f"url={url} err={e}",
-                )
-                time.sleep(2 ** attempt)
-                continue
-            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
+    return http_get_bytes(
+        url,
+        timeout=timeout,
+        retries=HTTP_RETRIES,
+        headers={"Accept": accept, "Referer": BOARD_URL},
+        label="MFDS GMP inspection",
+    )
 
 
 def _extract_deficiency_excerpt(text: str) -> str:

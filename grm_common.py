@@ -6,7 +6,7 @@ from __future__ import annotations
 import sys
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 import requests
@@ -137,3 +137,137 @@ def http_get_xml(
             if attempt < retries:
                 time.sleep(2 ** attempt)
     raise RuntimeError(f"HTTP XML GET final failure: {url} ({last_err})")
+
+
+# ── data.go.kr 공통 유틸리티 ──────────────────────────────────────────────────
+
+
+def parse_int_safe(value: Any, default: int = 0) -> int:
+    """Safely parse an integer value, returning *default* on failure."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def text_field(raw: dict[str, Any], key: str) -> str:
+    """Extract a stripped string field from a dict, defaulting to ``""``."""
+    return str(raw.get(key) or "").strip()
+
+
+def parse_datago_date(raw: str) -> str:
+    """Parse ``YYYYMMDD`` date strings used by data.go.kr APIs → ISO format."""
+    raw = (raw or "").strip()
+    if len(raw) >= 8 and raw[:8].isdigit():
+        y, m, d = raw[:4], raw[4:6], raw[6:8]
+        try:
+            return date(int(y), int(m), int(d)).isoformat()
+        except ValueError:
+            return ""
+    return ""
+
+
+def datago_normalize_items(raw_items: Any) -> list[dict[str, Any]]:
+    """Normalize data.go.kr's ``item`` wrapper across list/dict shapes."""
+    if raw_items is None:
+        return []
+    if isinstance(raw_items, list):
+        out: list[dict[str, Any]] = []
+        for item in raw_items:
+            out.extend(datago_normalize_items(item))
+        return out
+    if isinstance(raw_items, dict):
+        if "item" in raw_items:
+            return datago_normalize_items(raw_items.get("item"))
+        return [raw_items]
+    return []
+
+
+def datago_extract_items(
+    data: dict[str, Any], default_page_size: int = 100,
+) -> tuple[list[dict[str, Any]], int, int, int, str]:
+    """Extract items and pagination from a data.go.kr JSON response."""
+    header = data.get("header") if isinstance(data.get("header"), dict) else {}
+    result_code = str(header.get("resultCode") or "").strip()
+    result_msg = str(header.get("resultMsg") or "").strip()
+    body = data.get("body") if isinstance(data.get("body"), dict) else {}
+    page_no = parse_int_safe(body.get("pageNo"), 1)
+    num_rows = parse_int_safe(body.get("numOfRows"), default_page_size)
+    total_count = parse_int_safe(body.get("totalCount"), 0)
+    items = datago_normalize_items(body.get("items"))
+    return items, page_no, num_rows, total_count, f"{result_code}:{result_msg}"
+
+
+# ── HTML/bytes GET with retry ─────────────────────────────────────────────────
+
+
+def http_get_html(
+    url: str,
+    *,
+    timeout: int = 30,
+    retries: int = 3,
+    headers: dict[str, str] | None = None,
+    label: str = "",
+) -> str:
+    """GET HTML with 429 Retry-After and exponential retry."""
+    tag = label or "HTML"
+    req_headers = {
+        "User-Agent": DEFAULT_USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml",
+        **(headers or {}),
+    }
+    last_err: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.get(url, timeout=timeout, headers=req_headers)
+            if resp.status_code == 429 and attempt < retries:
+                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
+                log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")
+                time.sleep(sleep_s)
+                continue
+            resp.raise_for_status()
+            return resp.text or ""
+        except requests.RequestException as e:
+            last_err = e
+            if attempt < retries:
+                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={url} err={e}")
+                time.sleep(2 ** attempt)
+                continue
+            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
+    raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")
+
+
+def http_get_bytes(
+    url: str,
+    *,
+    timeout: int = 30,
+    retries: int = 3,
+    headers: dict[str, str] | None = None,
+    label: str = "",
+) -> bytes:
+    """GET raw bytes with 429 Retry-After and exponential retry."""
+    tag = label or "BYTES"
+    req_headers = {
+        "User-Agent": DEFAULT_USER_AGENT,
+        "Accept": "*/*",
+        **(headers or {}),
+    }
+    last_err: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.get(url, timeout=timeout, headers=req_headers)
+            if resp.status_code == 429 and attempt < retries:
+                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
+                log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")
+                time.sleep(sleep_s)
+                continue
+            resp.raise_for_status()
+            return resp.content or b""
+        except requests.RequestException as e:
+            last_err = e
+            if attempt < retries:
+                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={url} err={e}")
+                time.sleep(2 ** attempt)
+                continue
+            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
+    raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")

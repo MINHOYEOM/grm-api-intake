@@ -396,6 +396,94 @@ class RenderPlanTest(unittest.TestCase):
         self.assertTrue(all(not p["group_label"] for p in plan_few.values()))
 
 
+class ForbiddenMarkdownGuardTest(unittest.TestCase):
+    """A2 — 금지 마크다운 가드: raw 입력에 금지 토큰이 있어도 최종 markdown 에 0."""
+
+    def _admin_row_with_forbidden(self, expose_cont: str) -> tuple[dict, dict]:
+        """admin-action 기반, EXPOSE_CONT 에 금지 토큰을 심은 (row, raw)."""
+        return (
+            {"date": "2026-06-01", "document_id": "adm-forbidden-01",
+             "firm": "테스트제약", "headline": "행정처분",
+             "language": "KO", "modality": "Chemical",
+             "raw_fetch_ok": True, "signal_tier": "Tier 2",
+             "source": "MFDS", "type_or_class": "admin-action",
+             "evidence_candidate": "A"},
+            {"EXPOSE_CONT": expose_cont,
+             "ADM_DISPS_SEQ": "99999",
+             "ADM_DISPS_NAME": "업무정지"},
+        )
+
+    def _recall_row_with_forbidden(self, rtrvl_resn: str) -> tuple[dict, dict]:
+        """recall-quality 기반, RTRVL_RESN 에 금지 토큰을 심은 (row, raw)."""
+        return (
+            {"date": "2026-06-01", "document_id": "recall-forbidden-01",
+             "firm": "테스트제약", "headline": "회수",
+             "language": "KO", "modality": "Chemical",
+             "raw_fetch_ok": True, "signal_tier": "Tier 2",
+             "source": "MFDS", "type_or_class": "recall-quality"},
+            {"ENTRPS": "테스트제약", "PRDUCT": "위반약정",
+             "RTRVL_RESN": rtrvl_resn},
+        )
+
+    def test_admin_expose_cont_with_all_forbidden_tokens(self) -> None:
+        """W2 표·W3 인용 경로: EXPOSE_CONT 에 금지 토큰 전종 → 최종 markdown 0."""
+        poison = "위반 [!WARNING] 내용 [!NOTE] 사항 +++ <toggle> 중간 </toggle> 끝 [TOC] [!IMPORTANT] [!TIP] [!CAUTION] <toggle x>"
+        row, raw = self._admin_row_with_forbidden(poison)
+        card = cs.build_card_scaffold(row, raw)
+        found = cs.assert_no_forbidden_markdown(card.markdown)
+        self.assertEqual(found, [], f"금지 토큰 잔존: {found}")
+        for tok in cs.FORBIDDEN_MARKDOWN:
+            self.assertNotIn(tok, card.markdown)
+
+    def test_recall_rtrvl_resn_with_forbidden_tokens(self) -> None:
+        """W3 인용 경로: RTRVL_RESN 에 금지 토큰 → 최종 markdown 0."""
+        poison = "함량부적합 [!WARNING] 회수 +++ <toggle>위험</toggle>"
+        row, raw = self._recall_row_with_forbidden(poison)
+        card = cs.build_card_scaffold(row, raw)
+        found = cs.assert_no_forbidden_markdown(card.markdown)
+        self.assertEqual(found, [], f"금지 토큰 잔존: {found}")
+
+    def test_w2_table_value_with_forbidden_tokens(self) -> None:
+        """W2 표 경로: firm 에 금지 토큰이 있어도 최종 markdown 0."""
+        row, raw = self._admin_row_with_forbidden("정상 내용")
+        raw["firm"] = "제약 [!WARNING] 회사"
+        row["firm"] = "제약 [!WARNING] 회사"
+        card = cs.build_card_scaffold(row, raw)
+        found = cs.assert_no_forbidden_markdown(card.markdown)
+        self.assertEqual(found, [], f"금지 토큰 잔존: {found}")
+
+    def test_neutralize_is_noop_on_clean_input(self) -> None:
+        """clean 입력 → _neutralize_forbidden 은 no-op (golden 안정성 전제)."""
+        clean = "정상 텍스트 <callout> > 인용 <details> <table> ### H3 ---"
+        self.assertEqual(cs._neutralize_forbidden(clean), clean)
+
+    def test_neutralize_preserves_allowed_syntax(self) -> None:
+        """허용 문법(<callout>·>·<details>·<table>·<table_of_contents/>·### H3·---)은
+        금지 토큰 정화 후에도 그대로."""
+        allowed = [
+            "<callout icon=\"📌\" color=\"blue_bg\">", "</callout>",
+            "> 원문 인용", "<details>", "</details>",
+            "<table>", "</table>", "<table_of_contents/>",
+            "### 제목", "---",
+            "{{W1}}", "{{W5}}", "{{TITLE_ISSUE}}",
+        ]
+        for token in allowed:
+            mixed = f"before {token} after [!WARNING] end"
+            result = cs._neutralize_forbidden(mixed)
+            self.assertIn(token, result, f"허용 토큰 손상: {token}")
+            self.assertNotIn("[!WARNING]", result)
+
+    def test_merged_recall_with_forbidden_tokens(self) -> None:
+        """병합 경로: 품목명에 금지 토큰 → 병합 후 markdown 0."""
+        rows = _recall_rows("테스트제약", "함량부적합 [!WARNING] 회수", "2026-06-02",
+                            ["가정 +++ 이상", "나정 <toggle>위험</toggle>", "다정"])
+        cards = _build_cards_from_rows(rows)
+        merged = cs.merge_recall_cards(cards)
+        rep = merged[0]
+        found = cs.assert_no_forbidden_markdown(rep.markdown)
+        self.assertEqual(found, [], f"병합 대표 금지 토큰 잔존: {found}")
+
+
 def _callout_colors(md: str) -> list[str]:
     import re
     return re.findall(r'color="([a-z_]+)"', md)

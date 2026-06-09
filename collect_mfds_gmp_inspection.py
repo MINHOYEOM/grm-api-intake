@@ -46,7 +46,7 @@ LAST_HEALTH: dict[str, Any] = {}
 
 _NO_DEFICIENCY_RE = re.compile(
     r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*없음|"
-    r"지적\s*사항\s*없음|보완\s*사항\s*없음|이상\s*없음)"
+    r"지적\s*사항\s*없음|보완\s*사항\s*없음)"
 )
 _DEFICIENCY_PRESENT_RE = re.compile(
     r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*있음|"
@@ -262,10 +262,12 @@ def _assess_deficiency(text: str) -> str:
     compact = re.sub(r"\s+", " ", text or "").strip()
     if not compact:
         return "unknown"
-    if _NO_DEFICIENCY_RE.search(compact):
-        return "none"
-    if _DEFICIENCY_PRESENT_RE.search(compact):
+    has_present = _DEFICIENCY_PRESENT_RE.search(compact)
+    has_none = _NO_DEFICIENCY_RE.search(compact)
+    if has_present:
         return "present"
+    if has_none:
+        return "none"
     if "Deficiencies" in compact and "없음" not in compact:
         return "present"
     return "unknown"

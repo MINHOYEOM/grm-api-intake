@@ -48,10 +48,17 @@ _NO_DEFICIENCY_RE = re.compile(
     r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*없음|"
     r"지적\s*사항\s*없음|보완\s*사항\s*없음)"
 )
+# present 는 헤더 근접 '분류 명사'만으로 판정하지 않는다(B3): 표지/목차 보일러플레이트
+# '제조소 (일반)현황' 의 '제조' 가 .{0,80} 창에 걸려 정상 보고서가 Tier 3 로 오승격됐다.
+# ① 명사 '제조' 는 '제조소' 를 제외한 형태만(제조 공정·제조위생 등 finding 본문),
+# ② 명사 매칭 뒤 60자 내 판정 어휘(있음·미흡·부적합·불(적)합·일탈·N건) 동반을 요구.
+# 판정 불충분이면 unknown → manual_review_required 경고 경로(과승격보다 안전).
 _DEFICIENCY_PRESENT_RE = re.compile(
-    r"(지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?\s*있음|"
-    r"지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?.{0,80}"
-    r"(품질경영|시설장비|제조|시험실|원자재|포장표시|허가관리|위탁|밸리데이션))",
+    r"지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?"
+    r"(?:\s*있음"
+    r"|.{0,30}?\d+\s*건"
+    r"|.{0,80}(?:품질경영|시설장비|제조(?!소)|시험실|원자재|포장표시|허가관리|위탁|밸리데이션)"
+    r".{0,60}?(?:있음|미흡|부적합|불\s*적?\s*합|일탈|\d+\s*건))",
     re.S,
 )
 # 표지·개요(제조소 현황·실사 개요)를 건너뛰고 '평가 결과 지적(보완)사항' 결론
@@ -275,8 +282,9 @@ def _assess_deficiency(text: str) -> str:
         return "none"
     if _DEFICIENCY_PRESENT_RE.search(compact):
         return "present"
-    if "Deficiencies" in compact and "없음" not in compact:
-        return "present"
+    # 종전 fallback("Deficiencies" 존재 + 어디에도 '없음' 없음 → present)은 B3 와
+    # 동일한 오승격 경로(헤더만 있는 정상/영문 보고서를 Tier 3 로) — 제거.
+    # 판정 근거 불충분은 unknown → manual_review_required 로 사람이 본다.
     return "unknown"
 
 
@@ -287,6 +295,13 @@ def _extract_pdf_text(data: bytes) -> tuple[str, str]:
         return "", "pdf-parser-missing"
     try:
         with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                # C4: 잠긴 PDF 는 scan-no-text/parse-fail 로 오라벨하지 않는다 —
+                # 라우팅은 동일(unknown→manual_review)이나 수동 확인 메시지의
+                # 진단이 '스캔본'이 아니라 '암호화'를 가리키게 정정.
+                # (owner-pw 만 걸린 열람 가능 PDF 는 fitz 가 자동 해제해
+                # 둘 다 False — 본문 추출 경로 유지.)
+                return "", "pdf-encrypted"
             text = "\n".join(page.get_text("text") for page in doc)
     except Exception as e:
         return "", f"pdf-parse-fail:{type(e).__name__}"

@@ -746,6 +746,15 @@ _TRANSIENT_ERROR_MARKERS = [
 ]
 _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
 _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {"mfds-recall", "mfds-admin"}
+# ICH/WHO/HC 도 외부 공개 endpoint(admin.ich.org · extranet.who.int · recalls-rappels.canada.ca
+# 정적 JSON)라 GitHub-hosted IP 간헐 차단·timeout·5xx 가 발생한다. 네트워크성 일시 오류는 MFDS
+# 공개 endpoint 와 동일하게 warning(exit 0)으로 강등 — 설정·구조 오류는 마커 미포함이라 여전히
+# failure. 2026-06-05 활성화 때 누락된 스코프 확장(T1).
+_GLOBAL_PUBLIC_SOURCE_CODES = {"ich", "who", "health-canada"}
+_TRANSIENT_ELIGIBLE_SOURCE_CODES = _MFDS_FEATURE_SOURCE_CODES | _GLOBAL_PUBLIC_SOURCE_CODES
+# 403 transient 적격: 키 없는 공개 endpoint 만(WAF/IP 차단성). data.go.kr API 403 은
+# 키/서비스 권한 문제 가능성이 높아 failure 유지.
+_PUBLIC_ENDPOINT_403_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | _GLOBAL_PUBLIC_SOURCE_CODES
 
 
 def _is_transient_source_error(code: str, detail: str) -> bool:
@@ -753,13 +762,14 @@ def _is_transient_source_error(code: str, detail: str) -> bool:
     text = (detail or "").lower()
     if not text or "환경변수 필요" in text or "api key" in text or "service_key" in text:
         return False
-    if code not in _MFDS_FEATURE_SOURCE_CODES:
+    if code not in _TRANSIENT_ELIGIBLE_SOURCE_CODES:
         return False
     if any(marker in text for marker in _TRANSIENT_ERROR_MARKERS):
         return True
-    # MFDS/nedrug public HTML/RSS endpoints can intermittently block GitHub-hosted IPs.
-    # Keep data.go.kr API 403s as failures because they usually mean key/service permission.
-    if code in _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES and (
+    # MFDS/nedrug·ICH/WHO/HC public HTML/RSS endpoints can intermittently block
+    # GitHub-hosted IPs. Keep data.go.kr API 403s as failures because they usually
+    # mean key/service permission.
+    if code in _PUBLIC_ENDPOINT_403_SOURCE_CODES and (
         "http 403" in text or "403 forbidden" in text or "403 client error" in text
     ):
         return True

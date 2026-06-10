@@ -30,7 +30,7 @@ import re
 import time
 from datetime import date
 from html.parser import HTMLParser
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 from grm_common import http_get_html, log
 from collect_intake import (
@@ -179,6 +179,10 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
             pub = _rss_text(node.find("pubDate")) or _rss_text(node.find("pubdate"))
             date_iso = _parse_rss2_date(pub) if pub else ""
             desc = _rss_text(node.find("description"))
+            # C3-a: WHO Drupal RSS2 description 은 raw HTML(<p>/<a href=…>) —
+            # exclusion/relevance/body 에 태그가 그대로 흘러 잡음·오판 소지.
+            # Atom summary 는 텍스트라 RSS2 분기만 태그 제거.
+            desc = re.sub(r"<[^>]+>", " ", desc)
         title = _clean(title)
         if not title or not _within_window(date_iso, start, end):
             continue
@@ -224,8 +228,10 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 log("WARN", f"WHOPIR page={page} 실패(부분 수집 유지): {e}")
                 break
             return [], f"WHO WHOPIR 수집 실패: {e}"
+        # C3-b: ".pdf?download=1"/"#…" 꼬리가 붙어도 PDF — path 만 검사(endswith 는 탈락시킴).
         page_links = [(h, t) for h, t in _links(html_text)
-                      if "/whopir_files/" in h.lower() and h.lower().endswith(".pdf")]
+                      if "/whopir_files/" in h.lower()
+                      and urlsplit(h).path.lower().endswith(".pdf")]
         if not page_links:
             break  # 더 이상 보고서 없음 → 페이지네이션 종료
         new_on_page = 0
@@ -270,6 +276,12 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
 
 # ── 3) NOC (Notice of Concern) ────────────────────────────────────────────────
 _NODE_RE = re.compile(r"/prequal/node/\d+")
+# B4: Drupal 이 /node/N 대신 path alias 를 쓰게 되는 드리프트 대비 — 'notice' 를
+# 포함한 /prequal/ 경로도 후보로 수용. nav 의 'Notice of Concern' 메뉴류는 연도
+# 게이트(항목 텍스트의 연도)가 걸러주므로 과수집 위험 낮음(2026-06-10 라이브 확인:
+# 연도 텍스트 앵커 = NOC 엔트리뿐, nav 'notice' 링크들은 전부 연도 없음).
+_NOC_ALIAS_RE = re.compile(r"/prequal/[^\s\"'<>]*notice", re.I)
+_YEAR_TEXT_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 
 
 def _collect_noc(run_date: date) -> tuple[list[IntakeItem], str | None]:
@@ -281,16 +293,19 @@ def _collect_noc(run_date: date) -> tuple[list[IntakeItem], str | None]:
 
     items: list[IntakeItem] = []
     seen: set[str] = set()
-    for href, text in _links(html_text):
-        if not _NODE_RE.search(href):
+    seen_texts: set[str] = set()
+    links = _links(html_text)
+    for href, text in links:
+        if not (_NODE_RE.search(href) or _NOC_ALIAS_RE.search(href)):
             continue
         t = _clean(text)
-        if not t or not re.search(r"\b\d{4}\b", t):   # NOC 항목은 텍스트에 연도 포함
+        if not t or not _YEAR_TEXT_RE.search(t):   # NOC 항목은 텍스트에 연도 포함(nav 메뉴 배제)
             continue
         abs_url = urljoin(NOC_MED_URL, href)          # 상대경로 → 절대 URL
-        if abs_url in seen:
+        if abs_url in seen or t in seen_texts:        # node+alias 가 같은 NOC 가리킴 대비
             continue
         seen.add(abs_url)
+        seen_texts.add(t)
         items.append(IntakeItem(
             source=SOURCE_WHO,
             document_id="who-noc-" + hashlib.sha1((abs_url + "|" + t).encode()).hexdigest()[:12],
@@ -311,7 +326,23 @@ def _collect_noc(run_date: date) -> tuple[list[IntakeItem], str | None]:
             language=LANGUAGE_EN,
             region_jurisdiction=REGION_WHO,
         ))
-    # NOC 는 0건이 정상일 수 있다(현재 미해결 NOC 없음). 단, 페이지 자체를 못 읽으면 위에서 error.
+    if not items:
+        # B4 구조 sentinel: '선택자 전건 탈락'과 '진짜 빈 목록'을 구분해 침묵 0건 금지.
+        # NOC = Tier 3 최고신호(GMP 비순응)라 조용한 누락이 가장 위험하다.
+        prequal_hrefs = [h for h, _ in links if "/prequal/" in h]
+        if not prequal_hrefs:
+            return [], (f"WHO NOC 페이지 렌더 이상(prequal 앵커 0, {NOC_MED_URL}) "
+                        "— 구조/렌더 변경 의심(수동 확인 필요)")
+        stray_year_anchors = [
+            h for h, t in links
+            if ("/prequal/" in h or "node/" in h.lower())
+            and _YEAR_TEXT_RE.search(_clean(t))
+        ]
+        if stray_year_anchors:
+            return [], (f"WHO NOC 선택자 0건 — 연도 텍스트 콘텐츠 앵커 "
+                        f"{len(stray_year_anchors)}건이 패턴(/prequal/node/N·notice 별칭) "
+                        f"밖({NOC_MED_URL}) — URL 스킴 변경 의심(수동 확인 필요)")
+        # 페이지 정상 렌더 + 연도 콘텐츠 앵커 자체가 없음 = 진짜 빈 목록 → 0건 정상.
     log("INFO", f"WHO NOC 완료: {len(items)}건")
     return items, None
 
@@ -320,7 +351,10 @@ def collect_who(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """WHO 수집 진입점. (items, error_msg).
 
     - WHOPIR(핵심) 0건/실패 또는 RSS 실패는 error 로 올린다.
-    - NOC 0건은 정상(현재 미해결 NOC 없음 가능). NOC 페이지 자체 실패는 error.
+    - NOC 진짜 0건(빈 목록)은 정상. 단 페이지 실패·렌더 이상·선택자 전건 탈락은
+      sentinel 이 error 로 올린다(B4) — NOC 도 core: Tier 3 최고신호의 침묵 누락 금지.
+      네트워크성 블립은 health 단계에서 transient warning 강등(T1)이라 core 승격이
+      일시 오류로 run 을 red 로 만들지 않는다.
     - 부분 실패라도 수집분은 반환(graceful), 단 핵심 실패 시 error 동반.
     """
     items: list[IntakeItem] = []
@@ -329,7 +363,7 @@ def collect_who(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     seen: set[str] = set()
 
     for fn, core in ((_collect_rss, True), (lambda s, e: _collect_whopir(end), True),
-                     (lambda s, e: _collect_noc(end), False)):
+                     (lambda s, e: _collect_noc(end), True)):
         try:
             part, err = fn(start, end)
         except Exception as e:  # noqa: BLE001

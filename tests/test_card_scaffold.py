@@ -203,6 +203,39 @@ class BriefSkeletonTest(unittest.TestCase):
         self.assertFalse(any(ln.startswith("## ") for ln in md.splitlines()))
 
 
+class NegDateSortKeyTest(unittest.TestCase):
+    """C1 — _neg_date 정수 튜플 키: 비ASCII date 무크래시 + ASCII 순서 동치.
+
+    종전 chr(255-ord) 문자열 키는 ord>255(한글 등) date 에서 chr(음수) ValueError
+    로 _sort_key→assemble_brief_skeleton 전체를 중단시켰다. date 는 row.get("date")
+    무검증 유입이라 입력 기인 크래시였다.
+    """
+
+    def test_ascii_order_identical_to_legacy_chr_key(self) -> None:
+        def legacy(d: str) -> str:  # 종전 키(레퍼런스, ASCII 전용)
+            return "".join(chr(255 - ord(ch)) for ch in d) if d else "\xff"
+        dates = ["2026-06-08", "2026-06-01", "2025-12-31", "", "2026-06-08",
+                 "2026-1-2", "2026-06"]   # 중복·빈 값·prefix 변형 포함
+        self.assertEqual(sorted(dates, key=legacy),
+                         sorted(dates, key=cs._neg_date))
+        # 의미 자체도 고정: 큰 날짜 먼저(desc), 빈 date 최후순.
+        self.assertEqual(
+            sorted(["2026-06-01", "", "2026-06-08", "2025-12-31"],
+                   key=cs._neg_date),
+            ["2026-06-08", "2026-06-01", "2025-12-31", ""])
+
+    def test_non_ascii_date_does_not_crash_skeleton(self) -> None:
+        fx = _load_input("guidance_fr")
+        bad_row = dict(fx["row"])
+        bad_row["date"] = "이천이십육년 유월"          # 종전: ValueError 크래시
+        bad_row["document_id"] = "fr-nonascii-date"
+        cards = [cs.build_card_scaffold(bad_row, fx["raw"]),
+                 cs.build_card_scaffold(dict(fx["row"]), fx["raw"])]
+        page = cs.assemble_brief_skeleton(cards)
+        self.assertIsInstance(page, str)
+        self.assertIn("<table_of_contents/>", page)   # 정상 조립까지 완주
+
+
 def _build_cards_from_rows(rows: list[dict]) -> list:
     return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
 
@@ -335,6 +368,34 @@ class MergeRecallCardsTest(unittest.TestCase):
                             ["가정", "나정", "다정"])
         rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
         self.assertEqual(rep.prose_input["product"], "가정, 나정, 다정")
+
+    def test_c2_blank_member_counts_unified_to_named(self) -> None:
+        # C2: 멤버 1건 빈 PRDUCT → 제목/W2/toggle summary/merged_count 전부
+        # 비공란 수(2)로 일치 — 종전 "전체 품목 (3)" vs 불릿 2개 불일치 차단.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["가정", "", "다정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        md = rep.markdown
+        self.assertIn("<summary>전체 품목 (2)</summary>", md)
+        self.assertNotIn("전체 품목 (3)", md)
+        bullets = [ln for ln in md.splitlines() if ln.startswith("- ")]
+        self.assertEqual(len(bullets), 2)                       # summary 수 == 불릿 수
+        self.assertIn("가정 외 1품목", md)                       # 제목·W2 의 '외 N'
+        self.assertNotIn("외 2품목", md)
+        self.assertEqual(rep.prose_input["merged_count"], 2)
+        self.assertEqual(rep.prose_input["product"], "가정, 다정")
+
+    def test_c2_blank_representative_counts_named_only(self) -> None:
+        # C2 경계: 대표(card_id 첫) 자신이 빈 PRDUCT — '외 N' = 비공란 전체 수.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["", "나정", "다정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        md = rep.markdown
+        self.assertIn("<summary>전체 품목 (2)</summary>", md)
+        bullets = [ln for ln in md.splitlines() if ln.startswith("- ")]
+        self.assertEqual(len(bullets), 2)
+        self.assertIn("한국제약(주) 외 2품목", md)               # 대표 품목명 없이
+        self.assertEqual(rep.prose_input["merged_count"], 2)
 
     def test_merged_title_truncates_at_60(self) -> None:
         # R1-c: 구두점 없는 60자 초과 핵심대상 — _truncate_at_sentence 경계 동작 스냅샷.

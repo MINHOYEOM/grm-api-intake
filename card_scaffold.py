@@ -765,14 +765,18 @@ def _merge_items_toggle(items: list[str], total: int) -> str:
 
 
 def _render_merged_recall(rep_markdown: str, entrps: str, rep_product: str,
-                          items: list[str], n: int) -> str:
-    """대표 카드 markdown 을 병합 렌더로 변형(§14 D). W3/W5/W6/W7/W8 은 대표 그대로."""
+                          items: list[str], n: int, total: int) -> str:
+    """대표 카드 markdown 을 병합 렌더로 변형(§14 D). W3/W5/W6/W7/W8 은 대표 그대로.
+
+    C2: toggle 표기 수(total)는 호출부가 비공란 품목 수로 산출해 넘긴다 —
+    종전 n+1(=멤버수)은 빈 PRDUCT 멤버 시 불릿 수(빈 항목 제외)와 불일치.
+    """
     blocks = rep_markdown.split("\n\n")
     blocks[0] = _merge_title_target(blocks[0], entrps, rep_product, n)
     for i, blk in enumerate(blocks):
         if blk.startswith("<table>"):
             blocks[i] = _merge_w2_product(blk, rep_product, n)
-            blocks.insert(i + 1, _merge_items_toggle(items, n + 1))
+            blocks.insert(i + 1, _merge_items_toggle(items, total))
             break
     return _neutralize_forbidden("\n\n".join(blocks))
 
@@ -798,14 +802,18 @@ def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
         members = sorted(idxs, key=lambda i: cards[i].card_id)  # 대표 = card_id 오름차순 첫
         rep_idx = members[0]
         rep = cards[rep_idx]
-        n = len(members) - 1
         items = [cards[i].prose_input.get("product", "") for i in members]
+        # C2: 표시 수는 전부 비공란 품목 수에서 일원 파생 — 종전 멤버수 기반은
+        # 빈 PRDUCT 멤버 시 "전체 품목 (3)" vs 불릿 2개 식의 불일치를 만들었다.
+        named = [it for it in items if it]
         rep_product = rep.prose_input.get("product", "")
+        n = len(named) - 1 if rep_product else len(named)   # 제목/W2 의 "외 N품목"
         entrps = rep.prose_input.get("firm_or_product", "")
-        merged_md = _render_merged_recall(rep.markdown, entrps, rep_product, items, n)
+        merged_md = _render_merged_recall(rep.markdown, entrps, rep_product,
+                                          named, n, len(named))
         new_prose = dict(rep.prose_input)
-        new_prose["product"] = _merged_product_field(items, rep_product, n)
-        new_prose["merged_count"] = n + 1
+        new_prose["product"] = _merged_product_field(named, rep_product, n)
+        new_prose["merged_count"] = len(named)
         out[rep_idx] = replace(rep, markdown=merged_md, prose_input=new_prose)
         for i in members[1:]:
             out[i] = replace(cards[i], merged_into=rep.card_id)
@@ -819,14 +827,19 @@ _TIER_ORDER = {"Tier 3": 0, "Tier 2": 1, "Tier 1": 2}
 _SECTION_ORDER = ["global", "domestic", "watch", "recall_table"]
 
 
-def _sort_key(c: CardScaffold) -> tuple[int, str]:
+def _sort_key(c: CardScaffold) -> tuple[int, tuple[int, ...]]:
     # Signal Tier 3→2→1, 동급 발행일 desc (§7)
     return (_TIER_ORDER.get(c.signal_tier, 9), _neg_date(c.date))
 
 
-def _neg_date(d: str) -> str:
-    # desc 정렬용 — 큰 날짜가 먼저. 문자열 역순 키.
-    return "".join(chr(255 - ord(ch)) for ch in d) if d else "\xff"
+def _neg_date(d: str) -> tuple[int, ...]:
+    # desc 정렬용 — 큰 날짜가 먼저(ascending 정렬에 끼우는 역순 키).
+    # 종전 chr(255-ord) 문자열 키는 비ASCII date(한글 등, ord>255)에서 chr(음수)
+    # ValueError 로 _sort_key→assemble_brief_skeleton 전체를 중단시켰다(C1).
+    # -ord 정수 튜플은 ASCII 에서 종전과 비교 순서 동치(둘 다 ord 의 강감소 사상,
+    # prefix 단축 비교도 동일)이고 전 유니코드에서 안전. 빈 date 의 (0,) 은
+    # 모든 실제 키(-ord<0 시작)보다 뒤 — 종전 "\xff" 와 동일하게 최후순.
+    return tuple(-ord(ch) for ch in d) if d else (0,)
 
 
 def _ordered_cards_with_groups(

@@ -66,6 +66,42 @@ class TestDeficiencyExcerpt(unittest.TestCase):
         self.assertEqual(g._assess_deficiency(_FULL_PRESENT), "present")
         self.assertEqual(g._assess_deficiency(_FULL_NONE), "none")
 
+    def test_present_wins_over_incidental_no_deficiency(self):
+        """실제 지적 + 부수적 '이상 없음' 공존 → present (A1 수정 검증)."""
+        text = (
+            "- 1 - 의약품 제조소 GMP 정기실태조사(정기실사) 결과 "
+            "제조소 현황(Name & full address of the Inspected site) "
+            "제조소명: 테스트제약(주) 소재지: 서울특별시 "
+            "실태조사 개요(Overview of the inspection) 실사 목적: 정기 "
+            "평가 결과 지적(보완)사항(Deficiencies) "
+            "제조 공정 일탈 발견 보완 필요 설비 외관 이상 없음"
+        )
+        self.assertEqual(g._assess_deficiency(text), "present")
+
+    def test_incidental_no_deficiency_only_stays_none(self):
+        """지적 단서 없이 '이상 없음'만 있는 정상 보고서 → none (과교정 방지)."""
+        text = (
+            "평가 결과 지적(보완)사항(Deficiencies) 없음 "
+            "설비 외관 이상 없음"
+        )
+        self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_b3_none_then_header_stays_none(self):
+        """결론 '없음' 뒤 '제조소 현황' 헤더의 '제조' 오승격 차단 (B3 잠금)."""
+        text = (
+            "평가 결과 지적(보완)사항(Deficiencies) 없음 "
+            "제조소 현황 제조소명: 정상제약(주)"
+        )
+        self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_b3_none_then_general_header_stays_none(self):
+        """결론 '없음' 뒤 '제조소 일반현황' 헤더 변형도 none 유지 (B3 잠금)."""
+        text = (
+            "평가 결과 지적(보완)사항(Deficiencies) 없음 "
+            "제조소 일반현황 제조소명: 정상제약(주)"
+        )
+        self.assertEqual(g._assess_deficiency(text), "none")
+
 
 if __name__ == "__main__":
     unittest.main()

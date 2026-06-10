@@ -102,6 +102,43 @@ class TestDeficiencyExcerpt(unittest.TestCase):
         )
         self.assertEqual(g._assess_deficiency(text), "none")
 
+    def test_b3_header_then_boilerplate_without_verdict_not_present(self):
+        """'없음' 앵커조차 없는 정상 보고서: 헤더+보일러플레이트만 → present 금지 (B3).
+
+        '제조소 (일반)현황' 의 '제조' 가 80자 창에 걸리던 오탐과,
+        "Deficiencies 존재+'없음' 부재 → present" fallback 오탐을 함께 잠근다.
+        판정 근거가 없으므로 unknown(→ manual_review_required)으로 떨어져야 한다.
+        """
+        cases = [
+            "평가 결과 지적(보완)사항(Deficiencies) 제조소 일반현황 표.",
+            "목차 1. 제조소 현황 2. 실태조사 개요 "
+            "3. 지적(보완)사항(Deficiencies) 4. 제조소 일반현황",
+            "지적(보완)사항 다음 페이지: 제조소 현황",
+        ]
+        for text in cases:
+            with self.subTest(text=text[:40]):
+                self.assertNotEqual(g._assess_deficiency(text), "present")
+                self.assertEqual(g._assess_deficiency(text), "unknown")
+
+    def test_b3_real_findings_with_verdict_stay_present(self):
+        """실제 지적(판정어 동반)은 형태별로 present 유지 (B3 과교정 방지)."""
+        cases = [
+            # 분류 명사 + 판정어(미흡)
+            "평가 결과 지적(보완)사항(Deficiencies) 품질경영 기타 [별표 1] "
+            "제1.2호 오염관리전략 수립 미흡",
+            # '제조' 비-제조소 형태 + 판정어(일탈)
+            "평가 결과 지적(보완)사항(Deficiencies) 제조 공정 일탈 발견 보완 필요",
+            # 명시적 '있음'
+            "지적(보완)사항 있음",
+            # 건수 직접 표기
+            "지적(보완)사항(Deficiencies) 총 3건",
+            # 분류 명사 + N건
+            "지적(보완)사항 허가관리 변경허가 미신청 1건",
+        ]
+        for text in cases:
+            with self.subTest(text=text[:40]):
+                self.assertEqual(g._assess_deficiency(text), "present")
+
 
 if __name__ == "__main__":
     unittest.main()

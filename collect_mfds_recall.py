@@ -183,14 +183,8 @@ def collect_mfds_recall(
         if not raw_items:
             break
 
-        page_dates: list[date] = []
         for raw in raw_items:
             date_iso = _item_date(raw)
-            if date_iso:
-                try:
-                    page_dates.append(date.fromisoformat(date_iso))
-                except ValueError:
-                    pass
             if not _within_window(date_iso, start, end):
                 continue
             item = _to_item(raw, masked_url)
@@ -199,8 +193,12 @@ def collect_mfds_recall(
             seen_ids.add(item.document_id)
             items.append(item)
 
-        if page_dates and max(page_dates) < start:
-            break
+        # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다.
+        # 요청에 order 미지정(admin 의 order:Y 와 달리 미검증)이므로, 날짜 기반 조기중단
+        # (max(page_dates) < start)을 제거하고 totalCount 종료에만 의존한다. API 기본
+        # 정렬이 오름차순/미정의여도 page 1 의 과거 행으로 인해 후속 페이지 최신 회수를
+        # 누락하지 않게 한다(admin 과 동일하게 totalCount/빈 페이지로만 종료). 윈도우 밖
+        # 항목은 위 _within_window 로 걸러지므로 MAX_PAGES 내 추가 순회만 비용.
         if total_count and response_page * num_rows >= total_count:
             break
         page_no += 1

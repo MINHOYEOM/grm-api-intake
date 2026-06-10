@@ -192,7 +192,7 @@ def _to_item(
     # 상세 페이지 보강(필터 통과 항목에만 — 네트워크 절약). 실패 시 {} (피드 단독).
     detail = detail_fetcher(url) if detail_fetcher else {}
     ingredient = detail.get("strength", "")        # 유효성분·함량(생물 원료 단서)
-    dosage_form = detail.get("dosage_form", "")
+    dosage_form = detail.get("dosage form", "")   # 파서 키 = label.lower() — 공백 유지
     firm = _detail_company(detail)                 # 실제 회사만; Organization 은 회사 아님
 
     blob = f"{title} {product} {issue} {ingredient}".lower()

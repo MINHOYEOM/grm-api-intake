@@ -7,6 +7,7 @@ from collect_intake import (
     compute_relevance,
     compute_signal_tier,
 )
+from collect_mfds_admin_action import _is_collectable as _admin_is_collectable
 from collect_mfds_gmp_inspection import _is_medical_gas_gmp_noise
 
 
@@ -313,6 +314,84 @@ class MfdsGmpNoiseFilterTest(unittest.TestCase):
                         }
                     )
                 )
+
+
+class MfdsGmpGasOverExclusionTest(unittest.TestCase):
+    """A6: 한글 '가스' 부분문자열 과배제 차단(토큰경계 매칭).
+
+    바 '가스'가 '메가스터디제약'(메[가스]터디)·'한국가스공사 자회사 제약'(가스[공사])을
+    의료가스 노이즈로 오배제하던 결함. '가스' 뒤에 한글이 없을 때만 가스 제조사로 본다.
+    """
+
+    def test_megastudy_pharma_is_not_gas_noise(self) -> None:
+        # '메가스터디제약' — '가스' 뒤에 한글('터')이 이어짐 → 가스 제조사 아님(수집 유지).
+        self.assertFalse(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "메가스터디제약", "address": "서울특별시",
+                 "product_type": "완제"}
+            )
+        )
+
+    def test_gas_corp_subsidiary_pharma_is_not_gas_noise(self) -> None:
+        # '한국가스공사 자회사 제약' — '가스' 뒤 '공' → 어중 토큰 → 과배제 금지(수집 유지).
+        self.assertFalse(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "한국가스공사 자회사 제약", "address": "경기도",
+                 "product_type": "완제"}
+            )
+        )
+
+    def test_industrial_gas_suffix_company_still_noise(self) -> None:
+        # 회귀: '○○산업가스'(가스 접미사 토큰)는 여전히 의료가스 노이즈로 제외.
+        for manufacturer in ("대성산업가스", "밀성산업가스", "○○가스(주)"):
+            with self.subTest(manufacturer=manufacturer):
+                self.assertTrue(
+                    _is_medical_gas_gmp_noise(
+                        {"manufacturer": manufacturer, "address": "충청북도",
+                         "product_type": "완제"}
+                    )
+                )
+
+    def test_real_gas_via_context_term_still_noise(self) -> None:
+        # 회귀: 가스 접미사 없는 사명이라도 product_type 맥락어(의료용 고압가스)면 제외 유지.
+        self.assertTrue(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "동방메디칼", "address": "경기도",
+                 "product_type": "의료용 고압가스"}
+            )
+        )
+
+
+class MfdsAdminActionPurifiedWaterTest(unittest.TestCase):
+    """A5: 행정처분 collectability 게이트의 '정제수'→'정제' 오탐 차단.
+
+    바 '정제'(tablet) 가 '정제수'(purified water·비의약품)를 부분매칭해 비의약품
+    행정처분이 false positive 로 Intake 에 유입되던 누수. compute_modality 의
+    haystack.replace("정제수","") 가드를 collectability 게이트에도 전파했다.
+    """
+
+    def test_purified_water_nonpharma_is_not_collectable(self) -> None:
+        # 비의약품(손소독제) + 화장품 등 명시 저가치어 없음 + Tier3 처분어 없음(판매업무정지는
+        # ADMIN_TIER3_TERMS 미포함) → collectability 가 오직 pharma rescue 에 달림. '정제수'가
+        # 유일한 '정제' 부분문자열 출처가 되도록 구성('세정제'는 자체에 '정제' 포함 → 회피)해
+        # 정제수 제거 경로만 격리 검증한다. 가드 없으면 '정제' 오매칭으로 수집(누수).
+        raw = {
+            "ITEM_NAME": "정제수 기반 손소독제",
+            "EXPOSE_CONT": "정제수를 원료로 한 위생용품 표시 위반",
+            "ADM_DISPS_NAME": "판매업무정지",
+        }
+        self.assertFalse(_admin_is_collectable(raw))
+
+    def test_real_tablet_drug_admin_action_is_still_collectable(self) -> None:
+        # 회귀: 실제 '정제'(tablet) 의약품은 여전히 수집 유지. 처분어가 Tier3 가 아니어도
+        # pharma rescue('정제')만으로 collectable 이어야 한다(정제수 제거가 진짜 '정제'
+        # 단서를 깨면 안 됨 — '정제수' 부분문자열만 제거).
+        raw = {
+            "ITEM_NAME": "세파클러정제",
+            "EXPOSE_CONT": "표시기재 위반",
+            "ADM_DISPS_NAME": "판매업무정지",
+        }
+        self.assertTrue(_admin_is_collectable(raw))
 
 
 if __name__ == "__main__":

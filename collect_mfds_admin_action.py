@@ -161,13 +161,16 @@ def _tier_text(raw: dict[str, Any]) -> str:
 
 
 def _pharma_text(raw: dict[str, Any]) -> str:
+    # rescue 검사용 haystack. 바 '정제'(tablet) 가 '정제수'(purified water·비의약품)를
+    # 부분매칭하지 않도록 '정제수'를 선제거한다(compute_modality 의 haystack.replace
+    # ("정제수","") 와 동형 — 다른 rescue term(주사·캡슐 등)에는 영향 없음).
     return "\n".join(
         [
             _text(raw, "ITEM_NAME"),
             _text(raw, "EXPOSE_CONT"),
             _text(raw, "ADM_DISPS_NAME"),
         ]
-    ).lower()
+    ).lower().replace("정제수", "")
 
 
 def _has_actionable_signal(raw: dict[str, Any]) -> bool:

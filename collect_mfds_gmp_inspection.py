@@ -68,10 +68,9 @@ _DEFICIENCY_EXCERPT_PATTERNS = (
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
 # 한국어 단서는 substring, 영문 브랜드는 단어 경계(\b) 매칭 — "linde"가
 # "Lindenberg Pharma" 같은 무관 업체명에 오탐하는 것을 방지.
-# 단독 "수소"/"밀성산업"/"대성산업"은 제거: "가스"·전체 상호("한국수소" 등)로 충분하며
+# 단독 "수소"/"밀성산업"/"대성산업"은 제거: 전체 상호("한국수소" 등)·"가스" 토큰경계로 충분하며
 # 부분 일치 시 무관 제약사 오탐 위험이 더 크다.
 _MEDICAL_GAS_COMPANY_TERMS = [
-    "가스",  # 산업가스·고압가스 등 포함
     "에어퍼스트",
     "한국수소",
     "린데코리아",
@@ -81,6 +80,11 @@ _MEDICAL_GAS_COMPANY_TERMS = [
 _MEDICAL_GAS_COMPANY_WORD_RE = re.compile(
     r"\b(?:linde|praxair|air\s+first|air\s+products|air\s+liquide)\b"
 )
+# 한글 "가스"는 영문 브랜드(\b)와 동일하게 토큰경계로 매칭한다. 바 "가스" 부분문자열은
+# "메가스터디제약"(메[가스]터디)·"한국가스공사 자회사 제약"(가스[공사]) 같은 무관 제약사를
+# 과배제했다. "가스" 뒤에 한글이 이어지지 않을 때만(="○○산업가스" 류 접미사·단독 토큰)
+# 가스 제조사로 본다 — "밀성산업가스"·"대성산업가스"는 잡고, 어중 "가스"는 흘려보낸다.
+_MEDICAL_GAS_KO_COMPANY_RE = re.compile(r"가스(?![가-힣])")
 _MEDICAL_GAS_CONTEXT_TERMS = [
     "의료용 고압가스", "의료용가스", "의료용 가스",
     "고압가스", "액화산소", "액화질소",
@@ -203,6 +207,7 @@ def _is_medical_gas_gmp_noise(raw: dict[str, str]) -> bool:
     if manufacturer and (
         any(term in manufacturer for term in _MEDICAL_GAS_COMPANY_TERMS)
         or _MEDICAL_GAS_COMPANY_WORD_RE.search(manufacturer)
+        or _MEDICAL_GAS_KO_COMPANY_RE.search(manufacturer)
     ):
         return True
 

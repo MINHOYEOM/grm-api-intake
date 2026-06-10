@@ -369,6 +369,34 @@ class MergeRecallCardsTest(unittest.TestCase):
         rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
         self.assertEqual(rep.prose_input["product"], "가정, 나정, 다정")
 
+    def test_c2_blank_member_counts_unified_to_named(self) -> None:
+        # C2: 멤버 1건 빈 PRDUCT → 제목/W2/toggle summary/merged_count 전부
+        # 비공란 수(2)로 일치 — 종전 "전체 품목 (3)" vs 불릿 2개 불일치 차단.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["가정", "", "다정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        md = rep.markdown
+        self.assertIn("<summary>전체 품목 (2)</summary>", md)
+        self.assertNotIn("전체 품목 (3)", md)
+        bullets = [ln for ln in md.splitlines() if ln.startswith("- ")]
+        self.assertEqual(len(bullets), 2)                       # summary 수 == 불릿 수
+        self.assertIn("가정 외 1품목", md)                       # 제목·W2 의 '외 N'
+        self.assertNotIn("외 2품목", md)
+        self.assertEqual(rep.prose_input["merged_count"], 2)
+        self.assertEqual(rep.prose_input["product"], "가정, 다정")
+
+    def test_c2_blank_representative_counts_named_only(self) -> None:
+        # C2 경계: 대표(card_id 첫) 자신이 빈 PRDUCT — '외 N' = 비공란 전체 수.
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",
+                            ["", "나정", "다정"])
+        rep = cs.merge_recall_cards(_build_cards_from_rows(rows))[0]
+        md = rep.markdown
+        self.assertIn("<summary>전체 품목 (2)</summary>", md)
+        bullets = [ln for ln in md.splitlines() if ln.startswith("- ")]
+        self.assertEqual(len(bullets), 2)
+        self.assertIn("한국제약(주) 외 2품목", md)               # 대표 품목명 없이
+        self.assertEqual(rep.prose_input["merged_count"], 2)
+
     def test_merged_title_truncates_at_60(self) -> None:
         # R1-c: 구두점 없는 60자 초과 핵심대상 — _truncate_at_sentence 경계 동작 스냅샷.
         rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02",

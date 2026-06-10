@@ -2246,6 +2246,20 @@ def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# B1 임시 방어: handoff 조회 윈도우는 발행 cadence(주간 7일)보다 커야 주간 Routine 이
+# 1회 지연돼도 미소비 New row 가 Run Date 하한 밖으로 빠져 영구 누락되지 않는다.
+# 기본 30일은 dedup(MFDS enforcement 30일)과 정합. enforcement 의미를 handoff 에
+# 섞지 않도록 전용 환경변수를 둔다. 근본 해결(날짜 하한 제거)은 PL-10b 와 별도 트랙.
+_DEFAULT_HANDOFF_WINDOW_DAYS = 30
+
+
+def resolve_handoff_window_days(cli_value: int | None) -> int:
+    """handoff 조회 윈도우 결정 — CLI(--handoff-window-days) > GRM_HANDOFF_WINDOW_DAYS > 30."""
+    if cli_value:
+        return cli_value
+    return _env_int("GRM_HANDOFF_WINDOW_DAYS", _DEFAULT_HANDOFF_WINDOW_DAYS)
+
+
 def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
                                  window_days: int = 7,
                                  source_names: set[str] | None = None,
@@ -3488,7 +3502,8 @@ def main() -> int:
                         help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
     parser.add_argument("--handoff-window-days", type=int, default=None,
                         choices=range(1, 91), metavar="N(1-90)",
-                        help="Routine handoff 조회 윈도우. 기본값은 --window-days와 동일")
+                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
+                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
     parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
                         help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
     args = parser.parse_args()
@@ -3961,6 +3976,8 @@ def main() -> int:
     handoff_row_count = 0
     handoff_url = ""
     handoff_error_msg = ""
+    # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
+    handoff_window_days = resolve_handoff_window_days(args.handoff_window_days)
     if args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
@@ -3970,7 +3987,6 @@ def main() -> int:
             log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
         else:
             try:
-                handoff_window_days = args.handoff_window_days or args.window_days
                 handoff_sources = None
                 if explicit_sources and "none" not in requested_sources:
                     handoff_sources = {

@@ -238,6 +238,7 @@ v15.0-implementation/
 │  ├─ test_hc.py                      # [P7/P8] HC 상세 fetch 파서·모달리티 재판정·firm 매핑 회귀 + [A4] 제형 키 표면화
 │  ├─ test_gmp_inspection.py          # [P6] GMP 지적사항 excerpt 추출 회귀
 │  ├─ test_recall_pagination.py       # [B2] recall 페이지네이션 정렬 비의존·totalCount 종료 회귀
+│  ├─ test_handoff_window.py          # [B1] handoff 윈도우 30일 결정·쿼리 하한·노후 미소비 New 경고 회귀
 │  └─ golden/                         # [K2] 카드 골격 golden fixture(input/expected.md/json)+v1 스냅샷 + HC biologic recall fixture
 │
 ├─ setup.sh / setup.ps1   # 최초 셋업 스크립트

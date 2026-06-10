@@ -104,6 +104,11 @@ class TransientSourceErrorTest(unittest.TestCase):
             "mfds-gmp-inspection", "403 Forbidden"))
         self.assertFalse(ci._is_transient_source_error("mfds-recall", "HTTP 403 Forbidden"))
         self.assertFalse(ci._is_transient_source_error("mfds-admin", "HTTP 403 Forbidden"))
+        # T1: ICH/WHO/HC 도 키 없는 공개 endpoint — 403 은 WAF/IP 차단성(transient).
+        for code in ("ich", "who", "health-canada"):
+            with self.subTest(code=code):
+                self.assertTrue(ci._is_transient_source_error(
+                    code, f"HTTP 403 for https://example/{code}"))
 
     def test_config_errors_are_never_transient(self) -> None:
         # 설정 오류(환경변수/키)는 마커와 무관하게 failure — 사람이 고쳐야 함.
@@ -117,10 +122,29 @@ class TransientSourceErrorTest(unittest.TestCase):
         self.assertFalse(ci._is_transient_source_error(
             "mfds-gmp-inspection", "결과 테이블 컬럼 구조 변경 감지"))
 
-    def test_non_mfds_codes_are_never_transient(self) -> None:
-        # 현 동작 동결: MFDS 계열 외 코드(ich/who/hc/brave)는 timeout 이어도 False
-        # (= 활성 소스 error 시 failure 경로). 분류기 화이트리스트가 게이트.
-        for code in ("ich", "who", "health-canada", "brave-search"):
+    def test_global_public_sources_transient_is_transient(self) -> None:
+        # T1: 활성 글로벌 소스(ich/who/health-canada) 일시오류=warning 으로 정정 —
+        # 배치3 이 동결했던 "MFDS 외 무조건 False" 는 활성화(2026-06-05) 이전 스코프 누락.
+        for code in ("ich", "who", "health-canada"):
+            with self.subTest(code=code):
+                self.assertTrue(ci._is_transient_source_error(code, "read timed out"))
+                self.assertTrue(ci._is_transient_source_error(
+                    code, "HTTP GET final failure: https://x (503 Server Error: "
+                          "Service Unavailable)"))
+
+    def test_global_public_sources_structural_error_stays_failure(self) -> None:
+        # T1 경계: 마커 없는 구조/형식 오류는 ich/who/hc 도 여전히 failure.
+        for code, detail in (
+            ("who", "WHO WHOPIR 0건 — 구조/렌더 변경 의심(수동 확인 필요)"),
+            ("health-canada", "HC 오픈데이터 형식 이상(배열 아님/0레코드)"),
+            ("ich", "ICH 토픽 섹션 0건 — 코드 패턴 불일치"),
+        ):
+            with self.subTest(code=code):
+                self.assertFalse(ci._is_transient_source_error(code, detail))
+
+    def test_whitelist_outside_codes_are_never_transient(self) -> None:
+        # transient 적격 화이트리스트 밖(brave 등)은 timeout 이어도 False.
+        for code in ("brave-search", "ema", "wl"):
             with self.subTest(code=code):
                 self.assertFalse(ci._is_transient_source_error(code, "read timed out"))
 
@@ -232,6 +256,39 @@ class EvaluateHealthFailureBranchTest(unittest.TestCase):
         self.assertIn("all-active-sources-transient", _codes(health.warnings))
         self.assertNotIn("all-active-sources-failed", _codes(health.failures))
         self.assertEqual(health.exit_code, 0)
+
+    def test_t1_active_global_source_transient_blip_is_warning_not_red(self) -> None:
+        # T1 핵심 시나리오: FR/OpenFDA 정상 + ICH 단독 timeout — 종전엔 run 전체
+        # failure(exit 1)로 red. 정정 후 warning(exit 0) — graceful degrade 와 일치.
+        for src, set_err in (
+            ("ich", ("ich_error", "ich_error_msg")),
+            ("who", ("who_error", "who_error_msg")),
+            ("health-canada", ("hc_error", "hc_error_msg")),
+        ):
+            with self.subTest(src=src):
+                stats = ci.CollectionStats()
+                setattr(stats, set_err[0], True)
+                setattr(stats, set_err[1],
+                        "HTTP GET final failure: https://x (read timed out)")
+                health = ci._evaluate_health(**_health_kwargs(
+                    stats=stats, active={"fr", "recall"},
+                    enable_ich=(src == "ich"), enable_who=(src == "who"),
+                    enable_hc=(src == "health-canada")))
+                self.assertIn(f"transient-source-error:{src}",
+                              _codes(health.warnings))
+                self.assertNotIn(f"enabled-source-error:{src}",
+                                 _codes(health.failures))
+                self.assertEqual(health.exit_code, 0)
+
+    def test_t1_active_global_source_structural_error_stays_failure(self) -> None:
+        # T1 경계: 같은 ICH 라도 구조 오류(마커 없음)는 failure(exit 1) 유지.
+        stats = ci.CollectionStats()
+        stats.ich_error = True
+        stats.ich_error_msg = "ICH 토픽 섹션 0건 — 코드 패턴 불일치"
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=stats, active={"fr", "recall"}, enable_ich=True))
+        self.assertIn("enabled-source-error:ich", _codes(health.failures))
+        self.assertEqual(health.exit_code, 1)
 
 
 class EvaluateHealthInfoAndWarningTest(unittest.TestCase):

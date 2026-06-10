@@ -316,6 +316,52 @@ class MfdsGmpNoiseFilterTest(unittest.TestCase):
                 )
 
 
+class MfdsGmpGasOverExclusionTest(unittest.TestCase):
+    """A6: 한글 '가스' 부분문자열 과배제 차단(토큰경계 매칭).
+
+    바 '가스'가 '메가스터디제약'(메[가스]터디)·'한국가스공사 자회사 제약'(가스[공사])을
+    의료가스 노이즈로 오배제하던 결함. '가스' 뒤에 한글이 없을 때만 가스 제조사로 본다.
+    """
+
+    def test_megastudy_pharma_is_not_gas_noise(self) -> None:
+        # '메가스터디제약' — '가스' 뒤에 한글('터')이 이어짐 → 가스 제조사 아님(수집 유지).
+        self.assertFalse(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "메가스터디제약", "address": "서울특별시",
+                 "product_type": "완제"}
+            )
+        )
+
+    def test_gas_corp_subsidiary_pharma_is_not_gas_noise(self) -> None:
+        # '한국가스공사 자회사 제약' — '가스' 뒤 '공' → 어중 토큰 → 과배제 금지(수집 유지).
+        self.assertFalse(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "한국가스공사 자회사 제약", "address": "경기도",
+                 "product_type": "완제"}
+            )
+        )
+
+    def test_industrial_gas_suffix_company_still_noise(self) -> None:
+        # 회귀: '○○산업가스'(가스 접미사 토큰)는 여전히 의료가스 노이즈로 제외.
+        for manufacturer in ("대성산업가스", "밀성산업가스", "○○가스(주)"):
+            with self.subTest(manufacturer=manufacturer):
+                self.assertTrue(
+                    _is_medical_gas_gmp_noise(
+                        {"manufacturer": manufacturer, "address": "충청북도",
+                         "product_type": "완제"}
+                    )
+                )
+
+    def test_real_gas_via_context_term_still_noise(self) -> None:
+        # 회귀: 가스 접미사 없는 사명이라도 product_type 맥락어(의료용 고압가스)면 제외 유지.
+        self.assertTrue(
+            _is_medical_gas_gmp_noise(
+                {"manufacturer": "동방메디칼", "address": "경기도",
+                 "product_type": "의료용 고압가스"}
+            )
+        )
+
+
 class MfdsAdminActionPurifiedWaterTest(unittest.TestCase):
     """A5: 행정처분 collectability 게이트의 '정제수'→'정제' 오탐 차단.
 

@@ -203,6 +203,39 @@ class BriefSkeletonTest(unittest.TestCase):
         self.assertFalse(any(ln.startswith("## ") for ln in md.splitlines()))
 
 
+class NegDateSortKeyTest(unittest.TestCase):
+    """C1 — _neg_date 정수 튜플 키: 비ASCII date 무크래시 + ASCII 순서 동치.
+
+    종전 chr(255-ord) 문자열 키는 ord>255(한글 등) date 에서 chr(음수) ValueError
+    로 _sort_key→assemble_brief_skeleton 전체를 중단시켰다. date 는 row.get("date")
+    무검증 유입이라 입력 기인 크래시였다.
+    """
+
+    def test_ascii_order_identical_to_legacy_chr_key(self) -> None:
+        def legacy(d: str) -> str:  # 종전 키(레퍼런스, ASCII 전용)
+            return "".join(chr(255 - ord(ch)) for ch in d) if d else "\xff"
+        dates = ["2026-06-08", "2026-06-01", "2025-12-31", "", "2026-06-08",
+                 "2026-1-2", "2026-06"]   # 중복·빈 값·prefix 변형 포함
+        self.assertEqual(sorted(dates, key=legacy),
+                         sorted(dates, key=cs._neg_date))
+        # 의미 자체도 고정: 큰 날짜 먼저(desc), 빈 date 최후순.
+        self.assertEqual(
+            sorted(["2026-06-01", "", "2026-06-08", "2025-12-31"],
+                   key=cs._neg_date),
+            ["2026-06-08", "2026-06-01", "2025-12-31", ""])
+
+    def test_non_ascii_date_does_not_crash_skeleton(self) -> None:
+        fx = _load_input("guidance_fr")
+        bad_row = dict(fx["row"])
+        bad_row["date"] = "이천이십육년 유월"          # 종전: ValueError 크래시
+        bad_row["document_id"] = "fr-nonascii-date"
+        cards = [cs.build_card_scaffold(bad_row, fx["raw"]),
+                 cs.build_card_scaffold(dict(fx["row"]), fx["raw"])]
+        page = cs.assemble_brief_skeleton(cards)
+        self.assertIsInstance(page, str)
+        self.assertIn("<table_of_contents/>", page)   # 정상 조립까지 완주
+
+
 def _build_cards_from_rows(rows: list[dict]) -> list:
     return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
 

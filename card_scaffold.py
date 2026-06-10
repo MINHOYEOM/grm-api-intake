@@ -819,14 +819,19 @@ _TIER_ORDER = {"Tier 3": 0, "Tier 2": 1, "Tier 1": 2}
 _SECTION_ORDER = ["global", "domestic", "watch", "recall_table"]
 
 
-def _sort_key(c: CardScaffold) -> tuple[int, str]:
+def _sort_key(c: CardScaffold) -> tuple[int, tuple[int, ...]]:
     # Signal Tier 3→2→1, 동급 발행일 desc (§7)
     return (_TIER_ORDER.get(c.signal_tier, 9), _neg_date(c.date))
 
 
-def _neg_date(d: str) -> str:
-    # desc 정렬용 — 큰 날짜가 먼저. 문자열 역순 키.
-    return "".join(chr(255 - ord(ch)) for ch in d) if d else "\xff"
+def _neg_date(d: str) -> tuple[int, ...]:
+    # desc 정렬용 — 큰 날짜가 먼저(ascending 정렬에 끼우는 역순 키).
+    # 종전 chr(255-ord) 문자열 키는 비ASCII date(한글 등, ord>255)에서 chr(음수)
+    # ValueError 로 _sort_key→assemble_brief_skeleton 전체를 중단시켰다(C1).
+    # -ord 정수 튜플은 ASCII 에서 종전과 비교 순서 동치(둘 다 ord 의 강감소 사상,
+    # prefix 단축 비교도 동일)이고 전 유니코드에서 안전. 빈 date 의 (0,) 은
+    # 모든 실제 키(-ord<0 시작)보다 뒤 — 종전 "\xff" 와 동일하게 최후순.
+    return tuple(-ord(ch) for ch in d) if d else (0,)
 
 
 def _ordered_cards_with_groups(

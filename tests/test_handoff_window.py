@@ -79,5 +79,112 @@ class NewIntakeRowsQueryWindowTest(unittest.TestCase):
         self.assertEqual(status_eq, "New")
 
 
+def _fake_page(source: str = "MFDS", type_class: str = "recall-quality") -> dict:
+    return {"id": "pg-x", "properties": {
+        ci.PROP_SOURCE: {"select": {"name": source}},
+        ci.PROP_TYPE_CLASS: {"select": {"name": type_class}},
+    }}
+
+
+class AgedUnconsumedNewCountTest(unittest.TestCase):
+    """notion_count_aged_unconsumed_new — 필터 body·handoff 제외·페이지 누적 검증."""
+
+    def _run(self, responses):
+        captured: list[dict] = []
+        it = iter(responses)
+
+        def fake_api(method, url, token, *, body=None, retries=2):
+            captured.append({k: v for k, v in body.items()})
+            return next(it)
+
+        orig = ci.notion_api_request
+        ci.notion_api_request = fake_api
+        try:
+            n = ci.notion_count_aged_unconsumed_new(
+                "tok", "db", date(2026, 6, 10), handoff_window_days=30)
+        finally:
+            ci.notion_api_request = orig
+        return n, captured
+
+    def test_filter_targets_just_outside_window(self) -> None:
+        # cutoff = run_date − window − 1 = 2026-05-10 (윈도우 하한 2026-05-11 바로 바깥).
+        n, captured = self._run([{"results": [], "has_more": False}])
+        self.assertEqual(n, 0)
+        and_filters = captured[0]["filter"]["and"]
+        on_or_before = next(f["date"]["on_or_before"] for f in and_filters
+                            if f.get("property") == ci.PROP_RUN_DATE)
+        self.assertEqual(on_or_before, "2026-05-10")
+        status_eq = next(f["select"]["equals"] for f in and_filters
+                         if f.get("property") == ci.PROP_STATUS)
+        self.assertEqual(status_eq, "New")
+
+    def test_handoff_pages_are_excluded_from_count(self) -> None:
+        # handoff 페이지(SOURCE_HANDOFF/TYPE_ROUTINE_HANDOFF)는 큐 row 가 아님 — 미집계.
+        pages = [
+            _fake_page(),                                          # 진짜 노후 New
+            _fake_page(source=ci.SOURCE_HANDOFF),                  # handoff → 제외
+            _fake_page(type_class=ci.TYPE_ROUTINE_HANDOFF),       # handoff → 제외
+        ]
+        n, _ = self._run([{"results": pages, "has_more": False}])
+        self.assertEqual(n, 1)
+
+    def test_pagination_accumulates_across_pages(self) -> None:
+        n, captured = self._run([
+            {"results": [_fake_page(), _fake_page()], "has_more": True,
+             "next_cursor": "c2"},
+            {"results": [_fake_page()], "has_more": False},
+        ])
+        self.assertEqual(n, 3)
+        self.assertEqual(len(captured), 2)
+        self.assertEqual(captured[1].get("start_cursor"), "c2")
+
+
+def _health_kwargs(**over):
+    """_evaluate_health 최소 호출 kwargs(전 소스 비활성·에러 없음 → 기본 ok)."""
+    base = dict(
+        stats=ci.CollectionStats(),
+        active=set(),
+        enable_search=False, enable_mfds=False, enable_mfds_recall=False,
+        enable_mfds_admin=False, enable_mfds_gmp_inspection=False,
+        enable_ich=False, enable_who=False, enable_hc=False,
+        enable_moleg_api=False, enable_scrape=False,
+        event_name="schedule",
+        emit_routine_handoff=False, handoff_emitted=False, handoff_failed=False,
+        handoff_error_msg="",
+    )
+    base.update(over)
+    return base
+
+
+class AgedUnconsumedNewHealthWarningTest(unittest.TestCase):
+    """_evaluate_health 의 aged-unconsumed-new 경고 — warning(exit 0)이지 failure 아님."""
+
+    def test_aged_rows_surface_as_warning_not_failure(self) -> None:
+        health = ci._evaluate_health(**_health_kwargs(
+            aged_unconsumed_new=5, handoff_window_days=30))
+        codes = [w.code for w in health.warnings]
+        self.assertEqual(codes.count("aged-unconsumed-new"), 1)
+        self.assertEqual(health.status, "warning")
+        self.assertEqual(health.exit_code, 0)        # §3.5 warning 분류 — exit 0 유지
+        self.assertEqual(health.failures, [])
+        aged = next(w for w in health.warnings if w.code == "aged-unconsumed-new")
+        self.assertIn("30일", aged.message)
+        self.assertIn("5건", aged.message)
+
+    def test_zero_aged_rows_no_warning(self) -> None:
+        health = ci._evaluate_health(**_health_kwargs(
+            aged_unconsumed_new=0, handoff_window_days=30))
+        self.assertNotIn("aged-unconsumed-new", [w.code for w in health.warnings])
+        self.assertEqual(health.status, "ok")
+
+    def test_query_failure_surfaces_as_warning(self) -> None:
+        # 카운트 조회 실패는 조용한 0 이 아니라 별도 경고로 표면화(감시 공백 가시화).
+        health = ci._evaluate_health(**_health_kwargs(
+            aged_new_query_error="Notion API 500"))
+        codes = [w.code for w in health.warnings]
+        self.assertIn("aged-unconsumed-new-query-failed", codes)
+        self.assertEqual(health.exit_code, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -295,6 +295,13 @@ def _extract_pdf_text(data: bytes) -> tuple[str, str]:
         return "", "pdf-parser-missing"
     try:
         with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                # C4: 잠긴 PDF 는 scan-no-text/parse-fail 로 오라벨하지 않는다 —
+                # 라우팅은 동일(unknown→manual_review)이나 수동 확인 메시지의
+                # 진단이 '스캔본'이 아니라 '암호화'를 가리키게 정정.
+                # (owner-pw 만 걸린 열람 가능 PDF 는 fitz 가 자동 해제해
+                # 둘 다 False — 본문 추출 경로 유지.)
+                return "", "pdf-encrypted"
             text = "\n".join(page.get_text("text") for page in doc)
     except Exception as e:
         return "", f"pdf-parse-fail:{type(e).__name__}"

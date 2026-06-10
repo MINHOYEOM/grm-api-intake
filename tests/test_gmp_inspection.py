@@ -120,6 +120,48 @@ class TestDeficiencyExcerpt(unittest.TestCase):
                 self.assertNotEqual(g._assess_deficiency(text), "present")
                 self.assertEqual(g._assess_deficiency(text), "unknown")
 
+    def test_c4_encrypted_pdf_labeled_pdf_encrypted(self):
+        """암호화 PDF → 'pdf-encrypted' 진단 (scan-no-text/parse-fail 오라벨 정정, C4).
+
+        fitz(PyMuPDF) 를 sys.modules 스텁으로 대체 — 무의존·무파일.
+        """
+        import sys as _sys
+
+        class _FakeDoc:
+            def __init__(self, needs_pass, is_encrypted):
+                self.needs_pass = needs_pass
+                self.is_encrypted = is_encrypted
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def __iter__(self):                      # 잠긴 문서는 page 순회 안 됨
+                raise AssertionError("encrypted doc must not be iterated")
+
+        class _FakeFitz:
+            def __init__(self, doc):
+                self._doc = doc
+
+            def open(self, **kwargs):
+                return self._doc
+
+        saved = _sys.modules.get("fitz")
+        try:
+            for needs_pass, is_enc in ((True, True), (True, False), (False, True)):
+                with self.subTest(needs_pass=needs_pass, is_encrypted=is_enc):
+                    _sys.modules["fitz"] = _FakeFitz(_FakeDoc(needs_pass, is_enc))
+                    text, status = g._extract_pdf_text(b"%PDF-1.7 fake")
+                    self.assertEqual(text, "")
+                    self.assertEqual(status, "pdf-encrypted")
+        finally:
+            if saved is not None:
+                _sys.modules["fitz"] = saved
+            else:
+                _sys.modules.pop("fitz", None)
+
     def test_b3_real_findings_with_verdict_stay_present(self):
         """실제 지적(판정어 동반)은 형태별로 present 유지 (B3 과교정 방지)."""
         cases = [

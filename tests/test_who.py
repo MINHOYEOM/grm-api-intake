@@ -132,6 +132,58 @@ class NocSentinelTest(unittest.TestCase):
         self.assertIn("렌더 이상", err)
 
 
+class Rss2HtmlStripTest(unittest.TestCase):
+    """C3-a — WHO Drupal RSS2 description 의 raw HTML 태그 제거(RSS2 분기)."""
+
+    _RSS = """<rss version="2.0"><channel><title>WHO PQ</title>
+<item>
+  <title>Inspection update: Example Pharma</title>
+  <link>https://extranet.who.int/prequal/news/inspection-update</link>
+  <pubDate>Thu, 04 Jun 2026 09:00:00 GMT</pubDate>
+  <description>&lt;p&gt;GMP inspection of &lt;a href="https://x.example"&gt;Example
+Pharma&lt;/a&gt; manufacturing site completed.&lt;/p&gt;</description>
+</item>
+</channel></rss>"""
+
+    def test_rss2_description_tags_stripped_from_body(self) -> None:
+        import xml.etree.ElementTree as ET
+        orig = w.http_get_xml
+        w.http_get_xml = lambda url, **kw: ET.fromstring(self._RSS)
+        try:
+            items, err = w._collect_rss(date(2026, 6, 1), date(2026, 6, 8))
+        finally:
+            w.http_get_xml = orig
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        body = items[0].body
+        self.assertNotIn("<", body)                   # <p>/<a> 잔존 금지
+        self.assertNotIn("href", body)
+        self.assertIn("GMP inspection of Example", body)
+        self.assertIn("manufacturing site completed.", body)
+
+
+class WhopirPdfQuerystringTest(unittest.TestCase):
+    """C3-b — WHOPIR .pdf 링크에 ?download/# 꼬리가 붙어도 수집(path 검사)."""
+
+    def test_pdf_with_querystring_and_fragment_collected(self) -> None:
+        html = (
+            '<a href="/sites/default/files/whopir_files/maker-a.pdf">'
+            'Maker A, Site X (June 2026)</a>'
+            '<a href="/sites/default/files/whopir_files/maker-b.pdf?download=1">'
+            'Maker B, Site Y (June 2026)</a>'
+            '<a href="/sites/default/files/whopir_files/maker-c.pdf#page=2">'
+            'Maker C, Site Z (June 2026)</a>'
+            '<a href="/sites/default/files/whopir_files/notes.html">Not a PDF</a>'
+        )
+        with _Patched(html):
+            items, err = w._collect_whopir(RUN)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 3)               # 쿼리/프래그먼트 PDF 포함, html 제외
+        urls = [it.official_url for it in items]
+        self.assertTrue(any("maker-b.pdf?download=1" in u for u in urls))
+        self.assertTrue(any("maker-c.pdf#page=2" in u for u in urls))
+
+
 class NocCorePropagationTest(unittest.TestCase):
     def test_noc_sentinel_error_propagates_to_collect_who(self) -> None:
         # B4 core 승격: RSS/WHOPIR 정상이어도 NOC 구조 error 가 소스 error 로 전파

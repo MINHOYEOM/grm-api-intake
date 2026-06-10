@@ -30,7 +30,7 @@ import re
 import time
 from datetime import date
 from html.parser import HTMLParser
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 from grm_common import http_get_html, log
 from collect_intake import (
@@ -179,6 +179,10 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
             pub = _rss_text(node.find("pubDate")) or _rss_text(node.find("pubdate"))
             date_iso = _parse_rss2_date(pub) if pub else ""
             desc = _rss_text(node.find("description"))
+            # C3-a: WHO Drupal RSS2 description 은 raw HTML(<p>/<a href=…>) —
+            # exclusion/relevance/body 에 태그가 그대로 흘러 잡음·오판 소지.
+            # Atom summary 는 텍스트라 RSS2 분기만 태그 제거.
+            desc = re.sub(r"<[^>]+>", " ", desc)
         title = _clean(title)
         if not title or not _within_window(date_iso, start, end):
             continue
@@ -224,8 +228,10 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 log("WARN", f"WHOPIR page={page} 실패(부분 수집 유지): {e}")
                 break
             return [], f"WHO WHOPIR 수집 실패: {e}"
+        # C3-b: ".pdf?download=1"/"#…" 꼬리가 붙어도 PDF — path 만 검사(endswith 는 탈락시킴).
         page_links = [(h, t) for h, t in _links(html_text)
-                      if "/whopir_files/" in h.lower() and h.lower().endswith(".pdf")]
+                      if "/whopir_files/" in h.lower()
+                      and urlsplit(h).path.lower().endswith(".pdf")]
         if not page_links:
             break  # 더 이상 보고서 없음 → 페이지네이션 종료
         new_on_page = 0

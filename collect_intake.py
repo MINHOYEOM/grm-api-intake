@@ -2246,6 +2246,20 @@ def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# B1 임시 방어: handoff 조회 윈도우는 발행 cadence(주간 7일)보다 커야 주간 Routine 이
+# 1회 지연돼도 미소비 New row 가 Run Date 하한 밖으로 빠져 영구 누락되지 않는다.
+# 기본 30일은 dedup(MFDS enforcement 30일)과 정합. enforcement 의미를 handoff 에
+# 섞지 않도록 전용 환경변수를 둔다. 근본 해결(날짜 하한 제거)은 PL-10b 와 별도 트랙.
+_DEFAULT_HANDOFF_WINDOW_DAYS = 30
+
+
+def resolve_handoff_window_days(cli_value: int | None) -> int:
+    """handoff 조회 윈도우 결정 — CLI(--handoff-window-days) > GRM_HANDOFF_WINDOW_DAYS > 30."""
+    if cli_value:
+        return cli_value
+    return _env_int("GRM_HANDOFF_WINDOW_DAYS", _DEFAULT_HANDOFF_WINDOW_DAYS)
+
+
 def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
                                  window_days: int = 7,
                                  source_names: set[str] | None = None,
@@ -2292,6 +2306,51 @@ def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
     log("INFO", f"Routine handoff 후보 New row {len(snapshots)}건 "
                 f"(Run Date {window_start}~{run_date.isoformat()})")
     return snapshots
+
+
+# B1 임시 방어 ②: 윈도우(30일)로도 못 막는 케이스(Routine 3주+ 누락)를 침묵 대신
+# 경고로 띄운다. 카운트 목적이라 전수 페이지네이션 불요 — 상한 도달 시 하한값으로
+# 충분하다(경고 트리거는 N>0 여부, 정확 수는 사람이 Notion 에서 확인).
+_AGED_NEW_MAX_PAGES = 5
+_AGED_NEW_PAGE_SIZE = 50
+
+
+def notion_count_aged_unconsumed_new(token: str, db_id: str, run_date: date,
+                                     handoff_window_days: int) -> int:
+    """handoff 조회 윈도우 밖에 남은 미소비 Status=New row 수(읽기전용, 하한값).
+
+    필터: Status=New AND Run Date on_or_before (run_date − handoff_window_days − 1)
+    — notion_query_new_intake_rows 하한(on_or_after run_date−window) 바로 바깥.
+    handoff 페이지 자체(SOURCE_HANDOFF/TYPE_ROUTINE_HANDOFF)는 큐 row 가 아니므로
+    동일 규칙으로 제외. 조회 실패는 예외를 그대로 올린다 — 호출부(main)가
+    try/except 후 경고로 표면화한다(조용한 0 반환 금지).
+    """
+    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
+    cutoff = (run_date - timedelta(days=handoff_window_days + 1)).isoformat()
+    body: dict[str, Any] = {
+        "filter": {"and": [
+            {"property": PROP_RUN_DATE, "date": {"on_or_before": cutoff}},
+            {"property": PROP_STATUS, "select": {"equals": "New"}},
+        ]},
+        "page_size": _AGED_NEW_PAGE_SIZE,
+    }
+    count = 0
+    start_cursor: str | None = None
+    for _ in range(_AGED_NEW_MAX_PAGES):
+        if start_cursor:
+            body["start_cursor"] = start_cursor
+        elif "start_cursor" in body:
+            del body["start_cursor"]
+        data = notion_api_request("POST", url, token, body=body)
+        for page in data.get("results", []):
+            snap = _intake_page_snapshot(page)
+            if snap["source"] == SOURCE_HANDOFF or snap["type_or_class"] == TYPE_ROUTINE_HANDOFF:
+                continue
+            count += 1
+        if not data.get("has_more"):
+            break
+        start_cursor = data.get("next_cursor")
+    return count
 
 
 # ── K2-prep: page_id 로 원 row raw API JSON 복원 → rows 에 부착 (card_spec §12(A)) ──
@@ -2785,8 +2844,16 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          generated_at: datetime,
                          source_names: set[str] | None = None,
                          doc_ids: set[str] | None = None,
-                         inmemory_raw: dict[str, dict[str, Any]] | None = None
+                         inmemory_raw: dict[str, dict[str, Any]] | None = None,
+                         display_window_days: int | None = None
                          ) -> tuple[int, str]:
+    # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
+    # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
+    # 프롬프트가 발행 브리프의 "검색 기간" 속성으로 그대로 렌더하므로 발행 cadence
+    # (수집 윈도우, 주간 7일)를 유지해야 한다 — 프롬프트의 "지난 7일" 문구와 정합.
+    # display_window_days 미지정 시 window_days 사용(기존 호출 호환).
+    payload_window_days = (display_window_days if display_window_days is not None
+                           else window_days)
     rows = notion_query_new_intake_rows(token, db_id, run_date, window_days,
                                         source_names=source_names,
                                         doc_ids=doc_ids)
@@ -2795,13 +2862,15 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         # inmemory_raw 는 main() 가 당일 수집 IntakeItem.raw_payload 로 전달(K3 G2 와이어링).
         # 당일분은 메모리 적중(fetch 0), 과거 누적 New row 만 page children fetch 폴백.
         enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
-        payload = build_routine_handoff_payload_v2(enriched, run_date, window_days, generated_at)
+        payload = build_routine_handoff_payload_v2(enriched, run_date,
+                                                   payload_window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
                                                        generated_at, compact=True)
         log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")
     else:
         # 기존 v1 경로 — scheduled 운영 기본. 바이트 동일 보장(변경 없음).
-        payload = build_routine_handoff_payload(rows, run_date, window_days, generated_at)
+        payload = build_routine_handoff_payload(rows, run_date,
+                                                payload_window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
     return payload["row_count"], page_url
 
@@ -3223,6 +3292,9 @@ def _evaluate_health(
     handoff_failed: bool,
     handoff_error_msg: str,
     modality_preflight_disabled: bool = False,
+    aged_unconsumed_new: int = 0,
+    aged_new_query_error: str = "",
+    handoff_window_days: int = 0,
 ) -> HealthCheckResult:
     health = HealthCheckResult()
 
@@ -3248,6 +3320,23 @@ def _evaluate_health(
             "GRM Handoff",
             "Routine handoff 생성 실패",
             handoff_error_msg[:240],
+        )
+
+    # B1 임시 방어 ②: 윈도우 밖 미소비 New 잔존 = Routine 누락/지연 의심(침묵 누락 방지).
+    # warning 이므로 exit 0 유지(§3.5) — scheduled run 은 기존 운영 경고 Issue 경로로 누적.
+    if aged_unconsumed_new > 0:
+        health.add_warning(
+            "aged-unconsumed-new",
+            "GRM Handoff",
+            f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row {aged_unconsumed_new}건",
+            "주간 Routine 누락/지연 의심 — 수동 확인 후 처리(또는 윈도우 조정) 필요.",
+        )
+    if aged_new_query_error:
+        health.add_warning(
+            "aged-unconsumed-new-query-failed",
+            "GRM Handoff",
+            "노후 미소비 New row 카운트 조회 실패 — 이번 실행은 누락 감시 불가",
+            aged_new_query_error[:240],
         )
 
     handoff_only_success = (
@@ -3419,6 +3508,8 @@ def _health_payload(
     handoff_row_count: int,
     handoff_url: str,
     handoff_error_msg: str,
+    handoff_window_days: int = 0,
+    aged_unconsumed_new: int = 0,
 ) -> dict[str, Any]:
     return {
         "schema_version": "grm-health/v1",
@@ -3439,6 +3530,8 @@ def _health_payload(
             "row_count": handoff_row_count,
             "url": handoff_url,
             "error_msg": handoff_error_msg,
+            "window_days": handoff_window_days,
+            "aged_unconsumed_new": aged_unconsumed_new,   # B1: 윈도우 밖 미소비 New(하한)
         },
     }
 
@@ -3488,7 +3581,8 @@ def main() -> int:
                         help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
     parser.add_argument("--handoff-window-days", type=int, default=None,
                         choices=range(1, 91), metavar="N(1-90)",
-                        help="Routine handoff 조회 윈도우. 기본값은 --window-days와 동일")
+                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
+                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
     parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
                         help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
     args = parser.parse_args()
@@ -3961,6 +4055,8 @@ def main() -> int:
     handoff_row_count = 0
     handoff_url = ""
     handoff_error_msg = ""
+    # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
+    handoff_window_days = resolve_handoff_window_days(args.handoff_window_days)
     if args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
@@ -3970,7 +4066,6 @@ def main() -> int:
             log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
         else:
             try:
-                handoff_window_days = args.handoff_window_days or args.window_days
                 handoff_sources = None
                 if explicit_sources and "none" not in requested_sources:
                     handoff_sources = {
@@ -3988,12 +4083,29 @@ def main() -> int:
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
                     source_names=handoff_sources, doc_ids=handoff_doc_ids,
-                    inmemory_raw=inmemory_raw)
+                    inmemory_raw=inmemory_raw,
+                    # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
+                    display_window_days=args.window_days)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True
                 handoff_error_msg = str(e)
                 log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
+
+    # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
+    # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.
+    aged_unconsumed_new = 0
+    aged_new_query_error = ""
+    if notion_token and notion_db:
+        try:
+            aged_unconsumed_new = notion_count_aged_unconsumed_new(
+                notion_token, notion_db, run_date, handoff_window_days)
+            if aged_unconsumed_new:
+                log("WARN", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
+                            f"{aged_unconsumed_new}건 — Routine 누락/지연 의심")
+        except Exception as e:  # noqa: BLE001 — 감시 실패가 수집 자체를 죽이면 안 됨
+            aged_new_query_error = str(e)
+            log("WARN", f"노후 미소비 New row 카운트 조회 실패: {aged_new_query_error}")
 
     flags = {
         "ENABLE_SEARCH": enable_search,
@@ -4029,6 +4141,9 @@ def main() -> int:
         handoff_emitted=handoff_emitted,
         handoff_failed=handoff_failed,
         handoff_error_msg=handoff_error_msg,
+        aged_unconsumed_new=aged_unconsumed_new,
+        aged_new_query_error=aged_new_query_error,
+        handoff_window_days=handoff_window_days,
     )
     health_payload = _health_payload(
         health=health,
@@ -4046,6 +4161,8 @@ def main() -> int:
         handoff_row_count=handoff_row_count,
         handoff_url=handoff_url,
         handoff_error_msg=handoff_error_msg,
+        handoff_window_days=handoff_window_days,
+        aged_unconsumed_new=aged_unconsumed_new,
     )
     _write_health_json(health_json_path, health_payload)
 

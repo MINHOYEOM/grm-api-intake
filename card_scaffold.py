@@ -62,6 +62,29 @@ def assert_no_forbidden_markdown(markdown: str) -> list[str]:
     return [tok for tok in FORBIDDEN_MARKDOWN if tok in markdown]
 
 
+# 금지 토큰 → Notion-safe 치환 맵 (원문 의미 가독 유지, 렌더 무해)
+_FORBIDDEN_REPLACEMENTS = (
+    ("[!NOTE]",      "[ NOTE ]"),
+    ("[!WARNING]",   "[ WARNING ]"),
+    ("[!IMPORTANT]", "[ IMPORTANT ]"),
+    ("[!TIP]",       "[ TIP ]"),
+    ("[!CAUTION]",   "[ CAUTION ]"),
+    ("[TOC]",        "[ TOC ]"),
+    ("+++",          "＋＋＋"),
+    ("</toggle>",    "〈/toggle〉"),   # </toggle> 먼저(prefix 매칭 방지)
+    ("<toggle ",     "〈toggle "),
+    ("<toggle>",     "〈toggle〉"),
+)
+
+
+def _neutralize_forbidden(text: str) -> str:
+    """금지 마크다운 토큰을 Notion-safe 형태로 결정론적 치환. 금지 토큰 없으면 no-op."""
+    for old, new in _FORBIDDEN_REPLACEMENTS:
+        if old in text:
+            text = text.replace(old, new)
+    return text
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. FixedConfig — 결정론 상수 (현재시각·env 없음, frozen)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -609,7 +632,7 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
     # W8 — 출처 푸터(회색, 듀얼링크)
     blocks.append(_footer_block(kind, row, raw, cfg))
 
-    markdown = "\n\n".join(blocks)
+    markdown = _neutralize_forbidden("\n\n".join(blocks))
     prose_input = _prose_input(kind, row, raw, evidence, modality, language)
     return CardScaffold(
         card_id=card_id, section=section, kind=kind, evidence=evidence,
@@ -748,7 +771,7 @@ def _render_merged_recall(rep_markdown: str, entrps: str, rep_product: str,
             blocks[i] = _merge_w2_product(blk, rep_product, n)
             blocks.insert(i + 1, _merge_items_toggle(items, n + 1))
             break
-    return "\n\n".join(blocks)
+    return _neutralize_forbidden("\n\n".join(blocks))
 
 
 def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
@@ -864,4 +887,4 @@ def assemble_brief_skeleton(cards: list[CardScaffold],
     out.append("---")
     disc = list(cfg.disclaimer_ko) + [cfg.disclaimer_en]
     out.append(_callout(disc, icon="ℹ️", color=cfg.color_footer))
-    return "\n\n".join(out)
+    return _neutralize_forbidden("\n\n".join(out))

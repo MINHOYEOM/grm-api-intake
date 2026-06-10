@@ -68,6 +68,22 @@ class TestP7GenericToBiologic(unittest.TestCase):
         self.assertEqual(_modality(item), ci.MODALITY_BIOLOGIC)
 
 
+class TestA4DosageFormSurfacesToItem(unittest.TestCase):
+    """A4 회귀: 파서 키('dosage form', 공백)가 _to_item 까지 표면화돼야 한다.
+
+    파서는 `label.strip().lower()` 로 키를 만들어 'Dosage Form' → 'dosage form'(공백).
+    읽기측이 'dosage_form'(밑줄)으로 읽던 버그로 '제형:' 가 항상 공란이었다. 기존
+    테스트는 _parse_detail_html 만 격리 검사해 못 잡았으므로 _to_item 경유로 단언한다.
+    """
+
+    def test_dosage_form_reaches_body_and_raw_payload(self):
+        det = lambda u: {"dosage form": "Solution",
+                         "strength": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL"}
+        item = hc._to_item(_rec(), START, END, detail_fetcher=det)
+        self.assertIn("제형: Solution", item.body)
+        self.assertEqual(item.raw_payload["dosage_form_detail"], "Solution")
+
+
 class TestP7ChemicalNotMisclassified(unittest.TestCase):
     """반례: 화학 제품이 Biologic 으로 오분류되지 않아야 한다."""
 

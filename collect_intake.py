@@ -2844,8 +2844,16 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          generated_at: datetime,
                          source_names: set[str] | None = None,
                          doc_ids: set[str] | None = None,
-                         inmemory_raw: dict[str, dict[str, Any]] | None = None
+                         inmemory_raw: dict[str, dict[str, Any]] | None = None,
+                         display_window_days: int | None = None
                          ) -> tuple[int, str]:
+    # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
+    # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
+    # 프롬프트가 발행 브리프의 "검색 기간" 속성으로 그대로 렌더하므로 발행 cadence
+    # (수집 윈도우, 주간 7일)를 유지해야 한다 — 프롬프트의 "지난 7일" 문구와 정합.
+    # display_window_days 미지정 시 window_days 사용(기존 호출 호환).
+    payload_window_days = (display_window_days if display_window_days is not None
+                           else window_days)
     rows = notion_query_new_intake_rows(token, db_id, run_date, window_days,
                                         source_names=source_names,
                                         doc_ids=doc_ids)
@@ -2854,13 +2862,15 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         # inmemory_raw 는 main() 가 당일 수집 IntakeItem.raw_payload 로 전달(K3 G2 와이어링).
         # 당일분은 메모리 적중(fetch 0), 과거 누적 New row 만 page children fetch 폴백.
         enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
-        payload = build_routine_handoff_payload_v2(enriched, run_date, window_days, generated_at)
+        payload = build_routine_handoff_payload_v2(enriched, run_date,
+                                                   payload_window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
                                                        generated_at, compact=True)
         log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")
     else:
         # 기존 v1 경로 — scheduled 운영 기본. 바이트 동일 보장(변경 없음).
-        payload = build_routine_handoff_payload(rows, run_date, window_days, generated_at)
+        payload = build_routine_handoff_payload(rows, run_date,
+                                                payload_window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
     return payload["row_count"], page_url
 
@@ -4073,7 +4083,9 @@ def main() -> int:
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
                     source_names=handoff_sources, doc_ids=handoff_doc_ids,
-                    inmemory_raw=inmemory_raw)
+                    inmemory_raw=inmemory_raw,
+                    # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
+                    display_window_days=args.window_days)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True

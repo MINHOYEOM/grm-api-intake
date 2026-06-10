@@ -483,6 +483,23 @@ class ForbiddenMarkdownGuardTest(unittest.TestCase):
         found = cs.assert_no_forbidden_markdown(rep.markdown)
         self.assertEqual(found, [], f"병합 대표 금지 토큰 잔존: {found}")
 
+    def test_recall_rtrvl_resn_overlong_quote_is_truncated(self) -> None:
+        """A3: 2000자+ 무종결 RTRVL_RESN 의 '>' 인용 라인이 형제 분기처럼 250자
+        절단돼 Notion rich-text 한도(2000자)를 넘지 않는다. 옛 무절단 분기는 전체
+        회수사유를 그대로 '>' 한 줄로 내보내 한도 초과 가능했다."""
+        # 종결부호 없는 한국어 장문(>2000자) — _split_sentences 가 통째 반환하던 경로.
+        long_resn = "회수사유 " + "가나다라마바사아자차카타파하" * 200
+        self.assertGreater(len(long_resn), 2000)
+        row, raw = self._recall_row_with_forbidden(long_resn)
+        card = cs.build_card_scaffold(row, raw)
+        quote_lines = [ln for ln in card.markdown.splitlines() if ln.startswith("> ")]
+        self.assertTrue(quote_lines, "W3 인용 라인이 생성돼야 함(recall-quality=Evidence A)")
+        for ln in quote_lines:
+            # '> ' 접두(2) + 250자 + '…'(1) = 최대 253. 2000 한도 대비 충분히 짧다.
+            self.assertLessEqual(len(ln), 253, f"인용 라인 과길이: {len(ln)}")
+        # A2 불변식: 입력 기인 금지 토큰 부재(가드가 이 경로에서도 [] 를 반환).
+        self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
+
 
 def _callout_colors(md: str) -> list[str]:
     import re

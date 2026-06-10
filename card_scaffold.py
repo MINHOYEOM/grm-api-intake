@@ -369,7 +369,10 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
     if kind == "admin-action":
         return _truncate_at_sentence(raw.get("EXPOSE_CONT", ""), 250)
     if kind == "recall-quality":
-        return _first(raw.get("RTRVL_RESN"))
+        # 형제 분기와 동형으로 250자 절단(A3). RTRVL_RESN(회수사유)은 한국어 장문에
+        # 종결부호가 없는 경우가 많아 무절단 시 '>' 인용 라인이 Notion rich-text
+        # 한도(2000자)를 초과할 수 있다(300자 prose_input 가드는 렌더 라인 미보호).
+        return _truncate_at_sentence(_first(raw.get("RTRVL_RESN")), 250)
     if kind == "gmp-inspection":
         # 표지 너머 결론(지적/보완사항) 우선 — 없으면 전체 본문 폴백(P6).
         return _truncate_at_sentence(

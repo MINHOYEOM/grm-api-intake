@@ -631,6 +631,71 @@ class ExcerptProseInputGoldenTest(unittest.TestCase):
                                     without_excerpt.prose_input["issue_or_reason"])
 
 
+class Fda483GoldenTest(unittest.TestCase):
+    """WHY-1 #3 — FDA 483/EIR 신규 kind `fda-483` golden(기존 golden 과 분리, 바이트 불변 유지).
+
+    483 = Tier 3 결함 원본. excerpt(fda483_excerpt)는 prose_input(W5/W6/W7)만 보강하고
+    W3 인용(Evidence A) 승격은 아님(§5 — 여전히 Evidence B·무 '>'). W2 에 제조소·FEI·시설/
+    유형·실사일이 들어가고, W8 공식원본은 건별 483 PDF(/media/<id>/download)를 가리킨다.
+    """
+
+    _NAME = "fda_483"
+
+    def test_fda483_fixture_byte_identical(self) -> None:
+        fx = _load_input(self._NAME)
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        got_json_str = json.dumps(card.to_dict(), ensure_ascii=False,
+                                  indent=2, sort_keys=True)
+        if _UPDATE:
+            _write(os.path.join(GOLDEN, f"{self._NAME}.expected.md"), card.markdown)
+            _write(os.path.join(GOLDEN, f"{self._NAME}.expected.json"), got_json_str)
+            return
+        expected_md = _read(os.path.join(GOLDEN, f"{self._NAME}.expected.md"))
+        self.assertEqual(card.markdown, expected_md)
+        expected_json = json.loads(_read(os.path.join(GOLDEN, f"{self._NAME}.expected.json")))
+        self.assertEqual(json.loads(got_json_str), expected_json)
+
+    def test_fda483_kind_section_and_evidence_b(self) -> None:
+        fx = _load_input(self._NAME)
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        self.assertEqual(card.kind, "fda-483")
+        self.assertEqual(card.section, "global")
+        self.assertEqual(card.evidence, "B")            # §5 — Evidence B(인용 승격 아님)
+        self.assertNotIn("\n> ", card.markdown)         # B → W3 원문 인용 없음
+        self.assertNotIn("{{W4", card.markdown)         # 번역 토큰 없음
+
+    def test_fda483_excerpt_feeds_prose_over_meta(self) -> None:
+        fx = _load_input(self._NAME)
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        excerpt = fx["raw"]["fda483_excerpt"]
+        # excerpt 가 headline/메타가 아니라 issue_or_reason·body_excerpt 선두를 채운다.
+        self.assertTrue(excerpt.startswith(card.prose_input["issue_or_reason"][:30]))
+        self.assertTrue(excerpt.startswith(card.prose_input["body_excerpt"][:30]))
+
+    def test_fda483_excerpt_key_does_not_change_markdown(self) -> None:
+        # excerpt 는 prose_input 만 바꾸고 렌더 markdown 은 안 바꾼다(슬롯 {{W5}} 렌더).
+        fx = _load_input(self._NAME)
+        with_excerpt = cs.build_card_scaffold(fx["row"], fx["raw"])
+        raw_without = {k: v for k, v in fx["raw"].items() if k != "fda483_excerpt"}
+        without_excerpt = cs.build_card_scaffold(fx["row"], raw_without)
+        self.assertEqual(with_excerpt.markdown, without_excerpt.markdown)
+        self.assertNotEqual(with_excerpt.prose_input["issue_or_reason"],
+                            without_excerpt.prose_input["issue_or_reason"])
+
+    def test_fda483_w2_and_official_pdf_link(self) -> None:
+        fx = _load_input(self._NAME)
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        # W2 에 제조소·FEI·시설/유형·실사일
+        self.assertIn("**제조소/업체**", card.markdown)
+        self.assertIn("FEI 3015156709", card.markdown)
+        self.assertIn("Outsourcing Facility", card.markdown)
+        self.assertIn("**실사일**", card.markdown)
+        # W8 공식원본 = 건별 483 PDF
+        self.assertIn("/media/192439/download", card.markdown)
+        # 금지 마크다운 부재
+        self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
+
+
 def _callout_colors(md: str) -> list[str]:
     import re
     return re.findall(r'color="([a-z_]+)"', md)

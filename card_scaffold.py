@@ -36,6 +36,7 @@ SOURCE_MFDS = "MFDS"
 SOURCE_ICH = "ICH"
 SOURCE_WHO = "WHO"
 SOURCE_HC = "Health Canada"
+SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — FDA 483/EIR 실사 관찰사항
 
 # MFDS 하위 유형(type_or_class)
 TYPE_ADMIN_ACTION = "admin-action"
@@ -144,6 +145,7 @@ def _kind_meta(kind: str) -> tuple[str, str, str]:
         "who-inspection":   ("🟧", "WHO", "WHO"),
         "who-news":         ("🟫", "WHO", "WHO"),
         "hc-recall":        ("🟧", "Recall(HC)", "Recall"),
+        "fda-483":          ("🟧", "FDA 483 실사 관찰", "483"),
     }
     return table.get(kind, ("⬜", kind or "기타", ""))
 
@@ -277,6 +279,8 @@ def resolve_kind(row: dict[str, Any]) -> str:
         return "openfda-recall"
     if source == SOURCE_HC:
         return "hc-recall"
+    if source == SOURCE_FDA_483:
+        return "fda-483"
     if source == SOURCE_ICH:
         return "ich"
     if source == SOURCE_WHO:
@@ -420,6 +424,9 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
         fallback = not row.get("official_url")
     elif kind == "gmp-inspection":
         official = _first(row.get("source_url"), row.get("official_url"))
+    elif kind == "fda-483":
+        # L1 = 건별 483 PDF(/media/<id>/download). info = OII Reading Room(api_query/source_url).
+        official = _first(raw.get("pdf_url"), row.get("official_url"))
     else:  # FR/EMA/MHRA/PIC/S/ECA/WHO/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
         official = _first(row.get("official_url"))
     return info, official, fallback
@@ -498,6 +505,17 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
             rows.append(("제품", _truncate_at_sentence(str(product), 80)))
         if raw.get("Recall class"):
             rows.append(("Class", str(raw["Recall class"])))
+    elif kind == "fda-483":
+        # §6: 회사·FEI·Establishment Type·Record Type·실사일(발행일=Publish 은 발행일 행).
+        firm = _first(raw.get("firm"), row.get("firm")) or "원문 미기재"
+        fei = raw.get("fei_number", "")
+        rows.append(("제조소/업체", firm + (f" · FEI {fei}" if fei else "")))
+        meta = " · ".join(p for p in (raw.get("establishment_type", ""),
+                                      raw.get("record_type", "")) if p)
+        if meta:
+            rows.append(("시설 · 유형", meta))
+        if raw.get("record_date"):
+            rows.append(("실사일", raw["record_date"]))
     elif kind in ("who-noc", "who-inspection", "who-news"):
         topic = _first(raw.get("anchor_text"), row.get("headline"))
         if topic:
@@ -560,7 +578,7 @@ _REGULATOR_LABEL = {
     SOURCE_FR: "FDA", SOURCE_RECALL: "FDA", SOURCE_FDA_WL: "FDA",
     SOURCE_EMA: "EMA", SOURCE_MHRA: "MHRA", SOURCE_PICS: "PIC/S",
     SOURCE_ECA: "ECA", SOURCE_MFDS: "MFDS", SOURCE_ICH: "ICH",
-    SOURCE_WHO: "WHO", SOURCE_HC: "Health Canada",
+    SOURCE_WHO: "WHO", SOURCE_HC: "Health Canada", SOURCE_FDA_483: "FDA",
 }
 
 
@@ -679,10 +697,10 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         raw.get("EXPOSE_CONT"),
         raw.get("attachment_deficiency_excerpt"), raw.get("attachment_text"),
         raw.get("ADM_DISPS_NAME"),
-        # WHY-1 #1/#2: WHOPIR PDF·FDA WL 본문에서 추출한 결함/위반 excerpt(있으면 우선).
-        # 구조화 사유(위) 뒤 · 링크텍스트/표지(subject·anchor_text 등) 앞 — "왜"를 살린다.
-        # 두 키는 WHO-inspection/WL 외엔 부재 → 기존 golden 16종 _first 결과 바이트 불변.
-        raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
+        # WHY-1 #1/#2/#3: WHOPIR PDF·FDA WL 본문·FDA 483 PDF 에서 추출한 결함/위반 excerpt
+        # (있으면 우선). 구조화 사유(위) 뒤 · 링크텍스트/표지(subject·anchor_text 등) 앞 —
+        # "왜"를 살린다. 세 키는 WHO-inspection/WL/FDA-483 외엔 부재 → 기존 golden _first 불변.
+        raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"), raw.get("fda483_excerpt"),
         raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
         raw.get("anchor_text"), raw.get("description"),
     )
@@ -709,6 +727,7 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "w2_facts": {label: value for label, value in _w2_rows(kind, row, raw)},
         "body_excerpt": _truncate_at_sentence(
             _first(raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
+                   raw.get("fda483_excerpt"),
                    raw.get("description"), raw.get("summary"), row.get("body")), 300),
     }
 

@@ -163,6 +163,7 @@ def _health_kwargs(**over):
         enable_search=False, enable_mfds=False, enable_mfds_recall=False,
         enable_mfds_admin=False, enable_mfds_gmp_inspection=False,
         enable_ich=False, enable_who=False, enable_hc=False,
+        enable_fda483=False,
         enable_moleg_api=False, enable_scrape=False,
         event_name="schedule",
         emit_routine_handoff=False, handoff_emitted=False, handoff_failed=False,

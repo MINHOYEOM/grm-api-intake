@@ -1,0 +1,40 @@
+{
+  "card_id": "FDA 483::fda483-192439",
+  "card_scaffold": "### [FDA 483 실사 관찰 · FDA] BPI Labs, LLC — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `FDA 483` · `Signal High (T3)` · `💊 합성의약품` · `483`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-27</td></tr>\n<tr><td>**문서번호**</td><td>`fda483-192439`</td></tr>\n<tr><td>**제조소/업체**</td><td>BPI Labs, LLC · FEI 3015156709</td></tr>\n<tr><td>**시설 · 유형**</td><td>Outsourcing Facility · 483</td></tr>\n<tr><td>**실사일**</td><td>04/17/2026</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  📰 정보출처 [링크](https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room)   ·   📎 공식원본 [링크](https://www.fda.gov/media/192439/download)\n</callout>",
+  "date": "2026-05-27",
+  "evidence": "B",
+  "kind": "fda-483",
+  "modality": "Chemical",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "OBSERVATION 1 Aseptic processing operations observed during the inspection were deficient. Personnel performed interventions in the ISO 5 critical area without adequate gowning, exposing sterile drug products to potential contamination.",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "BPI Labs, LLC",
+    "headline": "[FDA 483] BPI Labs, LLC",
+    "issue_or_reason": "OBSERVATION 1 Aseptic processing operations observed during the inspection were deficient. Personnel performed interventions in the ISO 5 critical area without adequate gowning, exposing sterile drug products to potential contamination.",
+    "kind": "fda-483",
+    "language": "EN",
+    "modality": "Chemical",
+    "product": "Outsourcing Facility",
+    "quote_lines": [],
+    "regulator": "FDA 483",
+    "signal": "Tier 3",
+    "w2_facts": {
+      "문서번호": "`fda483-192439`",
+      "발행일": "2026-05-27",
+      "시설 · 유형": "Outsourcing Facility · 483",
+      "실사일": "04/17/2026",
+      "제조소/업체": "BPI Labs, LLC · FEI 3015156709"
+    }
+  },
+  "section": "global",
+  "signal_tier": "Tier 3"
+}

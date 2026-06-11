@@ -116,6 +116,7 @@ SOURCE_MFDS = "MFDS"
 SOURCE_ICH = "ICH"
 SOURCE_WHO = "WHO"
 SOURCE_HC = "Health Canada"
+SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — OII FOIA Reading Room 483/EIR (가장 깊은 결함 원본)
 SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
@@ -149,6 +150,7 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_ICH:     SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_WHO:     SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_HC:      SRC_TYPE_OFFICIAL_API,
+    SOURCE_FDA_483: SRC_TYPE_OFFICIAL_PAGE,
     SOURCE_HANDOFF: SRC_TYPE_OFFICIAL_PAGE,
     # Phase 2a 신규
     SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
@@ -618,6 +620,13 @@ class CollectionStats:
     hc_insert_failed: int = 0
     hc_error: bool = False
     hc_error_msg: str = ""
+    # ── WHY-1 #3: FDA 483/EIR ──────────────────────────────────────────────
+    fda483_fetched: int = 0
+    fda483_inserted: int = 0
+    fda483_skipped_dup: int = 0
+    fda483_insert_failed: int = 0
+    fda483_error: bool = False
+    fda483_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -631,6 +640,7 @@ class CollectionStats:
             + self.ich_insert_failed
             + self.who_insert_failed
             + self.hc_insert_failed
+            + self.fda483_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -653,6 +663,7 @@ class CollectionStats:
             or self.ich_error
             or self.who_error
             or self.hc_error
+            or self.fda483_error
         )
 
     def summary(self) -> str:
@@ -708,6 +719,9 @@ class CollectionStats:
             f"HC   fetched={self.hc_fetched}  inserted={self.hc_inserted}  "
             f"skip_dup={self.hc_skipped_dup}  failed={self.hc_insert_failed}  "
             f"error={self.hc_error}",
+            f"483  fetched={self.fda483_fetched}  inserted={self.fda483_inserted}  "
+            f"skip_dup={self.fda483_skipped_dup}  failed={self.fda483_insert_failed}  "
+            f"error={self.fda483_error}",
         ]
         return "\n".join(lines)
 
@@ -787,7 +801,7 @@ _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {"mfds-recall"
 # 정적 JSON)라 GitHub-hosted IP 간헐 차단·timeout·5xx 가 발생한다. 네트워크성 일시 오류는 MFDS
 # 공개 endpoint 와 동일하게 warning(exit 0)으로 강등 — 설정·구조 오류는 마커 미포함이라 여전히
 # failure. 2026-06-05 활성화 때 누락된 스코프 확장(T1).
-_GLOBAL_PUBLIC_SOURCE_CODES = {"ich", "who", "health-canada"}
+_GLOBAL_PUBLIC_SOURCE_CODES = {"ich", "who", "health-canada", "fda483"}
 _TRANSIENT_ELIGIBLE_SOURCE_CODES = _MFDS_FEATURE_SOURCE_CODES | _GLOBAL_PUBLIC_SOURCE_CODES
 # 403 transient 적격: 키 없는 공개 endpoint 만(WAF/IP 차단성). data.go.kr API 403 은
 # 키/서비스 권한 문제 가능성이 높아 failure 유지.
@@ -3226,7 +3240,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
 # ich/mfds 는 opt-in feature flag 소스라 _ALL_SOURCES(기본 all)엔 넣지 않되,
 # --sources 선택지와 handoff source 매핑에는 포함한다.
-_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "none"]
+_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "fda483", "none"]
 _SOURCE_TOKEN_TO_NOTION = {
     "fr": SOURCE_FR,
     "recall": SOURCE_RECALL,
@@ -3239,6 +3253,7 @@ _SOURCE_TOKEN_TO_NOTION = {
     "ich": SOURCE_ICH,
     "who": SOURCE_WHO,
     "hc": SOURCE_HC,
+    "fda483": SOURCE_FDA_483,
 }
 
 
@@ -3391,6 +3406,16 @@ def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
             "error_msg": stats.hc_error_msg,
         },
         {
+            "key": "fda483",
+            "label": "FDA 483/EIR",
+            "fetched": stats.fda483_fetched,
+            "inserted": stats.fda483_inserted,
+            "skip_dup": stats.fda483_skipped_dup,
+            "failed": stats.fda483_insert_failed,
+            "error": stats.fda483_error,
+            "error_msg": stats.fda483_error_msg,
+        },
+        {
             "key": "search",
             "label": "Brave Search",
             "fetched": stats.search_fetched,
@@ -3415,6 +3440,7 @@ def _evaluate_health(
     enable_ich: bool,
     enable_who: bool,
     enable_hc: bool,
+    enable_fda483: bool,
     enable_moleg_api: bool,
     enable_scrape: bool,
     event_name: str,
@@ -3480,6 +3506,7 @@ def _evaluate_health(
             enable_ich,
             enable_who,
             enable_hc,
+            enable_fda483,
             enable_search,
         ])
     )
@@ -3515,6 +3542,7 @@ def _evaluate_health(
             (enable_ich and stats.ich_error, "ich", "ICH", stats.ich_error_msg),
             (enable_who and stats.who_error, "who", "WHO", stats.who_error_msg),
             (enable_hc and stats.hc_error, "health-canada", "Health Canada", stats.hc_error_msg),
+            (enable_fda483 and stats.fda483_error, "fda483", "FDA 483/EIR", stats.fda483_error_msg),
         ]
 
         if not phase1_fr_active and not phase1_recall_active:
@@ -3537,6 +3565,7 @@ def _evaluate_health(
                 (enable_ich, "ich", "ICH", stats.ich_error, stats.ich_error_msg),
                 (enable_who, "who", "WHO", stats.who_error, stats.who_error_msg),
                 (enable_hc, "health-canada", "Health Canada", stats.hc_error, stats.hc_error_msg),
+                (enable_fda483, "fda483", "FDA 483/EIR", stats.fda483_error, stats.fda483_error_msg),
             ]
             active_phase2_sources = [row for row in phase2_source_states if row[0]]
             if active_phase2_sources and all(row[3] for row in active_phase2_sources):
@@ -3762,6 +3791,8 @@ def main() -> int:
                   or "who" in active)
     enable_hc = (os.environ.get("ENABLE_HC", "false").lower() == "true"
                  or "hc" in active)
+    enable_fda483 = (os.environ.get("ENABLE_FDA_483", "false").lower() == "true"
+                     or "fda483" in active)
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
     event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
@@ -4030,6 +4061,24 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_HC=false — Health Canada 수집 건너뜀")
 
+    # ── WHY-1 #3: FDA 483/EIR (ENABLE_FDA_483=true 또는 --sources fda483) ─────
+    fda483_items: list[IntakeItem] = []
+    if enable_fda483:
+        log("INFO", "=== FDA 483/EIR 수집 시작 ===")
+        try:
+            from collect_fda_483 import collect_fda_483
+            # 483 은 publish date 지연공개형 → enforcement 윈도우(MFDS_ENFORCEMENT_WINDOW_DAYS) 사용
+            fda483_items, fda483_err = collect_fda_483(enf_start, end)
+        except Exception as e:  # noqa: BLE001
+            fda483_items, fda483_err = [], str(e)
+        stats.fda483_fetched = len(fda483_items)
+        if fda483_err:
+            stats.fda483_error = True
+            stats.fda483_error_msg = fda483_err
+            log("WARN", f"FDA 483/EIR 오류: {fda483_err}")
+    else:
+        log("INFO", "ENABLE_FDA_483=false — FDA 483/EIR 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
@@ -4038,7 +4087,8 @@ def main() -> int:
                      + stats.mfds_gmp_inspection_fetched
                      + stats.ich_fetched
                      + stats.who_fetched
-                     + stats.hc_fetched)
+                     + stats.hc_fetched
+                     + stats.fda483_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
@@ -4048,7 +4098,7 @@ def main() -> int:
         f"MFDS-Admin={stats.mfds_admin_fetched} · "
         f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · "
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
-        f"HC={stats.hc_fetched} · 합계={total_fetched}건"
+        f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
     ))
 
     # 3) Notion 기존 row (중복 제거)
@@ -4189,6 +4239,13 @@ def main() -> int:
     stats.hc_skipped_dup = hc_sk
     stats.hc_insert_failed = hc_fail
 
+    fda483_in, fda483_sk, fda483_fail = insert_items(
+        notion_token, notion_db, fda483_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.fda483_inserted = fda483_in
+    stats.fda483_skipped_dup = fda483_sk
+    stats.fda483_insert_failed = fda483_fail
+
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
     search_items: list[IntakeItem] = []  # G2: inmemory_raw 집계에서 항상 참조 가능하게 선초기화
@@ -4246,7 +4303,8 @@ def main() -> int:
                 inmemory_raw = build_inmemory_raw(
                     fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
                     wl_items, mfds_items, mfds_recall_items, mfds_admin_items,
-                    mfds_gmp_inspection_items, ich_items, who_items, hc_items, search_items)
+                    mfds_gmp_inspection_items, ich_items, who_items, hc_items,
+                    fda483_items, search_items)
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
                     source_names=handoff_sources, doc_ids=handoff_doc_ids,
@@ -4283,6 +4341,7 @@ def main() -> int:
         "ENABLE_ICH": enable_ich,
         "ENABLE_WHO": enable_who,
         "ENABLE_HC": enable_hc,
+        "ENABLE_FDA_483": enable_fda483,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
@@ -4301,6 +4360,7 @@ def main() -> int:
         enable_ich=enable_ich,
         enable_who=enable_who,
         enable_hc=enable_hc,
+        enable_fda483=enable_fda483,
         enable_moleg_api=enable_moleg_api,
         enable_scrape=enable_scrape,
         event_name=event_name,
@@ -4411,6 +4471,10 @@ def main() -> int:
                     f.write(_src_line("Health Canada", stats.hc_fetched, stats.hc_inserted,
                                       stats.hc_skipped_dup, stats.hc_insert_failed,
                                       stats.hc_error, stats.hc_error_msg))
+                if enable_fda483:
+                    f.write(_src_line("FDA 483/EIR", stats.fda483_fetched, stats.fda483_inserted,
+                                      stats.fda483_skipped_dup, stats.fda483_insert_failed,
+                                      stats.fda483_error, stats.fda483_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,

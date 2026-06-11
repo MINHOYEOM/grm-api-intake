@@ -405,6 +405,57 @@ class EvaluateHealthExcerptDegradedTest(unittest.TestCase):
                 self.assertEqual(health.exit_code, 0)
 
 
+class EvaluateHealthFda483DegradedTest(unittest.TestCase):
+    """WHY-1 #3 P1 — 483 excerpt 실패/cap·표 절단은 warning-only(failure 승격 금지).
+
+    카드 자체는 graceful degrade(메타 카드 유지)이므로 수집 성공이며, 조용한 실패/
+    완전성 미보장만 표면화한다. flag off(시도 0·truncated 0)면 finding 미발생.
+    """
+
+    def test_fda483_excerpt_failed_is_warning_not_failure(self) -> None:
+        stats = ci.CollectionStats()
+        stats.fda483_excerpt_attempted = 5
+        stats.fda483_excerpt_failed = 2
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-excerpt-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])           # failure 승격 0
+        self.assertEqual(health.status, "warning")
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings if w.code == "fda483-excerpt-degraded")
+        self.assertIn("2건", warning.message)
+        self.assertIn("메타 카드 유지", warning.message)
+
+    def test_fda483_excerpt_capped_alone_is_warning(self) -> None:
+        stats = ci.CollectionStats()
+        stats.fda483_excerpt_attempted = 40
+        stats.fda483_excerpt_capped = 1
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-excerpt-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_fda483_table_truncated_is_warning(self) -> None:
+        stats = ci.CollectionStats()
+        stats.fda483_table_truncated = 1
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-table-truncated", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_flag_off_or_clean_counters_no_fda483_warning(self) -> None:
+        # flag off(시도 0·truncated 0) 또는 전건 성공 → finding 미발생.
+        for attempted in (0, 7):
+            with self.subTest(attempted=attempted):
+                stats = ci.CollectionStats()
+                stats.fda483_excerpt_attempted = attempted
+                health = ci._evaluate_health(**_health_kwargs(
+                    stats=stats, enable_fda483=True))
+                self.assertNotIn("fda483-excerpt-degraded", _codes(health.warnings))
+                self.assertNotIn("fda483-table-truncated", _codes(health.warnings))
+                self.assertEqual(health.status, "ok")
+                self.assertEqual(health.exit_code, 0)
+
+
 class HealthFinalizeTest(unittest.TestCase):
     """finalize(): failure > warning > ok 우선순위와 exit_code 결정."""
 

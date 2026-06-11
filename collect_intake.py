@@ -627,6 +627,13 @@ class CollectionStats:
     fda483_insert_failed: int = 0
     fda483_error: bool = False
     fda483_error_msg: str = ""
+    # P1: 483 excerpt 관측 — collect_fda_483.LAST_HEALTH 집계분. 실패/cap 은 graceful
+    # (메타 카드 유지)이라 warning 으로만 표면화(flag off 면 0 → 무발생). table_truncated
+    # 는 HTML 최신 ~10행 절단 의심(더 오래된 in-window 건 누락 가능) 신호.
+    fda483_excerpt_attempted: int = 0
+    fda483_excerpt_failed: int = 0
+    fda483_excerpt_capped: int = 0    # cap 도달 여부(0/1)
+    fda483_table_truncated: int = 0   # 표 절단 의심 여부(0/1)
 
     def total_insert_failures(self) -> int:
         return (
@@ -3672,6 +3679,31 @@ def _evaluate_health(
             f"WL 본문 excerpt {stats.wl_body_failed}건 추출 실패 — 메타 카드 유지",
             f"attempted={stats.wl_body_attempted} failed={stats.wl_body_failed}",
         )
+    # WHY-1 #3 P1: 483 excerpt 실패/cap 표면화(WHOPIR/WL 와 동형 warning-only·flag off 면
+    # 카운터 0 → 미발생). 카드 자체는 graceful degrade(메타 카드 유지)라 failure 승격 금지.
+    if stats.fda483_excerpt_failed > 0 or stats.fda483_excerpt_capped > 0:
+        degraded = []
+        if stats.fda483_excerpt_failed:
+            degraded.append(f"추출 실패 {stats.fda483_excerpt_failed}건")
+        if stats.fda483_excerpt_capped:
+            degraded.append("fetch cap 도달(이후 항목 excerpt 생략)")
+        health.add_warning(
+            "fda483-excerpt-degraded",
+            "FDA 483/EIR",
+            f"483 결함 excerpt {' · '.join(degraded)} — 메타 카드 유지",
+            f"attempted={stats.fda483_excerpt_attempted} "
+            f"failed={stats.fda483_excerpt_failed} "
+            f"capped={bool(stats.fda483_excerpt_capped)}",
+        )
+    # P1-① 한계 표면화: HTML 표 절단 의심(최신 ~10행만 노출 → 더 오래된 in-window 건 누락
+    # 가능). warning-only — 수집 자체는 정상이나 완전성 미보장을 운영에 알린다.
+    if stats.fda483_table_truncated:
+        health.add_warning(
+            "fda483-table-truncated",
+            "FDA 483/EIR",
+            "483 표 절단 의심 — 표시 행이 전부 윈도우 내(더 오래된 in-window 건 가려졌을 수 있음)",
+            "OII Reading Room HTML 은 최신 ~10행만 노출. 완전성 필요 시 수동 확인/후속 페이지 경로 검토.",
+        )
 
     return health.finalize()
 
@@ -4066,12 +4098,20 @@ def main() -> int:
     if enable_fda483:
         log("INFO", "=== FDA 483/EIR 수집 시작 ===")
         try:
-            from collect_fda_483 import collect_fda_483
+            import collect_fda_483 as fda483_module
             # 483 은 publish date 지연공개형 → enforcement 윈도우(MFDS_ENFORCEMENT_WINDOW_DAYS) 사용
-            fda483_items, fda483_err = collect_fda_483(enf_start, end)
+            fda483_items, fda483_err = fda483_module.collect_fda_483(enf_start, end)
+            fda483_health = getattr(fda483_module, "LAST_HEALTH", {}) or {}
         except Exception as e:  # noqa: BLE001
             fda483_items, fda483_err = [], str(e)
+            fda483_health = {}
         stats.fda483_fetched = len(fda483_items)
+        # P1: 483 excerpt 실패/cap·표 절단 의심은 graceful(메타 카드 유지) — warning 표면화용 집계.
+        fda483_excerpt_health = fda483_health.get("fda483_excerpt") or {}
+        stats.fda483_excerpt_attempted = int(fda483_excerpt_health.get("attempted") or 0)
+        stats.fda483_excerpt_failed = int(fda483_excerpt_health.get("failed") or 0)
+        stats.fda483_excerpt_capped = int(bool(fda483_excerpt_health.get("capped")))
+        stats.fda483_table_truncated = int(bool(fda483_health.get("table_truncated")))
         if fda483_err:
             stats.fda483_error = True
             stats.fda483_error_msg = fda483_err

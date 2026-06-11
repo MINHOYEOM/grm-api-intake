@@ -3,42 +3,46 @@
 
 ENABLE_FDA_483=true 또는 --sources fda483 일 때 collect_intake.main() 에서 호출된다.
 
-배경 (probe 2026-06-11, archive/point-in-time/probe_fda483*.py):
-  FDA OII FOIA Electronic Reading Room 는 **DataTables JSON 엔드포인트**로 전체 구조화
-  레코드를 제공한다(서버렌더 HTML 표는 최신 10행만, 나머지는 JS). 지시문이 가정한 HTML
-  표 파싱보다 이 JSON 이 깨끗하고 안정적이다.
-    JSON: https://www.fda.gov/datatables-json/ora-foia-reading.json  (≈3000 레코드)
-    필드: mid(=media id), field_record_date(실사일 MM/DD/YYYY), field_fein(FEI),
-          field_company_name_1(회사), field_foia_record_type_1(<a href=/media/<id>/download>483</a>),
-          field_state_1(미국 주), field_establishment_type_1(시설유형),
-          field_publish_date(공개일 MM/DD/YYYY — 윈도우 필터 대상), field_foia_record_type(평문 타입)
-  - mid == media id → PDF 직링크 /media/<id>/download. 안정 dedup 키.
-  - RSS 피드는 404(죽음) → JSON 단독.
+데이터 소스 (probe 2026-06-11 라이브 재확인):
+  FDA OII FOIA Electronic Reading Room 의 **공식 HTML 표**(서버사이드 렌더, 차단 없음).
+    https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room
+  컬럼: Record Date · Company Name · FEI Number · Record Type · State · Country ·
+        Establishment Type · Publish Date · Excerpt.
+  - Record Type 셀에 483 PDF 링크 <a href="…/media/<id>/download">483</a> — <id> = 안정 dedup 키.
+  - State 와 Country 는 **별도 컬럼**: 해외 소재국은 Country 에(예: India), 미국 국내 행은
+    State 채움·Country 공란.
+  - DataTables JSON(datatables-json/ora-foia-reading.json)은 간헐 사망(빈 응답)이 관측돼
+    신뢰 불가 → **HTML 단독 경로**. XLSX 내보내기는 openpyxl 신규 의존이라 사용 금지.
+  - HTML 표는 최신 ~10행만 노출(DataTables 클라이언트 페이지네이션, 서버 페이지 파라미터
+    없음). 저빈도 소스 + Publish Date 윈도우라 초기 rollout 에 충분. 단, 표 행이 전부
+    in-window(=오래된 경계 미도달)면 절단 의심 health warning 으로 표면화(누락 침묵 방지).
 
 수집 흐름:
-  JSON fetch → Record Type ∈ {483, EIR} 필터 → Publish Date 윈도우 필터(지연 공개형 →
-  MFDS_ENFORCEMENT_WINDOW_DAYS 재사용) → 노이즈/관련성 게이트(수의 드롭·기기/식품 드롭) →
-  건별 483 PDF 결함 excerpt(P6 _extract_pdf_text 재사용·최신 N건 cap·graceful) → IntakeItem.
+  HTML fetch → 표 파싱(FDA WL _FDAWLTableParser 재사용) → Record Type ∈ {483, EIR} 필터 →
+  Publish Date 윈도우 필터(지연 공개형 → MFDS_ENFORCEMENT_WINDOW_DAYS 재사용·정렬 비의존) →
+  노이즈/관련성 게이트(수의 드롭·기기/식품 드롭) → 건별 483 PDF 결함 excerpt(P6
+  _extract_pdf_text 재사용·최신 N건 cap·graceful) → IntakeItem.
 
 설계 역할:
   - 483 = Tier 3(미시정 시 WL/집행으로 이어지는 선행 신호), EIR = Tier 2(무균 시설/신호는
     Tier 3 floor). distributor-only(제조 아님)는 드롭 대신 한 단계 하향(§4 과필터 금지).
+  - Site Country = Country 컬럼(해외, 예: India). 공란+State 있음(미국 국내) → "United States".
+    State(주)는 절대 Site Country 에 넣지 않는다(raw_payload['state'] 별도 보존).
   - Evidence = B: excerpt 는 prose_input(W5/W6/W7)만 보강하고 W3 인용(Evidence A) 승격은
     WHOPIR·WL·483 통합 별도 게이트로 보류(#1+#2 와 동일 정책).
   - excerpt 실패(fetch/암호화/스캔본/앵커 미스)는 graceful — 키 미기록·항목은 메타 카드로
     유지·LAST_HEALTH 경고. 수집 전체 실패 금지.
-  - 일일/주간 0건은 정상(저빈도). JSON 구조 변경(0레코드·483/EIR 타입 전무)만 error.
+  - 일일/주간 0건은 정상(저빈도). 표 미발견(0행)·필터 전건 탈락만 error(구조 변경 의심).
 """
 
 from __future__ import annotations
 
-import os
 import re
 import time
 from datetime import date
 from typing import Any
 
-from grm_common import http_get_bytes, http_get_json, log
+from grm_common import http_get_bytes, http_get_html, log
 from collect_intake import (
     IntakeItem,
     SOURCE_FDA_483,
@@ -48,11 +52,11 @@ from collect_intake import (
     compute_relevance,
     _kw_any,
     _within_window,
+    _FDAWLTableParser,
 )
 
 
-# 데이터 소스 (probe 2026-06-11 라이브 확인)
-FDA_483_JSON_URL = "https://www.fda.gov/datatables-json/ora-foia-reading.json"
+# 데이터 소스 (probe 2026-06-11 라이브 재확인 — HTML 단독, JSON 경로 폐기)
 OII_READING_ROOM_URL = (
     "https://www.fda.gov/about-fda/office-inspections-and-investigations/"
     "oii-foia-electronic-reading-room"
@@ -62,7 +66,6 @@ FDA_MEDIA_BASE = "https://www.fda.gov"
 # Record Type — 결함 본문을 담은 두 타입만(나머지 Response/Consent Decree/Recall 등 제외).
 RECORD_TYPE_483 = "483"
 RECORD_TYPE_EIR = "Establishment Inspection Report (EIR)"
-KEEP_RECORD_TYPES = {RECORD_TYPE_483, RECORD_TYPE_EIR}
 
 TYPE_FDA_483 = "483"        # type_or_class(카드 분류) — 483
 TYPE_FDA_EIR = "EIR"        # type_or_class — EIR
@@ -70,7 +73,18 @@ LANGUAGE_EN = "EN"
 REGION_FDA = "USA (FDA)"
 
 HTTP_RETRIES = 3
-FDA_483_JSON_TIMEOUT = 60
+FDA_483_HTML_TIMEOUT = 30
+
+# 표 컬럼 인덱스(probe 채록 — 9컬럼 고정 순서).
+_COL_RECORD_DATE = 0
+_COL_COMPANY = 1
+_COL_FEI = 2
+_COL_RECORD_TYPE = 3        # 셀에 /media/<id>/download href
+_COL_STATE = 4
+_COL_COUNTRY = 5
+_COL_ESTABLISHMENT = 6
+_COL_PUBLISH_DATE = 7
+_MIN_COLS = 8              # Excerpt(8)는 선택 — 8컬럼이면 충분
 
 # WHY-1 #3: 483 PDF 결함 excerpt. P6(MFDS GMP)의 검증된 PDF 텍스트 엔진(_extract_pdf_text)을
 # 재사용하고, 483 특유 관찰사항 앵커만 새로 둔다. 비용·예의: per-item timeout/delay + 최신 N건 cap.
@@ -89,17 +103,11 @@ _FDA483_EXCERPT_PATTERNS = (
     r"specifically,",
 )
 
-# excerpt 관측용(dry-run 검증·운영 health). collect_who.LAST_HEALTH 패턴.
+# excerpt·절단 관측용(dry-run 검증·운영 health). collect_who.LAST_HEALTH 패턴.
 LAST_HEALTH: dict[str, Any] = {}
 
-_TAG_RE = re.compile(r"<[^>]+>")
 _MEDIA_RE = re.compile(r"/media/(\d+)/download")
 _MDY_RE = re.compile(r"(\d{1,2})/(\d{1,2})/(\d{4})")
-
-
-def _strip(value: Any) -> str:
-    """HTML 태그 제거 + 공백 정규화(셀 값 정리, 순수 함수)."""
-    return re.sub(r"\s+", " ", _TAG_RE.sub(" ", str(value or ""))).strip()
 
 
 def _parse_mdy(raw: str) -> str:
@@ -113,22 +121,80 @@ def _parse_mdy(raw: str) -> str:
         return ""
 
 
-def _record_type(row: dict[str, Any]) -> str:
-    """레코드의 Record Type(평문). field_foia_record_type 우선, 없으면 _1 에서 태그 제거."""
-    plain = _strip(row.get("field_foia_record_type"))
-    return plain or _strip(row.get("field_foia_record_type_1"))
+def _cell(cols: list[str], i: int) -> tuple[str, str]:
+    """_FDAWLTableParser 셀('text|HREF:href') → (text, href). 범위 밖이면 ('', '')."""
+    if i >= len(cols):
+        return "", ""
+    raw = cols[i]
+    if "|HREF:" in raw:
+        text, href = raw.split("|HREF:", 1)
+        return text.strip(), href.strip()
+    return raw.strip(), ""
 
 
-def _media_id(row: dict[str, Any]) -> str:
-    """483 PDF media id. field_foia_record_type_1 의 /media/<id>/download href 우선, 없으면 mid."""
-    m = _MEDIA_RE.search(str(row.get("field_foia_record_type_1", "")))
-    if m:
-        return m.group(1)
-    return _strip(row.get("mid"))
+def _norm_record_type(text: str) -> str:
+    """셀 텍스트 → 정규화 Record Type({483, EIR}) 또는 ''(비대상).
+
+    '483' 정확일치(‘Amended 483’·‘483 Response’ 제외), EIR 은 'Establishment Inspection
+    Report' 또는 \\bEIR\\b 포함.
+    """
+    t = (text or "").strip()
+    if t == RECORD_TYPE_483:
+        return RECORD_TYPE_483
+    low = t.lower()
+    if "establishment inspection report" in low or re.search(r"\beir\b", low):
+        return RECORD_TYPE_EIR
+    return ""
 
 
 def _pdf_url(media_id: str) -> str:
     return f"{FDA_MEDIA_BASE}/media/{media_id}/download" if media_id else ""
+
+
+def _parse_rows(html_text: str) -> tuple[list[dict[str, str]], int]:
+    """HTML 표 → 정규화 행 dict 리스트(483/EIR 만) + 파싱된 데이터행 총수.
+
+    데이터행 총수는 절단/구조변경 sentinel 용(헤더 제외, len>=_MIN_COLS 인 행).
+    """
+    parser = _FDAWLTableParser()
+    parser.feed(html_text)
+    rows: list[dict[str, str]] = []
+    data_row_count = 0
+    for raw_row in parser.rows:
+        cols = raw_row.get("_cols", [])
+        if len(cols) < _MIN_COLS:
+            continue
+        rtype_text, href = _cell(cols, _COL_RECORD_TYPE)
+        date_text, _ = _cell(cols, _COL_RECORD_DATE)
+        # 헤더 행 배제: Record Date 셀이 날짜 패턴이 아니면 헤더/비데이터.
+        if not _MDY_RE.search(date_text):
+            continue
+        data_row_count += 1
+        record_type = _norm_record_type(rtype_text)
+        if not record_type:
+            continue
+        m = _MEDIA_RE.search(href)
+        media_id = m.group(1) if m else ""
+        if not media_id:
+            continue
+        company, _ = _cell(cols, _COL_COMPANY)
+        fei, _ = _cell(cols, _COL_FEI)
+        state, _ = _cell(cols, _COL_STATE)
+        country, _ = _cell(cols, _COL_COUNTRY)
+        establishment, _ = _cell(cols, _COL_ESTABLISHMENT)
+        publish, _ = _cell(cols, _COL_PUBLISH_DATE)
+        rows.append({
+            "record_date": date_text,
+            "company": company,
+            "fei": fei,
+            "record_type": record_type,
+            "media_id": media_id,
+            "state": state,
+            "country": country,
+            "establishment_type": establishment,
+            "publish_date": publish,
+        })
+    return rows, data_row_count
 
 
 def _extract_fda483_excerpt(text: str) -> str:
@@ -190,23 +256,32 @@ def _signal_tier(record_type: str, establishment_type: str, excerpt: str) -> str
     return base
 
 
-def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
-    """필터 통과 레코드(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭)."""
-    record_type = _record_type(row)
-    if record_type not in KEEP_RECORD_TYPES:
-        return None
-    media_id = _media_id(row)
-    if not media_id:
-        return None
-    company = _strip(row.get("field_company_name_1"))
-    fei = _strip(row.get("field_fein"))
-    state = _strip(row.get("field_state_1"))
-    establishment_type = _strip(row.get("field_establishment_type_1"))
-    record_date = _strip(row.get("field_record_date"))     # 실사일(원문 MM/DD/YYYY 유지)
-    publish_iso = _parse_mdy(_strip(row.get("field_publish_date")))
+def _site_country(country: str, state: str) -> str:
+    """Site Country(소재국) 매핑. Country 우선(해외), 공란+State(미국 국내) → 'United States'.
+
+    State(주)는 절대 Site Country 에 넣지 않는다 — GRM 의 Site Country 의미(소재국)와 어긋남.
+    """
+    if country:
+        return country
+    if state:
+        return "United States"
+    return ""
+
+
+def _to_item(nrow: dict[str, str], excerpt: str) -> IntakeItem | None:
+    """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭)."""
+    record_type = nrow["record_type"]
+    media_id = nrow["media_id"]
+    company = nrow["company"]
+    fei = nrow["fei"]
+    state = nrow["state"]
+    country = nrow["country"]
+    establishment_type = nrow["establishment_type"]
+    record_date = nrow["record_date"]                    # 실사일(원문 MM/DD/YYYY 유지)
+    publish_iso = _parse_mdy(nrow["publish_date"])
 
     # 노이즈/관련성 게이트 — gate_blob 으로 도메인 판정.
-    gate_blob = " ".join([company, establishment_type, record_type, excerpt])
+    gate_blob = " ".join([company, establishment_type, country, record_type, excerpt])
     # 수의/동물용은 인체 의약품 밖 → 하드 드롭(타 수집기와 동일 정책).
     if _kw_any(gate_blob.lower(), QA_HARD_EXCLUDE_TERMS):
         return None
@@ -221,6 +296,7 @@ def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
     tier = _signal_tier(record_type, establishment_type, excerpt)
     type_or_class = TYPE_FDA_483 if record_type == RECORD_TYPE_483 else TYPE_FDA_EIR
     pdf_url = _pdf_url(media_id)
+    site_country = _site_country(country, state)
 
     raw_payload: dict[str, Any] = {
         "channel": "fda-483",
@@ -229,8 +305,9 @@ def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
         "record_type": record_type,
         "establishment_type": establishment_type,
         "record_date": record_date,
-        "publish_date": _strip(row.get("field_publish_date")),
-        "state": state,
+        "publish_date": nrow["publish_date"],
+        "country": country,
+        "site_state": state,          # 미국 주(소재국 아님 — Site Country 와 분리)
         "media_id": media_id,
         "pdf_url": pdf_url,
         # compute_modality 가 시설유형의 'drug' 단서를 보도록 product_type 으로 정규화.
@@ -243,12 +320,13 @@ def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
     # body 로 compute_modality 한다(IntakeItem 에 저장 필드 없음 — 타 수집기와 동일). 시설유형의
     # 'Drug Manufacturer' → Chemical, 'Outsourcing Facility' → Other 등으로 폴백된다.
     label = "FDA 483" if record_type == RECORD_TYPE_483 else "FDA EIR"
+    locale = country or (f"{state}, United States" if state else "")
     body = (
         f"FDA {record_type} — OII FOIA Electronic Reading Room 공개 실사 기록.\n"
         f"제조소/업체: {company or '원문 미기재'}"
         + (f" (FEI {fei})" if fei else "")
         + (f"\n시설 유형: {establishment_type}" if establishment_type else "")
-        + (f"\n소재: {state}" if state else "")
+        + (f"\n소재: {locale}" if locale else "")
         + f"\n출처: {OII_READING_ROOM_URL}"
     )
 
@@ -268,7 +346,7 @@ def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
         signal_tier=tier,
         raw_payload=raw_payload,
         source_url=OII_READING_ROOM_URL,
-        site_country=state,                          # 미국 주(JSON 에 국가 필드 없음)
+        site_country=site_country,                   # Country(해외) 또는 'United States'
         language=LANGUAGE_EN,
         region_jurisdiction=REGION_FDA,
     )
@@ -277,41 +355,52 @@ def _to_item(row: dict[str, Any], excerpt: str) -> IntakeItem | None:
 def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """FDA 483/EIR 수집 진입점. (items, error_msg).
 
-    - JSON fetch 실패/비배열/0레코드 → error(transient 마커는 health 단계에서 warning 강등).
-    - 483/EIR 타입이 전체 레코드에 전무 → 구조 변경 의심 error(침묵 0건 금지).
-    - 윈도우 내 0건 → 정상(저빈도, 빈 리스트·error 없음).
+    - HTML fetch 실패 → error(transient 마커는 health 단계에서 warning 강등).
+    - 표 미발견(데이터행 0) → 구조/렌더 변경 의심 error(침묵 0건 금지).
+    - 데이터행은 있으나 483/EIR 0건 → 정상(빈 리스트, 저빈도·newest 페이지 구성).
+    - 윈도우 내 0건 → 정상(빈 리스트·error 없음).
+    - 표가 전부 in-window(오래된 경계 미도달) → 절단 의심(LAST_HEALTH·warning, 누락 침묵 방지).
     - PDF excerpt 실패는 graceful(키 미기록·메타 카드 유지·LAST_HEALTH 경고).
     """
     global LAST_HEALTH
-    log("INFO", f"FDA 483/EIR 수집: {FDA_483_JSON_URL}")
-    try:
-        data = http_get_json(FDA_483_JSON_URL, timeout=FDA_483_JSON_TIMEOUT,
-                             retries=HTTP_RETRIES)
-    except Exception as e:  # noqa: BLE001
-        return [], f"FDA 483 JSON 수집 실패: {e}"
-
-    if not isinstance(data, list) or not data:
-        return [], ("FDA 483 JSON 형식 이상(배열 아님/0레코드) — 구조 변경 의심(수동 확인 필요)")
-
-    keep_rows = [r for r in data if isinstance(r, dict) and _record_type(r) in KEEP_RECORD_TYPES]
-    if not keep_rows:
-        # 전체 레코드에 483/EIR 타입이 하나도 없음 = 필드/구조 변경(필터·482 sentinel 침묵 금지).
-        return [], (f"FDA 483/EIR 레코드 0건(타입 부재, total={len(data)}) "
-                    "— JSON 필드/구조 변경 의심(수동 확인 필요)")
-
-    # Publish Date 윈도우 필터(지연 공개형). 최신 N건 excerpt cap 위해 publish desc 정렬
-    # (JSON 은 oldest-first 라 윈도우 통과분을 최신 우선으로 재정렬).
-    in_window = [r for r in keep_rows
-                 if _within_window(_parse_mdy(_strip(r.get("field_publish_date"))), start, end)]
-    in_window.sort(key=lambda r: _parse_mdy(_strip(r.get("field_publish_date"))), reverse=True)
-
     excerpt_health: dict[str, Any] = {
         "attempted": 0, "ok": 0, "failed": 0, "capped": False, "warnings": [],
     }
+    LAST_HEALTH = {"fda483_excerpt": excerpt_health, "table_truncated": False}
+
+    log("INFO", f"FDA 483/EIR 수집: {OII_READING_ROOM_URL}")
+    try:
+        html_text = http_get_html(OII_READING_ROOM_URL, timeout=FDA_483_HTML_TIMEOUT,
+                                  retries=HTTP_RETRIES, label="FDA 483")
+    except Exception as e:  # noqa: BLE001
+        return [], f"FDA 483 HTML 수집 실패: {e}"
+
+    keep_rows, data_row_count = _parse_rows(html_text)
+    if data_row_count == 0:
+        # 표가 아예 파싱되지 않음 = 구조/렌더 변경(침묵 0건 금지).
+        return [], ("FDA 483 표 미발견(데이터행 0) — HTML 구조/렌더 변경 의심(수동 확인 필요)")
+    if not keep_rows:
+        # 데이터행은 있으나 newest 페이지에 483/EIR 가 없음 = 저빈도 정상(드물지만 가능).
+        log("INFO", f"FDA 483/EIR 0건 — 표 데이터행 {data_row_count}개 중 483/EIR 없음(정상)")
+        return [], None
+
+    start_iso = start.isoformat()
+    in_window = [r for r in keep_rows
+                 if _within_window(_parse_mdy(r["publish_date"]), start, end)]
+    # 절단 의심: HTML 은 최신 ~10행만 노출 → 오래된 경계(start 이전 publish)를 한 번도 못 봤고
+    # in-window 행이 있으면 더 오래된 in-window 행이 가려졌을 수 있다(누락 침묵 방지 신호).
+    saw_older = any(
+        _parse_mdy(r["publish_date"]) and _parse_mdy(r["publish_date"]) < start_iso
+        for r in keep_rows
+    )
+    truncated = bool(in_window) and not saw_older
+    # 최신 N건 excerpt cap 위해 publish desc 정렬(파싱 순서 비의존 — B2 교훈).
+    in_window.sort(key=lambda r: _parse_mdy(r["publish_date"]), reverse=True)
+
     items: list[IntakeItem] = []
     seen: set[str] = set()
-    for row in in_window:
-        media_id = _media_id(row)
+    for nrow in in_window:
+        media_id = nrow["media_id"]
         if not media_id or media_id in seen:
             continue
         seen.add(media_id)
@@ -335,16 +424,19 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                     excerpt_health["warnings"].append(warn)
                     log("WARN", warn + " — 메타 카드로 유지(manual_review)")
 
-        item = _to_item(row, excerpt)   # None = 수의/기기/식품 도메인 드롭
-        if item is not None:            # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
+        item = _to_item(nrow, excerpt)   # None = 수의/기기/식품 도메인 드롭
+        if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 
-    LAST_HEALTH = {"fda483_excerpt": excerpt_health}
+    LAST_HEALTH = {"fda483_excerpt": excerpt_health, "table_truncated": truncated}
     if excerpt_health["capped"]:
         log("WARN", f"FDA 483 excerpt cap({FDA483_EXCERPT_MAX_ITEMS}) 도달 — "
                     "나머지 항목은 excerpt 없이 메타 카드로 유지")
+    if truncated:
+        log("WARN", "FDA 483 표 절단 의심 — 표시 행이 전부 윈도우 내(오래된 경계 미도달). "
+                    "더 오래된 in-window 483/EIR 가 가려졌을 수 있음(수동 확인 권장)")
     log("INFO", f"FDA 483/EIR 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
-                f"483/EIR 전체 {len(keep_rows)}) · excerpt "
+                f"483/EIR 파싱 {len(keep_rows)}, 데이터행 {data_row_count}) · excerpt "
                 f"attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "
-                f"failed={excerpt_health['failed']}")
+                f"failed={excerpt_health['failed']} · truncated={truncated}")
     return items, None

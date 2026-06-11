@@ -211,10 +211,53 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_BIOLOGIC,
         )
 
-    def test_hc_brand_only_drugs_without_generic_chemical(self):
-        # 유효성분 단서가 없으면(상세 fetch 실패) Category=Drugs → Chemical (graceful 반례)
+    def test_hc_brand_only_hizentra_now_biologic_via_curated_dict(self):
+        # GAP-2 supersedes the old graceful 반례: 상세 fetch 실패로 유효성분 단서가 없어도
+        # 큐레이티드 브랜드 사전(MODALITY_BIOLOGIC_BRANDS)이 'Hizentra'를 Biologic 으로 잡는다.
+        # (사전 주석: "HC P7 상세 fetch 누락 시 백업" — 바로 이 시나리오를 의도적으로 교정)
         payload = {"product_type": "Drugs", "product_description": "Hizentra"}
-        self.assertEqual(ci.compute_modality(payload, "Hizentra"), ci.MODALITY_CHEMICAL)
+        self.assertEqual(ci.compute_modality(payload, "Hizentra"), ci.MODALITY_BIOLOGIC)
+
+
+class TestGap2BrandOnlyBiologic(unittest.TestCase):
+    """GAP-2: 브랜드명만 있고 원료/클래스 텍스트가 없는 생물의약품을 큐레이티드
+    사전(MODALITY_BIOLOGIC_BRANDS)으로 Biologic 교정. 제형 접미사(2순위 d)가 덮어쓰기 전에
+    가로채야 한다. 자닥신주=thymosin alpha-1, Hizentra=면역글로불린.
+    """
+
+    def test_gap2_1_자닥신주_brand_only_biologic(self):
+        # PRDUCT='자닥신주', 본문에 생물 클래스 단서 없음 — 종전엔 '주' 접미사로 Chemical.
+        self.assertEqual(
+            ci.compute_modality({"PRDUCT": "자닥신주"}, "[회수·판매중지] 자닥신주"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_gap2_2_자닥신주_with_strength_variant_biologic(self):
+        # 함량 포함 변이(ITEM_NAME) 도 어간 '자닥신' 으로 매칭
+        self.assertEqual(
+            ci.compute_modality({"ITEM_NAME": "자닥신주 0.8mg"}, "[행정처분] 자닥신주 0.8mg"),
+            ci.MODALITY_BIOLOGIC,
+        )
+
+    def test_gap2_3_hizentra_english_brand_only_biologic(self):
+        # 영문 백업: 유효성분 텍스트 없이 brand-only 'Hizentra' → Biologic
+        self.assertEqual(ci.compute_modality({}, "Hizentra"), ci.MODALITY_BIOLOGIC)
+
+    def test_gap2_4_generic_chemical_forms_unbroken(self):
+        # 오탐 가드: 브랜드 어간을 포함하지 않는 일반 화학 정/주는 여전히 Chemical
+        self.assertEqual(
+            ci.compute_modality({"PRDUCT": "세파클러정"}, "[회수] 세파클러정"),
+            ci.MODALITY_CHEMICAL,
+        )
+        self.assertEqual(
+            ci.compute_modality({"PRDUCT": "오메프라졸주"}, "[회수] 오메프라졸주"),
+            ci.MODALITY_CHEMICAL,
+        )
+
+    def test_gap2_5_general_words_no_false_biologic(self):
+        # 일반어는 브랜드 부분문자열 오매칭 없이 여전히 비-Biologic(Other)
+        for txt in ["개정안", "행정처분", "규정 일부개정고시"]:
+            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_OTHER, msg=txt)
 
 
 class TestSterileBioTier3Floor(unittest.TestCase):

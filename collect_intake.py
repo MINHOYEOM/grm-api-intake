@@ -408,6 +408,15 @@ MODALITY_BIOLOGIC_TERMS = [
     "필그라스팀", "면역글로불린", "면역혈청", "톡소이드", "항독소", "보툴리눔",
     "줄기세포", "단클론",
 ]
+# 브랜드명만 있고 원료/클래스 텍스트가 없는 생물의약품(GAP-2) 큐레이티드 사전.
+# 키 = 브랜드 핵심 토큰(소문자, 한국어/영문). 제형 접미사(정/주/캡슐 등)는 제외하고
+# 브랜드 어간만 등록한다(예: '자닥신주'·'자닥신액' 모두 잡도록 '자닥신').
+# 유지 정책: 라이브에서 새로 발견된 brand-only 오분류만 추가(과수집 금지). 근거 주석 1줄 필수.
+MODALITY_BIOLOGIC_BRANDS = [
+    "자닥신",      # thymosin alpha-1 (면역조절 펩타이드/생물학적제제); MFDS 실데이터 '자닥신주'
+    "hizentra",    # 사람면역글로불린(IgG) 피하주사 — HC P7 상세 fetch 누락 시 백업
+    # ↓ 라이브 재검증에서 추가로 발견되는 brand-only 생물주사제를 여기에 근거와 함께 등록
+]
 # 의약품(제품) 일반 단서 — 제형/투여경로 등으로 '약'임을 식별(화학·생물 공통 1차 신호)
 MODALITY_DRUG_PRODUCT_TERMS = [
     "tablet", "capsule", "oral solid", "solid dosage",
@@ -1157,6 +1166,17 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
+        return MODALITY_BIOLOGIC
+    # GAP-2: 브랜드명만 있는 생물의약품 — 제형 접미사(2순위 d)·product_type 'drug'에
+    #        가려지기 전에 가로챈다. 제품명 필드 + haystack 양쪽에서 브랜드 어간을 찾는다
+    #        (haystack 은 PRDUCT/ITEM_NAME 을 포함하지 않으므로 제품명 필드를 별도로 합친다).
+    _brand_blob = haystack
+    for _k in MODALITY_PRODUCT_NAME_KEYS:
+        _v = raw_payload.get(_k)
+        if _v:
+            _brand_blob = _brand_blob + " " + str(_v).lower()
+            break
+    if any(b.lower() in _brand_blob for b in MODALITY_BIOLOGIC_BRANDS):
         return MODALITY_BIOLOGIC
     # 단클론항체 INN 접미사 '-mab'(adalimumab·rituximab 등)만 단어 끝에서 매칭.
     # (bare "mab" 부분문자열은 'Mabel' 류 오탐을 내므로 접미사 정규식으로 한정)

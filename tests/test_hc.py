@@ -50,15 +50,18 @@ class TestP7GenericToBiologic(unittest.TestCase):
         self.assertIn("IMMUNOGLOBULIN (HUMAN)", item.body)   # body 에 유효성분 주입됨
         self.assertEqual(_modality(item), ci.MODALITY_BIOLOGIC)
 
-    def test_brand_only_chemical_without_detail_is_graceful(self):
-        # 상세 fetch 실패({}) → 피드 단독 폴백. 브랜드명만으론 생물 식별 불가 → Chemical(무크래시).
+    def test_brand_only_biologic_via_curated_dict_when_detail_missing(self):
+        # GAP-2: 상세 fetch 실패({})로 유효성분 텍스트가 없어도, 큐레이티드 브랜드 사전
+        # (MODALITY_BIOLOGIC_BRANDS: 'hizentra')이 백업으로 Biologic 을 보장한다.
+        # (종전 graceful 폴백은 Chemical 이었으나 GAP-2가 의도적으로 교정 — 사전 주석 참조)
         item = hc._to_item(_rec(), START, END, detail_fetcher=lambda u: {})
-        self.assertNotIn("유효성분", item.body)
-        self.assertEqual(_modality(item), ci.MODALITY_CHEMICAL)
+        self.assertNotIn("유효성분", item.body)            # 상세 유효성분 주입은 여전히 없음
+        self.assertEqual(_modality(item), ci.MODALITY_BIOLOGIC)
 
-    def test_no_fetcher_falls_back_to_feed_only(self):
-        item = hc._to_item(_rec(), START, END)            # detail_fetcher 없음
-        self.assertEqual(_modality(item), ci.MODALITY_CHEMICAL)
+    def test_no_fetcher_brand_only_biologic_via_curated_dict(self):
+        # detail_fetcher 없음 → 피드 단독. 브랜드 'Hizentra' 가 사전으로 Biologic (GAP-2 백업).
+        item = hc._to_item(_rec(), START, END)
+        self.assertEqual(_modality(item), ci.MODALITY_BIOLOGIC)
 
     def test_feed_immune_globulin_space_form_is_biologic(self):
         # 피드 Product 에 'Immune globulin'(공백형) — 상세 없이도 Biologic (용어 보강).

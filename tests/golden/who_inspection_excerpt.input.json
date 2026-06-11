@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "anchor_text": "WHOPIR: Site Z, India (FPP)",
+    "channel": "whopir",
+    "list_page": "https://extranet.who.int/pqweb/inspection-services/whopir",
+    "pdf_url": "https://extranet.who.int/pqweb/sites/default/files/whopir-z.pdf",
+    "whopir_excerpt": "Summary of the deficiencies Three deficiencies were identified. 1. Quality management: the pharmaceutical quality system did not ensure timely closure of CAPA. 2. Production: cross-contamination controls were inadequate."
+  },
+  "row": {
+    "date": "2026-05-06",
+    "document_id": "who-whopir-2026-11-ex",
+    "headline": "WHOPIR — Site Z",
+    "language": "EN",
+    "official_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "WHO",
+    "type_or_class": "who-inspection"
+  }
+}

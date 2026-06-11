@@ -679,6 +679,10 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         raw.get("EXPOSE_CONT"),
         raw.get("attachment_deficiency_excerpt"), raw.get("attachment_text"),
         raw.get("ADM_DISPS_NAME"),
+        # WHY-1 #1/#2: WHOPIR PDF·FDA WL 본문에서 추출한 결함/위반 excerpt(있으면 우선).
+        # 구조화 사유(위) 뒤 · 링크텍스트/표지(subject·anchor_text 등) 앞 — "왜"를 살린다.
+        # 두 키는 WHO-inspection/WL 외엔 부재 → 기존 golden 16종 _first 결과 바이트 불변.
+        raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
         raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
         raw.get("anchor_text"), raw.get("description"),
     )
@@ -704,7 +708,8 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "quote_lines": _split_sentences(quote) if quote else [],
         "w2_facts": {label: value for label, value in _w2_rows(kind, row, raw)},
         "body_excerpt": _truncate_at_sentence(
-            _first(raw.get("description"), raw.get("summary"), row.get("body")), 300),
+            _first(raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
+                   raw.get("description"), raw.get("summary"), row.get("body")), 300),
     }
 
 

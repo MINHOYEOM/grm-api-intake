@@ -26,13 +26,15 @@ ENABLE_WHO=true 또는 --sources who 일 때 collect_intake.main() 에서 호출
 from __future__ import annotations
 
 import hashlib
+import os
 import re
 import time
 from datetime import date
 from html.parser import HTMLParser
+from typing import Any
 from urllib.parse import urljoin, urlsplit
 
-from grm_common import http_get_html, log
+from grm_common import http_get_bytes, http_get_html, log
 from collect_intake import (
     IntakeItem,
     SOURCE_WHO,
@@ -69,6 +71,31 @@ HTTP_RETRIES = 3
 REQUEST_DELAY_SECONDS = 1.0
 WHOPIR_MAX_PAGES = 8
 MAX_TITLE_CHARS = 240
+
+# WHY-1 #1: WHOPIR PDF 결함 excerpt (flag 게이트 ENABLE_WHOPIR_EXCERPT, 기본 off).
+# P6(MFDS GMP)의 검증된 PDF 텍스트 엔진(_extract_pdf_text)을 재사용하고, WHOPIR 영문
+# 구조에 맞는 결함 섹션 앵커만 새로 둔다. 비용·예의: per-item timeout/delay + 최신 N건 cap.
+WHOPIR_EXCERPT_MAX_CHARS = 1500
+WHOPIR_EXCERPT_FETCH_TIMEOUT = 20
+WHOPIR_EXCERPT_DELAY_SECONDS = 0.5
+WHOPIR_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(목록 newest-first → 최신 N건 우선)
+# 표지/개요를 건너뛰고 결함·결론 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
+# WHOPIR PDF는 [표지 → general info → summary of the inspection → outcome/conclusion →
+# (non-)compliance/GMP deficiencies] 구조라, 인용보다 LLM 컨텍스트("왜")용으로 결함 구간을 우선.
+_WHOPIR_EXCERPT_PATTERNS = (
+    r"summary\s+of\s+the\s+deficiencies",
+    r"summary\s+of\s+gmp\s+deficiencies",
+    r"list\s+of\s+(?:gmp\s+)?deficiencies",
+    r"gmp\s+deficiencies",
+    r"deficiencies",
+    r"non[-\s]?compliance",
+    r"outcome\s+of\s+(?:the\s+)?inspection",
+    r"conclusion",
+    r"summary\s+of\s+(?:the\s+)?inspection",
+)
+
+# WHOPIR excerpt 관측용(dry-run 검증·운영 health). gmp_inspection.LAST_HEALTH 패턴.
+LAST_HEALTH: dict[str, Any] = {}
 
 # 임상/기기 전용 등 명백히 무관한 것만 배제 (제조·품질은 보수적으로 포함)
 _WHO_EXCLUDE = [
@@ -215,9 +242,64 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
 
 
 # ── 2) WHOPIR (공개 실사보고서) ────────────────────────────────────────────────
+def _whopir_excerpt_enabled() -> bool:
+    """ENABLE_WHOPIR_EXCERPT=true 일 때만 PDF 본문 fetch+excerpt(기본 off)."""
+    return os.environ.get("ENABLE_WHOPIR_EXCERPT", "false").lower() == "true"
+
+
+def _extract_whopir_excerpt(text: str) -> str:
+    """WHOPIR PDF 평탄화 텍스트 → 영문 결함/결론 구간 excerpt(없으면 본문 앞부분).
+
+    표지/개요 보일러플레이트가 아니라 결함·결론을 카드 컨텍스트("왜")로 올리기 위한 추출.
+    앵커가 하나도 없으면 앞부분으로 폴백(빈 PDF/스캔본은 ""→ 호출부가 키 미기록).
+    """
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    if not compact:
+        return ""
+    for pat in _WHOPIR_EXCERPT_PATTERNS:
+        m = re.search(pat, compact, re.I)
+        if m:
+            return compact[m.start():][:WHOPIR_EXCERPT_MAX_CHARS].strip()
+    return compact[:WHOPIR_EXCERPT_MAX_CHARS].strip()
+
+
+def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:
+    """WHOPIR PDF fetch → 영문 결함 excerpt. 반환 (excerpt, status).
+
+    status: 'ok' | 'no-excerpt' | 'fetch-fail:…' | PDF 엔진 status
+    (pdf-encrypted/scan-no-text/pdf-parse-fail:…/pdf-parser-missing). 실패 시 excerpt=""
+    → 호출부가 raw_payload 에 키를 쓰지 않고 항목은 링크 카드로 유지(graceful degrade).
+    P6 PDF 엔진(_extract_pdf_text) 재사용 — MFDS 전용 Referer 가 없는 WHO PDF 라
+    fetch 는 grm_common.http_get_bytes(WHO 가 이미 쓰는 클라이언트)를 직접 쓴다.
+    """
+    try:
+        from collect_mfds_gmp_inspection import _extract_pdf_text
+    except Exception as e:  # noqa: BLE001 — 임포트 실패도 graceful(키 미기록)
+        return "", f"engine-missing:{type(e).__name__}"
+    try:
+        data = http_get_bytes(
+            pdf_url, timeout=WHOPIR_EXCERPT_FETCH_TIMEOUT, retries=HTTP_RETRIES,
+            headers={"Accept": "application/pdf"}, label="WHOPIR PDF",
+        )
+    except RuntimeError as e:
+        return "", f"fetch-fail:{str(e)[:120]}"
+    text, status = _extract_pdf_text(data)
+    if not text:
+        return "", status
+    excerpt = _extract_whopir_excerpt(text)
+    if not excerpt:
+        return "", "no-excerpt"
+    return excerpt, "ok"
+
+
 def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     items: list[IntakeItem] = []
     seen: set[str] = set()
+    excerpt_enabled = _whopir_excerpt_enabled()
+    excerpt_health: dict[str, Any] = {
+        "enabled": excerpt_enabled, "attempted": 0, "ok": 0, "failed": 0,
+        "capped": False, "warnings": [],
+    }
     for page in range(WHOPIR_MAX_PAGES):
         url = WHOPIR_MED_URL if page == 0 else f"{WHOPIR_MED_URL}?page={page}"
         time.sleep(REQUEST_DELAY_SECONDS)
@@ -242,6 +324,28 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
             seen.add(abs_url)
             new_on_page += 1
             manuf = _clean(text) or abs_url.rsplit("/", 1)[-1]
+            raw_payload: dict[str, Any] = {
+                "channel": "whopir", "anchor_text": _clean(text),
+                "pdf_url": abs_url, "list_page": url,
+            }
+            # WHY-1 #1: PDF 본문에서 결함 excerpt 추출(flag on 시). 실패는 키 미기록 +
+            # warning 누적(항목은 링크 카드로 유지) — 수집 전체 실패 금지. cap 으로 fetch 상한.
+            if excerpt_enabled and not excerpt_health["capped"]:
+                if excerpt_health["attempted"] >= WHOPIR_EXCERPT_MAX_ITEMS:
+                    excerpt_health["capped"] = True
+                else:
+                    excerpt_health["attempted"] += 1
+                    if WHOPIR_EXCERPT_DELAY_SECONDS:
+                        time.sleep(WHOPIR_EXCERPT_DELAY_SECONDS)
+                    excerpt, status = _fetch_whopir_excerpt(abs_url)
+                    if excerpt:
+                        raw_payload["whopir_excerpt"] = excerpt
+                        excerpt_health["ok"] += 1
+                    else:
+                        excerpt_health["failed"] += 1
+                        warn = f"WHOPIR excerpt 실패({status}): {abs_url}"
+                        excerpt_health["warnings"].append(warn)
+                        log("WARN", warn + " — 링크 카드로 유지(manual_review)")
             items.append(IntakeItem(
                 source=SOURCE_WHO,
                 document_id="who-whopir-" + hashlib.sha1(abs_url.encode()).hexdigest()[:12],
@@ -257,8 +361,7 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 osd_relevance="N/A",
                 source_type=SRC_TYPE_OFFICIAL_PAGE,
                 signal_tier="Tier 2",
-                raw_payload={"channel": "whopir", "anchor_text": _clean(text),
-                             "pdf_url": abs_url, "list_page": url},
+                raw_payload=raw_payload,
                 source_url=WHOPIR_MED_URL,
                 language=LANGUAGE_EN,
                 region_jurisdiction=REGION_WHO,
@@ -268,6 +371,14 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     else:
         # for-else: break 없이 WHOPIR_MAX_PAGES 소진 = cap 도달(이후 페이지 누락 가능)
         log("WARN", f"WHO WHOPIR 페이지 cap({WHOPIR_MAX_PAGES}) 도달 — 이후 보고서 누락 가능")
+    global LAST_HEALTH
+    LAST_HEALTH = {"whopir_excerpt": excerpt_health}
+    if excerpt_enabled:
+        if excerpt_health["capped"]:
+            log("WARN", f"WHOPIR excerpt cap({WHOPIR_EXCERPT_MAX_ITEMS}) 도달 — "
+                        f"나머지 항목은 excerpt 없이 링크 카드로 유지")
+        log("INFO", f"WHOPIR excerpt: attempted={excerpt_health['attempted']} "
+                    f"ok={excerpt_health['ok']} failed={excerpt_health['failed']}")
     if not items:
         return [], f"WHO WHOPIR 0건({WHOPIR_MED_URL}) — 구조/렌더 변경 의심(수동 확인 필요)"
     log("INFO", f"WHO WHOPIR 완료: {len(items)}건")

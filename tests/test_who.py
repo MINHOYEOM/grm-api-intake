@@ -15,10 +15,12 @@ import os
 import sys
 import unittest
 from datetime import date
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_who as w
+import collect_mfds_gmp_inspection as g
 
 RUN = date(2026, 6, 10)
 
@@ -211,6 +213,136 @@ class NocCorePropagationTest(unittest.TestCase):
             w._collect_rss, w._collect_whopir, w._collect_noc = orig
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)
+
+
+# WHY-1 #1 — WHOPIR PDF 결함 excerpt (flag ENABLE_WHOPIR_EXCERPT, 기본 off).
+# 실제 WHOPIR PDF 평탄화 형태 — 표지(general info)/개요 + 결함 섹션.
+_WHOPIR_TEXT = (
+    "WHO PUBLIC INSPECTION REPORT Finished Pharmaceutical Product Manufacturer "
+    "Part 1 General information Name of manufacturer: Example Pharma Ltd "
+    "Address: Plot 12, Industrial Area, India "
+    "Part 2 Brief summary of the activities "
+    "Outcome of inspection: The site was found to be operating at an acceptable "
+    "level of compliance with WHO GMP, subject to corrective actions. "
+    "Summary of the deficiencies Three deficiencies were identified. "
+    "1. Quality management: the pharmaceutical quality system did not ensure "
+    "timely closure of CAPA. 2. Production: cross-contamination controls were inadequate."
+)
+_WHOPIR_HTML = (
+    '<a href="/sites/default/files/whopir_files/maker-a.pdf">Maker A, Site X (June 2026)</a>'
+    '<a href="/sites/default/files/whopir_files/maker-b.pdf">Maker B, Site Y (June 2026)</a>'
+)
+
+
+class WhopirExcerptExtractTest(unittest.TestCase):
+    """_extract_whopir_excerpt — 표지 건너뛰고 결함 구간부터(없으면 앞부분 폴백)."""
+
+    def test_excerpt_skips_cover_and_starts_at_deficiencies(self) -> None:
+        ex = w._extract_whopir_excerpt(_WHOPIR_TEXT)
+        self.assertTrue(ex.startswith("Summary of the deficiencies"))
+        self.assertNotIn("Name of manufacturer", ex)   # 표지 제외
+        self.assertIn("cross-contamination controls", ex)
+
+    def test_excerpt_falls_back_to_leading_body_when_no_anchor(self) -> None:
+        # 결함/결론 앵커가 전혀 없는 표지성 텍스트 → 앞부분 폴백(빈 문자열 아님).
+        cover = "WHO PUBLIC INSPECTION REPORT Part 1 General information Name: X Address: Y"
+        ex = w._extract_whopir_excerpt(cover)
+        self.assertTrue(ex.startswith("WHO PUBLIC INSPECTION REPORT"))
+
+    def test_excerpt_empty_on_empty_text(self) -> None:
+        self.assertEqual(w._extract_whopir_excerpt(""), "")
+        self.assertEqual(w._extract_whopir_excerpt("   "), "")
+
+    def test_excerpt_capped_at_max_chars(self) -> None:
+        big = "GMP deficiencies " + ("x" * (w.WHOPIR_EXCERPT_MAX_CHARS + 500))
+        self.assertLessEqual(len(w._extract_whopir_excerpt(big)), w.WHOPIR_EXCERPT_MAX_CHARS)
+
+
+class WhopirFetchExcerptTest(unittest.TestCase):
+    """_fetch_whopir_excerpt — P6 PDF 엔진(_extract_pdf_text) 재사용 + graceful."""
+
+    def test_fetch_uses_pdf_engine_and_returns_ok(self) -> None:
+        orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
+        w.http_get_bytes = lambda url, **kw: b"%PDF-1.7 fake"
+        g._extract_pdf_text = lambda data: (_WHOPIR_TEXT, "pdf-ok")
+        try:
+            excerpt, status = w._fetch_whopir_excerpt("https://x/whopir-z.pdf")
+        finally:
+            w.http_get_bytes, g._extract_pdf_text = orig_bytes, orig_extract
+        self.assertEqual(status, "ok")
+        self.assertTrue(excerpt.startswith("Summary of the deficiencies"))
+
+    def test_fetch_graceful_on_network_failure(self) -> None:
+        orig_bytes = w.http_get_bytes
+
+        def _boom(url, **kw):
+            raise RuntimeError("HTTP GET final failure: timeout")
+
+        w.http_get_bytes = _boom
+        try:
+            excerpt, status = w._fetch_whopir_excerpt("https://x/whopir-z.pdf")
+        finally:
+            w.http_get_bytes = orig_bytes
+        self.assertEqual(excerpt, "")
+        self.assertTrue(status.startswith("fetch-fail:"))
+
+    def test_fetch_propagates_pdf_engine_status_on_no_text(self) -> None:
+        # 암호화/스캔본 등 본문 부재 → PDF 엔진 status 그대로(키 미기록 신호).
+        orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
+        w.http_get_bytes = lambda url, **kw: b"%PDF-1.7 fake"
+        g._extract_pdf_text = lambda data: ("", "pdf-encrypted")
+        try:
+            excerpt, status = w._fetch_whopir_excerpt("https://x/whopir-z.pdf")
+        finally:
+            w.http_get_bytes, g._extract_pdf_text = orig_bytes, orig_extract
+        self.assertEqual(excerpt, "")
+        self.assertEqual(status, "pdf-encrypted")
+
+
+class WhopirCollectExcerptGateTest(unittest.TestCase):
+    """_collect_whopir — flag on/off · excerpt 기록 · graceful degrade · health."""
+
+    def _run(self, fetch_stub):
+        orig_fetch, orig_delay = w._fetch_whopir_excerpt, w.WHOPIR_EXCERPT_DELAY_SECONDS
+        w._fetch_whopir_excerpt = fetch_stub
+        w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
+        try:
+            with _Patched(_WHOPIR_HTML):
+                return w._collect_whopir(RUN)
+        finally:
+            w._fetch_whopir_excerpt, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
+
+    def test_flag_on_writes_excerpt_to_raw_payload(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
+            items, err = self._run(lambda url: ("Summary of the deficiencies …", "ok"))
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 2)
+        for it in items:
+            self.assertEqual(it.raw_payload.get("whopir_excerpt"),
+                             "Summary of the deficiencies …")
+        self.assertEqual(w.LAST_HEALTH["whopir_excerpt"]["ok"], 2)
+        self.assertEqual(w.LAST_HEALTH["whopir_excerpt"]["failed"], 0)
+
+    def test_flag_on_failure_is_graceful_key_omitted_item_kept(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
+            items, err = self._run(lambda url: ("", "fetch-fail:boom"))
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 2)                 # 항목은 링크 카드로 유지
+        for it in items:
+            self.assertNotIn("whopir_excerpt", it.raw_payload)
+        self.assertEqual(w.LAST_HEALTH["whopir_excerpt"]["failed"], 2)
+
+    def test_flag_off_skips_fetch_entirely(self) -> None:
+        def _must_not_call(url):
+            raise AssertionError("flag off 인데 excerpt fetch 가 호출됨")
+
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "false"}):
+            items, err = self._run(_must_not_call)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 2)
+        for it in items:
+            self.assertNotIn("whopir_excerpt", it.raw_payload)
+        self.assertFalse(w.LAST_HEALTH["whopir_excerpt"]["enabled"])
 
 
 def _dummy_item(tag: str):

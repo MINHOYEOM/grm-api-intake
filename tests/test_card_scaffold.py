@@ -562,6 +562,75 @@ class ForbiddenMarkdownGuardTest(unittest.TestCase):
         self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
 
 
+class ExcerptProseInputGoldenTest(unittest.TestCase):
+    """WHY-1 #1/#2 — WHOPIR/WL excerpt 가 prose_input 에 반영되되 Evidence 는 불변(B).
+
+    신규 golden 2종(기존 16종과 분리 — page.expected.md·16-count 불변 유지). 두 키는
+    _prose_input 의 issue_or_reason·body_excerpt _first 폴백에만 추가됐으므로:
+      - issue_or_reason 이 링크텍스트(anchor_text)/subject 대신 excerpt 를 가리킨다.
+      - markdown(슬롯 {{W5}})·Evidence 판정은 불변(인용 승격 아님 → 여전히 B·무 '>').
+    """
+
+    _EXCERPT_FIXTURES = ("who_inspection_excerpt", "warning_letter_excerpt")
+
+    def test_excerpt_fixtures_byte_identical(self) -> None:
+        for name in self._EXCERPT_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                got_json_str = json.dumps(card.to_dict(), ensure_ascii=False,
+                                          indent=2, sort_keys=True)
+                if _UPDATE:
+                    _write(os.path.join(GOLDEN, f"{name}.expected.md"), card.markdown)
+                    _write(os.path.join(GOLDEN, f"{name}.expected.json"), got_json_str)
+                    continue
+                expected_md = _read(os.path.join(GOLDEN, f"{name}.expected.md"))
+                self.assertEqual(card.markdown, expected_md)
+                expected_json = json.loads(_read(os.path.join(GOLDEN, f"{name}.expected.json")))
+                self.assertEqual(json.loads(got_json_str), expected_json)
+
+    def test_whopir_excerpt_feeds_issue_or_reason_and_body(self) -> None:
+        fx = _load_input("who_inspection_excerpt")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        excerpt = fx["raw"]["whopir_excerpt"]
+        # excerpt 가 링크텍스트(anchor_text "WHOPIR: Site Z…") 대신 issue_or_reason 선두.
+        self.assertTrue(excerpt.startswith(card.prose_input["issue_or_reason"][:30]))
+        self.assertNotEqual(card.prose_input["issue_or_reason"], fx["raw"]["anchor_text"])
+        self.assertTrue(card.prose_input["body_excerpt"])
+
+    def test_wl_body_excerpt_feeds_issue_or_reason_over_subject(self) -> None:
+        fx = _load_input("warning_letter_excerpt")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        excerpt = fx["raw"]["wl_body_excerpt"]
+        # excerpt 가 subject("CGMP/Finished…") 대신 issue_or_reason 선두.
+        self.assertTrue(excerpt.startswith(card.prose_input["issue_or_reason"][:30]))
+        self.assertNotEqual(card.prose_input["issue_or_reason"], fx["raw"]["subject"])
+
+    def test_excerpt_does_not_promote_to_evidence_a(self) -> None:
+        # §6: prose_input(W5/W6/W7)만 보강 — W3 인용(Evidence A) 승격 아님.
+        for name in self._EXCERPT_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                self.assertEqual(card.evidence, "B")
+                self.assertNotIn("\n> ", card.markdown)
+
+    def test_excerpt_key_does_not_change_rendered_markdown(self) -> None:
+        # excerpt 는 prose_input(JSON 슬롯 입력)만 바꾸고 렌더 markdown 은 안 바꾼다.
+        # 동일 fixture 에서 excerpt 키만 제거 → markdown 바이트 동일(슬롯 {{W5}} 렌더).
+        keys = {"who_inspection_excerpt": "whopir_excerpt",
+                "warning_letter_excerpt": "wl_body_excerpt"}
+        for name, key in keys.items():
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                with_excerpt = cs.build_card_scaffold(fx["row"], fx["raw"])
+                raw_without = {k: v for k, v in fx["raw"].items() if k != key}
+                without_excerpt = cs.build_card_scaffold(fx["row"], raw_without)
+                self.assertEqual(with_excerpt.markdown, without_excerpt.markdown)
+                self.assertNotEqual(with_excerpt.prose_input["issue_or_reason"],
+                                    without_excerpt.prose_input["issue_or_reason"])
+
+
 def _callout_colors(md: str) -> list[str]:
     import re
     return re.findall(r'color="([a-z_]+)"', md)

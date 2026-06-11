@@ -40,6 +40,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from html import unescape as _html_unescape
 from html.parser import HTMLParser
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
@@ -173,6 +174,24 @@ FDA_WL_URL   = (
 )
 FDA_WL_SEARCH_API = (
     "https://api.fda.gov/other/warning_letters.json"   # 미공개 엔드포인트 — 폴백용
+)
+
+# WHY-1 #2: FDA Warning Letter 본문 위반 excerpt (flag 게이트 ENABLE_WL_BODY, 기본 off).
+# 목록 메타(subject)만 잡던 것을 편지 본문의 위반 서술 구간까지 추출해 카드 "왜"를 살린다.
+# in-window WL 은 부서 게이트 후 소수(주 한 줌) → fetch 부담 낮음. 실패는 graceful(키 미기록).
+WL_BODY_MAX_CHARS = 1500
+WL_BODY_FETCH_TIMEOUT = 20
+# 표지/머리말을 건너뛰고 위반 서술 단락부터 잘라내기 위한 영문 앵커(가장 이른 위치 우선).
+# 대소문자 무시(re.I) — 본문은 "During our inspection" 처럼 문장 첫 글자가 대문자.
+_WL_BODY_ANCHORS = (
+    r"during\s+(?:our|an|the)\s+inspection",
+    r"we\s+(?:found|observed)\s+that",
+    r"this\s+warning\s+letter",
+    r"\bviolations?\b",
+    r"current\s+good\s+manufacturing\s+practice",
+    r"\bcgmp\b",
+    r"\badulterated\b",
+    r"specifically,",
 )
 
 # 13 개 카테고리 휴리스틱 키워드 (lowercase 비교, 단어 경계 매칭)
@@ -1863,6 +1882,56 @@ def _parse_wl_date(raw: str) -> str:
     return _safe_date_iso(raw, context="FDA_WL")
 
 
+def _wl_html_to_text(html_text: str) -> str:
+    """WL 편지 HTML → 평탄화 텍스트. script/style 제거 + 태그 제거 + 엔티티 복원 + 공백 정규화.
+
+    PyMuPDF 불요(편지 본문은 HTML). 결정론·무의존(re + stdlib unescape).
+    """
+    text = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", html_text or "")
+    text = re.sub(r"(?s)<[^>]+>", " ", text)
+    text = _html_unescape(text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _extract_wl_body_excerpt(html_text: str) -> str:
+    """WL 본문에서 위반 서술 구간 excerpt(가장 이른 앵커부터). 앵커 없으면 ""(키 미기록).
+
+    표지/머리말 보일러플레이트가 아니라 위반 서술을 카드 컨텍스트("왜")로 올리기 위한 추출.
+    FDA 페이지는 nav/푸터가 많아 앵커 미발견 시 앞부분 폴백을 하지 않고 메타 카드를 유지한다.
+    """
+    text = _wl_html_to_text(html_text)
+    if not text:
+        return ""
+    best: int | None = None
+    for pat in _WL_BODY_ANCHORS:
+        m = re.search(pat, text, re.I)
+        if m and (best is None or m.start() < best):
+            best = m.start()
+    if best is None:
+        return ""
+    return text[best:best + WL_BODY_MAX_CHARS].strip()
+
+
+def _fetch_wl_body_excerpt(url: str) -> str:
+    """WL 편지 페이지 fetch → 위반 excerpt. 실패(403/timeout/네트워크)는 graceful("")."""
+    try:
+        resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+            "Accept": "text/html",
+        })
+        if resp.status_code == 403:
+            log("WARN", f"FDA WL 본문 403 — excerpt 건너뜀(메타 카드 유지): {truncate(url, 80)}")
+            return ""
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        log("WARN", f"FDA WL 본문 fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
+        return ""
+    excerpt = _extract_wl_body_excerpt(resp.text)
+    if not excerpt:
+        log("INFO", f"FDA WL 본문 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
+    return excerpt
+
+
 def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """FDA Warning Letters 페이지 HTML 테이블 파싱 수집.
 
@@ -1874,6 +1943,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     403/timeout 시 WARN 로그 후 빈 결과 반환.
     """
     log("INFO", f"FDA WL 수집: {FDA_WL_URL}")
+    wl_body_enabled = os.environ.get("ENABLE_WL_BODY", "false").lower() == "true"
     try:
         resp = requests.get(FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -1968,6 +2038,13 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
             log("INFO", f"FDA WL 부서 게이트 {office_verdict}(유지·관측): "
                         f"{truncate(issuing_office or '부서결측', 40)} | "
                         f"{truncate(firm or headline, 50)}")
+
+        # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
+        # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
+        if wl_body_enabled and wl_href:
+            body_excerpt = _fetch_wl_body_excerpt(wl_href)
+            if body_excerpt:
+                wl_raw["wl_body_excerpt"] = body_excerpt
 
         items.append(IntakeItem(
             source=SOURCE_FDA_WL,

@@ -1,0 +1,39 @@
+{
+  "card_id": "WHO::who-whopir-2026-11-ex",
+  "card_scaffold": "### [WHO · WHO] WHOPIR — Site Z — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `WHO` · `Signal Med (T2)` · `WHO`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-06</td></tr>\n<tr><td>**문서번호**</td><td>`who-whopir-2026-11-ex`</td></tr>\n<tr><td>**주제**</td><td>WHOPIR: Site Z, India (FPP)</td></tr>\n<tr><td>**발행기관**</td><td>WHO</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/inspection/whopir-site-z)\n</callout>",
+  "date": "2026-05-06",
+  "evidence": "B",
+  "kind": "who-inspection",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "Summary of the deficiencies Three deficiencies were identified. 1. Quality management: the pharmaceutical quality system did not ensure timely closure of CAPA. 2. Production: cross-contamination controls were inadequate.",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "",
+    "headline": "WHOPIR — Site Z",
+    "issue_or_reason": "Summary of the deficiencies Three deficiencies were identified. 1. Quality management: the pharmaceutical quality system did not ensure timely closure of CAPA. 2. Production: cross-contamination controls were inadequate.",
+    "kind": "who-inspection",
+    "language": "EN",
+    "modality": "",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "WHO",
+    "signal": "Tier 2",
+    "w2_facts": {
+      "문서번호": "`who-whopir-2026-11-ex`",
+      "발행기관": "WHO",
+      "발행일": "2026-05-06",
+      "주제": "WHOPIR: Site Z, India (FPP)"
+    }
+  },
+  "section": "global",
+  "signal_tier": "Tier 2"
+}

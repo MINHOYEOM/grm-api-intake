@@ -1,0 +1,39 @@
+{
+  "card_id": "FDA Warning Letter::WL-CMS-660124",
+  "card_scaffold": "### [Warning Letter · FDA] Acme Pharmaceuticals, LLC — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence B` · `FDA Warning Letter` · `Signal High (T3)` · `💊 합성의약품` · `CGMP`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-05-20</td></tr>\n<tr><td>**문서번호**</td><td>`WL-CMS-660124`</td></tr>\n<tr><td>**업체/제조소**</td><td>Acme Pharmaceuticals, LLC</td></tr>\n<tr><td>**발행 부서/일자**</td><td>Center for Drug Evaluation and Research (CDER) · 05/15/2026</td></tr>\n</table>\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: 공식 인덱스 + 보조 출처`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  📰 정보출처 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters)   ·   📎 공식원본 [링크](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660124)\n</callout>",
+  "date": "2026-05-20",
+  "evidence": "B",
+  "kind": "warning-letter",
+  "modality": "Chemical",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "During our inspection of your drug manufacturing facility, we observed significant violations of Current Good Manufacturing Practice (CGMP) regulations. Specifically, your firm failed to establish adequate written procedures for production and process controls.",
+    "deadline": "",
+    "evidence": "B",
+    "firm_or_product": "Acme Pharmaceuticals, LLC",
+    "headline": "CGMP for finished pharmaceuticals",
+    "issue_or_reason": "During our inspection of your drug manufacturing facility, we observed significant violations of Current Good Manufacturing Practice (CGMP) regulations. Specifically, your firm failed to establish adequate written procedures for production and process controls.",
+    "kind": "warning-letter",
+    "language": "EN",
+    "modality": "Chemical",
+    "product": "",
+    "quote_lines": [],
+    "regulator": "FDA Warning Letter",
+    "signal": "Tier 3",
+    "w2_facts": {
+      "문서번호": "`WL-CMS-660124`",
+      "발행 부서/일자": "Center for Drug Evaluation and Research (CDER) · 05/15/2026",
+      "발행일": "2026-05-20",
+      "업체/제조소": "Acme Pharmaceuticals, LLC"
+    }
+  },
+  "section": "global",
+  "signal_tier": "Tier 3"
+}

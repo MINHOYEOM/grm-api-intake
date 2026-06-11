@@ -235,7 +235,7 @@ _WHOPIR_HTML = (
 
 
 class WhopirExcerptExtractTest(unittest.TestCase):
-    """_extract_whopir_excerpt — 표지 건너뛰고 결함 구간부터(없으면 앞부분 폴백)."""
+    """_extract_whopir_excerpt — 표지 건너뛰고 결함 구간부터(앵커 미스는 키 미기록)."""
 
     def test_excerpt_skips_cover_and_starts_at_deficiencies(self) -> None:
         ex = w._extract_whopir_excerpt(_WHOPIR_TEXT)
@@ -243,11 +243,11 @@ class WhopirExcerptExtractTest(unittest.TestCase):
         self.assertNotIn("Name of manufacturer", ex)   # 표지 제외
         self.assertIn("cross-contamination controls", ex)
 
-    def test_excerpt_falls_back_to_leading_body_when_no_anchor(self) -> None:
-        # 결함/결론 앵커가 전혀 없는 표지성 텍스트 → 앞부분 폴백(빈 문자열 아님).
+    def test_excerpt_anchor_miss_returns_empty_no_cover_leak(self) -> None:
+        # P2-A: 결함/결론 앵커가 전혀 없는 표지성 텍스트 → ""(키 미기록·링크 카드 유지).
+        # 종전 선두 본문 폴백은 표지/General Information 유입 경로라 제거(WL 과 동일 정책).
         cover = "WHO PUBLIC INSPECTION REPORT Part 1 General information Name: X Address: Y"
-        ex = w._extract_whopir_excerpt(cover)
-        self.assertTrue(ex.startswith("WHO PUBLIC INSPECTION REPORT"))
+        self.assertEqual(w._extract_whopir_excerpt(cover), "")
 
     def test_excerpt_empty_on_empty_text(self) -> None:
         self.assertEqual(w._extract_whopir_excerpt(""), "")

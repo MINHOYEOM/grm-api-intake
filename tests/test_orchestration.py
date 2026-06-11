@@ -341,6 +341,69 @@ class EvaluateHealthInfoAndWarningTest(unittest.TestCase):
         self.assertEqual(health.exit_code, 0)
 
 
+class EvaluateHealthExcerptDegradedTest(unittest.TestCase):
+    """WHY-1 P1 — excerpt 실패/cap 은 warning-only 표면화(절대 failure 승격 금지).
+
+    카드 자체는 graceful degrade(WHOPIR=링크 카드, WL=메타 카드 유지)이므로 수집
+    성공이며, 조용한 실패만 막는다. flag off(시도 0)면 카운터 0 → finding 미발생.
+    """
+
+    def test_whopir_excerpt_failed_is_warning_not_failure(self) -> None:
+        stats = ci.CollectionStats()
+        stats.whopir_excerpt_attempted = 5
+        stats.whopir_excerpt_failed = 2
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_who=True))
+        self.assertIn("whopir-excerpt-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])           # failure 승격 0
+        self.assertEqual(health.status, "warning")
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings
+                       if w.code == "whopir-excerpt-degraded")
+        self.assertIn("2건", warning.message)
+        self.assertIn("링크 카드 유지", warning.message)
+
+    def test_whopir_excerpt_capped_alone_is_warning(self) -> None:
+        # 실패 0 이어도 cap 도달이면 이후 항목 excerpt 생략 사실을 표면화.
+        stats = ci.CollectionStats()
+        stats.whopir_excerpt_attempted = 40
+        stats.whopir_excerpt_capped = 1
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_who=True))
+        self.assertIn("whopir-excerpt-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings
+                       if w.code == "whopir-excerpt-degraded")
+        self.assertIn("cap", warning.message)
+
+    def test_wl_body_failed_is_warning_not_failure(self) -> None:
+        stats = ci.CollectionStats()
+        stats.wl_body_attempted = 3
+        stats.wl_body_failed = 3
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=stats, active={"fr", "recall", "wl"}))
+        self.assertIn("wl-body-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])           # failure 승격 0
+        self.assertEqual(health.status, "warning")
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings if w.code == "wl-body-degraded")
+        self.assertIn("3건", warning.message)
+        self.assertIn("메타 카드 유지", warning.message)
+
+    def test_flag_off_or_clean_counters_no_excerpt_warning(self) -> None:
+        # flag off(시도 0) 또는 전건 성공(failed=0·cap 미도달) → finding 미발생.
+        for attempted in (0, 7):
+            with self.subTest(attempted=attempted):
+                stats = ci.CollectionStats()
+                stats.whopir_excerpt_attempted = attempted
+                stats.wl_body_attempted = attempted
+                health = ci._evaluate_health(**_health_kwargs(
+                    stats=stats, active={"fr", "recall", "wl"}, enable_who=True))
+                self.assertNotIn("whopir-excerpt-degraded", _codes(health.warnings))
+                self.assertNotIn("wl-body-degraded", _codes(health.warnings))
+                self.assertEqual(health.status, "ok")
+                self.assertEqual(health.exit_code, 0)
+
+
 class HealthFinalizeTest(unittest.TestCase):
     """finalize(): failure > warning > ok 우선순위와 exit_code 결정."""
 

@@ -551,6 +551,10 @@ class CollectionStats:
     wl_insert_failed: int = 0
     wl_error: bool = False
     wl_error_msg: str = ""
+    # WHY-1 #2 P1: WL 본문 excerpt 관측 — 실패는 graceful(메타 카드 유지)이라 error 가
+    # 아니며, _evaluate_health 가 warning 으로만 표면화한다(flag off 면 0 → 무발생).
+    wl_body_attempted: int = 0
+    wl_body_failed: int = 0
     # ── Phase 2a: Search ────────────────────────────────────────────────────
     search_fetched: int = 0
     search_inserted: int = 0
@@ -602,6 +606,11 @@ class CollectionStats:
     who_insert_failed: int = 0
     who_error: bool = False
     who_error_msg: str = ""
+    # WHY-1 #1 P1: WHOPIR excerpt 관측 — collect_who.LAST_HEALTH 집계분. 실패/cap 은
+    # graceful(링크 카드 유지)이라 warning 으로만 표면화(flag off 면 0 → 무발생).
+    whopir_excerpt_attempted: int = 0
+    whopir_excerpt_failed: int = 0
+    whopir_excerpt_capped: int = 0   # cap 도달 여부(0/1) — 이후 항목 excerpt 생략 신호
     # ── P1: Health Canada ──────────────────────────────────────────────────
     hc_fetched: int = 0
     hc_inserted: int = 0
@@ -1912,6 +1921,11 @@ def _extract_wl_body_excerpt(html_text: str) -> str:
     return text[best:best + WL_BODY_MAX_CHARS].strip()
 
 
+# WHY-1 #2 P1: WL 본문 excerpt 관측용 — collect_who.LAST_HEALTH 동형 패턴.
+# collect_fda_warning_letters 가 매 호출 갱신하고 오케스트레이터가 stats 로 옮긴다.
+LAST_WL_HEALTH: dict[str, Any] = {}
+
+
 def _fetch_wl_body_excerpt(url: str) -> str:
     """WL 편지 페이지 fetch → 위반 excerpt. 실패(403/timeout/네트워크)는 graceful("")."""
     try:
@@ -1944,6 +1958,13 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     """
     log("INFO", f"FDA WL 수집: {FDA_WL_URL}")
     wl_body_enabled = os.environ.get("ENABLE_WL_BODY", "false").lower() == "true"
+    # P1: excerpt 시도/실패 집계 — 시작 시점에 전역을 교체해(이른 return 포함) 항상
+    # 이번 호출 분만 남긴다. dict 는 in-place 갱신이라 이후 증가분이 그대로 반영.
+    global LAST_WL_HEALTH
+    wl_body_health: dict[str, Any] = {
+        "enabled": wl_body_enabled, "attempted": 0, "failed": 0,
+    }
+    LAST_WL_HEALTH = {"wl_body": wl_body_health}
     try:
         resp = requests.get(FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -2042,9 +2063,12 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
         if wl_body_enabled and wl_href:
+            wl_body_health["attempted"] += 1
             body_excerpt = _fetch_wl_body_excerpt(wl_href)
             if body_excerpt:
                 wl_raw["wl_body_excerpt"] = body_excerpt
+            else:
+                wl_body_health["failed"] += 1
 
         items.append(IntakeItem(
             source=SOURCE_FDA_WL,
@@ -3595,6 +3619,31 @@ def _evaluate_health(
             warning[:240],
         )
 
+    # WHY-1 P1: excerpt 실패/cap 표면화. 카드 자체는 graceful degrade(링크/메타 카드
+    # 유지)이므로 warning-only — failure 승격 금지(§3.5, exit 0 유지). flag off 면
+    # 카운터가 전부 0 이라 finding 미발생(무변경).
+    if stats.whopir_excerpt_failed > 0 or stats.whopir_excerpt_capped > 0:
+        degraded = []
+        if stats.whopir_excerpt_failed:
+            degraded.append(f"추출 실패 {stats.whopir_excerpt_failed}건")
+        if stats.whopir_excerpt_capped:
+            degraded.append("fetch cap 도달(이후 항목 excerpt 생략)")
+        health.add_warning(
+            "whopir-excerpt-degraded",
+            "WHO WHOPIR",
+            f"WHOPIR 결함 excerpt {' · '.join(degraded)} — 링크 카드 유지",
+            f"attempted={stats.whopir_excerpt_attempted} "
+            f"failed={stats.whopir_excerpt_failed} "
+            f"capped={bool(stats.whopir_excerpt_capped)}",
+        )
+    if stats.wl_body_failed > 0:
+        health.add_warning(
+            "wl-body-degraded",
+            "FDA WL",
+            f"WL 본문 excerpt {stats.wl_body_failed}건 추출 실패 — 메타 카드 유지",
+            f"attempted={stats.wl_body_attempted} failed={stats.wl_body_failed}",
+        )
+
     return health.finalize()
 
 
@@ -3824,6 +3873,10 @@ def main() -> int:
     if "wl" in active:
         wl_items, wl_err = collect_fda_warning_letters(start, end)
         stats.wl_fetched = len(wl_items)
+        # P1: 본문 excerpt 실패는 graceful(메타 카드 유지) — warning 표면화용 집계.
+        wl_body_health = LAST_WL_HEALTH.get("wl_body") or {}
+        stats.wl_body_attempted = int(wl_body_health.get("attempted") or 0)
+        stats.wl_body_failed = int(wl_body_health.get("failed") or 0)
         if wl_err:
             stats.wl_error = True
             stats.wl_error_msg = wl_err
@@ -3940,11 +3993,18 @@ def main() -> int:
     if enable_who:
         log("INFO", "=== WHO 수집 시작 ===")
         try:
-            from collect_who import collect_who
-            who_items, who_err = collect_who(start, end)
+            import collect_who as who_module
+            who_items, who_err = who_module.collect_who(start, end)
+            who_health = getattr(who_module, "LAST_HEALTH", {}) or {}
         except Exception as e:  # noqa: BLE001
             who_items, who_err = [], str(e)
+            who_health = {}
         stats.who_fetched = len(who_items)
+        # P1: WHOPIR excerpt 실패/cap 은 graceful(링크 카드 유지) — warning 표면화용 집계.
+        whopir_excerpt_health = who_health.get("whopir_excerpt") or {}
+        stats.whopir_excerpt_attempted = int(whopir_excerpt_health.get("attempted") or 0)
+        stats.whopir_excerpt_failed = int(whopir_excerpt_health.get("failed") or 0)
+        stats.whopir_excerpt_capped = int(bool(whopir_excerpt_health.get("capped")))
         if who_err:
             stats.who_error = True
             stats.who_error_msg = who_err

@@ -6,6 +6,8 @@
   페이지는 nav/푸터가 많아 메타 카드 유지가 안전).
 - _fetch_wl_body_excerpt / collect_fda_warning_letters: 403/timeout graceful(키 미기록,
   목록 메타 카드 유지) · flag off=fetch 미호출.
+- LAST_WL_HEALTH(P1): excerpt 시도/실패 집계 — 오케스트레이터가 stats 로 옮겨
+  _evaluate_health 가 warning-only 로 표면화(조용한 실패 금지).
 """
 import os
 import sys
@@ -123,6 +125,9 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
         excerpt = items[0].raw_payload.get("wl_body_excerpt", "")
         self.assertTrue(excerpt.startswith("During our inspection"))
+        # P1: 성공도 attempted 로 집계(LAST_WL_HEALTH → stats 배선용).
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
+                         {"enabled": True, "attempted": 1, "failed": 0})
 
     def test_flag_on_fetch_failure_keeps_metadata_card(self) -> None:
         def _boom(url):
@@ -134,6 +139,9 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)                 # 목록 메타 카드 유지
         self.assertNotIn("wl_body_excerpt", items[0].raw_payload)
+        # P1: 조용한 실패 금지 — 실패가 카운터에 남아 health warning 으로 표면화된다.
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
+                         {"enabled": True, "attempted": 1, "failed": 1})
 
     def test_flag_off_skips_body_fetch(self) -> None:
         def _must_not_fetch_letter(url):
@@ -146,6 +154,9 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)
         self.assertNotIn("wl_body_excerpt", items[0].raw_payload)
+        # P1: flag off 면 카운터 0 → _evaluate_health warning 미발생(무변경 경로).
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
+                         {"enabled": False, "attempted": 0, "failed": 0})
 
 
 if __name__ == "__main__":

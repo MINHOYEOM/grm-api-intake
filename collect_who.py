@@ -248,10 +248,12 @@ def _whopir_excerpt_enabled() -> bool:
 
 
 def _extract_whopir_excerpt(text: str) -> str:
-    """WHOPIR PDF 평탄화 텍스트 → 영문 결함/결론 구간 excerpt(없으면 본문 앞부분).
+    """WHOPIR PDF 평탄화 텍스트 → 영문 결함/결론 구간 excerpt. 앵커 미스는 ""(키 미기록).
 
     표지/개요 보일러플레이트가 아니라 결함·결론을 카드 컨텍스트("왜")로 올리기 위한 추출.
-    앵커가 하나도 없으면 앞부분으로 폴백(빈 PDF/스캔본은 ""→ 호출부가 키 미기록).
+    P2-A: 앵커 미스 시 선두 본문 폴백을 두지 않는다 — 표지/General Information(사이트명·
+    주소·날짜)이 excerpt 로 새어드는 경로라 제거. WL excerpt 와 동일한 precision 우선
+    정책으로, 미스는 호출부에서 'no-excerpt' 실패로 집계돼 health warning 으로 표면화.
     """
     compact = re.sub(r"\s+", " ", text or "").strip()
     if not compact:
@@ -260,7 +262,7 @@ def _extract_whopir_excerpt(text: str) -> str:
         m = re.search(pat, compact, re.I)
         if m:
             return compact[m.start():][:WHOPIR_EXCERPT_MAX_CHARS].strip()
-    return compact[:WHOPIR_EXCERPT_MAX_CHARS].strip()
+    return ""
 
 
 def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:

@@ -434,16 +434,17 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
         self.assertEqual(health.failures, [])
         self.assertEqual(health.exit_code, 0)
 
-    def test_fda483_table_truncated_is_warning(self) -> None:
+    def test_fda483_source_degraded_is_warning(self) -> None:
+        # JSON 전수 경로 실패 → HTML 폴백(부분) = warning(완전성 미보장 표면화).
         stats = ci.CollectionStats()
-        stats.fda483_table_truncated = 1
+        stats.fda483_source_degraded = 1
         health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
-        self.assertIn("fda483-table-truncated", _codes(health.warnings))
+        self.assertIn("fda483-source-degraded", _codes(health.warnings))
         self.assertEqual(health.failures, [])
         self.assertEqual(health.exit_code, 0)
 
     def test_flag_off_or_clean_counters_no_fda483_warning(self) -> None:
-        # flag off(시도 0·truncated 0) 또는 전건 성공 → finding 미발생.
+        # flag off(시도 0·degraded 0) 또는 전건 성공 → finding 미발생.
         for attempted in (0, 7):
             with self.subTest(attempted=attempted):
                 stats = ci.CollectionStats()
@@ -451,7 +452,7 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
                 health = ci._evaluate_health(**_health_kwargs(
                     stats=stats, enable_fda483=True))
                 self.assertNotIn("fda483-excerpt-degraded", _codes(health.warnings))
-                self.assertNotIn("fda483-table-truncated", _codes(health.warnings))
+                self.assertNotIn("fda483-source-degraded", _codes(health.warnings))
                 self.assertEqual(health.status, "ok")
                 self.assertEqual(health.exit_code, 0)
 

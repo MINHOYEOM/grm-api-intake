@@ -628,12 +628,12 @@ class CollectionStats:
     fda483_error: bool = False
     fda483_error_msg: str = ""
     # P1: 483 excerpt 관측 — collect_fda_483.LAST_HEALTH 집계분. 실패/cap 은 graceful
-    # (메타 카드 유지)이라 warning 으로만 표면화(flag off 면 0 → 무발생). table_truncated
-    # 는 HTML 최신 ~10행 절단 의심(더 오래된 in-window 건 누락 가능) 신호.
+    # (메타 카드 유지)이라 warning 으로만 표면화(flag off 면 0 → 무발생). source_degraded
+    # 는 JSON 전수 경로 사망 → HTML 폴백(부분·완전성 미보장) 신호.
     fda483_excerpt_attempted: int = 0
     fda483_excerpt_failed: int = 0
     fda483_excerpt_capped: int = 0    # cap 도달 여부(0/1)
-    fda483_table_truncated: int = 0   # 표 절단 의심 여부(0/1)
+    fda483_source_degraded: int = 0   # JSON 전수 실패→HTML 폴백 여부(0/1)
 
     def total_insert_failures(self) -> int:
         return (
@@ -3695,14 +3695,15 @@ def _evaluate_health(
             f"failed={stats.fda483_excerpt_failed} "
             f"capped={bool(stats.fda483_excerpt_capped)}",
         )
-    # P1-① 한계 표면화: HTML 표 절단 의심(최신 ~10행만 노출 → 더 오래된 in-window 건 누락
-    # 가능). warning-only — 수집 자체는 정상이나 완전성 미보장을 운영에 알린다.
-    if stats.fda483_table_truncated:
+    # P1-① 완전성 표면화: JSON 전수 경로 사망 → HTML 폴백(최신 ~10행, 부분)으로 수집했음을
+    # 알린다. warning-only — 수집 자체는 정상이나 이번 실행은 윈도우 전수성 미보장.
+    if stats.fda483_source_degraded:
         health.add_warning(
-            "fda483-table-truncated",
+            "fda483-source-degraded",
             "FDA 483/EIR",
-            "483 표 절단 의심 — 표시 행이 전부 윈도우 내(더 오래된 in-window 건 가려졌을 수 있음)",
-            "OII Reading Room HTML 은 최신 ~10행만 노출. 완전성 필요 시 수동 확인/후속 페이지 경로 검토.",
+            "483 전수(JSON) 경로 실패 — HTML 폴백(최신 ~10행)으로 부분 수집(완전성 미보장)",
+            "OII DataTables JSON 이 응답하지 않아 HTML 표(최신 ~10행)로 폴백. 더 오래 공개된 "
+            "in-window 483/EIR 가 누락됐을 수 있음 — 다음 실행 복구 확인/수동 점검 권장.",
         )
 
     return health.finalize()
@@ -4106,12 +4107,12 @@ def main() -> int:
             fda483_items, fda483_err = [], str(e)
             fda483_health = {}
         stats.fda483_fetched = len(fda483_items)
-        # P1: 483 excerpt 실패/cap·표 절단 의심은 graceful(메타 카드 유지) — warning 표면화용 집계.
+        # P1: 483 excerpt 실패/cap·전수 경로 degrade 는 graceful — warning 표면화용 집계.
         fda483_excerpt_health = fda483_health.get("fda483_excerpt") or {}
         stats.fda483_excerpt_attempted = int(fda483_excerpt_health.get("attempted") or 0)
         stats.fda483_excerpt_failed = int(fda483_excerpt_health.get("failed") or 0)
         stats.fda483_excerpt_capped = int(bool(fda483_excerpt_health.get("capped")))
-        stats.fda483_table_truncated = int(bool(fda483_health.get("table_truncated")))
+        stats.fda483_source_degraded = int(bool(fda483_health.get("source_degraded")))
         if fda483_err:
             stats.fda483_error = True
             stats.fda483_error_msg = fda483_err

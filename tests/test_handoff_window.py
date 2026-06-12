@@ -155,7 +155,7 @@ class DisplayWindowSeparationTest(unittest.TestCase):
         captured: dict = {}
 
         def fake_query(token, db_id, run_date, window_days,
-                       source_names=None, doc_ids=None):
+                       source_names=None, doc_ids=None, current_handoff_id=None):
             captured["query_window"] = window_days
             return []
 

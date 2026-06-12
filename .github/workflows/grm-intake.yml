@@ -90,6 +90,10 @@ on:
         description: 'handoff v2 생성 (K3 — scaffold/slots)'
         type: boolean
         default: false
+      enable_handoff_idempotency_v2:
+        description: '멱등성 v2 — Handoff Ref 상태기계 (PL-10b/B1 근본해결, Notion에 Handoff Ref 속성 생성 후 켤 것)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -167,6 +171,10 @@ jobs:
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
           # K3 handoff v2 (scaffold/slots). 기본 off — schedule는 vars 미설정 시 v1 경로 유지.
           ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_v2) || vars.ENABLE_HANDOFF_V2 || 'false' }}
+          # PL-10b/B1 멱등성 근본해결 (Handoff Ref 상태기계). 기본 off — schedule는 vars
+          # 미설정 시 v1(날짜 윈도우+K4-1) 유지. 속성 미생성 상태로 켜도 preflight 가
+          # 그 실행만 v1 폴백(graceful degrade) + health warning.
+          ENABLE_HANDOFF_IDEMPOTENCY_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_idempotency_v2) || vars.ENABLE_HANDOFF_IDEMPOTENCY_V2 || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()

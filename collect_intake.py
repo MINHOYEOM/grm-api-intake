@@ -121,6 +121,12 @@ SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
 HANDOFF_SCHEMA_VERSION_V2 = "grm-routine-handoff/v2"  # K2 단계 D (additive)
+# PL-10b/B1 근본해결: row 가 어느 handoff 에 포함됐는지 결정론적 표시(rich_text).
+# 값 = handoff_id("routine-handoff::YYYY-MM-DD") — page id 가 아니라 handoff_id 를 쓰는
+# 이유: ① 같은 날 재-emit 시 page 탐색 없이 자격 판정 가능 ② 사람이 읽을 수 있음
+# ③ handoff page 재생성(삭제 후 upsert)에도 참조가 살아남음. Notion 속성은 사람이
+# 사전 생성(ENABLE_HANDOFF_IDEMPOTENCY_V2 preflight 가 부재 시 v1 폴백).
+PROP_HANDOFF_REF = "Handoff Ref"
 
 # ── Phase 2a: Search / Scrape 소스 ──────────────────────────────────────────
 SOURCE_BRAVE = "Brave Search"
@@ -2212,6 +2218,34 @@ def notion_verify_modality_property(token: str, db_id: str) -> bool:
     return True
 
 
+def notion_verify_handoff_ref_property(token: str, db_id: str) -> bool:
+    """ENABLE_HANDOFF_IDEMPOTENCY_V2=true 활성화 시 'Handoff Ref' 속성 사전 점검(preflight).
+
+    DB 에 'Handoff Ref' 가 rich_text 타입으로 존재하는지 확인한다. 없거나 타입이 다르면
+    emit 의 ref 기록·reconcile 이 전부 실패하므로, 그 전에 False 를 반환해 호출부가
+    이번 실행만 v2 를 끄고 v1(날짜 윈도우+K4-1)으로 graceful degrade 하도록 한다
+    (`notion_verify_modality_property` 선례와 동일 패턴).
+    """
+    url = f"https://api.notion.com/v1/databases/{db_id}"
+    try:
+        data = notion_api_request("GET", url, token)
+    except NotionHandoffError as e:
+        log("WARN", f"Handoff Ref preflight: DB 조회 실패 — {e}")
+        return False
+    prop = (data.get("properties", {}) or {}).get(PROP_HANDOFF_REF)
+    if not prop:
+        log("ERROR", f"Handoff Ref preflight 실패: Notion DB 에 '{PROP_HANDOFF_REF}' 속성이 "
+                     f"없습니다. Rich text 속성을 먼저 생성하세요.")
+        return False
+    ptype = prop.get("type")
+    if ptype != "rich_text":
+        log("ERROR", f"Handoff Ref preflight 실패: '{PROP_HANDOFF_REF}' 속성 타입이 "
+                     f"'{ptype}' — 'rich_text' 여야 합니다.")
+        return False
+    log("INFO", f"Handoff Ref preflight OK — '{PROP_HANDOFF_REF}' rich_text 확인")
+    return True
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                                   window_days: int = 7,
                                   source_names: set[str] | None = None) -> set[str]:
@@ -2415,18 +2449,36 @@ def resolve_handoff_window_days(cli_value: int | None) -> int:
 def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
                                  window_days: int = 7,
                                  source_names: set[str] | None = None,
-                                 doc_ids: set[str] | None = None) -> list[dict[str, Any]]:
-    """Routine 에 넘길 Status=New row 를 Notion API 속성 필터로 조회한다."""
+                                 doc_ids: set[str] | None = None,
+                                 current_handoff_id: str | None = None
+                                 ) -> list[dict[str, Any]]:
+    """Routine 에 넘길 Status=New row 를 Notion API 속성 필터로 조회한다.
+
+    `current_handoff_id` 지정(멱등성 v2) 시 소비 자격을 날짜 윈도우가 아니라
+    Handoff Ref 로 판정한다: `Status=New ∧ (Ref 비어있음 ∨ Ref=오늘 handoff)` —
+    Run Date 하한 제거(PL-10b/B1 근본해결). `Ref=오늘` OR 절은 같은 날 재-emit 때
+    이미 표시된 row 가 누락되지 않게 한다. 미지정(v1) 시 기존 날짜 윈도우 동작 그대로.
+    """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     window_start = (run_date - timedelta(days=window_days)).isoformat()
+    if current_handoff_id:
+        # v2: 날짜 하한 없음 — 상한(미래 Run Date 방어)과 ref 자격만.
+        filters: list[dict[str, Any]] = [
+            {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
+            {"property": PROP_STATUS, "select": {"equals": "New"}},
+            {"or": [
+                {"property": PROP_HANDOFF_REF, "rich_text": {"is_empty": True}},
+                {"property": PROP_HANDOFF_REF, "rich_text": {"equals": current_handoff_id}},
+            ]},
+        ]
+    else:
+        filters = [
+            {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
+            {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
+            {"property": PROP_STATUS, "select": {"equals": "New"}},
+        ]
     body: dict[str, Any] = {
-        "filter": {
-            "and": [
-                {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
-                {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
-                {"property": PROP_STATUS, "select": {"equals": "New"}},
-            ]
-        },
+        "filter": {"and": filters},
         "page_size": 100,
     }
     snapshots: list[dict[str, Any]] = []
@@ -2455,8 +2507,12 @@ def notion_query_new_intake_rows(token: str, db_id: str, run_date: date,
     else:
         log("WARN", "Routine handoff New row 조회 50페이지 상한 도달 — 일부 row 누락 가능")
 
-    log("INFO", f"Routine handoff 후보 New row {len(snapshots)}건 "
-                f"(Run Date {window_start}~{run_date.isoformat()})")
+    if current_handoff_id:
+        log("INFO", f"Routine handoff 후보 New row {len(snapshots)}건 "
+                    f"(멱등성 v2 ref 기반 — Run Date ≤{run_date.isoformat()}, 날짜 하한 없음)")
+    else:
+        log("INFO", f"Routine handoff 후보 New row {len(snapshots)}건 "
+                    f"(Run Date {window_start}~{run_date.isoformat()})")
     return snapshots
 
 
@@ -2696,6 +2752,16 @@ def _enable_handoff_v2() -> bool:
     return os.environ.get("ENABLE_HANDOFF_V2", "false").lower() == "true"
 
 
+def _enable_handoff_idempotency_v2() -> bool:
+    """PL-10b/B1 근본해결 flag (기본 off) — Handoff Ref 상태기계로 소비 자격 판정.
+
+    off = 현행(날짜 윈도우 + K4-1 STALE) 100% 동일. on 전환은 K3 4주 관찰 종료 후
+    사람 승인으로(Notion 'Handoff Ref' rich_text 속성 사전 생성 필요 — preflight 가
+    부재를 감지하면 그 실행만 v1 으로 폴백). ENABLE_HANDOFF_V2(payload 스키마)와 직교.
+    """
+    return os.environ.get("ENABLE_HANDOFF_IDEMPOTENCY_V2", "false").lower() == "true"
+
+
 # v2 row 에 보존할 v1 호환 필드(whitelist) — _intake_page_snapshot() 스키마.
 # blacklist 대신 whitelist 로(Codex P2): raw·Stage B 부착 bookkeeping(raw_fetch_ok·
 # raw_source·status_hint·evidence_hint) 같은 내부/대형 필드가 새지 않도록 보장.
@@ -2859,7 +2925,8 @@ def notion_find_handoff_page(token: str, db_id: str,
 
 def notion_stale_prior_open_handoffs(token: str, db_id: str,
                                      keep_handoff_id: str,
-                                     superseded_by: str) -> int:
+                                     superseded_by: str,
+                                     revert_refs: bool = False) -> int:
     """새 OPEN handoff emit 전, 직전 미소비 OPEN handoff 를 STALE 로 봉인한다(K4-1).
 
     Type or Class=`routine-handoff` 이고 Status=`New`(=OPEN) 인 handoff page 중
@@ -2867,9 +2934,15 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
     Handoff {날짜} (superseded by {superseded_by})`, Status→`Skipped` 로 바꾼다.
     → '항상 OPEN 1개' 불변식: 일일 emit 누적·주간 소비 오선택(6/8 근본원인) 차단.
 
-    ⚠️ 불가침: handoff page **자신의** Name·Status 두 속성만 PATCH 한다. 그 page 의
-    rows[] 가 가리키는 **개별 Intake row page 의 Status 는 절대 건드리지 않는다**
-    (handoff 의 children 은 JSON code block 일 뿐 — row page 가 아니다). 반환=봉인 건수.
+    ⚠️ 불가침(v1, revert_refs=False 기본): handoff page **자신의** Name·Status 두
+    속성만 PATCH 한다. 그 page 의 rows[] 가 가리키는 **개별 Intake row page 의
+    Status 는 절대 건드리지 않는다**(handoff 의 children 은 JSON code block 일 뿐 —
+    row page 가 아니다). 반환=봉인 건수.
+
+    `revert_refs=True`(멱등성 v2, PL-10b/B1 근본해결 — K4-1 불가침의 의도적 변경):
+    STALE 봉인한 handoff 의 **미발행(Status=New) row 만** `Handoff Ref` 를 비워
+    다음 emit 에 재투입한다(B1 revert — 누락 0). row 의 Status 는 여기서도 불변 —
+    Processed/Skipped row 는 ref 포함 일절 건드리지 않는다.
     """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     body: dict[str, Any] = {
@@ -2882,6 +2955,7 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
         "page_size": 100,
     }
     staled = 0
+    staled_ids: list[str] = []
     start_cursor: str | None = None
     for _ in range(25):  # handoff page 는 소수 — 안전 상한
         if start_cursor:
@@ -2905,6 +2979,7 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
                 }},
             )
             staled += 1
+            staled_ids.append(prior_id)
             time.sleep(0.34)
         if not data.get("has_more"):
             break
@@ -2912,7 +2987,176 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
     if staled:
         log("INFO", f"직전 미소비 OPEN handoff {staled}건 STALE 봉인 "
                     f"(keep={keep_handoff_id})")
+    if revert_refs:
+        for prior_id in staled_ids:
+            notion_revert_refs_for_handoff(token, db_id, prior_id)
     return staled
+
+
+_HANDOFF_REF_ROWS_MAX_PAGES = 10  # ref 잔존 New row 는 소수(미마감 handoff 분량) — 안전 상한
+
+
+def _query_new_rows_with_ref(token: str, db_id: str,
+                             ref_filter: dict[str, Any]) -> list[tuple[str, str]]:
+    """Status=New ∧ ref_filter 인 Intake row 의 (page_id, handoff_ref) 목록.
+
+    handoff page 자체(SOURCE_HANDOFF/TYPE_ROUTINE_HANDOFF)는 큐 row 가 아니므로 제외.
+    handoff_ref 는 snapshot 스키마에 넣지 않고 여기서만 읽는다 — snapshot 은 v1 handoff
+    payload rows 로 그대로 직렬화되므로 키 추가 = flag off 경로 바이트 변경(금지).
+    """
+    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
+    body: dict[str, Any] = {
+        "filter": {"and": [
+            {"property": PROP_STATUS, "select": {"equals": "New"}},
+            ref_filter,
+        ]},
+        "page_size": 100,
+    }
+    out: list[tuple[str, str]] = []
+    start_cursor: str | None = None
+    for _ in range(_HANDOFF_REF_ROWS_MAX_PAGES):
+        if start_cursor:
+            body["start_cursor"] = start_cursor
+        elif "start_cursor" in body:
+            del body["start_cursor"]
+        data = notion_api_request("POST", url, token, body=body)
+        for page in data.get("results", []):
+            snap = _intake_page_snapshot(page)
+            if snap["source"] == SOURCE_HANDOFF or snap["type_or_class"] == TYPE_ROUTINE_HANDOFF:
+                continue
+            ref = _prop_rich_text(page.get("properties", {}), PROP_HANDOFF_REF)
+            out.append((snap["page_id"], ref))
+        if not data.get("has_more"):
+            break
+        start_cursor = data.get("next_cursor")
+    else:
+        log("WARN", "Handoff Ref row 조회 페이지 상한 도달 — 일부 row 는 다음 emit 에서 처리")
+    return out
+
+
+def notion_revert_refs_for_handoff(token: str, db_id: str, handoff_id: str) -> int:
+    """STALE handoff 의 미발행 row 재투입(B1 revert) — Ref=handoff_id ∧ Status=New
+    row 의 `Handoff Ref` 를 비운다. Status 는 불변. per-row 실패는 경고 후 계속 —
+    남은 ref 는 다음 emit 의 reconcile sweep 이 다시 처리한다(자기치유). 반환=비운 건수.
+    """
+    rows = _query_new_rows_with_ref(
+        token, db_id,
+        {"property": PROP_HANDOFF_REF, "rich_text": {"equals": handoff_id}})
+    reverted = 0
+    for page_id, _ref in rows:
+        try:
+            notion_api_request(
+                "PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
+                body={"properties": {PROP_HANDOFF_REF: {"rich_text": []}}})
+            reverted += 1
+        except NotionHandoffError as e:
+            log("WARN", f"Handoff Ref revert 실패(다음 emit 재시도) page={page_id}: "
+                        f"{truncate(str(e), 120)}")
+        time.sleep(0.34)
+    if rows:
+        log("INFO", f"STALE handoff {handoff_id} 의 미발행 row {reverted}/{len(rows)}건 "
+                    f"재투입(Handoff Ref 비움)")
+    return reverted
+
+
+def notion_reconcile_handoff_refs(token: str, db_id: str,
+                                  current_handoff_id: str) -> dict[str, int]:
+    """emit 시 reconcile sweep(멱등성 v2) — `Status=New ∧ Handoff Ref 비어있지 않음`
+    row 전수를 ref 가 가리키는 handoff page 상태로 마감한다. 신뢰 신호 = handoff
+    page Status(발행 종료 시 Routine 의 단일 쓰기 — per-row Status 갱신보다 견고).
+
+      - CONSUMED(Processed) → row Status→Processed (PL-10b cleanup: 발행됐으나
+        per-row Status 갱신 실패/지연분 마감 — 재유입 0). ref 는 추적성 위해 유지.
+      - STALE(Skipped) → ref 비움 (B1 revert — 직전 revert 의 per-row 실패/크래시
+        잔존분 보정; 다음 소비 쿼리에 재투입).
+      - OPEN(New) ∧ ref=오늘(current) → 불변(같은 날 재-emit; 소비 쿼리 OR 절이 포함).
+      - OPEN(New) ∧ ref≠오늘 → 경고만(STALE 가드가 선행 실행되므로 비정상 상태).
+      - handoff page 미발견·기타 상태 → ref 비움 + 경고 (고아 ref — 재투입이 침묵
+        누락보다 안전. 중복은 v16 프롬프트 PL-10b 가드가 2차 방어).
+
+    idempotent — 같은 입력에 재적용해도 결과 동일. per-row 실패는 경고 후 계속.
+    반환: {"cleaned","reverted","orphaned","kept"} 건수.
+    """
+    rows = _query_new_rows_with_ref(
+        token, db_id,
+        {"property": PROP_HANDOFF_REF, "rich_text": {"is_not_empty": True}})
+    stats = {"cleaned": 0, "reverted": 0, "orphaned": 0, "kept": 0}
+    handoff_status_cache: dict[str, str | None] = {}
+    for page_id, ref in rows:
+        if ref == current_handoff_id:
+            stats["kept"] += 1
+            continue
+        if ref not in handoff_status_cache:
+            handoff_page = notion_find_handoff_page(token, db_id, ref)
+            handoff_status_cache[ref] = (
+                _intake_page_snapshot(handoff_page)["status"] if handoff_page else None)
+        handoff_status = handoff_status_cache[ref]
+        try:
+            if handoff_status == "Processed":
+                # CONSUMED — 발행 완료 신호. row 마감(Status 지연분 cleanup).
+                notion_api_request(
+                    "PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
+                    body={"properties": {PROP_STATUS: _select("Processed")}})
+                stats["cleaned"] += 1
+            elif handoff_status == "New":
+                log("WARN", f"reconcile: row {page_id} 의 ref={ref} 가 여전히 OPEN — "
+                            f"STALE 가드 선행 후 비정상 상태, 이번 emit 은 보류")
+                stats["kept"] += 1
+            else:
+                # STALE(Skipped)·미발견·기타 — 재투입(ref 비움).
+                if handoff_status is None:
+                    log("WARN", f"reconcile: row {page_id} 의 ref={ref} handoff page "
+                                f"미발견(고아) — ref 비우고 재투입")
+                    stats["orphaned"] += 1
+                else:
+                    stats["reverted"] += 1
+                notion_api_request(
+                    "PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
+                    body={"properties": {PROP_HANDOFF_REF: {"rich_text": []}}})
+        except NotionHandoffError as e:
+            log("WARN", f"reconcile PATCH 실패(다음 emit 재시도) page={page_id}: "
+                        f"{truncate(str(e), 120)}")
+        time.sleep(0.34)
+    if any(stats.values()):
+        log("INFO", "Handoff Ref reconcile: "
+                    f"CONSUMED 마감 {stats['cleaned']}건 · STALE 재투입 {stats['reverted']}건 · "
+                    f"고아 재투입 {stats['orphaned']}건 · 유지 {stats['kept']}건")
+    return stats
+
+
+def notion_mark_rows_handoff_ref(token: str, rows: list[dict[str, Any]],
+                                 handoff_ref: str) -> tuple[int, int]:
+    """emit 표시(멱등성 v2) — handoff 에 포함된 row 에 `Handoff Ref` 를 기록한다.
+
+    Status 는 New 유지(상태기계 §3.2). dedupe 전 전체 row 대상 — dedup 으로 payload
+    에서 빠진 중복 row 도 이 handoff 가 '가져간' 것이므로 함께 표시한다(CONSUMED 시
+    reconcile 이 함께 마감 — 중복 row 의 영구 New 잔존 방지). per-row 실패는 경고 후
+    계속(그 row 는 ref 없음 = v1 동작 폴백 — 다음 emit 재포함, 누락 없음).
+    반환=(성공, 실패) 건수.
+    """
+    ok = failed = 0
+    for row in rows:
+        page_id = row.get("page_id", "")
+        if not page_id:
+            failed += 1
+            continue
+        try:
+            notion_api_request(
+                "PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
+                body={"properties": {
+                    PROP_HANDOFF_REF: {"rich_text": _rich_text(handoff_ref)},
+                }})
+            ok += 1
+        except NotionHandoffError as e:
+            failed += 1
+            log("WARN", f"Handoff Ref 기록 실패(해당 row 는 v1 동작 폴백) "
+                        f"page={page_id}: {truncate(str(e), 120)}")
+        time.sleep(0.34)
+    if failed:
+        log("WARN", f"Handoff Ref 기록: 성공 {ok}건 / 실패 {failed}건 (ref={handoff_ref})")
+    elif ok:
+        log("INFO", f"Handoff Ref 기록 완료: {ok}건 (ref={handoff_ref})")
+    return ok, failed
 
 
 def notion_archive_page_children(token: str, page_id: str) -> None:
@@ -3006,9 +3250,30 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
     # display_window_days 미지정 시 window_days 사용(기존 호출 호환).
     payload_window_days = (display_window_days if display_window_days is not None
                            else window_days)
+    # 멱등성 v2(PL-10b/B1 근본해결): 소비 쿼리 **전에** ① 직전 OPEN handoff 를 STALE
+    # 봉인하며 그 미발행 row 의 ref 를 비우고(B1 revert — 이번 emit 에 즉시 재투입)
+    # ② reconcile sweep 으로 CONSUMED 마감/잔존 ref 를 정리한다. 순서가 뒤면 STALE
+    # 된 handoff 의 row 가 하루 늦게 재투입된다. upsert 내부의 K4-1 가드는 그대로
+    # 두되(여기서 이미 봉인됐으므로 no-op), v1(flag off)은 이 블록 전체를 건너뛴다.
+    idem_v2 = _enable_handoff_idempotency_v2()
+    handoff_id = f"routine-handoff::{run_date.isoformat()}"
+    if idem_v2:
+        notion_stale_prior_open_handoffs(
+            token, db_id, keep_handoff_id=handoff_id,
+            superseded_by=run_date.isoformat(), revert_refs=True)
+        try:
+            notion_reconcile_handoff_refs(token, db_id,
+                                          current_handoff_id=handoff_id)
+        except NotionHandoffError as e:
+            # reconcile 은 위생 단계 — 실패해도 중복/누락이 생기지 않는다(ref 가 남은
+            # row 는 소비 쿼리에서 제외된 채 다음 emit 의 sweep 이 재처리). emit 계속.
+            log("WARN", f"Handoff Ref reconcile 실패(다음 emit 재시도): "
+                        f"{truncate(str(e), 160)}")
     rows = notion_query_new_intake_rows(token, db_id, run_date, window_days,
                                         source_names=source_names,
-                                        doc_ids=doc_ids)
+                                        doc_ids=doc_ids,
+                                        current_handoff_id=(handoff_id if idem_v2
+                                                            else None))
     if _enable_handoff_v2():
         # K2-prep: dedupe → 하이브리드 raw 부착(메모리 우선) → scaffold v2 payload.
         # inmemory_raw 는 main() 가 당일 수집 IntakeItem.raw_payload 로 전달(K3 G2 와이어링).
@@ -3024,6 +3289,10 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         payload = build_routine_handoff_payload(rows, run_date,
                                                 payload_window_days, generated_at)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
+    if idem_v2:
+        # emit 표시는 handoff page 확정(upsert 성공) **후** — page 없는 ref 가 생기지
+        # 않게 한다. 대상은 dedupe 전 전체 rows(중복 row 도 이 handoff 가 가져감).
+        notion_mark_rows_handoff_ref(token, rows, handoff_id)
     return payload["row_count"], page_url
 
 
@@ -3456,6 +3725,7 @@ def _evaluate_health(
     handoff_failed: bool,
     handoff_error_msg: str,
     modality_preflight_disabled: bool = False,
+    handoff_idem_preflight_disabled: bool = False,
     aged_unconsumed_new: int = 0,
     aged_new_query_error: str = "",
     handoff_window_days: int = 0,
@@ -3469,6 +3739,16 @@ def _evaluate_health(
             "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치로 태그 기록 자동 비활성화",
             "Notion Intake DB 에 'Modality'(Select: Chemical/Biologic/Other) 속성을 생성하세요. "
             "수집은 정상 진행됨.",
+        )
+
+    if handoff_idem_preflight_disabled:
+        health.add_warning(
+            "handoff-idem-preflight-degraded",
+            "GRM Handoff",
+            "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 불일치로 "
+            "v1(날짜 윈도우) 경로 폴백",
+            "Notion Intake DB 에 'Handoff Ref'(Rich text) 속성을 생성하세요. "
+            "이번 실행 handoff 는 기존 v1 멱등성으로 진행됨.",
         )
 
     if stats.has_insert_failures():
@@ -3858,6 +4138,26 @@ def main() -> int:
                     "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
     modality_effective = (modality_requested and not modality_preflight_disabled
                           and not modality_preflight_skipped)
+
+    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
+    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
+    handoff_idem_requested = (os.environ.get("ENABLE_HANDOFF_IDEMPOTENCY_V2", "false")
+                              .lower() == "true")
+    handoff_idem_preflight_disabled = False
+    handoff_idem_preflight_skipped = False
+    if handoff_idem_requested and notion_token and notion_db:
+        if not notion_verify_handoff_ref_property(notion_token, notion_db):
+            handoff_idem_preflight_disabled = True
+            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
+            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
+                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
+    elif handoff_idem_requested:
+        handoff_idem_preflight_skipped = True
+        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
+                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
+    handoff_idem_effective = (handoff_idem_requested
+                              and not handoff_idem_preflight_disabled
+                              and not handoff_idem_preflight_skipped)
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)
@@ -4388,9 +4688,13 @@ def main() -> int:
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
         "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
         "ENABLE_MODALITY_TAG_PREFLIGHT_SKIPPED": modality_preflight_skipped,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_REQUESTED": handoff_idem_requested,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_EFFECTIVE": handoff_idem_effective,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
     }
     health = _evaluate_health(
         modality_preflight_disabled=modality_preflight_disabled,
+        handoff_idem_preflight_disabled=handoff_idem_preflight_disabled,
         stats=stats,
         active=active,
         enable_search=enable_search,

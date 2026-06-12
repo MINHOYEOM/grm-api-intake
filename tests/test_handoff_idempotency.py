@@ -96,7 +96,8 @@ class PreflightTest(unittest.TestCase):
 class ConsumeQueryTest(unittest.TestCase):
     """소비 쿼리 — v1 필터 잠금(flag off 바이트 동일) + v2 ref 기반(날짜 하한 제거)."""
 
-    def _capture_query_body(self, current_handoff_id: str | None) -> dict:
+    def _capture_query_body(self, current_handoff_id: str | None,
+                            current_handoff_open: bool = True) -> dict:
         captured = {}
 
         def fake_api(method, url, token, body=None, **kw):
@@ -105,7 +106,8 @@ class ConsumeQueryTest(unittest.TestCase):
 
         with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
             ci.notion_query_new_intake_rows(
-                "tok", "db", RUN_DATE, 30, current_handoff_id=current_handoff_id)
+                "tok", "db", RUN_DATE, 30, current_handoff_id=current_handoff_id,
+                current_handoff_open=current_handoff_open)
         return captured["body"]
 
     def test_v1_filter_byte_identical_lock(self) -> None:
@@ -139,6 +141,14 @@ class ConsumeQueryTest(unittest.TestCase):
                       or_clause)
         self.assertIn({"property": "Handoff Ref", "rich_text": {"equals": HID}},
                       or_clause)
+
+    def test_v2_filter_consumed_current_drops_or_clause(self) -> None:
+        # Codex P1 ①: 오늘 handoff 가 이미 종결(OPEN 아님) → ref=current OR 절 제거,
+        # 자격은 'ref 비어있음' 만 — 발행된 handoff 의 잔존 New 재유입 차단.
+        body = self._capture_query_body(HID, current_handoff_open=False)
+        self.assertEqual(body["filter"]["and"][2],
+                         {"property": "Handoff Ref", "rich_text": {"is_empty": True}})
+        self.assertNotIn('"equals": "routine-handoff', _filter_blob(body))
 
 
 class MarkRefTest(unittest.TestCase):
@@ -301,11 +311,30 @@ class ReconcileTest(unittest.TestCase):
         self.assertEqual(body := patches[0][1],
                          {"properties": {"Handoff Ref": {"rich_text": []}}})
 
-    def test_current_handoff_rows_kept(self) -> None:
-        # 오늘 ref 는 불변(같은 날 재-emit — 소비 쿼리 OR 절이 포함) — PATCH 0건.
-        stats, patches = self._run(rows=[("row-d", HID)], handoff_status={})
+    def test_current_open_rows_kept(self) -> None:
+        # 오늘 ref ∧ OPEN — 같은 날 재-emit(소비 쿼리 OR 절이 포함) — PATCH 0건.
+        stats, patches = self._run(rows=[("row-d", HID)],
+                                   handoff_status={HID: "New"})
         self.assertEqual(stats["kept"], 1)
         self.assertEqual(patches, [])
+
+    def test_current_consumed_rows_closed_as_processed(self) -> None:
+        # Codex P1 ②: 오늘 handoff 가 이미 CONSUMED — 잔존 New(ref=오늘)는 발행분
+        # 이므로 Processed 마감(같은 날 재실행 재유입 0 의 reconcile 측 처리).
+        stats, patches = self._run(rows=[("row-d", HID)],
+                                   handoff_status={HID: "Processed"})
+        self.assertEqual(stats["cleaned"], 1)
+        _url, body = patches[0]
+        self.assertEqual(set(body["properties"].keys()), {"Status"})
+        self.assertEqual(body["properties"]["Status"]["select"]["name"], "Processed")
+
+    def test_current_missing_treated_as_orphan(self) -> None:
+        # ref=오늘인데 page 미발견 — 표시는 upsert 성공 후에만 일어나므로 비정상
+        # (수동 삭제 등). 재투입(ref 비움)이 침묵 누락보다 안전.
+        stats, patches = self._run(rows=[("row-d", HID)], handoff_status={})
+        self.assertEqual(stats["orphaned"], 1)
+        self.assertEqual(patches[0][1],
+                         {"properties": {"Handoff Ref": {"rich_text": []}}})
 
     def test_unexpected_open_ref_kept_with_warning(self) -> None:
         # STALE 가드 선행 후에도 OPEN(≠오늘) ref 가 보이면 비정상 — 건드리지 않고 보류.
@@ -320,7 +349,8 @@ class ReconcileTest(unittest.TestCase):
                   ("row-b", "routine-handoff::2026-06-09"),
                   ("row-d", HID)],
             handoff_status={"routine-handoff::2026-06-08": "Processed",
-                            "routine-handoff::2026-06-09": "Skipped"})
+                            "routine-handoff::2026-06-09": "Skipped",
+                            HID: "New"})
         self.assertEqual((stats["cleaned"], stats["reverted"], stats["kept"]),
                          (1, 1, 1))
         self.assertEqual(len(patches), 2)
@@ -356,7 +386,8 @@ class EmitIntegrationTest(unittest.TestCase):
     _ROWS = [{"page_id": "p1", "source": "MFDS", "document_id": "d1",
               "signal_tier": "Tier 2", "headline": "x", "run_date": "2026-06-10"}]
 
-    def _run_emit(self, env: dict, reconcile_side_effect=None):
+    def _run_emit(self, env: dict, reconcile_side_effect=None,
+                  current_page: dict | None = None):
         order = []
 
         def track(name, ret=None):
@@ -370,6 +401,8 @@ class EmitIntegrationTest(unittest.TestCase):
         with mock.patch.dict(os.environ, env, clear=True), \
              mock.patch.object(ci, "notion_stale_prior_open_handoffs",
                                side_effect=track("stale", 0)) as stale, \
+             mock.patch.object(ci, "notion_find_handoff_page",
+                               side_effect=track("find_current", current_page)), \
              mock.patch.object(ci, "notion_reconcile_handoff_refs",
                                side_effect=track("reconcile", {})) as reconcile, \
              mock.patch.object(ci, "notion_query_new_intake_rows",
@@ -380,28 +413,56 @@ class EmitIntegrationTest(unittest.TestCase):
                                side_effect=track("mark", (1, 0))) as mark:
             row_count, page_url = ci.emit_routine_handoff(
                 "tok", "db", RUN_DATE, 30, GEN_AT, display_window_days=7)
-        return order, stale, reconcile, mark, row_count
+        return order, stale, reconcile, mark, row_count, page_url
 
     def test_flag_on_state_machine_order(self) -> None:
         env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
-        order, stale, reconcile, mark, row_count = self._run_emit(env)
-        # 순서: STALE+revert → reconcile → 소비 쿼리 → upsert → emit 표시.
+        order, stale, reconcile, mark, row_count, _ = self._run_emit(env)
+        # 순서: STALE+revert → current 상태 확인 → reconcile → 소비 쿼리 → upsert → 표시.
         self.assertEqual([n for n, _ in order],
-                         ["stale", "reconcile", "query", "upsert", "mark"])
+                         ["stale", "find_current", "reconcile", "query", "upsert",
+                          "mark"])
         self.assertTrue(stale.call_args.kwargs["revert_refs"])
         self.assertEqual(stale.call_args.kwargs["keep_handoff_id"], HID)
         self.assertEqual(reconcile.call_args.kwargs["current_handoff_id"], HID)
         query_kwargs = next(kw for n, kw in order if n == "query")
         self.assertEqual(query_kwargs["current_handoff_id"], HID)
+        self.assertTrue(query_kwargs["current_handoff_open"])  # 미존재 → OPEN 취급
         mark_args = mark.call_args
         self.assertEqual(mark_args.args[1], self._ROWS)   # dedupe 전 전체 rows
         self.assertEqual(mark_args.args[2], HID)
         self.assertEqual(row_count, 1)
 
+    def test_flag_on_open_current_proceeds_with_or_clause(self) -> None:
+        # 같은 날 재-emit(current OPEN) — 기존 동작 회귀: OR 절 유지, 정상 진행.
+        env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
+        order, *_ = self._run_emit(
+            env, current_page=_handoff_page(HID, "2026-06-12", "New", "today-page"))
+        self.assertEqual([n for n, _ in order],
+                         ["stale", "find_current", "reconcile", "query", "upsert",
+                          "mark"])
+        query_kwargs = next(kw for n, kw in order if n == "query")
+        self.assertTrue(query_kwargs["current_handoff_open"])
+
+    def test_flag_on_consumed_current_skips_reemit(self) -> None:
+        # Codex P1 ③: 오늘 handoff 가 이미 CONSUMED — 같은 날 재실행은 reconcile 만
+        # 수행(잔존 New 마감)하고 소비 쿼리/재기록/ref 표시 없이 종료 → 재유입 0,
+        # CONSUMED page 의 발행 payload 도 보존(부활 금지).
+        env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
+        consumed = _handoff_page(HID, "2026-06-12", "Processed", "today-page")
+        order, _stale, reconcile, mark, row_count, page_url = self._run_emit(
+            env, current_page=consumed)
+        self.assertEqual([n for n, _ in order],
+                         ["stale", "find_current", "reconcile"])  # query/upsert/mark 없음
+        reconcile.assert_called_once()
+        mark.assert_not_called()
+        self.assertEqual(row_count, 0)
+        self.assertEqual(page_url, consumed["url"])
+
     def test_flag_off_v1_path_untouched(self) -> None:
-        order, stale, reconcile, mark, _ = self._run_emit({})
-        # v2 전용 함수(조기 STALE·reconcile·mark) 미호출 — K4-1 가드는 upsert 내부 경로
-        # 그대로(여기선 upsert 를 mock 했으므로 호출 0). 소비 쿼리는 ref 미지정(v1 필터).
+        order, stale, reconcile, mark, _, _ = self._run_emit({})
+        # v2 전용 함수(조기 STALE·current 확인·reconcile·mark) 미호출 — K4-1 가드는
+        # upsert 내부 경로 그대로(여기선 upsert mock → 호출 0). 쿼리는 ref 미지정(v1).
         self.assertEqual([n for n, _ in order], ["query", "upsert"])
         stale.assert_not_called()
         reconcile.assert_not_called()
@@ -416,6 +477,55 @@ class EmitIntegrationTest(unittest.TestCase):
             env, reconcile_side_effect=ci.NotionHandoffError("HTTP 500"))
         self.assertIn("upsert", [n for n, _ in order])
         self.assertIn("mark", [n for n, _ in order])
+
+
+class UpsertReviveGuardTest(unittest.TestCase):
+    """Codex P1 ③ re-patch revive 가드 — 종결(CONSUMED/STALE)된 handoff page 재기록
+    금지(v2 한정). emit 진입 시 종결 확인 후 도달했다면 Routine 소비 경합 — 조용히
+    덮지 않고 NotionHandoffError 로 표면화(row ref 미기록 상태 중단 → 자동 정상화)."""
+
+    def _upsert(self, env: dict, existing_status: str):
+        existing = _handoff_page(HID, "2026-06-12", existing_status, "today-page")
+        patches = []
+
+        def fake_api(method, url, token, body=None, **kw):
+            if method == "PATCH":
+                patches.append((url, body))
+            return {"id": "p", "url": "u"}
+
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch.object(ci, "_handoff_blocks", return_value=[]), \
+             mock.patch.object(ci, "_handoff_page_properties", return_value={}), \
+             mock.patch.object(ci, "notion_stale_prior_open_handoffs", return_value=0), \
+             mock.patch.object(ci, "notion_find_handoff_page", return_value=existing), \
+             mock.patch.object(ci, "notion_archive_page_children"), \
+             mock.patch.object(ci, "notion_append_page_children"), \
+             mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+            result = ci.notion_upsert_routine_handoff(
+                "tok", "db", {"handoff_id": HID, "run_date_kst": "2026-06-12"}, GEN_AT)
+        return result, patches
+
+    def test_consumed_existing_raises_under_v2(self) -> None:
+        env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
+        with self.assertRaises(ci.NotionHandoffError):
+            self._upsert(env, "Processed")
+
+    def test_stale_existing_raises_under_v2(self) -> None:
+        env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
+        with self.assertRaises(ci.NotionHandoffError):
+            self._upsert(env, "Skipped")
+
+    def test_open_existing_updates_normally_under_v2(self) -> None:
+        env = {"ENABLE_HANDOFF_IDEMPOTENCY_V2": "true"}
+        (page_id, _url), patches = self._upsert(env, "New")
+        self.assertEqual(page_id, "today-page")
+        self.assertTrue(patches)  # 정상 재패치(같은 날 OPEN 갱신은 기존대로)
+
+    def test_flag_off_keeps_v1_repatch_behavior(self) -> None:
+        # v1 불변: flag off 면 Processed page 라도 기존 재패치 경로 그대로(현행 운영).
+        (page_id, _url), patches = self._upsert({}, "Processed")
+        self.assertEqual(page_id, "today-page")
+        self.assertTrue(patches)
 
 
 class HealthWarningTest(unittest.TestCase):
@@ -446,6 +556,20 @@ class HealthWarningTest(unittest.TestCase):
         health = ci._evaluate_health(**self._health_kwargs())
         self.assertNotIn("handoff-idem-preflight-degraded",
                          [w.code for w in health.warnings])
+
+    def test_aged_warning_suppressed_when_v2_effective(self) -> None:
+        # Codex P2(A안): v2 effective 면 노후 New 는 자동 재투입 대상 — 경고 미발생.
+        health = ci._evaluate_health(**self._health_kwargs(
+            aged_unconsumed_new=3, handoff_window_days=30,
+            handoff_idem_effective=True))
+        self.assertNotIn("aged-unconsumed-new", [w.code for w in health.warnings])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_aged_warning_kept_under_v1(self) -> None:
+        # v1(기본) 회귀: 기존 B1 임시 방어 경고 그대로.
+        health = ci._evaluate_health(**self._health_kwargs(
+            aged_unconsumed_new=3, handoff_window_days=30))
+        self.assertIn("aged-unconsumed-new", [w.code for w in health.warnings])
 
 
 if __name__ == "__main__":

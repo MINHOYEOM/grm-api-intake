@@ -6,6 +6,7 @@
 > **ICH 변동추적 보강(2026-06-06, §B [1단계] 슬롯 7만)**: 정적 guideline snapshot 은 Tier 1/Skipped 기본, 실제 변동은 ICH 공식 news/press-release WebSearch + 공식 URL WebFetch 로 Step 4·Step 2b·총회 보도자료만 카드/🔮 후보화.
 > **작성결함 R2 패치(2026-06-08, §B 슬롯/블록만)**: 6/8 발행 확정 결함 D1~D7 — TITLE_ISSUE "미상" 금지·위반유형 fallback(D1) · 회수 등급 raw-only·슬롯 간 모순 금지(D2) · 슬롯7 총회 가드+M3 기록(D3) · TL;DR 과확장·본문 정합(D4·D6) · W6/W7 작성 전 자기점검·교차유형 템플릿 금지(D5) · 요일=날짜 산출 임시가드(D7, 본질=K4) + Publish Lint 10~14. scaffold·collector·golden·테스트 불변(golden 무관·K3 4주 관찰 유지). Codex 게이트·사람 승인 후 동결.
 > **K4-1 슬라이스(2026-06-08, §B [0단계]·[실행일]·PL-10b + collect_intake emit 가드)**: 6/8 근본원인(LLM 날짜 의존 handoff 선택·일일 emit 누적) 제거 — handoff 소비를 "최신 `run_date_kst` OPEN 1건"으로, 실행일/요일/제목/기간을 그 handoff run_date 에서 파생(LLM 날짜계산 제거), PL-10b 를 "최신 `run_date_kst` CONSUMED 대조"로 결정화. Python emit 측은 새 OPEN 생성 전 직전 OPEN 을 STALE+Skipped 봉인(`notion_stale_prior_open_handoffs`, 항상 OPEN 1개·개별 row 불변). handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후.
+> **작성결함 R3 패치(2026-06-16, §B [2단계] W5 슬롯·공통 가드·Publish Lint 만)**: EVAL-1(6/15) E1 7건 — W2 표/`prose_input.w2_facts` 에 값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(역방향 슬롯 모순). W5 [W2 우선 인용]·공통 가드 기준 슬롯 W2·성분/marker/수치 단정 가드(현진 단삼 살비아놀산B↔탄시논류 유형)·Publish Lint 15(D8) 추가. scaffold·collector·golden·tests 불변. 브랜치 적용·Codex 게이트 대기.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -250,11 +251,21 @@ Modality 는 분류일 뿐 포함 결정이 아니다(Biologic 이어도 GMP 내
   행위·날짜·조항은 만들지 않는다. 동일 처분 다품목 공통이면 1회만. guidance/규정 카드는 변경
   내용·시행/의견기한·영향 대상 중심. gmp-inspection 은 attachment_text 기반 주요 지적/결론
   (없으면 "첨부 미파싱 — 수동 확인 필요").
-[등급·사실 단정 공통 가드 — TITLE_ISSUE·W1·W5]
+  [W2 우선 인용] prose_input 의 `w2_facts`(또는 그 카드의 W2 표 — card_scaffold 가 조립한 결정론
+  블록)에 값이 있는 필드는 W5·시사점에서 "원문 미기재/미확인"으로 적지 않는다 — 그 값을 사실로
+  인용한다. "원문 미기재"는 W2 표·prose_input 양쪽 모두 비어 있을 때만 허용한다(알려진 사실을
+  과소표기해 W2 와 어긋나게 하지 않는다 — EVAL-1 E1).
+[등급·사실 단정 공통 가드 — 대상 TITLE_ISSUE·W1·W5·시사점(W6) / 기준 슬롯 W2]
 · 회수 등급(Class/Type I·II·III·"등급")은 prose_input 등급 필드(raw recall_class 등)에 명시된
   경우에만 표기. 비어 있으면 생성 금지(추정·기본값 금지) → 등급 줄 생략 또는 "회수 등급: 원문 미기재".
 · 한 슬롯에서 "원문 미기재/미확인"으로 적은 항목을 다른 슬롯(제목·W1·W5)에서 구체값으로 단정
   금지(슬롯 간 모순 금지).
+· (역방향) W2 표/prose_input(w2_facts 등)에 확정값이 있는 항목을 W5·시사점에서 "미기재/미확인"으로
+  적지 않는다 — 미기재↔구체값 모순은 양방향 모두 금지. W2 는 결정론 scaffold 블록이므로 값이
+  있으면 그 값이 기준이다(없는 사실을 만드는 것은 여전히 금지=L48).
+· (성분·marker·수치) 성분·marker·수치는 prose_input 원문 표기를 그대로 인용한다. 원문이 'A'(예:
+  "살비아놀산B")면 동의어·상위어(B, 예: "탄시논류")로 치환·단정하지 않는다. 원문에 수치(예:
+  4.1%↑·1.5%)가 있으면 "세부 수치 원문 미기재"로 적지 않고 그 수치를 인용한다.
 · {{W6}} — 시사점 2문장(yellow callout 안). 톤: "규제가 이렇게 바뀌고 있다/집행 방향이
   보인다 → 우리 QA·RA 가 무엇을 봐야 한다". 지시·권고 명령형, 사내 절차 메타 언급 금지.
   [카드별 차별화] 같은 유형이라도 그 카드의 구체 사실(회수/처분 사유·위반유형·ICH 주제·모달리티)을
@@ -445,6 +456,8 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 12. 한 카드 안 "원문 미기재" 항목을 타 슬롯이 구체값으로 단정한 곳 0(D2).
 13. TL;DR 인용 사건 ↔ 본문 카드 1:1 대응(D6).
 14. 헤더 요일 == 헤더 날짜의 실제 요일(D7).
+15. W5·시사점의 "원문 미기재/미확인" 각 항목에 대해, 같은 카드 W2 표/prose_input.w2_facts 에
+    값이 있는 경우 0(D8) — 위반 시 발행 전 W2 값으로 교정(역방향 슬롯 모순 차단).
 위반 발견 시 발행 전에 고친다. 고칠 수 없는 구조적 한계만 M2 에 사실로 기록.
 
 [발송]
@@ -480,3 +493,4 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 | 2026-06-08 | **작성결함 R2 패치(§B 슬롯/블록만, scaffold·golden 불변)**: D1 TITLE_ISSUE "미상" 금지·위반유형 fallback · D2 회수 등급 raw-only·슬롯 간 모순 금지 · D3 슬롯7 총회 가드+M3 기록 강제 · D4 TL;DR 과확장 가드 · D5 W6/W7 작성 전 자기점검·교차유형 템플릿 금지 · D6 TL;DR↔본문 정합 · D7 요일=날짜 산출(임시, 본질 K4). Publish Lint 10~14 동반. 진단: 6/8 발행분 Cowork+Codex 확정 결함. Codex 게이트·사람 승인 후 동결 |
 | 2026-06-08 | **K4-1 슬라이스(handoff 선택·날짜 결정화 + emit STALE 가드)**: [0단계] handoff 소비 = 최신 `run_date_kst` OPEN 1건(LLM 날짜 검색 제거)·OPEN 0건이면 중복실행 억제 · [실행일·타임존] 실행일/요일/제목/기간을 handoff run_date 에서 파생(off-by-one 차단) · PL-10b = 최신 `run_date_kst` CONSUMED 대조로 결정화(DEFERRED 제외 유지). 코드: `collect_intake.py` `notion_stale_prior_open_handoffs()` 추가 — 새 OPEN emit 전 직전 미소비 OPEN(Status=New·routine-handoff) 전건 STALE rename+Status=Skipped(개별 Intake row 불가침), `notion_upsert_routine_handoff` 가 호출. handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후 |
 | 2026-06-08 | **R2 보정 2건(작성결함)**: D2(회수 등급 raw-only·슬롯 간 모순 금지)를 W6 아래 → TITLE_ISSUE·W1·W5 공통 가드로 이동(W1 등급 날조 1차 차단), W6 중복 제거(과확장 가드 "등급어 미첨가"는 유지) · 상단 상태줄 모순 정리(R2 게이트 전 명시 — "R2 동결/운영" 오해 제거). 프롬프트 1파일·scaffold/collector/golden/tests 불변 |
+| 2026-06-16 | **작성결함 R3 패치(§B [2단계] W5 슬롯·공통 가드·Publish Lint 만, scaffold·collector·golden·tests 불변)**: EVAL-1(6/15) E1 사실오류 7건 — W2 표/`prose_input.w2_facts` 에 확정값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(슬롯 간 역방향 모순). 기존 공통 가드(미기재→구체값 단정 금지)는 한 방향만 막아 역방향 무방비. ① W5 슬롯에 [W2 우선 인용] 추가(W2/prose_input 값 보유 필드는 미기재 금지·그 값 인용, 미기재는 양쪽 빈 경우만) · ② 공통 가드에 기준 슬롯 W2 추가(역방향 모순 금지) · ③ 성분·marker·수치 단정 가드(원문 'A'→동의어·상위어 'B' 치환 금지·원문 수치 있으면 "세부 수치 미기재" 금지 — 현진 단삼 살비아놀산B↔탄시논류·4.1%↑/1.5% 유형) · ④ Publish Lint 15(D8) 신설(W5 미기재 항목 ↔ W2 값 존재 0). 진단/지시 `GRM_발행결함_클로즈아웃_지시문초안_2026-06-16.md`. Codex 게이트·사람 승인 후 동결 |

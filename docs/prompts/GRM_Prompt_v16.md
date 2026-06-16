@@ -504,6 +504,12 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
      링크를 교정(Intake 카드는 scaffold 링크 복원 / 검색 날조면 출처 줄 제거·카드 보류)한 뒤
      **게이트를 다시 통과시켜야** 발행한다. 기본 정책 all_domains — MFDS 뿐 아니라 fetched
      목록에도 없는 타 기관 URL 도 차단(W2).
+  - **[소프트런치 — 운영 활성 초기 1~2회]** W2 의 타 기관 차단은 `fetched.txt` 가 정확히
+    넘어와야 정당한 검색 카드 URL 이 통과한다. 활성 첫 1~2회는 `--policy mfds_only` 로 실행해
+    (MFDS 미근거는 그대로 HARD 차단 유지·타 기관 미근거는 WARN 로 **보고만**) **정당한 타 기관
+    검색 링크가 fetched 누락으로 오차단되지 않는지** 먼저 확인한다. 정상 통과를 확인하면
+    `--allowed-fetched fetched.txt`(기본 all_domains)로 승격한다. (탐지 쪽 `grm-brief-audit` 는
+    처음부터 404/410 만 FAIL 로 보수적이라 안전.)
 - **(대체) 코드 실행이 불가능한 MCP 전용 세션**이면 같은 불변식을 수기로 검증한다(위 항목 17):
   발행물의 모든 📰/📎 링크가 handoff rows 의 official_url·source_url·card_scaffold 집합 또는
   이번 run 의 fetched 목록에 있는지 1:1 대조하고, 없는 mfds/nedrug 링크가 1건이라도 있으면

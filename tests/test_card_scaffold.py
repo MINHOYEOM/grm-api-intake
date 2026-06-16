@@ -701,5 +701,41 @@ def _callout_colors(md: str) -> list[str]:
     return re.findall(r'color="([a-z_]+)"', md)
 
 
+class AdminL1VerifyTest(unittest.TestCase):
+    """E2 — admin-action 듀얼링크가 raw.admin_l1_verify 를 존중.
+
+    None(flag off=기본)=현행 seq→L1 단언(골든 불변) · "pass"=검증된 L1 · "fail"=L2 인덱스+⚠️.
+    """
+    _ROW = {"official_url": "https://www.data.go.kr/data/15058457/openapi.do"}
+
+    def _official(self, raw):
+        _info, official, fallback = cs._dual_links("admin-action", self._ROW, raw)
+        return official, fallback
+
+    def test_verify_none_is_current_behavior(self):
+        official, fb = self._official({"ADM_DISPS_SEQ": "2026004188"})
+        self.assertEqual(
+            official,
+            "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026004188")
+        self.assertFalse(fb)
+
+    def test_verify_pass_is_verified_l1(self):
+        official, fb = self._official(
+            {"ADM_DISPS_SEQ": "2026004188", "admin_l1_verify": "pass"})
+        self.assertIn("getItem?dispsApplySeq=2026004188", official)
+        self.assertFalse(fb)  # 검증됨 → ⚠️ 없음
+
+    def test_verify_fail_demotes_to_l2_index(self):
+        official, fb = self._official(
+            {"ADM_DISPS_SEQ": "2026004188", "admin_l1_verify": "fail"})
+        self.assertEqual(official, "https://nedrug.mfds.go.kr/pbp/CCBAO01")
+        self.assertTrue(fb)  # 죽은 후보 → L2 인덱스 + ⚠️
+
+    def test_no_seq_is_l2_index(self):
+        official, fb = self._official({})
+        self.assertEqual(official, "https://nedrug.mfds.go.kr/pbp/CCBAO01")
+        self.assertTrue(fb)
+
+
 if __name__ == "__main__":
     unittest.main()

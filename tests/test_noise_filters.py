@@ -1,4 +1,6 @@
+import os
 import unittest
+from unittest import mock
 
 from collect_intake import (
     SOURCE_FR,
@@ -7,6 +9,7 @@ from collect_intake import (
     compute_relevance,
     compute_signal_tier,
 )
+import collect_mfds_admin_action as adm
 from collect_mfds_admin_action import _is_collectable as _admin_is_collectable
 from collect_mfds_gmp_inspection import _is_medical_gas_gmp_noise
 
@@ -392,6 +395,52 @@ class MfdsAdminActionPurifiedWaterTest(unittest.TestCase):
             "ADM_DISPS_NAME": "판매업무정지",
         }
         self.assertTrue(_admin_is_collectable(raw))
+
+
+class MfdsAdminUrlVerifyTest(unittest.TestCase):
+    """E2 — ENABLE_MFDS_URL_VERIFY(기본 off) 행정처분 L1 resolve&verify.
+
+    off=수집기 동작 불변(admin_l1_verify 키 미기록). on=verify_url_live 로 후보 L1 을
+    검증해 pass/fail 을 raw 에 남긴다(scaffold 가 L1 승격/강등). collect 행위 불변 보호.
+    """
+
+    _RAW = {
+        "ENTP_NAME": "대한약품", "ITEM_NAME": "정제X",
+        "LAST_SETTLE_DATE": "20260601", "ADM_DISPS_NAME": "제조업무정지",
+        "ADM_DISPS_SEQ": "2026004188", "EXPOSE_CONT": "품질부적합",
+    }
+
+    def test_flag_off_records_nothing(self):
+        # 기본(env 미설정) — 후보 검증 안 함, admin_l1_verify 키 미기록(현행 동작).
+        env = {k: v for k, v in os.environ.items() if k != "ENABLE_MFDS_URL_VERIFY"}
+        with mock.patch.dict(os.environ, env, clear=True):
+            item = adm._to_item(dict(self._RAW), "q")
+        self.assertIsNotNone(item)
+        self.assertNotIn("admin_l1_verify", item.raw_payload)
+
+    def test_flag_on_pass_promotes(self):
+        with mock.patch.dict(os.environ, {"ENABLE_MFDS_URL_VERIFY": "true"}), \
+             mock.patch("brief_lint.verify_url_live", return_value={"ok": True}) as m:
+            item = adm._to_item(dict(self._RAW), "q")
+        self.assertEqual(item.raw_payload["admin_l1_verify"], "pass")
+        self.assertEqual(
+            item.raw_payload["admin_l1_candidate_url"],
+            "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026004188")
+        # 후보 L1 URL 로 검증을 호출했는지 확인.
+        self.assertIn("dispsApplySeq=2026004188", m.call_args[0][0])
+
+    def test_flag_on_fail_demotes(self):
+        with mock.patch.dict(os.environ, {"ENABLE_MFDS_URL_VERIFY": "1"}), \
+             mock.patch("brief_lint.verify_url_live", return_value={"ok": False}):
+            item = adm._to_item(dict(self._RAW), "q")
+        self.assertEqual(item.raw_payload["admin_l1_verify"], "fail")
+
+    def test_flag_on_verify_exception_demotes(self):
+        # verify 자체가 터지면(예외) 미검증=강등(fail) — 차단 측 안전.
+        with mock.patch.dict(os.environ, {"ENABLE_MFDS_URL_VERIFY": "on"}), \
+             mock.patch("brief_lint.verify_url_live", side_effect=RuntimeError("boom")):
+            item = adm._to_item(dict(self._RAW), "q")
+        self.assertEqual(item.raw_payload["admin_l1_verify"], "fail")
 
 
 if __name__ == "__main__":

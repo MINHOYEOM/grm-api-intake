@@ -408,11 +408,20 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
         official = _first(raw.get("url"), row.get("official_url"))
     elif kind == "admin-action":
         seq = _first(raw.get("ADM_DISPS_SEQ"))
-        if seq:
-            # L1 (seq 로 결정론 생성). 라이브 검증 2026-06-16(URL전수검사): 실제 seq
-            # (예: 2026004188)→ 행정처분정보 레코드 정상 렌더(error-marker 부재). 단 nedrug
-            # getItem 은 무효 seq 도 HTTP 200(error-shell)이라 상태코드로 검증 불가 —
-            # 잔여: data.go.kr 15058457 이 ADM_DISPS_SEQ 를 반환하는지 키 보유 CI 확인.
+        # E2(resolve & verify): 수집기가 ENABLE_MFDS_URL_VERIFY=on 일 때만 남기는
+        # `admin_l1_verify`("pass"/"fail")를 존중한다. 키가 없으면(flag off=기본) verify
+        # 는 None → 현행 동작(seq→L1 단언) 그대로라 golden 바이트 불변(additive).
+        verify = raw.get("admin_l1_verify")
+        if verify == "fail":
+            # 후보 L1 이 live verify 에서 죽음/오류셸 → 정직하게 L2 인덱스 + ⚠️ 강등.
+            official = "https://nedrug.mfds.go.kr/pbp/CCBAO01"
+            fallback = True
+        elif seq:
+            # verify=="pass" → 검증된 L1. None(E2 off) → 현행(미검증 L1 단언, 행위 불변).
+            # 라이브 검증 2026-06-16(URL전수검사): 실제 seq(예 2026004188)→ 행정처분정보
+            # 레코드 정상 렌더. nedrug getItem 은 무효 seq 도 HTTP 200(error-shell)이라
+            # 상태코드로 검증 불가 → E2(본문 길이·오류마커)로만 확정. 잔여 R-1: data.go.kr
+            # 15058457 이 ADM_DISPS_SEQ 를 반환하는지 키 보유 CI 확인(증빙 §5.2 URL-1).
             official = ("https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
                         f"dispsApplySeq={seq}")
         else:

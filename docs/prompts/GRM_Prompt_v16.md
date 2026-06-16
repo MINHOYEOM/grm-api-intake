@@ -7,6 +7,7 @@
 > **작성결함 R2 패치(2026-06-08, §B 슬롯/블록만)**: 6/8 발행 확정 결함 D1~D7 — TITLE_ISSUE "미상" 금지·위반유형 fallback(D1) · 회수 등급 raw-only·슬롯 간 모순 금지(D2) · 슬롯7 총회 가드+M3 기록(D3) · TL;DR 과확장·본문 정합(D4·D6) · W6/W7 작성 전 자기점검·교차유형 템플릿 금지(D5) · 요일=날짜 산출 임시가드(D7, 본질=K4) + Publish Lint 10~14. scaffold·collector·golden·테스트 불변(golden 무관·K3 4주 관찰 유지). Codex 게이트·사람 승인 후 동결.
 > **K4-1 슬라이스(2026-06-08, §B [0단계]·[실행일]·PL-10b + collect_intake emit 가드)**: 6/8 근본원인(LLM 날짜 의존 handoff 선택·일일 emit 누적) 제거 — handoff 소비를 "최신 `run_date_kst` OPEN 1건"으로, 실행일/요일/제목/기간을 그 handoff run_date 에서 파생(LLM 날짜계산 제거), PL-10b 를 "최신 `run_date_kst` CONSUMED 대조"로 결정화. Python emit 측은 새 OPEN 생성 전 직전 OPEN 을 STALE+Skipped 봉인(`notion_stale_prior_open_handoffs`, 항상 OPEN 1개·개별 row 불변). handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후.
 > **작성결함 R3 패치(2026-06-16, §B [2단계] W5 슬롯·공통 가드·Publish Lint 만)**: EVAL-1(6/15) E1 7건 — W2 표/`prose_input.w2_facts` 에 값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(역방향 슬롯 모순). W5 [W2 우선 인용]·공통 가드 기준 슬롯 W2·성분/marker/수치 단정 가드(현진 단삼 살비아놀산B↔탄시논류 유형)·Publish Lint 15(D8) 추가. scaffold·collector·golden·tests 불변. 브랜치 적용·Codex 게이트 대기.
+> **toggle 회귀 핫픽스(2026-06-16, §B 메타 블록·Publish Lint·Brief Lint 게이트만)**: 6/15(W24) 발행 M2/M3 메타가 `<details>` 대신 literal `<toggle>`/`</toggle>` 로 노출(Brief Lint L3 FAIL). 원인 = 페이지 레벨 메타 블록은 LLM 작성이고 코드 중화(`_neutralize_forbidden`)는 card scaffold 에만 적용 — 메타 블록 무중화 + LLM 생성 회귀. 수정 = 메타 템플릿에 `<details>`/`<summary>` 리터럴 강제·`<toggle>`/`[toc]` 금지 명시 + Publish Lint 16(메타 토글 HARD FAIL) 신설 + Brief Lint L3 HARD 강화. scaffold·collector·golden·tests·v16 카드 슬롯 규칙 불변. M3 page-shell(메타 Python 이관)은 별도 트랙. 브랜치 적용·Codex 게이트 대기.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -419,6 +420,10 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 		생성 라벨: "생성: Claude (Anthropic) / GRM Automated Routine v16 Python-scaffold mode"
 	</callout>
 </details>
+⚠️ 메타 토글은 반드시 `<details>`…`</details>` + `<summary>`…`</summary>` 리터럴로만 연다 —
+`<toggle>`/`</toggle>` 는 절대 쓰지 않는다(렌더 실패·literal 텍스트 노출 → Brief Lint L3 FAIL).
+목차가 필요하면 `<table_of_contents/>` 만 쓰고 `[toc]`/`[TOC]` 리터럴은 쓰지 않는다. (06-07
+클린본과 동일한 `<details>` 실렌더가 합격선.)
 ⚠️ 자기판정 서술 금지: "점검 완료/passed/이상 없음" 류 문구를 본문·M2/M3 에 쓰지 않는다.
 사실 카운트만. 4주 연속 0건 소스만 "외부 수집기 KPI 확인 필요"로 표기.
 
@@ -441,7 +446,8 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 1. 잔존 토큰 0: 본문 전체에 `{{` 가 없다(슬롯 전부 치환됨).
 2. scaffold 불변: 카드의 표 행 수·링크·> 인용·배지가 handoff 의 card_scaffold 와 다르지 않다
    (직접 비교 — 변형 발견 시 scaffold 원본으로 되돌리고 슬롯만 다시 채운다).
-3. 금지 문법 0: [!NOTE]/[!WARNING]/<toggle>/빈 callout/빈 표 행/빈 줄 시작 > 없음.
+3. 금지 문법 0: [!NOTE]/[!WARNING]/<toggle>/</toggle>/[toc]/[TOC]/빈 callout/빈 표 행/빈 줄
+   시작 > 없음(목차는 <table_of_contents/> 만 — M2·M3 메타 toggle 은 항목 16 HARD 체크).
 4. quote 규율: > 는 scaffold W3 에만 존재. 네가 쓴 블록(검색 카드·🔮 표·고정 블록)에 > 없음.
 5. 페이지 단일 블록: TL;DR·커버리지·🔮 표·AI 면책·메타 toggle 각 1회. 카드 내부 면책 없음.
 6. 기관 태그: `출처 기관` 에 그 주 등장 기관 전부(국내 카드 있으면 MFDS).
@@ -460,6 +466,11 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 15. W5·시사점의 "원문 미기재/미확인" 각 항목에 대해, 같은 카드 W2 표/prose_input.w2_facts 에
     확정값(빈값·"원문 미기재"·"미확인" 제외, 회수 등급은 raw 등급 가드 우선)이 있는 경우 0(D8)
     — 위반 시 발행 전 W2 확정값으로 교정.
+16. [메타 토글 HARD] M2·M3 메타 블록이 `<details>`+`<summary>` … `</details>` 리터럴로 열리고,
+    페이지 전체에 `<toggle>`/`</toggle>` 리터럴 0 · `[toc]`/`[TOC]` 리터럴 0(목차는
+    `<table_of_contents/>` 만). 위반 시 HARD FAIL(발행 중단) — `<toggle>`→`<details>`·
+    `</toggle>`→`</details>`·`[toc]`/`[TOC]`→`<table_of_contents/>` 로 교정한 뒤에만 발행한다
+    (06-07 클린본과 동일한 toggle 실렌더가 합격선).
 위반 발견 시 발행 전에 고친다. 고칠 수 없는 구조적 한계만 M2 에 사실로 기록.
 
 [발송]

@@ -24,7 +24,10 @@ L1  듀얼 링크: 모든 사례 카드의 W8 출처 푸터에 📰 정보출처
     국내(MFDS) 카드도 📎 가 실제 URL 링크인가(Document ID 텍스트만 있으면 FAIL).
 L2  quote 규율: > 블록이 Evidence A 카드의 원문 인용에만 있는가.
     Evidence B/C 카드 또는 callout 내부에 > 가 있으면 FAIL. 빈 > 블록도 FAIL.
-L3  금지 문법: [!NOTE]/[!WARNING]/<toggle> 등 raw 노출 문법, 빈 callout, 비어 있는 인용이 없는가.
+L3  금지 문법(HARD FAIL): [!NOTE]/[!WARNING]/<toggle>/</toggle> 등 raw 노출 문법, [toc]/[TOC]
+    리터럴(목차는 <table_of_contents/> 여야 함), 빈 callout, 비어 있는 인용이 없는가.
+    특히 M2·M3 메타 toggle 이 <details>/<summary> 로 실렌더되는가 — 펼침 UI 가 아니라 literal
+    <toggle>/</toggle> 텍스트가 보이면 FAIL(06-15 회귀 사례). [toc] 리터럴이 보여도 FAIL.
 L4  카드 블록 매트릭스: Evidence A(비KO)=W1~W8 / Evidence A(KO)=W4 생략 / B,C=W3·W4 생략을 따르는가.
     KO 카드에 영문 병기·번역 블록이 있으면 FAIL.
 L5  카드 제목: 모든 카드가 H3 + 색 prefix(🟧/🟦/🟫/⬜) + 텍스트 라벨 + Document ID 형식인가.

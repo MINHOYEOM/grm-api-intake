@@ -94,6 +94,10 @@ on:
         description: '멱등성 v2 — Handoff Ref 상태기계 (PL-10b/B1 근본해결, Notion에 Handoff Ref 속성 생성 후 켤 것)'
         type: boolean
         default: false
+      enable_mfds_url_verify:
+        description: 'E2: 행정처분 건별 L1(nedrug getItem)을 collect 시 live verify (기본 off — K3 종료/명시 opt-in 후)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -175,6 +179,9 @@ jobs:
           # 미설정 시 v1(날짜 윈도우+K4-1) 유지. 속성 미생성 상태로 켜도 preflight 가
           # 그 실행만 v1 폴백(graceful degrade) + health warning.
           ENABLE_HANDOFF_IDEMPOTENCY_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_idempotency_v2) || vars.ENABLE_HANDOFF_IDEMPOTENCY_V2 || 'false' }}
+          # E2(URL전수검사): 행정처분 건별 L1 을 collect 시 resolve&verify(기본 off — collector
+          # 행위·K3 관찰 보호). on 이면 nedrug getItem 후보를 verify 해 L1 승격/강등.
+          ENABLE_MFDS_URL_VERIFY: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_url_verify) || vars.ENABLE_MFDS_URL_VERIFY || 'false' }}
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()

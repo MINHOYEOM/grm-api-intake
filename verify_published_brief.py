@@ -1,0 +1,391 @@
+#!/usr/bin/env python3
+"""GRM 발행 후 출처 링크 근거(provenance) 탐지(detective) — W1 belt-and-suspenders.
+
+발행(주간 Routine)은 LLM+MCP 라 결정론 **차단**은 발행 직전 예방 게이트
+(`brief_lint.run_publish_gate` / Publish Lint 17)에 의존한다. 이 모듈은 그 게이트를
+**발행 후 독립적으로 재실행**하는 2차 방어선이다 — 최신 Weekly Brief 페이지와 그 주
+handoff 를 Notion 에서 직접 받아 `lint_link_provenance` 를 재판정하고, FAIL(특히 MFDS
+날조 시그니처 `brd/*/view.do?seq=`)이면 운영 경고 JSON 을 낸다. CI(`grm-brief-audit.yml`)가
+이 JSON 을 기존 `GRM Intake 운영 경고` Issue 로 띄운다.
+
+**과알림 0 원칙:**
+- 알림은 **FAIL 만** 트리거한다(WARN·미확인은 정보로만 본문에 싣고 알림 트리거 아님).
+- MFDS 미근거 링크 = FAIL(네트워크 없이 결정론 — 오탐 0, 실제 W24 사고 클래스).
+- 비-MFDS 미근거 링크는 live verify 가 **명확히 나쁨**(404·오류셸·기대어 부재)일 때만 FAIL
+  로 승격하고, 일시 네트워크 실패(unknown)는 알리지 않는다.
+- 토큰·페이지·handoff 부재 또는 fetch 실패는 `ok:true`(건너뜀)로 처리 — false-red 금지.
+
+순수 코어(블록 URL 추출·분류·Issue JSON)는 네트워크 없이 단위테스트된다. Notion I/O 만
+lazy import(`collect_intake` 의 검증된 `notion_api_request` 재사용).
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+from typing import Any, Iterable
+
+import brief_lint as bl
+
+# Weekly Brief(발행) DB — v16 프롬프트 [발송] 의 ID. env 로 override 가능.
+DEFAULT_WEEKLY_BRIEF_DB_ID = "3653142f-dc11-8049-806d-e0a779cafd90"
+# Intake/handoff DB — handoff page(Source=GRM Handoff)가 사는 곳(= NOTION_DATABASE_ID).
+DEFAULT_INTAKE_DB_ID = "7784c71fb7b343749b2bee5d04db7926"
+
+DEFAULT_AUDIT_JSON = "grm-brief-audit.json"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 순수 코어 — Notion 블록 URL 추출 (네트워크 없음, 단위테스트 대상)
+# ─────────────────────────────────────────────────────────────────────────────
+def iter_rich_text_urls(rich_text: Iterable[dict[str, Any]]) -> list[str]:
+    """Notion rich_text 배열에서 링크 URL 을 모은다(`href` + `text.link.url`)."""
+    out: list[str] = []
+    for rt in rich_text or []:
+        if not isinstance(rt, dict):
+            continue
+        href = rt.get("href")
+        if href:
+            out.append(href)
+        link = (rt.get("text") or {}).get("link") if isinstance(rt.get("text"), dict) else None
+        if isinstance(link, dict) and link.get("url"):
+            out.append(link["url"])
+    return out
+
+
+# rich_text 를 담을 수 있는 블록 타입 payload 키들(callout·문단·제목·인용·리스트·표 셀 등).
+_RICH_TEXT_KEYS = (
+    "paragraph", "heading_1", "heading_2", "heading_3", "callout", "quote",
+    "bulleted_list_item", "numbered_list_item", "to_do", "toggle", "code",
+)
+
+
+def extract_urls_from_blocks(blocks: Iterable[dict[str, Any]]) -> list[str]:
+    """Notion 블록 리스트(인라인 children 포함)에서 모든 링크 URL 을 추출.
+
+    각 블록의 rich_text(문단·callout·표 셀 등) 링크 + 인라인 `children` 재귀.
+    (network fetch 로 받은 children 도 같은 함수로 처리 — fetch 계층이 children 을
+    블록에 인라인으로 붙여 넘긴다.)
+    """
+    urls: list[str] = []
+    for block in blocks or []:
+        if not isinstance(block, dict):
+            continue
+        btype = block.get("type")
+        payload = block.get(btype, {}) if btype else {}
+        if isinstance(payload, dict):
+            if isinstance(payload.get("rich_text"), list):
+                urls.extend(iter_rich_text_urls(payload["rich_text"]))
+            # table_row: cells = [[rich_text...], ...]
+            if isinstance(payload.get("cells"), list):
+                for cell in payload["cells"]:
+                    if isinstance(cell, list):
+                        urls.extend(iter_rich_text_urls(cell))
+            # 인라인으로 부착된 children 재귀(fetch 계층이 붙임).
+            if isinstance(payload.get("children"), list):
+                urls.extend(extract_urls_from_blocks(payload["children"]))
+        if isinstance(block.get("children"), list):
+            urls.extend(extract_urls_from_blocks(block["children"]))
+    # 순서 보존 dedupe.
+    seen: set[str] = set()
+    out: list[str] = []
+    for u in urls:
+        if u and u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 순수 코어 — 분류(과알림 0) + Issue JSON
+# ─────────────────────────────────────────────────────────────────────────────
+# verdict 콜백 반환값: 비-MFDS 미근거 링크의 live verify 판정.
+VERDICT_OK = "ok"          # 정상(통과) — 알림 아님
+VERDICT_BAD = "bad"        # 명확히 나쁨(404·오류셸·기대어 부재) — FAIL 승격
+VERDICT_UNKNOWN = "unknown"  # 일시 네트워크 실패 등 — 미확인(과알림 0: 알림 아님)
+
+
+# BAD 로 단정할 status — "확실히 없어진" 것만. 403/401/429/5xx/timeout 은 WAF·일시장애일
+# 수 있어 BAD 로 보지 않는다(과알림 0). 감사 결과 FDA 등은 비브라우저 fetch 를 WAF 로
+# 차단(UNVERIFIABLE)하므로, 살아있는 정당 링크가 CI 에서 403/abuse 로 보일 수 있다 →
+# 그걸 FAIL 로 올리면 오탐. "지어낸 URL" 차단의 본진은 발행 전 예방 게이트(allowed_fetched).
+_GONE_STATUSES = (404, 410)
+
+
+def definitive_verdict(url: str, **kwargs: Any) -> str:
+    """`verify_url_live` 결과를 ok/bad/unknown 으로 보수적으로 환원(과알림 0).
+
+    - ok → OK.
+    - status 404/410(확실히 없어짐) 또는 200+오류셸(nedrug) → BAD(승격).
+    - 그 외(403/401/429/5xx·timeout·길이부족·WAF abuse) → UNKNOWN(알림 아님 — 일시·WAF
+      차단일 수 있어 정당 링크 오탐 방지). 지어낸 URL 차단은 예방 게이트(fetch 화이트리스트)가
+      1차로 막는다.
+    """
+    r = bl.verify_url_live(url, **kwargs)
+    if r.get("ok"):
+        return VERDICT_OK
+    status = r.get("status") or 0
+    if status in _GONE_STATUSES:
+        return VERDICT_BAD
+    if status == 200 and r.get("is_error_page"):  # nedrug 오류셸(방어적; MFDS 는 별경로)
+        return VERDICT_BAD
+    return VERDICT_UNKNOWN
+
+
+def classify(handoff_rows: list[dict[str, Any]],
+             published_urls: list[str],
+             verdict: "Any | None" = None) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
+    """(alert_findings, info_findings) 반환.
+
+    base = MFDS_ONLY 판정(네트워크 0): MFDS 미근거=FAIL(alert), 비-MFDS 미근거=WARN.
+    비-MFDS WARN 은 `verdict(url)` 가 BAD 면 L17-UNGROUNDED FAIL(alert)로 승격,
+    OK/UNKNOWN(또는 verdict 미제공)이면 info(알림 트리거 아님).
+    """
+    allowed = bl.collect_allowed_urls(handoff_rows)
+    base = bl.lint_urls(published_urls, allowed, policy=bl.POLICY_MFDS_ONLY)
+    alerts: list[bl.LintFinding] = []
+    info: list[bl.LintFinding] = []
+    for f in base:
+        if f.severity == bl.SEV_FAIL:           # MFDS 미근거 — 결정론 alert
+            alerts.append(f)
+            continue
+        # 비-MFDS 미근거(WARN)
+        v = verdict(f.url) if verdict is not None else VERDICT_UNKNOWN
+        if v == VERDICT_BAD:
+            alerts.append(bl.LintFinding(
+                bl.SEV_FAIL, "L17-UNGROUNDED", f.url,
+                "handoff 근거 없는 외부 링크가 live verify 에서 명확히 나쁨(404·오류셸·"
+                "기대어 부재) — 지어낸/죽은 링크 의심."))
+        else:
+            info.append(f)
+    return alerts, info
+
+
+def build_audit_json(alerts: list[bl.LintFinding],
+                     info: list[bl.LintFinding],
+                     *,
+                     run_date_kst: str = "",
+                     brief_title: str = "",
+                     brief_url: str = "",
+                     note: str = "") -> dict[str, Any]:
+    """CI(grm-brief-audit.yml)가 읽어 `GRM Intake 운영 경고` Issue 로 띄울 결과 JSON.
+
+    `ok=False`(alert≥1)일 때만 Issue 가 열린다(과알림 0 — info/WARN 단독은 알림 아님).
+    """
+    def _ser(f: bl.LintFinding) -> dict[str, str]:
+        return {"severity": f.severity, "code": f.code, "url": f.url, "message": f.message}
+
+    return {
+        "ok": not alerts,
+        "run_date_kst": run_date_kst,
+        "brief": {"title": brief_title, "url": brief_url},
+        "fail_count": len(alerts),
+        "info_count": len(info),
+        "alerts": [_ser(f) for f in alerts],
+        "info": [_ser(f) for f in info],
+        "note": note,
+    }
+
+
+def skipped_json(note: str, *, run_date_kst: str = "") -> dict[str, Any]:
+    """대조 불가(토큰·brief·handoff 부재·fetch 실패) → ok:true 건너뜀(false-red 금지)."""
+    return {"ok": True, "run_date_kst": run_date_kst, "brief": {"title": "", "url": ""},
+            "fail_count": 0, "info_count": 0, "alerts": [], "info": [], "note": note}
+
+
+def format_audit_report(result: dict[str, Any]) -> str:
+    """audit JSON 을 사람이 읽는 텍스트로(CI 로그·Issue 본문 공용)."""
+    if result.get("note") and not result.get("alerts"):
+        return f"[SKIP] 발행 후 provenance 탐지 — {result['note']}"
+    alerts = result.get("alerts", [])
+    if not alerts:
+        return ("[PASS] 발행 후 provenance 탐지 — FAIL 0"
+                f" (info {result.get('info_count', 0)})")
+    lines = [f"[FAIL] 발행 후 provenance 탐지 — FAIL {len(alerts)}"
+             f" · brief={result.get('brief', {}).get('title') or '?'}"]
+    for a in alerts:
+        lines.append(f"  ✖ [{a['code']}] {a['url']} — {a['message']}")
+    lines.append("→ 발행물의 위 링크가 handoff 근거 없는 날조/오류 링크다. 운영자 확인·정정 필요.")
+    return "\n".join(lines)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Notion I/O — lazy import(collect_intake 재사용). 단위테스트는 stub 으로 대체.
+# ─────────────────────────────────────────────────────────────────────────────
+def _ci():  # lazy — 순수 코어/테스트는 collect_intake(=requests) 를 import 하지 않는다.
+    import collect_intake as ci
+    return ci
+
+
+_BRIEF_MAX_BLOCK_PAGES = 40   # children 100/page · 브리프 한 페이지 분량 안전 상한
+_BRIEF_MAX_DEPTH = 4          # callout>table>row 정도. 무한 재귀 방지.
+
+
+def fetch_latest_brief(token: str, db_id: str) -> dict[str, Any] | None:
+    """Weekly Brief DB 에서 가장 최근 발행 페이지 1건(메타) 조회."""
+    ci = _ci()
+    body = {"page_size": 1, "sorts": [{"timestamp": "created_time", "direction": "descending"}]}
+    data = ci.notion_api_request(
+        "POST", ci.NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
+    results = data.get("results", [])
+    if not results:
+        return None
+    page = results[0]
+    title = ""
+    props = page.get("properties", {})
+    for prop in props.values():
+        if isinstance(prop, dict) and prop.get("type") == "title":
+            title = "".join(t.get("plain_text", "") for t in prop.get("title", []))
+            break
+    return {"id": page.get("id", ""), "url": page.get("url", ""), "title": title}
+
+
+def _fetch_block_children(token: str, block_id: str, depth: int) -> list[dict[str, Any]]:
+    ci = _ci()
+    url_tpl = ci.NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=block_id)
+    import urllib.parse
+    out: list[dict[str, Any]] = []
+    cursor: str | None = None
+    for _ in range(_BRIEF_MAX_BLOCK_PAGES):
+        req = url_tpl + (f"?start_cursor={urllib.parse.quote(cursor)}" if cursor else "")
+        data = ci.notion_api_request("GET", req, token)
+        for block in data.get("results", []):
+            if depth < _BRIEF_MAX_DEPTH and block.get("has_children"):
+                kids = _fetch_block_children(token, block.get("id", ""), depth + 1)
+                block.setdefault("children", []).extend(kids)
+            out.append(block)
+        if not data.get("has_more"):
+            break
+        cursor = data.get("next_cursor")
+    return out
+
+
+def fetch_brief_urls(token: str, page_id: str) -> list[str]:
+    """발행 페이지 본문(중첩 블록 재귀)에서 모든 링크 URL 추출."""
+    blocks = _fetch_block_children(token, page_id, 0)
+    return extract_urls_from_blocks(blocks)
+
+
+def fetch_latest_consumed_handoff_rows(token: str, db_id: str) -> list[dict[str, Any]]:
+    """Intake DB 에서 가장 최근 CONSUMED handoff(Status=Processed)의 rows[] 복원."""
+    ci = _ci()
+    body = {
+        "filter": {"and": [
+            {"property": ci.PROP_TYPE_CLASS, "select": {"equals": "routine-handoff"}},
+            {"property": ci.PROP_STATUS, "select": {"equals": "Processed"}},
+        ]},
+        "sorts": [{"timestamp": "last_edited_time", "direction": "descending"}],
+        "page_size": 1,
+    }
+    data = ci.notion_api_request(
+        "POST", ci.NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
+    results = data.get("results", [])
+    if not results:
+        return []
+    page_id = results[0].get("id", "")
+    text = _fetch_page_code_json(token, page_id)
+    if not text:
+        return []
+    try:
+        obj = json.loads(text)
+    except json.JSONDecodeError:
+        return []
+    return bl.extract_handoff_rows(obj)
+
+
+def _fetch_page_code_json(token: str, page_id: str) -> str:
+    """페이지 본문의 JSON code block 들을 순서대로 이어붙여 반환(handoff payload 복원)."""
+    ci = _ci()
+    import urllib.parse
+    url_tpl = ci.NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
+    chunks: list[str] = []
+    cursor: str | None = None
+    for _ in range(ci._INTAKE_RAW_MAX_PAGES):
+        req = url_tpl + (f"?start_cursor={urllib.parse.quote(cursor)}" if cursor else "")
+        data = ci.notion_api_request("GET", req, token)
+        for block in data.get("results", []):
+            if block.get("type") != "code":
+                continue
+            code = block.get("code", {})
+            if (code.get("language") or "") not in ("json", "plain text", ""):
+                continue
+            for rt in code.get("rich_text", []):
+                chunks.append(rt.get("plain_text")
+                              or rt.get("text", {}).get("content", "") or "")
+        if not data.get("has_more"):
+            break
+        cursor = data.get("next_cursor")
+    return "".join(chunks)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 실행
+# ─────────────────────────────────────────────────────────────────────────────
+def run(token: str, *, weekly_db_id: str, intake_db_id: str,
+        verify: bool = True) -> dict[str, Any]:
+    """탐지 1회 실행 → audit JSON. 대조 불가/오류는 ok:true 건너뜀(false-red 금지)."""
+    if not token:
+        return skipped_json("NOTION_TOKEN 부재 — 발행 후 탐지 건너뜀")
+    try:
+        brief = fetch_latest_brief(token, weekly_db_id)
+    except Exception as exc:  # noqa: BLE001
+        return skipped_json(f"Weekly Brief 조회 실패(건너뜀): {str(exc)[:160]}")
+    if not brief:
+        return skipped_json("Weekly Brief 페이지 없음 — 건너뜀")
+    try:
+        rows = fetch_latest_consumed_handoff_rows(token, intake_db_id)
+    except Exception as exc:  # noqa: BLE001
+        return skipped_json(f"handoff 조회 실패(건너뜀): {str(exc)[:160]}")
+    if not rows:
+        # 근거 집합이 없으면 모든 링크가 미근거로 보여 과알림 → 대조 불가로 건너뜀.
+        return skipped_json("CONSUMED handoff 미발견 — 근거 대조 불가, 건너뜀")
+    try:
+        urls = fetch_brief_urls(token, brief["id"])
+    except Exception as exc:  # noqa: BLE001
+        return skipped_json(f"브리프 본문 fetch 실패(건너뜀): {str(exc)[:160]}")
+
+    verdict = (lambda u: definitive_verdict(u)) if verify else None
+    alerts, info = classify(rows, urls, verdict=verdict)
+    return build_audit_json(alerts, info, brief_title=brief.get("title", ""),
+                            brief_url=brief.get("url", ""))
+
+
+def main(argv: "list[str] | None" = None) -> int:
+    import argparse
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+    p = argparse.ArgumentParser(
+        prog="verify_published_brief",
+        description="발행 후 출처 링크 근거(provenance) 탐지 — FAIL 시 운영 경고 JSON 생성.")
+    p.add_argument("--out", default=os.environ.get("GRM_BRIEF_AUDIT_JSON", DEFAULT_AUDIT_JSON),
+                   help="audit 결과 JSON 출력 경로.")
+    p.add_argument("--no-verify", action="store_true",
+                   help="비-MFDS 미근거 링크 live verify 생략(MFDS 결정론 FAIL 만).")
+    p.add_argument("--exit-nonzero-on-fail", action="store_true",
+                   help="(로컬용) alert 발생 시 exit 1. CI 는 JSON 으로 Issue 처리(기본 exit 0).")
+    args = p.parse_args(argv)
+
+    token = os.environ.get("NOTION_TOKEN", "").strip()
+    weekly_db = os.environ.get("GRM_WEEKLY_BRIEF_DB_ID", DEFAULT_WEEKLY_BRIEF_DB_ID).strip()
+    intake_db = (os.environ.get("NOTION_DATABASE_ID")
+                 or os.environ.get("GRM_INTAKE_DB_ID")
+                 or DEFAULT_INTAKE_DB_ID).strip()
+
+    result = run(token, weekly_db_id=weekly_db, intake_db_id=intake_db,
+                 verify=not args.no_verify)
+    try:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            json.dump(result, fh, ensure_ascii=False, indent=2)
+    except OSError as exc:
+        print(f"[WARN] audit JSON 쓰기 실패: {exc}", file=sys.stderr)
+    print(format_audit_report(result))
+    if args.exit_nonzero_on_fail and not result.get("ok", True):
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -3,8 +3,10 @@
 정상(handoff 근거 있음)·누출(m_99/m_218 근거 없음 → FAIL)·검증실패(오류 셸·검색 URL → WARN)
 케이스를 동결한다. W24 사고(handoff 근거 없는 mfds/brd/view.do 링크)의 회귀 잠금.
 """
+import json
 import os
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -176,6 +178,172 @@ class TestVerifyUrlLive(unittest.TestCase):
             r = bl.verify_url_live("https://nedrug.mfds.go.kr/x")
         self.assertFalse(r["ok"])
         self.assertIn("conn reset", r["error"])
+
+
+class TestAllDomainsPolicy(unittest.TestCase):
+    """W2 — provenance 전 기관 일반화. 기본(mfds_only)은 무회귀, all_domains 는 FAIL 승격."""
+
+    def test_default_policy_unchanged_global_warns(self):
+        """기본 시그니처(policy 미지정)는 종전대로 비-MFDS 미근거 = WARN(무회귀)."""
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, "[x](https://www.fda.gov/new/wl-acme-999)")
+        self.assertFalse(bl.has_failures(findings))
+        self.assertEqual(findings[0].severity, bl.SEV_WARN)
+
+    def test_all_domains_invented_global_fails(self):
+        """all_domains: 근거 없고 fetch·verify 도 없는 타 기관 URL = FAIL(지어낸 링크 차단)."""
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, "[x](https://www.fda.gov/invented/wl-999)",
+            policy=bl.POLICY_ALL_DOMAINS)
+        self.assertTrue(bl.has_failures(findings))
+        self.assertEqual(findings[0].code, "L17-UNGROUNDED")
+
+    def test_all_domains_fetched_global_passes(self):
+        """all_domains: 이번 세션에 실제 fetch 한 검색 카드 URL 은 통과(PASS)."""
+        url = "https://www.fda.gov/inspections/warning-letters/acme-2026"
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, f"[x]({url})",
+            policy=bl.POLICY_ALL_DOMAINS, allowed_fetched=[url])
+        self.assertEqual(findings, [], msg=[str(f) for f in findings])
+
+    def test_all_domains_verifier_pass_passes(self):
+        """all_domains: verifier(live verify) 통과 시 통과."""
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, "[x](https://www.ema.europa.eu/new/guideline-x)",
+            policy=bl.POLICY_ALL_DOMAINS, verifier=lambda u: True)
+        self.assertEqual(findings, [])
+
+    def test_all_domains_verifier_fail_fails(self):
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, "[x](https://www.ema.europa.eu/invented/x)",
+            policy=bl.POLICY_ALL_DOMAINS, verifier=lambda u: False)
+        self.assertTrue(bl.has_failures(findings))
+
+    def test_fetched_whitelist_works_in_default_mode_too(self):
+        """allowed_fetched 는 기본 모드에서도 추가적으로 통과시킨다(additive)."""
+        url = "https://www.who.int/news/x"
+        findings = bl.lint_link_provenance(HANDOFF_ROWS, f"[x]({url})",
+                                           allowed_fetched=[url])
+        self.assertEqual(findings, [])
+
+    def test_mfds_specialness_not_rescued_by_fetched(self):
+        """MFDS 특례: 검색 슬롯 없음 → allowed_fetched·verifier 로도 구제 안 됨(여전히 FAIL)."""
+        url = "https://www.mfds.go.kr/brd/m_99/view.do?seq=46893"
+        findings = bl.lint_link_provenance(
+            HANDOFF_ROWS, f"[x]({url})",
+            policy=bl.POLICY_ALL_DOMAINS, allowed_fetched=[url], verifier=lambda u: True)
+        self.assertTrue(bl.has_failures(findings))
+        self.assertEqual(findings[0].code, "L17-MFDS-PROVENANCE")
+
+    def test_lint_urls_shared_core(self):
+        """lint_urls 코어는 URL 리스트를 직접 받아 동일 판정(Notion 블록 URL 경로 공용)."""
+        allowed = bl.collect_allowed_urls(HANDOFF_ROWS)
+        findings = bl.lint_urls(
+            ["https://www.mfds.go.kr/brd/m_99/view.do?seq=1"], allowed)
+        self.assertTrue(bl.has_failures(findings))
+
+
+class TestPublishGate(unittest.TestCase):
+    """W1 — run_publish_gate: 매 발행 1회 실행, FAIL 시 ok=False(발행 차단)."""
+
+    def test_grounded_gate_allows(self):
+        published = ADMIN_SCAFFOLD + "\n\n" + RSS_NOTICE_SCAFFOLD
+        g = bl.run_publish_gate(HANDOFF_ROWS, published)
+        self.assertTrue(g.ok)
+        self.assertEqual(g.fail_count, 0)
+        self.assertIn("PASS", g.report)
+
+    def test_leak_gate_blocks(self):
+        published = "[z](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)"
+        g = bl.run_publish_gate(HANDOFF_ROWS, published)
+        self.assertFalse(g.ok)
+        self.assertEqual(g.fail_count, 1)
+        self.assertIn("발행 중단", g.report)
+
+    def test_gate_default_is_all_domains(self):
+        """게이트 기본 정책은 all_domains — 지어낸 타 기관 URL 도 차단(W2 옵트인)."""
+        g = bl.run_publish_gate(HANDOFF_ROWS, "[x](https://www.fda.gov/invented/wl-1)")
+        self.assertFalse(g.ok)
+
+    def test_gate_warn_only_does_not_block(self):
+        """mfds_only 정책의 WARN(검색 카드 미확인)만 있으면 발행은 허용(차단=FAIL 한정)."""
+        g = bl.run_publish_gate(HANDOFF_ROWS, "[x](https://www.fda.gov/new/wl-1)",
+                                policy=bl.POLICY_MFDS_ONLY)
+        self.assertTrue(g.ok)
+        self.assertEqual(g.warn_count, 1)
+
+    def test_gate_fetched_search_card_allows(self):
+        url = "https://www.fda.gov/inspections/warning-letters/acme-2026"
+        g = bl.run_publish_gate(HANDOFF_ROWS, f"[x]({url})", allowed_fetched=[url])
+        self.assertTrue(g.ok)
+
+
+class TestGateCLI(unittest.TestCase):
+    """W1 — CLI(`python -m brief_lint`)는 결정론 실행·차단(exit 1)."""
+
+    def test_extract_handoff_rows_shapes(self):
+        rows = [{"source": "MFDS"}]
+        self.assertEqual(bl.extract_handoff_rows({"rows": rows}), rows)
+        self.assertEqual(bl.extract_handoff_rows(rows), rows)
+        self.assertEqual(bl.extract_handoff_rows({"payload": {"rows": rows}}), rows)
+        self.assertEqual(bl.extract_handoff_rows({"nope": 1}), [])
+
+    def _write(self, d, name, text):
+        path = os.path.join(d, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        return path
+
+    def test_cli_pass_exit_0(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = self._write(d, "h.json", json.dumps({"rows": HANDOFF_ROWS}))
+            p = self._write(d, "b.md",
+                            "[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)")
+            self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
+
+    def test_cli_fail_exit_1(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = self._write(d, "h.json", json.dumps({"rows": HANDOFF_ROWS}))
+            p = self._write(d, "b.md",
+                            "[leak](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)")
+            self.assertEqual(bl.main(["--handoff", h, "--published", p]), 1)
+
+    def test_cli_handoff_in_code_fence(self):
+        """handoff 페이지 export(```json ... ```)도 rows 추출 가능."""
+        with tempfile.TemporaryDirectory() as d:
+            fenced = "```json\n" + json.dumps({"rows": HANDOFF_ROWS}) + "\n```"
+            h = self._write(d, "h.txt", fenced)
+            p = self._write(d, "b.md",
+                            "[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)")
+            self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
+
+    def test_cli_bad_path_exit_2(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._write(d, "b.md", "x")
+            self.assertEqual(
+                bl.main(["--handoff", os.path.join(d, "missing.json"),
+                         "--published", p]), 2)
+
+
+class TestLiveVerifierFactory(unittest.TestCase):
+    """live_verifier — verify_url_live 를 verifier 콜백으로 감싸 ALL_DOMAINS 에 주입."""
+
+    def test_live_verifier_true_on_valid(self):
+        with mock.patch("requests.get",
+                        return_value=_StubResp(200, "행정처분정보 " + "x" * 9000)):
+            v = bl.live_verifier(expect_terms=["행정처분"])
+            self.assertTrue(v("https://nedrug.mfds.go.kr/x"))
+
+    def test_live_verifier_false_on_error_shell(self):
+        with mock.patch("requests.get",
+                        return_value=_StubResp(200, "오류가 발생하였습니다")):
+            self.assertFalse(bl.live_verifier()("https://nedrug.mfds.go.kr/x"))
+
+
+class _StubResp:
+    def __init__(self, status, text):
+        self.status_code = status
+        self.text = text
 
 
 if __name__ == "__main__":

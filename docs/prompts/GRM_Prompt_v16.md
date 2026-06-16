@@ -351,6 +351,11 @@ Intake 밖 이벤트만 이 양식으로 작성한다(Evidence B/C — W3/W4 없
 scaffold 어휘를 따른다(Warning Letter·Recall·지침·안내서·
 규제 소식·고시·개정법령 등) · 시사점·점검은 [2단계] W6/W7 규칙(카드별 차별화·thin 가드·과확장
 가드·길이 우선)을 동일 적용한다(검색 카드도 일반론 복붙·과확장 금지).
+**[fetched 기록 — 발행 전 게이트용]** 검색 카드의 📰/📎 에 쓴 URL 은 **이번 run 에 실제
+WebSearch/WebFetch 로 확인한 URL** 이어야 하며, 그 URL 들을 별도 **fetched 목록**으로 모아
+둔다(아래 [발행 전 출처 링크 근거 게이트] 의 `allowed_fetched`). 발행 전 게이트는 handoff
+근거에도 fetched 목록에도 없는 외부 링크를 **FAIL(발행 차단)** 로 본다(W2 전 기관 일반화) —
+"검색해서 실제로 본 URL"은 통과, "패턴으로 지어낸 URL"은 차단.
 
 [🔮 표 — 발행 예정·진행 중(구방식, 비카드 항목 전용)]
 대상: 검색/Fetch 에서 발견된 초안·공개협의·코멘트 마감·시행 예정 + Intake 카드 중 의견기한이
@@ -481,8 +486,29 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
     넣지 않는다. handoff rows 의 official_url·source_url·card_scaffold 에 없는 mfds/nedrug 링크가
     본문에 있으면 **HARD FAIL(발행 중단)** — Intake 카드면 scaffold 링크로 되돌리고, 검색으로
     날조된 것이면 그 출처 줄을 제거한다(근거 못 대면 카드 자체 보류). 2026-06-15(W24) 사고
-    재발 차단. (코드 게이트: `brief_lint.lint_link_provenance` — Publish Lint 17 ⇔ Brief Lint L11.)
+    재발 차단. **이 항목은 "권고"가 아니라 아래 [발행 전 출처 링크 근거 게이트] 로 결정론
+    실행·차단된다** — 게이트 FAIL 이면 발행하지 않는다. (코드 게이트:
+    `brief_lint.run_publish_gate`/`lint_link_provenance` — Publish Lint 17 ⇔ Brief Lint L11.)
 위반 발견 시 발행 전에 고친다. 고칠 수 없는 구조적 한계만 M2 에 사실로 기록.
+
+[발행 전 출처 링크 근거 게이트 — HARD BLOCK (Publish Lint 17 의 결정론 강제)]
+발행(Notion 페이지 생성) **직전**, 조립한 발행 markdown 전체 + 이번 주 handoff rows 로 출처
+링크 근거 게이트를 1회 실행하고 **FAIL 이면 발행하지 않는다**(자가 점검 "권고"가 아니라
+**차단 조건**). 발행 차단/통과는 이 게이트가 결정한다.
+- **(권장) 코드 실행이 가능한 환경**이면 결정론 스크립트로 강제한다:
+  1. 이번 주 handoff page 본문 JSON 을 `handoff.json`, 조립한 발행 markdown 을 `brief.md`,
+     이번 run 에 실제 fetch·확인한 검색 카드 URL 목록을 `fetched.txt`(줄당 1 URL)로 저장.
+  2. 레포 루트에서
+     `python -m brief_lint --handoff handoff.json --published brief.md --allowed-fetched fetched.txt`
+     실행. **exit 0 = 통과(발행 진행)** · **exit 1 = FAIL(발행 중단)** — 출력 리포트의 FAIL
+     링크를 교정(Intake 카드는 scaffold 링크 복원 / 검색 날조면 출처 줄 제거·카드 보류)한 뒤
+     **게이트를 다시 통과시켜야** 발행한다. 기본 정책 all_domains — MFDS 뿐 아니라 fetched
+     목록에도 없는 타 기관 URL 도 차단(W2).
+- **(대체) 코드 실행이 불가능한 MCP 전용 세션**이면 같은 불변식을 수기로 검증한다(위 항목 17):
+  발행물의 모든 📰/📎 링크가 handoff rows 의 official_url·source_url·card_scaffold 집합 또는
+  이번 run 의 fetched 목록에 있는지 1:1 대조하고, 없는 mfds/nedrug 링크가 1건이라도 있으면
+  발행을 멈춘다. (발행 후 `grm-brief-audit`(verify_published_brief)가 독립 재검증한다 — 2차
+  방어선. 게이트 통과/FAIL 은 자기판정 서술이므로 브리프 본문·M2/M3 에 쓰지 않는다.)
 
 [발송]
 Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에 새 페이지 생성.
@@ -518,3 +544,4 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 | 2026-06-08 | **K4-1 슬라이스(handoff 선택·날짜 결정화 + emit STALE 가드)**: [0단계] handoff 소비 = 최신 `run_date_kst` OPEN 1건(LLM 날짜 검색 제거)·OPEN 0건이면 중복실행 억제 · [실행일·타임존] 실행일/요일/제목/기간을 handoff run_date 에서 파생(off-by-one 차단) · PL-10b = 최신 `run_date_kst` CONSUMED 대조로 결정화(DEFERRED 제외 유지). 코드: `collect_intake.py` `notion_stale_prior_open_handoffs()` 추가 — 새 OPEN emit 전 직전 미소비 OPEN(Status=New·routine-handoff) 전건 STALE rename+Status=Skipped(개별 Intake row 불가침), `notion_upsert_routine_handoff` 가 호출. handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후 |
 | 2026-06-08 | **R2 보정 2건(작성결함)**: D2(회수 등급 raw-only·슬롯 간 모순 금지)를 W6 아래 → TITLE_ISSUE·W1·W5 공통 가드로 이동(W1 등급 날조 1차 차단), W6 중복 제거(과확장 가드 "등급어 미첨가"는 유지) · 상단 상태줄 모순 정리(R2 게이트 전 명시 — "R2 동결/운영" 오해 제거). 프롬프트 1파일·scaffold/collector/golden/tests 불변 |
 | 2026-06-16 | **작성결함 R3 패치(§B [2단계] W5 슬롯·공통 가드·Publish Lint 만, scaffold·collector·golden·tests 불변)**: EVAL-1(6/15) E1 사실오류 7건 — W2 표/`prose_input.w2_facts` 에 확정값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(슬롯 간 역방향 모순). 기존 공통 가드(미기재→구체값 단정 금지)는 한 방향만 막아 역방향 무방비. ① W5 슬롯에 [W2 우선 인용] 추가(W2/prose_input 값 보유 필드는 미기재 금지·그 값 인용, 미기재는 양쪽 빈 경우만) · ② 공통 가드에 기준 슬롯 W2 추가(역방향 모순 금지) · ③ 성분·marker·수치 단정 가드(원문 'A'→동의어·상위어 'B' 치환 금지·원문 수치 있으면 "세부 수치 미기재" 금지 — 현진 단삼 살비아놀산B↔탄시논류·4.1%↑/1.5% 유형) · ④ Publish Lint 15(D8) 신설(W5 미기재 항목 ↔ W2 값 존재 0). 진단/지시 `GRM_발행결함_클로즈아웃_지시문초안_2026-06-16.md`. Codex 게이트·사람 승인 후 동결 |
+| 2026-06-16 | **출처 링크 근거 게이트 명문화(W1/W2 — URL전수검사 잔여 갭, §B [발행 단계]·검색 카드 규칙만)**: Publish Lint 17 을 "권고 자가점검"에서 **결정론 실행·차단**으로 승격 — [발행 전 출처 링크 근거 게이트 — HARD BLOCK] 절 신설. 코드 실행 가능 환경은 `python -m brief_lint --handoff h.json --published brief.md --allowed-fetched fetched.txt`(exit 1=발행 중단), MCP 전용 세션은 동일 불변식 수기 검증 + 발행 후 `grm-brief-audit`(verify_published_brief) 독립 재검증(2차 방어선). 검색 카드 규칙에 **fetched 기록**(이번 run 에 실제 fetch 한 URL → `allowed_fetched`) 추가 — 게이트 기본 정책 all_domains(MFDS 뿐 아니라 fetched 에도 없는 타 기관 URL 차단, W2). scaffold·collector·golden·v16 카드 슬롯 규칙 불변(프롬프트 [발행 단계] 문구만). 코드=`brief_lint.run_publish_gate`·`verify_published_brief`·`.github/workflows/grm-brief-audit.yml`. branch `audit/url-gate-2026-06-16`. 지시 `GRM_URL가드강화_후속지시문_2026-06-16.md` |

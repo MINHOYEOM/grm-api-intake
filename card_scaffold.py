@@ -409,13 +409,21 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
     elif kind == "admin-action":
         seq = _first(raw.get("ADM_DISPS_SEQ"))
         if seq:
+            # L1 (seq 로 결정론 생성). 라이브 검증 2026-06-16(URL전수검사): 실제 seq
+            # (예: 2026004188)→ 행정처분정보 레코드 정상 렌더(error-marker 부재). 단 nedrug
+            # getItem 은 무효 seq 도 HTTP 200(error-shell)이라 상태코드로 검증 불가 —
+            # 잔여: data.go.kr 15058457 이 ADM_DISPS_SEQ 를 반환하는지 키 보유 CI 확인.
             official = ("https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
-                        f"dispsApplySeq={seq}")  # L1 (seq 로 결정론 생성)
+                        f"dispsApplySeq={seq}")
         else:
             official = "https://nedrug.mfds.go.kr/pbp/CCBAO01"  # L2 인덱스
             fallback = True
     elif kind == "recall-quality":
-        official = "https://nedrug.mfds.go.kr/pbp/CCBAH01"  # L2 인덱스(§12B)
+        # L2 인덱스(§12B). 라이브 검증 2026-06-16(URL전수검사): 종전 CCBAH01 은 '재평가공고
+        # 및 결과공시' 보드(회수와 무관)였음 → 회수·폐기 보드 CCBAI01 로 정정. 건별 L1 은
+        # data.go.kr 15059114 payload 에 nedrug 회수레코드 seq(targetItemSeq)가 없어 불가 →
+        # 정직하게 L2 인덱스 유지(📰 는 data.go.kr 회수 데이터셋 — 회수 특정).
+        official = "https://nedrug.mfds.go.kr/pbp/CCBAI01"
         fallback = True
     elif kind == "openfda-recall":
         # 항목별 L1 없음 → FDA Recalls 인덱스 L2(§5). 패턴 유추 금지.

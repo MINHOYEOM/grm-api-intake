@@ -1,0 +1,133 @@
+name: GRM Brief Audit (post-publish provenance detective)
+
+# 발행 후 출처 링크 근거(provenance) 탐지 — W1 belt-and-suspenders(2차 방어선).
+# 주간 Routine(월 07:30 KST = 일 22:30 UTC) 발행 뒤 최신 Weekly Brief 를 받아
+# brief_lint.lint_link_provenance 를 독립 재판정한다. handoff 근거 없는 mfds/nedrug
+# 링크(W24 사고 클래스) 또는 live verify 가 명확히 죽은 타 기관 링크 = FAIL →
+# 기존 `GRM Intake 운영 경고` Issue 로 표면화(과알림 0: FAIL 만 트리거).
+#
+# 월 02:00 UTC = 월 11:00 KST (발행 ~3.5h 후 — MFDS RSS 지연·발행 지연 흡수).
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      no_verify:
+        description: '비-MFDS 미근거 링크 live verify 생략(MFDS 결정론 FAIL 만)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write  # FAIL 시 운영 경고 Issue
+
+concurrency:
+  group: grm-brief-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Re-lint latest Weekly Brief (provenance)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GRM_BRIEF_AUDIT_JSON: grm-brief-audit.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run brief provenance detective
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          # Weekly Brief(발행) DB id — 기본값은 코드 상수, 필요 시 repo variable 로 override.
+          GRM_WEEKLY_BRIEF_DB_ID: ${{ vars.GRM_WEEKLY_BRIEF_DB_ID }}
+          GRM_NO_VERIFY: ${{ inputs.no_verify }}
+        run: |
+          args=()
+          if [ "$GRM_NO_VERIFY" = "true" ]; then args+=(--no-verify); fi
+          # 탐지 자체는 빌드를 red 로 만들지 않는다(JSON 으로 Issue 처리). exit 0 기본.
+          python verify_published_brief.py "${args[@]}"
+
+      - name: Open or update warning issue on provenance FAIL
+        if: always()
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const jsonPath = path.join(process.env.GITHUB_WORKSPACE,
+              process.env.GRM_BRIEF_AUDIT_JSON || 'grm-brief-audit.json');
+            if (!fs.existsSync(jsonPath)) {
+              console.log('audit JSON not found; skipping');
+              return;
+            }
+            let audit;
+            try {
+              audit = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+            } catch (error) {
+              console.log(`audit JSON parse failed: ${error}`);
+              return;
+            }
+            const alerts = audit.alerts || [];
+            if (audit.ok || alerts.length === 0) {
+              console.log(`no provenance FAIL (note: ${audit.note || 'none'}); skipping issue`);
+              return;
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+            await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
+            await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
+
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const brief = audit.brief || {};
+            const lines = [
+              'GRM 발행 후 provenance 탐지에서 **출처 링크 근거 FAIL** 이 감지되었습니다.',
+              '(handoff 근거 없는 mfds/nedrug 링크 또는 live verify 가 죽은 타 기관 링크 — W24 사고 클래스)',
+              '',
+              `- Run: ${runUrl}`,
+              `- Brief: ${brief.title || '?'}${brief.url ? ` (${brief.url})` : ''}`,
+              `- FAIL: ${alerts.length}`,
+              '',
+              'FAIL 링크:',
+              ...alerts.map((a) => `- [${a.code}] ${a.url} — ${a.message}`),
+              '',
+              '조치: 발행물의 해당 출처 줄을 handoff 근거(scaffold 링크)로 복원하거나, 검색 날조면 제거하세요.',
+              '예방 게이트(Publish Lint 17 / brief_lint run_publish_gate)가 다음 발행에서 차단하는지 확인하세요.',
+            ];
+            const body = lines.join('\n');
+            const title = 'GRM Intake 운영 경고';
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body,
+              });
+              return;
+            }
+            await github.rest.issues.create({
+              owner, repo, title, body, labels: ['grm-intake', 'automation-warning'],
+            });

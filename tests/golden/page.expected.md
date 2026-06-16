@@ -528,7 +528,7 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  📎 공식원본 [링크](https://nedrug.mfds.go.kr/pbp/CCBAH01) ⚠️
+	**출처**  📎 공식원본 [링크](https://nedrug.mfds.go.kr/pbp/CCBAI01) ⚠️
 </callout>
 
 ### [Recall · FDA] Subpotent tablets recall — **{{TITLE_ISSUE}}**

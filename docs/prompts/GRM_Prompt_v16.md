@@ -346,7 +346,9 @@ Intake 밖 이벤트만 이 양식으로 작성한다(Evidence B/C — W3/W4 없
 	**출처**  📰 정보출처 [링크]({실제 확인 URL})   ·   📎 공식원본 [링크]({기관 공식 URL}){⚠️ 인덱스/홈 fallback 시}
 </callout>
 규칙: > 인용 금지(paraphrase만) · 링크는 실제 확인한 URL 만(패턴 유추 금지, L1→L2 인덱스→L3
-기관 홈 fallback + ⚠️) · 유형 라벨은 scaffold 어휘를 따른다(Warning Letter·Recall·지침·안내서·
+기관 홈 fallback + ⚠️) · **MFDS/nedrug 링크는 검색 카드에 쓰지 않는다**(MFDS 는 Intake 전용·검색
+슬롯 없음 — `mfds.go.kr/brd/...view.do?seq=` 직링크 생성 금지, Publish Lint 17) · 유형 라벨은
+scaffold 어휘를 따른다(Warning Letter·Recall·지침·안내서·
 규제 소식·고시·개정법령 등) · 시사점·점검은 [2단계] W6/W7 규칙(카드별 차별화·thin 가드·과확장
 가드·길이 우선)을 동일 적용한다(검색 카드도 일반론 복붙·과확장 금지).
 
@@ -471,6 +473,15 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
     `<table_of_contents/>` 만). 위반 시 HARD FAIL(발행 중단) — `<toggle>`→`<details>`·
     `</toggle>`→`</details>`·`[toc]`/`[TOC]`→`<table_of_contents/>` 로 교정한 뒤에만 발행한다
     (06-07 클린본과 동일한 toggle 실렌더가 합격선).
+17. [출처 링크 근거 HARD] 모든 카드의 📰/📎 링크는 handoff 근거가 있어야 한다. Intake 카드는
+    scaffold footer 링크를 한 글자도 바꾸지 않고(항목 2), 검색 카드는 이번 run 에서 **실제로
+    fetch 해 확인한 URL** 만 쓴다(패턴 유추·기억 의존 금지 — L348). 특히 **MFDS/nedrug 링크는
+    전부 Intake(수집기) 근거 필수** — MFDS 는 Core 검색 슬롯이 없으므로([1단계] L187) 검색으로
+    만든 `mfds.go.kr/brd/*/view.do?seq=`(보도자료 m_99·자료실 m_218 등) 직링크를 카드 출처에
+    넣지 않는다. handoff rows 의 official_url·source_url·card_scaffold 에 없는 mfds/nedrug 링크가
+    본문에 있으면 **HARD FAIL(발행 중단)** — Intake 카드면 scaffold 링크로 되돌리고, 검색으로
+    날조된 것이면 그 출처 줄을 제거한다(근거 못 대면 카드 자체 보류). 2026-06-15(W24) 사고
+    재발 차단. (코드 게이트: `brief_lint.lint_link_provenance` — Publish Lint 17 ⇔ Brief Lint L11.)
 위반 발견 시 발행 전에 고친다. 고칠 수 없는 구조적 한계만 M2 에 사실로 기록.
 
 [발송]

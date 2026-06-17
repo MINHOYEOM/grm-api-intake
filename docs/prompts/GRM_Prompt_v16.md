@@ -8,6 +8,7 @@
 > **K4-1 슬라이스(2026-06-08, §B [0단계]·[실행일]·PL-10b + collect_intake emit 가드)**: 6/8 근본원인(LLM 날짜 의존 handoff 선택·일일 emit 누적) 제거 — handoff 소비를 "최신 `run_date_kst` OPEN 1건"으로, 실행일/요일/제목/기간을 그 handoff run_date 에서 파생(LLM 날짜계산 제거), PL-10b 를 "최신 `run_date_kst` CONSUMED 대조"로 결정화. Python emit 측은 새 OPEN 생성 전 직전 OPEN 을 STALE+Skipped 봉인(`notion_stale_prior_open_handoffs`, 항상 OPEN 1개·개별 row 불변). handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후.
 > **작성결함 R3 패치(2026-06-16, §B [2단계] W5 슬롯·공통 가드·Publish Lint 만)**: EVAL-1(6/15) E1 7건 — W2 표/`prose_input.w2_facts` 에 값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(역방향 슬롯 모순). W5 [W2 우선 인용]·공통 가드 기준 슬롯 W2·성분/marker/수치 단정 가드(현진 단삼 살비아놀산B↔탄시논류 유형)·Publish Lint 15(D8) 추가. scaffold·collector·golden·tests 불변. 브랜치 적용·Codex 게이트 대기.
 > **toggle 회귀 핫픽스(2026-06-16, §B 메타 블록·Publish Lint·Brief Lint 게이트만)**: 6/15(W24) 발행 M2/M3 메타가 `<details>` 대신 literal `<toggle>`/`</toggle>` 로 노출(Brief Lint L3 FAIL). 원인 = 페이지 레벨 메타 블록은 LLM 작성이고 코드 중화(`_neutralize_forbidden`)는 M2/M3 메타에는 미적용 — 메타 블록 무중화 + LLM 생성 회귀. 수정 = 메타 템플릿에 `<details>`/`<summary>` 리터럴 강제·`<toggle>`/`[toc]` 금지 명시 + Publish Lint 16(메타 토글 HARD FAIL) 신설 + Brief Lint L3 HARD 강화. scaffold·collector·golden·tests·v16 카드 슬롯 규칙 불변. M3 page-shell(메타 Python 이관)은 별도 트랙. 브랜치 적용·Codex 게이트 대기.
+> **프롬프트 축소 트랙 — 기계 Publish Lint 코드 이관(2026-06-17, §B [Publish Lint]·[발행 전 게이트] 만)**: 기계 판정 항목(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상·PL14 요일=날짜)을 `brief_lint.lint_publish_structure` + 게이트 `--structure` 로 결정론 강제 — 자가 서술을 코드 실행으로 강등(오류 표면 축소). 프롬프트는 게이트 실행 위임 + MCP 전용 세션 수기 fallback 만 유지. 의미 항목(2·5·7~9·11~13·15)·17(provenance)·[2단계] 슬롯·R2/R3 동결·toggle 핫픽스·URL 게이트 불훼손. 535 green(+15)·golden byte-diff 0·scaffold/collector 불변. 설계 `docs/GRM_v16_프롬프트축소_설계_2026-06-17.md`. branch `chore/v16-prompt-slim-2026-06-17`·Codex 게이트·사람 승인 후 동결.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -450,11 +451,13 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 ※ update 도구가 없으면 생략하고 M2 "Status update 미지원" 기록(PL-10b 가드가 유일 방어선이 됨).
 
 [Publish Lint — 발행 직전 자가 점검(내부 절차, 결과 서술 금지)]
-1. 잔존 토큰 0: 본문 전체에 `{{` 가 없다(슬롯 전부 치환됨).
+※ 기계 항목(1·3·10·14·16)은 [발행 전 게이트] 의 `--structure` 가 결정론 코드로 강제한다(통과=합격,
+  자가 서술→코드 강등). **코드 실행 불가 MCP 전용 세션만** 아래 1·3·10·14·16 수기 점검(의미 항목 유지).
+1. 잔존 토큰 0: 본문 전체에 `{{` 없음(슬롯 전부 치환). [→ PL1]
 2. scaffold 불변: 카드의 표 행 수·링크·> 인용·배지가 handoff 의 card_scaffold 와 다르지 않다
    (직접 비교 — 변형 발견 시 scaffold 원본으로 되돌리고 슬롯만 다시 채운다).
-3. 금지 문법 0: [!NOTE]/[!WARNING]/<toggle>/</toggle>/[toc]/[TOC]/빈 callout/빈 표 행/빈 줄
-   시작 > 없음(목차는 <table_of_contents/> 만 — M2·M3 메타 toggle 은 항목 16 HARD 체크).
+3. 금지 문법 0: [!NOTE]/[!WARNING]/<toggle>/</toggle>/[toc]/[TOC]/빈 callout·표 행·빈 줄 시작 > 없음
+   (목차는 <table_of_contents/> 만, 메타 toggle 은 16 HARD). [→ PL3/16]
 4. quote 규율: > 는 scaffold W3 에만 존재. 네가 쓴 블록(검색 카드·🔮 표·고정 블록)에 > 없음.
 5. 페이지 단일 블록: TL;DR·커버리지·🔮 표·AI 면책·메타 toggle 각 1회. 카드 내부 면책 없음.
 6. 기관 태그: `출처 기관` 에 그 주 등장 기관 전부(국내 카드 있으면 MFDS).
@@ -465,19 +468,17 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
    멤버에 실제 반영됐다. 용량 초과 보류분은 Processed 가 아니라 보류(Status 미변경)로 배정됐고,
    보류가 1건이라도 있으면 DEFERRED 블록 기록이 [PL-10 마감] 에 예정돼 있다.
    (예정 Processed 수 == 렌더 카드+표+병합 멤버 수. 불일치 시 보류분을 미변경으로 재배정.)
-10. TITLE_ISSUE 에 "미상/미기재" 문자열 0(D1).
+10. TITLE_ISSUE 에 "미상/미기재" 문자열 0(D1). [→ PL10]
 11. raw 등급 필드가 빈 회수 카드에 Class/Type 등급 표기 0(D2).
 12. 한 카드 안 "원문 미기재" 항목을 타 슬롯이 구체값으로 단정한 곳 0(D2).
 13. TL;DR 인용 사건 ↔ 본문 카드 1:1 대응(D6).
-14. 헤더 요일 == 헤더 날짜의 실제 요일(D7).
+14. 헤더 요일 == 헤더 날짜의 실제 요일(D7). [→ PL14]
 15. W5·시사점의 "원문 미기재/미확인" 각 항목에 대해, 같은 카드 W2 표/prose_input.w2_facts 에
     확정값(빈값·"원문 미기재"·"미확인" 제외, 회수 등급은 raw 등급 가드 우선)이 있는 경우 0(D8)
     — 위반 시 발행 전 W2 확정값으로 교정.
-16. [메타 토글 HARD] M2·M3 메타 블록이 `<details>`+`<summary>` … `</details>` 리터럴로 열리고,
-    페이지 전체에 `<toggle>`/`</toggle>` 리터럴 0 · `[toc]`/`[TOC]` 리터럴 0(목차는
-    `<table_of_contents/>` 만). 위반 시 HARD FAIL(발행 중단) — `<toggle>`→`<details>`·
-    `</toggle>`→`</details>`·`[toc]`/`[TOC]`→`<table_of_contents/>` 로 교정한 뒤에만 발행한다
-    (06-07 클린본과 동일한 toggle 실렌더가 합격선).
+16. [메타 토글 HARD] M2·M3 메타는 `<details>`+`<summary>`…`</details>` 리터럴로만 열고 페이지
+    전체에 `<toggle>`/`</toggle>`·`[toc]`/`[TOC]` 리터럴 0(목차는 `<table_of_contents/>`). 위반 시
+    HARD FAIL — `<toggle>`→`<details>`·`[toc]`→`<table_of_contents/>` 교정 후 발행. [→ PL3/16]
 17. [출처 링크 근거 HARD] 모든 카드의 📰/📎 링크는 handoff 근거가 있어야 한다. Intake 카드는
     scaffold footer 링크를 한 글자도 바꾸지 않고(항목 2), 검색 카드는 이번 run 에서 **실제로
     fetch 해 확인한 URL** 만 쓴다(패턴 유추·기억 의존 금지 — L348). 특히 **MFDS/nedrug 링크는
@@ -499,11 +500,12 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
   1. 이번 주 handoff page 본문 JSON 을 `handoff.json`, 조립한 발행 markdown 을 `brief.md`,
      이번 run 에 실제 fetch·확인한 검색 카드 URL 목록을 `fetched.txt`(줄당 1 URL)로 저장.
   2. 레포 루트에서
-     `python -m brief_lint --handoff handoff.json --published brief.md --allowed-fetched fetched.txt`
+     `python -m brief_lint --handoff handoff.json --published brief.md --allowed-fetched fetched.txt --structure`
      실행. **exit 0 = 통과(발행 진행)** · **exit 1 = FAIL(발행 중단)** — 출력 리포트의 FAIL
      링크를 교정(Intake 카드는 scaffold 링크 복원 / 검색 날조면 출처 줄 제거·카드 보류)한 뒤
      **게이트를 다시 통과시켜야** 발행한다. 기본 정책 all_domains — MFDS 뿐 아니라 fetched
-     목록에도 없는 타 기관 URL 도 차단(W2).
+     목록에도 없는 타 기관 URL 도 차단(W2). `--structure` 는 기계적 Publish Lint(1·3·10·14·16)도
+     같은 1회 실행으로 결정론 판정한다(생략하면 출처 근거만 검사 — 종전 동작).
   - **[소프트런치 — 운영 활성 초기 1~2회]** W2 의 타 기관 차단은 `fetched.txt` 가 정확히
     넘어와야 정당한 검색 카드 URL 이 통과한다. 활성 첫 1~2회는 `--policy mfds_only` 로 실행해
     (MFDS 미근거는 그대로 HARD 차단 유지·타 기관 미근거는 WARN 로 **보고만**) **정당한 타 기관
@@ -550,4 +552,5 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 | 2026-06-08 | **K4-1 슬라이스(handoff 선택·날짜 결정화 + emit STALE 가드)**: [0단계] handoff 소비 = 최신 `run_date_kst` OPEN 1건(LLM 날짜 검색 제거)·OPEN 0건이면 중복실행 억제 · [실행일·타임존] 실행일/요일/제목/기간을 handoff run_date 에서 파생(off-by-one 차단) · PL-10b = 최신 `run_date_kst` CONSUMED 대조로 결정화(DEFERRED 제외 유지). 코드: `collect_intake.py` `notion_stale_prior_open_handoffs()` 추가 — 새 OPEN emit 전 직전 미소비 OPEN(Status=New·routine-handoff) 전건 STALE rename+Status=Skipped(개별 Intake row 불가침), `notion_upsert_routine_handoff` 가 호출. handoff payload·golden 바이트 불변. 운영 전환(Routine 복사·B4 위생정리)은 사람 승인 후 |
 | 2026-06-08 | **R2 보정 2건(작성결함)**: D2(회수 등급 raw-only·슬롯 간 모순 금지)를 W6 아래 → TITLE_ISSUE·W1·W5 공통 가드로 이동(W1 등급 날조 1차 차단), W6 중복 제거(과확장 가드 "등급어 미첨가"는 유지) · 상단 상태줄 모순 정리(R2 게이트 전 명시 — "R2 동결/운영" 오해 제거). 프롬프트 1파일·scaffold/collector/golden/tests 불변 |
 | 2026-06-16 | **작성결함 R3 패치(§B [2단계] W5 슬롯·공통 가드·Publish Lint 만, scaffold·collector·golden·tests 불변)**: EVAL-1(6/15) E1 사실오류 7건 — W2 표/`prose_input.w2_facts` 에 확정값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(슬롯 간 역방향 모순). 기존 공통 가드(미기재→구체값 단정 금지)는 한 방향만 막아 역방향 무방비. ① W5 슬롯에 [W2 우선 인용] 추가(W2/prose_input 값 보유 필드는 미기재 금지·그 값 인용, 미기재는 양쪽 빈 경우만) · ② 공통 가드에 기준 슬롯 W2 추가(역방향 모순 금지) · ③ 성분·marker·수치 단정 가드(원문 'A'→동의어·상위어 'B' 치환 금지·원문 수치 있으면 "세부 수치 미기재" 금지 — 현진 단삼 살비아놀산B↔탄시논류·4.1%↑/1.5% 유형) · ④ Publish Lint 15(D8) 신설(W5 미기재 항목 ↔ W2 값 존재 0). 진단/지시 `GRM_발행결함_클로즈아웃_지시문초안_2026-06-16.md`. Codex 게이트·사람 승인 후 동결 |
+| 2026-06-17 | **프롬프트 축소 — 기계 Publish Lint 코드 이관(§B [Publish Lint]·[발행 전 게이트] 만)**: 기계 판정 5항(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상/미기재·PL14 요일=날짜)을 신규 순수 함수 `brief_lint.lint_publish_structure(md)` + `run_publish_gate(include_structure=)` + CLI `--structure` 로 결정론 강제. [Publish Lint] 의 해당 항목은 "게이트 실행=합격" 위임 + MCP 전용 세션 수기 fallback 으로 축약(자가 서술→코드 실행 강등=오류 표면 축소). [발행 전 게이트] 명령에 `--structure` 추가(출처 근거+구조 1회 실행). 의미 항목(2·5·7~9·11~13·15)·17 provenance·[2단계] 슬롯·R2/R3·toggle 핫픽스·URL 게이트 불훼손. `tests/test_brief_lint.py`(+15, **535 green**)·golden byte-diff 0·scaffold/collector 불변. 설계 `docs/GRM_v16_프롬프트축소_설계_2026-06-17.md`. branch `chore/v16-prompt-slim-2026-06-17`. Codex 게이트·사람 승인 후 동결 |
 | 2026-06-16 | **출처 링크 근거 게이트 명문화(W1/W2 — URL전수검사 잔여 갭, §B [발행 단계]·검색 카드 규칙만)**: Publish Lint 17 을 "권고 자가점검"에서 **결정론 실행·차단**으로 승격 — [발행 전 출처 링크 근거 게이트 — HARD BLOCK] 절 신설. 코드 실행 가능 환경은 `python -m brief_lint --handoff h.json --published brief.md --allowed-fetched fetched.txt`(exit 1=발행 중단), MCP 전용 세션은 동일 불변식 수기 검증 + 발행 후 `grm-brief-audit`(verify_published_brief) 독립 재검증(2차 방어선). 검색 카드 규칙에 **fetched 기록**(이번 run 에 실제 fetch 한 URL → `allowed_fetched`) 추가 — 게이트 기본 정책 all_domains(MFDS 뿐 아니라 fetched 에도 없는 타 기관 URL 차단, W2). scaffold·collector·golden·v16 카드 슬롯 규칙 불변(프롬프트 [발행 단계] 문구만). 코드=`brief_lint.run_publish_gate`·`verify_published_brief`·`.github/workflows/grm-brief-audit.yml`. branch `audit/url-gate-2026-06-16`. 지시 `GRM_URL가드강화_후속지시문_2026-06-16.md` |

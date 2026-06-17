@@ -27,9 +27,15 @@ W2(전 기관 일반화): `policy=ALL_DOMAINS` 면 MFDS 뿐 아니라 모든 미
 기존 호출처·테스트는 무회귀.
 
 Lint 번호: 발행 직전 Publish Lint **17**(출처 링크 근거) / 독립 Brief Lint **L11**.
+
+구조 lint(2026-06-17, v16 프롬프트 축소): `lint_publish_structure(md)` 가 v16 [Publish Lint] 의
+**기계 판정** 항목(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상·PL14 요일=날짜)을 결정론으로
+판정한다 — 프롬프트 자가 서술을 코드 실행으로 강등(`run_publish_gate(..., include_structure=True)`
+/ CLI `--structure`). 의미 판정 항목은 코드로 이관하지 않는다.
 """
 from __future__ import annotations
 
+import datetime as _dt
 import json
 import re
 import sys
@@ -256,6 +262,88 @@ def has_failures(findings: Iterable[LintFinding]) -> bool:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 발행물 구조 lint(기계적 Publish Lint) — v16 프롬프트 [Publish Lint] 의 **기계 판정** 항목을
+# 결정론 코드로 강등한다(자가 서술 → 실행). 순수 함수(네트워크 없음, markdown 만 입력).
+#   PL1    잔존 슬롯 토큰 `{{` 0 (전 슬롯 치환됨)
+#   PL3/16 금지 문법(admonition·<toggle>·[toc]·+++) 0 — 메타 toggle HARD(06-15 회귀) 포함
+#   PL10   카드 제목(TITLE_ISSUE)에 "미상/미기재" 0 (D1)
+#   PL14   헤더 날짜의 실제 KST 요일 == 표기 요일 (D7)
+# 의미 판정 항목(2 scaffold 불변·5 단일블록·7 Tier3 누락·8/9 조치배정·11~13·15·17 provenance)은
+# LLM 자가 점검 또는 provenance 게이트가 담당한다 — 기계화 어려운 항목은 코드로 이관하지 않는다.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# card_scaffold._FORBIDDEN_REPLACEMENTS 와 동일 어휘 + 메타 toggle 회귀 시그니처.
+_FORBIDDEN_LITERALS = (
+    "[!NOTE]", "[!WARNING]", "[!IMPORTANT]", "[!TIP]", "[!CAUTION]",
+    "[TOC]", "[toc]", "+++", "<toggle>", "</toggle>",
+)
+_TOGGLE_OPEN_RE = re.compile(r"<toggle\b", re.I)   # <toggle> 또는 속성형 <toggle ...>
+_RESIDUAL_TOKEN_RE = re.compile(r"\{\{")
+# 카드 제목 H3 + bold TITLE_ISSUE:  ### [유형 · 기관] 대상 — **핵심이슈**
+_CARD_TITLE_RE = re.compile(r"^#{3}\s+.*\*\*(?P<issue>.+?)\*\*", re.M)
+_TITLE_FORBIDDEN_WORDS = ("미상", "미기재")
+# 헤더 날짜+요일:  2026-06-15 (월)  또는  — 2026-06-15 (월요일)
+_DATE_WEEKDAY_RE = re.compile(
+    r"(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})\s*\(\s*(?P<wd>[월화수목금토일])")
+_KO_WEEKDAYS = ("월", "화", "수", "목", "금", "토", "일")  # date.weekday(): 월=0..일=6
+
+
+def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
+    """발행 markdown 의 기계적 구조 위반(PL1·PL3/16·PL10·PL14)을 결정론 판정.
+
+    순수 함수 — 네트워크·handoff 없이 markdown 만으로 판정한다. 모든 위반은 FAIL.
+    확인 불가(예: 헤더 날짜/요일 패턴 부재)는 finding 을 만들지 않는다(추측 금지).
+    """
+    md = published_markdown or ""
+    findings: list[LintFinding] = []
+
+    # PL1 — 잔존 슬롯 토큰
+    if _RESIDUAL_TOKEN_RE.search(md):
+        findings.append(LintFinding(
+            SEV_FAIL, "PL1-RESIDUAL-TOKEN", "",
+            "치환되지 않은 슬롯 토큰 `{{` 가 본문에 남아 있다 — 전 슬롯을 값으로 치환해야 발행."))
+
+    # PL3/16 — 금지 문법(메타 toggle HARD 포함)
+    for lit in _FORBIDDEN_LITERALS:
+        if lit in md:
+            findings.append(LintFinding(
+                SEV_FAIL, "PL3-FORBIDDEN-MD", "",
+                f"금지 문법 리터럴 `{lit}` 노출 — 메타는 <details>/<summary>, 목차는 "
+                "<table_of_contents/> 로만(06-15 toggle 회귀 차단)."))
+    if _TOGGLE_OPEN_RE.search(md) and "<toggle>" not in md:  # 속성형 <toggle ...>
+        findings.append(LintFinding(
+            SEV_FAIL, "PL3-FORBIDDEN-MD", "",
+            "`<toggle ...>` 태그 노출 — <details>/<summary> 로 교정해야 발행."))
+
+    # PL10 — 카드 제목(TITLE_ISSUE)에 미상/미기재
+    for m in _CARD_TITLE_RE.finditer(md):
+        issue = m.group("issue")
+        for w in _TITLE_FORBIDDEN_WORDS:
+            if w in issue:
+                findings.append(LintFinding(
+                    SEV_FAIL, "PL10-TITLE-UNKNOWN", "",
+                    f"카드 제목 핵심이슈에 '{w}' — TITLE_ISSUE 는 위반유형/주제 명사구만"
+                    f"(D1, 제목: …**{issue}**)."))
+                break
+
+    # PL14 — 헤더 날짜의 실제 KST 요일 == 표기 요일
+    m = _DATE_WEEKDAY_RE.search(md)
+    if m:
+        try:
+            d = _dt.date(int(m.group("y")), int(m.group("m")), int(m.group("d")))
+        except ValueError:
+            d = None  # 잘못된 날짜 자체는 본 항목 소관 아님
+        if d is not None:
+            actual = _KO_WEEKDAYS[d.weekday()]
+            if actual != m.group("wd"):
+                findings.append(LintFinding(
+                    SEV_FAIL, "PL14-WEEKDAY", "",
+                    f"헤더 요일 불일치 — {m.group('y')}-{m.group('m')}-{m.group('d')} 는 "
+                    f"'{actual}'요일인데 '{m.group('wd')}'로 표기(D7)."))
+    return findings
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 선택적 네트워크 유틸 — 수집기 resolve&verify(Phase E2)·Phase C 전수검증 재사용용.
 # 순수 lint 는 이걸 호출하지 않는다(테스트는 HTTP 스텁으로 검증).
 # ─────────────────────────────────────────────────────────────────────────────
@@ -334,8 +422,8 @@ def format_report(findings: list[LintFinding]) -> str:
     fails = [f for f in findings if f.severity == SEV_FAIL]
     warns = [f for f in findings if f.severity == SEV_WARN]
     if not findings:
-        return "[PASS] 출처 링크 근거(provenance) 게이트 — 위반 0 (발행 허용)"
-    head = (f"[{'FAIL' if fails else 'PASS(경고)'}] provenance 게이트 — "
+        return "[PASS] GRM 발행 게이트(출처 근거+구조) — 위반 0 (발행 허용)"
+    head = (f"[{'FAIL' if fails else 'PASS(경고)'}] GRM 발행 게이트 — "
             f"FAIL {len(fails)} · WARN {len(warns)}")
     lines = [head]
     for f in fails:
@@ -353,15 +441,20 @@ def run_publish_gate(rows: list[dict[str, Any]],
                      *,
                      policy: str = POLICY_ALL_DOMAINS,
                      allowed_fetched: Iterable[str] = (),
-                     verifier: "Any | None" = None) -> GateResult:
-    """발행 직전(또는 발행 후 탐지) provenance 게이트 1회 실행.
+                     verifier: "Any | None" = None,
+                     include_structure: bool = False) -> GateResult:
+    """발행 직전(또는 발행 후 탐지) provenance(+선택 구조) 게이트 1회 실행.
 
     기본 정책 = ALL_DOMAINS(전 기관 일반화, W2). `allowed_fetched` = 이번 세션에 실제
     fetch·확인한 검색 카드 URL(있으면 그 비-MFDS 링크는 근거로 인정). `verifier` 주입 시
-    미근거 비-MFDS 링크를 live verify(탐지 경로). 반환 `GateResult.ok=False` 면 **발행 차단**.
+    미근거 비-MFDS 링크를 live verify(탐지 경로). `include_structure=True` 면 기계적
+    Publish Lint(PL1·PL3/16·PL10·PL14)도 함께 검사(기본 off — 기존 호출처 무회귀).
+    반환 `GateResult.ok=False`(FAIL≥1) 면 **발행 차단**.
     """
     findings = lint_link_provenance(rows, published_markdown, policy=policy,
                                     allowed_fetched=allowed_fetched, verifier=verifier)
+    if include_structure:
+        findings = findings + lint_publish_structure(published_markdown)
     return GateResult(ok=not has_failures(findings), findings=findings,
                       report=format_report(findings))
 
@@ -433,6 +526,9 @@ def main(argv: "list[str] | None" = None) -> int:
                    help="기본 all_domains(전 기관 일반화). mfds_only=종전 동작.")
     p.add_argument("--verify", action="store_true",
                    help="미근거 비-MFDS 링크를 live verify(네트워크). 탐지 경로용.")
+    p.add_argument("--structure", action="store_true",
+                   help="기계적 Publish Lint(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상·"
+                        "PL14 요일=날짜)도 함께 검사(FAIL 시 발행 차단).")
     args = p.parse_args(argv)
 
     try:
@@ -450,7 +546,8 @@ def main(argv: "list[str] | None" = None) -> int:
     verifier = live_verifier() if args.verify else None
 
     result = run_publish_gate(rows, published, policy=args.policy,
-                              allowed_fetched=allowed_fetched, verifier=verifier)
+                              allowed_fetched=allowed_fetched, verifier=verifier,
+                              include_structure=args.structure)
     print(result.report)
     print(f"(handoff rows={len(rows)} · 근거 URL={len(collect_allowed_urls(rows))})",
           file=sys.stderr)

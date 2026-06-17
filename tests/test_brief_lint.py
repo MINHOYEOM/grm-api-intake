@@ -340,6 +340,105 @@ class TestLiveVerifierFactory(unittest.TestCase):
             self.assertFalse(bl.live_verifier()("https://nedrug.mfds.go.kr/x"))
 
 
+class TestPublishStructure(unittest.TestCase):
+    """구조 lint(2026-06-17, v16 축소) — 기계적 Publish Lint(PL1·PL3/16·PL10·PL14).
+
+    v16 프롬프트 [Publish Lint] 의 기계 판정 항목을 결정론 코드로 강등(자가 서술 → 실행).
+    """
+
+    # 합격 기준선: 위반 없는 최소 발행물(헤더 요일 정확·정상 카드 제목).
+    CLEAN = (
+        "**GRM Weekly Brief**\n"
+        "2026-06-15 (월) · 검색 기간: 06-09 ~ 06-15 KST\n"
+        "### [행정처분 · MFDS] 대한약품공업 — **출하시험 미실시 과징금**\n"
+        "<details>\n<summary>🔖 메타</summary>\n\t내용\n</details>\n"
+    )
+
+    def test_clean_brief_has_no_findings(self):
+        self.assertEqual(bl.lint_publish_structure(self.CLEAN), [])
+
+    def test_residual_slot_token_fails(self):
+        f = bl.lint_publish_structure("### [x · y] z — **{{TITLE_ISSUE}}**")
+        codes = {x.code for x in f}
+        self.assertIn("PL1-RESIDUAL-TOKEN", codes)
+        self.assertTrue(bl.has_failures(f))
+
+    def test_forbidden_toggle_literal_fails(self):
+        f = bl.lint_publish_structure("<toggle>메타</toggle>")
+        self.assertTrue(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
+        self.assertTrue(bl.has_failures(f))
+
+    def test_forbidden_toc_and_admonition_fail(self):
+        for bad in ("[toc]", "[TOC]", "[!NOTE]", "[!WARNING]", "+++"):
+            with self.subTest(bad=bad):
+                f = bl.lint_publish_structure(f"text {bad} more")
+                self.assertTrue(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
+
+    def test_toggle_attribute_form_fails(self):
+        f = bl.lint_publish_structure('<toggle open="true">x</toggle>')
+        self.assertTrue(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
+
+    def test_details_summary_not_flagged(self):
+        f = bl.lint_publish_structure("<details>\n<summary>메타</summary>\nx\n</details>")
+        self.assertEqual(f, [])
+
+    def test_title_unknown_word_fails(self):
+        for bad in ("업체 미상", "위반유형 미기재"):
+            with self.subTest(bad=bad):
+                f = bl.lint_publish_structure(f"### [행정처분 · MFDS] 회사 — **{bad}**")
+                self.assertTrue(any(x.code == "PL10-TITLE-UNKNOWN" for x in f))
+
+    def test_w2_table_mijae_is_not_a_title_violation(self):
+        """'원문 미기재' 가 W2 표/본문에 있는 것은 정상 — 제목(TITLE_ISSUE)만 PL10 대상."""
+        md = ("### [회수 · MFDS] 업체 — **벤조피렌 부적합 회수**\n"
+              "<table><tr><td>**회수 등급**</td><td>원문 미기재</td></tr></table>")
+        codes = {x.code for x in bl.lint_publish_structure(md)}
+        self.assertNotIn("PL10-TITLE-UNKNOWN", codes)
+
+    def test_modality_subheader_not_a_card_title(self):
+        """모달리티/그룹 H3(### 💊 합성의약품)는 bold 없음 → PL10 무관."""
+        self.assertEqual(bl.lint_publish_structure("### 💊 합성의약품\n### 🧬 바이오의약품"), [])
+
+    def test_weekday_mismatch_fails(self):
+        # 2026-06-15 는 월요일 — '화'로 표기하면 FAIL.
+        f = bl.lint_publish_structure("발행: 2026-06-15 (화)")
+        self.assertTrue(any(x.code == "PL14-WEEKDAY" for x in f))
+
+    def test_weekday_match_passes(self):
+        # 2026-06-15 = 월요일.
+        f = bl.lint_publish_structure("발행: 2026-06-15 (월요일)")
+        self.assertFalse(any(x.code == "PL14-WEEKDAY" for x in f))
+
+    def test_no_date_pattern_no_finding(self):
+        self.assertEqual(bl.lint_publish_structure("요일 없는 본문"), [])
+
+    def test_gate_include_structure_blocks_on_residual_token(self):
+        """run_publish_gate(include_structure=True) — provenance 통과여도 구조 FAIL 이면 차단."""
+        published = ADMIN_SCAFFOLD + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
+        g = bl.run_publish_gate(HANDOFF_ROWS, published, include_structure=True)
+        self.assertFalse(g.ok)
+        self.assertTrue(any(x.code == "PL1-RESIDUAL-TOKEN" for x in g.findings))
+
+    def test_gate_default_excludes_structure(self):
+        """기본(include_structure=False) 은 구조 위반을 보지 않는다(기존 호출처 무회귀)."""
+        published = ADMIN_SCAFFOLD + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
+        g = bl.run_publish_gate(HANDOFF_ROWS, published)
+        self.assertTrue(g.ok)
+
+    def test_cli_structure_flag_fails_on_toggle(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = os.path.join(d, "h.json")
+            with open(h, "w", encoding="utf-8") as fh:
+                fh.write(json.dumps({"rows": HANDOFF_ROWS}))
+            p = os.path.join(d, "b.md")
+            with open(p, "w", encoding="utf-8") as fh:
+                fh.write("[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)\n<toggle>x</toggle>")
+            # provenance 통과(근거 있는 링크) 이지만 구조(toggle) FAIL → exit 1
+            self.assertEqual(bl.main(["--handoff", h, "--published", p, "--structure"]), 1)
+            # --structure 없으면 통과(exit 0)
+            self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
+
+
 class _StubResp:
     def __init__(self, status, text):
         self.status_code = status

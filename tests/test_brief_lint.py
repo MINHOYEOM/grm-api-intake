@@ -409,6 +409,28 @@ class TestPublishStructure(unittest.TestCase):
         f = bl.lint_publish_structure("발행: 2026-06-15 (월요일)")
         self.assertFalse(any(x.code == "PL14-WEEKDAY" for x in f))
 
+    def test_weekday_footer_bare_form_mismatch_fails(self):
+        # 06-17 dry-run D-1: 비괄호 푸터형 `발행일: 2026-06-17 화요일` — 06-17 은 수요일.
+        f = bl.lint_publish_structure("발행일: 2026-06-17 화요일 | Run ID: x")
+        self.assertTrue(any(x.code == "PL14-WEEKDAY" for x in f))
+        self.assertTrue(bl.has_failures(f))
+
+    def test_weekday_footer_bare_form_match_passes(self):
+        # 2026-06-17 = 수요일 — 비괄호 푸터형 정상.
+        f = bl.lint_publish_structure("발행일: 2026-06-17 수요일")
+        self.assertFalse(any(x.code == "PL14-WEEKDAY" for x in f))
+
+    def test_weekday_bare_requires_요일_suffix(self):
+        # '요일' 접미사 없는 단일 글자(날짜 뒤 우연한 한글)는 PL14 대상 아님(오탐 0).
+        f = bl.lint_publish_structure("2026-06-17 수집 현황")
+        self.assertEqual(f, [])
+
+    def test_weekday_multiple_occurrences_each_checked(self):
+        # 헤더(정상) + 푸터(오류) 동시 — 푸터 오류만 잡힌다.
+        md = ("2026-06-17 (수)\n발행일: 2026-06-17 화요일")
+        codes = [x.code for x in bl.lint_publish_structure(md)]
+        self.assertEqual(codes.count("PL14-WEEKDAY"), 1)
+
     def test_no_date_pattern_no_finding(self):
         self.assertEqual(bl.lint_publish_structure("요일 없는 본문"), [])
 

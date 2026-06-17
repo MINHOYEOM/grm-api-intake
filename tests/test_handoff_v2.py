@@ -55,6 +55,11 @@ class BuildV2PayloadTest(unittest.TestCase):
         self.assertEqual(self.payload["schema_version"], "grm-routine-handoff/v2")
         self.assertEqual(self.payload["row_count"], 2)
 
+    def test_weekday_kst_deterministic(self) -> None:
+        # D-1: 발행 요일은 handoff 가 결정론 산출 — RUN_DATE 2026-06-05 = 금요일.
+        self.assertEqual(self.payload["weekday_kst"], "금요일")
+        self.assertEqual(self.payload["run_date_kst"], "2026-06-05")
+
     def test_rows_have_additive_v2_fields(self) -> None:
         for r in self.payload["rows"]:
             self.assertIn("card_id", r)
@@ -383,6 +388,20 @@ class StalePriorOpenHandoffTest(unittest.TestCase):
         self.assertEqual(guard.call_args.kwargs["keep_handoff_id"],
                          "routine-handoff::2026-06-08")
         self.assertEqual(guard.call_args.kwargs["superseded_by"], "2026-06-08")
+
+
+class WeekdayKstTest(unittest.TestCase):
+    """발행 요일 결정론 산출(D-1 근본수정) — LLM 산술 제거용."""
+
+    def test_known_anchors(self) -> None:
+        # 06-17 dry-run 앵커: 15=월, 16=화, 17=수(LLM 이 17 을 '화'로 오산했던 날).
+        self.assertEqual(ci.weekday_kst(date(2026, 6, 15)), "월요일")
+        self.assertEqual(ci.weekday_kst(date(2026, 6, 16)), "화요일")
+        self.assertEqual(ci.weekday_kst(date(2026, 6, 17)), "수요일")
+
+    def test_sunday_boundary(self) -> None:
+        # 2026-06-21 = 일요일(주 경계).
+        self.assertEqual(ci.weekday_kst(date(2026, 6, 21)), "일요일")
 
 
 if __name__ == "__main__":

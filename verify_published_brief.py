@@ -4,9 +4,12 @@
 발행(주간 Routine)은 LLM+MCP 라 결정론 **차단**은 발행 직전 예방 게이트
 (`brief_lint.run_publish_gate` / Publish Lint 17)에 의존한다. 이 모듈은 그 게이트를
 **발행 후 독립적으로 재실행**하는 2차 방어선이다 — 최신 Weekly Brief 페이지와 그 주
-handoff 를 Notion 에서 직접 받아 `lint_link_provenance` 를 재판정하고, FAIL(특히 MFDS
-날조 시그니처 `brd/*/view.do?seq=`)이면 운영 경고 JSON 을 낸다. CI(`grm-brief-audit.yml`)가
-이 JSON 을 기존 `GRM Intake 운영 경고` Issue 로 띄운다.
+handoff 를 Notion 에서 직접 받아 (1) `lint_link_provenance`(출처 근거)와 (2)
+`lint_publish_structure`(구조: PL1 잔존토큰·PL3/16 금지문법·PL14 요일=날짜)를 둘 다
+재판정하고, FAIL(MFDS 날조 시그니처 `brd/*/view.do?seq=` 또는 요일 불일치 등)이면 운영
+경고 JSON 을 낸다. CI(`grm-brief-audit.yml`)가 이 JSON 을 기존 `GRM Intake 운영 경고`
+Issue 로 띄운다. **발행 주체 CC Routine 은 커넥터가 Notion 뿐이라 인-루틴 `--structure`
+게이트를 코드로 못 돌린다 → 요일류 결함의 유일 결정론 방어선이 이 발행 후 탐지다(W2).**
 
 **과알림 0 원칙:**
 - 알림은 **FAIL 만** 트리거한다(WARN·미확인은 정보로만 본문에 싣고 알림 트리거 아님).
@@ -94,6 +97,58 @@ def extract_urls_from_blocks(blocks: Iterable[dict[str, Any]]) -> list[str]:
             seen.add(u)
             out.append(u)
     return out
+
+
+def _rich_text_plain(rich_text: Iterable[dict[str, Any]]) -> str:
+    """Notion rich_text 배열을 평문으로(annotation 무시 — `plain_text`∨`text.content`)."""
+    out: list[str] = []
+    for rt in rich_text or []:
+        if not isinstance(rt, dict):
+            continue
+        t = rt.get("plain_text")
+        if t is None and isinstance(rt.get("text"), dict):
+            t = rt["text"].get("content")
+        if t:
+            out.append(t)
+    return "".join(out)
+
+
+def _collect_block_text(blocks: Iterable[dict[str, Any]], lines: list[str]) -> None:
+    for block in blocks or []:
+        if not isinstance(block, dict):
+            continue
+        btype = block.get("type")
+        payload = block.get(btype, {}) if btype else {}
+        if isinstance(payload, dict):
+            if isinstance(payload.get("rich_text"), list):
+                txt = _rich_text_plain(payload["rich_text"])
+                if txt:
+                    lines.append(txt)
+            if isinstance(payload.get("cells"), list):   # table_row
+                for cell in payload["cells"]:
+                    if isinstance(cell, list):
+                        txt = _rich_text_plain(cell)
+                        if txt:
+                            lines.append(txt)
+            if isinstance(payload.get("children"), list):
+                _collect_block_text(payload["children"], lines)
+        if isinstance(block.get("children"), list):
+            _collect_block_text(block["children"], lines)
+
+
+def extract_text_from_blocks(blocks: Iterable[dict[str, Any]]) -> str:
+    """Notion 블록의 사람이 읽는 평문을 블록당 한 줄로 이어붙인다(구조 lint 입력용).
+
+    `brief_lint.lint_publish_structure` 에 먹여 PL14(요일=날짜)·PL1(잔존 `{{`)·PL3/16(리터럴
+    `<toggle>`·`[toc]` 등)을 발행 후 결정론 판정한다. 주의: Notion 은 굵게/제목을 마크다운
+    리터럴(`**`·`###`)이 아니라 annotation 으로 저장하므로 추출 평문엔 `###`/`**` 가 없다 →
+    PL10(카드 제목 `### …**이슈**`)은 이 경로에서 매칭되지 않는다(발행 전 `--structure`
+    마크다운 게이트가 담당). 비괄호 푸터형 `발행일: YYYY-MM-DD 화요일` 의 요일은 평문에
+    그대로 드러나 PL14 로 검출된다(06-17 dry-run D-1).
+    """
+    lines: list[str] = []
+    _collect_block_text(blocks, lines)
+    return "\n".join(lines)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -196,16 +251,18 @@ def skipped_json(note: str, *, run_date_kst: str = "") -> dict[str, Any]:
 def format_audit_report(result: dict[str, Any]) -> str:
     """audit JSON 을 사람이 읽는 텍스트로(CI 로그·Issue 본문 공용)."""
     if result.get("note") and not result.get("alerts"):
-        return f"[SKIP] 발행 후 provenance 탐지 — {result['note']}"
+        return f"[SKIP] 발행 후 탐지(출처 근거+구조) — {result['note']}"
     alerts = result.get("alerts", [])
     if not alerts:
-        return ("[PASS] 발행 후 provenance 탐지 — FAIL 0"
+        return ("[PASS] 발행 후 탐지(출처 근거+구조) — FAIL 0"
                 f" (info {result.get('info_count', 0)})")
-    lines = [f"[FAIL] 발행 후 provenance 탐지 — FAIL {len(alerts)}"
+    lines = [f"[FAIL] 발행 후 탐지(출처 근거+구조) — FAIL {len(alerts)}"
              f" · brief={result.get('brief', {}).get('title') or '?'}"]
     for a in alerts:
-        lines.append(f"  ✖ [{a['code']}] {a['url']} — {a['message']}")
-    lines.append("→ 발행물의 위 링크가 handoff 근거 없는 날조/오류 링크다. 운영자 확인·정정 필요.")
+        loc = f" {a['url']}" if a.get("url") else ""
+        lines.append(f"  ✖ [{a['code']}]{loc} — {a['message']}")
+    lines.append("→ 발행물에 결정론 위반(미근거 링크 / 구조: 요일·잔존토큰·금지문법)이 있다. "
+                 "운영자 확인·정정 필요.")
     return "\n".join(lines)
 
 
@@ -260,10 +317,14 @@ def _fetch_block_children(token: str, block_id: str, depth: int) -> list[dict[st
     return out
 
 
+def fetch_brief_blocks(token: str, page_id: str) -> list[dict[str, Any]]:
+    """발행 페이지 본문(중첩 블록 재귀) 블록 리스트 — URL·평문 추출 공용 입력."""
+    return _fetch_block_children(token, page_id, 0)
+
+
 def fetch_brief_urls(token: str, page_id: str) -> list[str]:
     """발행 페이지 본문(중첩 블록 재귀)에서 모든 링크 URL 추출."""
-    blocks = _fetch_block_children(token, page_id, 0)
-    return extract_urls_from_blocks(blocks)
+    return extract_urls_from_blocks(fetch_brief_blocks(token, page_id))
 
 
 def fetch_latest_consumed_handoff_rows(token: str, db_id: str) -> list[dict[str, Any]]:
@@ -323,7 +384,12 @@ def _fetch_page_code_json(token: str, page_id: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 def run(token: str, *, weekly_db_id: str, intake_db_id: str,
         verify: bool = True) -> dict[str, Any]:
-    """탐지 1회 실행 → audit JSON. 대조 불가/오류는 ok:true 건너뜀(false-red 금지)."""
+    """탐지 1회 실행 → audit JSON(출처 근거 + 구조). 대조 불가/오류는 ok:true 건너뜀(false-red 금지).
+
+    URL 근거 대조(handoff 필요)와 별개로, 발행 본문 평문에 `lint_publish_structure` 를 돌려
+    구조 위반(요일·잔존토큰·금지문법)도 alert 로 집계한다 — 구조 검사는 handoff 없이도
+    가능하지만 본 함수는 근거 대조와 한 번에 묶어 실행한다(handoff 미발견 시 전체 건너뜀).
+    """
     if not token:
         return skipped_json("NOTION_TOKEN 부재 — 발행 후 탐지 건너뜀")
     try:
@@ -340,12 +406,19 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
         # 근거 집합이 없으면 모든 링크가 미근거로 보여 과알림 → 대조 불가로 건너뜀.
         return skipped_json("CONSUMED handoff 미발견 — 근거 대조 불가, 건너뜀")
     try:
-        urls = fetch_brief_urls(token, brief["id"])
+        blocks = fetch_brief_blocks(token, brief["id"])
     except Exception as exc:  # noqa: BLE001
         return skipped_json(f"브리프 본문 fetch 실패(건너뜀): {str(exc)[:160]}")
+    urls = extract_urls_from_blocks(blocks)
+    text = extract_text_from_blocks(blocks)
 
     verdict = (lambda u: definitive_verdict(u)) if verify else None
     alerts, info = classify(rows, urls, verdict=verdict)
+    # 구조 위반(PL1 잔존토큰·PL3/16 금지문법·PL14 요일=날짜)도 alert 로 포함한다 —
+    # 발행 직전 `--structure` 게이트와 동등한 결정론 검사(네트워크 0 → 과알림 0). MCP 전용
+    # Routine 은 인-루틴 게이트를 코드로 못 돌리므로 이 탐지가 요일류 결함의 유일 결정론 방어선.
+    struct_alerts = [f for f in bl.lint_publish_structure(text) if f.severity == bl.SEV_FAIL]
+    alerts = struct_alerts + alerts
     return build_audit_json(alerts, info, brief_title=brief.get("title", ""),
                             brief_url=brief.get("url", ""))
 

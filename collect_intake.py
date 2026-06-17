@@ -2736,6 +2736,17 @@ def _dedupe_latest_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
 
 
+# 한국어 요일(date.weekday(): 월=0..일=6). 발행 요일을 LLM 이 산술하지 않게 handoff 에
+# 결정론 산출해 싣는다(06-17 dry-run D-1: LLM 이 수요일을 화요일로 오산). run_date 는 이미
+# KST 달력일이라 weekday() 가 KST 요일과 일치(타임존 off-by-one 없음).
+_KO_WEEKDAYS_FULL = ("월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일")
+
+
+def weekday_kst(run_date: date) -> str:
+    """run_date(KST 달력일)의 한국어 요일 문자열(예: '수요일'). handoff weekday_kst 슬롯용."""
+    return _KO_WEEKDAYS_FULL[run_date.weekday()]
+
+
 def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
                                   window_days: int,
                                   generated_at: datetime) -> dict[str, Any]:
@@ -2834,6 +2845,7 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
         "schema_version": HANDOFF_SCHEMA_VERSION_V2,
         "handoff_id": f"routine-handoff::{run_date.isoformat()}",
         "run_date_kst": run_date.isoformat(),
+        "weekday_kst": weekday_kst(run_date),  # 발행 요일 결정론 산출 — LLM 산술 금지(D-1)
         "window_start": start.isoformat(),
         "window_end": run_date.isoformat(),
         "generated_at_kst": generated_at.isoformat(),

@@ -267,7 +267,7 @@ def has_failures(findings: Iterable[LintFinding]) -> bool:
 #   PL1    잔존 슬롯 토큰 `{{` 0 (전 슬롯 치환됨)
 #   PL3/16 금지 문법(admonition·<toggle>·[toc]·+++) 0 — 메타 toggle HARD(06-15 회귀) 포함
 #   PL10   카드 제목(TITLE_ISSUE)에 "미상/미기재" 0 (D1)
-#   PL14   헤더 날짜의 실제 KST 요일 == 표기 요일 (D7)
+#   PL14   날짜(헤더·제목·푸터)의 실제 KST 요일 == 표기 요일 (D7) — 괄호형·비괄호 푸터형 모두
 # 의미 판정 항목(2 scaffold 불변·5 단일블록·7 Tier3 누락·8/9 조치배정·11~13·15·17 provenance)은
 # LLM 자가 점검 또는 provenance 게이트가 담당한다 — 기계화 어려운 항목은 코드로 이관하지 않는다.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -282,9 +282,14 @@ _RESIDUAL_TOKEN_RE = re.compile(r"\{\{")
 # 카드 제목 H3 + bold TITLE_ISSUE:  ### [유형 · 기관] 대상 — **핵심이슈**
 _CARD_TITLE_RE = re.compile(r"^#{3}\s+.*\*\*(?P<issue>.+?)\*\*", re.M)
 _TITLE_FORBIDDEN_WORDS = ("미상", "미기재")
-# 헤더 날짜+요일:  2026-06-15 (월)  또는  — 2026-06-15 (월요일)
+# 발행물 날짜+요일 표기 — 두 형태를 모두 잡는다:
+#   ① 괄호형(헤더 메타라인·페이지 제목):  2026-06-15 (월)  ·  2026-06-15 (월요일)
+#   ② 비괄호 푸터형(LLM 자유 작성 푸터):    발행일: 2026-06-17 화요일  (06-17 dry-run D-1)
+# ②는 오탐 방지를 위해 '요일' 접미사를 필수로 한다(날짜 뒤 우연한 단일 요일 글자는 무시).
 _DATE_WEEKDAY_RE = re.compile(
-    r"(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})\s*\(\s*(?P<wd>[월화수목금토일])")
+    r"(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})"
+    r"(?:\s*\(\s*(?P<wd_paren>[월화수목금토일])"      # ① (월) / (월요일)
+    r"|\s+(?P<wd_bare>[월화수목금토일])요일)")         # ② … 화요일
 _KO_WEEKDAYS = ("월", "화", "수", "목", "금", "토", "일")  # date.weekday(): 월=0..일=6
 
 
@@ -326,20 +331,26 @@ def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
                     f"(D1, 제목: …**{issue}**)."))
                 break
 
-    # PL14 — 헤더 날짜의 실제 KST 요일 == 표기 요일
-    m = _DATE_WEEKDAY_RE.search(md)
-    if m:
+    # PL14 — 발행물 날짜(헤더 메타라인·제목·푸터)의 실제 KST 요일 == 표기 요일.
+    # 한 발행물에 날짜+요일이 여러 곳(헤더·푸터)이라 전부 검사하되 같은 (날짜,표기) 는 1회만 보고.
+    seen_wd: set[tuple[str, str, str, str]] = set()
+    for m in _DATE_WEEKDAY_RE.finditer(md):
+        wd = m.group("wd_paren") or m.group("wd_bare")
+        y, mo, dd = m.group("y"), m.group("m"), m.group("d")
+        key = (y, mo, dd, wd)
+        if key in seen_wd:
+            continue
+        seen_wd.add(key)
         try:
-            d = _dt.date(int(m.group("y")), int(m.group("m")), int(m.group("d")))
+            d = _dt.date(int(y), int(mo), int(dd))
         except ValueError:
-            d = None  # 잘못된 날짜 자체는 본 항목 소관 아님
-        if d is not None:
-            actual = _KO_WEEKDAYS[d.weekday()]
-            if actual != m.group("wd"):
-                findings.append(LintFinding(
-                    SEV_FAIL, "PL14-WEEKDAY", "",
-                    f"헤더 요일 불일치 — {m.group('y')}-{m.group('m')}-{m.group('d')} 는 "
-                    f"'{actual}'요일인데 '{m.group('wd')}'로 표기(D7)."))
+            continue  # 잘못된 날짜 자체는 본 항목 소관 아님
+        actual = _KO_WEEKDAYS[d.weekday()]
+        if actual != wd:
+            findings.append(LintFinding(
+                SEV_FAIL, "PL14-WEEKDAY", "",
+                f"발행물 요일 불일치 — {y}-{mo}-{dd} 는 "
+                f"'{actual}'요일인데 '{wd}'로 표기(D7)."))
     return findings
 
 

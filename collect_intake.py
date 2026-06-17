@@ -2747,6 +2747,67 @@ def weekday_kst(run_date: date) -> str:
     return _KO_WEEKDAYS_FULL[run_date.weekday()]
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 수집 현황(커버리지) '수집' 컬럼 결정론화 (W1) — handoff source_counts 를 발행 커버리지
+# callout 어휘로 미리 포맷한다. LLM 이 재집계·추정하지 않고 그대로 전사한다(요일 weekday_kst
+# 와 동형). 라벨·순서는 v16 프롬프트 [블록 3 — 커버리지] callout 과 일치 — 코드가 단일 기준.
+# 발행 후 탐지(verify_published_brief + brief_lint.lint_coverage_counts)도 같은 정본으로
+# 발행물 숫자를 대조한다(W2). 06-17 검증: 발행=실제 카드수는 확인됐으나 수집/스킵은 LLM
+# 집계라 무보증 클래스(요일 오산과 동형) → 수집은 코드가 산출·감사 가능하게 한다.
+# ─────────────────────────────────────────────────────────────────────────────
+# (source 문자열, 발행 callout 라벨) — 고정 순서. 상시 수집기 11종(프롬프트 callout 동일).
+COVERAGE_SOURCE_LABELS: tuple[tuple[str, str], ...] = (
+    (SOURCE_FR, "FR"),
+    (SOURCE_RECALL, "Recall"),
+    (SOURCE_EMA, "EMA"),
+    (SOURCE_MHRA, "MHRA"),
+    (SOURCE_PICS, "PIC/S"),
+    (SOURCE_ECA, "ECA"),
+    (SOURCE_FDA_WL, "FDA WL"),
+    (SOURCE_MFDS, "MFDS"),
+    (SOURCE_ICH, "ICH"),
+    (SOURCE_WHO, "WHO"),
+    (SOURCE_HC, "HC"),
+)
+_COVERAGE_KNOWN_SOURCES = frozenset(s for s, _ in COVERAGE_SOURCE_LABELS)
+
+
+def coverage_source_counts(rows: list[dict[str, Any]]) -> dict[str, int]:
+    """rows 에서 소스별 수집 건수 재집계 — build_routine_handoff_payload* 와 동일 산식.
+
+    발행 후 탐지가 handoff rows(top-level source_counts 없이도)로 '수집' 정본을 독립
+    복원할 때 쓴다(병합 멤버 포함 전수 카운트 — payload 의 source_counts 와 바이트 동일).
+    """
+    out: dict[str, int] = {}
+    for row in rows or []:
+        if isinstance(row, dict):
+            src = row.get("source", "")
+            out[src] = out.get(src, 0) + 1
+    return out
+
+
+def build_coverage_collected(source_counts: dict[str, int]) -> dict[str, Any]:
+    """'수집' 컬럼(소스별 수집 건수 + 총계)을 결정론 산출한다(W1).
+
+    반환 {"total": int, "items": [{"label","source","count"}...], "md": str}:
+    - known 소스(COVERAGE_SOURCE_LABELS)는 고정 순서로 전부 포함(0건도 — '조용한 주' 가시화).
+    - 라벨 미정의 소스(예: FDA 483)는 count>0 일 때만 원 이름으로 끝에 덧붙인다(조용한 유실 금지).
+    - total = 모든 source_counts 합(= handoff row_count, 병합 멤버 포함).
+    - md = 발행 callout 의 수집 세그먼트: "Intake row {total}건 ({label} {n} · ...)".
+    LLM 은 md 를 그대로 삽입하고 병합·WebSearch·유효항목·Evidence·미확인 등 발행측 값만 채운다.
+    """
+    counts = {k: int(v) for k, v in (source_counts or {}).items()}
+    items: list[dict[str, Any]] = []
+    for source, label in COVERAGE_SOURCE_LABELS:
+        items.append({"label": label, "source": source, "count": counts.get(source, 0)})
+    for source in sorted(k for k in counts if k and k not in _COVERAGE_KNOWN_SOURCES):
+        if counts[source] > 0:
+            items.append({"label": source, "source": source, "count": counts[source]})
+    total = sum(counts.values())
+    seg = " · ".join(f"{it['label']} {it['count']}" for it in items)
+    return {"total": total, "items": items, "md": f"Intake row {total}건 ({seg})"}
+
+
 def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
                                   window_days: int,
                                   generated_at: datetime) -> dict[str, Any]:
@@ -2851,6 +2912,8 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
         "generated_at_kst": generated_at.isoformat(),
         "row_count": len(out_rows),
         "source_counts": source_counts,
+        # 수집 현황 '수집' 컬럼 결정론 산출 — LLM 재집계 금지(W1). 발행 callout 에 그대로 전사.
+        "coverage_collected_md": build_coverage_collected(source_counts)["md"],
         "rows": out_rows,
     }
 

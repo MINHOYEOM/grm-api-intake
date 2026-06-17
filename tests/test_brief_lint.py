@@ -461,6 +461,76 @@ class TestPublishStructure(unittest.TestCase):
             self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
 
 
+class TestCoverageCounts(unittest.TestCase):
+    """수집 현황 '수집' 숫자 대조 lint(W2) — 발행물 LLM 집계 ↔ handoff 정본 결정론 대조."""
+
+    # build_coverage_collected 가 만드는 정본 형태(label/count items + total). collect_intake
+    # 비의존(순수 brief_lint 테스트) — 정본 dict 를 직접 구성한다.
+    EXPECTED = {
+        "total": 36,
+        "items": [
+            {"label": "FR", "count": 2}, {"label": "Recall", "count": 1},
+            {"label": "EMA", "count": 0}, {"label": "FDA WL", "count": 3},
+            {"label": "MFDS", "count": 30},
+        ],
+    }
+    GOOD = ("Intake row 36건 (FR 2 · Recall 1 · EMA 0 · FDA WL 3 · MFDS 30) · "
+            "병합 5건→3카드 · WebSearch 9/9 · 유효항목 33건 · Evidence A 10/B 5/C 0 · 미확인 없음")
+
+    def test_parse_collected_coverage(self):
+        parsed = bl.parse_collected_coverage(self.GOOD)
+        self.assertEqual(parsed["total"], 36)
+        self.assertEqual(parsed["items"]["MFDS"], 30)
+        self.assertEqual(parsed["items"]["EMA"], 0)
+        # 첫 괄호까지만 — 그 뒤 '병합 5건→3카드' 등은 수집 아이템으로 잡지 않는다.
+        self.assertNotIn("병합", parsed["items"])
+
+    def test_no_anchor_returns_none_and_no_finding(self):
+        self.assertIsNone(bl.parse_collected_coverage("발행일: 2026-06-17 수요일"))
+        self.assertEqual(bl.lint_coverage_counts(self.EXPECTED, "요일만 있음"), [])
+
+    def test_no_expected_no_finding(self):
+        self.assertEqual(bl.lint_coverage_counts(None, self.GOOD), [])
+        self.assertEqual(bl.lint_coverage_counts({}, self.GOOD), [])
+
+    def test_match_no_finding(self):
+        self.assertEqual(bl.lint_coverage_counts(self.EXPECTED, self.GOOD), [])
+
+    def test_total_mismatch_is_fail(self):
+        bad = self.GOOD.replace("Intake row 36건", "Intake row 37건")
+        fs = bl.lint_coverage_counts(self.EXPECTED, bad)
+        self.assertEqual([f.code for f in fs], ["PL15-COVERAGE-TOTAL"])
+        self.assertEqual(fs[0].severity, bl.SEV_FAIL)
+
+    def test_source_count_mismatch_is_fail(self):
+        bad = self.GOOD.replace("MFDS 30", "MFDS 28")
+        fs = bl.lint_coverage_counts(self.EXPECTED, bad)
+        self.assertTrue(any(f.code == "PL15-COVERAGE-SOURCE" and "MFDS" in f.message
+                            for f in fs))
+        self.assertTrue(all(f.severity == bl.SEV_FAIL for f in fs))
+
+    def test_zero_source_omission_allowed(self):
+        # EMA 0 을 발행물이 생략 → 정상(과알림 0). '건' 접미도 허용.
+        pub = "Intake row 36건 (FR 2건 · Recall 1건 · FDA WL 3건 · MFDS 30건)"
+        self.assertEqual(bl.lint_coverage_counts(self.EXPECTED, pub), [])
+
+    def test_nonzero_source_missing_is_fail(self):
+        pub = "Intake row 33건 (FR 2 · Recall 1 · EMA 0 · MFDS 30)"  # FDA WL(3) 누락
+        fs = bl.lint_coverage_counts(self.EXPECTED, pub)
+        codes = [f.code for f in fs]
+        self.assertIn("PL15-COVERAGE-TOTAL", codes)      # 33 != 36
+        self.assertTrue(any(f.code == "PL15-COVERAGE-SOURCE" and "FDA WL" in f.message
+                            for f in fs))
+
+    def test_extra_label_is_warn_not_alert(self):
+        # handoff 근거에 없는 라벨이 발행물 수집 줄에 → WARN(저신뢰·알림 트리거 아님).
+        pub = "Intake row 36건 (FR 2 · Recall 1 · EMA 0 · FDA WL 3 · MFDS 30 · BOGUS 0)"
+        fs = bl.lint_coverage_counts(self.EXPECTED, pub)
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0].code, "PL15-COVERAGE-EXTRA")
+        self.assertEqual(fs[0].severity, bl.SEV_WARN)
+
+
 class _StubResp:
     def __init__(self, status, text):
         self.status_code = status

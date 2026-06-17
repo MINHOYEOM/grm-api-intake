@@ -416,6 +416,11 @@ Recall 최다면 ⚠️ → 규범 문서 최다면 📑 → 국내만 있으면
 <callout icon="🔍" color="gray_bg">
 	🔍  커버리지: Intake row {N}건 (FR {N} · Recall {N} · EMA {N} · MHRA {N} · PIC/S {N} · ECA {N} · FDA WL {N} · MFDS {N} · ICH {N} · WHO {N} · HC {N}) · 병합 {N}건→{M}카드 · 공식 API 직접호출 0 (수집기 위임) · WebSearch {N}/9 · WebFetch {N}/5 · 유효항목 {M}건 (글로벌 {G} · 국내 {K}) · Evidence A {N}/B {N}/C {N} · 미확인 {기관·카테고리|없음}
 </callout>
+⚠️ **수집 세그먼트 결정론 전사(W1):** "Intake row {N}건 (소스별 …)" — **닫는 괄호까지** 는 handoff 의
+`coverage_collected_md` 값을 **그대로 전사**한다(소스별 건수·총계를 직접 세거나 추정하지 않는다 —
+요일 `weekday_kst` 와 동형 결정론 산출). 닫는 괄호 뒤 값(병합·WebSearch·WebFetch·유효항목·Evidence·
+미확인)만 발행측 산출로 직접 채운다. handoff 가 없는 graceful 모드에서만 위 템플릿대로 직접 집계한다.
+발행 후 탐지가 이 수집 숫자를 handoff 정본과 결정론 대조한다(불일치=경보 — `lint_coverage_counts`).
 
 블록 마지막-1 — AI 면책(페이지당 1회, 🔮/카드 전부 끝난 뒤, --- 다음).
 ⚠️ 아래 3줄은 §13.1-11 동결 문구(`card_scaffold.py` FixedConfig)와 **바이트 동일**해야 한다 —

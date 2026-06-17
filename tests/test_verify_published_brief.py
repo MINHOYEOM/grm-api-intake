@@ -251,5 +251,41 @@ class TestRunSkips(unittest.TestCase):
         self.assertEqual(j["fail_count"], 0)
 
 
+class TestRunCoverage(unittest.TestCase):
+    """W2: 발행 후 탐지 — 수집 현황 '수집' 숫자가 handoff 정본과 어긋나면 FAIL 로 잡는다.
+
+    detective 는 handoff rows(여기 MFDS 1건)로 정본을 재집계(coverage_source_counts +
+    build_coverage_collected)해 발행물 수집 callout 과 대조한다(네트워크 0 → 과알림 0).
+    """
+
+    def _run_with_brief_text(self, coverage_text):
+        with mock.patch.object(vpb, "fetch_latest_brief",
+                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               return_value=HANDOFF_ROWS), \
+             mock.patch.object(vpb, "fetch_brief_blocks",
+                               return_value=[_paragraph(coverage_text)]):
+            return vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
+
+    def test_collected_mismatch_is_alert(self):
+        # handoff 정본 = MFDS 1건(total 1). 발행물이 9건/MFDS 9 로 집계 → FAIL.
+        j = self._run_with_brief_text("Intake row 9건 (MFDS 9)")
+        self.assertFalse(j["ok"])
+        codes = [a["code"] for a in j["alerts"]]
+        self.assertIn("PL15-COVERAGE-TOTAL", codes)
+        self.assertIn("PL15-COVERAGE-SOURCE", codes)
+
+    def test_collected_match_passes(self):
+        # 발행물 수집 = 정본과 일치(MFDS 1, 나머지 known 0 은 생략 정상) → 과알림 0.
+        j = self._run_with_brief_text("Intake row 1건 (MFDS 1)")
+        self.assertTrue(j["ok"])
+        self.assertEqual(j["fail_count"], 0)
+
+    def test_no_coverage_callout_no_alert(self):
+        # 수집 callout 부재(요일 푸터만) → 대조 불가, 추측 금지(과알림 0).
+        j = self._run_with_brief_text("발행일: 2026-06-17 수요일")
+        self.assertTrue(j["ok"])
+
+
 if __name__ == "__main__":
     unittest.main()

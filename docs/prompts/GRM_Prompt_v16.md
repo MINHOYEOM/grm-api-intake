@@ -9,6 +9,7 @@
 > **작성결함 R3 패치(2026-06-16, §B [2단계] W5 슬롯·공통 가드·Publish Lint 만)**: EVAL-1(6/15) E1 7건 — W2 표/`prose_input.w2_facts` 에 값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(역방향 슬롯 모순). W5 [W2 우선 인용]·공통 가드 기준 슬롯 W2·성분/marker/수치 단정 가드(현진 단삼 살비아놀산B↔탄시논류 유형)·Publish Lint 15(D8) 추가. scaffold·collector·golden·tests 불변. 브랜치 적용·Codex 게이트 대기.
 > **toggle 회귀 핫픽스(2026-06-16, §B 메타 블록·Publish Lint·Brief Lint 게이트만)**: 6/15(W24) 발행 M2/M3 메타가 `<details>` 대신 literal `<toggle>`/`</toggle>` 로 노출(Brief Lint L3 FAIL). 원인 = 페이지 레벨 메타 블록은 LLM 작성이고 코드 중화(`_neutralize_forbidden`)는 M2/M3 메타에는 미적용 — 메타 블록 무중화 + LLM 생성 회귀. 수정 = 메타 템플릿에 `<details>`/`<summary>` 리터럴 강제·`<toggle>`/`[toc]` 금지 명시 + Publish Lint 16(메타 토글 HARD FAIL) 신설 + Brief Lint L3 HARD 강화. scaffold·collector·golden·tests·v16 카드 슬롯 규칙 불변. M3 page-shell(메타 Python 이관)은 별도 트랙. 브랜치 적용·Codex 게이트 대기.
 > **프롬프트 축소 트랙 — 기계 Publish Lint 코드 이관(2026-06-17, §B [Publish Lint]·[발행 전 게이트] 만)**: 기계 판정 항목(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상·PL14 요일=날짜)을 `brief_lint.lint_publish_structure` + 게이트 `--structure` 로 결정론 강제 — 자가 서술을 코드 실행으로 강등(오류 표면 축소). 프롬프트는 게이트 실행 위임 + MCP 전용 세션 수기 fallback 만 유지. 의미 항목(2·5·7~9·11~13·15)·17(provenance)·[2단계] 슬롯·R2/R3 동결·toggle 핫픽스·URL 게이트 불훼손. 535 green(+15)·golden byte-diff 0·scaffold/collector 불변. 설계 `docs/GRM_v16_프롬프트축소_설계_2026-06-17.md`. branch `chore/v16-prompt-slim-2026-06-17`·Codex 게이트·사람 승인 후 동결.
+> **프롬프트 축소 Phase 3 — 검색/Fetch Intake-Master 재구성(2026-06-17, §B [1단계] Core 8 헤더·Deep Dive Fetch 만)**: 적대적 검증(10-agent) 결과 슬롯 1·3·4·5·6 과 Deep Dive 1~3 은 수집기 커버지만 **수집기 무음 실패(403·포맷 변동·Intake 게이트 누락) catch 용 load-bearing cross-check** 라 삭제 불가 → 제거가 아닌 **재구성**: ① Core 8 헤더에 "Intake 가 Master·자유검색/출처 URL 작성 금지·cross-check 1회만·graceful 모드만 1~8 전수검색" 명시 ② Deep Dive Fetch 의 PL-8 403-정직화(1~3 수집기 정본·403 정상·URL 날조 금지·4·5 미커버 2차). 검색 유일경로 슬롯 2(FDA Guidance·수집기 기본 비활성)·7(ICH, R2 동결)·8(TGA·수집기 없음) 보존. 목적=오류 표면(LLM 자유 URL 작성) 축소(순 줄수 ≈ 중립 — 검색이 load-bearing 이라 큰 절감은 FDA Guidance 수집기 tier-boost 별도 트랙에서). 코드·scaffold·golden·URL 게이트·[2단계] 슬롯·toggle 핫픽스 불훼손, 548 green·golden byte-diff 0. 평가 `docs/GRM_v16_Phase3_수집이관평가_2026-06-17.md`. branch `chore/v16-prompt-slim-phase3-2026-06-17`. 행동변화 → dry-run·Routine 재-붙여넣기·Codex 게이트·사람 승인 후 동결.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -162,8 +163,13 @@ MFDS data.go.kr·nedrug 전부 수집기 위임). 허용된 WebFetch 는 아래 
 슬롯 7 에서 발견한 ICH 공식 news/press-release URL 1개뿐이며, 전체 WebFetch 5회 한도 안에서
 배정한다(ICH 공식 URL을 쓰면 Deep Dive URL 하나를 생략).
 
-1순위 — Core 8 (고정 슬롯, Intake 가 커버하는 슬롯 1~6 은 "Intake 흡수로 대체" 기록 허용,
-슬롯 7(ICH)·8(TGA)은 생략 금지 — TGA 는 Intake 경로가 없어 이 슬롯이 유일 탐지 경로):
+1순위 — Core 8 (고정 슬롯). **수집기 커버분은 Intake 가 Master**: 슬롯 1·3·4·5·6(FDA WL·FR·
+Recall·EMA·PIC/S)은 상시 수집기(MFDS 제외 기본 7종, flag 무관)가 이미 handoff 로 넘기므로, 정상
+운영에선 "Intake 흡수로 대체" 로 적고 자유 검색·출처 URL 작성을 하지 않는다 — 다만 그 기관 handoff
+row 가 평소와 달리 0건이라 수집기 무음 실패(403·포맷 변동·Intake 게이트 누락)가 의심될 때만 슬롯당
+cross-check 1회(9회 한도 내)를 쓰고 결과 URL·내용은 지어내지 않는다(handoff 가 정본). **검색이 유일경로라 생략 금지: 슬롯 2(FDA Guidance·수집기 기본 비활성)·
+7(ICH 이벤트)·8(TGA·수집기 없음).** handoff 부재 graceful 모드에서만 1~8 전체를 1차 탐지로 정상
+검색한다:
 1. FDA WL/CGMP: site:fda.gov inurl:warning-letters "{월명} 2026" 또는
    site:fda.gov "Warning Letter" CGMP after:{YYYY-MM-DD}
 2. FDA Guidance: site:fda.gov "Draft Guidance" OR "Final Guidance" pharmaceutical quality after:{date}
@@ -196,21 +202,29 @@ MFDS 는 Core 슬롯이 없다 — Intake 흡수가 유일 경로(누락 시 보
 4주차(22~28일) "data integrity" OR "supplier qualification" warning letter site:fda.gov OR
 site:gmp-compliance.org · 5주차(29~31일) 1주차 재사용.
 
-3순위 — Deep Dive Fetch(≤5 URL, 검색 한도 외, 콘텐츠 흡수 전용·재시도 없음):
-1. https://picscheme.org/en/news (Official)
-2. https://mhrainspectorate.blog.gov.uk/ (Official)
-3. https://www.gmp-compliance.org/gmp-news/latest-gmp-news (Expert Secondary)
-4. https://www.raps.org/news-and-articles (Expert Secondary)
-5. https://www.europeanpharmaceuticalreview.com/news (Expert Secondary)
+3순위 — Deep Dive Fetch(≤5 URL, 검색 한도 외, 콘텐츠 흡수 전용·재시도 없음). ⚠️ 1~3(PIC/S·
+MHRA·ECA)은 수집기 RSS 로 이미 Intake 에 들어온다(소스표 #5·4·6) — **Intake 가 Master**, 이 Fetch
+는 누락 보강용 보조 cross-check 다. Routine 환경에선 5개 모두 상시 403(06-17 dry-run 실측: Routine
+fetch 환경 1~5 전부 403) — 403 이어도 출처 URL·내용을 지어내지 말고 Intake 로 충당한다(handoff 에
+있으면 그게 정본):
+1. https://picscheme.org/en/news (Official · 수집기 커버 #5)
+2. https://mhrainspectorate.blog.gov.uk/ (Official · 수집기 커버 #4)
+3. https://www.gmp-compliance.org/gmp-news/latest-gmp-news (Expert Secondary · 수집기 커버 #6)
+4. https://www.raps.org/news-and-articles (Expert Secondary · 수집기 미커버)
+5. https://www.europeanpharmaceuticalreview.com/news (Expert Secondary · 수집기 미커버)
 처리: 최근 7일 항목만 · 13개 카테고리 필터 · Evidence A 불가(B—Official direct / B—Official
 indexed / C—Secondary only 로 분류) · quote(>) 금지 · 단정 표현 금지("발행되었다"→"보도되었다").
-HTTP 200 인데 해당 0건 = "조용한 주"(성공으로 집계). 403/404/timeout = 실패(M2 기록,
-Official 출처 403 은 비정상으로 기록). 5개 전부 실패해도 Routine 은 계속.
+HTTP 200 인데 해당 0건 = "조용한 주". 403/404/timeout = M2 1줄 기록 — **1~3 은 수집기 RSS 가
+정본이라 403 도 URL 날조 금지(정상), 단 그 기관 handoff row 가 0건인데 Fetch 도 403 이면 "{기관}
+수집기·Fetch 동시 무음 — 수동 확인 필요" WARN 강제(특히 ECA 는 수집기가 403 을 조용히 넘김).**
+4·5(미커버 2차)는 403 허용·경보 불요. 5개 전부 실패해도 Routine 은 계속(Intake 가 정본).
 
 Boolean 강제(WebSearch): site:{도메인} "{검색어}" after:{date} / site: OR site: / intitle:
 패턴 우선, 자유 키워드는 패턴 0건일 때만. 0건 fallback(같은 슬롯 안 1차 OR 제거 → 2차 키워드
 간소화 → 3차 site: 제거)도 호출 1회로 계산. 9회 도달 즉시 검색 중단·작성 단계 전환. 추가
-verify 검색 금지. 미검색 슬롯은 "미확인"으로 M3 기록.
+verify 검색 금지. 미검색 슬롯은 "미확인"으로 M3 기록 — 단 "Intake 흡수로 대체"한 커버 슬롯
+(1·3·4·5·6)은 'Intake 충당'으로 적고 "미확인"에 넣지 않는다("미확인"은 검색 유일경로 슬롯 2·7·8
+또는 graceful 전수검색에서 실제 0건·실패가 확인된 경우만).
 
 발행일 해석: 검색/Fetch 신규 항목은 (a) 원본 발행일 7일 내 또는 (b) 보조 출처 분석 7일 내
 (원본 60일 내, 표기 "📅 원본 {날짜} → 보조 출처 분석 {날짜}") 면 포함. **Intake handoff 항목은
@@ -559,3 +573,4 @@ Notion DB "🌐 GRM Weekly Brief" (ID: 3653142f-dc11-8049-806d-e0a779cafd90) 에
 | 2026-06-16 | **작성결함 R3 패치(§B [2단계] W5 슬롯·공통 가드·Publish Lint 만, scaffold·collector·golden·tests 불변)**: EVAL-1(6/15) E1 사실오류 7건 — W2 표/`prose_input.w2_facts` 에 확정값(예: "CDER·06/02/2026")이 있는데 W5 가 "원문 미기재"로 과소표기(슬롯 간 역방향 모순). 기존 공통 가드(미기재→구체값 단정 금지)는 한 방향만 막아 역방향 무방비. ① W5 슬롯에 [W2 우선 인용] 추가(W2/prose_input 값 보유 필드는 미기재 금지·그 값 인용, 미기재는 양쪽 빈 경우만) · ② 공통 가드에 기준 슬롯 W2 추가(역방향 모순 금지) · ③ 성분·marker·수치 단정 가드(원문 'A'→동의어·상위어 'B' 치환 금지·원문 수치 있으면 "세부 수치 미기재" 금지 — 현진 단삼 살비아놀산B↔탄시논류·4.1%↑/1.5% 유형) · ④ Publish Lint 15(D8) 신설(W5 미기재 항목 ↔ W2 값 존재 0). 진단/지시 `GRM_발행결함_클로즈아웃_지시문초안_2026-06-16.md`. Codex 게이트·사람 승인 후 동결 |
 | 2026-06-17 | **프롬프트 축소 — 기계 Publish Lint 코드 이관(§B [Publish Lint]·[발행 전 게이트] 만)**: 기계 판정 5항(PL1 잔존토큰·PL3/16 금지문법·PL10 제목 미상/미기재·PL14 요일=날짜)을 신규 순수 함수 `brief_lint.lint_publish_structure(md)` + `run_publish_gate(include_structure=)` + CLI `--structure` 로 결정론 강제. [Publish Lint] 의 해당 항목은 "게이트 실행=합격" 위임 + MCP 전용 세션 수기 fallback 으로 축약(자가 서술→코드 실행 강등=오류 표면 축소). [발행 전 게이트] 명령에 `--structure` 추가(출처 근거+구조 1회 실행). 의미 항목(2·5·7~9·11~13·15)·17 provenance·[2단계] 슬롯·R2/R3·toggle 핫픽스·URL 게이트 불훼손. `tests/test_brief_lint.py`(+15, **535 green**)·golden byte-diff 0·scaffold/collector 불변. 설계 `docs/GRM_v16_프롬프트축소_설계_2026-06-17.md`. branch `chore/v16-prompt-slim-2026-06-17`. Codex 게이트·사람 승인 후 동결 |
 | 2026-06-16 | **출처 링크 근거 게이트 명문화(W1/W2 — URL전수검사 잔여 갭, §B [발행 단계]·검색 카드 규칙만)**: Publish Lint 17 을 "권고 자가점검"에서 **결정론 실행·차단**으로 승격 — [발행 전 출처 링크 근거 게이트 — HARD BLOCK] 절 신설. 코드 실행 가능 환경은 `python -m brief_lint --handoff h.json --published brief.md --allowed-fetched fetched.txt`(exit 1=발행 중단), MCP 전용 세션은 동일 불변식 수기 검증 + 발행 후 `grm-brief-audit`(verify_published_brief) 독립 재검증(2차 방어선). 검색 카드 규칙에 **fetched 기록**(이번 run 에 실제 fetch 한 URL → `allowed_fetched`) 추가 — 게이트 기본 정책 all_domains(MFDS 뿐 아니라 fetched 에도 없는 타 기관 URL 차단, W2). scaffold·collector·golden·v16 카드 슬롯 규칙 불변(프롬프트 [발행 단계] 문구만). 코드=`brief_lint.run_publish_gate`·`verify_published_brief`·`.github/workflows/grm-brief-audit.yml`. branch `audit/url-gate-2026-06-16`. 지시 `GRM_URL가드강화_후속지시문_2026-06-16.md` |
+| 2026-06-17 | **프롬프트 축소 Phase 3 — 검색/Fetch Intake-Master 재구성(§B [1단계] Core 8 헤더·Deep Dive Fetch 만, 코드·scaffold·golden 불변)**: Phase 3 의 전제(슬롯 1·3·4·5·6 + Deep Dive 검색을 "수집기 커버 redundant" 로 보고 제거→큰 줄 절감)를 적대적 검증(10-agent)으로 재판정 — **REFUTED**: 그 슬롯들은 수집기 무음 실패(FDA WL 스크랩 fail-silent·PIC/S/ECA RSS 403 무음 0행·Intake 부서게이트 누락) 를 잡는 **load-bearing cross-check** 라 삭제 시 침묵 커버리지 손실. C3 = Deep Dive 1~3 의 도메인 일치는 확인되나 RSS=HTML 동일성 미입증·ECA 403일엔 Fetch 가 유일 ECA 경로(redundancy 미성립). C4 = 슬롯 2(FDA Guidance)는 `collect_search.py` FDA_GUIDANCE 슬롯이 있으나 `ENABLE_SEARCH` 기본 off → 슬롯 2 가 유일 live 경로. → **제거 대신 재구성**: ① Core 8 헤더에 "수집기 커버분=Intake 가 Master·자유검색/출처 URL 작성 금지·무음실패 catch cross-check 1회만·handoff 부재 graceful 모드만 1~8 전수검색" 명시(LLM 자유 URL 작성 표면 축소=가짜-URL 사고 근본) ② Deep Dive Fetch 의 PL-8 403-정직화("Official 403=비정상" → "1~3 수집기 RSS 정본·403 정상·비정상 경보·URL 날조 금지", 4·5 미커버 2차 Evidence C 403 허용). 검색 유일경로 슬롯 2·7(ICH, R2-D3 동결, 미접촉)·8(TGA, 수집기 없음) 보존. 순 줄수 ≈ 중립(+9) — 큰 절감은 별도 트랙(FDA Guidance FR tier-boost: 키워드 없는 guidance NOTICE 가 Tier 1 로 떨어져 handoff 미도달, floor→Tier 2 시 슬롯 2 가 순수 cross-check 화). URL 게이트·[2단계] 슬롯·toggle 핫픽스 불훼손, **548 green**·golden byte-diff 0. 평가 `docs/GRM_v16_Phase3_수집이관평가_2026-06-17.md`. branch `chore/v16-prompt-slim-phase3-2026-06-17`. **Codex 3-lens 교차검토 go-with-fixes 반영**: ECA(#3) fail-silent 대응 "수집기·Fetch 동시 무음→WARN 강제"·`(PL-8)` dangling→자기완결 문구·L223 "미검색=미확인" carve-out(커버 슬롯=Intake 충당)·cross-check 트리거(handoff 0건 의심 시 슬롯당 1회·9회 내)·"MFDS 제외 기본 7종" 명시. 행동변화 → dry-run·**Routine 재-붙여넣기**·사람 승인 후 동결 |

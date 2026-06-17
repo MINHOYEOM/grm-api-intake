@@ -26,6 +26,7 @@ jobs:
           python -m py_compile collect_intake.py collect_mfds.py \
             collect_mfds_admin_action.py collect_mfds_gmp_inspection.py \
             collect_mfds_recall.py collect_ich.py collect_who.py \
-            collect_hc.py collect_search.py grm_common.py
+            collect_hc.py collect_search.py grm_common.py \
+            brief_lint.py verify_published_brief.py card_scaffold.py
       - name: unittest
         run: python -m unittest discover -s tests -v

@@ -7,6 +7,7 @@ actions) as enforcement-proxy intake rows for manufacturing/quality signals.
 
 from __future__ import annotations
 
+import os
 import re
 import hashlib
 import urllib.parse
@@ -35,6 +36,10 @@ ADMIN_API_ENDPOINT = (
     "/getMdcinExaathrList04"
 )
 DATASET_URL = "https://www.data.go.kr/data/15058457/openapi.do"
+# 행정처분 건별 상세(L1 후보) — scaffold 가 raw.ADM_DISPS_SEQ 로 조립하는 것과 동형.
+NEDRUG_ADMIN_DETAIL_TPL = (
+    "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq={seq}"
+)
 
 TYPE_ADMIN_ACTION = "admin-action"
 LANGUAGE_KO = "KO"
@@ -106,6 +111,32 @@ LOW_VALUE_ADMIN_TERMS = [
     "의료기기",
     "체외진단",
 ]
+
+
+def _url_verify_enabled() -> bool:
+    """E2 — `ENABLE_MFDS_URL_VERIFY`(기본 off). on 일 때만 후보 L1 을 collect 시점에
+    live verify 해 official_url L1 을 승격/강등한다. off 면 수집기 동작·골든 전부 불변."""
+    return os.environ.get("ENABLE_MFDS_URL_VERIFY", "").strip().lower() in (
+        "1", "true", "yes", "on")
+
+
+def _verify_admin_l1(seq: str, firm: str) -> tuple[str, str]:
+    """후보 L1(`CCBAO01/getItem?dispsApplySeq={seq}`)을 verify_url_live 로 판정.
+
+    반환 (verdict, candidate_url). verdict ∈ {"pass","fail"} — pass 면 scaffold 가
+    검증된 L1 으로 단언(⚠️ 없음), fail 이면 L2 인덱스 + ⚠️ fallback 으로 강등한다.
+    nedrug getItem 은 무효 seq 도 HTTP 200(오류 셸·~2.6KB)이라 길이·오류마커로 판정
+    (verify_url_live 가 200∧오류셸 아님∧길이≥min∧기대어 포함 을 ok 로 본다).
+    """
+    candidate = NEDRUG_ADMIN_DETAIL_TPL.format(
+        seq=urllib.parse.quote(seq, safe=""))
+    try:
+        from brief_lint import verify_url_live  # lazy — flag off 면 import 도 안 함
+        res = verify_url_live(candidate, expect_terms=["행정처분"])
+        verdict = "pass" if res.get("ok") else "fail"
+    except Exception:  # noqa: BLE001 — verify 불가는 미검증=강등(차단 측 안전)
+        verdict = "fail"
+    return verdict, candidate
 
 
 def _mask_service_key(url: str) -> str:
@@ -245,6 +276,16 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
             f"?itemSeq={urllib.parse.quote(item_seq, safe='')}"
         )
         raw_payload["nedrug_item_candidate_note"] = "Routine 검증 후 인용 (미검증 후보 URL)"
+
+    # E2(resolve & verify, ENABLE_MFDS_URL_VERIFY=on 일 때만): 행정처분 건별 L1 후보를
+    # collect 시점에 실제 검증해 scaffold 가 검증된 L1(pass) 또는 L2 인덱스+⚠️(fail)로
+    # 조립하게 한다. flag off(기본) 면 키를 남기지 않아 scaffold 가 현행대로 seq→L1 을
+    # 단언한다(수집기 동작·golden 불변). K3 관찰·collector 불가침 보호용 게이트.
+    adm_seq = _text(raw, "ADM_DISPS_SEQ")
+    if _url_verify_enabled() and adm_seq:
+        verdict, candidate = _verify_admin_l1(adm_seq, firm)
+        raw_payload["admin_l1_verify"] = verdict
+        raw_payload["admin_l1_candidate_url"] = candidate
 
     return IntakeItem(
         source=SOURCE_MFDS,

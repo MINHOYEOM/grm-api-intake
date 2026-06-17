@@ -27,6 +27,7 @@ tmp/
 output/
 *.local.json
 grm-health.json
+grm-brief-audit.json
 scheduled_*.log
 
 # 로컬 보관용 — git 추적 제외

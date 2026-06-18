@@ -322,73 +322,65 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const healthPath = path.join(process.env.GITHUB_WORKSPACE, process.env.GRM_HEALTH_JSON || 'grm-health.json');
-            if (!fs.existsSync(healthPath)) {
-              console.log('health JSON not found; skipping warning issue');
-              return;
-            }
-
+            if (!fs.existsSync(healthPath)) { console.log('health JSON not found; skipping'); return; }
             let health;
-            try {
-              health = JSON.parse(fs.readFileSync(healthPath, 'utf8'));
-            } catch (error) {
-              console.log(`health JSON parse failed: ${error}`);
-              return;
-            }
-
+            try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); }
+            catch (error) { console.log(`health JSON parse failed: ${error}`); return; }
             const warnings = health?.health?.warnings || [];
-            if (!warnings.length) {
-              console.log('no health warnings; skipping warning issue');
-              return;
-            }
-
+            const title = 'GRM Intake 운영 경고';
             async function ensureLabel(name, color, description) {
-              try {
-                await github.rest.issues.getLabel({ owner, repo, name });
-              } catch (error) {
-                if (error.status !== 404) throw error;
-                await github.rest.issues.createLabel({ owner, repo, name, color, description });
-              }
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch (error) { if (error.status !== 404) throw error; await github.rest.issues.createLabel({ owner, repo, name, color, description }); }
             }
-
             await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
             await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
-
-            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-            const title = 'GRM Intake 운영 경고';
-            const lines = [
-              `GRM Intake scheduled run에서 warning이 감지되었습니다.`,
-              '',
-              `- Run: ${runUrl}`,
-              `- Run date (KST): ${health.run_date_kst || 'unknown'}`,
-              `- Health status: ${health?.health?.status || 'warning'}`,
-              '',
-              '경고:',
-              ...warnings.map((item) => `- [${item.code}] ${item.source}: ${item.message}${item.detail ? ` — ${item.detail}` : ''}`),
-            ];
-            const body = lines.join('\n');
-
             const { data: issues } = await github.rest.issues.listForRepo({
-              owner,
-              repo,
-              state: 'open',
-              labels: 'automation-warning',
-              per_page: 100,
+              owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
             });
             const existing = issues.find((issue) => issue.title === title);
-            if (existing) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: existing.number,
-                body,
-              });
+            // 경고 구성 서명 = 정렬된 고유 code 집합 (휘발성 필드 제외 → 지속 차단 시 고정)
+            const sig = [...new Set(warnings.map((w) => w.code))].sort().join('|');
+            const SIG_RE = /<!--\s*grm-warn-sig:\s*(.*?)\s*-->/;
+            const prevSig = existing ? ((existing.body || '').match(SIG_RE)?.[1] ?? null) : null;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            function buildBody() {
+              return [
+                'GRM Intake 운영 경고 현황 — **이 본문은 매 scheduled run 마다 자동 갱신**되며, **알림(코멘트)은 경고 구성이 바뀔 때만** 발송됩니다.',
+                '',
+                `- 최신 Run: ${runUrl}`,
+                `- 최신 Run date (KST): ${health.run_date_kst || 'unknown'}`,
+                `- Health status: ${health?.health?.status || 'warning'}`,
+                '',
+                warnings.length ? '현재 경고:' : '현재 경고 없음.',
+                ...warnings.map((w) => `- [${w.code}] ${w.source}: ${w.message}${w.detail ? ` — ${w.detail}` : ''}`),
+                '',
+                `<!-- grm-warn-sig: ${sig} -->`,
+              ].join('\n');
+            }
+            // (A) 경고 0 → 해소 처리(직전에 경고가 있던 이슈만 1회 코멘트 후 close)
+            if (!warnings.length) {
+              if (existing && prevSig !== null) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: '✅ 최신 scheduled run 에서 경고가 모두 해소되었습니다. 이슈를 닫습니다.' });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+              console.log('no warnings; nothing to alert');
               return;
             }
-
-            await github.rest.issues.create({
-              owner,
-              repo,
-              title,
-              body,
-              labels: ['grm-intake', 'automation-warning'],
-            });
+            // (B) 최초 발생 → 이슈 생성(=1회 알림)
+            if (!existing) {
+              await github.rest.issues.create({ owner, repo, title, body: buildBody(),
+                labels: ['grm-intake', 'automation-warning'] });
+              console.log('created warning issue');
+              return;
+            }
+            // (C) 기존 이슈 → 본문 silent 갱신(편집=알림 없음)
+            await github.rest.issues.update({ owner, repo, issue_number: existing.number, body: buildBody() });
+            // (D) 서명이 바뀐 경우에만 코멘트(=알림)
+            if (prevSig !== sig) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                body: `⚠️ 경고 구성 변경: \`${prevSig ?? '없음'}\` → \`${sig}\`\n\n${buildBody()}` });
+              console.log(`signature changed (${prevSig} -> ${sig}); commented`);
+            } else {
+              console.log(`signature unchanged (${sig}); body updated silently, no comment`);
+            }

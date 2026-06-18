@@ -85,6 +85,59 @@ class WlExtractExcerptTest(unittest.TestCase):
         html = "<p>During our inspection " + ("x" * (ci.WL_BODY_MAX_CHARS + 500)) + "</p>"
         self.assertLessEqual(len(ci._extract_wl_body_excerpt(html)), ci.WL_BODY_MAX_CHARS)
 
+    # 2-tier 선별(2026-06-18): 위반 서술 1차 앵커가 일반 머리말보다 앞서 선택돼야 한다.
+    def test_primary_anchor_beats_earlier_generic_cgmp(self) -> None:
+        html = (
+            "<body><p>WARNING LETTER</p>"
+            "<p>This warning letter summarizes significant violations of Current Good "
+            "Manufacturing Practice (CGMP) regulations. Your drug products are adulterated.</p>"
+            "<p>During our inspection, our investigators observed specific violations "
+            "including, but not limited to, the following. 1. Your firm failed to establish "
+            "adequate written procedures (21 CFR 211.100(a)).</p></body>"
+        )
+        ex = ci._extract_wl_body_excerpt(html)
+        self.assertTrue(ex.startswith("During our inspection"))   # 1차 앵커 우선
+        self.assertNotIn("This warning letter", ex)               # 일반 머리말 절단
+        self.assertIn("21 CFR 211.100(a)", ex)
+
+    def test_primary_anchor_records_review_phrasing(self) -> None:
+        # 704(a)(4) 기록검토형(Sante 류): "significant violations were observed including"
+        html = (
+            "<body><p>This warning letter summarizes significant violations of CGMP. "
+            "Your drug products are adulterated.</p>"
+            "<p>Following review of records, significant violations were observed "
+            "including, but not limited to, the following: 1. Your firm failed to conduct "
+            "at least one test to verify the identity of each component "
+            "(21 CFR 211.84(d)(1)).</p></body>"
+        )
+        ex = ci._extract_wl_body_excerpt(html)
+        self.assertTrue(ex.startswith("significant violations were observed including"))
+        self.assertIn("211.84(d)(1)", ex)
+
+    def test_primary_anchor_telehealth_phrasing(self) -> None:
+        # 웹사이트 검토형(Telehealth): "FDA observed that ..."
+        html = (
+            "<body><p>This warning letter advises you of significant violations identified "
+            "during a U.S. FDA review of your website. The violations cited are not "
+            "all-inclusive.</p>"
+            "<p>FDA observed that your website offers compounded drug products, including "
+            "semaglutide products, with false or misleading claims under sections 502(a) "
+            "and 502(bb).</p></body>"
+        )
+        ex = ci._extract_wl_body_excerpt(html)
+        self.assertTrue(ex.startswith("FDA observed that"))
+        self.assertIn("semaglutide", ex)
+
+    def test_falls_back_to_generic_when_no_primary(self) -> None:
+        # 1차 앵커 부재 시 종전 동작(일반 머리말 폴백) 보존 — 빈 결과로 퇴행 금지.
+        html = (
+            "<body><p>This warning letter summarizes significant violations of CGMP "
+            "regulations. Your products are adulterated within the meaning of the Act.</p></body>"
+        )
+        ex = ci._extract_wl_body_excerpt(html)
+        self.assertTrue(ex.startswith("This warning letter"))
+        self.assertGreater(len(ex), 0)
+
 
 class WlFetchExcerptTest(unittest.TestCase):
     def test_fetch_success_returns_excerpt(self) -> None:

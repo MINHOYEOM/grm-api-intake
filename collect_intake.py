@@ -189,18 +189,29 @@ FDA_WL_SEARCH_API = (
 # in-window WL 은 부서 게이트 후 소수(주 한 줌) → fetch 부담 낮음. 실패는 graceful(키 미기록).
 WL_BODY_MAX_CHARS = 1500
 WL_BODY_FETCH_TIMEOUT = 20
-# 표지/머리말을 건너뛰고 위반 서술 단락부터 잘라내기 위한 영문 앵커(가장 이른 위치 우선).
-# 대소문자 무시(re.I) — 본문은 "During our inspection" 처럼 문장 첫 글자가 대문자.
-_WL_BODY_ANCHORS = (
+# 표지/머리말 보일러플레이트를 건너뛰고 위반 서술부터 자르기 위한 영문 앵커. 대소문자 무시(re.I).
+# 2-tier 선별(2026-06-18): 위반 서술을 직접 가리키는 1차 앵커가 본문에 있으면 그 가장 이른
+# 위치를 쓰고, 없을 때만 일반 머리말 폴백 앵커로 내려간다. (종전엔 전 앵커 통합 최이른 위치라
+# "this warning letter/violations/cgmp/adulterated" 같은 일반어가 요약 머리말에서 먼저 걸려
+# excerpt 앞부분이 보일러플레이트로 시작하던 문제 교정 — CGMP/기록검토/Telehealth 본문 모두.)
+_WL_BODY_ANCHORS_PRIMARY = (
     r"during\s+(?:our|an|the)\s+inspection",
+    r"(?:significant|specific)\s+violations\s+were\s+observed\s+including",
+    r"observed\s+(?:specific\s+)?violations\s+including",
     r"we\s+(?:found|observed)\s+that",
+    r"fda\s+observed\s+that",
+    r"fda\s+review\s+violations",
+    r"specifically,",
+)
+_WL_BODY_ANCHORS_FALLBACK = (
     r"this\s+warning\s+letter",
     r"\bviolations?\b",
     r"current\s+good\s+manufacturing\s+practice",
     r"\bcgmp\b",
     r"\badulterated\b",
-    r"specifically,",
 )
+# 하위호환: 통합 앵커 집합도 노출(외부 참조 안전망). 추출 선별은 PRIMARY→FALLBACK 순.
+_WL_BODY_ANCHORS = _WL_BODY_ANCHORS_PRIMARY + _WL_BODY_ANCHORS_FALLBACK
 
 # 13 개 카테고리 휴리스틱 키워드 (lowercase 비교, 단어 경계 매칭)
 # 주의: 단독 약어("csv", "oos" 등)는 \b 경계 매칭으로 오탐 방지됨
@@ -1929,8 +1940,19 @@ def _wl_html_to_text(html_text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _earliest_anchor(text: str, patterns: tuple[str, ...]) -> int | None:
+    """patterns 중 text 에서 가장 이른 매치 시작 위치. 없으면 None (re.I)."""
+    best: int | None = None
+    for pat in patterns:
+        m = re.search(pat, text, re.I)
+        if m and (best is None or m.start() < best):
+            best = m.start()
+    return best
+
+
 def _extract_wl_body_excerpt(html_text: str) -> str:
-    """WL 본문에서 위반 서술 구간 excerpt(가장 이른 앵커부터). 앵커 없으면 ""(키 미기록).
+    """WL 본문 위반 서술 구간 excerpt. 1차 앵커(위반 서술 직접 지시)가 있으면 그 가장 이른
+    위치, 없으면 폴백 앵커(일반 머리말), 둘 다 없으면 ""(키 미기록·목록 메타 카드 유지).
 
     표지/머리말 보일러플레이트가 아니라 위반 서술을 카드 컨텍스트("왜")로 올리기 위한 추출.
     FDA 페이지는 nav/푸터가 많아 앵커 미발견 시 앞부분 폴백을 하지 않고 메타 카드를 유지한다.
@@ -1938,14 +1960,12 @@ def _extract_wl_body_excerpt(html_text: str) -> str:
     text = _wl_html_to_text(html_text)
     if not text:
         return ""
-    best: int | None = None
-    for pat in _WL_BODY_ANCHORS:
-        m = re.search(pat, text, re.I)
-        if m and (best is None or m.start() < best):
-            best = m.start()
-    if best is None:
+    start = _earliest_anchor(text, _WL_BODY_ANCHORS_PRIMARY)
+    if start is None:
+        start = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
+    if start is None:
         return ""
-    return text[best:best + WL_BODY_MAX_CHARS].strip()
+    return text[start:start + WL_BODY_MAX_CHARS].strip()
 
 
 # WHY-1 #2 P1: WL 본문 excerpt 관측용 — collect_who.LAST_HEALTH 동형 패턴.

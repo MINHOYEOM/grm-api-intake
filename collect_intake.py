@@ -588,6 +588,12 @@ class CollectionStats:
     mfds_insert_failed: int = 0
     mfds_error: bool = False
     mfds_error_msg: str = ""
+    mfds_law_fetched: int = 0
+    mfds_law_inserted: int = 0
+    mfds_law_skipped_dup: int = 0
+    mfds_law_insert_failed: int = 0
+    mfds_law_error: bool = False
+    mfds_law_error_msg: str = ""
     # ── Phase 2c: MFDS Recall / Self-Check ────────────────────────────────
     mfds_recall_fetched: int = 0
     mfds_recall_inserted: int = 0
@@ -601,6 +607,18 @@ class CollectionStats:
     mfds_admin_insert_failed: int = 0
     mfds_admin_error: bool = False
     mfds_admin_error_msg: str = ""
+    mfds_gmp_cert_fetched: int = 0
+    mfds_gmp_cert_inserted: int = 0
+    mfds_gmp_cert_skipped_dup: int = 0
+    mfds_gmp_cert_insert_failed: int = 0
+    mfds_gmp_cert_error: bool = False
+    mfds_gmp_cert_error_msg: str = ""
+    mfds_safety_letter_fetched: int = 0
+    mfds_safety_letter_inserted: int = 0
+    mfds_safety_letter_skipped_dup: int = 0
+    mfds_safety_letter_insert_failed: int = 0
+    mfds_safety_letter_error: bool = False
+    mfds_safety_letter_error_msg: str = ""
     mfds_gmp_inspection_fetched: int = 0
     mfds_gmp_inspection_inserted: int = 0
     mfds_gmp_inspection_skipped_dup: int = 0
@@ -658,8 +676,10 @@ class CollectionStats:
             + self.ema_insert_failed + self.mhra_insert_failed
             + self.pics_insert_failed + self.eca_insert_failed
             + self.wl_insert_failed + self.search_insert_failed
-            + self.mfds_insert_failed + self.mfds_recall_insert_failed
-            + self.mfds_admin_insert_failed
+            + self.mfds_insert_failed + self.mfds_law_insert_failed
+            + self.mfds_recall_insert_failed
+            + self.mfds_admin_insert_failed + self.mfds_gmp_cert_insert_failed
+            + self.mfds_safety_letter_insert_failed
             + self.mfds_gmp_inspection_insert_failed
             + self.ich_insert_failed
             + self.who_insert_failed
@@ -681,8 +701,11 @@ class CollectionStats:
             or self.wl_error
             or self.search_error   # Phase 2a 신규 — misconfiguration 포함
             or self.mfds_error
+            or self.mfds_law_error
             or self.mfds_recall_error
             or self.mfds_admin_error
+            or self.mfds_gmp_cert_error
+            or self.mfds_safety_letter_error
             or self.mfds_gmp_inspection_error
             or self.ich_error
             or self.who_error
@@ -721,12 +744,23 @@ class CollectionStats:
             f"MFDS fetched={self.mfds_fetched}  inserted={self.mfds_inserted}  "
             f"skip_dup={self.mfds_skipped_dup}  failed={self.mfds_insert_failed}  "
             f"error={self.mfds_error}",
+            f"MFL  fetched={self.mfds_law_fetched}  inserted={self.mfds_law_inserted}  "
+            f"skip_dup={self.mfds_law_skipped_dup}  failed={self.mfds_law_insert_failed}  "
+            f"error={self.mfds_law_error}",
             f"MFR  fetched={self.mfds_recall_fetched}  inserted={self.mfds_recall_inserted}  "
             f"skip_dup={self.mfds_recall_skipped_dup}  failed={self.mfds_recall_insert_failed}  "
             f"error={self.mfds_recall_error}",
             f"MFA  fetched={self.mfds_admin_fetched}  inserted={self.mfds_admin_inserted}  "
             f"skip_dup={self.mfds_admin_skipped_dup}  failed={self.mfds_admin_insert_failed}  "
             f"error={self.mfds_admin_error}",
+            f"MFC  fetched={self.mfds_gmp_cert_fetched}  inserted={self.mfds_gmp_cert_inserted}  "
+            f"skip_dup={self.mfds_gmp_cert_skipped_dup}  failed={self.mfds_gmp_cert_insert_failed}  "
+            f"error={self.mfds_gmp_cert_error}",
+            f"MFS  fetched={self.mfds_safety_letter_fetched}  "
+            f"inserted={self.mfds_safety_letter_inserted}  "
+            f"skip_dup={self.mfds_safety_letter_skipped_dup}  "
+            f"failed={self.mfds_safety_letter_insert_failed}  "
+            f"error={self.mfds_safety_letter_error}",
             f"MFG  fetched={self.mfds_gmp_inspection_fetched}  "
             f"inserted={self.mfds_gmp_inspection_inserted}  "
             f"skip_dup={self.mfds_gmp_inspection_skipped_dup}  "
@@ -820,7 +854,13 @@ _TRANSIENT_ERROR_MARKERS = [
     "service unavailable", "gateway timeout",
 ]
 _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
-_MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {"mfds-recall", "mfds-admin"}
+_MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {
+    "mfds-recall",
+    "mfds-admin",
+    "mfds-law",
+    "mfds-gmp-cert",
+    "mfds-safety-letter",
+}
 # ICH/WHO/HC 도 외부 공개 endpoint(admin.ich.org · extranet.who.int · recalls-rappels.canada.ca
 # 정적 JSON)라 GitHub-hosted IP 간헐 차단·timeout·5xx 가 발생한다. 네트워크성 일시 오류는 MFDS
 # 공개 endpoint 와 동일하게 warning(exit 0)으로 강등 — 설정·구조 오류는 마커 미포함이라 여전히
@@ -3754,6 +3794,16 @@ def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
             "error_msg": stats.mfds_error_msg,
         },
         {
+            "key": "mfds_law",
+            "label": "MFDS Law/Admrul",
+            "fetched": stats.mfds_law_fetched,
+            "inserted": stats.mfds_law_inserted,
+            "skip_dup": stats.mfds_law_skipped_dup,
+            "failed": stats.mfds_law_insert_failed,
+            "error": stats.mfds_law_error,
+            "error_msg": stats.mfds_law_error_msg,
+        },
+        {
             "key": "mfds_recall",
             "label": "MFDS Recall",
             "fetched": stats.mfds_recall_fetched,
@@ -3772,6 +3822,26 @@ def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
             "failed": stats.mfds_admin_insert_failed,
             "error": stats.mfds_admin_error,
             "error_msg": stats.mfds_admin_error_msg,
+        },
+        {
+            "key": "mfds_gmp_cert",
+            "label": "MFDS GMP Certificate",
+            "fetched": stats.mfds_gmp_cert_fetched,
+            "inserted": stats.mfds_gmp_cert_inserted,
+            "skip_dup": stats.mfds_gmp_cert_skipped_dup,
+            "failed": stats.mfds_gmp_cert_insert_failed,
+            "error": stats.mfds_gmp_cert_error,
+            "error_msg": stats.mfds_gmp_cert_error_msg,
+        },
+        {
+            "key": "mfds_safety_letter",
+            "label": "MFDS Safety Letter",
+            "fetched": stats.mfds_safety_letter_fetched,
+            "inserted": stats.mfds_safety_letter_inserted,
+            "skip_dup": stats.mfds_safety_letter_skipped_dup,
+            "failed": stats.mfds_safety_letter_insert_failed,
+            "error": stats.mfds_safety_letter_error,
+            "error_msg": stats.mfds_safety_letter_error_msg,
         },
         {
             "key": "mfds_gmp_inspection",
@@ -3846,8 +3916,11 @@ def _evaluate_health(
     active: set[str],
     enable_search: bool,
     enable_mfds: bool,
+    enable_mfds_law: bool,
     enable_mfds_recall: bool,
     enable_mfds_admin: bool,
+    enable_mfds_gmp_cert: bool,
+    enable_mfds_safety_letter: bool,
     enable_mfds_gmp_inspection: bool,
     enable_ich: bool,
     enable_who: bool,
@@ -3927,8 +4000,11 @@ def _evaluate_health(
         emit_routine_handoff and handoff_emitted and
         (not active or active == {"mfds"}) and not any([
             enable_mfds,
+            enable_mfds_law,
             enable_mfds_recall,
             enable_mfds_admin,
+            enable_mfds_gmp_cert,
+            enable_mfds_safety_letter,
             enable_mfds_gmp_inspection,
             enable_ich,
             enable_who,
@@ -3958,8 +4034,21 @@ def _evaluate_health(
         enabled_source_failures = [
             (enable_search and stats.search_error, "brave-search", "Brave Search", stats.search_error_msg),
             (enable_mfds and stats.mfds_error, "mfds-rss", "MFDS RSS", stats.mfds_error_msg),
+            (enable_mfds_law and stats.mfds_law_error, "mfds-law", "MFDS Law/Admrul", stats.mfds_law_error_msg),
             (enable_mfds_recall and stats.mfds_recall_error, "mfds-recall", "MFDS Recall", stats.mfds_recall_error_msg),
             (enable_mfds_admin and stats.mfds_admin_error, "mfds-admin", "MFDS Admin", stats.mfds_admin_error_msg),
+            (
+                enable_mfds_gmp_cert and stats.mfds_gmp_cert_error,
+                "mfds-gmp-cert",
+                "MFDS GMP Certificate",
+                stats.mfds_gmp_cert_error_msg,
+            ),
+            (
+                enable_mfds_safety_letter and stats.mfds_safety_letter_error,
+                "mfds-safety-letter",
+                "MFDS Safety Letter",
+                stats.mfds_safety_letter_error_msg,
+            ),
             (
                 enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error,
                 "mfds-gmp-inspection",
@@ -3980,8 +4069,23 @@ def _evaluate_health(
                 ("eca" in active, "eca", "ECA Academy RSS", stats.eca_error, stats.eca_error_msg),
                 ("wl" in active, "wl", "FDA Warning Letters", stats.wl_error, stats.wl_error_msg),
                 (enable_mfds, "mfds-rss", "MFDS RSS", stats.mfds_error, stats.mfds_error_msg),
+                (enable_mfds_law, "mfds-law", "MFDS Law/Admrul", stats.mfds_law_error, stats.mfds_law_error_msg),
                 (enable_mfds_recall, "mfds-recall", "MFDS Recall", stats.mfds_recall_error, stats.mfds_recall_error_msg),
                 (enable_mfds_admin, "mfds-admin", "MFDS Admin", stats.mfds_admin_error, stats.mfds_admin_error_msg),
+                (
+                    enable_mfds_gmp_cert,
+                    "mfds-gmp-cert",
+                    "MFDS GMP Certificate",
+                    stats.mfds_gmp_cert_error,
+                    stats.mfds_gmp_cert_error_msg,
+                ),
+                (
+                    enable_mfds_safety_letter,
+                    "mfds-safety-letter",
+                    "MFDS Safety Letter",
+                    stats.mfds_safety_letter_error,
+                    stats.mfds_safety_letter_error_msg,
+                ),
                 (
                     enable_mfds_gmp_inspection,
                     "mfds-gmp-inspection",
@@ -4233,10 +4337,14 @@ def main() -> int:
     openfda_key = os.environ.get("OPENFDA_API_KEY", "").strip() or None
     data_go_kr_key = os.environ.get("DATA_GO_KR_KEY", "").strip()
     data_go_kr_service_key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
+    law_go_kr_oc = os.environ.get("LAW_GO_KR_OC", "").strip()
     enable_search = os.environ.get("ENABLE_SEARCH", "false").lower() == "true"
     enable_mfds = os.environ.get("ENABLE_MFDS", "false").lower() == "true"
+    enable_mfds_law = os.environ.get("ENABLE_MFDS_LAW", "false").lower() == "true"
     enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
     enable_mfds_admin = os.environ.get("ENABLE_MFDS_ADMIN", "false").lower() == "true"
+    enable_mfds_gmp_cert = os.environ.get("ENABLE_MFDS_GMP_CERT", "false").lower() == "true"
+    enable_mfds_safety_letter = os.environ.get("ENABLE_MFDS_SAFETY_LETTER", "false").lower() == "true"
     enable_mfds_gmp_inspection = os.environ.get("ENABLE_MFDS_GMP_INSPECTION", "false").lower() == "true"
     enable_ich = (os.environ.get("ENABLE_ICH", "false").lower() == "true"
                   or "ich" in active)
@@ -4405,6 +4513,28 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_MFDS=false — MFDS 수집 건너뜀")
 
+    # ── MFDS law/admrul official API replacements (ENABLE_MFDS_LAW=true) ─────
+    mfds_law_items: list[IntakeItem] = []
+    if enable_mfds_law:
+        log("INFO", "=== MFDS 법제처 행정규칙·법령 API 수집 시작 ===")
+        if not data_go_kr_service_key:
+            mfds_law_err = "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
+            mfds_law_items = []
+        else:
+            try:
+                from collect_mfds_law import collect_mfds_law
+                mfds_law_items, mfds_law_err = collect_mfds_law(
+                    start, end, data_go_kr_service_key, law_go_kr_oc=law_go_kr_oc)
+            except Exception as e:
+                mfds_law_items, mfds_law_err = [], str(e)
+        stats.mfds_law_fetched = len(mfds_law_items)
+        if mfds_law_err:
+            stats.mfds_law_error = True
+            stats.mfds_law_error_msg = mfds_law_err
+            log("WARN", f"MFDS Law 오류: {mfds_law_err}")
+    else:
+        log("INFO", "ENABLE_MFDS_LAW=false — MFDS 법제처 행정규칙·법령 API 수집 건너뜀")
+
     # ── Phase 2c: MFDS Recall / Self-Check (ENABLE_MFDS_RECALL=true 시 실행) ─
     mfds_recall_items: list[IntakeItem] = []
     if enable_mfds_recall:
@@ -4450,6 +4580,50 @@ def main() -> int:
             log("WARN", f"MFDS Admin 오류: {mfds_admin_err}")
     else:
         log("INFO", "ENABLE_MFDS_ADMIN=false — MFDS 행정처분 수집 건너뜀")
+
+    # ── MFDS GMP Certificate Status (ENABLE_MFDS_GMP_CERT=true 시 실행) ─────
+    mfds_gmp_cert_items: list[IntakeItem] = []
+    if enable_mfds_gmp_cert:
+        log("INFO", "=== MFDS GMP 적합판정서 발급현황 수집 시작 ===")
+        if not data_go_kr_service_key:
+            mfds_gmp_cert_err = "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
+            mfds_gmp_cert_items = []
+        else:
+            try:
+                from collect_mfds_gmp_cert import collect_mfds_gmp_certs
+                mfds_gmp_cert_items, mfds_gmp_cert_err = collect_mfds_gmp_certs(
+                    start, end, data_go_kr_service_key)
+            except Exception as e:
+                mfds_gmp_cert_items, mfds_gmp_cert_err = [], str(e)
+        stats.mfds_gmp_cert_fetched = len(mfds_gmp_cert_items)
+        if mfds_gmp_cert_err:
+            stats.mfds_gmp_cert_error = True
+            stats.mfds_gmp_cert_error_msg = mfds_gmp_cert_err
+            log("WARN", f"MFDS GMP Certificate 오류: {mfds_gmp_cert_err}")
+    else:
+        log("INFO", "ENABLE_MFDS_GMP_CERT=false — MFDS GMP 적합판정서 수집 건너뜀")
+
+    # ── MFDS Safety Letter API (ENABLE_MFDS_SAFETY_LETTER=true 시 실행) ─────
+    mfds_safety_letter_items: list[IntakeItem] = []
+    if enable_mfds_safety_letter:
+        log("INFO", "=== MFDS 안전성서한 API 수집 시작 ===")
+        if not data_go_kr_service_key:
+            mfds_safety_letter_err = "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
+            mfds_safety_letter_items = []
+        else:
+            try:
+                from collect_mfds_safety_letter import collect_mfds_safety_letters
+                mfds_safety_letter_items, mfds_safety_letter_err = collect_mfds_safety_letters(
+                    start, end, data_go_kr_service_key)
+            except Exception as e:
+                mfds_safety_letter_items, mfds_safety_letter_err = [], str(e)
+        stats.mfds_safety_letter_fetched = len(mfds_safety_letter_items)
+        if mfds_safety_letter_err:
+            stats.mfds_safety_letter_error = True
+            stats.mfds_safety_letter_error_msg = mfds_safety_letter_err
+            log("WARN", f"MFDS Safety Letter 오류: {mfds_safety_letter_err}")
+    else:
+        log("INFO", "ENABLE_MFDS_SAFETY_LETTER=false — MFDS 안전성서한 API 수집 건너뜀")
 
     # ── Phase 2d: MFDS GMP Inspection Results (ENABLE_MFDS_GMP_INSPECTION=true 시 실행) ─
     mfds_gmp_inspection_items: list[IntakeItem] = []
@@ -4563,8 +4737,10 @@ def main() -> int:
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
-                     + stats.mfds_fetched + stats.mfds_recall_fetched
-                     + stats.mfds_admin_fetched
+                     + stats.mfds_fetched + stats.mfds_law_fetched
+                     + stats.mfds_recall_fetched
+                     + stats.mfds_admin_fetched + stats.mfds_gmp_cert_fetched
+                     + stats.mfds_safety_letter_fetched
                      + stats.mfds_gmp_inspection_fetched
                      + stats.ich_fetched
                      + stats.who_fetched
@@ -4575,8 +4751,11 @@ def main() -> int:
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
         f"PICS={stats.pics_fetched} · ECA={stats.eca_fetched} · "
         f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
+        f"MFDS-Law={stats.mfds_law_fetched} · "
         f"MFDS-Recall={stats.mfds_recall_fetched} · "
         f"MFDS-Admin={stats.mfds_admin_fetched} · "
+        f"MFDS-GMPCert={stats.mfds_gmp_cert_fetched} · "
+        f"MFDS-SafetyLetter={stats.mfds_safety_letter_fetched} · "
         f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · "
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
         f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
@@ -4678,6 +4857,13 @@ def main() -> int:
     stats.mfds_skipped_dup = mfds_sk
     stats.mfds_insert_failed = mfds_fail
 
+    mfds_law_in, mfds_law_sk, mfds_law_fail = insert_items(
+        notion_token, notion_db, mfds_law_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.mfds_law_inserted = mfds_law_in
+    stats.mfds_law_skipped_dup = mfds_law_sk
+    stats.mfds_law_insert_failed = mfds_law_fail
+
     mfds_rec_in, mfds_rec_sk, mfds_rec_fail = insert_items(
         notion_token, notion_db, mfds_recall_items,
         run_date, collected_at, existing, args.dry_run)
@@ -4691,6 +4877,20 @@ def main() -> int:
     stats.mfds_admin_inserted = mfds_admin_in
     stats.mfds_admin_skipped_dup = mfds_admin_sk
     stats.mfds_admin_insert_failed = mfds_admin_fail
+
+    mfds_gmp_cert_in, mfds_gmp_cert_sk, mfds_gmp_cert_fail = insert_items(
+        notion_token, notion_db, mfds_gmp_cert_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.mfds_gmp_cert_inserted = mfds_gmp_cert_in
+    stats.mfds_gmp_cert_skipped_dup = mfds_gmp_cert_sk
+    stats.mfds_gmp_cert_insert_failed = mfds_gmp_cert_fail
+
+    mfds_safety_letter_in, mfds_safety_letter_sk, mfds_safety_letter_fail = insert_items(
+        notion_token, notion_db, mfds_safety_letter_items,
+        run_date, collected_at, existing, args.dry_run)
+    stats.mfds_safety_letter_inserted = mfds_safety_letter_in
+    stats.mfds_safety_letter_skipped_dup = mfds_safety_letter_sk
+    stats.mfds_safety_letter_insert_failed = mfds_safety_letter_fail
 
     mfds_gmp_insp_in, mfds_gmp_insp_sk, mfds_gmp_insp_fail = insert_items(
         notion_token, notion_db, mfds_gmp_inspection_items,
@@ -4783,7 +4983,8 @@ def main() -> int:
                 # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
                 inmemory_raw = build_inmemory_raw(
                     fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
-                    wl_items, mfds_items, mfds_recall_items, mfds_admin_items,
+                    wl_items, mfds_items, mfds_law_items, mfds_recall_items,
+                    mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
                     mfds_gmp_inspection_items, ich_items, who_items, hc_items,
                     fda483_items, search_items)
                 handoff_row_count, handoff_url = emit_routine_handoff(
@@ -4820,8 +5021,11 @@ def main() -> int:
     flags = {
         "ENABLE_SEARCH": enable_search,
         "ENABLE_MFDS": enable_mfds,
+        "ENABLE_MFDS_LAW": enable_mfds_law,
         "ENABLE_MFDS_RECALL": enable_mfds_recall,
         "ENABLE_MFDS_ADMIN": enable_mfds_admin,
+        "ENABLE_MFDS_GMP_CERT": enable_mfds_gmp_cert,
+        "ENABLE_MFDS_SAFETY_LETTER": enable_mfds_safety_letter,
         "ENABLE_MFDS_GMP_INSPECTION": enable_mfds_gmp_inspection,
         "ENABLE_ICH": enable_ich,
         "ENABLE_WHO": enable_who,
@@ -4835,6 +5039,8 @@ def main() -> int:
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_REQUESTED": handoff_idem_requested,
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_EFFECTIVE": handoff_idem_effective,
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
+        "MFDS_HTTP_PROXY_CONFIGURED": bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
+        "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
     }
     health = _evaluate_health(
         modality_preflight_disabled=modality_preflight_disabled,
@@ -4844,8 +5050,11 @@ def main() -> int:
         active=active,
         enable_search=enable_search,
         enable_mfds=enable_mfds,
+        enable_mfds_law=enable_mfds_law,
         enable_mfds_recall=enable_mfds_recall,
         enable_mfds_admin=enable_mfds_admin,
+        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+        enable_mfds_safety_letter=enable_mfds_safety_letter,
         enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
         enable_ich=enable_ich,
         enable_who=enable_who,

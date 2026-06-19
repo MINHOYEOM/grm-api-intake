@@ -53,6 +53,8 @@ DATA_GO_KR_SERVICE_KEY='data_go_kr_service_key_here' \
 OPENFDA_API_KEY='optional_openfda_key_here' \
 BRAVE_API_KEY='optional_brave_key_here' \
 DATA_GO_KR_KEY='optional_moleg_key_here' \
+LAW_GO_KR_OC='optional_law_go_kr_oc_here' \
+MFDS_HTTP_PROXY='optional_kr_proxy_url_here' \
 REPO_NAME='grm-api-intake' \
 bash setup.sh
 ```
@@ -66,6 +68,8 @@ $env:DATA_GO_KR_SERVICE_KEY = 'data_go_kr_service_key_here'
 $env:OPENFDA_API_KEY = 'optional_openfda_key_here'
 $env:BRAVE_API_KEY = 'optional_brave_key_here'
 $env:DATA_GO_KR_KEY = 'optional_moleg_key_here'
+$env:LAW_GO_KR_OC = 'optional_law_go_kr_oc_here'
+$env:MFDS_HTTP_PROXY = 'optional_kr_proxy_url_here'
 .\setup.ps1 -RepoName 'grm-api-intake' -Visibility 'public'
 ```
 
@@ -79,12 +83,14 @@ $env:DATA_GO_KR_KEY = 'optional_moleg_key_here'
 | 공개/비공개 | `public` | 필수 | 저장소 공개 범위 |
 | Notion Database ID | `7784c71fb7b343749b2bee5d04db7926` | 필수 | `GRM API Intake` DB ID |
 | `NOTION_TOKEN` | 없음 | 필수 | Notion Integration token |
-| `DATA_GO_KR_SERVICE_KEY` | 없음 | 필수 | MFDS 회수/행정처분 API용 data.go.kr service key |
+| `DATA_GO_KR_SERVICE_KEY` | 없음 | 필수 | data.go.kr service key(MFDS 회수/행정처분/GMP 적합판정/안전성서한, 법제처 국가법령정보) |
 | `OPENFDA_API_KEY` | 없음 | 선택 | OpenFDA rate limit 완화용 |
 | `BRAVE_API_KEY` | 없음 | 선택 | `ENABLE_SEARCH=true` 때만 사용 |
 | `DATA_GO_KR_KEY` | 없음 | 선택 | `ENABLE_MOLEG_API=true` 때만 사용 |
+| `LAW_GO_KR_OC` | 없음 | 선택 | `ENABLE_MFDS_LAW=true` 때 law.go.kr 고시/행정규칙 본문 enrich |
+| `MFDS_HTTP_PROXY` | 없음 | 선택 | MFDS/nedrug/law.go.kr 요청만 KR egress 프록시 경유 |
 
-현재 예약 workflow는 `ENABLE_MFDS_RECALL`, `ENABLE_MFDS_ADMIN`, `ENABLE_MFDS_GMP_INSPECTION` 기본값이 `true`입니다. 따라서 기본 운영 기준에서는 `DATA_GO_KR_SERVICE_KEY`가 필수입니다.
+현재 예약 workflow는 `ENABLE_MFDS_RECALL`, `ENABLE_MFDS_ADMIN`, `ENABLE_MFDS_GMP_INSPECTION` 기본값이 `true`입니다. `ENABLE_MFDS_LAW`, `ENABLE_MFDS_GMP_CERT`, `ENABLE_MFDS_SAFETY_LETTER`는 기본 off이며 키 보유 dry-run 후 opt-in합니다. KR-egress 잔여 3종은 `MFDS_HTTP_PROXY`와 Repository Variables `MFDS_RSS_BOARD_MODE=residual`(또는 `MFDS_RSS_BOARD_IDS`) 설정 후 `probe_mfds_egress.py`로 도달성을 먼저 확인합니다.
 
 마지막 요약 화면에서 `y` 입력 시에만 실제 저장소 생성, push, secret 등록이 진행됩니다.
 
@@ -120,6 +126,8 @@ $env:DATA_GO_KR_KEY = 'optional_moleg_key_here'
 - `OPENFDA_API_KEY`
 - `BRAVE_API_KEY`
 - `DATA_GO_KR_KEY`
+- `LAW_GO_KR_OC`
+- `MFDS_HTTP_PROXY`
 
 Actions 페이지에서 수동 검증:
 

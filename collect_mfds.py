@@ -27,6 +27,7 @@ ENABLE_MFDS=true 일 때 collect_intake.main() 에서 호출된다.
 
 from __future__ import annotations
 
+import os
 import re
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -81,6 +82,8 @@ MFDS_RSS_BOARDS: list[tuple[str, str]] = [
     ("data0005", TYPE_NOTICE_FINAL),         # 고시전문
     ("seohan001", TYPE_SAFETY_LETTER),       # 안전성 서한 (watch)
 ]
+_MFDS_RSS_BOARD_MAP = dict(MFDS_RSS_BOARDS)
+_MFDS_RSS_RESIDUAL_BOARD_IDS = {"data0013", "data0011", "data0010"}
 # 입법예고 RSS 보드 (ogLmPp fallback이 사용)
 LEGISLATIVE_RSS_BRDID = "data0009"
 
@@ -441,6 +444,44 @@ def _collect_rss_feed(type_or_class: str, brd_id: str,
     return items
 
 
+def _configured_rss_boards() -> list[tuple[str, str]]:
+    """Return MFDS RSS boards after optional residual-only selection.
+
+    Defaults to all boards for no-regression. For KR-egress runs where data.go.kr
+    APIs are the source of truth, set ``MFDS_RSS_BOARD_MODE=residual`` to fetch
+    only guidance/internal-guidance boards. Use ``MFDS_RSS_BOARD_IDS`` for an
+    explicit comma/space separated board allowlist.
+    """
+    raw_ids = os.environ.get("MFDS_RSS_BOARD_IDS", "").strip()
+    if raw_ids:
+        selected: list[tuple[str, str]] = []
+        invalid: list[str] = []
+        for brd_id in re.split(r"[\s,]+", raw_ids):
+            if not brd_id:
+                continue
+            type_or_class = _MFDS_RSS_BOARD_MAP.get(brd_id)
+            if type_or_class:
+                selected.append((brd_id, type_or_class))
+            else:
+                invalid.append(brd_id)
+        if invalid:
+            log("WARN", f"MFDS_RSS_BOARD_IDS 무시된 보드: {', '.join(invalid)}")
+        if selected:
+            return selected
+        log("WARN", "MFDS_RSS_BOARD_IDS 유효 보드 0건 — 기본 전체 보드 사용")
+
+    mode = os.environ.get("MFDS_RSS_BOARD_MODE", "all").strip().lower()
+    if mode == "residual":
+        return [
+            (brd_id, type_or_class)
+            for brd_id, type_or_class in MFDS_RSS_BOARDS
+            if brd_id in _MFDS_RSS_RESIDUAL_BOARD_IDS
+        ]
+    if mode and mode != "all":
+        log("WARN", f"MFDS_RSS_BOARD_MODE={mode!r} 미지원 — 기본 전체 보드 사용")
+    return list(MFDS_RSS_BOARDS)
+
+
 def _collect_legislative_datago(start: date, end: date, key: str) -> list[IntakeItem] | None:
     """법제처 ogLmPp 정부입법예고 API optional 경로.
 
@@ -518,7 +559,9 @@ def collect_mfds(start: date, end: date,
 
     # ① 비-입법 RSS 보드 일괄 (지침/안내서/개정법령/고시/안전성서한)
     #    입법예고(data0009)는 ②에서 ogLmPp optional 포함해 별도 처리.
-    for brd_id, type_or_class in MFDS_RSS_BOARDS:
+    rss_boards = _configured_rss_boards()
+    selected_board_ids = {brd_id for brd_id, _type_or_class in rss_boards}
+    for brd_id, type_or_class in rss_boards:
         if brd_id == LEGISLATIVE_RSS_BRDID:
             continue
         try:
@@ -529,10 +572,11 @@ def collect_mfds(start: date, end: date,
             errors.append(msg)
 
     # ② 입법예고 (RSS primary; ogLmPp optional when key is passed)
-    leg_items, leg_err = _collect_legislative(start, end, data_go_kr_key)
-    items += leg_items
-    if leg_err:
-        errors.append(leg_err)
+    if LEGISLATIVE_RSS_BRDID in selected_board_ids:
+        leg_items, leg_err = _collect_legislative(start, end, data_go_kr_key)
+        items += leg_items
+        if leg_err:
+            errors.append(leg_err)
 
     if errors and not items:
         # 전체 실패 → workflow fail 유도

@@ -355,6 +355,91 @@ def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 수집 현황(커버리지) '수집' 숫자 대조 lint (W2) — 발행물의 수집 callout 숫자(총계+소스별)가
+# handoff 근거(수집기 산출 source_counts)와 일치하는지 결정론 판정. 순수 함수(네트워크 없음).
+# 정본 expected({total, items}) 는 collect_intake.build_coverage_collected(= W1 이 handoff 에
+# 싣는 값과 동일 산식)가 만든다. 이 모듈은 source→label 매핑을 모르고 expected 만 받아 대조한다
+# (collect_intake 비의존 — 순수성 유지). 파싱 불가(앵커 부재)면 finding 없음(추측 금지·과알림 0).
+# 06-17 검증 동기: 발행=실제 카드수로 확인됐으나 수집/스킵은 LLM 집계라 무보증(요일 오산과 동형).
+# 수집 컬럼은 W1 이 결정론 산출하고, 이 lint 가 발행 후 결정론으로 재대조한다(발행물 LLM 집계 방어).
+# ─────────────────────────────────────────────────────────────────────────────
+# "Intake row {N}건 ( ... )" — 발행 커버리지 callout 의 수집 세그먼트(첫 괄호까지만 — 그 뒤
+# 병합·WebSearch 등은 수집 대상 아님).
+_COVERAGE_ANCHOR_RE = re.compile(r"Intake\s+row\s+(?P<total>\d+)\s*건\s*\((?P<body>[^)]*)\)")
+# 괄호 안 토큰: "{label} {count}[건]" — 라벨은 영문 시작·영숫자/공백/슬래시(FDA WL·PIC/S·FDA 483).
+_COVERAGE_ITEM_RE = re.compile(r"(?P<label>[A-Za-z][A-Za-z0-9/ ]*?)\s+(?P<count>\d+)\s*건?\s*$")
+
+
+def parse_collected_coverage(published_text: str) -> "dict[str, Any] | None":
+    """발행물 평문에서 수집 세그먼트('Intake row N건 (라벨 n · ...)')를 파싱.
+
+    반환 {"total": int, "items": {label: count}} 또는 None(앵커 부재 — 대조 불가).
+    괄호 안을 ' · ' 로 분리해 각 토큰 끝의 숫자를 카운트로 본다(선택적 '건' 접미 허용).
+    중복 라벨은 마지막 값. 토큰이 "label count" 형이 아니면 무시(잡음 내성).
+    """
+    m = _COVERAGE_ANCHOR_RE.search(published_text or "")
+    if not m:
+        return None
+    items: dict[str, int] = {}
+    for tok in m.group("body").split("·"):
+        tm = _COVERAGE_ITEM_RE.match(tok.strip())
+        if tm:
+            items[tm.group("label").strip()] = int(tm.group("count"))
+    return {"total": int(m.group("total")), "items": items}
+
+
+def lint_coverage_counts(expected: "dict[str, Any] | None",
+                         published_text: str) -> list[LintFinding]:
+    """발행물 '수집' 숫자가 handoff 정본(expected)과 일치하는지 결정론 판정(W2).
+
+    expected = `collect_intake.build_coverage_collected(source_counts)` 반환값
+    ({"total", "items":[{"label","count"}...]}). 발행물에서 수집 세그먼트를 파싱해
+    (1) 총계, (2) known 소스별 건수를 대조한다. 불일치는 **FAIL**(요일 PL14 와 동형 — MCP 전용
+    Routine 이 인-루틴 게이트를 못 돌리므로 발행 후 탐지가 유일 결정론 방어선).
+    파싱 불가(앵커 부재) 또는 expected 부재면 finding 없음(추측 금지·과알림 0).
+    - 총계 불일치 → PL15-COVERAGE-TOTAL FAIL.
+    - known 소스 건수 불일치(또는 0 아닌데 누락) → PL15-COVERAGE-SOURCE FAIL.
+      (expected 0 건 소스를 발행물이 생략한 건 정상 — 보고 안 함.)
+    - 발행물 수집 줄에만 있고 expected 에 없는 라벨 → PL15-COVERAGE-EXTRA WARN(저신뢰·라벨 오기
+      가능성 — 알림 트리거 아님).
+    """
+    if not expected:
+        return []
+    parsed = parse_collected_coverage(published_text)
+    if parsed is None:
+        return []  # 수집 callout 부재 — 대조 불가, 추측 금지(과알림 0)
+    findings: list[LintFinding] = []
+    exp_total = int(expected.get("total", 0))
+    if parsed["total"] != exp_total:
+        findings.append(LintFinding(
+            SEV_FAIL, "PL15-COVERAGE-TOTAL", "",
+            f"수집 현황 '수집' 총계 불일치 — 발행물 Intake row {parsed['total']}건인데 "
+            f"handoff 근거(수집기 산출)는 {exp_total}건(LLM 집계 오류 의심)."))
+    exp_items = {it["label"]: int(it["count"]) for it in expected.get("items", [])}
+    pub_items = parsed["items"]
+    for label, exp_n in exp_items.items():
+        pub_n = pub_items.get(label)
+        if pub_n is None:
+            if exp_n != 0:  # 0건 소스 생략은 정상(과알림 0)
+                findings.append(LintFinding(
+                    SEV_FAIL, "PL15-COVERAGE-SOURCE", "",
+                    f"수집 현황 소스 '{label}' 누락 — handoff 근거 {exp_n}건인데 발행물 수집 "
+                    f"줄에 없음(LLM 집계 누락 의심)."))
+        elif pub_n != exp_n:
+            findings.append(LintFinding(
+                SEV_FAIL, "PL15-COVERAGE-SOURCE", "",
+                f"수집 현황 소스 '{label}' 건수 불일치 — 발행물 {pub_n}건 / handoff 근거 "
+                f"{exp_n}건(LLM 집계 오류 의심)."))
+    for label in pub_items:
+        if label not in exp_items:
+            findings.append(LintFinding(
+                SEV_WARN, "PL15-COVERAGE-EXTRA", "",
+                f"수집 현황 소스 '{label}'({pub_items[label]}건)이 handoff 근거에 없음 — "
+                f"수집기 미산출 라벨(라벨 오기·검색 소스 혼입 가능성)."))
+    return findings
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 선택적 네트워크 유틸 — 수집기 resolve&verify(Phase E2)·Phase C 전수검증 재사용용.
 # 순수 lint 는 이걸 호출하지 않는다(테스트는 HTTP 스텁으로 검증).
 # ─────────────────────────────────────────────────────────────────────────────

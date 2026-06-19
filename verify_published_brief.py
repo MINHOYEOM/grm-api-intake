@@ -418,7 +418,17 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     # 발행 직전 `--structure` 게이트와 동등한 결정론 검사(네트워크 0 → 과알림 0). MCP 전용
     # Routine 은 인-루틴 게이트를 코드로 못 돌리므로 이 탐지가 요일류 결함의 유일 결정론 방어선.
     struct_alerts = [f for f in bl.lint_publish_structure(text) if f.severity == bl.SEV_FAIL]
-    alerts = struct_alerts + alerts
+    # 수집 현황 '수집' 숫자(총계+소스별)를 handoff 정본과 대조한다(W2) — 발행물 LLM 집계가
+    # 수집기 산출과 어긋나면 FAIL(요일 PL14 와 동형 결정론 검사·네트워크 0 → 과알림 0). 정본은
+    # handoff rows 로 독립 재집계(build_coverage_collected = W1 이 handoff 에 싣는 값과 동일 산식).
+    try:
+        expected_cov = _ci().build_coverage_collected(_ci().coverage_source_counts(rows))
+    except Exception:  # noqa: BLE001 — 정본 산출 실패는 대조 생략(false-red 금지)
+        expected_cov = None
+    cov_findings = bl.lint_coverage_counts(expected_cov, text)
+    cov_alerts = [f for f in cov_findings if f.severity == bl.SEV_FAIL]
+    info = info + [f for f in cov_findings if f.severity != bl.SEV_FAIL]
+    alerts = struct_alerts + cov_alerts + alerts
     return build_audit_json(alerts, info, brief_title=brief.get("title", ""),
                             brief_url=brief.get("url", ""))
 

@@ -42,6 +42,7 @@ SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — FDA 483/EIR 실사 관찰사항
 TYPE_ADMIN_ACTION = "admin-action"
 TYPE_RECALL_QUALITY = "recall-quality"
 TYPE_GMP_INSPECTION = "gmp-inspection"
+TYPE_GMP_CERTIFICATE = "gmp-certificate"
 
 # LLM 산문 슬롯 토큰 (이 토큰만 비운다)
 SLOT_TITLE_ISSUE = "{{TITLE_ISSUE}}"
@@ -134,6 +135,7 @@ def _kind_meta(kind: str) -> tuple[str, str, str]:
         "openfda-recall":   ("🟧", "Recall", "Recall"),
         "admin-action":     ("🟦", "행정처분", "행정처분"),
         "gmp-inspection":   ("🟦", "GMP실사", "GMP실사"),
+        "gmp-certificate":  ("🟦", "GMP적합판정", "GMP적합"),
         "guidance":         ("🟫", "지침·안내서", "Guidance"),
         "mfds-notice":      ("🟫", "지침·안내서", "Guidance"),
         "rss-news":         ("🟫", "규제 소식", "GMP News"),
@@ -296,6 +298,8 @@ def resolve_kind(row: dict[str, Any]) -> str:
             return "recall-quality"
         if toc == TYPE_GMP_INSPECTION:
             return "gmp-inspection"
+        if toc == TYPE_GMP_CERTIFICATE:
+            return "gmp-certificate"
         if "legislative" in toc:
             return "legislative"
         if "safety" in toc:
@@ -507,6 +511,12 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
             rows.append(("실사기간", period))
         elif raw.get("product_type"):
             rows.append(("대상 제형", raw["product_type"]))
+    elif kind == "gmp-certificate":
+        rows.append(("업체", _first(raw.get("BSSH_NM"), row.get("firm")) or "원문 미기재"))
+        if raw.get("KGMP_BGMP_NAME"):
+            rows.append(("구분", str(raw["KGMP_BGMP_NAME"])))
+        if raw.get("VLD_PRD_YMD"):
+            rows.append(("유효기한", str(raw["VLD_PRD_YMD"])))
     elif kind == "openfda-recall":
         rows.append(("업체", _first(raw.get("recalling_firm"), row.get("firm")) or "원문 미기재"))
         if raw.get("product_description"):

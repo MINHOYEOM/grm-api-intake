@@ -390,6 +390,57 @@ class StalePriorOpenHandoffTest(unittest.TestCase):
         self.assertEqual(guard.call_args.kwargs["superseded_by"], "2026-06-08")
 
 
+class CoverageCollectedTest(unittest.TestCase):
+    """수집 현황 '수집' 컬럼 결정론 산출(W1) — LLM 재집계 제거용."""
+
+    def test_known_sources_fixed_order_include_zero(self) -> None:
+        cov = ci.build_coverage_collected(
+            {"MFDS": 30, "Federal Register": 2, "OpenFDA Recall": 1, "FDA Warning Letter": 3})
+        labels = [it["label"] for it in cov["items"]]
+        # 11종 known 라벨이 프롬프트 callout 순서대로 전부(0건 포함) 나온다.
+        self.assertEqual(labels, ["FR", "Recall", "EMA", "MHRA", "PIC/S", "ECA",
+                                  "FDA WL", "MFDS", "ICH", "WHO", "HC"])
+        self.assertEqual(cov["total"], 36)
+        self.assertTrue(cov["md"].startswith("Intake row 36건 (FR 2 · Recall 1 · EMA 0 · "))
+        self.assertIn("MFDS 30", cov["md"])
+
+    def test_unknown_source_appended_only_when_nonzero(self) -> None:
+        cov = ci.build_coverage_collected({"FDA 483": 4, "MFDS": 1})
+        labels = [it["label"] for it in cov["items"]]
+        self.assertEqual(labels[-1], "FDA 483")        # 미정의 소스는 끝에 덧붙임(조용한 유실 금지)
+        self.assertEqual(cov["total"], 5)
+        # count 0 인 미정의 소스는 생략(클러터 방지)
+        cov0 = ci.build_coverage_collected({"FDA 483": 0, "MFDS": 1})
+        self.assertNotIn("FDA 483", [it["label"] for it in cov0["items"]])
+
+    def test_empty_counts(self) -> None:
+        cov = ci.build_coverage_collected({})
+        self.assertEqual(cov["total"], 0)
+        self.assertEqual(cov["md"], "Intake row 0건 (FR 0 · Recall 0 · EMA 0 · MHRA 0 · "
+                         "PIC/S 0 · ECA 0 · FDA WL 0 · MFDS 0 · ICH 0 · WHO 0 · HC 0)")
+
+    def test_source_counts_from_rows_matches_payload(self) -> None:
+        # 발행 후 탐지가 rows 로 재집계한 값 == build_payload 의 source_counts(동일 산식).
+        payload = ci.build_routine_handoff_payload_v2(_recall_group_rows(), RUN_DATE, 7, GEN_AT)
+        recomputed = ci.coverage_source_counts(payload["rows"])
+        self.assertEqual(recomputed, payload["source_counts"])
+        self.assertEqual(recomputed["MFDS"], 3)        # 병합 멤버 포함 전수
+
+    def test_coverage_collected_md_in_v2_payload(self) -> None:
+        payload = ci.build_routine_handoff_payload_v2(_enriched_rows(), RUN_DATE, 7, GEN_AT)
+        self.assertIn("coverage_collected_md", payload)
+        # 정본(rows 재집계) 과 동일 문자열을 싣는다.
+        expect = ci.build_coverage_collected(ci.coverage_source_counts(payload["rows"]))["md"]
+        self.assertEqual(payload["coverage_collected_md"], expect)
+        self.assertTrue(payload["coverage_collected_md"].startswith("Intake row 2건 ("))
+
+    def test_v1_payload_has_no_coverage_field(self) -> None:
+        # v1 은 바이트 golden 동결 — 신규 필드 미추가(회귀 금지).
+        payload = ci.build_routine_handoff_payload(
+            [dict(r) for r in _V1_ROWS], RUN_DATE, 7, GEN_AT)
+        self.assertNotIn("coverage_collected_md", payload)
+
+
 class WeekdayKstTest(unittest.TestCase):
     """발행 요일 결정론 산출(D-1 근본수정) — LLM 산술 제거용."""
 

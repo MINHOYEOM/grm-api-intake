@@ -11,7 +11,7 @@
 #   NOTION_TOKEN, NOTION_DATABASE_ID, DATA_GO_KR_SERVICE_KEY
 #
 # Optional secrets:
-#   OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_KEY
+#   OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_KEY, LAW_GO_KR_OC, MFDS_HTTP_PROXY
 #
 # Token values are read via SecureString prompt when not provided as env vars.
 # They are never echoed to terminal, git history, or log files.
@@ -176,10 +176,12 @@ if (-not $NotionDatabaseId) {
 }
 
 $NotionToken = Get-SecretValue "NOTION_TOKEN" -Required -HelpText "Paste your Notion Integration token. Input is hidden."
-$DataGoServiceKey = Get-SecretValue "DATA_GO_KR_SERVICE_KEY" -Required -HelpText "Paste your data.go.kr service key for MFDS Recall/Admin API. Input is hidden."
+$DataGoServiceKey = Get-SecretValue "DATA_GO_KR_SERVICE_KEY" -Required -HelpText "Paste your data.go.kr service key for MFDS/data.go.kr APIs. Input is hidden."
 $OpenfdaKey = Get-SecretValue "OPENFDA_API_KEY" -HelpText "OpenFDA API key is optional. Leave empty for no-key mode."
 $BraveKey = Get-SecretValue "BRAVE_API_KEY" -HelpText "Brave Search API key is optional and used only when ENABLE_SEARCH=true."
 $DataGoKey = Get-SecretValue "DATA_GO_KR_KEY" -HelpText "DATA_GO_KR_KEY is optional and used only when ENABLE_MOLEG_API=true."
+$LawGoOc = Get-SecretValue "LAW_GO_KR_OC" -HelpText "LAW_GO_KR_OC is optional and enriches MFDS law/admrul full text."
+$MfdsHttpProxy = Get-SecretValue "MFDS_HTTP_PROXY" -HelpText "MFDS_HTTP_PROXY is optional and used only for MFDS/nedrug/law.go.kr KR egress."
 
 Write-Host ""
 Write-Info "Summary:"
@@ -190,8 +192,10 @@ Write-SecretSummary "DATA_GO_KR_SERVICE_KEY" $DataGoServiceKey -Required
 Write-SecretSummary "OPENFDA_API_KEY" $OpenfdaKey
 Write-SecretSummary "BRAVE_API_KEY" $BraveKey
 Write-SecretSummary "DATA_GO_KR_KEY" $DataGoKey
+Write-SecretSummary "LAW_GO_KR_OC" $LawGoOc
+Write-SecretSummary "MFDS_HTTP_PROXY" $MfdsHttpProxy
 Write-Host ""
-Write-Info "Default scheduled runs enable MFDS Recall/Admin/GMP, so DATA_GO_KR_SERVICE_KEY is required."
+Write-Info "Default scheduled runs enable MFDS Recall/Admin/GMP Inspection; MFDS Law/GMP Cert/Safety Letter are opt-in. DATA_GO_KR_SERVICE_KEY is required. MFDS_HTTP_PROXY is optional KR egress."
 Write-Host ""
 $confirm = Read-Host "Proceed? [y/N]"
 if ($confirm -notmatch "^[Yy]$") {
@@ -343,6 +347,20 @@ try {
     } else {
         Write-Info "DATA_GO_KR_KEY skipped (ENABLE_MOLEG_API=false by default)"
     }
+
+    if ($LawGoOc) {
+        Set-RepoSecret "LAW_GO_KR_OC" $LawGoOc
+        Write-Ok "LAW_GO_KR_OC registered"
+    } else {
+        Write-Info "LAW_GO_KR_OC skipped (law.go.kr body enrich disabled)"
+    }
+
+    if ($MfdsHttpProxy) {
+        Set-RepoSecret "MFDS_HTTP_PROXY" $MfdsHttpProxy
+        Write-Ok "MFDS_HTTP_PROXY registered"
+    } else {
+        Write-Info "MFDS_HTTP_PROXY skipped (direct egress only)"
+    }
 } catch {
     Write-Err $_.Exception.Message
     Fail-And-Exit "Failed to register one or more secrets. Re-run after fixing."
@@ -357,6 +375,8 @@ $DataGoServiceKey = $null
 $OpenfdaKey = $null
 $BraveKey = $null
 $DataGoKey = $null
+$LawGoOc = $null
+$MfdsHttpProxy = $null
 [System.GC]::Collect()
 
 # ---- 6. Done ----

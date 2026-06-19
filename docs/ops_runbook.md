@@ -16,13 +16,15 @@
 |---|---|---|---|---|
 | `NOTION_TOKEN` | Intake DB 적재 + handoff 생성 | notion.so/my-integrations (internal integration) | 명시 만료 없음. 단 integration 권한 회수·워크스페이스 이전 시 무효 | 새 토큰 발급 → 두 DB(Intake·Weekly Brief 부모 페이지)에 integration 연결 확인 → Secret 교체 → workflow_dispatch dry-run 으로 적재 확인 |
 | `NOTION_DATABASE_ID` | Intake DB 식별 | 고정값 `7784c71f…` | DB 이동/재생성 시만 변경 | 변경 시 GRM_SYSTEM §2.2 도 갱신 |
-| `DATA_GO_KR_SERVICE_KEY` | 식약처 회수(15059114)·행정처분(15058457) API | data.go.kr 마이페이지 | **활용신청 기간 만료 있음** — 만료 시 401/403 | data.go.kr 로그인 → 활용 연장/재신청 → 키 동일하면 조치 불요, 재발급 시 Secret 교체 |
+| `DATA_GO_KR_SERVICE_KEY` | 식약처 회수(15059114)·행정처분(15058457)·GMP 적합판정(15097207)·안전성서한(15059182), 법제처 국가법령정보(15000115) API | data.go.kr 마이페이지 | **활용신청 기간 만료 있음** — 만료 시 401/403 | data.go.kr 로그인 → 활용 연장/재신청 → 키 동일하면 조치 불요, 재발급 시 Secret 교체 |
 | `DATA_GO_KR_KEY` | 법제처 ogLmPp (현재 `ENABLE_MOLEG_API=false`) | data.go.kr | 비활성 — 만료돼도 운영 영향 없음 | 활성화 시점에 재확인 |
+| `LAW_GO_KR_OC` | law.go.kr DRF 고시/행정규칙 본문 enrich | law.go.kr 국가법령정보센터 Open API | 선택. 미설정 시 법제처 목록 수집만 수행 | OC 등록/재발급 → Secret 교체 → `ENABLE_MFDS_LAW=true` dry-run |
+| `MFDS_HTTP_PROXY` | MFDS/nedrug/law.go.kr KR-egress 프록시 | 운영자가 구성한 KR proxy/runner | 선택. 잘못된 프록시는 잔여 3종만 실패해야 함 | `probe_mfds_egress.py` 3종 HTTP 200 확인 후 Secret 교체 |
 | `OPENFDA_API_KEY` | OpenFDA rate limit 상향(선택) | open.fda.gov | 없어도 동작(쿼터 축소) | 만료 시 무키 운영 가능 |
 | `BRAVE_API_KEY` | Brave 보조검색 (현재 `ENABLE_SEARCH=false`) | brave.com/search/api | 비활성 | 활성화 시점에 재확인 |
 
 만료 의심 신호: 수집 Issue 에 401/403 비일시 오류, 특정 소스만 연속 0건.
-점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > 나머지.
+점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지.
 
 ## 2. 정기 점검 (주간 5분)
 
@@ -41,6 +43,7 @@
 | 특정 소스 연속 0건(4주+) | 해당 collector 의 원 사이트 직접 확인 | 구조 변경이면 collector 수정 트랙 오픈. M2 기록과 대조 |
 | Notion 적재 실패 | `NOTION_TOKEN` 권한, DB 연결 | §1 로테이션 절차 |
 | data.go.kr 403/401 | 활용신청 만료 | §1 로테이션 절차 |
+| MFDS 가이드라인/GMP 실태조사/law.go.kr 본문만 실패 | KR proxy 차단·proxy URL 오류·law.go.kr OC 문제 | `MFDS_HTTP_PROXY` 설정 상태에서 `python probe_mfds_egress.py` 실행. RSS/nedrug/law.go.kr 3종 200 확인 후 `MFDS_RSS_BOARD_MODE=residual` 유지 여부 점검 |
 | 중복 카드 발견 | 전주 M2 의 Status 갱신 실패 기록 | PL-10b 가드 동작 여부 확인, 남은 New row Processed 처리 |
 
 상세 판정 기준(failure/warning)은 GRM_SYSTEM §3.5 운영 모니터링 health check 참조.
@@ -72,4 +75,5 @@ handoff 조회는 `Run Date 7일 + Status=New` 필터라 직접 영향은 작지
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-18 | KR-egress 잔여 QA 3종 운영 항목 추가 — `MFDS_HTTP_PROXY`, `LAW_GO_KR_OC`, `probe_mfds_egress.py`, `MFDS_RSS_BOARD_MODE=residual` 점검 경로 |
 | 2026-06-04 | 최초 작성 — Secrets 인벤토리·로테이션, 주간 점검, 장애 분기, Intake 아카이브 정책(180일), 인수인계 체크리스트 |

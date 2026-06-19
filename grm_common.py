@@ -3,10 +3,12 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timezone
+from urllib.parse import urlparse
 from typing import Any
 
 import requests
@@ -21,6 +23,7 @@ DEFAULT_JSON_HEADERS = {
     "User-Agent": DEFAULT_USER_AGENT,
     "Accept": "application/json",
 }
+MFDS_EGRESS_HOSTS = {"www.mfds.go.kr", "nedrug.mfds.go.kr", "www.law.go.kr"}
 
 
 class HTTPClientError(RuntimeError):
@@ -51,6 +54,17 @@ def retry_after_seconds(resp: requests.Response, attempt: int, *, max_sleep: int
         return min(2 ** attempt, max_sleep)
 
 
+def _proxies_for(url: str) -> dict[str, str] | None:
+    """Return an opt-in KR egress proxy only for MFDS/law.go.kr hosts."""
+    proxy = os.environ.get("MFDS_HTTP_PROXY", "").strip()
+    if not proxy:
+        return None
+    host = (urlparse(url).hostname or "").lower()
+    if host in MFDS_EGRESS_HOSTS:
+        return {"http": proxy, "https": proxy}
+    return None
+
+
 def http_get_json(
     url: str,
     *,
@@ -65,7 +79,13 @@ def http_get_json(
     req_headers = {**DEFAULT_JSON_HEADERS, **(headers or {})}
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(url, params=params, timeout=timeout, headers=req_headers)
+            resp = requests.get(
+                url,
+                params=params,
+                timeout=timeout,
+                headers=req_headers,
+                proxies=_proxies_for(url),
+            )
             if resp.status_code == 429:
                 if attempt < retries:
                     sleep_s = retry_after_seconds(resp, attempt)
@@ -103,7 +123,12 @@ def http_get_xml(
     req_headers = {**DEFAULT_XML_HEADERS, **(headers or {})}
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(url, timeout=timeout, headers=req_headers)
+            resp = requests.get(
+                url,
+                timeout=timeout,
+                headers=req_headers,
+                proxies=_proxies_for(url),
+            )
             if resp.status_code == 429:
                 if attempt < retries:
                     sleep_s = retry_after_seconds(resp, attempt)
@@ -219,7 +244,12 @@ def http_get_html(
     last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(url, timeout=timeout, headers=req_headers)
+            resp = requests.get(
+                url,
+                timeout=timeout,
+                headers=req_headers,
+                proxies=_proxies_for(url),
+            )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
                 log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")
@@ -255,7 +285,12 @@ def http_get_bytes(
     last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(url, timeout=timeout, headers=req_headers)
+            resp = requests.get(
+                url,
+                timeout=timeout,
+                headers=req_headers,
+                proxies=_proxies_for(url),
+            )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
                 log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")

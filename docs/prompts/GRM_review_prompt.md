@@ -8,12 +8,12 @@ GRM(Global Regulatory Monitor)에서 **국내 제조/품질 관련 식약처(MFD
 
 ## 1. 시스템 컨텍스트 (ground truth — 중복 구축 방지)
 - 흐름: GitHub Actions가 매일 03:17 KST 수집 → Notion "GRM API Intake" DB 적재 → 매주 Claude Weekly Brief가 읽어 QA팀 요약.
-- repo: `MINHOYEOM/grm-api-intake`(main). 핵심 파일: `collect_intake.py`, `collect_search.py`, `collect_mfds.py`(RSS 7보드), `collect_mfds_recall.py`, `collect_mfds_admin_action.py`, `collect_mfds_gmp_inspection.py`, `grm_common.py`, `.github/workflows/grm-intake.yml`, `GRM_session_decisions.md`, `Phase2*_*spec.md`.
+- repo: `MINHOYEOM/grm-api-intake`(main). 핵심 파일: `collect_intake.py`, `collect_search.py`, `collect_mfds.py`(RSS 7보드), `collect_mfds_law.py`, `collect_mfds_recall.py`, `collect_mfds_admin_action.py`, `collect_mfds_gmp_cert.py`, `collect_mfds_safety_letter.py`, `collect_mfds_gmp_inspection.py`, `grm_common.py`, `.github/workflows/grm-intake.yml`, `GRM_session_decisions.md`, `Phase2*_*spec.md`.
 - Notion: DB `7784c71fb7b343749b2bee5d04db7926`, data source `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
-- **현재 라이브(MFDS) — 중복 구축 금지**: ① GMP 지침·안내서·민원인안내서·공무원지침(RSS data0013/0011/0010) ② 입법예고(data0009)·개정법령(data0008)·고시(data0005) ③ 안전성서한(seohan001) ④ 회수·판매중지(data.go.kr 15059114) ⑤ 행정처분(15058457) ⑥ GMP 실사결과 목록+지적사항 본문(nedrug `/pbp/CCBBD03` 스크래핑+PDF/HWPX 추출).
+- **현재 라이브/구현(MFDS) — 중복 구축 금지**: ① GMP 지침·안내서·민원인안내서·공무원지침(RSS data0013/0011/0010) ② 입법예고(data0009)·개정법령(data0008)·고시(data0005) ③ 안전성서한(seohan001) ④ 회수·판매중지(data.go.kr 15059114) ⑤ 행정처분(15058457) ⑥ GMP 실사결과 목록+지적사항 본문(nedrug `/pbp/CCBBD03` 스크래핑+PDF/HWPX 추출) ⑦ opt-in 공식 API 복구 수집기: 법제처 행정규칙·법령(15000115/1170000), GMP 적합판정(15097207), 안전성서한(15059182).
 - 글로벌 라이브: FR·OpenFDA·EMA·MHRA·PIC/S·ECA·FDA WL·Brave.
-- 보류: 적합판정서(15097207, API 403 키전파 대기), 입법예고 ogLmPp API(`ENABLE_MOLEG_API=false`, IP/인가 제약 — RSS로 커버 중). 제거됨: **Self-Check 기능**(미래 사용자 설정형 제품으로 이관).
-- 플래그: `ENABLE_MFDS/ENABLE_MFDS_RECALL/ENABLE_MFDS_ADMIN/ENABLE_MFDS_GMP_INSPECTION=true`, `ENABLE_MOLEG_API=false`.
+- 보류/잔여: 입법예고 ogLmPp API(`ENABLE_MOLEG_API=false`, IP/인가 제약 — RSS로 커버 중), 가이드라인/지침 공식 API 부재. 제거됨: **Self-Check 기능**(미래 사용자 설정형 제품으로 이관).
+- 플래그: `ENABLE_MFDS/ENABLE_MFDS_RECALL/ENABLE_MFDS_ADMIN/ENABLE_MFDS_GMP_INSPECTION=true`, `ENABLE_MFDS_LAW/ENABLE_MFDS_GMP_CERT/ENABLE_MFDS_SAFETY_LETTER=false`(키 보유 dry-run 후 opt-in), `ENABLE_MOLEG_API=false`.
 
 ## 2. 점검 축
 

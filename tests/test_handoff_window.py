@@ -206,8 +206,10 @@ def _health_kwargs(**over):
     base = dict(
         stats=ci.CollectionStats(),
         active=set(),
-        enable_search=False, enable_mfds=False, enable_mfds_recall=False,
-        enable_mfds_admin=False, enable_mfds_gmp_inspection=False,
+        enable_search=False, enable_mfds=False, enable_mfds_law=False,
+        enable_mfds_recall=False, enable_mfds_admin=False,
+        enable_mfds_gmp_cert=False, enable_mfds_safety_letter=False,
+        enable_mfds_gmp_inspection=False,
         enable_ich=False, enable_who=False, enable_hc=False,
         enable_fda483=False,
         enable_moleg_api=False, enable_scrape=False,

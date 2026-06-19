@@ -12,7 +12,7 @@
 #   NOTION_TOKEN, NOTION_DATABASE_ID, DATA_GO_KR_SERVICE_KEY
 #
 # Optional secrets:
-#   OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_KEY
+#   OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_KEY, LAW_GO_KR_OC, MFDS_HTTP_PROXY
 #
 # Usage:
 #   cd <v15.0-implementation folder>
@@ -149,10 +149,12 @@ if [ -z "$NOTION_DATABASE_ID_INPUT" ]; then
 fi
 
 NOTION_TOKEN=$(read_secret "NOTION_TOKEN" "true" "Paste your Notion Integration token. Input is hidden.")
-DATA_GO_KR_SERVICE_KEY=$(read_secret "DATA_GO_KR_SERVICE_KEY" "true" "Paste your data.go.kr service key for MFDS Recall/Admin API. Input is hidden.")
+DATA_GO_KR_SERVICE_KEY=$(read_secret "DATA_GO_KR_SERVICE_KEY" "true" "Paste your data.go.kr service key for MFDS/data.go.kr APIs. Input is hidden.")
 OPENFDA_API_KEY=$(read_secret "OPENFDA_API_KEY" "false" "OpenFDA API key is optional. Leave empty for no-key mode.")
 BRAVE_API_KEY=$(read_secret "BRAVE_API_KEY" "false" "Brave Search API key is optional and used only when ENABLE_SEARCH=true.")
 DATA_GO_KR_KEY=$(read_secret "DATA_GO_KR_KEY" "false" "DATA_GO_KR_KEY is optional and used only when ENABLE_MOLEG_API=true.")
+LAW_GO_KR_OC=$(read_secret "LAW_GO_KR_OC" "false" "LAW_GO_KR_OC is optional and enriches MFDS law/admrul full text.")
+MFDS_HTTP_PROXY=$(read_secret "MFDS_HTTP_PROXY" "false" "MFDS_HTTP_PROXY is optional and used only for MFDS/nedrug/law.go.kr KR egress.")
 
 echo
 info "Summary:"
@@ -163,8 +165,10 @@ secret_summary "DATA_GO_KR_SERVICE_KEY" "$DATA_GO_KR_SERVICE_KEY" "true"
 secret_summary "OPENFDA_API_KEY" "$OPENFDA_API_KEY"
 secret_summary "BRAVE_API_KEY" "$BRAVE_API_KEY"
 secret_summary "DATA_GO_KR_KEY" "$DATA_GO_KR_KEY"
+secret_summary "LAW_GO_KR_OC" "$LAW_GO_KR_OC"
+secret_summary "MFDS_HTTP_PROXY" "$MFDS_HTTP_PROXY"
 echo
-info "Default scheduled runs enable MFDS Recall/Admin/GMP, so DATA_GO_KR_SERVICE_KEY is required."
+info "Default scheduled runs enable MFDS Recall/Admin/GMP Inspection; MFDS Law/GMP Cert/Safety Letter are opt-in. DATA_GO_KR_SERVICE_KEY is required. MFDS_HTTP_PROXY is optional KR egress."
 echo
 read -rp "Proceed? [y/N]: " confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
@@ -265,6 +269,20 @@ else
   info "DATA_GO_KR_KEY skipped (ENABLE_MOLEG_API=false by default)"
 fi
 
+if [ -n "$LAW_GO_KR_OC" ]; then
+  printf '%s' "$LAW_GO_KR_OC" | gh secret set LAW_GO_KR_OC --repo "${GH_USER}/${REPO_NAME}"
+  ok "LAW_GO_KR_OC registered"
+else
+  info "LAW_GO_KR_OC skipped (law.go.kr body enrich disabled)"
+fi
+
+if [ -n "$MFDS_HTTP_PROXY" ]; then
+  printf '%s' "$MFDS_HTTP_PROXY" | gh secret set MFDS_HTTP_PROXY --repo "${GH_USER}/${REPO_NAME}"
+  ok "MFDS_HTTP_PROXY registered"
+else
+  info "MFDS_HTTP_PROXY skipped (direct egress only)"
+fi
+
 echo
 info "Current secrets:"
 gh secret list --repo "${GH_USER}/${REPO_NAME}"
@@ -274,6 +292,8 @@ DATA_GO_KR_SERVICE_KEY=""
 OPENFDA_API_KEY=""
 BRAVE_API_KEY=""
 DATA_GO_KR_KEY=""
+LAW_GO_KR_OC=""
+MFDS_HTTP_PROXY=""
 
 title "6. Setup complete"
 

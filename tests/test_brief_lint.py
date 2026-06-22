@@ -5,6 +5,7 @@
 """
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -753,6 +754,61 @@ class TestScaffoldFixedCells(unittest.TestCase):
         g = bl.run_publish_gate([row], published)
         self.assertFalse(g.ok)
         self.assertTrue(any(f.code == "PL18-SCAFFOLD-CELL" for f in g.findings))
+
+
+class TestScaffoldFixedCellsRealData(unittest.TestCase):
+    """PL18/PL19 — 6/22 실데이터 회귀(FP 0/TP 8 정본). 합성 테스트가 못 잡은 enrich-날짜 placeholder
+    (WL·FR·ECA 발행일)·재구성 셀(발행부서·주제) 클래스를 실제 handoff(36행)+발행본으로 영구 고정.
+    데이터: handoff page 3863142f-dc11-81ff…, 발행 page 3863142f-dc11-8130… (build_brief_2026_06_22.py).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "fixtures", "brief_2026_06_22.json")
+        with open(path, encoding="utf-8") as fh:
+            cls.fx = json.load(fh)
+
+    def _pl18(self):
+        return bl.lint_scaffold_fixed_cells(self.fx["handoff_rows"], self.fx["published_text"])
+
+    def test_pl18_fp0_tp8(self):
+        findings = self._pl18()
+        flagged = sorted(re.search(r"카드\[([^\]]+)\]", f.message).group(1) for f in findings)
+        self.assertEqual(flagged, sorted(self.fx["expected_pl18_fail_doc_ids"]),
+                         msg=f"flagged={flagged}")
+        for clean_id in self.fx["expected_pl18_clean_doc_ids"]:  # enrich-날짜·재구성 = over-alert 0
+            self.assertNotIn(clean_id, flagged)
+        self.assertTrue(all(f.code == "PL18-SCAFFOLD-CELL" for f in findings))
+
+    def test_pl18_identity_cells_flagged_all_sources(self):
+        # FEI(제조소/업체)·Class·제품 같은 identity 셀 전사오류는 잡힌다.
+        msgs = {re.search(r"카드\[([^\]]+)\]", f.message).group(1): f.message for f in self._pl18()}
+        self.assertIn("FEI 3015156709", msgs["fda483-192439"])      # FEI 변형
+        self.assertIn("Type III", msgs["hc-82222"])                  # Class 삭제
+        self.assertIn("Lancora 5 mg tablet", msgs["hc-82222"])       # 제품명 단순화
+
+    def test_pl18_admin_date_not_masked_by_metadata(self):
+        # admin 처분일 오류(scaffold 발행일 2026-06-17)는 M3 'CONSUMED 2026-06-17 handoff' 에
+        # 가려지지 않고 카드 영역 한정 검사로 잡혀야 한다(보정 핵심).
+        admin = [f for f in self._pl18() if "admin-2026004434" in f.message]
+        self.assertEqual(len(admin), 1)
+        self.assertIn("2026-06-17", admin[0].message)
+
+    def test_pl18_enrich_dates_not_flagged(self):
+        # WL·FR·ECA 발행일(수집일 placeholder→WebSearch enrich)은 검사 제외 = false positive 0.
+        flagged = {re.search(r"카드\[([^\]]+)\]", f.message).group(1) for f in self._pl18()}
+        for enrich_id in ("d1e41608f7ba", "2026-12237", "2026-12238",
+                          "4399b537ba30", "bfa2307d43e9"):
+            self.assertNotIn(enrich_id, flagged)
+
+    def test_pl19_evidence_tally_mismatch_real(self):
+        # 발행 Coverage 헤더 Evidence A4/B10 vs 실제 카드 배지 A3/B11.
+        pl19 = [f for f in bl.lint_publish_structure(self.fx["published_text"])
+                if f.code == "PL19-EVIDENCE-TALLY"]
+        self.assertEqual(len(pl19), 1)
+        self.assertIn("A4/B10", pl19[0].message)
+        self.assertIn("A3/B11", pl19[0].message)
 
 
 class TestEvidenceTally(unittest.TestCase):

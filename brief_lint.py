@@ -246,13 +246,23 @@ def lint_scaffold_footer_integrity(rows: list[dict[str, Any]],
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# scaffold 고정 셀(W2 메타표) 전사 무결성 (PL18) — Routine(LLM) 이 scaffold 의 슬롯({{...}})이
-# 아닌 표 셀(FEI·발행일·시설유형·Class·문서번호 등)을 글자그대로 렌더했는지 발행 후 결정론 대조.
-# 06-22 사고 클래스(FDA 483 FEI·발행일·시설유형 전사오류 + Lancora Class 과억제 삭제)를 차단한다.
-# `card_scaffold` 의 표 셀은 수집기가 박은 결정론 사실이고 needs_llm_slots 가 아니므로(=고정 셀)
-# Routine 은 한 글자도 바꾸지 않아야 한다(v16 scaffold 계약). footer URL 은
-# lint_scaffold_footer_integrity, 표 고정 셀 텍스트는 이 함수가 담당한다(같은 결함 클래스의
-# 셀-텍스트 일반화). 순수 함수(네트워크 없음).
+# scaffold 고정 셀(W2 메타표) 전사 무결성 (PL18) — Routine(LLM) 이 scaffold 의 **authoritative
+# identity 셀**(수집기가 원문에서 박은 정본)을 글자그대로 렌더했는지 발행 후 결정론 대조.
+# 06-22 사고 클래스(FDA 483 FEI·시설유형 전사오류 + Lancora Class 과억제 삭제 + admin 처분일
+# 오사용)를 차단한다. footer URL 은 lint_scaffold_footer_integrity, 표 고정 셀 텍스트는 이 함수.
+#
+# 스코프(06-22 실데이터 보정 — FP 0/TP 8 정본):
+#   · **identity 셀(라벨 화이트리스트)** = FEI 동반 제조소/업체·문서번호·시설유형·Class·제품 등
+#     전 소스 공통 수집기 정본 → **전 소스 verbatim 강제**.
+#   · **날짜 셀**(값이 날짜형) = `fda483-`/`admin-` 카드의 발행일/처분일만 수집기가 원문에서
+#     추출한 authoritative 일자 → verbatim 강제. 그 외 소스(WL·FR·ECA·HC)의 발행일은 수집일
+#     placeholder 이고 Routine 이 WebSearch 로 실제 문서일자로 enrich 하도록 **설계된 동작**이라
+#     검사 제외(verbatim 강제 시 정상 enrich 를 오판 = false positive, 06-22 5건 확인).
+#   · 그 밖의 셀(발행 부서/일자·주제·발행기관·의견기한 등 derived/placeholder)은 LLM 이 enrich·
+#     재구성하도록 설계 → 검사 제외(WL 발행부서·FR/ECA 주제 재작성이 FP 였던 클래스).
+#   · **카드 영역 한정**: 전역 substring 은 타 카드·M2/M3 메타의 동일 값(예 M3 'CONSUMED
+#     2026-06-17 handoff')에 가려질 수 있어, 각 카드의 발행 영역(인접 document_id anchor 경계)
+#     안에서만 대조한다(admin 처분일 오류가 메타 날짜에 가려지던 것 차단).
 # ─────────────────────────────────────────────────────────────────────────────
 # W2 메타표 셀: <tr><td>**라벨**</td><td>값</td></tr> (card_scaffold._table 산출형).
 _SCAFFOLD_CELL_RE = re.compile(
@@ -260,6 +270,16 @@ _SCAFFOLD_CELL_RE = re.compile(
 # 대조 제외 값: 의도적 빈칸 placeholder(생성 금지 신호) + 무신호 기호. 이런 값은 발행본에
 # 그대로 없을 수도 있고(LLM 이 동일 placeholder 를 다른 칸에 쓰기도 함) 신호가 없어 과알림만 낸다.
 _SCAFFOLD_CELL_SKIP_VALUES = frozenset({"", "—", "-", "원문 미기재", "N/A"})
+# authoritative identity 셀 라벨(정규화형) — 수집기가 원문에서 박은 정본, 전 소스 verbatim.
+# 제조소/업체·업체/제조소 셀은 'FEI {n}' 를 동반하므로 FEI 전사오류가 여기서 잡힌다.
+_IDENTITY_CELL_LABELS = frozenset({
+    "제조소/업체", "업체/제조소", "제조소", "업체", "문서번호",
+    "시설 · 유형", "Class", "회수 등급", "제품", "제품명",
+})
+# 날짜형 셀 값(단일 날짜만 — 범위·식별자는 identity 로 본다): YYYY-MM-DD · YYYY/MM/DD · MM/DD/YYYY.
+_DATE_VALUE_RE = re.compile(r"^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}$|^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}$")
+# 날짜 셀을 verbatim 강제할 authoritative 소스 prefix(수집기가 원문 일자 추출). 그 외는 enrich 대상.
+_DATE_AUTHORITATIVE_PREFIXES = ("fda483-", "admin-")
 
 
 def _normalize_cell_text(text: str) -> str:
@@ -273,29 +293,57 @@ def _normalize_cell_text(text: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
+def _scaffold_cell_enforced(label: str, norm_value: str, doc_id: str) -> bool:
+    """이 셀을 verbatim 강제할지 판정(스코프 규칙). identity 라벨이면 전 소스 강제,
+    날짜형 값이면 fda483/admin 카드에서만 강제, 그 외는 비강제(enrich/derived 셀)."""
+    if label in _IDENTITY_CELL_LABELS:
+        return True
+    if _DATE_VALUE_RE.match(norm_value):
+        return doc_id.startswith(_DATE_AUTHORITATIVE_PREFIXES)
+    return False
+
+
 def lint_scaffold_fixed_cells(rows: list[dict[str, Any]],
                               published_text: str) -> list[LintFinding]:
-    """scaffold W2 메타표의 고정 셀이 발행본에 글자그대로 보존됐는지 검사한다(PL18).
+    """scaffold W2 메타표의 authoritative 고정 셀이 발행본에 글자그대로 보존됐는지 검사(PL18).
 
-    `card_scaffold` 의 표 셀 `<tr><td>**라벨**</td><td>값</td></tr>` 중 슬롯(`{{...}}`)이 아닌
-    값 셀을 추출해, **렌더된 카드**(그 row 의 `document_id` 가 발행 평문에 존재)에 한해 값(서식
-    정규화 후)이 발행 평문에 substring 으로 존재하는지 대조한다. 없으면 LLM 이 고정 값을
+    `card_scaffold` 의 표 셀 `<tr><td>**라벨**</td><td>값</td></tr>` 중 **강제 대상 셀**
+    (`_scaffold_cell_enforced`: identity 라벨 전 소스 + fda483/admin 날짜)을 추출해, **렌더된
+    카드**(그 row 의 `document_id` 가 발행 평문에 존재)에 한해 값(서식 정규화 후)이 **그 카드의
+    발행 영역**(인접 anchor 경계)에 substring 으로 존재하는지 대조한다. 없으면 LLM 이 고정 값을
     재생성·추론·삭제·단정보강한 것(scaffold 계약 위반) → **FAIL**. 카드당 1 finding(과알림 0).
 
-    W2 표는 전부 고정 셀(슬롯 없음)이지만 방어적으로 `{{` 포함 값은 건너뛴다. 의도적 빈칸
-    ('원문 미기재' 등)·미렌더 카드(Tier1 Skipped/보류)는 검사 제외(과알림 0 — 요일 PL14·footer
-    무결성과 동형 결정론 검사로, MCP 전용 Routine 이 못 돌리는 발행 후 방어선).
+    비강제 셀(WL·FR·ECA 발행일=수집일 placeholder→enrich, 발행부서/주제 등 derived)은 검사
+    제외 — 정상 enrich 를 오판하지 않는다(06-22 실데이터 FP 0/TP 8 정본). 슬롯(`{{...}}`)·의도적
+    빈칸('원문 미기재')·미렌더 카드(Tier1 Skipped/보류)도 제외(과알림 0). 요일 PL14·footer
+    무결성과 동형 결정론 검사로, MCP 전용 Routine 이 못 돌리는 발행 후 방어선.
     """
-    haystack = _normalize_cell_text(published_text or "")
-    findings: list[LintFinding] = []
+    pub = published_text or ""
+    # 렌더된 카드와 그 발행 영역(인접 anchor 경계) — 전역 substring 의 타 카드·메타 가림 방지.
+    rendered: list[tuple[int, str, str]] = []  # (anchor_pos, doc_id, scaffold)
     for row in rows or []:
         if not isinstance(row, dict):
             continue
         scaffold = row.get("card_scaffold")
         if not isinstance(scaffold, str) or not scaffold.strip():
             continue
-        if not _row_is_rendered(row, published_text or ""):
-            continue  # 미렌더 카드 — 무결성 검사 제외(과알림 0)
+        doc_id = (row.get("document_id") or "").strip()
+        if not doc_id:
+            continue
+        pos = pub.find(doc_id)
+        if pos < 0:
+            continue  # 미렌더 카드(Tier1 Skipped/보류) — 검사 제외(과알림 0)
+        rendered.append((pos, doc_id, scaffold))
+    rendered.sort(key=lambda t: t[0])
+    anchors = [pos for pos, _, _ in rendered]
+    findings: list[LintFinding] = []
+    for idx, (pos, doc_id, scaffold) in enumerate(rendered):
+        # 영역 = [직전 anchor, 다음 anchor] — 카드의 W2 표(발행일은 anchor 앞, 나머지는 뒤)를
+        # 온전히 포함하되 멀리 있는 메타(M2/M3)·비인접 카드는 배제한다. 인접 카드 일부는 들어올
+        # 수 있으나 FEI·업체명은 카드마다 고유라 가림 위험이 없다(공유 값은 날짜뿐).
+        start = anchors[idx - 1] if idx > 0 else 0
+        end = anchors[idx + 1] if idx + 1 < len(anchors) else len(pub)
+        region = _normalize_cell_text(pub[start:end])
         missing: list[str] = []
         for m in _SCAFFOLD_CELL_RE.finditer(scaffold):
             value = m.group("value")
@@ -304,16 +352,18 @@ def lint_scaffold_fixed_cells(rows: list[dict[str, Any]],
             norm_value = _normalize_cell_text(value)
             if norm_value in _SCAFFOLD_CELL_SKIP_VALUES:
                 continue
-            if norm_value not in haystack:
-                label = _normalize_cell_text(m.group("label"))
+            label = _normalize_cell_text(m.group("label"))
+            if not _scaffold_cell_enforced(label, norm_value, doc_id):
+                continue  # enrich/derived 셀(비강제) — 검사 제외
+            if norm_value not in region:
                 missing.append(f"{label}={value.strip()}")
         if missing:
-            doc_id = (row.get("document_id") or "").strip()
             findings.append(LintFinding(
                 SEV_FAIL, "PL18-SCAFFOLD-CELL", "",
                 f"카드[{doc_id}] scaffold 고정 셀이 발행본과 불일치 — {'; '.join(missing)} "
-                "(값을 재생성·추론·삭제·단정보강한 것으로 보임. scaffold 슬롯이 아닌 셀은 "
-                "글자그대로 전사해야 함 — 06-22 FDA 483 FEI·시설유형/Lancora Class 사고 클래스)."))
+                "(값을 재생성·추론·삭제·단정보강한 것으로 보임. scaffold 의 authoritative 셀은 "
+                "글자그대로 전사해야 함 — 06-22 FDA 483 FEI·시설유형/Lancora Class/admin 처분일 "
+                "사고 클래스)."))
     return findings
 
 

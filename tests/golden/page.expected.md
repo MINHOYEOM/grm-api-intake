@@ -528,7 +528,7 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  📎 공식원본 [링크](https://nedrug.mfds.go.kr/pbp/CCBAI01) ⚠️
+	**출처**  📎 공식원본(목록) [링크](https://nedrug.mfds.go.kr/pbp/CCBAI01) ⚠️
 </callout>
 
 ### [Recall · FDA] Subpotent tablets recall — **{{TITLE_ISSUE}}**
@@ -566,7 +566,7 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본 [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️
+	**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본(목록) [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️
 </callout>
 
 ### [Recall(HC) · Health Canada] Nitrosamine impurity recall — **{{TITLE_ISSUE}}**

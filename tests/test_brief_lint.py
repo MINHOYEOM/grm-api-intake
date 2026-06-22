@@ -47,6 +47,17 @@ HANDOFF_ROWS = [
     },
 ]
 
+HC_PACK_SCAFFOLD = (
+    "### [Recall(HC) · Health Canada] Lancora — **X**\n"
+    "<callout icon=\"🔖\" color=\"gray_bg\">\n"
+    "\t**출처**  정보출처/공식원본 "
+    "[링크](https://recalls-rappels.canada.ca/en/alert-recall/"
+    "lancora-tablets-broken-partial-tablets-blister-pack)\n"
+    "</callout>"
+)
+
+FULL_BRIEF = ADMIN_SCAFFOLD + "\n\n" + RSS_NOTICE_SCAFFOLD
+
 
 class TestNormalizeAndExtract(unittest.TestCase):
     def test_normalize_strips_fragment_trailing_slash_and_leading_amp(self):
@@ -130,14 +141,78 @@ class TestLintProvenance(unittest.TestCase):
         self.assertEqual(len(findings), 1)
 
 
+class TestScaffoldFooterIntegrity(unittest.TestCase):
+    def test_mfds_reconstructed_footer_missing_original_fails(self):
+        rows = [{
+            "source": "MFDS",
+            "document_id": "admin-2026004434",
+            "card_scaffold": (
+                "[링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+                "dispsApplySeq=2026004434)"
+            ),
+        }]
+        published_urls = ["https://www.mfds.go.kr/brd/m_74/view.do?seq=2026004434"]
+        findings = bl.lint_scaffold_footer_integrity(rows, published_urls)
+        self.assertTrue(bl.has_failures(findings))
+        self.assertEqual(findings[0].code, "L17-SCAFFOLD-FOOTER-MISSING")
+
+    def test_hc_slug_autocorrect_missing_original_fails(self):
+        rows = [{"source": "Health Canada", "document_id": "hc-lancora",
+                 "card_scaffold": HC_PACK_SCAFFOLD}]
+        published_urls = [
+            "https://recalls-rappels.canada.ca/en/alert-recall/"
+            "lancora-tablets-broken-partial-tablets-blister-package"
+        ]
+        findings = bl.lint_scaffold_footer_integrity(rows, published_urls)
+        self.assertTrue(bl.has_failures(findings))
+
+    def test_exact_scaffold_footer_passes(self):
+        urls = bl.extract_markdown_links(HC_PACK_SCAFFOLD)
+        findings = bl.lint_scaffold_footer_integrity(
+            [{"card_scaffold": HC_PACK_SCAFFOLD}], urls)
+        self.assertEqual(findings, [])
+
+    def test_published_text_scope_skips_unrendered_row(self):
+        """published_text 가 있으면 document_id 가 발행본에 없는(생략된) row 는 검사 안 함."""
+        rows = [{
+            "source": "Federal Register", "document_id": "2026-12165",
+            "card_scaffold": (
+                "[링크](https://www.federalregister.gov/documents/2026/06/17/"
+                "2026-12165/x)")}]
+        findings = bl.lint_scaffold_footer_integrity(
+            rows, [], published_text="다른 카드들만 있음")
+        self.assertEqual(findings, [])
+
+    def test_published_text_scope_checks_rendered_row(self):
+        """document_id 가 발행본에 있으면(렌더됨) footer 변형을 잡는다."""
+        rows = [{
+            "source": "MFDS", "document_id": "admin-2026004434",
+            "card_scaffold": (
+                "[링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+                "dispsApplySeq=2026004434)")}]
+        published_urls = ["https://www.mfds.go.kr/brd/m_74/view.do?seq=2026004434"]
+        findings = bl.lint_scaffold_footer_integrity(
+            rows, published_urls, published_text="문서번호 admin-2026004434")
+        self.assertTrue(bl.has_failures(findings))
+        self.assertEqual(findings[0].code, "L17-SCAFFOLD-FOOTER-MISSING")
+
+
 class TestErrorPageDetection(unittest.TestCase):
     def test_error_marker_detected(self):
         self.assertTrue(bl.looks_like_error_page(
             "<html>오류가 발생하였습니다 해당 화면 혹은 기능을 찾을 수 없습니다</html>"))
 
+    def test_mfds_brd_soft_error_marker_detected(self):
+        self.assertTrue(bl.looks_like_error_page(
+            "<html>일시적으로 서비스를 이용할 수 없습니다. 요청하신 페이지 주소를 다시 한번 확인</html>"))
+
     def test_real_content_not_error(self):
         self.assertFalse(bl.looks_like_error_page(
             "<html>행정처분정보 대한약품공업 제조업무정지 1개월</html>"))
+
+    def test_generic_error_phrase_in_large_normal_shell_not_error(self):
+        body = "회원정보 변경중에 오류가 발생하였습니다." + ("x" * 12000)
+        self.assertFalse(bl.looks_like_error_page(body))
 
     def test_empty_is_error(self):
         self.assertTrue(bl.looks_like_error_page(""))
@@ -254,7 +329,7 @@ class TestPublishGate(unittest.TestCase):
         self.assertIn("PASS", g.report)
 
     def test_leak_gate_blocks(self):
-        published = "[z](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)"
+        published = FULL_BRIEF + "\n[z](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)"
         g = bl.run_publish_gate(HANDOFF_ROWS, published)
         self.assertFalse(g.ok)
         self.assertEqual(g.fail_count, 1)
@@ -262,20 +337,39 @@ class TestPublishGate(unittest.TestCase):
 
     def test_gate_default_is_all_domains(self):
         """게이트 기본 정책은 all_domains — 지어낸 타 기관 URL 도 차단(W2 옵트인)."""
-        g = bl.run_publish_gate(HANDOFF_ROWS, "[x](https://www.fda.gov/invented/wl-1)")
+        g = bl.run_publish_gate(
+            HANDOFF_ROWS, FULL_BRIEF + "\n[x](https://www.fda.gov/invented/wl-1)")
         self.assertFalse(g.ok)
 
     def test_gate_warn_only_does_not_block(self):
         """mfds_only 정책의 WARN(검색 카드 미확인)만 있으면 발행은 허용(차단=FAIL 한정)."""
-        g = bl.run_publish_gate(HANDOFF_ROWS, "[x](https://www.fda.gov/new/wl-1)",
+        g = bl.run_publish_gate(HANDOFF_ROWS, FULL_BRIEF + "\n[x](https://www.fda.gov/new/wl-1)",
                                 policy=bl.POLICY_MFDS_ONLY)
         self.assertTrue(g.ok)
         self.assertEqual(g.warn_count, 1)
 
     def test_gate_fetched_search_card_allows(self):
         url = "https://www.fda.gov/inspections/warning-letters/acme-2026"
-        g = bl.run_publish_gate(HANDOFF_ROWS, f"[x]({url})", allowed_fetched=[url])
+        g = bl.run_publish_gate(HANDOFF_ROWS, FULL_BRIEF + f"\n[x]({url})",
+                                allowed_fetched=[url])
         self.assertTrue(g.ok)
+
+    def test_gate_scaffold_footer_scope_skips_unrendered_row(self):
+        """run_publish_gate 도 document_id 가 없는(미렌더) row footer 는 검사하지 않는다."""
+        skipped_row = {
+            "source": "Federal Register",
+            "document_id": "2026-12165",
+            "card_scaffold": (
+                "[링크](https://www.federalregister.gov/documents/2026/06/17/"
+                "2026-12165/x)"
+            ),
+        }
+        published = (
+            "문서번호 admin-2026003474\n"
+            f"{ADMIN_SCAFFOLD}"
+        )
+        g = bl.run_publish_gate([HANDOFF_ROWS[0], skipped_row], published)
+        self.assertTrue(g.ok, msg=[str(f) for f in g.findings])
 
 
 class TestGateCLI(unittest.TestCase):
@@ -297,15 +391,14 @@ class TestGateCLI(unittest.TestCase):
     def test_cli_pass_exit_0(self):
         with tempfile.TemporaryDirectory() as d:
             h = self._write(d, "h.json", json.dumps({"rows": HANDOFF_ROWS}))
-            p = self._write(d, "b.md",
-                            "[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)")
+            p = self._write(d, "b.md", FULL_BRIEF)
             self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
 
     def test_cli_fail_exit_1(self):
         with tempfile.TemporaryDirectory() as d:
             h = self._write(d, "h.json", json.dumps({"rows": HANDOFF_ROWS}))
-            p = self._write(d, "b.md",
-                            "[leak](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)")
+            p = self._write(d, "b.md", FULL_BRIEF +
+                            "\n[leak](https://www.mfds.go.kr/brd/m_99/view.do?seq=46893)")
             self.assertEqual(bl.main(["--handoff", h, "--published", p]), 1)
 
     def test_cli_handoff_in_code_fence(self):
@@ -313,8 +406,7 @@ class TestGateCLI(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             fenced = "```json\n" + json.dumps({"rows": HANDOFF_ROWS}) + "\n```"
             h = self._write(d, "h.txt", fenced)
-            p = self._write(d, "b.md",
-                            "[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)")
+            p = self._write(d, "b.md", FULL_BRIEF)
             self.assertEqual(bl.main(["--handoff", h, "--published", p]), 0)
 
     def test_cli_bad_path_exit_2(self):
@@ -436,14 +528,14 @@ class TestPublishStructure(unittest.TestCase):
 
     def test_gate_include_structure_blocks_on_residual_token(self):
         """run_publish_gate(include_structure=True) — provenance 통과여도 구조 FAIL 이면 차단."""
-        published = ADMIN_SCAFFOLD + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
+        published = FULL_BRIEF + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
         g = bl.run_publish_gate(HANDOFF_ROWS, published, include_structure=True)
         self.assertFalse(g.ok)
         self.assertTrue(any(x.code == "PL1-RESIDUAL-TOKEN" for x in g.findings))
 
     def test_gate_default_excludes_structure(self):
         """기본(include_structure=False) 은 구조 위반을 보지 않는다(기존 호출처 무회귀)."""
-        published = ADMIN_SCAFFOLD + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
+        published = FULL_BRIEF + "\n### [x · y] z — **{{TITLE_ISSUE}}**"
         g = bl.run_publish_gate(HANDOFF_ROWS, published)
         self.assertTrue(g.ok)
 
@@ -454,7 +546,7 @@ class TestPublishStructure(unittest.TestCase):
                 fh.write(json.dumps({"rows": HANDOFF_ROWS}))
             p = os.path.join(d, "b.md")
             with open(p, "w", encoding="utf-8") as fh:
-                fh.write("[ok](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)\n<toggle>x</toggle>")
+                fh.write(FULL_BRIEF + "\n<toggle>x</toggle>")
             # provenance 통과(근거 있는 링크) 이지만 구조(toggle) FAIL → exit 1
             self.assertEqual(bl.main(["--handoff", h, "--published", p, "--structure"]), 1)
             # --structure 없으면 통과(exit 0)

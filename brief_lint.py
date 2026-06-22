@@ -65,6 +65,12 @@ _BARE_URL_RE = re.compile(r"https?://[^\s)\"'<>\]]+")
 # 라이브 확인(2026-06-16): getItem?dispsApplySeq=<invalid> → 200 + 이 문구.
 _NEDRUG_ERROR_MARKERS = (
     "해당 화면 혹은 기능을 찾을 수 없습니다",
+    # www.mfds.go.kr/brd/*/view.do?seq=<invented> 계열은 HTTP 200 으로 오류 셸을 돌려줄 수 있다.
+    "일시적으로 서비스를 이용할 수 없습니다",
+    "요청하신 페이지 주소를 다시 한번 확인",
+)
+_SHORT_ERROR_MARKERS = (
+    # 정상 nedrug 페이지의 로그인 JS 에도 이 문구가 있어, 짧은 오류 셸에서만 단독 마커로 쓴다.
     "오류가 발생하였습니다",
 )
 
@@ -164,6 +170,79 @@ def collect_allowed_urls(rows: list[dict[str, Any]]) -> set[str]:
                     allowed.add(normalize_url(u))
     allowed.discard("")
     return allowed
+
+
+def collect_scaffold_footer_urls(rows: list[dict[str, Any]]) -> list[str]:
+    """Intake 카드 scaffold 가 실제 footer 에 싣도록 만든 URL 목록(원형, 중복 제거).
+
+    `card_scaffold` 가 없는 병합 멤버 row 는 렌더 대상이 아니므로 제외한다. 이 목록은
+    발행본에 그대로 남아야 하는 결정론 산출물이다.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        scaffold = row.get("card_scaffold")
+        if not isinstance(scaffold, str) or not scaffold.strip():
+            continue
+        for url in extract_markdown_links(scaffold):
+            key = normalize_url(url)
+            if key and key not in seen:
+                seen.add(key)
+                out.append(url)
+    return out
+
+
+def _row_is_rendered(row: dict[str, Any], published_text: str) -> bool:
+    """발행본에 이 row 의 카드가 실제로 렌더됐는지 — `document_id`(문서번호 셀, LLM 불변)
+    가 발행 평문에 존재하는지로 판정한다. footer URL 이 양쪽 다 변형돼도(예: MFDS 📰·📎
+    동시 재구성) 문서번호는 그대로라 렌더 판정이 견고하다. document_id 가 없으면 식별 불가 →
+    과알림 0 원칙상 미검사(False)."""
+    doc_id = row.get("document_id")
+    if not isinstance(doc_id, str) or not doc_id.strip():
+        return False
+    return doc_id.strip() in (published_text or "")
+
+
+def lint_scaffold_footer_integrity(rows: list[dict[str, Any]],
+                                   published_urls: Iterable[str],
+                                   *,
+                                   published_text: "str | None" = None
+                                   ) -> list[LintFinding]:
+    """Intake scaffold footer URL 이 발행본에 글자 그대로 보존됐는지 검사한다.
+
+    `published_text` 가 주어지면 **실제로 렌더된 카드**(그 row 의 `document_id` 가 발행본
+    문서번호 셀에 존재)만 검사한다 — Tier 1/용량초과 보류로 의도적으로 생략된 row 의 footer
+    가 "누락"으로 오탐되는 것을 막는다(과알림 0). `None` 이면 전수 검사(종전 동작·하위호환).
+
+    live verify 나 fetched 화이트리스트로 구제하지 않는다. 렌더된 카드의 footer(📰/📎)는
+    수집기+scaffold 결정론 산출물이므로 발행본에서 사라지면 LLM 이 URL 을 삭제·변형한 것이다
+    (예: nedrug→m_74 재구성·blister-pack→package 자동보정).
+    """
+    published_keys = {normalize_url(u) for u in published_urls if u}
+    findings: list[LintFinding] = []
+    seen_keys: set[str] = set()
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        scaffold = row.get("card_scaffold")
+        if not isinstance(scaffold, str) or not scaffold.strip():
+            continue
+        if published_text is not None and not _row_is_rendered(row, published_text):
+            continue  # 발행 안 된 카드(Tier1 Skipped/보류) — 무결성 검사 제외
+        for expected_url in extract_markdown_links(scaffold):
+            key = normalize_url(expected_url)
+            if not key or key in seen_keys:
+                continue
+            if key not in published_keys:
+                seen_keys.add(key)
+                findings.append(LintFinding(
+                    SEV_FAIL, "L17-SCAFFOLD-FOOTER-MISSING", expected_url,
+                    "렌더된 Intake 카드의 scaffold footer URL 이 발행본에 없음 — footer "
+                    "링크가 삭제·변형된 것으로 보임. live verify/fetched 관용 없이 scaffold "
+                    "원문 URL 로 복원해야 함."))
+    return findings
 
 
 def _host(url: str) -> str:
@@ -451,7 +530,9 @@ def looks_like_error_page(body: str) -> bool:
     """
     if not body:
         return True
-    return any(m in body for m in _NEDRUG_ERROR_MARKERS)
+    if any(m in body for m in _NEDRUG_ERROR_MARKERS):
+        return True
+    return len(body) < 10000 and any(m in body for m in _SHORT_ERROR_MARKERS)
 
 
 def verify_url_live(url: str, expect_terms: Iterable[str] = (),
@@ -538,6 +619,7 @@ def run_publish_gate(rows: list[dict[str, Any]],
                      policy: str = POLICY_ALL_DOMAINS,
                      allowed_fetched: Iterable[str] = (),
                      verifier: "Any | None" = None,
+                     require_scaffold_footers: bool = True,
                      include_structure: bool = False) -> GateResult:
     """발행 직전(또는 발행 후 탐지) provenance(+선택 구조) 게이트 1회 실행.
 
@@ -547,8 +629,13 @@ def run_publish_gate(rows: list[dict[str, Any]],
     Publish Lint(PL1·PL3/16·PL10·PL14)도 함께 검사(기본 off — 기존 호출처 무회귀).
     반환 `GateResult.ok=False`(FAIL≥1) 면 **발행 차단**.
     """
-    findings = lint_link_provenance(rows, published_markdown, policy=policy,
-                                    allowed_fetched=allowed_fetched, verifier=verifier)
+    published_urls = extract_markdown_links(published_markdown or "")
+    findings: list[LintFinding] = []
+    if require_scaffold_footers:
+        findings.extend(lint_scaffold_footer_integrity(
+            rows, published_urls, published_text=published_markdown or ""))
+    findings.extend(lint_urls(published_urls, collect_allowed_urls(rows), policy=policy,
+                              allowed_fetched=allowed_fetched, verifier=verifier))
     if include_structure:
         findings = findings + lint_publish_structure(published_markdown)
     return GateResult(ok=not has_failures(findings), findings=findings,

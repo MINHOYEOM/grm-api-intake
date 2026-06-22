@@ -33,5 +33,5 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본 [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️
+	**출처**  📰 정보출처 [링크](https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026)   ·   📎 공식원본(목록) [링크](https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts) ⚠️
 </callout>

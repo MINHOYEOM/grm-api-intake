@@ -20,6 +20,23 @@ HANDOFF_ROWS = [
      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716",
      "card_scaffold": "[링크](https://www.mfds.go.kr/brd/m_218/view.do?seq=33716)"},
 ]
+BASE_URLS = [HANDOFF_ROWS[0]["official_url"]]
+
+NEDRUG_HANDOFF_ROWS = [
+    {"source": "MFDS", "document_id": "admin-2026004434",
+     "card_scaffold": (
+         "[링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+         "dispsApplySeq=2026004434)"
+     )},
+]
+
+HC_HANDOFF_ROWS = [
+    {"source": "Health Canada", "document_id": "hc-lancora",
+     "card_scaffold": (
+         "[링크](https://recalls-rappels.canada.ca/en/alert-recall/"
+         "lancora-tablets-broken-partial-tablets-blister-pack)"
+     )},
+]
 
 
 def _callout_with_link(url):
@@ -95,10 +112,27 @@ class TestClassify(unittest.TestCase):
     def test_mfds_leak_is_alert_no_network(self):
         """MFDS 미근거 = 결정론 alert(verdict 미사용)."""
         alerts, info = vpb.classify(
-            HANDOFF_ROWS, ["https://www.mfds.go.kr/brd/m_99/view.do?seq=46893"])
+            HANDOFF_ROWS, BASE_URLS + ["https://www.mfds.go.kr/brd/m_99/view.do?seq=46893"])
         self.assertEqual(len(alerts), 1)
         self.assertEqual(alerts[0].code, "L17-MFDS-PROVENANCE")
         self.assertEqual(info, [])
+
+    def test_nedrug_scaffold_reconstructed_as_m74_is_alert(self):
+        alerts, _info = vpb.classify(
+            NEDRUG_HANDOFF_ROWS,
+            ["https://www.mfds.go.kr/brd/m_74/view.do?seq=2026004434"],
+        )
+        codes = {a.code for a in alerts}
+        self.assertIn("L17-SCAFFOLD-FOOTER-MISSING", codes)
+
+    def test_hc_pack_to_package_is_alert_all_domains(self):
+        alerts, _info = vpb.classify(
+            HC_HANDOFF_ROWS,
+            ["https://recalls-rappels.canada.ca/en/alert-recall/"
+             "lancora-tablets-broken-partial-tablets-blister-package"],
+        )
+        codes = {a.code for a in alerts}
+        self.assertIn("L17-SCAFFOLD-FOOTER-MISSING", codes)
 
     def test_grounded_mfds_passes(self):
         alerts, info = vpb.classify(
@@ -106,9 +140,53 @@ class TestClassify(unittest.TestCase):
         self.assertEqual(alerts, [])
         self.assertEqual(info, [])
 
+    def test_rendered_scope_excludes_skipped_tier1_no_false_positive(self):
+        """렌더된 카드(변형됨)만 footer 검사 — 의도적으로 생략된 Tier1 row 의 scaffold
+        footer 는 발행본에 없어도 오탐하지 않는다(과알림 0). 핵심 회귀: 36 row 중 14 만
+        렌더된 실제 운영 분포에서 ~18 건 오탐을 막는다."""
+        rendered = {
+            "source": "MFDS", "document_id": "admin-2026004434",
+            "card_scaffold": (
+                "[링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+                "dispsApplySeq=2026004434)")}
+        skipped_tier1 = {
+            "source": "Federal Register", "document_id": "2026-12165",
+            "card_scaffold": (
+                "[링크](https://www.federalregister.gov/documents/2026/06/17/"
+                "2026-12165/medical-devices-classification)")}
+        # 발행본: 렌더 카드(MFDS)만 존재 — 그 카드 footer 가 m_74 로 변형됨.
+        published_urls = ["https://www.mfds.go.kr/brd/m_74/view.do?seq=2026004434"]
+        # 평문엔 렌더된 카드의 문서번호만 있고 생략된 Tier1 문서번호는 없다.
+        published_text = "행정처분 경방신약(주) 문서번호 admin-2026004434 제조업무정지"
+        alerts, _info = vpb.classify(
+            [rendered, skipped_tier1], published_urls, published_text=published_text)
+        footer = [a for a in alerts if a.code == "L17-SCAFFOLD-FOOTER-MISSING"]
+        # 렌더된 MFDS 카드의 nedrug 변형 1건만 — 생략된 FR row 는 오탐 0.
+        self.assertEqual(len(footer), 1)
+        self.assertIn("nedrug.mfds.go.kr", footer[0].url)
+        self.assertFalse(any("federalregister" in a.url for a in footer))
+
+    def test_without_published_text_flags_all_backward_compat(self):
+        """published_text 없으면 전수 검사(하위호환) — 생략 row footer 도 잡힌다.
+        스코프 인자가 오탐 차단의 핵심임을 대조로 확인."""
+        rendered = {
+            "source": "MFDS", "document_id": "admin-2026004434",
+            "card_scaffold": (
+                "[링크](https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+                "dispsApplySeq=2026004434)")}
+        skipped_tier1 = {
+            "source": "Federal Register", "document_id": "2026-12165",
+            "card_scaffold": (
+                "[링크](https://www.federalregister.gov/documents/2026/06/17/"
+                "2026-12165/medical-devices-classification)")}
+        published_urls = ["https://www.mfds.go.kr/brd/m_74/view.do?seq=2026004434"]
+        alerts, _info = vpb.classify([rendered, skipped_tier1], published_urls)
+        footer = [a for a in alerts if a.code == "L17-SCAFFOLD-FOOTER-MISSING"]
+        self.assertEqual(len(footer), 2)  # 스코프 없으면 생략 row 도 오탐(=수정 전 동작)
+
     def test_nonmfds_bad_verdict_upgrades_to_alert(self):
         alerts, info = vpb.classify(
-            HANDOFF_ROWS, ["https://www.fda.gov/invented/wl-999"],
+            HANDOFF_ROWS, BASE_URLS + ["https://www.fda.gov/invented/wl-999"],
             verdict=lambda u: vpb.VERDICT_BAD)
         self.assertEqual(len(alerts), 1)
         self.assertEqual(alerts[0].code, "L17-UNGROUNDED")
@@ -116,22 +194,48 @@ class TestClassify(unittest.TestCase):
     def test_nonmfds_unknown_verdict_is_info_not_alert(self):
         """과알림 0: 일시 네트워크 실패(unknown)는 알림 아님(info)."""
         alerts, info = vpb.classify(
-            HANDOFF_ROWS, ["https://www.fda.gov/maybe/down"],
+            HANDOFF_ROWS, BASE_URLS + ["https://www.fda.gov/maybe/down"],
             verdict=lambda u: vpb.VERDICT_UNKNOWN)
         self.assertEqual(alerts, [])
         self.assertEqual(len(info), 1)
 
     def test_nonmfds_ok_verdict_is_info(self):
         alerts, info = vpb.classify(
-            HANDOFF_ROWS, ["https://www.fda.gov/live/wl-1"],
+            HANDOFF_ROWS, BASE_URLS + ["https://www.fda.gov/live/wl-1"],
             verdict=lambda u: vpb.VERDICT_OK)
         self.assertEqual(alerts, [])
         self.assertEqual(len(info), 1)
 
     def test_no_verdict_treats_nonmfds_as_info(self):
-        alerts, info = vpb.classify(HANDOFF_ROWS, ["https://www.fda.gov/x"])
+        alerts, info = vpb.classify(HANDOFF_ROWS, BASE_URLS + ["https://www.fda.gov/x"])
         self.assertEqual(alerts, [])
         self.assertEqual(len(info), 1)
+
+    def test_fetched_search_url_with_waf_unknown_is_not_alert(self):
+        url = "https://www.fda.gov/inspections/warning-letters/acme-2026"
+        alerts, info = vpb.classify(
+            HANDOFF_ROWS, BASE_URLS + [url],
+            verdict=lambda u: vpb.VERDICT_UNKNOWN,
+            allowed_fetched=[url],
+        )
+        self.assertEqual(alerts, [])
+        self.assertEqual(info, [])
+
+    def test_autofix_replacement_pairs_incident_urls(self):
+        replacements = vpb.build_autofix_replacements(
+            HC_HANDOFF_ROWS,
+            ["https://recalls-rappels.canada.ca/en/alert-recall/"
+             "lancora-tablets-broken-partial-tablets-blister-package"],
+        )
+        self.assertEqual(
+            replacements,
+            {
+                "https://recalls-rappels.canada.ca/en/alert-recall/"
+                "lancora-tablets-broken-partial-tablets-blister-package":
+                "https://recalls-rappels.canada.ca/en/alert-recall/"
+                "lancora-tablets-broken-partial-tablets-blister-pack"
+            },
+        )
 
 
 class TestVerdict(unittest.TestCase):
@@ -218,8 +322,11 @@ class TestRunSkips(unittest.TestCase):
              mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
                                return_value=HANDOFF_ROWS), \
              mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_callout_with_link(
-                                   "https://www.mfds.go.kr/brd/m_99/view.do?seq=1")]):
+                               return_value=[
+                                   _callout_with_link(HANDOFF_ROWS[0]["official_url"]),
+                                   _callout_with_link(
+                                       "https://www.mfds.go.kr/brd/m_99/view.do?seq=1"),
+                               ]):
             j = vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
         self.assertFalse(j["ok"])
         self.assertEqual(j["fail_count"], 1)
@@ -231,7 +338,8 @@ class TestRunSkips(unittest.TestCase):
              mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
                                return_value=HANDOFF_ROWS), \
              mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_paragraph("발행일: 2026-06-17 화요일")]):
+                               return_value=[_paragraph("발행일: 2026-06-17 화요일"),
+                                             _callout_with_link(HANDOFF_ROWS[0]["official_url"])]):
             j = vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
         self.assertFalse(j["ok"])
         codes = [a["code"] for a in j["alerts"]]
@@ -264,7 +372,8 @@ class TestRunCoverage(unittest.TestCase):
              mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
                                return_value=HANDOFF_ROWS), \
              mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_paragraph(coverage_text)]):
+                               return_value=[_paragraph(coverage_text),
+                                             _callout_with_link(HANDOFF_ROWS[0]["official_url"])]):
             return vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
 
     def test_collected_mismatch_is_alert(self):

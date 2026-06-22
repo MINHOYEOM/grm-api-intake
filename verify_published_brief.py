@@ -23,6 +23,7 @@ lazy import(`collect_intake` 의 검증된 `notion_api_request` 재사용).
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
 import sys
@@ -189,22 +190,32 @@ def definitive_verdict(url: str, **kwargs: Any) -> str:
 
 def classify(handoff_rows: list[dict[str, Any]],
              published_urls: list[str],
-             verdict: "Any | None" = None) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
+             verdict: "Any | None" = None,
+             *,
+             allowed_fetched: Iterable[str] = (),
+             published_text: "str | None" = None) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
     """(alert_findings, info_findings) 반환.
 
-    base = MFDS_ONLY 판정(네트워크 0): MFDS 미근거=FAIL(alert), 비-MFDS 미근거=WARN.
-    비-MFDS WARN 은 `verdict(url)` 가 BAD 면 L17-UNGROUNDED FAIL(alert)로 승격,
-    OK/UNKNOWN(또는 verdict 미제공)이면 info(알림 트리거 아님).
+    scaffold footer 누락은 도메인·live 상태와 무관하게 alert 다. 단 `published_text` 가
+    주어지면 **실제로 렌더된 카드**(document_id 가 발행본에 존재)에 한해 검사해 Tier1 Skipped
+    /보류 row 의 footer 오탐을 차단한다(과알림 0). 그 밖의 미근거 링크는 ALL_DOMAINS 로 전부
+    검사하되, 비-MFDS 검색 카드 후보는 `allowed_fetched` 이거나 `verdict(url)` 가 BAD 일 때만
+    alert 로 승격한다.
     """
     allowed = bl.collect_allowed_urls(handoff_rows)
-    base = bl.lint_urls(published_urls, allowed, policy=bl.POLICY_MFDS_ONLY)
-    alerts: list[bl.LintFinding] = []
+    base = bl.lint_urls(published_urls, allowed, policy=bl.POLICY_ALL_DOMAINS,
+                        allowed_fetched=allowed_fetched)
+    alerts: list[bl.LintFinding] = bl.lint_scaffold_footer_integrity(
+        handoff_rows, published_urls, published_text=published_text)
     info: list[bl.LintFinding] = []
     for f in base:
-        if f.severity == bl.SEV_FAIL:           # MFDS 미근거 — 결정론 alert
+        if f.code == "L17-MFDS-PROVENANCE":    # MFDS 미근거 — 결정론 alert
             alerts.append(f)
             continue
-        # 비-MFDS 미근거(WARN)
+        if f.severity != bl.SEV_FAIL:
+            info.append(f)
+            continue
+        # 비-MFDS 미근거(ALL_DOMAINS FAIL 후보): 검색 카드일 수 있어 live verdict 로 보수 환원.
         v = verdict(f.url) if verdict is not None else VERDICT_UNKNOWN
         if v == VERDICT_BAD:
             alerts.append(bl.LintFinding(
@@ -212,8 +223,125 @@ def classify(handoff_rows: list[dict[str, Any]],
                 "handoff 근거 없는 외부 링크가 live verify 에서 명확히 나쁨(404·오류셸·"
                 "기대어 부재) — 지어낸/죽은 링크 의심."))
         else:
-            info.append(f)
+            info.append(bl.LintFinding(
+                bl.SEV_WARN, "L17-UNVERIFIED", f.url,
+                "handoff 근거 없는 외부 링크이나 live verify 가 OK/UNKNOWN 이라 알림으로 "
+                "승격하지 않음(검색 카드·WAF 가능성)."))
     return alerts, info
+
+
+def _enable_brief_autofix() -> bool:
+    """발행 후 URL self-heal 옵션. 기본 off, 사람 게이트 후에만 활성화한다."""
+    return os.environ.get("ENABLE_BRIEF_AUTOFIX", "false").lower() == "true"
+
+
+def _url_tokens(url: str) -> set[str]:
+    import re
+    parts = [p.lower() for p in re.split(r"[^A-Za-z0-9]+", url) if len(p) >= 3]
+    return set(parts)
+
+
+def _same_url_family(expected: str, candidate: str) -> bool:
+    """self-heal 후보 매칭: 숫자 식별자 공유 또는 slug 토큰 대부분 공유일 때만."""
+    import re
+    nums_expected = set(re.findall(r"\d{5,}", expected))
+    nums_candidate = set(re.findall(r"\d{5,}", candidate))
+    if nums_expected and nums_candidate and nums_expected & nums_candidate:
+        return True
+    e_tokens = _url_tokens(expected)
+    c_tokens = _url_tokens(candidate)
+    if not e_tokens or not c_tokens:
+        return False
+    return len(e_tokens & c_tokens) / max(len(e_tokens), len(c_tokens)) >= 0.6
+
+
+def build_autofix_replacements(handoff_rows: list[dict[str, Any]],
+                               published_urls: list[str],
+                               *,
+                               published_text: "str | None" = None) -> dict[str, str]:
+    """미근거 URL→scaffold URL 자동치환 후보를 보수적으로 만든다(모호하면 제외).
+
+    `published_text` 로 렌더된 카드만 대상(classify 와 동일 스코프 — 생략 카드 footer 는
+    self-heal 대상이 아니다)."""
+    missing = [f.url for f in bl.lint_scaffold_footer_integrity(
+        handoff_rows, published_urls, published_text=published_text)]
+    if not missing:
+        return {}
+    allowed = bl.collect_allowed_urls(handoff_rows)
+    ungrounded = [f.url for f in bl.lint_urls(
+        published_urls, allowed, policy=bl.POLICY_ALL_DOMAINS)]
+    replacements: dict[str, str] = {}
+    used_candidates: set[str] = set()
+    for expected in missing:
+        candidates = [u for u in ungrounded
+                      if u not in used_candidates and _same_url_family(expected, u)]
+        if len(candidates) == 1:
+            candidate = candidates[0]
+            replacements[candidate] = expected
+            used_candidates.add(candidate)
+    return replacements
+
+
+def _patchable_rich_text(rt: dict[str, Any], replacements: dict[str, str]) -> tuple[dict[str, Any], bool]:
+    out: dict[str, Any] = {"type": rt.get("type", "text")}
+    changed = False
+    if out["type"] == "text":
+        text = copy.deepcopy(rt.get("text") or {})
+        text.setdefault("content", rt.get("plain_text", ""))
+        link = text.get("link")
+        if isinstance(link, dict) and link.get("url") in replacements:
+            link["url"] = replacements[link["url"]]
+            changed = True
+        out["text"] = text
+    else:
+        payload = rt.get(out["type"])
+        if isinstance(payload, dict):
+            out[out["type"]] = copy.deepcopy(payload)
+    if "annotations" in rt:
+        out["annotations"] = copy.deepcopy(rt["annotations"])
+    return out, changed
+
+
+def apply_autofix_replacements(token: str, blocks: list[dict[str, Any]],
+                               replacements: dict[str, str]) -> int:
+    """Notion rich_text 링크를 replacement map 으로 PATCH 한다. 호출자는 flag 를 확인한다."""
+    if not replacements:
+        return 0
+    ci = _ci()
+    patched = 0
+
+    def _walk(block_list: Iterable[dict[str, Any]]) -> None:
+        nonlocal patched
+        for block in block_list or []:
+            if not isinstance(block, dict):
+                continue
+            btype = block.get("type")
+            payload = block.get(btype, {}) if btype else {}
+            if isinstance(payload, dict) and isinstance(payload.get("rich_text"), list):
+                rich_text = []
+                changed = False
+                for rt in payload["rich_text"]:
+                    if isinstance(rt, dict):
+                        new_rt, rt_changed = _patchable_rich_text(rt, replacements)
+                        rich_text.append(new_rt)
+                        changed = changed or rt_changed
+                    else:
+                        rich_text.append(rt)
+                if changed and block.get("id"):
+                    ci.notion_api_request(
+                        "PATCH",
+                        f"https://api.notion.com/v1/blocks/{block['id']}",
+                        token,
+                        body={btype: {"rich_text": rich_text}},
+                    )
+                    patched += 1
+            if isinstance(payload, dict) and isinstance(payload.get("children"), list):
+                _walk(payload["children"])
+            if isinstance(block.get("children"), list):
+                _walk(block["children"])
+
+    _walk(blocks)
+    return patched
 
 
 def build_audit_json(alerts: list[bl.LintFinding],
@@ -413,7 +541,7 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     text = extract_text_from_blocks(blocks)
 
     verdict = (lambda u: definitive_verdict(u)) if verify else None
-    alerts, info = classify(rows, urls, verdict=verdict)
+    alerts, info = classify(rows, urls, verdict=verdict, published_text=text)
     # 구조 위반(PL1 잔존토큰·PL3/16 금지문법·PL14 요일=날짜)도 alert 로 포함한다 —
     # 발행 직전 `--structure` 게이트와 동등한 결정론 검사(네트워크 0 → 과알림 0). MCP 전용
     # Routine 은 인-루틴 게이트를 코드로 못 돌리므로 이 탐지가 요일류 결함의 유일 결정론 방어선.
@@ -429,8 +557,19 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     cov_alerts = [f for f in cov_findings if f.severity == bl.SEV_FAIL]
     info = info + [f for f in cov_findings if f.severity != bl.SEV_FAIL]
     alerts = struct_alerts + cov_alerts + alerts
+    note = ""
+    if alerts and _enable_brief_autofix():
+        replacements = build_autofix_replacements(rows, urls, published_text=text)
+        if replacements:
+            try:
+                patched = apply_autofix_replacements(token, blocks, replacements)
+                note = f"ENABLE_BRIEF_AUTOFIX=true — URL self-heal PATCH {patched} block(s)."
+            except Exception as exc:  # noqa: BLE001
+                note = f"ENABLE_BRIEF_AUTOFIX=true — URL self-heal 실패: {str(exc)[:160]}"
+        else:
+            note = "ENABLE_BRIEF_AUTOFIX=true — unambiguous URL replacement 없음(알림만)."
     return build_audit_json(alerts, info, brief_title=brief.get("title", ""),
-                            brief_url=brief.get("url", ""))
+                            brief_url=brief.get("url", ""), note=note)
 
 
 def main(argv: "list[str] | None" = None) -> int:

@@ -453,6 +453,15 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
     return info, official, fallback
 
 
+def _official_label(official_url: str, fallback: bool) -> str:
+    """footer 공식원본 라벨. L2 fallback 은 사용자가 목록/데이터셋임을 즉시 알 수 있게 표기."""
+    if not fallback:
+        return "공식원본"
+    if "data.go.kr" in official_url or "api.fda.gov" in official_url:
+        return "공식원본(데이터셋)"
+    return "공식원본(목록)"
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. 섹션 분류 (§7)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -703,7 +712,7 @@ def _footer_block(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
             parts.append(f"📰 정보출처 [링크]({info})")
         if official:
             warn = " ⚠️" if fallback else ""
-            parts.append(f"📎 공식원본 [링크]({official}){warn}")
+            parts.append(f"📎 {_official_label(official, fallback)} [링크]({official}){warn}")
     if not parts:
         parts.append("출처 링크 원문 미기재")
     return _callout(["**출처**  " + "   ·   ".join(parts)], icon="🔖", color=cfg.color_footer)

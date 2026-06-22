@@ -736,6 +736,17 @@ class AdminL1VerifyTest(unittest.TestCase):
         self.assertEqual(official, "https://nedrug.mfds.go.kr/pbp/CCBAO01")
         self.assertTrue(fb)
 
+    def test_footer_labels_l2_list_fallback(self):
+        md = cs._footer_block("admin-action", self._ROW,
+                              {"ADM_DISPS_SEQ": "2026004188", "admin_l1_verify": "fail"},
+                              cs.DEFAULT_CONFIG)
+        self.assertIn("📎 공식원본(목록)", md)
+
+    def test_footer_labels_l2_dataset_fallback(self):
+        self.assertEqual(
+            cs._official_label("https://www.data.go.kr/data/15058457/openapi.do", True),
+            "공식원본(데이터셋)")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -245,6 +245,78 @@ def lint_scaffold_footer_integrity(rows: list[dict[str, Any]],
     return findings
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# scaffold 고정 셀(W2 메타표) 전사 무결성 (PL18) — Routine(LLM) 이 scaffold 의 슬롯({{...}})이
+# 아닌 표 셀(FEI·발행일·시설유형·Class·문서번호 등)을 글자그대로 렌더했는지 발행 후 결정론 대조.
+# 06-22 사고 클래스(FDA 483 FEI·발행일·시설유형 전사오류 + Lancora Class 과억제 삭제)를 차단한다.
+# `card_scaffold` 의 표 셀은 수집기가 박은 결정론 사실이고 needs_llm_slots 가 아니므로(=고정 셀)
+# Routine 은 한 글자도 바꾸지 않아야 한다(v16 scaffold 계약). footer URL 은
+# lint_scaffold_footer_integrity, 표 고정 셀 텍스트는 이 함수가 담당한다(같은 결함 클래스의
+# 셀-텍스트 일반화). 순수 함수(네트워크 없음).
+# ─────────────────────────────────────────────────────────────────────────────
+# W2 메타표 셀: <tr><td>**라벨**</td><td>값</td></tr> (card_scaffold._table 산출형).
+_SCAFFOLD_CELL_RE = re.compile(
+    r"<tr>\s*<td>\s*\*\*(?P<label>.*?)\*\*\s*</td>\s*<td>(?P<value>.*?)</td>\s*</tr>", re.S)
+# 대조 제외 값: 의도적 빈칸 placeholder(생성 금지 신호) + 무신호 기호. 이런 값은 발행본에
+# 그대로 없을 수도 있고(LLM 이 동일 placeholder 를 다른 칸에 쓰기도 함) 신호가 없어 과알림만 낸다.
+_SCAFFOLD_CELL_SKIP_VALUES = frozenset({"", "—", "-", "원문 미기재", "N/A"})
+
+
+def _normalize_cell_text(text: str) -> str:
+    """셀/발행 평문 대조용 정규화 — 인라인 코드 백틱·볼드 제거 + 공백 1칸 정규화.
+
+    scaffold 의 문서번호 셀은 `` `값` ``(inline code)인데 Notion 발행 평문은 코드 서식이
+    벗겨져 백틱이 없다. 볼드(`**`)·여러 공백/줄바꿈도 정규화해 **서식 차이로 인한 오탐**을
+    막는다(FEI 숫자·날짜·고정 문구의 실질 내용만 비교 — 마크다운/평문 양쪽 입력 공용).
+    """
+    t = (text or "").replace("`", "").replace("**", "")
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def lint_scaffold_fixed_cells(rows: list[dict[str, Any]],
+                              published_text: str) -> list[LintFinding]:
+    """scaffold W2 메타표의 고정 셀이 발행본에 글자그대로 보존됐는지 검사한다(PL18).
+
+    `card_scaffold` 의 표 셀 `<tr><td>**라벨**</td><td>값</td></tr>` 중 슬롯(`{{...}}`)이 아닌
+    값 셀을 추출해, **렌더된 카드**(그 row 의 `document_id` 가 발행 평문에 존재)에 한해 값(서식
+    정규화 후)이 발행 평문에 substring 으로 존재하는지 대조한다. 없으면 LLM 이 고정 값을
+    재생성·추론·삭제·단정보강한 것(scaffold 계약 위반) → **FAIL**. 카드당 1 finding(과알림 0).
+
+    W2 표는 전부 고정 셀(슬롯 없음)이지만 방어적으로 `{{` 포함 값은 건너뛴다. 의도적 빈칸
+    ('원문 미기재' 등)·미렌더 카드(Tier1 Skipped/보류)는 검사 제외(과알림 0 — 요일 PL14·footer
+    무결성과 동형 결정론 검사로, MCP 전용 Routine 이 못 돌리는 발행 후 방어선).
+    """
+    haystack = _normalize_cell_text(published_text or "")
+    findings: list[LintFinding] = []
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        scaffold = row.get("card_scaffold")
+        if not isinstance(scaffold, str) or not scaffold.strip():
+            continue
+        if not _row_is_rendered(row, published_text or ""):
+            continue  # 미렌더 카드 — 무결성 검사 제외(과알림 0)
+        missing: list[str] = []
+        for m in _SCAFFOLD_CELL_RE.finditer(scaffold):
+            value = m.group("value")
+            if "{{" in value:
+                continue  # 슬롯 셀(LLM 채움) — 방어적 제외
+            norm_value = _normalize_cell_text(value)
+            if norm_value in _SCAFFOLD_CELL_SKIP_VALUES:
+                continue
+            if norm_value not in haystack:
+                label = _normalize_cell_text(m.group("label"))
+                missing.append(f"{label}={value.strip()}")
+        if missing:
+            doc_id = (row.get("document_id") or "").strip()
+            findings.append(LintFinding(
+                SEV_FAIL, "PL18-SCAFFOLD-CELL", "",
+                f"카드[{doc_id}] scaffold 고정 셀이 발행본과 불일치 — {'; '.join(missing)} "
+                "(값을 재생성·추론·삭제·단정보강한 것으로 보임. scaffold 슬롯이 아닌 셀은 "
+                "글자그대로 전사해야 함 — 06-22 FDA 483 FEI·시설유형/Lancora Class 사고 클래스)."))
+    return findings
+
+
 def _host(url: str) -> str:
     try:
         return urlsplit(url).netloc.lower()
@@ -371,6 +443,14 @@ _DATE_WEEKDAY_RE = re.compile(
     r"|\s+(?P<wd_bare>[월화수목금토일])요일)")         # ② … 화요일
 _KO_WEEKDAYS = ("월", "화", "수", "목", "금", "토", "일")  # date.weekday(): 월=0..일=6
 
+# PL19 — Evidence 집계(커버리지 헤더 선언) ↔ 실제 카드 W1 배지 수 대조.
+# 헤더 메타라인: `... · Evidence A {N}/B {N}/C {N} · 미확인 ...`(v16 L422). 카드 배지: W1 callout
+# 의 `` `Evidence A` · `Source` · ... ``(항상 첫 배지라 뒤에 ` · ` 가 온다). 헤더는 'A' 뒤에 숫자,
+# 범례(L439 "Evidence A: 1차…")는 'A' 뒤에 ':' 라 배지 패턴(`?\s*·)과 구분된다 → 오집계 없음.
+# 06-22 사고: 헤더 A4/B10 인데 실제 배지 A3/B11(요일 PL14 와 동형 — LLM 자유 집계가 실제와 어긋남).
+_EVIDENCE_TALLY_RE = re.compile(r"Evidence\s+A\s*(\d+)\s*/\s*B\s*(\d+)(?:\s*/\s*C\s*(\d+))?")
+_EVIDENCE_BADGE_RE = re.compile(r"Evidence ([ABC])`?\s*·")
+
 
 def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
     """발행 markdown 의 기계적 구조 위반(PL1·PL3/16·PL10·PL14)을 결정론 판정.
@@ -430,6 +510,24 @@ def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
                 SEV_FAIL, "PL14-WEEKDAY", "",
                 f"발행물 요일 불일치 — {y}-{mo}-{dd} 는 "
                 f"'{actual}'요일인데 '{wd}'로 표기(D7)."))
+
+    # PL19 — Evidence 집계 헤더(선언) ↔ 실제 카드 배지 수. 헤더 메타라인이 없으면 검사 생략
+    # (추측 금지·과알림 0). C 미선언(A/B 만)이면 C=0 으로 본다.
+    tally = _EVIDENCE_TALLY_RE.search(md)
+    if tally:
+        declared = {"A": int(tally.group(1)), "B": int(tally.group(2)),
+                    "C": int(tally.group(3) or 0)}
+        counted = {"A": 0, "B": 0, "C": 0}
+        for bm in _EVIDENCE_BADGE_RE.finditer(md):
+            counted[bm.group(1)] += 1
+        mismatched = [k for k in ("A", "B", "C") if declared[k] != counted[k]]
+        if mismatched:
+            findings.append(LintFinding(
+                SEV_FAIL, "PL19-EVIDENCE-TALLY", "",
+                "Evidence 집계 헤더 ↔ 카드 배지 수 불일치 — "
+                f"헤더 A{declared['A']}/B{declared['B']}/C{declared['C']} vs "
+                f"배지 A{counted['A']}/B{counted['B']}/C{counted['C']} "
+                f"(불일치: {', '.join(mismatched)}; LLM 집계 오류 의심)."))
     return findings
 
 
@@ -620,13 +718,16 @@ def run_publish_gate(rows: list[dict[str, Any]],
                      allowed_fetched: Iterable[str] = (),
                      verifier: "Any | None" = None,
                      require_scaffold_footers: bool = True,
+                     require_scaffold_cells: bool = True,
                      include_structure: bool = False) -> GateResult:
     """발행 직전(또는 발행 후 탐지) provenance(+선택 구조) 게이트 1회 실행.
 
     기본 정책 = ALL_DOMAINS(전 기관 일반화, W2). `allowed_fetched` = 이번 세션에 실제
     fetch·확인한 검색 카드 URL(있으면 그 비-MFDS 링크는 근거로 인정). `verifier` 주입 시
-    미근거 비-MFDS 링크를 live verify(탐지 경로). `include_structure=True` 면 기계적
-    Publish Lint(PL1·PL3/16·PL10·PL14)도 함께 검사(기본 off — 기존 호출처 무회귀).
+    미근거 비-MFDS 링크를 live verify(탐지 경로). `require_scaffold_cells=True`(기본) 면
+    scaffold W2 고정 셀 전사 무결성(PL18)도 검사한다(footer URL 과 동일 결함 클래스의 셀-텍스트
+    일반화 — 06-22 FDA 483/Lancora 사고). `include_structure=True` 면 기계적 Publish
+    Lint(PL1·PL3/16·PL10·PL14·PL19)도 함께 검사(기본 off — 기존 호출처 무회귀).
     반환 `GateResult.ok=False`(FAIL≥1) 면 **발행 차단**.
     """
     published_urls = extract_markdown_links(published_markdown or "")
@@ -634,6 +735,8 @@ def run_publish_gate(rows: list[dict[str, Any]],
     if require_scaffold_footers:
         findings.extend(lint_scaffold_footer_integrity(
             rows, published_urls, published_text=published_markdown or ""))
+    if require_scaffold_cells:
+        findings.extend(lint_scaffold_fixed_cells(rows, published_markdown or ""))
     findings.extend(lint_urls(published_urls, collect_allowed_urls(rows), policy=policy,
                               allowed_fetched=allowed_fetched, verifier=verifier))
     if include_structure:

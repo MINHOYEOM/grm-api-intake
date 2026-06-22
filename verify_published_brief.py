@@ -546,6 +546,10 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     # 발행 직전 `--structure` 게이트와 동등한 결정론 검사(네트워크 0 → 과알림 0). MCP 전용
     # Routine 은 인-루틴 게이트를 코드로 못 돌리므로 이 탐지가 요일류 결함의 유일 결정론 방어선.
     struct_alerts = [f for f in bl.lint_publish_structure(text) if f.severity == bl.SEV_FAIL]
+    # scaffold 고정 셀 전사 무결성(PL18) — handoff card_scaffold 의 W2 표 고정 셀(FEI·발행일·
+    # 시설유형·Class·문서번호 등)이 발행본에 글자그대로 보존됐는지 결정론 대조(06-22 FDA 483/
+    # Lancora 사고 클래스). 렌더된 카드만·과알림 0. 전부 FAIL 만 반환하므로 그대로 alert 에 합산.
+    scaffold_cell_alerts = bl.lint_scaffold_fixed_cells(rows, text)
     # 수집 현황 '수집' 숫자(총계+소스별)를 handoff 정본과 대조한다(W2) — 발행물 LLM 집계가
     # 수집기 산출과 어긋나면 FAIL(요일 PL14 와 동형 결정론 검사·네트워크 0 → 과알림 0). 정본은
     # handoff rows 로 독립 재집계(build_coverage_collected = W1 이 handoff 에 싣는 값과 동일 산식).
@@ -556,7 +560,7 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     cov_findings = bl.lint_coverage_counts(expected_cov, text)
     cov_alerts = [f for f in cov_findings if f.severity == bl.SEV_FAIL]
     info = info + [f for f in cov_findings if f.severity != bl.SEV_FAIL]
-    alerts = struct_alerts + cov_alerts + alerts
+    alerts = struct_alerts + cov_alerts + scaffold_cell_alerts + alerts
     note = ""
     if alerts and _enable_brief_autofix():
         replacements = build_autofix_replacements(rows, urls, published_text=text)

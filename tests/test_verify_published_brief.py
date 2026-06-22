@@ -396,5 +396,55 @@ class TestRunCoverage(unittest.TestCase):
         self.assertTrue(j["ok"])
 
 
+class TestRunScaffoldCells(unittest.TestCase):
+    """Track A — 발행 후 탐지가 scaffold 고정 셀 전사오류(PL18)를 FAIL 로 잡는다(06-22 FDA 483).
+
+    handoff card_scaffold(W2 고정 셀) ↔ 발행 본문 평문을 결정론 대조(네트워크 0 → 과알림 0).
+    """
+
+    FDA483_ROW = {
+        "source": "FDA 483", "document_id": "fda483-192439",
+        "card_scaffold": (
+            "### [FDA 483 실사 관찰 · FDA] BPI Labs, LLC — **{{TITLE_ISSUE}}**\n\n"
+            "<table>\n"
+            "<tr><td>**발행일**</td><td>2026-05-27</td></tr>\n"
+            "<tr><td>**문서번호**</td><td>`fda483-192439`</td></tr>\n"
+            "<tr><td>**제조소/업체**</td><td>BPI Labs, LLC · FEI 3015156709</td></tr>\n"
+            "<tr><td>**시설 · 유형**</td><td>Outsourcing Facility · 483</td></tr>\n"
+            "</table>"),
+    }
+
+    def _run(self, blocks):
+        with mock.patch.object(vpb, "fetch_latest_brief",
+                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               return_value=[self.FDA483_ROW]), \
+             mock.patch.object(vpb, "fetch_brief_blocks", return_value=blocks):
+            return vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
+
+    def _cells(self, fei):
+        # 발행 카드 평문: 문서번호 보존(렌더 판정) + FEI 칸만 가변.
+        return [_paragraph("발행일 2026-05-27"),
+                _paragraph("문서번호 fda483-192439"),
+                _paragraph(f"제조소/업체 BPI Labs, LLC · FEI {fei}"),
+                _paragraph("시설 · 유형 Outsourcing Facility · 483")]
+
+    def test_fei_mutation_detected(self):
+        j = self._run(self._cells("3016534068"))   # 3015156709 -> 3016534068 (6/22 오류)
+        self.assertFalse(j["ok"])
+        self.assertIn("PL18-SCAFFOLD-CELL", [a["code"] for a in j["alerts"]])
+
+    def test_verbatim_card_passes(self):
+        j = self._run(self._cells("3015156709"))    # scaffold 그대로 전사 → 과알림 0
+        self.assertTrue(j["ok"], msg=j["alerts"])
+        self.assertEqual(j["fail_count"], 0)
+
+    def test_unrendered_card_not_flagged(self):
+        # 문서번호가 발행본에 없으면(미렌더) 검사 제외 — FEI 변형이어도 무알림.
+        blocks = [_paragraph("제조소/업체 BPI Labs, LLC · FEI 3016534068")]
+        j = self._run(blocks)
+        self.assertTrue(j["ok"], msg=j["alerts"])
+
+
 if __name__ == "__main__":
     unittest.main()

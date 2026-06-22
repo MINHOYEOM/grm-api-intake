@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 최신 변경 | `v1.45` (**출처 링크 변형 방지 2026-06-22**): Intake scaffold footer URL 이 발행 단계에서 `nedrug/pbp/CCBAO01`→`mfds.go.kr/brd/m_74`, `blister-pack`→`blister-package`, FR 날짜 세그먼트 등으로 재구성되는 사고를 차단. `lint_scaffold_footer_integrity(..., published_text=...)` 는 실제 렌더 카드(`document_id` 매칭)만 검사하고, 발행 후 audit 은 ALL_DOMAINS + WAF/UNKNOWN 관용으로 확장. 구현 커밋 `4548b2c`. |
-| 문서 버전 | `v1.45` (**출처 링크 변형 방지 2026-06-22**: scaffold footer 무결성 렌더 스코프, `run_publish_gate`/`verify_published_brief` 발행 평문 전달, ALL_DOMAINS 발행 후 audit, 기본 off self-heal, L2 footer 라벨 명확화, v16 footer 글자그대로 전사 가드. 수집기 `collect_*.py` 불변. 상세 §3.3·§4.2·구성요소 변경이력). 직전 `v1.44` KR-egress 잔여 QA 3종 복구. |
-| 최종 수정일 | 2026-06-22 (출처 링크 변형 방지·footer 무결성 렌더 스코프 반영) |
+| 최신 변경 | `v1.46` (**scaffold 고정 셀·Evidence 집계 게이트 2026-06-22 주간점검**): 발행물의 W2 표 고정 셀(FEI·발행일·시설유형·Class·문서번호 등 슬롯 아닌 셀) 전사오류와 Evidence 집계 헤더↔배지 불일치를 결정론 차단. `brief_lint.lint_scaffold_fixed_cells`(PL18, footer 무결성의 셀-텍스트 일반화·항상 실행)+`lint_publish_structure` Evidence 집계(PL19)를 신설하고 `run_publish_gate`(`require_scaffold_cells`)·`verify_published_brief.run()` 양쪽에 배선. 06-22 FDA 483 FEI·시설유형 전사오류 + Lancora Class 과억제 삭제 사고 클래스. 수집기 `collect_*.py` 불변·golden byte-diff 0. |
+| 문서 버전 | `v1.46` (**scaffold 고정 셀(PL18)·Evidence 집계(PL19) 발행 후 게이트 2026-06-22**: 결정론 셀 전사 무결성, 관측·EVAL 트랙 공통 게이트 배선(비대칭 해소), v16 프롬프트 W2 고정 셀 verbatim·양방향 사실 가드, Brief Lint L12/L13·EVAL E1 게이트 연동. 상세 §3.3·구성요소 변경이력). 직전 `v1.45` 출처 링크 변형 방지(scaffold footer 무결성). |
+| 최종 수정일 | 2026-06-22 (scaffold 고정 셀·Evidence 집계 게이트 + 출처 링크 변형 방지) |
 | 현재 상태 | 매일 수집/Notion 적재 동작, GitHub Actions 내부 health check P1 구현. **바이오 소스 1단계: Phase 3 P1 글로벌 3종(ICH·WHO·HC) 라이브 검증 통과(dry-run + 실적재 207건 0실패)·운영 활성(`ENABLE_ICH/WHO/HC=true`)·`feature/biologic-sources` → `main` 머지.** ICH는 정적 guideline snapshot 자동 카드화를 중단하고 Tier 1 모니터링/Skipped 기본으로 운용한다. 실제 ICH 변동은 슬롯 7 공식 news/press-release 검색+WebFetch 로 Step 4·Step 2b·총회 보도자료만 카드/🔮 후보화한다. **Keystone K3 완료·운영 전환(2026-06-06): `ENABLE_HANDOFF_V2=true` + 월요일 Routine 프롬프트 v16(Python-scaffold). 4주 관찰 중** |
 | Active phase | 바이오 1단계 활성 — 1~2주 관찰(Biologic 칸 누적 증가·세 수집기 health·발행 브리프) + Phase 4 운영 관찰 + **Keystone K1~K4 중 K1·K2·K2.5·K3 완료·운영 전환됨(`ENABLE_HANDOFF_V2=true`·v16 Python-scaffold, 2026-06-06). K3 4주 관찰(Lint 0·Status 누락 0) 통과 시 종료 → K4(Status/Lint Python 마감)** + (필요 시 2단계 FDA CBER guidances 신규 수집기 트랙) |
 | 주요 enabled flags | 운영 기본: `ENABLE_MFDS/RECALL/ADMIN/GMP_INSPECTION=true`, `ENABLE_MFDS_LAW/GMP_CERT/SAFETY_LETTER=false`(공식 API 복구 opt-in), `MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`/`MFDS_RSS_BOARD_MODE`는 선택 KR-egress·본문 enrich 배선, `ENABLE_MODALITY_TAG=true`(2026-06-04 활성), **`ENABLE_ICH/WHO/HC=true`(2026-06-05 활성)**, **`ENABLE_HANDOFF_V2=true`(2026-06-06 활성 — K3 운영 전환)**, `ENABLE_SCRAPE/MOLEG_API=false` |
@@ -238,8 +238,8 @@ v15.0-implementation/
 ├─ collect_fda_483.py     # [WHY-1 #3] FDA 483/EIR 실사 관찰사항 — JSON 전수+HTML 폴백+PDF excerpt (ENABLE_FDA_483, off)
 ├─ collect_search.py      # Brave 보조 검색
 ├─ card_scaffold.py       # [K2] 결정론 카드 골격 조립기(순수): build_card_scaffold + assemble_brief_skeleton
-├─ brief_lint.py          # [URL전수검사] 발행물 출처 링크 근거(provenance) 하드 가드(순수)+발행 게이트 CLI(W1)+resolve&verify 엔진 +[v16-슬림] 구조 lint(기계 Publish Lint PL1·3/16·10·14)
-├─ verify_published_brief.py  # [URL전수검사 W1] 발행 후 provenance 탐지(detective) — 최신 brief 재판정→운영 경고 Issue
+├─ brief_lint.py          # [URL전수검사] 발행물 출처 링크 근거(provenance) 하드 가드(순수)+발행 게이트 CLI(W1)+resolve&verify 엔진 +[v16-슬림] 구조 lint(기계 Publish Lint PL1·3/16·10·14·19) +[06-22] scaffold 고정 셀 전사 무결성(PL18)·Evidence 집계(PL19)
+├─ verify_published_brief.py  # [URL전수검사 W1] 발행 후 provenance 탐지(detective) — 최신 brief 재판정(provenance+구조 PL14/19+scaffold 고정 셀 PL18)→운영 경고 Issue
 ├─ grm_common.py          # 공통 HTTP/재시도 헬퍼
 ├─ probe_*.py             # 개발용 탐침 스크립트(운영 무관)
 │
@@ -305,6 +305,7 @@ v15.0-implementation/
 
 ### 4.2 코드 파일
 > **Provenance footer scope (2026-06-22):** `lint_scaffold_footer_integrity(rows, urls, published_text=...)` 는 `published_text` 가 주어지면 `document_id` 가 발행 평문에 존재하는 실제 렌더 카드만 검사한다. `run_publish_gate` 는 발행 markdown 을, `verify_published_brief.run()` 은 Notion 평문을 넘겨 Tier 1/보류/스킵 row 의 footer 미출현을 오탐하지 않는다(`published_text=None` 은 하위호환 전수 검사).
+> **Scaffold 고정 셀 무결성 (2026-06-22, 주간점검 트랙 A/B/D):** `lint_scaffold_fixed_cells(rows, published_text)`(PL18) 는 footer 무결성의 **셀-텍스트 일반화** — 각 렌더 카드의 W2 표 고정 셀(슬롯 `{{...}}` 아닌 모든 `<td>` 값: FEI·발행일·시설유형·Class·문서번호 등)이 발행 평문에 글자그대로(백틱/볼드/공백 정규화 후 substring) 보존됐는지 결정론 대조한다. 카드당 1 finding·미렌더/`원문 미기재` 제외(과알림 0). `lint_publish_structure` 의 Evidence 집계(PL19)는 커버리지 헤더 `Evidence A {N}/B {N}/C {N}` 선언값↔카드 W1 배지 수를 대조한다. 둘 다 `run_publish_gate`(PL18 항상·PL19 는 `include_structure`)·`verify_published_brief.run()`(자동 탐지) 양쪽에서 실행돼 관측(Brief Lint L12/L13)·EVAL(E1) 트랙의 판정 비대칭을 제거한다. **ICH 0 카드 = by-design**(정적 guideline snapshot 은 Tier 1/Skipped, 변동은 슬롯 7 news/press-release 검색+WebFetch — 발행 시 "Assembly Fetch 403"은 이 LLM WebFetch 계층의 graceful 강등이지 결정론 수집기 차단이 아니다. admin.ich.org 는 봇/브라우저 UA 모두 200 응답).
 
 | 파일 | 역할 |
 |---|---|
@@ -360,6 +361,7 @@ v15.0-implementation/
 #### 📝 변경 이력 — 구성 요소
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-22 | **[주간점검 트랙 A/B/D] scaffold 고정 셀(PL18)·Evidence 집계(PL19) 발행 후 게이트** — `lint_scaffold_fixed_cells(rows, published_text)` 신설(W2 표 슬롯 아닌 고정 셀 FEI·발행일·시설유형·Class·문서번호 전사 무결성, footer 무결성의 셀-텍스트 일반화·렌더 카드만·과알림 0), `lint_publish_structure` 에 Evidence 집계(PL19) 추가(헤더 `A{N}/B{N}/C{N}`↔배지 수). `run_publish_gate(require_scaffold_cells=True)`·`verify_published_brief.run()` 양쪽 배선 → Brief Lint(L12/L13)·EVAL(E1) 트랙 판정 비대칭 해소(트랙 D). 06-22 FDA 483 FEI·시설유형 전사오류 + Lancora Class 과억제 삭제 차단. v16 프롬프트 W2 고정 셀 verbatim·양방향 사실 가드 명문화(운영 재-붙여넣기 사람 게이트). 트랙 C: ICH 0 카드 = by-design(Tier 1/Skipped, 403 은 슬롯 7 LLM WebFetch graceful — 결정론 수집기 아님). 테스트 600→618 green·golden byte-diff 0. commit `c547653`. branch `feat/scaffold-cell-evidence-gate-2026-06-22`(push/머지 사람 게이트). |
 | 2026-06-22 | **[URL전수검사] scaffold footer 무결성 렌더 스코프 보정** — `lint_scaffold_footer_integrity(rows, urls, published_text=...)` 가 `published_text` 제공 시 `document_id` 가 발행 평문에 존재하는 실제 렌더 카드만 검사해 Tier 1/보류/스킵 row 오탐을 차단한다. `verify_published_brief.run()` 은 Notion 평문, `run_publish_gate` 는 발행 markdown 을 전달한다. `published_text=None` 은 하위호환 전수 검사. |
 | 2026-06-18 | **[KR-egress 잔여 QA 3종]** `grm_common.py`에 `MFDS_HTTP_PROXY` 조건부 proxy 주입(`www.mfds.go.kr`·`nedrug.mfds.go.kr`·`www.law.go.kr` 한정, 미설정 무회귀). `collect_mfds.py`에 `MFDS_RSS_BOARD_MODE=residual`/`MFDS_RSS_BOARD_IDS` 보드 선택 추가(API 정본 보드 중복 fetch 감소, 잔여 지침 data0013/0011/0010 전용). `collect_mfds_law.py`는 `LAW_GO_KR_OC` 보유 시 law.go.kr DRF admrul 본문 발췌 enrich(실패해도 목록 유지). `probe_mfds_egress.py` T-E0 도달성 점검 스크립트와 `tests/test_kr_egress_proxy.py` 회귀 추가. workflow/.env/setup/runbook 배선 |
 | 2026-06-18 | **[WL본문-앵커 2-tier]** FDA WL 본문 excerpt 앵커 선별을 전 앵커 통합 최이른 위치 → PRIMARY(during our inspection·(significant\|specific) violations were observed including·we found/observed that·fda observed that·specifically, 등)→FALLBACK(this warning letter·violations·cgmp·adulterated) 2단계로. 일반어가 요약 머리말에서 먼저 걸려 excerpt 가 보일러플레이트로 시작하던 문제 교정(CGMP/704(a)(4) 기록검토/Telehealth 라이브 확인). 앵커 미발견 시 폴백→"" graceful 보존. `_earliest_anchor` 헬퍼 신설(`collect_intake.py`만). test_wl_body +4 = 15/15·card_scaffold/orchestration 97/97 green·golden 불변(WL body=flag-off). dry-run(run #27727955433)→non-dry 실적재(run #27729376086, Roen 행 raw `wl_body_excerpt` 실측)로 WHY-1 "flag-on 전 dry-run" 잔여 종결. `ENABLE_WL_BODY` 운영 활성은 **머지 후 결정**(GitHub 변수 미설정 — 머지 전 켜면 구 단일앵커 동작). commit `0138f06`·origin/main(eecfa72 v1.41) 통합 머지 `9bc47b7`. branch `feat/wl-body-anchor-2tier-2026-06-18`·push/머지/활성 사람 게이트. 한계 = §5.2 WL본문-앵커 |

@@ -5,6 +5,7 @@
 """
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -621,6 +622,239 @@ class TestCoverageCounts(unittest.TestCase):
         self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0].code, "PL15-COVERAGE-EXTRA")
         self.assertEqual(fs[0].severity, bl.SEV_WARN)
+
+
+class TestScaffoldFixedCells(unittest.TestCase):
+    """PL18 — scaffold W2 고정 셀 전사 무결성(06-22 FDA 483 FEI·시설유형/Lancora Class 사고).
+
+    `card_scaffold` 의 슬롯({{...}})이 아닌 표 셀(FEI·발행일·시설유형·Class·문서번호)을 LLM 이
+    재생성·추론·삭제·단정보강하면 FAIL. 렌더된 카드만·카드당 1 finding·과알림 0.
+    """
+
+    @staticmethod
+    def _fda483(doc_id, firm, fei, fac, pub="2026-05-27", insp="04/17/2026"):
+        """golden tests/golden/fda_483.expected.md 의 W2 표 형식과 동일(실제 6/22 카드 형)."""
+        return (
+            f"### [FDA 483 실사 관찰 · FDA] {firm} — **{{{{TITLE_ISSUE}}}}**\n\n"
+            "<table>\n"
+            f"<tr><td>**발행일**</td><td>{pub}</td></tr>\n"
+            f"<tr><td>**문서번호**</td><td>`{doc_id}`</td></tr>\n"
+            f"<tr><td>**제조소/업체**</td><td>{firm} · FEI {fei}</td></tr>\n"
+            f"<tr><td>**시설 · 유형**</td><td>{fac} · 483</td></tr>\n"
+            f"<tr><td>**실사일**</td><td>{insp}</td></tr>\n"
+            "</table>"
+        )
+
+    def test_fei_mutation_detected(self):
+        scaffold = self._fda483("fda483-192439", "BPI Labs, LLC", "3015156709",
+                                "Outsourcing Facility")
+        row = {"document_id": "fda483-192439", "card_scaffold": scaffold}
+        published = scaffold.replace("FEI 3015156709", "FEI 3016534068")
+        fs = bl.lint_scaffold_fixed_cells([row], published)
+        self.assertEqual([f.code for f in fs], ["PL18-SCAFFOLD-CELL"])
+        self.assertIn("3015156709", fs[0].message)
+        self.assertTrue(bl.has_failures(fs))
+
+    def test_verbatim_transcription_passes(self):
+        # 발행본 = scaffold 그대로(클린 카드, 192438 유형) → 0(과알림 0).
+        scaffold = self._fda483("fda483-192438", "Aurobindo", "1073935",
+                                "Drug Product Manufacturer")
+        row = {"document_id": "fda483-192438", "card_scaffold": scaffold}
+        self.assertEqual(bl.lint_scaffold_fixed_cells([row], scaffold), [])
+
+    def test_backtick_codeformat_docid_no_false_positive(self):
+        # 문서번호 셀은 scaffold 에선 `` `id` ``(코드)인데 Notion 평문은 백틱이 벗겨진다 —
+        # 서식 차이로 오탐하면 안 된다.
+        scaffold = self._fda483("fda483-192438", "Aurobindo", "1073935",
+                                "Drug Product Manufacturer")
+        row = {"document_id": "fda483-192438", "card_scaffold": scaffold}
+        plain = scaffold.replace("`", "")   # Notion 평문화 흉내(백틱 제거)
+        self.assertEqual(bl.lint_scaffold_fixed_cells([row], plain), [])
+
+    def test_unrendered_card_not_checked(self):
+        scaffold = self._fda483("fda483-192439", "BPI Labs, LLC", "3015156709",
+                                "Outsourcing Facility")
+        row = {"document_id": "fda483-192439", "card_scaffold": scaffold}
+        # 문서번호가 발행본에 없음(미렌더 = Tier1 Skipped/보류) → 검사 제외(과알림 0).
+        self.assertEqual(bl.lint_scaffold_fixed_cells([row], "전혀 다른 발행본"), [])
+
+    def test_slot_cell_change_no_alert(self):
+        # 슬롯 셀(TITLE_ISSUE)은 LLM 채움 영역 — 발행본이 산문으로 채워도 무알림.
+        scaffold = self._fda483("fda483-192439", "BPI Labs, LLC", "3015156709",
+                                "Outsourcing Facility")
+        row = {"document_id": "fda483-192439", "card_scaffold": scaffold}
+        published = scaffold.replace("{{TITLE_ISSUE}}", "무균공정 결함 관찰")
+        self.assertEqual(bl.lint_scaffold_fixed_cells([row], published), [])
+
+    def test_empty_placeholder_cell_skipped(self):
+        # '원문 미기재' 고정 셀은 발행본에 없어도 무알림(과확장 양방향 가드 — 빈칸 유지 정상).
+        scaffold = ("### [x · y] z — **{{TITLE_ISSUE}}**\n\n<table>\n"
+                    "<tr><td>**문서번호**</td><td>`d-1`</td></tr>\n"
+                    "<tr><td>**실사일**</td><td>원문 미기재</td></tr>\n</table>")
+        row = {"document_id": "d-1", "card_scaffold": scaffold}
+        self.assertEqual(bl.lint_scaffold_fixed_cells([row], "문서번호 d-1 카드 본문"), [])
+
+    def test_lancora_class_deletion_detected(self):
+        # Lancora 과억제: scaffold Class 'Type III' 고정값을 발행본이 삭제(원문 미기재) → FAIL.
+        scaffold = ("### [Recall(HC) · Health Canada] Lancora — **{{TITLE_ISSUE}}**\n\n"
+                    "<table>\n<tr><td>**문서번호**</td><td>`hc-82222`</td></tr>\n"
+                    "<tr><td>**Class**</td><td>Type III</td></tr>\n</table>")
+        row = {"document_id": "hc-82222", "card_scaffold": scaffold}
+        published = "Recall hc-82222 Lancora 등급: 원문 미기재 — 생성 금지"
+        fs = bl.lint_scaffold_fixed_cells([row], published)
+        self.assertEqual([f.code for f in fs], ["PL18-SCAFFOLD-CELL"])
+        self.assertIn("Type III", fs[0].message)
+
+    def test_six_card_brief_only_failing_cards_flagged(self):
+        """6/22 사고 재현(over-alert 0): 결함 카드만 정확히 FAIL, 클린 카드는 무알림."""
+        import re as _re
+        clean = self._fda483("fda483-192438", "Aurobindo", "1073935",
+                             "Drug Product Manufacturer")
+        fei_a = self._fda483("fda483-192439", "BPI Labs, LLC", "3015156709",
+                            "Outsourcing Facility")
+        fei_b = self._fda483("fda483-192443", "Acme Pharma", "3016710931", "API Manufacturer")
+        multi_a = self._fda483("fda483-192689", "Intas", "3005890633",
+                              "Solid Dose Manufacturer", pub="2026-05-26")
+        multi_b = self._fda483("fda483-192871", "Oregon Co", "3013670080",
+                              "Bulk Manufacturer", pub="2026-06-11")
+        mfds_clean = ("### [행정처분 · MFDS] 대한약품 — **{{TITLE_ISSUE}}**\n\n<table>\n"
+                      "<tr><td>**문서번호**</td><td>`admin-1`</td></tr>\n"
+                      "<tr><td>**업체**</td><td>대한약품공업 (대한민국)</td></tr>\n</table>")
+        fr_clean = ("### [지침 · FDA] Guidance — **{{TITLE_ISSUE}}**\n\n<table>\n"
+                    "<tr><td>**문서번호**</td><td>`fr-1`</td></tr>\n"
+                    "<tr><td>**발행기관**</td><td>Federal Register</td></tr>\n</table>")
+        rows = [{"document_id": did, "card_scaffold": sc} for did, sc in (
+            ("fda483-192438", clean), ("fda483-192439", fei_a), ("fda483-192443", fei_b),
+            ("fda483-192689", multi_a), ("fda483-192871", multi_b),
+            ("admin-1", mfds_clean), ("fr-1", fr_clean))]
+        published = "\n\n".join([
+            clean,                                       # 192438 클린(그대로)
+            fei_a.replace("FEI 3015156709", "FEI 3016534068"),
+            fei_b.replace("FEI 3016710931", "FEI 3016440965"),
+            multi_a.replace("FEI 3005890633", "FEI 3004831697")
+                   .replace("Solid Dose Manufacturer", "인도 소재 고형제")
+                   .replace("2026-05-26", "2026-05-27"),
+            multi_b.replace("FEI 3013670080", "FEI 3016827524")
+                   .replace("Bulk Manufacturer", "503B Outsourcing Facility")
+                   .replace("2026-06-11", "2026-05-27"),
+            mfds_clean, fr_clean,                        # 비-483 클린
+        ])
+        fs = bl.lint_scaffold_fixed_cells(rows, published)
+        flagged = sorted(_re.search(r"카드\[([^\]]+)\]", f.message).group(1) for f in fs)
+        self.assertEqual(flagged, ["fda483-192439", "fda483-192443",
+                                   "fda483-192689", "fda483-192871"])
+        self.assertTrue(all(f.code == "PL18-SCAFFOLD-CELL" for f in fs))
+
+    def test_gate_blocks_on_cell_mutation(self):
+        # run_publish_gate(기본 require_scaffold_cells=True) 가 셀 전사오류로 차단(Track D 배선).
+        scaffold = self._fda483("fda483-192439", "BPI Labs, LLC", "3015156709",
+                                "Outsourcing Facility")
+        row = {"document_id": "fda483-192439", "card_scaffold": scaffold}
+        published = scaffold.replace("FEI 3015156709", "FEI 3016534068")
+        g = bl.run_publish_gate([row], published)
+        self.assertFalse(g.ok)
+        self.assertTrue(any(f.code == "PL18-SCAFFOLD-CELL" for f in g.findings))
+
+
+class TestScaffoldFixedCellsRealData(unittest.TestCase):
+    """PL18/PL19 — 6/22 실데이터 회귀(FP 0/TP 8 정본). 합성 테스트가 못 잡은 enrich-날짜 placeholder
+    (WL·FR·ECA 발행일)·재구성 셀(발행부서·주제) 클래스를 실제 handoff(36행)+발행본으로 영구 고정.
+    데이터: handoff page 3863142f-dc11-81ff…, 발행 page 3863142f-dc11-8130… (build_brief_2026_06_22.py).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "fixtures", "brief_2026_06_22.json")
+        with open(path, encoding="utf-8") as fh:
+            cls.fx = json.load(fh)
+
+    def _pl18(self):
+        return bl.lint_scaffold_fixed_cells(self.fx["handoff_rows"], self.fx["published_text"])
+
+    def test_pl18_fp0_tp8(self):
+        findings = self._pl18()
+        flagged = sorted(re.search(r"카드\[([^\]]+)\]", f.message).group(1) for f in findings)
+        self.assertEqual(flagged, sorted(self.fx["expected_pl18_fail_doc_ids"]),
+                         msg=f"flagged={flagged}")
+        for clean_id in self.fx["expected_pl18_clean_doc_ids"]:  # enrich-날짜·재구성 = over-alert 0
+            self.assertNotIn(clean_id, flagged)
+        self.assertTrue(all(f.code == "PL18-SCAFFOLD-CELL" for f in findings))
+
+    def test_pl18_identity_cells_flagged_all_sources(self):
+        # FEI(제조소/업체)·Class·제품 같은 identity 셀 전사오류는 잡힌다.
+        msgs = {re.search(r"카드\[([^\]]+)\]", f.message).group(1): f.message for f in self._pl18()}
+        self.assertIn("FEI 3015156709", msgs["fda483-192439"])      # FEI 변형
+        self.assertIn("Type III", msgs["hc-82222"])                  # Class 삭제
+        self.assertIn("Lancora 5 mg tablet", msgs["hc-82222"])       # 제품명 단순화
+
+    def test_pl18_admin_date_not_masked_by_metadata(self):
+        # admin 처분일 오류(scaffold 발행일 2026-06-17)는 M3 'CONSUMED 2026-06-17 handoff' 에
+        # 가려지지 않고 카드 영역 한정 검사로 잡혀야 한다(보정 핵심).
+        admin = [f for f in self._pl18() if "admin-2026004434" in f.message]
+        self.assertEqual(len(admin), 1)
+        self.assertIn("2026-06-17", admin[0].message)
+
+    def test_pl18_enrich_dates_not_flagged(self):
+        # WL·FR·ECA 발행일(수집일 placeholder→WebSearch enrich)은 검사 제외 = false positive 0.
+        flagged = {re.search(r"카드\[([^\]]+)\]", f.message).group(1) for f in self._pl18()}
+        for enrich_id in ("d1e41608f7ba", "2026-12237", "2026-12238",
+                          "4399b537ba30", "bfa2307d43e9"):
+            self.assertNotIn(enrich_id, flagged)
+
+    def test_pl19_evidence_tally_mismatch_real(self):
+        # 발행 Coverage 헤더 Evidence A4/B10 vs 실제 카드 배지 A3/B11.
+        pl19 = [f for f in bl.lint_publish_structure(self.fx["published_text"])
+                if f.code == "PL19-EVIDENCE-TALLY"]
+        self.assertEqual(len(pl19), 1)
+        self.assertIn("A4/B10", pl19[0].message)
+        self.assertIn("A3/B11", pl19[0].message)
+
+
+class TestEvidenceTally(unittest.TestCase):
+    """PL19 — Evidence 집계 헤더(선언) ↔ 카드 배지 수(06-22 헤더 A4/B10 vs 배지 A3/B11 사고)."""
+
+    LEGEND = ("**범례** Evidence A: 1차 공식문서 직접 확인 · B: 공식 인덱스 · "
+              "C: 보조 출처 단독")
+
+    def _brief(self, declared, a, b, c):
+        badges = ("`Evidence A` · `FDA 483` · `Signal High (T3)`\n" * a
+                  + "`Evidence B` · `MFDS` · `Signal Low (T1)`\n" * b
+                  + "`Evidence C` · `RSS` · `Signal Low (T1)`\n" * c)
+        return declared + "\n" + badges + self.LEGEND
+
+    def _tally(self, md):
+        return [f for f in bl.lint_publish_structure(md) if f.code == "PL19-EVIDENCE-TALLY"]
+
+    def test_tally_mismatch_fails(self):
+        md = self._brief("Evidence A 4/B 10/C 0", a=3, b=11, c=0)
+        fs = self._tally(md)
+        self.assertEqual(len(fs), 1)
+        self.assertIn("A4/B10", fs[0].message)
+        self.assertIn("A3/B11", fs[0].message)
+        self.assertTrue(bl.has_failures(fs))
+
+    def test_tally_match_passes(self):
+        self.assertEqual(self._tally(self._brief("Evidence A 3/B 11/C 0", a=3, b=11, c=0)), [])
+
+    def test_plaintext_badges_no_backtick(self):
+        # Notion 발행 평문(백틱 없음) 경로에서도 배지 집계가 동작해야 한다(detective).
+        badges = ("Evidence A · FDA 483 · Signal\n" * 3) + ("Evidence B · MFDS · Signal\n" * 11)
+        self.assertEqual(self._tally("Evidence A 3/B 11/C 0\n" + badges), [])
+
+    def test_legend_and_header_not_counted_as_badges(self):
+        # 헤더('A 4')·범례('A:')는 배지가 아니다 — 배지 0 인데 A1 선언이면 불일치로 잡혀야.
+        fs = self._tally("Evidence A 1/B 0/C 0\n" + self.LEGEND)
+        self.assertEqual(len(fs), 1)
+        self.assertIn("배지 A0", fs[0].message)
+
+    def test_no_tally_header_no_finding(self):
+        # 집계 헤더 없으면 검사 생략(추측 금지·과알림 0).
+        self.assertEqual(self._tally("`Evidence A` · `FDA` 카드만 있고 집계 헤더 없음"), [])
+
+    def test_c_optional_in_header(self):
+        # 헤더가 C 미선언(A/B만)이어도 C=0 으로 본다.
+        self.assertEqual(self._tally("Evidence A 1/B 0\n`Evidence A` · `FDA` · x"), [])
 
 
 class _StubResp:

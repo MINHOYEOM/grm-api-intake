@@ -149,6 +149,20 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _is_renderable(card: dict[str, Any]) -> bool:
+    """렌더 제외 카드 판별(방어적 — 상류 순수성 미가정, §3.2/§3.3 렌더러 책임).
+
+    병합 멤버(`merged_into` truthy)와 watch(비카드 영역)는 렌더하지 않는다. 스키마 v1 정상
+    데이터엔 없음(상류 `assemble_web_brief` 가 이미 제외) — 적대/직접 주입에 대한 방어선.
+    정렬·섹션 카운트·TOC 산출 *이전*에 적용해 제외 카드가 목차·건수에 새지 않게 한다.
+    """
+    if card.get("merged_into"):
+        return False
+    if card.get("group") == "watch" or card.get("section") == "watch":
+        return False
+    return True
+
+
 def _build_sections(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """render_order 순 카드를 group(섹션)·group_label(소제목)별로 연속 묶음.
 
@@ -254,6 +268,9 @@ def _cover_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
         "publish_date": pub,
         "date_dotted": _date_dotted(pub),
         "rendered": cov["rendered"],
+        "intake_total": cov["intake_total"],     # 다크밴드 바인딩(단일 파생 경로)
+        "evidence": cov["evidence"],              # 다크밴드 Evidence A/B
+        "title_dateform": title_dateform(pub),    # 다크밴드 "{Y}년 {M}월 {N}주차"
         "window": bm.get("window", ""),
         "title": _brief_title(bm),
         "tldr": bm.get("tldr") or [],
@@ -337,7 +354,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     for b in briefs:
         pub = b["brief"].get("publish_date", "")
         issue_no = issue_no_by_date[pub]
-        cards_sorted = sorted((b.get("cards") or []),
+        renderable = [c for c in (b.get("cards") or []) if _is_renderable(c)]
+        cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
         card_views = [_card_view(c) for c in cards_sorted]

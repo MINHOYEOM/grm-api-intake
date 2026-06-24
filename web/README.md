@@ -12,7 +12,7 @@ web/
 ├─ render.py            # 빌더(순수): data/briefs/*.json → dist/
 ├─ templates/           # base · landing · archive · brief (Jinja2, autoescape on)
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
-├─ assets/grm.css       # v4 <style> verbatim 추출 (디자인 드리프트 0)
+├─ assets/grm.css       # GRM_웹_프로토타입_v4.html 의 <style> verbatim 추출(주석 없이 v4 본문 그대로). 손으로 편집 금지 — 디자인 변경은 v4 갱신 후 재추출
 ├─ data/briefs/*.json   # 입력(주차별 1파일). 현재 = 실 6/22
 ├─ tests/
 │  ├─ test_render.py    # 골든·결정론·무변형·escape·순수성

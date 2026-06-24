@@ -355,28 +355,39 @@ class WebRenderPurityTest(unittest.TestCase):
         self.assertFalse(bad, f"비결정 호출 가능 속성 사용: {bad}")
 
 
-# ── 하드닝 (스킴·링크상태·면책·중복일자 — 적대적 리뷰 보강) ──────────────────
-def _minimal_brief(pub: str, *, card: dict | None = None, ai_disclosure: bool = True) -> dict:
+# ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
+def _card(render_order: int = 0, **ov) -> dict:
     c = {
-        "id": "x1", "render_order": 0, "group": "글로벌", "group_label": None,
-        "agency": "FDA", "card_type": "지침·안내서", "category": "Guidance",
-        "modality": None, "evidence_level": "A", "signal_tier": 1, "signal_label": "Low",
-        "type_tag": "Guidance", "headline_target": "Test Card", "title_issue": "",
-        "summary": "", "facts": [{"label": "발행일", "value": pub}, {"label": "문서번호", "value": "x1"}],
+        "id": f"x{render_order}", "render_order": render_order, "group": "글로벌",
+        "group_label": None, "agency": "FDA", "card_type": "지침·안내서",
+        "category": "Guidance", "modality": None, "evidence_level": "A",
+        "signal_tier": 1, "signal_label": "Low", "type_tag": "Guidance",
+        "headline_target": f"Card {render_order}", "title_issue": "", "summary": "",
+        "facts": [{"label": "발행일", "value": "2026-06-01"}, {"label": "문서번호", "value": f"x{render_order}"}],
         "quotes": [], "evidence_basis": "Intake raw", "key_facts": [], "implication": "",
         "checks": [], "merged_count": 1, "merged_items": [],
         "sources": {"info_url": "https://example.org/info", "official_url": "https://example.org/off",
                     "official_is_pdf": False, "link_check": {"info": "pending", "official": "pending"}},
     }
-    if card:
-        c.update(card)
+    c.update(ov)
+    return c
+
+
+def _minimal_brief(pub: str, *, card: dict | None = None, ai_disclosure: bool = True,
+                   cards: list | None = None, coverage: dict | None = None) -> dict:
+    if cards is None:
+        c = _card(0, id="x1", headline_target="Test Card",
+                  facts=[{"label": "발행일", "value": pub}, {"label": "문서번호", "value": "x1"}])
+        if card:
+            c.update(card)
+        cards = [c]
+    cov = coverage or {"intake_total": 1, "rendered": 1, "evidence": {"A": 1, "B": 0, "C": 0}}
     return {
         "schema_version": "grm-web-card/v1",
         "brief": {"run_date_kst": pub, "window": f"{pub} ~ {pub}", "publish_date": pub,
                   "agencies": ["FDA"], "categories": ["Guidance"], "tldr": [],
-                  "coverage": {"intake_total": 1, "rendered": 1, "evidence": {"A": 1, "B": 0, "C": 0}},
-                  "ai_disclosure": ai_disclosure},
-        "cards": [c],
+                  "coverage": cov, "ai_disclosure": ai_disclosure},
+        "cards": cards,
     }
 
 
@@ -387,13 +398,19 @@ class WebRenderHardeningTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
-    def _render_detail(self, brief: dict) -> str:
+    def _render_site(self, briefs: list[dict]) -> pathlib.Path:
         data, out = self.tmp / "data", self.tmp / "out"
         data.mkdir(parents=True, exist_ok=True)
-        pub = brief["brief"]["publish_date"]
-        (data / f"brief_web_{pub}.json").write_text(
-            json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+        for br in briefs:
+            pub = br["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(br, ensure_ascii=False), encoding="utf-8")
         render.render_site(data, out)
+        return out
+
+    def _render_detail(self, brief: dict) -> str:
+        out = self._render_site([brief])
+        pub = brief["brief"]["publish_date"]
         return (out / "briefs" / pub / "index.html").read_text(encoding="utf-8")
 
     def test_unsafe_url_scheme_dropped_safe_kept(self):
@@ -440,6 +457,51 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 대조: true 면 출력.
         h2 = self._render_detail(_minimal_brief("2026-06-02", ai_disclosure=True))
         self.assertIn("AI 자동 생성 안내", h2)
+
+    def test_merged_into_member_excluded(self):
+        # 적대 입력: 병합 멤버(merged_into)를 cards[]에 직접 주입 → 렌더 부재.
+        cards = [
+            _card(0, id="keep", headline_target="KEEP ME PARENT"),
+            _card(1, id="member", headline_target="DROP MERGED MEMBER", merged_into="keep"),
+        ]
+        h = self._render_detail(_minimal_brief("2026-06-01", cards=cards))
+        self.assertIn("KEEP ME PARENT", h)
+        self.assertNotIn("DROP MERGED MEMBER", h)
+        # 제외 카드는 섹션 카운트·목차에도 미산입.
+        self.assertIn('글로벌 <span class="n">1장</span>', h)
+        self.assertNotIn('href="#c1"', h)
+
+    def test_watch_card_excluded(self):
+        # 적대 입력: group=="watch" 카드 직접 주입 → 렌더 부재(비카드 영역).
+        cards = [
+            _card(0, id="keep", headline_target="KEEP ME"),
+            _card(1, id="w", headline_target="DROP WATCH ITEM", group="watch"),
+        ]
+        h = self._render_detail(_minimal_brief("2026-06-01", cards=cards))
+        self.assertIn("KEEP ME", h)
+        self.assertNotIn("DROP WATCH ITEM", h)
+
+    def test_merged_parent_still_rendered(self):
+        # merged_count>1 이지만 merged_into 없음(대표 병합 카드) → 정상 렌더.
+        cards = [_card(0, id="parent", headline_target="MERGED PARENT",
+                       merged_count=3, merged_items=["품목A", "품목B", "품목C"])]
+        h = self._render_detail(_minimal_brief("2026-06-01", cards=cards))
+        self.assertIn("MERGED PARENT", h)
+        self.assertIn("전체 3품목", h)
+
+    def test_darkband_binds_latest_brief(self):
+        # 다크밴드 호별 수치가 최신호(06-29) 파생값을 반영(stale 아님).
+        older = _minimal_brief("2026-06-22")
+        latest = _minimal_brief("2026-06-29",
+                                coverage={"intake_total": 99, "rendered": 88,
+                                          "evidence": {"A": 7, "B": 5, "C": 0}})
+        out = self._render_site([older, latest])
+        landing = (out / "index.html").read_text(encoding="utf-8")
+        self.assertIn("수집 99건", landing)
+        self.assertIn("카드 88장", landing)
+        self.assertIn("Evidence A 7 / B 5", landing)
+        self.assertIn("2026년 6월 5주차", landing)   # 06-29 → (29-1)//7+1 = 5
+        self.assertNotIn("수집 36건", landing)         # 옛 정적 수치 잔존 금지
 
     def test_duplicate_publish_date_rejected(self):
         data, out = self.tmp / "data", self.tmp / "out"

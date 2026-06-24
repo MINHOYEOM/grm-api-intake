@@ -1,6 +1,3 @@
-/* grm.css — GRM 웹 렌더러 디자인 시스템.
-   GRM_웹_프로토타입_v4.html 의 <style> 블록 verbatim 추출(디자인 드리프트 0).
-   수정 금지: 디자인 변경은 v4 프로토타입을 먼저 갱신 후 재추출. P2 2026-06-24. */
 :root{
   --canvas:#FFFFFF; --paper:#FCFCFE; --soft:#F4F6FB; --soft-2:#EFF2F8; --strong:#E7EBF3; --ink:#0B0D14; --ink-2:#2A2F3C;
   --body:#525A6A; --muted:#868E9E; --line:#E6E9F1; --line-2:#D4DAE4;

@@ -116,7 +116,7 @@
     <div>
       <span class="kick">이번 주</span>
       <h2>이번 주, 무엇이 바뀌었나.</h2>
-      <p>2026년 6월 4주차 — 수집 36건, 카드 36장, Evidence A 15 / B 21. 글로벌과 국내 신호를 한 호로 묶었습니다.</p>
+      <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, Evidence A {{ cover.evidence.A }} / B {{ cover.evidence.B }}. 글로벌과 국내 신호를 한 호로 묶었습니다.</p>
       <a class="btn pri lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 호 열기 <i class="ti ti-arrow-right"></i></a>
     </div>
     <div class="miniprev">

@@ -6,13 +6,13 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 최신 변경 | `v1.47` (**PL18 스코프 실데이터 보정 2026-06-22**): PL18 을 6/22 실제 handoff(36행)+발행본으로 돌려 목표 결함 8건은 잡되 정상 카드 5건(WL·FR·ECA 발행일=수집일 placeholder→WebSearch enrich) 오검출이 드러나 스코프를 한정 — identity 셀(FEI·문서번호·시설유형·Class·제품)은 전 소스 verbatim, 날짜 셀은 fda483/admin 만, 그 외 derived 셀 제외, **카드 영역 한정**(M2/M3 메타 날짜 가림 차단). 실데이터 회귀 픽스처(`tests/fixtures/brief_2026_06_22.json`, FP 0/TP 8) 커밋. golden byte-diff 0. 직전 `v1.46` scaffold 고정 셀·Evidence 집계 게이트 신설(PL18/PL19). |
-| 문서 버전 | `v1.47` (**PL18 스코프 보정**: identity 셀 전 소스 + 483/admin 날짜 + 카드영역 한정, enrich-날짜/재구성 셀 제외 → 06-22 실데이터 FP 0/TP 8. 실데이터 회귀 픽스처. 상세 §4.2 note·구성요소 변경이력). 직전 `v1.46` scaffold 고정 셀(PL18)·Evidence 집계(PL19) 게이트 신설. |
-| 최종 수정일 | 2026-06-22 (PL18 스코프 실데이터 보정 + scaffold 고정 셀·Evidence 집계 게이트) |
+| 최신 변경 | `v1.48` (**발행 레이어 웹이관 P1 — web-card JSON 분리 2026-06-24**): routine 카드 출력을 Notion 표현 마크업에서 **`grm-web-card/v1` 구조화 JSON**으로 분리(헤드리스). 사실 셀은 기존 결정론 producer(`_w2_rows`·`_quote_source`·`_dual_links`·`_headline_target`·`_kind_meta`) **verbatim 재사용**(재계산 0), 산문 6+1 슬롯만 LLM. 신설 순수함수 `CardScaffold.to_web_card()`·`assemble_web_brief()`(정렬·그룹 `compute_render_plan` 단일원천·watch/병합멤버 제외). web-card golden 20종 + `brief_web.expected.json` + 6/22 실픽스처(`tests/fixtures/brief_web_2026_06_22.json`, 36 scaffold 파서·verbatim 보존) 동결. **기존 markdown 골든 byte-diff 0**(P4 컷오버까지 롤백 안전망 — 표현 틀 물리 삭제 아님). Codex 게이트 GO(보정 2건: `_category` gmp-guideline 정합·`_official_is_pdf` 경계테스트), 659 green. 직전 `v1.47` PL18 스코프 실데이터 보정. |
+| 문서 버전 | `v1.48` (**웹이관 P1: web-card JSON 분리** — `to_web_card`/`assemble_web_brief`, grm-web-card/v1 동결분 구현. 상세 §4.1 트리·§4.2 구성요소 변경이력). 직전 `v1.47` PL18 스코프 실데이터 보정. |
+| 최종 수정일 | 2026-06-24 (웹이관 P1 — web-card JSON 분리) |
 | 현재 상태 | 매일 수집/Notion 적재 동작, GitHub Actions 내부 health check P1 구현. **바이오 소스 1단계: Phase 3 P1 글로벌 3종(ICH·WHO·HC) 라이브 검증 통과(dry-run + 실적재 207건 0실패)·운영 활성(`ENABLE_ICH/WHO/HC=true`)·`feature/biologic-sources` → `main` 머지.** ICH는 정적 guideline snapshot 자동 카드화를 중단하고 Tier 1 모니터링/Skipped 기본으로 운용한다. 실제 ICH 변동은 슬롯 7 공식 news/press-release 검색+WebFetch 로 Step 4·Step 2b·총회 보도자료만 카드/🔮 후보화한다. **Keystone K3 완료·운영 전환(2026-06-06): `ENABLE_HANDOFF_V2=true` + 월요일 Routine 프롬프트 v16(Python-scaffold). 4주 관찰 중** |
-| Active phase | 바이오 1단계 활성 — 1~2주 관찰(Biologic 칸 누적 증가·세 수집기 health·발행 브리프) + Phase 4 운영 관찰 + **Keystone K1~K4 중 K1·K2·K2.5·K3 완료·운영 전환됨(`ENABLE_HANDOFF_V2=true`·v16 Python-scaffold, 2026-06-06). K3 4주 관찰(Lint 0·Status 누락 0) 통과 시 종료 → K4(Status/Lint Python 마감)** + (필요 시 2단계 FDA CBER guidances 신규 수집기 트랙) |
+| Active phase | 바이오 1단계 활성 — 1~2주 관찰(Biologic 칸 누적 증가·세 수집기 health·발행 브리프) + Phase 4 운영 관찰 + **Keystone K1~K4 중 K1·K2·K2.5·K3 완료·운영 전환됨(`ENABLE_HANDOFF_V2=true`·v16 Python-scaffold, 2026-06-06). K3 4주 관찰(Lint 0·Status 누락 0) 통과 시 종료 → K4(Status/Lint Python 마감)** + (필요 시 2단계 FDA CBER guidances 신규 수집기 트랙) + **발행 레이어 웹이관: P0(스키마 v1 동결)·P1(web-card JSON 분리·Codex GO·main 머지) 완료 → P2(웹 렌더러+미리보기) 대기** — routine 은 `grm-web-card/v1` JSON 을 단일 계약으로 산출(Notion 표시는 P4 병행 비교까지 유지) |
 | 주요 enabled flags | 운영 기본: `ENABLE_MFDS/RECALL/ADMIN/GMP_INSPECTION=true`, `ENABLE_MFDS_LAW/GMP_CERT/SAFETY_LETTER=false`(공식 API 복구 opt-in), `MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`/`MFDS_RSS_BOARD_MODE`는 선택 KR-egress·본문 enrich 배선, `ENABLE_MODALITY_TAG=true`(2026-06-04 활성), **`ENABLE_ICH/WHO/HC=true`(2026-06-05 활성)**, **`ENABLE_HANDOFF_V2=true`(2026-06-06 활성 — K3 운영 전환)**, `ENABLE_SCRAPE/MOLEG_API=false` |
-| 기준 시스템 버전 | 브랜치 `fix/source-link-provenance-2026-06-22` 구현 커밋 `4548b2c`(scaffold footer URL drift 차단) + 본 문서 메타 갱신 커밋. `origin/main` 반영/merge 커밋 해시는 사람 게이트 승인 후 확정·보고. Routine 프롬프트 `v16`은 사용자 재-붙여넣기 완료. |
+| 기준 시스템 버전 | **웹이관 P1**: 브랜치 `feat/web-card-json-p1-2026-06-24` `79e1f0d`(구현)+`2a130fb`(Codex 보정) → 로컬 `main` ff-머지(HEAD `2a130fb`, 별도 머지 커밋 없음) + 본 캐논 갱신 커밋. `origin/main` push 는 사람 게이트(미푸시·보고). Routine 프롬프트 `v16` JSON 슬롯 개정은 3순위(P2 연계). 직전 기준 `fix/source-link-provenance-2026-06-22 4548b2c`. |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 발행 위치 | Notion `Global Regulatory Monitor` 부모 페이지 하위 |
 
@@ -237,7 +237,7 @@ v15.0-implementation/
 ├─ collect_hc.py          # [P1] Health Canada 약품 recall JSON (ENABLE_HC, off)
 ├─ collect_fda_483.py     # [WHY-1 #3] FDA 483/EIR 실사 관찰사항 — JSON 전수+HTML 폴백+PDF excerpt (ENABLE_FDA_483, off)
 ├─ collect_search.py      # Brave 보조 검색
-├─ card_scaffold.py       # [K2] 결정론 카드 골격 조립기(순수): build_card_scaffold + assemble_brief_skeleton
+├─ card_scaffold.py       # [K2] 결정론 카드 골격 조립기(순수): build_card_scaffold + assemble_brief_skeleton + [웹이관 P1] to_web_card·assemble_web_brief(grm-web-card/v1 JSON 직렬화, 순수)·_category/_signal_level/_official_is_pdf/_headline_target 파생 헬퍼
 ├─ brief_lint.py          # [URL전수검사] 발행물 출처 링크 근거(provenance) 하드 가드(순수)+발행 게이트 CLI(W1)+resolve&verify 엔진 +[v16-슬림] 구조 lint(기계 Publish Lint PL1·3/16·10·14·19) +[06-22] scaffold 고정 셀 전사 무결성(PL18)·Evidence 집계(PL19)
 ├─ verify_published_brief.py  # [URL전수검사 W1] 발행 후 provenance 탐지(detective) — 최신 brief 재판정(provenance+구조 PL14/19+scaffold 고정 셀 PL18)→운영 경고 Issue
 ├─ grm_common.py          # 공통 HTTP/재시도 헬퍼
@@ -248,7 +248,7 @@ v15.0-implementation/
 │  ├─ test_modality.py                # [제품군 확장] 제품군(Modality) 3분류 + 무균/바이오 신호 비누락 회귀
 │  ├─ test_modality_live_revalidation.py  # [제품군 확장] 2026-06-04 라이브 실데이터 한국어 정제/주사제·생물원료 회귀(25건)
 │  ├─ test_k2_prep.py                 # [K2] page_id raw fetch·하이브리드 부착·graceful degrade 회귀
-│  ├─ test_card_scaffold.py           # [K2/K2.5] build_card_scaffold golden(활성 소스 전 유형 16종+페이지) 바이트 동결·금지문법 부재·Evidence A⟺quote 정합
+│  ├─ test_card_scaffold.py           # [K2/K2.5] build_card_scaffold golden(활성 소스 전 유형 16종+페이지) 바이트 동결·금지문법 부재·Evidence A⟺quote 정합 + [웹이관 P1] web-card golden 20종·category 망라/휴면Type 가드·official_is_pdf 경계
 │  ├─ test_handoff_v2.py              # [K2] handoff v2 플래그·additive·raw 미포함·children 분할·v1 스냅샷 잠금 + [K4-1] STALE 가드
 │  ├─ test_hc.py                      # [P7/P8] HC 상세 fetch 파서·모달리티 재판정·firm 매핑 회귀 + [A4] 제형 키 표면화
 │  ├─ test_gmp_inspection.py          # [P6] GMP 지적사항 excerpt 추출 회귀
@@ -262,7 +262,8 @@ v15.0-implementation/
 │  ├─ test_verify_published_brief.py  # [URL전수검사 W1] 발행 후 탐지 순수 코어(블록 URL 추출·분류 과알림0·audit JSON·verdict)
 │  ├─ test_mfds_api_recovery.py       # [MFDS API 복구] 법제처/GMP 적합판정/안전성서한 공식 API 매핑·키없음·scaffold 회귀
 │  ├─ test_kr_egress_proxy.py         # [KR-egress] MFDS_HTTP_PROXY 호스트 매칭·RSS residual 보드 선택 회귀
-│  └─ golden/                         # [K2] 카드 골격 golden fixture(input/expected.md/json)+v1 스냅샷 + HC biologic recall fixture
+│  ├─ golden/                         # [K2] 카드 골격 golden(input/expected.md/json)+v1 스냅샷 + HC biologic recall + [웹이관 P1] *.expected.webcard.json(20, grm-web-card/v1 카드)·brief_web.expected.json(페이지 봉투, producer 경로)
+│  └─ fixtures/                       # 실데이터 회귀 픽스처: brief_2026_06_22.json(PL18, +build_brief_2026_06_22.py·raw handoff_rows) + [웹이관 P1] brief_web_2026_06_22.json(6/22 36행→web-card 변환·verbatim)·build_brief_web_2026_06_22.py(scaffold 파서 빌더)
 │
 ├─ setup.sh / setup.ps1   # 최초 셋업 스크립트
 ├─ requirements.txt       # 파이썬 의존성
@@ -361,6 +362,7 @@ v15.0-implementation/
 #### 📝 변경 이력 — 구성 요소
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-24 | **[웹이관 P1 — web-card JSON 분리]** routine 발행 출력을 Notion 마크업 문자열에서 `grm-web-card/v1` 구조화 JSON 으로 분리(결정문서 §4 스키마 동결분 구현). 신설 순수함수 `CardScaffold.to_web_card(render_entry,cfg)`·`assemble_web_brief(cards,meta,cfg)`(`compute_render_plan` 단일원천 정렬·watch/병합멤버 제외). 파생 헬퍼: `_category`(내부 kind 매핑; `gmp-guideline` 은 collect_mfds 휴면 상수+`resolve_kind` 분기부재로 미발현→`mfds-notice`/Guidance 로 흡수·죽은 매핑 금지)·`_signal_level`(단일원천 `_signal_badge` 파생)·`_signal_tier_num`·`_official_is_pdf`(쿼리/프래그 제거 후 path 검사=collect_who 규칙)·`_headline_target`(제목과 동일 헬퍼=드리프트0)·`_merged_*_value`(병합 markdown 과 공유). 사실 셀=기존 producer verbatim 재사용(문서번호 백틱 제거 `_plain`·JSON 무마크업 `assert_no_card_markup`), LLM 슬롯=title_issue·summary·(비KO)quotes[].translation·key_facts·implication·checks·tldr(빈 placeholder). 신 골든 `tests/golden/*.expected.webcard.json`(20)+`brief_web.expected.json`(producer 경로)+`tests/fixtures/brief_web_2026_06_22.json`(+`build_brief_web_2026_06_22.py`, 36 scaffold 파서·verbatim/PL18 의미 보존). 기존 markdown 골든·`*.expected.json` byte-diff 0(롤백 안전망·표현 틀 물리 삭제는 P4 컷오버). 브랜치 `feat/web-card-json-p1-2026-06-24` `79e1f0d`+Codex 보정 `2a130fb`→local main ff-머지, Codex 게이트 GO, 659 green. 결정문서 `GRM_웹이관_결정+실행계획_2026-06-24.md`(§4 grm-web-card/v1 동결). |
 | 2026-06-22 | **[PL18 스코프 실데이터 보정]** 6/22 실 handoff(36행)+발행본 실행 결과 목표 8건은 검출되나 정상 5건(FDA WL·FR·ECA 발행일=수집일 placeholder→WebSearch enrich 설계분) false positive 확인 → PL18 스코프 한정: ① identity 셀(FEI·문서번호·시설유형·Class·제품) 전 소스 verbatim, ② 날짜 셀은 `fda483-`/`admin-` 카드만(그 외 발행일 enrich 제외), ③ derived 셀(발행부서·주제 등) 제외, ④ 카드 영역(인접 anchor) 한정(M2/M3 메타 'CONSUMED 2026-06-17' 가림 차단 — admin 처분일 오류 검출 유지). 실데이터 회귀 픽스처 `tests/fixtures/brief_2026_06_22.json`(+builder·raw handoff) 커밋, FP 0/TP 8. require_scaffold_cells 하드 게이트 유지(보정으로 FP 0 검증). 618→623 green·golden byte-diff 0. |
 | 2026-06-22 | **[주간점검 트랙 A/B/D] scaffold 고정 셀(PL18)·Evidence 집계(PL19) 발행 후 게이트** — `lint_scaffold_fixed_cells(rows, published_text)` 신설(W2 표 슬롯 아닌 고정 셀 FEI·발행일·시설유형·Class·문서번호 전사 무결성, footer 무결성의 셀-텍스트 일반화·렌더 카드만·과알림 0), `lint_publish_structure` 에 Evidence 집계(PL19) 추가(헤더 `A{N}/B{N}/C{N}`↔배지 수). `run_publish_gate(require_scaffold_cells=True)`·`verify_published_brief.run()` 양쪽 배선 → Brief Lint(L12/L13)·EVAL(E1) 트랙 판정 비대칭 해소(트랙 D). 06-22 FDA 483 FEI·시설유형 전사오류 + Lancora Class 과억제 삭제 차단. v16 프롬프트 W2 고정 셀 verbatim·양방향 사실 가드 명문화(운영 재-붙여넣기 사람 게이트). 트랙 C: ICH 0 카드 = by-design(Tier 1/Skipped, 403 은 슬롯 7 LLM WebFetch graceful — 결정론 수집기 아님). 테스트 600→618 green·golden byte-diff 0. commit `c547653`. branch `feat/scaffold-cell-evidence-gate-2026-06-22`(push/머지 사람 게이트). |
 | 2026-06-22 | **[URL전수검사] scaffold footer 무결성 렌더 스코프 보정** — `lint_scaffold_footer_integrity(rows, urls, published_text=...)` 가 `published_text` 제공 시 `document_id` 가 발행 평문에 존재하는 실제 렌더 카드만 검사해 Tier 1/보류/스킵 row 오탐을 차단한다. `verify_published_brief.run()` 은 Notion 평문, `run_publish_gate` 는 발행 markdown 을 전달한다. `published_text=None` 은 하위호환 전수 검사. |

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+  <div class="wrap page-head">
+    <span class="kick">Weekly Brief · Archive</span>
+    <h1>주간 브리프</h1>
+    <p>매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 최신호부터 정렬되며, 각 호를 열면 카드 형태로 전문을 볼 수 있습니다.</p>
+    <div class="filters">
+      <span class="chip on">전체</span><span class="chip">Warning Letter</span><span class="chip">Guidance</span>
+      <span class="chip">회수·행정처분</span><span class="chip">FDA</span><span class="chip">MFDS</span><span class="chip">EMA·MHRA</span>
+    </div>
+  </div>
+  <div class="wrap">
+    {%- for issue in issues %}
+    <a class="issue{% if issue.latest %} latest{% endif %}" href="{{ rel_root }}briefs/{{ issue.slug }}/index.html">
+      <div class="vol">Vol.<b>{{ issue.issue_no }}</b></div>
+      <div>{% if issue.latest %}<span class="badge"><span class="live"></span>최신호 · LIVE</span>{% endif %}<h3>{{ issue.title }}</h3>
+        <div class="row"><span class="tag mono">{{ issue.date }}</span><span class="tag">{{ issue.tags }}</span></div></div>
+      <div class="stat"><b>{{ issue.count }}<span class="u">건</span></b><span class="ev">{{ issue.ev }}</span></div>
+    </a>
+    {%- endfor %}
+  </div>
+</main>
+{% endblock %}

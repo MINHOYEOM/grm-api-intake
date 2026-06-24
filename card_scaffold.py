@@ -1084,10 +1084,16 @@ WEB_SCHEMA_VERSION = "grm-web-card/v1"
 _WEB_GROUP = {"global": "글로벌", "domestic": "국내", "recall_table": "Recall"}
 
 # Notion 발행 카테고리 멀티셀렉트(§3.4) 결정론 매핑 — 별도 산출 로직이 코드/프롬프트에
-# 없어 신규 단일원천으로 둔다. 미매핑(recall·admin·gmp·safety·who·hc·rss·483 등) = Other.
-# 주의: §3.4 의 `gmp-guideline → Guideline` 은 별도 kind 가 없어(현행 resolve_kind 는
-# PIC/S·ECA·MHRA 의 gmp-guideline 류를 `rss-news` 로 흡수 → Other) 현재 코퍼스에선 미발현.
-# GMP 가이드라인이 독립 kind 로 인입되면 resolve_kind 신설 + 여기에 `"...": "Guideline"` 추가.
+# 없어 신규 단일원천으로 둔다. 키 = `resolve_kind` 가 내는 **내부 kind**(raw Type 명 아님).
+# 미매핑(recall·admin·gmp-inspection/certificate·safety·who·hc·rss·483 등) = Other.
+#
+# §3.4 의 `gmp-guideline → Guideline` 은 raw Type 명을 혼용 표기한 것이다. 이 매핑에
+# `"gmp-guideline"` 키를 추가하지 않는다(죽은 매핑 금지): `TYPE_GMP_GUIDELINE="gmp-guideline"`
+# 은 collect_mfds.py 에 **정의만 있고 어느 수집기도 row 에 할당하지 않는 휴면 상수**이며,
+# `resolve_kind` 에도 `gmp-guideline` 분기가 없다 → 내부 kind `"gmp-guideline"` 은 파이프라인에서
+# 발현 불가. 만약 MFDS gmp-guideline Type 이 인입되면 MFDS else 분기 → kind `mfds-notice`
+# → 카테고리 **"Guidance"**(Other 로 새지 않음; 가드 테스트로 고정). `Guideline` 독립 승격은
+# 신규 kind 신설이 필요 = P1 범위 밖, 후속 이월.
 _CATEGORY_MAP = {
     "warning-letter": "Warning Letter",
     "guidance": "Guidance",        # FR guidance-industry

@@ -1108,5 +1108,89 @@ class Brief2026_06_22WebFixtureTest(unittest.TestCase):
                                   f"{c['id']}: {key} 가 scaffold 와 불일치(절단?): {url}")
 
 
+class CategoryMappingTest(unittest.TestCase):
+    """Codex 보정 #1 — _category 전 발현 kind 망라 + 휴면 gmp-guideline 가드(죽은 매핑 금지)."""
+
+    # resolve_kind 가 실제 낼 수 있는 전 내부 kind → 기대 Notion 카테고리.
+    _EXPECTED = {
+        "warning-letter": "Warning Letter",
+        "guidance": "Guidance", "mfds-notice": "Guidance",
+        "regulation": "Guidance", "legislative": "Guidance",
+        "ich": "Guideline",
+        "openfda-recall": "Other", "hc-recall": "Other", "fda-483": "Other",
+        "who-noc": "Other", "who-inspection": "Other", "who-news": "Other",
+        "admin-action": "Other", "recall-quality": "Other",
+        "gmp-inspection": "Other", "gmp-certificate": "Other",
+        "safety-letter": "Other", "rss-news": "Other",
+    }
+
+    def test_all_emergeable_kinds_map_to_notion_set(self) -> None:
+        for kind, expected in self._EXPECTED.items():
+            with self.subTest(kind=kind):
+                self.assertEqual(cs._category(kind), expected)
+                self.assertIn(cs._category(kind),
+                              {"Warning Letter", "Guidance", "Guideline", "Other"})
+
+    def test_no_dead_gmp_guideline_key(self) -> None:
+        # §3.4 표기와 달리 죽은 매핑을 넣지 않는다(휴면 Type + resolve_kind 분기 부재).
+        self.assertNotIn("gmp-guideline", cs._CATEGORY_MAP)
+
+    def test_dormant_gmp_guideline_type_absorbs_to_mfds_notice_guidance(self) -> None:
+        # 휴면 Type 이 인입돼도 Other 로 새지 않고 mfds-notice→Guidance 로 흡수됨을 고정.
+        row = {"source": cs.SOURCE_MFDS, "type_or_class": "gmp-guideline",
+               "document_id": "mfds-gmpg-1", "date": "2026-06-01"}
+        self.assertEqual(cs.resolve_kind(row), "mfds-notice")
+        self.assertEqual(cs._category("mfds-notice"), "Guidance")
+
+    def test_category_keys_subset_of_emergeable_kinds(self) -> None:
+        # _CATEGORY_MAP 의 모든 키는 실제 발현 가능한 kind 여야 한다(죽은 키 0).
+        for k in cs._CATEGORY_MAP:
+            self.assertIn(k, self._EXPECTED, f"발현 불가 kind 가 _CATEGORY_MAP 에: {k}")
+
+
+class OfficialIsPdfTest(unittest.TestCase):
+    """Codex 보정 #2 — _official_is_pdf 쿼리/프래그먼트 경계 고정(코드 무변경, 테스트만)."""
+
+    def test_true_cases(self) -> None:
+        for u in (
+            "https://www.fda.gov/media/192438/download",
+            "https://x/doc.pdf",
+            "https://x/doc.pdf?download=1",
+            "https://x/doc.pdf#page=2",
+            "https://x/file/download?x=1",
+            "https://x/DOC.PDF",
+        ):
+            self.assertTrue(cs._official_is_pdf(u), u)
+
+    def test_false_cases(self) -> None:
+        for u in (
+            "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026004434",
+            "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-"
+            "investigations/compliance-actions-and-activities/warning-letters",
+            "https://x/doc.pdfx",      # 꼬리 오탐 방지
+            "https://x/downloadx",
+            "",
+            None,
+        ):
+            self.assertFalse(cs._official_is_pdf(u), repr(u))
+
+
+class SignalDerivationTest(unittest.TestCase):
+    """_signal_level(단일원천 _signal_badge 파생)·_signal_tier_num 경계 고정."""
+
+    def test_signal_level(self) -> None:
+        self.assertEqual(cs._signal_level("Tier 3"), "High")
+        self.assertEqual(cs._signal_level("Tier 2"), "Med")
+        self.assertEqual(cs._signal_level("Tier 1"), "Low")
+        self.assertEqual(cs._signal_level("bogus"), "Low")   # 폴백 = Signal Low (T1)
+        self.assertEqual(cs._signal_level(""), "Low")
+
+    def test_signal_tier_num(self) -> None:
+        self.assertEqual(cs._signal_tier_num("Tier 3"), 3)
+        self.assertEqual(cs._signal_tier_num("Tier 1"), 1)
+        self.assertEqual(cs._signal_tier_num(""), 1)
+        self.assertEqual(cs._signal_tier_num("bogus"), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

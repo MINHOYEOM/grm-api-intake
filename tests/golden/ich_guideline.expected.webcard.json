@@ -1,0 +1,51 @@
+{
+  "agency": "ICH",
+  "card_type": "ICH",
+  "category": "Guideline",
+  "checks": [],
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-01"
+    },
+    {
+      "label": "문서번호",
+      "value": "ich-q5a-r2"
+    },
+    {
+      "label": "주제",
+      "value": "Q5A(R2) Viral Safety Evaluation of Biotechnology Products"
+    },
+    {
+      "label": "발행기관",
+      "value": "ICH"
+    }
+  ],
+  "group": "글로벌",
+  "group_label": null,
+  "headline_target": "ICH Q5A(R2) Viral Safety",
+  "id": "ich-q5a-r2",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "Low",
+  "signal_tier": 1,
+  "sources": {
+    "info_url": "https://www.ich.org/page/quality-guidelines",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://www.ich.org/page/quality-guidelines"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "ICH"
+}

@@ -1,0 +1,60 @@
+{
+  "agency": "MFDS",
+  "card_type": "행정처분",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-30"
+    },
+    {
+      "label": "문서번호",
+      "value": "admin-2026003474"
+    },
+    {
+      "label": "업체",
+      "value": "대한약품공업 (대한민국)"
+    },
+    {
+      "label": "처분",
+      "value": "제조업무정지 1개월"
+    }
+  ],
+  "group": "국내",
+  "group_label": null,
+  "headline_target": "대한약품공업",
+  "id": "admin-2026003474",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": "💊 합성의약품",
+  "quotes": [
+    {
+      "original": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함.",
+      "translation": null
+    },
+    {
+      "original": "제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨.",
+      "translation": null
+    }
+  ],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=123456"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "행정처분"
+}

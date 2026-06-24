@@ -1,0 +1,51 @@
+{
+  "agency": "WHO",
+  "card_type": "WHO",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-08"
+    },
+    {
+      "label": "문서번호",
+      "value": "who-noc-2026-04"
+    },
+    {
+      "label": "주제",
+      "value": "Notice of Concern: Firm Y (API site)"
+    },
+    {
+      "label": "발행기관",
+      "value": "WHO"
+    }
+  ],
+  "group": "글로벌",
+  "group_label": null,
+  "headline_target": "Notice of Concern — Firm Y",
+  "id": "who-noc-2026-04",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "High",
+  "signal_tier": 3,
+  "sources": {
+    "info_url": "https://extranet.who.int/pqweb/notice-of-concern/firm-y",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://extranet.who.int/pqweb/notice-of-concern/firm-y"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "WHO"
+}

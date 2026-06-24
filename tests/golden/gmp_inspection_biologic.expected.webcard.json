@@ -1,0 +1,60 @@
+{
+  "agency": "MFDS",
+  "card_type": "GMP실사",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-28"
+    },
+    {
+      "label": "문서번호",
+      "value": "gmp-2026-0007"
+    },
+    {
+      "label": "제조소",
+      "value": "GenBio Logics GmbH"
+    },
+    {
+      "label": "실사기간",
+      "value": "2026-03-10~2026-03-14"
+    }
+  ],
+  "group": "국내",
+  "group_label": null,
+  "headline_target": "지엔바이오로직스",
+  "id": "gmp-2026-0007",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": "🧬 바이오의약품",
+  "quotes": [
+    {
+      "original": "평가 결과 지적(보완)사항(Deficiencies) 무균공정 배지충전(media fill) 검증 자료가 미흡하고 환경모니터링 일탈에 대한 조사 기록이 불완전함.",
+      "translation": null
+    },
+    {
+      "original": "작업자 무균조작 적격성 재평가가 필요함.",
+      "translation": null
+    }
+  ],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": ""
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "GMP실사"
+}

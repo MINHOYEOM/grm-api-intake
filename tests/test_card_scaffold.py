@@ -10,6 +10,7 @@
 import io
 import json
 import os
+import re
 import unittest
 
 import card_scaffold as cs
@@ -38,6 +39,21 @@ FIXTURES = [
     "regulation_final",
     "mfds_notice",
 ]
+
+# P1 web-card golden 대상 = 기존 카드 fixture 전체 + excerpt 2 + fda-483(병합은 별도 클래스).
+# watch 섹션(legislative_notice)은 v1 카드 아님(§3.3) → per-card web 골든 미동결(to_web_card
+# 는 watch 로 호출되지 않음; brief 제외는 WebBriefGoldenTest 가 검증).
+WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
+    "who_inspection_excerpt", "warning_letter_excerpt", "fda_483",
+]
+
+# assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).
+WEB_BRIEF_META = {
+    "run_date_kst": "2026-06-22",
+    "window": "2026-06-15 ~ 2026-06-22",
+    "publish_date": "2026-06-22",
+    "intake_total": len(FIXTURES),
+}
 
 
 def _read(path: str) -> str:
@@ -746,6 +762,350 @@ class AdminL1VerifyTest(unittest.TestCase):
         self.assertEqual(
             cs._official_label("https://www.data.go.kr/data/15058457/openapi.do", True),
             "공식원본(데이터셋)")
+
+
+class WebCardGoldenTest(unittest.TestCase):
+    """P1 — `grm-web-card/v1` 카드 직렬화 골든 + 필드 소유권/verbatim/불변식.
+
+    per-card 골든은 render_entry={} 로 직렬화(render_order/group_label=null) — 카드 고유
+    필드만 동결한다. 브리프 단위 정렬(render_order/group_label)은 WebBriefGoldenTest 가 동결.
+    """
+
+    def test_each_webcard_byte_identical(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                wc = card.to_web_card({})
+                got = json.dumps(wc, ensure_ascii=False, indent=2, sort_keys=True)
+                path = os.path.join(GOLDEN, f"{name}.expected.webcard.json")
+                if _UPDATE:
+                    _write(path, got)
+                    continue
+                self.assertEqual(json.loads(got), json.loads(_read(path)),
+                                 f"{name}: web-card JSON 이 golden 과 다름")
+
+    def test_determinism_byte_for_byte(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                a = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({"render_order": 3})
+                b = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({"render_order": 3})
+                self.assertEqual(json.dumps(a, ensure_ascii=False, sort_keys=True),
+                                 json.dumps(b, ensure_ascii=False, sort_keys=True))
+
+    def test_llm_slots_empty_code_fields_set(self) -> None:
+        # 필드 소유권: LLM 슬롯만 빈 placeholder, 코드 필드는 결정값.
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertEqual(wc["title_issue"], "")
+                self.assertEqual(wc["summary"], "")
+                self.assertEqual(wc["key_facts"], [])
+                self.assertEqual(wc["implication"], "")
+                self.assertEqual(wc["checks"], [])
+                # 코드 필드는 채워짐
+                self.assertTrue(wc["agency"])
+                self.assertTrue(wc["card_type"])
+                self.assertIn(wc["category"],
+                              {"Warning Letter", "Guidance", "Guideline", "Other"})
+                self.assertIn(wc["evidence_level"], {"A", "B", "C"})
+                self.assertIn(wc["signal_label"], {"High", "Med", "Low"})
+                self.assertIsInstance(wc["signal_tier"], int)
+                self.assertTrue(wc["facts"])
+
+    def test_facts_verbatim_no_markup(self) -> None:
+        # facts[].value = _w2_rows 값에서 백틱만 벗긴 verbatim. 마크업 부재(불변식 #6).
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                wc = card.to_web_card({})
+                expected = [{"label": l, "value": cs._plain(v)}
+                            for l, v in cs._w2_rows(card.kind, fx["row"], fx["raw"])]
+                self.assertEqual(wc["facts"], expected)
+                for f in wc["facts"]:
+                    self.assertNotIn("`", f["value"])
+
+    def test_headline_target_verbatim(self) -> None:
+        # 비병합 headline_target = _headline_target(row) (제목과 동일 단일원천).
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertEqual(wc["headline_target"], cs._headline_target(fx["row"]))
+
+    def test_sources_match_dual_links(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                info, official, _fb = cs._dual_links(card.kind, fx["row"], fx["raw"])
+                wc = card.to_web_card({})
+                self.assertEqual(wc["sources"]["info_url"], info)
+                self.assertEqual(wc["sources"]["official_url"], official)
+                self.assertEqual(wc["sources"]["link_check"],
+                                 {"info": "pending", "official": "pending"})
+
+    def test_id_is_document_id_not_card_id(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertEqual(wc["id"], fx["row"].get("document_id", ""))
+                self.assertNotIn("::", wc["id"])
+
+    def test_evidence_quote_invariant(self) -> None:
+        # A ⟺ quotes 비지 않음(quote 소스 있을 때) · B/C → quotes==[].
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                wc = card.to_web_card({})
+                if card.evidence == "A":
+                    quote = cs._quote_source(card.kind, fx["raw"])
+                    self.assertEqual(bool(wc["quotes"]), bool(quote))
+                else:
+                    self.assertEqual(wc["quotes"], [])
+
+    def test_ko_translation_null_nonko_empty(self) -> None:
+        # KO(MFDS) Evidence A → translation null. 비KO Evidence A → translation "".
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                if not (card.evidence == "A" and card.to_web_card({})["quotes"]):
+                    continue
+                lang = cs._language(fx["row"], card.kind)
+                wc = card.to_web_card({})
+                for q in wc["quotes"]:
+                    if lang == "KO":
+                        self.assertIsNone(q["translation"])
+                    else:
+                        self.assertEqual(q["translation"], "")
+
+    def test_no_card_markup(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertEqual(cs.assert_no_card_markup(wc), [])
+
+    def test_modality_null_for_normative_kinds(self) -> None:
+        for name in WEBCARD_FIXTURES:
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                card = cs.build_card_scaffold(fx["row"], fx["raw"])
+                wc = card.to_web_card({})
+                if card.kind in cs._NORMATIVE_KINDS:
+                    self.assertIsNone(wc["modality"])
+
+    def test_render_entry_passthrough(self) -> None:
+        fx = _load_input("guidance_fr")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card(
+            {"render_order": 7, "group_label": "💊 합성의약품"})
+        self.assertEqual(wc["render_order"], 7)
+        self.assertEqual(wc["group_label"], "💊 합성의약품")
+        # 빈 group_label → null
+        wc2 = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card(
+            {"render_order": 7, "group_label": ""})
+        self.assertIsNone(wc2["group_label"])
+
+
+class WebMergedRecallTest(unittest.TestCase):
+    """P1 §3.7 — 병합 대표 카드 web-card 골든 + merged_count/items/headline."""
+
+    def _rep(self):
+        rows = json.loads(_read(os.path.join(GOLDEN, "recall_merged.input.json")))["rows"]
+        cards = cs.merge_recall_cards(_build_cards_from_rows(rows))
+        return cards[0]
+
+    def test_merged_webcard_byte_identical(self) -> None:
+        wc = self._rep().to_web_card({})
+        got = json.dumps(wc, ensure_ascii=False, indent=2, sort_keys=True)
+        path = os.path.join(GOLDEN, "recall_merged.expected.webcard.json")
+        if _UPDATE:
+            _write(path, got)
+            return
+        self.assertEqual(json.loads(got), json.loads(_read(path)))
+
+    def test_merged_fields(self) -> None:
+        wc = self._rep().to_web_card({})
+        self.assertEqual(wc["merged_count"], 3)
+        self.assertEqual(wc["merged_items"],
+                         ["아세트아미노펜정 500mg", "아세트아미노펜정 325mg",
+                          "이부프로펜정 200mg"])
+        self.assertIn("외 2품목", wc["headline_target"])
+        prod = [f for f in wc["facts"] if f["label"] == "제품"]
+        self.assertEqual(prod, [{"label": "제품", "value": "아세트아미노펜정 500mg 외 2품목"}])
+        self.assertEqual(cs.assert_no_card_markup(wc), [])
+
+    def test_non_merged_merged_count_one(self) -> None:
+        fx = _load_input("recall_quality_chemical")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+        self.assertEqual(wc["merged_count"], 1)
+        self.assertEqual(wc["merged_items"], [])
+
+
+class WebBriefGoldenTest(unittest.TestCase):
+    """P1 §3.2 — assemble_web_brief 골든 + 브리프 불변식(정렬·제외·집계)."""
+
+    def _cards(self) -> list:
+        return cs.merge_recall_cards(
+            [cs.build_card_scaffold(_load_input(n)["row"], _load_input(n)["raw"])
+             for n in FIXTURES])
+
+    def _brief(self) -> dict:
+        return cs.assemble_web_brief(self._cards(), WEB_BRIEF_META)
+
+    def test_brief_web_byte_identical(self) -> None:
+        brief = self._brief()
+        got = json.dumps(brief, ensure_ascii=False, indent=2, sort_keys=True)
+        path = os.path.join(GOLDEN, "brief_web.expected.json")
+        if _UPDATE:
+            _write(path, got)
+            return
+        self.assertEqual(json.loads(got), json.loads(_read(path)))
+
+    def test_schema_and_brief_meta(self) -> None:
+        brief = self._brief()
+        self.assertEqual(brief["schema_version"], "grm-web-card/v1")
+        b = brief["brief"]
+        self.assertEqual(b["run_date_kst"], "2026-06-22")
+        self.assertEqual(b["window"], "2026-06-15 ~ 2026-06-22")
+        self.assertEqual(b["tldr"], [])           # LLM placeholder
+        self.assertTrue(b["ai_disclosure"])
+        self.assertEqual(b["coverage"]["intake_total"], len(FIXTURES))
+        self.assertEqual(b["coverage"]["rendered"], len(brief["cards"]))
+        # 면책 정식 문안은 JSON 에 미포함(렌더러 보유)
+        self.assertNotIn("disclaimer", json.dumps(brief, ensure_ascii=False))
+
+    def test_render_order_monotonic(self) -> None:
+        ro = [c["render_order"] for c in self._brief()["cards"]]
+        self.assertEqual(ro, sorted(ro))
+        self.assertTrue(all(isinstance(x, int) for x in ro))
+
+    def test_watch_and_merged_members_excluded(self) -> None:
+        cards = self._cards()
+        brief = cs.assemble_web_brief(cards, WEB_BRIEF_META)
+        ids = {c["id"] for c in brief["cards"]}
+        # watch(legislative) 제외
+        self.assertNotIn(_load_input("legislative_notice")["row"]["document_id"], ids)
+        # 병합 멤버 제외 — recall_merged 멤버 추가해 확인
+        merged_rows = json.loads(
+            _read(os.path.join(GOLDEN, "recall_merged.input.json")))["rows"]
+        merged = cs.merge_recall_cards(_build_cards_from_rows(merged_rows))
+        brief2 = cs.assemble_web_brief(merged, WEB_BRIEF_META)
+        self.assertEqual(len(brief2["cards"]), 1)  # 대표 1장만
+
+    def test_brief_order_matches_render_plan(self) -> None:
+        # 단일원천: assemble_web_brief 카드의 render_order 가 compute_render_plan 의
+        # (watch 제외) render_order 집합과 일치하고 엄격 증가(중복 없음).
+        cards = self._cards()
+        plan = cs.compute_render_plan(cards)
+        non_watch_orders = sorted(
+            plan[c.card_id]["render_order"] for c in cards
+            if not c.merged_into and c.section != "watch")
+        brief = cs.assemble_web_brief(cards, WEB_BRIEF_META)
+        ro = [c["render_order"] for c in brief["cards"]]
+        self.assertEqual(ro, non_watch_orders)        # plan 순서와 동일(단일원천)
+        self.assertEqual(ro, sorted(set(ro)))         # 엄격 증가(중복 없음)
+
+    def test_no_card_markup_in_brief(self) -> None:
+        for c in self._brief()["cards"]:
+            self.assertEqual(cs.assert_no_card_markup(c), [])
+
+
+class Brief2026_06_22WebFixtureTest(unittest.TestCase):
+    """P1 §4-1 — 실-6/22 web-card 픽스처(`brief_web_2026_06_22.json`) 회귀.
+
+    빌더(`build_brief_web_2026_06_22.py`)가 36 동결 scaffold markdown 을 파싱한 결과를
+    동결한다. 핵심 보증: 각 카드의 facts 가 scaffold W2 셀과 **글자 단위 동일**(PL18 의미 보존).
+    """
+
+    _FIX = os.path.join(os.path.dirname(__file__), "fixtures", "brief_web_2026_06_22.json")
+    _HANDOFF = os.path.join(os.path.dirname(__file__), "fixtures",
+                            "handoff_rows_2026_06_22.json")
+
+    def _load(self) -> dict:
+        return json.loads(_read(self._FIX))
+
+    def _builder(self):
+        import importlib.util
+        path = os.path.join(os.path.dirname(__file__), "fixtures",
+                            "build_brief_web_2026_06_22.py")
+        spec = importlib.util.spec_from_file_location("build_brief_web", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_fixture_matches_builder_output(self) -> None:
+        # 동결된 픽스처 == 빌더 재실행 결과(결정론 freeze).
+        fixture = self._load()
+        built = self._builder().build()
+        self.assertEqual(built, fixture, "brief_web_2026_06_22.json 이 빌더 출력과 다름")
+
+    def test_schema_and_card_count(self) -> None:
+        d = self._load()
+        self.assertEqual(d["schema_version"], "grm-web-card/v1")
+        self.assertEqual(len(d["cards"]), 36)
+        self.assertEqual(d["brief"]["coverage"]["intake_total"], 36)
+        ro = [c["render_order"] for c in d["cards"]]
+        self.assertEqual(ro, list(range(36)))   # 6/22 = watch/병합 없음 → 0..35 연속
+
+    def test_no_card_markup(self) -> None:
+        for c in self._load()["cards"]:
+            self.assertEqual(cs.assert_no_card_markup(c), [],
+                             f"{c['id']}: 표현 틀 마크업 잔존")
+
+    def test_facts_verbatim_match_scaffold_cells(self) -> None:
+        # PL18 보증: web facts[].value == scaffold W2 셀(백틱 제거) 글자 단위 동일.
+        scaffolds = {r["document_id"]: r["card_scaffold"]
+                     for r in json.loads(_read(self._HANDOFF))}
+        for c in self._load()["cards"]:
+            with self.subTest(doc=c["id"]):
+                md = scaffolds[c["id"]]
+                expected = []
+                for ln in md.split("\n"):
+                    m = re.match(r"<tr><td>\*\*(.+?)\*\*</td><td>(.*)</td></tr>$", ln)
+                    if m:
+                        expected.append({"label": m.group(1),
+                                         "value": cs._plain(m.group(2))})
+                self.assertEqual(c["facts"], expected)
+
+    def test_evidence_matches_scaffold_badge(self) -> None:
+        scaffolds = {r["document_id"]: r["card_scaffold"]
+                     for r in json.loads(_read(self._HANDOFF))}
+        for c in self._load()["cards"]:
+            with self.subTest(doc=c["id"]):
+                badge = re.search(r"`Evidence ([ABC])`", scaffolds[c["id"]]).group(1)
+                self.assertEqual(c["evidence_level"], badge)
+
+    def test_quotes_verbatim_present_in_scaffold(self) -> None:
+        # 인용 원문(마커 제거)의 각 줄이 scaffold 에 그대로 존재(전사 무결성, 비순환 가드).
+        scaffolds = {r["document_id"]: r["card_scaffold"]
+                     for r in json.loads(_read(self._HANDOFF))}
+        for c in self._load()["cards"]:
+            md = scaffolds[c["id"]]
+            for q in c["quotes"]:
+                self.assertIsInstance(q["original"], str)
+                for line in q["original"].split("\n"):
+                    if line.strip():
+                        self.assertIn(line, md,
+                                      f"{c['id']}: 인용 줄이 scaffold 에 없음: {line!r}")
+
+    def test_source_urls_verbatim_present_in_scaffold(self) -> None:
+        # info/official URL 이 scaffold 링크에 글자 단위 존재 — URL 조기 절단 회귀 차단.
+        scaffolds = {r["document_id"]: r["card_scaffold"]
+                     for r in json.loads(_read(self._HANDOFF))}
+        for c in self._load()["cards"]:
+            md = scaffolds[c["id"]]
+            for key in ("info_url", "official_url"):
+                url = c["sources"][key]
+                if url:
+                    self.assertIn(f"]({url})", md,
+                                  f"{c['id']}: {key} 가 scaffold 와 불일치(절단?): {url}")
 
 
 if __name__ == "__main__":

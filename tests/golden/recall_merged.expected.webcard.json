@@ -1,0 +1,60 @@
+{
+  "agency": "MFDS",
+  "card_type": "회수·판매중지",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-06-02"
+    },
+    {
+      "label": "문서번호",
+      "value": "recall-2026003474"
+    },
+    {
+      "label": "업체",
+      "value": "한국제약(주)"
+    },
+    {
+      "label": "제품",
+      "value": "아세트아미노펜정 500mg 외 2품목"
+    }
+  ],
+  "group": "Recall",
+  "group_label": null,
+  "headline_target": "한국제약(주) 아세트아미노펜정 500mg 외 2품목",
+  "id": "recall-2026003474",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 3,
+  "merged_items": [
+    "아세트아미노펜정 500mg",
+    "아세트아미노펜정 325mg",
+    "이부프로펜정 200mg"
+  ],
+  "modality": "💊 합성의약품",
+  "quotes": [
+    {
+      "original": "함량부적합(98% 미만) 확인에 따른 자진 회수",
+      "translation": null
+    }
+  ],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "회수"
+}

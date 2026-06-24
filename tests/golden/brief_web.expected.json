@@ -1,0 +1,910 @@
+{
+  "brief": {
+    "agencies": [
+      "FDA",
+      "ICH",
+      "WHO",
+      "MHRA",
+      "MFDS",
+      "Health Canada"
+    ],
+    "ai_disclosure": true,
+    "categories": [
+      "Warning Letter",
+      "Guideline",
+      "Other",
+      "Guidance"
+    ],
+    "coverage": {
+      "evidence": {
+        "A": 7,
+        "B": 9,
+        "C": 0
+      },
+      "intake_total": 17,
+      "rendered": 16
+    },
+    "publish_date": "2026-06-22",
+    "run_date_kst": "2026-06-22",
+    "tldr": [],
+    "window": "2026-06-15 ~ 2026-06-22"
+  },
+  "cards": [
+    {
+      "agency": "FDA",
+      "card_type": "Warning Letter",
+      "category": "Warning Letter",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-20"
+        },
+        {
+          "label": "문서번호",
+          "value": "WL-CMS-660123"
+        },
+        {
+          "label": "업체/제조소",
+          "value": "Acme Pharmaceuticals, LLC"
+        },
+        {
+          "label": "발행 부서/일자",
+          "value": "Center for Drug Evaluation and Research (CDER) · 05/15/2026"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "💊 합성의약품",
+      "headline_target": "Acme Pharmaceuticals, LLC",
+      "id": "WL-CMS-660123",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [],
+      "render_order": 0,
+      "signal_label": "High",
+      "signal_tier": 3,
+      "sources": {
+        "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660123"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "CGMP"
+    },
+    {
+      "agency": "ICH",
+      "card_type": "ICH",
+      "category": "Guideline",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-01"
+        },
+        {
+          "label": "문서번호",
+          "value": "ich-q5a-r2"
+        },
+        {
+          "label": "주제",
+          "value": "Q5A(R2) Viral Safety Evaluation of Biotechnology Products"
+        },
+        {
+          "label": "발행기관",
+          "value": "ICH"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "🧬 바이오의약품",
+      "headline_target": "ICH Q5A(R2) Viral Safety",
+      "id": "ich-q5a-r2",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 1,
+      "signal_label": "Low",
+      "signal_tier": 1,
+      "sources": {
+        "info_url": "https://www.ich.org/page/quality-guidelines",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://www.ich.org/page/quality-guidelines"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "ICH"
+    },
+    {
+      "agency": "WHO",
+      "card_type": "WHO",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-08"
+        },
+        {
+          "label": "문서번호",
+          "value": "who-noc-2026-04"
+        },
+        {
+          "label": "주제",
+          "value": "Notice of Concern: Firm Y (API site)"
+        },
+        {
+          "label": "발행기관",
+          "value": "WHO"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "▫️ 기타",
+      "headline_target": "Notice of Concern — Firm Y",
+      "id": "who-noc-2026-04",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 2,
+      "signal_label": "High",
+      "signal_tier": 3,
+      "sources": {
+        "info_url": "https://extranet.who.int/pqweb/notice-of-concern/firm-y",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://extranet.who.int/pqweb/notice-of-concern/firm-y"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "WHO"
+    },
+    {
+      "agency": "FDA",
+      "card_type": "지침·안내서",
+      "category": "Guidance",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-22"
+        },
+        {
+          "label": "문서번호",
+          "value": "FR-2026-04578"
+        },
+        {
+          "label": "발행기관",
+          "value": "FDA"
+        },
+        {
+          "label": "의견기한",
+          "value": "2026-07-21"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "▫️ 기타",
+      "headline_target": "Guidance on Elemental Impurities in Drug Products",
+      "id": "FR-2026-04578",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [
+        {
+          "original": "This draft guidance describes FDA's current thinking on the control of elemental impurities consistent with ICH Q3D.",
+          "translation": ""
+        },
+        {
+          "original": "Comments should be submitted by the date in the notice.",
+          "translation": ""
+        }
+      ],
+      "render_order": 3,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://www.federalregister.gov/api/v1/documents/2026-04578",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://www.federalregister.gov/documents/2026/05/22/2026-04578"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "Guidance"
+    },
+    {
+      "agency": "WHO",
+      "card_type": "WHO",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-06"
+        },
+        {
+          "label": "문서번호",
+          "value": "who-whopir-2026-11"
+        },
+        {
+          "label": "주제",
+          "value": "WHOPIR: Site Z, India (FPP)"
+        },
+        {
+          "label": "발행기관",
+          "value": "WHO"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "▫️ 기타",
+      "headline_target": "WHOPIR — Site Z",
+      "id": "who-whopir-2026-11",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 4,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "WHO"
+    },
+    {
+      "agency": "MHRA",
+      "card_type": "규제 소식",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-03"
+        },
+        {
+          "label": "문서번호",
+          "value": "mhra-blog-512"
+        },
+        {
+          "label": "발행기관",
+          "value": "MHRA"
+        },
+        {
+          "label": "주제",
+          "value": "Data integrity expectations in 2026"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "▫️ 기타",
+      "headline_target": "Data integrity expectations",
+      "id": "mhra-blog-512",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 5,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://mhrainspectorate.blog.gov.uk/2026/05/03/data-integrity/",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://mhrainspectorate.blog.gov.uk/2026/05/03/data-integrity/"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "GMP News"
+    },
+    {
+      "agency": "WHO",
+      "card_type": "WHO",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-05"
+        },
+        {
+          "label": "문서번호",
+          "value": "who-news-2026-31"
+        },
+        {
+          "label": "주제",
+          "value": "WHO PQ news update"
+        },
+        {
+          "label": "발행기관",
+          "value": "WHO"
+        }
+      ],
+      "group": "글로벌",
+      "group_label": "▫️ 기타",
+      "headline_target": "WHO PQ news update",
+      "id": "who-news-2026-31",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 6,
+      "signal_label": "Low",
+      "signal_tier": 1,
+      "sources": {
+        "info_url": "https://extranet.who.int/pqweb/news/update-31",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://extranet.who.int/pqweb/news/update-31"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "WHO"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "행정처분",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-30"
+        },
+        {
+          "label": "문서번호",
+          "value": "admin-2026003474"
+        },
+        {
+          "label": "업체",
+          "value": "대한약품공업 (대한민국)"
+        },
+        {
+          "label": "처분",
+          "value": "제조업무정지 1개월"
+        }
+      ],
+      "group": "국내",
+      "group_label": null,
+      "headline_target": "대한약품공업",
+      "id": "admin-2026003474",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [
+        {
+          "original": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조를 위반함.",
+          "translation": null
+        },
+        {
+          "original": "제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨.",
+          "translation": null
+        }
+      ],
+      "render_order": 7,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=123456"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "행정처분"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "GMP실사",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-28"
+        },
+        {
+          "label": "문서번호",
+          "value": "gmp-2026-0007"
+        },
+        {
+          "label": "제조소",
+          "value": "GenBio Logics GmbH"
+        },
+        {
+          "label": "실사기간",
+          "value": "2026-03-10~2026-03-14"
+        }
+      ],
+      "group": "국내",
+      "group_label": null,
+      "headline_target": "지엔바이오로직스",
+      "id": "gmp-2026-0007",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "🧬 바이오의약품",
+      "quotes": [
+        {
+          "original": "평가 결과 지적(보완)사항(Deficiencies) 무균공정 배지충전(media fill) 검증 자료가 미흡하고 환경모니터링 일탈에 대한 조사 기록이 불완전함.",
+          "translation": null
+        },
+        {
+          "original": "작업자 무균조작 적격성 재평가가 필요함.",
+          "translation": null
+        }
+      ],
+      "render_order": 8,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": ""
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "GMP실사"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "지침·안내서",
+      "category": "Guidance",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-09"
+        },
+        {
+          "label": "문서번호",
+          "value": "mfds-guide-204"
+        },
+        {
+          "label": "발행기관",
+          "value": "MFDS"
+        },
+        {
+          "label": "주제",
+          "value": "데이터 완전성(Data Integrity) 평가 가이드라인"
+        }
+      ],
+      "group": "국내",
+      "group_label": null,
+      "headline_target": "데이터 완전성 평가 가이드라인",
+      "id": "mfds-guide-204",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 9,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://nedrug.mfds.go.kr/guide/204",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://nedrug.mfds.go.kr/guide/204"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "Guidance"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "고시·개정법령",
+      "category": "Guidance",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-07"
+        },
+        {
+          "label": "문서번호",
+          "value": "mfds-reg-2026-7"
+        },
+        {
+          "label": "발행기관",
+          "value": "MFDS"
+        },
+        {
+          "label": "주제",
+          "value": "의약품 제조 및 품질관리 기준 고시 개정"
+        }
+      ],
+      "group": "국내",
+      "group_label": null,
+      "headline_target": "의약품 GMP 고시 개정",
+      "id": "mfds-reg-2026-7",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": null,
+      "quotes": [],
+      "render_order": 10,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://www.mfds.go.kr/regulation/2026-7",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://www.mfds.go.kr/regulation/2026-7"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "규정"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "안전성서한",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "공식 인덱스 + 보조 출처",
+      "evidence_level": "B",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-02"
+        },
+        {
+          "label": "문서번호",
+          "value": "mfds-safety-77"
+        },
+        {
+          "label": "발행기관",
+          "value": "MFDS"
+        },
+        {
+          "label": "주제",
+          "value": "OO성분 의약품 안전성서한"
+        }
+      ],
+      "group": "국내",
+      "group_label": null,
+      "headline_target": "의약품 안전성서한",
+      "id": "mfds-safety-77",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [],
+      "render_order": 11,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://nedrug.mfds.go.kr/safety/77",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://nedrug.mfds.go.kr/safety/77"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "안전성"
+    },
+    {
+      "agency": "Health Canada",
+      "card_type": "Recall(HC)",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-06-03"
+        },
+        {
+          "label": "문서번호",
+          "value": "hc-82142"
+        },
+        {
+          "label": "업체",
+          "value": "원문 미기재"
+        },
+        {
+          "label": "제품",
+          "value": "Hizentra"
+        },
+        {
+          "label": "Class",
+          "value": "Type II"
+        }
+      ],
+      "group": "Recall",
+      "group_label": null,
+      "headline_target": "Hizentra: out of specification",
+      "id": "hc-82142",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "🧬 바이오의약품",
+      "quotes": [
+        {
+          "original": "The appearance is out of specification in the affected lot.",
+          "translation": ""
+        }
+      ],
+      "render_order": 13,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "Recall"
+    },
+    {
+      "agency": "MFDS",
+      "card_type": "회수·판매중지",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-06-02"
+        },
+        {
+          "label": "문서번호",
+          "value": "recall-2026003474"
+        },
+        {
+          "label": "업체",
+          "value": "한국제약(주)"
+        },
+        {
+          "label": "제품",
+          "value": "아세트아미노펜정 500mg"
+        }
+      ],
+      "group": "Recall",
+      "group_label": null,
+      "headline_target": "한국제약",
+      "id": "recall-2026003474",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [
+        {
+          "original": "함량부적합(98% 미만) 확인에 따른 자진 회수",
+          "translation": null
+        }
+      ],
+      "render_order": 14,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "회수"
+    },
+    {
+      "agency": "FDA",
+      "card_type": "Recall",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-15"
+        },
+        {
+          "label": "문서번호",
+          "value": "Z-1234-2026"
+        },
+        {
+          "label": "업체",
+          "value": "Acme Pharmaceuticals, Inc."
+        },
+        {
+          "label": "제품",
+          "value": "Lisinopril Tablets USP 10 mg, 100-count bottle"
+        },
+        {
+          "label": "Class",
+          "value": "Class II"
+        }
+      ],
+      "group": "Recall",
+      "group_label": null,
+      "headline_target": "Subpotent tablets recall",
+      "id": "Z-1234-2026",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [
+        {
+          "original": "Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+          "translation": ""
+        }
+      ],
+      "render_order": 15,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "Recall"
+    },
+    {
+      "agency": "Health Canada",
+      "card_type": "Recall(HC)",
+      "category": "Other",
+      "checks": [],
+      "evidence_basis": "Intake raw",
+      "evidence_level": "A",
+      "facts": [
+        {
+          "label": "발행일",
+          "value": "2026-05-10"
+        },
+        {
+          "label": "문서번호",
+          "value": "hc-rsam-88421"
+        },
+        {
+          "label": "업체",
+          "value": "원문 미기재"
+        },
+        {
+          "label": "제품",
+          "value": "Drug X 50 mg tablets"
+        },
+        {
+          "label": "Class",
+          "value": "Type II"
+        }
+      ],
+      "group": "Recall",
+      "group_label": null,
+      "headline_target": "Nitrosamine impurity recall",
+      "id": "hc-rsam-88421",
+      "implication": "",
+      "key_facts": [],
+      "merged_count": 1,
+      "merged_items": [],
+      "modality": "💊 합성의약품",
+      "quotes": [
+        {
+          "original": "The product may contain a nitrosamine impurity above the acceptable intake limit.",
+          "translation": ""
+        }
+      ],
+      "render_order": 16,
+      "signal_label": "Med",
+      "signal_tier": 2,
+      "sources": {
+        "info_url": "https://recalls-rappels.canada.ca/en/alert-recall/88421",
+        "link_check": {
+          "info": "pending",
+          "official": "pending"
+        },
+        "official_is_pdf": false,
+        "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/88421"
+      },
+      "summary": "",
+      "title_issue": "",
+      "type_tag": "Recall"
+    }
+  ],
+  "schema_version": "grm-web-card/v1"
+}

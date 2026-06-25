@@ -157,7 +157,7 @@ def check_url(url: str, session: requests.Session, *,
               timeout: float = DEFAULT_TIMEOUT,
               retries: int = DEFAULT_RETRIES) -> str:
     """URL 도달 상태 산정. 봇월 인터스티셜·교차호스트 에러 리다이렉트→inconclusive(보존),
-    타임아웃→degraded·연결실패→broken·재시도 소진 반영."""
+    타임아웃→degraded·연결실패(ConnectionError)→degraded·재시도 소진 반영."""
     last_exc: Exception | None = None
     for _ in range(retries + 1):
         try:

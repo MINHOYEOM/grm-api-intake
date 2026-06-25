@@ -211,11 +211,19 @@ class CheckUrlTest(unittest.TestCase):
             linkcheck.check_url("https://x.test/a", s, retries=1), linkcheck.DEGRADED)
         self.assertEqual(s.head_calls, 2)        # 최초 + 재시도 1
 
-    def test_connection_error_broken_after_retries(self):
+    def test_connection_error_degraded_after_retries(self):
+        # DNS·refused = 빌드 IP 의 일시 egress 차단 가능 → degraded 보존(false-broken 방지).
         s = FakeSession(head=requests.exceptions.ConnectionError)
         self.assertEqual(
-            linkcheck.check_url("https://x.test/a", s, retries=2), linkcheck.BROKEN)
+            linkcheck.check_url("https://x.test/a", s, retries=2), linkcheck.DEGRADED)
         self.assertEqual(s.head_calls, 3)        # 최초 + 재시도 2
+
+    def test_other_request_exception_broken_no_retry(self):
+        # 비일시 요청예외(과다 리다이렉트 등) → broken, 재시도 안 함(break).
+        s = FakeSession(head=requests.exceptions.TooManyRedirects)
+        self.assertEqual(
+            linkcheck.check_url("https://x.test/a", s, retries=2), linkcheck.BROKEN)
+        self.assertEqual(s.head_calls, 1)
 
     def test_timeout_then_success(self):
         # 첫 시도 타임아웃 → 재시도 200 → ok.

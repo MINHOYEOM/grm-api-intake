@@ -31,8 +31,8 @@
   · 5xx(500·502·503·504…)    → "degraded"   (서버측·일시 가능 — 링크 살리고 ⚠️)
   · 408·429                  → "degraded"   (타임아웃·레이트리밋 — 일시)
   · 그 외 4xx(400·451…)       → "broken"
-  · 타임아웃(재시도 소진)     → "degraded"
-  · 연결 실패(DNS·거부)       → "broken"
+  · 타임아웃·연결실패(DNS·거부, 재시도 소진) → "degraded"  (일시 egress 차단 가능 → 보존)
+  · 그 외 요청예외(잘못된 URL·과다 리다이렉트…) → "broken"
   · 빈 URL                    → 변경 없음(상태 보존: 보통 "pending")
   · KR-egress 화이트리스트     → "ok" (네트워크 스킵)
 
@@ -175,12 +175,15 @@ def check_url(url: str, session: requests.Session, *,
             last_exc = e          # 일시 — 재시도
             continue
         except requests.exceptions.ConnectionError as e:
-            last_exc = e          # 연결 실패 — 재시도 후 broken
+            last_exc = e          # DNS·refused — 일시 egress 가능 → 재시도 후 degraded(보존)
             continue
         except requests.exceptions.RequestException as e:
-            last_exc = e          # 그 외 요청 예외 — broken
+            last_exc = e          # 비일시 요청예외(잘못된 URL·과다 리다이렉트…) — broken
             break
-    if isinstance(last_exc, requests.exceptions.Timeout):
+    # 재시도 소진: 타임아웃·연결실패는 일시성(빌드 IP egress 차단 가능) → degraded 보존
+    # (false-broken 방지). 확실한 dead 는 same-host 404/410 HTTP 응답으로만 좁힌다.
+    if isinstance(last_exc, (requests.exceptions.Timeout,
+                             requests.exceptions.ConnectionError)):
         return DEGRADED
     return BROKEN
 

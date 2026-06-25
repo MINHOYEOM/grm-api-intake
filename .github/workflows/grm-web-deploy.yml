@@ -1,0 +1,117 @@
+name: GRM Web Deploy
+
+# 웹이관 P3 — 발행(배포) Action B. 수집(`GRM API Intake`)과 **완전 별도 파일·별도 트리거·
+# 최소권한**(D8). 두 Action 의 결합은 오직 공유 JSON(`web/data/briefs/*.json`)뿐 —
+# 한쪽 실패가 다른쪽을 멈추지 않고, 각자 독립 재실행 가능(workflow_dispatch).
+#
+# 파이프: linkcheck(C1·비차단·D7) → build(render·결정론) → deploy(Cloudflare Pages).
+#   · 빌드는 **우리 CI 의 Python** 에서(호스트 빌더 미사용) → 산출 dist 고정·락인 최소.
+#   · 호스트는 정적 dist 업로드만 받음. Vercel 로 바꾸려면 'Deploy' 스텝만 교체.
+#
+# 승인→라이브 게이트(D5):
+#   · PR / 비-production 브랜치 push → **미리보기**(Cloudflare preview URL + dist 아티팩트).
+#   · production 브랜치(Cloudflare 설정)로의 **사람 머지** = 라이브. 이 머지가 유일한 사람 게이트.
+#   · 이 워크플로우에 자동 라이브 승격 로직 0 — prod/preview 분류는 Cloudflare 가 브랜치명으로 판정.
+#   · 라이브 무인 발행 차단의 실효선 = production 브랜치 보호(PR 필수·사람 머지) + (선택) 아래
+#     `environment:` required reviewer. 시크릿 미등록 시 deploy 는 건너뛰고 빌드/아티팩트만 남긴다.
+#
+# 비용(D9): GitHub Actions 무료분 + Cloudflare Pages 무료(무제한 대역폭). 유료 서비스 0.
+
+on:
+  push:
+    paths:
+      - 'web/**'
+  pull_request:
+    paths:
+      - 'web/**'
+  workflow_dispatch: {}        # 독립 수동 재실행(D8)
+
+# 최소권한 — 콘텐츠 read 만. 배포는 시크릿(Cloudflare 토큰)으로, GitHub 권한 불필요.
+permissions:
+  contents: read
+
+concurrency:
+  # 같은 브랜치 연속 push 시 이전 빌드 취소(중복 배포 방지). 라이브 안전성과 무관(미리보기/결정론).
+  group: grm-web-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # (선택·권장) 무인 라이브 0 강화 — production 브랜치 배포에 사람 승인 한 겹 더:
+    #   GitHub Settings → Environments 에서 'production' 에 required reviewer 등록 후,
+    #   배포를 별도 job 으로 분리해 `if: github.ref_name == vars.CF_PAGES_PROD_BRANCH` +
+    #   `environment: production` 을 건다(빈 environment 이름은 무효이므로 인라인 삼항 금지).
+    #   그러면 production 실행은 reviewer 승인 전까지 deploy 가 보류된다.
+    env:
+      # linkcheck enrich 산출(비파괴) — 빌드 입력. 워크스페이스 밖(runner temp)이라 repo 오염 0.
+      CHECKED_DIR: ${{ runner.temp }}/grm_briefs_checked
+      # 시크릿을 env 로 끌어와 '존재 여부'를 판정(없으면 deploy 스킵).
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_PAGES_PROJECT: ${{ vars.CF_PAGES_PROJECT || 'grm-weekly-brief' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── C1: 링크체크(D7) — 비차단. 실패해도 워크플로우 exit≠0 0 (경고만). ──────
+      - name: Link check (non-blocking enrich)
+        continue-on-error: true
+        timeout-minutes: 6
+        run: |
+          python web/linkcheck.py \
+            --data web/data/briefs \
+            --out "$CHECKED_DIR" \
+            --timeout 8 --retries 1 --host-delay 0.3
+
+      # ── C2: 빌드(결정론) — enrich 된 입력이 있으면 그걸로, 없으면 원본(pending)으로 폴백. ──
+      - name: Build static site (render.py)
+        run: |
+          DATA="web/data/briefs"
+          if compgen -G "$CHECKED_DIR/*.json" > /dev/null 2>&1; then
+            DATA="$CHECKED_DIR"
+            echo "링크체크 enrich 입력 사용: $DATA"
+          else
+            echo "::warning::링크체크 산출 없음 — 원본(web/data/briefs, link_check=pending)으로 빌드"
+          fi
+          python web/render.py --data "$DATA" --out web/dist
+
+      # 미리보기 산출물(시크릿 미등록·호스트 미연결 시에도 D5 육안검토 가능).
+      - name: Upload dist artifact (preview)
+        uses: actions/upload-artifact@v4
+        with:
+          name: grm-web-dist
+          path: web/dist
+          if-no-files-found: error
+
+      # 배포 자격(시크릿) 존재 판정. fork PR 은 시크릿 미전달 → 자연히 have=false → deploy 스킵.
+      - name: Check deploy credentials
+        id: creds
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Cloudflare 시크릿 미등록 — 배포 스킵(빌드/아티팩트만). 사람이 CLOUDFLARE_API_TOKEN·CLOUDFLARE_ACCOUNT_ID 등록 후 자동 활성."
+          fi
+
+      # ── C3: 배포(Cloudflare Pages) — prod/preview 분류는 Cloudflare 가 브랜치명으로 판정. ──
+      #   production 브랜치(vars.CF_PAGES_PROD_BRANCH, Cloudflare 설정과 일치)로의 머지만 라이브.
+      #   그 외 브랜치/PR = preview. 자동 라이브 경로 없음(D5).
+      - name: Deploy to Cloudflare Pages
+        if: steps.creds.outputs.have == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy web/dist
+            --project-name=${{ env.CF_PAGES_PROJECT }}
+            --branch=${{ github.head_ref || github.ref_name }}

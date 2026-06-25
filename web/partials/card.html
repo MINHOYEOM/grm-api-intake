@@ -18,7 +18,7 @@
   {%- endif %}
   <table class="facts">
     {%- for f in card.facts %}
-    <tr><td class="k">{{ f.label }}</td><td class="v">{% if f.mono %}<span class="mono">{{ f.value }}</span>{% else %}{{ f.value }}{% endif %}</td></tr>
+    <tr><td class="k">{{ f.label }}</td><td class="v">{% if f.mono and f.value.isascii() %}<span class="mono">{{ f.value }}</span>{% else %}{{ f.value }}{% endif %}</td></tr>
     {%- endfor %}
   </table>
   {%- if card.merged %}

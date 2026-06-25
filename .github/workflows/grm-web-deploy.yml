@@ -45,8 +45,6 @@ jobs:
     #   `environment: production` 을 건다(빈 environment 이름은 무효이므로 인라인 삼항 금지).
     #   그러면 production 실행은 reviewer 승인 전까지 deploy 가 보류된다.
     env:
-      # linkcheck enrich 산출(비파괴) — 빌드 입력. 워크스페이스 밖(runner temp)이라 repo 오염 0.
-      CHECKED_DIR: ${{ runner.temp }}/grm_briefs_checked
       # 시크릿을 env 로 끌어와 '존재 여부'를 판정(없으면 deploy 스킵).
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -60,6 +58,12 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      # linkcheck enrich 산출(비파괴) — 빌드 입력. 워크스페이스 밖(runner.temp)이라 repo 오염 0.
+      # runner 컨텍스트는 job-level env 에서 평가 불가 → 스텝에서 $GITHUB_ENV 로 설정해
+      # 이후 스텝(linkcheck·build)이 $CHECKED_DIR 로 공유한다.
+      - name: Resolve checked dir (runner.temp 는 job env 에서 불가)
+        run: echo "CHECKED_DIR=${{ runner.temp }}/grm_briefs_checked" >> "$GITHUB_ENV"
 
       # ── C1: 링크체크(D7) — 비차단. 실패해도 워크플로우 exit≠0 0 (경고만). ──────
       - name: Link check (non-blocking enrich)

@@ -14,8 +14,8 @@
 <body>
 <div class="topline"></div>
 
-<header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="{{ rel_root }}index.html"><span class="wm">GRM</span><span class="full">Global Regulatory Monitor</span></a>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="{{ rel_root }}index.html"><span class="logo">GRM<span class="dot"></span></span><span class="rule"></span><span class="desc">Global Regulatory Monitor</span></a>
   <nav><a href="{{ rel_root }}index.html"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
   <span class="sp"></span>
   <button class="iconbtn" id="theme" aria-label="명도 모드 전환"><i class="ti ti-moon"></i></button>
@@ -44,6 +44,11 @@
 const root=document.documentElement;
 document.getElementById('theme').onclick=()=>{root.classList.toggle('dark');
   document.querySelector('#theme i').className=root.classList.contains('dark')?'ti ti-sun':'ti ti-moon';};
+// 스크롤 그림자 — 네비가 종이 위로 떠오르는 단서(v2).
+const _nav=document.getElementById('nav');
+const _navShadow=()=>_nav.classList.toggle('scrolled',window.scrollY>6);
+window.addEventListener('scroll',_navShadow,{passive:true});_navShadow();
 </script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

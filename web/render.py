@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""GRM 웹 렌더러 (P2) — `grm-web-card/v1` JSON → 정적 멀티페이지 사이트.
+"""GRM 웹 렌더러 (P2·P4) — `grm-web-card/v1` JSON → 정적 멀티페이지 사이트.
 
 순수·결정론 빌더. `web/data/briefs/*.json`(주차별 브리프)을 읽어 `dist/` 에
 랜딩(`index.html`)·아카이브(`archive/index.html`)·브리프 상세
 (`briefs/{slug}/index.html`)를 생성한다. 디자인 계약 = `GRM_웹_프로토타입_v4.html`
++ 검색/네비/모션 = `GRM_웹_P4_아카이브검색_프로토타입_v2.html`
 (CSS 는 `assets/grm.css` 로 동결 추출).
 
 불변식
@@ -17,6 +18,14 @@
 스키마 한계 2건(§1.a/§1.b)은 결정론 파생으로 처리(v1.1 후보):
   - issue 번호: data/briefs 의 publish_date 오름차순 순위(가장 오래된=1).
   - 브리프 제목: tldr[0] 있으면 사용, 없으면 publish_date 파생 "{Y}년 {M}월 {N}주차".
+
+P4 — 아카이브 교차검색(정적·클라이언트사이드):
+  - `dist/assets/search-index.json` 을 빌드시 결정론 파생(카드 1개=1엔트리 + facet
+    메타 + 호 메타). 사실/URL/제목 재생성 0 — 카드 기존 값만 담는다(무변형).
+  - 검색·필터는 `assets/archive.js`(정적 클라이언트사이드)가 이 인덱스로 동작.
+    JS 미로드/fetch 실패 시 서버사이드로 이미 렌더된 호 목록이 그대로 보임(graceful).
+  - 상세 카드 앵커는 `document_id`(=card.id) 기준(검색결과→카드 점프 안정화). 인덱스의
+    href 와 상세 article id 는 같은 `_card_anchor()` 로 파생 — 항상 일치.
 """
 from __future__ import annotations
 
@@ -81,6 +90,16 @@ def _brief_title(brief_meta: dict[str, Any]) -> str:
     return title_dateform(brief_meta.get("publish_date", ""))
 
 
+def _card_anchor(card: dict[str, Any]) -> str:
+    """상세 카드의 안정 앵커 = document_id(=card.id). 검색결과→카드 점프용(P4 §2.2).
+
+    상세 article id·TOC href(brief.html)와 search-index 의 href 가 **모두** 이 함수로
+    파생 → 항상 일치(드리프트 0). id 없는 적대/합성 입력은 render_order 폴백.
+    """
+    cid = str(card.get("id") or "").strip()
+    return cid if cid else f"c{card.get('render_order')}"
+
+
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
 def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     quotes_in = card.get("quotes") or []
@@ -116,7 +135,7 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "render_order": card.get("render_order"),
-        "anchor": f"c{card.get('render_order')}",
+        "anchor": _card_anchor(card),
         "group": card.get("group"),
         "group_label": card.get("group_label"),
         "group_head": None,                            # 섹션 조립 시 결정
@@ -246,12 +265,15 @@ def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str) -> dict[s
     cov = _norm_coverage(bm.get("coverage") or {})
     pub = bm.get("publish_date", "")
     ev = cov["evidence"]
+    agencies = list(bm.get("agencies") or [])
     return {
         "slug": pub,
         "issue_no": issue_no,
         "title": _brief_title(bm),
         "date": pub,
-        "tags": " · ".join(bm.get("agencies") or []),
+        "month": pub[:7],                          # YYYY-MM (publish_date 파생 — facet 기간)
+        "agencies": agencies,                      # 칩(기관) per-tag 렌더(v2)
+        "tags": " · ".join(agencies),              # (구) 조인 문자열 — 하위호환
         "count": cov["rendered"],
         "ev": f"A{ev['A']} · B{ev['B']}",
         "latest": pub == latest_slug,
@@ -277,6 +299,124 @@ def _cover_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
     }
 
 
+# ── 검색 인덱스(P4 — 정적·결정론·무변형) ──────────────────────────────────────
+# 인덱스는 **아카이브 페이지(`archive/index.html`, 깊이 1)** 전용 → href 는 그 페이지
+# 기준 상대경로(`../`). render.py 가 페이지마다 새로 만들지 않는 단일 산출물이라 접두를
+# 여기 고정한다(검색은 spec 상 아카이브에만 얹는다 — P4 §2.3).
+_ARCHIVE_REL = "../"
+
+
+def _card_search_text(card: dict[str, Any]) -> str:
+    """클라이언트 검색 대상 결합 문자열(소문자화는 클라이언트에서).
+
+    카드 **기존 값 verbatim 결합만** — 새 텍스트 생성 0(무변형). 순서·구성은 P4 §2.1:
+    target + issue + card_type + agency + facts[].value (+ summary·key_facts 있으면).
+    빈 조각은 건너뛴다(공백 중복 방지 — 각 조각은 카드값의 verbatim 부분문자열로 유지).
+    """
+    parts: list[str] = [
+        card.get("headline_target", ""),
+        card.get("title_issue", ""),
+        card.get("card_type", ""),
+        card.get("agency", ""),
+    ]
+    parts += [f.get("value", "") for f in (card.get("facts") or [])]
+    if card.get("summary"):
+        parts.append(card["summary"])
+    parts += [k for k in (card.get("key_facts") or []) if k]
+    return " ".join(p for p in parts if p)
+
+
+def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
+                      month: str, vol_title: str) -> dict[str, Any]:
+    """카드 1개 → 검색 인덱스 엔트리. 전 필드 카드 기존 값 파생(무변형)."""
+    return {
+        "issue_no": issue_no,
+        "date": date,
+        "month": month,
+        "vol_title": vol_title,
+        "agency": card.get("agency", ""),
+        "category": card.get("category", ""),
+        "modality": card.get("modality"),               # null 가능(필터 미해당)
+        "card_type": card.get("card_type", ""),
+        "evidence_level": card.get("evidence_level", ""),
+        "signal_tier": card.get("signal_tier", ""),
+        "target": card.get("headline_target", ""),
+        "issue": card.get("title_issue", ""),           # 빈값이면 "" (JS 가 처리)
+        "summary": card.get("summary", ""),
+        # 상세 카드 앵커 — 상세 article id 와 동일 함수 파생(항상 점프 일치).
+        "href": f"{_ARCHIVE_REL}briefs/{date}/index.html#{_card_anchor(card)}",
+        "text": _card_search_text(card),
+    }
+
+
+def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str, int],
+                       latest_slug: str) -> dict[str, Any]:
+    """전 브리프 카드 → 검색 인덱스(facet 메타 + 호 메타 + 카드 엔트리).
+
+    정렬(결정론): 카드 = date desc, 동일 호 내 render_order asc. facet 후보는 **실제
+    존재값만** 노출(데이터 파생) — agency/category/modality 알파벳, months 최신순.
+    호 메타(issues)는 baseline 서버목록과 JS 검색뷰가 동일하게 쓰는 단일 파생원
+    (`_issue_row`)에서 만들어 두 경로 일관성 보장.
+    """
+    cards_idx: list[dict[str, Any]] = []
+    issues_idx: list[dict[str, Any]] = []
+    agencies: set[str] = set()
+    categories: set[str] = set()
+    modalities: set[str] = set()
+    months: set[str] = set()
+
+    # date desc 순 브리프 순회 → 각 호 내부는 render_order asc → 결합이 곧 최종 정렬.
+    for b in sorted(briefs, key=lambda b: b["brief"].get("publish_date", ""), reverse=True):
+        bm = b["brief"]
+        date = bm.get("publish_date", "")
+        month = date[:7]
+        issue_no = issue_no_by_date[date]
+        vol_title = _brief_title(bm)
+        renderable = [c for c in (b.get("cards") or []) if _is_renderable(c)]
+        cards_sorted = sorted(renderable,
+                              key=lambda c: (c.get("render_order") is None,
+                                             c.get("render_order")))
+        for c in cards_sorted:
+            entry = _card_index_entry(c, issue_no=issue_no, date=date,
+                                      month=month, vol_title=vol_title)
+            cards_idx.append(entry)
+            if entry["agency"]:
+                agencies.add(entry["agency"])
+            if entry["category"]:
+                categories.add(entry["category"])
+            if entry["modality"]:
+                modalities.add(entry["modality"])
+        if month:
+            months.add(month)
+
+        row = _issue_row(b, issue_no, latest_slug)
+        issues_idx.append({
+            "issue_no": row["issue_no"],
+            "slug": row["slug"],
+            "date": row["date"],
+            "month": row["month"],
+            "title": row["title"],
+            "agencies": row["agencies"],
+            "count": row["count"],
+            "ev": row["ev"],
+            "latest": row["latest"],
+            "href": f"{_ARCHIVE_REL}briefs/{row['slug']}/index.html",
+        })
+
+    issues_idx.sort(key=lambda r: r["date"], reverse=True)
+    return {
+        "schema": "grm-search-index/v1",
+        "facets": {
+            "agencies": sorted(agencies),
+            "categories": sorted(categories),
+            "modalities": sorted(modalities),
+            "months": sorted(months, reverse=True),
+        },
+        "issues": issues_idx,
+        "cards": cards_idx,
+    }
+
+
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
 def _make_env() -> Environment:
     return Environment(
@@ -292,6 +432,12 @@ def _write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # 항상 LF/UTF-8 — OS 무관 결정론(Windows 의 \r\n 변환 차단).
     path.write_bytes(text.encode("utf-8"))
+
+
+def _write_json(path: Path, obj: Any) -> None:
+    """결정론 JSON 쓰기 — dict 삽입순서 보존(sort_keys 미사용), ensure_ascii=False,
+    indent=1(레포 data 관례), 항상 LF/UTF-8 + 후행개행. 같은 입력 → byte 동일."""
+    _write(path, json.dumps(obj, ensure_ascii=False, indent=1) + "\n")
 
 
 def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
@@ -348,6 +494,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     _write(out_dir / "archive" / "index.html", archive_html)
     written.append("archive/index.html")
+
+    # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
+    search_index = build_search_index(briefs, issue_no_by_date, latest_slug)
+    _write_json(dist_assets / "search-index.json", search_index)
+    written.append("assets/search-index.json")
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")

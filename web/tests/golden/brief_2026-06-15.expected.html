@@ -14,8 +14,8 @@
 <body>
 <div class="topline"></div>
 
-<header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html"><span class="wm">GRM</span><span class="full">Global Regulatory Monitor</span></a>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../index.html"><span class="logo">GRM<span class="dot"></span></span><span class="rule"></span><span class="desc">Global Regulatory Monitor</span></a>
   <nav><a href="../../index.html">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../briefs/2026-06-22/index.html" class="on">최신호</a></nav>
   <span class="sp"></span>
   <button class="iconbtn" id="theme" aria-label="명도 모드 전환"><i class="ti ti-moon"></i></button>
@@ -34,8 +34,8 @@
       <span>Evidence <b class="mono">A 1 · B 0 · C 0</b></span>
     </div>  </div>
   <div class="wrap layout">
-    <aside class="toc"><div class="l">목차</div><div>      <a class="sec" href="#sec-Recall">Recall</a>      <a href="#c0">한국제약(주) 아세트아미노펜정 500mg 외 2품목</a>    </div></aside>
-    <div id="cards">      <h2 class="sec-h" id="sec-Recall"><i class="ti ti-alert-triangle" style="color:var(--accent);font-size:20px"></i>Recall <span class="n">1장</span></h2><article class="card evA" id="c0">
+    <aside class="toc"><div class="l">목차</div><div>      <a class="sec" href="#sec-Recall">Recall</a>      <a href="#recall-syn-merged">한국제약(주) 아세트아미노펜정 500mg 외 2품목</a>    </div></aside>
+    <div id="cards">      <h2 class="sec-h" id="sec-Recall"><i class="ti ti-alert-triangle" style="color:var(--accent);font-size:20px"></i>Recall <span class="n">1장</span></h2><article class="card evA" id="recall-syn-merged">
   <div class="c-title"><span class="pre">[회수·판매중지 · MFDS]</span>한국제약(주) 아세트아미노펜정 500mg 외 2품목 — <b>함량부적합 자진회수</b></div>
   <div class="badges"><span class="b code ev">Evidence A</span><span class="b ag">MFDS</span><span class="b sig code"><span class="d" style="background:var(--med)"></span>Signal Med · T2</span><span class="b mod">💊 합성의약품</span><span class="b typ">회수</span></div>  <p class="summary">함량부적합(98% 미만) 확인에 따라 3개 품목을 자진 회수했다.</p>  <table class="facts">    <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-06-12</span></td></tr>    <tr><td class="k">문서번호</td><td class="v"><span class="mono">recall-syn-merged</span></td></tr>    <tr><td class="k">업체</td><td class="v">한국제약(주)</td></tr>    <tr><td class="k">제품</td><td class="v">아세트아미노펜정 500mg 외 2품목</td></tr>    <tr><td class="k">회수 등급</td><td class="v"><span class="mono">1등급</span></td></tr>  </table>  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 3품목</summary>
     <ul class="facts2">      <li>아세트아미노펜정 500mg</li>      <li>아세트아미노펜정 325mg</li>      <li>이부프로펜정 200mg</li>    </ul></details>  <div class="block"><div class="lab"><i class="ti ti-quote"></i>원문</div>    <div class="quote"><div class="o">함량부적합(98% 미만) 확인에 따른 자진 회수</div></div>  </div>  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: Intake raw</span></div>
@@ -66,6 +66,10 @@
 const root=document.documentElement;
 document.getElementById('theme').onclick=()=>{root.classList.toggle('dark');
   document.querySelector('#theme i').className=root.classList.contains('dark')?'ti ti-sun':'ti ti-moon';};
+// 스크롤 그림자 — 네비가 종이 위로 떠오르는 단서(v2).
+const _nav=document.getElementById('nav');
+const _navShadow=()=>_nav.classList.toggle('scrolled',window.scrollY>6);
+window.addEventListener('scroll',_navShadow,{passive:true});_navShadow();
 </script>
 </body>
 </html>

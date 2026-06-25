@@ -1,7 +1,10 @@
-# GRM 웹 렌더러 (P2)
+# GRM 웹 렌더러 (P2·P4)
 
 `grm-web-card/v1` JSON → **정적 멀티페이지 사이트**(랜딩·아카이브·브리프 상세).
-순수·결정론 빌더. 디자인 계약 = `GRM_웹_프로토타입_v4.html`(CSS 는 `assets/grm.css` 로 동결 추출).
+순수·결정론 빌더. 디자인 계약 = `GRM_웹_프로토타입_v4.html` + 검색/네비/모션
+= `GRM_웹_P4_아카이브검색_프로토타입_v2.html`(CSS 는 `assets/grm.css` 로 동결 추출).
+P4 = 아카이브 전 호 카드 **교차검색 + facet 필터**(정적 클라이언트사이드, 빌드시
+`search-index.json` 파생 + progressive enhancement)·상세 카드 `document_id` 앵커·v2 네비/모션.
 
 > **헤드리스 분리:** routine(수집 시스템)은 **데이터(JSON)만** 만들고, "그리는 일"은 이 렌더러가 맡는다.
 > 렌더러는 JSON 값을 **그대로** 출력한다 — 사실·URL·숫자·업체명 재생성/교정/번역 **금지**.
@@ -11,16 +14,17 @@
 web/
 ├─ render.py            # 빌더(순수): data/briefs/*.json → dist/
 ├─ linkcheck.py         # 배포단계 링크체크(P3·C1): link_check enrich. 네트워크는 여기만 — render.py 순수성 보존
-├─ templates/           # base · landing · archive · brief (Jinja2, autoescape on)
+├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief (Jinja2, autoescape on)
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
-├─ assets/grm.css       # GRM_웹_프로토타입_v4.html 의 <style> verbatim 추출(주석 없이 v4 본문 그대로). 손으로 편집 금지 — 디자인 변경은 v4 갱신 후 재추출
+├─ assets/grm.css       # 디자인 동결 CSS(v4 + P4 네비/모션/검색 UI). 손으로 편집 금지 — 디자인 변경은 프로토타입 갱신 후 반영
+├─ assets/archive.js    # 아카이브 교차검색(P4·정적 클라이언트사이드). search-index.json fetch → facet/검색/토글. 비골든
 ├─ data/briefs/*.json   # 입력(주차별 1파일). 현재 = 실 6/22. 규약 = data/briefs/README.md(C4)
 ├─ tests/
-│  ├─ test_render.py    # 골든·결정론·무변형·escape·순수성
+│  ├─ test_render.py    # 골든·결정론·무변형·escape·순수성 + 검색인덱스(WebSearchIndexTest)
 │  ├─ test_linkcheck.py # 링크체크 모킹 단위테스트(200/404/503/timeout/KR-skip/HEAD→GET)
-│  ├─ golden/           # 동결 기대 HTML (byte-diff)
+│  ├─ golden/           # 동결 기대 HTML + search-index*.expected.json (byte-diff)
 │  └─ fixtures/multi/   # 합성 2건(06-08 산문·번역 / 06-15 병합) — 멀티 골든용
-└─ dist/                # 빌드 산출(정적). git 비추적
+└─ dist/                # 빌드 산출(정적, assets/search-index.json 포함). git 비추적
 ```
 > 배포 Action = `.github/workflows/grm-web-deploy.yml`(루트 기준). 수집(`grm-intake.yml`)과
 > 완전 별도(D8). 테스트는 `tests/test_web_render.py`·`tests/test_web_linkcheck.py` shim 으로
@@ -90,6 +94,36 @@ routine(사람 실행 Claude)이 만든 grm-web-card/v1 JSON 을 `web/data/brief
 으로 커밋 → 그 커밋이 배포 Action 을 트리거(D8 공유 저장소 결합). 규약·중복일자 정책은
 `web/data/briefs/README.md`.
 
-## 범위 (P3)
-✅ 링크체크(200·비차단·KR-egress 관대)·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.
-⛔ Notion→JSON→commit 자동 파이프(후속) · 아카이브 필터/검색 동작·다크밴드 stale 플래그(P4).
+## 아카이브 교차검색 + facet (P4 — `search-index.json` + `archive.js`)
+빌드 시 `render.py` 가 전 호 카드를 모아 `dist/assets/search-index.json`(카드 1개=1엔트리
++ facet 메타 + 호 메타)을 **결정론·무변형**으로 파생한다. 검색·필터는 `archive.js`(정적
+클라이언트사이드)가 이 인덱스로 수행 — **런타임 서버 0**.
+- **무변형**: 인덱스는 카드 기존 값만 담는다(사실/URL/제목 재생성 0). `text` = `headline_target
+  + title_issue + card_type + agency + facts[].value (+ summary·key_facts)` verbatim 결합(소문자화는
+  클라이언트). `target`/`issue`/`href` 도 카드값 파생. null modality 보존.
+- **facet 차원** = 기관·카테고리·제품군·기간(Tier/Evidence 제외, 확정). **실제 존재값만** 노출
+  (agency/category/modality 알파벳, months 최신순). 빈 차원은 칩 그룹 자체 생략.
+- **상세 카드 앵커 = `document_id`**(`card.id`). 상세 `<article id>`·TOC `href`·인덱스 `href` 가
+  **모두** `_card_anchor()` 한 함수로 파생 → 검색결과→카드 점프가 항상 일치. id 없는 입력은
+  `c{render_order}` 폴백.
+- **인덱스 href 는 아카이브 페이지(깊이 1) 기준 상대경로**(`../briefs/{date}/index.html#{id}`).
+  검색은 spec 상 아카이브에만 얹으므로 단일 산출물에 접두를 고정한다.
+- **progressive enhancement / graceful**: 서버가 `#static-issues`(호 목록)를 항상 렌더 = baseline.
+  검색창·필터·토글은 기본 `display:none`, `archive.js` 가 인덱스 fetch **성공 시에만** `body.js-search`
+  로 노출하고 `#results` 를 동적 치환한다. JS 미지원/fetch 실패 → 정적 목록 그대로(열람 가능).
+- **검색 동작은 비골든**(spec §1.5). 골든 = `search-index*.expected.json`(byte) + 정적 마크업.
+  검색 로직 검증 = `WebSearchIndexTest`(구조·무변형·facet·정렬·앵커 href↔id 일치) + 결정론(2× 빌드 동일).
+- **XSS**: 인덱스 값은 `archive.js` 의 `esc()`(`& < > " '`)로 텍스트·속성 모두 이스케이프 후 삽입.
+  하이라이트는 이스케이프된 문자열에 정규식(메타문자 escape) 적용.
+
+## 네비·모션 (P4 — 사이트 전체)
+v2 로고타입(산스 볼드 `GRM` + 펄스 닷 + 구분선 + 모노 ASCII descriptor) + 네비 밑줄 인디케이터
++ 스크롤 그림자(`base.html`). 진입 페이드업(`.reveal`)·결과 행 stagger·토글 슬라이더·칩/행 호버.
+**`@media (prefers-reduced-motion: reduce)` 존중**. 데이터 목록(`.issue`)은 정적 `opacity:0` 없음 →
+애니메이션 미지원에도 가시. 기존 명암 토글·다크모드 유지. 한글에 자간·모노 금지(모노=ASCII만).
+
+## 범위 (P3·P4)
+✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.
+✅ (P4) 아카이브 교차검색+facet(정적 클라이언트사이드·search-index.json·progressive enhancement)
+   · 상세 document_id 앵커 · v2 네비/모션(사이트 전체·reduced-motion) · 전 골든 재동결.
+⛔ Notion→JSON→commit 자동 파이프(후속) · 다크밴드 stale 플래그(후속) · Notion 병행→단순화(Cowork+사람 관찰).

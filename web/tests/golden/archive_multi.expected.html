@@ -14,8 +14,8 @@
 <body>
 <div class="topline"></div>
 
-<header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="../index.html"><span class="wm">GRM</span><span class="full">Global Regulatory Monitor</span></a>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../index.html"><span class="logo">GRM<span class="dot"></span></span><span class="rule"></span><span class="desc">Global Regulatory Monitor</span></a>
   <nav><a href="../index.html">소개</a><a href="../archive/index.html" class="on">주간 브리프</a><a href="../briefs/2026-06-22/index.html">최신호</a></nav>
   <span class="sp"></span>
   <button class="iconbtn" id="theme" aria-label="명도 모드 전환"><i class="ti ti-moon"></i></button>
@@ -24,30 +24,43 @@
 
 <main>
   <div class="wrap page-head">
-    <span class="kick">Weekly Brief · Archive</span>
-    <h1>주간 브리프</h1>
-    <p>매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 최신호부터 정렬되며, 각 호를 열면 카드 형태로 전문을 볼 수 있습니다.</p>
-    <div class="filters">
-      <span class="chip on">전체</span><span class="chip">Warning Letter</span><span class="chip">Guidance</span>
-      <span class="chip">회수·행정처분</span><span class="chip">FDA</span><span class="chip">MFDS</span><span class="chip">EMA·MHRA</span>
+    <span class="kick reveal" style="animation-delay:.02s">Weekly Brief · Archive</span>
+    <h1 class="reveal" style="animation-delay:.08s">주간 브리프</h1>
+    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 전 호의 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
+    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
+      <i class="ti ti-search lead"></i>
+      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="브리프 카드 검색" />
+      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="panel reveal" id="panel" style="animation-delay:.26s">
+      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
+      <div class="facets" id="facets"></div>
+    </div>
+    <div class="bar reveal" id="bar" style="animation-delay:.32s">
+      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간 호</button><button type="button" data-view="cards">카드 전체</button></div>
+      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
     </div>
   </div>
-  <div class="wrap">    <a class="issue latest" href="../briefs/2026-06-22/index.html">
-      <div class="vol">Vol.<b>3</b></div>
-      <div><span class="badge"><span class="live"></span>최신호 · LIVE</span><h3>2026년 6월 4주차</h3>
-        <div class="row"><span class="tag mono">2026-06-22</span><span class="tag">FDA · ECA · EMA · MFDS · Health Canada</span></div></div>
-      <div class="stat"><b>36<span class="u">건</span></b><span class="ev">A15 · B21</span></div>
-    </a>    <a class="issue" href="../briefs/2026-06-15/index.html">
-      <div class="vol">Vol.<b>2</b></div>
-      <div><h3>2026년 6월 3주차</h3>
-        <div class="row"><span class="tag mono">2026-06-15</span><span class="tag">MFDS</span></div></div>
-      <div class="stat"><b>1<span class="u">건</span></b><span class="ev">A1 · B0</span></div>
-    </a>    <a class="issue" href="../briefs/2026-06-08/index.html">
-      <div class="vol">Vol.<b>1</b></div>
-      <div><h3>FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부</h3>
-        <div class="row"><span class="tag mono">2026-06-08</span><span class="tag">FDA · MHRA</span></div></div>
-      <div class="stat"><b>2<span class="u">건</span></b><span class="ev">A1 · B1</span></div>
-    </a>  </div>
+  <div class="wrap">
+    <div id="results">
+      <div id="static-issues">        <a class="issue latest" href="../briefs/2026-06-22/index.html">
+          <div class="vol">Vol.<b>3</b></div>
+          <div><span class="badge"><span class="live"></span>최신호 · LIVE</span><h3>2026년 6월 4주차</h3>
+            <div class="row"><span class="tag date">2026-06-22</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">EMA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
+          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A15 · B21</span></div>
+        </a>        <a class="issue" href="../briefs/2026-06-15/index.html">
+          <div class="vol">Vol.<b>2</b></div>
+          <div><h3>2026년 6월 3주차</h3>
+            <div class="row"><span class="tag date">2026-06-15</span><span class="tag">MFDS</span></div></div>
+          <div class="stat"><b>1</b><span class="u">건</span><span class="ev mono">A1 · B0</span></div>
+        </a>        <a class="issue" href="../briefs/2026-06-08/index.html">
+          <div class="vol">Vol.<b>1</b></div>
+          <div><h3>FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부</h3>
+            <div class="row"><span class="tag date">2026-06-08</span><span class="tag">FDA</span><span class="tag">MHRA</span></div></div>
+          <div class="stat"><b>2</b><span class="u">건</span><span class="ev mono">A1 · B1</span></div>
+        </a>      </div>
+    </div>
+  </div>
 </main>
 
 <footer class="site"><div class="wrap">
@@ -70,6 +83,10 @@
 const root=document.documentElement;
 document.getElementById('theme').onclick=()=>{root.classList.toggle('dark');
   document.querySelector('#theme i').className=root.classList.contains('dark')?'ti ti-sun':'ti ti-moon';};
+// 스크롤 그림자 — 네비가 종이 위로 떠오르는 단서(v2).
+const _nav=document.getElementById('nav');
+const _navShadow=()=>_nav.classList.toggle('scrolled',window.scrollY>6);
+window.addEventListener('scroll',_navShadow,{passive:true});_navShadow();
 </script>
-</body>
+<script src="../assets/archive.js" defer></script></body>
 </html>

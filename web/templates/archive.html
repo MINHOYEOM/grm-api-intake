@@ -1,24 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
+{#- 아카이브 = 전 호 카드 교차검색 + facet 필터(P4). progressive enhancement:
+    서버는 정적 호 목록(#static-issues)을 항상 렌더 → JS 미지원/로드 실패에도 열람 가능.
+    검색창·필터·토글은 기본 숨김(.searchbar/.panel/.bar { display:none }) → archive.js 가
+    search-index.json fetch 성공 시 body.js-search 로 노출하고 #results 를 동적 치환한다. -#}
 <main>
   <div class="wrap page-head">
-    <span class="kick">Weekly Brief · Archive</span>
-    <h1>주간 브리프</h1>
-    <p>매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 최신호부터 정렬되며, 각 호를 열면 카드 형태로 전문을 볼 수 있습니다.</p>
-    <div class="filters">
-      <span class="chip on">전체</span><span class="chip">Warning Letter</span><span class="chip">Guidance</span>
-      <span class="chip">회수·행정처분</span><span class="chip">FDA</span><span class="chip">MFDS</span><span class="chip">EMA·MHRA</span>
+    <span class="kick reveal" style="animation-delay:.02s">Weekly Brief · Archive</span>
+    <h1 class="reveal" style="animation-delay:.08s">주간 브리프</h1>
+    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 전 호의 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
+    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
+      <i class="ti ti-search lead"></i>
+      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="브리프 카드 검색" />
+      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="panel reveal" id="panel" style="animation-delay:.26s">
+      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
+      <div class="facets" id="facets"></div>
+    </div>
+    <div class="bar reveal" id="bar" style="animation-delay:.32s">
+      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간 호</button><button type="button" data-view="cards">카드 전체</button></div>
+      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
     </div>
   </div>
   <div class="wrap">
-    {%- for issue in issues %}
-    <a class="issue{% if issue.latest %} latest{% endif %}" href="{{ rel_root }}briefs/{{ issue.slug }}/index.html">
-      <div class="vol">Vol.<b>{{ issue.issue_no }}</b></div>
-      <div>{% if issue.latest %}<span class="badge"><span class="live"></span>최신호 · LIVE</span>{% endif %}<h3>{{ issue.title }}</h3>
-        <div class="row"><span class="tag mono">{{ issue.date }}</span><span class="tag">{{ issue.tags }}</span></div></div>
-      <div class="stat"><b>{{ issue.count }}<span class="u">건</span></b><span class="ev">{{ issue.ev }}</span></div>
-    </a>
-    {%- endfor %}
+    <div id="results">
+      <div id="static-issues">
+        {%- for issue in issues %}
+        <a class="issue{% if issue.latest %} latest{% endif %}" href="{{ rel_root }}briefs/{{ issue.slug }}/index.html">
+          <div class="vol">Vol.<b>{{ issue.issue_no }}</b></div>
+          <div>{% if issue.latest %}<span class="badge"><span class="live"></span>최신호 · LIVE</span>{% endif %}<h3>{{ issue.title }}</h3>
+            <div class="row"><span class="tag date">{{ issue.date }}</span>{% for a in issue.agencies %}<span class="tag">{{ a }}</span>{% endfor %}</div></div>
+          <div class="stat"><b>{{ issue.count }}</b><span class="u">건</span><span class="ev mono">{{ issue.ev }}</span></div>
+        </a>
+        {%- endfor %}
+      </div>
+    </div>
   </div>
 </main>
 {% endblock %}
+{% block scripts %}<script src="{{ rel_root }}assets/archive.js" defer></script>{% endblock %}

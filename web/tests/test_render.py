@@ -39,6 +39,7 @@ __all__ = [
     "WebRenderDeterminismTest",
     "WebRenderPurityTest",
     "WebRenderHardeningTest",
+    "WebSearchIndexTest",
 ]
 
 
@@ -62,12 +63,14 @@ SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
+    ("assets/search-index.json", "search-index.expected.json"),
 ]
 MULTI_GOLDENS = [
     ("archive/index.html", "archive_multi.expected.html"),
     ("index.html", "landing_multi.expected.html"),
     ("briefs/2026-06-08/index.html", "brief_2026-06-08.expected.html"),
     ("briefs/2026-06-15/index.html", "brief_2026-06-15.expected.html"),
+    ("assets/search-index.json", "search-index_multi.expected.json"),
 ]
 
 
@@ -121,6 +124,14 @@ class WebRenderGoldenTest(unittest.TestCase):
         src = (WEB_DIR / "assets" / "grm.css").read_bytes()
         self.assertEqual(built, src, "dist 의 grm.css 가 소스(v4 추출본)와 byte 불일치")
 
+    def test_archive_js_copied_and_index_emitted(self):
+        # P4: 검색 스크립트는 assets 정적 복사(verbatim), 인덱스는 빌드 산출.
+        built = (self.single / "assets" / "archive.js").read_bytes()
+        src = (WEB_DIR / "assets" / "archive.js").read_bytes()
+        self.assertEqual(built, src, "archive.js 가 dist 에 verbatim 복사되지 않음")
+        self.assertTrue((self.single / "assets" / "search-index.json").exists(),
+                        "search-index.json 미산출")
+
 
 # ── 구조 단언 (스키마 → 마크업 매핑) ─────────────────────────────────────────
 class WebRenderStructureTest(unittest.TestCase):
@@ -139,12 +150,13 @@ class WebRenderStructureTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_render_order_preserved(self):
-        # 카드 anchor 가 render_order 순(c0..c35)으로 정확히 등장.
-        anchors = [self.detail.index(f'id="c{c["render_order"]}"') for c in self.cards]
-        self.assertEqual(anchors, sorted(anchors), "카드가 render_order 순으로 나오지 않음")
-        # 모든 카드 anchor 존재.
+        # 카드 anchor = document_id(P4 §2.2). render_order 순으로 등장하는지 확인.
+        ordered = sorted(self.cards, key=lambda c: c["render_order"])
+        positions = [self.detail.index(f'id="{c["id"]}"') for c in ordered]
+        self.assertEqual(positions, sorted(positions), "카드가 render_order 순으로 나오지 않음")
+        # 모든 카드 anchor(=id) 존재.
         for c in self.cards:
-            self.assertIn(f'id="c{c["render_order"]}"', self.detail)
+            self.assertIn(f'id="{c["id"]}"', self.detail)
 
     def test_section_counts_derived(self):
         # 글로벌 34 · 국내 1 · Recall 1 (입력에서 파생).
@@ -174,9 +186,10 @@ class WebRenderStructureTest(unittest.TestCase):
 
     def test_evidence_bc_have_no_quotes(self):
         # to_web_card 는 Evidence A 만 quotes 채움 → B/C 카드는 quotes:[] → 인용 블록 없음.
-        # 첫 B 카드(fda483-192438, c0)의 article 범위에 ti-quote 없음.
-        start = self.detail.index('id="c0"')
-        end = self.detail.index('id="c1"')
+        # 첫 B 카드(render_order 0)의 article 범위(다음 카드 anchor 직전)에 ti-quote 없음.
+        byro = sorted(self.cards, key=lambda c: c["render_order"])
+        start = self.detail.index(f'id="{byro[0]["id"]}"')
+        end = self.detail.index(f'id="{byro[1]["id"]}"')
         self.assertNotIn('ti-quote', self.detail[start:end])
 
     def test_mono_only_for_data_labels(self):
@@ -355,6 +368,125 @@ class WebRenderPurityTest(unittest.TestCase):
         self.assertFalse(bad, f"비결정 호출 가능 속성 사용: {bad}")
 
 
+# ── 검색 인덱스 (P4 — 구조·무변형·facet·정렬·앵커 href) ───────────────────────
+class WebSearchIndexTest(unittest.TestCase):
+    """build_search_index 직접 단위테스트. byte 안정은 골든(search-index*.expected.json)
+    + 결정론 테스트(dist 전 파일 2× 동일)가 함께 잠근다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.cards = _read_real_cards()
+        briefs = render.load_briefs(DATA_DIR)
+        issue_no = render.assign_issue_numbers(briefs)
+        latest = max(b["brief"].get("publish_date", "") for b in briefs)
+        cls.idx = render.build_search_index(briefs, issue_no, latest)
+        # 멀티(합성2 + 실6/22) — date desc·호내 render_order asc 검증용.
+        mbriefs = [json.loads(p.read_text(encoding="utf-8"))
+                   for p in sorted(MULTI_FIXTURES.glob("*.json"))]
+        mbriefs.append(json.loads(REAL_FIXTURE.read_text(encoding="utf-8")))
+        m_issue_no = render.assign_issue_numbers(mbriefs)
+        m_latest = max(b["brief"].get("publish_date", "") for b in mbriefs)
+        cls.midx = render.build_search_index(mbriefs, m_issue_no, m_latest)
+        cls.all_cards = [c for b in mbriefs for c in (b.get("cards") or [])]
+
+    def _anchor(self, entry: dict) -> str:
+        return entry["href"].rsplit("#", 1)[1]
+
+    def test_schema_and_top_keys(self):
+        self.assertEqual(self.idx["schema"], "grm-search-index/v1")
+        for k in ("facets", "issues", "cards"):
+            self.assertIn(k, self.idx)
+        for k in ("agencies", "categories", "modalities", "months"):
+            self.assertIn(k, self.idx["facets"])
+
+    def test_one_entry_per_rendered_card(self):
+        renderable = [c for c in self.cards if render._is_renderable(c)]
+        self.assertEqual(len(self.idx["cards"]), len(renderable))
+        # 카드 엔트리 필드 집합 고정(스키마 v1 외 필드 신설 금지).
+        expect = {"issue_no", "date", "month", "vol_title", "agency", "category",
+                  "modality", "card_type", "evidence_level", "signal_tier",
+                  "target", "issue", "summary", "href", "text"}
+        for e in self.idx["cards"]:
+            self.assertEqual(set(e.keys()), expect)
+
+    def test_card_entry_fields_verbatim(self):
+        # 인덱스 값 = 카드 기존 값 그대로(재생성 0). null modality 보존.
+        by_anchor = {self._anchor(e): e for e in self.idx["cards"]}
+        for c in self.cards:
+            if not render._is_renderable(c):
+                continue
+            anchor = render._card_anchor(c)
+            e = by_anchor[anchor]
+            self.assertEqual(e["target"], c.get("headline_target", ""))
+            self.assertEqual(e["issue"], c.get("title_issue", ""))
+            self.assertEqual(e["agency"], c.get("agency", ""))
+            self.assertEqual(e["category"], c.get("category", ""))
+            self.assertEqual(e["modality"], c.get("modality"))
+            self.assertEqual(e["evidence_level"], c.get("evidence_level", ""))
+            self.assertEqual(e["href"],
+                             f"../briefs/{e['date']}/index.html#{anchor}")
+            # text = 카드 값들의 verbatim 부분문자열 결합(새 사실 0).
+            self.assertIn(c.get("headline_target", ""), e["text"])
+            for f in (c.get("facts") or []):
+                self.assertIn(f["value"], e["text"])
+
+    def test_href_anchor_matches_detail_article_id(self):
+        # 검색결과 href 의 앵커가 상세 article id 와 동일(점프 일치).
+        import tempfile as _tf
+        tmp = pathlib.Path(_tf.mkdtemp(prefix="grmweb_idx_"))
+        try:
+            out = tmp / "s"
+            _build_single(out)
+            detail = (out / "briefs/2026-06-22/index.html").read_text(encoding="utf-8")
+            for e in self.idx["cards"]:
+                self.assertIn(f'id="{self._anchor(e)}"', detail)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_facets_present_values_only_and_sorted(self):
+        rc = [c for c in self.cards if render._is_renderable(c)]
+        self.assertEqual(self.idx["facets"]["agencies"],
+                         sorted({c["agency"] for c in rc if c.get("agency")}))
+        self.assertEqual(self.idx["facets"]["categories"],
+                         sorted({c["category"] for c in rc if c.get("category")}))
+        self.assertEqual(self.idx["facets"]["modalities"],
+                         sorted({c["modality"] for c in rc if c.get("modality")}))
+        months = self.idx["facets"]["months"]
+        self.assertEqual(months, sorted(months, reverse=True))  # 최신순
+        # null modality 는 facet 후보에서 제외.
+        self.assertNotIn(None, self.idx["facets"]["modalities"])
+
+    def test_single_cards_sorted_render_order(self):
+        ro = {render._card_anchor(c): c["render_order"]
+              for c in self.cards if render._is_renderable(c)}
+        seq = [ro[self._anchor(e)] for e in self.idx["cards"]]
+        self.assertEqual(seq, sorted(seq), "단일 호 render_order asc 아님")
+
+    def test_multi_sorted_date_desc_then_render_order(self):
+        cards = self.midx["cards"]
+        dates = [c["date"] for c in cards]
+        self.assertEqual(dates, sorted(dates, reverse=True), "date desc 아님")
+        # 호 메타도 date desc, 호 수 = 3.
+        self.assertEqual(len(self.midx["issues"]), 3)
+        idates = [i["date"] for i in self.midx["issues"]]
+        self.assertEqual(idates, sorted(idates, reverse=True))
+        # 동일 date 구간 내 render_order asc.
+        ro = {render._card_anchor(c): c.get("render_order")
+              for c in self.all_cards if render._is_renderable(c)}
+        from itertools import groupby
+        for _, grp in groupby(cards, key=lambda c: c["date"]):
+            seq = [ro[self._anchor(e)] for e in grp]
+            self.assertEqual(seq, sorted(seq), "호 내 render_order asc 아님")
+
+    def test_issue_entry_shape(self):
+        e = self.idx["issues"][0]
+        for k in ("issue_no", "slug", "date", "month", "title", "agencies",
+                  "count", "ev", "latest", "href"):
+            self.assertIn(k, e)
+        self.assertEqual(e["href"], f"../briefs/{e['slug']}/index.html")
+        self.assertTrue(e["latest"])  # 단일 호 → 최신
+
+
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:
     c = {
@@ -467,9 +599,11 @@ class WebRenderHardeningTest(unittest.TestCase):
         h = self._render_detail(_minimal_brief("2026-06-01", cards=cards))
         self.assertIn("KEEP ME PARENT", h)
         self.assertNotIn("DROP MERGED MEMBER", h)
-        # 제외 카드는 섹션 카운트·목차에도 미산입.
+        # 제외 카드는 섹션 카운트·목차에도 미산입(anchor=document_id).
         self.assertIn('글로벌 <span class="n">1장</span>', h)
-        self.assertNotIn('href="#c1"', h)
+        self.assertIn('id="keep"', h)              # 대표 카드 anchor = id
+        self.assertNotIn('id="member"', h)         # 제외 멤버 anchor 부재
+        self.assertNotIn('href="#member"', h)      # 목차에도 미산입
 
     def test_watch_card_excluded(self):
         # 적대 입력: group=="watch" 카드 직접 주입 → 렌더 부재(비카드 영역).

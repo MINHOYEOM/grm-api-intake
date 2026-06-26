@@ -1,0 +1,60 @@
+{#- card.html — grm-web-card/v1 한 카드 → v4 카드 마크업. 순수 렌더(사실/URL 무변형).
+    표시 플래그(mono·badge·quote mark·show_*·link state)는 render.py 가 산출. -#}
+{%- macro srclink(src, role_label, role_state) -%}
+  {%- if src.url -%}
+    {%- if src.state == 'broken' -%}
+    {#- href 없는 <a> = 클릭 비활성이되 .src a pill 스타일 상속(grm.css 동결 유지). -#}
+    <a class="src-broken" title="일시 접근불가" style="opacity:.55;cursor:not-allowed"><span class="t">{{ role_label }}</span><i class="ti ti-link-off"></i> 일시 접근불가</a>
+    {%- else -%}
+    <a href="{{ src.url }}" target="_blank" rel="noopener"><span class="t">{{ role_label }}</span>{% if src.state == 'degraded' %}<i class="ti ti-alert-triangle"></i> {% endif %}<i class="ti {{ src.icon }}"></i> {{ src.text }} <i class="ti ti-external-link" style="font-size:12px"></i></a>
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+<article class="card{% if card.is_evA %} evA{% endif %}" id="{{ card.anchor }}">
+  <div class="c-title"><span class="pre">[{{ card.card_type }} · {{ card.agency }}]</span>{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
+  <div class="badges"><span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span><span class="b ag">{{ card.agency }}</span><span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
+  {%- if card.summary %}
+  <p class="summary">{{ card.summary }}</p>
+  {%- endif %}
+  <table class="facts">
+    {%- for f in card.facts %}
+    <tr><td class="k">{{ f.label }}</td><td class="v">{% if f.mono %}<span class="mono">{{ f.value }}</span>{% else %}{{ f.value }}{% endif %}</td></tr>
+    {%- endfor %}
+  </table>
+  {%- if card.merged %}
+  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 {{ card.merged_count }}품목</summary>
+    <ul class="facts2">
+      {%- for item in card.merged_items %}
+      <li>{{ item }}</li>
+      {%- endfor %}
+    </ul></details>
+  {%- endif %}
+  {%- if card.quotes %}
+  <div class="block"><div class="lab"><i class="ti ti-quote"></i>{{ card.quote_label }}</div>
+    {%- for q in card.quotes %}
+    <div class="quote"><div class="o">{% if q.mark %}<span class="m">{{ q.mark }}</span>{% endif %}{{ q.original }}</div>{% if q.show_translation %}<div class="t">{% if q.mark %}{{ q.mark }} {% endif %}{{ q.translation }}</div>{% endif %}</div>
+    {%- endfor %}
+  </div>
+  {%- endif %}
+  {%- if card.key_facts %}
+  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: {{ card.evidence_basis }}</span></div>
+    <ul class="facts2">
+      {%- for k in card.key_facts %}
+      <li>{{ k }}</li>
+      {%- endfor %}
+    </ul></div>
+  {%- endif %}
+  {%- if card.implication %}
+  <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· AI 해석</span></div><p>{{ card.implication }}</p></div>
+  {%- endif %}
+  {%- if card.checks %}
+  <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>점검 사항</div><ul>
+    {%- for c in card.checks %}
+    <li>{{ c }}</li>
+    {%- endfor %}
+  </ul></div>
+  {%- endif %}
+  {%- if card.sources.info.url or card.sources.official.url %}
+  <div class="src">{{ srclink(card.sources.info, '정보출처') }}{{ srclink(card.sources.official, '공식원본') }}</div>
+  {%- endif %}
+</article>

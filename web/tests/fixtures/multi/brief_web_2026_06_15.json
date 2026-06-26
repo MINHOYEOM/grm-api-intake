@@ -1,0 +1,57 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "provenance": {
+  "note": "P2 합성 픽스처(비실데이터) — 회수 다품목 병합 토글(merged_count>1·merged_items)·Recall 섹션·회수 등급 mono·KO 단일 인용(번역 null→줄 생략) 렌더 경로 골든용."
+ },
+ "brief": {
+  "run_date_kst": "2026-06-15",
+  "window": "2026-06-08 ~ 2026-06-15",
+  "publish_date": "2026-06-15",
+  "agencies": ["MFDS"],
+  "categories": ["Other"],
+  "tldr": [],
+  "coverage": {"intake_total": 19, "rendered": 1, "evidence": {"A": 1, "B": 0, "C": 0}},
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "recall-syn-merged",
+   "render_order": 0,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "회수",
+   "headline_target": "한국제약(주) 아세트아미노펜정 500mg 외 2품목",
+   "title_issue": "함량부적합 자진회수",
+   "summary": "함량부적합(98% 미만) 확인에 따라 3개 품목을 자진 회수했다.",
+   "facts": [
+    {"label": "발행일", "value": "2026-06-12"},
+    {"label": "문서번호", "value": "recall-syn-merged"},
+    {"label": "업체", "value": "한국제약(주)"},
+    {"label": "제품", "value": "아세트아미노펜정 500mg 외 2품목"},
+    {"label": "회수 등급", "value": "1등급"}
+   ],
+   "quotes": [
+    {"original": "함량부적합(98% 미만) 확인에 따른 자진 회수", "translation": null}
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": ["사유: 함량부적합(98% 미만)", "조치: 자진 회수"],
+   "implication": "동일 성분·제형 품목의 함량 시험 이력을 점검할 필요가 있다.",
+   "checks": ["함량 시험 OOS 이력 점검", "회수 대상 로트 추적성 확인"],
+   "merged_count": 3,
+   "merged_items": ["아세트아미노펜정 500mg", "아세트아미노펜정 325mg", "이부프로펜정 200mg"],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinPrductPrmisnInfoService06/getMdcinRecallList",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {"info": "pending", "official": "pending"}
+   }
+  }
+ ]
+}

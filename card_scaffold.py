@@ -170,6 +170,13 @@ class CardScaffold:
     status_hint: str = ""        # graceful degrade 시 'Error'
     needs_llm_slots: tuple[str, ...] = ()  # 이 카드가 비운 슬롯 토큰
     merged_into: str = ""        # §14(F) — 병합 멤버는 대표 card_id 로 마킹(렌더 제외, Status 유지)
+    # ── web-card(§3) 직렬화 보조 필드 — to_dict()/handoff v2 에는 미직렬화 ──
+    merged_count: int = 1        # §14 병합 멤버수(1=단독). 대표만 >1
+    merged_items: tuple[str, ...] = ()  # §14 병합 전체 품목명(대표). 비병합=()
+    merged_target: str = ""      # §14 병합 headline_target 치환값(제목과 동일 헬퍼)
+    merged_product: str = ""     # §14 병합 facts 제품행 치환값(W2 와 동일 헬퍼)
+    row: dict[str, Any] = field(default_factory=dict, repr=False)  # to_web_card producer 재사용
+    raw: dict[str, Any] = field(default_factory=dict, repr=False)  # (직렬화 제외 — handoff 무영향)
 
     def to_dict(self) -> dict[str, Any]:
         """handoff v2 직렬화용(결정론 — prose_input 은 sort_keys 로). raw 미포함."""
@@ -192,6 +199,74 @@ class CardScaffold:
         if self.merged_into:
             d["merged_into"] = self.merged_into
         return d
+
+    def to_web_card(self, render_entry: dict[str, Any] | None = None,
+                    cfg: "FixedConfig" = DEFAULT_CONFIG) -> dict[str, Any]:
+        """이 카드를 `grm-web-card/v1` 카드 dict 로 직렬화(§3 매핑). 순수·결정론.
+
+        사실 셀은 build 단계와 **동일한 결정론 producer**(`_w2_rows`·`_quote_source`·
+        `_dual_links`·`_headline_target`·`_kind_meta`)를 재사용한다(재계산 금지, 불변식 #1).
+        LLM 슬롯(title_issue·summary·key_facts·implication·checks·비KO quotes[].translation)만
+        빈 placeholder("" / [] / "")로 둔다 — null 이 아닌 빈값 = "LLM 채울 자리" 신호.
+        `render_entry` = `compute_render_plan()[card_id]`(없으면 render_order/group_label 미산출).
+        JSON 값에는 표현 틀 마크업을 넣지 않는다(문서번호 백틱은 `_plain` 으로 제거, 불변식 #6).
+        """
+        render_entry = render_entry or {}
+        row, raw, kind = self.row, self.raw, self.kind
+        language = _language(row, kind)
+        merged = self.merged_count > 1
+
+        facts = [{"label": l, "value": _plain(v)} for l, v in _w2_rows(kind, row, raw)]
+        if merged and self.merged_product:
+            facts = _apply_merged_product(facts, self.merged_product)
+
+        quotes: list[dict[str, Any]] = []
+        if self.evidence == "A":
+            quote = _quote_source(kind, raw)
+            if quote:
+                quotes = [{"original": seg,
+                           "translation": (None if language == "KO" else "")}
+                          for seg in _split_sentences(quote)]
+
+        info, official, _fallback = _dual_links(kind, row, raw)
+        modality = (cfg.modality_badge.get(self.modality, self.modality)
+                    if (self.modality and kind not in _NORMATIVE_KINDS) else None)
+        headline_target = (self.merged_target if (merged and self.merged_target)
+                           else _headline_target(row))
+
+        return {
+            "id": row.get("document_id", ""),
+            "render_order": render_entry.get("render_order"),
+            "group": _WEB_GROUP.get(self.section, self.section),
+            "group_label": render_entry.get("group_label") or None,
+            "agency": _regulator(row.get("source", "")),
+            "card_type": _kind_meta(kind)[1],
+            "category": _category(kind),
+            "modality": modality,
+            "evidence_level": self.evidence,
+            "signal_tier": _signal_tier_num(self.signal_tier),
+            "signal_label": _signal_level(self.signal_tier),
+            "type_tag": (_kind_meta(kind)[2] or None),
+            "headline_target": headline_target,
+            "title_issue": "",            # LLM
+            "summary": "",                # LLM
+            "facts": facts,               # 코드-verbatim
+            "quotes": quotes,             # original 코드-verbatim / translation LLM(비KO)
+            "evidence_basis": ("Intake raw" if self.evidence == "A"
+                               else "공식 인덱스 + 보조 출처"),
+            "key_facts": [],              # LLM
+            "implication": "",            # LLM
+            "checks": [],                 # LLM
+            "merged_count": self.merged_count,
+            "merged_items": list(self.merged_items),
+            "sources": {
+                "info_url": info,
+                "official_url": official,
+                "official_is_pdf": _official_is_pdf(official),
+                # P1 = 고정 placeholder. P3 D7 가 실제 200 체크로 덮어씀(골든 결정론 유지).
+                "link_check": {"info": "pending", "official": "pending"},
+            },
+        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -622,6 +697,15 @@ def _regulator(source: str) -> str:
     return _REGULATOR_LABEL.get(source, source or "")
 
 
+def _headline_target(row: dict[str, Any]) -> str:
+    """제목 핵심대상(업체/제품/문서명, 60자 문장경계 절단) — §13.1-1.
+
+    `_title()`(markdown)과 `CardScaffold.to_web_card()`(JSON)가 **이 단일 헬퍼를 공유**해
+    제목과 web-card `headline_target` 이 항상 같은 verbatim 값을 갖게 한다(드리프트 차단, §3.5).
+    """
+    return _truncate_at_sentence(_first(row.get("firm"), row.get("headline")), 60)
+
+
 def _title(kind: str, row: dict[str, Any]) -> str:
     """제목(§13.1-1·8 동결): ### [유형 · 기관] 핵심대상 — **{{TITLE_ISSUE}}**.
 
@@ -630,7 +714,7 @@ def _title(kind: str, row: dict[str, Any]) -> str:
     """
     _, label, _ = _kind_meta(kind)
     org = _regulator(row.get("source", ""))
-    target = _truncate_at_sentence(_first(row.get("firm"), row.get("headline")), 60)
+    target = _headline_target(row)
     return _h3(f"[{label} · {org}] {target} — **{SLOT_TITLE_ISSUE}**")
 
 
@@ -698,6 +782,7 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
         recall_group_key=recall_group_key(row, raw) if kind == "recall-quality" else "",
         status_hint=row.get("status_hint", ""),
         needs_llm_slots=tuple(used_slots),
+        row=row, raw=(raw or {}),  # to_web_card 가 producer 재사용(직렬화 제외)
     )
 
 
@@ -771,6 +856,21 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
 # ─────────────────────────────────────────────────────────────────────────────
 # 14b. merge_recall_cards — recall 다품목 1카드 병합 렌더 (card_spec §14, K3 G1)
 # ─────────────────────────────────────────────────────────────────────────────
+def _merged_target_value(entrps: str, rep_product: str, n: int) -> str:
+    """병합 카드 핵심대상값 `{ENTRPS} {대표 PRDUCT} 외 N품목`(60자 문장경계 절단, §14 D).
+
+    제목(markdown `_merge_title_target`)과 web-card `headline_target`(`to_web_card`)이
+    이 단일 헬퍼를 공유 → 두 표현이 항상 같은 값(드리프트 차단).
+    """
+    base = " ".join(p for p in (entrps, rep_product) if p)
+    return _truncate_at_sentence(f"{base} 외 {n}품목".strip(), 60)
+
+
+def _merged_product_value(rep_product: str, n: int) -> str:
+    """병합 카드 제품행값 `{대표 PRDUCT} 외 N품목`(§14 D) — W2 markdown·facts JSON 공유."""
+    return f"{rep_product} 외 {n}품목" if rep_product else f"외 {n}품목"
+
+
 def _merge_title_target(title_line: str, entrps: str, rep_product: str, n: int) -> str:
     """제목 §14(D): 핵심대상 → `{ENTRPS} {대표 PRDUCT} 외 N품목`(60자 문장경계 절단).
 
@@ -779,14 +879,13 @@ def _merge_title_target(title_line: str, entrps: str, rep_product: str, n: int) 
     """
     head, sep, rest = title_line.partition("] ")
     _old_target, dash, tail = rest.partition(" — ")
-    base = " ".join(p for p in (entrps, rep_product) if p)
-    new_target = _truncate_at_sentence(f"{base} 외 {n}품목".strip(), 60)
+    new_target = _merged_target_value(entrps, rep_product, n)
     return f"{head}{sep}{new_target}{dash}{tail}"
 
 
 def _merge_w2_product(table_block: str, rep_product: str, n: int) -> str:
     """W2 §14(D): `제품` 행 값을 `{대표 PRDUCT} 외 N품목` 으로 교체(없으면 행 추가)."""
-    val = f"{rep_product} 외 {n}품목" if rep_product else f"외 {n}품목"
+    val = _merged_product_value(rep_product, n)
     new_row = f"<tr><td>**제품**</td><td>{val}</td></tr>"
     lines = table_block.split("\n")
     out: list[str] = []
@@ -874,7 +973,13 @@ def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
         new_prose = dict(rep.prose_input)
         new_prose["product"] = _merged_product_field(named, rep_product, n)
         new_prose["merged_count"] = len(named)
-        out[rep_idx] = replace(rep, markdown=merged_md, prose_input=new_prose)
+        # web-card(§3.7) 도 같은 결정론 값을 쓰도록 대표 scaffold 에 병합 메타를 싣는다
+        # (markdown 의 제목/제품행과 동일 헬퍼 산출 → 드리프트 0). to_dict() 미직렬화.
+        out[rep_idx] = replace(
+            rep, markdown=merged_md, prose_input=new_prose,
+            merged_count=len(named), merged_items=tuple(named),
+            merged_target=_merged_target_value(entrps, rep_product, n),
+            merged_product=_merged_product_value(rep_product, n))
         for i in members[1:]:
             out[i] = replace(cards[i], merged_into=rep.card_id)
     return out
@@ -964,3 +1069,170 @@ def assemble_brief_skeleton(cards: list[CardScaffold],
     disc = list(cfg.disclaimer_ko) + [cfg.disclaimer_en]
     out.append(_callout(disc, icon="ℹ️", color=cfg.color_footer))
     return _neutralize_forbidden("\n\n".join(out))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 16. web-card 직렬화 (grm-web-card/v1, P1) — markdown 표현 틀과 분리된 JSON 계약.
+#     사실 셀은 §1~§15 의 결정론 producer 를 재사용(재계산 0). 산문만 LLM 슬롯.
+# ─────────────────────────────────────────────────────────────────────────────
+WEB_SCHEMA_VERSION = "grm-web-card/v1"
+
+# section → web group 라벨(§3.1). group enum = {글로벌, 국내, Recall} 뿐.
+# watch 는 v1 카드 아님(§3.3) → 매핑 없음. assemble_web_brief 가 watch 를 직렬화 전에
+# 제외하므로 to_web_card 는 watch 카드로 호출되지 않는다(호출 측 전제). 따라서 enum 밖
+# 값을 낼 경로 없음 — watch 카드의 per-card web 골든도 동결하지 않는다(WEBCARD_FIXTURES 제외).
+_WEB_GROUP = {"global": "글로벌", "domestic": "국내", "recall_table": "Recall"}
+
+# Notion 발행 카테고리 멀티셀렉트(§3.4) 결정론 매핑 — 별도 산출 로직이 코드/프롬프트에
+# 없어 신규 단일원천으로 둔다. 키 = `resolve_kind` 가 내는 **내부 kind**(raw Type 명 아님).
+# 미매핑(recall·admin·gmp-inspection/certificate·safety·who·hc·rss·483 등) = Other.
+#
+# §3.4 의 `gmp-guideline → Guideline` 은 raw Type 명을 혼용 표기한 것이다. 이 매핑에
+# `"gmp-guideline"` 키를 추가하지 않는다(죽은 매핑 금지): `TYPE_GMP_GUIDELINE="gmp-guideline"`
+# 은 collect_mfds.py 에 **정의만 있고 어느 수집기도 row 에 할당하지 않는 휴면 상수**이며,
+# `resolve_kind` 에도 `gmp-guideline` 분기가 없다 → 내부 kind `"gmp-guideline"` 은 파이프라인에서
+# 발현 불가. 만약 MFDS gmp-guideline Type 이 인입되면 MFDS else 분기 → kind `mfds-notice`
+# → 카테고리 **"Guidance"**(Other 로 새지 않음; 가드 테스트로 고정). `Guideline` 독립 승격은
+# 신규 kind 신설이 필요 = P1 범위 밖, 후속 이월.
+_CATEGORY_MAP = {
+    "warning-letter": "Warning Letter",
+    "guidance": "Guidance",        # FR guidance-industry
+    "mfds-notice": "Guidance",     # MFDS guidance-industry/internal
+    "regulation": "Guidance",      # regulation-final/notice-final
+    "legislative": "Guidance",     # legislative-notice
+    "ich": "Guideline",            # ich-guideline/consultation
+}
+
+# web-card JSON 값에 들어가면 안 되는 표현 틀 토큰(불변식 #6) — 렌더러가 그림.
+# modality/group_label 의 이모지(💊/🧬/▫️)는 스키마 데이터값이라 허용(여기 목록 밖).
+_CARD_MARKUP_TOKENS = ("<callout", "<table", "<tr", "<td", "<details", "<summary",
+                       "### ", "`", "{{")
+
+
+def _category(kind: str) -> str:
+    """Notion 발행 카테고리(§3.4): Warning Letter / Guidance / Guideline / Other."""
+    return _CATEGORY_MAP.get(kind, "Other")
+
+
+def _signal_level(signal_tier: str) -> str:
+    """signal_label(§3.1): `_signal_badge` 에서 레벨 단어(High/Med/Low) 추출 — 단일원천.
+
+    `_signal_badge("Tier 3")` = "Signal High (T3)" → split()[1] = "High". 미상 tier 는
+    `_signal_badge` 폴백("Signal Low (T1)") → "Low". 별도 매핑표 없이 배지와 항상 일치.
+    """
+    return _signal_badge(signal_tier).split()[1]
+
+
+def _signal_tier_num(signal_tier: str) -> int:
+    """`"Tier 3"` → 3(§3.1). 미상/결측은 1."""
+    parts = (signal_tier or "").split()
+    return int(parts[-1]) if parts and parts[-1].isdigit() else 1
+
+
+def _official_is_pdf(url: str) -> bool:
+    """공식원본 URL 이 PDF/다운로드 직링크인지(§3.1). 예: `.pdf`·`/media/<id>/download`.
+
+    쿼리/프래그먼트 꼬리(`.pdf?download=1`·`#page=2`)는 제거 후 path 만 검사 — collect_who 의
+    WHOPIR PDF 판정과 동일 규칙(§3.1 "기존 PDF 판정" 재사용).
+    """
+    u = (url or "").lower().split("?", 1)[0].split("#", 1)[0]
+    return u.endswith(".pdf") or u.endswith("/download")
+
+
+def _plain(value: str) -> str:
+    """facts 값에서 인라인 코드 백틱 한 겹 제거 → verbatim 값(불변식 #6 JSON 무마크업).
+
+    `_w2_rows` 의 문서번호 행만 `_code()` 로 백틱을 감싸므로 그 한 겹만 벗긴다(나머지 값 불변).
+    """
+    v = value or ""
+    if len(v) >= 2 and v.startswith("`") and v.endswith("`"):
+        v = v[1:-1]
+    return v
+
+
+def _apply_merged_product(facts: list[dict[str, Any]], value: str) -> list[dict[str, Any]]:
+    """병합 카드 facts 의 `제품` 행 값을 치환(없으면 추가) — `_merge_w2_product` 와 동형(§3.7)."""
+    out: list[dict[str, Any]] = []
+    replaced = False
+    for f in facts:
+        if f["label"] == "제품":
+            out.append({"label": "제품", "value": value})
+            replaced = True
+        else:
+            out.append(f)
+    if not replaced:
+        out.append({"label": "제품", "value": value})
+    return out
+
+
+def assert_no_card_markup(card: dict[str, Any]) -> list[str]:
+    """web card dict 의 문자열 값에 표현 틀 마크업이 있으면 토큰 목록 반환(없으면 []), 불변식 #6."""
+    found: set[str] = set()
+
+    def scan(v: Any) -> None:
+        if isinstance(v, str):
+            for tok in _CARD_MARKUP_TOKENS:
+                if tok in v:
+                    found.add(tok)
+            if v.startswith("> ") or "\n> " in v:
+                found.add("> ")
+        elif isinstance(v, dict):
+            for x in v.values():
+                scan(x)
+        elif isinstance(v, list):
+            for x in v:
+                scan(x)
+
+    scan(card)
+    return sorted(found)
+
+
+def assemble_web_brief(cards: list[CardScaffold], brief_meta: dict[str, Any],
+                       cfg: FixedConfig = DEFAULT_CONFIG) -> dict[str, Any]:
+    """카드들을 `grm-web-card/v1` 브리프 dict 로 조립(§3.2). 순수·결정론.
+
+    `cards` = `build_card_scaffold()` → `merge_recall_cards()` 결과.
+    `brief_meta`(코드 메타) = `run_date_kst`·`window`·`publish_date`·`intake_total`·(선택)`tldr`.
+    `compute_render_plan()` 단일원천으로 render_order 순 나열 — 병합 멤버(`merged_into`)와
+    watch 섹션(§3.3)은 제외. brief 의 `agencies`/`categories` 는 렌더 카드 등장순 distinct,
+    `tldr` 는 LLM placeholder([])이며 면책 정식 문안은 JSON 에 넣지 않는다(렌더러가 보유).
+    """
+    plan = compute_render_plan(cards, cfg)
+    web_cards: list[dict[str, Any]] = []
+    for c in cards:
+        if c.merged_into or c.section == "watch":
+            continue
+        entry = plan.get(c.card_id)
+        if entry is None:          # 안전망(병합 멤버는 plan 에 없음 — 위에서 이미 제외)
+            continue
+        web_cards.append(c.to_web_card(entry, cfg))
+    web_cards.sort(key=lambda d: d["render_order"])
+
+    agencies: list[str] = []
+    categories: list[str] = []
+    evidence = {"A": 0, "B": 0, "C": 0}
+    for wc in web_cards:
+        if wc["agency"] and wc["agency"] not in agencies:
+            agencies.append(wc["agency"])
+        if wc["category"] and wc["category"] not in categories:
+            categories.append(wc["category"])
+        evidence[wc["evidence_level"]] = evidence.get(wc["evidence_level"], 0) + 1
+
+    return {
+        "schema_version": WEB_SCHEMA_VERSION,
+        "brief": {
+            "run_date_kst": brief_meta.get("run_date_kst", ""),
+            "window": brief_meta.get("window", ""),
+            "publish_date": brief_meta.get("publish_date", ""),
+            "agencies": agencies,
+            "categories": categories,
+            "tldr": list(brief_meta.get("tldr", [])),   # LLM placeholder
+            "coverage": {
+                "intake_total": brief_meta.get("intake_total", len(web_cards)),
+                "rendered": len(web_cards),
+                "evidence": evidence,
+            },
+            "ai_disclosure": True,
+        },
+        "cards": web_cards,
+    }

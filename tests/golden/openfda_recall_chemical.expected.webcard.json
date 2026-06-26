@@ -1,0 +1,60 @@
+{
+  "agency": "FDA",
+  "card_type": "Recall",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-15"
+    },
+    {
+      "label": "문서번호",
+      "value": "Z-1234-2026"
+    },
+    {
+      "label": "업체",
+      "value": "Acme Pharmaceuticals, Inc."
+    },
+    {
+      "label": "제품",
+      "value": "Lisinopril Tablets USP 10 mg, 100-count bottle"
+    },
+    {
+      "label": "Class",
+      "value": "Class II"
+    }
+  ],
+  "group": "Recall",
+  "group_label": null,
+  "headline_target": "Subpotent tablets recall",
+  "id": "Z-1234-2026",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": "💊 합성의약품",
+  "quotes": [
+    {
+      "original": "Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+      "translation": ""
+    }
+  ],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "Recall"
+}

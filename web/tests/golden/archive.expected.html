@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>주간 브리프 · GRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="../assets/grm.css">
+</head>
+<body>
+<div class="topline"></div>
+
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../index.html"><span class="logo">GRM<span class="dot"></span></span><span class="rule"></span><span class="desc">Global Regulatory Monitor</span></a>
+  <nav><a href="../index.html">소개</a><a href="../archive/index.html" class="on">주간 브리프</a><a href="../briefs/2026-06-22/index.html">최신호</a></nav>
+  <span class="sp"></span>
+  <button class="iconbtn" id="theme" aria-label="명도 모드 전환"><i class="ti ti-moon"></i></button>
+  <a class="btn pri" href="../archive/index.html">구독하기</a>
+</div></header>
+
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Weekly Brief · Archive</span>
+    <h1 class="reveal" style="animation-delay:.08s">주간 브리프</h1>
+    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 신호를 한 호로 묶어 발행합니다. 전 호의 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
+    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
+      <i class="ti ti-search lead"></i>
+      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="브리프 카드 검색" />
+      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="panel reveal" id="panel" style="animation-delay:.26s">
+      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
+      <div class="facets" id="facets"></div>
+    </div>
+    <div class="bar reveal" id="bar" style="animation-delay:.32s">
+      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간 호</button><button type="button" data-view="cards">카드 전체</button></div>
+      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div id="results">
+      <div id="static-issues">        <a class="issue latest" href="../briefs/2026-06-22/index.html">
+          <div class="vol">Vol.<b>1</b></div>
+          <div><span class="badge"><span class="live"></span>최신호 · LIVE</span><h3>2026년 6월 4주차</h3>
+            <div class="row"><span class="tag date">2026-06-22</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">EMA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
+          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A15 · B21</span></div>
+        </a>      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">
+  <div class="foot-main">
+    <div class="foot-brand">
+      <div class="wm">GRM</div><div class="full">Global Regulatory Monitor</div>
+      <p>전 세계 제약 GMP·품질 규제 신호를 매주 자동으로 모아, QA 담당자가 읽기 쉬운 카드로 전하는 규제 인텔리전스 다이제스트.</p>
+    </div>
+    <div class="foot-col"><h5>둘러보기</h5><a href="../index.html">소개</a><a href="../archive/index.html">주간 브리프</a><a href="../briefs/2026-06-22/index.html">최신호</a></div>
+    <div class="foot-col"><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
+    <div class="foot-col"><h5>안내</h5><span>AI 자동 생성 고지</span><span>원문 확인 안내</span><span>문의</span></div>
+  </div>
+  <div class="foot-legal">
+    <span>© 2026 Global Regulatory Monitor</span>
+    <span class="mono">AI-generated from primary sources · verify against the original before acting</span>
+  </div>
+</div></footer>
+
+<script>
+const root=document.documentElement;
+document.getElementById('theme').onclick=()=>{root.classList.toggle('dark');
+  document.querySelector('#theme i').className=root.classList.contains('dark')?'ti ti-sun':'ti ti-moon';};
+// 스크롤 그림자 — 네비가 종이 위로 떠오르는 단서(v2).
+const _nav=document.getElementById('nav');
+const _navShadow=()=>_nav.classList.toggle('scrolled',window.scrollY>6);
+window.addEventListener('scroll',_navShadow,{passive:true});_navShadow();
+</script>
+<script src="../assets/archive.js" defer></script></body>
+</html>

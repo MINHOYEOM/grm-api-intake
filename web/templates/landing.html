@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 랜딩 = v4 프로토타입 home 정적 카피. 데이터 바인딩은 "이번 호 표지"(cover aside)와
+    hero 호수 라벨·CTA 링크뿐(spec §3.2 C). 나머지 카피(왜 필요한가·핵심기능·카드해부·
+    작동방식·다크밴드)는 v4 그대로. -#}
+<main>
+  <div class="wrap hero">
+    <div class="top"><span>제약 GMP · 품질 규제 인텔리전스</span><span class="r">Weekly Brief · Vol. {{ cover.issue_no }} · {{ cover.publish_date }}</span></div>
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span><span><b style="font-weight:600">GRM</b> — Global Regulatory Monitor</span></div>
+        <h1>흩어진 규제 신호를,<br><span class="hl">읽히는 한 장</span>으로.</h1>
+        <p class="lede">FDA·EMA·MHRA·PIC/S·ICH·식약처까지, 전 세계 제약 GMP·품질 규제 변화를 매주 자동으로 모읍니다.
+          원문은 그대로, 핵심은 한국어로 — 무엇이 바뀌었고 우리 QA가 무엇을 점검해야 하는지 카드 한 장으로 전합니다.</p>
+        <div class="cta">
+          <a class="btn pri lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">최신 브리프 읽기 <i class="ti ti-arrow-right"></i></a>
+          <a class="btn lg" href="{{ rel_root }}archive/index.html">지난 호 둘러보기</a>
+        </div>
+        <div class="stats">
+          <div><b>11</b><span>규제 소스</span></div>
+          <div><b>매주</b><span>정기 발행</span></div>
+          <div><b>A·B·C</b><span>신뢰 등급</span></div>
+          <div><b>2</b><span>듀얼 원문 링크</span></div>
+        </div>
+      </div>
+      <aside class="cover">
+        <div class="stack s1"></div><div class="stack s2"></div>
+        <div class="card">
+          <div class="ch"><span class="lab">이번 호</span><span class="d">{{ cover.date_dotted }}</span></div>
+          <div class="cb">
+            <div class="vol">Vol. {{ cover.issue_no }} — 카드 {{ cover.rendered }}장</div>
+            <h3>{{ cover.title }}</h3>
+            <div class="win">검색 기간 <span class="mono">{{ cover.window }}</span></div>
+            {%- if cover.tldr %}
+            <ul>
+              {%- for t in cover.tldr %}
+              <li>{{ t }}</li>
+              {%- endfor %}
+            </ul>
+            {%- endif %}
+            <a class="go" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 호 전체 읽기 <i class="ti ti-arrow-right"></i></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <div class="sources">
+      <div class="l">수집 대상 · 11 sources</div>
+      <div class="row">
+        <span>FDA</span><span class="sep">·</span><span>EMA</span><span class="sep">·</span><span>MHRA</span><span class="sep">·</span>
+        <span>PIC/S</span><span class="sep">·</span><span>ICH</span><span class="sep">·</span><span>MFDS</span><span class="sep">·</span>
+        <span>WHO</span><span class="sep">·</span><span>Health&nbsp;Canada</span><span class="sep">·</span><span>ECA</span><span class="sep">·</span><span>OpenFDA</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="section soft"><div class="wrap lead-grid">
+    <div><span class="kick">왜 필요한가</span><h2>규제는 흩어져 있고,<br>영문 원문은 부담입니다.</h2></div>
+    <p><span class="drop">규</span>제 정보는 FDA·EMA·MHRA·PIC/S·ICH·식약처처럼 출처가 흩어져 있고, 매주 사람이 일일이 확인하기엔
+      양이 많고 영문 원문도 부담입니다. GRM은 이 모니터링을 자동화하고 핵심만 한국어로 요약하되,
+      <b style="color:var(--ink);font-weight:600">원문 링크를 항상 함께 제공</b>해 신뢰성과 추적성을 유지합니다.
+      정보를 그대로 던지지 않고 사람이 빠르게 읽는 카드로 가공해, 규제가 어떻게 변하는지 인지하고
+      우리 QA가 무엇을 점검해야 하는지 한눈에 파악하도록 돕습니다.</p>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <div class="sec-head"><span class="idx">01</span><div><span class="kick">핵심 기능</span><h2 style="margin-top:8px">데이터 수집에서 점검 항목까지.</h2></div></div>
+    <div class="ledger">
+      <div class="lrow"><span class="no">01</span><h3>11개 소스 자동 수집</h3><p>FDA 경고장·483, OpenFDA 회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada를 매일 자동으로 수집합니다.</p></div>
+      <div class="lrow"><span class="no">02</span><h3>사실과 해석의 분리</h3><p>객관적 사실은 원문에서 글자 그대로, AI 해석(시사점)은 색과 위치로 분명히 분리해 표기합니다.</p></div>
+      <div class="lrow"><span class="no">03</span><h3>듀얼 링크 추적성</h3><p>모든 카드에 정보 출처와 공식 원본 두 링크를 붙여, 요약에서 1차 자료까지 한 번에 닿습니다.</p></div>
+      <div class="lrow"><span class="no">04</span><h3>Evidence · Signal 등급화</h3><p>신뢰도(A·B·C)와 신호 강도(Tier 1–3)를 모든 카드에 표기해 무엇을 먼저 볼지 빠르게 판단합니다.</p></div>
+      <div class="lrow"><span class="no">05</span><h3>원문 + 한국어 번역</h3><p>영문 핵심 문장은 원문 인용과 한국어 번역을 ①② 짝으로 나란히 두어, 의미를 잃지 않습니다.</p></div>
+      <div class="lrow"><span class="no">06</span><h3>실행 가능한 점검 항목</h3><p>각 신호마다 “우리 QA가 무엇을 확인해야 하는지”를 바로 옮길 수 있는 점검 리스트로 제시합니다.</p></div>
+    </div>
+  </div></section>
+
+  <section class="section soft"><div class="wrap">
+    <div class="sec-head"><span class="idx">02</span><div><span class="kick">카드 해부</span><h2 style="margin-top:8px">카드 한 장에 담기는 것.</h2></div></div>
+    <div class="anat">
+      <div class="card evA" style="margin-top:0">
+        <div class="c-title"><span class="pre">[행정처분 · MFDS]</span>경방신약(주) — <b>기준서 미준수로 제조정지</b></div>
+        <div class="badges">
+          <span class="b code ev">Evidence A</span><span class="b ag">MFDS</span>
+          <span class="b sig code"><span class="d" style="background:var(--hi)"></span>Signal High · T3</span>
+          <span class="b mod">💊 합성의약품</span>
+        </div>
+        <p class="summary">식약처가 제조관리기준서 미준수를 적발해 해당 품목에 제조업무정지 1개월을 처분했다.</p>
+        <table class="facts">
+          <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-06-17</span></td></tr>
+          <tr><td class="k">업체</td><td class="v">경방신약(주)</td></tr>
+          <tr><td class="k">처분</td><td class="v">제조업무정지 1개월(2026.7.1~7.31) · 2품목</td></tr>
+        </table>
+        <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· AI 해석</span></div><p>기준서·지시서 준수와 원료 칭량 관리 기록의 정합성을 재정비해야 한다.</p></div>
+      </div>
+      <ul class="legend">
+        <li><span class="ic"><i class="ti ti-bookmark"></i></span><div><h4>제목 = 인덱스</h4><p>유형·기관·핵심 대상과 한 줄 이슈. 목차에서 바로 점프합니다.</p></div></li>
+        <li><span class="ic"><i class="ti ti-rosette-discount-check"></i></span><div><h4>등급 배지</h4><p>Evidence·Signal·제품군을 한눈에 — 우선순위 판단의 기준.</p></div></li>
+        <li><span class="ic"><i class="ti ti-table"></i></span><div><h4>사실 표 · 원문 인용</h4><p>코드가 원문에서 그대로 옮긴 사실. 영문은 번역을 나란히.</p></div></li>
+        <li><span class="ic imp-ic"><i class="ti ti-bulb"></i></span><div><h4>시사점 (AI 해석)</h4><p>사실과 분리된 AI의 해석. 공식 견해가 아님을 색으로 구분.</p></div></li>
+        <li><span class="ic chk-ic"><i class="ti ti-checklist"></i></span><div><h4>점검 항목</h4><p>우리 QA가 바로 확인할 수 있는 실행 리스트.</p></div></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <div class="sec-head"><span class="idx">03</span><div><span class="kick">작동 방식</span><h2 style="margin-top:8px">수집부터 발행까지, 사람 개입은 한 곳뿐.</h2></div></div>
+    <div class="flow">
+      <div class="fstep"><div class="s">Step 1</div><h4>수집</h4><p>매일 11개 규제 소스에서 원시 데이터를 자동으로 가져옵니다.</p></div>
+      <div class="fstep"><div class="s">Step 2</div><h4>구조화</h4><p>사실은 코드가 원문 그대로, 산문은 AI가 정해진 슬롯만 채웁니다.</p></div>
+      <div class="fstep"><div class="s">Step 3</div><h4>검토</h4><p>발행 전 미리보기에서 사람이 실제 화면을 보고 승인합니다.</p></div>
+      <div class="fstep"><div class="s">Step 4</div><h4>발행</h4><p>매주 월요일, 새 브리프가 게시판에 라이브로 올라갑니다.</p></div>
+    </div>
+  </div></section>
+
+  <div class="wrap"><div class="darkband">
+    <div>
+      <span class="kick">이번 주</span>
+      <h2>이번 주, 무엇이 바뀌었나.</h2>
+      <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, Evidence A {{ cover.evidence.A }} / B {{ cover.evidence.B }}. 글로벌과 국내 신호를 한 호로 묶었습니다.</p>
+      <a class="btn pri lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 호 열기 <i class="ti ti-arrow-right"></i></a>
+    </div>
+    <div class="miniprev">
+      <div class="h"><span>행정처분 · MFDS</span><span class="e">Evidence A</span></div>
+      <div class="t">경방신약(주) — 기준서 미준수로 제조정지</div>
+      <div class="badges"><span class="mb"><span class="d"></span>Signal High · T3</span><span class="mb">💊 합성의약품</span></div>
+    </div>
+  </div></div>
+</main>
+{% endblock %}

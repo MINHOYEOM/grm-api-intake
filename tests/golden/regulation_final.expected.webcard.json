@@ -1,0 +1,51 @@
+{
+  "agency": "MFDS",
+  "card_type": "고시·개정법령",
+  "category": "Guidance",
+  "checks": [],
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-07"
+    },
+    {
+      "label": "문서번호",
+      "value": "mfds-reg-2026-7"
+    },
+    {
+      "label": "발행기관",
+      "value": "MFDS"
+    },
+    {
+      "label": "주제",
+      "value": "의약품 제조 및 품질관리 기준 고시 개정"
+    }
+  ],
+  "group": "국내",
+  "group_label": null,
+  "headline_target": "의약품 GMP 고시 개정",
+  "id": "mfds-reg-2026-7",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "https://www.mfds.go.kr/regulation/2026-7",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://www.mfds.go.kr/regulation/2026-7"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "규정"
+}

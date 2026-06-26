@@ -1,0 +1,95 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "provenance": {
+  "note": "P2 합성 픽스처(비실데이터) — 산문 슬롯(title_issue·summary·key_facts·implication·checks)·비KO 번역(①② 인터리브)·tldr 가 채워진 렌더 경로 골든용. 실 6/22 픽스처는 산문이 모두 빈 placeholder 라 이 경로를 못 덮으므로 합성으로 보강."
+ },
+ "brief": {
+  "run_date_kst": "2026-06-08",
+  "window": "2026-06-01 ~ 2026-06-08",
+  "publish_date": "2026-06-08",
+  "agencies": ["FDA", "MHRA"],
+  "categories": ["Warning Letter", "Other"],
+  "tldr": [
+   "FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부",
+   "MHRA, 안정성 프로그램 미흡 지적 다수",
+   "공통적으로 CAPA 종결 증빙 미비가 반복 관찰됨"
+  ],
+  "coverage": {"intake_total": 27, "rendered": 2, "evidence": {"A": 1, "B": 1, "C": 0}},
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "wl-syn-0608",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Synthetic Pharma Co.",
+   "title_issue": "데이터 무결성 결함",
+   "summary": "FDA가 무균 충전 공정의 데이터 무결성 결함을 이유로 경고장을 발부했다.",
+   "facts": [
+    {"label": "발행일", "value": "2026-06-05"},
+    {"label": "문서번호", "value": "wl-syn-0608"},
+    {"label": "업체/제조소", "value": "Synthetic Pharma Co."}
+   ],
+   "quotes": [
+    {"original": "Your firm failed to ensure data integrity for batch production records.", "translation": "귀사는 배치 생산 기록의 데이터 무결성을 보장하지 못했습니다."},
+    {"original": "Corrective actions were not completed within the committed timeline.", "translation": "시정조치가 약속된 기한 내에 완료되지 않았습니다."}
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": ["데이터 무결성 결함 적발", "CAPA 기한 미준수"],
+   "implication": "전자기록 감사추적과 CAPA 종결 증빙 체계를 재점검할 필요가 있다.",
+   "checks": ["감사추적 비활성화 여부 점검", "미결 CAPA 기한 초과 건 식별"],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/synthetic-pharma-co",
+    "official_is_pdf": false,
+    "link_check": {"info": "pending", "official": "pending"}
+   }
+  },
+  {
+   "id": "rss-syn-mhra",
+   "render_order": 1,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "MHRA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "MHRA stability programme deficiencies",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {"label": "발행일", "value": "2026-06-04"},
+    {"label": "문서번호", "value": "rss-syn-mhra"},
+    {"label": "발행기관", "value": "MHRA"}
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency",
+    "official_url": "https://www.gov.uk/drug-safety-update/stability-programme-deficiencies",
+    "official_is_pdf": false,
+    "link_check": {"info": "pending", "official": "pending"}
+   }
+  }
+ ]
+}

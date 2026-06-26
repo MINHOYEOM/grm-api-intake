@@ -40,6 +40,7 @@ __all__ = [
     "WebRenderPurityTest",
     "WebRenderHardeningTest",
     "WebSearchIndexTest",
+    "WebKoreanSafetyTest",
 ]
 
 
@@ -623,8 +624,8 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("MERGED PARENT", h)
         self.assertIn("전체 3품목", h)
 
-    def test_darkband_binds_latest_brief(self):
-        # 다크밴드 호별 수치가 최신호(06-29) 파생값을 반영(stale 아님).
+    def test_callout_binds_latest_brief(self):
+        # 코럴 콜아웃·히어로 이슈카드 호별 수치가 최신호(06-29) 파생값 반영(stale 아님).
         older = _minimal_brief("2026-06-22")
         latest = _minimal_brief("2026-06-29",
                                 coverage={"intake_total": 99, "rendered": 88,
@@ -645,6 +646,46 @@ class WebRenderHardeningTest(unittest.TestCase):
                 json.dumps(_minimal_brief("2026-06-01"), ensure_ascii=False), encoding="utf-8")
         with self.assertRaises(SystemExit):
             render.render_site(data, out)
+
+
+# ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────
+class WebKoreanSafetyTest(unittest.TestCase):
+    """v6 재스킨 §4·§5 자동 점검 — 렌더 HTML 기준.
+
+    1) class="mono" 요소 내부에 한글(Hangul) 0 — mono 는 ASCII 데이터 전용.
+    2) 렌더 HTML 에 inline letter-spacing·text-transform 스타일 0 — 자간/대문자는
+       CSS(영문 .kick·.mono 한정)에서만, 마크업으로 한글에 새지 않음.
+    """
+    import re as _re
+    _HANGUL = _re.compile(r"[가-힣ᄀ-ᇿ㄰-㆏ꥠ-꥿ힰ-퟿]")
+    # mono-styled class tokens: 'mono'(데이터 셀·범용) + 'code'(.b.code 배지). 한글 0 보장.
+    _MONO = _re.compile(r'<[^>]*class="[^"]*\b(?:mono|code)\b[^"]*"[^>]*>(.*?)</', _re.S)
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_k_"))
+        single, multi = cls._tmp / "single", cls._tmp / "multi"
+        _build_single(single)
+        _build_multi(multi, cls._tmp)
+        cls.htmls = {p.relative_to(cls._tmp).as_posix(): p.read_text(encoding="utf-8")
+                     for root in (single, multi) for p in root.rglob("*.html")}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_no_hangul_in_mono(self):
+        bad = []
+        for name, html in self.htmls.items():
+            for m in self._MONO.finditer(html):
+                if self._HANGUL.search(m.group(1)):
+                    bad.append((name, m.group(1)[:60]))
+        self.assertEqual(bad, [], f"class=mono 내부 한글(§4 위반): {bad[:8]}")
+
+    def test_no_inline_letterspacing_or_transform(self):
+        bad = [name for name, html in self.htmls.items()
+               if ("letter-spacing" in html or "text-transform" in html)]
+        self.assertEqual(bad, [], f"인라인 자간/대문자 스타일(§4 위반): {bad}")
 
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────

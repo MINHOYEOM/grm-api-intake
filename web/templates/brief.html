@@ -30,7 +30,7 @@
     </div></aside>
     <div id="cards">
       {%- for section in sections %}
-      <h2 class="sec-h" id="sec-{{ section.slug }}"><i class="ti {{ section.icon }}" style="color:var(--accent);font-size:20px"></i>{{ section.name }} <span class="n">{{ section.count }}장</span></h2>
+      <h2 class="sec-h" id="sec-{{ section.slug }}"><i class="ti {{ section.icon }}" style="color:var(--coral);font-size:20px"></i>{{ section.name }} <span class="n">{{ section.count }}장</span></h2>
       {%- for card in section.cards %}
       {%- if card.group_head %}
       <div class="grp-h">{{ card.group_head }}</div>

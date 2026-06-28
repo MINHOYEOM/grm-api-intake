@@ -110,6 +110,10 @@ on:
         description: 'E2: 행정처분 건별 L1(nedrug getItem)을 collect 시 live verify (기본 off — K3 종료/명시 opt-in 후)'
         type: boolean
         default: false
+      enable_web_brief_emit:
+        description: '§1-B: 빈슬롯 web brief(grm-web-card/v1) 자동 산출 → artifact (ENABLE_HANDOFF_V2 전제)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -126,6 +130,11 @@ jobs:
     timeout-minutes: 20
     env:
       GRM_HEALTH_JSON: grm-health.json
+      # §1-B 영구배선: job-level 로 둬 collector(산출)와 upload 스텝(조건/경로)이 동일 값을
+      # 본다(step-scoped env 는 타 스텝서 미해석 — grm-web-deploy runner.temp 버그 교훈).
+      # inputs/vars/github 컨텍스트는 job-level env 에서 해석 가능(runner.* 는 불가와 구분).
+      ENABLE_WEB_BRIEF_EMIT: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_web_brief_emit) || vars.ENABLE_WEB_BRIEF_EMIT || 'false' }}
+      GRM_WEB_BRIEF_DIR: ${{ vars.GRM_WEB_BRIEF_DIR || '.' }}
 
     steps:
       - name: Checkout
@@ -201,6 +210,7 @@ jobs:
           # E2(URL전수검사): 행정처분 건별 L1 을 collect 시 resolve&verify(기본 off — collector
           # 행위·K3 관찰 보호). on 이면 nedrug getItem 후보를 verify 해 L1 승격/강등.
           ENABLE_MFDS_URL_VERIFY: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_url_verify) || vars.ENABLE_MFDS_URL_VERIFY || 'false' }}
+          # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
           args=()
@@ -259,6 +269,18 @@ jobs:
             args+=(--emit-routine-handoff)
           fi
           python collect_intake.py "${args[@]}"
+
+      # §1-B 영구배선(Option A): 빈슬롯 web brief 를 artifact 로 업로드한다. 사람이 내려받아
+      # web/data/briefs/ 에 커밋 → GRM Web Deploy 트리거(무인 라이브 0 = D5 게이트 보존).
+      # ENABLE_WEB_BRIEF_EMIT off 면 파일 부재 → if-no-files-found:ignore 로 무해 스킵.
+      - name: Upload empty-slot web brief (§1-B)
+        if: ${{ always() && env.ENABLE_WEB_BRIEF_EMIT == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: grm-web-brief
+          path: ${{ env.GRM_WEB_BRIEF_DIR }}/brief_web_*.json
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Open issue on failure
         if: failure() && github.event_name == 'schedule'

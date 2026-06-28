@@ -55,7 +55,12 @@ from grm_common import (
     retry_after_seconds,
 )
 # K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
-from card_scaffold import build_card_scaffold, compute_render_plan, merge_recall_cards
+from card_scaffold import (
+    assemble_web_brief,
+    build_card_scaffold,
+    compute_render_plan,
+    merge_recall_cards,
+)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2894,6 +2899,26 @@ def _enable_handoff_v2() -> bool:
     return os.environ.get("ENABLE_HANDOFF_V2", "false").lower() == "true"
 
 
+def _enable_web_brief_emit() -> bool:
+    """빈슬롯 web brief emit flag (§1-B 영구배선, 기본 off, vars fallback 패턴).
+
+    off = 현행과 byte 동일(파일 산출 0). on(+ENABLE_HANDOFF_V2 path) = 수집 시점에
+    `brief_web_{run_date}.json`(grm-web-card/v1 빈슬롯)을 결정론 산출 → routine 델타를
+    `inject_slots` 로 주입만 하면 그 주 산문 발행(1회용 파서·수기 fixture 제거). raw 가
+    살아있는 handoff v2 카드 producer 를 재사용하므로 ENABLE_HANDOFF_V2 전제(아래 emit 분기).
+    """
+    return os.environ.get("ENABLE_WEB_BRIEF_EMIT", "false").lower() == "true"
+
+
+def resolve_web_brief_dir() -> str:
+    """빈슬롯 web brief 산출 디렉터리 — GRM_WEB_BRIEF_DIR > 현재 작업 디렉터리('.').
+
+    워크플로(Option A)는 이 경로의 `brief_web_*.json` 을 artifact 로 업로드하고, 사람이
+    `web/data/briefs/` 에 커밋한다(무인 라이브 0 = D5 게이트 보존). 직접 main push 금지.
+    """
+    return os.environ.get("GRM_WEB_BRIEF_DIR", "").strip() or "."
+
+
 def _enable_handoff_idempotency_v2() -> bool:
     """PL-10b/B1 근본해결 flag (기본 off) — Handoff Ref 상태기계로 소비 자격 판정.
 
@@ -2976,6 +3001,54 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
         "coverage_collected_md": build_coverage_collected(source_counts)["md"],
         "rows": out_rows,
     }
+
+
+def build_web_brief_payload_v2(rows: list[dict[str, Any]], run_date: date,
+                               window_days: int) -> dict[str, Any]:
+    """빈슬롯 `grm-web-card/v1` 브리프 payload(§1-B 영구배선). 순수·결정론 — 네트워크·
+    현재시각·LLM 0.
+
+    `rows` 는 handoff v2(`build_routine_handoff_payload_v2`)와 **동일한 enriched(raw 부착)
+    rows** 여야 한다 — 같은 카드 producer(`build_card_scaffold`→`merge_recall_cards`)를
+    재구성하므로 두 산출의 카드 사실 셀은 byte 동일(드리프트 0). `card_scaffold.assemble_web_brief`
+    가 LLM 슬롯(title_issue·summary·key_facts·implication·checks·비KO translation·tldr)을
+    빈값으로 둔 브리프를 낸다 → routine 델타를 `inject_slots` 로 주입만 하면 발행(1회용 파서 제거).
+
+    `brief_meta` = handoff 와 동일 소스: run_date·window(수집 윈도우)·intake_total(=row 수).
+    `publish_date` 기본 = run_date(주차 재발행 시 사람이 커밋 단계에서 조정). tldr 은 빈슬롯([]).
+    """
+    start = run_date - timedelta(days=window_days)
+    cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
+    brief_meta = {
+        "run_date_kst": run_date.isoformat(),
+        "window": f"{start.isoformat()} ~ {run_date.isoformat()}",
+        "publish_date": run_date.isoformat(),
+        "intake_total": len(rows),
+        "tldr": [],  # LLM placeholder (inject_slots 가 채움)
+    }
+    return assemble_web_brief(cards, brief_meta)
+
+
+def web_brief_filename(run_date: date) -> str:
+    """`brief_web_{YYYY_MM_DD}.json`(web/data/briefs 규약 — 날짜 구분자 '_')."""
+    return f"brief_web_{run_date.isoformat().replace('-', '_')}.json"
+
+
+def emit_web_brief_file(rows: list[dict[str, Any]], run_date: date, window_days: int,
+                        out_dir: str) -> str:
+    """빈슬롯 web brief 를 `out_dir/brief_web_{run_date}.json` 로 결정론 기록 후 경로 반환.
+
+    실 producer 경로(`build_web_brief_payload_v2` = `assemble_web_brief`)로 산출 —
+    파싱/수기 fixture 아님. data 관례(`indent=1`·`ensure_ascii=False`·LF·후행개행)로 쓴다
+    (`web/render._write_json` 과 동형 → 같은 입력 byte 동일).
+    """
+    payload = build_web_brief_payload_v2(rows, run_date, window_days)
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, web_brief_filename(run_date))
+    text = json.dumps(payload, ensure_ascii=False, indent=1) + "\n"
+    with open(path, "wb") as f:  # LF/UTF-8 고정 — OS 무관 결정론(Windows \r\n 차단)
+        f.write(text.encode("utf-8"))
+    return path
 
 
 def _handoff_page_properties(payload: dict[str, Any],
@@ -3399,7 +3472,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          source_names: set[str] | None = None,
                          doc_ids: set[str] | None = None,
                          inmemory_raw: dict[str, dict[str, Any]] | None = None,
-                         display_window_days: int | None = None
+                         display_window_days: int | None = None,
+                         web_brief_dir: str | None = None
                          ) -> tuple[int, str]:
     # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
     # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
@@ -3460,6 +3534,16 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
                                                        generated_at, compact=True)
         log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")
+        # §1-B 영구배선: raw 가 살아있는 이 지점(enriched)에서 빈슬롯 web brief 를 결정론
+        # 산출한다(handoff 와 동일 cards·소스). 비파괴·비차단 — 실패해도 handoff/수집은 계속.
+        if web_brief_dir:
+            try:
+                web_path = emit_web_brief_file(enriched, run_date,
+                                               payload_window_days, web_brief_dir)
+                log("INFO", f"빈슬롯 web brief 산출(§1-B): {web_path}")
+            except Exception as e:  # noqa: BLE001 — web brief 실패가 수집을 죽이면 안 됨
+                log("WARN", f"빈슬롯 web brief 산출 실패(handoff 계속): "
+                            f"{truncate(str(e), 160)}")
     else:
         # 기존 v1 경로 — scheduled 운영 기본. 바이트 동일 보장(변경 없음).
         payload = build_routine_handoff_payload(rows, run_date,
@@ -4987,12 +5071,16 @@ def main() -> int:
                     mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
                     mfds_gmp_inspection_items, ich_items, who_items, hc_items,
                     fda483_items, search_items)
+                # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
+                # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
+                web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
                     source_names=handoff_sources, doc_ids=handoff_doc_ids,
                     inmemory_raw=inmemory_raw,
                     # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
-                    display_window_days=args.window_days)
+                    display_window_days=args.window_days,
+                    web_brief_dir=web_brief_dir)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True

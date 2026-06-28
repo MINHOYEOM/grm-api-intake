@@ -64,6 +64,7 @@ SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
+    ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
 ]
 MULTI_GOLDENS = [
@@ -381,6 +382,10 @@ class WebSearchIndexTest(unittest.TestCase):
         issue_no = render.assign_issue_numbers(briefs)
         latest = max(b["brief"].get("publish_date", "") for b in briefs)
         cls.idx = render.build_search_index(briefs, issue_no, latest)
+        # 06-26 발행으로 단독 데이터 디렉터리도 2호(06-22·06-26)가 됨 — 인덱스는 전 호의
+        # 렌더 카드를 담는다(date desc·호내 render_order asc). 단일 호 가정의 어서션은
+        # 이 전 호 카드 집합 기준으로 정합화한다(self.cards=06-22 상세 검증용으로 유지).
+        cls.single_cards = [c for b in briefs for c in (b.get("cards") or [])]
         # 멀티(합성2 + 실6/22) — date desc·호내 render_order asc 검증용.
         mbriefs = [json.loads(p.read_text(encoding="utf-8"))
                    for p in sorted(MULTI_FIXTURES.glob("*.json"))]
@@ -401,7 +406,7 @@ class WebSearchIndexTest(unittest.TestCase):
             self.assertIn(k, self.idx["facets"])
 
     def test_one_entry_per_rendered_card(self):
-        renderable = [c for c in self.cards if render._is_renderable(c)]
+        renderable = [c for c in self.single_cards if render._is_renderable(c)]
         self.assertEqual(len(self.idx["cards"]), len(renderable))
         # 카드 엔트리 필드 집합 고정(스키마 v1 외 필드 신설 금지).
         expect = {"issue_no", "date", "month", "vol_title", "agency", "category",
@@ -432,15 +437,19 @@ class WebSearchIndexTest(unittest.TestCase):
                 self.assertIn(f["value"], e["text"])
 
     def test_href_anchor_matches_detail_article_id(self):
-        # 검색결과 href 의 앵커가 상세 article id 와 동일(점프 일치).
+        # 검색결과 href 의 앵커가 (해당 호) 상세 article id 와 동일(점프 일치). 2호가 되면
+        # 카드마다 자기 발행일(date) 상세 페이지에서 앵커를 찾는다.
         import tempfile as _tf
         tmp = pathlib.Path(_tf.mkdtemp(prefix="grmweb_idx_"))
         try:
             out = tmp / "s"
             _build_single(out)
-            detail = (out / "briefs/2026-06-22/index.html").read_text(encoding="utf-8")
+            details: dict[str, str] = {}
             for e in self.idx["cards"]:
-                self.assertIn(f'id="{self._anchor(e)}"', detail)
+                d = e["date"]
+                if d not in details:
+                    details[d] = (out / "briefs" / d / "index.html").read_text(encoding="utf-8")
+                self.assertIn(f'id="{self._anchor(e)}"', details[d])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
@@ -457,11 +466,17 @@ class WebSearchIndexTest(unittest.TestCase):
         # null modality 는 facet 후보에서 제외.
         self.assertNotIn(None, self.idx["facets"]["modalities"])
 
-    def test_single_cards_sorted_render_order(self):
-        ro = {render._card_anchor(c): c["render_order"]
-              for c in self.cards if render._is_renderable(c)}
-        seq = [ro[self._anchor(e)] for e in self.idx["cards"]]
-        self.assertEqual(seq, sorted(seq), "단일 호 render_order asc 아님")
+    def test_single_index_sorted_date_desc_then_render_order(self):
+        # 06-26 발행으로 단독 인덱스도 2호 — date desc 후 호내 render_order asc(멀티와 동형).
+        cards = self.idx["cards"]
+        dates = [c["date"] for c in cards]
+        self.assertEqual(dates, sorted(dates, reverse=True), "date desc 아님")
+        ro = {render._card_anchor(c): c.get("render_order")
+              for c in self.single_cards if render._is_renderable(c)}
+        from itertools import groupby
+        for _, grp in groupby(cards, key=lambda c: c["date"]):
+            seq = [ro[self._anchor(e)] for e in grp]
+            self.assertEqual(seq, sorted(seq), "호 내 render_order asc 아님")
 
     def test_multi_sorted_date_desc_then_render_order(self):
         cards = self.midx["cards"]
@@ -485,7 +500,7 @@ class WebSearchIndexTest(unittest.TestCase):
                   "count", "ev", "latest", "href"):
             self.assertIn(k, e)
         self.assertEqual(e["href"], f"../briefs/{e['slug']}/index.html")
-        self.assertTrue(e["latest"])  # 단일 호 → 최신
+        self.assertTrue(e["latest"])  # issues[0]=최신호(date desc) → latest=True
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

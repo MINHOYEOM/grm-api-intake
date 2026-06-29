@@ -68,7 +68,9 @@ button{font-family:inherit;cursor:pointer}
 .btn.cream:hover{background:var(--strong);border-color:var(--strong)}
 
 /* hero */
-.hero{padding:60px 0 0}
+/* P0-1: padding-top 만 — shorthand(60px 0 0)는 .wrap 의 좌우 36px 패딩을 0 으로
+   덮어써 히어로만 뷰포트 좌측에 붙던 버그. longhand 로 좌우 패딩(.wrap) 보존. */
+.hero{padding-top:60px}
 .hero-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;
   border-bottom:1px solid var(--line);padding-bottom:16px}
 .hero-top .r{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase}

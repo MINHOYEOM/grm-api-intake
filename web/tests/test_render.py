@@ -66,6 +66,8 @@ SINGLE_GOLDENS = [
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
+    ("robots.txt", "robots.expected.txt"),
+    ("sitemap.xml", "sitemap.expected.xml"),
 ]
 MULTI_GOLDENS = [
     ("archive/index.html", "archive_multi.expected.html"),

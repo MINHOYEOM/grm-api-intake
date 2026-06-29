@@ -70,6 +70,8 @@ button{font-family:inherit;cursor:pointer}
 .btn:hover{border-color:var(--ink)}
 .btn i{font-size:16px;transition:transform var(--tr)}
 .btn:hover i{transform:translateX(2px)}
+/* P3-4: CTA 화살표를 유니코드(폰트 비의존)로 — Tabler 아이콘폰트 로드 전 □(tofu) 깜빡임 제거(첫 페인트부터 →). ::before 만 교체, .btn i 호버 이동 유지. */
+.btn i.ti-arrow-right::before{content:'\2192';font-family:var(--sans)}
 .btn.coral{background:var(--coral);border-color:var(--coral);color:var(--on-coral)}
 .btn.coral:hover{background:var(--coral-2);border-color:var(--coral-2)}
 .btn.lg{padding:13px 24px;font-size:15px}
@@ -241,6 +243,7 @@ body.js-search .bar{display:flex}
 .detail-head{padding:50px 0 32px;border-bottom:1px solid var(--ink)}
 .bk{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:500;margin-bottom:24px}
 .bk:hover{color:var(--ink)}
+.bk i.ti-arrow-left::before{content:'\2190';font-family:var(--sans)}  /* P3-4 뒤로 화살표 폰트 비의존(tofu 제거) */
 .detail-head .kick{display:block;margin-bottom:14px}
 .detail-head h1{font-family:var(--serif);font-weight:400;font-size:44px;letter-spacing:-.02em;max-width:24ch;line-height:1.18;color:var(--ink)}
 .cov{display:flex;gap:14px 28px;flex-wrap:wrap;margin-top:26px;color:var(--muted);font-size:13px}
@@ -268,7 +271,7 @@ body.js-search .bar{display:flex}
   scroll-margin-top:88px;transition:border-color var(--tr)}
 .card:hover{border-color:var(--line-2)}
 .card.evA{border-top:2px solid var(--coral)}
-.c-title{font-family:'Noto Serif KR',Georgia,serif;font-size:25px;font-weight:500;letter-spacing:-.012em;line-height:1.32;color:var(--ink)}  /* P3-2 제목 단일 세리프 — 영문·한글 모두 Noto Serif KR(2폰트 톤 튐 제거). head 에 이미 로드(미편집). */
+.c-title{font-family:'Noto Serif KR','AppleMyungjo','Batang',Georgia,serif;font-size:25px;font-weight:500;letter-spacing:-.012em;line-height:1.32;color:var(--ink)}  /* P3-2 제목 단일 세리프(Noto Serif KR). P3-4 FOUT: 로드 전 한글이 시스템 세리프(AppleMyungjo/Batang)로 떠 swap 점프 완화(폴백만 추가, 로드 후엔 Noto Serif KR). */
 .c-title .pre{font-family:var(--sans);color:var(--muted);font-size:11.5px;font-weight:600;display:block;margin-bottom:9px;letter-spacing:0}  /* "[행정처분 · MFDS]" 한글 — sans·자간0·대문자없음(§4 교정, 상속 음수 자간 차단) */
 .c-title b{font-weight:500;color:var(--coral)}
 .badges{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 0;align-items:center}

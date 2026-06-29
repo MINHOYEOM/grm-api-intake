@@ -39,9 +39,11 @@
 {# P0-4: '소개' = 홈의 WHY 섹션(#why). 홈에선 순수 프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}
 {% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="{{ rel_root }}index.html"><b>Global Regulatory Monitor</b></a>
-  <nav><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
+  <a class="brand" href="{{ rel_root }}index.html"><b class="brand-full">Global Regulatory Monitor</b><b class="brand-abbr">GRM</b></a>
+  <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
   <span class="sp"></span>
+  {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
   {# P0-3: 구독 기능 미도입 — 헤더 상시 CTA를 최신 브리프(최신호)로. archive 3중 중복 제거. #}
   <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">최신 브리프</a>
@@ -67,6 +69,12 @@
 // 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
 const _nav=document.getElementById('nav');
 addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
 </script>
 {% block scripts %}{% endblock %}
 </body>

@@ -57,6 +57,11 @@ button{font-family:inherit;cursor:pointer}
 .nav nav a:hover{color:var(--ink)}
 .nav nav a.on{color:var(--ink)}
 .sp{flex:1}
+/* P2-2 좁은 폭 내비(햄버거) — 기본(데스크톱) 숨김. 브랜드 축약/토글은 ≤640px 에서만(파일 끝 미디어쿼리). */
+.brand-abbr,.navtoggle{display:none}
+.navtoggle{width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--line-2);background:transparent;color:var(--ink);border-radius:var(--rad-s);transition:var(--tr)}
+.navtoggle:hover{border-color:var(--ink)}
+.navtoggle i{font-size:20px}
 .btn{border:1px solid var(--line-2);background:transparent;color:var(--ink);padding:10px 18px;border-radius:var(--rad-s);
   font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:var(--tr)}
 .btn:hover{border-color:var(--ink)}
@@ -323,6 +328,14 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted-2)}
 .foot-legal .mono{font-size:11px}
 
+/* P2-1 중간 폭 분기점 — 900px 단일 붕괴 완화(태블릿~좁은 데스크톱 점진 축소).
+   900px 블록이 뒤에 와서 ≤900 에선 이 규칙들을 다시 1단으로 덮는다(소스 순서 의존). */
+@media(max-width:1024px){
+  .hero h1{font-size:52px}
+  .hero-grid{gap:40px}
+  .feats{grid-template-columns:repeat(2,1fr)}
+  .foot{grid-template-columns:1fr 1fr}
+}
 @media(max-width:900px){
   body{font-size:16px}
   .hero h1{font-size:42px}
@@ -356,4 +369,17 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .issue{grid-template-columns:78px 1fr}.issue .stat{display:none}
   .frow{grid-template-columns:1fr;gap:8px}
   .wrap{padding:0 22px}
+}
+/* P2-2 좁은 폭(≤640px) 내비 — 브랜드 축약(GRM) + 햄버거 드롭다운. 브랜드+토글+CTA만 한 줄, 링크는 수납.
+   ≤900 블록보다 뒤에 와서 .nav nav 의 좁은-폭 드롭다운 규칙이 우선한다. */
+@media(max-width:640px){
+  .brand-full{display:none}
+  .brand-abbr{display:inline}
+  .navtoggle{display:inline-flex}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;flex-direction:column;align-items:stretch;
+    gap:2px;margin:0;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);
+    box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
 }

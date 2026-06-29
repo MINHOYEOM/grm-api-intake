@@ -17,7 +17,8 @@
   <nav><a href="{{ rel_root }}index.html"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
   <span class="sp"></span>
   {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
-  <a class="btn coral" href="{{ rel_root }}archive/index.html">구독하기</a>
+  {# P0-3: 구독 폼/백엔드 부재(정적 $0 사이트) — 라벨을 실제 이동(아카이브)에 일치. #}
+  <a class="btn coral" href="{{ rel_root }}archive/index.html">지난 브리프 보기</a>
 </div></header>
 
 {% block content %}{% endblock %}

@@ -666,21 +666,22 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.render_site(data, out)
 
     def test_verification_meta_conditional(self):
-        # 기본(env 미설정) → 소유권 인증 메타 미출력(골든 불변 보장).
-        h0 = self._render_detail(_minimal_brief("2026-06-01"))
-        self.assertNotIn("google-site-verification", h0)
-        self.assertNotIn("naver-site-verification", h0)
-        # env-param 설정 시에만 <head> 에 토큰 메타 출력(GSC·네이버 등록 관문). 모듈 전역을
-        # 호출 시점에 읽으므로 monkeypatch 가 반영됨 — finally 로 복구해 타 테스트 오염 0.
-        render.GOOGLE_SITE_VERIFICATION = "g-tok-123"
-        render.NAVER_SITE_VERIFICATION = "n-tok-456"
+        # 소유권 인증 메타는 토큰 있을 때만 출력(빈 값이면 미출력). 모듈 전역을 호출
+        # 시점에 읽으므로 monkeypatch 가 반영 — 원래 기본값으로 복구해 타 테스트·골든 오염 0.
+        g0, n0 = render.GOOGLE_SITE_VERIFICATION, render.NAVER_SITE_VERIFICATION
         try:
-            h1 = self._render_detail(_minimal_brief("2026-06-02"))
-        finally:
             render.GOOGLE_SITE_VERIFICATION = ""
             render.NAVER_SITE_VERIFICATION = ""
-        self.assertIn('<meta name="google-site-verification" content="g-tok-123" />', h1)
-        self.assertIn('<meta name="naver-site-verification" content="n-tok-456" />', h1)
+            h_off = self._render_detail(_minimal_brief("2026-06-01"))
+            self.assertNotIn("google-site-verification", h_off)
+            self.assertNotIn("naver-site-verification", h_off)
+            render.GOOGLE_SITE_VERIFICATION = "g-tok-123"
+            render.NAVER_SITE_VERIFICATION = "n-tok-456"
+            h_on = self._render_detail(_minimal_brief("2026-06-02"))
+        finally:
+            render.GOOGLE_SITE_VERIFICATION, render.NAVER_SITE_VERIFICATION = g0, n0
+        self.assertIn('<meta name="google-site-verification" content="g-tok-123" />', h_on)
+        self.assertIn('<meta name="naver-site-verification" content="n-tok-456" />', h_on)
 
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────
@@ -781,6 +782,14 @@ class WebSeoMetaTest(unittest.TestCase):
         # 06-26(tldr 채움) → tldr[0]; 06-22(빈 tldr) → 날짜 파생 한 줄.
         self.assertIn('content="국내 N-nitroso', self.detail)          # tldr[0]
         self.assertIn('content="2026년 6월 4주차 ', self.detail22)      # 날짜 파생 폴백
+
+    def test_google_verification_live_by_default(self):
+        # main(ecb5043) 하드코딩 GSC 토큰을 env 기본값으로 흡수 → 기본 빌드에 라이브 노출
+        # (단일 <meta>·중복 0). 회전/비활성은 GRM_GOOGLE_SITE_VERIFICATION 으로.
+        tag = ('<meta name="google-site-verification" '
+               'content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />')
+        self.assertEqual(self.landing.count(tag), 1)        # 정확히 1개(중복 없음)
+        self.assertIn(tag, self.detail)                      # 전 페이지 공통(<head>)
 
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────

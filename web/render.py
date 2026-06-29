@@ -459,10 +459,13 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
 
 
 # ── SEO 메타·구조화데이터(description·canonical·OG·JSON-LD — 정적·결정론·한글안전) ──
-# 소유권 인증 토큰(GSC·네이버) — env-param. 미설정(기본 "")이면 메타 미출력(골든 불변).
-# 운영: repo var GRM_GOOGLE_SITE_VERIFICATION·GRM_NAVER_SITE_VERIFICATION 설정 → 재배포
-# → 라이브 <head> 노출 → 콘솔 "확인". (토큰은 공개값이라 하드코딩도 가능하나 env 권장.)
-GOOGLE_SITE_VERIFICATION = os.environ.get("GRM_GOOGLE_SITE_VERIFICATION", "").strip()
+# 소유권 인증 토큰(GSC·네이버) — env-param(회전/비활성은 env 로). 토큰은 공개값(라이브
+# <head> 노출). Google 기본값 = main(ecb5043)에서 하드코딩됐던 라이브 GSC 토큰을 단일
+# 소스로 흡수(중복 <meta> 제거 + 골든 일치). 네이버는 토큰 수령 전이라 기본 ""(미출력).
+# 운영: 토큰 회전/추가 시 repo var GRM_GOOGLE_SITE_VERIFICATION·GRM_NAVER_SITE_VERIFICATION
+# 설정(workflow env 배선 필요) 또는 이 기본값 교체 → 재배포 → 콘솔 "확인".
+GOOGLE_SITE_VERIFICATION = os.environ.get(
+    "GRM_GOOGLE_SITE_VERIFICATION", "pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4").strip()
 NAVER_SITE_VERIFICATION = os.environ.get("GRM_NAVER_SITE_VERIFICATION", "").strip()
 
 # 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.

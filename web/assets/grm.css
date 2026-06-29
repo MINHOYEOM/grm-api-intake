@@ -346,7 +346,7 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   body{font-size:16px}
   .hero h1{font-size:42px}
   .hero-grid,.lead,.showcase,.foot{grid-template-columns:1fr;gap:32px}
-  .feats{grid-template-columns:1fr}
+  /* P3-3: feats 는 ≤900 즉시 1단 대신 ≤720 까지 2단 유지(900 경계 동시 붕괴 완화) — 아래 별도 @media. */
   .hero .stats{grid-template-columns:repeat(2,1fr);gap:22px}
   .callout{padding:44px 28px}.callout h2{font-size:30px}
   .page-head h1{font-size:36px}.detail-head h1{font-size:34px}
@@ -375,6 +375,10 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .issue{grid-template-columns:78px 1fr}.issue .stat{display:none}
   .frow{grid-template-columns:1fr;gap:8px}
   .wrap{padding:0 22px}
+}
+/* P3-3 중간 폭 단계화 — feature 그리드는 900 경계서 한꺼번에 무너지지 않고 ≤720 에서 1단으로(640~900 점프 완화). */
+@media(max-width:720px){
+  .feats{grid-template-columns:1fr}
 }
 /* P2-2 좁은 폭(≤640px) 내비 — 브랜드 축약(GRM) + 햄버거 드롭다운. 브랜드+토글+CTA만 한 줄, 링크는 수납.
    ≤900 블록보다 뒤에 와서 .nav nav 의 좁은-폭 드롭다운 규칙이 우선한다. */

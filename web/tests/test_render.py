@@ -791,6 +791,14 @@ class WebSeoMetaTest(unittest.TestCase):
         self.assertEqual(self.landing.count(tag), 1)        # 정확히 1개(중복 없음)
         self.assertIn(tag, self.detail)                      # 전 페이지 공통(<head>)
 
+    def test_naver_verification_live_by_default(self):
+        # main 하드코딩 네이버 토큰을 env 기본값으로 흡수(들여쓰기/중복/누락 회귀 해소)
+        # → 기본 빌드에 단일 라이브 노출. 회전/비활성은 GRM_NAVER_SITE_VERIFICATION 으로.
+        tag = ('<meta name="naver-site-verification" '
+               'content="ed2cf23251d51b4f74ee2b39668e5176aa60de89" />')
+        self.assertEqual(self.landing.count(tag), 1)        # 정확히 1개(중복 없음)
+        self.assertIn(tag, self.detail)                      # 전 페이지 공통(<head>)
+
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────
 def freeze() -> None:

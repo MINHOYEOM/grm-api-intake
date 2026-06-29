@@ -41,6 +41,7 @@ __all__ = [
     "WebRenderHardeningTest",
     "WebSearchIndexTest",
     "WebKoreanSafetyTest",
+    "WebSeoMetaTest",
 ]
 
 
@@ -664,6 +665,23 @@ class WebRenderHardeningTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             render.render_site(data, out)
 
+    def test_verification_meta_conditional(self):
+        # 기본(env 미설정) → 소유권 인증 메타 미출력(골든 불변 보장).
+        h0 = self._render_detail(_minimal_brief("2026-06-01"))
+        self.assertNotIn("google-site-verification", h0)
+        self.assertNotIn("naver-site-verification", h0)
+        # env-param 설정 시에만 <head> 에 토큰 메타 출력(GSC·네이버 등록 관문). 모듈 전역을
+        # 호출 시점에 읽으므로 monkeypatch 가 반영됨 — finally 로 복구해 타 테스트 오염 0.
+        render.GOOGLE_SITE_VERIFICATION = "g-tok-123"
+        render.NAVER_SITE_VERIFICATION = "n-tok-456"
+        try:
+            h1 = self._render_detail(_minimal_brief("2026-06-02"))
+        finally:
+            render.GOOGLE_SITE_VERIFICATION = ""
+            render.NAVER_SITE_VERIFICATION = ""
+        self.assertIn('<meta name="google-site-verification" content="g-tok-123" />', h1)
+        self.assertIn('<meta name="naver-site-verification" content="n-tok-456" />', h1)
+
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────
 class WebKoreanSafetyTest(unittest.TestCase):
@@ -703,6 +721,66 @@ class WebKoreanSafetyTest(unittest.TestCase):
         bad = [name for name, html in self.htmls.items()
                if ("letter-spacing" in html or "text-transform" in html)]
         self.assertEqual(bad, [], f"인라인 자간/대문자 스타일(§4 위반): {bad}")
+
+
+# ── SEO 메타·구조화데이터 (§2/§3 — description·canonical·OG·JSON-LD, 결정론 head) ──
+class WebSeoMetaTest(unittest.TestCase):
+    """검색결과 품질·중복 색인 방지·구조화데이터 의미 단언(byte 안정은 골든이 잠금).
+    소유권 인증 메타 조건부는 WebRenderHardeningTest.test_verification_meta_conditional.
+    한글 메타값의 mono/자간 부재는 WebKoreanSafetyTest 가 전 HTML 스캔으로 함께 보장."""
+
+    BASE = "https://grm-weekly-brief.pages.dev"
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_seo_"))
+        single = cls._tmp / "single"
+        _build_single(single)
+        cls.landing = (single / "index.html").read_text(encoding="utf-8")
+        cls.archive = (single / "archive/index.html").read_text(encoding="utf-8")
+        cls.detail = (single / "briefs/2026-06-26/index.html").read_text(encoding="utf-8")
+        cls.detail22 = (single / "briefs/2026-06-22/index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_description_present_each_page(self):
+        for h in (self.landing, self.archive, self.detail):
+            self.assertIn('<meta name="description" content="', h)
+
+    def test_canonical_trailing_slash_dir_form(self):
+        self.assertIn(f'<link rel="canonical" href="{self.BASE}/" />', self.landing)
+        self.assertIn(f'<link rel="canonical" href="{self.BASE}/archive/" />', self.archive)
+        self.assertIn(f'<link rel="canonical" href="{self.BASE}/briefs/2026-06-26/" />', self.detail)
+
+    def test_open_graph_and_twitter(self):
+        for h in (self.landing, self.archive, self.detail):
+            self.assertIn('<meta property="og:type" content="website" />', h)
+            self.assertIn('<meta property="og:site_name" content="Global Regulatory Monitor" />', h)
+            self.assertIn('<meta property="og:locale" content="ko_KR" />', h)
+            self.assertIn('<meta property="og:title" content="', h)
+            self.assertIn('<meta name="twitter:card" content="summary" />', h)
+        # og:url == canonical(트레일링슬래시형 통일).
+        self.assertIn(f'<meta property="og:url" content="{self.BASE}/archive/" />', self.archive)
+
+    def test_json_ld_landing_only_and_valid(self):
+        import re as _re
+        m = _re.search(r'<script type="application/ld\+json">(.*?)</script>',
+                       self.landing, _re.S)
+        self.assertIsNotNone(m, "랜딩 JSON-LD 부재")
+        data = json.loads(m.group(1))                        # 유효 JSON
+        self.assertEqual([n["@type"] for n in data], ["Organization", "WebSite"])
+        for n in data:
+            self.assertEqual(n["url"], self.BASE)
+        # 상세·아카이브엔 JSON-LD 미출력(랜딩 한정).
+        self.assertNotIn("application/ld+json", self.archive)
+        self.assertNotIn("application/ld+json", self.detail)
+
+    def test_brief_description_tldr_or_dateform(self):
+        # 06-26(tldr 채움) → tldr[0]; 06-22(빈 tldr) → 날짜 파생 한 줄.
+        self.assertIn('content="국내 N-nitroso', self.detail)          # tldr[0]
+        self.assertIn('content="2026년 6월 4주차 ', self.detail22)      # 날짜 파생 폴백
 
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────

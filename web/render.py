@@ -458,6 +458,51 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
     return "\n".join(lines) + "\n"
 
 
+# ── SEO 메타·구조화데이터(description·canonical·OG·JSON-LD — 정적·결정론·한글안전) ──
+# 소유권 인증 토큰(GSC·네이버) — env-param. 미설정(기본 "")이면 메타 미출력(골든 불변).
+# 운영: repo var GRM_GOOGLE_SITE_VERIFICATION·GRM_NAVER_SITE_VERIFICATION 설정 → 재배포
+# → 라이브 <head> 노출 → 콘솔 "확인". (토큰은 공개값이라 하드코딩도 가능하나 env 권장.)
+GOOGLE_SITE_VERIFICATION = os.environ.get("GRM_GOOGLE_SITE_VERIFICATION", "").strip()
+NAVER_SITE_VERIFICATION = os.environ.get("GRM_NAVER_SITE_VERIFICATION", "").strip()
+
+# 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.
+SITE_NAME = "Global Regulatory Monitor"
+SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 신호를 매주 한자리에 모아 "
+                    "기관별 정렬·시사점·점검까지 정리하는 다이제스트.")
+ARCHIVE_DESCRIPTION = ("GRM 주간 브리프 아카이브 — 전 세계 제약 GMP·품질 규제 신호를 "
+                       "호별로 모아 기관·기간으로 검색·필터.")
+
+
+def _abs_url(rel_path: str = "") -> str:
+    """SITE_BASE_URL + 경로 → 절대 canonical(트레일링 슬래시 디렉터리형). 랜딩=베이스/."""
+    return f"{SITE_BASE_URL}/{rel_path}"
+
+
+def _brief_description(brief_meta: dict[str, Any]) -> str:
+    """브리프 description = tldr[0] 있으면 사용, 없으면 날짜 파생 한 줄(결정론)."""
+    tldr = brief_meta.get("tldr") or []
+    if tldr and tldr[0]:
+        return tldr[0]
+    return (f"{title_dateform(brief_meta.get('publish_date', ''))} "
+            "글로벌·국내 제약 GMP·품질 규제 신호 다이제스트.")
+
+
+def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
+    """랜딩 JSON-LD(Organization + WebSite) — 정적·결정론. <script> 임베드 안전 직렬화.
+
+    값은 전부 렌더 보유 정적 카피 + base_url(무변형). '<' 만 \\u003c 로 치환해 </script>
+    조기종료(브레이크아웃)를 원천 차단(데이터엔 '<' 부재 — 방어선). dict 삽입순 보존.
+    """
+    nodes = [
+        {"@context": "https://schema.org", "@type": "Organization",
+         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION},
+        {"@context": "https://schema.org", "@type": "WebSite",
+         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
+         "inLanguage": "ko"},
+    ]
+    return json.dumps(nodes, ensure_ascii=False, indent=1).replace("<", "\\u003c")
+
+
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
 def _make_env() -> Environment:
     return Environment(
@@ -485,6 +530,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 assets_dir: Path = ASSETS_DIR) -> dict[str, Any]:
     """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환."""
     env = _make_env()
+    # 소유권 인증 메타(env-param) — 전 페이지 <head> 공통(미설정 시 미출력). 모듈 전역을
+    # 호출 시점에 읽어 운영 var/테스트 monkeypatch 를 모두 반영(import-time 캡처 회피).
+    env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
+    env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")
@@ -515,6 +564,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         rel_root="",
         nav_active="home",
         latest_slug=latest_slug,
+        description=SITE_DESCRIPTION,
+        canonical=_abs_url(""),
+        json_ld=build_json_ld(),
         cover=_cover_context(latest_brief, latest_issue_no),
     )
     _write(out_dir / "index.html", landing_html)
@@ -531,6 +583,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         rel_root="../",
         nav_active="board",
         latest_slug=latest_slug,
+        description=ARCHIVE_DESCRIPTION,
+        canonical=_abs_url("archive/"),
         issues=issues,
     )
     _write(out_dir / "archive" / "index.html", archive_html)
@@ -558,6 +612,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             rel_root="../../",
             nav_active="detail",
             latest_slug=latest_slug,
+            description=_brief_description(b["brief"]),
+            canonical=_abs_url(f"briefs/{pub}/"),
             brief=ctx,
             sections=sections,
         )

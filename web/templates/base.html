@@ -16,7 +16,7 @@
   <a class="brand" href="{{ rel_root }}index.html"><b>Global Regulatory Monitor</b></a>
   <nav><a href="{{ rel_root }}index.html"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
   <span class="sp"></span>
-  <button class="btn" type="button">로그인</button>
+  {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
   <a class="btn coral" href="{{ rel_root }}archive/index.html">구독하기</a>
 </div></header>
 

@@ -652,7 +652,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         landing = (out / "index.html").read_text(encoding="utf-8")
         self.assertIn("수집 99건", landing)
         self.assertIn("카드 88장", landing)
-        self.assertIn("Evidence A 7 / B 5", landing)
+        self.assertIn("Evidence A 7 · B 5", landing)   # §1-6 표기 일관성: '/' → '·'
         self.assertIn("2026년 6월 5주차", landing)   # 06-29 → (29-1)//7+1 = 5
         self.assertNotIn("수집 36건", landing)         # 옛 정적 수치 잔존 금지
 

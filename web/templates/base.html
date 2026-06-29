@@ -3,13 +3,37 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% if google_site_verification %}
+<meta name="google-site-verification" content="{{ google_site_verification }}" />
+{% endif %}
+{% if naver_site_verification %}
+<meta name="naver-site-verification" content="{{ naver_site_verification }}" />
+{% endif %}
 <title>{{ page_title }}</title>
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if canonical %}
+<link rel="canonical" href="{{ canonical }}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Global Regulatory Monitor" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="{{ page_title }}" />
+{% if description %}
+<meta property="og:description" content="{{ description }}" />
+{% endif %}
+<meta property="og:url" content="{{ canonical }}" />
+<meta name="twitter:card" content="summary" />
+{% endif %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="{{ rel_root }}assets/grm.css">
+{% if json_ld %}
+<script type="application/ld+json">{{ json_ld | safe }}</script>
+{% endif %}
 </head>
 <body>
 {# P0-4: '소개' = 홈의 WHY 섹션(#why). 홈에선 순수 프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}

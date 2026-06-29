@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 from pathlib import Path
 from typing import Any
@@ -417,6 +418,46 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
     }
 
 
+# ── 검색 노출(robots.txt + sitemap.xml — 정적·결정론·입력 publish_date 파생) ────
+# 사이트 베이스 URL(+env override) — 향후 커스텀 도메인은 이 한 줄/환경변수만 교체.
+SITE_BASE_URL = os.environ.get(
+    "GRM_SITE_BASE_URL", "https://grm-weekly-brief.pages.dev").rstrip("/")
+
+
+def build_robots_txt(base_url: str = SITE_BASE_URL) -> str:
+    """robots.txt — 전체 허용 + sitemap 포인터. 입력 무관 정적(결정론)."""
+    return (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "\n"
+        f"Sitemap: {base_url}/sitemap.xml\n"
+    )
+
+
+def build_sitemap_xml(briefs: list[dict[str, Any]],
+                      base_url: str = SITE_BASE_URL) -> str:
+    """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
+    (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
+    아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
+
+    URL·날짜는 전부 ASCII(http(s)·YYYY-MM-DD)라 XML 메타문자 부재 — 무변형 결합.
+    """
+    pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
+                  reverse=True)
+    latest_pub = pubs[0] if pubs else ""
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        f"  <url><loc>{base_url}/</loc><lastmod>{latest_pub}</lastmod></url>",
+        f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
+    ]
+    for pub in pubs:
+        lines.append(
+            f"  <url><loc>{base_url}/briefs/{pub}/</loc><lastmod>{pub}</lastmod></url>")
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
+
+
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
 def _make_env() -> Environment:
     return Environment(
@@ -522,6 +563,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         _write(out_dir / "briefs" / pub / "index.html", html)
         written.append(f"briefs/{pub}/index.html")
+
+    # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
+    _write(out_dir / "robots.txt", build_robots_txt())
+    written.append("robots.txt")
+    _write(out_dir / "sitemap.xml", build_sitemap_xml(briefs))
+    written.append("sitemap.xml")
 
     return {"out_dir": str(out_dir), "written": written,
             "briefs": len(briefs), "latest": latest_slug}

@@ -154,7 +154,10 @@
             })
           ).size
         : DATA.issues.length;
-      countEl.innerHTML = "호 <b>" + shown + "</b>개";
+      // P1-3: 필터 적용 시 일치 카드 총수를 함께 노출(호 수만으론 'EMA 2건' 같은 결과량이 안 보임).
+      countEl.innerHTML = filtered
+        ? "카드 <b>" + matched.length + "</b>건 · 호 " + shown + "개"
+        : "호 <b>" + shown + "</b>개";
     }
     document.getElementById("clearall").classList.toggle("on", !!filtered);
 

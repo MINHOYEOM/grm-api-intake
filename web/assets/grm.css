@@ -42,6 +42,7 @@ button{font-family:inherit;cursor:pointer}
 @media(prefers-reduced-motion:reduce){
   .reveal,.issue,.cresult{animation:none!important;opacity:1!important;transform:none!important}
   html{scroll-behavior:auto}
+  .toc{transition:none}              /* P1-2: 모바일 시트 슬라이드 제거(즉시 이동) */
 }
 
 /* nav — 풀네임 세리프 브랜드(로고 마크 없음)·고스트/코럴 버튼·스크롤 보더 */
@@ -246,6 +247,8 @@ body.js-search .bar{display:flex}
 .toc a{display:block;color:var(--body);font-size:13px;padding:6px 0 6px 14px;border-left:1px solid var(--line);line-height:1.45;transition:var(--tr)}
 .toc a:hover{color:var(--ink);border-color:var(--coral)}
 .toc a.sec{font-family:var(--serif);font-size:15px;font-weight:500;color:var(--ink);border-left-color:var(--coral);padding-top:16px;margin-top:7px}
+.toc .toc-sub{color:var(--muted-2);font-weight:400}  /* P1-1 동명 카드 구분자 — sans·자간0(한글 가능) */
+.toc-fab,.toc-backdrop,.toc .toc-close{display:none}  /* P1-2 모바일 전용 점프 내비 — 데스크톱 숨김 */
 .sec-h{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.012em;color:var(--ink);margin:16px 0 2px;padding-top:20px;
   display:flex;align-items:baseline;gap:12px;border-top:1px solid var(--line);scroll-margin-top:88px}
 .sec-h .n{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:500;letter-spacing:0}  /* "N장" 한글 — 자간0(상속 음수 자간 차단) */
@@ -328,7 +331,28 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .hero .stats{grid-template-columns:repeat(2,1fr);gap:22px}
   .callout{padding:44px 28px}.callout h2{font-size:30px}
   .page-head h1{font-size:36px}.detail-head h1{font-size:34px}
-  .layout{grid-template-columns:1fr}.toc{display:none}
+  .layout{grid-template-columns:1fr}
+  /* P1-2: 데스크톱 사이드바 목차 → 모바일 바텀시트(+FAB). 화면 밖 대기, .open 시 슬라이드업. */
+  .toc{display:block;position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;margin:0;max-height:74vh;overflow-y:auto;
+    background:var(--canvas);border-top:1px solid var(--line-2);border-radius:16px 16px 0 0;box-shadow:0 -18px 44px -22px rgba(26,24,21,.42);
+    padding:16px 22px calc(20px + env(safe-area-inset-bottom));transform:translateY(110%);visibility:hidden;transition:transform .3s var(--ease),visibility .3s}
+  .toc.open{transform:translateY(0);visibility:visible}
+  .toc .l{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .toc .toc-close{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-8px -8px -8px auto;border:0;background:transparent;color:var(--muted);font-size:20px}
+  .toc-backdrop{position:fixed;inset:0;z-index:59;background:rgba(26,24,21,.42);border:0}
+  .toc-backdrop.open{display:block}
+  .toc-fab{display:inline-flex;align-items:center;gap:8px;position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:58;
+    min-height:48px;padding:0 22px;background:var(--ink);color:var(--canvas);border:0;border-radius:var(--pill);font-size:14px;font-weight:600;box-shadow:var(--shadow)}
+  .toc-fab i{font-size:18px}
+  /* P1-4: 모바일 터치 타깃 ≥44px(시각 크기 유지·히트 영역 확대) */
+  .toc a{min-height:44px;padding:10px 8px 10px 14px}
+  /* 내비 링크: 좁은 폭에서 줄바꿈으로 124px 까지 늘어나던 것을 단일 줄·44px 로 정리(터치 타깃).
+     ※ 브랜드 풀네임이 ≤~500px 에서 줄바꿈되는 건 별개의 기존 반응형 이슈(P2). */
+  .nav nav{align-items:center}
+  .nav nav a{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;padding-top:10px;padding-bottom:10px}
+  .chip{min-height:44px;display:inline-flex;align-items:center}
+  .toggle button{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .bk{min-height:44px}
   .issue{grid-template-columns:78px 1fr}.issue .stat{display:none}
   .frow{grid-template-columns:1fr;gap:8px}
   .wrap{padding:0 22px}

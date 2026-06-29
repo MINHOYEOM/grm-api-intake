@@ -20,11 +20,11 @@
     {%- endif %}
   </div>
   <div class="wrap layout">
-    <aside class="toc"><div class="l">목차</div><div>
+    <aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>
       {%- for section in sections %}
       <a class="sec" href="#sec-{{ section.slug }}">{{ section.name }}</a>
       {%- for card in section.cards %}
-      <a href="#{{ card.anchor }}">{{ card.headline_target }}</a>
+      <a href="#{{ card.anchor }}">{{ card.headline_target }}{% if card.toc_distinguisher %} <span class="toc-sub">· {{ card.toc_distinguisher }}</span>{% endif %}</a>
       {%- endfor %}
       {%- endfor %}
     </div></aside>
@@ -45,5 +45,20 @@
       {%- endif %}
     </div>
   </div>
+  <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>목차</button>
+  <div class="toc-backdrop" id="tocBackdrop"></div>
 </main>
 {% endblock %}
+{% block scripts %}<script>
+/* P1-2: 모바일 목차 점프 내비(≤900px) — FAB 탭 → 바텀시트. 데스크톱 미사용. 슬라이드는 reduced-motion 시 CSS 가 제거. */
+(function(){
+  var fab=document.getElementById('tocFab'),toc=document.getElementById('toc'),bd=document.getElementById('tocBackdrop');
+  if(!fab||!toc||!bd)return;
+  function set(o){toc.classList.toggle('open',o);bd.classList.toggle('open',o);fab.setAttribute('aria-expanded',o?'true':'false');}
+  fab.addEventListener('click',function(){set(!toc.classList.contains('open'));});
+  bd.addEventListener('click',function(){set(false);});
+  toc.addEventListener('click',function(e){if(e.target.closest('a'))set(false);});
+  var x=toc.querySelector('.toc-close');if(x)x.addEventListener('click',function(){set(false);});
+  addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
+})();
+</script>{% endblock %}

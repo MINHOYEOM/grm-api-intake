@@ -145,6 +145,7 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "agency": card.get("agency", ""),
         "headline_target": card.get("headline_target", ""),
         "title_issue": card.get("title_issue", ""),
+        "toc_distinguisher": "",            # P1-1: 동명 카드 목차 구분자(annotate 단계서 채움)
         "evidence_level": card.get("evidence_level", ""),
         "signal_label": card.get("signal_label", ""),
         "signal_tier": card.get("signal_tier", ""),
@@ -167,6 +168,22 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "checks": card.get("checks") or [],
         "sources": sources,
     }
+
+
+def _annotate_toc_distinguishers(card_views: list[dict[str, Any]]) -> None:
+    """동일 headline_target 이 2장 이상이면 목차 라벨이 중복으로 보이므로(P1-1),
+    그 카드들에 한해 구분자를 단다 — title_issue 우선, 없으면 anchor(=문서번호).
+
+    목차 표시 전용(브리프 단위로 산출). 카드 본문·딥링크 앵커(anchor)는 불변 —
+    값을 새로 만들지 않고 기존 카드값(title_issue/anchor)만 라벨에 덧붙인다(무변형).
+    """
+    counts: dict[str, int] = {}
+    for cv in card_views:
+        t = cv.get("headline_target", "")
+        counts[t] = counts.get(t, 0) + 1
+    for cv in card_views:
+        if counts.get(cv.get("headline_target", ""), 0) > 1:
+            cv["toc_distinguisher"] = cv.get("title_issue") or cv.get("anchor", "")
 
 
 def _is_renderable(card: dict[str, Any]) -> bool:
@@ -608,6 +625,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
         card_views = [_card_view(c) for c in cards_sorted]
+        _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
         sections = _build_sections(card_views)
         ctx = _brief_context(b, issue_no)
         html = brief_tmpl.render(

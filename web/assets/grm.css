@@ -10,7 +10,7 @@
  */
 :root{
   --canvas:#FAF9F5; --soft:#F5F0E8; --card:#EFE9DE; --strong:#E8E0D2;
-  --ink:#141413; --body-s:#252523; --body:#3D3D3A; --muted:#6C6A64; --muted-2:#8E8B82;
+  --ink:#141413; --body-s:#252523; --body:#3D3D3A; --muted:#6C6A64; --muted-2:#6A675F;  /* P2-3 --muted-2 #8E8B82→#6A675F: 라이트(canvas≈5.4·card≈4.7) 보조텍스트 ≥4.5:1(AA). 다크밴드 .foot-legal 은 --band-mut 로 분리. */
   --line:#E6DFD8; --line-2:#DCD3C7;
   --coral:#C2603F; --coral-2:#A14B30; --coral-tint:#F4E7DF; --on-coral:#FAF9F5;
   --band:#1A1815; --band-2:#262320; --band-soft:#211F1B; --band-ink:#FAF9F5; --band-mut:#A8A299; --band-line:rgba(255,255,255,.11);
@@ -33,7 +33,10 @@ a{color:inherit;text-decoration:none;transition:color var(--tr)}
 button{font-family:inherit;cursor:pointer}
 .hidden{display:none!important}
 /* eyebrow/kicker — 영문 전용(한글 금지). mono-대문자-자간은 여기만. */
-.kick{font-size:12px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
+.kick{font-size:12px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--coral-2)}  /* P2-3 12px 라벨 ≥4.5:1 */
+/* P2-5 디스플레이 헤딩 — 숫자 라이닝 일관화("11" 올드스타일 튐 방지) + 줄균형(제목 끝 한두 글자 고아 방지).
+   text-wrap:balance 는 미지원 브라우저서 무시(graceful)·디자인 동결 폰트/크기 불변. */
+.hero h1,.lead h2,.sec-title,.showcase .copy h2,.callout h2,.page-head h1,.detail-head h1,.hero .stats b,.c-title{font-variant-numeric:lining-nums;text-wrap:balance}
 
 /* motion — 진입 페이드업·결과행 등장. reduce 존중. */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -57,6 +60,11 @@ button{font-family:inherit;cursor:pointer}
 .nav nav a:hover{color:var(--ink)}
 .nav nav a.on{color:var(--ink)}
 .sp{flex:1}
+/* P2-2 좁은 폭 내비(햄버거) — 기본(데스크톱) 숨김. 브랜드 축약/토글은 ≤640px 에서만(파일 끝 미디어쿼리). */
+.brand-abbr,.navtoggle{display:none}
+.navtoggle{width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--line-2);background:transparent;color:var(--ink);border-radius:var(--rad-s);transition:var(--tr)}
+.navtoggle:hover{border-color:var(--ink)}
+.navtoggle i{font-size:20px}
 .btn{border:1px solid var(--line-2);background:transparent;color:var(--ink);padding:10px 18px;border-radius:var(--rad-s);
   font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:var(--tr)}
 .btn:hover{border-color:var(--ink)}
@@ -82,7 +90,7 @@ button{font-family:inherit;cursor:pointer}
 .hero .btns{display:flex;gap:11px;flex-wrap:wrap}
 .hero .stats{display:grid;grid-template-columns:repeat(4,auto);gap:36px;margin-top:46px;border-top:1px solid var(--line);padding-top:26px;width:fit-content}
 .hero .stats b{font-family:var(--serif);font-size:30px;font-weight:500;display:block;line-height:1;color:var(--ink);letter-spacing:-.01em}
-.hero .stats span{color:var(--muted);font-size:12.5px;margin-top:7px;display:block}
+.hero .stats span{color:var(--muted);font-size:13px;margin-top:7px;display:block}  /* P2-4 12.5→13 */
 
 /* dark issue card(제품 크롬) — 히어로 우측. 프로토타입 .issue → .issuecard 로 명명
    (아카이브 .issue 행과 클래스 충돌 회피). */
@@ -127,7 +135,7 @@ button{font-family:inherit;cursor:pointer}
 .feat .ic{width:40px;height:40px;display:grid;place-items:center;color:var(--coral);font-size:23px;margin-bottom:18px}
 .feat .no{font-family:var(--mono);font-size:11px;color:var(--muted-2);float:right}
 .feat h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
-.feat p{color:var(--body);font-size:14.5px;margin-top:9px;line-height:1.55}
+.feat p{color:var(--body);font-size:15px;margin-top:9px;line-height:1.55}  /* P2-4 14.5→15 */
 
 /* card anatomy showcase */
 .showcase{display:grid;grid-template-columns:.9fr 1.1fr;gap:54px;align-items:center;margin-top:46px}
@@ -188,7 +196,7 @@ body.js-search .bar{display:flex}
 .bar .right{display:flex;align-items:center;gap:18px}
 .count{color:var(--muted);font-size:13.5px}
 .count b{color:var(--ink);font-weight:600}
-.clearall{border:0;background:transparent;color:var(--coral);font-size:13.5px;font-weight:600;display:none}
+.clearall{border:0;background:transparent;color:var(--coral-2);font-size:13.5px;font-weight:600;display:none}
 .clearall.on{display:inline-flex;align-items:center;gap:5px}
 
 /* 이슈 행(주간 호 뷰) */
@@ -207,7 +215,7 @@ body.js-search .bar{display:flex}
 .tag{font-size:12px;font-weight:500;color:var(--body);border:1px solid var(--line-2);padding:3px 10px;border-radius:6px}
 .tag.date{font-family:var(--mono);font-size:11px;color:var(--body-s)}
 .tag.hit{background:var(--coral);border-color:transparent;color:#fff;font-weight:600}
-.latest .badge{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--coral);margin-bottom:9px;display:inline-flex;align-items:center;gap:6px}
+.latest .badge{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--coral-2);margin-bottom:9px;display:inline-flex;align-items:center;gap:6px}
 .latest .badge .live{width:6px;height:6px;border-radius:50%;background:var(--coral)}
 
 /* 카드 결과 행(카드 전체 뷰) */
@@ -236,9 +244,9 @@ body.js-search .bar{display:flex}
 .detail-head h1{font-family:var(--serif);font-weight:400;font-size:44px;letter-spacing:-.02em;max-width:24ch;line-height:1.18;color:var(--ink)}
 .cov{display:flex;gap:14px 28px;flex-wrap:wrap;margin-top:26px;color:var(--muted);font-size:13px}
 .cov b{color:var(--ink);font-weight:600}
-.cov b.mono{font-family:var(--mono);font-weight:500;font-size:12.5px}
+.cov b.mono{font-family:var(--mono);font-weight:500;font-size:13px}  /* P2-4 12.5→13(원문/데이터 라인 가독) */
 .tldr{margin-top:30px;border-left:3px solid var(--coral);padding:8px 0 8px 22px}
-.tldr .l{font-size:12px;font-weight:600;color:var(--coral)}  /* "이번 주 핵심" — 한글, 자간0·대문자 없음 */
+.tldr .l{font-size:12px;font-weight:600;color:var(--coral-2)}  /* "이번 주 핵심" — 한글, 자간0·대문자 없음 (P2-3 대비) */
 .tldr ul{margin:14px 0 0;padding-left:0;list-style:none}
 .tldr li{margin:10px 0;font-size:17.5px;font-family:var(--serif);color:var(--ink);line-height:1.5;font-weight:400;letter-spacing:-.01em}
 .layout{display:grid;grid-template-columns:230px 1fr;gap:52px;padding:38px 0 90px;align-items:start}
@@ -317,12 +325,21 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
 .foot .b1 b{font-family:var(--serif);font-size:21px;color:#fff;font-weight:600;display:block;letter-spacing:-.005em}
 .foot .b1 p{font-size:13.5px;margin-top:16px;max-width:34ch;line-height:1.6;color:var(--band-mut)}
 .foot h5{font-size:13px;font-weight:600;color:#fff;opacity:.78;margin-bottom:15px}  /* 한글 헤딩 — 자간0·대문자없음 */
-.foot a,.foot span{display:block;color:var(--band-mut);font-size:13.5px;padding:5px 0;cursor:pointer}
+.foot a,.foot span{display:block;color:var(--band-mut);font-size:13.5px;padding:5px 0}
+.foot a{cursor:pointer}  /* P2-6 링크만 포인터 — 라벨(span)은 기본 커서로 비링크 명확화(데드링크 오인 방지) */
 .foot a:hover{color:#fff}
 .foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;justify-content:space-between;
-  gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted-2)}
+  gap:16px;flex-wrap:wrap;font-size:12px;color:var(--band-mut)}  /* P2-3 다크밴드 — --muted-2 darken 영향 분리, --band-mut(라이트 그레이) 사용 */
 .foot-legal .mono{font-size:11px}
 
+/* P2-1 중간 폭 분기점 — 900px 단일 붕괴 완화(태블릿~좁은 데스크톱 점진 축소).
+   900px 블록이 뒤에 와서 ≤900 에선 이 규칙들을 다시 1단으로 덮는다(소스 순서 의존). */
+@media(max-width:1024px){
+  .hero h1{font-size:52px}
+  .hero-grid{gap:40px}
+  .feats{grid-template-columns:repeat(2,1fr)}
+  .foot{grid-template-columns:1fr 1fr}
+}
 @media(max-width:900px){
   body{font-size:16px}
   .hero h1{font-size:42px}
@@ -356,4 +373,17 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .issue{grid-template-columns:78px 1fr}.issue .stat{display:none}
   .frow{grid-template-columns:1fr;gap:8px}
   .wrap{padding:0 22px}
+}
+/* P2-2 좁은 폭(≤640px) 내비 — 브랜드 축약(GRM) + 햄버거 드롭다운. 브랜드+토글+CTA만 한 줄, 링크는 수납.
+   ≤900 블록보다 뒤에 와서 .nav nav 의 좁은-폭 드롭다운 규칙이 우선한다. */
+@media(max-width:640px){
+  .brand-full{display:none}
+  .brand-abbr{display:inline}
+  .navtoggle{display:inline-flex}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;flex-direction:column;align-items:stretch;
+    gap:2px;margin:0;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);
+    box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
 }

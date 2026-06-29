@@ -24,9 +24,10 @@
 </head>
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html"><b>Global Regulatory Monitor</b></a>
-  <nav><a href="../../index.html#why">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../briefs/2026-06-26/index.html" class="on">최신호</a></nav>
+  <a class="brand" href="../../index.html"><b class="brand-full">Global Regulatory Monitor</b><b class="brand-abbr">GRM</b></a>
+  <nav id="navmenu"><a href="../../index.html#why">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../briefs/2026-06-26/index.html" class="on">최신호</a></nav>
   <span class="sp"></span>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../../briefs/2026-06-26/index.html">최신 브리프</a>
 </div></header>
 
@@ -179,6 +180,12 @@
 // 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
 const _nav=document.getElementById('nav');
 addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
 </script>
 <script>
 /* P1-2: 모바일 목차 점프 내비(≤900px) — FAB 탭 → 바텀시트. 데스크톱 미사용. 슬라이드는 reduced-motion 시 CSS 가 제거. */

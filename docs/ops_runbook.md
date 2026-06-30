@@ -77,5 +77,6 @@ handoff 조회는 `Run Date 7일 + Status=New` 필터라 직접 영향은 작지
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-30 | Brevo 뉴스레터 설정 완료 — NEWSLETTER_API_KEY Secret 등록, 변수 4개(GRM_NEWSLETTER_*) 등록 |
 | 2026-06-18 | KR-egress 잔여 QA 3종 운영 항목 추가 — `MFDS_HTTP_PROXY`, `LAW_GO_KR_OC`, `probe_mfds_egress.py`, `MFDS_RSS_BOARD_MODE=residual` 점검 경로 |
 | 2026-06-04 | 최초 작성 — Secrets 인벤토리·로테이션, 주간 점검, 장애 분기, Intake 아카이브 정책(180일), 인수인계 체크리스트 |

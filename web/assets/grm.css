@@ -156,6 +156,57 @@ button{font-family:inherit;cursor:pointer}
 .feat h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
 .feat p{color:var(--body);font-size:15px;margin-top:9px;line-height:1.55}  /* P2-4 14.5→15 */
 
+/* What-it-does hover 미리보기 — feat:hover(데스크톱) 시 설명 아래로 max-height+opacity 펼침(≈.28s).
+   터치(hover:none)에선 상시 노출. 토큰 재사용·한글 안전(§4: ASCII 라벨만 mono, 한글은 sans·자간0).
+   배경은 카드 hover 색(--strong) 위에 올라가므로 칩/블록은 --canvas/--coral-tint 로 대비 확보. */
+.feat{position:relative}
+.feat-prev{max-height:0;opacity:0;overflow:hidden;margin-top:0;
+  transition:max-height .28s var(--ease),opacity .28s var(--ease),margin-top .28s var(--ease)}
+.feat:hover .feat-prev,.feat:focus-within .feat-prev{max-height:150px;opacity:1;margin-top:14px}
+.feat-prev-in{border-top:1px dashed var(--line-2);padding-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* 01 소스 칩(ASCII → mono 허용) */
+.fchip{font-size:11px;font-weight:500;color:var(--body-s);background:var(--canvas);
+  border:1px solid var(--line-2);border-radius:6px;padding:3px 9px}
+/* 02 사실=중립 / 시사점=accent 2색 블록 */
+.fblock{font-size:12px;font-weight:600;border-radius:6px;padding:5px 11px;display:inline-flex;gap:6px;align-items:center}
+.fblock .en{font-family:var(--mono);font-weight:500;font-size:10.5px;opacity:.72}
+.fblock.fact{background:var(--canvas);color:var(--body-s);border:1px solid var(--line-2)}
+.fblock.insight{background:var(--coral-tint);color:var(--coral-2)}
+/* 03 출처·공식페이지 링크 칩(.src a 어휘 재사용) */
+.flink{font-size:12px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);
+  border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center}
+.flink i{font-size:14px;color:var(--coral)}
+/* 05 EN→KO 2줄 대조 */
+.feat-trans{flex-direction:column;align-items:stretch;gap:6px}
+.t-en{font-family:var(--serif);font-size:13.5px;color:var(--ink);line-height:1.45;border-left:2px solid var(--coral);padding-left:11px}
+.t-ko{font-size:12.5px;color:var(--body);padding-left:13px}
+/* 06 체크리스트 2줄(.chk li 체크표식 재사용) */
+.feat-checks{flex-direction:column;align-items:stretch;gap:7px}
+.fcheck{font-size:13px;color:var(--body-s);padding-left:22px;position:relative;line-height:1.4}
+.fcheck::before{content:'\2713';position:absolute;left:0;top:0;color:var(--ink);font-weight:700;font-size:12px}
+/* 04 신뢰도·신호 뱃지 — 점/막대 인코딩 + hover/focus 캡션 툴팁(overflow:hidden 안에서 클리핑 없이 표시) */
+.feat-grades{position:relative;align-items:flex-start;padding-bottom:46px}
+.grade{font-size:11px;font-weight:600;border-radius:6px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px;cursor:help}
+.grade .enc{display:inline-flex;align-items:center;gap:3px}
+.grade.ev{background:var(--coral-tint);color:var(--coral-2)}            /* 신뢰도 A = accent(coral) 계열 */
+.grade.ev .dot{width:7px;height:7px;border-radius:50%;background:var(--coral)}
+.grade.ev .dot.off{background:transparent;box-shadow:inset 0 0 0 1.5px var(--coral);opacity:.5}
+.grade.sig{background:var(--canvas);border:1px solid var(--line-2);color:var(--body)}  /* 신호 강도 = --hi(고강도) 막대 */
+.grade.sig .bar{width:4px;border-radius:1px;background:var(--hi)}
+.grade.sig .bar.b1{height:7px}.grade.sig .bar.b2{height:10px}.grade.sig .bar.b3{height:13px}
+.grade:focus-visible{outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--coral)}
+.grade-tip{position:absolute;left:0;right:0;bottom:0;font-size:11.5px;line-height:1.5;color:var(--body);
+  background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:7px 10px;
+  box-shadow:var(--shadow);opacity:0;visibility:hidden;transition:opacity .18s var(--ease),visibility .18s}
+.grade-tip b{color:var(--ink);font-weight:600}
+.grade-tip .dim{color:var(--muted-2)}
+.grade.ev:hover ~ .grade-tip.t-ev,.grade.ev:focus ~ .grade-tip.t-ev,
+.grade.sig:hover ~ .grade-tip.t-sig,.grade.sig:focus ~ .grade-tip.t-sig{opacity:1;visibility:visible}
+/* 터치 기기 — hover 불가 → 미리보기 상시 노출(뱃지·인코딩·aria-label 로 의미 전달, 캡션 툴팁은 비노출) */
+@media(hover:none){.feat-prev{max-height:none;opacity:1;margin-top:14px}}
+/* 모션 최소화 — 펼침/페이드 즉시 토글 */
+@media(prefers-reduced-motion:reduce){.feat-prev,.grade-tip{transition:none}}
+
 /* card anatomy showcase */
 .showcase{display:grid;grid-template-columns:.95fr 1.05fr;gap:54px;align-items:center;margin-top:46px}  /* §3-1 좌측 텍스트 소폭 확대(.9→.95fr) — 세로 늘어짐 완화 */
 .showcase .copy h2{font-family:var(--serif);font-weight:400;font-size:38px;letter-spacing:-.018em;color:var(--ink);line-height:1.16;margin-top:14px}

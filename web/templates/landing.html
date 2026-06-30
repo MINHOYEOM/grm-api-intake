@@ -60,13 +60,28 @@
 
   <section class="section soft"><div class="wrap">
     <span class="kick">What it does</span><h2 class="sec-title">데이터 수집에서 점검 항목까지.</h2>
+    {#- 각 카드는 hover(데스크톱) 시 설명 아래 미니 미리보기가 펼쳐짐. 미리보기는 카드 카피의
+        시각 예시일 뿐이라 1·2·3·5·6 은 aria-hidden(장식). 04 의 등급 뱃지만 의미 정보를
+        담아 aria-label/title 로 노출(점·막대 인코딩 + hover/focus 캡션 툴팁). 터치(hover:none)
+        에선 미리보기 상시 노출(CSS). 순수 CSS — JS 없음. -#}
     <div class="feats">
-      <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>글로벌 소스 자동 수집</h3><p>FDA 경고장·483, OpenFDA(공개 데이터)·회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada 등 국내외 핵심 규제 소식을 매일 자동으로 수집합니다.</p></div>
-      <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>사실과 해석의 분리</h3><p>객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.</p></div>
-      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-link"></i></div><h3>원문·출처 직접 연결</h3><p>모든 카드에 정보 출처와 공식 원문 링크를 함께 제공하여, 요약본에서 1차 자료(Raw Data)까지 막힘없이 접근할 수 있습니다.</p></div>
-      <div class="feat"><span class="no">04</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p></div>
-      <div class="feat"><span class="no">05</span><div class="ic"><i class="ti ti-language"></i></div><h3>원문 대비 한국어 번역</h3><p>영문 핵심 문장은 원문 인용과 한국어 번역을 나란히 매칭하여 가독성과 대조 편의성을 높였습니다.</p></div>
-      <div class="feat"><span class="no">06</span><div class="ic"><i class="ti ti-checklist"></i></div><h3>실무 맞춤형 점검 리스트</h3><p>각 이슈마다 담당 실무자가 현장에서 즉시 활용할 수 있는 실행 체크리스트를 제공합니다.</p></div>
+      <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>글로벌 소스 자동 수집</h3><p>FDA 경고장·483, OpenFDA(공개 데이터)·회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada 등 국내외 핵심 규제 소식을 매일 자동으로 수집합니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-chips" aria-hidden="true"><span class="fchip mono">FDA 483</span><span class="fchip mono">EMA</span><span class="fchip mono">MFDS</span><span class="fchip mono">PIC/S</span><span class="fchip mono">ICH</span></div></div></div>
+      <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>사실과 해석의 분리</h3><p>객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">사실 <span class="en">Fact</span></span><span class="fblock insight">시사점 <span class="en">Insight</span></span></div></div></div>
+      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-link"></i></div><h3>원문·출처 직접 연결</h3><p>모든 카드에 정보 출처와 공식 원문 링크를 함께 제공하여, 요약본에서 1차 자료(Raw Data)까지 막힘없이 접근할 수 있습니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-links" aria-hidden="true"><span class="flink"><i class="ti ti-database"></i>정보출처</span><span class="flink"><i class="ti ti-file-text"></i>공식 페이지</span></div></div></div>
+      <div class="feat"><span class="no">04</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-grades">
+          <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=2차 보도, C=추정·미확인)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 2차 보도, C는 추정·미확인."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
+          <span class="grade sig" tabindex="0" title="신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)" aria-label="신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
+          <span class="grade-tip t-ev" aria-hidden="true"><b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=2차 보도, C=추정·미확인.</span></span>
+          <span class="grade-tip t-sig" aria-hidden="true"><b>신호 T3 (최상)</b> — 업무 영향도 높음, 즉시 점검 권장. <span class="dim">T2=중간, T1=참고.</span></span>
+        </div></div></div>
+      <div class="feat"><span class="no">05</span><div class="ic"><i class="ti ti-language"></i></div><h3>원문 대비 한국어 번역</h3><p>영문 핵심 문장은 원문 인용과 한국어 번역을 나란히 매칭하여 가독성과 대조 편의성을 높였습니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-trans" aria-hidden="true"><span class="t-en">“Data integrity deficiencies were observed.”</span><span class="t-ko">데이터 완전성 미비가 관찰되었다.</span></div></div></div>
+      <div class="feat"><span class="no">06</span><div class="ic"><i class="ti ti-checklist"></i></div><h3>실무 맞춤형 점검 리스트</h3><p>각 이슈마다 담당 실무자가 현장에서 즉시 활용할 수 있는 실행 체크리스트를 제공합니다.</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-checks" aria-hidden="true"><span class="fcheck">제조관리기준서 준수 여부 자가 점검</span><span class="fcheck">원료 칭량 기록과 실제 작업 일치 확인</span></div></div></div>
     </div>
   </div></section>
 

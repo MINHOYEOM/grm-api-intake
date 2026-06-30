@@ -35,6 +35,7 @@
 2. Weekly Brief 발행물에 대해 `GRM_Brief_Lint_실행프롬프트.md` 실행 (발행 후 독립 게이트).
 3. Intake DB 를 `Run Date (KST)` 내림차순으로 열어 최신 row 가 오늘/어제인지 확인.
 4. M2 메타에 "Status 갱신 실패" 또는 "주간 재유입 가드" 기록이 있으면 해당 doc_id 의 Status 를 수동 정리.
+5. **뉴스레터 발송** = 월 14:00 KST(05:00 UTC) `GRM Newsletter Send` 자동 트리거 + 승인 게이트 1클릭. Actions 알림이 오면 **Review deployments → Approve**(거부 시 미발송). 새 호가 없으면(이미 발송) 승인 요청 없이 클린 skip — 정상. 최초 운영 전 Settings→Environments 의 `newsletter-send` 에 reviewer(본인) 등록 확인(미등록 시 무인 발송).
 
 ## 3. 장애 대응 빠른 분기
 

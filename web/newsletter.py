@@ -366,9 +366,50 @@ def load_issue(data_dir: Path, publish_date: str) -> tuple[dict[str, Any], int]:
     return match[0], issue_no_by_date[publish_date]
 
 
+def resolve_latest_publish_date(data_dir: Path) -> str:
+    """data_dir 내 발행 브리프 중 가장 최근 publish_date(ISO `YYYY-MM-DD` 문자열의 사전식
+    max = 시간순 max). 스케줄 트리거가 '최신 호'를 결정론으로 고르는 진입점(하드코딩 금지)."""
+    briefs = render.load_briefs(data_dir)
+    dates = sorted(b["brief"].get("publish_date", "") for b in briefs
+                   if _DATE_RE.match(b["brief"].get("publish_date", "") or ""))
+    if not dates:
+        raise SystemExit(f"발행 브리프 없음: {data_dir} — 최신 발행일 결정 불가")
+    return dates[-1]
+
+
+def decide_should_send(sender: "NewsletterSender", publish_date: str,
+                       issue_no: int) -> "tuple[bool, str]":
+    """멱등(③) 결정 — 이 호를 지금 보내야 하나? `sender` 로 발송 기록(캠페인명)을 조회한다.
+    이미 발송/예약된 호면 (False, 사유), 신규·미발송 draft 면 (True, 사유).
+
+    발송 워크플로의 사전점검(precheck)이 이 결과로 send 잡 게이트를 연다 — **보낼 게 없으면
+    send 잡(=사람 승인 요청)에 아예 도달하지 않는다**(스케줄 무해성: 새 호 없으면 조용히 skip).
+    `main`(mode=send) 의 인라인 멱등과 같은 판정 규칙(`_DISPATCHED_STATUSES`)을 공유한다."""
+    name = idempotency_campaign_name(publish_date, issue_no)
+    existing = sender.find_campaign(name)
+    if existing and existing.get("status", "").lower() in _DISPATCHED_STATUSES:
+        return False, (f"이미 발송/예약(status={existing.get('status')}) — 캠페인 "
+                       f"{existing['id']}({name}). 재발송 0.")
+    if existing:
+        return True, f"이전 미발송 draft(status={existing.get('status')}) 재사용 예정 — {name}"
+    return True, f"신규 호 — 발송 필요: {name}"
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
+
+
+def _emit_should_send(value: bool, reason: str) -> None:
+    """precheck(③) 결정을 사람 로그 + GitHub Actions step output(`should_send`)으로 방출.
+    `GITHUB_OUTPUT` 미설정(로컬·테스트)이면 stdout 만 — 순수 판정은 `decide_should_send` 담당.
+    워크플로는 이 `should_send` 로 send 잡(사람 승인 게이트)에 도달할지 결정한다."""
+    val = "true" if value else "false"
+    print(f"멱등 사전점검: should_send={val} — {reason}")
+    out_path = os.environ.get("GITHUB_OUTPUT")
+    if out_path:
+        with open(out_path, "a", encoding="utf-8") as fh:
+            fh.write(f"should_send={val}\n")
 
 
 def main(argv: "list[str] | None" = None) -> int:
@@ -379,16 +420,40 @@ def main(argv: "list[str] | None" = None) -> int:
             pass
     ap = argparse.ArgumentParser(
         description="GRM 뉴스레터 — 티저 메일 빌드·게이트·발송(Brevo). 수집/배포와 별도(D8).")
-    ap.add_argument("--publish-date", required=True, help="발송할 호의 발행일(YYYY-MM-DD)")
+    ap.add_argument("--publish-date", default=None,
+                    help="발송할 호의 발행일(YYYY-MM-DD). latest-date 모드는 불필요(최신 자동 선택).")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
-    ap.add_argument("--mode", choices=["validate", "test", "send"], default="validate",
-                    help="validate=게이트만(네트워크는 링크체크) · test=테스트발송 · send=실발송")
+    ap.add_argument("--mode", choices=["validate", "test", "send", "latest-date", "precheck"],
+                    default="validate",
+                    help="validate=게이트만(네트워크는 링크체크) · test=테스트발송 · send=실발송 · "
+                         "latest-date=최신 발행일만 출력(스케줄 해석) · "
+                         "precheck=멱등 사전점검(should_send 방출, 발송 0)")
     ap.add_argument("--out", type=Path, default=None, help="렌더된 메일 HTML 저장(D5 사람 검토 아티팩트)")
     ap.add_argument("--no-linkcheck", action="store_true", help="링크체크 게이트 건너뜀(오프라인 검증)")
     args = ap.parse_args(argv)
 
+    # 스케줄 해석 보조 — 최신 발행일만 결정론으로 출력(게이트·로딩·네트워크 0).
+    if args.mode == "latest-date":
+        print(resolve_latest_publish_date(args.data))
+        return 0
+
+    if not args.publish_date:
+        ap.error("--publish-date 필요(latest-date 모드 제외)")
+
     site_base_url = render.SITE_BASE_URL
     brief_obj, issue_no = load_issue(args.data, args.publish_date)
+
+    # 멱등 사전점검(③) — send 경로 전용(발송 0). send 잡(=사람 승인 게이트)에 도달할지만 결정.
+    # 게이트 ①②(구조·provenance·링크체크)는 워크플로의 validate 스텝이 이미 실행(여기선 재실행 X).
+    if args.mode == "precheck":
+        api_key = _env("NEWSLETTER_API_KEY")
+        if not api_key:
+            _emit_should_send(False, "NEWSLETTER_API_KEY 미설정 — 멱등 조회 불가 → 발송 보류(클린 skip)")
+            return 0
+        sender = BrevoSender(api_key)
+        should, reason = decide_should_send(sender, args.publish_date, issue_no)
+        _emit_should_send(should, reason)
+        return 0
 
     report, teaser = run_gates(brief_obj, expected_date=args.publish_date,
                                site_base_url=site_base_url, issue_no=issue_no,

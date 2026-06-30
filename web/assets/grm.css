@@ -85,9 +85,16 @@ button{font-family:inherit;cursor:pointer}
   border-bottom:1px solid var(--line);padding-bottom:16px}
 .hero-top .r{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
 .hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:54px;align-items:center;padding:60px 0 56px}
-.hero h1{font-family:var(--serif);font-weight:400;font-size:62px;line-height:1.08;letter-spacing:-.018em;color:var(--ink);margin:22px 0 0}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:62px;line-height:1.08;letter-spacing:-.018em;color:var(--ink);margin:22px 0 0;word-break:keep-all}
 .hero h1 .c{color:var(--coral)}
-.hero .lede{font-size:18px;color:var(--body);max-width:42ch;margin:26px 0 32px;line-height:1.6}
+.hero .lede{font-size:18px;color:var(--body);max-width:42ch;margin:26px 0 18px;line-height:1.6;word-break:keep-all}
+/* 사실·시사점·점검 — 3핵심요소 태그칩(나열 대신 시각화: 사실=중립 / 시사점=앰버 / 점검=코럴) */
+.lede-tags{display:flex;gap:8px;margin:0 0 30px}
+.tag{display:inline-flex;align-items:center;font-size:12.5px;font-weight:600;line-height:1;
+  padding:7px 13px;border-radius:var(--pill);letter-spacing:0;border:1px solid transparent}
+.tag.fact{background:var(--strong);color:var(--body-s);border-color:var(--line-2)}
+.tag.insight{background:rgba(176,125,23,.13);color:var(--med);border-color:rgba(176,125,23,.28)}
+.tag.check{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
 .hero .btns{display:flex;gap:11px;flex-wrap:wrap}
 .hero .stats{display:grid;grid-template-columns:repeat(4,auto);gap:40px;margin-top:46px;border-top:1px solid var(--line);padding-top:26px;width:fit-content}  /* §3-2 항목 간격 36→40 — 4개 stat 뭉침 완화 */
 .hero .stats b{font-family:var(--serif);font-size:30px;font-weight:500;display:block;line-height:1;color:var(--ink);letter-spacing:-.01em}
@@ -113,19 +120,28 @@ button{font-family:inherit;cursor:pointer}
 .issuecard .ev{display:flex;gap:14px;margin-top:15px;font-size:12px;color:var(--band-mut)}
 .issuecard .ev b{font-family:var(--mono);color:#fff;font-weight:500}
 
-/* sources strip */
+/* sources strip — 연속 마퀴(좌→우 흐름, 끊김 없는 무한 루프) */
 .srcs{margin-top:14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;
-  display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+  display:flex;align-items:center;gap:28px;overflow:hidden}
 .srcs .l{font-size:12px;font-weight:500;color:var(--muted);flex:none}  /* 한글 라벨 — 자간0 */
-.srcs .row{display:flex;gap:26px;flex-wrap:wrap}
-.srcs .row span{font-family:var(--mono);font-size:13.5px;color:var(--body-s);opacity:.8;letter-spacing:.01em}
+/* 뷰포트: 양끝 페이드 마스크로 흘러 들어오고/사라지는 느낌 */
+.srcs .marquee{flex:1;min-width:0;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+/* 트랙: 동일 목록 2벌(span 마다 균일 우측 여백) → -50% 이동이 정확히 한 주기라 이음매 0 */
+.srcs .track{display:flex;width:max-content;will-change:transform;animation:srcMarquee 48s linear infinite}
+.srcs:hover .track{animation-play-state:paused}
+.srcs .track span{font-family:var(--mono);font-size:13.5px;color:var(--body-s);opacity:.8;letter-spacing:.01em;
+  white-space:nowrap;flex:none;margin-right:60px}
+@keyframes srcMarquee{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.srcs .track{animation:none}}
 
 /* sections */
 .section{padding:96px 0;border-top:1px solid var(--line)}
 .section.soft{background:var(--soft)}
 .lead{display:grid;grid-template-columns:.82fr 1.18fr;gap:52px;align-items:start}
 .lead h2{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:-.018em;color:var(--ink);line-height:1.14;margin-top:14px}
-.lead p{font-size:19px;color:var(--body);line-height:1.65}
+.lead p{font-size:19px;color:var(--body);line-height:1.65;word-break:keep-all}
 .lead p .em{color:var(--ink);font-weight:600}
 .sec-title{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:-.018em;color:var(--ink);margin-top:12px;line-height:1.14}
 
@@ -151,7 +167,7 @@ button{font-family:inherit;cursor:pointer}
 .callout{background:var(--coral);color:var(--on-coral);border-radius:var(--rad);padding:64px 56px;margin:96px 0;text-align:center}
 .callout .kick{color:var(--on-coral);opacity:.85}
 .callout h2{font-family:var(--serif);font-weight:400;font-size:42px;letter-spacing:-.02em;color:#fff;margin:14px 0 14px;line-height:1.1}
-.callout p{color:var(--on-coral);opacity:.92;font-size:17px;max-width:48ch;margin:0 auto 28px}
+.callout p{color:var(--on-coral);opacity:.92;font-size:17px;max-width:72ch;margin:0 auto 28px;word-break:keep-all;text-wrap:balance}
 
 /* ── 아카이브 게시판 헤더 ───────────────────────────────────────────────── */
 .page-head{padding:62px 0 10px}

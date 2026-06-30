@@ -77,6 +77,12 @@ jobs:
 
       # ── C2: 빌드(결정론) — enrich 된 입력이 있으면 그걸로, 없으면 원본(pending)으로 폴백. ──
       - name: Build static site (render.py)
+        env:
+          # 구독 폼 action(repo var) 을 render.py 로 전달 — 미전달이면 render.py 가 빈 값으로
+          # 읽어 폼 블록 미출력(GitHub Actions 는 repo Variables 를 자동 노출하지 않음).
+          # 미설정 시 빈 문자열 → 폼 생략(골든·기존 빌드 영향 0). 다른 render env-param(SEO·
+          # SITE_BASE_URL)은 render.py 기본값으로 동작하므로 여기선 폼 var 만 명시 배선한다.
+          GRM_NEWSLETTER_FORM_ACTION: ${{ vars.GRM_NEWSLETTER_FORM_ACTION }}
         run: |
           DATA="web/data/briefs"
           if compgen -G "$CHECKED_DIR/*.json" > /dev/null 2>&1; then

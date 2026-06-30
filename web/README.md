@@ -123,6 +123,22 @@ v2 로고타입(산스 볼드 `GRM` + 펄스 닷 + 구분선 + 모노 ASCII desc
 **`@media (prefers-reduced-motion: reduce)` 존중**. 데이터 목록(`.issue`)은 정적 `opacity:0` 없음 →
 애니메이션 미지원에도 가시. 기존 명암 토글·다크모드 유지. 한글에 자간·모노 금지(모노=ASCII만).
 
+## 뉴스레터 구독 폼 (T1 — env-gated, 회원 시스템 없음)
+랜딩·아카이브·상세 **전 페이지 푸터 위**에 이메일 1칸 구독 밴드(`base.html` `.subscribe`).
+회원가입/로그인 아님 — 이메일+더블옵트인+수신거부(SaaS 처리)만.
+- **env-param**: `GRM_NEWSLETTER_FORM_ACTION`(관리형 SaaS 호스팅 구독 endpoint). 빈 값(기본·테스트)
+  이면 폼 블록 전체 생략 → **전 페이지 골든 byte-diff 0**(인증 메타와 동일 패턴). 프로덕션 repo var
+  설정 시에만 노출. `_safe_url` 스킴가드(비http(s) 오설정 → ""→폼 미출력 fail-safe).
+- **정적·$0 보존(불변식 #3)**: 폼은 브라우저가 SaaS 로 직접 POST(`method=post`) — 빌드/페이지로드
+  시 외부 fetch·런타임 서버 0(제출 POST 는 외부 링크 클릭과 동형의 사용자 동작). 더블옵트인·수신거부·
+  구독자 PII 는 SaaS 소유(Notion 비복제). 추적 파라미터는 SaaS 가 발송 시점 래핑 → 카드 원문/공식 URL
+  (provenance 가드 대상)과 무관한 별개 endpoint = 무변형 보존.
+- **디자인**: `.subscribe`/`.sub-form` 은 추가 컴포넌트(v6 프로토타입에 없던 밴드) — 디자인 토큰
+  (`--coral`/`--soft`/`--line-2`/`--rad-s`)·`.btn.coral` 재사용, 입력 포커스는 `.searchbar input` 동형.
+  **§4 한글 안전**(문안 자간0·대문자/mono 없음, 영문 `.kick` eyebrow 만). 검증 = `test_render.py::
+  test_newsletter_form_conditional`(off=부재·on=action/email-only/PII 0/한글안전·비http fail-safe).
+- **발송(T1.3 후속)**: `.github/workflows/grm-newsletter-send.yml`(게이트 4겹) — 본 렌더러와 별도.
+
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.
 ✅ (P4) 아카이브 교차검색+facet(정적 클라이언트사이드·search-index.json·progressive enhancement)

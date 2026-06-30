@@ -476,15 +476,26 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
 
 
 # ── SEO 메타·구조화데이터(description·canonical·OG·JSON-LD — 정적·결정론·한글안전) ──
-# 소유권 인증 토큰(GSC·네이버) — env-param(회전/비활성은 env 로). 토큰은 공개값(라이브
-# <head> 노출). Google 기본값 = main(ecb5043)에서 하드코딩됐던 라이브 GSC 토큰을 단일
-# 소스로 흡수(중복 <meta> 제거 + 골든 일치 + 들여쓰기 일관). 둘 다 env 로 회전/비활성 가능.
-# 운영: 토큰 회전/추가 시 repo var GRM_GOOGLE_SITE_VERIFICATION·GRM_NAVER_SITE_VERIFICATION
-# 설정(workflow env 배선 필요) 또는 이 기본값 교체 → 재배포 → 콘솔 "확인".
-GOOGLE_SITE_VERIFICATION = os.environ.get(
-    "GRM_GOOGLE_SITE_VERIFICATION", "pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4").strip()
-NAVER_SITE_VERIFICATION = os.environ.get(
-    "GRM_NAVER_SITE_VERIFICATION", "51283dc3591917baf9e057d220f053a91131bbe2").strip()
+def _env_or_default(key: str, default: str) -> str:
+    """env-param 읽기 — 빈 문자열/미설정 모두 기본값으로 폴백.
+
+    GitHub Actions 는 미설정 repo Variable(`vars.*`)을 워크플로 env 에 **빈 문자열**로
+    주입한다. `os.environ.get(key, default)` 는 이때 default 가 아니라 ""를 돌려주므로,
+    deploy build 스텝에 인증 토큰 var 를 배선(`vars.* → env`)해도 var 미설정 시 토큰이
+    사라지지 않도록(메타 비활성 회귀 방지) 빈 값을 기본값으로 흡수한다.
+    """
+    return (os.environ.get(key) or "").strip() or default
+
+
+# 소유권 인증 토큰(GSC·네이버) — 공개값(라이브 <head> 노출). 기본값 = 라이브 토큰을 단일
+# 소스로 흡수(중복 <meta> 제거 + 골든 일치). **회전은 repo var 설정만으로(코드 수정 0)**:
+# `grm-web-deploy.yml` build env 에 GRM_GOOGLE_SITE_VERIFICATION·GRM_NAVER_SITE_VERIFICATION
+# 배선됨 → var 설정 시 그 값, 미설정/빈 값이면 아래 기본 토큰(무회귀) → 재배포 → 콘솔 "확인".
+# (빈 env 로 메타를 '비활성'하던 경로는 제거 — 라이브 SEO 사이트 비활성은 비현실적.)
+GOOGLE_SITE_VERIFICATION = _env_or_default(
+    "GRM_GOOGLE_SITE_VERIFICATION", "pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4")
+NAVER_SITE_VERIFICATION = _env_or_default(
+    "GRM_NAVER_SITE_VERIFICATION", "51283dc3591917baf9e057d220f053a91131bbe2")
 
 # 뉴스레터 구독 폼 action(관리형 SaaS 호스팅 endpoint) — env-param. 기본값 ""(빈 문자열)이면
 # 폼 블록 미출력 → 테스트/기본 빌드 골든 영향 0, 프로덕션 var 설정 시에만 노출(인증 메타와 동일

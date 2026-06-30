@@ -840,11 +840,31 @@ class WebSeoMetaTest(unittest.TestCase):
 
     def test_naver_verification_live_by_default(self):
         # main 하드코딩 네이버 토큰을 env 기본값으로 흡수(들여쓰기/중복/누락 회귀 해소)
-        # → 기본 빌드에 단일 라이브 노출. 회전/비활성은 GRM_NAVER_SITE_VERIFICATION 으로.
+        # → 기본 빌드에 단일 라이브 노출. 회전은 GRM_NAVER_SITE_VERIFICATION repo var 로.
         tag = ('<meta name="naver-site-verification" '
                'content="51283dc3591917baf9e057d220f053a91131bbe2" />')
         self.assertEqual(self.landing.count(tag), 1)        # 정확히 1개(중복 없음)
         self.assertIn(tag, self.detail)                      # 전 페이지 공통(<head>)
+
+    def test_env_or_default_empty_falls_back(self):
+        # deploy 가 미설정 repo var 를 빈 문자열로 전달해도(Actions 동작) 토큰이 사라지지
+        # 않도록 빈/미설정 → 기본값, 설정 → 그 값. (인증 토큰 deploy 배선의 무회귀 보증.)
+        import os as _os
+        KEY = "GRM_TEST_VERIFICATION_PROBE_X"
+        prev = _os.environ.pop(KEY, None)
+        try:
+            self.assertEqual(render._env_or_default(KEY, "DEF"), "DEF")   # 미설정 → 기본
+            _os.environ[KEY] = ""
+            self.assertEqual(render._env_or_default(KEY, "DEF"), "DEF")   # 빈 문자열 → 기본
+            _os.environ[KEY] = "   "
+            self.assertEqual(render._env_or_default(KEY, "DEF"), "DEF")   # 공백뿐 → 기본
+            _os.environ[KEY] = " tok-9 "
+            self.assertEqual(render._env_or_default(KEY, "DEF"), "tok-9")  # 설정 → strip 값
+        finally:
+            if prev is None:
+                _os.environ.pop(KEY, None)
+            else:
+                _os.environ[KEY] = prev
 
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────

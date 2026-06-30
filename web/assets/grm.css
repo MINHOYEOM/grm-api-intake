@@ -390,6 +390,22 @@ details.merged summary{cursor:pointer}
 .disc b{color:var(--ink);font-weight:600}
 .disc .en{color:var(--muted);display:block;margin-top:6px}
 
+/* ── 뉴스레터 구독 밴드(T1 — env-gated, 푸터 위) ───────────────────────────
+   디자인 토큰 재사용(coral/soft/line-2/rad-s)·한글 안전(§4: 문안 자간0·대문자/mono 없음).
+   입력 포커스는 .searchbar input 과 동형(coral 보더 + tint 글로). 버튼은 .btn.coral 재사용. */
+.subscribe{background:var(--soft);border-top:1px solid var(--line)}
+.subscribe .wrap{padding-top:64px;padding-bottom:64px;text-align:center}
+.subscribe .kick{display:block;margin-bottom:14px}
+.subscribe h2{font-family:var(--serif);font-weight:400;font-size:34px;letter-spacing:-.018em;color:var(--ink);line-height:1.16}
+.subscribe p{color:var(--body);font-size:16px;margin:14px auto 0;max-width:52ch;line-height:1.6;word-break:keep-all}
+.sub-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.sub-form input[type=email]{width:340px;max-width:100%;height:52px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);
+  background:var(--canvas);padding:0 18px;font-family:var(--sans);font-size:16px;color:var(--ink);transition:border-color var(--tr),box-shadow var(--tr)}
+.sub-form input[type=email]:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 4px var(--coral-tint)}
+.sub-form input[type=email]::placeholder{color:var(--muted)}
+.sub-form .btn.coral{height:52px}
+.subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+
 /* ── footer(다크 band) ─────────────────────────────────────────────────── */
 footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;margin-top:0}
 .foot{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}

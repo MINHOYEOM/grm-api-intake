@@ -486,6 +486,15 @@ GOOGLE_SITE_VERIFICATION = os.environ.get(
 NAVER_SITE_VERIFICATION = os.environ.get(
     "GRM_NAVER_SITE_VERIFICATION", "ed2cf23251d51b4f74ee2b39668e5176aa60de89").strip()
 
+# 뉴스레터 구독 폼 action(관리형 SaaS 호스팅 endpoint) — env-param. 기본값 ""(빈 문자열)이면
+# 폼 블록 미출력 → 테스트/기본 빌드 골든 영향 0, 프로덕션 var 설정 시에만 노출(인증 메타와 동일
+# 패턴). 폼은 브라우저가 SaaS 로 직접 POST 하므로 사이트는 100% 정적 유지(외부 fetch·런타임
+# 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 소유(우리 비복제). 운영: SaaS 호스팅
+# 구독 폼 생성 → action URL 을 repo var GRM_NEWSLETTER_FORM_ACTION 로 설정(이메일 필드명이
+# 'email' 이 아닌 SaaS 면 템플릿 input name 도 함께 맞춘다). 추적 파라미터는 발송 시점에 SaaS
+# 가 부착 — 우리 카드 원문/공식 URL(provenance 가드 대상)과 무관한 별개 endpoint.
+NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip()
+
 # 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.
 SITE_NAME = "Global Regulatory Monitor"
 SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 신호를 매주 한자리에 모아 "
@@ -555,6 +564,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 호출 시점에 읽어 운영 var/테스트 monkeypatch 를 모두 반영(import-time 캡처 회피).
     env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
+    # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
+    # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
+    env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")

@@ -683,6 +683,49 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn('<meta name="google-site-verification" content="g-tok-123" />', h_on)
         self.assertIn('<meta name="naver-site-verification" content="n-tok-456" />', h_on)
 
+    def test_newsletter_form_conditional(self):
+        # 구독 폼(T1)은 GRM_NEWSLETTER_FORM_ACTION(env-param) 설정 시에만 출력. 모듈 전역을
+        # 호출 시점에 읽어 monkeypatch 반영 — 복구로 타 테스트·골든 오염 0(인증 메타와 동형).
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            # off — 빈 값이면 if 블록 전체 미출력(전 페이지 골든 byte-diff 0 의 근거).
+            render.NEWSLETTER_FORM_ACTION = ""
+            h_off = self._render_detail(_minimal_brief("2026-06-01"))
+            self.assertNotIn('class="subscribe"', h_off)
+            self.assertNotIn('<form class="sub-form"', h_off)
+            # on — 호스팅 SaaS endpoint 로 직접 POST. 전 페이지(랜딩·상세) 공통(base.html 밴드).
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-02")])
+            h_on = (out / "briefs/2026-06-02/index.html").read_text(encoding="utf-8")
+            landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertIn('class="subscribe"', h_on)
+        self.assertIn('class="subscribe"', landing_on)          # 전 페이지(랜딩에도)
+        self.assertIn('action="https://newsletter.example.com/subscribe" method="post"', h_on)
+        self.assertIn('type="email" name="email"', h_on)
+        self.assertIn("required", h_on)
+        # 회원 시스템 아님 — 이메일 1칸. 비밀번호·이름 등 추가 PII 입력 0.
+        self.assertNotIn('type="password"', h_on)
+        self.assertNotIn('name="password"', h_on)
+        self.assertNotIn('name="name"', h_on)
+        # 한글 안전(§4) — 폼 밴드에 인라인 자간/대문자·한글 mono 0. WebKoreanSafetyTest 는
+        # 폼-off 빌드만 스캔하므로 on 경로(밴드 한정 범위)를 여기서 보강한다.
+        import re as _re
+        band = h_on[h_on.index('class="subscribe"'):h_on.index("<footer")]
+        self.assertNotIn("letter-spacing", band)
+        self.assertNotIn("text-transform", band)
+        self.assertIsNone(_re.search(r'class="[^"]*\bmono\b[^"]*"', band),
+                          "구독 밴드에 mono 클래스(한글 위험)")
+        # 안전 URL 가드(_safe_url) — 비http(s) 스킴 action 은 ""→폼 미출력(fail-safe).
+        try:
+            render.NEWSLETTER_FORM_ACTION = "javascript:alert(1)"
+            h_bad = self._render_detail(_minimal_brief("2026-06-03"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertNotIn("javascript:alert", h_bad)
+        self.assertNotIn('class="subscribe"', h_bad)
+
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────
 class WebKoreanSafetyTest(unittest.TestCase):

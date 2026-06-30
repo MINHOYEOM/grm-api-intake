@@ -405,6 +405,8 @@ details.merged summary{cursor:pointer}
 .sub-form input[type=email]::placeholder{color:var(--muted)}
 .sub-form .btn.coral{height:52px}
 .subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+/* Brevo 봇방지 허니팟 — 시각·접근성 숨김(off-screen). 사람은 못 보고 안 채움, 봇만 채워 Brevo 가 거른다. */
+.sub-hp{position:absolute!important;left:-5000px;width:1px;height:1px;overflow:hidden;opacity:0}
 
 /* ── footer(다크 band) ─────────────────────────────────────────────────── */
 footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;margin-top:0}

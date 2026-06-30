@@ -703,9 +703,13 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn('class="subscribe"', h_on)
         self.assertIn('class="subscribe"', landing_on)          # 전 페이지(랜딩에도)
         self.assertIn('action="https://newsletter.example.com/subscribe" method="post"', h_on)
-        self.assertIn('type="email" name="email"', h_on)
+        # Brevo 실제 폼 필드 정합: 이메일=EMAIL(대문자) + 봇방지 허니팟 + locale 히든.
+        self.assertIn('type="email" name="EMAIL"', h_on)
         self.assertIn("required", h_on)
-        # 회원 시스템 아님 — 이메일 1칸. 비밀번호·이름 등 추가 PII 입력 0.
+        self.assertIn('name="email_address_check"', h_on)        # 허니팟(빈값)
+        self.assertIn('class="sub-hp"', h_on)                    # 허니팟 시각 숨김(사람 미입력)
+        self.assertIn('name="locale"', h_on)
+        # 회원 시스템 아님 — 사람 입력은 이메일 1칸. 비밀번호·이름 등 추가 PII 입력 0.
         self.assertNotIn('type="password"', h_on)
         self.assertNotIn('name="password"', h_on)
         self.assertNotIn('name="name"', h_on)

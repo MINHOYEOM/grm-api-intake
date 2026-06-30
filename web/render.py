@@ -484,7 +484,7 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
 GOOGLE_SITE_VERIFICATION = os.environ.get(
     "GRM_GOOGLE_SITE_VERIFICATION", "pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4").strip()
 NAVER_SITE_VERIFICATION = os.environ.get(
-    "GRM_NAVER_SITE_VERIFICATION", "ed2cf23251d51b4f74ee2b39668e5176aa60de89").strip()
+    "GRM_NAVER_SITE_VERIFICATION", "51283dc3591917baf9e057d220f053a91131bbe2").strip()
 
 # 뉴스레터 구독 폼 action(관리형 SaaS 호스팅 endpoint) — env-param. 기본값 ""(빈 문자열)이면
 # 폼 블록 미출력 → 테스트/기본 빌드 골든 영향 0, 프로덕션 var 설정 시에만 노출(인증 메타와 동일

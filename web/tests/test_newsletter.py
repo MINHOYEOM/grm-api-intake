@@ -29,6 +29,7 @@ __all__ = [
     "NewsletterDisclosureDriftTest",
     "BrevoSenderTest",
     "NewsletterLoadTest",
+    "NewsletterScheduleSendTest",
 ]
 
 
@@ -280,6 +281,135 @@ class NewsletterLoadTest(unittest.TestCase):
     def test_load_issue_missing_raises(self):
         with self.assertRaises(SystemExit):
             newsletter.load_issue(DATA_DIR, "1999-01-01")
+
+
+# ── T1.4 주간 자동 발송 — 최신 호 해석 · 멱등 사전점검(should_send) ──────────────
+import contextlib            # noqa: E402
+import io                    # noqa: E402
+import os                    # noqa: E402
+import tempfile              # noqa: E402
+
+
+@contextlib.contextmanager
+def _env_patch(**kw):
+    """env 키를 임시 설정(값 None=삭제) 후 원복 — 테스트 격리(공유 프로세스)."""
+    backup = {k: os.environ.get(k) for k in kw}
+    try:
+        for k, v in kw.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        yield
+    finally:
+        for k, old in backup.items():
+            if old is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = old
+
+
+def _sender_with(campaigns):
+    """FakeSession 주입 BrevoSender — find_campaign 가 실제 페이지네이션 로직을 탄다(네트워크 0)."""
+    return newsletter.BrevoSender("k", session=_FakeSession(campaigns=campaigns))
+
+
+class NewsletterScheduleSendTest(unittest.TestCase):
+    # 06-26 = 최신(06-22 다음). issue_no=2 → 멱등 캠페인명 단일 파생.
+    NAME = "GRM Weekly Brief — 2026-06-26 (No.2)"
+
+    # ── 최신 발행일 해석(스케줄 진입점·하드코딩 0) ──
+    def test_resolve_latest_publish_date(self):
+        self.assertEqual(newsletter.resolve_latest_publish_date(DATA_DIR), "2026-06-26")
+
+    def test_latest_date_cli_prints_only_date(self):
+        # 워크플로 resolve 스텝이 $() 로 캡처 — 잡음 없이 날짜 한 줄만 나와야.
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = newsletter.main(["--mode", "latest-date", "--data", str(DATA_DIR)])
+        self.assertEqual(rc, 0)
+        self.assertEqual(buf.getvalue().strip(), "2026-06-26")
+
+    # ── 멱등 결정(③) — decide_should_send ──
+    def test_decide_skip_when_dispatched(self):
+        sender = _sender_with([{"id": 7, "name": self.NAME, "status": "sent"}])
+        should, reason = newsletter.decide_should_send(sender, "2026-06-26", 2)
+        self.assertFalse(should)                          # 이미 발송 → 발송 불필요
+        self.assertIn("재발송 0", reason)
+
+    def test_decide_send_when_missing(self):
+        sender = _sender_with([])
+        should, _ = newsletter.decide_should_send(sender, "2026-06-26", 2)
+        self.assertTrue(should)                           # 신규 호 → 발송 필요
+
+    def test_decide_send_when_unsent_draft(self):
+        # draft(create 후 sendNow 실패 잔여)는 미발송 → 재사용 발송해야(false-skip 방지).
+        sender = _sender_with([{"id": 7, "name": self.NAME, "status": "draft"}])
+        should, _ = newsletter.decide_should_send(sender, "2026-06-26", 2)
+        self.assertTrue(should)
+
+    # ── should_send 방출(GitHub Actions step output) ──
+    def test_emit_writes_github_output(self):
+        # stdout 리다이렉트 — 직접 호출은 main()의 utf-8 재설정을 안 거치므로 Windows cp949
+        # 콘솔의 em-dash 인코딩 에러를 피한다(Actions/Linux·main() 경로는 utf-8 로 무해).
+        with tempfile.TemporaryDirectory() as td:
+            out = pathlib.Path(td) / "out.txt"
+            with _env_patch(GITHUB_OUTPUT=str(out)), contextlib.redirect_stdout(io.StringIO()):
+                newsletter._emit_should_send(False, "이유")
+                newsletter._emit_should_send(True, "이유2")
+            lines = out.read_text(encoding="utf-8").splitlines()
+            self.assertEqual(lines, ["should_send=false", "should_send=true"])
+
+    # ── precheck(main) 엔드투엔드 — 발송 0, should_send 만 결정 ──
+    def _run_precheck(self, *, api_key, sender_cls=None):
+        """precheck 모드 main() 실행 → (exit code, GITHUB_OUTPUT 의 should_send 값)."""
+        orig = newsletter.BrevoSender
+        if sender_cls is not None:
+            newsletter.BrevoSender = sender_cls
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                out = pathlib.Path(td) / "o.txt"
+                with _env_patch(GITHUB_OUTPUT=str(out), NEWSLETTER_API_KEY=api_key):
+                    rc = newsletter.main(["--mode", "precheck", "--publish-date", "2026-06-26",
+                                          "--data", str(DATA_DIR)])
+                val = out.read_text(encoding="utf-8").strip() if out.exists() else ""
+        finally:
+            newsletter.BrevoSender = orig
+        return rc, val
+
+    def test_precheck_already_sent_skips_no_approval(self):
+        # 핵심(§1.3/§1.4): 최신 호 이미 발송 → should_send=false·exit 0 →
+        # send 잡(=사람 승인 요청)에 도달하지 않는다(승인 요청 0, 중복 0).
+        name = self.NAME
+
+        class _Sent(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                return {"id": "7", "status": "sent"} if n == name else None
+
+        rc, val = self._run_precheck(api_key="key-123", sender_cls=_Sent)
+        self.assertEqual(rc, 0)
+        self.assertEqual(val, "should_send=false")
+
+    def test_precheck_new_issue_requests_send(self):
+        class _New(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                return None                               # 미발송 신규
+
+        rc, val = self._run_precheck(api_key="key-123", sender_cls=_New)
+        self.assertEqual(rc, 0)
+        self.assertEqual(val, "should_send=true")
+
+    def test_precheck_no_api_key_clean_skip(self):
+        # API 키 미설정 → 멱등 조회 불가 → 안전하게 보류(false)·exit 0(승인 요청 0). 네트워크 0.
+        rc, val = self._run_precheck(api_key=None)
+        self.assertEqual(rc, 0)
+        self.assertEqual(val, "should_send=false")
 
 
 if __name__ == "__main__":

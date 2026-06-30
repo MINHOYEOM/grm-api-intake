@@ -1,24 +1,35 @@
 name: GRM Newsletter Send
 
-# 뉴스레터 발송(T1.3) — 수집(`grm-intake.yml`)·웹배포(`grm-web-deploy.yml`)와 **완전 별도
-# 파일·별도 트리거·최소권한**(D8). 한쪽 실패가 다른쪽을 멈추지 않는다. 발행된 주차
+# 뉴스레터 발송(T1.3/T1.4) — 수집(`grm-intake.yml`)·웹배포(`grm-web-deploy.yml`)와 **완전
+# 별도 파일·별도 트리거·최소권한**(D8). 한쪽 실패가 다른쪽을 멈추지 않는다. 발행된 주차
 # web-card JSON(`web/data/briefs/brief_web_{date}.json`)을 입력으로, 짧은 티저 메일을
 # 만들어 관리형 SaaS(Brevo)로 발송한다(풍부한 카드는 웹 브리프에서 — 이메일 전용 풀카드 X).
+#
+# 발송 운영(T1.4) = **"매주 자동 준비 + 1클릭 승인"**: 매주 월요일 스케줄로 자동 트리거하되,
+# 실제 발송 직전 사람 승인 게이트(environment)에서 멈춘다. 완전 무인 cron 도, 완전 수동도 아니다.
+#   · 스케줄(`schedule`) = mode=send · date=최신 호(자동) — 게이트 통과 + 새 호면 승인 요청.
+#   · 수동(`workflow_dispatch`) = 기존대로 publish_date·mode(validate/test/send) 직접 지정(불변).
 #
 # 발송 게이트 4겹(되돌릴 수 없는 발송 — 무인 발송 0):
 #   ① 발행검증(구조·provenance) — `newsletter.run_gates`(스키마·발행일·카드·면책 + 메일이
 #      우리 페이지만 링크·추적 파라미터 0). 발행 시점 Brief Lint(handoff provenance)는 별개로
-#      Routine 에서 이미 실행됨 — 여기선 web-card 산출물 무결성을 발송 직전 재확인.
+#      Routine 에서 이미 실행됨 — 여기선 web-card 산출물 무결성을 발송 직전 재확인.  → validate-build
 #   ② 링크체크(`web/linkcheck.py` 재사용) — 그 호 카드 링크에 broken 이 있으면 발송 **보류**
-#      (비차단 enrich 가 아니라 발송 게이트로 승격). degraded(일시)·KR-egress 스킵은 비차단.
-#   ③ 멱등 — 캠페인명(`publish_date` 파생) 키. 이미 발송된 호면 재발송 0(`find_campaign`).
-#   ④ 사람 승인 — `workflow_dispatch`(수동 트리거) + send 잡 `environment: production`(required
-#      reviewer). 자동/스케줄 발송 경로 0(D5 라이브 게이트 정신).
+#      (비차단 enrich 가 아니라 발송 게이트로 승격). degraded(일시)·KR-egress 스킵은 비차단.  → validate-build
+#   ③ 멱등 — 캠페인명(`publish_date`·issue 파생) 키. 이미 발송된 호면 재발송 0(`find_campaign`).
+#      **비-environment 잡(validate-build)의 사전점검**에서 read-only 로 판정해 `should_send` 를
+#      낸다 → 보낼 호가 없으면 send 잡(=승인 요청)에 **아예 도달하지 않는다**(스케줄 무해성).
+#   ④ 사람 승인 — send 잡 `environment: newsletter-send`(required reviewer). 스케줄/수동 모두
+#      이 게이트를 통과해야 발송(D5 라이브 게이트 정신). 승인 안 하면 안 나간다.
+#
+# ⚠️ 사람 설정 전제(이게 없으면 무인 발송 가능): GitHub Settings → Environments → `newsletter-send`
+#    생성 + Required reviewers 에 본인 추가. 미설정이면 environment 보호가 없어 승인 없이 발송된다.
+#    → 첫 월요일 스케줄이 뜨기 전(권장: 머지 전)에 반드시 설정. 상세 = T1.4 지시문 §2.
 #
 # 비용(D9): GitHub Actions 무료분 + SaaS 무료 티어. 유료 서비스 0.
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:        # 수동 — publish_date·mode 직접 지정(스케줄과 독립, 불변).
     inputs:
       publish_date:
         description: '발송할 호의 발행일 (YYYY-MM-DD, web/data/briefs 에 존재해야 함)'
@@ -33,21 +44,33 @@ on:
           - validate
           - test
           - send
+  schedule:
+    # 매주 월 05:00 UTC = 14:00 KST (월요일 Routine 발행 ~07:30 KST 이후). 스케줄은 **기본
+    # 브랜치(main)에서만** 실행된다. 승인 게이트(④)가 있어 정확한 시각보다 '발행 이후'가 중요
+    # — 고부하 시 지연돼도 무해(멱등 ③ 가 중복을 막고, 승인 ④ 가 발송을 사람이 연다).
+    - cron: '0 5 * * 1'
 
 # 최소권한 — 콘텐츠 read 만(발송은 SaaS 시크릿으로, GitHub 쓰기 권한 불필요).
 permissions:
   contents: read
 
 concurrency:
-  # 같은 호 동시 발송 차단(멱등이 이중 안전망이지만 동시성도 끊는다).
-  group: grm-newsletter-${{ github.event.inputs.publish_date }}
+  # 같은 호 동시 발송 차단(멱등이 이중 안전망이지만 동시성도 끊는다). 스케줄은 inputs 가 없으므로
+  # event_name 으로 폴백 — 두 스케줄 런이 직렬화된다(취소하지 않고 큐).
+  group: grm-newsletter-${{ github.event.inputs.publish_date || github.event_name }}
   cancel-in-progress: false
 
 jobs:
-  # ── 게이트 ①②(구조·provenance·링크체크) + 메일 HTML 아티팩트(D5 사람 검토) ──
+  # ── 게이트 ①②(구조·provenance·링크체크) + 멱등 사전점검 ③ + 메일 HTML 아티팩트(D5) ──
+  #   비-environment 잡 — 여기서 '보낼 호가 있는지'(should_send)까지 결정한다. 그래야 send 잡
+  #   (사람 승인 요청)이 **실제 보낼 새 호가 있을 때만** 뜬다(멱등 skip 은 승인 요청 0).
   validate-build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      mode: ${{ steps.resolve.outputs.mode }}
+      publish_date: ${{ steps.resolve.outputs.publish_date }}
+      should_send: ${{ steps.precheck.outputs.should_send }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -56,10 +79,28 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate + build teaser (gates ①②)
+      - name: Resolve mode + publish_date (schedule → send · 최신 호)
+        id: resolve
         env:
           # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
-          PUBLISH_DATE: ${{ github.event.inputs.publish_date }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_DATE: ${{ github.event.inputs.publish_date }}
+          INPUT_MODE: ${{ github.event.inputs.mode }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            MODE=send
+            PDATE="$(python web/newsletter.py --mode latest-date)"   # 최신 발행일 자동(하드코딩 0)
+          else
+            MODE="$INPUT_MODE"
+            PDATE="$INPUT_DATE"
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "publish_date=$PDATE" >> "$GITHUB_OUTPUT"
+          echo "해석: event=$EVENT_NAME → mode=$MODE · publish_date=$PDATE"
+
+      - name: Validate + build teaser (gates ①②)
+        env:
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
           GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-weekly-brief.pages.dev' }}
         run: |
           mkdir -p email_preview
@@ -75,17 +116,42 @@ jobs:
           path: email_preview
           if-no-files-found: error
 
-  # ── 발송(test/send) — 게이트 ③ 멱등 + ④ 사람 승인(environment) ──────────────
-  #   validate=게이트만이면 이 잡은 건너뛴다(발송 경로 자체가 없음).
+      - name: Idempotency precheck (gate ③) — should_send 결정
+        id: precheck
+        env:
+          MODE: ${{ steps.resolve.outputs.mode }}
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
+          # 멱등 조회(GET /emailCampaigns)는 발송 전 **read-only**. 비-environment 잡에서 수행해야
+          # '보낼 호가 있을 때만' 승인 요청이 뜬다(send 잡 도달 전에 결정). 실제 sendNow 는 승인 후.
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+        run: |
+          case "$MODE" in
+            send)
+              # 이미 발송된 호면 should_send=false(클린 skip·exit 0) → send 잡 미도달·승인 요청 0.
+              python web/newsletter.py --mode precheck --publish-date "$PUBLISH_DATE"
+              ;;
+            test)
+              echo "should_send=true" >> "$GITHUB_OUTPUT"
+              echo "test 모드 — 멱등 미적용(테스트 발송은 반복 가능). should_send=true"
+              ;;
+            *)
+              echo "should_send=false" >> "$GITHUB_OUTPUT"
+              echo "validate 모드 — 발송 잡 없음(게이트만). should_send=false"
+              ;;
+          esac
+
+  # ── 발송(test/send) — 게이트 ④ 사람 승인(environment) ────────────────────────
+  #   should_send=true(보낼 새 호가 있음)일 때만 잡이 생성된다 → 그때만 승인 요청이 뜬다.
+  #   멱등 skip(이미 발송)·validate 모드면 이 잡 자체가 없으므로 승인 요청도 0.
   send:
     needs: validate-build
-    if: ${{ github.event.inputs.mode != 'validate' }}
+    if: ${{ needs.validate-build.outputs.should_send == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # 사람 승인 게이트(④) — GitHub Settings → Environments 에서 'production' 에 required
-    # reviewer 등록 시, 이 잡은 승인 전까지 보류된다(무인 발송 0). 미설정이면 즉시 실행되므로
-    # workflow_dispatch(수동) 만이 유일 게이트가 된다 — reviewer 등록을 §사람 후속에 명시.
-    environment: production
+    # 사람 승인 게이트(④) — Settings → Environments 의 `newsletter-send` 에 required reviewer
+    # 등록 시 이 잡은 승인 전까지 보류(러너 미점유·승인자에게 알림). 웹 배포(`production`)와 분리해
+    # 뉴스레터 발송 승인을 독립적으로 관리. **미설정이면 보호 없이 즉시 실행되므로 사전 설정 필수**(§2).
+    environment: newsletter-send
     env:
       NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
       GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
@@ -101,10 +167,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Send (gate ③ 멱등 → 캠페인 생성·발송)
+      - name: Send (gate ③ 멱등 재확인 → 캠페인 생성·발송)
         env:
-          PUBLISH_DATE: ${{ github.event.inputs.publish_date }}
-          MODE: ${{ github.event.inputs.mode }}
+          # 해석된 값(스케줄=최신 호·send / 수동=입력)을 그대로 사용 — 사전점검과 동일 대상.
+          PUBLISH_DATE: ${{ needs.validate-build.outputs.publish_date }}
+          MODE: ${{ needs.validate-build.outputs.mode }}
         run: |
           python web/newsletter.py \
             --publish-date "$PUBLISH_DATE" \

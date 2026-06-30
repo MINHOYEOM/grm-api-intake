@@ -86,6 +86,11 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 **⑤ 발행 — Notion `🌐 GRM Weekly Brief` DB**
 완성된 주간 다이제스트가 페이지로 발행되는 곳. 사용자가 실제로 읽는 최종 산출물입니다.
 
+**⑥ 웹 발행·뉴스레터 배포 — 정적 사이트 + 이메일 (Notion 발행과 별도·additive·D8)**
+발행 산출물(`grm-web-card/v1` JSON)은 두 경로로도 배포됩니다. 둘 다 수집(`grm-intake.yml`)과 **완전 별도 파일·트리거·최소권한**(한쪽 실패가 다른쪽 무영향) 이며 **무변형·결정론·정적$0·provenance** 를 보존합니다.
+- **웹**: `web/render.py`(순수·결정론) → 정적 멀티페이지 사이트 → `grm-web-deploy.yml`(linkcheck→render→Cloudflare Pages). 라이브 게이트(D5) = production 브랜치 사람 머지만. 상세 `web/README`.
+- **뉴스레터(T1)**: 회원 시스템 없이 **구독**(정적 폼 → 관리형 SaaS=**Brevo** 직접 POST·더블옵트인·수신거부·구독자 PII=SaaS 소유)하고, **티저 메일**(그 호 요약 + 웹 브리프 링크 + 섹션 앵커 + 면책 캐논)을 `web/newsletter.py`(SaaS-무관 어댑터)→Brevo Campaigns API 로 발송합니다. 발송 워크플로 `grm-newsletter-send.yml` 은 **수동(`workflow_dispatch`)·발송 게이트 4겹**(발행검증·링크체크·멱등·`environment` 사람승인)·무인 발송 0. 메일은 우리 페이지 링크만 담아 카드 출처 URL 불변(provenance). 클릭으로 관심 주제를 측정해 향후 주제 세그먼트 근거를 모읍니다(T2). 상세 §5.3·`web/README`·지시문 `GRM_CC지시문_뉴스레터구독발송측정_2026-06-30.md`.
+
 ### 2.2 두 개의 Notion 데이터베이스
 둘 다 `Global Regulatory Monitor` 부모 페이지 하위에 있습니다.
 
@@ -99,6 +104,7 @@ GRM은 크게 **5개 계층** 으로 이루어집니다. 무거운 서버 없이
 #### 📝 변경 이력 — 풀스택
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-30 | **⑥ 웹 발행·뉴스레터 배포 계층 추가**(Notion 발행과 별도·additive·D8). 정적 사이트(`web/render.py`→Cloudflare, `grm-web-deploy.yml`) + **뉴스레터**(회원 시스템 없이 정적 구독 폼→Brevo·티저 메일 발송 `web/newsletter.py`→`grm-newsletter-send.yml` 게이트 4겹·수동). 무변형·결정론·정적$0·provenance 보존. 상세 §5.3 |
 | 2026-06-02 | 최초 작성. 5계층(수집/실행/저장/분석/발행) 구조 정리 |
 | 2026-06-02 | 실행 계층 정정: 워크플로우가 **매일(Daily, cron `17 20 * * *`)** 실행임을 `origin/main` 으로 확인·반영 |
 | 2026-06-02 | 수집 계층 소스 8개 → 11개(글로벌 확장 ICH·WHO·HC, opt-in). Weekly Brief `출처 기관`의 ICH·WHO·HC 옵션이 실제 수집기로 채워짐을 §2.2에 명시 |

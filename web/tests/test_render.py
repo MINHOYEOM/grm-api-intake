@@ -777,7 +777,7 @@ class WebSeoMetaTest(unittest.TestCase):
     소유권 인증 메타 조건부는 WebRenderHardeningTest.test_verification_meta_conditional.
     한글 메타값의 mono/자간 부재는 WebKoreanSafetyTest 가 전 HTML 스캔으로 함께 보장."""
 
-    BASE = "https://grm-weekly-brief.pages.dev"
+    BASE = "https://grm-solutions.com"
 
     @classmethod
     def setUpClass(cls):

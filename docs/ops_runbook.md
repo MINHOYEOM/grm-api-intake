@@ -22,9 +22,11 @@
 | `MFDS_HTTP_PROXY` | MFDS/nedrug/law.go.kr KR-egress 프록시 | 운영자가 구성한 KR proxy/runner | 선택. 잘못된 프록시는 잔여 3종만 실패해야 함 | `probe_mfds_egress.py` 3종 HTTP 200 확인 후 Secret 교체 |
 | `OPENFDA_API_KEY` | OpenFDA rate limit 상향(선택) | open.fda.gov | 없어도 동작(쿼터 축소) | 만료 시 무키 운영 가능 |
 | `BRAVE_API_KEY` | Brave 보조검색 (현재 `ENABLE_SEARCH=false`) | brave.com/search/api | 비활성 | 활성화 시점에 재확인 |
+| `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | 웹 배포 (`grm-web-deploy.yml` → Cloudflare Pages) | dash.cloudflare.com → API Tokens (Pages 편집 최소 스코프) | 토큰 만료 설정 가능. **미설정 시 배포 스킵**(빌드·아티팩트만, 비차단) | 새 토큰 발급(최소 스코프) → Secret 교체 → `web/**` push 로 preview 배포 확인 |
+| `NEWSLETTER_API_KEY` | 뉴스레터 발송 (Brevo Campaigns API v3 `api-key`, `grm-newsletter-send.yml` 전용) | brevo.com → SMTP & API → API Keys (v3) | **생성 2026-06-30 · 만료 2027-06-30**(Brevo 설정). 값 미기재(Secret UI 전용). **노출 시 즉시 폐기·재발급**(채팅 노출 이력 — MINO 판단 재발급 보류). 미설정 시 발송 불가(게이트는 PASS·발송만 스킵) | Brevo 에서 폐기·재생성 → GitHub Secret 값만 교체(코드 무변경) → `grm-newsletter-send.yml` `mode=test` 로 테스트 발송 확인 → 구 키 폐기 |
 
 만료 의심 신호: 수집 Issue 에 401/403 비일시 오류, 특정 소스만 연속 0건.
-점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지.
+점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지. `CLOUDFLARE_*`·`NEWSLETTER_API_KEY` 는 기능 게이트형(스케줄 수집 무영향 — 웹 배포/뉴스레터 발송 시점에만 필요, 발송은 수동·게이트). 구독자 명단·발송 기록 PII 는 SaaS(Brevo) 소유 — 락인 방지로 명단 주기적 CSV 백업만(bus-factor-1).
 
 ## 2. 정기 점검 (주간 5분)
 

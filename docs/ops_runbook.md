@@ -22,6 +22,7 @@
 | `MFDS_HTTP_PROXY` | MFDS/nedrug/law.go.kr KR-egress 프록시 | 운영자가 구성한 KR proxy/runner | 선택. 잘못된 프록시는 잔여 3종만 실패해야 함 | `probe_mfds_egress.py` 3종 HTTP 200 확인 후 Secret 교체 |
 | `OPENFDA_API_KEY` | OpenFDA rate limit 상향(선택) | open.fda.gov | 없어도 동작(쿼터 축소) | 만료 시 무키 운영 가능 |
 | `BRAVE_API_KEY` | Brave 보조검색 (현재 `ENABLE_SEARCH=false`) | brave.com/search/api | 비활성 | 활성화 시점에 재확인 |
+| `NEWSLETTER_API_KEY` | Brevo 뉴스레터 발송 API (주간 Brief → 구독자 이메일) | app.brevo.com → SMTP & API → API Keys | 만료: 2027-06-30. 유출 시 즉시 재발급 | 재발급 → GitHub Secrets NEWSLETTER_API_KEY 교체 → dry-run 1회 |
 
 만료 의심 신호: 수집 Issue 에 401/403 비일시 오류, 특정 소스만 연속 0건.
 점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지.
@@ -75,5 +76,6 @@ handoff 조회는 `Run Date 7일 + Status=New` 필터라 직접 영향은 작지
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-06-30 | Brevo 뉴스레터 설정 완료 — NEWSLETTER_API_KEY Secret 등록, 변수 4개(GRM_NEWSLETTER_*) 등록 |
 | 2026-06-18 | KR-egress 잔여 QA 3종 운영 항목 추가 — `MFDS_HTTP_PROXY`, `LAW_GO_KR_OC`, `probe_mfds_egress.py`, `MFDS_RSS_BOARD_MODE=residual` 점검 경로 |
 | 2026-06-04 | 최초 작성 — Secrets 인벤토리·로테이션, 주간 점검, 장애 분기, Intake 아카이브 정책(180일), 인수인계 체크리스트 |

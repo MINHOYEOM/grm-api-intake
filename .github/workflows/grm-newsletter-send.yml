@@ -101,7 +101,7 @@ jobs:
       - name: Validate + build teaser (gates ①②)
         env:
           PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
-          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-weekly-brief.pages.dev' }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
         run: |
           mkdir -p email_preview
           python web/newsletter.py \
@@ -158,7 +158,7 @@ jobs:
       GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
       GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME || 'Global Regulatory Monitor' }}
       GRM_NEWSLETTER_TEST_EMAILS: ${{ vars.GRM_NEWSLETTER_TEST_EMAILS }}
-      GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-weekly-brief.pages.dev' }}
+      GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

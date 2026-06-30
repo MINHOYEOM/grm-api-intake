@@ -438,7 +438,7 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
 # ── 검색 노출(robots.txt + sitemap.xml — 정적·결정론·입력 publish_date 파생) ────
 # 사이트 베이스 URL(+env override) — 향후 커스텀 도메인은 이 한 줄/환경변수만 교체.
 SITE_BASE_URL = os.environ.get(
-    "GRM_SITE_BASE_URL", "https://grm-weekly-brief.pages.dev").rstrip("/")
+    "GRM_SITE_BASE_URL", "https://grm-solutions.com").rstrip("/")
 
 
 def build_robots_txt(base_url: str = SITE_BASE_URL) -> str:

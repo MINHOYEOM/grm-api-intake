@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://grm-weekly-brief.pages.dev/sitemap.xml
+Sitemap: https://grm-solutions.com/sitemap.xml

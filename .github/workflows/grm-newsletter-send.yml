@@ -87,7 +87,7 @@ jobs:
     # workflow_dispatch(수동) 만이 유일 게이트가 된다 — reviewer 등록을 §사람 후속에 명시.
     environment: production
     env:
-      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
       GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
       GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
       GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME || 'Global Regulatory Monitor' }}

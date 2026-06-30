@@ -299,7 +299,7 @@ class BrevoSender(NewsletterSender):
     def __init__(self, api_key: str, *, base_url: str = "https://api.brevo.com/v3",
                  session: Any = None, timeout: float = 20.0):
         if not api_key:
-            raise ValueError("BREVO_API_KEY 필요")
+            raise ValueError("NEWSLETTER_API_KEY 필요")
         self.base = base_url.rstrip("/")
         self.timeout = timeout
         if session is None:
@@ -407,11 +407,11 @@ def main(argv: "list[str] | None" = None) -> int:
         return 0
 
     # 발송(test/send) — SaaS 자격·대상 확인.
-    api_key = _env("BREVO_API_KEY")
+    api_key = _env("NEWSLETTER_API_KEY")
     sender_name = _env("GRM_NEWSLETTER_SENDER_NAME", "Global Regulatory Monitor")
     sender_email = _env("GRM_NEWSLETTER_SENDER_EMAIL")
     if not api_key or not sender_email:
-        print("⚠️  BREVO_API_KEY·GRM_NEWSLETTER_SENDER_EMAIL 미설정 — 발송 불가(게이트는 PASS).",
+        print("⚠️  NEWSLETTER_API_KEY·GRM_NEWSLETTER_SENDER_EMAIL 미설정 — 발송 불가(게이트는 PASS).",
               file=sys.stderr)
         return 2
     sender = BrevoSender(api_key)

@@ -163,8 +163,9 @@ python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱
   에 `weekday_kst` 없음·산술 금지 클래스 차단). 면책 캐논(KO+EN)은 `brief.html` 과 동일 문안(drift 가드 테스트).
 - **SaaS 격리**: 발송 API 는 `NewsletterSender` 인터페이스 뒤(`BrevoSender` 구현). MailerLite/Mailchimp
   등 교체 시 인터페이스 구현만 추가. `requests` 는 `BrevoSender` 안에서 지연 import(코어 순수성 보존).
-- **사람 후속**: SaaS(Brevo) 가입 → `BREVO_API_KEY`(Secrets)·`GRM_NEWSLETTER_LIST_ID`/`SENDER_EMAIL`/
-  `SENDER_NAME`/`TEST_EMAILS`(Variables)·발송 도메인 SPF/DKIM/DMARC·Environments `production` reviewer.
+- **사람 후속**: SaaS(Brevo) 가입 → `NEWSLETTER_API_KEY`(Secret, UI 직접 등록)·`GRM_NEWSLETTER_LIST_ID`/
+  `SENDER_EMAIL`/`SENDER_NAME`/`TEST_EMAILS`(Variables)·발송 도메인 SPF/DKIM/DMARC·Environments
+  `production` reviewer. (2026-06-30 vars·폼 action·도메인 인증 완료 — API 키 UI 등록·첫 발송만 잔여.)
 
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.

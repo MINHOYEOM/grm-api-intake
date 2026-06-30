@@ -267,7 +267,9 @@ class NewsletterSender:
     """SaaS-무관 발송 인터페이스(교체 가능). 구현은 캠페인 생성/발송/테스트발송/멱등조회만.
     본문·게이트·워크플로는 이 인터페이스에만 의존 — Brevo→타 SaaS 교체 시 구현만 추가."""
 
-    def find_campaign(self, name: str) -> "str | None":
+    def find_campaign(self, name: str) -> "dict | None":
+        """이름 일치 캠페인 {'id','status'} 또는 None. status 로 '이미 발송' vs '미발송 draft'
+        구분(create 성공 후 sendNow 실패한 잔여 draft 를 false-skip 하지 않기 위함)."""
         raise NotImplementedError
 
     def create_campaign(self, *, name: str, subject: str, html: str, list_ids: list[int],
@@ -285,6 +287,9 @@ class NewsletterSender:
 BREVO_UNSUBSCRIBE_HTML = (
     '<a href="{{ unsubscribe }}" style="color:#8E8B82">수신거부</a> · '
     '본 메일은 GRM 주간 브리프 구독자에게 발송되었습니다.')
+
+# 멱등(③): 이 status 면 '이미 발송/예약' → 재발송 0. draft 등 그 외는 미발송으로 보고 재사용.
+_DISPATCHED_STATUSES = {"sent", "queued", "inprocess", "in_process", "suspended", "archive"}
 
 
 class BrevoSender(NewsletterSender):
@@ -307,8 +312,8 @@ class BrevoSender(NewsletterSender):
     def _url(self, path: str) -> str:
         return f"{self.base}{path}"
 
-    def find_campaign(self, name: str) -> "str | None":
-        """이름 일치(멱등) 캠페인 id 또는 None. 페이지네이션 순회(최신 우선)."""
+    def find_campaign(self, name: str) -> "dict | None":
+        """이름 일치 캠페인 {'id','status'} 또는 None. 페이지네이션 순회(최신 우선)."""
         offset, limit = 0, 100
         for _ in range(20):                              # 최대 2000건 — 운영 규모 충분
             r = self.s.get(self._url("/emailCampaigns"),
@@ -319,7 +324,7 @@ class BrevoSender(NewsletterSender):
             camps = data.get("campaigns") or []
             for c in camps:
                 if c.get("name") == name:
-                    return str(c.get("id"))
+                    return {"id": str(c.get("id")), "status": str(c.get("status") or "")}
             if len(camps) < limit:
                 break
             offset += limit
@@ -423,6 +428,10 @@ def main(argv: "list[str] | None" = None) -> int:
             print("⚠️  GRM_NEWSLETTER_TEST_EMAILS 미설정 — 테스트 발송 대상 없음.", file=sys.stderr)
             return 2
         list_ids = _list_ids(_env("GRM_NEWSLETTER_LIST_ID"))
+        if not list_ids:
+            print("⚠️  GRM_NEWSLETTER_LIST_ID 미설정 — Brevo 캠페인 생성에 리스트 필요(테스트도).",
+                  file=sys.stderr)
+            return 2
         cid = sender.create_campaign(name=f"{name} [TEST]", subject=teaser2["subject"],
                                      html=teaser2["html"], list_ids=list_ids,
                                      sender_name=sender_name, sender_email=sender_email)
@@ -432,16 +441,21 @@ def main(argv: "list[str] | None" = None) -> int:
 
     # mode == send — 멱등(③) 후 실발송.
     existing = sender.find_campaign(name)
-    if existing:
-        print(f"멱등: 이미 발송된 호 — 캠페인 {existing}({name}) 존재. 재발송 안 함.")
+    if existing and existing.get("status", "").lower() in _DISPATCHED_STATUSES:
+        print(f"멱등: 이미 발송/예약된 호(status={existing.get('status')}) — 캠페인 "
+              f"{existing['id']}({name}). 재발송 안 함.")
         return 0
     list_ids = _list_ids(_env("GRM_NEWSLETTER_LIST_ID"))
     if not list_ids:
         print("⚠️  GRM_NEWSLETTER_LIST_ID 미설정 — 발송 대상 리스트 없음.", file=sys.stderr)
         return 2
-    cid = sender.create_campaign(name=name, subject=teaser2["subject"], html=teaser2["html"],
-                                 list_ids=list_ids, sender_name=sender_name,
-                                 sender_email=sender_email)
+    if existing:                       # 이전 실패로 남은 미발송 draft → 재사용(중복 생성 방지)
+        cid = existing["id"]
+        print(f"이전 미발송 캠페인 재사용(status={existing.get('status')}) → sendNow: {cid}")
+    else:
+        cid = sender.create_campaign(name=name, subject=teaser2["subject"], html=teaser2["html"],
+                                     list_ids=list_ids, sender_name=sender_name,
+                                     sender_email=sender_email)
     sender.send_campaign(cid)
     print(f"발송 완료: 캠페인 {cid}({name}) → 리스트 {list_ids}")
     return 0

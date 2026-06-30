@@ -231,10 +231,19 @@ class BrevoSenderTest(unittest.TestCase):
         self.assertEqual(sess.headers.get("api-key"), "key-123")
 
     def test_find_campaign_match_and_miss(self):
-        s, _ = self._sender(campaigns=[{"id": 7, "name": "GRM Weekly Brief — 2026-06-26 (No.2)"}])
-        self.assertEqual(s.find_campaign("GRM Weekly Brief — 2026-06-26 (No.2)"), "7")
-        s2, _ = self._sender(campaigns=[{"id": 7, "name": "other"}])
+        s, _ = self._sender(campaigns=[{"id": 7, "name": "GRM Weekly Brief — 2026-06-26 (No.2)",
+                                        "status": "sent"}])
+        c = s.find_campaign("GRM Weekly Brief — 2026-06-26 (No.2)")
+        self.assertEqual(c, {"id": "7", "status": "sent"})           # dict(id+status) — draft 구분용
+        s2, _ = self._sender(campaigns=[{"id": 7, "name": "other", "status": "sent"}])
         self.assertIsNone(s2.find_campaign("GRM Weekly Brief — 2026-06-26 (No.2)"))
+
+    def test_idempotency_skips_dispatched_not_draft(self):
+        # 멱등: 'sent/queued/...' 만 재발송 스킵. 'draft'(create 후 sendNow 실패 잔여)는 미발송
+        # 으로 보고 재사용해야(false-skip=메일 영영 미발송 방지).
+        self.assertIn("sent", newsletter._DISPATCHED_STATUSES)
+        self.assertIn("queued", newsletter._DISPATCHED_STATUSES)
+        self.assertNotIn("draft", newsletter._DISPATCHED_STATUSES)
 
     def test_create_campaign_payload(self):
         s, sess = self._sender()

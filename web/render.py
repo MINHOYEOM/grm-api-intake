@@ -508,10 +508,10 @@ NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip(
 
 # 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.
 SITE_NAME = "Global Regulatory Monitor"
-SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 신호를 매주 한자리에 모아 "
-                    "기관별 정렬·시사점·점검까지 정리하는 다이제스트.")
-ARCHIVE_DESCRIPTION = ("GRM 주간 브리프 아카이브 — 전 세계 제약 GMP·품질 규제 신호를 "
-                       "호별로 모아 기관·기간으로 검색·필터.")
+SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한자리에 모아 "
+                    "기관별 정렬·시사점·점검까지 정리하는 규제뉴스.")
+ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
+                       "주차별로 모아 기관·기간으로 검색·필터.")
 
 
 def _abs_url(rel_path: str = "") -> str:
@@ -525,7 +525,7 @@ def _brief_description(brief_meta: dict[str, Any]) -> str:
     if tldr and tldr[0]:
         return tldr[0]
     return (f"{title_dateform(brief_meta.get('publish_date', ''))} "
-            "글로벌·국내 제약 GMP·품질 규제 신호 다이제스트.")
+            "글로벌·국내 제약 GMP·품질 규제 소식.")
 
 
 def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
@@ -623,7 +623,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         key=lambda r: r["date"], reverse=True,
     )
     archive_html = env.get_template("archive.html").render(
-        page_title="주간 브리프 · GRM",
+        page_title="규제뉴스 · GRM",
         rel_root="../",
         nav_active="board",
         latest_slug=latest_slug,
@@ -653,7 +653,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         sections = _build_sections(card_views)
         ctx = _brief_context(b, issue_no)
         html = brief_tmpl.render(
-            page_title=f"{ctx['title_dateform']} 브리프 · GRM",
+            page_title=f"{ctx['title_dateform']} 규제뉴스 · GRM",
             rel_root="../../",
             nav_active="detail",
             latest_slug=latest_slug,

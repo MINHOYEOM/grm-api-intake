@@ -69,9 +69,10 @@ class NewsletterTeaserTest(unittest.TestCase):
         cls.html = cls.t["html"]
 
     def test_subject_date_issue_no_weekday(self):
-        # 발행일+호수 기반(요일 없음 — web JSON 에 weekday 없음·산술 금지 클래스 차단).
+        # 발행일 기반(요일 없음 — web JSON 에 weekday 없음·산술 금지 클래스 차단). 2026-07-01
+        # 카피 톤 개편으로 "제N호" 표기 제거(주차 표기로 대체 표현).
         self.assertEqual(self.t["subject"],
-                         "[GRM 주간 브리프] 2026년 6월 4주차 · 제2호 (2026-06-26 발행)")
+                         "[GRM 규제뉴스] 2026년 6월 4주차 (2026-06-26 발행)")
         self.assertNotRegex(self.t["subject"], r"(월|화|수|목|금|토|일)요일")
 
     def test_title_is_tldr0(self):

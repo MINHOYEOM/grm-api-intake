@@ -43,13 +43,13 @@
 {% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="{{ rel_root }}index.html"><b class="brand-full">Global Regulatory Monitor</b><b class="brand-abbr">GRM</b></a>
-  <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>최신호</a></nav>
+  <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>모아보기</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>이번 주</a></nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
-  {# P0-3: 구독 기능 미도입 — 헤더 상시 CTA를 최신 브리프(최신호)로. archive 3중 중복 제거. #}
-  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">최신 브리프</a>
+  {# P0-3: 구독 기능 미도입 — 헤더 상시 CTA를 이번 주 소식으로. archive 3중 중복 제거. #}
+  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">이번 주 소식</a>
 </div></header>
 
 {% block content %}{% endblock %}
@@ -57,8 +57,8 @@
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
   <span class="kick">Weekly Newsletter</span>
-  <h2>새 브리프를 이메일로 받아보세요</h2>
-  <p>매주 발행되는 주간 브리프의 핵심 요약과 바로가기를 메일로 보내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.</p>
+  <h2>매주 새로운 규제소식을 이메일로 받아보세요</h2>
+  <p>매주 모아드리는 규제 클리핑의 핵심 요약과 바로가기를 메일로 보내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.</p>
   <form class="sub-form" action="{{ newsletter_form_action }}" method="post">
     <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="이메일 주소" placeholder="you@company.com" />
     {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
@@ -73,8 +73,8 @@
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 신호를 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제 인텔리전스 다이제스트.</p></div>
-    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">주간 브리프</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">최신호</a></div>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">이번 주</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><span>AI 자동 생성 고지</span><span>원문 확인 안내</span></div>
   </div>

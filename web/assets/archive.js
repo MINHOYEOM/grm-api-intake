@@ -235,7 +235,7 @@
       issues
         .map(function (v, i) {
           var badge = v.latest
-            ? '<span class="badge"><span class="live"></span>최신호 · LIVE</span>'
+            ? '<span class="badge"><span class="live"></span>이번 주 · LIVE</span>'
             : "";
           var tags = (v.agencies || [])
             .map(function (a) {

@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
 {% if google_site_verification %}
 <meta name="google-site-verification" content="{{ google_site_verification }}" />
 {% endif %}
@@ -23,7 +27,11 @@
 <meta property="og:description" content="{{ description }}" />
 {% endif %}
 <meta property="og:url" content="{{ canonical }}" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="{{ og_image }}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="{{ og_image }}" />
 {% endif %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +50,8 @@
 {# P0-4: '소개' = 홈의 WHY 섹션(#why). 홈에선 순수 프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}
 {% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="{{ rel_root }}index.html"><b class="brand-full">Global Regulatory Monitor</b><b class="brand-abbr">GRM</b></a>
+  {# 헤더 브랜드 락업(B안) — favicon.svg(올빼미) 재사용(단일원천) + GRM/서브타이틀. grm.css 프리즈 보존 위해 인라인 스타일(정렬·크기)만; .brand-full 은 기존 ≤640px 반응형 은닉 클래스 재사용(서브타이틀=구 전체명 대체). #}
+  <a class="brand" href="{{ rel_root }}index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
   <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>모아보기</a><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html"{% if nav_active == 'detail' %} class="on"{% endif %}>이번 주</a></nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}

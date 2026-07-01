@@ -536,12 +536,29 @@ def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
     """
     nodes = [
         {"@context": "https://schema.org", "@type": "Organization",
-         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION},
+         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
+         "logo": f"{base_url}/assets/favicon-512.png"},
         {"@context": "https://schema.org", "@type": "WebSite",
          "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
          "inLanguage": "ko"},
     ]
     return json.dumps(nodes, ensure_ascii=False, indent=1).replace("<", "\\u003c")
+
+
+def build_site_webmanifest() -> str:
+    """site.webmanifest — 정적·결정론(PWA 아이콘 메타). dict 삽입순 보존."""
+    manifest = {
+        "name": SITE_NAME,
+        "short_name": "GRM",
+        "icons": [
+            {"src": "/assets/favicon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "/assets/favicon-512.png", "sizes": "512x512", "type": "image/png"},
+        ],
+        "theme_color": "#C2603F",
+        "background_color": "#FAF9F5",
+        "display": "standalone",
+    }
+    return json.dumps(manifest, ensure_ascii=False, indent=1) + "\n"
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
@@ -575,6 +592,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 호출 시점에 읽어 운영 var/테스트 monkeypatch 를 모두 반영(import-time 캡처 회피).
     env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
+    env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
@@ -601,6 +619,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         if af.is_file():
             shutil.copyfile(af, dist_assets / af.name)
             written.append(f"assets/{af.name}")
+
+    # 파비콘(dist 루트) — 브라우저가 /favicon.ico·/favicon.svg 를 루트에서 자동 요청.
+    # 원본은 assets/ 에 두고(위 루프로 assets/ 복사됨) 루트에도 동일 바이트 복사.
+    for icon_name in ("favicon.ico", "favicon.svg"):
+        shutil.copyfile(assets_dir / icon_name, out_dir / icon_name)
+        written.append(icon_name)
+
+    # PWA 매니페스트(dist 루트) — 정적·결정론.
+    _write(out_dir / "site.webmanifest", build_site_webmanifest())
+    written.append("site.webmanifest")
 
     # 랜딩.
     landing_html = env.get_template("landing.html").render(

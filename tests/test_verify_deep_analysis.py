@@ -92,6 +92,14 @@ class CitationExtractionTest(unittest.TestCase):
         self.assertIn(vda._normalize_citation("21 CFR 211.192"), found)
         self.assertTrue(any("502(a)" in f for f in found))
 
+    def test_bare_citation_with_hangul_particle_extracted(self) -> None:
+        # Codex P1 회귀: 조사가 공백 없이 붙은 bare 조항("610.13는"/"502(a)는")도 추출돼야
+        # D2 근거대조가 걸린다(예전 \b 는 숫자-한글 경계를 못 만들어 추출조차 못 했다).
+        found = {vda._normalize_citation(t) for t in vda.extract_citations("610.13는 원문에 없는 조항")}
+        self.assertIn("610.13", found)
+        found2 = {vda._normalize_citation(t) for t in vda.extract_citations("502(a)는 조사 대상")}
+        self.assertTrue(any("502(a)" in f for f in found2))
+
 
 class CitationGroundingTest(unittest.TestCase):
     def test_grounded_citations_pass(self) -> None:
@@ -137,6 +145,19 @@ class GateTest(unittest.TestCase):
         result = vda.run_deep_analysis_gate(da, _SOURCE)
         self.assertFalse(result.ok)
         self.assertGreaterEqual(result.fail_count, 1)
+
+    def test_fabricated_bare_citation_with_particle_blocks_gate(self) -> None:
+        # Codex P1 회귀(핵심 위협 벡터): 한국어 산문에 조사 직결로 날조 조항("610.13는")을 심어
+        # D2 를 통째로 우회하던 것을 차단. citation 필드는 grounded, 산문에 날조 조항만 삽입.
+        da = dict(_GOOD_DEEP_ANALYSIS)
+        da["key_violations"] = list(da["key_violations"]) + [
+            {"citation": "21 CFR 211.192",
+             "description": "원문에 없는 610.13는 조항을 근거로 든 날조 서술", "risk": "-"}
+        ]
+        result = vda.run_deep_analysis_gate(da, _SOURCE)
+        self.assertFalse(result.ok)   # 예전엔 True(우회) — 이제 FAIL
+        self.assertTrue(any("610.13" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
 
     def test_incomplete_structure_blocks_merge_and_skips_citation_pass(self) -> None:
         da = dict(_GOOD_DEEP_ANALYSIS)

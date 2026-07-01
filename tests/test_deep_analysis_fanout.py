@@ -106,14 +106,15 @@ class AssembleTest(unittest.TestCase):
         self.assertIn("WL-1", r.deltas)
 
     def test_html_entities_normalized_before_merge(self):
-        # 실검증 발견(Intas 'FD&amp;C'): 서브에이전트가 & 를 이스케이프하면 Jinja 자동이스케이프와
-        # 겹쳐 렌더가 이중 이스케이프된다. assemble 이 병합 전 원문자로 되돌려야 한다.
+        # Codex P3 / 실검증 관측(Intas): 서브에이전트가 'FD&C Act'를 'FD&amp;C Act'로 이스케이프해
+        # 산출 → 그대로 두면 Jinja 자동이스케이프와 겹쳐 렌더가 이중 이스케이프('FD&amp;amp;C').
+        # assemble 이 병합 전 원문자로 되돌려야 한다(실관측 값 그대로 회귀).
         da = dict(_GOOD_DA)
-        da["administrative_risks"] = "미이행 시 수입경보(Import Alert) 및 R&amp;D 중단 위험이 있다."
+        da["administrative_risks"] = "미이행 시 수입금지 등 FD&amp;C Act 상의 규제 조치가 가능하다."
         r = fo.assemble_deltas(self.jobs, {"WL-1": da})
         stored = r.deltas["WL-1"]["deep_analysis"]["administrative_risks"]
-        self.assertIn("R&D", stored)
-        self.assertNotIn("&amp;", stored)
+        self.assertIn("FD&C Act", stored)
+        self.assertNotIn("FD&amp;C", stored)
 
 
 class EndToEndTest(unittest.TestCase):

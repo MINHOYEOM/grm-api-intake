@@ -69,6 +69,7 @@ SINGLE_GOLDENS = [
     ("assets/search-index.json", "search-index.expected.json"),
     ("robots.txt", "robots.expected.txt"),
     ("sitemap.xml", "sitemap.expected.xml"),
+    ("site.webmanifest", "site.expected.webmanifest"),
 ]
 MULTI_GOLDENS = [
     ("archive/index.html", "archive_multi.expected.html"),
@@ -136,6 +137,22 @@ class WebRenderGoldenTest(unittest.TestCase):
         self.assertEqual(built, src, "archive.js 가 dist 에 verbatim 복사되지 않음")
         self.assertTrue((self.single / "assets" / "search-index.json").exists(),
                         "search-index.json 미산출")
+
+    def test_favicon_and_og_assets_present(self):
+        # 브랜드 에셋(png·ico·og) 은 골든 대상 아님(존재/복사 byte-verbatim 만 확인).
+        for name in ("favicon-16.png", "favicon-32.png", "favicon-48.png",
+                     "favicon-180.png", "favicon-192.png", "favicon-512.png",
+                     "favicon.ico", "favicon.svg", "og-image.png"):
+            built = (self.single / "assets" / name).read_bytes()
+            src = (WEB_DIR / "assets" / name).read_bytes()
+            self.assertEqual(built, src, f"{name} 이 dist/assets 에 verbatim 복사되지 않음")
+
+    def test_favicon_copied_to_dist_root(self):
+        # 브라우저가 /favicon.ico·/favicon.svg 를 루트에서 자동 요청 — assets/ 와 별도 복사.
+        for name in ("favicon.ico", "favicon.svg"):
+            built = (self.single / name).read_bytes()
+            src = (WEB_DIR / "assets" / name).read_bytes()
+            self.assertEqual(built, src, f"{name} 이 dist 루트에 verbatim 복사되지 않음")
 
 
 # ── 구조 단언 (스키마 → 마크업 매핑) ─────────────────────────────────────────
@@ -803,14 +820,26 @@ class WebSeoMetaTest(unittest.TestCase):
         self.assertIn(f'<link rel="canonical" href="{self.BASE}/briefs/2026-06-26/" />', self.detail)
 
     def test_open_graph_and_twitter(self):
+        og_image = f'<meta property="og:image" content="{self.BASE}/assets/og-image.png" />'
         for h in (self.landing, self.archive, self.detail):
             self.assertIn('<meta property="og:type" content="website" />', h)
             self.assertIn('<meta property="og:site_name" content="Global Regulatory Monitor" />', h)
             self.assertIn('<meta property="og:locale" content="ko_KR" />', h)
             self.assertIn('<meta property="og:title" content="', h)
-            self.assertIn('<meta name="twitter:card" content="summary" />', h)
+            self.assertIn(og_image, h)
+            self.assertIn('<meta property="og:image:width" content="1200" />', h)
+            self.assertIn('<meta property="og:image:height" content="630" />', h)
+            self.assertIn('<meta name="twitter:card" content="summary_large_image" />', h)
+            self.assertIn(f'<meta name="twitter:image" content="{self.BASE}/assets/og-image.png" />', h)
         # og:url == canonical(트레일링슬래시형 통일).
         self.assertIn(f'<meta property="og:url" content="{self.BASE}/archive/" />', self.archive)
+
+    def test_favicon_links_root_absolute(self):
+        for h in (self.landing, self.archive, self.detail):
+            self.assertIn('<link rel="icon" href="/favicon.ico" sizes="any">', h)
+            self.assertIn('<link rel="icon" type="image/svg+xml" href="/favicon.svg">', h)
+            self.assertIn('<link rel="apple-touch-icon" href="/assets/favicon-180.png">', h)
+            self.assertIn('<link rel="manifest" href="/site.webmanifest">', h)
 
     def test_json_ld_landing_only_and_valid(self):
         import re as _re
@@ -821,6 +850,7 @@ class WebSeoMetaTest(unittest.TestCase):
         self.assertEqual([n["@type"] for n in data], ["Organization", "WebSite"])
         for n in data:
             self.assertEqual(n["url"], self.BASE)
+        self.assertEqual(data[0]["logo"], f"{self.BASE}/assets/favicon-512.png")
         # 상세·아카이브엔 JSON-LD 미출력(랜딩 한정).
         self.assertNotIn("application/ld+json", self.archive)
         self.assertNotIn("application/ld+json", self.detail)

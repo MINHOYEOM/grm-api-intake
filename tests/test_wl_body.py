@@ -212,5 +212,103 @@ class WlCollectBodyGateTest(unittest.TestCase):
                          {"enabled": False, "attempted": 0, "failed": 0})
 
 
+class WlExtractBodyFullTest(unittest.TestCase):
+    """[WL 심층분석 fan-out 2026-07-01] _extract_wl_body_full — 동일 앵커·더 긴 상한.
+
+    excerpt(1500자)와 앵커 탐색 로직을 공유(_extract_wl_body_span)하므로 시작점은 동일하고
+    상한(WL_BODY_FULL_MAX_CHARS)만 다르다 — excerpt 회귀(WlExtractExcerptTest)는 무변경.
+    """
+
+    def test_starts_at_same_anchor_as_excerpt(self) -> None:
+        full = ci._extract_wl_body_full(_WL_BODY_HTML)
+        excerpt = ci._extract_wl_body_excerpt(_WL_BODY_HTML)
+        self.assertTrue(full.startswith("During our inspection"))
+        self.assertTrue(excerpt.startswith(full[:len(excerpt)]) or full.startswith(excerpt))
+
+    def test_no_anchor_returns_empty(self) -> None:
+        html = "<html><body><p>Generic page with no enforcement narrative.</p></body></html>"
+        self.assertEqual(ci._extract_wl_body_full(html), "")
+
+    def test_captures_far_more_than_excerpt_cap(self) -> None:
+        # 실제 편지처럼 위반 서술 뒤 구제조치/행정리스크 단락까지 이어지는 긴 본문.
+        tail = ("Required Remediation: Within 15 working days, respond with corrective "
+                "actions. " * 40)
+        html = "<p>During our inspection, we observed violations. " + tail + "</p>"
+        full = ci._extract_wl_body_full(html)
+        excerpt = ci._extract_wl_body_excerpt(html)
+        self.assertGreater(len(full), len(excerpt))
+        self.assertIn("Required Remediation", full)
+
+    def test_capped_at_full_max_chars(self) -> None:
+        html = "<p>During our inspection " + ("x" * (ci.WL_BODY_FULL_MAX_CHARS + 5000)) + "</p>"
+        self.assertLessEqual(len(ci._extract_wl_body_full(html)), ci.WL_BODY_FULL_MAX_CHARS)
+
+
+class WlFetchBodyFullTest(unittest.TestCase):
+    def test_fetch_success_returns_full_body(self) -> None:
+        with patch.object(ci.requests, "get", return_value=_Resp(_WL_BODY_HTML)):
+            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+        self.assertTrue(full.startswith("During our inspection"))
+
+    def test_fetch_403_is_graceful_empty(self) -> None:
+        with patch.object(ci.requests, "get", return_value=_Resp("", 403)):
+            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+        self.assertEqual(full, "")
+
+    def test_fetch_timeout_is_graceful_empty(self) -> None:
+        with patch.object(ci.requests, "get", side_effect=requests.Timeout("slow")):
+            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+        self.assertEqual(full, "")
+
+
+class WlCollectBodyFullGateTest(unittest.TestCase):
+    """collect_fda_warning_letters — ENABLE_WL_BODY_FULL 은 ENABLE_WL_BODY 와 완전 독립."""
+
+    def _dispatch(self, *, body):
+        def _get(url, *args, **kwargs):
+            if url == ci.FDA_WL_URL:
+                return _Resp(_WL_LIST_HTML)
+            if callable(body):
+                return body(url)
+            return body
+        return _get
+
+    def test_flag_on_writes_body_full_independent_of_excerpt_flag(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WL_BODY_FULL": "true", "ENABLE_WL_BODY": "false"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_Resp(_WL_BODY_HTML))):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        raw = items[0].raw_payload
+        self.assertNotIn("wl_body_excerpt", raw)              # excerpt 플래그 off → 미기록
+        self.assertTrue(raw.get("wl_body_full", "").startswith("During our inspection"))
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body_full"],
+                         {"enabled": True, "attempted": 1, "failed": 0})
+
+    def test_both_flags_on_write_both_keys(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WL_BODY_FULL": "true", "ENABLE_WL_BODY": "true"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_Resp(_WL_BODY_HTML))):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        raw = items[0].raw_payload
+        self.assertIn("wl_body_excerpt", raw)
+        self.assertIn("wl_body_full", raw)
+
+    def test_flag_off_skips_full_body_fetch(self) -> None:
+        def _must_not_fetch_letter(url):
+            raise AssertionError(f"ENABLE_WL_BODY_FULL off 인데 전문 fetch 호출됨: {url}")
+
+        with patch.dict(os.environ, {"ENABLE_WL_BODY_FULL": "false", "ENABLE_WL_BODY": "false"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_must_not_fetch_letter)):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        self.assertNotIn("wl_body_full", items[0].raw_payload)
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body_full"],
+                         {"enabled": False, "attempted": 0, "failed": 0})
+
+
 if __name__ == "__main__":
     unittest.main()

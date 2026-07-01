@@ -249,5 +249,133 @@ class InjectRenderSmokeTest(unittest.TestCase):
         self.assertIn("요약헤드라인하나", html)
 
 
+_WL_SOURCE_TEXT = (
+    "During our inspection, we observed significant violations of Current Good "
+    "Manufacturing Practice regulations, including 21 CFR 211.192 (failure to "
+    "thoroughly investigate discrepancies). Within 15 working days, respond with "
+    "corrective actions. Failure to do so may result in seizure or injunction."
+)
+
+_GOOD_DELTA_DA = {
+    "key_violations": [
+        {"citation": "21 CFR 211.192", "description": "불일치 조사 미흡", "risk": "품질 위험"},
+    ],
+    "fda_evaluation": "FDA는 이전 대응이 불충분했다고 평가했다.",
+    "required_remediation": {
+        "deadline": "15영업일 이내 서면 회신",
+        "items": ["불일치 조사 절차를 재수립하고 근본 원인 분석을 문서화",
+                  "시정·예방 조치(CAPA) 계획을 수립해 제출"],
+    },
+    "administrative_risks": "미이행 시 압류·금지명령 등 법적 조치가 가능하다.",
+}
+
+
+class InjectDeepAnalysisTest(unittest.TestCase):
+    """[WL 심층분석 fan-out 2026-07-01] inject_deep_analysis — 6종 동결 슬롯 inject_llm_slots
+    와 완전 별개 경로(additive). 게이트(verify_deep_analysis) 통과 카드만 병합."""
+
+    def setUp(self) -> None:
+        fx = _load_input("warning_letter_excerpt")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = _WL_SOURCE_TEXT
+        self.card = cs.build_card_scaffold(fx["row"], raw)
+        self.brief = cs.assemble_web_brief([self.card], {
+            "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+            "publish_date": "2026-07-01", "intake_total": 1,
+        })
+        self.doc_id = self.brief["cards"][0]["id"]
+
+    def test_passing_delta_merges_deep_analysis(self) -> None:
+        deltas = {self.doc_id: {"deep_analysis": _GOOD_DELTA_DA, "source_text": _WL_SOURCE_TEXT}}
+        report = inj.inject_deep_analysis(self.brief, deltas)
+        self.assertEqual(report.errors, [])
+        card = self.brief["cards"][0]
+        self.assertEqual(card["deep_analysis"], _GOOD_DELTA_DA)
+
+    def test_fabricated_citation_blocked_card_stays_thin(self) -> None:
+        bad_da = dict(_GOOD_DELTA_DA)
+        bad_da["key_violations"] = list(bad_da["key_violations"]) + [
+            {"citation": "21 CFR 999.99", "description": "지어낸 조항", "risk": "-"}
+        ]
+        deltas = {self.doc_id: {"deep_analysis": bad_da, "source_text": _WL_SOURCE_TEXT}}
+        report = inj.inject_deep_analysis(self.brief, deltas)
+        self.assertTrue(report.errors)
+        card = self.brief["cards"][0]
+        self.assertIsNone(card["deep_analysis"])   # 병합 보류 — 카드는 6슬롯만으로 발행
+
+    def test_unknown_document_id_warns_not_errors(self) -> None:
+        deltas = {"no-such-id": {"deep_analysis": _GOOD_DELTA_DA, "source_text": _WL_SOURCE_TEXT}}
+        report = inj.inject_deep_analysis(self.brief, deltas)
+        self.assertEqual(report.errors, [])
+        self.assertTrue(any("브리프에 없는 카드" in w for w in report.warnings))
+
+    def test_card_not_deep_analysis_ready_warns_not_errors(self) -> None:
+        # deep_analysis_ready=False 카드(전문 미확보)에 델타를 보내면 무시(경고만).
+        fx = _load_input("mfds_notice")
+        other = cs.build_card_scaffold(fx["row"], fx["raw"])
+        brief2 = cs.assemble_web_brief([other], {
+            "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+            "publish_date": "2026-07-01", "intake_total": 1,
+        })
+        doc_id = brief2["cards"][0]["id"]
+        report = inj.inject_deep_analysis(
+            brief2, {doc_id: {"deep_analysis": _GOOD_DELTA_DA, "source_text": "x"}})
+        self.assertEqual(report.errors, [])
+        self.assertTrue(any("대상이 아님" in w for w in report.warnings))
+        self.assertNotIn("deep_analysis", brief2["cards"][0])
+
+
+class DeepAnalysisRenderSmokeTest(unittest.TestCase):
+    """[WL 심층분석 fan-out] card.html 단계적 노출(details) 렌더 스모크 — 있으면 나오고
+    없으면(대다수 카드) 마크업 자체가 안 나온다(golden 무회귀와 동형 확인)."""
+
+    def _render_brief_html(self, brief: dict) -> str:
+        web_dir = pathlib.Path(__file__).resolve().parent.parent / "web"
+        sys.path.insert(0, str(web_dir))
+        import render  # noqa: E402
+        with tempfile.TemporaryDirectory() as tmp:
+            data_dir = pathlib.Path(tmp) / "data"
+            data_dir.mkdir()
+            (data_dir / "brief_web_2026_07_01.json").write_text(
+                json.dumps(brief, ensure_ascii=False, indent=1), encoding="utf-8")
+            out_dir = pathlib.Path(tmp) / "dist"
+            render.render_site(data_dir=data_dir, out_dir=out_dir)
+            return (out_dir / "briefs" / "2026-07-01" / "index.html").read_text(encoding="utf-8")
+
+    def test_deep_analysis_renders_when_present(self) -> None:
+        fx = _load_input("warning_letter_excerpt")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = _WL_SOURCE_TEXT
+        card = cs.build_card_scaffold(fx["row"], raw)
+        brief = cs.assemble_web_brief([card], {
+            "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+            "publish_date": "2026-07-01", "intake_total": 1,
+        })
+        report = inj.inject_deep_analysis(
+            brief, {brief["cards"][0]["id"]: {"deep_analysis": _GOOD_DELTA_DA,
+                                              "source_text": _WL_SOURCE_TEXT}})
+        self.assertEqual(report.errors, [])
+        html = self._render_brief_html(brief)
+        self.assertIn("상세 분석 보기", html)
+        self.assertIn("Key Violations", html)
+        self.assertIn("21 CFR 211.192", html)
+        self.assertIn("Required Remediation", html)
+        # §2.5 확정: Overview 섹션 제거 + required_remediation 마감기한·체크리스트 렌더.
+        self.assertNotIn("Overview", html)
+        self.assertIn("15영업일 이내 서면 회신", html)   # deadline 한 줄
+        self.assertIn("CAPA", html)                      # 체크리스트 항목 중 하나
+
+    def test_deep_analysis_markup_absent_for_ordinary_cards(self) -> None:
+        fx = _load_input("warning_letter_chemical")   # wl_body_full 없음 — deep_analysis_ready=False
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        brief = cs.assemble_web_brief([card], {
+            "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+            "publish_date": "2026-07-01", "intake_total": 1,
+        })
+        html = self._render_brief_html(brief)
+        self.assertNotIn("상세 분석 보기", html)
+        self.assertNotIn("class=\"block deep\"", html)
+
+
 if __name__ == "__main__":
     unittest.main()

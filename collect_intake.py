@@ -194,6 +194,13 @@ FDA_WL_SEARCH_API = (
 # in-window WL 은 부서 게이트 후 소수(주 한 줌) → fetch 부담 낮음. 실패는 graceful(키 미기록).
 WL_BODY_MAX_CHARS = 1500
 WL_BODY_FETCH_TIMEOUT = 20
+# [WL 심층분석 fan-out 2026-07-01] 본문 전문(全文) 확보 (flag 게이트 ENABLE_WL_BODY_FULL,
+# 기본 off). 기존 WL_BODY_MAX_CHARS(1500자) excerpt 는 카드 "왜"용 짧은 발췌를 그대로 유지하고,
+# 이 상수는 카드 1건에 대한 별도 fan-out 심층분석(조항별 위반·구제조치·행정리스크 5섹션,
+# docs/prompts/GRM_Prompt_DeepWL_v1.md)의 입력 컨텍스트용 전문을 담는다. 수집(Python·GitHub
+# Actions) 단계 비용은 HTTP GET 1회뿐이라 상한을 넉넉히 잡아도 부담이 없다(LLM 비용은 fan-out
+# 단계에서 카드별로 격리 — collect_intake 는 저장만 한다). 실패는 graceful(키 미기록).
+WL_BODY_FULL_MAX_CHARS = 20000
 # 표지/머리말 보일러플레이트를 건너뛰고 위반 서술부터 자르기 위한 영문 앵커. 대소문자 무시(re.I).
 # 2-tier 선별(2026-06-18): 위반 서술을 직접 가리키는 1차 앵커가 본문에 있으면 그 가장 이른
 # 위치를 쓰고, 없을 때만 일반 머리말 폴백 앵커로 내려간다. (종전엔 전 앵커 통합 최이른 위치라
@@ -1995,9 +2002,13 @@ def _earliest_anchor(text: str, patterns: tuple[str, ...]) -> int | None:
     return best
 
 
-def _extract_wl_body_excerpt(html_text: str) -> str:
-    """WL 본문 위반 서술 구간 excerpt. 1차 앵커(위반 서술 직접 지시)가 있으면 그 가장 이른
-    위치, 없으면 폴백 앵커(일반 머리말), 둘 다 없으면 ""(키 미기록·목록 메타 카드 유지).
+def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
+    """WL 본문 위반 서술 구간 추출 공통 코어(앵커 탐색 + max_chars 절단).
+
+    1차 앵커(위반 서술 직접 지시)가 있으면 그 가장 이른 위치, 없으면 폴백 앵커(일반 머리말),
+    둘 다 없으면 ""(키 미기록·목록 메타 카드 유지). `_extract_wl_body_excerpt`(1500자, 기존
+    W1 카드 "왜"용)와 `_extract_wl_body_full`(전문, 심층분석 fan-out 입력용)이 이 코어를
+    공유한다 — 앵커 탐색 로직 중복 방지, `max_chars` 만 다르다(기존 호출부 동작 불변).
 
     표지/머리말 보일러플레이트가 아니라 위반 서술을 카드 컨텍스트("왜")로 올리기 위한 추출.
     FDA 페이지는 nav/푸터가 많아 앵커 미발견 시 앞부분 폴백을 하지 않고 메타 카드를 유지한다.
@@ -2010,7 +2021,22 @@ def _extract_wl_body_excerpt(html_text: str) -> str:
         start = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
     if start is None:
         return ""
-    return text[start:start + WL_BODY_MAX_CHARS].strip()
+    return text[start:start + max_chars].strip()
+
+
+def _extract_wl_body_excerpt(html_text: str) -> str:
+    """WL 본문 위반 서술 구간 excerpt(1500자) — `_extract_wl_body_span` 위임(동작 불변)."""
+    return _extract_wl_body_span(html_text, WL_BODY_MAX_CHARS)
+
+
+def _extract_wl_body_full(html_text: str) -> str:
+    """[WL 심층분석 fan-out] WL 본문 전문(全文, 최대 WL_BODY_FULL_MAX_CHARS) — 신규·additive.
+
+    excerpt 와 동일 앵커(위반 서술 시작점)에서 시작해 훨씬 더 긴 구간을 담는다 — 위반 서술
+    이후 이어지는 구제조치 기한·행정 리스크 문단까지 포함하도록(편지 뒷부분). 카드별 fan-out
+    심층분석(docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력 컨텍스트가 된다.
+    """
+    return _extract_wl_body_span(html_text, WL_BODY_FULL_MAX_CHARS)
 
 
 # WHY-1 #2 P1: WL 본문 excerpt 관측용 — collect_who.LAST_HEALTH 동형 패턴.
@@ -2038,6 +2064,30 @@ def _fetch_wl_body_excerpt(url: str) -> str:
     return excerpt
 
 
+def _fetch_wl_body_full(url: str) -> str:
+    """[WL 심층분석 fan-out] WL 편지 페이지 fetch → 본문 전문. 실패는 graceful("").
+
+    `_fetch_wl_body_excerpt` 와 별도 GET(단순성·격리 우선 — in-window WL 은 주 소수라
+    중복 fetch 비용 무시 가능). 두 플래그가 모두 켜져도 서로 독립적으로 동작한다.
+    """
+    try:
+        resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+            "Accept": "text/html",
+        })
+        if resp.status_code == 403:
+            log("WARN", f"FDA WL 본문(전문) 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
+            return ""
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        log("WARN", f"FDA WL 본문(전문) fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
+        return ""
+    full = _extract_wl_body_full(resp.text)
+    if not full:
+        log("INFO", f"FDA WL 본문(전문) 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
+    return full
+
+
 def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """FDA Warning Letters 페이지 HTML 테이블 파싱 수집.
 
@@ -2050,13 +2100,18 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     """
     log("INFO", f"FDA WL 수집: {FDA_WL_URL}")
     wl_body_enabled = os.environ.get("ENABLE_WL_BODY", "false").lower() == "true"
+    # [WL 심층분석 fan-out] 전문 확보 게이트 — ENABLE_WL_BODY 와 독립(둘 다 off 가 기본).
+    wl_body_full_enabled = os.environ.get("ENABLE_WL_BODY_FULL", "false").lower() == "true"
     # P1: excerpt 시도/실패 집계 — 시작 시점에 전역을 교체해(이른 return 포함) 항상
     # 이번 호출 분만 남긴다. dict 는 in-place 갱신이라 이후 증가분이 그대로 반영.
     global LAST_WL_HEALTH
     wl_body_health: dict[str, Any] = {
         "enabled": wl_body_enabled, "attempted": 0, "failed": 0,
     }
-    LAST_WL_HEALTH = {"wl_body": wl_body_health}
+    wl_body_full_health: dict[str, Any] = {
+        "enabled": wl_body_full_enabled, "attempted": 0, "failed": 0,
+    }
+    LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health}
     try:
         resp = requests.get(FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -2161,6 +2216,17 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
                 wl_raw["wl_body_excerpt"] = body_excerpt
             else:
                 wl_body_health["failed"] += 1
+
+        # [WL 심층분석 fan-out 2026-07-01] 전문 확보(flag on 시) — 카드별 fan-out 심층분석
+        # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
+        # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
+        if wl_body_full_enabled and wl_href:
+            wl_body_full_health["attempted"] += 1
+            body_full = _fetch_wl_body_full(wl_href)
+            if body_full:
+                wl_raw["wl_body_full"] = body_full
+            else:
+                wl_body_full_health["failed"] += 1
 
         items.append(IntakeItem(
             source=SOURCE_FDA_WL,

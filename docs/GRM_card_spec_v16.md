@@ -322,9 +322,93 @@ K3 프롬프트는 v15.8 방식대로 멤버 전원 갱신을 명시). v1 경로
 **(G) golden·회귀.** 신규 golden `recall-merged`(3품목 1카드) + 비병합 회귀(빈 키·단독 멤버·이종 사유 그룹 분리).
 기존 16종 golden 바이트 불변이 합격 조건.
 
+## 15. deep_analysis — 7번째·선택 슬롯 (WL 심층분석 fan-out, 2026-07-01)
+
+> 배경: 사용자 피드백 — 얇은 6슬롯(§0 표)만으로는 Warning Letter 카드의 시사점이 "조잡"하다.
+> §0~§14(6슬롯·동결)는 **그대로 불변**이다. 이 §15 는 그 위에 얹는 **완전 additive·선택적**
+> 7번째 슬롯이며, §0의 "LLM 이 채우는 칸은 단 6종" 원칙을 깨지 않는다 — deep_analysis 는
+> 별도 파이프라인(fan-out)이 채우는 별도 필드로, 6슬롯 Routine(GRM_Prompt_v16.md)은
+> 이 필드를 전혀 참조하지 않는다. 변경은 이 §15 + golden/테스트 갱신으로만.
+
+**(A) 적용 범위.** `kind == "warning-letter"` + 수집기가 `raw.wl_body_full`(전문, `ENABLE_WL_BODY_FULL`
+게이트)을 확보한 카드만. 그 외 전 유형·전문 미확보 WL 카드는 항상 `deep_analysis_ready=False`이며
+`to_web_card()` 출력에 `deep_analysis` 키 자체가 없다(기존 20+ golden 바이트 불변).
+
+**(B) 왜 별도 파이프라인인가(fan-out).** 기존 6슬롯 Routine은 "그 주 카드 전체를 한 세션이
+처리"하는 모델이라, 카드당 본문 전문+4섹션 산문까지 얹으면 세션 부하·환각 위험이 카드 수에
+비례해 커진다. 대신 **카드 1건 = 독립 호출 1건**(fan-out)으로 분리한다 — 호출당 컨텍스트가
+"편지 1건"으로 고정되어 카드 수와 무관하게 부하가 일정하고, 카드 간 내용 혼동이 구조적으로
+없다. 이 fan-out 은 6슬롯 Routine 예산(WebSearch 9/WebFetch 5)과 완전히 분리된 별도 트랙이다.
+
+**(C) 스키마(4섹션 — §2.5 확정: Overview 제거·required_remediation 객체화).**
+```json
+{
+  "key_violations": [
+    {"citation": "21 CFR 211.194(a)", "description": "...", "risk": "..."}
+  ],
+  "fda_evaluation": "평문 — FDA의 이전 대응 평가",
+  "required_remediation": {"deadline": "15영업일 이내 서면 회신", "items": ["...", "..."]},
+  "administrative_risks": "평문 — 행정처분·수입금지 등 리스크"
+}
+```
+> §2.5 변경: (1) `overview` 삭제 — 표·핵심사실과 중복이라 6슬롯 summary(W1)가 규제 프레이밍을
+> 흡수(fan-out 무관). (2) `required_remediation` 문자열 → `{deadline, items[]}` 객체(마감기한 한
+> 줄 + 체크리스트). D2/D3 인용·숫자 근거대조는 `key_violations[].citation` 대상 그대로 유지.
+
+**(D) 입력 컨텍스트.** fan-out 호출의 유일한 입력은 handoff v2 의 `deep_analysis_input.body_full`
+(= `raw.wl_body_full`, `CardScaffold.to_dict()` 가 대상 카드에만 조건부로 싣는다). 카드 메타데이터
+(facts·prose_input)는 참고만 하고, 4섹션 값은 반드시 `body_full` 원문에서 확인 가능한 사실만
+쓴다 — 6슬롯 규칙(§0 "사실 생성 금지")과 동일 원칙.
+
+**(E) 검증 게이트(발행 전 필수).** `verify_deep_analysis.run_deep_analysis_gate(deep_analysis,
+body_full)` — D1 구조 완전성(4섹션 전부 채움 + `required_remediation` 은 `{deadline, items[]}`
+객체이고 `items` 가 비어있지 않아야 함) + D2 조항 인용 근거대조(원문에 없는 조항번호 인용
+= FAIL) + D3 원문에 없는 신규 장문 숫자(WARN, 비차단). D2 인용은 **원문과 같은 어순/표현**으로
+써야 통과한다(예: "21 CFR 211.192" 처럼 원문 그대로 — "FD&C Act 502(a)"를 원문이 "section
+502(a) of the FD&C Act" 로 쓴 경우처럼 어순을 바꾸면 대조 실패로 FAIL 처리될 수 있다. 원문
+표현을 그대로 따르라). **FAIL 이 하나라도 있으면 그 카드는 deep_analysis 없이(6슬롯만으로)
+발행한다** — 이 실패가 전체 브리프 발행을 막지 않는다(graceful degrade, 카드 단위 격리).
+
+**(F) 병합.** `inject_slots.inject_deep_analysis(brief, deltas)` — `deltas` =
+`{document_id: {"deep_analysis": {...}, "source_text": "..."}}`. 게이트 통과 카드만
+`card["deep_analysis"]` 에 병합. 6슬롯 `inject_llm_slots()` 와 완전히 별개 함수(서로 호출 안 함).
+
+**(G) 렌더(단계적 노출 + §2.5 시각위계).** `web/partials/card.html` — 기존 카드 본문(요약·핵심사실·
+시사점·점검사항) 아래, 출처 링크(`.src`) 위에 `<details class="block deep">` 로 접힌 상태 기본
+노출("상세 분석 보기" 클릭 시 4섹션 펼침). 4섹션 헤더는 **원형 번호 배지(①②③④ — 폰트 비의존
+CSS 원+숫자, tofu 회피)+세리프 소제목**으로 위계를 준다. ① Key Violations 는 위반 항목별 카드
+블록(`.viol` — 조항 코드배지 `.viol-cite`·설명·점선 아래 경고색 리스크 `.viol-risk`), ③ Required
+Remediation 은 마감기한 한 줄+체크(✓) 리스트(`.rem-list`, 단일 마커 — 점검사항 `.chk` 와 구분).
+deep 카드는 W2 facts 를 2×2 그리드(`.facts-grid`)로 렌더(값 자체 불변 — 마크업/CSS 만, deep
+아님 카드는 기존 세로 표라 golden 불변). `card.deep_analysis` 가 없거나 `null` 이면 이 블록·그리드
+모두 렌더되지 않는다(기존 카드 무변형). 클릭 → 심층분석 → 출처 링크(공식원문) 3단계 노출.
+
+**(H) 구현 위치.** `collect_intake.py`(`_extract_wl_body_full`/`_fetch_wl_body_full`,
+`ENABLE_WL_BODY_FULL`) · `card_scaffold.py`(`deep_analysis_ready`, `to_dict`/`to_web_card` 조건부
+필드) · `verify_deep_analysis.py`(신규 모듈) · `inject_slots.py`(`inject_deep_analysis`) ·
+`web/partials/card.html` + `web/assets/grm.css`(`.deep`/`.viol`/`.rem-list`/`.facts-grid`) ·
+`web/render.py`(`_card_view` passthrough) · `deep_analysis_fanout.py`(신규 — `build_jobs`/
+`assemble_deltas` 오케스트레이션 헬퍼, 순수) · `docs/prompts/GRM_Prompt_DeepWL_v1.md`(fan-out
+프롬프트) · `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`(실행 절차).
+
+**fan-out 실행모델 — 확정(2026-07-01).** 저장소에 Anthropic API 키 기반 LLM 호출이 전무함을
+전수 확인(6슬롯 Routine = MINO 의 Claude Code 세션, 구독 사용량·무과금). deep_analysis 도 동일하게
+**카드당 Claude Code 서브에이전트 1개**(그 카드 `body_full` 만 컨텍스트)로 처리한다 — **신규 GitHub
+Actions + Anthropic API 키(호출당 과금) 조합은 배제.** 오케스트레이션 = 순수 스크립트
+(`deep_analysis_fanout` build-jobs/assemble) + 월요일 Routine 2단계 세션 절차(실행프롬프트) +
+`inject_slots.py --deep-analysis-deltas` 병합. 표본 육안 검증 후 운영 투입(§3.2).
+
+**(I) golden·회귀.** 기존 20+ web-card golden·8xx 회귀 스위트 바이트 불변(전제조건). 신규
+회귀: `tests/test_wl_body.py`(WlExtractBodyFullTest 등) · `tests/test_card_scaffold.py`
+(DeepAnalysisReadyTest) · `tests/test_verify_deep_analysis.py`(전체) ·
+`tests/test_inject_slots.py`(InjectDeepAnalysisTest·DeepAnalysisRenderSmokeTest — 실제
+`render.render_site()` 로 HTML 렌더까지 확인).
+
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-07-01 | **§2.5 확정 반영 — 콘텐츠 경계·시각위계**: MINO 피드백(상세분석 부실·헤더 위계 부족·표↔핵심사실 중복) 대응. ① `overview` 삭제(표·핵심사실과 중복 — 규제 프레이밍은 6슬롯 summary(W1) 흡수) ② `required_remediation` 문자열→`{deadline, items[]}` 객체(마감기한 한 줄+체크리스트, 단일 ✓ 마커) ③ 4섹션 헤더 원형 번호 배지(①②③④, CSS 원+숫자)+세리프 소제목(위계) ④ Key Violations 위반 항목별 카드 블록(조항 코드배지·설명·경고색 리스크) ⑤ deep 카드 W2 facts 2×2 그리드(값 불변, 마크업/CSS만). `verify_deep_analysis` D1 이 `required_remediation` 객체 구조·`items` 비어있지 않음까지 검사. 기존 golden 20+ 불변(deep 렌더는 populated deep_analysis 카드에만 나타나 기존 fixture 무영향)·신규 회귀 +3(remediation 구조). |
+| 2026-07-01 | **§15 신설(additive) — deep_analysis 7번째·선택 슬롯**: 사용자 피드백("카드가 조잡") 대응. Warning Letter 카드 한정, 전문 확보(`ENABLE_WL_BODY_FULL`) 카드만 카드별 fan-out(독립 호출 1건=카드 1건)으로 5섹션(Overview·Key Violations & Risk Analysis·FDA's Evaluation of Response·Required Remediation·Administrative Risks) 심층분석 생성. `verify_deep_analysis.py`(신규, 조항 인용 근거대조 게이트) 통과 카드만 병합, FAIL 카드는 6슬롯만으로 발행(카드 단위 graceful degrade). `card.html` 에 단계적 노출(`<details class="block deep">`, 기본 접힘) 추가. §0~§14(6슬롯 동결)는 완전 불변 — golden 20+·8xx 회귀 무변화, 신규 회귀 4개 테스트 파일 추가. 실제 FDA Huons Co., Ltd. 경고서한 원문으로 end-to-end 검증(수집→검증→병합→렌더) |
 | 2026-06-04 | 최초 작성(틀). 칸별 Python/LLM 책임표·유형별 필드매핑·제품군 배지·출력매트릭스·prose_input 계약·golden 방법론. v15.8 카드 표준 기준. 디자인 리뷰로 §11 동결 예정 |
 | 2026-06-04 | Codex 구현 검토 반영(§12): raw fetch 선행·실제 필드명 정정·Evidence/quote/grouping 결정론화·MFDS recall 통합 키·golden 순수성. |
 | 2026-06-05 | 디자인 리뷰 완료(§13.1 동결안 12개 원칙): 제목 인덱스화·제품군 W1 배지·W2 경량 4행·원문번역 인터리브·W5 라벨 통일·시사점 노랑/순서 현행 유지·면책 간소화(다이제스트 제외)·목차. 사용자+Codex 합의, 견본 3카드 반영. 사용자 최종 확인 시 동결 |

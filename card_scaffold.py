@@ -169,6 +169,10 @@ class CardScaffold:
     recall_group_key: str = ""   # §12(E) — recall 다품목 통합 키(해당 시)
     status_hint: str = ""        # graceful degrade 시 'Error'
     needs_llm_slots: tuple[str, ...] = ()  # 이 카드가 비운 슬롯 토큰
+    # [WL 심층분석 fan-out 2026-07-01] 이 카드가 카드별 fan-out 심층분석(5섹션, 6종 동결 슬롯과
+    # 완전 분리된 7번째·선택적 슬롯) 대상인지. warning-letter 유형 + raw.wl_body_full 확보 시만
+    # True. additive — 다른 모든 유형·기존 카드는 항상 False(golden 불변).
+    deep_analysis_ready: bool = False
     merged_into: str = ""        # §14(F) — 병합 멤버는 대표 card_id 로 마킹(렌더 제외, Status 유지)
     # ── web-card(§3) 직렬화 보조 필드 — to_dict()/handoff v2 에는 미직렬화 ──
     merged_count: int = 1        # §14 병합 멤버수(1=단독). 대표만 >1
@@ -198,6 +202,12 @@ class CardScaffold:
             d["status_hint"] = self.status_hint
         if self.merged_into:
             d["merged_into"] = self.merged_into
+        # [WL 심층분석 fan-out] 대상 카드만 전문(全文)을 별도 명시적 키로 노출 — raw 전체는
+        # 여전히 미포함(기존 원칙 불변). 6종 동결 슬롯 Routine 은 이 키를 쓰지 않는다(무관심
+        # 필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 오케스트레이터만 소비.
+        if self.deep_analysis_ready:
+            d["deep_analysis_ready"] = True
+            d["deep_analysis_input"] = {"body_full": self.raw.get("wl_body_full", "")}
         return d
 
     def to_web_card(self, render_entry: dict[str, Any] | None = None,
@@ -257,6 +267,10 @@ class CardScaffold:
             "key_facts": [],              # LLM
             "implication": "",            # LLM
             "checks": [],                 # LLM
+            **({"deep_analysis": None} if self.deep_analysis_ready else {}),
+            # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
+            # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
+            # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -775,6 +789,9 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
 
     markdown = _neutralize_forbidden("\n\n".join(blocks))
     prose_input = _prose_input(kind, row, raw, evidence, modality, language)
+    # [WL 심층분석 fan-out] warning-letter + 전문 확보(raw.wl_body_full, ENABLE_WL_BODY_FULL
+    # 게이트 산출) 시만 True. 그 외 전 유형·전문 미확보 WL 은 항상 False(golden 불변).
+    deep_analysis_ready = bool(kind == "warning-letter" and (raw or {}).get("wl_body_full"))
     return CardScaffold(
         card_id=card_id, section=section, kind=kind, evidence=evidence,
         modality=modality, signal_tier=row.get("signal_tier", "Tier 1"),
@@ -782,6 +799,7 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
         recall_group_key=recall_group_key(row, raw) if kind == "recall-quality" else "",
         status_hint=row.get("status_hint", ""),
         needs_llm_slots=tuple(used_slots),
+        deep_analysis_ready=deep_analysis_ready,
         row=row, raw=(raw or {}),  # to_web_card 가 producer 재사용(직렬화 제외)
     )
 

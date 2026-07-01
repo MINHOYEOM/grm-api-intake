@@ -834,6 +834,15 @@ class WebSeoMetaTest(unittest.TestCase):
         # og:url == canonical(트레일링슬래시형 통일).
         self.assertIn(f'<meta property="og:url" content="{self.BASE}/archive/" />', self.archive)
 
+    def test_header_brand_lockup_owl_grm(self):
+        # 헤더 로고 락업(B안) — favicon.svg(올빼미) 재사용 + GRM/서브타이틀, 전 페이지 공통.
+        for h in (self.landing, self.archive, self.detail):
+            self.assertIn('<img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true"', h)
+            self.assertIn('>GRM</span>', h)
+            self.assertIn('class="brand-full"', h)
+            self.assertIn('Global Regulatory Monitor</span>', h)
+            self.assertIn('aria-label="Global Regulatory Monitor 홈"', h)
+
     def test_favicon_links_root_absolute(self):
         for h in (self.landing, self.archive, self.detail):
             self.assertIn('<link rel="icon" href="/favicon.ico" sizes="any">', h)

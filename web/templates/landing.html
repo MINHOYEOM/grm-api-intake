@@ -5,17 +5,17 @@
     (나열·중복·표기 일관성) — 포커스는 기관 집약·기관별 정렬·시사점/점검(한국어 강조 최소화). -#}
 <main>
   <div class="wrap hero">
-    <div class="hero-top"><span>제약 GMP · 품질 규제 인텔리전스</span><span class="r">Weekly Brief — Vol. {{ cover.issue_no }}</span></div>
+    <div class="hero-top"><span>제약 GMP · 품질 규제소식</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
     <div class="hero-grid">
       <div>
         <span class="kick reveal" style="animation-delay:.05s">Global Regulatory Monitor</span>
         <h1 class="reveal" style="animation-delay:.12s">모든 규제 신호를<br>단 <span class="c">한곳으로</span>.</h1>
-        <p class="lede reveal" style="animation-delay:.2s">규제 정보 수집에 소요되던 업무 시간을 주간 브리프로 혁신적으로 단축합니다.
+        <p class="lede reveal" style="animation-delay:.2s">규제 정보 수집에 소요되던 업무 시간을 주간 규제뉴스 한 장으로 줄여드립니다.
           핵심 사실과 시사점, 그리고 실무 점검 포인트까지 한 페이지에 담아, 공유받은 즉시 업무에 활용할 수 있습니다.</p>
         <div class="lede-tags reveal" style="animation-delay:.24s"><span class="tag fact">사실</span><span class="tag insight">시사점</span><span class="tag check">점검</span></div>
         <div class="btns reveal" style="animation-delay:.28s">
-          <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">최신 브리프 읽기 <i class="ti ti-arrow-right"></i></a>
-          <a class="btn lg" href="{{ rel_root }}archive/index.html">지난 호 둘러보기</a>
+          <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 읽기 <i class="ti ti-arrow-right"></i></a>
+          <a class="btn lg" href="{{ rel_root }}archive/index.html">지난 소식 둘러보기</a>
         </div>
         <div class="stats reveal" style="animation-delay:.36s">
           <div><b>11</b><span>규제 소스</span></div>
@@ -119,8 +119,8 @@
   <div class="wrap"><div class="callout">
     <span class="kick">This Week</span>
     <h2>이번 주, 무엇이 바뀌었을까요?</h2>
-    <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}. 글로벌·국내 규제 신호를 한 호에 담았습니다.</p>
-    <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 호 열기 <i class="ti ti-arrow-right"></i></a>
+    <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
+    <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
   </div></div>
 </main>
 {% endblock %}

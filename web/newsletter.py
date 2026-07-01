@@ -99,7 +99,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     tldr = [t for t in (bm.get("tldr") or []) if t]
     base = site_base_url.rstrip("/")
     brief_url = brief_anchor_href(base, pub)
-    subject = f"[GRM 주간 브리프] {dateform} · 제{issue_no}호 ({pub} 발행)"
+    subject = f"[GRM 규제뉴스] {dateform} ({pub} 발행)"
 
     e = _html.escape
     parts: list[str] = [
@@ -114,7 +114,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         'text-transform:uppercase;color:#A14B30">Global Regulatory Monitor</div>',
         f'<h1 style="font-size:23px;line-height:1.3;color:#141413;margin:10px 0 4px">{e(title)}</h1>',
         f'<div style="font-size:13px;color:#6C6A64;margin-bottom:22px">'
-        f'{e(dateform)} · 제{e(str(issue_no))}호 · 발행 {e(pub)}</div>',
+        f'{e(dateform)} · 발행 {e(pub)}</div>',
     ]
     if tldr:
         parts.append('<div style="font-size:13px;font-weight:600;color:#A14B30;'
@@ -128,7 +128,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         f'<div style="margin:0 0 24px"><a href="{e(brief_url)}" '
         'style="display:inline-block;background:#C2603F;color:#FAF9F5;text-decoration:none;'
         'font-weight:600;font-size:15px;padding:13px 24px;border-radius:8px">'
-        '이번 호 전체 보기 →</a></div>')
+        '이번 주 소식 전체 보기 →</a></div>')
     # 섹션 앵커 링크 — "관심 주제 클릭 신호"(우리 페이지 #sec-{그룹}).
     groups = section_groups(brief_obj)
     if groups:
@@ -286,7 +286,7 @@ class NewsletterSender:
 # Brevo 캠페인은 수신거부 링크를 자동 처리하나, 본문에 태그를 명시해 위치를 고정한다.
 BREVO_UNSUBSCRIBE_HTML = (
     '<a href="{{ unsubscribe }}" style="color:#8E8B82">수신거부</a> · '
-    '본 메일은 GRM 주간 브리프 구독자에게 발송되었습니다.')
+    '본 메일은 GRM 규제뉴스 구독자에게 발송되었습니다.')
 
 # 멱등(③): 이 status 면 '이미 발송/예약' → 재발송 0. draft 등 그 외는 미발송으로 보고 재사용.
 _DISPATCHED_STATUSES = {"sent", "queued", "inprocess", "in_process", "suspended", "archive"}

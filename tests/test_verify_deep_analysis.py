@@ -238,6 +238,13 @@ class KoreanCitationExtractionTest(unittest.TestCase):
         self.assertEqual(vda._normalize_citation("「약사법」 제38조제1항"),
                          vda._normalize_citation("약사법 제38조제1항"))
 
+    def test_bracketed_law_extracted_as_full_token(self) -> None:
+        # Codex 2차: 「화장품법」 제38조제1항 은 법령명 뒤 `」`가 `제`를 막아 bare `제38조제1항`
+        # 만 추출되던 우회 — 이제 법령명까지 한 토큰으로 뽑혀야 교차오인용 대조가 성립한다.
+        toks = {vda._normalize_citation(t) for t in vda.extract_citations("「화장품법」 제38조제1항")}
+        self.assertIn(vda._normalize_citation("화장품법 제38조제1항"), toks)
+        self.assertNotIn("제38조제1항", toks)   # bare 만 남지 않는다(긴 매칭 dedup)
+
 
 class AdminGateTest(unittest.TestCase):
     def test_admin_good_passes_gate_autodetect(self) -> None:
@@ -305,6 +312,31 @@ class AdminGateTest(unittest.TestCase):
         da["disposition_basis"] = "[별표8] 행정처분 기준에 따라 제조업무정지 1개월이 부과되었다."
         result = vda.run_deep_analysis_gate(da, source)
         self.assertTrue(result.ok, result.report)   # 브래킷 차이만으로 FAIL 나지 않아야 함
+
+    def _admin_da(self, citation: str) -> dict:
+        return {
+            "key_violations": [{"citation": citation,
+                                "description": "제조기록서를 사실과 다르게 작성 위반",
+                                "risk": "데이터 무결성 훼손 위험"}],
+            "disposition_basis": "[별표8] 행정처분 기준에 따라 제조업무정지 1개월이 부과되었다.",
+            "required_remediation": {"deadline": "처분 통지 후 90일 이내 이의신청",
+                                     "items": ["과징금 납부 및 CAPA 재수행"]},
+            "administrative_risks": "재위반 시 가중처분 및 품목허가 취소로 이어질 수 있다."}
+
+    def test_bracketed_cross_law_fabrication_blocks(self) -> None:
+        # Codex 2차(핵심): 원문이 「약사법」 인데 산출물이 「화장품법」(브래킷 법령명)으로 오인용 →
+        # 교차오인용 D2 FAIL 이어야 한다(예전엔 bare `제38조제1항`만 추출돼 통째로 우회·PASS).
+        src = "「약사법」 제38조제1항 위반. [별표8] 행정처분 기준."
+        result = vda.run_deep_analysis_gate(self._admin_da("「화장품법」 제38조제1항"), src)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("화장품법" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_bracketed_law_grounds_bracketed_source(self) -> None:
+        # 짝: 같은 법(「약사법」)이면 브래킷 유무 무관하게 PASS(과탐 없음).
+        src = "「약사법」 제38조제1항 위반. [별표8] 행정처분 기준."
+        self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("「약사법」 제38조제1항"), src).ok)
+        self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("약사법 제38조제1항"), src).ok)
 
 
 if __name__ == "__main__":

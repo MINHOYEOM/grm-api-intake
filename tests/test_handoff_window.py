@@ -16,6 +16,7 @@ from datetime import date
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_intake as ci
+import grm_handoff  # 배치5 Phase2: handoff/emit 정의 모듈(patch 대상)
 
 
 class ResolveHandoffWindowDaysTest(unittest.TestCase):
@@ -61,13 +62,13 @@ class NewIntakeRowsQueryWindowTest(unittest.TestCase):
             captured.append(body)
             return {"results": [], "has_more": False}
 
-        orig = ci.notion_api_request
-        ci.notion_api_request = fake_api
+        orig = grm_handoff.notion_api_request
+        grm_handoff.notion_api_request = fake_api
         try:
             ci.notion_query_new_intake_rows(
                 "tok", "db", date(2026, 6, 10), window_days=30)
         finally:
-            ci.notion_api_request = orig
+            grm_handoff.notion_api_request = orig
 
         and_filters = captured[0]["filter"]["and"]
         on_or_after = next(f["date"]["on_or_after"] for f in and_filters
@@ -97,13 +98,13 @@ class AgedUnconsumedNewCountTest(unittest.TestCase):
             captured.append({k: v for k, v in body.items()})
             return next(it)
 
-        orig = ci.notion_api_request
-        ci.notion_api_request = fake_api
+        orig = grm_handoff.notion_api_request
+        grm_handoff.notion_api_request = fake_api
         try:
             n = ci.notion_count_aged_unconsumed_new(
                 "tok", "db", date(2026, 6, 10), handoff_window_days=30)
         finally:
-            ci.notion_api_request = orig
+            grm_handoff.notion_api_request = orig
         return n, captured
 
     def test_filter_targets_just_outside_window(self) -> None:
@@ -164,19 +165,21 @@ class DisplayWindowSeparationTest(unittest.TestCase):
             captured["payload"] = payload
             return "pid", "url"
 
-        orig_q = ci.notion_query_new_intake_rows
-        orig_u = ci.notion_upsert_routine_handoff
+        # notion_query_new_intake_rows·notion_upsert_routine_handoff 는 grm_handoff(배치5
+        # Phase2) 정의 — emit_routine_handoff 가 내부 호출하므로 정의 모듈에서 대체한다.
+        orig_q = grm_handoff.notion_query_new_intake_rows
+        orig_u = grm_handoff.notion_upsert_routine_handoff
         saved_v2 = os.environ.get("ENABLE_HANDOFF_V2")
-        ci.notion_query_new_intake_rows = fake_query
-        ci.notion_upsert_routine_handoff = fake_upsert
+        grm_handoff.notion_query_new_intake_rows = fake_query
+        grm_handoff.notion_upsert_routine_handoff = fake_upsert
         os.environ["ENABLE_HANDOFF_V2"] = "true" if v2 else "false"
         try:
             ci.emit_routine_handoff(
                 "tok", "db", self.RUN, 30, datetime(2026, 6, 10, 3, 17),
                 display_window_days=display)
         finally:
-            ci.notion_query_new_intake_rows = orig_q
-            ci.notion_upsert_routine_handoff = orig_u
+            grm_handoff.notion_query_new_intake_rows = orig_q
+            grm_handoff.notion_upsert_routine_handoff = orig_u
             if saved_v2 is None:
                 os.environ.pop("ENABLE_HANDOFF_V2", None)
             else:

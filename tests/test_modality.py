@@ -12,6 +12,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_intake as ci
+import grm_notion  # 배치5 Phase1: notion_api_request 정의 모듈(preflight 대체 대상)
 
 
 class TestComputeModality(unittest.TestCase):
@@ -409,11 +410,13 @@ class TestModalityPreflight(unittest.TestCase):
 
     def tearDown(self):
         if hasattr(self, "_orig"):
-            ci.notion_api_request = self._orig
+            grm_notion.notion_api_request = self._orig
 
     def _patch(self, fake):
-        self._orig = ci.notion_api_request
-        ci.notion_api_request = fake
+        # notion_verify_modality_property 는 grm_notion(배치5 Phase1) 에 있으므로
+        # 그 정의 모듈의 notion_api_request 를 대체해야 preflight 호출이 fake 를 본다.
+        self._orig = grm_notion.notion_api_request
+        grm_notion.notion_api_request = fake
 
     def test_ok_select_with_all_options(self):
         self._patch(lambda *a, **k: {"properties": {"Modality": {

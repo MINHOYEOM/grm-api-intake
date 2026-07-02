@@ -8,6 +8,7 @@ import unittest
 from unittest import mock
 
 import collect_intake
+import grm_handoff  # 배치5 Phase2: handoff/emit 정의 모듈(patch 대상)
 from collect_intake import (
     IntakeItem, attach_raw_to_rows, build_inmemory_raw, enrich_rows_with_raw,
     fetch_intake_raw_payload,
@@ -56,7 +57,7 @@ class FetchIntakeRawPayloadTest(unittest.TestCase):
 
     def _patch_api(self, pages: list[dict]) -> mock.MagicMock:
         m = mock.MagicMock(side_effect=pages)
-        p = mock.patch.object(collect_intake, "notion_api_request", m)
+        p = mock.patch.object(grm_handoff, "notion_api_request", m)
         p.start()
         self.addCleanup(p.stop)
         return m
@@ -111,13 +112,13 @@ class FetchIntakeRawPayloadTest(unittest.TestCase):
 
     def test_empty_page_id_returns_none_without_call(self) -> None:
         m = mock.MagicMock()
-        with mock.patch.object(collect_intake, "notion_api_request", m):
+        with mock.patch.object(grm_handoff, "notion_api_request", m):
             self.assertIsNone(fetch_intake_raw_payload("tok", ""))
         m.assert_not_called()
 
     def test_api_error_is_swallowed(self) -> None:
         m = mock.MagicMock(side_effect=collect_intake.NotionHandoffError("boom"))
-        with mock.patch.object(collect_intake, "notion_api_request", m):
+        with mock.patch.object(grm_handoff, "notion_api_request", m):
             self.assertIsNone(fetch_intake_raw_payload("tok", "page-1"))
 
 
@@ -131,7 +132,7 @@ class AttachRawToRowsTest(unittest.TestCase):
         def fake_fetch(token: str, page_id: str):
             return {"ENTRPS": "회사", "RTRVL_RESN": "사유"} if page_id == "p-ok" else None
 
-        with mock.patch.object(collect_intake, "fetch_intake_raw_payload",
+        with mock.patch.object(grm_handoff, "fetch_intake_raw_payload",
                                side_effect=fake_fetch):
             stats = attach_raw_to_rows("tok", rows, sleep_s=0)
 
@@ -151,7 +152,7 @@ class AttachRawToRowsTest(unittest.TestCase):
         # 당일 수집분: inmemory_raw 에 있으면 page children fetch 를 호출하지 않는다.
         rows = [{"source": "MFDS", "document_id": "today-1", "page_id": "p-x"}]
         cache = {"MFDS::today-1": {"RTRVL_RESN": "메모리 raw"}}
-        with mock.patch.object(collect_intake, "fetch_intake_raw_payload") as fetch:
+        with mock.patch.object(grm_handoff, "fetch_intake_raw_payload") as fetch:
             stats = attach_raw_to_rows("tok", rows, inmemory_raw=cache, sleep_s=0)
         fetch.assert_not_called()
         self.assertEqual(stats, {"ok": 1, "failed": 0, "from_memory": 1, "total": 1})
@@ -172,7 +173,7 @@ class EnrichRowsWithRawTest(unittest.TestCase):
             {"source": "MFDS", "document_id": "dup", "page_id": "p2",
              "run_date": "2026-06-04", "signal_tier": "Tier 2"},
         ]
-        with mock.patch.object(collect_intake, "fetch_intake_raw_payload",
+        with mock.patch.object(grm_handoff, "fetch_intake_raw_payload",
                                return_value={"k": "v"}) as fetch:
             deduped, stats = enrich_rows_with_raw("tok", rows, sleep_s=0)
         self.assertEqual(len(deduped), 1)
@@ -219,7 +220,7 @@ class MixedMemoryFetchEnrichTest(unittest.TestCase):
             {"source": "MFDS", "document_id": "past-1", "page_id": "p-past",
              "run_date": "2026-06-01", "signal_tier": "Tier 2"},      # fetch 폴백
         ]
-        with mock.patch.object(collect_intake, "fetch_intake_raw_payload",
+        with mock.patch.object(grm_handoff, "fetch_intake_raw_payload",
                                return_value={"RTRVL_RESN": "과거 raw"}) as fetch:
             deduped, stats = enrich_rows_with_raw("tok", rows, inmemory_raw=cache, sleep_s=0)
         self.assertEqual(stats, {"ok": 2, "failed": 0, "from_memory": 1, "total": 2})

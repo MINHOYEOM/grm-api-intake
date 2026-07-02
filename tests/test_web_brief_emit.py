@@ -15,6 +15,7 @@ from unittest import mock
 
 import card_scaffold as cs
 import collect_intake as ci
+import grm_handoff  # 배치5 Phase2: handoff/emit 정의 모듈(patch 대상)
 
 RUN_DATE = date(2026, 6, 22)
 GEN_AT = datetime(2026, 6, 22, 3, 17)
@@ -164,11 +165,11 @@ class EmitBranchTest(unittest.TestCase):
 
         env = {} if flag is None else {"ENABLE_HANDOFF_V2": flag}
         with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(ci, "notion_query_new_intake_rows",
+             mock.patch.object(grm_handoff, "notion_query_new_intake_rows",
                                return_value=_enriched_rows()), \
-             mock.patch.object(ci, "enrich_rows_with_raw",
+             mock.patch.object(grm_handoff, "enrich_rows_with_raw",
                                side_effect=lambda t, rows, inmemory_raw=None: (rows, {})), \
-             mock.patch.object(ci, "notion_upsert_routine_handoff", side_effect=fake_upsert):
+             mock.patch.object(grm_handoff, "notion_upsert_routine_handoff", side_effect=fake_upsert):
             ci.emit_routine_handoff("tok", "db", RUN_DATE, 7, GEN_AT,
                                     web_brief_dir=web_dir)
 
@@ -191,7 +192,7 @@ class EmitBranchTest(unittest.TestCase):
     def test_web_emit_failure_does_not_break_handoff(self) -> None:
         # web brief 빌드가 던져도 handoff 는 정상 반환(비차단).
         with tempfile.TemporaryDirectory() as d, \
-             mock.patch.object(ci, "emit_web_brief_file",
+             mock.patch.object(grm_handoff, "emit_web_brief_file",
                                side_effect=RuntimeError("boom")):
             # _run 내부에서 예외가 새지 않아야 한다(통과 = 비차단 보장).
             self._run(flag="true", web_dir=d)

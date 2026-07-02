@@ -405,3 +405,48 @@ def http_get_bytes(
                 continue
             raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
     raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")
+
+
+# ── [배치5 Phase0] collect_intake 에서 relocate: 소스 식별 상수 + 공용 텍스트/환경 헬퍼 ──
+SOURCE_FR = "Federal Register"
+SOURCE_RECALL = "OpenFDA Recall"
+SOURCE_EMA = "EMA"
+SOURCE_MHRA = "MHRA Inspectorate"
+SOURCE_PICS = "PIC/S"
+SOURCE_ECA = "ECA Academy"
+SOURCE_FDA_WL = "FDA Warning Letter"
+SOURCE_MFDS = "MFDS"
+SOURCE_ICH = "ICH"
+SOURCE_WHO = "WHO"
+SOURCE_HC = "Health Canada"
+SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — OII FOIA Reading Room 483 Observation (가장 깊은 결함 원본)
+SOURCE_HANDOFF = "GRM Handoff"
+SOURCE_BRAVE = "Brave Search"
+SOURCE_RAPS  = "RAPS"
+SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
+NOTION_RICH_TEXT_CHUNK = 1900  # 2000 한도, 여유 100
+
+
+def truncate(text: str, limit: int = NOTION_RICH_TEXT_CHUNK) -> str:
+    if text is None:
+        return ""
+    text = text.strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1] + "…"
+
+
+def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
+    if not text:
+        return [""]
+    return [text[i : i + size] for i in range(0, len(text), size)]
+
+
+def _env_int(name: str, default: int) -> int:
+    """환경변수를 정수로 안전 파싱. 비정상 값이면 WARN 후 default 사용 (graceful degradation)."""
+    raw = os.getenv(name, str(default)).strip()
+    try:
+        return int(raw)
+    except ValueError:
+        log("WARN", f"{name}={raw!r} 정수 파싱 실패 — default {default} 사용")
+        return default

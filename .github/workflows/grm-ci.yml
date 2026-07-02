@@ -27,7 +27,7 @@ jobs:
             collect_mfds_admin_action.py collect_mfds_gmp_inspection.py \
             collect_mfds_recall.py collect_ich.py collect_who.py \
             collect_hc.py collect_search.py grm_common.py \
-            grm_health.py grm_taxonomy.py \
+            grm_health.py grm_taxonomy.py grm_notion.py grm_handoff.py \
             inject_slots.py deep_analysis_fanout.py \
             brief_lint.py verify_published_brief.py card_scaffold.py
       - name: unittest

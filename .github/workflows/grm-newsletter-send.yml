@@ -80,8 +80,8 @@ jobs:
       publish_date: ${{ steps.resolve.outputs.publish_date }}
       should_send: ${{ steps.precheck.outputs.should_send }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: '3.12'
       - name: Install dependencies
@@ -221,8 +221,8 @@ jobs:
       GRM_NEWSLETTER_TEST_EMAILS: ${{ vars.GRM_NEWSLETTER_TEST_EMAILS }}
       GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: '3.12'
       - name: Install dependencies

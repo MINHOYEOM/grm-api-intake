@@ -415,12 +415,16 @@ def _extract_fda483_excerpt(text: str) -> str:
     return ""
 
 
-def _fetch_fda483_pdf_text(pdf_url: str, max_chars: "int | None" = None) -> tuple[str, str]:
+def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
     """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff).
 
-    `max_chars` 미지정(기본) 시 공유 엔진 기본 상한(GMP용 12000)을 그대로 쓴다 → excerpt/기존
-    경로 동작 불변. deep(전문) 경로만 FDA483_TEXT_MAX_CHARS(200000)를 넘겨 8쪽+ 483 의 뒤
-    Observation 까지 담는다(그 상한은 deep 활성 run 에서만 적용 = deep off 면 완전 불변).
+    ★상한은 483 전용 FDA483_TEXT_MAX_CHARS(200000·≈74쪽)를 **기본**으로 쓴다 — 공유 PDF 엔진의
+    기본 상한(GMP용 12000)은 8쪽+ 483 의 뒤 Observation 을 잘라, 이 라이브 경로를 쓰는 **결정론
+    Observation 추출**(ENABLE_FDA_483_OBSERVATIONS)과 **deep 전문 확보** 둘 다 앞 2~3건만 남기는
+    절단 버그를 냈다. PR #57 이 public `_extract_483_observations` API 만 200000 으로 고치고 이
+    라이브 경로(`_fetch_fda483_pdf_text`)는 12000 그대로 두었던 것을 보완한다. excerpt 경로도 이
+    함수를 쓰지만 자체적으로 앵커 뒤 1500자만 다시 잘라 무해(현실 483 은 200000 을 넘지 않아
+    excerpt/카드 산출물 바이트도 불변). GMP/WHO 는 각자 `_extract_pdf_text` 를 직접 호출해 무관.
     """
     try:
         from collect_mfds_gmp_inspection import _extract_pdf_text
@@ -433,9 +437,7 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: "int | None" = None) -> tupl
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
-    if max_chars is not None:
-        return _extract_pdf_text(data, max_chars=max_chars)
-    return _extract_pdf_text(data)
+    return _extract_pdf_text(data, max_chars=max_chars)
 
 
 def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
@@ -711,10 +713,10 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 excerpt_health["attempted"] += 1
                 if FDA483_EXCERPT_DELAY_SECONDS:
                     time.sleep(FDA483_EXCERPT_DELAY_SECONDS)
-                # deep on 이면 전문 상한(200000)으로 읽어 8쪽+ 483 뒤 Observation 까지 담는다.
-                # deep off(기본)면 max_chars=None → 공유 엔진 기본(12000) 그대로 = 기존 경로 불변.
-                text_cap = FDA483_TEXT_MAX_CHARS if deep_enabled else None
-                text, status = _fetch_fda483_pdf_text(pdf_url, max_chars=text_cap)
+                # 483 전문(200000 상한)을 읽는다 — 결정론 Observation·deep 전문 모두 8쪽+ 483 의
+                # 뒤 Observation 까지 담기게(공유 엔진 12000 기본이 절단하던 것 보완). excerpt 는
+                # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
+                text, status = _fetch_fda483_pdf_text(pdf_url)
                 excerpt = _extract_fda483_excerpt(text) if text else ""
                 if excerpt:
                     excerpt_health["ok"] += 1

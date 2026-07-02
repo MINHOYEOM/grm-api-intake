@@ -457,24 +457,39 @@ class DeepBodyFullTest(unittest.TestCase):
         self.assertNotIn("fda483_body_full", items[0].raw_payload)
         self.assertEqual(f.LAST_HEALTH["fda_483_deep"]["failed"], 1)
 
-    def test_deep_fetch_passes_full_text_cap_only_when_enabled(self):
-        # deep on → _fetch_fda483_pdf_text 가 200000 상한을 넘긴다(전문). off(기본)면 미전달=기존 불변.
+    def test_fetch_pdf_text_uses_full_483_cap_by_default(self):
+        # ★라이브 경로 절단 회귀: _fetch_fda483_pdf_text 는 기본으로 483 전용 200000 상한을
+        #   _extract_pdf_text 에 넘긴다(공유 GMP 12000 기본이 아님). 이걸 되돌리면(=default 없이
+        #   호출) 결정론 Observation·deep 전문이 다시 앞 2~3건에서 잘린다(PR #57 미해결분).
         captured = {}
 
-        def _cap_stub(data, max_chars="DEFAULT"):
+        def _cap_stub(data, max_chars=None):
             captured["max_chars"] = max_chars
             return "text", "pdf-ok"
         with patch.object(g, "_extract_pdf_text", _cap_stub), \
                 patch.object(f, "http_get_bytes", _StubBytes()):
-            f._fetch_fda483_pdf_text("https://x/media/1/download",
-                                     max_chars=f.FDA483_TEXT_MAX_CHARS)
+            f._fetch_fda483_pdf_text("https://x/media/1/download")   # 기본 상한
         self.assertEqual(captured["max_chars"], f.FDA483_TEXT_MAX_CHARS)
 
-        captured.clear()
-        with patch.object(g, "_extract_pdf_text", _cap_stub), \
-                patch.object(f, "http_get_bytes", _StubBytes()):
-            f._fetch_fda483_pdf_text("https://x/media/1/download")   # max_chars 미지정
-        self.assertEqual(captured["max_chars"], "DEFAULT")   # 기본값 그대로 = 미전달(경로 불변)
+    def test_live_loop_long_483_extracts_all_observations(self):
+        # ★엔드투엔드 절단 회귀: 라이브 수집 루프(_fetch→_extract_from_text)가 8쪽+ 483 의
+        #   Observation 을 전건 추출해야 한다. max_chars 를 실제로 존중하는 스텁으로 절단 경계를
+        #   재현 — 12000 이면 앞 2~3건만, 200000 이면 6건 전부(수정 없으면 이 테스트가 실패한다).
+        filler = " The inspection team reviewed additional batch records in detail." * 50
+        long_text = "I/WE OBSERVED: " + "".join(
+            f"OBSERVATION {n} Deficiency {n} concerns inadequate process control.{filler}"
+            for n in range(1, 7))
+        self.assertGreater(long_text.index("OBSERVATION 6"), 12000)   # 6번째는 12000자 이후
+
+        def _honor_cap(data, max_chars=12000):        # 실 엔진처럼 상한을 존중(GMP 기본=12000)
+            return long_text[:max_chars], "pdf-ok"
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "true"}), \
+                _Patched(json_rows=[_json_row(6301)], html_rows=[], pdf_text=long_text), \
+                patch.object(g, "_extract_pdf_text", _honor_cap):   # _Patched 의 무시-스텁 위에 덮어씀
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        obs = items[0].raw_payload["fda_483_observations"]
+        self.assertEqual([o["number"] for o in obs], ["1", "2", "3", "4", "5", "6"])
 
 
 class ObservationTruncationTest(unittest.TestCase):

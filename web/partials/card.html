@@ -131,17 +131,16 @@
     </div>
     {%- endfor %}
   </details>
-  {%- endif %}
-  {%- endif %}
-  {%- if card.detail %}
-  {#- [소스확장 2026-07-02] Federal Register 결정론 상세보기 — LLM 없음(원문 abstract 무변형).
-      분석층(deep)이 "AI 생성 해석"인 것과 달리 여기는 DB 사실이라 신뢰 라벨이 "원문 기반".
-      deep 스타일 재사용(.block.deep) — 단일 섹션이라 원형번호 배지는 생략. -#}
-  <details class="block deep detail"><summary class="lab"><i class="ti ti-file-text"></i>상세 보기 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% endif %}· 원문 기반</span></summary>
-    {%- if card.detail.summary_full %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-t">규정 요지{% if card.detail.detail_kind %} <span class="sub">· {{ card.detail.detail_kind }}</span>{% endif %}</span></div><p>{{ card.detail.summary_full }}</p></div>
+  {%- elif card.deterministic_detail.type == 'fr_summary' %}
+  {#- [소스확장 2026-07-02] Federal Register abstract 전문 — LLM 없음(DB 사실·무변형).
+      분석층(deep)의 "AI 생성 해석"과 달리 결정론이라 신뢰 라벨이 "원문 기반". -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-text"></i>상세 보기 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% endif %}· 원문 기반</span></summary>
+    {%- if dd.summary_full %}
+    <div class="deep-sec"><div class="deep-h"><span class="deep-t">규정 요지{% if dd.detail_kind %} <span class="sub">· {{ dd.detail_kind }}</span>{% endif %}</span></div><p>{{ dd.summary_full }}</p></div>
     {%- endif %}
   </details>
+  {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}
   <div class="src">{{ srclink(card.sources.info, '정보출처') }}{{ srclink(card.sources.official, '공식원본') }}</div>

@@ -114,11 +114,12 @@ def _deep_preview(da: dict[str, Any] | None) -> str:
     return " · ".join(parts)
 
 
-def _detail_preview(detail: dict[str, Any] | None) -> str:
-    """FR 결정론 상세 접힘 summary 힌트 — 문서 유형(있으면) 또는 '규정 요지'."""
-    if not isinstance(detail, dict):
+def _detail_preview(dd: dict[str, Any] | None) -> str:
+    """결정론 상세(deterministic_detail) 접힘 summary 힌트. fr_summary 는 문서 유형(있으면)
+    또는 '규정 요지'. gmp_deficiencies 는 card.html 이 자체 '· N건' 힌트를 쓰므로 빈 문자열."""
+    if not isinstance(dd, dict) or dd.get("type") != "fr_summary":
         return ""
-    return detail.get("detail_kind") or "규정 요지"
+    return dd.get("detail_kind") or "규정 요지"
 
 
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
@@ -193,12 +194,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
         "deterministic_detail": card.get("deterministic_detail") or None,
-        # [소스확장 2026-07-02] FR 결정론 상세보기(detail) — deep_analysis 와 동형으로 무가공
-        # 통과. guidance(FR) 카드만 키 보유, 그 외/커밋 스냅샷은 부재 → 기존 골든 불변(additive).
-        "detail": card.get("detail") or None,
         # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
         "deep_preview": _deep_preview(card.get("deep_analysis")),
-        "detail_preview": _detail_preview(card.get("detail")),
+        "detail_preview": _detail_preview(card.get("deterministic_detail")),
         "sources": sources,
     }
 

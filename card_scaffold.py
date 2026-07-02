@@ -247,7 +247,7 @@ class CardScaffold:
                     if (self.modality and kind not in _NORMATIVE_KINDS) else None)
         headline_target = (self.merged_target if (merged and self.merged_target)
                            else _headline_target(row))
-        detail = _deterministic_detail(kind, raw)
+        detail = _deterministic_detail(kind, row, raw)
 
         return {
             "id": row.get("document_id", ""),
@@ -274,16 +274,13 @@ class CardScaffold:
             "checks": [],                 # LLM
             **({"deterministic_detail": detail} if detail else {}),
             # ^ [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 — WL deep_analysis(LLM 분석층)와
-            # 별개의 결정론 층(환각 0). 현재 gmp-inspection 지적 표(raw.gmp_deficiencies)만 산출.
-            # 없으면 키 자체 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
+            # 별개의 결정론 층(환각 0). `type` 분기: gmp-inspection 지적 표(gmp_deficiencies) ·
+            # [소스확장 2026-07-02] Federal Register abstract 전문(fr_summary). 없으면 키 자체
+            # 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
             **({"deep_analysis": None} if self.deep_analysis_ready else {}),
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
             # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
-            **({"detail": _fr_detail(row, raw)}
-               if (kind == "guidance" and _fr_detail(row, raw)) else {}),
-            # ^ [소스확장 2026-07-02] Federal Register 결정론 상세보기(웹 전용·LLM 없음).
-            # guidance(=FR) + abstract 확보 시만 키 존재. 그 외 전 유형은 키 부재(additive).
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -504,13 +501,17 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
 _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup")
 
 
-def _deterministic_detail(kind: str, raw: dict[str, Any] | None) -> dict[str, Any] | None:
+def _deterministic_detail(kind: str, row: dict[str, Any],
+                          raw: dict[str, Any] | None) -> dict[str, Any] | None:
     """결정론 상세 슬롯(펼침 상세보기용). 없으면 None(요약카드 유지·golden 불변).
 
     WL `deep_analysis`(LLM 분석층·fan-out·게이트)와 **완전 별개**의 결정론 층 — 생성이 없어
-    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 PDF 표를 그대로 구조화).
-    현재는 `gmp-inspection` 지적사항 표(`raw.gmp_deficiencies`)만. `type` 분기로 향후 483 등
-    다른 결정론 detail 타입 확장 여지.
+    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 공개 사실을 그대로
+    구조화). `type` 분기로 소스별 결정론 detail 확장:
+      - `gmp_deficiencies` — gmp-inspection 지적사항 표(`raw.gmp_deficiencies`).
+      - `fr_summary` — [소스확장 2026-07-02] Federal Register abstract 전문(무절단) + 문서유형.
+        FR abstract 는 FDA 공식 요약이라 풍부(설계문서 §10·§15). W3 quote 는 250자 절단본이라
+        긴 abstract 는 상세가 값. abstract 부재면 None(graceful). 창작 0(DB 필드 무변형).
     """
     raw = raw or {}
     if kind == "gmp-inspection":
@@ -534,6 +535,14 @@ def _deterministic_detail(kind: str, raw: dict[str, Any] | None) -> dict[str, An
                 "severity_summary": severity_summary,
                 "rows": norm,
             }
+    if kind == "guidance":  # Federal Register — 적용범위·기업대응(결정론 불가)·comment_close
+        abstract = (raw.get("abstract") or "").strip()   # (facts 의견기한 중복)은 생략(창작·중복 방지).
+        if abstract:
+            detail: dict[str, Any] = {"type": "fr_summary", "summary_full": abstract}
+            kind_label = _fr_detail_kind(row.get("type_or_class", ""))
+            if kind_label:
+                detail["detail_kind"] = kind_label
+            return detail
     return None
 
 
@@ -1223,8 +1232,8 @@ def _official_is_pdf(url: str) -> bool:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# [소스확장 2026-07-02] Federal Register 결정론 상세보기(detail) — 웹 전용, LLM/게이트 없음.
-# FR abstract 는 FDA 공식 요약이라 충분히 풍부(설계문서 §10·§15) → 상세는 결정론 조립만.
+# [소스확장 2026-07-02] Federal Register 문서유형 라벨 — `_deterministic_detail`(type=fr_summary)이
+# abstract 전문과 함께 낸다(웹 전용·LLM/게이트 없음, §16 deterministic_detail 로 통합).
 # ─────────────────────────────────────────────────────────────────────────────
 _FR_KIND_LABEL = {  # type_or_class → 사람이 읽는 문서 유형(detail_kind)
     "rule": "Rule", "final-rule": "Rule", "notice-final": "Rule",
@@ -1250,26 +1259,6 @@ def _fr_detail_kind(type_or_class: str) -> str:
     if "guidance" in tc:
         return "Guidance"
     return type_or_class
-
-
-def _fr_detail(row: dict[str, Any], raw: dict[str, Any] | None) -> dict[str, Any] | None:
-    """Federal Register(kind=='guidance') 결정론 상세 슬롯 — 없으면 None(상세 블록 미출현).
-
-    `summary_full` = abstract **전문**(무절단)이 핵심 값 — W3 quote 는 250자 절단본이라
-    긴 abstract 는 상세에서 전문을 보여준다. abstract 부재면 None(설계문서 §10 축소규칙 —
-    제목 수준 데이터엔 상세 미부착, graceful). 창작 0(DB 필드 무변형). 적용범위·기업대응은
-    결정론으로 채울 수 없어 넣지 않는다(창작 금지). 시행일정 comment_close 는 facts 의견기한과
-    중복이라 상세에서 생략(중복 방지).
-    """
-    raw = raw or {}
-    abstract = (raw.get("abstract") or "").strip()
-    if not abstract:
-        return None
-    detail: dict[str, Any] = {"summary_full": abstract}
-    kind_label = _fr_detail_kind(row.get("type_or_class", ""))
-    if kind_label:
-        detail["detail_kind"] = kind_label
-    return detail
 
 
 def _plain(value: str) -> str:

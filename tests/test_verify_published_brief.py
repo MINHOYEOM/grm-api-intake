@@ -446,5 +446,105 @@ class TestRunScaffoldCells(unittest.TestCase):
         self.assertTrue(j["ok"], msg=j["alerts"])
 
 
+class TestSkipClass(unittest.TestCase):
+    """W1 탐지선 침묵 방지: skip 을 infra(탐지선 죽음)/content(대상 부재)로 분류한다.
+
+    CI(grm-brief-audit)가 이 값으로 분기해 **infra skip 만** 스케줄에서 경보한다(과알림 0).
+    각 skip 경로의 skip_class 를 동결한다 — 6 경로 = infra 4 · content 2.
+    """
+
+    _BRIEF = {"id": "p", "url": "u", "title": "t"}
+
+    def test_skipped_json_carries_skip_class(self):
+        self.assertEqual(vpb.skipped_json("x", skip_class="infra")["skip_class"], "infra")
+        self.assertEqual(vpb.skipped_json("x", skip_class="content")["skip_class"], "content")
+        self.assertEqual(vpb.skipped_json("x")["skip_class"], "")  # 기본값 = 미분류
+
+    def test_no_token_is_infra(self):
+        j = vpb.run("", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "infra")
+        self.assertIn("NOTION_TOKEN", j["note"])
+
+    def test_weekly_brief_query_failure_is_infra(self):
+        with mock.patch.object(vpb, "fetch_latest_brief", side_effect=RuntimeError("boom")):
+            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "infra")
+        self.assertIn("Weekly Brief 조회 실패", j["note"])
+
+    def test_weekly_brief_missing_is_content(self):
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=None):
+            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "content")
+
+    def test_handoff_query_failure_is_infra(self):
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               side_effect=RuntimeError("boom")):
+            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "infra")
+        self.assertIn("handoff", j["note"])
+
+    def test_consumed_handoff_missing_is_content(self):
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows", return_value=[]):
+            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "content")
+
+    def test_brief_body_fetch_failure_is_infra(self):
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               return_value=HANDOFF_ROWS), \
+             mock.patch.object(vpb, "fetch_brief_blocks", side_effect=RuntimeError("boom")):
+            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
+        self.assertEqual(j["skip_class"], "infra")
+
+    def test_six_skip_paths_are_infra4_content2(self):
+        """분포 동결: 6 skip 경로 = infra 4 · content 2 (분류가 바뀌면 이 테스트가 잡는다)."""
+        classes = []
+        classes.append(vpb.run("", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        with mock.patch.object(vpb, "fetch_latest_brief", side_effect=RuntimeError("x")):
+            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=None):
+            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               side_effect=RuntimeError("x")):
+            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows", return_value=[]):
+            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
+             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
+                               return_value=HANDOFF_ROWS), \
+             mock.patch.object(vpb, "fetch_brief_blocks", side_effect=RuntimeError("x")):
+            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
+        self.assertEqual(classes.count("infra"), 4)
+        self.assertEqual(classes.count("content"), 2)
+
+
+class TestAuditJsonSkipClass(unittest.TestCase):
+    """정상 경로(build_audit_json)는 skip_class truthy 값 부재 → 스케줄 infra-경보 대상 아님."""
+
+    def test_build_audit_json_has_no_truthy_skip_class(self):
+        j_fail = vpb.build_audit_json(
+            [bl.LintFinding(bl.SEV_FAIL, "C", "u", "m")], [])
+        self.assertFalse(j_fail.get("skip_class"))
+        j_pass = vpb.build_audit_json([], [])
+        self.assertFalse(j_pass.get("skip_class"))
+
+    def test_skipped_json_schema_is_additive(self):
+        """기존 스키마 필드 불변 — skip_class 만 추가된 additive 변경."""
+        j = vpb.skipped_json("x", skip_class="infra")
+        for key in ("ok", "run_date_kst", "brief", "fail_count", "info_count",
+                    "alerts", "info", "note"):
+            self.assertIn(key, j)
+        self.assertTrue(j["ok"])
+        self.assertEqual(j["brief"], {"title": "", "url": ""})
+        self.assertEqual(j["fail_count"], 0)
+        self.assertEqual(j["info_count"], 0)
+        self.assertEqual(j["alerts"], [])
+        self.assertEqual(j["info"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

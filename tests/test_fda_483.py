@@ -1,11 +1,10 @@
-"""FDA 483/EIR 수집기 회귀 — WHY-1 #3 (+ 완전성 HOLD: JSON 전수 + HTML 폴백/보강).
+"""FDA 483 수집기 회귀 — 현행 OII HTML/DataTables + Observation 상세보기.
 
-검증: JSON 전수 파싱(완전성)·HTML Country 보강·JSON 사망 시 HTML 폴백+source-degraded·
-Record Type 필터(483/EIR)·Publish 윈도우(전수·정렬 비의존)·노이즈/수의/기기 게이트·
-dedup(media id, node mid 불일치 대비)·PDF excerpt(483 앵커·graceful)·Tier·Country 매핑·
-구조변경 sentinel·flag/토큰 wiring.
+검증: HTML/DataTables 행 파싱·Record Type=483 필터(EIR 제외)·Publish 윈도우·노이즈/수의/기기
+게이트·dedup(media id)·PDF excerpt(483 앵커·graceful)·Observation 구조 추출(opt-in)·Tier·Country
+매핑·구조변경 sentinel·flag/토큰 wiring.
 
-무네트워크: http_get_json·http_get_html·http_get_bytes·_extract_pdf_text 스텁.
+무네트워크: _fetch_html_rows·http_get_bytes·_extract_pdf_text 스텁.
 """
 import os
 import sys
@@ -87,43 +86,59 @@ def _stub_pdf(text, status="pdf-ok"):
 
 
 class _Patched:
-    """JSON(전수)·HTML(보강/폴백)·PDF fetch·텍스트 추출 스텁 + delay 0.
+    """HTML/DataTables 행·PDF fetch·텍스트 추출 스텁 + delay 0.
 
-    json_rows: JSON 레코드 리스트 또는 None(JSON 사망) 또는 '비배열'.
-    html_rows: HTML 행 spec 리스트(자동 렌더) · 완성 HTML 문자열 · None.
+    기존 JSON fixture 입력도 HTML 행으로 변환해 테스트 데이터 재사용.
     """
     def __init__(self, json_rows=None, html_rows=None,
                  pdf_text="OBSERVATION 1 Sterile defect.", pdf_status="pdf-ok",
-                 bytes_exc=None, json_exc=None, html_exc=None):
+                 bytes_exc=None, json_exc=None, html_exc=None, source_degraded=False):
         self.json_rows = json_rows
         self.json_exc = json_exc
-        if html_rows is None:
-            self.html = ""
-        elif isinstance(html_rows, str):
-            self.html = html_rows
+        self.source_degraded = source_degraded
+        if html_exc:
+            self.rows = []
+            self.total = 0
         else:
-            self.html = _html(html_rows)
+            specs = html_rows
+            if (specs is None or specs == []) and isinstance(json_rows, list):
+                specs = [self._json_to_html_row(r) for r in json_rows if isinstance(r, dict)]
+            if isinstance(specs, str):
+                self.rows, self.total = f._html_norm_rows(specs)
+            else:
+                self.rows, self.total = f._html_norm_rows(_html(specs or []))
         self.html_exc = html_exc
         self.bytes = _StubBytes(raise_exc=bytes_exc)
         self.pdf_text = pdf_text
         self.pdf_status = pdf_status
+
+    @staticmethod
+    def _json_to_html_row(r):
+        rt_cell = str(r.get("field_foia_record_type_1", ""))
+        return _html_row(
+            f._media_id_from(rt_cell),
+            rtype=f._strip(r.get("field_foia_record_type")) or f._strip(rt_cell),
+            company=f._strip(r.get("field_company_name_1")),
+            est=f._strip(r.get("field_establishment_type_1")),
+            record_date=f._strip(r.get("field_record_date")),
+            publish=f._strip(r.get("field_publish_date")),
+            state=f._strip(r.get("field_state_1")),
+            country="",
+            fei=f._strip(r.get("field_fein")),
+        )
 
     def _stub_json(self, url, **kwargs):
         if self.json_exc:
             raise self.json_exc
         return self.json_rows
 
-    def _stub_html(self, url, **kwargs):
-        if self.html_exc:
-            raise self.html_exc
-        if not self.html:
-            raise RuntimeError("no html stub")
-        return self.html
+    def _stub_rows(self, start_date=None):
+        return list(self.rows), self.total, self.source_degraded
 
     def __enter__(self):
         self._p = [
             patch.object(f, "http_get_json", self._stub_json),
-            patch.object(f, "http_get_html", self._stub_html),
+            patch.object(f, "_fetch_html_rows", self._stub_rows),
             patch.object(f, "http_get_bytes", self.bytes),
             patch.object(g, "_extract_pdf_text", _stub_pdf(self.pdf_text, self.pdf_status)),
             patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0),
@@ -139,21 +154,15 @@ class _Patched:
 
 
 class CompletenessTest(unittest.TestCase):
-    def test_json_gives_full_window_not_html_subset(self):
-        # 핵심 회귀: JSON 전수가 윈도우 내 모든 483 을 준다 — HTML 최신 일부만이 아님.
-        # (실사일 오래됐지만 최근 공개된 Intas/Dabur 류가 누락되지 않아야 함.)
-        json_rows = [
-            _json_row(1, company="BPI Labs", record_date="04/17/2026", publish="05/27/2026"),
-            _json_row(2, company="Wells Pharma", record_date="04/13/2026", publish="05/27/2026"),
-            _json_row(3, company="Intas", state="", record_date="09/17/2025", publish="05/26/2026"),
-            _json_row(4, company="Dabur India", state="", record_date="01/16/2026", publish="05/26/2026"),
-            _json_row(5, company="Excel Vision", state="", record_date="01/22/2026", publish="05/15/2026"),
-        ]
-        html_rows = [  # HTML 은 최신 실사일 2건만(Intas/Dabur/Excel 은 표 아래로 밀림)
+    def test_html_datatables_gives_window_rows_not_static_subset(self):
+        rows = [
             _html_row(1, company="BPI Labs", record_date="04/17/2026", publish="05/27/2026"),
             _html_row(2, company="Wells Pharma", record_date="04/13/2026", publish="05/27/2026"),
+            _html_row(3, company="Intas", state="", record_date="09/17/2025", publish="05/26/2026"),
+            _html_row(4, company="Dabur India", state="", record_date="01/16/2026", publish="05/26/2026"),
+            _html_row(5, company="Excel Vision", state="", record_date="01/22/2026", publish="05/15/2026"),
         ]
-        with _Patched(json_rows=json_rows, html_rows=html_rows, pdf_text="OBSERVATION 1 x"):
+        with _Patched(html_rows=rows, pdf_text="OBSERVATION 1 x"):
             items, err = f.collect_fda_483(START, END)
         self.assertIsNone(err)
         self.assertEqual({it.document_id for it in items},
@@ -170,7 +179,7 @@ class CompletenessTest(unittest.TestCase):
 
 
 class RecordTypeFilterTest(unittest.TestCase):
-    def test_only_483_and_eir_kept(self):
+    def test_only_483_kept(self):
         json_rows = [
             _json_row(1001, "483"),
             _json_row(1002, EIR_TYPE),
@@ -181,15 +190,15 @@ class RecordTypeFilterTest(unittest.TestCase):
         with _Patched(json_rows=json_rows, html_rows=[]):
             items, err = f.collect_fda_483(START, END)
         self.assertIsNone(err)
-        self.assertEqual({it.document_id for it in items}, {"fda483-1001", "fda483-1002"})
+        self.assertEqual({it.document_id for it in items}, {"fda483-1001"})
 
-    def test_type_or_class_483_vs_eir(self):
+    def test_eir_is_out_of_scope(self):
         with _Patched(json_rows=[_json_row(2001, "483"), _json_row(2002, EIR_TYPE)],
                       html_rows=[]):
             items, _ = f.collect_fda_483(START, END)
         by_id = {it.document_id: it for it in items}
         self.assertEqual(by_id["fda483-2001"].type_or_class, "483")
-        self.assertEqual(by_id["fda483-2002"].type_or_class, "EIR")
+        self.assertNotIn("fda483-2002", by_id)
 
 
 class WindowFilterTest(unittest.TestCase):
@@ -243,16 +252,16 @@ class CountryMappingTest(unittest.TestCase):
 
 
 class SourceDegradeTest(unittest.TestCase):
-    def test_json_exception_falls_back_to_html(self):
+    def test_datatables_failure_static_html_fallback_is_marked(self):
         html_rows = [_html_row(5201, company="BPI", country="")]
-        with _Patched(json_exc=RuntimeError("HTTP 404"), html_rows=html_rows):
+        with _Patched(html_rows=html_rows, source_degraded=True):
             items, err = f.collect_fda_483(START, END)
         self.assertIsNone(err)
         self.assertEqual({it.document_id for it in items}, {"fda483-5201"})
         self.assertTrue(f.LAST_HEALTH["source_degraded"])   # 완전성 미보장 표면화
 
-    def test_json_nonlist_falls_back_to_html(self):
-        with _Patched(json_rows={"data": []}, html_rows=[_html_row(5202)]):
+    def test_static_html_fallback_recovers(self):
+        with _Patched(html_rows=[_html_row(5202)], source_degraded=True):
             items, _ = f.collect_fda_483(START, END)
         self.assertEqual({it.document_id for it in items}, {"fda483-5202"})
         self.assertTrue(f.LAST_HEALTH["source_degraded"])
@@ -264,7 +273,7 @@ class SourceDegradeTest(unittest.TestCase):
         self.assertIsNotNone(err)
         self.assertIn("수집 실패", err)
 
-    def test_json_ok_no_degrade(self):
+    def test_datatables_ok_no_degrade(self):
         with _Patched(json_rows=[_json_row(5203)], html_rows=[]):
             f.collect_fda_483(START, END)
         self.assertFalse(f.LAST_HEALTH["source_degraded"])
@@ -354,18 +363,63 @@ class ExcerptTest(unittest.TestCase):
         self.assertEqual(len(items), 3)        # cap 은 excerpt 만 제한, 항목은 전부 유지
 
 
+class ObservationExtractionTest(unittest.TestCase):
+    SAMPLE = (
+        "Cover. I/WE OBSERVED: OBSERVATION 1 There is a failure to thoroughly review "
+        "unexplained discrepancies. The investigation did not extend to other batches. "
+        "OBSERVATION 2 Established sampling plans are not documented at the time of "
+        "performance. Additional examples were observed. SEE REVERSE FORM FDA 483"
+    )
+
+    def test_text_observations_split_deterministically(self):
+        rows = f._extract_483_observations_from_text(self.SAMPLE)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertEqual(rows[0]["deficiency"],
+                         "There is a failure to thoroughly review unexplained discrepancies.")
+        self.assertIn("other batches", rows[0]["detail"])
+        self.assertEqual(rows[1]["deficiency"],
+                         "Established sampling plans are not documented at the time of performance.")
+
+    def test_observation_flag_off_does_not_write_raw(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false"}), \
+                _Patched(json_rows=[_json_row(6101)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda_483_observations", items[0].raw_payload)
+        self.assertFalse(f.LAST_HEALTH["fda_483_observations"]["enabled"])
+
+    def test_observation_flag_on_writes_raw_and_health(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "true"}), \
+                _Patched(json_rows=[_json_row(6102)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        obs = items[0].raw_payload["fda_483_observations"]
+        self.assertEqual(len(obs), 2)
+        self.assertEqual(obs[0]["number"], "1")
+        self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["attempted"], 1)
+        self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["extracted"], 1)
+        self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 0)
+
+    def test_observation_gate_degrades_to_summary_card(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "true"}), \
+                _Patched(json_rows=[_json_row(6103)], html_rows=[],
+                         pdf_text="cover page with no observation anchors"):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda_483_observations", items[0].raw_payload)
+        self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 1)
+
+
 class TierTest(unittest.TestCase):
-    def test_483_tier3_eir_tier2(self):
-        json_rows = [_json_row(8001, "483", est="Drug Manufacturer"),
-                     _json_row(8002, EIR_TYPE, est="Drug Manufacturer")]
+    def test_483_tier3(self):
+        json_rows = [_json_row(8001, "483", est="Drug Manufacturer")]
         with _Patched(json_rows=json_rows, html_rows=[], pdf_text="OBSERVATION 1 generic."):
             items, _ = f.collect_fda_483(START, END)
         by_id = {it.document_id: it for it in items}
         self.assertEqual(by_id["fda483-8001"].signal_tier, "Tier 3")
-        self.assertEqual(by_id["fda483-8002"].signal_tier, "Tier 2")
 
-    def test_sterile_eir_floor_tier3(self):
-        json_rows = [_json_row(8003, EIR_TYPE, est="Producer of Sterile Drug Products")]
+    def test_sterile_483_floor_tier3(self):
+        json_rows = [_json_row(8003, "483", est="Producer of Sterile Drug Products")]
         with _Patched(json_rows=json_rows, html_rows=[], pdf_text="OBSERVATION 1 aseptic."):
             items, _ = f.collect_fda_483(START, END)
         self.assertEqual(items[0].signal_tier, "Tier 3")
@@ -378,18 +432,16 @@ class TierTest(unittest.TestCase):
 
 
 class StructureSentinelTest(unittest.TestCase):
-    def test_no_483_eir_anywhere_falls_back_then_errors(self):
-        # JSON 0 keep + HTML 도 0행 → 두 경로 실패 error(침묵 0건 금지).
+    def test_no_483_anywhere_errors(self):
+        # HTML/DataTables 483 0행 → 구조 변경 의심 error(침묵 0건 금지).
         json_rows = [_json_row(9001, "Consent Decree"), _json_row(9002, "Recall Record")]
         with _Patched(json_rows=json_rows, html_rows=[]):
             items, err = f.collect_fda_483(START, END)
         self.assertEqual(items, [])
         self.assertIsNotNone(err)
 
-    def test_json_zero_keep_html_fallback_recovers(self):
-        # JSON 에 483/EIR 0(타입 이상)이지만 HTML 에 있으면 폴백 복구 + degrade.
-        json_rows = [_json_row(9003, "Consent Decree")]
-        with _Patched(json_rows=json_rows, html_rows=[_html_row(9004)]):
+    def test_static_fallback_recovers(self):
+        with _Patched(html_rows=[_html_row(9004)], source_degraded=True):
             items, err = f.collect_fda_483(START, END)
         self.assertIsNone(err)
         self.assertEqual({it.document_id for it in items}, {"fda483-9004"})
@@ -421,6 +473,11 @@ class OrchestrationWiringTest(unittest.TestCase):
             os.environ.pop("ENABLE_FDA_483", None)
             enabled = (os.environ.get("ENABLE_FDA_483", "false").lower() == "true")
         self.assertFalse(enabled)
+
+    def test_observation_flag_default_off(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("ENABLE_FDA_483_OBSERVATIONS", None)
+            self.assertFalse(f._observations_enabled())
 
     def test_transient_scope_includes_fda483(self):
         self.assertIn("fda483", ci._GLOBAL_PUBLIC_SOURCE_CODES)

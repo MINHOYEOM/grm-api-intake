@@ -131,6 +131,19 @@
     </div>
     {%- endfor %}
   </details>
+  {%- elif card.deterministic_detail.type == 'fda_483_observations' %}
+  {#- [FDA 483 상세보기 2026-07-02] Observation 번호 구조 — PDF 텍스트층을 결정론 분할.
+      LLM/해석 없음, 실패 시 수집기가 raw 키를 쓰지 않아 블록 자체가 사라진다. -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· 원문 기반</span></summary>
+    {%- for r in dd.observations %}
+    <div class="dt-row obs-row">
+      <div class="dt-h"><span class="obs-num">Observation {{ r.number }}</span></div>
+      <p class="dt-sum">{{ r.deficiency }}</p>
+      {%- if r.detail %}<p class="dt-fu">{{ r.detail }}</p>{% endif %}
+    </div>
+    {%- endfor %}
+  </details>
   {%- elif card.deterministic_detail.type == 'fr_summary' %}
   {#- [소스확장 2026-07-02] Federal Register abstract 전문 — LLM 없음(DB 사실·무변형).
       분석층(deep)의 "AI 생성 해석"과 달리 결정론이라 신뢰 라벨이 "원문 기반". -#}

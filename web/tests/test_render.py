@@ -1000,6 +1000,58 @@ class WebDeterministicDetailTest(unittest.TestCase):
                           "결정론 상세 블록에 mono/code 클래스(한글 위험, §4)")
 
 
+class WebFda483DeterministicDetailTest(unittest.TestCase):
+    """FDA 483 Observation deterministic_detail 렌더 스모크 — 번호 목록 + 원문 기반 라벨."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_483dd_"))
+        data = cls._tmp / "data"
+        data.mkdir(parents=True, exist_ok=True)
+        base = json.loads(
+            (MULTI_FIXTURES / "brief_web_2026_06_08.json").read_text(encoding="utf-8"))
+        card = dict(base["cards"][0])
+        card.update({
+            "id": "fda483-detail-smoke", "render_order": 999, "group": "글로벌",
+            "group_label": None, "agency": "FDA", "card_type": "FDA 483 실사 관찰",
+            "category": "Other", "modality": "💊 합성의약품", "evidence_level": "B",
+            "signal_tier": 3, "signal_label": "High", "type_tag": "483",
+            "headline_target": "BPI Labs, LLC", "title_issue": "", "summary": "",
+            "facts": [{"label": "문서번호", "value": "fda483-detail-smoke"}],
+            "quotes": [], "key_facts": [], "implication": "", "checks": [],
+            "merged_count": 1, "merged_items": [],
+            "sources": {"info_url": "", "official_url": "https://www.fda.gov/media/1/download",
+                        "official_is_pdf": True,
+                        "link_check": {"info": "pending", "official": "pending"}},
+            "deterministic_detail": {
+                "type": "fda_483_observations", "count": 2,
+                "observations": [
+                    {"number": "1",
+                     "deficiency": "There is a failure to thoroughly review discrepancies.",
+                     "detail": "The investigation did not extend to other batches."},
+                    {"number": "2",
+                     "deficiency": "Sampling plans are not documented at performance.",
+                     "detail": ""}]},
+        })
+        base["cards"] = base["cards"] + [card]
+        (data / "brief_web_2026_06_08.json").write_text(
+            json.dumps(base, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, cls._tmp / "out")
+        cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
+            encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_observation_detail_block_rendered(self):
+        self.assertIn("Observation 상세", self.html)
+        self.assertIn("Observation 2건", self.html)
+        self.assertIn('class="obs-num">Observation 1</span>', self.html)
+        self.assertIn("There is a failure to thoroughly review discrepancies.", self.html)
+        self.assertIn("원문 기반", self.html)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

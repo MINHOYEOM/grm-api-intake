@@ -1,0 +1,44 @@
+{
+  "raw": {
+    "channel": "fda-483",
+    "establishment_type": "Outsourcing Facility",
+    "fda483_excerpt": "OBSERVATION 1 There is a failure to thoroughly review any unexplained discrepancy. The investigation did not extend to other potentially affected batches. OBSERVATION 2 Established sampling plans are not documented at the time of performance. Sampling records were completed after the operation.",
+    "fda_483_observations": [
+      {
+        "number": "1",
+        "deficiency": "There is a failure to thoroughly review any unexplained discrepancy.",
+        "detail": "The investigation did not extend to other potentially affected batches."
+      },
+      {
+        "number": "2",
+        "deficiency": "Established sampling plans are not documented at the time of performance.",
+        "detail": "Sampling records were completed after the operation."
+      }
+    ],
+    "country": "",
+    "fei_number": "3015156709",
+    "firm": "BPI Labs, LLC",
+    "media_id": "192439",
+    "pdf_url": "https://www.fda.gov/media/192439/download",
+    "product_type": "Outsourcing Facility",
+    "publish_date": "05/27/2026",
+    "record_date": "04/17/2026",
+    "record_type": "483",
+    "site_state": "Florida"
+  },
+  "row": {
+    "date": "2026-05-27",
+    "document_id": "fda483-192439",
+    "firm": "BPI Labs, LLC",
+    "headline": "[FDA 483] BPI Labs, LLC",
+    "language": "EN",
+    "modality": "Chemical",
+    "official_url": "https://www.fda.gov/media/192439/download",
+    "signal_tier": "Tier 3",
+    "site_country": "United States",
+    "source": "FDA 483",
+    "source_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "api_query": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "type_or_class": "483"
+  }
+}

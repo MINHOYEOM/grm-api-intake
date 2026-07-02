@@ -79,7 +79,11 @@ on:
         type: boolean
         default: false
       enable_fda483:
-        description: 'FDA 483/EIR 실사 관찰사항 수집 활성화 (기본: vars.ENABLE_FDA_483 또는 false)'
+        description: 'FDA 483 실사 관찰사항 수집 활성화 (기본: vars.ENABLE_FDA_483 또는 true)'
+        type: boolean
+        default: true
+      enable_fda483_observations:
+        description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
         type: boolean
         default: false
       enable_moleg_api:
@@ -205,8 +209,10 @@ jobs:
           ENABLE_ICH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_ich) || vars.ENABLE_ICH || 'false' }}
           ENABLE_WHO: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_who) || vars.ENABLE_WHO || 'false' }}
           ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_hc) || vars.ENABLE_HC || 'false' }}
-          # WHY-1 #3: FDA 483/EIR 실사 관찰사항(기본 off — dry-run 검증·Notion Source 옵션 등록 후 on).
-          ENABLE_FDA_483: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483) || vars.ENABLE_FDA_483 || 'false' }}
+          # FDA 483 실사 관찰사항 — 현행 OII HTML/DataTables 소스로 부활. repo var 로 false override 가능.
+          ENABLE_FDA_483: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483) || vars.ENABLE_FDA_483 || 'true' }}
+          # FDA 483 Observation 번호 목록 결정론 상세보기. 기본 off — 실패는 graceful=요약카드 유지.
+          ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_observations) || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
@@ -363,7 +369,7 @@ jobs:
                 '2. Notion DB 스키마 (속성 이름·타입)',
                 '3. Federal Register / OpenFDA / RSS / FDA WL / MFDS / ICH / WHO / Health Canada 상태',
                 '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY, MFDS_HTTP_PROXY, LAW_GO_KR_OC)',
-                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_LAW, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_CERT, ENABLE_MFDS_SAFETY_LETTER, ENABLE_MFDS_GMP_INSPECTION, ENABLE_GMP_DEFICIENCY_TABLE, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_FDA_483, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_WHOPIR_EXCERPT, ENABLE_WL_BODY, ENABLE_WL_BODY_FULL, ENABLE_MFDS_ADMIN_BODY_FULL, ENABLE_MODALITY_TAG, MFDS_RSS_BOARD_MODE, MFDS_RSS_BOARD_IDS) 설정 확인',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_LAW, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_CERT, ENABLE_MFDS_SAFETY_LETTER, ENABLE_MFDS_GMP_INSPECTION, ENABLE_GMP_DEFICIENCY_TABLE, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_FDA_483, ENABLE_FDA_483_OBSERVATIONS, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_WHOPIR_EXCERPT, ENABLE_WL_BODY, ENABLE_WL_BODY_FULL, ENABLE_MFDS_ADMIN_BODY_FULL, ENABLE_MODALITY_TAG, MFDS_RSS_BOARD_MODE, MFDS_RSS_BOARD_IDS) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',

@@ -44,7 +44,7 @@ FIXTURES = [
 # watch 섹션(legislative_notice)은 v1 카드 아님(§3.3) → per-card web 골든 미동결(to_web_card
 # 는 watch 로 호출되지 않음; brief 제외는 WebBriefGoldenTest 가 검증).
 WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
-    "who_inspection_excerpt", "warning_letter_excerpt", "fda_483",
+    "who_inspection_excerpt", "warning_letter_excerpt", "fda_483", "fda_483_observations",
     # [상세보기 결정론 승격 2026-07-02 · spec §16] gmp-inspection deterministic_detail —
     # periodic(지적 표 有 → deterministic_detail) + pre_market(표 無 → 필드 부재). web-card 전용
     # (FIXTURES 미포함 → brief golden·intake_total 불변).
@@ -714,6 +714,38 @@ class Fda483GoldenTest(unittest.TestCase):
         self.assertIn("/media/192439/download", card.markdown)
         # 금지 마크다운 부재
         self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
+
+
+class Fda483DeterministicDetailTest(unittest.TestCase):
+    """FDA 483 Observation 결정론 상세보기 — raw.fda_483_observations 가 있을 때만 web-card 추가."""
+
+    def test_fda483_observations_emit_detail(self) -> None:
+        fx = _load_input("fda_483_observations")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        dd = wc["deterministic_detail"]
+        self.assertEqual(dd["type"], "fda_483_observations")
+        self.assertEqual(dd["count"], 2)
+        self.assertEqual(dd["observations"][0]["number"], "1")
+        self.assertIn("failure to thoroughly review", dd["observations"][0]["deficiency"])
+
+    def test_fda483_without_observations_has_no_detail(self) -> None:
+        fx = _load_input("fda_483")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_invalid_observation_rows_yield_no_detail(self) -> None:
+        fx = _load_input("fda_483")
+        raw = dict(fx["raw"])
+        raw["fda_483_observations"] = [{"number": 1, "deficiency": "", "detail": "x"}]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_non_483_ignores_observation_raw(self) -> None:
+        fx = _load_input("warning_letter_chemical")
+        raw = dict(fx["raw"])
+        raw["fda_483_observations"] = [{"number": "1", "deficiency": "Do not render"}]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
 
 
 def _callout_colors(md: str) -> list[str]:

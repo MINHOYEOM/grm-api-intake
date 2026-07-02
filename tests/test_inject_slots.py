@@ -430,6 +430,23 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertNotIn("FDA's Evaluation of Response", html)  # WL 영문 헤더 미출현
         self.assertNotIn("Key Violations", html)
 
+    def test_fr_detail_renders_deterministic(self) -> None:
+        # [소스확장 2026-07-02] Federal Register 결정론 상세보기 — abstract 전문·"원문 기반" 라벨.
+        fx = _load_input("guidance_fr")
+        raw = dict(fx["raw"])
+        raw["abstract"] = "FDA 요지 " + "가" * 300 + " 종료 문장."
+        card = cs.build_card_scaffold(fx["row"], raw)
+        brief = cs.assemble_web_brief([card], {
+            "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+            "publish_date": "2026-07-01", "intake_total": 1,
+        })
+        html = self._render_brief_html(brief)
+        self.assertIn("상세 보기", html)
+        self.assertIn("원문 기반", html)                 # 결정론 신뢰 라벨
+        self.assertIn("규정 요지", html)
+        self.assertIn(raw["abstract"], html)             # abstract 전문(무절단) 렌더
+        self.assertNotIn("AI 심층분석", html)            # 분석층(deep) 라벨은 미출현(결정론)
+
     def test_deep_analysis_markup_absent_for_ordinary_cards(self) -> None:
         fx = _load_input("warning_letter_chemical")   # wl_body_full 없음 — deep_analysis_ready=False
         card = cs.build_card_scaffold(fx["row"], fx["raw"])

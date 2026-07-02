@@ -173,6 +173,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
         "deterministic_detail": card.get("deterministic_detail") or None,
+        # [소스확장 2026-07-02] FR 결정론 상세보기(detail) — deep_analysis 와 동형으로 무가공
+        # 통과. guidance(FR) 카드만 키 보유, 그 외/커밋 스냅샷은 부재 → 기존 골든 불변(additive).
+        "detail": card.get("detail") or None,
         "sources": sources,
     }
 

@@ -1337,5 +1337,48 @@ class DeterministicDetailTest(unittest.TestCase):
                                       "summary", "followup"})
 
 
+class FrDetailTest(unittest.TestCase):
+    """[소스확장 2026-07-02] Federal Register 결정론 상세보기(detail) — 웹 전용·LLM 없음·additive."""
+
+    def test_guidance_card_has_detail_full_abstract(self) -> None:
+        fx = _load_input("guidance_fr")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+        self.assertIn("detail", wc)
+        self.assertEqual(wc["detail"]["summary_full"], fx["raw"]["abstract"])  # 전문·무변형
+        self.assertEqual(wc["detail"]["detail_kind"], "Guidance")
+
+    def test_long_abstract_not_truncated_in_detail(self) -> None:
+        # 상세는 abstract 전문(무절단) — quote(250자 절단)와 달리 긴 abstract 를 온전히 보여준다.
+        fx = _load_input("guidance_fr")
+        raw = dict(fx["raw"])
+        raw["abstract"] = "A" * 400 + ". " + "B" * 400 + "."
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
+        self.assertEqual(wc["detail"]["summary_full"], raw["abstract"])
+        self.assertGreater(len(wc["detail"]["summary_full"]), 250)
+
+    def test_no_abstract_no_detail(self) -> None:
+        fx = _load_input("guidance_fr")
+        raw = dict(fx["raw"]); raw.pop("abstract", None)
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
+        self.assertNotIn("detail", wc)          # graceful — 제목 수준 데이터엔 상세 미부착
+
+    def test_non_guidance_cards_have_no_detail(self) -> None:
+        for name in ("mfds_notice", "ich_guideline", "openfda_recall_chemical",
+                     "warning_letter_chemical", "admin_action_chemical"):
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertNotIn("detail", wc)
+
+    def test_detail_kind_mapping(self) -> None:
+        self.assertEqual(cs._fr_detail_kind("proposed-rule"), "Proposed Rule")
+        self.assertEqual(cs._fr_detail_kind("notice-final"), "Rule")
+        self.assertEqual(cs._fr_detail_kind("Final Rule"), "Rule")
+        self.assertEqual(cs._fr_detail_kind("notice"), "Notice")
+        self.assertEqual(cs._fr_detail_kind("guidance-industry"), "Guidance")
+        self.assertEqual(cs._fr_detail_kind("메타-미지유형"), "메타-미지유형")  # 무변형 passthrough
+        self.assertEqual(cs._fr_detail_kind(""), "")
+
+
 if __name__ == "__main__":
     unittest.main()

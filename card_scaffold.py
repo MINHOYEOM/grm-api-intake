@@ -280,6 +280,10 @@ class CardScaffold:
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
             # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
+            **({"detail": _fr_detail(row, raw)}
+               if (kind == "guidance" and _fr_detail(row, raw)) else {}),
+            # ^ [소스확장 2026-07-02] Federal Register 결정론 상세보기(웹 전용·LLM 없음).
+            # guidance(=FR) + abstract 확보 시만 키 존재. 그 외 전 유형은 키 부재(additive).
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -1208,6 +1212,56 @@ def _official_is_pdf(url: str) -> bool:
     """
     u = (url or "").lower().split("?", 1)[0].split("#", 1)[0]
     return u.endswith(".pdf") or u.endswith("/download")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# [소스확장 2026-07-02] Federal Register 결정론 상세보기(detail) — 웹 전용, LLM/게이트 없음.
+# FR abstract 는 FDA 공식 요약이라 충분히 풍부(설계문서 §10·§15) → 상세는 결정론 조립만.
+# ─────────────────────────────────────────────────────────────────────────────
+_FR_KIND_LABEL = {  # type_or_class → 사람이 읽는 문서 유형(detail_kind)
+    "rule": "Rule", "final-rule": "Rule", "notice-final": "Rule",
+    "proposed-rule": "Proposed Rule", "notice": "Notice",
+    "guidance-industry": "Guidance", "guidance": "Guidance",
+}
+
+
+def _fr_detail_kind(type_or_class: str) -> str:
+    """FR type_or_class → 문서 유형 라벨(Rule/Proposed Rule/Notice/Guidance). 미지 유형은
+    원문 값 그대로(무변형). 결정론(사실 재작성 0)."""
+    tc = (type_or_class or "").strip().lower()
+    if not tc:
+        return ""
+    if tc in _FR_KIND_LABEL:
+        return _FR_KIND_LABEL[tc]
+    if "proposed" in tc:
+        return "Proposed Rule"
+    if "rule" in tc:
+        return "Rule"
+    if "notice" in tc:
+        return "Notice"
+    if "guidance" in tc:
+        return "Guidance"
+    return type_or_class
+
+
+def _fr_detail(row: dict[str, Any], raw: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Federal Register(kind=='guidance') 결정론 상세 슬롯 — 없으면 None(상세 블록 미출현).
+
+    `summary_full` = abstract **전문**(무절단)이 핵심 값 — W3 quote 는 250자 절단본이라
+    긴 abstract 는 상세에서 전문을 보여준다. abstract 부재면 None(설계문서 §10 축소규칙 —
+    제목 수준 데이터엔 상세 미부착, graceful). 창작 0(DB 필드 무변형). 적용범위·기업대응은
+    결정론으로 채울 수 없어 넣지 않는다(창작 금지). 시행일정 comment_close 는 facts 의견기한과
+    중복이라 상세에서 생략(중복 방지).
+    """
+    raw = raw or {}
+    abstract = (raw.get("abstract") or "").strip()
+    if not abstract:
+        return None
+    detail: dict[str, Any] = {"summary_full": abstract}
+    kind_label = _fr_detail_kind(row.get("type_or_class", ""))
+    if kind_label:
+        detail["detail_kind"] = kind_label
+    return detail
 
 
 def _plain(value: str) -> str:

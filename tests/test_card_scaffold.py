@@ -1399,33 +1399,22 @@ class DeterministicDetailTest(unittest.TestCase):
 
 
 class FrDetailTest(unittest.TestCase):
-    """[소스확장 2026-07-02] Federal Register 결정론 상세보기 — §16 deterministic_detail(type=
-    fr_summary)로 통합(gmp_deficiencies 와 동일 슬롯·`type` 분기). 웹 전용·LLM 없음·additive."""
+    """[FR 상세보기 철회 2026-07-02] Federal Register 는 요약보강(6슬롯+듀얼링크)으로 복귀 —
+    결정론 상세보기(fr_summary)를 제거했다(마감일/시행일은 API 메타, 전문은 abstract=요약이라
+    증분 가치 없음). guidance 카드는 abstract 유무와 무관하게 deterministic_detail 미부착."""
 
-    def test_guidance_card_emits_fr_summary(self) -> None:
+    def test_guidance_card_has_no_detail(self) -> None:
+        # abstract 가 있어도 guidance 는 상세보기 미부착(요약카드) — FR 상세보기 철회 확인.
         fx = _load_input("guidance_fr")
         wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
-        self.assertIn("deterministic_detail", wc)
-        dd = wc["deterministic_detail"]
-        self.assertEqual(dd["type"], "fr_summary")
-        self.assertEqual(dd["summary_full"], fx["raw"]["abstract"])  # 전문·무변형
-        self.assertEqual(dd["detail_kind"], "Guidance")
-        self.assertNotIn("detail", wc)          # 구 별도 키 제거(통합 확인)
-
-    def test_long_abstract_not_truncated(self) -> None:
-        # 상세는 abstract 전문(무절단) — quote(250자 절단)와 달리 긴 abstract 를 온전히 보여준다.
-        fx = _load_input("guidance_fr")
-        raw = dict(fx["raw"])
-        raw["abstract"] = "A" * 400 + ". " + "B" * 400 + "."
-        dd = cs.build_card_scaffold(fx["row"], raw).to_web_card({})["deterministic_detail"]
-        self.assertEqual(dd["summary_full"], raw["abstract"])
-        self.assertGreater(len(dd["summary_full"]), 250)
+        self.assertNotIn("deterministic_detail", wc)
+        self.assertNotIn("detail", wc)
 
     def test_no_abstract_no_detail(self) -> None:
         fx = _load_input("guidance_fr")
         raw = dict(fx["raw"]); raw.pop("abstract", None)
         wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
-        self.assertNotIn("deterministic_detail", wc)   # graceful — 제목 수준 데이터엔 상세 미부착
+        self.assertNotIn("deterministic_detail", wc)
 
     def test_non_guidance_non_gmp_cards_have_no_detail(self) -> None:
         for name in ("mfds_notice", "ich_guideline", "openfda_recall_chemical",
@@ -1435,15 +1424,6 @@ class FrDetailTest(unittest.TestCase):
                 wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
                 self.assertNotIn("deterministic_detail", wc)
                 self.assertNotIn("detail", wc)
-
-    def test_detail_kind_mapping(self) -> None:
-        self.assertEqual(cs._fr_detail_kind("proposed-rule"), "Proposed Rule")
-        self.assertEqual(cs._fr_detail_kind("notice-final"), "Rule")
-        self.assertEqual(cs._fr_detail_kind("Final Rule"), "Rule")
-        self.assertEqual(cs._fr_detail_kind("notice"), "Notice")
-        self.assertEqual(cs._fr_detail_kind("guidance-industry"), "Guidance")
-        self.assertEqual(cs._fr_detail_kind("메타-미지유형"), "메타-미지유형")  # 무변형 passthrough
-        self.assertEqual(cs._fr_detail_kind(""), "")
 
 
 if __name__ == "__main__":

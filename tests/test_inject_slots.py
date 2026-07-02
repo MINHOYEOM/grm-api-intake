@@ -438,24 +438,21 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertIn("원문 근거·검증", html)
         self.assertIn("처분근거", html)
 
-    def test_fr_detail_renders_deterministic(self) -> None:
-        # [소스확장 2026-07-02] Federal Register 결정론 상세보기 — abstract 전문·"원문 기반" 라벨.
+    def test_fr_detail_retracted_no_deterministic_block(self) -> None:
+        # [FR 상세보기 철회 2026-07-02] guidance 카드는 abstract 가 있어도 결정론 상세보기
+        # (fr_summary)를 렌더하지 않는다 — 요약카드로만 발행(FR=요약보강).
         fx = _load_input("guidance_fr")
         raw = dict(fx["raw"])
         raw["abstract"] = "FDA 요지 " + "가" * 300 + " 종료 문장."
         card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertNotIn("deterministic_detail", card.to_web_card({}))  # 슬롯 자체 부재
         brief = cs.assemble_web_brief([card], {
             "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
             "publish_date": "2026-07-01", "intake_total": 1,
         })
         html = self._render_brief_html(brief)
-        self.assertIn("상세 보기", html)
-        self.assertIn("원문 기반", html)                 # 결정론 신뢰 라벨
-        self.assertIn("규정 요지", html)
-        self.assertIn(raw["abstract"], html)             # abstract 전문(무절단) 렌더
-        # 결정론 상세는 분석층 신뢰라벨/해석 뱃지가 붙지 않는다(원문 기반 vs 원문 근거·검증).
-        self.assertNotIn("원문 근거·검증", html)
-        self.assertIn("Guidance", html)                  # 미리보기 태그 = 문서 유형
+        self.assertNotIn("규정 요지", html)                 # FR 상세 블록 라벨 미출현
+        self.assertNotIn("class=\"block detail\"", html)   # 결정론 상세 details 블록 부재
 
     def test_deep_analysis_markup_absent_for_ordinary_cards(self) -> None:
         fx = _load_input("warning_letter_chemical")   # wl_body_full 없음 — deep_analysis_ready=False

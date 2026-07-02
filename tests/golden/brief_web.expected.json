@@ -188,11 +188,6 @@
       "card_type": "지침·안내서",
       "category": "Guidance",
       "checks": [],
-      "deterministic_detail": {
-        "detail_kind": "Guidance",
-        "summary_full": "This draft guidance describes FDA's current thinking on the control of elemental impurities consistent with ICH Q3D. Comments should be submitted by the date in the notice.",
-        "type": "fr_summary"
-      },
       "evidence_basis": "Intake raw",
       "evidence_level": "A",
       "facts": [

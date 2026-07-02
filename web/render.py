@@ -115,16 +115,13 @@ def _deep_preview(da: dict[str, Any] | None) -> str:
 
 
 def _detail_preview(dd: dict[str, Any] | None) -> str:
-    """결정론 상세(deterministic_detail) 접힘 summary 힌트. fr_summary 는 문서 유형(있으면)
-    또는 '규정 요지'. fda_483_observations 는 Observation 건수. gmp_deficiencies 는 card.html 이
-    자체 '· N건' 힌트를 쓰므로 빈 문자열."""
+    """결정론 상세(deterministic_detail) 접힘 summary 힌트. fda_483_observations 는 Observation
+    건수. gmp_deficiencies 는 card.html 이 자체 '· N건' 힌트를 쓰므로 빈 문자열."""
     if not isinstance(dd, dict):
         return ""
     if dd.get("type") == "fda_483_observations":
         return f"Observation {dd.get('count') or 0}건"
-    if dd.get("type") != "fr_summary":
-        return ""
-    return dd.get("detail_kind") or "규정 요지"
+    return ""
 
 
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────

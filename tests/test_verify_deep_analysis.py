@@ -227,6 +227,17 @@ class KoreanCitationExtractionTest(unittest.TestCase):
         found = {vda._normalize_citation(t) for t in vda.extract_citations("약사법 제38조를 위반")}
         self.assertIn(vda._normalize_citation("약사법 제38조"), found)
 
+    def test_standalone_ho_and_hang_extracted(self) -> None:
+        # Codex 차단1: `조` 없이 단독으로 온 제N호/제N항도 추출돼야 근거대조가 걸린다.
+        found = {vda._normalize_citation(t) for t in vda.extract_citations("근거 제999호 및 제12항 위반")}
+        self.assertIn("제999호", found)
+        self.assertIn("제12항", found)
+
+    def test_corner_bracket_law_normalized_equal(self) -> None:
+        # Codex 차단2: 「」 브래킷 유무만 다른 표기는 같은 토큰으로 정규화(과탐 방지).
+        self.assertEqual(vda._normalize_citation("「약사법」 제38조제1항"),
+                         vda._normalize_citation("약사법 제38조제1항"))
+
 
 class AdminGateTest(unittest.TestCase):
     def test_admin_good_passes_gate_autodetect(self) -> None:
@@ -264,9 +275,36 @@ class AdminGateTest(unittest.TestCase):
                             if f.severity == vda.SEV_FAIL))
 
     def test_wl_unaffected_by_admin_extension(self) -> None:
-        # 회귀: WL 산출물은 card_type 없이도 여전히 WL 스키마로 PASS(fda_evaluation 자리 유지).
+        # 회귀(Codex 차단3c): WL 산출물은 card_type 없이도 여전히 WL 스키마로 PASS·불변
+        # (fda_evaluation 자리 유지, 한국법령/브래킷 패치가 영문 WL 경로에 영향 없음).
         result = vda.run_deep_analysis_gate(_GOOD_DEEP_ANALYSIS, _SOURCE)
         self.assertTrue(result.ok)
+        self.assertEqual(result.fail_count, 0)
+        self.assertEqual(vda.check_citation_grounding(_GOOD_DEEP_ANALYSIS, _SOURCE), [])
+
+    def test_fabricated_standalone_ho_blocks_gate(self) -> None:
+        # Codex 차단3a: 산문에 `조` 없이 단독으로 심은 날조 `제999호`(원문 부재) → D2 FAIL.
+        da = dict(_GOOD_ADMIN_DA)
+        da["administrative_risks"] += " 원문에 없는 제999호를 근거로 든 날조 서술이다."
+        result = vda.run_deep_analysis_gate(da, _ADMIN_SOURCE)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("제999호" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_corner_bracket_source_grounds_plain_citation(self) -> None:
+        # Codex 차단3b: 원문이 「」 브래킷 법령명(「약사법」 제38조제1항)이어도 정상 인용
+        # (약사법 제38조제1항)이 과탐 없이 PASS.
+        source = ("제조기록서 거짓작성으로 「약사법」 제38조제1항을 위반함. "
+                  "처분: 제조업무정지 1개월. 근거 「의약품 등의 안전에 관한 규칙」 제48조제9호, [별표8].")
+        da = dict(_GOOD_ADMIN_DA)
+        da["key_violations"] = [
+            {"citation": "약사법 제38조제1항", "description": "제조기록서를 사실과 다르게 작성",
+             "risk": "데이터 무결성 훼손 위험"},
+            {"citation": "의약품 등의 안전에 관한 규칙 제48조제9호",
+             "description": "행정처분 기준 위반", "risk": "품질 시스템 결함"}]
+        da["disposition_basis"] = "[별표8] 행정처분 기준에 따라 제조업무정지 1개월이 부과되었다."
+        result = vda.run_deep_analysis_gate(da, source)
+        self.assertTrue(result.ok, result.report)   # 브래킷 차이만으로 FAIL 나지 않아야 함
 
 
 if __name__ == "__main__":

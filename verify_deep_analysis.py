@@ -176,7 +176,10 @@ _CITATION_PATTERNS = (
         r"(?:약사법|화장품법|의료기기법|마약류\s*관리에\s*관한\s*법률|"
         r"의약품\s*등의\s*안전에\s*관한\s*규칙|약사법\s*시행규칙|약사법\s*시행령)"
         r"\s*(?:시행규칙|시행령)?\s*제\d+조(?:의\d+)?(?:제\d+항)?(?:제\d+호)?"),
-    re.compile(r"제\d+조(?:의\d+)?(?:제\d+항)?(?:제\d+호)?"),                       # bare 제N조 류
+    # 앵커를 조/항/호로 확장(Codex 게이트 차단1): 앵커가 `제\d+조` 뿐이면 `조` 없이 단독으로
+    # 온 날조 `제999호`·`제99항`이 추출조차 안 돼 D2 근거대조를 통째로 우회한다. `제38조제1항`은
+    # 여전히 긴 매칭 1토큰으로 유지(extract_citations 의 겹침 dedup) → 기존 동작 불변.
+    re.compile(r"제\d+(?:조|항|호)(?:의\d+)?(?:제\d+항)?(?:제\d+호)?"),   # bare 제N조/항/호
     re.compile(r"\[\s*별표\s*\d+\s*\]"),                                            # [별표N]
 )
 
@@ -210,8 +213,12 @@ def extract_citations(text: str) -> list[str]:
 
 
 def _normalize_citation(tok: str) -> str:
-    """공백·대소문자 차이만 정규화(원문·산출물 양쪽 표기 차이 흡수)."""
-    return re.sub(r"\s+", "", tok).lower()
+    """공백·대소문자·법령명 코너 브래킷(「」『』) 차이만 정규화(원문·산출물 양쪽 표기 차이 흡수).
+
+    Codex 게이트 차단2: 원문이 `「약사법」 제38조제1항`인데 정상 인용 `약사법 제38조제1항`이
+    브래킷 차이만으로 FAIL(과탐)나던 것을 막는다. CFR `502(a)`의 소괄호는 의미 있는 부분이라
+    보존(문자클래스에 넣지 않는다)."""
+    return re.sub(r"[\s「」『』]+", "", tok).lower()
 
 
 def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,

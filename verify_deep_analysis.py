@@ -381,8 +381,8 @@ def main(argv: "list[str] | None" = None) -> int:
             pass
     p = argparse.ArgumentParser(
         prog="verify_deep_analysis",
-        description="GRM WL 심층분석(5섹션) 사실 근거 게이트 — FAIL 시 이 카드의 심층 섹션 병합 보류.")
-    p.add_argument("--deep-analysis", required=True, help="deep_analysis JSON 경로(5섹션 키).")
+        description="GRM WL 심층분석(4섹션) 사실 근거 게이트 — FAIL 시 이 카드의 심층 섹션 병합 보류.")
+    p.add_argument("--deep-analysis", required=True, help="deep_analysis JSON 경로(4섹션 키).")
     p.add_argument("--source", required=True, help="fan-out 입력 원문(wl_body_full) 텍스트 경로.")
     args = p.parse_args(argv)
 

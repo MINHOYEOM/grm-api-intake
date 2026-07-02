@@ -627,8 +627,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 assets_dir: Path = ASSETS_DIR) -> dict[str, Any]:
     """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환."""
     env = _make_env()
-    # 소유권 인증 메타(env-param) — 전 페이지 <head> 공통(미설정 시 미출력). 모듈 전역을
-    # 호출 시점에 읽어 운영 var/테스트 monkeypatch 를 모두 반영(import-time 캡처 회피).
+    # 소유권 인증 메타(env-param) — 전 페이지 <head> 공통(미설정 시 미출력). 아래 전역들
+    # (SITE_BASE_URL·NEWSLETTER_FORM_ACTION·*_SITE_VERIFICATION)은 import 시점에 os.environ
+    # 에서 캡처된다. 여기서는 그 모듈 전역을 render_site() 호출 시점에 env.globals 로 주입 —
+    # 테스트가 모듈 속성(render.SITE_BASE_URL 등)을 monkeypatch 하면 반영되지만 os.environ 을
+    # 호출 시점에 재조회하진 않는다(monkeypatch 계약 = 모듈 속성 기준, os.environ 아님).
     env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"

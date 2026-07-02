@@ -8,12 +8,13 @@ records) as high-signal intake rows.
 from __future__ import annotations
 
 import hashlib
-import re
 import urllib.parse
 from datetime import date
 from typing import Any
 
 from grm_common import (
+    DatagoPageError,
+    datago_paginate,
     http_get_json,
     log,
     parse_datago_date,
@@ -41,18 +42,6 @@ REGION_MFDS = "Korea (MFDS)"
 
 PAGE_SIZE = 100
 MAX_PAGES = 25
-
-
-def _mask_service_key(url: str) -> str:
-    return re.sub(r"([?&]serviceKey=)[^&]+", r"\1***REDACTED***", url)
-
-
-def _request_url(params: dict[str, Any]) -> str:
-    return RECALL_API_ENDPOINT + "?" + urllib.parse.urlencode(params)
-
-
-def _api_query(params: dict[str, Any]) -> str:
-    return _mask_service_key(_request_url(params))
 
 
 _parse_int = parse_int_safe
@@ -157,56 +146,35 @@ def collect_mfds_recall(
 
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
-    page_no = 1
-    total_count = 0
+    # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다. 요청에 order
+    # 미지정(admin 의 order:Y 와 달리 미검증)이므로 날짜 기반 조기중단을 쓰지 않고 datago_paginate
+    # 의 totalCount/빈 페이지 종료에만 의존한다(page 1 의 과거 행으로 후속 페이지 최신 회수 누락 방지).
+    paginator = datago_paginate(
+        RECALL_API_ENDPOINT, service_key=service_key, extract=_extract_items,
+        http_get=http_get_json, max_pages=MAX_PAGES, page_size=PAGE_SIZE)
+    try:
+        for raw_items, masked_url in paginator:
+            for raw in raw_items:
+                date_iso = _item_date(raw)
+                if not _within_window(date_iso, start, end):
+                    continue
+                item = _to_item(raw, masked_url)
+                if item is None or item.document_id in seen_ids:
+                    continue
+                seen_ids.add(item.document_id)
+                items.append(item)
+    except DatagoPageError as e:
+        msg = f"MFDS recall API page={e.page_no} 실패: {e.cause}"
+        if items:
+            log("WARN", msg)
+            return items, None
+        return [], msg
 
-    while page_no <= MAX_PAGES:
-        params = {
-            "serviceKey": service_key,
-            "pageNo": page_no,
-            "numOfRows": PAGE_SIZE,
-            "type": "json",
-        }
-        masked_url = _api_query(params)
-        try:
-            data = http_get_json(RECALL_API_ENDPOINT, params=params, timeout=30, retries=2)
-            raw_items, response_page, num_rows, total_count, status = _extract_items(data)
-            if not status.startswith("00:"):
-                raise RuntimeError(f"API status {status}")
-        except Exception as e:  # noqa: BLE001
-            msg = f"MFDS recall API page={page_no} 실패: {e}"
-            if items:
-                log("WARN", msg)
-                return items, None
-            return [], msg
-
-        if not raw_items:
-            break
-
-        for raw in raw_items:
-            date_iso = _item_date(raw)
-            if not _within_window(date_iso, start, end):
-                continue
-            item = _to_item(raw, masked_url)
-            if item is None or item.document_id in seen_ids:
-                continue
-            seen_ids.add(item.document_id)
-            items.append(item)
-
-        # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다.
-        # 요청에 order 미지정(admin 의 order:Y 와 달리 미검증)이므로, 날짜 기반 조기중단
-        # (max(page_dates) < start)을 제거하고 totalCount 종료에만 의존한다. API 기본
-        # 정렬이 오름차순/미정의여도 page 1 의 과거 행으로 인해 후속 페이지 최신 회수를
-        # 누락하지 않게 한다(admin 과 동일하게 totalCount/빈 페이지로만 종료). 윈도우 밖
-        # 항목은 위 _within_window 로 걸러지므로 MAX_PAGES 내 추가 순회만 비용.
-        if total_count and response_page * num_rows >= total_count:
-            break
-        page_no += 1
-
+    total_count = paginator.total_count
     # P2 개선: page cap 도달은 WARN-only로 묻지 않고 truncated 에러로 올려
     # collect_intake summary/error에 드러나게 한다(scheduled run이 green으로 끝나는 것 방지).
     truncated_msg: str | None = None
-    if page_no > MAX_PAGES:
+    if paginator.truncated:
         truncated_msg = (f"MFDS recall API max_pages={MAX_PAGES} 도달 — truncated "
                          f"(수집 {len(items)}건, totalCount={total_count}, 이후 항목 누락 가능)")
         log("WARN", truncated_msg)

@@ -7,13 +7,14 @@ actions) as enforcement-proxy intake rows for manufacturing/quality signals.
 
 from __future__ import annotations
 
-import re
 import hashlib
 import urllib.parse
 from datetime import date
 from typing import Any
 
 from grm_common import (
+    DatagoPageError,
+    datago_paginate,
     env_flag,
     http_get_json,
     log,
@@ -145,18 +146,6 @@ def _verify_admin_l1(seq: str, firm: str) -> tuple[str, str]:
     except Exception:  # noqa: BLE001 — verify 불가는 미검증=강등(차단 측 안전)
         verdict = "fail"
     return verdict, candidate
-
-
-def _mask_service_key(url: str) -> str:
-    return re.sub(r"([?&]serviceKey=)[^&]+", r"\1***REDACTED***", url)
-
-
-def _request_url(params: dict[str, Any]) -> str:
-    return ADMIN_API_ENDPOINT + "?" + urllib.parse.urlencode(params)
-
-
-def _api_query(params: dict[str, Any]) -> str:
-    return _mask_service_key(_request_url(params))
 
 
 _parse_int = parse_int_safe
@@ -335,57 +324,39 @@ def collect_mfds_admin_actions(
     tier3_count = 0
     tier2_count = 0
     filtered_count = 0
-    page_no = 1
-    total_count = 0
+    paginator = datago_paginate(
+        ADMIN_API_ENDPOINT, service_key=service_key, extract=_extract_items,
+        http_get=http_get_json, max_pages=MAX_PAGES, page_size=PAGE_SIZE,
+        extra_params={"order": "Y"})
+    try:
+        for raw_items, masked_url in paginator:
+            for raw in raw_items:
+                date_iso = _item_date(raw)
+                if not _within_window(date_iso, start, end):
+                    continue
+                item = _to_item(raw, masked_url)
+                if item is None:
+                    filtered_count += 1
+                    continue
+                if item.document_id in seen_ids:
+                    continue
+                seen_ids.add(item.document_id)
+                items.append(item)
+                if item.signal_tier == "Tier 3":
+                    tier3_count += 1
+                else:
+                    tier2_count += 1
+    except DatagoPageError as e:
+        msg = f"MFDS admin-action API page={e.page_no} 실패: {e.cause}"
+        if items:
+            log("WARN", msg)
+            return items, None
+        return [], msg
 
-    while page_no <= MAX_PAGES:
-        params = {
-            "serviceKey": service_key,
-            "pageNo": page_no,
-            "numOfRows": PAGE_SIZE,
-            "type": "json",
-            "order": "Y",
-        }
-        masked_url = _api_query(params)
-        try:
-            data = http_get_json(ADMIN_API_ENDPOINT, params=params, timeout=30, retries=2)
-            raw_items, response_page, num_rows, total_count, status = _extract_items(data)
-            if not status.startswith("00:"):
-                raise RuntimeError(f"API status {status}")
-        except Exception as e:  # noqa: BLE001
-            msg = f"MFDS admin-action API page={page_no} 실패: {e}"
-            if items:
-                log("WARN", msg)
-                return items, None
-            return [], msg
-
-        if not raw_items:
-            break
-
-        for raw in raw_items:
-            date_iso = _item_date(raw)
-            if not _within_window(date_iso, start, end):
-                continue
-            item = _to_item(raw, masked_url)
-            if item is None:
-                filtered_count += 1
-                continue
-            if item.document_id in seen_ids:
-                continue
-            seen_ids.add(item.document_id)
-            items.append(item)
-            if item.signal_tier == "Tier 3":
-                tier3_count += 1
-            else:
-                tier2_count += 1
-
-        if total_count and response_page * num_rows >= total_count:
-            break
-        page_no += 1
-
+    total_count = paginator.total_count
     # P2 개선: page cap 도달을 WARN-only가 아니라 truncated 에러로 승격 (loud failure).
     truncated_msg: str | None = None
-    if page_no > MAX_PAGES:
+    if paginator.truncated:
         truncated_msg = (f"MFDS admin-action API max_pages={MAX_PAGES} 도달 — truncated "
                          f"(수집 {len(items)}건, totalCount={total_count}, 이후 항목 누락 가능)")
         log("WARN", truncated_msg)

@@ -9,16 +9,19 @@
 > 서브에이전트(Task)** 로, 즉 구독 사용량 안에서(무과금) 처리한다. 카드당 서브에이전트 1개가
 > 그 카드의 `body_full` 만 보므로 카드 간 내용이 섞일 여지가 구조적으로 없다.
 
-> **소스확장(2026-07-02).** 이 절차는 이제 WL 뿐 아니라 **MFDS 행정처분(admin-action)** 카드도 함께
-> 처리한다 — fan-out 은 유형무관이다(`build-jobs` 가 `deep_analysis_ready=true` 카드를 유형 상관없이
-> 모은다). 카드 유형에 따라 **2)단계에서 주는 생성 프롬프트만 다르다**(WL=`GRM_Prompt_DeepWL_v1.md`,
-> 행정처분=`GRM_Prompt_DeepAdmin_v1.md`). 게이트·병합은 동일 경로이며, 행정처분은 산출물의
-> `disposition_basis` 키로 스키마·한글 섹션명이 자동 선택된다(`verify_deep_analysis.resolve_required_sections`).
+> **소스확장(2026-07-02).** 이 절차는 이제 WL 뿐 아니라 **MFDS 행정처분(admin-action)** 과 **FDA 483**
+> 카드도 함께 처리한다 — fan-out 은 유형무관이다(`build-jobs` 가 `deep_analysis_ready=true` 카드를 유형
+> 상관없이 모으고, 각 job 에 `card_type`(kind)을 동봉한다). 카드 유형에 따라 **2)단계에서 주는 생성
+> 프롬프트만 다르다**(WL=`GRM_Prompt_DeepWL_v1.md`, 행정처분=`GRM_Prompt_DeepAdmin_v1.md`,
+> FDA 483=`GRM_Prompt_DeepFda483_v1.md`). 게이트·병합은 동일 경로이며, 스키마·한글 섹션명은 산출물의
+> ②키(행정처분=`disposition_basis` · 483=`inspectional_significance`)로 자동 선택된다
+> (`verify_deep_analysis.resolve_required_sections`). ★483 은 원문(관찰사항)에 CFR 이 없어도 D2 가
+> WARN(비차단)이다 — 정당한 규제 해석을 막지 않기 위함(WL/행정처분의 하드 FAIL 과 다름).
 
 ## 전제
-- `ENABLE_WL_BODY_FULL=true`(WL) / `ENABLE_MFDS_ADMIN_BODY_FULL=true`(행정처분) 로 수집돼 handoff 에 `deep_analysis_ready=true` + `deep_analysis_input.body_full` 이 실린 카드가 있을 것(없으면 이 절차는 통째로 건너뛴다 — 브리프는 6슬롯만으로 정상 발행).
+- `ENABLE_WL_BODY_FULL=true`(WL) / `ENABLE_MFDS_ADMIN_BODY_FULL=true`(행정처분) / `ENABLE_FDA_483_DEEP=true`(FDA 483) 로 수집돼 handoff 에 `deep_analysis_ready=true` + `deep_analysis_input.body_full` 이 실린 카드가 있을 것(없으면 이 절차는 통째로 건너뛴다 — 브리프는 6슬롯만으로 정상 발행).
 - 1단계(6슬롯) 완료 — 그때 쓴 **handoff JSON**(카드 목록)과 빈슬롯 **`brief_web_*.json`** 이 있을 것.
-- 순수 헬퍼: `deep_analysis_fanout.py` / 게이트: `verify_deep_analysis.py` / 프롬프트: `docs/prompts/GRM_Prompt_DeepWL_v1.md`(WL)·`GRM_Prompt_DeepAdmin_v1.md`(행정처분) / 병합: `inject_slots.py`.
+- 순수 헬퍼: `deep_analysis_fanout.py` / 게이트: `verify_deep_analysis.py` / 프롬프트: `docs/prompts/GRM_Prompt_DeepWL_v1.md`(WL)·`GRM_Prompt_DeepAdmin_v1.md`(행정처분)·`GRM_Prompt_DeepFda483_v1.md`(FDA 483) / 병합: `inject_slots.py`.
 
 ## 절차
 
@@ -30,9 +33,9 @@ python -m deep_analysis_fanout build-jobs --handoff <handoff.json> --out jobs.js
 
 **2) 카드당 서브에이전트 1개 호출 (LLM 단계 — 이 세션에서)**
 `jobs.json` 의 **각 항목마다** Claude Code 서브에이전트(Task)를 **하나씩** 띄운다. 각 서브에이전트에 주는 것은 **딱 두 가지**뿐:
-  - 그 카드 유형의 생성 프롬프트 전문 — **WL 카드**면 `docs/prompts/GRM_Prompt_DeepWL_v1.md`, **행정처분(admin-action) 카드**면 `docs/prompts/GRM_Prompt_DeepAdmin_v1.md`. (카드 유형은 handoff 의 `card_id`/`kind` 로 판별: `MFDS::admin-…` = 행정처분, `FDA Warning Letter::…` = WL.)
+  - 그 카드 유형의 생성 프롬프트 전문 — **WL 카드**면 `docs/prompts/GRM_Prompt_DeepWL_v1.md`, **행정처분(admin-action) 카드**면 `docs/prompts/GRM_Prompt_DeepAdmin_v1.md`, **FDA 483 카드**면 `docs/prompts/GRM_Prompt_DeepFda483_v1.md`. (카드 유형은 job 의 `card_type` 또는 handoff 의 `card_id`/`kind` 로 판별: `MFDS::admin-…` = 행정처분, `FDA Warning Letter::…` = WL, `document_id` 가 `fda483-…` = FDA 483.)
   - 그 job 의 `body_full` (해당 원문. **다른 카드·다른 맥락은 절대 주지 말 것** — 격리가 fan-out 의 핵심).
-서브에이전트는 4섹션 JSON **하나만** 반환한다 — WL=`key_violations`·`fda_evaluation`·`required_remediation`·`administrative_risks`, 행정처분=`key_violations`·**`disposition_basis`**·`required_remediation`·`administrative_risks`. 여러 카드를 한 서브에이전트에 몰아넣지 말 것(부하·혼동 방지).
+서브에이전트는 4섹션 JSON **하나만** 반환한다 — WL=`key_violations`·`fda_evaluation`·`required_remediation`·`administrative_risks`, 행정처분=`key_violations`·**`disposition_basis`**·`required_remediation`·`administrative_risks`, FDA 483=`key_violations`·**`inspectional_significance`**·`required_remediation`·`administrative_risks`. 여러 카드를 한 서브에이전트에 몰아넣지 말 것(부하·혼동 방지).
 
 **3) 응답 모으기**
 반환된 JSON 들을 `{document_id: <4섹션 JSON>}` 형태의 `responses.json` 으로 저장(키 = 그 job 의 `document_id`).
@@ -58,5 +61,6 @@ python inject_slots.py --brief <brief_web.json> --delta <sixslot_delta.json> \
 ## 📝 변경 이력
 | 날짜 | 변경 |
 |---|---|
+| 2026-07-02 | 483 확장(CC). 절차에 **FDA 483** 유형 추가 — 2)단계 생성 프롬프트 483=`GRM_Prompt_DeepFda483_v1.md`, 산출물 ②키=`inspectional_significance`(게이트·렌더 자동판별·`document_id`=`fda483-…`). 전제에 `ENABLE_FDA_483_DEEP` 추가. build-jobs 가 job 에 `card_type` 동봉. ★483 D2 는 CFR 미근거 시 WARN(비차단) — 정당한 규제 해석 허용(WL/행정처분 하드 FAIL 과 다름). |
 | 2026-07-02 | 소스확장(CC). 절차를 유형무관으로 일반화 — WL 외 **MFDS 행정처분** 카드도 동일 fan-out 으로 처리. 2)단계 생성 프롬프트를 카드 유형별로 분기(WL=DeepWL_v1·행정처분=`GRM_Prompt_DeepAdmin_v1.md`), 행정처분 산출물 ②키=`disposition_basis`(게이트·렌더 자동판별). 전제에 `ENABLE_MFDS_ADMIN_BODY_FULL` 추가. |
 | 2026-07-01 | 최초(CC). 실행모델 확정(카드당 서브에이전트·무과금) 반영. `deep_analysis_fanout.py`(build-jobs/assemble) + `GRM_Prompt_DeepWL_v1.md` + `inject_slots.py --deep-analysis-deltas` 배선. |

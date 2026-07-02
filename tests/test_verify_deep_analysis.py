@@ -339,5 +339,102 @@ class AdminGateTest(unittest.TestCase):
         self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("약사법 제38조제1항"), src).ok)
 
 
+# ── [FDA 483 분석층 2026-07-02] FDA 483 스키마 + D2 해석성 인용 WARN(비차단) ──────────────
+# 483 원문 = 실사 관찰사항 목록(영문). CFR 조항을 명시하지 않는 게 보통 — 분석가가 붙인 CFR 해석
+# 인용은 원문에 없어도 WARN(비차단). 날조 식별번호(FEI 등)는 D3 가 여전히 WARN 으로 잡는다.
+_FDA483_SOURCE = (
+    "During an inspection of your firm, we documented the following observations. "
+    "OBSERVATION 1: There is a failure to thoroughly review unexplained discrepancies. "
+    "Your firm invalidated out-of-specification (OOS) results without scientific justification. "
+    "OBSERVATION 2: Aseptic processing areas were not adequately monitored for microbial "
+    "contamination during production, and environmental monitoring records were incomplete."
+)
+
+_GOOD_FDA483_DA = {
+    "key_violations": [
+        {"citation": "21 CFR 211.192",
+         "description": "규격초과(OOS) 결과를 과학적 근거 없이 무효화하고 불일치 조사를 문서화하지 않음",
+         "risk": "불량 배치가 시장에 유통될 위험"},
+        {"citation": "21 CFR 211.42(c)",
+         "description": "무균 공정 구역의 미생물 오염 모니터링·기록이 미흡함",
+         "risk": "무균 제품 오염으로 인한 환자 안전 위험"},
+    ],
+    "inspectional_significance": (
+        "본 483 은 데이터 무결성과 무균 관리의 systemic 결함을 지적하며, 회사의 응답이 미흡할 경우 "
+        "Warning Letter 또는 해외 제조소의 경우 Import Alert 로 승격될 가능성이 있다."),
+    "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+        "items": ["OOS 조사 절차를 재수립하고 소급 검토를 수행",
+                  "환경 모니터링 프로그램을 강화하고 CAPA 를 문서화"],
+    },
+    "administrative_risks": "미시정 시 Warning Letter·Import Alert·OAI 분류로 이어질 수 있다.",
+}
+
+
+class Fda483ResolveTest(unittest.TestCase):
+    def test_card_type_fda483(self) -> None:
+        self.assertEqual(vda.resolve_required_sections(card_type="fda-483"),
+                         vda.REQUIRED_SECTIONS_FDA483)
+        self.assertEqual(vda.resolve_required_sections(card_type="FDA 483"),
+                         vda.REQUIRED_SECTIONS_FDA483)
+
+    def test_autodetect_by_inspectional_significance(self) -> None:
+        self.assertEqual(vda.resolve_required_sections(_GOOD_FDA483_DA),
+                         vda.REQUIRED_SECTIONS_FDA483)
+
+    def test_admin_and_wl_autodetect_unaffected(self) -> None:
+        # 483 판별 추가가 admin/WL 자동판별을 흔들지 않는다(fda_evaluation·disposition_basis 우선).
+        self.assertEqual(vda.resolve_required_sections(_GOOD_ADMIN_DA),
+                         vda.REQUIRED_SECTIONS_ADMIN)
+        self.assertEqual(vda.resolve_required_sections(_GOOD_DEEP_ANALYSIS),
+                         vda.REQUIRED_SECTIONS)
+
+
+class Fda483GateTest(unittest.TestCase):
+    def test_good_483_passes_gate_by_card_type(self) -> None:
+        # CFR 인용이 원문(관찰사항)에 없어도 483 은 D2 WARN(비차단) → FAIL 0, gate PASS.
+        result = vda.run_deep_analysis_gate(_GOOD_FDA483_DA, _FDA483_SOURCE, card_type="fda-483")
+        self.assertTrue(result.ok, result.report)
+        self.assertEqual(result.fail_count, 0)
+
+    def test_good_483_passes_gate_by_autodetect(self) -> None:
+        # card_type 미전달이어도 inspectional_significance 키로 483 판별 → 동일하게 PASS.
+        result = vda.run_deep_analysis_gate(_GOOD_FDA483_DA, _FDA483_SOURCE)
+        self.assertTrue(result.ok, result.report)
+
+    def test_ungrounded_cfr_is_warn_not_fail(self) -> None:
+        result = vda.run_deep_analysis_gate(_GOOD_FDA483_DA, _FDA483_SOURCE, card_type="fda-483")
+        self.assertEqual(result.fail_count, 0)
+        self.assertGreaterEqual(result.warn_count, 1)   # CFR 인용은 WARN 으로 남음
+        warns = [f for f in result.findings if f.code == "D2-CITATION-UNGROUNDED"]
+        self.assertTrue(warns and all(f.severity == vda.SEV_WARN for f in warns))
+
+    def test_missing_inspectional_significance_fails_d1(self) -> None:
+        da = dict(_GOOD_FDA483_DA)
+        del da["inspectional_significance"]
+        result = vda.run_deep_analysis_gate(da, _FDA483_SOURCE, card_type="fda-483")
+        self.assertFalse(result.ok)
+        self.assertTrue(any(f.code == "D1-SECTION-INCOMPLETE"
+                            and "inspectional_significance" in f.detail for f in result.findings))
+
+    def test_fabricated_fei_number_still_warns_d3(self) -> None:
+        da = {**_GOOD_FDA483_DA,
+              "administrative_risks": _GOOD_FDA483_DA["administrative_risks"] + " FEI 30441955는 원문에 없다."}
+        result = vda.run_deep_analysis_gate(da, _FDA483_SOURCE, card_type="fda-483")
+        self.assertTrue(result.ok)   # D3 는 비차단
+        self.assertTrue(any(f.code == "D3-NUMBER-UNVERIFIED" and "30441955" in f.detail
+                            for f in result.findings))
+
+    def test_wl_citation_still_hard_fails(self) -> None:
+        # 회귀(격리): 483 의 D2 WARN 강등이 WL 경로로 새면 안 된다 — WL 은 여전히 하드 FAIL.
+        da = dict(_GOOD_DEEP_ANALYSIS)
+        da["key_violations"] = list(da["key_violations"]) + [
+            {"citation": "21 CFR 610.13", "description": "원문에 없는 조항", "risk": "-"}]
+        result = vda.run_deep_analysis_gate(da, _SOURCE, card_type="warning-letter")
+        self.assertFalse(result.ok)
+        self.assertTrue(any(f.code == "D2-CITATION-UNGROUNDED" and f.severity == vda.SEV_FAIL
+                            for f in result.findings))
+
+
 if __name__ == "__main__":
     unittest.main()

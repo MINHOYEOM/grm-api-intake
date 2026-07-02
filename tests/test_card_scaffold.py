@@ -1335,6 +1335,51 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         card = cs.build_card_scaffold(fx["row"], raw)
         self.assertFalse(card.deep_analysis_ready)
 
+    # ── [483 분석층 2026-07-02] FDA 483 — WL 과 동형(fda483_body_full 게이트) ──
+    def test_fda483_without_body_full_is_not_ready(self) -> None:
+        fx = _load_input("fda_483")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])   # 픽스처엔 fda483_body_full 없음
+        self.assertFalse(card.deep_analysis_ready)
+        self.assertNotIn("deep_analysis", card.to_web_card())  # golden 불변(키 부재)
+        self.assertNotIn("deep_analysis_ready", card.to_dict())
+
+    def test_fda483_with_body_full_is_ready(self) -> None:
+        fx = _load_input("fda_483")
+        raw = dict(fx["raw"])
+        raw["fda483_body_full"] = ("During an inspection of your firm we observed that OOS "
+                                   "results were invalidated without scientific justification.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertTrue(card.deep_analysis_ready)
+
+        webcard = card.to_web_card()
+        self.assertIn("deep_analysis", webcard)
+        self.assertIsNone(webcard["deep_analysis"])            # 병합 전 placeholder
+
+        d = card.to_dict()
+        self.assertTrue(d["deep_analysis_ready"])
+        self.assertEqual(d["deep_analysis_input"]["body_full"], raw["fda483_body_full"])
+        self.assertNotIn("deep_analysis", card.needs_llm_slots)
+
+    def test_fda483_deep_and_deterministic_detail_coexist(self) -> None:
+        # 층 혼용 완성형: 483 은 결정론 상세(Observation)와 분석층(deep)을 동시에 가질 수 있다.
+        fx = _load_input("fda_483")
+        raw = dict(fx["raw"])
+        raw["fda483_body_full"] = "During an inspection we observed OBSERVATION 1 sterile defect."
+        raw["fda_483_observations"] = [{"number": "1", "deficiency": "무균 결함", "detail": ""}]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertIn("deep_analysis", wc)                     # 분석층 placeholder
+        self.assertIn("deterministic_detail", wc)              # 결정론 층
+        self.assertEqual(wc["deterministic_detail"]["type"], "fda_483_observations")
+
+    def test_fda483_with_wrong_body_key_not_ready(self) -> None:
+        # 483 은 fda483_body_full 이 있어야 함 — wl/admin body_full 만으론 False(유형 격리).
+        fx = _load_input("fda_483")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = "irrelevant"
+        raw["admin_body_full"] = "irrelevant"
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertFalse(card.deep_analysis_ready)
+
 
 class DeterministicDetailTest(unittest.TestCase):
     """[상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 슬롯 additive 회귀.

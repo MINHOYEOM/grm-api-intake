@@ -63,19 +63,29 @@ def _document_id(card: dict[str, Any]) -> str:
 
 @dataclass(frozen=True)
 class Job:
-    """서브에이전트 1건 = 카드 1건. body_full 만 컨텍스트로 준다(다른 카드와 격리)."""
+    """서브에이전트 1건 = 카드 1건. body_full 만 컨텍스트로 준다(다른 카드와 격리).
+
+    `card_type`(=handoff `kind`: warning-letter | admin-action | fda-483 | "")은 오케스트레이터가
+    유형별 생성 프롬프트(DeepWL/DeepAdmin/DeepFda483)를 고르고, assemble 이 게이트에 카드 유형을
+    넘겨 필수 섹션·D2 성격을 확정하는 데 쓴다. 빈 문자열이면 게이트가 산출물 키로 자동판별(후방호환).
+    """
     document_id: str
     body_full: str
+    card_type: str = ""
 
     def to_dict(self) -> dict[str, str]:
-        return {"document_id": self.document_id, "body_full": self.body_full}
+        d = {"document_id": self.document_id, "body_full": self.body_full}
+        if self.card_type:
+            d["card_type"] = self.card_type
+        return d
 
 
 def build_jobs(handoff: Any) -> list[Job]:
     """`deep_analysis_ready=True` + `body_full` 확보 카드만 서브에이전트 작업으로 변환.
 
     결정론(입력 순서 보존). body_full 이 비었거나 document_id 를 못 얻으면 조용히 건너뛴다
-    (그 카드는 6슬롯만으로 발행). document_id 중복은 첫 건만.
+    (그 카드는 6슬롯만으로 발행). document_id 중복은 첫 건만. 카드 `kind` 를 `card_type` 으로
+    실어 오케스트레이터가 유형별 프롬프트를 고르게 한다(WL·admin·483 유형무관 추출).
     """
     jobs: list[Job] = []
     seen: set[str] = set()
@@ -87,7 +97,8 @@ def build_jobs(handoff: Any) -> list[Job]:
         if not doc or not body or doc in seen:
             continue
         seen.add(doc)
-        jobs.append(Job(document_id=doc, body_full=body))
+        jobs.append(Job(document_id=doc, body_full=body,
+                        card_type=str(card.get("kind") or "")))
     return jobs
 
 
@@ -101,7 +112,9 @@ def _as_jobs(jobs: Any) -> list[Job]:
         if isinstance(j, Job):
             out.append(j)
         elif isinstance(j, dict) and j.get("document_id"):
-            out.append(Job(document_id=str(j["document_id"]), body_full=str(j.get("body_full", ""))))
+            out.append(Job(document_id=str(j["document_id"]),
+                           body_full=str(j.get("body_full", "")),
+                           card_type=str(j.get("card_type") or "")))
     return out
 
 
@@ -182,7 +195,9 @@ def assemble_deltas(jobs: Any, responses: dict[str, Any] | None) -> AssembleResu
                                                 "응답이 JSON 객체가 아님 — 6슬롯만으로 발행"))
             continue
         da = _unescape_entities(da)  # LLM 이 이스케이프한 &amp;/&lt; 등 → 원문자(이중 이스케이프 방지)
-        gate = vda.run_deep_analysis_gate(da, job.body_full)
+        # card_type 을 넘겨 필수 섹션·D2 성격을 확정(483=CFR 인용 WARN). 빈값이면 게이트가
+        # 산출물 키로 자동판별(WL·admin 후방호환 — Job.card_type 미설정 옛 jobs.json 도 안전).
+        gate = vda.run_deep_analysis_gate(da, job.body_full, card_type=job.card_type or None)
         if gate.ok:
             result.deltas[doc] = {"deep_analysis": da, "source_text": job.body_full}
             result.outcomes.append(CardOutcome(doc, MERGED, gate.report))

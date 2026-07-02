@@ -86,6 +86,10 @@ on:
         description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
         type: boolean
         default: false
+      enable_fda483_deep:
+        description: 'FDA 483 전문(全文) 확보 — deep_analysis fan-out 대상 (ENABLE_FDA_483_OBSERVATIONS 결정론과 독립, 기본: vars.ENABLE_FDA_483_DEEP 또는 false)'
+        type: boolean
+        default: false
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -213,6 +217,8 @@ jobs:
           ENABLE_FDA_483: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483) || vars.ENABLE_FDA_483 || 'true' }}
           # FDA 483 Observation 번호 목록 결정론 상세보기. 기본 off — 실패는 graceful=요약카드 유지.
           ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_observations) || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
+          # [483 분석층] 483 전문 확보 = deep_analysis fan-out 대상. Observation 결정론과 독립·기본 off(활성=repo 변수).
+          ENABLE_FDA_483_DEEP: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_deep) || vars.ENABLE_FDA_483_DEEP || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).

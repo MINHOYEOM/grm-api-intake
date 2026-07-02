@@ -104,12 +104,18 @@ def _card_anchor(card: dict[str, Any]) -> str:
 # ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
 def _deep_preview(da: dict[str, Any] | None) -> str:
     """분석층(deep) 접힘 summary 에 붙는 내용 힌트 — 펼치기 전에 무엇이 들었는지 스캔용.
-    admin(처분근거) vs WL(대응조치)은 disposition_basis 유무로 구분. 결정론(값 재생성 0)."""
+    유형별 ②섹션명으로 구분: admin=처분근거(disposition_basis)·483=실사의미
+    (inspectional_significance)·WL=대응조치(기본). 결정론(값 재생성 0)."""
     if not isinstance(da, dict):
         return ""
     kv = da.get("key_violations")
     n = len(kv) if isinstance(kv, list) else 0
-    mid = "처분근거" if da.get("disposition_basis") else "대응조치"
+    if da.get("disposition_basis"):
+        mid = "처분근거"
+    elif da.get("inspectional_significance"):
+        mid = "실사의미"
+    else:
+        mid = "대응조치"
     parts = ([f"위반 {n}건"] if n else []) + [mid, "행정리스크"]
     return " · ".join(parts)
 

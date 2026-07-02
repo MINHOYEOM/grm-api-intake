@@ -142,6 +142,15 @@ def _observations_enabled() -> bool:
     return _env_true("ENABLE_FDA_483_OBSERVATIONS")
 
 
+def _deep_enabled() -> bool:
+    """[483 분석층 2026-07-02] `ENABLE_FDA_483_DEEP`(기본 off) — WL 의 `ENABLE_WL_BODY_FULL`
+    동형. on 일 때만 483 PDF 전문(全文)을 raw 에 `fda483_body_full` 로 보존해 심층분석
+    (deep_analysis) fan-out 입력으로 쓴다. `ENABLE_FDA_483_OBSERVATIONS`(결정론 상세)와 **독립** —
+    deep off 여도 결정론 Observation 상세는 그대로 나오고, deep on 이어도 결정론 층은 불변.
+    off(기본) 면 키 부재 → scaffold deep_analysis_ready=False → 골든/동작 완전 불변(활성=사람 게이트)."""
+    return _env_true("ENABLE_FDA_483_DEEP")
+
+
 def _parse_mdy(raw: str) -> str:
     """MM/DD/YYYY → ISO(YYYY-MM-DD). 실패 시 ''."""
     m = _MDY_RE.search(raw or "")
@@ -406,8 +415,13 @@ def _extract_fda483_excerpt(text: str) -> str:
     return ""
 
 
-def _fetch_fda483_pdf_text(pdf_url: str) -> tuple[str, str]:
-    """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff)."""
+def _fetch_fda483_pdf_text(pdf_url: str, max_chars: "int | None" = None) -> tuple[str, str]:
+    """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff).
+
+    `max_chars` 미지정(기본) 시 공유 엔진 기본 상한(GMP용 12000)을 그대로 쓴다 → excerpt/기존
+    경로 동작 불변. deep(전문) 경로만 FDA483_TEXT_MAX_CHARS(200000)를 넘겨 8쪽+ 483 의 뒤
+    Observation 까지 담는다(그 상한은 deep 활성 run 에서만 적용 = deep off 면 완전 불변).
+    """
     try:
         from collect_mfds_gmp_inspection import _extract_pdf_text
     except Exception as e:  # noqa: BLE001 — 임포트 실패도 graceful(키 미기록)
@@ -419,6 +433,8 @@ def _fetch_fda483_pdf_text(pdf_url: str) -> tuple[str, str]:
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
+    if max_chars is not None:
+        return _extract_pdf_text(data, max_chars=max_chars)
     return _extract_pdf_text(data)
 
 
@@ -539,8 +555,12 @@ def _site_country(country: str, state: str) -> str:
 
 
 def _to_item(nrow: dict[str, str], excerpt: str,
-             observations: list[dict[str, str]] | None = None) -> IntakeItem | None:
-    """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭)."""
+             observations: list[dict[str, str]] | None = None,
+             body_full: str = "") -> IntakeItem | None:
+    """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭).
+
+    `body_full`(비공백)이면 raw 에 `fda483_body_full` 로 실어 deep_analysis fan-out 입력으로 쓴다
+    (ENABLE_FDA_483_DEEP 게이트 산출 — WL wl_body_full 동형). 결정론 Observation 상세와 별개 층."""
     record_type = nrow["record_type"]
     media_id = nrow["media_id"]
     company = nrow["company"]
@@ -585,6 +605,8 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         raw_payload["fda483_excerpt"] = excerpt
     if observations:
         raw_payload["fda_483_observations"] = observations
+    if body_full:
+        raw_payload["fda483_body_full"] = body_full   # deep_analysis fan-out 입력(전문)
 
     # Modality 는 insert 시 notion_create_page 가 raw_payload(product_type)+headline/body 로
     # compute_modality 한다(IntakeItem 에 저장 필드 없음 — 타 수집기와 동일).
@@ -639,9 +661,15 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "enabled": observations_enabled, "attempted": 0, "extracted": 0,
         "failed": 0, "warnings": [],
     }
+    # [483 분석층 2026-07-02] deep(전문 보존) 관측. 결정론 Observation 과 독립(위 _deep_enabled).
+    deep_enabled = _deep_enabled()
+    deep_health: dict[str, Any] = {
+        "enabled": deep_enabled, "attempted": 0, "stored": 0, "failed": 0, "warnings": [],
+    }
     LAST_HEALTH = {
         "fda483_excerpt": excerpt_health,
         "fda_483_observations": observations_health,
+        "fda_483_deep": deep_health,
         "source_degraded": False,
     }
 
@@ -651,6 +679,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         LAST_HEALTH = {
             "fda483_excerpt": excerpt_health,
             "fda_483_observations": observations_health,
+            "fda_483_deep": deep_health,
             "source_degraded": source_degraded,
         }
         return [], ("FDA 483 수집 실패: HTML/DataTables 483 행 0 — "
@@ -669,9 +698,11 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             continue
         seen.add(media_id)
 
-        # 483 PDF 결함 excerpt + Observation 상세(cap 내 시도). 실패는 키 미기록 + warning.
+        # 483 PDF 결함 excerpt + Observation 상세 + (deep on) 전문 보존(cap 내 시도).
+        # 실패는 키 미기록 + warning(graceful — 결정론/deep 어느 층이 빠져도 요약카드는 유지).
         excerpt = ""
         observations: list[dict[str, str]] = []
+        body_full = ""
         pdf_url = _pdf_url(media_id)
         if pdf_url and not excerpt_health["capped"]:
             if excerpt_health["attempted"] >= FDA483_EXCERPT_MAX_ITEMS:
@@ -680,7 +711,10 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 excerpt_health["attempted"] += 1
                 if FDA483_EXCERPT_DELAY_SECONDS:
                     time.sleep(FDA483_EXCERPT_DELAY_SECONDS)
-                text, status = _fetch_fda483_pdf_text(pdf_url)
+                # deep on 이면 전문 상한(200000)으로 읽어 8쪽+ 483 뒤 Observation 까지 담는다.
+                # deep off(기본)면 max_chars=None → 공유 엔진 기본(12000) 그대로 = 기존 경로 불변.
+                text_cap = FDA483_TEXT_MAX_CHARS if deep_enabled else None
+                text, status = _fetch_fda483_pdf_text(pdf_url, max_chars=text_cap)
                 excerpt = _extract_fda483_excerpt(text) if text else ""
                 if excerpt:
                     excerpt_health["ok"] += 1
@@ -700,14 +734,30 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                                 f"({status if not text else 'no-observations'}): {pdf_url}")
                         observations_health["warnings"].append(warn)
                         log("WARN", warn + " — 요약카드로 유지")
+                # [483 분석층] 전문 보존 — 파싱 가능한 실제 483(Observation ≥1)일 때만 보존해
+                # fan-out 이 스캔본/표지-only/깨진 텍스트를 LLM 입력으로 삼지 않게 한다(환각 통제).
+                # ENABLE_FDA_483_OBSERVATIONS 와 독립(순수 파서 재사용 — 그 플래그와 무관하게 판정).
+                if deep_enabled:
+                    deep_health["attempted"] += 1
+                    parsed = _extract_483_observations_from_text(text) if text else []
+                    if parsed:
+                        body_full = text
+                        deep_health["stored"] += 1
+                    else:
+                        deep_health["failed"] += 1
+                        warn = (f"FDA 483 deep 전문 미확보"
+                                f"({status if not text else 'no-observations'}): {pdf_url}")
+                        deep_health["warnings"].append(warn)
+                        log("WARN", warn + " — 분석층 없이 발행(결정론 상세·요약카드는 유지)")
 
-        item = _to_item(nrow, excerpt, observations)   # None = 수의/기기/식품 도메인 드롭
+        item = _to_item(nrow, excerpt, observations, body_full)   # None = 수의/기기/식품 도메인 드롭
         if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 
     LAST_HEALTH = {
         "fda483_excerpt": excerpt_health,
         "fda_483_observations": observations_health,
+        "fda_483_deep": deep_health,
         "source_degraded": source_degraded,
     }
     if excerpt_health["capped"]:
@@ -720,5 +770,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 f"failed={excerpt_health['failed']} · observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "
                 f"extracted={observations_health['extracted']} "
-                f"failed={observations_health['failed']}")
+                f"failed={observations_health['failed']} · deep enabled={deep_enabled} "
+                f"attempted={deep_health['attempted']} stored={deep_health['stored']} "
+                f"failed={deep_health['failed']}")
     return items, None

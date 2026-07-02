@@ -54,6 +54,16 @@ REQUIRED_SECTIONS_ADMIN: tuple[str, ...] = (
     "required_remediation",
     "administrative_risks",
 )
+# [FDA 483 분석층 2026-07-02] FDA 483 4섹션 — WL 의 fda_evaluation(응답 왕복 평가) 자리를
+# inspectional_significance(실사 지적의 규제적 의미·중대도·WL/Import Alert 승격 가능성)로 교체.
+# 483 은 실사 종료 시 발부되는 문서라 "회사 응답 → 당국 평가" 왕복이 아직 없다(설계문서 §9·§12).
+# 나머지 3섹션(key_violations·required_remediation·administrative_risks)은 WL·admin 과 동일 구조 재사용.
+REQUIRED_SECTIONS_FDA483: tuple[str, ...] = (
+    "key_violations",
+    "inspectional_significance",
+    "required_remediation",
+    "administrative_risks",
+)
 _MIN_SECTION_LEN = 20  # 구조 완전성 최소 길이(문자열 섹션). 리스트 섹션은 비었는지만 본다.
 
 
@@ -61,16 +71,22 @@ def resolve_required_sections(deep_analysis: "dict[str, Any] | None" = None,
                               card_type: "str | None" = None) -> tuple[str, ...]:
     """카드타입별 필수 섹션 집합. card_type 이 명시되면 그것으로, 없으면 산출물 키로 자동판별.
 
-    자동판별: `disposition_basis` 만 있고 `fda_evaluation` 이 없으면 admin(행정처분), 그 외엔 WL.
+    자동판별: `disposition_basis`(admin)·`inspectional_significance`(483) 중 하나가 있고
+    `fda_evaluation` 이 없으면 그 유형, 그 외엔 WL.
     → 기존 WL 호출부(card_type 미전달·fda_evaluation 보유)는 항상 REQUIRED_SECTIONS 로 귀결(불변).
     """
     if card_type in ("admin-action", "행정처분"):
         return REQUIRED_SECTIONS_ADMIN
+    if card_type in ("fda-483", "FDA 483"):
+        return REQUIRED_SECTIONS_FDA483
     if card_type in ("warning-letter", "Warning Letter"):
         return REQUIRED_SECTIONS
     da = deep_analysis or {}
-    if isinstance(da, dict) and "disposition_basis" in da and "fda_evaluation" not in da:
-        return REQUIRED_SECTIONS_ADMIN
+    if isinstance(da, dict) and "fda_evaluation" not in da:
+        if "disposition_basis" in da:
+            return REQUIRED_SECTIONS_ADMIN
+        if "inspectional_significance" in da:
+            return REQUIRED_SECTIONS_FDA483
     return REQUIRED_SECTIONS
 
 
@@ -228,12 +244,18 @@ def _normalize_citation(tok: str) -> str:
 
 
 def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,
-                             sections: tuple[str, ...] = REQUIRED_SECTIONS) -> list[Finding]:
+                             sections: tuple[str, ...] = REQUIRED_SECTIONS,
+                             severity: str = SEV_FAIL) -> list[Finding]:
     """D2: deep_analysis 안의 조항 인용이 source_text(원문 body_full)에 실제 있는지.
 
-    없으면 FAIL(날조 의심) — brief_lint 의 MFDS 미근거 링크 FAIL 과 동형(식별자성 사실은
-    하드 검증, 근거 없이 지어낸 조항 번호로 카드가 나가는 걸 구조적으로 막는다). 한국 행정처분은
+    없으면 `severity`(기본 FAIL, 날조 의심) — brief_lint 의 MFDS 미근거 링크 FAIL 과 동형(식별자성
+    사실은 하드 검증, 근거 없이 지어낸 조항 번호로 카드가 나가는 걸 구조적으로 막는다). 한국 행정처분은
     약사법 조항·[별표N] 등 한국법령 토큰이 대상(_CITATION_PATTERNS 확장, 설계문서 §5-1).
+
+    ★FDA 483 은 `severity=SEV_WARN`(비차단): 483 원문(관찰사항 목록)은 CFR 조항을 명시하지 않을
+    때가 많아, 분석가가 붙인 정당한 규제 해석(21 CFR 211.x 등)을 하드 FAIL 로 막으면 과차단이 된다.
+    → 원문 밖 인용은 WARN 으로 남겨 발행 전 수동 확인만 유도한다(WL 의 "원문 밖 숫자 WARN" 원리와
+    동형). 날조된 식별자성 숫자(FEI·날짜 등)는 D3 가 여전히 잡는다.
     """
     findings: list[Finding] = []
     source_norm = _normalize_citation(source_text or "")
@@ -246,10 +268,14 @@ def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,
                 continue
             if key_norm not in source_norm:
                 reported.add(key_norm)
-                findings.append(Finding(
-                    SEV_FAIL, "D2-CITATION-UNGROUNDED",
-                    f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(wl_body_full)에 없음 — "
-                    "날조/오인용 의심. 원문에 실재하는 조항만 인용해야 함."))
+                if severity == SEV_WARN:
+                    detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(body_full)에 없음 — "
+                              "483 원문은 CFR 조항을 명시하지 않을 수 있어 해석성 인용은 차단하지 "
+                              "않으나 발행 전 수동 확인 권고.")
+                else:
+                    detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(wl_body_full)에 없음 — "
+                              "날조/오인용 의심. 원문에 실재하는 조항만 인용해야 함.")
+                findings.append(Finding(severity, "D2-CITATION-UNGROUNDED", detail))
     return findings
 
 
@@ -330,10 +356,14 @@ def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
     → 기존 WL 호출부(card_type 없음·fda_evaluation 보유)는 동작 완전 불변.
     """
     sections = resolve_required_sections(deep_analysis, card_type)
+    # FDA 483 은 CFR 인용이 원문에 없어도 정당한 해석일 수 있어 D2 를 WARN(비차단)으로 강등한다
+    # (WL·admin 은 하드 FAIL 유지 — 조항이 원문에 실재해야 함). 위 docstring · 설계문서 §12.
+    citation_severity = SEV_WARN if sections is REQUIRED_SECTIONS_FDA483 else SEV_FAIL
     findings: list[Finding] = []
     findings.extend(check_structure(deep_analysis, sections))
     if not has_failures(findings):  # 구조가 불완전하면 인용 대조는 의미가 없어 생략
-        findings.extend(check_citation_grounding(deep_analysis, source_text, sections))
+        findings.extend(check_citation_grounding(deep_analysis, source_text, sections,
+                                                 severity=citation_severity))
         findings.extend(check_novel_numbers(deep_analysis, source_text, sections))
     return GateResult(ok=not has_failures(findings), findings=findings,
                       report=format_report(findings))

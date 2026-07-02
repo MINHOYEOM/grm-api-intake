@@ -80,7 +80,7 @@ class _StubBytes:
 
 
 def _stub_pdf(text, status="pdf-ok"):
-    def _inner(data):
+    def _inner(data, **kwargs):   # max_chars 등 kwarg 무시 — 스텁은 상한 무관하게 전체 반환
         return text, status
     return _inner
 
@@ -408,6 +408,73 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertNotIn("fda_483_observations", items[0].raw_payload)
         self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 1)
+
+
+class DeepBodyFullTest(unittest.TestCase):
+    """[483 분석층 2026-07-02] ENABLE_FDA_483_DEEP on 일 때만 PDF 전문을 raw.fda483_body_full 로
+    보존해 deep_analysis fan-out 입력으로 쓴다. 결정론 Observation(ENABLE_FDA_483_OBSERVATIONS)과
+    독립. 파싱 불가(스캔본/표지-only)면 body_full 미기록(graceful — 요약카드·결정론 상세 유지)."""
+
+    SAMPLE = ("Cover. I/WE OBSERVED: OBSERVATION 1 There is a failure to review unexplained "
+              "discrepancies. OBSERVATION 2 Sampling plans are not documented at performance. "
+              "SEE REVERSE FORM FDA 483")
+
+    def test_deep_flag_off_no_body_full(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "false"}), \
+                _Patched(json_rows=[_json_row(6201)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda483_body_full", items[0].raw_payload)
+        self.assertFalse(f.LAST_HEALTH["fda_483_deep"]["enabled"])
+        self.assertEqual(f.LAST_HEALTH["fda_483_deep"]["stored"], 0)
+
+    def test_deep_flag_on_stores_full_text_and_health(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true"}), \
+                _Patched(json_rows=[_json_row(6202)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(items[0].raw_payload["fda483_body_full"], self.SAMPLE)
+        h = f.LAST_HEALTH["fda_483_deep"]
+        self.assertTrue(h["enabled"])
+        self.assertEqual((h["attempted"], h["stored"], h["failed"]), (1, 1, 0))
+
+    def test_deep_independent_of_observations_flag(self):
+        # deep on·observations off → 전문(body_full)은 저장되지만 결정론 상세 키는 부재(독립).
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true",
+                                     "ENABLE_FDA_483_OBSERVATIONS": "false"}), \
+                _Patched(json_rows=[_json_row(6203)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIn("fda483_body_full", items[0].raw_payload)
+        self.assertNotIn("fda_483_observations", items[0].raw_payload)
+
+    def test_deep_garbage_pdf_degrades_gracefully(self):
+        # 앵커 없는 표지-only(파싱 0) → body_full 미기록·failed=1, 요약카드/결정론 상세 유지.
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true"}), \
+                _Patched(json_rows=[_json_row(6204)], html_rows=[],
+                         pdf_text="cover page with no observation anchors"):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda483_body_full", items[0].raw_payload)
+        self.assertEqual(f.LAST_HEALTH["fda_483_deep"]["failed"], 1)
+
+    def test_deep_fetch_passes_full_text_cap_only_when_enabled(self):
+        # deep on → _fetch_fda483_pdf_text 가 200000 상한을 넘긴다(전문). off(기본)면 미전달=기존 불변.
+        captured = {}
+
+        def _cap_stub(data, max_chars="DEFAULT"):
+            captured["max_chars"] = max_chars
+            return "text", "pdf-ok"
+        with patch.object(g, "_extract_pdf_text", _cap_stub), \
+                patch.object(f, "http_get_bytes", _StubBytes()):
+            f._fetch_fda483_pdf_text("https://x/media/1/download",
+                                     max_chars=f.FDA483_TEXT_MAX_CHARS)
+        self.assertEqual(captured["max_chars"], f.FDA483_TEXT_MAX_CHARS)
+
+        captured.clear()
+        with patch.object(g, "_extract_pdf_text", _cap_stub), \
+                patch.object(f, "http_get_bytes", _StubBytes()):
+            f._fetch_fda483_pdf_text("https://x/media/1/download")   # max_chars 미지정
+        self.assertEqual(captured["max_chars"], "DEFAULT")   # 기본값 그대로 = 미전달(경로 불변)
 
 
 class ObservationTruncationTest(unittest.TestCase):

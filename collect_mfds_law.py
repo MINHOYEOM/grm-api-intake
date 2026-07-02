@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 from datetime import date
 from typing import Any
 
-from grm_common import http_get_xml, log, parse_int_safe
+from grm_common import http_get_xml, log, mask_service_key, parse_int_safe
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -78,10 +78,6 @@ TARGET_META = {
 }
 
 
-def _mask_service_key(url: str) -> str:
-    return re.sub(r"([?&]serviceKey=)[^&]+", r"\1***REDACTED***", url)
-
-
 def _mask_oc(url: str) -> str:
     return re.sub(r"([?&]OC=)[^&]+", r"\1***REDACTED***", url)
 
@@ -91,7 +87,7 @@ def _request_url(params: dict[str, Any]) -> str:
 
 
 def _api_query(params: dict[str, Any]) -> str:
-    return _mask_service_key(_request_url(params))
+    return mask_service_key(_request_url(params))
 
 
 def _law_service_url(target: str, fields: dict[str, str], oc: str) -> str:
@@ -317,6 +313,7 @@ def _to_item(
     start: date | None = None,
     end: date | None = None,
     law_go_kr_oc: str = "",
+    seen_ids: set[str] | None = None,
 ) -> IntakeItem | None:
     meta = TARGET_META[target]
     title = _first(fields, *meta["title_keys"])
@@ -333,6 +330,12 @@ def _to_item(
         return None
 
     document_id = _document_id(target, fields, title, date_iso)
+    # dedup 을 본문 fetch **이전**으로: 같은 admrul 이 여러 query term 에 걸쳐 반복돼도
+    # _fetch_body_excerpt(네트워크)를 문서당 1회만 수행(옛 코드는 마지막에 dedup → 최대 11회 낭비).
+    if seen_ids is not None:
+        if document_id in seen_ids:
+            return None
+        seen_ids.add(document_id)
     body = _body(target, fields)
     body_excerpt, body_query_url, body_error = _fetch_body_excerpt(target, fields, law_go_kr_oc)
     if body_excerpt:
@@ -384,6 +387,7 @@ def _collect_target_query(
     end: date,
     service_key: str,
     law_go_kr_oc: str = "",
+    seen_ids: set[str] | None = None,
 ) -> tuple[list[IntakeItem], str | None]:
     items: list[IntakeItem] = []
     page_no = 1
@@ -418,6 +422,7 @@ def _collect_target_query(
                 start=start,
                 end=end,
                 law_go_kr_oc=law_go_kr_oc,
+                seen_ids=seen_ids,
             )
             if item is None:
                 continue
@@ -440,6 +445,8 @@ def collect_mfds_law(
 
     items: list[IntakeItem] = []
     errors: list[str] = []
+    # seen_ids 를 target/query 루프 전체에서 공유해 _to_item 이 본문 fetch 이전에 dedup 하게 한다
+    # (중복 admrul 의 반복 본문 fetch 제거 — 이전엔 이 루프 끝에서 dedup 했다).
     seen_ids: set[str] = set()
     for target in ("admrul", "law"):
         for query in LAW_QUERY_TERMS:
@@ -450,18 +457,19 @@ def collect_mfds_law(
                 end=end,
                 service_key=service_key,
                 law_go_kr_oc=law_go_kr_oc,
+                seen_ids=seen_ids,
             )
             if err:
                 errors.append(err)
                 log("WARN", err)
                 continue
-            for item in got:
-                if item.document_id in seen_ids:
-                    continue
-                seen_ids.add(item.document_id)
-                items.append(item)
+            items.extend(got)  # _to_item 이 seen_ids 로 이미 dedup 완료
 
     if errors and not items:
         return [], "; ".join(errors[:3])
+    if errors:
+        # 부분 실패(items 확보)를 error 반환 대신 consolidated WARN 으로 표면화(침묵 제거).
+        log("WARN", f"MFDS law/admrul API 부분 실패 {len(errors)}건 (items {len(items)}건 확보): "
+                    + "; ".join(errors[:3]))
     log("INFO", f"MFDS law/admrul API 수집 완료: {len(items)}건 (부분오류={len(errors)})")
     return items, None

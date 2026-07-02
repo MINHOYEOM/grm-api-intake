@@ -139,6 +139,78 @@ class MfdsLawCollectorTest(unittest.TestCase):
         self.assertIn("law_go_kr_body_excerpt", items[0].raw_payload)
         self.assertIn("OC=***REDACTED***", items[0].raw_payload["law_go_kr_body_query"])
 
+    def test_admrul_body_fetched_once_across_queries(self) -> None:
+        # 같은 admrul 이 11개 query term 전부에 걸쳐 반복돼도 본문(전문) fetch 는 문서당 1회.
+        # dedup 을 _to_item 본문 fetch **이전**으로 옮긴 결과(옛 코드는 마지막 dedup → 최대 11회).
+        body_calls: list[str] = []
+
+        def fake_http_get_xml(url, timeout=None, retries=None, headers=None):
+            parsed = urllib.parse.urlparse(url)
+            qs = urllib.parse.parse_qs(parsed.query)
+            if parsed.netloc == "www.law.go.kr":            # 본문 전문 fetch
+                body_calls.append(url)
+                return ET.fromstring(
+                    "<AdmrulService><조문단위><조문제목>목적</조문제목>"
+                    "<조문내용>의약품 제조 및 품질관리에 관한 세부 기준을 정한다.</조문내용>"
+                    "</조문단위></AdmrulService>")
+            if qs.get("target", [""])[0] == "admrul":       # 모든 admrul list query = 동일 레코드
+                return ET.fromstring(
+                    "<LawSearch><resultCode>00</resultCode><totalCnt>1</totalCnt>"
+                    "<law><행정규칙일련번호>2000000777777</행정규칙일련번호>"
+                    "<행정규칙명>의약품 제조 및 품질관리에 관한 규정</행정규칙명>"
+                    "<행정규칙종류>고시</행정규칙종류><발령일자>20260617</발령일자>"
+                    "<소관부처코드>1471000</소관부처코드><소관부처명>식품의약품안전처</소관부처명>"
+                    "</law></LawSearch>")
+            return ET.fromstring(
+                "<LawSearch><resultCode>00</resultCode><totalCnt>0</totalCnt></LawSearch>")
+
+        orig = law.http_get_xml
+        law.http_get_xml = fake_http_get_xml
+        try:
+            items, err = law.collect_mfds_law(
+                date(2026, 6, 1), date(2026, 6, 30), "dummy", law_go_kr_oc="oc-secret")
+        finally:
+            law.http_get_xml = orig
+
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)          # 중복 제거 → 1건
+        self.assertEqual(len(body_calls), 1)     # 본문 fetch 문서당 1회(dedup 선행)
+
+    def test_partial_failure_surfaced_as_warn_not_error(self) -> None:
+        # 일부 query 실패 + items 확보 → (items, None) 반환(전량 실패만 error). consolidated WARN 표면화.
+        logs: list[tuple[str, str]] = []
+
+        def fake_http_get_xml(url, timeout=None, retries=None, headers=None):
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+            target = qs.get("target", [""])[0]
+            query = qs.get("query", [""])[0]
+            if target == "admrul" and query == law.LAW_QUERY_TERMS[0]:   # 첫 term 만 성공
+                return ET.fromstring(
+                    "<LawSearch><resultCode>00</resultCode><totalCnt>1</totalCnt>"
+                    "<law><행정규칙일련번호>2000000888888</행정규칙일련번호>"
+                    "<행정규칙명>의약품 제조 및 품질관리에 관한 규정</행정규칙명>"
+                    "<행정규칙종류>고시</행정규칙종류><발령일자>20260617</발령일자>"
+                    "<소관부처코드>1471000</소관부처코드><소관부처명>식품의약품안전처</소관부처명>"
+                    "</law></LawSearch>")
+            if target == "law":
+                return ET.fromstring(
+                    "<LawSearch><resultCode>00</resultCode><totalCnt>0</totalCnt></LawSearch>")
+            raise RuntimeError("boom")   # 나머지 admrul query 실패
+
+        orig_xml, orig_log = law.http_get_xml, law.log
+        law.http_get_xml = fake_http_get_xml
+        law.log = lambda level, msg: logs.append((level, msg))
+        try:
+            items, err = law.collect_mfds_law(date(2026, 6, 1), date(2026, 6, 30), "dummy")
+        finally:
+            law.http_get_xml, law.log = orig_xml, orig_log
+
+        self.assertIsNone(err)                   # items 확보 → error 아님(전량 실패만 error)
+        self.assertEqual(len(items), 1)
+        self.assertTrue(
+            any(lvl == "WARN" and "부분 실패" in msg for lvl, msg in logs),
+            "부분 실패 consolidated WARN 미표면화")
+
 
 class MfdsSafetyLetterCollectorTest(unittest.TestCase):
     def test_key_required(self) -> None:

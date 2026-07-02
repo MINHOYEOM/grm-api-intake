@@ -1,6 +1,6 @@
 {#- card.html — grm-web-card/v1 한 카드 → v4 카드 마크업. 순수 렌더(사실/URL 무변형).
     표시 플래그(mono·badge·quote mark·show_*·link state)는 render.py 가 산출. -#}
-{%- macro srclink(src, role_label, role_state) -%}
+{%- macro srclink(src, role_label) -%}
   {%- if src.url -%}
     {%- if src.state == 'broken' -%}
     {#- href 없는 <a> = 클릭 비활성이되 .src a pill 스타일 상속(grm.css 동결 유지). -#}

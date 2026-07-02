@@ -145,10 +145,17 @@ def _detail_company(detail: dict[str, str]) -> str:
     return ""
 
 
-def _fetch_recall_detail(url: str) -> dict[str, str]:
-    """항목별 상세 페이지를 best-effort 로 가져와 구조화 셀을 파싱. 실패는 {} (조용히)."""
+def _fetch_recall_detail(url: str, stats: dict[str, int] | None = None) -> dict[str, str]:
+    """항목별 상세 페이지를 best-effort 로 가져와 구조화 셀을 파싱. 실패는 {} (조용히).
+
+    stats(선택): {"attempted","failed"} 카운터를 in-place 증가시켜 collect_hc 가 run 말미에
+    집계 요약(대량 실패 침묵 방지)을 낼 수 있게 한다. 미전달 시 카운트 없음(직접 호출·테스트
+    후방호환). 보강 비활성/URL 부재는 '시도 아님'이라 집계에서 제외한다.
+    """
     if not HC_DETAIL_FETCH or not url or url == HC_BASE:
         return {}
+    if stats is not None:
+        stats["attempted"] = stats.get("attempted", 0) + 1
     last_err: Exception | None = None
     for attempt in range(HC_DETAIL_RETRIES + 1):
         try:
@@ -163,6 +170,8 @@ def _fetch_recall_detail(url: str) -> dict[str, str]:
             return _parse_detail_html(resp.content.decode("utf-8", "replace"))
         except Exception as e:  # noqa: BLE001 — 보강은 best-effort, 실패해도 피드 단독 폴백
             last_err = e
+    if stats is not None:
+        stats["failed"] = stats.get("failed", 0) + 1
     log("INFO", f"HC 상세 보강 건너뜀(피드 단독 폴백) url={url} err={last_err}")
     return {}
 
@@ -265,13 +274,19 @@ def collect_hc(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     org_total = 0
     items: list[IntakeItem] = []
     seen: set[str] = set()
+    # 상세 보강 시도/실패를 run 단위로 집계(건별 INFO 는 흩어져 대량 실패가 묻힘).
+    detail_stats: dict[str, int] = {"attempted": 0, "failed": 0}
+
+    def _fetcher(u: str) -> dict[str, str]:
+        return _fetch_recall_detail(u, detail_stats)
+
     for rec in data:
         if not isinstance(rec, dict):
             continue
         if _text(rec, "Organization").lower() != TARGET_ORG:
             continue
         org_total += 1
-        item = _to_item(rec, start, end, detail_fetcher=_fetch_recall_detail)
+        item = _to_item(rec, start, end, detail_fetcher=_fetcher)
         if item is None or item.document_id in seen:
             continue
         seen.add(item.document_id)
@@ -282,5 +297,11 @@ def collect_hc(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
         return [], (f"HC 피드에서 Organization='{TARGET_ORG}' 레코드 0건(total={total}) "
                     f"— 필드/값 변경 의심(수동 확인 필요)")
 
+    # 상세 보강 집계 요약 — 실패는 error 승격 아님(피드 단독 폴백 = 정상 수집). N>0 이면 WARN.
+    attempted, failed = detail_stats["attempted"], detail_stats["failed"]
+    if attempted:
+        log("WARN" if failed else "INFO",
+            f"HC 상세 보강 집계: 실패 {failed}/시도 {attempted}건"
+            + (" — 실패분은 피드 단독 폴백(수집 자체는 정상)" if failed else ""))
     log("INFO", f"HC 수집 완료: {len(items)}건 (의약품/건강제품 {org_total}건 중 윈도우내, 전체 {total})")
     return items, None

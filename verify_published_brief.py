@@ -370,9 +370,22 @@ def build_audit_json(alerts: list[bl.LintFinding],
     }
 
 
-def skipped_json(note: str, *, run_date_kst: str = "") -> dict[str, Any]:
-    """대조 불가(토큰·brief·handoff 부재·fetch 실패) → ok:true 건너뜀(false-red 금지)."""
-    return {"ok": True, "run_date_kst": run_date_kst, "brief": {"title": "", "url": ""},
+def skipped_json(note: str, *, run_date_kst: str = "", skip_class: str = "") -> dict[str, Any]:
+    """대조 불가(토큰·brief·handoff 부재·fetch 실패) → ok:true 건너뜀(false-red 금지).
+
+    `skip_class` 로 skip 을 두 클래스로 나눈다(과알림 0 유지 — CI 가 이 값으로 분기):
+      - ``"infra"``   = 탐지선(detective) 자체가 죽음(NOTION_TOKEN 부재·Notion 조회/본문
+                        fetch 실패). 발행 후 2차 방어선이 무력화된 상태 → CI(grm-brief-audit)
+                        가 **스케줄 실행에서만** 운영 경고로 표면화한다(토큰 만료 시 탐지선이
+                        무기한 죽어도 신호 0 이던 침묵 실패를 차단).
+      - ``"content"`` = 탐지선은 살아있고 대조 **대상**이 없음(Weekly Brief 페이지 없음·
+                        CONSUMED handoff 미발견). 발행 부재는 주간 리뷰·health 가 다른 경로로
+                        커버 → 무알림 유지(과알림 0).
+    기본값 ``""`` = 미분류(정상 경로는 skip 이 아니므로 이 값을 쓰지 않는다). 기존 스키마에
+    키만 추가하는 additive 변경 — 기존 소비자(정상 audit JSON 필드) 무영향.
+    """
+    return {"ok": True, "run_date_kst": run_date_kst, "skip_class": skip_class,
+            "brief": {"title": "", "url": ""},
             "fail_count": 0, "info_count": 0, "alerts": [], "info": [], "note": note}
 
 
@@ -519,24 +532,34 @@ def run(token: str, *, weekly_db_id: str, intake_db_id: str,
     가능하지만 본 함수는 근거 대조와 한 번에 묶어 실행한다(handoff 미발견 시 전체 건너뜀).
     """
     if not token:
-        return skipped_json("NOTION_TOKEN 부재 — 발행 후 탐지 건너뜀")
+        # infra: 토큰 부재 = 탐지선 자체가 못 뜬다(만료 시 무기한 침묵 방지 → 스케줄 경보).
+        return skipped_json("NOTION_TOKEN 부재 — 발행 후 탐지 건너뜀", skip_class="infra")
     try:
         brief = fetch_latest_brief(token, weekly_db_id)
     except Exception as exc:  # noqa: BLE001
-        return skipped_json(f"Weekly Brief 조회 실패(건너뜀): {str(exc)[:160]}")
+        # infra: Notion 조회 실패(만료·권한·네트워크) = 탐지선 죽음.
+        return skipped_json(f"Weekly Brief 조회 실패(건너뜀): {str(exc)[:160]}",
+                            skip_class="infra")
     if not brief:
-        return skipped_json("Weekly Brief 페이지 없음 — 건너뜀")
+        # content: 탐지선은 살아있고 발행 대상만 없음 → 무알림(발행 부재는 다른 경로가 커버).
+        return skipped_json("Weekly Brief 페이지 없음 — 건너뜀", skip_class="content")
     try:
         rows = fetch_latest_consumed_handoff_rows(token, intake_db_id)
     except Exception as exc:  # noqa: BLE001
-        return skipped_json(f"handoff 조회 실패(건너뜀): {str(exc)[:160]}")
+        # infra: handoff 조회 실패 = 탐지선 죽음.
+        return skipped_json(f"handoff 조회 실패(건너뜀): {str(exc)[:160]}",
+                            skip_class="infra")
     if not rows:
-        # 근거 집합이 없으면 모든 링크가 미근거로 보여 과알림 → 대조 불가로 건너뜀.
-        return skipped_json("CONSUMED handoff 미발견 — 근거 대조 불가, 건너뜀")
+        # content: 근거 집합이 없으면 모든 링크가 미근거로 보여 과알림 → 대조 불가로 건너뜀
+        # (탐지선은 살아있고 대조 대상 handoff 만 없음 → 무알림).
+        return skipped_json("CONSUMED handoff 미발견 — 근거 대조 불가, 건너뜀",
+                            skip_class="content")
     try:
         blocks = fetch_brief_blocks(token, brief["id"])
     except Exception as exc:  # noqa: BLE001
-        return skipped_json(f"브리프 본문 fetch 실패(건너뜀): {str(exc)[:160]}")
+        # infra: 본문 fetch 실패 = 탐지선 죽음.
+        return skipped_json(f"브리프 본문 fetch 실패(건너뜀): {str(exc)[:160]}",
+                            skip_class="infra")
     urls = extract_urls_from_blocks(blocks)
     text = extract_text_from_blocks(blocks)
 

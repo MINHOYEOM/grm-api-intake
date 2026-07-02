@@ -60,7 +60,7 @@ jobs:
           # 탐지 자체는 빌드를 red 로 만들지 않는다(JSON 으로 Issue 처리). exit 0 기본.
           python verify_published_brief.py "${args[@]}"
 
-      - name: Open or update warning issue on provenance FAIL
+      - name: Open or update warning issue on provenance FAIL / detective 침묵 실패
         if: always()
         uses: actions/github-script@v9.0.0
         with:
@@ -69,24 +69,10 @@ jobs:
             const path = require('path');
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const jsonPath = path.join(process.env.GITHUB_WORKSPACE,
-              process.env.GRM_BRIEF_AUDIT_JSON || 'grm-brief-audit.json');
-            if (!fs.existsSync(jsonPath)) {
-              console.log('audit JSON not found; skipping');
-              return;
-            }
-            let audit;
-            try {
-              audit = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-            } catch (error) {
-              console.log(`audit JSON parse failed: ${error}`);
-              return;
-            }
-            const alerts = audit.alerts || [];
-            if (audit.ok || alerts.length === 0) {
-              console.log(`no provenance FAIL (note: ${audit.note || 'none'}); skipping issue`);
-              return;
-            }
+            // 스케줄 실행에서만 인프라 침묵 실패를 경보한다(수동 dispatch 실험은 로그만 → 과알림 0).
+            const isSchedule = context.eventName === 'schedule';
+            const title = 'GRM Intake 운영 경고';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
             async function ensureLabel(name, color, description) {
               try {
@@ -96,12 +82,84 @@ jobs:
                 await github.rest.issues.createLabel({ owner, repo, name, color, description });
               }
             }
-            await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
-            await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
 
-            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            // 기존 `GRM Intake 운영 경고` Issue 에 comment(없으면 생성) — state-change 관행
+            // (2026-06-18)을 유지해 새 제목 신설 없이 단일 운영 경고 Issue 에 누적한다.
+            async function postWarning(body) {
+              await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
+              await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
+              });
+              const existing = issues.find((issue) => issue.title === title);
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number, body,
+                });
+                return;
+              }
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: ['grm-intake', 'automation-warning'],
+              });
+            }
+
+            const jsonPath = path.join(process.env.GITHUB_WORKSPACE,
+              process.env.GRM_BRIEF_AUDIT_JSON || 'grm-brief-audit.json');
+
+            // ── 분기 ① audit JSON 미존재 = 스크립트가 산출물을 쓰기 전에 크래시(탐지선 죽음) ──
+            // 스케줄 실행이면 경보(수동은 로그만). always() 스텝이라 python 스텝 실패 시에도 여기 온다.
+            if (!fs.existsSync(jsonPath)) {
+              if (isSchedule) {
+                await postWarning([
+                  'GRM 발행 후 탐지(detective)가 **audit 산출물(JSON)을 내지 못했습니다**.',
+                  '(verify_published_brief.py 가 JSON 을 쓰기 전에 크래시했을 가능성 — 탐지선 자체 점검 필요)',
+                  '',
+                  `- Run: ${runUrl}`,
+                ].join('\n'));
+                console.log('audit JSON not found on schedule; warning posted');
+              } else {
+                console.log('audit JSON not found; skipping (non-schedule, 로그만)');
+              }
+              return;
+            }
+            let audit;
+            try {
+              audit = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+            } catch (error) {
+              console.log(`audit JSON parse failed: ${error}`);
+              return;
+            }
+
+            // ── 분기 ② 탐지선 인프라 실패로 skip(skip_class='infra') ──
+            // infra skip = NOTION_TOKEN 부재/Notion 조회/본문 fetch 실패 → 발행 후 2차 방어선 무력화.
+            // 스케줄에서만 경보한다. content skip(대상 부재)은 무알림 유지(과알림 0), 수동은 로그만.
+            if (audit.ok && audit.skip_class === 'infra') {
+              if (isSchedule) {
+                await postWarning([
+                  'GRM 발행 후 탐지가 **탐지선 인프라 실패로 skip** 되었습니다.',
+                  '(NOTION_TOKEN 부재 또는 Notion 조회/본문 fetch 실패 — 발행 후 provenance/구조 2차 방어선이 무력화된 상태)',
+                  '',
+                  `- Run: ${runUrl}`,
+                  `- Skip 사유: ${audit.note || '(note 없음)'}`,
+                  '',
+                  '조치: NOTION_TOKEN(만료 여부)·Notion 접근·네트워크를 점검하세요. 복구 전까지는 '
+                    + '발행물의 미근거 링크·요일/구조 위반이 감지되지 않습니다.',
+                ].join('\n'));
+                console.log(`infra skip on schedule; warning posted (note: ${audit.note || 'none'})`);
+              } else {
+                console.log(`infra skip (non-schedule, 로그만); note: ${audit.note || 'none'}`);
+              }
+              return;
+            }
+
+            // ── 기존 provenance FAIL → Issue (트리거/본문 불변 · 게시 방식만 postWarning 공용) ──
+            const alerts = audit.alerts || [];
+            if (audit.ok || alerts.length === 0) {
+              console.log(`no provenance FAIL (note: ${audit.note || 'none'}); skipping issue`);
+              return;
+            }
             const brief = audit.brief || {};
-            const lines = [
+            const body = [
               'GRM 발행 후 provenance 탐지에서 **출처 링크 근거 FAIL** 이 감지되었습니다.',
               '(handoff 근거 없는 mfds/nedrug 링크 또는 live verify 가 죽은 타 기관 링크 — W24 사고 클래스)',
               '',
@@ -114,20 +172,5 @@ jobs:
               '',
               '조치: 발행물의 해당 출처 줄을 handoff 근거(scaffold 링크)로 복원하거나, 검색 날조면 제거하세요.',
               '예방 게이트(Publish Lint 17 / brief_lint run_publish_gate)가 다음 발행에서 차단하는지 확인하세요.',
-            ];
-            const body = lines.join('\n');
-            const title = 'GRM Intake 운영 경고';
-
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
-            });
-            const existing = issues.find((issue) => issue.title === title);
-            if (existing) {
-              await github.rest.issues.createComment({
-                owner, repo, issue_number: existing.number, body,
-              });
-              return;
-            }
-            await github.rest.issues.create({
-              owner, repo, title, body, labels: ['grm-intake', 'automation-warning'],
-            });
+            ].join('\n');
+            await postWarning(body);

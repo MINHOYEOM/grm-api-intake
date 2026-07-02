@@ -489,8 +489,40 @@ def _language(row: dict[str, Any], kind: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. W3 원문 인용 소스 필드 (§12(C))
 # ─────────────────────────────────────────────────────────────────────────────
+# per-kind 인용 추출기(A-eligible 만) — SourceSpec.quote 로 배선. 각기 실제 수집기 raw
+# 키 기준, 형제와 동형으로 250자 문장경계 절단. 미지정 kind(RSS·WHO·ICH §12H·WL 본문
+# 미수집)는 quote=None → dispatcher 가 "" 반환(Evidence B).
+def _quote_admin(raw: dict[str, Any]) -> str:
+    return _truncate_at_sentence(raw.get("EXPOSE_CONT", ""), 250)
+
+
+def _quote_recall_quality(raw: dict[str, Any]) -> str:
+    # RTRVL_RESN(회수사유)은 한국어 장문에 종결부호가 없는 경우가 많아 무절단 시 '>' 인용
+    # 라인이 Notion rich-text 한도(2000자)를 초과할 수 있다(300자 prose_input 가드는 렌더
+    # 라인 미보호) → 형제 분기와 동형 250자 절단(A3).
+    return _truncate_at_sentence(_first(raw.get("RTRVL_RESN")), 250)
+
+
+def _quote_gmp_inspection(raw: dict[str, Any]) -> str:
+    # 표지 너머 결론(지적/보완사항) 우선 — 없으면 전체 본문 폴백(P6).
+    return _truncate_at_sentence(
+        _first(raw.get("attachment_deficiency_excerpt"), raw.get("attachment_text")), 250)
+
+
+def _quote_openfda_recall(raw: dict[str, Any]) -> str:
+    return _truncate_at_sentence(raw.get("reason_for_recall", ""), 250)
+
+
+def _quote_hc_recall(raw: dict[str, Any]) -> str:
+    return _truncate_at_sentence(_first(raw.get("Issue"), raw.get("What you should do")), 250)
+
+
+def _quote_guidance(raw: dict[str, Any]) -> str:  # FR 전용 — abstract(없으면 title)
+    return _truncate_at_sentence(_first(raw.get("abstract"), raw.get("title")), 250)
+
+
 def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
-    """유형별 W3 인용 소스 필드(§12C). 실제 수집기 raw 키 기준. 없으면 "" → Evidence B.
+    """유형별 W3 인용 소스 필드(§12C). `SourceSpec.quote` 디스패치. 없으면 "" → Evidence B.
 
     A-eligible 만 인용 가능: admin(EXPOSE_CONT)·recall(RTRVL_RESN)·gmp(attachment_text)·
     openfda-recall(reason_for_recall)·hc-recall(Issue)·guidance/FR(abstract). 그 외(RSS·
@@ -498,26 +530,8 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
     """
     if not raw:
         return ""
-    if kind == "admin-action":
-        return _truncate_at_sentence(raw.get("EXPOSE_CONT", ""), 250)
-    if kind == "recall-quality":
-        # 형제 분기와 동형으로 250자 절단(A3). RTRVL_RESN(회수사유)은 한국어 장문에
-        # 종결부호가 없는 경우가 많아 무절단 시 '>' 인용 라인이 Notion rich-text
-        # 한도(2000자)를 초과할 수 있다(300자 prose_input 가드는 렌더 라인 미보호).
-        return _truncate_at_sentence(_first(raw.get("RTRVL_RESN")), 250)
-    if kind == "gmp-inspection":
-        # 표지 너머 결론(지적/보완사항) 우선 — 없으면 전체 본문 폴백(P6).
-        return _truncate_at_sentence(
-            _first(raw.get("attachment_deficiency_excerpt"),
-                   raw.get("attachment_text")), 250)
-    if kind == "openfda-recall":
-        return _truncate_at_sentence(raw.get("reason_for_recall", ""), 250)
-    if kind == "hc-recall":
-        return _truncate_at_sentence(_first(raw.get("Issue"), raw.get("What you should do")), 250)
-    if kind == "guidance":  # FR 전용 — abstract(없으면 title)
-        return _truncate_at_sentence(_first(raw.get("abstract"), raw.get("title")), 250)
-    # mfds-notice·rss-news·safety-letter·legislative·regulation·ich·who-*·WL → quote 없음
-    return ""
+    fn = _spec(kind).quote
+    return fn(raw) if fn else ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -777,23 +791,23 @@ _REGISTRY: dict[str, SourceSpec] = {
     "admin-action": SourceSpec(
         "🟦", "행정처분", "행정처분",
         a_eligible=True, deep_body_key="admin_body_full",
-        quote=None, extra_rows=None, official=None),
+        quote=_quote_admin, extra_rows=None, official=None),
     "recall-quality": SourceSpec(
         "🟦", "회수·판매중지", "회수",
         a_eligible=True, section="recall_table",
-        quote=None, extra_rows=None, official=None),
+        quote=_quote_recall_quality, extra_rows=None, official=None),
     "openfda-recall": SourceSpec(
         "🟧", "Recall", "Recall",
         a_eligible=True, section="recall_table",
-        quote=None, extra_rows=None, official=None),
+        quote=_quote_openfda_recall, extra_rows=None, official=None),
     "hc-recall": SourceSpec(
         "🟧", "Recall(HC)", "Recall",
         a_eligible=True, section="recall_table",
-        quote=None, extra_rows=None),
+        quote=_quote_hc_recall, extra_rows=None),
     "gmp-inspection": SourceSpec(
         "🟦", "GMP실사", "GMP실사",
         a_eligible=True,
-        quote=None, extra_rows=None, official=None, detail=None),
+        quote=_quote_gmp_inspection, extra_rows=None, official=None, detail=None),
     "gmp-certificate": SourceSpec(
         "🟦", "GMP적합판정", "GMP적합",
         extra_rows=None),
@@ -813,7 +827,7 @@ _REGISTRY: dict[str, SourceSpec] = {
     "guidance": SourceSpec(
         "🟫", "지침·안내서", "Guidance",
         category="Guidance", a_eligible=True, normative=True,
-        quote=None),
+        quote=_quote_guidance),
     "mfds-notice": SourceSpec(
         "🟫", "지침·안내서", "Guidance",
         category="Guidance", normative=True),

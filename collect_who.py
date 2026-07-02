@@ -26,7 +26,6 @@ ENABLE_WHO=true 또는 --sources who 일 때 collect_intake.main() 에서 호출
 from __future__ import annotations
 
 import hashlib
-import os
 import re
 import time
 from datetime import date
@@ -34,7 +33,7 @@ from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlsplit
 
-from grm_common import http_get_bytes, http_get_html, log
+from grm_common import env_flag, http_get_bytes, http_get_html, log
 from collect_intake import (
     IntakeItem,
     SOURCE_WHO,
@@ -244,7 +243,7 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
 # ── 2) WHOPIR (공개 실사보고서) ────────────────────────────────────────────────
 def _whopir_excerpt_enabled() -> bool:
     """ENABLE_WHOPIR_EXCERPT=true 일 때만 PDF 본문 fetch+excerpt(기본 off)."""
-    return os.environ.get("ENABLE_WHOPIR_EXCERPT", "false").lower() == "true"
+    return env_flag("ENABLE_WHOPIR_EXCERPT")
 
 
 def _extract_whopir_excerpt(text: str) -> str:

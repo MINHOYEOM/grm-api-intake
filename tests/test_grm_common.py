@@ -3,10 +3,12 @@
 
 from __future__ import annotations
 
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
 from grm_common import (
+    env_flag,
     parse_int_safe,
     text_field,
     parse_datago_date,
@@ -132,6 +134,37 @@ class TestDatagoExtractItems(unittest.TestCase):
         data = {"body": {"items": []}}
         _, _, num_rows, _, _ = datago_extract_items(data, default_page_size=50)
         self.assertEqual(num_rows, 50)
+
+
+class TestEnvFlag(unittest.TestCase):
+    """ENABLE_* 단일 파서 — truthy = {"1","true","yes","on"} (case/공백 무시)."""
+
+    VAR = "GRM_TEST_ENV_FLAG"
+
+    def _set(self, value: str):
+        return patch.dict(os.environ, {self.VAR: value})
+
+    def test_truthy_values(self):
+        for v in ("1", "true", "TRUE", "yes", "YES ", "on", " On "):
+            with self._set(v):
+                self.assertTrue(env_flag(self.VAR), f"expected truthy: {v!r}")
+
+    def test_falsy_values(self):
+        for v in ("0", "false", "FALSE", "no", "off", "banana"):
+            with self._set(v):
+                self.assertFalse(env_flag(self.VAR), f"expected falsy: {v!r}")
+
+    def test_empty_returns_default(self):
+        with self._set(""):
+            self.assertFalse(env_flag(self.VAR))
+            self.assertTrue(env_flag(self.VAR, default=True))
+
+    def test_unset_returns_default(self):
+        env = {k: v for k, v in os.environ.items() if k != self.VAR}
+        with patch.dict(os.environ, env, clear=True):
+            self.assertFalse(env_flag(self.VAR))
+            self.assertTrue(env_flag(self.VAR, default=True))
+            self.assertFalse(env_flag("GRM_DEFINITELY_MISSING_VAR_XYZ"))
 
 
 if __name__ == "__main__":

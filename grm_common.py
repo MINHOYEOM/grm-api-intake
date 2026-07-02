@@ -46,6 +46,14 @@ def log(level: str, msg: str) -> None:
         print(safe, flush=True)
 
 
+def env_flag(name: str, default: bool = False) -> bool:
+    """ENABLE_* 플래그 단일 파서 — truthy = {"1","true","yes","on"} (case/공백 무시)."""
+    val = (os.environ.get(name) or "").strip().lower()
+    if not val:
+        return default
+    return val in ("1", "true", "yes", "on")
+
+
 def retry_after_seconds(resp: requests.Response, attempt: int, *, max_sleep: int = 60) -> int:
     raw = resp.headers.get("Retry-After", "")
     try:

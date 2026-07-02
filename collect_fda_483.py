@@ -34,14 +34,13 @@ ENABLE_FDA_483=true 또는 --sources fda483 일 때 collect_intake.main() 에서
 from __future__ import annotations
 
 import json
-import os
 import re
 import time
 from datetime import date
 from typing import Any
 from urllib.parse import urlencode, urljoin
 
-from grm_common import http_get_bytes, http_get_html, http_get_json, log
+from grm_common import env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
     IntakeItem,
     SOURCE_FDA_483,
@@ -134,12 +133,8 @@ def _strip(value: Any) -> str:
     return re.sub(r"\s+", " ", _TAG_RE.sub(" ", str(value or ""))).strip()
 
 
-def _env_true(name: str) -> bool:
-    return (os.environ.get(name, "false") or "").strip().lower() == "true"
-
-
 def _observations_enabled() -> bool:
-    return _env_true("ENABLE_FDA_483_OBSERVATIONS")
+    return env_flag("ENABLE_FDA_483_OBSERVATIONS")
 
 
 def _deep_enabled() -> bool:
@@ -148,7 +143,7 @@ def _deep_enabled() -> bool:
     (deep_analysis) fan-out 입력으로 쓴다. `ENABLE_FDA_483_OBSERVATIONS`(결정론 상세)와 **독립** —
     deep off 여도 결정론 Observation 상세는 그대로 나오고, deep on 이어도 결정론 층은 불변.
     off(기본) 면 키 부재 → scaffold deep_analysis_ready=False → 골든/동작 완전 불변(활성=사람 게이트)."""
-    return _env_true("ENABLE_FDA_483_DEEP")
+    return env_flag("ENABLE_FDA_483_DEEP")
 
 
 def _parse_mdy(raw: str) -> str:

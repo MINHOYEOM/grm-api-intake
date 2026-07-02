@@ -30,6 +30,7 @@ import sys
 from typing import Any, Iterable
 
 import brief_lint as bl
+from grm_common import env_flag
 
 # Weekly Brief(발행) DB — v16 프롬프트 [발송] 의 ID. env 로 override 가능.
 DEFAULT_WEEKLY_BRIEF_DB_ID = "3653142f-dc11-8049-806d-e0a779cafd90"
@@ -232,7 +233,7 @@ def classify(handoff_rows: list[dict[str, Any]],
 
 def _enable_brief_autofix() -> bool:
     """발행 후 URL self-heal 옵션. 기본 off, 사람 게이트 후에만 활성화한다."""
-    return os.environ.get("ENABLE_BRIEF_AUTOFIX", "false").lower() == "true"
+    return env_flag("ENABLE_BRIEF_AUTOFIX")
 
 
 def _url_tokens(url: str) -> set[str]:

@@ -12,14 +12,13 @@ import re
 import time
 import urllib.parse
 import xml.etree.ElementTree as ET
-import os
 import zipfile
 from dataclasses import dataclass, field
 from datetime import date
 from html.parser import HTMLParser
 from typing import Any
 
-from grm_common import http_get_bytes, log
+from grm_common import env_flag, http_get_bytes, log
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -317,9 +316,7 @@ def _deficiency_table_enabled() -> bool:
     off 면 기존 플로우 완전 무변경(현행 excerpt/assessment 그대로). on 이고 periodic 이고
     표 추출 성공 시만 raw_payload["gmp_deficiencies"] = rows 기록(점진 활성).
     """
-    return os.environ.get("ENABLE_GMP_DEFICIENCY_TABLE", "").strip().lower() in (
-        "1", "true", "yes", "on",
-    )
+    return env_flag("ENABLE_GMP_DEFICIENCY_TABLE")
 
 
 def _detect_inspection_type(text: str) -> str:

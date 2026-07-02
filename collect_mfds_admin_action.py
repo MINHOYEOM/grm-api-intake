@@ -7,7 +7,6 @@ actions) as enforcement-proxy intake rows for manufacturing/quality signals.
 
 from __future__ import annotations
 
-import os
 import re
 import hashlib
 import urllib.parse
@@ -15,6 +14,7 @@ from datetime import date
 from typing import Any
 
 from grm_common import (
+    env_flag,
     http_get_json,
     log,
     parse_datago_date,
@@ -116,8 +116,7 @@ LOW_VALUE_ADMIN_TERMS = [
 def _url_verify_enabled() -> bool:
     """E2 — `ENABLE_MFDS_URL_VERIFY`(기본 off). on 일 때만 후보 L1 을 collect 시점에
     live verify 해 official_url L1 을 승격/강등한다. off 면 수집기 동작·골든 전부 불변."""
-    return os.environ.get("ENABLE_MFDS_URL_VERIFY", "").strip().lower() in (
-        "1", "true", "yes", "on")
+    return env_flag("ENABLE_MFDS_URL_VERIFY")
 
 
 def _admin_body_full_enabled() -> bool:
@@ -126,8 +125,7 @@ def _admin_body_full_enabled() -> bool:
     raw 에 `admin_body_full` 로 노출해 심층분석(deep_analysis) fan-out 입력으로 쓴다. 외부
     fetch 0(이미 수집된 DB 필드 조립). off(기본) 면 키 부재 → scaffold deep_analysis_ready=False
     → 골든/동작 완전 불변(활성은 사람 게이트)."""
-    return os.environ.get("ENABLE_MFDS_ADMIN_BODY_FULL", "").strip().lower() in (
-        "1", "true", "yes", "on")
+    return env_flag("ENABLE_MFDS_ADMIN_BODY_FULL")
 
 
 def _verify_admin_l1(seq: str, firm: str) -> tuple[str, str]:

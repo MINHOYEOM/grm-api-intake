@@ -43,6 +43,8 @@ __all__ = [
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
     "WebDeterministicDetailTest",
+    "WebFda483DeterministicDetailTest",
+    "WebFda483DeepAnalysisTest",
 ]
 
 
@@ -1050,6 +1052,86 @@ class WebFda483DeterministicDetailTest(unittest.TestCase):
         self.assertIn('class="obs-num">Observation 1</span>', self.html)
         self.assertIn("There is a failure to thoroughly review discrepancies.", self.html)
         self.assertIn("원문 기반", self.html)
+
+
+class WebFda483DeepAnalysisTest(unittest.TestCase):
+    """[483 분석층 2026-07-02] FDA 483 deep_analysis(4섹션) 렌더 스모크 — ②섹션이
+    inspectional_significance 이면 483 한글 섹션명("실사 지적의 의미")으로 스왑되고 WL 영문
+    섹션명은 나타나지 않는다. 483 은 결정론 상세(Observation)와 분석층을 함께 가질 수 있다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_483deep_"))
+        data = cls._tmp / "data"
+        data.mkdir(parents=True, exist_ok=True)
+        base = json.loads(
+            (MULTI_FIXTURES / "brief_web_2026_06_08.json").read_text(encoding="utf-8"))
+        card = dict(base["cards"][0])
+        card.update({
+            "id": "fda483-deep-smoke", "render_order": 999, "group": "글로벌",
+            "group_label": None, "agency": "FDA", "card_type": "FDA 483 실사 관찰",
+            "category": "Other", "modality": "💊 합성의약품", "evidence_level": "B",
+            "signal_tier": 3, "signal_label": "High", "type_tag": "483",
+            "headline_target": "BPI Labs, LLC", "title_issue": "", "summary": "",
+            "facts": [{"label": "문서번호", "value": "fda483-deep-smoke"}],
+            "quotes": [], "key_facts": [], "implication": "", "checks": [],
+            "merged_count": 1, "merged_items": [],
+            "sources": {"info_url": "", "official_url": "https://www.fda.gov/media/1/download",
+                        "official_is_pdf": True,
+                        "link_check": {"info": "pending", "official": "pending"}},
+            "deep_analysis": {
+                "key_violations": [
+                    {"citation": "21 CFR 211.192",
+                     "observation": "OOS 결과를 과학적 근거 없이 무효화하고 조사를 문서화하지 않음",
+                     "risk": "불량 배치가 시장에 유통될 위험"}],
+                "inspectional_significance": (
+                    "데이터 무결성·무균 관리의 systemic 결함으로 Warning Letter 승격 가능성이 있다."),
+                "required_remediation": {
+                    "deadline": "483 수령 후 15영업일 이내 서면 회신",
+                    "items": ["OOS 조사 절차를 재수립하고 소급 검토를 수행한다"]},
+                "administrative_risks": "미시정 시 Import Alert·OAI 분류로 이어질 수 있다.",
+            },
+        })
+        base["cards"] = base["cards"] + [card]
+        (data / "brief_web_2026_06_08.json").write_text(
+            json.dumps(base, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, cls._tmp / "out")
+        cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
+            encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _deep_block(self) -> str:
+        start = self.html.index('<details class="block deep">')
+        return self.html[start:self.html.index("</details>", start)]
+
+    def test_deep_block_uses_483_korean_section_names(self):
+        block = self._deep_block()
+        self.assertIn("위반 항목 및 리스크", block)       # ①
+        self.assertIn("실사 지적의 의미", block)          # ② (483 전용)
+        self.assertIn("요구 시정 조치", block)            # ③ (483 전용)
+        self.assertIn("행정 리스크", block)               # ④
+        # ② 본문(inspectional_significance)이 렌더된다.
+        self.assertIn("Warning Letter 승격 가능성", block)
+        # ① key_violations 의 observation 키(483 스키마)가 본문으로 렌더된다.
+        self.assertIn("OOS 결과를 과학적 근거 없이 무효화", block)
+
+    def test_wl_english_section_names_absent(self):
+        # 483 카드에는 WL 영문 섹션명이 나타나면 안 된다(스왑 정확).
+        block = self._deep_block()
+        self.assertNotIn("FDA's Evaluation of Response", block)
+        self.assertNotIn("Key Violations", block)
+        self.assertNotIn("Required Remediation", block)
+        self.assertNotIn("Administrative Risks", block)
+
+    def test_deep_preview_hint_is_483_flavored(self):
+        # 접힘 요약 힌트가 483 색("실사의미")으로 나온다(처분근거/대응조치 아님).
+        block = self._deep_block()
+        self.assertIn("실사의미", block)
+        self.assertNotIn("처분근거", block)
+        self.assertNotIn("대응조치", block)
 
 
 if __name__ == "__main__":

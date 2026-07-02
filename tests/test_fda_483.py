@@ -80,7 +80,7 @@ class _StubBytes:
 
 
 def _stub_pdf(text, status="pdf-ok"):
-    def _inner(data):
+    def _inner(data, **kwargs):   # max_chars 등 kwarg 무시 — 스텁은 상한 무관하게 전체 반환
         return text, status
     return _inner
 
@@ -408,6 +408,88 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertNotIn("fda_483_observations", items[0].raw_payload)
         self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 1)
+
+
+class DeepBodyFullTest(unittest.TestCase):
+    """[483 분석층 2026-07-02] ENABLE_FDA_483_DEEP on 일 때만 PDF 전문을 raw.fda483_body_full 로
+    보존해 deep_analysis fan-out 입력으로 쓴다. 결정론 Observation(ENABLE_FDA_483_OBSERVATIONS)과
+    독립. 파싱 불가(스캔본/표지-only)면 body_full 미기록(graceful — 요약카드·결정론 상세 유지)."""
+
+    SAMPLE = ("Cover. I/WE OBSERVED: OBSERVATION 1 There is a failure to review unexplained "
+              "discrepancies. OBSERVATION 2 Sampling plans are not documented at performance. "
+              "SEE REVERSE FORM FDA 483")
+
+    def test_deep_flag_off_no_body_full(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "false"}), \
+                _Patched(json_rows=[_json_row(6201)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda483_body_full", items[0].raw_payload)
+        self.assertFalse(f.LAST_HEALTH["fda_483_deep"]["enabled"])
+        self.assertEqual(f.LAST_HEALTH["fda_483_deep"]["stored"], 0)
+
+    def test_deep_flag_on_stores_full_text_and_health(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true"}), \
+                _Patched(json_rows=[_json_row(6202)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(items[0].raw_payload["fda483_body_full"], self.SAMPLE)
+        h = f.LAST_HEALTH["fda_483_deep"]
+        self.assertTrue(h["enabled"])
+        self.assertEqual((h["attempted"], h["stored"], h["failed"]), (1, 1, 0))
+
+    def test_deep_independent_of_observations_flag(self):
+        # deep on·observations off → 전문(body_full)은 저장되지만 결정론 상세 키는 부재(독립).
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true",
+                                     "ENABLE_FDA_483_OBSERVATIONS": "false"}), \
+                _Patched(json_rows=[_json_row(6203)], html_rows=[], pdf_text=self.SAMPLE):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIn("fda483_body_full", items[0].raw_payload)
+        self.assertNotIn("fda_483_observations", items[0].raw_payload)
+
+    def test_deep_garbage_pdf_degrades_gracefully(self):
+        # 앵커 없는 표지-only(파싱 0) → body_full 미기록·failed=1, 요약카드/결정론 상세 유지.
+        with patch.dict(os.environ, {"ENABLE_FDA_483_DEEP": "true"}), \
+                _Patched(json_rows=[_json_row(6204)], html_rows=[],
+                         pdf_text="cover page with no observation anchors"):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertNotIn("fda483_body_full", items[0].raw_payload)
+        self.assertEqual(f.LAST_HEALTH["fda_483_deep"]["failed"], 1)
+
+    def test_fetch_pdf_text_uses_full_483_cap_by_default(self):
+        # ★라이브 경로 절단 회귀: _fetch_fda483_pdf_text 는 기본으로 483 전용 200000 상한을
+        #   _extract_pdf_text 에 넘긴다(공유 GMP 12000 기본이 아님). 이걸 되돌리면(=default 없이
+        #   호출) 결정론 Observation·deep 전문이 다시 앞 2~3건에서 잘린다(PR #57 미해결분).
+        captured = {}
+
+        def _cap_stub(data, max_chars=None):
+            captured["max_chars"] = max_chars
+            return "text", "pdf-ok"
+        with patch.object(g, "_extract_pdf_text", _cap_stub), \
+                patch.object(f, "http_get_bytes", _StubBytes()):
+            f._fetch_fda483_pdf_text("https://x/media/1/download")   # 기본 상한
+        self.assertEqual(captured["max_chars"], f.FDA483_TEXT_MAX_CHARS)
+
+    def test_live_loop_long_483_extracts_all_observations(self):
+        # ★엔드투엔드 절단 회귀: 라이브 수집 루프(_fetch→_extract_from_text)가 8쪽+ 483 의
+        #   Observation 을 전건 추출해야 한다. max_chars 를 실제로 존중하는 스텁으로 절단 경계를
+        #   재현 — 12000 이면 앞 2~3건만, 200000 이면 6건 전부(수정 없으면 이 테스트가 실패한다).
+        filler = " The inspection team reviewed additional batch records in detail." * 50
+        long_text = "I/WE OBSERVED: " + "".join(
+            f"OBSERVATION {n} Deficiency {n} concerns inadequate process control.{filler}"
+            for n in range(1, 7))
+        self.assertGreater(long_text.index("OBSERVATION 6"), 12000)   # 6번째는 12000자 이후
+
+        def _honor_cap(data, max_chars=12000):        # 실 엔진처럼 상한을 존중(GMP 기본=12000)
+            return long_text[:max_chars], "pdf-ok"
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "true"}), \
+                _Patched(json_rows=[_json_row(6301)], html_rows=[], pdf_text=long_text), \
+                patch.object(g, "_extract_pdf_text", _honor_cap):   # _Patched 의 무시-스텁 위에 덮어씀
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        obs = items[0].raw_payload["fda_483_observations"]
+        self.assertEqual([o["number"] for o in obs], ["1", "2", "3", "4", "5", "6"])
 
 
 class ObservationTruncationTest(unittest.TestCase):

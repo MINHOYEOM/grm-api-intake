@@ -162,5 +162,54 @@ class CliTest(unittest.TestCase):
             self.assertEqual(deltas["WL-1"]["source_text"], _BODY)
 
 
+# ── [FDA 483 분석층 2026-07-02] card_type 이 Job → 게이트로 흘러 유형별 게이트를 고른다 ──────
+_FDA483_BODY = (
+    "During an inspection of your firm we observed OBSERVATION 1 that OOS results were "
+    "invalidated without scientific justification and discrepancies were not investigated. "
+    "OBSERVATION 2 aseptic processing areas were not adequately monitored and records were incomplete."
+)
+_FDA483_DA = {
+    "key_violations": [
+        {"citation": "21 CFR 211.192",   # 원문(관찰사항)엔 CFR 명시 없음 → 483 은 D2 WARN(비차단)
+         "description": "OOS 결과를 과학적 근거 없이 무효화하고 불일치 조사를 문서화하지 않음",
+         "risk": "불량 배치가 시장에 유통될 위험"},
+    ],
+    "inspectional_significance": "데이터 무결성·무균 관리의 systemic 결함으로 Warning Letter 승격 가능성이 있다.",
+    "required_remediation": {"deadline": "483 수령 후 15영업일 이내 서면 회신",
+                             "items": ["OOS 조사 절차를 재수립하고 소급 검토를 수행한다"]},
+    "administrative_risks": "미시정 시 Warning Letter·Import Alert 로 이어질 수 있다.",
+}
+
+
+class CardTypeFlowTest(unittest.TestCase):
+    def test_build_jobs_carries_kind_as_card_type(self):
+        handoff = [{"card_id": "fda_483::D-1", "kind": "fda-483", "deep_analysis_ready": True,
+                    "deep_analysis_input": {"body_full": _FDA483_BODY}}]
+        jobs = fo.build_jobs(handoff)
+        self.assertEqual(jobs[0].card_type, "fda-483")
+        self.assertEqual(jobs[0].to_dict()["card_type"], "fda-483")
+
+    def test_build_jobs_missing_kind_omits_card_type(self):
+        jobs = fo.build_jobs([{"card_id": "x::y", "deep_analysis_ready": True,
+                               "deep_analysis_input": {"body_full": _FDA483_BODY}}])
+        self.assertEqual(jobs[0].card_type, "")
+        self.assertNotIn("card_type", jobs[0].to_dict())   # 빈값은 직렬화 생략(후방호환)
+
+    def test_dict_job_roundtrips_card_type(self):
+        r = fo.assemble_deltas(
+            [{"document_id": "D-1", "body_full": _FDA483_BODY, "card_type": "fda-483"}],
+            {"D-1": _FDA483_DA})
+        self.assertIn("D-1", r.deltas)     # 483 스키마·D2 WARN 로 병합
+
+    def test_483_ungrounded_cfr_merges_via_card_type(self):
+        # card_type 이 게이트에 흘러 483 스키마(inspectional_significance)·D2 WARN 적용 →
+        # CFR 미근거여도 병합(WL 이면 하드 FAIL·보류 — gate 테스트가 대조군을 잠근다).
+        jobs = [fo.Job("D-1", _FDA483_BODY, card_type="fda-483")]
+        r = fo.assemble_deltas(jobs, {"D-1": _FDA483_DA})
+        self.assertIn("D-1", r.deltas)
+        self.assertEqual(r.merged, 1)
+        self.assertEqual(r.deltas["D-1"], {"deep_analysis": _FDA483_DA, "source_text": _FDA483_BODY})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -45,6 +45,7 @@ __all__ = [
     "WebDeterministicDetailTest",
     "WebFda483DeterministicDetailTest",
     "WebFda483DeepAnalysisTest",
+    "WebMonoLabelsContractTest",
 ]
 
 
@@ -1132,6 +1133,37 @@ class WebFda483DeepAnalysisTest(unittest.TestCase):
         self.assertIn("실사의미", block)
         self.assertNotIn("처분근거", block)
         self.assertNotIn("대응조치", block)
+
+
+class WebMonoLabelsContractTest(unittest.TestCase):
+    """render.MONO_LABELS ↔ card_scaffold._w2_rows 라벨 어휘 계약(교차 모듈 드리프트 가드).
+
+    MONO_LABELS 는 `_w2_rows` 가 산출하는 라벨명을 문자열로 재기술한다(facts.label 매칭 시
+    mono 렌더). `_w2_rows` 가 라벨을 rename 하면 매칭이 조용히 끊겨 mono 표기가 소실된다(무경보).
+    골든 web-card(tests/golden/*.webcard.json)의 실제 facts 라벨 어휘로 이 결합을 고정한다.
+    셋은 현행 실측 고정(배치2 P1 §Phase2).
+    """
+
+    _SCAFFOLD_GOLDEN = WEB_DIR.parent / "tests" / "golden"
+
+    def _produced_labels(self) -> set:
+        labels: set = set()
+        for fn in sorted(self._SCAFFOLD_GOLDEN.glob("*.webcard.json")):
+            card = json.loads(fn.read_text(encoding="utf-8"))
+            for fact in card.get("facts") or []:
+                if isinstance(fact, dict) and "label" in fact:
+                    labels.add(fact["label"])
+        return labels
+
+    def test_mono_labels_vocabulary_pinned(self):
+        produced = self._produced_labels()
+        self.assertTrue(produced, "웹카드 골든에서 facts 라벨을 수집하지 못함")
+        # mono 4종은 실제 산출 어휘에 존재(mono 렌더 활성) — 라벨 rename 시 red.
+        self.assertEqual(render.MONO_LABELS & produced,
+                         {"발행일", "문서번호", "실사일", "Class"})
+        # '회수 등급' = `_w2_rows` 미산출 dormant 라벨(현행 실측 고정 · 배치2 보고).
+        # 신규 고아 추가·산출 어휘 변경 시 red.
+        self.assertEqual(render.MONO_LABELS - produced, {"회수 등급"})
 
 
 if __name__ == "__main__":

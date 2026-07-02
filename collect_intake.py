@@ -49,6 +49,7 @@ import requests
 
 from grm_common import (
     HTTPClientError,
+    env_flag,
     http_get_json,
     http_get_xml,
     log,
@@ -2113,9 +2114,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     403/timeout 시 WARN 로그 후 빈 결과 반환.
     """
     log("INFO", f"FDA WL 수집: {FDA_WL_URL}")
-    wl_body_enabled = os.environ.get("ENABLE_WL_BODY", "false").lower() == "true"
+    wl_body_enabled = env_flag("ENABLE_WL_BODY")
     # [WL 심층분석 fan-out] 전문 확보 게이트 — ENABLE_WL_BODY 와 독립(둘 다 off 가 기본).
-    wl_body_full_enabled = os.environ.get("ENABLE_WL_BODY_FULL", "false").lower() == "true"
+    wl_body_full_enabled = env_flag("ENABLE_WL_BODY_FULL")
     # P1: excerpt 시도/실패 집계 — 시작 시점에 전역을 교체해(이른 return 포함) 항상
     # 이번 호출 분만 남긴다. dict 는 in-place 갱신이라 이후 증가분이 그대로 반영.
     global LAST_WL_HEALTH
@@ -2976,7 +2977,7 @@ def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
 
 def _enable_handoff_v2() -> bool:
     """handoff v2 feature flag (기본 off, vars fallback 패턴). 운영 전환은 K3 와 함께."""
-    return os.environ.get("ENABLE_HANDOFF_V2", "false").lower() == "true"
+    return env_flag("ENABLE_HANDOFF_V2")
 
 
 def _enable_web_brief_emit() -> bool:
@@ -2987,7 +2988,7 @@ def _enable_web_brief_emit() -> bool:
     `inject_slots` 로 주입만 하면 그 주 산문 발행(1회용 파서·수기 fixture 제거). raw 가
     살아있는 handoff v2 카드 producer 를 재사용하므로 ENABLE_HANDOFF_V2 전제(아래 emit 분기).
     """
-    return os.environ.get("ENABLE_WEB_BRIEF_EMIT", "false").lower() == "true"
+    return env_flag("ENABLE_WEB_BRIEF_EMIT")
 
 
 def resolve_web_brief_dir() -> str:
@@ -3006,7 +3007,7 @@ def _enable_handoff_idempotency_v2() -> bool:
     사람 승인으로(Notion 'Handoff Ref' rich_text 속성 사전 생성 필요 — preflight 가
     부재를 감지하면 그 실행만 v1 으로 폴백). ENABLE_HANDOFF_V2(payload 스키마)와 직교.
     """
-    return os.environ.get("ENABLE_HANDOFF_IDEMPOTENCY_V2", "false").lower() == "true"
+    return env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2")
 
 
 # v2 row 에 보존할 v1 호환 필드(whitelist) — _intake_page_snapshot() 스키마.
@@ -3676,7 +3677,7 @@ def build_notion_properties(item: IntakeItem, run_date: date,
     # ── 제품군(Modality) 태그 (제품군 확장) ─────────────────────────────────────
     # ENABLE_MODALITY_TAG=true 이고 Notion 에 'Modality' select 속성이 있을 때만 기록.
     # (기본 false — 속성 미생성 상태로 운영에 머지돼도 insert 가 깨지지 않도록 안전 게이트)
-    if os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true":
+    if env_flag("ENABLE_MODALITY_TAG"):
         modality = compute_modality(
             item.raw_payload, item.headline, item.body,
             item.type_or_class, item.firm,
@@ -4512,26 +4513,21 @@ def main() -> int:
     data_go_kr_key = os.environ.get("DATA_GO_KR_KEY", "").strip()
     data_go_kr_service_key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
     law_go_kr_oc = os.environ.get("LAW_GO_KR_OC", "").strip()
-    enable_search = os.environ.get("ENABLE_SEARCH", "false").lower() == "true"
-    enable_mfds = os.environ.get("ENABLE_MFDS", "false").lower() == "true"
-    enable_mfds_law = os.environ.get("ENABLE_MFDS_LAW", "false").lower() == "true"
-    enable_mfds_recall = os.environ.get("ENABLE_MFDS_RECALL", "false").lower() == "true"
-    enable_mfds_admin = os.environ.get("ENABLE_MFDS_ADMIN", "false").lower() == "true"
-    enable_mfds_gmp_cert = os.environ.get("ENABLE_MFDS_GMP_CERT", "false").lower() == "true"
-    enable_mfds_safety_letter = os.environ.get("ENABLE_MFDS_SAFETY_LETTER", "false").lower() == "true"
-    enable_mfds_gmp_inspection = os.environ.get("ENABLE_MFDS_GMP_INSPECTION", "false").lower() == "true"
-    enable_ich = (os.environ.get("ENABLE_ICH", "false").lower() == "true"
-                  or "ich" in active)
-    enable_who = (os.environ.get("ENABLE_WHO", "false").lower() == "true"
-                  or "who" in active)
-    enable_hc = (os.environ.get("ENABLE_HC", "false").lower() == "true"
-                 or "hc" in active)
-    enable_fda483 = (os.environ.get("ENABLE_FDA_483", "false").lower() == "true"
-                     or "fda483" in active)
-    enable_fda483_observations = os.environ.get(
-        "ENABLE_FDA_483_OBSERVATIONS", "false").lower() == "true"
-    enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
-    enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
+    enable_search = env_flag("ENABLE_SEARCH")
+    enable_mfds = env_flag("ENABLE_MFDS")
+    enable_mfds_law = env_flag("ENABLE_MFDS_LAW")
+    enable_mfds_recall = env_flag("ENABLE_MFDS_RECALL")
+    enable_mfds_admin = env_flag("ENABLE_MFDS_ADMIN")
+    enable_mfds_gmp_cert = env_flag("ENABLE_MFDS_GMP_CERT")
+    enable_mfds_safety_letter = env_flag("ENABLE_MFDS_SAFETY_LETTER")
+    enable_mfds_gmp_inspection = env_flag("ENABLE_MFDS_GMP_INSPECTION")
+    enable_ich = env_flag("ENABLE_ICH") or "ich" in active
+    enable_who = env_flag("ENABLE_WHO") or "who" in active
+    enable_hc = env_flag("ENABLE_HC") or "hc" in active
+    enable_fda483 = env_flag("ENABLE_FDA_483") or "fda483" in active
+    enable_fda483_observations = env_flag("ENABLE_FDA_483_OBSERVATIONS")
+    enable_moleg_api = env_flag("ENABLE_MOLEG_API")
+    enable_scrape = env_flag("ENABLE_SCRAPE")
     event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
     health_json_path = os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip()
     if enable_scrape:
@@ -4545,7 +4541,7 @@ def main() -> int:
     # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
     # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
     # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
-    modality_requested = os.environ.get("ENABLE_MODALITY_TAG", "false").lower() == "true"
+    modality_requested = env_flag("ENABLE_MODALITY_TAG")
     modality_preflight_disabled = False
     modality_preflight_skipped = False
     if modality_requested and notion_token and notion_db:
@@ -4565,8 +4561,7 @@ def main() -> int:
 
     # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
     # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
-    handoff_idem_requested = (os.environ.get("ENABLE_HANDOFF_IDEMPOTENCY_V2", "false")
-                              .lower() == "true")
+    handoff_idem_requested = env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2")
     handoff_idem_preflight_disabled = False
     handoff_idem_preflight_skipped = False
     if handoff_idem_requested and notion_token and notion_db:

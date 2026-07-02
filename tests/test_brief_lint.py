@@ -3,6 +3,7 @@
 정상(handoff 근거 있음)·누출(m_99/m_218 근거 없음 → FAIL)·검증실패(오류 셸·검색 URL → WARN)
 케이스를 동결한다. W24 사고(handoff 근거 없는 mfds/brd/view.do 링크)의 회귀 잠금.
 """
+import glob
 import json
 import os
 import re
@@ -14,6 +15,7 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import brief_lint as bl  # noqa: E402
+import card_scaffold as cs  # noqa: E402
 
 
 # ── 대표 handoff rows(v2 형태 일부) ───────────────────────────────────────────
@@ -861,6 +863,69 @@ class _StubResp:
     def __init__(self, status, text):
         self.status_code = status
         self.text = text
+
+
+# ── PL18 ↔ card_scaffold 계약(교차 모듈 드리프트 가드, 배치2 P1 §Phase2) ─────────
+_GOLDEN_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "golden")
+
+
+def _scaffold_produced_labels() -> set:
+    """골든 web-card(*.webcard.json)의 facts 라벨 어휘 = card_scaffold._w2_rows 산출 라벨.
+
+    `to_web_card` 가 facts 를 `_w2_rows` 라벨 그대로 직렬화하므로, 골든 전 유형의 facts
+    라벨 합집합이 '현재 산출되는 W2 라벨 어휘'다(instruction: 골든서 수집 허용).
+    """
+    labels: set = set()
+    for fn in glob.glob(os.path.join(_GOLDEN_DIR, "*.webcard.json")):
+        with open(fn, encoding="utf-8") as f:
+            card = json.load(f)
+        for fact in card.get("facts") or []:
+            if isinstance(fact, dict) and "label" in fact:
+                labels.add(fact["label"])
+    return labels
+
+
+class ScaffoldCellContractTest(unittest.TestCase):
+    """PL18(`_SCAFFOLD_CELL_RE`·`_IDENTITY_CELL_LABELS`) ↔ `card_scaffold._table`/`_w2_rows` 계약.
+
+    PL18 은 scaffold W2 표 포맷을 정규식·라벨 화이트리스트로 '재기술'한다. `_table` 포맷이
+    바뀌거나 `_w2_rows` 가 identity 라벨을 rename 하면 PL18 은 셀 0건 매칭/미인식으로 '조용히
+    전부 통과'한다(발행 후 방어선 소실, 무경보). 실제 scaffold(골든 input 재사용)로 이 결합을
+    고정 — 드리프트 시 red. 셀 수·집합은 현행 실측 고정.
+    """
+
+    def _w2_cells(self, fixture: str):
+        with open(os.path.join(_GOLDEN_DIR, f"{fixture}.input.json"), encoding="utf-8") as f:
+            fx = json.load(f)
+        md = cs.build_card_scaffold(fx["row"], fx["raw"]).markdown
+        # W2 = 카드 markdown 의 첫 <table> 블록(이후 deterministic_detail 표와 격리).
+        m = re.search(r"<table>.*?</table>", md, re.S)
+        self.assertIsNotNone(m, f"{fixture}: W2 <table> 블록 없음")
+        return [(mm.group("label"), mm.group("value"))
+                for mm in bl._SCAFFOLD_CELL_RE.finditer(m.group(0))]
+
+    def test_regex_matches_real_table_format(self):
+        # ① `_table` 포맷 계약 — 실측 셀 수(fda483 5·admin 4). <tr><td>**라벨**</td><td>값</td>
+        #    형태가 바뀌면 매칭이 0/감소 → red(PL18 침묵 통과 차단).
+        self.assertEqual(len(self._w2_cells("fda_483")), 5)
+        self.assertEqual(len(self._w2_cells("admin_action_chemical")), 4)
+
+    def test_identity_labels_enforced_are_recognized(self):
+        # ② PL18 이 verbatim 강제하는 authoritative 소스(fda483·admin)의 identity 셀 라벨이
+        #    실제 산출되며 & 화이트리스트에 실존해야 강제가 실효한다. `_w2_rows` rename 또는
+        #    화이트리스트 누락 → red.
+        emitted_483 = {label for label, _ in self._w2_cells("fda_483")}
+        emitted_admin = {label for label, _ in self._w2_cells("admin_action_chemical")}
+        self.assertLessEqual({"제조소/업체", "시설 · 유형", "문서번호"}, emitted_483)
+        self.assertLessEqual({"업체", "문서번호"}, emitted_admin)
+        self.assertLessEqual({"제조소/업체", "시설 · 유형", "문서번호", "업체"},
+                             bl._IDENTITY_CELL_LABELS)
+
+    def test_identity_whitelist_orphans_pinned(self):
+        # `_IDENTITY_CELL_LABELS` 중 현행 `_w2_rows` 가 산출하지 않는 라벨(dormant/forward-compat).
+        # 현행 실측으로 고정 — 신규 고아 추가·산출 어휘 변경 시 red(리뷰 유도). 상세는 배치2 보고.
+        self.assertEqual(bl._IDENTITY_CELL_LABELS - _scaffold_produced_labels(),
+                         {"제품명", "회수 등급"})
 
 
 if __name__ == "__main__":

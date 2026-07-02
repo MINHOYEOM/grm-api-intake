@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 import os
+import re
 import sys
 import time
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timezone
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 from typing import Any
 
 import requests
@@ -44,6 +45,14 @@ def log(level: str, msg: str) -> None:
         encoding = sys.stdout.encoding or "utf-8"
         safe = line.encode(encoding, errors="replace").decode(encoding, errors="replace")
         print(safe, flush=True)
+
+
+def env_flag(name: str, default: bool = False) -> bool:
+    """ENABLE_* 플래그 단일 파서 — truthy = {"1","true","yes","on"} (case/공백 무시)."""
+    val = (os.environ.get(name) or "").strip().lower()
+    if not val:
+        return default
+    return val in ("1", "true", "yes", "on")
 
 
 def retry_after_seconds(resp: requests.Response, attempt: int, *, max_sleep: int = 60) -> int:
@@ -221,6 +230,96 @@ def datago_extract_items(
     total_count = parse_int_safe(body.get("totalCount"), 0)
     items = datago_normalize_items(body.get("items"))
     return items, page_no, num_rows, total_count, f"{result_code}:{result_msg}"
+
+
+def mask_service_key(url: str) -> str:
+    """data.go.kr/law.go.kr URL 의 serviceKey 값을 REDACTED 로 마스킹.
+
+    5개 수집기의 동일 구현을 단일화 — provenance(item.api_query)에 실 키가 새지 않게 한다.
+    """
+    return re.sub(r"([?&]serviceKey=)[^&]+", r"\1***REDACTED***", url)
+
+
+class DatagoPageError(RuntimeError):
+    """data.go.kr 페이지 요청 실패 — page_no·원인 첨부(수집기가 부분/치명 판정)."""
+
+    def __init__(self, page_no: int, cause: BaseException) -> None:
+        super().__init__(str(cause))
+        self.page_no = page_no
+        self.cause = cause
+
+
+class _DatagoPaginator:
+    """data.go.kr serviceKey JSON 엔드포인트 페이지네이션 이터레이터(4개 수집기 공용 골격).
+
+    각 페이지 ``(raw_items, masked_url)`` 를 yield. 현행 수집기 루프 의미 보존:
+      · params = ``{serviceKey, pageNo, numOfRows, type:json, **extra_params}`` (원 순서 동일)
+      · masked_url = ``mask_service_key(endpoint?urlencode(params))`` — item provenance 바이트 동일
+      · ``http_get(endpoint, params=, timeout=, retries=)`` → ``extract(data)`` 5-튜플
+        ``(raw_items, response_page, num_rows, total_count, status)``
+      · status ``'00:'`` 로 시작하지 않으면 페이지 실패
+      · 빈 페이지 또는 ``response_page*num_rows >= total_count`` 시 종료
+      · ``pageNo > max_pages`` 소진 시 ``.truncated = True``
+    페이지 실패는 ``DatagoPageError(page_no, cause)`` raise — 수집기가 items 유무로 부분(WARN)/
+    치명(error) 판정한다(소스별 실패·truncated 문구·health 의미는 수집기 소유 → 로깅은 수집기가
+    담당; 제너릭 on_warn 미도입). ``extract``·``http_get`` 은 수집기 네임스페이스의 것을 주입받아
+    기존 단위테스트의 monkeypatch 호환을 유지한다.
+    """
+
+    def __init__(self, endpoint: str, *, service_key: str, extract, http_get,
+                 max_pages: int, page_size: int = 100,
+                 extra_params: dict[str, Any] | None = None,
+                 timeout: int = 30, retries: int = 2) -> None:
+        self.endpoint = endpoint
+        self.service_key = service_key
+        self.extract = extract
+        self.http_get = http_get
+        self.max_pages = max_pages
+        self.page_size = page_size
+        self.extra_params = extra_params or {}
+        self.timeout = timeout
+        self.retries = retries
+        self.truncated = False
+        self.total_count = 0
+
+    def __iter__(self):
+        page_no = 1
+        while page_no <= self.max_pages:
+            params = {
+                "serviceKey": self.service_key,
+                "pageNo": page_no,
+                "numOfRows": self.page_size,
+                "type": "json",
+            }
+            params.update(self.extra_params)
+            masked_url = mask_service_key(self.endpoint + "?" + urlencode(params))
+            try:
+                data = self.http_get(self.endpoint, params=params,
+                                     timeout=self.timeout, retries=self.retries)
+                raw_items, response_page, num_rows, total_count, status = self.extract(data)
+                if not status.startswith("00:"):
+                    raise RuntimeError(f"API status {status}")
+            except Exception as e:  # noqa: BLE001
+                raise DatagoPageError(page_no, e) from e
+            self.total_count = total_count
+            if not raw_items:
+                return
+            yield raw_items, masked_url
+            if total_count and response_page * num_rows >= total_count:
+                return
+            page_no += 1
+        self.truncated = True
+
+
+def datago_paginate(endpoint: str, *, service_key: str, extract, http_get,
+                    max_pages: int, page_size: int = 100,
+                    extra_params: dict[str, Any] | None = None,
+                    timeout: int = 30, retries: int = 2) -> _DatagoPaginator:
+    """``_DatagoPaginator`` 팩토리 — 반복 후 ``.truncated``·``.total_count`` 조회. 상세는 클래스 docstring."""
+    return _DatagoPaginator(
+        endpoint, service_key=service_key, extract=extract, http_get=http_get,
+        max_pages=max_pages, page_size=page_size, extra_params=extra_params,
+        timeout=timeout, retries=retries)
 
 
 # ── HTML/bytes GET with retry ─────────────────────────────────────────────────

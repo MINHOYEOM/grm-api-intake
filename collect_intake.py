@@ -119,6 +119,30 @@ from grm_taxonomy import (
     compute_relevance,
 )
 
+# ── [배치5] Phase0 공용 relocate(SOURCE_*·truncate·chunk_text·_env_int·chunk상수) — grm_common 재수출(하위호환·테스트·위성 무수정) ──
+from grm_common import (
+    NOTION_RICH_TEXT_CHUNK,
+    SOURCE_BRAVE,
+    SOURCE_ECA,
+    SOURCE_EMA,
+    SOURCE_EPR,
+    SOURCE_FDA_483,
+    SOURCE_FDA_WL,
+    SOURCE_FR,
+    SOURCE_HANDOFF,
+    SOURCE_HC,
+    SOURCE_ICH,
+    SOURCE_MFDS,
+    SOURCE_MHRA,
+    SOURCE_PICS,
+    SOURCE_RAPS,
+    SOURCE_RECALL,
+    SOURCE_WHO,
+    _env_int,
+    chunk_text,
+    truncate,
+)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 상수
@@ -166,20 +190,7 @@ PROP_RAW_EXCERPT        = "Raw Excerpt"
 PROP_SEARCH_QUERY       = "Search Query"
 PROP_EVIDENCE_CANDIDATE = "Evidence Candidate"
 
-SOURCE_FR = "Federal Register"
-SOURCE_RECALL = "OpenFDA Recall"
 # v15.1 Phase 2 — RSS / HTML 소스
-SOURCE_EMA = "EMA"
-SOURCE_MHRA = "MHRA Inspectorate"
-SOURCE_PICS = "PIC/S"
-SOURCE_ECA = "ECA Academy"
-SOURCE_FDA_WL = "FDA Warning Letter"
-SOURCE_MFDS = "MFDS"
-SOURCE_ICH = "ICH"
-SOURCE_WHO = "WHO"
-SOURCE_HC = "Health Canada"
-SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — OII FOIA Reading Room 483 Observation (가장 깊은 결함 원본)
-SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
 HANDOFF_SCHEMA_VERSION_V2 = "grm-routine-handoff/v2"  # K2 단계 D (additive)
@@ -191,9 +202,6 @@ HANDOFF_SCHEMA_VERSION_V2 = "grm-routine-handoff/v2"  # K2 단계 D (additive)
 PROP_HANDOFF_REF = "Handoff Ref"
 
 # ── Phase 2a: Search / Scrape 소스 ──────────────────────────────────────────
-SOURCE_BRAVE = "Brave Search"
-SOURCE_RAPS  = "RAPS"
-SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
 
 # Source Type 분류 값 (Notion Select 옵션과 1:1 대응)
 PROP_SOURCE_TYPE = "Source Type"
@@ -332,7 +340,6 @@ FR_PER_PAGE = 100  # API 최대치
 OPENFDA_LIMIT = 100  # no-key 한도, key 있어도 안전치
 OPENFDA_MAX_TOTAL = 200  # 안전 상한 (의약품 리콜 주간 통상 < 50)
 
-NOTION_RICH_TEXT_CHUNK = 1900  # 2000 한도, 여유 100
 NOTION_CODE_BLOCK_CHUNK = 1900
 
 
@@ -663,31 +670,6 @@ def kst_run_date(now: datetime | None = None) -> date:
 def date_window(run_date: date, window_days: int = 7) -> tuple[date, date]:
     start = run_date - timedelta(days=window_days)
     return start, run_date
-
-
-def truncate(text: str, limit: int = NOTION_RICH_TEXT_CHUNK) -> str:
-    if text is None:
-        return ""
-    text = text.strip()
-    if len(text) <= limit:
-        return text
-    return text[: limit - 1] + "…"
-
-
-def chunk_text(text: str, size: int = NOTION_RICH_TEXT_CHUNK) -> list[str]:
-    if not text:
-        return [""]
-    return [text[i : i + size] for i in range(0, len(text), size)]
-
-
-def _env_int(name: str, default: int) -> int:
-    """환경변수를 정수로 안전 파싱. 비정상 값이면 WARN 후 default 사용 (graceful degradation)."""
-    raw = os.getenv(name, str(default)).strip()
-    try:
-        return int(raw)
-    except ValueError:
-        log("WARN", f"{name}={raw!r} 정수 파싱 실패 — default {default} 사용")
-        return default
 
 
 # ─────────────────────────────────────────────────────────────────────────────

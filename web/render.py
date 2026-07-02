@@ -101,6 +101,26 @@ def _card_anchor(card: dict[str, Any]) -> str:
     return cid if cid else f"c{card.get('render_order')}"
 
 
+# ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
+def _deep_preview(da: dict[str, Any] | None) -> str:
+    """분석층(deep) 접힘 summary 에 붙는 내용 힌트 — 펼치기 전에 무엇이 들었는지 스캔용.
+    admin(처분근거) vs WL(대응조치)은 disposition_basis 유무로 구분. 결정론(값 재생성 0)."""
+    if not isinstance(da, dict):
+        return ""
+    kv = da.get("key_violations")
+    n = len(kv) if isinstance(kv, list) else 0
+    mid = "처분근거" if da.get("disposition_basis") else "대응조치"
+    parts = ([f"위반 {n}건"] if n else []) + [mid, "행정리스크"]
+    return " · ".join(parts)
+
+
+def _detail_preview(detail: dict[str, Any] | None) -> str:
+    """FR 결정론 상세 접힘 summary 힌트 — 문서 유형(있으면) 또는 '규정 요지'."""
+    if not isinstance(detail, dict):
+        return ""
+    return detail.get("detail_kind") or "규정 요지"
+
+
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
 def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     quotes_in = card.get("quotes") or []
@@ -176,6 +196,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # [소스확장 2026-07-02] FR 결정론 상세보기(detail) — deep_analysis 와 동형으로 무가공
         # 통과. guidance(FR) 카드만 키 보유, 그 외/커밋 스냅샷은 부재 → 기존 골든 불변(additive).
         "detail": card.get("detail") or None,
+        # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
+        "deep_preview": _deep_preview(card.get("deep_analysis")),
+        "detail_preview": _detail_preview(card.get("detail")),
         "sources": sources,
     }
 

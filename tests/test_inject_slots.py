@@ -412,6 +412,10 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertNotIn("Overview", html)
         self.assertIn("15영업일 이내 서면 회신", html)   # deadline 한 줄
         self.assertIn("CAPA", html)                      # 체크리스트 항목 중 하나
+        # UI 보강(2-4): 해석 뱃지 + 신뢰 라벨 + 접힘 미리보기 태그.
+        self.assertIn("해석", html)
+        self.assertIn("원문 근거·검증", html)
+        self.assertIn("대응조치", html)                  # WL 미리보기 태그(위반 N건 · 대응조치 · …)
 
     def test_admin_deep_renders_korean_sections(self) -> None:
         # [소스확장 2026-07-02] 행정처분 카드 — 한글·기관중립 섹션명 렌더, WL 영문 헤더는 부재.
@@ -429,6 +433,10 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertIn("약사법 제38조제1항", html)
         self.assertNotIn("FDA's Evaluation of Response", html)  # WL 영문 헤더 미출현
         self.assertNotIn("Key Violations", html)
+        # UI 보강(2-4): 해석 뱃지·신뢰 라벨·미리보기 태그(admin=처분근거).
+        self.assertIn("해석", html)
+        self.assertIn("원문 근거·검증", html)
+        self.assertIn("처분근거", html)
 
     def test_fr_detail_renders_deterministic(self) -> None:
         # [소스확장 2026-07-02] Federal Register 결정론 상세보기 — abstract 전문·"원문 기반" 라벨.
@@ -445,7 +453,9 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertIn("원문 기반", html)                 # 결정론 신뢰 라벨
         self.assertIn("규정 요지", html)
         self.assertIn(raw["abstract"], html)             # abstract 전문(무절단) 렌더
-        self.assertNotIn("AI 심층분석", html)            # 분석층(deep) 라벨은 미출현(결정론)
+        # 결정론 상세는 분석층 신뢰라벨/해석 뱃지가 붙지 않는다(원문 기반 vs 원문 근거·검증).
+        self.assertNotIn("원문 근거·검증", html)
+        self.assertIn("Guidance", html)                  # 미리보기 태그 = 문서 유형
 
     def test_deep_analysis_markup_absent_for_ordinary_cards(self) -> None:
         fx = _load_input("warning_letter_chemical")   # wl_body_full 없음 — deep_analysis_ready=False

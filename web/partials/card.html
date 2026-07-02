@@ -69,7 +69,7 @@
       그 아래 공식원문 링크(.src)로 이어짐(단계적 노출: 요약 → 심층분석 → 원문). Overview 는
       §2.5 로 제거(summary 흡수). 섹션 헤더 = 원형번호 배지(①②③④, 폰트 비의존 CSS 원)
       + 세리프 소제목으로 4섹션 위계·가시성 확보. -#}
-  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>상세 분석 보기 <span class="sub">· AI 심층분석</span></summary>
+  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>상세 분석 보기 <span class="tag-interp">해석</span> <span class="sub">{% if card.deep_preview %}· {{ card.deep_preview }} {% endif %}· 원문 근거·검증</span></summary>
     {#- [소스확장 2026-07-02] admin-action(행정처분)은 disposition_basis 슬롯 보유 → 한글·기관중립
         섹션명. WL(disposition_basis 부재)은 기존 영문 그대로 = 바이트 불변. -#}
     {%- set da_admin = card.deep_analysis.disposition_basis %}
@@ -137,7 +137,7 @@
   {#- [소스확장 2026-07-02] Federal Register 결정론 상세보기 — LLM 없음(원문 abstract 무변형).
       분석층(deep)이 "AI 생성 해석"인 것과 달리 여기는 DB 사실이라 신뢰 라벨이 "원문 기반".
       deep 스타일 재사용(.block.deep) — 단일 섹션이라 원형번호 배지는 생략. -#}
-  <details class="block deep detail"><summary class="lab"><i class="ti ti-file-text"></i>상세 보기 <span class="sub">· 원문 기반</span></summary>
+  <details class="block deep detail"><summary class="lab"><i class="ti ti-file-text"></i>상세 보기 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% endif %}· 원문 기반</span></summary>
     {%- if card.detail.summary_full %}
     <div class="deep-sec"><div class="deep-h"><span class="deep-t">규정 요지{% if card.detail.detail_kind %} <span class="sub">· {{ card.detail.detail_kind }}</span>{% endif %}</span></div><p>{{ card.detail.summary_full }}</p></div>
     {%- endif %}

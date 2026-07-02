@@ -408,7 +408,7 @@ class EvaluateHealthExcerptDegradedTest(unittest.TestCase):
 
 
 class EvaluateHealthFda483DegradedTest(unittest.TestCase):
-    """WHY-1 #3 P1 — 483 excerpt 실패/cap·표 절단은 warning-only(failure 승격 금지).
+    """FDA 483 excerpt/Observation/source degrade 는 warning-only(failure 승격 금지).
 
     카드 자체는 graceful degrade(메타 카드 유지)이므로 수집 성공이며, 조용한 실패/
     완전성 미보장만 표면화한다. flag off(시도 0·truncated 0)면 finding 미발생.
@@ -437,11 +437,22 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
         self.assertEqual(health.exit_code, 0)
 
     def test_fda483_source_degraded_is_warning(self) -> None:
-        # JSON 전수 경로 실패 → HTML 폴백(부분) = warning(완전성 미보장 표면화).
+        # DataTables AJAX 실패 → 정적 HTML fallback(부분) = warning(완전성 미보장 표면화).
         stats = ci.CollectionStats()
         stats.fda483_source_degraded = 1
         health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
         self.assertIn("fda483-source-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_fda483_observations_failed_is_warning(self) -> None:
+        stats = ci.CollectionStats()
+        stats.fda483_observations_enabled = True
+        stats.fda483_observations_attempted = 3
+        stats.fda483_observations_extracted = 1
+        stats.fda483_observations_failed = 2
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-observations-degraded", _codes(health.warnings))
         self.assertEqual(health.failures, [])
         self.assertEqual(health.exit_code, 0)
 
@@ -455,6 +466,7 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
                     stats=stats, enable_fda483=True))
                 self.assertNotIn("fda483-excerpt-degraded", _codes(health.warnings))
                 self.assertNotIn("fda483-source-degraded", _codes(health.warnings))
+                self.assertNotIn("fda483-observations-degraded", _codes(health.warnings))
                 self.assertEqual(health.status, "ok")
                 self.assertEqual(health.exit_code, 0)
 

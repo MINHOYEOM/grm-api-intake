@@ -121,7 +121,7 @@ SOURCE_MFDS = "MFDS"
 SOURCE_ICH = "ICH"
 SOURCE_WHO = "WHO"
 SOURCE_HC = "Health Canada"
-SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — OII FOIA Reading Room 483/EIR (가장 깊은 결함 원본)
+SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — OII FOIA Reading Room 483 Observation (가장 깊은 결함 원본)
 SOURCE_HANDOFF = "GRM Handoff"
 TYPE_ROUTINE_HANDOFF = "routine-handoff"
 HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
@@ -674,7 +674,7 @@ class CollectionStats:
     hc_insert_failed: int = 0
     hc_error: bool = False
     hc_error_msg: str = ""
-    # ── WHY-1 #3: FDA 483/EIR ──────────────────────────────────────────────
+    # ── WHY-1 #3: FDA 483 ──────────────────────────────────────────────────
     fda483_fetched: int = 0
     fda483_inserted: int = 0
     fda483_skipped_dup: int = 0
@@ -683,11 +683,18 @@ class CollectionStats:
     fda483_error_msg: str = ""
     # P1: 483 excerpt 관측 — collect_fda_483.LAST_HEALTH 집계분. 실패/cap 은 graceful
     # (메타 카드 유지)이라 warning 으로만 표면화(flag off 면 0 → 무발생). source_degraded
-    # 는 JSON 전수 경로 사망 → HTML 폴백(부분·완전성 미보장) 신호.
+    # 는 DataTables AJAX 실패 → 정적 HTML 폴백(부분·완전성 미보장) 신호.
     fda483_excerpt_attempted: int = 0
     fda483_excerpt_failed: int = 0
     fda483_excerpt_capped: int = 0    # cap 도달 여부(0/1)
-    fda483_source_degraded: int = 0   # JSON 전수 실패→HTML 폴백 여부(0/1)
+    fda483_source_degraded: int = 0   # DataTables AJAX 실패→정적 HTML fallback 여부(0/1)
+    # [FDA 483 상세보기 2026-07-02] Observation 구조 추출 관측 — 실패는 상세만 생략하고
+    # 요약카드 유지. ENABLE_FDA_483_OBSERVATIONS=false 면 enabled=false·카운터 0.
+    fda483_observations_enabled: bool = False
+    fda483_observations_attempted: int = 0
+    fda483_observations_extracted: int = 0
+    fda483_observations_failed: int = 0
+    fda483_observations_warnings: list[str] = field(default_factory=list)
 
     def total_insert_failures(self) -> int:
         return (
@@ -4046,7 +4053,7 @@ def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
         },
         {
             "key": "fda483",
-            "label": "FDA 483/EIR",
+            "label": "FDA 483",
             "fetched": stats.fda483_fetched,
             "inserted": stats.fda483_inserted,
             "skip_dup": stats.fda483_skipped_dup,
@@ -4215,7 +4222,7 @@ def _evaluate_health(
             (enable_ich and stats.ich_error, "ich", "ICH", stats.ich_error_msg),
             (enable_who and stats.who_error, "who", "WHO", stats.who_error_msg),
             (enable_hc and stats.hc_error, "health-canada", "Health Canada", stats.hc_error_msg),
-            (enable_fda483 and stats.fda483_error, "fda483", "FDA 483/EIR", stats.fda483_error_msg),
+            (enable_fda483 and stats.fda483_error, "fda483", "FDA 483", stats.fda483_error_msg),
         ]
 
         if not phase1_fr_active and not phase1_recall_active:
@@ -4253,7 +4260,7 @@ def _evaluate_health(
                 (enable_ich, "ich", "ICH", stats.ich_error, stats.ich_error_msg),
                 (enable_who, "who", "WHO", stats.who_error, stats.who_error_msg),
                 (enable_hc, "health-canada", "Health Canada", stats.hc_error, stats.hc_error_msg),
-                (enable_fda483, "fda483", "FDA 483/EIR", stats.fda483_error, stats.fda483_error_msg),
+                (enable_fda483, "fda483", "FDA 483", stats.fda483_error, stats.fda483_error_msg),
             ]
             active_phase2_sources = [row for row in phase2_source_states if row[0]]
             if active_phase2_sources and all(row[3] for row in active_phase2_sources):
@@ -4370,21 +4377,31 @@ def _evaluate_health(
             degraded.append("fetch cap 도달(이후 항목 excerpt 생략)")
         health.add_warning(
             "fda483-excerpt-degraded",
-            "FDA 483/EIR",
+            "FDA 483",
             f"483 결함 excerpt {' · '.join(degraded)} — 메타 카드 유지",
             f"attempted={stats.fda483_excerpt_attempted} "
             f"failed={stats.fda483_excerpt_failed} "
             f"capped={bool(stats.fda483_excerpt_capped)}",
         )
-    # P1-① 완전성 표면화: JSON 전수 경로 사망 → HTML 폴백(최신 ~10행, 부분)으로 수집했음을
+    if stats.fda483_observations_failed > 0:
+        health.add_warning(
+            "fda483-observations-degraded",
+            "FDA 483",
+            f"483 Observation 상세 추출 {stats.fda483_observations_failed}건 실패 — 요약카드 유지",
+            f"enabled={stats.fda483_observations_enabled} "
+            f"attempted={stats.fda483_observations_attempted} "
+            f"extracted={stats.fda483_observations_extracted} "
+            f"warnings={stats.fda483_observations_warnings[:3]}",
+        )
+    # 완전성 표면화: DataTables AJAX 실패 → 정적 HTML 10행 fallback 으로 부분 수집했음을
     # 알린다. warning-only — 수집 자체는 정상이나 이번 실행은 윈도우 전수성 미보장.
     if stats.fda483_source_degraded:
         health.add_warning(
             "fda483-source-degraded",
-            "FDA 483/EIR",
-            "483 전수(JSON) 경로 실패 — HTML 폴백(최신 ~10행)으로 부분 수집(완전성 미보장)",
-            "OII DataTables JSON 이 응답하지 않아 HTML 표(최신 ~10행)로 폴백. 더 오래 공개된 "
-            "in-window 483/EIR 가 누락됐을 수 있음 — 다음 실행 복구 확인/수동 점검 권장.",
+            "FDA 483",
+            "483 DataTables 페이지네이션 실패 — 정적 HTML 10행 fallback 으로 부분 수집(완전성 미보장)",
+            "OII 리딩룸 DataTables AJAX 가 응답하지 않아 HTML 본문 10행으로 폴백. "
+            "in-window 483 이 누락됐을 수 있음 — 다음 실행 복구 확인/수동 점검 권장.",
         )
 
     return health.finalize()
@@ -4511,6 +4528,8 @@ def main() -> int:
                  or "hc" in active)
     enable_fda483 = (os.environ.get("ENABLE_FDA_483", "false").lower() == "true"
                      or "fda483" in active)
+    enable_fda483_observations = os.environ.get(
+        "ENABLE_FDA_483_OBSERVATIONS", "false").lower() == "true"
     enable_moleg_api = os.environ.get("ENABLE_MOLEG_API", "false").lower() == "true"
     enable_scrape = os.environ.get("ENABLE_SCRAPE", "false").lower() == "true"
     event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
@@ -4876,10 +4895,10 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_HC=false — Health Canada 수집 건너뜀")
 
-    # ── WHY-1 #3: FDA 483/EIR (ENABLE_FDA_483=true 또는 --sources fda483) ─────
+    # ── WHY-1 #3: FDA 483 (ENABLE_FDA_483=true 또는 --sources fda483) ─────────
     fda483_items: list[IntakeItem] = []
     if enable_fda483:
-        log("INFO", "=== FDA 483/EIR 수집 시작 ===")
+        log("INFO", "=== FDA 483 수집 시작 ===")
         try:
             import collect_fda_483 as fda483_module
             # 483 은 publish date 지연공개형 → enforcement 윈도우(MFDS_ENFORCEMENT_WINDOW_DAYS) 사용
@@ -4895,12 +4914,18 @@ def main() -> int:
         stats.fda483_excerpt_failed = int(fda483_excerpt_health.get("failed") or 0)
         stats.fda483_excerpt_capped = int(bool(fda483_excerpt_health.get("capped")))
         stats.fda483_source_degraded = int(bool(fda483_health.get("source_degraded")))
+        fda483_obs_health = fda483_health.get("fda_483_observations") or {}
+        stats.fda483_observations_enabled = bool(fda483_obs_health.get("enabled"))
+        stats.fda483_observations_attempted = int(fda483_obs_health.get("attempted") or 0)
+        stats.fda483_observations_extracted = int(fda483_obs_health.get("extracted") or 0)
+        stats.fda483_observations_failed = int(fda483_obs_health.get("failed") or 0)
+        stats.fda483_observations_warnings = list(fda483_obs_health.get("warnings") or [])
         if fda483_err:
             stats.fda483_error = True
             stats.fda483_error_msg = fda483_err
-            log("WARN", f"FDA 483/EIR 오류: {fda483_err}")
+            log("WARN", f"FDA 483 오류: {fda483_err}")
     else:
-        log("INFO", "ENABLE_FDA_483=false — FDA 483/EIR 수집 건너뜀")
+        log("INFO", "ENABLE_FDA_483=false — FDA 483 수집 건너뜀")
 
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.pics_fetched
@@ -5203,6 +5228,7 @@ def main() -> int:
         "ENABLE_WHO": enable_who,
         "ENABLE_HC": enable_hc,
         "ENABLE_FDA_483": enable_fda483,
+        "ENABLE_FDA_483_OBSERVATIONS": enable_fda483_observations,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
@@ -5343,7 +5369,7 @@ def main() -> int:
                                       stats.hc_skipped_dup, stats.hc_insert_failed,
                                       stats.hc_error, stats.hc_error_msg))
                 if enable_fda483:
-                    f.write(_src_line("FDA 483/EIR", stats.fda483_fetched, stats.fda483_inserted,
+                    f.write(_src_line("FDA 483", stats.fda483_fetched, stats.fda483_inserted,
                                       stats.fda483_skipped_dup, stats.fda483_insert_failed,
                                       stats.fda483_error, stats.fda483_error_msg))
                 if enable_search:

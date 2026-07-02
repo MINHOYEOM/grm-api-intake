@@ -274,8 +274,8 @@ class CardScaffold:
             "checks": [],                 # LLM
             **({"deterministic_detail": detail} if detail else {}),
             # ^ [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 — WL deep_analysis(LLM 분석층)와
-            # 별개의 결정론 층(환각 0). `type` 분기: gmp-inspection 지적 표(gmp_deficiencies) ·
-            # [소스확장 2026-07-02] Federal Register abstract 전문(fr_summary). 없으면 키 자체
+            # 별개의 결정론 층(환각 0). `type` 분기: gmp-inspection 지적 표(gmp_deficiencies)·
+            # FDA 483 Observation(fda_483_observations). 없으면 키 자체
             # 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
             **({"deep_analysis": None} if self.deep_analysis_ready else {}),
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
@@ -499,6 +499,7 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
 # 7b. 결정론 상세보기 슬롯 (spec §16, 2026-07-02) — WL deep_analysis(LLM)와 별개 결정론 층
 # ─────────────────────────────────────────────────────────────────────────────
 _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup")
+_FDA483_OBSERVATION_ROW_KEYS = ("number", "deficiency", "detail")
 
 
 def _deterministic_detail(kind: str, row: dict[str, Any],
@@ -509,9 +510,8 @@ def _deterministic_detail(kind: str, row: dict[str, Any],
     환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 공개 사실을 그대로
     구조화). `type` 분기로 소스별 결정론 detail 확장:
       - `gmp_deficiencies` — gmp-inspection 지적사항 표(`raw.gmp_deficiencies`).
-      - `fr_summary` — [소스확장 2026-07-02] Federal Register abstract 전문(무절단) + 문서유형.
-        FR abstract 는 FDA 공식 요약이라 풍부(설계문서 §10·§15). W3 quote 는 250자 절단본이라
-        긴 abstract 는 상세가 값. abstract 부재면 None(graceful). 창작 0(DB 필드 무변형).
+      - `fda_483_observations` — FDA 483 Observation 번호 목록(`raw.fda_483_observations`).
+        해당 raw 필드 부재면 None(graceful). 창작 0(DB 필드 무변형).
     """
     raw = raw or {}
     if kind == "gmp-inspection":
@@ -535,14 +535,18 @@ def _deterministic_detail(kind: str, row: dict[str, Any],
                 "severity_summary": severity_summary,
                 "rows": norm,
             }
-    if kind == "guidance":  # Federal Register — 적용범위·기업대응(결정론 불가)·comment_close
-        abstract = (raw.get("abstract") or "").strip()   # (facts 의견기한 중복)은 생략(창작·중복 방지).
-        if abstract:
-            detail: dict[str, Any] = {"type": "fr_summary", "summary_full": abstract}
-            kind_label = _fr_detail_kind(row.get("type_or_class", ""))
-            if kind_label:
-                detail["detail_kind"] = kind_label
-            return detail
+    if kind == "fda-483":
+        obs = raw.get("fda_483_observations")
+        if isinstance(obs, list) and obs:
+            norm = [{k: str(o.get(k, "") or "") for k in _FDA483_OBSERVATION_ROW_KEYS}
+                    for o in obs if isinstance(o, dict)]
+            norm = [o for o in norm if o["deficiency"]]
+            if norm:
+                return {
+                    "type": "fda_483_observations",
+                    "count": len(norm),
+                    "observations": norm,
+                }
     return None
 
 
@@ -1229,36 +1233,6 @@ def _official_is_pdf(url: str) -> bool:
     """
     u = (url or "").lower().split("?", 1)[0].split("#", 1)[0]
     return u.endswith(".pdf") or u.endswith("/download")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# [소스확장 2026-07-02] Federal Register 문서유형 라벨 — `_deterministic_detail`(type=fr_summary)이
-# abstract 전문과 함께 낸다(웹 전용·LLM/게이트 없음, §16 deterministic_detail 로 통합).
-# ─────────────────────────────────────────────────────────────────────────────
-_FR_KIND_LABEL = {  # type_or_class → 사람이 읽는 문서 유형(detail_kind)
-    "rule": "Rule", "final-rule": "Rule", "notice-final": "Rule",
-    "proposed-rule": "Proposed Rule", "notice": "Notice",
-    "guidance-industry": "Guidance", "guidance": "Guidance",
-}
-
-
-def _fr_detail_kind(type_or_class: str) -> str:
-    """FR type_or_class → 문서 유형 라벨(Rule/Proposed Rule/Notice/Guidance). 미지 유형은
-    원문 값 그대로(무변형). 결정론(사실 재작성 0)."""
-    tc = (type_or_class or "").strip().lower()
-    if not tc:
-        return ""
-    if tc in _FR_KIND_LABEL:
-        return _FR_KIND_LABEL[tc]
-    if "proposed" in tc:
-        return "Proposed Rule"
-    if "rule" in tc:
-        return "Rule"
-    if "notice" in tc:
-        return "Notice"
-    if "guidance" in tc:
-        return "Guidance"
-    return type_or_class
 
 
 def _plain(value: str) -> str:

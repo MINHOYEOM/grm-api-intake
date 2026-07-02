@@ -44,7 +44,7 @@ FIXTURES = [
 # watch 섹션(legislative_notice)은 v1 카드 아님(§3.3) → per-card web 골든 미동결(to_web_card
 # 는 watch 로 호출되지 않음; brief 제외는 WebBriefGoldenTest 가 검증).
 WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
-    "who_inspection_excerpt", "warning_letter_excerpt", "fda_483",
+    "who_inspection_excerpt", "warning_letter_excerpt", "fda_483", "fda_483_observations",
     # [상세보기 결정론 승격 2026-07-02 · spec §16] gmp-inspection deterministic_detail —
     # periodic(지적 표 有 → deterministic_detail) + pre_market(표 無 → 필드 부재). web-card 전용
     # (FIXTURES 미포함 → brief golden·intake_total 불변).
@@ -716,6 +716,38 @@ class Fda483GoldenTest(unittest.TestCase):
         self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
 
 
+class Fda483DeterministicDetailTest(unittest.TestCase):
+    """FDA 483 Observation 결정론 상세보기 — raw.fda_483_observations 가 있을 때만 web-card 추가."""
+
+    def test_fda483_observations_emit_detail(self) -> None:
+        fx = _load_input("fda_483_observations")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        dd = wc["deterministic_detail"]
+        self.assertEqual(dd["type"], "fda_483_observations")
+        self.assertEqual(dd["count"], 2)
+        self.assertEqual(dd["observations"][0]["number"], "1")
+        self.assertIn("failure to thoroughly review", dd["observations"][0]["deficiency"])
+
+    def test_fda483_without_observations_has_no_detail(self) -> None:
+        fx = _load_input("fda_483")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_invalid_observation_rows_yield_no_detail(self) -> None:
+        fx = _load_input("fda_483")
+        raw = dict(fx["raw"])
+        raw["fda_483_observations"] = [{"number": 1, "deficiency": "", "detail": "x"}]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_non_483_ignores_observation_raw(self) -> None:
+        fx = _load_input("warning_letter_chemical")
+        raw = dict(fx["raw"])
+        raw["fda_483_observations"] = [{"number": "1", "deficiency": "Do not render"}]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+
 def _callout_colors(md: str) -> list[str]:
     import re
     return re.findall(r'color="([a-z_]+)"', md)
@@ -1367,33 +1399,22 @@ class DeterministicDetailTest(unittest.TestCase):
 
 
 class FrDetailTest(unittest.TestCase):
-    """[소스확장 2026-07-02] Federal Register 결정론 상세보기 — §16 deterministic_detail(type=
-    fr_summary)로 통합(gmp_deficiencies 와 동일 슬롯·`type` 분기). 웹 전용·LLM 없음·additive."""
+    """[FR 상세보기 철회 2026-07-02] Federal Register 는 요약보강(6슬롯+듀얼링크)으로 복귀 —
+    결정론 상세보기(fr_summary)를 제거했다(마감일/시행일은 API 메타, 전문은 abstract=요약이라
+    증분 가치 없음). guidance 카드는 abstract 유무와 무관하게 deterministic_detail 미부착."""
 
-    def test_guidance_card_emits_fr_summary(self) -> None:
+    def test_guidance_card_has_no_detail(self) -> None:
+        # abstract 가 있어도 guidance 는 상세보기 미부착(요약카드) — FR 상세보기 철회 확인.
         fx = _load_input("guidance_fr")
         wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
-        self.assertIn("deterministic_detail", wc)
-        dd = wc["deterministic_detail"]
-        self.assertEqual(dd["type"], "fr_summary")
-        self.assertEqual(dd["summary_full"], fx["raw"]["abstract"])  # 전문·무변형
-        self.assertEqual(dd["detail_kind"], "Guidance")
-        self.assertNotIn("detail", wc)          # 구 별도 키 제거(통합 확인)
-
-    def test_long_abstract_not_truncated(self) -> None:
-        # 상세는 abstract 전문(무절단) — quote(250자 절단)와 달리 긴 abstract 를 온전히 보여준다.
-        fx = _load_input("guidance_fr")
-        raw = dict(fx["raw"])
-        raw["abstract"] = "A" * 400 + ". " + "B" * 400 + "."
-        dd = cs.build_card_scaffold(fx["row"], raw).to_web_card({})["deterministic_detail"]
-        self.assertEqual(dd["summary_full"], raw["abstract"])
-        self.assertGreater(len(dd["summary_full"]), 250)
+        self.assertNotIn("deterministic_detail", wc)
+        self.assertNotIn("detail", wc)
 
     def test_no_abstract_no_detail(self) -> None:
         fx = _load_input("guidance_fr")
         raw = dict(fx["raw"]); raw.pop("abstract", None)
         wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
-        self.assertNotIn("deterministic_detail", wc)   # graceful — 제목 수준 데이터엔 상세 미부착
+        self.assertNotIn("deterministic_detail", wc)
 
     def test_non_guidance_non_gmp_cards_have_no_detail(self) -> None:
         for name in ("mfds_notice", "ich_guideline", "openfda_recall_chemical",
@@ -1403,15 +1424,6 @@ class FrDetailTest(unittest.TestCase):
                 wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
                 self.assertNotIn("deterministic_detail", wc)
                 self.assertNotIn("detail", wc)
-
-    def test_detail_kind_mapping(self) -> None:
-        self.assertEqual(cs._fr_detail_kind("proposed-rule"), "Proposed Rule")
-        self.assertEqual(cs._fr_detail_kind("notice-final"), "Rule")
-        self.assertEqual(cs._fr_detail_kind("Final Rule"), "Rule")
-        self.assertEqual(cs._fr_detail_kind("notice"), "Notice")
-        self.assertEqual(cs._fr_detail_kind("guidance-industry"), "Guidance")
-        self.assertEqual(cs._fr_detail_kind("메타-미지유형"), "메타-미지유형")  # 무변형 passthrough
-        self.assertEqual(cs._fr_detail_kind(""), "")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,71 @@
+{
+  "agency": "FDA",
+  "card_type": "FDA 483 실사 관찰",
+  "category": "Other",
+  "checks": [],
+  "deterministic_detail": {
+    "count": 2,
+    "observations": [
+      {
+        "deficiency": "There is a failure to thoroughly review any unexplained discrepancy.",
+        "detail": "The investigation did not extend to other potentially affected batches.",
+        "number": "1"
+      },
+      {
+        "deficiency": "Established sampling plans are not documented at the time of performance.",
+        "detail": "Sampling records were completed after the operation.",
+        "number": "2"
+      }
+    ],
+    "type": "fda_483_observations"
+  },
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-05-27"
+    },
+    {
+      "label": "문서번호",
+      "value": "fda483-192439"
+    },
+    {
+      "label": "제조소/업체",
+      "value": "BPI Labs, LLC · FEI 3015156709"
+    },
+    {
+      "label": "시설 · 유형",
+      "value": "Outsourcing Facility · 483"
+    },
+    {
+      "label": "실사일",
+      "value": "04/17/2026"
+    }
+  ],
+  "group": "글로벌",
+  "group_label": null,
+  "headline_target": "BPI Labs, LLC",
+  "id": "fda483-192439",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": "💊 합성의약품",
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "High",
+  "signal_tier": 3,
+  "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": true,
+    "official_url": "https://www.fda.gov/media/192439/download"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "483"
+}

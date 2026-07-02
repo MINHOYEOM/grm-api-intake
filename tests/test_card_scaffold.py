@@ -767,6 +767,35 @@ class AdminL1VerifyTest(unittest.TestCase):
             cs._official_label("https://www.data.go.kr/data/15058457/openapi.do", True),
             "공식원본(데이터셋)")
 
+    # ── [소스확장 2026-07-02] 검사·실사 결과 PDF 링크 승격 ──────────────────────────────
+    def test_who_inspection_promotes_result_pdf(self):
+        # WHOPIR 결과 PDF(raw.pdf_url)가 공식원본으로 승격(종전 official_url=HTML 페이지).
+        row = {"official_url": "https://who.int/whopir-site-z"}
+        raw = {"pdf_url": "https://who.int/files/whopir-z.pdf"}
+        _info, official, _fb = cs._dual_links("who-inspection", row, raw)
+        self.assertEqual(official, "https://who.int/files/whopir-z.pdf")
+        self.assertTrue(cs._official_is_pdf(official))
+
+    def test_who_inspection_falls_back_without_pdf(self):
+        # pdf_url 부재 시 official_url 로 graceful 폴백.
+        row = {"official_url": "https://who.int/whopir-site-z"}
+        _info, official, _fb = cs._dual_links("who-inspection", row, {})
+        self.assertEqual(official, "https://who.int/whopir-site-z")
+
+    def test_gmp_inspection_download_url_fallback(self):
+        # source_url 부재 시 raw.download_url(결과 PDF)로 폴백(belt-and-suspenders).
+        row = {}
+        raw = {"download_url": "https://nedrug.mfds.go.kr/download/gmp-0007.pdf"}
+        _info, official, _fb = cs._dual_links("gmp-inspection", row, raw)
+        self.assertEqual(official, "https://nedrug.mfds.go.kr/download/gmp-0007.pdf")
+
+    def test_who_noc_unchanged_by_inspection_promotion(self):
+        # who-noc/who-news 는 else 경로 유지 — pdf_url 이 있어도 official_url 만 노출.
+        row = {"official_url": "https://who.int/noc-page"}
+        raw = {"pdf_url": "https://who.int/should-not-use.pdf"}
+        _info, official, _fb = cs._dual_links("who-noc", row, raw)
+        self.assertEqual(official, "https://who.int/noc-page")
+
 
 class WebCardGoldenTest(unittest.TestCase):
     """P1 — `grm-web-card/v1` 카드 직렬화 골든 + 필드 소유권/verbatim/불변식.

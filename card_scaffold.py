@@ -585,11 +585,19 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
                           "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts")
         fallback = not row.get("official_url")
     elif kind == "gmp-inspection":
-        official = _first(row.get("source_url"), row.get("official_url"))
+        # [소스확장 2026-07-02] 실사 결과 PDF 를 공식원본으로 노출(설계문서 §11·§15). 라이브
+        # 수집기는 source_url=download_url 이나, download_url raw 키도 폴백에 넣어(belt-and-
+        # suspenders) 결과문서 누락을 막는다(픽스처엔 둘 다 부재 → official="" 유지, golden 불변).
+        official = _first(row.get("source_url"), raw.get("download_url"), row.get("official_url"))
+    elif kind == "who-inspection":
+        # [소스확장 2026-07-02] WHOPIR 결과 PDF(raw.pdf_url)를 공식원본으로 승격 — 종전엔
+        # HTML 실사 페이지(official_url)만 노출돼 실제 결과문서가 클릭 불가였다. pdf_url 부재
+        # 시 official_url 로 graceful 폴백(who-noc/who-news 는 아래 else 유지 — 변경 없음).
+        official = _first(raw.get("pdf_url"), row.get("official_url"))
     elif kind == "fda-483":
         # L1 = 건별 483 PDF(/media/<id>/download). info = OII Reading Room(api_query/source_url).
         official = _first(raw.get("pdf_url"), row.get("official_url"))
-    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
+    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO(noc·news)/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
         official = _first(row.get("official_url"))
     return info, official, fallback
 

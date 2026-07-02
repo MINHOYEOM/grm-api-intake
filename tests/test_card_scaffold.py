@@ -1192,5 +1192,51 @@ class SignalDerivationTest(unittest.TestCase):
         self.assertEqual(cs._signal_tier_num("bogus"), 1)
 
 
+class DeepAnalysisReadyTest(unittest.TestCase):
+    """[WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 additive 회귀.
+
+    deep_analysis_ready/deep_analysis 는 warning-letter + raw.wl_body_full 확보 시만
+    True/키존재이고, 그 외 모든 카드(전 유형·전문 미확보 WL 포함)는 기존 20+ golden
+    fixture 와 완전히 동일한 출력을 낸다(이 클래스는 golden 비교를 건드리지 않는다 —
+    신규 동작만 별도로 확인).
+    """
+
+    def test_warning_letter_without_body_full_is_not_ready(self) -> None:
+        fx = _load_input("warning_letter_chemical")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        self.assertFalse(card.deep_analysis_ready)
+        webcard = card.to_web_card()
+        self.assertNotIn("deep_analysis", webcard)          # 대다수 카드 — 키 자체 부재
+        self.assertNotIn("deep_analysis_ready", card.to_dict())
+        self.assertNotIn("deep_analysis_input", card.to_dict())
+
+    def test_warning_letter_with_body_full_is_ready(self) -> None:
+        fx = _load_input("warning_letter_excerpt")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = ("During our inspection, we observed violations of 21 CFR "
+                               "211.192. Required remediation: respond within 15 days.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertTrue(card.deep_analysis_ready)
+
+        webcard = card.to_web_card()
+        self.assertIn("deep_analysis", webcard)
+        self.assertIsNone(webcard["deep_analysis"])          # 병합 전 placeholder
+
+        d = card.to_dict()
+        self.assertTrue(d["deep_analysis_ready"])
+        self.assertEqual(d["deep_analysis_input"]["body_full"], raw["wl_body_full"])
+        # 6종 동결 슬롯 토큰 목록(needs_llm_slots)은 이 신규 필드로 오염되지 않는다.
+        self.assertNotIn("deep_analysis", card.needs_llm_slots)
+
+    def test_non_warning_letter_kinds_never_ready(self) -> None:
+        # recall/admin/gmp 등 타 유형은 raw 에 wl_body_full 이 있어도(방어적 입력) False.
+        fx = _load_input("recall_quality_chemical")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = "irrelevant"
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertFalse(card.deep_analysis_ready)
+        self.assertNotIn("deep_analysis", card.to_web_card())
+
+
 if __name__ == "__main__":
     unittest.main()

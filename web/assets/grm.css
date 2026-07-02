@@ -380,6 +380,37 @@ details.merged summary{cursor:pointer}
 .chk ul{margin:11px 0 0;padding-left:0;list-style:none}
 .chk li{margin:7px 0;padding-left:24px;position:relative;font-size:15px;line-height:1.55;color:var(--body-s)}
 .chk li::before{content:'\2713';position:absolute;left:0;top:0;color:var(--ink);font-weight:700;font-size:13px}
+/* [WL 심층분석 fan-out 2026-07-01 · §2.5 확정 시각위계] 단계적 노출(요약 기본 → 클릭 시 4섹션
+   펼침 → 원문 링크). 기존 토큰만 재사용 — 신규 색 0(§4 동결 색 규칙 준수). */
+details.deep{background:var(--soft);border-radius:var(--rad-s);padding:14px 20px;margin-top:12px;border-left:3px solid var(--line-2)}
+details.deep summary{cursor:pointer}
+details.deep .lab{margin:0}
+.deep-sec{margin-top:18px}
+.deep-sec:first-of-type{margin-top:16px}
+/* 섹션 헤더 = 원형 번호 배지(폰트 비의존 CSS 원 + 숫자) + 세리프 소제목 → 4섹션 위계·가시성 */
+.deep-h{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.deep-n{flex:none;width:21px;height:21px;border-radius:50%;background:var(--coral-tint);color:var(--coral-2);font-family:var(--sans);font-size:12px;font-weight:600;display:grid;place-items:center;line-height:1}
+.deep-t{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink)}
+/* 직계 <p> 만(섹션 산문 = fda_evaluation·administrative_risks). .viol 안의 .viol-desc/
+   .viol-risk 는 자기 스타일 유지 — > 결합자로 특이도 충돌 차단(coral 리스크색 보존). */
+.deep-sec>p{font-size:14px;line-height:1.62;color:var(--body-s)}
+/* ① Key Violations — 위반 항목별 카드 블록(조항 코드배지 · 설명 문단 · 점선 아래 경고색 리스크) */
+.viol{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 14px;margin-top:9px}
+.viol-cite{display:inline-block;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);background:var(--strong);border-radius:5px;padding:2px 8px}
+.viol-desc{margin-top:8px;font-size:14px;line-height:1.6;color:var(--body-s)}
+.viol-risk{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line-2);font-size:13px;line-height:1.55;color:var(--coral-2)}
+/* ③ Required Remediation — 마감기한 한 줄 + 체크(✓) 리스트(단일 마커 — 점검사항 .chk 와 구분) */
+.rem-deadline{font-size:13.5px;color:var(--body-s);margin-top:2px}
+.rem-dl{font-size:11px;font-weight:600;color:var(--coral-2);margin-right:8px}
+.rem-list{margin:9px 0 0;padding-left:0;list-style:none}
+.rem-list li{margin:6px 0;padding-left:23px;position:relative;font-size:14px;line-height:1.55;color:var(--body-s)}
+.rem-list li::before{content:'\2713';position:absolute;left:0;top:1px;color:var(--coral-2);font-weight:700;font-size:12px}
+/* W2 facts 2×2 그리드(deep 카드 한정) — 라벨 muted + 값 굵게(스캔성). 값 자체 불변(마크업/CSS만) */
+.facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:19px;background:var(--line);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
+.fcell{background:var(--canvas);padding:11px 14px}
+.fk{font-size:11px;font-weight:500;color:var(--muted)}
+.fv{margin-top:3px;font-size:14px;font-weight:600;color:var(--ink);line-height:1.5;word-break:keep-all}
+@media(max-width:560px){.facts-grid{grid-template-columns:1fr}}
 .src{display:flex;gap:8px;flex-wrap:wrap;margin-top:19px;padding-top:17px;border-top:1px solid var(--line)}
 .src a{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--body);border:1px solid var(--line-2);
   border-radius:var(--rad-s);padding:8px 14px;transition:var(--tr)}

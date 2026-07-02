@@ -241,6 +241,58 @@ def _inject_quotes(card: dict[str, Any], qt: Any) -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# [WL 심층분석 fan-out 2026-07-01] deep_analysis(7번째·선택 슬롯) 주입 — 6종 동결 슬롯
+# inject_llm_slots 와 완전 별개 함수(서로 호출 안 함, additive). 카드별 fan-out(카드 1건 =
+# 호출 1건, 독립 컨텍스트) 결과를 verify_deep_analysis 게이트로 검증한 뒤에만 주입한다.
+# ─────────────────────────────────────────────────────────────────────────────
+def inject_deep_analysis(brief: dict[str, Any],
+                         deltas: dict[str, dict[str, Any]]) -> InjectionReport:
+    """카드별 deep_analysis 델타를 검증 후 주입(in-place — 호출 전 필요시 별도 deepcopy).
+
+    `deltas` = {document_id(=card.id): {"deep_analysis": {5섹션 dict}, "source_text": str}}.
+    `source_text` 는 그 카드의 fan-out 입력 원문(handoff `deep_analysis_input.body_full`)이며
+    verify_deep_analysis 가 인용 근거 대조에 쓴다.
+
+    카드마다 `verify_deep_analysis.run_deep_analysis_gate`를 통과해야 주입된다. FAIL 카드는
+    `card["deep_analysis"]`를 placeholder(None) 그대로 두고 report.errors 에 사유만 남긴다 —
+    이 실패가 전체 브리프 발행을 막지 않는다(그 카드는 기존 6슬롯만으로 발행 — graceful
+    degrade. 6종 동결 슬롯 트랙과 이 트랙은 서로 독립이라 한쪽 실패가 다른 쪽에 번지지 않는다).
+    """
+    import verify_deep_analysis as vda
+    report = InjectionReport()
+    cards_by_id = {c.get("id"): c for c in (brief.get("cards") or []) if isinstance(c, dict)}
+    for doc_id, payload in (deltas or {}).items():
+        card = cards_by_id.get(doc_id)
+        if card is None:
+            report.warnings.append(f"deep_analysis[{doc_id!r}]: 브리프에 없는 카드 id (무시됨)")
+            continue
+        if "deep_analysis" not in card:
+            report.warnings.append(
+                f"deep_analysis[{doc_id!r}]: 이 카드는 대상이 아님"
+                "(deep_analysis_ready=False, 무시됨)")
+            continue
+        if not isinstance(payload, dict):
+            report.errors.append(f"deep_analysis[{doc_id!r}]: 델타는 객체여야 함")
+            continue
+        da = payload.get("deep_analysis")
+        source_text = payload.get("source_text", "")
+        if not isinstance(da, dict):
+            report.errors.append(f"deep_analysis[{doc_id!r}]: 'deep_analysis' 키가 dict 아님")
+            continue
+        gate = vda.run_deep_analysis_gate(da, source_text)
+        if not gate.ok:
+            report.errors.append(
+                f"deep_analysis[{doc_id!r}]: 게이트 FAIL {gate.fail_count}건(병합 보류) — "
+                f"{gate.report}")
+            continue
+        card["deep_analysis"] = da
+        if gate.warn_count:
+            report.warnings.append(
+                f"deep_analysis[{doc_id!r}]: 게이트 WARN {gate.warn_count}건(병합은 진행)")
+    return report
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # CLI — python inject_slots.py --brief <scaffold.json> --delta <delta.json> --out <out.json>
 # ─────────────────────────────────────────────────────────────────────────────
 def _load_json(path: str) -> Any:
@@ -254,6 +306,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--brief", required=True, help="scaffold 브리프 JSON(빈 슬롯, assemble_web_brief 산출)")
     ap.add_argument("--delta", required=True, help="v16 LLM 델타 JSON({cards:{id:{슬롯}}, tldr:[]})")
     ap.add_argument("--out", required=True, help="완성 브리프 출력 경로(web/data/briefs/brief_web_{date}.json)")
+    ap.add_argument("--deep-analysis-deltas", default=None,
+                   help="[WL 심층분석 fan-out, 선택] {document_id:{deep_analysis,source_text}} "
+                        "JSON 경로. 미지정 시 기존 동작과 완전 동일(additive).")
     args = ap.parse_args(argv)
 
     brief = _load_json(args.brief)
@@ -269,6 +324,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     out = inject_llm_slots(brief, delta, strict=True)
+
+    if args.deep_analysis_deltas:
+        deltas = _load_json(args.deep_analysis_deltas)
+        da_report = inject_deep_analysis(out, deltas)
+        for w in da_report.warnings:
+            print(f"WARN {w}", file=sys.stderr)
+        for e in da_report.errors:
+            print(f"WARN(심층분석 병합 보류) {e}", file=sys.stderr)  # 비차단 — 6슬롯 발행은 계속
+
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
         f.write("\n")

@@ -166,6 +166,10 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "evidence_basis": card.get("evidence_basis", ""),
         "implication": card.get("implication", ""),
         "checks": card.get("checks") or [],
+        # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
+        # 동형 — 표시 플래그 미가공, 값 자체는 raw). 대다수 카드는 키 부재/None → card.html
+        # `{% if card.deep_analysis %}` 가 False 라 기존 golden 출력 바이트 불변(additive).
+        "deep_analysis": card.get("deep_analysis") or None,
         "sources": sources,
     }
 

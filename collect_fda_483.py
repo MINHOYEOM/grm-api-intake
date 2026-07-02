@@ -98,6 +98,7 @@ FDA483_EXCERPT_DELAY_SECONDS = 0.5
 FDA483_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(윈도우 내 newest-first → 최신 N건 우선)
 FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
+FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
 # 표지/머리말을 건너뛰고 관찰사항(findings) 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
 _FDA483_EXCERPT_PATTERNS = (
     r"observation\s+1\b",
@@ -507,7 +508,9 @@ def _extract_483_observations(pdf_bytes: bytes) -> list[dict[str, str]]:
         from collect_mfds_gmp_inspection import _extract_pdf_text
     except Exception:  # noqa: BLE001
         return []
-    text, _status = _extract_pdf_text(pdf_bytes)
+    text, _status = _extract_pdf_text(pdf_bytes, max_chars=FDA483_TEXT_MAX_CHARS)
+    if len(text) >= FDA483_TEXT_MAX_CHARS:
+        log("WARN", "483 텍스트 상한 도달 — Observation 일부 누락 가능(수동 확인)")
     return _extract_483_observations_from_text(text)
 
 

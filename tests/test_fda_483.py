@@ -410,6 +410,66 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 1)
 
 
+class ObservationTruncationTest(unittest.TestCase):
+    """긴 483(8쪽+·2만자↑)에서 GMP용 12000자 상한이 뒤 Observation 을 자르던 버그 가드.
+
+    483 경로는 FDA483_TEXT_MAX_CHARS(200000)로 PDF 텍스트를 읽어 뒤 Observation 을 보존하고,
+    상한 도달 시 조용한 유실 대신 WARN 을 남긴다. GMP/WHO 경로는 기본 12000 그대로.
+    """
+    _FILLER = (" The inspection team reviewed additional batch records and quality "
+               "data relating to this observation in detail.") * 50
+
+    def _long_483_text(self) -> str:
+        blocks = [
+            f"OBSERVATION {n} Deficiency {n} concerns inadequate control of the "
+            f"manufacturing process.{self._FILLER}"
+            for n in range(1, 7)
+        ]
+        return "Cover page. I/WE OBSERVED: " + "".join(blocks)
+
+    def test_long_doc_all_six_observations_extracted(self):
+        text = self._long_483_text()
+        self.assertGreater(len(text), 12000)                     # GMP 상한을 넘는 긴 문서
+        self.assertGreater(text.index("OBSERVATION 6"), 12000)   # 6번째는 12000자 이후
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2", "3", "4", "5", "6"])
+
+    def test_483_reads_beyond_gmp_cap(self):
+        # 483 경로는 GMP 12000 이 아닌 200000 으로 PDF 를 읽어 뒤 Observation 을 보존.
+        self.assertGreater(f.FDA483_TEXT_MAX_CHARS, g.MAX_ATTACHMENT_TEXT_CHARS)
+        full = self._long_483_text()
+        captured = {}
+
+        def fake_extract(data, max_chars=g.MAX_ATTACHMENT_TEXT_CHARS):
+            captured["max_chars"] = max_chars
+            return full[:max_chars], "pdf-ok"   # 실 엔진과 동일하게 max_chars 로 절단
+
+        with patch.object(g, "_extract_pdf_text", fake_extract):
+            rows = f._extract_483_observations(b"%PDF-1.4 fake")
+        self.assertEqual(captured["max_chars"], f.FDA483_TEXT_MAX_CHARS)
+        self.assertEqual([r["number"] for r in rows], ["1", "2", "3", "4", "5", "6"])
+
+    def test_gmp_default_cap_unchanged(self):
+        # GMP(및 WHO·483 excerpt) 경로는 기본값 12000 그대로 — 회귀 방지.
+        import inspect
+        self.assertEqual(g.MAX_ATTACHMENT_TEXT_CHARS, 12000)
+        default = inspect.signature(g._extract_pdf_text).parameters["max_chars"].default
+        self.assertEqual(default, g.MAX_ATTACHMENT_TEXT_CHARS)
+
+    def test_cap_reached_logs_warning(self):
+        # 상한 도달 시 조용한 유실 대신 WARN(수동 확인 신호) — silent loss 방지.
+        at_cap = "OBSERVATION 1 Deficiency one is noted. " + "x" * f.FDA483_TEXT_MAX_CHARS
+        logged: list[tuple[str, str]] = []
+
+        def fake_extract(data, max_chars=g.MAX_ATTACHMENT_TEXT_CHARS):
+            return at_cap[:max_chars], "pdf-ok"
+
+        with patch.object(g, "_extract_pdf_text", fake_extract), \
+                patch.object(f, "log", lambda level, msg: logged.append((level, msg))):
+            f._extract_483_observations(b"%PDF fake")
+        self.assertTrue(any(lvl == "WARN" and "상한 도달" in msg for lvl, msg in logged))
+
+
 class TierTest(unittest.TestCase):
     def test_483_tier3(self):
         json_rows = [_json_row(8001, "483", est="Drug Manufacturer")]

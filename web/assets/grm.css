@@ -460,6 +460,12 @@ details.detail .lab{margin:0}
 .subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px}
 /* Brevo 봇방지 허니팟 — 시각·접근성 숨김(off-screen). 사람은 못 보고 안 채움, 봇만 채워 Brevo 가 거른다. */
 .sub-hp{position:absolute!important;left:-5000px;width:1px;height:1px;overflow:hidden;opacity:0}
+/* 인라인 구독 성공 상태(방식 A) — base.html 스크립트가 폼 제출 가로채기 후 표시. 페이지 이동 없음.
+   토큰 재사용(coral-tint/coral-2/serif)·fadeUp 재사용·한글 안전(§4: 자간/대문자/mono 없음). */
+.sub-done{margin-top:26px;animation:fadeUp .5s var(--ease) both}
+.sub-done-ic{width:56px;height:56px;border-radius:50%;background:var(--coral-tint);color:var(--coral-2);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;line-height:1}
+.sub-done p{color:var(--body);font-size:15px;margin:10px auto 0;max-width:46ch;line-height:1.6;word-break:keep-all}
 
 /* ── footer(다크 band) ─────────────────────────────────────────────────── */
 footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;margin-top:0}

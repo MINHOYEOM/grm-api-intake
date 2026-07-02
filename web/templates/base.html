@@ -68,15 +68,43 @@
   <span class="kick">Weekly Newsletter</span>
   <h2>매주 새로운 규제소식을 이메일로 받아보세요</h2>
   <p>매주 모아드리는 규제 클리핑의 핵심 요약과 바로가기를 메일로 보내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.</p>
-  <form class="sub-form" action="{{ newsletter_form_action }}" method="post">
+  <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
     <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="이메일 주소" placeholder="you@company.com" />
     {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
     <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <input type="hidden" name="locale" value="en" />
     <button class="btn coral" type="submit">구독</button>
   </form>
-  <p class="note">구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.</p>
+  <p class="note" id="grm-sub-note">구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.</p>
+  {# 인라인 성공 상태(방식 A) — 아래 스크립트가 폼 제출을 가로채면 표시. 초기엔 hidden. 페이지 이동 없음. #}
+  <div id="grm-sub-done" class="sub-done" role="status" aria-live="polite" hidden>
+    <div class="sub-done-ic" aria-hidden="true">✓</div>
+    <h2>확인 메일을 보냈습니다</h2>
+    <p><b id="grm-sub-dest"></b> 으로 보낸 메일에서 구독 확인 버튼을 눌러 주세요. 메일이 보이지 않으면 스팸함도 확인해 주세요.</p>
+  </div>
 </div></section>
+{# 방식 A 배선: 폼 제출을 가로채 fetch(no-cors)로 Brevo endpoint 에 백그라운드 POST → 페이지를 떠나지 않고 인라인 성공 메시지 표시. 스크립트 미실행(JS off)·fetch 미지원이면 preventDefault 가 안 걸려 네이티브 POST 로 자연 폴백(=기존 동작). 밴드 한글안전(§4): 아래 스크립트에 letter-spacing/text-transform/mono 미사용. #}
+<script>
+(function(){
+  var f=document.getElementById('grm-sub-form');
+  if(!f||!window.fetch)return;
+  f.addEventListener('submit',function(e){
+    var email=document.getElementById('grm-sub-email');
+    if(!email||!f.checkValidity())return;
+    e.preventDefault();
+    var fd=new FormData(f),body=new URLSearchParams();
+    fd.forEach(function(v,k){body.append(k,v);});
+    fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
+    var dest=document.getElementById('grm-sub-dest');
+    if(dest)dest.textContent=email.value;
+    var note=document.getElementById('grm-sub-note');
+    f.hidden=true;
+    if(note)note.hidden=true;
+    var done=document.getElementById('grm-sub-done');
+    if(done)done.hidden=false;
+  });
+})();
+</script>
 {% endif %}
 
 <footer class="site"><div class="wrap">

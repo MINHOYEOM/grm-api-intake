@@ -425,7 +425,7 @@ def _extract_deficiency_table(data: bytes) -> list[dict[str, str]]:
     return out
 
 
-def _extract_pdf_text(data: bytes) -> tuple[str, str]:
+def _extract_pdf_text(data: bytes, max_chars: int = MAX_ATTACHMENT_TEXT_CHARS) -> tuple[str, str]:
     try:
         import fitz  # type: ignore[import-not-found]
     except ImportError:
@@ -445,7 +445,7 @@ def _extract_pdf_text(data: bytes) -> tuple[str, str]:
     text = _normalize_extracted_text(text)
     if not text:
         return "", "scan-no-text"
-    return text[:MAX_ATTACHMENT_TEXT_CHARS], "pdf-ok"
+    return text[:max_chars], "pdf-ok"
 
 
 def _extract_hwpx_text(data: bytes) -> tuple[str, str]:

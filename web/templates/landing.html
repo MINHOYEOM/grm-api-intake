@@ -17,12 +17,6 @@
           <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 읽기 <i class="ti ti-arrow-right"></i></a>
           <a class="btn lg" href="{{ rel_root }}archive/index.html">지난 소식 둘러보기</a>
         </div>
-        <div class="stats reveal" style="animation-delay:.36s">
-          <div><b>11</b><span>규제 소스</span></div>
-          <div><b>주 1회</b><span>정기 발행</span></div>
-          <div><b>A·B·C</b><span>신뢰 등급</span></div>
-          <div><b>100%</b><span>원문 추적</span></div>
-        </div>
       </div>
       <aside class="reveal" style="animation-delay:.22s">
         <div class="issuecard">
@@ -42,6 +36,13 @@
           </div>
         </div>
       </aside>
+    </div>
+    {#- §5-3: 통계 바를 히어로 그리드 밖 전폭으로 이동 — 좌측 컬럼에 갇혀 우측(카드) 여백이 비던 문제 해소. 4등분 스팬. -#}
+    <div class="stats reveal" style="animation-delay:.4s">
+      <div><b>11</b><span>규제 소스</span></div>
+      <div><b>주 1회</b><span>정기 발행</span></div>
+      <div><b>A·B·C</b><span>신뢰 등급</span></div>
+      <div><b>100%</b><span>원문 추적</span></div>
     </div>
     <div class="srcs reveal" style="animation-delay:.44s">
       <span class="l">수집 대상 — 11 sources</span>
@@ -93,7 +94,7 @@
         <ul class="legend">
           <li><i class="ti ti-bookmark"></i><div><b>제목 · 배지</b> <span>— 유형·기관·핵심 이슈 및 시그널, 대상 제품군 직관적 분류</span></div></li>
           <li><i class="ti ti-table"></i><div><b>사실 표 · 원문 인용</b> <span>— 수치와 코드는 원문 그대로, 주요 영문은 한국어 번역 병기</span></div></li>
-          <li><i class="ti ti-bulb"></i><div><b>시사점 (편집 해석)</b> <span>— 객관적 사실과 분리된 전문 분석, 공식 견해와 명확한 색상 구분</span></div></li>
+          <li><i class="ti ti-bulb"></i><div><b>시사점 · 편집 해석</b> <span>— 객관적 사실과 분리된 전문 분석, 공식 견해와 명확한 색상 구분</span></div></li>
           <li><i class="ti ti-checklist"></i><div><b>점검 항목</b> <span>— 실무 현장에서 즉시 확인하고 적용해야 할 실행 리스트(Checklist)</span></div></li>
         </ul>
       </div>
@@ -119,7 +120,7 @@
   <div class="wrap"><div class="callout">
     <span class="kick">This Week</span>
     <h2>이번 주, 무엇이 바뀌었을까요?</h2>
-    <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
+    <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, <span style="white-space:nowrap">Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</span>. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
     <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
   </div></div>
 </main>

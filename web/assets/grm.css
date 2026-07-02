@@ -98,7 +98,7 @@ button{font-family:inherit;cursor:pointer}
 .tag.insight{background:rgba(176,125,23,.13);color:var(--med);border-color:rgba(176,125,23,.28)}
 .tag.check{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
 .hero .btns{display:flex;gap:11px;flex-wrap:wrap}
-.hero .stats{display:grid;grid-template-columns:repeat(4,auto);gap:40px;margin-top:46px;border-top:1px solid var(--line);padding-top:26px;width:fit-content}  /* §3-2 항목 간격 36→40 — 4개 stat 뭉침 완화 */
+.hero .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:10px;border-top:1px solid var(--line);padding-top:26px}  /* §5-3 히어로 전폭 통계 바(그리드 하단 배치) — 4등분 스팬으로 우측 여백 해소 */
 .hero .stats b{font-family:var(--serif);font-size:30px;font-weight:500;display:block;line-height:1;color:var(--ink);letter-spacing:-.01em}
 .hero .stats span{color:var(--muted);font-size:13px;margin-top:7px;display:block}  /* P2-4 12.5→13 */
 
@@ -208,7 +208,7 @@ button{font-family:inherit;cursor:pointer}
 @media(prefers-reduced-motion:reduce){.feat-prev,.grade-tip{transition:none}}
 
 /* card anatomy showcase */
-.showcase{display:grid;grid-template-columns:.95fr 1.05fr;gap:54px;align-items:center;margin-top:46px}  /* §3-1 좌측 텍스트 소폭 확대(.9→.95fr) — 세로 늘어짐 완화 */
+.showcase{display:grid;grid-template-columns:.95fr 1.05fr;gap:54px;align-items:start;margin-top:46px}  /* §5-2 좌측 텍스트 .95fr + 상단정렬(align-items:start) — 카드 높이차로 인한 좌측 텍스트 중앙 부유·하단 여백 제거 */
 .showcase .copy h2{font-family:var(--serif);font-weight:400;font-size:38px;letter-spacing:-.018em;color:var(--ink);line-height:1.16;margin-top:14px}
 .showcase .copy p{font-size:16.5px;color:var(--body);margin-top:16px;line-height:1.65}
 .showcase .legend{list-style:none;margin-top:22px}
@@ -457,7 +457,7 @@ details.detail .lab{margin:0}
 .sub-form input[type=email]:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 4px var(--coral-tint)}
 .sub-form input[type=email]::placeholder{color:var(--muted)}
 .sub-form .btn.coral{height:52px}
-.subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+.subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px;max-width:none;text-wrap:balance;word-break:keep-all}  /* §5-1 max-width 해제(.subscribe p 52ch 상속 취소)→데스크톱 1줄, 균형 배분(balance)+어절 줄바꿈(keep-all)로 좁은 폭서도 '가능합니다.' 고아 줄 방지 */
 /* Brevo 봇방지 허니팟 — 시각·접근성 숨김(off-screen). 사람은 못 보고 안 채움, 봇만 채워 Brevo 가 거른다. */
 .sub-hp{position:absolute!important;left:-5000px;width:1px;height:1px;overflow:hidden;opacity:0}
 /* 인라인 구독 성공 상태(방식 A) — base.html 스크립트가 intro 를 감추고 이 패널만 표시. 페이지 이동 없음.
@@ -484,10 +484,9 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
 .foot a,.foot span{display:block;color:var(--band-mut);font-size:13.5px;padding:5px 0}
 .foot a{cursor:pointer}  /* P2-6 링크만 포인터 — 라벨(span)은 기본 커서로 비링크 명확화(데드링크 오인 방지) */
 .foot a:hover{color:#fff}
-.foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;justify-content:space-between;
-  gap:16px;flex-wrap:wrap;font-size:12px;color:var(--band-mut)}  /* P2-3 다크밴드 — --muted-2 darken 영향 분리, --band-mut(라이트 그레이) 사용 */
-.foot-legal .mono{font-size:11px}
-.foot-legal .legal-ko{font-size:12px;color:var(--band-mut)}  /* §2-2 한글 병기 — 본문체(자간·대문자·mono 강제 없음). 영문 mono 줄과 별개 span */
+.foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;justify-content:flex-start;
+  gap:8px 20px;flex-wrap:wrap;font-size:12px;color:var(--band-mut)}  /* P2-3 다크밴드(--band-mut). §5-4 영문 mono 제거 후 2항목 좌측 그룹(space-between→flex-start)으로 — 중앙 705px 공백 방지 */
+.foot-legal .legal-ko{font-size:12px;color:var(--band-mut)}  /* §5-4 한국어 fine-print(영문 mono 제거 후 단독) — 본문체(자간·대문자·mono 강제 없음) */
 
 /* P2-1 중간 폭 분기점 — 900px 단일 붕괴 완화(태블릿~좁은 데스크톱 점진 축소).
    900px 블록이 뒤에 와서 ≤900 에선 이 규칙들을 다시 1단으로 덮는다(소스 순서 의존). */

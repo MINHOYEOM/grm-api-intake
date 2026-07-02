@@ -541,52 +541,56 @@ _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup"
 _FDA483_OBSERVATION_ROW_KEYS = ("number", "deficiency", "detail")
 
 
+# per-kind 결정론 상세 슬롯 생성기 — SourceSpec.detail 로 배선. WL `deep_analysis`(LLM 분석층·
+# fan-out·게이트)와 **완전 별개**의 결정론 층(생성 0 → 환각 0, 근거대조 게이트 불필요). 해당
+# raw 필드 부재면 None(graceful·요약카드 유지). row 인자는 시그니처 통일용(현행 미사용).
+def _detail_gmp_deficiencies(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """gmp-inspection 지적사항 표(`raw.gmp_deficiencies`)."""
+    rows = raw.get("gmp_deficiencies")
+    if not (isinstance(rows, list) and rows):
+        return None
+    # 방어적 재정규화: 5개 키만·문자열 강제. 근거법령/지적내용 둘 다 빈 행은 제외
+    # (수집기 게이트와 동일 불변 — 손수 작성 raw·손상 입력도 안전).
+    norm = [{k: str(r.get(k, "") or "") for k in _DEFICIENCY_ROW_KEYS}
+            for r in rows if isinstance(r, dict)]
+    norm = [r for r in norm if r["legal_basis"] or r["summary"]]
+    if not norm:
+        return None
+    severity_summary: dict[str, int] = {}
+    for r in norm:
+        sev = r["severity"]
+        if sev:
+            severity_summary[sev] = severity_summary.get(sev, 0) + 1
+    return {
+        "type": "gmp_deficiencies",
+        "count": len(norm),
+        "severity_summary": severity_summary,
+        "rows": norm,
+    }
+
+
+def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """FDA 483 Observation 번호 목록(`raw.fda_483_observations`)."""
+    obs = raw.get("fda_483_observations")
+    if not (isinstance(obs, list) and obs):
+        return None
+    norm = [{k: str(o.get(k, "") or "") for k in _FDA483_OBSERVATION_ROW_KEYS}
+            for o in obs if isinstance(o, dict)]
+    norm = [o for o in norm if o["deficiency"]]
+    if not norm:
+        return None
+    return {
+        "type": "fda_483_observations",
+        "count": len(norm),
+        "observations": norm,
+    }
+
+
 def _deterministic_detail(kind: str, row: dict[str, Any],
                           raw: dict[str, Any] | None) -> dict[str, Any] | None:
-    """결정론 상세 슬롯(펼침 상세보기용). 없으면 None(요약카드 유지·golden 불변).
-
-    WL `deep_analysis`(LLM 분석층·fan-out·게이트)와 **완전 별개**의 결정론 층 — 생성이 없어
-    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 공개 사실을 그대로
-    구조화). `type` 분기로 소스별 결정론 detail 확장:
-      - `gmp_deficiencies` — gmp-inspection 지적사항 표(`raw.gmp_deficiencies`).
-      - `fda_483_observations` — FDA 483 Observation 번호 목록(`raw.fda_483_observations`).
-        해당 raw 필드 부재면 None(graceful). 창작 0(DB 필드 무변형).
-    """
-    raw = raw or {}
-    if kind == "gmp-inspection":
-        rows = raw.get("gmp_deficiencies")
-        if isinstance(rows, list) and rows:
-            # 방어적 재정규화: 5개 키만·문자열 강제. 근거법령/지적내용 둘 다 빈 행은 제외
-            # (수집기 게이트와 동일 불변 — 손수 작성 raw·손상 입력도 안전).
-            norm = [{k: str(r.get(k, "") or "") for k in _DEFICIENCY_ROW_KEYS}
-                    for r in rows if isinstance(r, dict)]
-            norm = [r for r in norm if r["legal_basis"] or r["summary"]]
-            if not norm:
-                return None
-            severity_summary: dict[str, int] = {}
-            for r in norm:
-                sev = r["severity"]
-                if sev:
-                    severity_summary[sev] = severity_summary.get(sev, 0) + 1
-            return {
-                "type": "gmp_deficiencies",
-                "count": len(norm),
-                "severity_summary": severity_summary,
-                "rows": norm,
-            }
-    if kind == "fda-483":
-        obs = raw.get("fda_483_observations")
-        if isinstance(obs, list) and obs:
-            norm = [{k: str(o.get(k, "") or "") for k in _FDA483_OBSERVATION_ROW_KEYS}
-                    for o in obs if isinstance(o, dict)]
-            norm = [o for o in norm if o["deficiency"]]
-            if norm:
-                return {
-                    "type": "fda_483_observations",
-                    "count": len(norm),
-                    "observations": norm,
-                }
-    return None
+    """결정론 상세 슬롯(펼침 상세보기용). `SourceSpec.detail` 디스패치. 없으면 None(요약카드 유지)."""
+    fn = _spec(kind).detail
+    return fn(row, raw or {}) if fn else None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -807,14 +811,15 @@ _REGISTRY: dict[str, SourceSpec] = {
     "gmp-inspection": SourceSpec(
         "🟦", "GMP실사", "GMP실사",
         a_eligible=True,
-        quote=_quote_gmp_inspection, extra_rows=None, official=None, detail=None),
+        quote=_quote_gmp_inspection, extra_rows=None, official=None,
+        detail=_detail_gmp_deficiencies),
     "gmp-certificate": SourceSpec(
         "🟦", "GMP적합판정", "GMP적합",
         extra_rows=None),
     "fda-483": SourceSpec(
         "🟧", "FDA 483 실사 관찰", "483",
         deep_body_key="fda483_body_full",
-        extra_rows=None, official=None, detail=None),
+        extra_rows=None, official=None, detail=_detail_fda_483_observations),
     "who-noc": SourceSpec("🟧", "WHO", "WHO", normative=True, extra_rows=None),
     "who-inspection": SourceSpec(
         "🟧", "WHO", "WHO", normative=True,

@@ -460,12 +460,20 @@ details.detail .lab{margin:0}
 .subscribe .note{font-size:12.5px;color:var(--muted);margin-top:14px}
 /* Brevo 봇방지 허니팟 — 시각·접근성 숨김(off-screen). 사람은 못 보고 안 채움, 봇만 채워 Brevo 가 거른다. */
 .sub-hp{position:absolute!important;left:-5000px;width:1px;height:1px;overflow:hidden;opacity:0}
-/* 인라인 구독 성공 상태(방식 A) — base.html 스크립트가 폼 제출 가로채기 후 표시. 페이지 이동 없음.
+/* 인라인 구독 성공 상태(방식 A) — base.html 스크립트가 intro 를 감추고 이 패널만 표시. 페이지 이동 없음.
    토큰 재사용(coral-tint/coral-2/serif)·fadeUp 재사용·한글 안전(§4: 자간/대문자/mono 없음). */
-.sub-done{margin-top:26px;animation:fadeUp .5s var(--ease) both}
-.sub-done-ic{width:56px;height:56px;border-radius:50%;background:var(--coral-tint);color:var(--coral-2);
-  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;line-height:1}
-.sub-done p{color:var(--body);font-size:15px;margin:10px auto 0;max-width:46ch;line-height:1.6;word-break:keep-all}
+.sub-done{animation:fadeUp .5s var(--ease) both}
+.sub-done-ic{display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;
+  background:var(--coral-tint);color:var(--coral-2);margin:0 auto 22px;animation:subPop .44s var(--ease) both}
+.sub-done-ic svg path{stroke-dasharray:26;stroke-dashoffset:26;animation:subCheck .4s .22s var(--ease) forwards}
+.sub-done h2{margin:0}
+.sub-done p{color:var(--body);font-size:16px;margin:12px auto 0;max-width:52ch;line-height:1.65;word-break:keep-all;text-wrap:balance}
+.sub-done p b{color:var(--ink)}
+.sub-done .sub-done-mail{font-size:15px;color:var(--ink);margin-top:12px}
+.sub-done .sub-done-sub{font-size:13px;color:var(--muted);margin-top:10px}
+@keyframes subPop{0%{transform:scale(.5);opacity:0}62%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes subCheck{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.sub-done,.sub-done-ic{animation:none}.sub-done-ic svg path{animation:none;stroke-dashoffset:0}}
 
 /* ── footer(다크 band) ─────────────────────────────────────────────────── */
 footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;margin-top:0}

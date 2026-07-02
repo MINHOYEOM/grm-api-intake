@@ -15,6 +15,7 @@ from datetime import date, datetime
 from unittest import mock
 
 import collect_intake as ci
+import grm_notion  # 배치5 Phase1: notion_api_request 정의 모듈(preflight 대체 대상)
 
 RUN_DATE = date(2026, 6, 12)
 GEN_AT = datetime(2026, 6, 12, 3, 17)
@@ -77,7 +78,9 @@ class PreflightTest(unittest.TestCase):
                 raise properties
             return {"properties": properties}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+        # notion_verify_handoff_ref_property 는 grm_notion(배치5 Phase1) 정의 —
+        # 정의 모듈의 notion_api_request 를 대체해야 preflight 가 fake 를 본다.
+        with mock.patch.object(grm_notion, "notion_api_request", side_effect=fake_api):
             return ci.notion_verify_handoff_ref_property("tok", "db")
 
     def test_rich_text_property_ok(self) -> None:

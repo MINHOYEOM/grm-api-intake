@@ -471,11 +471,56 @@ present 인데 유효행 0 = `gate-degraded`(WARN + 표 미기록, 요약카드 
 
 **범위 밖.** FDA 483 상세보기(트랙 2순위) — 이 `deterministic_detail`+`<details class="block detail">`
 렌더를 `type` 분기로 재사용. 선결 = `collect_fda_483.py` 소스 URL 갱신뿐(별도 지시문).
+## 17. 소스별 상세보기 확장 + 요약카드 보강 (2026-07-02)
+
+> §15(WL deep_analysis)의 자산을 나머지 소스로 확장한다. **모델(설계문서 §12): 모든 카드 상세영역
+> = 2개 층** — ① 결정론 층(DB 필드 조립, 환각·fetch 0, 항상) + ② LLM 분석 층(Body 두껍고
+> `verify_deep_analysis` 통과 시만 additive). 실 DB 깊이 기준 펼침 상세보기가 값 있는 소스는 **3개뿐**
+> (FDA WL·MFDS 행정처분=분석층까지, Federal Register=결정론 상세). 나머지 13개는 데이터가 얕아
+> 요약카드로 충분(펼침 상세 없음). §0~§15·§16(deterministic_detail) 불변, 이 §17 + golden/테스트 갱신으로만.
+
+**(A) MFDS 행정처분 — 상세보기 + 분석층(§15 패턴 확장).** WL 4섹션 뼈대 재사용, ②섹션만 교체:
+`fda_evaluation`(응답 왕복 평가) → **`disposition_basis`**(확정처분 내용·수위·판단근거 — 행정처분엔
+"응답 왕복"이 없음). 스키마: `{key_violations[], disposition_basis, required_remediation{deadline,items[]},
+administrative_risks}`. `verify_deep_analysis`: `REQUIRED_SECTIONS_ADMIN` + `resolve_required_sections`
+(card_type 없으면 `disposition_basis` 키로 admin 자동판별, 있으면 WL 기본 → 후방호환)·3검사 `sections`
+파라미터(기본=WL)·**한국법령 D2 정규식**(약사법 제N조·「의약품 등의 안전에 관한 규칙」·[별표N]·bare
+제N조; 조사 경계는 후행 `\b` 미사용=D3 교훈 동형). 입력 body = `raw.admin_body_full`(다단락 Body —
+위반상세 EXPOSE_CONT+근거법령 BEF_APPLY_LAW+처분명, `collect_mfds_admin_action` 의 `ENABLE_MFDS_ADMIN_BODY_FULL`
+opt-in·기본 off 시 주입, 외부 fetch 0). `card_scaffold.deep_analysis_ready` 를 admin-action 로 확장,
+`deep_analysis_input.body_full` 일반화(wl or admin). `card.html`: 섹션2 키 분기(fda_evaluation|disposition_basis)
++ 한글 섹션명(① 위반 항목 및 리스크 / ② 처분 내용 및 근거 / ③ 이행·후속 조치 / ④ 행정 리스크). WL 은
+`disposition_basis` 부재 → 영문 그대로 = **바이트 불변**. 생성 프롬프트 `docs/prompts/GRM_Prompt_DeepAdmin_v1.md`
+(신규), fanout 절차는 유형무관 일반화(build-jobs 가 유형 상관없이 deep_analysis_ready 카드 수집).
+
+**(B) Federal Register — 상세보기(결정론만, 분석층 없음).** FR abstract 는 FDA 공식 요약이라 충분히
+풍부 → **결정론 조립만**(LLM/게이트/외부 fetch 0). `card_scaffold._fr_detail(row, raw)` → `{summary_full
+(abstract 전문·무절단 — quote 는 250자 절단본이라 긴 abstract 는 상세가 값), detail_kind(Rule/Proposed
+Rule/Notice/Guidance)}`. abstract 부재면 미출현(graceful). `to_web_card` 는 `kind=="guidance"`(=FR) 카드만
+`detail` 키 방출(웹 전용 — Notion 마크다운 스캐폴드 불변). 적용범위·기업대응(결정론 불가)·comment_close
+(facts 의견기한 중복)은 생략(창작·중복 방지). `card.html`: `<details class="block deep detail">` 재사용.
+
+**(C) 요약카드 보강 — 결과/원문 PDF 링크 승격(신규 블록 없음, MINO 확정).** 나머지 13개 소스는 이미
+facts(대상·일자)·quote(사유, Ev A)·sources(링크)·LLM 슬롯으로 커버 → 신규 블록은 중복. 유일한 실질
+보강 = 검사·실사 결과 문서 링크. `_dual_links`: who-inspection→`raw.pdf_url`(WHOPIR 결과 PDF, 종전
+official_url=HTML 페이지만 노출)·gmp-inspection `download_url` 폴백. fda-483 은 이미 `raw.pdf_url` 노출.
+
+**(D) 상세보기 UI 보강(3개 공통).** 접힘 미리보기 태그(`<details>` summary 에 결정론 내용 힌트 —
+`_deep_preview`/`_detail_preview`)·신뢰 라벨(분석층="원문 근거·검증"/결정론 FR="원문 기반")·해석 뱃지
+(`.tag-interp`, 분석층 summary, coral 기존 토큰 재사용·한글 안전=자간/mono 미적용). CSS 신규 색 토큰 0.
+
+**(E) golden·회귀.** 기본 OFF 플래그(admin)·샘플브리프 부재(deep/detail)라 커밋 골든 additive —
+`guidance_fr.expected.webcard.json`·`brief_web.expected.json`(FR detail)·`who_inspection[_excerpt]`
+계열(WHO PDF)만 의도적 재동결, 웹 full-page 골든 불변. **1033 green**(+27). 비용모델(신규 API 과금 0)·
+외부 PDF/전문 fetch 0(승격은 별도 트랙 — 설계문서 §16). 신규 회귀: `test_verify_deep_analysis`(admin
+스키마·한국법령 D2·조사경계·자동판별)·`test_card_scaffold`(admin ready·FrDetail·who-inspection 승격)·
+`test_inject_slots`(admin 병합·한글섹션 렌더·FR 상세 렌더·UI 보강).
 
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-07-02 | **§16 신설(additive) — deterministic_detail 결정론 상세보기 슬롯(MFDS GMP실사)**: PDF/전문 수집 트랙 실측 근거로 MFDS **정기실태조사** 지적사항 5컬럼 표(분야·구분·근거법령·지적내용·비고)를 PyMuPDF `find_tables()` 결정론 추출→저장→상세보기 렌더로 승격(새 의존성·OCR·LLM 0, 환각 0). §15 deep_analysis(LLM 분석층)와 병렬되는 **결정론 층**으로 별도 필드(`deterministic_detail`). 유형 2분기(periodic=상세보기·pre_market=요약보강)·품질 게이트(유효행 0∧present→degrade)·`ENABLE_GMP_DEFICIENCY_TABLE`(기본 off) 점진 활성. 렌더는 WL `.deep` 옆 `<details class="block detail">`(단계적 노출)·`.detail`/`.dt-*` CSS(한글안전 §4 — mono/자간 미사용). 기존 20+ golden·900+ 회귀 바이트 불변(additive), 신규 web-card golden 2종 + 수집기/card_scaffold/렌더 회귀. 범위밖=483(이 렌더 재사용·소스 URL 갱신 선결). |
+| 2026-07-02 | **§17 신설 — 소스별 상세보기 확장 + 요약카드 보강**: §15 WL 자산을 확장. Phase A(MFDS 행정처분 상세보기+분석층 — `disposition_basis` ②섹션·한국법령 D2·`resolve_required_sections`·`ENABLE_MFDS_ADMIN_BODY_FULL`·한글 섹션명)·Phase B(Federal Register 결정론 상세보기 — `_fr_detail` abstract 전문·guidance 만 `detail` 키·웹 전용)·Phase C(검사·실사 결과 PDF 링크 승격 — `_dual_links` who-inspection→pdf_url·gmp download_url, 신규 블록 없음)·Phase D(UI 보강 — 미리보기 태그·신뢰 라벨·해석 뱃지). 기본 OFF/샘플브리프 부재 → 커밋 골든 additive(guidance_fr.webcard·brief_web·who_inspection 계열만). 1033 green(+27). 6슬롯 §0~§14·§15 WL 경로 불변. |
 | 2026-07-01 | **§2.5 확정 반영 — 콘텐츠 경계·시각위계**: MINO 피드백(상세분석 부실·헤더 위계 부족·표↔핵심사실 중복) 대응. ① `overview` 삭제(표·핵심사실과 중복 — 규제 프레이밍은 6슬롯 summary(W1) 흡수) ② `required_remediation` 문자열→`{deadline, items[]}` 객체(마감기한 한 줄+체크리스트, 단일 ✓ 마커) ③ 4섹션 헤더 원형 번호 배지(①②③④, CSS 원+숫자)+세리프 소제목(위계) ④ Key Violations 위반 항목별 카드 블록(조항 코드배지·설명·경고색 리스크) ⑤ deep 카드 W2 facts 2×2 그리드(값 불변, 마크업/CSS만). `verify_deep_analysis` D1 이 `required_remediation` 객체 구조·`items` 비어있지 않음까지 검사. 기존 golden 20+ 불변(deep 렌더는 populated deep_analysis 카드에만 나타나 기존 fixture 무영향)·신규 회귀 +3(remediation 구조). |
 | 2026-07-01 | **§15 신설(additive) — deep_analysis 7번째·선택 슬롯**: 사용자 피드백("카드가 조잡") 대응. Warning Letter 카드 한정, 전문 확보(`ENABLE_WL_BODY_FULL`) 카드만 카드별 fan-out(독립 호출 1건=카드 1건)으로 5섹션(Overview·Key Violations & Risk Analysis·FDA's Evaluation of Response·Required Remediation·Administrative Risks) 심층분석 생성. `verify_deep_analysis.py`(신규, 조항 인용 근거대조 게이트) 통과 카드만 병합, FAIL 카드는 6슬롯만으로 발행(카드 단위 graceful degrade). `card.html` 에 단계적 노출(`<details class="block deep">`, 기본 접힘) 추가. §0~§14(6슬롯 동결)는 완전 불변 — golden 20+·8xx 회귀 무변화, 신규 회귀 4개 테스트 파일 추가. 실제 FDA Huons Co., Ltd. 경고서한 원문으로 end-to-end 검증(수집→검증→병합→렌더) |
 | 2026-06-04 | 최초 작성(틀). 칸별 Python/LLM 책임표·유형별 필드매핑·제품군 배지·출력매트릭스·prose_input 계약·golden 방법론. v15.8 카드 표준 기준. 디자인 리뷰로 §11 동결 예정 |

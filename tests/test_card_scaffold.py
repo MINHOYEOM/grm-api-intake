@@ -45,6 +45,10 @@ FIXTURES = [
 # 는 watch 로 호출되지 않음; brief 제외는 WebBriefGoldenTest 가 검증).
 WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
     "who_inspection_excerpt", "warning_letter_excerpt", "fda_483",
+    # [상세보기 결정론 승격 2026-07-02 · spec §16] gmp-inspection deterministic_detail —
+    # periodic(지적 표 有 → deterministic_detail) + pre_market(표 無 → 필드 부재). web-card 전용
+    # (FIXTURES 미포함 → brief golden·intake_total 불변).
+    "gmp_inspection_periodic", "gmp_inspection_pre_market",
 ]
 
 # assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).
@@ -1236,6 +1240,68 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         card = cs.build_card_scaffold(fx["row"], raw)
         self.assertFalse(card.deep_analysis_ready)
         self.assertNotIn("deep_analysis", card.to_web_card())
+
+
+class DeterministicDetailTest(unittest.TestCase):
+    """[상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 슬롯 additive 회귀.
+
+    deterministic_detail 은 gmp-inspection + raw.gmp_deficiencies 확보 시만 키가 존재하고,
+    그 외 모든 카드(전 유형·표 미확보 gmp 포함)는 키 자체가 없어 기존 20+ golden 바이트 불변.
+    WL deep_analysis(LLM 분석층)와 완전 별개 필드 — 서로 오염시키지 않는다.
+    """
+
+    def test_periodic_emits_deterministic_detail(self):
+        fx = _load_input("gmp_inspection_periodic")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertIn("deterministic_detail", wc)
+        dd = wc["deterministic_detail"]
+        self.assertEqual(dd["type"], "gmp_deficiencies")
+        self.assertEqual(dd["count"], 3)
+        self.assertEqual(dd["severity_summary"], {"기타": 2, "중요": 1})
+        self.assertEqual([r["area"] for r in dd["rows"]], ["시설장비", "제조", "품질"])
+        # 결정론 층은 deep_analysis(LLM 분석층)와 상호 오염 없음.
+        self.assertNotIn("deep_analysis", wc)
+
+    def test_pre_market_has_no_detail(self):
+        fx = _load_input("gmp_inspection_pre_market")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_gmp_without_deficiencies_has_no_detail(self):
+        # 기존 gmp fixture(gmp_deficiencies 키 부재) → 필드 없음(golden 불변 근거).
+        fx = _load_input("gmp_inspection_biologic")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertNotIn("deterministic_detail", wc)
+
+    def test_empty_or_invalid_rows_yield_no_detail(self):
+        fx = _load_input("gmp_inspection_periodic")
+        # 빈 배열 → 필드 없음.
+        raw = dict(fx["raw"]); raw["gmp_deficiencies"] = []
+        self.assertNotIn("deterministic_detail",
+                         cs.build_card_scaffold(fx["row"], raw).to_web_card())
+        # 근거법령·지적내용 둘 다 빈 행만 → 방어 필터로 제거 → 필드 없음.
+        raw2 = dict(fx["raw"])
+        raw2["gmp_deficiencies"] = [{"area": "제조", "severity": "기타",
+                                     "legal_basis": "", "summary": "", "followup": "x"}]
+        self.assertNotIn("deterministic_detail",
+                         cs.build_card_scaffold(fx["row"], raw2).to_web_card())
+
+    def test_non_gmp_kind_never_emits_detail(self):
+        # 방어적 입력(다른 유형 raw 에 gmp_deficiencies) — gmp-inspection 만 산출.
+        fx = _load_input("recall_quality_chemical")
+        raw = dict(fx["raw"])
+        raw["gmp_deficiencies"] = [{"area": "제조", "severity": "중대",
+                                    "legal_basis": "[별표1] 1호",
+                                    "summary": "x", "followup": ""}]
+        self.assertNotIn("deterministic_detail",
+                         cs.build_card_scaffold(fx["row"], raw).to_web_card())
+
+    def test_deterministic_detail_row_keys_exact(self):
+        fx = _load_input("gmp_inspection_periodic")
+        dd = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()["deterministic_detail"]
+        for r in dd["rows"]:
+            self.assertEqual(set(r), {"area", "severity", "legal_basis",
+                                      "summary", "followup"})
 
 
 if __name__ == "__main__":

@@ -243,6 +243,7 @@ class CardScaffold:
                     if (self.modality and kind not in _NORMATIVE_KINDS) else None)
         headline_target = (self.merged_target if (merged and self.merged_target)
                            else _headline_target(row))
+        detail = _deterministic_detail(kind, raw)
 
         return {
             "id": row.get("document_id", ""),
@@ -267,6 +268,10 @@ class CardScaffold:
             "key_facts": [],              # LLM
             "implication": "",            # LLM
             "checks": [],                 # LLM
+            **({"deterministic_detail": detail} if detail else {}),
+            # ^ [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 — WL deep_analysis(LLM 분석층)와
+            # 별개의 결정론 층(환각 0). 현재 gmp-inspection 지적 표(raw.gmp_deficiencies)만 산출.
+            # 없으면 키 자체 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
             **({"deep_analysis": None} if self.deep_analysis_ready else {}),
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
@@ -483,6 +488,45 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
         return _truncate_at_sentence(_first(raw.get("abstract"), raw.get("title")), 250)
     # mfds-notice·rss-news·safety-letter·legislative·regulation·ich·who-*·WL → quote 없음
     return ""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7b. 결정론 상세보기 슬롯 (spec §16, 2026-07-02) — WL deep_analysis(LLM)와 별개 결정론 층
+# ─────────────────────────────────────────────────────────────────────────────
+_DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup")
+
+
+def _deterministic_detail(kind: str, raw: dict[str, Any] | None) -> dict[str, Any] | None:
+    """결정론 상세 슬롯(펼침 상세보기용). 없으면 None(요약카드 유지·golden 불변).
+
+    WL `deep_analysis`(LLM 분석층·fan-out·게이트)와 **완전 별개**의 결정론 층 — 생성이 없어
+    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 PDF 표를 그대로 구조화).
+    현재는 `gmp-inspection` 지적사항 표(`raw.gmp_deficiencies`)만. `type` 분기로 향후 483 등
+    다른 결정론 detail 타입 확장 여지.
+    """
+    raw = raw or {}
+    if kind == "gmp-inspection":
+        rows = raw.get("gmp_deficiencies")
+        if isinstance(rows, list) and rows:
+            # 방어적 재정규화: 5개 키만·문자열 강제. 근거법령/지적내용 둘 다 빈 행은 제외
+            # (수집기 게이트와 동일 불변 — 손수 작성 raw·손상 입력도 안전).
+            norm = [{k: str(r.get(k, "") or "") for k in _DEFICIENCY_ROW_KEYS}
+                    for r in rows if isinstance(r, dict)]
+            norm = [r for r in norm if r["legal_basis"] or r["summary"]]
+            if not norm:
+                return None
+            severity_summary: dict[str, int] = {}
+            for r in norm:
+                sev = r["severity"]
+                if sev:
+                    severity_summary[sev] = severity_summary.get(sev, 0) + 1
+            return {
+                "type": "gmp_deficiencies",
+                "count": len(norm),
+                "severity_summary": severity_summary,
+                "rows": norm,
+            }
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────

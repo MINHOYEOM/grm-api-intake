@@ -641,6 +641,13 @@ class CollectionStats:
     mfds_gmp_inspection_deficiency: dict[str, int] = field(default_factory=dict)
     mfds_gmp_inspection_manual_review: int = 0
     mfds_gmp_inspection_page_warnings: list[str] = field(default_factory=list)
+    # [상세보기 결정론 승격 2026-07-02] 지적 표 추출 관측 — collect_mfds_gmp_inspection.LAST_HEALTH
+    # ["deficiency_table"] 집계분(WHOPIR excerpt health 동형). 실패/degrade 는 warning 표면화용.
+    gmp_deficiency_table_enabled: bool = False
+    gmp_deficiency_table_attempted: int = 0
+    gmp_deficiency_table_extracted: int = 0
+    gmp_deficiency_table_failed: int = 0
+    gmp_deficiency_table_warnings: list[str] = field(default_factory=list)
     # ── P1: ICH (직접 모니터링) ────────────────────────────────────────────
     ich_fetched: int = 0
     ich_inserted: int = 0
@@ -4792,6 +4799,17 @@ def main() -> int:
         stats.mfds_gmp_inspection_deficiency = dict(gmp_health.get("deficiency_counts") or {})
         stats.mfds_gmp_inspection_manual_review = int(gmp_health.get("manual_review_count") or 0)
         stats.mfds_gmp_inspection_page_warnings = list(gmp_health.get("page_warnings") or [])
+        # [상세보기 결정론 승격 2026-07-02] 지적 표 추출 관측(degrade 는 요약카드 유지 — 비차단).
+        deficiency_table_health = gmp_health.get("deficiency_table") or {}
+        stats.gmp_deficiency_table_enabled = bool(deficiency_table_health.get("enabled"))
+        stats.gmp_deficiency_table_attempted = int(deficiency_table_health.get("attempted") or 0)
+        stats.gmp_deficiency_table_extracted = int(deficiency_table_health.get("extracted") or 0)
+        stats.gmp_deficiency_table_failed = int(deficiency_table_health.get("failed") or 0)
+        stats.gmp_deficiency_table_warnings = list(deficiency_table_health.get("warnings") or [])
+        if stats.gmp_deficiency_table_failed:
+            log("WARN", "MFDS GMP 지적 표 추출 degrade "
+                        f"{stats.gmp_deficiency_table_failed}건(요약카드 유지): "
+                        f"{stats.gmp_deficiency_table_warnings}")
         if mfds_gmp_inspection_err:
             stats.mfds_gmp_inspection_error = True
             stats.mfds_gmp_inspection_error_msg = mfds_gmp_inspection_err

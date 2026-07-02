@@ -411,6 +411,22 @@ details.deep .lab{margin:0}
 .fk{font-size:11px;font-weight:500;color:var(--muted)}
 .fv{margin-top:3px;font-size:14px;font-weight:600;color:var(--ink);line-height:1.5;word-break:keep-all}
 @media(max-width:560px){.facts-grid{grid-template-columns:1fr}}
+/* [상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 층(gmp 지적사항 표) — WL .deep 과
+   동형 단계적 노출. 기존 토큰만 재사용(신규 색 0, §4 동결 색 규칙). 셀은 전부 한글일 수 있어
+   mono/자간(letter-spacing) 절대 미사용 — 근거법령도 일반 sans(§4 한글안전). */
+details.detail{background:var(--soft);border-radius:var(--rad-s);padding:14px 20px;margin-top:12px;border-left:3px solid var(--line-2)}
+details.detail summary{cursor:pointer}
+details.detail .lab{margin:0}
+.dt-sev{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.dt-chip{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--body-s);background:var(--strong);border-radius:5px;padding:2px 9px}
+.dt-row{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 14px;margin-top:9px}
+.dt-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.dt-area{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink)}
+.dt-badge{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border-radius:5px;padding:2px 9px}
+.dt-law{font-family:var(--sans);font-size:12px;color:var(--muted)}
+.dt-sum{margin-top:8px;font-size:14px;line-height:1.6;color:var(--body-s)}
+.dt-fu{margin-top:8px;display:flex;align-items:flex-start;gap:6px;font-size:13px;line-height:1.5;color:var(--muted)}
+.dt-fu i{flex:none;margin-top:2px;color:var(--coral-2)}
 .src{display:flex;gap:8px;flex-wrap:wrap;margin-top:19px;padding-top:17px;border-top:1px solid var(--line)}
 .src a{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--body);border:1px solid var(--line-2);
   border-radius:var(--rad-s);padding:8px 14px;transition:var(--tr)}

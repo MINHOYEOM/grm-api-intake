@@ -1,0 +1,51 @@
+{
+  "agency": "MFDS",
+  "card_type": "GMP실사",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-06-28"
+    },
+    {
+      "label": "문서번호",
+      "value": "gmpinspect-1Px_jsc10ws"
+    },
+    {
+      "label": "제조소",
+      "value": "Aachen Pharma GmbH"
+    },
+    {
+      "label": "실사기간",
+      "value": "2026-05-02~2026-05-04"
+    }
+  ],
+  "group": "국내",
+  "group_label": null,
+  "headline_target": "아헨파마",
+  "id": "gmpinspect-1Px_jsc10ws",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": ""
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "GMP실사"
+}

@@ -108,6 +108,28 @@
     {%- endif %}
   </details>
   {%- endif %}
+  {%- if card.deterministic_detail %}
+  {#- [상세보기 결정론 승격 2026-07-02 · spec §16] WL deep 블록 옆 결정론 상세 층 — 수집기가
+      공개 PDF 표를 그대로 구조화(환각 0, LLM 없음). 기본 접힘(요약카드 먼저) → "지적사항 상세"
+      클릭 시 표 펼침(WL deep 과 동형 단계적 노출). 값 부재 카드는 이 블록 자체가 렌더되지 않아
+      기존 카드 무변형. `type` 분기로 향후 483 등 다른 결정론 detail 타입 확장 여지. 한글안전(§4):
+      셀은 전부 한글일 수 있어 mono/code·자간 클래스 절대 사용 안 함(근거법령도 일반 서체). -#}
+  {%- if card.deterministic_detail.type == 'gmp_deficiencies' %}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-table"></i>지적사항 상세 <span class="sub">· {{ dd.count }}건</span></summary>
+    {%- if dd.severity_summary %}
+    <div class="dt-sev">{% for sev, n in dd.severity_summary.items() %}<span class="dt-chip">{{ sev }} {{ n }}</span>{% endfor %}</div>
+    {%- endif %}
+    {%- for r in dd.rows %}
+    <div class="dt-row">
+      <div class="dt-h">{% if r.area %}<span class="dt-area">{{ r.area }}</span>{% endif %}{% if r.severity %}<span class="dt-badge">{{ r.severity }}</span>{% endif %}{% if r.legal_basis %}<span class="dt-law">{{ r.legal_basis }}</span>{% endif %}</div>
+      {%- if r.summary %}<p class="dt-sum">{{ r.summary }}</p>{% endif %}
+      {%- if r.followup %}<p class="dt-fu"><i class="ti ti-arrow-narrow-right"></i>{{ r.followup }}</p>{% endif %}
+    </div>
+    {%- endfor %}
+  </details>
+  {%- endif %}
+  {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}
   <div class="src">{{ srclink(card.sources.info, '정보출처') }}{{ srclink(card.sources.official, '공식원본') }}</div>
   {%- endif %}

@@ -1,0 +1,24 @@
+{
+  "raw": {
+    "manufacturer": "Aachen Pharma GmbH",
+    "before_after": "사전 GMP 평가",
+    "country": "독일",
+    "product_type": "주사제",
+    "inspection_start": "2026-05-02",
+    "inspection_end": "2026-05-04",
+    "attachment_deficiency_assessment": "none",
+    "source_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Px_jsc10ws"
+  },
+  "row": {
+    "date": "2026-06-28",
+    "document_id": "gmpinspect-1Px_jsc10ws",
+    "firm": "아헨파마",
+    "headline": "수입 사전 GMP 평가 적합",
+    "language": "KO",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "site_country": "독일",
+    "source": "MFDS",
+    "type_or_class": "gmp-inspection"
+  }
+}

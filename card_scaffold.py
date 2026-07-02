@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import Any
 
@@ -127,29 +128,63 @@ class FixedConfig:
 DEFAULT_CONFIG = FixedConfig()
 
 
-# 유형 → (prefix, 한글 라벨, W1 유형 핵심 태그) — §2 고정표
+# ─────────────────────────────────────────────────────────────────────────────
+# 1b. SourceSpec 레지스트리 — kind 당 1 선언 레코드 (소스 분기 산재 단일화)
+#     레지스트리 리터럴은 §10b(모든 per-kind callable 정의 뒤)에서 조립한다.
+# ─────────────────────────────────────────────────────────────────────────────
+@dataclass(frozen=True)
+class SourceSpec:
+    """한 내부 kind 의 카드 산출 규칙 1레코드(선언형). `_REGISTRY[kind]` 로 조회.
+
+    데이터로 접히는 것은 값 필드로, 데이터로 안 접히는 분기(인용 추출·유형별 사실 행·
+    듀얼링크 규칙·상세 슬롯)는 **per-kind callable 참조**로 담는다. callable 미지정(None)은
+    dispatcher 의 공통 기본으로 폴백(quote=""·detail=None·official=official_url·
+    extra_rows=발행기관 기본행) — 대다수 kind 는 값 필드만으로 충분하다.
+
+    값 필드
+      prefix/label/core_tag — W1 배지·제목 라벨·유형 핵심태그(구 `_kind_meta` 3-튜플).
+      category              — Notion 발행 카테고리(구 `_CATEGORY_MAP`, 기본 "Other").
+      a_eligible            — Evidence A 자격(구 `_A_ELIGIBLE_KINDS`). quote 존재와 커플링.
+      normative             — 규범 문서 → 제품군 배지 억제(구 `_NORMATIVE_KINDS`).
+      section               — 섹션 override. "" 면 source 기본(MFDS→domestic·else global).
+                              str 또는 callable(row)->str(ich=consultation 판정용).
+      deep_body_key         — deep_analysis fan-out 활성 raw 키("" 면 비대상).
+    callable 필드(모두 순수·결정론)
+      quote(raw)->str                 — W3 인용 소스(§12C). None → "".
+      extra_rows(row,raw)->list[(l,v)] — W2 유형별 사실 행(발행일·문서번호 이후). None → 기본행.
+      official(row,raw)->(url,is_fb)   — W8 공식원본과 fallback 여부. None → (official_url, False).
+      detail(row,raw)->dict|None       — 결정론 상세 슬롯(§16). None → None.
+    """
+    prefix: str
+    label: str
+    core_tag: str
+    category: str = "Other"
+    a_eligible: bool = False
+    normative: bool = False
+    section: str | Callable[[dict[str, Any]], str] = ""
+    deep_body_key: str = ""
+    quote: Callable[[dict[str, Any]], str] | None = None
+    extra_rows: Callable[[dict[str, Any], dict[str, Any]], list[tuple[str, str]]] | None = None
+    official: Callable[[dict[str, Any], dict[str, Any]], tuple[str, bool]] | None = None
+    detail: Callable[[dict[str, Any], dict[str, Any]], dict[str, Any] | None] | None = None
+
+
+# 미등록(발현 불가) kind 안전망 — 무채색·비A·비규범·source 기본 섹션·콜러블 없음.
+_DEFAULT_SPEC = SourceSpec(prefix="⬜", label="기타", core_tag="")
+
+
+def _spec(kind: str) -> SourceSpec:
+    """kind 의 SourceSpec 조회(`resolve_kind` 산출 kind 는 항상 등록). 미등록 → 기본 스펙."""
+    return _REGISTRY.get(kind, _DEFAULT_SPEC)
+
+
+# 유형 → (prefix, 한글 라벨, W1 유형 핵심 태그) — 구 §2 고정표(→ SourceSpec 로 흡수).
+# 미등록 kind 만 동적 기본(라벨=kind 문자열)을 쓰므로 `_spec`(고정 라벨)과 분리 유지.
 def _kind_meta(kind: str) -> tuple[str, str, str]:
-    table = {
-        "warning-letter":   ("🟧", "Warning Letter", "CGMP"),
-        "recall-quality":   ("🟦", "회수·판매중지", "회수"),
-        "openfda-recall":   ("🟧", "Recall", "Recall"),
-        "admin-action":     ("🟦", "행정처분", "행정처분"),
-        "gmp-inspection":   ("🟦", "GMP실사", "GMP실사"),
-        "gmp-certificate":  ("🟦", "GMP적합판정", "GMP적합"),
-        "guidance":         ("🟫", "지침·안내서", "Guidance"),
-        "mfds-notice":      ("🟫", "지침·안내서", "Guidance"),
-        "rss-news":         ("🟫", "규제 소식", "GMP News"),
-        "regulation":       ("🟫", "고시·개정법령", "규정"),
-        "legislative":      ("🟫", "입법예고", "입법예고"),
-        "safety-letter":    ("🟦", "안전성서한", "안전성"),
-        "ich":              ("🟫", "ICH", "ICH"),
-        "who-noc":          ("🟧", "WHO", "WHO"),
-        "who-inspection":   ("🟧", "WHO", "WHO"),
-        "who-news":         ("🟫", "WHO", "WHO"),
-        "hc-recall":        ("🟧", "Recall(HC)", "Recall"),
-        "fda-483":          ("🟧", "FDA 483 실사 관찰", "483"),
-    }
-    return table.get(kind, ("⬜", kind or "기타", ""))
+    spec = _REGISTRY.get(kind)
+    if spec is not None:
+        return (spec.prefix, spec.label, spec.core_tag)
+    return ("⬜", kind or "기타", "")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -207,13 +242,11 @@ class CardScaffold:
         # 필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 오케스트레이터만 소비.
         if self.deep_analysis_ready:
             d["deep_analysis_ready"] = True
-            # WL=wl_body_full, admin-action=admin_body_full(소스확장 2026-07-02),
-            # fda-483=fda483_body_full(483 분석층 2026-07-02). fan-out 오케스트레이터가 이
-            # body_full 만 서브에이전트 컨텍스트로 준다(카드 격리 불변).
+            # 유형별 body_full raw 키 = SourceSpec.deep_body_key(WL=wl_body_full·admin-action=
+            # admin_body_full·fda-483=fda483_body_full). deep_analysis_ready 가 True 인 시점이라
+            # 그 키는 항상 채워져 있다. fan-out 오케스트레이터가 이 body_full 만 준다(카드 격리 불변).
             d["deep_analysis_input"] = {
-                "body_full": self.raw.get("wl_body_full")
-                or self.raw.get("admin_body_full")
-                or self.raw.get("fda483_body_full", "")}
+                "body_full": self.raw.get(_spec(self.kind).deep_body_key, "")}
         return d
 
     def to_web_card(self, render_entry: dict[str, Any] | None = None,
@@ -246,7 +279,7 @@ class CardScaffold:
 
         info, official, _fallback = _dual_links(kind, row, raw)
         modality = (cfg.modality_badge.get(self.modality, self.modality)
-                    if (self.modality and kind not in _NORMATIVE_KINDS) else None)
+                    if (self.modality and not _spec(kind).normative) else None)
         headline_target = (self.merged_target if (merged and self.merged_target)
                            else _headline_target(row))
         detail = _deterministic_detail(kind, row, raw)
@@ -415,19 +448,9 @@ def resolve_kind(row: dict[str, Any]) -> str:
     return "rss-news"
 
 
-# 규범 문서(특정 제품군에 매이지 않음) — 제품군 배지 생략 (§4)
-_NORMATIVE_KINDS = {
-    "guidance", "mfds-notice", "rss-news", "regulation", "legislative",
-    "ich", "who-noc", "who-inspection", "who-news",
-}
-
-# Evidence A 가능 유형 — 결정론적으로 인용 가능한 공식 raw 필드를 가진 유형만.
-# 그 외(RSS·WHO·ICH §12H)는 항상 B. determine_evidence 와 _quote_source 가 함께 보장:
-# "A 인데 quote 없음" 조합이 한 유형도 없도록(최종 정합 가드).
-_A_ELIGIBLE_KINDS = {
-    "admin-action", "recall-quality", "gmp-inspection",
-    "openfda-recall", "hc-recall", "guidance",
-}
+# 규범 문서(§4·제품군 배지 생략) 집합 `_NORMATIVE_KINDS` 와 Evidence A 가능 유형 집합
+# `_A_ELIGIBLE_KINDS`(§6·"A ⟺ 인용 가능한 raw 필드" 불변식)는 이제 SourceSpec.normative/
+# a_eligible 필드로 흡수 — §10b 레지스트리에서 파생 재수출한다(단일원천).
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -443,7 +466,7 @@ def determine_evidence(kind: str, row: dict[str, Any], raw: dict[str, Any] | Non
     hint = (row.get("evidence_candidate") or row.get("evidence_hint") or "").upper()
     if hint in ("A", "B", "C"):
         ev = hint
-    elif kind in _A_ELIGIBLE_KINDS and raw and quote:
+    elif _spec(kind).a_eligible and raw and quote:
         ev = "A"
     else:
         ev = "B"
@@ -629,13 +652,18 @@ def _official_label(official_url: str, fallback: bool) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. 섹션 분류 (§7)
 # ─────────────────────────────────────────────────────────────────────────────
+def _section_ich(row: dict[str, Any]) -> str:
+    """ICH 섹션(§7): 의견수렴(consultation) → watch, 그 외 → global."""
+    return "watch" if "consultation" in (row.get("type_or_class", "") or "").lower() else "global"
+
+
 def resolve_section(kind: str, row: dict[str, Any]) -> str:
-    if kind in ("recall-quality", "openfda-recall", "hc-recall"):
-        return "recall_table"
-    if kind == "legislative":
-        return "watch"
-    if kind == "ich" and "consultation" in (row.get("type_or_class", "") or "").lower():
-        return "watch"
+    """카드 섹션(§7). SourceSpec.section override → 없으면 source 기본(MFDS→domestic·else global)."""
+    sec = _spec(kind).section
+    if callable(sec):
+        return sec(row)
+    if sec:
+        return sec
     if row.get("source") == SOURCE_MFDS:
         return "domestic"
     return "global"
@@ -737,6 +765,78 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 10b. _REGISTRY — kind → SourceSpec 선언 테이블(단일원천). 위(§7~§10)의 per-kind
+#      callable 이 모두 정의된 지점에서 조립한다. 신규 소스 추가 절차는 모듈 docstring 참조.
+# ─────────────────────────────────────────────────────────────────────────────
+_REGISTRY: dict[str, SourceSpec] = {
+    # 위치인자 = prefix, label, core_tag (구 `_kind_meta`). 나머지는 kwargs.
+    "warning-letter": SourceSpec(
+        "🟧", "Warning Letter", "CGMP",
+        category="Warning Letter", deep_body_key="wl_body_full",
+        quote=None, extra_rows=None, official=None, detail=None),
+    "admin-action": SourceSpec(
+        "🟦", "행정처분", "행정처분",
+        a_eligible=True, deep_body_key="admin_body_full",
+        quote=None, extra_rows=None, official=None),
+    "recall-quality": SourceSpec(
+        "🟦", "회수·판매중지", "회수",
+        a_eligible=True, section="recall_table",
+        quote=None, extra_rows=None, official=None),
+    "openfda-recall": SourceSpec(
+        "🟧", "Recall", "Recall",
+        a_eligible=True, section="recall_table",
+        quote=None, extra_rows=None, official=None),
+    "hc-recall": SourceSpec(
+        "🟧", "Recall(HC)", "Recall",
+        a_eligible=True, section="recall_table",
+        quote=None, extra_rows=None),
+    "gmp-inspection": SourceSpec(
+        "🟦", "GMP실사", "GMP실사",
+        a_eligible=True,
+        quote=None, extra_rows=None, official=None, detail=None),
+    "gmp-certificate": SourceSpec(
+        "🟦", "GMP적합판정", "GMP적합",
+        extra_rows=None),
+    "fda-483": SourceSpec(
+        "🟧", "FDA 483 실사 관찰", "483",
+        deep_body_key="fda483_body_full",
+        extra_rows=None, official=None, detail=None),
+    "who-noc": SourceSpec("🟧", "WHO", "WHO", normative=True, extra_rows=None),
+    "who-inspection": SourceSpec(
+        "🟧", "WHO", "WHO", normative=True,
+        extra_rows=None, official=None),
+    "who-news": SourceSpec("🟫", "WHO", "WHO", normative=True, extra_rows=None),
+    "ich": SourceSpec(
+        "🟫", "ICH", "ICH",
+        category="Guideline", normative=True, section=_section_ich,
+        extra_rows=None),
+    "guidance": SourceSpec(
+        "🟫", "지침·안내서", "Guidance",
+        category="Guidance", a_eligible=True, normative=True,
+        quote=None),
+    "mfds-notice": SourceSpec(
+        "🟫", "지침·안내서", "Guidance",
+        category="Guidance", normative=True),
+    "regulation": SourceSpec(
+        "🟫", "고시·개정법령", "규정",
+        category="Guidance", normative=True),
+    "legislative": SourceSpec(
+        "🟫", "입법예고", "입법예고",
+        category="Guidance", normative=True, section="watch"),
+    "safety-letter": SourceSpec("🟦", "안전성서한", "안전성"),
+    "rss-news": SourceSpec("🟫", "규제 소식", "GMP News", normative=True),
+}
+
+# 구 선언 테이블의 파생 재수출(단일원천 = 레지스트리). 외부/테스트 후방호환 유지.
+#  _NORMATIVE_KINDS: 규범 문서(제품군 배지 억제) — test_modality_null_for_normative_kinds.
+#  _A_ELIGIBLE_KINDS: "A ⟺ 인용 가능" 불변식 문서화(내부 dispatch 는 spec.a_eligible 사용).
+#  _CATEGORY_MAP: Notion 카테고리(비 Other 만) — test_no_dead_gmp_guideline_key 등.
+_NORMATIVE_KINDS = frozenset(k for k, s in _REGISTRY.items() if s.normative)
+_A_ELIGIBLE_KINDS = frozenset(k for k, s in _REGISTRY.items() if s.a_eligible)
+_CATEGORY_MAP = {k: s.category for k, s in _REGISTRY.items() if s.category != "Other"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 11. W1 배지 (§0 + §13.1-2): Evidence · 기관 · Signal · 제품군 · 유형태그 (≤5)
 # ─────────────────────────────────────────────────────────────────────────────
 def _signal_badge(signal_tier: str) -> str:
@@ -748,7 +848,7 @@ def _w1_badges(kind: str, evidence: str, row: dict[str, Any], cfg: FixedConfig) 
     badges = [_code(f"Evidence {evidence}"), _code(row.get("source", "") or "?"),
               _code(_signal_badge(row.get("signal_tier", "Tier 1")))]
     modality = row.get("modality", "")
-    if modality and kind not in _NORMATIVE_KINDS:
+    if modality and not _spec(kind).normative:
         # 배지에는 한글명만(이모지+한글) — §13.1 D5
         badges.append(_code(cfg.modality_badge.get(modality, modality)))
     _, _, core_tag = _kind_meta(kind)
@@ -864,17 +964,14 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
 
     markdown = _neutralize_forbidden("\n\n".join(blocks))
     prose_input = _prose_input(kind, row, raw, evidence, modality, language)
-    # [WL 심층분석 fan-out] warning-letter + 전문 확보(raw.wl_body_full, ENABLE_WL_BODY_FULL
-    # 게이트 산출) 시만 True. [소스확장 2026-07-02] admin-action + raw.admin_body_full
-    # (ENABLE_MFDS_ADMIN_BODY_FULL 게이트 산출) 도 대상. [483 분석층 2026-07-02] fda-483 +
-    # raw.fda483_body_full(ENABLE_FDA_483_DEEP 게이트 산출) 도 대상 — 483 은 결정론 상세
-    # (Observation)와 분석층을 함께 가질 수 있는 층 혼용 완성형(결정론 경로는 불변). 그 외 전
-    # 유형·body 미확보 카드는 항상 False(플래그 off 기본 → 픽스처/샘플브리프 키 부재 → golden 불변).
+    # deep_analysis fan-out 대상 여부 = SourceSpec.deep_body_key 가 있고 그 raw 키가 채워짐.
+    # warning-letter=wl_body_full(ENABLE_WL_BODY_FULL) · admin-action=admin_body_full
+    # (ENABLE_MFDS_ADMIN_BODY_FULL) · fda-483=fda483_body_full(ENABLE_FDA_483_DEEP). 483 은 결정론
+    # 상세(Observation)와 분석층을 함께 갖는 층 혼용 완성형(결정론 경로 불변). 그 외 전 유형·body
+    # 미확보 카드는 False(플래그 off 기본 → 픽스처/샘플브리프 키 부재 → golden 불변).
     _raw = raw or {}
-    deep_analysis_ready = bool(
-        (kind == "warning-letter" and _raw.get("wl_body_full"))
-        or (kind == "admin-action" and _raw.get("admin_body_full"))
-        or (kind == "fda-483" and _raw.get("fda483_body_full")))
+    _deep_key = _spec(kind).deep_body_key
+    deep_analysis_ready = bool(_deep_key and _raw.get(_deep_key))
     return CardScaffold(
         card_id=card_id, section=section, kind=kind, evidence=evidence,
         modality=modality, signal_tier=row.get("signal_tier", "Tier 1"),
@@ -1184,25 +1281,15 @@ WEB_SCHEMA_VERSION = "grm-web-card/v1"
 # 값을 낼 경로 없음 — watch 카드의 per-card web 골든도 동결하지 않는다(WEBCARD_FIXTURES 제외).
 _WEB_GROUP = {"global": "글로벌", "domestic": "국내", "recall_table": "Recall"}
 
-# Notion 발행 카테고리 멀티셀렉트(§3.4) 결정론 매핑 — 별도 산출 로직이 코드/프롬프트에
-# 없어 신규 단일원천으로 둔다. 키 = `resolve_kind` 가 내는 **내부 kind**(raw Type 명 아님).
-# 미매핑(recall·admin·gmp-inspection/certificate·safety·who·hc·rss·483 등) = Other.
+# Notion 발행 카테고리 멀티셀렉트(§3.4)는 이제 SourceSpec.category 로 단일화 —
+# `_CATEGORY_MAP`(비 Other 파생 재수출)는 §10b 레지스트리 직후에 생성한다. 키 = `resolve_kind`
+# 가 내는 **내부 kind**(raw Type 명 아님), 미매핑(recall·admin·gmp·safety·who·hc·rss·483 등)=Other.
 #
-# §3.4 의 `gmp-guideline → Guideline` 은 raw Type 명을 혼용 표기한 것이다. 이 매핑에
-# `"gmp-guideline"` 키를 추가하지 않는다(죽은 매핑 금지): `TYPE_GMP_GUIDELINE="gmp-guideline"`
-# 은 collect_mfds.py 에 **정의만 있고 어느 수집기도 row 에 할당하지 않는 휴면 상수**이며,
-# `resolve_kind` 에도 `gmp-guideline` 분기가 없다 → 내부 kind `"gmp-guideline"` 은 파이프라인에서
-# 발현 불가. 만약 MFDS gmp-guideline Type 이 인입되면 MFDS else 분기 → kind `mfds-notice`
-# → 카테고리 **"Guidance"**(Other 로 새지 않음; 가드 테스트로 고정). `Guideline` 독립 승격은
-# 신규 kind 신설이 필요 = P1 범위 밖, 후속 이월.
-_CATEGORY_MAP = {
-    "warning-letter": "Warning Letter",
-    "guidance": "Guidance",        # FR guidance-industry
-    "mfds-notice": "Guidance",     # MFDS guidance-industry/internal
-    "regulation": "Guidance",      # regulation-final/notice-final
-    "legislative": "Guidance",     # legislative-notice
-    "ich": "Guideline",            # ich-guideline/consultation
-}
+# §3.4 의 `gmp-guideline → Guideline` 은 raw Type 명을 혼용 표기한 것이며 레지스트리에 키를
+# 두지 않는다(죽은 매핑 금지): `TYPE_GMP_GUIDELINE="gmp-guideline"` 은 collect_mfds.py 에
+# 정의만 있고 어느 수집기도 row 에 할당하지 않는 휴면 상수 → 내부 kind `"gmp-guideline"` 은
+# 발현 불가. MFDS gmp-guideline Type 이 인입되면 MFDS else 분기 → kind `mfds-notice`
+# → 카테고리 **"Guidance"**(Other 로 새지 않음; 가드 테스트로 고정).
 
 # web-card JSON 값에 들어가면 안 되는 표현 틀 토큰(불변식 #6) — 렌더러가 그림.
 # modality/group_label 의 이모지(💊/🧬/▫️)는 스키마 데이터값이라 허용(여기 목록 밖).
@@ -1212,7 +1299,7 @@ _CARD_MARKUP_TOKENS = ("<callout", "<table", "<tr", "<td", "<details", "<summary
 
 def _category(kind: str) -> str:
     """Notion 발행 카테고리(§3.4): Warning Letter / Guidance / Guideline / Other."""
-    return _CATEGORY_MAP.get(kind, "Other")
+    return _spec(kind).category
 
 
 def _signal_level(signal_tier: str) -> str:

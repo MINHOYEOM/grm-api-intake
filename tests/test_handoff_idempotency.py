@@ -15,6 +15,7 @@ from datetime import date, datetime
 from unittest import mock
 
 import collect_intake as ci
+import grm_handoff  # 배치5 Phase2: handoff/emit 정의 모듈(patch 대상)
 import grm_notion  # 배치5 Phase1: notion_api_request 정의 모듈(preflight 대체 대상)
 
 RUN_DATE = date(2026, 6, 12)
@@ -107,7 +108,7 @@ class ConsumeQueryTest(unittest.TestCase):
             captured["body"] = json.loads(json.dumps(body))  # deep copy
             return {"results": [], "has_more": False}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
             ci.notion_query_new_intake_rows(
                 "tok", "db", RUN_DATE, 30, current_handoff_id=current_handoff_id,
                 current_handoff_open=current_handoff_open)
@@ -169,7 +170,7 @@ class MarkRefTest(unittest.TestCase):
             patches.append((url, body))
             return {}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api), \
+        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
              mock.patch("collect_intake.time.sleep"):
             ok, failed = ci.notion_mark_rows_handoff_ref("tok", self._rows(), HID)
 
@@ -188,7 +189,7 @@ class MarkRefTest(unittest.TestCase):
                 raise ci.NotionHandoffError("HTTP 502")
             return {}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api), \
+        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
              mock.patch("collect_intake.time.sleep"):
             ok, failed = ci.notion_mark_rows_handoff_ref("tok", self._rows(), HID)
         self.assertEqual((ok, failed), (2, 1))
@@ -224,7 +225,7 @@ class StaleRevertTest(unittest.TestCase):
                 return {}
             return {}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api), \
+        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
              mock.patch("collect_intake.time.sleep"):
             staled = ci.notion_stale_prior_open_handoffs(
                 "tok", "db", keep_handoff_id=HID, superseded_by="2026-06-12",
@@ -274,9 +275,9 @@ class ReconcileTest(unittest.TestCase):
                 patches.append((url, body))
             return {}
 
-        with mock.patch.object(ci, "_query_new_rows_with_ref", return_value=rows), \
-             mock.patch.object(ci, "notion_find_handoff_page", side_effect=fake_find), \
-             mock.patch.object(ci, "notion_api_request", side_effect=fake_api), \
+        with mock.patch.object(grm_handoff, "_query_new_rows_with_ref", return_value=rows), \
+             mock.patch.object(grm_handoff, "notion_find_handoff_page", side_effect=fake_find), \
+             mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
              mock.patch("collect_intake.time.sleep"):
             stats = ci.notion_reconcile_handoff_refs("tok", "db",
                                                      current_handoff_id=HID)
@@ -372,7 +373,7 @@ class RefRowQueryTest(unittest.TestCase):
                 _handoff_page(PRIOR_HID, "2026-06-11", "New", "hp-11"),  # 제외 대상
             ], "has_more": False}
 
-        with mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
             rows = ci._query_new_rows_with_ref(
                 "tok", "db",
                 {"property": "Handoff Ref", "rich_text": {"is_not_empty": True}})
@@ -402,17 +403,17 @@ class EmitIntegrationTest(unittest.TestCase):
             return _inner
 
         with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(ci, "notion_stale_prior_open_handoffs",
+             mock.patch.object(grm_handoff, "notion_stale_prior_open_handoffs",
                                side_effect=track("stale", 0)) as stale, \
-             mock.patch.object(ci, "notion_find_handoff_page",
+             mock.patch.object(grm_handoff, "notion_find_handoff_page",
                                side_effect=track("find_current", current_page)), \
-             mock.patch.object(ci, "notion_reconcile_handoff_refs",
+             mock.patch.object(grm_handoff, "notion_reconcile_handoff_refs",
                                side_effect=track("reconcile", {})) as reconcile, \
-             mock.patch.object(ci, "notion_query_new_intake_rows",
+             mock.patch.object(grm_handoff, "notion_query_new_intake_rows",
                                side_effect=track("query", list(self._ROWS))), \
-             mock.patch.object(ci, "notion_upsert_routine_handoff",
+             mock.patch.object(grm_handoff, "notion_upsert_routine_handoff",
                                side_effect=track("upsert", ("pid", "url"))), \
-             mock.patch.object(ci, "notion_mark_rows_handoff_ref",
+             mock.patch.object(grm_handoff, "notion_mark_rows_handoff_ref",
                                side_effect=track("mark", (1, 0))) as mark:
             row_count, page_url = ci.emit_routine_handoff(
                 "tok", "db", RUN_DATE, 30, GEN_AT, display_window_days=7)
@@ -497,13 +498,13 @@ class UpsertReviveGuardTest(unittest.TestCase):
             return {"id": "p", "url": "u"}
 
         with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(ci, "_handoff_blocks", return_value=[]), \
-             mock.patch.object(ci, "_handoff_page_properties", return_value={}), \
-             mock.patch.object(ci, "notion_stale_prior_open_handoffs", return_value=0), \
-             mock.patch.object(ci, "notion_find_handoff_page", return_value=existing), \
-             mock.patch.object(ci, "notion_archive_page_children"), \
-             mock.patch.object(ci, "notion_append_page_children"), \
-             mock.patch.object(ci, "notion_api_request", side_effect=fake_api):
+             mock.patch.object(grm_handoff, "_handoff_blocks", return_value=[]), \
+             mock.patch.object(grm_handoff, "_handoff_page_properties", return_value={}), \
+             mock.patch.object(grm_handoff, "notion_stale_prior_open_handoffs", return_value=0), \
+             mock.patch.object(grm_handoff, "notion_find_handoff_page", return_value=existing), \
+             mock.patch.object(grm_handoff, "notion_archive_page_children"), \
+             mock.patch.object(grm_handoff, "notion_append_page_children"), \
+             mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
             result = ci.notion_upsert_routine_handoff(
                 "tok", "db", {"handoff_id": HID, "run_date_kst": "2026-06-12"}, GEN_AT)
         return result, patches

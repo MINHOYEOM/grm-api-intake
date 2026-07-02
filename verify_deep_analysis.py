@@ -38,13 +38,40 @@ from typing import Any, Iterable
 SEV_FAIL = "FAIL"
 SEV_WARN = "WARN"
 
+# WL(warning-letter) 4섹션 — 기본값(후방호환: 기존 직접 호출·테스트가 이 상수를 그대로 씀).
 REQUIRED_SECTIONS: tuple[str, ...] = (
     "key_violations",
     "fda_evaluation",
     "required_remediation",
     "administrative_risks",
 )
+# [소스확장 2026-07-02] MFDS 행정처분 4섹션 — WL 의 fda_evaluation(응답 왕복 평가) 자리를
+# disposition_basis(처분 내용·수위·판단근거)로 교체(확정처분엔 "응답 평가"가 없음, 설계문서 §5·§15).
+# 나머지 3섹션(key_violations·required_remediation·administrative_risks)은 WL 과 동일 구조 재사용.
+REQUIRED_SECTIONS_ADMIN: tuple[str, ...] = (
+    "key_violations",
+    "disposition_basis",
+    "required_remediation",
+    "administrative_risks",
+)
 _MIN_SECTION_LEN = 20  # 구조 완전성 최소 길이(문자열 섹션). 리스트 섹션은 비었는지만 본다.
+
+
+def resolve_required_sections(deep_analysis: "dict[str, Any] | None" = None,
+                              card_type: "str | None" = None) -> tuple[str, ...]:
+    """카드타입별 필수 섹션 집합. card_type 이 명시되면 그것으로, 없으면 산출물 키로 자동판별.
+
+    자동판별: `disposition_basis` 만 있고 `fda_evaluation` 이 없으면 admin(행정처분), 그 외엔 WL.
+    → 기존 WL 호출부(card_type 미전달·fda_evaluation 보유)는 항상 REQUIRED_SECTIONS 로 귀결(불변).
+    """
+    if card_type in ("admin-action", "행정처분"):
+        return REQUIRED_SECTIONS_ADMIN
+    if card_type in ("warning-letter", "Warning Letter"):
+        return REQUIRED_SECTIONS
+    da = deep_analysis or {}
+    if isinstance(da, dict) and "disposition_basis" in da and "fda_evaluation" not in da:
+        return REQUIRED_SECTIONS_ADMIN
+    return REQUIRED_SECTIONS
 
 
 @dataclass(frozen=True)
@@ -100,11 +127,15 @@ def _check_remediation_structure(value: Any) -> list[Finding]:
     return findings
 
 
-def check_structure(deep_analysis: dict[str, Any]) -> list[Finding]:
+def check_structure(deep_analysis: dict[str, Any],
+                    sections: tuple[str, ...] = REQUIRED_SECTIONS) -> list[Finding]:
     """D1: 4개 섹션 전부 존재 + 공백 아님. required_remediation 은 객체 구조(deadline·items)
-    까지 검사한다(§2.5 — overview 제거·remediation 객체화). 누락/공백 섹션마다 FAIL 1건."""
+    까지 검사한다(§2.5 — overview 제거·remediation 객체화). 누락/공백 섹션마다 FAIL 1건.
+
+    `sections` 로 카드타입별 필수 섹션 집합을 받는다(기본=WL, 후방호환). admin 은 fda_evaluation
+    자리에 disposition_basis(문자열 섹션 — 동일 최소길이 검사)."""
     findings: list[Finding] = []
-    for key in REQUIRED_SECTIONS:
+    for key in sections:
         if key == "required_remediation":
             findings.extend(_check_remediation_structure(deep_analysis.get(key)))
             continue
@@ -132,6 +163,30 @@ _CITATION_PATTERNS = (
     #   Codex 리뷰 P1 발견·재현). (?<!\d)…(?!\d) 는 한글/공백/문장부호에 인접해도 정상 추출한다.
     re.compile(r"(?<!\d)\d{3}\.\d{1,4}(?:\([A-Za-z0-9]{1,4}\))*(?!\d)"),          # 211.192(a) 류
     re.compile(r"(?<!\d)\d{3}\([A-Za-z0-9]{1,4}\)(?:\([A-Za-z0-9]{1,4}\))*(?!\d)"),  # 502(a) 류
+    # ─ [소스확장 2026-07-02] 한국 행정처분 근거법령 — 위 CFR/FD&C 전용 패턴은 한국 법령에
+    #   매칭이 0건이라 D2 근거대조가 무력화된다(설계문서 §5-1). 아래 3종을 추가한다.
+    #   (1) 알려진 법령/규칙명 + 조항 = 하나의 토큰(법령명까지 근거대조 → "화장품법 제38조"를
+    #       원문의 "약사법 제38조"로 잘못 근거삼는 교차오인용 차단). generic `[가-힣]+법` 은
+    #       앞 단어를 greedy 하게 삼켜(예 "위반한약사법") 오탐하므로 명시 열거만 쓴다.
+    #       ★코너 브래킷 관용(Codex 게이트 2차): 법령명은 원문/산출물서 「」『』로 감싸 인용된다
+    #       (예 「화장품법」 제38조제1항). 법령명 뒤 `」`가 `제` 앞을 막으면 full law token 이
+    #       추출 안 돼 bare `제N조`만 남고, 그러면 원문의 다른 법(「약사법」)에 근거삼아져 교차
+    #       오인용이 통째로 우회된다. → 선행 여는브래킷 `[「『]?` + 법령명·`제` 사이 구분자를
+    #       `[\s「」『』]*`(브래킷 관용)로 둬 `「화장품법」 제38조제1항` 전체를 한 토큰으로 뽑는다
+    #       (정규화 `_normalize_citation` 이 「」 제거 → 법령명 대조 성립). 약사법↔화장품법=FAIL.
+    #   (2) bare 조항(제N조[의N][제N항][제N호]) — 법령명 없이 인용된 조/항/호.
+    #   (3) [별표N] — 행정처분 기준 별표.
+    #   조사 경계: 후행 `\b` 미사용(패턴이 조사 직전에서 끝나 "제38조를"→"제38조" 정상 추출 —
+    #   D3 `_LONG_NUMBER_RE` 의 한글 조사 경계 교훈과 동형). 한글 부재 텍스트(WL 영문)엔 무매칭.
+    re.compile(
+        r"[「『]?(?:약사법|화장품법|의료기기법|마약류\s*관리에\s*관한\s*법률|"
+        r"의약품\s*등의\s*안전에\s*관한\s*규칙|약사법\s*시행규칙|약사법\s*시행령)"
+        r"[\s「」『』]*(?:시행규칙|시행령)?[\s「」『』]*제\d+조(?:의\d+)?(?:제\d+항)?(?:제\d+호)?"),
+    # 앵커를 조/항/호로 확장(Codex 게이트 차단1): 앵커가 `제\d+조` 뿐이면 `조` 없이 단독으로
+    # 온 날조 `제999호`·`제99항`이 추출조차 안 돼 D2 근거대조를 통째로 우회한다. `제38조제1항`은
+    # 여전히 긴 매칭 1토큰으로 유지(extract_citations 의 겹침 dedup) → 기존 동작 불변.
+    re.compile(r"제\d+(?:조|항|호)(?:의\d+)?(?:제\d+항)?(?:제\d+호)?"),   # bare 제N조/항/호
+    re.compile(r"\[\s*별표\s*\d+\s*\]"),                                            # [별표N]
 )
 
 
@@ -164,20 +219,26 @@ def extract_citations(text: str) -> list[str]:
 
 
 def _normalize_citation(tok: str) -> str:
-    """공백·대소문자 차이만 정규화(원문·산출물 양쪽 표기 차이 흡수)."""
-    return re.sub(r"\s+", "", tok).lower()
+    """공백·대소문자·법령명 코너 브래킷(「」『』) 차이만 정규화(원문·산출물 양쪽 표기 차이 흡수).
+
+    Codex 게이트 차단2: 원문이 `「약사법」 제38조제1항`인데 정상 인용 `약사법 제38조제1항`이
+    브래킷 차이만으로 FAIL(과탐)나던 것을 막는다. CFR `502(a)`의 소괄호는 의미 있는 부분이라
+    보존(문자클래스에 넣지 않는다)."""
+    return re.sub(r"[\s「」『』]+", "", tok).lower()
 
 
-def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str) -> list[Finding]:
-    """D2: deep_analysis 안의 조항 인용이 source_text(원문 wl_body_full)에 실제 있는지.
+def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,
+                             sections: tuple[str, ...] = REQUIRED_SECTIONS) -> list[Finding]:
+    """D2: deep_analysis 안의 조항 인용이 source_text(원문 body_full)에 실제 있는지.
 
     없으면 FAIL(날조 의심) — brief_lint 의 MFDS 미근거 링크 FAIL 과 동형(식별자성 사실은
-    하드 검증, 근거 없이 지어낸 조항 번호로 카드가 나가는 걸 구조적으로 막는다).
+    하드 검증, 근거 없이 지어낸 조항 번호로 카드가 나가는 걸 구조적으로 막는다). 한국 행정처분은
+    약사법 조항·[별표N] 등 한국법령 토큰이 대상(_CITATION_PATTERNS 확장, 설계문서 §5-1).
     """
     findings: list[Finding] = []
     source_norm = _normalize_citation(source_text or "")
     reported: set[str] = set()
-    for key in REQUIRED_SECTIONS:
+    for key in sections:
         text = _section_text(deep_analysis.get(key))
         for tok in extract_citations(text):
             key_norm = _normalize_citation(tok)
@@ -201,12 +262,13 @@ def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str) ->
 _LONG_NUMBER_RE = re.compile(r"(?<!\d)\d{4,}(?!\d)")
 
 
-def check_novel_numbers(deep_analysis: dict[str, Any], source_text: str) -> list[Finding]:
+def check_novel_numbers(deep_analysis: dict[str, Any], source_text: str,
+                        sections: tuple[str, ...] = REQUIRED_SECTIONS) -> list[Finding]:
     """D3: 4자리 이상 숫자(날짜·FEI·금액 등)가 원문에 없으면 WARN(비차단 — 표기법 차이 가능)."""
     findings: list[Finding] = []
     source_nums = set(_LONG_NUMBER_RE.findall(source_text or ""))
     reported: set[str] = set()
-    for key in REQUIRED_SECTIONS:
+    for key in sections:
         text = _section_text(deep_analysis.get(key))
         for m in _LONG_NUMBER_RE.finditer(text):
             num = m.group(0)
@@ -256,18 +318,23 @@ def format_report(findings: list[Finding]) -> str:
     return "\n".join(lines)
 
 
-def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str) -> GateResult:
-    """카드 1건의 deep_analysis 를 원문(source_text=wl_body_full)과 대조해 병합 가부 판정.
+def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
+                           card_type: "str | None" = None) -> GateResult:
+    """카드 1건의 deep_analysis 를 원문(source_text=body_full)과 대조해 병합 가부 판정.
 
     FAIL 이 하나라도 있으면 이 카드의 deep_analysis 는 최종 브리프에 병합하지 않는다
     (카드는 기존 6슬롯 얇은 형태로 발행 — graceful degrade). WARN 은 병합을 막지 않되
     사람이 검토할 수 있게 report 에 남긴다.
+
+    `card_type` 미전달 시 산출물 키로 WL/admin 섹션 집합을 자동판별(resolve_required_sections)
+    → 기존 WL 호출부(card_type 없음·fda_evaluation 보유)는 동작 완전 불변.
     """
+    sections = resolve_required_sections(deep_analysis, card_type)
     findings: list[Finding] = []
-    findings.extend(check_structure(deep_analysis))
+    findings.extend(check_structure(deep_analysis, sections))
     if not has_failures(findings):  # 구조가 불완전하면 인용 대조는 의미가 없어 생략
-        findings.extend(check_citation_grounding(deep_analysis, source_text))
-        findings.extend(check_novel_numbers(deep_analysis, source_text))
+        findings.extend(check_citation_grounding(deep_analysis, source_text, sections))
+        findings.extend(check_novel_numbers(deep_analysis, source_text, sections))
     return GateResult(ok=not has_failures(findings), findings=findings,
                       report=format_report(findings))
 

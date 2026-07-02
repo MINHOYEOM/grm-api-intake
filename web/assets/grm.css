@@ -384,7 +384,11 @@ details.merged summary{cursor:pointer}
    펼침 → 원문 링크). 기존 토큰만 재사용 — 신규 색 0(§4 동결 색 규칙 준수). */
 details.deep{background:var(--soft);border-radius:var(--rad-s);padding:14px 20px;margin-top:12px;border-left:3px solid var(--line-2)}
 details.deep summary{cursor:pointer}
-details.deep .lab{margin:0}
+details.deep .lab{margin:0;flex-wrap:wrap;row-gap:5px}
+/* [소스확장 2026-07-02] 생성 해석(AI 분석층) 뱃지 — 결정론 상세(원문 기반)와 시각 구분.
+   coral 계열(기존 토큰 재사용, 신규 색 0). 한글 텍스트라 자간·mono 미적용(한글 안전규칙). */
+.tag-interp{font-family:var(--sans);font-size:10.5px;font-weight:600;color:var(--coral-2);
+  background:var(--coral-tint);border-radius:4px;padding:1px 7px;line-height:1.5;flex:none}
 .deep-sec{margin-top:18px}
 .deep-sec:first-of-type{margin-top:16px}
 /* 섹션 헤더 = 원형 번호 배지(폰트 비의존 CSS 원 + 숫자) + 세리프 소제목 → 4섹션 위계·가시성 */

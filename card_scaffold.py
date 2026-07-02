@@ -207,7 +207,11 @@ class CardScaffold:
         # 필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 오케스트레이터만 소비.
         if self.deep_analysis_ready:
             d["deep_analysis_ready"] = True
-            d["deep_analysis_input"] = {"body_full": self.raw.get("wl_body_full", "")}
+            # WL=wl_body_full, admin-action=admin_body_full(소스확장 2026-07-02). fan-out
+            # 오케스트레이터가 이 body_full 만 서브에이전트 컨텍스트로 준다(카드 격리 불변).
+            d["deep_analysis_input"] = {
+                "body_full": self.raw.get("wl_body_full")
+                or self.raw.get("admin_body_full", "")}
         return d
 
     def to_web_card(self, render_entry: dict[str, Any] | None = None,
@@ -243,7 +247,7 @@ class CardScaffold:
                     if (self.modality and kind not in _NORMATIVE_KINDS) else None)
         headline_target = (self.merged_target if (merged and self.merged_target)
                            else _headline_target(row))
-        detail = _deterministic_detail(kind, raw)
+        detail = _deterministic_detail(kind, row, raw)
 
         return {
             "id": row.get("document_id", ""),
@@ -270,8 +274,9 @@ class CardScaffold:
             "checks": [],                 # LLM
             **({"deterministic_detail": detail} if detail else {}),
             # ^ [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 — WL deep_analysis(LLM 분석층)와
-            # 별개의 결정론 층(환각 0). 현재 gmp-inspection 지적 표(raw.gmp_deficiencies)만 산출.
-            # 없으면 키 자체 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
+            # 별개의 결정론 층(환각 0). `type` 분기: gmp-inspection 지적 표(gmp_deficiencies) ·
+            # [소스확장 2026-07-02] Federal Register abstract 전문(fr_summary). 없으면 키 자체
+            # 부재(요약카드 유지) → 기존 20+ golden web-card 바이트 불변(additive).
             **({"deep_analysis": None} if self.deep_analysis_ready else {}),
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
@@ -496,13 +501,17 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
 _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup")
 
 
-def _deterministic_detail(kind: str, raw: dict[str, Any] | None) -> dict[str, Any] | None:
+def _deterministic_detail(kind: str, row: dict[str, Any],
+                          raw: dict[str, Any] | None) -> dict[str, Any] | None:
     """결정론 상세 슬롯(펼침 상세보기용). 없으면 None(요약카드 유지·golden 불변).
 
     WL `deep_analysis`(LLM 분석층·fan-out·게이트)와 **완전 별개**의 결정론 층 — 생성이 없어
-    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 PDF 표를 그대로 구조화).
-    현재는 `gmp-inspection` 지적사항 표(`raw.gmp_deficiencies`)만. `type` 분기로 향후 483 등
-    다른 결정론 detail 타입 확장 여지.
+    환각 0, `verify_deep_analysis` 같은 근거대조 게이트 불필요(수집기가 공개 사실을 그대로
+    구조화). `type` 분기로 소스별 결정론 detail 확장:
+      - `gmp_deficiencies` — gmp-inspection 지적사항 표(`raw.gmp_deficiencies`).
+      - `fr_summary` — [소스확장 2026-07-02] Federal Register abstract 전문(무절단) + 문서유형.
+        FR abstract 는 FDA 공식 요약이라 풍부(설계문서 §10·§15). W3 quote 는 250자 절단본이라
+        긴 abstract 는 상세가 값. abstract 부재면 None(graceful). 창작 0(DB 필드 무변형).
     """
     raw = raw or {}
     if kind == "gmp-inspection":
@@ -526,6 +535,14 @@ def _deterministic_detail(kind: str, raw: dict[str, Any] | None) -> dict[str, An
                 "severity_summary": severity_summary,
                 "rows": norm,
             }
+    if kind == "guidance":  # Federal Register — 적용범위·기업대응(결정론 불가)·comment_close
+        abstract = (raw.get("abstract") or "").strip()   # (facts 의견기한 중복)은 생략(창작·중복 방지).
+        if abstract:
+            detail: dict[str, Any] = {"type": "fr_summary", "summary_full": abstract}
+            kind_label = _fr_detail_kind(row.get("type_or_class", ""))
+            if kind_label:
+                detail["detail_kind"] = kind_label
+            return detail
     return None
 
 
@@ -577,11 +594,19 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
                           "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts")
         fallback = not row.get("official_url")
     elif kind == "gmp-inspection":
-        official = _first(row.get("source_url"), row.get("official_url"))
+        # [소스확장 2026-07-02] 실사 결과 PDF 를 공식원본으로 노출(설계문서 §11·§15). 라이브
+        # 수집기는 source_url=download_url 이나, download_url raw 키도 폴백에 넣어(belt-and-
+        # suspenders) 결과문서 누락을 막는다(픽스처엔 둘 다 부재 → official="" 유지, golden 불변).
+        official = _first(row.get("source_url"), raw.get("download_url"), row.get("official_url"))
+    elif kind == "who-inspection":
+        # [소스확장 2026-07-02] WHOPIR 결과 PDF(raw.pdf_url)를 공식원본으로 승격 — 종전엔
+        # HTML 실사 페이지(official_url)만 노출돼 실제 결과문서가 클릭 불가였다. pdf_url 부재
+        # 시 official_url 로 graceful 폴백(who-noc/who-news 는 아래 else 유지 — 변경 없음).
+        official = _first(raw.get("pdf_url"), row.get("official_url"))
     elif kind == "fda-483":
         # L1 = 건별 483 PDF(/media/<id>/download). info = OII Reading Room(api_query/source_url).
         official = _first(raw.get("pdf_url"), row.get("official_url"))
-    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
+    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO(noc·news)/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
         official = _first(row.get("official_url"))
     return info, official, fallback
 
@@ -834,8 +859,13 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
     markdown = _neutralize_forbidden("\n\n".join(blocks))
     prose_input = _prose_input(kind, row, raw, evidence, modality, language)
     # [WL 심층분석 fan-out] warning-letter + 전문 확보(raw.wl_body_full, ENABLE_WL_BODY_FULL
-    # 게이트 산출) 시만 True. 그 외 전 유형·전문 미확보 WL 은 항상 False(golden 불변).
-    deep_analysis_ready = bool(kind == "warning-letter" and (raw or {}).get("wl_body_full"))
+    # 게이트 산출) 시만 True. [소스확장 2026-07-02] admin-action + raw.admin_body_full
+    # (ENABLE_MFDS_ADMIN_BODY_FULL 게이트 산출) 도 대상. 그 외 전 유형·body 미확보 카드는
+    # 항상 False(플래그 off 기본 → 픽스처/샘플브리프 키 부재 → golden 불변).
+    _raw = raw or {}
+    deep_analysis_ready = bool(
+        (kind == "warning-letter" and _raw.get("wl_body_full"))
+        or (kind == "admin-action" and _raw.get("admin_body_full")))
     return CardScaffold(
         card_id=card_id, section=section, kind=kind, evidence=evidence,
         modality=modality, signal_tier=row.get("signal_tier", "Tier 1"),
@@ -1199,6 +1229,36 @@ def _official_is_pdf(url: str) -> bool:
     """
     u = (url or "").lower().split("?", 1)[0].split("#", 1)[0]
     return u.endswith(".pdf") or u.endswith("/download")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# [소스확장 2026-07-02] Federal Register 문서유형 라벨 — `_deterministic_detail`(type=fr_summary)이
+# abstract 전문과 함께 낸다(웹 전용·LLM/게이트 없음, §16 deterministic_detail 로 통합).
+# ─────────────────────────────────────────────────────────────────────────────
+_FR_KIND_LABEL = {  # type_or_class → 사람이 읽는 문서 유형(detail_kind)
+    "rule": "Rule", "final-rule": "Rule", "notice-final": "Rule",
+    "proposed-rule": "Proposed Rule", "notice": "Notice",
+    "guidance-industry": "Guidance", "guidance": "Guidance",
+}
+
+
+def _fr_detail_kind(type_or_class: str) -> str:
+    """FR type_or_class → 문서 유형 라벨(Rule/Proposed Rule/Notice/Guidance). 미지 유형은
+    원문 값 그대로(무변형). 결정론(사실 재작성 0)."""
+    tc = (type_or_class or "").strip().lower()
+    if not tc:
+        return ""
+    if tc in _FR_KIND_LABEL:
+        return _FR_KIND_LABEL[tc]
+    if "proposed" in tc:
+        return "Proposed Rule"
+    if "rule" in tc:
+        return "Rule"
+    if "notice" in tc:
+        return "Notice"
+    if "guidance" in tc:
+        return "Guidance"
+    return type_or_class
 
 
 def _plain(value: str) -> str:

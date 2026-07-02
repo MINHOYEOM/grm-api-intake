@@ -767,6 +767,35 @@ class AdminL1VerifyTest(unittest.TestCase):
             cs._official_label("https://www.data.go.kr/data/15058457/openapi.do", True),
             "공식원본(데이터셋)")
 
+    # ── [소스확장 2026-07-02] 검사·실사 결과 PDF 링크 승격 ──────────────────────────────
+    def test_who_inspection_promotes_result_pdf(self):
+        # WHOPIR 결과 PDF(raw.pdf_url)가 공식원본으로 승격(종전 official_url=HTML 페이지).
+        row = {"official_url": "https://who.int/whopir-site-z"}
+        raw = {"pdf_url": "https://who.int/files/whopir-z.pdf"}
+        _info, official, _fb = cs._dual_links("who-inspection", row, raw)
+        self.assertEqual(official, "https://who.int/files/whopir-z.pdf")
+        self.assertTrue(cs._official_is_pdf(official))
+
+    def test_who_inspection_falls_back_without_pdf(self):
+        # pdf_url 부재 시 official_url 로 graceful 폴백.
+        row = {"official_url": "https://who.int/whopir-site-z"}
+        _info, official, _fb = cs._dual_links("who-inspection", row, {})
+        self.assertEqual(official, "https://who.int/whopir-site-z")
+
+    def test_gmp_inspection_download_url_fallback(self):
+        # source_url 부재 시 raw.download_url(결과 PDF)로 폴백(belt-and-suspenders).
+        row = {}
+        raw = {"download_url": "https://nedrug.mfds.go.kr/download/gmp-0007.pdf"}
+        _info, official, _fb = cs._dual_links("gmp-inspection", row, raw)
+        self.assertEqual(official, "https://nedrug.mfds.go.kr/download/gmp-0007.pdf")
+
+    def test_who_noc_unchanged_by_inspection_promotion(self):
+        # who-noc/who-news 는 else 경로 유지 — pdf_url 이 있어도 official_url 만 노출.
+        row = {"official_url": "https://who.int/noc-page"}
+        raw = {"pdf_url": "https://who.int/should-not-use.pdf"}
+        _info, official, _fb = cs._dual_links("who-noc", row, raw)
+        self.assertEqual(official, "https://who.int/noc-page")
+
 
 class WebCardGoldenTest(unittest.TestCase):
     """P1 — `grm-web-card/v1` 카드 직렬화 골든 + 필드 소유권/verbatim/불변식.
@@ -1232,14 +1261,47 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         # 6종 동결 슬롯 토큰 목록(needs_llm_slots)은 이 신규 필드로 오염되지 않는다.
         self.assertNotIn("deep_analysis", card.needs_llm_slots)
 
-    def test_non_warning_letter_kinds_never_ready(self) -> None:
-        # recall/admin/gmp 등 타 유형은 raw 에 wl_body_full 이 있어도(방어적 입력) False.
+    def test_non_deep_kinds_never_ready(self) -> None:
+        # recall/gmp 등 비대상 유형은 raw 에 wl_body_full 이 있어도(방어적 입력) False.
         fx = _load_input("recall_quality_chemical")
         raw = dict(fx["raw"])
         raw["wl_body_full"] = "irrelevant"
         card = cs.build_card_scaffold(fx["row"], raw)
         self.assertFalse(card.deep_analysis_ready)
         self.assertNotIn("deep_analysis", card.to_web_card())
+
+    # ── [소스확장 2026-07-02] MFDS 행정처분(admin-action) — WL 과 동형(admin_body_full 게이트) ──
+    def test_admin_action_without_body_full_is_not_ready(self) -> None:
+        fx = _load_input("admin_action_chemical")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])   # 픽스처엔 admin_body_full 없음
+        self.assertFalse(card.deep_analysis_ready)
+        self.assertNotIn("deep_analysis", card.to_web_card())  # golden 불변(키 부재)
+        self.assertNotIn("deep_analysis_ready", card.to_dict())
+
+    def test_admin_action_with_body_full_is_ready(self) -> None:
+        fx = _load_input("admin_action_chemical")
+        raw = dict(fx["raw"])
+        raw["admin_body_full"] = ("제조기록서를 사실과 다르게 작성해 약사법 제38조제1항을 위반함. "
+                                  "처분명: 제조업무정지 1개월. 적용법령: [별표8] 행정처분 기준.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertTrue(card.deep_analysis_ready)
+
+        webcard = card.to_web_card()
+        self.assertIn("deep_analysis", webcard)
+        self.assertIsNone(webcard["deep_analysis"])            # 병합 전 placeholder
+
+        d = card.to_dict()
+        self.assertTrue(d["deep_analysis_ready"])
+        self.assertEqual(d["deep_analysis_input"]["body_full"], raw["admin_body_full"])
+        self.assertNotIn("deep_analysis", card.needs_llm_slots)
+
+    def test_admin_action_with_wrong_body_key_not_ready(self) -> None:
+        # admin 은 admin_body_full 이 있어야 함 — wl_body_full(오키) 만으론 False.
+        fx = _load_input("admin_action_chemical")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = "irrelevant"
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertFalse(card.deep_analysis_ready)
 
 
 class DeterministicDetailTest(unittest.TestCase):
@@ -1302,6 +1364,54 @@ class DeterministicDetailTest(unittest.TestCase):
         for r in dd["rows"]:
             self.assertEqual(set(r), {"area", "severity", "legal_basis",
                                       "summary", "followup"})
+
+
+class FrDetailTest(unittest.TestCase):
+    """[소스확장 2026-07-02] Federal Register 결정론 상세보기 — §16 deterministic_detail(type=
+    fr_summary)로 통합(gmp_deficiencies 와 동일 슬롯·`type` 분기). 웹 전용·LLM 없음·additive."""
+
+    def test_guidance_card_emits_fr_summary(self) -> None:
+        fx = _load_input("guidance_fr")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+        self.assertIn("deterministic_detail", wc)
+        dd = wc["deterministic_detail"]
+        self.assertEqual(dd["type"], "fr_summary")
+        self.assertEqual(dd["summary_full"], fx["raw"]["abstract"])  # 전문·무변형
+        self.assertEqual(dd["detail_kind"], "Guidance")
+        self.assertNotIn("detail", wc)          # 구 별도 키 제거(통합 확인)
+
+    def test_long_abstract_not_truncated(self) -> None:
+        # 상세는 abstract 전문(무절단) — quote(250자 절단)와 달리 긴 abstract 를 온전히 보여준다.
+        fx = _load_input("guidance_fr")
+        raw = dict(fx["raw"])
+        raw["abstract"] = "A" * 400 + ". " + "B" * 400 + "."
+        dd = cs.build_card_scaffold(fx["row"], raw).to_web_card({})["deterministic_detail"]
+        self.assertEqual(dd["summary_full"], raw["abstract"])
+        self.assertGreater(len(dd["summary_full"]), 250)
+
+    def test_no_abstract_no_detail(self) -> None:
+        fx = _load_input("guidance_fr")
+        raw = dict(fx["raw"]); raw.pop("abstract", None)
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
+        self.assertNotIn("deterministic_detail", wc)   # graceful — 제목 수준 데이터엔 상세 미부착
+
+    def test_non_guidance_non_gmp_cards_have_no_detail(self) -> None:
+        for name in ("mfds_notice", "ich_guideline", "openfda_recall_chemical",
+                     "warning_letter_chemical", "admin_action_chemical"):
+            with self.subTest(fixture=name):
+                fx = _load_input(name)
+                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+                self.assertNotIn("deterministic_detail", wc)
+                self.assertNotIn("detail", wc)
+
+    def test_detail_kind_mapping(self) -> None:
+        self.assertEqual(cs._fr_detail_kind("proposed-rule"), "Proposed Rule")
+        self.assertEqual(cs._fr_detail_kind("notice-final"), "Rule")
+        self.assertEqual(cs._fr_detail_kind("Final Rule"), "Rule")
+        self.assertEqual(cs._fr_detail_kind("notice"), "Notice")
+        self.assertEqual(cs._fr_detail_kind("guidance-industry"), "Guidance")
+        self.assertEqual(cs._fr_detail_kind("메타-미지유형"), "메타-미지유형")  # 무변형 passthrough
+        self.assertEqual(cs._fr_detail_kind(""), "")
 
 
 if __name__ == "__main__":

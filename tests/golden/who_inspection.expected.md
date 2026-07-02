@@ -28,5 +28,5 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  정보출처/공식원본 [링크](https://extranet.who.int/pqweb/inspection/whopir-site-z)
+	**출처**  📰 정보출처 [링크](https://extranet.who.int/pqweb/inspection/whopir-site-z)   ·   📎 공식원본 [링크](https://extranet.who.int/pqweb/sites/default/files/whopir-z.pdf)
 </callout>

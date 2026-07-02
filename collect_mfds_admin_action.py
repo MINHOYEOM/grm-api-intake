@@ -120,6 +120,16 @@ def _url_verify_enabled() -> bool:
         "1", "true", "yes", "on")
 
 
+def _admin_body_full_enabled() -> bool:
+    """[소스확장 2026-07-02] `ENABLE_MFDS_ADMIN_BODY_FULL`(기본 off) — WL 의
+    `ENABLE_WL_BODY_FULL` 과 동형. on 일 때만 다단락 Body(위반상세+근거법령+처분명·과징금)를
+    raw 에 `admin_body_full` 로 노출해 심층분석(deep_analysis) fan-out 입력으로 쓴다. 외부
+    fetch 0(이미 수집된 DB 필드 조립). off(기본) 면 키 부재 → scaffold deep_analysis_ready=False
+    → 골든/동작 완전 불변(활성은 사람 게이트)."""
+    return os.environ.get("ENABLE_MFDS_ADMIN_BODY_FULL", "").strip().lower() in (
+        "1", "true", "yes", "on")
+
+
 def _verify_admin_l1(seq: str, firm: str) -> tuple[str, str]:
     """후보 L1(`CCBAO01/getItem?dispsApplySeq={seq}`)을 verify_url_live 로 판정.
 
@@ -286,6 +296,12 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
         verdict, candidate = _verify_admin_l1(adm_seq, firm)
         raw_payload["admin_l1_verify"] = verdict
         raw_payload["admin_l1_candidate_url"] = candidate
+
+    # [소스확장 2026-07-02] 심층분석 fan-out 입력(flag 게이트, WL wl_body_full 동형).
+    if _admin_body_full_enabled():
+        body_full = _body(raw)
+        if body_full.strip():
+            raw_payload["admin_body_full"] = body_full
 
     return IntakeItem(
         source=SOURCE_MFDS,

@@ -101,6 +101,27 @@ def _card_anchor(card: dict[str, Any]) -> str:
     return cid if cid else f"c{card.get('render_order')}"
 
 
+# ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
+def _deep_preview(da: dict[str, Any] | None) -> str:
+    """분석층(deep) 접힘 summary 에 붙는 내용 힌트 — 펼치기 전에 무엇이 들었는지 스캔용.
+    admin(처분근거) vs WL(대응조치)은 disposition_basis 유무로 구분. 결정론(값 재생성 0)."""
+    if not isinstance(da, dict):
+        return ""
+    kv = da.get("key_violations")
+    n = len(kv) if isinstance(kv, list) else 0
+    mid = "처분근거" if da.get("disposition_basis") else "대응조치"
+    parts = ([f"위반 {n}건"] if n else []) + [mid, "행정리스크"]
+    return " · ".join(parts)
+
+
+def _detail_preview(dd: dict[str, Any] | None) -> str:
+    """결정론 상세(deterministic_detail) 접힘 summary 힌트. fr_summary 는 문서 유형(있으면)
+    또는 '규정 요지'. gmp_deficiencies 는 card.html 이 자체 '· N건' 힌트를 쓰므로 빈 문자열."""
+    if not isinstance(dd, dict) or dd.get("type") != "fr_summary":
+        return ""
+    return dd.get("detail_kind") or "규정 요지"
+
+
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
 def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     quotes_in = card.get("quotes") or []
@@ -173,6 +194,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
         "deterministic_detail": card.get("deterministic_detail") or None,
+        # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
+        "deep_preview": _deep_preview(card.get("deep_analysis")),
+        "detail_preview": _detail_preview(card.get("deterministic_detail")),
         "sources": sources,
     }
 

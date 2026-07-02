@@ -182,5 +182,224 @@ class TestDeficiencyExcerpt(unittest.TestCase):
                 self.assertEqual(g._assess_deficiency(text), "present")
 
 
+# ── [상세보기 결정론 승격 2026-07-02 · spec §16] 지적 표 결정론 추출 회귀 ──────────
+def _has_fitz() -> bool:
+    try:
+        import fitz  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _build_pdf(title: str, table_rows=None, extra_text: str = "") -> bytes:
+    """지적 표 회귀용 합성 PDF. 내장 CJK 폰트 'korea' 사용 — 외부 폰트 불요·CI 이식성.
+
+    table_rows=None → 표 없는 문서(사전평가/적합). 리스트면 5컬럼 ruled 표를 그린다
+    (find_tables 는 벡터 선 격자를 결정론으로 인식 — 실측 PDF 와 동형 구조).
+    """
+    import fitz
+    doc = fitz.open()
+    page = doc.new_page(width=595, height=842)
+    kw = dict(fontname="korea")
+    page.insert_text((50, 50), title, fontsize=11, **kw)
+    if extra_text:
+        page.insert_text((50, 78), extra_text, fontsize=10, **kw)
+    if table_rows:
+        header = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]
+        cols_x = [40, 100, 150, 275, 470, 555]
+        rows_y = [110 + 34 * i for i in range(len(table_rows) + 2)]
+        for x in cols_x:
+            page.draw_line((x, rows_y[0]), (x, rows_y[-1]))
+        for y in rows_y:
+            page.draw_line((cols_x[0], y), (cols_x[-1], y))
+        for r, row in enumerate([header] + table_rows):
+            for c, cell in enumerate(row):
+                page.insert_text((cols_x[c] + 2, rows_y[r] + 18), cell, fontsize=7, **kw)
+    return doc.tobytes()
+
+
+class _FlagCtx:
+    """ENABLE_GMP_DEFICIENCY_TABLE 를 임시로 설정/복원(테스트 격리)."""
+    def __init__(self, value):
+        self.value = value
+
+    def __enter__(self):
+        import os
+        self._saved = os.environ.get("ENABLE_GMP_DEFICIENCY_TABLE")
+        if self.value is None:
+            os.environ.pop("ENABLE_GMP_DEFICIENCY_TABLE", None)
+        else:
+            os.environ["ENABLE_GMP_DEFICIENCY_TABLE"] = self.value
+        return self
+
+    def __exit__(self, *exc):
+        import os
+        if self._saved is None:
+            os.environ.pop("ENABLE_GMP_DEFICIENCY_TABLE", None)
+        else:
+            os.environ["ENABLE_GMP_DEFICIENCY_TABLE"] = self._saved
+        return False
+
+
+class TestInspectionTypeDetection(unittest.TestCase):
+    def test_periodic(self):
+        self.assertEqual(
+            g._detect_inspection_type("의약품 제조소 GMP 정기실태조사(정기실사) 결과"),
+            "periodic")
+
+    def test_pre_market(self):
+        self.assertEqual(
+            g._detect_inspection_type("의약품 사전 GMP 평가 실태조사 결과 실사 결과: 적합"),
+            "pre_market")
+
+    def test_unknown(self):
+        self.assertEqual(g._detect_inspection_type("무관한 공지문"), "unknown")
+        self.assertEqual(g._detect_inspection_type(""), "unknown")
+
+    def test_pre_market_wins_when_both_present(self):
+        # 사전평가 문서에 '정기실태조사' 참조가 섞여도 pre_market(표 미추출=안전 쪽).
+        self.assertEqual(
+            g._detect_inspection_type("사전 GMP 평가 결과 — 정기실태조사 규정 준용"),
+            "pre_market")
+
+
+class TestNormalizeDeficiencyTable(unittest.TestCase):
+    _HEADER = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]
+
+    def test_maps_columns_by_header_token(self):
+        rows = [self._HEADER,
+                ["시설장비", "기타", "[별표1] 2.1호", "교차오염 방지", "이행 인정"]]
+        self.assertEqual(g._normalize_deficiency_table(rows), [{
+            "area": "시설장비", "severity": "기타", "legal_basis": "[별표1] 2.1호",
+            "summary": "교차오염 방지", "followup": "이행 인정"}])
+
+    def test_skips_rows_without_legal_or_summary(self):
+        rows = [self._HEADER,
+                ["", "", "", "", ""],                     # 빈행
+                ["구분줄", "", "", "", "비고만"],           # 근거·지적 없음 → 주석/구분줄 제외
+                ["제조", "중요", "[별표1] 6호", "밸리데이션", "행정처분"]]
+        out = g._normalize_deficiency_table(rows)
+        self.assertEqual(len(out), 1)
+        self.assertEqual(out[0]["area"], "제조")
+
+    def test_returns_empty_without_deficiency_header(self):
+        # 제조소 현황 표(분야/근거/지적 헤더 부재) → 지적 표 아님 → [].
+        rows = [["구분", "내용"], ["제조소명", "테스트제약"]]
+        self.assertEqual(g._normalize_deficiency_table(rows), [])
+
+    def test_cleans_newlines_and_whitespace(self):
+        rows = [self._HEADER,
+                ["제조", "기타", "[별표1]\n6.1호", "밸리데이션\n 실시  할 것", "이행"]]
+        out = g._normalize_deficiency_table(rows)
+        self.assertEqual(out[0]["legal_basis"], "[별표1] 6.1호")
+        self.assertEqual(out[0]["summary"], "밸리데이션 실시 할 것")
+
+    def test_handles_none_cells(self):
+        rows = [self._HEADER, ["제조", None, "[별표1] 6호", None, None]]
+        self.assertEqual(g._normalize_deficiency_table(rows), [{
+            "area": "제조", "severity": "", "legal_basis": "[별표1] 6호",
+            "summary": "", "followup": ""}])
+
+    def test_repeated_header_row_skipped(self):
+        rows = [self._HEADER, self._HEADER,
+                ["제조", "기타", "[별표1] 6호", "밸리데이션", "이행"]]
+        self.assertEqual(len(g._normalize_deficiency_table(rows)), 1)
+
+    def test_empty_input(self):
+        self.assertEqual(g._normalize_deficiency_table([]), [])
+
+
+@unittest.skipUnless(_has_fitz(), "PyMuPDF(fitz) 필요")
+class TestExtractDeficiencyTablePDF(unittest.TestCase):
+    def test_extracts_rows_from_ruled_table(self):
+        data = _build_pdf(
+            "의약품 제조소 GMP 정기실태조사(정기실사) 결과",
+            [["시설장비", "기타", "[별표1] 2.1호", "교차오염 방지 시설", "이행 인정"],
+             ["제조", "중요", "[별표1] 6.1호", "밸리데이션 실시", "행정처분 예정"]])
+        rows = g._extract_deficiency_table(data)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["area"], "시설장비")
+        self.assertEqual(rows[0]["legal_basis"], "[별표1] 2.1호")
+        self.assertEqual(rows[1]["severity"], "중요")
+        self.assertEqual(rows[1]["followup"], "행정처분 예정")
+
+    def test_deterministic_same_bytes_same_rows(self):
+        data = _build_pdf("정기실태조사",
+                          [["제조", "기타", "[별표1] 6호", "밸리데이션", "이행"]])
+        self.assertEqual(g._extract_deficiency_table(data),
+                         g._extract_deficiency_table(data))
+
+    def test_no_table_returns_empty(self):
+        data = _build_pdf("의약품 사전 GMP 평가 실태조사 결과", None,
+                          extra_text="실사 결과: 적합")
+        self.assertEqual(g._extract_deficiency_table(data), [])
+
+
+@unittest.skipUnless(_has_fitz(), "PyMuPDF(fitz) 필요")
+class TestParseDeficiencyTableGate(unittest.TestCase):
+    _PERIODIC_TITLE = "의약품 제조소 GMP 정기실태조사(정기실사) 결과"
+    _ROWS = [["제조", "중요", "[별표1] 6호", "밸리데이션 실시", "행정처분 예정"]]
+
+    def test_flag_off_no_extraction(self):
+        data = _build_pdf(self._PERIODIC_TITLE, self._ROWS)
+        with _FlagCtx(None):
+            self.assertEqual(
+                g._parse_deficiency_table(data, "pdf", self._PERIODIC_TITLE,
+                                          "present", "doc1"),
+                ([], ""))
+
+    def test_enabled_periodic_extracts(self):
+        data = _build_pdf(self._PERIODIC_TITLE, self._ROWS)
+        with _FlagCtx("true"):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._PERIODIC_TITLE, "present", "doc1")
+        self.assertEqual(status, "extracted")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["area"], "제조")
+
+    def test_enabled_pre_market_skipped(self):
+        data = _build_pdf(self._PERIODIC_TITLE, self._ROWS)  # 데이터 무관 — 유형이 우선
+        with _FlagCtx("true"):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", "의약품 사전 GMP 평가 실태조사 결과 적합", "none", "doc2")
+        self.assertEqual((rows, status), ([], "skipped-type"))
+
+    def test_gate_degraded_when_present_but_no_table(self):
+        # periodic·지적사항 present 인데 표가 안 잡히면 조용히 강등(요약카드 유지) + gate-degraded.
+        data = _build_pdf(self._PERIODIC_TITLE, None)  # 표 없음
+        with _FlagCtx("true"):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._PERIODIC_TITLE, "present", "doc3")
+        self.assertEqual((rows, status), ([], "gate-degraded"))
+
+    def test_empty_when_none_and_no_table(self):
+        # '지적사항 없음'(none)은 표 없음이 정상 → empty(경고 없음).
+        data = _build_pdf(self._PERIODIC_TITLE, None)
+        with _FlagCtx("true"):
+            self.assertEqual(
+                g._parse_deficiency_table(data, "pdf", self._PERIODIC_TITLE,
+                                          "none", "doc4"),
+                ([], "empty"))
+
+    def test_non_pdf_or_empty_text_no_extraction(self):
+        with _FlagCtx("true"):
+            self.assertEqual(
+                g._parse_deficiency_table(b"", "hwpx", "정기실태조사", "present", "d"),
+                ([], ""))
+            self.assertEqual(
+                g._parse_deficiency_table(b"%PDF", "pdf", "", "present", "d"),
+                ([], ""))
+
+
+class TestAnchorColonForm(unittest.TestCase):
+    def test_colon_form_now_matched(self):
+        # 실문 콜론형("평가 결과: 지적(보완)사항") — 종전 1번 앵커 MISS → 콜론 허용 수정 검증.
+        text = ("- 1 - GMP 정기실태조사 결과 제조소명: 콜론제약 실사 목적: 정기 "
+                "평가 결과: 지적(보완)사항 품질경영 기타 오염관리 미흡")
+        ex = g._extract_deficiency_excerpt(text)
+        self.assertTrue(ex.startswith("평가 결과: 지적(보완)사항"))
+        self.assertNotIn("제조소명", ex)
+
+
 if __name__ == "__main__":
     unittest.main()

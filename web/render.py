@@ -170,6 +170,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # 동형 — 표시 플래그 미가공, 값 자체는 raw). 대다수 카드는 키 부재/None → card.html
         # `{% if card.deep_analysis %}` 가 False 라 기존 golden 출력 바이트 불변(additive).
         "deep_analysis": card.get("deep_analysis") or None,
+        # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
+        # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
+        "deterministic_detail": card.get("deterministic_detail") or None,
         "sources": sources,
     }
 

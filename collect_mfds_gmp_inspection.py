@@ -12,8 +12,9 @@ import re
 import time
 import urllib.parse
 import xml.etree.ElementTree as ET
+import os
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from html.parser import HTMLParser
 from typing import Any
@@ -66,10 +67,29 @@ _DEFICIENCY_PRESENT_RE = re.compile(
 # [표지 → 제조소 현황 → 실태조사 개요 → 실태조사 결과 → 평가 결과 지적(보완)사항(Deficiencies)]
 # 순서라, 카드 인용이 표지 보일러플레이트가 아니라 실제 지적/결론을 가리키게 한다.
 _DEFICIENCY_EXCERPT_PATTERNS = (
-    r"평가\s*결과\s*지적\s*\(?\s*보완\s*\)?\s*사항",
+    # 1번 앵커: 실문은 "평가 결과: 지적(보완)사항" 처럼 콜론이 껴서 종전 정규식이 MISS 했다
+    # (전문수집 트랙 실측 2026-07-02). `:?` 로 콜론 허용 — 무해·기존 무콜론 형태도 그대로 매칭.
+    r"평가\s*결과\s*:?\s*지적\s*\(?\s*보완\s*\)?\s*사항",
     r"지적\s*\(?\s*보완\s*\)?\s*사항\s*\(\s*Deficiencies\s*\)",
     r"지적\s*\(?\s*보완\s*\)?\s*사항",
 )
+
+# ── [상세보기 결정론 승격 2026-07-02] 지적사항 표 구조 추출 ────────────────────
+# nedrug 정기실태조사 PDF 는 지적(보완)사항을 5컬럼 표(분야·구분·근거법령·지적내용·비고)로
+# 공개한다(전문수집 트랙 실측). PyMuPDF `find_tables()` 만으로 결정론 추출 — 새 의존성·OCR·LLM
+# 전무, 환각 0. 사전 GMP 평가(수입) B형은 판정만 있어 표가 없다 → 유형 분기 후 periodic 만 시도.
+_INSPECTION_TYPE_PERIODIC_RE = re.compile(r"정기\s*실태\s*조사|정기\s*실사")
+_INSPECTION_TYPE_PRE_MARKET_RE = re.compile(r"사전\s*GMP\s*평가|사전\s*평가\s*실태조사")
+# 표 헤더 판별 토큰(모두 포함해야 지적 표로 채택) + 컬럼→필드 매핑 토큰.
+_DEFICIENCY_HEADER_TOKENS = ("분야", "근거", "지적")
+_DEFICIENCY_COLUMN_TOKENS = {
+    "area": ("분야",),
+    "severity": ("구분", "중대도"),
+    "legal_basis": ("근거",),
+    "summary": ("지적", "보완"),
+    "followup": ("비고", "후속", "조치"),
+}
+_DEFICIENCY_TABLE_MAX_ROWS = 200  # 폭주 방어(정상 최대 수십 행)
 
 # 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
@@ -114,6 +134,9 @@ class _AttachmentParse:
     deficiency_excerpt: str = ""   # 표지 너머 '지적(보완)사항' 결론 섹션(카드 인용용)
     bytes_downloaded: int = 0
     error: str = ""
+    # [상세보기 결정론 승격 2026-07-02] periodic PDF 지적 표 구조 추출 결과 + 관측 상태.
+    deficiencies: list[dict[str, str]] = field(default_factory=list)
+    deficiency_table_status: str = ""  # extracted|empty|gate-degraded|parse-fail|skipped-type
 
 
 class _InspectionTableParser(HTMLParser):
@@ -288,6 +311,120 @@ def _assess_deficiency(text: str) -> str:
     return "unknown"
 
 
+def _deficiency_table_enabled() -> bool:
+    """`ENABLE_GMP_DEFICIENCY_TABLE`(기본 off, opt-in) — WL `ENABLE_WL_BODY_FULL` 동형.
+
+    off 면 기존 플로우 완전 무변경(현행 excerpt/assessment 그대로). on 이고 periodic 이고
+    표 추출 성공 시만 raw_payload["gmp_deficiencies"] = rows 기록(점진 활성).
+    """
+    return os.environ.get("ENABLE_GMP_DEFICIENCY_TABLE", "").strip().lower() in (
+        "1", "true", "yes", "on",
+    )
+
+
+def _detect_inspection_type(text: str) -> str:
+    """제목 문자열로 문서 유형 분기: periodic(국내 정기실태조사)·pre_market(수입 사전평가)·unknown.
+
+    periodic 만 지적 표를 공개한다 → periodic 일 때만 표 추출을 시도(사전평가 B형에 강제하면
+    표 없음 → 오탐/빈블록). 결정론·LLM 없음.
+    """
+    compact = re.sub(r"\s+", " ", text or "")
+    if not compact:
+        return "unknown"
+    # pre_market 을 먼저 본다: 사전평가 문서에도 "정기실태조사" 문구가 참조로 섞일 수 있어
+    # 사전평가 표지가 우선 판별되도록(오분류 시 표 미추출=안전 쪽).
+    if _INSPECTION_TYPE_PRE_MARKET_RE.search(compact):
+        return "pre_market"
+    if _INSPECTION_TYPE_PERIODIC_RE.search(compact):
+        return "periodic"
+    return "unknown"
+
+
+def _clean_deficiency_cell(value: str | None) -> str:
+    return re.sub(r"\s+", " ", (value or "").replace("\n", " ")).strip()
+
+
+def _match_deficiency_header(rows: list[list[str | None]]) -> tuple[int | None, dict[str, int | None]]:
+    """지적 표 헤더행 인덱스 + 컬럼→필드 인덱스 매핑 반환(없으면 (None, {})).
+
+    헤더에 분야·근거·지적 을 모두 포함하는 행만 지적 표로 채택(다른 표=제조소 현황 등 배제).
+    컬럼 매핑은 위치가 아니라 헤더 토큰으로 — '근거 법령' vs '근거법령' 같은 표기차에 견고.
+    """
+    for i, row in enumerate(rows):
+        cells = [_clean_deficiency_cell(c) for c in row]
+        joined = " ".join(cells)
+        if all(tok in joined for tok in _DEFICIENCY_HEADER_TOKENS):
+            colmap: dict[str, int | None] = {}
+            for field_name, tokens in _DEFICIENCY_COLUMN_TOKENS.items():
+                idx = None
+                for ci, cell in enumerate(cells):
+                    compact = cell.replace(" ", "")
+                    if any(tok in compact for tok in tokens):
+                        idx = ci
+                        break
+                colmap[field_name] = idx
+            return i, colmap
+    return None, {}
+
+
+def _normalize_deficiency_table(rows: list[list[str | None]]) -> list[dict[str, str]]:
+    """`Table.extract()` 표(행=셀 리스트)를 지적사항 dict 목록으로 정규화(순수·결정론).
+
+    헤더행·주석행(구조 컬럼 전무)·빈행·반복 헤더 제외. 각 행은 근거법령 또는 지적내용이
+    비어있지 않아야 유효(품질 게이트). LLM·fetch 없음.
+    """
+    if not rows:
+        return []
+    header_idx, colmap = _match_deficiency_header(rows)
+    if header_idx is None:
+        return []
+    out: list[dict[str, str]] = []
+    for row in rows[header_idx + 1:]:
+        rec: dict[str, str] = {}
+        for field_name in ("area", "severity", "legal_basis", "summary", "followup"):
+            ci = colmap.get(field_name)
+            rec[field_name] = (_clean_deficiency_cell(row[ci])
+                               if ci is not None and ci < len(row) else "")
+        # 품질 게이트: 근거법령 또는 지적내용 둘 다 비면 주석/빈/구분줄 → 제외.
+        if not (rec["legal_basis"] or rec["summary"]):
+            continue
+        # 페이지 걸친 반복 헤더행 방어.
+        if rec["area"] == "분야" or rec["legal_basis"].replace(" ", "") == "근거법령":
+            continue
+        out.append(rec)
+        if len(out) >= _DEFICIENCY_TABLE_MAX_ROWS:
+            break
+    return out
+
+
+def _extract_deficiency_table(data: bytes) -> list[dict[str, str]]:
+    """PDF 바이트에서 지적사항 표를 결정론 추출(PyMuPDF find_tables). 없으면 [].
+
+    페이지 걸친 다중 표를 누적. 개별 표/페이지 파싱 예외는 건너뛰되(부분 성공 우선),
+    문서 열기 실패는 상위로 전파(호출부가 parse-fail 로 강등). OCR·LLM 없음.
+    """
+    try:
+        import fitz  # type: ignore[import-not-found]
+    except ImportError:
+        return []
+    out: list[dict[str, str]] = []
+    with fitz.open(stream=data, filetype="pdf") as doc:
+        if doc.needs_pass or doc.is_encrypted:
+            return []
+        for page in doc:
+            try:
+                finder = page.find_tables()
+            except Exception:
+                continue
+            for table in finder.tables:
+                try:
+                    extracted = table.extract()
+                except Exception:
+                    continue
+                out.extend(_normalize_deficiency_table(extracted))
+    return out
+
+
 def _extract_pdf_text(data: bytes) -> tuple[str, str]:
     try:
         import fitz  # type: ignore[import-not-found]
@@ -366,6 +503,8 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
         text, status = "", "unknown-format"
 
     deficiency = _assess_deficiency(text)
+    deficiencies, table_status = _parse_deficiency_table(
+        data, file_format, text, deficiency, doc_id)
     return _AttachmentParse(
         status=status,
         file_format=file_format,
@@ -373,7 +512,36 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
         deficiency=deficiency,
         deficiency_excerpt=_extract_deficiency_excerpt(text),
         bytes_downloaded=len(data),
+        deficiencies=deficiencies,
+        deficiency_table_status=table_status,
     )
+
+
+def _parse_deficiency_table(
+    data: bytes, file_format: str, text: str, deficiency: str, doc_id: str,
+) -> tuple[list[dict[str, str]], str]:
+    """지적 표 추출 오케스트레이션(플래그·유형분기·품질게이트). 반환 (rows, status).
+
+    플래그 off·비PDF·본문없음 → ("", "") 로 완전 무영향(현행 플로우 불변). periodic PDF 만
+    시도하고, 추출 실패·유형 unknown·플래그 off = 조용히 요약카드 유지(degrade 우선).
+    """
+    if not (_deficiency_table_enabled() and file_format == "pdf" and text):
+        return [], ""
+    itype = _detect_inspection_type(text)
+    if itype != "periodic":
+        return [], "skipped-type"  # pre_market/unknown → 요약보강(적합/부적합 배지)
+    try:
+        rows = _extract_deficiency_table(data)
+    except Exception as e:  # noqa: BLE001 — 파싱 붕괴는 degrade(요약카드 유지)
+        log("WARN", f"MFDS GMP 지적 표 추출 실패({type(e).__name__}) — 요약카드 유지: {doc_id}")
+        return [], "parse-fail"
+    if rows:
+        return rows, "extracted"
+    # 유효행 0. '지적사항 present' 인데 표가 안 잡히면(레이아웃 변이 등) 조용히 강등 + 경고.
+    if deficiency == "present":
+        log("WARN", "MFDS GMP 지적 표 0행(지적사항 present) — 요약카드 유지: " f"{doc_id}")
+        return [], "gate-degraded"
+    return [], "empty"  # '지적사항 없음' 정상(적합 배지) — 표 없음이 맞음
 
 
 def _row_to_raw(row: list[_Cell]) -> dict[str, str] | None:
@@ -420,6 +588,7 @@ def _set_last_health(
     page_warnings: list[str],
     pages_seen: int,
     max_pages_reached: bool = False,
+    deficiency_table: dict[str, Any] | None = None,
 ) -> None:
     global LAST_HEALTH
     LAST_HEALTH = {
@@ -431,6 +600,8 @@ def _set_last_health(
         "page_warnings": list(page_warnings),
         "pages_seen": pages_seen,
         "max_pages_reached": max_pages_reached,
+        # [상세보기 결정론 승격 2026-07-02] 지적 표 추출 관측(collect_who WHOPIR health 동형).
+        "deficiency_table": dict(deficiency_table or {}),
     }
 
 
@@ -521,6 +692,12 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         raw_payload["attachment_text"] = attachment.text
     if attachment.deficiency_excerpt:
         raw_payload["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
+    # [상세보기 결정론 승격 2026-07-02] periodic 지적 표 성공 시만 구조 배열 기록(card_scaffold
+    # deterministic_detail 소비). status 는 관측용(플래그 on 시도분만) — off 면 키 자체 부재.
+    if attachment.deficiencies:
+        raw_payload["gmp_deficiencies"] = attachment.deficiencies
+    if attachment.deficiency_table_status:
+        raw_payload["gmp_deficiency_table_status"] = attachment.deficiency_table_status
 
     return IntakeItem(
         source=SOURCE_MFDS,
@@ -544,6 +721,19 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     )
 
 
+def _tally_deficiency_table_health(health: dict[str, Any], item: IntakeItem) -> None:
+    """수집 항목 1건의 지적 표 관측 상태를 health 누적기에 반영(결정론·부작용 없음)."""
+    status = str(item.raw_payload.get("gmp_deficiency_table_status") or "")
+    if status not in ("extracted", "empty", "gate-degraded", "parse-fail"):
+        return  # 플래그 off / 비PDF / skipped-type 은 attempted 로 세지 않음
+    health["attempted"] += 1
+    if status == "extracted":
+        health["extracted"] += 1
+    elif status in ("gate-degraded", "parse-fail"):
+        health["failed"] += 1
+        health["warnings"].append(f"{status}: {item.firm}")
+
+
 def collect_mfds_gmp_inspections(
     start: date,
     end: date,
@@ -558,6 +748,10 @@ def collect_mfds_gmp_inspections(
     deficiency_counts: dict[str, int] = {}
     manual_review_count = 0
     page_warnings: list[str] = []
+    deficiency_table_health: dict[str, Any] = {
+        "enabled": _deficiency_table_enabled(),
+        "attempted": 0, "extracted": 0, "failed": 0, "warnings": [],
+    }
     _set_last_health(
         item_count=0,
         parsed_rows=0,
@@ -566,6 +760,7 @@ def collect_mfds_gmp_inspections(
         manual_review_count=0,
         page_warnings=page_warnings,
         pages_seen=0,
+        deficiency_table=deficiency_table_health,
     )
 
     while page_no <= MAX_PAGES:
@@ -590,6 +785,7 @@ def collect_mfds_gmp_inspections(
                     manual_review_count=manual_review_count,
                     page_warnings=page_warnings,
                     pages_seen=pages_fetched,
+                    deficiency_table=deficiency_table_health,
                 )
                 return items, None
             _set_last_health(
@@ -600,6 +796,7 @@ def collect_mfds_gmp_inspections(
                 manual_review_count=manual_review_count,
                 page_warnings=[msg],
                 pages_seen=pages_fetched,
+                deficiency_table=deficiency_table_health,
             )
             return [], msg
 
@@ -618,6 +815,7 @@ def collect_mfds_gmp_inspections(
                     manual_review_count=manual_review_count,
                     page_warnings=page_warnings,
                     pages_seen=pages_fetched,
+                    deficiency_table=deficiency_table_health,
                 )
                 return items, None
             _set_last_health(
@@ -628,6 +826,7 @@ def collect_mfds_gmp_inspections(
                 manual_review_count=manual_review_count,
                 page_warnings=[msg],
                 pages_seen=pages_fetched,
+                deficiency_table=deficiency_table_health,
             )
             return [], msg
 
@@ -653,6 +852,7 @@ def collect_mfds_gmp_inspections(
             deficiency_counts[deficiency] = deficiency_counts.get(deficiency, 0) + 1
             if item.raw_payload.get("manual_review_required"):
                 manual_review_count += 1
+            _tally_deficiency_table_health(deficiency_table_health, item)
 
         if page_dates and max(page_dates) < start:
             break
@@ -674,6 +874,14 @@ def collect_mfds_gmp_inspections(
             "MFDS GMP inspection attachment parse: "
             f"status={parse_status_counts} deficiency={deficiency_counts}",
         )
+    if items and deficiency_table_health["enabled"]:
+        log(
+            "INFO",
+            "MFDS GMP 지적 표: "
+            f"attempted={deficiency_table_health['attempted']} "
+            f"extracted={deficiency_table_health['extracted']} "
+            f"failed={deficiency_table_health['failed']}",
+        )
     _set_last_health(
         item_count=len(items),
         parsed_rows=total_seen_rows,
@@ -683,5 +891,6 @@ def collect_mfds_gmp_inspections(
         page_warnings=page_warnings,
         pages_seen=pages_fetched,
         max_pages_reached=page_no > MAX_PAGES,
+        deficiency_table=deficiency_table_health,
     )
     return items, None

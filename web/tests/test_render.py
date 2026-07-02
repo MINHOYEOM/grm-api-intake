@@ -42,6 +42,7 @@ __all__ = [
     "WebSearchIndexTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
+    "WebDeterministicDetailTest",
 ]
 
 
@@ -923,6 +924,80 @@ def freeze() -> None:
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"골든 동결 완료 → {GOLDEN_DIR}")
+
+
+# ── [상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 블록 렌더 스모크 ──────────
+class WebDeterministicDetailTest(unittest.TestCase):
+    """gmp deterministic_detail 카드를 합성 브리프(06-08 봉투 재사용)에 주입해 실제
+    render_site() 로 HTML 렌더까지 확인. WL deep 과 동형 단계적 노출 블록. 값 부재 카드에는
+    블록이 붙지 않는다(additive). 한글안전(§4) — 셀에 mono/자간 0."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_dd_"))
+        data = cls._tmp / "data"
+        data.mkdir(parents=True, exist_ok=True)
+        base = json.loads(
+            (MULTI_FIXTURES / "brief_web_2026_06_08.json").read_text(encoding="utf-8"))
+        card = dict(base["cards"][0])
+        card.update({
+            "id": "gmpinspect-detailsmoke", "render_order": 999, "group": "국내",
+            "group_label": None, "agency": "MFDS", "card_type": "GMP실사",
+            "category": "Other", "modality": None, "evidence_level": "A",
+            "signal_tier": 3, "signal_label": "High", "type_tag": "GMP실사",
+            "headline_target": "퍼슨", "title_issue": "", "summary": "",
+            "facts": [{"label": "제조소", "value": "㈜퍼슨 천안공장"}],
+            "quotes": [], "key_facts": [], "implication": "", "checks": [],
+            "merged_count": 1, "merged_items": [],
+            "sources": {"info_url": "", "official_url": "https://nedrug.mfds.go.kr/x",
+                        "official_is_pdf": True,
+                        "link_check": {"info": "pending", "official": "pending"}},
+            "deterministic_detail": {
+                "type": "gmp_deficiencies", "count": 2,
+                "severity_summary": {"중요": 1, "기타": 1},
+                "rows": [
+                    {"area": "시설장비", "severity": "기타",
+                     "legal_basis": "[별표1] 2.1호",
+                     "summary": "제품 교차오염 방지 제조시설 운영할 것",
+                     "followup": "이행계획 타당성 인정"},
+                    {"area": "제조", "severity": "중요",
+                     "legal_basis": "[별표1] 6.1호 나목",
+                     "summary": "밸리데이션 규정 반영·실시할 것",
+                     "followup": "행정처분 예정"}]},
+        })
+        base["cards"] = base["cards"] + [card]
+        (data / "brief_web_2026_06_08.json").write_text(
+            json.dumps(base, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, cls._tmp / "out")
+        cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
+            encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_detail_block_rendered(self):
+        self.assertIn('<details class="block detail">', self.html)
+        self.assertIn("지적사항 상세", self.html)
+        self.assertIn("· 2건", self.html)
+
+    def test_rows_and_badges_present(self):
+        self.assertIn("[별표1] 6.1호 나목", self.html)              # 근거법령(일반 서체)
+        self.assertIn("밸리데이션 규정 반영·실시할 것", self.html)     # 지적내용
+        self.assertIn('class="dt-badge">중요</span>', self.html)     # 중대도 배지
+        self.assertIn('class="dt-chip">기타 1</span>', self.html)    # 집계 칩
+
+    def test_only_one_detail_block(self):
+        # 원본 06-08 카드(deterministic_detail 부재)에는 블록이 붙지 않는다(정확히 1개).
+        self.assertEqual(self.html.count('<details class="block detail">'), 1)
+
+    def test_korean_safe_no_mono_no_letterspacing(self):
+        import re as _re
+        block = self.html[self.html.index('<details class="block detail">'):]
+        block = block[:block.index("</details>")]
+        self.assertNotIn("letter-spacing", block)
+        self.assertIsNone(_re.search(r'class="[^"]*\b(?:mono|code)\b[^"]*"', block),
+                          "결정론 상세 블록에 mono/code 클래스(한글 위험, §4)")
 
 
 if __name__ == "__main__":

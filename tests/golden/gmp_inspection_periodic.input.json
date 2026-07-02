@@ -1,0 +1,30 @@
+{
+  "raw": {
+    "manufacturer": "㈜퍼슨 천안공장",
+    "before_after": "사후(정기)",
+    "product_type": "내용고형제",
+    "inspection_start": "2026-04-07",
+    "inspection_end": "2026-04-09",
+    "attachment_deficiency_assessment": "present",
+    "attachment_deficiency_excerpt": "평가 결과: 지적(보완)사항 시설장비 기타 제품 교차오염 방지 제조시설 운영할 것. 제조 중요 밸리데이션 규정 반영·실시할 것.",
+    "attachment_text": "- 1 - 의약품 제조소 GMP 정기실태조사(정기실사) 결과 제조소 현황 제조소명: ㈜퍼슨 천안공장 소재지: 충청남도 천안시 실태조사 개요 실사 기간: 2026. 4. 7. ∼ 2026. 4. 9. 평가 결과: 지적(보완)사항(Deficiencies) 시설장비 기타 제품 교차오염 방지 제조시설 운영할 것. 제조 중요 밸리데이션 규정 반영·실시할 것.",
+    "source_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
+    "gmp_deficiencies": [
+      {"area": "시설장비", "severity": "기타", "legal_basis": "[별표1] 2.1호", "summary": "제품 교차오염 방지 제조시설 운영할 것", "followup": "이행계획 타당성 인정"},
+      {"area": "제조", "severity": "중요", "legal_basis": "[별표1] 6.1호 나목", "summary": "밸리데이션 규정 반영·실시할 것", "followup": "행정처분 예정"},
+      {"area": "품질", "severity": "기타", "legal_basis": "[별표1] 3.3호 하목", "summary": "주성분 공급업체 평가방법 마련할 것", "followup": "이행계획 타당성 인정"}
+    ]
+  },
+  "row": {
+    "date": "2026-06-30",
+    "document_id": "gmpinspect-1PyJBfLEtwC",
+    "firm": "퍼슨",
+    "headline": "GMP 정기실태조사 지적사항",
+    "language": "KO",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 3",
+    "site_country": "대한민국",
+    "source": "MFDS",
+    "type_or_class": "gmp-inspection"
+  }
+}

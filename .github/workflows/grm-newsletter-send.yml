@@ -22,9 +22,11 @@ name: GRM Newsletter Send
 #   ④ 사람 승인 — send 잡 `environment: newsletter-send`(required reviewer). 스케줄/수동 모두
 #      이 게이트를 통과해야 발송(D5 라이브 게이트 정신). 승인 안 하면 안 나간다.
 #
-# ⚠️ 사람 설정 전제(이게 없으면 무인 발송 가능): GitHub Settings → Environments → `newsletter-send`
-#    생성 + Required reviewers 에 본인 추가. 미설정이면 environment 보호가 없어 승인 없이 발송된다.
-#    → 첫 월요일 스케줄이 뜨기 전(권장: 머지 전)에 반드시 설정. 상세 = T1.4 지시문 §2.
+# ⚠️ 사람 설정 전제: GitHub Settings → Environments → `newsletter-send` 생성 + Required reviewers
+#    에 본인 추가. 미설정이면 environment 보호가 없어 승인 없이 발송될 수 있으므로, validate-build
+#    의 사전 assert(gate ④ 사전검증)가 mode=send 일 때 이를 감지해 **발송을 차단**한다(send 잡
+#    미도달 = 무승인 발송 불가). → 첫 월요일 스케줄 전(권장: 머지 전)에 설정해야 발송이 가능해진다.
+#    상세 = T1.4 지시문 §2.
 #
 # 비용(D9): GitHub Actions 무료분 + SaaS 무료 티어. 유료 서비스 0.
 
@@ -67,6 +69,12 @@ jobs:
   validate-build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # 최소권한 유지 + 환경 보호 조회용 actions:read 를 **이 잡에만** 추가(사유: gate ④ 사전
+    # assert 의 getEnvironment 는 private repo 에서 actions:read 필요). send 잡은 워크플로
+    # 기본값(contents:read)을 그대로 상속 — 권한 확대 없음.
+    permissions:
+      contents: read
+      actions: read
     outputs:
       mode: ${{ steps.resolve.outputs.mode }}
       publish_date: ${{ steps.resolve.outputs.publish_date }}
@@ -97,6 +105,58 @@ jobs:
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "publish_date=$PDATE" >> "$GITHUB_OUTPUT"
           echo "해석: event=$EVENT_NAME → mode=$MODE · publish_date=$PDATE"
+
+      # ── 게이트 ④ 사전검증: newsletter-send environment 보호가 실제로 설정돼 있는지 assert ──
+      #   승인 게이트(send 잡의 environment)는 GitHub 에 Required reviewers 가 **설정돼 있을 때만**
+      #   작동한다. 미설정/삭제 시 send 잡이 승인 없이 즉시 실행 → 무승인 발송. 여기서 발송 직전에
+      #   보호를 검증해 미설정이면 validate-build 를 red 로 만든다 → send 잡(needs: validate-build)
+      #   미도달 → **구조적으로 발송 불가**. mode=send 일 때만(validate/test 는 발송 없음 → 불필요).
+      #
+      #   채택 경로(폴백 설계): 1차로 REST getEnvironment 로 required_reviewers 존재를 확인한다
+      #   (actions:read 권한). 조회 자체가 실패(403 등)해 확인 불가하면, 사람 attestation repo
+      #   변수 `GRM_NEWSLETTER_ENV_CONFIRMED == 'true'` 를 요구하는 폴백으로 전환한다. 어느 경로든
+      #   "보호 미설정/미확인 = 발송 불가" 불변식을 지킨다(과발송 0). 404/미보호/미확인 모두 setFailed.
+      - name: Assert newsletter-send environment is protected (gate ④ 사전검증)
+        if: ${{ steps.resolve.outputs.mode == 'send' }}
+        uses: actions/github-script@v9.0.0
+        env:
+          ENV_CONFIRMED: ${{ vars.GRM_NEWSLETTER_ENV_CONFIRMED }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const envName = 'newsletter-send';
+            let rules = null;
+            try {
+              const { data } = await github.rest.repos.getEnvironment({
+                owner, repo, environment_name: envName,
+              });
+              rules = data.protection_rules || [];
+            } catch (error) {
+              if (error.status === 404) {
+                core.setFailed(`newsletter-send environment 보호 미설정(환경 없음) — 무승인 발송 `
+                  + `차단. Settings→Environments 에서 '${envName}' 생성 + Required reviewers 등록 후 재실행.`);
+                return;
+              }
+              // 조회 자체 불가(403 등) → attestation 폴백. 사람이 보호 설정을 확인했다고 attest 한
+              // repo 변수만 신뢰(미확인이면 차단 = 안전 실패).
+              console.log(`environment 조회 실패(status=${error.status}) — attestation 폴백으로 전환.`);
+              if (process.env.ENV_CONFIRMED === 'true') {
+                console.log('GRM_NEWSLETTER_ENV_CONFIRMED=true — 사람 attestation 확인, 통과.');
+                return;
+              }
+              core.setFailed('newsletter-send environment 보호를 API 로 확인할 수 없고 repo 변수 '
+                + 'GRM_NEWSLETTER_ENV_CONFIRMED 도 true 가 아님 — 무승인 발송 차단. 환경 보호(Required '
+                + 'reviewers)를 설정한 뒤, API 조회가 계속 막히면 GRM_NEWSLETTER_ENV_CONFIRMED=true 로 attest 하세요.');
+              return;
+            }
+            const hasReviewers = rules.some((r) => r.type === 'required_reviewers');
+            if (!hasReviewers) {
+              core.setFailed(`newsletter-send environment 에 Required reviewers 미설정 — 무승인 발송 `
+                + `차단. Settings→Environments→'${envName}' 에 Required reviewers 추가 후 재실행.`);
+              return;
+            }
+            console.log('newsletter-send environment 보호 확인(required_reviewers 존재) — 통과.');
 
       - name: Validate + build teaser (gates ①②)
         env:
@@ -150,7 +210,8 @@ jobs:
     timeout-minutes: 10
     # 사람 승인 게이트(④) — Settings → Environments 의 `newsletter-send` 에 required reviewer
     # 등록 시 이 잡은 승인 전까지 보류(러너 미점유·승인자에게 알림). 웹 배포(`production`)와 분리해
-    # 뉴스레터 발송 승인을 독립적으로 관리. **미설정이면 보호 없이 즉시 실행되므로 사전 설정 필수**(§2).
+    # 뉴스레터 발송 승인을 독립적으로 관리. **미설정이면 validate-build 의 사전 assert 가 발송을
+    # 차단**(이 잡 미도달)하므로 사전 설정이 발송의 전제다(§2).
     environment: newsletter-send
     env:
       NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}

@@ -596,65 +596,80 @@ def _deterministic_detail(kind: str, row: dict[str, Any],
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. W8 듀얼링크 (§5 + §12(B)) — L1 실존할 때만, 패턴 유추 금지
 # ─────────────────────────────────────────────────────────────────────────────
-def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> tuple[str, str, bool]:
-    """반환 (info_url=📰, official_url=📎, official_is_fallback). 없으면 ''.
+# per-kind W8 공식원본(📎) 생성기 — SourceSpec.official 로 배선. 반환 (official_url, is_fallback).
+# L1(공식 원본)은 필드에 실제 존재할 때만, 없으면 L2 인덱스(⚠️·fallback=True). 패턴 유추 금지.
+# 미지정 kind(FR/EMA/MHRA/PIC/S/ECA/WHO noc·news/HC/ICH/gmp-certificate/safety-letter 등)는
+# official=None → dispatcher 가 (official_url, False)로 폴백.
+def _official_wl(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    return _first(raw.get("url"), row.get("official_url")), False
 
-    L1(공식 원본)은 필드에 실제 존재할 때만. 없으면 L2 인덱스(⚠️). (§5/§8/§12B)
+
+def _official_admin(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    seq = _first(raw.get("ADM_DISPS_SEQ"))
+    # E2(resolve & verify): 수집기가 ENABLE_MFDS_URL_VERIFY=on 일 때만 남기는
+    # `admin_l1_verify`("pass"/"fail")를 존중한다. 키가 없으면(flag off=기본) verify
+    # 는 None → 현행 동작(seq→L1 단언) 그대로라 golden 바이트 불변(additive).
+    verify = raw.get("admin_l1_verify")
+    if verify == "fail":
+        # 후보 L1 이 live verify 에서 죽음/오류셸 → 정직하게 L2 인덱스 + ⚠️ 강등.
+        return "https://nedrug.mfds.go.kr/pbp/CCBAO01", True
+    if seq:
+        # verify=="pass" → 검증된 L1. None(E2 off) → 현행(미검증 L1 단언, 행위 불변).
+        # 라이브 검증 2026-06-16(URL전수검사): 실제 seq(예 2026004188)→ 행정처분정보
+        # 레코드 정상 렌더. nedrug getItem 은 무효 seq 도 HTTP 200(error-shell)이라
+        # 상태코드로 검증 불가 → E2(본문 길이·오류마커)로만 확정. 잔여 R-1: data.go.kr
+        # 15058457 이 ADM_DISPS_SEQ 를 반환하는지 키 보유 CI 확인(증빙 §5.2 URL-1).
+        return ("https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
+                f"dispsApplySeq={seq}"), False
+    return "https://nedrug.mfds.go.kr/pbp/CCBAO01", True  # L2 인덱스
+
+
+def _official_recall_quality(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    # L2 인덱스(§12B). 라이브 검증 2026-06-16(URL전수검사): 종전 CCBAH01 은 '재평가공고
+    # 및 결과공시' 보드(회수와 무관)였음 → 회수·폐기 보드 CCBAI01 로 정정. 건별 L1 은
+    # data.go.kr 15059114 payload 에 nedrug 회수레코드 seq(targetItemSeq)가 없어 불가 →
+    # 정직하게 L2 인덱스 유지(📰 는 data.go.kr 회수 데이터셋 — 회수 특정).
+    return "https://nedrug.mfds.go.kr/pbp/CCBAI01", True
+
+
+def _official_openfda_recall(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    # 항목별 L1 없음 → FDA Recalls 인덱스 L2(§5). 패턴 유추 금지.
+    official = _first(row.get("official_url"),
+                      "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts")
+    return official, not row.get("official_url")
+
+
+def _official_gmp_inspection(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    # [소스확장 2026-07-02] 실사 결과 PDF 를 공식원본으로 노출(설계문서 §11·§15). 라이브
+    # 수집기는 source_url=download_url 이나, download_url raw 키도 폴백에 넣어(belt-and-
+    # suspenders) 결과문서 누락을 막는다(픽스처엔 둘 다 부재 → official="" 유지, golden 불변).
+    return _first(row.get("source_url"), raw.get("download_url"), row.get("official_url")), False
+
+
+def _official_who_inspection(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    # [소스확장 2026-07-02] WHOPIR 결과 PDF(raw.pdf_url)를 공식원본으로 승격 — 종전엔
+    # HTML 실사 페이지(official_url)만 노출돼 실제 결과문서가 클릭 불가였다. pdf_url 부재
+    # 시 official_url 로 graceful 폴백(who-noc/who-news 는 default 유지 — 변경 없음).
+    return _first(raw.get("pdf_url"), row.get("official_url")), False
+
+
+def _official_fda_483(row: dict[str, Any], raw: dict[str, Any]) -> tuple[str, bool]:
+    # L1 = 건별 483 PDF(/media/<id>/download). info = OII Reading Room(api_query/source_url).
+    return _first(raw.get("pdf_url"), row.get("official_url")), False
+
+
+def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> tuple[str, str, bool]:
+    """반환 (info_url=📰, official_url=📎, official_is_fallback). `SourceSpec.official` 디스패치.
+
+    info(📰)는 공통 산출. official(📎)은 spec.official 콜러블, 없으면 official_url 폴백(§5/§8/§12B).
     """
     raw = raw or {}
     info = _first(row.get("api_query"), row.get("source_url"), row.get("official_url"))
-    official = ""
-    fallback = False
-    if kind == "warning-letter":
-        official = _first(raw.get("url"), row.get("official_url"))
-    elif kind == "admin-action":
-        seq = _first(raw.get("ADM_DISPS_SEQ"))
-        # E2(resolve & verify): 수집기가 ENABLE_MFDS_URL_VERIFY=on 일 때만 남기는
-        # `admin_l1_verify`("pass"/"fail")를 존중한다. 키가 없으면(flag off=기본) verify
-        # 는 None → 현행 동작(seq→L1 단언) 그대로라 golden 바이트 불변(additive).
-        verify = raw.get("admin_l1_verify")
-        if verify == "fail":
-            # 후보 L1 이 live verify 에서 죽음/오류셸 → 정직하게 L2 인덱스 + ⚠️ 강등.
-            official = "https://nedrug.mfds.go.kr/pbp/CCBAO01"
-            fallback = True
-        elif seq:
-            # verify=="pass" → 검증된 L1. None(E2 off) → 현행(미검증 L1 단언, 행위 불변).
-            # 라이브 검증 2026-06-16(URL전수검사): 실제 seq(예 2026004188)→ 행정처분정보
-            # 레코드 정상 렌더. nedrug getItem 은 무효 seq 도 HTTP 200(error-shell)이라
-            # 상태코드로 검증 불가 → E2(본문 길이·오류마커)로만 확정. 잔여 R-1: data.go.kr
-            # 15058457 이 ADM_DISPS_SEQ 를 반환하는지 키 보유 CI 확인(증빙 §5.2 URL-1).
-            official = ("https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?"
-                        f"dispsApplySeq={seq}")
-        else:
-            official = "https://nedrug.mfds.go.kr/pbp/CCBAO01"  # L2 인덱스
-            fallback = True
-    elif kind == "recall-quality":
-        # L2 인덱스(§12B). 라이브 검증 2026-06-16(URL전수검사): 종전 CCBAH01 은 '재평가공고
-        # 및 결과공시' 보드(회수와 무관)였음 → 회수·폐기 보드 CCBAI01 로 정정. 건별 L1 은
-        # data.go.kr 15059114 payload 에 nedrug 회수레코드 seq(targetItemSeq)가 없어 불가 →
-        # 정직하게 L2 인덱스 유지(📰 는 data.go.kr 회수 데이터셋 — 회수 특정).
-        official = "https://nedrug.mfds.go.kr/pbp/CCBAI01"
-        fallback = True
-    elif kind == "openfda-recall":
-        # 항목별 L1 없음 → FDA Recalls 인덱스 L2(§5). 패턴 유추 금지.
-        official = _first(row.get("official_url"),
-                          "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts")
-        fallback = not row.get("official_url")
-    elif kind == "gmp-inspection":
-        # [소스확장 2026-07-02] 실사 결과 PDF 를 공식원본으로 노출(설계문서 §11·§15). 라이브
-        # 수집기는 source_url=download_url 이나, download_url raw 키도 폴백에 넣어(belt-and-
-        # suspenders) 결과문서 누락을 막는다(픽스처엔 둘 다 부재 → official="" 유지, golden 불변).
-        official = _first(row.get("source_url"), raw.get("download_url"), row.get("official_url"))
-    elif kind == "who-inspection":
-        # [소스확장 2026-07-02] WHOPIR 결과 PDF(raw.pdf_url)를 공식원본으로 승격 — 종전엔
-        # HTML 실사 페이지(official_url)만 노출돼 실제 결과문서가 클릭 불가였다. pdf_url 부재
-        # 시 official_url 로 graceful 폴백(who-noc/who-news 는 아래 else 유지 — 변경 없음).
-        official = _first(raw.get("pdf_url"), row.get("official_url"))
-    elif kind == "fda-483":
-        # L1 = 건별 483 PDF(/media/<id>/download). info = OII Reading Room(api_query/source_url).
-        official = _first(raw.get("pdf_url"), row.get("official_url"))
-    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO(noc·news)/HC/ICH 등 RSS·페이지 L1(official_url 실존 시)
-        official = _first(row.get("official_url"))
+    fn = _spec(kind).official
+    if fn:
+        official, fallback = fn(row, raw)
+    else:  # FR/EMA/MHRA/PIC/S/ECA/WHO(noc·news)/HC/ICH 등 — official_url 실존 시만
+        official, fallback = _first(row.get("official_url")), False
     return info, official, fallback
 
 
@@ -791,19 +806,19 @@ _REGISTRY: dict[str, SourceSpec] = {
     "warning-letter": SourceSpec(
         "🟧", "Warning Letter", "CGMP",
         category="Warning Letter", deep_body_key="wl_body_full",
-        quote=None, extra_rows=None, official=None, detail=None),
+        quote=None, extra_rows=None, official=_official_wl, detail=None),
     "admin-action": SourceSpec(
         "🟦", "행정처분", "행정처분",
         a_eligible=True, deep_body_key="admin_body_full",
-        quote=_quote_admin, extra_rows=None, official=None),
+        quote=_quote_admin, extra_rows=None, official=_official_admin),
     "recall-quality": SourceSpec(
         "🟦", "회수·판매중지", "회수",
         a_eligible=True, section="recall_table",
-        quote=_quote_recall_quality, extra_rows=None, official=None),
+        quote=_quote_recall_quality, extra_rows=None, official=_official_recall_quality),
     "openfda-recall": SourceSpec(
         "🟧", "Recall", "Recall",
         a_eligible=True, section="recall_table",
-        quote=_quote_openfda_recall, extra_rows=None, official=None),
+        quote=_quote_openfda_recall, extra_rows=None, official=_official_openfda_recall),
     "hc-recall": SourceSpec(
         "🟧", "Recall(HC)", "Recall",
         a_eligible=True, section="recall_table",
@@ -811,7 +826,7 @@ _REGISTRY: dict[str, SourceSpec] = {
     "gmp-inspection": SourceSpec(
         "🟦", "GMP실사", "GMP실사",
         a_eligible=True,
-        quote=_quote_gmp_inspection, extra_rows=None, official=None,
+        quote=_quote_gmp_inspection, extra_rows=None, official=_official_gmp_inspection,
         detail=_detail_gmp_deficiencies),
     "gmp-certificate": SourceSpec(
         "🟦", "GMP적합판정", "GMP적합",
@@ -819,11 +834,11 @@ _REGISTRY: dict[str, SourceSpec] = {
     "fda-483": SourceSpec(
         "🟧", "FDA 483 실사 관찰", "483",
         deep_body_key="fda483_body_full",
-        extra_rows=None, official=None, detail=_detail_fda_483_observations),
+        extra_rows=None, official=_official_fda_483, detail=_detail_fda_483_observations),
     "who-noc": SourceSpec("🟧", "WHO", "WHO", normative=True, extra_rows=None),
     "who-inspection": SourceSpec(
         "🟧", "WHO", "WHO", normative=True,
-        extra_rows=None, official=None),
+        extra_rows=None, official=_official_who_inspection),
     "who-news": SourceSpec("🟫", "WHO", "WHO", normative=True, extra_rows=None),
     "ich": SourceSpec(
         "🟫", "ICH", "ICH",

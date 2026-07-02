@@ -207,7 +207,11 @@ class CardScaffold:
         # 필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 오케스트레이터만 소비.
         if self.deep_analysis_ready:
             d["deep_analysis_ready"] = True
-            d["deep_analysis_input"] = {"body_full": self.raw.get("wl_body_full", "")}
+            # WL=wl_body_full, admin-action=admin_body_full(소스확장 2026-07-02). fan-out
+            # 오케스트레이터가 이 body_full 만 서브에이전트 컨텍스트로 준다(카드 격리 불변).
+            d["deep_analysis_input"] = {
+                "body_full": self.raw.get("wl_body_full")
+                or self.raw.get("admin_body_full", "")}
         return d
 
     def to_web_card(self, render_entry: dict[str, Any] | None = None,
@@ -834,8 +838,13 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
     markdown = _neutralize_forbidden("\n\n".join(blocks))
     prose_input = _prose_input(kind, row, raw, evidence, modality, language)
     # [WL 심층분석 fan-out] warning-letter + 전문 확보(raw.wl_body_full, ENABLE_WL_BODY_FULL
-    # 게이트 산출) 시만 True. 그 외 전 유형·전문 미확보 WL 은 항상 False(golden 불변).
-    deep_analysis_ready = bool(kind == "warning-letter" and (raw or {}).get("wl_body_full"))
+    # 게이트 산출) 시만 True. [소스확장 2026-07-02] admin-action + raw.admin_body_full
+    # (ENABLE_MFDS_ADMIN_BODY_FULL 게이트 산출) 도 대상. 그 외 전 유형·body 미확보 카드는
+    # 항상 False(플래그 off 기본 → 픽스처/샘플브리프 키 부재 → golden 불변).
+    _raw = raw or {}
+    deep_analysis_ready = bool(
+        (kind == "warning-letter" and _raw.get("wl_body_full"))
+        or (kind == "admin-action" and _raw.get("admin_body_full")))
     return CardScaffold(
         card_id=card_id, section=section, kind=kind, evidence=evidence,
         modality=modality, signal_tier=row.get("signal_tier", "Tier 1"),

@@ -70,8 +70,11 @@
       §2.5 로 제거(summary 흡수). 섹션 헤더 = 원형번호 배지(①②③④, 폰트 비의존 CSS 원)
       + 세리프 소제목으로 4섹션 위계·가시성 확보. -#}
   <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>상세 분석 보기 <span class="sub">· AI 심층분석</span></summary>
+    {#- [소스확장 2026-07-02] admin-action(행정처분)은 disposition_basis 슬롯 보유 → 한글·기관중립
+        섹션명. WL(disposition_basis 부재)은 기존 영문 그대로 = 바이트 불변. -#}
+    {%- set da_admin = card.deep_analysis.disposition_basis %}
     {%- if card.deep_analysis.key_violations %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">1</span><span class="deep-t">Key Violations &amp; Risk Analysis</span></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">1</span><span class="deep-t">{% if da_admin %}위반 항목 및 리스크{% else %}Key Violations &amp; Risk Analysis{% endif %}</span></div>
       {%- for v in card.deep_analysis.key_violations %}
       {%- if v is mapping %}
       <div class="viol">{% if v.citation %}<span class="viol-cite">{{ v.citation }}</span>{% endif %}{% if v.description or v.summary %}<p class="viol-desc">{{ v.description or v.summary }}</p>{% endif %}{% if v.risk %}<p class="viol-risk"><i class="ti ti-alert-triangle"></i> {{ v.risk }}</p>{% endif %}</div>
@@ -81,12 +84,12 @@
       {%- endfor %}
     </div>
     {%- endif %}
-    {%- if card.deep_analysis.fda_evaluation %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">2</span><span class="deep-t">FDA's Evaluation of Response</span></div><p>{{ card.deep_analysis.fda_evaluation }}</p></div>
+    {%- if card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation %}
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">2</span><span class="deep-t">{% if da_admin %}처분 내용 및 근거{% else %}FDA's Evaluation of Response{% endif %}</span></div><p>{{ card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation }}</p></div>
     {%- endif %}
     {%- if card.deep_analysis.required_remediation %}
     {%- set rem = card.deep_analysis.required_remediation %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">3</span><span class="deep-t">Required Remediation</span></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">3</span><span class="deep-t">{% if da_admin %}이행·후속 조치{% else %}Required Remediation{% endif %}</span></div>
       {%- if rem is mapping %}
       {#- rem['items'] 는 반드시 대괄호 접근 — Jinja 에서 rem.items 는 dict 의 .items() 메서드로
           해석돼 렌더가 깨진다(키 'items' 와 충돌). deadline 은 충돌 없으나 일관성 위해 대괄호. -#}
@@ -104,7 +107,7 @@
     </div>
     {%- endif %}
     {%- if card.deep_analysis.administrative_risks %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">4</span><span class="deep-t">Administrative Risks &amp; Special Notes</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">4</span><span class="deep-t">{% if da_admin %}행정 리스크{% else %}Administrative Risks &amp; Special Notes{% endif %}</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
     {%- endif %}
   </details>
   {%- endif %}

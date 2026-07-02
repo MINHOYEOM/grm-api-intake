@@ -1232,14 +1232,47 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         # 6종 동결 슬롯 토큰 목록(needs_llm_slots)은 이 신규 필드로 오염되지 않는다.
         self.assertNotIn("deep_analysis", card.needs_llm_slots)
 
-    def test_non_warning_letter_kinds_never_ready(self) -> None:
-        # recall/admin/gmp 등 타 유형은 raw 에 wl_body_full 이 있어도(방어적 입력) False.
+    def test_non_deep_kinds_never_ready(self) -> None:
+        # recall/gmp 등 비대상 유형은 raw 에 wl_body_full 이 있어도(방어적 입력) False.
         fx = _load_input("recall_quality_chemical")
         raw = dict(fx["raw"])
         raw["wl_body_full"] = "irrelevant"
         card = cs.build_card_scaffold(fx["row"], raw)
         self.assertFalse(card.deep_analysis_ready)
         self.assertNotIn("deep_analysis", card.to_web_card())
+
+    # ── [소스확장 2026-07-02] MFDS 행정처분(admin-action) — WL 과 동형(admin_body_full 게이트) ──
+    def test_admin_action_without_body_full_is_not_ready(self) -> None:
+        fx = _load_input("admin_action_chemical")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])   # 픽스처엔 admin_body_full 없음
+        self.assertFalse(card.deep_analysis_ready)
+        self.assertNotIn("deep_analysis", card.to_web_card())  # golden 불변(키 부재)
+        self.assertNotIn("deep_analysis_ready", card.to_dict())
+
+    def test_admin_action_with_body_full_is_ready(self) -> None:
+        fx = _load_input("admin_action_chemical")
+        raw = dict(fx["raw"])
+        raw["admin_body_full"] = ("제조기록서를 사실과 다르게 작성해 약사법 제38조제1항을 위반함. "
+                                  "처분명: 제조업무정지 1개월. 적용법령: [별표8] 행정처분 기준.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertTrue(card.deep_analysis_ready)
+
+        webcard = card.to_web_card()
+        self.assertIn("deep_analysis", webcard)
+        self.assertIsNone(webcard["deep_analysis"])            # 병합 전 placeholder
+
+        d = card.to_dict()
+        self.assertTrue(d["deep_analysis_ready"])
+        self.assertEqual(d["deep_analysis_input"]["body_full"], raw["admin_body_full"])
+        self.assertNotIn("deep_analysis", card.needs_llm_slots)
+
+    def test_admin_action_with_wrong_body_key_not_ready(self) -> None:
+        # admin 은 admin_body_full 이 있어야 함 — wl_body_full(오키) 만으론 False.
+        fx = _load_input("admin_action_chemical")
+        raw = dict(fx["raw"])
+        raw["wl_body_full"] = "irrelevant"
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertFalse(card.deep_analysis_ready)
 
 
 class DeterministicDetailTest(unittest.TestCase):

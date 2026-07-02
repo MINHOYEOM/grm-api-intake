@@ -168,5 +168,106 @@ class GateTest(unittest.TestCase):
         self.assertTrue(all(f.code == "D1-SECTION-INCOMPLETE" for f in result.findings))
 
 
+# ── [소스확장 2026-07-02] MFDS 행정처분(admin-action) 스키마 + 한국법령 D2 ──────────────
+_ADMIN_SOURCE = (
+    "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조제1항을 "
+    "위반함. 제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨. "
+    "처분명: 제조업무정지 1개월. "
+    "적용법령: 약사법 제38조제1항, 의약품 등의 안전에 관한 규칙 제48조제9호, [별표8] 행정처분 기준. "
+    "과징금 166,800,000원, 납부기한 2026-07-15."
+)
+
+_GOOD_ADMIN_DA = {
+    "key_violations": [
+        {"citation": "약사법 제38조제1항",
+         "description": "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않음",
+         "risk": "데이터 무결성 훼손 및 품질 보증 실패"},
+        {"citation": "의약품 등의 안전에 관한 규칙 제48조제9호",
+         "description": "제조소 현장점검 결과 청정도 관리기준 이탈이 확인됨",
+         "risk": "무균·청정 환경 오염 위험"},
+    ],
+    "disposition_basis": "[별표8] 행정처분 기준에 따라 제조업무정지 1개월 처분이 부과되었다.",
+    "required_remediation": {
+        "deadline": "2026-07-15 납부기한",
+        "items": ["과징금 166,800,000원 납부", "제조기록 관리 절차를 재수립하고 CAPA 를 문서화"],
+    },
+    "administrative_risks": "재위반 시 가중처분 및 품목허가 취소로 이어질 수 있다.",
+}
+
+
+class ResolveSectionsTest(unittest.TestCase):
+    def test_card_type_admin(self) -> None:
+        self.assertEqual(vda.resolve_required_sections(card_type="admin-action"),
+                         vda.REQUIRED_SECTIONS_ADMIN)
+
+    def test_card_type_wl(self) -> None:
+        self.assertEqual(vda.resolve_required_sections(card_type="warning-letter"),
+                         vda.REQUIRED_SECTIONS)
+
+    def test_autodetect_admin_by_disposition_key(self) -> None:
+        self.assertEqual(vda.resolve_required_sections(_GOOD_ADMIN_DA),
+                         vda.REQUIRED_SECTIONS_ADMIN)
+
+    def test_autodetect_wl_default(self) -> None:
+        # fda_evaluation 보유(또는 disposition_basis 부재) → WL 기본(후방호환).
+        self.assertEqual(vda.resolve_required_sections(_GOOD_DEEP_ANALYSIS),
+                         vda.REQUIRED_SECTIONS)
+
+
+class KoreanCitationExtractionTest(unittest.TestCase):
+    def test_law_article_and_byeolpyo_extracted(self) -> None:
+        found = {vda._normalize_citation(t) for t in vda.extract_citations(
+            "약사법 제38조제1항 및 [별표8], 제48조제9호 위반")}
+        self.assertIn(vda._normalize_citation("약사법 제38조제1항"), found)
+        self.assertIn(vda._normalize_citation("[별표8]"), found)
+        self.assertTrue(any("제48조제9호" in f for f in found))
+
+    def test_hangul_particle_boundary_extracted(self) -> None:
+        # 조사가 공백 없이 붙은 조항("제38조를")도 추출돼야 D2 근거대조가 걸린다(WL D3 교훈과 동형).
+        found = {vda._normalize_citation(t) for t in vda.extract_citations("약사법 제38조를 위반")}
+        self.assertIn(vda._normalize_citation("약사법 제38조"), found)
+
+
+class AdminGateTest(unittest.TestCase):
+    def test_admin_good_passes_gate_autodetect(self) -> None:
+        # card_type 미전달 → disposition_basis 키로 admin 스키마 자동판별.
+        result = vda.run_deep_analysis_gate(_GOOD_ADMIN_DA, _ADMIN_SOURCE)
+        self.assertTrue(result.ok, result.report)
+        self.assertEqual(result.fail_count, 0)
+
+    def test_admin_missing_disposition_basis_fails_d1(self) -> None:
+        da = dict(_GOOD_ADMIN_DA)
+        del da["disposition_basis"]
+        result = vda.run_deep_analysis_gate(da, _ADMIN_SOURCE, card_type="admin-action")
+        self.assertFalse(result.ok)
+        self.assertTrue(any(f.code == "D1-SECTION-INCOMPLETE"
+                            and "disposition_basis" in f.detail for f in result.findings))
+
+    def test_admin_fabricated_law_blocks_merge(self) -> None:
+        # 원문은 약사법인데 화장품법 제99조(원문 부재)로 오인용/날조 → 교차오인용 D2 FAIL.
+        da = dict(_GOOD_ADMIN_DA)
+        da["key_violations"] = list(da["key_violations"]) + [
+            {"citation": "화장품법 제99조", "description": "원문에 없는 법령을 근거로 든 날조 서술",
+             "risk": "-"}]
+        result = vda.run_deep_analysis_gate(da, _ADMIN_SOURCE)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("화장품법 제99조" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_admin_fabricated_bare_article_with_particle_blocks(self) -> None:
+        # 조사 직결 날조 조항("제77조를")이 산문에 섞여도 추출·차단(우회 방지).
+        da = dict(_GOOD_ADMIN_DA)
+        da["administrative_risks"] += " 원문에 없는 제77조를 근거로 든 날조."
+        result = vda.run_deep_analysis_gate(da, _ADMIN_SOURCE)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("제77조" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_wl_unaffected_by_admin_extension(self) -> None:
+        # 회귀: WL 산출물은 card_type 없이도 여전히 WL 스키마로 PASS(fda_evaluation 자리 유지).
+        result = vda.run_deep_analysis_gate(_GOOD_DEEP_ANALYSIS, _SOURCE)
+        self.assertTrue(result.ok)
+
+
 if __name__ == "__main__":
     unittest.main()

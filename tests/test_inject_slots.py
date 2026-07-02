@@ -269,6 +269,35 @@ _GOOD_DELTA_DA = {
     "administrative_risks": "미이행 시 압류·금지명령 등 법적 조치가 가능하다.",
 }
 
+# [소스확장 2026-07-02] MFDS 행정처분 admin-action deep_analysis(disposition_basis 스키마).
+_ADMIN_SOURCE_TEXT = (
+    "제조기록서를 사실과 다르게 작성하고 일부 시험성적서를 보관하지 않아 약사법 제38조제1항을 "
+    "위반함. 처분명: 제조업무정지 1개월. 적용법령: [별표8] 행정처분 기준."
+)
+_GOOD_ADMIN_DELTA_DA = {
+    "key_violations": [
+        {"citation": "약사법 제38조제1항", "description": "제조기록서를 사실과 다르게 작성",
+         "risk": "데이터 무결성 훼손 위험"},
+    ],
+    "disposition_basis": "[별표8] 행정처분 기준에 따라 제조업무정지 1개월 처분이 부과되었다.",
+    "required_remediation": {"deadline": "처분 통지 후 90일 이내 이의신청 가능",
+                             "items": ["제조기록 관리 절차를 재수립하고 CAPA 를 문서화"]},
+    "administrative_risks": "재위반 시 가중처분 및 품목허가 취소로 이어질 수 있다.",
+}
+
+
+def _admin_deep_brief() -> tuple[dict, str]:
+    """admin_body_full 확보 admin-action 카드 1장 브리프 + 그 카드 id 반환(테스트 헬퍼)."""
+    fx = _load_input("admin_action_chemical")
+    raw = dict(fx["raw"])
+    raw["admin_body_full"] = _ADMIN_SOURCE_TEXT
+    card = cs.build_card_scaffold(fx["row"], raw)
+    brief = cs.assemble_web_brief([card], {
+        "run_date_kst": "2026-07-01", "window": "2026-06-24 ~ 2026-07-01",
+        "publish_date": "2026-07-01", "intake_total": 1,
+    })
+    return brief, brief["cards"][0]["id"]
+
 
 class InjectDeepAnalysisTest(unittest.TestCase):
     """[WL 심층분석 fan-out 2026-07-01] inject_deep_analysis — 6종 동결 슬롯 inject_llm_slots
@@ -302,6 +331,25 @@ class InjectDeepAnalysisTest(unittest.TestCase):
         self.assertTrue(report.errors)
         card = self.brief["cards"][0]
         self.assertIsNone(card["deep_analysis"])   # 병합 보류 — 카드는 6슬롯만으로 발행
+
+    def test_admin_delta_merges_via_autodetect(self) -> None:
+        # [소스확장] 행정처분 카드 — card_type 미전달이나 disposition_basis 키로 admin 게이트 자동판별.
+        brief, doc_id = _admin_deep_brief()
+        deltas = {doc_id: {"deep_analysis": _GOOD_ADMIN_DELTA_DA,
+                           "source_text": _ADMIN_SOURCE_TEXT}}
+        report = inj.inject_deep_analysis(brief, deltas)
+        self.assertEqual(report.errors, [])
+        self.assertEqual(brief["cards"][0]["deep_analysis"], _GOOD_ADMIN_DELTA_DA)
+
+    def test_admin_fabricated_law_blocked(self) -> None:
+        brief, doc_id = _admin_deep_brief()
+        bad = dict(_GOOD_ADMIN_DELTA_DA)
+        bad["key_violations"] = list(bad["key_violations"]) + [
+            {"citation": "화장품법 제99조", "description": "원문에 없는 법령 날조", "risk": "-"}]
+        report = inj.inject_deep_analysis(brief, {doc_id: {"deep_analysis": bad,
+                                                          "source_text": _ADMIN_SOURCE_TEXT}})
+        self.assertTrue(report.errors)
+        self.assertIsNone(brief["cards"][0]["deep_analysis"])   # 병합 보류
 
     def test_unknown_document_id_warns_not_errors(self) -> None:
         deltas = {"no-such-id": {"deep_analysis": _GOOD_DELTA_DA, "source_text": _WL_SOURCE_TEXT}}
@@ -364,6 +412,23 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertNotIn("Overview", html)
         self.assertIn("15영업일 이내 서면 회신", html)   # deadline 한 줄
         self.assertIn("CAPA", html)                      # 체크리스트 항목 중 하나
+
+    def test_admin_deep_renders_korean_sections(self) -> None:
+        # [소스확장 2026-07-02] 행정처분 카드 — 한글·기관중립 섹션명 렌더, WL 영문 헤더는 부재.
+        brief, doc_id = _admin_deep_brief()
+        report = inj.inject_deep_analysis(
+            brief, {doc_id: {"deep_analysis": _GOOD_ADMIN_DELTA_DA,
+                             "source_text": _ADMIN_SOURCE_TEXT}})
+        self.assertEqual(report.errors, [])
+        html = self._render_brief_html(brief)
+        self.assertIn("상세 분석 보기", html)
+        self.assertIn("위반 항목 및 리스크", html)
+        self.assertIn("처분 내용 및 근거", html)          # disposition_basis 섹션(②)
+        self.assertIn("이행·후속 조치", html)
+        self.assertIn("행정 리스크", html)
+        self.assertIn("약사법 제38조제1항", html)
+        self.assertNotIn("FDA's Evaluation of Response", html)  # WL 영문 헤더 미출현
+        self.assertNotIn("Key Violations", html)
 
     def test_deep_analysis_markup_absent_for_ordinary_cards(self) -> None:
         fx = _load_input("warning_letter_chemical")   # wl_body_full 없음 — deep_analysis_ready=False

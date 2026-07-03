@@ -203,5 +203,68 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
+<style>
+#grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
+#grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
+#grm-mascot .lid{transform-box:fill-box;transform-origin:center top;transform:scaleY(0);transition:transform .09s ease}
+#grm-mascot.is-blink .lid{transform:scaleY(1)}
+#grm-mascot .wingL,#grm-mascot .wingR{transform-box:fill-box;transform-origin:top center}
+#grm-mascot.is-flap .wingL{animation:grmOwlFlapL .26s ease-in-out 3}
+#grm-mascot.is-flap .wingR{animation:grmOwlFlapR .26s ease-in-out 3}
+@keyframes grmOwlBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes grmOwlFlapL{0%,100%{transform:rotate(0)}50%{transform:rotate(28deg)}}
+@keyframes grmOwlFlapR{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
+#grm-mascot .owl-msg{position:absolute;top:calc(100% + 9px);right:0;text-align:left;background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 12px;border-radius:11px;width:max-content;max-width:220px;word-break:keep-all;opacity:0;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;box-shadow:0 10px 22px -10px rgba(0,0,0,.42)}
+#grm-mascot .owl-msg.show{opacity:1;transform:translateY(0)}
+#grm-mascot .owl-msg::after{content:"";position:absolute;top:-11px;right:22px;border:6px solid transparent;border-bottom-color:var(--ink)}
+@media (max-width:760px){ #grm-mascot{display:none} }
+@media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} }
+</style>
+<div id="grm-mascot" data-page="home" aria-hidden="true">
+  <span class="owl-msg"></span>
+  <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>
+    <path d="M30 30 L52 30 L36 8 Z" fill="#CE6E4C"/><path d="M90 30 L68 30 L84 8 Z" fill="#CE6E4C"/>
+    <rect x="18" y="22" width="84" height="92" rx="34" fill="url(#grmOwlGrad)"/>
+    <ellipse cx="60" cy="86" rx="26" ry="24" fill="#F4E7DF" opacity=".85"/>
+    <path class="wingR" d="M100 52 q16 6 12 30 q-3 14 -14 16 q6 -22 2 -46 Z" fill="#B9542F"/>
+    <path class="wingL" d="M20 52 q-16 6 -12 30 q3 14 14 16 q-6 -22 -2 -46 Z" fill="#B9542F"/>
+    <g class="eyes">
+      <circle cx="43" cy="56" r="18" fill="#FAF6EE"/><circle cx="77" cy="56" r="18" fill="#FAF6EE"/>
+      <circle cx="43" cy="57" r="7" fill="#22303F"/><circle cx="77" cy="57" r="7" fill="#22303F"/>
+      <circle cx="45.4" cy="54.6" r="2.1" fill="#FAF6EE"/><circle cx="79.4" cy="54.6" r="2.1" fill="#FAF6EE"/>
+      <rect class="lid" x="24" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+      <rect class="lid" x="58" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+    </g>
+    <path d="M53 68 L67 68 L60 80 Z" fill="#E8B04A"/>
+  </svg>
+</div>
+<script>
+(function(){
+  var m=document.getElementById('grm-mascot'); if(!m) return;
+  var msg=m.querySelector('.owl-msg'), eyes=m.querySelector('.eyes');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var sets={
+    home:{greet:'안녕하세요! 이번 주 규제 소식이 왔어요 🦉',msgs:['반가워요! GRM이에요 👋','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
+    board:{greet:'찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
+    detail:{greet:'이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
+  };
+  var set=sets[m.getAttribute('data-page')]||sets.home, i=0, t;
+  function blink(){ m.classList.add('is-blink'); setTimeout(function(){m.classList.remove('is-blink');},140); }
+  function flap(){ if(reduce) return; m.classList.remove('is-flap'); void m.offsetWidth; m.classList.add('is-flap'); }
+  function say(txt){ msg.textContent=txt; msg.classList.add('show'); clearTimeout(t); t=setTimeout(function(){msg.classList.remove('show');},3600); }
+  (function amb(){ setTimeout(function(){ blink(); if(!reduce&&Math.random()<0.25) flap(); amb(); }, 2800+Math.random()*3600); })();
+  if(!reduce&&eyes){ window.addEventListener('mousemove', function(e){
+    var r=eyes.getBoundingClientRect(); if(!r.width) return;
+    var cx=r.left+r.width/2, cy=r.top+r.height/2, dx=e.clientX-cx, dy=e.clientY-cy;
+    var a=Math.atan2(dy,dx), d=Math.min(3, Math.hypot(dx,dy)/70);
+    eyes.style.transform='translate('+(Math.cos(a)*d).toFixed(2)+'px,'+(Math.sin(a)*d).toFixed(2)+'px)';
+  }, {passive:true}); }
+  m.addEventListener('click', function(){ flap(); blink(); say(set.msgs[i++%set.msgs.length]); });
+  m.addEventListener('mouseenter', function(){ if(!msg.classList.contains('show')) say(set.msgs[i++%set.msgs.length]); });
+  setTimeout(function(){ say(set.greet); }, 1200);
+})();
+</script>
 </body>
 </html>

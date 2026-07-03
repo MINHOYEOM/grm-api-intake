@@ -546,6 +546,13 @@ NAVER_SITE_VERIFICATION = _env_or_default(
 # 가 부착 — 우리 카드 원문/공식 URL(provenance 가드 대상)과 무관한 별개 endpoint.
 NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip()
 
+# 웹 카드 반응 계층(하트·스크랩·회원, S1) — env-param(공개값). SUPABASE_URL·SUPABASE_ANON_KEY
+# 둘 다 설정돼야 활성(reactions_enabled). 미설정(기본·테스트)이면 반응 블록 전체 미출력 →
+# 전 페이지 골든 byte-diff 0(뉴스레터 form_action 선례 동형). anon key 는 publishable(RLS 로
+# 보호)이라 클라이언트 노출 안전 — service_role 키는 절대 배선하지 않는다.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+
 # 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.
 SITE_NAME = "Global Regulatory Monitor"
 SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한자리에 모아 "
@@ -645,6 +652,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         return hashlib.sha1(p.read_bytes()).hexdigest()[:8] if p.is_file() else "0"
     env.globals["css_ver"] = _asset_ver("grm.css")
     env.globals["archivejs_ver"] = _asset_ver("archive.js")
+    # 반응 계층 공개 설정 주입 — url 이 https(_safe_url 통과)이고 anon key 가 있을 때만 활성.
+    # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.
+    _supa_url = _safe_url(SUPABASE_URL)
+    env.globals["reactions_enabled"] = bool(_supa_url and SUPABASE_ANON_KEY)
+    env.globals["supabase_url"] = _supa_url
+    env.globals["supabase_anon_key"] = SUPABASE_ANON_KEY
+    env.globals["reactionsjs_ver"] = _asset_ver("reactions.js")
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")

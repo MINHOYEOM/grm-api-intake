@@ -20,6 +20,7 @@ web/
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
 ├─ assets/grm.css       # 디자인 동결 CSS(v4 + P4 네비/모션/검색 UI). 손으로 편집 금지 — 디자인 변경은 프로토타입 갱신 후 반영
 ├─ assets/archive.js    # 아카이브 교차검색(P4·정적 클라이언트사이드). search-index.json fetch → facet/검색/토글. 비골든
+├─ assets/reactions.js  # [S1] 카드 반응(하트·스크랩·회원) — supabase-js 로 Supabase 직접 호출·RLS. 매직링크 로그인·토글·공개 하트 집계·런타임 카운트/상태 주입(비골든·PE). env-gate(SUPABASE_URL/ANON_KEY) 시에만 로드
 ├─ data/briefs/*.json   # 입력(주차별 1파일). 현재 = 실 6/22. 규약 = data/briefs/README.md(C4)
 ├─ tests/
 │  ├─ test_render.py    # 골든·결정론·무변형·escape·순수성 + 검색인덱스(WebSearchIndexTest) + 구독폼(test_newsletter_form_conditional)
@@ -27,6 +28,7 @@ web/
 │  ├─ test_linkcheck.py # 링크체크 모킹 단위테스트(200/404/503/timeout/KR-skip/HEAD→GET)
 │  ├─ golden/           # 동결 기대 HTML + search-index*.expected.json (byte-diff)
 │  └─ fixtures/multi/   # 합성 2건(06-08 산문·번역 / 06-15 병합) — 멀티 골든용
+├─ migrations/001_reaction.sql  # [S1] Supabase(Postgres) 반응 테이블+RLS+heart_counts 뷰. 사람 1회 실행(배포물 아님·render 미복사)
 └─ dist/                # 빌드 산출(정적, assets/search-index.json 포함). git 비추적
 ```
 > 배포 Action = `.github/workflows/grm-web-deploy.yml`(루트 기준). 수집(`grm-intake.yml`)과
@@ -166,6 +168,20 @@ python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱
 - **사람 후속**: SaaS(Brevo) 가입 → `NEWSLETTER_API_KEY`(Secret, UI 직접 등록)·`GRM_NEWSLETTER_LIST_ID`/
   `SENDER_EMAIL`/`SENDER_NAME`/`TEST_EMAILS`(Variables)·발송 도메인 SPF/DKIM/DMARC·Environments
   `production` reviewer. (2026-06-30 vars·폼 action·도메인 인증 완료 — API 키 UI 등록·첫 발송만 잔여.)
+
+## 카드 반응 계층 (S1 — 하트·스크랩·회원, env-gated)
+`web/assets/reactions.js` + `web/migrations/001_reaction.sql`. **B안**: 브라우저가 `supabase-js` 로 Supabase 를
+직접 호출(뉴스레터 Brevo 직접 POST 선례 동형)하고 **RLS** 가 "본인 반응만" 을 DB 레벨에서 강제 → **엣지 함수·
+런타임 서버 0**(불변식 #3 반응 층 예외에 부합).
+- **env-gate**: `SUPABASE_URL`·`SUPABASE_ANON_KEY`(repo Variables·공개값·anon key=publishable·RLS 로 보호) 둘 다
+  설정 시에만 `render.py` `reactions_enabled=True` → `base.html`/`card.html` 반응 블록 출력. 미설정(기본·테스트)=
+  전 페이지 골든 byte-diff 0(뉴스레터 form_action 선례 동형).
+- **비골든·PE**: 카운트·내상태·로그인은 런타임 클라이언트 주입(콘텐츠 골든/결정론 불침범). 로드/로그인/네트워크
+  실패해도 정적 카드 열람·공유(S0) 무영향.
+- **provenance/PII**: 백엔드는 불투명 `card_id`(=card.anchor)만 — 카드 사실·원문 URL 미전송. email·신원 PII=
+  Supabase 소유(뉴스레터 원칙 정합). service_role 키 미배선(anon key 만·RLS 로 보호).
+- **사람 선행작업**: Supabase 프로젝트·URL/anon key repo Variables·Auth 매직링크+Redirect URL·`001_reaction.sql`
+  실행. 상세 설계=`GRM_웹_S1_회원반응_Supabase_구현설계_2026-07-03.md`.
 
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.

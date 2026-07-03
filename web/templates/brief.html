@@ -18,6 +18,9 @@
       {%- endfor %}
     </ul></div>
     {%- endif %}
+    {%- if brief.ai_disclosure %}
+    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><p><b>AI 자동 생성 안내</b> · 요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오. <a href="#ai-notice">전문 보기 ↓</a></p></div>
+    {%- endif %}
   </div>
   <div class="wrap layout">
     <aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>
@@ -39,9 +42,18 @@
       {%- endfor %}
       {%- endfor %}
       {%- if brief.ai_disclosure %}
-      <div class="disc"><b>AI 자동 생성 안내</b> · 본 자료는 1차 공식 자료를 바탕으로 AI가 자동 작성한 규제 정보 요약입니다.
-        사실 항목은 출처·원본을 병기해 추적 가능하나, 시사점·점검 항목은 편집 해석으로 공식 견해나 법적 자문이 아닙니다. 의사결정 전 반드시 원문을 확인하십시오.
-        <span class="en">This digest is AI-generated from primary sources; interpretations are not official or legal advice — verify against the original before acting.</span></div>
+      <section class="disc" id="ai-notice" aria-label="AI 자동 생성 안내">
+        <div class="disc-h"><i class="ti ti-robot" aria-hidden="true"></i><b>AI 자동 생성 안내</b></div>
+        <div class="disc-sec"><h4>1. AI가 생성한 정보</h4><p>카드 제목, 요약, 한국어 번역, 시사점, 점검 항목 및 상세 분석은 생성형 AI가 공개된 1차 공식 자료를 기반으로 자동 생성한 콘텐츠입니다.</p></div>
+        <div class="disc-sec"><h4>2. 원문 그대로 제공되는 정보</h4><p>사실표에 포함된 수치·코드·일자·기관명·업체명, 영문 원문 인용, 정보출처·공식원본 링크 및 지적사항 표(FDA Form 483 Observation, 식약처 정기실태조사 지적사항 등)는 원문에서 기계적으로 추출한 정보이며, 의미를 변경하거나 재작성하지 않습니다.</p></div>
+        <div class="disc-sec"><h4>3. 검증·한계 및 이용자 유의사항</h4><ul>
+          <li>GRM은 정보의 정확성을 높이기 위해 신뢰도(Evidence A·B·C)와 신호 강도(Tier 1~3)를 제공합니다. Evidence A는 1차 공식 문서를 직접 확인할 수 있는 정보를 의미합니다.</li>
+          <li>생성형 AI가 생성한 요약·번역·시사점·점검 항목 및 상세 분석에는 오역, 누락, 맥락 해석 오류 또는 최신 정보 미반영 가능성이 존재합니다.</li>
+          <li>본 서비스는 규제 및 품질 관련 정보 제공을 목적으로 하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문 또는 공식 해석을 제공하지 않습니다.</li>
+          <li>이용자는 의사결정, 품질시스템 운영, 규제 대응 또는 감사 준비에 활용하기 전에 반드시 공식 원문 및 관련 기관의 최신 자료를 직접 확인해야 합니다.</li>
+        </ul></div>
+        <p class="en">This digest is AI-generated from primary sources; interpretations are not official or legal advice — verify against the original before acting.</p>
+      </section>
       {%- endif %}
     </div>
   </div>

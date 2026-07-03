@@ -45,10 +45,10 @@ DATA_DIR = WEB_DIR / "data" / "briefs"
 # render.py(같은 디렉터리·순수·네트워크 0) — issue 번호/제목/섹션/SITE_BASE_URL 단일 파생원.
 import render  # noqa: E402
 
-# ── 면책 캐논(brief.html 과 **동일 문안** — drift 가드 테스트가 일치 강제) ─────────
-DISCLOSURE_KO = ("본 자료는 1차 공식 자료를 바탕으로 AI가 자동 작성한 규제 정보 요약입니다. "
-                 "사실 항목은 출처·원본을 병기해 추적 가능하나, 시사점·점검 항목은 편집 해석으로 "
-                 "공식 견해나 법적 자문이 아닙니다. 의사결정 전 반드시 원문을 확인하십시오.")
+# ── 면책 캐논(brief.html 상단 배지와 **동일 문안** — drift 가드 테스트가 일치 강제) ──
+DISCLOSURE_KO = ("요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, "
+                 "수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. "
+                 "본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.")
 DISCLOSURE_EN = ("This digest is AI-generated from primary sources; interpretations are not "
                  "official or legal advice — verify against the original before acting.")
 

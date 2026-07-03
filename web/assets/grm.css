@@ -441,7 +441,23 @@ details.detail .lab{margin:0}
 .src a .t{color:var(--muted);font-weight:600;font-size:10px}  /* "정보출처/공식원본" 한글 — sans·자간0·대문자없음(§4 교정) */
 .disc{margin-top:36px;padding:24px 26px;background:var(--soft);border:1px solid var(--line);border-radius:var(--rad);color:var(--body);font-size:13px;line-height:1.78}
 .disc b{color:var(--ink);font-weight:600}
-.disc .en{color:var(--muted);display:block;margin-top:6px}
+.disc .en{color:var(--muted);display:block;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12px}
+/* AI 고지 고도화 — 상단 요약 배지(코럴 틴트) + 하단 전문 3단(§4 한글안전: 인라인 자간/대문자·mono-한글 0) */
+.ai-badge{display:flex;gap:12px;align-items:flex-start;margin-top:26px;padding:14px 18px;background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:var(--rad-s);color:var(--body-s);font-size:13.5px;line-height:1.7}
+.ai-badge i{color:var(--coral-2);font-size:18px;flex:none;margin-top:2px}
+.ai-badge p{margin:0}
+.ai-badge b{color:var(--coral-2);font-weight:600}
+.ai-badge a{color:var(--coral-2);font-weight:600;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+.disc .disc-h{display:flex;gap:9px;align-items:center;margin-bottom:8px}
+.disc .disc-h i{color:var(--coral-2);font-size:19px}
+.disc .disc-h b{font-size:15px}
+.disc-sec{margin-top:16px}
+.disc-sec h4{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.disc-sec p{margin:0}
+.disc-sec ul{margin:6px 0 0;padding-left:18px}
+.disc-sec li{margin:6px 0}
+.notice-body{margin-top:24px;max-width:78ch;display:flex;flex-direction:column;gap:16px}
+.notice-body p{font-size:15px;line-height:1.75;color:var(--body)}
 
 /* ── 뉴스레터 구독 밴드(T1 — env-gated, 푸터 위) ───────────────────────────
    디자인 토큰 재사용(coral/soft/line-2/rad-s)·한글 안전(§4: 문안 자간0·대문자/mono 없음).

@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="{{ rel_root }}assets/grm.css">
+<link rel="stylesheet" href="{{ rel_root }}assets/grm.css?v={{ css_ver }}">
 {% if json_ld %}
 <script type="application/ld+json">{{ json_ld | safe }}</script>
 {% endif %}
@@ -131,7 +131,7 @@
   <div class="foot-legal">
     <div class="foot-copy">
       <span>© 2026 Global Regulatory Monitor</span>
-      <span class="mono">AI-generated from primary sources · verify against the original</span>
+      <span class="prov">AI-generated from primary sources · verify against the original</span>
     </div>
     <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
   </div>

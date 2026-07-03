@@ -245,5 +245,41 @@ if(_nt&&_nm){
   setTimeout(function(){ say(set.greet); }, 1200);
 })();
 </script>
+
+{# 카드 반응 계층 S0 — 공유하기(하트·스크랩 서버 계층의 무백엔드 선행 단계). 순수 클라이언트: navigator.share 우선, 미지원이면 클립보드 복사(그마저 없으면 prompt 폴백). 카드 콘텐츠·원문 URL 미참조 — 불투명 anchor 로 우리 페이지 딥링크(location+'#'+anchor)만 조립 → provenance 보존. grm.css 무편집(디자인 프리즈) 위해 마스코트·구독밴드 선례처럼 스코프 스타일을 base 인라인으로 둠. progressive enhancement: 스크립트 실행 시에만 body.grm-has-share 로 노출(JS off → 버튼 미표시, 정적 카드 열람 무영향). §4 한글안전: letter-spacing/text-transform/class=mono 미사용. 결정론: now()/난수 0. #}
+<style>
+.grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
+body.grm-has-share .grm-card-actions{display:flex}
+.grm-ca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.grm-ca:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-ca .ti{font-size:15px}
+.grm-ca.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-card-actions');
+  if(!rows.length) return;
+  document.body.classList.add('grm-has-share');
+  function done(btn){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent='복사됨'; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  for(var i=0;i<rows.length;i++){ (function(row){
+    var btn=row.querySelector('[data-share]'); if(!btn) return;
+    btn.addEventListener('click', function(){
+      var anchor=row.getAttribute('data-anchor')||'';
+      var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
+      var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
+      var title=tEl?tEl.textContent.trim():document.title;
+      if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
+      else { fallback(url); }
+    });
+  })(rows[i]); }
+})();
+</script>
 </body>
 </html>

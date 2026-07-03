@@ -1,0 +1,42 @@
+name: Supabase Keep-Alive
+
+# Supabase 무료 프로젝트는 7일간 API 요청이 없으면 자동 일시정지된다(데이터 보존·요청 시 재개).
+# GRM 은 주간 사이클이라 방문이 뜸한 구간에 pause 될 수 있어, 가벼운 heart_counts 조회 1회로
+# 타이머를 리셋한다. 수집(grm-intake)·배포(grm-web-deploy)와 완전 별도(별도 파일·트리거·최소권한).
+# SUPABASE_URL/ANON_KEY 미설정이면 클린 스킵(무해). anon key=publishable·RLS 보호(로그 노출 무해).
+on:
+  schedule:
+    - cron: "0 6 * * 1,3,5"   # 월·수·금 06:00 UTC — 최대 간격 3일(<7일), 1회 실패해도 여유
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (heart_counts read)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "SUPABASE_URL/ANON_KEY 미설정 — keep-alive 스킵(무해)"
+            exit 0
+          fi
+          code=$(curl -sS -m 30 -o /dev/null -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/heart_counts?select=card_id&limit=1")
+          echo "heart_counts 응답 코드: $code"
+          # 요청이 프로젝트에 도달하면 pause 타이머는 리셋된다(4xx/5xx 여도 목적 달성).
+          # 완전 연결 실패(000)만 실패 처리 — 네트워크/URL 오설정 신호.
+          if [ "$code" = "000" ]; then
+            echo "::error::Supabase 연결 실패(000) — SUPABASE_URL/네트워크 확인"
+            exit 1
+          fi
+          echo "keep-alive OK — pause 타이머 리셋"

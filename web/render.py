@@ -30,6 +30,7 @@ P4 — 아카이브 교차검색(정적·클라이언트사이드):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -638,6 +639,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    # 자산 캐시버스팅 — grm.css/archive.js content-hash 쿼리(재배포 시 stale CSS 방지·결정론).
+    def _asset_ver(name: str) -> str:
+        p = assets_dir / name
+        return hashlib.sha1(p.read_bytes()).hexdigest()[:8] if p.is_file() else "0"
+    env.globals["css_ver"] = _asset_ver("grm.css")
+    env.globals["archivejs_ver"] = _asset_ver("archive.js")
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")

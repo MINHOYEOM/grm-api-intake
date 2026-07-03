@@ -2018,43 +2018,19 @@ def _health_payload(
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="GRM API Intake Collector v15.1")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Notion 호출 없이 stdout 만 출력")
-    parser.add_argument("--window-days", type=int, default=7,
-                        choices=range(1, 91), metavar="N(1-90)",
-                        help="수집 윈도우 일수 1~90 (default 7)")
-    parser.add_argument("--sources", nargs="+", choices=_SOURCE_CHOICES,
-                        default=None,
-                        help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema. "
-                             "none은 feature-flag collector만 단독 실행")
-    parser.add_argument("--emit-routine-handoff", action="store_true",
-                        help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
-    parser.add_argument("--handoff-window-days", type=int, default=None,
-                        choices=range(1, 91), metavar="N(1-90)",
-                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
-                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
-    parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
-                        help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
-    args = parser.parse_args()
-
-    # ── [배치6 Phase1] env·CLI 를 1회 파싱해 RunConfig 로 고정. 아래 로컬은 config 참조
-    #    별칭(하위 main 본문 무수정) — Phase4 에서 하위 함수로 config 를 전달하며 정리한다. ──
-    cfg = RunConfig.from_env(args)
-    requested_sources = cfg.requested_sources
-    explicit_sources = cfg.explicit_sources
-    active = set(cfg.active)
-
-    notion_token = cfg.notion_token
-    notion_db = cfg.notion_db
+def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
+                    start: date, end: date, enf_start: date) -> tuple[CollectionStats, tuple[list[IntakeItem], ...]]:
+    """[배치6 Phase4] 소스별 수집 블록(flag→수집→stats)을 실행해 stats 와 18개 소스
+    item 리스트를 반환한다. 소스별 env alias 는 cfg 에서 재바인딩(바디 무수정). 수집 블록
+    자체는 소스별 window/키/health 추출이 상이해 bespoke 유지 — 새 소스는 여기 블록 1개 +
+    grm_common.INTAKE_SOURCE_SPECS 1건으로 insert/health 가 자동 처리된다."""
     openfda_key = cfg.openfda_key
+    enable_mfds = cfg.enable_mfds
     data_go_kr_key = cfg.data_go_kr_key
+    enable_moleg_api = cfg.enable_moleg_api
+    enable_mfds_law = cfg.enable_mfds_law
     data_go_kr_service_key = cfg.data_go_kr_service_key
     law_go_kr_oc = cfg.law_go_kr_oc
-    enable_search = cfg.enable_search
-    enable_mfds = cfg.enable_mfds
-    enable_mfds_law = cfg.enable_mfds_law
     enable_mfds_recall = cfg.enable_mfds_recall
     enable_mfds_admin = cfg.enable_mfds_admin
     enable_mfds_gmp_cert = cfg.enable_mfds_gmp_cert
@@ -2064,77 +2040,6 @@ def main() -> int:
     enable_who = cfg.enable_who
     enable_hc = cfg.enable_hc
     enable_fda483 = cfg.enable_fda483
-    enable_fda483_observations = cfg.enable_fda483_observations
-    enable_moleg_api = cfg.enable_moleg_api
-    enable_scrape = cfg.enable_scrape
-    event_name = cfg.event_name
-    health_json_path = cfg.health_json_path
-    if enable_scrape:
-        log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
-
-    if not args.dry_run:
-        if not notion_token or not notion_db:
-            log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
-            return 2
-
-    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
-    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
-    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
-    modality_requested = cfg.modality_requested
-    modality_preflight_disabled = False
-    modality_preflight_skipped = False
-    if modality_requested and notion_token and notion_db:
-        if not notion_verify_modality_property(notion_token, notion_db):
-            modality_preflight_disabled = True
-            # [배치6 Phase2] os.environ 변조 제거 — 아래 insert 루프가 modality_effective 를
-            # build_notion_properties 로 직접 전달하므로 env 를 제어채널로 쓸 필요가 없다.
-            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
-                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
-    elif modality_requested:
-        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
-        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
-        modality_preflight_skipped = True
-        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
-                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
-    modality_effective = (modality_requested and not modality_preflight_disabled
-                          and not modality_preflight_skipped)
-
-    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
-    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
-    handoff_idem_requested = cfg.handoff_idem_requested
-    handoff_idem_preflight_disabled = False
-    handoff_idem_preflight_skipped = False
-    if handoff_idem_requested and notion_token and notion_db:
-        if not notion_verify_handoff_ref_property(notion_token, notion_db):
-            handoff_idem_preflight_disabled = True
-            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
-            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
-                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
-    elif handoff_idem_requested:
-        handoff_idem_preflight_skipped = True
-        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
-                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
-    handoff_idem_effective = (handoff_idem_requested
-                              and not handoff_idem_preflight_disabled
-                              and not handoff_idem_preflight_skipped)
-
-    now_k = now_kst()
-    run_date = kst_run_date(now_k)
-    start, end = date_window(run_date, args.window_days)
-    log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
-
-    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
-    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
-    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
-    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
-    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
-    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
-    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
-    mfds_enforcement_window_days = cfg.mfds_enforcement_window_days
-    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
-    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
-                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
-
     stats = CollectionStats()
 
     # ── Phase 1: Official API ──────────────────────────────────────────────
@@ -2487,6 +2392,272 @@ def main() -> int:
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
         f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
     ))
+    return (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items)
+
+
+def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
+                        stats: CollectionStats, health: HealthCheckResult,
+                        run_date: date, start: date, end: date,
+                        handoff_emitted: bool, handoff_failed: bool,
+                        handoff_row_count: int, handoff_url: str,
+                        handoff_error_msg: str) -> None:
+    """[배치6 Phase4] GITHUB_STEP_SUMMARY 출력(문구·행순서 불변). enable_* alias 는 cfg
+    에서 재바인딩(바디 무수정)."""
+    enable_mfds = cfg.enable_mfds
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
+    enable_search = cfg.enable_search
+    health_json_path = cfg.health_json_path
+    # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
+    summary_path = cfg.step_summary_path
+    if summary_path:
+        try:
+            with open(summary_path, "a", encoding="utf-8") as f:
+                f.write("## GRM Intake Collection Summary\n\n")
+                f.write(f"- Run date (KST): `{run_date.isoformat()}`\n")
+                f.write(f"- Window: `{start.isoformat()}` ~ `{end.isoformat()}`\n")
+                def _src_line(label: str, fetched: int, inserted: int,
+                              skipped: int, failed: int, error: bool,
+                              err_msg: str, truncated: bool = False) -> str:
+                    prefix = "⚠️ " if (error or failed > 0 or truncated) else ""
+                    trunc  = " · ⚠️ TRUNCATED" if truncated else ""
+                    return (f"- {prefix}{label}: fetched {fetched} · "
+                            f"inserted {inserted} · skip-dup {skipped} · "
+                            f"failed {failed} · error `{err_msg or 'none'}`{trunc}\n")
+
+                f.write(_src_line("Federal Register", stats.fr_fetched, stats.fr_inserted,
+                                  stats.fr_skipped_dup, stats.fr_insert_failed,
+                                  stats.fr_error, stats.fr_error_msg, stats.fr_truncated))
+                f.write(_src_line("OpenFDA Recall", stats.recall_fetched, stats.recall_inserted,
+                                  stats.recall_skipped_dup, stats.recall_insert_failed,
+                                  stats.recall_error, stats.recall_error_msg, stats.recall_truncated))
+                f.write(_src_line("EMA RSS", stats.ema_fetched, stats.ema_inserted,
+                                  stats.ema_skipped_dup, stats.ema_insert_failed,
+                                  stats.ema_error, stats.ema_error_msg))
+                f.write(_src_line("MHRA RSS", stats.mhra_fetched, stats.mhra_inserted,
+                                  stats.mhra_skipped_dup, stats.mhra_insert_failed,
+                                  stats.mhra_error, stats.mhra_error_msg))
+                f.write(_src_line("PIC/S RSS", stats.pics_fetched, stats.pics_inserted,
+                                  stats.pics_skipped_dup, stats.pics_insert_failed,
+                                  stats.pics_error, stats.pics_error_msg))
+                f.write(_src_line("ECA Academy RSS", stats.eca_fetched, stats.eca_inserted,
+                                  stats.eca_skipped_dup, stats.eca_insert_failed,
+                                  stats.eca_error, stats.eca_error_msg))
+                f.write(_src_line("FDA Warning Letters", stats.wl_fetched, stats.wl_inserted,
+                                  stats.wl_skipped_dup, stats.wl_insert_failed,
+                                  stats.wl_error, stats.wl_error_msg))
+                if enable_mfds:
+                    f.write(_src_line("MFDS", stats.mfds_fetched, stats.mfds_inserted,
+                                      stats.mfds_skipped_dup, stats.mfds_insert_failed,
+                                      stats.mfds_error, stats.mfds_error_msg))
+                if enable_mfds_recall:
+                    f.write(_src_line("MFDS Recall", stats.mfds_recall_fetched,
+                                      stats.mfds_recall_inserted,
+                                      stats.mfds_recall_skipped_dup,
+                                      stats.mfds_recall_insert_failed,
+                                      stats.mfds_recall_error,
+                                      stats.mfds_recall_error_msg))
+                if enable_mfds_admin:
+                    f.write(_src_line("MFDS Admin", stats.mfds_admin_fetched,
+                                      stats.mfds_admin_inserted,
+                                      stats.mfds_admin_skipped_dup,
+                                      stats.mfds_admin_insert_failed,
+                                      stats.mfds_admin_error,
+                                      stats.mfds_admin_error_msg))
+                if enable_mfds_gmp_inspection:
+                    f.write(_src_line("MFDS GMP Inspection",
+                                      stats.mfds_gmp_inspection_fetched,
+                                      stats.mfds_gmp_inspection_inserted,
+                                      stats.mfds_gmp_inspection_skipped_dup,
+                                      stats.mfds_gmp_inspection_insert_failed,
+                                      stats.mfds_gmp_inspection_error,
+                                      stats.mfds_gmp_inspection_error_msg))
+                if enable_ich:
+                    f.write(_src_line("ICH", stats.ich_fetched, stats.ich_inserted,
+                                      stats.ich_skipped_dup, stats.ich_insert_failed,
+                                      stats.ich_error, stats.ich_error_msg))
+                if enable_who:
+                    f.write(_src_line("WHO", stats.who_fetched, stats.who_inserted,
+                                      stats.who_skipped_dup, stats.who_insert_failed,
+                                      stats.who_error, stats.who_error_msg))
+                if enable_hc:
+                    f.write(_src_line("Health Canada", stats.hc_fetched, stats.hc_inserted,
+                                      stats.hc_skipped_dup, stats.hc_insert_failed,
+                                      stats.hc_error, stats.hc_error_msg))
+                if enable_fda483:
+                    f.write(_src_line("FDA 483", stats.fda483_fetched, stats.fda483_inserted,
+                                      stats.fda483_skipped_dup, stats.fda483_insert_failed,
+                                      stats.fda483_error, stats.fda483_error_msg))
+                if enable_search:
+                    f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
+                                      stats.search_skipped_dup, stats.search_insert_failed,
+                                      stats.search_error, stats.search_error_msg))
+                if args.emit_routine_handoff:
+                    if handoff_emitted:
+                        f.write(f"- Routine handoff: `{handoff_row_count}` New rows · "
+                                f"{handoff_url or 'url unavailable'}\n")
+                    elif handoff_failed:
+                        f.write(f"- ⚠️ Routine handoff: failed/skipped · "
+                                f"`{handoff_error_msg[:160]}`\n")
+                    else:
+                        f.write("- Routine handoff: not emitted (dry-run)\n")
+                f.write(f"- Dry run: `{args.dry_run}`\n")
+                if stats.has_insert_failures():
+                    total_fail = stats.total_insert_failures()
+                    f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "
+                            f"해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다. "
+                            f"Actions 로그에서 doc ID 확인 후 필요 시 수동 재실행.\n")
+                if stats.has_source_errors():
+                    f.write("\n> ❌ **수집기 오류 발생** — "
+                            "Actions 로그에서 source별 error 메시지를 확인하세요.\n")
+                    if stats.search_error:
+                        f.write(f"> Brave Search error: `{stats.search_error_msg[:120] or 'none'}` "
+                                f"— BRAVE_API_KEY 및 ENABLE_SEARCH 설정 확인.\n")
+                    if stats.mfds_error:
+                        f.write(f"> MFDS error: `{stats.mfds_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS 및 DATA_GO_KR_KEY 설정 확인.\n")
+                    if stats.mfds_recall_error:
+                        f.write(f"> MFDS Recall error: `{stats.mfds_recall_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS_RECALL 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
+                    if stats.mfds_admin_error:
+                        f.write(f"> MFDS Admin error: `{stats.mfds_admin_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS_ADMIN 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
+                    if stats.mfds_gmp_inspection_error:
+                        f.write(f"> MFDS GMP Inspection error: "
+                                f"`{stats.mfds_gmp_inspection_error_msg[:120] or 'none'}` "
+                                f"— ENABLE_MFDS_GMP_INSPECTION 및 nedrug HTML 구조 확인.\n")
+                _write_health_summary(f, health, health_json_path)
+        except OSError as e:
+            log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="GRM API Intake Collector v15.1")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Notion 호출 없이 stdout 만 출력")
+    parser.add_argument("--window-days", type=int, default=7,
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="수집 윈도우 일수 1~90 (default 7)")
+    parser.add_argument("--sources", nargs="+", choices=_SOURCE_CHOICES,
+                        default=None,
+                        help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema. "
+                             "none은 feature-flag collector만 단독 실행")
+    parser.add_argument("--emit-routine-handoff", action="store_true",
+                        help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
+    parser.add_argument("--handoff-window-days", type=int, default=None,
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
+                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
+    parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
+                        help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
+    args = parser.parse_args()
+
+    # ── [배치6 Phase1] env·CLI 를 1회 파싱해 RunConfig 로 고정. 아래 로컬은 config 참조
+    #    별칭(하위 main 본문 무수정) — Phase4 에서 하위 함수로 config 를 전달하며 정리한다. ──
+    cfg = RunConfig.from_env(args)
+    requested_sources = cfg.requested_sources
+    explicit_sources = cfg.explicit_sources
+    active = set(cfg.active)
+
+    notion_token = cfg.notion_token
+    notion_db = cfg.notion_db
+    openfda_key = cfg.openfda_key
+    data_go_kr_key = cfg.data_go_kr_key
+    data_go_kr_service_key = cfg.data_go_kr_service_key
+    law_go_kr_oc = cfg.law_go_kr_oc
+    enable_search = cfg.enable_search
+    enable_mfds = cfg.enable_mfds
+    enable_mfds_law = cfg.enable_mfds_law
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_cert = cfg.enable_mfds_gmp_cert
+    enable_mfds_safety_letter = cfg.enable_mfds_safety_letter
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
+    enable_fda483_observations = cfg.enable_fda483_observations
+    enable_moleg_api = cfg.enable_moleg_api
+    enable_scrape = cfg.enable_scrape
+    event_name = cfg.event_name
+    health_json_path = cfg.health_json_path
+    if enable_scrape:
+        log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
+
+    if not args.dry_run:
+        if not notion_token or not notion_db:
+            log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
+            return 2
+
+    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
+    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
+    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
+    modality_requested = cfg.modality_requested
+    modality_preflight_disabled = False
+    modality_preflight_skipped = False
+    if modality_requested and notion_token and notion_db:
+        if not notion_verify_modality_property(notion_token, notion_db):
+            modality_preflight_disabled = True
+            # [배치6 Phase2] os.environ 변조 제거 — 아래 insert 루프가 modality_effective 를
+            # build_notion_properties 로 직접 전달하므로 env 를 제어채널로 쓸 필요가 없다.
+            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
+                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
+    elif modality_requested:
+        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
+        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
+        modality_preflight_skipped = True
+        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
+                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
+    modality_effective = (modality_requested and not modality_preflight_disabled
+                          and not modality_preflight_skipped)
+
+    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
+    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
+    handoff_idem_requested = cfg.handoff_idem_requested
+    handoff_idem_preflight_disabled = False
+    handoff_idem_preflight_skipped = False
+    if handoff_idem_requested and notion_token and notion_db:
+        if not notion_verify_handoff_ref_property(notion_token, notion_db):
+            handoff_idem_preflight_disabled = True
+            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
+            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
+                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
+    elif handoff_idem_requested:
+        handoff_idem_preflight_skipped = True
+        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
+                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
+    handoff_idem_effective = (handoff_idem_requested
+                              and not handoff_idem_preflight_disabled
+                              and not handoff_idem_preflight_skipped)
+
+    now_k = now_kst()
+    run_date = kst_run_date(now_k)
+    start, end = date_window(run_date, args.window_days)
+    log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
+
+    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
+    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
+    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
+    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
+    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
+    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
+    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
+    mfds_enforcement_window_days = cfg.mfds_enforcement_window_days
+    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
+    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
+                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
+
+    (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
+     wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
+     mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
+     ich_items, who_items, hc_items, fda483_items) = _run_collection(
+        cfg, active, run_date, start, end, enf_start)
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
@@ -2735,127 +2906,9 @@ def main() -> int:
 
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
-    # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
-    summary_path = cfg.step_summary_path
-    if summary_path:
-        try:
-            with open(summary_path, "a", encoding="utf-8") as f:
-                f.write("## GRM Intake Collection Summary\n\n")
-                f.write(f"- Run date (KST): `{run_date.isoformat()}`\n")
-                f.write(f"- Window: `{start.isoformat()}` ~ `{end.isoformat()}`\n")
-                def _src_line(label: str, fetched: int, inserted: int,
-                              skipped: int, failed: int, error: bool,
-                              err_msg: str, truncated: bool = False) -> str:
-                    prefix = "⚠️ " if (error or failed > 0 or truncated) else ""
-                    trunc  = " · ⚠️ TRUNCATED" if truncated else ""
-                    return (f"- {prefix}{label}: fetched {fetched} · "
-                            f"inserted {inserted} · skip-dup {skipped} · "
-                            f"failed {failed} · error `{err_msg or 'none'}`{trunc}\n")
-
-                f.write(_src_line("Federal Register", stats.fr_fetched, stats.fr_inserted,
-                                  stats.fr_skipped_dup, stats.fr_insert_failed,
-                                  stats.fr_error, stats.fr_error_msg, stats.fr_truncated))
-                f.write(_src_line("OpenFDA Recall", stats.recall_fetched, stats.recall_inserted,
-                                  stats.recall_skipped_dup, stats.recall_insert_failed,
-                                  stats.recall_error, stats.recall_error_msg, stats.recall_truncated))
-                f.write(_src_line("EMA RSS", stats.ema_fetched, stats.ema_inserted,
-                                  stats.ema_skipped_dup, stats.ema_insert_failed,
-                                  stats.ema_error, stats.ema_error_msg))
-                f.write(_src_line("MHRA RSS", stats.mhra_fetched, stats.mhra_inserted,
-                                  stats.mhra_skipped_dup, stats.mhra_insert_failed,
-                                  stats.mhra_error, stats.mhra_error_msg))
-                f.write(_src_line("PIC/S RSS", stats.pics_fetched, stats.pics_inserted,
-                                  stats.pics_skipped_dup, stats.pics_insert_failed,
-                                  stats.pics_error, stats.pics_error_msg))
-                f.write(_src_line("ECA Academy RSS", stats.eca_fetched, stats.eca_inserted,
-                                  stats.eca_skipped_dup, stats.eca_insert_failed,
-                                  stats.eca_error, stats.eca_error_msg))
-                f.write(_src_line("FDA Warning Letters", stats.wl_fetched, stats.wl_inserted,
-                                  stats.wl_skipped_dup, stats.wl_insert_failed,
-                                  stats.wl_error, stats.wl_error_msg))
-                if enable_mfds:
-                    f.write(_src_line("MFDS", stats.mfds_fetched, stats.mfds_inserted,
-                                      stats.mfds_skipped_dup, stats.mfds_insert_failed,
-                                      stats.mfds_error, stats.mfds_error_msg))
-                if enable_mfds_recall:
-                    f.write(_src_line("MFDS Recall", stats.mfds_recall_fetched,
-                                      stats.mfds_recall_inserted,
-                                      stats.mfds_recall_skipped_dup,
-                                      stats.mfds_recall_insert_failed,
-                                      stats.mfds_recall_error,
-                                      stats.mfds_recall_error_msg))
-                if enable_mfds_admin:
-                    f.write(_src_line("MFDS Admin", stats.mfds_admin_fetched,
-                                      stats.mfds_admin_inserted,
-                                      stats.mfds_admin_skipped_dup,
-                                      stats.mfds_admin_insert_failed,
-                                      stats.mfds_admin_error,
-                                      stats.mfds_admin_error_msg))
-                if enable_mfds_gmp_inspection:
-                    f.write(_src_line("MFDS GMP Inspection",
-                                      stats.mfds_gmp_inspection_fetched,
-                                      stats.mfds_gmp_inspection_inserted,
-                                      stats.mfds_gmp_inspection_skipped_dup,
-                                      stats.mfds_gmp_inspection_insert_failed,
-                                      stats.mfds_gmp_inspection_error,
-                                      stats.mfds_gmp_inspection_error_msg))
-                if enable_ich:
-                    f.write(_src_line("ICH", stats.ich_fetched, stats.ich_inserted,
-                                      stats.ich_skipped_dup, stats.ich_insert_failed,
-                                      stats.ich_error, stats.ich_error_msg))
-                if enable_who:
-                    f.write(_src_line("WHO", stats.who_fetched, stats.who_inserted,
-                                      stats.who_skipped_dup, stats.who_insert_failed,
-                                      stats.who_error, stats.who_error_msg))
-                if enable_hc:
-                    f.write(_src_line("Health Canada", stats.hc_fetched, stats.hc_inserted,
-                                      stats.hc_skipped_dup, stats.hc_insert_failed,
-                                      stats.hc_error, stats.hc_error_msg))
-                if enable_fda483:
-                    f.write(_src_line("FDA 483", stats.fda483_fetched, stats.fda483_inserted,
-                                      stats.fda483_skipped_dup, stats.fda483_insert_failed,
-                                      stats.fda483_error, stats.fda483_error_msg))
-                if enable_search:
-                    f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
-                                      stats.search_skipped_dup, stats.search_insert_failed,
-                                      stats.search_error, stats.search_error_msg))
-                if args.emit_routine_handoff:
-                    if handoff_emitted:
-                        f.write(f"- Routine handoff: `{handoff_row_count}` New rows · "
-                                f"{handoff_url or 'url unavailable'}\n")
-                    elif handoff_failed:
-                        f.write(f"- ⚠️ Routine handoff: failed/skipped · "
-                                f"`{handoff_error_msg[:160]}`\n")
-                    else:
-                        f.write("- Routine handoff: not emitted (dry-run)\n")
-                f.write(f"- Dry run: `{args.dry_run}`\n")
-                if stats.has_insert_failures():
-                    total_fail = stats.total_insert_failures()
-                    f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "
-                            f"해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다. "
-                            f"Actions 로그에서 doc ID 확인 후 필요 시 수동 재실행.\n")
-                if stats.has_source_errors():
-                    f.write("\n> ❌ **수집기 오류 발생** — "
-                            "Actions 로그에서 source별 error 메시지를 확인하세요.\n")
-                    if stats.search_error:
-                        f.write(f"> Brave Search error: `{stats.search_error_msg[:120] or 'none'}` "
-                                f"— BRAVE_API_KEY 및 ENABLE_SEARCH 설정 확인.\n")
-                    if stats.mfds_error:
-                        f.write(f"> MFDS error: `{stats.mfds_error_msg[:120] or 'none'}` "
-                                f"— ENABLE_MFDS 및 DATA_GO_KR_KEY 설정 확인.\n")
-                    if stats.mfds_recall_error:
-                        f.write(f"> MFDS Recall error: `{stats.mfds_recall_error_msg[:120] or 'none'}` "
-                                f"— ENABLE_MFDS_RECALL 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
-                    if stats.mfds_admin_error:
-                        f.write(f"> MFDS Admin error: `{stats.mfds_admin_error_msg[:120] or 'none'}` "
-                                f"— ENABLE_MFDS_ADMIN 및 DATA_GO_KR_SERVICE_KEY 설정 확인.\n")
-                    if stats.mfds_gmp_inspection_error:
-                        f.write(f"> MFDS GMP Inspection error: "
-                                f"`{stats.mfds_gmp_inspection_error_msg[:120] or 'none'}` "
-                                f"— ENABLE_MFDS_GMP_INSPECTION 및 nedrug HTML 구조 확인.\n")
-                _write_health_summary(f, health, health_json_path)
-        except OSError as e:
-            log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
+    _write_step_summary(cfg, args, stats, health, run_date, start, end,
+                        handoff_emitted, handoff_failed, handoff_row_count,
+                        handoff_url, handoff_error_msg)
 
     # 종료 코드는 _evaluate_health() 하나만 기준으로 삼는다.
     # - failure → exit 1 (workflow failure Issue)

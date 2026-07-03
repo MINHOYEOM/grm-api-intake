@@ -116,7 +116,7 @@ button{font-family:inherit;cursor:pointer}
 .issuecard .win{color:var(--band-mut);font-size:12px;margin-bottom:16px}
 .issuecard .win .mono{font-size:11px;color:#D8D5CC}
 .issuecard ul{list-style:none;border-top:1px solid var(--band-line);padding-top:14px}
-.issuecard li{font-size:13.5px;color:#D8D5CC;padding:8px 0 8px 22px;position:relative;line-height:1.5;border-bottom:1px solid var(--band-line)}
+.issuecard li{font-size:13.5px;color:#D8D5CC;padding:8px 0 8px 22px;position:relative;line-height:1.5;border-bottom:1px solid var(--band-line);word-break:keep-all}  /* §DP-1 한글 목록 단어중간 끊김 제거(§4 keep-all 확장) */
 .issuecard li:last-child{border-bottom:0}.issuecard li b{color:#fff;font-weight:600}
 .issuecard li::before{content:'';position:absolute;left:3px;top:14px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
 .issuecard .ev{display:flex;gap:14px;margin-top:15px;font-size:12px;color:var(--band-mut)}
@@ -149,12 +149,12 @@ button{font-family:inherit;cursor:pointer}
 
 /* feature cards(What it does) */
 .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
-.feat{background:var(--card);border-radius:var(--rad);padding:30px;transition:var(--tr)}
+.feat{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:30px;transition:var(--tr)}  /* §DP-7 카드↔캔버스 저대비 보완(기존 토큰) */
 .feat:hover{background:var(--strong)}
-.feat .ic{width:40px;height:40px;display:grid;place-items:center;color:var(--coral);font-size:23px;margin-bottom:18px}
+.feat .ic{width:44px;height:44px;display:grid;place-items:center;color:var(--coral);font-size:24px;margin-bottom:18px;background:var(--coral-tint);border-radius:10px}  /* §DP-8 아이콘 시각계층(기존 coral-tint 재사용) */
 .feat .no{font-family:var(--mono);font-size:11px;color:var(--muted-2);float:right}
-.feat h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
-.feat p{color:var(--body);font-size:15px;margin-top:9px;line-height:1.55}  /* P2-4 14.5→15 */
+.feat h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;word-break:keep-all}  /* §DP-2 */
+.feat p{color:var(--body);font-size:15px;margin-top:9px;line-height:1.55;word-break:keep-all}  /* P2-4 14.5→15; §DP-3 keep-all */
 
 /* What-it-does hover 미리보기 — feat:hover(데스크톱) 시 설명 아래로 max-height+opacity 펼침(≈.28s).
    터치(hover:none)에선 상시 노출. 토큰 재사용·한글 안전(§4: ASCII 라벨만 mono, 한글은 sans·자간0).
@@ -210,9 +210,9 @@ button{font-family:inherit;cursor:pointer}
 /* card anatomy showcase */
 .showcase{display:grid;grid-template-columns:.95fr 1.05fr;gap:54px;align-items:start;margin-top:46px}  /* §5-2 좌측 텍스트 .95fr + 상단정렬(align-items:start) — 카드 높이차로 인한 좌측 텍스트 중앙 부유·하단 여백 제거 */
 .showcase .copy h2{font-family:var(--serif);font-weight:400;font-size:38px;letter-spacing:-.018em;color:var(--ink);line-height:1.16;margin-top:14px}
-.showcase .copy p{font-size:16.5px;color:var(--body);margin-top:16px;line-height:1.65}
+.showcase .copy p{font-size:16.5px;color:var(--body);margin-top:16px;line-height:1.65;word-break:keep-all}  /* §DP-4 */
 .showcase .legend{list-style:none;margin-top:22px}
-.showcase .legend li{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line);font-size:14.5px}
+.showcase .legend li{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line);font-size:14.5px;word-break:keep-all}  /* §DP-5 3번 항목 2줄 시 단어중간 끊김 제거 */
 .showcase .legend i{color:var(--coral);font-size:18px;margin-top:1px;flex:none}
 .showcase .legend b{font-weight:600;color:var(--ink)}.showcase .legend span{color:var(--body)}
 

@@ -266,9 +266,9 @@ if(_nt&&_nm){
   var msg=m.querySelector('.owl-msg'), eyes=m.querySelector('.eyes');
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var sets={
-    home:{greet:'안녕하세요! 이번 주 규제 소식이 왔어요 🦉',msgs:['반가워요! GRM이에요 👋','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
-    board:{greet:'찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
-    detail:{greet:'이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
+    home:{greet:'안녕하세요, 구름이예요! 이번 주 규제 소식이 왔어요 🦉',msgs:['구름 위에서 규제 소식을 살펴보고 있어요 ☁️','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
+    board:{greet:'구름이예요! 찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
+    detail:{greet:'구름이가 이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
   };
   var set=sets[m.getAttribute('data-page')]||sets.home, i=0, t;
   function blink(){ m.classList.add('is-blink'); setTimeout(function(){m.classList.remove('is-blink');},140); }

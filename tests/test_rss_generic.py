@@ -218,6 +218,30 @@ class RssGenericTest(unittest.TestCase):
         self.assertEqual(items[0].document_id, "e46469e87f7e")
         self._assert_doc_id(items[0])
 
+    def test_ema_httpclienterror_accumulates(self):
+        """멀티피드 EMA 에서 한 피드의 HTTPClientError(4xx/429)는 accumulate+continue 해야
+        하며 나머지 피드 item 을 죽이면 안 된다(원 collect_ema_rss 의 per-feed graceful
+        degrade — bare except Exception 이 HTTPClientError 도 잡던 계약). 회귀 방어."""
+        good = {
+            ci.EMA_RSS_FEEDS["scientific-guidelines"]: EMA_SG,
+            ci.EMA_RSS_FEEDS["news"]: EMA_NEWS,
+        }
+
+        def fake(url, *a, **k):
+            if url in good:
+                return ET.fromstring(good[url])
+            raise HTTPClientError(404, url, "not found")  # inspections·regulatory 피드
+
+        with _PatchXml(fake):
+            items, err = ci.collect_ema_rss(START, END)
+        # 정상 피드 2개의 item 은 유지(중단 금지) — sg(doc1) + news(news1)
+        urls = {it.official_url for it in items}
+        self.assertIn("https://www.ema.europa.eu/en/doc1", urls)
+        self.assertIn("https://www.ema.europa.eu/en/news1", urls)
+        # 실패 피드는 accumulate(양쪽 피드명 포함)
+        self.assertIn("inspections", err)
+        self.assertIn("regulatory", err)
+
     def test_eca_http_403_silent(self):
         def fake(url, *a, **k):
             raise HTTPClientError(403, url, "forbidden")

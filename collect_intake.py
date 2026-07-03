@@ -1290,14 +1290,15 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
             log("INFO", f"{spec.label} 수집: {feed_url}")
         try:
             root = http_get_xml(feed_url)
-        except HTTPClientError as e:
-            if spec.http_silent:
+        except Exception as e:
+            # http_silent(ECA Expert Secondary) 은 HTTPClientError 만 경고 없이 skip.
+            # 그 외에는 HTTPClientError 를 일반 예외와 동일 처리해야 한다 — 원 EMA 수집기가
+            # HTTPClientError 를 bare ``except Exception`` 로 잡아 accumulate+continue 했기
+            # 때문(멀티피드 소스에서 한 피드의 4xx/429 가 나머지 피드를 죽이면 안 됨).
+            if spec.http_silent and isinstance(e, HTTPClientError):
                 # Expert Secondary: 403/404 는 경고 없이 넘어감
                 log("INFO", f"{spec.label} HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
                 return [], None
-            log("WARN", f"{spec.label} 실패: {e}")
-            return [], str(e)
-        except Exception as e:
             if spec.accumulate_errors:
                 msg = f"{spec.label} '{feed_name}' 실패: {e}"
                 log("WARN", msg)

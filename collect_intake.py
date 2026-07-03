@@ -42,7 +42,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from html import unescape as _html_unescape
 from html.parser import HTMLParser
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
 import requests
@@ -1241,314 +1241,278 @@ def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EMA RSS 수집 (v15.1)
+# RSS 수집기 제네릭 (배치6 Phase3) — EMA · MHRA · PIC/S · ECA
 # ─────────────────────────────────────────────────────────────────────────────
+# 4종 RSS/Atom 수집기의 공통 골격(fetch 루프·윈도우 필터·doc_id·relevance·tier·IntakeItem
+# 조립)을 collect_rss_feed(spec) 하나로 통합한다. 소스별로 상이한 부분(피드 목록·item 반복자·
+# 필드 추출·raw_payload·type_or_class·source_type)만 RssFeedSpec + per-source extractor 로
+# 분리했다. **extractor 는 기존 각 수집기의 추출 로직을 그대로 옮긴 것**이라 doc_id/dedup 키를
+# 포함한 산출 IntakeItem 이 입력과 무관하게 byte 동일하다(전면 재적재 방지 절대선).
+#
+# 새 RSS 소스 추가: extractor 1개 + RssFeedSpec 1개 + 얇은 공개 함수 1개.
 
 
-def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """EMA 공식 RSS 피드 4개 (scientific-guidelines · inspections · news ·
-    regulatory-guidelines) 를 수집해 날짜 필터링 후 반환.
+@dataclass(frozen=True)
+class _RssItemFields:
+    """추출기가 반환하는 정규화 필드(수집기 공통 tail 이 IntakeItem 으로 조립)."""
+    title: str
+    link: str
+    date_iso: str
+    description: str
+    category: str          # raw category (uses_category=True 소스만 relevance/tier 에 사용)
+    type_or_class: str     # == compute_signal_tier 의 context 인자 (4종 모두 동일값)
+    guid: str
+    raw_payload: dict[str, Any]
 
-    Source Type: Official API (EMA 공식 RSS 피드).
-    Evidence Level: A 불가 — RSS 요약이므로 B (Official direct identified) 이상.
-    """
+
+@dataclass(frozen=True)
+class RssFeedSpec:
+    source: str            # SOURCE_* (doc_id/dedup 키의 일부)
+    source_type: str       # SRC_TYPE_*
+    label: str             # 로그 라벨 ("EMA RSS" 등)
+    feeds: tuple[tuple[str, str], ...]       # (feed_name, url) — 단일피드는 1항
+    iter_items: Callable[[ET.Element], list[ET.Element]]
+    extract: Callable[[ET.Element, str, str], "_RssItemFields"]
+    uses_category: bool = False       # relevance/tier 에 category 전달(EMA·MHRA)
+    accumulate_errors: bool = False   # 멀티피드 누적(EMA); False=첫 실패 즉시 반환
+    http_silent: bool = False         # HTTPClientError 를 경고없이 skip(ECA Expert Secondary)
+
+
+def collect_rss_feed(spec: RssFeedSpec, start: date,
+                     end: date) -> tuple[list[IntakeItem], str | None]:
+    """RssFeedSpec 하나로 RSS/Atom 피드를 수집해 IntakeItem 리스트를 반환한다(배치6 Phase3)."""
     items: list[IntakeItem] = []
     errors: list[str] = []
-
-    for feed_name, feed_url in EMA_RSS_FEEDS.items():
-        log("INFO", f"EMA RSS 수집: {feed_name} ({feed_url})")
+    for feed_name, feed_url in spec.feeds:
+        if spec.accumulate_errors:
+            log("INFO", f"{spec.label} 수집: {feed_name} ({feed_url})")
+        else:
+            log("INFO", f"{spec.label} 수집: {feed_url}")
         try:
             root = http_get_xml(feed_url)
+        except HTTPClientError as e:
+            if spec.http_silent:
+                # Expert Secondary: 403/404 는 경고 없이 넘어감
+                log("INFO", f"{spec.label} HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
+                return [], None
+            log("WARN", f"{spec.label} 실패: {e}")
+            return [], str(e)
         except Exception as e:
-            msg = f"EMA RSS '{feed_name}' 실패: {e}"
-            log("WARN", msg)
-            errors.append(msg)
-            continue
-
-        # RSS 2.0 형식 확인
-        rss_items = _rss2_items_from_root(root)
-        for el in rss_items:
-            title = _rss_text(el.find("title"))
-            link  = _rss_text(el.find("link"))
-            # <link> 가 CDATA 로 감싸진 경우 텍스트에 없고 tail 에 있을 수 있음
-            if not link:
-                link_el = el.find("link")
-                if link_el is not None:
-                    link = (link_el.tail or "").strip()
-            pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
-            # EMA 피드에 따라 dc:date 를 fallback 으로 사용
-            if not pub_raw:
-                dc_date = _rss_find(el, f"{{{_NS_DC}}}date", f"{{{_NS_DCTERMS}}}modified")
-                pub_raw = _rss_text(dc_date)
-            date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
-            # dc:date 가 Atom 형식인 경우 재시도
-            if not date_iso and pub_raw:
-                date_iso = _parse_atom_date(pub_raw)
-
-            description = _rss_text(el.find("description"))
-            category_el = el.find("category")
-            category = _rss_text(category_el)
-            guid_el = el.find("guid")
-            guid = _rss_text(guid_el) or link
-
-            if not _within_window(date_iso, start, end):
+            if spec.accumulate_errors:
+                msg = f"{spec.label} '{feed_name}' 실패: {e}"
+                log("WARN", msg)
+                errors.append(msg)
                 continue
+            log("WARN", f"{spec.label} 실패: {e}")
+            return [], str(e)
 
-            doc_id = _stable_doc_id(SOURCE_EMA, title, link, date_iso)
-            relevance = compute_relevance(title, description, category)
-            tier = compute_signal_tier(SOURCE_EMA, category or feed_name, relevance,
-                                       "N/A", title, description, category)
-
+        for el in spec.iter_items(root):
+            f = spec.extract(el, feed_name, feed_url)
+            if not _within_window(f.date_iso, start, end):
+                continue
+            doc_id = _stable_doc_id(spec.source, f.title, f.link, f.date_iso)
+            if spec.uses_category:
+                relevance = compute_relevance(f.title, f.description, f.category)
+                tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
+                                           "N/A", f.title, f.description, f.category)
+            else:
+                relevance = compute_relevance(f.title, f.description)
+                tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
+                                           "N/A", f.title, f.description)
             items.append(IntakeItem(
-                source=SOURCE_EMA,
+                source=spec.source,
                 document_id=doc_id,
-                date_iso=date_iso,
-                headline=title,
-                official_url=link,
-                type_or_class=category or feed_name,
-                body=description,
+                date_iso=f.date_iso,
+                headline=f.title,
+                official_url=f.link,
+                type_or_class=f.type_or_class,
+                body=f.description,
                 api_query=feed_url,
                 qa_relevance=relevance,
                 osd_relevance="N/A",
-                source_type=SRC_TYPE_OFFICIAL_API,
+                source_type=spec.source_type,
                 signal_tier=tier,
-                raw_payload={
-                    "feed": feed_name,
-                    "title": title,
-                    "link": link,
-                    "pubDate": pub_raw,
-                    "description": description,
-                    "category": category,
-                    "guid": guid,
-                },
+                raw_payload=f.raw_payload,
             ))
 
-    err_msg = "; ".join(errors) if errors else None
-    # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
-    log("INFO", f"EMA RSS 수집 완료: {len(items)}건 (errors={len(errors)})")
-    return items, err_msg if errors else None
+    if spec.accumulate_errors:
+        # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
+        log("INFO", f"{spec.label} 수집 완료: {len(items)}건 (errors={len(errors)})")
+        return items, ("; ".join(errors) if errors else None)
+    log("INFO", f"{spec.label} 수집 완료: {len(items)}건")
+    return items, None
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# MHRA Inspectorate RSS 수집 (v15.1) — Atom 형식
-# ─────────────────────────────────────────────────────────────────────────────
+def _rss2_or_atom_items(root: ET.Element) -> list[ET.Element]:
+    """ECA: RSS 2.0 우선, 비면 Atom 폴백."""
+    rss_items = _rss2_items_from_root(root)
+    if not rss_items:
+        rss_items = _atom_entries_from_root(root)
+    return rss_items
+
+
+def _extract_ema(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title = _rss_text(el.find("title"))
+    link  = _rss_text(el.find("link"))
+    # <link> 가 CDATA 로 감싸진 경우 텍스트에 없고 tail 에 있을 수 있음
+    if not link:
+        link_el = el.find("link")
+        if link_el is not None:
+            link = (link_el.tail or "").strip()
+    pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+    # EMA 피드에 따라 dc:date 를 fallback 으로 사용
+    if not pub_raw:
+        dc_date = _rss_find(el, f"{{{_NS_DC}}}date", f"{{{_NS_DCTERMS}}}modified")
+        pub_raw = _rss_text(dc_date)
+    date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+    # dc:date 가 Atom 형식인 경우 재시도
+    if not date_iso and pub_raw:
+        date_iso = _parse_atom_date(pub_raw)
+    description = _rss_text(el.find("description"))
+    category_el = el.find("category")
+    category = _rss_text(category_el)
+    guid_el = el.find("guid")
+    guid = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category=category, type_or_class=category or feed_name, guid=guid,
+        raw_payload={
+            "feed": feed_name,
+            "title": title,
+            "link": link,
+            "pubDate": pub_raw,
+            "description": description,
+            "category": category,
+            "guid": guid,
+        },
+    )
+
+
+def _extract_mhra(entry: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title   = _atom_text(entry, "title")
+    link    = _atom_link(entry)
+    # Atom: <updated> 또는 <published>
+    pub_raw = (
+        _rss_text(entry.find(f"{{{_NS_ATOM}}}published"))
+        or _rss_text(entry.find(f"{{{_NS_ATOM}}}updated"))
+        or _rss_text(entry.find("published"))
+        or _rss_text(entry.find("updated"))
+    )
+    date_iso = _parse_atom_date(pub_raw)
+    summary  = _atom_text(entry, "summary") or _atom_text(entry, "content")
+    cat_el = _rss_find(entry, f"{{{_NS_ATOM}}}category", "category")
+    category = (cat_el.get("term", "") if cat_el is not None else "").strip()
+    id_el = _rss_find(entry, f"{{{_NS_ATOM}}}id", "id")
+    guid  = _rss_text(id_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=summary,
+        category=category, type_or_class=category or "Blog", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "published": pub_raw, "summary": summary,
+            "category": category, "id": guid,
+        },
+    )
+
+
+def _extract_pics(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title   = _rss_text(el.find("title"))
+    link    = _rss_text(el.find("link"))
+    pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+    date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+    description = _rss_text(el.find("description"))
+    guid_el = el.find("guid")
+    guid    = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category="", type_or_class="PIC/S", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "pubDate": pub_raw, "description": description, "guid": guid,
+        },
+    )
+
+
+def _extract_eca(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    # RSS 2.0 태그 우선, Atom 폴백
+    title = (
+        _rss_text(el.find("title"))
+        or _atom_text(el, "title")
+    )
+    link = (
+        _rss_text(el.find("link"))
+        or _atom_link(el)
+    )
+    pub_raw = (
+        _rss_text(el.find("pubDate"))
+        or _rss_text(el.find("pubdate"))
+        or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
+        or _rss_text(el.find("published"))
+    )
+    date_iso = (
+        _parse_rss2_date(pub_raw) if pub_raw
+        else _parse_atom_date(pub_raw)
+    )
+    description = (
+        _rss_text(el.find("description"))
+        or _atom_text(el, "summary")
+    )
+    guid_el = el.find("guid")
+    guid    = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category="", type_or_class="GMP News", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "pubDate": pub_raw, "description": description, "guid": guid,
+        },
+    )
+
+
+_EMA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_EMA, source_type=SRC_TYPE_OFFICIAL_API, label="EMA RSS",
+    feeds=tuple(EMA_RSS_FEEDS.items()),
+    iter_items=_rss2_items_from_root, extract=_extract_ema,
+    uses_category=True, accumulate_errors=True,
+)
+_MHRA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_BLOG, label="MHRA RSS",
+    feeds=(("mhra", MHRA_RSS_URL),),
+    iter_items=_atom_entries_from_root, extract=_extract_mhra,
+    uses_category=True,
+)
+_PICS_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_PICS, source_type=SRC_TYPE_OFFICIAL_PAGE, label="PIC/S RSS",
+    feeds=(("pics", PICS_RSS_URL),),
+    iter_items=_rss2_items_from_root, extract=_extract_pics,
+)
+_ECA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_ECA, source_type=SRC_TYPE_EXPERT_SECONDARY, label="ECA RSS",
+    feeds=(("eca", ECA_RSS_URL),),
+    iter_items=_rss2_or_atom_items, extract=_extract_eca,
+    http_silent=True,
+)
+
+
+def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """EMA 공식 RSS 피드 4개 수집. Source Type: Official API. Evidence: B 이상(RSS 요약)."""
+    return collect_rss_feed(_EMA_FEED_SPEC, start, end)
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """MHRA Inspectorate Blog RSS (Atom 형식) 수집.
-
-    Source Type: Official Regulator Blog.
-    URL: https://mhrainspectorate.blog.gov.uk/feed/
-    """
-    log("INFO", f"MHRA RSS 수집: {MHRA_RSS_URL}")
-    try:
-        root = http_get_xml(MHRA_RSS_URL)
-    except Exception as e:
-        log("WARN", f"MHRA RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    entries = _atom_entries_from_root(root)
-
-    for entry in entries:
-        title   = _atom_text(entry, "title")
-        link    = _atom_link(entry)
-        # Atom: <updated> 또는 <published>
-        pub_raw = (
-            _rss_text(entry.find(f"{{{_NS_ATOM}}}published"))
-            or _rss_text(entry.find(f"{{{_NS_ATOM}}}updated"))
-            or _rss_text(entry.find("published"))
-            or _rss_text(entry.find("updated"))
-        )
-        date_iso = _parse_atom_date(pub_raw)
-        summary  = _atom_text(entry, "summary") or _atom_text(entry, "content")
-
-        # category
-        cat_el = _rss_find(entry, f"{{{_NS_ATOM}}}category", "category")
-        category = (cat_el.get("term", "") if cat_el is not None else "").strip()
-
-        # Atom id 를 document_id 로 사용
-        id_el = _rss_find(entry, f"{{{_NS_ATOM}}}id", "id")
-        guid  = _rss_text(id_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_MHRA, title, link, date_iso)
-        relevance = compute_relevance(title, summary, category)
-        tier      = compute_signal_tier(SOURCE_MHRA, category or "Blog", relevance,
-                                        "N/A", title, summary, category)
-
-        items.append(IntakeItem(
-            source=SOURCE_MHRA,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class=category or "Blog",
-            body=summary,
-            api_query=MHRA_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_OFFICIAL_BLOG,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "published": pub_raw, "summary": summary,
-                "category": category, "id": guid,
-            },
-        ))
-
-    log("INFO", f"MHRA RSS 수집 완료: {len(items)}건")
-    return items, None
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# PIC/S RSS 수집 (v15.1)
-# ─────────────────────────────────────────────────────────────────────────────
+    """MHRA Inspectorate Blog RSS(Atom) 수집. Source Type: Official Regulator Blog."""
+    return collect_rss_feed(_MHRA_FEED_SPEC, start, end)
 
 
 def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """PIC/S 공식 RSS 수집.
-
-    Source Type: Official Regulatory Page.
-    URL: https://picscheme.org/rss/general_en.rss
-    """
-    log("INFO", f"PIC/S RSS 수집: {PICS_RSS_URL}")
-    try:
-        root = http_get_xml(PICS_RSS_URL)
-    except Exception as e:
-        log("WARN", f"PIC/S RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    rss_items = _rss2_items_from_root(root)
-
-    for el in rss_items:
-        title   = _rss_text(el.find("title"))
-        link    = _rss_text(el.find("link"))
-        pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
-        date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
-        description = _rss_text(el.find("description"))
-        guid_el = el.find("guid")
-        guid    = _rss_text(guid_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_PICS, title, link, date_iso)
-        relevance = compute_relevance(title, description)
-        tier      = compute_signal_tier(SOURCE_PICS, "PIC/S", relevance,
-                                        "N/A", title, description)
-
-        items.append(IntakeItem(
-            source=SOURCE_PICS,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class="PIC/S",
-            body=description,
-            api_query=PICS_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_OFFICIAL_PAGE,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "pubDate": pub_raw, "description": description, "guid": guid,
-            },
-        ))
-
-    log("INFO", f"PIC/S RSS 수집 완료: {len(items)}건")
-    return items, None
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ECA Academy RSS 수집 (v15.1) — Expert Secondary
-# ─────────────────────────────────────────────────────────────────────────────
+    """PIC/S 공식 RSS 수집. Source Type: Official Regulatory Page."""
+    return collect_rss_feed(_PICS_FEED_SPEC, start, end)
 
 
 def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """ECA Academy (gmp-compliance.org) RSS 수집.
-
-    Source Type: Expert Secondary — FDA·EMA·MHRA·TGA·PIC/S·ICH 전문 GMP 뉴스 큐레이션.
-    URL: https://app.gxp-services.net/eca_newsfeed.xml
-    403 발생 시 운영 경고 없이 진행 (Expert Secondary 허용 정책).
-    """
-    log("INFO", f"ECA RSS 수집: {ECA_RSS_URL}")
-    try:
-        root = http_get_xml(ECA_RSS_URL)
-    except HTTPClientError as e:
-        # Expert Secondary: 403/404 는 경고 없이 넘어감
-        log("INFO", f"ECA RSS HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
-        return [], None
-    except Exception as e:
-        log("WARN", f"ECA RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    # ECA 피드는 RSS 2.0 또는 Atom 모두 가능 — 두 방향 시도
-    rss_items = _rss2_items_from_root(root)
-    if not rss_items:
-        rss_items = _atom_entries_from_root(root)  # type: ignore[assignment]
-
-    for el in rss_items:
-        # RSS 2.0 태그 우선, Atom 폴백
-        title = (
-            _rss_text(el.find("title"))
-            or _atom_text(el, "title")
-        )
-        link = (
-            _rss_text(el.find("link"))
-            or _atom_link(el)
-        )
-        pub_raw = (
-            _rss_text(el.find("pubDate"))
-            or _rss_text(el.find("pubdate"))
-            or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
-            or _rss_text(el.find("published"))
-        )
-        date_iso = (
-            _parse_rss2_date(pub_raw) if pub_raw
-            else _parse_atom_date(pub_raw)
-        )
-        description = (
-            _rss_text(el.find("description"))
-            or _atom_text(el, "summary")
-        )
-        guid_el = el.find("guid")
-        guid    = _rss_text(guid_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_ECA, title, link, date_iso)
-        relevance = compute_relevance(title, description)
-        tier      = compute_signal_tier(SOURCE_ECA, "GMP News", relevance,
-                                        "N/A", title, description)
-
-        items.append(IntakeItem(
-            source=SOURCE_ECA,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class="GMP News",
-            body=description,
-            api_query=ECA_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_EXPERT_SECONDARY,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "pubDate": pub_raw, "description": description, "guid": guid,
-            },
-        ))
-
-    log("INFO", f"ECA RSS 수집 완료: {len(items)}건")
-    return items, None
+    """ECA Academy(gmp-compliance.org) RSS 수집. Source Type: Expert Secondary.
+    403 발생 시 운영 경고 없이 진행(Expert Secondary 허용 정책)."""
+    return collect_rss_feed(_ECA_FEED_SPEC, start, end)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

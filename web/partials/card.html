@@ -155,4 +155,11 @@
   {%- if card.sources.info.url or card.sources.official.url %}
   <div class="src">{{ srclink(card.sources.info, '정보출처') }}{{ srclink(card.sources.official, '공식원본') }}</div>
   {%- endif %}
+  {#- [카드 반응 계층 S0 — 공유하기 2026-07-03] 순수 클라이언트(백엔드·계정 0). 정적 마크업(카드값
+      미참조·불투명 anchor 만) → 콘텐츠 순수/결정론(#1·#2) 불침범. 기본 display:none, base.html 인라인
+      스크립트가 활성 시에만 노출(progressive enhancement — JS off 면 미표시). 공유 URL 은 런타임에
+      location + '#'+anchor 로 조립(빌드는 호스트 무관 유지). §4 한글안전: mono/자간/대문자 미사용. -#}
+  <div class="grm-card-actions" data-anchor="{{ card.anchor }}">
+    <button type="button" class="grm-ca" data-share aria-label="이 카드 공유하기"><i class="ti ti-share-2"></i><span class="grm-ca-t">공유</span></button>
+  </div>
 </article>

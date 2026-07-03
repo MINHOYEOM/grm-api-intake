@@ -42,7 +42,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from html import unescape as _html_unescape
 from html.parser import HTMLParser
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
 import requests
@@ -121,6 +121,7 @@ from grm_taxonomy import (
 
 # ── [배치5] Phase0 공용 relocate(SOURCE_*·truncate·chunk_text·_env_int·chunk상수) — grm_common 재수출(하위호환·테스트·위성 무수정) ──
 from grm_common import (
+    INTAKE_SOURCE_SPECS,
     NOTION_RICH_TEXT_CHUNK,
     SOURCE_BRAVE,
     SOURCE_ECA,
@@ -724,6 +725,101 @@ class CollectionStats:
         return "\n".join(lines)
 
 
+@dataclass(frozen=True)
+class RunConfig:
+    """main() 실행 1회분의 환경변수·CLI 인자 파싱 결과(불변).
+
+    [리팩토링 배치6 Phase1] 모든 ``ENABLE_*`` 플래그와 값형 env(윈도우·키·경로·dry-run)를
+    실행 시작 시 ``from_env(args)`` 로 **1회** 파싱해 담는다. 이후 수집/삽입/handoff/health
+    단계는 env 를 재독해하지 않고 이 객체를 참조한다. ``env_flag``/``_env_int`` 를 재사용하며,
+    preflight 로 결정되는 *effective* 값(modality/handoff_idem)은 네트워크 의존이라 여기 담지
+    않고 main 에서 ``*_requested`` 를 근거로 계산한다.
+    """
+    # ── CLI 인자 파생 ────────────────────────────────────────────────────────
+    dry_run: bool
+    window_days: int
+    requested_sources: tuple[str, ...]
+    explicit_sources: bool
+    active: frozenset[str]
+    # ── 자격증명 / 키 ────────────────────────────────────────────────────────
+    notion_token: str
+    notion_db: str
+    openfda_key: str | None
+    data_go_kr_key: str
+    data_go_kr_service_key: str
+    law_go_kr_oc: str
+    brave_api_key: str
+    # ── ENABLE_* 플래그 ──────────────────────────────────────────────────────
+    enable_search: bool
+    enable_mfds: bool
+    enable_mfds_law: bool
+    enable_mfds_recall: bool
+    enable_mfds_admin: bool
+    enable_mfds_gmp_cert: bool
+    enable_mfds_safety_letter: bool
+    enable_mfds_gmp_inspection: bool
+    enable_ich: bool
+    enable_who: bool
+    enable_hc: bool
+    enable_fda483: bool
+    enable_fda483_observations: bool
+    enable_moleg_api: bool
+    enable_scrape: bool
+    modality_requested: bool
+    handoff_idem_requested: bool
+    # ── 값형 env / 파생 ──────────────────────────────────────────────────────
+    event_name: str
+    health_json_path: str
+    step_summary_path: str | None
+    mfds_http_proxy_configured: bool
+    mfds_enforcement_window_days: int
+    handoff_window_days: int
+
+    @classmethod
+    def from_env(cls, args: argparse.Namespace) -> "RunConfig":
+        requested_sources = tuple(args.sources or _ALL_SOURCES)
+        active = (frozenset() if "none" in requested_sources
+                  else frozenset(requested_sources))
+        return cls(
+            dry_run=args.dry_run,
+            window_days=args.window_days,
+            requested_sources=requested_sources,
+            explicit_sources=args.sources is not None,
+            active=active,
+            notion_token=os.environ.get("NOTION_TOKEN", "").strip(),
+            notion_db=os.environ.get("NOTION_DATABASE_ID", "").strip(),
+            openfda_key=os.environ.get("OPENFDA_API_KEY", "").strip() or None,
+            data_go_kr_key=os.environ.get("DATA_GO_KR_KEY", "").strip(),
+            data_go_kr_service_key=os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip(),
+            law_go_kr_oc=os.environ.get("LAW_GO_KR_OC", "").strip(),
+            brave_api_key=os.environ.get("BRAVE_API_KEY", ""),
+            enable_search=env_flag("ENABLE_SEARCH"),
+            enable_mfds=env_flag("ENABLE_MFDS"),
+            enable_mfds_law=env_flag("ENABLE_MFDS_LAW"),
+            enable_mfds_recall=env_flag("ENABLE_MFDS_RECALL"),
+            enable_mfds_admin=env_flag("ENABLE_MFDS_ADMIN"),
+            enable_mfds_gmp_cert=env_flag("ENABLE_MFDS_GMP_CERT"),
+            enable_mfds_safety_letter=env_flag("ENABLE_MFDS_SAFETY_LETTER"),
+            enable_mfds_gmp_inspection=env_flag("ENABLE_MFDS_GMP_INSPECTION"),
+            enable_ich=env_flag("ENABLE_ICH") or "ich" in active,
+            enable_who=env_flag("ENABLE_WHO") or "who" in active,
+            enable_hc=env_flag("ENABLE_HC") or "hc" in active,
+            enable_fda483=env_flag("ENABLE_FDA_483") or "fda483" in active,
+            enable_fda483_observations=env_flag("ENABLE_FDA_483_OBSERVATIONS"),
+            enable_moleg_api=env_flag("ENABLE_MOLEG_API"),
+            enable_scrape=env_flag("ENABLE_SCRAPE"),
+            modality_requested=env_flag("ENABLE_MODALITY_TAG"),
+            handoff_idem_requested=env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2"),
+            event_name=os.environ.get("GRM_EVENT_NAME", "").strip(),
+            health_json_path=os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip(),
+            step_summary_path=os.environ.get("GITHUB_STEP_SUMMARY"),
+            mfds_http_proxy_configured=bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
+            mfds_enforcement_window_days=max(
+                args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30)),
+            handoff_window_days=resolve_handoff_window_days(args.handoff_window_days),
+        )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 유틸
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1145,314 +1241,279 @@ def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EMA RSS 수집 (v15.1)
+# RSS 수집기 제네릭 (배치6 Phase3) — EMA · MHRA · PIC/S · ECA
 # ─────────────────────────────────────────────────────────────────────────────
+# 4종 RSS/Atom 수집기의 공통 골격(fetch 루프·윈도우 필터·doc_id·relevance·tier·IntakeItem
+# 조립)을 collect_rss_feed(spec) 하나로 통합한다. 소스별로 상이한 부분(피드 목록·item 반복자·
+# 필드 추출·raw_payload·type_or_class·source_type)만 RssFeedSpec + per-source extractor 로
+# 분리했다. **extractor 는 기존 각 수집기의 추출 로직을 그대로 옮긴 것**이라 doc_id/dedup 키를
+# 포함한 산출 IntakeItem 이 입력과 무관하게 byte 동일하다(전면 재적재 방지 절대선).
+#
+# 새 RSS 소스 추가: extractor 1개 + RssFeedSpec 1개 + 얇은 공개 함수 1개.
 
 
-def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """EMA 공식 RSS 피드 4개 (scientific-guidelines · inspections · news ·
-    regulatory-guidelines) 를 수집해 날짜 필터링 후 반환.
+@dataclass(frozen=True)
+class _RssItemFields:
+    """추출기가 반환하는 정규화 필드(수집기 공통 tail 이 IntakeItem 으로 조립)."""
+    title: str
+    link: str
+    date_iso: str
+    description: str
+    category: str          # raw category (uses_category=True 소스만 relevance/tier 에 사용)
+    type_or_class: str     # == compute_signal_tier 의 context 인자 (4종 모두 동일값)
+    guid: str
+    raw_payload: dict[str, Any]
 
-    Source Type: Official API (EMA 공식 RSS 피드).
-    Evidence Level: A 불가 — RSS 요약이므로 B (Official direct identified) 이상.
-    """
+
+@dataclass(frozen=True)
+class RssFeedSpec:
+    source: str            # SOURCE_* (doc_id/dedup 키의 일부)
+    source_type: str       # SRC_TYPE_*
+    label: str             # 로그 라벨 ("EMA RSS" 등)
+    feeds: tuple[tuple[str, str], ...]       # (feed_name, url) — 단일피드는 1항
+    iter_items: Callable[[ET.Element], list[ET.Element]]
+    extract: Callable[[ET.Element, str, str], "_RssItemFields"]
+    uses_category: bool = False       # relevance/tier 에 category 전달(EMA·MHRA)
+    accumulate_errors: bool = False   # 멀티피드 누적(EMA); False=첫 실패 즉시 반환
+    http_silent: bool = False         # HTTPClientError 를 경고없이 skip(ECA Expert Secondary)
+
+
+def collect_rss_feed(spec: RssFeedSpec, start: date,
+                     end: date) -> tuple[list[IntakeItem], str | None]:
+    """RssFeedSpec 하나로 RSS/Atom 피드를 수집해 IntakeItem 리스트를 반환한다(배치6 Phase3)."""
     items: list[IntakeItem] = []
     errors: list[str] = []
-
-    for feed_name, feed_url in EMA_RSS_FEEDS.items():
-        log("INFO", f"EMA RSS 수집: {feed_name} ({feed_url})")
+    for feed_name, feed_url in spec.feeds:
+        if spec.accumulate_errors:
+            log("INFO", f"{spec.label} 수집: {feed_name} ({feed_url})")
+        else:
+            log("INFO", f"{spec.label} 수집: {feed_url}")
         try:
             root = http_get_xml(feed_url)
         except Exception as e:
-            msg = f"EMA RSS '{feed_name}' 실패: {e}"
-            log("WARN", msg)
-            errors.append(msg)
-            continue
-
-        # RSS 2.0 형식 확인
-        rss_items = _rss2_items_from_root(root)
-        for el in rss_items:
-            title = _rss_text(el.find("title"))
-            link  = _rss_text(el.find("link"))
-            # <link> 가 CDATA 로 감싸진 경우 텍스트에 없고 tail 에 있을 수 있음
-            if not link:
-                link_el = el.find("link")
-                if link_el is not None:
-                    link = (link_el.tail or "").strip()
-            pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
-            # EMA 피드에 따라 dc:date 를 fallback 으로 사용
-            if not pub_raw:
-                dc_date = _rss_find(el, f"{{{_NS_DC}}}date", f"{{{_NS_DCTERMS}}}modified")
-                pub_raw = _rss_text(dc_date)
-            date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
-            # dc:date 가 Atom 형식인 경우 재시도
-            if not date_iso and pub_raw:
-                date_iso = _parse_atom_date(pub_raw)
-
-            description = _rss_text(el.find("description"))
-            category_el = el.find("category")
-            category = _rss_text(category_el)
-            guid_el = el.find("guid")
-            guid = _rss_text(guid_el) or link
-
-            if not _within_window(date_iso, start, end):
+            # http_silent(ECA Expert Secondary) 은 HTTPClientError 만 경고 없이 skip.
+            # 그 외에는 HTTPClientError 를 일반 예외와 동일 처리해야 한다 — 원 EMA 수집기가
+            # HTTPClientError 를 bare ``except Exception`` 로 잡아 accumulate+continue 했기
+            # 때문(멀티피드 소스에서 한 피드의 4xx/429 가 나머지 피드를 죽이면 안 됨).
+            if spec.http_silent and isinstance(e, HTTPClientError):
+                # Expert Secondary: 403/404 는 경고 없이 넘어감
+                log("INFO", f"{spec.label} HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
+                return [], None
+            if spec.accumulate_errors:
+                msg = f"{spec.label} '{feed_name}' 실패: {e}"
+                log("WARN", msg)
+                errors.append(msg)
                 continue
+            log("WARN", f"{spec.label} 실패: {e}")
+            return [], str(e)
 
-            doc_id = _stable_doc_id(SOURCE_EMA, title, link, date_iso)
-            relevance = compute_relevance(title, description, category)
-            tier = compute_signal_tier(SOURCE_EMA, category or feed_name, relevance,
-                                       "N/A", title, description, category)
-
+        for el in spec.iter_items(root):
+            f = spec.extract(el, feed_name, feed_url)
+            if not _within_window(f.date_iso, start, end):
+                continue
+            doc_id = _stable_doc_id(spec.source, f.title, f.link, f.date_iso)
+            if spec.uses_category:
+                relevance = compute_relevance(f.title, f.description, f.category)
+                tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
+                                           "N/A", f.title, f.description, f.category)
+            else:
+                relevance = compute_relevance(f.title, f.description)
+                tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
+                                           "N/A", f.title, f.description)
             items.append(IntakeItem(
-                source=SOURCE_EMA,
+                source=spec.source,
                 document_id=doc_id,
-                date_iso=date_iso,
-                headline=title,
-                official_url=link,
-                type_or_class=category or feed_name,
-                body=description,
+                date_iso=f.date_iso,
+                headline=f.title,
+                official_url=f.link,
+                type_or_class=f.type_or_class,
+                body=f.description,
                 api_query=feed_url,
                 qa_relevance=relevance,
                 osd_relevance="N/A",
-                source_type=SRC_TYPE_OFFICIAL_API,
+                source_type=spec.source_type,
                 signal_tier=tier,
-                raw_payload={
-                    "feed": feed_name,
-                    "title": title,
-                    "link": link,
-                    "pubDate": pub_raw,
-                    "description": description,
-                    "category": category,
-                    "guid": guid,
-                },
+                raw_payload=f.raw_payload,
             ))
 
-    err_msg = "; ".join(errors) if errors else None
-    # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
-    log("INFO", f"EMA RSS 수집 완료: {len(items)}건 (errors={len(errors)})")
-    return items, err_msg if errors else None
+    if spec.accumulate_errors:
+        # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
+        log("INFO", f"{spec.label} 수집 완료: {len(items)}건 (errors={len(errors)})")
+        return items, ("; ".join(errors) if errors else None)
+    log("INFO", f"{spec.label} 수집 완료: {len(items)}건")
+    return items, None
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# MHRA Inspectorate RSS 수집 (v15.1) — Atom 형식
-# ─────────────────────────────────────────────────────────────────────────────
+def _rss2_or_atom_items(root: ET.Element) -> list[ET.Element]:
+    """ECA: RSS 2.0 우선, 비면 Atom 폴백."""
+    rss_items = _rss2_items_from_root(root)
+    if not rss_items:
+        rss_items = _atom_entries_from_root(root)
+    return rss_items
+
+
+def _extract_ema(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title = _rss_text(el.find("title"))
+    link  = _rss_text(el.find("link"))
+    # <link> 가 CDATA 로 감싸진 경우 텍스트에 없고 tail 에 있을 수 있음
+    if not link:
+        link_el = el.find("link")
+        if link_el is not None:
+            link = (link_el.tail or "").strip()
+    pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+    # EMA 피드에 따라 dc:date 를 fallback 으로 사용
+    if not pub_raw:
+        dc_date = _rss_find(el, f"{{{_NS_DC}}}date", f"{{{_NS_DCTERMS}}}modified")
+        pub_raw = _rss_text(dc_date)
+    date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+    # dc:date 가 Atom 형식인 경우 재시도
+    if not date_iso and pub_raw:
+        date_iso = _parse_atom_date(pub_raw)
+    description = _rss_text(el.find("description"))
+    category_el = el.find("category")
+    category = _rss_text(category_el)
+    guid_el = el.find("guid")
+    guid = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category=category, type_or_class=category or feed_name, guid=guid,
+        raw_payload={
+            "feed": feed_name,
+            "title": title,
+            "link": link,
+            "pubDate": pub_raw,
+            "description": description,
+            "category": category,
+            "guid": guid,
+        },
+    )
+
+
+def _extract_mhra(entry: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title   = _atom_text(entry, "title")
+    link    = _atom_link(entry)
+    # Atom: <updated> 또는 <published>
+    pub_raw = (
+        _rss_text(entry.find(f"{{{_NS_ATOM}}}published"))
+        or _rss_text(entry.find(f"{{{_NS_ATOM}}}updated"))
+        or _rss_text(entry.find("published"))
+        or _rss_text(entry.find("updated"))
+    )
+    date_iso = _parse_atom_date(pub_raw)
+    summary  = _atom_text(entry, "summary") or _atom_text(entry, "content")
+    cat_el = _rss_find(entry, f"{{{_NS_ATOM}}}category", "category")
+    category = (cat_el.get("term", "") if cat_el is not None else "").strip()
+    id_el = _rss_find(entry, f"{{{_NS_ATOM}}}id", "id")
+    guid  = _rss_text(id_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=summary,
+        category=category, type_or_class=category or "Blog", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "published": pub_raw, "summary": summary,
+            "category": category, "id": guid,
+        },
+    )
+
+
+def _extract_pics(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    title   = _rss_text(el.find("title"))
+    link    = _rss_text(el.find("link"))
+    pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
+    date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+    description = _rss_text(el.find("description"))
+    guid_el = el.find("guid")
+    guid    = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category="", type_or_class="PIC/S", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "pubDate": pub_raw, "description": description, "guid": guid,
+        },
+    )
+
+
+def _extract_eca(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    # RSS 2.0 태그 우선, Atom 폴백
+    title = (
+        _rss_text(el.find("title"))
+        or _atom_text(el, "title")
+    )
+    link = (
+        _rss_text(el.find("link"))
+        or _atom_link(el)
+    )
+    pub_raw = (
+        _rss_text(el.find("pubDate"))
+        or _rss_text(el.find("pubdate"))
+        or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
+        or _rss_text(el.find("published"))
+    )
+    date_iso = (
+        _parse_rss2_date(pub_raw) if pub_raw
+        else _parse_atom_date(pub_raw)
+    )
+    description = (
+        _rss_text(el.find("description"))
+        or _atom_text(el, "summary")
+    )
+    guid_el = el.find("guid")
+    guid    = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category="", type_or_class="GMP News", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "pubDate": pub_raw, "description": description, "guid": guid,
+        },
+    )
+
+
+_EMA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_EMA, source_type=SRC_TYPE_OFFICIAL_API, label="EMA RSS",
+    feeds=tuple(EMA_RSS_FEEDS.items()),
+    iter_items=_rss2_items_from_root, extract=_extract_ema,
+    uses_category=True, accumulate_errors=True,
+)
+_MHRA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_BLOG, label="MHRA RSS",
+    feeds=(("mhra", MHRA_RSS_URL),),
+    iter_items=_atom_entries_from_root, extract=_extract_mhra,
+    uses_category=True,
+)
+_PICS_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_PICS, source_type=SRC_TYPE_OFFICIAL_PAGE, label="PIC/S RSS",
+    feeds=(("pics", PICS_RSS_URL),),
+    iter_items=_rss2_items_from_root, extract=_extract_pics,
+)
+_ECA_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_ECA, source_type=SRC_TYPE_EXPERT_SECONDARY, label="ECA RSS",
+    feeds=(("eca", ECA_RSS_URL),),
+    iter_items=_rss2_or_atom_items, extract=_extract_eca,
+    http_silent=True,
+)
+
+
+def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """EMA 공식 RSS 피드 4개 수집. Source Type: Official API. Evidence: B 이상(RSS 요약)."""
+    return collect_rss_feed(_EMA_FEED_SPEC, start, end)
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """MHRA Inspectorate Blog RSS (Atom 형식) 수집.
-
-    Source Type: Official Regulator Blog.
-    URL: https://mhrainspectorate.blog.gov.uk/feed/
-    """
-    log("INFO", f"MHRA RSS 수집: {MHRA_RSS_URL}")
-    try:
-        root = http_get_xml(MHRA_RSS_URL)
-    except Exception as e:
-        log("WARN", f"MHRA RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    entries = _atom_entries_from_root(root)
-
-    for entry in entries:
-        title   = _atom_text(entry, "title")
-        link    = _atom_link(entry)
-        # Atom: <updated> 또는 <published>
-        pub_raw = (
-            _rss_text(entry.find(f"{{{_NS_ATOM}}}published"))
-            or _rss_text(entry.find(f"{{{_NS_ATOM}}}updated"))
-            or _rss_text(entry.find("published"))
-            or _rss_text(entry.find("updated"))
-        )
-        date_iso = _parse_atom_date(pub_raw)
-        summary  = _atom_text(entry, "summary") or _atom_text(entry, "content")
-
-        # category
-        cat_el = _rss_find(entry, f"{{{_NS_ATOM}}}category", "category")
-        category = (cat_el.get("term", "") if cat_el is not None else "").strip()
-
-        # Atom id 를 document_id 로 사용
-        id_el = _rss_find(entry, f"{{{_NS_ATOM}}}id", "id")
-        guid  = _rss_text(id_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_MHRA, title, link, date_iso)
-        relevance = compute_relevance(title, summary, category)
-        tier      = compute_signal_tier(SOURCE_MHRA, category or "Blog", relevance,
-                                        "N/A", title, summary, category)
-
-        items.append(IntakeItem(
-            source=SOURCE_MHRA,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class=category or "Blog",
-            body=summary,
-            api_query=MHRA_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_OFFICIAL_BLOG,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "published": pub_raw, "summary": summary,
-                "category": category, "id": guid,
-            },
-        ))
-
-    log("INFO", f"MHRA RSS 수집 완료: {len(items)}건")
-    return items, None
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# PIC/S RSS 수집 (v15.1)
-# ─────────────────────────────────────────────────────────────────────────────
+    """MHRA Inspectorate Blog RSS(Atom) 수집. Source Type: Official Regulator Blog."""
+    return collect_rss_feed(_MHRA_FEED_SPEC, start, end)
 
 
 def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """PIC/S 공식 RSS 수집.
-
-    Source Type: Official Regulatory Page.
-    URL: https://picscheme.org/rss/general_en.rss
-    """
-    log("INFO", f"PIC/S RSS 수집: {PICS_RSS_URL}")
-    try:
-        root = http_get_xml(PICS_RSS_URL)
-    except Exception as e:
-        log("WARN", f"PIC/S RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    rss_items = _rss2_items_from_root(root)
-
-    for el in rss_items:
-        title   = _rss_text(el.find("title"))
-        link    = _rss_text(el.find("link"))
-        pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
-        date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
-        description = _rss_text(el.find("description"))
-        guid_el = el.find("guid")
-        guid    = _rss_text(guid_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_PICS, title, link, date_iso)
-        relevance = compute_relevance(title, description)
-        tier      = compute_signal_tier(SOURCE_PICS, "PIC/S", relevance,
-                                        "N/A", title, description)
-
-        items.append(IntakeItem(
-            source=SOURCE_PICS,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class="PIC/S",
-            body=description,
-            api_query=PICS_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_OFFICIAL_PAGE,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "pubDate": pub_raw, "description": description, "guid": guid,
-            },
-        ))
-
-    log("INFO", f"PIC/S RSS 수집 완료: {len(items)}건")
-    return items, None
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ECA Academy RSS 수집 (v15.1) — Expert Secondary
-# ─────────────────────────────────────────────────────────────────────────────
+    """PIC/S 공식 RSS 수집. Source Type: Official Regulatory Page."""
+    return collect_rss_feed(_PICS_FEED_SPEC, start, end)
 
 
 def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """ECA Academy (gmp-compliance.org) RSS 수집.
-
-    Source Type: Expert Secondary — FDA·EMA·MHRA·TGA·PIC/S·ICH 전문 GMP 뉴스 큐레이션.
-    URL: https://app.gxp-services.net/eca_newsfeed.xml
-    403 발생 시 운영 경고 없이 진행 (Expert Secondary 허용 정책).
-    """
-    log("INFO", f"ECA RSS 수집: {ECA_RSS_URL}")
-    try:
-        root = http_get_xml(ECA_RSS_URL)
-    except HTTPClientError as e:
-        # Expert Secondary: 403/404 는 경고 없이 넘어감
-        log("INFO", f"ECA RSS HTTP {e.status_code} — 건너뜀 (Expert Secondary 정책)")
-        return [], None
-    except Exception as e:
-        log("WARN", f"ECA RSS 실패: {e}")
-        return [], str(e)
-
-    items: list[IntakeItem] = []
-    # ECA 피드는 RSS 2.0 또는 Atom 모두 가능 — 두 방향 시도
-    rss_items = _rss2_items_from_root(root)
-    if not rss_items:
-        rss_items = _atom_entries_from_root(root)  # type: ignore[assignment]
-
-    for el in rss_items:
-        # RSS 2.0 태그 우선, Atom 폴백
-        title = (
-            _rss_text(el.find("title"))
-            or _atom_text(el, "title")
-        )
-        link = (
-            _rss_text(el.find("link"))
-            or _atom_link(el)
-        )
-        pub_raw = (
-            _rss_text(el.find("pubDate"))
-            or _rss_text(el.find("pubdate"))
-            or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
-            or _rss_text(el.find("published"))
-        )
-        date_iso = (
-            _parse_rss2_date(pub_raw) if pub_raw
-            else _parse_atom_date(pub_raw)
-        )
-        description = (
-            _rss_text(el.find("description"))
-            or _atom_text(el, "summary")
-        )
-        guid_el = el.find("guid")
-        guid    = _rss_text(guid_el) or link
-
-        if not _within_window(date_iso, start, end):
-            continue
-
-        doc_id    = _stable_doc_id(SOURCE_ECA, title, link, date_iso)
-        relevance = compute_relevance(title, description)
-        tier      = compute_signal_tier(SOURCE_ECA, "GMP News", relevance,
-                                        "N/A", title, description)
-
-        items.append(IntakeItem(
-            source=SOURCE_ECA,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=title,
-            official_url=link,
-            type_or_class="GMP News",
-            body=description,
-            api_query=ECA_RSS_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_EXPERT_SECONDARY,
-            signal_tier=tier,
-            raw_payload={
-                "title": title, "link": link,
-                "pubDate": pub_raw, "description": description, "guid": guid,
-            },
-        ))
-
-    log("INFO", f"ECA RSS 수집 완료: {len(items)}건")
-    return items, None
+    """ECA Academy(gmp-compliance.org) RSS 수집. Source Type: Expert Secondary.
+    403 발생 시 운영 경고 없이 진행(Expert Secondary 허용 정책)."""
+    return collect_rss_feed(_ECA_FEED_SPEC, start, end)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1855,8 +1916,13 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
-                 existing_ids: set[str], dry_run: bool) -> tuple[int, int, int]:
-    """삽입 실행. 반환: (inserted, skipped, failed)"""
+                 existing_ids: set[str], dry_run: bool, *,
+                 modality_enabled: bool | None = None) -> tuple[int, int, int]:
+    """삽입 실행. 반환: (inserted, skipped, failed)
+
+    [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
+    row 당 env 재독해 없이 그대로 build_notion_properties 로 흐른다(미지정 시 env 폴백).
+    """
     inserted = 0
     skipped = 0
     failed = 0
@@ -1877,7 +1943,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             continue
         # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
         time.sleep(0.34)
-        ok = notion_create_page(token, db_id, item, run_date, collected_at)
+        ok = notion_create_page(token, db_id, item, run_date, collected_at,
+                                modality_enabled=modality_enabled)
         if ok:
             inserted += 1
             existing_ids.add(dedup_key)
@@ -1952,119 +2019,28 @@ def _health_payload(
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="GRM API Intake Collector v15.1")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Notion 호출 없이 stdout 만 출력")
-    parser.add_argument("--window-days", type=int, default=7,
-                        choices=range(1, 91), metavar="N(1-90)",
-                        help="수집 윈도우 일수 1~90 (default 7)")
-    parser.add_argument("--sources", nargs="+", choices=_SOURCE_CHOICES,
-                        default=None,
-                        help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema. "
-                             "none은 feature-flag collector만 단독 실행")
-    parser.add_argument("--emit-routine-handoff", action="store_true",
-                        help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
-    parser.add_argument("--handoff-window-days", type=int, default=None,
-                        choices=range(1, 91), metavar="N(1-90)",
-                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
-                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
-    parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
-                        help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
-    args = parser.parse_args()
-    requested_sources = args.sources or _ALL_SOURCES
-    explicit_sources = args.sources is not None
-    active = set() if "none" in requested_sources else set(requested_sources)
-
-    notion_token = os.environ.get("NOTION_TOKEN", "").strip()
-    notion_db = os.environ.get("NOTION_DATABASE_ID", "").strip()
-    openfda_key = os.environ.get("OPENFDA_API_KEY", "").strip() or None
-    data_go_kr_key = os.environ.get("DATA_GO_KR_KEY", "").strip()
-    data_go_kr_service_key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
-    law_go_kr_oc = os.environ.get("LAW_GO_KR_OC", "").strip()
-    enable_search = env_flag("ENABLE_SEARCH")
-    enable_mfds = env_flag("ENABLE_MFDS")
-    enable_mfds_law = env_flag("ENABLE_MFDS_LAW")
-    enable_mfds_recall = env_flag("ENABLE_MFDS_RECALL")
-    enable_mfds_admin = env_flag("ENABLE_MFDS_ADMIN")
-    enable_mfds_gmp_cert = env_flag("ENABLE_MFDS_GMP_CERT")
-    enable_mfds_safety_letter = env_flag("ENABLE_MFDS_SAFETY_LETTER")
-    enable_mfds_gmp_inspection = env_flag("ENABLE_MFDS_GMP_INSPECTION")
-    enable_ich = env_flag("ENABLE_ICH") or "ich" in active
-    enable_who = env_flag("ENABLE_WHO") or "who" in active
-    enable_hc = env_flag("ENABLE_HC") or "hc" in active
-    enable_fda483 = env_flag("ENABLE_FDA_483") or "fda483" in active
-    enable_fda483_observations = env_flag("ENABLE_FDA_483_OBSERVATIONS")
-    enable_moleg_api = env_flag("ENABLE_MOLEG_API")
-    enable_scrape = env_flag("ENABLE_SCRAPE")
-    event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
-    health_json_path = os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip()
-    if enable_scrape:
-        log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
-
-    if not args.dry_run:
-        if not notion_token or not notion_db:
-            log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
-            return 2
-
-    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
-    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
-    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
-    modality_requested = env_flag("ENABLE_MODALITY_TAG")
-    modality_preflight_disabled = False
-    modality_preflight_skipped = False
-    if modality_requested and notion_token and notion_db:
-        if not notion_verify_modality_property(notion_token, notion_db):
-            modality_preflight_disabled = True
-            os.environ["ENABLE_MODALITY_TAG"] = "false"
-            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
-                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
-    elif modality_requested:
-        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
-        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
-        modality_preflight_skipped = True
-        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
-                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
-    modality_effective = (modality_requested and not modality_preflight_disabled
-                          and not modality_preflight_skipped)
-
-    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
-    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
-    handoff_idem_requested = env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2")
-    handoff_idem_preflight_disabled = False
-    handoff_idem_preflight_skipped = False
-    if handoff_idem_requested and notion_token and notion_db:
-        if not notion_verify_handoff_ref_property(notion_token, notion_db):
-            handoff_idem_preflight_disabled = True
-            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
-            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
-                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
-    elif handoff_idem_requested:
-        handoff_idem_preflight_skipped = True
-        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
-                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
-    handoff_idem_effective = (handoff_idem_requested
-                              and not handoff_idem_preflight_disabled
-                              and not handoff_idem_preflight_skipped)
-
-    now_k = now_kst()
-    run_date = kst_run_date(now_k)
-    start, end = date_window(run_date, args.window_days)
-    log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
-
-    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
-    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
-    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
-    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
-    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
-    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
-    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
-    mfds_enforcement_window_days = max(
-        args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30))
-    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
-    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
-                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
-
+def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
+                    start: date, end: date, enf_start: date) -> tuple[CollectionStats, tuple[list[IntakeItem], ...]]:
+    """[배치6 Phase4] 소스별 수집 블록(flag→수집→stats)을 실행해 stats 와 18개 소스
+    item 리스트를 반환한다. 소스별 env alias 는 cfg 에서 재바인딩(바디 무수정). 수집 블록
+    자체는 소스별 window/키/health 추출이 상이해 bespoke 유지 — 새 소스는 여기 블록 1개 +
+    grm_common.INTAKE_SOURCE_SPECS 1건으로 insert/health 가 자동 처리된다."""
+    openfda_key = cfg.openfda_key
+    enable_mfds = cfg.enable_mfds
+    data_go_kr_key = cfg.data_go_kr_key
+    enable_moleg_api = cfg.enable_moleg_api
+    enable_mfds_law = cfg.enable_mfds_law
+    data_go_kr_service_key = cfg.data_go_kr_service_key
+    law_go_kr_oc = cfg.law_go_kr_oc
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_cert = cfg.enable_mfds_gmp_cert
+    enable_mfds_safety_letter = cfg.enable_mfds_safety_letter
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
     stats = CollectionStats()
 
     # ── Phase 1: Official API ──────────────────────────────────────────────
@@ -2417,347 +2393,29 @@ def main() -> int:
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
         f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
     ))
+    return (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items)
 
-    # 3) Notion 기존 row (중복 제거)
-    # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
-    # (7일 윈도우 시 8일 전 RAPS URL이 누락되어 재삽입될 수 있음 — Task #13)
-    _SEARCH_DEDUP_WINDOW_DAYS = 35  # pm(31일) + 여유 4일
-    # P0: dedup 윈도우는 가장 넓은 수집 윈도우(enforcement 30일)를 반드시 덮어야 한다.
-    # 그래야 enforcement 윈도우로 backfill된 과거 일자 항목이 다음 실행에서 중복 재삽입되지 않는다.
-    dedup_window_days = max(
-        args.window_days,
-        mfds_enforcement_window_days,
-        _SEARCH_DEDUP_WINDOW_DAYS if enable_search else 0,
-    )
-    log("INFO", f"dedupe window={dedup_window_days}일 (window_days={args.window_days}, enable_search={enable_search})")
 
-    # P1: snapshot 소스(ICH·WHO)는 날짜 미단언/URL 기반 안정 스냅샷이라 매 실행 동일 항목을 재수집한다.
-    # 기본 dedup 윈도우(≤30일)를 넘으면 같은 항목이 다시 New로 들어오므로(월간 중복 삽입),
-    # 이들 소스만 별도로 장기(3년) Source-한정 dedup을 조회해 합친다.
-    # (전체 윈도우를 3년으로 늘리면 Notion 페이지 cap에 걸릴 수 있어 Source 필터로 한정.)
-    _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
-    _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
-
-    if args.dry_run:
-        existing: set[str] = set()
-    else:
-        try:
-            existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date,
-                                                     window_days=dedup_window_days)
-        except NotionDedupeQueryError as e:
-            # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
-            log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
-            return 1
-        snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
-        if snapshot_active:
-            try:
-                snap_existing = notion_query_existing_doc_ids(
-                    notion_token, notion_db, run_date,
-                    window_days=_SNAPSHOT_DEDUP_WINDOW_DAYS,
-                    source_names=snapshot_active)
-                existing |= snap_existing
-                log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
-                            f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
-            except NotionDedupeQueryError as e:
-                log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
-                return 1
-
-    collected_at = now_k
-
-    # 4) 삽입 (반환: inserted, skipped, failed)
-    fr_in, fr_sk, fr_fail = insert_items(notion_token, notion_db, fr_items,
-                                         run_date, collected_at, existing, args.dry_run)
-    stats.fr_inserted = fr_in
-    stats.fr_skipped_dup = fr_sk
-    stats.fr_insert_failed = fr_fail
-
-    rec_in, rec_sk, rec_fail = insert_items(notion_token, notion_db, recall_items,
-                                            run_date, collected_at, existing, args.dry_run)
-    stats.recall_inserted = rec_in
-    stats.recall_skipped_dup = rec_sk
-    stats.recall_insert_failed = rec_fail
-
-    # Phase 2 삽입
-    ema_in, ema_sk, ema_fail = insert_items(notion_token, notion_db, ema_items,
-                                             run_date, collected_at, existing, args.dry_run)
-    stats.ema_inserted = ema_in
-    stats.ema_skipped_dup = ema_sk
-    stats.ema_insert_failed = ema_fail
-
-    mhra_in, mhra_sk, mhra_fail = insert_items(notion_token, notion_db, mhra_items,
-                                                run_date, collected_at, existing, args.dry_run)
-    stats.mhra_inserted = mhra_in
-    stats.mhra_skipped_dup = mhra_sk
-    stats.mhra_insert_failed = mhra_fail
-
-    pics_in, pics_sk, pics_fail = insert_items(notion_token, notion_db, pics_items,
-                                                run_date, collected_at, existing, args.dry_run)
-    stats.pics_inserted = pics_in
-    stats.pics_skipped_dup = pics_sk
-    stats.pics_insert_failed = pics_fail
-
-    eca_in, eca_sk, eca_fail = insert_items(notion_token, notion_db, eca_items,
-                                             run_date, collected_at, existing, args.dry_run)
-    stats.eca_inserted = eca_in
-    stats.eca_skipped_dup = eca_sk
-    stats.eca_insert_failed = eca_fail
-
-    wl_in, wl_sk, wl_fail = insert_items(notion_token, notion_db, wl_items,
-                                          run_date, collected_at, existing, args.dry_run)
-    stats.wl_inserted = wl_in
-    stats.wl_skipped_dup = wl_sk
-    stats.wl_insert_failed = wl_fail
-
-    mfds_in, mfds_sk, mfds_fail = insert_items(notion_token, notion_db, mfds_items,
-                                               run_date, collected_at, existing, args.dry_run)
-    stats.mfds_inserted = mfds_in
-    stats.mfds_skipped_dup = mfds_sk
-    stats.mfds_insert_failed = mfds_fail
-
-    mfds_law_in, mfds_law_sk, mfds_law_fail = insert_items(
-        notion_token, notion_db, mfds_law_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_law_inserted = mfds_law_in
-    stats.mfds_law_skipped_dup = mfds_law_sk
-    stats.mfds_law_insert_failed = mfds_law_fail
-
-    mfds_rec_in, mfds_rec_sk, mfds_rec_fail = insert_items(
-        notion_token, notion_db, mfds_recall_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_recall_inserted = mfds_rec_in
-    stats.mfds_recall_skipped_dup = mfds_rec_sk
-    stats.mfds_recall_insert_failed = mfds_rec_fail
-
-    mfds_admin_in, mfds_admin_sk, mfds_admin_fail = insert_items(
-        notion_token, notion_db, mfds_admin_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_admin_inserted = mfds_admin_in
-    stats.mfds_admin_skipped_dup = mfds_admin_sk
-    stats.mfds_admin_insert_failed = mfds_admin_fail
-
-    mfds_gmp_cert_in, mfds_gmp_cert_sk, mfds_gmp_cert_fail = insert_items(
-        notion_token, notion_db, mfds_gmp_cert_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_gmp_cert_inserted = mfds_gmp_cert_in
-    stats.mfds_gmp_cert_skipped_dup = mfds_gmp_cert_sk
-    stats.mfds_gmp_cert_insert_failed = mfds_gmp_cert_fail
-
-    mfds_safety_letter_in, mfds_safety_letter_sk, mfds_safety_letter_fail = insert_items(
-        notion_token, notion_db, mfds_safety_letter_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_safety_letter_inserted = mfds_safety_letter_in
-    stats.mfds_safety_letter_skipped_dup = mfds_safety_letter_sk
-    stats.mfds_safety_letter_insert_failed = mfds_safety_letter_fail
-
-    mfds_gmp_insp_in, mfds_gmp_insp_sk, mfds_gmp_insp_fail = insert_items(
-        notion_token, notion_db, mfds_gmp_inspection_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_gmp_inspection_inserted = mfds_gmp_insp_in
-    stats.mfds_gmp_inspection_skipped_dup = mfds_gmp_insp_sk
-    stats.mfds_gmp_inspection_insert_failed = mfds_gmp_insp_fail
-
-    ich_in, ich_sk, ich_fail = insert_items(
-        notion_token, notion_db, ich_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.ich_inserted = ich_in
-    stats.ich_skipped_dup = ich_sk
-    stats.ich_insert_failed = ich_fail
-
-    who_in, who_sk, who_fail = insert_items(
-        notion_token, notion_db, who_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.who_inserted = who_in
-    stats.who_skipped_dup = who_sk
-    stats.who_insert_failed = who_fail
-
-    hc_in, hc_sk, hc_fail = insert_items(
-        notion_token, notion_db, hc_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.hc_inserted = hc_in
-    stats.hc_skipped_dup = hc_sk
-    stats.hc_insert_failed = hc_fail
-
-    fda483_in, fda483_sk, fda483_fail = insert_items(
-        notion_token, notion_db, fda483_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.fda483_inserted = fda483_in
-    stats.fda483_skipped_dup = fda483_sk
-    stats.fda483_insert_failed = fda483_fail
-
-    # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
-    # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
-    search_items: list[IntakeItem] = []  # G2: inmemory_raw 집계에서 항상 참조 가능하게 선초기화
-    if enable_search:
-        brave_api_key = os.environ.get("BRAVE_API_KEY", "")
-        log("INFO", "=== Brave Search 수집 시작 ===")
-        try:
-            from collect_search import collect_brave_search
-            search_items, search_err = collect_brave_search(brave_api_key)
-        except Exception as e:
-            search_items, search_err = [], str(e)
-
-        stats.search_fetched = len(search_items)
-        if search_err:
-            stats.search_error = True
-            stats.search_error_msg = search_err
-            log("WARN", f"Brave Search 오류: {search_err}")
-
-        src_in, src_sk, src_fail = insert_items(
-            notion_token, notion_db, search_items,
-            run_date, collected_at, existing, args.dry_run,
-        )
-        stats.search_inserted = src_in
-        stats.search_skipped_dup = src_sk
-        stats.search_insert_failed = src_fail
-    else:
-        log("INFO", "ENABLE_SEARCH=false — Brave Search 건너뜀")
-
-    handoff_emitted = False
-    handoff_failed = False
-    handoff_row_count = 0
-    handoff_url = ""
-    handoff_error_msg = ""
-    # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
-    handoff_window_days = resolve_handoff_window_days(args.handoff_window_days)
-    if args.emit_routine_handoff:
-        if args.dry_run:
-            log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
-        elif stats.has_insert_failures():
-            handoff_failed = True
-            handoff_error_msg = "insert failure가 있어 partial handoff 생성 생략"
-            log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
-        else:
-            try:
-                handoff_sources = None
-                if explicit_sources and "none" not in requested_sources:
-                    handoff_sources = {
-                        _SOURCE_TOKEN_TO_NOTION[src]
-                        for src in requested_sources
-                        if src in _SOURCE_TOKEN_TO_NOTION
-                    }
-                handoff_doc_ids = set(args.handoff_doc_ids or []) or None
-                # G2 와이어링: 당일 수집분 raw 를 메모리로 전달(과거 New row 만 fetch 폴백).
-                # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
-                inmemory_raw = build_inmemory_raw(
-                    fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
-                    wl_items, mfds_items, mfds_law_items, mfds_recall_items,
-                    mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
-                    mfds_gmp_inspection_items, ich_items, who_items, hc_items,
-                    fda483_items, search_items)
-                # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
-                # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
-                web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
-                handoff_row_count, handoff_url = emit_routine_handoff(
-                    notion_token, notion_db, run_date, handoff_window_days, collected_at,
-                    source_names=handoff_sources, doc_ids=handoff_doc_ids,
-                    inmemory_raw=inmemory_raw,
-                    # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
-                    display_window_days=args.window_days,
-                    web_brief_dir=web_brief_dir)
-                handoff_emitted = True
-            except NotionHandoffError as e:
-                handoff_failed = True
-                handoff_error_msg = str(e)
-                log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
-
-    # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
-    # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.
-    aged_unconsumed_new = 0
-    aged_new_query_error = ""
-    if notion_token and notion_db:
-        try:
-            aged_unconsumed_new = notion_count_aged_unconsumed_new(
-                notion_token, notion_db, run_date, handoff_window_days)
-            if aged_unconsumed_new and handoff_idem_effective:
-                # Codex P2: v2 effective — 노후 New 는 ref 기반 쿼리가 자동 재투입(정보성).
-                log("INFO", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
-                            f"{aged_unconsumed_new}건 — 멱등성 v2 자동 재투입 대상(다음 emit 포함)")
-            elif aged_unconsumed_new:
-                log("WARN", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
-                            f"{aged_unconsumed_new}건 — Routine 누락/지연 의심")
-        except Exception as e:  # noqa: BLE001 — 감시 실패가 수집 자체를 죽이면 안 됨
-            aged_new_query_error = str(e)
-            log("WARN", f"노후 미소비 New row 카운트 조회 실패: {aged_new_query_error}")
-
-    flags = {
-        "ENABLE_SEARCH": enable_search,
-        "ENABLE_MFDS": enable_mfds,
-        "ENABLE_MFDS_LAW": enable_mfds_law,
-        "ENABLE_MFDS_RECALL": enable_mfds_recall,
-        "ENABLE_MFDS_ADMIN": enable_mfds_admin,
-        "ENABLE_MFDS_GMP_CERT": enable_mfds_gmp_cert,
-        "ENABLE_MFDS_SAFETY_LETTER": enable_mfds_safety_letter,
-        "ENABLE_MFDS_GMP_INSPECTION": enable_mfds_gmp_inspection,
-        "ENABLE_ICH": enable_ich,
-        "ENABLE_WHO": enable_who,
-        "ENABLE_HC": enable_hc,
-        "ENABLE_FDA_483": enable_fda483,
-        "ENABLE_FDA_483_OBSERVATIONS": enable_fda483_observations,
-        "ENABLE_MOLEG_API": enable_moleg_api,
-        "ENABLE_SCRAPE": enable_scrape,
-        "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
-        "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
-        "ENABLE_MODALITY_TAG_PREFLIGHT_SKIPPED": modality_preflight_skipped,
-        "ENABLE_HANDOFF_IDEMPOTENCY_V2_REQUESTED": handoff_idem_requested,
-        "ENABLE_HANDOFF_IDEMPOTENCY_V2_EFFECTIVE": handoff_idem_effective,
-        "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
-        "MFDS_HTTP_PROXY_CONFIGURED": bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
-        "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
-    }
-    health = _evaluate_health(
-        modality_preflight_disabled=modality_preflight_disabled,
-        handoff_idem_preflight_disabled=handoff_idem_preflight_disabled,
-        handoff_idem_effective=handoff_idem_effective,
-        stats=stats,
-        active=active,
-        enable_search=enable_search,
-        enable_mfds=enable_mfds,
-        enable_mfds_law=enable_mfds_law,
-        enable_mfds_recall=enable_mfds_recall,
-        enable_mfds_admin=enable_mfds_admin,
-        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
-        enable_mfds_safety_letter=enable_mfds_safety_letter,
-        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
-        enable_ich=enable_ich,
-        enable_who=enable_who,
-        enable_hc=enable_hc,
-        enable_fda483=enable_fda483,
-        enable_moleg_api=enable_moleg_api,
-        enable_scrape=enable_scrape,
-        event_name=event_name,
-        emit_routine_handoff=args.emit_routine_handoff,
-        handoff_emitted=handoff_emitted,
-        handoff_failed=handoff_failed,
-        handoff_error_msg=handoff_error_msg,
-        aged_unconsumed_new=aged_unconsumed_new,
-        aged_new_query_error=aged_new_query_error,
-        handoff_window_days=handoff_window_days,
-    )
-    health_payload = _health_payload(
-        health=health,
-        stats=stats,
-        run_date=run_date,
-        start=start,
-        end=end,
-        event_name=event_name,
-        dry_run=args.dry_run,
-        requested_sources=list(requested_sources),
-        active=active,
-        flags=flags,
-        handoff_emitted=handoff_emitted,
-        handoff_failed=handoff_failed,
-        handoff_row_count=handoff_row_count,
-        handoff_url=handoff_url,
-        handoff_error_msg=handoff_error_msg,
-        handoff_window_days=handoff_window_days,
-        aged_unconsumed_new=aged_unconsumed_new,
-    )
-    _write_health_json(health_json_path, health_payload)
-
-    log("INFO", "── Collection summary ──\n" + stats.summary())
-
+def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
+                        stats: CollectionStats, health: HealthCheckResult,
+                        run_date: date, start: date, end: date,
+                        handoff_emitted: bool, handoff_failed: bool,
+                        handoff_row_count: int, handoff_url: str,
+                        handoff_error_msg: str) -> None:
+    """[배치6 Phase4] GITHUB_STEP_SUMMARY 출력(문구·행순서 불변). enable_* alias 는 cfg
+    에서 재바인딩(바디 무수정)."""
+    enable_mfds = cfg.enable_mfds
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
+    enable_search = cfg.enable_search
+    health_json_path = cfg.health_json_path
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
-    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    summary_path = cfg.step_summary_path
     if summary_path:
         try:
             with open(summary_path, "a", encoding="utf-8") as f:
@@ -2877,6 +2535,381 @@ def main() -> int:
                 _write_health_summary(f, health, health_json_path)
         except OSError as e:
             log("WARN", f"STEP_SUMMARY 쓰기 실패: {e}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="GRM API Intake Collector v15.1")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Notion 호출 없이 stdout 만 출력")
+    parser.add_argument("--window-days", type=int, default=7,
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="수집 윈도우 일수 1~90 (default 7)")
+    parser.add_argument("--sources", nargs="+", choices=_SOURCE_CHOICES,
+                        default=None,
+                        help="수집할 소스 선택 (기본: all). 예: --sources fr recall ema. "
+                             "none은 feature-flag collector만 단독 실행")
+    parser.add_argument("--emit-routine-handoff", action="store_true",
+                        help="수집 후 Status=New row만 담은 Routine handoff 페이지를 Notion에 생성/갱신")
+    parser.add_argument("--handoff-window-days", type=int, default=None,
+                        choices=range(1, 91), metavar="N(1-90)",
+                        help="Routine handoff 조회 윈도우. 기본 GRM_HANDOFF_WINDOW_DAYS"
+                             "(미설정 시 30일 — 발행 cadence 초과로 미소비 New 누락 방지, B1)")
+    parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
+                        help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
+    args = parser.parse_args()
+
+    # ── [배치6 Phase1] env·CLI 를 1회 파싱해 RunConfig 로 고정. 아래 로컬은 config 참조
+    #    별칭(하위 main 본문 무수정) — Phase4 에서 하위 함수로 config 를 전달하며 정리한다. ──
+    cfg = RunConfig.from_env(args)
+    requested_sources = cfg.requested_sources
+    explicit_sources = cfg.explicit_sources
+    active = set(cfg.active)
+
+    notion_token = cfg.notion_token
+    notion_db = cfg.notion_db
+    openfda_key = cfg.openfda_key
+    data_go_kr_key = cfg.data_go_kr_key
+    data_go_kr_service_key = cfg.data_go_kr_service_key
+    law_go_kr_oc = cfg.law_go_kr_oc
+    enable_search = cfg.enable_search
+    enable_mfds = cfg.enable_mfds
+    enable_mfds_law = cfg.enable_mfds_law
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_cert = cfg.enable_mfds_gmp_cert
+    enable_mfds_safety_letter = cfg.enable_mfds_safety_letter
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
+    enable_fda483_observations = cfg.enable_fda483_observations
+    enable_moleg_api = cfg.enable_moleg_api
+    enable_scrape = cfg.enable_scrape
+    event_name = cfg.event_name
+    health_json_path = cfg.health_json_path
+    if enable_scrape:
+        log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
+
+    if not args.dry_run:
+        if not notion_token or not notion_db:
+            log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
+            return 2
+
+    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
+    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
+    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
+    modality_requested = cfg.modality_requested
+    modality_preflight_disabled = False
+    modality_preflight_skipped = False
+    if modality_requested and notion_token and notion_db:
+        if not notion_verify_modality_property(notion_token, notion_db):
+            modality_preflight_disabled = True
+            # [배치6 Phase2] os.environ 변조 제거 — 아래 insert 루프가 modality_effective 를
+            # build_notion_properties 로 직접 전달하므로 env 를 제어채널로 쓸 필요가 없다.
+            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
+                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
+    elif modality_requested:
+        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
+        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
+        modality_preflight_skipped = True
+        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
+                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
+    modality_effective = (modality_requested and not modality_preflight_disabled
+                          and not modality_preflight_skipped)
+
+    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
+    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
+    handoff_idem_requested = cfg.handoff_idem_requested
+    handoff_idem_preflight_disabled = False
+    handoff_idem_preflight_skipped = False
+    if handoff_idem_requested and notion_token and notion_db:
+        if not notion_verify_handoff_ref_property(notion_token, notion_db):
+            handoff_idem_preflight_disabled = True
+            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
+            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
+                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
+    elif handoff_idem_requested:
+        handoff_idem_preflight_skipped = True
+        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
+                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
+    handoff_idem_effective = (handoff_idem_requested
+                              and not handoff_idem_preflight_disabled
+                              and not handoff_idem_preflight_skipped)
+
+    now_k = now_kst()
+    run_date = kst_run_date(now_k)
+    start, end = date_window(run_date, args.window_days)
+    log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
+
+    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
+    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
+    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
+    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
+    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
+    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
+    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
+    mfds_enforcement_window_days = cfg.mfds_enforcement_window_days
+    enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
+    log("INFO", f"MFDS enforcement window={enf_start}~{end} "
+                f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
+
+    (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
+     wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
+     mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
+     ich_items, who_items, hc_items, fda483_items) = _run_collection(
+        cfg, active, run_date, start, end, enf_start)
+
+    # 3) Notion 기존 row (중복 제거)
+    # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
+    # (7일 윈도우 시 8일 전 RAPS URL이 누락되어 재삽입될 수 있음 — Task #13)
+    _SEARCH_DEDUP_WINDOW_DAYS = 35  # pm(31일) + 여유 4일
+    # P0: dedup 윈도우는 가장 넓은 수집 윈도우(enforcement 30일)를 반드시 덮어야 한다.
+    # 그래야 enforcement 윈도우로 backfill된 과거 일자 항목이 다음 실행에서 중복 재삽입되지 않는다.
+    dedup_window_days = max(
+        args.window_days,
+        mfds_enforcement_window_days,
+        _SEARCH_DEDUP_WINDOW_DAYS if enable_search else 0,
+    )
+    log("INFO", f"dedupe window={dedup_window_days}일 (window_days={args.window_days}, enable_search={enable_search})")
+
+    # P1: snapshot 소스(ICH·WHO)는 날짜 미단언/URL 기반 안정 스냅샷이라 매 실행 동일 항목을 재수집한다.
+    # 기본 dedup 윈도우(≤30일)를 넘으면 같은 항목이 다시 New로 들어오므로(월간 중복 삽입),
+    # 이들 소스만 별도로 장기(3년) Source-한정 dedup을 조회해 합친다.
+    # (전체 윈도우를 3년으로 늘리면 Notion 페이지 cap에 걸릴 수 있어 Source 필터로 한정.)
+    _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
+    _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
+
+    if args.dry_run:
+        existing: set[str] = set()
+    else:
+        try:
+            existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date,
+                                                     window_days=dedup_window_days)
+        except NotionDedupeQueryError as e:
+            # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
+            log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
+            return 1
+        snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
+        if snapshot_active:
+            try:
+                snap_existing = notion_query_existing_doc_ids(
+                    notion_token, notion_db, run_date,
+                    window_days=_SNAPSHOT_DEDUP_WINDOW_DAYS,
+                    source_names=snapshot_active)
+                existing |= snap_existing
+                log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
+                            f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
+            except NotionDedupeQueryError as e:
+                log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
+                return 1
+
+    collected_at = now_k
+
+    # 4) 삽입 (반환: inserted, skipped, failed)
+    # [배치6 Phase2] 소스별 insert_items + stats 대입 19블록을 INTAKE_SOURCE_SPECS 레지스트리로
+    # 구동한다(setattr). search 는 수집+삽입이 결합된 별도 블록(아래)이라 여기서 건너뛴다.
+    # modality_enabled=modality_effective 를 전달해 build_notion_properties 의 row 당 env
+    # 재독해를 제거(→ 아래 os.environ 변조도 불필요). 순서(=existing dedup 누적 순서)는 레지스트리
+    # 순서로 기존과 byte 동일하다.
+    _insert_items_map = {
+        "fr": fr_items, "recall": recall_items, "ema": ema_items,
+        "mhra": mhra_items, "pics": pics_items, "eca": eca_items, "wl": wl_items,
+        "mfds": mfds_items, "mfds_law": mfds_law_items,
+        "mfds_recall": mfds_recall_items, "mfds_admin": mfds_admin_items,
+        "mfds_gmp_cert": mfds_gmp_cert_items,
+        "mfds_safety_letter": mfds_safety_letter_items,
+        "mfds_gmp_inspection": mfds_gmp_inspection_items,
+        "ich": ich_items, "who": who_items, "hc": hc_items,
+        "fda483": fda483_items,
+    }
+    for spec in INTAKE_SOURCE_SPECS:
+        if spec.prefix == "search":
+            continue  # search 는 아래 결합 블록에서 처리
+        ins, sk, fail = insert_items(
+            notion_token, notion_db, _insert_items_map[spec.prefix],
+            run_date, collected_at, existing, args.dry_run,
+            modality_enabled=modality_effective)
+        setattr(stats, f"{spec.prefix}_inserted", ins)
+        setattr(stats, f"{spec.prefix}_skipped_dup", sk)
+        setattr(stats, f"{spec.prefix}_insert_failed", fail)
+
+    # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
+    # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
+    search_items: list[IntakeItem] = []  # G2: inmemory_raw 집계에서 항상 참조 가능하게 선초기화
+    if enable_search:
+        brave_api_key = cfg.brave_api_key
+        log("INFO", "=== Brave Search 수집 시작 ===")
+        try:
+            from collect_search import collect_brave_search
+            search_items, search_err = collect_brave_search(brave_api_key)
+        except Exception as e:
+            search_items, search_err = [], str(e)
+
+        stats.search_fetched = len(search_items)
+        if search_err:
+            stats.search_error = True
+            stats.search_error_msg = search_err
+            log("WARN", f"Brave Search 오류: {search_err}")
+
+        src_in, src_sk, src_fail = insert_items(
+            notion_token, notion_db, search_items,
+            run_date, collected_at, existing, args.dry_run,
+            modality_enabled=modality_effective,
+        )
+        stats.search_inserted = src_in
+        stats.search_skipped_dup = src_sk
+        stats.search_insert_failed = src_fail
+    else:
+        log("INFO", "ENABLE_SEARCH=false — Brave Search 건너뜀")
+
+    handoff_emitted = False
+    handoff_failed = False
+    handoff_row_count = 0
+    handoff_url = ""
+    handoff_error_msg = ""
+    # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
+    handoff_window_days = cfg.handoff_window_days
+    if args.emit_routine_handoff:
+        if args.dry_run:
+            log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
+        elif stats.has_insert_failures():
+            handoff_failed = True
+            handoff_error_msg = "insert failure가 있어 partial handoff 생성 생략"
+            log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
+        else:
+            try:
+                handoff_sources = None
+                if explicit_sources and "none" not in requested_sources:
+                    handoff_sources = {
+                        _SOURCE_TOKEN_TO_NOTION[src]
+                        for src in requested_sources
+                        if src in _SOURCE_TOKEN_TO_NOTION
+                    }
+                handoff_doc_ids = set(args.handoff_doc_ids or []) or None
+                # G2 와이어링: 당일 수집분 raw 를 메모리로 전달(과거 New row 만 fetch 폴백).
+                # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
+                inmemory_raw = build_inmemory_raw(
+                    fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
+                    wl_items, mfds_items, mfds_law_items, mfds_recall_items,
+                    mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
+                    mfds_gmp_inspection_items, ich_items, who_items, hc_items,
+                    fda483_items, search_items)
+                # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
+                # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
+                web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
+                handoff_row_count, handoff_url = emit_routine_handoff(
+                    notion_token, notion_db, run_date, handoff_window_days, collected_at,
+                    source_names=handoff_sources, doc_ids=handoff_doc_ids,
+                    inmemory_raw=inmemory_raw,
+                    # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
+                    display_window_days=args.window_days,
+                    web_brief_dir=web_brief_dir)
+                handoff_emitted = True
+            except NotionHandoffError as e:
+                handoff_failed = True
+                handoff_error_msg = str(e)
+                log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
+
+    # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
+    # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.
+    aged_unconsumed_new = 0
+    aged_new_query_error = ""
+    if notion_token and notion_db:
+        try:
+            aged_unconsumed_new = notion_count_aged_unconsumed_new(
+                notion_token, notion_db, run_date, handoff_window_days)
+            if aged_unconsumed_new and handoff_idem_effective:
+                # Codex P2: v2 effective — 노후 New 는 ref 기반 쿼리가 자동 재투입(정보성).
+                log("INFO", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
+                            f"{aged_unconsumed_new}건 — 멱등성 v2 자동 재투입 대상(다음 emit 포함)")
+            elif aged_unconsumed_new:
+                log("WARN", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
+                            f"{aged_unconsumed_new}건 — Routine 누락/지연 의심")
+        except Exception as e:  # noqa: BLE001 — 감시 실패가 수집 자체를 죽이면 안 됨
+            aged_new_query_error = str(e)
+            log("WARN", f"노후 미소비 New row 카운트 조회 실패: {aged_new_query_error}")
+
+    flags = {
+        "ENABLE_SEARCH": enable_search,
+        "ENABLE_MFDS": enable_mfds,
+        "ENABLE_MFDS_LAW": enable_mfds_law,
+        "ENABLE_MFDS_RECALL": enable_mfds_recall,
+        "ENABLE_MFDS_ADMIN": enable_mfds_admin,
+        "ENABLE_MFDS_GMP_CERT": enable_mfds_gmp_cert,
+        "ENABLE_MFDS_SAFETY_LETTER": enable_mfds_safety_letter,
+        "ENABLE_MFDS_GMP_INSPECTION": enable_mfds_gmp_inspection,
+        "ENABLE_ICH": enable_ich,
+        "ENABLE_WHO": enable_who,
+        "ENABLE_HC": enable_hc,
+        "ENABLE_FDA_483": enable_fda483,
+        "ENABLE_FDA_483_OBSERVATIONS": enable_fda483_observations,
+        "ENABLE_MOLEG_API": enable_moleg_api,
+        "ENABLE_SCRAPE": enable_scrape,
+        "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,
+        "ENABLE_MODALITY_TAG_EFFECTIVE": modality_effective,
+        "ENABLE_MODALITY_TAG_PREFLIGHT_SKIPPED": modality_preflight_skipped,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_REQUESTED": handoff_idem_requested,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_EFFECTIVE": handoff_idem_effective,
+        "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
+        "MFDS_HTTP_PROXY_CONFIGURED": cfg.mfds_http_proxy_configured,
+        "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
+    }
+    health = _evaluate_health(
+        modality_preflight_disabled=modality_preflight_disabled,
+        handoff_idem_preflight_disabled=handoff_idem_preflight_disabled,
+        handoff_idem_effective=handoff_idem_effective,
+        stats=stats,
+        active=active,
+        enable_search=enable_search,
+        enable_mfds=enable_mfds,
+        enable_mfds_law=enable_mfds_law,
+        enable_mfds_recall=enable_mfds_recall,
+        enable_mfds_admin=enable_mfds_admin,
+        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+        enable_mfds_safety_letter=enable_mfds_safety_letter,
+        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+        enable_ich=enable_ich,
+        enable_who=enable_who,
+        enable_hc=enable_hc,
+        enable_fda483=enable_fda483,
+        enable_moleg_api=enable_moleg_api,
+        enable_scrape=enable_scrape,
+        event_name=event_name,
+        emit_routine_handoff=args.emit_routine_handoff,
+        handoff_emitted=handoff_emitted,
+        handoff_failed=handoff_failed,
+        handoff_error_msg=handoff_error_msg,
+        aged_unconsumed_new=aged_unconsumed_new,
+        aged_new_query_error=aged_new_query_error,
+        handoff_window_days=handoff_window_days,
+    )
+    health_payload = _health_payload(
+        health=health,
+        stats=stats,
+        run_date=run_date,
+        start=start,
+        end=end,
+        event_name=event_name,
+        dry_run=args.dry_run,
+        requested_sources=list(requested_sources),
+        active=active,
+        flags=flags,
+        handoff_emitted=handoff_emitted,
+        handoff_failed=handoff_failed,
+        handoff_row_count=handoff_row_count,
+        handoff_url=handoff_url,
+        handoff_error_msg=handoff_error_msg,
+        handoff_window_days=handoff_window_days,
+        aged_unconsumed_new=aged_unconsumed_new,
+    )
+    _write_health_json(health_json_path, health_payload)
+
+    log("INFO", "── Collection summary ──\n" + stats.summary())
+
+    _write_step_summary(cfg, args, stats, health, run_date, start, end,
+                        handoff_emitted, handoff_failed, handoff_row_count,
+                        handoff_url, handoff_error_msg)
 
     # 종료 코드는 _evaluate_health() 하나만 기준으로 삼는다.
     # - failure → exit 1 (workflow failure Issue)

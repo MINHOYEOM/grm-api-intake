@@ -8,6 +8,7 @@ import re
 import sys
 import time
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from urllib.parse import urlencode, urlparse
 from typing import Any
@@ -425,6 +426,51 @@ SOURCE_BRAVE = "Brave Search"
 SOURCE_RAPS  = "RAPS"
 SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
 NOTION_RICH_TEXT_CHUNK = 1900  # 2000 한도, 여유 100
+
+
+# ── [배치6 Phase2] 수집 소스 레지스트리 — 소스당 1 레코드 ────────────────────────
+# card_scaffold.py 의 SourceSpec(_REGISTRY, 발행측)과 대칭인 "수집측" 레지스트리.
+# CollectionStats 스칼라 필드는 유지(사용자 결정)하고, 이 레지스트리가 getattr/setattr
+# 로 ② main insert 루프(collect_intake)와 ③ health rows(grm_health)를 구동한다.
+# ``prefix`` = CollectionStats 필드 프리픽스 = health row "key" (전 소스 동일).
+# 순서는 insert 순서(=existing dedup 누적 순서)·health rows 리스트 순서와 byte 일치해야 함.
+#
+# 새 수집 소스 추가 절차(4A card_scaffold._REGISTRY 절차와 대칭):
+#   1) IntakeSourceSpec 1건을 아래 INTAKE_SOURCE_SPECS 에 (원하는 insert/health 순서로) 추가
+#   2) collect_intake.CollectionStats 에 {prefix}_fetched/_inserted/_skipped_dup/
+#      _insert_failed/_error/_error_msg 6필드 추가(스칼라 유지 결정의 잔여 — item④)
+#   3) collect_intake main 에 수집 블록 1개(collect 호출 → stats.{prefix}_fetched·error) +
+#      _insert_items_map 에 {prefix}: items 1항 추가
+#   → ② insert / ③ health row / (해당 시) 골든 3종만 갱신. coverage 라벨은 별개
+#     (grm_handoff.COVERAGE_SOURCE_LABELS, SOURCE_* 키), transient 적격은 grm_health.
+@dataclass(frozen=True)
+class IntakeSourceSpec:
+    prefix: str          # CollectionStats 필드 프리픽스 & health row key
+    health_label: str    # _source_health_rows 의 "label"
+    has_truncated: bool = False   # fr/recall 만 health row 에 "truncated" 노출
+
+
+INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
+    IntakeSourceSpec("fr", "Federal Register", has_truncated=True),
+    IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True),
+    IntakeSourceSpec("ema", "EMA RSS"),
+    IntakeSourceSpec("mhra", "MHRA RSS"),
+    IntakeSourceSpec("pics", "PIC/S RSS"),
+    IntakeSourceSpec("eca", "ECA Academy RSS"),
+    IntakeSourceSpec("wl", "FDA Warning Letters"),
+    IntakeSourceSpec("mfds", "MFDS RSS"),
+    IntakeSourceSpec("mfds_law", "MFDS Law/Admrul"),
+    IntakeSourceSpec("mfds_recall", "MFDS Recall"),
+    IntakeSourceSpec("mfds_admin", "MFDS Admin"),
+    IntakeSourceSpec("mfds_gmp_cert", "MFDS GMP Certificate"),
+    IntakeSourceSpec("mfds_safety_letter", "MFDS Safety Letter"),
+    IntakeSourceSpec("mfds_gmp_inspection", "MFDS GMP Inspection"),
+    IntakeSourceSpec("ich", "ICH"),
+    IntakeSourceSpec("who", "WHO"),
+    IntakeSourceSpec("hc", "Health Canada"),
+    IntakeSourceSpec("fda483", "FDA 483"),
+    IntakeSourceSpec("search", "Brave Search"),
+)
 
 
 def truncate(text: str, limit: int = NOTION_RICH_TEXT_CHUNK) -> str:

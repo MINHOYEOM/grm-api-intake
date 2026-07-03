@@ -17,7 +17,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from grm_common import log
+from grm_common import INTAKE_SOURCE_SPECS, log
 
 
 @dataclass
@@ -128,204 +128,34 @@ def _is_transient_source_error(code: str, detail: str) -> bool:
 
 
 def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
-    return [
-        {
-            "key": "fr",
-            "label": "Federal Register",
-            "fetched": stats.fr_fetched,
-            "inserted": stats.fr_inserted,
-            "skip_dup": stats.fr_skipped_dup,
-            "failed": stats.fr_insert_failed,
-            "error": stats.fr_error,
-            "error_msg": stats.fr_error_msg,
-            "truncated": stats.fr_truncated,
-        },
-        {
-            "key": "recall",
-            "label": "OpenFDA Recall",
-            "fetched": stats.recall_fetched,
-            "inserted": stats.recall_inserted,
-            "skip_dup": stats.recall_skipped_dup,
-            "failed": stats.recall_insert_failed,
-            "error": stats.recall_error,
-            "error_msg": stats.recall_error_msg,
-            "truncated": stats.recall_truncated,
-        },
-        {
-            "key": "ema",
-            "label": "EMA RSS",
-            "fetched": stats.ema_fetched,
-            "inserted": stats.ema_inserted,
-            "skip_dup": stats.ema_skipped_dup,
-            "failed": stats.ema_insert_failed,
-            "error": stats.ema_error,
-            "error_msg": stats.ema_error_msg,
-        },
-        {
-            "key": "mhra",
-            "label": "MHRA RSS",
-            "fetched": stats.mhra_fetched,
-            "inserted": stats.mhra_inserted,
-            "skip_dup": stats.mhra_skipped_dup,
-            "failed": stats.mhra_insert_failed,
-            "error": stats.mhra_error,
-            "error_msg": stats.mhra_error_msg,
-        },
-        {
-            "key": "pics",
-            "label": "PIC/S RSS",
-            "fetched": stats.pics_fetched,
-            "inserted": stats.pics_inserted,
-            "skip_dup": stats.pics_skipped_dup,
-            "failed": stats.pics_insert_failed,
-            "error": stats.pics_error,
-            "error_msg": stats.pics_error_msg,
-        },
-        {
-            "key": "eca",
-            "label": "ECA Academy RSS",
-            "fetched": stats.eca_fetched,
-            "inserted": stats.eca_inserted,
-            "skip_dup": stats.eca_skipped_dup,
-            "failed": stats.eca_insert_failed,
-            "error": stats.eca_error,
-            "error_msg": stats.eca_error_msg,
-        },
-        {
-            "key": "wl",
-            "label": "FDA Warning Letters",
-            "fetched": stats.wl_fetched,
-            "inserted": stats.wl_inserted,
-            "skip_dup": stats.wl_skipped_dup,
-            "failed": stats.wl_insert_failed,
-            "error": stats.wl_error,
-            "error_msg": stats.wl_error_msg,
-        },
-        {
-            "key": "mfds",
-            "label": "MFDS RSS",
-            "fetched": stats.mfds_fetched,
-            "inserted": stats.mfds_inserted,
-            "skip_dup": stats.mfds_skipped_dup,
-            "failed": stats.mfds_insert_failed,
-            "error": stats.mfds_error,
-            "error_msg": stats.mfds_error_msg,
-        },
-        {
-            "key": "mfds_law",
-            "label": "MFDS Law/Admrul",
-            "fetched": stats.mfds_law_fetched,
-            "inserted": stats.mfds_law_inserted,
-            "skip_dup": stats.mfds_law_skipped_dup,
-            "failed": stats.mfds_law_insert_failed,
-            "error": stats.mfds_law_error,
-            "error_msg": stats.mfds_law_error_msg,
-        },
-        {
-            "key": "mfds_recall",
-            "label": "MFDS Recall",
-            "fetched": stats.mfds_recall_fetched,
-            "inserted": stats.mfds_recall_inserted,
-            "skip_dup": stats.mfds_recall_skipped_dup,
-            "failed": stats.mfds_recall_insert_failed,
-            "error": stats.mfds_recall_error,
-            "error_msg": stats.mfds_recall_error_msg,
-        },
-        {
-            "key": "mfds_admin",
-            "label": "MFDS Admin",
-            "fetched": stats.mfds_admin_fetched,
-            "inserted": stats.mfds_admin_inserted,
-            "skip_dup": stats.mfds_admin_skipped_dup,
-            "failed": stats.mfds_admin_insert_failed,
-            "error": stats.mfds_admin_error,
-            "error_msg": stats.mfds_admin_error_msg,
-        },
-        {
-            "key": "mfds_gmp_cert",
-            "label": "MFDS GMP Certificate",
-            "fetched": stats.mfds_gmp_cert_fetched,
-            "inserted": stats.mfds_gmp_cert_inserted,
-            "skip_dup": stats.mfds_gmp_cert_skipped_dup,
-            "failed": stats.mfds_gmp_cert_insert_failed,
-            "error": stats.mfds_gmp_cert_error,
-            "error_msg": stats.mfds_gmp_cert_error_msg,
-        },
-        {
-            "key": "mfds_safety_letter",
-            "label": "MFDS Safety Letter",
-            "fetched": stats.mfds_safety_letter_fetched,
-            "inserted": stats.mfds_safety_letter_inserted,
-            "skip_dup": stats.mfds_safety_letter_skipped_dup,
-            "failed": stats.mfds_safety_letter_insert_failed,
-            "error": stats.mfds_safety_letter_error,
-            "error_msg": stats.mfds_safety_letter_error_msg,
-        },
-        {
-            "key": "mfds_gmp_inspection",
-            "label": "MFDS GMP Inspection",
-            "fetched": stats.mfds_gmp_inspection_fetched,
-            "inserted": stats.mfds_gmp_inspection_inserted,
-            "skip_dup": stats.mfds_gmp_inspection_skipped_dup,
-            "failed": stats.mfds_gmp_inspection_insert_failed,
-            "error": stats.mfds_gmp_inspection_error,
-            "error_msg": stats.mfds_gmp_inspection_error_msg,
-            "parse_status": dict(stats.mfds_gmp_inspection_parse_status),
-            "deficiency": dict(stats.mfds_gmp_inspection_deficiency),
-            "manual_review": stats.mfds_gmp_inspection_manual_review,
-            "page_warnings": list(stats.mfds_gmp_inspection_page_warnings),
-        },
-        {
-            "key": "ich",
-            "label": "ICH",
-            "fetched": stats.ich_fetched,
-            "inserted": stats.ich_inserted,
-            "skip_dup": stats.ich_skipped_dup,
-            "failed": stats.ich_insert_failed,
-            "error": stats.ich_error,
-            "error_msg": stats.ich_error_msg,
-        },
-        {
-            "key": "who",
-            "label": "WHO",
-            "fetched": stats.who_fetched,
-            "inserted": stats.who_inserted,
-            "skip_dup": stats.who_skipped_dup,
-            "failed": stats.who_insert_failed,
-            "error": stats.who_error,
-            "error_msg": stats.who_error_msg,
-        },
-        {
-            "key": "hc",
-            "label": "Health Canada",
-            "fetched": stats.hc_fetched,
-            "inserted": stats.hc_inserted,
-            "skip_dup": stats.hc_skipped_dup,
-            "failed": stats.hc_insert_failed,
-            "error": stats.hc_error,
-            "error_msg": stats.hc_error_msg,
-        },
-        {
-            "key": "fda483",
-            "label": "FDA 483",
-            "fetched": stats.fda483_fetched,
-            "inserted": stats.fda483_inserted,
-            "skip_dup": stats.fda483_skipped_dup,
-            "failed": stats.fda483_insert_failed,
-            "error": stats.fda483_error,
-            "error_msg": stats.fda483_error_msg,
-        },
-        {
-            "key": "search",
-            "label": "Brave Search",
-            "fetched": stats.search_fetched,
-            "inserted": stats.search_inserted,
-            "skip_dup": stats.search_skipped_dup,
-            "failed": stats.search_insert_failed,
-            "error": stats.search_error,
-            "error_msg": stats.search_error_msg,
-        },
-    ]
+    """[배치6 Phase2] grm_common.INTAKE_SOURCE_SPECS(수집 소스 레지스트리)로부터 소스별
+    health row 를 결정론 생성한다. 스칼라 CollectionStats 필드를 getattr 로 읽으며, 순서·키·
+    값은 기존 수제 dict 리스트와 byte 동일(_write_health_json 은 sort_keys=True 라 dict 내부
+    키 순서는 무관하나 리스트 순서는 레지스트리 순서로 보존). fr/recall 은 truncated 를,
+    mfds_gmp_inspection 은 parse_status/deficiency/manual_review/page_warnings 를 추가한다.
+    """
+    rows: list[dict[str, Any]] = []
+    for spec in INTAKE_SOURCE_SPECS:
+        p = spec.prefix
+        row: dict[str, Any] = {
+            "key": p,
+            "label": spec.health_label,
+            "fetched": getattr(stats, f"{p}_fetched"),
+            "inserted": getattr(stats, f"{p}_inserted"),
+            "skip_dup": getattr(stats, f"{p}_skipped_dup"),
+            "failed": getattr(stats, f"{p}_insert_failed"),
+            "error": getattr(stats, f"{p}_error"),
+            "error_msg": getattr(stats, f"{p}_error_msg"),
+        }
+        if spec.has_truncated:
+            row["truncated"] = getattr(stats, f"{p}_truncated")
+        if p == "mfds_gmp_inspection":
+            row["parse_status"] = dict(stats.mfds_gmp_inspection_parse_status)
+            row["deficiency"] = dict(stats.mfds_gmp_inspection_deficiency)
+            row["manual_review"] = stats.mfds_gmp_inspection_manual_review
+            row["page_warnings"] = list(stats.mfds_gmp_inspection_page_warnings)
+        rows.append(row)
+    return rows
 
 
 def _evaluate_health(

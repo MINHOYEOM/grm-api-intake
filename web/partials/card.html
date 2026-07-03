@@ -161,5 +161,9 @@
       location + '#'+anchor 로 조립(빌드는 호스트 무관 유지). §4 한글안전: mono/자간/대문자 미사용. -#}
   <div class="grm-card-actions" data-anchor="{{ card.anchor }}">
     <button type="button" class="grm-ca" data-share aria-label="이 카드 공유하기"><i class="ti ti-share-2"></i><span class="grm-ca-t">공유</span></button>
+    {% if reactions_enabled %}
+    <button type="button" class="grm-ca-react" data-react="heart" aria-pressed="false" aria-label="관심(하트)"><i class="ti ti-heart"></i><span class="grm-ca-count" data-count>0</span></button>
+    <button type="button" class="grm-ca-react" data-react="scrap" aria-pressed="false" aria-label="스크랩"><i class="ti ti-bookmark"></i></button>
+    {% endif %}
   </div>
 </article>

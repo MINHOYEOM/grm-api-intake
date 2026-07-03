@@ -439,25 +439,24 @@ details.detail .lab{margin:0}
 .src a:hover{border-color:var(--coral);color:var(--coral)}
 .src a.src-broken:hover{border-color:var(--line-2);color:var(--body)}
 .src a .t{color:var(--muted);font-weight:600;font-size:10px}  /* "정보출처/공식원본" 한글 — sans·자간0·대문자없음(§4 교정) */
-.disc{margin-top:36px;padding:24px 26px;background:var(--soft);border:1px solid var(--line);border-radius:var(--rad);color:var(--body);font-size:13px;line-height:1.78}
-.disc b{color:var(--ink);font-weight:600}
-.disc .en{color:var(--muted);display:block;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12px}
-/* AI 고지 고도화 — 상단 요약 배지(코럴 틴트) + 하단 전문 3단(§4 한글안전: 인라인 자간/대문자·mono-한글 0) */
-.ai-badge{display:flex;gap:12px;align-items:flex-start;margin-top:26px;padding:14px 18px;background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:var(--rad-s);color:var(--body-s);font-size:13.5px;line-height:1.7}
-.ai-badge i{color:var(--coral-2);font-size:18px;flex:none;margin-top:2px}
-.ai-badge p{margin:0}
-.ai-badge b{color:var(--coral-2);font-weight:600}
-.ai-badge a{color:var(--coral-2);font-weight:600;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
-.disc .disc-h{display:flex;gap:9px;align-items:center;margin-bottom:8px}
-.disc .disc-h i{color:var(--coral-2);font-size:19px}
-.disc .disc-h b{font-size:15px}
-.disc-sec{margin-top:16px}
-.disc-sec h4{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:5px}
-.disc-sec p{margin:0}
-.disc-sec ul{margin:6px 0 0;padding-left:18px}
-.disc-sec li{margin:6px 0}
-.notice-body{margin-top:24px;max-width:78ch;display:flex;flex-direction:column;gap:16px}
-.notice-body p{font-size:15px;line-height:1.75;color:var(--body)}
+/* AI 고지 상단 배지 — 스택(헤더/캐논/링크) */
+.ai-badge{display:flex;gap:11px;align-items:flex-start;margin-top:26px;padding:15px 20px;background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:var(--rad-s);color:var(--body-s)}
+.ai-badge>i{color:var(--coral-2);font-size:19px;flex:none;margin-top:2px}
+.ai-badge-b{display:flex;flex-direction:column;gap:4px}
+.ai-badge-b b{color:var(--coral-2);font-weight:600;font-size:13.5px}
+.ai-badge-b p{margin:0;font-size:13.5px;line-height:1.6}
+.ai-badge-b a{color:var(--coral-2);font-weight:600;font-size:13px;text-decoration:underline;text-underline-offset:2px;width:fit-content}
+/* AI 고지 독립 섹션(브리프 하단 + 랜딩 공용) — full-width, --card 로 페이지와 구분 */
+.ai-disclosure{background:var(--card);border-top:1px solid var(--line)}
+.ai-disclosure .wrap{max-width:880px;padding-top:60px;padding-bottom:60px}
+.ai-disclosure .kick{display:block;margin-bottom:13px}
+.ai-disclosure h2{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:-.018em;color:var(--ink);line-height:1.18}
+.ai-disclosure .disc-body{margin-top:26px;display:grid;gap:22px}
+.ai-disclosure .disc-sec h4{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.ai-disclosure .disc-sec p{font-size:15px;line-height:1.72;color:var(--body)}
+.ai-disclosure .disc-sec ul{margin:6px 0 0;padding-left:19px}
+.ai-disclosure .disc-sec li{margin:7px 0;font-size:15px;line-height:1.66;color:var(--body)}
+.ai-disclosure .en{display:block;margin-top:26px;padding-top:18px;border-top:1px solid var(--line-2);color:var(--muted);font-size:12.5px;line-height:1.6}
 
 /* ── 뉴스레터 구독 밴드(T1 — env-gated, 푸터 위) ───────────────────────────
    디자인 토큰 재사용(coral/soft/line-2/rad-s)·한글 안전(§4: 문안 자간0·대문자/mono 없음).
@@ -500,9 +499,11 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
 .foot a,.foot span{display:block;color:var(--band-mut);font-size:13.5px;padding:5px 0}
 .foot a{cursor:pointer}  /* P2-6 링크만 포인터 — 라벨(span)은 기본 커서로 비링크 명확화(데드링크 오인 방지) */
 .foot a:hover{color:#fff}
-.foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;justify-content:flex-start;
-  gap:8px 20px;flex-wrap:wrap;font-size:12px;color:var(--band-mut)}  /* P2-3 다크밴드(--band-mut). §5-4 영문 mono 제거 후 2항목 좌측 그룹(space-between→flex-start)으로 — 중앙 705px 공백 방지 */
-.foot-legal .legal-ko{font-size:12px;color:var(--band-mut)}  /* §5-4 한국어 fine-print(영문 mono 제거 후 단독) — 본문체(자간·대문자·mono 강제 없음) */
+/* 푸터 legal — 저작권·출처 행 + 책임 문장 분리 */
+.foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;flex-direction:column;gap:11px;font-size:12px;color:var(--band-mut)}
+.foot-copy{display:flex;flex-wrap:wrap;align-items:center;gap:7px 14px}
+.foot-copy .mono{font-size:11px}
+.foot-disclaimer{font-size:11.5px;color:var(--band-mut);line-height:1.55;max-width:76ch}
 
 /* P2-1 중간 폭 분기점 — 900px 단일 붕괴 완화(태블릿~좁은 데스크톱 점진 축소).
    900px 블록이 뒤에 와서 ≤900 에선 이 규칙들을 다시 1단으로 덮는다(소스 순서 의존). */

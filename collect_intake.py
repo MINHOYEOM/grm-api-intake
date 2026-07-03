@@ -121,6 +121,7 @@ from grm_taxonomy import (
 
 # ── [배치5] Phase0 공용 relocate(SOURCE_*·truncate·chunk_text·_env_int·chunk상수) — grm_common 재수출(하위호환·테스트·위성 무수정) ──
 from grm_common import (
+    INTAKE_SOURCE_SPECS,
     NOTION_RICH_TEXT_CHUNK,
     SOURCE_BRAVE,
     SOURCE_ECA,
@@ -1950,8 +1951,13 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
-                 existing_ids: set[str], dry_run: bool) -> tuple[int, int, int]:
-    """삽입 실행. 반환: (inserted, skipped, failed)"""
+                 existing_ids: set[str], dry_run: bool, *,
+                 modality_enabled: bool | None = None) -> tuple[int, int, int]:
+    """삽입 실행. 반환: (inserted, skipped, failed)
+
+    [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
+    row 당 env 재독해 없이 그대로 build_notion_properties 로 흐른다(미지정 시 env 폴백).
+    """
     inserted = 0
     skipped = 0
     failed = 0
@@ -1972,7 +1978,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             continue
         # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
         time.sleep(0.34)
-        ok = notion_create_page(token, db_id, item, run_date, collected_at)
+        ok = notion_create_page(token, db_id, item, run_date, collected_at,
+                                modality_enabled=modality_enabled)
         if ok:
             inserted += 1
             existing_ids.add(dedup_key)
@@ -2115,7 +2122,8 @@ def main() -> int:
     if modality_requested and notion_token and notion_db:
         if not notion_verify_modality_property(notion_token, notion_db):
             modality_preflight_disabled = True
-            os.environ["ENABLE_MODALITY_TAG"] = "false"
+            # [배치6 Phase2] os.environ 변조 제거 — 아래 insert 루프가 modality_effective 를
+            # build_notion_properties 로 직접 전달하므로 env 를 제어채널로 쓸 필요가 없다.
             log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
                         "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
     elif modality_requested:
@@ -2563,124 +2571,32 @@ def main() -> int:
     collected_at = now_k
 
     # 4) 삽입 (반환: inserted, skipped, failed)
-    fr_in, fr_sk, fr_fail = insert_items(notion_token, notion_db, fr_items,
-                                         run_date, collected_at, existing, args.dry_run)
-    stats.fr_inserted = fr_in
-    stats.fr_skipped_dup = fr_sk
-    stats.fr_insert_failed = fr_fail
-
-    rec_in, rec_sk, rec_fail = insert_items(notion_token, notion_db, recall_items,
-                                            run_date, collected_at, existing, args.dry_run)
-    stats.recall_inserted = rec_in
-    stats.recall_skipped_dup = rec_sk
-    stats.recall_insert_failed = rec_fail
-
-    # Phase 2 삽입
-    ema_in, ema_sk, ema_fail = insert_items(notion_token, notion_db, ema_items,
-                                             run_date, collected_at, existing, args.dry_run)
-    stats.ema_inserted = ema_in
-    stats.ema_skipped_dup = ema_sk
-    stats.ema_insert_failed = ema_fail
-
-    mhra_in, mhra_sk, mhra_fail = insert_items(notion_token, notion_db, mhra_items,
-                                                run_date, collected_at, existing, args.dry_run)
-    stats.mhra_inserted = mhra_in
-    stats.mhra_skipped_dup = mhra_sk
-    stats.mhra_insert_failed = mhra_fail
-
-    pics_in, pics_sk, pics_fail = insert_items(notion_token, notion_db, pics_items,
-                                                run_date, collected_at, existing, args.dry_run)
-    stats.pics_inserted = pics_in
-    stats.pics_skipped_dup = pics_sk
-    stats.pics_insert_failed = pics_fail
-
-    eca_in, eca_sk, eca_fail = insert_items(notion_token, notion_db, eca_items,
-                                             run_date, collected_at, existing, args.dry_run)
-    stats.eca_inserted = eca_in
-    stats.eca_skipped_dup = eca_sk
-    stats.eca_insert_failed = eca_fail
-
-    wl_in, wl_sk, wl_fail = insert_items(notion_token, notion_db, wl_items,
-                                          run_date, collected_at, existing, args.dry_run)
-    stats.wl_inserted = wl_in
-    stats.wl_skipped_dup = wl_sk
-    stats.wl_insert_failed = wl_fail
-
-    mfds_in, mfds_sk, mfds_fail = insert_items(notion_token, notion_db, mfds_items,
-                                               run_date, collected_at, existing, args.dry_run)
-    stats.mfds_inserted = mfds_in
-    stats.mfds_skipped_dup = mfds_sk
-    stats.mfds_insert_failed = mfds_fail
-
-    mfds_law_in, mfds_law_sk, mfds_law_fail = insert_items(
-        notion_token, notion_db, mfds_law_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_law_inserted = mfds_law_in
-    stats.mfds_law_skipped_dup = mfds_law_sk
-    stats.mfds_law_insert_failed = mfds_law_fail
-
-    mfds_rec_in, mfds_rec_sk, mfds_rec_fail = insert_items(
-        notion_token, notion_db, mfds_recall_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_recall_inserted = mfds_rec_in
-    stats.mfds_recall_skipped_dup = mfds_rec_sk
-    stats.mfds_recall_insert_failed = mfds_rec_fail
-
-    mfds_admin_in, mfds_admin_sk, mfds_admin_fail = insert_items(
-        notion_token, notion_db, mfds_admin_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_admin_inserted = mfds_admin_in
-    stats.mfds_admin_skipped_dup = mfds_admin_sk
-    stats.mfds_admin_insert_failed = mfds_admin_fail
-
-    mfds_gmp_cert_in, mfds_gmp_cert_sk, mfds_gmp_cert_fail = insert_items(
-        notion_token, notion_db, mfds_gmp_cert_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_gmp_cert_inserted = mfds_gmp_cert_in
-    stats.mfds_gmp_cert_skipped_dup = mfds_gmp_cert_sk
-    stats.mfds_gmp_cert_insert_failed = mfds_gmp_cert_fail
-
-    mfds_safety_letter_in, mfds_safety_letter_sk, mfds_safety_letter_fail = insert_items(
-        notion_token, notion_db, mfds_safety_letter_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_safety_letter_inserted = mfds_safety_letter_in
-    stats.mfds_safety_letter_skipped_dup = mfds_safety_letter_sk
-    stats.mfds_safety_letter_insert_failed = mfds_safety_letter_fail
-
-    mfds_gmp_insp_in, mfds_gmp_insp_sk, mfds_gmp_insp_fail = insert_items(
-        notion_token, notion_db, mfds_gmp_inspection_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.mfds_gmp_inspection_inserted = mfds_gmp_insp_in
-    stats.mfds_gmp_inspection_skipped_dup = mfds_gmp_insp_sk
-    stats.mfds_gmp_inspection_insert_failed = mfds_gmp_insp_fail
-
-    ich_in, ich_sk, ich_fail = insert_items(
-        notion_token, notion_db, ich_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.ich_inserted = ich_in
-    stats.ich_skipped_dup = ich_sk
-    stats.ich_insert_failed = ich_fail
-
-    who_in, who_sk, who_fail = insert_items(
-        notion_token, notion_db, who_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.who_inserted = who_in
-    stats.who_skipped_dup = who_sk
-    stats.who_insert_failed = who_fail
-
-    hc_in, hc_sk, hc_fail = insert_items(
-        notion_token, notion_db, hc_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.hc_inserted = hc_in
-    stats.hc_skipped_dup = hc_sk
-    stats.hc_insert_failed = hc_fail
-
-    fda483_in, fda483_sk, fda483_fail = insert_items(
-        notion_token, notion_db, fda483_items,
-        run_date, collected_at, existing, args.dry_run)
-    stats.fda483_inserted = fda483_in
-    stats.fda483_skipped_dup = fda483_sk
-    stats.fda483_insert_failed = fda483_fail
+    # [배치6 Phase2] 소스별 insert_items + stats 대입 19블록을 INTAKE_SOURCE_SPECS 레지스트리로
+    # 구동한다(setattr). search 는 수집+삽입이 결합된 별도 블록(아래)이라 여기서 건너뛴다.
+    # modality_enabled=modality_effective 를 전달해 build_notion_properties 의 row 당 env
+    # 재독해를 제거(→ 아래 os.environ 변조도 불필요). 순서(=existing dedup 누적 순서)는 레지스트리
+    # 순서로 기존과 byte 동일하다.
+    _insert_items_map = {
+        "fr": fr_items, "recall": recall_items, "ema": ema_items,
+        "mhra": mhra_items, "pics": pics_items, "eca": eca_items, "wl": wl_items,
+        "mfds": mfds_items, "mfds_law": mfds_law_items,
+        "mfds_recall": mfds_recall_items, "mfds_admin": mfds_admin_items,
+        "mfds_gmp_cert": mfds_gmp_cert_items,
+        "mfds_safety_letter": mfds_safety_letter_items,
+        "mfds_gmp_inspection": mfds_gmp_inspection_items,
+        "ich": ich_items, "who": who_items, "hc": hc_items,
+        "fda483": fda483_items,
+    }
+    for spec in INTAKE_SOURCE_SPECS:
+        if spec.prefix == "search":
+            continue  # search 는 아래 결합 블록에서 처리
+        ins, sk, fail = insert_items(
+            notion_token, notion_db, _insert_items_map[spec.prefix],
+            run_date, collected_at, existing, args.dry_run,
+            modality_enabled=modality_effective)
+        setattr(stats, f"{spec.prefix}_inserted", ins)
+        setattr(stats, f"{spec.prefix}_skipped_dup", sk)
+        setattr(stats, f"{spec.prefix}_insert_failed", fail)
 
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
@@ -2703,6 +2619,7 @@ def main() -> int:
         src_in, src_sk, src_fail = insert_items(
             notion_token, notion_db, search_items,
             run_date, collected_at, existing, args.dry_run,
+            modality_enabled=modality_effective,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk

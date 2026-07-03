@@ -400,7 +400,8 @@ def _url(value: str) -> dict[str, Any] | None:
 
 
 def build_notion_properties(item: IntakeItem, run_date: date,
-                            collected_at: datetime) -> dict[str, Any]:
+                            collected_at: datetime, *,
+                            modality_enabled: bool | None = None) -> dict[str, Any]:
     # Name 타이틀 — 소스별 프리픽스
     _prefix_map = {
         SOURCE_FR:      "FR",
@@ -439,7 +440,12 @@ def build_notion_properties(item: IntakeItem, run_date: date,
     # ── 제품군(Modality) 태그 (제품군 확장) ─────────────────────────────────────
     # ENABLE_MODALITY_TAG=true 이고 Notion 에 'Modality' select 속성이 있을 때만 기록.
     # (기본 false — 속성 미생성 상태로 운영에 머지돼도 insert 가 깨지지 않도록 안전 게이트)
-    if env_flag("ENABLE_MODALITY_TAG"):
+    # [배치6 Phase2] modality_enabled 미지정(=직접호출/테스트) 시 env 폴백으로 하위호환.
+    # main 은 preflight 로 결정된 effective 값을 insert_items→notion_create_page 로 전달해
+    # (os.environ 변조 없이) row 당 env 재독해를 제거한다.
+    if modality_enabled is None:
+        modality_enabled = env_flag("ENABLE_MODALITY_TAG")
+    if modality_enabled:
         modality = compute_modality(
             item.raw_payload, item.headline, item.body,
             item.type_or_class, item.firm,
@@ -524,11 +530,13 @@ def build_notion_children(item: IntakeItem) -> list[dict[str, Any]]:
 
 def notion_create_page(token: str, db_id: str, item: IntakeItem,
                        run_date: date, collected_at: datetime,
-                       retries: int = 2) -> bool:
+                       retries: int = 2, *,
+                       modality_enabled: bool | None = None) -> bool:
     """Notion 페이지 생성. 429/5xx 는 재시도, 4xx(429 제외)는 즉시 실패."""
     body = {
         "parent": {"database_id": db_id},
-        "properties": build_notion_properties(item, run_date, collected_at),
+        "properties": build_notion_properties(item, run_date, collected_at,
+                                              modality_enabled=modality_enabled),
         "children": build_notion_children(item),
     }
     # 재시도 불필요 상태 코드 (클라이언트 에러 — 재시도해도 동일 결과)

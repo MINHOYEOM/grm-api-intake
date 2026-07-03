@@ -313,6 +313,7 @@ body.grm-has-share .grm-card-actions{display:flex}
   var rows=document.querySelectorAll('.grm-card-actions');
   if(!rows.length) return;
   document.body.classList.add('grm-has-share');
+  var isMobileOS=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   function done(btn){
     var t=btn.querySelector('.grm-ca-t'); if(!t) return;
     var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
@@ -327,7 +328,7 @@ body.grm-has-share .grm-card-actions{display:flex}
       var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
       var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
       var title=tEl?tEl.textContent.trim():document.title;
-      if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      if(isMobileOS&&navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
       else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
       else { fallback(url); }
     });

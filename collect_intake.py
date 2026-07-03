@@ -724,6 +724,101 @@ class CollectionStats:
         return "\n".join(lines)
 
 
+@dataclass(frozen=True)
+class RunConfig:
+    """main() 실행 1회분의 환경변수·CLI 인자 파싱 결과(불변).
+
+    [리팩토링 배치6 Phase1] 모든 ``ENABLE_*`` 플래그와 값형 env(윈도우·키·경로·dry-run)를
+    실행 시작 시 ``from_env(args)`` 로 **1회** 파싱해 담는다. 이후 수집/삽입/handoff/health
+    단계는 env 를 재독해하지 않고 이 객체를 참조한다. ``env_flag``/``_env_int`` 를 재사용하며,
+    preflight 로 결정되는 *effective* 값(modality/handoff_idem)은 네트워크 의존이라 여기 담지
+    않고 main 에서 ``*_requested`` 를 근거로 계산한다.
+    """
+    # ── CLI 인자 파생 ────────────────────────────────────────────────────────
+    dry_run: bool
+    window_days: int
+    requested_sources: tuple[str, ...]
+    explicit_sources: bool
+    active: frozenset[str]
+    # ── 자격증명 / 키 ────────────────────────────────────────────────────────
+    notion_token: str
+    notion_db: str
+    openfda_key: str | None
+    data_go_kr_key: str
+    data_go_kr_service_key: str
+    law_go_kr_oc: str
+    brave_api_key: str
+    # ── ENABLE_* 플래그 ──────────────────────────────────────────────────────
+    enable_search: bool
+    enable_mfds: bool
+    enable_mfds_law: bool
+    enable_mfds_recall: bool
+    enable_mfds_admin: bool
+    enable_mfds_gmp_cert: bool
+    enable_mfds_safety_letter: bool
+    enable_mfds_gmp_inspection: bool
+    enable_ich: bool
+    enable_who: bool
+    enable_hc: bool
+    enable_fda483: bool
+    enable_fda483_observations: bool
+    enable_moleg_api: bool
+    enable_scrape: bool
+    modality_requested: bool
+    handoff_idem_requested: bool
+    # ── 값형 env / 파생 ──────────────────────────────────────────────────────
+    event_name: str
+    health_json_path: str
+    step_summary_path: str | None
+    mfds_http_proxy_configured: bool
+    mfds_enforcement_window_days: int
+    handoff_window_days: int
+
+    @classmethod
+    def from_env(cls, args: argparse.Namespace) -> "RunConfig":
+        requested_sources = tuple(args.sources or _ALL_SOURCES)
+        active = (frozenset() if "none" in requested_sources
+                  else frozenset(requested_sources))
+        return cls(
+            dry_run=args.dry_run,
+            window_days=args.window_days,
+            requested_sources=requested_sources,
+            explicit_sources=args.sources is not None,
+            active=active,
+            notion_token=os.environ.get("NOTION_TOKEN", "").strip(),
+            notion_db=os.environ.get("NOTION_DATABASE_ID", "").strip(),
+            openfda_key=os.environ.get("OPENFDA_API_KEY", "").strip() or None,
+            data_go_kr_key=os.environ.get("DATA_GO_KR_KEY", "").strip(),
+            data_go_kr_service_key=os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip(),
+            law_go_kr_oc=os.environ.get("LAW_GO_KR_OC", "").strip(),
+            brave_api_key=os.environ.get("BRAVE_API_KEY", ""),
+            enable_search=env_flag("ENABLE_SEARCH"),
+            enable_mfds=env_flag("ENABLE_MFDS"),
+            enable_mfds_law=env_flag("ENABLE_MFDS_LAW"),
+            enable_mfds_recall=env_flag("ENABLE_MFDS_RECALL"),
+            enable_mfds_admin=env_flag("ENABLE_MFDS_ADMIN"),
+            enable_mfds_gmp_cert=env_flag("ENABLE_MFDS_GMP_CERT"),
+            enable_mfds_safety_letter=env_flag("ENABLE_MFDS_SAFETY_LETTER"),
+            enable_mfds_gmp_inspection=env_flag("ENABLE_MFDS_GMP_INSPECTION"),
+            enable_ich=env_flag("ENABLE_ICH") or "ich" in active,
+            enable_who=env_flag("ENABLE_WHO") or "who" in active,
+            enable_hc=env_flag("ENABLE_HC") or "hc" in active,
+            enable_fda483=env_flag("ENABLE_FDA_483") or "fda483" in active,
+            enable_fda483_observations=env_flag("ENABLE_FDA_483_OBSERVATIONS"),
+            enable_moleg_api=env_flag("ENABLE_MOLEG_API"),
+            enable_scrape=env_flag("ENABLE_SCRAPE"),
+            modality_requested=env_flag("ENABLE_MODALITY_TAG"),
+            handoff_idem_requested=env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2"),
+            event_name=os.environ.get("GRM_EVENT_NAME", "").strip(),
+            health_json_path=os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip(),
+            step_summary_path=os.environ.get("GITHUB_STEP_SUMMARY"),
+            mfds_http_proxy_configured=bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
+            mfds_enforcement_window_days=max(
+                args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30)),
+            handoff_window_days=resolve_handoff_window_days(args.handoff_window_days),
+        )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 유틸
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1972,33 +2067,37 @@ def main() -> int:
     parser.add_argument("--handoff-doc-ids", nargs="+", default=None,
                         help="검증/재처리용: 지정한 Document ID만 Routine handoff에 포함")
     args = parser.parse_args()
-    requested_sources = args.sources or _ALL_SOURCES
-    explicit_sources = args.sources is not None
-    active = set() if "none" in requested_sources else set(requested_sources)
 
-    notion_token = os.environ.get("NOTION_TOKEN", "").strip()
-    notion_db = os.environ.get("NOTION_DATABASE_ID", "").strip()
-    openfda_key = os.environ.get("OPENFDA_API_KEY", "").strip() or None
-    data_go_kr_key = os.environ.get("DATA_GO_KR_KEY", "").strip()
-    data_go_kr_service_key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
-    law_go_kr_oc = os.environ.get("LAW_GO_KR_OC", "").strip()
-    enable_search = env_flag("ENABLE_SEARCH")
-    enable_mfds = env_flag("ENABLE_MFDS")
-    enable_mfds_law = env_flag("ENABLE_MFDS_LAW")
-    enable_mfds_recall = env_flag("ENABLE_MFDS_RECALL")
-    enable_mfds_admin = env_flag("ENABLE_MFDS_ADMIN")
-    enable_mfds_gmp_cert = env_flag("ENABLE_MFDS_GMP_CERT")
-    enable_mfds_safety_letter = env_flag("ENABLE_MFDS_SAFETY_LETTER")
-    enable_mfds_gmp_inspection = env_flag("ENABLE_MFDS_GMP_INSPECTION")
-    enable_ich = env_flag("ENABLE_ICH") or "ich" in active
-    enable_who = env_flag("ENABLE_WHO") or "who" in active
-    enable_hc = env_flag("ENABLE_HC") or "hc" in active
-    enable_fda483 = env_flag("ENABLE_FDA_483") or "fda483" in active
-    enable_fda483_observations = env_flag("ENABLE_FDA_483_OBSERVATIONS")
-    enable_moleg_api = env_flag("ENABLE_MOLEG_API")
-    enable_scrape = env_flag("ENABLE_SCRAPE")
-    event_name = os.environ.get("GRM_EVENT_NAME", "").strip()
-    health_json_path = os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip()
+    # ── [배치6 Phase1] env·CLI 를 1회 파싱해 RunConfig 로 고정. 아래 로컬은 config 참조
+    #    별칭(하위 main 본문 무수정) — Phase4 에서 하위 함수로 config 를 전달하며 정리한다. ──
+    cfg = RunConfig.from_env(args)
+    requested_sources = cfg.requested_sources
+    explicit_sources = cfg.explicit_sources
+    active = set(cfg.active)
+
+    notion_token = cfg.notion_token
+    notion_db = cfg.notion_db
+    openfda_key = cfg.openfda_key
+    data_go_kr_key = cfg.data_go_kr_key
+    data_go_kr_service_key = cfg.data_go_kr_service_key
+    law_go_kr_oc = cfg.law_go_kr_oc
+    enable_search = cfg.enable_search
+    enable_mfds = cfg.enable_mfds
+    enable_mfds_law = cfg.enable_mfds_law
+    enable_mfds_recall = cfg.enable_mfds_recall
+    enable_mfds_admin = cfg.enable_mfds_admin
+    enable_mfds_gmp_cert = cfg.enable_mfds_gmp_cert
+    enable_mfds_safety_letter = cfg.enable_mfds_safety_letter
+    enable_mfds_gmp_inspection = cfg.enable_mfds_gmp_inspection
+    enable_ich = cfg.enable_ich
+    enable_who = cfg.enable_who
+    enable_hc = cfg.enable_hc
+    enable_fda483 = cfg.enable_fda483
+    enable_fda483_observations = cfg.enable_fda483_observations
+    enable_moleg_api = cfg.enable_moleg_api
+    enable_scrape = cfg.enable_scrape
+    event_name = cfg.event_name
+    health_json_path = cfg.health_json_path
     if enable_scrape:
         log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
 
@@ -2010,7 +2109,7 @@ def main() -> int:
     # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
     # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
     # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
-    modality_requested = env_flag("ENABLE_MODALITY_TAG")
+    modality_requested = cfg.modality_requested
     modality_preflight_disabled = False
     modality_preflight_skipped = False
     if modality_requested and notion_token and notion_db:
@@ -2030,7 +2129,7 @@ def main() -> int:
 
     # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
     # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
-    handoff_idem_requested = env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2")
+    handoff_idem_requested = cfg.handoff_idem_requested
     handoff_idem_preflight_disabled = False
     handoff_idem_preflight_skipped = False
     if handoff_idem_requested and notion_token and notion_db:
@@ -2059,8 +2158,7 @@ def main() -> int:
     # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
     #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
     #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
-    mfds_enforcement_window_days = max(
-        args.window_days, _env_int("MFDS_ENFORCEMENT_WINDOW_DAYS", 30))
+    mfds_enforcement_window_days = cfg.mfds_enforcement_window_days
     enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
     log("INFO", f"MFDS enforcement window={enf_start}~{end} "
                 f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
@@ -2588,7 +2686,7 @@ def main() -> int:
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)
     search_items: list[IntakeItem] = []  # G2: inmemory_raw 집계에서 항상 참조 가능하게 선초기화
     if enable_search:
-        brave_api_key = os.environ.get("BRAVE_API_KEY", "")
+        brave_api_key = cfg.brave_api_key
         log("INFO", "=== Brave Search 수집 시작 ===")
         try:
             from collect_search import collect_brave_search
@@ -2618,7 +2716,7 @@ def main() -> int:
     handoff_url = ""
     handoff_error_msg = ""
     # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
-    handoff_window_days = resolve_handoff_window_days(args.handoff_window_days)
+    handoff_window_days = cfg.handoff_window_days
     if args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
@@ -2701,7 +2799,7 @@ def main() -> int:
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_REQUESTED": handoff_idem_requested,
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_EFFECTIVE": handoff_idem_effective,
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
-        "MFDS_HTTP_PROXY_CONFIGURED": bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
+        "MFDS_HTTP_PROXY_CONFIGURED": cfg.mfds_http_proxy_configured,
         "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
     }
     health = _evaluate_health(
@@ -2757,7 +2855,7 @@ def main() -> int:
     log("INFO", "── Collection summary ──\n" + stats.summary())
 
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
-    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    summary_path = cfg.step_summary_path
     if summary_path:
         try:
             with open(summary_path, "a", encoding="utf-8") as f:

@@ -88,6 +88,12 @@ jobs:
           # 미설정 시 메타가 사라지지 않는다(무회귀). 설정 시 그 값이 라이브 <head> 에 노출.
           GRM_GOOGLE_SITE_VERIFICATION: ${{ vars.GRM_GOOGLE_SITE_VERIFICATION }}
           GRM_NAVER_SITE_VERIFICATION: ${{ vars.GRM_NAVER_SITE_VERIFICATION }}
+          # 카드 반응 계층(S1) — Supabase 공개 설정(repo var)을 render.py 로 전달. 미전달이면
+          # render.py 가 빈 값 → reactions_enabled=False → 반응 블록 미출력(뉴스레터 form_action
+          # 과 동형·골든/기존 빌드 영향 0). 둘 다 설정 시에만 활성. anon key 는 publishable(RLS 로
+          # 보호)이라 라이브 <head> 노출 안전 — service_role 은 미배선.
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
         run: |
           DATA="web/data/briefs"
           if compgen -G "$CHECKED_DIR/*.json" > /dev/null 2>&1; then

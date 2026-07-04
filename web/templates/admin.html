@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.admin-main{padding-top:34px;padding-bottom:72px}
+.admin-shell{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}
+.admin-rail{position:sticky;top:86px;border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:16px}
+.admin-brand{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.admin-brand img{width:34px;height:34px;border-radius:8px}
+.admin-brand b{display:block;color:var(--ink);font-size:15px;line-height:1.15}
+.admin-brand span{display:block;color:var(--muted);font-size:12px}
+.admin-nav{display:grid;gap:6px;margin-top:14px}
+.admin-nav button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--body);border-radius:var(--rad-s);padding:9px 10px;text-align:left;font-size:13.5px}
+.admin-nav button:hover,.admin-nav button.on{background:var(--canvas);color:var(--ink)}
+.admin-nav .ti{font-size:17px;color:var(--coral-2)}
+.admin-identity{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.admin-pill{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid var(--line-2);border-radius:var(--pill);padding:6px 10px;background:var(--canvas);color:var(--muted);font-size:12.5px}
+.admin-pill.ok{background:var(--coral-tint);border-color:rgba(194,96,63,.22);color:var(--coral-2)}
+.admin-pill.warn{background:rgba(176,125,23,.12);border-color:rgba(176,125,23,.25);color:var(--med)}
+.admin-pill.bad{background:rgba(189,75,54,.1);border-color:rgba(189,75,54,.22);color:var(--hi)}
+.admin-identity .admin-pill{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.admin-head h1{font-family:var(--serif);font-size:38px;font-weight:500;line-height:1.08;color:var(--ink);margin-top:5px}
+.admin-head p{max-width:68ch;color:var(--muted);font-size:14px;margin-top:6px}
+.admin-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.admin-login{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:22px;max-width:520px}
+.admin-login h2{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--ink);margin-bottom:6px}
+.admin-login p{color:var(--muted);font-size:13.5px;margin-bottom:15px}
+.admin-form{display:grid;gap:10px}
+.admin-form label{display:grid;gap:6px;color:var(--muted);font-size:12.5px}
+.admin-form input{width:100%;border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:11px 12px;font:inherit;font-size:14px;color:var(--ink)}
+.admin-form input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.admin-login-alt{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+.admin-linkbtn{border:0;background:transparent;color:var(--muted);font-size:12.5px;text-decoration:underline;padding:0}
+.admin-status{min-height:20px;margin-top:10px;color:var(--muted);font-size:13px}
+.admin-status.err{color:var(--hi)}
+.admin-status.ok{color:var(--coral-2)}
+.admin-dashboard{display:grid;gap:16px}
+.admin-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:14px 15px;min-width:0}
+.admin-kpi span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.admin-kpi .ti{color:var(--coral-2);font-size:16px}
+.admin-kpi b{display:block;font-family:var(--serif);font-size:28px;font-weight:500;color:var(--ink);line-height:1.05;margin-top:6px;overflow:hidden;text-overflow:ellipsis}
+.admin-panel{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:18px}
+.admin-panel[hidden],.admin-hidden{display:none!important}
+.admin-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.admin-panel h2{font-size:18px;font-weight:650;color:var(--ink)}
+.admin-panel .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.admin-actions-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.admin-op{display:grid;gap:10px;align-content:space-between;text-align:left;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:14px;min-height:148px}
+.admin-op h3{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px;font-weight:650}
+.admin-op h3 .ti{font-size:18px;color:var(--coral-2)}
+.admin-op p{color:var(--muted);font-size:12.5px;line-height:1.45}
+.admin-op .btn{justify-content:center;width:100%;padding:9px 12px}
+.admin-split{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:14px}
+.admin-issue{border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:15px}
+.admin-issue b{display:block;color:var(--ink);font-size:17px;margin-bottom:5px}
+.admin-issue span{display:block;color:var(--muted);font-size:13px}
+.admin-inline-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.admin-inline-form input,.admin-toolbar input,.admin-toolbar select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:9px 11px;font:inherit;font-size:13.5px;color:var(--ink)}
+.admin-inline-form input{min-width:240px;flex:1}
+.admin-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.admin-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:var(--rad-s)}
+.admin-table{width:100%;border-collapse:collapse;min-width:760px;font-size:13px}
+.admin-table th,.admin-table td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.admin-table th{background:var(--soft);color:var(--muted);font-weight:650;font-size:12px;white-space:nowrap}
+.admin-table tr:last-child td{border-bottom:0}
+.admin-table td{color:var(--body)}
+.admin-table a{color:var(--coral-2);text-decoration:underline}
+.admin-row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.admin-mini{border:1px solid var(--line-2);background:transparent;color:var(--body);border-radius:var(--rad-s);padding:5px 8px;font-size:12px}
+.admin-mini:hover{border-color:var(--coral);color:var(--coral-2)}
+.admin-mini.danger:hover{border-color:var(--hi);color:var(--hi)}
+.admin-empty{padding:16px;color:var(--muted);font-size:13px}
+.admin-insight{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.admin-bars{display:grid;gap:9px}
+.admin-bar{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
+.admin-bar-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font-size:13.5px}
+.admin-bar-track{height:8px;border-radius:var(--pill);background:var(--strong);overflow:hidden}
+.admin-bar-fill{height:100%;background:var(--coral);border-radius:var(--pill);min-width:3px}
+.admin-checks{display:grid;gap:8px}
+.admin-check{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px;font-size:13px;color:var(--body)}
+.admin-check:last-child{border-bottom:0;padding-bottom:0}
+.admin-check code{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.admin-toast{position:fixed;right:18px;bottom:18px;z-index:90;display:grid;gap:8px;max-width:360px}
+.admin-toast p{border:1px solid var(--line-2);background:var(--ink);color:var(--canvas);border-radius:var(--rad-s);padding:10px 12px;font-size:13px;box-shadow:var(--shadow)}
+.site,#grm-mascot{display:none}
+@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-split,.admin-insight{grid-template-columns:1fr}}
+@media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-kpis,.admin-actions-grid{grid-template-columns:1fr}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn{width:100%;justify-content:center}}
+</style>
+
+<main class="admin-main wrap" id="grm-admin">
+  <div id="grm-admin-cfg"
+       data-supabase-url="{{ supabase_url }}"
+       data-supabase-anon-key="{{ supabase_anon_key }}"
+       data-index="/assets/search-index.json"
+       data-admin-email="yeomminho1472@gmail.com"
+       hidden></div>
+
+  <div class="admin-shell">
+    <aside class="admin-rail" aria-label="Admin navigation">
+      <div class="admin-brand">
+        <img src="/favicon.svg" alt="" aria-hidden="true">
+        <span><b>GRM Admin</b><span>Operations Console</span></span>
+      </div>
+      <nav class="admin-nav" id="grm-admin-tabs">
+        <button type="button" class="on" data-tab="ops"><i class="ti ti-bolt"></i>자동화</button>
+        <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
+        <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
+        <button type="button" data-tab="users"><i class="ti ti-users"></i>회원</button>
+        <button type="button" data-tab="insights"><i class="ti ti-chart-bar"></i>인사이트</button>
+        <button type="button" data-tab="system"><i class="ti ti-shield-check"></i>시스템</button>
+      </nav>
+      <div class="admin-identity">
+        <span class="admin-pill" id="grm-admin-email"><i class="ti ti-lock"></i>로그인 필요</span>
+        <button class="btn admin-hidden" type="button" id="grm-admin-signout" style="margin-top:10px;width:100%;justify-content:center"><i class="ti ti-logout"></i>로그아웃</button>
+      </div>
+    </aside>
+
+    <section>
+      <header class="admin-head">
+        <div>
+          <span class="kick">Admin</span>
+          <h1>운영자 페이지</h1>
+          <p>뉴스레터 발송, 수집, 배포, 회원, 구독자, 반응 데이터를 한 화면에서 운영합니다.</p>
+        </div>
+        <div class="admin-head-actions">
+          <span class="admin-pill warn" id="grm-admin-live"><i class="ti ti-activity"></i>상태 확인 중</span>
+          <button class="btn" type="button" id="grm-refresh-all"><i class="ti ti-refresh"></i>새로고침</button>
+        </div>
+      </header>
+
+      <section class="admin-login" id="grm-admin-login">
+        <h2>Admin 로그인</h2>
+        <p>단일 Admin 계정만 운영 콘솔에 접근할 수 있습니다.</p>
+        <form class="admin-form" id="grm-admin-login-form">
+          <label>이메일
+            <input type="email" name="email" autocomplete="email" required value="yeomminho1472@gmail.com">
+          </label>
+          <label>비밀번호
+            <input type="password" name="password" autocomplete="current-password" required minlength="6">
+          </label>
+          <button class="btn coral" type="submit" id="grm-admin-login-submit"><i class="ti ti-login-2"></i>로그인</button>
+        </form>
+        <div class="admin-login-alt">
+          <button class="admin-linkbtn" type="button" id="grm-admin-signup">최초 Admin 계정 만들기</button>
+          <button class="admin-linkbtn" type="button" id="grm-admin-reset">비밀번호 재설정 메일 보내기</button>
+        </div>
+        <div class="admin-status" id="grm-admin-login-status" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="admin-dashboard admin-hidden" id="grm-admin-dashboard" aria-live="polite">
+        <div class="admin-kpis">
+          <div class="admin-kpi"><span><i class="ti ti-users"></i>회원</span><b id="grm-kpi-users">-</b></div>
+          <div class="admin-kpi"><span><i class="ti ti-address-book"></i>구독자</span><b id="grm-kpi-subscribers">-</b></div>
+          <div class="admin-kpi"><span><i class="ti ti-heart"></i>하트</span><b id="grm-kpi-hearts">-</b></div>
+          <div class="admin-kpi"><span><i class="ti ti-bookmark"></i>스크랩</span><b id="grm-kpi-scraps">-</b></div>
+          <div class="admin-kpi"><span><i class="ti ti-send"></i>최근 발송</span><b id="grm-kpi-dispatch">-</b></div>
+        </div>
+
+        <section class="admin-panel" data-panel="ops">
+          <div class="admin-panel-head">
+            <div><h2>운영 자동화</h2><p class="sub">버튼 클릭으로 GitHub Actions 운영 파이프라인을 실행합니다.</p></div>
+            <span class="admin-pill" id="grm-github-state">GitHub 확인 중</span>
+          </div>
+          <div class="admin-actions-grid">
+            <div class="admin-op">
+              <div><h3><i class="ti ti-mail-forward"></i>뉴스레터 실발송</h3><p>최신호 기준으로 발송 워크플로우를 실행합니다.</p></div>
+              <button class="btn coral" type="button" data-dispatch="newsletter_send"><i class="ti ti-send"></i>발송</button>
+            </div>
+            <div class="admin-op">
+              <div><h3><i class="ti ti-cloud-upload"></i>웹 재배포</h3><p>현재 main의 정적 사이트를 다시 빌드하고 배포합니다.</p></div>
+              <button class="btn" type="button" data-dispatch="web_deploy"><i class="ti ti-player-play"></i>실행</button>
+            </div>
+            <div class="admin-op">
+              <div><h3><i class="ti ti-database-import"></i>수집 실행</h3><p>규제 소스 수집 워크플로우를 수동 실행합니다.</p></div>
+              <button class="btn" type="button" data-dispatch="intake_run"><i class="ti ti-player-play"></i>실행</button>
+            </div>
+            <div class="admin-op">
+              <div><h3><i class="ti ti-search"></i>브리프 감사</h3><p>발행 후 provenance 감사 워크플로우를 실행합니다.</p></div>
+              <button class="btn" type="button" data-dispatch="brief_audit"><i class="ti ti-player-play"></i>실행</button>
+            </div>
+          </div>
+          <div class="admin-status" id="grm-ops-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="newsletter" hidden>
+          <div class="admin-panel-head">
+            <div><h2>뉴스레터</h2><p class="sub">구독자에게 발송되는 최신호와 발송 기록입니다.</p></div>
+            <span class="admin-pill ok" id="grm-latest-label">최신호 확인 중</span>
+          </div>
+          <div class="admin-split">
+            <div class="admin-issue">
+              <b id="grm-newsletter-title">최신 규제뉴스</b>
+              <span id="grm-newsletter-date">발행일 확인 중</span>
+              <div class="admin-status" id="grm-newsletter-status" role="status" aria-live="polite"></div>
+              <button class="btn coral" type="button" id="grm-newsletter-send" style="margin-top:12px"><i class="ti ti-send"></i>최신호 실발송</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>발행일</th><th>상태</th><th>요청 시각</th><th>실행</th></tr></thead>
+                <tbody id="grm-dispatch-body"><tr><td colspan="4"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="subscribers" hidden>
+          <div class="admin-panel-head">
+            <div><h2>구독자 관리</h2><p class="sub">Brevo 리스트의 구독자를 조회하고 추가하거나 목록에서 제거합니다.</p></div>
+            <button class="btn" type="button" id="grm-subscribers-refresh"><i class="ti ti-refresh"></i>새로고침</button>
+          </div>
+          <form class="admin-inline-form" id="grm-subscriber-form">
+            <input type="email" name="email" placeholder="subscriber@example.com" required autocomplete="email" aria-label="구독자 이메일">
+            <button class="btn coral" type="submit"><i class="ti ti-user-plus"></i>구독자 추가</button>
+          </form>
+          <div class="admin-toolbar">
+            <input type="search" id="grm-subscriber-filter" placeholder="이메일 검색" aria-label="구독자 검색">
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>이메일</th><th>상태</th><th>가입일</th><th>수정일</th><th>작업</th></tr></thead>
+              <tbody id="grm-subscribers-body"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="admin-status" id="grm-subscribers-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="users" hidden>
+          <div class="admin-panel-head">
+            <div><h2>회원 관리</h2><p class="sub">Supabase Auth 회원 상태를 확인하고 필요한 조치를 실행합니다.</p></div>
+            <button class="btn" type="button" id="grm-users-refresh"><i class="ti ti-refresh"></i>새로고침</button>
+          </div>
+          <div class="admin-toolbar">
+            <input type="search" id="grm-user-filter" placeholder="회원 이메일 검색" aria-label="회원 검색">
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>이메일</th><th>상태</th><th>가입일</th><th>최근 로그인</th><th>작업</th></tr></thead>
+              <tbody id="grm-users-body"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="admin-status" id="grm-users-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="insights" hidden>
+          <div class="admin-panel-head">
+            <div><h2>콘텐츠 인사이트</h2><p class="sub">회원 반응과 검색 인덱스를 연결해 카드 관심도를 봅니다.</p></div>
+            <span class="admin-pill" id="grm-index-state">인덱스 확인 중</span>
+          </div>
+          <div class="admin-insight">
+            <div>
+              <h3 style="font-size:15px;color:var(--ink);margin-bottom:10px">상위 반응 카드</h3>
+              <div class="admin-bars" id="grm-top-cards"><div class="admin-empty">불러오는 중</div></div>
+            </div>
+            <div>
+              <h3 style="font-size:15px;color:var(--ink);margin-bottom:10px">최신호 상태</h3>
+              <div class="admin-checks" id="grm-content-checks"><div class="admin-empty">불러오는 중</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="system" hidden>
+          <div class="admin-panel-head">
+            <div><h2>시스템 상태</h2><p class="sub">배포, 함수, 시크릿, 감사 로그를 확인합니다.</p></div>
+            <button class="btn" type="button" id="grm-system-refresh"><i class="ti ti-refresh"></i>점검</button>
+          </div>
+          <div class="admin-split">
+            <div class="admin-checks" id="grm-system-checks"><div class="admin-empty">점검 중</div></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>워크플로우</th><th>상태</th><th>브랜치</th><th>시간</th><th>링크</th></tr></thead>
+                <tbody id="grm-runs-body"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>시각</th><th>작업</th><th>대상</th><th>상세</th></tr></thead>
+              <tbody id="grm-audit-body"><tr><td colspan="4"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </section>
+  </div>
+  <div class="admin-toast" id="grm-admin-toast" aria-live="polite" aria-atomic="false"></div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/admin.js?v={{ adminjs_ver }}" defer></script>
+{% endblock %}

@@ -1,0 +1,8 @@
+[functions.admin-supabase]
+verify_jwt = false
+
+[functions.admin-github]
+verify_jwt = false
+
+[functions.admin-brevo]
+verify_jwt = false

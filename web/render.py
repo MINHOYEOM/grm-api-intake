@@ -481,14 +481,19 @@ SITE_BASE_URL = os.environ.get(
     "GRM_SITE_BASE_URL", "https://grm-solutions.com").rstrip("/")
 
 
-def build_robots_txt(base_url: str = SITE_BASE_URL) -> str:
-    """robots.txt — 전체 허용 + sitemap 포인터. 입력 무관 정적(결정론)."""
-    return (
-        "User-agent: *\n"
-        "Allow: /\n"
-        "\n"
-        f"Sitemap: {base_url}/sitemap.xml\n"
-    )
+def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = False) -> str:
+    """robots.txt — 공개 페이지 허용 + sitemap 포인터. Admin 은 비색인."""
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+    ]
+    if disallow_admin:
+        lines.append("Disallow: /admin/")
+    lines += [
+        "",
+        f"Sitemap: {base_url}/sitemap.xml",
+    ]
+    return "\n".join(lines) + "\n"
 
 
 def build_sitemap_xml(briefs: list[dict[str, Any]],
@@ -656,9 +661,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.
     _supa_url = _safe_url(SUPABASE_URL)
     env.globals["reactions_enabled"] = bool(_supa_url and SUPABASE_ANON_KEY)
+    env.globals["admin_enabled"] = env.globals["reactions_enabled"]
     env.globals["supabase_url"] = _supa_url
     env.globals["supabase_anon_key"] = SUPABASE_ANON_KEY
     env.globals["reactionsjs_ver"] = _asset_ver("reactions.js")
+    env.globals["adminjs_ver"] = _asset_ver("admin.js")
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")
@@ -742,6 +749,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         _write(out_dir / "me" / "index.html", me_html)
         written.append("me/index.html")
+        admin_html = env.get_template("admin.html").render(
+            page_title="Admin · GRM",
+            rel_root="../",
+            nav_active="admin",
+            latest_slug=latest_slug,
+            description="",
+            canonical="",
+            json_ld="",
+            newsletter_form_action="",
+            reactions_enabled=False,
+        )
+        _write(out_dir / "admin" / "index.html", admin_html)
+        written.append("admin/index.html")
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
@@ -770,7 +790,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         written.append(f"briefs/{pub}/index.html")
 
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
-    _write(out_dir / "robots.txt", build_robots_txt())
+    _write(out_dir / "robots.txt", build_robots_txt(
+        disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
     _write(out_dir / "sitemap.xml", build_sitemap_xml(briefs))
     written.append("sitemap.xml")

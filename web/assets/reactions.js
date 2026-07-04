@@ -466,7 +466,7 @@
       return;
     }
     myScrapsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
-    var idxUrl = myScrapsEl.getAttribute("data-index") || "assets/search-index.json";
+    var idxUrl = myScrapsEl.getAttribute("data-index") || "/assets/search-index.json";
     Promise.all([
       sb.from("reaction").select("card_id,created_at").eq("kind", "scrap"),
       fetch(idxUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })

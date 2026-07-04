@@ -262,10 +262,10 @@ class WebRenderStructureTest(unittest.TestCase):
     def test_relative_paths_per_depth(self):
         landing = (self.single / "index.html").read_text(encoding="utf-8")
         archive = (self.single / "archive/index.html").read_text(encoding="utf-8")
-        self.assertIn('href="assets/grm.css?v=', landing)             # 깊이 0
-        self.assertIn('href="../assets/grm.css?v=', archive)          # 깊이 1
-        self.assertIn('href="../../assets/grm.css?v=', self.detail)   # 깊이 2
-        # 브리프 상세 nav 링크는 ../../ 접두.
+        self.assertIn('href="/assets/grm.css?v=', landing)
+        self.assertIn('href="/assets/grm.css?v=', archive)
+        self.assertIn('href="/assets/grm.css?v=', self.detail)
+        # 내부 페이지 링크는 페이지 깊이에 맞춘 상대경로를 유지한다.
         self.assertIn('href="../../archive/index.html"', self.detail)
 
     def test_archive_sort_and_latest(self):

@@ -18,7 +18,8 @@
   var rows = Array.prototype.slice.call(
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
   var myScrapsEl = document.getElementById("grm-my-scraps");   // /me 페이지 컨테이너(있으면 마이페이지)
-  if (!rows.length && !myScrapsEl) return;
+  // 로그인/계정 UI(renderAuth)는 카드 유무와 무관하게 모든 페이지 헤더에 필요하므로 조기 종료하지 않는다.
+  // (카드 반응·집계는 rows, 마이페이지는 myScrapsEl 로 각각 개별 가드된다.)
   var ids = rows.map(function (r) { return r.getAttribute("data-anchor"); }).filter(Boolean);
   var cfgRoot = cfg.getAttribute("data-root") || "";
   var session = null;
@@ -531,10 +532,10 @@
   });
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
-    renderAuth(); loadMine(); renderMyScraps();
+    renderAuth(); if (rows.length) loadMine(); renderMyScraps();
   }).catch(function () { renderAuth(); renderMyScraps(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
-    session = s; renderAuth(); loadMine(); renderMyScraps();
+    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps();
     if (s && s.user) closeLogin();
   });
   if (rows.length) loadCounts();

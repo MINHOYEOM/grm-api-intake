@@ -294,7 +294,7 @@ body.grm-reactions-on .grm-ca-react{display:inline-flex}
 .grm-ca-count{font-variant-numeric:tabular-nums;opacity:.75}
 .grm-auth{display:none;align-items:center;gap:8px;margin-left:10px;font-family:var(--sans);font-size:12px;color:var(--muted)}
 body.grm-reactions-on .grm-auth{display:inline-flex}
-.grm-auth button{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.grm-auth button{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer}
 .grm-login-pop{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(26,24,21,.42);padding:20px}
 .grm-login-pop.show{display:flex}
 .grm-login-card{position:relative;background:var(--canvas,#fff);max-width:360px;width:100%;border-radius:14px;padding:22px 20px;box-shadow:0 20px 50px -18px rgba(0,0,0,.5)}
@@ -336,6 +336,45 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-my-rm:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
 .grm-auth .grm-my-link{color:var(--muted);text-decoration:underline}
 .grm-auth .grm-my-link:hover{color:var(--coral,#B9542F)}
+.grm-acct{position:relative;display:inline-flex}
+.grm-acct-btn{display:inline-flex;align-items:center;gap:5px;background:var(--canvas,#fff);border:1px solid var(--line-2,#DCD3C7);border-radius:999px;padding:3px 8px 3px 3px;cursor:pointer}
+.grm-acct-btn:hover{border-color:var(--coral,#C2603F)}
+.grm-acct-av{width:26px;height:26px;border-radius:50%;background:var(--coral,#C2603F);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none;font-family:var(--sans)}
+.grm-acct-cv{font-size:15px;color:var(--muted)}
+.grm-acct-menu{position:absolute;right:0;top:calc(100% + 8px);width:236px;background:var(--canvas,#fff);border:1px solid var(--line-2,#DCD3C7);border-radius:12px;box-shadow:0 16px 40px -14px rgba(0,0,0,.35);overflow:hidden;z-index:70}
+.grm-acct-menu[hidden]{display:none}
+.grm-acct-head{display:flex;align-items:center;gap:10px;padding:13px 14px 11px}
+.grm-acct-av-lg{width:34px;height:34px;font-size:15px}
+.grm-acct-id{min-width:0;display:flex;flex-direction:column}
+.grm-acct-label{font-size:11px;color:var(--muted)}
+.grm-acct-email{font-size:13px;color:var(--ink,#141413);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
+.grm-acct-div{height:1px;background:var(--line-2,#DCD3C7)}
+.grm-acct-menu .grm-acct-item{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;text-align:left;padding:10px 14px;font-family:var(--sans);font-size:13px;color:var(--ink,#141413);background:transparent;border:0;cursor:pointer;text-decoration:none}
+.grm-acct-menu .grm-acct-item .ti{font-size:17px;color:var(--muted)}
+.grm-acct-menu .grm-acct-item:hover{background:var(--coral-tint,#F4E7DF)}
+.grm-acct-menu .grm-acct-item:hover .ti{color:var(--coral-2,#A14B30)}
+.grm-acct-login{text-decoration:underline}
+.grm-acct-login:hover{color:var(--coral,#C2603F)}
+.grm-login-form input:focus{outline:none;border-color:var(--coral,#C2603F);box-shadow:0 0 0 3px var(--coral-tint,#F4E7DF)}
+.grm-my-h2{font-family:var(--serif);font-size:18px;margin:26px 0 4px}
+.grm-me-head{margin:14px 0 8px}
+.grm-me-card{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--canvas,#fff);border:1px solid var(--line-2,#DCD3C7);border-radius:12px}
+.grm-acct-av-xl{width:48px;height:48px;font-size:20px}
+.grm-me-idbox{min-width:0}
+.grm-me-label{font-size:11px;color:var(--muted)}
+.grm-me-email{font-family:var(--sans);font-size:15px;color:var(--ink,#141413);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grm-me-metaline{display:flex;align-items:center;gap:12px;margin-top:5px}
+.grm-me-stat{font-size:12px;color:var(--muted)}
+.grm-me-stat b{color:var(--coral-2,#A14B30);font-variant-numeric:tabular-nums}
+.grm-me-out{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.grm-me-out:hover{color:var(--coral,#C2603F)}
+.grm-my-empty{text-align:center;padding:40px 20px;border:1px dashed var(--line-2,#DCD3C7);border-radius:12px}
+.grm-my-empty-ic{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:var(--coral-tint,#F4E7DF);color:var(--coral-2,#A14B30);margin-bottom:12px}
+.grm-my-empty-ic .ti{font-size:26px}
+.grm-my-empty-t{font-family:var(--serif);font-size:16px;color:var(--ink,#141413);margin:0 0 4px}
+.grm-my-empty-s{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 16px}
+.grm-my-cta{display:inline-block;font-family:var(--sans);font-size:13px;color:#fff;background:var(--coral,#C2603F);border-radius:var(--rad-s,8px);padding:9px 16px;text-decoration:none}
+.grm-my-cta:hover{background:var(--coral-2,#A14B30)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="{{ rel_root }}assets/reactions.js?v={{ reactionsjs_ver }}" defer></script>

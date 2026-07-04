@@ -28,6 +28,9 @@
   }
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function esc(x){return String(x==null?"":x).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function acctInitial(email){var t=String(email||'G').trim();return (t.charAt(0)||'G').toUpperCase();}
+  var acctMenuOpen=false, acctDocBound=false;
   var OWL_SVG =
     '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
     '<rect x="0" y="0" width="64" height="64" rx="16" fill="#C2603F"/>' +
@@ -53,25 +56,55 @@
     host.appendChild(authEl);
     return authEl;
   }
+  function closeAcctMenu() {
+    if (!authEl) return;
+    var m = authEl.querySelector(".grm-acct-menu"), b = authEl.querySelector(".grm-acct-btn");
+    if (m) m.hidden = true;
+    if (b) b.setAttribute("aria-expanded", "false");
+    acctMenuOpen = false;
+  }
+  // 계정 칩(아바타) + 드롭다운 메뉴(이메일·내 스크랩·로그아웃) — 런타임 주입(정적 HTML 무변형).
   function renderAuth() {
     var el = ensureAuthEl(); if (!el) return;
     el.innerHTML = "";
     if (session && session.user) {
-      var meLink = document.createElement("a");
-      meLink.href = cfgRoot + "me/index.html";
-      meLink.className = "grm-my-link";
-      meLink.textContent = "내 스크랩";
-      el.appendChild(meLink);
-      var who = document.createElement("span");
-      who.className = "grm-auth-who";
-      who.textContent = session.user.email || "회원";
-      var out = document.createElement("button");
-      out.type = "button"; out.textContent = "로그아웃";
-      out.addEventListener("click", function () { sb.auth.signOut(); });
-      el.appendChild(who); el.appendChild(out);
+      var email = session.user.email || "회원", ini = acctInitial(email);
+      var wrap = document.createElement("div"); wrap.className = "grm-acct";
+      wrap.innerHTML =
+        '<button type="button" class="grm-acct-btn" aria-haspopup="menu" aria-expanded="false" aria-label="계정 메뉴">' +
+        '<span class="grm-acct-av">' + esc(ini) + '</span>' +
+        '<i class="ti ti-chevron-down grm-acct-cv" aria-hidden="true"></i></button>' +
+        '<div class="grm-acct-menu" role="menu" hidden>' +
+        '<div class="grm-acct-head"><span class="grm-acct-av grm-acct-av-lg">' + esc(ini) + '</span>' +
+        '<span class="grm-acct-id"><span class="grm-acct-label">로그인 계정</span>' +
+        '<span class="grm-acct-email">' + esc(email) + '</span></span></div>' +
+        '<div class="grm-acct-div"></div>' +
+        '<a class="grm-acct-item" role="menuitem" href="' + esc(cfgRoot) + 'me/index.html">' +
+        '<i class="ti ti-bookmark" aria-hidden="true"></i>내 스크랩</a>' +
+        '<button type="button" class="grm-acct-item grm-acct-out" role="menuitem">' +
+        '<i class="ti ti-logout" aria-hidden="true"></i>로그아웃</button></div>';
+      el.appendChild(wrap);
+      var btn = wrap.querySelector(".grm-acct-btn"), menu = wrap.querySelector(".grm-acct-menu");
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var willOpen = menu.hidden;
+        menu.hidden = !willOpen;
+        btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        acctMenuOpen = willOpen;
+      });
+      wrap.querySelector(".grm-acct-out").addEventListener("click", function () { closeAcctMenu(); sb.auth.signOut(); });
+      if (!acctDocBound) {
+        acctDocBound = true;
+        document.addEventListener("click", function (e) {
+          if (acctMenuOpen && authEl && !authEl.contains(e.target)) closeAcctMenu();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (acctMenuOpen && (e.key === "Escape" || e.key === "Esc")) closeAcctMenu();
+        });
+      }
     } else {
       var login = document.createElement("button");
-      login.type = "button"; login.textContent = "로그인";
+      login.type = "button"; login.className = "grm-acct-login"; login.textContent = "로그인";
       login.addEventListener("click", function () { openLogin(); });
       el.appendChild(login);
     }
@@ -401,10 +434,28 @@
   }
 
   // ── /me 페이지: 내 스크랩 목록(호를 넘나들며) ─────────────────────────────
+  // /me 계정 헤더(아바타·이메일·스크랩 수) — 런타임 주입.
+  function renderMeHead(count) {
+    var head = document.getElementById("grm-me-head");
+    if (!head) return;
+    if (!session || !session.user) { head.innerHTML = ""; return; }
+    var email = session.user.email || "회원", ini = acctInitial(email);
+    var stat = (count == null) ? "" : ('<span class="grm-me-stat"><b>' + count + '</b> 스크랩</span>');
+    head.innerHTML =
+      '<div class="grm-me-card">' +
+      '<span class="grm-acct-av grm-acct-av-xl">' + esc(ini) + '</span>' +
+      '<div class="grm-me-idbox"><div class="grm-me-label">로그인 계정</div>' +
+      '<div class="grm-me-email">' + esc(email) + '</div>' +
+      '<div class="grm-me-metaline">' + stat +
+      '<button type="button" class="grm-me-out">로그아웃</button></div></div></div>';
+    var out = head.querySelector(".grm-me-out");
+    if (out) out.addEventListener("click", function () { sb.auth.signOut(); });
+  }
   // Supabase 스크랩 card_id + search-index.json(card_id→제목·기관·링크)로 목록을 런타임 렌더.
   // provenance: 제목·링크는 우리 인덱스에서만, Supabase 엔 불투명 card_id 만.
   function renderMyScraps() {
     if (!myScrapsEl) return;
+    renderMeHead(null);
     if (!session || !session.user) {
       myScrapsEl.innerHTML = '<p class="grm-my-note">로그인하면 스크랩한 카드를 모아볼 수 있어요.</p>';
       var lb = document.createElement("button");
@@ -422,7 +473,15 @@
       var res = out[0], idx = out[1];
       if (res && res.error) { myScrapsEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>'; return; }
       var scraps = (res && res.data) ? res.data.slice() : [];
-      if (!scraps.length) { myScrapsEl.innerHTML = '<p class="grm-my-note">아직 스크랩한 카드가 없어요. 카드의 스크랩 버튼을 눌러 저장해 보세요.</p>'; return; }
+      if (!scraps.length) {
+        myScrapsEl.innerHTML =
+          '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
+          '<p class="grm-my-empty-t">아직 스크랩한 카드가 없어요</p>' +
+          '<p class="grm-my-empty-s">카드의 스크랩 버튼을 누르면 이곳에 모여요.</p>' +
+          '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'archive/index.html">규제뉴스 둘러보기</a></div>';
+        renderMeHead(0);
+        return;
+      }
       scraps.sort(function (a, c) { return (c.created_at || "").localeCompare(a.created_at || ""); });
       var byAnchor = {};
       if (idx && idx.cards) {
@@ -459,6 +518,7 @@
         li.appendChild(rm); ul.appendChild(li);
       });
       myScrapsEl.innerHTML = ""; myScrapsEl.appendChild(ul);
+      renderMeHead(scraps.length);
     });
   }
 

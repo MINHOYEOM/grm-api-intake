@@ -54,10 +54,11 @@
     }
   }
 
-  // ── 로그인 유도(이메일 → 6자리 OTP 코드) ────────────────────────────────
+  // ── 로그인 유도(이메일 → 인증 코드) ─────────────────────────────────────
   // 매직링크 대신 코드 입력: 메일 스캐너/클릭추적(Brevo sendibt3)이 링크를 선방문해 1회용
   // 토큰을 소모하는 문제를 우회한다(클릭할 링크 자체가 없음). Supabase 이메일 템플릿은
-  // {{ .Token }}(6자리 코드)만 담아야 하며 {{ .ConfirmationURL }} 링크는 제거해야 한다.
+  // {{ .Token }}(인증 코드)만 담아야 하며 {{ .ConfirmationURL }} 링크는 제거해야 한다.
+  // 코드 길이는 Supabase 설정을 따른다(6~8자리 등) — UI/verifyOtp 는 길이 비의존.
   var pop, pendingEmail = "";
   function openLogin(msg) {
     if (!pop) {
@@ -67,12 +68,12 @@
         '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="로그인">' +
         '<button type="button" class="grm-login-x" aria-label="닫기">×</button>' +
         '<h3>관심 카드를 모으려면 로그인하세요</h3>' +
-        '<p>이메일을 입력하면 6자리 로그인 코드를 보내드립니다. 비밀번호는 없습니다.</p>' +
+        '<p>이메일을 입력하면 로그인 인증 코드를 보내드립니다. 비밀번호는 없습니다.</p>' +
         '<form class="grm-login-form grm-login-email"><input type="email" required autocomplete="email" ' +
         'placeholder="you@company.com" aria-label="이메일" />' +
         '<button type="submit">코드 받기</button></form>' +
         '<form class="grm-login-form grm-login-code" style="display:none"><input type="text" inputmode="numeric" ' +
-        'pattern="[0-9]*" autocomplete="one-time-code" placeholder="메일로 받은 6자리 코드" aria-label="로그인 코드" />' +
+        'pattern="[0-9]*" autocomplete="one-time-code" placeholder="메일로 받은 인증 코드" aria-label="로그인 코드" />' +
         '<button type="submit">확인</button></form>' +
         '<p class="grm-login-msg" role="status" aria-live="polite"></p></div>';
       document.body.appendChild(pop);
@@ -90,7 +91,7 @@
           if (res && res.error) { m.textContent = "전송 실패: " + res.error.message; return; }
           pendingEmail = email;
           emailForm.style.display = "none"; codeForm.style.display = "flex";
-          m.textContent = "메일로 받은 6자리 코드를 입력하세요. (안 보이면 스팸함도 확인)";
+          m.textContent = "메일로 받은 인증 코드를 입력하세요. (안 보이면 스팸함도 확인)";
           var ci = codeForm.querySelector("input"); if (ci) setTimeout(function () { ci.focus(); }, 30);
         }).catch(function () { m.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
       });
@@ -107,6 +108,12 @@
         }).catch(function () { m.textContent = "확인에 실패했습니다. 다시 시도해 주세요."; });
       });
     }
+    // 매 호출마다 이메일 단계로 초기화 — 로그아웃 후 재로그인 시 옛 코드/단계 잔존 방지.
+    var ef = pop.querySelector(".grm-login-email");
+    var cf = pop.querySelector(".grm-login-code");
+    if (ef) ef.style.display = "flex";
+    if (cf) { cf.style.display = "none"; var cin = cf.querySelector("input"); if (cin) cin.value = ""; }
+    pendingEmail = "";
     var msgEl = pop.querySelector(".grm-login-msg");
     if (msgEl) msgEl.textContent = msg || "";
     pop.classList.add("show");

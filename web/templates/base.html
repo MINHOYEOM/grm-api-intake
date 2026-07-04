@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="{{ rel_root }}assets/grm.css?v={{ css_ver }}">
+<link rel="stylesheet" href="/assets/grm.css?v={{ css_ver }}">
 {% if json_ld %}
 <script type="application/ld+json">{{ json_ld | safe }}</script>
 {% endif %}
@@ -284,7 +284,7 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 {% if reactions_enabled %}
 {# 웹 카드 반응 계층 S1(하트·스크랩·회원) — env-gated(SUPABASE_URL/ANON_KEY 설정 시에만 출력·미설정이면 전 페이지 골든 byte-diff 0, 뉴스레터 form_action 선례 동형). 브라우저가 supabase-js 로 Supabase 직접 호출(뉴스레터 Brevo 직접 POST 선례 동형)·RLS 로 본인 반응만. anon key 는 publishable(RLS 보호)이라 data-속성 주입 안전. reactions.js 는 비골든(런타임 카운트/상태 주입→콘텐츠 골든/결정론 불침범). progressive enhancement: 로드/로그인/네트워크 실패해도 정적 카드 열람·공유(S0) 무영향. grm.css 무편집(프리즈) 위해 스코프 스타일 인라인. §4 한글안전: letter-spacing/text-transform/class=mono 미사용. #}
-<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
+<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-index="/assets/search-index.json" hidden></div>
 <style>
 .grm-ca-react{display:none;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
 body.grm-reactions-on .grm-ca-react{display:inline-flex}
@@ -377,7 +377,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-my-cta:hover{background:var(--coral-2,#A14B30)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="{{ rel_root }}assets/reactions.js?v={{ reactionsjs_ver }}" defer></script>
+<script src="/assets/reactions.js?v={{ reactionsjs_ver }}" defer></script>
 {% endif %}
 </body>
 </html>

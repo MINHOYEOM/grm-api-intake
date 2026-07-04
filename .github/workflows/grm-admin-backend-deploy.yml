@@ -60,7 +60,7 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: supabase/setup-cli@v3
+      - uses: supabase/setup-cli@v2.1.1
         if: steps.ref.outputs.ready == 'true'
 
       - name: Link Supabase project

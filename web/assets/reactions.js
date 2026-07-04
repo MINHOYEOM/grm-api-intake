@@ -17,8 +17,10 @@
 
   var rows = Array.prototype.slice.call(
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
-  if (!rows.length) return;
+  var myScrapsEl = document.getElementById("grm-my-scraps");   // /me 페이지 컨테이너(있으면 마이페이지)
+  if (!rows.length && !myScrapsEl) return;
   var ids = rows.map(function (r) { return r.getAttribute("data-anchor"); }).filter(Boolean);
+  var cfgRoot = cfg.getAttribute("data-root") || "";
   var session = null;
 
   function reactBtns(row) {
@@ -40,6 +42,11 @@
     var el = ensureAuthEl(); if (!el) return;
     el.innerHTML = "";
     if (session && session.user) {
+      var meLink = document.createElement("a");
+      meLink.href = cfgRoot + "me/index.html";
+      meLink.className = "grm-my-link";
+      meLink.textContent = "내 스크랩";
+      el.appendChild(meLink);
       var who = document.createElement("span");
       who.textContent = session.user.email || "회원";
       var out = document.createElement("button");
@@ -187,6 +194,68 @@
     op.then(function (res) { if (res && res.error) rollback(); }).catch(rollback);
   }
 
+  // ── /me 페이지: 내 스크랩 목록(호를 넘나들며) ─────────────────────────────
+  // Supabase 스크랩 card_id + search-index.json(card_id→제목·기관·링크)로 목록을 런타임 렌더.
+  // provenance: 제목·링크는 우리 인덱스에서만, Supabase 엔 불투명 card_id 만.
+  function renderMyScraps() {
+    if (!myScrapsEl) return;
+    if (!session || !session.user) {
+      myScrapsEl.innerHTML = '<p class="grm-my-note">로그인하면 스크랩한 카드를 모아볼 수 있어요.</p>';
+      var lb = document.createElement("button");
+      lb.type = "button"; lb.className = "grm-my-login"; lb.textContent = "로그인";
+      lb.addEventListener("click", function () { openLogin(); });
+      myScrapsEl.appendChild(lb);
+      return;
+    }
+    myScrapsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    var idxUrl = myScrapsEl.getAttribute("data-index") || "assets/search-index.json";
+    Promise.all([
+      sb.from("reaction").select("card_id,created_at").eq("kind", "scrap"),
+      fetch(idxUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (out) {
+      var res = out[0], idx = out[1];
+      if (res && res.error) { myScrapsEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>'; return; }
+      var scraps = (res && res.data) ? res.data.slice() : [];
+      if (!scraps.length) { myScrapsEl.innerHTML = '<p class="grm-my-note">아직 스크랩한 카드가 없어요. 카드의 스크랩 버튼을 눌러 저장해 보세요.</p>'; return; }
+      scraps.sort(function (a, c) { return (c.created_at || "").localeCompare(a.created_at || ""); });
+      var byAnchor = {};
+      if (idx && idx.cards) {
+        idx.cards.forEach(function (e) {
+          var h = e.href || "", i = h.indexOf("#");
+          if (i >= 0) byAnchor[h.slice(i + 1)] = e;
+        });
+      }
+      var ul = document.createElement("ul"); ul.className = "grm-my-list";
+      scraps.forEach(function (sc) {
+        var e = byAnchor[sc.card_id], li = document.createElement("li");
+        li.className = "grm-my-item";
+        if (e) {
+          var a = document.createElement("a"); a.className = "grm-my-a"; a.href = e.href;
+          a.textContent = (e.target || "") + (e.issue ? (" — " + e.issue) : "") || "카드 보기";
+          var meta = document.createElement("span"); meta.className = "grm-my-meta";
+          meta.textContent = [e.agency, e.date].filter(Boolean).join(" · ");
+          li.appendChild(a); li.appendChild(meta);
+        } else {
+          var sp = document.createElement("span"); sp.className = "grm-my-meta";
+          sp.textContent = "저장된 카드 (원문을 찾지 못함)";
+          li.appendChild(sp);
+        }
+        var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = "스크랩 해제";
+        rm.addEventListener("click", function () {
+          rm.disabled = true;
+          sb.from("reaction").delete().match({ user_id: session.user.id, card_id: sc.card_id, kind: "scrap" })
+            .then(function (d) {
+              if (d && d.error) { rm.disabled = false; return; }
+              if (li.parentNode) li.parentNode.removeChild(li);
+              if (!ul.children.length) renderMyScraps();
+            }).catch(function () { rm.disabled = false; });
+        });
+        li.appendChild(rm); ul.appendChild(li);
+      });
+      myScrapsEl.innerHTML = ""; myScrapsEl.appendChild(ul);
+    });
+  }
+
   // ── 배선 ─────────────────────────────────────────────────────────────────
   document.body.classList.add("grm-reactions-on");
   rows.forEach(function (row) {
@@ -196,11 +265,11 @@
   });
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
-    renderAuth(); loadMine();
-  }).catch(function () { renderAuth(); });
+    renderAuth(); loadMine(); renderMyScraps();
+  }).catch(function () { renderAuth(); renderMyScraps(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
-    session = s; renderAuth(); loadMine();
+    session = s; renderAuth(); loadMine(); renderMyScraps();
     if (s && s.user) closeLogin();
   });
-  loadCounts();
+  if (rows.length) loadCounts();
 })();

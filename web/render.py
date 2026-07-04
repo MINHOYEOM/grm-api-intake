@@ -730,6 +730,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write_json(dist_assets / "search-index.json", search_index)
     written.append("assets/search-index.json")
 
+    # 내 스크랩(마이페이지) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
+    # 로그인 게이트·개인화라 sitemap/canonical 제외(비색인). 목록은 런타임에 reactions.js 가
+    # Supabase 스크랩 + search-index.json 으로 렌더(정적 셸·콘텐츠 골든 불침범).
+    if env.globals.get("reactions_enabled"):
+        me_html = env.get_template("me.html").render(
+            page_title="내 스크랩 · GRM",
+            rel_root="../",
+            nav_active="board",
+            latest_slug=latest_slug,
+        )
+        _write(out_dir / "me" / "index.html", me_html)
+        written.append("me/index.html")
+
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
     for b in briefs:

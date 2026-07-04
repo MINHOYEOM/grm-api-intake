@@ -300,10 +300,27 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-login-card{position:relative;background:var(--canvas,#fff);max-width:360px;width:100%;border-radius:14px;padding:22px 20px;box-shadow:0 20px 50px -18px rgba(0,0,0,.5)}
 .grm-login-card h3{font-family:var(--serif);font-size:17px;margin:0 0 6px}
 .grm-login-card p{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 12px}
-.grm-login-form{display:flex;gap:8px}
-.grm-login-form input{flex:1;min-width:0;font-family:var(--sans);font-size:14px;padding:9px 11px;border:1px solid var(--line-2,rgba(26,24,21,.18));border-radius:var(--rad-s,8px)}
-.grm-login-form button{font-family:var(--sans);font-size:13px;white-space:nowrap;color:#fff;background:var(--coral,#B9542F);border:0;border-radius:var(--rad-s,8px);padding:9px 13px;cursor:pointer}
+.grm-login-form{display:flex;flex-direction:column;gap:8px}
+.grm-login-form input{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:14px;padding:9px 11px;border:1px solid var(--line-2,rgba(26,24,21,.18));border-radius:var(--rad-s,8px)}
+.grm-login-form button{width:100%;font-family:var(--sans);font-size:14px;white-space:nowrap;color:#fff;background:var(--coral,#B9542F);border:0;border-radius:var(--rad-s,8px);padding:10px 13px;cursor:pointer}
 .grm-login-x{position:absolute;top:8px;right:10px;font-size:20px;line-height:1;color:var(--muted);background:transparent;border:0;cursor:pointer}
+.grm-login-alt{display:flex;justify-content:space-between;gap:10px;margin-top:12px}
+.grm-login-link{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.grm-login-brand{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.grm-login-brand svg{width:24px;height:24px;flex:none}
+.grm-login-brand span{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--muted)}
+.grm-pw-wrap{position:relative;display:flex;width:100%}
+.grm-pw-wrap input{padding-right:42px}
+.grm-login-form .grm-pw-toggle{position:absolute;right:4px;top:0;height:100%;width:34px;display:flex;align-items:center;justify-content:center;color:var(--muted);background:transparent;border:0;border-radius:0;padding:0;cursor:pointer}
+.grm-login-form .grm-pw-toggle:hover{color:var(--ink,#141413)}
+.grm-login-form button.grm-login-primary{background:var(--coral,#C2603F);transition:background .15s ease}
+.grm-login-form button.grm-login-primary:hover{background:var(--coral-2,#A14B30)}
+.grm-login-primary.is-busy{opacity:.7;cursor:default}
+.grm-login-hint{margin:8px 0 0;font-size:12px;color:var(--coral-2,#A14B30)}
+.grm-login-resend{margin-top:8px;font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.grm-login-resend[disabled]{opacity:.55;cursor:default;text-decoration:none}
+.grm-login-note{margin-top:12px;font-size:11px;line-height:1.5;color:var(--muted)}
+.grm-auth-who{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .grm-login-msg{margin-top:10px;font-size:12px}
 #grm-me{padding:40px 0 60px}
 .grm-my-h{font-family:var(--serif);font-size:26px;margin:0 0 6px}

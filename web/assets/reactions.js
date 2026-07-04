@@ -54,8 +54,11 @@
     }
   }
 
-  // ── 매직링크 로그인 유도 ──────────────────────────────────────────────────
-  var pop;
+  // ── 로그인 유도(이메일 → 6자리 OTP 코드) ────────────────────────────────
+  // 매직링크 대신 코드 입력: 메일 스캐너/클릭추적(Brevo sendibt3)이 링크를 선방문해 1회용
+  // 토큰을 소모하는 문제를 우회한다(클릭할 링크 자체가 없음). Supabase 이메일 템플릿은
+  // {{ .Token }}(6자리 코드)만 담아야 하며 {{ .ConfirmationURL }} 링크는 제거해야 한다.
+  var pop, pendingEmail = "";
   function openLogin(msg) {
     if (!pop) {
       pop = document.createElement("div");
@@ -64,34 +67,50 @@
         '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="로그인">' +
         '<button type="button" class="grm-login-x" aria-label="닫기">×</button>' +
         '<h3>관심 카드를 모으려면 로그인하세요</h3>' +
-        '<p>이메일을 입력하면 로그인 링크를 보내드립니다. 비밀번호는 없습니다.</p>' +
-        '<form class="grm-login-form"><input type="email" required autocomplete="email" ' +
+        '<p>이메일을 입력하면 6자리 로그인 코드를 보내드립니다. 비밀번호는 없습니다.</p>' +
+        '<form class="grm-login-form grm-login-email"><input type="email" required autocomplete="email" ' +
         'placeholder="you@company.com" aria-label="이메일" />' +
-        '<button type="submit">로그인 링크 받기</button></form>' +
+        '<button type="submit">코드 받기</button></form>' +
+        '<form class="grm-login-form grm-login-code" style="display:none"><input type="text" inputmode="numeric" ' +
+        'pattern="[0-9]*" autocomplete="one-time-code" placeholder="메일로 받은 6자리 코드" aria-label="로그인 코드" />' +
+        '<button type="submit">확인</button></form>' +
         '<p class="grm-login-msg" role="status" aria-live="polite"></p></div>';
       document.body.appendChild(pop);
+      var emailForm = pop.querySelector(".grm-login-email");
+      var codeForm = pop.querySelector(".grm-login-code");
+      var m = pop.querySelector(".grm-login-msg");
       pop.querySelector(".grm-login-x").addEventListener("click", closeLogin);
       pop.addEventListener("click", function (e) { if (e.target === pop) closeLogin(); });
-      pop.querySelector(".grm-login-form").addEventListener("submit", function (e) {
+      emailForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        var input = pop.querySelector("input");
-        var m = pop.querySelector(".grm-login-msg");
-        var email = (input.value || "").trim();
+        var email = (emailForm.querySelector("input").value || "").trim();
         if (!email) return;
         m.textContent = "전송 중…";
-        sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.href } })
-          .then(function (res) {
-            m.textContent = (res && res.error)
-              ? ("전송 실패: " + res.error.message)
-              : "확인 메일을 보냈습니다. 메일의 로그인 링크를 눌러 주세요.";
-          })
-          .catch(function () { m.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
+        sb.auth.signInWithOtp({ email: email }).then(function (res) {
+          if (res && res.error) { m.textContent = "전송 실패: " + res.error.message; return; }
+          pendingEmail = email;
+          emailForm.style.display = "none"; codeForm.style.display = "flex";
+          m.textContent = "메일로 받은 6자리 코드를 입력하세요. (안 보이면 스팸함도 확인)";
+          var ci = codeForm.querySelector("input"); if (ci) setTimeout(function () { ci.focus(); }, 30);
+        }).catch(function () { m.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
+      });
+      codeForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var token = (codeForm.querySelector("input").value || "").trim();
+        if (!token || !pendingEmail) return;
+        m.textContent = "확인 중…";
+        sb.auth.verifyOtp({ email: pendingEmail, token: token, type: "email" }).then(function (res) {
+          m.textContent = (res && res.error)
+            ? "코드가 올바르지 않거나 만료됐습니다. 다시 시도해 주세요."
+            : "로그인되었습니다.";
+          // 성공 시 onAuthStateChange 가 UI 갱신·closeLogin 처리.
+        }).catch(function () { m.textContent = "확인에 실패했습니다. 다시 시도해 주세요."; });
       });
     }
     var msgEl = pop.querySelector(".grm-login-msg");
     if (msgEl) msgEl.textContent = msg || "";
     pop.classList.add("show");
-    var i = pop.querySelector("input"); if (i) setTimeout(function () { i.focus(); }, 30);
+    var i = pop.querySelector(".grm-login-email input"); if (i) setTimeout(function () { i.focus(); }, 30);
   }
   function closeLogin() { if (pop) pop.classList.remove("show"); }
 

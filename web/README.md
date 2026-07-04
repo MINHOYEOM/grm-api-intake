@@ -16,7 +16,7 @@ web/
 ├─ render.py            # 빌더(순수): data/briefs/*.json → dist/
 ├─ linkcheck.py         # 배포단계 링크체크(P3·C1): link_check enrich. 네트워크는 여기만 — render.py 순수성 보존
 ├─ newsletter.py        # [T1.3] 뉴스레터 — 순수 티저 빌더 + 발송 게이트 + SaaS-무관 NewsletterSender + BrevoSender(Campaigns API) + CLI. 수집/배포와 별도(D8)
-├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief (Jinja2, autoescape on)
+├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief · me(내 스크랩·env-gated) (Jinja2, autoescape on)
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
 ├─ assets/grm.css       # 디자인 동결 CSS(v4 + P4 네비/모션/검색 UI). 손으로 편집 금지 — 디자인 변경은 프로토타입 갱신 후 반영
 ├─ assets/archive.js    # 아카이브 교차검색(P4·정적 클라이언트사이드). search-index.json fetch → facet/검색/토글. 비골든
@@ -182,6 +182,9 @@ python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱
   Supabase 소유(뉴스레터 원칙 정합). service_role 키 미배선(anon key 만·RLS 로 보호).
 - **사람 선행작업**: Supabase 프로젝트·URL/anon key repo Variables·Auth 매직링크+Redirect URL·`001_reaction.sql`
   실행. 상세 설계=`GRM_웹_S1_회원반응_Supabase_구현설계_2026-07-03.md`.
+- **내 스크랩 페이지(`/me`)**: 반응 활성 시에만 빌드되는 정적 셸(`templates/me.html`). 로그인 사용자의 스크랩
+  `card_id` 를 Supabase 에서 가져와 `search-index.json`(card_id→제목·기관·링크)으로 풀어 호를 넘나드는 목록을
+  런타임 렌더(reactions.js). sitemap/canonical 제외(비색인·개인화). 헤더 로그인 상태 옆 "내 스크랩" 링크(런타임).
 
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.

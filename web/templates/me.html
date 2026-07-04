@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="wrap" id="grm-me">
+  <h1 class="grm-my-h">내 스크랩</h1>
+  <p class="grm-my-sub">관심 있게 저장한 카드를 한곳에 모았습니다.</p>
+  <div id="grm-my-scraps" data-index="{{ rel_root }}assets/search-index.json">
+    <p class="grm-my-note">불러오는 중…</p>
+  </div>
+</main>
+{% endblock %}

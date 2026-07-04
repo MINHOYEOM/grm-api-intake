@@ -284,7 +284,7 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 {% if reactions_enabled %}
 {# 웹 카드 반응 계층 S1(하트·스크랩·회원) — env-gated(SUPABASE_URL/ANON_KEY 설정 시에만 출력·미설정이면 전 페이지 골든 byte-diff 0, 뉴스레터 form_action 선례 동형). 브라우저가 supabase-js 로 Supabase 직접 호출(뉴스레터 Brevo 직접 POST 선례 동형)·RLS 로 본인 반응만. anon key 는 publishable(RLS 보호)이라 data-속성 주입 안전. reactions.js 는 비골든(런타임 카운트/상태 주입→콘텐츠 골든/결정론 불침범). progressive enhancement: 로드/로그인/네트워크 실패해도 정적 카드 열람·공유(S0) 무영향. grm.css 무편집(프리즈) 위해 스코프 스타일 인라인. §4 한글안전: letter-spacing/text-transform/class=mono 미사용. #}
-<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
+<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
 <style>
 .grm-ca-react{display:none;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
 body.grm-reactions-on .grm-ca-react{display:inline-flex}
@@ -305,6 +305,20 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-login-form button{font-family:var(--sans);font-size:13px;white-space:nowrap;color:#fff;background:var(--coral,#B9542F);border:0;border-radius:var(--rad-s,8px);padding:9px 13px;cursor:pointer}
 .grm-login-x{position:absolute;top:8px;right:10px;font-size:20px;line-height:1;color:var(--muted);background:transparent;border:0;cursor:pointer}
 .grm-login-msg{margin-top:10px;font-size:12px}
+#grm-me{padding:40px 0 60px}
+.grm-my-h{font-family:var(--serif);font-size:26px;margin:0 0 6px}
+.grm-my-sub{font-family:var(--sans);color:var(--muted);margin:0 0 20px}
+.grm-my-note{font-family:var(--sans);color:var(--muted)}
+.grm-my-login{margin-top:12px;font-family:var(--sans);font-size:14px;color:#fff;background:var(--coral,#B9542F);border:0;border-radius:var(--rad-s,8px);padding:8px 14px;cursor:pointer}
+.grm-my-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.grm-my-item{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line-2,rgba(26,24,21,.12));border-radius:var(--rad-s,8px)}
+.grm-my-a{font-family:var(--serif);font-size:15px;color:var(--ink);text-decoration:none;flex:1;min-width:200px}
+.grm-my-a:hover{color:var(--coral,#B9542F)}
+.grm-my-meta{font-family:var(--sans);font-size:12px;color:var(--muted)}
+.grm-my-rm{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:4px 9px;cursor:pointer}
+.grm-my-rm:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-auth .grm-my-link{color:var(--muted);text-decoration:underline}
+.grm-auth .grm-my-link:hover{color:var(--coral,#B9542F)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="{{ rel_root }}assets/reactions.js?v={{ reactionsjs_ver }}" defer></script>

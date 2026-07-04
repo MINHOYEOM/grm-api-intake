@@ -16,11 +16,12 @@ web/
 ├─ render.py            # 빌더(순수): data/briefs/*.json → dist/
 ├─ linkcheck.py         # 배포단계 링크체크(P3·C1): link_check enrich. 네트워크는 여기만 — render.py 순수성 보존
 ├─ newsletter.py        # [T1.3] 뉴스레터 — 순수 티저 빌더 + 발송 게이트 + SaaS-무관 NewsletterSender + BrevoSender(Campaigns API) + CLI. 수집/배포와 별도(D8)
-├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief · me(내 스크랩·env-gated) (Jinja2, autoescape on)
+├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief · me(내 스크랩) · admin(운영 콘솔, env-gated)
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
 ├─ assets/grm.css       # 디자인 동결 CSS(v4 + P4 네비/모션/검색 UI). 손으로 편집 금지 — 디자인 변경은 프로토타입 갱신 후 반영
 ├─ assets/archive.js    # 아카이브 교차검색(P4·정적 클라이언트사이드). search-index.json fetch → facet/검색/토글. 비골든
 ├─ assets/reactions.js  # [S1] 카드 반응(하트·스크랩·회원) — supabase-js 로 Supabase 직접 호출·RLS. 매직링크 로그인·토글·공개 하트 집계·런타임 카운트/상태 주입(비골든·PE). env-gate(SUPABASE_URL/ANON_KEY) 시에만 로드
+├─ assets/admin.js      # [A1] Admin 운영 콘솔 런타임 — Admin 로그인·GitHub Actions 실행·Brevo 구독자·Supabase 회원/반응 관리
 ├─ data/briefs/*.json   # 입력(주차별 1파일). 현재 = 실 6/22. 규약 = data/briefs/README.md(C4)
 ├─ tests/
 │  ├─ test_render.py    # 골든·결정론·무변형·escape·순수성 + 검색인덱스(WebSearchIndexTest) + 구독폼(test_newsletter_form_conditional)
@@ -29,6 +30,8 @@ web/
 │  ├─ golden/           # 동결 기대 HTML + search-index*.expected.json (byte-diff)
 │  └─ fixtures/multi/   # 합성 2건(06-08 산문·번역 / 06-15 병합) — 멀티 골든용
 ├─ migrations/001_reaction.sql  # [S1] Supabase(Postgres) 반응 테이블+RLS+heart_counts 뷰. 사람 1회 실행(배포물 아님·render 미복사)
+├─ ../supabase/migrations/202607050001_admin_ops.sql  # [A1] Admin 권한·감사·뉴스레터 발송 로그 + 최초 Admin bootstrap
+├─ ../supabase/functions/admin-* # [A1] Admin Edge Functions(Supabase service role·GitHub Actions·Brevo)
 └─ dist/                # 빌드 산출(정적, assets/search-index.json 포함). git 비추적
 ```
 > 배포 Action = `.github/workflows/grm-web-deploy.yml`(루트 기준). 수집(`grm-intake.yml`)과
@@ -185,6 +188,23 @@ python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱
 - **내 스크랩 페이지(`/me`)**: 반응 활성 시에만 빌드되는 정적 셸(`templates/me.html`). 로그인 사용자의 스크랩
   `card_id` 를 Supabase 에서 가져와 `search-index.json`(card_id→제목·기관·링크)으로 풀어 호를 넘나드는 목록을
   런타임 렌더(reactions.js). sitemap/canonical 제외(비색인·개인화). 헤더 로그인 상태 옆 "내 스크랩" 링크(런타임).
+
+## Admin 운영 콘솔 (A1 — `/admin`, 단일 Admin)
+`SUPABASE_URL`·`SUPABASE_ANON_KEY` 가 설정된 프로덕션 빌드에서만 `/admin/index.html` 이 생성된다.
+robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `yeomminho1472@gmail.com` 단일 계정이다.
+
+- **접근 제어**: 브라우저는 Supabase Auth 로그인만 수행한다. 실제 권한은 DB `public.admin_user`
+  + `public.is_admin()` 에서 확인한다. `202607050001_admin_ops.sql` 은 해당 이메일의 Auth 사용자가 존재하거나
+  새로 생성될 때 자동으로 `Admin` 권한을 bootstrap 한다.
+- **기능**: 뉴스레터 실발송(`grm-newsletter-send.yml` `mode=send`), 웹 재배포, 수집 실행, 브리프 감사,
+  Brevo 구독자 조회/추가/리스트 제거, Supabase Auth 회원 조회/인증/차단/차단해제, 반응 인사이트, 감사 로그.
+- **백엔드**: `supabase/functions/admin-supabase`, `admin-github`, `admin-brevo`. 모든 함수는
+  `verify_jwt=false` 로 배포하되, 함수 내부에서 `Authorization: Bearer <Supabase session>` 을 검증하고
+  Admin 권한을 재확인한다. service role·GitHub PAT·Brevo API key 는 Edge Function secrets 로만 둔다.
+- **배포**: `.github/workflows/grm-admin-backend-deploy.yml` 이 DB migration, Edge Function secrets, function deploy 를
+  담당한다. 필요한 GitHub Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_GITHUB_ACTIONS_TOKEN`(Actions write 가능한 fine-grained PAT),
+  기존 `NEWSLETTER_API_KEY`. `SUPABASE_PROJECT_REF` 는 Secret/Variable 로 두거나 `vars.SUPABASE_URL` 에서 자동 파생된다.
 
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.

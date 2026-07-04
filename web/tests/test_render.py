@@ -39,6 +39,7 @@ __all__ = [
     "WebRenderDeterminismTest",
     "WebRenderPurityTest",
     "WebRenderHardeningTest",
+    "WebAdminRenderTest",
     "WebSearchIndexTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
@@ -750,6 +751,47 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.NEWSLETTER_FORM_ACTION = a0
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
+
+
+class WebAdminRenderTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_admin_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _render_site(self, pub: str = "2026-06-01") -> pathlib.Path:
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        (data / f"brief_web_{pub}.json").write_text(
+            json.dumps(_minimal_brief(pub), ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        return out
+
+    def test_admin_console_env_gated(self):
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        try:
+            render.SUPABASE_URL = ""
+            render.SUPABASE_ANON_KEY = ""
+            out_off = self._render_site("2026-06-01")
+            self.assertFalse((out_off / "admin" / "index.html").exists())
+            self.assertNotIn("Disallow: /admin/", (out_off / "robots.txt").read_text(encoding="utf-8"))
+
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out_on = self._render_site("2026-06-02")
+            admin = (out_on / "admin" / "index.html")
+            self.assertTrue(admin.exists(), "Supabase env 설정 시 /admin/index.html 이 생성돼야 함")
+            h = admin.read_text(encoding="utf-8")
+            robots = (out_on / "robots.txt").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+
+        self.assertIn('id="grm-admin-cfg"', h)
+        self.assertIn('data-admin-email="yeomminho1472@gmail.com"', h)
+        self.assertIn('data-supabase-url="https://rfwixqqdljpmtjdlblct.supabase.co"', h)
+        self.assertIn('/assets/admin.js?v=', h)
+        self.assertIn('Disallow: /admin/', robots)
 
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────

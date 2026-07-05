@@ -75,24 +75,45 @@
 .admin-metric b.ok{color:var(--coral-2)}.admin-metric b.warn{color:var(--med)}.admin-metric b.bad{color:var(--hi)}
 .admin-monitor-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(310px,.65fr);gap:14px;align-items:start}
 .admin-monitor-section h3{font-size:14px;color:var(--ink);font-weight:700;margin-bottom:9px}
-.admin-workflow-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.admin-workflow-card{display:grid;gap:10px;border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 14px;min-width:0}
-.admin-workflow-card.bad{border-color:rgba(189,75,54,.32);background:rgba(189,75,54,.06)}
-.admin-workflow-card.warn{border-color:rgba(176,125,23,.28)}
-.admin-workflow-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.admin-workflow-top b{color:var(--ink);font-size:14px}
-.admin-workflow-card p{color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:5px}
-.admin-workflow-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.admin-workflow-facts{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:9px}
-.admin-workflow-facts div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;font-size:12.2px;line-height:1.35}
-.admin-workflow-facts dt{color:var(--muted)}
+.admin-section-sub{color:var(--muted);font-size:12.4px;line-height:1.45;margin:-4px 0 10px}
+.admin-workflow-pipeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:8px;margin-bottom:12px}
+.admin-pipeline-step{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:10px;min-width:0}
+.admin-pipeline-step.ok{border-color:rgba(194,96,63,.24)}
+.admin-pipeline-step.warn{border-color:rgba(176,125,23,.28);background:rgba(176,125,23,.05)}
+.admin-pipeline-step.bad{border-color:rgba(189,75,54,.34);background:rgba(189,75,54,.06)}
+.admin-pipeline-step span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11.8px;line-height:1.3}
+.admin-pipeline-step b{display:block;color:var(--ink);font-size:13px;margin:5px 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-pipeline-step em{font-style:normal;color:var(--body);font-size:11.8px;line-height:1.35}
+.admin-workflow-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.admin-workflow-card{display:grid;border:1px solid var(--line);border-left:4px solid var(--coral);background:var(--canvas);border-radius:var(--rad-s);padding:0;min-width:0;overflow:hidden}
+.admin-workflow-card.bad{border-color:rgba(189,75,54,.34);border-left-color:var(--hi);background:rgba(189,75,54,.04)}
+.admin-workflow-card.warn{border-color:rgba(176,125,23,.3);border-left-color:var(--med);background:rgba(176,125,23,.04)}
+.admin-workflow-main{display:grid;gap:11px;padding:14px 15px}
+.admin-workflow-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.admin-workflow-identity{display:flex;align-items:flex-start;gap:10px;min-width:0}
+.admin-workflow-index{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:var(--rad-s);background:var(--soft);color:var(--coral-2);font-size:12px;font-weight:750;flex:0 0 auto}
+.admin-workflow-top b{display:block;color:var(--ink);font-size:15px;line-height:1.25}
+.admin-workflow-stage{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11.8px;margin-bottom:3px}
+.admin-workflow-card p{color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:4px}
+.admin-workflow-readout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.admin-workflow-note{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:9px 10px;color:var(--body);font-size:12.4px;line-height:1.45}
+.admin-workflow-note span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11.7px;margin-bottom:3px}
+.admin-workflow-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.admin-workflow-facts div{min-width:0;border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:8px 9px;font-size:12px;line-height:1.35}
+.admin-workflow-facts dt{color:var(--muted);margin-bottom:3px}
 .admin-workflow-facts dd{color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.admin-next-action{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:8px 9px;color:var(--body);font-size:12.4px;line-height:1.4}
+.admin-workflow-run{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12.2px;line-height:1.4;min-width:0}
+.admin-workflow-run span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-next-action{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:9px 10px;color:var(--body);font-size:12.6px;line-height:1.45}
 .admin-next-action.ok{color:var(--coral-2)}
 .admin-next-action.warn{border-color:rgba(176,125,23,.28);color:var(--med)}
 .admin-next-action.bad{border-color:rgba(189,75,54,.32);color:var(--hi)}
+.admin-workflow-alerts{display:grid;gap:6px}
+.admin-workflow-alert{border:1px solid rgba(176,125,23,.25);background:rgba(176,125,23,.06);border-radius:var(--rad-s);padding:7px 8px;color:var(--med);font-size:12px;line-height:1.4}
 .admin-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.admin-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.admin-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.admin-mini.primary{background:var(--ink);border-color:var(--ink);color:var(--canvas);text-decoration:none}
+.admin-mini.primary:hover{background:var(--coral-2);border-color:var(--coral-2);color:var(--canvas)}
 .admin-incidents{display:grid;gap:9px}
 .admin-incident{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:12px 13px}
 .admin-incident.bad{border-color:rgba(189,75,54,.32);background:rgba(189,75,54,.06)}
@@ -144,8 +165,9 @@ html:not(.grm-icons-ready) #grm-admin .ti::before{content:"";font-family:inherit
 html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-family:system-ui,sans-serif}
 .nav #navmenu,.nav .navtoggle,.nav .btn.coral{display:none!important}
 .site,#grm-mascot{display:none}
-@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid,.admin-workflow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-monitor-layout,.admin-split,.admin-insight{grid-template-columns:1fr}}
+@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-monitor-layout,.admin-split,.admin-insight{grid-template-columns:1fr}}
 @media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.admin-workflow-readout,.admin-workflow-facts{grid-template-columns:1fr}.admin-workflow-top{display:grid}.admin-workflow-run span{white-space:normal}}
 @media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-kpis,.admin-actions-grid,.admin-ops-guide,.admin-ops-summary,.admin-workflow-grid{grid-template-columns:1fr}.admin-ops-brief{display:grid}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn{width:100%;justify-content:center}}
 </style>
 
@@ -269,6 +291,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           <div class="admin-monitor-layout">
             <div class="admin-monitor-section">
               <h3>핵심 워크플로우</h3>
+              <p class="admin-section-sub">새 규제 소식이 수집되어 검증, 배포, 발송까지 이어지는 운영 흐름입니다.</p>
+              <div class="admin-workflow-pipeline" id="grm-workflow-pipeline"><div class="admin-empty">불러오는 중</div></div>
               <div class="admin-workflow-grid" id="grm-workflow-cards"><div class="admin-empty">불러오는 중</div></div>
             </div>
             <div class="admin-monitor-section">

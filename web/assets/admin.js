@@ -159,8 +159,10 @@
     var backendLabel = probe.error === "function_not_deployed" ? "미배포" : "확인 필요";
     var backendKind = probe.error === "function_not_deployed" ? "bad" : "warn";
     host.innerHTML = '<h3>운영 API 활성화 요건</h3><div class="admin-activation-grid">' +
-      '<div class="admin-check"><span>GitHub Secrets<br><code>SUPABASE_ACCESS_TOKEN · SUPABASE_DB_PASSWORD · SUPABASE_SERVICE_ROLE_KEY · ADMIN_GITHUB_ACTIONS_TOKEN</code></span>' +
+      '<div class="admin-check"><span>남은 Supabase Secrets<br><code>SUPABASE_ACCESS_TOKEN · SUPABASE_DB_PASSWORD · SUPABASE_SERVICE_ROLE_KEY</code></span>' +
       badge("필요", "bad") + "</div>" +
+      '<div class="admin-check"><span>GitHub Dispatch Token<br><code>ADMIN_GITHUB_ACTIONS_TOKEN</code></span>' +
+      badge("설정됨", "ok") + "</div>" +
       '<div class="admin-check"><span>Backend Deploy<br><code><a href="' + deployUrl + '" target="_blank" rel="noopener">GRM Admin Backend Deploy</a></code></span>' +
       badge(backendLabel, backendKind) + "</div>" +
       '<div class="admin-check"><span>Admin Email<br><code>' + esc(adminEmail) + '</code></span>' +
@@ -229,7 +231,7 @@
     if (probe.ok) return true;
     var message = probe.detail === "확인 중"
       ? "운영 API 상태 확인 중입니다. 잠시 후 다시 시도하세요."
-      : "운영 API가 아직 활성화되지 않았습니다. GitHub Secrets 4개를 등록하고 GRM Admin Backend Deploy를 실행한 뒤 다시 시도하세요.";
+      : "운영 API가 아직 활성화되지 않았습니다. 남은 Supabase Secrets 3개를 등록하고 GRM Admin Backend Deploy를 실행한 뒤 다시 시도하세요.";
     setStatus(byId("grm-admin-login-status"), message, "err");
     renderActivationPanel();
     return false;

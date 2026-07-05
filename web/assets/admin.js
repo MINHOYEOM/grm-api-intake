@@ -595,10 +595,14 @@
         '<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button></div></div>');
     });
     warnings.slice(0, 4).forEach(function (issue) {
+      var detail = issue.detail || "";
+      var meta = [issue.title || "", fmtDate(issue.updated_at)].filter(Boolean).join(" · ");
+      var actions = [link(issue.html_url, "Issue 열기")];
+      if (issue.latest_run_url) actions.push(link(issue.latest_run_url, "최신 Run"));
       parts.push('<div class="admin-incident"><div class="admin-incident-head"><b>운영 경고 Issue #' +
-        esc(issue.number || "-") + "</b>" + badge("open", "warn") + '</div><p>' + esc(issue.title || "") +
-        " · " + esc(fmtDate(issue.updated_at)) + '</p><div class="admin-card-actions">' +
-        link(issue.html_url, "Issue 열기") + "</div></div>");
+        esc(issue.number || "-") + "</b>" + badge("open", "warn") + '</div><p>' + esc(meta) +
+        '</p>' + (detail ? '<p>' + esc(detail) + "</p>" : "") +
+        '<div class="admin-card-actions">' + actions.join("") + "</div></div>");
     });
     host.innerHTML = parts.join("");
   }

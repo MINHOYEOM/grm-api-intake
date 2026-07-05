@@ -491,7 +491,7 @@
     var items = [
       ["규제소스", summary.source_status || "-", sourceOk ? "ok" : "bad", "ti-database-import"],
       ["진행 중", number(summary.in_progress || 0), summary.in_progress ? "warn" : "ok", "ti-loader-2"],
-      ["실패 Run", number(summary.incidents || 0), summary.incidents ? "bad" : "ok", "ti-alert-triangle"],
+      ["현재 실패", number(summary.incidents || 0), summary.incidents ? "bad" : "ok", "ti-alert-triangle"],
       ["운영 경고", number(warningTotal || 0), warningTotal ? "warn" : "ok", "ti-message-report"]
     ];
     host.innerHTML = items.map(function (item) {

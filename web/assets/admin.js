@@ -58,7 +58,7 @@
     missing_auth: "로그인이 필요합니다.",
     invalid_session: "세션이 만료되었습니다. 다시 로그인해 주세요.",
     forbidden: "Admin 권한이 없습니다.",
-    server_not_configured: "Supabase service role 설정이 필요합니다.",
+    server_not_configured: "Admin Edge Function service role 설정을 확인해야 합니다.",
     github_not_configured: "GitHub Actions 토큰 설정이 필요합니다.",
     brevo_not_configured: "Brevo API 키 설정이 필요합니다.",
     brevo_list_not_configured: "Brevo 리스트 ID 설정이 필요합니다.",
@@ -159,10 +159,10 @@
     var backendLabel = probe.error === "function_not_deployed" ? "미배포" : "확인 필요";
     var backendKind = probe.error === "function_not_deployed" ? "bad" : "warn";
     host.innerHTML = '<h3>운영 API 활성화 요건</h3><div class="admin-activation-grid">' +
-      '<div class="admin-check"><span>남은 Supabase Secrets<br><code>SUPABASE_ACCESS_TOKEN · SUPABASE_DB_PASSWORD · SUPABASE_SERVICE_ROLE_KEY</code></span>' +
-      badge("필요", "bad") + "</div>" +
-      '<div class="admin-check"><span>GitHub Dispatch Token<br><code>ADMIN_GITHUB_ACTIONS_TOKEN</code></span>' +
-      badge("설정됨", "ok") + "</div>" +
+      '<div class="admin-check"><span>Edge Function Secrets<br><code>SUPABASE_SERVICE_ROLE_KEY · GITHUB_ACTIONS_TOKEN · NEWSLETTER_API_KEY</code></span>' +
+      badge("점검", "warn") + "</div>" +
+      '<div class="admin-check"><span>Newsletter List<br><code>GRM_NEWSLETTER_LIST_ID</code></span>' +
+      badge("점검", "warn") + "</div>" +
       '<div class="admin-check"><span>Backend Deploy<br><code><a href="' + deployUrl + '" target="_blank" rel="noopener">GRM Admin Backend Deploy</a></code></span>' +
       badge(backendLabel, backendKind) + "</div>" +
       '<div class="admin-check"><span>Admin Email<br><code>' + esc(adminEmail) + '</code></span>' +
@@ -231,7 +231,7 @@
     if (probe.ok) return true;
     var message = probe.detail === "확인 중"
       ? "운영 API 상태 확인 중입니다. 잠시 후 다시 시도하세요."
-      : "운영 API가 아직 활성화되지 않았습니다. 남은 Supabase Secrets 3개를 등록하고 GRM Admin Backend Deploy를 실행한 뒤 다시 시도하세요.";
+      : "운영 API가 아직 활성화되지 않았습니다. Admin Backend Deploy와 Edge Function secrets 상태를 확인한 뒤 다시 시도하세요.";
     setStatus(byId("grm-admin-login-status"), message, "err");
     renderActivationPanel();
     return false;

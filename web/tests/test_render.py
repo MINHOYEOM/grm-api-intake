@@ -813,6 +813,7 @@ class WebAdminRenderTest(unittest.TestCase):
         self.assertIn("구독자 전체에게 최신 뉴스레터", admin_js)
         self.assertIn("Brevo 리스트에서 제거", admin_js)
         self.assertIn("복구 전까지 로그인할 수 없습니다", admin_js)
+        self.assertIn("현재 실패", admin_js)
         self.assertIn("<th>요청</th><th>실행</th>", h)
         self.assertIn('/assets/admin.js?v=', h)
         self.assertIn('Disallow: /admin/', robots)

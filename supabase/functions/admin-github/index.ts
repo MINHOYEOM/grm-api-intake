@@ -15,6 +15,7 @@ type WorkflowDef = {
   group: string;
   manual?: boolean;
   inputs?: Record<string, string | boolean>;
+  events?: string[];
 };
 
 type WorkflowRun = {
@@ -92,6 +93,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "매일 03:17 KST 자동 실행",
       group: "source",
       inputs: {},
+      events: ["schedule", "workflow_dispatch"],
     },
     brief_audit: {
       label: "브리프 감사",
@@ -100,6 +102,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "매주 월 11:00 KST 자동 실행",
       group: "quality",
       inputs: {},
+      events: ["schedule", "workflow_dispatch"],
     },
     web_deploy: {
       label: "웹 배포",
@@ -108,6 +111,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "web/** 변경 시 자동 실행",
       group: "publish",
       inputs: {},
+      events: ["push", "pull_request", "workflow_dispatch"],
     },
     newsletter_send: {
       label: "뉴스레터 실발송",
@@ -116,6 +120,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "Admin 수동 승인 실행",
       group: "newsletter",
       inputs: { publish_date: publishDate, mode: "send" },
+      events: ["schedule", "workflow_dispatch"],
     },
     ci: {
       label: "CI 테스트",
@@ -124,6 +129,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "push / pull_request 자동 실행",
       group: "quality",
       manual: false,
+      events: ["push", "pull_request"],
     },
     admin_backend: {
       label: "Admin 백엔드 배포",
@@ -132,6 +138,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "Admin 백엔드 변경 시 자동 실행",
       group: "admin",
       inputs: {},
+      events: ["push", "workflow_dispatch"],
     },
     keepalive: {
       label: "Supabase Keepalive",
@@ -140,6 +147,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       schedule: "정기 자동 실행",
       group: "infra",
       manual: false,
+      events: ["schedule", "workflow_dispatch"],
     },
   };
 }
@@ -203,6 +211,7 @@ async function listRuns() {
     if (!res.ok) continue;
     const runs = (res.payload as Record<string, unknown>).workflow_runs as Array<Record<string, unknown>> | undefined;
     for (const run of runs || []) {
+      const relevant = runMatchesWorkflowDef(def, run);
       out.push({
         action,
         group: def.group,
@@ -210,6 +219,7 @@ async function listRuns() {
         workflow_name: def.label,
         purpose: def.purpose,
         schedule: def.schedule,
+        relevant,
         id: run.id,
         run_number: run.run_number,
         display_title: run.display_title,
@@ -235,6 +245,11 @@ function runKind(run: Record<string, unknown> | WorkflowRun | null | undefined):
   if (run.conclusion === "success") return "ok";
   if (["cancelled", "skipped", "neutral"].includes(String(run.conclusion || ""))) return "warn";
   return "bad";
+}
+
+function runMatchesWorkflowDef(def: WorkflowDef, run: WorkflowRun | Record<string, unknown>): boolean {
+  const event = String(run.event || "");
+  return !def.events || !event || def.events.includes(event);
 }
 
 function stepSnapshot(step: NonNullable<WorkflowJob["steps"]>[number]): WorkflowStepSnapshot {
@@ -339,6 +354,7 @@ async function opsOverview() {
   const latestByWorkflow: Record<string, Record<string, unknown>> = {};
   for (const run of runs) {
     const workflow = String(run.workflow_id || "");
+    if (run.relevant === false) continue;
     if (workflow && !latestByWorkflow[workflow]) latestByWorkflow[workflow] = run;
   }
 
@@ -372,8 +388,9 @@ async function opsOverview() {
     });
   }
 
-  const incidents = runs
-    .filter((run) => runKind(run) === "bad")
+  const incidents = workflows
+    .map((workflow) => workflow.latest as Record<string, unknown> | null)
+    .filter((run): run is Record<string, unknown> => !!run && runKind(run) === "bad")
     .slice(0, 6);
   for (const incident of incidents.slice(0, 4)) {
     incident.failed_jobs = incident.id ? await jobsForRun(String(incident.id)) : [];

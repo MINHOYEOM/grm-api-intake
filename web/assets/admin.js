@@ -674,6 +674,16 @@
     }).join("");
   }
 
+  function confirmDispatch(action, publishDate) {
+    if (action === "newsletter_send") {
+      return window.confirm("구독자 전체에게 최신 뉴스레터" + (publishDate ? " (" + publishDate + ")" : "") + "를 실제 발송합니다. 계속할까요?");
+    }
+    if (action === "web_deploy") return window.confirm("현재 main 기준으로 웹 재배포 워크플로우를 실행할까요?");
+    if (action === "intake_run") return window.confirm("규제 소스 수집 워크플로우를 수동 실행할까요?");
+    if (action === "brief_audit") return window.confirm("발행본 provenance 감사 워크플로우를 실행할까요?");
+    return true;
+  }
+
   function dispatch(action, button) {
     var payload = { action: action };
     if (action === "newsletter_send") {
@@ -683,6 +693,7 @@
       }
       payload.publish_date = state.latest.date;
     }
+    if (!confirmDispatch(action, payload.publish_date)) return;
     if (button) button.disabled = true;
     setStatus(byId("grm-ops-status"), "워크플로우 실행 요청 중", "");
     return api("admin-github", { method: "POST", json: payload }).then(function (data) {
@@ -714,6 +725,7 @@
   }
 
   function subscriberAction(action, email) {
+    if (action === "remove_from_list" && !window.confirm("이 구독자를 Brevo 리스트에서 제거할까요? " + (email || ""))) return Promise.resolve();
     setStatus(byId("grm-subscribers-status"), "구독자 정보를 갱신하는 중", "");
     return api("admin-brevo", { method: "POST", json: { action: action, email: email } }).then(function () {
       toast("구독자 정보를 갱신했습니다.");
@@ -722,6 +734,9 @@
     }).catch(function (error) { setStatus(byId("grm-subscribers-status"), errText(error), "err"); });
   }
   function userAction(action, userId) {
+    if (action === "confirm_user" && !window.confirm("이 회원의 이메일 인증 상태를 관리자가 인증 완료로 변경할까요?")) return Promise.resolve();
+    if (action === "ban_user" && !window.confirm("이 회원을 즉시 차단할까요? 복구 전까지 로그인할 수 없습니다.")) return Promise.resolve();
+    if (action === "unban_user" && !window.confirm("이 회원의 차단을 해제할까요?")) return Promise.resolve();
     setStatus(byId("grm-users-status"), "회원 조치를 실행하는 중", "");
     return api("admin-supabase", { method: "POST", json: { action: action, user_id: userId } }).then(function () {
       toast("회원 조치를 완료했습니다.");

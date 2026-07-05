@@ -808,6 +808,8 @@ class WebAdminRenderTest(unittest.TestCase):
         self.assertIn("Edge Function secrets", admin_js)
         self.assertIn("admin-github?action=ops", admin_js)
         self.assertIn("rerun_failed", admin_js)
+        self.assertIn("configuration_warnings", admin_js)
+        self.assertIn("Secrets 확인", admin_js)
         self.assertIn("<th>요청</th><th>실행</th>", h)
         self.assertIn('/assets/admin.js?v=', h)
         self.assertIn('Disallow: /admin/', robots)

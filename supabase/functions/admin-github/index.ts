@@ -50,6 +50,27 @@ type WorkflowJob = {
   }>;
 };
 
+type WorkflowStepSnapshot = {
+  name: string;
+  number: number | null;
+  status: string | null;
+  conclusion: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+};
+
+type NormalizedWorkflowJob = {
+  id: number | null;
+  name: string;
+  status: string | null;
+  conclusion: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  html_url: string | null;
+  failed_steps: WorkflowStepSnapshot[];
+  skipped_steps: WorkflowStepSnapshot[];
+};
+
 function repoName(): string {
   return envAny(["GITHUB_REPO", "GITHUB_REPOSITORY"]) || "MINHOYEOM/grm-api-intake";
 }
@@ -216,17 +237,24 @@ function runKind(run: Record<string, unknown> | WorkflowRun | null | undefined):
   return "bad";
 }
 
-function normalizeJob(job: WorkflowJob) {
+function stepSnapshot(step: NonNullable<WorkflowJob["steps"]>[number]): WorkflowStepSnapshot {
+  return {
+    name: step.name || "-",
+    number: step.number || null,
+    status: step.status || null,
+    conclusion: step.conclusion || null,
+    started_at: step.started_at || null,
+    completed_at: step.completed_at || null,
+  };
+}
+
+function normalizeJob(job: WorkflowJob): NormalizedWorkflowJob {
   const failedSteps = (job.steps || [])
     .filter((step) => step.conclusion && !["success", "skipped", "neutral"].includes(String(step.conclusion)))
-    .map((step) => ({
-      name: step.name || "-",
-      number: step.number || null,
-      status: step.status || null,
-      conclusion: step.conclusion || null,
-      started_at: step.started_at || null,
-      completed_at: step.completed_at || null,
-    }));
+    .map(stepSnapshot);
+  const skippedSteps = (job.steps || [])
+    .filter((step) => String(step.conclusion || "") === "skipped")
+    .map(stepSnapshot);
   return {
     id: job.id || null,
     name: job.name || "-",
@@ -236,18 +264,56 @@ function normalizeJob(job: WorkflowJob) {
     completed_at: job.completed_at || null,
     html_url: job.html_url || null,
     failed_steps: failedSteps,
+    skipped_steps: skippedSteps,
   };
 }
 
-async function jobsForRun(runId: number | string) {
+async function allJobsForRun(runId: number | string): Promise<NormalizedWorkflowJob[]> {
   const id = String(runId || "").replace(/[^\d]/g, "");
   if (!id) return [];
   const res = await githubFetch(`/actions/runs/${encodeURIComponent(id)}/jobs?per_page=100`);
   if (!res.ok) return [];
   const jobs = (res.payload as Record<string, unknown>).jobs as WorkflowJob[] | undefined;
-  return (jobs || [])
-    .map(normalizeJob)
+  return (jobs || []).map(normalizeJob);
+}
+
+async function jobsForRun(runId: number | string) {
+  return (await allJobsForRun(runId))
     .filter((job) => job.conclusion && !["success", "skipped", "neutral"].includes(String(job.conclusion)));
+}
+
+function isAdminDeployCriticalStep(name: string): boolean {
+  const n = name.toLowerCase();
+  return n.includes("supabase/setup-cli")
+    || n.includes("link supabase project")
+    || n.includes("push database migrations")
+    || n.includes("set edge function secrets")
+    || n.includes("deploy admin edge functions");
+}
+
+function adminDeployConfigurationWarnings(
+  run: Record<string, unknown> | null,
+  jobs: NormalizedWorkflowJob[],
+) {
+  if (!run) return [];
+  const skipped = jobs.flatMap((job) => job.skipped_steps.map((step) => ({
+    ...step,
+    job_name: job.name,
+    job_url: job.html_url,
+  }))).filter((step) => isAdminDeployCriticalStep(step.name));
+  if (!skipped.length) return [];
+  const runId = run.id == null ? null : String(run.id);
+  return [{
+    code: "admin_backend_deploy_skipped",
+    severity: "warn",
+    title: "Admin Backend Deploy 실제 배포 단계 skip",
+    detail: "GitHub Secrets 누락 가능성이 높습니다: SUPABASE_ACCESS_TOKEN · SUPABASE_SERVICE_ROLE_KEY · SUPABASE_DB_PASSWORD · ADMIN_GITHUB_ACTIONS_TOKEN",
+    workflow: "grm-admin-backend-deploy.yml",
+    run_id: runId,
+    run_number: run.run_number || null,
+    run_url: run.html_url || null,
+    steps: skipped.slice(0, 8),
+  }];
 }
 
 async function openWarningIssues() {
@@ -276,11 +342,20 @@ async function opsOverview() {
     if (workflow && !latestByWorkflow[workflow]) latestByWorkflow[workflow] = run;
   }
 
-  const workflows = Object.entries(defs).map(([action, def]) => {
+  const configurationWarnings = [];
+  const workflows = [];
+  for (const [action, def] of Object.entries(defs)) {
     const latest = latestByWorkflow[def.workflow] || null;
     const check = checkByWorkflow[def.workflow] || {};
-    const kind = check.ok === false ? "bad" : runKind(latest);
-    return {
+    let kind = check.ok === false ? "bad" : runKind(latest);
+    let warnings: Array<Record<string, unknown>> = [];
+    if (action === "admin_backend" && latest && latest.id) {
+      const jobs = await allJobsForRun(String(latest.id));
+      warnings = adminDeployConfigurationWarnings(latest, jobs);
+      if (warnings.length && kind === "ok") kind = "warn";
+      configurationWarnings.push(...warnings);
+    }
+    workflows.push({
       action,
       label: def.label,
       workflow: def.workflow,
@@ -290,11 +365,12 @@ async function opsOverview() {
       schedule: def.schedule,
       group: def.group,
       manual: def.manual !== false,
-      ok: check.ok !== false && kind !== "bad",
+      ok: check.ok !== false && kind !== "bad" && warnings.length === 0,
       kind,
       latest,
-    };
-  });
+      warnings,
+    });
+  }
 
   const incidents = runs
     .filter((run) => runKind(run) === "bad")
@@ -316,6 +392,8 @@ async function opsOverview() {
       in_progress: inProgress,
       incidents: incidents.length,
       warning_issues: warningIssues.length,
+      configuration_warnings: configurationWarnings.length,
+      warning_total: warningIssues.length + configurationWarnings.length,
       source_ok: sourceWorkflow ? sourceWorkflow.ok : false,
       source_status: sourceWorkflow?.latest
         ? ((sourceWorkflow.latest as Record<string, unknown>).conclusion || (sourceWorkflow.latest as Record<string, unknown>).status || "-")
@@ -323,6 +401,7 @@ async function opsOverview() {
     },
     workflows,
     incidents,
+    configuration_warnings: configurationWarnings,
     warning_issues: warningIssues,
     workflow_checks: workflowChecks,
     runs,

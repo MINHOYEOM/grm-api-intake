@@ -209,9 +209,11 @@ robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `
   `newsletter_dispatch_log` 에 기록한다.
 - **상태 진단**: 로그인 전 readiness 패널은 Edge Function 404(미배포), 500(시크릿/서버 설정), 401/403(배포됨·인증 대기)
   를 구분한다. 로그인 후 첫 탭은 `admin-github?action=ops` 로 GitHub Actions 실행 결과를 집계해 규제소스 수집의 최신
-  상태, 진행 중 run, 실패 run, `automation-warning` Issue, 실패 job/step 을 먼저 보여준다. 시스템 탭은 Supabase DB 테이블,
-  GitHub workflow 존재 여부, Brevo 리스트/API 상태를 `health` 엔드포인트로 확인한다. 백엔드 미배포 또는 런타임 오류 시에는
-  Edge Function secrets 와 `GRM Admin Backend Deploy` 상태를 함께 점검하도록 안내한다.
+  상태, 진행 중 run, 실패 run, `automation-warning` Issue, 실패 job/step 을 먼저 보여준다. 특히
+  `GRM Admin Backend Deploy` 가 초록색 성공으로 끝났더라도 Supabase CLI 설치, 프로젝트 링크, migration, Edge Function
+  secrets, function deploy 단계가 skip 되면 운영 경고로 올려 GitHub Secrets 누락을 바로 확인하게 한다. 시스템 탭은
+  Supabase DB 테이블, GitHub workflow 존재 여부, Brevo 리스트/API 상태를 `health` 엔드포인트로 확인한다.
+  백엔드 미배포 또는 런타임 오류 시에는 Edge Function secrets 와 `GRM Admin Backend Deploy` 상태를 함께 점검하도록 안내한다.
 - **백엔드**: `supabase/functions/admin-supabase`, `admin-github`, `admin-brevo`. 모든 함수는
   `verify_jwt=false` 로 배포하되, 함수 내부에서 `Authorization: Bearer <Supabase session>` 을 검증하고
   Admin 권한을 재확인한다. service role·GitHub PAT·Brevo API key 는 Edge Function secrets 로만 둔다.

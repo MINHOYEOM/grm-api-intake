@@ -442,6 +442,7 @@
     var supaHealth = state.health.supabase || {};
     var githubHealth = state.health.github || {};
     var brevoHealth = state.health.brevo || {};
+    var opsWarnings = ((state.ops && state.ops.configuration_warnings) || []).length;
     var workflowChecks = (githubHealth.workflows || []).map(function (w) {
       return {
         name: "Workflow · " + (w.label || w.action || w.workflow),
@@ -460,7 +461,7 @@
       { name: "Supabase URL", ok: /^https:\/\/.+\.supabase\.co$/i.test(supabaseUrl), detail: supabaseUrl.replace(/^https:\/\//, "") },
       { name: "Admin Edge Function", ok: !!(state.backendProbe && state.backendProbe.ok), detail: state.backendProbe ? (state.backendProbe.detail || state.backendProbe.status || "-") : "확인 전" },
       { name: "Supabase Admin API", ok: supaHealth.ok === true || (supaHealth.ok == null && !!state.session), detail: supaHealth.error || (state.session ? "Admin 세션 확인" : "로그인 필요") },
-      { name: "GitHub Actions", ok: githubHealth.ok === true || state.runs.length > 0, detail: githubHealth.error || (state.runs.length ? state.runs.length + "개 실행 확인" : "워크플로우 상태 확인") },
+      { name: "GitHub Actions", ok: (githubHealth.ok === true || state.runs.length > 0) && !opsWarnings, detail: githubHealth.error || (opsWarnings ? opsWarnings + "개 운영 경고" : (state.runs.length ? state.runs.length + "개 실행 확인" : "워크플로우 상태 확인")) },
       { name: "Brevo 구독자", ok: brevoHealth.ok === true || state.subscribers.length > 0, detail: brevoHealth.error || (state.subscribers.length ? state.subscribers.length + "명 로드" : "리스트 연결 확인") },
       { name: "Search Index", ok: !!(state.index && state.index.cards), detail: state.index ? (state.index.cards || []).length + "개 카드" : "로드 전" }
     ].concat(dbChecks, workflowChecks, extra || []);
@@ -484,11 +485,14 @@
     }
     var summary = (state.ops && state.ops.summary) || {};
     var sourceOk = summary.source_ok === true;
+    var warningTotal = summary.warning_total == null
+      ? ((summary.warning_issues || 0) + (summary.configuration_warnings || 0))
+      : summary.warning_total;
     var items = [
       ["규제소스", summary.source_status || "-", sourceOk ? "ok" : "bad", "ti-database-import"],
       ["진행 중", number(summary.in_progress || 0), summary.in_progress ? "warn" : "ok", "ti-loader-2"],
       ["실패 Run", number(summary.incidents || 0), summary.incidents ? "bad" : "ok", "ti-alert-triangle"],
-      ["운영 경고", number(summary.warning_issues || 0), summary.warning_issues ? "warn" : "ok", "ti-message-report"]
+      ["운영 경고", number(warningTotal || 0), warningTotal ? "warn" : "ok", "ti-message-report"]
     ];
     host.innerHTML = items.map(function (item) {
       return '<div class="admin-metric"><span><i class="ti ' + esc(item[3]) + '"></i>' + esc(item[0]) +
@@ -510,14 +514,24 @@
     host.innerHTML = workflows.map(function (wf) {
       var run = wf.latest || null;
       var kind = wf.kind || runKind(run);
+      var wfWarnings = wf.warnings || [];
       var title = run && run.display_title ? run.display_title : (run && run.event ? run.event : "최근 실행 없음");
       var status = runLabel(run);
       var runNo = run && run.run_number ? "#" + run.run_number : "-";
       var actions = [];
+      var warningHtml = "";
       if (run && run.html_url) actions.push(link(run.html_url, "최근 run"));
       actions.push(link(wf.workflow_url || ("https://github.com/MINHOYEOM/grm-api-intake/actions/workflows/" + encodeURIComponent(wf.workflow || "")), "워크플로우"));
       if (run && kind === "bad") {
         actions.push('<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button>');
+      }
+      if (wfWarnings.length) {
+        warningHtml = '<div class="admin-step-list">' + wfWarnings.slice(0, 2).map(function (warning) {
+          var skipped = (warning.steps || []).slice(0, 3).map(function (step) {
+            return step.name || "-";
+          }).join(" / ");
+          return "<code>" + esc((warning.title || "운영 경고") + (skipped ? " · skip: " + skipped : "")) + "</code>";
+        }).join("") + "</div>";
       }
       return '<article class="admin-workflow-card ' + esc(kind) + '">' +
         '<div class="admin-workflow-top"><div><b>' + esc(wf.label || wf.workflow || "-") +
@@ -530,6 +544,7 @@
           badge(run ? runDuration(run) : "-", "") +
         "</div>" +
         '<p title="' + esc(title) + '">' + esc(title) + "</p>" +
+        warningHtml +
         '<div class="admin-card-actions">' + actions.join("") + "</div>" +
       "</article>";
     }).join("");
@@ -543,11 +558,25 @@
     }
     var incidents = (state.ops && state.ops.incidents) || [];
     var warnings = (state.ops && state.ops.warning_issues) || [];
+    var configWarnings = (state.ops && state.ops.configuration_warnings) || [];
     var parts = [];
-    if (!incidents.length && !warnings.length) {
+    if (!incidents.length && !warnings.length && !configWarnings.length) {
       parts.push('<div class="admin-incident"><div class="admin-incident-head"><b>최근 실패 없음</b>' +
         badge("정상", "ok") + '</div><p>최근 GitHub Actions 실행에서 즉시 조치할 실패가 없습니다.</p></div>');
     }
+    configWarnings.slice(0, 6).forEach(function (warning) {
+      var steps = (warning.steps || []).slice(0, 5).map(function (step) {
+        return "<code>" + esc((step.job_name || "job") + " · " + (step.name || "-") + " · " + (step.conclusion || step.status || "-")) + "</code>";
+      }).join("");
+      var actions = [];
+      if (warning.run_url) actions.push(link(warning.run_url, "Run 열기"));
+      actions.push(link("https://github.com/MINHOYEOM/grm-api-intake/settings/secrets/actions", "Secrets 확인"));
+      parts.push('<div class="admin-incident warn"><div class="admin-incident-head"><b>' +
+        esc(warning.title || "운영 설정 경고") + "</b>" + badge("설정 필요", "warn") +
+        '</div><p>' + esc(warning.detail || "") + "</p>" +
+        (steps ? '<div class="admin-step-list">' + steps + "</div>" : "") +
+        '<div class="admin-card-actions">' + actions.join("") + "</div></div>");
+    });
     incidents.slice(0, 6).forEach(function (run) {
       var jobs = run.failed_jobs || [];
       var jobHtml = "";

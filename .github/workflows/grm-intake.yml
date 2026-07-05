@@ -86,10 +86,6 @@ on:
         description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
         type: boolean
         default: false
-      enable_fda483_deep:
-        description: 'FDA 483 전문(全文) 확보 — deep_analysis fan-out 대상 (ENABLE_FDA_483_OBSERVATIONS 결정론과 독립, 기본: vars.ENABLE_FDA_483_DEEP 또는 false)'
-        type: boolean
-        default: false
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -106,28 +102,12 @@ on:
         description: 'FDA WL 편지 본문 위반 excerpt 추출 (기본: vars.ENABLE_WL_BODY 또는 false)'
         type: boolean
         default: false
-      enable_wl_body_full:
-        description: 'FDA WL 편지 전문(全文) 확보 — deep_analysis fan-out 대상 (ENABLE_WL_BODY excerpt 와 독립, 기본: vars.ENABLE_WL_BODY_FULL 또는 false)'
-        type: boolean
-        default: false
-      enable_mfds_admin_body_full:
-        description: 'MFDS 행정처분 다단락 Body 확보 — deep_analysis fan-out 대상 (ENABLE_WL_BODY_FULL 과 동형, 기본: vars.ENABLE_MFDS_ADMIN_BODY_FULL 또는 false)'
-        type: boolean
-        default: false
       enable_modality_tag:
         description: '제품군(Modality) 태그 기록 — Notion에 Modality 속성 생성 후 켤 것 (기본: vars.ENABLE_MODALITY_TAG 또는 false)'
         type: boolean
         default: false
       enable_handoff_v2:
         description: 'handoff v2 생성 (K3 — scaffold/slots)'
-        type: boolean
-        default: false
-      enable_handoff_idempotency_v2:
-        description: '멱등성 v2 — Handoff Ref 상태기계 (PL-10b/B1 근본해결, Notion에 Handoff Ref 속성 생성 후 켤 것)'
-        type: boolean
-        default: false
-      enable_mfds_url_verify:
-        description: 'E2: 행정처분 건별 L1(nedrug getItem)을 collect 시 live verify (기본 off — K3 종료/명시 opt-in 후)'
         type: boolean
         default: false
       enable_web_brief_emit:
@@ -218,16 +198,16 @@ jobs:
           # FDA 483 Observation 번호 목록 결정론 상세보기. 기본 off — 실패는 graceful=요약카드 유지.
           ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_observations) || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           # [483 분석층] 483 전문 확보 = deep_analysis fan-out 대상. Observation 결정론과 독립·기본 off(활성=repo 변수).
-          ENABLE_FDA_483_DEEP: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_deep) || vars.ENABLE_FDA_483_DEEP || 'false' }}
+          ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
           ENABLE_WHOPIR_EXCERPT: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_whopir_excerpt) || vars.ENABLE_WHOPIR_EXCERPT || 'false' }}
           ENABLE_WL_BODY: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_wl_body) || vars.ENABLE_WL_BODY || 'false' }}
           # [WL 심층분석 fan-out] 편지 전문(全文) 확보 = deep_analysis 대상. ENABLE_WL_BODY(excerpt)와 독립·기본 off.
-          ENABLE_WL_BODY_FULL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_wl_body_full) || vars.ENABLE_WL_BODY_FULL || 'false' }}
+          ENABLE_WL_BODY_FULL: ${{ vars.ENABLE_WL_BODY_FULL || 'false' }}
           # [소스확장 2026-07-02] 행정처분 다단락 Body 확보 = deep_analysis(admin) 대상. WL_BODY_FULL 과 동형·기본 off(활성=repo 변수).
-          ENABLE_MFDS_ADMIN_BODY_FULL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_admin_body_full) || vars.ENABLE_MFDS_ADMIN_BODY_FULL || 'false' }}
+          ENABLE_MFDS_ADMIN_BODY_FULL: ${{ vars.ENABLE_MFDS_ADMIN_BODY_FULL || 'false' }}
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
@@ -236,10 +216,10 @@ jobs:
           # PL-10b/B1 멱등성 근본해결 (Handoff Ref 상태기계). 기본 off — schedule는 vars
           # 미설정 시 v1(날짜 윈도우+K4-1) 유지. 속성 미생성 상태로 켜도 preflight 가
           # 그 실행만 v1 폴백(graceful degrade) + health warning.
-          ENABLE_HANDOFF_IDEMPOTENCY_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_idempotency_v2) || vars.ENABLE_HANDOFF_IDEMPOTENCY_V2 || 'false' }}
+          ENABLE_HANDOFF_IDEMPOTENCY_V2: ${{ vars.ENABLE_HANDOFF_IDEMPOTENCY_V2 || 'false' }}
           # E2(URL전수검사): 행정처분 건별 L1 을 collect 시 resolve&verify(기본 off — collector
           # 행위·K3 관찰 보호). on 이면 nedrug getItem 후보를 verify 해 L1 승격/강등.
-          ENABLE_MFDS_URL_VERIFY: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_url_verify) || vars.ENABLE_MFDS_URL_VERIFY || 'false' }}
+          ENABLE_MFDS_URL_VERIFY: ${{ vars.ENABLE_MFDS_URL_VERIFY || 'false' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

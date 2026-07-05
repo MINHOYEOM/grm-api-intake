@@ -94,6 +94,7 @@
     user_action_failed: "회원 조치에 실패했습니다.",
     missing_user_id: "회원 ID가 없습니다.",
     cannot_ban_self: "현재 로그인한 Admin 계정은 차단할 수 없습니다.",
+    cannot_manage_admin_user: "Admin 계정은 회원 관리 조치 대상이 아닙니다.",
     function_not_deployed: "Admin 백엔드 함수가 아직 배포되지 않았습니다."
   };
   function errText(error) {
@@ -127,6 +128,7 @@
     latest: null,
     index: null,
     users: [],
+    adminUsers: [],
     subscribers: [],
     dispatches: [],
     audit: [],
@@ -336,6 +338,7 @@
   function loadOverview() {
     return api("admin-supabase?action=overview").then(function (data) {
       state.users = data.users || [];
+      state.adminUsers = data.admin_users || [];
       state.dispatches = data.dispatches || [];
       state.audit = data.audit || [];
       state.reactions = data.reactions || { totals: {}, topCards: [] };
@@ -357,9 +360,10 @@
     setStatus(byId("grm-users-status"), "회원 목록을 새로 불러오는 중", "");
     return api("admin-supabase?action=users&limit=100").then(function (data) {
       state.users = data.users || [];
+      state.adminUsers = data.admin_users || [];
       txt("grm-kpi-users", number(data.count || state.users.length));
       renderUsers();
-      setStatus(byId("grm-users-status"), "회원 목록을 갱신했습니다.", "ok");
+      setStatus(byId("grm-users-status"), "일반 회원 목록을 갱신했습니다." + (state.adminUsers.length ? " Admin 계정 " + state.adminUsers.length + "개는 제외됩니다." : ""), "ok");
     }).catch(function (error) { setStatus(byId("grm-users-status"), errText(error), "err"); });
   }
   function loadSubscribers() {
@@ -687,15 +691,18 @@
     if (!body) return;
     var q = (byId("grm-user-filter") && byId("grm-user-filter").value || "").toLowerCase();
     var rows = (state.users || []).filter(function (u) { return !q || String(u.email || "").toLowerCase().indexOf(q) >= 0; });
-    if (!rows.length) { body.innerHTML = emptyRow(5, "회원 내역 없음"); return; }
+    var adminMatch = q && (state.adminUsers || []).some(function (u) { return String(u.email || "").toLowerCase().indexOf(q) >= 0; });
+    if (!rows.length) { body.innerHTML = emptyRow(5, adminMatch ? "Admin 계정은 운영자 권한으로 분리되어 회원 관리 대상에서 제외됩니다." : "일반 회원 내역 없음"); return; }
     body.innerHTML = rows.map(function (u) {
       var confirmed = !!u.email_confirmed_at;
       var banned = !!u.banned_until;
-      var status = banned ? badge("차단", "bad") : badge(confirmed ? "활성" : "미인증", confirmed ? "ok" : "warn");
-      var actions = '<button class="admin-mini" type="button" data-user-action="confirm_user" data-user-id="' + esc(u.id) + '">인증</button>';
-      actions += banned
-        ? '<button class="admin-mini" type="button" data-user-action="unban_user" data-user-id="' + esc(u.id) + '">차단 해제</button>'
-        : '<button class="admin-mini danger" type="button" data-user-action="ban_user" data-user-id="' + esc(u.id) + '">차단</button>';
+      var status = u.is_admin ? badge("Admin", "warn") : (banned ? badge("차단", "bad") : badge(confirmed ? "활성" : "미인증", confirmed ? "ok" : "warn"));
+      var actions = u.is_admin ? badge("조치 제외", "warn") : '<button class="admin-mini" type="button" data-user-action="confirm_user" data-user-id="' + esc(u.id) + '">인증</button>';
+      if (!u.is_admin) {
+        actions += banned
+          ? '<button class="admin-mini" type="button" data-user-action="unban_user" data-user-id="' + esc(u.id) + '">차단 해제</button>'
+          : '<button class="admin-mini danger" type="button" data-user-action="ban_user" data-user-id="' + esc(u.id) + '">차단</button>';
+      }
       return "<tr><td>" + esc(u.email || "-") + "</td><td>" + status + "</td><td>" + esc(fmtDate(u.created_at)) +
         "</td><td>" + esc(fmtDate(u.last_sign_in_at)) + '</td><td><div class="admin-row-actions">' + actions + "</div></td></tr>";
     }).join("");
@@ -761,6 +768,10 @@
     }).catch(function (error) { setStatus(byId("grm-subscribers-status"), errText(error), "err"); });
   }
   function userAction(action, userId) {
+    if ((state.adminUsers || []).some(function (u) { return String(u.id || "") === String(userId || ""); })) {
+      setStatus(byId("grm-users-status"), "Admin 계정은 회원 관리 조치 대상이 아닙니다.", "err");
+      return Promise.resolve();
+    }
     if (action === "confirm_user" && !window.confirm("이 회원의 이메일 인증 상태를 관리자가 인증 완료로 변경할까요?")) return Promise.resolve();
     if (action === "ban_user" && !window.confirm("이 회원을 즉시 차단할까요? 복구 전까지 로그인할 수 없습니다.")) return Promise.resolve();
     if (action === "unban_user" && !window.confirm("이 회원의 차단을 해제할까요?")) return Promise.resolve();

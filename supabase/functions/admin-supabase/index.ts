@@ -7,10 +7,20 @@ import {
   requireAdmin,
 } from "../_shared/admin.ts";
 
-function publicUser(user: Record<string, unknown>) {
+type AdminLookup = {
+  byId: Map<string, Record<string, unknown>>;
+  byEmail: Map<string, Record<string, unknown>>;
+};
+
+function publicUser(user: Record<string, unknown>, admins?: AdminLookup) {
+  const id = String(user.id || "");
+  const email = String(user.email || "").toLowerCase();
+  const admin = (id && admins?.byId.get(id)) || (email && admins?.byEmail.get(email)) || null;
   return {
     id: user.id,
     email: user.email,
+    is_admin: !!admin,
+    admin_role: admin?.role || null,
     created_at: user.created_at,
     confirmed_at: user.confirmed_at,
     email_confirmed_at: user.email_confirmed_at,
@@ -19,12 +29,32 @@ function publicUser(user: Record<string, unknown>) {
   };
 }
 
+async function adminLookup(ctx: Awaited<ReturnType<typeof requireAdmin>>): Promise<AdminLookup> {
+  const lookup: AdminLookup = { byId: new Map(), byEmail: new Map() };
+  if ("error" in ctx) return lookup;
+  const { data, error } = await ctx.supabase
+    .from("admin_user")
+    .select("user_id,email,role")
+    .is("revoked_at", null);
+  if (error || !data) return lookup;
+  for (const row of data as Array<Record<string, unknown>>) {
+    const userId = String(row.user_id || "");
+    const email = String(row.email || "").toLowerCase();
+    if (userId) lookup.byId.set(userId, row);
+    if (email) lookup.byEmail.set(email, row);
+  }
+  return lookup;
+}
+
 async function listUsers(ctx: Awaited<ReturnType<typeof requireAdmin>>, limit: number) {
-  if ("error" in ctx) return { users: [], count: 0 };
+  if ("error" in ctx) return { users: [], count: 0, admin_users: [], admin_count: 0, total_count: 0 };
+  const admins = await adminLookup(ctx);
   const { data, error } = await ctx.supabase.auth.admin.listUsers({ page: 1, perPage: limit });
   if (error) throw error;
-  const users = (data?.users || []).map((u: unknown) => publicUser(u as Record<string, unknown>));
-  return { users, count: users.length };
+  const allUsers = (data?.users || []).map((u: unknown) => publicUser(u as Record<string, unknown>, admins));
+  const adminUsers = allUsers.filter((user) => user.is_admin);
+  const users = allUsers.filter((user) => !user.is_admin);
+  return { users, count: users.length, admin_users: adminUsers, admin_count: adminUsers.length, total_count: allUsers.length };
 }
 
 async function readDispatches(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
@@ -121,10 +151,21 @@ async function health(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
 
   return {
     ok: checks.every((check) => check.ok),
-    user: publicUser(ctx.user as Record<string, unknown>),
+    user: publicUser(ctx.user as Record<string, unknown>, await adminLookup(ctx)),
     admin: ctx.admin,
     checks,
   };
+}
+
+async function targetIsAdmin(ctx: Awaited<ReturnType<typeof requireAdmin>>, userId: string): Promise<boolean> {
+  if ("error" in ctx) return false;
+  const { data, error } = await ctx.supabase
+    .from("admin_user")
+    .select("user_id")
+    .eq("user_id", userId)
+    .is("revoked_at", null)
+    .maybeSingle();
+  return !error && !!data;
 }
 
 Deno.serve(async (req: Request) => {
@@ -139,7 +180,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (req.method === "GET" && action === "me") {
-      return jsonResponse({ ok: true, user: publicUser(ctx.user as Record<string, unknown>), admin: ctx.admin });
+      return jsonResponse({ ok: true, user: publicUser(ctx.user as Record<string, unknown>, await adminLookup(ctx)), admin: ctx.admin });
     }
 
     if (req.method === "GET" && action === "health") {
@@ -169,8 +210,9 @@ Deno.serve(async (req: Request) => {
       ]);
       return jsonResponse({
         ok: true,
-        counts: { users: users.count },
+        counts: { users: users.count, admins: users.admin_count, auth_users: users.total_count },
         users: users.users,
+        admin_users: users.admin_users,
         dispatches,
         audit: auditRows,
         reactions,
@@ -182,8 +224,8 @@ Deno.serve(async (req: Request) => {
       const postAction = String(body.action || "").trim();
       const userId = String(body.user_id || "").trim();
       if (!userId) return jsonResponse({ error: "missing_user_id" }, 400);
+      if (await targetIsAdmin(ctx, userId)) return jsonResponse({ error: "cannot_manage_admin_user" }, 400);
       if (postAction === "ban_user") {
-        if (userId === ctx.user.id) return jsonResponse({ error: "cannot_ban_self" }, 400);
         const { data, error } = await ctx.supabase.auth.admin.updateUserById(userId, {
           ban_duration: String(body.duration || "876000h"),
         });

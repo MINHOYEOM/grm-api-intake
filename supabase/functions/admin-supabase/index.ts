@@ -51,9 +51,10 @@ async function listUsers(ctx: Awaited<ReturnType<typeof requireAdmin>>, limit: n
   const admins = await adminLookup(ctx);
   const { data, error } = await ctx.supabase.auth.admin.listUsers({ page: 1, perPage: limit });
   if (error) throw error;
-  const allUsers = (data?.users || []).map((u: unknown) => publicUser(u as Record<string, unknown>, admins));
-  const adminUsers = allUsers.filter((user) => user.is_admin);
-  const users = allUsers.filter((user) => !user.is_admin);
+  const allUsers: Array<ReturnType<typeof publicUser>> = ((data?.users || []) as Array<Record<string, unknown>>)
+    .map((u) => publicUser(u, admins));
+  const adminUsers = allUsers.filter((user: ReturnType<typeof publicUser>) => user.is_admin);
+  const users = allUsers.filter((user: ReturnType<typeof publicUser>) => !user.is_admin);
   return { users, count: users.length, admin_users: adminUsers, admin_count: adminUsers.length, total_count: allUsers.length };
 }
 

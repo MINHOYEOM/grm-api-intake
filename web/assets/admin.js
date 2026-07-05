@@ -53,6 +53,11 @@
   function link(url, label) {
     return /^https?:\/\//i.test(String(url || "")) ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label || "열기") + "</a>" : "-";
   }
+  function actionLink(url, label, kind) {
+    return /^https?:\/\//i.test(String(url || ""))
+      ? '<a class="admin-mini ' + esc(kind || "") + '" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label || "열기") + "</a>"
+      : "-";
+  }
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   function runKind(run) {
     if (!run) return "warn";
@@ -112,6 +117,42 @@
     if (run.status && run.status !== "completed") return { kind: "warn", text: "현재 실행 중입니다. 완료 후 결과가 정상으로 바뀌는지 확인하세요." };
     if ((warnings || []).length) return { kind: "warn", text: "실행은 완료됐지만 스킵 또는 소스 경고가 있습니다. 경고 Issue와 최신 Run을 확인하세요." };
     return { kind: "ok", text: "조치 없음. 최신 실행이 정상 범위입니다." };
+  }
+  function workflowDisplayKind(wf) {
+    var kind = wf.kind || runKind(wf.latest || null);
+    return (wf.warnings || []).length && kind === "ok" ? "warn" : kind;
+  }
+  function workflowMeta(wf) {
+    var action = String((wf && wf.action) || "");
+    var group = String((wf && wf.group) || "");
+    var workflow = String((wf && wf.workflow) || "").toLowerCase();
+    var defaults = {
+      source: { order: 1, index: "01", stage: "수집", stageKey: "source", icon: "ti-database-import", pipeline: "소스 수집", pipelineDesc: "규제 신호 확보", impact: "실패하면 새 규제 카드와 주간 소식 소재가 갱신되지 않습니다.", focus: "소스 누락, 인증 차단, 수집 결과 파일 생성 여부를 봅니다." },
+      quality: { order: 2, index: "02", stage: "검증", stageKey: "quality", icon: "ti-shield-check", pipeline: "검증", pipelineDesc: "테스트와 근거 확인", impact: "실패하면 코드 회귀나 근거 검증 누락을 먼저 확인해야 합니다.", focus: "실패 테스트, provenance 경고, 링크 검증 결과를 봅니다." },
+      publish: { order: 3, index: "03", stage: "배포", stageKey: "publish", icon: "ti-cloud-upload", pipeline: "웹 배포", pipelineDesc: "사이트 반영", impact: "실패하면 운영 도메인에 최신 웹사이트 변경사항이 반영되지 않습니다.", focus: "빌드, 링크체크, Cloudflare Pages 배포 단계를 봅니다." },
+      newsletter: { order: 4, index: "04", stage: "발송", stageKey: "newsletter", icon: "ti-mail-forward", pipeline: "뉴스레터", pipelineDesc: "구독자 도달", impact: "실패하면 구독자에게 최신 Weekly Brief가 발송되지 않습니다.", focus: "발송 게이트, Brevo 캠페인 생성, 중복 발송 방지 결과를 봅니다." },
+      admin: { order: 5, index: "05", stage: "운영 API", stageKey: "admin", icon: "ti-server-2", pipeline: "운영 API", pipelineDesc: "Admin 기능", impact: "실패하면 운영자 버튼, 회원 관리, 구독자 관리 API가 최신 상태가 아닐 수 있습니다.", focus: "Supabase migration, Edge Function secrets, 함수 배포 단계를 봅니다." },
+      infra: { order: 6, index: "06", stage: "인프라", stageKey: "infra", icon: "ti-database-cog", pipeline: "인프라", pipelineDesc: "서비스 유지", impact: "실패가 반복되면 Supabase 프로젝트 휴면 방지나 기본 연결 상태를 확인해야 합니다.", focus: "정기 keepalive 실행과 Supabase 응답 상태를 봅니다." }
+    };
+    var meta = defaults[group] || defaults.quality;
+    if (action === "brief_audit" || workflow.indexOf("brief-audit") >= 0) {
+      meta = Object.assign({}, meta, { index: "02A", stage: "근거 감사", impact: "실패하면 발행된 브리프의 원문 링크와 근거 신뢰도 확인이 지연됩니다.", focus: "provenance JSON, 링크 검증, 경고 Issue 갱신 여부를 봅니다." });
+    } else if (action === "ci" || workflow.indexOf("ci") >= 0) {
+      meta = Object.assign({}, meta, { index: "02B", stage: "회귀 검증", impact: "실패하면 코드나 렌더 결과에 회귀 가능성이 있어 배포 전 확인이 필요합니다.", focus: "컴파일, 단위 테스트, 렌더 골든 테스트 실패 지점을 봅니다." });
+    }
+    return meta;
+  }
+  function workflowJudgment(kind, run, warnings) {
+    if (!run) return "실행 기록이 없어 상태 판단이 제한됩니다. 워크플로우 활성화와 GitHub Actions 연결을 확인하세요.";
+    if (kind === "bad") return "운영 흐름이 이 단계에서 멈췄을 수 있습니다. 실패 job 로그가 최우선 확인 대상입니다.";
+    if (run.status && run.status !== "completed") return "현재 처리 중입니다. 완료 후 정상 또는 실패로 판정됩니다.";
+    if ((warnings || []).length) return "실행은 완료됐지만 운영 경고가 남았습니다. 경고 내용을 확인하면 됩니다.";
+    return "정상 완료 상태입니다. 다음 자동 실행 또는 필요한 수동 실행까지 대기하면 됩니다.";
+  }
+  function worseKind(a, b) {
+    if (a === "bad" || b === "bad") return "bad";
+    if (a === "warn" || b === "warn") return "warn";
+    return "ok";
   }
   function runDuration(run) {
     if (!run) return "-";
@@ -549,6 +590,7 @@
   function renderOpsMonitor(errorMessage) {
     renderOpsBrief(errorMessage);
     renderOpsSummary(errorMessage);
+    renderWorkflowPipeline(errorMessage);
     renderWorkflowCards(errorMessage);
     renderOpsIncidents(errorMessage);
   }
@@ -623,58 +665,99 @@
       host.innerHTML = '<div class="admin-empty">' + esc(errorMessage) + "</div>";
       return;
     }
-    var workflows = (state.ops && state.ops.workflows) || [];
+    var workflows = ((state.ops && state.ops.workflows) || []).slice().sort(function (a, b) {
+      var ma = workflowMeta(a);
+      var mb = workflowMeta(b);
+      return ma.order === mb.order ? ma.index.localeCompare(mb.index) : ma.order - mb.order;
+    });
     if (!workflows.length) {
       host.innerHTML = '<div class="admin-empty">워크플로우 상태를 불러오는 중입니다.</div>';
       return;
     }
     host.innerHTML = workflows.map(function (wf) {
       var run = wf.latest || null;
-      var kind = wf.kind || runKind(run);
       var wfWarnings = wf.warnings || [];
-      var displayKind = wfWarnings.length && kind === "ok" ? "warn" : kind;
+      var displayKind = workflowDisplayKind(wf);
+      var meta = workflowMeta(wf);
       var title = run && run.display_title ? run.display_title : (run && run.event ? run.event : "최근 실행 없음");
-      var status = wfWarnings.length && kind === "ok" ? "경고 확인" : runLabel(run);
+      var status = wfWarnings.length && displayKind === "warn" ? "경고 확인" : runLabel(run);
       var runNo = run && run.run_number ? "#" + run.run_number : "-";
       var action = nextAction(displayKind, run, wfWarnings);
       var actions = [];
       var warningHtml = "";
       var facts = [
-        ["최근 결과", status],
-        ["마지막 실행", run ? fmtDate(run.created_at) : "기록 없음"],
-        ["소요 시간", run ? runDuration(run) : "-"],
-        ["실행 방식", run ? eventLabel(run.event) : "-"]
+        ["주기", wf.schedule || "일정 없음"],
+        ["최근", run ? fmtDate(run.created_at) : "기록 없음"],
+        ["소요", run ? runDuration(run) : "-"],
+        ["방식", run ? eventLabel(run.event) : "-"]
       ];
-      if (run && run.html_url) actions.push(link(run.html_url, "GitHub 로그"));
-      actions.push(link(wf.workflow_url || ("https://github.com/MINHOYEOM/grm-api-intake/actions/workflows/" + encodeURIComponent(wf.workflow || "")), "워크플로우 설정"));
+      if (run && run.html_url) actions.push(actionLink(run.html_url, "GitHub 로그", "primary"));
+      actions.push(actionLink(wf.workflow_url || ("https://github.com/MINHOYEOM/grm-api-intake/actions/workflows/" + encodeURIComponent(wf.workflow || "")), "워크플로우 설정", ""));
       if (run && displayKind === "bad") {
         actions.push('<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button>');
       }
       if (wfWarnings.length) {
-        warningHtml = '<div class="admin-step-list">' + wfWarnings.slice(0, 2).map(function (warning) {
+        warningHtml = '<div class="admin-workflow-alerts">' + wfWarnings.slice(0, 2).map(function (warning) {
           var skipped = (warning.steps || []).slice(0, 3).map(function (step) {
             return step.name || "-";
           }).join(" / ");
-          return "<code>" + esc((warning.title || "운영 경고") + (skipped ? " · 확인 단계: " + skipped : "")) + "</code>";
+          return '<div class="admin-workflow-alert"><i class="ti ti-alert-circle"></i> ' +
+            esc((warning.title || "운영 경고") + (skipped ? " · 확인 단계: " + skipped : "")) + "</div>";
         }).join("") + "</div>";
       }
       return '<article class="admin-workflow-card ' + esc(displayKind) + '">' +
-        '<div class="admin-workflow-top"><div><b>' + esc(wf.label || wf.workflow || "-") +
-        '</b><p>' + esc(wf.purpose || "") + '</p></div>' + badge(status, displayKind) + "</div>" +
-        '<div class="admin-meta">' +
-          badge(wf.schedule || "일정 없음", "warn") +
-          badge(wf.workflow_state === "active" ? "활성" : (wf.workflow_state || "상태 확인"), wf.workflow_state === "active" ? "ok" : "warn") +
-          badge(runNo, "") +
+        '<div class="admin-workflow-main">' +
+          '<div class="admin-workflow-top"><div class="admin-workflow-identity"><span class="admin-workflow-index">' + esc(meta.index) +
+          '</span><div><span class="admin-workflow-stage"><i class="ti ' + esc(meta.icon) + '"></i>' + esc(meta.stage) +
+          ' · ' + esc(wf.workflow || "") + '</span><b>' + esc(wf.label || wf.workflow || "-") +
+          '</b><p>' + esc(wf.purpose || "") + '</p></div></div>' + badge(status, displayKind) + "</div>" +
+          '<div class="admin-workflow-readout">' +
+            '<div class="admin-workflow-note"><span><i class="ti ti-route"></i>운영 영향</span>' + esc(meta.impact) + "</div>" +
+            '<div class="admin-workflow-note"><span><i class="ti ti-clipboard-check"></i>현재 판단</span>' + esc(workflowJudgment(displayKind, run, wfWarnings)) + "</div>" +
+          "</div>" +
+          '<dl class="admin-workflow-facts">' + facts.map(function (fact) {
+            return "<div><dt>" + esc(fact[0]) + "</dt><dd>" + esc(fact[1]) + "</dd></div>";
+          }).join("") + "</dl>" +
+          '<div class="admin-workflow-run"><i class="ti ti-history"></i><span title="' + esc(title) + '">최근 실행 ' + esc(runNo) + ': ' + esc(title) + "</span></div>" +
+          '<div class="admin-workflow-note"><span><i class="ti ti-search"></i>볼 곳</span>' + esc(meta.focus) + "</div>" +
+          warningHtml +
+          '<div class="admin-next-action ' + esc(action.kind) + '"><strong>다음 조치</strong> · ' + esc(action.text) + "</div>" +
+          '<div class="admin-card-actions">' + actions.join("") + "</div>" +
         "</div>" +
-        '<dl class="admin-workflow-facts">' + facts.map(function (fact) {
-          return "<div><dt>" + esc(fact[0]) + "</dt><dd>" + esc(fact[1]) + "</dd></div>";
-        }).join("") + "</dl>" +
-        '<p class="admin-workflow-title" title="' + esc(title) + '">최근 실행: ' + esc(title) + "</p>" +
-        warningHtml +
-        '<div class="admin-next-action ' + esc(action.kind) + '"><strong>다음 조치</strong> · ' + esc(action.text) + "</div>" +
-        '<div class="admin-card-actions">' + actions.join("") + "</div>" +
       "</article>";
     }).join("");
+  }
+  function renderWorkflowPipeline(errorMessage) {
+    var host = byId("grm-workflow-pipeline");
+    if (!host) return;
+    if (errorMessage) {
+      host.innerHTML = '<div class="admin-empty">' + esc(errorMessage) + "</div>";
+      return;
+    }
+    var workflows = (state.ops && state.ops.workflows) || [];
+    if (!workflows.length) {
+      host.innerHTML = '<div class="admin-empty">운영 흐름을 불러오는 중입니다.</div>';
+      return;
+    }
+    var grouped = {};
+    workflows.forEach(function (wf) {
+      var meta = workflowMeta(wf);
+      var key = meta.stageKey || meta.stage;
+      if (!grouped[key]) grouped[key] = { meta: meta, kind: "ok", total: 0, bad: 0, warn: 0 };
+      var kind = workflowDisplayKind(wf);
+      grouped[key].kind = worseKind(grouped[key].kind, kind);
+      grouped[key].total += 1;
+      if (kind === "bad") grouped[key].bad += 1;
+      if (kind === "warn") grouped[key].warn += 1;
+    });
+    host.innerHTML = Object.keys(grouped).map(function (key) { return grouped[key]; })
+      .sort(function (a, b) { return a.meta.order - b.meta.order; })
+      .map(function (item) {
+        var status = item.bad ? item.bad + "개 실패" : (item.warn ? item.warn + "개 확인" : "정상");
+        return '<div class="admin-pipeline-step ' + esc(item.kind) + '"><span><i class="ti ' + esc(item.meta.icon) +
+          '"></i>' + esc(item.meta.index.replace(/[A-Z]$/, "")) + "단계</span><b>" + esc(item.meta.pipeline) +
+          '</b><em>' + esc(item.meta.pipelineDesc) + " · " + esc(status) + "</em></div>";
+      }).join("");
   }
   function renderOpsIncidents(errorMessage) {
     var host = byId("grm-ops-incidents");

@@ -7,9 +7,7 @@
 
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(function () {
-      if (document.fonts.check('16px "tabler-icons"') || document.fonts.check("16px tabler-icons")) {
-        document.documentElement.classList.add("grm-icons-ready");
-      }
+      document.documentElement.classList.add("grm-icons-ready");
     }).catch(function () {});
   } else {
     document.documentElement.classList.add("grm-icons-ready");
@@ -151,6 +149,24 @@
     n.className = "admin-pill " + (kind || "");
     n.innerHTML = '<i class="ti ti-activity"></i>' + esc(label);
   }
+  function renderActivationPanel() {
+    var host = byId("grm-admin-activation");
+    if (!host) return;
+    var probe = state.backendProbe || {};
+    host.hidden = !!probe.ok;
+    if (probe.ok) return;
+    var deployUrl = "https://github.com/MINHOYEOM/grm-api-intake/actions/workflows/grm-admin-backend-deploy.yml";
+    var backendLabel = probe.error === "function_not_deployed" ? "미배포" : "확인 필요";
+    var backendKind = probe.error === "function_not_deployed" ? "bad" : "warn";
+    host.innerHTML = '<h3>운영 API 활성화 요건</h3><div class="admin-activation-grid">' +
+      '<div class="admin-check"><span>GitHub Secrets<br><code>SUPABASE_ACCESS_TOKEN · SUPABASE_DB_PASSWORD · SUPABASE_SERVICE_ROLE_KEY · ADMIN_GITHUB_ACTIONS_TOKEN</code></span>' +
+      badge("필요", "bad") + "</div>" +
+      '<div class="admin-check"><span>Backend Deploy<br><code><a href="' + deployUrl + '" target="_blank" rel="noopener">GRM Admin Backend Deploy</a></code></span>' +
+      badge(backendLabel, backendKind) + "</div>" +
+      '<div class="admin-check"><span>Admin Email<br><code>' + esc(adminEmail) + '</code></span>' +
+      badge("고정", "ok") + "</div>" +
+      "</div>";
+  }
   function renderLoginReadiness() {
     var host = byId("grm-admin-readiness");
     if (!host) return;
@@ -181,6 +197,7 @@
       '<div class="admin-check"><span>Admin Backend<br><code>' + esc(backendDetail) + '</code></span>' +
         badge(backendLabel, backendKind) + "</div>"
     ].join("");
+    renderActivationPanel();
   }
   function probeBackend() {
     state.backendProbe = { ok: false, detail: "확인 중" };

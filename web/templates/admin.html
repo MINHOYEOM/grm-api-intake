@@ -34,6 +34,8 @@
 .admin-status{min-height:20px;margin-top:10px;color:var(--muted);font-size:13px}
 .admin-status.err{color:var(--hi)}
 .admin-status.ok{color:var(--coral-2)}
+.admin-readiness{display:grid;gap:7px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.admin-readiness .admin-check{padding-bottom:7px}
 .admin-dashboard{display:grid;gap:16px}
 .admin-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:14px 15px;min-width:0}
@@ -83,6 +85,10 @@
 .admin-check code{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .admin-toast{position:fixed;right:18px;bottom:18px;z-index:90;display:grid;gap:8px;max-width:360px}
 .admin-toast p{border:1px solid var(--line-2);background:var(--ink);color:var(--canvas);border-radius:var(--rad-s);padding:10px 12px;font-size:13px;box-shadow:var(--shadow)}
+#grm-admin .ti{display:inline-flex;width:1em;min-width:1em;justify-content:center}
+html:not(.grm-icons-ready) #grm-admin .ti::before{content:"";font-family:inherit}
+html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-family:system-ui,sans-serif}
+.nav #navmenu,.nav .navtoggle,.nav .btn.coral{display:none!important}
 .site,#grm-mascot{display:none}
 @media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-split,.admin-insight{grid-template-columns:1fr}}
 @media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -147,6 +153,10 @@
           <button class="admin-linkbtn" type="button" id="grm-admin-reset">비밀번호 재설정 메일 보내기</button>
         </div>
         <div class="admin-status" id="grm-admin-login-status" role="status" aria-live="polite"></div>
+        <div class="admin-readiness" id="grm-admin-readiness" aria-live="polite">
+          <div class="admin-check"><span>Admin Web Config<br><code>Supabase client</code></span><span class="admin-pill warn">확인 중</span></div>
+          <div class="admin-check"><span>Admin Backend<br><code>Supabase Edge Functions</code></span><span class="admin-pill warn">확인 중</span></div>
+        </div>
       </section>
 
       <section class="admin-dashboard admin-hidden" id="grm-admin-dashboard" aria-live="polite">
@@ -198,8 +208,8 @@
             </div>
             <div class="admin-table-wrap">
               <table class="admin-table">
-                <thead><tr><th>발행일</th><th>상태</th><th>요청 시각</th><th>실행</th></tr></thead>
-                <tbody id="grm-dispatch-body"><tr><td colspan="4"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+                <thead><tr><th>발행일</th><th>요청</th><th>실행</th><th>요청 시각</th><th>링크</th></tr></thead>
+                <tbody id="grm-dispatch-body"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
               </table>
             </div>
           </div>

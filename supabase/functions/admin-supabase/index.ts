@@ -31,7 +31,7 @@ async function readDispatches(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
   if ("error" in ctx) return [];
   const { data, error } = await ctx.supabase
     .from("newsletter_dispatch_log")
-    .select("id,publish_date,mode,github_status,github_run_url,created_at")
+    .select("id,publish_date,mode,workflow,ref,github_status,github_run_url,github_run_id,github_run_status,github_run_conclusion,created_at")
     .order("created_at", { ascending: false })
     .limit(20);
   if (error) return [];
@@ -75,6 +75,58 @@ async function readReactions(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
   return { totals, topCards };
 }
 
+async function health(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
+  if ("error" in ctx) return { ok: false };
+  const checks = [];
+  const adminRows = await ctx.supabase
+    .from("admin_user")
+    .select("user_id", { count: "exact", head: true })
+    .is("revoked_at", null);
+  checks.push({
+    name: "admin_user",
+    ok: !adminRows.error && (adminRows.count || 0) > 0,
+    count: adminRows.count || 0,
+    error: adminRows.error?.message || null,
+  });
+
+  const dispatchRows = await ctx.supabase
+    .from("newsletter_dispatch_log")
+    .select("id", { count: "exact", head: true });
+  checks.push({
+    name: "newsletter_dispatch_log",
+    ok: !dispatchRows.error,
+    count: dispatchRows.count || 0,
+    error: dispatchRows.error?.message || null,
+  });
+
+  const auditRows = await ctx.supabase
+    .from("admin_audit_log")
+    .select("id", { count: "exact", head: true });
+  checks.push({
+    name: "admin_audit_log",
+    ok: !auditRows.error,
+    count: auditRows.count || 0,
+    error: auditRows.error?.message || null,
+  });
+
+  const reactionRows = await ctx.supabase
+    .from("reaction")
+    .select("user_id", { count: "exact", head: true });
+  checks.push({
+    name: "reaction",
+    ok: !reactionRows.error,
+    count: reactionRows.count || 0,
+    error: reactionRows.error?.message || null,
+  });
+
+  return {
+    ok: checks.every((check) => check.ok),
+    user: publicUser(ctx.user as Record<string, unknown>),
+    admin: ctx.admin,
+    checks,
+  };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return optionsResponse();
 
@@ -88,6 +140,10 @@ Deno.serve(async (req: Request) => {
   try {
     if (req.method === "GET" && action === "me") {
       return jsonResponse({ ok: true, user: publicUser(ctx.user as Record<string, unknown>), admin: ctx.admin });
+    }
+
+    if (req.method === "GET" && action === "health") {
+      return jsonResponse(await health(ctx));
     }
 
     if (req.method === "GET" && action === "users") {
@@ -133,7 +189,7 @@ Deno.serve(async (req: Request) => {
         });
         if (error) return jsonResponse({ error: "user_action_failed", message: error.message }, 502);
         await audit(ctx, "user.ban", { duration: body.duration || "876000h" }, "auth.users", userId);
-        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as Record<string, unknown>) : null });
+        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as unknown as Record<string, unknown>) : null });
       }
       if (postAction === "unban_user") {
         const { data, error } = await ctx.supabase.auth.admin.updateUserById(userId, {
@@ -141,7 +197,7 @@ Deno.serve(async (req: Request) => {
         });
         if (error) return jsonResponse({ error: "user_action_failed", message: error.message }, 502);
         await audit(ctx, "user.unban", {}, "auth.users", userId);
-        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as Record<string, unknown>) : null });
+        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as unknown as Record<string, unknown>) : null });
       }
       if (postAction === "confirm_user") {
         const { data, error } = await ctx.supabase.auth.admin.updateUserById(userId, {
@@ -149,7 +205,7 @@ Deno.serve(async (req: Request) => {
         });
         if (error) return jsonResponse({ error: "user_action_failed", message: error.message }, 502);
         await audit(ctx, "user.confirm_email", {}, "auth.users", userId);
-        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as Record<string, unknown>) : null });
+        return jsonResponse({ ok: true, user: data?.user ? publicUser(data.user as unknown as Record<string, unknown>) : null });
       }
       return jsonResponse({ error: "unknown_action" }, 400);
     }

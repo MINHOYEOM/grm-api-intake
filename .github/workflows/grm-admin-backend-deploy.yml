@@ -34,6 +34,30 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
 
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check Admin Edge Functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            supabase/functions/admin-supabase/index.ts \
+            supabase/functions/admin-github/index.ts \
+            supabase/functions/admin-brevo/index.ts
+          do
+            for attempt in 1 2 3; do
+              if deno check "$file"; then
+                break
+              fi
+              if [ "$attempt" = "3" ]; then
+                exit 1
+              fi
+              sleep $((attempt * 2))
+            done
+          done
+
       - name: Resolve project ref
         id: ref
         shell: bash

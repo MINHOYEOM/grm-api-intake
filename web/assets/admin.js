@@ -5,6 +5,16 @@
   var cfg = document.getElementById("grm-admin-cfg");
   if (!root || !cfg) return;
 
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      if (document.fonts.check('16px "tabler-icons"') || document.fonts.check("16px tabler-icons")) {
+        document.documentElement.classList.add("grm-icons-ready");
+      }
+    }).catch(function () {});
+  } else {
+    document.documentElement.classList.add("grm-icons-ready");
+  }
+
   function byId(id) { return document.getElementById(id); }
   function qs(sel, host) { return (host || document).querySelector(sel); }
   function qsa(sel, host) { return Array.prototype.slice.call((host || document).querySelectorAll(sel)); }
@@ -56,9 +66,13 @@
     brevo_list_not_configured: "Brevo 리스트 ID 설정이 필요합니다.",
     invalid_email: "이메일 형식이 올바르지 않습니다.",
     invalid_publish_date: "발행일 형식이 올바르지 않습니다.",
+    newsletter_already_dispatched: "이 발행일은 이미 실발송 요청이 기록되어 있습니다.",
     github_dispatch_failed: "GitHub Actions 실행 요청에 실패했습니다.",
     brevo_request_failed: "Brevo 요청에 실패했습니다.",
-    user_action_failed: "회원 조치에 실패했습니다."
+    user_action_failed: "회원 조치에 실패했습니다.",
+    missing_user_id: "회원 ID가 없습니다.",
+    cannot_ban_self: "현재 로그인한 Admin 계정은 차단할 수 없습니다.",
+    function_not_deployed: "Admin 백엔드 함수가 아직 배포되지 않았습니다."
   };
   function errText(error) {
     if (!error) return "요청에 실패했습니다.";
@@ -94,7 +108,9 @@
     audit: [],
     reactions: { totals: {}, topCards: [] },
     runs: [],
-    checks: []
+    checks: [],
+    health: { supabase: null, github: null, brevo: null },
+    backendProbe: null
   };
 
   if (!window.supabase || !window.supabase.createClient || !supabaseUrl || !anonKey) {
@@ -134,6 +150,62 @@
     if (!n) return;
     n.className = "admin-pill " + (kind || "");
     n.innerHTML = '<i class="ti ti-activity"></i>' + esc(label);
+  }
+  function renderLoginReadiness() {
+    var host = byId("grm-admin-readiness");
+    if (!host) return;
+    var probe = state.backendProbe || {};
+    var backendKind = "warn";
+    var backendLabel = "확인 중";
+    var backendDetail = "Supabase Edge Functions";
+    if (probe.ok) {
+      backendKind = "ok";
+      backendLabel = "배포됨";
+      backendDetail = probe.detail || "인증 대기";
+    } else if (probe.status === 404 || probe.error === "function_not_deployed") {
+      backendKind = "bad";
+      backendLabel = "미배포";
+      backendDetail = "GRM Admin Backend Deploy 필요";
+    } else if (probe.status >= 500) {
+      backendKind = "bad";
+      backendLabel = "설정 필요";
+      backendDetail = probe.detail || "Edge Function secret 확인";
+    } else if (probe.error) {
+      backendKind = "bad";
+      backendLabel = "확인 필요";
+      backendDetail = probe.detail || probe.error;
+    }
+    host.innerHTML = [
+      '<div class="admin-check"><span>Admin Web Config<br><code>' + esc(supabaseUrl.replace(/^https:\/\//, "")) + '</code></span>' +
+        badge(supabaseUrl && anonKey ? "정상" : "설정 필요", supabaseUrl && anonKey ? "ok" : "bad") + "</div>",
+      '<div class="admin-check"><span>Admin Backend<br><code>' + esc(backendDetail) + '</code></span>' +
+        badge(backendLabel, backendKind) + "</div>"
+    ].join("");
+  }
+  function probeBackend() {
+    state.backendProbe = { ok: false, detail: "확인 중" };
+    renderLoginReadiness();
+    return fetch(functionsBase + "admin-supabase?action=me", {
+      headers: { Authorization: "Bearer grm-admin-probe" }
+    }).then(function (res) {
+      return res.text().then(function (raw) {
+        var body = {};
+        if (raw) {
+          try { body = JSON.parse(raw); } catch (_) { body = { raw: raw }; }
+        }
+        if (res.status === 401 || res.status === 403) {
+          state.backendProbe = { ok: true, status: res.status, detail: "인증 응답 정상" };
+        } else if (res.status === 404) {
+          state.backendProbe = { ok: false, status: res.status, error: "function_not_deployed", detail: "Edge Function 404" };
+        } else {
+          state.backendProbe = { ok: res.ok, status: res.status, error: body.error || "", detail: errText({ data: body }) };
+        }
+        renderLoginReadiness();
+      });
+    }).catch(function (error) {
+      state.backendProbe = { ok: false, error: "function_not_deployed", detail: "Edge Function 응답 없음" };
+      renderLoginReadiness();
+    });
   }
   function showLogin(message, type) {
     hide(byId("grm-admin-login"), false);
@@ -244,8 +316,20 @@
       renderSystemChecks([{ name: "GitHub Actions API", ok: false, detail: errText(error) }]);
     });
   }
+  function loadHealth() {
+    return Promise.allSettled([
+      api("admin-supabase?action=health"),
+      api("admin-github?action=health"),
+      api("admin-brevo?action=health")
+    ]).then(function (results) {
+      state.health.supabase = results[0].status === "fulfilled" ? results[0].value : { ok: false, error: errText(results[0].reason) };
+      state.health.github = results[1].status === "fulfilled" ? results[1].value : { ok: false, error: errText(results[1].reason) };
+      state.health.brevo = results[2].status === "fulfilled" ? results[2].value : { ok: false, error: errText(results[2].reason) };
+      renderSystemChecks();
+    });
+  }
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadRuns()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadRuns(), loadHealth()]).then(function () {
       renderSystemChecks();
     });
   }
@@ -298,13 +382,31 @@
   function renderSystemChecks(extra) {
     var host = byId("grm-system-checks");
     if (!host) return;
+    var supaHealth = state.health.supabase || {};
+    var githubHealth = state.health.github || {};
+    var brevoHealth = state.health.brevo || {};
+    var workflowChecks = (githubHealth.workflows || []).map(function (w) {
+      return {
+        name: "Workflow · " + (w.label || w.action || w.workflow),
+        ok: !!w.ok,
+        detail: (w.workflow || "-") + (w.state ? " · " + w.state : "")
+      };
+    });
+    var dbChecks = (supaHealth.checks || []).map(function (c) {
+      return {
+        name: "DB · " + c.name,
+        ok: !!c.ok,
+        detail: c.error || ((c.count == null ? "-" : c.count) + " rows")
+      };
+    });
     var checks = [
       { name: "Supabase URL", ok: /^https:\/\/.+\.supabase\.co$/i.test(supabaseUrl), detail: supabaseUrl.replace(/^https:\/\//, "") },
-      { name: "Admin Edge Function", ok: !!state.session, detail: state.session ? "세션 확인" : "로그인 필요" },
-      { name: "GitHub Actions", ok: state.runs.length > 0, detail: state.runs.length ? state.runs.length + "개 실행 확인" : "실행 내역 없음" },
-      { name: "Brevo 구독자", ok: state.subscribers.length > 0, detail: state.subscribers.length ? state.subscribers.length + "명 로드" : "구독자 없음 또는 설정 필요" },
+      { name: "Admin Edge Function", ok: !!(state.backendProbe && state.backendProbe.ok), detail: state.backendProbe ? (state.backendProbe.detail || state.backendProbe.status || "-") : "확인 전" },
+      { name: "Supabase Admin API", ok: supaHealth.ok === true || (supaHealth.ok == null && !!state.session), detail: supaHealth.error || (state.session ? "Admin 세션 확인" : "로그인 필요") },
+      { name: "GitHub Actions", ok: githubHealth.ok === true || state.runs.length > 0, detail: githubHealth.error || (state.runs.length ? state.runs.length + "개 실행 확인" : "워크플로우 상태 확인") },
+      { name: "Brevo 구독자", ok: brevoHealth.ok === true || state.subscribers.length > 0, detail: brevoHealth.error || (state.subscribers.length ? state.subscribers.length + "명 로드" : "리스트 연결 확인") },
       { name: "Search Index", ok: !!(state.index && state.index.cards), detail: state.index ? (state.index.cards || []).length + "개 카드" : "로드 전" }
-    ].concat(extra || []);
+    ].concat(dbChecks, workflowChecks, extra || []);
     host.innerHTML = checks.map(function (c) {
       return '<div class="admin-check"><span>' + esc(c.name) + '<br><code>' + esc(c.detail || "") + '</code></span>' +
         badge(c.ok ? "정상" : "확인 필요", c.ok ? "ok" : "bad") + "</div>";
@@ -315,12 +417,15 @@
     var body = byId("grm-dispatch-body");
     if (!body) return;
     var rows = state.dispatches || [];
-    if (!rows.length) { body.innerHTML = emptyRow(4, "발송 요청 내역 없음"); return; }
+    if (!rows.length) { body.innerHTML = emptyRow(5, "발송 요청 내역 없음"); return; }
     body.innerHTML = rows.slice(0, 12).map(function (row) {
       var status = row.github_status || "-";
       var ok = Number(status) >= 200 && Number(status) < 300;
+      var runStatus = row.github_run_conclusion || row.github_run_status || "-";
+      var runKind = row.github_run_conclusion === "success" ? "ok" : (row.github_run_conclusion ? "bad" : "warn");
       return "<tr><td>" + esc(fmtDay(row.publish_date)) + "</td><td>" + badge(status, ok ? "ok" : "warn") +
-        "</td><td>" + esc(fmtDate(row.created_at)) + "</td><td>" + link(row.github_run_url, "열기") + "</td></tr>";
+        "</td><td>" + badge(runStatus, runKind) + "</td><td>" + esc(fmtDate(row.created_at)) +
+        "</td><td>" + link(row.github_run_url, row.github_run_id ? "#" + row.github_run_id : "열기") + "</td></tr>";
     }).join("");
   }
   function renderAudit() {
@@ -396,8 +501,12 @@
       if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), "뉴스레터 실발송 워크플로우를 요청했습니다.", "ok");
       return Promise.allSettled([loadRuns(), loadOverview()]);
     }).catch(function (error) {
-      setStatus(byId("grm-ops-status"), errText(error), "err");
-      if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), errText(error), "err");
+      var message = errText(error);
+      if (error && error.status === 409 && error.data && error.data.existing) {
+        message += " (" + fmtDate(error.data.existing.created_at) + ")";
+      }
+      setStatus(byId("grm-ops-status"), message, "err");
+      if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), message, "err");
     }).finally(function () { if (button) button.disabled = false; });
   }
 
@@ -496,6 +605,8 @@
       showLogin("", "");
     });
   });
+
+  probeBackend();
 
   state.client.auth.getSession().then(function (res) {
     state.session = res.data && res.data.session;

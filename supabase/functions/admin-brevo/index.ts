@@ -61,6 +61,35 @@ Deno.serve(async (req: Request) => {
 
   if (req.method === "GET") {
     if (!apiKey()) return jsonResponse({ error: "brevo_not_configured" }, 500);
+    if (action === "health") {
+      if (!listId()) {
+        return jsonResponse({
+          ok: false,
+          configured: true,
+          list_configured: false,
+          error: "brevo_list_not_configured",
+        }, 500);
+      }
+      const [list, contacts, campaigns] = await Promise.all([
+        brevo(`/contacts/lists/${encodeURIComponent(listId())}`),
+        brevo(`/contacts/lists/${encodeURIComponent(listId())}/contacts?limit=1&offset=0`),
+        brevo(`/emailCampaigns?type=classic&limit=5&offset=0&sort=desc`),
+      ]);
+      return jsonResponse({
+        ok: list.ok && contacts.ok && campaigns.ok,
+        configured: true,
+        list_configured: true,
+        list_id: listId(),
+        list: list.payload,
+        contacts: contacts.payload,
+        campaigns: campaigns.payload,
+        statuses: {
+          list: list.status,
+          contacts: contacts.status,
+          campaigns: campaigns.status,
+        },
+      }, list.ok && contacts.ok && campaigns.ok ? 200 : 502);
+    }
     if (action === "subscribers") {
       if (!listId()) return jsonResponse({ error: "brevo_list_not_configured" }, 500);
       const res = await brevo(`/contacts/lists/${encodeURIComponent(listId())}/contacts?limit=${limit}&offset=${offset}`);

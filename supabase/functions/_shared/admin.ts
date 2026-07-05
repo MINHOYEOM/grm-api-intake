@@ -44,7 +44,7 @@ export async function readJsonBody(req: Request): Promise<Record<string, unknown
 }
 
 export type AdminContext = {
-  supabase: ReturnType<typeof createClient>;
+  supabase: any;
   user: { id: string; email?: string | null };
   admin: Record<string, unknown>;
 };
@@ -94,7 +94,7 @@ export async function audit(
       action,
       target_type: targetType || null,
       target_id: targetId || null,
-      details,
+      details: { actor_email: ctx.user.email || null, ...details },
     });
   } catch (_) {
     // Auditing should never block the operator action.

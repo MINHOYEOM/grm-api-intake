@@ -31,6 +31,7 @@ web/
 │  └─ fixtures/multi/   # 합성 2건(06-08 산문·번역 / 06-15 병합) — 멀티 골든용
 ├─ migrations/001_reaction.sql  # [S1] Supabase(Postgres) 반응 테이블+RLS+heart_counts 뷰. 사람 1회 실행(배포물 아님·render 미복사)
 ├─ ../supabase/migrations/202607050001_admin_ops.sql  # [A1] Admin 권한·감사·뉴스레터 발송 로그 + 최초 Admin bootstrap
+├─ ../supabase/migrations/202607050002_admin_ops_hardening.sql # [A1.1] 발송 실행 추적·중복 실발송 방지
 ├─ ../supabase/functions/admin-* # [A1] Admin Edge Functions(Supabase service role·GitHub Actions·Brevo)
 └─ dist/                # 빌드 산출(정적, assets/search-index.json 포함). git 비추적
 ```
@@ -197,7 +198,14 @@ robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `
   + `public.is_admin()` 에서 확인한다. `202607050001_admin_ops.sql` 은 해당 이메일의 Auth 사용자가 존재하거나
   새로 생성될 때 자동으로 `Admin` 권한을 bootstrap 한다.
 - **기능**: 뉴스레터 실발송(`grm-newsletter-send.yml` `mode=send`), 웹 재배포, 수집 실행, 브리프 감사,
-  Brevo 구독자 조회/추가/리스트 제거, Supabase Auth 회원 조회/인증/차단/차단해제, 반응 인사이트, 감사 로그.
+  Brevo 구독자 조회/추가/리스트 제거, Supabase Auth 회원 조회/인증/차단/차단해제, 반응 인사이트, 감사 로그,
+  운영 준비도 점검.
+- **실발송 보호**: Admin 버튼은 테스트 발송 없이 실제 `workflow_dispatch` 를 호출한다. 단, 같은 `publish_date`
+  의 성공 요청(`github_status` 2xx)은 재요청을 차단하고, GitHub가 생성한 실제 run URL/id/status 를
+  `newsletter_dispatch_log` 에 기록한다.
+- **상태 진단**: 로그인 전 readiness 패널은 Edge Function 404(미배포), 500(시크릿/서버 설정), 401/403(배포됨·인증 대기)
+  를 구분한다. 로그인 후 시스템 탭은 Supabase DB 테이블, GitHub workflow 존재 여부, Brevo 리스트/API 상태를 `health`
+  엔드포인트로 확인한다.
 - **백엔드**: `supabase/functions/admin-supabase`, `admin-github`, `admin-brevo`. 모든 함수는
   `verify_jwt=false` 로 배포하되, 함수 내부에서 `Authorization: Bearer <Supabase session>` 을 검증하고
   Admin 권한을 재확인한다. service role·GitHub PAT·Brevo API key 는 Edge Function secrets 로만 둔다.

@@ -790,6 +790,9 @@ class WebAdminRenderTest(unittest.TestCase):
         self.assertIn('id="grm-admin-cfg"', h)
         self.assertIn('data-admin-email="yeomminho1472@gmail.com"', h)
         self.assertIn('data-supabase-url="https://rfwixqqdljpmtjdlblct.supabase.co"', h)
+        self.assertIn('id="grm-admin-readiness"', h)
+        self.assertIn("Admin Backend", h)
+        self.assertIn("<th>요청</th><th>실행</th>", h)
         self.assertIn('/assets/admin.js?v=', h)
         self.assertIn('Disallow: /admin/', robots)
 

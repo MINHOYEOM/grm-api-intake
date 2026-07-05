@@ -180,9 +180,25 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </label>
           <button class="btn coral" type="submit" id="grm-admin-login-submit"><i class="ti ti-login-2"></i>로그인</button>
         </form>
+        <form class="admin-form admin-hidden" id="grm-admin-confirm-form">
+          <label>인증 코드
+            <input type="text" name="token" inputmode="numeric" autocomplete="one-time-code" required placeholder="메일로 받은 코드">
+          </label>
+          <button class="btn coral" type="submit"><i class="ti ti-shield-check"></i>Admin 계정 인증</button>
+        </form>
+        <form class="admin-form admin-hidden" id="grm-admin-reset-form">
+          <label>재설정 코드
+            <input type="text" name="token" inputmode="numeric" autocomplete="one-time-code" required placeholder="메일로 받은 코드">
+          </label>
+          <label>새 비밀번호
+            <input type="password" name="password" autocomplete="new-password" required minlength="6">
+          </label>
+          <button class="btn coral" type="submit"><i class="ti ti-key"></i>비밀번호 변경</button>
+        </form>
         <div class="admin-login-alt">
           <button class="admin-linkbtn" type="button" id="grm-admin-signup">최초 Admin 계정 만들기</button>
           <button class="admin-linkbtn" type="button" id="grm-admin-reset">비밀번호 재설정 메일 보내기</button>
+          <button class="admin-linkbtn admin-hidden" type="button" id="grm-admin-auth-back">로그인으로 돌아가기</button>
         </div>
         <div class="admin-status" id="grm-admin-login-status" role="status" aria-live="polite"></div>
         <div class="admin-readiness" id="grm-admin-readiness" aria-live="polite">

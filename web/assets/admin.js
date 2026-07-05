@@ -53,6 +53,7 @@
   function link(url, label) {
     return /^https?:\/\//i.test(String(url || "")) ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label || "열기") + "</a>" : "-";
   }
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   function runKind(run) {
     if (!run) return "warn";
     if (run.status && run.status !== "completed") return "warn";
@@ -118,6 +119,8 @@
   var anonKey = cfg.getAttribute("data-supabase-anon-key") || "";
   var indexUrl = cfg.getAttribute("data-index") || "/assets/search-index.json";
   var adminEmail = cfg.getAttribute("data-admin-email") || "yeomminho1472@gmail.com";
+  var pendingAdminSignupEmail = "";
+  var pendingAdminResetEmail = "";
   var state = {
     client: null,
     session: null,
@@ -140,7 +143,14 @@
     txt("grm-admin-live", "설정 필요");
     return;
   }
-  state.client = window.supabase.createClient(supabaseUrl, anonKey);
+  state.client = window.supabase.createClient(supabaseUrl, anonKey, {
+    auth: {
+      storageKey: "grm-admin-auth-v1",
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
   var functionsBase = supabaseUrl + "/functions/v1/";
 
   function api(path, options) {
@@ -264,6 +274,7 @@
     hide(byId("grm-admin-login"), false);
     hide(byId("grm-admin-dashboard"), true);
     hide(byId("grm-admin-signout"), true);
+    setAdminAuthMode("login");
     byId("grm-admin-email").className = "admin-pill";
     byId("grm-admin-email").innerHTML = '<i class="ti ti-lock"></i>로그인 필요';
     setLive("로그인 필요", "warn");
@@ -278,6 +289,18 @@
     byId("grm-admin-email").innerHTML = '<i class="ti ti-shield-check"></i>' + esc(email || "Admin");
     setLive("Admin 연결됨", "ok");
     setStatus(byId("grm-admin-login-status"), "", "");
+  }
+  function setAdminAuthMode(mode) {
+    hide(byId("grm-admin-login-form"), mode !== "login");
+    hide(byId("grm-admin-confirm-form"), mode !== "confirm");
+    hide(byId("grm-admin-reset-form"), mode !== "reset");
+    hide(byId("grm-admin-signup"), mode !== "login");
+    hide(byId("grm-admin-reset"), mode !== "login");
+    hide(byId("grm-admin-auth-back"), mode === "login");
+  }
+  function adminLoginEmail() {
+    var form = byId("grm-admin-login-form");
+    return ((form && form.elements.email.value) || adminEmail).trim();
   }
 
   function setTab(name) {
@@ -821,19 +844,95 @@
         state.session = res.data.session;
         return api("admin-supabase?action=me").then(function () { showDashboard(); return refreshAll(); });
       }
-      setStatus(byId("grm-admin-login-status"), "확인 메일을 보냈습니다. 메일 인증 후 로그인하세요.", "ok");
+      pendingAdminSignupEmail = email;
+      setAdminAuthMode("confirm");
+      setStatus(byId("grm-admin-login-status"), "인증 코드를 " + email + " 로 보냈습니다. 메일의 코드를 입력하세요.", "ok");
     }).catch(function (error) { setStatus(byId("grm-admin-login-status"), errText(error), "err"); });
+  });
+  byId("grm-admin-confirm-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var token = (e.currentTarget.elements.token.value || "").trim();
+    if (!pendingAdminSignupEmail) {
+      setAdminAuthMode("login");
+      setStatus(byId("grm-admin-login-status"), "먼저 Admin 계정 만들기를 실행하세요.", "err");
+      return;
+    }
+    if (!token) {
+      setStatus(byId("grm-admin-login-status"), "메일로 받은 인증 코드를 입력하세요.", "err");
+      return;
+    }
+    setStatus(byId("grm-admin-login-status"), "인증 중", "");
+    state.client.auth.verifyOtp({ email: pendingAdminSignupEmail, token: token, type: "signup" }).then(function (res) {
+      if (res.error) throw res.error;
+      state.session = res.data && res.data.session;
+      return api("admin-supabase?action=me");
+    }).then(function () {
+      pendingAdminSignupEmail = "";
+      showDashboard();
+      return refreshAll();
+    }).catch(function (error) {
+      setStatus(byId("grm-admin-login-status"), errText(error) || "코드가 올바르지 않거나 만료됐습니다.", "err");
+    });
   });
   byId("grm-admin-reset").addEventListener("click", function () {
     if (!requireBackendReady()) return;
-    var email = (byId("grm-admin-login-form").elements.email.value || adminEmail).trim();
+    var email = adminLoginEmail();
+    if (!EMAIL_RE.test(email)) {
+      setStatus(byId("grm-admin-login-status"), "올바른 이메일을 입력하세요.", "err");
+      return;
+    }
+    if (email.toLowerCase() !== adminEmail.toLowerCase()) {
+      setStatus(byId("grm-admin-login-status"), "Admin 비밀번호 재설정은 " + adminEmail + " 계정만 가능합니다.", "err");
+      return;
+    }
     state.client.auth.resetPasswordForEmail(email).then(function (res) {
       if (res.error) throw res.error;
-      setStatus(byId("grm-admin-login-status"), "비밀번호 재설정 메일을 보냈습니다.", "ok");
+      pendingAdminResetEmail = email;
+      setAdminAuthMode("reset");
+      setStatus(byId("grm-admin-login-status"), "재설정 코드를 " + email + " 로 보냈습니다. 코드와 새 비밀번호를 입력하세요.", "ok");
     }).catch(function (error) { setStatus(byId("grm-admin-login-status"), errText(error), "err"); });
   });
+  byId("grm-admin-reset-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var token = (e.currentTarget.elements.token.value || "").trim();
+    var password = e.currentTarget.elements.password.value || "";
+    if (!pendingAdminResetEmail) {
+      setAdminAuthMode("login");
+      setStatus(byId("grm-admin-login-status"), "먼저 재설정 코드를 요청하세요.", "err");
+      return;
+    }
+    if (!token) {
+      setStatus(byId("grm-admin-login-status"), "메일로 받은 재설정 코드를 입력하세요.", "err");
+      return;
+    }
+    if (password.length < 6) {
+      setStatus(byId("grm-admin-login-status"), "새 비밀번호를 6자 이상 입력하세요.", "err");
+      return;
+    }
+    setStatus(byId("grm-admin-login-status"), "코드 확인 중", "");
+    state.client.auth.verifyOtp({ email: pendingAdminResetEmail, token: token, type: "recovery" }).then(function (res) {
+      if (res.error) throw res.error;
+      state.session = res.data && res.data.session;
+      return state.client.auth.updateUser({ password: password });
+    }).then(function (res) {
+      if (res.error) throw res.error;
+      return api("admin-supabase?action=me");
+    }).then(function () {
+      pendingAdminResetEmail = "";
+      showDashboard();
+      return refreshAll();
+    }).catch(function (error) {
+      setStatus(byId("grm-admin-login-status"), errText(error) || "코드가 올바르지 않거나 만료됐습니다.", "err");
+    });
+  });
+  byId("grm-admin-auth-back").addEventListener("click", function () {
+    pendingAdminSignupEmail = "";
+    pendingAdminResetEmail = "";
+    setAdminAuthMode("login");
+    setStatus(byId("grm-admin-login-status"), "", "");
+  });
   byId("grm-admin-signout").addEventListener("click", function () {
-    state.client.auth.signOut().finally(function () {
+    state.client.auth.signOut({ scope: "local" }).finally(function () {
       state.session = null;
       showLogin("", "");
     });

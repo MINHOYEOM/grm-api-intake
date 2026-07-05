@@ -29,9 +29,10 @@ web/
 │  ├─ test_linkcheck.py # 링크체크 모킹 단위테스트(200/404/503/timeout/KR-skip/HEAD→GET)
 │  ├─ golden/           # 동결 기대 HTML + search-index*.expected.json (byte-diff)
 │  └─ fixtures/multi/   # 합성 2건(06-08 산문·번역 / 06-15 병합) — 멀티 골든용
-├─ migrations/001_reaction.sql  # [S1] Supabase(Postgres) 반응 테이블+RLS+heart_counts 뷰. 사람 1회 실행(배포물 아님·render 미복사)
+├─ migrations/001_reaction.sql  # [S1] Supabase(Postgres) 반응 테이블+RLS+공개 집계 테이블/heart_counts 뷰. 사람 1회 실행(배포물 아님·render 미복사)
 ├─ ../supabase/migrations/202607050001_admin_ops.sql  # [A1] Admin 권한·감사·뉴스레터 발송 로그 + 최초 Admin bootstrap
 ├─ ../supabase/migrations/202607050002_admin_ops_hardening.sql # [A1.1] 발송 실행 추적·중복 실발송 방지
+├─ ../supabase/migrations/20260705033033_admin_ops_security_definer_hardening.sql # [A1.2] Admin SECURITY DEFINER RPC 노출 차단
 ├─ ../supabase/functions/admin-* # [A1] Admin Edge Functions(Supabase service role·GitHub Actions·Brevo)
 └─ dist/                # 빌드 산출(정적, assets/search-index.json 포함). git 비추적
 ```
@@ -155,12 +156,13 @@ python web/newsletter.py --publish-date 2026-06-26 --mode validate --out mail.ht
 python web/newsletter.py --publish-date 2026-06-26 --mode test   # 테스트 발송(GRM_NEWSLETTER_TEST_EMAILS)
 python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱등 → 캠페인 생성·sendNow)
 ```
-- **발송 게이트 4겹**(되돌릴 수 없는 발송 — 무인 발송 0): ① 발행검증=`run_gates`(구조: 스키마·
+- **발송 게이트 3겹**(되돌릴 수 없는 발송): ① 발행검증=`run_gates`(구조: 스키마·
   발행일·카드·면책 + provenance: 메일이 우리 페이지만 링크·추적 파라미터 0) — 무거운 Brief Lint/
   handoff provenance 는 발행 시점 Routine 에서 이미 실행, 여기선 web-card 무결성 재확인 ② 링크체크
   **승격**=`linkcheck.py` 재사용(broken→발송 **보류**, degraded/KR-egress 스킵은 비차단) ③ 멱등=
-  캠페인명(`publish_date` 파생) 키(`find_campaign`→이미 발송 호 재발송 0) ④ 사람승인=`workflow_dispatch`
-  +send 잡 `environment: production`(required reviewer).
+  캠페인명(`publish_date` 파생) 키(`find_campaign`→이미 발송 호 재발송 0). Admin 콘솔의 단일 Admin
+  인증·감사 로그·중복 발송 차단을 운영 승인 경계로 삼아, Admin 버튼은 GitHub 추가 승인 없이 실발송
+  워크플로우를 끝까지 실행한다.
 - **무변형/provenance**: 메일은 `tldr`(verbatim)·섹션명·**우리 사이트 링크**만. 카드 사실·원문 인용·
   **카드 출처 URL(provenance 보호 대상)은 메일에 안 들어간다** — 딥링크는 `SITE_BASE_URL` 의 우리 페이지·
   `#sec-{그룹}` 앵커뿐(추적 파라미터 0). 클릭 추적은 SaaS 가 발송 시점에 자기 도메인으로 래핑 →
@@ -195,8 +197,9 @@ python web/newsletter.py --publish-date 2026-06-26 --mode send   # 실발송(멱
 robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `yeomminho1472@gmail.com` 단일 계정이다.
 
 - **접근 제어**: 브라우저는 Supabase Auth 로그인만 수행한다. 실제 권한은 DB `public.admin_user`
-  + `public.is_admin()` 에서 확인한다. `202607050001_admin_ops.sql` 은 해당 이메일의 Auth 사용자가 존재하거나
-  새로 생성될 때 자동으로 `Admin` 권한을 bootstrap 한다.
+  + `private.is_admin()` 에서 확인한다. `202607050001_admin_ops.sql` 은 해당 이메일의 Auth 사용자가 존재하거나
+  새로 생성될 때 자동으로 `Admin` 권한을 bootstrap 하고, `20260705033033_admin_ops_security_definer_hardening.sql`
+  은 Admin helper RPC 노출을 차단한다.
 - **기능**: 뉴스레터 실발송(`grm-newsletter-send.yml` `mode=send`), 웹 재배포, 수집 실행, 브리프 감사,
   Brevo 구독자 조회/추가/리스트 제거, Supabase Auth 회원 조회/인증/차단/차단해제, 반응 인사이트, 감사 로그,
   운영 준비도 점검.
@@ -205,17 +208,16 @@ robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `
   `newsletter_dispatch_log` 에 기록한다.
 - **상태 진단**: 로그인 전 readiness 패널은 Edge Function 404(미배포), 500(시크릿/서버 설정), 401/403(배포됨·인증 대기)
   를 구분한다. 로그인 후 시스템 탭은 Supabase DB 테이블, GitHub workflow 존재 여부, Brevo 리스트/API 상태를 `health`
-  엔드포인트로 확인한다. 백엔드 미배포 시에는 로그인 카드 하단에 남은 Supabase Secrets 와
-  `GRM Admin Backend Deploy` 활성화 상태를 함께 표시한다.
+  엔드포인트로 확인한다. 백엔드 미배포 또는 런타임 오류 시에는 Edge Function secrets 와
+  `GRM Admin Backend Deploy` 상태를 함께 점검하도록 안내한다.
 - **백엔드**: `supabase/functions/admin-supabase`, `admin-github`, `admin-brevo`. 모든 함수는
   `verify_jwt=false` 로 배포하되, 함수 내부에서 `Authorization: Bearer <Supabase session>` 을 검증하고
   Admin 권한을 재확인한다. service role·GitHub PAT·Brevo API key 는 Edge Function secrets 로만 둔다.
 - **배포**: `.github/workflows/grm-admin-backend-deploy.yml` 이 DB migration, Edge Function secrets, function deploy 를
   담당한다. 필요한 GitHub Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`,
   `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_GITHUB_ACTIONS_TOKEN`(Actions write 가능한 fine-grained PAT),
-  기존 `NEWSLETTER_API_KEY`. 현재 `ADMIN_GITHUB_ACTIONS_TOKEN` 과 `SUPABASE_PROJECT_REF` 는 설정되어 있으므로,
-  backend 활성화에 남은 값은 Supabase Secrets 3개다. `SUPABASE_PROJECT_REF` 는 Secret/Variable 로 두거나
-  `vars.SUPABASE_URL` 에서 자동 파생된다.
+  기존 `NEWSLETTER_API_KEY`. `SUPABASE_PROJECT_REF` 는 Secret/Variable 로 두거나 `vars.SUPABASE_URL`
+  에서 자동 파생된다.
   워크플로우는 Edge Function `deno check` 를 먼저 수행하고, 시크릿 누락으로 skip 될 때는 GitHub Actions Step Summary 에
   구성/누락 항목을 표로 남긴다.
 

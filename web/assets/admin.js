@@ -600,7 +600,7 @@
     if (errorMessage) {
       host.className = "admin-ops-brief bad";
       host.innerHTML = '<div><h3><i class="ti ti-alert-triangle"></i>GitHub 연결 확인 필요</h3>' +
-        '<p>관제 데이터를 불러오지 못했습니다. Admin GitHub 설정과 Edge Function 응답을 먼저 확인해야 합니다.</p></div>' +
+        '<p>운영 데이터를 불러오지 못했습니다. Admin GitHub 설정과 Edge Function 응답을 먼저 확인해야 합니다.</p></div>' +
         badge("연결 실패", "bad");
       return;
     }
@@ -624,7 +624,7 @@
     if (configWarnings.length) statusBits.push(number(configWarnings.length) + "개 설정 경고");
     if (!statusBits.length && inProgress) statusBits.push(number(inProgress) + "개 워크플로우 실행 중");
     if (!statusBits.length && warningTotal) statusBits.push(number(warningTotal) + "개 운영 경고");
-    var message = "수집, 발행, 배포 워크플로우가 정상 범위입니다. 별도 조치 없이 주기 관제만 유지하면 됩니다.";
+    var message = "수집, 발행, 배포 워크플로우가 정상 범위입니다. 별도 조치 없이 정기 점검만 유지하면 됩니다.";
     if (kind === "bad") {
       message = "다음 항목이 감지되었습니다: " + statusBits.join(", ") + ". 오른쪽 조치 항목에서 GitHub 로그를 열고 필요한 경우 복구 실행을 사용하세요.";
     } else if (kind === "warn") {
@@ -639,7 +639,7 @@
     var host = byId("grm-ops-summary");
     if (!host) return;
     if (errorMessage) {
-      host.innerHTML = '<div class="admin-metric"><span><i class="ti ti-alert-triangle"></i>GitHub 연결</span><b class="bad">확인 필요</b><p>관제 API 응답 실패</p></div>';
+      host.innerHTML = '<div class="admin-metric"><span><i class="ti ti-alert-triangle"></i>GitHub 연결</span><b class="bad">확인 필요</b><p>운영 API 응답 실패</p></div>';
       return;
     }
     var summary = (state.ops && state.ops.summary) || {};
@@ -705,26 +705,29 @@
             esc((warning.title || "운영 경고") + (skipped ? " · 확인 단계: " + skipped : "")) + "</div>";
         }).join("") + "</div>";
       }
-      return '<article class="admin-workflow-card ' + esc(displayKind) + '">' +
-        '<div class="admin-workflow-main">' +
-          '<div class="admin-workflow-top"><div class="admin-workflow-identity"><span class="admin-workflow-index">' + esc(meta.index) +
-          '</span><div><span class="admin-workflow-stage"><i class="ti ' + esc(meta.icon) + '"></i>' + esc(meta.stage) +
-          ' · ' + esc(wf.workflow || "") + '</span><b>' + esc(wf.label || wf.workflow || "-") +
-          '</b><p>' + esc(wf.purpose || "") + '</p></div></div>' + badge(status, displayKind) + "</div>" +
-          '<div class="admin-workflow-readout">' +
-            '<div class="admin-workflow-note"><span><i class="ti ti-route"></i>운영 영향</span>' + esc(meta.impact) + "</div>" +
+      return '<details class="admin-workflow-row ' + esc(displayKind) + '">' +
+        '<summary><div class="admin-workflow-compact">' +
+          '<div class="admin-workflow-identity"><span class="admin-workflow-index">' + esc(meta.index) +
+          '</span><div class="admin-workflow-name"><span class="admin-workflow-stage"><i class="ti ' + esc(meta.icon) + '"></i> ' +
+          esc(meta.stage) + ' · ' + esc(wf.workflow || "") + '</span><b>' + esc(wf.label || wf.workflow || "-") + "</b></div></div>" +
+          '<div class="admin-workflow-quick"><i class="ti ti-history"></i><span>' + esc((wf.purpose || meta.pipelineDesc)) +
+          " · 최근 " + esc(run ? fmtDate(run.created_at) : "기록 없음") + " · " + esc(run ? eventLabel(run.event) : "-") + "</span></div>" +
+        '</div><div class="admin-workflow-action">' + badge(status, displayKind) +
+          '<span class="admin-expand-label">상세 런북</span></div></summary>' +
+        '<div class="admin-workflow-detail">' +
+          '<div class="admin-next-action ' + esc(action.kind) + '"><strong>다음 조치</strong> · ' + esc(action.text) + "</div>" +
+          '<div class="admin-workflow-detail-grid">' +
             '<div class="admin-workflow-note"><span><i class="ti ti-clipboard-check"></i>현재 판단</span>' + esc(workflowJudgment(displayKind, run, wfWarnings)) + "</div>" +
+            '<div class="admin-workflow-note"><span><i class="ti ti-route"></i>운영 영향</span>' + esc(meta.impact) + "</div>" +
+            '<div class="admin-workflow-note"><span><i class="ti ti-search"></i>볼 곳</span>' + esc(meta.focus) + "</div>" +
           "</div>" +
           '<dl class="admin-workflow-facts">' + facts.map(function (fact) {
             return "<div><dt>" + esc(fact[0]) + "</dt><dd>" + esc(fact[1]) + "</dd></div>";
           }).join("") + "</dl>" +
-          '<div class="admin-workflow-run"><i class="ti ti-history"></i><span title="' + esc(title) + '">최근 실행 ' + esc(runNo) + ': ' + esc(title) + "</span></div>" +
-          '<div class="admin-workflow-note"><span><i class="ti ti-search"></i>볼 곳</span>' + esc(meta.focus) + "</div>" +
+          '<div class="admin-workflow-note"><span><i class="ti ti-history"></i>최근 실행</span>' + esc(runNo) + " · " + esc(title) + "</div>" +
           warningHtml +
-          '<div class="admin-next-action ' + esc(action.kind) + '"><strong>다음 조치</strong> · ' + esc(action.text) + "</div>" +
           '<div class="admin-card-actions">' + actions.join("") + "</div>" +
-        "</div>" +
-      "</article>";
+        "</div></details>";
     }).join("");
   }
   function renderWorkflowPipeline(errorMessage) {
@@ -771,22 +774,21 @@
     var configWarnings = (state.ops && state.ops.configuration_warnings) || [];
     var parts = [];
     if (!incidents.length && !warnings.length && !configWarnings.length) {
-      parts.push('<div class="admin-incident"><div class="admin-incident-head"><div><span class="admin-incident-kind">정상 상태</span><b>현재 조치할 항목 없음</b></div>' +
-        badge("정상", "ok") + '</div><p><strong>의미</strong> · 최근 GitHub Actions 실행에서 실패 작업이나 설정 경고가 발견되지 않았습니다.</p></div>');
+      parts.push('<div class="admin-incident-empty"><strong>현재 조치할 항목 없음</strong><br>실패 작업이나 설정 경고가 발견되지 않았습니다.</div>');
     }
     configWarnings.slice(0, 6).forEach(function (warning) {
       var steps = (warning.steps || []).slice(0, 5).map(function (step) {
         return "<code>" + esc((step.job_name || "job") + " · " + (step.name || "-") + " · " + (step.conclusion || step.status || "-")) + "</code>";
       }).join("");
       var actions = [];
-      if (warning.run_url) actions.push(link(warning.run_url, "GitHub 로그"));
-      actions.push(link("https://github.com/MINHOYEOM/grm-api-intake/settings/secrets/actions", "Secrets 확인"));
-      parts.push('<div class="admin-incident warn"><div class="admin-incident-head"><div><span class="admin-incident-kind">설정 경고</span><b>' +
-        esc(warning.title || "운영 설정 경고") + "</b></div>" + badge("설정 필요", "warn") +
-        '</div><p><strong>의미</strong> · ' + esc(warning.detail || "워크플로우 일부 단계가 설정 문제로 건너뛰었을 수 있습니다.") + "</p>" +
+      if (warning.run_url) actions.push(actionLink(warning.run_url, "GitHub 로그", "primary"));
+      actions.push(actionLink("https://github.com/MINHOYEOM/grm-api-intake/settings/secrets/actions", "Secrets 확인", ""));
+      parts.push('<details class="admin-incident-row warn"><summary><div class="admin-incident-title"><span>설정 경고</span><b>' +
+        esc(warning.title || "운영 설정 경고") + "</b></div>" + badge("상세", "warn") + "</summary>" +
+        '<div class="admin-incident-detail"><p><strong>의미</strong> · ' + esc(warning.detail || "워크플로우 일부 단계가 설정 문제로 건너뛰었을 수 있습니다.") + "</p>" +
         '<p><strong>권장 조치</strong> · 필요한 GitHub Secret과 배포 단계를 확인하세요.</p>' +
         (steps ? '<div class="admin-step-list">' + steps + "</div>" : "") +
-        '<div class="admin-card-actions">' + actions.join("") + "</div></div>");
+        '<div class="admin-card-actions">' + actions.join("") + "</div></div></details>");
     });
     incidents.slice(0, 6).forEach(function (run) {
       var jobs = run.failed_jobs || [];
@@ -799,22 +801,22 @@
           return "<code>" + esc((job.name || "job") + " · " + (job.conclusion || "-") + (steps ? " · " + steps : "")) + "</code>";
         }).join("") + "</div>";
       }
-      parts.push('<div class="admin-incident bad"><div class="admin-incident-head"><div><span class="admin-incident-kind">실패 Run</span><b>' +
-        esc(run.workflow_name || run.workflow_id || "Workflow") + "</b></div>" + badge(runLabel(run), "bad") +
-        '</div><p><strong>의미</strong> · 최신 실행이 실패했습니다. ' + esc(fmtDate(run.created_at)) + " 기준 " + esc(run.display_title || eventLabel(run.event) || "") + "</p>" +
+      parts.push('<details class="admin-incident-row bad"><summary><div class="admin-incident-title"><span>실패 Run</span><b>' +
+        esc(run.workflow_name || run.workflow_id || "Workflow") + "</b></div>" + badge(runLabel(run), "bad") + "</summary>" +
+        '<div class="admin-incident-detail"><p><strong>의미</strong> · 최신 실행이 실패했습니다. ' + esc(fmtDate(run.created_at)) + " 기준 " + esc(run.display_title || eventLabel(run.event) || "") + "</p>" +
         '<p><strong>권장 조치</strong> · 실패 job 로그를 확인하고 원인이 일시적이면 재실행하세요.</p>' +
-        jobHtml + '<div class="admin-card-actions">' + link(run.html_url, "GitHub 로그") +
-        '<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button></div></div>');
+        jobHtml + '<div class="admin-card-actions">' + actionLink(run.html_url, "GitHub 로그", "primary") +
+        '<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button></div></div></details>');
     });
     warnings.slice(0, 4).forEach(function (issue) {
       var detail = issue.detail || "";
       var meta = [issue.title || "", fmtDate(issue.updated_at)].filter(Boolean).join(" · ");
-      var actions = [link(issue.html_url, "Issue 확인")];
-      if (issue.latest_run_url) actions.push(link(issue.latest_run_url, "최신 Run"));
-      parts.push('<div class="admin-incident warn"><div class="admin-incident-head"><div><span class="admin-incident-kind">운영 경고</span><b>Issue #' +
-        esc(issue.number || "-") + "</b></div>" + badge("확인", "warn") + '</div><p><strong>의미</strong> · ' + esc(meta || "운영 경고가 열려 있습니다.") +
+      var actions = [actionLink(issue.html_url, "Issue 확인", "primary")];
+      if (issue.latest_run_url) actions.push(actionLink(issue.latest_run_url, "최신 Run", ""));
+      parts.push('<details class="admin-incident-row warn"><summary><div class="admin-incident-title"><span>운영 경고</span><b>Issue #' +
+        esc(issue.number || "-") + "</b></div>" + badge("상세", "warn") + '</summary><div class="admin-incident-detail"><p><strong>의미</strong> · ' + esc(meta || "운영 경고가 열려 있습니다.") +
         '</p>' + (detail ? '<p><strong>권장 조치</strong> · ' + esc(detail) + "</p>" : '<p><strong>권장 조치</strong> · Issue 내용을 확인하고 최신 Run과 비교하세요.</p>') +
-        '<div class="admin-card-actions">' + actions.join("") + "</div></div>");
+        '<div class="admin-card-actions">' + actions.join("") + "</div></div></details>");
     });
     host.innerHTML = parts.join("");
   }

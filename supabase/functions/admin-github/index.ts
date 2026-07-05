@@ -340,7 +340,38 @@ async function openWarningIssues() {
     title: issue.title || "",
     html_url: issue.html_url || null,
     updated_at: issue.updated_at || null,
+    ...warningIssueSummary(issue),
   }));
+}
+
+function warningIssueSummary(issue: Record<string, unknown>) {
+  const body = typeof issue.body === "string" ? issue.body : "";
+  const warningLines = body.split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("- ["))
+    .slice(0, 4);
+  const warningCodes = warningLines
+    .map((line) => line.match(/^- \[([^\]]+)\]/)?.[1] || "")
+    .filter(Boolean);
+  const warnings = warningLines.map((line) =>
+    line
+      .replace(/^- \[[^\]]+\]\s*/, "")
+      .replace(/\*\*/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
+  const detailBase = warnings.slice(0, 2).map((line) =>
+    line.length > 180 ? `${line.slice(0, 177)}...` : line
+  ).join(" / ");
+  const detail = detailBase
+    ? `${detailBase}${warnings.length > 2 ? ` 외 ${warnings.length - 2}건` : ""}`
+    : "";
+  return {
+    detail,
+    warning_codes: warningCodes,
+    latest_run_url: body.match(/- 최신 Run:\s*(\S+)/)?.[1] || null,
+    latest_run_date: body.match(/- 최신 Run date \(KST\):\s*([^\n]+)/)?.[1]?.trim() || null,
+  };
 }
 
 async function opsOverview() {

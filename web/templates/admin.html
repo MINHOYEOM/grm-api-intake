@@ -36,6 +36,10 @@
 .admin-status.ok{color:var(--coral-2)}
 .admin-readiness{display:grid;gap:7px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 .admin-readiness .admin-check{padding-bottom:7px}
+.admin-activation{margin-top:12px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:13px 14px}
+.admin-activation h3{font-size:13.5px;color:var(--ink);font-weight:700;margin-bottom:8px}
+.admin-activation-grid{display:grid;gap:7px}
+.admin-activation a{color:var(--coral-2);text-decoration:underline}
 .admin-dashboard{display:grid;gap:16px}
 .admin-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:14px 15px;min-width:0}
@@ -156,6 +160,13 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <div class="admin-readiness" id="grm-admin-readiness" aria-live="polite">
           <div class="admin-check"><span>Admin Web Config<br><code>Supabase client</code></span><span class="admin-pill warn">확인 중</span></div>
           <div class="admin-check"><span>Admin Backend<br><code>Supabase Edge Functions</code></span><span class="admin-pill warn">확인 중</span></div>
+        </div>
+        <div class="admin-activation" id="grm-admin-activation" hidden>
+          <h3>운영 API 활성화 요건</h3>
+          <div class="admin-activation-grid">
+            <div class="admin-check"><span>GitHub Secrets<br><code>SUPABASE_ACCESS_TOKEN · SUPABASE_DB_PASSWORD · SUPABASE_SERVICE_ROLE_KEY · ADMIN_GITHUB_ACTIONS_TOKEN</code></span><span class="admin-pill bad">필요</span></div>
+            <div class="admin-check"><span>Backend Deploy<br><code>GRM Admin Backend Deploy</code></span><span class="admin-pill warn">대기</span></div>
+          </div>
         </div>
       </section>
 

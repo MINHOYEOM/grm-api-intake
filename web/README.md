@@ -205,7 +205,8 @@ robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `
   `newsletter_dispatch_log` 에 기록한다.
 - **상태 진단**: 로그인 전 readiness 패널은 Edge Function 404(미배포), 500(시크릿/서버 설정), 401/403(배포됨·인증 대기)
   를 구분한다. 로그인 후 시스템 탭은 Supabase DB 테이블, GitHub workflow 존재 여부, Brevo 리스트/API 상태를 `health`
-  엔드포인트로 확인한다.
+  엔드포인트로 확인한다. 백엔드 미배포 시에는 로그인 카드 하단에 필수 GitHub Secrets 와
+  `GRM Admin Backend Deploy` 활성화 상태를 함께 표시한다.
 - **백엔드**: `supabase/functions/admin-supabase`, `admin-github`, `admin-brevo`. 모든 함수는
   `verify_jwt=false` 로 배포하되, 함수 내부에서 `Authorization: Bearer <Supabase session>` 을 검증하고
   Admin 권한을 재확인한다. service role·GitHub PAT·Brevo API key 는 Edge Function secrets 로만 둔다.
@@ -213,6 +214,8 @@ robots.txt 는 `/admin/` 을 비색인 처리한다. 최초 Admin 이메일은 `
   담당한다. 필요한 GitHub Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`,
   `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_GITHUB_ACTIONS_TOKEN`(Actions write 가능한 fine-grained PAT),
   기존 `NEWSLETTER_API_KEY`. `SUPABASE_PROJECT_REF` 는 Secret/Variable 로 두거나 `vars.SUPABASE_URL` 에서 자동 파생된다.
+  워크플로우는 Edge Function `deno check` 를 먼저 수행하고, 시크릿 누락으로 skip 될 때는 GitHub Actions Step Summary 에
+  구성/누락 항목을 표로 남긴다.
 
 ## 범위 (P3·P4)
 ✅ (P3) 링크체크·배포 Action(Cloudflare)·승인→라이브 게이트·입력 배선 규약.

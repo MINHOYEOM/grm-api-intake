@@ -224,6 +224,16 @@
       renderLoginReadiness();
     });
   }
+  function requireBackendReady() {
+    var probe = state.backendProbe || {};
+    if (probe.ok) return true;
+    var message = probe.detail === "확인 중"
+      ? "운영 API 상태 확인 중입니다. 잠시 후 다시 시도하세요."
+      : "운영 API가 아직 활성화되지 않았습니다. GitHub Secrets 4개를 등록하고 GRM Admin Backend Deploy를 실행한 뒤 다시 시도하세요.";
+    setStatus(byId("grm-admin-login-status"), message, "err");
+    renderActivationPanel();
+    return false;
+  }
   function showLogin(message, type) {
     hide(byId("grm-admin-login"), false);
     hide(byId("grm-admin-dashboard"), true);
@@ -575,6 +585,7 @@
     var form = e.currentTarget;
     var email = (form.elements.email.value || "").trim();
     var password = form.elements.password.value || "";
+    if (!requireBackendReady()) return;
     setStatus(byId("grm-admin-login-status"), "로그인 중", "");
     state.client.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
       if (res.error) throw res.error;
@@ -599,6 +610,7 @@
       setStatus(byId("grm-admin-login-status"), "비밀번호를 6자 이상 입력한 뒤 계정을 만드세요.", "err");
       return;
     }
+    if (!requireBackendReady()) return;
     setStatus(byId("grm-admin-login-status"), "Admin 계정 생성 중", "");
     state.client.auth.signUp({ email: email, password: password }).then(function (res) {
       if (res.error) throw res.error;
@@ -610,6 +622,7 @@
     }).catch(function (error) { setStatus(byId("grm-admin-login-status"), errText(error), "err"); });
   });
   byId("grm-admin-reset").addEventListener("click", function () {
+    if (!requireBackendReady()) return;
     var email = (byId("grm-admin-login-form").elements.email.value || adminEmail).trim();
     state.client.auth.resetPasswordForEmail(email).then(function (res) {
       if (res.error) throw res.error;

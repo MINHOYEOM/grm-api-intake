@@ -13,7 +13,16 @@
   if (!SUPA_URL || !SUPA_KEY) return;
 
   var sb;
-  try { sb = lib.createClient(SUPA_URL, SUPA_KEY); } catch (e) { return; }
+  try {
+    sb = lib.createClient(SUPA_URL, SUPA_KEY, {
+      auth: {
+        storageKey: "grm-public-auth-v1",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false
+      }
+    });
+  } catch (e) { return; }
 
   var rows = Array.prototype.slice.call(
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
@@ -29,8 +38,10 @@
   }
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var ADMIN_EMAIL = "yeomminho1472@gmail.com";
   function esc(x){return String(x==null?"":x).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
   function acctInitial(email){var t=String(email||'G').trim();return (t.charAt(0)||'G').toUpperCase();}
+  function isAdminEmail(email){return String(email||"").trim().toLowerCase()===ADMIN_EMAIL;}
   var acctMenuOpen=false, acctDocBound=false;
   var OWL_SVG =
     '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
@@ -93,7 +104,7 @@
         btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
         acctMenuOpen = willOpen;
       });
-      wrap.querySelector(".grm-acct-out").addEventListener("click", function () { closeAcctMenu(); sb.auth.signOut(); });
+      wrap.querySelector(".grm-acct-out").addEventListener("click", function () { closeAcctMenu(); sb.auth.signOut({ scope: "local" }); });
       if (!acctDocBound) {
         acctDocBound = true;
         document.addEventListener("click", function (e) {
@@ -198,6 +209,7 @@
       var email = (authForm.querySelector('input[type="email"]').value || "").trim();
       var pw = (authForm.querySelector(".grm-pw-wrap input").value || "");
       if (!EMAIL_RE.test(email)) { hint.textContent = "올바른 이메일 형식을 입력해 주세요."; return; }
+      if (isAdminEmail(email)) { hint.textContent = "운영자 계정은 Admin 페이지에서 로그인하세요."; return; }
       if (pw.length < 6) { hint.textContent = "비밀번호는 6자 이상이어야 합니다."; return; }
       var signup = pop.getAttribute("data-mode") === "signup";
       setBusy(authForm, true); m.textContent = signup ? "가입 중…" : "로그인 중…";
@@ -237,6 +249,7 @@
       e.preventDefault();
       var email = (reqcodeForm.querySelector("input").value || "").trim();
       if (!EMAIL_RE.test(email)) { hint.textContent = "올바른 이메일 형식을 입력해 주세요."; return; }
+      if (isAdminEmail(email)) { hint.textContent = "운영자 비밀번호 재설정은 Admin 페이지에서 진행하세요."; return; }
       setBusy(reqcodeForm, true); m.textContent = "전송 중…";
       sb.auth.resetPasswordForEmail(email).then(function (res) {
         setBusy(reqcodeForm, false);

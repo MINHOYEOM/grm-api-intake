@@ -57,6 +57,33 @@
 .admin-op h3 .ti{font-size:18px;color:var(--coral-2)}
 .admin-op p{color:var(--muted);font-size:12.5px;line-height:1.45}
 .admin-op .btn{justify-content:center;width:100%;padding:9px 12px}
+.admin-ops-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.admin-metric{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 14px;min-width:0}
+.admin-metric span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.admin-metric b{display:block;margin-top:5px;color:var(--ink);font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-metric b.ok{color:var(--coral-2)}.admin-metric b.warn{color:var(--med)}.admin-metric b.bad{color:var(--hi)}
+.admin-monitor-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(310px,.65fr);gap:14px;align-items:start}
+.admin-monitor-section h3{font-size:14px;color:var(--ink);font-weight:700;margin-bottom:9px}
+.admin-workflow-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-workflow-card{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 14px;min-width:0}
+.admin-workflow-card.bad{border-color:rgba(189,75,54,.32);background:rgba(189,75,54,.06)}
+.admin-workflow-card.warn{border-color:rgba(176,125,23,.28)}
+.admin-workflow-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.admin-workflow-top b{color:var(--ink);font-size:14px}
+.admin-workflow-card p{color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:5px}
+.admin-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.admin-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.admin-incidents{display:grid;gap:9px}
+.admin-incident{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:12px 13px}
+.admin-incident.bad{border-color:rgba(189,75,54,.32);background:rgba(189,75,54,.06)}
+.admin-incident-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.admin-incident b{display:block;color:var(--ink);font-size:13.5px;line-height:1.35}
+.admin-incident p{color:var(--muted);font-size:12.3px;line-height:1.45;margin-top:5px}
+.admin-step-list{margin-top:8px;display:grid;gap:5px}
+.admin-step-list code{display:block;border:1px solid var(--line);border-radius:var(--rad-s);background:var(--canvas);padding:6px 8px;color:var(--body);font-size:11.5px;white-space:normal}
+.admin-recovery{margin-top:14px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:12px 13px}
+.admin-recovery summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:13.5px}
+.admin-recovery .admin-actions-grid{margin-top:12px}
 .admin-split{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:14px}
 .admin-issue{border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:15px}
 .admin-issue b{display:block;color:var(--ink);font-size:17px;margin-bottom:5px}
@@ -94,9 +121,9 @@ html:not(.grm-icons-ready) #grm-admin .ti::before{content:"";font-family:inherit
 html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-family:system-ui,sans-serif}
 .nav #navmenu,.nav .navtoggle,.nav .btn.coral{display:none!important}
 .site,#grm-mascot{display:none}
-@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-split,.admin-insight{grid-template-columns:1fr}}
+@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid,.admin-workflow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-monitor-layout,.admin-split,.admin-insight{grid-template-columns:1fr}}
 @media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-kpis,.admin-actions-grid{grid-template-columns:1fr}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn{width:100%;justify-content:center}}
+@media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-kpis,.admin-actions-grid,.admin-ops-summary,.admin-workflow-grid{grid-template-columns:1fr}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn{width:100%;justify-content:center}}
 </style>
 
 <main class="admin-main wrap" id="grm-admin">
@@ -114,7 +141,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <span><b>GRM Admin</b><span>Operations Console</span></span>
       </div>
       <nav class="admin-nav" id="grm-admin-tabs">
-        <button type="button" class="on" data-tab="ops"><i class="ti ti-bolt"></i>자동화</button>
+        <button type="button" class="on" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>관제</button>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
         <button type="button" data-tab="users"><i class="ti ti-users"></i>회원</button>
@@ -132,7 +159,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <div>
           <span class="kick">Admin</span>
           <h1>운영자 페이지</h1>
-          <p>뉴스레터 발송, 수집, 배포, 회원, 구독자, 반응 데이터를 한 화면에서 운영합니다.</p>
+          <p>GitHub Actions 파이프라인 결과, 뉴스레터 발송, 회원, 구독자, 반응 데이터를 한 화면에서 운영합니다.</p>
         </div>
         <div class="admin-head-actions">
           <span class="admin-pill warn" id="grm-admin-live"><i class="ti ti-activity"></i>상태 확인 중</span>
@@ -182,27 +209,43 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 
         <section class="admin-panel" data-panel="ops">
           <div class="admin-panel-head">
-            <div><h2>운영 자동화</h2><p class="sub">버튼 클릭으로 GitHub Actions 운영 파이프라인을 실행합니다.</p></div>
+            <div><h2>워크플로우 관제</h2><p class="sub">규제소스 수집과 발행 파이프라인은 GitHub Actions 실행 결과를 기준으로 감시합니다.</p></div>
             <span class="admin-pill" id="grm-github-state">GitHub 확인 중</span>
           </div>
-          <div class="admin-actions-grid">
-            <div class="admin-op">
-              <div><h3><i class="ti ti-mail-forward"></i>뉴스레터 실발송</h3><p>최신호 기준으로 발송 워크플로우를 실행합니다.</p></div>
-              <button class="btn coral" type="button" data-dispatch="newsletter_send"><i class="ti ti-send"></i>발송</button>
+          <div class="admin-ops-summary" id="grm-ops-summary">
+            <div class="admin-metric"><span><i class="ti ti-loader-2"></i>불러오는 중</span><b>-</b></div>
+          </div>
+          <div class="admin-monitor-layout">
+            <div class="admin-monitor-section">
+              <h3>핵심 워크플로우</h3>
+              <div class="admin-workflow-grid" id="grm-workflow-cards"><div class="admin-empty">불러오는 중</div></div>
             </div>
-            <div class="admin-op">
-              <div><h3><i class="ti ti-cloud-upload"></i>웹 재배포</h3><p>현재 main의 정적 사이트를 다시 빌드하고 배포합니다.</p></div>
-              <button class="btn" type="button" data-dispatch="web_deploy"><i class="ti ti-player-play"></i>실행</button>
-            </div>
-            <div class="admin-op">
-              <div><h3><i class="ti ti-database-import"></i>수집 실행</h3><p>규제 소스 수집 워크플로우를 수동 실행합니다.</p></div>
-              <button class="btn" type="button" data-dispatch="intake_run"><i class="ti ti-player-play"></i>실행</button>
-            </div>
-            <div class="admin-op">
-              <div><h3><i class="ti ti-search"></i>브리프 감사</h3><p>발행 후 provenance 감사 워크플로우를 실행합니다.</p></div>
-              <button class="btn" type="button" data-dispatch="brief_audit"><i class="ti ti-player-play"></i>실행</button>
+            <div class="admin-monitor-section">
+              <h3>확인 필요</h3>
+              <div class="admin-incidents" id="grm-ops-incidents"><div class="admin-empty">불러오는 중</div></div>
             </div>
           </div>
+          <details class="admin-recovery">
+            <summary>수동 복구 실행</summary>
+            <div class="admin-actions-grid">
+              <div class="admin-op">
+                <div><h3><i class="ti ti-mail-forward"></i>뉴스레터 실발송</h3><p>최신호 기준으로 발송 워크플로우를 실행합니다.</p></div>
+                <button class="btn coral" type="button" data-dispatch="newsletter_send"><i class="ti ti-send"></i>발송</button>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-cloud-upload"></i>웹 재배포</h3><p>배포 실패나 캐시 점검 시 정적 사이트를 다시 빌드합니다.</p></div>
+                <button class="btn" type="button" data-dispatch="web_deploy"><i class="ti ti-player-play"></i>실행</button>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-database-import"></i>수집 재실행</h3><p>자동 수집 실패 또는 누락 확인 시 규제소스 수집을 재실행합니다.</p></div>
+                <button class="btn" type="button" data-dispatch="intake_run"><i class="ti ti-player-play"></i>실행</button>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-search"></i>브리프 감사</h3><p>발행 후 provenance 감사 워크플로우를 즉시 재검증합니다.</p></div>
+                <button class="btn" type="button" data-dispatch="brief_audit"><i class="ti ti-player-play"></i>실행</button>
+              </div>
+            </div>
+          </details>
           <div class="admin-status" id="grm-ops-status" role="status" aria-live="polite"></div>
         </section>
 

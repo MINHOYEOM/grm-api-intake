@@ -53,6 +53,26 @@
   function link(url, label) {
     return /^https?:\/\//i.test(String(url || "")) ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label || "열기") + "</a>" : "-";
   }
+  function runKind(run) {
+    if (!run) return "warn";
+    if (run.status && run.status !== "completed") return "warn";
+    if (run.conclusion === "success") return "ok";
+    if (["cancelled", "skipped", "neutral"].indexOf(String(run.conclusion || "")) >= 0) return "warn";
+    return "bad";
+  }
+  function runLabel(run) {
+    if (!run) return "실행 없음";
+    return run.conclusion || run.status || "-";
+  }
+  function runDuration(run) {
+    if (!run) return "-";
+    var start = Date.parse(run.run_started_at || run.created_at || "");
+    var end = Date.parse(run.updated_at || "");
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return "-";
+    var sec = Math.max(1, Math.round((end - start) / 1000));
+    if (sec < 60) return sec + "초";
+    return Math.floor(sec / 60) + "분 " + (sec % 60) + "초";
+  }
 
   var ERROR_COPY = {
     missing_auth: "로그인이 필요합니다.",
@@ -66,6 +86,9 @@
     invalid_publish_date: "발행일 형식이 올바르지 않습니다.",
     newsletter_already_dispatched: "이 발행일은 이미 실발송 요청이 기록되어 있습니다.",
     github_dispatch_failed: "GitHub Actions 실행 요청에 실패했습니다.",
+    github_rerun_failed: "실패 job 재실행 요청에 실패했습니다.",
+    missing_run_id: "재실행할 GitHub run ID가 없습니다.",
+    workflow_not_dispatchable: "이 워크플로우는 Admin에서 직접 실행하지 않습니다.",
     brevo_request_failed: "Brevo 요청에 실패했습니다.",
     user_action_failed: "회원 조치에 실패했습니다.",
     missing_user_id: "회원 ID가 없습니다.",
@@ -106,6 +129,7 @@
     audit: [],
     reactions: { totals: {}, topCards: [] },
     runs: [],
+    ops: null,
     checks: [],
     health: { supabase: null, github: null, brevo: null },
     backendProbe: null
@@ -330,16 +354,20 @@
     });
   }
   function loadRuns() {
-    return api("admin-github?action=runs").then(function (data) {
+    return api("admin-github?action=ops").then(function (data) {
+      state.ops = data;
       state.runs = data.runs || [];
       byId("grm-github-state").className = "admin-pill ok";
       txt("grm-github-state", "GitHub 연결됨");
+      renderOpsMonitor();
       renderRuns();
       renderSystemChecks();
     }).catch(function (error) {
+      state.ops = null;
       state.runs = [];
       byId("grm-github-state").className = "admin-pill bad";
       txt("grm-github-state", "GitHub 설정 필요");
+      renderOpsMonitor(errText(error));
       var body = byId("grm-runs-body");
       if (body) body.innerHTML = emptyRow(5, errText(error));
       renderSystemChecks([{ name: "GitHub Actions API", ok: false, detail: errText(error) }]);
@@ -442,6 +470,110 @@
     }).join("");
   }
 
+  function renderOpsMonitor(errorMessage) {
+    renderOpsSummary(errorMessage);
+    renderWorkflowCards(errorMessage);
+    renderOpsIncidents(errorMessage);
+  }
+  function renderOpsSummary(errorMessage) {
+    var host = byId("grm-ops-summary");
+    if (!host) return;
+    if (errorMessage) {
+      host.innerHTML = '<div class="admin-metric"><span><i class="ti ti-alert-triangle"></i>GitHub 연결</span><b>확인 필요</b></div>';
+      return;
+    }
+    var summary = (state.ops && state.ops.summary) || {};
+    var sourceOk = summary.source_ok === true;
+    var items = [
+      ["규제소스", summary.source_status || "-", sourceOk ? "ok" : "bad", "ti-database-import"],
+      ["진행 중", number(summary.in_progress || 0), summary.in_progress ? "warn" : "ok", "ti-loader-2"],
+      ["실패 Run", number(summary.incidents || 0), summary.incidents ? "bad" : "ok", "ti-alert-triangle"],
+      ["운영 경고", number(summary.warning_issues || 0), summary.warning_issues ? "warn" : "ok", "ti-message-report"]
+    ];
+    host.innerHTML = items.map(function (item) {
+      return '<div class="admin-metric"><span><i class="ti ' + esc(item[3]) + '"></i>' + esc(item[0]) +
+        '</span><b class="' + esc(item[2]) + '">' + esc(item[1]) + "</b></div>";
+    }).join("");
+  }
+  function renderWorkflowCards(errorMessage) {
+    var host = byId("grm-workflow-cards");
+    if (!host) return;
+    if (errorMessage) {
+      host.innerHTML = '<div class="admin-empty">' + esc(errorMessage) + "</div>";
+      return;
+    }
+    var workflows = (state.ops && state.ops.workflows) || [];
+    if (!workflows.length) {
+      host.innerHTML = '<div class="admin-empty">워크플로우 상태를 불러오는 중입니다.</div>';
+      return;
+    }
+    host.innerHTML = workflows.map(function (wf) {
+      var run = wf.latest || null;
+      var kind = wf.kind || runKind(run);
+      var title = run && run.display_title ? run.display_title : (run && run.event ? run.event : "최근 실행 없음");
+      var status = runLabel(run);
+      var runNo = run && run.run_number ? "#" + run.run_number : "-";
+      var actions = [];
+      if (run && run.html_url) actions.push(link(run.html_url, "최근 run"));
+      actions.push(link(wf.workflow_url || ("https://github.com/MINHOYEOM/grm-api-intake/actions/workflows/" + encodeURIComponent(wf.workflow || "")), "워크플로우"));
+      if (run && kind === "bad") {
+        actions.push('<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button>');
+      }
+      return '<article class="admin-workflow-card ' + esc(kind) + '">' +
+        '<div class="admin-workflow-top"><div><b>' + esc(wf.label || wf.workflow || "-") +
+        '</b><p>' + esc(wf.purpose || "") + '</p></div>' + badge(status, kind) + "</div>" +
+        '<div class="admin-meta">' +
+          badge(wf.schedule || "-", "warn") +
+          badge(wf.workflow_state || "active", wf.workflow_state === "active" ? "ok" : "warn") +
+          badge(runNo, "") +
+          badge(run ? fmtDate(run.created_at) : "실행 없음", "") +
+          badge(run ? runDuration(run) : "-", "") +
+        "</div>" +
+        '<p title="' + esc(title) + '">' + esc(title) + "</p>" +
+        '<div class="admin-card-actions">' + actions.join("") + "</div>" +
+      "</article>";
+    }).join("");
+  }
+  function renderOpsIncidents(errorMessage) {
+    var host = byId("grm-ops-incidents");
+    if (!host) return;
+    if (errorMessage) {
+      host.innerHTML = '<div class="admin-empty">' + esc(errorMessage) + "</div>";
+      return;
+    }
+    var incidents = (state.ops && state.ops.incidents) || [];
+    var warnings = (state.ops && state.ops.warning_issues) || [];
+    var parts = [];
+    if (!incidents.length && !warnings.length) {
+      parts.push('<div class="admin-incident"><div class="admin-incident-head"><b>최근 실패 없음</b>' +
+        badge("정상", "ok") + '</div><p>최근 GitHub Actions 실행에서 즉시 조치할 실패가 없습니다.</p></div>');
+    }
+    incidents.slice(0, 6).forEach(function (run) {
+      var jobs = run.failed_jobs || [];
+      var jobHtml = "";
+      if (jobs.length) {
+        jobHtml = '<div class="admin-step-list">' + jobs.slice(0, 4).map(function (job) {
+          var steps = (job.failed_steps || []).slice(0, 3).map(function (step) {
+            return step.name + " · " + (step.conclusion || step.status || "-");
+          }).join(" / ");
+          return "<code>" + esc((job.name || "job") + " · " + (job.conclusion || "-") + (steps ? " · " + steps : "")) + "</code>";
+        }).join("") + "</div>";
+      }
+      parts.push('<div class="admin-incident bad"><div class="admin-incident-head"><b>' +
+        esc(run.workflow_name || run.workflow_id || "Workflow") + "</b>" + badge(run.conclusion || run.status || "-", "bad") +
+        '</div><p>' + esc(fmtDate(run.created_at)) + " · " + esc(run.display_title || run.event || "") + "</p>" +
+        jobHtml + '<div class="admin-card-actions">' + link(run.html_url, "GitHub에서 보기") +
+        '<button class="admin-mini danger" type="button" data-rerun-failed="' + esc(run.id || "") + '">실패 job 재실행</button></div></div>');
+    });
+    warnings.slice(0, 4).forEach(function (issue) {
+      parts.push('<div class="admin-incident"><div class="admin-incident-head"><b>운영 경고 Issue #' +
+        esc(issue.number || "-") + "</b>" + badge("open", "warn") + '</div><p>' + esc(issue.title || "") +
+        " · " + esc(fmtDate(issue.updated_at)) + '</p><div class="admin-card-actions">' +
+        link(issue.html_url, "Issue 열기") + "</div></div>");
+    });
+    host.innerHTML = parts.join("");
+  }
+
   function renderDispatches() {
     var body = byId("grm-dispatch-body");
     if (!body) return;
@@ -474,7 +606,7 @@
     var runs = state.runs || [];
     if (!runs.length) { body.innerHTML = emptyRow(5, "워크플로우 실행 내역 없음"); return; }
     body.innerHTML = runs.slice(0, 24).map(function (run) {
-      var kind = run.conclusion === "success" ? "ok" : (run.status === "completed" ? "bad" : "warn");
+      var kind = runKind(run);
       return "<tr><td>" + esc(run.workflow_name || run.workflow_id || "-") + "</td><td>" +
         badge(run.conclusion || run.status || "-", kind) + "</td><td>" + esc(run.head_branch || "-") +
         "</td><td>" + esc(fmtDate(run.created_at)) + "</td><td>" + link(run.html_url, "열기") + "</td></tr>";
@@ -538,6 +670,19 @@
       if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), message, "err");
     }).finally(function () { if (button) button.disabled = false; });
   }
+  function rerunFailed(runId, button) {
+    if (!runId) return;
+    if (!window.confirm("이 GitHub Actions run의 실패한 job만 다시 실행할까요?")) return;
+    if (button) button.disabled = true;
+    setStatus(byId("grm-ops-status"), "실패 job 재실행 요청 중", "");
+    return api("admin-github", { method: "POST", json: { action: "rerun_failed", run_id: runId } }).then(function (data) {
+      toast("실패 job 재실행을 요청했습니다.");
+      setStatus(byId("grm-ops-status"), "재실행 요청 완료: run #" + (data.run_id || runId), "ok");
+      return loadRuns();
+    }).catch(function (error) {
+      setStatus(byId("grm-ops-status"), errText(error), "err");
+    }).finally(function () { if (button) button.disabled = false; });
+  }
 
   function subscriberAction(action, email) {
     setStatus(byId("grm-subscribers-status"), "구독자 정보를 갱신하는 중", "");
@@ -564,6 +709,14 @@
   byId("grm-newsletter-send").addEventListener("click", function (e) { dispatch("newsletter_send", e.currentTarget); });
   qsa("[data-dispatch]").forEach(function (b) {
     b.addEventListener("click", function () { dispatch(b.getAttribute("data-dispatch"), b); });
+  });
+  ["grm-workflow-cards", "grm-ops-incidents"].forEach(function (id) {
+    var host = byId(id);
+    if (!host) return;
+    host.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-rerun-failed]");
+      if (b) rerunFailed(b.getAttribute("data-rerun-failed"), b);
+    });
   });
   byId("grm-subscriber-filter").addEventListener("input", renderSubscribers);
   byId("grm-user-filter").addEventListener("input", renderUsers);

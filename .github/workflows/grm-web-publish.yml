@@ -50,6 +50,12 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Resolve publish_date + delta 경로
         id: r
         run: |

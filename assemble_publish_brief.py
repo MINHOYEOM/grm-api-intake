@@ -68,10 +68,17 @@ def _distinct_in_order(values: list[str]) -> list[str]:
 
 
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
-                           *, strict: bool = True) -> tuple[dict[str, Any], AssembleReport]:
+                           *, strict: bool = True,
+                           deep_deltas: dict[str, dict[str, Any]] | None = None
+                           ) -> tuple[dict[str, Any], AssembleReport]:
     """(scaffold, delta) → (발행본 브리프, 보고). 입력 불변(순수).
 
     strict=True(기본): 델타 카드가 스캐폴드에 없거나·채택 카드에 빈 슬롯이 남으면 AssembleError.
+
+    deep_deltas(선택, additive): {document_id: {"deep_analysis": {...}, "source_text": str}}.
+    지정 시 채택 필터 이후 inject_slots.inject_deep_analysis 로 카드별 게이트 검증 후 주입한다.
+    게이트 FAIL 카드는 deep_analysis 없이 6슬롯만으로 발행(카드 단위 graceful degrade —
+    이 실패는 report.errors 에 넣지 않고 report.warnings 에만 남겨 발행을 막지 않는다).
     """
     report = AssembleReport()
     delta_cards = delta.get("cards") or {}
@@ -123,6 +130,16 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     out["cards"] = adopted_cards
     brief = out.setdefault("brief", {})
 
+    # [심층분석 fan-out 배선] deep_deltas 지정 시 채택분 카드에 한해 게이트 검증 후 주입.
+    # additive·선택 — 미지정 시 기존 동작과 완전 동일. 게이트 FAIL 은 발행을 막지 않는다
+    # (해당 카드는 deep_analysis=null 그대로 6슬롯만 발행 — inject_deep_analysis 자체 규약).
+    if deep_deltas:
+        deep_report = inject_slots.inject_deep_analysis(out, deep_deltas)
+        for w in deep_report.warnings:
+            report.warnings.append(f"[deep] {w}")
+        for e in deep_report.errors:
+            report.warnings.append(f"[deep] {e}")
+
     agencies = _distinct_in_order([c.get("agency", "") for c in adopted_cards])
     categories = _distinct_in_order([c.get("category", "") for c in adopted_cards])
     evidence = {"A": 0, "B": 0, "C": 0}
@@ -166,12 +183,16 @@ def main(argv: list[str] | None = None) -> int:
                     help="라우틴 델타 JSON({cards:{id:{슬롯}}, tldr:[]})")
     ap.add_argument("--out", required=True,
                     help="발행본 출력 경로(web/data/briefs/brief_web_{date}.json)")
+    ap.add_argument("--deep", default=None,
+                    help="[선택] 심층분석 델타 JSON 경로 "
+                         "({document_id:{deep_analysis,source_text}}). 미지정 시 기존 동작과 완전 동일.")
     args = ap.parse_args(argv)
 
     scaffold = _load_json(args.scaffold)
     delta = _load_json(args.delta)
+    deep_deltas = _load_json(args.deep) if args.deep else None
     try:
-        out, report = assemble_publish_brief(scaffold, delta, strict=True)
+        out, report = assemble_publish_brief(scaffold, delta, strict=True, deep_deltas=deep_deltas)
     except (inject_slots.SlotInjectionError, AssembleError) as e:
         print(f"조립 거부:\n{e}", file=sys.stderr)
         return 2
@@ -180,7 +201,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"WARN {w}", file=sys.stderr)
     _write_json(args.out, out)
     cov = out["brief"]["coverage"]
+    deep_merged = sum(1 for c in out["cards"] if c.get("deep_analysis"))
     print(f"조립 완료: 채택 {report.adopted}카드 (스킵 {report.dropped}) → {args.out}")
+    if args.deep:
+        print(f"  deep_analysis: 병합 {deep_merged}카드 (게이트 보류는 위 WARN 참고)")
     print(f"  coverage: 수집 {cov.get('intake_total')} · 카드 {cov['rendered']} · "
           f"Evidence A{cov['evidence']['A']}/B{cov['evidence']['B']}/C{cov['evidence']['C']}")
     print(f"  agencies: {out['brief']['agencies']}")

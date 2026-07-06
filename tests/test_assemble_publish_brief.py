@@ -153,5 +153,48 @@ class TestGuards(unittest.TestCase):
         self.assertEqual(d1, d2)
 
 
+class TestDeepAnalysisWiring(unittest.TestCase):
+    """assemble_publish_brief(deep_deltas=...) — additive 배선 검증. 실제 게이트 로직은
+    verify_deep_analysis 자체 테스트가 담당하므로, 여기선 '연결이 되는지'만 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
+        cls.delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+
+    def _scaffold(self):
+        return _blank_scaffold_from(self.truth)
+
+    def test_no_deep_deltas_unchanged(self):
+        """deep_deltas 미지정 — 기존 동작과 바이트 동일(회귀 가드)."""
+        s = self._scaffold()
+        out_old, _ = apb.assemble_publish_brief(s, self.delta, strict=True)
+        out_new, _ = apb.assemble_publish_brief(s, self.delta, strict=True, deep_deltas=None)
+        self.assertEqual(
+            json.dumps(out_old, ensure_ascii=False, sort_keys=True),
+            json.dumps(out_new, ensure_ascii=False, sort_keys=True))
+
+    def test_deep_gate_fail_does_not_block_publish(self):
+        """게이트 FAIL(구조 불완전) deep_deltas 를 줘도 assemble 은 계속 성공해야 한다
+        (카드 단위 graceful degrade — 전체 발행은 안 막힘)."""
+        s = self._scaffold()
+        first_id = self.truth["cards"][0]["id"]
+        deep_deltas = {first_id: {"deep_analysis": {"key_violations": ""}, "source_text": "x"}}
+        out, report = apb.assemble_publish_brief(
+            s, self.delta, strict=True, deep_deltas=deep_deltas)
+        self.assertTrue(report.ok)  # errors 는 비어야 함(FAIL 은 warnings 로만 기록)
+        self.assertTrue(any("[deep]" in w for w in report.warnings))
+
+    def test_deep_delta_for_non_target_card_is_noop(self):
+        """deep_analysis_ready=False 카드(=scaffold 에 deep_analysis 키 자체 없음)에 대한
+        델타는 무시되고 발행은 정상 진행되어야 한다."""
+        s = self._scaffold()
+        out, report = apb.assemble_publish_brief(
+            s, self.delta, strict=True,
+            deep_deltas={"no-such-card-id": {"deep_analysis": {}, "source_text": ""}})
+        self.assertTrue(report.ok)
+        self.assertEqual(report.adopted, len(self.truth["cards"]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

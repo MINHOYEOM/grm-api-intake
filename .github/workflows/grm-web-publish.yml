@@ -103,10 +103,19 @@ jobs:
       - name: 조립(assemble_publish_brief) — 채택 필터·메타 재계산·코드 가드
         run: |
           set -euo pipefail
+          DEEP_ARGS=()
+          DEEP_FILE="web/data/deltas/deep_${{ steps.r.outputs.under }}.json"
+          if [ -f "$DEEP_FILE" ]; then
+            echo "::notice::deep_analysis 델타 발견: $DEEP_FILE (게이트 통과분만 병합)"
+            DEEP_ARGS=(--deep "$DEEP_FILE")
+          else
+            echo "::notice::deep_analysis 델타 없음 — 6슬롯만 발행(정상)"
+          fi
           python assemble_publish_brief.py \
             --scaffold "_scaffold/brief_web_${{ steps.r.outputs.under }}.json" \
             --delta    "${{ steps.r.outputs.delta }}" \
-            --out      "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
+            --out      "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
+            "${DEEP_ARGS[@]}"
 
       - name: 골든 재동결(기본 env — prod 변수 미주입) + 렌더 스모크
         run: |

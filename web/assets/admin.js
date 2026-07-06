@@ -215,7 +215,10 @@
     missing_user_id: "회원 ID가 없습니다.",
     cannot_ban_self: "현재 로그인한 Admin 계정은 차단할 수 없습니다.",
     cannot_manage_admin_user: "Admin 계정은 회원 관리 조치 대상이 아닙니다.",
-    function_not_deployed: "Admin 백엔드 함수가 아직 배포되지 않았습니다."
+    function_not_deployed: "Admin 백엔드 함수가 아직 배포되지 않았습니다.",
+    checks_not_green: "발행 PR의 CI가 아직 통과하지 않았습니다.",
+    not_a_publish_branch: "발행 브랜치가 아니어서 머지할 수 없습니다.",
+    publish_pr_not_found: "이번 주 발행 PR을 찾지 못했습니다."
   };
   function errText(error) {
     if (!error) return "요청에 실패했습니다.";
@@ -257,7 +260,8 @@
     ops: null,
     checks: [],
     health: { supabase: null, github: null, brevo: null },
-    backendProbe: null
+    backendProbe: null,
+    publishPr: null
   };
 
   if (!window.supabase || !window.supabase.createClient || !supabaseUrl || !anonKey) {
@@ -535,8 +539,67 @@
       renderSystemChecks();
     });
   }
+  function loadPublishPr() {
+    return api("admin-github?action=publish_pr").then(function (data) {
+      state.publishPr = data && data.pr ? data : null;
+      renderPublishPr();
+    }).catch(function (error) {
+      state.publishPr = null;
+      renderPublishPr(errText(error));
+    });
+  }
+  function renderPublishPr(errorMessage) {
+    var prLine = byId("grm-web-approve-pr");
+    var previewLink = byId("grm-web-preview-link");
+    var checksBadge = byId("grm-web-checks");
+    var submitBtn = byId("grm-web-approve-submit");
+    if (!prLine || !previewLink || !checksBadge || !submitBtn) return;
+    if (errorMessage) {
+      txt("grm-web-approve-pr", errorMessage);
+      hide(previewLink, true);
+      checksBadge.className = "admin-pill bad";
+      txt("grm-web-checks", "확인 필요");
+      submitBtn.disabled = true;
+      setStatus(byId("grm-web-approve-status"), errorMessage, "err");
+      return;
+    }
+    var data = state.publishPr;
+    if (!data || !data.pr) {
+      txt("grm-web-approve-pr", "이번 주 발행 PR 없음");
+      hide(previewLink, true);
+      checksBadge.className = "admin-pill";
+      txt("grm-web-checks", "-");
+      submitBtn.disabled = true;
+      setStatus(byId("grm-web-approve-status"), "", "");
+      return;
+    }
+    var pr = data.pr;
+    if (pr.html_url) {
+      prLine.innerHTML = "#" + esc(pr.number || "-") + " " + esc(pr.title || "발행 PR") + " · " +
+        '<a href="' + esc(pr.html_url) + '" target="_blank" rel="noopener">PR 열기</a>';
+    } else {
+      prLine.textContent = "#" + (pr.number || "-") + " " + (pr.title || "발행 PR");
+    }
+    if (data.preview_url) {
+      previewLink.href = data.preview_url;
+      hide(previewLink, false);
+    } else {
+      hide(previewLink, true);
+    }
+    var checksState = (data.checks && data.checks.state) || "none";
+    var checksKindMap = { green: "ok", red: "bad", pending: "warn", none: "warn" };
+    var checksLabelMap = { green: "CI 통과", red: "CI 실패", pending: "CI 대기 중", none: "CI 확인 불가" };
+    checksBadge.className = "admin-pill " + (checksKindMap[checksState] || "warn");
+    txt("grm-web-checks", checksLabelMap[checksState] || "확인 중");
+    submitBtn.disabled = !data.gate_ok;
+    if (!data.gate_ok) {
+      setStatus(byId("grm-web-approve-status"), errText({ data: { error: data.gate_reason } }) || "승인 게이트를 통과하지 못했습니다.", "err");
+    } else {
+      setStatus(byId("grm-web-approve-status"), "승인 가능합니다. 미리보기를 확인한 뒤 승인하세요.", "");
+    }
+  }
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadRuns(), loadHealth()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
       renderSystemChecks();
     });
   }
@@ -1005,6 +1068,32 @@
       setStatus(byId("grm-ops-status"), errText(error), "err");
     }).finally(function () { if (button) button.disabled = false; });
   }
+  function publishDateFromHeadRef(headRef) {
+    var m = /^publish\/brief-(\d{4}-\d{2}-\d{2})/.exec(String(headRef || ""));
+    return m ? m[1] : "";
+  }
+  function approveMerge(button) {
+    var data = state.publishPr;
+    var pr = data && data.pr;
+    if (!pr || !pr.number) {
+      setStatus(byId("grm-web-approve-status"), "이번 주 발행 PR을 찾지 못했습니다.", "err");
+      return;
+    }
+    if (!window.confirm("미리보기를 확인하셨나요? 승인하면 grm-solutions.com 라이브에 반영됩니다.")) return;
+    var publishDate = publishDateFromHeadRef(pr.head_ref);
+    var payload = publishDate ? { action: "merge", publish_date: publishDate } : { action: "merge", pr_number: pr.number };
+    if (button) button.disabled = true;
+    setStatus(byId("grm-web-approve-status"), "승인 처리 중", "");
+    return api("admin-github", { method: "POST", json: payload }).then(function () {
+      toast("승인됨 — 곧 라이브 반영");
+      setStatus(byId("grm-web-approve-status"), "승인됨 — 곧 라이브 반영", "ok");
+      return Promise.allSettled([loadPublishPr(), loadRuns()]);
+    }).catch(function (error) {
+      setStatus(byId("grm-web-approve-status"), errText(error), "err");
+    }).finally(function () {
+      if (button) button.disabled = !(state.publishPr && state.publishPr.gate_ok);
+    });
+  }
 
   function subscriberAction(action, email) {
     if (action === "remove_from_list" && !window.confirm("이 구독자를 Brevo 리스트에서 제거할까요? " + (email || ""))) return Promise.resolve();
@@ -1041,6 +1130,9 @@
     e.preventDefault();
     dispatch("web_publish", byId("grm-web-publish-submit"));
   });
+  if (byId("grm-web-approve-submit")) {
+    byId("grm-web-approve-submit").addEventListener("click", function (e) { approveMerge(e.currentTarget); });
+  }
   qsa("[data-dispatch]").forEach(function (b) {
     b.addEventListener("click", function () { dispatch(b.getAttribute("data-dispatch"), b); });
   });

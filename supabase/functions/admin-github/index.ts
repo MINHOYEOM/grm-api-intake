@@ -72,8 +72,28 @@ type NormalizedWorkflowJob = {
   skipped_steps: WorkflowStepSnapshot[];
 };
 
+type CheckRun = {
+  name?: string;
+  status?: string;
+  conclusion?: string | null;
+};
+
+type PullRequest = {
+  number?: number;
+  html_url?: string;
+  title?: string;
+  created_at?: string;
+  state?: string;
+  mergeable_state?: string;
+  head?: { ref?: string; sha?: string };
+};
+
 function repoName(): string {
   return envAny(["GITHUB_REPO", "GITHUB_REPOSITORY"]) || "MINHOYEOM/grm-api-intake";
+}
+
+function repoOwner(): string {
+  return repoName().split("/")[0];
 }
 
 function githubToken(): string {
@@ -191,6 +211,117 @@ async function githubFetch(path: string, init: RequestInit = {}) {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function findOpenPublishPr(publishDate: string): Promise<PullRequest | null> {
+  const owner = repoOwner();
+  const path = `/pulls?state=open&head=${encodeURIComponent(`${owner}:publish/brief-${publishDate}`)}&per_page=20`;
+  const res = await githubFetch(path);
+  if (!res.ok) return null;
+  const prs = (res.payload as PullRequest[] | undefined) || [];
+  if (!prs.length) return null;
+  // run-id suffix branches (publish/brief-{date}-{runid}) may yield several — pick most recent (highest number).
+  return prs.slice().sort((a, b) => (b.number || 0) - (a.number || 0))[0];
+}
+
+async function findLatestOpenPublishPr(): Promise<PullRequest | null> {
+  const owner = repoOwner();
+  const path = `/pulls?state=open&per_page=50`;
+  const res = await githubFetch(path);
+  if (!res.ok) return null;
+  const prs = ((res.payload as PullRequest[] | undefined) || [])
+    .filter((pr) => String(pr.head?.ref || "").startsWith("publish/brief-"));
+  if (!prs.length) return null;
+  return prs.slice().sort((a, b) => (b.number || 0) - (a.number || 0))[0];
+}
+
+async function checkRunsForSha(sha: string): Promise<{
+  state: "green" | "red" | "pending" | "none";
+  failing: string[];
+  pending: string[];
+}> {
+  const failing: string[] = [];
+  const pending: string[] = [];
+  let sawAny = false;
+
+  const checkRunsRes = await githubFetch(`/commits/${encodeURIComponent(sha)}/check-runs?per_page=100`);
+  if (checkRunsRes.ok) {
+    const runs = ((checkRunsRes.payload as Record<string, unknown>).check_runs as CheckRun[] | undefined) || [];
+    for (const run of runs) {
+      sawAny = true;
+      const conclusion = run.conclusion || null;
+      const name = run.name || "check-run";
+      if (conclusion === null) {
+        pending.push(name);
+      } else if (!["success", "neutral", "skipped"].includes(conclusion)) {
+        failing.push(name);
+      }
+    }
+  }
+
+  const statusRes = await githubFetch(`/commits/${encodeURIComponent(sha)}/status`);
+  let combinedState: string | null = null;
+  if (statusRes.ok) {
+    const payload = statusRes.payload as Record<string, unknown>;
+    combinedState = (payload.state as string) || null;
+    const statuses = (payload.statuses as Array<Record<string, unknown>> | undefined) || [];
+    if (statuses.length) sawAny = true;
+    if (combinedState && combinedState !== "success" && statuses.length) {
+      for (const s of statuses) {
+        if (String(s.state || "") !== "success") failing.push(String(s.context || "status"));
+      }
+    }
+  }
+
+  if (!sawAny) return { state: "none", failing: [], pending: [] };
+  if (failing.length) return { state: "red", failing, pending };
+  if (pending.length) return { state: "pending", failing, pending };
+  if (combinedState && !["success"].includes(combinedState)) {
+    return { state: combinedState === "pending" ? "pending" : "red", failing, pending };
+  }
+  return { state: "green", failing: [], pending: [] };
+}
+
+async function findWebDeployPreviewUrl(sha: string): Promise<string | null> {
+  const res = await githubFetch(`/commits/${encodeURIComponent(sha)}/check-runs?per_page=100`);
+  if (!res.ok) return null;
+  const runs = ((res.payload as Record<string, unknown>).check_runs as Array<Record<string, unknown>> | undefined) || [];
+  const deployRun = runs.find((run) => String(run.name || "").toLowerCase().includes("grm-web-deploy")
+    || String(run.name || "").toLowerCase().includes("web deploy"));
+  const detailsUrl = deployRun ? String(deployRun.details_url || "") : "";
+  return detailsUrl || null;
+}
+
+function derivedPreviewUrl(headRef: string): string {
+  // Fallback derivation when no grm-web-deploy check-run details_url is available yet.
+  const slug = headRef.replace(/\//g, "-");
+  return `https://${slug}.grm-weekly-brief.pages.dev`;
+}
+
+async function evaluateMergeGate(pr: PullRequest): Promise<{
+  ok: boolean;
+  reason: string;
+  checks: { state: "green" | "red" | "pending" | "none"; failing: string[]; pending: string[] };
+}> {
+  const headRef = String(pr.head?.ref || "");
+  const headSha = String(pr.head?.sha || "");
+  const checks = headSha
+    ? await checkRunsForSha(headSha)
+    : { state: "none" as const, failing: [], pending: [] };
+
+  if (!headRef.startsWith("publish/brief-")) {
+    return { ok: false, reason: "not_a_publish_branch", checks };
+  }
+  if (pr.state !== "open") {
+    return { ok: false, reason: "publish_pr_not_found", checks };
+  }
+  if (pr.mergeable_state === "dirty") {
+    return { ok: false, reason: "checks_not_green", checks };
+  }
+  if (checks.state !== "green") {
+    return { ok: false, reason: "checks_not_green", checks };
+  }
+  return { ok: true, reason: "", checks };
 }
 
 function runIsRecent(run: WorkflowRun, startedAt: string): boolean {
@@ -534,6 +665,32 @@ Deno.serve(async (req: Request) => {
       if (!githubToken()) return jsonResponse({ error: "github_not_configured", runs: [] }, 500);
       return jsonResponse(await opsOverview());
     }
+    if (action === "publish_pr") {
+      if (!githubToken()) return jsonResponse({ error: "github_not_configured" }, 500);
+      const pr = await findLatestOpenPublishPr();
+      if (!pr) return jsonResponse({ ok: true, pr: null });
+      const headRef = String(pr.head?.ref || "");
+      const headSha = String(pr.head?.sha || "");
+      const gate = await evaluateMergeGate(pr);
+      // preview_url: prefer the grm-web-deploy check-run's details_url for this sha; else derive
+      // https://{head_ref with "/"→"-"}.grm-weekly-brief.pages.dev as a fallback (marked below).
+      const previewUrl = (headSha ? await findWebDeployPreviewUrl(headSha) : null) || derivedPreviewUrl(headRef);
+      return jsonResponse({
+        ok: true,
+        pr: {
+          number: pr.number || null,
+          html_url: pr.html_url || null,
+          head_ref: headRef,
+          head_sha: headSha,
+          title: pr.title || "",
+          created_at: pr.created_at || null,
+        },
+        checks: gate.checks,
+        preview_url: previewUrl,
+        gate_ok: gate.ok,
+        gate_reason: gate.reason,
+      });
+    }
     if (action !== "runs") return jsonResponse({ error: "unknown_action" }, 400);
     if (!githubToken()) return jsonResponse({ error: "github_not_configured", runs: [] }, 500);
     return jsonResponse({ ok: true, repo: repoName(), ref: gitRef(), runs: await listRuns() });
@@ -572,6 +729,63 @@ Deno.serve(async (req: Request) => {
       run_id: runId,
       github_status: rerun.status,
       github_run_url: `https://github.com/${repoName()}/actions/runs/${runId}`,
+    });
+  }
+  if (action === "merge") {
+    if (!githubToken()) return jsonResponse({ error: "github_not_configured" }, 500);
+    const rawPrNumber = String(body.pr_number || "").replace(/[^\d]/g, "");
+    if (!rawPrNumber && !/^\d{4}-\d{2}-\d{2}$/.test(publishDate)) {
+      return jsonResponse({ error: "invalid_publish_date" }, 400);
+    }
+
+    let pr: PullRequest | null = null;
+    if (rawPrNumber) {
+      const prRes = await githubFetch(`/pulls/${encodeURIComponent(rawPrNumber)}`);
+      if (prRes.ok) pr = prRes.payload as PullRequest;
+    } else {
+      pr = await findOpenPublishPr(publishDate);
+    }
+    if (!pr || !pr.number) {
+      return jsonResponse({ error: "publish_pr_not_found" }, 404);
+    }
+
+    const gate = await evaluateMergeGate(pr);
+    if (!gate.ok) {
+      return jsonResponse({
+        error: gate.reason,
+        pr_number: pr.number,
+        checks: gate.checks,
+      }, 409);
+    }
+
+    const mergeRes = await githubFetch(`/pulls/${encodeURIComponent(String(pr.number))}/merge`, {
+      method: "PUT",
+      body: JSON.stringify({ merge_method: "squash" }),
+    });
+    await audit(ctx, "github.merge", {
+      pr_number: pr.number,
+      sha: pr.head?.sha || null,
+      publish_date: publishDate || null,
+      gate: { ok: gate.ok, reason: gate.reason, checks: gate.checks },
+      status: mergeRes.status,
+      response: mergeRes.payload,
+    }, "github.pr", String(pr.number));
+
+    if (!mergeRes.ok) {
+      return jsonResponse({
+        error: "github_merge_failed",
+        status: mergeRes.status,
+        details: mergeRes.payload,
+      }, 502);
+    }
+
+    return jsonResponse({
+      ok: true,
+      action: "merge",
+      pr_number: pr.number,
+      merged: true,
+      sha: pr.head?.sha || null,
+      note: "grm-web-deploy 가 production 배포 = 라이브",
     });
   }
   const defs = workflowMap(publishDate, intakeRunId);

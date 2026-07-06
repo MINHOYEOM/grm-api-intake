@@ -84,7 +84,9 @@ function gitRef(): string {
   return envAny(["GITHUB_REF", "GITHUB_BRANCH"]) || "main";
 }
 
-function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
+function workflowMap(publishDate = "", intakeRunId = ""): Record<string, WorkflowDef> {
+  const webPublishInputs: Record<string, string> = { publish_date: publishDate };
+  if (intakeRunId) webPublishInputs.intake_run_id = intakeRunId;
   return {
     intake_run: {
       label: "규제소스 수집",
@@ -119,7 +121,7 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       purpose: "라우틴 델타 → 발행본 자동 조립 + PR (프리뷰 확인 후 사람이 머지 = 라이브)",
       schedule: "델타 커밋 시 자동 / Admin 수동 실행",
       group: "publish",
-      inputs: { publish_date: publishDate },
+      inputs: webPublishInputs,
       events: ["push", "workflow_dispatch"],
     },
     newsletter_send: {
@@ -542,6 +544,8 @@ Deno.serve(async (req: Request) => {
   const body = await readJsonBody(req);
   const action = String(body.action || "").trim();
   const publishDate = String(body.publish_date || "").trim();
+  const rawIntakeRunId = String(body.intake_run_id || "").trim();
+  const intakeRunId = rawIntakeRunId;
   const force = body.force === true || String(body.force || "").toLowerCase() === "true";
   if (action === "rerun_failed") {
     const runId = String(body.run_id || "").replace(/[^\d]/g, "");
@@ -570,12 +574,15 @@ Deno.serve(async (req: Request) => {
       github_run_url: `https://github.com/${repoName()}/actions/runs/${runId}`,
     });
   }
-  const defs = workflowMap(publishDate);
+  const defs = workflowMap(publishDate, intakeRunId);
   const def = defs[action];
   if (!def) return jsonResponse({ error: "unknown_action" }, 400);
   if (def.manual === false) return jsonResponse({ error: "workflow_not_dispatchable" }, 400);
   if ((action === "newsletter_send" || action === "web_publish") && !/^\d{4}-\d{2}-\d{2}$/.test(publishDate)) {
     return jsonResponse({ error: "invalid_publish_date" }, 400);
+  }
+  if (action === "web_publish" && rawIntakeRunId && !/^\d+$/.test(rawIntakeRunId)) {
+    return jsonResponse({ error: "invalid_intake_run_id" }, 400);
   }
   if (!githubToken()) return jsonResponse({ error: "github_not_configured" }, 500);
 
@@ -601,6 +608,7 @@ Deno.serve(async (req: Request) => {
     action,
     workflow: def.workflow,
     ref: gitRef(),
+    inputs: def.inputs || {},
     status: dispatch.status,
     run_id: run?.id || null,
     run_url: run?.html_url || null,
@@ -638,6 +646,7 @@ Deno.serve(async (req: Request) => {
     workflow: def.workflow,
     repo: repoName(),
     ref: gitRef(),
+    inputs: def.inputs || {},
     github_status: dispatch.status,
     github_run_id: run?.id || null,
     github_run_status: run?.status || null,

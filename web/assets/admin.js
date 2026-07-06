@@ -135,10 +135,40 @@
       infra: { order: 6, index: "06", stage: "인프라", stageKey: "infra", icon: "ti-database-cog", pipeline: "인프라", pipelineDesc: "서비스 유지", impact: "실패가 반복되면 Supabase 프로젝트 휴면 방지나 기본 연결 상태를 확인해야 합니다.", focus: "정기 keepalive 실행과 Supabase 응답 상태를 봅니다." }
     };
     var meta = defaults[group] || defaults.quality;
-    if (action === "brief_audit" || workflow.indexOf("brief-audit") >= 0) {
-      meta = Object.assign({}, meta, { index: "02A", stage: "근거 감사", impact: "실패하면 발행된 브리프의 원문 링크와 근거 신뢰도 확인이 지연됩니다.", focus: "provenance JSON, 링크 검증, 경고 Issue 갱신 여부를 봅니다." });
+    if (action === "web_publish" || workflow.indexOf("web-publish") >= 0) {
+      meta = Object.assign({}, meta, {
+        order: 2,
+        index: "02",
+        stage: "발행 준비",
+        stageKey: "web_publish",
+        icon: "ti-git-pull-request",
+        pipeline: "웹 발행 PR",
+        pipelineDesc: "브리프 초안 생성",
+        impact: "실패하면 최신 주간 브리프 초안 PR과 미리보기가 만들어지지 않습니다.",
+        focus: "발행일, 델타 파일, 스캐폴드 다운로드, 조립, PR 생성 단계를 봅니다."
+      });
+    } else if (action === "web_deploy" || workflow.indexOf("web-deploy") >= 0) {
+      meta = Object.assign({}, meta, {
+        order: 3,
+        index: "03",
+        stage: "라이브 배포",
+        stageKey: "web_deploy",
+        icon: "ti-cloud-upload",
+        pipeline: "웹 배포",
+        pipelineDesc: "사이트 반영",
+        impact: "실패하면 PR 미리보기나 운영 사이트 배포가 되지 않습니다.",
+        focus: "렌더, 링크체크, Cloudflare Pages 배포 단계를 봅니다."
+      });
+    } else if (action === "brief_audit" || workflow.indexOf("brief-audit") >= 0) {
+      meta = Object.assign({}, meta, { order: 4, index: "04", stage: "근거 감사", stageKey: "audit", impact: "실패하면 발행된 브리프의 원문 링크와 근거 신뢰도 확인이 지연됩니다.", focus: "provenance JSON, 링크 검증, 경고 Issue 갱신 여부를 봅니다." });
     } else if (action === "ci" || workflow.indexOf("ci") >= 0) {
-      meta = Object.assign({}, meta, { index: "02B", stage: "회귀 검증", impact: "실패하면 코드나 렌더 결과에 회귀 가능성이 있어 배포 전 확인이 필요합니다.", focus: "컴파일, 단위 테스트, 렌더 골든 테스트 실패 지점을 봅니다." });
+      meta = Object.assign({}, meta, { order: 4.5, index: "04B", stage: "회귀 검증", stageKey: "ci", impact: "실패하면 코드나 렌더 결과에 회귀 가능성이 있어 배포 전 확인이 필요합니다.", focus: "컴파일, 단위 테스트, 렌더 골든 테스트 실패 지점을 봅니다." });
+    } else if (action === "newsletter_send") {
+      meta = Object.assign({}, meta, { order: 5, index: "05", stage: "뉴스레터", stageKey: "newsletter" });
+    } else if (action === "admin_backend") {
+      meta = Object.assign({}, meta, { order: 6, index: "06", stage: "운영 API", stageKey: "admin" });
+    } else if (action === "keepalive") {
+      meta = Object.assign({}, meta, { order: 7, index: "07", stage: "인프라", stageKey: "infra" });
     }
     return meta;
   }
@@ -174,6 +204,7 @@
     brevo_list_not_configured: "Brevo 리스트 ID 설정이 필요합니다.",
     invalid_email: "이메일 형식이 올바르지 않습니다.",
     invalid_publish_date: "발행일 형식이 올바르지 않습니다.",
+    invalid_intake_run_id: "수집 run id는 숫자만 입력할 수 있습니다.",
     newsletter_already_dispatched: "이 발행일은 이미 실발송 요청이 기록되어 있습니다.",
     github_dispatch_failed: "GitHub Actions 실행 요청에 실패했습니다.",
     github_rerun_failed: "실패 job 재실행 요청에 실패했습니다.",
@@ -411,6 +442,9 @@
         txt("grm-latest-label", "최신호 " + state.latest.date);
         txt("grm-newsletter-title", state.latest.title || "최신 규제뉴스");
         txt("grm-newsletter-date", "Vol. " + state.latest.issue_no + " · " + state.latest.date + " · 카드 " + state.latest.count + "장");
+        var publishDateInput = byId("grm-web-publish-date");
+        if (publishDateInput && !publishDateInput.value) publishDateInput.value = state.latest.date || "";
+        txt("grm-web-publish-latest", state.latest.date ? "최신 발행본 기준 " + state.latest.date : "최신 발행본 확인 중");
       }
       renderInsights();
       renderContentChecks();
@@ -899,10 +933,31 @@
     if (action === "newsletter_send") {
       return window.confirm("구독자 전체에게 최신 뉴스레터" + (publishDate ? " (" + publishDate + ")" : "") + "를 실제 발송합니다. 계속할까요?");
     }
+    if (action === "web_publish") return window.confirm("발행일 " + (publishDate || "-") + " 기준으로 웹 브리프 초안 PR을 만들까요? PR 미리보기 확인 전에는 라이브 사이트가 바뀌지 않습니다.");
     if (action === "web_deploy") return window.confirm("현재 main 기준으로 웹 재배포 워크플로우를 실행할까요?");
     if (action === "intake_run") return window.confirm("규제 소스 수집 워크플로우를 수동 실행할까요?");
     if (action === "brief_audit") return window.confirm("발행본 provenance 감사 워크플로우를 실행할까요?");
     return true;
+  }
+
+  function webPublishPayload() {
+    var dateInput = byId("grm-web-publish-date");
+    var runInput = byId("grm-web-publish-run");
+    var publishDate = ((dateInput && dateInput.value) || (state.latest && state.latest.date) || "").trim();
+    var intakeRunId = ((runInput && runInput.value) || "").trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(publishDate)) {
+      setStatus(byId("grm-web-publish-status"), "발행일을 YYYY-MM-DD 형식으로 입력해 주세요.", "err");
+      setStatus(byId("grm-ops-status"), "발행일 형식이 올바르지 않습니다.", "err");
+      return null;
+    }
+    if (intakeRunId && !/^\d+$/.test(intakeRunId)) {
+      setStatus(byId("grm-web-publish-status"), "수집 run id는 숫자만 입력할 수 있습니다.", "err");
+      setStatus(byId("grm-ops-status"), "수집 run id는 숫자만 입력할 수 있습니다.", "err");
+      return null;
+    }
+    var payload = { action: "web_publish", publish_date: publishDate };
+    if (intakeRunId) payload.intake_run_id = intakeRunId;
+    return payload;
   }
 
   function dispatch(action, button) {
@@ -915,11 +970,8 @@
       payload.publish_date = state.latest.date;
     }
     if (action === "web_publish") {
-      var wpDate = window.prompt(
-        "웹 발행일 (YYYY-MM-DD)\nweb/data/deltas/delta_{date}.json 가 먼저 커밋돼 있어야 합니다.",
-        (state.latest && state.latest.date) || "");
-      if (!wpDate) return;
-      payload.publish_date = String(wpDate).trim();
+      payload = webPublishPayload();
+      if (!payload) return;
     }
     if (!confirmDispatch(action, payload.publish_date)) return;
     if (button) button.disabled = true;
@@ -928,6 +980,7 @@
       toast((data.label || "워크플로우") + " 실행을 요청했습니다.");
       setStatus(byId("grm-ops-status"), "실행 요청 완료: " + (data.label || action), "ok");
       if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), "뉴스레터 실발송 워크플로우를 요청했습니다.", "ok");
+      if (action === "web_publish") setStatus(byId("grm-web-publish-status"), "웹 발행 PR 생성 워크플로우를 요청했습니다. 아래 운영 흐름에서 결과를 확인하세요.", "ok");
       return Promise.allSettled([loadRuns(), loadOverview()]);
     }).catch(function (error) {
       var message = errText(error);
@@ -936,6 +989,7 @@
       }
       setStatus(byId("grm-ops-status"), message, "err");
       if (action === "newsletter_send") setStatus(byId("grm-newsletter-status"), message, "err");
+      if (action === "web_publish") setStatus(byId("grm-web-publish-status"), message, "err");
     }).finally(function () { if (button) button.disabled = false; });
   }
   function rerunFailed(runId, button) {
@@ -983,6 +1037,10 @@
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);
   byId("grm-users-refresh").addEventListener("click", loadUsersOnly);
   byId("grm-newsletter-send").addEventListener("click", function (e) { dispatch("newsletter_send", e.currentTarget); });
+  byId("grm-web-publish-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    dispatch("web_publish", byId("grm-web-publish-submit"));
+  });
   qsa("[data-dispatch]").forEach(function (b) {
     b.addEventListener("click", function () { dispatch(b.getAttribute("data-dispatch"), b); });
   });

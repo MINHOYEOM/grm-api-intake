@@ -29,12 +29,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm -q .github/workflows/grm-golden-freeze.yml
           git add web/tests/golden
-          if git diff --cached --quiet; then
-            echo "골든 변경 없음 — 워크플로만 제거"
-          fi
-          git commit -m "chore(golden): render 골든 재동결(render.py drift) + freeze 워크플로 제거
-
-PR#109 발행 이후 렌더 골든이 render.py 출력과 어긋난(캐시버스팅 해시 등)
-6종(landing·archive·brief_06-22·brief_06-26·search-index·sitemap)을
-test_render.py --freeze 로 현행 출력에 맞춰 재동결. GRM CI green 복구."
+          git commit -m "chore(golden): render 골든 재동결(render.py drift) + freeze 워크플로 자기제거 — GRM CI green 복구"
           git push origin HEAD:main

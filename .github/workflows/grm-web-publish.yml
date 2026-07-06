@@ -109,6 +109,10 @@ jobs:
         run: |
           set -euo pipefail
           BR="publish/brief-${{ steps.r.outputs.pub }}"
+          if git ls-remote --exit-code --heads origin "$BR" >/dev/null 2>&1; then
+            BR="publish/brief-${{ steps.r.outputs.pub }}-${GITHUB_RUN_ID}"
+            echo "::notice::publish branch already exists; using $BR"
+          fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BR"

@@ -117,7 +117,7 @@ jobs:
 
       - name: 커밋 + PR (프리뷰 트리거)
         env:
-          GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
         run: |
           set -euo pipefail
           BR="publish/brief-${{ steps.r.outputs.pub }}"

@@ -1,0 +1,108 @@
+name: GRM Delta Bridge (Notion → git)
+
+# 클라우드 델타 브릿지(Fix A, §2) — 사람 컴퓨터가 꺼져 있어도 발행 준비가 진행되도록,
+# 클라우드 Routine 이 Notion Intake DB 에 예치한 슬롯 델타(OPEN GRM Web Delta {date})를
+# 읽어 web/data/deltas/delta_{date}.json 으로 커밋+push 한다(수집기가 handoff 를 Notion 에
+# 남기는 것과 정확히 대칭 — 이 워크플로가 그 반대편에서 읽어간다).
+#
+# 파이프:
+#   Notion OPEN GRM Web Delta {date} (Routine 예치, A-1)
+#     → delta_bridge.py (select_open_delta → extract_delta → write_delta)
+#       → web/data/deltas/delta_{date}.json(+deep_{date}.json) 커밋 + push (PAT)
+#         → grm-web-publish.yml 이 push 트리거로 자동 기동
+#     → push 성공 후에만 delta_bridge.py --consume 으로 Notion 페이지 CONSUMED 처리
+#
+# 무인 라이브 0: 이 워크플로우는 델타 커밋까지만 — main 에 직접 push 하지만 발행 PR/프리뷰/
+# 라이브는 건드리지 않는다(④ grm-web-publish.yml 이하가 별도로 이어받음).
+# 수집(grm-intake)·발행(grm-web-publish)·배포(grm-web-deploy)와 별도 파일·별도 트리거·
+# 최소권한·독립 재실행(D8).
+
+on:
+  schedule:
+    # 00:30 UTC 월 = 09:30 KST(Routine 07:30 KST 이후·워치독 10:00 KST 이전).
+    - cron: '30 0 * * 1'
+  workflow_dispatch:
+    inputs:
+      publish_date:
+        description: '발행일 YYYY-MM-DD (선택 — 미지정 시 최신 OPEN Web Delta 페이지 날짜)'
+        required: false
+        type: string
+
+permissions:
+  contents: write   # 델타 커밋
+
+concurrency:
+  group: grm-delta-bridge-${{ github.event.inputs.publish_date || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GRM_INTAKE_DB_ID: '7784c71fb7b343749b2bee5d04db7926'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # ★핵심: ADMIN_GITHUB_ACTIONS_TOKEN(PAT) 로 push 해야 이 커밋이
+          # grm-web-publish.yml 의 on: push 를 실제로 트리거한다(GITHUB_TOKEN push 는
+          # recursion 방지로 다른 워크플로를 트리거하지 않음 — 2026-07-06 web-publish→
+          # deploy 토큰 교훈 동형).
+          token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 델타 브릿지 실행(select → extract → write)
+        id: bridge
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          set -euo pipefail
+          ARGS=(--db "$GRM_INTAKE_DB_ID")
+          if [ -n "${{ github.event.inputs.publish_date }}" ]; then
+            ARGS+=(--publish-date "${{ github.event.inputs.publish_date }}")
+          fi
+          python delta_bridge.py "${ARGS[@]}"
+
+      - name: 커밋 + push (wrote=true 일 때만)
+        if: steps.bridge.outputs.wrote == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
+        run: |
+          set -euo pipefail
+          U=$(echo "${{ steps.bridge.outputs.date }}" | tr '-' '_')
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "web/data/deltas/delta_${U}.json"
+          if [ -f "web/data/deltas/deep_${U}.json" ]; then
+            git add "web/data/deltas/deep_${U}.json"
+          fi
+          git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} 라우틴 델타 커밋 (자동)"
+          git push
+
+      - name: Notion 마감(CONSUMED) — 커밋+push 성공 후에만
+        if: steps.bridge.outputs.wrote == 'true'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          set -euo pipefail
+          ARGS=(--db "$GRM_INTAKE_DB_ID" --consume)
+          if [ -n "${{ github.event.inputs.publish_date }}" ]; then
+            ARGS+=(--publish-date "${{ github.event.inputs.publish_date }}")
+          else
+            ARGS+=(--publish-date "${{ steps.bridge.outputs.date }}")
+          fi
+          python delta_bridge.py "${ARGS[@]}"
+
+      - name: OPEN 델타 없음 — 클린 skip
+        if: steps.bridge.outputs.wrote != 'true'
+        run: echo "no OPEN web-delta — nothing to bridge (또는 이미 동일 내용 커밋됨)"

@@ -515,6 +515,29 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 화면을 보고 승인하면 라이브 발행**된다(D5). 운영 흐름: 산출 JSON → `web/data/briefs/` 커밋 →
 빌드·미리보기 → 사람 승인 → 배포. 산출 후 [Status 갱신] + handoff CONSUMED 처리를 수행하면 Routine
 종료. (Notion 병행 표시도 동일 JSON 에서 파생 — 롤백 안전망, P4 병행기간.)
+
+[산출물 — 델타 Notion 예치 (클라우드 델타 브릿지, 2026-07-07 additive)]
+너(클라우드 Routine)는 git 에 쓸 수 없다 — 완성한 슬롯 델타 JSON 을 **Notion Intake DB**
+(`7784c71fb7b343749b2bee5d04db7926`, 이 handoff 를 읽어온 것과 같은 DB)에 **페이지로 예치**하면,
+별도 자동화(`grm-delta-bridge.yml` + `delta_bridge.py`)가 그 반대편에서 읽어 git 커밋 → 발행
+파이프로 넘긴다(네가 handoff 를 Notion 에서 읽어오는 것과 정확히 대칭 — 이번엔 네가 쓰는 쪽).
+  - **새 페이지 1개** 생성(Intake DB): 제목 `OPEN GRM Web Delta {publish_date}`
+    (예: `OPEN GRM Web Delta 2026-07-13`, `publish_date` = 이 handoff 의 `run_date_kst`).
+  - 속성: `Source` = `GRM Web Delta` · `Type or Class` = `web-delta` · `Status` = `New`
+    (옵션이 없으면 Notion 이 자동 생성 — handoff 페이지 생성 규약과 동형).
+  - 본문에 **코드 블록 1개**로 네 [산출물] 슬롯 델타 JSON 을 그대로 붙여넣는다(형태 불변 —
+    `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}`, `publish_date` 키를 최상위에 추가해도 무방).
+  - [2단계] 심층분석(deep_analysis)을 수행했다면, **같은 페이지에 두 번째 코드 블록**으로
+    `{"<card.id>":{"deep_analysis":{...4섹션...},"source_text":"..."}}` 델타를 추가로 붙인다
+    (별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
+    심층분석이 없으면(대다수 주) 이 블록은 생략 — 정상.
+  - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
+    **기존 `OPEN GRM Web Delta {date}` 페이지 본문을 덮어쓴다**(handoff 의 upsert 규약과 동형).
+  - 이 예치는 [Status 갱신]·handoff CONSUMED 처리와 **별개**다 — 델타 페이지의 CONSUMED 전환은
+    브릿지 자동화가 git 커밋 성공 후에 처리한다(너는 예치만 하면 된다. 페이지 Status 를 직접
+    바꾸지 않는다).
+  - 위 [산출물] 문단의 "산출 JSON → `web/data/briefs/` 커밋" 운영 흐름 자체는 불변 — 이 예치는
+    "네 컴퓨터가 꺼져 있어도 그 커밋이 자동으로 일어나게" 만드는 추가 단계일 뿐이다.
 ```
 
 ## C. 운영 노트
@@ -555,3 +578,4 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 | 2026-07-02 | **stage-2 자동 연결 추가(§B 끝 `[2단계]` 절 순수 추가 — 기존 6슬롯 지시문 한 글자도 무접촉)**: 월요일 Routine 이 1단계(6슬롯) 완료 후, handoff 에 `deep_analysis_ready=true` WL 카드가 있으면 발행 전 deep_analysis fan-out(카드당 서브에이전트 → `verify_deep_analysis` 게이트 → `inject_slots.py --deep-analysis-deltas` 병합)을 이어서 수행하도록 배선 — 매주 수동 트리거 불필요(스케줄 실행이 6슬롯+deep_analysis 둘 다 자동 수행). 절차 정본 = `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`, 카드당 프롬프트 = `GRM_Prompt_DeepWL_v1.md`. deep_analysis_ready 카드 없으면 통째로 건너뜀(6슬롯만 발행·대다수 주). 실 handoff dry-run(build-jobs → assemble) 검증. deep_analysis 머지(PR #47, main) 후속 §6-B. scaffold·collector·golden·6슬롯 슬롯 규칙 불변(순수 additive·별도 트랙). 순서: 프롬프트 반영 → `ENABLE_WL_BODY_FULL=true` → 7/6 자동 실행 관찰. |
 | 2026-07-02 | **fan-out 절 행정처분 반영(카드 유형별 프롬프트 DeepWL/DeepAdmin·스키마 자동선택). 6슬롯·코드 불변.** `ENABLE_MFDS_ADMIN_BODY_FULL=true` 활성으로 MFDS 행정처분 카드도 `deep_analysis_ready=true` 로 fan-out 에 유입 → `[2단계]` 절을 WL 전용→유형인식으로 수정: ②단계 생성 프롬프트를 카드 유형별 분기(WL=`GRM_Prompt_DeepWL_v1.md`·행정처분=`GRM_Prompt_DeepAdmin_v1.md`), 4섹션 스키마·한글 섹션명은 `verify_deep_analysis.resolve_required_sections` 가 카드 유형으로 자동선택(행정처분 ②섹션=`disposition_basis`). 절차 정본 `GRM_DeepWL_fanout_실행프롬프트.md` 은 이미 행정처분 분기 반영(무변경). 순수 doc 문구 수정 — 6슬롯 규칙·나머지 절·코드·테스트·골든 불변. 7/6 자동 Routine 반영 목표. |
 | 2026-07-02 | **fan-out 절 FDA 483 반영(§B `[2단계]` 절 유형 추가 — 6슬롯·나머지 절 무접촉)**: `ENABLE_FDA_483_DEEP=true` 활성 시 FDA 483 카드(`fda483-…`)도 `deep_analysis_ready=true` 로 fan-out 에 유입 → 대상 목록에 **FDA 483** 추가, ②단계 생성 프롬프트 매핑에 **483=`GRM_Prompt_DeepFda483_v1.md`**(신규) 추가, 스키마 자동선택에 483 ②섹션=`inspectional_significance`(WL/Import Alert 승격 가능성) 추가. 483 은 실사 종료 문서라 응답 평가 없음. ★483 D2 = CFR 인용이 원문(관찰사항)에 없어도 **WARN(비차단)** — 정당한 규제 해석 허용(WL 하드 FAIL 과 다름). build-jobs 가 job 에 `card_type`(kind) 동봉해 오케스트레이터가 유형별 프롬프트 선택. 483 = 결정론 Observation 상세 + 분석층 둘 다(층 혼용). 지시 `GRM_CC지시문_FDA483_분석층_2026-07-02.md`. 순수 doc 문구 수정 — 6슬롯 규칙·코드·골든 불변. 7/6 자동 Routine 반영 목표(머지+`ENABLE_FDA_483_DEEP=true`+운영 Routine 프롬프트 재-붙여넣기). |
+| 2026-07-07 | **클라우드 델타 브릿지 연동 — 델타 Notion 예치 지시 추가(§B `[산출물]` 절 순수 추가 — 기존 6슬롯·[출력]·[2단계] 지시문 무접촉)**: "카드는 만들어졌지만 웹사이트에 자동으로 올라가지 못한" 근본 원인(Routine 산출 델타를 git 으로 옮기는 다리의 부재) 해소 — 클라우드 Routine 은 git 에 못 쓰므로, 완성한 슬롯 델타 JSON 을 Notion Intake DB 페이지(`OPEN GRM Web Delta {date}`, `Type or Class`=`web-delta`, handoff 예치와 동형)에 남기면 신규 자동화(`grm-delta-bridge.yml`+`delta_bridge.py`, GitHub Actions·매주 월 09:30 KST)가 그 반대편에서 읽어 `web/data/deltas/delta_{date}.json` 을 git 커밋하고 발행 파이프(`grm-web-publish.yml`)를 자동 기동한다(사람 컴퓨터가 꺼져 있어도 발행 준비 진행). [산출물] 절에 "델타 Notion 예치" 지시 블록만 추가(본문 코드 블록 1개=슬롯 델타·심층분석 있으면 2번째 블록=deep 델타·같은 주 재실행은 페이지 덮어쓰기). 6슬롯 계약·코드 verbatim 필드·[출력]/[2단계]/기존 [산출물] 운영 흐름 불변(예치는 additive 후행 단계일 뿐). 무인 라이브 0 불변 — 브릿지는 델타 커밋까지만, 사람 승인(Admin 머지 버튼, 별도 트랙)이 유일한 라이브 게이트. 설계 `GRM_웹발행_클라우드자동화_설계_2026-07-07.md` §2(Fix A). 코드=`delta_bridge.py`·`.github/workflows/grm-delta-bridge.yml`·`tests/test_delta_bridge.py`. branch `feat/web-publish-cloud-bridge-2026-07-07`. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영). |

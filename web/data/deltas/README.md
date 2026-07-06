@@ -10,6 +10,9 @@ PR)이 트리거된다. 이 폴더가 "라우틴 산출물 → 발행 파이프"
   - 코드 verbatim 필드(facts·sources·배지·render_order 등)는 **넣지 않는다**(스캐폴드가 소유).
 - **중복 publish_date 금지.** 재발행 = 같은 파일 덮어쓰기(사람 판단).
 - 이 델타는 `assemble_publish_brief.py` 가 빈슬롯 스캐폴드(grm-intake 아티팩트)와 합쳐 발행본을 만든다.
+- **클라우드 예치 경로(2026-07-07)**: 사람 컴퓨터 없이도 이 폴더에 델타가 도착하도록, 클라우드 Routine
+  이 Notion Intake DB 에 남긴 `OPEN GRM Web Delta {date}` 페이지를 `grm-delta-bridge.yml`+`delta_bridge.py`
+  가 읽어 여기에 커밋한다(수동 커밋 대체 — 규약은 동일, 상세는 `docs/prompts/GRM_Routine_델타예치_스니펫.md`).
 
 ## 흐름
 ```

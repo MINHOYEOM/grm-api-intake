@@ -1,0 +1,40 @@
+name: GRM Golden Freeze (one-shot)
+
+# 일회성: render.py drift 로 stale 해진 렌더 골든(landing·archive·brief·search-index·sitemap)을
+# CI 에서 재동결(`test_render.py --freeze`)하고 main 에 커밋한다. 실행 후 이 워크플로는 자기 제거된다.
+# (로컬 EDR 로 Python 실행 불가한 환경에서 CI 로 freeze 하기 위한 임시 잡.)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Freeze render goldens
+        run: python web/tests/test_render.py --freeze
+      - name: Commit re-frozen goldens (and self-remove)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -q .github/workflows/grm-golden-freeze.yml
+          git add web/tests/golden
+          if git diff --cached --quiet; then
+            echo "골든 변경 없음 — 워크플로만 제거"
+          fi
+          git commit -m "chore(golden): render 골든 재동결(render.py drift) + freeze 워크플로 제거
+
+PR#109 발행 이후 렌더 골든이 render.py 출력과 어긋난(캐시버스팅 해시 등)
+6종(landing·archive·brief_06-22·brief_06-26·search-index·sitemap)을
+test_render.py --freeze 로 현행 출력에 맞춰 재동결. GRM CI green 복구."
+          git push origin HEAD:main

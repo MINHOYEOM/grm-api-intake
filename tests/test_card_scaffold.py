@@ -260,6 +260,41 @@ def _build_cards_from_rows(rows: list[dict]) -> list:
     return [cs.build_card_scaffold(item["row"], item["raw"]) for item in rows]
 
 
+def _openfda_recall_rows(firm: str, reason: str, products: list[str],
+                         *, event_id: str = "", pub: str = "2026-07-01",
+                         start: int = 589) -> list[dict]:
+    """OpenFDA 회수 fan-out row 생성 — 하나의 사건이 SKU/유통사별 개별 recall_number 로
+    쪼개진 상황(PAI/Keystone/Dabur 재현). event_id 지정 시 정본 그룹핑 경로."""
+    out = []
+    for i, prd in enumerate(products):
+        raw = {"recalling_firm": firm, "reason_for_recall": reason,
+               "product_description": prd}
+        if event_id:
+            raw["event_id"] = event_id
+        out.append({
+            "row": {"date": pub, "document_id": f"D-{start + i:04d}-2026", "firm": firm,
+                    "headline": prd, "language": "EN", "modality": "Chemical",
+                    "raw_fetch_ok": True, "signal_tier": "Tier 2",
+                    "source": "OpenFDA Recall", "type_or_class": "Class II"},
+            "raw": raw,
+        })
+    return out
+
+
+def _rss_news_rows(headlines: list[dict]) -> list[dict]:
+    """rss-news row 생성 — headlines = [{doc, headline, pub}] (ECA TGA 중복 재현)."""
+    out = []
+    for h in headlines:
+        out.append({
+            "row": {"date": h["pub"], "document_id": h["doc"], "firm": "",
+                    "headline": h["headline"], "language": "EN", "modality": "Other",
+                    "raw_fetch_ok": True, "signal_tier": "Tier 2", "source": "ECA",
+                    "type_or_class": "news"},
+            "raw": {"description": h.get("body", "")},
+        })
+    return out
+
+
 def _all_fixture_cards() -> list:
     return [cs.build_card_scaffold(_load_input(n)["row"], _load_input(n)["raw"])
             for n in FIXTURES]
@@ -434,6 +469,121 @@ class MergeRecallCardsTest(unittest.TestCase):
         self.assertIn("외 2품목", page)
         self.assertNotIn("아세트아미노펜정 325mg</td>", page)  # 멤버 W2 미렌더
         self.assertEqual(page.count("<details>"), 1)             # 병합 toggle 1회
+
+
+class OpenFdaRecallMergeTest(unittest.TestCase):
+    """§14A 확장 — OpenFDA(openfda-recall) 회수도 병합. 하나의 실제 회수 사건이
+    SKU/유통사/함량별 개별 recall_number 로 쪼개져 들어오는 실데이터(PAI/Keystone/Dabur)
+    를 대표 1카드 + '외 N품목' 으로 접는다(2026-07-06 회귀)."""
+
+    def test_openfda_group_key_uses_event_id(self) -> None:
+        rows = _openfda_recall_rows(
+            "Keystone Industries", "Container closure failure",
+            ["Gel A", "Gel B"], event_id="93765")
+        card = _build_cards_from_rows(rows)[0]
+        self.assertEqual(card.recall_group_key, "RECALL|event|93765")
+
+    def test_openfda_group_key_firm_reason_fallback(self) -> None:
+        # event_id 부재 시 recalling_firm|reason_for_recall 폴백.
+        rows = _openfda_recall_rows(
+            "PAI Holdings", "USP monograph nonconformance", ["25g", "50g"])
+        card = _build_cards_from_rows(rows)[0]
+        self.assertEqual(card.recall_group_key,
+                         "RECALL|PAI Holdings|USP monograph nonconformance")
+
+    def test_openfda_fanout_merges_to_one_card(self) -> None:
+        # Dabur 재현: 동일 event_id 14 SKU → 대표 1 + 멤버 13 merged_into.
+        prods = [f"OTC Product {i}" for i in range(14)]
+        rows = _openfda_recall_rows("Dabur India Limited", "CGMP deviations",
+                                    prods, event_id="90001", start=629)
+        merged = cs.merge_recall_cards(_build_cards_from_rows(rows))
+        reps = [c for c in merged if not c.merged_into]
+        members = [c for c in merged if c.merged_into]
+        self.assertEqual(len(reps), 1)
+        self.assertEqual(len(members), 13)
+        self.assertEqual(reps[0].card_id, "OpenFDA Recall::D-0629-2026")
+        self.assertTrue(all(m.merged_into == "OpenFDA Recall::D-0629-2026"
+                            for m in members))
+        self.assertIn("외 13품목", reps[0].markdown)
+        self.assertIn("<summary>전체 품목 (14)</summary>", reps[0].markdown)
+
+    def test_openfda_and_mfds_do_not_cross_merge(self) -> None:
+        # 소스 네임스페이스: 우연히 firm|reason 이 같아도 교차 병합 금지.
+        of = _openfda_recall_rows("한국제약(주)", "함량부적합 회수", ["A", "B"])
+        mf = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-07-01", ["다정", "라정"])
+        merged = cs.merge_recall_cards(_build_cards_from_rows(of + mf))
+        reps = [c for c in merged if not c.merged_into]
+        self.assertEqual(len(reps), 2)                       # OpenFDA 대표 1 + MFDS 대표 1
+        of_rep = next(c for c in reps if c.kind == "openfda-recall")
+        mf_rep = next(c for c in reps if c.kind == "recall-quality")
+        self.assertTrue(of_rep.recall_group_key.startswith("RECALL|"))
+        self.assertTrue(mf_rep.recall_group_key.startswith("MFDS|"))
+
+
+class MfdsRecallCrossDateMergeTest(unittest.TestCase):
+    """§12(E) 회귀 — 발행일을 그룹키에서 제외. 같은 사건이 다른 날 재등록돼도 병합
+    (대일제약 클린방수밴드 06-26/06-29 2026-07-06 회귀)."""
+
+    def test_same_event_different_pub_dates_merge(self) -> None:
+        r1 = _recall_rows("대일제약(주)", "사전예방적 자율회수", "2026-06-26",
+                          ["클린방수밴드(1회용)"])
+        r2 = _recall_rows("대일제약(주)", "사전예방적 자율회수", "2026-06-29",
+                          ["클린방수밴드(1회용)"])
+        r2[0]["row"]["document_id"] = "recall-9b17bd1aed29"
+        r1[0]["row"]["document_id"] = "recall-60a00ffadd4c"
+        merged = cs.merge_recall_cards(_build_cards_from_rows(r1 + r2))
+        reps = [c for c in merged if not c.merged_into]
+        self.assertEqual(len(reps), 1)                       # 날짜 달라도 1군으로 병합
+
+    def test_group_key_has_no_date(self) -> None:
+        rows = _recall_rows("대일제약(주)", "사전예방적 자율회수", "2026-06-26",
+                            ["클린방수밴드"])
+        card = _build_cards_from_rows(rows)[0]
+        self.assertNotIn("2026-06-26", card.recall_group_key)
+        self.assertEqual(card.recall_group_key, "MFDS|대일제약(주)|사전예방적 자율회수")
+
+
+class DedupeNewsCardsTest(unittest.TestCase):
+    """§14A 확장 — 동일 rss-news 기사(doc_id·발행일만 상이) 중복 제거
+    (ECA 'Should TGA publish GMP Certificates?' 07-01/06-29 2026-07-06 회귀)."""
+
+    def test_duplicate_headline_folds_to_one(self) -> None:
+        rows = _rss_news_rows([
+            {"doc": "93182856dcda", "headline": "Should TGA publish GMP Certificates?",
+             "pub": "2026-07-01"},
+            {"doc": "df29a15eaaf1", "headline": "Should TGA publish GMP Certificates?",
+             "pub": "2026-06-29"},
+        ])
+        deduped = cs.dedupe_news_cards(_build_cards_from_rows(rows))
+        reps = [c for c in deduped if not c.merged_into]
+        members = [c for c in deduped if c.merged_into]
+        self.assertEqual(len(reps), 1)
+        self.assertEqual(len(members), 1)
+        # 대표 = card_id 사전식 첫 (ECA::93182856dcda < ECA::df29a15eaaf1)
+        self.assertEqual(reps[0].card_id, "ECA::93182856dcda")
+        self.assertEqual(members[0].merged_into, "ECA::93182856dcda")
+
+    def test_distinct_headlines_untouched(self) -> None:
+        rows = _rss_news_rows([
+            {"doc": "a", "headline": "TGA transparency consultation", "pub": "2026-07-01"},
+            {"doc": "b", "headline": "EMA annual report published", "pub": "2026-07-01"},
+        ])
+        deduped = cs.dedupe_news_cards(_build_cards_from_rows(rows))
+        self.assertTrue(all(not c.merged_into for c in deduped))
+
+    def test_headline_normalization_whitespace_case(self) -> None:
+        rows = _rss_news_rows([
+            {"doc": "a", "headline": "Should TGA  publish GMP Certificates?", "pub": "2026-07-01"},
+            {"doc": "b", "headline": "should tga publish gmp certificates?", "pub": "2026-06-29"},
+        ])
+        deduped = cs.dedupe_news_cards(_build_cards_from_rows(rows))
+        self.assertEqual(len([c for c in deduped if not c.merged_into]), 1)
+
+    def test_recall_kinds_not_touched_by_news_dedup(self) -> None:
+        # 회수 유형은 news dedup 대상 아님(merge_recall_cards 소관).
+        rows = _recall_rows("한국제약(주)", "함량부적합 회수", "2026-06-02", ["가정", "나정"])
+        deduped = cs.dedupe_news_cards(_build_cards_from_rows(rows))
+        self.assertTrue(all(not c.merged_into for c in deduped))
 
 
 class RenderPlanTest(unittest.TestCase):

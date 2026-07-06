@@ -62,8 +62,14 @@ jobs:
           set -euo pipefail
           PUB="${{ github.event.inputs.publish_date }}"
           if [ -z "$PUB" ]; then
-            PUB=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'web/data/deltas/delta_*.json' 2>/dev/null \
-                  | head -1 | sed -E 's#.*delta_([0-9]{4})_([0-9]{2})_([0-9]{2})\.json#\1-\2-\3#')
+            BEFORE="${{ github.event.before }}"
+            SHA="${{ github.sha }}"
+            if echo "$BEFORE" | grep -qE '^0{40}$'; then
+              DELTA_FILE=$(git diff-tree --no-commit-id --name-only -r "$SHA" -- 'web/data/deltas/delta_*.json' | head -1)
+            else
+              DELTA_FILE=$(git diff --name-only "$BEFORE" "$SHA" -- 'web/data/deltas/delta_*.json' 2>/dev/null | head -1)
+            fi
+            PUB=$(echo "$DELTA_FILE" | sed -E 's#.*delta_([0-9]{4})_([0-9]{2})_([0-9]{2})\.json#\1-\2-\3#')
           fi
           [ -n "$PUB" ] || { echo "::error::publish_date 미해결"; exit 1; }
           echo "$PUB" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "::error::형식 오류 $PUB"; exit 1; }

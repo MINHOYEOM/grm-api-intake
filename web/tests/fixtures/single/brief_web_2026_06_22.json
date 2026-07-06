@@ -1,0 +1,1985 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "provenance": {
+  "handoff_page": "3863142f-dc11-81ff-8d9f-fcea41becbab",
+  "run_date_kst": "2026-06-22",
+  "note": "36 동결 scaffold markdown 을 파싱한 실-6/22 web-card 골든(P1, fixture 전용·1회성). 사실 셀=scaffold verbatim 전사(PL18 의미 보존). 운영 경로는 to_web_card — golden/*.expected.webcard.json·brief_web.expected.json 가 검증."
+ },
+ "brief": {
+  "run_date_kst": "2026-06-22",
+  "window": "2026-06-15 ~ 2026-06-22",
+  "publish_date": "2026-06-22",
+  "agencies": [
+   "FDA",
+   "ECA",
+   "EMA",
+   "MFDS",
+   "Health Canada"
+  ],
+  "categories": [
+   "Other",
+   "Warning Letter",
+   "Guidance"
+  ],
+  "tldr": [],
+  "coverage": {
+   "intake_total": 36,
+   "rendered": 36,
+   "evidence": {
+    "A": 15,
+    "B": 21,
+    "C": 0
+   }
+  },
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "fda483-192438",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Central Alabama Veterans Health Care System",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-27"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192438"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Central Alabama Veterans Health Care System · FEI 1073935"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Producer of Sterile Drug Products · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/16/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192438/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192689",
+   "render_order": 1,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Intas Pharmaceutical Limited",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192689"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Intas Pharmaceutical Limited · FEI 3005890633"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "09/17/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192689/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192690",
+   "render_order": 2,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192690"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Dabur India Limited · FEI 3001413302"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "OTC Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/16/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192690/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "d1e41608f7ba",
+   "render_order": 3,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Pharmathen International S.A.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "d1e41608f7ba"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Pharmathen International S.A."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 05/27/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/pharmathen-international-sa-723680-05272026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192439",
+   "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "BPI Labs, LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-27"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192439"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "BPI Labs, LLC · FEI 3015156709"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Outsourcing Facility · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/17/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192439/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192443",
+   "render_order": 5,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Wells Pharma of Houston LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-27"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192443"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Wells Pharma of Houston LLC · FEI 3016710931"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Outsourcing Facility · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/13/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192443/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "4399b537ba30",
+   "render_order": 6,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "GDP Non-Compliance Report: Missed CAPA Timelines lead to Ref…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "4399b537ba30"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "GDP Non-Compliance Report: Missed CAPA Timelines lead to Refusal of GDP Certific…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/gdp-non-compliance-report-missed-capa-timelines-lead-to-refusal-of-gdp-certificate",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12237",
+   "render_order": 7,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Guidance",
+   "headline_target": "Agency Information Collection Activities; Submission for Off…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12237"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Agency Information Collection Activities; Submission for Office of Management an…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is announcing that a proposed collection of information has been submitted to the Office of Management and Budget (OMB) for review and clearance under the Paperwork Reduction Act of 1995.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12237/agency-information-collection-activities-submission-for-office-of-management-and-budget-review",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12238",
+   "render_order": 8,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Guidance",
+   "headline_target": "Agency Information Collection Activities; Submission for Off…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12238"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Agency Information Collection Activities; Submission for Office of Management an…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is announcing that a proposed collection of information has been submitted to the Office of Management and Budget (OMB) for review and clearance under the Paperwork Reduction Act of 1995.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12238/agency-information-collection-activities-submission-for-office-of-management-and-budget-review",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "bfa2307d43e9",
+   "render_order": 9,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Warning Letter: Deficiencies in Incoming Component Testi…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "bfa2307d43e9"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Warning Letter: Deficiencies in Incoming Component Testing, Stability Progra…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-deficiencies-in-incoming-component-testing-stability-program-and-data-integrity-controls",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192871",
+   "render_order": 10,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "483",
+   "headline_target": "BlendHouse Portland LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-11"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192871"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "BlendHouse Portland LLC · FEI 3013670080"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Manufacturer · Establishment Inspection Report (EIR)"
+    },
+    {
+     "label": "실사일",
+     "value": "01/23/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192871/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192916",
+   "render_order": 11,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "483",
+   "headline_target": "BlendHouse Allerton LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-11"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192916"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "BlendHouse Allerton LLC · FEI 1921383"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Manufacturer · Establishment Inspection Report (EIR)"
+    },
+    {
+     "label": "실사일",
+     "value": "01/22/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192916/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12367",
+   "render_order": 12,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Epizyme, Inc.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-22"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12367"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Epizyme, Inc."
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or Agency) is withdrawing approval of new drug application (NDA) for TAZVERIK (tazemetostat) tablet, 200 milligrams (mg), held by Epizyme, Inc., an Ipsen Company (Epizyme), 1 Main St., Cambridge, MA 02142.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-15&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-22&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/22/2026-12367/epizyme-inc-withdrawal-of-approval-of-new-drug-application-for-tazverik-tazemetostat-tablet-200",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12443",
+   "render_order": 13,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Medical Devices; Immunology and Microbiology Devices; Classi…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-22"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12443"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Medical Devices; Immunology and Microbiology Devices; Classification of the Simp…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is classifying the simple in vitro diagnostic device for the detection of secreted proteins from Bacillus species (spp.) in human clinical samples into class II (special controls).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-15&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-22&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/22/2026-12443/medical-devices-immunology-and-microbiology-devices-classification-of-the-simple-in-vitro-diagnostic",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12444",
+   "render_order": 14,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Medical Devices; Gastroenterology-Urology Devices; Classific…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-22"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12444"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Medical Devices; Gastroenterology-Urology Devices; Classification of the Endosco…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is classifying the endoscopic light-projecting measuring device into class II (special controls).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-15&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-22&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/22/2026-12444/medical-devices-gastroenterology-urology-devices-classification-of-the-endoscopic-light-projecting",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12445",
+   "render_order": 15,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Medical Devices; Gastroenterology-Urology Devices; Classific…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-22"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12445"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Medical Devices; Gastroenterology-Urology Devices; Classification of the Endosco…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is classifying the endoscopic traction device into class II (special controls).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-15&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-22&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/22/2026-12445/medical-devices-gastroenterology-urology-devices-classification-of-the-endoscopic-traction-device",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "a539f45fec9e",
+   "render_order": 16,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Meeting highlights from the Committee for Veterinary Medicin…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-19"
+    },
+    {
+     "label": "문서번호",
+     "value": "a539f45fec9e"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP) 1…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/news.xml",
+    "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-veterinary-medicinal-products-cvmp-16-18-june-2026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "1c4f028e2881",
+   "render_order": 17,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Questions and Answers from the ECA Webinar \"GDP Update 2026\"…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "1c4f028e2881"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Questions and Answers from the ECA Webinar \"GDP Update 2026\" - Part 4"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/questions-and-answers-from-the-eca-webinar-gdp-update-2026-part-4",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "ce1e12b61e37",
+   "render_order": 18,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "GDPA Participated as an Observer in the EMA GMDP-IWG Interes…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "ce1e12b61e37"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "GDPA Participated as an Observer in the EMA GMDP-IWG Interested Parties Meeting"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/gdpa-participated-as-an-observer-in-the-ema-gmdp-iwg-interested-parties-meeting",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12235",
+   "render_order": 19,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Advisory Committee; Science Board to the Food and Drug Admin…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12235"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Advisory Committee; Science Board to the Food and Drug Administration; Renewal"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is announcing the renewal of the Science Board to the Food and Drug Administration by the Commissioner of Food and Drugs (the Commissioner).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12235/advisory-committee-science-board-to-the-food-and-drug-administration-renewal",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12236",
+   "render_order": 20,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "SpecGx LLC; Withdrawal of Approval of Abbreviated New Drug A…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12236"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "SpecGx LLC; Withdrawal of Approval of Abbreviated New Drug Application for Methy…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or Agency) is withdrawing approval of abbreviated new drug application (ANDA) 202608 for Methylphenidate Hydrochloride (HCl) Extended-Release (ER) tablets, 27 milligrams (mg), 36 mg, and 54 mg, held by SpecGx LLC…",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12236/specgx-llc-withdrawal-of-approval-of-abbreviated-new-drug-application-for-methylphenidate",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12239",
+   "render_order": 21,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Agency Information Collection Activities; Proposed Collectio…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12239"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Agency Information Collection Activities; Proposed Collection; Comment Request;…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or Agency) is announcing an opportunity for public comment on the proposed collection of certain information by the Agency.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12239/agency-information-collection-activities-proposed-collection-comment-request-extralabel-drug-use-in",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12245",
+   "render_order": 22,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Authorization of Emergency Use for Two Animal Drugs for the…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-18"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12245"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Authorization of Emergency Use for Two Animal Drugs for the Prevention and Treat…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or the Agency) is announcing the issuance of two Emergency Use Authorizations (EUA) (Authorization) under the Federal Food, Drug, and Cosmetic Act (FD&C Act) for new animal products.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-12&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-19&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12245/authorization-of-emergency-use-for-two-animal-drugs-for-the-prevention-and-treatment-of-new-world",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "92613444e102",
+   "render_order": 23,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "European GDP Association Developments January through April…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "92613444e102"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "European GDP Association Developments January through April 2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/european-gdp-association-developments-january-through-april-2026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "c1adef04914d",
+   "render_order": 24,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "FDA adopts updated ICH Q8/Q9/Q10 Questions & Answers (R5)",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "c1adef04914d"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA adopts updated ICH Q8/Q9/Q10 Questions & Answers (R5)"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-adopts-updated-ich-q8-q9-q10-questions-answers-r5",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "e170a70f927c",
+   "render_order": 25,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "BioPhorum Publishes a Roadmap for QC Sample Test Execution",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "e170a70f927c"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "BioPhorum Publishes a Roadmap for QC Sample Test Execution"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/biophorum-publishes-a-roadmap-for-qc-sample-test-execution",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12165",
+   "render_order": 26,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Medical Devices; Gastroenterology-Urology Devices; Classific…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12165"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Medical Devices; Gastroenterology-Urology Devices; Classification of the Ingesti…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is classifying the ingestible gastrointestinal blood detection capsule into class II (special controls).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-11&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-18&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/17/2026-12165/medical-devices-gastroenterology-urology-devices-classification-of-the-ingestible-gastrointestinal",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12166",
+   "render_order": 27,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Medical Devices; Radiology Devices; Classification of the Ra…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12166"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Medical Devices; Radiology Devices; Classification of the Radiological Machine L…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA) is classifying the radiological machine learning-based quantitative imaging software with predetermined change control plan into class II (special controls).",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-11&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-18&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/17/2026-12166/medical-devices-radiology-devices-classification-of-the-radiological-machine-learning-based",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-12167",
+   "render_order": 28,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Andrew Jonathan Morgan: Final Debarment Order",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-12167"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Andrew Jonathan Morgan: Final Debarment Order"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or the Agency) is issuing an order under the Federal Food, Drug, and Cosmetic Act (FD&C Act) debarring Andrew Jonathan Morgan for a period of 5 years from importing or offering for import any drug into the United…",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-11&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-18&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/17/2026-12167/andrew-jonathan-morgan-final-debarment-order",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "1c12afdcf673",
+   "render_order": 29,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "CGMP",
+   "headline_target": "Roen Health, Inc. dba RoenRx",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "1c12afdcf673"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Roen Health, Inc. dba RoenRx"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/08/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/roen-health-inc-dba-roenrx-728293-06082026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "4a58d2e02eb1",
+   "render_order": 30,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "CGMP",
+   "headline_target": "OrderlyMeds LLC dba OrderlyMeds",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "4a58d2e02eb1"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "OrderlyMeds LLC dba OrderlyMeds"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/08/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/orderlymeds-llc-dba-orderlymeds-728291-06082026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "de8dbe142778",
+   "render_order": 31,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "CGMP",
+   "headline_target": "FITISH",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "de8dbe142778"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "FITISH"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/08/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/fitish-728280-06082026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "f28938fbb3d2",
+   "render_order": 32,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "CGMP",
+   "headline_target": "Joi and Blokes dba Joi + Blokes",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "f28938fbb3d2"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Joi and Blokes dba Joi + Blokes"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/08/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/joi-and-blokes-dba-joi-blokes-728283-06082026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "1bae7194b5bc",
+   "render_order": 33,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Questions and answers on the impact of Mutual Recognition Ag…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-11"
+    },
+    {
+     "label": "문서번호",
+     "value": "1bae7194b5bc"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Questions and answers on the impact of Mutual Recognition Agreement (MRA) betwee…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/inspections.xml",
+    "official_url": "https://www.ema.europa.eu/system/files/documents/other/qa-us-mra-updated-9-june-2026_en.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026004434",
+   "render_order": 34,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "경방신약(주)",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-17"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026004434"
+    },
+    {
+     "label": "업체",
+     "value": "경방신약(주)"
+    },
+    {
+     "label": "처분",
+     "value": "해당품목 제조업무정지 1개월(2026. 7. 1. ~ 2026. 7. 31.): 쎄파렉신캡슐(은교산), 소폐탕엑스과립(소청룡탕)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, ‘쎄파렉신캡슐(은교산)’, ‘소폐탕엑스과립(소청룡탕)’에 대하여 다음과 같이 기준서를 준수하지 않은 사실이 있음\n   - 제조관리기준서 ｢원료 칭량 관리｣(문서번호 PMN032, 승인일자 2025.",
+     "translation": null
+    },
+    {
+     "original": "10.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026004434",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "hc-82222",
+   "render_order": 35,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "Health Canada",
+   "card_type": "Recall(HC)",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "[HC] Lancora Tablets; Broken / partial tablets in blister pa…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "hc-82222"
+    },
+    {
+     "label": "업체",
+     "value": "원문 미기재"
+    },
+    {
+     "label": "제품",
+     "value": "Lancora 5 mg tablet"
+    },
+    {
+     "label": "Class",
+     "value": "Type III"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Product quality",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/lancora-tablets-broken-partial-tablets-blister-pack",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  }
+ ]
+}

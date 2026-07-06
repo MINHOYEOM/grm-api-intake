@@ -1,0 +1,2568 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "brief": {
+  "run_date_kst": "2026-07-06",
+  "window": "2026-06-29 ~ 2026-07-06",
+  "publish_date": "2026-07-06",
+  "agencies": [
+   "FDA",
+   "ECA",
+   "MFDS",
+   "Health Canada"
+  ],
+  "categories": [
+   "Other",
+   "Warning Letter",
+   "Guidance"
+  ],
+  "tldr": [
+   "케이보은제약, 금속이물 혼입으로 치약 40개 브랜드 일괄 회수",
+   "한국비엔씨, 국가출하승인 없이 수출전용 보툴리눔독소를 국내 판매해 회수·판매중지",
+   "동화약품, 니트로소불순물(N-nitroso-meglumine) 초과로 리나디엠메트서방정 2개 함량 회수"
+  ],
+  "coverage": {
+   "intake_total": 89,
+   "rendered": 36,
+   "evidence": {
+    "A": 29,
+    "B": 7,
+    "C": 0
+   }
+  },
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "fda483-193420",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Mixlab WI LLC",
+   "title_issue": "품질관리 절차 미준수",
+   "summary": "FDA가 Mixlab WI LLC(비무균 의약품 제조소)에 대한 483 실사에서, 품질관리부서(QC unit)의 책임·절차가 완전히 이행되지 않았으며 자사 SOP(비무균 조제구역 관련)가 일관되게 준수되지 않았다는 관찰사항을 확인했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-01"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-193420"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Mixlab WI LLC · FEI 3005946041"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Producer of Non Sterile Drug Products · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "07/24/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "관찰사항: 품질관리부서 책임·절차 미이행",
+    "위반 SOP: 비무균 조제구역 절차서(ML WI-001-04 Rev 2.0) 미준수",
+    "실사일: 2025-07-24(FEI 3005946041)"
+   ],
+   "implication": "품질관리부서(QC unit)의 절차 미준수는 문서화된 기준서와 실제 운영 간 괴리를 보여주는 전형적 483 지적이다. 국내 제조소도 QC 관련 SOP의 개정 이력과 현장 준수 여부 일치를 점검할 필요가 있다.",
+   "checks": [
+    "QC 관련 SOP와 현장 운영 일치 여부",
+    "비무균 조제구역 절차 준수 기록"
+   ],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 7,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+      "detail": "Specifically, A. The written procedure, SOP ML Wl-001-04, titled' on-Sterile Compounding Area\", Revision 2.0, is not consistently followed. As specified in Section 3.9.1, the minimum garb required to enter the compounding area includes a reusable lab coat, shoe covers, Hair/bear net, and N95 mask or respirator. When gowned, they must remain within the compounding area and may only be reused during the <Redacted B4>. However, employees were observed donning gloves and shoe covers upon entry through the back door, proceeding through the compounding area to the basement to put on their gowns, and then re-entering the compounding area. B. The written procedure, SOP J\\1L WI-001-05, titled \"Non-Sterile HD Compounding Area,\" Revision 2.0, is not always followed. As specified in Section 3.3, non-sterile hazardous drug (HD) compounding and HD storage must occur in a Containment Segregated Compounding Area (C-SEC) that is separate from non-HD compounding and/or non-HD storage. However, on 7/15/2025, a pharmacy technician was observed filling Methimazole (6mL pen) 2.5mg/0.lmL, Transdermal, Lot <Redacted B4> quantity <Redacted B4>, in the non-HD compounding area. C. The written procedure, SOP"
+     },
+     {
+      "number": "2",
+      "deficiency": "The master production and control records are not followed.",
+      "detail": "Specifically, EMPI..OYEE(S) SIGNAT\\JRE SEE Muna Algharibeh, I nvestigator ).,l.A. 07/24/2025 REVERSE OF Tiffani Tur;i.nski , Veterinary THIS PAGE Medical Offi cer Andy J . Bar rowcliff, Branch Chief ~ FORM FDA 4&3 (09/08) PREVIOUS.EDmON Oll$0l.Elll"
+     },
+     {
+      "number": "3",
+      "deficiency": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+      "detail": "Specifically, Your firm's batch records do not include documentation and/or complete documentation of each significant step in the production of drug products. For example, Your firm compounds Methimazole 2.5mg/0. l mL Transdermal and fills it into a <Redacted B4> syringe. The CJ syringe is then used to fill Metbimazole 2.5mg/0. lmL Transdermal into 1mL, 3mL, 6mL, and 9mL pens. The following was observed upon review of the manufacturing batch record for Methimazol(6mL pen) 2.5mg/0.lmL Transdermal, Lot <Redacted B4> quantity <Redacted B4> manufactured on <Redacted B4> e EMPLOYEE(S) SIGNA~ SEE Muna Al gharibeh, Investigator /v( .ft. 07/2 4/2025 REVERSE OF Tiffani Turinski , Veterinary • THIS PAGE Medical Officer Andy J . Barrowcliff, Branch Chief FORM FDA483 (09/0S) Pi);IIIOUSEOITTON OIISOLIITE"
+     },
+     {
+      "number": "4",
+      "deficiency": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture processing, packing or holding of a drug product.",
+      "detail": "Specifically, Your fi nn did not conduct an in-house efficacy study to verify the sporicidal product's label Instead, the adequacy of the cleaning agent for its intended use was determined based on a review of the efficacy study provided by the cleaning agent manufacturer."
+     },
+     {
+      "number": "5",
+      "deficiency": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release.",
+      "detail": "Specifically, EMPLOYEE(S) SIGNATURE SEE Muna Algharibeh , Investigator /J..·A· 07/24/2025 REVERSE OF Tiffani Turinski, Veterinary THIS PAGE Medical Officer Andy J . Barrowcliff, Branch Chief ~~ 5PAGES"
+     },
+     {
+      "number": "6",
+      "deficiency": "Specific identification tests are not conducted on components that have been accepted based on the supplier's report of analysis.",
+      "detail": "Specifically, A certificate of analysis from the supplier is accepted in lieu of testing of each component received. The firm currently neither is testing each component, including excipient and active ingredient, nor has a program to establish the reliability of the supplier."
+     },
+     {
+      "number": "7",
+      "deficiency": "There is no written testing program designed to assess the stability characteristics of drug products.",
+      "detail": "Specifically, Your firm does not have a written stability testing program to determine Beyond Use Dates (BUD) placed on all your drug product."
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/193420/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "06d62503deb8",
+   "render_order": 1,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Wizcure Pharmaa Private Limited",
+   "title_issue": "완제의약품 CGMP위반",
+   "summary": "FDA가 Wizcure Pharmaa Private Limited에 완제의약품 CGMP 위반으로 경고서한을 발부했다(불량(Adulterated) 의약품 해당).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "06d62503deb8"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Wizcure Pharmaa Private Limited"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/24/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "구분: CGMP/완제의약품/불량(Adulterated)",
+    "발행: CDER, 2026-06-24",
+    "세부 위반 내용: 원문 미기재(요약문만 확인)"
+   ],
+   "implication": "완제의약품의 불량(Adulterated) 판정은 CGMP 기본 요건 미준수를 뜻하는 중대 지적이다. 국내 수출용 제조소도 유사 지적을 피하기 위해 CGMP 기본 준수 상태를 재점검할 필요가 있다.",
+   "checks": [
+    "CGMP 기본 요건 준수 현황",
+    "원문 Warning Letter 상세 확인"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/wizcure-pharmaa-private-limited-726378-06242026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "d3ed64283016",
+   "render_order": 2,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Excelvision - Fareva",
+   "title_issue": "완제의약품 CGMP위반",
+   "summary": "FDA가 Excelvision - Fareva(완제의약품 제조소)에 완제의약품 CGMP 위반으로 경고서한을 발부했다(불량(Adulterated) 의약품 해당).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "d3ed64283016"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Excelvision - Fareva"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/25/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "구분: CGMP/완제의약품/불량(Adulterated)",
+    "발행: CDER, 2026-06-25",
+    "세부 위반 내용: 원문 미기재(요약문만 확인)"
+   ],
+   "implication": "동일 분류(CGMP/완제의약품/불량)의 경고서한이 같은 주에 복수 발부된 것은 FDA가 완제의약품 CGMP 기본 요건 위반에 대한 단속을 이어가고 있음을 보여준다. 미국向 수출 완제의약품 제조소는 실사 대응 체계와 CAPA 이력을 미리 점검할 필요가 있다.",
+   "checks": [
+    "CGMP 기본 요건 준수 현황",
+    "원문 Warning Letter 상세 확인"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/excelvision-726714-fareva",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "91eb33bf0faa",
+   "render_order": 3,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Genzyme Ireland Limited",
+   "title_issue": "바이오의약품 CGMP위반",
+   "summary": "FDA가 Genzyme Ireland Limited(생물학적제제 제조소)에 CGMP 위반 관련 경고서한을 발부했다. 해당 위반은 생물학적제제 허가(BLA) 대상 제조공정의 이탈(Deviation)과 관련된다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "91eb33bf0faa"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Genzyme Ireland Limited"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Biologics Evaluation and Research (CBER) · 06/22/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "구분: CGMP/이탈(Deviations)/BLA 대상",
+    "발행: CBER, 2026-06-22",
+    "근거: 21 U.S.C.(세부 조항 원문 미기재)"
+   ],
+   "implication": "바이오의약품 제조공정의 CGMP 이탈은 품질시스템 전반에 대한 규제 신뢰도에 영향을 미친다. 국내 바이오의약품 제조소도 공정 이탈(Deviation) 관리와 BLA 조건 준수 여부를 재확인할 필요가 있다.",
+   "checks": [
+    "공정 이탈(Deviation) 관리 절차 점검",
+    "BLA 조건 대비 제조공정 일치 여부"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/genzyme-ireland-limited-728681-06222026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-193419",
+   "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "QuVa Pharma Inc",
+   "title_issue": "무균공정 절차 미흡",
+   "summary": "FDA가 QuVa Pharma Inc(위탁제조시설)에 대한 483 실사에서, 무균 의약품의 미생물 오염 방지 절차가 수립·문서화·준수되지 않았다는 관찰사항을 확인했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-01"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-193419"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "QuVa Pharma Inc · FEI 3012053582"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Outsourcing Facility · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "05/04/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "실사일: 2026-05-04(FEI 3012053582)",
+    "관찰사항: 무균 제품 미생물 오염 방지 절차 미수립·미준수",
+    "시설유형: Outsourcing Facility"
+   ],
+   "implication": "무균 공정에서 미생물 오염 방지 절차의 수립·문서화 미비는 반복 지적되는 핵심 483 관찰 영역이다. 국내 위탁제조소도 무균공정 관련 SOP의 수립 여부와 실제 준수 기록을 점검할 필요가 있다.",
+   "checks": [
+    "무균 공정 관련 SOP 수립 여부",
+    "미생물 오염 방지 절차 준수 기록 점검"
+   ],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+      "detail": "Specifically, your firm failed to adequately establish procedures to prevent microbiological contamination of drug products purporting to be sterile. For example, A. Your firm failed to adequately define and document the frequency of disinfection of a device used by technicians to pick items off the floor and place items into the trash in the ISO 7 cleanrooms. The device storage location has not been defined and documented. Currently, your technicians hang the device on the side of the <Redacted B4> used to hold drug components, utensils, drug product containers, and finished drug products. B. On 4/20/2026, during a site walk-through of your firm's ISO 7 classified aseptic processing cleanroom, I observed a \"black residue\" near the <Redacted B4> of each <Redacted B4> used to hold drug components, utensils, drug product containers, and finished drug products <Redacted B4> within all ISO 7 cleanrooms. Your firm's technicians failed to adequately clean and disinfect the entire <Redacted B4> located within the ISO 7 cleanroom. C. Your firm's dynamic ISO 5 LAFH/BSC smoke studies were found to be inadequate. Your firm's smoke studies within the ISO 5 LAFH/BSCs fail to adequately assess l"
+     },
+     {
+      "number": "2",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+      "detail": "Specifically, during a review of nonconforrmance number, IR-12512 (DEV-02984) documented on 14 Nov 2024, prior to compounding Fentanyl Citrate PF 50 mcg/mL Syringe, PC 700092168448, Lot 10138352, Expiry 02/12/2025 compounding in ISO 7 Cleanroom Suite 7, ISO 5 LAFH numbered <Redacted B4> your compounding technician found on the ISO 5 LAFH grate in front of the installed HEPA filter, a brown to black foreign residue contaminate, later within an investigation identified as a \"Heat Resistant 6Sealant <Redacted B4>. The sealant is applied during the HEPA filter production as an exterior coating. Potential particulates from the degradation may become an airborne contaminate affecting first air quality used during aseptic processing of sterile drug product. The ISO 5 LAFH was removed from service, HEPA filter replaced by your firm's contract cleanroom re-certifier, re-certified, clean/disinfected, before returning to service in aseptically processing the product, Fentanyl Citrate PF 50 mcg/mL Syringe, PC 700092168448, Lot 10138352. Your firm was unable to provide sufficient documented evidence in support of the HEPA filter degradation start and if other potential ISO 5 LAFHs/BSCs in other"
+     },
+     {
+      "number": "3",
+      "deficiency": "Buildings used in the manufacturing, processing, packing and holding of a drug product are not maintained in a good state of repair.",
+      "detail": "Specifically, on 4/20/2026, during a site walk-through of your firm's ISO classified cleanroom, I observed paint peeling off Suite 3 ISO 8 Degowning Room wall comers and around the door frame exiting the ISO 7 Cleanroom. EMPLOYEE($) SIGNATURE DATE lSSUEO"
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/193419/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "93182856dcda",
+   "render_order": 5,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Should TGA publish GMP Certificates?",
+   "title_issue": "TGA GMP인증서 공개 논의",
+   "summary": "ECA가 호주 TGA의 GMP 인증서·실사 결과 공개 확대 논의를 다룬 뉴스를 게재했다(TGA의 GMP 실사결과 투명성 컨설테이션과 관련된 보도로 확인됨(검색 확인)).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-01"
+    },
+    {
+     "label": "문서번호",
+     "value": "93182856dcda"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Should TGA publish GMP Certificates?"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "주제: TGA GMP 인증서·실사결과 공개 여부 논의",
+    "발행: ECA, 2026-07-01",
+    "관련: TGA 공식 GMP 실사결과 투명성 컨설테이션 진행 중(검색 확인)"
+   ],
+   "implication": "TGA의 GMP 인증서·실사결과 공개 확대는 다른 규제기관의 투명성 정책에도 영향을 줄 수 있는 흐름이다. 국내 업체도 실사 결과가 공개될 가능성을 염두에 두고 이력 관리에 유의할 필요가 있다.",
+   "checks": [
+    "TGA GMP 인증서 공개 정책 향방 확인",
+    "원문 확인 필요(제목 수준 보도)"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/should-tga-publish-gmp-certificates",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026005294",
+   "render_order": 7,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "대웅바이오(주)",
+   "title_issue": "불만처리규정 미준수",
+   "summary": "대웅바이오가 이코사연질캡슐300밀리그램(이코사펜트산에틸) 관련 소비자 불만 처리 시 자사 불만처리 규정(ACR01-001)에 따른 판단·조치 절차를 준수하지 않아 제조업무정지 1개월 처분을 받았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-03"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026005294"
+    },
+    {
+     "label": "업체",
+     "value": "대웅바이오(주)"
+    },
+    {
+     "label": "처분",
+     "value": "해당품목 제조업무정지 1개월(2026. 7. 13. ~ 2026. 8. 12.) : 이코사연질캡슐300밀리그램(이코사펜트산에틸)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, ‘이코사연질캡슐300밀리그램(이코사펜트산에틸)’에 대하여 다음과 같이 기준서를 준수하지 않은 사실이 있음\n    - 자사기준서 ｢불만처리 규정｣(문서번호 ACR01-001)에 따라 마케팅팀 소비자 불만 담당자는 불만이 접수된 경우, 제기한 불만이 적절한 불만인지, 추가 조치가 필요한 불만인지, 단순…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 불만처리 규정(ACR01-001)에 따른 판단·조치 절차 미준수",
+    "처분: 제조업무정지 1개월(2026.7.13~8.12)",
+    "대상품목: 이코사연질캡슐300밀리그램(이코사펜트산에틸)"
+   ],
+   "implication": "소비자 불만처리(Complaint Handling) 절차 미준수는 품질 이슈의 조기 감지·CAPA 연계를 저해하는 지적사항이다. 국내 제조소도 불만접수-판단-조치 전 과정의 문서화 여부를 점검할 필요가 있다.",
+   "checks": [
+    "불만처리 규정상 판단기준 적용 여부",
+    "불만 관련 CAPA 연계 기록 확인"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005294",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026005254",
+   "render_order": 8,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "원광제약(주)",
+   "title_issue": "기준서 미준수",
+   "summary": "원광제약이 원광우황청심원액(사향대체물질 엘-무스콘 함유) 제조 시 기준서를 준수하지 않아 제조업무정지 1개월 처분을 받았다(세부 위반내용 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-02"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026005254"
+    },
+    {
+     "label": "업체",
+     "value": "원광제약(주)"
+    },
+    {
+     "label": "처분",
+     "value": " ○ 해당 품목 제조업무정지 1개월(2026. 7. 16. ∼ 2026. 8. 15.)\n    해당 품목: 원광우황청심원액(사향대체물질엘-무스콘함유)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "기준서 미준수",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 기준서 미준수(세부 내용 원문 미기재)",
+    "처분: 제조업무정지 1개월(2026.7.16~8.15)",
+    "대상품목: 원광우황청심원액(사향대체물질 엘-무스콘 함유)"
+   ],
+   "implication": "기준서(제조관리기준서·제품표준서) 미준수는 GMP의 가장 기본적 요건 위반으로 반복 지적되는 영역이다. 국내 한약제제 제조소도 기준서와 실제 제조기록 간 일치 여부를 재확인할 필요가 있다.",
+   "checks": [
+    "제조기준서와 실제 제조기록 일치 여부",
+    "원문 처분 상세 확인 필요"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005254",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026005214",
+   "render_order": 9,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "주식회사 휴메디솔",
+   "title_issue": "주원료시험 미실시",
+   "summary": "휴메디솔이 아이원케어액·드롭오투액(폴리헥사메틸렌비구아니드염산염액 20%) 제조 시 신고규격에 따른 주원료시험을 실시하지 않고 주원료 제조원 변경도 신고하지 않아 제조업무정지 3개월15일 처분을 받았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-01"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026005214"
+    },
+    {
+     "label": "업체",
+     "value": "주식회사 휴메디솔"
+    },
+    {
+     "label": "처분",
+     "value": "해당 품목 제조업무정지 3개월15일(2026. 7. 15. ∼ 2026. 10. 28.)\n※ 해당 품목: ①아이원케어액(폴리헥사메틸렌비구아니드염산염액20%),②드롭오투액(20%염산폴리헥사메칠렌비구아니드)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 신고 규격에 따른 주원료시험 미실시\n- 주원료 제조원 변경 미신고",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 신고규격 주원료시험 미실시, 주원료 제조원 변경 미신고",
+    "처분: 제조업무정지 3개월15일(2026.7.15~10.28)",
+    "대상품목: 아이원케어액, 드롭오투액(2품목)"
+   ],
+   "implication": "주원료 시험 미실시와 제조원 변경 미신고는 원료 이력추적성(traceability) 관리의 근본적 결함을 시사한다. 국내 유사 제제 제조소도 원료 변경관리(Change Control) 신고 체계를 재점검할 필요가 있다.",
+   "checks": [
+    "주원료시험 실시 여부 및 시험성적서 보관",
+    "원료 제조원 변경관리(Change Control) 신고 절차"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005214",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026005134",
+   "render_order": 10,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "정우신약(주)",
+   "title_issue": "시험의뢰 기록 미준수",
+   "summary": "정우신약이 반제품 미생물시험 의뢰 시 자사 기준서(품질관리 업무규정)에 따른 기록·결재 절차를 준수하지 않아, 대상 품목 제조업무정지 1개월 및 수탁 제형 제조업무정지 15일 처분을 받았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026005134"
+    },
+    {
+     "label": "업체",
+     "value": "정우신약(주)"
+    },
+    {
+     "label": "처분",
+     "value": "<의약품 제조업자 등의 준수사항 위반 관련 품목>\n○ 해당 품목 제조업무정지 1개월(2026. 7. 13. ~ 2026. 8. 12.)\n * (대상품목) ① 정우이진탕산(단미엑스혼합제)(허가번호: 제858호, 허가일자: 2000.02.10.)\n             ② 정우대시호탕엑스과립(허가번호: 제858호, 허가일자: 2000.02.10.)\n             ③ 정우소청룡탕산(단미엑스혼합제)(허가번호: 제858호, 허가일자: 2000.02.10.)\n             ④ 요로신정(허가번호: 제858호, 허가일자: 2000.02.10.)\n\n<의약품 수탁자의 관리책임 등 위반 관련 품목>\n○ 해당 제형 제조업무정지 15일(2026. 7. 13. ~ 2026. 7. 27.)\n  * (대상제형) 장용성필름코팅정 "
+    }
+   ],
+   "quotes": [
+    {
+     "original": "<의약품 제조업자 등의 준수사항 위반 관련>\n ○ 의약품 제조업자는「약사법」제38조제1항 및「의약품안전규칙」제48조제9호가목 [별표1] 의약품 제조 및 품질관리기준을 준수하여,\n ① 자사 기준서 ‘품질관리 업무규정(문서번호: JW-Q-02)’에 따라 시험의뢰부서는 시험의뢰에 해당하는 모든 사항을 기록하여 의뢰부서의 팀장 결재를 득한 후 시험을 의뢰하여야 하나,\n  - 동 업체는 ‘정우이진탕산(단미엑스혼합제)’, ‘정우대시호탕엑스과립’,‘소청룡탕…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 반제품 미생물시험 의뢰 기록·팀장결재 절차 미준수",
+    "처분1: 대상품목 4종 제조업무정지 1개월(2026.7.13~8.12)",
+    "처분2: 장용성필름코팅정 제형 제조업무정지 15일(2026.7.13~7.27)"
+   ],
+   "implication": "시험의뢰 기록·결재 등 문서관리 절차의 미준수는 데이터 무결성(ALCOA+) 관점에서 지적되는 대표 사례다. 국내 한약제제 제조소도 시험의뢰 프로세스의 기록·결재 이력을 전수 점검할 필요가 있다.",
+   "checks": [
+    "시험의뢰 기록·결재 절차 준수 여부",
+    "수탁 제조 제형별 관리책임 이행 현황"
+   ],
+   "deep_analysis": null,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005134",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyJBfLEtwC",
+   "render_order": 11,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)퍼슨",
+   "title_issue": "시설장비 보완사항 인정",
+   "summary": "MFDS가 (주)퍼슨에 대한 사후 GMP 실사에서 시설·장비 관련 다수 보완사항(교차오염 방지 제조시설 운영, 계측기 교정관리 절차, 압축공기 경향분석 등)을 지적했고, 업체가 제출한 이행계획서의 타당성이 인정됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyJBfLEtwC"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)퍼슨"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-04-07~2026-04-09"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시설장비 기타 [별표 1] 제2.1호 제품의 교차오염 방지를 위한 제조시설을 운영할 것 이행계획서 타당성 인정 시설장비 기타 [별표 1] 제2.1호 아목 설비(계측기)의 교정 관리 절차, 재적격성 평가 주기 설정 타당성을 마련할 것 이행계획서 타당성 인정 시설장비 기타 [별표 1] 제2.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2026-04-07~2026-04-09(사후·완제 단일)",
+    "지적: 교차오염 방지 제조시설 운영, 계측기 교정관리·재적격성평가 주기, 압축공기 경향분석 등(시설장비 분야)",
+    "결과: 지적사항에 대한 이행계획서 타당성 인정"
+   ],
+   "implication": "교차오염 방지시설·계측기 교정·유틸리티(압축공기) 경향분석은 GMP 실사에서 반복 지적되는 시설관리 영역이다. 국내 제조소는 유틸리티 시스템의 정기 경향분석과 계측기 재적격성평가 주기 설정 여부를 재점검할 필요가 있다.",
+   "checks": [
+    "압축공기 등 유틸리티 경향분석 실시 여부",
+    "계측기 교정·재적격성평가 주기 설정 문서화"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 20,
+    "severity_summary": {
+     "기타": 20
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.1호",
+      "summary": "제품의 교차오염 방지를 위한 제조시설을 운영할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.1호 아목",
+      "summary": "설비(계측기)의 교정 관리 절차, 재적격성 평가 주기 설정 타당성을 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.3호",
+      "summary": "기준서에 따른 압축공기 결과를 경향 분석할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.3호 나목",
+      "summary": "다른 청정구역 간 오염되지 않도록 차압을 확인할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "품질",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제3.3호 하목",
+      "summary": "주성분 공급업체 평가방법을 타당하게 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제4.3호 가목",
+      "summary": "제조관리 기준서에 실제 칭량 방법 등을 포함할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제4.3호 나목",
+      "summary": "시설 및 기기에 대한 정기적인 점검방법 등을 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제4.3호 다목",
+      "summary": "원료약품 등의 보관장소 및 방법을 기준서에 반영할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제6.1호 나목",
+      "summary": "밸리데이션 규정을 반영하고, 밸리데이션을 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제6.4호",
+      "summary": "캠페인 생산에 대한 세척 유효성을 검증할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제6.5호",
+      "summary": "제조지원설비 적격성 평가 시 범위 설정 등 기준을 수립할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제6.6호",
+      "summary": "컴퓨터시스템을 정기적으로 평가할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "품질",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제7.3호 나목",
+      "summary": "평가결과에 따른 편향 조사 후 필요한 조치를 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제8.1호 가목",
+      "summary": "제조기록서는 설비 정보, 공정 중 시험(근거), 원약분량 산출 근거 등을 포함하여 작성할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9.2호 가목",
+      "summary": "작업소 청소는 청소 방법 및 주기, 확인 방법에 따라 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9.2호 라목",
+      "summary": "제조구역은 제품 품질에 영향을 미칠 수 있는 행위를 하지 않을 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9.2호 마목",
+      "summary": "방충·방서 점검 결과에 따른 조치사항을 확인할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9.3호 나목",
+      "summary": "세척한 제조설비는 다음 사용 시까지 오염되지 않도록 관리할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9.3호 다목",
+      "summary": "제조설비 세척 시 사용한 세척제, 세척기록 등을 작성할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "품질",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제14호 나목",
+      "summary": "작업원이 맡은 업무를 수행할 수 있도록 교육 연간계획을 수립하여 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asL5S",
+   "render_order": 12,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Baxter Oncology GmbH",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Baxter Oncology GmbH(독일)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asL5S"
+    },
+    {
+     "label": "제조소",
+     "value": "Baxter Oncology GmbH"
+    },
+    {
+     "label": "실사기간",
+     "value": "2024-09-23~2024-09-27"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Baxter Oncology GmbH\n❍ 소 재 지: Kantstraße 2, 33790 Halle/Westfalen, Germany (독일)\n2\n실태조사 개요\n❍ 실사 목적: ｢약사법｣제42조, ｢의약품 등의 안전에 관한 규칙｣(총리령) 제8조 및\n[별표 1]의 제조 및 품질관리기준에 따라 수입 완제의약품에 대한 사전 GMP 평가를\n위하여 의약품 해외제조소 실태조…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2024-09-23~2024-09-27",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asL5S",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asNCa",
+   "render_order": 13,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Liebel-Flarsheim Company LLC",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Liebel-Flarsheim Company LLC(미국)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asNCa"
+    },
+    {
+     "label": "제조소",
+     "value": "Liebel-Flarsheim Company LLC"
+    },
+    {
+     "label": "실사기간",
+     "value": "2024-12-09~2024-12-13"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Liebel-Flarsheim Company LLC\n❍ 소 재 지: 8800 Durant Road, Raleigh, North Carolina 27616, USA (미국)\n2\n실태조사 개요\n❍ 실사 목적: ｢약사법｣제42조, ｢의약품 등의 안전에 관한 규칙｣(총리령) 제4조 및\n[별표 1]의 제조 및 품질관리기준에 따라 수입 완제의약품에 대한 사전 GMP 평가를\n위…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2024-12-09~2024-12-13",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asNCa",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asOMf",
+   "render_order": 14,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Guerbet",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Guerbet(프랑스)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asOMf"
+    },
+    {
+     "label": "제조소",
+     "value": "Guerbet"
+    },
+    {
+     "label": "실사기간",
+     "value": "2024-11-18~2024-11-22"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Guerbet\n❍ 소 재 지: 16 Rue Jean Chaptal, Aulnay Sous Bois, 93600, France (프랑스)\n2\n실태조사 개요\n❍ 실사 목적: ｢약사법｣제42조, ｢의약품 등의 안전에 관한 규칙｣(총리령) 제4조 및\n[별표 1]의 제조 및 품질관리기준에 따라 수입 완제의약품에 대한 사전 GMP 평가를\n위하여 의약품 해외제조소 실태조사를 실…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2024-11-18~2024-11-22",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asOMf",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asSGJ",
+   "render_order": 15,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Patheon France",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Patheon France(프랑스)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asSGJ"
+    },
+    {
+     "label": "제조소",
+     "value": "Patheon France"
+    },
+    {
+     "label": "실사기간",
+     "value": "2025-02-10~2025-02-14"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Patheon France\n❍ 소 재 지: 40 Boulevard de Champaret Bourgoin Jallieu, 38300, France (프랑스)\n2\n실태조사 개요\n❍ 실사 목적: ｢약사법｣제42조, ｢의약품 등의 안전에 관한 규칙｣(총리령) 제4조 및\n[별표 1]의 제조 및 품질관리기준에 따라 수입 완제의약품에 대한 사전 GMP 평가를\n위하여 의약품 해…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2025-02-10~2025-02-14",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asSGJ",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asUDD",
+   "render_order": 16,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Recipharm Leganes S.L.U.",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Recipharm Leganes S.L.U.(스페인)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asUDD"
+    },
+    {
+     "label": "제조소",
+     "value": "Recipharm Leganes S.L.U."
+    },
+    {
+     "label": "실사기간",
+     "value": "2025-05-06~2025-05-08"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Recipharm Leganes S.L.U.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2025-05-06~2025-05-08",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asUDD",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asWoD",
+   "render_order": 17,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Novartis Pharmaceuticals S.R.L.",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 Novartis Pharmaceuticals S.R.L.(루마니아)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asWoD"
+    },
+    {
+     "label": "제조소",
+     "value": "Novartis Pharmaceuticals S.R.L."
+    },
+    {
+     "label": "실사기간",
+     "value": "2025-05-12~2025-05-16"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: Novartis Pharmaceuticals S.R.L.",
+     "translation": null
+    },
+    {
+     "original": "❍ 소 재 지: Str.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2025-05-12~2025-05-16",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asWoD",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1PyLW-asYv7",
+   "render_order": 18,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "IBSA Farmaceutici Italia S.r.l.",
+   "title_issue": "해외 사전GMP 실태조사",
+   "summary": "MFDS가 해외제조소 IBSA Farmaceutici Italia S.r.l.(이탈리아)에 대한 수입 완제의약품 사전 GMP 평가 실태조사를 현지실사로 실시했다(평가 결과 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1PyLW-asYv7"
+    },
+    {
+     "label": "제조소",
+     "value": "IBSA Farmaceutici Italia S.r.l."
+    },
+    {
+     "label": "실사기간",
+     "value": "2025-11-17~2025-11-21"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 1 -\n의약품 사전 GMP 평가 실태조사 결과\n1\n제조소 현황\n❍ 제조소명: IBSA Farmaceutici Italia Srl\n❍ 소 재 지: Via Martiri di Cefalonia 2, 26900 Lodi, Italy (이탈리아)\n2\n실태조사 개요\n❍ 실사 목적: ｢약사법｣제42조, ｢의약품 등의 안전에 관한 규칙｣(총리령) 제4조 및\n[별표 1]의 제조 및 품질관리기준에 따라 수입 완제의약품에 대한 사전 GMP 평가를\n위하여 의약…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "실사기간: 2025-11-17~2025-11-21",
+    "실사방식: 현지실사(사전·완제 단일)",
+    "평가결과: 원문 미기재(확인 필요)"
+   ],
+   "implication": "수입 완제의약품에 대한 사전 GMP 평가는 국내 유통 전 해외제조소의 품질시스템을 검증하는 절차다. 해당 제조소로부터 원료·완제품을 공급받는 국내 업체는 평가 결과 확정 여부를 확인할 필요가 있다.",
+   "checks": [
+    "사전 GMP 평가 결과 확정 여부 확인",
+    "해당 제조소발 수입품목 국내 공급 현황 파악"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyLW-asYv7",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "data0011-15874",
+   "render_order": 19,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Guidance",
+   "headline_target": "디지털의료기기 변경관리 계획서 허가 심사 가이드라인",
+   "title_issue": "변경관리계획서 가이드라인",
+   "summary": "MFDS가 디지털의료기기 변경관리 계획서의 허가·심사 관련 가이드라인을 발간했다(세부 개정사항 원문 미기재).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "data0011-15874"
+    },
+    {
+     "label": "발행기관",
+     "value": "MFDS"
+    },
+    {
+     "label": "주제",
+     "value": "디지털의료기기 변경관리 계획서 허가 심사 가이드라인"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "주제: 디지털의료기기 변경관리 계획서 허가·심사 가이드라인",
+    "발행: MFDS, 2026-06-26",
+    "세부 내용: 원문 확인 필요(제목 수준 정보)"
+   ],
+   "implication": "디지털의료기기의 변경관리 계획서 사전 심사 체계는 SaMD(소프트웨어 의료기기)의 잦은 업데이트 특성을 반영한 규제 흐름이다. 디지털의료기기 관련 업체는 변경관리 계획서 작성 요건을 사전에 확인할 필요가 있다.",
+   "checks": [
+    "원문 가이드라인 세부 요건 확인",
+    "디지털의료기기 변경관리 계획서 작성 여부 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.mfds.go.kr/www/rss/brd.do?brdId=data0011",
+    "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-a4ca19db4e52",
+   "render_order": 20,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "동화약품(주) 리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민) 외 1품목",
+   "title_issue": "니트로소불순물 우려",
+   "summary": "동화약품이 리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)에서 불순물(N-nitroso-meglumine) 허용기준 초과 우려에 따라 예방적 자율회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-02"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-a4ca19db4e52"
+    },
+    {
+     "label": "업체",
+     "value": "동화약품(주)"
+    },
+    {
+     "label": "제품",
+     "value": "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민) 외 1품목"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "불순물(N-nitroso-meglumine) 허용기준 초과 우려에 따른 영업자 회수",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: N-nitroso-meglumine 허용기준 초과 우려(예방적)",
+    "제품: 리나디엠메트서방정5/1000밀리그램",
+    "발행일: 2026-07-02"
+   ],
+   "implication": "니트로사민류 불순물은 전 세계 규제기관이 지속 모니터링하는 대표 유전독성 불순물이다. 메트포르민 함유 복합제 제조소는 N-니트로소 불순물 관리계획 이행 여부를 재점검할 필요가 있다.",
+   "checks": [
+    "N-니트로소 불순물 관리계획 이행 여부",
+    "동일 성분(리나글립틴·메트포르민) 타 함량 제품 연계 확인"
+   ],
+   "merged_count": 2,
+   "merged_items": [
+    "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)",
+    "리나디엠메트서방정2.5/1000밀리그램(리나글립틴,메트포르민)"
+   ],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-d3e479b8f155",
+   "render_order": 22,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)케이보은제약",
+   "title_issue": "금속이물 혼입 회수",
+   "summary": "케이보은제약이 뷰카클래식구취케어치약 등에서 금속성 이물 혼입이 확인됨에 따라, 동일 생산라인에서 제조된 치약 제품 40개 브랜드를 일괄 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-02"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-d3e479b8f155"
+    },
+    {
+     "label": "업체",
+     "value": "(주)케이보은제약"
+    },
+    {
+     "label": "제품",
+     "value": "1.케이보은프라그케어치약, 2.고스케어덴티플루치약, 3.투비짱충치케어치약, 4.쏘두위안티캐비티치약, 5.뷰카클래식구취케어치약, 6.에이카랩스닥터라이노치약(사과향), 7.뷰카클래식구취케어치약(스피아민트향), 8.뷰카클래식블랙차콜치약(허브민트향), 9.뷰카주니어마일드구취케어치약(포도향), 10.칸디데일사오공키즈치약(복숭아향), 11.아미덴클래식치약, 12.뷰카주니어마일드구취케어치약(딸기향), 13.아미덴일사오공키즈치약(딸기향), 14.크리오엑스퍼트브레스케어치약, 15.크리오엑스퍼트보타닉치약, 16.크리오엑스퍼트주니어치약(후르츠민트향), 17.네이쳐스영프로메가폴리스덴탈케어치약, 18.뷰카주니어마일드구취케어치약(사과향), 19.케이맘주니어구취케어치약(사과향), 20.앙오리지널구취케어치약, 21.러블리티스일사오공치약, 22.코튼하임덴탈에이지구취케어치약(쿨링아쿠아민트향), 23.뷰카주니어마일드구취케어치약(바나나향), 24.뷰카주니어마일드구취케어치약(복숭아향), 25.더블케이덴티에피소드치약, 26.안티프라그쎈스트롱치약, 27.하이안베이직치약(민트향), 28.치카포카주니어충치케어치약(포도향), 29.치카포카주니어충치케어치약(딸기향), 30.지그비주니어구취케어치약, 31.센토프라임블랙차콜구취케어치약, 32.센토프라임구취케어치약, 33.센토주니어세이프구취케어치약(딸기향), 34.센토주니어세이프구취케어치약(포도향), 35.센토주니어세이프구취케어치약(복숭아향), 36.센토주니어세이프구취케어치약(사과향), 37.지그비주니어구취케어치약(딸기향), 38.지그비주니어구취케어치약(사과향), 39.센토주니어세이프구취케어치약(트로피컬향), 40.케이맘베이비앤키즈일사오공퓨어치약"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "금속성 이물 혼입(뷰카클래식구취케어치약)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 금속성 이물 혼입(뷰카클래식구취케어치약에서 확인)",
+    "대상: 동일 제조소 생산 치약 제품 40개 브랜드(품목)",
+    "발행일: 2026-07-02"
+   ],
+   "implication": "하나의 생산라인에서 발견된 금속 이물이 40개에 달하는 사설 브랜드 치약으로 확산된 것은, 위탁생산(OEM) 구조에서 제조공정 이상이 다수 유통채널에 영향을 미칠 수 있음을 보여준다. 치약 등 OEM 위탁생산 품목 담당자는 금속검출기 점검 이력과 라인별 이물관리 기록을 확인할 필요가 있다.",
+   "checks": [
+    "생산라인 금속검출기 점검·교정 이력",
+    "동일 라인 위탁생산 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-5cb847f79512",
+   "render_order": 23,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)현진제약",
+   "title_issue": "회분 기준초과 회수",
+   "summary": "현진제약이 생약제제 현진종대황에서 회분(灰分) 시험 기준 부적합이 확인되어 회수·판매중지 조치했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-5cb847f79512"
+    },
+    {
+     "label": "업체",
+     "value": "(주)현진제약"
+    },
+    {
+     "label": "제품",
+     "value": "현진종대황"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "회분",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 회분(灰分) 기준 부적합",
+    "제품: 현진종대황(생약제제)",
+    "발행일: 2026-06-29"
+   ],
+   "implication": "생약제제에서 회분 기준초과가 확인되는 사례는 원료 관리 전반의 재점검 필요성을 보여준다. 국내 생약제제 제조소도 원료 입고 시 회분·산불용성회분 시험을 강화할 필요가 있다.",
+   "checks": [
+    "원료 입고 시 회분 시험 실시 여부",
+    "동일 원료 사용 타 품목 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-74aef91e1df5",
+   "render_order": 24,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)나음제약",
+   "title_issue": "중금속 카드뮴 검출",
+   "summary": "나음제약이 생약제제 나음당귀에서 중금속(카드뮴) 기준초과가 확인되어 회수·판매중지 조치했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-74aef91e1df5"
+    },
+    {
+     "label": "업체",
+     "value": "(주)나음제약"
+    },
+    {
+     "label": "제품",
+     "value": "나음당귀"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "중금속(카드뮴)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 중금속(카드뮴) 기준초과",
+    "제품: 나음당귀(생약제제)",
+    "발행일: 2026-06-29"
+   ],
+   "implication": "생약제제에서 중금속(카드뮴)이 검출되는 사례는 원료 관리 전반의 재점검 필요성을 보여준다. 국내 생약제제 제조소는 원료 산지별 중금속 시험 이력을 강화할 필요가 있다.",
+   "checks": [
+    "원료 산지별 중금속 시험 성적서 확인",
+    "동일 원료(당귀) 사용 타 품목 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-b6baa101018b",
+   "render_order": 26,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "휴먼바이오(주)",
+   "title_issue": "미생물한도 부적합",
+   "summary": "휴먼바이오가 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)의 수거검사에서 미생물한도 부적합이 확인되어 회수·판매중지 조치했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-b6baa101018b"
+    },
+    {
+     "label": "업체",
+     "value": "휴먼바이오(주)"
+    },
+    {
+     "label": "제품",
+     "value": "1.퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "수거검사(미생물한도)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 수거검사 결과 미생물한도 부적합",
+    "제품: 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)",
+    "발행일: 2026-06-29"
+   ],
+   "implication": "항균 성분 제제에서의 미생물한도 부적합은 보존력(preservative efficacy) 관리의 실패를 시사할 수 있다. 국내 제조소는 완제품 보존력시험과 미생물한도 시험 이력을 재점검할 필요가 있다.",
+   "checks": [
+    "완제품 보존력시험(PET) 이력 확인",
+    "동일 성분 타 제품 미생물한도 재시험 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-f6e0aa34a0c2",
+   "render_order": 27,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)현진제약",
+   "title_issue": "산불용성회분 초과",
+   "summary": "현진제약이 생약제제 현진몰약에서 회분 및 산불용성회분 시험 기준 부적합이 확인되어 회수·판매중지 조치했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-f6e0aa34a0c2"
+    },
+    {
+     "label": "업체",
+     "value": "(주)현진제약"
+    },
+    {
+     "label": "제품",
+     "value": "현진몰약"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "회분, 산불용성회분",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 회분·산불용성회분 기준 부적합",
+    "제품: 현진몰약(생약제제)",
+    "발행일: 2026-06-29"
+   ],
+   "implication": "같은 제조소(현진제약)에서 서로 다른 두 품목이 동시에 회분 관련 기준을 벗어난 것은 원료 검사 공정 전반의 점검 필요성을 시사한다. 국내 생약제제 제조소는 원료별 회분 시험 기록을 전수 재확인할 필요가 있다.",
+   "checks": [
+    "원료 입고 시 회분·산불용성회분 시험 이력",
+    "동일 제조소 타 생약 품목 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-32d883703cb1",
+   "render_order": 28,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)한국비엔씨",
+   "title_issue": "수출전용품 국내판매",
+   "summary": "한국비엔씨가 국가출하승인 없이 수출전용 의약품인 비에녹스주(클로스트리디움보툴리눔독소A형)를 국내에 판매하여 회수·판매중지 조치됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-32d883703cb1"
+    },
+    {
+     "label": "업체",
+     "value": "(주)한국비엔씨"
+    },
+    {
+     "label": "제품",
+     "value": "비에녹스주(클로스트리디움보툴리눔독소A형)(수출용)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "국가출하승인없이 수출전용 의약품을 국내에 판매",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 국가출하승인 없이 수출전용 의약품을 국내 판매",
+    "제품: 비에녹스주(클로스트리디움보툴리눔독소A형)(수출용)",
+    "발행일: 2026-06-26"
+   ],
+   "implication": "수출전용 의약품의 국가출하승인 없는 국내 유통은 생물학적제제 국가출하승인 제도의 근간을 흔드는 중대한 위반이다. 보툴리눔독소 등 고위해 생물학적제제 취급업체는 수출·내수 유통경로 분리 관리를 재점검할 필요가 있다.",
+   "checks": [
+    "수출전용품 국내 유통경로 분리 관리",
+    "국가출하승인 대상 품목 출하 기록 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-60a00ffadd4c",
+   "render_order": 29,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)대일제약",
+   "title_issue": "사전예방적 자율회수",
+   "summary": "대일제약이 시판 후 안전관리 정보를 근거로 클린방수밴드(1회용)에 대해 사전예방적 자율회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-60a00ffadd4c"
+    },
+    {
+     "label": "업체",
+     "value": "(주)대일제약"
+    },
+    {
+     "label": "제품",
+     "value": "클린방수밴드(1회용)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "시판 후 안전관리 정보에 따른 사전예방적 조치로 영업자 회수",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 시판 후 안전관리 정보에 따른 사전예방적 영업자 회수",
+    "제품: 클린방수밴드(1회용)",
+    "발행일: 2026-06-26"
+   ],
+   "implication": "시판 후 안전관리(PMS) 정보에 기반한 사전예방적 자율회수는 이상사례 확산 전 선제적으로 대응하는 사례다. 유사 의료용품 제조소도 시판 후 정보 모니터링 체계와 회수 트리거 기준을 점검할 필요가 있다.",
+   "checks": [
+    "시판 후 안전관리 정보 모니터링 체계 확인",
+    "동일 사유 재공지 여부(문서번호 중복) 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "hc-82272",
+   "render_order": 30,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "Health Canada",
+   "card_type": "Recall(HC)",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "[HC] Fludeoxyglucose (18F) Injection; Cracket vial",
+   "title_issue": "품질 문제 회수",
+   "summary": "Health Canada가 방사성의약품 Fludeoxyglucose (18F) Injection에 대해 품질 문제(Product quality)를 사유로 Type III 등급 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-02"
+    },
+    {
+     "label": "문서번호",
+     "value": "hc-82272"
+    },
+    {
+     "label": "업체",
+     "value": "원문 미기재"
+    },
+    {
+     "label": "제품",
+     "value": "Fludeoxyglucose (18F) Injection"
+    },
+    {
+     "label": "Class",
+     "value": "Type III"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Product quality",
+     "translation": "제품 품질"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Type III",
+    "사유: Product quality(세부 사유 원문 미기재)",
+    "제품: Fludeoxyglucose (18F) Injection(방사성의약품)"
+   ],
+   "implication": "방사성의약품(Radiopharmaceuticals)의 품질 이슈는 짧은 반감기 특성상 유통·재고 관리에 즉각적 영향을 준다. 국내 방사성의약품 취급 기관도 유사 품질 이슈 발생 시 신속 대응 체계를 점검할 필요가 있다.",
+   "checks": [
+    "방사성의약품 품질관리 기준 재확인",
+    "회수 대상 로트 유통 현황 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/fludeoxyglucose-18f-injection-cracket-vial",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0588-2026",
+   "render_order": 31,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Glenmark Pharmaceuticals Inc., USA",
+   "title_issue": "불순물 기준초과 회수",
+   "summary": "Glenmark Pharmaceuticals가 경구피임제 Alyacen 7/7/7에서 총 불순물 기준초과(OOS)가 확인되어 자율 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0588-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Glenmark Pharmaceuticals Inc., USA"
+    },
+    {
+     "label": "제품",
+     "value": "Alyacen 7/7/7, Norethindrone and Ethinyl Estradiol Tablets USP, 0.5mg/0."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Failed Impurities/Degradation Specifications: This recall is being initiated due to out-of-specification results total impurities.",
+     "translation": "불순물/분해 규격 부적합: 총 불순물 규격외(OOS) 결과로 인해 이번 회수가 개시됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 총 불순물 기준초과(Out-of-Specification)",
+    "유통: 미국 전역(Nationwide)"
+   ],
+   "implication": "경구용 정제의 불순물 기준초과는 안정성시험 중 분해산물 관리 미흡을 시사하는 대표적 사례다. 국내 제조소도 유효기간 내 분해산물·불순물 트렌드 관리 체계를 점검할 필요가 있다.",
+   "checks": [
+    "분해산물·불순물 안정성 데이터 트렌드 점검",
+    "회수 대상 로트 국내 유통 여부 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0589-2026",
+   "render_order": 32,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "PAI Holdings LLC VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS B…",
+   "title_issue": "약전기준 부적합 회수",
+   "summary": "PAI Holdings(VistaPharm 유통)가 활성탄 제제 KERR Insta-Char(25g, 수성(Aqueous) 기제, 체리향, 120mL)에서 OTC 모노그래프(M023) 기준 부적합이 확인되어 자율 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0589-2026"
+    },
+    {
+     "label": "업체",
+     "value": "PAI Holdings LLC"
+    },
+    {
+     "label": "제품",
+     "value": "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti… 외 3품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Does Not Meet USP or OTC Monograph: Product did not meet the Over-the-Counter (OTC) Monograph M023",
+     "translation": "OTC 모노그래프(M023) 기준 부적합: 제품이 OTC(일반의약품) 모노그래프 M023 기준을 충족하지 못함."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: OTC 모노그래프(M023) 기준 부적합",
+    "유통: 미국 전역(Nationwide)"
+   ],
+   "implication": "활성탄 제제는 급성 중독 응급 대응에 쓰이는 OTC 제품으로, 약전·모노그래프 기준 부적합은 효능 신뢰도에 직접 영향을 준다. 국내 유사 OTC 제제도 모노그래프 대비 규격 적합성을 재확인할 필요가 있다.",
+   "checks": [
+    "OTC 모노그래프 대비 규격 적합성 검토",
+    "동일 제형 타 용량·기제 제품 연계 점검"
+   ],
+   "merged_count": 4,
+   "merged_items": [
+    "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti…",
+    "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 50 Grams Acti…",
+    "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 25 Grams Act…",
+    "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 50 Grams Act…"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0593-2026",
+   "render_order": 36,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "IntegraDose Compounding Services LLC",
+   "title_issue": "함량미달 회수",
+   "summary": "IntegraDose Compounding Services가 조제한 주사제 Vasopressin 2 Units/2mL(0.9% 생리식염수)에서 함량미달(Subpotent)이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0593-2026"
+    },
+    {
+     "label": "업체",
+     "value": "IntegraDose Compounding Services LLC"
+    },
+    {
+     "label": "제품",
+     "value": "Vasopressin 2 Units/2 mL in 0."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Subpotent Drug",
+     "translation": "함량미달 의약품"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 함량미달(Subpotent Drug)",
+    "제형: 무균조제 주사제(시린지)"
+   ],
+   "implication": "무균조제(compounding) 주사제의 함량미달은 조제 공정의 정량·혼합 관리 미흡을 시사한다. 국내 조제전문업체도 주사제 조제 시 함량 검증(assay) 절차를 재점검할 필요가 있다.",
+   "checks": [
+    "조제 주사제 함량 검증(assay) 절차 점검",
+    "동일 로트 사용 의료기관 통보 여부 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0594-2026",
+   "render_order": 37,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Ajanta Pharma USA Inc",
+   "title_issue": "품목 혼동 회수",
+   "summary": "Ajanta Pharma USA의 Aripiprazole정 30mg 용기에 다른 성분인 Voriconazole정 50mg이 표시·유통되어 품목 혼동(Product Mix-Up)으로 회수됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0594-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Ajanta Pharma USA Inc"
+    },
+    {
+     "label": "제품",
+     "value": "Aripiprazole Tablets USP, Rx only, 30 mg, 30 tablets, Marketed by: Ajanta Pharma…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Product Mix-Up:  A bottle containing Voriconazole Tablets 50 mg was labelled and distributed as Aripiprazole Tablets USP 30 mg.",
+     "translation": "품목 혼동: Voriconazole정 50mg이 Aripiprazole정 USP 30mg으로 표시되어 유통됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 품목 혼동 — Voriconazole정 50mg이 Aripiprazole정 30mg으로 표시·유통",
+    "유통: 미국 전역"
+   ],
+   "implication": "포장·표시 단계에서의 품목 혼동은 환자가 의도치 않은 약물을 복용하게 되는 중대한 위해 가능성을 내포한다. 국내 제조소도 포장 라인 전환 시 물리적 격리(line clearance)와 표시 검증 절차를 재확인할 필요가 있다.",
+   "checks": [
+    "포장 라인 전환 시 line clearance 절차 점검",
+    "표시(라벨) 검증 이중 확인 체계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0596-2026",
+   "render_order": 38,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Par Health USA, LLC",
+   "title_issue": "결정화 발생 회수",
+   "summary": "Par Health USA(Endo USA 위탁)가 제조한 Buprenorphine HCl 주사제에서 결정화(활성성분 유리염기 결정) 현상이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0596-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Par Health USA, LLC"
+    },
+    {
+     "label": "제품",
+     "value": "Buprenorphine HCl, CIII, Injection, 0."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Crystallization; identified as Buprenorphine free base",
+     "translation": "결정화 확인됨: Buprenorphine 유리염기(free base) 결정으로 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 결정화 — Buprenorphine 유리염기(free base) 결정으로 확인",
+    "제형: 근육·정맥주사용 단회투여 바이알"
+   ],
+   "implication": "주사제 내 활성성분 결정화는 용해도·제형 안정성 문제를 시사하며 투여 시 이물 위험으로 이어질 수 있다. 국내 주사제 제조소도 보관조건별 결정화 발생 이력을 점검할 필요가 있다.",
+   "checks": [
+    "제형 안정성(용해도) 데이터 재검토",
+    "보관조건별 결정화 발생 이력 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0600-2026",
+   "render_order": 39,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries Pearson Quality Topical Anesthetic Gel (…",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, Pearson Quality Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0600-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten… 외 6품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 7,
+   "merged_items": [
+    "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten…",
+    "Quala Dental Products, Topical Anesthetic Gel, 20 % Benzocaine, Strawberry Flavo…",
+    "DHP Topical Anesthetic Gel, Benzocaine 20%, Strawberry Flavor, 1 oz.",
+    "Burkhart topical anesthetic gel, benzocaine 20 %, Strawberry Flavor, 1 oz (30 mL…",
+    "Dental City TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, Strawberry Flavor, 1 OZ (30…",
+    "PureLife, TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, 1 oz (30mL), Strawberry Flavo…",
+    "safco SensiCaine-Ultra (20% Benzocaine), Topical Anesthetic Gel, Strawberry Flav…"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0610-2026",
+   "render_order": 46,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Inventia Healthcare Limited",
+   "title_issue": "용출시험 부적합 회수",
+   "summary": "Inventia Healthcare(인도, Risiong Pharma 유통)의 Chlorthalidone정 25mg에서 용출시험 규격 부적합이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0610-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Inventia Healthcare Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Chlorthalidone Tablets, USP, 25 mg, [100 or 1000] Tablets pr bottle, Rx only, Ma…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Failed Dissolution Specifications",
+     "translation": "용출시험 규격 부적합"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용출시험 규격 부적합(Failed Dissolution Specifications)",
+    "유통: 미국 전역"
+   ],
+   "implication": "용출시험 부적합은 제제의 생체이용률·동등성에 영향을 줄 수 있는 핵심 품질 지표 이탈이다. 국내 제네릭 제조소도 배치별 용출 프로파일 트렌드를 재점검할 필요가 있다.",
+   "checks": [
+    "배치별 용출 프로파일 트렌드 확인",
+    "제형(정제) 처방·공정 변경 이력 검토"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0629-2026",
+   "render_order": 47,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited Lucky Super Soft, Antifungal Athlete's F…",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Lucky Super Soft Antifungal Athlete's Foot Cream(Clotrimazole 1%))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0629-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt… 외 13품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 14,
+   "merged_items": [
+    "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt…",
+    "Lucky Super Soft, First Aid Triple Antibiotic Ointment, Bacitracin zinc 400 unit…",
+    "Circle K, triple antibiotic ointment, Bacitracin Zinc (400 units), Neomycin Sulf…",
+    "Lil Drug Store, Triple Antibiotic Ointment, Bacitracin Zinc (400 units), Neomyci…",
+    "Rapidol, Triple Antibiotic First Aid Ointment, Bacitracin Zinc 400 units, Neomyc…",
+    "Cura Hongos, Crema Antifungica, Clotrimazole 1%, 2oz (57g) tubes, Dist by/por: P…",
+    "Med Pride, Bacitracin Zinc Ointment, 500 units, 0.",
+    "Med Pride, Bacitracin Zinc Ointment, 500 units, 1oz (28.",
+    "Med Pride, Bacitracin Zinc Ointment, 1oz (28.",
+    "Med Pride, 1% Clotrimazole Antifungal Cream, Net Wt. 1oz (28.",
+    "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt.",
+    "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt. 1 oz (28.",
+    "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc (equivalent to 400 units)…",
+    "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc 400 units, Neomycin Sulfa…"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  }
+ ]
+}

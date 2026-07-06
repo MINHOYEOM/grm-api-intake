@@ -914,6 +914,13 @@
       }
       payload.publish_date = state.latest.date;
     }
+    if (action === "web_publish") {
+      var wpDate = window.prompt(
+        "웹 발행일 (YYYY-MM-DD)\nweb/data/deltas/delta_{date}.json 가 먼저 커밋돼 있어야 합니다.",
+        (state.latest && state.latest.date) || "");
+      if (!wpDate) return;
+      payload.publish_date = String(wpDate).trim();
+    }
     if (!confirmDispatch(action, payload.publish_date)) return;
     if (button) button.disabled = true;
     setStatus(byId("grm-ops-status"), "워크플로우 실행 요청 중", "");

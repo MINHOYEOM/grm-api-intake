@@ -113,6 +113,15 @@ function workflowMap(publishDate = ""): Record<string, WorkflowDef> {
       inputs: {},
       events: ["push", "pull_request", "workflow_dispatch"],
     },
+    web_publish: {
+      label: "웹 발행",
+      workflow: envAny(["WEB_PUBLISH_WORKFLOW_ID"]) || "grm-web-publish.yml",
+      purpose: "라우틴 델타 → 발행본 자동 조립 + PR (프리뷰 확인 후 사람이 머지 = 라이브)",
+      schedule: "델타 커밋 시 자동 / Admin 수동 실행",
+      group: "publish",
+      inputs: { publish_date: publishDate },
+      events: ["push", "workflow_dispatch"],
+    },
     newsletter_send: {
       label: "뉴스레터 실발송",
       workflow: envAny(["NEWSLETTER_WORKFLOW_ID"]) || "grm-newsletter-send.yml",
@@ -565,7 +574,7 @@ Deno.serve(async (req: Request) => {
   const def = defs[action];
   if (!def) return jsonResponse({ error: "unknown_action" }, 400);
   if (def.manual === false) return jsonResponse({ error: "workflow_not_dispatchable" }, 400);
-  if (action === "newsletter_send" && !/^\d{4}-\d{2}-\d{2}$/.test(publishDate)) {
+  if ((action === "newsletter_send" || action === "web_publish") && !/^\d{4}-\d{2}-\d{2}$/.test(publishDate)) {
     return jsonResponse({ error: "invalid_publish_date" }, 400);
   }
   if (!githubToken()) return jsonResponse({ error: "github_not_configured" }, 500);

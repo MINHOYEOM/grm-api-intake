@@ -146,10 +146,14 @@ def select_open_delta(token: str, db_id: str,
     return candidates[-1][1]
 
 
-def _fetch_code_blocks(token: str, page_id: str) -> list[dict[str, Any]]:
-    """페이지 본문의 code 블록들을 순서대로(파싱된 JSON) 반환. 코드블록이 아니면 skip."""
+def _fetch_code_blocks(token: str, page_id: str) -> list[str]:
+    """페이지 본문의 code 블록 원문 텍스트들을 순서대로 반환. 코드블록이 아니면 skip.
+
+    ★파싱하지 않고 원문을 그대로 보존한다 — Notion 은 긴 본문을 여러 code 블록으로
+    쪼개 저장할 수 있어(작성 도구 의존), 블록 단위 선-파싱은 쪼개진 델타를 전부 버리는
+    침묵 실패가 된다. 파싱·결합 전략은 extract_delta 가 담당(A/B/C 폴백)."""
     url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
-    blocks: list[dict[str, Any]] = []
+    texts: list[str] = []
     start_cursor: str | None = None
     for _ in range(25):
         req_url = url
@@ -164,19 +168,12 @@ def _fetch_code_blocks(token: str, page_id: str) -> list[dict[str, Any]]:
                 rt.get("plain_text") or rt.get("text", {}).get("content", "") or ""
                 for rt in code.get("rich_text", [])
             )
-            blocks.append({"text": text})
+            if text.strip():
+                texts.append(text)
         if not data.get("has_more"):
             break
         start_cursor = data.get("next_cursor")
-    parsed: list[dict[str, Any]] = []
-    for b in blocks:
-        try:
-            obj = json.loads(b["text"])
-        except (ValueError, TypeError):
-            continue
-        if isinstance(obj, dict):
-            parsed.append(obj)
-    return parsed
+    return texts
 
 
 def _validate_envelope(obj: Any, *, what: str) -> dict[str, Any]:
@@ -191,11 +188,49 @@ def _validate_envelope(obj: Any, *, what: str) -> dict[str, Any]:
     return obj
 
 
+def _is_envelope(obj: Any) -> bool:
+    """슬롯 델타 envelope 모양(cards dict + tldr list)인지 — deep 델타와 구별용."""
+    return (isinstance(obj, dict)
+            and isinstance(obj.get("cards"), dict)
+            and isinstance(obj.get("tldr"), list))
+
+
+def _validate_deep(obj: Any) -> dict[str, Any]:
+    """deep 델타 = 맨몸 `{document_id: {"deep_analysis": {...}, ...}}` dict.
+
+    소비자 계약 = `assemble_publish_brief(deep_deltas=...)` → `inject_slots.
+    inject_deep_analysis` — cards/tldr 봉투 없음(예치 스니펫 규약과 동일). 봉투로
+    감싸 예치되면 card id 매칭이 전부 빗나가 deep 이 조용히 유실되므로 fail-loud."""
+    if not isinstance(obj, dict) or not obj:
+        raise DeltaBridgeError("deep delta: 비어있지 않은 dict 여야 함")
+    if _is_envelope(obj):
+        raise DeltaBridgeError(
+            "deep delta: cards/tldr 봉투 금지 — `{document_id: {...}}` 맨몸 dict 만 허용"
+            "(assemble --deep 계약, 예치 스니펫 규약)")
+    bad = [k for k, v in obj.items() if not isinstance(v, dict)]
+    if bad:
+        raise DeltaBridgeError(f"deep delta: 값이 dict 가 아닌 키 존재: {bad[:3]}")
+    return obj
+
+
+def _try_json_dict(text: str) -> dict[str, Any] | None:
+    try:
+        obj = json.loads(text)
+    except (ValueError, TypeError):
+        return None
+    return obj if isinstance(obj, dict) else None
+
+
 def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
     """페이지에서 (delta, deep|None, publish_date) 추출·검증.
 
-    본문 code 블록: 1개 = delta 만, 2개 = (delta, deep). envelope 검증(최상위 dict +
-    cards dict + tldr list) 은 fail-loud — 구조 불량이면 DeltaBridgeError.
+    본문 code 블록 결합 전략(작성 도구가 긴 본문을 여러 블록으로 쪼개도 견딘다):
+      A) 블록1 = delta envelope (+블록2 = deep 맨몸 dict) — 예치 규약 기본형.
+      B) 전체 블록 결합 = 단일 delta envelope (Notion 분할 저장 대응).
+      C) 마지막 블록 제외 결합 = delta envelope + 마지막 블록 = deep.
+    deep 델타는 맨몸 `{document_id: {...}}` — cards/tldr 봉투 금지(_validate_deep,
+    assemble --deep 소비 계약). envelope 검증(최상위 dict + cards dict + tldr list)은
+    fail-loud — 구조 불량이면 DeltaBridgeError.
     가능하면 `inject_slots.validate_injection` 류 슬롯 계약도 참고하되(카드 id 정합은
     scaffold 가 없어 이 시점엔 알 수 없으므로), 여기서는 envelope 형태만 강제한다
     (슬롯 세부 가드는 조립 단계 assemble_publish_brief/inject_slots 가 다시 강제).
@@ -206,19 +241,44 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
     title = _prop_title(props, PROP_NAME)
     title_date = _date_from_title(title)
 
-    blocks = page.get("_code_blocks")
-    if blocks is None:
+    texts = page.get("_code_blocks")
+    if texts is None:
         raise DeltaBridgeError(
-            "extract_delta 는 page['_code_blocks'] (사전 fetch 된 코드블록 리스트)를 "
+            "extract_delta 는 page['_code_blocks'] (사전 fetch 된 코드블록 원문 리스트)를 "
             "요구합니다 — select_open_delta 호출 후 _attach_code_blocks 로 채우세요.")
-
-    if not blocks:
+    texts = [t for t in texts if isinstance(t, str) and t.strip()]
+    if not texts:
         raise DeltaBridgeError(f"페이지 {title!r}: 코드 블록(델타 envelope JSON) 없음")
 
-    delta = _validate_envelope(blocks[0], what="delta envelope")
+    parsed = [_try_json_dict(t) for t in texts]
+    delta: dict[str, Any] | None = None
     deep: dict[str, Any] | None = None
-    if len(blocks) > 1:
-        deep = _validate_envelope(blocks[1], what="deep delta envelope")
+    # A) 기본형(예치 규약): 블록1 = delta envelope, (있으면) 블록2 = deep 맨몸 dict.
+    if parsed[0] is not None and _is_envelope(parsed[0]):
+        delta = _validate_envelope(parsed[0], what="delta envelope")
+        if len(texts) > 1:
+            if parsed[1] is None:
+                raise DeltaBridgeError("deep delta 블록 JSON 파싱 실패(블록 2)")
+            deep = parsed[1]
+    # B) Notion 이 긴 본문을 여러 code 블록으로 쪼갠 경우 — 전체 결합이 단일 delta.
+    if delta is None:
+        joined = _try_json_dict("".join(texts))
+        if joined is not None and _is_envelope(joined):
+            delta = _validate_envelope(joined, what="delta envelope(다중 블록 결합)")
+    # C) 쪼개진 delta + 마지막 블록이 deep 인 경우.
+    if delta is None and len(texts) >= 2:
+        head = _try_json_dict("".join(texts[:-1]))
+        if head is not None and _is_envelope(head) and parsed[-1] is not None:
+            delta = _validate_envelope(head, what="delta envelope(다중 블록 결합)")
+            deep = parsed[-1]
+    if delta is None:
+        diag = " · ".join(
+            f"블록{i + 1}={'dict' if p is not None else '파싱실패/비dict'}"
+            for i, p in enumerate(parsed))
+        raise DeltaBridgeError(
+            f"페이지 {title!r}: 델타 envelope(cards+tldr)를 어떤 결합으로도 못 찾음 — {diag}")
+    if deep is not None:
+        deep = _validate_deep(deep)
 
     publish_date = delta.get("publish_date") or title_date
     if not isinstance(publish_date, str) or not _DATE_RE.match(publish_date):

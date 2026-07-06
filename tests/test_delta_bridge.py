@@ -37,6 +37,11 @@ def _code_block(payload: dict) -> dict:
     }
 
 
+def _j(payload: dict) -> str:
+    """extract_delta 입력용 코드블록 원문(JSON 문자열) — _fetch_code_blocks 반환형과 동형."""
+    return json.dumps(payload, ensure_ascii=False)
+
+
 def _delta_page(pid: str, date_str: str, *, status: str = "New",
                  title_prefix: str = db.TITLE_PREFIX_OPEN,
                  type_class: str = db.TYPE_WEB_DELTA,
@@ -124,35 +129,72 @@ class SelectOpenDeltaTest(unittest.TestCase):
 class ExtractDeltaTest(unittest.TestCase):
     def test_normal_delta_extracted(self) -> None:
         page = _delta_page("p1", "2026-07-13")
-        page["_code_blocks"] = [_valid_delta()]
+        page["_code_blocks"] = [_j(_valid_delta())]
         delta, deep, date_str = db.extract_delta(page)
         self.assertEqual(date_str, "2026-07-13")
         self.assertIsNone(deep)
         self.assertEqual(delta["tldr"], ["가", "나", "다"])
 
     def test_deep_delta_extracted_as_second_block(self) -> None:
+        """deep 델타 = 맨몸 {document_id: {...}} — assemble --deep 소비 계약."""
         page = _delta_page("p1", "2026-07-13")
-        deep_payload = {"cards": {"mfds-1": {"deep_analysis": {"x": "y"}}}, "tldr": []}
-        page["_code_blocks"] = [_valid_delta(), deep_payload]
+        deep_payload = {"mfds-1": {"deep_analysis": {"x": "y"}, "source_text": "원문"}}
+        page["_code_blocks"] = [_j(_valid_delta()), _j(deep_payload)]
         delta, deep, date_str = db.extract_delta(page)
         self.assertIsNotNone(deep)
-        self.assertEqual(deep["cards"]["mfds-1"]["deep_analysis"], {"x": "y"})
+        self.assertEqual(deep["mfds-1"]["deep_analysis"], {"x": "y"})
+
+    def test_deep_envelope_wrapped_rejected(self) -> None:
+        """cards/tldr 봉투로 감싼 deep 는 거부 — 조용한 deep 유실(card id 매칭 실패) 차단."""
+        page = _delta_page("p1", "2026-07-13")
+        wrapped = {"cards": {"mfds-1": {"deep_analysis": {"x": "y"}}}, "tldr": []}
+        page["_code_blocks"] = [_j(_valid_delta()), _j(wrapped)]
+        with self.assertRaises(db.DeltaBridgeError):
+            db.extract_delta(page)
+
+    def test_multiblock_split_delta_joined(self) -> None:
+        """Notion 이 긴 델타를 여러 code 블록으로 쪼갠 경우 — 결합 파싱(B) 으로 복원."""
+        page = _delta_page("p1", "2026-07-13")
+        text = _j(_valid_delta())
+        third = max(1, len(text) // 3)
+        page["_code_blocks"] = [text[:third], text[third:2 * third], text[2 * third:]]
+        delta, deep, date_str = db.extract_delta(page)
+        self.assertEqual(date_str, "2026-07-13")
+        self.assertIn("mfds-1", delta["cards"])
+        self.assertIsNone(deep)
+
+    def test_multiblock_split_delta_plus_deep_tail(self) -> None:
+        """쪼개진 델타 + 마지막 블록 deep(C) — deep 은 맨몸 dict."""
+        page = _delta_page("p1", "2026-07-13")
+        text = _j(_valid_delta())
+        half = len(text) // 2
+        deep_payload = {"mfds-1": {"deep_analysis": {"x": "y"}}}
+        page["_code_blocks"] = [text[:half], text[half:], _j(deep_payload)]
+        delta, deep, _date = db.extract_delta(page)
+        self.assertIn("mfds-1", delta["cards"])
+        self.assertEqual(deep["mfds-1"]["deep_analysis"], {"x": "y"})
+
+    def test_garbage_blocks_fail_loud(self) -> None:
+        page = _delta_page("p1", "2026-07-13")
+        page["_code_blocks"] = ["not json at all", "{broken"]
+        with self.assertRaises(db.DeltaBridgeError):
+            db.extract_delta(page)
 
     def test_publish_date_from_body_overrides_title(self) -> None:
         page = _delta_page("p1", "2026-07-13")
-        page["_code_blocks"] = [_valid_delta(publish_date="2026-07-14")]
+        page["_code_blocks"] = [_j(_valid_delta(publish_date="2026-07-14"))]
         _delta, _deep, date_str = db.extract_delta(page)
         self.assertEqual(date_str, "2026-07-14")
 
     def test_missing_cards_fails_loud(self) -> None:
         page = _delta_page("p1", "2026-07-13")
-        page["_code_blocks"] = [{"tldr": []}]  # cards 없음
+        page["_code_blocks"] = [_j({"tldr": []})]  # cards 없음
         with self.assertRaises(db.DeltaBridgeError):
             db.extract_delta(page)
 
     def test_cards_wrong_type_fails_loud(self) -> None:
         page = _delta_page("p1", "2026-07-13")
-        page["_code_blocks"] = [{"cards": ["not", "a", "dict"], "tldr": []}]
+        page["_code_blocks"] = [_j({"cards": ["not", "a", "dict"], "tldr": []})]
         with self.assertRaises(db.DeltaBridgeError):
             db.extract_delta(page)
 
@@ -164,7 +206,7 @@ class ExtractDeltaTest(unittest.TestCase):
 
     def test_bad_publish_date_format_fails_loud(self) -> None:
         page = _delta_page("p1", "2026-07-13")
-        page["_code_blocks"] = [_valid_delta(publish_date="07/13/2026")]
+        page["_code_blocks"] = [_j(_valid_delta(publish_date="07/13/2026"))]
         with self.assertRaises(db.DeltaBridgeError):
             db.extract_delta(page)
 
@@ -192,7 +234,7 @@ class WriteDeltaTest(unittest.TestCase):
 
     def test_writes_deep_delta_when_present(self) -> None:
         delta = _valid_delta()
-        deep = {"cards": {"mfds-1": {"deep_analysis": {"a": "b"}}}, "tldr": []}
+        deep = {"mfds-1": {"deep_analysis": {"a": "b"}, "source_text": "원문"}}
         wrote = db.write_delta(delta, deep, "2026-07-13")
         self.assertTrue(wrote)
         self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())

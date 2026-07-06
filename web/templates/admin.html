@@ -333,7 +333,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
               </label>
               <button class="btn coral" type="submit" id="grm-web-publish-submit"><i class="ti ti-player-play"></i>웹 발행 PR 만들기</button>
             </form>
-            <div class="admin-publish-note"><i class="ti ti-info-circle"></i><span><b id="grm-web-publish-latest">최신 발행본 확인 중</b><br>델타 파일이 먼저 커밋되어 있어야 합니다. PR 미리보기를 확인하고 머지해야 라이브 사이트가 바뀝니다. 최초 운영 전 GitHub Actions의 PR 생성 권한 또는 <code>GRM_PUBLISH_TOKEN</code> secret 이 필요합니다.</span></div>
+            <div class="admin-publish-note"><i class="ti ti-info-circle"></i><span><b id="grm-web-publish-latest">최신 발행본 확인 중</b><br>델타 파일이 먼저 커밋되어 있어야 합니다. PR 미리보기를 확인하고 머지해야 라이브 사이트가 바뀝니다. 최초 운영 전 GitHub Actions의 PR 생성 권한과 <code>GRM_PUBLISH_TOKEN</code> 또는 <code>ADMIN_GITHUB_ACTIONS_TOKEN</code> secret 이 필요합니다.</span></div>
             <div class="admin-status" id="grm-web-publish-status" role="status" aria-live="polite"></div>
           </section>
           <div class="admin-ops-hint" aria-label="운영 상태 기준">

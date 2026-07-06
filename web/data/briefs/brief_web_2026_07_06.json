@@ -22,10 +22,10 @@
   ],
   "coverage": {
    "intake_total": 89,
-   "rendered": 36,
+   "rendered": 61,
    "evidence": {
-    "A": 29,
-    "B": 7,
+    "A": 53,
+    "B": 8,
     "C": 0
    }
   },
@@ -436,6 +436,64 @@
    "key_facts": [
     "주제: TGA GMP 인증서·실사결과 공개 여부 논의",
     "발행: ECA, 2026-07-01",
+    "관련: TGA 공식 GMP 실사결과 투명성 컨설테이션 진행 중(검색 확인)"
+   ],
+   "implication": "TGA의 GMP 인증서·실사결과 공개 확대는 다른 규제기관의 투명성 정책에도 영향을 줄 수 있는 흐름이다. 국내 업체도 실사 결과가 공개될 가능성을 염두에 두고 이력 관리에 유의할 필요가 있다.",
+   "checks": [
+    "TGA GMP 인증서 공개 정책 향방 확인",
+    "원문 확인 필요(제목 수준 보도)"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/should-tga-publish-gmp-certificates",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "df29a15eaaf1",
+   "render_order": 6,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Should TGA publish GMP Certificates?",
+   "title_issue": "TGA GMP인증서 공개 논의",
+   "summary": "ECA가 호주 TGA의 GMP 인증서·실사 결과 공개 확대 논의를 다룬 뉴스를 게재했다(TGA의 GMP 실사결과 투명성 컨설테이션과 관련된 보도로 확인됨(검색 확인)).",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "df29a15eaaf1"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Should TGA publish GMP Certificates?"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "주제: TGA GMP 인증서·실사결과 공개 여부 논의",
+    "발행: ECA, 2026-06-29",
     "관련: TGA 공식 GMP 실사결과 투명성 컨설테이션 진행 중(검색 확인)"
    ],
    "implication": "TGA의 GMP 인증서·실사결과 공개 확대는 다른 규제기관의 투명성 정책에도 영향을 줄 수 있는 흐름이다. 국내 업체도 실사 결과가 공개될 가능성을 염두에 두고 이력 관리에 유의할 필요가 있다.",
@@ -1439,7 +1497,7 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "회수",
-   "headline_target": "동화약품(주) 리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민) 외 1품목",
+   "headline_target": "동화약품(주)",
    "title_issue": "니트로소불순물 우려",
    "summary": "동화약품이 리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)에서 불순물(N-nitroso-meglumine) 허용기준 초과 우려에 따라 예방적 자율회수를 실시했다.",
    "facts": [
@@ -1457,7 +1515,7 @@
     },
     {
      "label": "제품",
-     "value": "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민) 외 1품목"
+     "value": "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)"
     }
    ],
    "quotes": [
@@ -1477,11 +1535,71 @@
     "N-니트로소 불순물 관리계획 이행 여부",
     "동일 성분(리나글립틴·메트포르민) 타 함량 제품 연계 확인"
    ],
-   "merged_count": 2,
-   "merged_items": [
-    "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)",
-    "리나디엠메트서방정2.5/1000밀리그램(리나글립틴,메트포르민)"
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-ca2d1f8a6947",
+   "render_order": 21,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "동화약품(주)",
+   "title_issue": "니트로소불순물 검출",
+   "summary": "동화약품이 리나디엠메트서방정2.5/1000밀리그램(리나글립틴,메트포르민)에서 불순물(N-nitroso-meglumine) 허용기준 초과가 검출되어 회수·판매중지 조치했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-02"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-ca2d1f8a6947"
+    },
+    {
+     "label": "업체",
+     "value": "동화약품(주)"
+    },
+    {
+     "label": "제품",
+     "value": "리나디엠메트서방정2.5/1000밀리그램(리나글립틴,메트포르민)"
+    }
    ],
+   "quotes": [
+    {
+     "original": "불순물(N-nitroso-meglumine) 허용기준 초과 검출",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: N-nitroso-meglumine 허용기준 초과 검출(확정)",
+    "제품: 리나디엠메트서방정2.5/1000밀리그램",
+    "발행일: 2026-07-02"
+   ],
+   "implication": "동일 계열 제품에서 우려(예방)와 검출(확정)이 함께 보고된 것은 니트로소 불순물이 여러 함량대에서 발생할 수 있음을 보여준다. 메트포르민 복합제 제조소는 함량별 로트에 대한 불순물 재시험을 검토할 필요가 있다.",
+   "checks": [
+    "함량별 로트 N-니트로소 불순물 재시험",
+    "불순물 발생 공정 단계(원료·보관) 조사 이력 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
    "sources": {
     "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
     "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
@@ -1668,6 +1786,69 @@
    "checks": [
     "원료 산지별 중금속 시험 성적서 확인",
     "동일 원료(당귀) 사용 타 품목 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-9b17bd1aed29",
+   "render_order": 25,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)대일제약",
+   "title_issue": "사전예방적 자율회수",
+   "summary": "대일제약이 시판 후 안전관리 정보를 근거로 클린방수밴드(1회용)에 대해 사전예방적 자율회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-9b17bd1aed29"
+    },
+    {
+     "label": "업체",
+     "value": "(주)대일제약"
+    },
+    {
+     "label": "제품",
+     "value": "클린방수밴드(1회용)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "시판 후 안전관리 정보에 따른 사전예방적 조치로 영업자 회수",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 시판 후 안전관리 정보에 따른 사전예방적 영업자 회수",
+    "제품: 클린방수밴드(1회용)",
+    "발행일: 2026-06-29"
+   ],
+   "implication": "시판 후 안전관리(PMS) 정보에 기반한 사전예방적 자율회수는 이상사례 확산 전 선제적으로 대응하는 사례다. 유사 의료용품 제조소도 시판 후 정보 모니터링 체계와 회수 트리거 기준을 점검할 필요가 있다.",
+   "checks": [
+    "시판 후 안전관리 정보 모니터링 체계 확인",
+    "동일 사유 재공지 여부(문서번호 중복) 확인"
    ],
    "merged_count": 1,
    "merged_items": [],
@@ -2080,7 +2261,7 @@
    "signal_tier": 2,
    "signal_label": "Med",
    "type_tag": "Recall",
-   "headline_target": "PAI Holdings LLC VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS B…",
+   "headline_target": "PAI Holdings LLC",
    "title_issue": "약전기준 부적합 회수",
    "summary": "PAI Holdings(VistaPharm 유통)가 활성탄 제제 KERR Insta-Char(25g, 수성(Aqueous) 기제, 체리향, 120mL)에서 OTC 모노그래프(M023) 기준 부적합이 확인되어 자율 회수를 실시했다.",
    "facts": [
@@ -2098,7 +2279,7 @@
     },
     {
      "label": "제품",
-     "value": "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti… 외 3품목"
+     "value": "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti…"
     },
     {
      "label": "Class",
@@ -2122,13 +2303,209 @@
     "OTC 모노그래프 대비 규격 적합성 검토",
     "동일 제형 타 용량·기제 제품 연계 점검"
    ],
-   "merged_count": 4,
-   "merged_items": [
-    "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti…",
-    "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 50 Grams Acti…",
-    "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 25 Grams Act…",
-    "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 50 Grams Act…"
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0590-2026",
+   "render_order": 33,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "PAI Holdings LLC",
+   "title_issue": "약전기준 부적합 회수",
+   "summary": "PAI Holdings(VistaPharm 유통)가 활성탄 제제 KERR Insta-Char(50g, 수성(Aqueous) 기제, 체리향, 240mL)에서 OTC 모노그래프(M023) 기준 부적합이 확인되어 자율 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0590-2026"
+    },
+    {
+     "label": "업체",
+     "value": "PAI Holdings LLC"
+    },
+    {
+     "label": "제품",
+     "value": "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 50 Grams Acti…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
    ],
+   "quotes": [
+    {
+     "original": "Does Not Meet USP or OTC Monograph: Product did not meet the Over-the-Counter (OTC) Monograph M023",
+     "translation": "OTC 모노그래프(M023) 기준 부적합: 제품이 OTC(일반의약품) 모노그래프 M023 기준을 충족하지 못함."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: OTC 모노그래프(M023) 기준 부적합",
+    "유통: 미국 전역(Nationwide)"
+   ],
+   "implication": "활성탄 제제는 급성 중독 응급 대응에 쓰이는 OTC 제품으로, 약전·모노그래프 기준 부적합은 효능 신뢰도에 직접 영향을 준다. 국내 유사 OTC 제제도 모노그래프 대비 규격 적합성을 재확인할 필요가 있다.",
+   "checks": [
+    "OTC 모노그래프 대비 규격 적합성 검토",
+    "동일 제형 타 용량·기제 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0591-2026",
+   "render_order": 34,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "PAI Holdings LLC",
+   "title_issue": "약전기준 부적합 회수",
+   "summary": "PAI Holdings(VistaPharm 유통)가 활성탄 제제 KERR Insta-Char(25g, 소르비톨 기제, 체리향, 120mL)에서 OTC 모노그래프(M023) 기준 부적합이 확인되어 자율 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0591-2026"
+    },
+    {
+     "label": "업체",
+     "value": "PAI Holdings LLC"
+    },
+    {
+     "label": "제품",
+     "value": "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 25 Grams Act…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Does Not Meet USP or OTC Monograph: Product did not meet the Over-the-Counter (OTC) Monograph M023",
+     "translation": "OTC 모노그래프(M023) 기준 부적합: 제품이 OTC(일반의약품) 모노그래프 M023 기준을 충족하지 못함."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: OTC 모노그래프(M023) 기준 부적합",
+    "유통: 미국 전역(Nationwide)"
+   ],
+   "implication": "활성탄 제제는 급성 중독 응급 대응에 쓰이는 OTC 제품으로, 약전·모노그래프 기준 부적합은 효능 신뢰도에 직접 영향을 준다. 국내 유사 OTC 제제도 모노그래프 대비 규격 적합성을 재확인할 필요가 있다.",
+   "checks": [
+    "OTC 모노그래프 대비 규격 적합성 검토",
+    "동일 제형 타 용량·기제 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0592-2026",
+   "render_order": 35,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "PAI Holdings LLC",
+   "title_issue": "약전기준 부적합 회수",
+   "summary": "PAI Holdings(VistaPharm 유통)가 활성탄 제제 KERR Insta-Char(50g, 소르비톨 기제, 체리향, 240mL)에서 OTC 모노그래프(M023) 기준 부적합이 확인되어 자율 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0592-2026"
+    },
+    {
+     "label": "업체",
+     "value": "PAI Holdings LLC"
+    },
+    {
+     "label": "제품",
+     "value": "VistaPharm, KERR INSTA-CHAR IN AN SORBITOL BASE WITH CHERRY FLAVOR, 50 Grams Act…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Does Not Meet USP or OTC Monograph: Product did not meet the Over-the-Counter (OTC) Monograph M023",
+     "translation": "OTC 모노그래프(M023) 기준 부적합: 제품이 OTC(일반의약품) 모노그래프 M023 기준을 충족하지 못함."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: OTC 모노그래프(M023) 기준 부적합",
+    "유통: 미국 전역(Nationwide)"
+   ],
+   "implication": "활성탄 제제는 급성 중독 응급 대응에 쓰이는 OTC 제품으로, 약전·모노그래프 기준 부적합은 효능 신뢰도에 직접 영향을 준다. 국내 유사 OTC 제제도 모노그래프 대비 규격 적합성을 재확인할 필요가 있다.",
+   "checks": [
+    "OTC 모노그래프 대비 규격 적합성 검토",
+    "동일 제형 타 용량·기제 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
    "sources": {
     "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
     "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
@@ -2353,7 +2730,7 @@
    "signal_tier": 2,
    "signal_label": "Med",
    "type_tag": "Recall",
-   "headline_target": "Keystone Industries Pearson Quality Topical Anesthetic Gel (…",
+   "headline_target": "Keystone Industries",
    "title_issue": "용기 밀봉불량 회수",
    "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, Pearson Quality Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
    "facts": [
@@ -2371,7 +2748,7 @@
     },
     {
      "label": "제품",
-     "value": "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten… 외 6품목"
+     "value": "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten…"
     },
     {
      "label": "Class",
@@ -2395,16 +2772,410 @@
     "용기 밀봉 검사(leak test) 기록 점검",
     "동일 제조소의 타 브랜드 제품 연계 확인"
    ],
-   "merged_count": 7,
-   "merged_items": [
-    "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten…",
-    "Quala Dental Products, Topical Anesthetic Gel, 20 % Benzocaine, Strawberry Flavo…",
-    "DHP Topical Anesthetic Gel, Benzocaine 20%, Strawberry Flavor, 1 oz.",
-    "Burkhart topical anesthetic gel, benzocaine 20 %, Strawberry Flavor, 1 oz (30 mL…",
-    "Dental City TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, Strawberry Flavor, 1 OZ (30…",
-    "PureLife, TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, 1 oz (30mL), Strawberry Flavo…",
-    "safco SensiCaine-Ultra (20% Benzocaine), Topical Anesthetic Gel, Strawberry Flav…"
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0601-2026",
+   "render_order": 40,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, Quala Dental Products Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0601-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "Quala Dental Products, Topical Anesthetic Gel, 20 % Benzocaine, Strawberry Flavo…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
    ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0602-2026",
+   "render_order": 41,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, DHP Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0602-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "DHP Topical Anesthetic Gel, Benzocaine 20%, Strawberry Flavor, 1 oz."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0603-2026",
+   "render_order": 42,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, Burkhart Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0603-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "Burkhart topical anesthetic gel, benzocaine 20 %, Strawberry Flavor, 1 oz (30 mL…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0604-2026",
+   "render_order": 43,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, Dental City Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0604-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "Dental City TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, Strawberry Flavor, 1 OZ (30…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0605-2026",
+   "render_order": 44,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, PureLife Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0605-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "PureLife, TOPICAL ANESTHETIC GEL,  BENZOCAINE 20%, 1 oz (30mL), Strawberry Flavo…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0606-2026",
+   "render_order": 45,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Keystone Industries",
+   "title_issue": "용기 밀봉불량 회수",
+   "summary": "Keystone Industries가 제조한 국소마취 젤(벤조카인 20%, safco SensiCaine-Ultra Topical Anesthetic Gel)에서 용기 밀봉불량(불완전 밀봉) 가능성이 확인되어 회수를 실시했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0606-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Keystone Industries"
+    },
+    {
+     "label": "제품",
+     "value": "safco SensiCaine-Ultra (20% Benzocaine), Topical Anesthetic Gel, Strawberry Flav…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Defective container:may contain bottles with incomplete seals",
+     "translation": "용기 결함: 병 밀봉이 불완전할 수 있음."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: 용기 밀봉불량 — 병 밀봉이 불완전할 수 있음",
+    "제품군: 벤조카인 20% 국소마취 젤(치과용)"
+   ],
+   "implication": "동일 제조소(Keystone Industries)에서 여러 브랜드로 유통되는 벤조카인 젤 전반에 동일한 용기 밀봉 결함이 발견된 점은 포장 공정 관리의 구조적 문제를 시사한다. 국내 위탁포장 제품도 용기·밀봉 검사(leak test) 이력을 확인할 필요가 있다.",
+   "checks": [
+    "용기 밀봉 검사(leak test) 기록 점검",
+    "동일 제조소의 타 브랜드 제품 연계 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
    "sources": {
     "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
     "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
@@ -2495,7 +3266,7 @@
    "signal_tier": 2,
    "signal_label": "Med",
    "type_tag": "Recall",
-   "headline_target": "Dabur India Limited Lucky Super Soft, Antifungal Athlete's F…",
+   "headline_target": "Dabur India Limited",
    "title_issue": "CGMP 일탈 회수",
    "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Lucky Super Soft Antifungal Athlete's Foot Cream(Clotrimazole 1%))을 자율 회수했다.",
    "facts": [
@@ -2513,7 +3284,7 @@
     },
     {
      "label": "제품",
-     "value": "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt… 외 13품목"
+     "value": "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt…"
     },
     {
      "label": "Class",
@@ -2537,23 +3308,879 @@
     "위탁제조소(Dabur India) CGMP 실사 이력 확인",
     "동일 제조소 기반 타 브랜드 제품 연계 점검"
    ],
-   "merged_count": 14,
-   "merged_items": [
-    "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt…",
-    "Lucky Super Soft, First Aid Triple Antibiotic Ointment, Bacitracin zinc 400 unit…",
-    "Circle K, triple antibiotic ointment, Bacitracin Zinc (400 units), Neomycin Sulf…",
-    "Lil Drug Store, Triple Antibiotic Ointment, Bacitracin Zinc (400 units), Neomyci…",
-    "Rapidol, Triple Antibiotic First Aid Ointment, Bacitracin Zinc 400 units, Neomyc…",
-    "Cura Hongos, Crema Antifungica, Clotrimazole 1%, 2oz (57g) tubes, Dist by/por: P…",
-    "Med Pride, Bacitracin Zinc Ointment, 500 units, 0.",
-    "Med Pride, Bacitracin Zinc Ointment, 500 units, 1oz (28.",
-    "Med Pride, Bacitracin Zinc Ointment, 1oz (28.",
-    "Med Pride, 1% Clotrimazole Antifungal Cream, Net Wt. 1oz (28.",
-    "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt.",
-    "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt. 1 oz (28.",
-    "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc (equivalent to 400 units)…",
-    "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc 400 units, Neomycin Sulfa…"
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0630-2026",
+   "render_order": 48,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Lucky Super Soft First Aid Triple Antibiotic Ointment)을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0630-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Lucky Super Soft, First Aid Triple Antibiotic Ointment, Bacitracin zinc 400 unit…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
    ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0631-2026",
+   "render_order": 49,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Circle K Triple Antibiotic Ointment)을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0631-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Circle K, triple antibiotic ointment, Bacitracin Zinc (400 units), Neomycin Sulf…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0632-2026",
+   "render_order": 50,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Lil Drug Store Triple Antibiotic Ointment)을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0632-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Lil Drug Store, Triple Antibiotic Ointment, Bacitracin Zinc (400 units), Neomyci…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0633-2026",
+   "render_order": 51,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Rapidol Triple Antibiotic First Aid Ointment)을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0633-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Rapidol, Triple Antibiotic First Aid Ointment, Bacitracin Zinc 400 units, Neomyc…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0634-2026",
+   "render_order": 52,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Cura Hongos Crema Antifungica(Clotrimazole 1%))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0634-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Cura Hongos, Crema Antifungica, Clotrimazole 1%, 2oz (57g) tubes, Dist by/por: P…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0635-2026",
+   "render_order": 53,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Bacitracin Zinc Ointment(130g 상자))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0635-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, Bacitracin Zinc Ointment, 500 units, 0."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0636-2026",
+   "render_order": 54,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Bacitracin Zinc Ointment(1oz 튜브))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0636-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, Bacitracin Zinc Ointment, 500 units, 1oz (28."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0637-2026",
+   "render_order": 55,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Bacitracin Zinc Ointment(1oz, 72튜브/케이스))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0637-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, Bacitracin Zinc Ointment, 1oz (28."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0638-2026",
+   "render_order": 56,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride 1% Clotrimazole Antifungal Cream)을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0638-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, 1% Clotrimazole Antifungal Cream, Net Wt. 1oz (28."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0639-2026",
+   "render_order": 57,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Hydrocortisone Cream 1%(16oz))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0639-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0640-2026",
+   "render_order": 58,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Hydrocortisone Cream 1%(1oz))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0640-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, HYDROCORTISONE CREAM 1%, Net Wt. 1 oz (28."
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0641-2026",
+   "render_order": 59,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Triple Antibiotic Ointment(파우치형))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0641-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc (equivalent to 400 units)…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0642-2026",
+   "render_order": 60,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dabur India Limited",
+   "title_issue": "CGMP 일탈 회수",
+   "summary": "Dabur India Limited(인도 제조)가 실사에서 확인된 CGMP 일탈을 사유로 자사 제조 OTC 제품(Med Pride Triple Antibiotic Ointment(1oz 튜브))을 자율 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0642-2026"
+    },
+    {
+     "label": "업체",
+     "value": "Dabur India Limited"
+    },
+    {
+     "label": "제품",
+     "value": "Med Pride, Triple Antibiotic Ointment, Bacitracin Zinc 400 units, Neomycin Sulfa…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations; deficiencies observed during FDA inspection",
+     "translation": "CGMP 일탈: FDA 실사 중 결함이 확인됨."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Class II",
+    "사유: FDA 실사에서 확인된 CGMP 일탈(Deviations)",
+    "유통: 미국 전역, 다수 사설 브랜드(private label)로 판매"
+   ],
+   "implication": "한 제조소의 CGMP 일탈로 다수 사설 브랜드(private label) 제품이 동시에 회수된 것은, 위탁제조 공급망에서 원 제조소의 품질시스템 결함이 여러 유통 채널로 확산될 수 있음을 보여준다. 국내 위탁제조(OEM) 담당자는 원료·완제 공급업체의 CGMP 실사 이력을 재확인할 필요가 있다.",
+   "checks": [
+    "위탁제조소(Dabur India) CGMP 실사 이력 확인",
+    "동일 제조소 기반 타 브랜드 제품 연계 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
    "sources": {
     "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20260624+TO+20260701]&limit=100&skip=0",
     "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",

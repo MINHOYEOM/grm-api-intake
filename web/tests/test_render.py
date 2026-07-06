@@ -479,7 +479,9 @@ class WebSearchIndexTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
     def test_facets_present_values_only_and_sorted(self):
-        rc = [c for c in self.cards if render._is_renderable(c)]
+        # facet 은 전 호 렌더 카드에서 파생(idx 는 DATA_DIR 전 브리프로 빌드) — 단일 호
+        # 가정(self.cards=06-22)이 아닌 전 호 집합(single_cards) 기준으로 정합화한다.
+        rc = [c for c in self.single_cards if render._is_renderable(c)]
         self.assertEqual(self.idx["facets"]["agencies"],
                          sorted({c["agency"] for c in rc if c.get("agency")}))
         self.assertEqual(self.idx["facets"]["categories"],

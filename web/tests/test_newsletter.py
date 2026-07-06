@@ -321,7 +321,7 @@ class NewsletterScheduleSendTest(unittest.TestCase):
 
     # ── 최신 발행일 해석(스케줄 진입점·하드코딩 0) ──
     def test_resolve_latest_publish_date(self):
-        self.assertEqual(newsletter.resolve_latest_publish_date(DATA_DIR), "2026-06-26")
+        self.assertEqual(newsletter.resolve_latest_publish_date(DATA_DIR), "2026-07-06")
 
     def test_latest_date_cli_prints_only_date(self):
         # 워크플로 resolve 스텝이 $() 로 캡처 — 잡음 없이 날짜 한 줄만 나와야.
@@ -329,7 +329,7 @@ class NewsletterScheduleSendTest(unittest.TestCase):
         with contextlib.redirect_stdout(buf):
             rc = newsletter.main(["--mode", "latest-date", "--data", str(DATA_DIR)])
         self.assertEqual(rc, 0)
-        self.assertEqual(buf.getvalue().strip(), "2026-06-26")
+        self.assertEqual(buf.getvalue().strip(), "2026-07-06")
 
     # ── 멱등 결정(③) — decide_should_send ──
     def test_decide_skip_when_dispatched(self):

@@ -80,6 +80,7 @@ from card_scaffold import (
     assemble_web_brief,
     build_card_scaffold,
     compute_render_plan,
+    dedupe_news_cards,
     merge_recall_cards,
 )
 
@@ -592,7 +593,8 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
     Routine 이 정렬을 재현하지 않게 한다(`compute_render_plan` = assemble_brief_skeleton 공유).
     """
     start = run_date - timedelta(days=window_days)
-    cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
+    cards = dedupe_news_cards(
+        merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows]))
     render_plan = compute_render_plan(cards)
     out_rows: list[dict[str, Any]] = []
     source_counts: dict[str, int] = {}
@@ -652,7 +654,8 @@ def build_web_brief_payload_v2(rows: list[dict[str, Any]], run_date: date,
     `publish_date` 기본 = run_date(주차 재발행 시 사람이 커밋 단계에서 조정). tldr 은 빈슬롯([]).
     """
     start = run_date - timedelta(days=window_days)
-    cards = merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows])
+    cards = dedupe_news_cards(
+        merge_recall_cards([build_card_scaffold(row, row.get("raw")) for row in rows]))
     brief_meta = {
         "run_date_kst": run_date.isoformat(),
         "window": f"{start.isoformat()} ~ {run_date.isoformat()}",

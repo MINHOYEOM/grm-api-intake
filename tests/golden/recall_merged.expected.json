@@ -37,7 +37,7 @@
       "제품": "아세트아미노펜정 500mg"
     }
   },
-  "recall_group_key": "한국제약(주)|함량부적합(98% 미만) 확인에 따른 자진 회수|2026-06-02",
+  "recall_group_key": "MFDS|한국제약(주)|함량부적합(98% 미만) 확인에 따른 자진 회수",
   "section": "recall_table",
   "signal_tier": "Tier 2"
 }

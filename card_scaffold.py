@@ -961,12 +961,36 @@ def _w1_badges(kind: str, evidence: str, row: dict[str, Any], cfg: FixedConfig) 
 # 12. recall_group_key (§12(E)) — 산출까지만. card_id 는 그대로 유지.
 # ─────────────────────────────────────────────────────────────────────────────
 def recall_group_key(row: dict[str, Any], raw: dict[str, Any] | None) -> str:
+    """recall 다품목 통합 키(§12(E)). 하나의 실제 회수 사건이 SKU·lot·유통사·함량별
+    개별 레코드(MFDS document_id / OpenFDA recall_number)로 쪼개져 들어와도 한 군으로
+    묶기 위한 결정론 키. 값이 같으면 `merge_recall_cards()`가 대표 1카드로 접는다.
+
+    - MFDS(recall-quality)       : `MFDS|{ENTRPS}|{RTRVL_RESN}`
+    - OpenFDA(openfda-recall)    : 정본 `event_id` 우선 → 부재 시 `RECALL|{recalling_firm}|{reason_for_recall}`
+
+    발행일(`row.date`)은 키에서 **제외**한다 — 같은 사건이 다른 날 재등록·재수집돼도
+    (MFDS 대일제약 06-26/06-29, OpenFDA distributor/SKU fan-out 등) 같은 군으로 묶여야
+    하기 때문. 종전 키는 `pub` 를 포함해 날짜만 다르면 병합이 갈라졌다.
+    소스 접두사로 네임스페이스해 서로 다른 소스가 우연히 같은 firm|reason 를 가져도
+    교차 병합되지 않게 한다.
+    """
     raw = raw or {}
-    entrps = _first(raw.get("ENTRPS"), row.get("firm"))
-    reason = _first(raw.get("RTRVL_RESN"))
-    pub = row.get("date", "")
-    if entrps and reason and pub:
-        return f"{entrps}|{reason}|{pub}"
+    source = row.get("source", "")
+    if source == SOURCE_MFDS:
+        entrps = _first(raw.get("ENTRPS"), row.get("firm"))
+        reason = _first(raw.get("RTRVL_RESN"))
+        if entrps and reason:
+            return f"MFDS|{entrps}|{reason}"
+        return ""
+    if source == SOURCE_RECALL:
+        event_id = _first(raw.get("event_id"))
+        if event_id:
+            return f"RECALL|event|{event_id}"
+        firm = _first(raw.get("recalling_firm"), row.get("firm"))
+        reason = _first(raw.get("reason_for_recall"))
+        if firm and reason:
+            return f"RECALL|{firm}|{reason}"
+        return ""
     return ""
 
 
@@ -1076,7 +1100,8 @@ def build_card_scaffold(row: dict[str, Any], raw: dict[str, Any] | None,
         card_id=card_id, section=section, kind=kind, evidence=evidence,
         modality=modality, signal_tier=row.get("signal_tier", "Tier 1"),
         date=row.get("date", ""), markdown=markdown, prose_input=prose_input,
-        recall_group_key=recall_group_key(row, raw) if kind == "recall-quality" else "",
+        recall_group_key=(recall_group_key(row, raw)
+                          if kind in ("recall-quality", "openfda-recall") else ""),
         status_hint=row.get("status_hint", ""),
         needs_llm_slots=tuple(used_slots),
         deep_analysis_ready=deep_analysis_ready,
@@ -1241,15 +1266,16 @@ def _render_merged_recall(rep_markdown: str, entrps: str, rep_product: str,
 def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
     """recall 다품목을 1카드로 접는다(card_spec §14, 순수 함수 — 입력 순서·길이 보존).
 
-    적용 범위(§14A): `kind=="recall-quality"` & 비어있지 않은 `recall_group_key` 동일군,
-    멤버 2건 이상. 대표(§14C) = 그룹 내 `card_id` 사전식 오름차순 첫 카드.
+    적용 범위(§14A): `kind in {recall-quality, openfda-recall}` & 비어있지 않은
+    `recall_group_key` 동일군, 멤버 2건 이상. 대표(§14C) = 그룹 내 `card_id` 사전식
+    오름차순 첫 카드. (그룹키는 소스로 네임스페이스돼 MFDS/OpenFDA 교차 병합 없음.)
     대표 = 병합 markdown + 통합 prose_input(§14E). 멤버 = `merged_into`=대표 card_id 마킹
     (렌더 제외·Status 유지). 빈 키·단독 멤버·이종 사유(다른 키)는 무변화.
     `build_card_scaffold()` 결과를 받아 `assemble_brief_skeleton()`/직렬화 직전에 적용.
     """
     groups: dict[str, list[int]] = {}
     for i, c in enumerate(cards):
-        if c.kind == "recall-quality" and c.recall_group_key:
+        if c.kind in ("recall-quality", "openfda-recall") and c.recall_group_key:
             groups.setdefault(c.recall_group_key, []).append(i)
 
     out = list(cards)
@@ -1278,6 +1304,45 @@ def merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
             merged_count=len(named), merged_items=tuple(named),
             merged_target=_merged_target_value(entrps, rep_product, n),
             merged_product=_merged_product_value(rep_product, n))
+        for i in members[1:]:
+            out[i] = replace(cards[i], merged_into=rep.card_id)
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 14c. dedupe_news_cards — 동일 뉴스 기사 중복 제거 (§14A 확장)
+# ─────────────────────────────────────────────────────────────────────────────
+def _news_dedup_key(headline: str) -> str:
+    """뉴스 중복 판정용 정규화 제목 — 공백 축약 + 소문자. 문장부호는 보존."""
+    return " ".join((headline or "").split()).lower()
+
+
+def dedupe_news_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
+    """동일 기사가 문서ID·발행일만 다르게 2회 수집된 rss-news 중복을 접는다(순수 함수).
+
+    RSS 피드는 같은 기사를 여러 날 재노출할 수 있고, `_stable_doc_id` 가 date_iso 를
+    포함해 doc_id 가 갈리면 `source::document_id` 수집 dedup 을 우회한다(예: ECA
+    "Should TGA publish GMP Certificates?" 07-01/06-29 2건). 여기서 같은 (source·정규화
+    제목) 카드는 대표 1장만 남기고 나머지를 `merged_into` 로 마킹한다 — 렌더 제외·Status
+    유지(회수 병합과 동일 규약). 대표 = `card_id` 사전식 첫 카드. 회수 유형은 대상 아님
+    (`merge_recall_cards` 가 별도 처리). 이미 병합된 멤버(`merged_into`)도 건너뛴다.
+    """
+    groups: dict[tuple[str, str], list[int]] = {}
+    for i, c in enumerate(cards):
+        if c.merged_into or c.kind != "rss-news":
+            continue
+        headline = c.prose_input.get("headline", "")
+        key = _news_dedup_key(headline)
+        if not key:
+            continue
+        groups.setdefault((c.prose_input.get("regulator", ""), key), []).append(i)
+
+    out = list(cards)
+    for idxs in groups.values():
+        if len(idxs) < 2:
+            continue
+        members = sorted(idxs, key=lambda i: cards[i].card_id)
+        rep = cards[members[0]]
         for i in members[1:]:
             out[i] = replace(cards[i], merged_into=rep.card_id)
     return out

@@ -38,6 +38,7 @@
       "제품": "Lisinopril Tablets USP 10 mg, 100-count bottle"
     }
   },
+  "recall_group_key": "RECALL|Acme Pharmaceuticals, Inc.|Subpotent (out-of-specification) assay results at the 12-month stability time point.",
   "section": "recall_table",
   "signal_tier": "Tier 2"
 }

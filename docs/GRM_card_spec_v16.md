@@ -232,11 +232,11 @@ prose_input 공통 필드(P1-2 확장): `w2_facts · quote_lines · issue_or_rea
 - B/C(입력 플래그 필요): "공식 인덱스+보조" vs "보조 단독" 은 WebSearch/검증 성공 여부가 **구조화된 입력**으로
   들어와야 결정론. 그 플래그가 없으면 LLM 판단이 끼므로, search 단계가 `evidence_hint(B/C)` 를 row 에 기록한다.
 
-**(E) MFDS recall 다품목 1카드 통합 키.**
-현재 `_dedupe_latest_rows()` 는 `source::document_id` 1건 dedupe 뿐. 6품목→1카드 통합은
-**`ENTRPS + 사유(RTRVL_RESN) + 발행일` 동일군 묶음 키**를 collector(또는 scaffold)가 산출해야 함(신규).
-**범위 확정(2026-06-05, Codex 사전검증)**: K2 는 `recall_group_key` **산출까지만**(`card_id`=`source::document_id` 유지,
-dedupe 와 비충돌). 실제 다품목 1카드 병합 렌더는 별도 단계(K3 연계).
+**(E) recall 다품목 1카드 통합 키.**
+현재 `_dedupe_latest_rows()` 는 `source::document_id` 1건 dedupe 뿐. 하나의 회수 사건이 SKU·유통사·함량별
+개별 레코드로 쪼개진 것을 1카드로 통합하려면 `recall_group_key`(scaffold 산출)로 동일군을 묶는다.
+**키 규칙은 §14(A)** 참조(2026-07-06 확장: MFDS `MFDS|ENTRPS|RTRVL_RESN` + OpenFDA `event_id`/`firm|reason`,
+**발행일 제외**·소스 네임스페이스). `card_id`=`source::document_id` 유지(dedupe 와 비충돌).
 
 **(F) WHO prefix 고정.** `who-noc`·`who-inspection` = 🟧, `who-news` = 🟫.
 
@@ -291,9 +291,15 @@ URL 인코딩·block chunk 재조립 순서를 고정.
 > 상태: **동결** — Codex G1 조건부 GO → R1 보정(R1-a/b/c) → 재확인 GO + 사람 승인·main 머지(2026-06-05).
 > 구현: `merge_recall_cards()`(card_scaffold.py) + golden `recall_merged`. 변경은 본 §14 + golden 갱신으로만.
 
-**(A) 적용 범위.** `kind == "recall-quality"`(MFDS 회수)만. openfda-recall·hc-recall 은 키 부재로 제외
-(필요 시 별도 키 정의 후 확장 — K3 범위 아님). 빈 `recall_group_key` 는 병합 금지(현행 키 규칙:
-`ENTRPS|RTRVL_RESN|발행일` 3요소 모두 존재 시에만 키 산출).
+**(A) 적용 범위.** `kind in {"recall-quality"(MFDS 회수), "openfda-recall"(OpenFDA 회수)}`.
+빈 `recall_group_key` 는 병합 금지. **키 규칙(2026-07-06 확장)**: 소스로 네임스페이스하고 **발행일은 키에서 제외**한다
+(하나의 실제 회수 사건이 SKU·lot·유통사·함량별 개별 레코드로 다른 날 재등록·재수집돼도 한 군으로 묶기 위함) —
+- MFDS: `MFDS|{ENTRPS}|{RTRVL_RESN}` (두 요소 모두 존재 시)
+- OpenFDA: 정본 `event_id` 우선 `RECALL|event|{event_id}`, 부재 시 `RECALL|{recalling_firm}|{reason_for_recall}`
+
+hc-recall 은 여전히 제외(키 미정의). 종전 키 `ENTRPS|RTRVL_RESN|발행일` 은 (a)openfda-recall 을 아예 배제했고
+(b)날짜만 다르면 같은 사건도 병합이 갈라지는 결함(대일제약 06-26/06-29·OpenFDA distributor/SKU fan-out)이 있어 대체됨.
+소스 접두사로 서로 다른 소스가 우연히 같은 firm|reason 를 가져도 교차 병합되지 않는다.
 
 **(B) 병합 시점·함수.** `build_card_scaffold()` 는 그대로 row 1:1 유지(순수성·golden 불변).
 신규 순수함수 `merge_recall_cards(cards: list[CardScaffold]) -> list[CardScaffold]` 가
@@ -320,7 +326,17 @@ URL 인코딩·block chunk 재조립 순서를 고정.
 K3 프롬프트는 v15.8 방식대로 멤버 전원 갱신을 명시). v1 경로(`ENABLE_HANDOFF_V2` off)는 바이트 동일 무영향.
 
 **(G) golden·회귀.** 신규 golden `recall-merged`(3품목 1카드) + 비병합 회귀(빈 키·단독 멤버·이종 사유 그룹 분리).
-기존 16종 golden 바이트 불변이 합격 조건.
+기존 16종 golden 바이트 불변이 합격 조건. **2026-07-06 확장 회귀**: OpenFDA fan-out(event_id/firm|reason)
+병합·MFDS 발행일 무관 병합·소스 교차 비병합(`OpenFdaRecallMergeTest`·`MfdsRecallCrossDateMergeTest`).
+`recall_group_key` 문자열은 `recall_merged`/`recall_quality_chemical` 두 골든에만 직렬화되어 키 형식 갱신분만 반영,
+markdown·web-card 골든은 병합 결과 동일로 불변.
+
+**(H) 동일 뉴스 기사 중복 제거(rss-news).** 회수와 별개로, RSS 피드가 같은 기사를 여러 날 재노출하면
+`_stable_doc_id` 가 date_iso 를 포함해 doc_id 가 갈려 `source::document_id` 수집 dedup 을 우회한다
+(예: ECA "Should TGA publish GMP Certificates?" 07-01/06-29 2건). 순수함수 `dedupe_news_cards()` 가
+`merge_recall_cards()` 직후(`grm_handoff` 병합 지점) 같은 (source·정규화 제목) rss-news 카드를 대표 1장만 남기고
+나머지를 `merged_into` 마킹한다(회수 병합과 동일 규약: 렌더 제외·Status 유지). 회수 유형은 대상 아님.
+additive — 기존 골든 불변(픽스처에 중복 뉴스 부재).
 
 ## 15. deep_analysis — 7번째·선택 슬롯 (WL 심층분석 fan-out, 2026-07-01)
 
@@ -561,6 +577,7 @@ official_url=HTML 페이지만 노출)·gmp-inspection `download_url` 폴백. fd
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-07-06 | **회수 병합 범위 확장 + 뉴스 중복 제거(§12E·§14A·§14G·§14H)**: 7/6 발행본 중복 진단(글로벌 TGA 2·Recall Dabur 14·Keystone 7·PAI 4·동화약품/대일제약)에서 3결함 확정 — ①OpenFDA 회수는 `kind="openfda-recall"` 이라 `merge_recall_cards`(recall-quality 전용)·`recall_group_key`(MFDS 필드 전용) 양쪽서 배제돼 fan-out 이 카드 N장 ②MFDS 키가 발행일 포함이라 같은 사건 다른 날 재등록 시 병합 갈라짐 ③동일 rss-news 기사가 `_stable_doc_id`(date_iso 포함)로 doc_id 갈려 수집 dedup 우회. 수정: `recall_group_key` 소스별 분기(MFDS `MFDS|ENTRPS|RTRVL_RESN` + OpenFDA `event_id`/`firm|reason`)·**발행일 제외**·소스 네임스페이스, group_key 산출·`merge_recall_cards` 를 openfda-recall 까지 확장(prose_input·W2 "제품"·병합 렌더 기계는 기존 그대로 재사용). 신규 순수함수 `dedupe_news_cards()`(grm_handoff 병합 지점 배선, rss-news 동일 제목 대표 1장·`merged_into`). 골든 영향=`recall_group_key` 직렬화 2종(키 문자열만)·markdown/web-card/handoff 골든 불변, 뉴스 dedup=additive. 신규 회귀 `OpenFdaRecallMergeTest`·`MfdsRecallCrossDateMergeTest`·`DedupeNewsCardsTest`. |
 | 2026-07-02 | **FR 상세보기 철회(FR=요약보강)**: v1.60 Phase B 가 도입한 Federal Register 결정론 상세보기(`deterministic_detail` type=`fr_summary`)를 외과 제거. 근거=`GRM_PDF전문수집_FR프로토타입_스키마확정_2026-07-02.md` §0(마감일/시행일=API 메타·본문=abstract 요약 → 증분 가치 0). `_deterministic_detail` guidance 분기·`_FR_KIND_LABEL`/`_fr_detail_kind`·`card.html` `type=='fr_summary'` 분기·`render._detail_preview` FR부·FR 골든 2종(guidance_fr.webcard·brief_web)의 `fr_summary` 제거. GMP `gmp_deficiencies`·483 `fda_483_observations`(같은 슬롯 다른 `type`)·admin deep_analysis·UI 보강은 완전 불변. FrDetail/inject_slots FR 테스트는 철회 검증으로 전환. |
 | 2026-07-02 | **FDA 483 Observation 결정론 상세보기 추가(additive)**: 죽은 `datatables-json/ora-foia-reading.json` 경로를 버리고 현행 OII 리딩룸 HTML/DataTables(`/datatables/views/ajax`)를 주 경로로 전환(`Record Type=483`, media id 링크, Publish Date 페이지네이션). `ENABLE_FDA_483` 워크플로 기본 on(변수 false override 가능)·`ENABLE_FDA_483_OBSERVATIONS` opt-in 기본 off. 483 PDF 텍스트층에서 `WE OBSERVED` 이후 `OBSERVATION N` 분할→첫 문장 deficiency·나머지 detail, 품질게이트 실패 시 raw 키 미기록+요약카드 유지. `deterministic_detail.type="fda_483_observations"` 를 §16 슬롯에 병렬 추가, `card.html` Observation 목록 분기와 최소 CSS(`.obs-num`) 추가. 신규 web-card golden 1종(관찰 有) + 기존 fda_483(관찰 無)·수집기/card_scaffold/render/health 회귀. |
 | 2026-07-02 | **§16 신설(additive) — deterministic_detail 결정론 상세보기 슬롯(MFDS GMP실사)**: PDF/전문 수집 트랙 실측 근거로 MFDS **정기실태조사** 지적사항 5컬럼 표(분야·구분·근거법령·지적내용·비고)를 PyMuPDF `find_tables()` 결정론 추출→저장→상세보기 렌더로 승격(새 의존성·OCR·LLM 0, 환각 0). §15 deep_analysis(LLM 분석층)와 병렬되는 **결정론 층**으로 별도 필드(`deterministic_detail`). 유형 2분기(periodic=상세보기·pre_market=요약보강)·품질 게이트(유효행 0∧present→degrade)·`ENABLE_GMP_DEFICIENCY_TABLE`(기본 off) 점진 활성. 렌더는 WL `.deep` 옆 `<details class="block detail">`(단계적 노출)·`.detail`/`.dt-*` CSS(한글안전 §4 — mono/자간 미사용). 기존 20+ golden·900+ 회귀 바이트 불변(additive), 신규 web-card golden 2종 + 수집기/card_scaffold/렌더 회귀. 범위밖=483(이 렌더 재사용·소스 URL 갱신 선결). |

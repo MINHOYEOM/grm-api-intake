@@ -95,6 +95,7 @@
 .admin-flow-node.ok{border-color:rgba(194,96,63,.28)}
 .admin-flow-node.bad{border-color:rgba(189,75,54,.4);background:rgba(189,75,54,.05)}
 .admin-flow-node.warn{border-color:rgba(176,125,23,.32);background:rgba(176,125,23,.05)}
+.admin-flow-node.pending{border-color:var(--line-2);background:var(--soft)}
 .admin-flow-node.human{border-style:dashed;border-color:rgba(194,96,63,.45);background:var(--coral-tint)}
 .admin-flow-node .ti{font-size:20px;color:var(--coral-2)}
 .admin-flow-node b{display:block;color:var(--ink);font-size:14.5px;margin:7px 0 4px;line-height:1.3}
@@ -103,7 +104,7 @@
 .admin-flow-arrow{flex:0 0 26px;display:grid;place-items:center;color:var(--coral);font-size:16px}
 .admin-flow-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--body)}
 .admin-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--line-2)}
-.admin-dot.ok{background:#4c8a52}.admin-dot.bad{background:var(--hi)}.admin-dot.warn{background:var(--med)}
+.admin-dot.ok{background:#4c8a52}.admin-dot.bad{background:var(--hi)}.admin-dot.warn{background:var(--med)}.admin-dot.pending{background:var(--muted)}
 .admin-flow-support{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .admin-flow-support .admin-flow-support-label{color:var(--muted);font-size:12px;font-weight:700}
 .admin-flow-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--pill);padding:6px 12px;font-size:12px;color:var(--body)}
@@ -338,7 +339,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           <div class="admin-monitor-layout">
             <div class="admin-monitor-section">
               <h3>주간 발행 흐름 — 한눈에 보기</h3>
-              <p class="admin-section-sub">매일 수집부터 뉴스레터 발송까지, 각 단계가 지금 어떤 상태인지 보여줍니다. 색 점: <span class="admin-dot ok"></span> 초록빛=정상 · <span class="admin-dot bad"></span> 붉은빛=실패 · <span class="admin-dot warn"></span> 노란빛=진행/확인</p>
+              <p class="admin-section-sub">매일 수집부터 뉴스레터 발송까지, 각 단계가 지금 어떤 상태인지 보여줍니다. 색 점: <span class="admin-dot ok"></span> 초록빛=정상 · <span class="admin-dot bad"></span> 붉은빛=실패 · <span class="admin-dot warn"></span> 노란빛=진행/확인 · <span class="admin-dot pending"></span> 회색빛=대기 중(정상)</p>
               <div id="grm-workflow-pipeline"><div class="admin-empty">불러오는 중</div></div>
               <details class="admin-workflow-log">
                 <summary>워크플로우 상세 기록 — 로그와 조치 안내</summary>

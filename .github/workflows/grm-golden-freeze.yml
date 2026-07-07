@@ -1,0 +1,41 @@
+name: GRM Golden Freeze (one-shot)
+
+# 일회성 골든 재동결 — 템플릿/CSS(css_ver 해시) 변경으로 web 렌더 골든이 stale 해져
+# grm-ci 가 red 일 때, 이 워크플로를 workflow_dispatch 로 돌려 골든을 재동결·main 커밋한다.
+# python 이 로컬(CC EDR)에서 막혀 --freeze 를 못 돌릴 때의 대체 경로. 사용 후 제거 가능.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Freeze render goldens
+        run: python web/tests/test_render.py --freeze
+      - name: Show golden changes
+        run: git status --short web/tests/golden
+      - name: Upload frozen goldens (fallback if push blocked)
+        uses: actions/upload-artifact@v4
+        with:
+          name: frozen-goldens
+          path: web/tests/golden
+      - name: Commit and push frozen goldens to main
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/tests/golden
+          if git diff --cached --quiet; then echo "no golden changes"; exit 0; fi
+          git commit -m "test(web): 골든 재동결 — 주간 브리프 UX(목차 재건 + 카드 보기 토글) 반영"
+          git push origin HEAD:main

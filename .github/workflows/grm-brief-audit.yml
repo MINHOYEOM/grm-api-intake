@@ -1,10 +1,13 @@
 name: GRM Brief Audit (post-publish provenance detective)
 
 # 발행 후 출처 링크 근거(provenance) 탐지 — W1 belt-and-suspenders(2차 방어선).
-# 주간 Routine(월 07:30 KST = 일 22:30 UTC) 발행 뒤 최신 Weekly Brief 를 받아
-# brief_lint.lint_link_provenance 를 독립 재판정한다. handoff 근거 없는 mfds/nedrug
-# 링크(W24 사고 클래스) 또는 live verify 가 명확히 죽은 타 기관 링크 = FAIL →
-# 기존 `GRM Intake 운영 경고` Issue 로 표면화(과알림 0: FAIL 만 트리거).
+# **2026-07-07 부로 대조 대상 = `web/data/briefs/brief_web_{date}.json`(현재 실 발행 채널,
+# 체크아웃된 워킹트리에서 직접 읽음 — 네트워크 0). Notion `🌐 GRM Weekly Brief` DB(6/22 이후
+# 레거시)는 웹 발행본이 하나도 없을 때만 쓰는 폴백이라 NOTION_TOKEN 미등록이어도 웹 경로가
+# 있으면 이 워크플로는 정상 동작한다.** handoff 근거 없는 mfds/nedrug 링크(W24 사고 클래스)
+# 또는 live verify 가 명확히 죽은 타 기관 링크 = FAIL → 기존 `GRM Intake 운영 경고` Issue 로
+# 표면화(과알림 0: FAIL 만 트리거). 상세 = `verify_published_brief.py` 모듈 docstring·
+# `GRM_SYSTEM.md` §2.1 ⑤/⑥.
 #
 # 월 02:00 UTC = 월 11:00 KST (발행 ~3.5h 후 — MFDS RSS 지연·발행 지연 흡수).
 on:

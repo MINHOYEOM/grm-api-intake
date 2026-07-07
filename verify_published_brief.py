@@ -3,27 +3,36 @@
 
 발행(주간 Routine)은 LLM+MCP 라 결정론 **차단**은 발행 직전 예방 게이트
 (`brief_lint.run_publish_gate` / Publish Lint 17)에 의존한다. 이 모듈은 그 게이트를
-**발행 후 독립적으로 재실행**하는 2차 방어선이다 — 최신 Weekly Brief 페이지와 그 주
-handoff 를 Notion 에서 직접 받아 (1) `lint_link_provenance`(출처 근거)와 (2)
-`lint_publish_structure`(구조: PL1 잔존토큰·PL3/16 금지문법·PL14 요일=날짜)를 둘 다
-재판정하고, FAIL(MFDS 날조 시그니처 `brd/*/view.do?seq=` 또는 요일 불일치 등)이면 운영
-경고 JSON 을 낸다. CI(`grm-brief-audit.yml`)가 이 JSON 을 기존 `GRM Intake 운영 경고`
-Issue 로 띄운다. **발행 주체 CC Routine 은 커넥터가 Notion 뿐이라 인-루틴 `--structure`
-게이트를 코드로 못 돌린다 → 요일류 결함의 유일 결정론 방어선이 이 발행 후 탐지다(W2).**
+**발행 후 독립적으로 재실행**하는 2차 방어선이다 — (1) `lint_link_provenance`류(출처 근거)와
+(2) `lint_publish_structure`(구조: PL1 잔존토큰·PL3/16 금지문법)를 둘 다 재판정하고, FAIL
+(MFDS 날조 시그니처 `brd/*/view.do?seq=` 등)이면 운영 경고 JSON 을 낸다. CI
+(`grm-brief-audit.yml`)가 이 JSON 을 기존 `GRM Intake 운영 경고` Issue 로 띄운다.
+
+**대조 대상(2026-07-07 전환)**: 진입점 `run_audit()` 은 **웹 발행본**
+(`web/data/briefs/brief_web_{date}.json` — 현재 실 채널)을 우선 감사한다. 이 경로는
+파일 기반이라 brief 자체를 얻는 데 네트워크가 필요 없다(발행 PR 이 사람 승인 머지된 뒤에야
+CI 체크아웃에 존재 → 이미 신뢰된 입력). Notion `🌐 GRM Weekly Brief` DB 는 6/22 이후 신규
+페이지가 쓰이지 않는 **레거시**이며, 웹 발행본이 하나도 없을 때만 쓰는 폴백으로 남긴다
+(과거 페이지 삭제 없음). 상세 스코프·드롭한 체크 3개의 근거는 `run_audit`/`classify_web`
+주변 주석과 `GRM_SYSTEM.md` §2.1 ⑤/⑥ 참조. 레거시 `run()`(Notion 경로)은 완전 불변 — 발행
+주체 CC Routine 은 커넥터가 Notion 뿐이라 인-루틴 `--structure` 게이트를 코드로 못 돌리므로
+Notion 폴백이 살아있는 동안엔 이 발행 후 탐지가 요일류 결함의 유일 결정론 방어선이었다(W2).
 
 **과알림 0 원칙:**
 - 알림은 **FAIL 만** 트리거한다(WARN·미확인은 정보로만 본문에 싣고 알림 트리거 아님).
 - MFDS 미근거 링크 = FAIL(네트워크 없이 결정론 — 오탐 0, 실제 W24 사고 클래스).
 - 비-MFDS 미근거 링크는 live verify 가 **명확히 나쁨**(404·오류셸·기대어 부재)일 때만 FAIL
   로 승격하고, 일시 네트워크 실패(unknown)는 알리지 않는다.
-- 토큰·페이지·handoff 부재 또는 fetch 실패는 `ok:true`(건너뜀)로 처리 — false-red 금지.
+- (Notion 폴백 한정) 토큰·페이지·handoff 부재 또는 fetch 실패는 `ok:true`(건너뜀)로 처리 —
+  false-red 금지. 웹 경로는 파일 존재 시 네트워크 의존이 없어 이 skip 클래스가 발생하지 않는다.
 
-순수 코어(블록 URL 추출·분류·Issue JSON)는 네트워크 없이 단위테스트된다. Notion I/O 만
-lazy import(`collect_intake` 의 검증된 `notion_api_request` 재사용).
+순수 코어(URL 추출·분류·Issue JSON)는 네트워크 없이 단위테스트된다. Notion I/O 만
+lazy import(`collect_intake` 의 검증된 `notion_api_request` 재사용, 레거시 폴백 전용).
 """
 from __future__ import annotations
 
 import copy
+import glob
 import json
 import os
 import sys
@@ -33,11 +42,17 @@ import brief_lint as bl
 from grm_common import env_flag
 
 # Weekly Brief(발행) DB — v16 프롬프트 [발송] 의 ID. env 로 override 가능.
+# **레거시(2026-07-07 확인)**: 6/22 이후 신규 페이지가 쓰이지 않는다 — 실 발행 채널은
+# `web/data/briefs/`(아래 §웹 발행본 감사)로 대체됐다. 이 DB·경로는 웹 발행본을 못 찾을 때만
+# 쓰는 **폴백**으로 남긴다(과거 페이지 삭제 없음 — 참고용 보존). 상세=GRM_SYSTEM.md §2.1 ⑤/⑥.
 DEFAULT_WEEKLY_BRIEF_DB_ID = "3653142f-dc11-8049-806d-e0a779cafd90"
 # Intake/handoff DB — handoff page(Source=GRM Handoff)가 사는 곳(= NOTION_DATABASE_ID).
 DEFAULT_INTAKE_DB_ID = "7784c71fb7b343749b2bee5d04db7926"
 
 DEFAULT_AUDIT_JSON = "grm-brief-audit.json"
+# 웹 발행본(현 실채널) 디렉터리 — 규약은 `web/data/briefs/README.md`(주차당 1파일·
+# `brief_web_{publish_date}.json`·`grm-web-card/v1` 스키마).
+DEFAULT_WEB_BRIEFS_DIR = "web/data/briefs"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -189,25 +204,21 @@ def definitive_verdict(url: str, **kwargs: Any) -> str:
     return VERDICT_UNKNOWN
 
 
-def classify(handoff_rows: list[dict[str, Any]],
-             published_urls: list[str],
-             verdict: "Any | None" = None,
-             *,
-             allowed_fetched: Iterable[str] = (),
-             published_text: "str | None" = None) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
-    """(alert_findings, info_findings) 반환.
+def classify_urls(allowed: "set[str]",
+                  published_urls: list[str],
+                  verdict: "Any | None" = None,
+                  *,
+                  allowed_fetched: Iterable[str] = ()) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
+    """URL 근거 대조 코어 — 근거 집합(`allowed`)만 있으면 되고 handoff rows 형태는 몰라도 된다.
 
-    scaffold footer 누락은 도메인·live 상태와 무관하게 alert 다. 단 `published_text` 가
-    주어지면 **실제로 렌더된 카드**(document_id 가 발행본에 존재)에 한해 검사해 Tier1 Skipped
-    /보류 row 의 footer 오탐을 차단한다(과알림 0). 그 밖의 미근거 링크는 ALL_DOMAINS 로 전부
-    검사하되, 비-MFDS 검색 카드 후보는 `allowed_fetched` 이거나 `verdict(url)` 가 BAD 일 때만
-    alert 로 승격한다.
+    Notion 경로(`classify`, handoff rows 에서 allowed 를 파생)와 웹 경로(`classify_web`, 카드
+    `sources` 에서 allowed 를 파생)가 이 함수를 공용한다. 미근거 링크는 ALL_DOMAINS 로 전부
+    검사하되, 비-MFDS 후보는 `allowed_fetched` 이거나 `verdict(url)` 가 BAD 일 때만 alert 로
+    승격한다(과알림 0 — MFDS 는 예외적으로 항상 alert, W1 사고 클래스).
     """
-    allowed = bl.collect_allowed_urls(handoff_rows)
     base = bl.lint_urls(published_urls, allowed, policy=bl.POLICY_ALL_DOMAINS,
                         allowed_fetched=allowed_fetched)
-    alerts: list[bl.LintFinding] = bl.lint_scaffold_footer_integrity(
-        handoff_rows, published_urls, published_text=published_text)
+    alerts: list[bl.LintFinding] = []
     info: list[bl.LintFinding] = []
     for f in base:
         if f.code == "L17-MFDS-PROVENANCE":    # MFDS 미근거 — 결정론 alert
@@ -229,6 +240,26 @@ def classify(handoff_rows: list[dict[str, Any]],
                 "handoff 근거 없는 외부 링크이나 live verify 가 OK/UNKNOWN 이라 알림으로 "
                 "승격하지 않음(검색 카드·WAF 가능성)."))
     return alerts, info
+
+
+def classify(handoff_rows: list[dict[str, Any]],
+             published_urls: list[str],
+             verdict: "Any | None" = None,
+             *,
+             allowed_fetched: Iterable[str] = (),
+             published_text: "str | None" = None) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
+    """(alert_findings, info_findings) 반환 — Notion 발행 경로(레거시/폴백) 전용.
+
+    scaffold footer 누락은 도메인·live 상태와 무관하게 alert 다. 단 `published_text` 가
+    주어지면 **실제로 렌더된 카드**(document_id 가 발행본에 존재)에 한해 검사해 Tier1 Skipped
+    /보류 row 의 footer 오탐을 차단한다(과알림 0). URL 근거 대조 자체는 `classify_urls` 공용.
+    """
+    allowed = bl.collect_allowed_urls(handoff_rows)
+    alerts, info = classify_urls(allowed, published_urls, verdict=verdict,
+                                 allowed_fetched=allowed_fetched)
+    footer_alerts = bl.lint_scaffold_footer_integrity(
+        handoff_rows, published_urls, published_text=published_text)
+    return footer_alerts + alerts, info
 
 
 def _enable_brief_autofix() -> bool:
@@ -522,8 +553,168 @@ def _fetch_page_code_json(token: str, page_id: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 웹 발행본(`web/data/briefs/`) 감사 — 2026-07-07 근본 전환. 파일 기반이라 네트워크 0(brief
+# 자체를 얻는 데 Notion 토큰·API 호출이 필요 없다 — 발행 PR 이 사람 승인으로 머지된 뒤에야
+# CI 체크아웃에 파일이 존재하므로 "최신"도 `brief.publish_date` 로 직접 정본 판단한다. Notion
+# 경로의 `fetch_latest_brief` 정렬버그(Issue #110) 클래스가 구조적으로 재발 불가).
+#
+# `grm-web-card/v1` 스키마는 코드-verbatim 필드(`facts`·`quotes[].original`·`sources`·`id`·
+# 배지류)와 LLM 슬롯(`title_issue`·`summary`·`implication`·`key_facts`·`checks`·
+# `quotes[].translation`·brief `tldr`)이 스키마 레벨로 분리돼 있고, `inject_slots.py` 가드가
+# LLM 델타가 code-verbatim 필드를 건드리는 것 자체를 차단한다(주입 시 무시). 그 결과 Notion
+# 감사의 5개 체크 중 3개는 웹 경로에서 **구조적으로 불필요**해 의도적으로 드롭한다:
+#   · scaffold footer 유실(L17-SCAFFOLD-FOOTER-MISSING) — `sources` 는 별도 JSON 필드라
+#     "본문에서 사라짐" 자체가 불가능.
+#   · 표 고정 셀 전사(PL18-SCAFFOLD-CELL) — `facts`[] 도 동일 이유로 불가침.
+#   · 수집건수 대조(PL15-COVERAGE-*) — `brief.coverage` 는 LLM 슬롯이 아니라
+#     `assemble_publish_brief.py` 가 카드 집합에서 직접 재계산하는 코드값(LLM 이 쓰지 않음).
+# 남기는 2개(모두 LLM 자유텍스트 슬롯에 여전히 유효한 위협)는 `classify_urls`/
+# `lint_publish_structure` 로 그대로 이관한다:
+#   · 미근거 URL 삽입(L17-MFDS-PROVENANCE/UNGROUNDED/UNVERIFIED).
+#   · 잔존 슬롯 토큰·금지 문법(PL1/PL3/16) — PL10/PL14 패턴(마크다운 카드 제목·괄호 요일)은
+#     웹 스키마에 대응 형태가 없어 매칭되지 않는다(무해 no-op — 오탐 유발 없음).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# LLM 이 채우는 카드 슬롯(inject_slots._STR_SLOTS/_LIST_SLOTS 와 동일 — 코드-verbatim
+# 필드(facts·sources·id·quotes[].original 등)는 여기 포함하지 않는다).
+_WEB_LLM_STR_SLOTS = ("title_issue", "summary", "implication")
+_WEB_LLM_LIST_SLOTS = ("key_facts", "checks")
+
+
+def find_latest_web_brief(briefs_dir: str = DEFAULT_WEB_BRIEFS_DIR
+                          ) -> "tuple[str, dict[str, Any]] | None":
+    """`{briefs_dir}/brief_web_*.json` 중 `brief.publish_date` 최댓값 1건을 (path, json)로.
+
+    파일명·mtime 이 아니라 **JSON 내부 `publish_date`**(ISO `YYYY-MM-DD`, 문자열 비교로 정렬
+    가능)로 최신을 정본 판단한다 — Notion `fetch_latest_brief` 의 `created_time` 정렬버그
+    (Issue #110) 클래스가 이 경로엔 애초에 존재하지 않는다. 디렉터리 부재·파일 0건·전부 파싱
+    실패 → `None`(호출자가 Notion 폴백으로 넘어간다).
+    """
+    try:
+        paths = sorted(glob.glob(os.path.join(briefs_dir, "brief_web_*.json")))
+    except OSError:
+        return None
+    best: "tuple[str, dict[str, Any]] | None" = None
+    best_date = ""
+    for path in paths:
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            continue
+        date = (data.get("brief") or {}).get("publish_date")
+        if not isinstance(date, str) or not date:
+            continue
+        if date > best_date:
+            best_date = date
+            best = (path, data)
+    return best
+
+
+def extract_web_llm_text(brief_json: dict[str, Any]) -> str:
+    """웹 브리프 JSON 에서 LLM 슬롯 값만 평문 한 블록으로 이어붙인다(구조 lint·URL 스캔 공용 입력).
+
+    `facts`·`sources`·`id`·배지류(코드-verbatim)는 제외 — inject_slots 가드로 LLM 이 못 건드리는
+    필드라 조사할 이유가 없다. `deep_analysis`(있으면)는 별도 게이트(`verify_deep_analysis.py`
+    — 인용 근거를 소스 원문과 대조)가 주입 시점에 이미 검증하므로 여기서 다시 다루지 않는다.
+    """
+    lines: list[str] = []
+    brief_meta = brief_json.get("brief") or {}
+    for t in brief_meta.get("tldr") or []:
+        if isinstance(t, str) and t:
+            lines.append(t)
+    for card in brief_json.get("cards") or []:
+        if not isinstance(card, dict):
+            continue
+        for key in _WEB_LLM_STR_SLOTS:
+            v = card.get(key)
+            if isinstance(v, str) and v:
+                lines.append(v)
+        for key in _WEB_LLM_LIST_SLOTS:
+            for v in card.get(key) or []:
+                if isinstance(v, str) and v:
+                    lines.append(v)
+        for q in card.get("quotes") or []:
+            if isinstance(q, dict):
+                tr = q.get("translation")
+                if isinstance(tr, str) and tr:
+                    lines.append(tr)
+    return "\n".join(lines)
+
+
+def collect_web_allowed_urls(brief_json: dict[str, Any]) -> set[str]:
+    """카드 `sources.info_url`/`official_url`(코드-verbatim) = 이 발행본의 근거 URL 집합.
+
+    Notion 경로의 `collect_allowed_urls(handoff_rows)`에 대응하지만, 웹 JSON 은 카드 자신의
+    `sources` 가 이미 정본이라 별도 handoff 재조회(Notion 등)가 필요 없다.
+    """
+    allowed: set[str] = set()
+    for card in brief_json.get("cards") or []:
+        if not isinstance(card, dict):
+            continue
+        sources = card.get("sources") or {}
+        if not isinstance(sources, dict):
+            continue
+        for key in ("info_url", "official_url"):
+            u = sources.get(key)
+            if isinstance(u, str) and u.strip():
+                allowed.add(bl.normalize_url(u))
+    allowed.discard("")
+    return allowed
+
+
+def classify_web(brief_json: dict[str, Any], *,
+                 verify: bool = True) -> tuple[list[bl.LintFinding], list[bl.LintFinding]]:
+    """웹 발행본 1건 → (alert_findings, info_findings). §웹 발행본 감사 스코프 참조."""
+    allowed = collect_web_allowed_urls(brief_json)
+    llm_text = extract_web_llm_text(brief_json)
+    urls = bl.extract_markdown_links(llm_text)
+    verdict = (lambda u: definitive_verdict(u)) if verify else None
+    alerts, info = classify_urls(allowed, urls, verdict=verdict)
+    struct_alerts = [f for f in bl.lint_publish_structure(llm_text) if f.severity == bl.SEV_FAIL]
+    return struct_alerts + alerts, info
+
+
+def _web_brief_title(brief_json: dict[str, Any]) -> str:
+    """브리프 제목 파생 — 스키마에 전용 필드 없음(web/README §스키마 v1 한계와 동일 규칙)."""
+    brief_meta = brief_json.get("brief") or {}
+    tldr = brief_meta.get("tldr") or []
+    if tldr and isinstance(tldr[0], str) and tldr[0]:
+        return tldr[0]
+    date = brief_meta.get("publish_date", "")
+    return f"GRM 웹 발행 — {date}" if date else "GRM 웹 발행"
+
+
+def run_web(brief_path: str, brief_json: dict[str, Any], *,
+           verify: bool = True) -> dict[str, Any]:
+    """웹 발행본 1건 탐지 실행 → audit JSON. `run()`(Notion) 과 동일 스키마 산출."""
+    alerts, info = classify_web(brief_json, verify=verify)
+    brief_meta = brief_json.get("brief") or {}
+    return build_audit_json(alerts, info,
+                            run_date_kst=brief_meta.get("publish_date", "") or "",
+                            brief_title=_web_brief_title(brief_json),
+                            brief_url=brief_path)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 실행
 # ─────────────────────────────────────────────────────────────────────────────
+def run_audit(token: str, *, weekly_db_id: str, intake_db_id: str,
+             verify: bool = True,
+             web_briefs_dir: str = DEFAULT_WEB_BRIEFS_DIR) -> dict[str, Any]:
+    """탐지 진입점(CLI 기본) — 웹 발행본 우선, 없으면 Notion(레거시) 폴백.
+
+    `web_briefs_dir` 에 유효한 `brief_web_*.json` 이 하나라도 있으면 그 최신본만 감사하고
+    Notion 은 아예 조회하지 않는다(중복 알림 방지). 웹 발행본이 하나도 없을 때만 기존 `run()`
+    (Notion 경로, 완전 불변)으로 넘어간다 — 웹 파이프 도입 전 과거 상태·과도기 대비.
+    """
+    found = find_latest_web_brief(web_briefs_dir)
+    if found is not None:
+        path, data = found
+        return run_web(path, data, verify=verify)
+    return run(token, weekly_db_id=weekly_db_id, intake_db_id=intake_db_id, verify=verify)
+
+
 def run(token: str, *, weekly_db_id: str, intake_db_id: str,
         verify: bool = True) -> dict[str, Any]:
     """탐지 1회 실행 → audit JSON(출처 근거 + 구조). 대조 불가/오류는 ok:true 건너뜀(false-red 금지).
@@ -612,6 +803,10 @@ def main(argv: "list[str] | None" = None) -> int:
         description="발행 후 출처 링크 근거(provenance) 탐지 — FAIL 시 운영 경고 JSON 생성.")
     p.add_argument("--out", default=os.environ.get("GRM_BRIEF_AUDIT_JSON", DEFAULT_AUDIT_JSON),
                    help="audit 결과 JSON 출력 경로.")
+    p.add_argument("--web-briefs-dir",
+                   default=os.environ.get("GRM_WEB_BRIEFS_DIR", DEFAULT_WEB_BRIEFS_DIR),
+                   help="웹 발행본 디렉터리(현 실채널). 유효한 brief_web_*.json 이 있으면 "
+                        "이 경로만 감사하고 Notion 은 조회하지 않는다 — 없을 때만 Notion 폴백.")
     p.add_argument("--no-verify", action="store_true",
                    help="비-MFDS 미근거 링크 live verify 생략(MFDS 결정론 FAIL 만).")
     p.add_argument("--exit-nonzero-on-fail", action="store_true",
@@ -624,8 +819,8 @@ def main(argv: "list[str] | None" = None) -> int:
                  or os.environ.get("GRM_INTAKE_DB_ID")
                  or DEFAULT_INTAKE_DB_ID).strip()
 
-    result = run(token, weekly_db_id=weekly_db, intake_db_id=intake_db,
-                 verify=not args.no_verify)
+    result = run_audit(token, weekly_db_id=weekly_db, intake_db_id=intake_db,
+                       verify=not args.no_verify, web_briefs_dir=args.web_briefs_dir)
     try:
         with open(args.out, "w", encoding="utf-8") as fh:
             json.dump(result, fh, ensure_ascii=False, indent=2)

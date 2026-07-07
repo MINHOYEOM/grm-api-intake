@@ -78,4 +78,37 @@
   var x=toc.querySelector('.toc-close');if(x)x.addEventListener('click',function(){set(false);});
   addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
 })();
+/* 스크롤 스파이 — 현재 화면의 카드/섹션을 목차에서 하이라이트하고, 활성 항목을
+   목차 스크롤 영역 안으로 자동 이동. IntersectionObserver 미지원/타깃 없으면 무동작(graceful).
+   목차 마크업·href 불변 전제: 링크 href="#id" ↔ 본문 요소 id 매칭. */
+(function(){
+  var toc=document.getElementById('toc'); if(!toc) return;
+  var links={};
+  [].forEach.call(toc.querySelectorAll('a[href^="#"]'),function(a){
+    var id=a.getAttribute('href').slice(1); if(id){links[id]=a; a.title=a.textContent.trim();}
+  });
+  var targets=[].filter.call(document.querySelectorAll('#cards [id]'),function(el){return links[el.id];});
+  if(!targets.length || !('IntersectionObserver' in window)) return;
+  var current=null, visible={};
+  function setActive(id){
+    if(id===current) return;
+    if(current && links[current]) links[current].classList.remove('on');
+    current=id;
+    var a=links[id]; if(!a) return;
+    a.classList.add('on');
+    var ar=a.getBoundingClientRect(), tr=toc.getBoundingClientRect();
+    if(ar.top<tr.top || ar.bottom>tr.bottom){
+      toc.scrollTop += (ar.top - tr.top) - (toc.clientHeight/2 - ar.height/2);
+    }
+  }
+  var io=new IntersectionObserver(function(ents){
+    ents.forEach(function(e){ if(e.isIntersecting) visible[e.target.id]=1; else delete visible[e.target.id]; });
+    var best=null, bestTop=Infinity;
+    targets.forEach(function(t){
+      if(visible[t.id]){ var top=t.getBoundingClientRect().top; if(top<bestTop){bestTop=top; best=t.id;} }
+    });
+    if(best) setActive(best);
+  },{rootMargin:'-88px 0px -55% 0px', threshold:0});
+  targets.forEach(function(t){ io.observe(t); });
+})();
 </script>{% endblock %}

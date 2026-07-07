@@ -321,11 +321,20 @@ body.js-search .bar{display:flex}
 .tldr ul{margin:14px 0 0;padding-left:0;list-style:none}
 .tldr li{margin:10px 0;font-size:17.5px;font-family:var(--serif);color:var(--ink);line-height:1.5;font-weight:400;letter-spacing:-.01em}
 .layout{display:grid;grid-template-columns:230px 1fr;gap:52px;padding:38px 0 90px;align-items:start}
-.toc{position:sticky;top:90px}
+.toc{position:sticky;top:90px;max-height:calc(100vh - 110px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;
+  scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.toc::-webkit-scrollbar{width:7px}
+.toc::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
+.toc::-webkit-scrollbar-track{background:transparent}
 .toc .l{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:15px}  /* "목차" — 한글, 자간0 */
-.toc a{display:block;color:var(--body);font-size:13px;padding:6px 0 6px 14px;border-left:1px solid var(--line);line-height:1.45;transition:var(--tr)}
+.toc a{display:block;color:var(--body);font-size:13px;padding:6px 0 6px 14px;border-left:1px solid var(--line);line-height:1.45;transition:var(--tr);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .toc a:hover{color:var(--ink);border-color:var(--coral)}
 .toc a.sec{font-family:var(--serif);font-size:15px;font-weight:500;color:var(--ink);border-left-color:var(--coral);padding-top:16px;margin-top:7px}
+/* 스크롤 스파이 — 현재 뷰포트에 있는 카드/섹션의 목차 링크 강조(런타임 JS 가 .on 부여).
+   §4 한글안전: 색·굵기·테두리만(자간/대문자/mono 없음). 신규 색 0(기존 토큰 재사용). */
+.toc a.on{color:var(--coral-2);font-weight:600;border-left-color:var(--coral);background:var(--coral-tint)}
+.toc a.sec.on{color:var(--coral-2);background:var(--coral-tint)}
 .toc .toc-sub{color:var(--muted-2);font-weight:400}  /* P1-1 동명 카드 구분자 — sans·자간0(한글 가능) */
 .toc-fab,.toc-backdrop,.toc .toc-close{display:none}  /* P1-2 모바일 전용 점프 내비 — 데스크톱 숨김 */
 .sec-h{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.012em;color:var(--ink);margin:16px 0 2px;padding-top:20px;

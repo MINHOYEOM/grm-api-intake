@@ -304,6 +304,46 @@ class TestAuditJson(unittest.TestCase):
         self.assertIn("SKIP", vpb.format_audit_report(vpb.skipped_json("x")))
 
 
+class TestFetchLatestBriefSort(unittest.TestCase):
+    """회귀: `발행일` 속성 내림차순(1차)로 정렬 요청해야 한다.
+
+    created_time(생성시각) 단독 정렬은 나중에 생성된 과거 주차 중복 페이지를
+    최신으로 잘못 뽑는 사고를 냈다(Issue #110 — 06-17 발행 중복 페이지가
+    06-22 진짜 최신 페이지보다 먼저 선택됨). Notion 서버가 실제 정렬을 수행하므로
+    여기서는 클라이언트가 올바른 정렬 조건을 요청하는지만 검증한다."""
+
+    def test_requests_published_date_desc_as_primary_sort(self):
+        import collect_intake as ci
+
+        fake_response = {"results": [
+            {"id": "p1", "url": "u1",
+             "properties": {"Name": {"type": "title",
+                                      "title": [{"plain_text": "Brief"}]}}},
+        ]}
+        with mock.patch.object(ci, "notion_api_request",
+                                return_value=fake_response) as mock_req:
+            vpb.fetch_latest_brief("tok", "db123")
+
+        self.assertEqual(mock_req.call_count, 1)
+        _args, kwargs = mock_req.call_args
+        sorts = kwargs["body"]["sorts"]
+        self.assertEqual(sorts[0], {"property": "발행일", "direction": "descending"})
+        self.assertEqual(sorts[1],
+                          {"timestamp": "created_time", "direction": "descending"})
+
+    def test_created_time_alone_is_not_the_only_sort(self):
+        """created_time 단독 정렬(수정 전 버그 재발)을 회귀 방지로 명시 배제."""
+        import collect_intake as ci
+
+        with mock.patch.object(ci, "notion_api_request",
+                                return_value={"results": []}) as mock_req:
+            vpb.fetch_latest_brief("tok", "db123")
+
+        sorts = mock_req.call_args.kwargs["body"]["sorts"]
+        self.assertNotEqual(
+            sorts, [{"timestamp": "created_time", "direction": "descending"}])
+
+
 class TestRunSkips(unittest.TestCase):
     def test_no_token_skips(self):
         j = vpb.run("", weekly_db_id="w", intake_db_id="i")

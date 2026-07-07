@@ -854,12 +854,28 @@
     var workflows = (state.ops && state.ops.workflows) || [];
     return workflows.filter(function (wf) { return wf.action === action; });
   }
+  function isExpectedNoDeltaGateRejection(wf) {
+    var run = wf && wf.latest;
+    if (!run || runKind(run) !== "bad") return false;
+    var jobs = run.failed_jobs || [];
+    return jobs.some(function (job) {
+      return (job.failed_steps || []).some(function (step) {
+        return /Resolve publish_date|델타 경로/.test(String(step.name || ""));
+      });
+    });
+  }
   function flowNodeStatus(stage) {
     if (!stage.action) return { kind: "", dot: "", label: "자동 진행" };
     var matches = findWorkflowsByAction(stage.action);
     if (!matches.length) return { kind: "", dot: "", label: "기록 없음" };
     var kind = "ok";
     matches.forEach(function (wf) { kind = worseKind(kind, workflowDisplayKind(wf)); });
+    if (stage.action === "web_publish" && kind === "bad") {
+      var gateRejected = matches.some(isExpectedNoDeltaGateRejection);
+      if (gateRejected) {
+        return { kind: "pending", dot: "pending", label: "대기 중", descOverride: "이번 주 카드가 아직 준비되지 않아 정상적으로 대기 중입니다. 자동 실행이 새 카드를 만들면 여기가 바뀝니다." };
+      }
+    }
     var label = kind === "bad" ? "실패" : (kind === "warn" ? "확인 필요" : "정상");
     var anyRunning = matches.some(function (wf) { return wf.latest && wf.latest.status && wf.latest.status !== "completed"; });
     if (anyRunning) { kind = "warn"; label = "실행 중"; }
@@ -884,7 +900,7 @@
       var node = '<div class="' + nodeClass + '">' +
         '<i class="ti ' + esc(stage.icon) + '"></i>' +
         "<b>" + esc(stage.title) + "</b>" +
-        "<p>" + esc(stage.desc) + "</p>" +
+        "<p>" + esc(status.descOverride || stage.desc) + "</p>" +
         '<span class="admin-flow-when">' + esc(stage.when) + "</span>" +
         '<span class="admin-flow-status">' + dotHtml + esc(status.label) + "</span>" +
         "</div>";

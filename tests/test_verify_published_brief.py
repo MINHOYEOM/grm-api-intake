@@ -546,5 +546,29 @@ class TestAuditJsonSkipClass(unittest.TestCase):
         self.assertEqual(j["info"], [])
 
 
+class TestMainWeeklyDbIdEnvFallback(unittest.TestCase):
+    """main() 의 GRM_WEEKLY_BRIEF_DB_ID 해석: CI 에서 미등록 vars 는 빈 문자열로
+    치환되어 주입된다(키 자체가 사라지지 않음). os.environ.get(key, default) 는
+    키가 존재하되 값이 "" 인 경우 default 로 폴백하지 않으므로, 빈 문자열이
+    그대로 Notion database_id 로 쓰이면 API 요청 URL 이 깨진다(회귀 방지)."""
+
+    def test_empty_env_falls_back_to_default_db_id(self):
+        with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "",
+                                           "NOTION_TOKEN": "tok"}), \
+             mock.patch.object(vpb, "run",
+                               return_value=vpb.build_audit_json([], [])) as mock_run:
+            vpb.main([])
+        self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"],
+                          vpb.DEFAULT_WEEKLY_BRIEF_DB_ID)
+
+    def test_nonempty_env_is_used_verbatim(self):
+        with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "custom-db-id",
+                                           "NOTION_TOKEN": "tok"}), \
+             mock.patch.object(vpb, "run",
+                               return_value=vpb.build_audit_json([], [])) as mock_run:
+            vpb.main([])
+        self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"], "custom-db-id")
+
+
 if __name__ == "__main__":
     unittest.main()

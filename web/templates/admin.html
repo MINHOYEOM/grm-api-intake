@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-.admin-main{padding-top:34px;padding-bottom:72px}
-.admin-shell{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}
+.admin-main{padding-top:34px;padding-bottom:72px;max-width:1460px}
+.admin-shell{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;align-items:start}
 .admin-rail{position:sticky;top:86px;border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:16px}
 .admin-brand{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .admin-brand img{width:34px;height:34px;border-radius:8px}
@@ -41,30 +41,30 @@
 .admin-activation h3{font-size:13.5px;color:var(--ink);font-weight:700;margin-bottom:8px}
 .admin-activation-grid{display:grid;gap:7px}
 .admin-activation a{color:var(--coral-2);text-decoration:underline}
-.admin-dashboard{display:grid;gap:16px}
+.admin-dashboard{display:grid;gap:20px}
 .admin-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:14px 15px;min-width:0}
+.admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:18px 20px;min-width:0}
 .admin-kpi span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;white-space:nowrap}
 .admin-kpi .ti{color:var(--coral-2);font-size:16px}
-.admin-kpi b{display:block;font-family:var(--serif);font-size:28px;font-weight:500;color:var(--ink);line-height:1.05;margin-top:6px;overflow:hidden;text-overflow:ellipsis}
-.admin-panel{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:18px}
+.admin-kpi b{display:block;font-family:var(--serif);font-size:34px;font-weight:500;color:var(--ink);line-height:1.05;margin-top:6px;overflow:hidden;text-overflow:ellipsis}
+.admin-panel{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:24px}
 .admin-panel[hidden],.admin-hidden{display:none!important}
 .admin-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .admin-panel h2{font-size:18px;font-weight:650;color:var(--ink)}
 .admin-panel .sub{color:var(--muted);font-size:13px;margin-top:3px}
-.admin-flow-strip{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:9px 12px;margin-bottom:12px;color:var(--muted);font-size:12.5px;line-height:1.5}
 .admin-actions-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .admin-op{display:grid;gap:10px;align-content:space-between;text-align:left;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:14px;min-height:148px}
 .admin-op h3{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px;font-weight:650}
 .admin-op h3 .ti{font-size:18px;color:var(--coral-2)}
 .admin-op p{color:var(--muted);font-size:12.5px;line-height:1.45}
 .admin-op .btn{justify-content:center;width:100%;padding:9px 12px}
-.admin-approve-hero{border:1.5px solid rgba(194,96,63,.4);background:var(--soft);border-radius:var(--rad-s);padding:18px;margin-bottom:16px}
+.admin-approve-hero{border:1.5px solid rgba(194,96,63,.4);background:var(--soft);border-radius:var(--rad-s);padding:24px 26px;margin-bottom:16px}
 .admin-approve-hero h3{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:19px;font-weight:750;margin-bottom:6px}
 .admin-approve-hero>p{color:var(--body);font-size:13.5px;line-height:1.55;margin-bottom:12px}
-.admin-web-approve-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.admin-web-approve-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .admin-web-approve-pr{color:var(--body);font-size:12.8px;line-height:1.4}
-.admin-web-approve-row .btn{padding:8px 14px}
+.admin-approve-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.admin-approve-actions .btn{padding:12px 22px;font-size:15px}
 #grm-web-approve-submit[disabled]{opacity:.5;cursor:not-allowed}
 .admin-publish-console{border:1px solid rgba(194,96,63,.24);background:var(--canvas);border-radius:var(--rad-s);padding:15px 16px;margin:0 0 12px}
 .admin-publish-console h3{display:flex;align-items:center;gap:7px;color:var(--ink);font-size:16px;font-weight:750;margin-bottom:5px}
@@ -81,11 +81,8 @@
 .admin-ops-brief h3{display:flex;align-items:center;gap:7px;color:var(--ink);font-size:16px;font-weight:750;margin-bottom:5px}
 .admin-ops-brief p{color:var(--body);font-size:13.2px;line-height:1.5;max-width:760px}
 .admin-ops-brief small{display:block;color:var(--muted);font-size:11.8px;margin-top:6px}
-.admin-ops-hint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:9px 10px;margin-bottom:12px;color:var(--muted);font-size:12.2px;line-height:1.4}
-.admin-ops-hint span{display:flex;align-items:center;gap:5px;color:var(--ink);font-weight:700}
-.admin-ops-hint b{color:var(--body);font-weight:650}
 .admin-ops-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.admin-metric{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 14px;min-width:0}
+.admin-metric{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:16px 18px;min-width:0}
 .admin-metric span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
 .admin-metric b{display:block;margin-top:5px;color:var(--ink);font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin-metric p{color:var(--muted);font-size:11.8px;line-height:1.35;margin-top:5px}
@@ -93,14 +90,26 @@
 .admin-monitor-layout{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
 .admin-monitor-section h3{font-size:14px;color:var(--ink);font-weight:700;margin-bottom:9px}
 .admin-section-sub{color:var(--muted);font-size:12.4px;line-height:1.45;margin:-4px 0 10px}
-.admin-workflow-pipeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:7px;margin-bottom:10px}
-.admin-pipeline-step{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:8px 9px;min-width:0}
-.admin-pipeline-step.ok{border-color:rgba(194,96,63,.24)}
-.admin-pipeline-step.warn{border-color:rgba(176,125,23,.28);background:rgba(176,125,23,.05)}
-.admin-pipeline-step.bad{border-color:rgba(189,75,54,.34);background:rgba(189,75,54,.06)}
-.admin-pipeline-step span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11.8px;line-height:1.3}
-.admin-pipeline-step b{display:block;color:var(--ink);font-size:12.8px;margin:4px 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.admin-pipeline-step em{font-style:normal;color:var(--body);font-size:11.8px;line-height:1.35}
+.admin-flow{display:flex;align-items:stretch;gap:0;margin-bottom:14px;flex-wrap:nowrap}
+.admin-flow-node{flex:1 1 0;min-width:0;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:16px 15px}
+.admin-flow-node.ok{border-color:rgba(194,96,63,.28)}
+.admin-flow-node.bad{border-color:rgba(189,75,54,.4);background:rgba(189,75,54,.05)}
+.admin-flow-node.warn{border-color:rgba(176,125,23,.32);background:rgba(176,125,23,.05)}
+.admin-flow-node.human{border-style:dashed;border-color:rgba(194,96,63,.45);background:var(--coral-tint)}
+.admin-flow-node .ti{font-size:20px;color:var(--coral-2)}
+.admin-flow-node b{display:block;color:var(--ink);font-size:14.5px;margin:7px 0 4px;line-height:1.3}
+.admin-flow-node p{color:var(--body);font-size:12.3px;line-height:1.45;margin-bottom:9px}
+.admin-flow-node .admin-flow-when{display:block;color:var(--muted);font-size:11.5px;margin-bottom:7px}
+.admin-flow-arrow{flex:0 0 26px;display:grid;place-items:center;color:var(--coral);font-size:16px}
+.admin-flow-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--body)}
+.admin-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--line-2)}
+.admin-dot.ok{background:#4c8a52}.admin-dot.bad{background:var(--hi)}.admin-dot.warn{background:var(--med)}
+.admin-flow-support{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.admin-flow-support .admin-flow-support-label{color:var(--muted);font-size:12px;font-weight:700}
+.admin-flow-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--pill);padding:6px 12px;font-size:12px;color:var(--body)}
+.admin-workflow-log{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:12px 13px}
+.admin-workflow-log summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:13.5px}
+.admin-workflow-log[open] summary{margin-bottom:12px}
 .admin-workflow-grid{display:grid;grid-template-columns:1fr;gap:8px}
 .admin-workflow-row{border:1px solid var(--line);border-left:4px solid var(--coral);background:var(--canvas);border-radius:var(--rad-s);overflow:hidden}
 .admin-workflow-row.warn{border-color:rgba(176,125,23,.3);border-left-color:var(--med);background:rgba(176,125,23,.035)}
@@ -115,7 +124,7 @@
 .admin-workflow-name b{display:block;color:var(--ink);font-size:14px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin-workflow-stage{display:block;color:var(--muted);font-size:11.6px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
 .admin-workflow-quick{display:flex;align-items:center;gap:6px;min-width:0;color:var(--muted);font-size:12px}
-.admin-workflow-quick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-workflow-quick span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .admin-workflow-action{display:flex;align-items:center;justify-content:flex-end;gap:8px}
 .admin-expand-label{color:var(--muted);font-size:12px;white-space:nowrap}
 .admin-workflow-detail{display:grid;gap:10px;padding:11px 12px;background:var(--canvas)}
@@ -191,7 +200,7 @@ html:not(.grm-icons-ready) #grm-admin .ti::before{content:"";font-family:inherit
 html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-family:system-ui,sans-serif}
 .nav #navmenu,.nav .navtoggle,.nav .btn.coral{display:none!important}
 .site,#grm-mascot{display:none}
-@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-monitor-layout,.admin-split,.admin-insight{grid-template-columns:1fr}}
+@media(max-width:1080px){.admin-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-monitor-layout,.admin-split,.admin-insight{grid-template-columns:1fr}.admin-flow{flex-direction:column}.admin-flow-arrow{transform:rotate(90deg);padding:2px 0}}
 @media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.admin-workflow-compact,.admin-workflow-detail-grid,.admin-workflow-facts{grid-template-columns:1fr}.admin-workflow-action{justify-content:flex-start}.admin-workflow-quick span{white-space:normal}.admin-workflow-row summary{grid-template-columns:1fr}}
 @media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-kpis,.admin-actions-grid,.admin-ops-summary,.admin-workflow-grid,.admin-publish-form{grid-template-columns:1fr}.admin-ops-brief{display:grid}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn,.admin-publish-form .btn{width:100%;justify-content:center}}
@@ -214,7 +223,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
       <nav class="admin-nav" id="grm-admin-tabs">
         <span class="admin-nav-label">매주 월요일</span>
         <button type="button" class="on" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>운영센터</button>
-        <span class="admin-nav-label">가끔 확인</span>
+        <span class="admin-nav-label">서비스 관리</span>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
         <button type="button" data-tab="users"><i class="ti ti-users"></i>회원</button>
@@ -298,7 +307,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 
         <section class="admin-panel" data-panel="ops">
           <div class="admin-panel-head">
-            <div><h2>운영 상태 센터</h2><p class="sub">매주 월요일에는 맨 위 승인 카드 하나만 보면 됩니다. 나머지는 문제가 있거나 궁금할 때만 확인하세요.</p></div>
+            <div><h2>운영 상태 센터</h2><p class="sub">매주 월요일에는 맨 위 승인 카드 하나만 보면 됩니다. 아래 흐름도에서 시스템이 지금 어떻게 돌아가는지 한눈에 확인할 수 있습니다.</p></div>
             <span class="admin-pill" id="grm-github-state">GitHub 확인 중</span>
           </div>
           <section class="admin-approve-hero" aria-labelledby="grm-web-approve-title">
@@ -307,10 +316,12 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div id="grm-web-approve">
               <div class="admin-web-approve-row">
                 <span class="admin-web-approve-pr" id="grm-web-approve-pr">발행 PR 확인 중</span>
-                <a class="btn" id="grm-web-preview-link" href="#" target="_blank" rel="noopener" hidden>미리보기 열기</a>
                 <span class="admin-pill warn" id="grm-web-checks">CI 확인 중</span>
               </div>
-              <button class="btn coral" type="button" id="grm-web-approve-submit" disabled><i class="ti ti-shield-check"></i>승인 — 라이브 발행</button>
+              <div class="admin-approve-actions">
+                <a class="btn admin-hidden" id="grm-web-preview-link" href="#" target="_blank" rel="noopener" hidden>미리보기 열기</a>
+                <button class="btn coral" type="button" id="grm-web-approve-submit" disabled><i class="ti ti-shield-check"></i>승인 — 라이브 발행</button>
+              </div>
               <div class="admin-status" id="grm-web-approve-status" role="status" aria-live="polite"></div>
             </div>
           </section>
@@ -321,22 +332,18 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
             <span class="admin-pill">진단 중</span>
           </div>
-          <div class="admin-flow-strip" aria-label="주간 발행 흐름">① 수집(자동) → ② 카드 선별(자동) → ③ 발행 PR·미리보기(자동) → ④ 승인(운영자·위 카드) → ⑤ 뉴스레터 발송(운영자)</div>
-          <div class="admin-ops-hint" aria-label="운영 상태 기준">
-            <span><i class="ti ti-info-circle"></i>상태 기준</span>
-            <b>실패 작업</b> 최신 실행 실패
-            <b>운영 경고</b> 완료됐지만 확인 필요
-            <b>상세</b> 행을 눌러 런북 확인
-          </div>
           <div class="admin-ops-summary" id="grm-ops-summary">
             <div class="admin-metric"><span><i class="ti ti-loader-2"></i>불러오는 중</span><b>-</b></div>
           </div>
           <div class="admin-monitor-layout">
             <div class="admin-monitor-section">
-              <h3>운영 흐름</h3>
-              <p class="admin-section-sub">기본 화면은 요약만 표시합니다. 세부 판단, 영향, 로그 링크는 각 행을 펼쳐 확인합니다.</p>
-              <div class="admin-workflow-pipeline" id="grm-workflow-pipeline"><div class="admin-empty">불러오는 중</div></div>
-              <div class="admin-workflow-grid" id="grm-workflow-cards"><div class="admin-empty">불러오는 중</div></div>
+              <h3>주간 발행 흐름 — 한눈에 보기</h3>
+              <p class="admin-section-sub">매일 수집부터 뉴스레터 발송까지, 각 단계가 지금 어떤 상태인지 보여줍니다. 색 점: <span class="admin-dot ok"></span> 초록빛=정상 · <span class="admin-dot bad"></span> 붉은빛=실패 · <span class="admin-dot warn"></span> 노란빛=진행/확인</p>
+              <div id="grm-workflow-pipeline"><div class="admin-empty">불러오는 중</div></div>
+              <details class="admin-workflow-log">
+                <summary>워크플로우 상세 기록 — 로그와 조치 안내</summary>
+                <div class="admin-workflow-grid" id="grm-workflow-cards"><div class="admin-empty">불러오는 중</div></div>
+              </details>
             </div>
             <div class="admin-monitor-section">
               <h3>운영 이슈</h3>

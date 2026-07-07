@@ -3,8 +3,11 @@
 블록 URL 추출(Notion 블록 JSON)·분류(과알림 0)·audit JSON·verdict 환원을 동결한다.
 Notion I/O 는 lazy import 라 순수 코어 테스트는 네트워크/requests 불필요.
 """
+import json
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -590,12 +593,16 @@ class TestMainWeeklyDbIdEnvFallback(unittest.TestCase):
     """main() 의 GRM_WEEKLY_BRIEF_DB_ID 해석: CI 에서 미등록 vars 는 빈 문자열로
     치환되어 주입된다(키 자체가 사라지지 않음). os.environ.get(key, default) 는
     키가 존재하되 값이 "" 인 경우 default 로 폴백하지 않으므로, 빈 문자열이
-    그대로 Notion database_id 로 쓰이면 API 요청 URL 이 깨진다(회귀 방지)."""
+    그대로 Notion database_id 로 쓰이면 API 요청 URL 이 깨진다(회귀 방지).
+
+    main() 은 2026-07-07 부로 `run_audit()`(웹 우선·Notion 폴백)을 호출한다 — Notion
+    db_id 해석 로직 자체는 불변이라 이 테스트는 mock 대상만 `run_audit` 으로 갱신한다.
+    """
 
     def test_empty_env_falls_back_to_default_db_id(self):
         with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "",
                                            "NOTION_TOKEN": "tok"}), \
-             mock.patch.object(vpb, "run",
+             mock.patch.object(vpb, "run_audit",
                                return_value=vpb.build_audit_json([], [])) as mock_run:
             vpb.main([])
         self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"],
@@ -604,10 +611,198 @@ class TestMainWeeklyDbIdEnvFallback(unittest.TestCase):
     def test_nonempty_env_is_used_verbatim(self):
         with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "custom-db-id",
                                            "NOTION_TOKEN": "tok"}), \
-             mock.patch.object(vpb, "run",
+             mock.patch.object(vpb, "run_audit",
                                return_value=vpb.build_audit_json([], [])) as mock_run:
             vpb.main([])
         self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"], "custom-db-id")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 웹 발행본(web/data/briefs) 감사 — 2026-07-07 근본 전환. 파일 기반(임시 디렉터리에
+# brief_web_*.json 을 직접 써서 검증) — Notion I/O 전혀 필요 없다.
+# ─────────────────────────────────────────────────────────────────────────────
+def _web_card(card_id, **overrides):
+    card = {
+        "id": card_id, "render_order": 0, "group": "글로벌", "group_label": None,
+        "agency": "FDA", "card_type": "Warning Letter", "category": "Other",
+        "modality": None, "evidence_level": "A", "signal_tier": 1, "signal_label": "High",
+        "type_tag": "WL", "headline_target": "Acme Pharma",
+        "title_issue": "품질 결함", "summary": "정상 요약",
+        "facts": [{"label": "문서번호", "value": card_id}],
+        "quotes": [], "evidence_basis": "공식 인덱스",
+        "key_facts": ["정상 사실"], "implication": "정상 시사점",
+        "checks": ["점검1", "점검2"],
+        "sources": {"info_url": "https://www.fda.gov/info",
+                    "official_url": "https://www.fda.gov/official",
+                    "official_is_pdf": False,
+                    "link_check": {"info": "pending", "official": "pending"}},
+    }
+    card.update(overrides)
+    return card
+
+
+def _web_brief(publish_date, cards, tldr=None):
+    return {"schema_version": "grm-web-card/v1",
+            "brief": {"run_date_kst": publish_date, "publish_date": publish_date,
+                      "tldr": tldr or [], "coverage": {"intake_total": len(cards),
+                                                        "rendered": len(cards),
+                                                        "evidence": {"A": len(cards), "B": 0, "C": 0}}},
+            "cards": cards}
+
+
+class TestFindLatestWebBrief(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _write(self, name, data):
+        path = os.path.join(self.tmp, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, ensure_ascii=False)
+        return path
+
+    def test_missing_dir_returns_none(self):
+        self.assertIsNone(vpb.find_latest_web_brief(os.path.join(self.tmp, "nope")))
+
+    def test_empty_dir_returns_none(self):
+        self.assertIsNone(vpb.find_latest_web_brief(self.tmp))
+
+    def test_picks_max_publish_date_not_filename_or_mtime(self):
+        """파일명 알파벳 순서가 날짜 역순이어도 `brief.publish_date` 로 정본 판단."""
+        self._write("brief_web_zzz_older.json", _web_brief("2026-06-22", [_web_card("c1")]))
+        self._write("brief_web_aaa_newer.json", _web_brief("2026-07-06", [_web_card("c2")]))
+        found = vpb.find_latest_web_brief(self.tmp)
+        self.assertIsNotNone(found)
+        _path, data = found
+        self.assertEqual(data["brief"]["publish_date"], "2026-07-06")
+
+    def test_malformed_file_skipped(self):
+        path = os.path.join(self.tmp, "brief_web_bad.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("{not valid json")
+        self._write("brief_web_good.json", _web_brief("2026-07-06", [_web_card("c1")]))
+        found = vpb.find_latest_web_brief(self.tmp)
+        self.assertIsNotNone(found)
+        self.assertEqual(found[1]["brief"]["publish_date"], "2026-07-06")
+
+
+class TestWebExtraction(unittest.TestCase):
+    def test_extracts_only_llm_slots_not_code_fields(self):
+        card = _web_card("c1", summary="요약문 https://leaked.example.com/x 포함")
+        brief = _web_brief("2026-07-06", [card], tldr=["tldr1", "tldr2", "tldr3"])
+        text = vpb.extract_web_llm_text(brief)
+        self.assertIn("leaked.example.com", text)   # LLM 슬롯 안 URL 은 스캔 대상
+        self.assertIn("tldr1", text)
+        self.assertNotIn("fda.gov/official", text)  # 코드-verbatim sources 는 제외
+
+    def test_allowed_urls_come_from_card_sources(self):
+        card = _web_card("c1")
+        brief = _web_brief("2026-07-06", [card])
+        allowed = vpb.collect_web_allowed_urls(brief)
+        self.assertIn(bl.normalize_url("https://www.fda.gov/info"), allowed)
+        self.assertIn(bl.normalize_url("https://www.fda.gov/official"), allowed)
+
+
+class TestClassifyWeb(unittest.TestCase):
+    def test_clean_brief_passes(self):
+        brief = _web_brief("2026-07-06", [_web_card("c1")])
+        alerts, info = vpb.classify_web(brief, verify=False)
+        self.assertEqual(alerts, [])
+
+    def test_mfds_url_leaked_in_summary_is_alert(self):
+        card = _web_card(
+            "c1", agency="MFDS",
+            summary="식약처 발표 https://www.mfds.go.kr/brd/m_99/view.do?seq=1 참고")
+        brief = _web_brief("2026-07-06", [card])
+        alerts, _info = vpb.classify_web(brief, verify=False)
+        codes = {a.code for a in alerts}
+        self.assertIn("L17-MFDS-PROVENANCE", codes)
+
+    def test_grounded_url_in_summary_is_not_alert(self):
+        """LLM 이 카드 자신의 official_url 을 자유텍스트에 그대로 인용하면 근거 있음."""
+        card = _web_card("c1", summary="상세는 https://www.fda.gov/official 참고")
+        brief = _web_brief("2026-07-06", [card])
+        alerts, _info = vpb.classify_web(brief, verify=False)
+        self.assertEqual(alerts, [])
+
+    def test_nonmfds_ungrounded_bad_verdict_is_alert(self):
+        card = _web_card("c1", summary="참고: https://www.fda.gov/invented/wl-999")
+        brief = _web_brief("2026-07-06", [card])
+        with mock.patch.object(vpb, "definitive_verdict", return_value=vpb.VERDICT_BAD):
+            alerts, _info = vpb.classify_web(brief, verify=True)
+        self.assertIn("L17-UNGROUNDED", {a.code for a in alerts})
+
+    def test_nonmfds_ungrounded_unknown_verdict_is_info_not_alert(self):
+        card = _web_card("c1", summary="참고: https://www.fda.gov/maybe/down")
+        brief = _web_brief("2026-07-06", [card])
+        with mock.patch.object(vpb, "definitive_verdict", return_value=vpb.VERDICT_UNKNOWN):
+            alerts, info = vpb.classify_web(brief, verify=True)
+        self.assertEqual(alerts, [])
+        self.assertEqual(len(info), 1)
+
+    def test_residual_token_in_implication_is_alert(self):
+        card = _web_card("c1", implication="{{TITLE_ISSUE}} 관련 시사점")
+        brief = _web_brief("2026-07-06", [card])
+        alerts, _info = vpb.classify_web(brief, verify=False)
+        self.assertIn("PL1-RESIDUAL-TOKEN", {a.code for a in alerts})
+
+    def test_forbidden_markup_in_checks_is_alert(self):
+        card = _web_card("c1", checks=["<toggle> 점검", "점검2"])
+        brief = _web_brief("2026-07-06", [card])
+        alerts, _info = vpb.classify_web(brief, verify=False)
+        self.assertIn("PL3-FORBIDDEN-MD", {a.code for a in alerts})
+
+
+class TestRunWebAndAudit(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _write(self, name, data):
+        path = os.path.join(self.tmp, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, ensure_ascii=False)
+        return path
+
+    def test_run_web_clean_brief_ok(self):
+        brief = _web_brief("2026-07-06", [_web_card("c1")], tldr=["a", "b", "c"])
+        j = vpb.run_web("path.json", brief, verify=False)
+        self.assertTrue(j["ok"])
+        self.assertEqual(j["fail_count"], 0)
+        self.assertEqual(j["brief"]["title"], "a")
+
+    def test_run_web_leak_is_not_ok(self):
+        card = _web_card("c1", agency="MFDS",
+                         summary="https://www.mfds.go.kr/brd/m_99/view.do?seq=1")
+        brief = _web_brief("2026-07-06", [card])
+        j = vpb.run_web("path.json", brief, verify=False)
+        self.assertFalse(j["ok"])
+        self.assertEqual(j["fail_count"], 1)
+
+    def test_run_audit_prefers_web_over_notion(self):
+        """웹 발행본이 있으면 Notion 은 조회하지 않는다(중복 알림 방지)."""
+        self._write("brief_web_2026_07_06.json",
+                    _web_brief("2026-07-06", [_web_card("c1")]))
+        with mock.patch.object(vpb, "run") as mock_notion_run:
+            j = vpb.run_audit("tok", weekly_db_id="w", intake_db_id="i",
+                              verify=False, web_briefs_dir=self.tmp)
+        mock_notion_run.assert_not_called()
+        self.assertTrue(j["ok"])
+
+    def test_run_audit_falls_back_to_notion_when_no_web_brief(self):
+        """웹 브리프 디렉터리가 비어 있으면(과도기·마이그레이션 전) 기존 Notion 경로로."""
+        with mock.patch.object(vpb, "run",
+                               return_value=vpb.skipped_json("no token", skip_class="infra")
+                               ) as mock_notion_run:
+            j = vpb.run_audit("", weekly_db_id="w", intake_db_id="i",
+                              verify=False, web_briefs_dir=self.tmp)
+        mock_notion_run.assert_called_once_with(
+            "", weekly_db_id="w", intake_db_id="i", verify=False)
+        self.assertEqual(j["skip_class"], "infra")
 
 
 if __name__ == "__main__":

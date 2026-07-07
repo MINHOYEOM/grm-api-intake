@@ -565,12 +565,12 @@
     }
     var data = state.publishPr;
     if (!data || !data.pr) {
-      txt("grm-web-approve-pr", "이번 주 발행 PR 없음");
+      txt("grm-web-approve-pr", "이번 주 발행 PR이 아직 없습니다 — 월요일 오전 9시 30분에 자동 생성됩니다.");
       hide(previewLink, true);
       checksBadge.className = "admin-pill";
-      txt("grm-web-checks", "-");
+      txt("grm-web-checks", "대기");
       submitBtn.disabled = true;
-      setStatus(byId("grm-web-approve-status"), "", "");
+      setStatus(byId("grm-web-approve-status"), "지금은 할 일이 없습니다. PR이 생기면 이 카드에 미리보기 버튼이 나타납니다.", "");
       return;
     }
     var pr = data.pr;
@@ -595,7 +595,7 @@
     if (!data.gate_ok) {
       setStatus(byId("grm-web-approve-status"), errText({ data: { error: data.gate_reason } }) || "승인 게이트를 통과하지 못했습니다.", "err");
     } else {
-      setStatus(byId("grm-web-approve-status"), "승인 가능합니다. 미리보기를 확인한 뒤 승인하세요.", "");
+      setStatus(byId("grm-web-approve-status"), "미리보기에서 이번 주 카드를 확인한 뒤 승인을 누르세요. 승인하면 몇 분 안에 라이브 사이트가 바뀝니다.", "");
     }
   }
   function refreshAll() {

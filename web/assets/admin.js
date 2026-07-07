@@ -220,6 +220,16 @@
     not_a_publish_branch: "발행 브랜치가 아니어서 머지할 수 없습니다.",
     publish_pr_not_found: "이번 주 발행 PR을 찾지 못했습니다."
   };
+  var FRIENDLY_PURPOSE = {
+    intake_run: "규제기관 발표를 모아 정리합니다",
+    web_publish: "이번 주 브리프 초안과 미리보기를 만듭니다",
+    web_deploy: "사이트를 다시 빌드해 grm-solutions.com 에 반영합니다",
+    brief_audit: "발행된 카드의 원문 링크와 근거를 다시 검사합니다",
+    ci: "코드와 화면이 깨지지 않았는지 자동 테스트합니다",
+    newsletter_send: "최신호를 구독자 메일로 보냅니다",
+    admin_backend: "관리자 콘솔 백엔드를 배포합니다",
+    keepalive: "데이터베이스가 잠들지 않게 유지합니다"
+  };
   function errText(error) {
     if (!error) return "요청에 실패했습니다.";
     var data = error.data || {};
@@ -723,7 +733,7 @@
     if (!statusBits.length && warningTotal) statusBits.push(number(warningTotal) + "개 운영 경고");
     var message = "수집, 발행, 배포 워크플로우가 정상 범위입니다. 별도 조치 없이 정기 점검만 유지하면 됩니다.";
     if (kind === "bad") {
-      message = "다음 항목이 감지되었습니다: " + statusBits.join(", ") + ". 오른쪽 조치 항목에서 GitHub 로그를 열고 필요한 경우 복구 실행을 사용하세요.";
+      message = "다음 항목이 감지되었습니다: " + statusBits.join(", ") + ". 아래 '운영 이슈'에서 어떤 작업이 실패했는지 확인하고 필요한 경우 복구 실행을 사용하세요.";
     } else if (kind === "warn") {
       message = statusBits.join(", ") + " 상태입니다. 서비스가 멈춘 상태는 아니지만 최신 Run과 경고 Issue를 확인하는 것이 좋습니다.";
     }
@@ -807,7 +817,7 @@
           '<div class="admin-workflow-identity"><span class="admin-workflow-index">' + esc(meta.index) +
           '</span><div class="admin-workflow-name"><span class="admin-workflow-stage"><i class="ti ' + esc(meta.icon) + '"></i> ' +
           esc(meta.stage) + ' · ' + esc(wf.workflow || "") + '</span><b>' + esc(wf.label || wf.workflow || "-") + "</b></div></div>" +
-          '<div class="admin-workflow-quick"><i class="ti ti-history"></i><span>' + esc((wf.purpose || meta.pipelineDesc)) +
+          '<div class="admin-workflow-quick"><i class="ti ti-history"></i><span>' + esc((FRIENDLY_PURPOSE[wf.action] || wf.purpose || meta.pipelineDesc)) +
           " · 최근 " + esc(run ? fmtDate(run.created_at) : "기록 없음") + " · " + esc(run ? eventLabel(run.event) : "-") + "</span></div>" +
         '</div><div class="admin-workflow-action">' + badge(status, displayKind) +
           '<span class="admin-expand-label">상세 런북</span></div></summary>' +
@@ -827,6 +837,34 @@
         "</div></details>";
     }).join("");
   }
+  var FLOW_STAGES = [
+    { icon: "ti-database-import", title: "소식 수집", desc: "전 세계 규제기관 발표를 매일 새벽 자동으로 모읍니다.", when: "매일 새벽 · 자동", action: "intake_run" },
+    { icon: "ti-sparkles", title: "카드 선별", desc: "AI가 모인 소식 중 이번 주에 알릴 카드를 골라 정리합니다.", when: "월요일 아침 · 자동", action: null },
+    { icon: "ti-git-pull-request", title: "검토용 초안", desc: "이번 주 브리프 초안과 미리보기 화면을 자동으로 만듭니다.", when: "월요일 09:35 · 자동", action: "web_publish" },
+    { icon: "ti-shield-check", title: "승인 → 사이트 반영", desc: "운영자가 미리보기를 확인하고 승인하면 사이트가 새 브리프로 바뀝니다.", when: "월요일 · 운영자(맨 위 카드)", action: "web_deploy", human: true },
+    { icon: "ti-mail-forward", title: "뉴스레터 발송", desc: "새 브리프를 구독자 메일로 보냅니다.", when: "사이트 확인 후 · 운영자(뉴스레터 메뉴)", action: "newsletter_send", human: true }
+  ];
+  var FLOW_SUPPORT_CHIPS = [
+    { action: "ci", label: "코드·화면 자동 테스트" },
+    { action: "brief_audit", label: "카드 근거 재검사" },
+    { action: "admin_backend", label: "관리자 콘솔 백엔드" },
+    { action: "keepalive", label: "데이터베이스 유지" }
+  ];
+  function findWorkflowsByAction(action) {
+    var workflows = (state.ops && state.ops.workflows) || [];
+    return workflows.filter(function (wf) { return wf.action === action; });
+  }
+  function flowNodeStatus(stage) {
+    if (!stage.action) return { kind: "", dot: "", label: "자동 진행" };
+    var matches = findWorkflowsByAction(stage.action);
+    if (!matches.length) return { kind: "", dot: "", label: "기록 없음" };
+    var kind = "ok";
+    matches.forEach(function (wf) { kind = worseKind(kind, workflowDisplayKind(wf)); });
+    var label = kind === "bad" ? "실패" : (kind === "warn" ? "확인 필요" : "정상");
+    var anyRunning = matches.some(function (wf) { return wf.latest && wf.latest.status && wf.latest.status !== "completed"; });
+    if (anyRunning) { kind = "warn"; label = "실행 중"; }
+    return { kind: kind, dot: kind, label: label };
+  }
   function renderWorkflowPipeline(errorMessage) {
     var host = byId("grm-workflow-pipeline");
     if (!host) return;
@@ -839,25 +877,32 @@
       host.innerHTML = '<div class="admin-empty">운영 흐름을 불러오는 중입니다.</div>';
       return;
     }
-    var grouped = {};
-    workflows.forEach(function (wf) {
-      var meta = workflowMeta(wf);
-      var key = meta.stageKey || meta.stage;
-      if (!grouped[key]) grouped[key] = { meta: meta, kind: "ok", total: 0, bad: 0, warn: 0 };
-      var kind = workflowDisplayKind(wf);
-      grouped[key].kind = worseKind(grouped[key].kind, kind);
-      grouped[key].total += 1;
-      if (kind === "bad") grouped[key].bad += 1;
-      if (kind === "warn") grouped[key].warn += 1;
-    });
-    host.innerHTML = Object.keys(grouped).map(function (key) { return grouped[key]; })
-      .sort(function (a, b) { return a.meta.order - b.meta.order; })
-      .map(function (item) {
-        var status = item.bad ? item.bad + "개 실패" : (item.warn ? item.warn + "개 확인" : "정상");
-        return '<div class="admin-pipeline-step ' + esc(item.kind) + '"><span><i class="ti ' + esc(item.meta.icon) +
-          '"></i>' + esc(item.meta.index.replace(/[A-Z]$/, "")) + "단계</span><b>" + esc(item.meta.pipeline) +
-          '</b><em>' + esc(item.meta.pipelineDesc) + " · " + esc(status) + "</em></div>";
-      }).join("");
+    var nodesHtml = FLOW_STAGES.map(function (stage, i) {
+      var status = flowNodeStatus(stage);
+      var nodeClass = "admin-flow-node" + (status.kind ? " " + status.kind : "") + (stage.human ? " human" : "");
+      var dotHtml = status.dot ? '<span class="admin-dot ' + esc(status.dot) + '"></span>' : "";
+      var node = '<div class="' + nodeClass + '">' +
+        '<i class="ti ' + esc(stage.icon) + '"></i>' +
+        "<b>" + esc(stage.title) + "</b>" +
+        "<p>" + esc(stage.desc) + "</p>" +
+        '<span class="admin-flow-when">' + esc(stage.when) + "</span>" +
+        '<span class="admin-flow-status">' + dotHtml + esc(status.label) + "</span>" +
+        "</div>";
+      var arrow = i < FLOW_STAGES.length - 1 ? '<div class="admin-flow-arrow">→</div>' : "";
+      return node + arrow;
+    }).join("");
+    var chipsHtml = FLOW_SUPPORT_CHIPS.map(function (chip) {
+      var matches = findWorkflowsByAction(chip.action);
+      var dotKind = "";
+      if (matches.length) {
+        var kind = "ok";
+        matches.forEach(function (wf) { kind = worseKind(kind, workflowDisplayKind(wf)); });
+        dotKind = kind;
+      }
+      return '<span class="admin-flow-chip"><span class="admin-dot' + (dotKind ? " " + esc(dotKind) : "") + '"></span>' + esc(chip.label) + "</span>";
+    }).join("");
+    host.innerHTML = '<div class="admin-flow">' + nodesHtml + "</div>" +
+      '<div class="admin-flow-support"><span class="admin-flow-support-label">뒤에서 돌아가는 자동 검사</span>' + chipsHtml + "</div>";
   }
   function renderOpsIncidents(errorMessage) {
     var host = byId("grm-ops-incidents");

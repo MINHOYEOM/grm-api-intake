@@ -421,9 +421,17 @@ _BRIEF_MAX_DEPTH = 4          # callout>table>row 정도. 무한 재귀 방지.
 
 
 def fetch_latest_brief(token: str, db_id: str) -> dict[str, Any] | None:
-    """Weekly Brief DB 에서 가장 최근 발행 페이지 1건(메타) 조회."""
+    """Weekly Brief DB 에서 가장 최근 발행 페이지 1건(메타) 조회.
+
+    정렬 기준: `발행일` 속성 내림차순(1차) · `created_time` 내림차순(2차, tie-break).
+    created_time 단독 정렬 시 나중에 생성된 과거 주차 중복 페이지가 최신으로
+    잘못 선택되는 사고가 있었다(발행일 역행 회귀, Issue #110).
+    """
     ci = _ci()
-    body = {"page_size": 1, "sorts": [{"timestamp": "created_time", "direction": "descending"}]}
+    body = {"page_size": 1, "sorts": [
+        {"property": "발행일", "direction": "descending"},
+        {"timestamp": "created_time", "direction": "descending"},
+    ]}
     data = ci.notion_api_request(
         "POST", ci.NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
     results = data.get("results", [])

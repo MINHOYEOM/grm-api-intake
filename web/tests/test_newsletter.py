@@ -320,14 +320,22 @@ class NewsletterScheduleSendTest(unittest.TestCase):
     NAME = "GRM Weekly Brief — 2026-06-26 (No.2)"
 
     # ── 최신 발행일 해석(스케줄 진입점·하드코딩 0) ──
+    # ★기대치는 라이브 web/data/briefs 가 아니라 동결 fixture(single/)로 검증한다 —
+    # 라이브 대조는 새 브리프 발행마다 이 테스트 2개를 깨서 발행 PR CI 를 항구 red 로
+    # 만들던 결합(렌더 SINGLE_GOLDENS 분리 v1.80 과 동일 클래스, 2026-07-07 E2E 실측
+    # PR #127). 로직(ISO 사전식 max)은 fixture 로 동일하게 검증되고, 라이브 파손은
+    # WebLiveBriefsRenderSmokeTest·발행 파이프 assemble 게이트가 잡는다.
+    FIXED_DIR = WEB_DIR / "tests" / "fixtures" / "single"
+
     def test_resolve_latest_publish_date(self):
-        self.assertEqual(newsletter.resolve_latest_publish_date(DATA_DIR), "2026-07-06")
+        self.assertEqual(
+            newsletter.resolve_latest_publish_date(self.FIXED_DIR), "2026-07-06")
 
     def test_latest_date_cli_prints_only_date(self):
         # 워크플로 resolve 스텝이 $() 로 캡처 — 잡음 없이 날짜 한 줄만 나와야.
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            rc = newsletter.main(["--mode", "latest-date", "--data", str(DATA_DIR)])
+            rc = newsletter.main(["--mode", "latest-date", "--data", str(self.FIXED_DIR)])
         self.assertEqual(rc, 0)
         self.assertEqual(buf.getvalue().strip(), "2026-07-06")
 

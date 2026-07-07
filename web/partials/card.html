@@ -10,7 +10,7 @@
     {%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
-<article class="card{% if card.is_evA %} evA{% endif %}" id="{{ card.anchor }}">
+<article class="card{% if card.is_evA %} evA{% endif %}" id="{{ card.anchor }}" data-card-type="{{ card.card_type }}" data-signal-tier="{{ card.signal_tier }}" data-evidence="{{ card.evidence_level }}">
   <div class="c-title"><span class="pre">[{{ card.card_type }} · {{ card.agency }}]</span>{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
   <div class="badges"><span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span><span class="b ag">{{ card.agency }}</span><span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
   {%- if card.summary %}

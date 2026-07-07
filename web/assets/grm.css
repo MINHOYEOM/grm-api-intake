@@ -573,3 +573,18 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
   .nav nav a:hover{background:var(--soft)}
 }
+/* ── 카드 파트 — 섹션 접기 + 전체/요약 보기 토글(progressive; body.js-brief 활성) ──────
+   §4 한글안전: 색·굵기·transform·display 만(자간/대문자/mono 신규 0). .cresult/.toggle/.count 재사용. */
+.brief-bar{display:none}
+body.js-brief .brief-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 6px}
+.toggle.on-summary .slider{transform:translateX(100%)}
+/* 섹션 헤더 접기 어포던스 */
+body.js-brief .sec-h{cursor:pointer}
+.sec-chev{font-size:18px;color:var(--coral);transition:transform var(--tr);flex:none}
+.sec-h.collapsed .sec-chev{transform:rotate(-90deg)}
+/* 요약행 = .cresult 재사용. 기본 숨김, 요약 뷰에서만 전체 카드와 교대 노출. */
+.card-summary{display:none}
+body.brief-summary #cards article.card{display:none}
+body.brief-summary #cards .card-summary{display:grid}
+body.brief-summary #cards .grp-h{display:none}
+@media(prefers-reduced-motion:reduce){.sec-chev{transition:none}}

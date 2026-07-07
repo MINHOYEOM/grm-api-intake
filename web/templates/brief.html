@@ -31,15 +31,21 @@
       {%- endfor %}
       {%- endfor %}
     </div></aside>
-    <div id="cards">
+    <div id="cards" data-issue-no="{{ brief.issue_no }}" data-date="{{ brief.publish_date }}">
+      <div class="brief-bar" id="briefBar">
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체</button><button type="button" data-view="summary">요약</button></div>
+        <div class="right"><span class="count">카드 <b>{{ brief.coverage.rendered }}</b>장</span></div>
+      </div>
       {%- for section in sections %}
       <h2 class="sec-h" id="sec-{{ section.slug }}"><i class="ti {{ section.icon }}" style="color:var(--coral);font-size:20px"></i>{{ section.name }} <span class="n">{{ section.count }}장</span></h2>
+      <div class="sec-body" id="secbody-{{ section.slug }}">
       {%- for card in section.cards %}
       {%- if card.group_head %}
       <div class="grp-h">{{ card.group_head }}</div>
       {%- endif %}
       {% include "partials/card.html" %}
       {%- endfor %}
+      </div>
       {%- endfor %}
     </div>
   </div>
@@ -110,5 +116,70 @@
     if(best) setActive(best);
   },{rootMargin:'-88px 0px -55% 0px', threshold:0});
   targets.forEach(function(t){ io.observe(t); });
+})();
+/* 카드 파트 — 섹션 접기 + 전체/요약 보기 토글(progressive). 요약행은 각 카드에서 파생
+   (값은 data-* 로 무파싱, 뱃지는 노드 복제)해 카드 뒤 형제로 1회 주입 → CSS 로 전체/요약 교대.
+   요약 뷰에서 전체 카드가 display:none 이 되면 설계1 스크롤 스파이는 섹션 헤더만 관측(자동 강등).
+   §4 한글안전: 인라인 스타일/자간/대문자/mono 미사용. */
+(function(){
+  var cards=document.getElementById('cards'); if(!cards) return;
+  var toggle=document.getElementById('briefView');
+  function setView(v){
+    document.body.classList.toggle('brief-summary', v==='summary');
+    if(toggle){
+      toggle.classList.toggle('on-summary', v==='summary');
+      [].forEach.call(toggle.querySelectorAll('button'), function(b){
+        b.classList.toggle('on', b.getAttribute('data-view')===v);
+      });
+    }
+  }
+  document.body.classList.add('js-brief');
+
+  /* 섹션 접기 — 셰브런 주입 + 클릭/키보드 토글 */
+  [].forEach.call(cards.querySelectorAll('.sec-h'), function(h){
+    var slug=h.id.replace(/^sec-/,'');
+    var body=document.getElementById('secbody-'+slug); if(!body) return;
+    var chev=document.createElement('i');
+    chev.className='ti ti-chevron-down sec-chev'; chev.setAttribute('aria-hidden','true');
+    h.insertBefore(chev, h.firstChild);
+    h.setAttribute('role','button'); h.setAttribute('tabindex','0');
+    h.setAttribute('aria-expanded','true'); h.setAttribute('aria-controls', body.id);
+    function tog(){
+      var open=h.getAttribute('aria-expanded')!=='false';
+      h.setAttribute('aria-expanded', open?'false':'true');
+      body.hidden=open; h.classList.toggle('collapsed', open);
+    }
+    h.addEventListener('click', tog);
+    h.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();} });
+  });
+
+  /* 요약행 — 각 카드에서 파생, 카드 뒤 형제로 1회 주입 */
+  var issueNo=cards.getAttribute('data-issue-no')||'', date=cards.getAttribute('data-date')||'';
+  [].forEach.call(cards.querySelectorAll('article.card'), function(card){
+    var a=document.createElement('a');
+    a.className='cresult card-summary'; a.href='#'+card.id;
+    var badges=card.querySelector('.badges');
+    var bhtml=badges?badges.outerHTML:'';
+    var title=card.querySelector('.c-title'), tclone=title?title.cloneNode(true):null;
+    if(tclone){ var pre=tclone.querySelector('.pre'); if(pre)pre.parentNode.removeChild(pre); }
+    var thtml=tclone?tclone.innerHTML.trim():'';
+    var ct=card.getAttribute('data-card-type')||'';
+    var tier=card.getAttribute('data-signal-tier')||'', ev=card.getAttribute('data-evidence')||'';
+    var meta='<span class="mono">Vol.'+issueNo+' · '+date+'</span> · '+ct+' · Signal T'+tier+' · Evidence '+ev;
+    a.innerHTML='<div>'+bhtml+'<h4>'+thtml+'</h4><div class="meta">'+meta+'</div></div><i class="ti ti-arrow-right go" aria-hidden="true"></i>';
+    a.addEventListener('click', function(e){
+      e.preventDefault(); setView('full');
+      var t=document.getElementById(card.id);
+      if(t){ t.scrollIntoView({block:'start'}); if(history.replaceState) history.replaceState(null,'','#'+card.id); }
+    });
+    card.insertAdjacentElement('afterend', a);
+  });
+
+  /* 뷰 토글 배선 */
+  if(toggle){
+    toggle.addEventListener('click', function(e){
+      var b=e.target.closest('button'); if(b) setView(b.getAttribute('data-view'));
+    });
+  }
 })();
 </script>{% endblock %}

@@ -619,7 +619,7 @@ def main(argv: "list[str] | None" = None) -> int:
     args = p.parse_args(argv)
 
     token = os.environ.get("NOTION_TOKEN", "").strip()
-    weekly_db = os.environ.get("GRM_WEEKLY_BRIEF_DB_ID", DEFAULT_WEEKLY_BRIEF_DB_ID).strip()
+    weekly_db = (os.environ.get("GRM_WEEKLY_BRIEF_DB_ID") or DEFAULT_WEEKLY_BRIEF_DB_ID).strip()
     intake_db = (os.environ.get("NOTION_DATABASE_ID")
                  or os.environ.get("GRM_INTAKE_DB_ID")
                  or DEFAULT_INTAKE_DB_ID).strip()

@@ -491,6 +491,12 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 이 게이트의 통과/FAIL 을 브리프 슬롯·run-log 에 자기판정으로 서술하지 않는다(사실만).
 
 [2단계 (선택·additive) — 심층분석 deep_analysis fan-out (WL·MFDS 행정처분·FDA 483)]
+⚠️ [환경 가드 — 클라우드 Routines 전용 주의, 2026-07-07] 이 fan-out 절차는 python CLI·서브에이전트
+(Task) 도구가 있는 Claude Code 세션 전용이다. 네 실행 환경이 클라우드 Routines(커넥터=Notion 뿐,
+python/git/Task 없음)이면 이 단계를 **통째로 건너뛰고 6슬롯 델타만 예치**한다 — deep_analysis
+4섹션 JSON 을 게이트(verify_deep_analysis) 없이 손으로 작성해 deep 델타 블록에 넣지 않는다
+(deep_analysis 는 도구 있는 세션에서 수행된 것만 합류; 없으면 6슬롯만 발행 = 정상 graceful).
+run-log 에 "deep fan-out 환경 미지원 — skip {N}건" 한 줄만 남긴다.
 위 6슬롯 델타를 만든 뒤, 아래 [산출물] 발행(커밋·미리보기·사람 승인) 전에 수행한다. handoff 카드 중
 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 카드(FDA WL · MFDS 행정처분 · FDA 483)가 **있을 때만** — 없으면 이 단계를
 통째로 건너뛰고 6슬롯만 발행한다(정상·대다수 주). 절차 정본 = `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`. 요지:

@@ -1,0 +1,12 @@
+{
+  "batches": [
+    {
+      "name": "m1b-seed",
+      "input": "findings_m1b_sample_export.json"
+    },
+    {
+      "name": "m1f-source-coverage",
+      "input": "findings_m1f_source_coverage_export.json"
+    }
+  ]
+}

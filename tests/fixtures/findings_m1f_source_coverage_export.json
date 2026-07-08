@@ -1,0 +1,125 @@
+{
+  "collected_at": "2026-07-08T00:00:00+09:00",
+  "notion_snapshots": [
+    {
+      "page_id": "page-fda-483-192439",
+      "source": "FDA 483",
+      "document_id": "fda483-192439",
+      "date": "2026-05-27",
+      "headline": "[FDA 483] BPI Labs, LLC",
+      "official_url": "https://www.fda.gov/media/192439/download",
+      "source_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+      "type_or_class": "483",
+      "firm": "BPI Labs, LLC",
+      "modality": "Chemical",
+      "site_country": "United States"
+    },
+    {
+      "page_id": "page-mfds-gmp-table",
+      "source": "MFDS",
+      "document_id": "gmpinspect-1PyJBfLEtwC",
+      "date": "2026-06-30",
+      "headline": "GMP 정기실태조사 지적사항",
+      "type_or_class": "gmp-inspection",
+      "firm": "퍼슨",
+      "language": "KO",
+      "site_country": "대한민국"
+    },
+    {
+      "page_id": "page-fda-wl-660124",
+      "source": "FDA Warning Letter",
+      "document_id": "WL-CMS-660124",
+      "date": "2026-05-20",
+      "headline": "CGMP for finished pharmaceuticals",
+      "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660124",
+      "type_or_class": "Center for Drug Evaluation and Research (CDER)",
+      "firm": "Acme Pharmaceuticals, LLC",
+      "modality": "Chemical"
+    },
+    {
+      "page_id": "page-who-whopir-z",
+      "source": "WHO",
+      "document_id": "who-whopir-2026-11-ex",
+      "date": "2026-05-06",
+      "headline": "WHOPIR — Site Z",
+      "official_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z",
+      "type_or_class": "who-inspection",
+      "language": "EN"
+    },
+    {
+      "page_id": "page-who-whopir-link-only",
+      "source": "WHO",
+      "document_id": "who-whopir-link-only",
+      "date": "2026-05-07",
+      "headline": "WHOPIR — Link Only",
+      "official_url": "https://extranet.who.int/pqweb/inspection/whopir-link-only",
+      "type_or_class": "who-inspection",
+      "language": "EN"
+    }
+  ],
+  "raw_by_page_id": {
+    "page-fda-483-192439": {
+      "channel": "fda-483",
+      "fda_483_observations": [
+        {
+          "number": "1",
+          "deficiency": "There is a failure to thoroughly review any unexplained discrepancy.",
+          "detail": "The investigation did not extend to other potentially affected batches."
+        }
+      ],
+      "firm": "BPI Labs, LLC",
+      "media_id": "192439",
+      "pdf_url": "https://www.fda.gov/media/192439/download",
+      "record_type": "483"
+    },
+    "page-mfds-gmp-table": {
+      "manufacturer": "㈜퍼슨 천안공장",
+      "attachment_deficiency_assessment": "present",
+      "attachment_deficiency_excerpt": "평가 결과: 지적(보완)사항 시설장비 기타 제품 교차오염 방지 제조시설 운영할 것. 제조 중요 밸리데이션 규정 반영·실시할 것.",
+      "source_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
+      "gmp_deficiencies": [
+        {
+          "area": "시설장비",
+          "severity": "기타",
+          "legal_basis": "[별표1] 2.1호",
+          "summary": "제품 교차오염 방지 제조시설 운영할 것",
+          "followup": "이행계획 타당성 인정"
+        },
+        {
+          "area": "제조",
+          "severity": "중요",
+          "legal_basis": "[별표1] 6.1호 나목",
+          "summary": "밸리데이션 규정 반영·실시할 것",
+          "followup": "행정처분 예정"
+        },
+        {
+          "area": "품질",
+          "severity": "기타",
+          "legal_basis": "[별표1] 3.3호 하목",
+          "summary": "주성분 공급업체 평가방법 마련할 것",
+          "followup": "이행계획 타당성 인정"
+        }
+      ]
+    },
+    "page-fda-wl-660124": {
+      "firm": "Acme Pharmaceuticals, LLC",
+      "issuing_office": "Center for Drug Evaluation and Research (CDER)",
+      "subject": "CGMP/Finished Pharmaceuticals/Adulterated",
+      "url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/acme-660124",
+      "wl_body_excerpt": "During our inspection of your drug manufacturing facility, we observed significant violations of Current Good Manufacturing Practice (CGMP) regulations. Specifically, your firm failed to establish adequate written procedures for production and process controls."
+    },
+    "page-who-whopir-z": {
+      "anchor_text": "WHOPIR: Site Z, India (FPP)",
+      "channel": "whopir",
+      "list_page": "https://extranet.who.int/pqweb/inspection-services/whopir",
+      "pdf_url": "https://extranet.who.int/pqweb/sites/default/files/whopir-z.pdf",
+      "whopir_excerpt": "Summary of the deficiencies Three deficiencies were identified. 1. Quality management: the pharmaceutical quality system did not ensure timely closure of CAPA. 2. Production: cross-contamination controls were inadequate."
+    },
+    "page-who-whopir-link-only": {
+      "anchor_text": "WHOPIR: Link Only",
+      "channel": "whopir",
+      "list_page": "https://extranet.who.int/pqweb/inspection-services/whopir",
+      "pdf_url": "https://extranet.who.int/pqweb/sites/default/files/whopir-link-only.pdf"
+    }
+  }
+}

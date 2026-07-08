@@ -758,6 +758,79 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("translation_method", js_src)
         self.assertIn("fetchFindings(LEGACY_FIELDS)", js_src)
 
+    # ── FIND-1 M7: 대시보드 밴드(정적 셸=hidden 빈 컨테이너, 로직=findings.js) ──────────
+    def test_dash_shell_present_and_hidden_by_default(self):
+        """#fnd-dash 는 골든 결정론을 위해 항상 빈 컨테이너+hidden 셸로만 렌더된다
+        (통계/분포/추이/업체 실제 채움은 findings.js 가 런타임에 수행)."""
+        self.assertIn('<section class="fnd-dash" id="fnd-dash"', self.html)
+        self.assertIn('id="fnd-dash-stats"', self.html)
+        self.assertIn('id="fnd-dash-cat"', self.html)
+        self.assertIn('id="fnd-dash-month"', self.html)
+        self.assertIn('id="fnd-dash-firm"', self.html)
+        # hidden 속성이 #fnd-dash 여는 태그 자체에 붙어 있어야 한다(기본 숨김 셸).
+        import re as _re
+        m = _re.search(r'<section class="fnd-dash" id="fnd-dash"[^>]*>', self.html)
+        self.assertIsNotNone(m)
+        self.assertIn("hidden", m.group(0))
+        # 컨테이너는 항상 비어 있다(자식 마커·데이터 문자열 없음 — render() 이전 정적 셸).
+        self.assertIn('id="fnd-dash-stats"></div>', self.html)
+        self.assertIn('id="fnd-dash-cat" class="fnd-dash-cat"></div>', self.html)
+        self.assertIn('id="fnd-dash-month" class="fnd-dash-month"></div>', self.html)
+        self.assertIn('id="fnd-dash-firm" class="fnd-dash-firm"></div>', self.html)
+
+    def test_dash_compute_and_click_wiring_markers_present(self):
+        """집계는 순수 함수(computeStats 등)로 분리돼 있고, 카테고리/월/업체 클릭이 기존
+        state·select 값을 재사용해 render() 를 재호출하는 경로인지 소스 마커로 확인."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        for fn in ("computeStats", "computeAgencyDist", "computeCategoryDist",
+                   "computeMonthTrend", "computeFirmTop"):
+            self.assertIn("function " + fn + "(", js_src)
+        # 클릭 = 기존 state 필드 재사용(별도 상태 저장소 없음) + 기존 render() 재호출.
+        self.assertIn("state.category_code = state.category_code === code", js_src)
+        self.assertIn("state.month = state.month === month", js_src)
+        self.assertIn("state.q = state.q === name", js_src)
+        self.assertIn('document.getElementById("fnd-f-category")', js_src)
+        self.assertIn('document.getElementById("fnd-f-month")', js_src)
+        self.assertIn("function renderDash(matched)", js_src)
+        self.assertIn("renderDash(matched)", js_src)  # render() 에서 호출
+
+    def test_dash_accessibility_markers_present(self):
+        """클릭 가능한 대시보드 행(카테고리/월/업체)은 role=button+tabindex+키보드
+        Enter/Space 활성화를 갖춰야 한다(마우스 전용 UI 금지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('setAttribute("role", "button")', js_src)
+        self.assertIn("tabIndex = 0", js_src)
+        self.assertIn('setAttribute("aria-label"', js_src)
+        self.assertIn('ev.key === "Enter"', js_src)
+        self.assertIn('ev.key === " "', js_src)
+
+    def test_dash_hides_when_zero_results(self):
+        """데이터 로드 실패/0건이면 밴드 자체를 숨긴다(빈 필터 결과에서도 동일)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("if (!matched.length) {\n      dashEl.hidden = true;", js_src)
+
+    def test_dash_no_innerhtml_data_injection(self):
+        """대시보드 렌더 함수도 기존 계약(innerHTML 데이터 삽입 금지)을 따른다 — innerHTML
+        사용은 컨테이너 비우기(= \"\")뿐이어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_dash_no_new_external_resources(self):
+        """대시보드는 순수 vanilla JS/CSS 만 사용 — 새 CDN·스크립트·차트 라이브러리를 추가
+        하지 않는다. base.html 의 공통 폰트/아이콘 CDN(fonts.googleapis/cdn.jsdelivr)은
+        기존 계약이라 대상이 아니다 — findings.html/findings.js 소스 자체에 새 외부 참조나
+        차트 라이브러리 마커가 없는지 확인한다(div 막대만 사용)."""
+        findings_html_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        for forbidden in ("cdn.", "chart.js", "Chart.js", "d3.", "echarts",
+                           '<script src="http', "<canvas"):
+            self.assertNotIn(forbidden, findings_html_src, forbidden)
+            self.assertNotIn(forbidden, js_src, forbidden)
+        # findings.html 은 여전히 findings.js 하나만 <script> 로 참조한다(신규 태그 無).
+        self.assertEqual(findings_html_src.count("<script"), 1)
+
     def test_ai_disclosure_mentions_translation(self):
         # AI 고지 문단에 국문 해석=AI 번역·법적 판단은 원문 기준이라는 문장이 추가됐는지.
         self.assertIn("국문 해석", self.html)

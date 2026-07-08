@@ -36,9 +36,11 @@ findings_sqlite_backfill_dry_run*.json
 findings_sqlite_backfill_apply*.json
 findings_search_*.json
 findings_supabase_load*.json
+findings_taxonomy_migrate*.json
 grm-findings-supabase-apply*.sql
 grm-findings-search*.html
 grm-findings.sqlite3
+*.bak-v1
 *.sqlite3-shm
 *.sqlite3-wal
 

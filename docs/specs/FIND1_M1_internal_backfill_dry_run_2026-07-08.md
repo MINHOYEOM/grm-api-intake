@@ -1,7 +1,7 @@
 # FIND-1 M1h Internal Backfill Dry-Run
 
-> 날짜: 2026-07-08  
-> 범위: 내부 백필 실행 전 dry-run plan/report 고정  
+> 날짜: 2026-07-08
+> 범위: 내부 백필 실행 전 dry-run plan/report 고정
 > 금지: Notion API 조회, SQLite write, Supabase write, Status/handoff 변경
 
 ## 목적

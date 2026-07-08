@@ -167,15 +167,16 @@ def _insert_statements(
     columns: tuple[str, ...],
     records: list[dict[str, Any]],
     value_fn: Any,
-    conflict_column: str,
+    conflict_column: str = "",
 ) -> list[str]:
     columns_sql = ", ".join(columns)
     statements: list[str] = []
+    conflict_sql = f"on conflict ({conflict_column}) do nothing" if conflict_column else "on conflict do nothing"
     for batch in _batched(records, _BATCH_SIZE):
         values_sql = ", ".join(value_fn(record) for record in batch)
         statements.append(
             f"insert into public.{table} ({columns_sql}) values {values_sql} "
-            f"on conflict ({conflict_column}) do nothing;"
+            f"{conflict_sql};"
         )
     return statements
 
@@ -271,7 +272,6 @@ def build_supabase_load_plan(db_path: str | Path) -> dict[str, Any]:
         columns=findings_store.FINDING_SQLITE_COLUMNS,
         records=finding_records,
         value_fn=_finding_values_sql,
-        conflict_column="finding_id",
     ))
 
     counts = {

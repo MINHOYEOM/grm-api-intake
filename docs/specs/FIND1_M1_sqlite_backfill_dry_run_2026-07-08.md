@@ -1,7 +1,7 @@
 # FIND-1 M1i SQLite Backfill Transaction Dry-Run
 
-> 날짜: 2026-07-08  
-> 범위: M1h backfill dry-run plan의 SQLite write 경계 검증  
+> 날짜: 2026-07-08
+> 범위: M1h backfill dry-run plan의 SQLite write 경계 검증
 > 금지: SQLite 파일 write, Notion API 조회, Supabase write, Status/handoff 변경
 
 ## 목적

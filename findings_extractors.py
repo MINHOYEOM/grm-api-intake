@@ -318,11 +318,6 @@ def _extract_mfds_refs(text: str) -> list[str]:
     return refs
 
 
-def _dedupe_valid_findings(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    out, _report = _dedupe_valid_findings_with_report(findings)
-    return out
-
-
 def _dedupe_valid_findings_with_report(
     findings: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:

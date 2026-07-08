@@ -131,6 +131,61 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(len(findings), 2)
         self.assertEqual(len({f["finding_text"] for f in findings}), 2)
 
+    def test_with_report_clean_extraction_has_zero_drops(self) -> None:
+        raw_signal = _raw_signal("fda_483_observations")
+
+        findings, report = extractors.findings_from_raw_signal_with_report(raw_signal)
+
+        self.assertEqual(len(findings), 2)
+        self.assertEqual(
+            report,
+            {
+                "extracted": 2,
+                "kept": 2,
+                "dropped_invalid": 0,
+                "dropped_duplicate_text": 0,
+                "invalid_errors": [],
+            },
+        )
+
+    def test_with_report_counts_invalid_drop_when_evidence_url_is_missing(self) -> None:
+        fx = _load_input("warning_letter_excerpt")
+        fx["row"] = dict(fx["row"])
+        fx["row"].pop("official_url", None)
+        fx["row"].pop("source_url", None)
+        fx["row"].pop("api_query", None)
+        fx["raw"] = dict(fx["raw"])
+        fx["raw"].pop("url", None)
+        fx["raw"].pop("source_url", None)
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        self.assertEqual(gf.validate_raw_signal(raw_signal), [])
+
+        findings, report = extractors.findings_from_raw_signal_with_report(raw_signal)
+
+        self.assertEqual(findings, [])
+        self.assertEqual(report["extracted"], 1)
+        self.assertEqual(report["kept"], 0)
+        self.assertEqual(report["dropped_invalid"], 1)
+        self.assertEqual(report["dropped_duplicate_text"], 0)
+        self.assertEqual(report["invalid_errors"], ["findings.evidence_url required"])
+
+        # Unchanged public function still returns an empty list for this case.
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
+    def test_with_report_counts_duplicate_text_drop(self) -> None:
+        fx = _load_input("fda_483_observations")
+        fx["raw"]["fda_483_observations"].append(dict(fx["raw"]["fda_483_observations"][0]))
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+        findings, report = extractors.findings_from_raw_signal_with_report(raw_signal)
+
+        self.assertEqual(len(findings), 2)
+        self.assertEqual(report["extracted"], 3)
+        self.assertEqual(report["kept"], 2)
+        self.assertEqual(report["dropped_invalid"], 0)
+        self.assertEqual(report["dropped_duplicate_text"], 1)
+        self.assertEqual(report["invalid_errors"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

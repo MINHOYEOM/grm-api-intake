@@ -26,13 +26,27 @@ _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*"
 
 def findings_from_raw_signal(raw_signal: dict[str, Any]) -> list[dict[str, Any]]:
     """Extract deterministic v0 findings from one grm-raw-signal/v1 record."""
+    findings, _report = findings_from_raw_signal_with_report(raw_signal)
+    return findings
+
+
+def findings_from_raw_signal_with_report(
+    raw_signal: dict[str, Any],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Extract findings plus a diagnostic report distinguishing "nothing to
+    extract" from "extracted but dropped as invalid/duplicate".
+
+    Report keys: extracted (attempts before dedupe/validation), kept,
+    dropped_invalid, dropped_duplicate_text, invalid_errors (deduped, sorted
+    validate_finding error strings).
+    """
     if gf.validate_raw_signal(raw_signal):
-        return []
+        return [], _empty_extraction_report()
 
     raw = _json_object(raw_signal.get("raw_json"))
     row = _json_object(raw_signal.get("row_json"))
     if not raw:
-        return []
+        return [], _empty_extraction_report()
 
     signal = _raw_signal_with_firm_fallback(raw_signal, raw, row)
     findings: list[dict[str, Any]] = []
@@ -40,7 +54,17 @@ def findings_from_raw_signal(raw_signal: dict[str, Any]) -> list[dict[str, Any]]
     findings.extend(_from_mfds_gmp(signal, raw, row))
     findings.extend(_from_warning_letter(signal, raw, row))
     findings.extend(_from_whopir(signal, raw, row))
-    return _dedupe_valid_findings(findings)
+    return _dedupe_valid_findings_with_report(findings)
+
+
+def _empty_extraction_report() -> dict[str, Any]:
+    return {
+        "extracted": 0,
+        "kept": 0,
+        "dropped_invalid": 0,
+        "dropped_duplicate_text": 0,
+        "invalid_errors": [],
+    }
 
 
 def _from_fda_483_observations(
@@ -295,14 +319,35 @@ def _extract_mfds_refs(text: str) -> list[str]:
 
 
 def _dedupe_valid_findings(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    out, _report = _dedupe_valid_findings_with_report(findings)
+    return out
+
+
+def _dedupe_valid_findings_with_report(
+    findings: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     out: list[dict[str, Any]] = []
     seen_texts: set[str] = set()
+    dropped_invalid = 0
+    dropped_duplicate_text = 0
+    invalid_errors: set[str] = set()
     for finding in findings:
         key = _compact(finding.get("finding_text")).casefold()
         if not key or key in seen_texts:
+            dropped_duplicate_text += 1
             continue
-        if gf.validate_finding(finding):
+        errors = gf.validate_finding(finding)
+        if errors:
+            dropped_invalid += 1
+            invalid_errors.update(errors)
             continue
         seen_texts.add(key)
         out.append(finding)
-    return out
+    report = {
+        "extracted": len(findings),
+        "kept": len(out),
+        "dropped_invalid": dropped_invalid,
+        "dropped_duplicate_text": dropped_duplicate_text,
+        "invalid_errors": sorted(invalid_errors),
+    }
+    return out, report

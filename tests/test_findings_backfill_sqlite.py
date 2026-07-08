@@ -94,6 +94,33 @@ class FindingsBackfillSqliteTest(unittest.TestCase):
 
         self.assertEqual(rc, 2)
 
+    def test_cli_exits_3_when_plan_has_blocking_errors(self) -> None:
+        plan = _plan()
+        orphan = dict(plan["findings"][0])
+        orphan["finding_id"] = "finding-orphan"
+        orphan["raw_signal_id"] = "rawsig-missing"
+        plan["findings"].append(orphan)
+
+        with tempfile.TemporaryDirectory() as td:
+            plan_path = os.path.join(td, "plan_with_orphan.json")
+            with open(plan_path, "w", encoding="utf-8") as f:
+                json.dump(plan, f)
+            out = os.path.join(td, "findings_sqlite_backfill_dry_run.json")
+
+            rc = sqlite_dry_run.main(["--plan", plan_path, "--output", out, "--pretty"])
+
+            self.assertEqual(rc, 3)
+            with open(out, encoding="utf-8") as f:
+                result = json.load(f)
+            self.assertGreater(result["report"]["blocking_errors"], 0)
+
+    def test_cli_still_exits_0_when_plan_is_clean(self) -> None:
+        manifest = os.path.join(FIXTURES, "findings_m1h_backfill_manifest.json")
+
+        rc = sqlite_dry_run.main(["--manifest", manifest])
+
+        self.assertEqual(rc, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

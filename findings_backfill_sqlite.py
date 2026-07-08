@@ -233,9 +233,13 @@ def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Exit codes: 0 clean, 2 input/IO error, 3 blocking_errors > 0 or rollback not verified."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    parser = argparse.ArgumentParser(description="FIND-1 M1i SQLite backfill transaction dry-run")
+    parser = argparse.ArgumentParser(
+        description="FIND-1 M1i SQLite backfill transaction dry-run "
+        "(exit 0=clean, 2=input/IO error, 3=blocking_errors > 0 or rollback not verified)"
+    )
     parser.add_argument("--plan", help="M1h backfill dry-run plan JSON")
     parser.add_argument("--manifest", help="M1h manifest; builds a plan in memory before SQLite validation")
     parser.add_argument("--input", action="append", default=[], help="Exporter input JSON path, repeatable. Use NAME=PATH to name a batch")
@@ -253,7 +257,11 @@ def main(argv: list[str] | None = None) -> int:
         _write_json(args.output, result, pretty=args.pretty)
     else:
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2 if args.pretty else None))
-    return 0
+
+    report = result.get("report", {})
+    blocking_errors = int(report.get("blocking_errors") or 0)
+    rollback_verified = bool(result.get("transaction", {}).get("rollback_verified"))
+    return 3 if blocking_errors > 0 or not rollback_verified else 0
 
 
 if __name__ == "__main__":

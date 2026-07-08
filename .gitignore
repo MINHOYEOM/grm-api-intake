@@ -38,7 +38,10 @@ findings_search_*.json
 findings_supabase_load*.json
 findings_taxonomy_migrate*.json
 findings_translation_migrate*.json
+findings_translation_plan*.json
+findings_translation_apply*.json
 grm-findings-supabase-apply*.sql
+grm-findings-translations-*.sql
 grm-findings-search*.html
 grm-findings.sqlite3
 *.bak-v1

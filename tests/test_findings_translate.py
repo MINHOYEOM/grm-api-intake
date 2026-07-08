@@ -543,5 +543,475 @@ def _base_plan_with_valid_items_two_row(db_path: str) -> dict:
     return plan
 
 
+# ---------------------------------------------------------------------------
+# FIND-1 M8a: --source supabase (live PostgREST, anon read-only). All HTTP is
+# mocked via findings_translate.requests.get -- no real network access.
+# ---------------------------------------------------------------------------
+
+from unittest import mock  # noqa: E402  (M8a additions only; header untouched)
+
+
+_SB_URL = "https://example.supabase.co"
+_SB_KEY = "anon-public-key"
+
+
+class _FakeGetResponse:
+    def __init__(self, status_code: int, payload=None, headers=None):
+        self.status_code = status_code
+        self._payload = payload
+        self.headers = dict(headers or {})
+
+    def json(self):
+        if self._payload is None:
+            raise ValueError("no json body")
+        return self._payload
+
+
+def _sb_item(i: int, *, date: str = "2026-07-05") -> dict:
+    return {
+        "finding_id": f"f-{i:03d}",
+        "source": "FDA 483",
+        "agency": "FDA",
+        "category_code": "documentation",
+        "category_label_ko": "문서관리",
+        "published_date": date,
+        "firm_name": f"Firm {i}",
+        "finding_text": f"Observation number {i} was not documented.",
+        "finding_text_ko": "",
+        "translation_method": "",
+    }
+
+
+def _sb_live_row(item: dict, *, finding_text_ko: str = "") -> dict:
+    return {
+        "finding_id": item["finding_id"],
+        "finding_text": item["finding_text"],
+        "finding_text_ko": finding_text_ko,
+    }
+
+
+def _sb_filled_plan(items: list[dict]) -> dict:
+    filled = []
+    for item in items:
+        entry = dict(item)
+        entry["finding_text_ko"] = f"관찰사항 {entry['finding_id']} 국문 번역."
+        entry["translation_method"] = "llm_assisted"
+        filled.append(entry)
+    return {
+        "schema_version": translate.TRANSLATION_PLAN_SCHEMA_VERSION,
+        "items": filled,
+    }
+
+
+class SupabaseExportTest(unittest.TestCase):
+    def test_export_query_string_and_plan_structure(self) -> None:
+        rows = [_sb_item(1), _sb_item(2, date="2026-06-01")]
+        count_resp = _FakeGetResponse(200, [], headers={"Content-Range": "0-0/42"})
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(200, rows), count_resp],
+        ) as get:
+            plan = translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertEqual(get.call_count, 2)
+
+        export_args, export_kwargs = get.call_args_list[0]
+        self.assertEqual(export_args[0], f"{_SB_URL}/rest/v1/findings")
+        params = export_kwargs["params"]
+        self.assertEqual(params["finding_text_ko"], "eq.")
+        self.assertEqual(params["order"], "published_date.desc,finding_id.asc")
+        self.assertEqual(params["limit"], "1000")
+        self.assertEqual(
+            params["select"],
+            "finding_id,source,agency,category_code,category_label_ko,"
+            "published_date,firm_name,finding_text,finding_text_ko,translation_method",
+        )
+        self.assertEqual(export_kwargs["headers"]["apikey"], _SB_KEY)
+        self.assertEqual(export_kwargs["headers"]["Authorization"], f"Bearer {_SB_KEY}")
+        self.assertEqual(export_kwargs["timeout"], 15)
+
+        count_args, count_kwargs = get.call_args_list[1]
+        self.assertEqual(count_args[0], f"{_SB_URL}/rest/v1/findings")
+        self.assertEqual(count_kwargs["params"], {"select": "finding_id", "limit": "1"})
+        self.assertEqual(count_kwargs["headers"]["Prefer"], "count=exact")
+
+        self.assertEqual(plan["schema_version"], translate.TRANSLATION_PLAN_SCHEMA_VERSION)
+        self.assertEqual(
+            plan["source_db"],
+            {
+                "file_name": "supabase:example.supabase.co",
+                "findings_total": 42,
+                "untranslated": 2,
+            },
+        )
+        self.assertNotIn("truncated_possible", plan)
+        self.assertNotIn("count_unavailable", plan)
+        # item shape matches the sqlite export contract exactly
+        for item in plan["items"]:
+            self.assertEqual(
+                set(item.keys()),
+                {
+                    "finding_id",
+                    "source",
+                    "agency",
+                    "category_code",
+                    "category_label_ko",
+                    "published_date",
+                    "firm_name",
+                    "finding_text",
+                    "finding_text_ko",
+                    "translation_method",
+                },
+            )
+            self.assertEqual(item["finding_text_ko"], "")
+            self.assertEqual(item["translation_method"], "")
+
+    def test_export_truncated_possible_flag_at_limit(self) -> None:
+        rows = [_sb_item(i) for i in range(1000)]
+        count_resp = _FakeGetResponse(200, [], headers={"Content-Range": "0-0/2345"})
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(200, rows), count_resp],
+        ):
+            plan = translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertIs(plan["truncated_possible"], True)
+        self.assertEqual(plan["source_db"]["untranslated"], 1000)
+
+    def test_export_count_failure_falls_back_to_minus_one(self) -> None:
+        rows = [_sb_item(1)]
+        # count probe answers 200 but without a parseable Content-Range header
+        count_resp = _FakeGetResponse(200, [], headers={})
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(200, rows), count_resp],
+        ):
+            plan = translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertEqual(plan["source_db"]["findings_total"], -1)
+        self.assertIs(plan["count_unavailable"], True)
+        self.assertEqual(plan["source_db"]["untranslated"], 1)
+
+    def test_export_count_http_error_also_falls_back(self) -> None:
+        rows = [_sb_item(1)]
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(200, rows), _FakeGetResponse(403)],
+        ):
+            plan = translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertEqual(plan["source_db"]["findings_total"], -1)
+        self.assertIs(plan["count_unavailable"], True)
+
+    def test_export_5xx_retries_once_then_succeeds(self) -> None:
+        rows = [_sb_item(1)]
+        count_resp = _FakeGetResponse(200, [], headers={"Content-Range": "0-0/7"})
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(503), _FakeGetResponse(200, rows), count_resp],
+        ) as get:
+            plan = translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertEqual(get.call_count, 3)
+        self.assertEqual(plan["source_db"]["findings_total"], 7)
+        self.assertEqual(plan["source_db"]["untranslated"], 1)
+
+    def test_export_5xx_exhausted_raises_http_summary(self) -> None:
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(503), _FakeGetResponse(503)],
+        ) as get:
+            with self.assertRaises(ValueError) as ctx:
+                translate.build_translation_plan_supabase(_SB_URL, _SB_KEY)
+
+        self.assertEqual(get.call_count, 2)
+        self.assertIn("http_503", str(ctx.exception))
+        self.assertNotIn(_SB_KEY, str(ctx.exception))
+
+    def test_export_non_https_url_rejected_without_network(self) -> None:
+        with mock.patch("findings_translate.requests.get") as get:
+            with self.assertRaises(ValueError):
+                translate.build_translation_plan_supabase("http://example.supabase.co", _SB_KEY)
+        get.assert_not_called()
+
+
+class SupabaseApplyTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+
+    def _sql_path(self, name: str = "live-updates.sql") -> str:
+        return os.path.join(self._tmp.name, name)
+
+    def test_apply_valid_plan_writes_sql_only_report_and_sql_file(self) -> None:
+        items = [_sb_item(1), _sb_item(2)]
+        plan = _sb_filled_plan(items)
+        live_rows = [_sb_live_row(item) for item in items]
+        sql_path = self._sql_path()
+
+        with mock.patch(
+            "findings_translate.requests.get",
+            return_value=_FakeGetResponse(200, live_rows),
+        ) as get:
+            result = translate.apply_translations_supabase(
+                plan, _SB_URL, _SB_KEY, sql_output=sql_path
+            )
+
+        self.assertEqual(get.call_count, 1)
+        _, kwargs = get.call_args
+        self.assertEqual(
+            kwargs["params"]["select"], "finding_id,finding_text,finding_text_ko"
+        )
+        self.assertEqual(kwargs["params"]["finding_id"], "in.(f-001,f-002)")
+
+        self.assertEqual(result["mode"], "sql_only")
+        self.assertTrue(result["ready"])
+        self.assertEqual(result["validated"], 2)
+        self.assertEqual(result["updated"], 2)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["sql_output_path"], sql_path)
+
+        sql_text = open(sql_path, encoding="utf-8").read()
+        self.assertIn("update public.findings set", sql_text)
+        self.assertIn(fs.pg_quote_text("관찰사항 f-001 국문 번역."), sql_text)
+        self.assertIn(
+            f"and finding_text = {fs.pg_quote_text(items[0]['finding_text'])}", sql_text
+        )
+
+    def test_apply_finding_text_mismatch_blocks_and_writes_nothing(self) -> None:
+        items = [_sb_item(1)]
+        plan = _sb_filled_plan(items)
+        live_rows = [
+            {
+                "finding_id": "f-001",
+                "finding_text": "Live text differs from the plan.",
+                "finding_text_ko": "",
+            }
+        ]
+        sql_path = self._sql_path("blocked.sql")
+
+        with mock.patch(
+            "findings_translate.requests.get",
+            return_value=_FakeGetResponse(200, live_rows),
+        ):
+            result = translate.apply_translations_supabase(
+                plan, _SB_URL, _SB_KEY, sql_output=sql_path
+            )
+
+        self.assertFalse(result["ready"])
+        self.assertEqual(result["mode"], "sql_only")
+        self.assertEqual(result["updated"], 0)
+        self.assertEqual(result["sql_output_path"], "")
+        self.assertTrue(any("does not byte-match" in e for e in result["errors"]))
+        self.assertFalse(os.path.exists(sql_path))
+
+    def test_apply_skips_already_translated_without_overwrite(self) -> None:
+        items = [_sb_item(1), _sb_item(2)]
+        plan = _sb_filled_plan(items)
+        live_rows = [
+            _sb_live_row(items[0], finding_text_ko="이미 번역됨."),
+            _sb_live_row(items[1]),
+        ]
+        sql_path = self._sql_path("skip.sql")
+
+        with mock.patch(
+            "findings_translate.requests.get",
+            return_value=_FakeGetResponse(200, live_rows),
+        ):
+            result = translate.apply_translations_supabase(
+                plan, _SB_URL, _SB_KEY, sql_output=sql_path
+            )
+
+        self.assertTrue(result["ready"])
+        self.assertEqual(result["updated"], 1)
+        self.assertEqual(result["skipped_already_translated"], 1)
+        sql_text = open(sql_path, encoding="utf-8").read()
+        update_lines = [l for l in sql_text.splitlines() if l.startswith("update ")]
+        self.assertEqual(len(update_lines), 1)
+        self.assertIn("'f-002'", update_lines[0])
+
+    def test_apply_batches_in_filter_at_20_ids(self) -> None:
+        items = [_sb_item(i) for i in range(21)]  # f-000 .. f-020
+        plan = _sb_filled_plan(items)
+        first_batch_rows = [_sb_live_row(item) for item in items[:20]]
+        second_batch_rows = [_sb_live_row(items[20])]
+        sql_path = self._sql_path("batched.sql")
+
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[
+                _FakeGetResponse(200, first_batch_rows),
+                _FakeGetResponse(200, second_batch_rows),
+            ],
+        ) as get:
+            result = translate.apply_translations_supabase(
+                plan, _SB_URL, _SB_KEY, sql_output=sql_path
+            )
+
+        self.assertEqual(get.call_count, 2)
+        first_filter = get.call_args_list[0][1]["params"]["finding_id"]
+        second_filter = get.call_args_list[1][1]["params"]["finding_id"]
+        self.assertTrue(first_filter.startswith("in.(f-000,"))
+        self.assertEqual(len(first_filter[len("in.("):-1].split(",")), 20)
+        self.assertEqual(second_filter, "in.(f-020)")
+
+        self.assertTrue(result["ready"])
+        self.assertEqual(result["updated"], 21)
+
+    def test_apply_5xx_exhausted_raises_http_summary(self) -> None:
+        plan = _sb_filled_plan([_sb_item(1)])
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(503), _FakeGetResponse(503)],
+        ):
+            with self.assertRaises(ValueError) as ctx:
+                translate.apply_translations_supabase(
+                    plan, _SB_URL, _SB_KEY, sql_output=self._sql_path()
+                )
+        self.assertIn("http_503", str(ctx.exception))
+
+
+class SupabaseCliTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+
+    def _write_plan(self, plan: dict, name: str = "plan.json") -> str:
+        path = os.path.join(self._tmp.name, name)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(plan, f, ensure_ascii=False)
+        return path
+
+    def test_cli_write_file_rejected_for_supabase_source(self) -> None:
+        plan_path = self._write_plan(_sb_filled_plan([_sb_item(1)]))
+        with mock.patch("findings_translate.requests.get") as get:
+            rc = translate.main(
+                [
+                    "--source", "supabase",
+                    "--supabase-url", _SB_URL,
+                    "--supabase-anon-key", _SB_KEY,
+                    "--apply", plan_path,
+                    "--write-file",
+                    "--sql-output", os.path.join(self._tmp.name, "out.sql"),
+                ]
+            )
+        self.assertEqual(rc, 2)
+        get.assert_not_called()
+
+    def test_cli_missing_url_and_key_exits_2(self) -> None:
+        with mock.patch("findings_translate.requests.get") as get:
+            with mock.patch.dict(os.environ):
+                os.environ.pop("SUPABASE_URL", None)
+                os.environ.pop("SUPABASE_ANON_KEY", None)
+                rc = translate.main(["--source", "supabase", "--export"])
+        self.assertEqual(rc, 2)
+        get.assert_not_called()
+
+    def test_cli_apply_without_sql_output_exits_2(self) -> None:
+        plan_path = self._write_plan(_sb_filled_plan([_sb_item(1)]))
+        with mock.patch("findings_translate.requests.get") as get:
+            rc = translate.main(
+                [
+                    "--source", "supabase",
+                    "--supabase-url", _SB_URL,
+                    "--supabase-anon-key", _SB_KEY,
+                    "--apply", plan_path,
+                ]
+            )
+        self.assertEqual(rc, 2)
+        get.assert_not_called()
+
+    def test_cli_export_uses_env_fallback_credentials(self) -> None:
+        rows = [_sb_item(1)]
+        count_resp = _FakeGetResponse(200, [], headers={"Content-Range": "0-0/9"})
+        out = os.path.join(self._tmp.name, "plan-out.json")
+        with mock.patch(
+            "findings_translate.requests.get",
+            side_effect=[_FakeGetResponse(200, rows), count_resp],
+        ) as get:
+            with mock.patch.dict(
+                os.environ, {"SUPABASE_URL": _SB_URL, "SUPABASE_ANON_KEY": _SB_KEY}
+            ):
+                rc = translate.main(["--source", "supabase", "--export", "--output", out])
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(get.call_args_list[0][1]["headers"]["apikey"], _SB_KEY)
+        with open(out, encoding="utf-8") as f:
+            plan = json.load(f)
+        self.assertEqual(plan["source_db"]["file_name"], "supabase:example.supabase.co")
+        self.assertEqual(plan["source_db"]["findings_total"], 9)
+
+    def test_cli_apply_validation_failure_exits_3(self) -> None:
+        plan = _sb_filled_plan([_sb_item(1)])
+        plan["items"][0]["translation_method"] = "auto"
+        plan_path = self._write_plan(plan)
+        live_rows = [_sb_live_row(_sb_item(1))]
+        with mock.patch(
+            "findings_translate.requests.get",
+            return_value=_FakeGetResponse(200, live_rows),
+        ):
+            rc = translate.main(
+                [
+                    "--source", "supabase",
+                    "--supabase-url", _SB_URL,
+                    "--supabase-anon-key", _SB_KEY,
+                    "--apply", plan_path,
+                    "--sql-output", os.path.join(self._tmp.name, "out.sql"),
+                ]
+            )
+        self.assertEqual(rc, 3)
+
+
+class SqliteSourceRegressionTest(unittest.TestCase):
+    """--source defaults to sqlite and the sqlite path never touches the network."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.db_path = os.path.join(self._tmp.name, "grm-findings.sqlite3")
+        _seed_db(
+            self.db_path,
+            [
+                _pair(
+                    document_id="fda-1",
+                    firm="Acme Pharma",
+                    finding_text="Batch record review was skipped.",
+                    date="2026-07-05",
+                ),
+            ],
+        )
+
+    def test_default_source_matches_explicit_sqlite_and_never_uses_http(self) -> None:
+        out_default = os.path.join(self._tmp.name, "plan-default.json")
+        out_explicit = os.path.join(self._tmp.name, "plan-explicit.json")
+
+        with mock.patch("findings_translate.requests.get") as get:
+            rc_default = translate.main(
+                ["--db-path", self.db_path, "--export", "--output", out_default]
+            )
+            rc_explicit = translate.main(
+                [
+                    "--source", "sqlite",
+                    "--db-path", self.db_path,
+                    "--export",
+                    "--output", out_explicit,
+                ]
+            )
+
+        self.assertEqual(rc_default, 0)
+        self.assertEqual(rc_explicit, 0)
+        get.assert_not_called()
+        with open(out_default, encoding="utf-8") as f:
+            plan_default = json.load(f)
+        with open(out_explicit, encoding="utf-8") as f:
+            plan_explicit = json.load(f)
+        self.assertEqual(plan_default, plan_explicit)
+        self.assertEqual(plan_default["source_db"]["file_name"], "grm-findings.sqlite3")
+
+    def test_sqlite_source_without_db_path_exits_2(self) -> None:
+        rc = translate.main(["--export"])
+        self.assertEqual(rc, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

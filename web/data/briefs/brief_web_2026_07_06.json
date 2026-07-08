@@ -128,38 +128,32 @@
      {
       "observation": "비무균 조제구역(Non-Sterile Compounding Area) SOP인 ML WI-001-04에 따르면 가운을 착용한 직원은 조제구역 내에 머물러야 하나, 직원들이 뒷문으로 입장하여 장갑과 신발커버만 착용한 채 조제구역을 통과해 지하실로 이동하여 가운을 착용한 뒤 재입장하는 것이 관찰되었다.",
       "citation": "21 CFR 211.28",
-      "risk": "가운착용 절차 위반으로 조제구역 내 오염물질(입자·미생물) 유입 가능성이 높아져 제품 오염 및 교차오염 위험이 증가한다.",
-      "original": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+      "risk": "가운착용 절차 위반으로 조제구역 내 오염물질(입자·미생물) 유입 가능성이 높아져 제품 오염 및 교차오염 위험이 증가한다."
      },
      {
       "observation": "비HD 조제구역과 분리되어야 할 위험약물(HD) 조제·보관 구역 규정(SOP ML WI-001-05)을 위반하여, 약사보조원이 2025년 7월 15일 비HD 조제구역에서 Methimazole(경피용, 6mL 펜) 제품을 충전하는 것이 관찰되었다.",
       "citation": "21 CFR 211.42",
-      "risk": "위험약물과 일반약물 간 교차오염 가능성뿐 아니라 작업자의 위험약물 노출 위험이 발생한다.",
-      "original": "The master production and control records are not followed."
+      "risk": "위험약물과 일반약물 간 교차오염 가능성뿐 아니라 작업자의 위험약물 노출 위험이 발생한다."
      },
      {
       "observation": "배치기록에 Methimazole 2.5mg/0.1mL 경피용 제품을 특정 실린지에 조제한 뒤 이를 이용해 1mL·3mL·6mL·9mL 펜에 다시 충전하는 등 생산의 주요 단계에 대한 문서화가 누락되어 있다.",
       "citation": "21 CFR 211.188",
-      "risk": "배치이력 추적 불가로 제품 동일성·역가 확인이 어려워지고, 문제 발생 시 원인규명 및 회수 대상 배치 특정이 곤란해진다.",
-      "original": "Batch production and control records do not include complete information relating to the production and control of each batch."
+      "risk": "배치이력 추적 불가로 제품 동일성·역가 확인이 어려워지고, 문제 발생 시 원인규명 및 회수 대상 배치 특정이 곤란해진다."
      },
      {
       "observation": "세정제(sporicidal 제품)의 효능에 대해 자체 사내 효능시험을 실시하지 않고 제조사가 제공한 효능시험 자료 검토만으로 세정제의 적합성을 판단하였으며, 장비·기구의 세척 및 유지관리에 관한 문서화된 절차가 확립되어 있지 않다.",
       "citation": "21 CFR 211.67",
-      "risk": "실제 사용조건에서 세정제의 살균·살포자 효능이 검증되지 않아 잔류 오염 및 미생물 오염 위험이 존재한다.",
-      "original": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture processing, packing or holding of a drug product."
+      "risk": "실제 사용조건에서 세정제의 살균·살포자 효능이 검증되지 않아 잔류 오염 및 미생물 오염 위험이 존재한다."
      },
      {
       "observation": "완제의약품 출하 전 각 활성성분의 동일성 및 함량에 대한 적절한 실험실 시험 및 판정이 이루어지지 않고 있으며, 공급업체 성적서(CoA)만으로 원료(부형제 및 원료의약품 포함) 입고검사를 대체하고 있고 공급업체 신뢰성 확립 프로그램도 부재하다.",
       "citation": "21 CFR 211.165",
-      "risk": "출하되는 제품의 동일성·함량 미검증으로 인해 오조제, 함량 부적합, 오염된 원료 사용 등이 발견되지 못한 채 환자에게 투여될 위험이 있다.",
-      "original": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release."
+      "risk": "출하되는 제품의 동일성·함량 미검증으로 인해 오조제, 함량 부적합, 오염된 원료 사용 등이 발견되지 못한 채 환자에게 투여될 위험이 있다."
      },
      {
       "observation": "모든 완제의약품에 대해 사용기한(Beyond Use Date)을 설정하기 위한 안정성 특성 평가를 위한 문서화된 안정성시험 프로그램이 존재하지 않는다.",
       "citation": "21 CFR 211.166",
-      "risk": "과학적 근거 없이 설정된 사용기한으로 인해 유효기간 경과 후에도 효력이 저하되거나 분해산물이 생성된 제품이 환자에게 투여될 위험이 있다.",
-      "original": "Specific identification tests are not conducted on components that have been accepted based on the supplier's report of analysis."
+      "risk": "과학적 근거 없이 설정된 사용기한으로 인해 유효기간 경과 후에도 효력이 저하되거나 분해산물이 생성된 제품이 환자에게 투여될 위험이 있다."
      }
     ],
     "inspectional_significance": "이번 483은 단일한 국소적 결함이 아니라 품질관리 체계 전반에 걸친 구조적 문제를 보여준다. 무균/비무균 조제구역 가운착용 절차 미준수, 위험약물과 일반약물 조제구역 미분리, 배치기록 문서화 누락, 세정제 효능 미검증, 출하 전 동일성·함량 시험 부재, 원료 공급업체 신뢰성 프로그램 부재, 안정성시험 프로그램 부재 등 7개 관찰사항이 원료 입고부터 최종 출하까지 전 공정에 걸쳐 나타나고 있어 산발적 결함이라기보다 시스템적(systemic) 품질관리 실패에 가깝다. 특히 활성성분의 동일성·함량 확인 없이 제품이 출하되고 있다는 점과 안정성시험 프로그램 자체가 부재하다는 점은 환자 안전과 직결되는 중대한 결함으로, 데이터 완전성(data integrity) 문제로 명시적으로 지적되지는 않았으나 배치기록의 불완전성은 추적성과 신뢰성에 의문을 제기한다. 이러한 다수의 반복적·구조적 결함의 조합을 고려할 때 경고서한(Warning Letter)으로 격상될 가능성이 있으며, 이는 조제약국(compounding pharmacy) 성격의 시설로 보이는 점을 감안하면 규제기관의 후속 조치 강도가 더 높아질 가능성도 있다.",
@@ -239,22 +233,26 @@
      {
       "citation": "21 CFR 211.194(a)",
       "description": "미생물 배양접시에서 육안으로 확인된 성장이 있었음에도 다음날 동일 식별정보의 배지로 교체하여 무성장 결과를 조작하였고, 절차상 요구된 환경 모니터링·인적 모니터링 샘플 채취를 상습적으로 누락하였으며, 무균시험 등 미생물 시험기록 양식에 결과값을 사전 기재해 두는 관행이 확인되었다.",
-      "risk": "무균공정 라인의 ISO 5 환경 상태에 대한 데이터가 조작되어 실제 오염 여부를 신뢰할 수 없으며, 오염된 무균제제가 시장에 유통될 위험이 있다."
+      "risk": "무균공정 라인의 ISO 5 환경 상태에 대한 데이터가 조작되어 실제 오염 여부를 신뢰할 수 없으며, 오염된 무균제제가 시장에 유통될 위험이 있다.",
+      "original": "For example, our investigator observed (b)(4) personnel monitoring microbial plates in your laboratory incubator with visible microbial growth. The next day, our investigator observed microbial plates with the same identification information with no growth. Both management and a microbiologist confirmed that the original microbial plates were discarded and replaced with new plates."
      },
      {
       "citation": "21 CFR 211.42(c)(10)",
       "description": "OTC 무균제제를 생산하는 충전라인에 ISO 5(Grade A) 구역과 주변 ISO 7(Grade B) 구역 및 그 작업자를 분리하는 물리적 방벽이 전혀 없었고, 작업공간이 인체공학·인력동선·자재동선을 충족하지 못했으며 장비도 노후 상태였고 의미 있는 환경·인적 모니터링 프로그램이 부재했다.",
-      "risk": "무균 충전구역이 주변 등급 구역의 오염원에 그대로 노출되어 제품 오염 및 무균보증 실패로 이어질 위험이 크다."
+      "risk": "무균 충전구역이 주변 등급 구역의 오염원에 그대로 노출되어 제품 오염 및 무균보증 실패로 이어질 위험이 크다.",
+      "original": "For example, the inspection documented that your filling line has no physical barrier separating and protecting your ISO 5 (Grade A) aseptic filling line from the surrounding ISO 7 (Grade B) room and its personnel."
      },
      {
       "citation": "21 CFR 211.113(b)",
       "description": "배지충전(media fill) 무균공정 모의시험이 실제 상업 생산공정을 충분히 대표하지 못했고, 배치기록에 무균작업 중 참여 인원 및 개입(intervention) 내역이 기록되지 않았으며, 스모크 스터디(기류 시각화)가 동적 조건에서 수행되지 않았다.",
-      "risk": "무균공정 검증이 실제 생산조건을 반영하지 못해 오염 유입 경로를 사전에 식별·차단할 수 없는 위험이 있다."
+      "risk": "무균공정 검증이 실제 생산조건을 반영하지 못해 오염 유입 경로를 사전에 식별·차단할 수 없는 위험이 있다.",
+      "original": "Your aseptic process simulations (media fills) were not sufficiently representative of commercial aseptic manufacturing operations. Also, batch records lacked documentation of all personnel present and interventions conducted during aseptic manufacturing. Additionally, the airflow visualization (i.e., smoke studies) was not performed under dynamic conditions to assess the hazards posed by interventions into the aseptic processing line."
      },
      {
       "citation": "21 CFR 211.67(a)",
       "description": "충전라인의 핵심 무균공정 장비에서 육안으로 녹이 관찰되었고, 충전라인 상부 HEPA 필터와 디퓨저 그리드에도 얼룩과 녹이 확인되어 장비의 세척·유지관리·적정 주기 관리가 이루어지지 않았다.",
-      "risk": "부식된 장비 표면 및 오염된 HEPA 필터로 인해 이물 또는 미생물이 제품에 혼입될 위험이 있다."
+      "risk": "부식된 장비 표면 및 오염된 HEPA 필터로 인해 이물 또는 미생물이 제품에 혼입될 위험이 있다.",
+      "original": "your filling line was observed with apparent rust on the critical aseptic processing equipment, including the (b)(4). Also, our investigators observed stains and apparent rust on the HEPA filters and their diffuser grids above the filling line."
      }
     ],
     "fda_evaluation": "FDA는 회사의 2025년 12월 30일 Form FDA 483 답변 및 후속 서신을 검토한 결과 모든 핵심 사항에서 답변이 불충분(inadequate)하다고 평가하였다. 데이터 진실성 문제에 대해서는 회사가 조직적 문제의 존재를 인정하고 조사를 개시했음에도, 품질부서가 데이터 진실성 및 무균공정 관련 일탈을 탐지할 자원과 전문성을 갖추었다는 근거를 제시하지 못했다고 지적했다. 무균시설 적합성 문제에 대해서는 RABS 도입과 환경모니터링 프로그램 구축을 약속했으나 클린룸 설계를 포함한 시설 전반의 포괄적 적합성 평가가 결여되었다고 판단했다. 배지충전 관련 답변은 문제를 인정했으나 배치기록 개선에 대한 구체적 세부사항이 부족하다고 보았다. 장비 유지관리 문제에 대해서는 부식·노후 상태를 인정했음에도 시정조치가 제한적 수준에 그쳤고, 부적합 상태의 장비로 생산된 배치에 대한 소급적 위험평가를 실시하지 않았다고 지적하며 전반적으로 품질시스템이 CGMP에 부합하는 권한과 기능을 행사하지 못하고 있다고 결론지었다.",
@@ -332,22 +330,26 @@
      {
       "citation": "21 CFR 211.192",
       "description": "무균 의약품에 대한 고객 불만(용기 팁과 내부 캡의 곰팡이, 검은 반점, 변색 등 오염 흔적)을 충분히 조사하지 않았으며, 조사 범위를 적절히 확대하지 않고 과학적으로 뒷받침되는 근본원인 분석 없이 대부분의 원인을 고객의 부적절한 취급으로 결론지었다. 특히 실패한 불만 샘플에서 검출된 Alternaria alternata 균주가 해당 배치 제조 전후의 환경모니터링(EM/PM)에서도 동일하게 검출되었음에도 이 사실이 조사보고서에 포함되지 않았다.",
-      "risk": "최근 3년간 9건의 무균성 시험 실패 사례가 반복되고 있어 근본원인이 규명·차단되지 않은 채 오염된 무균제품이 지속 출하될 위험이 있다."
+      "risk": "최근 3년간 9건의 무균성 시험 실패 사례가 반복되고 있어 근본원인이 규명·차단되지 않은 채 오염된 무균제품이 지속 출하될 위험이 있다.",
+      "original": "Visible evidence of contamination included mold, black specks, and discoloration on the tips and inner caps of containers for your (b)(4) drug product, (b)(4). Several complaint samples subsequently failed sterility testing. Notably, nine such non-sterility events have occurred in the last three years."
      },
      {
       "citation": "21 CFR 211.113(b)",
       "description": "충전 라인 설치 중 작업자가 장갑으로 단방향 기류를 막았고, 라인 클리어런스를 수행하던 작업자가 머리와 상체를 ISO 5 충전구역 안으로 기울인 후 재진입 전 소독을 하지 않는 등 부적절한 무균작업 관행이 관찰되었다.",
-      "risk": "상용 생산 중 작업자의 무균기술을 정기적으로 모니터링하는 프로그램이 부재하여 과거 시정조치가 실패했던 것처럼 오염 재발 위험이 지속된다."
+      "risk": "상용 생산 중 작업자의 무균기술을 정기적으로 모니터링하는 프로그램이 부재하여 과거 시정조치가 실패했던 것처럼 오염 재발 위험이 지속된다.",
+      "original": "Personnel blocked unidirectional airflow to (b)(4) with their gloves during installation of the (b)(4) assembly. An operator conducting line clearance after setup leaned their head and torso through (b)(4) into the ISO 5 filling area and failed to disinfect the (b)(4) before (b)(4)."
      },
      {
       "citation": "21 CFR 211.42(c)(10)(i)",
       "description": "무균 작업구역의 바닥, 벽, 천장이 매끄럽고 단단하며 세척이 용이한 표면으로 구성되지 않았고, 2024년 1월부터 2026년 1월 사이 등급구역 내 다수의 누수 및 곰팡이 검출이 발생했으며, 충전 시 멸균 캡을 담는 캡보울 위 손잡이에 페인트가 벗겨진 검은 도장과 부식된 장비가 확인되었다.",
-      "risk": "시설·장비의 정기점검 체계와 종합적인 개선 완료 전 제조 중단 계획이 없어 오염원이 상존하는 환경에서 계속 생산이 이루어질 위험이 있다."
+      "risk": "시설·장비의 정기점검 체계와 종합적인 개선 완료 전 제조 중단 계획이 없어 오염원이 상존하는 환경에서 계속 생산이 이루어질 위험이 있다.",
+      "original": "The floors, walls, and ceilings in your aseptic processing area are not constructed of smooth, hard surfaces that can be easily cleaned, or were not adequately maintained."
      },
      {
       "citation": "21 CFR 211.42(c)(10)(v)",
       "description": "배치 간 핵심 장비 구성품을 멸균하지 않고 대신 살포자이드(sporicide)로 소독만 실시하고 있으며, 기기 설계상 일부 부품은 멸균이 불가능하다는 이유로 살포자이드 사용과 미생물 샘플링 증가만을 대안으로 제시했다.",
-      "risk": "살포자이드 소독, 샘플링 확대, 스와빙은 제품 접촉 장비의 멸균을 대체할 수 없어 이미 미국 시장에 유통 중인 제품의 무균성에 대한 영향평가가 이루어지지 않은 채 방치될 위험이 있다."
+      "risk": "살포자이드 소독, 샘플링 확대, 스와빙은 제품 접촉 장비의 멸균을 대체할 수 없어 이미 미국 시장에 유통 중인 제품의 무균성에 대한 영향평가가 이루어지지 않은 채 방치될 위험이 있다.",
+      "original": "you do not sterilize critical equipment components, such as bowls, (b)(4) that handle container/closure parts, between batches. Instead, you disinfect the (b)(4) product ISO 5 (Grade A) filling lines (b)(4) using sporicide and (b)(4)."
      }
     ],
     "fda_evaluation": "FDA는 2026년 2월 12일자 Form FDA 483 답변 및 후속 서신을 검토한 결과 네 가지 핵심 위반사항 모두에 대해 회사의 시정조치 답변이 부적절(inadequate)하다고 평가했다. 불만 조사와 관련해서는 고객의 부적절한 취급이 근본원인이라는 결론을 뒷받침할 근거가 전혀 제시되지 않았고, 출하 시 무균이었다면 어떻게 미생물이 오염되었는지에 대한 설명도 없다고 지적했으며, 용기-마개 시스템의 적합성 자체에 대해 깊은 우려를 표명했다. 무균작업 관행에 대해서는 절차 개정과 재교육, 제3자 컨설턴트 관찰 계획만으로는 상용 생산 중 무균기술을 상시 모니터링하는 프로그램 수립이 빠져 있어 불충분하다고 판단했으며, 과거 시정 시도가 이미 실패한 전례가 있음을 특히 우려했다. 시설 표면에 대해서는 보수·세척이 완료되었다는 답변만으로는 정기점검 체계와 종합 개선 완료 전 제조 중단 여부가 불명확하여 불충분하다고 보았다. 멸균 대체 문제에 대해서도 현재 미국 시장에 유통 중인 제품에 대한 영향평가와 향후 멸균 가능한 장비 사용에 대한 확약이 없다는 점에서 답변이 불충분하다고 결론지었다. 아울러 이전 경고서한(WL 320-25-70)에서 유사한 심각한 CGMP 위반이 이미 지적된 바 있어, 이번 위반의 재발은 이전 시정조치가 효과적이지도 지속적이지도 않았음을 보여준다고 평가했다.",
@@ -425,17 +427,20 @@
      {
       "citation": "21 CFR 211.22",
       "description": "품질관리부서(QU)가 의약품이 CGMP를 준수하여 제조되고 동일성·역가·품질·순도 규격에 적합하도록 보장할 책임을 이행하지 못했다. 데이터 완전성 관리 및 편차 조사 전반에 걸쳐 품질부서의 구조적 감독 실패가 확인되었다.",
-      "risk": "품질시스템 자체의 근본적 오류로 간주되어 개별 시정조치만으로는 해소되지 않으며, 전 제품(Thymoglobulin, Altuviiio) 배치 적합성에 대한 신뢰가 훼손될 위험이 있다."
+      "risk": "품질시스템 자체의 근본적 오류로 간주되어 개별 시정조치만으로는 해소되지 않으며, 전 제품(Thymoglobulin, Altuviiio) 배치 적합성에 대한 신뢰가 훼손될 위험이 있다.",
+      "original": "Your firm's quality control unit failed to exercise its responsibility to ensure that drug products are manufactured in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity, as required by 21 CFR 211.22."
      },
      {
       "citation": "21 CFR 211.194(a)",
       "description": "다수 배치에서 발생한 비생육 입자 이탈 및 반복적 시험 실패가 기기 이력에는 남아있음에도 실험실 기록에 문서화되어 검토·조사가 이루어지지 않았으며, 최대 11회까지 재시험이 문서화 없이 반복되었다. 또한 환경모니터링 기록상 활성 공기 샘플 수가 해당 샘플러의 기기 이력과 추적 일치하지 않았고, 품질관리 담당자가 비공식 검토용 체크리스트(uncontrolled Review Checklists)를 사용한 뒤 폐기하여 실험실 기록이 불완전했다.",
-      "risk": "시험 결과의 은폐 및 데이터 완전성 훼손으로 배치 방출 결정의 신뢰성이 무너지고, 데이터 인테그리티 위반으로 규제조치가 확대될 위험이 있다."
+      "risk": "시험 결과의 은폐 및 데이터 완전성 훼손으로 배치 방출 결정의 신뢰성이 무너지고, 데이터 인테그리티 위반으로 규제조치가 확대될 위험이 있다.",
+      "original": "Multiple non-viable particulate excursions and repeated (b)(4) test failures across multiple batches present in instrument histories were not documented in laboratory records for review and investigation. (b)(4) testing was repeated up to 11 times without documentation."
      },
      {
       "citation": "21 CFR 211.192",
       "description": "배치 또는 그 구성요소가 규격에 미달한 경우나 원인불명의 불일치에 대해 철저한 조사를 실시하지 못했으며, 실사 당시 다수의 편차가 근본원인 조사나 제품영향평가 없이 취소되었다.",
-      "risk": "품질에 영향을 미칠 수 있는 문제가 조사 없이 종결되어 불량 제품이 유통되었을 가능성을 배제할 수 없다."
+      "risk": "품질에 영향을 미칠 수 있는 문제가 조사 없이 종결되어 불량 제품이 유통되었을 가능성을 배제할 수 없다.",
+      "original": "at the time of the inspection, your firm cancelled numerous deviations without investigating the root cause or assessing product impact."
      }
     ],
     "fda_evaluation": "FDA는 회사가 2026년 2월 10일, 2월 26일, 4월 8일에 제출한 답변들을 검토한 결과, Form FDA-483의 개별 관찰사항에 대해서는 시정조치를 시행했다고 인정하면서도, 품질부서가 CGMP 준수를 보장하는 데 실패한 근본 원인을 다루는 포괄적 계획은 제시하지 못했다고 평가했다. 데이터 인테그리티와 관련해 회사가 '데이터에 대한 강력한 통제와 관리'를 갖추고 있다고 주장했음에도, 지적된 위반이 실제로 존재했다는 사실 자체가 그 통제 체계가 표방된 대로 작동하지 않았음을 보여주며, 데이터 인테그리티 문제가 실사에서 확인된 특정 시험장비·기록에 국한된다는 것을 입증할 충분한 근거도 제시되지 않았다고 판단했다. 취소된 편차와 관련해서도, 74건의 소급 검토 중 36건이 조사가 필요하다고 판단되었음에도 검토 대상 기간을 특정 범위로 한정한 데 대한 정당성이 충분히 제시되지 않았다고 지적했다. 충진 공정의 잔류물(orange material) 관련 사안에서도, 이미 승인·종결된 편차(QE-1679805) 내 기록 간 분석결과 불일치가 해소되지 않았고 조사가 해당 물질을 충분히 규명하지 못했다고 결론지었다.",
@@ -538,20 +543,17 @@
      {
       "observation": "ISO 7 무균작업 클린룸 내에서 기술자가 바닥의 이물을 집어 쓰레기통에 버리는 데 사용하는 도구의 소독 주기가 문서화되어 있지 않고, 보관 위치도 정의되지 않은 채 기술자들이 이를 약물 성분·기구·용기·완제품을 보관하는 장비 측면에 걸어두고 있었으며, 2026년 4월 20일 현장 점검 시 ISO 7 클린룸 내 해당 장비 표면 전체에서 미세척·미소독된 것으로 보이는 검은색 잔류물이 관찰되었다.",
       "citation": "21 CFR 211.113(b)",
-      "risk": "무균 클린룸 표면의 소독 절차 미비 및 잔류 오염물 방치로 인해 무균 공정 중 미생물 오염이 발생할 위험이 있다.",
-      "original": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+      "risk": "무균 클린룸 표면의 소독 절차 미비 및 잔류 오염물 방치로 인해 무균 공정 중 미생물 오염이 발생할 위험이 있다."
      },
      {
       "observation": "ISO 5 LAFH/BSC의 동적 스모크 스터디가 기류를 적절히 평가하지 못하여 부적절한 것으로 확인되었다.",
       "citation": "21 CFR 211.42(c)(10)",
-      "risk": "First Air(1차 공기) 품질 및 기류 패턴을 검증하지 못해 무균 충전 구역의 오염 방지 설계가 입증되지 않을 위험이 있다.",
-      "original": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+      "risk": "First Air(1차 공기) 품질 및 기류 패턴을 검증하지 못해 무균 충전 구역의 오염 방지 설계가 입증되지 않을 위험이 있다."
      },
      {
       "observation": "2024년 11월 14일 문서화된 부적합 IR-12512(DEV-02984) 검토에서, Fentanyl Citrate PF 50 mcg/mL Syringe(Lot 10138352) 조제 전 ISO 5 LAFH의 HEPA 필터 앞 그레이트에서 갈색~검은색 이물(HEPA 필터 외장 코팅에 사용되는 내열 실런트로 사후 확인됨)이 발견되었으나, 회사는 해당 HEPA 필터 열화 시작 시점 및 다른 ISO 5 LAFH/BSC의 영향 여부에 대한 충분한 문서적 증거를 제공하지 못했다.",
       "citation": "21 CFR 211.192",
-      "risk": "HEPA 필터 열화로 인한 입자성 오염이 마약성 무균주사제 제조 중 first air에 유입되어 제품 무균성 및 환자 안전에 직접적 위해를 초래할 위험이 있으며, 근본원인 및 영향범위 조사가 불완전하여 유사 로트로 오염이 확산되었을 가능성을 배제할 수 없다.",
-      "original": "Buildings used in the manufacturing, processing, packing and holding of a drug product are not maintained in a good state of repair."
+      "risk": "HEPA 필터 열화로 인한 입자성 오염이 마약성 무균주사제 제조 중 first air에 유입되어 제품 무균성 및 환자 안전에 직접적 위해를 초래할 위험이 있으며, 근본원인 및 영향범위 조사가 불완전하여 유사 로트로 오염이 확산되었을 가능성을 배제할 수 없다."
      },
      {
       "observation": "2026년 4월 20일 현장 점검에서 Suite 3 ISO 8 디가우닝룸 벽 모서리 및 ISO 7 클린룸 출입문 프레임 주변의 페인트가 벗겨진 상태가 관찰되어 건물이 양호한 보수 상태로 유지되지 않고 있음이 확인되었다.",

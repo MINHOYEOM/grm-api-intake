@@ -195,11 +195,18 @@ def assemble_deltas(jobs: Any, responses: dict[str, Any] | None) -> AssembleResu
                                                 "응답이 JSON 객체가 아님 — 6슬롯만으로 발행"))
             continue
         da = _unescape_entities(da)  # LLM 이 이스케이프한 &amp;/&lt; 등 → 원문자(이중 이스케이프 방지)
+        # [원문·국문 병기 2026-07-09] 483 fan-out 이 함께 산출하는 관찰 statement 국문 번역을
+        # deep_analysis(4섹션)와 분리한다 — 게이트는 4섹션만 검증하고, 번역은 별도 델타 키로
+        # 실어 inject_slots 가 deterministic_detail.observations 에 번호로 병합한다(선택·비게이트).
+        obs_ko = da.pop("observations_ko", None) if isinstance(da, dict) else None
         # card_type 을 넘겨 필수 섹션·D2 성격을 확정(483=CFR 인용 WARN). 빈값이면 게이트가
         # 산출물 키로 자동판별(WL·admin 후방호환 — Job.card_type 미설정 옛 jobs.json 도 안전).
         gate = vda.run_deep_analysis_gate(da, job.body_full, card_type=job.card_type or None)
         if gate.ok:
-            result.deltas[doc] = {"deep_analysis": da, "source_text": job.body_full}
+            delta: dict[str, Any] = {"deep_analysis": da, "source_text": job.body_full}
+            if isinstance(obs_ko, list) and obs_ko:
+                delta["observations_ko"] = obs_ko
+            result.deltas[doc] = delta
             result.outcomes.append(CardOutcome(doc, MERGED, gate.report))
         else:
             result.outcomes.append(CardOutcome(doc, GATE_FAILED, gate.report))

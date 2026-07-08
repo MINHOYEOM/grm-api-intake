@@ -289,7 +289,40 @@ def inject_deep_analysis(brief: dict[str, Any],
         if gate.warn_count:
             report.warnings.append(
                 f"deep_analysis[{doc_id!r}]: 게이트 WARN {gate.warn_count}건(병합은 진행)")
+        _merge_observation_translations(card, payload.get("observations_ko"), report, doc_id)
     return report
+
+
+def _merge_observation_translations(card: dict[str, Any], obs_ko: Any,
+                                    report: InjectionReport, doc_id: str) -> None:
+    """[원문·국문 병기 2026-07-09] fan-out 이 낸 관찰 statement 국문 번역을 이 카드의
+    deterministic_detail.observations 에 **번호(number)로 매칭** 병합(deficiency_ko/detail_ko).
+
+    결정론 English 관찰(수집기 산출)은 그대로 두고 국문만 additive 로 얹는다 → 웹 렌더가
+    원문(영문)+국문 병기. 번호가 안 맞거나 관찰 블록이 없으면 조용히 건너뛴다(비차단). 값은
+    문자열 강제·평문(렌더러가 이스케이프). deep_analysis 와 독립이라 실패해도 카드는 발행된다."""
+    if not isinstance(obs_ko, list) or not obs_ko:
+        return
+    dd = card.get("deterministic_detail")
+    if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
+        return
+    by_num = {str(o.get("number")): o for o in dd.get("observations", [])
+              if isinstance(o, dict)}
+    merged = 0
+    for t in obs_ko:
+        if not isinstance(t, dict):
+            continue
+        obs = by_num.get(str(t.get("number")))
+        if obs is None:
+            continue
+        if t.get("deficiency_ko"):
+            obs["deficiency_ko"] = str(t["deficiency_ko"])
+            merged += 1
+        if t.get("detail_ko"):
+            obs["detail_ko"] = str(t["detail_ko"])
+    if merged:
+        report.warnings.append(
+            f"observations_ko[{doc_id!r}]: 관찰 국문 번역 {merged}건 병합(원문+국문 병기)")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

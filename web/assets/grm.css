@@ -448,6 +448,14 @@ details.detail .lab{margin:0}
 .dt-law{font-family:var(--sans);font-size:12px;color:var(--muted)}
 .obs-num{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border-radius:5px;padding:2px 9px}
 .obs-row .dt-fu{display:block}
+/* [원문·국문 병기 2026-07-09] Observation statement 를 원문(영문 세리프)→국문 쌍으로. 위반
+   병기(.viol-orig/.viol-lang)와 동일 코럴 룰 언어. 원문 상세(.obs-en-det)는 verbatim 근거라
+   muted 영문 유지. deficiency_ko 없는 관찰은 이 블록 미출력(기존 영문만·additive). */
+.obs-orig{margin-top:9px;border-left:2px solid var(--coral);padding-left:12px}
+.obs-en{margin-top:4px;font-family:var(--serif);font-size:14px;line-height:1.55;color:var(--ink)}
+.obs-en-det{margin-top:6px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.obs-ko{margin-top:10px;padding-left:12px}
+.obs-ko .dt-sum{margin-top:4px}
 .dt-sum{margin-top:8px;font-size:14px;line-height:1.6;color:var(--body-s)}
 .dt-fu{margin-top:8px;display:flex;align-items:flex-start;gap:6px;font-size:13px;line-height:1.5;color:var(--muted)}
 .dt-fu i{flex:none;margin-top:2px;color:var(--coral-2)}

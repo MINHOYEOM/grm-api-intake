@@ -6,6 +6,7 @@ from __future__ import annotations
 import inspect
 import json
 import os
+import re
 import sqlite3
 import tempfile
 import unittest
@@ -241,6 +242,30 @@ class TaxonomyV2AlterMigrationTest(unittest.TestCase):
 
     def test_does_not_reclassify_existing_rows(self) -> None:
         self.assertNotIn("update public.findings", self.sql.lower())
+
+    def test_loop_variable_does_not_shadow_query_table_alias(self) -> None:
+        """Regression: a plpgsql record var reused as a query table alias makes
+        Postgres resolve `alias.column` as the not-yet-assigned plpgsql record
+        (ERROR 55000: record "..." is not assigned yet) instead of the SQL
+        alias. Live-tested failure on 2026-07-09 with `con`/`con` collision.
+        """
+        declare_match = re.search(r"declare\s+(\w+)\s+record;", self.sql)
+        self.assertIsNotNone(declare_match, "expected a `declare <name> record;` line")
+        record_var = declare_match.group(1)
+
+        loop_match = re.search(r"for\s+(\w+)\s+in", self.sql)
+        self.assertIsNotNone(loop_match, "expected a `for <name> in` loop")
+        self.assertEqual(loop_match.group(1), record_var, "loop variable must match declared record")
+
+        alias_match = re.search(r"from\s+pg_constraint\s+(\w+)", self.sql)
+        self.assertIsNotNone(alias_match, "expected `from pg_constraint <alias>`")
+        constraint_alias = alias_match.group(1)
+
+        self.assertNotEqual(
+            record_var, constraint_alias,
+            "plpgsql record variable must not share a name with a table alias "
+            "used inside its own FOR-loop query (ambiguous `alias.column` resolution)",
+        )
 
 
 class PgQuoteTextTest(unittest.TestCase):

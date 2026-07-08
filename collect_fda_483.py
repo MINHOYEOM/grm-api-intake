@@ -119,12 +119,26 @@ _DRUPAL_SETTINGS_RE = re.compile(
 )
 _OBS_RE = re.compile(r"\bOBSERVATION\s+(\d+)\b", re.I)
 _WE_OBSERVED_RE = re.compile(r"\b(?:I\s*/\s*)?WE\s+OBSERVED\b", re.I)
-_BOILERPLATE_RE = re.compile(
-    r"\b(?:SEE\s+REVERSE|EMPLOYEE\(S\)|DEPARTMENT\s+OF\s+HEAL(?:TH)?|"
-    r"FORM\s+FDA\s+483|INSPECTIONAL\s+OBSERVATIONS|DATE\s+ISSUED|"
-    r"PREVIOUS\s+EDITION|PAGE\s+\d+\s+OF\s+\d+)\b",
+# FDA 483 페이지 하단 서명/양식 푸터 블록 시작 마커. 스캔 OCR 이 이 블록의 텍스트를 자주
+# 깨뜨리고(EMPLOYEE(S)→EMPI..OYEE(S)/EMPLOYEE($), SIGNATURE→SIGNAT\JRE, FORM FDA 483→
+# FORM FDA 4&3), 심지어 Observation 본문 자리로 흘려보내(본문을 통째로 대체) 서명블록이
+# detail 로 들어온다(2026-07 Mixlab Obs2·5 실측 결함). 옛 정규식은 ① `EMPLOYEE\(S\)\b` 의
+# 후행 `\b` 가 `)` 뒤에서 성립하지 않아 이 마커를 아예 못 잡고 ② OCR 변형에 취약했다.
+# 아래는 가장 이른 푸터 마커에서 잘라내며, EMPLOYEE(S)/($) 는 소문자 산문("employees were
+# observed")과 달리 반드시 괄호 (S)/($) 를 동반하므로 오탐 없이 서명블록 시작을 잡는다.
+_FDA483_FOOTER_RE = re.compile(
+    r"EMP[LI][A-Z.]{0,4}OYEE\s*\([S$]\)"       # EMPLOYEE(S) / EMPI..OYEE(S) / EMPLOYEE($)
+    r"|\bSEE\s+REVERSE\b"
+    r"|\bFORM\s+FDA\s*4"                         # FORM FDA 483 / FORM FDA 4&3
+    r"|PREVIOUS[\s.]*EDITION"
+    r"|\bINSPECTIONAL\s+OBSERVATIONS?\b"
+    r"|\bDEPARTMENT\s+OF\s+HEAL(?:TH)?"
+    r"|\bDATE\s+ISSUED\b"
+    r"|\bPAGE\s+\d+\s+OF\s+\d+\b",
     re.I,
 )
+_BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안전)
+_DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으면 detail 을 비운다
 _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
@@ -460,13 +474,28 @@ def _text_corruption_ratio(text: str) -> float:
 
 
 def _clean_observation_chunk(chunk: str) -> str:
-    """Observation 본문 chunk 에서 페이지 머리말/서명 보일러플레이트를 제거."""
+    """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
-    m = _BOILERPLATE_RE.search(text)
+    m = _FDA483_FOOTER_RE.search(text)
     if m:
         text = text[:m.start()]
     text = re.sub(r"\s+", " ", text).strip(" :-\t\n")
     return text
+
+
+def _clean_observation_detail(detail: str) -> str:
+    """detail 잔여 푸터 절단 + 실질내용 검증. 'Specifically,' 만 남거나 알파벳 실질 내용이
+    `_DETAIL_MIN_ALPHA` 미만이면 빈 문자열을 돌려준다 — 서명블록이 본문 자리를 차지한 관찰
+    (Mixlab Obs2·5)은 deficiency 만 표시하고 detail 은 생략(garbage 미노출). 순수 함수.
+    (재추출뿐 아니라 이미 저장된 detail 문자열 재청소(backfill)에도 그대로 쓴다.)"""
+    text = re.sub(r"\s+", " ", detail or "").strip()
+    m = _FDA483_FOOTER_RE.search(text)
+    if m:
+        text = text[:m.start()].rstrip(" :-.\t")
+    core = re.sub(r"^\s*specifically[,:]?\s*", "", text, flags=re.I)
+    if len(re.sub(r"[^A-Za-z]", "", core)) < _DETAIL_MIN_ALPHA:
+        return ""
+    return text.strip()
 
 
 def _first_sentence(text: str) -> tuple[str, str]:
@@ -506,10 +535,11 @@ def _extract_483_observations_from_text(text: str) -> list[dict[str, str]]:
         deficiency, detail = _first_sentence(chunk)
         if not deficiency:
             continue
+        clean_detail = _clean_observation_detail(detail)
         row = {
             "number": obs.group(1),
             "deficiency": deficiency,
-            "detail": detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
+            "detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
         }
         out.append(row)
     return out

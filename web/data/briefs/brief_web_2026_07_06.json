@@ -128,32 +128,38 @@
      {
       "observation": "비무균 조제구역(Non-Sterile Compounding Area) SOP인 ML WI-001-04에 따르면 가운을 착용한 직원은 조제구역 내에 머물러야 하나, 직원들이 뒷문으로 입장하여 장갑과 신발커버만 착용한 채 조제구역을 통과해 지하실로 이동하여 가운을 착용한 뒤 재입장하는 것이 관찰되었다.",
       "citation": "21 CFR 211.28",
-      "risk": "가운착용 절차 위반으로 조제구역 내 오염물질(입자·미생물) 유입 가능성이 높아져 제품 오염 및 교차오염 위험이 증가한다."
+      "risk": "가운착용 절차 위반으로 조제구역 내 오염물질(입자·미생물) 유입 가능성이 높아져 제품 오염 및 교차오염 위험이 증가한다.",
+      "original": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
      },
      {
       "observation": "비HD 조제구역과 분리되어야 할 위험약물(HD) 조제·보관 구역 규정(SOP ML WI-001-05)을 위반하여, 약사보조원이 2025년 7월 15일 비HD 조제구역에서 Methimazole(경피용, 6mL 펜) 제품을 충전하는 것이 관찰되었다.",
       "citation": "21 CFR 211.42",
-      "risk": "위험약물과 일반약물 간 교차오염 가능성뿐 아니라 작업자의 위험약물 노출 위험이 발생한다."
+      "risk": "위험약물과 일반약물 간 교차오염 가능성뿐 아니라 작업자의 위험약물 노출 위험이 발생한다.",
+      "original": "The master production and control records are not followed."
      },
      {
       "observation": "배치기록에 Methimazole 2.5mg/0.1mL 경피용 제품을 특정 실린지에 조제한 뒤 이를 이용해 1mL·3mL·6mL·9mL 펜에 다시 충전하는 등 생산의 주요 단계에 대한 문서화가 누락되어 있다.",
       "citation": "21 CFR 211.188",
-      "risk": "배치이력 추적 불가로 제품 동일성·역가 확인이 어려워지고, 문제 발생 시 원인규명 및 회수 대상 배치 특정이 곤란해진다."
+      "risk": "배치이력 추적 불가로 제품 동일성·역가 확인이 어려워지고, 문제 발생 시 원인규명 및 회수 대상 배치 특정이 곤란해진다.",
+      "original": "Batch production and control records do not include complete information relating to the production and control of each batch."
      },
      {
       "observation": "세정제(sporicidal 제품)의 효능에 대해 자체 사내 효능시험을 실시하지 않고 제조사가 제공한 효능시험 자료 검토만으로 세정제의 적합성을 판단하였으며, 장비·기구의 세척 및 유지관리에 관한 문서화된 절차가 확립되어 있지 않다.",
       "citation": "21 CFR 211.67",
-      "risk": "실제 사용조건에서 세정제의 살균·살포자 효능이 검증되지 않아 잔류 오염 및 미생물 오염 위험이 존재한다."
+      "risk": "실제 사용조건에서 세정제의 살균·살포자 효능이 검증되지 않아 잔류 오염 및 미생물 오염 위험이 존재한다.",
+      "original": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture processing, packing or holding of a drug product."
      },
      {
       "observation": "완제의약품 출하 전 각 활성성분의 동일성 및 함량에 대한 적절한 실험실 시험 및 판정이 이루어지지 않고 있으며, 공급업체 성적서(CoA)만으로 원료(부형제 및 원료의약품 포함) 입고검사를 대체하고 있고 공급업체 신뢰성 확립 프로그램도 부재하다.",
       "citation": "21 CFR 211.165",
-      "risk": "출하되는 제품의 동일성·함량 미검증으로 인해 오조제, 함량 부적합, 오염된 원료 사용 등이 발견되지 못한 채 환자에게 투여될 위험이 있다."
+      "risk": "출하되는 제품의 동일성·함량 미검증으로 인해 오조제, 함량 부적합, 오염된 원료 사용 등이 발견되지 못한 채 환자에게 투여될 위험이 있다.",
+      "original": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release."
      },
      {
       "observation": "모든 완제의약품에 대해 사용기한(Beyond Use Date)을 설정하기 위한 안정성 특성 평가를 위한 문서화된 안정성시험 프로그램이 존재하지 않는다.",
       "citation": "21 CFR 211.166",
-      "risk": "과학적 근거 없이 설정된 사용기한으로 인해 유효기간 경과 후에도 효력이 저하되거나 분해산물이 생성된 제품이 환자에게 투여될 위험이 있다."
+      "risk": "과학적 근거 없이 설정된 사용기한으로 인해 유효기간 경과 후에도 효력이 저하되거나 분해산물이 생성된 제품이 환자에게 투여될 위험이 있다.",
+      "original": "Specific identification tests are not conducted on components that have been accepted based on the supplier's report of analysis."
      }
     ],
     "inspectional_significance": "이번 483은 단일한 국소적 결함이 아니라 품질관리 체계 전반에 걸친 구조적 문제를 보여준다. 무균/비무균 조제구역 가운착용 절차 미준수, 위험약물과 일반약물 조제구역 미분리, 배치기록 문서화 누락, 세정제 효능 미검증, 출하 전 동일성·함량 시험 부재, 원료 공급업체 신뢰성 프로그램 부재, 안정성시험 프로그램 부재 등 7개 관찰사항이 원료 입고부터 최종 출하까지 전 공정에 걸쳐 나타나고 있어 산발적 결함이라기보다 시스템적(systemic) 품질관리 실패에 가깝다. 특히 활성성분의 동일성·함량 확인 없이 제품이 출하되고 있다는 점과 안정성시험 프로그램 자체가 부재하다는 점은 환자 안전과 직결되는 중대한 결함으로, 데이터 완전성(data integrity) 문제로 명시적으로 지적되지는 않았으나 배치기록의 불완전성은 추적성과 신뢰성에 의문을 제기한다. 이러한 다수의 반복적·구조적 결함의 조합을 고려할 때 경고서한(Warning Letter)으로 격상될 가능성이 있으며, 이는 조제약국(compounding pharmacy) 성격의 시설로 보이는 점을 감안하면 규제기관의 후속 조치 강도가 더 높아질 가능성도 있다.",
@@ -532,17 +538,20 @@
      {
       "observation": "ISO 7 무균작업 클린룸 내에서 기술자가 바닥의 이물을 집어 쓰레기통에 버리는 데 사용하는 도구의 소독 주기가 문서화되어 있지 않고, 보관 위치도 정의되지 않은 채 기술자들이 이를 약물 성분·기구·용기·완제품을 보관하는 장비 측면에 걸어두고 있었으며, 2026년 4월 20일 현장 점검 시 ISO 7 클린룸 내 해당 장비 표면 전체에서 미세척·미소독된 것으로 보이는 검은색 잔류물이 관찰되었다.",
       "citation": "21 CFR 211.113(b)",
-      "risk": "무균 클린룸 표면의 소독 절차 미비 및 잔류 오염물 방치로 인해 무균 공정 중 미생물 오염이 발생할 위험이 있다."
+      "risk": "무균 클린룸 표면의 소독 절차 미비 및 잔류 오염물 방치로 인해 무균 공정 중 미생물 오염이 발생할 위험이 있다.",
+      "original": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
      },
      {
       "observation": "ISO 5 LAFH/BSC의 동적 스모크 스터디가 기류를 적절히 평가하지 못하여 부적절한 것으로 확인되었다.",
       "citation": "21 CFR 211.42(c)(10)",
-      "risk": "First Air(1차 공기) 품질 및 기류 패턴을 검증하지 못해 무균 충전 구역의 오염 방지 설계가 입증되지 않을 위험이 있다."
+      "risk": "First Air(1차 공기) 품질 및 기류 패턴을 검증하지 못해 무균 충전 구역의 오염 방지 설계가 입증되지 않을 위험이 있다.",
+      "original": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
      },
      {
       "observation": "2024년 11월 14일 문서화된 부적합 IR-12512(DEV-02984) 검토에서, Fentanyl Citrate PF 50 mcg/mL Syringe(Lot 10138352) 조제 전 ISO 5 LAFH의 HEPA 필터 앞 그레이트에서 갈색~검은색 이물(HEPA 필터 외장 코팅에 사용되는 내열 실런트로 사후 확인됨)이 발견되었으나, 회사는 해당 HEPA 필터 열화 시작 시점 및 다른 ISO 5 LAFH/BSC의 영향 여부에 대한 충분한 문서적 증거를 제공하지 못했다.",
       "citation": "21 CFR 211.192",
-      "risk": "HEPA 필터 열화로 인한 입자성 오염이 마약성 무균주사제 제조 중 first air에 유입되어 제품 무균성 및 환자 안전에 직접적 위해를 초래할 위험이 있으며, 근본원인 및 영향범위 조사가 불완전하여 유사 로트로 오염이 확산되었을 가능성을 배제할 수 없다."
+      "risk": "HEPA 필터 열화로 인한 입자성 오염이 마약성 무균주사제 제조 중 first air에 유입되어 제품 무균성 및 환자 안전에 직접적 위해를 초래할 위험이 있으며, 근본원인 및 영향범위 조사가 불완전하여 유사 로트로 오염이 확산되었을 가능성을 배제할 수 없다.",
+      "original": "Buildings used in the manufacturing, processing, packing and holding of a drug product are not maintained in a good state of repair."
      },
      {
       "observation": "2026년 4월 20일 현장 점검에서 Suite 3 ISO 8 디가우닝룸 벽 모서리 및 ISO 7 클린룸 출입문 프레임 주변의 페인트가 벗겨진 상태가 관찰되어 건물이 양호한 보수 상태로 유지되지 않고 있음이 확인되었다.",

@@ -291,6 +291,57 @@ class WebRenderStructureTest(unittest.TestCase):
         self.assertIn('<div class="t">① ', h)                # 번역 줄에도 마크
         self.assertIn('<div class="t">② ', h)
 
+    def _render_card_partial(self, card: dict) -> str:
+        """card.html 파셜만 단독 렌더(합성 카드 뷰 → 마크업). 골든과 무관한 유닛 경로."""
+        env = render._make_env()
+        view = render._card_view(card)
+        return env.get_template("partials/card.html").render(card=view)
+
+    def test_violation_bilingual_pair_when_original_present(self):
+        # [원문·국문 병기 2026-07-08] deep_analysis 위반에 original 이 있으면 원문(세리프)+국문
+        # 해석 쌍으로 렌더. original 은 raw 통과(사실 무변형)이므로 값 그대로 나와야 한다.
+        card = {
+            "id": "wl-x", "render_order": 1, "evidence_level": "A",
+            "headline_target": "Acme Pharma", "agency": "FDA", "card_type": "Warning Letter",
+            "deep_analysis": {
+                "key_violations": [{
+                    "citation": "21 CFR 211.194(a)",
+                    "original": "Your firm failed to establish adequate written procedures.",
+                    "description": "귀사는 적절한 서면 절차를 수립하지 못했다.",
+                    "risk": "데이터 신뢰성 저하 위험.",
+                }],
+                "fda_evaluation": "x" * 30,
+                "required_remediation": {"deadline": "15영업일", "items": ["원인 조사"]},
+                "administrative_risks": "y" * 30,
+            },
+        }
+        h = self._render_card_partial(card)
+        self.assertIn('<div class="viol-orig"><span class="viol-lang">원문 · 규제 원어</span>', h)
+        self.assertIn('<p class="viol-o">Your firm failed to establish adequate written '
+                      'procedures.</p>', h)                      # 원문 verbatim
+        self.assertIn('<span class="viol-lang ko">국문 해석</span>귀사는 적절한 서면 절차를', h)
+
+    def test_violation_korean_only_when_no_original(self):
+        # original 미보유(백필 전·구데이터) 카드는 병기 마크업이 전혀 없어야 한다(현행 바이트 불변).
+        card = {
+            "id": "wl-y", "render_order": 1, "evidence_level": "A",
+            "headline_target": "Beta Pharma", "agency": "FDA", "card_type": "Warning Letter",
+            "deep_analysis": {
+                "key_violations": [{
+                    "citation": "21 CFR 211.100",
+                    "description": "귀사는 절차를 준수하지 않았다.",
+                    "risk": "품질 위험.",
+                }],
+                "fda_evaluation": "x" * 30,
+                "required_remediation": {"deadline": "15영업일", "items": ["시정"]},
+                "administrative_risks": "y" * 30,
+            },
+        }
+        h = self._render_card_partial(card)
+        self.assertNotIn("viol-orig", h)
+        self.assertNotIn("viol-lang", h)
+        self.assertIn('<p class="viol-desc">귀사는 절차를 준수하지 않았다.</p>', h)  # 현행 형태 그대로
+
     def test_filled_prose_rendered_in_synthetic(self):
         h = (self.multi / "briefs/2026-06-08/index.html").read_text(encoding="utf-8")
         self.assertIn('class="summary"', h)

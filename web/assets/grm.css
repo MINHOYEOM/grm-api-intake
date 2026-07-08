@@ -410,7 +410,16 @@ details.deep .lab{margin:0;flex-wrap:wrap;row-gap:5px}
 /* ① Key Violations — 위반 항목별 카드 블록(조항 코드배지 · 설명 문단 · 점선 아래 경고색 리스크) */
 .viol{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 14px;margin-top:9px}
 .viol-cite{display:inline-block;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);background:var(--strong);border-radius:5px;padding:2px 8px}
+/* [원문·국문 병기 2026-07-08] 위반 항목의 규제 원문(원어) → 국문 해석 쌍. Recall .quote(.o/.t)에서
+   검증된 원문/번역 병기 패턴을 위반 단위로 확장: 코럴 좌측 룰이 "같은 위반의 두 언어"임을 묶고,
+   원문은 세리프(인용·권위 톤)·국문 해석은 산세리프(가독). 신규 색 0(기존 토큰만 — §4 동결 규칙 준수).
+   .viol-lang 라벨은 원문/국문 짝을 명시(원문=코럴 eyebrow·영문 자간 허용, .ko=한글이라 자간 0·§4). */
+.viol-orig{margin-top:9px;border-left:2px solid var(--coral);padding-left:12px}
+.viol-lang{display:block;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--coral-2)}
+.viol-lang.ko{letter-spacing:0;text-transform:none;color:var(--muted)}  /* 한글 라벨 — 자간·대문자 금지(§4) */
+.viol-o{margin-top:4px;font-family:var(--serif);font-size:14.5px;line-height:1.6;color:var(--ink)}
 .viol-desc{margin-top:8px;font-size:14px;line-height:1.6;color:var(--body-s)}
+.viol-orig+.viol-desc{margin-top:11px;padding-left:12px}  /* 원문 병기 시 국문 해석도 동일 들여쓰기로 쌍 정렬 */
 .viol-risk{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line-2);font-size:13px;line-height:1.55;color:var(--coral-2)}
 /* ③ Required Remediation — 마감기한 한 줄 + 체크(✓) 리스트(단일 마커 — 점검사항 .chk 와 구분) */
 .rem-deadline{font-size:13.5px;color:var(--body-s);margin-top:2px}

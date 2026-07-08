@@ -24,8 +24,8 @@
 ```json
 {
   "key_violations": [
-    {"citation": "21 CFR 211.192", "description": "…", "risk": "…"},
-    {"citation": "21 CFR 211.113(b)", "description": "…", "risk": "…"}
+    {"citation": "21 CFR 211.192", "original": "…원문 발췌…", "description": "…", "risk": "…"},
+    {"citation": "21 CFR 211.113(b)", "original": "…원문 발췌…", "description": "…", "risk": "…"}
   ],
   "fda_evaluation": "…",
   "required_remediation": {"deadline": "…", "items": ["…", "…"]},
@@ -37,19 +37,29 @@
   **모두** 있어야 한다. 하나라도 비면 게이트 D1 FAIL → 이 카드는 심층분석 없이 발행된다.
 - **`overview` 키는 없다**(§2.5 로 삭제 — 표·핵심사실과 중복이라 6슬롯 요약이 흡수).
 - 산문(description·risk·fda_evaluation·administrative_risks·items)은 **한국어**로 쓴다.
+- **`original`(원문 병기)은 영어 그대로** 둔다(번역하지 마라) — 아래 ① 참조.
 - 출력은 **순수 평문**이다 — `&`·`<`·`>` 를 HTML 엔티티(`&amp;`·`&lt;`)로 이스케이프하지 마라
   (예: 원문 `FD&C Act` → `FD&C Act` 그대로, `FD&amp;C` 금지). HTML 이스케이프는 렌더러가 담당한다.
 
 ## 3. 섹션별 작성 규칙
 
 ### ① key_violations (위반 항목 배열, 2~4개 권장)
-각 항목은 `{citation, description, risk}`:
+각 항목은 `{citation, original, description, risk}`:
 - **`citation`** — 그 위반의 근거 조항. **원문에 나온 표현·어순을 그대로** 옮겨 적어라.
   - 예: 원문이 `21 CFR 211.192` 면 그대로. 원문이 `section 502(a) of the FD&C Act` 면
     **그대로** 쓰고 `FD&C Act 502(a)` 처럼 **재배열하지 마라.**
   - ⚠️ 게이트 D2 는 인용 조항이 원문(`body_full`)에 **실재하는지** 문자 대조한다. 원문에 없는
     조항번호(오인용·날조)나 어순을 바꾼 표현은 **FAIL** 처리되어 이 카드의 심층분석이 통째로
     보류된다(과알림이지만 사실 왜곡보다 안전한 방향 — 의도된 동작).
+- **`original`(원문 병기 — 필수)** — 그 위반을 서술한 `body_full` 속 **영어 원문 문장을 그대로
+  1~2문장 발췌**한다. 웹 카드가 이 원문을 국문 해석 바로 위에 나란히 보여주므로(원문↔해석 병기),
+  담당자가 FDA 가 **실제로 무엇이라 썼는지** 원어로 확인·인용할 수 있다.
+  - ⚠️ **`body_full` 에 있는 문장을 글자 그대로(verbatim)** 옮겨라 — 요약·의역·문장 재조합 금지.
+    게이트 D4 가 `original` 이 원문에 실재하는 부분문자열인지 대조한다(공백·따옴표 표기차는 허용).
+    근거 없으면 WARN(비차단)이나 **지어낸 원어는 절대 금지** — 발췌할 원문이 없으면 그 항목의
+    `original` 을 **생략**하라(누락은 D1 FAIL 아님 — 선택 필드, 국문만으로 발행).
+  - `description` 이 여러 결함을 묶었다면, `original` 은 그중 **가장 핵심 위반 문장**을 발췌한다
+    (짧고 대표성 있게 — 문단 전체를 붙이지 말 것).
 - **`description`** — 그 조항이 실제로 어떻게 위반됐는지 **구체적 실체**를 담은 1~2문장.
   - ❌ "실험실 기록 위반" 같은 라벨 나열 금지. ⭕ "규격초과(OOS) 함량시험 결과를 과학적
     근거 없이 무효화하고, 배치 규격 미달의 원인 조사를 문서화하지 않았다" 처럼 **무엇을 했는지**.
@@ -85,6 +95,8 @@ Alert) 등). 원문이 경고한 조치를 근거로 쓴다.
 
 - [ ] 4개 키 모두 채웠는가? (`required_remediation` 은 `{deadline, items[]}` 객체·items 비어있지 않음)
 - [ ] 모든 `citation` 이 `body_full` 에 **그 표현 그대로** 나오는가?
+- [ ] 각 `original` 이 `body_full` 의 **영어 원문 문장을 글자 그대로** 발췌했는가(의역·요약·날조 0)?
+      발췌할 원문이 없으면 그 항목의 `original` 을 넣지 않았는가(억지 생성 금지)?
 - [ ] description·risk 가 라벨 나열이 아니라 실질 정보를 담았는가(빈약하지 않게)?
 - [ ] 원문에 없는 숫자·조항·사실을 지어내지 않았는가?
 - [ ] JSON **하나만** 출력하는가(설명·코드펜스 없이)?
@@ -95,3 +107,4 @@ Alert) 등). 원문이 경고한 조치를 근거로 쓴다.
 | 날짜 | 변경 |
 |---|---|
 | 2026-07-01 | 최초(CC). §2.5 확정 스키마(4섹션·`required_remediation` 객체·Overview 제거) + §2 인용-verbatim 게이트 교훈 반영. `verify_deep_analysis` D1/D2/D3 와 정합. |
+| 2026-07-08 | 원문·국문 병기(CC). `key_violations` 각 항목에 **`original`(원문 verbatim 발췌·선택 필드)** 추가 — 웹 카드가 원문↔국문 해석을 나란히 렌더(랜딩 "원문 항상 함께" 약속을 상세층까지 이행). 게이트 D4(`check_original_grounding`)가 `original` 이 `body_full` 부분문자열인지 대조(미근거=WARN·비차단). 발췌할 원문 없으면 생략(D1 FAIL 아님). |

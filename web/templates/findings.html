@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+{#- FIND-1 M3c — 규제 지적사항 검색(라이브 데이터, Supabase PostgREST 직접 fetch).
+    빌드시 카드/facet 을 고정할 수 없다(브리프 아카이브와 달리 findings 는 실시간 축적) →
+    서버는 셸(로딩 상태)만 렌더하고, findings.js 가 fetch 성공 시 결과를 채운다.
+    env(SUPABASE_URL/ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열 → JS 가 "준비 중" 안내로
+    조용히 종료(오류 아님, 골든 결정론 — env 값과 무관하게 이 템플릿 출력 byte 는 항상 동일). -#}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 Observation · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 한곳에 모읍니다. 업체·기관·카테고리·증거등급·발행월로 좁혀 검색할 수 있습니다.</p>
+  </div>
+  <div class="wrap">
+    <section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
+      <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다.</p>
+    </section>
+
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
+
+    <section class="fnd-tools" aria-label="검색 및 필터">
+      <div class="fnd-search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input id="fnd-q" type="text" placeholder="업체·문서번호·지적내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+      </div>
+      <div class="fnd-filters" id="fnd-filters">
+        <div class="fnd-field"><label for="fnd-f-agency">기관</label><select id="fnd-f-agency" data-key="agency"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
+        <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
+      </div>
+      <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
+    </section>
+
+    <section aria-label="검색 결과">
+      <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
+      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>
+      <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div>
+      <div id="fnd-results" class="fnd-results"></div>
+    </section>
+  </div>
+</main>
+<style>
+.fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px}
+.fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:0}
+.fnd-tools{margin-bottom:22px}
+.fnd-search{position:relative;margin-bottom:14px}
+.fnd-search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
+.fnd-search input{width:100%;box-sizing:border-box;height:50px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:15px;color:var(--ink)}
+.fnd-search input:focus{outline:none;border-color:var(--coral)}
+.fnd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.fnd-field{display:flex;flex-direction:column;gap:5px}
+.fnd-field label{font-size:11.5px;color:var(--muted)}
+.fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px}
+.fnd-field select:focus{outline:none;border-color:var(--coral)}
+.fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content}
+.fnd-reset:hover{color:var(--coral);border-color:var(--coral)}
+.fnd-reset .ti{font-size:14px}
+.fnd-count{margin-top:12px;font-size:13px;color:var(--muted)}
+.fnd-count b{color:var(--ink)}
+.fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.fnd-state-error{color:var(--coral-2)}
+.fnd-results{display:flex;flex-direction:column;gap:12px}
+.fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;background:var(--canvas)}
+.fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.fnd-b{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:4px 9px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fnd-b.date{font-family:var(--mono);background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
+.fnd-b.ev-a{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-b.needs-review{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
+.fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
+.fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
+.fnd-refs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.fnd-ref{font-family:var(--mono);font-size:11.5px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
+.fnd-link{font-size:12.5px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center;text-decoration:none}
+.fnd-link:hover{border-color:var(--coral);color:var(--coral)}
+.fnd-link i{font-size:14px;color:var(--coral)}
+</style>
+{% endblock %}
+{% block scripts %}<script src="{{ rel_root }}assets/findings.js?v={{ findingsjs_ver }}" defer></script>{% endblock %}

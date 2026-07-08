@@ -143,14 +143,23 @@
   </details>
   {%- elif card.deterministic_detail.type == 'fda_483_observations' %}
   {#- [FDA 483 상세보기 2026-07-02] Observation 번호 구조 — PDF 텍스트층을 결정론 분할.
-      LLM/해석 없음, 실패 시 수집기가 raw 키를 쓰지 않아 블록 자체가 사라진다. -#}
+      LLM/해석 없음, 실패 시 수집기가 raw 키를 쓰지 않아 블록 자체가 사라진다.
+      [원문·국문 병기 2026-07-09] deficiency_ko(관찰 statement 국문 번역·fan-out 산출·선택)가
+      있으면 관찰 statement 를 원문(영문 세리프)→국문 쌍으로. 원문 상세(detail)는 verbatim
+      근거로 영문 유지(detail_ko 있으면 함께). deficiency_ko 미보유 관찰은 기존 영문만 렌더 →
+      골든 fixture(ko 무) 바이트 불변(additive). -#}
   {%- set dd = card.deterministic_detail %}
   <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· 원문 기반</span></summary>
     {%- for r in dd.observations %}
     <div class="dt-row obs-row">
       <div class="dt-h"><span class="obs-num">Observation {{ r.number }}</span></div>
+      {%- if r.deficiency_ko %}
+      <div class="obs-orig"><span class="viol-lang">원문 · FDA 483</span><p class="obs-en">{{ r.deficiency }}</p>{% if r.detail %}<p class="obs-en-det">{{ r.detail }}</p>{% endif %}</div>
+      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ r.deficiency_ko }}</p>{% if r.detail_ko %}<p class="dt-fu">{{ r.detail_ko }}</p>{% endif %}</div>
+      {%- else %}
       <p class="dt-sum">{{ r.deficiency }}</p>
       {%- if r.detail %}<p class="dt-fu">{{ r.detail }}</p>{% endif %}
+      {%- endif %}
     </div>
     {%- endfor %}
   </details>

@@ -590,12 +590,24 @@ def _detail_gmp_deficiencies(row: dict[str, Any], raw: dict[str, Any]) -> dict[s
 
 
 def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
-    """FDA 483 Observation 번호 목록(`raw.fda_483_observations`)."""
+    """FDA 483 Observation 번호 목록(`raw.fda_483_observations`).
+
+    [원문·국문 병기 2026-07-09] 국문 번역(deficiency_ko/detail_ko)은 존재할 때만 보존한다
+    (fan-out 이 원문 statement 를 번역해 채우는 선택 필드 — 통상은 inject_slots 가 웹 카드에
+    직접 병합하나, raw 에 이미 있으면 여기서도 통과). 부재 시 키를 아예 추가하지 않아
+    기존 골든(ko 없는 fixture) 바이트 불변."""
     obs = raw.get("fda_483_observations")
     if not (isinstance(obs, list) and obs):
         return None
-    norm = [{k: str(o.get(k, "") or "") for k in _FDA483_OBSERVATION_ROW_KEYS}
-            for o in obs if isinstance(o, dict)]
+    norm: list[dict[str, str]] = []
+    for o in obs:
+        if not isinstance(o, dict):
+            continue
+        r = {k: str(o.get(k, "") or "") for k in _FDA483_OBSERVATION_ROW_KEYS}
+        for kk in ("deficiency_ko", "detail_ko"):     # 있을 때만 — 없으면 키 미추가(골든 불변)
+            if o.get(kk):
+                r[kk] = str(o[kk])
+        norm.append(r)
     norm = [o for o in norm if o["deficiency"]]
     if not norm:
         return None

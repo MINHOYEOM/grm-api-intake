@@ -342,6 +342,38 @@ class WebRenderStructureTest(unittest.TestCase):
         self.assertNotIn("viol-lang", h)
         self.assertIn('<p class="viol-desc">귀사는 절차를 준수하지 않았다.</p>', h)  # 현행 형태 그대로
 
+    def _obs_card(self, ko: bool) -> dict:
+        obs = {"number": "1",
+               "deficiency": "The master production and control records are not followed.",
+               "detail": "Specifically, ABC."}
+        if ko:
+            obs["deficiency_ko"] = "마스터 생산·관리 기록서가 준수되지 않았다."
+            obs["detail_ko"] = "구체적으로, 가나다."
+        return {
+            "id": "f483", "render_order": 1, "evidence_level": "B",
+            "headline_target": "Acme 483", "agency": "FDA", "card_type": "FDA 483 실사 관찰",
+            "deterministic_detail": {"type": "fda_483_observations", "count": 1,
+                                     "observations": [obs]},
+        }
+
+    def test_observation_bilingual_when_deficiency_ko_present(self):
+        # [원문·국문 병기 2026-07-09] deficiency_ko 있으면 Observation 상세가 원문(영문)+국문 쌍.
+        h = self._render_card_partial(self._obs_card(ko=True))
+        self.assertIn('<span class="viol-lang">원문 · FDA 483</span>', h)
+        self.assertIn('<p class="obs-en">The master production and control records '
+                      'are not followed.</p>', h)                        # 원문 verbatim
+        self.assertIn('<span class="viol-lang ko">국문 해석</span>', h)
+        self.assertIn('마스터 생산·관리 기록서가 준수되지 않았다.', h)         # 국문 번역
+        self.assertIn('구체적으로, 가나다.', h)                              # detail_ko
+
+    def test_observation_english_only_when_no_ko(self):
+        # deficiency_ko 미보유(백필 전·번역 실패)면 기존 영문만 — additive·바이트 불변.
+        h = self._render_card_partial(self._obs_card(ko=False))
+        self.assertNotIn("obs-orig", h)
+        self.assertNotIn("viol-lang", h)
+        self.assertIn('<p class="dt-sum">The master production and control records '
+                      'are not followed.</p>', h)                        # 현행 영문 형태 그대로
+
     def test_filled_prose_rendered_in_synthetic(self):
         h = (self.multi / "briefs/2026-06-08/index.html").read_text(encoding="utf-8")
         self.assertIn('class="summary"', h)

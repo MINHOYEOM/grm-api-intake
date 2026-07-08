@@ -208,11 +208,14 @@
   }
 
   function computeStats(rows) {
+    // [FIND-1 M9a] 미번역 건수 집계는 여기서 더 이상 계산하지 않는다 — 공개 게이트
+    // (006_findings_publish_gate.sql)가 DB 레벨에서 국문 해석이 없는(finding_text_ko=''
+    // 이고 finding_language!='KO') 행을 anon fetch 결과 자체에서 차단하므로, 클라이언트가
+    // 세는 값은 항상 0에 수렴해 오해를 일으킨다.
     return {
       total: rows.length,
       agencies: computeAgencyDist(rows),
       needsReview: rows.filter(function (r) { return r.review_status === "needs_review"; }).length,
-      pendingTranslation: rows.filter(function (r) { return !((r.finding_text_ko || "").trim()); }).length,
       categories: computeCategoryDist(rows),
       months: computeMonthTrend(rows),
       firms: computeFirmTop(rows),
@@ -270,9 +273,6 @@
     });
     if (stats.needsReview > 0) {
       dashStatsEl.appendChild(el("span", "fnd-dash-chip warn", "검토 필요 " + stats.needsReview + "건"));
-    }
-    if (stats.pendingTranslation > 0) {
-      dashStatsEl.appendChild(el("span", "fnd-dash-chip warn", "번역 대기 " + stats.pendingTranslation + "건"));
     }
   }
 

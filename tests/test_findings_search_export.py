@@ -151,6 +151,18 @@ class BuildSearchExportTest(unittest.TestCase):
             self.assertIn("title", raw_signal)
             self.assertIn("source", raw_signal)
 
+    def test_records_carry_optional_translation_fields_through_select_star(self) -> None:
+        """FIND-1 M6a: query_findings does SELECT * so the new optional columns
+        (finding_text_ko/translation_method) pass through the search export
+        untouched, without any code change to findings_views/findings_search_export.
+        """
+        result = search_export.build_search_export(self.db_path)
+        for record in result["records"]:
+            self.assertIn("finding_text_ko", record)
+            self.assertIn("translation_method", record)
+            self.assertEqual(record["finding_text_ko"], "")
+            self.assertEqual(record["translation_method"], "")
+
     def test_records_sorted_by_published_date_desc(self) -> None:
         result = search_export.build_search_export(self.db_path)
         dates = [r["published_date"] for r in result["records"]]

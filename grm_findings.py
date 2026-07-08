@@ -63,6 +63,10 @@ FINDING_REQUIRED_FIELDS = (
 EVIDENCE_LEVELS = ("A", "B", "C")
 EXTRACTION_METHODS = ("deterministic", "llm_assisted", "manual")
 REVIEW_STATUSES = ("accepted", "needs_review", "rejected")
+# FIND-1 M6a: optional 국문 해석 필드 계약. schema_version(grm-finding/v1)과
+# FINDING_REQUIRED_FIELDS 는 불변 -- 두 필드 모두 additive/optional 이다.
+# ""(빈 문자열)는 "허용값"이자 "미번역" 기본 상태를 동시에 의미한다.
+TRANSLATION_METHODS = ("", "llm_assisted", "manual")
 
 
 @dataclass(frozen=True)
@@ -340,6 +344,8 @@ def finding_from_raw_signal(
     cfr_refs: list[str] | None = None,
     mfds_refs: list[str] | None = None,
     confidence: float = 1.0,
+    finding_text_ko: str = "",
+    translation_method: str = "",
 ) -> dict[str, Any]:
     """Build one grm-finding/v1 record from a validated raw signal."""
     text = _text(finding_text)
@@ -378,6 +384,8 @@ def finding_from_raw_signal(
         "extraction_method": _text(extraction_method),
         "confidence": float(confidence),
         "review_status": _text(review_status),
+        "finding_text_ko": _text(finding_text_ko),
+        "translation_method": _text(translation_method),
     }
 
 
@@ -438,6 +446,36 @@ def validate_finding(record: dict[str, Any]) -> list[str]:
     for key in ("inspector_names", "cfr_refs", "mfds_refs"):
         if not isinstance(record.get(key), list):
             errors.append(f"findings.{key} must be a list")
+    errors.extend(_validate_translation_fields(record))
+    return errors
+
+
+def _validate_translation_fields(record: dict[str, Any]) -> list[str]:
+    """FIND-1 M6a optional 국문 해석 필드 계약.
+
+    Both fields are additive/optional -- a record that has neither key at all
+    (a pre-M6a record) passes untouched. Once either key is present, the pair
+    must agree: a non-empty finding_text_ko requires a non-empty
+    translation_method, and vice versa; translation_method (when present)
+    must be one of TRANSLATION_METHODS.
+    """
+    errors: list[str] = []
+    has_ko_key = "finding_text_ko" in record
+    has_method_key = "translation_method" in record
+    if not has_ko_key and not has_method_key:
+        return errors
+
+    ko = _text(record.get("finding_text_ko")) if has_ko_key else ""
+    method = _text(record.get("translation_method")) if has_method_key else ""
+
+    if has_method_key and method not in TRANSLATION_METHODS:
+        errors.append(
+            "findings.translation_method must be one of " + ", ".join(TRANSLATION_METHODS)
+        )
+    if ko and not method:
+        errors.append("findings.translation_method required when finding_text_ko is set")
+    if method and not ko:
+        errors.append("findings.finding_text_ko required when translation_method is set")
     return errors
 
 
@@ -455,6 +493,7 @@ def sqlite_row(record: dict[str, Any]) -> dict[str, Any]:
 def sqlite_schema_ddl() -> str:
     category_check = ", ".join(f"'{code}'" for code in FINDING_CATEGORY_CODES)
     taxonomy_check = ", ".join(f"'{version}'" for version in TAXONOMY_VERSIONS)
+    translation_method_check = ", ".join(f"'{method}'" for method in TRANSLATION_METHODS)
     return f"""
 CREATE TABLE IF NOT EXISTS raw_signals (
   schema_version TEXT NOT NULL CHECK (schema_version = '{RAW_SIGNAL_SCHEMA_VERSION}'),
@@ -506,6 +545,8 @@ CREATE TABLE IF NOT EXISTS findings (
   extraction_method TEXT NOT NULL CHECK (extraction_method IN ('deterministic', 'llm_assisted', 'manual')),
   confidence REAL NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
   review_status TEXT NOT NULL CHECK (review_status IN ('accepted', 'needs_review', 'rejected')),
+  finding_text_ko TEXT NOT NULL DEFAULT '',
+  translation_method TEXT NOT NULL DEFAULT '' CHECK (translation_method IN ({translation_method_check})),
   UNIQUE (raw_signal_id, finding_text)
 );
 

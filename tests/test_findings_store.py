@@ -42,6 +42,25 @@ def _item(**overrides) -> ci.IntakeItem:
 
 
 class FindingsStoreTest(unittest.TestCase):
+    def test_finding_sqlite_columns_include_translation_fields_after_review_status(self) -> None:
+        columns = store.FINDING_SQLITE_COLUMNS
+        self.assertEqual(columns[-2:], ("finding_text_ko", "translation_method"))
+        self.assertEqual(columns.index("review_status"), len(columns) - 3)
+
+    def test_append_intake_item_with_findings_to_sqlite_defaults_translation_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            db = os.path.join(td, "findings.sqlite3")
+            store.append_intake_item_with_findings_to_sqlite(db, _item())
+
+            conn = sqlite3.connect(db)
+            try:
+                row = conn.execute(
+                    "SELECT finding_text_ko, translation_method FROM findings"
+                ).fetchone()
+            finally:
+                conn.close()
+            self.assertEqual(row, ("", ""))
+
     def test_raw_signal_from_intake_item_matches_schema(self) -> None:
         collected_at = datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc)
         record = store.raw_signal_from_intake_item(_item(), collected_at=collected_at)

@@ -21,6 +21,9 @@ _MIGRATION_PATH = Path(__file__).resolve().parent.parent / "web" / "migrations" 
 _TAXONOMY_V2_MIGRATION_PATH = (
     Path(__file__).resolve().parent.parent / "web" / "migrations" / "004_findings_taxonomy_v2.sql"
 )
+_TRANSLATION_MIGRATION_PATH = (
+    Path(__file__).resolve().parent.parent / "web" / "migrations" / "005_findings_translation_columns.sql"
+)
 
 
 def _pair(
@@ -198,6 +201,14 @@ class PostgresSchemaDdlTest(unittest.TestCase):
     def test_ddl_has_korean_block_comments(self) -> None:
         self.assertGreaterEqual(self.ddl.count("--"), 8)
 
+    def test_translation_columns_present_with_defaults_and_check(self) -> None:
+        self.assertIn("finding_text_ko text not null default ''", self.ddl)
+        self.assertIn(
+            "translation_method text not null default '' check (translation_method in "
+            "('', 'llm_assisted', 'manual'))",
+            self.ddl,
+        )
+
 
 class MigrationFileMatchesDdlTest(unittest.TestCase):
     def test_migration_file_exists(self) -> None:
@@ -266,6 +277,44 @@ class TaxonomyV2AlterMigrationTest(unittest.TestCase):
             "plpgsql record variable must not share a name with a table alias "
             "used inside its own FOR-loop query (ambiguous `alias.column` resolution)",
         )
+
+
+class TranslationColumnsMigrationTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(
+            _TRANSLATION_MIGRATION_PATH.is_file(), f"missing {_TRANSLATION_MIGRATION_PATH}"
+        )
+        self.sql = _TRANSLATION_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _TRANSLATION_MIGRATION_PATH.read_bytes())
+
+    def test_adds_both_columns_idempotently(self) -> None:
+        self.assertIn(
+            "add column if not exists finding_text_ko text not null default ''", self.sql
+        )
+        self.assertIn(
+            "add column if not exists translation_method text not null default ''", self.sql
+        )
+
+    def test_check_constraint_is_drop_then_add_named(self) -> None:
+        self.assertIn(
+            "drop constraint if exists findings_translation_method_check", self.sql
+        )
+        self.assertIn("add constraint", self.sql)
+        self.assertIn("findings_translation_method_check", self.sql)
+        for value in gf.TRANSLATION_METHODS:
+            self.assertIn(f"'{value}'", self.sql)
+        self.assertIn(
+            "check (translation_method in ('', 'llm_assisted', 'manual'));", self.sql
+        )
+
+    def test_does_not_touch_finding_text_or_existing_rows(self) -> None:
+        self.assertNotIn("update public.findings", self.sql.lower())
+        self.assertNotIn("finding_text ", self.sql)
+
+    def test_no_do_block_needed(self) -> None:
+        self.assertNotIn("do $$", self.sql)
 
 
 class PgQuoteTextTest(unittest.TestCase):

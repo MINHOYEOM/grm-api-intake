@@ -380,6 +380,34 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertEqual(rows[1]["deficiency"],
                          "Established sampling plans are not documented at the time of performance.")
 
+    def test_footer_signature_block_stripped_from_detail(self):
+        # [2026-07 실측 결함] 스캔 OCR 이 483 페이지 하단 서명/양식 푸터를 Observation detail
+        # 자리로 흘려보내 garbage(EMPLOYEE(S) SIGNATURE ... FORM FDA 483 ...)가 노출됐다.
+        # 옛 정규식은 EMPLOYEE\(S\)\b 의 후행 \b 가 ')' 뒤에서 성립 안 해 못 잡았고 OCR 변형에
+        # 취약했다. 새 클리너는 footer 를 절단하고, 본문이 통째로 footer 로 대체된 관찰은 detail 을 비운다.
+        garbage_only = ("Specifically, EMPI..OYEE(S) SIGNAT\\JRE SEE Muna Algharibeh, "
+                        "I nvestigator 07/24/2025 REVERSE OF Tiffani , Veterinary THIS PAGE "
+                        "Medical Offi cer , Branch Chief ~ FORM FDA 4&3 (09/08) PREVIOUS.EDmON")
+        self.assertEqual(f._clean_observation_detail(garbage_only), "")  # detail 통째 garbage → 빈값
+
+        legit_plus_footer = ("Specifically, Your firm's batch records do not include complete "
+                             "documentation of each significant step. EMPLOYEE(S) SIGNA~ SEE "
+                             "Muna Algharibeh, Investigator FORM FDA483 (09/0S)")
+        cleaned = f._clean_observation_detail(legit_plus_footer)
+        self.assertIn("batch records do not include", cleaned)         # 실질 본문 보존
+        self.assertNotIn("EMPLOYEE", cleaned)                          # 서명블록 제거
+        self.assertNotIn("SIGNA", cleaned)
+        self.assertNotIn("FORM FDA", cleaned)
+
+        # ($) OCR 변형 + 소문자 'employees' 산문 오탐 방지 동시 확인
+        quva = ("Specifically, on 4/20/2026, I observed paint peeling off the ISO 7 Cleanroom. "
+                "EMPLOYEE($) SIGNATURE DATE lSSUEO")
+        self.assertIn("paint peeling", f._clean_observation_detail(quva))
+        self.assertNotIn("EMPLOYEE", f._clean_observation_detail(quva))
+        prose = ("Specifically, the minimum garb is required. However, employees were observed "
+                 "donning gloves upon entry through the back door.")
+        self.assertIn("employees were observed", f._clean_observation_detail(prose))  # 산문 미절단
+
     def test_observation_flag_off_does_not_write_raw(self):
         with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false"}), \
                 _Patched(json_rows=[_json_row(6101)], html_rows=[], pdf_text=self.SAMPLE):

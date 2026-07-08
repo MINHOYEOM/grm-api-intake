@@ -47,6 +47,7 @@ __all__ = [
     "WebRenderHardeningTest",
     "WebAdminRenderTest",
     "WebSearchIndexTest",
+    "WebFindingsRenderTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
     "WebDeterministicDetailTest",
@@ -75,6 +76,7 @@ def _build_multi(out: pathlib.Path, scratch: pathlib.Path) -> None:
 SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
     ("archive/index.html", "archive.expected.html"),
+    ("findings/index.html", "findings.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
@@ -566,6 +568,64 @@ class WebSearchIndexTest(unittest.TestCase):
             self.assertIn(k, e)
         self.assertEqual(e["href"], f"../briefs/{e['slug']}/index.html")
         self.assertTrue(e["latest"])  # issues[0]=최신호(date desc) → latest=True
+
+
+# ── 지적사항 검색 (FIND-1 M3c — 셸 렌더·env-gate·sitemap·nav 배선) ─────────────
+class WebFindingsRenderTest(unittest.TestCase):
+    """findings/index.html 은 라이브 Supabase 데이터를 담지 않는 정적 셸이다(런타임에
+    findings.js 가 PostgREST 를 직접 fetch). 여기선 셸 자체의 결정론·env-gate·배선만
+    검증한다 — 결과 카드 렌더는 findings.js 소관(비골든, JS 단위테스트 범위 밖)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_find_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_generated(self):
+        self.assertIn("규제 지적사항 검색", self.html)
+        self.assertIn('id="findings-notice"', self.html)
+        self.assertIn("AI 자동 추출 고지", self.html)
+
+    def test_cfg_div_env_gated_empty_by_default(self):
+        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
+        # (reactions cfg 와 무관한 별개 게이트 — 골든 결정론 유지의 근거).
+        self.assertIn('id="grm-findings-cfg" data-url="" data-key="" hidden', self.html)
+
+    def test_findings_js_referenced_with_content_hash(self):
+        import re as _re
+        m = _re.search(r'assets/findings\.js\?v=([0-9a-f]{8})"', self.html)
+        self.assertIsNotNone(m, "findings.js 캐시버스팅 해시 미발견")
+
+    def test_findings_js_copied_verbatim(self):
+        built = (self.single / "assets" / "findings.js").read_bytes()
+        src = (WEB_DIR / "assets" / "findings.js").read_bytes()
+        self.assertEqual(built, src, "findings.js 가 dist 에 verbatim 복사되지 않음")
+
+    def test_sitemap_includes_findings(self):
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/</loc>", self.sitemap)
+
+    def test_nav_link_present_and_active_state(self):
+        # findings 페이지에서만 nav 'on' 클래스가 지적사항 링크에 붙는다.
+        self.assertIn('href="../findings/index.html" class="on">지적사항</a>', self.html)
+        self.assertIn('href="findings/index.html">지적사항</a>', self.landing)
+        self.assertNotIn('href="../findings/index.html" class="on">지적사항</a>', self.archive)
+        self.assertIn('href="../findings/index.html">지적사항</a>', self.archive)
+
+    def test_footer_link_present(self):
+        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
+
+    def test_canonical_and_description(self):
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

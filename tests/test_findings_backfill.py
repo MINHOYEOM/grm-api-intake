@@ -110,6 +110,30 @@ class FindingsBackfillTest(unittest.TestCase):
 
         self.assertEqual(rc, 2)
 
+    def test_cli_exits_3_when_preflight_has_blocking_errors(self) -> None:
+        data = _load_fixture("findings_m1b_sample_export.json")
+        data["raw_by_page_id"].pop("page-fda-483-192439")
+
+        with tempfile.TemporaryDirectory() as td:
+            broken_input = os.path.join(td, "broken_input.json")
+            with open(broken_input, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+            out = os.path.join(td, "internal_backfill_dry_run.json")
+
+            rc = backfill.main(["--input", broken_input, "--output", out, "--pretty"])
+
+            self.assertEqual(rc, 3)
+            with open(out, encoding="utf-8") as f:
+                result = json.load(f)
+            self.assertGreater(result["report"]["preflight"]["blocking_errors"], 0)
+
+    def test_cli_still_exits_0_when_preflight_is_clean(self) -> None:
+        manifest = os.path.join(FIXTURES, "findings_m1h_backfill_manifest.json")
+
+        rc = backfill.main(["--manifest", manifest])
+
+        self.assertEqual(rc, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

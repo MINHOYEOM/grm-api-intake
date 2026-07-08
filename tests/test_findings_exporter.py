@@ -167,6 +167,75 @@ class FindingsExporterTest(unittest.TestCase):
             },
         )
 
+    def test_coverage_reports_extraction_drop_counts_and_details(self) -> None:
+        row_no_evidence_url = {
+            "page_id": "page-wl-no-url",
+            "source": "FDA Warning Letter",
+            "document_id": "WL-NOURL-1",
+            "date": "2026-05-20",
+            "headline": "CGMP violation with no evidence url",
+            "firm": "NoUrl Pharma",
+            "modality": "Chemical",
+            "site_country": "United States",
+            "type_or_class": "Center for Drug Evaluation and Research (CDER)",
+        }
+        raw_no_evidence_url = {
+            "firm": "NoUrl Pharma",
+            "wl_body_excerpt": "During our inspection we found violations of CGMP documentation and records control.",
+        }
+        row_dup = {
+            "page_id": "page-fda-483-dup",
+            "source": "FDA 483",
+            "document_id": "fda483-dup-1",
+            "date": "2026-05-27",
+            "headline": "[FDA 483] Dup Labs, LLC",
+            "official_url": "https://www.fda.gov/media/999999/download",
+            "type_or_class": "483",
+            "firm": "Dup Labs, LLC",
+            "modality": "Chemical",
+            "site_country": "United States",
+        }
+        raw_dup = {
+            "firm": "Dup Labs, LLC",
+            "fda_483_observations": [
+                {"number": "1", "deficiency": "Failure to maintain equipment records.", "detail": "detail 1"},
+                {"number": "2", "deficiency": "Failure to maintain equipment records.", "detail": "detail 2"},
+            ],
+        }
+
+        result = exporter.build_raw_signal_export(
+            [row_no_evidence_url, row_dup],
+            raw_by_page_id={
+                "page-wl-no-url": raw_no_evidence_url,
+                "page-fda-483-dup": raw_dup,
+            },
+            include_findings=True,
+        )
+
+        report = result["report"]
+        self.assertEqual(report["exported"], 2)
+        self.assertEqual(report["findings_exported"], 1)
+        self.assertEqual(len(report["raw_signals_without_findings"]), 1)
+        self.assertEqual(
+            report["raw_signals_without_findings"][0]["row_key"],
+            "FDA Warning Letter::WL-NOURL-1",
+        )
+
+        coverage = report["coverage"]
+        self.assertEqual(coverage["extraction_dropped_invalid"], 1)
+        self.assertEqual(coverage["extraction_dropped_duplicate_text"], 1)
+
+        details = {d["row_key"]: d for d in report["extraction_drop_details"]}
+        self.assertEqual(len(details), 2)
+        wl_detail = details["FDA Warning Letter::WL-NOURL-1"]
+        self.assertEqual(wl_detail["dropped_invalid"], 1)
+        self.assertEqual(wl_detail["dropped_duplicate_text"], 0)
+        self.assertEqual(wl_detail["invalid_errors"], ["findings.evidence_url required"])
+        dup_detail = details["FDA 483::fda483-dup-1"]
+        self.assertEqual(dup_detail["dropped_invalid"], 0)
+        self.assertEqual(dup_detail["dropped_duplicate_text"], 1)
+        self.assertEqual(dup_detail["invalid_errors"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

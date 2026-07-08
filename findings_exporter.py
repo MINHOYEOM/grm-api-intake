@@ -63,6 +63,9 @@ def build_raw_signal_export(
     raw_signals_without_findings: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
+    extraction_drop_details: list[dict[str, Any]] = []
+    extraction_dropped_invalid = 0
+    extraction_dropped_duplicate_text = 0
 
     for index, row in enumerate(rows, start=1):
         if not isinstance(row, dict):
@@ -122,7 +125,7 @@ def build_raw_signal_export(
         records.append(record)
         seen_ids.add(raw_signal_id)
         if include_findings:
-            extracted = findings_extractors.findings_from_raw_signal(record)
+            extracted, extraction_report = findings_extractors.findings_from_raw_signal_with_report(record)
             if extracted:
                 findings.extend(extracted)
             else:
@@ -130,6 +133,16 @@ def build_raw_signal_export(
                     "index": index,
                     "row_key": key,
                     "raw_signal_id": raw_signal_id,
+                })
+            extraction_dropped_invalid += int(extraction_report["dropped_invalid"])
+            extraction_dropped_duplicate_text += int(extraction_report["dropped_duplicate_text"])
+            if extraction_report["dropped_invalid"] or extraction_report["dropped_duplicate_text"]:
+                extraction_drop_details.append({
+                    "raw_signal_id": raw_signal_id,
+                    "row_key": key,
+                    "dropped_invalid": extraction_report["dropped_invalid"],
+                    "dropped_duplicate_text": extraction_report["dropped_duplicate_text"],
+                    "invalid_errors": extraction_report["invalid_errors"],
                 })
 
     report: dict[str, Any] = {
@@ -147,7 +160,11 @@ def build_raw_signal_export(
     if include_findings:
         report["findings_exported"] = len(findings)
         report["raw_signals_without_findings"] = raw_signals_without_findings
-        report["coverage"] = _coverage_summary(records, findings, raw_signals_without_findings)
+        report["extraction_drop_details"] = extraction_drop_details
+        coverage = _coverage_summary(records, findings, raw_signals_without_findings)
+        coverage["extraction_dropped_invalid"] = extraction_dropped_invalid
+        coverage["extraction_dropped_duplicate_text"] = extraction_dropped_duplicate_text
+        report["coverage"] = coverage
         result["finding_schema_version"] = gf.FINDING_SCHEMA_VERSION
         result["taxonomy_version"] = gf.TAXONOMY_VERSION
         result["findings"] = findings

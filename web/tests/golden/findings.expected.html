@@ -9,15 +9,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>규제뉴스 · GRM</title>
-<meta name="description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<link rel="canonical" href="https://grm-solutions.com/archive/" />
+<title>규제 지적사항 검색 · GRM</title>
+<meta name="description" content="FDA 483 Observation · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 검색·필터." />
+<link rel="canonical" href="https://grm-solutions.com/findings/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="규제뉴스 · GRM" />
-<meta property="og:description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<meta property="og:url" content="https://grm-solutions.com/archive/" />
+<meta property="og:title" content="규제 지적사항 검색 · GRM" />
+<meta property="og:description" content="FDA 483 Observation · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 검색·필터." />
+<meta property="og:url" content="https://grm-solutions.com/findings/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -35,57 +35,91 @@
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html" class="on">모아보기</a><a href="../findings/index.html">지적사항</a><a href="../briefs/2026-06-22/index.html">이번 주</a></nav>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html" class="on">지적사항</a><a href="../briefs/2026-07-06/index.html">이번 주</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
-  <a class="btn coral" href="../briefs/2026-06-22/index.html">이번 주 소식</a>
+  <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
 <main>
   <div class="wrap page-head">
-    <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제뉴스 모아보기</h1>
-    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
-    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
-      <i class="ti ti-search lead"></i>
-      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="규제뉴스 카드 검색" />
-      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="panel reveal" id="panel" style="animation-delay:.26s">
-      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
-      <div class="facets" id="facets"></div>
-    </div>
-    <div class="bar reveal" id="bar" style="animation-delay:.32s">
-      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간</button><button type="button" data-view="cards">카드 전체</button></div>
-      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
-    </div>
+    <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 Observation · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 한곳에 모읍니다. 업체·기관·카테고리·증거등급·발행월로 좁혀 검색할 수 있습니다.</p>
   </div>
   <div class="wrap">
-    <div id="results">
-      <div id="static-issues">        <a class="issue latest" href="../briefs/2026-06-22/index.html">
-          <div class="vol">Vol.<b>3</b></div>
-          <div><span class="badge"><span class="live"></span>이번 주 · LIVE</span><h3>2026년 6월 4주차</h3>
-            <div class="row"><span class="tag date">2026-06-22</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">EMA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
-          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A15 · B21</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-15/index.html">
-          <div class="vol">Vol.<b>2</b></div>
-          <div><h3>2026년 6월 3주차</h3>
-            <div class="row"><span class="tag date">2026-06-15</span><span class="tag">MFDS</span></div></div>
-          <div class="stat"><b>1</b><span class="u">건</span><span class="ev mono">A1 · B0</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-08/index.html">
-          <div class="vol">Vol.<b>1</b></div>
-          <div><h3>FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부</h3>
-            <div class="row"><span class="tag date">2026-06-08</span><span class="tag">FDA</span><span class="tag">MHRA</span></div></div>
-          <div class="stat"><b>2</b><span class="u">건</span><span class="ev mono">A1 · B1</span></div>
-        </a>      </div>
-    </div>
+    <section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
+      <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다.</p>
+    </section>
+
+    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div>
+
+    <section class="fnd-tools" aria-label="검색 및 필터">
+      <div class="fnd-search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input id="fnd-q" type="text" placeholder="업체·문서번호·지적내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+      </div>
+      <div class="fnd-filters" id="fnd-filters">
+        <div class="fnd-field"><label for="fnd-f-agency">기관</label><select id="fnd-f-agency" data-key="agency"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
+        <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
+      </div>
+      <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
+    </section>
+
+    <section aria-label="검색 결과">
+      <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
+      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>
+      <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div>
+      <div id="fnd-results" class="fnd-results"></div>
+    </section>
   </div>
 </main>
+<style>
+.fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px}
+.fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:0}
+.fnd-tools{margin-bottom:22px}
+.fnd-search{position:relative;margin-bottom:14px}
+.fnd-search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
+.fnd-search input{width:100%;box-sizing:border-box;height:50px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:15px;color:var(--ink)}
+.fnd-search input:focus{outline:none;border-color:var(--coral)}
+.fnd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.fnd-field{display:flex;flex-direction:column;gap:5px}
+.fnd-field label{font-size:11.5px;color:var(--muted)}
+.fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px}
+.fnd-field select:focus{outline:none;border-color:var(--coral)}
+.fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content}
+.fnd-reset:hover{color:var(--coral);border-color:var(--coral)}
+.fnd-reset .ti{font-size:14px}
+.fnd-count{margin-top:12px;font-size:13px;color:var(--muted)}
+.fnd-count b{color:var(--ink)}
+.fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.fnd-state-error{color:var(--coral-2)}
+.fnd-results{display:flex;flex-direction:column;gap:12px}
+.fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;background:var(--canvas)}
+.fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.fnd-b{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:4px 9px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fnd-b.date{font-family:var(--mono);background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
+.fnd-b.ev-a{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-b.needs-review{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
+.fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
+.fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
+.fnd-refs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.fnd-ref{font-family:var(--mono);font-size:11.5px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
+.fnd-link{font-size:12.5px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center;text-decoration:none}
+.fnd-link:hover{border-color:var(--coral);color:var(--coral)}
+.fnd-link i{font-size:14px;color:var(--coral)}
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">지적사항</a><a href="../briefs/2026-06-22/index.html">이번 주</a></div>
+    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">지적사항</a><a href="../briefs/2026-07-06/index.html">이번 주</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
   </div>
@@ -109,7 +143,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="/assets/archive.js?v=2c499bbb" defer></script><style>
+<script src="../assets/findings.js?v=defe1758" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
@@ -138,7 +172,7 @@ if(_nt&&_nm){
 @media (max-width:760px){ #grm-mascot{display:none} }
 @media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
 </style>
-<div id="grm-mascot" data-page="board" aria-hidden="true">
+<div id="grm-mascot" data-page="findings" aria-hidden="true">
   <span class="owl-msg"></span>
   <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>

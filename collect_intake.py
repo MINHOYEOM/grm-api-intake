@@ -60,6 +60,10 @@ from findings_store import (
     append_intake_item_to_sqlite,
     append_intake_item_with_findings_to_sqlite,
 )
+from findings_supabase_append import (
+    append_intake_item_to_supabase,
+    append_intake_item_with_findings_to_supabase,
+)
 # K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
 from card_scaffold import (
     assemble_web_brief,
@@ -774,11 +778,15 @@ class RunConfig:
     handoff_idem_requested: bool
     findings_sqlite_append_requested: bool
     findings_sqlite_findings_append_requested: bool
+    findings_supabase_append_requested: bool
+    findings_supabase_findings_append_requested: bool
     # ── 값형 env / 파생 ──────────────────────────────────────────────────────
     event_name: str
     health_json_path: str
     step_summary_path: str | None
     findings_sqlite_path: str
+    findings_supabase_url: str
+    findings_supabase_service_key_configured: bool
     mfds_http_proxy_configured: bool
     mfds_enforcement_window_days: int
     handoff_window_days: int
@@ -820,12 +828,18 @@ class RunConfig:
             handoff_idem_requested=env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2"),
             findings_sqlite_append_requested=env_flag("ENABLE_FINDINGS_SQLITE_APPEND"),
             findings_sqlite_findings_append_requested=env_flag("ENABLE_FINDINGS_SQLITE_FINDINGS_APPEND"),
+            findings_supabase_append_requested=env_flag("ENABLE_FINDINGS_SUPABASE_APPEND"),
+            findings_supabase_findings_append_requested=env_flag("ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND"),
             event_name=os.environ.get("GRM_EVENT_NAME", "").strip(),
             health_json_path=os.environ.get("GRM_HEALTH_JSON", "grm-health.json").strip(),
             step_summary_path=os.environ.get("GITHUB_STEP_SUMMARY"),
             findings_sqlite_path=(
                 os.environ.get("GRM_FINDINGS_SQLITE_PATH", DEFAULT_FINDINGS_SQLITE_PATH).strip()
                 or DEFAULT_FINDINGS_SQLITE_PATH
+            ),
+            findings_supabase_url=os.environ.get("SUPABASE_URL", "").strip(),
+            findings_supabase_service_key_configured=bool(
+                os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
             ),
             mfds_http_proxy_configured=bool(os.environ.get("MFDS_HTTP_PROXY", "").strip()),
             mfds_enforcement_window_days=max(
@@ -1933,7 +1947,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  existing_ids: set[str], dry_run: bool, *,
                  modality_enabled: bool | None = None,
                  findings_sqlite_path: str | None = None,
-                 findings_sqlite_include_findings: bool = False) -> tuple[int, int, int]:
+                 findings_sqlite_include_findings: bool = False,
+                 findings_supabase: tuple[str, str] | None = None,
+                 findings_supabase_include_findings: bool = False) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
 
     [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
@@ -1996,6 +2012,39 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
                     mode = "raw_signals+findings" if findings_sqlite_include_findings else "raw_signals"
                     log("WARN", f"FIND-1 {mode} SQLite append 실패 doc={item.document_id}: {e}")
+            if findings_supabase:
+                supabase_url, supabase_service_key = findings_supabase
+                try:
+                    if findings_supabase_include_findings:
+                        result = append_intake_item_with_findings_to_supabase(
+                            supabase_url, supabase_service_key, item, collected_at=collected_at)
+                        if result.status in {"inserted", "raw_signal_inserted"}:
+                            log("INFO", f"FIND-1 raw_signals+findings Supabase append 완료 "
+                                        f"doc={item.document_id} raw={result.raw_signal_status} "
+                                        f"findings_inserted={result.findings_inserted} "
+                                        f"duplicates={result.findings_duplicate} "
+                                        f"invalid={result.findings_invalid}")
+                        elif result.status == "duplicate":
+                            log("INFO", f"FIND-1 raw_signals+findings Supabase append 중복 skip "
+                                        f"doc={item.document_id} raw={result.raw_signal_status} "
+                                        f"findings_duplicate={result.findings_duplicate}")
+                        else:
+                            log("WARN", f"FIND-1 raw_signals+findings Supabase append skip "
+                                        f"doc={item.document_id} status={result.status} "
+                                        f"raw={result.raw_signal_status} errors={list(result.errors)}")
+                    else:
+                        result = append_intake_item_to_supabase(
+                            supabase_url, supabase_service_key, item, collected_at=collected_at)
+                        if result.status == "inserted":
+                            log("INFO", f"FIND-1 raw_signals Supabase append 완료 doc={item.document_id}")
+                        elif result.status == "duplicate":
+                            log("INFO", f"FIND-1 raw_signals Supabase append 중복 skip doc={item.document_id}")
+                        else:
+                            log("WARN", f"FIND-1 raw_signals Supabase append skip doc={item.document_id} "
+                                        f"status={result.status} errors={list(result.errors)}")
+                except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
+                    mode = "raw_signals+findings" if findings_supabase_include_findings else "raw_signals"
+                    log("WARN", f"FIND-1 {mode} Supabase append 실패 doc={item.document_id}: {e}")
         else:
             failed += 1
             log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id}")
@@ -2767,6 +2816,25 @@ def main() -> int:
         log("WARN", "ENABLE_FINDINGS_SQLITE_FINDINGS_APPEND=true 이지만 "
                     "ENABLE_FINDINGS_SQLITE_APPEND=false 이므로 SQLite append 비활성")
 
+    findings_supabase = None
+    findings_supabase_include_findings = False
+    if cfg.findings_supabase_append_requested:
+        if args.dry_run:
+            log("INFO", "ENABLE_FINDINGS_SUPABASE_APPEND=true 이지만 dry-run 이므로 Supabase append 생략")
+        else:
+            supabase_service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+            if not cfg.findings_supabase_url or not supabase_service_key:
+                log("WARN", "ENABLE_FINDINGS_SUPABASE_APPEND=true 이지만 SUPABASE_URL 또는 "
+                            "SUPABASE_SERVICE_ROLE_KEY 미설정 — Supabase append 비활성")
+            else:
+                findings_supabase = (cfg.findings_supabase_url, supabase_service_key)
+                findings_supabase_include_findings = cfg.findings_supabase_findings_append_requested
+                mode = "raw_signals+findings" if findings_supabase_include_findings else "raw_signals"
+                log("INFO", f"FIND-1 {mode} Supabase append 활성화 url={cfg.findings_supabase_url}")
+    elif cfg.findings_supabase_findings_append_requested:
+        log("WARN", "ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND=true 이지만 "
+                    "ENABLE_FINDINGS_SUPABASE_APPEND=false 이므로 Supabase append 비활성")
+
     # 4) 삽입 (반환: inserted, skipped, failed)
     # [배치6 Phase2] 소스별 insert_items + stats 대입 19블록을 INTAKE_SOURCE_SPECS 레지스트리로
     # 구동한다(setattr). search 는 수집+삽입이 결합된 별도 블록(아래)이라 여기서 건너뛴다.
@@ -2792,7 +2860,9 @@ def main() -> int:
             run_date, collected_at, existing, args.dry_run,
             modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
-            findings_sqlite_include_findings=findings_sqlite_include_findings)
+            findings_sqlite_include_findings=findings_sqlite_include_findings,
+            findings_supabase=findings_supabase,
+            findings_supabase_include_findings=findings_supabase_include_findings)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -2821,6 +2891,8 @@ def main() -> int:
             modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,
+            findings_supabase=findings_supabase,
+            findings_supabase_include_findings=findings_supabase_include_findings,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk
@@ -2919,6 +2991,8 @@ def main() -> int:
         "ENABLE_HANDOFF_IDEMPOTENCY_V2_PREFLIGHT_SKIPPED": handoff_idem_preflight_skipped,
         "ENABLE_FINDINGS_SQLITE_APPEND": cfg.findings_sqlite_append_requested,
         "ENABLE_FINDINGS_SQLITE_FINDINGS_APPEND": cfg.findings_sqlite_findings_append_requested,
+        "ENABLE_FINDINGS_SUPABASE_APPEND": cfg.findings_supabase_append_requested,
+        "ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND": cfg.findings_supabase_findings_append_requested,
         "MFDS_HTTP_PROXY_CONFIGURED": cfg.mfds_http_proxy_configured,
         "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
     }

@@ -40,6 +40,7 @@ def postgres_schema_ddl() -> str:
     """
     category_check = ", ".join(f"'{code}'" for code in gf.FINDING_CATEGORY_CODES)
     taxonomy_check = ", ".join(f"'{version}'" for version in gf.TAXONOMY_VERSIONS)
+    translation_method_check = ", ".join(f"'{method}'" for method in gf.TRANSLATION_METHODS)
     return f"""-- FIND-1 M3a Supabase(Postgres) 스키마 — grm-findings.sqlite3 sidecar와 컬럼/제약 의미 동치.
 -- 단일 소스: findings_supabase.postgres_schema_ddl() 출력이 이 파일과 byte 일치해야 한다.
 -- 이 단계(M3a)는 스키마만 생성한다. 데이터 적재는 컨트롤 타워가 Supabase MCP로 별도 실행한다.
@@ -101,6 +102,8 @@ create table if not exists public.findings (
   extraction_method text not null check (extraction_method in ('deterministic', 'llm_assisted', 'manual')),
   confidence double precision not null check (confidence >= 0 and confidence <= 1),
   review_status text not null check (review_status in ('accepted', 'needs_review', 'rejected')),
+  finding_text_ko text not null default '',
+  translation_method text not null default '' check (translation_method in ({translation_method_check})),
   ingested_at timestamptz not null default now()
 );
 

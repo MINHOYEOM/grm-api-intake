@@ -67,6 +67,8 @@ FINDING_SQLITE_COLUMNS = (
     "extraction_method",
     "confidence",
     "review_status",
+    "finding_text_ko",
+    "translation_method",
 )
 
 

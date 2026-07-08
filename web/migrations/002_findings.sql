@@ -59,6 +59,8 @@ create table if not exists public.findings (
   extraction_method text not null check (extraction_method in ('deterministic', 'llm_assisted', 'manual')),
   confidence double precision not null check (confidence >= 0 and confidence <= 1),
   review_status text not null check (review_status in ('accepted', 'needs_review', 'rejected')),
+  finding_text_ko text not null default '',
+  translation_method text not null default '' check (translation_method in ('', 'llm_assisted', 'manual')),
   ingested_at timestamptz not null default now()
 );
 

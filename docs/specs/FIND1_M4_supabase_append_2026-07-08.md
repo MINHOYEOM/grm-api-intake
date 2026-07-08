@@ -1,7 +1,8 @@
 # FIND-1 M4 — collect_intake → Supabase 직행 적재 자동화(기본 off)
 
 > 날짜: 2026-07-08
-> 상태: M4a 코드(`findings_supabase_append.py`+`collect_intake` 배선) 완료·테스트 green · M4b 워크플로 배선(`grm-intake.yml` env 4줄)+본 문서 완료 · **라이브 활성화는 미실행(사람 게이트 대기)**
+> 상태: M4a 코드(`findings_supabase_append.py`+`collect_intake` 배선) 완료·테스트 green · M4b 워크플로 배선(`grm-intake.yml` env 4줄)+본 문서 완료 · **raw-only 1단계 설정 완료(2026-07-09 재검증), post-M4 daily run 실증 대기**
+> 2026-07-09 Codex 재검증: repo Variable `ENABLE_FINDINGS_SUPABASE_APPEND=true`, `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND` 미설정(기본 `false`), Secret `SUPABASE_SERVICE_ROLE_KEY` 존재를 확인했다. 따라서 raw-only 1단계 설정은 완료됐지만, 최신 scheduled `GRM API Intake (Daily)` 실행은 2026-07-07T20:16Z로 M4 머지 전이라 post-M4 daily run의 실제 raw append 로그/DB count 증가는 아직 관측 전이다(`raw_signals=112`, `findings=24` 유지).
 > 코드 정본: `findings_supabase_append.py`, `collect_intake.py`(`RunConfig.findings_supabase_*`/`insert_items(..., findings_supabase=...)`), `.env.example`(M4a 블록)
 > 테스트 정본: `tests/test_findings_supabase_append.py`(15개, HTTP 전량 mock), `tests/test_findings_store.py`(`CollectIntakeFindingsSupabaseAppendTest` 5개, collect_intake↔append 배선 경계) — 합계 20개, 기존 회귀 전량 무수정 통과(1263 passed+842 subtests)
 > 커밋: `deed40e`(M4a 코드) · 이 M4b 세션(워크플로 배선+문서화)은 코드 무변경

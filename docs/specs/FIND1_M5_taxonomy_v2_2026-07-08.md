@@ -1,7 +1,8 @@
 # FIND-1 M5 — taxonomy v2(단어경계 분류기) + v1/v2 이중 수용 마이그레이션
 
 > 날짜: 2026-07-08
-> 상태: M5a 코드(`grm_findings.py` 매칭 엔진+키워드 정제) 완료·테스트 green · M5b 코드(`postgres_schema_ddl()` IN-list+`002_findings.sql` 재생성+`004_findings_taxonomy_v2.sql`+`findings_taxonomy_migrate_sqlite.py`) 완료·로컬 sidecar 마이그레이션 적용 완료 · **라이브 Supabase 004 적용은 미실행(사람 게이트 대기)**
+> 상태: M5a 코드(`grm_findings.py` 매칭 엔진+키워드 정제) 완료·테스트 green · M5b 코드(`postgres_schema_ddl()` IN-list+`002_findings.sql` 재생성+`004_findings_taxonomy_v2.sql`+`findings_taxonomy_migrate_sqlite.py`) 완료·로컬 sidecar 마이그레이션 적용 완료 · **라이브 Supabase 004 적용 완료(2026-07-09 Codex 재검증)**
+> 2026-07-09 Codex 재검증: 사용자가 004를 적용한 뒤 live DB에서 `findings_taxonomy_version_v1v2_check` 존재와 full 문자열 `grm-finding-taxonomy/v1`/`grm-finding-taxonomy/v2` 허용을 확인했다. 저장된 24개 finding은 모두 기존 provenance대로 `grm-finding-taxonomy/v1`이며 v2 row는 아직 없다.
 > 코드 정본: `grm_findings.py`(`TAXONOMY_VERSION`/`TAXONOMY_VERSIONS`/`FINDING_TAXONOMY`/`classify_finding_category`/`_keyword_matches`/`_ascii_keyword_pattern`), `findings_supabase.py`(`postgres_schema_ddl()`), `web/migrations/002_findings.sql`, `web/migrations/004_findings_taxonomy_v2.sql`, `findings_taxonomy_migrate_sqlite.py`
 > 테스트 정본: `tests/test_grm_findings.py`(M5a 신규 13개), `tests/test_findings_supabase.py`(M5b DDL 회귀 확장), `tests/test_findings_taxonomy_migrate.py`(M5b 신규 17개) — 신규 합계 30개, 전체 스위트 1293 passed+842 subtests
 > 커밋: `fb4509a`(M5a+M5b, 단일 커밋)
@@ -97,7 +98,7 @@ SQLite는 컬럼 CHECK 제약을 `ALTER`로 바꿀 수 없으므로, `findings_t
 
 **실행 기록(2026-07-08):** 운영 `grm-findings.sqlite3`(raw_signals 112/findings 24)에 대해 dry-run으로 `verified=true`를 먼저 확인한 뒤 `--write-file`을 적용했다. `counts.before == counts.after == {raw_signals: 112, findings: 24}`, `finding_identity_match=true`, `taxonomy_versions_after`가 `{grm-finding-taxonomy/v1}`의 부분집합(기존 24건은 모두 v1로 생성됐으므로 v2 값은 아직 등장하지 않음 — 저장소가 v2도 받아들일 준비만 됐다는 뜻), `findings_ddl_has_in_list=true`를 확인했다. `grm-findings.sqlite3.bak-v1` 백업이 로컬에 남아 있다(둘 다 `.gitignore` 대상, 커밋되지 않음).
 
-### 4.2 라이브 Supabase — 미실행(사람 게이트 대기), 순서 제약
+### 4.2 라이브 Supabase — 004 적용 완료(2026-07-09 재검증), 순서 제약
 
 라이브 `public.findings`는 이미 002의 v1 등호 CHECK로 생성돼 있다(M3 라이브 적용, `raw_signals=112`/`findings=24`). `004_findings_taxonomy_v2.sql`은 그 제약만 넓히는 `DO $$ ... $$` 블록이다 — `pg_constraint`를 `public.findings`·`taxonomy_version` 관련 CHECK로 필터링해 이름에 의존하지 않고 전부 drop한 뒤, 명명된 `findings_taxonomy_version_v1v2_check`를 추가한다. 재실행해도 동일 결과(멱등)이며 행 데이터는 전혀 건드리지 않는다.
 
@@ -152,7 +153,7 @@ alter table public.findings
 
 ## 7. 이월
 
-- **라이브 004 적용 실행 자체** — 이 문서가 다루는 코드/SQL은 준비까지이며, 사용자가 SQL Editor에서 1회 실행해야 한다. 적용 후 `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND=true` 활성화가 뒤따를 수 있다(§4 순서 제약).
+- **라이브 004 적용 실행 자체** — 2026-07-09 재검증 기준 사용자가 SQL Editor에서 1회 실행을 완료했고, `findings_taxonomy_version_v1v2_check`가 live DB에 존재한다. 다음 잔여는 `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND=true`를 켜기 전 raw-only 관찰 결과를 확인하는 것이다.
 - **M4 잔여 후보(대시보드 고도화 등)** — 파셋 검색·히트맵·업체 이력 등은 M5와 무관하게 여전히 잔여다(`FIND1_M4_supabase_append_2026-07-08.md` §6 참고).
 - **v1 기존 행의 선택적 재분류는 의도적으로 수행하지 않는다.** §5의 실코퍼스 검증은 v2 분류기가 개선 방향으로만 움직인다는 것을 확인하는 관측이며, 기존 24건(이후 라이브 004 적용·findings append 활성화 전까지 계속 v1로만 쌓일 신규 행 포함)을 일괄 재분류하는 별도 배치는 이 문서의 범위 밖이다. 필요해지면 "언제·무엇을 재분류했는지"를 별도 taxonomy 마이그레이션 이벤트로 문서화하고, `category_code` 변경 이력을 추적할 수 있는 감사 필드(예: `taxonomy_reclassified_at`)를 먼저 설계해야 한다 — 이번 M5는 그 설계를 포함하지 않는다.
 - **Copilot Studio 에이전트 연동(M4~M5, 전략 로드맵)** — `GRM_Findings인텔리전스_전략로드맵_2026-07-07.md`의 후속 단계이며, 이번 taxonomy v2(내부 명명 M5)와는 별개 트랙이다.

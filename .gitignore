@@ -37,10 +37,17 @@ findings_sqlite_backfill_apply*.json
 findings_search_*.json
 findings_supabase_load*.json
 findings_taxonomy_migrate*.json
+findings_translation_migrate*.json
+findings_translation_plan*.json
+findings_translation_filled*.json
+findings_translation_apply*.json
 grm-findings-supabase-apply*.sql
+grm-findings-translations-*.sql
+grm-findings-translation-apply*.sql
 grm-findings-search*.html
 grm-findings.sqlite3
 *.bak-v1
+*.bak-v2
 *.sqlite3-shm
 *.sqlite3-wal
 

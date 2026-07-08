@@ -13,7 +13,7 @@
   </div>
   <div class="wrap">
     <section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
-      <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다.</p>
+      <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
     </section>
 
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
@@ -73,6 +73,10 @@
 .fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
 .fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
 .fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
+.fnd-orig{margin:0 0 10px}
+.fnd-orig summary{cursor:pointer;font-size:12.5px;font-weight:500;color:var(--coral-2)}
+.fnd-orig p{font-family:var(--serif);font-size:13.5px;line-height:1.6;color:var(--muted);margin:8px 0 0;white-space:pre-wrap}
+.fnd-tr-note{display:block;font-size:11.5px;color:var(--muted);margin:0 0 10px}
 .fnd-refs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .fnd-ref{font-family:var(--mono);font-size:11.5px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
 .fnd-link{font-size:12.5px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center;text-decoration:none}

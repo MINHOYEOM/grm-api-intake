@@ -157,6 +157,11 @@ class AppendRawSignalWithFindingsTest(unittest.TestCase):
             self.assertIsInstance(row["inspector_names"], list)
             self.assertIsInstance(row["mfds_refs"], list)
             self.assertIsInstance(row["confidence"], float)
+            # FIND-1 M6a: optional translation fields propagate automatically because
+            # _finding_payload iterates findings_store.FINDING_SQLITE_COLUMNS, and
+            # finding_from_raw_signal always sets them (default "").
+            self.assertEqual(row["finding_text_ko"], "")
+            self.assertEqual(row["translation_method"], "")
 
     def test_raw_signal_invalid_skips_findings_entirely(self) -> None:
         with mock.patch("findings_supabase_append.requests.post") as post:

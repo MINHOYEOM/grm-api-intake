@@ -303,5 +303,167 @@ class FindingsSchemaTest(unittest.TestCase):
             conn.close()
 
 
+class FindingsTranslationFieldTest(unittest.TestCase):
+    """FIND-1 M6a optional 국문 해석 필드 계약: finding_text_ko/translation_method."""
+
+    def test_finding_from_raw_signal_defaults_translation_fields_to_empty(self) -> None:
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        finding = gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
+        )
+        self.assertIn("finding_text_ko", finding)
+        self.assertIn("translation_method", finding)
+        self.assertEqual(finding["finding_text_ko"], "")
+        self.assertEqual(finding["translation_method"], "")
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_finding_from_raw_signal_accepts_explicit_translation(self) -> None:
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        finding = gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
+            finding_text_ko="국문 해석 예시",
+            translation_method="llm_assisted",
+        )
+        self.assertEqual(finding["finding_text_ko"], "국문 해석 예시")
+        self.assertEqual(finding["translation_method"], "llm_assisted")
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_finding_id_is_unaffected_by_translation_fields(self) -> None:
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        text = fx["raw"]["fda_483_observations"][0]["deficiency"]
+        plain = gf.finding_from_raw_signal(raw_signal, finding_text=text)
+        translated = gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=text,
+            finding_text_ko="국문 해석 예시",
+            translation_method="manual",
+        )
+        self.assertEqual(plain["finding_id"], translated["finding_id"])
+
+    # -- validator rule matrix: missing / both-empty / ko-only / method-only / valid-pair / bad-method --
+
+    def _base_finding(self) -> dict:
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        return gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
+        )
+
+    def test_validator_passes_when_translation_keys_absent(self) -> None:
+        finding = self._base_finding()
+        del finding["finding_text_ko"]
+        del finding["translation_method"]
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_validator_passes_when_both_translation_fields_empty(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = ""
+        finding["translation_method"] = ""
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_validator_rejects_ko_only(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = "국문 해석"
+        finding["translation_method"] = ""
+        errors = gf.validate_finding(finding)
+        self.assertIn(
+            "findings.translation_method required when finding_text_ko is set", errors
+        )
+
+    def test_validator_rejects_method_only(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = ""
+        finding["translation_method"] = "llm_assisted"
+        errors = gf.validate_finding(finding)
+        self.assertIn(
+            "findings.finding_text_ko required when translation_method is set", errors
+        )
+
+    def test_validator_accepts_valid_pair(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = "국문 해석"
+        finding["translation_method"] = "manual"
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_validator_rejects_invalid_translation_method(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = "국문 해석"
+        finding["translation_method"] = "auto"
+        errors = gf.validate_finding(finding)
+        self.assertTrue(any("translation_method" in e for e in errors))
+
+    def test_sqlite_ddl_has_translation_columns_and_check(self) -> None:
+        ddl = gf.sqlite_schema_ddl()
+        self.assertIn("finding_text_ko TEXT NOT NULL DEFAULT ''", ddl)
+        self.assertIn(
+            "translation_method TEXT NOT NULL DEFAULT '' CHECK (translation_method IN "
+            "('', 'llm_assisted', 'manual'))",
+            ddl,
+        )
+
+    def test_sqlite_schema_accepts_translated_finding(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = "국문 해석"
+        finding["translation_method"] = "llm_assisted"
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+        conn = sqlite3.connect(":memory:")
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.executescript(gf.sqlite_schema_ddl())
+            raw_row = gf.sqlite_row(raw_signal)
+            conn.execute(
+                f"INSERT INTO raw_signals ({', '.join(raw_row.keys())}) "
+                f"VALUES ({', '.join('?' for _ in raw_row)})",
+                tuple(raw_row.values()),
+            )
+            finding_row = gf.sqlite_row(finding)
+            conn.execute(
+                f"INSERT INTO findings ({', '.join(finding_row.keys())}) "
+                f"VALUES ({', '.join('?' for _ in finding_row)})",
+                tuple(finding_row.values()),
+            )
+            row = conn.execute(
+                "SELECT finding_text_ko, translation_method FROM findings"
+            ).fetchone()
+            self.assertEqual(row, ("국문 해석", "llm_assisted"))
+        finally:
+            conn.close()
+
+    def test_sqlite_schema_rejects_bad_translation_method(self) -> None:
+        finding = self._base_finding()
+        finding["finding_text_ko"] = "국문 해석"
+        finding["translation_method"] = "auto"
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+        conn = sqlite3.connect(":memory:")
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.executescript(gf.sqlite_schema_ddl())
+            raw_row = gf.sqlite_row(raw_signal)
+            conn.execute(
+                f"INSERT INTO raw_signals ({', '.join(raw_row.keys())}) "
+                f"VALUES ({', '.join('?' for _ in raw_row)})",
+                tuple(raw_row.values()),
+            )
+            finding_row = gf.sqlite_row(finding)
+            with self.assertRaises(sqlite3.IntegrityError):
+                conn.execute(
+                    f"INSERT INTO findings ({', '.join(finding_row.keys())}) "
+                    f"VALUES ({', '.join('?' for _ in finding_row)})",
+                    tuple(finding_row.values()),
+                )
+        finally:
+            conn.close()
+
+
 if __name__ == "__main__":
     unittest.main()

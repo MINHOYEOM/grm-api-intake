@@ -1,7 +1,7 @@
 # FIND-1 M3 Supabase 적재 준비 + `/findings/` 웹 검색 페이지 + 하드닝
 
 > 날짜: 2026-07-08  
-> 상태: M3a Postgres 스키마 계약 + 오프라인 로드 플랜 생성기 완료 · 실플랜 산출까지 완료(**Supabase 실제 적재는 미실행** — 사람 SQL Editor 1회 실행 대기) · M3c `/findings/` 웹 검색 페이지 완료·라이브 배선 · M3d 하드닝 2건 완료  
+> 상태: M3a Postgres 스키마 계약 + 오프라인 로드 플랜 생성기 완료 · **Supabase 라이브 적용·재검증 완료(2026-07-08, raw_signals 112/findings 24)** · M3c `/findings/` 웹 검색 페이지 완료·라이브 배선 · M3d 하드닝 2건 완료
 > 코드 정본: `findings_supabase.py`, `web/migrations/002_findings.sql`, `web/migrations/003_findings_public_read.sql`, `web/templates/findings.html`, `web/assets/findings.js`, `findings_extractors.py`(`findings_from_raw_signal_with_report`), `findings_backfill.py`/`findings_backfill_sqlite.py`(CLI exit code)  
 > 테스트 정본: `tests/test_findings_supabase.py`(42), 웹 스위트(`web/tests/`, 80 OK — `findings.expected.html` 골든 포함), 기존 회귀 전량 무수정 통과
 
@@ -12,7 +12,7 @@
 M3는 M2가 완료한 read-only 조회/정적 export/오프라인 뷰어 위에서 두 방향으로 갈라진다: **(A) Supabase(Postgres) 적재 준비**와 **(B) 그 데이터를 서빙하는 라이브 웹 검색 페이지**. 이 문서는 세 세션(M3a/M3c/M3d)의 정확한 범위와, 각 단계에서 **하지 않은 것**을 우선 명시한다.
 
 - **M3a(완료)**: `findings_supabase.py`로 SQLite sidecar를 읽어 Postgres DDL + 데이터 INSERT + 검증 SQL을 담은 **오프라인 로드 플랜**을 만든다. 이 단계는 네트워크 호출도, Supabase 연결도, 실제 적재도 하지 않는다. `web/migrations/002_findings.sql`은 `postgres_schema_ddl()` 출력의 byte 단일 소스로 커밋됐을 뿐, 이 SQL이 실제 Supabase 프로젝트에 실행됐다는 뜻은 아니다.
-- **M3a 실행(완료, 적재는 미완료)**: 2026-07-08에 실제 운영 `grm-findings.sqlite3`(raw_signals 112/findings 24)로 로드 플랜을 산출해 원샷 SQL 파일(`grm-findings-supabase-apply-2026-07-08.sql`, 15문·454KB·`report.ready_for_apply=true`·`blocking_errors=0`)까지 만들었다. **이 SQL을 대상 Supabase 프로젝트(`grm-reactions`)에 실행하는 단계는 이 세션에서 수행하지 않았다** — CC 세션의 auto-mode 권한 분류기가 공유 프로덕션 Supabase 프로젝트에 대한 write 실행을 거부했기 때문이다(§3 참고). 산출물은 `.gitignore` 대상(`grm-findings-supabase-apply*.sql`)이라 git에는 없다.
+- **M3a 실행(완료, 라이브 적재·검증까지 완료)**: 2026-07-08에 실제 운영 `grm-findings.sqlite3`(raw_signals 112/findings 24)로 로드 플랜을 산출해 원샷 SQL 파일(`grm-findings-supabase-apply-2026-07-08.sql`, DDL+데이터 15문+`003_findings_public_read.sql`까지 포함·454KB·`report.ready_for_apply=true`·`blocking_errors=0`)을 만들었다. **CC 세션의 auto-mode 권한 분류기가 공유 프로덕션 Supabase 프로젝트에 대한 CC 직접 write를 거부**했기 때문에(§3 참고), CC가 아니라 사용자가 Supabase Dashboard(`grm-reactions`) SQL Editor에서 이 파일을 1회 실행해 적용했다. CC는 이후 read-only로 재검증(`raw_signals=112`·`findings=24`·orphan `0`·`raw_sha256` 무결성 `112/112`·`findings` 공개 read 정책 1개·`raw_signals` 정책 0개)하고 security/performance advisors를 점검(M3 신규 테이블 관련 WARN/ERROR 없음, 의도된 INFO 2건만)해 M3a를 라이브까지 완결했다. 산출물 SQL 파일은 `.gitignore` 대상(`grm-findings-supabase-apply*.sql`)이라 git에는 없다.
 - **M3c(완료)**: 위 적재 여부와 무관하게 독립적으로 진행 가능한 웹 레이어 — `/findings/` 정적 페이지 셸 + `findings.js` 런타임 PostgREST fetch + `web/migrations/003_findings_public_read.sql`(findings 테이블만 anon/authenticated SELECT 재허용). 렌더 골든 전체 재동결. **이 페이지는 002/003이 실제 Supabase에 적용되고 데이터가 적재돼 있어야 콘텐츠가 채워진다** — 그 전까지는 "검색 서비스 준비 중입니다" 셸만 보인다(오류 아님, §4 참고).
 - **M3d(완료)**: M1/M2 코드에 대한 관측성/운영 하드닝 2건. 신규 기능이 아니라 기존 계약의 보강이다.
 - M3 전체에 걸쳐 Notion write, 대시보드 구현, collect_intake → Supabase 직행 적재 자동화는 범위 밖이며 M4 이후로 이월한다(§6).
@@ -66,16 +66,17 @@ CLI: `python findings_supabase.py --db-path <sqlite경로> [--output <json경로
 
 M3a는 계약과 플랜 생성기만 만들고, 실제 Supabase 프로젝트에 대한 적용은 사람/컨트롤 타워의 별도 실행 단계로 분리했다. 2026-07-08 실행 기록:
 
-1. **플랜 산출**: `python findings_supabase.py --db-path grm-findings.sqlite3 --output grm-findings-supabase-apply-2026-07-08.sql`(실제로는 `ddl_sql`+`data_sql`을 이어붙인 원샷 실행 가능 SQL 파일로 조립) — raw_signals 112건·findings 24건 기준 15개 문장·454KB, `report.blocking_errors=0`.
-2. **적용 시도**: 대상 프로젝트 `grm-reactions`(기존 반응 계층과 동일 프로젝트, 신규 프로젝트 아님)에 Supabase MCP `apply_migration`/`execute_sql`로 직접 적용을 시도했으나, **이 CC 세션의 auto-mode 권한 분류기가 공유 프로덕션 Supabase 프로젝트에 대한 write 실행을 거부**했다(로컬 개발 스택이 아닌 공유 운영 프로젝트에 스키마 변경 SQL을 자동 실행하는 것은 게이트 대상). 이는 코드/스키마 결함이 아니라 세션 권한 경계다.
-3. **인계**: 원샷 SQL 파일을 사용자에게 전달했다. 파일은 `.gitignore`(`grm-findings-supabase-apply*.sql`) 대상이라 git에는 없다. 사용자가 Supabase SQL Editor에서 1회 실행하는 것을 대기 중이다.
-4. **적용 후 검증(예정, 사람 실행 후 CC가 재확인)**: `_verification_sql()`이 고정하는 6종 쿼리 —
-   - `raw_signals`/`findings` count(기대: 112 / 24)
-   - `findings.schema_version` DISTINCT(기대: `grm-finding/v1` 단일값)
-   - `findings.taxonomy_version` DISTINCT(기대: `grm-finding-taxonomy/v1` 단일값)
-   - `raw_sha256` 무결성: `encode(sha256(convert_to(raw_json, 'UTF8')), 'hex')`가 저장된 `raw_sha256`과 일치하는 행 수 vs 전체 행 수(기대: 두 값이 동일 — 원문 byte 손상 없음)
-   - orphan `findings` 카운트(`raw_signal_id`가 `raw_signals`에 없는 행, 기대: 0)
-5. **security advisors 점검(예정)**: 적용 후 `get_advisors(type="security")`로 RLS 누락·과다 권한 등을 확인 — 특히 003 적용 후 `raw_signals`가 여전히 차단 상태인지 재확인.
+1. **플랜 산출**: `python findings_supabase.py --db-path grm-findings.sqlite3 --output grm-findings-supabase-apply-2026-07-08.sql`(실제로는 `ddl_sql`+`data_sql`+`003_findings_public_read.sql`을 이어붙인 원샷 실행 가능 SQL 파일로 조립) — raw_signals 112건·findings 24건 기준 15개 데이터 문장·454KB, `report.blocking_errors=0`.
+2. **적용 시도**: 대상 프로젝트 `grm-reactions`(기존 반응 계층과 동일 프로젝트, 신규 프로젝트 아님)에 Supabase MCP `apply_migration`/`execute_sql`로 직접 적용을 시도했으나, **CC 세션의 auto-mode 권한 분류기가 공유 프로덕션 Supabase 프로젝트에 대한 write 실행을 거부**했다(로컬 개발 스택이 아닌 공유 운영 프로젝트에 스키마 변경 SQL을 자동 실행하는 것은 게이트 대상). 이는 코드/스키마 결함이 아니라 세션 권한 경계다.
+3. **인계 및 실행**: 원샷 SQL 파일을 사용자에게 전달했다(파일은 `.gitignore` 대상이라 git에는 없다). **사용자가 Supabase Dashboard(`grm-reactions`) SQL Editor에서 이 파일을 1회 실행해 적용을 완료했다** (2026-07-08).
+4. **적용 후 검증(완료)**: CC가 `_verification_sql()`이 고정하는 6종 쿼리를 실제로 재실행해 확인 —
+   - `raw_signals`/`findings` count → **112 / 24** (기대치와 일치)
+   - `findings.schema_version` DISTINCT → **`grm-finding/v1`** 단일값
+   - `findings.taxonomy_version` DISTINCT → **`grm-finding-taxonomy/v1`** 단일값
+   - `raw_sha256` 무결성: 일치 행 수 **112 / 전체 112** — 원문 byte 손상 없음
+   - orphan `findings` 카운트 → **0**
+   - `findings` RLS 정책 `findings_public_read`(anon/authenticated SELECT) **1개** 존재, `raw_signals` 정책 **0개**(anon SELECT 불가 재확인)
+5. **security advisors 점검(완료)**: `get_advisors(type="security"/"performance")` 재실행. M3 신규 테이블 관련은 `raw_signals`의 "RLS enabled, no policy"(INFO, 의도된 설계)와 신규 인덱스 2종의 "unused index"(INFO, 트래픽 미발생)뿐이며 **WARN/ERROR 없음**. 기존 프로젝트의 leaked-password-protection·`reaction` auth_rls_initplan 등은 M3 이전부터 있던 무관 이슈로 이번 범위에서 손대지 않았다.
 
 ---
 
@@ -131,7 +132,7 @@ Headers: apikey: {anon_key}, Authorization: Bearer {anon_key}
 
 ## 6. 잔여 / 이월 목록
 
-- **ⓐ 원샷 SQL 실행 + 검증**: 사용자가 Supabase SQL Editor에서 `grm-findings-supabase-apply-2026-07-08.sql`을 1회 실행한 뒤, CC가 §3의 검증 6쿼리 + security advisors를 재확인한다.
+- **ⓐ 원샷 SQL 실행 + 검증** — ✅ **완료(2026-07-08)**: 사용자가 Supabase SQL Editor에서 `grm-findings-supabase-apply-2026-07-08.sql`을 1회 실행했고, CC가 §3의 검증 6쿼리 + security advisors를 재확인했다(전부 기대치 일치, WARN/ERROR 없음).
 - **ⓑ 배포 env 확인**: Cloudflare 배포 빌드의 `SUPABASE_URL`/`SUPABASE_ANON_KEY`가 이미 반응 계층(S1)용으로 등록돼 있어 `/findings/` 활성화에 추가 secret 등록이 필요 없을 가능성이 높지만, 실제로 확인된 사실은 아니다 — 라이브에서 "준비 중" 문구가 사라지는지 배포 후 재확인 필요.
-- **ⓒ PR 머지**: M1+M2는 PR#135(OPEN)에 있고, M3(M3a/M3c/M3d)는 이 worktree(`feat/findings-m3-supabase-2026-07-08`)에서 아직 별도 PR로 열리지 않았다.
+- **ⓒ PR 머지**: M1+M2는 PR#135(OPEN), M3(M3a/M3c/M3d)는 PR#136(OPEN, `feat/findings-m1-schema-2026-07-08` 위에 스택 — #135 머지 후 base를 main으로 전환해 머지). 데이터가 이미 라이브에 적재됐으므로 PR 머지는 코드/문서 반영일 뿐 재적재를 의미하지 않는다.
 - **ⓓ M4 후보**: 대시보드 고도화(파셋 검색·히트맵·업체 이력), 분류기(v1 substring 매칭) 키워드 정제(`other_quality_system`/`needs_review` 비중이 높은 카테고리 우선 — taxonomy 버전 이벤트 필요, SQLite/Postgres CHECK 제약 동반 마이그레이션), `collect_intake` → Supabase 직행 적재 자동화(현재는 SQLite sidecar 경유 + 수동 로드 플랜 생성 + 사람 적용).

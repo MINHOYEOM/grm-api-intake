@@ -278,5 +278,120 @@ class CollectIntakeFindingsAppendTest(unittest.TestCase):
         self.assertEqual(got, (1, 0, 0))
 
 
+class CollectIntakeFindingsSupabaseAppendTest(unittest.TestCase):
+    """FIND-1 M4a insert_items <-> findings_supabase_append wiring boundary tests."""
+
+    _SUPABASE = ("https://example.supabase.co", "service-role-secret-token")
+
+    def test_flag_off_default_never_calls_supabase(self) -> None:
+        with mock.patch.object(ci.time, "sleep"), \
+                mock.patch.object(ci, "notion_create_page", return_value=True), \
+                mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
+            got = ci.insert_items(
+                "tok",
+                "db",
+                [_item()],
+                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
+                datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
+                set(),
+                False,
+                modality_enabled=False,
+            )
+
+        self.assertEqual(got, (1, 0, 0))
+        append_supabase.assert_not_called()
+
+    def test_dry_run_never_calls_supabase(self) -> None:
+        with mock.patch.object(ci, "notion_create_page") as create_page, \
+                mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
+            got = ci.insert_items(
+                "tok",
+                "db",
+                [_item()],
+                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
+                datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
+                set(),
+                True,
+                modality_enabled=False,
+                findings_supabase=self._SUPABASE,
+            )
+
+        self.assertEqual(got, (1, 0, 0))
+        create_page.assert_not_called()
+        append_supabase.assert_not_called()
+
+    def test_supabase_append_failure_does_not_change_notion_insert_stats(self) -> None:
+        with mock.patch.object(ci.time, "sleep"), \
+                mock.patch.object(ci, "notion_create_page", return_value=True), \
+                mock.patch.object(ci, "append_intake_item_to_supabase", side_effect=OSError("network down")):
+            got = ci.insert_items(
+                "tok",
+                "db",
+                [_item()],
+                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
+                datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
+                set(),
+                False,
+                modality_enabled=False,
+                findings_supabase=self._SUPABASE,
+            )
+
+        self.assertEqual(got, (1, 0, 0))
+
+    def test_supabase_findings_append_failure_does_not_change_notion_insert_stats(self) -> None:
+        with mock.patch.object(ci.time, "sleep"), \
+                mock.patch.object(ci, "notion_create_page", return_value=True), \
+                mock.patch.object(
+                    ci, "append_intake_item_with_findings_to_supabase", side_effect=OSError("network down")
+                ):
+            got = ci.insert_items(
+                "tok",
+                "db",
+                [_item()],
+                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
+                datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
+                set(),
+                False,
+                modality_enabled=False,
+                findings_supabase=self._SUPABASE,
+                findings_supabase_include_findings=True,
+            )
+
+        self.assertEqual(got, (1, 0, 0))
+
+    def test_sqlite_and_supabase_both_on_calls_both(self) -> None:
+        import findings_store as store_result_module  # local alias to build a stub result
+
+        stub_result = store_result_module.RawSignalAppendResult("inserted", raw_signal_id="rawsig-x")
+        with tempfile.TemporaryDirectory() as td:
+            db = os.path.join(td, "findings.sqlite3")
+            with mock.patch.object(ci.time, "sleep"), \
+                    mock.patch.object(ci, "notion_create_page", return_value=True), \
+                    mock.patch.object(
+                        ci, "append_intake_item_to_supabase", return_value=stub_result
+                    ) as append_supabase:
+                got = ci.insert_items(
+                    "tok",
+                    "db",
+                    [_item()],
+                    datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
+                    datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
+                    set(),
+                    False,
+                    modality_enabled=False,
+                    findings_sqlite_path=db,
+                    findings_supabase=self._SUPABASE,
+                )
+
+            self.assertEqual(got, (1, 0, 0))
+            append_supabase.assert_called_once()
+            conn = sqlite3.connect(db)
+            try:
+                raw_count = conn.execute("SELECT COUNT(*) FROM raw_signals").fetchone()[0]
+            finally:
+                conn.close()
+            self.assertEqual(raw_count, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

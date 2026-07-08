@@ -10,13 +10,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
 
 
 RAW_SIGNAL_SCHEMA_VERSION = "grm-raw-signal/v1"
 FINDING_SCHEMA_VERSION = "grm-finding/v1"
-TAXONOMY_VERSION = "grm-finding-taxonomy/v1"
+# grm-finding-taxonomy/v2 change log (keep in sync with docs/specs FIND1_M1 §분류기 한계):
+#   1) matching engine: ASCII keywords now use case-insensitive \b word-boundary regex
+#      (with a simple trailing `s?` for plurals) instead of raw substring matching;
+#      Korean keywords keep substring matching (no word-boundary concept in Hangul).
+#   2) three categories had overly broad keywords narrowed to reduce false positives:
+#      documentation_records, deviation_capa, qc_lab_controls (see FINDING_TAXONOMY below).
+#   3) v1-tagged records already on disk remain valid; TAXONOMY_VERSIONS accepts both.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v2"
+TAXONOMY_VERSIONS: tuple[str, ...] = ("grm-finding-taxonomy/v1", "grm-finding-taxonomy/v2")
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
     "schema_version",
@@ -75,7 +84,17 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "documentation_records",
         "문서화/기록관리",
         "Documentation and records",
-        ("record", "records", "documentation", "written procedure", "제조기록", "기록서", "문서"),
+        (
+            "batch record",
+            "written procedure",
+            "documentation practice",
+            "recordkeeping",
+            "record retention",
+            "제조기록",
+            "기록서",
+            "문서관리",
+            "기록관리",
+        ),
     ),
     FindingCategory(
         "aseptic_sterility_assurance",
@@ -99,7 +118,16 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "deviation_capa",
         "일탈/CAPA/조사",
         "Deviation, CAPA, and investigation",
-        ("deviation", "capa", "investigation", "unexplained discrepancy", "일탈", "조사", "시정"),
+        (
+            "deviation",
+            "capa",
+            "investigation",
+            "unexplained discrepancy",
+            "일탈",
+            "원인조사",
+            "일탈조사",
+            "시정조치",
+        ),
     ),
     FindingCategory(
         "quality_unit_oversight",
@@ -111,7 +139,7 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "qc_lab_controls",
         "시험실/품질관리",
         "Laboratory and QC controls",
-        ("laboratory", "quality control", "test method", "시험", "시험성적", "품질관리"),
+        ("laboratory", "quality control", "test method", "시험실", "시험방법", "시험성적", "품질관리"),
     ),
     FindingCategory(
         "process_validation",
@@ -212,12 +240,39 @@ def _first_text(*values: Any) -> str:
     return ""
 
 
+_ASCII_KEYWORD_PATTERN_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
+def _ascii_keyword_pattern(keyword: str) -> "re.Pattern[str]":
+    """Compile (and cache) a case-insensitive word-boundary regex for an ASCII keyword.
+
+    A single word becomes ``\\b{word}s?\\b`` (simple plural allowed).  A multi-word
+    phrase keeps internal whitespace flexible (``\\s+``) and also allows a trailing
+    ``s?`` so "batch record" matches both "batch record" and "batch records".
+    """
+    pattern = _ASCII_KEYWORD_PATTERN_CACHE.get(keyword)
+    if pattern is None:
+        words = keyword.split()
+        body = r"\s+".join(re.escape(word) for word in words)
+        pattern = re.compile(rf"\b{body}s?\b", re.IGNORECASE)
+        _ASCII_KEYWORD_PATTERN_CACHE[keyword] = pattern
+    return pattern
+
+
+def _keyword_matches(haystack: str, keyword: str) -> bool:
+    """v2 match rule: ASCII keywords use word-boundary regex; Hangul keywords keep substring."""
+    if keyword.isascii():
+        return _ascii_keyword_pattern(keyword).search(haystack) is not None
+    return keyword.lower() in haystack
+
+
 def classify_finding_category(text: str) -> str:
-    """Deterministic v1 keyword classifier.
+    """Deterministic v2 keyword classifier.
 
     The order of FINDING_TAXONOMY is part of the contract.  It gives highly
     specific categories such as aseptic processing a chance to match before more
-    general quality-system buckets.
+    general quality-system buckets.  See the TAXONOMY_VERSION change log above
+    for what changed between v1 and v2.
     """
     haystack = _text(text).lower()
     if not haystack:
@@ -225,7 +280,7 @@ def classify_finding_category(text: str) -> str:
     for category in FINDING_TAXONOMY:
         if category.code == "other_quality_system":
             continue
-        if any(keyword.lower() in haystack for keyword in category.keywords):
+        if any(_keyword_matches(haystack, keyword) for keyword in category.keywords):
             return category.code
     return "other_quality_system"
 
@@ -365,8 +420,10 @@ def validate_finding(record: dict[str, Any]) -> list[str]:
             errors.append(f"findings.{key} required")
     if record.get("schema_version") != FINDING_SCHEMA_VERSION:
         errors.append("findings.schema_version must be grm-finding/v1")
-    if record.get("taxonomy_version") != TAXONOMY_VERSION:
-        errors.append("findings.taxonomy_version must be grm-finding-taxonomy/v1")
+    if record.get("taxonomy_version") not in TAXONOMY_VERSIONS:
+        errors.append(
+            "findings.taxonomy_version must be one of " + ", ".join(TAXONOMY_VERSIONS)
+        )
     if record.get("category_code") not in CATEGORY_BY_CODE:
         errors.append("findings.category_code must be in grm-finding-taxonomy/v1")
     if record.get("evidence_level") not in EVIDENCE_LEVELS:
@@ -397,6 +454,7 @@ def sqlite_row(record: dict[str, Any]) -> dict[str, Any]:
 
 def sqlite_schema_ddl() -> str:
     category_check = ", ".join(f"'{code}'" for code in FINDING_CATEGORY_CODES)
+    taxonomy_check = ", ".join(f"'{version}'" for version in TAXONOMY_VERSIONS)
     return f"""
 CREATE TABLE IF NOT EXISTS raw_signals (
   schema_version TEXT NOT NULL CHECK (schema_version = '{RAW_SIGNAL_SCHEMA_VERSION}'),
@@ -422,7 +480,7 @@ CREATE TABLE IF NOT EXISTS raw_signals (
 
 CREATE TABLE IF NOT EXISTS findings (
   schema_version TEXT NOT NULL CHECK (schema_version = '{FINDING_SCHEMA_VERSION}'),
-  taxonomy_version TEXT NOT NULL CHECK (taxonomy_version = '{TAXONOMY_VERSION}'),
+  taxonomy_version TEXT NOT NULL CHECK (taxonomy_version IN ({taxonomy_check})),
   finding_id TEXT PRIMARY KEY,
   raw_signal_id TEXT NOT NULL REFERENCES raw_signals(raw_signal_id) ON DELETE CASCADE,
   source TEXT NOT NULL,

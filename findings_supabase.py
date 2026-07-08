@@ -32,8 +32,14 @@ _FINDING_NUMERIC_COLUMNS = ("confidence",)
 
 
 def postgres_schema_ddl() -> str:
-    """Return the Postgres DDL text. Single source for web/migrations/002_findings.sql."""
+    """Return the Postgres DDL text. Single source for web/migrations/002_findings.sql.
+
+    002 is the fresh-install baseline (create table if not exists — a no-op replay
+    against the live DB); the taxonomy_version CHECK expansion for an already-live
+    DB is handled by the separate 004_findings_taxonomy_v2.sql ALTER migration.
+    """
     category_check = ", ".join(f"'{code}'" for code in gf.FINDING_CATEGORY_CODES)
+    taxonomy_check = ", ".join(f"'{version}'" for version in gf.TAXONOMY_VERSIONS)
     return f"""-- FIND-1 M3a Supabase(Postgres) 스키마 — grm-findings.sqlite3 sidecar와 컬럼/제약 의미 동치.
 -- 단일 소스: findings_supabase.postgres_schema_ddl() 출력이 이 파일과 byte 일치해야 한다.
 -- 이 단계(M3a)는 스키마만 생성한다. 데이터 적재는 컨트롤 타워가 Supabase MCP로 별도 실행한다.
@@ -69,7 +75,7 @@ alter table public.raw_signals enable row level security;
 -- findings: 지적사항 분석층. inspector_names/cfr_refs/mfds_refs 는 SQLite TEXT 배열의 jsonb 강화형.
 create table if not exists public.findings (
   schema_version text not null check (schema_version = '{gf.FINDING_SCHEMA_VERSION}'),
-  taxonomy_version text not null check (taxonomy_version = '{gf.TAXONOMY_VERSION}'),
+  taxonomy_version text not null check (taxonomy_version in ({taxonomy_check})),
   finding_id text primary key,
   raw_signal_id text not null references public.raw_signals (raw_signal_id) on delete cascade,
   source text not null,

@@ -17,6 +17,9 @@ import grm_findings as gf
 
 
 _MIGRATION_PATH = Path(__file__).resolve().parent.parent / "web" / "migrations" / "002_findings.sql"
+_TAXONOMY_V2_MIGRATION_PATH = (
+    Path(__file__).resolve().parent.parent / "web" / "migrations" / "004_findings_taxonomy_v2.sql"
+)
 
 
 def _pair(
@@ -125,7 +128,16 @@ class PostgresSchemaDdlTest(unittest.TestCase):
     def test_schema_version_and_taxonomy_checks_pinned(self) -> None:
         self.assertIn(f"schema_version = '{gf.RAW_SIGNAL_SCHEMA_VERSION}'", self.ddl)
         self.assertIn(f"schema_version = '{gf.FINDING_SCHEMA_VERSION}'", self.ddl)
-        self.assertIn(f"taxonomy_version = '{gf.TAXONOMY_VERSION}'", self.ddl)
+        taxonomy_check = ", ".join(f"'{version}'" for version in gf.TAXONOMY_VERSIONS)
+        self.assertIn(f"taxonomy_version in ({taxonomy_check})", self.ddl)
+
+    def test_taxonomy_check_lists_both_versions(self) -> None:
+        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 2)
+        for version in gf.TAXONOMY_VERSIONS:
+            self.assertIn(f"'{version}'", self.ddl)
+        # 002 is the fresh-install baseline (IN-list, both versions accepted from day one) --
+        # it is not an equality-pinned CHECK anymore.
+        self.assertNotIn(f"taxonomy_version = '{gf.TAXONOMY_VERSION}'", self.ddl)
 
     def test_evidence_extraction_review_checks_present(self) -> None:
         self.assertIn("evidence_level in ('A', 'B', 'C')", self.ddl)
@@ -198,6 +210,37 @@ class MigrationFileMatchesDdlTest(unittest.TestCase):
     def test_migration_file_has_no_crlf(self) -> None:
         on_disk = _MIGRATION_PATH.read_bytes()
         self.assertNotIn(b"\r\n", on_disk)
+
+
+class TaxonomyV2AlterMigrationTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(
+            _TAXONOMY_V2_MIGRATION_PATH.is_file(), f"missing {_TAXONOMY_V2_MIGRATION_PATH}"
+        )
+        self.sql = _TAXONOMY_V2_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _TAXONOMY_V2_MIGRATION_PATH.read_bytes())
+
+    def test_targets_public_findings_taxonomy_version_column(self) -> None:
+        self.assertIn("public.findings", self.sql)
+        self.assertIn("taxonomy_version", self.sql)
+
+    def test_uses_do_block_and_pg_constraint_lookup(self) -> None:
+        self.assertIn("do $$", self.sql)
+        self.assertIn("pg_constraint", self.sql)
+
+    def test_adds_named_v1v2_in_list_check(self) -> None:
+        self.assertIn("findings_taxonomy_version_v1v2_check", self.sql)
+        for version in gf.TAXONOMY_VERSIONS:
+            self.assertIn(f"'{version}'", self.sql)
+        self.assertIn(
+            "check (taxonomy_version in ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2'))",
+            self.sql,
+        )
+
+    def test_does_not_reclassify_existing_rows(self) -> None:
+        self.assertNotIn("update public.findings", self.sql.lower())
 
 
 class PgQuoteTextTest(unittest.TestCase):

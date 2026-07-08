@@ -27,8 +27,11 @@ import unittest
 from markupsafe import escape as _esc
 
 WEB_DIR = pathlib.Path(__file__).resolve().parent.parent      # …/web
+REPO_ROOT = WEB_DIR.parent                                     # 저장소 루트(grm_findings.py 등)
 sys.path.insert(0, str(WEB_DIR))
+sys.path.insert(0, str(REPO_ROOT))
 import render  # noqa: E402  (web/render.py — 경로 삽입 후 import)
+import grm_findings  # noqa: E402  (FIND-1 M6d 카테고리 라벨 동기화 대조용)
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 GOLDEN_DIR = TESTS_DIR / "golden"
@@ -677,6 +680,57 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_canonical_and_description(self):
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
+
+    # ── FIND-1 M6d: 국문 우선표시 + 카테고리 라벨 병기 ──────────────────────────
+    def test_category_labels_sync_with_taxonomy(self):
+        """findings.js 의 CATEGORY_LABELS 는 grm_findings.FINDING_TAXONOMY 20개
+        code/label_ko/label_en 과 완전히 일치해야 한다(하드코딩 사본 드리프트 방지)."""
+        import re as _re
+
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
+        self.assertIsNotNone(m, "findings.js 에 CATEGORY_LABELS 정의 미발견")
+        body = m.group(1)
+
+        entry_pat = _re.compile(
+            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
+        )
+        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
+
+        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
+        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
+        self.assertEqual(found, expected, "findings.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
+
+    def test_category_dropdown_never_exposes_raw_code(self):
+        """카테고리 <select> 옵션 텍스트는 항상 '{ko} · {en}' — snake_case 코드가 옵션
+        표시 로직(카드 렌더 로직과 별개)에 그대로 노출되는 경로가 없는지 소스 마커로 확인."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        # category_code 분기에서 raw value(v)를 그대로 textContent 로 쓰는 건 CATEGORY_LABELS
+        # 미존재(방어적 폴백)일 때 뿐이고, 정상 경로는 "ko · en" 조합이어야 한다.
+        self.assertIn('cat.ko + " · " + cat.en', js_src)
+        self.assertIn('if (key2 === "category_code")', js_src)
+
+    def test_fnd_orig_and_translation_note_styles_present(self):
+        # findings/index.html 은 정적 셸이라 .fnd-orig/.fnd-tr-note 스타일 규칙만 여기 있고,
+        # 실제 <details>/<span> 마크업은 findings.js 가 런타임에 생성한다(별도 마커 테스트).
+        self.assertIn(".fnd-orig", self.html)
+        self.assertIn(".fnd-tr-note", self.html)
+        self.assertIn("summary", self.html)  # .fnd-orig summary{...} 셀렉터
+
+    def test_legacy_fetch_fallback_marker_present(self):
+        """005(finding_text_ko/translation_method) 미적용 라이브 DB 에서도 페이지가 깨지지
+        않도록, 비-200 응답 시 legacy FIELDS 로 재시도하는 폴백 로직이 배선돼 있어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("LEGACY_FIELDS", js_src)
+        self.assertIn("finding_text_ko", js_src)
+        self.assertIn("translation_method", js_src)
+        self.assertIn("fetchFindings(LEGACY_FIELDS)", js_src)
+
+    def test_ai_disclosure_mentions_translation(self):
+        # AI 고지 문단에 국문 해석=AI 번역·법적 판단은 원문 기준이라는 문장이 추가됐는지.
+        self.assertIn("국문 해석", self.html)
+        self.assertIn("AI 번역", self.html)
+        self.assertIn("원문을 기준", self.html)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

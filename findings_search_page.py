@@ -23,8 +23,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import grm_findings as gf
+
 
 SEARCH_PAGE_SCHEMA_VERSION = "grm-findings-search-page/v1"
+
+# FIND-1 M6d: 카테고리 드롭다운 옵션의 label_en 은 grm_findings.FINDING_TAXONOMY 에서
+# 직접 가져온다(하드코딩 금지) -- 20개 code -> (label_ko, label_en).
+_CATEGORY_TAXONOMY_LABELS: dict[str, tuple[str, str]] = {
+    c.code: (c.label_ko, c.label_en) for c in gf.FINDING_TAXONOMY
+}
 
 # Schema version this builder accepts as input (produced by findings_search_export.py).
 _REQUIRED_EXPORT_SCHEMA_VERSION = "grm-findings-search/v1"
@@ -213,6 +221,30 @@ body {
   margin: 0 0 8px 0;
 }
 
+.card-orig {
+  margin: 0 0 8px 0;
+}
+
+.card-orig summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.card-orig p {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 6px 0 0 0;
+}
+
+.card-tr-note {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+}
+
 .card-tags {
   display: flex;
   flex-wrap: wrap;
@@ -336,6 +368,31 @@ _APP_JS = """
     }
   }
 
+  function appendFindingText(card, record) {
+    // [원문·국문 병기 M6d] finding_text_ko 가 있으면 국문을 본문으로, 원문은 접기(details)로
+    // 낮춰 보여준다. 없으면 기존처럼 원문만 그대로 표시.
+    var ko = String(record.finding_text_ko || "").trim();
+    if (!ko) {
+      appendTag(card, "p", record.finding_text || "", "card-text");
+      return;
+    }
+    appendTag(card, "p", ko, "card-text");
+    if (record.finding_text) {
+      var details = document.createElement("details");
+      details.className = "card-orig";
+      var summary = document.createElement("summary");
+      summary.textContent = "원문 보기 (영문)";
+      details.appendChild(summary);
+      var p = document.createElement("p");
+      p.textContent = record.finding_text;
+      details.appendChild(p);
+      card.appendChild(details);
+    }
+    if (record.translation_method === "llm_assisted") {
+      appendTag(card, "span", "AI 번역 — 원문 대조 권장", "card-tr-note");
+    }
+  }
+
   function renderCard(record) {
     var card = document.createElement("article");
     card.className = "finding-card";
@@ -355,7 +412,7 @@ _APP_JS = """
       appendTag(card, "div", rawSignal.title, "card-subtitle");
     }
 
-    appendTag(card, "p", record.finding_text || "", "card-text");
+    appendFindingText(card, record);
 
     var refs = [];
     (record.cfr_refs || []).forEach(function (ref) {
@@ -431,9 +488,14 @@ def _category_label_map(records: list[dict[str, Any]]) -> dict[str, str]:
 
 def _option_label(field: str, value: str, category_labels: dict[str, str]) -> str:
     if field == "category_code":
+        taxonomy = _CATEGORY_TAXONOMY_LABELS.get(value)
+        if taxonomy:
+            label_ko, label_en = taxonomy
+            return f"{label_ko} · {label_en}"
+        # 방어적 폴백: 분류기가 만들어내지 않는 미지의 코드라도 code 자체는 노출하지 않는다.
         label_ko = category_labels.get(value, "")
         if label_ko:
-            return f"{label_ko} ({value})"
+            return label_ko
     return value
 
 

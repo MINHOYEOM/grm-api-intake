@@ -28,6 +28,8 @@ def _pair(
     review_status: str,
     finding_text: str,
     site_country: str = "US",
+    finding_text_ko: str = "",
+    translation_method: str = "",
 ) -> tuple[dict, dict]:
     row = {
         "source": source,
@@ -49,6 +51,8 @@ def _pair(
         category_code=category_code,
         evidence_level=evidence_level,
         review_status=review_status,
+        finding_text_ko=finding_text_ko,
+        translation_method=translation_method,
     )
     return raw_signal, finding
 
@@ -205,10 +209,20 @@ class BuildSearchPageTest(unittest.TestCase):
         ):
             self.assertIn(f'id="{select_id}"', page)
 
-    def test_category_option_uses_korean_label_and_code(self) -> None:
+    def test_category_option_uses_korean_and_english_label_without_code(self) -> None:
+        # FIND-1 M6d: 옵션 표시는 "{label_ko} · {label_en}"이며, snake_case 코드
+        # (data_integrity 등)는 화면 텍스트 어디에도 노출되지 않는다(option value 속성 제외).
         page = search_page.build_search_page(self.export)
-        self.assertIn("데이터 완전성 (data_integrity)", page)
-        self.assertIn("세척밸리데이션 (cleaning_validation)", page)
+        self.assertIn("데이터 완전성 · Data integrity", page)
+        self.assertIn("세척밸리데이션 · Cleaning validation", page)
+        self.assertIn("환경모니터링 · Environmental monitoring", page)
+
+        # 코드 문자열(예: data_integrity)이 옵션 텍스트 어디에도 등장하지 않는지 직접 검증.
+        option_texts = re.findall(r'<option value="[^"]*">([^<]*)</option>', page)
+        for code in gf.FINDING_CATEGORY_CODES:
+            for text in option_texts:
+                self.assertNotIn(f"({code})", text)
+                self.assertNotEqual(text.strip(), code)
 
     def test_no_external_resource_references_in_chrome_markup(self) -> None:
         page = search_page.build_search_page(self.export)
@@ -229,6 +243,55 @@ class BuildSearchPageTest(unittest.TestCase):
         page = search_page.build_search_page(self.export)
         self.assertIn('id="empty-message"', page)
         self.assertIn("조건에 맞는 finding이 없습니다.", page)
+
+
+class KoTranslationRenderTest(unittest.TestCase):
+    """FIND-1 M6d: finding_text_ko/translation_method 가 있는 레코드의 원문·국문 병기
+    배선 검증. 실제 DOM 렌더는 클라이언트 JS 몫이라(브라우저 엔진 없이 실행 불가) 여기서는
+    (a) 임베드 JSON 이 두 신규 필드를 손실 없이 왕복시키는지, (b) 병기 로직/마커(card-orig
+    details·번역 안내 문구·CSS)가 산출 HTML 에 배선되어 있는지를 검증한다."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.db_path = os.path.join(self._tmp.name, "grm-findings.sqlite3")
+        pairs = _sample_pairs() + [
+            _pair(
+                source="MFDS",
+                document_id="mfds-2",
+                date="2026-06-25",
+                firm="Hanmi BioCare",
+                category_code="data_integrity",
+                evidence_level="A",
+                review_status="accepted",
+                finding_text="Audit trail entries were not reviewed prior to batch release.",
+                finding_text_ko="배치 출하 전 감사추적 항목이 검토되지 않았음.",
+                translation_method="llm_assisted",
+                site_country="KR",
+            ),
+        ]
+        _seed_db(self.db_path, pairs)
+        self.export = search_export.build_search_export(self.db_path)
+
+    def test_embedded_json_round_trips_ko_fields(self) -> None:
+        page = search_page.build_search_page(self.export)
+        embedded = _extract_embedded_json(page)
+        records = json.loads(embedded)
+
+        ko_records = [r for r in records if r.get("finding_text_ko")]
+        self.assertEqual(len(ko_records), 1)
+        self.assertEqual(ko_records[0]["finding_text_ko"], "배치 출하 전 감사추적 항목이 검토되지 않았음.")
+        self.assertEqual(ko_records[0]["translation_method"], "llm_assisted")
+        self.assertTrue(ko_records[0]["finding_text"])  # 원문도 함께 보존
+
+    def test_ko_first_render_wiring_present(self) -> None:
+        page = search_page.build_search_page(self.export)
+        self.assertIn("appendFindingText", page)
+        self.assertIn("card-orig", page)
+        self.assertIn("원문 보기 (영문)", page)
+        self.assertIn("AI 번역", page)
+        self.assertIn(".card-orig", page)
+        self.assertIn(".card-tr-note", page)
 
 
 class CliTest(unittest.TestCase):

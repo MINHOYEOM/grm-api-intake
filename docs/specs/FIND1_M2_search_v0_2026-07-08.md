@@ -1,8 +1,8 @@
 # FIND-1 M2 검색 v0 — read-only 조회 계층 + 정적 export + 오프라인 뷰어
 
-> 날짜: 2026-07-08  
-> 상태: M2a read-only SQLite 조회 계층 + M2b grm-findings-search/v1 정적 export + M2c grm-findings-search-page/v1 오프라인 HTML 뷰어 빌더 + M2d 운영 실행(7월 데이터) 완료  
-> 코드 정본: `findings_views.py`, `findings_search_export.py`, `findings_search_page.py`  
+> 날짜: 2026-07-08
+> 상태: M2a read-only SQLite 조회 계층 + M2b grm-findings-search/v1 정적 export + M2c grm-findings-search-page/v1 오프라인 HTML 뷰어 빌더 + M2d 운영 실행(7월 데이터) 완료
+> 코드 정본: `findings_views.py`, `findings_search_export.py`, `findings_search_page.py`
 > 테스트 정본: `tests/test_findings_views.py`, `tests/test_findings_search_export.py`, `tests/test_findings_search_page.py`
 
 ---

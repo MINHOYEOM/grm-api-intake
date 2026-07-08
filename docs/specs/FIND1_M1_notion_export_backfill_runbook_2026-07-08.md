@@ -1,7 +1,7 @@
 # FIND-1 M1k Notion Export + July Backfill Runbook
 
-> 날짜: 2026-07-08  
-> 범위: 실제 Notion Intake 데이터를 M1 backfill pipeline 입력으로 export한 뒤 SQLite 파일 apply까지 이어가는 운영 절차  
+> 날짜: 2026-07-08
+> 범위: 실제 Notion Intake 데이터를 M1 backfill pipeline 입력으로 export한 뒤 SQLite 파일 apply까지 이어가는 운영 절차
 > 금지: Notion write, Supabase write, Status/handoff 변경, 자동 운영 반영
 
 ## 목적

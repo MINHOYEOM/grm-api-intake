@@ -1,8 +1,8 @@
 # FIND-1 M1 스키마 계약 — raw_signals + grm-finding/v1
 
-> 날짜: 2026-07-08  
-> 상태: M1a 스키마 동결 + M1b raw_signals dry-run exporter + M1c SQLite append 배선 + M1d findings 변환 v0 + M1e findings dry-run/SQLite 경계 검증 + M1f source coverage dry-run 검증 + M1g feature-flagged collect_intake findings append + M1h internal backfill dry-run planner + M1i SQLite transaction dry-run + M1j guarded SQLite file write boundary + M1k read-only Notion export/live 7월 백필 완료  
-> 코드 정본: `grm_findings.py`, `findings_exporter.py`, `findings_store.py`, `findings_extractors.py`, `findings_backfill.py`, `findings_backfill_sqlite.py`, `findings_backfill_apply.py`, `findings_notion_export.py`  
+> 날짜: 2026-07-08
+> 상태: M1a 스키마 동결 + M1b raw_signals dry-run exporter + M1c SQLite append 배선 + M1d findings 변환 v0 + M1e findings dry-run/SQLite 경계 검증 + M1f source coverage dry-run 검증 + M1g feature-flagged collect_intake findings append + M1h internal backfill dry-run planner + M1i SQLite transaction dry-run + M1j guarded SQLite file write boundary + M1k read-only Notion export/live 7월 백필 완료
+> 코드 정본: `grm_findings.py`, `findings_exporter.py`, `findings_store.py`, `findings_extractors.py`, `findings_backfill.py`, `findings_backfill_sqlite.py`, `findings_backfill_apply.py`, `findings_notion_export.py`
 > 테스트 정본: `tests/test_grm_findings.py`, `tests/test_findings_exporter.py`, `tests/test_findings_store.py`, `tests/test_findings_extractors.py`, `tests/test_findings_backfill.py`, `tests/test_findings_backfill_sqlite.py`, `tests/test_findings_backfill_apply.py`, `tests/test_findings_notion_export.py`
 
 ---

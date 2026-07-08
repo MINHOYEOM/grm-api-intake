@@ -1,7 +1,7 @@
 # FIND-1 M1j SQLite File Write Boundary
 
-> 날짜: 2026-07-08  
-> 범위: M1h plan을 명시 guard 뒤 로컬 SQLite 파일에 적용하는 수동 write 경계  
+> 날짜: 2026-07-08
+> 범위: M1h plan을 명시 guard 뒤 로컬 SQLite 파일에 적용하는 수동 write 경계
 > 금지: Notion API 조회, Supabase write, Status/handoff 변경, 운영 자동화
 
 ## 목적

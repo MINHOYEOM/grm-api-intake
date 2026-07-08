@@ -292,7 +292,7 @@ class BuildSupabaseLoadPlanTest(unittest.TestCase):
             if stmt.startswith("insert into public.raw_signals"):
                 self.assertTrue(stmt.endswith("on conflict (raw_signal_id) do nothing;"))
             elif stmt.startswith("insert into public.findings"):
-                self.assertTrue(stmt.endswith("on conflict (finding_id) do nothing;"))
+                self.assertTrue(stmt.endswith("on conflict do nothing;"))
             else:
                 self.fail(f"unexpected data_sql statement: {stmt[:60]!r}")
 

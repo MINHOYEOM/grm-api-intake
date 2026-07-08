@@ -9,9 +9,9 @@
 -- (동일 이름 제약이 이미 있으면 drop 후 재생성).
 do $$
 declare
-  con record;
+  rec record;
 begin
-  for con in
+  for rec in
     select con.conname
     from pg_constraint con
     join pg_class rel on rel.oid = con.conrelid
@@ -21,7 +21,7 @@ begin
       and con.contype = 'c'
       and pg_get_constraintdef(con.oid) like '%taxonomy_version%'
   loop
-    execute format('alter table public.findings drop constraint %I', con.conname);
+    execute format('alter table public.findings drop constraint %I', rec.conname);
   end loop;
 
   alter table public.findings

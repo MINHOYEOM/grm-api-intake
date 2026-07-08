@@ -52,7 +52,23 @@
       <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
     </section>
 
-    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div>
+    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
+      <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
+      <div class="fnd-dash-grid">
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">카테고리 분포</h2>
+          <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
+        </div>
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">월별 추이</h2>
+          <div id="fnd-dash-month" class="fnd-dash-month"></div>
+        </div>
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">업체 상위 5</h2>
+          <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
+        </div>
+      </div>
+    </section>
 
     <section class="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
@@ -80,6 +96,41 @@
   </div>
 </main>
 <style>
+/* FIND-1 M7 — 대시보드 밴드(.controls 와 동일 카드 스타일: --card/--line-2/--rad). */
+.fnd-dash{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 22px}
+.fnd-dash-stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px;font-size:13px;color:var(--muted)}
+.fnd-dash-stats b{color:var(--ink)}
+.fnd-dash-chip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:5px 10px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fnd-dash-chip.warn{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.fnd-dash-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.fnd-dash-empty{font-size:12.5px;color:var(--muted);margin:0}
+/* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기 */
+.fnd-dash-cat-row{display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:8px;cursor:pointer}
+.fnd-dash-cat-row:hover,.fnd-dash-cat-row:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-cat-row.on{background:var(--coral-tint)}
+.fnd-dash-cat-label{flex:0 0 96px;font-size:12.5px;color:var(--body);line-height:1.3}
+.fnd-dash-cat-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--line)}
+.fnd-dash-cat-bar{height:100%;border-radius:99px;background:var(--coral)}
+.fnd-dash-cat-count{flex:0 0 auto;min-width:20px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+/* 월별 추이 — 세로 미니 막대 + 월 라벨 */
+.fnd-dash-month-bars{display:flex;align-items:flex-end;gap:6px}
+.fnd-dash-month-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:3px 0;border-radius:8px;cursor:pointer}
+.fnd-dash-month-col:hover,.fnd-dash-month-col:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-month-col.on{background:var(--coral-tint)}
+.fnd-dash-month-barwrap{height:64px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.fnd-dash-month-bar{width:100%;max-width:16px;min-height:4px;border-radius:3px 3px 0 0;background:var(--coral)}
+.fnd-dash-month-col:hover .fnd-dash-month-bar,.fnd-dash-month-col:focus-visible .fnd-dash-month-bar,.fnd-dash-month-col.on .fnd-dash-month-bar{background:var(--coral-2)}
+.fnd-dash-month-lbl{font-family:var(--mono);font-size:10px;color:var(--muted)}
+/* 업체 상위 5 */
+.fnd-dash-firm-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--body)}
+.fnd-dash-firm-row:hover,.fnd-dash-firm-row:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-firm-row.on{background:var(--coral-tint)}
+.fnd-dash-firm-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fnd-dash-firm-count{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+@media (max-width:860px){
+  .fnd-dash-grid{grid-template-columns:1fr;gap:22px}
+}
 .fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px}
 .fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:0}
 .fnd-tools{margin-bottom:22px}
@@ -147,7 +198,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=43f38d00" defer></script><style>
+<script src="../assets/findings.js?v=ac86b5ef" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

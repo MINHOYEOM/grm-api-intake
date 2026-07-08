@@ -1,5 +1,5 @@
-/* GRM 지적사항 검색 (FIND-1 M3c, 국문 우선표시+카테고리 라벨 M6d) — 정적·클라이언트사이드,
- * 순수 fetch(PostgREST 직접 호출).
+/* GRM 지적사항 검색 (FIND-1 M3c, 국문 우선표시+카테고리 라벨 M6d, 대시보드 밴드 M7) —
+ * 정적·클라이언트사이드, 순수 fetch(PostgREST 직접 호출).
  *
  * supabase-js CDN 미사용 — 인증 불필요한 anon SELECT 뿐이라 REST 엔드포인트를 직접 fetch 한다.
  * cfg(url/key) 는 템플릿의 #grm-findings-cfg data-속성(env-param, 미설정이면 빈 문자열)에서
@@ -95,6 +95,16 @@
   var qInput = document.getElementById("fnd-q");
   var resetBtn = document.getElementById("fnd-reset");
 
+  // [FIND-1 M7] 대시보드 밴드 — 필터 컨트롤 위 콤팩트 조망(스탯/카테고리/월별/업체).
+  // 셸(findings.html)은 빈 컨테이너+hidden 만 가진다 — 다섯 엘리먼트가 모두 있을 때만
+  // 활성화하고(hasDash), 없으면 검색 자체는 기존과 동일하게 계속 동작한다(하위호환).
+  var dashEl = document.getElementById("fnd-dash");
+  var dashStatsEl = document.getElementById("fnd-dash-stats");
+  var dashCatEl = document.getElementById("fnd-dash-cat");
+  var dashMonthEl = document.getElementById("fnd-dash-month");
+  var dashFirmEl = document.getElementById("fnd-dash-firm");
+  var hasDash = !!(dashEl && dashStatsEl && dashCatEl && dashMonthEl && dashFirmEl);
+
   function monthOf(row) {
     var d = row.published_date || "";
     return d.length >= 7 ? d.slice(0, 7) : "";
@@ -142,6 +152,230 @@
       if (hay.indexOf(q) === -1) return false;
     }
     return true;
+  }
+
+  // ── [FIND-1 M7] 대시보드 집계 — 순수 함수(입력=현재 필터 결과 rows, 부작용 없음). ──────
+  function computeAgencyDist(rows) {
+    var counts = {};
+    rows.forEach(function (r) {
+      var a = r.agency || "";
+      if (!a) return;
+      counts[a] = (counts[a] || 0) + 1;
+    });
+    return Object.keys(counts)
+      .map(function (a) { return { agency: a, count: counts[a] }; })
+      .sort(function (x, y) { return y.count - x.count || x.agency.localeCompare(y.agency); });
+  }
+
+  function computeCategoryDist(rows) {
+    var counts = {};
+    rows.forEach(function (r) {
+      var code = r.category_code || "";
+      if (!code) return;
+      counts[code] = (counts[code] || 0) + 1;
+    });
+    return Object.keys(counts)
+      .map(function (code) {
+        var cat = CATEGORY_LABELS[code];
+        return { code: code, ko: cat ? cat.ko : code, count: counts[code] };
+      })
+      .sort(function (a, b) { return b.count - a.count || a.code.localeCompare(b.code); });
+  }
+
+  function computeMonthTrend(rows) {
+    var counts = {};
+    rows.forEach(function (r) {
+      var m = monthOf(r);
+      if (!m) return;
+      counts[m] = (counts[m] || 0) + 1;
+    });
+    var months = Object.keys(counts).sort(); // published_month 오름차순
+    if (months.length > 12) months = months.slice(months.length - 12); // 최근 12개월
+    return months.map(function (m) { return { month: m, count: counts[m] }; });
+  }
+
+  function computeFirmTop(rows) {
+    var counts = {};
+    rows.forEach(function (r) {
+      var f = (r.firm_name || "").trim();
+      if (!f) return;
+      counts[f] = (counts[f] || 0) + 1;
+    });
+    return Object.keys(counts)
+      .map(function (name) { return { name: name, count: counts[name] }; })
+      .sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name); })
+      .slice(0, 5);
+  }
+
+  function computeStats(rows) {
+    return {
+      total: rows.length,
+      agencies: computeAgencyDist(rows),
+      needsReview: rows.filter(function (r) { return r.review_status === "needs_review"; }).length,
+      pendingTranslation: rows.filter(function (r) { return !((r.finding_text_ko || "").trim()); }).length,
+      categories: computeCategoryDist(rows),
+      months: computeMonthTrend(rows),
+      firms: computeFirmTop(rows),
+    };
+  }
+
+  // ── [FIND-1 M7] 대시보드 클릭 연동 — 기존 state/select 재사용, 별도 상태 저장소 없음.
+  // 클릭 시 대응하는 select.value 도 동기화해 드롭다운·행 클릭 상태가 항상 일치하게 한다.
+  function toggleCategoryFilter(code) {
+    var sel = document.getElementById("fnd-f-category");
+    state.category_code = state.category_code === code ? "" : code;
+    if (sel) sel.value = state.category_code;
+    render();
+  }
+
+  function toggleMonthFilter(month) {
+    var sel = document.getElementById("fnd-f-month");
+    state.month = state.month === month ? "" : month;
+    if (sel) sel.value = state.month;
+    render();
+  }
+
+  function toggleFirmFilter(name) {
+    state.q = state.q === name ? "" : name;
+    if (qInput) qInput.value = state.q;
+    render();
+  }
+
+  function makeClickableRow(node, ariaLabel, onActivate) {
+    // role=button+tabindex+Enter/Space — 클릭 가능한 div 행의 공용 접근성 배선(M7).
+    node.setAttribute("role", "button");
+    node.tabIndex = 0;
+    node.setAttribute("aria-label", ariaLabel);
+    node.addEventListener("click", onActivate);
+    node.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+        ev.preventDefault();
+        onActivate();
+      }
+    });
+  }
+
+  function renderDashStats(stats) {
+    dashStatsEl.innerHTML = "";
+    var total = document.createElement("span");
+    total.appendChild(document.createTextNode("총 "));
+    var b = document.createElement("b");
+    b.textContent = String(stats.total);
+    total.appendChild(b);
+    total.appendChild(document.createTextNode("건"));
+    dashStatsEl.appendChild(total);
+
+    stats.agencies.forEach(function (a) {
+      dashStatsEl.appendChild(el("span", "fnd-dash-chip", a.agency + " " + a.count));
+    });
+    if (stats.needsReview > 0) {
+      dashStatsEl.appendChild(el("span", "fnd-dash-chip warn", "검토 필요 " + stats.needsReview + "건"));
+    }
+    if (stats.pendingTranslation > 0) {
+      dashStatsEl.appendChild(el("span", "fnd-dash-chip warn", "번역 대기 " + stats.pendingTranslation + "건"));
+    }
+  }
+
+  function renderDashCategories(stats) {
+    dashCatEl.innerHTML = "";
+    var top = stats.categories.slice(0, 6);
+    var restCount = stats.categories.slice(6).reduce(function (s, c) { return s + c.count; }, 0);
+    if (!top.length) {
+      dashCatEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      return;
+    }
+    var maxCount = top.reduce(function (m, c) { return Math.max(m, c.count); }, 0) || 1;
+    top.forEach(function (c) {
+      dashCatEl.appendChild(buildCatRow(c.ko, c.count, maxCount, c.code));
+    });
+    if (restCount > 0) {
+      dashCatEl.appendChild(buildCatRow("그 외", restCount, maxCount, null));
+    }
+  }
+
+  function buildCatRow(label, count, maxCount, code) {
+    var row = document.createElement("div");
+    row.className = "fnd-dash-cat-row";
+    if (code) {
+      if (state.category_code === code) row.classList.add("on");
+      makeClickableRow(row, label + " 카테고리로 필터: " + count + "건", function () {
+        toggleCategoryFilter(code);
+      });
+    }
+    row.appendChild(el("span", "fnd-dash-cat-label", label));
+    var track = el("div", "fnd-dash-cat-track");
+    var bar = el("div", "fnd-dash-cat-bar");
+    bar.style.width = Math.round((count / maxCount) * 100) + "%";
+    track.appendChild(bar);
+    row.appendChild(track);
+    row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
+    return row;
+  }
+
+  function renderDashMonths(stats) {
+    dashMonthEl.innerHTML = "";
+    var months = stats.months;
+    if (!months.length) {
+      dashMonthEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      return;
+    }
+    var maxCount = months.reduce(function (m, x) { return Math.max(m, x.count); }, 0) || 1;
+    var years = {};
+    months.forEach(function (x) { years[x.month.slice(0, 4)] = true; });
+    var multiYear = Object.keys(years).length > 1;
+    var wrap = el("div", "fnd-dash-month-bars");
+    months.forEach(function (x) {
+      var col = document.createElement("div");
+      col.className = "fnd-dash-month-col";
+      if (state.month === x.month) col.classList.add("on");
+      makeClickableRow(col, x.month + " " + x.count + "건", function () {
+        toggleMonthFilter(x.month);
+      });
+      col.title = x.month + " " + x.count + "건";
+      var barwrap = el("div", "fnd-dash-month-barwrap");
+      var bar = el("div", "fnd-dash-month-bar");
+      bar.style.height = Math.max(6, Math.round((x.count / maxCount) * 100)) + "%";
+      barwrap.appendChild(bar);
+      col.appendChild(barwrap);
+      var mm = x.month.slice(5, 7);
+      var lblText = multiYear ? x.month.slice(2, 4) + "." + mm : mm;
+      col.appendChild(el("span", "fnd-dash-month-lbl", lblText));
+      wrap.appendChild(col);
+    });
+    dashMonthEl.appendChild(wrap);
+  }
+
+  function renderDashFirms(stats) {
+    dashFirmEl.innerHTML = "";
+    if (!stats.firms.length) {
+      dashFirmEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      return;
+    }
+    stats.firms.forEach(function (f) {
+      var row = document.createElement("div");
+      row.className = "fnd-dash-firm-row";
+      if (state.q === f.name) row.classList.add("on");
+      makeClickableRow(row, f.name + " 검색: " + f.count + "건", function () {
+        toggleFirmFilter(f.name);
+      });
+      row.appendChild(el("span", "fnd-dash-firm-name", f.name));
+      row.appendChild(el("span", "fnd-dash-firm-count", String(f.count)));
+      dashFirmEl.appendChild(row);
+    });
+  }
+
+  function renderDash(matched) {
+    if (!hasDash) return;
+    if (!matched.length) {
+      dashEl.hidden = true;
+      return;
+    }
+    var stats = computeStats(matched);
+    renderDashStats(stats);
+    renderDashCategories(stats);
+    renderDashMonths(stats);
+    renderDashFirms(stats);
+    dashEl.hidden = false;
   }
 
   function safeUrl(u) {
@@ -236,6 +470,7 @@
 
   function render() {
     var matched = ROWS.filter(matches);
+    renderDash(matched); // [FIND-1 M7] 필터 결과 기준 대시보드 재계산(데이터 없으면 hidden)
     countEl.innerHTML = "";
     var b = document.createElement("b");
     b.textContent = String(matched.length);

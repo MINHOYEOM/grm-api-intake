@@ -18,6 +18,27 @@
 
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
 
+    {#- FIND-1 M7 — 대시보드 밴드(콤팩트 조망: 스탯·카테고리 분포·월별 추이·업체 상위).
+        정적 셸은 빈 컨테이너+hidden 만 렌더(골든 결정론) — findings.js 가 필터 결과 기준
+        render() 마다 재계산해 채운다(데이터 로드 실패/0건이면 hidden 유지). -#}
+    <section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
+      <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
+      <div class="fnd-dash-grid">
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">카테고리 분포</h2>
+          <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
+        </div>
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">월별 추이</h2>
+          <div id="fnd-dash-month" class="fnd-dash-month"></div>
+        </div>
+        <div class="fnd-dash-block">
+          <h2 class="fnd-dash-h">업체 상위 5</h2>
+          <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
@@ -44,6 +65,41 @@
   </div>
 </main>
 <style>
+/* FIND-1 M7 — 대시보드 밴드(.controls 와 동일 카드 스타일: --card/--line-2/--rad). */
+.fnd-dash{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 22px}
+.fnd-dash-stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px;font-size:13px;color:var(--muted)}
+.fnd-dash-stats b{color:var(--ink)}
+.fnd-dash-chip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:5px 10px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fnd-dash-chip.warn{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+.fnd-dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.fnd-dash-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.fnd-dash-empty{font-size:12.5px;color:var(--muted);margin:0}
+/* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기 */
+.fnd-dash-cat-row{display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:8px;cursor:pointer}
+.fnd-dash-cat-row:hover,.fnd-dash-cat-row:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-cat-row.on{background:var(--coral-tint)}
+.fnd-dash-cat-label{flex:0 0 96px;font-size:12.5px;color:var(--body);line-height:1.3}
+.fnd-dash-cat-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--line)}
+.fnd-dash-cat-bar{height:100%;border-radius:99px;background:var(--coral)}
+.fnd-dash-cat-count{flex:0 0 auto;min-width:20px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+/* 월별 추이 — 세로 미니 막대 + 월 라벨 */
+.fnd-dash-month-bars{display:flex;align-items:flex-end;gap:6px}
+.fnd-dash-month-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:3px 0;border-radius:8px;cursor:pointer}
+.fnd-dash-month-col:hover,.fnd-dash-month-col:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-month-col.on{background:var(--coral-tint)}
+.fnd-dash-month-barwrap{height:64px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.fnd-dash-month-bar{width:100%;max-width:16px;min-height:4px;border-radius:3px 3px 0 0;background:var(--coral)}
+.fnd-dash-month-col:hover .fnd-dash-month-bar,.fnd-dash-month-col:focus-visible .fnd-dash-month-bar,.fnd-dash-month-col.on .fnd-dash-month-bar{background:var(--coral-2)}
+.fnd-dash-month-lbl{font-family:var(--mono);font-size:10px;color:var(--muted)}
+/* 업체 상위 5 */
+.fnd-dash-firm-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--body)}
+.fnd-dash-firm-row:hover,.fnd-dash-firm-row:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-firm-row.on{background:var(--coral-tint)}
+.fnd-dash-firm-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fnd-dash-firm-count{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+@media (max-width:860px){
+  .fnd-dash-grid{grid-template-columns:1fr;gap:22px}
+}
 .fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px}
 .fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:0}
 .fnd-tools{margin-bottom:22px}

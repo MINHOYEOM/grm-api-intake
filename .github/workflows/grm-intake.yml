@@ -166,6 +166,10 @@ jobs:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
           LAW_GO_KR_OC: ${{ secrets.LAW_GO_KR_OC }}
+          # [FIND-1 M4a] collect_intake → Supabase 직행 append. SUPABASE_URL 은 vars(웹 배포와 동일 공개
+          # 프로젝트 URL), SERVICE_ROLE_KEY 는 secrets(기존 admin-backend-deploy 와 동일 키 재사용) — 신규 secret 아님.
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           MFDS_RSS_BOARD_MODE: ${{ vars.MFDS_RSS_BOARD_MODE || 'all' }}
           MFDS_RSS_BOARD_IDS: ${{ vars.MFDS_RSS_BOARD_IDS || '' }}
           # workflow_dispatch 입력을 env 변수로만 받아 shell 본문에 직접 삽입 금지
@@ -220,6 +224,10 @@ jobs:
           # E2(URL전수검사): 행정처분 건별 L1 을 collect 시 resolve&verify(기본 off — collector
           # 행위·K3 관찰 보호). on 이면 nedrug getItem 후보를 verify 해 L1 승격/강등.
           ENABLE_MFDS_URL_VERIFY: ${{ vars.ENABLE_MFDS_URL_VERIFY || 'false' }}
+          # [FIND-1 M4a] SQLite sidecar 와 대칭·독립 배선. 기본 off — secret 미등록이면 collect 가 WARN
+          # 후 자동 비활성(hard fail 없음). FINDINGS_APPEND 는 APPEND 도 true 여야 findings 까지 포함.
+          ENABLE_FINDINGS_SUPABASE_APPEND: ${{ vars.ENABLE_FINDINGS_SUPABASE_APPEND || 'false' }}
+          ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND: ${{ vars.ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND || 'false' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

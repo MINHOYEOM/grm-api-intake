@@ -625,5 +625,239 @@ class CliTest(unittest.TestCase):
         self.assertNotIn(_SERVICE_KEY, json.dumps(data))
 
 
+# ---------------------------------------------------------------------------
+# F2c: --auto mode (unattended daily chunk)
+# ---------------------------------------------------------------------------
+
+
+def _auto_rep(source: str, **kw) -> backfill.BackfillFetchReport:
+    """Canned per-source report for run_auto orchestration tests."""
+    defaults = dict(offset=0, max_docs=500)
+    defaults.update(kw)
+    return backfill.BackfillFetchReport(source=source, **defaults)
+
+
+def _run_auto(*, existing_483=frozenset(), existing_wl=frozenset(),
+              run_483_side=(), run_wl_side=(), dry_run=False, max_docs=500):
+    """run_auto with mocked existing-id fetch and mocked per-source runners;
+    returns (merged_report_dict, exit_code, run_483_mock, run_wl_mock)."""
+    def fake_existing(base, key, source, **_kw):
+        assert base == _BASE_URL and key == _SERVICE_KEY
+        return set(existing_483) if source == "FDA 483" else set(existing_wl)
+
+    r483 = mock.MagicMock(side_effect=list(run_483_side))
+    rwl = mock.MagicMock(side_effect=list(run_wl_side))
+    with mock.patch("collect_fda_backfill.fetch_existing_document_ids",
+                    side_effect=fake_existing), \
+         mock.patch.dict(backfill._RUNNERS, {"fda483": r483, "fda_wl": rwl}):
+        merged, code = backfill.run_auto(
+            max_docs=max_docs, delay=0, dry_run=dry_run,
+            base_url=_BASE_URL, service_key=_SERVICE_KEY,
+        )
+    return merged, code, r483, rwl
+
+
+class AutoModeBudgetCapTest(unittest.TestCase):
+    def test_483_with_new_documents_never_invokes_wl(self) -> None:
+        existing = {f"fda483-{i}" for i in range(100)}
+        rep = _auto_rep("fda483", offset=100, listed=500, fetched=5, appended=5,
+                        next_offset=600, exhausted=False)
+        merged, code, r483, rwl = _run_auto(
+            existing_483=existing, run_483_side=[(rep, 0)],
+        )
+        self.assertEqual(code, 0)
+        self.assertEqual(r483.call_count, 1)
+        kwargs = r483.call_args.kwargs
+        self.assertEqual(kwargs["offset"], 100)  # offset = len(existing 483 ids)
+        self.assertEqual(kwargs["max_docs"], 500)
+        self.assertEqual(kwargs["existing_ids"], existing)
+        rwl.assert_not_called()  # budget cap: 483 did the day's real fetching
+        self.assertEqual(merged["auto_source_order"], ["fda483"])
+        self.assertFalse(merged["auto_complete"])
+        self.assertEqual(merged["appended"], 5)
+
+    def test_dry_run_would_fetch_also_stops_before_wl(self) -> None:
+        rep = _auto_rep("fda483", listed=500, would_fetch=["fda483-1"], exhausted=False)
+        _merged, code, _r483, rwl = _run_auto(run_483_side=[(rep, 0)], dry_run=True)
+        self.assertEqual(code, 0)
+        rwl.assert_not_called()
+
+
+class AutoModeSourceTransitionTest(unittest.TestCase):
+    def test_483_exhausted_zero_new_falls_through_to_wl_same_run(self) -> None:
+        existing_wl = {f"wl-{i}" for i in range(200)}
+        rep483 = _auto_rep("fda483", offset=1900, listed=0, exhausted=True, next_offset=1900)
+        repwl = _auto_rep("fda_wl", offset=200, listed=500, fetched=3, appended=3,
+                          next_offset=700, exhausted=False)
+        merged, code, r483, rwl = _run_auto(
+            existing_wl=existing_wl,
+            run_483_side=[(rep483, 0)], run_wl_side=[(repwl, 0)],
+        )
+        self.assertEqual(code, 0)
+        self.assertEqual(r483.call_count, 1)
+        self.assertEqual(rwl.call_count, 1)
+        self.assertEqual(rwl.call_args.kwargs["offset"], 200)  # len(existing WL ids)
+        self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
+        self.assertFalse(merged["auto_complete"])  # WL fetched -> not complete
+        self.assertEqual(merged["appended"], 3)
+
+    def test_both_exhausted_zero_new_is_auto_complete(self) -> None:
+        rep483 = _auto_rep("fda483", offset=2000, listed=0, exhausted=True, next_offset=2000)
+        repwl = _auto_rep("fda_wl", offset=3600, listed=0, exhausted=True, next_offset=3600)
+        merged, code, r483, rwl = _run_auto(
+            run_483_side=[(rep483, 0)], run_wl_side=[(repwl, 0)],
+        )
+        self.assertEqual(code, 0)
+        self.assertEqual(r483.call_count, 1)
+        self.assertEqual(rwl.call_count, 1)
+        self.assertTrue(merged["auto_complete"])
+        self.assertEqual(merged["fetched"], 0)
+        self.assertEqual(merged["appended"], 0)
+        self.assertEqual(merged["would_fetch"], [])
+        self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
+
+
+class AutoModeOffsetDriftRetryTest(unittest.TestCase):
+    def _overshoot(self, offset: int) -> backfill.BackfillFetchReport:
+        # listed > 0, all skip_existing, NOT exhausted -> offset overshot.
+        return _auto_rep("fda483", offset=offset, listed=500, skipped_existing=500,
+                         next_offset=offset + 500, exhausted=False)
+
+    def test_all_skip_not_exhausted_advances_offset_up_to_cap_then_stops(self) -> None:
+        existing = {f"fda483-{i}" for i in range(1000)}
+        side_483 = [(self._overshoot(off), 0) for off in (1000, 1500, 2000, 2500)]
+        repwl = _auto_rep("fda_wl", exhausted=True)
+        merged, code, r483, rwl = _run_auto(
+            existing_483=existing, run_483_side=side_483, run_wl_side=[(repwl, 0)],
+        )
+        self.assertEqual(code, 0)
+        # Initial read + exactly 3 advances -- never a 5th call (no infinite loop).
+        self.assertEqual(r483.call_count, 4)
+        offsets = [c.kwargs["offset"] for c in r483.call_args_list]
+        self.assertEqual(offsets, [1000, 1500, 2000, 2500])
+        # Gave up on 483 with nothing new found -> still proceeds to WL this run,
+        # but 483 was never confirmed exhausted so the run is not auto_complete.
+        self.assertEqual(rwl.call_count, 1)
+        self.assertFalse(merged["auto_complete"])
+        self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
+        self.assertEqual(len(merged["auto_attempts"]), 5)
+
+    def test_retry_stops_early_once_new_documents_found(self) -> None:
+        found = _auto_rep("fda483", offset=1500, listed=500, skipped_existing=490,
+                          fetched=10, appended=10, next_offset=2000, exhausted=False)
+        merged, code, r483, rwl = _run_auto(
+            existing_483={f"fda483-{i}" for i in range(1000)},
+            run_483_side=[(self._overshoot(1000), 0), (found, 0)],
+        )
+        self.assertEqual(code, 0)
+        self.assertEqual(r483.call_count, 2)
+        rwl.assert_not_called()
+        self.assertEqual(merged["appended"], 10)
+        self.assertFalse(merged["auto_complete"])
+
+
+class AutoCliExclusionTest(unittest.TestCase):
+    def _main_expect_2_no_work(self, argv: list[str]) -> None:
+        env = dict(os.environ)
+        env["SUPABASE_URL"] = _BASE_URL
+        env["SUPABASE_SERVICE_ROLE_KEY"] = _SERVICE_KEY
+        r483, rwl = mock.MagicMock(), mock.MagicMock()
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch("collect_fda_backfill.run_auto") as run_auto_mock, \
+             mock.patch("collect_fda_backfill.fetch_existing_document_ids") as existing_mock, \
+             mock.patch.dict(backfill._RUNNERS, {"fda483": r483, "fda_wl": rwl}):
+            self.assertEqual(backfill.main(argv), 2)
+        run_auto_mock.assert_not_called()
+        existing_mock.assert_not_called()
+        r483.assert_not_called()
+        rwl.assert_not_called()
+
+    def test_auto_with_source_is_exit_2_without_any_work(self) -> None:
+        self._main_expect_2_no_work(["--auto", "--source", "fda483"])
+
+    def test_auto_with_offset_is_exit_2_without_any_work(self) -> None:
+        self._main_expect_2_no_work(["--auto", "--offset", "100"])
+
+    def test_manual_mode_without_source_is_exit_2(self) -> None:
+        self._main_expect_2_no_work(["--dry-run"])
+
+
+class AutoReportSchemaTest(unittest.TestCase):
+    # Every pre-F2c consumer-visible field of the single-source report, which the
+    # merged auto report must keep at the top level with the same types.
+    _EXISTING_FIELDS = {
+        "schema_version": str, "source": str, "offset": int, "max_docs": int,
+        "listed": int, "skipped_existing": int, "skipped_gated": int,
+        "fetched": int, "appended": int, "invalid": int, "errors": list,
+        "next_offset": int, "exhausted": bool, "would_fetch": list,
+    }
+
+    def test_merged_report_keeps_existing_fields_and_adds_auto_fields(self) -> None:
+        rep483 = _auto_rep("fda483", offset=2000, listed=0, exhausted=True, next_offset=2000)
+        repwl = _auto_rep("fda_wl", offset=3600, listed=0, exhausted=True, next_offset=3600)
+        merged, _code, _r483, _rwl = _run_auto(
+            run_483_side=[(rep483, 0)], run_wl_side=[(repwl, 0)],
+        )
+        for name, typ in self._EXISTING_FIELDS.items():
+            self.assertIn(name, merged, f"missing existing field: {name}")
+            self.assertIsInstance(merged[name], typ, f"field type changed: {name}")
+        self.assertEqual(merged["schema_version"], "grm-findings-backfill-fetch/v1")
+        self.assertIs(merged["auto"], True)
+        self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
+        self.assertIs(merged["auto_complete"], True)
+        # Per-attempt detail nests the untouched single-source reports.
+        self.assertEqual([a["source"] for a in merged["auto_attempts"]],
+                         ["fda483", "fda_wl"])
+        for attempt in merged["auto_attempts"]:
+            self.assertEqual(set(attempt), set(self._EXISTING_FIELDS))
+
+    def test_manual_mode_report_shape_is_unchanged(self) -> None:
+        from dataclasses import asdict
+        report = backfill.BackfillFetchReport(source="fda483")
+        self.assertEqual(set(asdict(report)), set(self._EXISTING_FIELDS))
+
+    def test_cli_auto_writes_merged_report(self) -> None:
+        import tempfile
+        env = dict(os.environ)
+        env["SUPABASE_URL"] = _BASE_URL
+        env["SUPABASE_SERVICE_ROLE_KEY"] = _SERVICE_KEY
+        fake = {"schema_version": "grm-findings-backfill-fetch/v1", "appended": 0,
+                "auto": True, "auto_source_order": ["fda483", "fda_wl"],
+                "auto_complete": True}
+        with tempfile.TemporaryDirectory() as td:
+            out_path = os.path.join(td, "report.json")
+            with mock.patch.dict(os.environ, env, clear=True), \
+                 mock.patch("collect_fda_backfill.run_auto",
+                            return_value=(fake, 0)) as run_auto_mock:
+                exit_code = backfill.main(["--auto", "--output", out_path])
+            self.assertEqual(exit_code, 0)
+            run_auto_mock.assert_called_once()
+            self.assertEqual(run_auto_mock.call_args.kwargs["max_docs"], 200)
+            with open(out_path, encoding="utf-8") as f:
+                data = json.load(f)
+        self.assertIs(data["auto"], True)
+        self.assertIs(data["auto_complete"], True)
+        self.assertIn("appended", data)  # workflow summary/M12 chain reads this key
+        self.assertNotIn(_SERVICE_KEY, json.dumps(data))
+
+
+class AutoModeExistingIdsFailureTest(unittest.TestCase):
+    def test_existing_ids_failure_is_exit_2_without_key_leak(self) -> None:
+        r483, rwl = mock.MagicMock(), mock.MagicMock()
+        with mock.patch("collect_fda_backfill.fetch_existing_document_ids",
+                        side_effect=RuntimeError(f"boom apikey={_SERVICE_KEY}")), \
+             mock.patch.dict(backfill._RUNNERS, {"fda483": r483, "fda_wl": rwl}):
+            merged, code = backfill.run_auto(
+                max_docs=500, delay=0, dry_run=False,
+                base_url=_BASE_URL, service_key=_SERVICE_KEY,
+            )
+        self.assertEqual(code, 2)
+        r483.assert_not_called()
+        rwl.assert_not_called()
+        self.assertFalse(merged["auto_complete"])
+        self.assertTrue(any("existing-ids-fetch-failed" in e for e in merged["errors"]))
+        self.assertNotIn(_SERVICE_KEY, json.dumps(merged))
+
+
 if __name__ == "__main__":
     unittest.main()

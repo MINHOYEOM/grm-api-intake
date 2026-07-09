@@ -1,11 +1,23 @@
-name: GRM Findings Backfill Fetch (F2b)
+name: GRM Findings Backfill Fetch (F2b/F2c)
 
-# [FIND-1 F2b] Manual, human-triggered *historical document fetch* backfill:
-# pulls past FDA 483 / FDA Warning Letter documents in chunks and appends them
-# directly to Supabase raw_signals (Notion is never written -- the weekly brief
-# queue must not see backfill noise), then (unless dry_run) chains the M12
-# findings backfill (findings_supabase_backfill.py) so raw -> findings completes
-# in the same job.
+# [FIND-1 F2b/F2c] *Historical document fetch* backfill: pulls past FDA 483 /
+# FDA Warning Letter documents in chunks and appends them directly to Supabase
+# raw_signals (Notion is never written -- the weekly brief queue must not see
+# backfill noise), then (unless dry_run) chains the M12 findings backfill
+# (findings_supabase_backfill.py) so raw -> findings completes in the same job.
+#
+# Two trigger modes:
+#   - workflow_dispatch (F2b, manual): human picks source/offset/max_docs/dry_run.
+#   - schedule, or dispatch with auto=true (F2c, unattended): collect_fda_backfill.py
+#     --auto computes everything itself -- offset per source = count of already-
+#     collected document_ids, 483 first then WL, at most ONE source actually
+#     fetches documents per run (fda.gov request budget), and WL is only attempted
+#     when 483 found nothing new. Once BOTH backlogs are exhausted the run exits
+#     cleanly after a couple of list requests with auto_complete=true in the
+#     report -- no document fetches, no wasted work. Leaving the daily cron
+#     enabled after backfill completes is therefore harmless and INTENTIONAL: it
+#     doubles as an ongoing safety net that picks up any newly-appearing old
+#     documents that fall outside the daily collection window.
 #
 # robots.txt design constraints (do not weaken):
 #   - fda.gov robots specifies Crawl-Delay: 30 -- the collector sleeps `delay`
@@ -20,6 +32,11 @@ name: GRM Findings Backfill Fetch (F2b)
 # 이후 커밋/푸시/PR 생성 스텝이 없다. dry_run=true(기본값)로 먼저 실행해
 # 목록/skip 판정을 확인한 뒤, dry_run=false 로 재실행해야 실제 fetch/적재가 된다.
 on:
+  # F2c daily auto run: 07:17 UTC = 16:17 KST -- deliberately ~11h apart from the
+  # daily collection cron (grm-intake.yml, 18:17 UTC) so the two workflows never
+  # share the same fda.gov request-budget window.
+  schedule:
+    - cron: '17 7 * * *'
   workflow_dispatch:
     inputs:
       source:
@@ -45,6 +62,10 @@ on:
         description: 'Seconds to sleep between fda.gov requests (robots Crawl-Delay)'
         type: string
         default: '30'
+      auto:
+        description: 'true = one F2c --auto pass (ignores source/offset/max_docs/dry_run/delay above)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -82,13 +103,22 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          ARGS=(--source "${{ inputs.source }}"
-                --offset "${{ inputs.offset }}"
-                --max-docs "${{ inputs.max_docs }}"
-                --delay "${{ inputs.delay }}"
-                --output fetch_report.json)
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            ARGS+=(--dry-run)
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto }}" = "true" ]; then
+            # F2c auto mode: never uses the manual source/offset dispatch inputs
+            # (on schedule they are empty anyway). The collector computes each
+            # source's offset itself and fetches at most one source's chunk; when
+            # both backlogs are exhausted it exits 0 after a couple of list
+            # requests with auto_complete=true (cheap steady state -- see header).
+            ARGS=(--auto --max-docs 500 --delay 30 --output fetch_report.json)
+          else
+            ARGS=(--source "${{ inputs.source }}"
+                  --offset "${{ inputs.offset }}"
+                  --max-docs "${{ inputs.max_docs }}"
+                  --delay "${{ inputs.delay }}"
+                  --output fetch_report.json)
+            if [ "${{ inputs.dry_run }}" = "true" ]; then
+              ARGS+=(--dry-run)
+            fi
           fi
           python collect_fda_backfill.py "${ARGS[@]}"
           APPENDED=$(python -c "import json; print(json.load(open('fetch_report.json'))['appended'])")
@@ -96,8 +126,10 @@ jobs:
 
       # dry_run 이 아니고 이번 실행에서 raw_signals 가 실제 추가됐을 때만 M12 체인:
       # 방금 적재된 raw 를 같은 잡에서 findings 로 변환해 백필을 완결한다.
+      # auto 경로(schedule 또는 dispatch auto=true)는 dry_run 이 아니므로 -- dispatch 의
+      # dry_run 기본값('true')이 남아 있어도 -- appended>0 이면 체인이 그대로 실행된다.
       - name: Chain M12 findings backfill (raw -> findings)
-        if: ${{ inputs.dry_run != 'true' && steps.fetch.outputs.appended != '0' && steps.fetch.outputs.appended != '' }}
+        if: ${{ (github.event_name == 'schedule' || inputs.auto == true || inputs.dry_run != 'true') && steps.fetch.outputs.appended != '0' && steps.fetch.outputs.appended != '' }}
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -108,9 +140,11 @@ jobs:
         if: always()
         run: |
           {
-            echo "### GRM Findings Backfill Fetch (F2b)"
+            echo "### GRM Findings Backfill Fetch (F2b/F2c)"
             echo ""
-            echo "source: \`${{ inputs.source }}\` / offset: \`${{ inputs.offset }}\` / max_docs: \`${{ inputs.max_docs }}\` / dry_run: \`${{ inputs.dry_run }}\` / delay: \`${{ inputs.delay }}\`"
+            echo "event: \`${{ github.event_name }}\` / auto: \`${{ github.event_name == 'schedule' || inputs.auto == true }}\`"
+            echo ""
+            echo "source: \`${{ inputs.source }}\` / offset: \`${{ inputs.offset }}\` / max_docs: \`${{ inputs.max_docs }}\` / dry_run: \`${{ inputs.dry_run }}\` / delay: \`${{ inputs.delay }}\` (dispatch inputs -- auto 실행에서는 비어 있거나 무시됨)"
             echo ""
             if [ -f fetch_report.json ]; then
               echo "#### Fetch report (collect_fda_backfill.py)"

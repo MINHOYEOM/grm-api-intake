@@ -556,6 +556,18 @@
 
   var EVIDENCE_LABEL = { A: "Evidence A", B: "Evidence B", C: "Evidence C" };
   var STATUS_LABEL = { needs_review: "검토 필요", accepted: "검토 완료", rejected: "반려" };
+  // [M13a] 배지 의미 툴팁 — 증거등급/검토상태가 "무엇을 뜻하는지" title 로 즉답한다
+  // (setAttribute("title", ...) 뿐이라 XSS 무관). accepted 는 사람이 검토를 마쳤다는
+  // 뜻이 아니라 결정론 규칙 기반 자동 승인이므로, 그렇게 오해될 문구는 쓰지 않는다.
+  var EVIDENCE_TITLE = {
+    A: "Evidence A — 1차 공식문서에서 직접 추출(신뢰도 높음)",
+    B: "Evidence B — 공식 인덱스+보조 자료 기반(원문 대조 권장)",
+    C: "Evidence C — 보조 출처 단독(참고용)",
+  };
+  var STATUS_TITLE = {
+    needs_review: "AI 추출 후 사람 검수 전 — 원문 대조 필수",
+    accepted: "결정론 추출 규칙 통과(자동 승인)",
+  };
 
   // [M10b P0] 검토 필요 카드 상시 경고 한 줄. confidence 없으면 신뢰도 부분 생략.
   function appendReviewNote(card, row) {
@@ -659,12 +671,20 @@
     head.appendChild(el("span", "fnd-b", row.source || ""));
     var evLabel = EVIDENCE_LABEL[row.evidence_level] || row.evidence_level || "";
     if (evLabel) {
-      head.appendChild(el("span", "fnd-b" + (row.evidence_level === "A" ? " ev-a" : ""), evLabel));
+      var evBadge = el("span", "fnd-b" + (row.evidence_level === "A" ? " ev-a" : ""), evLabel);
+      var evTitle = EVIDENCE_TITLE[row.evidence_level];
+      if (evTitle) evBadge.setAttribute("title", evTitle);
+      head.appendChild(evBadge);
     }
     if (row.review_status === "needs_review") {
-      head.appendChild(el("span", "fnd-b needs-review", STATUS_LABEL.needs_review));
+      var reviewBadge = el("span", "fnd-b needs-review", STATUS_LABEL.needs_review);
+      reviewBadge.setAttribute("title", STATUS_TITLE.needs_review);
+      head.appendChild(reviewBadge);
     } else if (row.review_status && STATUS_LABEL[row.review_status]) {
-      head.appendChild(el("span", "fnd-b", STATUS_LABEL[row.review_status]));
+      var statusBadge = el("span", "fnd-b", STATUS_LABEL[row.review_status]);
+      var statusTitle = STATUS_TITLE[row.review_status];
+      if (statusTitle) statusBadge.setAttribute("title", statusTitle);
+      head.appendChild(statusBadge);
     }
     card.appendChild(head);
 

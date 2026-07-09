@@ -209,7 +209,9 @@
 .fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
 .fnd-b{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:4px 9px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
 .fnd-b.date{font-family:var(--mono);background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
-.fnd-b.ev-a{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+/* M13a — 증거등급(A)은 "신뢰 높음" 신호라 coral(경고색)과 분리한다: 중립 강조(--strong/--ink)로
+   또렷하게, 검토상태(needs-review)만 coral-tint 를 "주의" 신호로 전용한다. */
+.fnd-b.ev-a{background:var(--strong);color:var(--ink);border-color:var(--line-2);font-weight:700}
 .fnd-b.needs-review{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
 .fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
 .fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
@@ -266,7 +268,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=ded232fa" defer></script><style>
+<script src="../assets/findings.js?v=dec7f080" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

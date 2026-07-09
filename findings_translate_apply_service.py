@@ -295,12 +295,23 @@ def main(argv: list[str] | None = None) -> int:
     base_url, service_key = creds
 
     report = apply_outbox(args.outbox_dir, base_url, service_key, dry_run=args.dry_run)
+    # Report JSON is always printed/written before we decide the exit code --
+    # even a red (exit 1) run leaves the report behind for the workflow's
+    # step summary to surface.
     _write_report(args.output, report)
 
-    # items_errored is intentionally NOT a failure exit -- PATCH is idempotent
-    # and outbox files are never removed, so a future scheduled run naturally
-    # retries anything that failed this time. The report is the source of
-    # truth for operators; CI is not gated on it.
+    # FIND-1 M13b: PATCH is still idempotent and outbox files are still never
+    # removed, so a future scheduled run naturally retries anything that
+    # failed this time -- that retry design is unchanged. What changes here
+    # is *visibility*: retryability and CI gating are orthogonal, so errors
+    # (items_errored, e.g. failed PATCHes/parses/anomalous row counts, or any
+    # other entry landing in report["errors"], such as a malformed
+    # SUPABASE_URL) now surface as exit 1 instead of a silently-green run
+    # that only a human reading the report JSON would ever notice. An empty
+    # outbox (0 items processed) is a normal steady state, not an error, and
+    # keeps exiting 0.
+    if report["errors"]:
+        return 1
     return 0
 
 

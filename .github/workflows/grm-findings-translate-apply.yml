@@ -47,6 +47,12 @@ jobs:
       # 읽기(outbox 파일) + PATCH(Supabase) 만 수행한다 — git add/commit/push 없음.
       # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4 야간 적재)이 이미 쓰는 동일 secret
       # 재사용이며, 이 워크플로를 위한 신규 secret 등록은 필요 없다.
+      # FIND-1 M13b: items_errored>0 (or any other report["errors"] entry,
+      # e.g. a malformed SUPABASE_URL) now makes the script exit 1 -- PATCH
+      # retry semantics are unchanged (outbox files are never removed, so a
+      # future scheduled run naturally re-processes anything that failed
+      # this time), but the run now goes red instead of silently green so a
+      # human notices without having to open the report JSON by hand.
       - name: Apply translation outbox (no git writes — read + PATCH only)
         id: apply
         env:

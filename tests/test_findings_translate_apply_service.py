@@ -378,7 +378,11 @@ class CredentialsTest(unittest.TestCase):
             report = json.load(f)
         self.assertEqual(report["files_scanned"], 0)
 
-    def test_cli_items_errored_still_exits_0(self) -> None:
+    def test_cli_items_errored_exits_1(self) -> None:
+        """FIND-1 M13b: items_errored>0 must surface as a red (exit 1) CI
+        run -- retry semantics are unchanged (the outbox file is left in
+        place either way), but a silently-green run on partial failure is
+        no longer acceptable."""
         _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
         out = os.path.join(self._tmp.name, "report.json")
 
@@ -395,10 +399,85 @@ class CredentialsTest(unittest.TestCase):
                 ]
             )
 
-        self.assertEqual(rc, 0)
+        self.assertEqual(rc, 1)
+        # The report is still written even though the run is red -- exit 1
+        # does not suppress the report output.
         with open(out, encoding="utf-8") as f:
             report = json.load(f)
         self.assertEqual(report["items_errored"], 1)
+
+    def test_cli_items_succeeded_exits_0(self) -> None:
+        """items_errored == 0 (all PATCHes succeeded) must still exit 0."""
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+        out = os.path.join(self._tmp.name, "report.json")
+
+        with mock.patch(
+            "findings_translate_apply_service.requests.patch",
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}]),
+        ):
+            rc = svc.main(
+                [
+                    "--outbox-dir", self._tmp.name,
+                    "--supabase-url", _BASE_URL,
+                    "--service-role-key", _SERVICE_KEY,
+                    "--output", out,
+                ]
+            )
+
+        self.assertEqual(rc, 0)
+        with open(out, encoding="utf-8") as f:
+            report = json.load(f)
+        self.assertEqual(report["items_errored"], 0)
+
+    def test_cli_empty_outbox_exits_0_not_an_error(self) -> None:
+        """An outbox directory with zero items (nothing queued to translate
+        this week) is a normal steady state, not an error -- it must keep
+        exiting 0 even though the M13b policy change now gates on
+        report["errors"]."""
+        empty_dir = os.path.join(self._tmp.name, "empty-outbox")
+        os.makedirs(empty_dir, exist_ok=True)
+        out = os.path.join(self._tmp.name, "report.json")
+
+        with mock.patch("findings_translate_apply_service.requests.patch") as patch:
+            rc = svc.main(
+                [
+                    "--outbox-dir", empty_dir,
+                    "--supabase-url", _BASE_URL,
+                    "--service-role-key", _SERVICE_KEY,
+                    "--output", out,
+                ]
+            )
+
+        self.assertEqual(rc, 0)
+        patch.assert_not_called()
+        with open(out, encoding="utf-8") as f:
+            report = json.load(f)
+        self.assertEqual(report["items_total"], 0)
+        self.assertEqual(report["errors"], [])
+
+    def test_cli_items_errored_report_printed_to_stdout_on_exit_1(self) -> None:
+        """report JSON must still be printed to stdout (no --output given)
+        on the exit-1 (red) path, so CI logs / step summaries can capture
+        it even though the run is failing."""
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+
+        with mock.patch(
+            "findings_translate_apply_service.requests.patch",
+            return_value=_FakeResponse(500),
+        ):
+            with mock.patch("builtins.print") as mock_print:
+                rc = svc.main(
+                    [
+                        "--outbox-dir", self._tmp.name,
+                        "--supabase-url", _BASE_URL,
+                        "--service-role-key", _SERVICE_KEY,
+                    ]
+                )
+
+        self.assertEqual(rc, 1)
+        printed_text = "\n".join(str(call.args[0]) for call in mock_print.call_args_list)
+        printed_report = json.loads(printed_text)
+        self.assertEqual(printed_report["items_errored"], 1)
 
     def test_cli_env_fallback_credentials(self) -> None:
         _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])

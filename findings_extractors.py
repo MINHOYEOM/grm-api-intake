@@ -23,6 +23,90 @@ FDA_483_LIST_URL = (
 
 _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*", re.I)
 
+# [FIND-1 M11] 법조항 추출 강화 -- 21 CFR 만 잡던 옛 `_extract_cfr_refs`(단일 패턴, `_CFR_RE`)를
+# 21 U.S.C./FD&C Act section 까지 잡는 `_extract_us_legal_refs` 로 승격한다. `_CFR_RE`(21 CFR 단일
+# 패턴)는 그대로 재사용 -- 매칭 로직을 다시 쓰지 않고 이 상위 함수 안 CFR pass 에 그대로 포함시켰다.
+# 483(`_from_fda_483_observations`)·WL(`_from_warning_letter`) 양쪽 호출부 모두 이 함수로 교체.
+#
+# "21 CFR parts 210 and 211" 처럼 한 접두사 뒤에 번호 목록이 이어지는 형태는 각 항으로 전개한다.
+# 전개 시도 중 흔한 함정: 목록 계속(continuation) 패턴이 탐욕적으로 다음 절의 무관한 숫자까지
+# 삼킬 수 있다(예 "21 U.S.C. § 351(a)(2)(B) and 21 CFR parts 210 and 211" 에서 " and " 뒤의
+# "21"이 "21 CFR" 의 시작인데 U.S.C. 목록의 다음 항으로 오인될 수 있음) -- 그래서 U.S.C./section
+# 목록의 계속 절은 바로 뒤에 "CFR" 이 오면 소비하지 않도록 부정 전방탐색을 둔다.
+_LIST_SEP = r"(?:,\s*and\s+|,\s*|and\s+)"  # "and"/","/", and " -- longest-alt-first
+_CFR_PARTS_LIST_RE = re.compile(
+    r"21\s*CFR\s*parts\s+(\d+(?:\s*" + _LIST_SEP + r"\d+)*)", re.I
+)
+_USC_PREFIX_RE = re.compile(r"21\s*U\.S\.C\.\s*§?\s*", re.I)
+# NOTE: `\d++` (possessive) not `\d+` -- a plain greedy `\d+` can backtrack to a
+# shorter digit run (e.g. "21" -> "2") purely to *satisfy* the trailing
+# `(?!\s*CFR)` negative lookahead, which defeats the guard it's there for
+# (observed live on "... and 21 CFR parts 210 ..." matching a phantom "2").
+# Possessive quantifiers (Python 3.11+) forbid that backtrack.
+_USC_RE = re.compile(
+    r"21\s*U\.S\.C\.\s*§?\s*\d++(?:\([a-zA-Z0-9]+\))*+(?!\s*CFR)"
+    r"(?:\s*" + _LIST_SEP + r"§?\s*\d++(?:\([a-zA-Z0-9]+\))*+(?!\s*CFR))*",
+    re.I,
+)
+_SECTION_RE = re.compile(
+    r"sections?\s+\d++(?:\([a-zA-Z0-9]+\))*+(?!\s*CFR)"
+    r"(?:\s*" + _LIST_SEP + r"\d++(?:\([a-zA-Z0-9]+\))*+(?!\s*CFR))*",
+    re.I,
+)
+
+
+def _extract_us_legal_refs(text: str) -> list[str]:
+    """Extract+normalize+dedupe 21 CFR / 21 U.S.C. / FD&C Act section references.
+
+    List forms ("21 CFR parts 210 and 211", "sections 301(a), 301(d)") are
+    expanded into one ref per item where feasible; a form that resists clean
+    expansion is kept as the original matched string (better a coarse ref than
+    a dropped one).
+    """
+    haystack = text or ""
+    seen: set[str] = set()
+    refs: list[str] = []
+    consumed: list[tuple[int, int]] = []
+
+    def _add(ref: str) -> None:
+        key = ref.lower()
+        if key not in seen:
+            seen.add(key)
+            refs.append(ref)
+
+    def _overlaps(span: tuple[int, int]) -> bool:
+        start, end = span
+        return any(not (end <= s or start >= e) for s, e in consumed)
+
+    for match in _CFR_PARTS_LIST_RE.finditer(haystack):
+        consumed.append(match.span())
+        for number in re.findall(r"\d+", match.group(1)):
+            _add(f"21 CFR {number}")
+
+    for match in _CFR_RE.finditer(haystack):
+        if _overlaps(match.span()):
+            continue
+        ref = re.sub(r"\s+", " ", match.group(0)).strip()
+        ref = re.sub(r"(?i)\bcfr\b", "CFR", ref)
+        ref = re.sub(r"(?i)\bpart\b", "Part", ref)
+        _add(ref)
+
+    for match in _USC_RE.finditer(haystack):
+        consumed.append(match.span())
+        prefix = _USC_PREFIX_RE.match(match.group(0))
+        body = match.group(0)[prefix.end():] if prefix else match.group(0)
+        for number in re.findall(r"\d+(?:\([a-zA-Z0-9]+\))*", body):
+            _add(f"21 U.S.C. § {number}")
+
+    for match in _SECTION_RE.finditer(haystack):
+        if _overlaps(match.span()):
+            continue
+        consumed.append(match.span())
+        for number in re.findall(r"\d+(?:\([a-zA-Z0-9]+\))*", match.group(0)):
+            _add(f"section {number}")
+
+    return refs
+
 
 def findings_from_raw_signal(raw_signal: dict[str, Any]) -> list[dict[str, Any]]:
     """Extract deterministic v0 findings from one grm-raw-signal/v1 record."""
@@ -97,7 +181,7 @@ def _from_fda_483_observations(
         detail = _compact(
             gf.strip_fda483_page_header(_compact(observation.get("detail")), **header_hints)
         )
-        refs = _extract_cfr_refs(" ".join(part for part in (deficiency, detail) if part))
+        refs = _extract_us_legal_refs(" ".join(part for part in (deficiency, detail) if part))
         out.append(gf.finding_from_raw_signal(
             raw_signal,
             finding_text=deficiency,
@@ -172,21 +256,146 @@ def _from_warning_letter(
     raw: dict[str, Any],
     row: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    text = _compact(raw.get("wl_body_excerpt")) or _compact(raw.get("wl_body_full"))
+    # [FIND-1 M11] WL 본문을 483 Observation 처럼 개별 위반 finding 여러 건으로 분해한다(과거엔
+    # 편지 전체가 finding 1건 -- 483 대비 정보 밀도가 완전히 달라 스캔이 불가능했다). 완전판
+    # (wl_body_full)이 있으면 그것을, 없으면 excerpt(1500자, 절단 감수)를 쓴다.
+    text = _compact(raw.get("wl_body_full")) or _compact(raw.get("wl_body_excerpt"))
     if not text:
         return []
 
-    return [gf.finding_from_raw_signal(
-        raw_signal,
-        finding_text=text,
-        ordinal=1,
-        evidence_level="B",
-        evidence_url=_evidence_url(raw_signal, raw, "url", "source_url"),
-        finding_language=_language(row, "EN"),
-        cfr_refs=_extract_cfr_refs(text),
-        confidence=0.72,
-        review_status="needs_review",
-    )]
+    body = _cut_wl_footer(text) or text
+    raw_blocks = _split_wl_violation_blocks(body)
+    payload = [parts for parts in (_wl_block_parts(block) for block in raw_blocks) if parts]
+    if not payload:
+        # degrade -- 앵커(번호/헤딩)가 없거나 유효 블록이 하나도 안 남으면 현행 동작 그대로
+        # 통짜 1건(길이 상한도 적용하지 않는다 -- 회귀 0 이 우선).
+        payload = [(body, body)]
+
+    evidence_url = _evidence_url(raw_signal, raw, "url", "source_url")
+    out: list[dict[str, Any]] = []
+    for ordinal, (full_block, finding_text) in enumerate(payload, start=1):
+        out.append(gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=finding_text,
+            ordinal=ordinal,
+            evidence_level="B",
+            evidence_url=evidence_url,
+            finding_language=_language(row, "EN"),
+            cfr_refs=_extract_us_legal_refs(full_block),
+            confidence=0.72,
+            review_status="needs_review",
+        ))
+    return out
+
+
+# 편지 결론/서명/nav boilerplate -- 위반 서술 뒤에 오는 이 마커들 중 가장 이른 위치부터 잘라
+# 버린다. ★대소문자를 반드시 구분한다(re.I 금지): 이 마커들은 전부 편지의 섹션 제목/맺음말/
+# nav 로 나오는 고정 대문자 문구다. re.I 를 쓰면 위반 본문 산문의 소문자 "at the conclusion of
+# the inspection"(Genzyme 실측) 같은 표현을 푸터로 오인해 위반 서술 뒷부분과 조항(21 CFR 211.22)
+# 을 통째로 잘라내는 회귀가 난다 -- "위반을 살린다"는 M11 목표와 정반대. Title-Case 제목형만 잡아
+# LyfeUnit 실측 "… section 505(a). Conclusion As previously stated …"(대문자 C) 는 정확히 절단하되
+# 소문자 산문은 보존한다.
+_WL_FOOTER_MARKERS_RE = re.compile(
+    r"\bConclusion\b"
+    r"|Send your written response"
+    r"|\bSincerely\b"
+    r"|/S/"
+    r"|Content current as of"
+    r"|Regulated Product\(s\)"
+    r"|Please note FDA posts warning letters"
+)
+
+# 번호 리스트 앵커: "1. " "2. " 처럼 문장/구절 경계(문서 시작·마침표+공백·닫는괄호+공백·콜론+공백)
+# 뒤에서 시작하고 이어서 대문자(또는 인용부호)로 시작하는 항목만 잡는다. 이 경계 요구가 없으면
+# "21 CFR 211.22." 같은 조항번호의 소수점 뒷자리("22.")를 리스트 항목으로 오탐한다(실측 확인됨).
+# 하위항목 "a. b." 는 숫자가 아니므로 이 패턴에 안 걸려 상위 번호 블록에 자연히 포함된다(과분해
+# 방지 -- 스펙 요구사항).
+_WL_NUMBERED_ITEM_RE = re.compile(r"(\d{1,2})\.\s+(?=[A-Z\"“])")
+_WL_NUMBERED_BOUNDARY_OK = ("\n", ". ", ") ", ": ")
+
+# 섹션 헤딩 앵커: "Unapproved New Drug Violations" 처럼 2~5개의 Title-Case 단어 뒤에 "Violations"
+# 로 끝나는 짧은 제목구. 바로 뒤에 공백+대문자가 이어질 때만 앵커로 인정한다 -- 원문 HTML 의
+# <h2> 헤딩이 텍스트 추출 과정에서 다음 문단과 공백 하나로 그냥 이어붙는 특징(개행이 사라짐)을
+# 이용한 판별이다. 이 조건이 없으면 문서 서두의 "FDA Review Violations were identified..."
+# (뒤에 소문자 "were"가 옴 -- 진짜 헤딩이 아니라 페이지 타이틀+본문이 그냥 이어붙은 것)까지
+# 헤딩으로 오탐해 서두가 첫 finding 이 돼 버린다(스펙: 서두는 반드시 버려야 함).
+_WL_HEADING_RE = re.compile(r"((?:[A-Z][A-Za-z]*\s+){2,5}Violations)(?=\s+[A-Z])")
+
+_WL_BLOCK_CHAR_CAP = 480
+_WL_FRAGMENT_MIN_CHARS = 40
+
+
+def _cut_wl_footer(text: str) -> str:
+    match = _WL_FOOTER_MARKERS_RE.search(text)
+    if not match:
+        return text
+    return text[: match.start()].rstrip()
+
+
+def _wl_numbered_anchors(text: str) -> list[tuple[int, int]]:
+    anchors: list[tuple[int, int]] = []
+    for match in _WL_NUMBERED_ITEM_RE.finditer(text):
+        start = match.start()
+        if start == 0 or text[max(0, start - 2):start] in _WL_NUMBERED_BOUNDARY_OK:
+            anchors.append((start, match.end()))
+    return anchors
+
+
+def _wl_heading_anchors(text: str) -> list[tuple[int, int]]:
+    anchors: list[tuple[int, int]] = []
+    for match in _WL_HEADING_RE.finditer(text):
+        start = match.start(1)
+        if start == 0 or text[max(0, start - 2):start] in (". ", "! ", "? ") or text[max(0, start - 1):start] == "\n":
+            anchors.append((start, match.end(1)))
+    return anchors
+
+
+def _split_wl_violation_blocks(text: str) -> list[str]:
+    """(우선순위 degrade) 번호 리스트 -> 섹션 헤딩 -> [] (호출부가 통짜 1건으로 되돌린다).
+
+    각 anchor 는 (label_start, content_start): label_start 는 다음 anchor 를 만나기 전까지
+    "이전 블록"의 끝 경계로, content_start 는 "이 블록" 자신의 시작(번호/헤딩 잔여를 뗀 지점)으로
+    쓰인다.
+    """
+    anchors = _wl_numbered_anchors(text)
+    if len(anchors) < 2:
+        anchors = _wl_heading_anchors(text)
+    if len(anchors) < 2:
+        return []
+    blocks = []
+    for index, (_label_start, content_start) in enumerate(anchors):
+        end = anchors[index + 1][0] if index + 1 < len(anchors) else len(text)
+        blocks.append(text[content_start:end])
+    return blocks
+
+
+def _wl_block_parts(raw_block: str) -> tuple[str, str] | None:
+    """블록 1개 -> (조항추출용 원문 전체, 표시용 finding_text) 또는 미완결 조각이면 None.
+
+    excerpt(1500자) 절단으로 마지막 블록이 문장 중간에서 잘리는 경우(`...data, i`)를 짧고
+    미완결이면 버린다(<40자 + 문장부호 없음). 길면 -- 잘렸어도 -- 정보가 있으니 보존한다.
+    """
+    block = _compact(raw_block)
+    if not block:
+        return None
+    ends_with_terminal = block[-1] in ".?!\""
+    if not ends_with_terminal and len(block) < _WL_FRAGMENT_MIN_CHARS:
+        return None
+    return block, _cap_wl_block_text(block, ends_with_terminal)
+
+
+def _cap_wl_block_text(block: str, ends_with_terminal: bool) -> str:
+    """표시용 상한(약 480자) -- 483 은 첫 문장만 쓰지만 WL 위반은 한 문단이 한 위반이라 문단
+    전체를 유지하는 게 자연스럽다. 다만 벽텍스트 방지를 위해 480자 근방에서 안전 절단한다.
+    문장부호 없이 끝나는(미완결) 블록은 짧아도 길어도 "…" 로 표시해 절단됐음을 드러낸다.
+    """
+    if len(block) <= _WL_BLOCK_CHAR_CAP:
+        return block if ends_with_terminal else block.rstrip(" .,;:") + "…"
+    truncated = block[:_WL_BLOCK_CHAR_CAP]
+    cut = truncated.rfind(" ")
+    if cut > 0:
+        truncated = truncated[:cut]
+    return truncated.rstrip(" .,;:") + "…"
 
 
 def _from_whopir(
@@ -305,20 +514,6 @@ def _classify_gmp_summary(text: str) -> str:
     if any(token in lowered for token in ("cross-contamination", "contamination", "교차오염", "오염")):
         return "contamination_control"
     return gf.classify_finding_category(text)
-
-
-def _extract_cfr_refs(text: str) -> list[str]:
-    seen: set[str] = set()
-    refs: list[str] = []
-    for match in _CFR_RE.finditer(text or ""):
-        ref = re.sub(r"\s+", " ", match.group(0)).strip()
-        ref = re.sub(r"(?i)\bcfr\b", "CFR", ref)
-        ref = re.sub(r"(?i)\bpart\b", "Part", ref)
-        key = ref.lower()
-        if key not in seen:
-            seen.add(key)
-            refs.append(ref)
-    return refs
 
 
 def _extract_mfds_refs(text: str) -> list[str]:

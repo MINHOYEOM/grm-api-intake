@@ -678,8 +678,11 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_page_generated(self):
         self.assertIn("규제 지적사항 검색", self.html)
-        self.assertIn('id="findings-notice"', self.html)
-        self.assertIn("AI 자동 추출 고지", self.html)
+        # [M15] 상단 슬림 고지(#findings-notice)는 제거되고, 하단 기존 AI Disclosure 디자인
+        # (id="ai-notice")으로 이전됐다.
+        self.assertNotIn('id="findings-notice"', self.html)
+        self.assertIn('id="ai-notice"', self.html)
+        self.assertIn("AI Disclosure", self.html)
 
     def test_cfg_div_env_gated_empty_by_default(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
@@ -700,14 +703,25 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/</loc>", self.sitemap)
 
     def test_nav_link_present_and_active_state(self):
-        # findings 페이지에서만 nav 'on' 클래스가 지적사항 링크에 붙는다.
-        self.assertIn('href="../findings/index.html" class="on">지적사항</a>', self.html)
-        self.assertIn('href="findings/index.html">지적사항</a>', self.landing)
-        self.assertNotIn('href="../findings/index.html" class="on">지적사항</a>', self.archive)
-        self.assertIn('href="../findings/index.html">지적사항</a>', self.archive)
+        # [M15] "지적사항" → "찾아보기" 로 이름 변경, findings 페이지에서만 nav 'on' 클래스가 붙는다.
+        self.assertIn('href="../findings/index.html" class="on">찾아보기</a>', self.html)
+        self.assertIn('href="findings/index.html">찾아보기</a>', self.landing)
+        self.assertNotIn('href="../findings/index.html" class="on">찾아보기</a>', self.archive)
+        self.assertIn('href="../findings/index.html">찾아보기</a>', self.archive)
+
+    def test_nav_this_week_tab_removed_but_cta_kept(self):
+        # [M15] nav 탭에서 "이번 주" 링크는 제거됐다(CTA "이번 주 소식" 버튼과 중복) —
+        # 헤더 상시 CTA 버튼("이번 주 소식")은 그대로 유지된다.
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertNotIn(">이번 주<", nav_m.group(1))
+        self.assertEqual(nav_m.group(1).count("<a "), 3, "nav 탭은 소개·모아보기·찾아보기 3개여야 함")
+        self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
-        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
+        self.assertIn('<a href="../findings/index.html">찾아보기</a>', self.html)
+        self.assertNotIn(">이번 주</a>", self.html)
 
     def test_canonical_and_description(self):
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/" />', self.html)
@@ -852,36 +866,27 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("stats.needsReview", js_src)
         self.assertIn("검토 필요", js_src)
 
-    # ── FIND-1 M10b: 카드 UX 오버홀(고지 슬림화·검토필요 경계·기본접힘·하이라이트·refs 상태) ──
-    def test_notice_is_details_summary_slim_banner(self):
-        """AI 고지(P0)는 <details>/<summary> 구조로 축소돼 있어야 한다 — summary 는 항상
-        보이는 한 줄 요지, 본문은 펼쳐야 보인다. id/aria-label 은 기존 계약대로 유지."""
+    # ── FIND-1 M15: AI 고지를 하단 기존 .ai-disclosure 디자인으로 이전 ──────────────────
+    def test_notice_moved_to_bottom_ai_disclosure(self):
+        """[M15] 상단 슬림 고지(.fnd-notice/#findings-notice)는 완전히 제거됐고, landing.html
+        과 동일한 .ai-disclosure 구조(kick + h2 + .disc-body > .disc-sec)가 페이지 하단에
+        findings 전용 id(#ai-notice)로 렌더된다."""
         import re as _re
-        self.assertIn('id="findings-notice" aria-label="AI 자동 추출 고지"', self.html)
+        self.assertNotIn("fnd-notice", self.html)
+        self.assertNotIn('id="findings-notice"', self.html)
         m = _re.search(
-            r'<section class="fnd-notice" id="findings-notice"[^>]*>\s*<details',
+            r'<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지">',
             self.html)
-        self.assertIsNotNone(m, "고지 섹션이 details 로 시작하지 않음")
-        self.assertIn("<summary", self.html)
+        self.assertIsNotNone(m, "하단 ai-disclosure 섹션 마커 미발견")
+        block = self.html[m.start():]
+        self.assertIn('<span class="kick">AI Disclosure</span>', block[:400])
+        self.assertIn("<h2>콘텐츠 생성 방식 및 유의사항</h2>", block[:400])
+        self.assertEqual(block.count('<div class="disc-sec">'), 4)
 
-    def test_notice_summary_has_short_gist_and_quiet_style(self):
-        """summary 한 줄은 조용한 스타일 클래스(.fnd-notice-sum)를 쓰고, 펼침 힌트 아이콘
-        (ti-info-circle)을 포함하며, 요지 문구를 담는다. [M14] 박스 배너를 걷어내며 요지
-        문구도 더 짧게(추출·번역 병기) 다듬었다 — 전문(<p>)은 그대로 불변."""
-        self.assertIn("fnd-notice-sum", self.html)
-        self.assertIn("ti-info-circle", self.html)
-        self.assertIn("AI 자동 추출·번역 — 의사결정 전 원문 대조 필수", self.html)
-
-    def test_notice_is_slim_inline_note_not_boxed_banner(self):
-        """[M14 P0] 상단 고지는 더 이상 박스 배너(배경/보더/패딩)가 아니다 — margin 만
-        남은 초경량 인라인 노트여야 한다."""
-        import re as _re
-        m = _re.search(r'\.fnd-notice\{([^}]*)\}', self.html)
-        self.assertIsNotNone(m, ".fnd-notice CSS 규칙 미발견")
-        rule = m.group(1)
-        self.assertNotIn("background", rule)
-        self.assertNotIn("border:", rule)
-        self.assertIn("margin:0 0 20px", rule)
+    def test_ai_disclosure_appears_after_results_section(self):
+        """[M15] AI 고지는 더 이상 첫 화면(page-head 바로 아래)이 아니라 본문(검색 결과)
+        뒤로 이동했다 — 마크업 순서로 fnd-results 가 ai-notice 보다 먼저 나와야 한다."""
+        self.assertLess(self.html.index('id="fnd-results"'), self.html.index('id="ai-notice"'))
 
     def test_page_head_description_is_one_sentence(self):
         """첫 화면 밀도(보조) — page-head 설명문단이 압축된 한 문장(마침표 1개로 종결)인지 확인."""
@@ -969,20 +974,60 @@ class WebFindingsRenderTest(unittest.TestCase):
         for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
             self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
 
-    # ── FIND-1 M10c: 탐색 툴바 오버홀(칩 필터·건수병기·정렬·sticky·모바일 접기·URL 동기화) ──
-    def test_low_cardinality_filters_are_chip_groups_not_selects(self):
-        """소스·증거등급·검토상태는 <select> 대신 버튼 칩 그룹 컨테이너로 렌더된다
-        (값은 findings.js 가 런타임에 채운다) — 드롭다운 제거를 셸 마크업으로 확인.
-        카테고리·발행월은 20종/월 단위라 여전히 드롭다운을 유지한다. [M14] 기관(agency)
-        칩 그룹은 DOM 에서 완전히 제거됐다 — 소스가 기관을 포함하는 상위 구분이라
-        "MFDS" 가 기관·소스 양쪽에 중복 표기되던 혼란을 없앤다(state.agency/URL 매칭
-        로직 자체는 findings.js 소스에 그대로 남아 있다 — 별도 마커로 확인)."""
-        for facet_id in ("fnd-f-source", "fnd-f-evidence", "fnd-f-status"):
-            self.assertIn(f'<div class="fnd-chipgroup" id="{facet_id}"', self.html)
-            self.assertNotIn(f'<select id="{facet_id}"', self.html)
+    # ── FIND-1 M15: 필터 전면 재설계(균일 셀렉트 행 + 적용 필터 칩) ─────────────────────
+    def test_all_low_cardinality_filters_are_selects_not_chip_groups(self):
+        """[M15] 소스·증거등급·검토상태도 카테고리·발행월과 동일하게 <select> 로 통일됐다
+        (균일 셀렉트 행) — 옛 버튼 칩 그룹 컨테이너(.fnd-chipgroup)는 완전히 제거. [M14]
+        기관(agency) 필드는 여전히 DOM 에 없다(state.agency/URL 매칭 로직만 findings.js
+        소스에 잔존 — 별도 마커로 확인)."""
+        self.assertNotIn("fnd-chipgroup", self.html)
+        self.assertNotIn("fnd-chip", self.html)
+        for facet_id in ("fnd-f-source", "fnd-f-evidence", "fnd-f-status", "fnd-f-category", "fnd-f-month"):
+            self.assertIn(f'<select id="{facet_id}"', self.html)
         self.assertNotIn('id="fnd-f-agency"', self.html)
-        self.assertIn('<select id="fnd-f-category"', self.html)
-        self.assertIn('<select id="fnd-f-month"', self.html)
+
+    def test_select_row_order_and_sort_at_end(self):
+        """[M15] 셀렉트 행 순서 = 소스·증거등급·검토상태·카테고리·발행월 + 우측 끝 정렬."""
+        order = ["fnd-f-source", "fnd-f-evidence", "fnd-f-status", "fnd-f-category", "fnd-f-month", "fnd-sort"]
+        positions = [self.html.index(f'id="{fid}"') for fid in order]
+        self.assertEqual(positions, sorted(positions), "필터 셀렉트 순서가 스펙과 다름")
+
+    def test_select_field_widths_match_spec(self):
+        """[M15] 필드별 고정 폭: 소스 150 · 증거 110 · 검토 120 · 카테고리 230 · 발행월 110 ·
+        정렬 110(px, 모바일 100%)."""
+        widths = {
+            "fnd-f-source": "150px", "fnd-f-evidence": "110px", "fnd-f-status": "120px",
+            "fnd-f-category": "230px", "fnd-f-month": "110px", "fnd-sort": "110px",
+        }
+        for fid, width in widths.items():
+            self.assertIn(f"#{fid}{{width:{width}}}", self.html, f"{fid} 폭 규칙 미발견")
+
+    def test_uniform_select_style(self):
+        """[M15] 전 셀렉트 동일 컴포넌트 — height 36px, font-size 13px."""
+        import re as _re
+        m = _re.search(r'\.fnd-field select\{([^}]*)\}', self.html)
+        self.assertIsNotNone(m, ".fnd-field select CSS 규칙 미발견")
+        rule = m.group(1)
+        self.assertIn("height:36px", rule)
+        self.assertIn("font-size:13px", rule)
+
+    def test_reset_button_removed(self):
+        """[M15] #fnd-reset 초기화 버튼은 완전히 제거됐다 — 적용 필터 칩 행의 "모두 지우기"가
+        그 역할을 대체한다."""
+        self.assertNotIn('id="fnd-reset"', self.html)
+        self.assertNotIn("fnd-reset", self.html)
+
+    def test_active_filters_row_shell_present(self):
+        """[M15] #fnd-active 는 골든 결정론을 위해 정적 셸에서 빈 hidden 컨테이너로만
+        렌더되고(활성 필터가 없는 초기 상태), findings.js 가 render() 마다 채운다.
+        모바일 필터 접기(#fnd-filters) 대상 밖(형제)에 배치돼 접힘 상태에서도 노출된다 —
+        #fnd-filters 가 </div> 로 닫힌 *직후* 형제로 오는지 마크업 인접성으로 확인한다."""
+        self.assertIn('<div class="fnd-active" id="fnd-active" hidden></div>', self.html)
+        self.assertIn(
+            '</select></div>\n      </div>\n      <div class="fnd-active" id="fnd-active" hidden></div>',
+            self.html,
+            "#fnd-active 가 #fnd-filters 의 형제(밖)로 배치되지 않음",
+        )
 
     def test_agency_state_and_url_matching_retained_without_chip_dom(self):
         """[M14] 기관 칩 UI 는 사라졌지만 state.agency·URL param(agency)·매칭 로직은
@@ -993,12 +1038,17 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("state.agency && row.agency !== state.agency", js_src)
         self.assertNotIn('"fnd-f-agency"', js_src)
 
-    def test_chip_group_skeleton_and_refresh_wiring_present(self):
-        """칩은 실제 <button type=button> + aria-pressed 이고, DOM 은 1회만 만들고(스켈레톤)
-        매 render() 마다 건수/on/disabled 만 갱신하는 구조인지 소스 마커로 확인."""
+    def test_select_facet_skeleton_and_refresh_wiring_present(self):
+        """[M15] CHIP_FACETS 는 완전히 제거됐다 — SELECT_FACETS 단일 경로로 5개 셀렉트의
+        DOM(옵션)은 1회만 만들고(스켈레톤), 매 render() 마다 건수·disabled 만 갱신한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('btn.type = "button"', js_src)
-        self.assertIn('btn.setAttribute("aria-pressed"', js_src)
+        self.assertNotIn("CHIP_FACETS", js_src)
+        self.assertIn(
+            'var SELECT_FACETS = [\n    ["fnd-f-source", "source"],\n'
+            '    ["fnd-f-evidence", "evidence_level"],\n    ["fnd-f-status", "review_status"],\n'
+            '    ["fnd-f-category", "category_code"],\n    ["fnd-f-month", "month"],\n  ];',
+            js_src,
+        )
         self.assertIn("function buildFacetSkeleton()", js_src)
         self.assertIn("function refreshFacetUI()", js_src)
         self.assertIn("refreshFacetUI()", js_src[js_src.index("function render()"):], "render() 가 refreshFacetUI 호출 안 함")
@@ -1098,14 +1148,31 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("collectFacetValues(k).indexOf(raw) !== -1", js_src)
         self.assertIn("SORT_VALUES.indexOf(sortRaw) !== -1", js_src)
 
-    def test_reset_clears_sort_and_relies_on_render_for_url_clear(self):
-        """초기화 버튼은 sort 도 기본값(date_desc)으로 되돌리고, querystring 은 render()의
-        syncStateToUrl() 이 기본 state 를 반영해 자동으로 비운다(별도 URL clear 불필요)."""
+    def test_clear_all_filters_resets_sort_and_relies_on_render_for_url_clear(self):
+        """[M15] #fnd-reset 버튼은 제거됐다 — "모두 지우기"는 clearAllFilters() 가 담당하며
+        sort 도 기본값(date_desc)으로 되돌리고, querystring 은 render()의 syncStateToUrl()
+        이 기본 state 를 반영해 자동으로 비운다(별도 URL clear 불필요)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        reset_block = js_src[js_src.index("if (resetBtn)"):js_src.index("if (resetBtn)") + 400]
-        self.assertIn('sort: "date_desc"', reset_block)
-        self.assertIn("syncControlsFromState()", reset_block)
-        self.assertIn("render()", reset_block)
+        self.assertIn("function clearAllFilters()", js_src)
+        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 300]
+        self.assertIn('sort: "date_desc"', fn_block)
+        self.assertIn("syncControlsFromState()", fn_block)
+        self.assertIn("render()", fn_block)
+
+    def test_active_filter_chips_clear_and_clear_all_wiring(self):
+        """[M15] 적용 필터 칩 각각은 클릭 시 해당 조건만 해제(clearActiveFilter)하고,
+        전부 textContent/createElement 로만 조립된다(XSS 계약). "모두 지우기"는
+        clearAllFilters 를 호출한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function clearActiveFilter(key)", js_src)
+        self.assertIn("function renderActiveChips()", js_src)
+        self.assertIn("function buildActiveChip(label, value, onClear)", js_src)
+        self.assertIn('btn.setAttribute("aria-label", label + " 필터 해제")', js_src)
+        self.assertIn('clearAllBtn.addEventListener("click", clearAllFilters)', js_src)
+        self.assertIn("renderActiveChips();", js_src[js_src.index("function render()"):], "render() 가 renderActiveChips 호출 안 함")
+        # 정렬(sort)은 필터가 아니므로 칩 대상에서 제외된다.
+        active_defs_block = js_src[js_src.index("var ACTIVE_FILTER_DEFS"):js_src.index("var ACTIVE_FILTER_DEFS") + 500]
+        self.assertNotIn('"sort"', active_defs_block)
 
     def test_findings_js_toolbar_features_no_innerhtml_data_injection(self):
         """M10c 신규 경로(칩/셀렉트 갱신·URL 동기화)도 기존 XSS 계약을 지킨다."""

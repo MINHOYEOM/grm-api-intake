@@ -866,10 +866,22 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_notice_summary_has_short_gist_and_quiet_style(self):
         """summary 한 줄은 조용한 스타일 클래스(.fnd-notice-sum)를 쓰고, 펼침 힌트 아이콘
-        (ti-info-circle)을 포함하며, 요지 문구를 담는다."""
+        (ti-info-circle)을 포함하며, 요지 문구를 담는다. [M14] 박스 배너를 걷어내며 요지
+        문구도 더 짧게(추출·번역 병기) 다듬었다 — 전문(<p>)은 그대로 불변."""
         self.assertIn("fnd-notice-sum", self.html)
         self.assertIn("ti-info-circle", self.html)
-        self.assertIn("AI 자동 추출 고지 — 누락·오분류 가능, 의사결정 전 반드시 원문 대조", self.html)
+        self.assertIn("AI 자동 추출·번역 — 의사결정 전 원문 대조 필수", self.html)
+
+    def test_notice_is_slim_inline_note_not_boxed_banner(self):
+        """[M14 P0] 상단 고지는 더 이상 박스 배너(배경/보더/패딩)가 아니다 — margin 만
+        남은 초경량 인라인 노트여야 한다."""
+        import re as _re
+        m = _re.search(r'\.fnd-notice\{([^}]*)\}', self.html)
+        self.assertIsNotNone(m, ".fnd-notice CSS 규칙 미발견")
+        rule = m.group(1)
+        self.assertNotIn("background", rule)
+        self.assertNotIn("border:", rule)
+        self.assertIn("margin:0 0 20px", rule)
 
     def test_page_head_description_is_one_sentence(self):
         """첫 화면 밀도(보조) — page-head 설명문단이 압축된 한 문장(마침표 1개로 종결)인지 확인."""
@@ -881,17 +893,22 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertTrue(text.endswith("검색합니다."), text)
 
     def test_review_card_boundary_markers_present(self):
-        """검토 필요(needs_review) 카드는 article 에 fnd-card--review 클래스가 붙고,
-        상시 경고 한 줄(.fnd-review-note)이 배지 줄 아래에 렌더돼야 한다."""
+        """[M14] 검토 필요(needs_review) 카드는 article 에 fnd-card--review 클래스가 붙는다.
+        상시 경고 한 줄(.fnd-review-note)은 완전히 제거됐다 — 그 역할은 ①"검토 필요" 배지
+        (coral) ②카드 좌측 보더 ③배지 title 툴팁이 담당한다(AI 경고문구 중복 통폐합)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn('card.classList.add("fnd-card--review")', js_src)
-        self.assertIn("fnd-review-note", js_src)
-        self.assertIn("AI 추출 검수 전", js_src)
-        self.assertIn("원문 대조 필수", js_src)
-        # CSS: coral 계열 왼쪽 보더 + 틴트 배경(--coral-tint 재사용).
-        self.assertIn(".fnd-card.fnd-card--review", self.html)
-        self.assertIn("border-left:4px solid var(--coral)", self.html)
-        self.assertIn("var(--coral-tint)", self.html)
+        self.assertNotIn("fnd-review-note", js_src)
+        self.assertNotIn("appendReviewNote", js_src)
+        self.assertNotIn(".fnd-review-note", self.html)
+        # CSS: coral 왼쪽 보더만(배경 틴트는 제거 — 카드 리스트 얼룩 방지, coral=주의 전용).
+        import re as _re
+        m = _re.search(r'\.fnd-card\.fnd-card--review\{([^}]*)\}', self.html)
+        self.assertIsNotNone(m, ".fnd-card.fnd-card--review CSS 규칙 미발견")
+        rule = m.group(1)
+        self.assertIn("border-left:3px solid var(--coral)", rule)
+        self.assertNotIn("coral-tint", rule)
+        self.assertNotIn("background", rule)
 
     def test_review_note_confidence_percent_marker(self):
         """신뢰도 표시는 Math.round(confidence*100) 로 산출되고, confidence 없으면
@@ -954,14 +971,27 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     # ── FIND-1 M10c: 탐색 툴바 오버홀(칩 필터·건수병기·정렬·sticky·모바일 접기·URL 동기화) ──
     def test_low_cardinality_filters_are_chip_groups_not_selects(self):
-        """기관·소스·증거등급·검토상태는 <select> 대신 버튼 칩 그룹 컨테이너로 렌더된다
-        (값은 findings.js 가 런타임에 채운다) — 4개 드롭다운 제거를 셸 마크업으로 확인.
-        카테고리·발행월은 20종/월 단위라 여전히 드롭다운을 유지한다."""
-        for facet_id in ("fnd-f-agency", "fnd-f-source", "fnd-f-evidence", "fnd-f-status"):
+        """소스·증거등급·검토상태는 <select> 대신 버튼 칩 그룹 컨테이너로 렌더된다
+        (값은 findings.js 가 런타임에 채운다) — 드롭다운 제거를 셸 마크업으로 확인.
+        카테고리·발행월은 20종/월 단위라 여전히 드롭다운을 유지한다. [M14] 기관(agency)
+        칩 그룹은 DOM 에서 완전히 제거됐다 — 소스가 기관을 포함하는 상위 구분이라
+        "MFDS" 가 기관·소스 양쪽에 중복 표기되던 혼란을 없앤다(state.agency/URL 매칭
+        로직 자체는 findings.js 소스에 그대로 남아 있다 — 별도 마커로 확인)."""
+        for facet_id in ("fnd-f-source", "fnd-f-evidence", "fnd-f-status"):
             self.assertIn(f'<div class="fnd-chipgroup" id="{facet_id}"', self.html)
             self.assertNotIn(f'<select id="{facet_id}"', self.html)
+        self.assertNotIn('id="fnd-f-agency"', self.html)
         self.assertIn('<select id="fnd-f-category"', self.html)
         self.assertIn('<select id="fnd-f-month"', self.html)
+
+    def test_agency_state_and_url_matching_retained_without_chip_dom(self):
+        """[M14] 기관 칩 UI 는 사라졌지만 state.agency·URL param(agency)·매칭 로직은
+        findings.js 소스에 남아 있어야 한다 — URL 로 agency 가 들어오면 여전히 필터링된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('agency: "", category_code: "", source: ""', js_src)
+        self.assertIn('agency: "agency"', js_src)  # URL_KEYS
+        self.assertIn("state.agency && row.agency !== state.agency", js_src)
+        self.assertNotIn('"fnd-f-agency"', js_src)
 
     def test_chip_group_skeleton_and_refresh_wiring_present(self):
         """칩은 실제 <button type=button> + aria-pressed 이고, DOM 은 1회만 만들고(스켈레톤)
@@ -1117,6 +1147,82 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('evBadge.setAttribute("title", evTitle)', js_src)
         self.assertIn('reviewBadge.setAttribute("title", STATUS_TITLE.needs_review)', js_src)
         self.assertIn('statusBadge.setAttribute("title", statusTitle)', js_src)
+
+    # ── FIND-1 M14: 디자인 오버홀(한글 줄바꿈·AI 통폐합·필터 정렬·대시보드·카드·카테고리순서) ──
+    def test_main_scoped_korean_keep_all_word_break(self):
+        """[M14 §1 P0] 한국어 음절 중간 줄바꿈 방지 — 이 페이지(main) 범위에 word-break:
+        keep-all + overflow-wrap:anywhere 를 적용한다(grm.css 는 불가침이라 페이지 자체
+        <style> 에 스코프)."""
+        self.assertIn("main{word-break:keep-all;overflow-wrap:anywhere}", self.html)
+
+    def test_dash_stat_blocks_replace_stat_chips(self):
+        """[M14 §4] 대시보드 스탯 줄 → 스탯 블록(큰 숫자+라벨 가로 나열)으로 재작성됐다 —
+        옛 총건수 span+칩(.fnd-dash-chip) 마크업은 제거되고, renderDashStats 가
+        전체→기관 순회→검토필요(>0) 순으로 블록을 만든다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function renderDashStats(stats)", js_src)
+        self.assertIn("function buildStatBlock(num, label, warn)", js_src)
+        self.assertIn('buildStatBlock(String(stats.total), "전체", false)', js_src)
+        self.assertIn('buildStatBlock(String(a.count), a.agency, false)', js_src)
+        self.assertIn('buildStatBlock(String(stats.needsReview), "검토 필요", true)', js_src)
+        self.assertNotIn("fnd-dash-chip", js_src)
+        self.assertNotIn("fnd-dash-chip", self.html)
+        self.assertIn(".fnd-dash-stat-num{", self.html)
+        self.assertIn("font-size:22px;font-weight:700;color:var(--ink)", self.html)
+        self.assertIn(".fnd-dash-stat-num.warn{color:var(--coral-2)}", self.html)
+        self.assertIn(".fnd-dash-stat-lbl{font-size:11px;color:var(--muted)", self.html)
+
+    def test_card_head_date_pushed_right_via_margin_auto(self):
+        """[M14 §5] 카드 head — date 는 배지 줄 마지막 자식으로 붙어 margin-left:auto 로
+        우측에 고정된다(flex 행에서 첫 자식에 auto 마진을 주면 행 전체가 밀리므로, 좌측
+        배지들 다음에 와야 한다). 기관(agency) 배지는 head 에서 완전히 제거됐다."""
+        self.assertIn(".fnd-b.date{margin-left:auto", self.html)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        head_block = js_src[js_src.index('el("div", "fnd-card-head")'):js_src.index("card.appendChild(head)")]
+        self.assertNotIn("row.agency", head_block)
+        # date 배지가 head 조립부의 마지막 appendChild 호출이어야 우측 고정이 실제로 동작한다.
+        self.assertTrue(head_block.rstrip().endswith(
+            'head.appendChild(el("span", "fnd-b date", row.published_date || ""));'
+        ), "date 배지가 head 의 마지막 자식으로 추가되지 않음(우측 고정 깨짐)")
+
+    def test_translation_note_generated_inside_orig_details(self):
+        """[M14 §2] "AI 번역 — 원문 대조 권장" 은 원문 <details> 내부(summary 아래·원문
+        <p> 위)에서 생성돼야 한다 — 접힌 기본 화면에는 노출되지 않고, 원문을 펼쳐 대조하는
+        맥락에서만 보인다(클래스·문구는 기존 테스트 마커와 동일하게 불변)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function appendOrigAndNote"):js_src.index("function appendOrigAndNote") + 700]
+        idx_summary_append = fn.index("details.appendChild(summary)")
+        idx_trnote = fn.index('el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장")')
+        idx_p_append = fn.index("details.appendChild(p)")
+        self.assertLess(idx_summary_append, idx_trnote, "tr-note 가 summary 보다 먼저 옴")
+        self.assertLess(idx_trnote, idx_p_append, "tr-note 가 원문 <p> 보다 뒤에 생성됨")
+        self.assertIn("details.appendChild(el(", fn[idx_trnote - 30:idx_trnote + 10])
+
+    def test_category_dropdown_uses_taxonomy_declaration_order(self):
+        """[M14 §6] 카테고리 <select> 옵션은 category_code 알파벳순이 아니라 CATEGORY_LABELS
+        선언 순서(=grm_findings.FINDING_TAXONOMY 계약 순서)를 따른다 — 한국어 사용자에게
+        snake_case 알파벳순은 무작위로 보이기 때문."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function categoryCodesInTaxonomyOrder(available)", js_src)
+        self.assertIn("Object.keys(CATEGORY_LABELS).filter(", js_src)
+        self.assertIn('if (key2 === "category_code") values = categoryCodesInTaxonomyOrder(values)', js_src)
+
+    def test_agency_chip_field_and_label_removed_from_filters(self):
+        """[M14 §3] 기관 필터 필드(라벨+칩그룹 wrapper)가 필터 섹션에서 완전히 제거됐다."""
+        self.assertNotIn('id="fnd-f-agency-lbl"', self.html)
+        self.assertNotIn(">기관<", self.html)
+
+    def test_search_row_contains_count_and_filters_align_flex_start(self):
+        """[M14 §3] 결과 카운트(#fnd-count)가 검색창 행(.fnd-search) 내부로 이동했고,
+        필터 툴바는 align-items:flex-start 로 라벨 시작 높이를 통일한다."""
+        import re as _re
+        m = _re.search(r'<div class="fnd-search">(.*?)</div>', self.html, _re.S)
+        self.assertIsNotNone(m)
+        self.assertIn('id="fnd-count"', m.group(1))
+        fm = _re.search(r'\.fnd-filters\{([^}]*)\}', self.html)
+        self.assertIsNotNone(fm, ".fnd-filters CSS 규칙 미발견")
+        self.assertIn("align-items:flex-start", fm.group(1))
+        self.assertNotIn("align-items:end", fm.group(1))
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

@@ -16,7 +16,7 @@
         항상 보이는 한 줄 요지, 펼치면 기존 전체 고지문(내용 무변경). id/aria-label 유지. -#}
     <section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
       <details class="fnd-notice-d">
-        <summary class="fnd-notice-sum"><i class="ti ti-info-circle" aria-hidden="true"></i>AI 자동 추출 고지 — 누락·오분류 가능, 의사결정 전 반드시 원문 대조<i class="ti ti-chevron-down fnd-notice-car" aria-hidden="true"></i></summary>
+        <summary class="fnd-notice-sum"><i class="ti ti-info-circle" aria-hidden="true"></i>AI 자동 추출·번역 — 의사결정 전 원문 대조 필수<i class="ti ti-chevron-down fnd-notice-car" aria-hidden="true"></i></summary>
         <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
       </details>
     </section>
@@ -24,22 +24,20 @@
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
 
     {#- FIND-1 M10c — 툴바(검색+칩필터+정렬)를 대시보드보다 위로(검색이 최우선 도구),
-        sticky 컴팩트화. 저카디널리티 필터(기관·소스·증거등급·검토상태)는 칩 그룹으로,
+        sticky 컴팩트화. 저카디널리티 필터(소스·증거등급·검토상태)는 칩 그룹으로,
         카테고리·발행월·정렬은 드롭다운으로 유지한다 — 값은 findings.js 가 런타임에
-        채우므로 정적 셸은 빈 컨테이너만 렌더(골든 결정론). -#}
+        채우므로 정적 셸은 빈 컨테이너만 렌더(골든 결정론). [M14] 기관(agency) 칩 그룹은
+        소스와 중복 표기돼 DOM 에서 제거(state.agency/URL 매칭은 findings.js 에 유지). -#}
     <section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
-        <input id="fnd-q" type="text" placeholder="업체·문서번호·지적내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+        <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+        <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
       </div>
       <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
         <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
       </button>
       <div class="fnd-filters" id="fnd-filters">
-        <div class="fnd-field fnd-chipfield">
-          <span class="fnd-field-lbl" id="fnd-f-agency-lbl">기관</span>
-          <div class="fnd-chipgroup" id="fnd-f-agency" data-key="agency" role="group" aria-labelledby="fnd-f-agency-lbl"></div>
-        </div>
         <div class="fnd-field fnd-chipfield">
           <span class="fnd-field-lbl" id="fnd-f-source-lbl">소스</span>
           <div class="fnd-chipgroup" id="fnd-f-source" data-key="source" role="group" aria-labelledby="fnd-f-source-lbl"></div>
@@ -57,7 +55,6 @@
         <div class="fnd-field"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
         <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
       </div>
-      <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
     </section>
 
     {#- FIND-1 M7 — 대시보드 밴드(콤팩트 조망: 스탯·카테고리 분포·월별 추이·업체 상위).
@@ -92,31 +89,36 @@
   </div>
 </main>
 <style>
-/* FIND-1 M7 — 대시보드 밴드(.controls 와 동일 카드 스타일: --card/--line-2/--rad). */
-.fnd-dash{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 22px}
-.fnd-dash-stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px;font-size:13px;color:var(--muted)}
-.fnd-dash-stats b{color:var(--ink)}
-.fnd-dash-chip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:5px 10px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
-.fnd-dash-chip.warn{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
+/* M14 — 한국어 어절 줄바꿈(§1 P0). 이 페이지 범위(main)에만 적용 — grm.css 는 불가침. */
+main{word-break:keep-all;overflow-wrap:anywhere}
+/* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
+.fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
+/* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */
+.fnd-dash-stats{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start;margin-bottom:18px}
+.fnd-dash-stat{display:flex;flex-direction:column}
+.fnd-dash-stat-num{font-size:22px;font-weight:700;color:var(--ink);line-height:1.2}
+.fnd-dash-stat-num.warn{color:var(--coral-2)}
+.fnd-dash-stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 .fnd-dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .fnd-dash-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 12px}
 .fnd-dash-empty{font-size:12.5px;color:var(--muted);margin:0}
-/* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기 */
+/* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기. [M14] 회색 트랙 제거,
+   바 자체가 flex 셀을 채우고 transform:scaleX() 로 비율을 표현(레이아웃 폭은 불변). */
 .fnd-dash-cat-row{display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:8px;cursor:pointer}
 .fnd-dash-cat-row:hover,.fnd-dash-cat-row:focus-visible{background:var(--strong);outline:none}
+.fnd-dash-cat-row:hover .fnd-dash-cat-label,.fnd-dash-cat-row:focus-visible .fnd-dash-cat-label{color:var(--coral-2)}
 .fnd-dash-cat-row.on{background:var(--coral-tint)}
-.fnd-dash-cat-label{flex:0 0 96px;font-size:12.5px;color:var(--body);line-height:1.3}
-.fnd-dash-cat-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--line)}
-.fnd-dash-cat-bar{height:100%;border-radius:99px;background:var(--coral)}
+.fnd-dash-cat-label{flex:0 0 110px;font-size:12.5px;color:var(--body);line-height:1.3}
+.fnd-dash-cat-bar{flex:1 1 auto;height:6px;border-radius:99px;background:var(--coral);opacity:.85;transform-origin:left}
 .fnd-dash-cat-count{flex:0 0 auto;min-width:20px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-/* 월별 추이 — 세로 미니 막대 + 월 라벨 */
+/* 월별 추이 — 세로 미니 막대 + 월 라벨. [M14] 바 하단 baseline 보더. */
 .fnd-dash-month-bars{display:flex;align-items:flex-end;gap:6px}
 .fnd-dash-month-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:3px 0;border-radius:8px;cursor:pointer}
 .fnd-dash-month-col:hover,.fnd-dash-month-col:focus-visible{background:var(--strong);outline:none}
 .fnd-dash-month-col.on{background:var(--coral-tint)}
-.fnd-dash-month-barwrap{height:64px;width:100%;display:flex;align-items:flex-end;justify-content:center}
-.fnd-dash-month-bar{width:100%;max-width:16px;min-height:4px;border-radius:3px 3px 0 0;background:var(--coral)}
-.fnd-dash-month-col:hover .fnd-dash-month-bar,.fnd-dash-month-col:focus-visible .fnd-dash-month-bar,.fnd-dash-month-col.on .fnd-dash-month-bar{background:var(--coral-2)}
+.fnd-dash-month-barwrap{height:64px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--line)}
+.fnd-dash-month-bar{width:100%;max-width:14px;min-height:4px;border-radius:3px;background:var(--coral);opacity:.85}
+.fnd-dash-month-col:hover .fnd-dash-month-bar,.fnd-dash-month-col:focus-visible .fnd-dash-month-bar,.fnd-dash-month-col.on .fnd-dash-month-bar{background:var(--coral-2);opacity:1}
 .fnd-dash-month-lbl{font-family:var(--mono);font-size:10px;color:var(--muted)}
 /* 업체 상위 5 */
 .fnd-dash-firm-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--body)}
@@ -127,91 +129,112 @@
 @media (max-width:860px){
   .fnd-dash-grid{grid-template-columns:1fr;gap:22px}
 }
-/* [M10c] 대시보드 세부지표(3블록 그리드) 접기 토글 — 스탯 줄은 항상 노출. */
-.fnd-dash-toggle{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;cursor:pointer;margin:0 0 16px}
-.fnd-dash-toggle:hover{color:var(--coral);border-color:var(--coral)}
+/* [M10c] 대시보드 세부지표(3블록 그리드) 접기 토글 — 스탯 줄은 항상 노출.
+   [M14] 보더 버튼 → 텍스트 버튼(경량화). */
+.fnd-dash-toggle{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:4px 0;cursor:pointer;margin:0 0 16px}
+.fnd-dash-toggle:hover{color:var(--coral)}
 .fnd-dash-toggle .ti{font-size:13px;transition:transform .15s}
 .fnd-dash-toggle[aria-expanded="false"] .ti{transform:rotate(-90deg)}
 .fnd-dash-grid--collapsed{display:none}
-.fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:12px 18px;margin:0 0 28px}
+/* [M14 P0] AI 고지 — 박스 배너 제거, 초경량 인라인 노트(details/summary 한 줄). */
+.fnd-notice{margin:0 0 20px}
 .fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:12px 0 0}
 .fnd-notice-d summary{cursor:pointer;list-style:none}
 .fnd-notice-d summary::-webkit-details-marker{display:none}
-.fnd-notice-sum{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--muted)}
-.fnd-notice-sum .ti-info-circle{font-size:15px;color:var(--coral-2);flex:none}
+.fnd-notice-sum{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.fnd-notice-sum .ti-info-circle{font-size:14px;color:var(--muted);flex:none}
 .fnd-notice-car{margin-left:auto;font-size:13px;color:var(--muted);transition:transform .15s;flex:none}
 .fnd-notice-d[open] .fnd-notice-car{transform:rotate(180deg)}
 /* [M10c] sticky 컴팩트 툴바 — 사이트 nav(top:0,z-index:50,높이 66px) 바로 아래 고정.
    z-index 는 nav 보다 낮게(40) 유지해 nav 드롭다운/모바일 메뉴가 항상 위에 온다. */
 .fnd-tools{position:sticky;top:66px;z-index:40;background:color-mix(in srgb,var(--canvas) 94%,transparent);backdrop-filter:blur(8px);margin:0 0 22px;padding:14px 0 16px;border-bottom:1px solid var(--line-2)}
-.fnd-search{position:relative;margin-bottom:14px}
+/* [M14] 검색창 행 — input(flex:1) + 결과 카운트(우측, flex:none). */
+.fnd-search{position:relative;margin-bottom:14px;display:flex;align-items:center;gap:14px}
 .fnd-search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
-.fnd-search input{width:100%;box-sizing:border-box;height:44px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:14.5px;color:var(--ink)}
+.fnd-search input{flex:1 1 auto;min-width:0;box-sizing:border-box;height:44px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:14.5px;color:var(--ink)}
 .fnd-search input:focus{outline:none;border-color:var(--coral)}
+.fnd-count{flex:none;font-size:13px;color:var(--muted);white-space:nowrap}
+.fnd-count b{font-size:15px;color:var(--ink)}
 /* 모바일 필터 접기 토글 — 데스크톱(>700px)에선 숨김(필터는 항상 펼침). */
 .fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
 .fnd-filters-badge{font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
-.fnd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-.fnd-field{display:flex;flex-direction:column;gap:5px;max-width:100%;min-width:0}
-.fnd-field label,.fnd-field-lbl{font-size:11.5px;color:var(--muted)}
+/* [M14] align-items:flex-start — 라벨 시작 높이를 전 필드 동일하게(칩그룹 wrap 높이차 무관). */
+.fnd-filters{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start}
+.fnd-field{display:flex;flex-direction:column;max-width:100%;min-width:0}
+/* §4 한글 안전(불가침, WebKoreanSafetyTest) — 스펙 원안의 자간 지정은 한글 라벨(소스/증거
+   등급/검토 상태/카테고리/발행월/정렬)에 적용돼 사이트 전역 "한글 자간 금지" 계약을 깬다.
+   시각 위계는 font-weight(600)+size(11px)만으로 낸다(디자인 원칙: 무게로 위계, coral 은
+   주의 신호 전용 — 자간 남용도 같은 취지로 배제). */
+.fnd-field label,.fnd-field-lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0 0 6px}
 /* select 고유 폭은 가장 긴 옵션(카테고리 국·영문 병기 ~425px)을 따라가므로 상한을 두지
    않으면 모바일(375px)에서 뷰포트 가로 오버플로가 난다 — max-width 로 컨테이너에 가둔다. */
 .fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px;max-width:320px}
 .fnd-field select:focus{outline:none;border-color:var(--coral)}
-/* 저카디널리티 필터(기관·소스·증거등급·검토상태) 칩 그룹 — 대시보드 행 토글과 동일한
+/* [M14] 필드별 고정 폭(카테고리/발행월/정렬) — max-width 규칙과 공존, 모바일 100% 유지. */
+#fnd-f-category{width:230px}
+#fnd-f-month{width:120px}
+#fnd-sort{width:110px}
+/* 저카디널리티 필터(소스·증거등급·검토상태) 칩 그룹 — 대시보드 행 토글과 동일한
    coral-tint 계열로 선택 상태를 강조(§coral 팔레트 재사용, 신규 색상 도입 없음). */
-.fnd-chipfield{gap:6px}
-.fnd-chipgroup{display:flex;flex-wrap:wrap;gap:6px;max-width:280px}
-.fnd-chip{display:inline-flex;align-items:center;font:inherit;font-size:12.5px;font-weight:500;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer;line-height:1;white-space:nowrap;transition:background var(--tr),border-color var(--tr),color var(--tr)}
+.fnd-chipgroup{display:flex;flex-wrap:wrap;gap:6px}
+.fnd-chip{display:inline-flex;align-items:center;height:28px;font:inherit;font-size:12px;font-weight:500;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 12px;cursor:pointer;line-height:1;white-space:nowrap;transition:background var(--tr),border-color var(--tr),color var(--tr)}
 .fnd-chip:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
 .fnd-chip.on{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22);font-weight:600}
 .fnd-chip:disabled{opacity:.4;cursor:not-allowed}
-.fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content}
+/* [M14] 초기화 버튼 — 라벨 높이(약 20px)만큼 아래로 내려 셀렉트/칩 행과 baseline 정렬. */
+.fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content;margin-top:21px}
 .fnd-reset:hover{color:var(--coral);border-color:var(--coral)}
 .fnd-reset .ti{font-size:14px}
-.fnd-count{margin-top:12px;font-size:13px;color:var(--muted)}
-.fnd-count b{color:var(--ink)}
 @media (max-width:700px){
   .fnd-filters-toggle{display:inline-flex}
   .fnd-filters{display:none}
   .fnd-filters.open{display:flex}
   .fnd-field select{max-width:100%}
+  #fnd-f-category,#fnd-f-month,#fnd-sort{width:100%}
+  .fnd-search{flex-wrap:wrap}
+  .fnd-count{flex:1 0 100%;margin-top:6px}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}
-.fnd-results{display:flex;flex-direction:column;gap:12px}
-.fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;background:var(--canvas)}
-/* M10b P0 — 검토 필요 카드 시각 경계(왼쪽 coral 보더 + 옅은 틴트 배경, 즉시 구분). */
-.fnd-card.fnd-card--review{border-color:rgba(194,96,63,.3);border-left:4px solid var(--coral);background:var(--coral-tint);padding-left:18px}
-.fnd-review-note{font-size:11.5px;font-weight:600;color:var(--coral-2);margin:0 0 10px}
+.fnd-results{display:flex;flex-direction:column;gap:14px}
+/* [M14] 카드 패딩 확대(20px 22px). */
+.fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}
+/* M10b P0 — 검토 필요 카드 시각 경계. [M14] 배경 틴트 제거(얼룩 방지) — 왼쪽 coral 보더만
+   신호로 남긴다(coral=주의 전용 원칙). border-left 3px 만큼 padding-left 로 보정(22-3=19). */
+.fnd-card.fnd-card--review{border-left:3px solid var(--coral);padding-left:19px}
 .fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-.fnd-b{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:4px 9px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
-.fnd-b.date{font-family:var(--mono);background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
+/* [M14] 배지 통일: height 22px, font-size 11.5px, padding 0 8px. */
+.fnd-b{display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+/* [M14] date 는 배지가 아니라 우측 여백 텍스트 — margin-left:auto 로 head 우측에 고정. */
+.fnd-b.date{margin-left:auto;height:auto;font-family:var(--mono);font-size:12px;background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
 /* M13a — 증거등급(A)은 "신뢰 높음" 신호라 coral(경고색)과 분리한다: 중립 강조(--strong/--ink)로
    또렷하게, 검토상태(needs-review)만 coral-tint 를 "주의" 신호로 전용한다. */
 .fnd-b.ev-a{background:var(--strong);color:var(--ink);border-color:var(--line-2);font-weight:700}
 .fnd-b.needs-review{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
-.fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
-.fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
+.fnd-firm{font-family:var(--serif);font-size:18px;color:var(--ink);margin:0 0 2px}
+.fnd-cat{font-size:12.5px;color:var(--muted);margin:0 0 12px}
 .fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
 /* M10b P1 — 카드 기본 접힘: 접힌 상태(.fnd-card.fnd-collapsed)에서만 본문 3줄 클램프 +
-   부가 섹션(.fnd-extra: 원문 접기/refs/번역고지/메타줄) 숨김. 펼치면(버튼 클릭) 클래스 제거. */
+   부가 섹션(.fnd-extra: 원문 접기/refs/메타줄) 숨김. 펼치면(버튼 클릭) 클래스 제거. */
 .fnd-card.fnd-collapsed .fnd-text{-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
 .fnd-card.fnd-collapsed .fnd-extra{display:none}
-/* 하이라이트는 검토필요 카드 배경(--coral-tint)과 겹쳐도 구분되도록 tint 보다 진한 혼합색. */
+/* 하이라이트는 검토필요 카드 왼쪽 보더와도 구분되도록 coral 혼합색. */
 .fnd-hl{background:color-mix(in srgb,var(--coral) 30%,transparent);color:inherit;border-radius:2px;padding:0 1px}
 .fnd-extra{margin:0}
 .fnd-orig{margin:0 0 10px}
 .fnd-orig summary{cursor:pointer;font-size:12.5px;font-weight:500;color:var(--coral-2)}
 .fnd-orig p{font-family:var(--serif);font-size:13.5px;line-height:1.6;color:var(--muted);margin:8px 0 0;white-space:pre-wrap}
-.fnd-tr-note{display:block;font-size:11.5px;color:var(--muted);margin:0 0 10px}
+/* [M14 P0] "AI 번역 — 원문 대조 권장" — 원문 details 내부(summary 아래·원문 p 위)로 이동,
+   원문을 펼쳐 대조하는 맥락에서만 노출(클래스·문구 불변). */
+.fnd-tr-note{display:block;font-size:11.5px;color:var(--muted);margin:8px 0 0}
 .fnd-refs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .fnd-ref{font-family:var(--mono);font-size:11.5px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
 .fnd-ref-missing{font-size:11.5px;color:var(--muted);background:var(--strong);border-radius:6px;padding:3px 8px}
 .fnd-meta{font-size:11.5px;color:var(--muted);margin:0 0 10px}
 .fnd-meta-doc{font-family:var(--mono)}
-.fnd-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+/* [M14] 액션 행을 카드 푸터화 — 본문/부가정보와 시각 분리. */
+.fnd-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .fnd-link{font-size:12.5px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center;text-decoration:none}
 .fnd-link:hover{border-color:var(--coral);color:var(--coral)}
 .fnd-link i{font-size:14px;color:var(--coral)}

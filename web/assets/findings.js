@@ -82,10 +82,13 @@
     return f !== "finding_text_ko" && f !== "translation_method";
   });
 
-  // [FIND-1 M10c] 저카디널리티 필터(기관·소스·증거등급·검토상태)는 칩 그룹(버튼), 카테고리·
+  // [FIND-1 M10c] 저카디널리티 필터(소스·증거등급·검토상태)는 칩 그룹(버튼), 카테고리·
   // 발행월은 드롭다운으로 유지한다. state 키 구조는 M3c 이후 불변 — DOM 배선만 갈린다.
+  // [M14] 기관(agency) 칩 그룹은 DOM 에서 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가
+  // 이미 기관을 포함하는 상위 구분이라 "MFDS" 칩이 기관·소스 양쪽에 중복 노출되던 혼란을
+  // 없앤다. state.agency·URL param(agency)·rowMatchesFilters/searchTermsFor 의 매칭 로직은
+  // 그대로 유지한다 — URL 로 agency 파라미터가 들어오면 여전히 필터가 적용된다(하위호환).
   var CHIP_FACETS = [
-    ["fnd-f-agency", "agency", function (v) { return v; }],
     ["fnd-f-source", "source", function (v) { return v; }],
     ["fnd-f-evidence", "evidence_level", function (v) { return "증거 " + v; }],
     ["fnd-f-status", "review_status", function (v) { return STATUS_LABEL[v] || v; }],
@@ -152,6 +155,16 @@
     return v;
   }
 
+  // [M14 §6] 카테고리 옵션 정렬 — collectFacetValues() 의 알파벳순(snake_case code 기준)은
+  // 한국어 사용자에게 무작위 순서로 보인다. 대신 CATEGORY_LABELS 선언 순서(=grm_findings.
+  // FINDING_TAXONOMY 계약 순서, 대략 "데이터 무결성→ 시설/설비→..." 식의 의미 있는 그룹핑)를
+  // 따른다 — 실제 데이터에 존재하는(available) 코드만, 그 선언 순서대로 필터링한다.
+  function categoryCodesInTaxonomyOrder(available) {
+    var avail = {};
+    available.forEach(function (v) { avail[v] = true; });
+    return Object.keys(CATEGORY_LABELS).filter(function (code) { return avail[code]; });
+  }
+
   function arrayTerms(v) {
     return Array.isArray(v) ? v : [];
   }
@@ -200,7 +213,9 @@
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
       if (!sel) return;
-      collectFacetValues(key2).forEach(function (v) {
+      var values = collectFacetValues(key2);
+      if (key2 === "category_code") values = categoryCodesInTaxonomyOrder(values);
+      values.forEach(function (v) {
         var opt = document.createElement("option");
         opt.value = v;
         opt.dataset.label = selectOptionLabel(key2, v);
@@ -384,21 +399,23 @@
     });
   }
 
+  // [M14 §4] 스탯 줄 → 스탯 블록(큰 숫자+라벨 가로 나열): [N 전체][N FDA][N MFDS]…[N 검토 필요].
+  // 숫자는 textContent 로만 채운다(XSS 계약). 검토 필요 블록은 needsReview 0 이면 생략.
+  function buildStatBlock(num, label, warn) {
+    var block = el("div", "fnd-dash-stat");
+    block.appendChild(el("span", "fnd-dash-stat-num" + (warn ? " warn" : ""), num));
+    block.appendChild(el("span", "fnd-dash-stat-lbl", label));
+    return block;
+  }
+
   function renderDashStats(stats) {
     dashStatsEl.innerHTML = "";
-    var total = document.createElement("span");
-    total.appendChild(document.createTextNode("총 "));
-    var b = document.createElement("b");
-    b.textContent = String(stats.total);
-    total.appendChild(b);
-    total.appendChild(document.createTextNode("건"));
-    dashStatsEl.appendChild(total);
-
+    dashStatsEl.appendChild(buildStatBlock(String(stats.total), "전체", false));
     stats.agencies.forEach(function (a) {
-      dashStatsEl.appendChild(el("span", "fnd-dash-chip", a.agency + " " + a.count));
+      dashStatsEl.appendChild(buildStatBlock(String(a.count), a.agency, false));
     });
     if (stats.needsReview > 0) {
-      dashStatsEl.appendChild(el("span", "fnd-dash-chip warn", "검토 필요 " + stats.needsReview + "건"));
+      dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), "검토 필요", true));
     }
   }
 
@@ -419,6 +436,8 @@
     }
   }
 
+  // [M14 §4] 회색 트랙 제거 — 바 자체가 flex 셀(flex:1 1 auto)을 채우고, 비율은
+  // transform:scaleX() 로 표현한다(레이아웃 폭은 항상 셀 전체 — width 축소가 아니다).
   function buildCatRow(label, count, maxCount, code) {
     var row = document.createElement("div");
     row.className = "fnd-dash-cat-row";
@@ -429,11 +448,10 @@
       });
     }
     row.appendChild(el("span", "fnd-dash-cat-label", label));
-    var track = el("div", "fnd-dash-cat-track");
     var bar = el("div", "fnd-dash-cat-bar");
-    bar.style.width = Math.round((count / maxCount) * 100) + "%";
-    track.appendChild(bar);
-    row.appendChild(track);
+    var ratio = maxCount > 0 ? count / maxCount : 0;
+    bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
+    row.appendChild(bar);
     row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
     return row;
   }
@@ -569,17 +587,6 @@
     accepted: "결정론 추출 규칙 통과(자동 승인)",
   };
 
-  // [M10b P0] 검토 필요 카드 상시 경고 한 줄. confidence 없으면 신뢰도 부분 생략.
-  function appendReviewNote(card, row) {
-    if (row.review_status !== "needs_review") return;
-    var text = "AI 추출 검수 전 — 원문 대조 필수";
-    if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
-      var pct = Math.round(Number(row.confidence) * 100);
-      if (!isNaN(pct)) text += " · 신뢰도 " + pct + "%";
-    }
-    card.appendChild(el("p", "fnd-review-note", text));
-  }
-
   // [M10b P1] 본문(국문 우선, 없으면 원문). 접힘 상태에서도 항상 보이므로 card 에 직접
   // 붙인다(부가 섹션과 분리) — 반환한 엘리먼트로 render() 가 오버플로 판정을 한다.
   function appendMainText(card, row, query) {
@@ -591,8 +598,10 @@
     return p;
   }
 
-  // [원문·국문 병기 M6d, M10b P1] finding_text_ko 가 있을 때만 원문(영문) 접기 + 번역고지가
-  // 존재한다 — 둘 다 접힘 상태에서 숨기는 부가 섹션(extra)에 들어간다.
+  // [원문·국문 병기 M6d, M10b P1, M14 P0] finding_text_ko 가 있을 때만 원문(영문) 접기가
+  // 존재한다 — 접힘 상태에서 숨기는 부가 섹션(extra)에 들어간다. [M14] 번역고지("AI 번역 —
+  // 원문 대조 권장")는 details 내부(summary 아래·원문 <p> 위)로 이동했다 — 원문을 펼쳐
+  // 대조하는 맥락에서만 보이게 해, 기본(접힌) 화면의 AI 경고 문구 노출을 0회로 줄인다.
   function appendOrigAndNote(extra, row, query) {
     var ko = (row.finding_text_ko || "").trim();
     if (!ko || !row.finding_text) return;
@@ -601,12 +610,12 @@
     var summary = document.createElement("summary");
     summary.textContent = "원문 보기 (영문)";
     details.appendChild(summary);
+    if (row.translation_method === "llm_assisted") {
+      details.appendChild(el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장"));
+    }
     var p = elHL("p", null, row.finding_text, query);
     details.appendChild(p);
     extra.appendChild(details);
-    if (row.translation_method === "llm_assisted") {
-      extra.appendChild(el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장"));
-    }
   }
 
   // [M10b P0] 조항(refs) 상태 명시 — 있으면 기존 칩, 없으면 "조항 미추출" 회색 칩
@@ -665,10 +674,12 @@
     if (row.review_status === "needs_review") card.classList.add("fnd-card--review");
     card.classList.add("fnd-collapsed"); // 기본 접힘(카드 단위 로컬 상태, 재렌더시 초기화 허용)
 
+    // [M14 §5] head 재구성 — 좌측 [소스][증거][검토 필요(해당 시)], 우측 date(margin-left:
+    // auto, 배지 줄의 마지막 자식으로 붙여야 flex 행에서 실제로 우측 끝에 고정된다). 기관
+    // (agency) 배지는 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가 기관을 포함하는
+    // 상위 구분이라 "FDA"+"FDA 483" 같은 중복 표기를 없앤다.
     var head = el("div", "fnd-card-head");
-    head.appendChild(el("span", "fnd-b date", row.published_date || ""));
-    head.appendChild(el("span", "fnd-b", row.agency || ""));
-    head.appendChild(el("span", "fnd-b", row.source || ""));
+    if (row.source) head.appendChild(el("span", "fnd-b", row.source));
     var evLabel = EVIDENCE_LABEL[row.evidence_level] || row.evidence_level || "";
     if (evLabel) {
       var evBadge = el("span", "fnd-b" + (row.evidence_level === "A" ? " ev-a" : ""), evLabel);
@@ -686,9 +697,8 @@
       if (statusTitle) statusBadge.setAttribute("title", statusTitle);
       head.appendChild(statusBadge);
     }
+    head.appendChild(el("span", "fnd-b date", row.published_date || ""));
     card.appendChild(head);
-
-    appendReviewNote(card, row); // 배지 줄 아래, 접힘 상태에서도 항상 보임
 
     if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", row.firm_name, query));
     var cat = CATEGORY_LABELS[row.category_code];

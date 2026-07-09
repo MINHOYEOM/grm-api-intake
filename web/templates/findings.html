@@ -9,11 +9,16 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
-    <p class="reveal" style="animation-delay:.14s">FDA 483 Observation · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 한곳에 모읍니다. 업체·기관·카테고리·증거등급·발행월로 좁혀 검색할 수 있습니다.</p>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 검색합니다.</p>
   </div>
   <div class="wrap">
+    {#- M10b P0 — AI 고지를 details/summary 슬림 배너로 축소(첫 화면 절약). summary 는
+        항상 보이는 한 줄 요지, 펼치면 기존 전체 고지문(내용 무변경). id/aria-label 유지. -#}
     <section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
-      <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
+      <details class="fnd-notice-d">
+        <summary class="fnd-notice-sum"><i class="ti ti-info-circle" aria-hidden="true"></i>AI 자동 추출 고지 — 누락·오분류 가능, 의사결정 전 반드시 원문 대조<i class="ti ti-chevron-down fnd-notice-car" aria-hidden="true"></i></summary>
+        <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
+      </details>
     </section>
 
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
@@ -100,8 +105,14 @@
 @media (max-width:860px){
   .fnd-dash-grid{grid-template-columns:1fr;gap:22px}
 }
-.fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px}
-.fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:0}
+.fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:12px 18px;margin:0 0 28px}
+.fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:12px 0 0}
+.fnd-notice-d summary{cursor:pointer;list-style:none}
+.fnd-notice-d summary::-webkit-details-marker{display:none}
+.fnd-notice-sum{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--muted)}
+.fnd-notice-sum .ti-info-circle{font-size:15px;color:var(--coral-2);flex:none}
+.fnd-notice-car{margin-left:auto;font-size:13px;color:var(--muted);transition:transform .15s;flex:none}
+.fnd-notice-d[open] .fnd-notice-car{transform:rotate(180deg)}
 .fnd-tools{margin-bottom:22px}
 .fnd-search{position:relative;margin-bottom:14px}
 .fnd-search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
@@ -121,6 +132,9 @@
 .fnd-state-error{color:var(--coral-2)}
 .fnd-results{display:flex;flex-direction:column;gap:12px}
 .fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;background:var(--canvas)}
+/* M10b P0 — 검토 필요 카드 시각 경계(왼쪽 coral 보더 + 옅은 틴트 배경, 즉시 구분). */
+.fnd-card.fnd-card--review{border-color:rgba(194,96,63,.3);border-left:4px solid var(--coral);background:var(--coral-tint);padding-left:18px}
+.fnd-review-note{font-size:11.5px;font-weight:600;color:var(--coral-2);margin:0 0 10px}
 .fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
 .fnd-b{display:inline-flex;align-items:center;font-size:12px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:4px 9px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
 .fnd-b.date{font-family:var(--mono);background:transparent;border:0;padding:0;color:var(--muted);font-weight:500}
@@ -129,15 +143,29 @@
 .fnd-firm{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 4px}
 .fnd-cat{font-size:13px;color:var(--muted);margin:0 0 10px}
 .fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
+/* M10b P1 — 카드 기본 접힘: 접힌 상태(.fnd-card.fnd-collapsed)에서만 본문 3줄 클램프 +
+   부가 섹션(.fnd-extra: 원문 접기/refs/번역고지/메타줄) 숨김. 펼치면(버튼 클릭) 클래스 제거. */
+.fnd-card.fnd-collapsed .fnd-text{-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.fnd-card.fnd-collapsed .fnd-extra{display:none}
+/* 하이라이트는 검토필요 카드 배경(--coral-tint)과 겹쳐도 구분되도록 tint 보다 진한 혼합색. */
+.fnd-hl{background:color-mix(in srgb,var(--coral) 30%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.fnd-extra{margin:0}
 .fnd-orig{margin:0 0 10px}
 .fnd-orig summary{cursor:pointer;font-size:12.5px;font-weight:500;color:var(--coral-2)}
 .fnd-orig p{font-family:var(--serif);font-size:13.5px;line-height:1.6;color:var(--muted);margin:8px 0 0;white-space:pre-wrap}
 .fnd-tr-note{display:block;font-size:11.5px;color:var(--muted);margin:0 0 10px}
 .fnd-refs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .fnd-ref{font-family:var(--mono);font-size:11.5px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
+.fnd-ref-missing{font-size:11.5px;color:var(--muted);background:var(--strong);border-radius:6px;padding:3px 8px}
+.fnd-meta{font-size:11.5px;color:var(--muted);margin:0 0 10px}
+.fnd-meta-doc{font-family:var(--mono)}
+.fnd-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
 .fnd-link{font-size:12.5px;font-weight:500;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;display:inline-flex;gap:7px;align-items:center;text-decoration:none}
 .fnd-link:hover{border-color:var(--coral);color:var(--coral)}
 .fnd-link i{font-size:14px;color:var(--coral)}
+.fnd-more-btn{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);background:transparent;border:0;padding:0;cursor:pointer}
+.fnd-more-btn[hidden]{display:none}
+.fnd-more-btn:hover{text-decoration:underline}
 </style>
 {% endblock %}
 {% block scripts %}<script src="{{ rel_root }}assets/findings.js?v={{ findingsjs_ver }}" defer></script>{% endblock %}

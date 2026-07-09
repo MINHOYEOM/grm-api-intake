@@ -1,5 +1,5 @@
-/* GRM 지적사항 검색 (FIND-1 M3c, 국문 우선표시+카테고리 라벨 M6d, 대시보드 밴드 M7) —
- * 정적·클라이언트사이드, 순수 fetch(PostgREST 직접 호출).
+/* GRM 지적사항 검색 (FIND-1 M3c, 국문 우선표시+카테고리 라벨 M6d, 대시보드 밴드 M7,
+ * 카드 UX 오버홀 M10b) — 정적·클라이언트사이드, 순수 fetch(PostgREST 직접 호출).
  *
  * supabase-js CDN 미사용 — 인증 불필요한 anon SELECT 뿐이라 REST 엔드포인트를 직접 fetch 한다.
  * cfg(url/key) 는 템플릿의 #grm-findings-cfg data-속성(env-param, 미설정이면 빈 문자열)에서
@@ -8,7 +8,9 @@
  *
  * 렌더는 전부 textContent/createElement 로만 한다(innerHTML 에 데이터 삽입 금지) — findings
  * 는 원문에서 자동 추출한 자유 텍스트라 이스케이프 누락 시 XSS 위험이 크다(archive.js 의
- * search-index.json 은 렌더러가 이미 생성한 신뢰 데이터라 다른 계약).
+ * search-index.json 은 렌더러가 이미 생성한 신뢰 데이터라 다른 계약). 매칭어 하이라이트
+ * (M10b P1)도 이 계약을 지킨다 — appendHighlighted() 는 text node 분할 + createElement
+ * ("mark") 조립로만 구현하고, innerHTML/정규식 치환 문자열 삽입은 쓰지 않는다.
  *
  * [동기화 규칙] CATEGORY_LABELS 는 grm_findings.FINDING_TAXONOMY 의 20개 code/label_ko/
  * label_en 과 완전히 일치해야 한다 — web/tests/test_render.py 가 대조 테스트로 강제한다.
@@ -390,36 +392,142 @@
     return e;
   }
 
+  // [M10b P1] 매칭어 하이라이트 — text node 분할 + createElement("mark") 조립만 사용
+  // (innerHTML/정규식 치환 문자열 삽입 금지, 파일 상단 XSS 계약 참조). query 는 이미
+  // trim+lowercase 된 상태로 전달받는다. indexOf 루프로 전 구간을 순회한다.
+  function appendHighlighted(parent, text, query) {
+    if (!query) {
+      parent.appendChild(document.createTextNode(text));
+      return;
+    }
+    var hay = text.toLowerCase();
+    var i = 0;
+    var idx = hay.indexOf(query, i);
+    if (idx === -1) {
+      parent.appendChild(document.createTextNode(text));
+      return;
+    }
+    while (idx !== -1) {
+      if (idx > i) parent.appendChild(document.createTextNode(text.slice(i, idx)));
+      var mark = document.createElement("mark");
+      mark.className = "fnd-hl";
+      mark.textContent = text.slice(idx, idx + query.length);
+      parent.appendChild(mark);
+      i = idx + query.length;
+      idx = hay.indexOf(query, i);
+    }
+    if (i < text.length) parent.appendChild(document.createTextNode(text.slice(i)));
+  }
+
+  // el() 의 하이라이트 버전 — query 가 없으면 el() 과 동일한 순수 textContent 경로.
+  function elHL(tag, className, text, query) {
+    var e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text !== undefined && text !== null && text !== "") {
+      if (query) appendHighlighted(e, text, query);
+      else e.textContent = text;
+    }
+    return e;
+  }
+
   var EVIDENCE_LABEL = { A: "Evidence A", B: "Evidence B", C: "Evidence C" };
   var STATUS_LABEL = { needs_review: "검토 필요", accepted: "검토 완료", rejected: "반려" };
 
-  function appendFindingText(card, row) {
-    // [원문·국문 병기 M6d] finding_text_ko 가 있으면 국문을 본문으로, 원문은 접기(details)로
-    // 낮춰 보여준다. 없으면(폴백 fetch 포함) 기존처럼 원문만 그대로 표시.
+  // [M10b P0] 검토 필요 카드 상시 경고 한 줄. confidence 없으면 신뢰도 부분 생략.
+  function appendReviewNote(card, row) {
+    if (row.review_status !== "needs_review") return;
+    var text = "AI 추출 검수 전 — 원문 대조 필수";
+    if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
+      var pct = Math.round(Number(row.confidence) * 100);
+      if (!isNaN(pct)) text += " · 신뢰도 " + pct + "%";
+    }
+    card.appendChild(el("p", "fnd-review-note", text));
+  }
+
+  // [M10b P1] 본문(국문 우선, 없으면 원문). 접힘 상태에서도 항상 보이므로 card 에 직접
+  // 붙인다(부가 섹션과 분리) — 반환한 엘리먼트로 render() 가 오버플로 판정을 한다.
+  function appendMainText(card, row, query) {
     var ko = (row.finding_text_ko || "").trim();
-    if (!ko) {
-      if (row.finding_text) card.appendChild(el("p", "fnd-text", row.finding_text));
-      return;
-    }
-    card.appendChild(el("p", "fnd-text", ko));
-    if (row.finding_text) {
-      var details = document.createElement("details");
-      details.className = "fnd-orig";
-      var summary = document.createElement("summary");
-      summary.textContent = "원문 보기 (영문)";
-      details.appendChild(summary);
-      var p = document.createElement("p");
-      p.textContent = row.finding_text;
-      details.appendChild(p);
-      card.appendChild(details);
-    }
+    var text = ko || row.finding_text || "";
+    if (!text) return null;
+    var p = elHL("p", "fnd-text", text, query);
+    card.appendChild(p);
+    return p;
+  }
+
+  // [원문·국문 병기 M6d, M10b P1] finding_text_ko 가 있을 때만 원문(영문) 접기 + 번역고지가
+  // 존재한다 — 둘 다 접힘 상태에서 숨기는 부가 섹션(extra)에 들어간다.
+  function appendOrigAndNote(extra, row, query) {
+    var ko = (row.finding_text_ko || "").trim();
+    if (!ko || !row.finding_text) return;
+    var details = document.createElement("details");
+    details.className = "fnd-orig";
+    var summary = document.createElement("summary");
+    summary.textContent = "원문 보기 (영문)";
+    details.appendChild(summary);
+    var p = elHL("p", null, row.finding_text, query);
+    details.appendChild(p);
+    extra.appendChild(details);
     if (row.translation_method === "llm_assisted") {
-      card.appendChild(el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장"));
+      extra.appendChild(el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장"));
     }
   }
 
-  function buildCard(row) {
+  // [M10b P0] 조항(refs) 상태 명시 — 있으면 기존 칩, 없으면 "조항 미추출" 회색 칩
+  // (한글이므로 .fnd-ref 를 재사용하지 않고 별도 클래스 .fnd-ref-missing, mono 미적용).
+  function appendRefs(extra, row) {
+    var refs = ([]).concat(row.cfr_refs || [], row.mfds_refs || []);
+    var refsWrap = el("div", "fnd-refs");
+    if (refs.length) {
+      refs.forEach(function (r) {
+        if (r) refsWrap.appendChild(el("span", "fnd-ref", r));
+      });
+    } else {
+      refsWrap.appendChild(el("span", "fnd-ref-missing", "조항 미추출"));
+    }
+    extra.appendChild(refsWrap);
+  }
+
+  // [M10b P0] 메타 줄 — 문서번호(ASCII, mono 허용) · 신뢰도. 문서번호 표시 위치이므로
+  // 매칭어 하이라이트 대상(P1)이기도 하다.
+  function appendMetaLine(extra, row, query) {
+    var docId = row.document_id || "";
+    var meta = document.createElement("p");
+    meta.className = "fnd-meta";
+    meta.appendChild(document.createTextNode("문서번호 "));
+    var docSpan = elHL("span", "fnd-meta-doc", docId, query);
+    meta.appendChild(docSpan);
+    if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
+      var pct = Math.round(Number(row.confidence) * 100);
+      if (!isNaN(pct)) meta.appendChild(document.createTextNode(" · 신뢰도 " + pct + "%"));
+    }
+    extra.appendChild(meta);
+  }
+
+  // [M10b P1] "자세히 보기"/"접기" 토글. 상태는 카드(article) 단위 로컬(전역 오염 없음) —
+  // 클로저가 card/btn 을 캡처하고, 별도 state 저장소를 쓰지 않는다. 기본은 hidden(판정
+  // 전) — render() 가 rAF 1회로 오버플로/부가섹션 존재 여부를 확인한 뒤 필요할 때만
+  // 노출하고, 불필요하면 DOM 에서 제거한다("버튼을 만들지 않는다").
+  function buildMoreToggle(card) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-more-btn";
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "자세히 보기";
+    btn.hidden = true;
+    btn.addEventListener("click", function () {
+      var stillCollapsed = card.classList.toggle("fnd-collapsed");
+      var expanded = !stillCollapsed;
+      btn.setAttribute("aria-expanded", expanded ? "true" : "false");
+      btn.textContent = expanded ? "접기" : "자세히 보기";
+    });
+    return btn;
+  }
+
+  function buildCard(row, query) {
     var card = el("article", "fnd-card");
+    if (row.review_status === "needs_review") card.classList.add("fnd-card--review");
+    card.classList.add("fnd-collapsed"); // 기본 접힘(카드 단위 로컬 상태, 재렌더시 초기화 허용)
 
     var head = el("div", "fnd-card-head");
     head.appendChild(el("span", "fnd-b date", row.published_date || ""));
@@ -436,21 +544,22 @@
     }
     card.appendChild(head);
 
-    if (row.firm_name) card.appendChild(el("h3", "fnd-firm", row.firm_name));
+    appendReviewNote(card, row); // 배지 줄 아래, 접힘 상태에서도 항상 보임
+
+    if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", row.firm_name, query));
     var cat = CATEGORY_LABELS[row.category_code];
     var catText = cat ? cat.ko : row.category_label_ko;
     if (catText) card.appendChild(el("p", "fnd-cat", catText));
-    appendFindingText(card, row);
 
-    var refs = ([]).concat(row.cfr_refs || [], row.mfds_refs || []);
-    if (refs.length) {
-      var refsWrap = el("div", "fnd-refs");
-      refs.forEach(function (r) {
-        if (r) refsWrap.appendChild(el("span", "fnd-ref", r));
-      });
-      card.appendChild(refsWrap);
-    }
+    var textEl = appendMainText(card, row, query);
 
+    var extra = el("div", "fnd-extra"); // 접힘 상태에서 숨기는 부가 섹션(원문/refs/번역고지/메타)
+    appendOrigAndNote(extra, row, query);
+    appendRefs(extra, row);
+    appendMetaLine(extra, row, query);
+    card.appendChild(extra);
+
+    var actions = el("div", "fnd-actions");
     if (safeUrl(row.evidence_url)) {
       var a = document.createElement("a");
       a.className = "fnd-link";
@@ -462,10 +571,13 @@
       icon.setAttribute("aria-hidden", "true");
       a.appendChild(icon);
       a.appendChild(document.createTextNode("원문 보기"));
-      card.appendChild(a);
+      actions.appendChild(a);
     }
+    var moreBtn = buildMoreToggle(card);
+    actions.appendChild(moreBtn);
+    card.appendChild(actions);
 
-    return card;
+    return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };
   }
 
   function render() {
@@ -484,11 +596,31 @@
       return;
     }
     showState("none");
+    var query = state.q.trim().toLowerCase(); // [M10b P1] 하이라이트 검색어(trim+대소문자무시)
     var frag = document.createDocumentFragment();
+    var built = [];
     matched.forEach(function (row) {
-      frag.appendChild(buildCard(row));
+      var b2 = buildCard(row, query);
+      frag.appendChild(b2.card);
+      built.push(b2);
     });
     resultsEl.appendChild(frag);
+    // [M10b P1] "자세히 보기" 버튼 표시 여부 — DOM 삽입 후(레이아웃 확정) 1회 rAF 로 판정.
+    // 본문이 3줄을 넘겨 잘렸거나(scrollHeight>clientHeight) 부가 섹션이 있으면 노출,
+    // 둘 다 아니면 DOM 에서 제거한다(버튼 없음).
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () {
+        built.forEach(function (item) {
+          var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
+          var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
+          if (overflow || hasExtra) {
+            item.moreBtn.hidden = false;
+          } else {
+            item.moreBtn.remove();
+          }
+        });
+      });
+    }
   }
 
   function wire() {

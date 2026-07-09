@@ -852,6 +852,106 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("stats.needsReview", js_src)
         self.assertIn("검토 필요", js_src)
 
+    # ── FIND-1 M10b: 카드 UX 오버홀(고지 슬림화·검토필요 경계·기본접힘·하이라이트·refs 상태) ──
+    def test_notice_is_details_summary_slim_banner(self):
+        """AI 고지(P0)는 <details>/<summary> 구조로 축소돼 있어야 한다 — summary 는 항상
+        보이는 한 줄 요지, 본문은 펼쳐야 보인다. id/aria-label 은 기존 계약대로 유지."""
+        import re as _re
+        self.assertIn('id="findings-notice" aria-label="AI 자동 추출 고지"', self.html)
+        m = _re.search(
+            r'<section class="fnd-notice" id="findings-notice"[^>]*>\s*<details',
+            self.html)
+        self.assertIsNotNone(m, "고지 섹션이 details 로 시작하지 않음")
+        self.assertIn("<summary", self.html)
+
+    def test_notice_summary_has_short_gist_and_quiet_style(self):
+        """summary 한 줄은 조용한 스타일 클래스(.fnd-notice-sum)를 쓰고, 펼침 힌트 아이콘
+        (ti-info-circle)을 포함하며, 요지 문구를 담는다."""
+        self.assertIn("fnd-notice-sum", self.html)
+        self.assertIn("ti-info-circle", self.html)
+        self.assertIn("AI 자동 추출 고지 — 누락·오분류 가능, 의사결정 전 반드시 원문 대조", self.html)
+
+    def test_page_head_description_is_one_sentence(self):
+        """첫 화면 밀도(보조) — page-head 설명문단이 압축된 한 문장(마침표 1개로 종결)인지 확인."""
+        import re as _re
+        m = _re.search(r'<p class="reveal"[^>]*>([^<]*)</p>', self.html)
+        self.assertIsNotNone(m)
+        text = m.group(1)
+        self.assertEqual(text.count("."), 1, f"한 문장이 아닌 것으로 보임: {text!r}")
+        self.assertTrue(text.endswith("검색합니다."), text)
+
+    def test_review_card_boundary_markers_present(self):
+        """검토 필요(needs_review) 카드는 article 에 fnd-card--review 클래스가 붙고,
+        상시 경고 한 줄(.fnd-review-note)이 배지 줄 아래에 렌더돼야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('card.classList.add("fnd-card--review")', js_src)
+        self.assertIn("fnd-review-note", js_src)
+        self.assertIn("AI 추출 검수 전", js_src)
+        self.assertIn("원문 대조 필수", js_src)
+        # CSS: coral 계열 왼쪽 보더 + 틴트 배경(--coral-tint 재사용).
+        self.assertIn(".fnd-card.fnd-card--review", self.html)
+        self.assertIn("border-left:4px solid var(--coral)", self.html)
+        self.assertIn("var(--coral-tint)", self.html)
+
+    def test_review_note_confidence_percent_marker(self):
+        """신뢰도 표시는 Math.round(confidence*100) 로 산출되고, confidence 없으면
+        생략되는 분기가 있어야 한다(소스 마커)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("Math.round(Number(row.confidence) * 100)", js_src)
+        self.assertIn("신뢰도 ", js_src)
+
+    def test_card_default_collapsed_and_more_toggle(self):
+        """카드는 기본 접힘(.fnd-collapsed)이고, "자세히 보기"/"접기" 토글 버튼이
+        aria-expanded 를 갖춘 button 으로 textContent 라벨만 쓰는지 확인."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('card.classList.add("fnd-collapsed")', js_src)
+        self.assertIn("자세히 보기", js_src)
+        self.assertIn('btn.textContent = expanded ? "접기" : "자세히 보기"', js_src)
+        self.assertIn('setAttribute("aria-expanded"', js_src)
+        # CSS: 접힘 상태에서만 3줄 클램프 + 부가 섹션(.fnd-extra) 숨김.
+        self.assertIn(".fnd-card.fnd-collapsed .fnd-text", self.html)
+        self.assertIn("-webkit-line-clamp:3", self.html)
+        self.assertIn(".fnd-card.fnd-collapsed .fnd-extra{display:none}", self.html)
+
+    def test_highlight_uses_textnode_and_createelement_mark(self):
+        """매칭어 하이라이트(P1)는 text node 분할 + createElement("mark") 조립로만
+        구현돼야 한다 — innerHTML/정규식 치환 문자열 삽입 금지(XSS 계약)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function appendHighlighted(parent, text, query)", js_src)
+        self.assertIn('document.createElement("mark")', js_src)
+        self.assertIn('mark.className = "fnd-hl"', js_src)
+        self.assertIn("document.createTextNode", js_src)
+        # CSS 마커.
+        self.assertIn(".fnd-hl", self.html)
+
+    def test_refs_missing_chip_marker_present(self):
+        """cfr_refs/mfds_refs 가 둘 다 비어있으면 회색 '조항 미추출' 칩을 렌더한다
+        (한글이므로 .fnd-ref 재사용 없이 별도 클래스, mono 미적용)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("fnd-ref-missing", js_src)
+        self.assertIn("조항 미추출", js_src)
+        # CSS: .fnd-ref-missing 은 .fnd-ref 와 달리 font-family mono 를 쓰지 않는다.
+        import re as _re
+        m = _re.search(r'\.fnd-ref-missing\{([^}]*)\}', self.html)
+        self.assertIsNotNone(m, ".fnd-ref-missing CSS 규칙 미발견")
+        self.assertNotIn("var(--mono)", m.group(1), "한글 칩에 mono 적용(§4 위반 위험)")
+
+    def test_meta_line_document_id_and_confidence_marker(self):
+        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII) · 신뢰도(퍼센트)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function appendMetaLine(extra, row, query)", js_src)
+        self.assertIn('meta.appendChild(document.createTextNode("문서번호 "))', js_src)
+        self.assertIn("fnd-meta-doc", js_src)
+        self.assertIn(".fnd-meta-doc{font-family:var(--mono)}", self.html)
+
+    def test_findings_js_still_no_innerhtml_data_injection_after_m10b(self):
+        """M10b 신규 렌더 경로(하이라이트/접힘/메타)도 기존 XSS 계약을 지킨다 —
+        innerHTML 대입은 컨테이너 비우기("")뿐이어야 한다(전역 재확인)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:

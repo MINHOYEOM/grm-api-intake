@@ -1,0 +1,132 @@
+name: GRM Findings Backfill Fetch (F2b)
+
+# [FIND-1 F2b] Manual, human-triggered *historical document fetch* backfill:
+# pulls past FDA 483 / FDA Warning Letter documents in chunks and appends them
+# directly to Supabase raw_signals (Notion is never written -- the weekly brief
+# queue must not see backfill noise), then (unless dry_run) chains the M12
+# findings backfill (findings_supabase_backfill.py) so raw -> findings completes
+# in the same job.
+#
+# robots.txt design constraints (do not weaken):
+#   - fda.gov robots specifies Crawl-Delay: 30 -- the collector sleeps `delay`
+#     seconds (default 30) before every fda.gov request (list AJAX + each doc).
+#   - FDA 483 and FDA WL live on the SAME host, so one run handles exactly one
+#     source and the concurrency group below forbids two runs racing the same
+#     per-host rate budget (cancel-in-progress: false -- queued, never killed).
+#   - MFDS/nedrug is excluded from backfill scope entirely: its robots is
+#     Disallow: / (no crawling permission).
+#
+# ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 -- checkout(read-only)
+# 이후 커밋/푸시/PR 생성 스텝이 없다. dry_run=true(기본값)로 먼저 실행해
+# 목록/skip 판정을 확인한 뒤, dry_run=false 로 재실행해야 실제 fetch/적재가 된다.
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Which source to backfill (one per run -- same fda.gov host)'
+        type: choice
+        options:
+          - fda483
+          - fda_wl
+        default: fda483
+      offset:
+        description: 'DataTables start offset (resume point; see previous run next_offset)'
+        type: string
+        default: '0'
+      max_docs:
+        description: 'Max documents to list/fetch this run (DataTables length)'
+        type: string
+        default: '200'
+      dry_run:
+        description: 'true = list + skip triage only (no document fetch, no POST)'
+        type: string
+        default: 'true'
+      delay:
+        description: 'Seconds to sleep between fda.gov requests (robots Crawl-Delay)'
+        type: string
+        default: '30'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-backfill-fetch
+  cancel-in-progress: false
+
+jobs:
+  backfill-fetch:
+    name: Fetch historical FDA docs into raw_signals (+ M12 findings chain)
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 목록 조회 + (dry_run 아님) 문서 fetch + raw_signals POST. Notion/git 쓰기 없음.
+      # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4)·grm-findings-backfill.yml(M12)이
+      # 이미 쓰는 동일 secret 재사용 -- 신규 secret/var 등록 불필요.
+      - name: Run backfill fetch (no git writes -- list/fetch + raw_signals POST only)
+        id: fetch
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=(--source "${{ inputs.source }}"
+                --offset "${{ inputs.offset }}"
+                --max-docs "${{ inputs.max_docs }}"
+                --delay "${{ inputs.delay }}"
+                --output fetch_report.json)
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          python collect_fda_backfill.py "${ARGS[@]}"
+          APPENDED=$(python -c "import json; print(json.load(open('fetch_report.json'))['appended'])")
+          echo "appended=${APPENDED}" >> "$GITHUB_OUTPUT"
+
+      # dry_run 이 아니고 이번 실행에서 raw_signals 가 실제 추가됐을 때만 M12 체인:
+      # 방금 적재된 raw 를 같은 잡에서 findings 로 변환해 백필을 완결한다.
+      - name: Chain M12 findings backfill (raw -> findings)
+        if: ${{ inputs.dry_run != 'true' && steps.fetch.outputs.appended != '0' && steps.fetch.outputs.appended != '' }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python findings_supabase_backfill.py | tee m12_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Backfill Fetch (F2b)"
+            echo ""
+            echo "source: \`${{ inputs.source }}\` / offset: \`${{ inputs.offset }}\` / max_docs: \`${{ inputs.max_docs }}\` / dry_run: \`${{ inputs.dry_run }}\` / delay: \`${{ inputs.delay }}\`"
+            echo ""
+            if [ -f fetch_report.json ]; then
+              echo "#### Fetch report (collect_fda_backfill.py)"
+              echo '```json'
+              cat fetch_report.json
+              echo '```'
+            else
+              echo "fetch_report.json 이 생성되지 않았습니다 (인자/인증/목록 접근 실패로 exit 2 조기 종료 가능 -- SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+            echo ""
+            if [ -f m12_report.json ]; then
+              echo "#### M12 findings backfill report (findings_supabase_backfill.py)"
+              echo '```json'
+              cat m12_report.json
+              echo '```'
+            else
+              echo "(M12 체인 미실행 -- dry_run 이거나 appended=0)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

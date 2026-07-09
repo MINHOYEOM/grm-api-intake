@@ -1084,6 +1084,40 @@ class WebFindingsRenderTest(unittest.TestCase):
         for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
             self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
 
+    # ── FIND-1 M13a: 신뢰도 UX 분리(증거등급 vs 검토상태 배지) ─────────────────────
+    def test_evidence_badge_no_longer_uses_coral_tint(self):
+        """.fnd-b.ev-a 는 더 이상 coral-tint 를 쓰지 않는다 — Evidence A(신뢰 높음)와
+        needs-review(주의 신호)가 같은 색으로 강조되는 시각 혼동을 없앤다. ev-a 는 중립
+        강조(--strong/--ink)로 분리되고, needs-review 는 coral-tint 를 그대로 유지한다."""
+        import re as _re
+        ev_a_rule = _re.search(r'\.fnd-b\.ev-a\{([^}]*)\}', self.html)
+        self.assertIsNotNone(ev_a_rule, ".fnd-b.ev-a CSS 규칙 미발견")
+        self.assertNotIn("var(--coral-tint)", ev_a_rule.group(1))
+        self.assertIn("var(--strong)", ev_a_rule.group(1))
+        self.assertIn("var(--ink)", ev_a_rule.group(1))
+
+        review_rule = _re.search(r'\.fnd-b\.needs-review\{([^}]*)\}', self.html)
+        self.assertIsNotNone(review_rule, ".fnd-b.needs-review CSS 규칙 미발견")
+        self.assertIn("var(--coral-tint)", review_rule.group(1))
+
+    def test_badge_title_tooltips_present(self):
+        """증거등급/검토상태 배지는 의미를 즉답하는 title 툴팁을 갖는다(순수 setAttribute
+        — XSS 무관). accepted 는 결정론 규칙 자동 승인이지 사람 검수 완료가 아니므로
+        그렇게 쓰지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        for title in (
+            "Evidence A — 1차 공식문서에서 직접 추출(신뢰도 높음)",
+            "Evidence B — 공식 인덱스+보조 자료 기반(원문 대조 권장)",
+            "Evidence C — 보조 출처 단독(참고용)",
+            "AI 추출 후 사람 검수 전 — 원문 대조 필수",
+            "결정론 추출 규칙 통과(자동 승인)",
+        ):
+            self.assertIn(title, js_src)
+        self.assertNotIn("사람 검수 완료", js_src)
+        self.assertIn('evBadge.setAttribute("title", evTitle)', js_src)
+        self.assertIn('reviewBadge.setAttribute("title", STATUS_TITLE.needs_review)', js_src)
+        self.assertIn('statusBadge.setAttribute("title", statusTitle)', js_src)
+
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:

@@ -1,0 +1,92 @@
+name: GRM Findings Backfill (M12)
+
+# [FIND-1 M12] Manual, human-triggered backfill for raw_signals that already
+# live in Supabase but never got their findings extracted/inserted (e.g. the
+# ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND flag was still off, or the
+# extractor code hadn't shipped yet, when the raw_signal was first
+# collected -- document_id dedup means a later run never revisits it).
+#
+# This is a pure, deterministic Python script (findings_supabase_backfill.py)
+# -- no LLM, no judgment calls. Translation is out of scope by design:
+# backfilled findings land untranslated and the normal weekly M8/M9
+# translation loop fills in finding_text_ko later; the M9 public-read RLS
+# gate keeps untranslated rows off the website in the meantime.
+#
+# ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 -- checkout(read-only)
+# 이후 커밋/푸시/PR 생성 스텝이 없다. dry_run=true(기본값)로 먼저 실행해 무엇이
+# 적재될지 로그로 확인한 뒤, dry_run=false 로 재실행해야 실제로 findings 가
+# 적재된다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true = read-only plan only (no POST); false = actually append findings'
+        type: boolean
+        default: true
+      limit:
+        description: 'Optional: only process the first N unbackfilled raw_signals (blank = all)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Backfill findings for already-ingested raw_signals
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 읽기(raw_signals·findings) + POST(findings 만) 수행 -- git add/commit/push
+      # 없음. raw_signal 은 이미 Supabase 에 있으므로 재-POST 하지 않는다.
+      # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4)·grm-findings-translate-apply.yml(M9b)
+      # 이 이미 쓰는 동일 secret 재사용 -- 신규 secret/var 등록 불필요.
+      - name: Run backfill (no git writes -- read + findings POST only)
+        id: backfill
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=()
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ -n "${{ inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ inputs.limit }}")
+          fi
+          python findings_supabase_backfill.py "${ARGS[@]}" | tee backfill_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Backfill (M12)"
+            echo ""
+            echo "dry_run: \`${{ inputs.dry_run }}\` / limit: \`${{ inputs.limit || 'all' }}\`"
+            echo ""
+            if [ -f backfill_report.json ]; then
+              echo '```json'
+              cat backfill_report.json
+              echo '```'
+            else
+              echo "backfill_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 -- SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

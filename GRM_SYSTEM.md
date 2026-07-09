@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.115-draft` |
+| 문서 버전 | `v1.116-draft` |
 | 최종 수정일 | 2026-07-09 |
-| 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M9 완료** — 규제 지적사항 검색 DB + 국문 자동 번역 파이프라인 라이브. |
+| 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M10 완료** — 규제 지적사항 검색 DB + 국문 자동 번역 파이프라인 + 탐색 UX 오버홀 라이브. |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -187,7 +187,7 @@ flowchart TD
 - **매일 적재(M4):** `collect_intake.py`가 Notion 적재 성공분을 Supabase `findings`에 직행 append(기본 off 플래그, 현재 활성).
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
 - **주간 번역(M8·M9):** 매주 월요일 예약된 Claude Code 세션(구독 사용량·API 비용 0)이 미번역분을 추출→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영.
-- **웹 표시(M6·M7):** `/findings/`가 국문 우선 + 원문 접기로 표시하고, 검색·필터 + 대시보드(기관·카테고리·기간·업체 통계)를 제공.
+- **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 카드 기본 접힘(3줄 요약→자세히 보기) + 원문 접기로 표시하고, 칩 필터(건수 병기)·정렬·매칭어 하이라이트·검토 필요 시각 경계·URL 쿼리 공유 + 대시보드(기관·카테고리·기간·업체 통계)를 제공.
 
 ### 4.3 데이터 계약
 - **`raw_signals`** (원본 보존층): 재추출 가능한 원본. `raw_json`은 원문 byte 그대로 보존해 해시 재검증 가능. **비공개**(service_role 전용).
@@ -195,7 +195,7 @@ flowchart TD
 - **taxonomy v2:** 20개 카테고리(코드·한국어·영문 라벨 고정). 분류기는 단어경계 매칭으로 오분류 방지. `finding_id`는 내용 해시 기반 안정 ID(번역 추가로 안 바뀜).
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
 
-### 4.4 마일스톤 요약 (M1~M9, 전부 완료·라이브)
+### 4.4 마일스톤 요약 (M1~M10, 전부 완료·라이브)
 
 | 단계 | 내용 |
 |---|---|
@@ -208,6 +208,7 @@ flowchart TD
 | M7 | `/findings/` 대시보드 밴드(필터 연동 분포·추이·업체 통계) |
 | M8 | 번역 도구 라이브 소스 모드(`--source supabase`) |
 | M9 | 공개 게이트(RLS) + 주간 번역 자동화(예약 세션 + outbox 워크플로) |
+| M10 | `/findings/` 탐색 UX 오버홀(483 페이지헤더 잡음 스크럽·카드 접힘·매칭어 하이라이트·검토 필요 시각 경계·칩 필터·정렬·모바일 접기·URL 동기화·화면표시값 검색) + 오염 finding 2건 백필 |
 
 > **운영 지위:** 신규 유입분의 정본은 Supabase. 로컬 SQLite sidecar(`grm-findings.sqlite3`)는 7월 백필 스냅샷 + 로컬 개발용.
 
@@ -296,13 +297,14 @@ grm-api-intake/
 | Phase 3 | 글로벌 심화(ICH·WHO·Health Canada) | ✅ 완료·활성 |
 | Phase 4 | 제품군 확장(경구 고형제 → 의약품 전반 3분류) | ✅ 완료·운영 |
 | 웹/뉴스레터 | 웹 발행·뉴스레터·Admin 콘솔·클라우드 자동화 | ✅ 완료·라이브 |
-| **FIND-1** | Findings 인텔리전스(M1~M9) | ✅ 완료·라이브 |
+| **FIND-1** | Findings 인텔리전스(M1~M10, 검색 DB·번역 자동화·탐색 UX) | ✅ 완료·라이브 |
 
 ### 6.2 잔여 작업 (OPEN)
 | ID | 내용 | 상태 |
 |---|---|---|
 | FIND-관찰 | M4 findings 자동 적재 후 첫 실전 수집·주간 번역 사이클 관찰(오늘 밤 첫 수집부터) | 🟡 관찰 대기 |
-| FIND-M10 | outbox 누적 정리, 번역 export 1000행 페이지네이션, WL 장문 finding 분할 추출 | 🔲 후보 |
+| FIND-M10-백필 | 오염 finding 2건 교체 SQL(`grm-findings-supabase-apply-m10-header-2026-07-09.sql`) Supabase 1회 실행 | 🟡 사람 실행 대기 |
+| FIND-M10-DATA | outbox 누적 정리, 번역 export 1000행 페이지네이션, WL 장문 finding 분할 추출 | 🔲 후보 |
 | ROUTINE-AUTO | 클라우드 Routine 실행 자체의 완전 자동화(현재 델타 브릿지까지 자동, 실행은 클라우드 Routines 의존) | 🟡 부분 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
 | GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 | 🔲 후보 |

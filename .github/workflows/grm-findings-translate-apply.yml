@@ -1,0 +1,71 @@
+name: GRM Findings Translate Apply (M9b)
+
+# [FIND-1 M9b] translations/outbox/ 에 새 배치 파일이 main 에 병합되면(트리거는 M9c 의
+# 자동 머지 PR), 순수 결정론 Python 스크립트(findings_translate_apply_service.py)가
+# outbox 를 읽어 Supabase(PostgREST)에 finding_text_ko/translation_method 를 PATCH 한다.
+# LLM 은 이 워크플로에 전혀 관여하지 않는다 — 번역/판단은 M9c(별도 예약 세션)에서 이미
+# 끝난 뒤 outbox JSON 으로 고정되어 여기 도달한다.
+#
+# ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 — checkout(read-only) 이후
+# 커밋/푸시/PR 생성 스텝이 없다. outbox 파일은 이동·삭제되지 않고 그대로 남는다(PATCH 는
+# finding_id+finding_text 로 필터링해 멱등이므로 재실행 시 이미 반영된 항목은 매칭 0건
+# 또는 동일값 재반영으로 무해 — outbox 누적은 의도적으로 다루지 않는 사소한 이월 항목).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'translations/outbox/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-translate-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Apply queued translation outbox → Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 읽기(outbox 파일) + PATCH(Supabase) 만 수행한다 — git add/commit/push 없음.
+      # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4 야간 적재)이 이미 쓰는 동일 secret
+      # 재사용이며, 이 워크플로를 위한 신규 secret 등록은 필요 없다.
+      - name: Apply translation outbox (no git writes — read + PATCH only)
+        id: apply
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python findings_translate_apply_service.py --output apply_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Translate Apply (M9b)"
+            echo ""
+            if [ -f apply_report.json ]; then
+              echo '```json'
+              cat apply_report.json
+              echo '```'
+            else
+              echo "apply_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -18,11 +18,18 @@ deterministic, guarded work:
             Postgres UPDATE SQL file for the live database.
 
 Validation is intentionally strict and all-or-nothing: if any item in the
-plan fails validation, nothing is written -- not to the sidecar, and not to
---sql-output -- and the process exits 3. Sidecar writes additionally require
-the explicit --write-file guard (mirroring the other guarded writers in this
-repo); without it, --apply is always a dry-run that still fully validates and
-still reports what would change.
+plan fails validation, nothing is written -- not to the sidecar, not to
+--sql-output, and not to --outbox-output -- and the process exits 3. Sidecar
+writes additionally require the explicit --write-file guard (mirroring the
+other guarded writers in this repo); without it, --apply is always a dry-run
+that still fully validates and still reports what would change.
+
+[FIND-1 M9b] --outbox-output writes a queued translation batch JSON
+(grm-findings-translation-outbox/v1 item shape: finding_id/finding_text/
+finding_text_ko/translation_method) that a separate, LLM-free CI script --
+findings_translate_apply_service.py -- later PATCHes onto the live Supabase
+database with the service-role key. This module never performs that PATCH
+itself; it only ever produces the file.
 
 --source {sqlite,supabase} (default: sqlite) selects where findings are read
 from. supabase mode talks to the live database anon-key, read-only (RLS) via
@@ -353,6 +360,30 @@ def _write_sql_file(path: str | Path, items: list[dict[str, Any]]) -> None:
     Path(path).write_text(_build_sql_text(items), encoding="utf-8")
 
 
+# ---------------------------------------------------------------------------
+# FIND-1 M9b: --outbox-output (queued batch for the unattended CI apply
+# service, findings_translate_apply_service.py). This is additive to the
+# existing --sql-output path -- both may be requested from the same --apply
+# invocation, and neither is required by the other. Written only when the
+# plan is fully validated (ready=True), same all-or-nothing rule as
+# --sql-output. finding_text (the original, untranslated source text) is
+# included so the CI service can PATCH with a WHERE-clause-equivalent
+# byte-match filter (finding_id + finding_text), mirroring the SQL path's
+# idempotent UPDATE guard without needing a second live read.
+# ---------------------------------------------------------------------------
+
+_OUTBOX_ITEM_KEYS = ("finding_id", "finding_text", "finding_text_ko", "translation_method")
+
+
+def _build_outbox_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [{key: str(item.get(key) or "") for key in _OUTBOX_ITEM_KEYS} for item in items]
+
+
+def _write_outbox_file(path: str | Path, items: list[dict[str, Any]]) -> None:
+    text = json.dumps(_build_outbox_items(items), ensure_ascii=False, sort_keys=True, indent=2)
+    Path(path).write_text(text + "\n", encoding="utf-8")
+
+
 def _write_updates(db_path: Path, items: list[dict[str, Any]]) -> int:
     """Commit UPDATEs to the live sidecar file inside one transaction (all or rollback)."""
     if not items:
@@ -394,17 +425,19 @@ def apply_translations(
     write_file: bool = False,
     overwrite: bool = False,
     sql_output: str | Path | None = None,
+    outbox_output: str | Path | None = None,
 ) -> dict[str, Any]:
     """Validate then (optionally) apply a completed translation plan to the sidecar.
 
     Validation is all-or-nothing across every item in the plan: if any item
-    fails, nothing is written anywhere (not the sidecar, not --sql-output) and
-    the returned report has ready=False. Rows that already carry a non-empty
-    finding_text_ko are skipped unless overwrite=True (translation overwrite
-    is opt-in). Without write_file=True the sidecar is never touched -- the
-    report still reflects what a real apply would do (validated/updated/
-    skipped counts), and --sql-output (if given) is still written, since it
-    never touches the sidecar file either.
+    fails, nothing is written anywhere (not the sidecar, not --sql-output, not
+    --outbox-output) and the returned report has ready=False. Rows that
+    already carry a non-empty finding_text_ko are skipped unless
+    overwrite=True (translation overwrite is opt-in). Without write_file=True
+    the sidecar is never touched -- the report still reflects what a real
+    apply would do (validated/updated/skipped counts), and --sql-output /
+    --outbox-output (if given) are still written, since neither touches the
+    sidecar file.
     """
     path = Path(db_path)
     if not path.is_file():
@@ -461,6 +494,7 @@ def apply_translations(
             "skipped_already_translated": 0,
             "errors": errors,
             "sql_output_path": "",
+            "outbox_output_path": "",
             "ready": False,
         }
 
@@ -480,6 +514,11 @@ def apply_translations(
         sql_output_path = str(Path(sql_output))
         _write_sql_file(sql_output_path, to_update)
 
+    outbox_output_path = ""
+    if outbox_output:
+        outbox_output_path = str(Path(outbox_output))
+        _write_outbox_file(outbox_output_path, to_update)
+
     if not write_file:
         return {
             "schema_version": TRANSLATION_APPLY_SCHEMA_VERSION,
@@ -489,6 +528,7 @@ def apply_translations(
             "skipped_already_translated": skipped,
             "errors": [],
             "sql_output_path": sql_output_path,
+            "outbox_output_path": outbox_output_path,
             "ready": True,
         }
 
@@ -502,6 +542,7 @@ def apply_translations(
         "skipped_already_translated": skipped,
         "errors": [],
         "sql_output_path": sql_output_path,
+        "outbox_output_path": outbox_output_path,
         "ready": True,
     }
 
@@ -546,14 +587,19 @@ def apply_translations_supabase(
     *,
     sql_output: str | Path,
     overwrite: bool = False,
+    outbox_output: str | Path | None = None,
 ) -> dict[str, Any]:
     """Validate a completed translation plan against the live Supabase database.
 
     There is no live write path in supabase mode -- RLS grants anon read-only.
     Validation reuses the exact same all-or-nothing rules as the sqlite --apply
     path (`_validate_item`), just sourced from a live GET snapshot instead of a
-    local SQLite read. On success this only writes --sql-output (mode
-    "sql_only"); a human applies that SQL through the Supabase SQL Editor.
+    local SQLite read. On success this writes --sql-output (mode "sql_only";
+    a human applies that SQL through the Supabase SQL Editor) and, if
+    requested, --outbox-output -- a queued batch JSON that the unattended
+    FIND-1 M9b CI apply service (findings_translate_apply_service.py) later
+    PATCHes onto the live database with the service-role key, no human or LLM
+    involved in that step.
     """
     base = _normalize_supabase_url(base_url)
     if base is None:
@@ -608,6 +654,7 @@ def apply_translations_supabase(
             "skipped_already_translated": 0,
             "errors": errors,
             "sql_output_path": "",
+            "outbox_output_path": "",
             "ready": False,
         }
 
@@ -625,6 +672,11 @@ def apply_translations_supabase(
     sql_output_path = str(Path(sql_output))
     _write_sql_file(sql_output_path, to_update)
 
+    outbox_output_path = ""
+    if outbox_output:
+        outbox_output_path = str(Path(outbox_output))
+        _write_outbox_file(outbox_output_path, to_update)
+
     return {
         "schema_version": TRANSLATION_APPLY_SCHEMA_VERSION,
         "mode": "sql_only",
@@ -633,6 +685,7 @@ def apply_translations_supabase(
         "skipped_already_translated": skipped,
         "errors": [],
         "sql_output_path": sql_output_path,
+        "outbox_output_path": outbox_output_path,
         "ready": True,
     }
 
@@ -727,6 +780,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Path to write a one-shot live Postgres UPDATE SQL file (--apply only; required "
         "for --source supabase)",
     )
+    parser.add_argument(
+        "--outbox-output",
+        help="[FIND-1 M9b] Path to write a translation outbox batch JSON for the unattended CI "
+        "apply service findings_translate_apply_service.py (--apply only; may be combined with "
+        "--sql-output; --source sqlite and supabase both supported)",
+    )
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output")
     args = parser.parse_args(argv)
 
@@ -786,6 +845,7 @@ def main(argv: list[str] | None = None) -> int:
                 anon_key,
                 sql_output=args.sql_output,
                 overwrite=args.overwrite,
+                outbox_output=args.outbox_output,
             )
         except ValueError as exc:
             print(f"findings_translate: {exc}", file=sys.stderr)
@@ -824,6 +884,7 @@ def main(argv: list[str] | None = None) -> int:
             write_file=args.write_file,
             overwrite=args.overwrite,
             sql_output=args.sql_output,
+            outbox_output=args.outbox_output,
         )
     except (OSError, ValueError, sqlite3.Error) as exc:
         print(f"findings_translate: {exc}", file=sys.stderr)

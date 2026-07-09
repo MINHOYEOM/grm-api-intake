@@ -837,6 +837,21 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("AI 번역", self.html)
         self.assertIn("원문을 기준", self.html)
 
+    # ── FIND-1 M9a: 공개 게이트 이후 "번역 대기" 칩 제거 ─────────────────────────
+    def test_pending_translation_chip_removed_from_dashboard(self):
+        """006_findings_publish_gate.sql 이 DB 레벨에서 미번역 행을 anon fetch 결과에서
+        차단하므로, 클라이언트가 세던 '번역 대기 N건' chip 은 항상 0에 수렴해 오해를
+        일으킨다 -- computeStats/렌더 양쪽에서 완전히 제거됐는지 소스 마커로 확인한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertNotIn("pendingTranslation", js_src)
+        self.assertNotIn("번역 대기", js_src)
+
+    def test_needs_review_chip_still_present(self):
+        """번역 대기 chip 제거가 인접한 '검토 필요' chip 로직까지 지우지 않았는지 확인."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("stats.needsReview", js_src)
+        self.assertIn("검토 필요", js_src)
+
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:

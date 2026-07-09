@@ -16,6 +16,14 @@ and appends new `raw_signals` rows directly to Supabase -- Notion is never touch
 weekly brief queue must not see backfill noise). MFDS/nedrug is out of scope (robots
 Disallow: /).
 
+F2c adds an unattended `--auto` mode on top (daily cron): no --source/--offset needed --
+the run computes each source's resume offset from the count of already-collected
+document_ids, works through at most ONE source's chunk per run (fda.gov request budget),
+falls through 483 -> WL only when 483 found nothing new, and once both backlogs are
+exhausted it exits cleanly after just the list requests with `auto_complete=true` -- so
+leaving the daily cron enabled forever is harmless and doubles as a safety net for any
+old documents that appear outside the daily collection window. See `run_auto`.
+
 robots.txt for fda.gov specifies `Crawl-Delay: 30`. Both FDA 483 and FDA WL live on the
 same host, so a single run only ever touches one --source; the GitHub Actions workflow
 enforces this with a `concurrency` group so the two sources can never race the same
@@ -268,15 +276,17 @@ def run_483(
     base_url: str,
     service_key: str,
     sleeper: Sleeper | None = None,
+    existing_ids: set[str] | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda483", offset=offset, max_docs=max_docs)
 
-    try:
-        existing_ids = fetch_existing_document_ids(base_url, service_key, SOURCE_FDA_483)
-    except Exception as e:  # noqa: BLE001
-        report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
-        return report, 2
+    if existing_ids is None:  # --auto pre-fetches this set (to compute the offset) and passes it in.
+        try:
+            existing_ids = fetch_existing_document_ids(base_url, service_key, SOURCE_FDA_483)
+        except Exception as e:  # noqa: BLE001
+            report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
+            return report, 2
 
     try:
         sleeper(delay)
@@ -517,15 +527,17 @@ def run_wl(
     base_url: str,
     service_key: str,
     sleeper: Sleeper | None = None,
+    existing_ids: set[str] | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda_wl", offset=offset, max_docs=max_docs)
 
-    try:
-        existing_ids = fetch_existing_document_ids(base_url, service_key, SOURCE_FDA_WL)
-    except Exception as e:  # noqa: BLE001
-        report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
-        return report, 2
+    if existing_ids is None:  # --auto pre-fetches this set (to compute the offset) and passes it in.
+        try:
+            existing_ids = fetch_existing_document_ids(base_url, service_key, SOURCE_FDA_WL)
+        except Exception as e:  # noqa: BLE001
+            report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
+            return report, 2
 
     try:
         sleeper(delay)
@@ -636,15 +648,172 @@ _RUNNERS: dict[str, Callable[..., tuple[BackfillFetchReport, int]]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# F2c: --auto mode -- unattended daily chunk (cron), no --source/--offset needed.
+# ---------------------------------------------------------------------------
+
+# 483 first, then WL -- fixed deterministic order (483 backlog is the smaller one, so it
+# finishes first and the cron then spends its daily budget draining WL).
+_AUTO_SOURCES: tuple[tuple[str, str], ...] = (
+    ("fda483", SOURCE_FDA_483),
+    ("fda_wl", SOURCE_FDA_WL),
+)
+# Hard cap on offset += max_docs re-reads per source per run (overshoot recovery) --
+# prevents any possibility of an unbounded list-request loop against fda.gov.
+_AUTO_MAX_OFFSET_ADVANCES = 3
+
+
+def _auto_no_new(report: BackfillFetchReport) -> bool:
+    """Nothing new found in this window: no real document fetch, nothing appended, and
+    (under --dry-run) nothing that would have been fetched."""
+    return report.fetched == 0 and report.appended == 0 and not report.would_fetch
+
+
+def _auto_caught_up(report: BackfillFetchReport) -> bool:
+    """The source's listing ran out and nothing new was found -- fully backfilled."""
+    return report.exhausted and _auto_no_new(report)
+
+
+def _auto_offset_overshot(report: BackfillFetchReport) -> bool:
+    """listed > 0, every listed row was skip_existing, and the listing has more pages:
+    the computed offset landed inside already-collected territory (e.g. today's daily
+    collection inflated the existing-id count, pushing the offset past newer uncollected
+    rows into old ones we already have). Advancing by max_docs moves toward the
+    uncollected tail. Undershoot needs no counterpart -- skip_existing absorbs it.
+    """
+    return (
+        report.listed > 0
+        and report.skipped_existing == report.listed
+        and not report.exhausted
+    )
+
+
+def run_auto(
+    *,
+    max_docs: int,
+    delay: float,
+    dry_run: bool,
+    base_url: str,
+    service_key: str,
+    sleeper: Sleeper | None = None,
+) -> tuple[dict[str, Any], int]:
+    """One unattended backfill chunk (deterministic; designed for a daily cron).
+
+    Per source (483 first, then WL):
+      1. offset = len(existing document_ids for that source). The listing is
+         newest-first, so skipping that many lands near the start of the uncollected
+         tail; exactness is not required because skip_existing absorbs drift.
+      2. If the window came back all-skip_existing and not exhausted (offset overshot
+         into already-collected territory), advance offset by max_docs and retry the
+         same source -- at most _AUTO_MAX_OFFSET_ADVANCES advances per run.
+      3. Budget cap: at most ONE source does real document fetching per run (fda.gov
+         daily request budget). As soon as a source finds anything new (fetched/
+         appended >= 1, or would_fetch under --dry-run), stop -- the next source
+         continues tomorrow. Only fall through 483 -> WL when 483 found nothing new.
+      4. auto_complete=true only when every source was attempted and each ended
+         exhausted-with-nothing-new: the whole backlog is done and this run cost only
+         a couple of list requests. Leaving the cron enabled in that steady state is
+         intentional -- it doubles as a safety net that picks up any newly-appearing
+         old documents outside the daily collection window.
+
+    Returns (merged report dict, exit_code). The merged dict keeps every
+    BackfillFetchReport field at the top level (counters summed across attempts;
+    offset/next_offset/exhausted/source from the last attempt) so existing consumers
+    of the single-source schema -- e.g. the workflow's `['appended']` read -- keep
+    working unchanged; per-attempt detail is nested under `auto_attempts`.
+    """
+    attempts: list[BackfillFetchReport] = []
+    order: list[str] = []
+    exit_code = 0
+    caught_up_all = True
+
+    for cli_name, source_const in _AUTO_SOURCES:
+        order.append(cli_name)
+        try:
+            existing_ids = fetch_existing_document_ids(base_url, service_key, source_const)
+        except Exception as e:  # noqa: BLE001
+            report = BackfillFetchReport(source=cli_name, offset=0, max_docs=max_docs)
+            report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
+            attempts.append(report)
+            exit_code = 2
+            caught_up_all = False
+            break
+
+        runner = _RUNNERS[cli_name]
+        offset = len(existing_ids)
+        advances = 0
+        while True:
+            report, code = runner(
+                offset=offset, max_docs=max_docs, delay=delay, dry_run=dry_run,
+                base_url=base_url, service_key=service_key, sleeper=sleeper,
+                existing_ids=existing_ids,
+            )
+            attempts.append(report)
+            if code != 0:
+                exit_code = code
+                break
+            if _auto_offset_overshot(report) and advances < _AUTO_MAX_OFFSET_ADVANCES:
+                advances += 1
+                offset += max_docs
+                continue
+            break
+
+        if exit_code != 0:
+            caught_up_all = False
+            break
+        last = attempts[-1]
+        if not _auto_caught_up(last):
+            caught_up_all = False
+        if not _auto_no_new(last):
+            # Budget cap: this source did (or, dry-run, would do) the day's real work.
+            break
+
+    auto_complete = caught_up_all and exit_code == 0 and len(order) == len(_AUTO_SOURCES)
+
+    last = attempts[-1]
+    merged: dict[str, Any] = {
+        # Existing single-source schema, kept intact (additive changes only below).
+        "schema_version": SCHEMA_VERSION,
+        "source": last.source,
+        "offset": last.offset,
+        "max_docs": max_docs,
+        "listed": sum(r.listed for r in attempts),
+        "skipped_existing": sum(r.skipped_existing for r in attempts),
+        "skipped_gated": sum(r.skipped_gated for r in attempts),
+        "fetched": sum(r.fetched for r in attempts),
+        "appended": sum(r.appended for r in attempts),
+        "invalid": sum(r.invalid for r in attempts),
+        "errors": [e for r in attempts for e in r.errors],
+        "next_offset": last.next_offset,
+        "exhausted": last.exhausted,
+        "would_fetch": [d for r in attempts for d in r.would_fetch][:10],
+        # F2c additive fields.
+        "auto": True,
+        "auto_source_order": order,
+        "auto_complete": auto_complete,
+        "auto_attempts": [asdict(r) for r in attempts],
+    }
+    return merged, exit_code
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="GRM FIND-1 F2b -- chunked backfill fetch of historical FDA 483 / "
         "Warning Letter documents directly into Supabase raw_signals (bypasses Notion; "
         "robots Crawl-Delay=30 aware; one source per run -- 483/WL share a host)."
     )
-    parser.add_argument("--source", required=True, choices=("fda483", "fda_wl"))
-    parser.add_argument("--offset", type=int, default=0)
+    # --source is required unless --auto (checked in main -- explicit exit-2 check,
+    # matching the existing credential-validation style).
+    parser.add_argument("--source", choices=("fda483", "fda_wl"))
+    parser.add_argument("--offset", type=int, default=None)  # manual mode default: 0
     parser.add_argument("--max-docs", type=int, default=200)
+    parser.add_argument(
+        "--auto", action="store_true", default=False,
+        help="F2c unattended mode (daily cron): computes offset per source from the "
+        "already-collected id count, 483 first then WL, at most one source fetches per "
+        "run; exits cleanly with auto_complete=true once both backlogs are exhausted. "
+        "Mutually exclusive with --source/--offset.",
+    )
     parser.add_argument("--delay", type=float, default=30)
     parser.add_argument(
         "--dry-run", action="store_true", default=False,
@@ -661,6 +830,17 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     args = build_arg_parser().parse_args(argv)
 
+    if args.auto and (args.source is not None or args.offset is not None):
+        print(
+            "collect_fda_backfill: --auto cannot be combined with --source/--offset "
+            "(auto computes both itself)",
+            file=sys.stderr,
+        )
+        return 2
+    if not args.auto and args.source is None:
+        print("collect_fda_backfill: --source is required (or use --auto)", file=sys.stderr)
+        return 2
+
     url = (args.supabase_url or os.environ.get("SUPABASE_URL") or "").strip()
     key = (args.service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
     if not url or not key:
@@ -675,13 +855,21 @@ def main(argv: list[str] | None = None) -> int:
         print("collect_fda_backfill: SUPABASE_URL must start with https://", file=sys.stderr)
         return 2
 
-    runner = _RUNNERS[args.source]
-    report, exit_code = runner(
-        offset=args.offset, max_docs=args.max_docs, delay=args.delay,
-        dry_run=args.dry_run, base_url=base, service_key=key,
-    )
+    if args.auto:
+        report_dict, exit_code = run_auto(
+            max_docs=args.max_docs, delay=args.delay,
+            dry_run=args.dry_run, base_url=base, service_key=key,
+        )
+    else:
+        runner = _RUNNERS[args.source]
+        report, exit_code = runner(
+            offset=args.offset if args.offset is not None else 0,
+            max_docs=args.max_docs, delay=args.delay,
+            dry_run=args.dry_run, base_url=base, service_key=key,
+        )
+        report_dict = asdict(report)
 
-    payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
+    payload = json.dumps(report_dict, ensure_ascii=False, sort_keys=True, indent=2)
     print(payload)
     if args.output:
         Path(args.output).write_text(payload, encoding="utf-8")
@@ -693,6 +881,7 @@ __all__ = [
     "fetch_existing_document_ids",
     "run_483",
     "run_wl",
+    "run_auto",
     "main",
 ]
 

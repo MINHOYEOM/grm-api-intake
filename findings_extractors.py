@@ -76,13 +76,27 @@ def _from_fda_483_observations(
     if not observations:
         return []
 
+    # [FIND-1 M10a] 저장된 raw 재추출 방어(백필 경로) — Observation 이 이미 수집기 층에서
+    # 스크럽됐어도(또는 스크럽 이전 raw 가 그대로 저장돼 있어도) 페이지 넘김 헤더 라벨-값
+    # 인터리브를 여기서도 한 번 더 제거한다. finding_text 가 바뀌면 finding_id(해시)도
+    # 바뀐다 -- 오염 텍스트를 깨끗한 텍스트로 교체하는 의도된 동작이다.
+    header_hints = {
+        "establishment_type": _compact(raw.get("establishment_type")),
+        "fei_number": _compact(raw.get("fei_number")),
+        "firm_name": _compact(raw_signal.get("firm_name")) or _compact(raw.get("firm")),
+    }
+
     evidence_url = _evidence_url(raw_signal, raw, "pdf_url", "url", fallback=FDA_483_LIST_URL)
     out: list[dict[str, Any]] = []
     for index, observation in enumerate(observations, start=1):
-        deficiency = _compact(observation.get("deficiency"))
+        deficiency = _compact(
+            gf.strip_fda483_page_header(_compact(observation.get("deficiency")), **header_hints)
+        )
         if not deficiency:
             continue
-        detail = _compact(observation.get("detail"))
+        detail = _compact(
+            gf.strip_fda483_page_header(_compact(observation.get("detail")), **header_hints)
+        )
         refs = _extract_cfr_refs(" ".join(part for part in (deficiency, detail) if part))
         out.append(gf.finding_from_raw_signal(
             raw_signal,

@@ -438,6 +438,73 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertEqual(f.LAST_HEALTH["fda_483_observations"]["failed"], 1)
 
 
+class PageHeaderScrubTest(unittest.TestCase):
+    """FIND-1 M10a — 483 Observation 이 페이지 경계에 걸쳐 헤더 라벨-값 인터리브(STREET
+    ADDRESS/FEI NUMBER/TYPE OF ESTABLISHMENT INSPECTED 등)가 deficiency 앞에 접두사로 섞여
+    들어오는 라이브 오염(VA San Diego Healthcare Systems, doc fda483-193454) 회귀 가드.
+    """
+
+    HEADER_BLOCK = (
+        "STREET ADDRESS 4/27/26-5/1/26, 5/4/26-5/6/26, 5/8/26 FEI NUMBER 2071629 "
+        "3350 La Jolla Village Dr TYPE OF ESTABLISHMENT INSPECTED Producer of Sterile "
+        "Drug Products "
+    )
+
+    def test_extract_from_text_scrubs_header_with_hints(self):
+        text = (
+            "I/WE OBSERVED: OBSERVATION 1 " + self.HEADER_BLOCK +
+            "Personnel engaged in aseptic processing were observed wearing "
+            "non-sterile gloves."
+        )
+        hints = {
+            "establishment_type": "Producer of Sterile Drug Products",
+            "fei_number": "2071629",
+            "firm_name": "VA San Diego Healthcare Systems",
+        }
+        rows = f._extract_483_observations_from_text(text, hints)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(
+            rows[0]["deficiency"],
+            "Personnel engaged in aseptic processing were observed wearing non-sterile gloves.",
+        )
+
+    def test_extract_from_text_without_hints_still_strips_label_date_digits_address(self):
+        # header_hints=None(기본값, 후방호환) 이어도 라벨/날짜범위/FEI 숫자런/미국식 주소는 제거된다.
+        text = (
+            "I/WE OBSERVED: OBSERVATION 1 " + self.HEADER_BLOCK +
+            "Personnel engaged in aseptic processing were observed wearing "
+            "non-sterile gloves."
+        )
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual(len(rows), 1)
+        self.assertNotIn("STREET ADDRESS", rows[0]["deficiency"])
+        self.assertNotIn("2071629", rows[0]["deficiency"])
+        self.assertNotIn("3350 La Jolla Village Dr", rows[0]["deficiency"])
+
+    def test_collect_loop_wires_nrow_hints_into_observation_scrub(self):
+        # 수집 루프가 nrow(establishment_type/fei/company)를 header_hints 로 그대로 넘겨
+        # deficiency 오염을 제거하는지 엔드투엔드로 확인.
+        pdf_text = (
+            "I/WE OBSERVED: OBSERVATION 1 " + self.HEADER_BLOCK +
+            "Personnel engaged in aseptic processing were observed wearing "
+            "non-sterile gloves."
+        )
+        json_rows = [_json_row(
+            6401, est="Producer of Sterile Drug Products", fei="2071629",
+            company="VA San Diego Healthcare Systems",
+        )]
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "true"}), \
+                _Patched(json_rows=json_rows, html_rows=[], pdf_text=pdf_text):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        obs = items[0].raw_payload["fda_483_observations"]
+        self.assertEqual(len(obs), 1)
+        self.assertEqual(
+            obs[0]["deficiency"],
+            "Personnel engaged in aseptic processing were observed wearing non-sterile gloves.",
+        )
+
+
 class DeepBodyFullTest(unittest.TestCase):
     """[483 분석층 2026-07-02] ENABLE_FDA_483_DEEP on 일 때만 PDF 전문을 raw.fda483_body_full 로
     보존해 deep_analysis fan-out 입력으로 쓴다. 결정론 Observation(ENABLE_FDA_483_OBSERVATIONS)과

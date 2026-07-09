@@ -35,7 +35,7 @@
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html" class="on">지적사항</a><a href="../briefs/2026-07-06/index.html">이번 주</a></nav>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html" class="on">찾아보기</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
@@ -45,15 +45,9 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
-    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 GMP 실태조사 지적사항을 원문에서 자동 추출해 검색합니다.</p>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 GMP 지적사항을 원문에서 추출해 검색합니다.</p>
   </div>
-  <div class="wrap"><section class="fnd-notice" id="findings-notice" aria-label="AI 자동 추출 고지">
-      <details class="fnd-notice-d">
-        <summary class="fnd-notice-sum"><i class="ti ti-info-circle" aria-hidden="true"></i>AI 자동 추출·번역 — 의사결정 전 원문 대조 필수<i class="ti ti-chevron-down fnd-notice-car" aria-hidden="true"></i></summary>
-        <p><b>AI 자동 추출 고지.</b> 아래 지적사항은 원문 문서(483·Warning Letter·실태조사 결과통지 등)에서 AI가 자동으로 추출·분류한 내용입니다. 추출 과정에서 누락·오분류가 있을 수 있으므로, 의사결정 전 반드시 <b>원문 링크</b>를 확인해 대조하시기 바랍니다. 각 항목의 <b>증거 등급</b>은 추출 신뢰도를 나타내며, <b>검토 필요</b> 표시가 있는 항목은 사람 검수가 진행 중임을 의미합니다. 카드에 표시되는 국문 해석 역시 AI 번역이므로, 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p>
-      </details>
-    </section>
-
+  <div class="wrap">
     <div id="grm-findings-cfg" data-url="" data-key="" hidden></div><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
@@ -64,23 +58,14 @@
         <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
       </button>
       <div class="fnd-filters" id="fnd-filters">
-        <div class="fnd-field fnd-chipfield">
-          <span class="fnd-field-lbl" id="fnd-f-source-lbl">소스</span>
-          <div class="fnd-chipgroup" id="fnd-f-source" data-key="source" role="group" aria-labelledby="fnd-f-source-lbl"></div>
-        </div>
-        <div class="fnd-field fnd-chipfield">
-          <span class="fnd-field-lbl" id="fnd-f-evidence-lbl">증거 등급</span>
-          <div class="fnd-chipgroup" id="fnd-f-evidence" data-key="evidence_level" role="group" aria-labelledby="fnd-f-evidence-lbl"></div>
-        </div>
-        <div class="fnd-field fnd-chipfield">
-          <span class="fnd-field-lbl" id="fnd-f-status-lbl">검토 상태</span>
-          <div class="fnd-chipgroup" id="fnd-f-status" data-key="review_status" role="group" aria-labelledby="fnd-f-status-lbl"></div>
-        </div>
-        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
-        <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
       </div>
+      <div class="fnd-active" id="fnd-active" hidden></div>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
       <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
@@ -156,15 +141,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-dash-toggle .ti{font-size:13px;transition:transform .15s}
 .fnd-dash-toggle[aria-expanded="false"] .ti{transform:rotate(-90deg)}
 .fnd-dash-grid--collapsed{display:none}
-/* [M14 P0] AI 고지 — 박스 배너 제거, 초경량 인라인 노트(details/summary 한 줄). */
-.fnd-notice{margin:0 0 20px}
-.fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:12px 0 0}
-.fnd-notice-d summary{cursor:pointer;list-style:none}
-.fnd-notice-d summary::-webkit-details-marker{display:none}
-.fnd-notice-sum{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.fnd-notice-sum .ti-info-circle{font-size:14px;color:var(--muted);flex:none}
-.fnd-notice-car{margin-left:auto;font-size:13px;color:var(--muted);transition:transform .15s;flex:none}
-.fnd-notice-d[open] .fnd-notice-car{transform:rotate(180deg)}
 /* [M10c] sticky 컴팩트 툴바 — 사이트 nav(top:0,z-index:50,높이 66px) 바로 아래 고정.
    z-index 는 nav 보다 낮게(40) 유지해 nav 드롭다운/모바일 메뉴가 항상 위에 온다. */
 .fnd-tools{position:sticky;top:66px;z-index:40;background:color-mix(in srgb,var(--canvas) 94%,transparent);backdrop-filter:blur(8px);margin:0 0 22px;padding:14px 0 16px;border-bottom:1px solid var(--line-2)}
@@ -179,39 +155,41 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
 .fnd-filters-badge{font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
-/* [M14] align-items:flex-start — 라벨 시작 높이를 전 필드 동일하게(칩그룹 wrap 높이차 무관). */
+/* [M15] 균일 셀렉트 행 — 소스/증거등급/검토상태/카테고리/발행월/정렬 6개가 전부 동일
+   컴포넌트(select+라벨 위)를 쓴다. align-items:flex-start 로 라벨 시작 높이를 통일. */
 .fnd-filters{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start}
 .fnd-field{display:flex;flex-direction:column;max-width:100%;min-width:0}
 /* §4 한글 안전(불가침, WebKoreanSafetyTest) — 스펙 원안의 자간 지정은 한글 라벨(소스/증거
    등급/검토 상태/카테고리/발행월/정렬)에 적용돼 사이트 전역 "한글 자간 금지" 계약을 깬다.
    시각 위계는 font-weight(600)+size(11px)만으로 낸다(디자인 원칙: 무게로 위계, coral 은
    주의 신호 전용 — 자간 남용도 같은 취지로 배제). */
-.fnd-field label,.fnd-field-lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0 0 6px}
-/* select 고유 폭은 가장 긴 옵션(카테고리 국·영문 병기 ~425px)을 따라가므로 상한을 두지
-   않으면 모바일(375px)에서 뷰포트 가로 오버플로가 난다 — max-width 로 컨테이너에 가둔다. */
-.fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px;max-width:320px}
+.fnd-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0 0 6px}
+/* [M15] 전 셀렉트 동일 높이/폰트(height 36px·font-size 13px), 필드별 고정 폭은 아래
+   #fnd-f-* 로 지정(모바일은 미디어쿼리에서 100%). */
+.fnd-field select{height:36px;box-sizing:border-box;border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:0 10px;font:inherit;font-size:13px;color:var(--ink);max-width:100%}
 .fnd-field select:focus{outline:none;border-color:var(--coral)}
-/* [M14] 필드별 고정 폭(카테고리/발행월/정렬) — max-width 규칙과 공존, 모바일 100% 유지. */
+#fnd-f-source{width:150px}
+#fnd-f-evidence{width:110px}
+#fnd-f-status{width:120px}
 #fnd-f-category{width:230px}
-#fnd-f-month{width:120px}
+#fnd-f-month{width:110px}
 #fnd-sort{width:110px}
-/* 저카디널리티 필터(소스·증거등급·검토상태) 칩 그룹 — 대시보드 행 토글과 동일한
-   coral-tint 계열로 선택 상태를 강조(§coral 팔레트 재사용, 신규 색상 도입 없음). */
-.fnd-chipgroup{display:flex;flex-wrap:wrap;gap:6px}
-.fnd-chip{display:inline-flex;align-items:center;height:28px;font:inherit;font-size:12px;font-weight:500;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 12px;cursor:pointer;line-height:1;white-space:nowrap;transition:background var(--tr),border-color var(--tr),color var(--tr)}
-.fnd-chip:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
-.fnd-chip.on{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22);font-weight:600}
-.fnd-chip:disabled{opacity:.4;cursor:not-allowed}
-/* [M14] 초기화 버튼 — 라벨 높이(약 20px)만큼 아래로 내려 셀렉트/칩 행과 baseline 정렬. */
-.fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content;margin-top:21px}
-.fnd-reset:hover{color:var(--coral);border-color:var(--coral)}
-.fnd-reset .ti{font-size:14px}
+/* [M15] 적용 필터 칩 행 — 셀렉트 행 아래, 활성 필터가 1개 이상일 때만 findings.js 가
+   노출한다(hidden 토글). 모바일 필터 접기(#fnd-filters-toggle) 대상 밖에 둬 항상 보인다. */
+.fnd-active{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.fnd-active[hidden]{display:none}
+.fnd-active-chip{display:inline-flex;align-items:center;gap:5px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1;white-space:nowrap}
+.fnd-active-chip:hover{border-color:var(--coral)}
+.fnd-active-x{color:var(--muted);font-size:13px;line-height:1}
+.fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
+.fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
+.fnd-active-clearall:hover{color:var(--coral)}
 @media (max-width:700px){
   .fnd-filters-toggle{display:inline-flex}
   .fnd-filters{display:none}
-  .fnd-filters.open{display:flex}
+  .fnd-filters.open{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
   .fnd-field select{max-width:100%}
-  #fnd-f-category,#fnd-f-month,#fnd-sort{width:100%}
+  #fnd-f-source,#fnd-f-evidence,#fnd-f-status,#fnd-f-category,#fnd-f-month,#fnd-sort{width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
 }
@@ -262,11 +240,21 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-more-btn[hidden]{display:none}
 .fnd-more-btn:hover{text-decoration:underline}
 </style>
+<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+  <span class="kick">AI Disclosure</span>
+  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <div class="disc-body">
+    <div class="disc-sec"><p>본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·식약처 GMP 실태조사 결과 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.</p></div>
+    <div class="disc-sec"><p>국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.</p></div>
+    <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+  </div>
+</div></section>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">지적사항</a><a href="../briefs/2026-07-06/index.html">이번 주</a></div>
+    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
   </div>
@@ -290,7 +278,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=b27a8386" defer></script><style>
+<script src="../assets/findings.js?v=01af9250" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

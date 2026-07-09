@@ -82,20 +82,32 @@
     return f !== "finding_text_ko" && f !== "translation_method";
   });
 
-  // [FIND-1 M10c] 저카디널리티 필터(소스·증거등급·검토상태)는 칩 그룹(버튼), 카테고리·
-  // 발행월은 드롭다운으로 유지한다. state 키 구조는 M3c 이후 불변 — DOM 배선만 갈린다.
-  // [M14] 기관(agency) 칩 그룹은 DOM 에서 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가
-  // 이미 기관을 포함하는 상위 구분이라 "MFDS" 칩이 기관·소스 양쪽에 중복 노출되던 혼란을
+  // [M15] 전면 재설계 — 소스·증거등급·검토상태 칩 그룹을 카테고리·발행월과 동일한
+  // <select> 로 통일했다(균일 셀렉트 행). state 키 구조·URL 파라미터·매칭 로직은 M3c
+  // 이후 불변 — DOM 배선만 단일 경로(SELECT_FACETS)로 단순화됐다. 옛 칩 파셋 정의는 제거.
+  // [M14] 기관(agency) 은 이미 DOM 에서 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가
+  // 이미 기관을 포함하는 상위 구분이라 "MFDS" 가 기관·소스 양쪽에 중복 노출되던 혼란을
   // 없앤다. state.agency·URL param(agency)·rowMatchesFilters/searchTermsFor 의 매칭 로직은
   // 그대로 유지한다 — URL 로 agency 파라미터가 들어오면 여전히 필터가 적용된다(하위호환).
-  var CHIP_FACETS = [
-    ["fnd-f-source", "source", function (v) { return v; }],
-    ["fnd-f-evidence", "evidence_level", function (v) { return "증거 " + v; }],
-    ["fnd-f-status", "review_status", function (v) { return STATUS_LABEL[v] || v; }],
-  ];
   var SELECT_FACETS = [
+    ["fnd-f-source", "source"],
+    ["fnd-f-evidence", "evidence_level"],
+    ["fnd-f-status", "review_status"],
     ["fnd-f-category", "category_code"],
     ["fnd-f-month", "month"],
+  ];
+  // [M15] 적용 필터 칩 행(#fnd-active) 라벨 — 정렬(sort)은 필터가 아니므로 대상에서
+  // 제외한다. 값 포맷터는 selectOptionLabel 과 별개(칩엔 건수 병기가 필요 없다).
+  // agency 는 M14 이후 화면 컨트롤이 없지만 URL(?agency=)로는 여전히 걸린다 — 보이지 않는
+  // 필터가 결과를 좁히는 상태를 드러내는 것이 이 칩 행의 존재 이유이므로 칩에는 포함한다.
+  var ACTIVE_FILTER_DEFS = [
+    ["q", "검색", function (v) { return v; }],
+    ["agency", "기관", function (v) { return v; }],
+    ["source", "소스", function (v) { return v; }],
+    ["evidence_level", "증거 등급", function (v) { return EVIDENCE_LABEL[v] || v; }],
+    ["review_status", "검토 상태", function (v) { return STATUS_LABEL[v] || v; }],
+    ["category_code", "카테고리", function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
+    ["month", "발행월", function (v) { return v; }],
   ];
 
   var SORT_VALUES = ["date_desc", "date_asc", "firm_asc"];
@@ -111,11 +123,11 @@
   var debounceTimer = null;
 
   var qInput = document.getElementById("fnd-q");
-  var resetBtn = document.getElementById("fnd-reset");
   var sortSel = document.getElementById("fnd-sort");
   var filtersEl = document.getElementById("fnd-filters");
   var filtersToggleBtn = document.getElementById("fnd-filters-toggle");
   var filtersBadgeEl = document.getElementById("fnd-filters-badge");
+  var activeEl = document.getElementById("fnd-active"); // [M15] 적용 필터 칩 행
   var dashToggleBtn = document.getElementById("fnd-dash-toggle");
   var dashGridEl = document.getElementById("fnd-dash-grid");
 
@@ -152,6 +164,8 @@
       var cat = CATEGORY_LABELS[v];
       return cat ? cat.ko + " · " + cat.en : v;
     }
+    if (key2 === "evidence_level") return EVIDENCE_LABEL[v] || v;
+    if (key2 === "review_status") return STATUS_LABEL[v] || v;
     return v;
   }
 
@@ -187,28 +201,9 @@
     ].concat(arrayTerms(row.cfr_refs), arrayTerms(row.mfds_refs));
   }
 
-  // [FIND-1 M10c] 칩 그룹(agency/source/evidence_level/review_status)과 카테고리·발행월
-  // <select> 의 DOM 골격을 데이터 로드 직후 1회만 만든다. 클릭/change 배선은 wire()에서.
+  // [M15] 소스/증거등급/검토상태/카테고리/발행월 <select> 5개의 DOM 골격(옵션)을 데이터
+  // 로드 직후 1회만 만든다. change 배선은 wire()에서(전 필드 동일 경로 — SELECT_FACETS 단일).
   function buildFacetSkeleton() {
-    CHIP_FACETS.forEach(function (def) {
-      var containerId = def[0], key2 = def[1], labelFn = def[2];
-      var container = document.getElementById(containerId);
-      if (!container) return;
-      collectFacetValues(key2).forEach(function (v) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "fnd-chip";
-        btn.setAttribute("aria-pressed", "false");
-        btn.dataset.value = v;
-        btn.dataset.label = labelFn(v);
-        btn.addEventListener("click", function () {
-          if (btn.disabled) return;
-          state[key2] = state[key2] === v ? "" : v;
-          render();
-        });
-        container.appendChild(btn);
-      });
-    });
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
@@ -263,24 +258,9 @@
     return counts;
   }
 
-  // [FIND-1 M10c] 칩 disabled/on/aria-pressed 와 셀렉트 옵션 라벨(건수 병기)을 매 render()
-  // 마다 갱신한다 — DOM 엘리먼트는 buildFacetSkeleton()이 1회 만든 것을 재사용(재생성 없음).
+  // [M15] 셀렉트 옵션 라벨(건수 병기)을 매 render() 마다 갱신한다 — DOM 엘리먼트는
+  // buildFacetSkeleton()이 1회 만든 것을 재사용(재생성 없음).
   function refreshFacetUI() {
-    CHIP_FACETS.forEach(function (def) {
-      var containerId = def[0], key2 = def[1];
-      var container = document.getElementById(containerId);
-      if (!container) return;
-      var counts = computeFacetCounts(key2);
-      Array.prototype.forEach.call(container.children, function (btn) {
-        var v = btn.dataset.value;
-        var count = counts[v] || 0;
-        var isOn = state[key2] === v;
-        btn.textContent = btn.dataset.label + " " + count;
-        btn.classList.toggle("on", isOn);
-        btn.setAttribute("aria-pressed", isOn ? "true" : "false");
-        btn.disabled = count === 0 && !isOn;
-      });
-    });
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
@@ -807,7 +787,7 @@
     if (sortRaw !== null && SORT_VALUES.indexOf(sortRaw) !== -1) state.sort = sortRaw;
   }
 
-  // URL 복원값을 검색창/셀렉트 UI 에도 동기화(칩 .on/aria-pressed 는 render()가 매번 갱신).
+  // URL 복원값을 검색창/셀렉트 UI 에도 동기화(칩 행은 renderActiveChips()가 매번 재계산).
   function syncControlsFromState() {
     if (qInput) qInput.value = state.q;
     SELECT_FACETS.forEach(function (def) {
@@ -817,10 +797,66 @@
     if (sortSel) sortSel.value = state.sort;
   }
 
+  // [M15] 적용 필터 칩 행(#fnd-active) — 활성 필터(검색어 포함, 정렬 제외) 각각을 제거
+  // 가능한 칩으로 보여주고, 끝에 "모두 지우기" 텍스트 버튼을 붙인다. 활성 필터가 0개면
+  // 컨테이너 자체를 hidden 처리한다. 전부 textContent/createElement(XSS 계약).
+  function clearActiveFilter(key) {
+    state[key] = "";
+    syncControlsFromState();
+    render();
+  }
+
+  function clearAllFilters() {
+    state = {
+      q: "", agency: "", category_code: "", source: "", evidence_level: "",
+      review_status: "", month: "", sort: "date_desc",
+    };
+    syncControlsFromState();
+    render();
+  }
+
+  function buildActiveChip(label, value, onClear) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-active-chip";
+    btn.setAttribute("aria-label", label + " 필터 해제");
+    btn.appendChild(document.createTextNode(label + ": " + value + " "));
+    var x = document.createElement("span");
+    x.className = "fnd-active-x";
+    x.setAttribute("aria-hidden", "true");
+    x.textContent = "×";
+    btn.appendChild(x);
+    btn.addEventListener("click", onClear);
+    return btn;
+  }
+
+  function renderActiveChips() {
+    if (!activeEl) return;
+    activeEl.innerHTML = "";
+    var entries = ACTIVE_FILTER_DEFS.filter(function (def) { return !!state[def[0]]; });
+    if (!entries.length) {
+      activeEl.hidden = true;
+      return;
+    }
+    entries.forEach(function (def) {
+      var key = def[0], label = def[1], formatFn = def[2];
+      var chip = buildActiveChip(label, formatFn(state[key]), function () { clearActiveFilter(key); });
+      activeEl.appendChild(chip);
+    });
+    var clearAllBtn = document.createElement("button");
+    clearAllBtn.type = "button";
+    clearAllBtn.className = "fnd-active-clearall";
+    clearAllBtn.textContent = "모두 지우기";
+    clearAllBtn.addEventListener("click", clearAllFilters);
+    activeEl.appendChild(clearAllBtn);
+    activeEl.hidden = false;
+  }
+
   function render() {
     var matched = sortRows(ROWS.filter(matches));
     renderDash(matched); // [FIND-1 M7] 필터 결과 기준 대시보드 재계산(데이터 없으면 hidden)
-    refreshFacetUI(); // [FIND-1 M10c] 칩/셀렉트 건수·on·disabled 갱신(표준 파세팅)
+    refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
+    renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     updateFiltersToggleBadge();
     syncStateToUrl();
     countEl.innerHTML = "";
@@ -864,8 +900,8 @@
   }
 
   function wire() {
-    // 칩 그룹 클릭 배선은 buildFacetSkeleton()에서 버튼 생성 시 이미 끝났다 — 여기선
-    // <select> 유지 대상(카테고리·발행월)의 change 만 배선한다.
+    // [M15] 6개 셀렉트(소스·증거등급·검토상태·카테고리·발행월·정렬 중 정렬 제외 5개)가
+    // 전부 SELECT_FACETS 단일 경로로 change 배선된다(칩 그룹 배선 없음).
     SELECT_FACETS.forEach(function (def) {
       var sel = document.getElementById(def[0]);
       if (!sel) return;
@@ -887,16 +923,8 @@
         debounceTimer = setTimeout(render, 150);
       });
     }
-    if (resetBtn) {
-      resetBtn.addEventListener("click", function () {
-        state = {
-          q: "", agency: "", category_code: "", source: "", evidence_level: "",
-          review_status: "", month: "", sort: "date_desc",
-        };
-        syncControlsFromState();
-        render();
-      });
-    }
+    // [M15] 전체 초기화는 #fnd-reset 버튼이 아니라 적용 필터 칩 행의 "모두 지우기"
+    // (renderActiveChips() 가 매 render() 마다 동적으로 만든다) — clearAllFilters() 참조.
     // [FIND-1 M10c] 모바일(≤700px) 필터·정렬 접기 — JS 는 클래스/aria 토글만, 표시/숨김은
     // CSS 미디어쿼리(.fnd-filters.open)가 담당한다.
     if (filtersToggleBtn && filtersEl) {

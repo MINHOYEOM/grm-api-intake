@@ -153,9 +153,11 @@
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
 .fnd-filters-badge{font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
 .fnd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-.fnd-field{display:flex;flex-direction:column;gap:5px}
+.fnd-field{display:flex;flex-direction:column;gap:5px;max-width:100%;min-width:0}
 .fnd-field label,.fnd-field-lbl{font-size:11.5px;color:var(--muted)}
-.fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px}
+/* select 고유 폭은 가장 긴 옵션(카테고리 국·영문 병기 ~425px)을 따라가므로 상한을 두지
+   않으면 모바일(375px)에서 뷰포트 가로 오버플로가 난다 — max-width 로 컨테이너에 가둔다. */
+.fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px;max-width:320px}
 .fnd-field select:focus{outline:none;border-color:var(--coral)}
 /* 저카디널리티 필터(기관·소스·증거등급·검토상태) 칩 그룹 — 대시보드 행 토글과 동일한
    coral-tint 계열로 선택 상태를 강조(§coral 팔레트 재사용, 신규 색상 도입 없음). */
@@ -174,6 +176,7 @@
   .fnd-filters-toggle{display:inline-flex}
   .fnd-filters{display:none}
   .fnd-filters.open{display:flex}
+  .fnd-field select{max-width:100%}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}

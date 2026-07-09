@@ -445,6 +445,173 @@ class SqlOutputTest(unittest.TestCase):
         self.assertFalse(os.path.exists(sql_path))
 
 
+class OutboxOutputTest(unittest.TestCase):
+    """[FIND-1 M9b] --outbox-output: queued batch JSON for the unattended CI
+    apply service. Mirrors SqlOutputTest's guarantees (all-or-nothing,
+    additive/optional, never touches the sidecar) but for the new outbox
+    schema instead of the SQL file."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.db_path = os.path.join(self._tmp.name, "grm-findings.sqlite3")
+        self.pairs = [
+            _pair(
+                document_id="fda-1",
+                firm="Acme Pharma",
+                finding_text="Firm's batch record review was skipped.",
+                date="2026-07-05",
+            ),
+        ]
+        _seed_db(self.db_path, self.pairs)
+
+    def test_outbox_output_contains_expected_item_schema(self) -> None:
+        plan = translate.build_translation_plan(self.db_path)
+        plan["items"][0]["finding_text_ko"] = "회사의 배치 기록 검토가 누락되었다."
+        plan["items"][0]["translation_method"] = "llm_assisted"
+
+        outbox_path = os.path.join(self._tmp.name, "outbox-batch.json")
+        result = translate.apply_translations(
+            plan, self.db_path, write_file=False, outbox_output=outbox_path
+        )
+
+        self.assertEqual(result["outbox_output_path"], outbox_path)
+        self.assertTrue(os.path.exists(outbox_path))
+        with open(outbox_path, encoding="utf-8") as f:
+            items = json.load(f)
+
+        self.assertEqual(len(items), 1)
+        self.assertEqual(
+            set(items[0].keys()),
+            {"finding_id", "finding_text", "finding_text_ko", "translation_method"},
+        )
+        self.assertEqual(items[0]["finding_text"], "Firm's batch record review was skipped.")
+        self.assertEqual(items[0]["finding_text_ko"], "회사의 배치 기록 검토가 누락되었다.")
+        self.assertEqual(items[0]["translation_method"], "llm_assisted")
+        self.assertEqual(items[0]["finding_id"], plan["items"][0]["finding_id"])
+
+    def test_outbox_output_written_even_without_write_file(self) -> None:
+        plan = translate.build_translation_plan(self.db_path)
+        plan["items"][0]["finding_text_ko"] = "회사의 배치 기록 검토가 누락되었다."
+        plan["items"][0]["translation_method"] = "manual"
+        outbox_path = os.path.join(self._tmp.name, "outbox-dryrun.json")
+
+        translate.apply_translations(
+            plan, self.db_path, write_file=False, outbox_output=outbox_path
+        )
+
+        self.assertTrue(os.path.exists(outbox_path))
+        rows = _findings_rows(self.db_path)
+        self.assertTrue(all(r["finding_text_ko"] == "" for r in rows.values()))
+
+    def test_outbox_output_not_written_when_validation_fails(self) -> None:
+        plan = translate.build_translation_plan(self.db_path)
+        plan["items"][0]["finding_text_ko"] = "no hangul here"
+        plan["items"][0]["translation_method"] = "manual"
+        outbox_path = os.path.join(self._tmp.name, "outbox-blocked.json")
+
+        result = translate.apply_translations(
+            plan, self.db_path, write_file=False, outbox_output=outbox_path
+        )
+
+        self.assertFalse(result["ready"])
+        self.assertEqual(result["outbox_output_path"], "")
+        self.assertFalse(os.path.exists(outbox_path))
+
+    def test_outbox_output_coexists_with_sql_output(self) -> None:
+        plan = translate.build_translation_plan(self.db_path)
+        plan["items"][0]["finding_text_ko"] = "회사의 배치 기록 검토가 누락되었다."
+        plan["items"][0]["translation_method"] = "llm_assisted"
+        outbox_path = os.path.join(self._tmp.name, "outbox-both.json")
+        sql_path = os.path.join(self._tmp.name, "sql-both.sql")
+
+        result = translate.apply_translations(
+            plan,
+            self.db_path,
+            write_file=False,
+            outbox_output=outbox_path,
+            sql_output=sql_path,
+        )
+
+        self.assertTrue(result["ready"])
+        self.assertTrue(os.path.exists(outbox_path))
+        self.assertTrue(os.path.exists(sql_path))
+
+    def test_outbox_output_excludes_skipped_already_translated_rows(self) -> None:
+        first_plan = translate.build_translation_plan(self.db_path)
+        first_plan["items"][0]["finding_text_ko"] = "첫 번째 번역."
+        first_plan["items"][0]["translation_method"] = "manual"
+        translate.apply_translations(first_plan, self.db_path, write_file=True)
+
+        replay_plan = {
+            "schema_version": translate.TRANSLATION_PLAN_SCHEMA_VERSION,
+            "items": [
+                {
+                    "finding_id": first_plan["items"][0]["finding_id"],
+                    "finding_text": first_plan["items"][0]["finding_text"],
+                    "finding_text_ko": "다른 번역문으로 덮어쓰기 시도.",
+                    "translation_method": "manual",
+                }
+            ],
+        }
+        outbox_path = os.path.join(self._tmp.name, "outbox-skip.json")
+
+        result = translate.apply_translations(
+            replay_plan, self.db_path, write_file=False, outbox_output=outbox_path
+        )
+
+        self.assertTrue(result["ready"])
+        self.assertEqual(result["skipped_already_translated"], 1)
+        with open(outbox_path, encoding="utf-8") as f:
+            items = json.load(f)
+        self.assertEqual(items, [])
+
+    def test_outbox_output_supabase_source(self) -> None:
+        item = {
+            "finding_id": "f-001",
+            "source": "FDA 483",
+            "agency": "FDA",
+            "category_code": "documentation",
+            "category_label_ko": "문서관리",
+            "published_date": "2026-07-05",
+            "firm_name": "Firm 1",
+            "finding_text": "Observation number 1 was not documented.",
+            "finding_text_ko": "관찰사항 1 국문 번역.",
+            "translation_method": "llm_assisted",
+        }
+        plan = {
+            "schema_version": translate.TRANSLATION_PLAN_SCHEMA_VERSION,
+            "items": [item],
+        }
+        live_row = {
+            "finding_id": "f-001",
+            "finding_text": "Observation number 1 was not documented.",
+            "finding_text_ko": "",
+        }
+        outbox_path = os.path.join(self._tmp.name, "outbox-supabase.json")
+        sql_path = os.path.join(self._tmp.name, "sql-supabase.sql")
+
+        with mock.patch(
+            "findings_translate.requests.get",
+            return_value=_FakeGetResponse(200, [live_row]),
+        ):
+            result = translate.apply_translations_supabase(
+                plan,
+                _SB_URL,
+                _SB_KEY,
+                sql_output=sql_path,
+                outbox_output=outbox_path,
+            )
+
+        self.assertTrue(result["ready"])
+        self.assertEqual(result["outbox_output_path"], outbox_path)
+        with open(outbox_path, encoding="utf-8") as f:
+            items = json.load(f)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["finding_id"], "f-001")
+        self.assertEqual(items[0]["finding_text_ko"], "관찰사항 1 국문 번역.")
+
+
 class CliTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()

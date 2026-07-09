@@ -23,12 +23,51 @@
 
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
 
+    {#- FIND-1 M10c — 툴바(검색+칩필터+정렬)를 대시보드보다 위로(검색이 최우선 도구),
+        sticky 컴팩트화. 저카디널리티 필터(기관·소스·증거등급·검토상태)는 칩 그룹으로,
+        카테고리·발행월·정렬은 드롭다운으로 유지한다 — 값은 findings.js 가 런타임에
+        채우므로 정적 셸은 빈 컨테이너만 렌더(골든 결정론). -#}
+    <section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
+      <div class="fnd-search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input id="fnd-q" type="text" placeholder="업체·문서번호·지적내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+      </div>
+      <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
+        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
+      </button>
+      <div class="fnd-filters" id="fnd-filters">
+        <div class="fnd-field fnd-chipfield">
+          <span class="fnd-field-lbl" id="fnd-f-agency-lbl">기관</span>
+          <div class="fnd-chipgroup" id="fnd-f-agency" data-key="agency" role="group" aria-labelledby="fnd-f-agency-lbl"></div>
+        </div>
+        <div class="fnd-field fnd-chipfield">
+          <span class="fnd-field-lbl" id="fnd-f-source-lbl">소스</span>
+          <div class="fnd-chipgroup" id="fnd-f-source" data-key="source" role="group" aria-labelledby="fnd-f-source-lbl"></div>
+        </div>
+        <div class="fnd-field fnd-chipfield">
+          <span class="fnd-field-lbl" id="fnd-f-evidence-lbl">증거 등급</span>
+          <div class="fnd-chipgroup" id="fnd-f-evidence" data-key="evidence_level" role="group" aria-labelledby="fnd-f-evidence-lbl"></div>
+        </div>
+        <div class="fnd-field fnd-chipfield">
+          <span class="fnd-field-lbl" id="fnd-f-status-lbl">검토 상태</span>
+          <div class="fnd-chipgroup" id="fnd-f-status" data-key="review_status" role="group" aria-labelledby="fnd-f-status-lbl"></div>
+        </div>
+        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
+        <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
+      </div>
+      <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
+    </section>
+
     {#- FIND-1 M7 — 대시보드 밴드(콤팩트 조망: 스탯·카테고리 분포·월별 추이·업체 상위).
         정적 셸은 빈 컨테이너+hidden 만 렌더(골든 결정론) — findings.js 가 필터 결과 기준
-        render() 마다 재계산해 채운다(데이터 로드 실패/0건이면 hidden 유지). -#}
+        render() 마다 재계산해 채운다(데이터 로드 실패/0건이면 hidden 유지).
+        [M10c] 스탯 줄은 상시 노출, 3블록 그리드는 토글로 접는다(모바일 기본 접힘). -#}
     <section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <div class="fnd-dash-grid">
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <div class="fnd-dash-grid" id="fnd-dash-grid">
         <div class="fnd-dash-block">
           <h2 class="fnd-dash-h">카테고리 분포</h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
@@ -42,23 +81,6 @@
           <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
         </div>
       </div>
-    </section>
-
-    <section class="fnd-tools" aria-label="검색 및 필터">
-      <div class="fnd-search">
-        <i class="ti ti-search" aria-hidden="true"></i>
-        <input id="fnd-q" type="text" placeholder="업체·문서번호·지적내용 검색" autocomplete="off" aria-label="지적사항 검색" />
-      </div>
-      <div class="fnd-filters" id="fnd-filters">
-        <div class="fnd-field"><label for="fnd-f-agency">기관</label><select id="fnd-f-agency" data-key="agency"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
-        <button class="fnd-reset" id="fnd-reset" type="button"><i class="ti ti-x" aria-hidden="true"></i>초기화</button>
-      </div>
-      <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
     </section>
 
     <section aria-label="검색 결과">
@@ -105,6 +127,12 @@
 @media (max-width:860px){
   .fnd-dash-grid{grid-template-columns:1fr;gap:22px}
 }
+/* [M10c] 대시보드 세부지표(3블록 그리드) 접기 토글 — 스탯 줄은 항상 노출. */
+.fnd-dash-toggle{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 12px;cursor:pointer;margin:0 0 16px}
+.fnd-dash-toggle:hover{color:var(--coral);border-color:var(--coral)}
+.fnd-dash-toggle .ti{font-size:13px;transition:transform .15s}
+.fnd-dash-toggle[aria-expanded="false"] .ti{transform:rotate(-90deg)}
+.fnd-dash-grid--collapsed{display:none}
 .fnd-notice{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:12px 18px;margin:0 0 28px}
 .fnd-notice p{font-size:13.5px;line-height:1.65;color:var(--body);margin:12px 0 0}
 .fnd-notice-d summary{cursor:pointer;list-style:none}
@@ -113,21 +141,40 @@
 .fnd-notice-sum .ti-info-circle{font-size:15px;color:var(--coral-2);flex:none}
 .fnd-notice-car{margin-left:auto;font-size:13px;color:var(--muted);transition:transform .15s;flex:none}
 .fnd-notice-d[open] .fnd-notice-car{transform:rotate(180deg)}
-.fnd-tools{margin-bottom:22px}
+/* [M10c] sticky 컴팩트 툴바 — 사이트 nav(top:0,z-index:50,높이 66px) 바로 아래 고정.
+   z-index 는 nav 보다 낮게(40) 유지해 nav 드롭다운/모바일 메뉴가 항상 위에 온다. */
+.fnd-tools{position:sticky;top:66px;z-index:40;background:color-mix(in srgb,var(--canvas) 94%,transparent);backdrop-filter:blur(8px);margin:0 0 22px;padding:14px 0 16px;border-bottom:1px solid var(--line-2)}
 .fnd-search{position:relative;margin-bottom:14px}
 .fnd-search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
-.fnd-search input{width:100%;box-sizing:border-box;height:50px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:15px;color:var(--ink)}
+.fnd-search input{width:100%;box-sizing:border-box;height:44px;border:1.5px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);padding:0 16px 0 44px;font:inherit;font-size:14.5px;color:var(--ink)}
 .fnd-search input:focus{outline:none;border-color:var(--coral)}
+/* 모바일 필터 접기 토글 — 데스크톱(>700px)에선 숨김(필터는 항상 펼침). */
+.fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
+.fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
+.fnd-filters-badge{font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
 .fnd-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
 .fnd-field{display:flex;flex-direction:column;gap:5px}
-.fnd-field label{font-size:11.5px;color:var(--muted)}
+.fnd-field label,.fnd-field-lbl{font-size:11.5px;color:var(--muted)}
 .fnd-field select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink);min-width:120px}
 .fnd-field select:focus{outline:none;border-color:var(--coral)}
+/* 저카디널리티 필터(기관·소스·증거등급·검토상태) 칩 그룹 — 대시보드 행 토글과 동일한
+   coral-tint 계열로 선택 상태를 강조(§coral 팔레트 재사용, 신규 색상 도입 없음). */
+.fnd-chipfield{gap:6px}
+.fnd-chipgroup{display:flex;flex-wrap:wrap;gap:6px;max-width:280px}
+.fnd-chip{display:inline-flex;align-items:center;font:inherit;font-size:12.5px;font-weight:500;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer;line-height:1;white-space:nowrap;transition:background var(--tr),border-color var(--tr),color var(--tr)}
+.fnd-chip:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
+.fnd-chip.on{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22);font-weight:600}
+.fnd-chip:disabled{opacity:.4;cursor:not-allowed}
 .fnd-reset{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 12px;cursor:pointer;height:fit-content}
 .fnd-reset:hover{color:var(--coral);border-color:var(--coral)}
 .fnd-reset .ti{font-size:14px}
 .fnd-count{margin-top:12px;font-size:13px;color:var(--muted)}
 .fnd-count b{color:var(--ink)}
+@media (max-width:700px){
+  .fnd-filters-toggle{display:inline-flex}
+  .fnd-filters{display:none}
+  .fnd-filters.open{display:flex}
+}
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}
 .fnd-results{display:flex;flex-direction:column;gap:12px}

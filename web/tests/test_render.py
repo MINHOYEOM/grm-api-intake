@@ -952,6 +952,138 @@ class WebFindingsRenderTest(unittest.TestCase):
         for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
             self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
 
+    # ── FIND-1 M10c: 탐색 툴바 오버홀(칩 필터·건수병기·정렬·sticky·모바일 접기·URL 동기화) ──
+    def test_low_cardinality_filters_are_chip_groups_not_selects(self):
+        """기관·소스·증거등급·검토상태는 <select> 대신 버튼 칩 그룹 컨테이너로 렌더된다
+        (값은 findings.js 가 런타임에 채운다) — 4개 드롭다운 제거를 셸 마크업으로 확인.
+        카테고리·발행월은 20종/월 단위라 여전히 드롭다운을 유지한다."""
+        for facet_id in ("fnd-f-agency", "fnd-f-source", "fnd-f-evidence", "fnd-f-status"):
+            self.assertIn(f'<div class="fnd-chipgroup" id="{facet_id}"', self.html)
+            self.assertNotIn(f'<select id="{facet_id}"', self.html)
+        self.assertIn('<select id="fnd-f-category"', self.html)
+        self.assertIn('<select id="fnd-f-month"', self.html)
+
+    def test_chip_group_skeleton_and_refresh_wiring_present(self):
+        """칩은 실제 <button type=button> + aria-pressed 이고, DOM 은 1회만 만들고(스켈레톤)
+        매 render() 마다 건수/on/disabled 만 갱신하는 구조인지 소스 마커로 확인."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('btn.type = "button"', js_src)
+        self.assertIn('btn.setAttribute("aria-pressed"', js_src)
+        self.assertIn("function buildFacetSkeleton()", js_src)
+        self.assertIn("function refreshFacetUI()", js_src)
+        self.assertIn("refreshFacetUI()", js_src[js_src.index("function render()"):], "render() 가 refreshFacetUI 호출 안 함")
+
+    def test_facet_counts_use_standard_faceting_exclude_self(self):
+        """칩/옵션 건수는 '검색어 + 그 파셋을 제외한 나머지 활성 필터' 기준(표준 파세팅) —
+        자기 자신 필터는 제외하고 계산해야 칩이 항상 의미 있는 건수를 보여준다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function computeFacetCounts(key2)", js_src)
+        self.assertIn("function rowMatchesFilters(row, exclude)", js_src)
+        self.assertIn("rowMatchesFilters(r, key2)", js_src)
+        # matches(row) 는 exclude 없이(=전체 적용) rowMatchesFilters 를 재사용(기존 계약 유지).
+        self.assertIn("return rowMatchesFilters(row, null)", js_src)
+
+    def test_search_haystack_includes_visible_facets_and_labels(self):
+        """사용자가 화면에서 보는 메타데이터도 검색 대상이다 — 기관/소스/증거/검토상태/
+        카테고리/월/refs 가 빠지면 '보이는데 검색 0건' UX 회귀가 난다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function searchTermsFor(row)", js_src)
+        self.assertIn("searchTermsFor(row)", js_src[js_src.index("function rowMatchesFilters"):])
+        for marker in (
+            "row.agency", "row.source", "row.published_date", "monthOf(row)",
+            "row.evidence_level", "EVIDENCE_LABEL[row.evidence_level]",
+            '"증거 " + row.evidence_level',
+            "row.review_status", "reviewStatusPlain", "STATUS_LABEL[row.review_status]",
+            "row.category_code", "row.category_label_ko", "cat.ko", "cat.en",
+            "arrayTerms(row.cfr_refs)", "arrayTerms(row.mfds_refs)",
+        ):
+            self.assertIn(marker, js_src)
+
+    def test_sort_select_present_with_three_options(self):
+        self.assertIn('<select id="fnd-sort">', self.html)
+        self.assertIn('<option value="date_desc">최신순</option>', self.html)
+        self.assertIn('<option value="date_asc">오래된순</option>', self.html)
+        self.assertIn('<option value="firm_asc">업체명순</option>', self.html)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function sortRows(rows)", js_src)
+        self.assertIn('sort: "date_desc"', js_src)
+
+    def test_tools_sticky_below_nav_and_below_nav_z_index(self):
+        """.fnd-tools 는 top:66px(사이트 nav 높이) sticky, z-index 는 nav(50) 미만이어야
+        한다 — 겹칠 때 nav(드롭다운/모바일 메뉴)가 항상 위에 오도록(불변 계약)."""
+        import re as _re
+        m = _re.search(r'\.fnd-tools\{([^}]*)\}', self.html)
+        self.assertIsNotNone(m, ".fnd-tools CSS 규칙 미발견")
+        rule = m.group(1)
+        self.assertIn("position:sticky", rule)
+        self.assertIn("top:66px", rule)
+        zm = _re.search(r'z-index:(\d+)', rule)
+        self.assertIsNotNone(zm, ".fnd-tools 에 z-index 미지정")
+        self.assertLess(int(zm.group(1)), 50)
+
+    def test_tools_appears_before_dashboard_in_markup(self):
+        """검색이 최우선 도구 — 배치 순서는 page-head → 고지 → tools(sticky) → dash → 결과."""
+        self.assertLess(self.html.index('id="fnd-tools"'), self.html.index('id="fnd-dash"'))
+
+    def test_mobile_filters_toggle_present(self):
+        """≤700px 에서만 보이는 "필터·정렬" 토글 버튼 + 활성 필터 개수 배지."""
+        self.assertIn('id="fnd-filters-toggle"', self.html)
+        self.assertIn('aria-controls="fnd-filters"', self.html)
+        self.assertIn('id="fnd-filters-badge"', self.html)
+        self.assertIn("max-width:700px", self.html)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('filtersEl.classList.toggle("open")', js_src)
+        self.assertIn("function countActiveFilters()", js_src)
+        self.assertIn("function updateFiltersToggleBadge()", js_src)
+
+    def test_dashboard_grid_collapse_toggle_present(self):
+        """대시보드는 스탯 줄은 항상 노출, 3블록 그리드만 토글로 접는다(모바일 기본 접힘)."""
+        self.assertIn('id="fnd-dash-toggle"', self.html)
+        self.assertIn('aria-controls="fnd-dash-grid"', self.html)
+        self.assertIn('id="fnd-dash-grid"', self.html)
+        self.assertIn(".fnd-dash-grid--collapsed{display:none}", self.html)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('matchMedia("(max-width:700px)")', js_src)
+        self.assertIn('classList.toggle("fnd-dash-grid--collapsed")', js_src)
+
+    def test_url_sync_uses_replacestate_only_no_pushstate(self):
+        """URL 동기화는 history.replaceState 만 쓴다 — pushState 는 뒤로가기 히스토리를
+        오염시키므로 findings.js 어디에도 존재하면 안 된다(불변 계약)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('history.replaceState(null, "", newUrl)', js_src)
+        self.assertNotIn("pushState(", js_src)
+        self.assertIn("function syncStateToUrl()", js_src)
+        self.assertIn("function readStateFromUrl()", js_src)
+
+    def test_url_param_scheme_matches_spec(self):
+        """URL 파라미터 스킴 = q/agency/cat/src/ev/status/m/sort (state 키와 1:1 매핑)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        for pair in ('q: "q"', 'agency: "agency"', 'category_code: "cat"', 'source: "src"',
+                     'evidence_level: "ev"', 'review_status: "status"', 'month: "m"', 'sort: "sort"'):
+            self.assertIn(pair, js_src)
+
+    def test_url_sync_ignores_unknown_values_silently(self):
+        """URL 의 알 수 없는/무효한 파셋 값·정렬 값은 조용히 무시한다(오류·크래시 없이)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("collectFacetValues(k).indexOf(raw) !== -1", js_src)
+        self.assertIn("SORT_VALUES.indexOf(sortRaw) !== -1", js_src)
+
+    def test_reset_clears_sort_and_relies_on_render_for_url_clear(self):
+        """초기화 버튼은 sort 도 기본값(date_desc)으로 되돌리고, querystring 은 render()의
+        syncStateToUrl() 이 기본 state 를 반영해 자동으로 비운다(별도 URL clear 불필요)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        reset_block = js_src[js_src.index("if (resetBtn)"):js_src.index("if (resetBtn)") + 400]
+        self.assertIn('sort: "date_desc"', reset_block)
+        self.assertIn("syncControlsFromState()", reset_block)
+        self.assertIn("render()", reset_block)
+
+    def test_findings_js_toolbar_features_no_innerhtml_data_injection(self):
+        """M10c 신규 경로(칩/셀렉트 갱신·URL 동기화)도 기존 XSS 계약을 지킨다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:

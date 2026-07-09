@@ -40,6 +40,7 @@ from datetime import date
 from typing import Any
 from urllib.parse import urlencode, urljoin
 
+import grm_findings as gf
 from grm_common import env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
     IntakeItem,
@@ -511,14 +512,34 @@ def _first_sentence(text: str) -> tuple[str, str]:
     return t[:280].rstrip() + "...", t[280:].strip()
 
 
-def _extract_483_observations_from_text(text: str) -> list[dict[str, str]]:
+def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
+    """수집 행(nrow)/raw 의 힌트 dict → strip_fda483_page_header kwargs. None 은 힌트 없음(후방호환)."""
+    hints = header_hints or {}
+    return {
+        "establishment_type": hints.get("establishment_type", ""),
+        "fei_number": hints.get("fei_number", ""),
+        "firm_name": hints.get("firm_name", ""),
+    }
+
+
+def _extract_483_observations_from_text(
+    text: str, header_hints: dict[str, str] | None = None,
+) -> list[dict[str, str]]:
     """483 PDF 텍스트층 → Observation 번호별 결정론 구조.
 
     `WE OBSERVED` 이후 `OBSERVATION N` 앵커로 분할하고, 각 Observation 의 첫 문장을
     deficiency 로 둔다. 유효 deficiency 가 없거나 텍스트층 깨짐률이 높으면 [] 로 degrade.
+
+    [FIND-1 M10a] `header_hints`(establishment_type/fei_number/firm_name)가 있으면
+    `grm_findings.strip_fda483_page_header` 로 페이지 넘김 헤더 라벨-값 인터리브를 chunk·
+    detail 양쪽에서 제거한다 — Observation 이 페이지 경계에 걸치면 STREET ADDRESS/FEI NUMBER/
+    TYPE OF ESTABLISHMENT INSPECTED 등 헤더 파편이 deficiency 앞에 접두사로 섞여 들어오는
+    라이브 오염(2026-07 VA San Diego 실측)을 방지한다. header_hints=None 은 힌트 없이도
+    라벨/날짜/숫자런/주소는 그대로 제거된다(후방호환 — 기존 호출부는 그대로 동작).
     """
     if not text or _text_corruption_ratio(text) > FDA483_TEXT_CORRUPTION_RATIO_MAX:
         return []
+    hints = _header_hint_kwargs(header_hints)
     body = text
     m = _WE_OBSERVED_RE.search(body)
     if m:
@@ -532,10 +553,12 @@ def _extract_483_observations_from_text(text: str) -> list[dict[str, str]]:
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
         chunk = _clean_observation_chunk(body[start:end])
+        chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
         if not deficiency:
             continue
         clean_detail = _clean_observation_detail(detail)
+        clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)
         row = {
             "number": obs.group(1),
             "deficiency": deficiency,
@@ -545,7 +568,9 @@ def _extract_483_observations_from_text(text: str) -> list[dict[str, str]]:
     return out
 
 
-def _extract_483_observations(pdf_bytes: bytes) -> list[dict[str, str]]:
+def _extract_483_observations(
+    pdf_bytes: bytes, header_hints: dict[str, str] | None = None,
+) -> list[dict[str, str]]:
     """483 PDF bytes → Observation rows. 공개 API(테스트/후속 재사용용), LLM/OCR 없음."""
     try:
         from collect_mfds_gmp_inspection import _extract_pdf_text
@@ -554,7 +579,7 @@ def _extract_483_observations(pdf_bytes: bytes) -> list[dict[str, str]]:
     text, _status = _extract_pdf_text(pdf_bytes, max_chars=FDA483_TEXT_MAX_CHARS)
     if len(text) >= FDA483_TEXT_MAX_CHARS:
         log("WARN", "483 텍스트 상한 도달 — Observation 일부 누락 가능(수동 확인)")
-    return _extract_483_observations_from_text(text)
+    return _extract_483_observations_from_text(text, header_hints)
 
 
 def _signal_tier(record_type: str, establishment_type: str, excerpt: str) -> str:
@@ -731,6 +756,13 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         observations: list[dict[str, str]] = []
         body_full = ""
         pdf_url = _pdf_url(media_id)
+        # [FIND-1 M10a] Observation 추출의 페이지헤더 스크럽 힌트 — 이 행(nrow)의 시설유형/
+        # FEI/업체명을 strip_fda483_page_header 에 그대로 넘겨 OCR 공백변형까지 흡수한다.
+        header_hints = {
+            "establishment_type": nrow.get("establishment_type", ""),
+            "fei_number": nrow.get("fei", ""),
+            "firm_name": nrow.get("company", ""),
+        }
         if pdf_url and not excerpt_health["capped"]:
             if excerpt_health["attempted"] >= FDA483_EXCERPT_MAX_ITEMS:
                 excerpt_health["capped"] = True
@@ -752,7 +784,9 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                     log("WARN", warn + " — 메타 카드로 유지(manual_review)")
                 if observations_enabled:
                     observations_health["attempted"] += 1
-                    observations = _extract_483_observations_from_text(text) if text else []
+                    observations = (
+                        _extract_483_observations_from_text(text, header_hints) if text else []
+                    )
                     if observations:
                         observations_health["extracted"] += 1
                     else:
@@ -766,7 +800,9 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 # ENABLE_FDA_483_OBSERVATIONS 와 독립(순수 파서 재사용 — 그 플래그와 무관하게 판정).
                 if deep_enabled:
                     deep_health["attempted"] += 1
-                    parsed = _extract_483_observations_from_text(text) if text else []
+                    parsed = (
+                        _extract_483_observations_from_text(text, header_hints) if text else []
+                    )
                     if parsed:
                         body_full = text
                         deep_health["stored"] += 1

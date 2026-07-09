@@ -465,5 +465,104 @@ class FindingsTranslationFieldTest(unittest.TestCase):
             conn.close()
 
 
+class Fda483PageHeaderScrubTest(unittest.TestCase):
+    """FIND-1 M10a — strip_fda483_page_header 페이지 넘김 헤더 스크럽 단위 테스트.
+
+    라이브 실측 오염 2건(VA San Diego Healthcare Systems, doc fda483-193454)을 원문 그대로 재현.
+    """
+
+    CASE_A = (
+        "STREET ADDRESS 4/27/26-5/1/26, 5/4/26-5/6/26, 5/8/26 FEI NUMBER 2071629 "
+        "3350 La Jolla Village Dr TYPE OF ESTABLISHMENT INSPECTED Producer of Sterile "
+        "Drug Products Personnel engaged in aseptic processing were observed wearing "
+        "non-sterile gloves."
+    )
+    CASE_B = (
+        "STREET ADDRESS DATE(S) OF INSPECTION 4/27/26-5/1/26, 5/4/26-5/6/26, 5/8/26 "
+        "FEI NUMBER 2071629 3350 La Jolla Village Dr TYPE OF ESTABLISHMENT INSPECTED "
+        "Producer of Sterile Drug Products Personnel were observed moving quickly in a "
+        "critical area or in an area immediately adjacent to a critical area likely "
+        "causing disruption of unidirectional airflow."
+    )
+    HINTS = dict(
+        establishment_type="Producer of Sterile Drug Products",
+        fei_number="2071629",
+        firm_name="VA San Diego Healthcare Systems",
+    )
+
+    def test_case_a_scrub_matches_live_expectation(self) -> None:
+        self.assertEqual(
+            gf.strip_fda483_page_header(self.CASE_A, **self.HINTS),
+            "Personnel engaged in aseptic processing were observed wearing non-sterile gloves.",
+        )
+
+    def test_case_b_scrub_matches_live_expectation(self) -> None:
+        self.assertEqual(
+            gf.strip_fda483_page_header(self.CASE_B, **self.HINTS),
+            "Personnel were observed moving quickly in a critical area or in an area "
+            "immediately adjacent to a critical area likely causing disruption of "
+            "unidirectional airflow.",
+        )
+
+    def test_no_labels_returns_input_byte_unchanged(self) -> None:
+        prose = "Personnel  were   observed\tdonning gloves without proper hand hygiene."
+        self.assertEqual(gf.strip_fda483_page_header(prose), prose)  # 공백 정규화도 없음
+
+    def test_hint_flexible_matching_handles_missing_space_ocr_variant(self) -> None:
+        # OCR 변형: "Producer of Sterile Drug Products" 의 공백이 사라져 "ofSterile" 이 됨.
+        text = (
+            "TYPE OF ESTABLISHMENT INSPECTED Producer ofSterile Drug Products "
+            "Personnel observed contamination in the aseptic core."
+        )
+        self.assertEqual(
+            gf.strip_fda483_page_header(text, establishment_type="Producer of Sterile Drug Products"),
+            "Personnel observed contamination in the aseptic core.",
+        )
+
+    def test_labels_dates_digits_address_removed_without_hints(self) -> None:
+        # 힌트가 전혀 없어도 라벨/날짜범위/FEI 숫자런/미국식 주소는 제거된다(establishment_type
+        # 프로즈 값만 힌트 없이는 남을 수 있음 — 설계상 허용).
+        cleaned = gf.strip_fda483_page_header(self.CASE_A)
+        self.assertNotIn("STREET ADDRESS", cleaned)
+        self.assertNotIn("4/27/26", cleaned)
+        self.assertNotIn("2071629", cleaned)
+        self.assertNotIn("3350 La Jolla Village Dr", cleaned)
+        self.assertIn("Personnel engaged in aseptic processing", cleaned)
+
+    def test_header_block_spliced_into_middle_of_prose(self) -> None:
+        text = (
+            "Personnel observed contamination during the aseptic fill. "
+            "STREET ADDRESS 1/2/26-1/3/26 FEI NUMBER 1234567 123 Main St "
+            "TYPE OF ESTABLISHMENT INSPECTED Drug Manufacturer "
+            "Investigators noted deviations from written procedures."
+        )
+        cleaned = gf.strip_fda483_page_header(
+            text, establishment_type="Drug Manufacturer",
+        )
+        self.assertEqual(
+            cleaned,
+            "Personnel observed contamination during the aseptic fill. "
+            "Investigators noted deviations from written procedures.",
+        )
+
+    def test_trailing_to_name_does_not_swallow_following_prose(self) -> None:
+        # TO: 인명이 헤더 파편의 마지막 요소(뒤에 라벨 없음)일 때, TO: 소비가 문서 끝($)까지
+        # 이어지면 관찰 본문 전체가 사라진다(잡음 제거가 아니라 데이터 손실). 본문은 남아야 한다.
+        text = (
+            "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT IS ISSUED "
+            "TO: Dr. Frank P. Pearson, Medical Center Director "
+            "Personnel engaged in aseptic processing were observed wearing non-sterile gloves."
+        )
+        cleaned = gf.strip_fda483_page_header(text, **self.HINTS)
+        self.assertIn(
+            "Personnel engaged in aseptic processing were observed wearing non-sterile gloves.",
+            cleaned,
+        )
+
+    def test_no_header_labels_present_in_gate_check(self) -> None:
+        self.assertIsNone(gf._FDA483_LABEL_RE.search("just an ordinary finding sentence"))
+        self.assertIsNotNone(gf._FDA483_LABEL_RE.search("FEI NUMBER 1234567"))
+
+
 if __name__ == "__main__":
     unittest.main()

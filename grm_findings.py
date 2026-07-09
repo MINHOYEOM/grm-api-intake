@@ -289,6 +289,118 @@ def classify_finding_category(text: str) -> str:
     return "other_quality_system"
 
 
+# FIND-1 M10a: FDA 483 페이지 넘김 헤더(양식 라벨·값 인터리브) 스크럽. 483 PDF 는 페이지가
+# 바뀔 때마다 DISTRICT OFFICE ADDRESS / FEI NUMBER / STREET ADDRESS / TYPE OF ESTABLISHMENT
+# INSPECTED 등 표지 라벨-값 블록이 텍스트층에 반복 삽입된다. Observation 이 페이지 경계에 걸치면
+# 이 블록이 finding 본문(deficiency) 앞에 접두사로 섞여 들어온다. 기존 _FDA483_FOOTER_RE
+# (collect_fda_483.py)는 페이지 **하단** 서명/양식 푸터만 잡고, 이 페이지 **상단** 헤더 라벨은
+# 못 잡는다 — 게다가 라이브 실측(VA San Diego Healthcare Systems, doc fda483-193454)에서는
+# 푸터 마커(FORM FDA 4/DEPARTMENT OF HEAL/PAGE n OF n)가 OCR 누락으로 아예 없는 헤더 파편이
+# 나왔다(푸터 절단이 발동하지 못함). 라벨(전부 대문자 — PDF 양식 고정 문구)이 하나도 없으면
+# 산문 오탐을 피하기 위해 입력을 그대로 반환한다(byte 불변). 라벨이 있으면 라벨에서 시작해
+# 뒤따르는 "헤더 값 토큰"(다른 라벨·날짜범위·FEI 숫자런·전화/팩스·URL·TO: 인명·미국식 주소·
+# 도시/주/우편 + 옵션 힌트값)을 탐욕적으로 반복 소비한 스팬을 제거한다.
+_FDA483_HEADER_LABELS: tuple[str, ...] = (
+    r"DISTRICT OFFICE ADDRESS(?: AND PHONE NUMBER)?",
+    r"DATE\(S\) OF INSPECTION",
+    r"FEI NUMBER",
+    r"NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT IS(?: ISSUED)?",
+    r"FIRM NAME",
+    r"STREET ADDRESS",
+    r"CITY, STATE AND ZIP CODE",
+    r"TYPE OF ESTABLISHMENT INSPECTED",
+    r"DEPARTMENT OF HEALTH AND HUMAN SERVICES",
+    r"FOOD AND DRUG ADMINISTRATION",
+)
+_FDA483_LABEL_ALT = "(?:" + "|".join(_FDA483_HEADER_LABELS) + ")"
+_FDA483_LABEL_RE = re.compile(_FDA483_LABEL_ALT)  # 대소문자 구분 -- 산문 오탐 방지
+
+_FDA483_DATE_CHAIN = r"\d{1,2}/\d{1,2}/\d{2,4}(?:\s*[-,]\s*\d{1,2}/\d{1,2}/\d{2,4})*"
+_FDA483_FEI_RUN = r"\d{5,}"
+_FDA483_PHONE = r"(?:Fax:)?\(\d{3}\)\d{3}-\d{4}"
+_FDA483_URL = r"(?:Industry Information:\s*)?(?:www\.|https?://)\S+"
+# TO: 인명·직함은 반드시 **다음 라벨이 뒤따를 때만** 소비한다 -- `|$` 를 허용하면 TO: 가
+# 헤더 파편의 마지막 요소일 때 뒤따르는 관찰 본문 전체를 문서 끝까지 삼켜(잡음 제거가 아니라
+# 데이터 손실) deficiency 가 통째로 사라진다. 라벨이 안 따라오면 "TO: ..." 는 남긴다(안전 우선).
+_FDA483_TO_NAME = r"TO:\s+.*?(?=" + _FDA483_LABEL_ALT + r")"
+_FDA483_STREET_ADDR = (
+    r"\d+\s+(?:[A-Z][A-Za-z.]*\s+){1,5}"
+    r"(?:Dr|St|Ave|Rd|Blvd|Drive|Street|Avenue|Road|Boulevard|Lane|Ln|Way|Pkwy)\.?\b"
+)
+_FDA483_CITY_STATE_ZIP = r"[A-Z][A-Za-z .]+,\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?"
+
+# 값 토큰 순서: 더 구체적인 패턴(날짜/전화/URL/TO:/주소)을 FEI_RUN(순수 5자리+ 숫자런)보다
+# 앞에 둔다 -- FEI_RUN 이 먼저면 주소의 5자리+ 번지수(예: "12345 Main St")를 통째로 삼켜버릴 수 있다.
+_FDA483_BASE_UNITS: tuple[str, ...] = (
+    _FDA483_LABEL_ALT,
+    _FDA483_DATE_CHAIN,
+    _FDA483_PHONE,
+    _FDA483_URL,
+    _FDA483_TO_NAME,
+    _FDA483_STREET_ADDR,
+    _FDA483_CITY_STATE_ZIP,
+    _FDA483_FEI_RUN,
+)
+
+_FDA483_SPAN_PATTERN_CACHE: dict[tuple[str, str, str], "re.Pattern[str]"] = {}
+
+
+def _fda483_hint_unit(hint: str) -> str:
+    """힌트 문자열 -> 문자 사이 \\s* 유연 매칭 유닛(공백 문자는 버리고 나머지를 \\s* 로 이음).
+
+    OCR 이 "Producer of Sterile Drug Products"의 공백을 지우거나("ofSterile") 끼워 넣는
+    변형에 대응한다. 힌트가 비어 있으면 ''(unit 리스트에서 제외).
+    """
+    chars = [c for c in (hint or "") if not c.isspace()]
+    if not chars:
+        return ""
+    return r"\s*".join(re.escape(c) for c in chars)
+
+
+def _fda483_span_pattern(establishment_type: str, fei_number: str, firm_name: str) -> "re.Pattern[str]":
+    key = (establishment_type or "", fei_number or "", firm_name or "")
+    pattern = _FDA483_SPAN_PATTERN_CACHE.get(key)
+    if pattern is not None:
+        return pattern
+    units = list(_FDA483_BASE_UNITS)
+    for hint in (establishment_type, fei_number, firm_name):
+        unit = _fda483_hint_unit(hint)
+        if unit:
+            units.append(unit)
+    unit_alt = "(?:" + "|".join(units) + ")"
+    pattern = re.compile(_FDA483_LABEL_ALT + r"(?:\s*" + unit_alt + r")*")
+    _FDA483_SPAN_PATTERN_CACHE[key] = pattern
+    return pattern
+
+
+def strip_fda483_page_header(
+    text: str,
+    *,
+    establishment_type: str = "",
+    fei_number: str = "",
+    firm_name: str = "",
+) -> str:
+    """FDA 483 페이지 넘김 헤더(양식 라벨-값 인터리브) 제거(순수 함수).
+
+    483 PDF 는 페이지 경계마다 STREET ADDRESS / FEI NUMBER / TYPE OF ESTABLISHMENT INSPECTED
+    등 표지 라벨-값 블록이 텍스트층에 반복돼, Observation 이 페이지에 걸치면 이 블록이 finding
+    본문 앞에 섞여 들어온다(collect_fda_483._FDA483_FOOTER_RE 는 페이지 **하단** 서명/양식
+    푸터만 잡고 이 **상단** 헤더는 못 잡는다 -- 게다가 푸터 마커 자체가 OCR 누락으로 빠진
+    헤더-only 파편도 실재한다). 텍스트에 헤더 라벨(전부 대문자 고정 문구)이 하나도 없으면
+    산문 오탐을 피해 입력을 그대로(공백 정규화도 없이) 반환한다. 라벨이 있으면 그 지점부터
+    날짜범위/FEI 숫자런/전화·팩스/URL/TO: 인명/미국식 주소/도시·주·우편 + (있으면) 힌트값을
+    탐욕적으로 반복 소비한 스팬을 제거하고, 공백을 재정규화해 반환한다.
+    """
+    if not text:
+        return text
+    normalized = " ".join(text.split())
+    if not _FDA483_LABEL_RE.search(normalized):
+        return text
+    span_re = _fda483_span_pattern(establishment_type, fei_number, firm_name)
+    cleaned = span_re.sub(" ", normalized)
+    return " ".join(cleaned.split())
+
+
 def raw_signal_from_row(
     row: dict[str, Any],
     raw: dict[str, Any],

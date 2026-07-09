@@ -172,6 +172,51 @@ class FindingsExtractorsTest(unittest.TestCase):
         # Unchanged public function still returns an empty list for this case.
         self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
 
+    def test_fda_483_page_header_contamination_is_scrubbed_on_reextraction(self) -> None:
+        # FIND-1 M10a — 저장된 raw 가 이미 오염된 채로 있어도(백필 경로) 페이지 넘김 헤더
+        # 라벨-값 인터리브가 여기서 제거되고, finding_id 는 깨끗한 텍스트 기준으로 계산된다.
+        fx = _load_input("fda_483_observations")
+        raw = dict(fx["raw"])
+        raw["establishment_type"] = "Producer of Sterile Drug Products"
+        raw["fei_number"] = "2071629"
+        raw["firm"] = "VA San Diego Healthcare Systems"
+        raw["fda_483_observations"] = [
+            {
+                "number": "1",
+                "deficiency": (
+                    "STREET ADDRESS 4/27/26-5/1/26, 5/4/26-5/6/26, 5/8/26 FEI NUMBER 2071629 "
+                    "3350 La Jolla Village Dr TYPE OF ESTABLISHMENT INSPECTED Producer of "
+                    "Sterile Drug Products Personnel engaged in aseptic processing were "
+                    "observed wearing non-sterile gloves."
+                ),
+                "detail": "",
+            }
+        ]
+        row = dict(fx["row"])
+        row["firm"] = ""  # firm_name 힌트가 raw.firm 폴백 경로를 타도록 row 쪽은 비움
+        raw_signal = gf.raw_signal_from_row(row, raw)
+        # raw_signal_from_row 는 raw.firm 도 firm_name 후보로 보므로 여기선 그대로 채워짐 —
+        # extractor 는 raw_signal.get("firm_name") 우선, 없으면 raw.get("firm") 폴백을 쓴다.
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        clean_text = "Personnel engaged in aseptic processing were observed wearing non-sterile gloves."
+        self.assertEqual(findings[0]["finding_text"], clean_text)
+
+        expected = gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=clean_text,
+            ordinal=1,
+            evidence_level="A",
+            evidence_url=findings[0]["evidence_url"],
+            finding_language="EN",
+            confidence=0.95,
+            review_status="accepted",
+        )
+        self.assertEqual(findings[0]["finding_id"], expected["finding_id"])
+
     def test_with_report_counts_duplicate_text_drop(self) -> None:
         fx = _load_input("fda_483_observations")
         fx["raw"]["fda_483_observations"].append(dict(fx["raw"]["fda_483_observations"][0]))

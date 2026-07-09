@@ -46,8 +46,7 @@ grm-findings-translations-*.sql
 grm-findings-translation-apply*.sql
 grm-findings-search*.html
 grm-findings.sqlite3
-*.bak-v1
-*.bak-v2
+*.bak-*
 *.sqlite3-shm
 *.sqlite3-wal
 

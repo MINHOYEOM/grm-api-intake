@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.117-draft` |
-| 최종 수정일 | 2026-07-09 |
-| 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브** — 검색 DB·자동 적재·국문 번역 자동화·탐색 UX·WL 위반 분해·신뢰도 UX까지 전부 라이브. 단, 이는 원래 5개월 전략 로드맵(§6.4)의 1단계일 뿐 — 외부 백필(볼륨)·Copilot Studio 연동·히트맵/업체이력/실사관 프로파일·부서 파일럿은 아직 미착수. |
+| 문서 버전 | `v1.118` |
+| 최종 수정일 | 2026-07-10 |
+| 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -54,7 +54,7 @@ flowchart TD
 | 발행 | **매주** 한 번에 묶어 발행 | 매일 계속 쌓이는 **실시간 DB** |
 | 읽는 법 | 처음부터 읽는 다이제스트 | 조건으로 검색·필터 |
 | 저장 | Notion → 웹 정적 사이트 | Supabase(Postgres) → 웹 |
-| 웹 위치 | `/`, `/archive/` | `/findings/` |
+| 웹 위치 | `/`, `/archive/` | `/findings/`, `/findings/trends/`(전량 집계 대시보드) |
 
 ### 1.3 핵심 설계 원칙
 - **원문 우선·추적 가능:** 모든 카드/항목에 정보 출처와 공식 원문 링크를 붙입니다. 요약·번역이 있어도 법적 판단은 항상 원문 기준.
@@ -176,15 +176,19 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[매일 수집 → findings 추출<br/>자동 분류·카테고리] --> B[(Supabase findings)]
+    Z[외부 백필 F2<br/>collect_fda_backfill.py<br/>매일 07:17 UTC --auto] --> B
     B --> C{공개 게이트 RLS<br/>국문 번역 있음?}
     C -->|없음| D[웹 비공개<br/>미완성 노출 차단]
     C -->|있음| E[웹사이트 /findings/ 공개]
     D -. 매주 월요일 예약 .-> F[예약 Claude 세션<br/>번역·검증·PR 자동 머지]
     F --> G[GitHub Actions<br/>LLM 없는 순수 스크립트가<br/>Supabase에 번역 반영]
     G --> B
+    B --> H[(집계 RPC 007/008<br/>findings_stats 등)]
+    H --> I[웹사이트 /findings/trends/<br/>전량 집계 대시보드]
 ```
 
 - **매일 적재(M4):** `collect_intake.py`가 Notion 적재 성공분을 Supabase `findings`에 직행 append(기본 off 플래그, 현재 활성).
+- **외부 백필(F2):** `collect_fda_backfill.py`(+ `grm-findings-backfill-fetch.yml`)가 FDA 483(총 2,002건)·Warning Letter(3,608건, 2021년~)의 과거분을 Notion을 우회해 Supabase에 직행 적재. robots.txt `Crawl-Delay: 30`초를 완전 준수하며, 매일 07:17 UTC cron이 `--auto` 모드로 1청크씩 소진합니다(483→WL 순, 완료되면 자가 종료 후 신규 문서 2차 안전망으로 전환). MFDS는 nedrug robots `Disallow: /` 정책 판단에 따라 백필 대상에서 제외(일일 수집만 유지). 스케줄 배치 번역은 주당 최대 40건·최신 우선이라 백필 미번역분은 당분간 웹 row로는 안 보이고 집계로만 소비됩니다.
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
 - **주간 번역(M8·M9):** 매주 월요일 예약된 Claude Code 세션(구독 사용량·API 비용 0)이 미번역분을 추출→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영.
 - **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 원문 접기 + 대시보드(기관·카테고리·기간·업체 통계)를 제공. M10 검증 브랜치에서는 카드 기본 접힘(3줄 요약→자세히 보기), 칩 필터(건수 병기), 정렬, 매칭어 하이라이트, 검토 필요 시각 경계, URL 쿼리 공유, 화면표시값 검색을 보강했다.
@@ -194,6 +198,7 @@ flowchart TD
 - **`findings`** (지적사항 분석층): FDA 483 Observation·Warning Letter·MFDS GMP 지적 등에서 정규화한 개별 위반. `finding_text`(영문 원문·불변) + `finding_text_ko`(국문 해석) + 카테고리·증거등급·검토상태. **공개 게이트 통과분만 노출.**
 - **taxonomy v2:** 20개 카테고리(코드·한국어·영문 라벨 고정). 분류기는 단어경계 매칭으로 오분류 방지. `finding_id`는 내용 해시 기반 안정 ID(번역 추가로 안 바뀜).
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
+- **집계 RPC(007/008, 카운트 전용 안전 계약):** `findings_stats`/`findings_firm_stats`(007)·`findings_category_matrix`(008)는 공개 게이트(006)를 우회해 **전량** 집계(건수·연도·카테고리·업체 통계)를 서빙하되, 원문 텍스트(`finding_text`/`finding_text_ko`)는 어떤 경로로도 반환하지 않습니다. `/findings/trends/`가 이 두 RPC만 소비.
 
 ### 4.4 구현 마일스톤 요약 (M1~M14, 전부 완료·라이브)
 
@@ -216,7 +221,10 @@ flowchart TD
 | M13 | 신뢰도 UX 분리(Evidence 배지 vs 검토 필요 배지 시각 구분) + 번역 반영 오류 표면화 |
 | M14 | `/findings/` 디자인 전면 정돈(전문 SaaS 수준 — 신호색 절제·위계 정리·모바일 오버플로 제거) |
 
-> **운영 지위:** 신규 유입분의 정본은 Supabase. 로컬 SQLite sidecar(`grm-findings.sqlite3`)는 7월 백필 스냅샷 + 로컬 개발용. **현재 라이브 findings 46건** — 대부분 최근 수개월 데이터이며, §6.4의 "3~5년치 백필" 목표에는 아직 크게 못 미친다.
+### 4.5 트렌드 대시보드 (`/findings/trends/`, F3b·H1)
+`web/templates/trends.html` + `web/assets/trends.js`가 007/008 집계 RPC를 직접 fetch해 그리는 전량 통계 페이지입니다. 스탯 스트립·카테고리 상위 10 바·카테고리×연도 히트맵(008)·연도별 추이·업체 Top 30(클릭 시 `?firm=` 상세 패널·URL 공유)·증거등급/소스 구성을 보여줍니다. 공개 게이트(006)와 무충돌 — 카운트·서지 메타만 반환하고 원문은 어떤 경로로도 내려주지 않습니다(§4.3). 렌더러는 빈 셸만 결정론적으로 출력하고 실데이터는 클라이언트 JS가 채웁니다(env 미설정 시 "준비 중" 안내로 조용히 종료).
+
+> **운영 지위:** 신규 유입분의 정본은 Supabase. 로컬 SQLite sidecar(`grm-findings.sqlite3`)는 7월 백필 스냅샷 + 로컬 개발용. **findings 2,775건+·업체 428곳**(F2 외부 백필 진행 중, 매일 증가) — §6.4의 F2(볼륨) 단계가 가동 중이며, row 단위 공개는 주당 번역 상한(최대 40건)에 따라 점진적으로 늘어나고 집계(트렌드 대시보드)는 이미 전량을 반영합니다.
 
 ---
 
@@ -231,6 +239,7 @@ grm-api-intake/
 ├─ collect_intake.py               # 수집 오케스트레이터(단일 진입점)
 ├─ collect_mfds*.py                # 식약처 수집기(recall/admin/gmp_inspection/law/gmp_cert/safety_letter)
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
+├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ grm_common.py                   # 공통 HTTP·유틸
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, delta_bridge.py
@@ -241,23 +250,25 @@ grm-api-intake/
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
-├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구
+├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
-│  ├─ templates/  (landing·archive·brief·findings·me·admin·base)
-│  ├─ assets/  (grm.css·archive.js·findings.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 006_findings_publish_gate.sql)
-│  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든)
+│  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
+│  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
+│  ├─ migrations/  (001_reaction ~ 006_findings_publish_gate, 007_findings_stats_rpc, 008_findings_category_matrix.sql)
+│  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/outbox/            # [FIND-1 M9] 주간 번역 배치 큐(CI가 읽어 Supabase 반영)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
 ├─ docs/  (prompts/·specs/ 포함)
+│  └─ copilot/  (grm_findings_connector.swagger.json, COPILOT_SETUP_GUIDE.md, QA_SCENARIOS.md)  # [FIND-1 F4a]
 └─ .github/workflows/
    ├─ grm-intake.yml, grm-ci.yml
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-supabase-keepalive.yml
-   └─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
+   ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
+   └─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
 ```
 
 ### 5.2 주요 실행 파일
@@ -308,7 +319,10 @@ grm-api-intake/
 ### 6.2 잔여 작업 (OPEN)
 | ID | 내용 | 상태 |
 |---|---|---|
-| FIND-관찰 | M4 findings 자동 적재+M11 WL 자동분해가 실전 수집에서 처음 도는 것 확인, 첫 주간 번역 사이클 관찰 | 🟡 관찰 대기 |
+| FIND-483-SIGNER | FDA 483 실사관(서명자) 추출기 미구현 — `inspector_names` 전량 빈값. F3 실사관 프로파일의 선결 조건 | 🔲 이월 |
+| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) | 🔲 이월 |
+| MIGRATION-008 | `008_findings_category_matrix.sql` 라이브 DB 적용 대기(사람이 Supabase SQL Editor에서 실행) — 미적용 상태에서도 웹은 폴백으로 무장애 | 🟡 적용 대기 |
+| FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
 | ROUTINE-AUTO | 클라우드 Routine 실행 자체의 완전 자동화(현재 델타 브릿지까지 자동, 실행은 클라우드 Routines 의존) | 🟡 부분 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
 | GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 | 🔲 후보 |
@@ -317,20 +331,19 @@ grm-api-intake/
 
 ### 6.3 정기 운영 (사람 개입 지점)
 - **매주 월요일:** Admin 콘솔에서 웹 브리프 미리보기 확인 후 **승인 버튼 1클릭**(트랙 A). Findings 번역(트랙 B)은 예약 세션이 자동 처리 — 데스크톱 앱이 열려 있어야 정시 실행(꺼져 있으면 다음 실행 시 처리).
+- **매일 07:17 UTC:** 외부 백필(F2) cron이 `--auto` 로 483→WL 순 1청크씩 자동 소진(사람 개입 없음, 완료 시 자가 종료 후 신규 문서 안전망으로 전환).
 - **가끔:** health 경고 Issue 확인, Secrets 로테이션.
 
 ### 6.4 FIND-1 전략 로드맵 대비 현황 (공모전 목표)
 
-FIND-1의 원래 목표는 검색 DB 하나가 아니라 **"규제 지적사항 트렌드 인텔리전스 + Copilot 에이전트"** 로, AI 공모전(2026-07-07 기준 D-5개월+) 출품과 이후 상용화를 겨냥한 5개월 전략 계획(`docs/GRM_Findings인텔리전스_전략로드맵_2026-07-07.md`, 확정 결정 사항·평가기준 매핑 포함)이 별도로 존재한다. §4.4의 M1~M14는 이 전략 로드맵의 **1단계(M1: 스키마+내부 백필)** 에 해당하며, 나머지 대부분은 **아직 착수 전**이다.
-
-**2026-07-09 단계 재설정:** 구현 M-번호와의 충돌을 피해 잔여 전략 단계를 **F2~F5**로 개칭하고, 현 상태에 맞춰 일정·완료 기준을 재정의했다(상세 = 로드맵 문서 부록). 원계획 M1을 조기 초과 달성해 약 3주 버퍼가 있다.
+FIND-1의 원래 목표는 검색 DB 하나가 아니라 **"규제 지적사항 트렌드 인텔리전스 + Copilot 에이전트"** 로, AI 공모전(2026-07-07 기준 D-5개월+) 출품과 이후 상용화를 겨냥한 5개월 전략 계획(`docs/GRM_Findings인텔리전스_전략로드맵_2026-07-07.md`, 확정 결정 사항·평가기준 매핑 포함)이 별도로 존재한다. §4.4의 M1~M14는 이 전략 로드맵의 **1단계(M1: 스키마+내부 백필)** 에 해당한다. 2026-07-09 구현 M-번호와의 충돌을 피해 잔여 전략 단계를 **F2~F5**로 개칭했고, **2026-07-10 기준 F2(볼륨)가 가동 중, F3(인텔리전스)의 핵심(트렌드 대시보드)이 라이브, F4(에이전트)는 연동 자산이 완료**됐다 — 원계획 대비 앞서 있다.
 
 | 단계 | 목표 | 시기 | 현황 |
 |---|---|---|---|
 | (원 M1) 스키마+내부 백필 | grm-finding/v1 동결, 이중 적재, 검색·번역 자동화 | 7월 | ✅ 완료(§4.4 구현 M1~M14) |
-| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치·MFDS 과거 PDF → findings ≥2,000건·3년+ 커버리지. **공개·번역 정책 게이트**(집계=전량/row 노출=최근 12개월 우선 번역) 포함 | 7월 중순~8월 말 | 🔲 다음 착수 |
-| **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 파셋·분포(M7)만 선행됨 |
-| **F4** 에이전트·검증 | Copilot Studio 커넥터+Q&A + 생산·품질·RA 3부서 파일럿(효과 정량화 4종) | 9월 중순~10월 말 | 🔲 선결=사내 M365 권한 확인(F0-1, 사람) |
+| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지. **공개·번역 정책 게이트**(집계=전량/row 노출=주당 최대 40건·최신 우선 번역) 포함 | 7월 중순~8월 말 | ✅ 가동(`collect_fda_backfill.py`+매일 07:17 UTC cron, findings 2,775건+·업체 428곳, 매일 증가. MFDS는 robots 정책상 제외) |
+| **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 핵심 라이브(`/findings/trends/` 스탯·카테고리·히트맵·연도추이·업체 Top30 라이브; 실사관 프로파일=FIND-483-SIGNER 미구현으로 보류) |
+| **F4** 에이전트·검증 | Copilot Studio 커넥터+Q&A + 생산·품질·RA 3부서 파일럿(효과 정량화 4종) | 9월 중순~10월 말 | 🟡 자산 완료·파일럿 대기(F4a: `docs/copilot/` Swagger 커넥터 스펙+셋업 가이드+Q&A 시나리오 12건 완료; Studio 등록·부서 파일럿=사람 수행 대기) |
 | **F5** 패키징 | 효과 정리·데모·발표자료 | 11월~공모전 | 🔲 D-day 확정 필요 |
 
 > 이 문서는 그동안 git에 커밋되지 않고 로컬 파일로만 존재해 유실 위험이 있었다(2026-07-09 `docs/`로 이관). 단계 진행 시 이 표와 로드맵 문서 부록을 함께 갱신한다.

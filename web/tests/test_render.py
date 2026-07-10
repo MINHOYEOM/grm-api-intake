@@ -51,6 +51,7 @@ __all__ = [
     "WebAdminRenderTest",
     "WebSearchIndexTest",
     "WebFindingsRenderTest",
+    "WebTrendsRenderTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
     "WebDeterministicDetailTest",
@@ -80,6 +81,7 @@ SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
+    ("findings/trends/index.html", "trends.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
@@ -716,7 +718,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 3, "nav 탭은 소개·모아보기·찾아보기 3개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 4, "nav 탭은 소개·모아보기·찾아보기·트렌드 4개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
@@ -1290,6 +1292,176 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIsNotNone(fm, ".fnd-filters CSS 규칙 미발견")
         self.assertIn("align-items:flex-start", fm.group(1))
         self.assertNotIn("align-items:end", fm.group(1))
+
+
+# ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
+class WebTrendsRenderTest(unittest.TestCase):
+    """findings/trends/index.html 은 findings/index.html 과 동형인 정적 셸이다(런타임에
+    trends.js 가 Supabase RPC findings_stats/findings_firm_stats 를 직접 fetch). 여기선
+    셸 자체의 결정론·env-gate·배선만 검증한다 — 실제 집계 렌더는 trends.js 소관(비골든,
+    JS 단위테스트 범위 밖)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_trends_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.findings_html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_generated(self):
+        self.assertIn("규제 지적사항 트렌드", self.html)
+        self.assertIn("Findings Intelligence", self.html)
+
+    def test_cfg_div_env_gated_empty_by_default_with_root(self):
+        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
+        # (findings.js 계약과 동일). data-root 는 rel_root 값("../../")을 그대로 담는다
+        # (카테고리 순위 바 → findings 검색 페이지 링크 계산용).
+        self.assertIn(
+            'id="grm-findings-cfg" data-url="" data-key="" data-root="../../" hidden',
+            self.html,
+        )
+
+    def test_trends_js_referenced_with_content_hash(self):
+        import re as _re
+        m = _re.search(r'assets/trends\.js\?v=([0-9a-f]{8})"', self.html)
+        self.assertIsNotNone(m, "trends.js 캐시버스팅 해시 미발견")
+
+    def test_trends_js_copied_verbatim(self):
+        built = (self.single / "assets" / "trends.js").read_bytes()
+        src = (WEB_DIR / "assets" / "trends.js").read_bytes()
+        self.assertEqual(built, src, "trends.js 가 dist 에 verbatim 복사되지 않음")
+
+    def test_sitemap_includes_trends(self):
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/trends/</loc>", self.sitemap)
+
+    def test_nav_link_present_and_active_state(self):
+        self.assertIn('href="../../findings/trends/index.html" class="on">트렌드</a>', self.html)
+        self.assertIn('href="findings/trends/index.html">트렌드</a>', self.landing)
+        self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.archive)
+        self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.findings_html)
+        # 트렌드 페이지 자체에서만 '찾아보기'는 on 이 아니고, '트렌드'만 on.
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertNotIn('class="on">찾아보기', nav_m.group(1))
+        self.assertEqual(nav_m.group(1).count("<a "), 4)
+
+    def test_footer_link_present(self):
+        self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
+
+    def test_findings_page_links_to_trends(self):
+        # findings/index.html 헤더 근처에 트렌드 대시보드로 가는 절제된 텍스트 링크 1개.
+        self.assertIn('href="../findings/trends/index.html">전체 트렌드 보기', self.findings_html)
+
+    def test_canonical_and_description(self):
+        self.assertIn(
+            f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/trends/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_category_labels_sync_with_taxonomy(self):
+        """trends.js 의 CATEGORY_LABELS 는 findings.js 와 동일한 복제본 하드코딩이라
+        grm_findings.FINDING_TAXONOMY 20개 code/label_ko/label_en 과 완전히 일치해야
+        한다(findings.js 의 동명 테스트와 동일한 대조 — 이중 하드코딩 드리프트 방지)."""
+        import re as _re
+
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
+        self.assertIsNotNone(m, "trends.js 에 CATEGORY_LABELS 정의 미발견")
+        body = m.group(1)
+
+        entry_pat = _re.compile(
+            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
+        )
+        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
+
+        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
+        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
+        self.assertEqual(found, expected, "trends.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
+
+    def test_rpc_endpoints_present(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('"/rest/v1/rpc/" + name', js_src)
+        self.assertIn('rpcEndpoint("findings_stats")', js_src)
+        self.assertIn('rpcEndpoint("findings_firm_stats")', js_src)
+        self.assertIn('method: "POST"', js_src)
+        self.assertIn('apikey: key, Authorization: "Bearer " + key', js_src)
+        self.assertIn('JSON.stringify({ p_firm: firmName })', js_src)
+
+    def test_category_bar_links_to_findings_cat_param(self):
+        """카테고리 순위 바 클릭 → /findings/?cat={code}(findings.js 의 URL_KEYS.
+        category_code="cat" 계약과 일치해야 실제로 필터가 걸린다)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('findingsHref("cat", entry.code)', js_src)
+        self.assertIn(
+            'return root + "findings/index.html?" + paramKey + "=" + encodeURIComponent(value);',
+            js_src,
+        )
+
+    def test_url_sync_uses_replacestate_only_no_pushstate(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('history.replaceState(null, "", newUrl)', js_src)
+        self.assertNotIn("pushState(", js_src)
+        self.assertIn("function syncFirmUrl(name)", js_src)
+        self.assertIn("function maybeOpenFirmFromUrl()", js_src)
+        self.assertIn('params.get("firm")', js_src)
+
+    def test_accessibility_markers_present(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('setAttribute("role", "button")', js_src)
+        self.assertIn("tabIndex = 0", js_src)
+        self.assertIn('setAttribute("aria-label"', js_src)
+        self.assertIn('ev.key === "Enter"', js_src)
+        self.assertIn('ev.key === " "', js_src)
+
+    def test_no_innerhtml_data_injection(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_no_new_external_resources(self):
+        """차트 라이브러리/CDN/canvas 0 — 순수 div/svg-less 바 렌더만 사용."""
+        html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        for forbidden in ("cdn.", "chart.js", "Chart.js", "d3.", "echarts",
+                           '<script src="http', "<canvas"):
+            self.assertNotIn(forbidden, html_src, forbidden)
+            self.assertNotIn(forbidden, js_src, forbidden)
+        self.assertEqual(html_src.count("<script"), 1)
+
+    def test_headline_generation_rules_present(self):
+        """한눈 요약 생성 규칙 — 문장1=최다 카테고리(항상), 문장2=YoY 증감(24개월 커버리지
+        + 두 구간 모두 0건 아닐 때만) 아니면 최다 업체 문장으로 대체(억지 통계 금지)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function buildHeadline(data)", js_src)
+        self.assertIn("function computeYoy(byMonth)", js_src)
+        self.assertIn("if (months[0] > prevStart) return null;", js_src)
+        self.assertIn("if (prevSum <= 0 || recentSum <= 0) return null;", js_src)
+        self.assertIn("가장 많이 지적된 영역은", js_src)
+        self.assertIn("지적 건수가 가장 많은 업체는", js_src)
+
+    def test_year_trend_caveat_note_present(self):
+        self.assertIn("백필이 진행 중입니다", self.html)
+        self.assertIn("하한치", self.html)
+
+    def test_stat_strip_note_present(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("나머지는 집계에만 반영(원문 영문)", js_src)
+
+    def test_page_shell_hidden_pending_load(self):
+        """골든 결정론 — #tr-content/#tr-error 는 정적 셸에서 hidden, 로딩 스켈레톤만
+        기본 노출(findings.js 의 #fnd-loading 관례와 동형)."""
+        self.assertIn('<div id="tr-content" hidden>', self.html)
+        self.assertIn('<div class="tr-state tr-state-error" id="tr-error" hidden>', self.html)
+        self.assertIn('<div class="tr-state" id="tr-loading" role="status" aria-live="polite">', self.html)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

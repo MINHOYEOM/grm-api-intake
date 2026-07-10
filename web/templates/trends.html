@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block content %}
+{#- FIND-1 F3b — 규제 지적사항 트렌드 대시보드(라이브 집계, Supabase RPC
+    findings_stats/findings_firm_stats 직접 fetch). findings/index.html 과 동일한 이유로
+    빌드시 수치를 고정할 수 없다 → 서버는 셸(로딩 스켈레톤)만 렌더하고, trends.js 가 fetch
+    성공 시 결과를 채운다. env(SUPABASE_URL/ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열
+    → JS 가 "준비 중" 안내로 조용히 종료(오류 아님, 골든 결정론 — env 값과 무관하게 이
+    템플릿 출력 byte 는 항상 동일). 집계 RPC 는 공개 게이트(006)를 우회해 전량 통계를
+    반환하지만 원문 텍스트는 어떤 경로로도 내려주지 않는다(007_findings_stats_rpc.sql
+    안전 계약 — 이 페이지가 다루는 값은 카운트·서지 메타뿐). -#}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 GMP 실태조사 지적사항을 매일 자동으로 축적한 전량 집계입니다(수집 범위 2016년~현재).</p>
+  </div>
+  <div class="wrap">
+    {#- data-root 는 카테고리 순위 바 클릭 시 이동할 검색 페이지(findings/index.html) 상대
+        경로 계산용(reactions.js 의 data-root 관례와 동형) — findings.js 의 cfg 계약(url/key)
+        은 그대로 유지하고 속성만 추가한다. -#}
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
+
+    <div class="tr-state" id="tr-loading" role="status" aria-live="polite">
+      <div class="tr-skel-row w1"></div>
+      <div class="tr-skel-row w2"></div>
+      <div class="tr-skel-row w3"></div>
+    </div>
+    <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
+
+    <div id="tr-content" hidden>
+      <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
+      <p class="tr-headline" id="tr-headline"></p>
+
+      <section class="tr-block" aria-label="카테고리 순위">
+        <h2 class="tr-h">카테고리 순위</h2>
+        <div id="tr-cat" class="tr-cat"></div>
+      </section>
+
+      <section class="tr-block" aria-label="연도별 추이">
+        <h2 class="tr-h">연도별 추이</h2>
+        <div id="tr-year" class="tr-year"></div>
+        <p class="tr-note">2021년 이전, 특히 Warning Letter 는 백필이 진행 중입니다 — 과거 연도 수치는 실제보다 적을 수 있는 하한치입니다.</p>
+      </section>
+
+      <section class="tr-block" aria-label="업체 랭킹">
+        <h2 class="tr-h">업체 랭킹 Top 30</h2>
+        <div id="tr-firms" class="tr-firms"></div>
+        <div id="tr-firm-detail" class="tr-firm-detail" hidden></div>
+      </section>
+
+      <div class="tr-bottom">
+        <section class="tr-block" aria-label="증거 등급 구성">
+          <h2 class="tr-h">증거 등급 구성</h2>
+          <div id="tr-evidence" class="tr-evidence"></div>
+        </section>
+        <section class="tr-block" aria-label="소스 구성">
+          <h2 class="tr-h">소스 구성</h2>
+          <div id="tr-source" class="tr-source"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+<style>
+/* [F3b] 한국어 어절 줄바꿈(§1 P0, findings.html 과 동일 스코프). */
+main{word-break:keep-all;overflow-wrap:anywhere}
+
+/* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
+.tr-state{padding:14px 0}
+.tr-state-error{padding:60px 20px;text-align:center;color:var(--coral-2);font-size:14px}
+.tr-skel-row{height:16px;border-radius:6px;background:var(--strong);margin-bottom:12px;animation:trPulse 1.7s ease-in-out infinite}
+.tr-skel-row.w1{width:60%}
+.tr-skel-row.w2{width:88%}
+.tr-skel-row.w3{width:72%}
+@keyframes trPulse{0%,100%{opacity:.55}50%{opacity:.92}}
+@media(prefers-reduced-motion:reduce){.tr-skel-row{animation:none;opacity:.7}}
+
+/* 스탯 스트립 — 큰 세리프 숫자 + 산세리프 muted 라벨. */
+.tr-stats{display:flex;flex-wrap:wrap;gap:44px;margin:6px 0 30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.tr-stat{display:flex;flex-direction:column;gap:4px;position:relative}
+.tr-stat-num{display:block;font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);line-height:1.05;font-variant-numeric:lining-nums}
+.tr-stat-lbl{display:block;font-size:12.5px;color:var(--muted)}
+.tr-stat-note{display:block;font-size:11px;color:var(--muted-2);margin-top:3px;max-width:22ch;line-height:1.4}
+
+/* 한눈 요약 헤드라인 — 세리프 풀쿼트 톤. */
+.tr-headline{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--body-s);margin:0 0 44px;max-width:74ch}
+.tr-headline:empty{display:none}
+
+.tr-block{margin:0 0 46px}
+.tr-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 18px}
+.tr-empty{font-size:12.5px;color:var(--muted);margin:0}
+.tr-note{font-size:12px;color:var(--muted);margin-top:14px;max-width:70ch;line-height:1.55}
+
+/* 카테고리 순위 — 상위 10, coral 단색 순위별 농도(opacity, JS 계산). */
+.tr-cat{display:flex;flex-direction:column;gap:2px}
+.tr-cat-row{display:flex;align-items:center;gap:14px;padding:9px 6px;border-radius:8px;text-decoration:none}
+.tr-cat-row:hover,.tr-cat-row:focus-visible{background:var(--strong);outline:none}
+.tr-cat-row:hover .tr-cat-label,.tr-cat-row:focus-visible .tr-cat-label{color:var(--coral-2)}
+.tr-cat-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.tr-cat-label{flex:0 0 200px;max-width:200px;font-size:14px;color:var(--body-s);line-height:1.35}
+.tr-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+/* 연도별 추이 — 세로 미니 바(트랙+coral 채움). */
+.tr-year-bars{display:flex;align-items:flex-end;gap:8px}
+.tr-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tr-year-barwrap{height:120px;width:100%;max-width:36px;display:flex;align-items:flex-end;border-radius:6px 6px 0 0;background:var(--coral-tint);overflow:hidden}
+.tr-year-bar{width:100%;background:var(--coral)}
+.tr-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.tr-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s)}
+
+/* 업체 랭킹 Top 30 — 2열 반응형. */
+.tr-firms{display:grid;grid-template-columns:1fr 1fr;gap:2px 30px}
+.tr-firm-row{display:flex;align-items:center;gap:12px;padding:9px 6px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tr-firm-row:hover,.tr-firm-row:focus-visible{background:var(--strong);outline:none}
+.tr-firm-row.on{background:var(--coral-tint)}
+.tr-firm-rank{flex:0 0 24px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.tr-firm-name{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-firm-bar{flex:0 0 64px;height:6px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-firm-bar-fill{height:100%;background:var(--coral)}
+.tr-firm-count{flex:0 0 42px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+@media(max-width:860px){.tr-firms{grid-template-columns:1fr}}
+
+/* 업체 상세 패널 — 랭킹 아래 삽입, 닫기 가능. */
+.tr-firm-detail{margin-top:22px;padding:24px 26px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas)}
+.tr-firm-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.tr-firm-detail-name{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0 0 4px}
+.tr-firm-detail-meta{font-size:12.5px;color:var(--muted)}
+.tr-firm-detail-close{font:inherit;font-size:20px;line-height:1;color:var(--muted);background:transparent;border:0;cursor:pointer;padding:2px 6px}
+.tr-firm-detail-close:hover{color:var(--coral)}
+.tr-firm-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:20px}
+@media(max-width:640px){.tr-firm-detail-grid{grid-template-columns:1fr}}
+.tr-fd-h{font-size:11px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.tr-fd-row{display:flex;align-items:center;gap:10px;padding:5px 0}
+.tr-fd-label{flex:0 0 130px;max-width:130px;font-size:12.5px;color:var(--body-s)}
+.tr-fd-track{flex:1 1 auto;height:7px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-fd-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-fd-count{flex:0 0 auto;min-width:34px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.tr-fd-year-bars{display:flex;align-items:flex-end;gap:6px}
+.tr-fd-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tr-fd-year-barwrap{height:64px;width:100%;max-width:20px;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
+.tr-fd-year-bar{width:100%;background:var(--coral)}
+.tr-fd-year-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.tr-fd-src-list{font-size:12.5px;color:var(--body-s);line-height:1.6;margin:0}
+
+/* 하단 — 증거등급 구성(coral 단색 농도 스택) + 소스 구성. */
+.tr-bottom{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media(max-width:860px){.tr-bottom{grid-template-columns:1fr}}
+.tr-evidence-bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--strong)}
+.tr-evidence-seg{height:100%;background:var(--coral)}
+.tr-evidence-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+.tr-evidence-item{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--body-s)}
+.tr-evidence-swatch{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--coral)}
+.tr-src-row{display:flex;align-items:center;gap:12px;padding:6px 0}
+.tr-src-label{flex:0 0 150px;max-width:150px;font-size:13px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-src-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-src-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);opacity:.75;transform-origin:left}
+.tr-src-count{flex:0 0 auto;min-width:44px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+@media(max-width:640px){
+  .tr-cat-label{flex-basis:120px;max-width:120px}
+  .tr-stats{gap:28px}
+  .tr-stat-num{font-size:26px}
+}
+</style>
+{% endblock %}
+{% block scripts %}<script src="{{ rel_root }}assets/trends.js?v={{ trendsjs_ver }}" defer></script>{% endblock %}

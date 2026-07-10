@@ -35,7 +35,7 @@
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html" class="on">찾아보기</a></nav>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html" class="on">찾아보기</a><a href="../findings/trends/index.html">트렌드</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
@@ -46,6 +46,7 @@
     <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
     <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 GMP 지적사항을 원문에서 추출해 검색합니다.</p>
+    <a class="fnd-trends-link reveal" style="animation-delay:.18s" href="../findings/trends/index.html">전체 트렌드 보기 →</a>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="" data-key="" hidden></div><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
@@ -96,6 +97,9 @@
 <style>
 /* M14 — 한국어 어절 줄바꿈(§1 P0). 이 페이지 범위(main)에만 적용 — grm.css 는 불가침. */
 main{word-break:keep-all;overflow-wrap:anywhere}
+/* [F3b] 트렌드 대시보드로 가는 절제된 텍스트 링크(page-head 하단, 새 버튼/박스 0). */
+.fnd-trends-link{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.fnd-trends-link:hover{color:var(--coral)}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */
@@ -254,7 +258,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a></div>
+    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
   </div>

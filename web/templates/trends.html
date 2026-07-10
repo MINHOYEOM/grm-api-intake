@@ -36,6 +36,16 @@
         <div id="tr-cat" class="tr-cat"></div>
       </section>
 
+      {#- FIND-1 H1 — findings_category_matrix() RPC(008, findings_stats 와 별개
+          엔드포인트) 전용 섹션. 정적 셸에서는 hidden — 008 미적용 라이브·fetch 실패
+          시 trends.js 가 이 블록만 조용히 숨긴 채로 두고 나머지 섹션엔 손대지 않는다
+          (골든 결정론 — env/RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는 항상
+          동일). -#}
+      <section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="카테고리 × 연도 히트맵" hidden>
+        <h2 class="tr-h">카테고리 × 연도 히트맵</h2>
+        <div id="tr-heatmap" class="tr-heatmap"></div>
+      </section>
+
       <section class="tr-block" aria-label="연도별 추이">
         <h2 class="tr-h">연도별 추이</h2>
         <div id="tr-year" class="tr-year"></div>
@@ -101,6 +111,20 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
 .tr-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
 .tr-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+/* 카테고리 × 연도 히트맵(H1) — coral 농도 테이블, 가로 스크롤(모바일 대응), 첫 열
+   고정폭 좌측정렬(카테고리 라벨은 sticky 로 스크롤 시에도 식별 가능하게 유지). */
+.tr-heatmap-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--rad-s)}
+.tr-heatmap-table{border-collapse:collapse;width:100%;min-width:560px}
+.tr-heatmap-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tr-heatmap-corner,.tr-heatmap-rowhead{position:sticky;left:0;background:var(--canvas);z-index:1}
+.tr-heatmap-corner{width:168px;min-width:168px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--line-2)}
+.tr-heatmap-yearhead{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--muted);text-align:center;padding:10px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.tr-heatmap-rowhead{width:168px;min-width:168px;max-width:168px;text-align:left;font-size:13px;color:var(--body-s);font-weight:400;padding:8px 14px;border-right:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-heatmap-cell{min-width:44px;height:34px;text-align:center;font-family:var(--mono);font-size:11.5px;border:1px solid var(--canvas)}
+.tr-heatmap-cell-empty{background:var(--line)}
+.tr-heatmap tbody tr:nth-child(odd) .tr-heatmap-rowhead{background:var(--canvas)}
+.tr-heatmap tbody tr:nth-child(even) .tr-heatmap-rowhead{background:var(--soft)}
 
 /* 연도별 추이 — 세로 미니 바(트랙+coral 채움). */
 .tr-year-bars{display:flex;align-items:flex-end;gap:8px}

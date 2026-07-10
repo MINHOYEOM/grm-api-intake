@@ -31,13 +31,16 @@
   var statsEl = document.getElementById("tr-stats");
   var headlineEl = document.getElementById("tr-headline");
   var catEl = document.getElementById("tr-cat");
+  var heatmapBlockEl = document.getElementById("tr-heatmap-block");
+  var heatmapEl = document.getElementById("tr-heatmap");
   var yearEl = document.getElementById("tr-year");
   var firmsEl = document.getElementById("tr-firms");
   var firmDetailEl = document.getElementById("tr-firm-detail");
   var evidenceEl = document.getElementById("tr-evidence");
   var sourceEl = document.getElementById("tr-source");
   if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl || !headlineEl ||
-      !catEl || !yearEl || !firmsEl || !firmDetailEl || !evidenceEl || !sourceEl) return;
+      !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
+      !evidenceEl || !sourceEl) return;
 
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
@@ -239,6 +242,105 @@
     }
     var maxCnt = cats[0].cnt || 1;
     cats.forEach(function (c, i) { catEl.appendChild(buildCatRow(c, i, maxCnt)); });
+  }
+
+  // ── 카테고리 × 연도 히트맵(H1) ───────────────────────────────────────────
+  // findings_stats()(007)엔 카테고리×시간 매트릭스가 없어 findings_category_matrix()
+  // (008)를 별도 RPC 로 병렬 fetch 한다 — 실패해도(008 미적용 라이브 포함) 이 섹션만
+  // 조용히 숨겨진 채로 남고 다른 섹션엔 전혀 영향이 없다(§ 오케스트레이션 하단 참조).
+  // 셀 농도는 opacity 5단계 정적 버킷(0.08/0.25/0.45/0.7/1.0, 행렬 전체 최댓값 대비 비율
+  // 기준) — 0건 셀은 --line 톤의 빈 셀로 렌더한다.
+  var HEATMAP_OPACITY_STEPS = [0.08, 0.25, 0.45, 0.7, 1.0];
+
+  function heatmapOpacity(cnt, maxCnt) {
+    if (!cnt || maxCnt <= 0) return 0;
+    var ratio = cnt / maxCnt;
+    if (ratio > 0.8) return HEATMAP_OPACITY_STEPS[4];
+    if (ratio > 0.6) return HEATMAP_OPACITY_STEPS[3];
+    if (ratio > 0.35) return HEATMAP_OPACITY_STEPS[2];
+    if (ratio > 0.15) return HEATMAP_OPACITY_STEPS[1];
+    return HEATMAP_OPACITY_STEPS[0];
+  }
+
+  function renderHeatmap(data) {
+    heatmapEl.innerHTML = "";
+    var years = data.years || [];
+    var cats = (data.category_totals || []).slice(0, 12);
+    if (!cats.length || !years.length) {
+      heatmapEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      heatmapBlockEl.hidden = false;
+      return;
+    }
+    var cellMap = {};
+    (data.cells || []).forEach(function (c) {
+      cellMap[c.category_code + "|" + c.year] = c.cnt || 0;
+    });
+    var maxCnt = 0;
+    cats.forEach(function (c) {
+      years.forEach(function (y) {
+        var v = cellMap[c.category_code + "|" + y] || 0;
+        if (v > maxCnt) maxCnt = v;
+      });
+    });
+
+    var scroll = document.createElement("div");
+    scroll.className = "tr-heatmap-scroll";
+    var table = document.createElement("table");
+    table.className = "tr-heatmap-table";
+
+    var caption = document.createElement("caption");
+    caption.className = "tr-heatmap-caption";
+    caption.textContent = "카테고리별 연도별 지적 건수 히트맵(코럴 농도가 건수를 나타냅니다)";
+    table.appendChild(caption);
+
+    var thead = document.createElement("thead");
+    var headRow = document.createElement("tr");
+    var cornerTh = document.createElement("th");
+    cornerTh.setAttribute("scope", "col");
+    cornerTh.className = "tr-heatmap-corner";
+    cornerTh.textContent = "카테고리";
+    headRow.appendChild(cornerTh);
+    years.forEach(function (y) {
+      var th = document.createElement("th");
+      th.setAttribute("scope", "col");
+      th.className = "tr-heatmap-yearhead";
+      th.textContent = y;
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    cats.forEach(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      var ko = label ? label.ko : c.category_code;
+      var row = document.createElement("tr");
+      var rowTh = document.createElement("th");
+      rowTh.setAttribute("scope", "row");
+      rowTh.className = "tr-heatmap-rowhead";
+      rowTh.textContent = ko;
+      row.appendChild(rowTh);
+      years.forEach(function (y) {
+        var cnt = cellMap[c.category_code + "|" + y] || 0;
+        var td = document.createElement("td");
+        td.className = "tr-heatmap-cell";
+        td.title = ko + " · " + y + " · " + fmtNum(cnt) + "건";
+        if (cnt > 0) {
+          var opacity = heatmapOpacity(cnt, maxCnt);
+          td.style.backgroundColor = "rgba(194,96,63," + opacity + ")";
+          td.style.color = opacity > 0.45 ? "var(--on-coral)" : "var(--ink)";
+          td.textContent = fmtNum(cnt);
+        } else {
+          td.classList.add("tr-heatmap-cell-empty");
+        }
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    scroll.appendChild(table);
+    heatmapEl.appendChild(scroll);
+    heatmapBlockEl.hidden = false;
   }
 
   // ── 연도별 추이 ──────────────────────────────────────────────────────────
@@ -550,6 +652,19 @@
     });
   }
 
+  // 008_findings_category_matrix.sql — findings_stats() 와 별개 RPC(H1). 008 미적용
+  // 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다(아래 오케스트레이션).
+  function fetchCategoryMatrix() {
+    return fetch(rpcEndpoint("findings_category_matrix"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_category_matrix " + r.status);
+      return r.json();
+    });
+  }
+
   function fetchFirmStats(firmName) {
     return fetch(rpcEndpoint("findings_firm_stats"), {
       method: "POST",
@@ -577,4 +692,11 @@
       loadingEl.hidden = true;
       errorEl.hidden = false;
     });
+
+  // H1 히트맵 — findings_stats 와 독립적으로 병렬 fetch(위 fetchStats() 와 별개 promise
+  // 체인). 실패해도(008 미적용 라이브 포함) tr-heatmap-block 은 정적 셸의 기본값인
+  // hidden 상태 그대로 남는다 — 다른 섹션엔 전혀 영향이 없다.
+  fetchCategoryMatrix()
+    .then(function (data) { renderHeatmap(data); })
+    .catch(function () { /* 조용히 숨김 유지 */ });
 })();

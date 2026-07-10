@@ -1463,6 +1463,60 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('<div class="tr-state tr-state-error" id="tr-error" hidden>', self.html)
         self.assertIn('<div class="tr-state" id="tr-loading" role="status" aria-live="polite">', self.html)
 
+    # ── H1 카테고리×연도 히트맵 ─────────────────────────────────────────────
+    def test_heatmap_section_shell_present_and_hidden(self):
+        """정적 셸에 히트맵 섹션이 '카테고리 순위'와 '연도별 추이' 사이에 존재하며
+        기본 hidden(008 미적용 라이브·fetch 실패 시 trends.js 가 그대로 두는 상태와
+        일치 — 골든 결정론)."""
+        self.assertIn(
+            '<section class="tr-block tr-heatmap-block" id="tr-heatmap-block" '
+            'aria-label="카테고리 × 연도 히트맵" hidden>',
+            self.html,
+        )
+        self.assertIn('<h2 class="tr-h">카테고리 × 연도 히트맵</h2>', self.html)
+        self.assertIn('<div id="tr-heatmap" class="tr-heatmap"></div>', self.html)
+        cat_idx = self.html.index('aria-label="카테고리 순위"')
+        heatmap_idx = self.html.index('id="tr-heatmap-block"')
+        year_idx = self.html.index('aria-label="연도별 추이"')
+        self.assertTrue(cat_idx < heatmap_idx < year_idx,
+                         "히트맵 섹션이 카테고리 순위와 연도별 추이 사이에 있지 않음")
+
+    def test_heatmap_rpc_endpoint_present(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('rpcEndpoint("findings_category_matrix")', js_src)
+        self.assertIn("function fetchCategoryMatrix()", js_src)
+
+    def test_heatmap_independent_fetch_and_silent_fallback(self):
+        """findings_stats 와 별개 promise 체인으로 병렬 fetch 되고, 실패해도(008 미적용
+        라이브의 404 포함) 다른 섹션을 건드리지 않고 조용히 숨김 유지되어야 한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("fetchCategoryMatrix()", js_src)
+        self.assertIn("function renderHeatmap(data)", js_src)
+        # fetchStats() 체인과 독립된 .catch() — errorEl/contentEl 을 건드리지 않는다.
+        heatmap_chain = js_src[js_src.index("fetchCategoryMatrix()\n    .then"):]
+        self.assertNotIn("errorEl.hidden", heatmap_chain[:400])
+        self.assertIn("조용히 숨김 유지", js_src)
+
+    def test_heatmap_table_accessibility_markup(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('document.createElement("table")', js_src)
+        self.assertIn('document.createElement("caption")', js_src)
+        self.assertIn('th.setAttribute("scope", "col")', js_src)
+        self.assertIn('rowTh.setAttribute("scope", "row")', js_src)
+
+    def test_heatmap_five_step_opacity_buckets(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn(
+            "var HEATMAP_OPACITY_STEPS = [0.08, 0.25, 0.45, 0.7, 1.0];", js_src)
+        self.assertIn("function heatmapOpacity(cnt, maxCnt)", js_src)
+        self.assertIn('td.style.color = opacity > 0.45 ? "var(--on-coral)" : "var(--ink)";',
+                       js_src)
+        self.assertIn("tr-heatmap-cell-empty", js_src)
+
+    def test_heatmap_scroll_wrapper_present(self):
+        html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        self.assertIn(".tr-heatmap-scroll{overflow-x:auto", html_src)
+
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:

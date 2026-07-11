@@ -156,12 +156,16 @@ class FindingsExporterTest(unittest.TestCase):
         self.assertEqual(coverage["findings_by_agency"], {"FDA": 2, "MFDS": 3, "WHO": 1})
         self.assertEqual(coverage["findings_by_review_status"], {"accepted": 4, "needs_review": 2})
         self.assertEqual(coverage["findings_by_evidence_level"], {"A": 4, "B": 2})
+        # v3 taxonomy: same 211.100(a)-style "written procedures for production and
+        # process controls" fixture text as test_findings_extractors' WL case now
+        # classifies as process_validation, not documentation_records (see
+        # archive/findings_classification_audit_2026-07-12.md case 3df6f81c).
         self.assertEqual(
             coverage["findings_by_category_code"],
             {
                 "contamination_control": 1,
                 "deviation_capa": 2,
-                "documentation_records": 1,
+                "process_validation": 1,
                 "material_supplier_control": 1,
                 "validation_qualification": 1,
             },

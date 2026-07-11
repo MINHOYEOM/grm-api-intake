@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-a2a6921f8a297b16c0f2f47f",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.",
+    "expected_category": "aseptic_sterility_assurance",
+    "note": "aseptic 바레 키워드 직접 매칭 -- sterile 패턴 변경과 무관하게 안정적으로 유지되는지 확인."
+  },
+  {
+    "finding_id": "finding-45157c290b33a6842d1a5ae0",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "expected_category": "qc_lab_controls",
+    "note": "laboratory 바레 키워드 직접 매칭."
+  },
+  {
+    "finding_id": "finding-41796471c7e9fa5c2225f0e1",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "expected_category": "quality_unit_oversight",
+    "note": "'quality control unit' 정형 문구(0a1df74a 의 OCR 정상 버전) -- OCR 정상일 때 정확히 분류되는지 확인하는 대조군."
+  },
+  {
+    "finding_id": "finding-3872fd021f212ef21cd4ec89",
+    "finding_text": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
+    "expected_category": "deviation_capa",
+    "note": "'investigation' 키워드 -- 신규 batch...records 패턴이 'records of investigations... batch'(역순)에서 오발동하지 않는지 확인."
+  },
+  {
+    "finding_id": "finding-1ed16b2b1f2355f523566bb8",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "expected_category": "labeling_packaging",
+    "note": "labeling 바레 키워드 직접 매칭."
+  },
+  {
+    "finding_id": "finding-11fb92ef9f600b1bfb2d27f6",
+    "finding_text": "The written stability testing program is not followed.",
+    "expected_category": "stability_storage",
+    "note": "stability 바레 키워드 직접 매칭 -- written procedure 제거와 무관."
+  },
+  {
+    "finding_id": "finding-a5288f7d07a955c4566c7d6b",
+    "finding_text": "The Quality Unit has not established adequate procedural controls and oversight to ensure the accuracy of environmental monitoring data.",
+    "expected_category": "environmental_monitoring",
+    "note": "'environmental monitoring' 인접 키워드 -- 'quality unit' 문구가 같은 문장에 있어도 environmental_monitoring 이 taxonomy 순서상 더 앞이라 먼저 매칭되는지 확인."
+  },
+  {
+    "finding_id": "finding-9cfbe0098f665a2832c765c8",
+    "finding_text": "Appropriate procedures are not established and followed for control ofcomputerized systems and electronic records in the QC laboratory.",
+    "expected_category": "data_integrity",
+    "note": "'electronic records' 매칭 -- 'computerized systems' 문구도 있지만 data_integrity 가 computer_system_validation 보다 여전히 앞이라 순서가 안전한지 확인(CSV 재배치가 data_integrity 를 앞지르지 않는지)."
+  },
+  {
+    "finding_id": "finding-1fa0ea98000a30e16863fd7a",
+    "finding_text": "Cleaning procedures are not appropriate or reproducible to prevent contamination that would alter the safety, identity, strength, quality, or purity of the finished drug substances.",
+    "expected_category": "cleaning_validation",
+    "note": "신규 'cleaning procedure' 키워드가 실제 correct 사례에서 여전히 작동하는지 확인."
+  },
+  {
+    "finding_id": "finding-8e64ac7b349e87392bc74f50",
+    "finding_text": "Equipment used in the manufacture, processing, packing, or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "expected_category": "equipment_facility",
+    "note": "'equipment' 바레 키워드 -- facility 패턴의 outsourcing 부정 lookbehind 변경과 무관하게 안정적으로 유지되는지 확인."
+  }
+]

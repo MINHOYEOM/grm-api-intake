@@ -24,8 +24,45 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #   2) three categories had overly broad keywords narrowed to reduce false positives:
 #      documentation_records, deviation_capa, qc_lab_controls (see FINDING_TAXONOMY below).
 #   3) v1-tagged records already on disk remain valid; TAXONOMY_VERSIONS accepts both.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v2"
-TAXONOMY_VERSIONS: tuple[str, ...] = ("grm-finding-taxonomy/v1", "grm-finding-taxonomy/v2")
+#
+# grm-finding-taxonomy/v3 change log (2026-07-12 층화 감사 -- 실질 정확도 71%, wrong 25%,
+# archive/findings_classification_audit_2026-07-12.md 전문 참조):
+#   1) mechanism: FindingCategory gained an optional `patterns` field -- explicit regex
+#      strings (compiled case-insensitively) checked alongside `keywords` for a category.
+#      This lets a category express negative lookbehind / flexible-gap / alternation rules
+#      that the plain word-boundary keyword engine cannot.
+#   2) documentation_records: dropped the catch-all "written procedure" keyword (36% of the
+#      25 wrong cases -- this category's own strict accuracy was 0%). Added a relaxed
+#      `\bbatch\b.{0,40}\brecords?\b` pattern plus "master production and control record" /
+#      "master production record" keywords for the CFR phrasing that "batch record" alone
+#      could not reach.
+#   3) computer_system_validation: replaced the rigid "computer system" keyword with two
+#      patterns (`computer(ized)?s? (or related )?systems?` and `electronic data`) and moved
+#      the category ahead of process_validation/training_personnel in match order.
+#   4) aseptic_sterility_assurance: replaced the bare "sterile"/"sterility" keywords with a
+#      pattern covering sterile/sterility/sterilized/sterilization/sterilizing while
+#      excluding "non-sterile"/"non sterile" (negative lookbehind); added a "pyrogen(ic)"
+#      pattern (21 CFR 211.94).
+#   5) cleaning_validation: dropped the bare "cleaning" keyword (this category's strict
+#      accuracy was 0%, both wrong-sample hits were equipment-design text with an incidental
+#      trailing "cleaning" mention); added "cleaning procedure" keyword plus
+#      residue(s)/carry-over patterns.
+#   6) complaint_recall moved ahead of deviation_capa/contamination_control in match order
+#      so "field alert"/"complaint" text is no longer intercepted by the more general
+#      "investigation"/"contamination" keywords.
+#   7) equipment_facility: added a "building" keyword; replaced the bare "facility" keyword
+#      with a pattern that excludes "outsourcing facility" (a company-type name, not a
+#      finding about physical facilities).
+#   8) process_validation: added a "process parameter" keyword (redacted-text CFR variant).
+#   9) v1/v2-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all
+#      three. Category codes/labels/count (20) are unchanged -- only keyword/pattern/order
+#      tuning within the existing categories.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v3"
+TAXONOMY_VERSIONS: tuple[str, ...] = (
+    "grm-finding-taxonomy/v1",
+    "grm-finding-taxonomy/v2",
+    "grm-finding-taxonomy/v3",
+)
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
     "schema_version",
@@ -75,6 +112,10 @@ class FindingCategory:
     label_ko: str
     label_en: str
     keywords: tuple[str, ...]
+    # v3: optional explicit regex strings (compiled case-insensitively), checked
+    # alongside `keywords`. Lets a category express negative lookbehind / flexible
+    # adjacency / alternation that the plain word-boundary keyword engine cannot.
+    patterns: tuple[str, ...] = ()
 
 
 FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
@@ -90,7 +131,8 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "Documentation and records",
         (
             "batch record",
-            "written procedure",
+            "master production and control record",
+            "master production record",
             "documentation practice",
             "recordkeeping",
             "record retention",
@@ -99,12 +141,17 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
             "문서관리",
             "기록관리",
         ),
+        patterns=(r"\bbatch\b.{0,40}\brecords?\b",),
     ),
     FindingCategory(
         "aseptic_sterility_assurance",
         "무균보증/무균공정",
         "Aseptic processing and sterility assurance",
-        ("aseptic", "sterility", "sterile", "media fill", "무균", "배지충전", "주사제"),
+        ("aseptic", "media fill", "무균", "배지충전", "주사제"),
+        patterns=(
+            r"(?<!non-)(?<!non )\bsteril(?:e|ity|iz(?:ed|ation|ing))s?\b",
+            r"\bpyrogen(?:ic)?s?\b",
+        ),
     ),
     FindingCategory(
         "environmental_monitoring",
@@ -116,7 +163,17 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "cleaning_validation",
         "세척밸리데이션",
         "Cleaning validation",
-        ("cleaning validation", "cleaning", "residue", "세척", "잔류"),
+        ("cleaning validation", "cleaning procedure", "세척", "잔류"),
+        patterns=(r"\bresidues?\b", r"\bcarry-?over\b"),
+    ),
+    # v3: complaint_recall moved ahead of deviation_capa/contamination_control so
+    # "field alert"/"complaint" text is not intercepted by the more general
+    # "investigation"/"contamination" keywords (audit cases 9f360506, dcf1a6bb).
+    FindingCategory(
+        "complaint_recall",
+        "불만/회수",
+        "Complaint and recall handling",
+        ("complaint", "recall", "field alert", "불만", "회수"),
     ),
     FindingCategory(
         "deviation_capa",
@@ -145,17 +202,38 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "Laboratory and QC controls",
         ("laboratory", "quality control", "test method", "시험실", "시험방법", "시험성적", "품질관리"),
     ),
+    # v3: computer_system_validation moved ahead of process_validation/training_personnel
+    # (audit cases e1c91f60, 648323af, 51a31e62, 5c069f7f -- the 211.68(b) CFR citation
+    # was repeatedly intercepted by "process control"/"personnel" before reaching here).
+    FindingCategory(
+        "computer_system_validation",
+        "컴퓨터화시스템",
+        "Computer system validation",
+        ("csv", "access control", "backup", "컴퓨터화", "시스템 접근"),
+        patterns=(
+            r"\bcomputer(?:ized)?s?\s+(?:or\s+related\s+)?systems?\b",
+            r"\belectronic\s+data\b",
+        ),
+    ),
     FindingCategory(
         "process_validation",
         "공정밸리데이션",
         "Process validation",
-        ("process validation", "process control", "continued process", "공정밸리데이션", "공정 관리"),
+        (
+            "process validation",
+            "process control",
+            "continued process",
+            "process parameter",
+            "공정밸리데이션",
+            "공정 관리",
+        ),
     ),
     FindingCategory(
         "equipment_facility",
         "설비/시설",
         "Equipment and facility",
-        ("equipment", "facility", "maintenance", "calibration", "설비", "시설", "교정"),
+        ("equipment", "maintenance", "calibration", "building", "설비", "시설", "교정"),
+        patterns=(r"(?<!outsourcing )facilit(?:y|ies)",),
     ),
     FindingCategory(
         "material_supplier_control",
@@ -176,22 +254,10 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         ("validation", "qualification", "qualified", "밸리데이션", "적격성", "검증"),
     ),
     FindingCategory(
-        "complaint_recall",
-        "불만/회수",
-        "Complaint and recall handling",
-        ("complaint", "recall", "field alert", "불만", "회수"),
-    ),
-    FindingCategory(
         "stability_storage",
         "안정성/보관",
         "Stability and storage",
         ("stability", "storage", "temperature", "humidity", "안정성", "보관", "온도", "습도"),
-    ),
-    FindingCategory(
-        "computer_system_validation",
-        "컴퓨터화시스템",
-        "Computer system validation",
-        ("computer system", "csv", "access control", "backup", "컴퓨터화", "시스템 접근"),
     ),
     FindingCategory(
         "labeling_packaging",
@@ -270,13 +336,31 @@ def _keyword_matches(haystack: str, keyword: str) -> bool:
     return keyword.lower() in haystack
 
 
+_EXPLICIT_PATTERN_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
+def _explicit_pattern(pattern: str) -> "re.Pattern[str]":
+    """Compile (and cache) a v3 category `patterns` regex string, case-insensitive."""
+    compiled = _EXPLICIT_PATTERN_CACHE.get(pattern)
+    if compiled is None:
+        compiled = re.compile(pattern, re.IGNORECASE)
+        _EXPLICIT_PATTERN_CACHE[pattern] = compiled
+    return compiled
+
+
+def _pattern_matches(haystack: str, pattern: str) -> bool:
+    return _explicit_pattern(pattern).search(haystack) is not None
+
+
 def classify_finding_category(text: str) -> str:
-    """Deterministic v2 keyword classifier.
+    """Deterministic v3 keyword+pattern classifier.
 
     The order of FINDING_TAXONOMY is part of the contract.  It gives highly
     specific categories such as aseptic processing a chance to match before more
-    general quality-system buckets.  See the TAXONOMY_VERSION change log above
-    for what changed between v1 and v2.
+    general quality-system buckets.  A category matches if any of its `keywords`
+    (word-boundary regex for ASCII, substring for Hangul) OR any of its explicit
+    `patterns` (raw regex, case-insensitive) matches the haystack.  See the
+    TAXONOMY_VERSION change log above for what changed between v1/v2/v3.
     """
     haystack = _text(text).lower()
     if not haystack:
@@ -285,6 +369,8 @@ def classify_finding_category(text: str) -> str:
         if category.code == "other_quality_system":
             continue
         if any(_keyword_matches(haystack, keyword) for keyword in category.keywords):
+            return category.code
+        if any(_pattern_matches(haystack, pattern) for pattern in category.patterns):
             return category.code
     return "other_quality_system"
 

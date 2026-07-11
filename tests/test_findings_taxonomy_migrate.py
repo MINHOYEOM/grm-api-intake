@@ -225,7 +225,11 @@ class WriteFileTest(unittest.TestCase):
             self.assertEqual(_findings_taxonomy_versions(db_path), [gf.TAXONOMY_VERSIONS[0]])
             self.assertEqual(_counts(db_path), {"raw_signals": 4, "findings": 4})
 
-            # The migrated database now accepts a fresh v2-tagged finding.
+            # The migrated database now accepts a fresh current-taxonomy-tagged finding
+            # (gf.TAXONOMY_VERSION, not necessarily gf.TAXONOMY_VERSIONS[1] -- the migrator
+            # accepts the full IN-list, but a freshly-built finding is only ever tagged the
+            # *current* version, so the DB ends up with {legacy v1} union {current version},
+            # not necessarily every version the CHECK constraint merely allows).
             conn = sqlite3.connect(db_path)
             try:
                 conn.execute("PRAGMA foreign_keys = ON")
@@ -247,7 +251,7 @@ class WriteFileTest(unittest.TestCase):
                 conn.close()
             self.assertEqual(
                 _findings_taxonomy_versions(db_path),
-                sorted(gf.TAXONOMY_VERSIONS),
+                sorted({gf.TAXONOMY_VERSIONS[0], gf.TAXONOMY_VERSION}),
             )
 
     def test_write_file_refuses_when_backup_already_exists(self) -> None:

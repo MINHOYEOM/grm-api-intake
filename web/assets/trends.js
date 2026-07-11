@@ -54,23 +54,27 @@
 
   // grm_findings.FINDING_TAXONOMY verbatim(code -> {ko, en}) — findings.js CATEGORY_LABELS
   // 와 동일 복제본(동기화 테스트로 드리프트 차단, 파일 상단 계약 참조).
+  // v3(2026-07-12): grm_findings.FINDING_TAXONOMY 순서 변경(complaint_recall,
+  // computer_system_validation 이동)에 맞춰 선언 순서도 동기화 -- code/label 값 자체는
+  // 불변(20개), 대조 테스트는 순서 무관 dict 비교이지만 이 파일의 관례상 선언 순서는
+  // taxonomy 계약 순서를 따른다.
   var CATEGORY_LABELS = {
     data_integrity: { ko: "데이터 완전성", en: "Data integrity" },
     documentation_records: { ko: "문서화/기록관리", en: "Documentation and records" },
     aseptic_sterility_assurance: { ko: "무균보증/무균공정", en: "Aseptic processing and sterility assurance" },
     environmental_monitoring: { ko: "환경모니터링", en: "Environmental monitoring" },
     cleaning_validation: { ko: "세척밸리데이션", en: "Cleaning validation" },
+    complaint_recall: { ko: "불만/회수", en: "Complaint and recall handling" },
     deviation_capa: { ko: "일탈/CAPA/조사", en: "Deviation, CAPA, and investigation" },
     quality_unit_oversight: { ko: "품질부서 관리감독", en: "Quality unit oversight" },
     qc_lab_controls: { ko: "시험실/품질관리", en: "Laboratory and QC controls" },
+    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
     process_validation: { ko: "공정밸리데이션", en: "Process validation" },
     equipment_facility: { ko: "설비/시설", en: "Equipment and facility" },
     material_supplier_control: { ko: "원자재/공급업체 관리", en: "Material and supplier control" },
     contamination_control: { ko: "오염/교차오염 관리", en: "Contamination control" },
     validation_qualification: { ko: "밸리데이션/적격성평가", en: "Validation and qualification" },
-    complaint_recall: { ko: "불만/회수", en: "Complaint and recall handling" },
     stability_storage: { ko: "안정성/보관", en: "Stability and storage" },
-    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
     labeling_packaging: { ko: "표시/포장", en: "Labeling and packaging" },
     regulatory_reporting: { ko: "규제보고/변경관리", en: "Regulatory reporting and change control" },
     training_personnel: { ko: "교육/작업자", en: "Training and personnel" },

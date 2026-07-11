@@ -1,0 +1,90 @@
+name: GRM Findings Reclassify (taxonomy v3)
+
+# grm-finding-taxonomy/v3 findings 재분류 -- workflow_dispatch 전용, cron 없음.
+# findings_reclassify_service.py 가 PostgREST 로 findings 전량을 페이지네이션 GET 한 뒤
+# 순수 결정론 Python(classify_finding_category, LLM 0)을 각 행의 finding_text 에 재실행해
+# category_code 가 달라지거나 taxonomy_version 이 아직 v3 가 아닌 행만 PATCH 한다.
+# finding_text/finding_text_ko/scope_status 는 절대 건드리지 않는다(스크립트 docstring
+# 계약 참조).
+#
+# ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 -- checkout(read-only) 이후
+# 커밋/푸시/PR 생성 스텝이 없다. dry_run 기본값 true -- 실제 PATCH 는 사람이 dispatch
+# 입력을 false 로 명시할 때만 실행된다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true=변경 예정 건수/카테고리 이동 매트릭스만 출력(PATCH 없음), false=실제 PATCH 적용"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      limit:
+        description: "PATCH 를 적용할 최대 건수(비우면 전체). dry_run=false 일 때만 의미 있음."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-reclassify
+  cancel-in-progress: false
+
+jobs:
+  reclassify:
+    name: Reclassify findings.category_code under taxonomy v3
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 읽기(findings 전량 GET) + PATCH(category_code/category_label_ko/taxonomy_version
+      # 만) -- git add/commit/push 없음. SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4
+      # 야간 적재)·grm-findings-translate-apply.yml(M9b) 이 이미 쓰는 동일 secret 재사용이며,
+      # 이 워크플로를 위한 신규 secret 등록은 필요 없다.
+      - name: Reclassify findings (no git writes — read + category PATCH only)
+        id: reclassify
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--output reclassify_report.json"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ -n "${{ inputs.limit }}" ]; then
+            ARGS="$ARGS --limit ${{ inputs.limit }}"
+          fi
+          python findings_reclassify_service.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Reclassify (taxonomy v3)"
+            echo ""
+            echo "dry_run=${{ inputs.dry_run }} limit=${{ inputs.limit }}"
+            echo ""
+            if [ -f reclassify_report.json ]; then
+              echo '```json'
+              cat reclassify_report.json
+              echo '```'
+            else
+              echo "reclassify_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

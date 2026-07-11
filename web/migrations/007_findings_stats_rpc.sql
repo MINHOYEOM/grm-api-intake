@@ -1,3 +1,6 @@
+-- ※ 2026-07: scope_status='ok' 필터가 010_findings_scope_purity.sql 에서 추가됨(프로덕션
+-- 현행 정의는 010 참조).
+--
 -- FIND-1 F3a 집계 서빙 RPC — 미번역분 포함 전량 집계를 공개 게이트(006, anon/authenticated
 -- SELECT 는 finding_text_ko<>'' or finding_language='KO' 인 행만 허용)를 우회해 제공한다.
 -- 근거(F2e 정책, docs/GRM_Findings인텔리전스_전략로드맵_2026-07-07.md 부록): 백필분은 전량

@@ -47,7 +47,7 @@ create table if not exists public.findings (
   site_country text,
   product_family text,
   modality text,
-  category_code text not null check (category_code in ('data_integrity', 'documentation_records', 'aseptic_sterility_assurance', 'environmental_monitoring', 'cleaning_validation', 'complaint_recall', 'deviation_capa', 'quality_unit_oversight', 'qc_lab_controls', 'computer_system_validation', 'process_validation', 'equipment_facility', 'material_supplier_control', 'contamination_control', 'validation_qualification', 'stability_storage', 'labeling_packaging', 'regulatory_reporting', 'training_personnel', 'other_quality_system')),
+  category_code text not null check (category_code in ('data_integrity', 'computer_system_validation', 'documentation_records', 'aseptic_sterility_assurance', 'environmental_monitoring', 'cleaning_validation', 'complaint_recall', 'deviation_capa', 'quality_unit_oversight', 'qc_lab_controls', 'process_validation', 'equipment_facility', 'material_supplier_control', 'contamination_control', 'validation_qualification', 'stability_storage', 'labeling_packaging', 'regulatory_reporting', 'training_personnel', 'other_quality_system')),
   category_label_ko text not null,
   finding_text text not null,
   finding_language text,

@@ -225,7 +225,14 @@ class TaxonomyV3BoundedTest(unittest.TestCase):
         # complaint_recall now precedes both deviation_capa and contamination_control.
         self.assertLess(codes.index("complaint_recall"), codes.index("deviation_capa"))
         self.assertLess(codes.index("complaint_recall"), codes.index("contamination_control"))
-        # computer_system_validation now precedes both process_validation and training_personnel.
+        # computer_system_validation precedes documentation_records (control-tower ruling
+        # on the 648323af conflict: 21 CFR 211.68(b) is fundamentally a computerized-
+        # systems control clause; the master production and control records it mentions
+        # are the *object* those controls protect, so the computer/electronic-data signal
+        # always outranks the records keyword) -- and hence also precedes
+        # process_validation and training_personnel. Only data_integrity stays ahead.
+        self.assertLess(codes.index("data_integrity"), codes.index("computer_system_validation"))
+        self.assertLess(codes.index("computer_system_validation"), codes.index("documentation_records"))
         self.assertLess(codes.index("computer_system_validation"), codes.index("process_validation"))
         self.assertLess(codes.index("computer_system_validation"), codes.index("training_personnel"))
 
@@ -248,7 +255,7 @@ class AuditWrong25FixtureTest(unittest.TestCase):
 
     def test_fixable_cases_now_return_expected_category(self) -> None:
         fixable = [c for c in self.cases if not c["known_limitation"]]
-        self.assertEqual(len(fixable), 19, "expected fix count changed -- update fixture/PR notes")
+        self.assertEqual(len(fixable), 20, "expected fix count changed -- update fixture/PR notes")
         failures = []
         for case in fixable:
             got = gf.classify_finding_category(case["finding_text"])
@@ -257,18 +264,20 @@ class AuditWrong25FixtureTest(unittest.TestCase):
         self.assertEqual(failures, [], f"regressions among fixable audit cases: {failures}")
 
     def test_known_limitation_cases_are_pinned_not_silently_changing(self) -> None:
-        """These 6 cases cannot reach the audit's expected category under the
-        v3 rule set as specified (OCR corruption, or a discovered conflict
-        between two v3 rules -- see each case's known_limitation_reason).
-        Pin their actual v3 output so a *future* code change that silently
-        shifts them again gets caught."""
+        """These 5 cases cannot reach the audit's expected category under the
+        v3 rule set (OCR corruption, or requiring domain knowledge beyond
+        keyword matching -- see each case's known_limitation_reason). Pin
+        their actual v3 output so a *future* code change that silently shifts
+        them again gets caught. (648323af was originally in this set as a
+        rule1/rule2 conflict; the control-tower ruling moved
+        computer_system_validation ahead of documentation_records, which
+        resolved it into a normal fixable case.)"""
         pinned = {
             "finding-1b836c8a1bf34727d471053a": "equipment_facility",
             "finding-0a1df74ab174e17188c68719": "other_quality_system",
             "finding-596b2bd48f06e734ff289d44": "material_supplier_control",
             "finding-ab4e3d27348680a83ef3685b": "other_quality_system",
             "finding-a2d14f0f95909fc6d168155e": "other_quality_system",
-            "finding-648323af727e3453c9478a98": "documentation_records",
         }
         known_limitation_ids = {c["finding_id"] for c in self.cases if c["known_limitation"]}
         self.assertEqual(known_limitation_ids, set(pinned.keys()))

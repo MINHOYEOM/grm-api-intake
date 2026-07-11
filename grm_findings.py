@@ -38,7 +38,12 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      could not reach.
 #   3) computer_system_validation: replaced the rigid "computer system" keyword with two
 #      patterns (`computer(ized)?s? (or related )?systems?` and `electronic data`) and moved
-#      the category ahead of process_validation/training_personnel in match order.
+#      the category ahead of documentation_records (and hence also ahead of
+#      process_validation/training_personnel) in match order. 컨트롤 타워 판정(648323af
+#      충돌 해소): 21 CFR 211.68(b)는 본질적으로 컴퓨터화시스템 통제 조항이고 "master
+#      production and control records"는 그 통제로 변경이 방지되어야 할 '대상'일 뿐이다 --
+#      컴퓨터/전자데이터 신호가 있는 텍스트에서 기록 키워드는 항상 부차적이므로 CSV 우선.
+#      data_integrity 만 여전히 CSV 보다 앞이다(electronic record 신호 선점).
 #   4) aseptic_sterility_assurance: replaced the bare "sterile"/"sterility" keywords with a
 #      pattern covering sterile/sterility/sterilized/sterilization/sterilizing while
 #      excluding "non-sterile"/"non sterile" (negative lookbehind); added a "pyrogen(ic)"
@@ -125,6 +130,23 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "Data integrity",
         ("data integrity", "audit trail", "electronic record", "데이터 완전성", "감사추적"),
     ),
+    # v3 + 컨트롤 타워 판정(648323af 충돌): computer_system_validation 은
+    # documentation_records 보다 앞이다 -- 21 CFR 211.68(b)류 텍스트에서
+    # "computers or related systems ... master production and control records" 가
+    # 나오면 기록은 통제의 '대상'일 뿐이므로 컴퓨터/전자데이터 신호가 우선한다.
+    # (audit cases e1c91f60, 648323af, 51a31e62, 5c069f7f -- v2 에서는 "process
+    # control"/"personnel"/기록 키워드가 이 CFR 인용을 반복적으로 가로챘다.)
+    # data_integrity 만 여전히 이 카테고리보다 앞이다(electronic record 신호 선점).
+    FindingCategory(
+        "computer_system_validation",
+        "컴퓨터화시스템",
+        "Computer system validation",
+        ("csv", "access control", "backup", "컴퓨터화", "시스템 접근"),
+        patterns=(
+            r"\bcomputer(?:ized)?s?\s+(?:or\s+related\s+)?systems?\b",
+            r"\belectronic\s+data\b",
+        ),
+    ),
     FindingCategory(
         "documentation_records",
         "문서화/기록관리",
@@ -201,19 +223,6 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "시험실/품질관리",
         "Laboratory and QC controls",
         ("laboratory", "quality control", "test method", "시험실", "시험방법", "시험성적", "품질관리"),
-    ),
-    # v3: computer_system_validation moved ahead of process_validation/training_personnel
-    # (audit cases e1c91f60, 648323af, 51a31e62, 5c069f7f -- the 211.68(b) CFR citation
-    # was repeatedly intercepted by "process control"/"personnel" before reaching here).
-    FindingCategory(
-        "computer_system_validation",
-        "컴퓨터화시스템",
-        "Computer system validation",
-        ("csv", "access control", "backup", "컴퓨터화", "시스템 접근"),
-        patterns=(
-            r"\bcomputer(?:ized)?s?\s+(?:or\s+related\s+)?systems?\b",
-            r"\belectronic\s+data\b",
-        ),
     ),
     FindingCategory(
         "process_validation",

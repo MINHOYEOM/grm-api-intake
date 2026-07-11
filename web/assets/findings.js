@@ -48,6 +48,7 @@
   // 이동)에 맞춰 선언 순서도 동기화 -- code/label 값 자체는 불변(20개).
   var CATEGORY_LABELS = {
     data_integrity: { ko: "데이터 완전성", en: "Data integrity" },
+    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
     documentation_records: { ko: "문서화/기록관리", en: "Documentation and records" },
     aseptic_sterility_assurance: { ko: "무균보증/무균공정", en: "Aseptic processing and sterility assurance" },
     environmental_monitoring: { ko: "환경모니터링", en: "Environmental monitoring" },
@@ -56,7 +57,6 @@
     deviation_capa: { ko: "일탈/CAPA/조사", en: "Deviation, CAPA, and investigation" },
     quality_unit_oversight: { ko: "품질부서 관리감독", en: "Quality unit oversight" },
     qc_lab_controls: { ko: "시험실/품질관리", en: "Laboratory and QC controls" },
-    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
     process_validation: { ko: "공정밸리데이션", en: "Process validation" },
     equipment_facility: { ko: "설비/시설", en: "Equipment and facility" },
     material_supplier_control: { ko: "원자재/공급업체 관리", en: "Material and supplier control" },

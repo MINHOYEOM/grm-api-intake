@@ -92,8 +92,8 @@
     "finding_text": "Approp1iate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records ai·e instituted only by authorized personnel.",
     "v2_wrong_category": "training_personnel",
     "expected_v3_category": "computer_system_validation",
-    "known_limitation": true,
-    "known_limitation_reason": "rule1(documentation_records에 'master production and control record' 키워드 추가)과 rule2(computer_system_validation 패턴+순번 이동)이 이 원문 하나에서 충돌한다 -- 원문에 'computers or related systems'와 'master production and control records'가 모두 있고, documentation_records 가 taxonomy 순서상 여전히 computer_system_validation보다 앞이라(순서 변경은 CSV를 process_validation/training_personnel 앞으로만 이동하도록 명시돼 documentation_records 와의 상대 순서는 유지) documentation_records 가 먼저 매칭된다. v2(training_personnel)와는 다른 오답(documentation_records)이지만 여전히 expected(computer_system_validation)는 아니다 -- 7개 규칙 지시사항 내에서는 해소 불가한 발견된 충돌."
+    "known_limitation": false,
+    "known_limitation_reason": ""
   },
   {
     "finding_id": "finding-764def3f1f63ef6d9e964917",

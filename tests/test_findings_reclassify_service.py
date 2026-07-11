@@ -306,6 +306,58 @@ class ServiceKeySecrecyTest(unittest.TestCase):
         self.assertTrue(any("GET findings failed" in e for e in report["errors"]))
 
 
+class StdoutReportTest(unittest.TestCase):
+    """CI step summaries can't be queried via `gh` CLI, so the report JSON
+    must also land in the run's stdout log -- even when --output writes it
+    to a file too. See _write_report's docstring for the contract."""
+
+    def test_report_is_also_printed_to_stdout_when_output_file_given(self) -> None:
+        import contextlib
+        import io
+        import tempfile
+
+        rows = [_row("f-1", "The stability program is deficient.", "stability_storage", gf.TAXONOMY_VERSION)]
+        with tempfile.TemporaryDirectory() as td:
+            out = os.path.join(td, "report.json")
+            buf = io.StringIO()
+            with _mock_get_all(rows):
+                with contextlib.redirect_stdout(buf):
+                    rc = svc.main([
+                        "--dry-run",
+                        "--supabase-url", _BASE_URL,
+                        "--service-role-key", _SERVICE_KEY,
+                        "--output", out,
+                    ])
+            self.assertEqual(rc, 0)
+
+            printed = json.loads(buf.getvalue())
+            self.assertEqual(printed["mode"], "dry_run")
+
+            with open(out, encoding="utf-8") as f:
+                file_report = json.load(f)
+            self.assertEqual(printed, file_report)
+
+    def test_service_key_never_appears_in_stdout_report(self) -> None:
+        import contextlib
+        import io
+
+        rows = [_row("f-1", "The stability program is deficient.", "other_quality_system", "grm-finding-taxonomy/v1")]
+        buf = io.StringIO()
+        with _mock_get_all(rows):
+            with mock.patch(
+                "findings_reclassify_service.requests.patch",
+                return_value=_FakePatchResponse(500),
+            ):
+                with contextlib.redirect_stdout(buf):
+                    rc = svc.main([
+                        "--supabase-url", _BASE_URL,
+                        "--service-role-key", _SERVICE_KEY,
+                    ])
+
+        self.assertEqual(rc, 1)
+        self.assertNotIn(_SERVICE_KEY, buf.getvalue())
+
+
 class CredentialsTest(unittest.TestCase):
     def test_non_https_url_yields_error_in_report_not_exception(self) -> None:
         report = svc.run_reclassify("http://example.supabase.co", _SERVICE_KEY, dry_run=True)

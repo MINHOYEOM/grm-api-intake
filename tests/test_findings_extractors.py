@@ -93,7 +93,12 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(len(findings), 1)
         self.assertValidFindings(findings)
         self.assertEqual(findings[0]["agency"], "FDA")
-        self.assertEqual(findings[0]["category_code"], "documentation_records")
+        # v3 taxonomy: "written procedures for production and process controls" now
+        # classifies as process_validation, not documentation_records -- the audit-
+        # identified "written procedure" catch-all keyword was removed in v3 (see
+        # archive/findings_classification_audit_2026-07-12.md case 3df6f81c, the same
+        # 211.100(a) CFR phrasing this fixture models).
+        self.assertEqual(findings[0]["category_code"], "process_validation")
         self.assertEqual(findings[0]["evidence_level"], "B")
         self.assertEqual(findings[0]["finding_language"], "EN")
         self.assertEqual(findings[0]["review_status"], "needs_review")

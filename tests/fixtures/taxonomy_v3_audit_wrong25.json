@@ -1,0 +1,202 @@
+[
+  {
+    "finding_id": "finding-0a1df74ab174e17188c68719",
+    "finding_text": "The responsibilities and procedures applicable to the quaJity unit are not in writing and fully followed.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "quality_unit_oversight",
+    "known_limitation": true,
+    "known_limitation_reason": "OCR 손상('quality'→'quaJity')으로 quality_unit_oversight 키워드가 원천적으로 매칭 불가 -- 규칙 수정으로 해결 불가능한 사례(감사 명시)."
+  },
+  {
+    "finding_id": "finding-15729d1351e42b4a2666e890",
+    "finding_text": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "v2_wrong_category": "documentation_records",
+    "expected_v3_category": "equipment_facility",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-1b836c8a1bf34727d471053a",
+    "finding_text": "Your program for the visual inspection ofsterih drug products does not provide adequate assurance that finished products manufactured at your facility possess their purported quality attributes, including that they are essentially free from particulate matter.",
+    "v2_wrong_category": "equipment_facility",
+    "expected_v3_category": "aseptic_sterility_assurance",
+    "known_limitation": true,
+    "known_limitation_reason": "OCR 손상('sterile'→'sterih')으로 aseptic 키워드/패턴이 원천적으로 매칭 불가 -- 규칙 수정으로 해결 불가능한 사례(감사 명시)."
+  },
+  {
+    "finding_id": "finding-291c77c9e4d903f24f78135f",
+    "finding_text": "You did not maintain a building used in the manufacture, processing, packing or holding of infant formula in a clean and sanitary condition.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "equipment_facility",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-3acbf1ccc4ff816fcd2d4a95",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drng products is not of appropriate design, of adequate size and suitably located to facilitate operations for its intended use and cleaning and maintenance.",
+    "v2_wrong_category": "cleaning_validation",
+    "expected_v3_category": "equipment_facility",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-3df6f81c903f504271602b14",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "v2_wrong_category": "documentation_records",
+    "expected_v3_category": "process_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-43a87469d47b0aa0373c1120",
+    "finding_text": "Drug product containers and closures were not clean and sterilized and processed to remove pyrogenic properties to assure that they are suitable for their intended use.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "aseptic_sterility_assurance",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-51a31e62ed4eba82a7a37ae5",
+    "finding_text": "Appropriate conti·ols are not exercised over computer or related system to assme that the changes in the master production or conti-ol records or other records are instituted only by authorized persons.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "computer_system_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-596b2bd48f06e734ff289d44",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "v2_wrong_category": "material_supplier_control",
+    "expected_v3_category": "process_validation",
+    "known_limitation": true,
+    "known_limitation_reason": "'Control procedures ... manufacturing processes ... in-process material' -- \"process\" 와 \"control\"이 인접하지 않아(어순 도치) 기존 process_control 키워드도, 신규 'process parameter' 키워드도 매칭되지 않는다. 'material' бare 키워드가 그대로 살아있어 v2 와 동일하게 material_supplier_control 로 남는다 -- 7개 규칙 범위 밖(어순 도치까지 다루는 규칙은 지시되지 않음)."
+  },
+  {
+    "finding_id": "finding-5c069f7f67d656119604b268",
+    "finding_text": "Appropriate controls were not exercised over computerized systems to ensure that changes in records are made only by authorized personnel.",
+    "v2_wrong_category": "training_personnel",
+    "expected_v3_category": "computer_system_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-634d7875628d1e4a5963607d",
+    "finding_text": "There is a lack ofadequate controls in place to minimize the carryover ofthe residual materials into successive batches of the same intermediate or API.",
+    "v2_wrong_category": "material_supplier_control",
+    "expected_v3_category": "cleaning_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-648323af727e3453c9478a98",
+    "finding_text": "Approp1iate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records ai·e instituted only by authorized personnel.",
+    "v2_wrong_category": "training_personnel",
+    "expected_v3_category": "computer_system_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-764def3f1f63ef6d9e964917",
+    "finding_text": "QC laboratory established written procedure for synchronization of laboratory instruments time with the actual time was not followed.",
+    "v2_wrong_category": "documentation_records",
+    "expected_v3_category": "qc_lab_controls",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-77ea1641ec5cea771b2318f9",
+    "finding_text": "Written procedures are lacking which describe in sufficient detail the receipt, identification , sampling, testing, approval and rejection of components.",
+    "v2_wrong_category": "documentation_records",
+    "expected_v3_category": "material_supplier_control",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-7b6b8f7c83edb39e921fdfe3",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch .",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "documentation_records",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-83a2506f20e5fb509179c294",
+    "finding_text": "Process Parameters (PPs) are not adequately controlled within established ranges iDCb><4> DS manufacturing process.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "process_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-87a812982cb562572921bf87",
+    "finding_text": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing, and processing.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "documentation_records",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-9f36050645ff0c4982dcc5e9",
+    "finding_text": "Complaints records arc deficient in that they do not include the findings ofthe investigation and follow­ up.",
+    "v2_wrong_category": "deviation_capa",
+    "expected_v3_category": "complaint_recall",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-a2d14f0f95909fc6d168155e",
+    "finding_text": "Written procedures are not followed for the sampling of drug substance and excipients.",
+    "v2_wrong_category": "documentation_records",
+    "expected_v3_category": "material_supplier_control",
+    "known_limitation": true,
+    "known_limitation_reason": "rule1 이 명시적으로 예견한 결과: 'written procedure'를 제거하면 주제어(material/component/supplier 등)가 전혀 없는 이 원문은 catch-all로 떨어진다 -- rule1 원문 설명 그대로('주제 없는 written procedures not followed류는 catch-all로 떨어지는 것이 정직한 결과다'). expected(material_supplier_control)는 도메인 지식 기반 감사자 판단이지 키워드 매칭으로 재현 가능한 결과가 아니다."
+  },
+  {
+    "finding_id": "finding-ab4e3d27348680a83ef3685b",
+    "finding_text": "Your firm failed to confirm that the quality of water was suitable for its intended use in the production of non-sterile drug products.",
+    "v2_wrong_category": "aseptic_sterility_assurance",
+    "expected_v3_category": "equipment_facility",
+    "known_limitation": true,
+    "known_limitation_reason": "non-sterile 오탐 차단(v3 rule 3)의 직접 결과로 aseptic 매칭이 해제됐으나, 원문에 equipment_facility 키워드(equipment/facility/building/maintenance/calibration)가 전혀 없어 catch-all(other_quality_system)로 떨어진다. '수질 시스템'류 도메인 키워드 추가 없이는 7개 규칙만으로 도달 불가 -- 버그 수정의 의도된 부작용이지 회귀가 아니다."
+  },
+  {
+    "finding_id": "finding-d26d05a3fad0984e0e37fdbe",
+    "finding_text": "The labels of your outsourcing facility's drug products are deficient.",
+    "v2_wrong_category": "equipment_facility",
+    "expected_v3_category": "labeling_packaging",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-dcf1a6bb9a66add4e13354b9",
+    "finding_text": "There is a failure to submit a field alert report (FAR) to FDA within 3 working days of receiving information concerning bacteriological contamination in the distributed drug product.",
+    "v2_wrong_category": "contamination_control",
+    "expected_v3_category": "complaint_recall",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-e082e2cd18e237f9188902a2",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of di11g products is not of appropriate design to facilitate operations for its intended use and cleaning and maintenance.",
+    "v2_wrong_category": "cleaning_validation",
+    "expected_v3_category": "equipment_facility",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-e1c91f608cb1f8111d750822",
+    "finding_text": "Adequate procedural controls were not established to protect the electronic data acquisition and process control systems used for the manufacturing ofj (b)(4ps and DP in your manufacturing facility.",
+    "v2_wrong_category": "process_validation",
+    "expected_v3_category": "computer_system_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-f92727bfaadbdd21c8cb562c",
+    "finding_text": "Master production and control records lack complete manufacturing and control instructions.",
+    "v2_wrong_category": "other_quality_system",
+    "expected_v3_category": "documentation_records",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  }
+]

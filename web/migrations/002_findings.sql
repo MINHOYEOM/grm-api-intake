@@ -33,7 +33,7 @@ alter table public.raw_signals enable row level security;
 -- findings: 지적사항 분석층. inspector_names/cfr_refs/mfds_refs 는 SQLite TEXT 배열의 jsonb 강화형.
 create table if not exists public.findings (
   schema_version text not null check (schema_version = 'grm-finding/v1'),
-  taxonomy_version text not null check (taxonomy_version in ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2')),
+  taxonomy_version text not null check (taxonomy_version in ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2', 'grm-finding-taxonomy/v3')),
   finding_id text primary key,
   raw_signal_id text not null references public.raw_signals (raw_signal_id) on delete cascade,
   source text not null,
@@ -47,7 +47,7 @@ create table if not exists public.findings (
   site_country text,
   product_family text,
   modality text,
-  category_code text not null check (category_code in ('data_integrity', 'documentation_records', 'aseptic_sterility_assurance', 'environmental_monitoring', 'cleaning_validation', 'deviation_capa', 'quality_unit_oversight', 'qc_lab_controls', 'process_validation', 'equipment_facility', 'material_supplier_control', 'contamination_control', 'validation_qualification', 'complaint_recall', 'stability_storage', 'computer_system_validation', 'labeling_packaging', 'regulatory_reporting', 'training_personnel', 'other_quality_system')),
+  category_code text not null check (category_code in ('data_integrity', 'computer_system_validation', 'documentation_records', 'aseptic_sterility_assurance', 'environmental_monitoring', 'cleaning_validation', 'complaint_recall', 'deviation_capa', 'quality_unit_oversight', 'qc_lab_controls', 'process_validation', 'equipment_facility', 'material_supplier_control', 'contamination_control', 'validation_qualification', 'stability_storage', 'labeling_packaging', 'regulatory_reporting', 'training_personnel', 'other_quality_system')),
   category_label_ko text not null,
   finding_text text not null,
   finding_language text,

@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.118` |
-| 최종 수정일 | 2026-07-10 |
+| 문서 버전 | `v1.119` |
+| 최종 수정일 | 2026-07-12 |
 | 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -196,7 +196,7 @@ flowchart TD
 ### 4.3 데이터 계약
 - **`raw_signals`** (원본 보존층): 재추출 가능한 원본. `raw_json`은 원문 byte 그대로 보존해 해시 재검증 가능. **비공개**(service_role 전용).
 - **`findings`** (지적사항 분석층): FDA 483 Observation·Warning Letter·MFDS GMP 지적 등에서 정규화한 개별 위반. `finding_text`(영문 원문·불변) + `finding_text_ko`(국문 해석) + 카테고리·증거등급·검토상태. **공개 게이트 통과분만 노출.**
-- **taxonomy v2:** 20개 카테고리(코드·한국어·영문 라벨 고정). 분류기는 단어경계 매칭으로 오분류 방지. `finding_id`는 내용 해시 기반 안정 ID(번역 추가로 안 바뀜).
+- **taxonomy v3:** 20개 카테고리(코드·한국어·영문 라벨 고정, v1~v3 전부 불변). 분류기는 단어경계 키워드 매칭 + 카테고리별 선택적 명시 정규식(`patterns`, 부정어/활용형/유연 인접 표현)을 병행하며, 2026-07-12 층화 감사(실질 정확도 71%)에서 발견된 구조적 오분류(범용 "written procedure" 가로채기, "computer system" 경직 구문, "non-sterile" 부정어 오탐 등)를 반영해 키워드·순번을 조정했다(`findings_reclassify_service.py`가 라이브 재분류 담당, workflow_dispatch 전용). `finding_id`는 내용 해시 기반 안정 ID(번역·재분류로 안 바뀜).
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
 - **집계 RPC(007/008, 카운트 전용 안전 계약):** `findings_stats`/`findings_firm_stats`(007)·`findings_category_matrix`(008)는 공개 게이트(006)를 우회해 **전량** 집계(건수·연도·카테고리·업체 통계)를 서빙하되, 원문 텍스트(`finding_text`/`finding_text_ko`)는 어떤 경로로도 반환하지 않습니다. `/findings/trends/`가 이 두 RPC만 소비.
 
@@ -252,11 +252,12 @@ grm-api-intake/
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
+├─ findings_reclassify_service.py  # taxonomy v3 라이브 재분류(workflow_dispatch 전용, LLM 0)
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 006_findings_publish_gate, 007_findings_stats_rpc, 008_findings_category_matrix.sql)
+│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql)
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/outbox/            # [FIND-1 M9] 주간 번역 배치 큐(CI가 읽어 Supabase 반영)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
@@ -268,7 +269,8 @@ grm-api-intake/
    ├─ grm-newsletter-send.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-supabase-keepalive.yml
    ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
-   └─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
+   ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
+   └─ grm-findings-reclassify.yml        # taxonomy v3 재분류(workflow_dispatch 전용, dry_run 기본 true)
 ```
 
 ### 5.2 주요 실행 파일

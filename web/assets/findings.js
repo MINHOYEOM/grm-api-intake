@@ -989,9 +989,16 @@
         var totals = (data && data.totals) || {};
         var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
         var total = Number(totals.findings || 0).toLocaleString("ko-KR");
-        coverageTextEl.textContent =
-          "국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 " + pub +
-          "건 공개 / 전체 " + total + "건 집계 반영 (매일 확대 중)";
+        // [문서 수 병기] totals.documents(010_findings_scope_purity.sql 신규 키)가 있을
+        // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 공개"로 문서-지적 관계를 명시한다.
+        // 010 미적용 라이브(undefined)에서는 기존 문안을 그대로 유지한다(방어적 생략).
+        var hasDocs = typeof totals.documents === "number" && !isNaN(totals.documents);
+        coverageTextEl.textContent = hasDocs
+          ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
+            total + "건 중 " + pub + "건 공개 — 국문 번역이 완료된 지적사항만 열람할 수 " +
+            "있습니다 (매일 확대 중)"
+          : "국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 " + pub +
+            "건 공개 / 전체 " + total + "건 집계 반영 (매일 확대 중)";
         coverageNoteEl.hidden = false;
       })
       .catch(function () {

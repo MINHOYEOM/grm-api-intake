@@ -204,9 +204,22 @@
     return block;
   }
 
+  // [문서 수 병기] totals.documents(010_findings_scope_purity.sql findings_stats 신규
+  // 키 — count distinct raw_signal_id, scope_status='ok' 기준)가 있을 때만 "분석 문서"
+  // 스탯을 끼워 넣는다. 010 을 프로덕션 SQL Editor 에서 아직 적용하지 않은 라이브에서는
+  // 이 키가 undefined 이므로 무조건 조용히 생략한다(레이아웃 깨짐 없음 — 기존 커버리지
+  // 노트의 독립 폴백과 동일 정신). "지적 N건" 만 보면 문서(실사) 수로 오해하는 문제를
+  // 완화하기 위해 총 지적사항 바로 옆에 둔다.
+  function hasDocumentsCount(totals) {
+    return typeof totals.documents === "number" && !isNaN(totals.documents);
+  }
+
   function renderStats(totals) {
     statsEl.innerHTML = "";
     statsEl.appendChild(buildStat(fmtNum(totals.findings), "총 지적사항"));
+    if (hasDocumentsCount(totals)) {
+      statsEl.appendChild(buildStat(fmtNum(totals.documents), "분석 문서"));
+    }
     statsEl.appendChild(buildStat(fmtNum(totals.firms), "업체"));
     statsEl.appendChild(buildStat(fmtNum(totals.raw_signals), "원문서"));
     var pub = buildStat(fmtNum(totals.public_findings), "국문 열람 가능");
@@ -220,12 +233,19 @@
 
   // [공개 범위 투명성] totals 는 fetchStats() 가 이미 fetch 한 findings_stats RPC 응답 —
   // 추가 네트워크 호출 없이 재사용한다. 요소가 없으면(구버전 셸) 조용히 no-op.
+  // [문서 수 병기] totals.documents 가 있으면 첫 문장을 "규제 문서 N건에서 추출한 개별
+  // 지적사항 M건"으로 바꿔 문서-지적 1:N 관계를 명시한다(010 미적용 시 undefined → 기존
+  // "전체 M건" 문안 그대로 유지, 방어적 생략).
   function renderCoverageNote(totals) {
     if (!coverageNoteEl || !coverageTextEl) return;
     var total = Number(totals.findings || 0).toLocaleString("ko-KR");
     var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
+    var intro = hasDocumentsCount(totals)
+      ? "이 대시보드의 수치는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
+        "건에서 추출한 개별 지적사항 " + total + "건 기준 집계입니다(문서당 평균 여러 건)."
+      : "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다.";
     coverageTextEl.textContent =
-      "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다. 개별 원문 열람은 국문 " +
+      intro + " 개별 원문 열람은 국문 " +
       "번역 완료분(" + pub + "건)부터 순차 공개되며, 카테고리를 클릭해 이동한 검색 결과는 " +
       "집계 수치보다 적을 수 있습니다.";
     coverageNoteEl.hidden = false;

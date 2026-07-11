@@ -1351,6 +1351,35 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('document.getElementById("fnd-coverage-text")', js_src)
         self.assertIn("if (!coverageNoteEl || !coverageTextEl) return;", js_src)
 
+    # ── [문서 수 병기] totals.documents(010_findings_scope_purity.sql) 있음/없음 두 경로 ──
+    def test_coverage_note_documents_present_path_mentions_document_count(self):
+        """010 적용 라이브(totals.documents 존재)에서는 "규제 문서 N건 · 지적사항 M건 중
+        P건 공개" 식으로 문서-지적 1:N 관계를 명시한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        fn = fn[:fn.index("\n  showState(\"loading\");")]
+        self.assertIn("totals.documents", fn)
+        self.assertIn('typeof totals.documents === "number"', fn)
+        self.assertIn("규제 문서 ", fn)
+        self.assertIn("건 · 지적사항 ", fn)
+        self.assertIn("건 중 ", fn)
+        self.assertIn("건 공개", fn)
+
+    def test_coverage_note_documents_absent_path_falls_back_silently(self):
+        """010 미적용 라이브(totals.documents=undefined)에서는 기존 문안("국문 번역이
+        완료된 지적사항만 열람할 수 있습니다 — 현재 N건 공개 / 전체 M건 집계 반영")을
+        그대로 유지한다 — 레이아웃/문구 깨짐 없는 방어적 생략."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        fn = fn[:fn.index("\n  showState(\"loading\");")]
+        self.assertIn("국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 ", fn)
+        self.assertIn("건 공개 / 전체 ", fn)
+        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        # 두 경로 모두 삼항연산자 한 문장으로 분기(방어적 no-op 이 아니라 문구 전환) —
+        # hasDocs 가 false 일 때 fallback 표현식이 그대로 textContent 에 대입된다.
+        self.assertIn("var hasDocs = ", fn)
+        self.assertIn("coverageTextEl.textContent = hasDocs", fn)
+
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):
@@ -1626,6 +1655,60 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('document.getElementById("tr-coverage-note")', js_src)
         self.assertIn('document.getElementById("tr-coverage-text")', js_src)
         self.assertIn("if (!coverageNoteEl || !coverageTextEl) return;", js_src)
+
+    # ── [문서 수 병기] 스탯 스트립 "분석 문서" — totals.documents(010) 있음/없음 두 경로 ──
+    def test_stats_documents_present_path_renders_stat(self):
+        """totals.documents 가 유효 숫자면 "총 지적사항" 바로 다음에 "분석 문서" 스탯
+        카드를 끼워 넣는다(지적 건수=문서 수로 오해하는 문제 완화)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function hasDocumentsCount(totals)", js_src)
+        self.assertIn('typeof totals.documents === "number" && !isNaN(totals.documents)', js_src)
+        fn = js_src[js_src.index("function renderStats(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("if (hasDocumentsCount(totals)) {", fn)
+        self.assertIn('buildStat(fmtNum(totals.documents), "분석 문서")', fn)
+        # "총 지적사항" 카드 다음, "업체" 카드 이전에 위치(문서-지적 관계를 바로 옆에서
+        # 대조할 수 있도록).
+        idx_findings = fn.index('"총 지적사항"')
+        idx_docs = fn.index('"분석 문서"')
+        idx_firms = fn.index('"업체"')
+        self.assertTrue(idx_findings < idx_docs < idx_firms)
+
+    def test_stats_documents_absent_path_omits_stat_without_breaking_layout(self):
+        """010 미적용 라이브(totals.documents=undefined)에서는 "분석 문서" 카드를 조용히
+        생략한다 — appendChild 가 조건부(if 블록) 안에만 있으므로 나머지 스탯(총 지적사항/
+        업체/원문서/국문 열람 가능)은 항상 그대로 렌더되어 레이아웃이 깨지지 않는다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderStats(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        # "분석 문서" 카드 추가가 조건문 내부에 있고, 그 뒤 3개 카드(업체/원문서/국문 열람
+        # 가능) 는 조건과 무관하게 무조건 실행된다 — 문서 스탯만 옵셔널.
+        guard_idx = fn.index("if (hasDocumentsCount(totals)) {")
+        after_guard = fn[fn.index("}", guard_idx) + 1:]
+        self.assertIn('buildStat(fmtNum(totals.firms), "업체")', after_guard)
+        self.assertIn('buildStat(fmtNum(totals.raw_signals), "원문서")', after_guard)
+        self.assertIn('buildStat(fmtNum(totals.public_findings), "국문 열람 가능")', after_guard)
+
+    def test_coverage_note_documents_present_path_mentions_document_count(self):
+        """010 적용 라이브(totals.documents 존재)에서는 첫 문장이 "규제 문서 N건에서
+        추출한 개별 지적사항 M건" 식으로 문서-지적 1:N 관계를 명시한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("hasDocumentsCount(totals)", fn)
+        self.assertIn("규제 문서 ", fn)
+        self.assertIn("건에서 추출한 개별 지적사항 ", fn)
+        self.assertIn("문서당 평균 여러 건", fn)
+
+    def test_coverage_note_documents_absent_path_falls_back_silently(self):
+        """010 미적용 라이브(totals.documents=undefined)에서는 기존 "이 대시보드의 수치는
+        전체 M건 기준 집계입니다." 문안을 그대로 유지한다 — 방어적 생략, 문구 깨짐 없음."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("이 대시보드의 수치는 전체 ", fn)
+        self.assertIn('건 기준 집계입니다."', fn)
+        self.assertIn("var intro = hasDocumentsCount(totals)", fn)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

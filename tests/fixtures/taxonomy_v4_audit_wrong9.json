@@ -1,0 +1,90 @@
+[
+  {
+    "finding_id": "finding-07dc5ab1f92a2e8e426904e7",
+    "finding_text": "Your fnm's cleaning processes for non-dedicated equipment have not been adequately established and validated.",
+    "v3_wrong_category": "equipment_facility",
+    "expected_v4_category": "cleaning_validation",
+    "known_limitation": true,
+    "known_limitation_reason": "211.67(b) 세척공정 밸리데이션 인용이지만 \"cleaning process**es**... validated\"처럼 표현이 v3/v4 cleaning_validation 키워드(\"cleaning validation\"/\"cleaning procedure\")·패턴(residue/carry-over)과 다른 어순이다. v4 후보1/2/3 어디에도 이 어순변형을 다루는 규칙이 없어 그대로 known_limitation -- actual output 은 equipment_facility 로 v3와 동일하게 불변."
+  },
+  {
+    "finding_id": "finding-0a1df74ab174e17188c68719",
+    "finding_text": "The responsibilities and procedures applicable to the quaJity unit are not in writing and fully followed.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "quality_unit_oversight",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-1b836c8a1bf34727d471053a",
+    "finding_text": "Your program for the visual inspection ofsterih drug products does not provide adequate assurance that finished products manufactured at your facility possess their purported quality attributes, including that they are essentially free from particulate matter.",
+    "v3_wrong_category": "equipment_facility",
+    "expected_v4_category": "aseptic_sterility_assurance",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-596b2bd48f06e734ff289d44",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "v3_wrong_category": "material_supplier_control",
+    "expected_v4_category": "process_validation",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-5ab992077bc68a25acea5edd",
+    "finding_text": "Written procedures ai��e not followed for evaluations conducted at least aimually to review records associated with a representative number ofbatches, whether approved or rejected.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "quality_unit_oversight",
+    "known_limitation": true,
+    "known_limitation_reason": "211.180(e) 연차제품검토(APR) 조항 -- v4 후보2가 quality_unit_oversight 에 \"annual product review\" 키워드와 `\\bannual\\w*\\b.{0,40}\\b(?:review|evaluation)\\b` 패턴을 추가했으나, 이 사례의 실제 원문은 감사 리포트가 인용한 \"annually\"가 아니라 추가로 OCR 손상된 \"aimually\"(nn -> im 오인식)이다. 이 손상은 v4 스코프(quality/sterile 2개 확인된 혼동쌍)에 포함되지 않아 패턴이 매칭하지 못한다 -- 이 구체적 발견은 v4 픽스처 구축 중 실측으로 확인됐다(리포트가 예상한 것과 다름). actual output 은 other_quality_system 로 v3와 동일하게 불변."
+  },
+  {
+    "finding_id": "finding-8327eaebcc00d2cada2d4c31",
+    "finding_text": "Reserve samples from representative sample lots or batches of diug products selected by acceptable statistical procedures are not examined visually at least once a year for evidence of deterioration.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "qc_lab_controls",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-8d3ae3935966ee9ccd9227ae",
+    "finding_text": "processing areas are deficient regarding the system for cleaning and disinfecting the room and ent to produce~ onditions.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "aseptic_sterility_assurance",
+    "known_limitation": true,
+    "known_limitation_reason": "극심한 OCR/추출 손상으로 문장 선두 \"Aseptic\"이 완전히 잘려나가고 말미 \"aseptic conditions\"도 깨져 있다 -- aseptic/media fill/steril*/pyrogen/smoke study 등 v3+v4 신호가 텍스트에 전혀 남아 있지 않아 어떤 키워드/패턴 규칙으로도 도달 불가. v4 후보1~3 어디에도 해당 없음 -- actual output 은 other_quality_system 로 v3와 동일하게 불변."
+  },
+  {
+    "finding_id": "finding-a2d14f0f95909fc6d168155e",
+    "finding_text": "Written procedures are not followed for the sampling of drug substance and excipients.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "material_supplier_control",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-d3f0bcd19b73e360804ff533",
+    "finding_text": "Smoke studies were inadequately performed under dynamic conditions.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "aseptic_sterility_assurance",
+    "known_limitation": false,
+    "known_limitation_reason": ""
+  },
+  {
+    "finding_id": "finding-a9d5baca5875ea9f2bde6682",
+    "finding_text": "The \"Tille\" SlItbilily progr.un for drug prod\"'U doe< nol indude sample size ba.ed 00 SlaliS/leal .rileri.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "other_quality_system",
+    "known_limitation": true,
+    "known_limitation_reason": "1차·2차 감사 공통 unclassifiable(§4) -- 원문이 OCR로 완전히 파손되어(추정 원문: \"stability program... sample size based on statistical criteria\") 기계적 판독 자체가 불가능하다. 분류 규칙의 문제가 아니라 원문 품질 문제이므로 v4 스코프 밖 -- other_quality_system 캐치올이 정직한 결과."
+  },
+  {
+    "finding_id": "finding-e2e676d2434e55fc658ca07f",
+    "finding_text": "The information provided by the firm does not conform to the{b)(4) ~cifically, in the H4> the(b)(4) drug substance (DS) shelflife iS(bH4> at :$(b><4> C.",
+    "v3_wrong_category": "other_quality_system",
+    "expected_v4_category": "other_quality_system",
+    "known_limitation": true,
+    "known_limitation_reason": "1차·2차 감사 공통 unclassifiable(§4) -- (b)(4) 편집(redaction) 과다로 문장 구조 자체가 소실되어 판독 불가(추정: drug substance shelf life/안정성 관련). 이 텍스트가 우연히 \"drug substance\"라는 문자열을 포함하지만, v4 candidate 3 구현 시 bare \"drug substance\" 키워드를 추가하면 이 무관한 텍스트가 material_supplier_control 로 과매칭되는 것을 실측으로 발견 -- 그래서 v4는 bare \"drug substance\" 키워드를 넣지 않고 \"sampling of drug substance\" 패턴만 추가했다(grm_findings.py material_supplier_control 주석 참조). 그 결과 이 사례는 v3와 동일하게 other_quality_system 로 남아 known_limitation 유지 -- 원문 품질 문제이지 규칙 버그가 아니다."
+  }
+]

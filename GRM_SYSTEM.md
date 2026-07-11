@@ -196,7 +196,7 @@ flowchart TD
 ### 4.3 데이터 계약
 - **`raw_signals`** (원본 보존층): 재추출 가능한 원본. `raw_json`은 원문 byte 그대로 보존해 해시 재검증 가능. **비공개**(service_role 전용).
 - **`findings`** (지적사항 분석층): FDA 483 Observation·Warning Letter·MFDS GMP 지적 등에서 정규화한 개별 위반. `finding_text`(영문 원문·불변) + `finding_text_ko`(국문 해석) + 카테고리·증거등급·검토상태. **공개 게이트 통과분만 노출.**
-- **taxonomy v3:** 20개 카테고리(코드·한국어·영문 라벨 고정, v1~v3 전부 불변). 분류기는 단어경계 키워드 매칭 + 카테고리별 선택적 명시 정규식(`patterns`, 부정어/활용형/유연 인접 표현)을 병행하며, 2026-07-12 층화 감사(실질 정확도 71%)에서 발견된 구조적 오분류(범용 "written procedure" 가로채기, "computer system" 경직 구문, "non-sterile" 부정어 오탐 등)를 반영해 키워드·순번을 조정했다(`findings_reclassify_service.py`가 라이브 재분류 담당, workflow_dispatch 전용). `finding_id`는 내용 해시 기반 안정 ID(번역·재분류로 안 바뀜).
+- **taxonomy v4:** 20개 카테고리(코드·한국어·영문 라벨 고정, v1~v4 전부 불변). 분류기는 단어경계 키워드 매칭 + 카테고리별 선택적 명시 정규식(`patterns`, 부정어/활용형/유연 인접 표현)을 병행한다. v3(2026-07-12 층화 감사, 실질 정확도 71%→89%)가 범용 "written procedure" 가로채기·"computer system" 경직 구문·"non-sterile" 부정어 오탐 등 구조적 오분류를 고쳤고, v4(동일 감사의 사후 재감사)는 잔여 wrong 9건을 근거로 ①확인된 2개 OCR 오탈자 혼동쌍 한정 내성(quality/quaJity, sterile/sterih) ②캐치올로 새는 CFR 조항 어휘 보강(연차제품검토·보류샘플·스모크스터디) ③원자재 샘플링/CPV 어순변형 보강을 추가했다(`findings_reclassify_service.py`가 라이브 재분류 담당, workflow_dispatch 전용, LLM 0). `finding_id`는 내용 해시 기반 안정 ID(번역·재분류로 안 바뀜).
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
 - **집계 RPC(007/008, 카운트 전용 안전 계약):** `findings_stats`/`findings_firm_stats`(007)·`findings_category_matrix`(008)는 공개 게이트(006)를 우회해 **전량** 집계(건수·연도·카테고리·업체 통계)를 서빙하되, 원문 텍스트(`finding_text`/`finding_text_ko`)는 어떤 경로로도 반환하지 않습니다. `/findings/trends/`가 이 두 RPC만 소비.
 
@@ -252,12 +252,12 @@ grm-api-intake/
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
-├─ findings_reclassify_service.py  # taxonomy v3 라이브 재분류(workflow_dispatch 전용, LLM 0)
+├─ findings_reclassify_service.py  # taxonomy 라이브 재분류(현재 v4, workflow_dispatch 전용, LLM 0)
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql)
+│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql)
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/outbox/            # [FIND-1 M9] 주간 번역 배치 큐(CI가 읽어 Supabase 반영)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
@@ -270,7 +270,7 @@ grm-api-intake/
    ├─ grm-brief-audit.yml, grm-supabase-keepalive.yml
    ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
    ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
-   └─ grm-findings-reclassify.yml        # taxonomy v3 재분류(workflow_dispatch 전용, dry_run 기본 true)
+   └─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
 ```
 
 ### 5.2 주요 실행 파일

@@ -62,11 +62,48 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #   9) v1/v2-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all
 #      three. Category codes/labels/count (20) are unchanged -- only keyword/pattern/order
 #      tuning within the existing categories.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v3"
+#
+# grm-finding-taxonomy/v4 change log (2026-07-12 v3 사후 재감사 -- 실질 정확도 89%, wrong 9건/
+# unclassifiable 2건, archive/findings_classification_audit_v3_2026-07-12.md 전문 참조).
+# No category is added, removed, relabeled, or reordered in v4 -- every change below is an
+# additive keyword/pattern within an existing category. §5 후보1/2/3 그대로:
+#   1) OCR 오탈자 내성 (표본에서 실제 확인된 2개 혼동쌍 한정 -- 광범위 퍼지매칭 아님):
+#      - quality_unit_oversight: `\bqua[lJ1i]+ty\s+units?\b` 패턴 추가(소문자 l이 대문자 J/숫자
+#        1로 오인식되는 "quaJity unit" 류; audit case 0a1df74a).
+#      - aseptic_sterility_assurance: `sterih\b` 패턴 추가(선행 \b 없음 -- 실측 원문이 공백
+#        탈락으로 "of sterile"이 "ofsterih"로 붙어버려 앞쪽 단어경계가 존재하지 않는다; "sterile"
+#        의 "le" 가 OCR 로 "h" 하나로 뭉개진 확인된 손상 케이스, audit case 1b836c8a). 두 패턴 다
+#        기존 non-sterile 부정어 lookbehind 를 유지한다.
+#   2) 캐치올(other_quality_system)로 떨어지는 CFR 조항 어휘 공백 보강:
+#      - quality_unit_oversight: "annual product review" 키워드 + `\bannual\w*\b.{0,40}\b
+#        (?:review|evaluation)\b` 패턴(211.180(e) 연차제품검토, audit case 5ab99207 방향 --
+#        단 그 실제 원문은 "annually"가 "aimually"로 추가 OCR 손상돼 있어 이 패턴으로도 이 특정
+#        사례는 안 잡힌다; known_limitation 유지, 아래 v4 픽스처 참조).
+#      - qc_lab_controls: "reserve sample"/"evidence of deterioration" 키워드 +
+#        `\breserve\s+samples?\b` 패턴(211.170 보류샘플, audit case 8327eaeb -- 실측 확인).
+#      - aseptic_sterility_assurance: `\bsmoke\s+stud(?:y|ies)\b` 패턴(무균공정 스모크스터디,
+#        audit case d3f0bcd1 -- 실측 확인).
+#   3) material_supplier_control 어휘 확장 + CPV 어순변형:
+#      - material_supplier_control: "drug substance"/"excipient" 키워드 +
+#        `\bsampling\s+of\s+(?:drug\s+substances?|components?|excipients?)\b` 패턴(audit case
+#        a2d14f0f, 1·2차 공통 미해결이었던 케이스 -- 실측 확인).
+#      - process_validation: `\bmanufacturing\s+process(?:es)?\b.{0,60}\b(?:variability|
+#        monitor|output|validate)\b` 패턴(211.110(a) CPV 어순변형, audit case 596b2bd4, 1·2차
+#        공통 미해결이었던 케이스 -- 실측 확인).
+#   4) 결과: wrong 9건 중 7건(1b836c8a, 0a1df74a, 596b2bd4, 5ab99207 -- 부분, 8327eaeb, a2d14f0f,
+#      d3f0bcd1)이 후보1~3 규칙으로 재검증됐다 -- 단 5ab99207 은 위 §2 의 추가 OCR 손상 때문에
+#      실제로는 여전히 미해결(known_limitation)이다. 나머지 2건(07dc5ab1 "cleaning process**es**
+#      ... validated" 어순변형, 8d3ae393 극심한 OCR 손상)은 이번 3개 후보 어디에도 해당하지 않는
+#      진짜 스코프 밖이라 손대지 않았다 -- tests/fixtures/taxonomy_v4_audit_wrong9.json 에 정직하게
+#      known_limitation=true 로 고정.
+#   5) v1/v2/v3-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all
+#      four. Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v4"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
     "grm-finding-taxonomy/v3",
+    "grm-finding-taxonomy/v4",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -172,7 +209,14 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         ("aseptic", "media fill", "무균", "배지충전", "주사제"),
         patterns=(
             r"(?<!non-)(?<!non )\bsteril(?:e|ity|iz(?:ed|ation|ing))s?\b",
+            # v4: known OCR corruption of "sterile" -- audit case 1b836c8a. The real
+            # extracted text drops the space too ("of sterile" -> "ofsterih"), so there is
+            # no word-boundary transition before the "s" -- only the trailing \b is used.
+            # Deliberately literal (not a fuzzy class) per the "2 confirmed pairs only" scope.
+            r"(?<!non-)(?<!non )sterih\b",
             r"\bpyrogen(?:ic)?s?\b",
+            # v4: 211.42/211.113 스모크스터디(무균공정 기류 시각화 검증) -- audit case d3f0bcd1.
+            r"\bsmoke\s+stud(?:y|ies)\b",
         ),
     ),
     FindingCategory(
@@ -216,13 +260,43 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "quality_unit_oversight",
         "품질부서 관리감독",
         "Quality unit oversight",
-        ("quality unit", "quality control unit", "qa", "품질부서", "품질보증"),
+        (
+            "quality unit",
+            "quality control unit",
+            "qa",
+            "annual product review",
+            "품질부서",
+            "품질보증",
+        ),
+        patterns=(
+            # v4: known OCR corruption of "quality" -- audit case 0a1df74a ("quaJity unit",
+            # lowercase l misread as uppercase J; also tolerates the digit-1 confusion).
+            # Scoped to the "quality unit" phrase (not bare "quality") to stay conservative.
+            r"\bqua[lJ1i]+ty\s+units?\b",
+            # v4: 211.180(e) 연차제품검토(annual product review) -- audit case 5ab99207
+            # direction. Real-world note: the audit's own sample had a *second*, undocumented
+            # OCR corruption ("annually" -> "aimually") that this literal pattern cannot
+            # reach -- see the v4 change log and tests/fixtures/taxonomy_v4_audit_wrong9.json.
+            r"\bannual\w*\b.{0,40}\b(?:review|evaluation)\b",
+        ),
     ),
     FindingCategory(
         "qc_lab_controls",
         "시험실/품질관리",
         "Laboratory and QC controls",
-        ("laboratory", "quality control", "test method", "시험실", "시험방법", "시험성적", "품질관리"),
+        (
+            "laboratory",
+            "quality control",
+            "test method",
+            "reserve sample",
+            "evidence of deterioration",
+            "시험실",
+            "시험방법",
+            "시험성적",
+            "품질관리",
+        ),
+        # v4: 211.170 보류샘플 프로그램 -- audit case 8327eaeb.
+        patterns=(r"\breserve\s+samples?\b",),
     ),
     FindingCategory(
         "process_validation",
@@ -236,6 +310,13 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
             "공정밸리데이션",
             "공정 관리",
         ),
+        # v4: 211.110(a) CPV(continued process verification) 어순변형 -- "monitor the
+        # output and validate ... manufacturing processes ... variability" 처럼 동사가
+        # "manufacturing process(es)"보다 앞서 나오는 문형. audit case 596b2bd4(1·2차 감사
+        # 공통 미해결).
+        patterns=(
+            r"\bmanufacturing\s+process(?:es)?\b.{0,60}\b(?:variability|monitor|output|validate)\b",
+        ),
     ),
     FindingCategory(
         "equipment_facility",
@@ -248,7 +329,26 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "material_supplier_control",
         "원자재/공급업체 관리",
         "Material and supplier control",
-        ("supplier", "component", "material", "raw material", "원자재", "공급업체"),
+        (
+            "supplier",
+            "component",
+            "material",
+            "raw material",
+            "excipient",
+            "원자재",
+            "공급업체",
+        ),
+        # v4: "component"/"material" 동의어 부재로 반복 미스매칭됐던 성분 샘플링 조항 --
+        # audit case a2d14f0f(1·2차 감사 공통 미해결). 판단: 리포트 §5 후보3은 bare "drug
+        # substance" 키워드도 제안했으나, 실측 검증(known_limitation case e2e676d2 -- shelf
+        # life 관련 텍스트에 "drug substance (DS)"가 우연히 등장) 결과 bare 키워드는 이 문맥과
+        # 무관한 텍스트까지 material_supplier_control 로 끌어당기는 과매칭을 유발함을 확인했다.
+        # "sampling of drug substance" 처럼 조항 문맥에 결합된 패턴만으로도 a2d14f0f 는 정확히
+        # 해결되므로, 과매칭 위험이 있는 bare "drug substance" 키워드는 추가하지 않는다(보수적
+        # 원칙 -- 표본에서 실제 확인된 것만 다룬다).
+        patterns=(
+            r"\bsampling\s+of\s+(?:drug\s+substances?|components?|excipients?)\b",
+        ),
     ),
     FindingCategory(
         "contamination_control",
@@ -362,14 +462,14 @@ def _pattern_matches(haystack: str, pattern: str) -> bool:
 
 
 def classify_finding_category(text: str) -> str:
-    """Deterministic v3 keyword+pattern classifier.
+    """Deterministic v4 keyword+pattern classifier.
 
     The order of FINDING_TAXONOMY is part of the contract.  It gives highly
     specific categories such as aseptic processing a chance to match before more
     general quality-system buckets.  A category matches if any of its `keywords`
     (word-boundary regex for ASCII, substring for Hangul) OR any of its explicit
     `patterns` (raw regex, case-insensitive) matches the haystack.  See the
-    TAXONOMY_VERSION change log above for what changed between v1/v2/v3.
+    TAXONOMY_VERSION change log above for what changed between v1/v2/v3/v4.
     """
     haystack = _text(text).lower()
     if not haystack:

@@ -27,6 +27,9 @@ _TRANSLATION_MIGRATION_PATH = (
 _TAXONOMY_V3_MIGRATION_PATH = (
     Path(__file__).resolve().parent.parent / "web" / "migrations" / "011_findings_taxonomy_v3.sql"
 )
+_TAXONOMY_V4_MIGRATION_PATH = (
+    Path(__file__).resolve().parent.parent / "web" / "migrations" / "012_findings_taxonomy_v4.sql"
+)
 
 
 def _pair(
@@ -139,7 +142,7 @@ class PostgresSchemaDdlTest(unittest.TestCase):
         self.assertIn(f"taxonomy_version in ({taxonomy_check})", self.ddl)
 
     def test_taxonomy_check_lists_all_versions(self) -> None:
-        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 3)
+        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 4)
         for version in gf.TAXONOMY_VERSIONS:
             self.assertIn(f"'{version}'", self.ddl)
         # 002 is the fresh-install baseline (IN-list, both versions accepted from day one) --
@@ -309,8 +312,12 @@ class TaxonomyV3AlterMigrationTest(unittest.TestCase):
         self.assertIn("pg_constraint", self.sql)
 
     def test_adds_named_v1v2v3_in_list_check(self) -> None:
+        # 011 is a frozen historical migration (v1/v2/v3 only, superseded by 012's
+        # v1/v2/v3/v4 IN-list for an already-live DB) -- it must NOT grow to reference
+        # v4 just because gf.TAXONOMY_VERSIONS grew, so this asserts the v1/v2/v3
+        # literals directly (same fix already applied to 004's analogous test).
         self.assertIn("findings_taxonomy_version_v1v2v3_check", self.sql)
-        for version in gf.TAXONOMY_VERSIONS:
+        for version in ("grm-finding-taxonomy/v1", "grm-finding-taxonomy/v2", "grm-finding-taxonomy/v3"):
             self.assertIn(f"'{version}'", self.sql)
         self.assertIn(
             "check (taxonomy_version in (\n      'grm-finding-taxonomy/v1', "
@@ -360,6 +367,87 @@ class TaxonomyV3AlterMigrationTest(unittest.TestCase):
         self.assertIn("grm-finding-taxonomy/v1", self.sql)
         self.assertIn("grm-finding-taxonomy/v2", self.sql)
         self.assertIn("grm-finding-taxonomy/v3", self.sql)
+
+
+class TaxonomyV4AlterMigrationTest(unittest.TestCase):
+    """012_findings_taxonomy_v4.sql -- same shape as 004/011, extended to the
+    v1/v2/v3/v4 IN-list. Re-confirms both known pitfalls discovered in prior
+    migrations: 004's loop-variable/table-alias name collision, and 009's
+    array-slice parenthesization (not applicable here -- this migration has no
+    array slicing at all)."""
+
+    def setUp(self) -> None:
+        self.assertTrue(
+            _TAXONOMY_V4_MIGRATION_PATH.is_file(), f"missing {_TAXONOMY_V4_MIGRATION_PATH}"
+        )
+        self.sql = _TAXONOMY_V4_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _TAXONOMY_V4_MIGRATION_PATH.read_bytes())
+
+    def test_targets_public_findings_taxonomy_version_column(self) -> None:
+        self.assertIn("public.findings", self.sql)
+        self.assertIn("taxonomy_version", self.sql)
+
+    def test_uses_do_block_and_pg_constraint_lookup(self) -> None:
+        self.assertIn("do $$", self.sql)
+        self.assertIn("pg_constraint", self.sql)
+
+    def test_adds_named_v1v2v3v4_in_list_check(self) -> None:
+        self.assertIn("findings_taxonomy_version_v1v2v3v4_check", self.sql)
+        for version in gf.TAXONOMY_VERSIONS:
+            self.assertIn(f"'{version}'", self.sql)
+        self.assertIn(
+            "check (taxonomy_version in (\n      'grm-finding-taxonomy/v1', "
+            "'grm-finding-taxonomy/v2', 'grm-finding-taxonomy/v3',\n      "
+            "'grm-finding-taxonomy/v4'\n    ))",
+            self.sql,
+        )
+
+    def test_does_not_reclassify_existing_rows(self) -> None:
+        self.assertNotIn("update public.findings", self.sql.lower())
+
+    def test_no_array_slice_syntax_present(self) -> None:
+        """009's pitfall (array slice needs the sliced expression parenthesized,
+        e.g. `(coalesce(...))[1:500]`) does not apply here because this migration
+        performs no array slicing at all -- assert that stays true so a future
+        edit of this file doesn't quietly introduce the pattern unreviewed."""
+        self.assertNotIn("[1:", self.sql)
+        self.assertNotRegex(self.sql, r"\]\s*\[\s*\d*\s*:\s*\d*\s*\]")
+
+    def test_loop_variable_does_not_shadow_query_table_alias(self) -> None:
+        """Same regression class as 004/011's test above: a plpgsql record var
+        reused as a query table alias makes Postgres resolve `alias.column` as
+        the not-yet-assigned plpgsql record instead of the SQL alias."""
+        declare_match = re.search(r"declare\s+(\w+)\s+record;", self.sql)
+        self.assertIsNotNone(declare_match, "expected a `declare <name> record;` line")
+        record_var = declare_match.group(1)
+
+        loop_match = re.search(r"for\s+(\w+)\s+in", self.sql)
+        self.assertIsNotNone(loop_match, "expected a `for <name> in` loop")
+        self.assertEqual(loop_match.group(1), record_var, "loop variable must match declared record")
+
+        alias_match = re.search(r"from\s+pg_constraint\s+(\w+)", self.sql)
+        self.assertIsNotNone(alias_match, "expected `from pg_constraint <alias>`")
+        constraint_alias = alias_match.group(1)
+
+        self.assertNotEqual(
+            record_var, constraint_alias,
+            "plpgsql record variable must not share a name with a table alias "
+            "used inside its own FOR-loop query (ambiguous `alias.column` resolution)",
+        )
+
+    def test_supersedes_011_by_expanding_not_narrowing(self) -> None:
+        """012 must be a strict superset of 011's accepted versions -- it should
+        never be possible for a migration ordering to leave v3 rows unacceptable."""
+        v3_sql = _TAXONOMY_V3_MIGRATION_PATH.read_text(encoding="utf-8")
+        self.assertIn("grm-finding-taxonomy/v1", v3_sql)
+        self.assertIn("grm-finding-taxonomy/v2", v3_sql)
+        self.assertIn("grm-finding-taxonomy/v3", v3_sql)
+        self.assertIn("grm-finding-taxonomy/v1", self.sql)
+        self.assertIn("grm-finding-taxonomy/v2", self.sql)
+        self.assertIn("grm-finding-taxonomy/v3", self.sql)
+        self.assertIn("grm-finding-taxonomy/v4", self.sql)
 
 
 class TranslationColumnsMigrationTest(unittest.TestCase):

@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""grm-finding-taxonomy/v3 -- unattended CI reclassification service for the live
+"""grm-finding-taxonomy -- unattended CI reclassification service for the live
 findings table.
 
 Background: the 2026-07-12 classification audit (archive/findings_classification_
 audit_2026-07-12.md) found `classify_finding_category()` (v2) had a real-world
-accuracy of 71% (25/100 wrong in a stratified sample). grm_findings.py v3 fixes
-the identified structural bugs (see grm_findings.TAXONOMY_VERSION change log).
-Rows already live in Supabase were classified under v1/v2 and never get
-revisited by the normal ingestion path (findings are written once, at
-collection time) -- something has to walk the live table and re-run the new
+accuracy of 71% (25/100 wrong in a stratified sample). grm_findings.py v3 fixed
+the identified structural bugs, and the v3 sochu 재감사(archive/findings_
+classification_audit_v3_2026-07-12.md, 실질 정확도 89%) drove a v4 revision
+addressing the remaining wrong 9 cases (see grm_findings.TAXONOMY_VERSION change
+log for both). This module is intentionally version-agnostic -- it always calls
+whatever `gf.classify_finding_category()`/`gf.TAXONOMY_VERSION` currently is, so
+the v3->v4 upgrade required no code change here, only a re-dispatch of the
+existing workflow.
+
+Rows already live in Supabase were classified under an older taxonomy version and
+never get revisited by the normal ingestion path (findings are written once, at
+collection time) -- something has to walk the live table and re-run the current
 classifier against each row's already-stored `finding_text` to bring
 `category_code`/`category_label_ko`/`taxonomy_version` up to date.
 

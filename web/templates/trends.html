@@ -74,9 +74,11 @@
 <style>
 /* [F3b] 한국어 어절 줄바꿈(§1 P0, findings.html 과 동일 스코프). */
 main{word-break:keep-all;overflow-wrap:anywhere}
-/* [F3c] 히어로 설명 — 균형 줄바꿈(grm.css .page-head p 전역규칙 확장, 이 페이지 스코프만.
-   §5-1 .subscribe .note 와 동일 패턴 — 마지막 줄 짧은 고아 줄 방지). */
-.page-head p{text-wrap:balance}
+/* [F3c] 히어로 설명 — grm.css .page-head p 의 62ch 캡(영문 기준 가독폭)을 이 페이지
+   스코프에서만 해제. 한글은 음절당 폭이 넓어 62ch 이 실제로는 한 줄에 다 안 들어가는
+   길이라 뷰포트 우측에 여백이 남는데도 불필요하게 2줄로 접혔다 — .wrap 폭까지 그대로
+   펴지게 하고, 그래도 접혀야 하는 좁은 뷰포트에서만 균형 배분(text-wrap:balance). */
+.page-head p{max-width:none;text-wrap:balance}
 
 /* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
 .tr-state{padding:14px 0}
@@ -96,13 +98,13 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-stat-note{display:block;font-size:11px;color:var(--muted-2);margin-top:3px;max-width:22ch;line-height:1.4;text-wrap:balance}
 
 /* 한눈 요약 헤드라인 — 세리프 풀쿼트 톤. */
-.tr-headline{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--body-s);margin:0 0 44px;max-width:74ch;text-wrap:balance}
+.tr-headline{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--body-s);margin:0 0 44px;text-wrap:balance}
 .tr-headline:empty{display:none}
 
 .tr-block{margin:0 0 46px}
 .tr-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 18px}
 .tr-empty{font-size:12.5px;color:var(--muted);margin:0}
-.tr-note{font-size:12px;color:var(--muted);margin-top:14px;max-width:70ch;line-height:1.55;text-wrap:balance}
+.tr-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.55;text-wrap:balance}
 
 /* 카테고리 순위 — 상위 10, coral 단색 순위별 농도(opacity, JS 계산). */
 .tr-cat{display:flex;flex-direction:column;gap:2px}

@@ -131,6 +131,12 @@
   var dashToggleBtn = document.getElementById("fnd-dash-toggle");
   var dashGridEl = document.getElementById("fnd-dash-grid");
 
+  // [공개 범위 투명성] 커버리지 노트 — 메인 fetchFindings() 와 완전히 독립된 별도 fetch
+  // (findings_stats RPC, trends.js 와 동일 엔드포인트). 성공 시에만 노트를 채우고 노출한다
+  // — 실패(RPC 미존재 등)해도 이 노트만 hidden 유지, 검색 페이지 본기능엔 영향 없다.
+  var coverageNoteEl = document.getElementById("fnd-coverage-note");
+  var coverageTextEl = document.getElementById("fnd-coverage-text");
+
   // [FIND-1 M7] 대시보드 밴드 — 필터 컨트롤 위 콤팩트 조망(스탯/카테고리/월별/업체).
   // 셸(findings.html)은 빈 컨테이너+hidden 만 가진다 — 다섯 엘리먼트가 모두 있을 때만
   // 활성화하고(hasDash), 없으면 검색 자체는 기존과 동일하게 계속 동작한다(하위호환).
@@ -964,7 +970,37 @@
     });
   }
 
+  // [공개 범위 투명성] findings_stats RPC(007) — 공개 게이트(006)를 우회해 전량 집계를
+  // 반환한다(trends.js 와 동일 계약, 원문 텍스트는 내려주지 않는 안전 계약도 동일). 이
+  // 페이지의 anon SELECT(공개 게이트 통과분만)와 이 RPC 의 전량 집계 사이 간극을 사용자에게
+  // 정직하게 알리는 것이 목적이다 — 실패해도 독립적으로 조용히 숨김 유지(아래 .catch()).
+  function fetchCoverageNote() {
+    if (!coverageNoteEl || !coverageTextEl) return;
+    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error("findings_stats " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var totals = (data && data.totals) || {};
+        var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
+        var total = Number(totals.findings || 0).toLocaleString("ko-KR");
+        coverageTextEl.textContent =
+          "국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 " + pub +
+          "건 공개 / 전체 " + total + "건 집계 반영 (매일 확대 중)";
+        coverageNoteEl.hidden = false;
+      })
+      .catch(function () {
+        // 조용히 숨김 유지 — 검색 페이지 본기능(검색·필터)과 무관한 독립 폴백.
+      });
+  }
+
   showState("loading");
+  fetchCoverageNote();
   fetchFindings(FIELDS)
     .then(function (r) {
       if (r.ok) return r.json();

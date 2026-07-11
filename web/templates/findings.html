@@ -65,6 +65,14 @@
       </div>
     </section>
 
+    {#- [공개 범위 투명성] 트렌드 대시보드(findings_stats RPC, 공개 게이트 우회 전량 집계)와
+        이 검색 페이지(공개 게이트 006 통과분만 anon fetch)의 건수 차이를 정직하게 명시한다.
+        정적 셸은 hidden 빈 노트만 렌더(골든 결정론) — findings.js 가 findings_stats RPC 를
+        독립적으로(메인 fetch 와 무관) fetch 해 성공 시에만 채우고 노출한다. 실패(RPC 미존재
+        등)하면 이 노트만 조용히 숨김 유지 — 페이지 본기능(검색)엔 전혀 영향 없다. 기존
+        .imp(시사점 노트) 토큰을 그대로 재사용 — 신규 CSS 0. -#}
+    <div class="imp" id="fnd-coverage-note" hidden><p id="fnd-coverage-text"></p></div>
+
     <section aria-label="검색 결과">
       <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
       <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>

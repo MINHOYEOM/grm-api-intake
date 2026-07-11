@@ -29,6 +29,12 @@
   var errorEl = document.getElementById("tr-error");
   var contentEl = document.getElementById("tr-content");
   var statsEl = document.getElementById("tr-stats");
+  // [공개 범위 투명성] 스탯 스트립 수치(전량 집계)와 카테고리 클릭 → 검색 페이지 이동 결과
+  // (공개 게이트 통과분만) 사이 간극을 명시하는 노트. 이미 보유한 fetchStats() 응답(totals)을
+  // 재사용해 채운다(추가 fetch 0) — 엘리먼트가 없는 구버전 셸이어도(하위호환) renderCoverageNote()
+  // 가 조용히 no-op 하도록 방어적으로 조회한다(findings.js 의 hasDash 관례와 동형).
+  var coverageNoteEl = document.getElementById("tr-coverage-note");
+  var coverageTextEl = document.getElementById("tr-coverage-text");
   var headlineEl = document.getElementById("tr-headline");
   var catEl = document.getElementById("tr-cat");
   var heatmapBlockEl = document.getElementById("tr-heatmap-block");
@@ -210,6 +216,19 @@
 
   function renderHeadline(lines) {
     headlineEl.textContent = lines.join(" ");
+  }
+
+  // [공개 범위 투명성] totals 는 fetchStats() 가 이미 fetch 한 findings_stats RPC 응답 —
+  // 추가 네트워크 호출 없이 재사용한다. 요소가 없으면(구버전 셸) 조용히 no-op.
+  function renderCoverageNote(totals) {
+    if (!coverageNoteEl || !coverageTextEl) return;
+    var total = Number(totals.findings || 0).toLocaleString("ko-KR");
+    var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
+    coverageTextEl.textContent =
+      "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다. 개별 원문 열람은 국문 " +
+      "번역 완료분(" + pub + "건)부터 순차 공개되며, 카테고리를 클릭해 이동한 검색 결과는 " +
+      "집계 수치보다 적을 수 있습니다.";
+    coverageNoteEl.hidden = false;
   }
 
   // ── 카테고리 순위(메인 시각) — 상위 10, 순위별 opacity 100→40% 농도 단계 ─────────
@@ -628,6 +647,7 @@
   function renderAll(data) {
     var totals = data.totals || {};
     renderStats(totals);
+    renderCoverageNote(totals);
     renderHeadline(buildHeadline(data));
     renderCategoryRanking(data.by_agency_category || []);
     renderYearTrend(data.by_month || []);

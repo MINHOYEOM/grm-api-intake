@@ -33,7 +33,7 @@ alter table public.raw_signals enable row level security;
 -- findings: 지적사항 분석층. inspector_names/cfr_refs/mfds_refs 는 SQLite TEXT 배열의 jsonb 강화형.
 create table if not exists public.findings (
   schema_version text not null check (schema_version = 'grm-finding/v1'),
-  taxonomy_version text not null check (taxonomy_version in ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2', 'grm-finding-taxonomy/v3')),
+  taxonomy_version text not null check (taxonomy_version in ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2', 'grm-finding-taxonomy/v3', 'grm-finding-taxonomy/v4')),
   finding_id text primary key,
   raw_signal_id text not null references public.raw_signals (raw_signal_id) on delete cascade,
   source text not null,

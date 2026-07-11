@@ -1,0 +1,86 @@
+[
+  {
+    "finding_id": "finding-a2a6921f8a297b16c0f2f47f",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.",
+    "expected_category": "aseptic_sterility_assurance",
+    "note": "정상 철자 'sterile'/'sterilization' -- v4 의 신규 'sterih' OCR 변형 패턴을 추가해도 정상 철자 매칭이 깨지지 않는지 확인하는 최우선 대조군(재사용: taxonomy_v3_regression_correct.json 과 동일 실측 원문)."
+  },
+  {
+    "finding_id": "finding-41796471c7e9fa5c2225f0e1",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "expected_category": "quality_unit_oversight",
+    "note": "정상 철자 'quality control unit'(0a1df74a 의 OCR 정상 버전) -- v4 의 신규 `qua[lJ1i]+ty` 문자클래스 패턴을 추가해도 정상 철자 매칭이 깨지지 않는지 확인하는 최우선 대조군(재사용: taxonomy_v3_regression_correct.json 과 동일 실측 원문)."
+  },
+  {
+    "finding_id": "finding-15729d1351e42b4a2666e890",
+    "finding_text": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "expected_category": "equipment_facility",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례(2차 감사 재확인) -- v4 신규 규칙(quality/sterile OCR, annual/reserve/smoke, drug substance/CPV)이 이 'cleaning and maintenance of equipment' 문구를 가로채지 않는지 확인."
+  },
+  {
+    "finding_id": "finding-3acbf1ccc4ff816fcd2d4a95",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drng products is not of appropriate design, of adequate size and suitably located to facilitate operations for its intended use and cleaning and maintenance.",
+    "expected_category": "equipment_facility",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- equipment_facility 의 facility 부정 lookbehind 패턴이 v4 에서도 안정적인지 확인."
+  },
+  {
+    "finding_id": "finding-e082e2cd18e237f9188902a2",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of di11g products is not of appropriate design to facilitate operations for its intended use and cleaning and maintenance.",
+    "expected_category": "equipment_facility",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 위와 동일 템플릿의 별도 OCR 변형('di11g'='drug')."
+  },
+  {
+    "finding_id": "finding-9f36050645ff0c4982dcc5e9",
+    "finding_text": "Complaints records arc deficient in that they do not include the findings ofthe investigation and follow­ up.",
+    "expected_category": "complaint_recall",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- complaint_recall 이 deviation_capa/investigation 보다 앞선 순번을 v4 에서도 유지하는지 확인."
+  },
+  {
+    "finding_id": "finding-51a31e62ed4eba82a7a37ae5",
+    "finding_text": "Appropriate conti��ols are not exercised over computer or related system to assme that the changes in the master production or conti-ol records or other records are instituted only by authorized persons.",
+    "expected_category": "computer_system_validation",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- computer_system_validation 이 documentation_records 보다 앞선 순번(648323af 충돌 해소)을 v4 에서도 유지하는지 확인."
+  },
+  {
+    "finding_id": "finding-648323af727e3453c9478a98",
+    "finding_text": "Approp1iate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records ai��e instituted only by authorized personnel.",
+    "expected_category": "computer_system_validation",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례(648323af 충돌 해소의 원본 사례) -- v4 에서도 동일하게 유지되는지 확인."
+  },
+  {
+    "finding_id": "finding-e1c91f608cb1f8111d750822",
+    "finding_text": "Adequate procedural controls were not established to protect the electronic data acquisition and process control systems used for the manufacturing ofj (b)(4ps and DP in your manufacturing facility.",
+    "expected_category": "computer_system_validation",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 'electronic data' 패턴이 v4 신규 CPV 패턴('manufacturing process(es)...variability/monitor/output/validate')보다 여전히 먼저(computer_system_validation 이 process_validation 보다 앞선 순번) 매칭되는지 확인. 이 문장은 'process control systems'/'manufacturing facility'는 있지만 'manufacturing process(es)' 리터럴 구는 없어 어차피 CPV 패턴은 매칭 대상이 아님 -- 순번 안전 이중 확인."
+  },
+  {
+    "finding_id": "finding-87a812982cb562572921bf87",
+    "finding_text": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing, and processing.",
+    "expected_category": "documentation_records",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- documentation_records 의 batch...records 패턴이 v4 에서도 유지되는지, computer_system_validation 신규 순번이 이 사례를 가로채지 않는지(컴퓨터/전자데이터 신호 없음) 확인."
+  },
+  {
+    "finding_id": "finding-3df6f81c903f504271602b14",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "expected_category": "process_validation",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 'process controls' 바레 키워드가 v4 신규 CPV 패턴 추가 이후에도 여전히 먼저 매칭되는지, quality_unit_oversight 신규 'annual...review' 패턴이 이 문장의 'quality'를 오발동하지 않는지 확인."
+  },
+  {
+    "finding_id": "finding-83a2506f20e5fb509179c294",
+    "finding_text": "Process Parameters (PPs) are not adequately controlled within established ranges iDCb><4> DS manufacturing process.",
+    "expected_category": "process_validation",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 'Process Parameters' 키워드가 v4 신규 CPV 패턴('manufacturing process...variability/monitor/output/validate')보다 먼저 매칭되는지(이 문장은 CPV 패턴의 우변 신호가 없어 어차피 무관) 확인."
+  },
+  {
+    "finding_id": "finding-d26d05a3fad0984e0e37fdbe",
+    "finding_text": "The labels of your outsourcing facility's drug products are deficient.",
+    "expected_category": "labeling_packaging",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 'outsourcing facility' 부정 lookbehind 로 equipment_facility 오탐을 차단한 v3 수정이 v4 에서도 유지되는지, 그리고 이 문장에 등장하는 'drug products'가 신규 material_supplier_control 패턴('sampling of drug substance...')을 오발동하지 않는지(sampling 없음 -- 무관) 확인."
+  },
+  {
+    "finding_id": "finding-77ea1641ec5cea771b2318f9",
+    "finding_text": "Written procedures are lacking which describe in sufficient detail the receipt, identification , sampling, testing, approval and rejection of components.",
+    "expected_category": "material_supplier_control",
+    "note": "1차 감사 wrong -> v3 에서 fixed 된 실사례 -- 'component' 바레 키워드 매칭이 v4 신규 'sampling of (drug substance|component|excipient)' 패턴 추가 이후에도 여전히 유지되는지 확인(이 문장은 'sampling'과 'components'가 인접하지 않아 신규 패턴은 매칭되지 않고, 기존 bare 'component' 키워드로 매칭되는 것이 정상)."
+  }
+]

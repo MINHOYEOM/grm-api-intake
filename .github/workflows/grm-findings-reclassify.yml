@@ -1,9 +1,11 @@
-name: GRM Findings Reclassify (taxonomy v3)
+name: GRM Findings Reclassify (taxonomy)
 
-# grm-finding-taxonomy/v3 findings 재분류 -- workflow_dispatch 전용, cron 없음.
+# grm-finding-taxonomy findings 재분류 -- workflow_dispatch 전용, cron 없음. 버전 무관
+# 재사용(v3 도입 시 최초 작성, v4 도입 시 코드 변경 없이 그대로 재사용 -- 아래 스크립트가
+# 항상 grm_findings.py 의 "현재" classify_finding_category/TAXONOMY_VERSION 을 참조한다).
 # findings_reclassify_service.py 가 PostgREST 로 findings 전량을 페이지네이션 GET 한 뒤
 # 순수 결정론 Python(classify_finding_category, LLM 0)을 각 행의 finding_text 에 재실행해
-# category_code 가 달라지거나 taxonomy_version 이 아직 v3 가 아닌 행만 PATCH 한다.
+# category_code 가 달라지거나 taxonomy_version 이 아직 최신이 아닌 행만 PATCH 한다.
 # finding_text/finding_text_ko/scope_status 는 절대 건드리지 않는다(스크립트 docstring
 # 계약 참조).
 #
@@ -35,7 +37,7 @@ concurrency:
 
 jobs:
   reclassify:
-    name: Reclassify findings.category_code under taxonomy v3
+    name: Reclassify findings.category_code under current taxonomy
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -76,7 +78,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "### GRM Findings Reclassify (taxonomy v3)"
+            echo "### GRM Findings Reclassify (taxonomy)"
             echo ""
             echo "dry_run=${{ inputs.dry_run }} limit=${{ inputs.limit }}"
             echo ""

@@ -191,14 +191,20 @@ class PatternMechanismTest(unittest.TestCase):
 
 
 class TaxonomyV3BoundedTest(unittest.TestCase):
+    """Note: taxonomy has since moved to v4 (see tests/test_findings_taxonomy_v4.py) --
+    this class keeps its v3 name for history/diff-locality, but the version/order
+    assertions below are updated in place to track whatever TAXONOMY_VERSION actually
+    is, since there is only one live classify_finding_category(), not a v3-frozen one."""
+
     def test_taxonomy_v3_is_current_and_v1v2_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v3")
+        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v4")
         self.assertEqual(
             gf.TAXONOMY_VERSIONS,
             (
                 "grm-finding-taxonomy/v1",
                 "grm-finding-taxonomy/v2",
                 "grm-finding-taxonomy/v3",
+                "grm-finding-taxonomy/v4",
             ),
         )
         self.assertEqual(len(gf.FINDING_TAXONOMY), 20)
@@ -264,32 +270,52 @@ class AuditWrong25FixtureTest(unittest.TestCase):
         self.assertEqual(failures, [], f"regressions among fixable audit cases: {failures}")
 
     def test_known_limitation_cases_are_pinned_not_silently_changing(self) -> None:
-        """These 5 cases cannot reach the audit's expected category under the
-        v3 rule set (OCR corruption, or requiring domain knowledge beyond
-        keyword matching -- see each case's known_limitation_reason). Pin
-        their actual v3 output so a *future* code change that silently shifts
-        them again gets caught. (648323af was originally in this set as a
-        rule1/rule2 conflict; the control-tower ruling moved
-        computer_system_validation ahead of documentation_records, which
-        resolved it into a normal fixable case.)"""
-        pinned = {
-            "finding-1b836c8a1bf34727d471053a": "equipment_facility",
-            "finding-0a1df74ab174e17188c68719": "other_quality_system",
-            "finding-596b2bd48f06e734ff289d44": "material_supplier_control",
+        """These 5 cases were flagged `known_limitation: true` in the v3 fixture
+        because the v3 rule set could not reach the audit's expected category
+        (OCR corruption, or domain knowledge beyond keyword matching -- see each
+        case's known_limitation_reason). The `known_limitation` flag itself is
+        frozen fixture metadata (the v3 fixture JSON is not edited post-hoc), but
+        classify_finding_category() is a single live function -- when a later
+        taxonomy revision genuinely fixes one of these cases, this test is
+        updated to assert the *new* (correct) output instead of silently letting
+        the old "still wrong" assertion rot.
+
+        v4 update (grm-finding-taxonomy/v4, 2026-07-12 v3 사후 재감사 후보1/3):
+        4 of the 5 cases are exactly the wrong9 cases v4's OCR-tolerance
+        (candidate 1) and CPV/material vocabulary (candidate 3) rules were
+        designed to fix, and real-data verification confirms they now resolve
+        to their expected_v3_category -- `fixed_by_v4` below. Only
+        ab4e3d27348680a83ef3685b ("quality of water ... non-sterile drug
+        products") remains a genuine known_limitation after v4: no v4 candidate
+        rule targets it, so it is still pinned to its actual (still-wrong)
+        output. (648323af was similarly resolved during the v2->v3 transition --
+        see the historical note that used to live here.)"""
+        still_wrong_pinned = {
             "finding-ab4e3d27348680a83ef3685b": "other_quality_system",
-            "finding-a2d14f0f95909fc6d168155e": "other_quality_system",
+        }
+        fixed_by_v4 = {
+            "finding-1b836c8a1bf34727d471053a",
+            "finding-0a1df74ab174e17188c68719",
+            "finding-596b2bd48f06e734ff289d44",
+            "finding-a2d14f0f95909fc6d168155e",
         }
         known_limitation_ids = {c["finding_id"] for c in self.cases if c["known_limitation"]}
-        self.assertEqual(known_limitation_ids, set(pinned.keys()))
+        self.assertEqual(known_limitation_ids, set(still_wrong_pinned) | fixed_by_v4)
 
         for case in self.cases:
             if not case["known_limitation"]:
                 continue
             got = gf.classify_finding_category(case["finding_text"])
-            self.assertEqual(
-                got, pinned[case["finding_id"]],
-                f"known_limitation case {case['finding_id']} v3 output drifted",
-            )
+            if case["finding_id"] in fixed_by_v4:
+                self.assertEqual(
+                    got, case["expected_v3_category"],
+                    f"expected v4 to fix known_limitation case {case['finding_id']}",
+                )
+            else:
+                self.assertEqual(
+                    got, still_wrong_pinned[case["finding_id"]],
+                    f"known_limitation case {case['finding_id']} output drifted",
+                )
             self.assertTrue(case["known_limitation_reason"].strip())
 
 

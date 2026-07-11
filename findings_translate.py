@@ -33,10 +33,16 @@ itself; it only ever produces the file.
 
 --source {sqlite,supabase} (default: sqlite) selects where findings are read
 from. supabase mode talks to the live database anon-key, read-only (RLS) via
-PostgREST: --export issues GET requests and --apply validates against a live
-GET snapshot, but there is no live write path -- --apply --source supabase
-requires --sql-output (the resulting SQL is applied by a human via the
-Supabase SQL Editor) and rejects --write-file with exit 2.
+PostgREST: --export and --apply both call the RPC bridge in
+web/migrations/009_findings_translation_bridge.sql (findings_translation_queue /
+findings_translation_rows), which deliberately bypasses the 006 public-read RLS
+gate -- that gate hides every untranslated row from a plain anon GET, which would
+otherwise make this tool blind to the very rows it exists to translate. Falls
+back to the legacy gate-limited REST GET path only if the RPC is unreachable
+(HTTP 404, i.e. 009 hasn't been applied to that environment yet). There is no
+live write path -- --apply --source supabase requires --sql-output (the
+resulting SQL is applied by a human via the Supabase SQL Editor) and rejects
+--write-file with exit 2.
 """
 
 from __future__ import annotations
@@ -88,6 +94,14 @@ _SUPABASE_HTTP_TIMEOUT_SECONDS = 15
 _SUPABASE_MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 _SUPABASE_EXPORT_LIMIT = 1000
 _SUPABASE_VALIDATE_BATCH_SIZE = 20  # finding_id=in.(...) batch size (URL length defense)
+
+# [RLS bridge] RPC names from web/migrations/009_findings_translation_bridge.sql. Both
+# are SECURITY DEFINER and bypass the 006_findings_publish_gate.sql public-read RLS
+# policy on purpose -- that gate hides every untranslated row from the anon key this
+# module uses, which otherwise makes --export/--apply --source supabase blind to the
+# very rows they exist to find (see 009's header comment for the full rationale).
+_RPC_TRANSLATION_QUEUE = "findings_translation_queue"
+_RPC_TRANSLATION_ROWS = "findings_translation_rows"
 
 
 # ---------------------------------------------------------------------------
@@ -203,8 +217,60 @@ def _supabase_get(
     return 0, None, {}, "retry_exhausted"  # unreachable safety net
 
 
-def _fetch_untranslated_supabase(base_url: str, anon_key: str) -> tuple[list[dict[str, Any]], str]:
-    """Read-only PostgREST export of untranslated findings. Returns (items, error)."""
+def _supabase_post_rpc(
+    base_url: str,
+    anon_key: str,
+    function_name: str,
+    body: dict[str, Any],
+    *,
+    timeout: int = _SUPABASE_HTTP_TIMEOUT_SECONDS,
+) -> tuple[int, Any, dict[str, Any], str]:
+    """POST one PostgREST RPC resource (rpc/<function_name>) with the (public) anon key.
+
+    Mirrors _supabase_get's contract exactly (same retry-once-on-5xx/timeout rule, same
+    (status_code, parsed_json_or_None, response_headers, error_summary) return shape,
+    same anon-key-never-in-error-text convention) -- just POST + a JSON body instead of
+    GET + query params, which is PostgREST's calling convention for functions (RPC).
+    """
+    url = f"{base_url}/rest/v1/rpc/{function_name}"
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {anon_key}",
+        "Content-Type": "application/json",
+    }
+
+    for attempt in range(1, _SUPABASE_MAX_ATTEMPTS + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=body, timeout=timeout)
+        except requests.exceptions.Timeout:
+            if attempt < _SUPABASE_MAX_ATTEMPTS:
+                continue
+            return 0, None, {}, "timeout"
+        except requests.exceptions.RequestException as exc:
+            return 0, None, {}, type(exc).__name__
+
+        if resp.status_code >= 500:
+            if attempt < _SUPABASE_MAX_ATTEMPTS:
+                continue
+            return resp.status_code, None, dict(resp.headers), f"http_{resp.status_code}"
+        if resp.status_code >= 400:
+            return resp.status_code, None, dict(resp.headers), f"http_{resp.status_code}"
+
+        try:
+            data = resp.json()
+        except ValueError:
+            data = None
+        return resp.status_code, data, dict(resp.headers), ""
+
+    return 0, None, {}, "retry_exhausted"  # unreachable safety net
+
+
+def _fetch_untranslated_supabase_legacy(
+    base_url: str, anon_key: str,
+) -> tuple[list[dict[str, Any]], str]:
+    """Pre-009 REST GET export path -- gate-limited (006 hides untranslated rows from
+    anon), kept only as a fallback for environments where 009's RPC isn't deployed yet
+    (PostgREST answers 404/PGRST202 for an unknown function). Returns (items, error)."""
     status, data, _headers, err = _supabase_get(
         base_url,
         anon_key,
@@ -221,6 +287,47 @@ def _fetch_untranslated_supabase(base_url: str, anon_key: str) -> tuple[list[dic
     if not isinstance(data, list):
         return [], "invalid_response_shape"
     return [dict(row) for row in data], ""
+
+
+def _fetch_untranslated_supabase(
+    base_url: str, anon_key: str,
+) -> tuple[list[dict[str, Any]], int | None, str, str]:
+    """Read-only export of untranslated findings. Returns (items, untranslated_total,
+    error, queue_source).
+
+    Primary path: POST rpc/findings_translation_queue (009_findings_translation_bridge.sql)
+    -- a SECURITY DEFINER RPC that bypasses the 006 public-read RLS gate, which otherwise
+    hides every untranslated row from the anon key this module uses (see 009's header
+    comment for the full rationale -- the 006 gate is a web-display-quality gate, not a
+    confidentiality gate, and this RPC's only consumer is this translation tool).
+
+    Falls back to the legacy REST GET (gate-limited, pre-009 behavior) only when the RPC
+    itself is missing (HTTP 404, PostgREST's PGRST202 "function not found") -- e.g. an
+    environment 009 hasn't been applied to yet. Any other error is returned as-is.
+
+    queue_source is "rpc" (untranslated_total is the exact live count from the RPC
+    envelope) or "legacy_rest_gate_limited" (fallback -- untranslated_total is None, the
+    caller falls back to len(items), and that count is known to undercount due to the
+    006 gate).
+    """
+    status, data, _headers, err = _supabase_post_rpc(
+        base_url,
+        anon_key,
+        _RPC_TRANSLATION_QUEUE,
+        {"p_limit": _SUPABASE_EXPORT_LIMIT},
+    )
+    if err == "http_404":
+        items, legacy_err = _fetch_untranslated_supabase_legacy(base_url, anon_key)
+        return items, None, legacy_err, "legacy_rest_gate_limited"
+    if err:
+        return [], None, err, "rpc"
+    if not isinstance(data, dict):
+        return [], None, "invalid_response_shape", "rpc"
+    items = data.get("items")
+    total = data.get("untranslated_total")
+    if not isinstance(items, list) or not isinstance(total, int):
+        return [], None, "invalid_response_shape", "rpc"
+    return [dict(row) for row in items], total, "", "rpc"
 
 
 def _fetch_findings_total_supabase(base_url: str, anon_key: str) -> int:
@@ -260,26 +367,38 @@ def build_translation_plan_supabase(base_url: str, anon_key: str) -> dict[str, A
     if base is None:
         raise ValueError("findings_translate: --supabase-url must start with https://")
 
-    items, err = _fetch_untranslated_supabase(base, anon_key)
+    items, untranslated_total, err, queue_source = _fetch_untranslated_supabase(base, anon_key)
     if err:
         raise ValueError(f"findings_translate: supabase export failed: {err}")
 
     findings_total = _fetch_findings_total_supabase(base, anon_key)
     host = urlsplit(base).netloc or base
 
+    # RPC mode reports the exact live untranslated count in the envelope even when the
+    # page of items is capped -- prefer it. Legacy fallback has no such count (it never
+    # did), so len(items) remains the only signal, same as before 009 existed.
+    untranslated_count = untranslated_total if untranslated_total is not None else len(items)
+
     plan: dict[str, Any] = {
         "schema_version": TRANSLATION_PLAN_SCHEMA_VERSION,
         "source_db": {
             "file_name": f"supabase:{host}",
             "findings_total": findings_total,
-            "untranslated": len(items),
+            "untranslated": untranslated_count,
         },
         "items": items,
+        # [RLS bridge] "rpc" (009's findings_translation_queue served this export) or
+        # "legacy_rest_gate_limited" (009 wasn't reachable -- fell back to the pre-009
+        # REST GET path, which the 006 gate silently truncates to near-zero rows).
+        "queue_source": queue_source,
     }
     if findings_total == -1:
         # Additive field: the exact-count probe failed; the export itself is intact.
         plan["count_unavailable"] = True
-    if len(items) == _SUPABASE_EXPORT_LIMIT:
+    if queue_source == "rpc":
+        if untranslated_total is not None and len(items) < untranslated_total:
+            plan["truncated_possible"] = True
+    elif len(items) == _SUPABASE_EXPORT_LIMIT:
         plan["truncated_possible"] = True
     return plan
 
@@ -547,30 +666,61 @@ def apply_translations(
     }
 
 
+def _fetch_live_rows_batch_legacy(
+    base_url: str, anon_key: str, batch: list[str],
+) -> tuple[dict[str, dict[str, Any]], str]:
+    """Pre-009 REST GET path for one batch -- gate-limited (006 hides untranslated rows
+    from anon, so this cannot actually validate a plan full of untranslated items).
+    Kept only as a fallback for environments where 009's RPC isn't deployed yet."""
+    status, data, _headers, err = _supabase_get(
+        base_url,
+        anon_key,
+        "findings",
+        params={
+            "select": "finding_id,finding_text,finding_text_ko",
+            "finding_id": "in.(" + ",".join(batch) + ")",
+        },
+    )
+    if err:
+        return {}, err
+    if not isinstance(data, list):
+        return {}, "invalid_response_shape"
+    return {str(row.get("finding_id") or ""): dict(row) for row in data}, ""
+
+
 def _fetch_live_rows_for_ids_supabase(
     base_url: str, anon_key: str, finding_ids: list[str],
 ) -> tuple[dict[str, dict[str, Any]], str]:
     """Fetch finding_id/finding_text/finding_text_ko for a set of ids, batched.
 
-    Batches at _SUPABASE_VALIDATE_BATCH_SIZE ids per `finding_id=in.(...)` GET as
-    a URL-length defense. Returns (rows_by_finding_id, error_summary); on error
-    the dict is always empty so a caller can't accidentally validate against a
-    partial snapshot.
+    Primary path: POST rpc/findings_translation_rows (009_findings_translation_bridge.sql)
+    per batch -- a SECURITY DEFINER RPC that bypasses the 006 public-read RLS gate, so
+    the live byte-match validation this feeds can actually see untranslated rows (the
+    very rows a translation-apply plan is about). Falls back to the legacy REST GET path
+    per-batch only when the RPC is missing (HTTP 404); any other error aborts immediately.
+
+    Batches at _SUPABASE_VALIDATE_BATCH_SIZE ids per call as a URL-length/payload-size
+    defense (unchanged from the pre-009 batching). Returns (rows_by_finding_id,
+    error_summary); on error the dict is always empty so a caller can't accidentally
+    validate against a partial snapshot.
     """
     rows: dict[str, dict[str, Any]] = {}
     for start in range(0, len(finding_ids), _SUPABASE_VALIDATE_BATCH_SIZE):
         batch = finding_ids[start : start + _SUPABASE_VALIDATE_BATCH_SIZE]
         if not batch:
             continue
-        status, data, _headers, err = _supabase_get(
+        status, data, _headers, err = _supabase_post_rpc(
             base_url,
             anon_key,
-            "findings",
-            params={
-                "select": "finding_id,finding_text,finding_text_ko",
-                "finding_id": "in.(" + ",".join(batch) + ")",
-            },
+            _RPC_TRANSLATION_ROWS,
+            {"p_finding_ids": batch},
         )
+        if err == "http_404":
+            batch_rows, legacy_err = _fetch_live_rows_batch_legacy(base_url, anon_key, batch)
+            if legacy_err:
+                return {}, legacy_err
+            rows.update(batch_rows)
+            continue
         if err:
             return {}, err
         if not isinstance(data, list):

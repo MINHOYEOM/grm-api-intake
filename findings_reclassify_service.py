@@ -277,12 +277,17 @@ def _resolve_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
 
 
 def _write_report(path: str | None, report: dict[str, Any]) -> None:
+    """Write the report JSON to `path` if given, and always print it to stdout
+    too -- CI step summaries can't be queried via `gh` CLI, so the run log
+    (stdout) must carry the planned/patched counts and category migration
+    matrix even when --output is also set. The service-role key is never a
+    key or value in `report` (see run_reclassify/_patch_finding contracts),
+    so this print can never leak it."""
     text = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2)
     if path:
         with open(path, "w", encoding="utf-8") as f:
             f.write(text + "\n")
-    else:
-        print(text)
+    print(text)
 
 
 def main(argv: list[str] | None = None) -> int:

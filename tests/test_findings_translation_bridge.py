@@ -252,6 +252,55 @@ class VariableAliasCollisionTest(unittest.TestCase):
             self.assertNotEqual("p_finding_ids", column)
 
 
+class ArraySliceRequiresParensRegressionTest(unittest.TestCase):
+    """Live-DB-only SQL trap regression -- same class as the 004 alias-collision
+    regression (a defect that offline text/shape checks cannot catch on their own,
+    only a real Postgres session surfaces it; control-tower verified against the live
+    DB for PR #170: `ERROR: 42601: syntax error at or near "["`).
+
+    Postgres rejects an array slice `[lo:hi]` applied directly to a function call's
+    result -- `coalesce(p_finding_ids, '{}'::text[])[1:500]` is a syntax error. The
+    call must be wrapped in its own parens before slicing:
+    `(coalesce(p_finding_ids, '{}'::text[]))[1:500]`. This pins that shape so the
+    unparenthesized form can never silently regress back in.
+    """
+
+    def setUp(self) -> None:
+        self.sql = _BRIDGE_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_array_slice_wraps_coalesce_call_in_parens(self) -> None:
+        self.assertIn(
+            "(coalesce(p_finding_ids, '{}'::text[]))[1:500]",
+            self.sql,
+        )
+
+    def test_every_array_slice_site_is_immediately_preceded_by_double_close_paren(
+        self,
+    ) -> None:
+        # Every `[lo:hi]` slice in this file must be sliced off a parenthesized
+        # expression, i.e. `))[1:500]` -- one `)` closing coalesce(...), one closing
+        # the wrapping paren around it. A bare `)[1:500]` (single close paren, the
+        # syntax-error form) must never appear.
+        slice_positions = [
+            m.start() for m in re.finditer(re.escape("[1:500]"), self.sql)
+        ]
+        self.assertTrue(slice_positions, "expected at least one [1:500] array slice")
+        for pos in slice_positions:
+            self.assertEqual(
+                self.sql[pos - 2 : pos],
+                "))",
+                f"array slice at offset {pos} is not preceded by '))' -- "
+                "the function call result must be wrapped in parens before slicing",
+            )
+
+    def test_unparenthesized_slice_form_is_absent(self) -> None:
+        # The exact syntax-error form this migration originally shipped with.
+        self.assertNotIn(
+            "coalesce(p_finding_ids, '{}'::text[])[1:500]",
+            self.sql,
+        )
+
+
 class EmptyResultCoalesceTest(unittest.TestCase):
     def setUp(self) -> None:
         self.sql = _BRIDGE_MIGRATION_PATH.read_text(encoding="utf-8")

@@ -100,7 +100,7 @@ as $$
     )
   ), '[]'::jsonb)
   from public.findings
-  where finding_id = any(coalesce(p_finding_ids, '{}'::text[])[1:500]);
+  where finding_id = any((coalesce(p_finding_ids, '{}'::text[]))[1:500]);
 $$;
 
 -- Supabase 는 함수 생성 시 기본적으로 PUBLIC 에 execute 를 부여할 수 있으므로, 먼저

@@ -29,6 +29,15 @@
 
     <div id="tr-content" hidden>
       <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
+
+      {#- [공개 범위 투명성] 이 페이지의 수치는 findings_stats RPC(공개 게이트 우회, 전량
+          집계)에서 오지만, 카테고리 순위 클릭 → 검색 페이지 이동은 공개 게이트(006) 통과분
+          (국문 번역 완료)만 보여준다 — 그 간극을 정직하게 명시한다. 정적 셸은 hidden 빈
+          노트만 렌더(골든 결정론) — trends.js 가 이미 보유한 fetchStats() 응답(totals)을
+          재사용해 채운다(추가 네트워크 호출 0). 기존 .imp(시사점 노트) 토큰 재사용 —
+          신규 CSS 0. -#}
+      <div class="imp" id="tr-coverage-note" hidden><p id="tr-coverage-text"></p></div>
+
       <p class="tr-headline" id="tr-headline"></p>
 
       <section class="tr-block" aria-label="카테고리 순위">

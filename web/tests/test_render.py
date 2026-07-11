@@ -1293,6 +1293,64 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("align-items:flex-start", fm.group(1))
         self.assertNotIn("align-items:end", fm.group(1))
 
+    # ── [공개 범위 투명성] 검색 페이지 커버리지 노트 ─────────────────────────────
+    def test_coverage_note_shell_present_hidden_and_positioned(self):
+        """정적 셸은 hidden 빈 노트만 렌더(골든 결정론) — findings.js 가 런타임에 채운다.
+        기존 .imp(시사점) 토큰을 재사용하므로 신규 CSS 는 0 이어야 한다. 위치는 대시보드
+        섹션 아래·검색 결과 섹션 위(필터 영역 아래·결과 목록 상단)."""
+        self.assertIn(
+            '<div class="imp" id="fnd-coverage-note" hidden><p id="fnd-coverage-text"></p></div>',
+            self.html,
+        )
+        dash_idx = self.html.index('id="fnd-dash"')
+        note_idx = self.html.index('id="fnd-coverage-note"')
+        results_idx = self.html.index('aria-label="검색 결과"')
+        self.assertTrue(dash_idx < note_idx < results_idx,
+                         "커버리지 노트가 대시보드~검색결과 사이에 있지 않음")
+
+    def test_coverage_note_independent_fetch_and_silent_fallback(self):
+        """findings_stats RPC(006 공개 게이트를 우회하는 전량 집계, trends.js 와 동일
+        엔드포인트)를 메인 fetchFindings() 와 완전히 독립된 별도 promise 체인으로 fetch
+        한다 — 실패(RPC 미존재 등)해도 이 노트만 조용히 hidden 유지하고 검색 자체엔
+        영향이 없어야 한다(trends.js 히트맵 404 폴백과 동일 패턴)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function fetchCoverageNote()", js_src)
+        self.assertIn('"/rest/v1/rpc/findings_stats"', js_src)
+        self.assertIn('method: "POST"', js_src)
+        self.assertIn('apikey: key, Authorization: "Bearer " + key', js_src)
+        fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        fn = fn[:fn.index("\n  showState(\"loading\");")]
+        self.assertIn(".catch(function () {", fn)
+        # 실패 콜백은 로딩/에러 상태(showState)를 건드리지 않는다 — 노트만 독립적으로 숨김.
+        catch_body = fn[fn.index(".catch(function () {"):]
+        self.assertNotIn("showState(", catch_body)
+        self.assertNotIn("coverageNoteEl.hidden = false", catch_body)
+        # 메인 검색 fetch 호출 앞에 독립적으로 1회 호출된다(둘 다 showState("loading") 직후).
+        self.assertIn('fetchCoverageNote();\n  fetchFindings(FIELDS)', js_src)
+
+    def test_coverage_note_numbers_not_hardcoded_and_locale_formatted(self):
+        """숫자(공개/전체 건수)는 findings_stats RPC 응답의 totals.public_findings/
+        totals.findings 에서 런타임에 채워지며(하드코딩 금지), toLocaleString('ko-KR')
+        로 천단위 구분한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        fn = fn[:fn.index("\n  showState(\"loading\");")]
+        self.assertIn("totals.public_findings", fn)
+        self.assertIn("totals.findings", fn)
+        self.assertIn('.toLocaleString("ko-KR")', fn)
+        self.assertIn("건 공개 / 전체 ", fn)
+        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약).
+        self.assertIn("coverageTextEl.textContent =", fn)
+
+    def test_coverage_note_element_lookup_is_defensive(self):
+        """구버전 셸(노트 엘리먼트 없음)에서도 조용히 no-op — findings.js 의 hasDash 관례와
+        동형 방어적 조회."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('document.getElementById("fnd-coverage-note")', js_src)
+        self.assertIn('document.getElementById("fnd-coverage-text")', js_src)
+        self.assertIn("if (!coverageNoteEl || !coverageTextEl) return;", js_src)
+
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):
@@ -1516,6 +1574,58 @@ class WebTrendsRenderTest(unittest.TestCase):
     def test_heatmap_scroll_wrapper_present(self):
         html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
         self.assertIn(".tr-heatmap-scroll{overflow-x:auto", html_src)
+
+    # ── [공개 범위 투명성] 트렌드 페이지 커버리지 노트 ───────────────────────────
+    def test_coverage_note_shell_present_hidden_and_positioned(self):
+        """정적 셸은 hidden 빈 노트만 렌더(골든 결정론) — trends.js 가 런타임에 채운다.
+        기존 .imp(시사점) 토큰을 재사용하므로 신규 CSS 는 0 이어야 한다. 위치는 스탯
+        스트립 직하단·한눈 요약 헤드라인 위."""
+        self.assertIn(
+            '<div class="imp" id="tr-coverage-note" hidden><p id="tr-coverage-text"></p></div>',
+            self.html,
+        )
+        stats_idx = self.html.index('id="tr-stats"')
+        note_idx = self.html.index('id="tr-coverage-note"')
+        headline_idx = self.html.index('id="tr-headline"')
+        self.assertTrue(stats_idx < note_idx < headline_idx,
+                         "커버리지 노트가 스탯 스트립~헤드라인 사이에 있지 않음")
+
+    def test_coverage_note_reuses_fetched_totals_no_extra_network_call(self):
+        """카테고리 클릭 → 검색 페이지 이동 결과가 이 페이지의 집계 수치보다 적을 수 있음을
+        알리는 안내는, fetchStats() 가 이미 받아온 totals 를 재사용한다 — 별도 fetch/RPC
+        호출을 추가하지 않는다(추가 네트워크 호출 0)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function renderCoverageNote(totals)", js_src)
+        self.assertIn("renderCoverageNote(totals);", js_src)
+        # renderAll(data) 안에서 fetchStats() 가 이미 fetch 한 동일 totals 를 renderStats 와
+        # 함께 재사용한다(같은 인자, 새 fetch()/rpcEndpoint() 호출 없음).
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertNotIn("fetch(", fn)
+        self.assertNotIn("rpcEndpoint(", fn)
+
+    def test_coverage_note_numbers_not_hardcoded_and_locale_formatted(self):
+        """숫자(전체/공개 건수)는 findings_stats RPC 응답의 totals.findings/
+        totals.public_findings 에서 채워지며(하드코딩 금지), toLocaleString('ko-KR')
+        로 천단위 구분한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("totals.findings", fn)
+        self.assertIn("totals.public_findings", fn)
+        self.assertIn('.toLocaleString("ko-KR")', fn)
+        self.assertIn("이 대시보드의 수치는 전체 ", fn)
+        self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
+        # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약, 파일 상단 XSS 계약 참조).
+        self.assertIn("coverageTextEl.textContent =", fn)
+
+    def test_coverage_note_element_lookup_is_defensive(self):
+        """구버전 셸(노트 엘리먼트 없음)에서도 조용히 no-op — trends.js 의 다른 옵셔널
+        섹션(히트맵 등)과 동형 방어적 조회."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn('document.getElementById("tr-coverage-note")', js_src)
+        self.assertIn('document.getElementById("tr-coverage-text")', js_src)
+        self.assertIn("if (!coverageNoteEl || !coverageTextEl) return;", js_src)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

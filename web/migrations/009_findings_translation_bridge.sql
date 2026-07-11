@@ -1,3 +1,7 @@
+-- ※ 2026-07: scope_status='ok' 필터가 010_findings_scope_purity.sql 에서 추가됨(findings_
+-- translation_queue 만 해당 -- findings_translation_rows 는 필터 없이 그대로 유지. 프로덕션
+-- 현행 정의는 010 참조).
+--
 -- FIND-1 번역 파이프라인 RLS 브릿지 — findings_translate.py 가 anon 키(PostgREST)로 미번역
 -- 행을 조회/검증하지 못하는 구조 결함을 RPC 2개로 우회한다.
 --

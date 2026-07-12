@@ -1156,14 +1156,19 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_clear_all_filters_resets_sort_and_relies_on_render_for_url_clear(self):
         """[M15] #fnd-reset 버튼은 제거됐다 — "모두 지우기"는 clearAllFilters() 가 담당하며
-        sort 도 기본값(date_desc)으로 되돌리고, querystring 은 render()의 syncStateToUrl()
-        이 기본 state 를 반영해 자동으로 비운다(별도 URL clear 불필요)."""
+        sort 도 기본값(date_desc)으로 되돌린다. [문서 단위 페이지네이션] 전체 초기화는
+        currentPage=1 로 되돌리고 goToPage(1) 로 재렌더하며(goToPage → render()), 그
+        render()의 syncStateToUrl() 이 기본 state 를 반영해 querystring 을 자동으로 비운다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function clearAllFilters()", js_src)
-        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 300]
+        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 320]
         self.assertIn('sort: "date_desc"', fn_block)
         self.assertIn("syncControlsFromState()", fn_block)
-        self.assertIn("render()", fn_block)
+        self.assertIn("currentPage = 1", fn_block)
+        self.assertIn("goToPage(1)", fn_block)
+        # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
+        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 400]
+        self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
         """[M15] 적용 필터 칩 각각은 클릭 시 해당 조건만 해제(clearActiveFilter)하고,

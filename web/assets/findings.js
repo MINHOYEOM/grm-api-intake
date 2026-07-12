@@ -163,6 +163,22 @@
   var pendingPageCallbacks = [];
   var currentPage = 1;
   var navToken = 0;
+  // [정확 총수 M1a] findings_stats RPC(fetchCoverageNote() 가 독립적으로 fetch)의
+  // totals.documents/totals.findings — 무필터 기준 exact 값(로드 진행과 무관). 무필터 +
+  // 서버 미소진 구간에서 render() 가 이 값으로 문서수·지적수·총 페이지를 정확히 표시하고,
+  // 끝(») 점프의 목표 페이지로도 그대로 쓴다(더 이상 "로드된 만큼"이 아니라 진짜 마지막
+  // 페이지 1클릭). RPC 실패/010 미적용 라이브에서는 null 유지 — 기존 로드 기준 폴백.
+  var SERVER_DOC_TOTAL = null;
+  var SERVER_FINDINGS_TOTAL = null;
+  // [대시보드 실총수 M3] findings_stats RPC 의 by_agency_category 를 agency 기준으로 합산한
+  // {agency: count} — 무필터 대시보드 스탯의 소스별(FDA/MFDS) 분해를 정확화한다. null 이면
+  // (RPC 실패 등) 대시보드는 기존처럼 로드된 데이터 기준(computeAgencyDist)으로 폴백한다.
+  var SERVER_AGENCY_TOTALS = null;
+  // [선로딩 c] 페이지네이션 버튼(처음/이전/번호/다음/끝) 클릭으로 촉발된 이동에서만 완료
+  // 후 결과 목록 상단으로 스크롤한다 — goToPageFromPager() 가 세팅, goToPage() 의 완료
+  // 콜백이 소비 후 즉시 리셋한다. 필터/검색/정렬 변경발 goToPage(1) 리셋은 스크롤하지
+  // 않는다(검색창에 타이핑할 때마다 화면이 튀는 것을 방지).
+  var pendingScrollAfterNav = false;
 
   var qInput = document.getElementById("fnd-q");
   var sortSel = document.getElementById("fnd-sort");
@@ -1066,36 +1082,56 @@
     // 있다(isServerExhausted() 참조) — 필터 여부와 무관하게 동일 기준을 쓴다: 필터가
     // 걸려도 ensurePageReady() 가 필요할 때 계속 다음 청크를 당겨오므로, "아직 최소
     // 추정치일 뿐"이라는 신호는 필터 여부와 상관없이 항상 정직해야 한다.
-    // totalPagesKnown=지금까지 로드된(+필터링된) 문서 수 기준 페이지 수 — moreMayExist
-    // 면 이 값도 최소 추정치.
     var moreMayExist = !isServerExhausted();
+    // [정확 총수 M1a] 무필터(검색어·필터 전부 비어있음) + 서버 미소진 구간에서는 지금까지
+    // 로드된 docs.length 대신 findings_stats RPC 의 exact 총수(SERVER_DOC_TOTAL/
+    // SERVER_FINDINGS_TOTAL — fetchCoverageNote() 가 독립적으로 채운다)를 그대로 쓴다 —
+    // 로드 진행과 무관하게 항상 정확하다. 서버가 소진되면(전량 로드 완료) 로드된
+    // docs.length 자체가 이미 ground truth 이므로 그쪽으로 자연 전환된다(exactUnfiltered
+    // 는 moreMayExist 가 꺼지면 함께 꺼진다 — RPC 추정치와의 미세한 오차가 있어도 소진
+    // 시점에 스스로 교정됨). 필터가 걸리면 matched 자체가 "필터링된 결과 전체"라는 다른
+    // 모집단이라 RPC 총수로 바꿔치기하지 않는다(로드 기준 유지, renderDash() 의 filtersActive
+    // 판정과 동일 조건).
+    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
+    var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;
     var totalDocsKnown = docs.length;
-    var totalPagesKnown = Math.max(1, Math.ceil(totalDocsKnown / DOCS_PER_PAGE));
+    var totalFindingsKnown = matched.length;
+    var totalPagesKnown;
+    if (exactUnfiltered) {
+      totalDocsKnown = SERVER_DOC_TOTAL;
+      if (SERVER_FINDINGS_TOTAL !== null) totalFindingsKnown = SERVER_FINDINGS_TOTAL;
+      totalPagesKnown = Math.max(1, Math.ceil(SERVER_DOC_TOTAL / DOCS_PER_PAGE));
+    } else {
+      totalPagesKnown = Math.max(1, Math.ceil(totalDocsKnown / DOCS_PER_PAGE));
+    }
     if (currentPage > totalPagesKnown) currentPage = totalPagesKnown; // 방어적 클램프(필터 변경 등)
     if (currentPage < 1) currentPage = 1;
 
-    // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y" — moreMayExist 면 N/M/Y 모두
-    // 최소 추정치라 toLocaleString 뒤에 "+" 를 붙인다(정확한 총수를 아직 모른다는 정직한
-    // 신호 — 페이지네이션 바의 마지막 페이지 번호 "+" 표기와 동일한 관례). 필터가 걸린
-    // 상태에서도 같은 표기를 쓴다 — "로드된 범위 기준"이라는 한계가 "+" 로 이미 드러나므로
-    // 별도 문구 분기를 두지 않는다.
+    // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y" — exactUnfiltered 면 N/M/Y 모두
+    // findings_stats RPC 의 exact 값이라 접미사를 붙이지 않는다. 그 외(필터 적용 중이거나
+    // RPC 미확보)이고 moreMayExist 면 아직 최소 추정치일 뿐이라는 정직한 신호로 숫자 뒤에
+    // " 이상"을 붙인다 — 구버전의 "+" 기호보다 명확한 표기(필터 상태에서도 동일하게 적용).
+    var uncertain = moreMayExist && !exactUnfiltered;
     countEl.textContent = "";
     countEl.appendChild(document.createTextNode("전체 "));
     var bDocs = document.createElement("b");
-    bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR") + (moreMayExist ? "+" : "");
+    bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR");
     countEl.appendChild(bDocs);
+    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
     countEl.appendChild(document.createTextNode("문서 · "));
     var bObs = document.createElement("b");
-    bObs.textContent = matched.length.toLocaleString("ko-KR") + (moreMayExist ? "+" : "");
+    bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR");
     countEl.appendChild(bObs);
+    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
     countEl.appendChild(document.createTextNode("지적 · 페이지 "));
     var bCur = document.createElement("b");
     bCur.textContent = String(currentPage);
     countEl.appendChild(bCur);
     countEl.appendChild(document.createTextNode(" / "));
     var bTotal = document.createElement("b");
-    bTotal.textContent = String(totalPagesKnown) + (moreMayExist ? "+" : "");
+    bTotal.textContent = String(totalPagesKnown);
     countEl.appendChild(bTotal);
+    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
 
     syncStateToUrl(); // [페이지네이션] ?page= 도 여기서 함께 반영(currentPage 확정 이후)
 
@@ -1120,7 +1156,8 @@
       built = built.concat(d.built);
     });
     resultsEl.appendChild(frag);
-    renderPager(currentPage, totalPagesKnown, moreMayExist);
+    renderPager(currentPage, totalPagesKnown, uncertain);
+    schedulePrefetch(docs.length, moreMayExist); // [선로딩 c] 다음 청크 lookahead 1개
     // [M10b P1] "자세히 보기" 버튼 표시 여부 — DOM 삽입 후(레이아웃 확정) 1회 rAF 로 판정.
     // 본문이 3줄을 넘겨 잘렸거나(scrollHeight>clientHeight) 부가 섹션이 있으면 노출,
     // 둘 다 아니면 DOM 에서 제거한다(버튼 없음).
@@ -1327,6 +1364,26 @@
       });
   }
 
+  // [선로딩 c] 현재 페이지 렌더 후 idle 시간에 다음 청크 1개만 미리 fetch한다(lookahead
+  // 1 — 완역 시 수 MB 가 될 수 있는 전량 eager 로드는 절대 하지 않는다). 아직 여유가
+  // 있으면(로드된 문서 기준 페이지 수가 현재 페이지보다 1 이상 남아있으면) 아무 것도
+  // 하지 않는다 — PAGE_LIMIT=1000 obs 청크 하나가 보통 여러 페이지 분량을 이미 커버하므로
+  // 실제로는 로드된 데이터의 마지막·마지막 직전 페이지에 있을 때만 net 요청이 나간다.
+  // 렌더를 트리거하지 않는 순수 선로딩(fetchNextChunkFor 의 콜백은 no-op) — 다음 실제
+  // 페이지 이동(goToPage)이 이 데이터를 즉시 재사용한다.
+  function schedulePrefetch(loadedDocsCount, uncertainLoad) {
+    if (!uncertainLoad || isFetchingPage) return;
+    var loadedPages = Math.max(1, Math.ceil(loadedDocsCount / DOCS_PER_PAGE));
+    if (currentPage < loadedPages - 1) return; // 아직 여유 있음 — lookahead 불필요
+    var idle = (typeof requestIdleCallback === "function")
+      ? requestIdleCallback
+      : function (fn) { return setTimeout(fn, 200); };
+    idle(function () {
+      if (isFetchingPage || isServerExhausted()) return;
+      fetchNextChunkFor(function () {}); // 선로딩만 — 렌더 트리거 없음(다음 이동 시 즉시 반영)
+    });
+  }
+
   // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 이동의
   // 완료 콜백은 currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
   // 최근 클릭"만 화면에 반영된다.
@@ -1334,12 +1391,28 @@
     var target = Math.max(1, Math.floor(n) || 1);
     navToken += 1;
     var myToken = navToken;
+    var doScroll = pendingScrollAfterNav;
+    pendingScrollAfterNav = false;
     setPagerLoading(true);
     ensurePageReady(target, function () {
       if (myToken !== navToken) return; // 더 최근 이동에 의해 취소됨
       currentPage = target;
       render(); // render() 가 pager 를 통째로 재생성하므로 로딩 상태는 자연히 정리된다.
+      // [로딩 UX b] fetch 완료 후 목표 페이지 렌더가 끝나면 결과 목록 상단으로 스크롤한다
+      // — 페이지네이션 바 클릭(goToPageFromPager())에서만(doScroll), 필터/검색/정렬 변경발
+      // goToPage(1) 리셋은 스크롤하지 않는다.
+      if (doScroll && resultsEl && typeof resultsEl.scrollIntoView === "function") {
+        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     });
+  }
+
+  // [로딩 UX b] 페이지네이션 바(처음/이전/번호/다음/끝) 전용 진입점 — goToPage() 를 그대로
+  // 위임하되, 완료 후 스크롤 플래그만 세팅한다(goToPage() 자체 시그니처는 다른 호출부
+  // 다수가 공유하므로 변경하지 않는다).
+  function goToPageFromPager(n) {
+    pendingScrollAfterNav = true;
+    goToPage(n);
   }
 
   function hidePager() {
@@ -1348,13 +1421,26 @@
   }
 
   // 페이지 이동 중(네트워크 대기) 버튼을 비활성화한다 — render() 가 뒤이어 pager 를
-  // 완전히 새로 그리므로 별도 "재활성화" 처리는 필요 없다.
+  // 완전히 새로 그리므로 별도 "재활성화" 처리는 필요 없다. [로딩 UX b] 현재 페이지 pill
+  // (.on)이 있으면 그 자리에서 바로 "불러오는 중…"으로 바꿔 보여주고(없으면 — 현재 페이지가
+  // "..." 로 축약된 윈도우 밖일 때 — nav 끝에 별도 상태 텍스트를 붙인다), 무반응처럼
+  // 보이던 문제를 없앤다.
   function setPagerLoading(loading) {
     [pagerTopEl, pagerBottomEl].forEach(function (nav) {
       if (!nav) return;
       nav.setAttribute("aria-busy", loading ? "true" : "false");
       if (loading) {
         Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });
+        var current = nav.querySelector(".fnd-pager-btn.on");
+        if (current) {
+          current.textContent = "불러오는 중…";
+        } else {
+          var status = document.createElement("span");
+          status.className = "fnd-pager-status";
+          status.setAttribute("aria-live", "polite");
+          status.textContent = "불러오는 중…";
+          nav.appendChild(status);
+        }
       }
     });
   }
@@ -1403,8 +1489,8 @@
         return;
       }
       nav.hidden = false;
-      nav.appendChild(buildPagerBtn("«", "처음 페이지로 이동", current === 1, function () { goToPage(1); }));
-      nav.appendChild(buildPagerBtn("‹", "이전 페이지", current === 1, function () { goToPage(current - 1); }));
+      nav.appendChild(buildPagerBtn("«", "처음 페이지로 이동", current === 1, function () { goToPageFromPager(1); }));
+      nav.appendChild(buildPagerBtn("‹ 이전", "이전 페이지", current === 1, function () { goToPageFromPager(current - 1); }));
       computePageWindow(current, total).forEach(function (item) {
         if (item === "...") {
           var gap = document.createElement("span");
@@ -1416,7 +1502,7 @@
         }
         var isLastKnown = item === total;
         var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");
-        var btn = buildPagerBtn(label, "페이지 " + item + "로 이동", false, function () { goToPage(item); });
+        var btn = buildPagerBtn(label, "페이지 " + item + "로 이동", false, function () { goToPageFromPager(item); });
         if (item === current) {
           btn.classList.add("on");
           btn.setAttribute("aria-current", "page");
@@ -1425,8 +1511,8 @@
         nav.appendChild(btn);
       });
       var atKnownEnd = current >= total && !moreMayExist;
-      nav.appendChild(buildPagerBtn("›", "다음 페이지", atKnownEnd, function () { goToPage(current + 1); }));
-      nav.appendChild(buildPagerBtn("»", "끝 페이지로 이동", atKnownEnd, function () { goToPage(total); }));
+      nav.appendChild(buildPagerBtn("다음 ›", "다음 페이지", atKnownEnd, function () { goToPageFromPager(current + 1); }));
+      nav.appendChild(buildPagerBtn("»", "끝 페이지로 이동", atKnownEnd, function () { goToPageFromPager(total); }));
     });
   }
 
@@ -1453,6 +1539,13 @@
         // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 공개"로 문서-지적 관계를 명시한다.
         // 010 미적용 라이브(undefined)에서는 기존 문안을 그대로 유지한다(방어적 생략).
         var hasDocs = typeof totals.documents === "number" && !isNaN(totals.documents);
+        // [정확 총수 M1a] 페이지네이션(render())·대시보드(renderDash())가 공유하는 exact
+        // 총수 — 이 fetch 는 메인 검색 fetch 와 독립적이라, 성공하면 페이지 이동/렌더
+        // 시점과 무관하게 항상 최신값을 들고 있다(실패하면 null 유지 — 기존 로드 기준 폴백).
+        if (hasDocs) SERVER_DOC_TOTAL = totals.documents;
+        if (typeof totals.findings === "number" && !isNaN(totals.findings)) {
+          SERVER_FINDINGS_TOTAL = totals.findings;
+        }
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
         // 완파손 등 번역 불능 원문뿐) "매일 확대 중" 진행형 문안을 완료형으로 스스로
         // 전환한다 — 완역 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.

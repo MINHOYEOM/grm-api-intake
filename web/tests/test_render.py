@@ -1167,7 +1167,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("currentPage = 1", fn_block)
         self.assertIn("goToPage(1)", fn_block)
         # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
-        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 400]
+        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 600]
         self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
@@ -1521,13 +1521,14 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_result_count_line_shows_document_finding_and_page_summary(self):
         """[문서 단위 페이지네이션] 결과 요약 줄(#fnd-count)은 "전체 N문서 · M지적 ·
-        페이지 X / Y" 형태여야 한다 — N=groupByDocument() 결과 문서 수, M=observation
-        (matched) 수, X=현재 페이지, Y=지금까지 알려진 총 페이지 수."""
+        페이지 X / Y" 형태여야 한다 — N=totalDocsKnown, M=totalFindingsKnown(무필터+RPC
+        확보 시 findings_stats exact 총수, 그 외엔 groupByDocument()/matched 로드 기준),
+        X=현재 페이지, Y=지금까지 알려진(또는 exact) 총 페이지 수."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         start = js_src.index("function render() {")
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
         self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("전체 "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("문서 · "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("지적 · 페이지 "));', render_fn)
@@ -1537,15 +1538,55 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_result_count_line_all_numbers_use_locale_string(self):
         """[콤마 통일] 카운트 줄의 문서수·지적수·총 페이지수는 모두 toLocaleString
         ('ko-KR') 로 천단위 콤마를 붙인다(현재 페이지 번호만은 순수 정수라 콤마 대상이
-        아니다) — String(totalDocsKnown)/String(matched.length) 처럼 콤마 없는 표기가
+        아니다) — String(totalDocsKnown)/String(totalFindingsKnown) 처럼 콤마 없는 표기가
         남아있으면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
         self.assertNotIn("String(totalDocsKnown)", render_fn)
-        self.assertNotIn("String(matched.length)", render_fn)
+        self.assertNotIn("String(totalFindingsKnown)", render_fn)
         self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
         self.assertIn('bTotal.textContent = String(totalPagesKnown)', render_fn)
+
+    def test_exact_totals_shared_from_coverage_rpc_and_used_when_unfiltered(self):
+        """[정확 총수 M1a] fetchCoverageNote() 가 findings_stats RPC 의 totals.documents/
+        totals.findings 를 전역(SERVER_DOC_TOTAL/SERVER_FINDINGS_TOTAL)에 공유하고,
+        render() 는 무필터(검색어·필터 전부 비었음) + 서버 미소진 구간에서만 그 exact
+        값으로 문서수·지적수·총 페이지를 계산한다(exactUnfiltered) — 필터가 걸리면
+        로드 기준(docs.length/matched.length)을 그대로 쓴다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var SERVER_DOC_TOTAL = null;", js_src)
+        self.assertIn("var SERVER_FINDINGS_TOTAL = null;", js_src)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (hasDocs) SERVER_DOC_TOTAL = totals.documents;", cov_fn)
+        self.assertIn(
+            'if (typeof totals.findings === "number" && !isNaN(totals.findings)) {\n'
+            "          SERVER_FINDINGS_TOTAL = totals.findings;\n"
+            "        }",
+            cov_fn,
+        )
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn(
+            "var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;",
+            render_fn,
+        )
+        self.assertIn("totalDocsKnown = SERVER_DOC_TOTAL;", render_fn)
+        self.assertIn("if (SERVER_FINDINGS_TOTAL !== null) totalFindingsKnown = SERVER_FINDINGS_TOTAL;", render_fn)
+        self.assertIn(
+            "totalPagesKnown = Math.max(1, Math.ceil(SERVER_DOC_TOTAL / DOCS_PER_PAGE));",
+            render_fn,
+        )
+
+    def test_uncertain_suffix_replaces_old_plus_sign_in_count_line(self):
+        """[정확 표기] 무필터+exact 확보 시("exactUnfiltered")에는 접미사가 전혀 붙지
+        않는다. 필터가 걸려있거나 RPC 를 아직 확보하지 못했으면서 서버가 아직 소진되지
+        않았을 때만(uncertain) 숫자 뒤에 옛 "+" 기호 대신 " 이상"을 붙인다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
+        self.assertEqual(render_fn.count('countEl.appendChild(document.createTextNode(" 이상"));'), 3)
+        self.assertNotIn('toLocaleString("ko-KR") + (moreMayExist ? "+" : "")', render_fn)
 
     def test_document_card_head_markers_and_css_present(self):
         """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
@@ -1699,18 +1740,19 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("var DOCS_PER_PAGE = 24;", js_src)
 
-    def test_more_may_exist_indicator_applies_regardless_of_filters(self):
-        """[+표기] moreMayExist(=!isServerExhausted())는 필터 여부와 무관하게 동일
-        기준을 쓴다 — 필터가 걸려도 ensurePageReady() 가 필요하면 계속 청크를 당겨오므로,
-        "최소 추정치일 뿐"이라는 정직한 신호(toLocaleString 뒤 "+")는 필터 유무로
-        분기하지 않는다(구버전의 filtersActive 분기 자체가 제거됨)."""
+    def test_more_may_exist_indicator_narrows_to_uncertain_state(self):
+        """[정확 총수 M1a] moreMayExist(=!isServerExhausted())는 여전히 필터 여부와
+        무관하게 동일 기준을 쓴다. 다만 카운트 줄의 "이상" 접미사(구버전 "+")는
+        moreMayExist 만이 아니라 exactUnfiltered(무필터+RPC exact 확보)가 아닐 때만
+        붙는다(uncertain = moreMayExist && !exactUnfiltered) — 무필터+exact 확보 시에는
+        moreMayExist 가 true 여도(서버 청크가 아직 안 끝났어도) 접미사를 붙이지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         start = js_src.index("function render() {")
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
         self.assertIn("var moreMayExist = !isServerExhausted();", render_fn)
-        self.assertIn('(moreMayExist ? "+" : "")', render_fn)
-        # 옛 filtersActive 기반 SERVER_TOTAL-vs-ROWS.length 분기는 render() 에서 제거됐다.
-        self.assertNotIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
+        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
+        self.assertIn("var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;", render_fn)
+        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
 
     def test_is_server_exhausted_falls_back_to_batch_size_heuristic(self):
         """[방어] Content-Range 파싱 실패(헤더 미노출 등)로 SERVER_TOTAL 이 null 이면,
@@ -1753,12 +1795,29 @@ class WebFindingsRenderTest(unittest.TestCase):
         pager_fn = js_src[js_src.index("function renderPager(current, total, moreMayExist)"):]
         pager_fn = pager_fn[:pager_fn.index("\n  }\n") + 4]
         self.assertIn('buildPagerBtn("«", "처음 페이지로 이동"', pager_fn)
-        self.assertIn('buildPagerBtn("‹", "이전 페이지"', pager_fn)
-        self.assertIn('buildPagerBtn("›", "다음 페이지"', pager_fn)
+        # [b 폴리시] 이전/다음은 «‹›» 단독 글리프 대신 아이콘+텍스트를 병기해 처음 보는
+        # 사용자에게도 명확하다("‹ 이전"/"다음 ›") — 처음/끝은 압축 글리프 그대로 유지.
+        self.assertIn('buildPagerBtn("‹ 이전", "이전 페이지"', pager_fn)
+        self.assertIn('buildPagerBtn("다음 ›", "다음 페이지"', pager_fn)
         self.assertIn('buildPagerBtn("»", "끝 페이지로 이동"', pager_fn)
         self.assertIn('btn.setAttribute("aria-current", "page");', pager_fn)
-        # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정).
+        # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정 —
+        # 이 압축 페이지 버튼의 "+" 표기는 카운트 줄의 " 이상" 문구와 달리 그대로 유지한다,
+        # 좁은 버튼 안에서는 기호가 더 명확하다).
         self.assertIn('var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");', pager_fn)
+        # [선로딩 c] 페이지네이션 버튼 클릭은 goToPageFromPager() 를 거쳐 완료 후 스크롤한다.
+        self.assertEqual(pager_fn.count("goToPageFromPager("), 5)
+
+    def test_pager_css_touch_target_and_loading_status_present(self):
+        """[b 폴리시] 페이저 버튼 최소 터치영역 32px(모바일)·현재 페이지 코럴 필 강조·
+        로딩 중 nav 옅어짐(aria-busy)·대체 상태 텍스트(.fnd-pager-status) CSS 가
+        findings.html 자체 <style> 블록에 존재해야 한다(grm.css 무변경)."""
+        self.assertIn('.fnd-pager[aria-busy="true"]{opacity:.7}', self.html)
+        self.assertIn(".fnd-pager-status{", self.html)
+        self.assertIn(".fnd-pager-btn.on{background:var(--coral-tint)", self.html)
+        mobile_block = self.html[self.html.index("@media (max-width:480px){"):]
+        mobile_block = mobile_block[:mobile_block.index("}\n")]
+        self.assertIn("min-width:32px;height:32px", mobile_block)
 
     def test_pager_hidden_when_single_page_and_no_more_data(self):
         """결과가 0건이거나(hidePager) 1페이지뿐이고 서버도 소진됐으면(moreMayExist=false)
@@ -1789,6 +1848,57 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("return !isNaN(n) && n >= 1 ? n : 1;", read_fn)
         self.assertIn("var initialPage = readPageFromUrl();", js_src)
         self.assertIn("goToPage(initialPage);", js_src)
+
+    def test_pager_loading_shows_status_text_and_disables_buttons(self):
+        """[로딩 UX b] 미로드 페이지 이동 중에는 버튼을 disabled 처리하고, 현재 페이지
+        pill(.on)이 있으면 그 자리에서 바로 "불러오는 중…" 텍스트로 바꿔 보여준다(없으면
+        —페이지 창 밖— nav 끝에 별도 상태 텍스트를 붙인다). 지금까지는 버튼만 비활성화돼
+        무반응처럼 보였다는 신고 대응."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function setPagerLoading(loading)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });', fn)
+        self.assertIn('var current = nav.querySelector(".fnd-pager-btn.on");', fn)
+        self.assertIn('current.textContent = "불러오는 중…";', fn)
+        self.assertIn('status.className = "fnd-pager-status";', fn)
+        self.assertIn('status.textContent = "불러오는 중…";', fn)
+
+    def test_pager_click_scrolls_results_into_view_after_render(self):
+        """[로딩 UX b] 페이지네이션 바 클릭(goToPageFromPager())으로 촉발된 이동만 완료
+        후 결과 목록(#fnd-results) 상단으로 스크롤한다. 필터/검색/정렬 변경발 goToPage(1)
+        리셋(pendingScrollAfterNav 세팅 없음)은 스크롤하지 않아야 한다 — 검색창 타이핑마다
+        화면이 튀는 것을 방지."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var pendingScrollAfterNav = false;", js_src)
+        goto_fn = js_src[js_src.index("function goToPage(n)"):]
+        goto_fn = goto_fn[:goto_fn.index("\n  }\n") + 4]
+        self.assertIn("var doScroll = pendingScrollAfterNav;", goto_fn)
+        self.assertIn("pendingScrollAfterNav = false;", goto_fn)
+        self.assertIn(
+            'if (doScroll && resultsEl && typeof resultsEl.scrollIntoView === "function") {\n'
+            '        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });\n'
+            "      }",
+            goto_fn,
+        )
+        pager_entry_fn = js_src[js_src.index("function goToPageFromPager(n)"):]
+        pager_entry_fn = pager_entry_fn[:pager_entry_fn.index("\n  }\n") + 4]
+        self.assertIn("pendingScrollAfterNav = true;", pager_entry_fn)
+        self.assertIn("goToPage(n);", pager_entry_fn)
+
+    def test_schedule_prefetch_looks_ahead_one_chunk_near_loaded_edge(self):
+        """[선로딩 c] render() 후 idle 시간에 다음 청크 1개만 미리 fetch한다(전체 eager
+        로드 금지) — 이미 로드된 데이터로 현재 페이지보다 1페이지 이상 여유가 있으면
+        아무 것도 하지 않고, 서버가 이미 소진됐거나(uncertainLoad=false) 이미 fetch 중이면
+        스킵한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function schedulePrefetch(loadedDocsCount, uncertainLoad)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!uncertainLoad || isFetchingPage) return;", fn)
+        self.assertIn("if (currentPage < loadedPages - 1) return;", fn)
+        self.assertIn("requestIdleCallback", fn)
+        self.assertIn("fetchNextChunkFor(function () {});", fn)
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("schedulePrefetch(docs.length, moreMayExist);", render_fn)
 
     def test_dash_total_stat_uses_server_total_when_unfiltered(self):
         """[대시보드 "전체" 정정] SERVER_TOTAL(서버 exact count) 이 있고 필터가 하나도

@@ -267,13 +267,21 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    같은 톤(캔버스 배경+연한 보더, coral 은 hover·현재 페이지 강조 전용). */
 .fnd-pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:20px 0}
 .fnd-pager[hidden]{display:none}
-.fnd-pager-btn{font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);min-width:34px;height:34px;padding:0 10px;cursor:pointer}
+/* [로딩 UX b] fetch 대기 중에는 nav 전체를 옅게 눌러 "지금 반응 중"임을 알린다(버튼
+   disabled 만으로는 무반응처럼 보인다는 신고 대응 — 현재 페이지 pill 자체는
+   setPagerLoading() 이 텍스트를 "불러오는 중…"으로 바꿔치기해 더 직접적으로 알린다). */
+.fnd-pager[aria-busy="true"]{opacity:.7}
+.fnd-pager-btn{font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);min-width:34px;height:34px;padding:0 10px;cursor:pointer;white-space:nowrap}
 .fnd-pager-btn:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
 .fnd-pager-btn.on{background:var(--coral-tint);border-color:rgba(194,96,63,.35);color:var(--coral-2);cursor:default}
 .fnd-pager-btn:disabled{opacity:.4;cursor:default}
 .fnd-pager-gap{display:inline-flex;align-items:center;justify-content:center;min-width:20px;color:var(--muted);font-size:13px}
+/* [로딩 UX b] 현재 페이지 pill 이 화면에 없을 때(페이지 창 밖) 쓰는 대체 상태 텍스트. */
+.fnd-pager-status{display:inline-flex;align-items:center;height:34px;padding:0 10px;font-size:13px;font-weight:600;color:var(--muted)}
 @media (max-width:480px){
-  .fnd-pager-btn{min-width:30px;height:30px;padding:0 7px;font-size:12.5px}
+  /* 최소 터치영역 32px 유지(모바일 접근성) — 기존 30px 에서 상향. */
+  .fnd-pager-btn{min-width:32px;height:32px;padding:0 8px;font-size:12.5px}
+  .fnd-pager-status{height:32px}
 }
 </style>
 {% endblock %}

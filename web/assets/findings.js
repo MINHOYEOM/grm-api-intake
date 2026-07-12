@@ -140,19 +140,29 @@
   var ROWS = null; // fetch 성공 시 findings 배열
   var debounceTimer = null;
 
-  // [페이지네이션] PAGE_LIMIT=페이지당 행 수(기존 limit=1000 고정값 그대로 유지).
-  // SERVER_TOTAL=Content-Range 헤더(Prefer: count=exact 응답)에서 파싱한 서버측 exact
-  // count — 파싱 실패/헤더 미노출 환경이면 null(폴백). LOADED_FIELDS=최초 3단계 폴백
-  // 체인 중 실제로 성공한 필드 리스트(로드 완료 후 고정 — "더 보기" 추가 fetch 는 매번
-  // 재협상하지 않고 이 필드셋을 재사용한다). LAST_BATCH_SIZE=가장 최근 fetch 가 반환한
-  // 행 수(SERVER_TOTAL 미확보 환경 — PostgREST 가 Content-Range 를 노출하지 않는 경우 —
-  // "이번 페이지가 PAGE_LIMIT 로 꽉 찼으니 더 있을 수 있다"는 방어적 휴리스틱에 쓴다).
-  // isLoadingMore=중복 클릭 방어(버튼 disabled 와 이중 방어).
+  // [문서 단위 페이지네이션] "더 보기" 무한로드 → 문서 24개=1페이지 이전/다음 페이지네이션
+  // 으로 전환(§목표: 페이지 경계에서 문서가 절대 쪼개지지 않는다). PAGE_LIMIT=서버 청크
+  // fetch 단위(obs 행 기준, 기존 limit=1000 그대로 유지 — 서버 왕복 최소화). DOCS_PER_PAGE=
+  // 화면에 보여줄 문서 카드 수. SERVER_TOTAL=Content-Range 헤더(Prefer: count=exact 응답)
+  // 에서 파싱한 서버측 obs exact count — 파싱 실패/헤더 미노출 환경이면 null(폴백).
+  // LOADED_FIELDS=최초 3단계 폴백 체인 중 실제로 성공한 필드 리스트(로드 완료 후 고정 —
+  // 페이지 이동으로 인한 추가 fetch 는 매번 재협상하지 않고 이 필드셋을 재사용한다).
+  // LAST_BATCH_SIZE=가장 최근 fetch 가 반환한 행 수(SERVER_TOTAL 미확보 환경에서 "이번
+  // 청크가 PAGE_LIMIT 로 꽉 찼으니 더 있을 수 있다"는 방어적 휴리스틱에 쓴다). fetchGaveUp=
+  // 청크 fetch 실패 시 영구 플래그(무한 재시도 방지 — 이후 로드된 데이터만으로 계속
+  // 동작). isFetchingPage/pendingPageCallbacks=중복 fetch 방어(여러 페이지 이동이 겹쳐도
+  // 실제 네트워크 요청은 1개만 진행, 나머지는 그 결과에 편승). currentPage=1-based 현재
+  // 페이지. navToken=페이지 이동 연타 방어용 세대 카운터(오래된 이동의 완료 콜백 무시).
   var PAGE_LIMIT = 1000;
+  var DOCS_PER_PAGE = 24;
   var SERVER_TOTAL = null;
   var LOADED_FIELDS = null;
   var LAST_BATCH_SIZE = null;
-  var isLoadingMore = false;
+  var fetchGaveUp = false;
+  var isFetchingPage = false;
+  var pendingPageCallbacks = [];
+  var currentPage = 1;
+  var navToken = 0;
 
   var qInput = document.getElementById("fnd-q");
   var sortSel = document.getElementById("fnd-sort");
@@ -179,14 +189,12 @@
   var dashFirmEl = document.getElementById("fnd-dash-firm");
   var hasDash = !!(dashEl && dashStatsEl && dashCatEl && dashMonthEl && dashFirmEl);
 
-  // [페이지네이션] "더 보기" 버튼 — 구버전 셸(엘리먼트 없음)에서도 조용히 no-op
-  // (hasDash 관례와 동형 방어적 조회, 아래 참조부 전부 loadMoreBtn 존재를 먼저 확인한다).
-  var loadMoreBtn = document.getElementById("fnd-load-more");
-  // [페이지네이션 발견성] 카운트 줄 옆 인라인 "더 보기" — 하단 loadMoreBtn 과 완전히 동일한
-  // 노출 규칙·클릭 로직(loadMoreRows)을 공유한다(updateLoadMoreUI() 참조). 카드 ~200장을
-  // 지나야 보이는 하단 버튼만으로는 발견성이 낮다는 실사용자 신고에 대응 — 부재(구버전 셸)
-  // 에서도 loadMoreBtn 과 동형으로 조용히 no-op.
-  var loadMoreTopBtn = document.getElementById("fnd-load-more-top");
+  // [문서 단위 페이지네이션] 상단(#fnd-pager-top)·하단(#fnd-pager-bottom) 페이지네이션
+  // 바 — 완전히 동일한 goToPage()/renderPager() 로직을 공유한다. 구버전 셸(엘리먼트
+  // 없음)에서도 조용히 no-op(hasDash 관례와 동형 방어적 조회 — renderPager()/
+  // setPagerLoading() 내부에서 개별 null 체크).
+  var pagerTopEl = document.getElementById("fnd-pager-top");
+  var pagerBottomEl = document.getElementById("fnd-pager-bottom");
 
   function monthOf(row) {
     var d = row.published_date || "";
@@ -250,9 +258,9 @@
 
   // [M15] 소스/증거등급/검토상태/카테고리/발행월 <select> 5개의 DOM 골격(옵션)을 데이터
   // 로드 직후 1회만 만든다. change 배선은 wire()에서(전 필드 동일 경로 — SELECT_FACETS 단일).
-  // [페이지네이션] "더 보기"로 ROWS 가 늘어난 뒤에도 새로 드러난 값을 옵션으로 추가할 수
-  // 있도록 재호출 가능(idempotent)하게 만든다 — 이미 존재하는 옵션 값은 건너뛰어 중복
-  // <option> 이 생기지 않는다.
+  // [페이지네이션] 페이지 이동으로 청크가 추가 fetch 돼 ROWS 가 늘어난 뒤에도 새로 드러난
+  // 값을 옵션으로 추가할 수 있도록 재호출 가능(idempotent)하게 만든다 — 이미 존재하는
+  // 옵션 값은 건너뛰어 중복 <option> 이 생기지 않는다.
   function buildFacetSkeleton() {
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
@@ -402,20 +410,23 @@
     var sel = document.getElementById("fnd-f-category");
     state.category_code = state.category_code === code ? "" : code;
     if (sel) sel.value = state.category_code;
-    render();
+    currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
+    goToPage(1);
   }
 
   function toggleMonthFilter(month) {
     var sel = document.getElementById("fnd-f-month");
     state.month = state.month === month ? "" : month;
     if (sel) sel.value = state.month;
-    render();
+    currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
+    goToPage(1);
   }
 
   function toggleFirmFilter(name) {
     state.q = state.q === name ? "" : name;
     if (qInput) qInput.value = state.q;
-    render();
+    currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
+    goToPage(1);
   }
 
   function makeClickableRow(node, ariaLabel, onActivate) {
@@ -553,8 +564,8 @@
     // 서버 총수(예: 2,272+)로 오인되는 신고에 대응. 카테고리/월별/업체 분해 스탯은 로드된
     // 행 기준일 수밖에 없다는 점은 카운트 줄이 이미 설명하므로 그대로 둔다. 필터가 걸린
     // 상태에서는 matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버
-    // 전체수로 바꾸면 오히려 더 오해를 만든다 — render() 의 filtersActive 판정과 동일
-    // 조건을 재사용한다. SERVER_TOTAL 미확보(폴백)면 기존대로 로드 수(stats.total) 유지.
+    // 전체수로 바꾸면 오히려 더 오해를 만든다 — countActiveFilters()/state.q.trim() 로
+    // 자체 판정한다. SERVER_TOTAL 미확보(폴백)면 기존대로 로드 수(stats.total) 유지.
     var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
     if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {
       stats.total = SERVER_TOTAL;
@@ -941,6 +952,9 @@
       var v = state[k];
       if (v && v !== DEFAULT_STATE[k]) params.set(URL_KEYS[k], v);
     });
+    // [문서 단위 페이지네이션] 1페이지(기본값)는 URL 을 더럽히지 않는다 — 딥링크/뒤로가기는
+    // 2페이지 이상일 때만 의미가 있다.
+    if (currentPage > 1) params.set("page", String(currentPage));
     var qs = params.toString();
     var newUrl = location.pathname + (qs ? "?" + qs : "") + location.hash;
     history.replaceState(null, "", newUrl);
@@ -962,6 +976,17 @@
     if (sortRaw !== null && SORT_VALUES.indexOf(sortRaw) !== -1) state.sort = sortRaw;
   }
 
+  // [문서 단위 페이지네이션] URL ?page= → 초기 페이지(양의 정수만, 그 외/누락은 1 —
+  // syncStateToUrl() 과 짝을 이루는 딥링크·뒤로가기 지원). 최종 유효 범위(로드된 문서
+  // 수 대비 클램프)는 render() 가 보정한다.
+  function readPageFromUrl() {
+    if (typeof URLSearchParams === "undefined") return 1;
+    var raw = new URLSearchParams(location.search).get("page");
+    if (raw === null) return 1;
+    var n = parseInt(raw, 10);
+    return !isNaN(n) && n >= 1 ? n : 1;
+  }
+
   // URL 복원값을 검색창/셀렉트 UI 에도 동기화(칩 행은 renderActiveChips()가 매번 재계산).
   function syncControlsFromState() {
     if (qInput) qInput.value = state.q;
@@ -978,7 +1003,8 @@
   function clearActiveFilter(key) {
     state[key] = "";
     syncControlsFromState();
-    render();
+    currentPage = 1; // [페이지네이션] 필터 해제 → 1페이지로 리셋
+    goToPage(1);
   }
 
   function clearAllFilters() {
@@ -987,7 +1013,8 @@
       review_status: "", month: "", sort: "date_desc",
     };
     syncControlsFromState();
-    render();
+    currentPage = 1; // [페이지네이션] 전체 초기화 → 1페이지로 리셋
+    goToPage(1);
   }
 
   function buildActiveChip(label, value, onClear) {
@@ -1034,65 +1061,66 @@
     refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     updateFiltersToggleBadge();
-    syncStateToUrl();
-    // [문서 중심 열람] "총 N건" → "문서 X건 · 지적 Y건" 이중 표기(observation 조각 수량이
-    // 그대로 문서 수로 오인되지 않도록 명시).
-    countEl.innerHTML = "";
+
+    // [문서 단위 페이지네이션] moreMayExist=서버에 아직 더 받아올 obs 청크가 남아있을 수
+    // 있다(isServerExhausted() 참조) — 필터 여부와 무관하게 동일 기준을 쓴다: 필터가
+    // 걸려도 ensurePageReady() 가 필요할 때 계속 다음 청크를 당겨오므로, "아직 최소
+    // 추정치일 뿐"이라는 신호는 필터 여부와 상관없이 항상 정직해야 한다.
+    // totalPagesKnown=지금까지 로드된(+필터링된) 문서 수 기준 페이지 수 — moreMayExist
+    // 면 이 값도 최소 추정치.
+    var moreMayExist = !isServerExhausted();
+    var totalDocsKnown = docs.length;
+    var totalPagesKnown = Math.max(1, Math.ceil(totalDocsKnown / DOCS_PER_PAGE));
+    if (currentPage > totalPagesKnown) currentPage = totalPagesKnown; // 방어적 클램프(필터 변경 등)
+    if (currentPage < 1) currentPage = 1;
+
+    // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y" — moreMayExist 면 N/M/Y 모두
+    // 최소 추정치라 toLocaleString 뒤에 "+" 를 붙인다(정확한 총수를 아직 모른다는 정직한
+    // 신호 — 페이지네이션 바의 마지막 페이지 번호 "+" 표기와 동일한 관례). 필터가 걸린
+    // 상태에서도 같은 표기를 쓴다 — "로드된 범위 기준"이라는 한계가 "+" 로 이미 드러나므로
+    // 별도 문구 분기를 두지 않는다.
+    countEl.textContent = "";
+    countEl.appendChild(document.createTextNode("전체 "));
     var bDocs = document.createElement("b");
-    // [콤마 통일] 카운트 줄의 모든 숫자는 toLocaleString('ko-KR') 로 천단위 콤마를
-    // 붙인다 — 아래(부분 로드 분기, 1041행~)의 bTotal/bLoaded 와 표기를 맞춘다(이전엔
-    // 이 전량 로드 분기만 String() 이라 "지적 1926건"처럼 콤마가 빠졌었다).
-    bDocs.textContent = docs.length.toLocaleString("ko-KR");
-    var bObs = document.createElement("b");
-    bObs.textContent = matched.length.toLocaleString("ko-KR");
-    countEl.appendChild(document.createTextNode("문서 "));
+    bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR") + (moreMayExist ? "+" : "");
     countEl.appendChild(bDocs);
-    countEl.appendChild(document.createTextNode("건 · 지적 "));
+    countEl.appendChild(document.createTextNode("문서 · "));
+    var bObs = document.createElement("b");
+    bObs.textContent = matched.length.toLocaleString("ko-KR") + (moreMayExist ? "+" : "");
     countEl.appendChild(bObs);
-    countEl.appendChild(document.createTextNode("건"));
+    countEl.appendChild(document.createTextNode("지적 · 페이지 "));
+    var bCur = document.createElement("b");
+    bCur.textContent = String(currentPage);
+    countEl.appendChild(bCur);
+    countEl.appendChild(document.createTextNode(" / "));
+    var bTotal = document.createElement("b");
+    bTotal.textContent = String(totalPagesKnown) + (moreMayExist ? "+" : "");
+    countEl.appendChild(bTotal);
 
-    // [페이지네이션] 필터가 하나도 없을 때만(=matched 가 곧 로드된 전체) 서버 exact
-    // count(SERVER_TOTAL) 와 비교해 "지적 총수 중 표시 수"를 정직하게 덧표기한다. 필터가
-    // 걸리면 필터링된 부분집합을 서버 전체 수와 비교하는 것 자체가 다른 모집단 비교라
-    // 의미가 없으므로 위 기본(문서/지적 이중 표기) 그대로 둔다 — 필터 변경마다 render()
-    // 가 다시 호출되므로 이 판정(및 표기 전환)도 매번 새로 계산된다("총수 재계산").
-    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
-    if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > ROWS.length) {
-      countEl.innerHTML = "";
-      countEl.appendChild(document.createTextNode("지적 "));
-      var bTotal = document.createElement("b");
-      bTotal.textContent = SERVER_TOTAL.toLocaleString("ko-KR");
-      countEl.appendChild(bTotal);
-      countEl.appendChild(document.createTextNode("건 중 "));
-      var bLoaded = document.createElement("b");
-      bLoaded.textContent = ROWS.length.toLocaleString("ko-KR");
-      countEl.appendChild(bLoaded);
-      countEl.appendChild(document.createTextNode("건 표시 · 문서 "));
-      var bDocs2 = document.createElement("b");
-      bDocs2.textContent = docs.length.toLocaleString("ko-KR");
-      countEl.appendChild(bDocs2);
-      countEl.appendChild(document.createTextNode("건"));
-    }
-    // [더 보기] 버튼 노출/문구는 필터 상태와 무관(전역 로드 진행률) — matched 가 0건이라
-    // 아래에서 곧 return 하더라도 이 갱신은 먼저 수행한다(필터링 결과 0건이어도 서버에
-    // 아직 안 불러온 행이 남아있으면 "더 보기"로 계속 채울 수 있어야 하므로).
-    updateLoadMoreUI();
+    syncStateToUrl(); // [페이지네이션] ?page= 도 여기서 함께 반영(currentPage 확정 이후)
 
-    resultsEl.innerHTML = "";
+    resultsEl.textContent = "";
     if (!matched.length) {
       showState("empty");
+      hidePager();
       return;
     }
     showState("none");
+    // [문서 단위 페이지네이션] 문서 24개=1페이지 슬라이스 — obs 가 아니라 문서 경계로
+    // 자른다(페이지 경계에서 같은 raw_signal_id 문서가 절대 쪼개지지 않는다. 경계 문서
+    // 완결성 보장은 ensurePageReady()/incompleteDocKey() 가 페이지 이동 시점에 이미
+    // 확인했으므로, 여기서는 순수 슬라이스만 한다).
+    var pageDocs = docs.slice((currentPage - 1) * DOCS_PER_PAGE, currentPage * DOCS_PER_PAGE);
     var query = state.q.trim().toLowerCase(); // [M10b P1] 하이라이트 검색어(trim+대소문자무시)
     var frag = document.createDocumentFragment();
     var built = [];
-    docs.forEach(function (rows) {
+    pageDocs.forEach(function (rows) {
       var d = buildDocCard(rows, query);
       frag.appendChild(d.card);
       built = built.concat(d.built);
     });
     resultsEl.appendChild(frag);
+    renderPager(currentPage, totalPagesKnown, moreMayExist);
     // [M10b P1] "자세히 보기" 버튼 표시 여부 — DOM 삽입 후(레이아웃 확정) 1회 rAF 로 판정.
     // 본문이 3줄을 넘겨 잘렸거나(scrollHeight>clientHeight) 부가 섹션이 있으면 노출,
     // 둘 다 아니면 DOM 에서 제거한다(버튼 없음).
@@ -1119,20 +1147,25 @@
       if (!sel) return;
       sel.addEventListener("change", function () {
         state[def[1]] = sel.value;
-        render();
+        currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
+        goToPage(1);
       });
     });
     if (sortSel) {
       sortSel.addEventListener("change", function () {
         state.sort = sortSel.value;
-        render();
+        currentPage = 1; // [페이지네이션] 정렬 변경 → 1페이지로 리셋
+        goToPage(1);
       });
     }
     if (qInput) {
       qInput.addEventListener("input", function () {
         state.q = qInput.value;
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(render, 150);
+        debounceTimer = setTimeout(function () {
+          currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
+          goToPage(1);
+        }, 150);
       });
     }
     // [M15] 전체 초기화는 #fnd-reset 버튼이 아니라 적용 필터 칩 행의 "모두 지우기"
@@ -1157,16 +1190,6 @@
         var collapsed = dashGridEl.classList.toggle("fnd-dash-grid--collapsed");
         dashToggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
       });
-    }
-    // [페이지네이션] "더 보기" — loadMoreRows() 가 중복 클릭 방어(isLoadingMore)까지
-    // 책임진다. 필터/그룹핑 재계산과 달리 이 버튼만 실제 네트워크 fetch 를 새로 낸다.
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener("click", loadMoreRows);
-    }
-    // [페이지네이션 발견성] 상단 인라인 버튼도 완전히 같은 loadMoreRows() 를 호출한다 —
-    // 중복 클릭 방어(isLoadingMore)·로딩 문구 동기화가 하단 버튼과 자동으로 공유된다.
-    if (loadMoreTopBtn) {
-      loadMoreTopBtn.addEventListener("click", loadMoreRows);
     }
   }
 
@@ -1204,9 +1227,9 @@
     return isNaN(n) ? null : n;
   }
 
-  // [페이지네이션] "더 보기" 로 불러온 다음 페이지를 ROWS 에 병합한다. finding_id 기준
-  // 중복 제거 — 두 fetch 사이 새 번역이 공개(publish gate 통과)돼 정렬 경계에서 행이
-  // 밀리더라도(§4 참조) 같은 행이 두 번 들어오지 않게 방어한다.
+  // [페이지네이션] 페이지 이동으로 이어서 불러온 다음 청크를 ROWS 에 병합한다.
+  // finding_id 기준 중복 제거 — 두 fetch 사이 새 번역이 공개(publish gate 통과)돼 정렬
+  // 경계에서 행이 밀리더라도 같은 행이 두 번 들어오지 않게 방어한다.
   function mergeRows(newRows) {
     var seen = {};
     ROWS.forEach(function (r) {
@@ -1220,56 +1243,65 @@
     });
   }
 
-  // [페이지네이션] 버튼 노출/문구/비활성 상태 — SERVER_TOTAL 이 있으면 정확한 남은 건수를
-  // 병기하고, 없으면(헤더 미노출) LAST_BATCH_SIZE===PAGE_LIMIT 휴리스틱으로 "더 있을 수
-  // 있다"고만 판단해 건수 없이 노출한다(§5 폴백). 둘 다 아니면(전량 로드 확인) 버튼을
-  // 완전히 숨긴다.
-  function updateLoadMoreUI() {
-    if (!loadMoreBtn) return;
-    var hasMore = SERVER_TOTAL !== null
-      ? ROWS.length < SERVER_TOTAL
-      : LAST_BATCH_SIZE === PAGE_LIMIT;
-    if (!hasMore) {
-      loadMoreBtn.hidden = true;
-      if (loadMoreTopBtn) loadMoreTopBtn.hidden = true;
-      return;
-    }
-    loadMoreBtn.hidden = false;
-    loadMoreBtn.disabled = isLoadingMore;
-    if (isLoadingMore) {
-      loadMoreBtn.textContent = "불러오는 중…";
-    } else if (SERVER_TOTAL !== null) {
-      var remaining = SERVER_TOTAL - ROWS.length;
-      loadMoreBtn.textContent = "더 보기 (남은 " + remaining.toLocaleString("ko-KR") + "건)";
-    } else {
-      loadMoreBtn.textContent = "더 보기";
-    }
-    // [페이지네이션 발견성] 상단 인라인 버튼 — hasMore 판정은 하단 버튼과 완전히 동일하게
-    // 공유한다(전역 로드 진행률 기준, 필터 상태 무관 — §3 참조). 문구만 카운트 줄 옆
-    // 자리에 맞춰 "나머지 N건 불러오기"로 목적어를 명시한다(남은 건수 미확보 폴백은
-    // 하단과 동일하게 건수 없는 "더 보기").
-    if (loadMoreTopBtn) {
-      loadMoreTopBtn.hidden = false;
-      loadMoreTopBtn.disabled = isLoadingMore;
-      if (isLoadingMore) {
-        loadMoreTopBtn.textContent = "불러오는 중…";
-      } else if (SERVER_TOTAL !== null) {
-        var remainingTop = SERVER_TOTAL - ROWS.length;
-        loadMoreTopBtn.textContent = "나머지 " + remainingTop.toLocaleString("ko-KR") + "건 불러오기";
-      } else {
-        loadMoreTopBtn.textContent = "더 보기";
-      }
-    }
+  // ── [문서 단위 페이지네이션] 점진 로드 + 페이지 요구 기반 fetch ─────────────────────
+  // 전량을 한 번에 받지 않는다 — 이미 로드된 페이지는 서버 왕복 0(ROWS 슬라이스만), 아직
+  // 로드 안 된 페이지로 이동할 때만 필요한 만큼 청크(PAGE_LIMIT=1000)를 이어서 fetch 한다.
+
+  // 서버 obs 청크가 소진됐는지 — SERVER_TOTAL(exact count) 이 있으면 정확히 비교하고,
+  // 없으면(헤더 미노출 환경) "가장 최근 청크가 PAGE_LIMIT 미만이었다"는 휴리스틱으로
+  // 판단한다(초기 로드 전=LAST_BATCH_SIZE null 이면 미확정 → false, 즉 "아직 더 있을
+  // 수 있다"). fetchGaveUp(청크 fetch 실패)이면 무조건 소진 취급해 무한 재시도를 막는다.
+  function isServerExhausted() {
+    if (fetchGaveUp) return true;
+    if (SERVER_TOTAL !== null) return ROWS.length >= SERVER_TOTAL;
+    return LAST_BATCH_SIZE !== null && LAST_BATCH_SIZE < PAGE_LIMIT;
   }
 
-  // [페이지네이션] 다음 페이지 fetch — isLoadingMore 로 중복 클릭을 방어한다(버튼
-  // disabled 와 이중 방어, 버튼이 없는 구버전 셸에서도 안전). 최초 로드가 성공시킨
-  // LOADED_FIELDS 를 그대로 재사용한다(3단계 폴백 재협상 없음 — 이미 성공한 필드셋이
-  // 이번에도 통한다는 전제는 같은 세션 내에서 합리적이다).
-  function loadMoreRows() {
-    if (isLoadingMore || !LOADED_FIELDS) return;
-    isLoadingMore = true;
-    updateLoadMoreUI();
+  // [경계 문서 완결성] 서버가 아직 소진되지 않았다면, 가장 최근에 로드된 obs 행의
+  // raw_signal_id 를 가진 문서는 다음 청크에 같은 문서의 obs 가 더 있을 수 있어
+  // "미완결"로 간주한다 — 서버 fetch 가 published_date.desc, finding_id.asc 로 안정
+  // 정렬되므로 같은 문서(raw_signal_id)의 obs 들은 서버 응답에서 서로 인접하게 도착한다는
+  // 전제다. ensurePageReady() 가 이 키를 가진 문서가 목표 페이지 안에 있으면 한 청크
+  // 더 당겨 재확인한다(클라이언트 정렬(state.sort)과 무관하게 항상 raw_signal_id 로만
+  // 판정하므로 오래된순/업체명순 등 다른 정렬에서도 동일하게 안전하다).
+  function incompleteDocKey() {
+    if (isServerExhausted() || !ROWS.length) return null;
+    var lastKey = ROWS[ROWS.length - 1].raw_signal_id;
+    return lastKey === undefined || lastKey === null || lastKey === "" ? null : lastKey;
+  }
+
+  // pageNum 페이지를 안전하게 그릴 수 있을 만큼 ROWS 가 찼는지 확인하고, 부족하면 fetch
+  // 를 이어서 한 뒤 done() 을 호출한다(충분하거나 서버가 소진됐으면 done() 을 동기
+  // 호출 — 흔한 경우엔 네트워크 지연 없이 즉시 진행). 필터가 걸려 있어도 동일 로직을
+  // 그대로 쓴다 — ROWS(원본)에 계속 청크를 채우고 그 위에서 매번 새로 필터링하므로,
+  // 결과가 희소한 필터라면 여러 청크를 연달아 당길 수 있다(별도 최적화는 스코프 밖).
+  function ensurePageReady(pageNum, done) {
+    function attempt() {
+      var matched = sortRows(ROWS.filter(matches));
+      var docs = groupByDocument(matched);
+      var neededDocs = pageNum * DOCS_PER_PAGE;
+      if (docs.length >= neededDocs) {
+        var pageSlice = docs.slice(neededDocs - DOCS_PER_PAGE, neededDocs);
+        var badKey = incompleteDocKey();
+        var unsafe = badKey !== null && pageSlice.some(function (rows) {
+          return rows[0].raw_signal_id === badKey;
+        });
+        if (!unsafe) { done(); return; }
+      }
+      if (isServerExhausted()) { done(); return; }
+      fetchNextChunkFor(attempt);
+    }
+    attempt();
+  }
+
+  // [중복 fetch 방어] 이미 진행 중인 청크 fetch 가 있으면 새 요청을 내지 않고 콜백만
+  // 큐에 편승시킨다 — 여러 페이지 이동(연타)이 겹쳐도 실제 네트워크 요청은 항상 1개만
+  // 진행되고, 그 결과가 도착하면 대기 중이던 콜백이 전부 한 번에 재개된다.
+  function fetchNextChunkFor(cb) {
+    if (!LOADED_FIELDS) { cb(); return; }
+    pendingPageCallbacks.push(cb);
+    if (isFetchingPage) return;
+    isFetchingPage = true;
     fetchFindings(LOADED_FIELDS, ROWS.length)
       .then(function (r) {
         if (!r.ok) throw new Error("findings fetch more " + r.status);
@@ -1282,16 +1314,120 @@
         LAST_BATCH_SIZE = data.length;
         mergeRows(data);
         buildFacetSkeleton(); // 새로 드러난 파셋 값 옵션 추가(중복 방지는 자체 보장)
-        render();
       })
       .catch(function () {
-        // 조용히 복구 — 이미 로드된 데이터로 검색은 계속 정상 동작한다. 버튼은 finally
-        // 에서 재활성화되므로 사용자가 다시 시도할 수 있다.
+        // 조용히 포기 — 이미 로드된 데이터만으로 계속 진행한다(무한 재시도 방지).
+        fetchGaveUp = true;
       })
       .then(function () {
-        isLoadingMore = false;
-        updateLoadMoreUI();
+        isFetchingPage = false;
+        var cbs = pendingPageCallbacks;
+        pendingPageCallbacks = [];
+        cbs.forEach(function (fn) { fn(); });
       });
+  }
+
+  // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 이동의
+  // 완료 콜백은 currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
+  // 최근 클릭"만 화면에 반영된다.
+  function goToPage(n) {
+    var target = Math.max(1, Math.floor(n) || 1);
+    navToken += 1;
+    var myToken = navToken;
+    setPagerLoading(true);
+    ensurePageReady(target, function () {
+      if (myToken !== navToken) return; // 더 최근 이동에 의해 취소됨
+      currentPage = target;
+      render(); // render() 가 pager 를 통째로 재생성하므로 로딩 상태는 자연히 정리된다.
+    });
+  }
+
+  function hidePager() {
+    if (pagerTopEl) pagerTopEl.hidden = true;
+    if (pagerBottomEl) pagerBottomEl.hidden = true;
+  }
+
+  // 페이지 이동 중(네트워크 대기) 버튼을 비활성화한다 — render() 가 뒤이어 pager 를
+  // 완전히 새로 그리므로 별도 "재활성화" 처리는 필요 없다.
+  function setPagerLoading(loading) {
+    [pagerTopEl, pagerBottomEl].forEach(function (nav) {
+      if (!nav) return;
+      nav.setAttribute("aria-busy", loading ? "true" : "false");
+      if (loading) {
+        Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });
+      }
+    });
+  }
+
+  // "1 … 4 [5] 6 … 20" 식 페이지 윈도우 — 전체 7페이지 이하면 생략 없이 전부, 아니면
+  // 처음·끝 고정 + 현재 페이지 좌우 1개씩 + 그 사이는 "..." 로 축약한다.
+  function computePageWindow(current, total) {
+    if (total <= 7) {
+      var all = [];
+      for (var i = 1; i <= total; i++) all.push(i);
+      return all;
+    }
+    var items = [1];
+    var start = Math.max(2, current - 1);
+    var end = Math.min(total - 1, current + 1);
+    if (start > 2) items.push("...");
+    for (var j = start; j <= end; j++) items.push(j);
+    if (end < total - 1) items.push("...");
+    items.push(total);
+    return items;
+  }
+
+  function buildPagerBtn(label, ariaLabel, disabled, onClick) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-pager-btn";
+    btn.textContent = label;
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.disabled = !!disabled;
+    btn.addEventListener("click", onClick);
+    return btn;
+  }
+
+  // [문서 단위 페이지네이션] 이전/다음 + 페이지 번호(현재 주변 윈도우) + 처음/끝 점프.
+  // moreMayExist 면 마지막(=지금까지 알려진) 페이지 번호에 "+" 를 붙이고(최소 추정 표기)
+  // 다음/끝 버튼도 그 지점에서 비활성화하지 않는다 — 항상 열어둬서, 클릭하면 goToPage()
+  // 가 필요한 만큼 서버 청크를 이어서 fetch 한다. 상단·하단 두 nav 모두 완전히 동일한
+  // 내용을 렌더한다(둘 다 goToPage() 를 공유 — 중복 클릭 방어·로딩 표시가 자동 동기화).
+  function renderPager(current, total, moreMayExist) {
+    [pagerTopEl, pagerBottomEl].forEach(function (nav) {
+      if (!nav) return;
+      nav.textContent = "";
+      nav.setAttribute("aria-busy", "false");
+      if (total <= 1 && !moreMayExist) {
+        nav.hidden = true;
+        return;
+      }
+      nav.hidden = false;
+      nav.appendChild(buildPagerBtn("«", "처음 페이지로 이동", current === 1, function () { goToPage(1); }));
+      nav.appendChild(buildPagerBtn("‹", "이전 페이지", current === 1, function () { goToPage(current - 1); }));
+      computePageWindow(current, total).forEach(function (item) {
+        if (item === "...") {
+          var gap = document.createElement("span");
+          gap.className = "fnd-pager-gap";
+          gap.setAttribute("aria-hidden", "true");
+          gap.textContent = "…";
+          nav.appendChild(gap);
+          return;
+        }
+        var isLastKnown = item === total;
+        var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");
+        var btn = buildPagerBtn(label, "페이지 " + item + "로 이동", false, function () { goToPage(item); });
+        if (item === current) {
+          btn.classList.add("on");
+          btn.setAttribute("aria-current", "page");
+          btn.disabled = true;
+        }
+        nav.appendChild(btn);
+      });
+      var atKnownEnd = current >= total && !moreMayExist;
+      nav.appendChild(buildPagerBtn("›", "다음 페이지", atKnownEnd, function () { goToPage(current + 1); }));
+      nav.appendChild(buildPagerBtn("»", "끝 페이지로 이동", atKnownEnd, function () { goToPage(total); }));
+    });
   }
 
   // [공개 범위 투명성] findings_stats RPC(007) — 공개 게이트(006)를 우회해 전량 집계를
@@ -1383,9 +1519,11 @@
       // [FIND-1 M10c] URL→state 복원은 facet 값 목록(collectFacetValues)이 필요해
       // buildFacetSkeleton() 다음, 첫 render() 이전에 수행한다.
       readStateFromUrl();
+      // [문서 단위 페이지네이션] ?page= 도 초기 1회만 복원한다(무효/누락 값은 조용히 1).
+      var initialPage = readPageFromUrl();
       syncControlsFromState();
       wire();
-      render();
+      goToPage(initialPage); // 필요하면 목표 페이지까지 청크를 이어서 fetch 한 뒤 render()
     })
     .catch(function () {
       showState("error");

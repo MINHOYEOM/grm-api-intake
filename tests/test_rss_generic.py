@@ -83,6 +83,51 @@ MHRA_FEED = """<feed xmlns="http://www.w3.org/2005/Atom">
   </entry>
 </feed>"""
 
+# gov.uk drug-device-alerts Atom: 의약품 회수/결함 + 의료기기 FSN + Safety Roundup 혼재.
+# 필터(_is_mhra_medicines_alert)가 의약품 회수/결함만 채택하고 나머지는 버려야 한다.
+MHRA_ALERT_FEED = """<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Bristol Laboratories Phenoxymethylpenicillin Oral Solution EL(26)A/33</title>
+    <link rel="alternate" href="https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-bristol"/>
+    <published>2026-07-01T08:00:00Z</published>
+    <category term="Class 2 Medicines Recall"/>
+    <summary>Recall of specific batches</summary>
+    <id>mhra-alert-recall-1</id>
+  </entry>
+  <entry>
+    <title>Brancaster Pharma Benzylpenicillin Defect EL(26)A/30</title>
+    <link rel="alternate" href="https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-brancaster"/>
+    <published>2026-06-29T08:00:00Z</published>
+    <category term="Class 4 Medicines Defect Information"/>
+    <summary>Defect notification</summary>
+    <id>mhra-alert-defect-1</id>
+  </entry>
+  <entry>
+    <title>Field Safety Notices: 22 to 26 June 2026</title>
+    <link rel="alternate" href="https://www.gov.uk/drug-device-alerts/field-safety-notices-22-26-june"/>
+    <published>2026-06-30T08:00:00Z</published>
+    <category term="Field Safety Notices"/>
+    <summary>Device FSN roundup</summary>
+    <id>mhra-alert-fsn-1</id>
+  </entry>
+  <entry>
+    <title>MHRA Safety Roundup: June 2026</title>
+    <link rel="alternate" href="https://www.gov.uk/drug-device-alerts/mhra-safety-roundup-june"/>
+    <published>2026-06-30T08:00:00Z</published>
+    <category term="Safety Roundup"/>
+    <summary>Monthly summary</summary>
+    <id>mhra-alert-roundup-1</id>
+  </entry>
+  <entry>
+    <title>Old recall</title>
+    <link rel="alternate" href="https://www.gov.uk/drug-device-alerts/old"/>
+    <published>2020-01-01T00:00:00Z</published>
+    <category term="Class 2 Medicines Recall"/>
+    <summary>old</summary>
+    <id>mhra-alert-old</id>
+  </entry>
+</feed>"""
+
 PICS_FEED = """<rss version="2.0"><channel>
   <item>
     <title>PICS aide memoire</title>
@@ -173,6 +218,27 @@ class RssGenericTest(unittest.TestCase):
         # news1: dc:date 폴백 → 2026-07-03
         self.assertEqual(items[2].date_iso, "2026-07-03")
         self.assertEqual(items[2].document_id, "49f799bc9892")
+
+    def test_mhra_alert_keeps_only_medicines_recalls(self):
+        # [MHRA 회수 커버리지 수리] gov.uk drug-device-alerts 는 의약품 회수/결함과
+        # 의료기기 FSN·Safety Roundup 이 섞여 있다. 필터가 의약품 회수/결함만 채택해야 한다.
+        with _PatchXml(lambda u, *a, **k: ET.fromstring(MHRA_ALERT_FEED)):
+            items, err = ci.collect_mhra_alerts(START, END)
+        self.assertIsNone(err)
+        # Class 2 Recall + Class 4 Defect 2건만 (FSN·Roundup 제외, old 윈도우 제외)
+        self.assertEqual(len(items), 2)
+        titles = " ".join(it.headline for it in items)
+        self.assertIn("Bristol", titles)
+        self.assertIn("Brancaster", titles)
+        self.assertNotIn("Field Safety", titles)
+        self.assertNotIn("Safety Roundup", titles)
+        for it in items:
+            # source 는 기존 MHRA 재사용(신규 Notion Source 옵션 불요), source_type 은 페이지
+            self.assertEqual(it.source, ci.SOURCE_MHRA)
+            self.assertEqual(it.source_type, "Official Regulatory Page")
+            self._assert_doc_id(it)
+        # category term 이 type_or_class 로 보존돼 Recall 성격을 신호
+        self.assertIn("Medicines", items[0].type_or_class)
 
     def test_mhra_atom(self):
         with _PatchXml(lambda u, *a, **k: ET.fromstring(MHRA_FEED)):

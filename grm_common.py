@@ -455,6 +455,7 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True),
     IntakeSourceSpec("ema", "EMA RSS"),
     IntakeSourceSpec("mhra", "MHRA RSS"),
+    IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts"),
     IntakeSourceSpec("pics", "PIC/S RSS"),
     IntakeSourceSpec("eca", "ECA Academy RSS"),
     IntakeSourceSpec("wl", "FDA Warning Letters"),

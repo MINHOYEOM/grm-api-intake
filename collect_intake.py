@@ -330,6 +330,10 @@ EMA_RSS_FEEDS: dict[str, str] = {
     "regulatory-guidelines":  "https://www.ema.europa.eu/en/regulatory-and-procedural-guideline.xml",
 }
 MHRA_RSS_URL = "https://mhrainspectorate.blog.gov.uk/feed/"   # Atom 형식
+# [MHRA 회수 커버리지 수리 2026-07-12] gov.uk 의약품/의료기기 경보 finder 의 Atom 피드.
+# Class 2/3/4 Medicines Recall·Medicines Defect 와 Device 경보(FSN)가 섞여 있어 category
+# term 으로 의약품 회수/결함만 채택한다(_is_mhra_medicines_alert).
+MHRA_ALERT_RSS_URL = "https://www.gov.uk/drug-device-alerts.atom"
 PICS_RSS_URL = "https://picscheme.org/rss/general_en.rss"
 ECA_RSS_URL  = "https://app.gxp-services.net/eca_newsfeed.xml"
 FDA_WL_URL   = (
@@ -488,6 +492,16 @@ class CollectionStats:
     mhra_insert_failed: int = 0
     mhra_error: bool = False
     mhra_error_msg: str = ""
+    # [MHRA 회수 커버리지 수리 2026-07-12] 의약품 회수(Class 2/3/4)는 인스펙터 블로그가
+    # 아니라 gov.uk/drug-device-alerts 채널(별도 Atom 피드)에 게시된다 — 감사 결과 이 채널을
+    # 전혀 안 봐서 회수를 통째로 놓치고 있었다. item.source 는 기존 "MHRA Inspectorate" 를
+    # 재사용(신규 Notion Source 옵션·coverage 라벨 추가 불요)하되, 수집 통계는 별도 prefix.
+    mhra_alert_fetched: int = 0
+    mhra_alert_inserted: int = 0
+    mhra_alert_skipped_dup: int = 0
+    mhra_alert_insert_failed: int = 0
+    mhra_alert_error: bool = False
+    mhra_alert_error_msg: str = ""
     pics_fetched: int = 0
     pics_inserted: int = 0
     pics_skipped_dup: int = 0
@@ -647,7 +661,7 @@ class CollectionStats:
         """
         return (
             self.fr_error or self.recall_error or self.ema_error
-            or self.mhra_error or self.pics_error or self.eca_error
+            or self.mhra_error or self.mhra_alert_error or self.pics_error or self.eca_error
             or self.wl_error
             or self.search_error   # Phase 2a 신규 — misconfiguration 포함
             or self.mfds_error
@@ -679,6 +693,9 @@ class CollectionStats:
             f"MHRA fetched={self.mhra_fetched}  inserted={self.mhra_inserted}  "
             f"skip_dup={self.mhra_skipped_dup}  failed={self.mhra_insert_failed}  "
             f"error={self.mhra_error}",
+            f"MHRA-ALERT fetched={self.mhra_alert_fetched}  inserted={self.mhra_alert_inserted}  "
+            f"skip_dup={self.mhra_alert_skipped_dup}  failed={self.mhra_alert_insert_failed}  "
+            f"error={self.mhra_alert_error}",
             f"PICS fetched={self.pics_fetched}  inserted={self.pics_inserted}  "
             f"skip_dup={self.pics_skipped_dup}  failed={self.pics_insert_failed}  "
             f"error={self.pics_error}",
@@ -1304,6 +1321,10 @@ class RssFeedSpec:
     uses_category: bool = False       # relevance/tier 에 category 전달(EMA·MHRA)
     accumulate_errors: bool = False   # 멀티피드 누적(EMA); False=첫 실패 즉시 반환
     http_silent: bool = False         # HTTPClientError 를 경고없이 skip(ECA Expert Secondary)
+    # 윈도우 통과 후 category 등으로 항목을 걸러내는 선택 훅(예: MHRA alerts 에서 의료기기
+    # FSN 을 버리고 의약품 회수/결함만 채택). None(기본)이면 전건 채택 — 기존 4종 스펙은
+    # 이 필드 미지정이라 산출 IntakeItem 이 byte 동일하게 유지된다.
+    keep_item: Callable[["_RssItemFields"], bool] | None = None
 
 
 def collect_rss_feed(spec: RssFeedSpec, start: date,
@@ -1338,6 +1359,8 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
         for el in spec.iter_items(root):
             f = spec.extract(el, feed_name, feed_url)
             if not _within_window(f.date_iso, start, end):
+                continue
+            if spec.keep_item is not None and not spec.keep_item(f):
                 continue
             doc_id = _stable_doc_id(spec.source, f.title, f.link, f.date_iso)
             if spec.uses_category:
@@ -1444,6 +1467,37 @@ def _extract_mhra(entry: ET.Element, feed_name: str, feed_url: str) -> _RssItemF
     )
 
 
+# gov.uk drug-device-alerts 는 의약품 회수/결함과 의료기기 경보(FSN)가 한 피드에 섞여 있다.
+# category term 이 의약품(medicine) 회수/결함인 항목만 채택하고, 순수 의료기기 경보(Field
+# Safety Notice·Device)와 월간 Safety Roundup 요약은 버린다(감사 목표=의약품 회수 누락 차단).
+_MHRA_ALERT_KEEP_RE = re.compile(r"medicines?\s+(recall|defect)", re.I)
+_MHRA_ALERT_DROP_RE = re.compile(r"field\s+safety|device|safety\s+roundup", re.I)
+
+
+def _is_mhra_medicines_alert(f: "_RssItemFields") -> bool:
+    """의약품 회수/결함만 True. category term 우선, 없으면 제목으로 판별."""
+    haystack = f"{f.category} {f.title}"
+    if _MHRA_ALERT_KEEP_RE.search(haystack):
+        return True
+    # category 가 명시적 device/FSN/roundup 이면 확실히 제외
+    if _MHRA_ALERT_DROP_RE.search(haystack):
+        return False
+    # 애매하면 제외(과수집보다 정밀도 우선 — 회수 category 는 항상 "... Medicines Recall" 형식)
+    return False
+
+
+def _extract_mhra_alert(entry: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    # gov.uk finder Atom 은 MHRA Inspectorate 블로그와 동일한 Atom 구조라 _extract_mhra 를
+    # 재사용하되, type_or_class 를 category(예 "Class 2 Medicines Recall")로 남겨 Recall 성격을
+    # 신호한다(블로그의 "Blog" fallback 과 구분).
+    f = _extract_mhra(entry, feed_name, feed_url)
+    return _RssItemFields(
+        title=f.title, link=f.link, date_iso=f.date_iso, description=f.description,
+        category=f.category, type_or_class=f.category or "Medicines Recall",
+        guid=f.guid, raw_payload=f.raw_payload,
+    )
+
+
 def _extract_pics(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
     title   = _rss_text(el.find("title"))
     link    = _rss_text(el.find("link"))
@@ -1504,6 +1558,12 @@ _EMA_FEED_SPEC = RssFeedSpec(
     iter_items=_rss2_items_from_root, extract=_extract_ema,
     uses_category=True, accumulate_errors=True,
 )
+_MHRA_ALERT_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_PAGE, label="MHRA Drug/Device Alerts",
+    feeds=(("mhra_alert", MHRA_ALERT_RSS_URL),),
+    iter_items=_atom_entries_from_root, extract=_extract_mhra_alert,
+    uses_category=True, keep_item=_is_mhra_medicines_alert,
+)
 _MHRA_FEED_SPEC = RssFeedSpec(
     source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_BLOG, label="MHRA RSS",
     feeds=(("mhra", MHRA_RSS_URL),),
@@ -1531,6 +1591,12 @@ def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | Non
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """MHRA Inspectorate Blog RSS(Atom) 수집. Source Type: Official Regulator Blog."""
     return collect_rss_feed(_MHRA_FEED_SPEC, start, end)
+
+
+def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """MHRA gov.uk 의약품 회수/결함(drug-device-alerts) 수집. 의료기기 FSN 은 제외.
+    item.source 는 "MHRA Inspectorate" 재사용(신규 Notion Source 옵션 불요)."""
+    return collect_rss_feed(_MHRA_ALERT_FEED_SPEC, start, end)
 
 
 def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -2171,12 +2237,19 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             stats.ema_error_msg = ema_err
 
     mhra_items: list[IntakeItem] = []
+    mhra_alert_items: list[IntakeItem] = []
     if "mhra" in active:
         mhra_items, mhra_err = collect_mhra_rss(start, end)
         stats.mhra_fetched = len(mhra_items)
         if mhra_err:
             stats.mhra_error = True
             stats.mhra_error_msg = mhra_err
+        # [MHRA 회수 커버리지 수리] 같은 "mhra" 토큰으로 의약품 회수 채널도 함께 수집.
+        mhra_alert_items, mhra_alert_err = collect_mhra_alerts(start, end)
+        stats.mhra_alert_fetched = len(mhra_alert_items)
+        if mhra_alert_err:
+            stats.mhra_alert_error = True
+            stats.mhra_alert_error_msg = mhra_alert_err
 
     pics_items: list[IntakeItem] = []
     if "pics" in active:
@@ -2465,7 +2538,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         log("INFO", "ENABLE_FDA_483=false — FDA 483 수집 건너뜀")
 
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
-                     + stats.mhra_fetched + stats.pics_fetched
+                     + stats.mhra_fetched + stats.mhra_alert_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
                      + stats.mfds_fetched + stats.mfds_law_fetched
                      + stats.mfds_recall_fetched
@@ -2479,6 +2552,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
+        f"MHRA-Alert={stats.mhra_alert_fetched} · "
         f"PICS={stats.pics_fetched} · ECA={stats.eca_fetched} · "
         f"WL={stats.wl_fetched} · MFDS={stats.mfds_fetched} · "
         f"MFDS-Law={stats.mfds_law_fetched} · "
@@ -2540,6 +2614,10 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                 f.write(_src_line("MHRA RSS", stats.mhra_fetched, stats.mhra_inserted,
                                   stats.mhra_skipped_dup, stats.mhra_insert_failed,
                                   stats.mhra_error, stats.mhra_error_msg))
+                f.write(_src_line("MHRA Drug/Device Alerts", stats.mhra_alert_fetched,
+                                  stats.mhra_alert_inserted, stats.mhra_alert_skipped_dup,
+                                  stats.mhra_alert_insert_failed,
+                                  stats.mhra_alert_error, stats.mhra_alert_error_msg))
                 f.write(_src_line("PIC/S RSS", stats.pics_fetched, stats.pics_inserted,
                                   stats.pics_skipped_dup, stats.pics_insert_failed,
                                   stats.pics_error, stats.pics_error_msg))
@@ -2843,7 +2921,8 @@ def main() -> int:
     # 순서로 기존과 byte 동일하다.
     _insert_items_map = {
         "fr": fr_items, "recall": recall_items, "ema": ema_items,
-        "mhra": mhra_items, "pics": pics_items, "eca": eca_items, "wl": wl_items,
+        "mhra": mhra_items, "mhra_alert": mhra_alert_items,
+        "pics": pics_items, "eca": eca_items, "wl": wl_items,
         "mfds": mfds_items, "mfds_law": mfds_law_items,
         "mfds_recall": mfds_recall_items, "mfds_admin": mfds_admin_items,
         "mfds_gmp_cert": mfds_gmp_cert_items,

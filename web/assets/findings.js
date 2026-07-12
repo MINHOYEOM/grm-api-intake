@@ -1,6 +1,11 @@
 /* GRM 지적사항 검색 (FIND-1 M3c, 국문 우선표시+카테고리 라벨 M6d, 대시보드 밴드 M7,
- * 카드 UX 오버홀 M10b, 탐색 툴바 오버홀 M10c) — 정적·클라이언트사이드, 순수 fetch(PostgREST
- * 직접 호출).
+ * 카드 UX 오버홀 M10b, 탐색 툴바 오버홀 M10c, 문서 중심 열람 재편) — 정적·클라이언트사이드,
+ * 순수 fetch(PostgREST 직접 호출).
+ *
+ * [문서 중심 열람] 열람 단위는 observation 조각이 아니라 문서·업체다(Redica 등 상용
+ * 규제 인텔리전스 검증 패턴) — 같은 문서(raw_signal_id 동일)의 지적사항을 groupByDocument()
+ * 로 묶어 buildDocCard() 문서 카드 1장으로 렌더한다. observation 단위 카드(buildCard())
+ * 자체는 무변경으로 문서 카드 내부에 재사용된다.
  *
  * supabase-js CDN 미사용 — 인증 불필요한 anon SELECT 뿐이라 REST 엔드포인트를 직접 fetch 한다.
  * cfg(url/key) 는 템플릿의 #grm-findings-cfg data-속성(env-param, 미설정이면 빈 문자열)에서
@@ -73,12 +78,15 @@
   // 아직 적용되지 않은 경우 PostgREST 가 알 수 없는 컬럼에 400 을 반환하므로, 그 경우에만
   // LEGACY_FIELDS(신규 2컬럼 제외)로 1회 재시도한다 — 배포 순서와 무관하게 페이지가 절대
   // 깨지지 않도록 하는 폴백이다.
+  // [문서 중심 열람] raw_signal_id = 문서 정체성 키(002_findings.sql: findings.raw_signal_id
+  // → raw_signals.raw_signal_id FK). anon RLS(003)는 행 필터만 있고 컬럼 제한이 없어
+  // select 목록에 추가해도 무해하다 — 같은 문서의 지적사항을 그룹핑하는 데만 쓴다.
   var FIELDS = [
     "finding_id", "source", "agency", "document_id", "published_date",
     "firm_name", "category_code", "category_label_ko", "finding_text",
     "finding_text_ko", "translation_method",
     "finding_language", "evidence_level", "evidence_url", "cfr_refs",
-    "mfds_refs", "review_status", "confidence",
+    "mfds_refs", "review_status", "confidence", "raw_signal_id",
   ];
   var LEGACY_FIELDS = FIELDS.filter(function (f) {
     return f !== "finding_text_ko" && f !== "translation_method";
@@ -722,6 +730,100 @@
     return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };
   }
 
+  // ── [문서 중심 열람] observation 조각이 아니라 문서·업체 단위로 열람한다(Redica 등
+  // 상용 규제 인텔리전스의 검증된 패턴 — observation 조각은 집계 엔진 내부용). 같은
+  // 문서(raw_signal_id 동일)의 지적사항을 문서 카드 1장으로 묶는다. ────────────────────
+  // matched(정렬 완료) 배열의 순서를 그대로 보존하며 병합만 한다 — 문서 순서는 그 문서의
+  // 첫 지적사항이 정렬 결과에서 나타나는 위치로 결정되고(published_date 최신순 등 기존
+  // 정렬 그대로), 문서 내부 지적사항 순서도 기존 정렬을 그대로 유지한다(재정렬 없음).
+  // raw_signal_id 가 없는 행(legacy fetch 폴백 등 방어적 케이스)은 홀로 자기 그룹을
+  // 이룬다 — 그룹핑 실패가 검색 결과 누락으로 이어지지 않게 한다.
+  function groupByDocument(rows) {
+    var order = [];
+    var byKey = {};
+    rows.forEach(function (row) {
+      var key = row.raw_signal_id || ("__standalone__" + (row.finding_id || order.length));
+      if (!byKey[key]) {
+        byKey[key] = [];
+        order.push(key);
+      }
+      byKey[key].push(row);
+    });
+    return order.map(function (key) { return byKey[key]; });
+  }
+
+  // 문서 카드 헤더 — 업체명이 주인공(기존 .fnd-firm 과 동일한 세리프 규칙, 문서 단위라
+  // 조금 더 크게), 소스·발행일·지적 건수는 보조 메타. 문서 내 모든 행이 firm_name/source/
+  // published_date 를 공유하므로 대표값(rows[0])만 쓴다.
+  function buildDocHead(rows) {
+    var head = rows[0];
+    var docHead = el("div", "fnd-doc-head");
+    if (head.firm_name) docHead.appendChild(el("h2", "fnd-doc-firm", head.firm_name));
+    var meta = el("div", "fnd-doc-meta");
+    if (head.source) meta.appendChild(el("span", "fnd-b", head.source));
+    if (head.published_date) meta.appendChild(el("span", "fnd-doc-date", head.published_date));
+    meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));
+    docHead.appendChild(meta);
+    return docHead;
+  }
+
+  // [긴 문서 접기] 한 문서에 지적사항이 DOC_OBS_VISIBLE_LIMIT(6)개 이상이면 처음 5개만
+  // 펼치고 "지적 N건 모두 보기" 버튼으로 나머지를 토글한다(textContent/createElement만,
+  // innerHTML 금지 — 기존 XSS 계약과 동일).
+  var DOC_OBS_VISIBLE_LIMIT = 6;
+  var DOC_OBS_INITIAL_SHOW = 5;
+
+  function buildDocObsToggle(hiddenWrap, totalCount) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-doc-toggle";
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "지적 " + totalCount + "건 모두 보기";
+    btn.addEventListener("click", function () {
+      var expanded = hiddenWrap.hidden; // 현재 숨김이면 이번 클릭으로 펼쳐짐
+      hiddenWrap.hidden = !expanded;
+      btn.setAttribute("aria-expanded", expanded ? "true" : "false");
+      btn.textContent = expanded ? "접기" : "지적 " + totalCount + "건 모두 보기";
+    });
+    return btn;
+  }
+
+  // 문서 카드 1장 조립 — 헤더 + 소속 observation 카드들(기존 buildCard() 렌더를 그대로
+  // 재사용: 카테고리 칩·국문 우선·원문 details 접기·LEGACY_FIELDS 폴백 전부 무변경).
+  // 반환한 built 배열은 render() 의 rAF 오버플로 판정(자세히 보기 버튼 표시 여부)에 쓰인다.
+  function buildDocCard(rows, query) {
+    var doc = el("article", "fnd-doc");
+    doc.appendChild(buildDocHead(rows));
+
+    var obsWrap = el("div", "fnd-doc-obs");
+    var built = [];
+    var overflows = rows.length >= DOC_OBS_VISIBLE_LIMIT;
+    var visibleCount = overflows ? DOC_OBS_INITIAL_SHOW : rows.length;
+    rows.slice(0, visibleCount).forEach(function (row) {
+      var b = buildCard(row, query);
+      obsWrap.appendChild(b.card);
+      built.push(b);
+    });
+    doc.appendChild(obsWrap);
+
+    var rest = rows.slice(visibleCount);
+    if (rest.length) {
+      var hiddenWrap = el("div", "fnd-doc-obs fnd-doc-obs-more");
+      hiddenWrap.hidden = true;
+      rest.forEach(function (row) {
+        var b = buildCard(row, query);
+        hiddenWrap.appendChild(b.card);
+        built.push(b);
+      });
+      doc.appendChild(hiddenWrap);
+      var toggleWrap = el("div", "fnd-doc-more");
+      toggleWrap.appendChild(buildDocObsToggle(hiddenWrap, rows.length));
+      doc.appendChild(toggleWrap);
+    }
+
+    return { card: doc, built: built };
+  }
+
   // [FIND-1 M10c] 정렬 — 최신순(기본, published_date desc → finding_id asc)/오래된순/
   // 업체명순(localeCompare, 동순위는 published_date desc). 순수 함수(원본 배열 비파괴).
   function sortRows(rows) {
@@ -862,16 +964,23 @@
 
   function render() {
     var matched = sortRows(ROWS.filter(matches));
-    renderDash(matched); // [FIND-1 M7] 필터 결과 기준 대시보드 재계산(데이터 없으면 hidden)
+    var docs = groupByDocument(matched); // [문서 중심 열람] raw_signal_id 로 문서 단위 그룹핑
+    renderDash(matched); // [FIND-1 M7] 필터 결과 기준 대시보드 재계산(데이터 없으면 hidden, obs 기준 불변)
     refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     updateFiltersToggleBadge();
     syncStateToUrl();
+    // [문서 중심 열람] "총 N건" → "문서 X건 · 지적 Y건" 이중 표기(observation 조각 수량이
+    // 그대로 문서 수로 오인되지 않도록 명시).
     countEl.innerHTML = "";
-    var b = document.createElement("b");
-    b.textContent = String(matched.length);
-    countEl.appendChild(document.createTextNode("총 "));
-    countEl.appendChild(b);
+    var bDocs = document.createElement("b");
+    bDocs.textContent = String(docs.length);
+    var bObs = document.createElement("b");
+    bObs.textContent = String(matched.length);
+    countEl.appendChild(document.createTextNode("문서 "));
+    countEl.appendChild(bDocs);
+    countEl.appendChild(document.createTextNode("건 · 지적 "));
+    countEl.appendChild(bObs);
     countEl.appendChild(document.createTextNode("건"));
 
     resultsEl.innerHTML = "";
@@ -883,10 +992,10 @@
     var query = state.q.trim().toLowerCase(); // [M10b P1] 하이라이트 검색어(trim+대소문자무시)
     var frag = document.createDocumentFragment();
     var built = [];
-    matched.forEach(function (row) {
-      var b2 = buildCard(row, query);
-      frag.appendChild(b2.card);
-      built.push(b2);
+    docs.forEach(function (rows) {
+      var d = buildDocCard(rows, query);
+      frag.appendChild(d.card);
+      built = built.concat(d.built);
     });
     resultsEl.appendChild(frag);
     // [M10b P1] "자세히 보기" 버튼 표시 여부 — DOM 삽입 후(레이아웃 확정) 1회 rAF 로 판정.

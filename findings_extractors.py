@@ -228,7 +228,9 @@ def _from_mfds_gmp(
         finding_text=excerpt,
         ordinal=1,
         evidence_level="B",
-        evidence_url=_evidence_url(raw_signal, raw, "source_url", "url", fallback=MFDS_GMP_LIST_URL),
+        # [Fix A 2026-07-12] download_url = 실사 결과 PDF(raw_json, card_scaffold.
+        # _official_gmp_inspection 과 동일 소스) — source_url/url 보다 먼저 시도한다.
+        evidence_url=_evidence_url(raw_signal, raw, "download_url", "source_url", "url", fallback=MFDS_GMP_LIST_URL),
         finding_language=_language(row, "KO"),
         mfds_refs=_extract_mfds_refs(excerpt),
         confidence=0.72,
@@ -242,7 +244,13 @@ def _from_mfds_gmp_table(
     row: dict[str, Any],
     table_rows: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    evidence_url = _evidence_url(raw_signal, raw, "source_url", "url", fallback=MFDS_GMP_LIST_URL)
+    # [Fix A 2026-07-12 — 사고2 직접 수리] raw_json.download_url = 실사 결과 PDF
+    # (card_scaffold._official_gmp_inspection 과 동일 소스). 실측: raw_json 에는 이
+    # download_url 만 있고 source_url/url 은 null — 그런데도 옛 _evidence_url 은
+    # raw_signal.official_url(목록 CCBBD03)을 최우선 반환해 사고가 났다. 위 _evidence_url
+    # 재정렬로 raw_keys 가 official_url/source_url 보다 먼저 시도되므로 download_url 이
+    # 최우선 채택된다.
+    evidence_url = _evidence_url(raw_signal, raw, "download_url", "source_url", "url", fallback=MFDS_GMP_LIST_URL)
     out: list[dict[str, Any]] = []
     for index, item in enumerate(table_rows, start=1):
         text = _gmp_table_text(item)
@@ -577,13 +585,20 @@ def _evidence_url(
     *raw_keys: str,
     fallback: str = "",
 ) -> str:
-    for value in (raw_signal.get("official_url"), raw_signal.get("source_url")):
+    # [Fix A 2026-07-12 — findings evidence_url 품질 계층] 근본 원인 #1 수리: 추출기가
+    # 명시한 문서급 raw 필드(raw_keys)를 최우선으로 시도한다. raw_signal 레벨(official_url/
+    # source_url)은 소스마다 의미가 달라(483/WL=개별 문서, MFDS 계열=목록/데이터셋/API
+    # 엔드포인트) 마지막 순위로 강등한다 -- 이전 순서(official_url 최우선)에서는 추출기가
+    # "이 raw 필드가 문서급 링크"라고 명시해도 official_url 에 밀려 죽었다(사고2: MFDS GMP
+    # 실사 raw.source_url=PDF 인데 official_url=목록 CCBBD03 이 승격). 모든 후보는 품질
+    # 분류기(gf.evidence_url_quality_error)를 통과해야 채택된다 -- serviceKey/API 엔드포인트/
+    # data.go.kr 데이터셋 페이지가 조용히 evidence_url 로 승격되는 경로를 차단한다.
+    candidates = [raw.get(key) for key in raw_keys]
+    candidates.append(raw_signal.get("official_url"))
+    candidates.append(raw_signal.get("source_url"))
+    for value in candidates:
         text = _compact(value)
-        if text:
-            return text
-    for key in raw_keys:
-        text = _compact(raw.get(key))
-        if text:
+        if text and not gf.evidence_url_quality_error(text):
             return text
     return fallback
 

@@ -419,6 +419,40 @@ def _first_text(*values: Any) -> str:
     return ""
 
 
+# [Fix A 2026-07-12 — findings evidence_url 품질 계층] `/findings/` 의 "원본 확인" 링크
+# (evidence_url)가 개별 문서가 아니라 목록/데이터셋/API 엔드포인트로 가는 사고가 연속 2건
+# 발생했다(사고1 PR#213=MFDS 행정처분·회수→data.go.kr 오픈API 데이터셋 안내 페이지, 사고2=
+# MFDS GMP실사→목록 CCBBD03, raw 에는 결과 PDF 가 멀쩡히 있었음). 이 분류기가 단일 진실원
+# 이다 -- findings_extractors._evidence_url(추출기 우선순위 필터)과 아래 validate_finding
+# (최후 방어선) 양쪽이 이 함수를 통해 evidence_url 을 걸러낸다. stdlib re 만 사용(이 모듈은
+# stdlib-only 계약).
+#   - serviceKey= : 오픈API 인증키 포함 엔드포인트(키 유출 + 사용자 무의미)
+#   - apis.data.go.kr : 오픈API 엔드포인트(문서 아님)
+#   - data.go.kr .../openapi.do 등 데이터셋 안내 페이지(개별 사건 열람 불가)
+EVIDENCE_URL_BLOCKLIST: tuple[tuple[str, str], ...] = (
+    (r"[?&]serviceKey=", "api-key-url"),
+    (r"^https?://apis\.data\.go\.kr/", "api-endpoint"),
+    (r"^https?://(www\.)?data\.go\.kr/", "dataset-page"),
+)
+
+
+def evidence_url_quality_error(url: Any) -> str:
+    """부적합 evidence_url 이면 사유 문자열, 적합하면 ''.
+
+    빈 값은 ''(적합)을 반환한다 -- required 필드 검증은 별도(validate_finding)의 몫이라
+    이 분류기와 중복시키지 않는다.
+    """
+    text = _text(url)
+    if not text:
+        return ""
+    if not re.match(r"^https?://", text, re.IGNORECASE):
+        return "non-http"
+    for pattern, reason in EVIDENCE_URL_BLOCKLIST:
+        if re.search(pattern, text, re.IGNORECASE):
+            return reason
+    return ""
+
+
 _ASCII_KEYWORD_PATTERN_CACHE: dict[str, "re.Pattern[str]"] = {}
 
 
@@ -636,6 +670,18 @@ def raw_signal_from_row(
     }
 
 
+def _choose_evidence_url(evidence_url: str, raw_signal: dict[str, Any]) -> str:
+    """[Fix A 2026-07-12] 근본 원인 #2 수리: raw_signal.official_url/source_url 무조건
+    폴백을 품질 필터 통과 후보만 채택으로 교체한다. official_url/source_url 의 의미는
+    소스마다 다르다(483/WL=개별 문서라 대개 적합, MFDS 계열=목록/데이터셋/serviceKey API
+    엔드포인트라 부적합) -- serviceKey/API 엔드포인트가 조용히 evidence_url 로 승격되는
+    경로를 막는다. 전부 부적합이면 ''(침묵 승격 대신 validate_finding required 에러로
+    표면화된다).
+    """
+    candidates = (_text(evidence_url), _text(raw_signal.get("official_url")), _text(raw_signal.get("source_url")))
+    return next((c for c in candidates if c and not evidence_url_quality_error(c)), "")
+
+
 def finding_from_raw_signal(
     raw_signal: dict[str, Any],
     *,
@@ -684,7 +730,7 @@ def finding_from_raw_signal(
         "finding_text": text,
         "finding_language": _text(finding_language),
         "evidence_level": _text(evidence_level),
-        "evidence_url": _text(evidence_url) or _text(raw_signal.get("official_url")) or _text(raw_signal.get("source_url")),
+        "evidence_url": _choose_evidence_url(evidence_url, raw_signal),
         "inspector_names": list(inspector_names or []),
         "cfr_refs": list(cfr_refs or []),
         "mfds_refs": list(mfds_refs or []),
@@ -783,6 +829,15 @@ def validate_finding(record: dict[str, Any]) -> list[str]:
         errors.append("findings.category_code must be in grm-finding-taxonomy/v1")
     if record.get("evidence_level") not in EVIDENCE_LEVELS:
         errors.append("findings.evidence_level must be A/B/C")
+    # [Fix A 2026-07-12] 최후 방어선 — 어느 경로로 만들어졌든(추출기/수동/백필) evidence_url
+    # 이 목록/API/serviceKey 클래스면 POST 전에 반드시 거부되고 extraction report
+    # invalid_errors 로 관측된다. 빈 값은 위 required 루프의 몫이라 여기선 다루지 않는다
+    # (evidence_url_quality_error 자체도 빈 값엔 ''을 반환해 중복 에러를 안 만든다).
+    evidence_url_reason = evidence_url_quality_error(record.get("evidence_url"))
+    if evidence_url_reason:
+        errors.append(
+            f"findings.evidence_url {evidence_url_reason}: {_text(record.get('evidence_url'))[:80]}"
+        )
     if record.get("extraction_method") not in EXTRACTION_METHODS:
         errors.append("findings.extraction_method invalid")
     if record.get("review_status") not in REVIEW_STATUSES:

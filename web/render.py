@@ -514,6 +514,9 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
+        # 업체 프로파일(FIND-FIRM-ALIAS) — 쿼리스트링 기반 동적 조회(`?key=firm_key`)라
+        # 개별 업체 URL 은 넣지 않고 베이스 경로 1건만 등록한다.
+        f"  <url><loc>{base_url}/findings/firm/</loc><lastmod>{latest_pub}</lastmod></url>",
     ]
     for pub in pubs:
         lines.append(
@@ -570,6 +573,8 @@ FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 식약처 GMP 
                         "지적사항을 원문에서 자동 추출해 검색·필터.")
 TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 식약처 GMP 지적사항 전량 집계 통계 — "
                       "카테고리 순위·연도별 추이·업체 랭킹으로 보는 규제 지적 트렌드.")
+FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·식약처 GMP 지적사항 누적 이력을 "
+                    "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
 
 
 def _abs_url(rel_path: str = "") -> str:
@@ -665,6 +670,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["archivejs_ver"] = _asset_ver("archive.js")
     env.globals["findingsjs_ver"] = _asset_ver("findings.js")
     env.globals["trendsjs_ver"] = _asset_ver("trends.js")
+    env.globals["firmjs_ver"] = _asset_ver("firm.js")
     # 반응 계층 공개 설정 주입 — url 이 https(_safe_url 통과)이고 anon key 가 있을 때만 활성.
     # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.
     _supa_url = _safe_url(SUPABASE_URL)
@@ -768,6 +774,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     _write(out_dir / "findings" / "trends" / "index.html", trends_html)
     written.append("findings/trends/index.html")
+
+    # 업체 프로파일(FIND-FIRM-ALIAS 웹 절반) — findings/trends 와 동일 이유로 라이브
+    # 데이터는 빌드시 고정할 수 없다(013_findings_firm_key.sql 의 findings_firm_profile
+    # RPC 를 firm.js 가 URL 파라미터(?key=)로 직접 fetch). 서버는 셸(로딩 상태)만 렌더.
+    # findings/firm/index.html 은 findings/trends/index.html 과 같은 깊이라 rel_root 동일.
+    firm_html = env.get_template("firm.html").render(
+        page_title="업체 프로파일 · GRM",
+        rel_root="../../",
+        nav_active="findings",
+        latest_slug=latest_slug,
+        description=FIRM_DESCRIPTION,
+        canonical=_abs_url("findings/firm/"),
+    )
+    _write(out_dir / "findings" / "firm" / "index.html", firm_html)
+    written.append("findings/firm/index.html")
 
     # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
     search_index = build_search_index(briefs, issue_no_by_date, latest_slug)

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
+<meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
+<title>업체 프로파일 · GRM</title>
+<meta name="description" content="특정 업체의 FDA 483·Warning Letter·식약처 GMP 지적사항 누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일." />
+<link rel="canonical" href="https://grm-solutions.com/findings/firm/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Global Regulatory Monitor" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="업체 프로파일 · GRM" />
+<meta property="og:description" content="특정 업체의 FDA 483·Warning Letter·식약처 GMP 지적사항 누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일." />
+<meta property="og:url" content="https://grm-solutions.com/findings/firm/" />
+<meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://grm-solutions.com/assets/og-image.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/fonts/tabler-icons.woff2?v3.7.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/grm.css?v=cdd24069">
+</head>
+<body>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
+  <nav id="navmenu"><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html" class="on">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a></nav>
+  <span class="sp"></span>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
+</div></header>
+
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Firm Profile</span>
+    <h1 class="reveal" style="animation-delay:.08s">업체 프로파일</h1>
+    <p class="reveal" style="animation-delay:.14s">특정 업체의 FDA 483 · Warning Letter · 식약처 GMP 지적사항 누적 이력을 한 곳에서 확인합니다.</p>
+  </div>
+  <div class="wrap">
+    <div id="grm-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
+
+    <div class="fp-state" id="fp-loading" role="status" aria-live="polite">불러오는 중…</div>
+    <div class="fp-state fp-state-error" id="fp-error" hidden>업체 프로파일 준비 중입니다.</div>
+    <div class="fp-state" id="fp-notfound" hidden>
+      <p>해당 업체를 찾을 수 없습니다.</p>
+      <a class="fp-search-link" href="../../findings/index.html">검색 페이지로 이동 →</a>
+    </div>
+
+    <div id="fp-content" hidden>
+      <div class="fp-head">
+        <h2 class="fp-firm-name" id="fp-firm-name"></h2>
+      </div>
+
+      <section class="fp-stats" id="fp-stats" aria-label="핵심 통계"></section>
+
+      <section class="fp-block" aria-label="카테고리 구성">
+        <h2 class="fp-h">카테고리 구성</h2>
+        <div id="fp-cat" class="fp-cat"></div>
+      </section>
+
+      <section class="fp-block" aria-label="연도 추이">
+        <h2 class="fp-h">연도 추이</h2>
+        <div id="fp-year" class="fp-year"></div>
+      </section>
+
+      <section class="fp-block" aria-label="문서 이력">
+        <h2 class="fp-h">문서 이력</h2>
+        <div id="fp-docs" class="fp-docs"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<style>
+/* 한국어 어절 줄바꿈(§1 P0, findings/trends 페이지와 동일 스코프). */
+main{word-break:keep-all;overflow-wrap:anywhere}
+.page-head p{max-width:none;text-wrap:balance}
+
+.fp-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.fp-state-error{color:var(--coral-2)}
+.fp-search-link{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.fp-search-link:hover{color:var(--coral)}
+
+.fp-head{margin:0 0 22px}
+.fp-firm-name{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0}
+
+.fp-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 34px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.fp-stat{display:flex;flex-direction:column;gap:4px}
+.fp-stat-num{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.1;font-variant-numeric:lining-nums}
+.fp-stat-lbl{font-size:12px;color:var(--muted)}
+
+.fp-block{margin:0 0 42px}
+.fp-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 16px}
+.fp-empty{font-size:12.5px;color:var(--muted);margin:0}
+
+/* 카테고리 구성 — trends.js 카테고리 순위 렌더 관례 재사용(coral 단색 막대). */
+.fp-cat{display:flex;flex-direction:column;gap:2px}
+.fp-cat-row{display:flex;align-items:center;gap:14px;padding:9px 6px;border-radius:8px;text-decoration:none}
+.fp-cat-row:hover,.fp-cat-row:focus-visible{background:var(--strong);outline:none}
+.fp-cat-row:hover .fp-cat-label,.fp-cat-row:focus-visible .fp-cat-label{color:var(--coral-2)}
+.fp-cat-label{flex:0 0 200px;max-width:200px;font-size:14px;color:var(--body-s);line-height:1.35}
+.fp-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.fp-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.fp-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+/* 연도 추이 — trends.js 연도별 추이 관례 재사용(세로 미니 바). */
+.fp-year-bars{display:flex;align-items:flex-end;gap:8px}
+.fp-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fp-year-barwrap{height:110px;width:100%;max-width:36px;display:flex;align-items:flex-end;border-radius:6px 6px 0 0;background:var(--coral-tint);overflow:hidden}
+.fp-year-bar{width:100%;background:var(--coral)}
+.fp-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.fp-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s)}
+
+/* 문서 이력 — 최신순 리스트, public_obs_cnt>0 인 문서만 클릭 시 인라인 확장. */
+.fp-docs{display:flex;flex-direction:column;gap:0}
+.fp-doc-row{border-bottom:1px solid var(--line)}
+.fp-doc-row-main{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 6px;border-radius:8px}
+.fp-doc-row:not(.disabled) .fp-doc-row-main{cursor:pointer}
+.fp-doc-row:not(.disabled) .fp-doc-row-main:hover,
+.fp-doc-row:not(.disabled) .fp-doc-row-main:focus-visible{background:var(--strong);outline:none}
+.fp-doc-date{font-family:var(--mono);font-size:12.5px;color:var(--muted);flex:0 0 92px}
+.fp-doc-count{flex:1 1 auto;font-size:13px;color:var(--body-s)}
+.fp-doc-pending{font-size:12px;color:var(--muted-2)}
+.fp-doc-chev{flex:0 0 auto;color:var(--muted);font-size:13px;transition:transform .15s}
+.fp-doc-row.open .fp-doc-chev{transform:rotate(90deg)}
+.fp-doc-detail{padding:4px 6px 20px;display:flex;flex-direction:column;gap:14px}
+.fp-doc-detail[hidden]{display:none}
+.fp-doc-detail-loading,.fp-doc-detail-empty{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+
+/* 문서 인라인 확장 — 단순화한 국문+원문 details 카드(findings.js buildCard() 축약형). */
+.fp-obs{border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;background:var(--canvas)}
+.fp-obs-cat{font-size:11.5px;color:var(--muted);margin:0 0 6px}
+.fp-obs-text{font-size:13.5px;line-height:1.6;color:var(--body);margin:0;white-space:pre-wrap}
+.fp-obs-orig{margin-top:8px}
+.fp-obs-orig summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--coral-2)}
+.fp-obs-orig p{font-family:var(--serif);font-size:13px;line-height:1.6;color:var(--muted);margin:6px 0 0;white-space:pre-wrap}
+.fp-obs-refs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fp-obs-ref{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
+
+.fp-b{display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+
+@media(max-width:640px){
+  .fp-cat-label{flex-basis:120px;max-width:120px}
+  .fp-stats{gap:26px}
+  .fp-stat-num{font-size:22px}
+  .fp-doc-date{flex-basis:76px}
+}
+</style>
+<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+  <span class="kick">AI Disclosure</span>
+  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <div class="disc-body">
+    <div class="disc-sec"><p>이 페이지의 업체별 집계(총 지적·카테고리·연도별 추이)는 FDA 483 Observation·Warning Letter·식약처 GMP 실태조사 결과 등 공개 원문에서 자동 추출·정규화된 지적사항을 기반으로 합니다.</p></div>
+    <div class="disc-sec"><p>문서 이력에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+  </div>
+</div></section>
+<footer class="site"><div class="wrap">
+  <div class="foot">
+    <div class="b1"><b>Global Regulatory Monitor</b>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a></div>
+    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
+    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
+  </div>
+  <div class="foot-legal">
+    <div class="foot-copy">
+      <span>© 2026 Global Regulatory Monitor</span>
+      <span class="prov">AI-generated from primary sources · verify against the original</span>
+    </div>
+    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+  </div>
+</div></footer>
+
+<script>
+// 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
+const _nav=document.getElementById('nav');
+addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
+</script>
+<script src="../../assets/firm.js?v=c3451b94" defer></script><style>
+#grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
+#grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
+#grm-mascot .lid{transform-box:fill-box;transform-origin:center top;transform:scaleY(0);transition:transform .09s ease}
+#grm-mascot.is-blink .lid{transform:scaleY(1)}
+#grm-mascot .wingL,#grm-mascot .wingR{transform-box:fill-box;transform-origin:top center}
+#grm-mascot.is-flap .wingL{animation:grmOwlFlapL .26s ease-in-out 3}
+#grm-mascot.is-flap .wingR{animation:grmOwlFlapR .26s ease-in-out 3}
+#grm-mascot.is-bounce .owl{animation:grmOwlBounce .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes grmOwlBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes grmOwlFlapL{0%,100%{transform:rotate(0)}50%{transform:rotate(28deg)}}
+@keyframes grmOwlFlapR{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
+@keyframes grmOwlBounce{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-9px) scale(1.06,.94)}60%{transform:translateY(2px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
+#grm-mascot .owl-msg{position:absolute;top:calc(100% + 9px);right:0;text-align:left;background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 12px;border-radius:11px;width:max-content;max-width:none;white-space:nowrap;opacity:0;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;box-shadow:0 10px 22px -10px rgba(0,0,0,.42)}
+#grm-mascot .owl-msg.show{opacity:1;transform:translateY(0)}
+#grm-mascot .owl-msg::after{content:"";position:absolute;top:-11px;right:22px;border:6px solid transparent;border-bottom-color:var(--ink)}
+#grm-mascot .burst{position:absolute;left:50%;top:16%;font-size:17px;line-height:1;pointer-events:none;will-change:transform,opacity}
+#grm-mascot .burst.v-float{animation:grmBurstFloat .85s cubic-bezier(.2,.7,.3,1) forwards}
+#grm-mascot .burst.v-wobble{animation:grmBurstWobble 1s ease-out forwards}
+#grm-mascot .burst.v-spin{animation:grmBurstSpin .9s cubic-bezier(.34,1.56,.64,1) forwards}
+#grm-mascot .burst.v-pop{animation:grmBurstPop .7s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes grmBurstFloat{0%{transform:translate(-50%,0) scale(.4) rotate(var(--r0,0deg));opacity:0}18%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-58px) scale(1) rotate(var(--r1,0deg));opacity:0}}
+@keyframes grmBurstWobble{0%{transform:translate(-50%,0) scale(.5);opacity:0}15%{opacity:1}30%{transform:translate(calc(-50% - var(--dx,0px)),-14px) scale(.9)}50%{transform:translate(calc(-50% + var(--dx,0px)),-28px) scale(1)}70%{transform:translate(calc(-50% - var(--dx,0px)),-42px) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-60px) scale(.9);opacity:0}}
+@keyframes grmBurstSpin{0%{transform:translate(-50%,0) scale(.3) rotate(0deg);opacity:0}20%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-56px) scale(1.1) rotate(360deg);opacity:0}}
+@keyframes grmBurstPop{0%{transform:translate(-50%,0) scale(.2);opacity:0}40%{transform:translate(-50%,-10px) scale(1.3);opacity:1}60%{transform:translate(-50%,-6px) scale(.9)}80%{transform:translate(-50%,-16px) scale(1.08)}100%{transform:translate(-50%,-34px) scale(.85);opacity:0}}
+@media (max-width:760px){ #grm-mascot{display:none} }
+@media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
+</style>
+<div id="grm-mascot" data-page="findings" aria-hidden="true">
+  <span class="owl-msg"></span>
+  <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>
+    <path d="M30 30 L52 30 L36 8 Z" fill="#CE6E4C"/><path d="M90 30 L68 30 L84 8 Z" fill="#CE6E4C"/>
+    <rect x="18" y="22" width="84" height="92" rx="34" fill="url(#grmOwlGrad)"/>
+    <ellipse cx="60" cy="86" rx="26" ry="24" fill="#F4E7DF" opacity=".85"/>
+    <path class="wingR" d="M100 52 q16 6 12 30 q-3 14 -14 16 q6 -22 2 -46 Z" fill="#B9542F"/>
+    <path class="wingL" d="M20 52 q-16 6 -12 30 q3 14 14 16 q-6 -22 -2 -46 Z" fill="#B9542F"/>
+    <g class="eyes">
+      <circle cx="43" cy="56" r="18" fill="#FAF6EE"/><circle cx="77" cy="56" r="18" fill="#FAF6EE"/>
+      <circle cx="43" cy="57" r="7" fill="#22303F"/><circle cx="77" cy="57" r="7" fill="#22303F"/>
+      <circle cx="45.4" cy="54.6" r="2.1" fill="#FAF6EE"/><circle cx="79.4" cy="54.6" r="2.1" fill="#FAF6EE"/>
+      <rect class="lid" x="24" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+      <rect class="lid" x="58" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+    </g>
+    <path d="M53 68 L67 68 L60 80 Z" fill="#E8B04A"/>
+  </svg>
+</div>
+<script>
+(function(){
+  var m=document.getElementById('grm-mascot'); if(!m) return;
+  var msg=m.querySelector('.owl-msg'), eyes=m.querySelector('.eyes');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HEARTS=['💛','💕','✨','🧡','⭐'];
+  var VARIANTS=['v-float','v-wobble','v-spin','v-pop'];
+  function burst(){
+    if(reduce) return;
+    var n=2+(Math.random()<0.4?1:0);
+    for(var k=0;k<n;k++){
+      (function(){
+        setTimeout(function(){
+          var el=document.createElement('span');
+          el.className='burst '+VARIANTS[Math.floor(Math.random()*VARIANTS.length)];
+          el.textContent=HEARTS[Math.floor(Math.random()*HEARTS.length)];
+          el.style.setProperty('--dx', (Math.random()*44-22).toFixed(1)+'px');
+          el.style.setProperty('--r0', (Math.random()*30-15).toFixed(1)+'deg');
+          el.style.setProperty('--r1', (Math.random()*50-25).toFixed(1)+'deg');
+          m.appendChild(el);
+          el.addEventListener('animationend', function(){ el.remove(); });
+          setTimeout(function(){ if(el.parentNode) el.remove(); }, 1300);
+        }, k*70);
+      })();
+    }
+  }
+  function bounce(){ if(reduce) return; m.classList.remove('is-bounce'); void m.offsetWidth; m.classList.add('is-bounce'); }
+  var sets={
+    home:{greet:'안녕하세요, 구름이예요! 이번 주 규제 소식이 왔어요 🦉',msgs:['구름 위에서 규제 소식을 살펴보고 있어요 ☁️','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
+    board:{greet:'구름이예요! 찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
+    detail:{greet:'구름이가 이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
+  };
+  var set=sets[m.getAttribute('data-page')]||sets.home, i=0, t;
+  function blink(){ m.classList.add('is-blink'); setTimeout(function(){m.classList.remove('is-blink');},140); }
+  function flap(){ if(reduce) return; m.classList.remove('is-flap'); void m.offsetWidth; m.classList.add('is-flap'); }
+  function say(txt){ msg.textContent=txt; msg.classList.add('show'); clearTimeout(t); t=setTimeout(function(){msg.classList.remove('show');},3600); }
+  (function amb(){ setTimeout(function(){ blink(); if(!reduce&&Math.random()<0.25) flap(); amb(); }, 2800+Math.random()*3600); })();
+  if(!reduce&&eyes){ window.addEventListener('mousemove', function(e){
+    var r=eyes.getBoundingClientRect(); if(!r.width) return;
+    var cx=r.left+r.width/2, cy=r.top+r.height/2, dx=e.clientX-cx, dy=e.clientY-cy;
+    var a=Math.atan2(dy,dx), d=Math.min(3, Math.hypot(dx,dy)/70);
+    eyes.style.transform='translate('+(Math.cos(a)*d).toFixed(2)+'px,'+(Math.sin(a)*d).toFixed(2)+'px)';
+  }, {passive:true}); }
+  m.addEventListener('click', function(){ flap(); blink(); bounce(); burst(); say(set.msgs[i++%set.msgs.length]); });
+  m.addEventListener('mouseenter', function(){ if(!msg.classList.contains('show')) say(set.msgs[i++%set.msgs.length]); });
+  setTimeout(function(){ say(set.greet); }, 1200);
+})();
+</script>
+
+<style>
+.grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
+body.grm-has-share .grm-card-actions{display:flex}
+.grm-ca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.grm-ca:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-ca .ti{font-size:15px}
+.grm-ca.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-card-actions');
+  if(!rows.length) return;
+  document.body.classList.add('grm-has-share');
+  var isMobileOS=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  function done(btn){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent='복사됨'; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  for(var i=0;i<rows.length;i++){ (function(row){
+    var btn=row.querySelector('[data-share]'); if(!btn) return;
+    btn.addEventListener('click', function(){
+      var anchor=row.getAttribute('data-anchor')||'';
+      var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
+      var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
+      var title=tEl?tEl.textContent.trim():document.title;
+      if(isMobileOS&&navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
+      else { fallback(url); }
+    });
+  })(rows[i]); }
+})();
+</script>
+</body>
+</html>

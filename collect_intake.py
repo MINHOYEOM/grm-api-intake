@@ -2564,7 +2564,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
         f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
     ))
-    return (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items)
+    return (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items)
 
 
 def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
@@ -2829,7 +2829,8 @@ def main() -> int:
     log("INFO", f"MFDS enforcement window={enf_start}~{end} "
                 f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
 
-    (stats, fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
+    (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items,
+     pics_items, eca_items,
      wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
      mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
      ich_items, who_items, hc_items, fda483_items) = _run_collection(

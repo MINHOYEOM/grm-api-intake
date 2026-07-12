@@ -90,7 +90,7 @@
       <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
       <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>
       <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div>
-      <div id="fnd-results" class="fnd-results"></div>
+      <div id="fnd-results" class="fnd-results"></div><div class="fnd-load-more-wrap"><button class="fnd-load-more" id="fnd-load-more" type="button" hidden></button></div>
     </section>
   </div>
 </main>
@@ -208,8 +208,14 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-doc-firm{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0;flex:1 1 auto;min-width:0}
 /* [업체 프로파일 진입] firm_key 있는 문서는 업체명이 프로파일 링크 — 밑줄 없는 상속색,
    hover 시에만 coral+밑줄(기존 링크 계열과 동일 절제된 신호). */
-.fnd-doc-firm a{color:inherit;text-decoration:none}
-.fnd-doc-firm a:hover,.fnd-doc-firm a:focus-visible{color:var(--coral-2);text-decoration:underline}
+/* [어포던스 수정] 실사용자가 "클릭이 안 된다"고 오인 신고(기능은 정상 — 시각 신호만
+   부재했던 순수 어포던스 문제). 기본 상태에서도 옅은 코럴 밑줄 + 우측 화살표 글리프
+   (CSS ::after, 이모지 아님)로 클릭 가능함을 드러낸다. color-mix 는 .fnd-hl 과 동일한
+   기존 관례(옅은 코럴 혼합색) 재사용. */
+.fnd-doc-firm a{color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--coral) 40%,transparent);text-underline-offset:3px}
+.fnd-doc-firm a::after{content:"→";display:inline-block;margin-left:5px;font-size:.7em;color:var(--coral-2);opacity:.75}
+.fnd-doc-firm a:hover,.fnd-doc-firm a:focus-visible{color:var(--coral-2);text-decoration-color:var(--coral-2)}
+.fnd-doc-firm a:hover::after,.fnd-doc-firm a:focus-visible::after{opacity:1}
 .fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
 .fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
 .fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
@@ -262,6 +268,13 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-more-btn{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);background:transparent;border:0;padding:0;cursor:pointer}
 .fnd-more-btn[hidden]{display:none}
 .fnd-more-btn:hover{text-decoration:underline}
+/* [페이지네이션] "더 보기" — 기존 버튼 톤(코럴) 재사용. .fnd-filters-toggle 과 동일한
+   보더+연한 배경 계열(경량 2차 액션), 문구/노출은 findings.js 가 채운다. */
+.fnd-load-more-wrap{display:flex;justify-content:center;margin-top:20px}
+.fnd-load-more{font:inherit;font-size:13.5px;font-weight:600;color:var(--coral-2);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px 22px;cursor:pointer}
+.fnd-load-more:hover{border-color:var(--coral);color:var(--coral)}
+.fnd-load-more[hidden]{display:none}
+.fnd-load-more:disabled{opacity:.6;cursor:default}
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
@@ -301,7 +314,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=1067c30e" defer></script><style>
+<script src="../assets/findings.js?v=3776738f" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

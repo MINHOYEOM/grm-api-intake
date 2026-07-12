@@ -140,6 +140,20 @@
   var ROWS = null; // fetch 성공 시 findings 배열
   var debounceTimer = null;
 
+  // [페이지네이션] PAGE_LIMIT=페이지당 행 수(기존 limit=1000 고정값 그대로 유지).
+  // SERVER_TOTAL=Content-Range 헤더(Prefer: count=exact 응답)에서 파싱한 서버측 exact
+  // count — 파싱 실패/헤더 미노출 환경이면 null(폴백). LOADED_FIELDS=최초 3단계 폴백
+  // 체인 중 실제로 성공한 필드 리스트(로드 완료 후 고정 — "더 보기" 추가 fetch 는 매번
+  // 재협상하지 않고 이 필드셋을 재사용한다). LAST_BATCH_SIZE=가장 최근 fetch 가 반환한
+  // 행 수(SERVER_TOTAL 미확보 환경 — PostgREST 가 Content-Range 를 노출하지 않는 경우 —
+  // "이번 페이지가 PAGE_LIMIT 로 꽉 찼으니 더 있을 수 있다"는 방어적 휴리스틱에 쓴다).
+  // isLoadingMore=중복 클릭 방어(버튼 disabled 와 이중 방어).
+  var PAGE_LIMIT = 1000;
+  var SERVER_TOTAL = null;
+  var LOADED_FIELDS = null;
+  var LAST_BATCH_SIZE = null;
+  var isLoadingMore = false;
+
   var qInput = document.getElementById("fnd-q");
   var sortSel = document.getElementById("fnd-sort");
   var filtersEl = document.getElementById("fnd-filters");
@@ -164,6 +178,10 @@
   var dashMonthEl = document.getElementById("fnd-dash-month");
   var dashFirmEl = document.getElementById("fnd-dash-firm");
   var hasDash = !!(dashEl && dashStatsEl && dashCatEl && dashMonthEl && dashFirmEl);
+
+  // [페이지네이션] "더 보기" 버튼 — 구버전 셸(엘리먼트 없음)에서도 조용히 no-op
+  // (hasDash 관례와 동형 방어적 조회, 아래 참조부 전부 loadMoreBtn 존재를 먼저 확인한다).
+  var loadMoreBtn = document.getElementById("fnd-load-more");
 
   function monthOf(row) {
     var d = row.published_date || "";
@@ -227,14 +245,20 @@
 
   // [M15] 소스/증거등급/검토상태/카테고리/발행월 <select> 5개의 DOM 골격(옵션)을 데이터
   // 로드 직후 1회만 만든다. change 배선은 wire()에서(전 필드 동일 경로 — SELECT_FACETS 단일).
+  // [페이지네이션] "더 보기"로 ROWS 가 늘어난 뒤에도 새로 드러난 값을 옵션으로 추가할 수
+  // 있도록 재호출 가능(idempotent)하게 만든다 — 이미 존재하는 옵션 값은 건너뛰어 중복
+  // <option> 이 생기지 않는다.
   function buildFacetSkeleton() {
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
       if (!sel) return;
+      var existing = {};
+      Array.prototype.forEach.call(sel.options, function (opt) { existing[opt.value] = true; });
       var values = collectFacetValues(key2);
       if (key2 === "category_code") values = categoryCodesInTaxonomyOrder(values);
       values.forEach(function (v) {
+        if (existing[v]) return; // 재호출 시 이미 만든 옵션은 다시 만들지 않는다
         var opt = document.createElement("option");
         opt.value = v;
         opt.dataset.label = selectOptionLabel(key2, v);
@@ -1008,6 +1032,33 @@
     countEl.appendChild(bObs);
     countEl.appendChild(document.createTextNode("건"));
 
+    // [페이지네이션] 필터가 하나도 없을 때만(=matched 가 곧 로드된 전체) 서버 exact
+    // count(SERVER_TOTAL) 와 비교해 "지적 총수 중 표시 수"를 정직하게 덧표기한다. 필터가
+    // 걸리면 필터링된 부분집합을 서버 전체 수와 비교하는 것 자체가 다른 모집단 비교라
+    // 의미가 없으므로 위 기본(문서/지적 이중 표기) 그대로 둔다 — 필터 변경마다 render()
+    // 가 다시 호출되므로 이 판정(및 표기 전환)도 매번 새로 계산된다("총수 재계산").
+    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
+    if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > ROWS.length) {
+      countEl.innerHTML = "";
+      countEl.appendChild(document.createTextNode("지적 "));
+      var bTotal = document.createElement("b");
+      bTotal.textContent = SERVER_TOTAL.toLocaleString("ko-KR");
+      countEl.appendChild(bTotal);
+      countEl.appendChild(document.createTextNode("건 중 "));
+      var bLoaded = document.createElement("b");
+      bLoaded.textContent = ROWS.length.toLocaleString("ko-KR");
+      countEl.appendChild(bLoaded);
+      countEl.appendChild(document.createTextNode("건 표시 · 문서 "));
+      var bDocs2 = document.createElement("b");
+      bDocs2.textContent = String(docs.length);
+      countEl.appendChild(bDocs2);
+      countEl.appendChild(document.createTextNode("건"));
+    }
+    // [더 보기] 버튼 노출/문구는 필터 상태와 무관(전역 로드 진행률) — matched 가 0건이라
+    // 아래에서 곧 return 하더라도 이 갱신은 먼저 수행한다(필터링 결과 0건이어도 서버에
+    // 아직 안 불러온 행이 남아있으면 "더 보기"로 계속 채울 수 있어야 하므로).
+    updateLoadMoreUI();
+
     resultsEl.innerHTML = "";
     if (!matched.length) {
       showState("empty");
@@ -1088,22 +1139,118 @@
         dashToggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
       });
     }
+    // [페이지네이션] "더 보기" — loadMoreRows() 가 중복 클릭 방어(isLoadingMore)까지
+    // 책임진다. 필터/그룹핑 재계산과 달리 이 버튼만 실제 네트워크 fetch 를 새로 낸다.
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", loadMoreRows);
+    }
   }
 
-  function buildEndpoint(fields) {
+  // [페이지네이션] offset(2번째 인자)이 있으면 &offset= 을 덧붙인다 — 생략(단일 인자
+  // 호출, 기존 3단계 폴백 체인이 그대로 쓰는 형태)하면 offset=0 과 동일(기존 동작 불변).
+  function buildEndpoint(fields, offset) {
     var cols = fields.join(",");
+    var off = offset || 0;
     return (
       url.replace(/\/$/, "") +
       "/rest/v1/findings?select=" +
       encodeURIComponent(cols).replace(/%2C/g, ",") +
-      "&order=published_date.desc,finding_id.asc&limit=1000"
+      "&order=published_date.desc,finding_id.asc&limit=" + PAGE_LIMIT +
+      (off > 0 ? "&offset=" + off : "")
     );
   }
 
-  function fetchFindings(fields) {
-    return fetch(buildEndpoint(fields), {
-      headers: { apikey: key, Authorization: "Bearer " + key },
+  // [페이지네이션] Prefer: count=exact — PostgREST 가 응답 Content-Range 헤더(예:
+  // "0-999/1926")에 서버 exact total 을 실어 보낸다. parseServerTotal() 이 그 헤더를
+  // 읽어 SERVER_TOTAL 을 채운다(헤더 미노출/파싱 실패 시 null 폴백 — 아래 §5 방어 참조).
+  function fetchFindings(fields, offset) {
+    return fetch(buildEndpoint(fields, offset), {
+      headers: { apikey: key, Authorization: "Bearer " + key, Prefer: "count=exact" },
     });
+  }
+
+  // Content-Range: "0-999/1926" → 1926. 형식이 다르거나(예: "*/*") 헤더 자체가 없으면
+  // (CORS 로 노출되지 않는 환경 포함) null 을 반환해 호출부가 조용히 폴백하게 한다.
+  function parseServerTotal(resp) {
+    var cr = resp && resp.headers ? resp.headers.get("content-range") : null;
+    if (!cr) return null;
+    var m = /\/(\d+)$/.exec(cr);
+    if (!m) return null;
+    var n = parseInt(m[1], 10);
+    return isNaN(n) ? null : n;
+  }
+
+  // [페이지네이션] "더 보기" 로 불러온 다음 페이지를 ROWS 에 병합한다. finding_id 기준
+  // 중복 제거 — 두 fetch 사이 새 번역이 공개(publish gate 통과)돼 정렬 경계에서 행이
+  // 밀리더라도(§4 참조) 같은 행이 두 번 들어오지 않게 방어한다.
+  function mergeRows(newRows) {
+    var seen = {};
+    ROWS.forEach(function (r) {
+      if (r.finding_id !== undefined && r.finding_id !== null) seen[r.finding_id] = true;
+    });
+    newRows.forEach(function (r) {
+      var id = r.finding_id;
+      if (id !== undefined && id !== null && seen[id]) return;
+      ROWS.push(r);
+      if (id !== undefined && id !== null) seen[id] = true;
+    });
+  }
+
+  // [페이지네이션] 버튼 노출/문구/비활성 상태 — SERVER_TOTAL 이 있으면 정확한 남은 건수를
+  // 병기하고, 없으면(헤더 미노출) LAST_BATCH_SIZE===PAGE_LIMIT 휴리스틱으로 "더 있을 수
+  // 있다"고만 판단해 건수 없이 노출한다(§5 폴백). 둘 다 아니면(전량 로드 확인) 버튼을
+  // 완전히 숨긴다.
+  function updateLoadMoreUI() {
+    if (!loadMoreBtn) return;
+    var hasMore = SERVER_TOTAL !== null
+      ? ROWS.length < SERVER_TOTAL
+      : LAST_BATCH_SIZE === PAGE_LIMIT;
+    if (!hasMore) {
+      loadMoreBtn.hidden = true;
+      return;
+    }
+    loadMoreBtn.hidden = false;
+    loadMoreBtn.disabled = isLoadingMore;
+    if (isLoadingMore) {
+      loadMoreBtn.textContent = "불러오는 중…";
+    } else if (SERVER_TOTAL !== null) {
+      var remaining = SERVER_TOTAL - ROWS.length;
+      loadMoreBtn.textContent = "더 보기 (남은 " + remaining.toLocaleString("ko-KR") + "건)";
+    } else {
+      loadMoreBtn.textContent = "더 보기";
+    }
+  }
+
+  // [페이지네이션] 다음 페이지 fetch — isLoadingMore 로 중복 클릭을 방어한다(버튼
+  // disabled 와 이중 방어, 버튼이 없는 구버전 셸에서도 안전). 최초 로드가 성공시킨
+  // LOADED_FIELDS 를 그대로 재사용한다(3단계 폴백 재협상 없음 — 이미 성공한 필드셋이
+  // 이번에도 통한다는 전제는 같은 세션 내에서 합리적이다).
+  function loadMoreRows() {
+    if (isLoadingMore || !LOADED_FIELDS) return;
+    isLoadingMore = true;
+    updateLoadMoreUI();
+    fetchFindings(LOADED_FIELDS, ROWS.length)
+      .then(function (r) {
+        if (!r.ok) throw new Error("findings fetch more " + r.status);
+        var total = parseServerTotal(r);
+        if (total !== null) SERVER_TOTAL = total;
+        return r.json();
+      })
+      .then(function (data) {
+        if (!Array.isArray(data)) throw new Error("findings shape");
+        LAST_BATCH_SIZE = data.length;
+        mergeRows(data);
+        buildFacetSkeleton(); // 새로 드러난 파셋 값 옵션 추가(중복 방지는 자체 보장)
+        render();
+      })
+      .catch(function () {
+        // 조용히 복구 — 이미 로드된 데이터로 검색은 계속 정상 동작한다. 버튼은 finally
+        // 에서 재활성화되므로 사용자가 다시 시도할 수 있다.
+      })
+      .then(function () {
+        isLoadingMore = false;
+        updateLoadMoreUI();
+      });
   }
 
   // [공개 범위 투명성] findings_stats RPC(007) — 공개 게이트(006)를 우회해 전량 집계를
@@ -1142,18 +1289,33 @@
       });
   }
 
+  // [페이지네이션] 3단계 폴백 체인 중 실제로 성공한 Response·필드셋을 기억해뒀다가
+  // (아래 .then 에서) SERVER_TOTAL/LOADED_FIELDS 를 채운다 — 어느 단계가 성공했든
+  // 동일하게 처리한다(체인 흐름 자체는 §3 fallback 계약과 무변경).
+  var loadedResp = null;
+  var loadedFieldsUsed = null;
   showState("loading");
   fetchCoverageNote();
   fetchFindings(FIELDS)
     .then(function (r) {
-      if (r.ok) return r.json();
+      if (r.ok) {
+        loadedResp = r;
+        loadedFieldsUsed = FIELDS;
+        return r.json();
+      }
       // 013(firm_key) 미적용 라이브 DB 대비 1차 재시도(firm_key 만 제외).
       return fetchFindings(FIELDS_NO_FIRM_KEY).then(function (r2) {
-        if (r2.ok) return r2.json();
+        if (r2.ok) {
+          loadedResp = r2;
+          loadedFieldsUsed = FIELDS_NO_FIRM_KEY;
+          return r2.json();
+        }
         // 013·005(finding_text_ko/translation_method) 둘 다 미적용 라이브 DB 대비
         // 최종 legacy FIELDS 재시도.
         return fetchFindings(LEGACY_FIELDS).then(function (r3) {
           if (!r3.ok) throw new Error("findings fetch " + r3.status);
+          loadedResp = r3;
+          loadedFieldsUsed = LEGACY_FIELDS;
           return r3.json();
         });
       });
@@ -1161,6 +1323,10 @@
     .then(function (data) {
       if (!Array.isArray(data)) throw new Error("findings shape");
       ROWS = data;
+      LOADED_FIELDS = loadedFieldsUsed;
+      LAST_BATCH_SIZE = data.length;
+      var total = parseServerTotal(loadedResp);
+      if (total !== null) SERVER_TOTAL = total;
       buildFacetSkeleton();
       // [FIND-1 M10c] URL→state 복원은 facet 값 목록(collectFacetValues)이 필요해
       // buildFacetSkeleton() 다음, 첫 render() 이전에 수행한다.

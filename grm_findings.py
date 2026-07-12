@@ -711,6 +711,46 @@ def agency_from_source(source: str) -> str:
     return source
 
 
+_FIRM_SUFFIX_RE = re.compile(
+    r"\b(inc|llc|ltd|co|corp|corporation|company|limited|lp|llp|pvt|private|gmbh|sa|srl|dba)\b",
+    re.IGNORECASE,
+)
+_FIRM_PUNCT_RE = re.compile(r"[.,]")
+_FIRM_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def normalize_firm_name(name: str) -> str:
+    """FIND-1 업체명 정규화(firm_key) — 단일 정의.
+
+    실측(컨트롤 타워, 2026-07): findings.firm_name 982 고유 표기 -> 정규화 시 855 실업체
+    (충돌 100그룹, 표본 오병합 0건) — 같은 회사가 구두점/법인접미사 변형(예: "SCA
+    Pharmaceuticals" / "SCA Pharmaceuticals, Inc." / "SCA Pharmaceuticals LLC")으로
+    흩어져 있던 것을 하나로 묶는다.
+
+    규칙(순서 고정 — web/migrations/013_findings_firm_key.sql 의
+    public.grm_normalize_firm_name 이 이 함수의 SQL 복제본이며 반드시 동일 결과를 내야
+    한다. 파리티는 tests/test_findings_firm_key.py 로 고정):
+      1) HTML 엔티티 복원: `&amp;` -> `&`, `&#039;` -> `'`
+      2) lowercase
+      3) `[.,]` 제거
+      4) 단어경계 법인접미사 제거: inc|llc|ltd|co|corp|corporation|company|limited|lp|llp|
+         pvt|private|gmbh|sa|srl|dba (예: "Coherus" 는 안전 -- \\b 가 "co" 를 단어 전체로만
+         매치하므로 "coherus" 내부의 "co" 는 매치되지 않는다)
+      5) 연속 공백을 1개로 축약 후 trim
+
+    빈 입력(None/공백)은 빈 문자열을 반환한다.
+    """
+    text = _text(name)
+    if not text:
+        return ""
+    text = text.replace("&amp;", "&").replace("&#039;", "'")
+    text = text.lower()
+    text = _FIRM_PUNCT_RE.sub("", text)
+    text = _FIRM_SUFFIX_RE.sub("", text)
+    text = _FIRM_WHITESPACE_RE.sub(" ", text).strip()
+    return text
+
+
 def validate_raw_signal(record: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for key in RAW_SIGNAL_REQUIRED_FIELDS:

@@ -257,7 +257,7 @@ grm-api-intake/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql)
+│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql, 013_findings_firm_key.sql)
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/outbox/            # [FIND-1 M9] 주간 번역 배치 큐(CI가 읽어 Supabase 반영)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
@@ -322,7 +322,7 @@ grm-api-intake/
 | ID | 내용 | 상태 |
 |---|---|---|
 | FIND-483-SIGNER | FDA 483 실사관(서명자) 추출기 미구현 — `inspector_names` 전량 빈값. F3 실사관 프로파일의 선결 조건 | 🔲 이월 |
-| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) | 🔲 이월 |
+| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) — 백엔드(`firm_key` generated 컬럼 + `grm_normalize_firm_name`/`findings_firm_profile` RPC, `013_findings_firm_key.sql`, 실측 982→855 업체 수렴) PR 제출·라이브 DB 미적용. 업체 프로파일 웹 페이지는 후속 PR | 🟡 백엔드 구현 완료(검수 대기) |
 | MIGRATION-008 | `008_findings_category_matrix.sql` 라이브 DB 적용 대기(사람이 Supabase SQL Editor에서 실행) — 미적용 상태에서도 웹은 폴백으로 무장애 | 🟡 적용 대기 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
 | ROUTINE-AUTO | 클라우드 Routine 실행 자체의 완전 자동화(현재 델타 브릿지까지 자동, 실행은 클라우드 Routines 의존) | 🟡 부분 |

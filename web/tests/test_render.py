@@ -1502,11 +1502,22 @@ class WebFindingsRenderTest(unittest.TestCase):
         이중 표기여야 한다 — X=groupByDocument() 결과 문서 수, Y=observation(matched) 수."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         render_fn = js_src[js_src.index("function render() {"):]
-        self.assertIn("bDocs.textContent = String(docs.length);", render_fn[:1000])
-        self.assertIn("bObs.textContent = String(matched.length);", render_fn[:1000])
-        self.assertIn('countEl.appendChild(document.createTextNode("문서 "));', render_fn[:1000])
-        self.assertIn('countEl.appendChild(document.createTextNode("건 · 지적 "));', render_fn[:1000])
+        self.assertIn('bDocs.textContent = docs.length.toLocaleString("ko-KR");', render_fn[:1500])
+        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR");', render_fn[:1500])
+        self.assertIn('countEl.appendChild(document.createTextNode("문서 "));', render_fn[:1500])
+        self.assertIn('countEl.appendChild(document.createTextNode("건 · 지적 "));', render_fn[:1500])
         self.assertNotIn('countEl.appendChild(document.createTextNode("총 "));', js_src)
+
+    def test_result_count_line_all_numbers_use_locale_string(self):
+        """[콤마 통일] 카운트 줄(전량 로드 분기 + 부분 로드 분기) 어디에도 순수 숫자를
+        콤마 없이 넣는 String(docs.length)/String(matched.length) 표기가 남아있으면
+        안 된다 — 전부 toLocaleString('ko-KR') 로 통일(전량 로드시 "지적 1926건"처럼
+        콤마가 빠지던 회귀 방지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertNotIn("String(docs.length)", render_fn)
+        self.assertNotIn("String(matched.length)", render_fn)
+        self.assertIn('bDocs2.textContent = docs.length.toLocaleString("ko-KR");', render_fn)
 
     def test_document_card_head_markers_and_css_present(self):
         """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
@@ -1997,6 +2008,77 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("이 대시보드의 수치는 전체 ", fn)
         self.assertIn('건 기준 집계입니다."', fn)
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
+
+    # ── [업체 프로파일 진입] 017_findings_stats_firm_key.sql top_firms.firm_key 배선 ──
+    def test_firm_row_click_passes_firm_key_through(self):
+        """업체 랭킹 행 클릭 시 openFirm 에 firm_name 뿐 아니라 f.firm_key 도 함께
+        넘긴다(017 미적용 라이브에서는 f.firm_key 가 undefined 라 자연히 방어된다)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("else openFirm(f.firm_name, f.firm_key);", js_src)
+
+    def test_open_firm_stores_key_and_close_resets_it(self):
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function openFirm(name, firmKey)", js_src)
+        self.assertIn('state.openFirmKey = firmKey || "";', js_src)
+        close_fn = js_src[js_src.index("function closeFirm()"):]
+        close_fn = close_fn[:close_fn.index("\n  }")]
+        self.assertIn('state.openFirmKey = "";', close_fn)
+
+    def test_profile_link_builder_uses_sibling_relative_path(self):
+        """트렌드 페이지(findings/trends/index.html)에서 업체 프로파일 페이지
+        (findings/firm/index.html)로는 형제 디렉터리 상대경로 "../firm/index.html" 로
+        충분하다(둘 다 findings/ 바로 아래 — findings.js buildDocHead 의
+        "firm/index.html" 관례와 동형, root 변수 불필요)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function buildFirmProfileLink(firmKey)", js_src)
+        fn = js_src[js_src.index("function buildFirmProfileLink(firmKey)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn(
+            'a.href = "../firm/index.html?key=" + encodeURIComponent(firmKey);', fn
+        )
+        self.assertIn('a.textContent = "업체 프로파일 전체 보기 →";', fn)
+        self.assertIn('a.className = "tr-fd-profile-link";', fn)
+
+    def test_profile_link_rendered_at_top_of_detail_panel_only_when_key_present(self):
+        """firm_key 가 있을 때만(017 적용 라이브) 패널 최상단(head 보다 먼저)에 링크를
+        붙인다 — 013/017 미적용 라이브(구버전 top_firms, firm_key 없음)에서는 렌더 자체를
+        생략해 기존 패널과 완전히 동일하게 유지한다(방어 폴백)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderFirmDetail(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (state.openFirmKey) {", fn)
+        self.assertIn("firmDetailEl.appendChild(buildFirmProfileLink(state.openFirmKey));", fn)
+        # 링크 삽입이 head(업체명·닫기 버튼) 삽입보다 앞서야 "패널 상단" 요건을 만족한다.
+        key_guard_idx = fn.index("if (state.openFirmKey)")
+        head_idx = fn.index('var head = document.createElement("div");')
+        self.assertLess(key_guard_idx, head_idx)
+
+    def test_maybe_open_firm_from_url_resolves_key_from_last_firms(self):
+        """?firm= 직접 진입(북마크·공유 링크)에도 프로필 링크가 뜨도록, 이미 fetch 된
+        state.lastFirms 에서 이름이 일치하는 행의 firm_key 를 찾아 openFirm 에 함께
+        넘긴다(017 미적용 라이브에서는 항상 "" 로 방어)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function findFirmKeyByName(name)", js_src)
+        fn = js_src[js_src.index("function maybeOpenFirmFromUrl()"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("if (f) openFirm(f, findFirmKeyByName(f));", fn)
+
+    def test_profile_link_css_scoped_to_page_not_grm_css(self):
+        """grm.css 는 무변경 — 신규 링크 스타일은 trends.html 자체 스코프 <style> 에만
+        추가된다(findings.html 의 .fnd-trends-link 관례와 동형)."""
+        html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        self.assertIn(".tr-fd-profile-link{", html_src)
+        css_path = WEB_DIR / "assets" / "grm.css"
+        if css_path.is_file():
+            self.assertNotIn(".tr-fd-profile-link", css_path.read_text(encoding="utf-8"))
+
+    def test_url_sync_still_uses_firm_name_only(self):
+        """?firm= URL 파라미터 동기화는 기존과 동일하게 firm_name 기준이다(firm_key 는
+        이 파라미터 계약을 바꾸지 않는다 — findings_firm_stats(p_firm) exact-match 계약
+        불변)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function syncFirmUrl(name)", js_src)
+        self.assertIn('if (name) params.set("firm", name); else params.delete("firm");', js_src)
 
 
 # ── 업체 프로파일 (FIND-FIRM-ALIAS 웹 절반 — 셸 렌더·env-gate·sitemap·nav 배선·

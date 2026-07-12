@@ -475,7 +475,10 @@ if(_nt&&_nm){
     cards.forEach(function(card){
       var k=card.getAttribute('data-firm-key').trim();
       var stat=byKey[k];
-      if(!stat||!(stat.findings>0)) return;
+      /* 임계값 2 이상 — findings=1 인 경우 그 1건은 대개 이 카드 자신이 만든
+         행이라("규제 이력 1건" 링크가 자기 자신을 가리키는 순환 안내가 됨) 노이즈다.
+         실제로 "과거 이력"이라 부를 만한 건 최소 2건부터다. */
+      if(!stat||!(stat.findings>=2)) return;
       var actions=card.querySelector('.grm-card-actions'); if(!actions) return;
       var a=document.createElement('a');
       a.className='grm-ca'; a.setAttribute('data-firm-history','');

@@ -20,6 +20,13 @@
  * 20개 code/label_ko/label_en 과 완전히 일치해야 한다(web/tests/test_render.py 가
  * WebTrendsRenderTest.test_category_labels_sync_with_taxonomy 로 대조). findings.js 를
  * import 할 수 없는 독립 정적 자산이라 값을 그대로 복제해 두되, 드리프트는 테스트가 잡는다.
+ *
+ * [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서 top_firms 행에
+ * firm_key 가 실려오면, 업체 상세 패널 상단에 findings/firm/index.html?key= 로 가는
+ * "업체 프로파일 전체 보기" 링크를 추가한다(findings_firm_stats(p_firm=firm_name) 기반
+ * 기존 상세 패널 자체는 그대로 유지 — firm_key 는 오직 이 링크에만 쓴다). 017 미적용
+ * 라이브(top_firms 에 firm_key 없음)에서는 링크 렌더를 조용히 생략한다(방어 폴백 —
+ * 구버전 top_firms 형태와 신규 형태 둘 다 깨짐 없이 렌더되어야 한다).
  */
 (function () {
   "use strict";
@@ -85,7 +92,10 @@
 
   // 업체 상세 패널이 열려 있는지(?firm=)·직전 렌더의 top_firms(업체 랭킹 재렌더용)를
   // 여기 담는다 — findings.js 의 단일 state 객체 관례와 동형(별도 저장소 난립 금지).
-  var state = { openFirm: "", lastFirms: [] };
+  // openFirmKey — [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서만
+  // top_firms 행에 firm_key 가 실려온다. 013 미적용/017 미적용 라이브(구버전 top_firms,
+  // firm_name 만 있는 형태)에서는 빈 문자열로 남아 프로필 링크를 방어적으로 생략한다.
+  var state = { openFirm: "", openFirmKey: "", lastFirms: [] };
 
   // ── 공용 헬퍼 ────────────────────────────────────────────────────────────
   function el(tag, className, text) {
@@ -421,7 +431,7 @@
     if (state.openFirm === f.firm_name) row.classList.add("on");
     makeClickableRow(row, f.firm_name + " 상세 보기: " + f.cnt + "건", function () {
       if (state.openFirm === f.firm_name) closeFirm();
-      else openFirm(f.firm_name);
+      else openFirm(f.firm_name, f.firm_key);
     });
     row.appendChild(el("span", "tr-firm-rank", String(idx + 1)));
     row.appendChild(el("span", "tr-firm-name", f.firm_name));
@@ -523,8 +533,26 @@
     return wrap;
   }
 
+  // [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서 top_firms
+  // 행에 firm_key 가 실려올 때만 렌더한다(state.openFirmKey, openFirm 호출 시점에
+  // 세팅) — 017 미적용 라이브(top_firms 에 firm_key 없음)에서는 빈 문자열이라 링크
+  // 자체를 생략한다(방어, 레이아웃 깨짐 없음). findings/firm/index.html 은 findings/
+  // trends/index.html 과 같은 findings/ 하위 형제 디렉터리라 rel_root 계산 없이
+  // "../firm/index.html" 상대경로 하나로 충분하다(findings.js buildDocHead 의
+  // "firm/index.html" 관례와 동형 — 깊이만 한 단계 다르다).
+  function buildFirmProfileLink(firmKey) {
+    var a = document.createElement("a");
+    a.className = "tr-fd-profile-link";
+    a.href = "../firm/index.html?key=" + encodeURIComponent(firmKey);
+    a.textContent = "업체 프로파일 전체 보기 →";
+    return a;
+  }
+
   function renderFirmDetail(data) {
     firmDetailEl.innerHTML = "";
+    if (state.openFirmKey) {
+      firmDetailEl.appendChild(buildFirmProfileLink(state.openFirmKey));
+    }
     var head = document.createElement("div");
     head.className = "tr-firm-detail-head";
     var idbox = document.createElement("div");
@@ -572,8 +600,9 @@
     history.replaceState(null, "", newUrl);
   }
 
-  function openFirm(name) {
+  function openFirm(name, firmKey) {
     state.openFirm = name;
+    state.openFirmKey = firmKey || "";
     renderFirmRanking(state.lastFirms);
     syncFirmUrl(name);
     firmDetailEl.hidden = false;
@@ -590,17 +619,28 @@
 
   function closeFirm() {
     state.openFirm = "";
+    state.openFirmKey = "";
     renderFirmRanking(state.lastFirms);
     syncFirmUrl("");
     firmDetailEl.hidden = true;
     firmDetailEl.innerHTML = "";
   }
 
+  // ?firm= 으로 직접 진입한 경우(북마크·공유 링크 등)에도 프로필 링크가 뜨도록,
+  // 이미 fetch 된 state.lastFirms(top_firms) 에서 이름이 일치하는 행의 firm_key 를
+  // 찾아 함께 넘긴다 — 017 미적용 라이브에서는 어차피 firm_key 가 없어 "" 로 방어된다.
+  function findFirmKeyByName(name) {
+    for (var i = 0; i < state.lastFirms.length; i++) {
+      if (state.lastFirms[i].firm_name === name) return state.lastFirms[i].firm_key || "";
+    }
+    return "";
+  }
+
   function maybeOpenFirmFromUrl() {
     if (typeof URLSearchParams === "undefined") return;
     var params = new URLSearchParams(location.search);
     var f = params.get("firm");
-    if (f) openFirm(f);
+    if (f) openFirm(f, findFirmKeyByName(f));
   }
 
   // ── 하단: 증거등급 구성(A/B/C 스택 바) · 소스 구성 ───────────────────────────

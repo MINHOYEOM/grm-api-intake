@@ -181,6 +181,10 @@ using (
 -- 008/009 가 이미 부여한 anon/authenticated EXECUTE 가 그대로 유지된다).
 -- ============================================================================
 
+-- ※ 2026-07: findings_stats() 의 top_firms 키는 017_findings_stats_firm_key.sql 에서
+-- 다시 create or replace 로 재정의됨(firm_name group by -> firm_key group by, 프로덕션
+-- 현행 top_firms 정의는 017 참조). 이 파일의 totals/by_agency_category/by_month/
+-- by_source/by_evidence 4개 키는 017 이후에도 무변경으로 계속 유효하다.
 -- --- 007: findings_stats() -----------------------------------------------
 -- totals.documents 신규 -- count(distinct raw_signal_id)(scope_status='ok' 기준, 문서
 -- 단위 커버리지). totals.findings/public_findings 도 scope_status='ok' 반영해 재계산.

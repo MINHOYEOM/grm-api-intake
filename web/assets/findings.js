@@ -212,6 +212,37 @@
   var pagerTopEl = document.getElementById("fnd-pager-top");
   var pagerBottomEl = document.getElementById("fnd-pager-bottom");
 
+  // [sticky 미니 내비] .fnd-tools(sticky) 안의 이전/다음 버튼 — 실사용자 신고("다음 누르면
+  // 화면이 밀려나 매번 위로 되돌아가 다시 눌러야 함") 해법의 본체. sticky 영역에 있으므로
+  // 스크롤 위치와 무관하게 항상 같은 화면 자리에 떠 있고, instant 스크롤(goToPage 내부)과
+  // 결합하면 커서를 움직이지 않고 연타로 페이지를 넘길 수 있다. 리스너는 여기서 1회만
+  // 바인딩(렌더마다 재바인딩 금지) — 클릭 시점의 currentPage 를 읽어 이동한다. 구버전
+  // 셸(엘리먼트 없음)에서는 조용히 no-op(pager 관례와 동형).
+  var pnavEl = document.getElementById("fnd-pnav");
+  var pnavPrevBtn = document.getElementById("fnd-pnav-prev");
+  var pnavNextBtn = document.getElementById("fnd-pnav-next");
+  if (pnavPrevBtn) {
+    pnavPrevBtn.addEventListener("click", function () { goToPageFromPager(currentPage - 1); });
+  }
+  if (pnavNextBtn) {
+    pnavNextBtn.addEventListener("click", function () { goToPageFromPager(currentPage + 1); });
+  }
+
+  // renderPager() 가 호출하는 미니 내비 상태 갱신 — 페이지 1개뿐이면 통째로 숨기고,
+  // 처음/끝에서 해당 방향 버튼을 disabled 처리한다(moreMayExist 면 다음은 항상 열어둠).
+  function updatePnav(current, total, moreMayExist) {
+    if (!pnavEl || !pnavPrevBtn || !pnavNextBtn) return;
+    if (total <= 1 && !moreMayExist) {
+      pnavEl.hidden = true;
+      return;
+    }
+    pnavEl.hidden = false;
+    pnavPrevBtn.disabled = current === 1;
+    pnavNextBtn.disabled = current >= total && !moreMayExist;
+    pnavPrevBtn.setAttribute("aria-label", "이전 페이지 (현재 " + current + " / " + total + ")");
+    pnavNextBtn.setAttribute("aria-label", "다음 페이지 (현재 " + current + " / " + total + ")");
+  }
+
   function monthOf(row) {
     var d = row.published_date || "";
     return d.length >= 7 ? d.slice(0, 7) : "";
@@ -1447,11 +1478,19 @@
       if (myToken !== navToken) return; // 더 최근 이동에 의해 취소됨
       currentPage = target;
       render(); // render() 가 pager 를 통째로 재생성하므로 로딩 상태는 자연히 정리된다.
-      // [로딩 UX b] fetch 완료 후 목표 페이지 렌더가 끝나면 결과 목록 상단으로 스크롤한다
+      // [로딩 UX b′] fetch 완료 후 목표 페이지 렌더가 끝나면 결과 목록 상단으로 스크롤한다
       // — 페이지네이션 바 클릭(goToPageFromPager())에서만(doScroll), 필터/검색/정렬 변경발
-      // goToPage(1) 리셋은 스크롤하지 않는다.
-      if (doScroll && resultsEl && typeof resultsEl.scrollIntoView === "function") {
-        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      // goToPage(1) 리셋은 스크롤하지 않는다. ★실사용자 신고 반영 2건: ①.fnd-tools 가
+      // sticky(top:66px)라 단순 scrollIntoView(start)는 결과 상단이 sticky 툴바 밑에
+      // 가려지고 상단 페이저는 화면 위로 밀려나 "매번 위로 되돌아가 다음을 눌러야" 했다
+      // → 결과 상단을 sticky 툴바 바닥 바로 아래에 정렬(오프셋 보정). ②smooth 애니메이션
+      // 은 연타 시 버튼 위치가 흘러다녀 instant(auto)로 교체 — sticky 미니 내비(#fnd-pnav)
+      // 와 결합하면 커서를 움직이지 않고 같은 자리에서 연속으로 페이지를 넘길 수 있다.
+      if (doScroll && resultsEl) {
+        var toolsBar = document.getElementById("fnd-tools");
+        var stickyBottom = toolsBar ? toolsBar.getBoundingClientRect().bottom : 0;
+        var scrollTarget = window.scrollY + resultsEl.getBoundingClientRect().top - stickyBottom - 10;
+        window.scrollTo({ top: Math.max(0, scrollTarget), behavior: "auto" });
       }
     });
   }
@@ -1475,6 +1514,10 @@
   // "..." 로 축약된 윈도우 밖일 때 — nav 끝에 별도 상태 텍스트를 붙인다), 무반응처럼
   // 보이던 문제를 없앤다.
   function setPagerLoading(loading) {
+    // [sticky 미니 내비] 로딩 중 연타 방어 — pnav 도 페이저와 함께 잠근다(해제는
+    // 로딩 종료 후 render()→renderPager()→updatePnav() 가 상태 기준으로 되살린다).
+    if (loading && pnavPrevBtn) pnavPrevBtn.disabled = true;
+    if (loading && pnavNextBtn) pnavNextBtn.disabled = true;
     [pagerTopEl, pagerBottomEl].forEach(function (nav) {
       if (!nav) return;
       nav.setAttribute("aria-busy", loading ? "true" : "false");
@@ -1529,6 +1572,7 @@
   // 가 필요한 만큼 서버 청크를 이어서 fetch 한다. 상단·하단 두 nav 모두 완전히 동일한
   // 내용을 렌더한다(둘 다 goToPage() 를 공유 — 중복 클릭 방어·로딩 표시가 자동 동기화).
   function renderPager(current, total, moreMayExist) {
+    updatePnav(current, total, moreMayExist); // [sticky 미니 내비] 항상 페이저와 동기
     [pagerTopEl, pagerBottomEl].forEach(function (nav) {
       if (!nav) return;
       nav.textContent = "";

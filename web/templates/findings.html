@@ -27,6 +27,14 @@
         <i class="ti ti-search" aria-hidden="true"></i>
         <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
         <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
+        {#- [sticky 미니 내비] 이전/다음 — sticky 툴바(.fnd-tools) 안에 있어 스크롤 위치와
+            무관하게 항상 같은 화면 자리에 떠 있다(실사용자 신고 "다음 누르면 밀려나 매번
+            위로 되돌아가야 함" 해법의 본체). 셸은 hidden — findings.js 의 updatePnav() 가
+            페이지 상태에 따라 노출/비활성을 관리한다(구버전 JS 에서도 무해). -#}
+        <div class="fnd-pnav" id="fnd-pnav" hidden>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-prev" aria-label="이전 페이지">‹</button>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-next" aria-label="다음 페이지">›</button>
+        </div>
       </div>
       <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
         <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
@@ -161,6 +169,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-search input:focus{outline:none;border-color:var(--coral)}
 .fnd-count{flex:none;font-size:13px;color:var(--muted);white-space:nowrap}
 .fnd-count b{font-size:15px;color:var(--ink)}
+/* [sticky 미니 내비] 이전/다음 — sticky 툴바 안 고정 자리(연타 가능). 코럴 알약 톤. */
+.fnd-pnav{flex:none;display:flex;gap:6px}
+.fnd-pnav-btn{min-width:34px;height:34px;font:inherit;font-size:16px;line-height:1;color:var(--coral-2);background:transparent;border:1.5px solid var(--line-2);border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.fnd-pnav-btn:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
+.fnd-pnav-btn:disabled{opacity:.35;cursor:default}
+.fnd-pnav[hidden]{display:none}
 /* 모바일 필터 접기 토글 — 데스크톱(>700px)에선 숨김(필터는 항상 펼침). */
 .fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}

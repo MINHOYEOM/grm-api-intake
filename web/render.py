@@ -34,6 +34,7 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -41,11 +42,25 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # ── 경로(이 파일 기준 — cwd 무관) ──────────────────────────────────────────────
 WEB_DIR = Path(__file__).resolve().parent
+REPO_ROOT = WEB_DIR.parent                 # grm_findings.py 등 저장소 루트 모듈
 TEMPLATES_DIR = WEB_DIR / "templates"
 PARTIALS_PARENT = WEB_DIR                  # "partials/card.html" 해석용
 DATA_DIR = WEB_DIR / "data" / "briefs"
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
+
+# [브리프→업체 프로파일 브릿지] normalize_firm_name() 은 grm_findings.py 의 파이썬
+# 정본(013_findings_firm_key.sql 의 SQL 복제본과 파리티가 유일한 계약)을 그대로
+# import 한다 — web/tests/test_render.py 가 이미 동일 sys.path 트릭(REPO_ROOT 삽입)
+# 으로 grm_findings 를 import 하고 있어(카테고리 라벨 동기화 대조용) 이 실행 컨텍스트
+# (`python web/render.py ...`, repo 루트에서 실행)에서도 구조적으로 문제 없음을 확인—
+# render.py 는 스크립트로 직접 실행되므로 sys.path[0] 이 web/ 디렉터리라 REPO_ROOT 를
+# 명시적으로 추가해야 한다(cwd 의존 없이 __file__ 기준 — 워크플로/로컬 어디서 실행해도
+# 동일). 순수 함수 재사용일 뿐 네트워크·부작용 없음(grm_findings 모듈 최상위는 상수/
+# 함수 정의만 — 010 계열 검증됨).
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 
 # ── v4 디자인 계약에서 가져온 결정론 매핑 ──────────────────────────────────────
 # 사실표에서 mono(ASCII 데이터)로 표기하는 라벨(v4 dataLabels 동결). 한글에 mono 금지.
@@ -54,6 +69,44 @@ SIG_COLOR = {"High": "var(--hi)", "Med": "var(--med)", "Low": "var(--lo)"}
 SECTION_ICON = {"글로벌": "ti-world", "국내": "ti-map-pin", "Recall": "ti-alert-triangle"}
 _SECTION_ICON_DEFAULT = "ti-folder"
 MARKS = "①②③④⑤"
+
+# ── [브리프→업체 프로파일 브릿지] 카드 facts → firm_key 스탬프 ────────────────
+# card_scaffold.py _w2_extra_*() 실측 기준 업체명을 담는 fact 라벨 4종(카드 유형별
+# 배선): WL="업체/제조소", FDA 483="제조소/업체", GMP 정기실태조사="제조소",
+# 그 외(행정처분/회수(질)/GMP 인증서/openFDA 회수/HC 회수)="업체". 그 외 유형
+# (guidance/FR·rss-news·mfds-notice·safety-letter·legislative·regulation·WHO)은
+# 업체 개념 자체가 없는 문서라 매칭 없음 — 정상(링크가 성립하지 않을 뿐).
+_FIRM_FACT_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업체/제조소"})
+# fact 값 접미사 구분자 — 이 지점 이전까지만 업체명으로 취급한다. 카드유형별로 서로
+# 다른 접미사를 붙인다: 행정처분=" (KR)" 국가코드(공백+괄호), FDA 483=" · FEI 12345"
+# 식별자(공백+가운뎃점). 한글 법인 표기(예: "경방신약(주)")는 괄호가 공백 없이 바로
+# 붙어 있어 오탐하지 않는다 — 013 정규화(normalize_firm_name)가 처리하는 법인접미사/
+# 구두점 규칙과는 별개 계층(이 절단은 그 앞단 "카드 표시값 → 순수 업체명" 전처리다).
+_FIRM_VALUE_SEPS = (" (", " · ")
+_FIRM_PLACEHOLDER = "원문 미기재"
+
+
+def _firm_key_for_card(card: dict[str, Any]) -> str:
+    """카드 facts → firm_key(013 grm_normalize_firm_name 파리티, grm_findings.py 정본
+    import). 라벨이 매칭되는 첫 fact 1개만 확인한다 — 그 fact 의 값이 비어있거나
+    placeholder("원문 미기재")면 다른 fact 로 넘어가지 않고 바로 실패(빈 문자열)
+    처리한다. 실패 시 card.html 이 data-firm-key 속성 자체를 생략한다.
+
+    순수 함수(로컬 카드 JSON 값만 참조, 네트워크 0) — 빌드 결정론(골든) 계약 유지."""
+    for f in (card.get("facts") or []):
+        if f.get("label", "") not in _FIRM_FACT_LABELS:
+            continue
+        value = str(f.get("value") or "")
+        cut = len(value)
+        for sep in _FIRM_VALUE_SEPS:
+            idx = value.find(sep)
+            if idx != -1 and idx < cut:
+                cut = idx
+        name = value[:cut].strip()
+        if not name or name == _FIRM_PLACEHOLDER:
+            return ""
+        return _normalize_firm_name(name)
+    return ""
 
 
 # ── 날짜 파생(결정론) ──────────────────────────────────────────────────────────
@@ -187,6 +240,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
                    "value": f.get("value", ""),
                    "mono": f.get("label", "") in MONO_LABELS}
                   for f in (card.get("facts") or [])],
+        # [브리프→업체 프로파일 브릿지] 파생 키(사실 재작성 0 — facts 값에서 결정론
+        # 파생만). 빈 문자열이면 card.html 이 data-firm-key 속성을 생략한다.
+        "firm_key": _firm_key_for_card(card),
         "merged": (card.get("merged_count") or 1) > 1,
         "merged_count": card.get("merged_count", 1),
         "merged_items": card.get("merged_items") or [],

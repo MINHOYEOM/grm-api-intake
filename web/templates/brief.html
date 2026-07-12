@@ -32,6 +32,14 @@
       {%- endfor %}
     </div></aside>
     <div id="cards" data-issue-no="{{ brief.issue_no }}" data-date="{{ brief.publish_date }}">
+      {#- [브리프→업체 프로파일 브릿지] findings.html/firm.html 관례와 동일 — env
+          미설정이면 값이 빈 문자열이라도 이 div 자체는 항상 렌더한다(골든 결정론,
+          env 상태와 무관하게 byte 동일). reactions_enabled 게이트에 묶지 않는 이유:
+          그 게이트는 "반응(하트/스크랩)" 기능 전용 신호라 이 기능(카드→업체 이력
+          링크)과 무관하게 독립적으로 켜지고 꺼져야 한다(반응 끄고 이 링크만 켜는
+          배포도 가능해야 함) — supabase_url/supabase_anon_key 자체는 이 게이트와
+          무관하게 항상 계산되는 전역값이다(render.py render_site 참조). -#}
+      <div id="grm-brief-firm-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
       <div class="brief-bar" id="briefBar">
         <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체</button><button type="button" data-view="summary">요약</button></div>
         <div class="right"><span class="count">카드 <b>{{ brief.coverage.rendered }}</b>장</span></div>
@@ -181,5 +189,63 @@
       var b=e.target.closest('button'); if(b) setView(b.getAttribute('data-view'));
     });
   }
+})();
+/* [브리프→업체 프로파일 브릿지] 카드 data-firm-key(render.py 빌드시 스탬프) → 013
+   findings_firm_counts RPC 1회 호출(카드 수만큼 개별 호출 금지) → 지적 건수>0 인
+   카드의 .grm-card-actions 에 "규제 이력 N건" 링크 추가. 방어(전부 조용히 종료,
+   콘솔 에러 0 · 기존 카드 그대로): cfg 없음/url·key 빈값/data-firm-key 카드 0/
+   014 RPC 미배선(404)/network 실패. textContent·createElement 만 사용(innerHTML
+   데이터 삽입 금지 — findings.js/firm.js 와 동일 계약, 업체명은 자유 텍스트라
+   이스케이프 누락 시 XSS 위험). */
+(function(){
+  var cfg=document.getElementById('grm-brief-firm-cfg'); if(!cfg) return;
+  var url=(cfg.getAttribute('data-url')||'').trim();
+  var key=(cfg.getAttribute('data-key')||'').trim();
+  var root=(cfg.getAttribute('data-root')||'').trim();
+  if(!url||!key) return;
+
+  var cards=[].filter.call(document.querySelectorAll('article.card[data-firm-key]'), function(c){
+    return (c.getAttribute('data-firm-key')||'').trim()!=='';
+  });
+  if(!cards.length) return;
+
+  var keys=[], seen={};
+  cards.forEach(function(c){
+    var k=c.getAttribute('data-firm-key').trim();
+    if(!seen[k]){ seen[k]=true; keys.push(k); }
+  });
+
+  var endpoint=url.replace(/\/$/,'')+'/rest/v1/rpc/findings_firm_counts';
+  fetch(endpoint, {
+    method:'POST',
+    headers:{ apikey:key, Authorization:'Bearer '+key, 'Content-Type':'application/json' },
+    body:JSON.stringify({ p_firm_keys:keys })
+  }).then(function(r){
+    if(!r.ok) throw new Error('findings_firm_counts '+r.status);
+    return r.json();
+  }).then(function(rows){
+    if(!Array.isArray(rows)||!rows.length) return;
+    var byKey={};
+    rows.forEach(function(row){ if(row&&row.firm_key) byKey[row.firm_key]=row; });
+    cards.forEach(function(card){
+      var k=card.getAttribute('data-firm-key').trim();
+      var stat=byKey[k];
+      if(!stat||!(stat.findings>0)) return;
+      var actions=card.querySelector('.grm-card-actions'); if(!actions) return;
+      var a=document.createElement('a');
+      a.className='grm-ca'; a.setAttribute('data-firm-history','');
+      a.href=root+'findings/firm/index.html?key='+encodeURIComponent(k);
+      var icon=document.createElement('i'); icon.className='ti ti-history';
+      a.appendChild(icon);
+      var t=document.createElement('span'); t.className='grm-ca-t';
+      t.textContent='규제 이력 '+stat.findings+'건';
+      a.appendChild(t);
+      var arrow=document.createElement('i'); arrow.className='ti ti-arrow-right';
+      a.appendChild(arrow);
+      actions.appendChild(a);
+    });
+  }).catch(function(){
+    /* RPC 404(014 미배선)·network 실패 — 링크 없이 기존과 완전 동일(방어). */
+  });
 })();
 </script>{% endblock %}

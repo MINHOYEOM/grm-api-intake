@@ -59,6 +59,7 @@ __all__ = [
     "WebFda483DeterministicDetailTest",
     "WebFda483DeepAnalysisTest",
     "WebMonoLabelsContractTest",
+    "WebBriefFirmLinkTest",
 ]
 
 
@@ -2724,6 +2725,188 @@ class WebMonoLabelsContractTest(unittest.TestCase):
         # '회수 등급' = `_w2_rows` 미산출 dormant 라벨(현행 실측 고정 · 배치2 보고).
         # 신규 고아 추가·산출 어휘 변경 시 red.
         self.assertEqual(render.MONO_LABELS - produced, {"회수 등급"})
+
+
+class WebBriefFirmLinkTest(unittest.TestCase):
+    """[브리프→업체 프로파일 브릿지] render._firm_key_for_card()·카드 data-firm-key
+    스탬프·brief.html cfg div·인라인 JS(findings_firm_counts RPC 1회 호출) 계약.
+
+    render._FIRM_FACT_LABELS(업체/제조소/제조소·업체/업체·제조소)는 card_scaffold.py
+    _w2_extra_*() 가 실제로 산출하는 라벨 어휘의 부분집합이어야 한다 — 아래
+    test_firm_fact_labels_subset_of_scaffold_vocabulary 가 tests/golden/*.webcard.json
+    (card_scaffold 골든, 이 웹 서브트리와 별개 관리)의 실측 라벨로 드리프트를 고정한다
+    (WebMonoLabelsContractTest 와 동형 계약 패턴).
+    """
+
+    _SCAFFOLD_GOLDEN = WEB_DIR.parent / "tests" / "golden"
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firmlink_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.detail = (cls.single / "briefs/2026-06-26/index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _render_card_partial(self, card: dict) -> str:
+        env = render._make_env()
+        view = render._card_view(card)
+        return env.get_template("partials/card.html").render(card=view)
+
+    # ── (1) _firm_key_for_card() 순수 함수 단위 테스트 ──────────────────────
+    def test_label_업체_extracted_and_normalized(self):
+        card = {"facts": [{"label": "업체", "value": "SCA Pharmaceuticals, Inc."}]}
+        self.assertEqual(render._firm_key_for_card(card), "sca pharmaceuticals")
+
+    def test_label_제조소_extracted(self):
+        card = {"facts": [{"label": "제조소", "value": "Baxter Oncology GmbH"}]}
+        self.assertEqual(render._firm_key_for_card(card), "baxter oncology")
+
+    def test_label_제조소_업체_extracted(self):
+        card = {"facts": [{"label": "제조소/업체", "value": "BPI Labs, LLC · FEI 3015156709"}]}
+        self.assertEqual(render._firm_key_for_card(card), "bpi labs")
+
+    def test_label_업체_제조소_extracted(self):
+        card = {"facts": [{"label": "업체/제조소", "value": "Huons Co., Ltd."}]}
+        self.assertEqual(render._firm_key_for_card(card), "huons")
+
+    def test_country_code_suffix_stripped_before_normalize(self):
+        # 행정처분 배선(_w2_extra_admin) 접미사 — " (KR)" 국가코드(공백+괄호).
+        card = {"facts": [{"label": "업체", "value": "Acme Pharma, Inc. (KR)"}]}
+        self.assertEqual(render._firm_key_for_card(card), "acme pharma")
+
+    def test_fei_suffix_stripped_before_normalize(self):
+        # FDA 483 배선(_w2_extra_fda_483) 접미사 — " · FEI 12345"(공백+가운뎃점).
+        card = {"facts": [{"label": "제조소/업체", "value": "Zep Inc · FEI 1234567"}]}
+        self.assertEqual(render._firm_key_for_card(card), "zep")
+
+    def test_korean_parenthesis_suffix_not_mistaken_for_separator(self):
+        # 한글 법인 표기(예: "경방신약(주)")는 공백 없이 괄호가 바로 붙어 있어
+        # " (" 구분자에 매칭되지 않는다(오탐 방지 — 실 fixture 실측 케이스).
+        card = {"facts": [{"label": "업체", "value": "경방신약(주)"}]}
+        self.assertEqual(render._firm_key_for_card(card), "경방신약(주)")
+
+    def test_placeholder_value_yields_empty_key(self):
+        card = {"facts": [{"label": "업체", "value": "원문 미기재"}]}
+        self.assertEqual(render._firm_key_for_card(card), "")
+
+    def test_empty_value_yields_empty_key(self):
+        card = {"facts": [{"label": "업체", "value": ""}]}
+        self.assertEqual(render._firm_key_for_card(card), "")
+
+    def test_no_matching_label_yields_empty_key(self):
+        card = {"facts": [{"label": "발행기관", "value": "WHO"}, {"label": "주제", "value": "머시기"}]}
+        self.assertEqual(render._firm_key_for_card(card), "")
+
+    def test_no_facts_yields_empty_key(self):
+        self.assertEqual(render._firm_key_for_card({}), "")
+        self.assertEqual(render._firm_key_for_card({"facts": []}), "")
+
+    def test_first_matching_fact_used_even_if_extraction_fails(self):
+        # "첫 매칭 fact 1개만 사용" — 첫 매칭이 placeholder 면 다른 매칭 fact 로
+        # 넘어가지 않고 바로 실패(빈 문자열) 처리한다.
+        card = {"facts": [
+            {"label": "업체", "value": "원문 미기재"},
+            {"label": "제조소", "value": "Real Firm Inc."},
+        ]}
+        self.assertEqual(render._firm_key_for_card(card), "")
+
+    def test_firm_key_matches_normalize_firm_name_directly(self):
+        # 파리티 확인 — grm_findings.normalize_firm_name() 을 그대로 재사용하는지.
+        import grm_findings
+        card = {"facts": [{"label": "업체", "value": "Johnson &amp; Johnson"}]}
+        self.assertEqual(
+            render._firm_key_for_card(card),
+            grm_findings.normalize_firm_name("Johnson &amp; Johnson"),
+        )
+
+    # ── (2) card.html data-firm-key 스탬프 ──────────────────────────────────
+    def test_data_firm_key_attribute_present_when_extractable(self):
+        card = {
+            "render_order": 0, "id": "c1", "card_type": "Warning Letter", "agency": "FDA",
+            "evidence_level": "A", "signal_label": "High", "signal_tier": 1,
+            "headline_target": "Acme", "facts": [{"label": "업체/제조소", "value": "Acme Pharma, Inc."}],
+        }
+        html = self._render_card_partial(card)
+        self.assertIn('data-firm-key="acme pharma"', html)
+
+    def test_data_firm_key_attribute_omitted_when_not_extractable(self):
+        card = {
+            "render_order": 0, "id": "c2", "card_type": "WHO", "agency": "WHO",
+            "evidence_level": "B", "signal_label": "Low", "signal_tier": 3,
+            "headline_target": "WHO 뉴스", "facts": [{"label": "발행기관", "value": "WHO"}],
+        }
+        html = self._render_card_partial(card)
+        self.assertNotIn("data-firm-key", html)
+
+    def test_firm_fact_labels_subset_of_scaffold_vocabulary(self):
+        labels: set = set()
+        for fn in sorted(self._SCAFFOLD_GOLDEN.glob("*.webcard.json")):
+            wc = json.loads(fn.read_text(encoding="utf-8"))
+            for fact in wc.get("facts") or []:
+                if isinstance(fact, dict) and "label" in fact:
+                    labels.add(fact["label"])
+        self.assertTrue(labels, "웹카드 골든에서 facts 라벨을 수집하지 못함")
+        self.assertTrue(render._FIRM_FACT_LABELS.issubset(labels))
+        # 정확히 이 4개 라벨(추가/누락 시 드리프트 — 신규 소스 배선 시 의도적으로 갱신).
+        self.assertEqual(
+            render._FIRM_FACT_LABELS,
+            {"업체", "제조소", "제조소/업체", "업체/제조소"},
+        )
+
+    def test_real_fixture_stamps_firm_key_on_most_cards(self):
+        # 6/26 실 fixture: 27장 중 firm 라벨이 없는 유형(발행기관 등) 제외 대부분에
+        # data-firm-key 가 스탬프된다(회귀 스모크 — 정확한 개수보다 "0건이 아님·과반"
+        # 을 고정해 카드 구성 변화에 과민하지 않게 한다).
+        self.assertGreaterEqual(self.detail.count("data-firm-key="), 20)
+
+    # ── (3) brief.html cfg div + 인라인 JS 계약 ─────────────────────────────
+    def test_cfg_div_present_unconditionally(self):
+        self.assertIn(
+            '<div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>',
+            self.detail,
+        )
+
+    def test_js_single_rpc_call_not_per_card(self):
+        # fetch() 가 브리프 상세 페이지 전체에서 정확히 1번만 호출된다 — 카드마다
+        # 개별 호출하지 않고 for-each 밖에서 1회만 여는 계약(신규 구독폼 fetch 등
+        # 다른 fetch 가 없는 이 고정 fixture 빌드 기준).
+        self.assertEqual(self.detail.count("fetch("), 1)
+        self.assertEqual(self.detail.count("p_firm_keys"), 1)
+        # RPC POST body 는 카드에서 모은 고유 firm_key 배열 하나(keys 변수).
+        self.assertIn("JSON.stringify({ p_firm_keys:keys })", self.detail)
+
+    def test_js_defensive_early_returns_present(self):
+        js = self.detail
+        self.assertIn("var cfg=document.getElementById('grm-brief-firm-cfg'); if(!cfg) return;", js)
+        self.assertIn("if(!url||!key) return;", js)
+        self.assertIn("if(!cards.length) return;", js)
+
+    def test_js_uses_textcontent_and_createelement_only(self):
+        # innerHTML 데이터 삽입 금지(findings.js/firm.js 와 동일 계약) — 이 IIFE 구간엔
+        # innerHTML 자체가 아예 등장하지 않아야 한다(회귀: 값 삽입 시 XSS 방지). 앵커는
+        # 이 IIFE 도입부(cfg 조회 줄, 유일 문자열)에서 `})();` 로 끝나는 지점까지만
+        # 전방(forward-only) 슬라이스한다 — 직전 스크립트(요약행 조립, innerHTML 사용)
+        # 를 앞쪽 컨텍스트로 잘못 포함하지 않기 위함.
+        start = self.detail.index("var cfg=document.getElementById('grm-brief-firm-cfg'); if(!cfg) return;")
+        end = self.detail.index("})();", start) + len("})();")
+        block = self.detail[start:end]
+        self.assertNotIn(".innerHTML", block)
+        self.assertIn(".textContent=", block)
+        self.assertIn("document.createElement(", block)
+
+    def test_js_link_href_uses_root_and_encoded_key(self):
+        self.assertIn(
+            "a.href=root+'findings/firm/index.html?key='+encodeURIComponent(k);",
+            self.detail,
+        )
+
+    def test_js_reuses_grm_ca_pill_class_no_new_css(self):
+        # grm.css 변경 금지 — 기존 공유버튼과 동일한 .grm-ca 클래스 재사용.
+        self.assertIn("a.className='grm-ca';", self.detail)
 
 
 if __name__ == "__main__":

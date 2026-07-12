@@ -1,0 +1,14 @@
+[
+  {
+    "finding_id": "finding-596e953a481add51237aef33",
+    "finding_text": "The plant is not constructed in such a manner as to prevent condensate from contaminating food -contact surfaces.",
+    "finding_text_ko": "해당 시설(plant)은 응축수(condensate)가 식품 접촉면(food-contact surface)을 오염시키지 않도록 하는 구조로 건설되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-596f4e5bd2c539a1b2e3c399",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성(stability) 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -1,0 +1,48 @@
+name: GRM Coverage Reconciliation (weekly, non-blocking)
+
+# [신뢰성 게이트 2026-07-12] 주간 커버리지 reconciliation — 소스별 주간 수집량이 과거
+# 대비 비정상 낙차(무음 실패·피드 파손·IP 차단)인지 관측한다. 수집(grm-intake)·발행
+# (grm-web-publish)과 완전히 분리된 별도 파일·별도 트리거·읽기 전용(Supabase raw_signals
+# 조회만). 이상치가 있어도 파이프라인을 차단하지 않는다 — GitHub Actions ::warning:: 주석과
+# STEP_SUMMARY 로만 표면화(과잉경보로 게이트가 무시되지 않도록 비차단·정밀도 우선).
+#
+# 기존 grm_health(수집된 항목 내부 추출품질)와 상보적: 이쪽은 "원천 대비 못 받은 누락"을
+# 본다. 감사에서 MHRA 회수 전건 누락이 이렇게 조용히 방치됐던 게 이 잡의 존재 이유.
+
+on:
+  schedule:
+    # 21:00 UTC 일 = 06:00 KST 월 (Routine 07:30 KST 발행 직전 — 이번 주 수집 마감 후 점검).
+    - cron: '0 21 * * 0'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-reconciliation-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: 주간 reconciliation 실행(비차단)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          python reconciliation_audit.py | tee "$GITHUB_STEP_SUMMARY"

@@ -1380,6 +1380,110 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("var hasDocs = ", fn)
         self.assertIn("coverageTextEl.textContent = hasDocs", fn)
 
+    # ── [문서 중심 열람] observation 조각 → 문서 카드 재편 ─────────────────────────────
+    def test_raw_signal_id_added_to_select_fields(self):
+        """문서 그룹핑 키(raw_signal_id, 002_findings.sql FK)가 FIELDS/LEGACY_FIELDS
+        select 목록에 추가돼야 한다 — anon RLS(003)는 행 필터만 있고 컬럼 제한이 없어
+        select 확장 자체는 안전하다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fields_block = js_src[js_src.index("var FIELDS = ["):js_src.index("var LEGACY_FIELDS")]
+        self.assertIn('"raw_signal_id"', fields_block)
+        # LEGACY_FIELDS 는 finding_text_ko/translation_method 두 필드만 제외한 파생 배열이라
+        # (필터 목록에 raw_signal_id 가 없으면) raw_signal_id 는 자동으로 포함된다.
+        self.assertIn(
+            'return f !== "finding_text_ko" && f !== "translation_method";',
+            js_src,
+        )
+
+    def test_group_by_document_merges_same_raw_signal_id(self):
+        """groupByDocument() 는 raw_signal_id 가 같은 행을 하나의 그룹으로 병합하고,
+        raw_signal_id 가 없는 방어적 케이스는 홀로 자기 그룹을 이뤄 결과 누락 없이
+        렌더되게 한다(그룹핑 실패=검색 결과 실종 방지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function groupByDocument(rows)", js_src)
+        fn = js_src[js_src.index("function groupByDocument(rows)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("row.raw_signal_id ||", fn)
+        self.assertIn("byKey[key].push(row)", fn)
+        self.assertIn("order.push(key)", fn)
+        self.assertIn("return order.map(function (key) { return byKey[key]; });", fn)
+
+    def test_group_by_document_preserves_sort_order_no_extra_fetch(self):
+        """문서 순서는 matched(정렬 완료) 배열에서 그 문서의 첫 지적사항이 나타나는
+        위치를 그대로 따른다(재정렬 없음) — 카테고리/기관 필터로 일부 obs만 fetch돼도
+        추가 fetch 없이 그 obs들이 속한 문서 카드 아래 그대로 그룹핑된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var matched = sortRows(ROWS.filter(matches));", js_src)
+        self.assertIn("var docs = groupByDocument(matched);", js_src)
+        # 필터 select 의 change 핸들러(SELECT_FACETS 배선)는 render() 만 재호출할 뿐,
+        # fetchFindings 를 호출하지 않는다 — 필터/그룹핑은 이미 로드된 ROWS 위에서만
+        # 클라이언트 재계산되고, 새 네트워크 요청은 발생하지 않는다.
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint")]
+        self.assertNotIn("fetchFindings", wire_fn)
+        self.assertIn("render();", wire_fn)
+
+    def test_document_card_reuses_existing_observation_card_render(self):
+        """문서 카드는 새 observation 렌더를 만들지 않고 기존 buildCard() 를 그대로
+        재사용한다(카테고리 칩·국문 우선·원문 details 접기·LEGACY_FIELDS 폴백 무변경)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function buildDocCard(rows, query)", js_src)
+        fn = js_src[js_src.index("function buildDocCard(rows, query)"):]
+        fn = fn[:fn.index("return { card: doc, built: built };")]
+        self.assertEqual(fn.count("buildCard(row, query)"), 2)  # 보이는 5개 + 접힌 나머지 양쪽 경로
+
+    def test_document_collapse_threshold_and_toggle_present(self):
+        """[긴 문서 접기] 6개 이상이면 처음 5개만 펼치고 나머지는 "지적 N건 모두 보기"
+        토글로 감춘다(textContent/createElement 만 사용, innerHTML 금지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var DOC_OBS_VISIBLE_LIMIT = 6;", js_src)
+        self.assertIn("var DOC_OBS_INITIAL_SHOW = 5;", js_src)
+        self.assertIn("var overflows = rows.length >= DOC_OBS_VISIBLE_LIMIT;", js_src)
+        self.assertIn("var visibleCount = overflows ? DOC_OBS_INITIAL_SHOW : rows.length;", js_src)
+        self.assertIn('btn.textContent = "지적 " + totalCount + "건 모두 보기";', js_src)
+        self.assertIn('btn.textContent = expanded ? "접기" : "지적 " + totalCount + "건 모두 보기";', js_src)
+        self.assertIn('hiddenWrap.hidden = true;', js_src)
+        self.assertIn('setAttribute("aria-expanded"', js_src[js_src.index("function buildDocObsToggle"):])
+
+    def test_document_collapse_no_innerhtml_data_injection(self):
+        """문서 카드 신규 렌더 경로도 기존 XSS 계약을 지킨다 — innerHTML 대입은
+        컨테이너 비우기("")뿐이어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_result_count_line_shows_document_and_finding_dual_count(self):
+        """결과 요약 줄(#fnd-count)은 "N건" 단일 표기가 아니라 "문서 X건 · 지적 Y건"
+        이중 표기여야 한다 — X=groupByDocument() 결과 문서 수, Y=observation(matched) 수."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function render() {"):]
+        self.assertIn("bDocs.textContent = String(docs.length);", render_fn[:1000])
+        self.assertIn("bObs.textContent = String(matched.length);", render_fn[:1000])
+        self.assertIn('countEl.appendChild(document.createTextNode("문서 "));', render_fn[:1000])
+        self.assertIn('countEl.appendChild(document.createTextNode("건 · 지적 "));', render_fn[:1000])
+        self.assertNotIn('countEl.appendChild(document.createTextNode("총 "));', js_src)
+
+    def test_document_card_head_markers_and_css_present(self):
+        """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
+        CSS 는 findings.html 자체 <style> 스코프에만 추가되고(grm.css 무변경), 기존
+        .fnd-b/.fnd-card 스타일 계열을 재사용한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function buildDocHead(rows)", js_src)
+        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', js_src)
+        self.assertIn('meta.appendChild(el("span", "fnd-b", head.source));', js_src)
+        self.assertIn('meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));', js_src)
+        self.assertIn(".fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}", self.html)
+        self.assertIn("font-family:var(--serif)", self.html[self.html.index(".fnd-doc-firm{"):self.html.index(".fnd-doc-firm{") + 100])
+
+    def test_findings_html_script_style_unchanged_scope(self):
+        """findings.html 은 여전히 findings.js 하나만 <script> 로 참조하고, 문서 카드
+        CSS 는 이 페이지 자체 <style> 블록에만 존재한다(grm.css 파일 자체는 건드리지
+        않는다 — 별도 grm.css byte-verbatim 테스트가 이를 전역으로 보증)."""
+        findings_html_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertEqual(findings_html_src.count("<script"), 1)
+        self.assertIn(".fnd-doc{", findings_html_src)
+        self.assertIn(".fnd-doc-toggle{", findings_html_src)
+
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):

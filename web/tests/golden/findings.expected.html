@@ -200,6 +200,21 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}
 .fnd-results{display:flex;flex-direction:column;gap:14px}
+/* [문서 중심 열람] 문서 카드 — 기존 .fnd-card 스타일 계열(보더/라운드/배경) 재사용,
+   내부에 소속 observation 카드(.fnd-card, 무변경)를 그대로 담는다. */
+.fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}
+/* 업체명이 주인공 — 기존 .fnd-firm 과 동일한 세리프 규칙, 문서 단위라 한 단계 크게. */
+.fnd-doc-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.fnd-doc-firm{font-family:var(--serif);font-size:21px;color:var(--ink);margin:0;flex:1 1 auto;min-width:0}
+.fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
+.fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
+.fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
+.fnd-doc-obs{display:flex;flex-direction:column;gap:14px}
+.fnd-doc-obs + .fnd-doc-obs-more{margin-top:14px}
+/* [긴 문서 접기] "지적 N건 모두 보기" — 텍스트 버튼(기존 .fnd-more-btn 과 동일 어휘). */
+.fnd-doc-more{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.fnd-doc-toggle{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);background:transparent;border:0;padding:0;cursor:pointer}
+.fnd-doc-toggle:hover{text-decoration:underline}
 /* [M14] 카드 패딩 확대(20px 22px). */
 .fnd-card{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}
 /* M10b P0 — 검토 필요 카드 시각 경계. [M14] 배경 틴트 제거(얼룩 방지) — 왼쪽 coral 보더만
@@ -282,7 +297,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=d05b6404" defer></script><style>
+<script src="../assets/findings.js?v=02d5fc45" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

@@ -182,6 +182,11 @@
   // [페이지네이션] "더 보기" 버튼 — 구버전 셸(엘리먼트 없음)에서도 조용히 no-op
   // (hasDash 관례와 동형 방어적 조회, 아래 참조부 전부 loadMoreBtn 존재를 먼저 확인한다).
   var loadMoreBtn = document.getElementById("fnd-load-more");
+  // [페이지네이션 발견성] 카운트 줄 옆 인라인 "더 보기" — 하단 loadMoreBtn 과 완전히 동일한
+  // 노출 규칙·클릭 로직(loadMoreRows)을 공유한다(updateLoadMoreUI() 참조). 카드 ~200장을
+  // 지나야 보이는 하단 버튼만으로는 발견성이 낮다는 실사용자 신고에 대응 — 부재(구버전 셸)
+  // 에서도 loadMoreBtn 과 동형으로 조용히 no-op.
+  var loadMoreTopBtn = document.getElementById("fnd-load-more-top");
 
   function monthOf(row) {
     var d = row.published_date || "";
@@ -543,6 +548,17 @@
       return;
     }
     var stats = computeStats(matched);
+    // [대시보드 "전체" 정정] 필터가 하나도 없을 때만(=matched 가 로드된 전체) 첫 스탯을
+    // 서버 exact count(SERVER_TOTAL) 로 바꿔치기한다 — "전체 1000" 처럼 로드된 행 수가
+    // 서버 총수(예: 2,272+)로 오인되는 신고에 대응. 카테고리/월별/업체 분해 스탯은 로드된
+    // 행 기준일 수밖에 없다는 점은 카운트 줄이 이미 설명하므로 그대로 둔다. 필터가 걸린
+    // 상태에서는 matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버
+    // 전체수로 바꾸면 오히려 더 오해를 만든다 — render() 의 filtersActive 판정과 동일
+    // 조건을 재사용한다. SERVER_TOTAL 미확보(폴백)면 기존대로 로드 수(stats.total) 유지.
+    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
+    if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {
+      stats.total = SERVER_TOTAL;
+    }
     renderDashStats(stats);
     renderDashCategories(stats);
     renderDashMonths(stats);
@@ -1147,6 +1163,11 @@
     if (loadMoreBtn) {
       loadMoreBtn.addEventListener("click", loadMoreRows);
     }
+    // [페이지네이션 발견성] 상단 인라인 버튼도 완전히 같은 loadMoreRows() 를 호출한다 —
+    // 중복 클릭 방어(isLoadingMore)·로딩 문구 동기화가 하단 버튼과 자동으로 공유된다.
+    if (loadMoreTopBtn) {
+      loadMoreTopBtn.addEventListener("click", loadMoreRows);
+    }
   }
 
   // [페이지네이션] offset(2번째 인자)이 있으면 &offset= 을 덧붙인다 — 생략(단일 인자
@@ -1210,6 +1231,7 @@
       : LAST_BATCH_SIZE === PAGE_LIMIT;
     if (!hasMore) {
       loadMoreBtn.hidden = true;
+      if (loadMoreTopBtn) loadMoreTopBtn.hidden = true;
       return;
     }
     loadMoreBtn.hidden = false;
@@ -1221,6 +1243,22 @@
       loadMoreBtn.textContent = "더 보기 (남은 " + remaining.toLocaleString("ko-KR") + "건)";
     } else {
       loadMoreBtn.textContent = "더 보기";
+    }
+    // [페이지네이션 발견성] 상단 인라인 버튼 — hasMore 판정은 하단 버튼과 완전히 동일하게
+    // 공유한다(전역 로드 진행률 기준, 필터 상태 무관 — §3 참조). 문구만 카운트 줄 옆
+    // 자리에 맞춰 "나머지 N건 불러오기"로 목적어를 명시한다(남은 건수 미확보 폴백은
+    // 하단과 동일하게 건수 없는 "더 보기").
+    if (loadMoreTopBtn) {
+      loadMoreTopBtn.hidden = false;
+      loadMoreTopBtn.disabled = isLoadingMore;
+      if (isLoadingMore) {
+        loadMoreTopBtn.textContent = "불러오는 중…";
+      } else if (SERVER_TOTAL !== null) {
+        var remainingTop = SERVER_TOTAL - ROWS.length;
+        loadMoreTopBtn.textContent = "나머지 " + remainingTop.toLocaleString("ko-KR") + "건 불러오기";
+      } else {
+        loadMoreTopBtn.textContent = "더 보기";
+      }
     }
   }
 

@@ -1657,6 +1657,57 @@ class WebFindingsRenderTest(unittest.TestCase):
         )
         self.assertIn('loadMoreBtn.textContent = "더 보기";', fn)
 
+    # ── [페이지네이션 발견성] 카운트 줄 옆 인라인 "더 보기" ────────────────────────
+    def test_load_more_top_inline_button_shell_present_next_to_count(self):
+        """실사용자 신고(하단 #fnd-load-more 는 카드 ~200장을 지나야 보인다) 대응 —
+        카운트 줄(#fnd-count) 바로 뒤에 라벨 없는 hidden 인라인 버튼을 셸에 심는다
+        (골든 결정론 — 문구/노출은 findings.js 런타임 몫)."""
+        self.assertIn(
+            '<div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>'
+            '<button class="fnd-load-more-inline" id="fnd-load-more-top" type="button" hidden></button>',
+            self.html,
+        )
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('document.getElementById("fnd-load-more-top")', js_src)
+
+    def test_load_more_top_shares_click_handler_and_expose_rule_with_bottom_button(self):
+        """상단 인라인 버튼은 하단 버튼과 완전히 같은 loadMoreRows() 를 호출해야 한다
+        (중복 클릭 방어·로딩 문구 동기화를 별도 구현 없이 그대로 공유) — wire() 배선과
+        updateLoadMoreUI() 의 hasMore 판정 재사용을 소스로 확인한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        wire_fn = js_src[js_src.index("function wire() {"):]
+        wire_fn = wire_fn[:wire_fn.index("\n  function ")]
+        self.assertIn("if (loadMoreTopBtn) {\n      loadMoreTopBtn.addEventListener(\"click\", loadMoreRows);", wire_fn)
+        update_fn = js_src[js_src.index("function updateLoadMoreUI()"):]
+        update_fn = update_fn[:update_fn.index("\n  }\n") + 4]
+        # 전량 로드 시(hasMore=false) 상단 버튼도 함께 숨겨야 한다.
+        self.assertIn("if (loadMoreTopBtn) loadMoreTopBtn.hidden = true;", update_fn)
+        # 로딩 중 문구도 하단과 동일하게 동기화된다(공유 isLoadingMore 플래그).
+        self.assertIn('loadMoreTopBtn.textContent = "불러오는 중…";', update_fn)
+        self.assertIn('loadMoreTopBtn.textContent = "나머지 " + remainingTop.toLocaleString("ko-KR") + "건 불러오기";', update_fn)
+        self.assertIn("loadMoreTopBtn.disabled = isLoadingMore;", update_fn)
+
+    def test_dash_total_stat_uses_server_total_when_unfiltered(self):
+        """[대시보드 "전체" 정정] SERVER_TOTAL(서버 exact count) 이 있고 필터가 하나도
+        없을 때만 첫 스탯("전체")을 로드된 행 수 대신 서버 총수로 바꿔치기한다 —
+        "전체 1000" 이 서버 총수(2,272+)와 다르다는 오해를 없앤다. 필터가 걸리면
+        matched.length 가 "필터링된 전체"라는 다른 모집단이므로 그대로 둔다(render() 의
+        filtersActive 판정과 동일 조건 재사용)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDash(matched)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn(
+            "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
+            fn,
+        )
+        self.assertIn(
+            "if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
+            "      stats.total = SERVER_TOTAL;\n"
+            "    }",
+            fn,
+        )
+        self.assertIn("renderDashStats(stats);", fn)
+
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
         """buildFacetSkeleton() 은 "더 보기" 이후에도 재호출될 수 있어(새로 드러난 값
         옵션 추가) 이미 존재하는 옵션 값은 건너뛰어야 한다 — 그렇지 않으면 재호출 시

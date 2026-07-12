@@ -471,8 +471,21 @@
   function renderDashStats(stats) {
     dashStatsEl.innerHTML = "";
     dashStatsEl.appendChild(buildStatBlock(String(stats.total), "전체", false));
+    // [대시보드 실총수 M3] renderDash() 가 무필터+SERVER_DOC_TOTAL 확보 시에만 채우는
+    // 값 — 필터 상태·RPC 미확보에서는 stats.documents 자체가 없어(undefined) 조용히
+    // 생략된다(레이아웃 깨짐 없음, 기존 옵셔널 스탯들과 동일한 방어적 관례).
+    if (stats.documents !== undefined && stats.documents !== null) {
+      dashStatsEl.appendChild(buildStatBlock(String(stats.documents), "문서", false));
+    }
     stats.agencies.forEach(function (a) {
-      dashStatsEl.appendChild(buildStatBlock(String(a.count), a.agency, false));
+      var block = buildStatBlock(String(a.count), a.agency, false);
+      // stats.agenciesExact 가 아니면(RPC 미확보·필터 적용 중) 로드된 데이터 기준
+      // 추정치라는 것을 툴팁으로 시각적으로 구분한다(EVIDENCE_TITLE/STATUS_TITLE 와
+      // 동일한 title 속성 관례 — XSS 무관).
+      if (!stats.agenciesExact) {
+        block.title = "현재 로드된 데이터 기준(참고용)";
+      }
+      dashStatsEl.appendChild(block);
     });
     if (stats.needsReview > 0) {
       dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), "검토 필요", true));
@@ -582,16 +595,32 @@
       return;
     }
     var stats = computeStats(matched);
-    // [대시보드 "전체" 정정] 필터가 하나도 없을 때만(=matched 가 로드된 전체) 첫 스탯을
-    // 서버 exact count(SERVER_TOTAL) 로 바꿔치기한다 — "전체 1000" 처럼 로드된 행 수가
-    // 서버 총수(예: 2,272+)로 오인되는 신고에 대응. 카테고리/월별/업체 분해 스탯은 로드된
-    // 행 기준일 수밖에 없다는 점은 카운트 줄이 이미 설명하므로 그대로 둔다. 필터가 걸린
-    // 상태에서는 matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버
-    // 전체수로 바꾸면 오히려 더 오해를 만든다 — countActiveFilters()/state.q.trim() 로
-    // 자체 판정한다. SERVER_TOTAL 미확보(폴백)면 기존대로 로드 수(stats.total) 유지.
+    // [대시보드 실총수 M3] 필터가 하나도 없을 때만(=matched 가 로드된 전체라는 모집단)
+    // findings_stats RPC 의 exact 총수로 스탯을 바꿔치기한다 — "전체 1000" 처럼 로드된
+    // 행 수가 서버 총수(예: 2,272+)로 오인되는 신고에 대응. 필터가 걸린 상태에서는
+    // matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버 총수로 바꾸면
+    // 오히려 더 오해를 만든다 — countActiveFilters()/state.q.trim() 로 자체 판정한다.
     var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
-    if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {
-      stats.total = SERVER_TOTAL;
+    if (!filtersActive) {
+      // 전체(지적) — RPC exact 우선, 실패 시 Content-Range exact(SERVER_TOTAL) 폴백,
+      // 그마저 없으면 로드 수(stats.total 원래값) 유지.
+      if (SERVER_FINDINGS_TOTAL !== null) {
+        stats.total = SERVER_FINDINGS_TOTAL;
+      } else if (SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {
+        stats.total = SERVER_TOTAL;
+      }
+      // 문서 — RPC 에만 있는 값이라 폴백 없음(미확보면 스탯 자체를 생략, renderDashStats 참조).
+      if (SERVER_DOC_TOTAL !== null) {
+        stats.documents = SERVER_DOC_TOTAL;
+      }
+      // FDA/MFDS 소스별 분해 — RPC 확보 시 exact 로 교체하고 시각적으로 구분
+      // (agenciesExact=false 이면 renderDashStats() 가 "로드된 데이터 기준" 툴팁을 단다).
+      if (SERVER_AGENCY_TOTALS !== null) {
+        stats.agencies = Object.keys(SERVER_AGENCY_TOTALS)
+          .map(function (a) { return { agency: a, count: SERVER_AGENCY_TOTALS[a] }; })
+          .sort(function (x, y) { return y.count - x.count || x.agency.localeCompare(y.agency); });
+        stats.agenciesExact = true;
+      }
     }
     renderDashStats(stats);
     renderDashCategories(stats);
@@ -1552,6 +1581,18 @@
         if (hasDocs) SERVER_DOC_TOTAL = totals.documents;
         if (typeof totals.findings === "number" && !isNaN(totals.findings)) {
           SERVER_FINDINGS_TOTAL = totals.findings;
+        }
+        // [대시보드 실총수 M3] by_agency_category(agency×category_code 교차 집계)를
+        // agency 기준으로만 합산해 무필터 대시보드 스탯의 FDA/MFDS 소스별 분해를
+        // 정확화한다 — findings_stats 에 agency 단독 집계 키가 없어 이 교차표에서
+        // 파생한다(RPC 실패/010 미적용이면 null 유지 — renderDash() 가 로드 기준으로 폴백).
+        if (Array.isArray(data.by_agency_category)) {
+          var agencySums = {};
+          data.by_agency_category.forEach(function (row) {
+            if (!row || !row.agency) return;
+            agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);
+          });
+          SERVER_AGENCY_TOTALS = agencySums;
         }
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
         // 완파손 등 번역 불능 원문뿐) "매일 확대 중" 진행형 문안을 완료형으로 스스로

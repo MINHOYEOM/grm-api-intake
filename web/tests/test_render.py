@@ -1942,11 +1942,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("schedulePrefetch(docs.length, moreMayExist);", render_fn)
 
     def test_dash_total_stat_uses_server_total_when_unfiltered(self):
-        """[대시보드 "전체" 정정] SERVER_TOTAL(서버 exact count) 이 있고 필터가 하나도
-        없을 때만 첫 스탯("전체")을 로드된 행 수 대신 서버 총수로 바꿔치기한다 —
-        "전체 1000" 이 서버 총수(2,272+)와 다르다는 오해를 없앤다. 필터가 걸리면
-        matched.length 가 "필터링된 전체"라는 다른 모집단이므로 그대로 둔다(render() 의
-        filtersActive 판정과 동일 조건 재사용)."""
+        """[대시보드 실총수 M3] 필터가 하나도 없을 때만 대시보드 스탯을 findings_stats
+        RPC exact 총수로 바꿔치기한다 — "전체"는 SERVER_FINDINGS_TOTAL 우선(없으면
+        Content-Range SERVER_TOTAL 폴백), "문서"는 SERVER_DOC_TOTAL(폴백 없음 — 미확보면
+        스탯 자체 생략), 소스별(agencies)은 SERVER_AGENCY_TOTALS 확보 시 exact 로 교체
+        (agenciesExact=true). 필터가 걸리면 matched.length 가 "필터링된 전체"라는 다른
+        모집단이므로 전부 로드 기준(computeStats 원래값)을 그대로 둔다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDash(matched)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
@@ -1954,13 +1955,51 @@ class WebFindingsRenderTest(unittest.TestCase):
             "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
             fn,
         )
+        self.assertIn("if (!filtersActive) {", fn)
         self.assertIn(
-            "if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
-            "      stats.total = SERVER_TOTAL;\n"
-            "    }",
+            "if (SERVER_FINDINGS_TOTAL !== null) {\n"
+            "        stats.total = SERVER_FINDINGS_TOTAL;\n"
+            "      } else if (SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
+            "        stats.total = SERVER_TOTAL;\n"
+            "      }",
             fn,
         )
+        self.assertIn(
+            "if (SERVER_DOC_TOTAL !== null) {\n"
+            "        stats.documents = SERVER_DOC_TOTAL;\n"
+            "      }",
+            fn,
+        )
+        self.assertIn("stats.agenciesExact = true;", fn)
         self.assertIn("renderDashStats(stats);", fn)
+
+    def test_dash_agency_totals_derived_from_by_agency_category_rpc(self):
+        """[대시보드 실총수 M3] findings_stats 에는 agency 단독 집계 키가 없어(by_source/
+        by_agency_category 만 존재), fetchCoverageNote() 가 by_agency_category(agency×
+        category_code 교차표)를 agency 기준으로만 합산해 SERVER_AGENCY_TOTALS 를 채운다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var SERVER_AGENCY_TOTALS = null;", js_src)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (Array.isArray(data.by_agency_category)) {", cov_fn)
+        self.assertIn(
+            "agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);",
+            cov_fn,
+        )
+        self.assertIn("SERVER_AGENCY_TOTALS = agencySums;", cov_fn)
+
+    def test_dash_stats_documents_and_agency_estimate_tooltip(self):
+        """[대시보드 실총수 M3] renderDashStats() 는 stats.documents 가 있을 때만 "문서"
+        스탯 카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), stats.agenciesExact
+        가 아니면 소스별 스탯 각각에 "로드된 데이터 기준" 툴팁을 달아 추정치임을 시각적으로
+        구분한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDashStats(stats)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
+        self.assertIn('buildStatBlock(String(stats.documents), "문서", false)', fn)
+        self.assertIn("if (!stats.agenciesExact) {", fn)
+        self.assertIn('block.title = "현재 로드된 데이터 기준(참고용)";', fn)
 
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
         """buildFacetSkeleton() 은 페이지 이동으로 청크가 추가 fetch 된 이후에도

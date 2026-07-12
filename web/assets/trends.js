@@ -258,10 +258,17 @@
       ? "이 대시보드의 수치는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
         "건에서 추출한 개별 지적사항 " + total + "건 기준 집계입니다(문서당 평균 여러 건)."
       : "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다.";
-    coverageTextEl.textContent =
-      intro + " 개별 원문 열람은 국문 " +
-      "번역 완료분(" + pub + "건)부터 순차 공개되며, 카테고리를 클릭해 이동한 검색 결과는 " +
-      "집계 수치보다 적을 수 있습니다.";
+    // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 — 잔여는 OCR 완파손 등
+    // 번역 불능 원문뿐) "순차 공개·집계보다 적을 수 있음" 경고를 완료형으로 스스로 전환
+    // 한다(완역 시점엔 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
+    var isComplete =
+      Number(totals.findings || 0) > 0 &&
+      Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
+    coverageTextEl.textContent = isComplete
+      ? intro + " 전체 지적사항을 국문으로 열람할 수 있습니다."
+      : intro + " 개별 원문 열람은 국문 " +
+        "번역 완료분(" + pub + "건)부터 순차 공개되며, 카테고리를 클릭해 이동한 검색 결과는 " +
+        "집계 수치보다 적을 수 있습니다.";
     coverageNoteEl.hidden = false;
   }
 

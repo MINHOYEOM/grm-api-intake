@@ -1380,9 +1380,24 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("건 공개 / 전체 ", fn)
         self.assertIn("건 집계 반영 (매일 확대 중)", fn)
         # 두 경로 모두 삼항연산자 한 문장으로 분기(방어적 no-op 이 아니라 문구 전환) —
-        # hasDocs 가 false 일 때 fallback 표현식이 그대로 textContent 에 대입된다.
+        # 완역 자동 전환(isComplete)이 최상위 분기, hasDocs 가 그 아래 분기다.
         self.assertIn("var hasDocs = ", fn)
-        self.assertIn("coverageTextEl.textContent = hasDocs", fn)
+        self.assertIn("coverageTextEl.textContent = isComplete", fn)
+
+    def test_coverage_note_complete_state_switches_wording(self):
+        """[완역 자동 전환] 미번역 잔량 5건 이하(findings-public_findings<=5)면 진행형
+        문안("매일 확대 중")이 완료형("전체를 국문으로 열람할 수 있습니다")으로 스스로
+        전환된다 — 완역 도달 시점에 별도 배포가 필요 없도록 조건을 미리 심어둔 계약."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        fn = fn[:fn.index("\n  showState(\"loading\");")]
+        self.assertIn("var isComplete =", fn)
+        self.assertIn("<= 5", fn)
+        # 0/0 오탐 방지: findings 가 0(집계 미로드·초기 상태)이면 완료로 판정하지 않는다.
+        self.assertIn("Number(totals.findings || 0) > 0", fn)
+        self.assertIn("건 전체를 국문으로 열람할 수 있습니다.", fn)
+        # 완료형에도 hasDocs 유무(010 미적용) 폴백이 있다.
+        self.assertIn('전체 " + total + "건을 국문으로 열람할 수 있습니다.', fn)
 
     # ── [문서 중심 열람] observation 조각 → 문서 카드 재편 ─────────────────────────────
     def test_raw_signal_id_added_to_select_fields(self):
@@ -2059,6 +2074,19 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("이 대시보드의 수치는 전체 ", fn)
         self.assertIn('건 기준 집계입니다."', fn)
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
+
+    def test_coverage_note_complete_state_switches_wording(self):
+        """[완역 자동 전환] 미번역 잔량 5건 이하면 "순차 공개·집계보다 적을 수 있음"
+        경고가 "전체 지적사항을 국문으로 열람할 수 있습니다" 완료형으로 스스로 전환된다
+        (완역 시점엔 카테고리 클릭 결과와 집계 수치가 일치해 경고가 무의미)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("var isComplete =", fn)
+        self.assertIn("<= 5", fn)
+        self.assertIn("Number(totals.findings || 0) > 0", fn)
+        self.assertIn("전체 지적사항을 국문으로 열람할 수 있습니다.", fn)
+        self.assertIn("coverageTextEl.textContent = isComplete", fn)
 
     # ── [업체 프로파일 진입] 017_findings_stats_firm_key.sql top_firms.firm_key 배선 ──
     def test_firm_row_click_passes_firm_key_through(self):

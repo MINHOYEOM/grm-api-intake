@@ -27,6 +27,7 @@
   var rows = Array.prototype.slice.call(
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
   var myScrapsEl = document.getElementById("grm-my-scraps");   // /me 페이지 컨테이너(있으면 마이페이지)
+  var myFirmsEl = document.getElementById("grm-my-firms");     // /me 관심 업체 컨테이너(015 워치리스트)
   // 로그인/계정 UI(renderAuth)는 카드 유무와 무관하게 모든 페이지 헤더에 필요하므로 조기 종료하지 않는다.
   // (카드 반응·집계는 rows, 마이페이지는 myScrapsEl 로 각각 개별 가드된다.)
   var ids = rows.map(function (r) { return r.getAttribute("data-anchor"); }).filter(Boolean);
@@ -536,6 +537,63 @@
     });
   }
 
+  // ── /me 페이지: 관심 업체 목록(015_firm_watchlist.sql — 등록은 업체 프로파일에서) ──
+  // 스크랩 목록(renderMyScraps)과 동일 관례: 본인 행만(RLS), created_at 최신순 클라이언트
+  // 정렬, 오류(015 미적용 포함)는 오류처럼 보이지 않는 노트로 조용히 폴백. Supabase 엔
+  // 불투명 firm_key + 등록 시점 표시명 스냅샷(firm_display)만 있다 — 업체 사실 미저장.
+  function renderMyFirms() {
+    if (!myFirmsEl) return;
+    if (!session || !session.user) {
+      myFirmsEl.innerHTML = '<p class="grm-my-note">로그인하면 관심 업체를 모아볼 수 있어요.</p>';
+      return;
+    }
+    myFirmsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    sb.from("firm_watchlist").select("firm_key,firm_display,created_at")
+      .then(function (res) {
+        // 015 미적용(테이블 부재 → PostgREST 오류) 포함 — "준비 중" 노트로 조용히 폴백.
+        if (res && res.error) {
+          myFirmsEl.innerHTML = '<p class="grm-my-note">관심 업체 목록 준비 중입니다.</p>';
+          return;
+        }
+        var firms = (res && res.data) ? res.data.slice() : [];
+        if (!firms.length) {
+          myFirmsEl.innerHTML =
+            '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-building-factory-2" aria-hidden="true"></i></span>' +
+            '<p class="grm-my-empty-t">아직 등록한 업체가 없습니다</p>' +
+            '<p class="grm-my-empty-s">업체 프로파일에서 관심 업체로 등록하세요.</p>' +
+            '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'findings/index.html">규제 지적사항 검색하기</a></div>';
+          return;
+        }
+        firms.sort(function (a, c) { return (c.created_at || "").localeCompare(a.created_at || ""); });
+        var ul = document.createElement("ul"); ul.className = "grm-my-list";
+        firms.forEach(function (fw) {
+          var li = document.createElement("li");
+          li.className = "grm-my-item";
+          var a = document.createElement("a"); a.className = "grm-my-a";
+          a.href = cfgRoot + "findings/firm/index.html?key=" + encodeURIComponent(fw.firm_key);
+          a.textContent = fw.firm_display || fw.firm_key;
+          var meta = document.createElement("span"); meta.className = "grm-my-meta";
+          meta.textContent = "등록 " + String(fw.created_at || "").slice(0, 10);
+          li.appendChild(a); li.appendChild(meta);
+          var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = "해제";
+          rm.addEventListener("click", function () {
+            rm.disabled = true;
+            sb.from("firm_watchlist").delete().match({ user_id: session.user.id, firm_key: fw.firm_key })
+              .then(function (d) {
+                if (d && d.error) { rm.disabled = false; return; }
+                if (li.parentNode) li.parentNode.removeChild(li);
+                if (!ul.children.length) renderMyFirms();
+              }).catch(function () { rm.disabled = false; });
+          });
+          li.appendChild(rm); ul.appendChild(li);
+        });
+        myFirmsEl.innerHTML = ""; myFirmsEl.appendChild(ul);
+      })
+      .catch(function () {
+        myFirmsEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>';
+      });
+  }
+
   // ── 배선 ─────────────────────────────────────────────────────────────────
   document.body.classList.add("grm-reactions-on");
   rows.forEach(function (row) {
@@ -545,10 +603,10 @@
   });
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
-    renderAuth(); if (rows.length) loadMine(); renderMyScraps();
-  }).catch(function () { renderAuth(); renderMyScraps(); });
+    renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms();
+  }).catch(function () { renderAuth(); renderMyScraps(); renderMyFirms(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
-    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps();
+    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms();
     if (s && s.user) closeLogin();
   });
   if (rows.length) loadCounts();

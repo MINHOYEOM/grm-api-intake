@@ -8,5 +8,13 @@
   <div id="grm-my-scraps" data-index="/assets/search-index.json">
     <p class="grm-my-note">불러오는 중…</p>
   </div>
+  {#- 관심 업체(015_firm_watchlist.sql) — 스크랩 목록과 동일 관례: 셸은 로딩 노트만,
+      목록은 reactions.js(renderMyFirms)가 런타임 렌더. 015 미적용/비로그인 방어도
+      스크랩 섹션과 동형(오류처럼 보이지 않는 노트로 조용히 폴백). -#}
+  <h2 class="grm-my-h2">관심 업체</h2>
+  <p class="grm-my-sub">등록한 업체의 새 규제 이력을 프로파일에서 확인할 수 있습니다.</p>
+  <div id="grm-my-firms">
+    <p class="grm-my-note">불러오는 중…</p>
+  </div>
 </main>
 {% endblock %}

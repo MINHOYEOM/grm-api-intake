@@ -40,6 +40,12 @@
     <div id="fp-content" hidden>
       <div class="fp-head">
         <h2 class="fp-firm-name" id="fp-firm-name"></h2>
+        {#- 관심 업체 워치리스트(015_firm_watchlist.sql) — 셸은 빈 컨테이너만. firm.js 가
+            프로파일 로드 성공 후 로그인 상태에 따라 등록/해제 토글 버튼(로그인 시) 또는
+            로그인 안내(비로그인 시)를 런타임 주입한다. env 미설정·supabase-js 부재·015
+            미적용(테이블 404)이면 hidden 그대로 조용히 비활성 — 프로파일 본기능 무장애
+            (골든 결정론: 이 셸 출력 byte 는 env 와 무관하게 항상 동일). -#}
+        <div class="fp-watch" id="fp-watch" hidden></div>
       </div>
 
       <section class="fp-stats" id="fp-stats" aria-label="핵심 통계"></section>
@@ -71,8 +77,22 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fp-search-link{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .fp-search-link:hover{color:var(--coral)}
 
-.fp-head{margin:0 0 22px}
+.fp-head{margin:0 0 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .fp-firm-name{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0}
+
+/* 관심 업체 워치리스트 — 기존 버튼 톤(코럴 계열·이모지 금지) 계승. base.html 의
+   .grm-ca(아웃라인→코럴)·.grm-my-cta 관례를 이 페이지 스코프로 축약 복제. */
+.fp-watch{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fp-watch[hidden]{display:none}
+.fp-watch-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);background:transparent;border:1px solid var(--coral);border-radius:var(--rad-s);padding:6px 13px;cursor:pointer;transition:color .15s ease,background .15s ease,border-color .15s ease}
+.fp-watch-btn:hover{color:#fff;background:var(--coral)}
+.fp-watch-btn.is-on{color:var(--coral-2);background:var(--coral-tint);border-color:var(--coral-tint)}
+.fp-watch-btn.is-on:hover{color:#fff;background:var(--coral-2);border-color:var(--coral-2)}
+.fp-watch-btn[disabled]{opacity:.55;cursor:default}
+.fp-watch-note{font-size:12.5px;color:var(--muted);margin:0}
+.fp-watch-login{font-family:var(--sans);font-size:12.5px;color:var(--coral-2);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.fp-watch-login:hover{color:var(--coral)}
+.fp-watch-hint{font-size:12px;color:var(--coral-2);margin:0;flex-basis:100%}
 
 .fp-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 34px;padding-bottom:22px;border-bottom:1px solid var(--line)}
 .fp-stat{display:flex;flex-direction:column;gap:4px}

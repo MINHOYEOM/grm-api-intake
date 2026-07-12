@@ -109,16 +109,27 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-dash-stat-num{font-size:22px;font-weight:700;color:var(--ink);line-height:1.2}
 .fnd-dash-stat-num.warn{color:var(--coral-2)}
 .fnd-dash-stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
-.fnd-dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+/* [그리드 균형] 1fr 트랙은 기본적으로 minmax(auto,1fr) 취급돼, 자식 콘텐츠의 min-content
+   가 크면(예: 카테고리 라벨이 overflow:visible 이라 줄바꿈 대신 트랙을 밀어내는 경우) 그
+   컬럼이 제 몫(1/3)보다 넓어지고 나머지 두 컬럼이 눌린다 — minmax(0,1fr) 로 각 트랙의
+   최소폭을 0 으로 고정해 3컬럼이 항상 동일 폭을 유지하게 한다(월별 추이/업체 상위가
+   카테고리 분포에 밀려 좁아지던 문제의 근본 원인). */
+.fnd-dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .fnd-dash-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 12px}
 .fnd-dash-empty{font-size:12.5px;color:var(--muted);margin:0}
 /* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기. [M14] 회색 트랙 제거,
    바 자체가 flex 셀을 채우고 transform:scaleX() 로 비율을 표현(레이아웃 폭은 불변). */
+.fnd-dash-block{min-width:0}
 .fnd-dash-cat-row{display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:8px;cursor:pointer}
 .fnd-dash-cat-row:hover,.fnd-dash-cat-row:focus-visible{background:var(--strong);outline:none}
 .fnd-dash-cat-row:hover .fnd-dash-cat-label,.fnd-dash-cat-row:focus-visible .fnd-dash-cat-label{color:var(--coral-2)}
 .fnd-dash-cat-row.on{background:var(--coral-tint)}
-.fnd-dash-cat-label{flex:0 0 110px;font-size:12.5px;color:var(--body);line-height:1.3}
+/* [라벨·바 트랙 분리] 라벨은 고정폭+ellipsis 로 자르는 자체 트랙 — 형제(fnd-dash-firm-name)
+   와 달리 overflow:hidden 이 빠져 있어 긴 카테고리명이 flex 자동 최소폭(min-content)만큼
+   110px 를 넘어 막대를 밀어내던 게 겹침의 실제 원인이었다. min-width:0 으로 그 자동
+   최소폭 자체를 없애고 overflow:hidden+ellipsis 로 잘라, 막대·건수 트랙과 절대 겹치지
+   않게 한다. title 로 잘린 전체 라벨을 계속 확인할 수 있다(findings.js buildCatRow 참조). */
+.fnd-dash-cat-label{flex:0 0 110px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--body);line-height:1.3}
 .fnd-dash-cat-bar{flex:1 1 auto;height:6px;border-radius:99px;background:var(--coral);opacity:.85;transform-origin:left}
 .fnd-dash-cat-count{flex:0 0 auto;min-width:20px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 /* 월별 추이 — 세로 미니 막대 + 월 라벨. [M14] 바 하단 baseline 보더. */
@@ -273,13 +284,21 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    같은 톤(캔버스 배경+연한 보더, coral 은 hover·현재 페이지 강조 전용). */
 .fnd-pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:20px 0}
 .fnd-pager[hidden]{display:none}
-.fnd-pager-btn{font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);min-width:34px;height:34px;padding:0 10px;cursor:pointer}
+/* [로딩 UX b] fetch 대기 중에는 nav 전체를 옅게 눌러 "지금 반응 중"임을 알린다(버튼
+   disabled 만으로는 무반응처럼 보인다는 신고 대응 — 현재 페이지 pill 자체는
+   setPagerLoading() 이 텍스트를 "불러오는 중…"으로 바꿔치기해 더 직접적으로 알린다). */
+.fnd-pager[aria-busy="true"]{opacity:.7}
+.fnd-pager-btn{font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);min-width:34px;height:34px;padding:0 10px;cursor:pointer;white-space:nowrap}
 .fnd-pager-btn:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
 .fnd-pager-btn.on{background:var(--coral-tint);border-color:rgba(194,96,63,.35);color:var(--coral-2);cursor:default}
 .fnd-pager-btn:disabled{opacity:.4;cursor:default}
 .fnd-pager-gap{display:inline-flex;align-items:center;justify-content:center;min-width:20px;color:var(--muted);font-size:13px}
+/* [로딩 UX b] 현재 페이지 pill 이 화면에 없을 때(페이지 창 밖) 쓰는 대체 상태 텍스트. */
+.fnd-pager-status{display:inline-flex;align-items:center;height:34px;padding:0 10px;font-size:13px;font-weight:600;color:var(--muted)}
 @media (max-width:480px){
-  .fnd-pager-btn{min-width:30px;height:30px;padding:0 7px;font-size:12.5px}
+  /* 최소 터치영역 32px 유지(모바일 접근성) — 기존 30px 에서 상향. */
+  .fnd-pager-btn{min-width:32px;height:32px;padding:0 8px;font-size:12.5px}
+  .fnd-pager-status{height:32px}
 }
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
@@ -320,7 +339,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="../assets/findings.js?v=656f14ee" defer></script><style>
+<script src="../assets/findings.js?v=c5ca5cb6" defer></script><style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}

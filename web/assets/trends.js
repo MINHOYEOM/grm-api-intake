@@ -110,6 +110,13 @@
     return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  // [firm_name 엔티티 디코드 M5] findings.js 의 동명 헬퍼와 동일 계약(별도 파일이라
+  // 재사용 불가, 계약만 복제) — DB firm_name 에 &amp;/&#039; 가 이미 이스케이프된 채로
+  // 저장된 행을 표시 직전(textContent 대입 전)에만 되돌린다(순수 문자열 치환, XSS 무관).
+  function decodeFirmDisplay(s) {
+    return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
+  }
+
   // 클릭 가능한 div 행(role=button+tabindex+Enter/Space) — findings.js 의 동명 헬퍼와
   // 동일 계약(별도 파일이라 재사용 불가, 계약만 복제).
   function makeClickableRow(node, ariaLabel, onActivate) {
@@ -205,7 +212,7 @@
       lines.push("최근 12개월 지적은 전년 동기 대비 " + Math.abs(yoy.pct) + "% " + dir + "했습니다.");
     } else if ((data.top_firms || []).length) {
       var f = data.top_firms[0];
-      lines.push("지적 건수가 가장 많은 업체는 " + f.firm_name + "(" + fmtNum(f.cnt) + "건)입니다.");
+      lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");
     }
     return lines;
   }
@@ -259,16 +266,18 @@
         "건에서 추출한 개별 지적사항 " + total + "건 기준 집계입니다(문서당 평균 여러 건)."
       : "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다.";
     // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 — 잔여는 OCR 완파손 등
-    // 번역 불능 원문뿐) "순차 공개·집계보다 적을 수 있음" 경고를 완료형으로 스스로 전환
-    // 한다(완역 시점엔 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
+    // 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔 카테고리
+    // 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
     var isComplete =
       Number(totals.findings || 0) > 0 &&
       Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
+    // [진행형 문구 중립화] 계속 진행 중이라는 인상을 주던 옛 서술을 "국문 번역이 완료된
+    // 지적사항만 열람 가능"이라는 현재 상태 서술로 바꾼다 — 집계 수치와 클릭 결과가 다를
+    // 수 있다는 핵심 정보(사용자가 오해하지 않도록 하는 실질 안내)는 그대로 유지한다.
     coverageTextEl.textContent = isComplete
       ? intro + " 전체 지적사항을 국문으로 열람할 수 있습니다."
-      : intro + " 개별 원문 열람은 국문 " +
-        "번역 완료분(" + pub + "건)부터 순차 공개되며, 카테고리를 클릭해 이동한 검색 결과는 " +
-        "집계 수치보다 적을 수 있습니다.";
+      : intro + " 개별 원문 열람은 국문 번역이 완료된 지적사항(" + pub + "건)만 가능하며, " +
+        "카테고리를 클릭해 이동한 검색 결과는 집계 수치보다 적을 수 있습니다.";
     coverageNoteEl.hidden = false;
   }
 
@@ -436,12 +445,16 @@
     var row = document.createElement("div");
     row.className = "tr-firm-row";
     if (state.openFirm === f.firm_name) row.classList.add("on");
-    makeClickableRow(row, f.firm_name + " 상세 보기: " + f.cnt + "건", function () {
+    // [firm_name 엔티티 디코드 M5] 클릭/state 비교는 raw f.firm_name(DB 원본값) 그대로 —
+    // openFirm()/syncFirmUrl() 이 그 값을 findings_firm_stats RPC exact-match 파라미터로
+    // 쓰므로 디코드하면 어긋난다. 디코드는 표시(라벨·aria-label)에만 적용한다.
+    var firmDisplay = decodeFirmDisplay(f.firm_name);
+    makeClickableRow(row, firmDisplay + " 상세 보기: " + f.cnt + "건", function () {
       if (state.openFirm === f.firm_name) closeFirm();
       else openFirm(f.firm_name, f.firm_key);
     });
     row.appendChild(el("span", "tr-firm-rank", String(idx + 1)));
-    row.appendChild(el("span", "tr-firm-name", f.firm_name));
+    row.appendChild(el("span", "tr-firm-name", firmDisplay));
     var track = document.createElement("div");
     track.className = "tr-firm-bar";
     var fill = document.createElement("div");
@@ -563,7 +576,7 @@
     var head = document.createElement("div");
     head.className = "tr-firm-detail-head";
     var idbox = document.createElement("div");
-    idbox.appendChild(el("h3", "tr-firm-detail-name", data.firm_name || ""));
+    idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));
     var period = (data.first_seen || "?") + " ~ " + (data.last_seen || "?");
     idbox.appendChild(el("p", "tr-firm-detail-meta",
       period + " · 총 " + fmtNum((data.totals || {}).findings || 0) + "건"));

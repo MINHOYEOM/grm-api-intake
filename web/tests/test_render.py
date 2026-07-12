@@ -814,6 +814,51 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function renderDash(matched)", js_src)
         self.assertIn("renderDash(matched)", js_src)  # render() 에서 호출
 
+    def test_dash_category_top8_and_rest_row(self):
+        """[그리드 균형 M2a] 카테고리 분포는 상위 8개만 개별 바로 그리고, 나머지는
+        "그 외 N건" 한 줄로 합산한다(옛 top6 에서 상향)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDashCategories(stats)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var top = stats.categories.slice(0, 8);", fn)
+        self.assertIn(
+            "var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
+            fn,
+        )
+        self.assertIn('buildCatRow("그 외", restCount, maxCount, null)', fn)
+
+    def test_dash_category_label_track_separated_from_bar(self):
+        """[라벨·바 트랙 분리 M2a] 카테고리 라벨은 고정폭(110px)+ellipsis 로 잘려 막대·
+        건수 트랙과 절대 겹치지 않는다 — 형제 컴포넌트(fnd-dash-firm-name)와 동일하게
+        overflow:hidden+white-space:nowrap+min-width:0 을 갖춰야 한다(옛 라벨 CSS 에는
+        이 3속성이 빠져 있어 긴 라벨이 자동 최소폭만큼 막대를 밀어내던 게 겹침의 원인).
+        buildCatRow() 는 title 속성으로 잘린 전체 라벨을 계속 노출한다."""
+        # 정확히 이 셀렉터로 시작하는 규칙만 골라낸다(".fnd-dash-cat-label{" 부분 문자열은
+        # ".fnd-dash-cat-row:focus-visible .fnd-dash-cat-label{color:...}" 같은 결합
+        # 셀렉터 규칙 끝에도 나타나 첫 occurrence 가 엉뚱한 규칙을 집어올 수 있다).
+        anchor = "\n.fnd-dash-cat-label{"
+        css = self.html[self.html.index(anchor) + 1:]
+        css = css[:css.index("}") + 1]
+        self.assertIn("min-width:0", css)
+        self.assertIn("overflow:hidden", css)
+        self.assertIn("text-overflow:ellipsis", css)
+        self.assertIn("white-space:nowrap", css)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("labelEl.title = label;", fn)
+
+    def test_dash_grid_uses_minmax_zero_to_keep_columns_balanced(self):
+        """[그리드 균형 M2b] .fnd-dash-grid 의 3컬럼은 minmax(0,1fr) 이어야 한다 — 맨 1fr
+        은 자식의 min-content 가 크면(예: 라벨 오버플로) 그 컬럼이 제 몫보다 넓어지고
+        나머지 컬럼(월별 추이/업체 상위)이 눌리는 CSS Grid 기본 함정이 있다. 자식 그리드
+        아이템(.fnd-dash-block)도 min-width:0 으로 동일 계열 안전장치를 갖춘다."""
+        self.assertIn(
+            ".fnd-dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}",
+            self.html,
+        )
+        self.assertIn(".fnd-dash-block{min-width:0}", self.html)
+
     def test_dash_accessibility_markers_present(self):
         """클릭 가능한 대시보드 행(카테고리/월/업체)은 role=button+tabindex+키보드
         Enter/Space 활성화를 갖춰야 한다(마우스 전용 UI 금지)."""
@@ -1167,7 +1212,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("currentPage = 1", fn_block)
         self.assertIn("goToPage(1)", fn_block)
         # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
-        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 400]
+        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 600]
         self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
@@ -1347,8 +1392,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("totals.public_findings", fn)
         self.assertIn("totals.findings", fn)
         self.assertIn('.toLocaleString("ko-KR")', fn)
-        self.assertIn("건 공개 / 전체 ", fn)
-        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        self.assertIn("건 중 ", fn)
+        self.assertIn("건 국문 열람 가능", fn)
+        # [진행형 문구 중립화 M4] "(매일 확대 중)" 진행형 문구는 완전히 제거됐다.
+        self.assertNotIn("매일 확대 중", fn)
         # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약).
         self.assertIn("coverageTextEl.textContent =", fn)
 
@@ -1363,7 +1410,8 @@ class WebFindingsRenderTest(unittest.TestCase):
     # ── [문서 수 병기] totals.documents(010_findings_scope_purity.sql) 있음/없음 두 경로 ──
     def test_coverage_note_documents_present_path_mentions_document_count(self):
         """010 적용 라이브(totals.documents 존재)에서는 "규제 문서 N건 · 지적사항 M건 중
-        P건 공개" 식으로 문서-지적 1:N 관계를 명시한다."""
+        P건 국문 열람 가능" 식으로 문서-지적 1:N 관계를 명시한다(진행형 "공개"·"매일
+        확대 중" 문구는 쓰지 않는다 — M4 중립화)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
@@ -1372,27 +1420,27 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("규제 문서 ", fn)
         self.assertIn("건 · 지적사항 ", fn)
         self.assertIn("건 중 ", fn)
-        self.assertIn("건 공개", fn)
+        self.assertIn("건 국문 열람 가능", fn)
 
     def test_coverage_note_documents_absent_path_falls_back_silently(self):
-        """010 미적용 라이브(totals.documents=undefined)에서는 기존 문안("국문 번역이
-        완료된 지적사항만 열람할 수 있습니다 — 현재 N건 공개 / 전체 M건 집계 반영")을
-        그대로 유지한다 — 레이아웃/문구 깨짐 없는 방어적 생략."""
+        """010 미적용 라이브(totals.documents=undefined)에서는 문서 수 없는 "지적사항
+        N건 중 M건 국문 열람 가능" 문안을 쓴다 — 레이아웃/구조는 그대로, 문구만 M4 에서
+        진행형("현재 N건 공개 / 전체 M건 집계 반영 (매일 확대 중)")을 중립 서술로 갈음."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
-        self.assertIn("국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 ", fn)
-        self.assertIn("건 공개 / 전체 ", fn)
-        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        self.assertIn('"지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능"', fn)
+        self.assertNotIn("매일 확대 중", fn)
         # 두 경로 모두 삼항연산자 한 문장으로 분기(방어적 no-op 이 아니라 문구 전환) —
         # 완역 자동 전환(isComplete)이 최상위 분기, hasDocs 가 그 아래 분기다.
         self.assertIn("var hasDocs = ", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
-        """[완역 자동 전환] 미번역 잔량 5건 이하(findings-public_findings<=5)면 진행형
-        문안("매일 확대 중")이 완료형("전체를 국문으로 열람할 수 있습니다")으로 스스로
-        전환된다 — 완역 도달 시점에 별도 배포가 필요 없도록 조건을 미리 심어둔 계약."""
+        """[완역 자동 전환] 미번역 잔량 5건 이하(findings-public_findings<=5)면 미완료
+        문안("N건 중 M건 국문 열람 가능")이 완료형("전체를 국문으로 열람할 수 있습니다")
+        으로 스스로 전환된다 — 완역 도달 시점에 별도 배포가 필요 없도록 조건을 미리
+        심어둔 계약."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
@@ -1447,18 +1495,43 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_document_card_head_links_to_firm_profile_when_key_present(self):
         """문서 카드 헤더 업체명은 firm_key(013)가 있으면 /findings/firm/?key= 링크,
-        없으면(013 미적용 라이브) 기존처럼 링크 없는 텍스트 그대로 렌더한다(방어)."""
+        없으면(013 미적용 라이브) 기존처럼 링크 없는 텍스트 그대로 렌더한다(방어). 둘 다
+        firmDisplay(=decodeFirmDisplay(head.firm_name))를 표시에 쓴다(M5 엔티티 디코드)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildDocHead(rows)"):]
         fn = fn[:fn.index("var meta = el(\"div\", \"fnd-doc-meta\")")]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(head.firm_name);", fn)
         self.assertIn("if (head.firm_key) {", fn)
         self.assertIn(
             'firmLink.href = "firm/index.html?key=" + encodeURIComponent(head.firm_key);',
             fn,
         )
-        self.assertIn("firmLink.textContent = head.firm_name;", fn)
-        # firm_key 없는 방어 폴백 경로 — 기존 계약(리터럴 el() 호출) 그대로 유지.
-        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', fn)
+        self.assertIn("firmLink.textContent = firmDisplay;", fn)
+        # firm_key 없는 방어 폴백 경로 — el() 호출은 firmDisplay 를 넘긴다.
+        self.assertIn('el("h2", "fnd-doc-firm", firmDisplay)', fn)
+
+    def test_firm_name_html_entity_decode_applied_at_every_display_point(self):
+        """[firm_name 엔티티 디코드 M5] DB firm_name 에 &amp;/&#039; 가 이미 이스케이프된
+        채로 저장된 행("H &amp; P Industries")도 화면엔 디코드된 형태로 표시된다 —
+        decodeFirmDisplay() 는 이 2종 엔티티만 순수 문자열 replace 로 되돌리며(innerHTML
+        아님, XSS 무관), 업체명이 표시되는 모든 지점(observation 카드 헤더·문서 카드
+        헤더·대시보드 업체 상위)에 적용된다. 클릭/필터 매칭은 raw f.name 그대로 써야
+        state.q 비교가 어긋나지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        self.assertIn(
+            'card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));',
+            js_src,
+        )
+        dash_firms_fn = js_src[js_src.index("function renderDashFirms(stats)"):]
+        dash_firms_fn = dash_firms_fn[:dash_firms_fn.index("\n  }\n") + 4]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(f.name);", dash_firms_fn)
+        self.assertIn('el("span", "fnd-dash-firm-name", firmDisplay)', dash_firms_fn)
+        # 클릭 핸들러는 여전히 raw f.name 을 넘겨 state.q 비교/검색 매칭이 어긋나지 않는다.
+        self.assertIn("toggleFirmFilter(f.name);", dash_firms_fn)
 
     def test_group_by_document_merges_same_raw_signal_id(self):
         """groupByDocument() 는 raw_signal_id 가 같은 행을 하나의 그룹으로 병합하고,
@@ -1521,13 +1594,14 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_result_count_line_shows_document_finding_and_page_summary(self):
         """[문서 단위 페이지네이션] 결과 요약 줄(#fnd-count)은 "전체 N문서 · M지적 ·
-        페이지 X / Y" 형태여야 한다 — N=groupByDocument() 결과 문서 수, M=observation
-        (matched) 수, X=현재 페이지, Y=지금까지 알려진 총 페이지 수."""
+        페이지 X / Y" 형태여야 한다 — N=totalDocsKnown, M=totalFindingsKnown(무필터+RPC
+        확보 시 findings_stats exact 총수, 그 외엔 groupByDocument()/matched 로드 기준),
+        X=현재 페이지, Y=지금까지 알려진(또는 exact) 총 페이지 수."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         start = js_src.index("function render() {")
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
         self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("전체 "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("문서 · "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("지적 · 페이지 "));', render_fn)
@@ -1537,15 +1611,55 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_result_count_line_all_numbers_use_locale_string(self):
         """[콤마 통일] 카운트 줄의 문서수·지적수·총 페이지수는 모두 toLocaleString
         ('ko-KR') 로 천단위 콤마를 붙인다(현재 페이지 번호만은 순수 정수라 콤마 대상이
-        아니다) — String(totalDocsKnown)/String(matched.length) 처럼 콤마 없는 표기가
+        아니다) — String(totalDocsKnown)/String(totalFindingsKnown) 처럼 콤마 없는 표기가
         남아있으면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
         self.assertNotIn("String(totalDocsKnown)", render_fn)
-        self.assertNotIn("String(matched.length)", render_fn)
+        self.assertNotIn("String(totalFindingsKnown)", render_fn)
         self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
         self.assertIn('bTotal.textContent = String(totalPagesKnown)', render_fn)
+
+    def test_exact_totals_shared_from_coverage_rpc_and_used_when_unfiltered(self):
+        """[정확 총수 M1a] fetchCoverageNote() 가 findings_stats RPC 의 totals.documents/
+        totals.findings 를 전역(SERVER_DOC_TOTAL/SERVER_FINDINGS_TOTAL)에 공유하고,
+        render() 는 무필터(검색어·필터 전부 비었음) + 서버 미소진 구간에서만 그 exact
+        값으로 문서수·지적수·총 페이지를 계산한다(exactUnfiltered) — 필터가 걸리면
+        로드 기준(docs.length/matched.length)을 그대로 쓴다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var SERVER_DOC_TOTAL = null;", js_src)
+        self.assertIn("var SERVER_FINDINGS_TOTAL = null;", js_src)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (hasDocs) SERVER_DOC_TOTAL = totals.documents;", cov_fn)
+        self.assertIn(
+            'if (typeof totals.findings === "number" && !isNaN(totals.findings)) {\n'
+            "          SERVER_FINDINGS_TOTAL = totals.findings;\n"
+            "        }",
+            cov_fn,
+        )
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn(
+            "var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;",
+            render_fn,
+        )
+        self.assertIn("totalDocsKnown = SERVER_DOC_TOTAL;", render_fn)
+        self.assertIn("if (SERVER_FINDINGS_TOTAL !== null) totalFindingsKnown = SERVER_FINDINGS_TOTAL;", render_fn)
+        self.assertIn(
+            "totalPagesKnown = Math.max(1, Math.ceil(SERVER_DOC_TOTAL / DOCS_PER_PAGE));",
+            render_fn,
+        )
+
+    def test_uncertain_suffix_replaces_old_plus_sign_in_count_line(self):
+        """[정확 표기] 무필터+exact 확보 시("exactUnfiltered")에는 접미사가 전혀 붙지
+        않는다. 필터가 걸려있거나 RPC 를 아직 확보하지 못했으면서 서버가 아직 소진되지
+        않았을 때만(uncertain) 숫자 뒤에 옛 "+" 기호 대신 " 이상"을 붙인다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
+        self.assertEqual(render_fn.count('countEl.appendChild(document.createTextNode(" 이상"));'), 3)
+        self.assertNotIn('toLocaleString("ko-KR") + (moreMayExist ? "+" : "")', render_fn)
 
     def test_document_card_head_markers_and_css_present(self):
         """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
@@ -1553,7 +1667,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         .fnd-b/.fnd-card 스타일 계열을 재사용한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function buildDocHead(rows)", js_src)
-        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', js_src)
+        self.assertIn('el("h2", "fnd-doc-firm", firmDisplay)', js_src)
         self.assertIn('meta.appendChild(el("span", "fnd-b", head.source));', js_src)
         self.assertIn('meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));', js_src)
         self.assertIn(".fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}", self.html)
@@ -1699,18 +1813,19 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("var DOCS_PER_PAGE = 24;", js_src)
 
-    def test_more_may_exist_indicator_applies_regardless_of_filters(self):
-        """[+표기] moreMayExist(=!isServerExhausted())는 필터 여부와 무관하게 동일
-        기준을 쓴다 — 필터가 걸려도 ensurePageReady() 가 필요하면 계속 청크를 당겨오므로,
-        "최소 추정치일 뿐"이라는 정직한 신호(toLocaleString 뒤 "+")는 필터 유무로
-        분기하지 않는다(구버전의 filtersActive 분기 자체가 제거됨)."""
+    def test_more_may_exist_indicator_narrows_to_uncertain_state(self):
+        """[정확 총수 M1a] moreMayExist(=!isServerExhausted())는 여전히 필터 여부와
+        무관하게 동일 기준을 쓴다. 다만 카운트 줄의 "이상" 접미사(구버전 "+")는
+        moreMayExist 만이 아니라 exactUnfiltered(무필터+RPC exact 확보)가 아닐 때만
+        붙는다(uncertain = moreMayExist && !exactUnfiltered) — 무필터+exact 확보 시에는
+        moreMayExist 가 true 여도(서버 청크가 아직 안 끝났어도) 접미사를 붙이지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         start = js_src.index("function render() {")
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
         self.assertIn("var moreMayExist = !isServerExhausted();", render_fn)
-        self.assertIn('(moreMayExist ? "+" : "")', render_fn)
-        # 옛 filtersActive 기반 SERVER_TOTAL-vs-ROWS.length 분기는 render() 에서 제거됐다.
-        self.assertNotIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
+        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
+        self.assertIn("var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;", render_fn)
+        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
 
     def test_is_server_exhausted_falls_back_to_batch_size_heuristic(self):
         """[방어] Content-Range 파싱 실패(헤더 미노출 등)로 SERVER_TOTAL 이 null 이면,
@@ -1753,12 +1868,29 @@ class WebFindingsRenderTest(unittest.TestCase):
         pager_fn = js_src[js_src.index("function renderPager(current, total, moreMayExist)"):]
         pager_fn = pager_fn[:pager_fn.index("\n  }\n") + 4]
         self.assertIn('buildPagerBtn("«", "처음 페이지로 이동"', pager_fn)
-        self.assertIn('buildPagerBtn("‹", "이전 페이지"', pager_fn)
-        self.assertIn('buildPagerBtn("›", "다음 페이지"', pager_fn)
+        # [b 폴리시] 이전/다음은 «‹›» 단독 글리프 대신 아이콘+텍스트를 병기해 처음 보는
+        # 사용자에게도 명확하다("‹ 이전"/"다음 ›") — 처음/끝은 압축 글리프 그대로 유지.
+        self.assertIn('buildPagerBtn("‹ 이전", "이전 페이지"', pager_fn)
+        self.assertIn('buildPagerBtn("다음 ›", "다음 페이지"', pager_fn)
         self.assertIn('buildPagerBtn("»", "끝 페이지로 이동"', pager_fn)
         self.assertIn('btn.setAttribute("aria-current", "page");', pager_fn)
-        # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정).
+        # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정 —
+        # 이 압축 페이지 버튼의 "+" 표기는 카운트 줄의 " 이상" 문구와 달리 그대로 유지한다,
+        # 좁은 버튼 안에서는 기호가 더 명확하다).
         self.assertIn('var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");', pager_fn)
+        # [선로딩 c] 페이지네이션 버튼 클릭은 goToPageFromPager() 를 거쳐 완료 후 스크롤한다.
+        self.assertEqual(pager_fn.count("goToPageFromPager("), 5)
+
+    def test_pager_css_touch_target_and_loading_status_present(self):
+        """[b 폴리시] 페이저 버튼 최소 터치영역 32px(모바일)·현재 페이지 코럴 필 강조·
+        로딩 중 nav 옅어짐(aria-busy)·대체 상태 텍스트(.fnd-pager-status) CSS 가
+        findings.html 자체 <style> 블록에 존재해야 한다(grm.css 무변경)."""
+        self.assertIn('.fnd-pager[aria-busy="true"]{opacity:.7}', self.html)
+        self.assertIn(".fnd-pager-status{", self.html)
+        self.assertIn(".fnd-pager-btn.on{background:var(--coral-tint)", self.html)
+        mobile_block = self.html[self.html.index("@media (max-width:480px){"):]
+        mobile_block = mobile_block[:mobile_block.index("}\n")]
+        self.assertIn("min-width:32px;height:32px", mobile_block)
 
     def test_pager_hidden_when_single_page_and_no_more_data(self):
         """결과가 0건이거나(hidePager) 1페이지뿐이고 서버도 소진됐으면(moreMayExist=false)
@@ -1790,12 +1922,64 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("var initialPage = readPageFromUrl();", js_src)
         self.assertIn("goToPage(initialPage);", js_src)
 
+    def test_pager_loading_shows_status_text_and_disables_buttons(self):
+        """[로딩 UX b] 미로드 페이지 이동 중에는 버튼을 disabled 처리하고, 현재 페이지
+        pill(.on)이 있으면 그 자리에서 바로 "불러오는 중…" 텍스트로 바꿔 보여준다(없으면
+        —페이지 창 밖— nav 끝에 별도 상태 텍스트를 붙인다). 지금까지는 버튼만 비활성화돼
+        무반응처럼 보였다는 신고 대응."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function setPagerLoading(loading)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });', fn)
+        self.assertIn('var current = nav.querySelector(".fnd-pager-btn.on");', fn)
+        self.assertIn('current.textContent = "불러오는 중…";', fn)
+        self.assertIn('status.className = "fnd-pager-status";', fn)
+        self.assertIn('status.textContent = "불러오는 중…";', fn)
+
+    def test_pager_click_scrolls_results_into_view_after_render(self):
+        """[로딩 UX b] 페이지네이션 바 클릭(goToPageFromPager())으로 촉발된 이동만 완료
+        후 결과 목록(#fnd-results) 상단으로 스크롤한다. 필터/검색/정렬 변경발 goToPage(1)
+        리셋(pendingScrollAfterNav 세팅 없음)은 스크롤하지 않아야 한다 — 검색창 타이핑마다
+        화면이 튀는 것을 방지."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var pendingScrollAfterNav = false;", js_src)
+        goto_fn = js_src[js_src.index("function goToPage(n)"):]
+        goto_fn = goto_fn[:goto_fn.index("\n  }\n") + 4]
+        self.assertIn("var doScroll = pendingScrollAfterNav;", goto_fn)
+        self.assertIn("pendingScrollAfterNav = false;", goto_fn)
+        self.assertIn(
+            'if (doScroll && resultsEl && typeof resultsEl.scrollIntoView === "function") {\n'
+            '        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });\n'
+            "      }",
+            goto_fn,
+        )
+        pager_entry_fn = js_src[js_src.index("function goToPageFromPager(n)"):]
+        pager_entry_fn = pager_entry_fn[:pager_entry_fn.index("\n  }\n") + 4]
+        self.assertIn("pendingScrollAfterNav = true;", pager_entry_fn)
+        self.assertIn("goToPage(n);", pager_entry_fn)
+
+    def test_schedule_prefetch_looks_ahead_one_chunk_near_loaded_edge(self):
+        """[선로딩 c] render() 후 idle 시간에 다음 청크 1개만 미리 fetch한다(전체 eager
+        로드 금지) — 이미 로드된 데이터로 현재 페이지보다 1페이지 이상 여유가 있으면
+        아무 것도 하지 않고, 서버가 이미 소진됐거나(uncertainLoad=false) 이미 fetch 중이면
+        스킵한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function schedulePrefetch(loadedDocsCount, uncertainLoad)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!uncertainLoad || isFetchingPage) return;", fn)
+        self.assertIn("if (currentPage < loadedPages - 1) return;", fn)
+        self.assertIn("requestIdleCallback", fn)
+        self.assertIn("fetchNextChunkFor(function () {});", fn)
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("schedulePrefetch(docs.length, moreMayExist);", render_fn)
+
     def test_dash_total_stat_uses_server_total_when_unfiltered(self):
-        """[대시보드 "전체" 정정] SERVER_TOTAL(서버 exact count) 이 있고 필터가 하나도
-        없을 때만 첫 스탯("전체")을 로드된 행 수 대신 서버 총수로 바꿔치기한다 —
-        "전체 1000" 이 서버 총수(2,272+)와 다르다는 오해를 없앤다. 필터가 걸리면
-        matched.length 가 "필터링된 전체"라는 다른 모집단이므로 그대로 둔다(render() 의
-        filtersActive 판정과 동일 조건 재사용)."""
+        """[대시보드 실총수 M3] 필터가 하나도 없을 때만 대시보드 스탯을 findings_stats
+        RPC exact 총수로 바꿔치기한다 — "전체"는 SERVER_FINDINGS_TOTAL 우선(없으면
+        Content-Range SERVER_TOTAL 폴백), "문서"는 SERVER_DOC_TOTAL(폴백 없음 — 미확보면
+        스탯 자체 생략), 소스별(agencies)은 SERVER_AGENCY_TOTALS 확보 시 exact 로 교체
+        (agenciesExact=true). 필터가 걸리면 matched.length 가 "필터링된 전체"라는 다른
+        모집단이므로 전부 로드 기준(computeStats 원래값)을 그대로 둔다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDash(matched)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
@@ -1803,13 +1987,51 @@ class WebFindingsRenderTest(unittest.TestCase):
             "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
             fn,
         )
+        self.assertIn("if (!filtersActive) {", fn)
         self.assertIn(
-            "if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
-            "      stats.total = SERVER_TOTAL;\n"
-            "    }",
+            "if (SERVER_FINDINGS_TOTAL !== null) {\n"
+            "        stats.total = SERVER_FINDINGS_TOTAL;\n"
+            "      } else if (SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
+            "        stats.total = SERVER_TOTAL;\n"
+            "      }",
             fn,
         )
+        self.assertIn(
+            "if (SERVER_DOC_TOTAL !== null) {\n"
+            "        stats.documents = SERVER_DOC_TOTAL;\n"
+            "      }",
+            fn,
+        )
+        self.assertIn("stats.agenciesExact = true;", fn)
         self.assertIn("renderDashStats(stats);", fn)
+
+    def test_dash_agency_totals_derived_from_by_agency_category_rpc(self):
+        """[대시보드 실총수 M3] findings_stats 에는 agency 단독 집계 키가 없어(by_source/
+        by_agency_category 만 존재), fetchCoverageNote() 가 by_agency_category(agency×
+        category_code 교차표)를 agency 기준으로만 합산해 SERVER_AGENCY_TOTALS 를 채운다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var SERVER_AGENCY_TOTALS = null;", js_src)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (Array.isArray(data.by_agency_category)) {", cov_fn)
+        self.assertIn(
+            "agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);",
+            cov_fn,
+        )
+        self.assertIn("SERVER_AGENCY_TOTALS = agencySums;", cov_fn)
+
+    def test_dash_stats_documents_and_agency_estimate_tooltip(self):
+        """[대시보드 실총수 M3] renderDashStats() 는 stats.documents 가 있을 때만 "문서"
+        스탯 카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), stats.agenciesExact
+        가 아니면 소스별 스탯 각각에 "로드된 데이터 기준" 툴팁을 달아 추정치임을 시각적으로
+        구분한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDashStats(stats)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
+        self.assertIn('buildStatBlock(String(stats.documents), "문서", false)', fn)
+        self.assertIn("if (!stats.agenciesExact) {", fn)
+        self.assertIn('block.title = "현재 로드된 데이터 기준(참고용)";', fn)
 
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
         """buildFacetSkeleton() 은 페이지 이동으로 청크가 추가 fetch 된 이후에도
@@ -2164,9 +2386,9 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
-        """[완역 자동 전환] 미번역 잔량 5건 이하면 "순차 공개·집계보다 적을 수 있음"
-        경고가 "전체 지적사항을 국문으로 열람할 수 있습니다" 완료형으로 스스로 전환된다
-        (완역 시점엔 카테고리 클릭 결과와 집계 수치가 일치해 경고가 무의미)."""
+        """[완역 자동 전환] 미번역 잔량 5건 이하면 미완료 경고가 "전체 지적사항을
+        국문으로 열람할 수 있습니다" 완료형으로 스스로 전환된다(완역 시점엔 카테고리
+        클릭 결과와 집계 수치가 일치해 경고가 무의미)."""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
@@ -2175,6 +2397,41 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("Number(totals.findings || 0) > 0", fn)
         self.assertIn("전체 지적사항을 국문으로 열람할 수 있습니다.", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
+
+    def test_coverage_note_incomplete_wording_neutralized(self):
+        """[진행형 문구 중립화 M4] 미완료 경고에서 "순차 공개되며"(계속 진행 중이라는
+        인상)를 제거하고 "국문 번역이 완료된 지적사항만 가능"이라는 현재 상태 서술로
+        바꾼다 — 집계와 클릭 결과가 다를 수 있다는 핵심 정보는 그대로 유지."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertNotIn("순차", fn)
+        self.assertIn("국문 번역이 완료된 지적사항(", fn)
+        self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
+
+    def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):
+        """[firm_name 엔티티 디코드 M5] 업체 랭킹(buildFirmRow)·상세 패널 헤더
+        (renderFirmDetail)·헤드라인(buildHeadline) 모두 decodeFirmDisplay() 를 거쳐
+        표시한다 — 클릭/state 비교(openFirm 호출·state.openFirm===f.firm_name)는
+        findings_firm_stats RPC exact-match 파라미터라 raw f.firm_name 그대로 유지한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        row_fn = js_src[js_src.index("function buildFirmRow(f, idx, maxCnt)"):]
+        row_fn = row_fn[:row_fn.index("\n  }\n") + 4]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(f.firm_name);", row_fn)
+        self.assertIn('el("span", "tr-firm-name", firmDisplay)', row_fn)
+        self.assertIn("else openFirm(f.firm_name, f.firm_key);", row_fn)  # 클릭은 raw 그대로
+        self.assertIn(
+            'idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));',
+            js_src,
+        )
+        self.assertIn(
+            'lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");',
+            js_src,
+        )
 
     # ── [업체 프로파일 진입] 017_findings_stats_firm_key.sql top_firms.firm_key 배선 ──
     def test_firm_row_click_passes_firm_key_through(self):
@@ -2370,6 +2627,17 @@ class WebFirmRenderTest(unittest.TestCase):
         self.assertNotIn("cdn.", js_src)
         self.assertNotIn("<canvas", self.html)
 
+    def test_firm_name_html_entity_decode_at_profile_header(self):
+        """[firm_name 엔티티 디코드 M5] 업체 프로파일 헤더(fp-firm-name)는 data.display_name
+        (=firm_name)에 &amp;/&#039; 가 이미 이스케이프된 채로 저장돼 있어도 decodeFirmDisplay()
+        로 되돌려 표시한다(textContent 대입 전용, innerHTML 아님 — XSS 무관)."""
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        self.assertIn('nameEl.textContent = decodeFirmDisplay(data.display_name || "");', js_src)
+
 
 class WebFirmWatchlistTest(unittest.TestCase):
     """관심 업체 워치리스트(015_firm_watchlist.sql 의 웹 절반) — 셸 배선·JS 소스 계약.
@@ -2491,10 +2759,22 @@ class WebFirmWatchlistTest(unittest.TestCase):
         self.assertIn("renderMyScraps(); renderMyFirms();", self.reactions_js)
 
     def test_reactions_js_firm_display_never_injected_as_html(self):
-        # firm_display 는 자유 텍스트(스냅샷) — textContent 로만 렌더(XSS 계약).
-        self.assertIn("a.textContent = fw.firm_display || fw.firm_key", self.reactions_js)
+        # firm_display 는 자유 텍스트(스냅샷) — textContent 로만 렌더(XSS 계약). M5(엔티티
+        # 디코드) 이후에도 순수 문자열 함수 호출·연결일 뿐 innerHTML 삽입은 아니어야 한다.
+        self.assertIn("a.textContent = decodeFirmDisplay(fw.firm_display) || fw.firm_key", self.reactions_js)
         self.assertNotIn("fw.firm_display +", self.reactions_js)
         self.assertNotIn("+ fw.firm_display", self.reactions_js)
+
+    def test_reactions_js_firm_display_html_entity_decode(self):
+        """[firm_name 엔티티 디코드 M5] DB firm_display 에 &amp;/&#039; 가 이미 이스케이프된
+        채로 저장된 행("H &amp; P Industries")도 워치리스트 목록에는 디코드된 형태로
+        표시된다 — decodeFirmDisplay() 는 이 2종 엔티티만 순수 문자열 replace 로 되돌리며
+        (innerHTML 아님, XSS 무관), 표시 직전(textContent 대입 전)에 적용된다."""
+        self.assertIn("function decodeFirmDisplay(s)", self.reactions_js)
+        fn = self.reactions_js[self.reactions_js.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

@@ -1,0 +1,14 @@
+[
+  {
+    "finding_id": "finding-4eb822259b174f8a8f9d0ece",
+    "finding_text": "DEPART~1E1'.'T OF HEALTH AND HUMAN SERVICES FOOD AND DRUG AD:..ilNISTRA no;.: OISHHCT Aocn...,s AN-;!",
+    "finding_text_ko": "미국 보건복지부(Department of Health and Human Services) 산하 식품의약국(Food and Drug Administration), 관할지청 주소 및 연락처.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4eba89b6764f424a6e986ccb",
+    "finding_text": "Protective apparel is not worn as necessary to protect drug products from contamination.",
+    "finding_text_ko": "의약품을 오염으로부터 보호하기 위해 필요한 만큼 보호복(protective apparel)을 착용하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

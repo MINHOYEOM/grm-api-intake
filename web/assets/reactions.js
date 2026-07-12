@@ -537,6 +537,13 @@
     });
   }
 
+  // [firm_name 엔티티 디코드 M5] findings.js/trends.js/firm.js 의 동명 헬퍼와 동일 계약
+  // (별도 파일이라 재사용 불가, 계약만 복제) — DB firm_display 에 &amp;/&#039; 가 이미
+  // 이스케이프된 채로 저장된 행을 표시 직전(textContent 대입 전)에만 되돌린다.
+  function decodeFirmDisplay(s) {
+    return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
+  }
+
   // ── /me 페이지: 관심 업체 목록(015_firm_watchlist.sql — 등록은 업체 프로파일에서) ──
   // 스크랩 목록(renderMyScraps)과 동일 관례: 본인 행만(RLS), created_at 최신순 클라이언트
   // 정렬, 오류(015 미적용 포함)는 오류처럼 보이지 않는 노트로 조용히 폴백. Supabase 엔
@@ -571,7 +578,7 @@
           li.className = "grm-my-item";
           var a = document.createElement("a"); a.className = "grm-my-a";
           a.href = cfgRoot + "findings/firm/index.html?key=" + encodeURIComponent(fw.firm_key);
-          a.textContent = fw.firm_display || fw.firm_key;
+          a.textContent = decodeFirmDisplay(fw.firm_display) || fw.firm_key;
           var meta = document.createElement("span"); meta.className = "grm-my-meta";
           meta.textContent = "등록 " + String(fw.created_at || "").slice(0, 10);
           li.appendChild(a); li.appendChild(meta);

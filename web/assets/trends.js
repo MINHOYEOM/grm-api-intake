@@ -110,6 +110,13 @@
     return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  // [firm_name 엔티티 디코드 M5] findings.js 의 동명 헬퍼와 동일 계약(별도 파일이라
+  // 재사용 불가, 계약만 복제) — DB firm_name 에 &amp;/&#039; 가 이미 이스케이프된 채로
+  // 저장된 행을 표시 직전(textContent 대입 전)에만 되돌린다(순수 문자열 치환, XSS 무관).
+  function decodeFirmDisplay(s) {
+    return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
+  }
+
   // 클릭 가능한 div 행(role=button+tabindex+Enter/Space) — findings.js 의 동명 헬퍼와
   // 동일 계약(별도 파일이라 재사용 불가, 계약만 복제).
   function makeClickableRow(node, ariaLabel, onActivate) {
@@ -205,7 +212,7 @@
       lines.push("최근 12개월 지적은 전년 동기 대비 " + Math.abs(yoy.pct) + "% " + dir + "했습니다.");
     } else if ((data.top_firms || []).length) {
       var f = data.top_firms[0];
-      lines.push("지적 건수가 가장 많은 업체는 " + f.firm_name + "(" + fmtNum(f.cnt) + "건)입니다.");
+      lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");
     }
     return lines;
   }
@@ -438,12 +445,16 @@
     var row = document.createElement("div");
     row.className = "tr-firm-row";
     if (state.openFirm === f.firm_name) row.classList.add("on");
-    makeClickableRow(row, f.firm_name + " 상세 보기: " + f.cnt + "건", function () {
+    // [firm_name 엔티티 디코드 M5] 클릭/state 비교는 raw f.firm_name(DB 원본값) 그대로 —
+    // openFirm()/syncFirmUrl() 이 그 값을 findings_firm_stats RPC exact-match 파라미터로
+    // 쓰므로 디코드하면 어긋난다. 디코드는 표시(라벨·aria-label)에만 적용한다.
+    var firmDisplay = decodeFirmDisplay(f.firm_name);
+    makeClickableRow(row, firmDisplay + " 상세 보기: " + f.cnt + "건", function () {
       if (state.openFirm === f.firm_name) closeFirm();
       else openFirm(f.firm_name, f.firm_key);
     });
     row.appendChild(el("span", "tr-firm-rank", String(idx + 1)));
-    row.appendChild(el("span", "tr-firm-name", f.firm_name));
+    row.appendChild(el("span", "tr-firm-name", firmDisplay));
     var track = document.createElement("div");
     track.className = "tr-firm-bar";
     var fill = document.createElement("div");
@@ -565,7 +576,7 @@
     var head = document.createElement("div");
     head.className = "tr-firm-detail-head";
     var idbox = document.createElement("div");
-    idbox.appendChild(el("h3", "tr-firm-detail-name", data.firm_name || ""));
+    idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));
     var period = (data.first_seen || "?") + " ~ " + (data.last_seen || "?");
     idbox.appendChild(el("p", "tr-firm-detail-meta",
       period + " · 총 " + fmtNum((data.totals || {}).findings || 0) + "건"));

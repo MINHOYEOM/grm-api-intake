@@ -83,6 +83,13 @@
     return e;
   }
 
+  // [firm_name 엔티티 디코드 M5] findings.js/trends.js 의 동명 헬퍼와 동일 계약(별도
+  // 파일이라 재사용 불가, 계약만 복제) — DB firm_name(=display_name)에 &amp;/&#039; 가
+  // 이미 이스케이프된 채로 저장된 행을 표시 직전(textContent 대입 전)에만 되돌린다.
+  function decodeFirmDisplay(s) {
+    return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
+  }
+
   // 전 페이지 공용 관례(§ 관례) — 숫자 표기는 toLocaleString("ko-KR").
   function fmtNum(n) {
     return Number(n || 0).toLocaleString("ko-KR");
@@ -428,7 +435,7 @@
 
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
-    nameEl.textContent = data.display_name || "";
+    nameEl.textContent = decodeFirmDisplay(data.display_name || "");
     renderStats(data.totals || {});
     renderCategories(data.by_category || []);
     renderYears(data.by_year || []);

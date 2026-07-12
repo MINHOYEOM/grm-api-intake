@@ -1491,18 +1491,43 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_document_card_head_links_to_firm_profile_when_key_present(self):
         """문서 카드 헤더 업체명은 firm_key(013)가 있으면 /findings/firm/?key= 링크,
-        없으면(013 미적용 라이브) 기존처럼 링크 없는 텍스트 그대로 렌더한다(방어)."""
+        없으면(013 미적용 라이브) 기존처럼 링크 없는 텍스트 그대로 렌더한다(방어). 둘 다
+        firmDisplay(=decodeFirmDisplay(head.firm_name))를 표시에 쓴다(M5 엔티티 디코드)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildDocHead(rows)"):]
         fn = fn[:fn.index("var meta = el(\"div\", \"fnd-doc-meta\")")]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(head.firm_name);", fn)
         self.assertIn("if (head.firm_key) {", fn)
         self.assertIn(
             'firmLink.href = "firm/index.html?key=" + encodeURIComponent(head.firm_key);',
             fn,
         )
-        self.assertIn("firmLink.textContent = head.firm_name;", fn)
-        # firm_key 없는 방어 폴백 경로 — 기존 계약(리터럴 el() 호출) 그대로 유지.
-        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', fn)
+        self.assertIn("firmLink.textContent = firmDisplay;", fn)
+        # firm_key 없는 방어 폴백 경로 — el() 호출은 firmDisplay 를 넘긴다.
+        self.assertIn('el("h2", "fnd-doc-firm", firmDisplay)', fn)
+
+    def test_firm_name_html_entity_decode_applied_at_every_display_point(self):
+        """[firm_name 엔티티 디코드 M5] DB firm_name 에 &amp;/&#039; 가 이미 이스케이프된
+        채로 저장된 행("H &amp; P Industries")도 화면엔 디코드된 형태로 표시된다 —
+        decodeFirmDisplay() 는 이 2종 엔티티만 순수 문자열 replace 로 되돌리며(innerHTML
+        아님, XSS 무관), 업체명이 표시되는 모든 지점(observation 카드 헤더·문서 카드
+        헤더·대시보드 업체 상위)에 적용된다. 클릭/필터 매칭은 raw f.name 그대로 써야
+        state.q 비교가 어긋나지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        self.assertIn(
+            'card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));',
+            js_src,
+        )
+        dash_firms_fn = js_src[js_src.index("function renderDashFirms(stats)"):]
+        dash_firms_fn = dash_firms_fn[:dash_firms_fn.index("\n  }\n") + 4]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(f.name);", dash_firms_fn)
+        self.assertIn('el("span", "fnd-dash-firm-name", firmDisplay)', dash_firms_fn)
+        # 클릭 핸들러는 여전히 raw f.name 을 넘겨 state.q 비교/검색 매칭이 어긋나지 않는다.
+        self.assertIn("toggleFirmFilter(f.name);", dash_firms_fn)
 
     def test_group_by_document_merges_same_raw_signal_id(self):
         """groupByDocument() 는 raw_signal_id 가 같은 행을 하나의 그룹으로 병합하고,
@@ -2380,6 +2405,30 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("국문 번역이 완료된 지적사항(", fn)
         self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
 
+    def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):
+        """[firm_name 엔티티 디코드 M5] 업체 랭킹(buildFirmRow)·상세 패널 헤더
+        (renderFirmDetail)·헤드라인(buildHeadline) 모두 decodeFirmDisplay() 를 거쳐
+        표시한다 — 클릭/state 비교(openFirm 호출·state.openFirm===f.firm_name)는
+        findings_firm_stats RPC exact-match 파라미터라 raw f.firm_name 그대로 유지한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        row_fn = js_src[js_src.index("function buildFirmRow(f, idx, maxCnt)"):]
+        row_fn = row_fn[:row_fn.index("\n  }\n") + 4]
+        self.assertIn("var firmDisplay = decodeFirmDisplay(f.firm_name);", row_fn)
+        self.assertIn('el("span", "tr-firm-name", firmDisplay)', row_fn)
+        self.assertIn("else openFirm(f.firm_name, f.firm_key);", row_fn)  # 클릭은 raw 그대로
+        self.assertIn(
+            'idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));',
+            js_src,
+        )
+        self.assertIn(
+            'lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");',
+            js_src,
+        )
+
     # ── [업체 프로파일 진입] 017_findings_stats_firm_key.sql top_firms.firm_key 배선 ──
     def test_firm_row_click_passes_firm_key_through(self):
         """업체 랭킹 행 클릭 시 openFirm 에 firm_name 뿐 아니라 f.firm_key 도 함께
@@ -2574,6 +2623,17 @@ class WebFirmRenderTest(unittest.TestCase):
         self.assertNotIn("cdn.", js_src)
         self.assertNotIn("<canvas", self.html)
 
+    def test_firm_name_html_entity_decode_at_profile_header(self):
+        """[firm_name 엔티티 디코드 M5] 업체 프로파일 헤더(fp-firm-name)는 data.display_name
+        (=firm_name)에 &amp;/&#039; 가 이미 이스케이프된 채로 저장돼 있어도 decodeFirmDisplay()
+        로 되돌려 표시한다(textContent 대입 전용, innerHTML 아님 — XSS 무관)."""
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
+        self.assertIn('nameEl.textContent = decodeFirmDisplay(data.display_name || "");', js_src)
+
 
 class WebFirmWatchlistTest(unittest.TestCase):
     """관심 업체 워치리스트(015_firm_watchlist.sql 의 웹 절반) — 셸 배선·JS 소스 계약.
@@ -2695,10 +2755,22 @@ class WebFirmWatchlistTest(unittest.TestCase):
         self.assertIn("renderMyScraps(); renderMyFirms();", self.reactions_js)
 
     def test_reactions_js_firm_display_never_injected_as_html(self):
-        # firm_display 는 자유 텍스트(스냅샷) — textContent 로만 렌더(XSS 계약).
-        self.assertIn("a.textContent = fw.firm_display || fw.firm_key", self.reactions_js)
+        # firm_display 는 자유 텍스트(스냅샷) — textContent 로만 렌더(XSS 계약). M5(엔티티
+        # 디코드) 이후에도 순수 문자열 함수 호출·연결일 뿐 innerHTML 삽입은 아니어야 한다.
+        self.assertIn("a.textContent = decodeFirmDisplay(fw.firm_display) || fw.firm_key", self.reactions_js)
         self.assertNotIn("fw.firm_display +", self.reactions_js)
         self.assertNotIn("+ fw.firm_display", self.reactions_js)
+
+    def test_reactions_js_firm_display_html_entity_decode(self):
+        """[firm_name 엔티티 디코드 M5] DB firm_display 에 &amp;/&#039; 가 이미 이스케이프된
+        채로 저장된 행("H &amp; P Industries")도 워치리스트 목록에는 디코드된 형태로
+        표시된다 — decodeFirmDisplay() 는 이 2종 엔티티만 순수 문자열 replace 로 되돌리며
+        (innerHTML 아님, XSS 무관), 표시 직전(textContent 대입 전)에 적용된다."""
+        self.assertIn("function decodeFirmDisplay(s)", self.reactions_js)
+        fn = self.reactions_js[self.reactions_js.index("function decodeFirmDisplay(s)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('.replace(/&amp;/g, "&")', fn)
+        self.assertIn('.replace(/&#039;/g, "\'")', fn)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

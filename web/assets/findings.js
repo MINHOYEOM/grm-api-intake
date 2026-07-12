@@ -579,10 +579,13 @@
       var row = document.createElement("div");
       row.className = "fnd-dash-firm-row";
       if (state.q === f.name) row.classList.add("on");
-      makeClickableRow(row, f.name + " 검색: " + f.count + "건", function () {
+      // [firm_name 엔티티 디코드 M5] 클릭/필터는 raw f.name(DB 원본값) 그대로 써야 검색
+      // state.q·rowMatchesFilters 매칭이 어긋나지 않는다 — 디코드는 표시(라벨·툴팁)에만.
+      var firmDisplay = decodeFirmDisplay(f.name);
+      makeClickableRow(row, firmDisplay + " 검색: " + f.count + "건", function () {
         toggleFirmFilter(f.name);
       });
-      row.appendChild(el("span", "fnd-dash-firm-name", f.name));
+      row.appendChild(el("span", "fnd-dash-firm-name", firmDisplay));
       row.appendChild(el("span", "fnd-dash-firm-count", String(f.count)));
       dashFirmEl.appendChild(row);
     });
@@ -632,6 +635,15 @@
   function safeUrl(u) {
     var s = (u || "").trim().toLowerCase();
     return s.indexOf("http://") === 0 || s.indexOf("https://") === 0;
+  }
+
+  // [firm_name 엔티티 디코드 M5] DB firm_name 에 &amp;/&#039; 가 이미 이스케이프된 채로
+  // 저장된 행이 있어("H &amp; P Industries") 표시 직전 이 2종 엔티티만 순수 문자열
+  // replace 로 되돌린다 — textContent/setAttribute 대입 전용이라 innerHTML 이 아니므로
+  // XSS 계약과 무관하다(트렌드/업체 프로파일/워치리스트 등 다른 정적 자산에도 동일
+  // 헬퍼가 각각 복제돼 있다 — 별도 파일이라 import 불가, 계약만 복제하는 기존 관례와 동형).
+  function decodeFirmDisplay(s) {
+    return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
   }
 
   function el(tag, className, text) {
@@ -807,7 +819,7 @@
     head.appendChild(el("span", "fnd-b date", row.published_date || ""));
     card.appendChild(head);
 
-    if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", row.firm_name, query));
+    if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));
     var cat = CATEGORY_LABELS[row.category_code];
     var catText = cat ? cat.ko : row.category_label_ko;
     if (catText) card.appendChild(el("p", "fnd-cat", catText));
@@ -875,16 +887,17 @@
     var head = rows[0];
     var docHead = el("div", "fnd-doc-head");
     if (head.firm_name) {
+      var firmDisplay = decodeFirmDisplay(head.firm_name);
       if (head.firm_key) {
         var h2 = document.createElement("h2");
         h2.className = "fnd-doc-firm";
         var firmLink = document.createElement("a");
         firmLink.href = "firm/index.html?key=" + encodeURIComponent(head.firm_key);
-        firmLink.textContent = head.firm_name;
+        firmLink.textContent = firmDisplay;
         h2.appendChild(firmLink);
         docHead.appendChild(h2);
       } else {
-        docHead.appendChild(el("h2", "fnd-doc-firm", head.firm_name));
+        docHead.appendChild(el("h2", "fnd-doc-firm", firmDisplay));
       }
     }
     var meta = el("div", "fnd-doc-meta");

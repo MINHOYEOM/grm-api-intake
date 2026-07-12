@@ -27,6 +27,12 @@
         <i class="ti ti-search" aria-hidden="true"></i>
         <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
         <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
+        {#- [페이지네이션 발견성] 카운트 줄 바로 옆의 인라인 "더 보기" — 하단 #fnd-load-more
+            까지 카드 ~200장을 스크롤해야만 보이는 문제(실사용자 신고)를 없앤다. 정적 셸은
+            빈 라벨+hidden 버튼만 렌더(골든 결정론) — 노출/문구/클릭 로직은 findings.js 의
+            updateLoadMoreUI()/loadMoreRows() 를 하단 버튼과 그대로 공유한다(#fnd-load-more
+            부재 시 조용히 no-op 인 것과 동형 방어). -#}
+        <button class="fnd-load-more-inline" id="fnd-load-more-top" type="button" hidden></button>
       </div>
       <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
         <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
@@ -148,6 +154,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-search input:focus{outline:none;border-color:var(--coral)}
 .fnd-count{flex:none;font-size:13px;color:var(--muted);white-space:nowrap}
 .fnd-count b{font-size:15px;color:var(--ink)}
+/* [페이지네이션 발견성] 카운트 줄 옆 인라인 "더 보기" — 하단 .fnd-load-more 와 동일 톤,
+   다만 인라인 자리에 맞춰 더 작고 둥근 알약형(코럴 보더+투명 배경). */
+.fnd-load-more-inline{flex:none;font:inherit;font-size:12px;font-weight:600;color:var(--coral-2);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:3px 11px;cursor:pointer;white-space:nowrap}
+.fnd-load-more-inline:hover{border-color:var(--coral);color:var(--coral)}
+.fnd-load-more-inline[hidden]{display:none}
+.fnd-load-more-inline:disabled{opacity:.6;cursor:default}
 /* 모바일 필터 접기 토글 — 데스크톱(>700px)에선 숨김(필터는 항상 펼침). */
 .fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
@@ -189,6 +201,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   #fnd-f-source,#fnd-f-evidence,#fnd-f-status,#fnd-f-category,#fnd-f-month,#fnd-sort{width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
+  .fnd-load-more-inline{flex:none;margin-top:6px}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}

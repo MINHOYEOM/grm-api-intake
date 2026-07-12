@@ -1,0 +1,1202 @@
+[
+  {
+    "finding_id": "finding-908667e86b8be1cf89100b3e",
+    "finding_text": "Policies PP 04‐01, Member Grievance and PP 04‐07, Major Incident Response Plan will be updated in accordance with Adverse Event Reporting for Outsourcing Facilities under Section 503B of the Federal Food, Drug and Cosmetic Act, Guidance for Industry.",
+    "finding_text_ko": "Policies PP 04-01, Member Grievance 및 PP 04-07, Major Incident Response Plan은 Federal Food, Drug and Cosmetic Act section 503B에 따른 Adverse Event Reporting for Outsourcing Facilities, Guidance for Industry에 맞춰 개정될 예정이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-908da7a1593fda3080c2bf62",
+    "finding_text": "Clothing of personnel engaged in the of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 관련 작업에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90bc76791a94eb0fbe46d3dc",
+    "finding_text": "Procedures for training and identifying training needs have not been adequately established.",
+    "finding_text_ko": "교육 및 교육 필요성 식별 절차가 적절히 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90c3f758768c11a388d5dfb1",
+    "finding_text": "Clothing of personnel engaged in the manufacturing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 제조에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90c99cc339d5e5dcdcd12ebb",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립, 문서화 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90d6289f2e9b68347596e903",
+    "finding_text": "Investigations of an unexplained discrepancy did not extend to other batches of the same drug product and other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사가 동일 의약품의 다른 배치(batch) 및 특정 실패 또는 불일치와 관련되었을 수 있는 다른 의약품으로 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90e42c7de3bff75685853195",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength ofeach active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90fa53c0a5432ff272b2978f",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a)(10)(A).",
+    "finding_text_ko": "외주제조시설 의약품의 라벨에 section 503B(a)(10)(A)에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-911135fd40df3506eb83895f",
+    "finding_text": "Drug products failing to meet established specifications are not re.iected Hemorrhoidal Suppository with Phenylephrine has a phenylephrine specification of redacted text multiple batches of this product were released outside of the specification range as follows: [table of81ots and test results].",
+    "finding_text_ko": "설정된 규격에 부합하지 않는 의약품이 부적합 처리되지 않았다. Hemorrhoidal Suppository with Phenylephrine은 phenylephrine 규격이 redacted text였으며, 이 제품의 여러 배치(batch)가 규격 범위를 벗어난 상태로 출하되었다: [table of81ots and test results].",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-913299776326cf1020436ee3",
+    "finding_text": "The responsibilities and procedures applicable to the quality .controllJilit are not fu11y foJlowed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9135aaeaac58bbee2e33eb77",
+    "finding_text": "Established test procedures are not followed.",
+    "finding_text_ko": "설정된 시험 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-913796e1fc049b06ab1d9d44",
+    "finding_text": "Written records of investigations into unexplained discrepancies do not always include the conclusions and follow-up.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사 기록에 결론 및 후속조치가 항상 포함되지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-915395d7fb3b844317e887f1",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91ad36ceb5fca7c6161649f9",
+    "finding_text": "Procedures describing the warehousing of drug products are not followed.",
+    "finding_text_ko": "의약품 창고보관을 설명한 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91cfd351d91a826a6f49887e",
+    "finding_text": "Buildings used in the processing ofadrug product are not maintained in a good state ofrepair.",
+    "finding_text_ko": "의약품 가공에 사용되는 건물이 양호한 보수 상태로 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91d570469c61f130aa97a84a",
+    "finding_text": "Clothing of personnel engaged in the manufacturing, processing, packing and holding of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 및 보관에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91d669d6fdfa802bd751ee8a",
+    "finding_text": "occurs Adequate exhaust systems or other systems to control contaminants are lacking in areas where air contamination occurs during production.",
+    "finding_text_ko": "생산 중 공기 오염이 발생하는 구역에 오염원을 관리하기 위한 적절한 배기 시스템 또는 기타 시스템이 부족했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91e959744aa2ad5a8fa2fa77",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room to p roduce aseptic conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 무균 조건을 만들기 위한 작업실 세척·소독 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91fad9824b33f20520603b8f",
+    "finding_text": "Strict control is not exercised over labeling issued for use in drug product labeling operations.",
+    "finding_text_ko": "의약품 표시 작업에 사용하도록 발행된 표시자재에 대해 엄격한 관리가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9200ba6479290bca33befc8d",
+    "finding_text": "Specifically, Environmental monitoring <Redac tion (b)(4) (b)(4)> used to prepare sterile products is not conducted each day that sterile drugs are prepared.",
+    "finding_text_ko": "구체적으로, 무균 제품 조제에 사용되는 Environmental monitoring <Redaction (b)(4) (b)(4)>가 무균 의약품을 조제하는 매일 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9209ff227d779a99c3fe3a4e",
+    "finding_text": "You do not have a sporicidal agent for cleaning your ISO 5 laminar flow hood",
+    "finding_text_ko": "ISO 5 laminar flow hood 세척에 사용할 sporicidal agent(포자살균제)가 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-920ee5acb35db441305b7f1b",
+    "finding_text": "The certification of ISO 5 classified area is not representative of its condition of use.",
+    "finding_text_ko": "ISO 5 등급 구역 인증이 사용 상태를 대표하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-921fbe235c2303c722f9f92d",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a)(10)(A).",
+    "finding_text_ko": "외주제조시설 의약품의 라벨에 section 503B(a)(10)(A)에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-922b411ed16e164c108b2f7d",
+    "finding_text": "Each batch of drug product purporting to be sterile is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균으로 표방되는 각 의약품 배치(batch)에 대해 해당 요건 적합성을 확인하는 실험실 시험이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-922d7aa5dd553bad4f28734a",
+    "finding_text": "Failure to sign and date equipment validation/revalidation records.",
+    "finding_text_ko": "장비 validation/revalidation 기록에 서명 및 날짜가 기재되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92351b91b316e0a7cca29115",
+    "finding_text": "Establishment of the reliability of the component supplier's report of analyses is deficient in that the test results are not appropriately validated at appropriate intervals.",
+    "finding_text_ko": "원자재 공급업체 분석 보고서의 신뢰성 확립이 미흡했으며, 시험 결과가 적절한 간격으로 적절히 validation(밸리데이션)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92516bc645b66faa9d733f6f",
+    "finding_text": "The plant is not constructed in such a manner as to prevent condensate from contaminating food-contact surfaces.",
+    "finding_text_ko": "공장은 응축수가 식품 접촉 표면을 오염시키지 않도록 건축되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-925a44627ce9689d01f27758",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치(batch) 또는 그 구성성분이 규격에 부합하지 못한 경우에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-925d0e9fcbe38919b7c2dc84",
+    "finding_text": "Clothing of personnel engaged in the manu facturing and holding ofdrug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 제조 및 보관에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-925ea753db9e5948865f07af",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile are not followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92ab0b2fff2081b8fdc347cc",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 무균 조건을 만들기 위한 작업실 및 장비의 세척·소독 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92ab652943744e169b15352c",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92b134a81f5b3e1054b77ef9",
+    "finding_text": "Clothing of personnel engaged in the manufacturing, processing, packing, and holding of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 및 보관에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92b451d8766ddcd502a176cb",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactor y conformanceo the final specifictions and identify and strength of each active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 최종 규격과 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92bf0f533ca129f31996e0d8",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92c576f59c05b52931114fa0",
+    "finding_text": "Written records of investigation of a drug complaint do not include the findings of the investigation.",
+    "finding_text_ko": "의약품 불만 조사 기록에 조사 결과가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92dc5245b14acd7ef516aaf0",
+    "finding_text": "Laboratory records do not include the initials or signature of a second person showing that the original records have been reviewed for accuracy, completeness, and compliance with established standards.",
+    "finding_text_ko": "실험실 기록에는 원기록이 정확성, 완전성 및 설정 기준 준수 측면에서 검토되었음을 보여주는 두 번째 사람의 이니셜 또는 서명이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92f5f2258e36fca5fec9aaba",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not written and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 문서화 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9302fc43b39ffa2f3e3b92f0",
+    "finding_text": "Each batch of drug product required to be free of objectionable microorganisms is not tested through appropriate laboratory testing.",
+    "finding_text_ko": "유해 미생물이 없어야 하는 각 의약품 배치(batch)에 대해 적절한 실험실 시험이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93122c8cf996650ef2c571fd",
+    "finding_text": "Written production and process control procedures are not followed in the execution of production and process control functions and documented at the time of performance.",
+    "finding_text_ko": "생산 및 공정관리 기능 수행 시 서면 생산 및 공정관리 절차가 준수되지 않았고 수행 시점에 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-931a0932a303f866e587b378",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B (a)(10) ( A) and (B).",
+    "finding_text_ko": "외주제조시설 의약품의 라벨에 section 503B(a)(10)(A) and (B)에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9339d8e7a77a7b74f0775341",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차에 멸균 공정의 적절한 validation(밸리데이션)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9348c4926a244dd90dfc2d78",
+    "finding_text": "Procedures designed to assure that correct labeling are used for drug products are not written.",
+    "finding_text_ko": "의약품에 올바른 표시자재가 사용되도록 보장하기 위한 절차가 문서화되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9361e7dd02148d5c1c49a6d8",
+    "finding_text": "Written MDR procedures have not been developed and implemented.",
+    "finding_text_ko": "서면 MDR 절차가 개발 및 이행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93639be635b2c0110bfb5793",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to ensure aseptic conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 무균 조건을 보장하기 위한 작업실 및 장비의 세척·소독 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9363ba11b3b818e24a6330f4",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-936574238b18090d12cd2fbb",
+    "finding_text": "Procedures for corrective and preventive action have not been adequately established.",
+    "finding_text_ko": "corrective and preventive action(CAPA) 절차가 적절히 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-936a751246ebf34006c91773",
+    "finding_text": "Written records of investigation of a drug complaint do not include the findings of the investigation and the follow-up.",
+    "finding_text_ko": "의약품 불만 조사 기록에 조사 결과 및 후속조치가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-937eca4876b6c4755e2fef77",
+    "finding_text": "Written procedures are not followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "기구를 포함하여 의약품의 제조, 가공, 포장 또는 보관에 사용되는 장비의 세척 및 유지관리에 대한 서면 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-938bfd40a3eda78a0d221f42",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products pu:qJorting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립, 문서화 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93bdd5ea611f415a32585bca",
+    "finding_text": "Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter th e safety, identity, strength, quality, or purity of the drug product beyond the official or other establishe d requirements.",
+    "finding_text_ko": "업체는 의약품의 안전성, 확인, 함량, 품질 또는 순도를 공식 또는 기타 설정 요건을 벗어나 변경할 수 있는 오작동 또는 오염을 방지하도록, 의약품 특성에 적절하게 장비와 기구를 적절한 간격으로 세척, 유지관리, sanitizing(위생처리) 및/또는 멸균하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93c2be7370fec7d065b1c8a3",
+    "finding_text": "Personnel moved rapidly in the vicinity of open sterile units and instruments which disrupted the airflow and increased the risk of bringing lesser quality air into the ISO 5 classified aseptic processing area.",
+    "finding_text_ko": "작업자가 개방된 무균 유닛 및 기기 근처에서 빠르게 이동하여 공기흐름을 방해했고, ISO 5 등급 aseptic processing area(무균 공정 구역)로 낮은 품질의 공기가 유입될 위험을 증가시켰다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93ecdefb80af365c5f18f203",
+    "finding_text": "Failme to maintain buildings, fixtures, or other physical facilities in a sanitary condition Specifically, on 10/18110, a roof drain pipe leading from the roofofthe facility down into the front entrance door area of the facility was observed to be leaking water from an elbow bend, as well as from the poim where the pipe enlers the floor.",
+    "finding_text_ko": "건물, 설비 또는 기타 물리적 시설이 위생적인 상태로 유지되지 않았다. 구체적으로 10/18/10에 시설 지붕에서 전면 출입구 구역으로 이어지는 roof drain pipe가 elbow bend 및 배관이 바닥으로 들어가는 지점에서 누수되는 것이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-941a3a921dc88357035ba21d",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9420191b280d001bb086d199",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of s atisfactory conformance to the identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9423cef9c34688e6c6bf03a6",
+    "finding_text": "The certification of ISO 5 classified area is not representative of its condition of use.",
+    "finding_text_ko": "ISO 5 등급 구역 인증이 사용 상태를 대표하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-942ca1dd69eff6a51ef96552",
+    "finding_text": "Inspection of the packaging and labeling facilities immediately before use is not done to assure that all drug products have been removed from previous operations.",
+    "finding_text_ko": "사용 직전 포장 및 표시 시설 점검이 이전 작업의 모든 의약품이 제거되었는지 보장하기 위해 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9446188726f397742f6e37bf",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality, and <Redacted B4> purity.",
+    "finding_text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 <Redacted B4> 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격 및 시험 절차의 수립을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-944e293e0cb297e7d72e29a7",
+    "finding_text": "Non-pharmaceutical grade components are used in the formulation of non-sterile drug products.",
+    "finding_text_ko": "비의약품 등급 원자재가 비무균 의약품 제형에 사용되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9452963e3a51d07f063baad2",
+    "finding_text": "Process validation procedures do not ensure the integrity of process validation, and the quality unit does not retain the authority to accept or reject batches conducted in accordance with process validation.",
+    "finding_text_ko": "공정 validation(밸리데이션) 절차가 공정 validation의 완전성을 보장하지 않았고, 품질부서는 공정 validation에 따라 수행된 배치(batch)를 승인 또는 부적합 처리할 권한을 보유하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-946150e04738577fce3f0d00",
+    "finding_text": "Failure to maintain equipment and utensils inan acceptable condition through appropriate cleaning and sanitizing.",
+    "finding_text_ko": "장비와 기구가 적절한 세척 및 sanitizing(위생처리)을 통해 허용 가능한 상태로 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-946188506e051c7ef5335708",
+    "finding_text": "Investigations of an unexplained discrepancy did not extend to other batches of the same drug product and other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사가 동일 의약품의 다른 배치(batch) 및 특정 실패 또는 불일치와 관련되었을 수 있는 다른 의약품으로 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9464251aa64d6ca30963c1ac",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치(batch) 또는 그 구성성분이 규격에 부합하지 못한 경우와 원인 불명의 불일치에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94787df497542ddb54733894",
+    "finding_text": "Written procedures for cleaning and maintenance fail to include description in sufficient detail of methods, equipment and materials used.",
+    "finding_text_ko": "세척 및 유지관리 서면 절차에는 사용되는 방법, 장비 및 자재에 대한 충분히 상세한 설명이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-949c9357f976f4a7604d8388",
+    "finding_text": "There is no quality control unit.",
+    "finding_text_ko": "품질관리부서가 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94a02649d00aa05a185c7db2",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the ident ity, strength, quality, and purity they purport or ar e represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시한 확인, 함량, 품질 및 순도를 갖도록 보장하기 위한 생산 및 공정관리 서면 절차가 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94ae6c26cf0f463ec7c6c873",
+    "finding_text": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such equipme nt .",
+    "finding_text_ko": "무균으로 표방되고 pyrogen-free로 표방되는 각 의약품 배치(batch)에 대해 해당 요건 적합성을 확인하는 실험실 시험이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94b50d9a789bf6ea973e82b6",
+    "finding_text": "Written records are not always made of investigations into unexplained discrepancies.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사 기록이 항상 작성되지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94c44f493d2ba87a43d2974e",
+    "finding_text": "\u0001 Samples taken of drug products for determination ofconformance to written specifications are not properly identified.\u0001 Specifically,\u0001 EMPLOVEE(S) SIGNATUR!;\u0001 OATElssuao Anita R.",
+    "finding_text_ko": "서면 규격 적합성 판정을 위해 채취한 의약품 검체가 적절히 식별되지 않았다. 구체적으로 EMPLOYEE(S) SIGNATURE, DATE ISSUED Anita R. 문구가 기록되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94dc755c5b0989159e0afb93",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94f01aa9342e73e3274b93c4",
+    "finding_text": "Written records of major equipment use are not included in individual equipment logs.",
+    "finding_text_ko": "주요 장비 사용에 대한 서면 기록이 개별 장비 로그에 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94fc86db812d56028740bbbf",
+    "finding_text": "Established sampling plans are not followed.",
+    "finding_text_ko": "설정된 검체채취 계획이 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9514ada6c59540c3f3a5c7a0",
+    "finding_text": "Investigations of an unexplained discrepancy did not extend to other batches of the same drug product and other dru g products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사가 동일 의약품의 다른 배치(batch) 및 특정 실패 또는 불일치와 관련되었을 수 있는 다른 의약품으로 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95185fc2041b9c2063cd4efe",
+    "finding_text": "Written standard operating procedures including all steps to be followed in the collection and distribution of blood and blood components for homologous transfusion are not always maintained and followed.",
+    "finding_text_ko": "동종 수혈용 혈액 및 혈액 구성성분 채취와 배포 시 따라야 할 모든 단계를 포함한 서면 표준작업절차가 항상 유지 및 준수되지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95189a684c2ab30fcb532984",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-958a69c4266299935f323e0d",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-959104b7e03c9e788f052f7d",
+    "finding_text": "Equipment and utensils are not cleaned, maintained, and sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the dmg product.",
+    "finding_text_ko": "장비와 기구가 의약품의 안전성, 확인, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 적절한 간격으로 세척, 유지관리 및 sanitizing(위생처리)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95a7f2b77337cc7c68e42928",
+    "finding_text": "Chemical sanitizing agents are not used in your facilities cleanrooms.",
+    "finding_text_ko": "시설 클린룸에서 화학적 sanitizing agent(위생처리제)가 사용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95b8d6b29af43762c4f76c46",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95c6c88042f7ae11df797927",
+    "finding_text": "Written records of major equipment cleaning, maintenance, and use are not included in individual equipment logs.",
+    "finding_text_ko": "주요 장비의 세척, 유지관리 및 사용에 대한 서면 기록이 개별 장비 로그에 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95ce73a19b2b1f66b2d860ae",
+    "finding_text": "l An NDA-Field Alert Report was not submitted within three working days of receipt of information concerning significant chemical, physical, or other change or deterioration in a distributed drug product.",
+    "finding_text_ko": "유통 의약품의 중대한 화학적, 물리적 또는 기타 변화나 열화에 관한 정보를 접수한 후 3영업일 이내에 NDA-Field Alert Report가 제출되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95e787a130e3d352c1c0bdc6",
+    "finding_text": "Failure to take apart equipment as necessary to ensure thorough cleaning.",
+    "finding_text_ko": "철저한 세척을 보장하기 위해 필요한 경우 장비를 분해하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95ef1db8d108616f51ccf058",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95fe57218d75e02cd986db39",
+    "finding_text": "Inspection ofthe packaging facilities immediately before use is not done to assure that all drug products have been removed from previous operations.",
+    "finding_text_ko": "사용 직전 포장 시설 점검이 이전 작업의 모든 의약품이 제거되었는지 보장하기 위해 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9611ad23d4c4b399a1604948",
+    "finding_text": "The accuracy, sensitivity, specificity, and reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험방법의 정확성, 감도, 특이성 및 재현성이 확립 및 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-962480f4221291a323edef86",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-963e6a50b8b6940112fe6286",
+    "finding_text": "Written procedures are not followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product Specifically, several leaks were noted in the high purity water system, including one from a sample port atHDIOlwhich is hard plumbed to the wall mounted tester unit, dripping at an observed rate of several drops per second.",
+    "finding_text_ko": "기구를 포함하여 의약품의 제조, 가공, 포장 또는 보관에 사용되는 장비의 세척 및 유지관리에 대한 서면 절차가 준수되지 않았다. 구체적으로 고순도수 시스템에서 HDI01 sample port의 누수를 포함해 여러 누수가 확인되었고, 해당 port는 벽부착 tester unit에 hard plumbed되어 관찰 시 초당 여러 방울이 떨어졌다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9656f66468481b187d363adc",
+    "finding_text": "Master production and control records lack complete manufactming and control instructions.",
+    "finding_text_ko": "마스터 생산 및 관리 기록에 완전한 제조 및 관리 지시사항이 부족했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-965b2f5ac334d110a8c624b5",
+    "finding_text": "Changes to written procedures are not drafted, reviewed and approved by the appropriate organizational unit and reviewed and approved by the quality control unit.",
+    "finding_text_ko": "서면 절차 변경사항이 적절한 조직 단위에서 작성, 검토 및 승인되지 않았고 품질관리부서의 검토 및 승인을 받지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9663ed6d5e842239a3dc9f2a",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring envirorunental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9668c6d7c70fef4fcb51aef9",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards ofidentity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-967871670346d21894d80fb6",
+    "finding_text": "Buildings used in the mannfucture, processing, packing or holding of drug products are not maintained in a clean and sanitary condition.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물이 청결하고 위생적인 상태로 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-967b4664162b3d197e2ba26d",
+    "finding_text": "You failed to prevent contamination while working in the aseptic production area (ISO 5 hood).",
+    "finding_text_ko": "ISO 5 hood의 aseptic production area(무균 생산 구역)에서 작업하는 동안 오염을 방지하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-968a9964b73feab97ea93389",
+    "finding_text": "The entries in the equipment cleaning and use logs are not in chronological order.",
+    "finding_text_ko": "장비 세척 및 사용 로그의 기재사항이 시간순으로 정리되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96967cf932ca9dd1227c10ba",
+    "finding_text": "Investigations of an unexplained discrepancy and a failure of a batch or any of its components to meet any of its specifications did not extend to other batches of the same drug product and other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인 불명의 불일치와 배치(batch) 또는 그 구성성분의 규격 부적합에 대한 조사가 동일 의약품의 다른 배치(batch) 및 특정 실패 또는 불일치와 관련되었을 수 있는 다른 의약품으로 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96ba923fd2354b5827a35d2a",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 양압 상태에서 HEPA 필터로 여과된 공기 공급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96ccaeb9ce6eded83d49ee93",
+    "finding_text": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing and processing.",
+    "finding_text_ko": "배치 생산 및 관리 기록은 제조 및 가공의 각 주요 단계 완료 문서를 포함하지 않아 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96e5338f6cd3c261d628227f",
+    "finding_text": "Written procedmes are lacking which describe in sufficient detail the receipt, identification, storage, handling, sampling, testing, approval, and rejection ofcomponents.",
+    "finding_text_ko": "원자재의 수령, 식별, 보관, 취급, 검체채취, 시험, 승인 및 부적합 처리를 충분히 상세히 설명한 서면 절차가 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96f29137a4c96ebe28116a9e",
+    "finding_text": "Drug products failing to meet established specifications are not rejected.",
+    "finding_text_ko": "설정된 규격에 부합하지 않는 의약품이 부적합 처리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97038b8220f34900db53ebf9",
+    "finding_text": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균으로 표방되고 pyrogen-free로 표방되는 각 의약품 배치(batch)에 대해 해당 요건 적합성을 확인하는 실험실 시험이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-972240d9cd1707ed7dc02ad1",
+    "finding_text": "Clothing of personnel engaged in the processing ofdrug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9729a52c501f43df6b1a2bc2",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not suitably located to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 장비가 의도된 용도에 따른 작업을 용이하게 하기에 적합한 위치에 설치되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9736ca2461e1ae8b94586601",
+    "finding_text": "Procedures for design validation have not been adequately established.",
+    "finding_text_ko": "설계 validation(밸리데이션) 절차가 적절히 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-974269a34b8b6b83016d116a",
+    "finding_text": "Written procedures are not established and followed for evaluations done at least annually and including provisions for a review of complaints, recalls, returned or salvaged drug products, and investigations conducted for each drug product.",
+    "finding_text_ko": "각 의약품에 대해 불만, 회수, 반품 또는 회수품, 수행된 조사 검토 조항을 포함하여 적어도 매년 수행되는 평가에 대한 서면 절차가 수립 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-976c71adac3c33e76ca57a45",
+    "finding_text": "Producer of Sterile and non-sterile drug products Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균 및 비무균 의약품 생산자에서, 무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차에 멸균 공정의 적절한 validation(밸리데이션)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-976ffb984a20051dfcfda780",
+    "finding_text": "Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination of the drug product.",
+    "finding_text_ko": "용기·마개 시스템은 보관 및 사용 중 의약품의 열화 또는 오염을 유발할 수 있는 예측 가능한 외부 요인으로부터 적절한 보호를 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-977877a6de1416e7ffb22c8e",
+    "finding_text": "I Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차에 멸균 공정의 적절한 validation(밸리데이션)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9781f2e2032e1476feeac293",
+    "finding_text": "The labels of your outsourcing facility's drug products are deficient.",
+    "finding_text_ko": "외주제조시설 의약품의 라벨이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-978a4a7c2b0e7956811d3e6c",
+    "finding_text": "IS0-5 classified areas were not certified under dynamic conditions.",
+    "finding_text_ko": "ISO-5 등급 구역이 동적 조건에서 인증되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97977783e9eea5df9ae37954",
+    "finding_text": "Testing and release ofdrug product for distribution do not include appropriate laboratory determination ofsatisfactory conformance to the final specifications and identity and strength ofeach active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 최종 규격과 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-979c7eb8246b3bdb95a7d1f8",
+    "finding_text": "Equipment ·and utensils are not maintained at appropriate intervals to prevent malfunctions that would alter the <Redacted B4> safety; strength, ·quality, .or purity of the drug product.",
+    "finding_text_ko": "장비와 기구가 의약품의 <Redacted B4> 안전성, 함량, 품질 또는 순도를 변경할 수 있는 오작동을 방지하도록 적절한 간격으로 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97a3f2ed4023862250b62cf2",
+    "finding_text": "An MDR report was not submitted within 30 days of receiving or otherwise becoming aware of information that reasonably su ggests that a market ed device has malfunctioned and would be likely to cause or contribute to a death or serious injur y if the malfunction were to recur.",
+    "finding_text_ko": "시판 의료기기가 오작동했으며 그 오작동이 재발할 경우 사망 또는 중대한 상해를 유발하거나 이에 기여할 가능성이 있음을 합리적으로 시사하는 정보를 접수하거나 알게 된 후 30일 이내에 MDR report가 제출되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97b85735ae95574b814688a3",
+    "finding_text": "for details ofdeficiencies noted.",
+    "finding_text_ko": "지적된 결함의 세부사항을 참조하라는 문구가 기록되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97b8c1ed3a10b14dc9c9180f",
+    "finding_text": "The separate or defined areas necessary to prevent contamination or mix-ups are deficient.",
+    "finding_text_ko": "오염 또는 혼입을 방지하는 데 필요한 분리 또는 지정 구역이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97cb3fa35312340418d70039",
+    "finding_text": "The firm does not conduct inhibitory/enhancement testing on all of their products to see if their products interfere with endotoxin testing.",
+    "finding_text_ko": "업체는 모든 제품에 대해 제품이 endotoxin testing(엔도톡신 시험)을 방해하는지 확인하기 위한 inhibition/enhancement testing(억제/증강 시험)을 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97d6cbc956a378efcd3d1b7d",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile a re not f ollowed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97d80e0676a28fed2d5f19f6",
+    "finding_text": "Employees engaged in the manufacture, processing, packing, and holding ofa drug product Jack the training and experience required to perform their assigned functions.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 및 보관에 종사하는 직원이 배정된 업무를 수행하는 데 필요한 교육과 경험을 갖추지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97dbff9383223c8db2b8d11d",
+    "finding_text": "Control procedures are not established which validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질 및 의약품 특성 변동을 유발할 수 있는 제조 공정의 성능을 validation(밸리데이션)하는 관리 절차가 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97e38527701ce541d120a0ab",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile a re not established .",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97ece2c0b908acc049109656",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97eef72a401344736e577c20",
+    "finding_text": "All reasonable precautions are not taken to ensure that production procedures do not contribute contamination from any source.",
+    "finding_text_ko": "생산 절차가 어떤 출처의 오염도 유발하지 않도록 보장하기 위한 모든 합리적 예방조치가 취해지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-980458341ecb58322e01a6ca",
+    "finding_text": "An adequate number of batches of each drug product are not tested to determine an appropriate expiration date.",
+    "finding_text_ko": "적절한 유효기간을 결정하기 위해 각 의약품의 충분한 수의 배치(batch)가 시험되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9804676874f0c3d914146b80",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차에 멸균 공정의 적절한 validation(밸리데이션)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98090f2354568d75bd37d345",
+    "finding_text": "Results of stability testing are not used in determining expiration dates.",
+    "finding_text_ko": "안정성 시험 결과가 유효기간을 결정하는 데 사용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9816c52f0a6fc7e5fd0968f6",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 양압 상태에서 HEPA 필터로 여과된 공기 공급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98193ad5853de7b4232f39dc",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distnbuted.",
+    "finding_text_ko": "배치(batch) 또는 그 구성성분이 규격에 부합하지 못한 경우와 원인 불명의 불일치에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98247f6c1a3570284436b0dc",
+    "finding_text": "All major equipment used during production ofa batch ofdrug product is not properly identified at all times to indicate contents.",
+    "finding_text_ko": "의약품 배치(batch) 생산 중 사용되는 모든 주요 장비가 내용물을 표시하도록 항상 적절히 식별되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9825146722dc85c5beaf59aa",
+    "finding_text": "GMP training is not conducted with sufficient frequency to assure that employees remain familiar with CGMP requirements applicable to them.",
+    "finding_text_ko": "직원이 자신에게 적용되는 CGMP 요건을 계속 숙지하도록 보장하기에 충분한 빈도로 GMP 교육이 실시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9837244bd86bcfadcdb7afd1",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-984d16e3ed35a3d10658f27c",
+    "finding_text": "Written records are not always made of investigations into unexplained discrepancies.",
+    "finding_text_ko": "원인 불명의 불일치에 대한 조사 기록이 항상 작성되지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-984dd3c1b1c86f94318472f3",
+    "finding_text": "Buildings used in the manufacture, processing, packing or holding ofdrug products are not maintained in a clean and sanitary condition.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물이 청결하고 위생적인 상태로 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-985d2975aee546dba7a185bd",
+    "finding_text": "Your facility design allowed the influx of poor quality air into a higher classified area.",
+    "finding_text_ko": "시설 설계로 인해 낮은 품질의 공기가 더 높은 등급 구역으로 유입될 수 있었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98792727cb581e5b32c10ac8",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9889fc85680b28c16866519e",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 최종 규격과 각 활성성분의 확인 및 함량에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-989c07d410f781e0794639b6",
+    "finding_text": "Procedures describing the handling of all written and oral complaints regarding a drug product are not followed.",
+    "finding_text_ko": "의약품에 관한 모든 서면 및 구두 불만 처리를 설명한 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98c0902a500f380074ed4901",
+    "finding_text": "Time limits are not established when appropriate for the completion of each production phase to assure the quality of the drug product.",
+    "finding_text_ko": "의약품 품질을 보장하기 위해 각 생산 단계 완료에 적절한 시간 제한이 설정되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98c5d429ad4276fe151f10fb",
+    "finding_text": "Laboratory records are deficient in that they do not include the signature of the second person reviewing the record for accuracy.",
+    "finding_text_ko": "실험실 기록은 정확성을 검토한 두 번째 사람의 서명이 포함되지 않아 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98cbf09fe65ad22c8ebd56d7",
+    "finding_text": "Samples taken ofiu-process materials for determination of conformance to specifications are not representative.",
+    "finding_text_ko": "규격 적합성 판정을 위해 채취한 공정 중 물질 검체가 대표성이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98dc55b32aadb6ffd6bbd95a",
+    "finding_text": "Specifically, pressure gauges are not installed to monitor the pressure differential or air flow between the ISO 7 Cleanroom, the ISO 8 ante room and the unclassified general environment.",
+    "finding_text_ko": "구체적으로 ISO 7 Cleanroom, ISO 8 ante room 및 비등급 일반 환경 사이의 차압 또는 공기흐름을 모니터링하기 위한 압력계가 설치되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98f46c1c4a05d069645a7825",
+    "finding_text": "Each lot of drug product containers and closures is not withheld from use until the lot has been sampled, tested, examined, and released by the quality control unit.",
+    "finding_text_ko": "의약품 용기 및 마개의 각 lot는 품질관리부서가 검체채취, 시험, 검사 및 출하승인하기 전까지 사용 보류되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98f6901af9000271d53a603a",
+    "finding_text": "Protective apparel is not worn as necessary to protect drug products from contamination.",
+    "finding_text_ko": "의약품을 오염으로부터 보호하기 위해 필요한 보호복이 착용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-990ab3d5301120827ffba483",
+    "finding_text": "Control procedures are not established which validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질 및 의약품 특성 변동을 유발할 수 있는 제조 공정의 성능을 validation(밸리데이션)하는 관리 절차가 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-991082ef511b486ba395e646",
+    "finding_text": "Failure to properly store equipment and remove litter and waste that may constitute an attractant, breeding place, or harborage area for pests, within the immediate vicinity of the plant buildings or structures.",
+    "finding_text_ko": "공장 건물 또는 구조물 바로 인근에서 해충의 유인물, 번식 장소 또는 은신처가 될 수 있는 장비를 적절히 보관하고 쓰레기와 폐기물을 제거하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9913a041d28c3831aeaf02ea",
+    "finding_text": "The user facility did not submit FDA Form 3500A or electronic equivalent to FDA within ten working days after becoming aware of information that reasonably suggests that a device has or may have caused or contributed to the death of a patient of the facility.",
+    "finding_text_ko": "사용 시설은 의료기기가 해당 시설 환자의 사망을 유발했거나 이에 기여했을 수 있음을 합리적으로 시사하는 정보를 알게 된 후 10영업일 이내에 FDA Form 3500A 또는 전자 동등 양식을 FDA에 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-993d122a3ab3971393bfbcbc",
+    "finding_text": "Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination ofthe drug product.",
+    "finding_text_ko": "용기·마개 시스템은 보관 및 사용 중 의약품의 열화 또는 오염을 유발할 수 있는 예측 가능한 외부 요인으로부터 적절한 보호를 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99474c99fdd638a84256bd77",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-996ae938eb4b2c3d54bb6298",
+    "finding_text": "The labels and containers of your outsourcing facility's drug products do not include information required by section 503B(a)(10)(A) and (B).",
+    "finding_text_ko": "외주제조시설 의약품의 라벨 및 용기에 section 503B(a)(10)(A) and (B)에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9972ae76014b265add400ba9",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립 및 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-997e20b97c0674bfa4d4f535",
+    "finding_text": "Reserve drug product samples are not retained and stored under conditions cons istent with product labe ling.",
+    "finding_text_ko": "보관용 의약품 검체가 제품 표시사항과 일치하는 조건에서 보관 및 저장되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-998e19b5985558c95f31f76d",
+    "finding_text": "Each batch of drug product purporting to be sterile is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균으로 표방되는 각 의약품 배치(batch)에 대해 해당 요건 적합성을 확인하는 실험실 시험이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-998f850a8e84f99682961529",
+    "finding_text": "Effective measures are not being taken to protect against the contamination of food on the premises by pests.",
+    "finding_text_ko": "사업장 내 식품이 해충에 의해 오염되는 것을 방지하기 위한 효과적인 조치가 취해지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9999cf0bdee542554156a370",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 양압 상태에서 HEPA 필터로 여과된 공기 공급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99ad3ffe70998df3fffc799c",
+    "finding_text": "Failure to manufacture, package, and store foods under conditions and controls necessary to minimize the potential for growth of microorganisms and contamination.",
+    "finding_text_ko": "미생물 증식 및 오염 가능성을 최소화하는 데 필요한 조건과 관리 하에서 식품을 제조, 포장 및 보관하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99cbd13a523d30764375a7b5",
+    "finding_text": "Approved components, drug product containers and closures are not retested or reexamined as appropriate for identity, strength, quality and purity after exposure to conditions that might have an adverse effect with subsequent approval or rejection by the quality control unit.",
+    "finding_text_ko": "승인된 원자재, 의약품 용기 및 마개가 악영향을 줄 수 있는 조건에 노출된 후 확인, 함량, 품질 및 순도에 대해 적절히 재시험 또는 재검사되고 품질관리부서의 후속 승인 또는 부적합 처리를 받지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a02a26297ad2c9ab38ee1ba",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 양압 상태에서 HEPA 필터로 여과된 공기 공급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a04a8db14317553942f17d8",
+    "finding_text": "Equipment used in the manufacture, processing.",
+    "finding_text_ko": "의약품 제조 및 가공에 사용되는 장비 관련 지적사항이 기록되었으나 문장이 불완전했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a24c15c3c59e6725c8b6fbf",
+    "finding_text": "The operations relating to the processing ofpenicillin are not performed in facilities separate from those used for other drug products for human use.",
+    "finding_text_ko": "페니실린 가공 관련 작업이 인체용 다른 의약품에 사용되는 시설과 분리된 시설에서 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a3e4e4a7710ba6ea9fda609",
+    "finding_text": "Batch production and control records are not prepared for each batch of drug product produced and do not include complete info1mation relating to the production and control of each batch.",
+    "finding_text_ko": "생산된 각 의약품 배치(batch)에 대해 배치 생산 및 관리 기록이 작성되지 않았고, 각 배치(batch)의 생산 및 관리와 관련된 완전한 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a4b2d0ca19acc3c91b96633",
+    "finding_text": "The labels of some of your outsourcing facility's drug products do not include information required by section 503B(a)(10)(A) and (B).",
+    "finding_text_ko": "외주제조시설 일부 의약품의 라벨에 section 503B(a)(10)(A) and (B)에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a4bf36e1c3d67650eb62e19",
+    "finding_text": "Procedures describing the handling of all written and oral complaints regarding a drug product are not established and written.",
+    "finding_text_ko": "의약품에 관한 모든 서면 및 구두 불만 처리를 설명한 절차가 수립 및 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a4ea87f908c00cf4ec41dd0",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 검체채취 계획 및 시험 절차의 수립을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a55d5fc9989312c9c16fd91",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+    "finding_text_ko": "배치 생산 및 관리 기록에 각 배치(batch)의 생산 및 관리와 관련된 완전한 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a6687373dbd6cd3879d4efb",
+    "finding_text": "Failure to store raw materials in a maMer that protects against contamination.",
+    "finding_text_ko": "원료가 오염으로부터 보호되는 방식으로 보관되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a79899391d4c69cbabf0b8c",
+    "finding_text": "4625 N Uni versity St Producer of sterile drugs The separate or defined areas necessary to prevent contamination or mix-ups are deficient.",
+    "finding_text_ko": "4625 N University St, Producer of sterile drugs에서 오염 또는 혼입을 방지하는 데 필요한 분리 또는 지정 구역이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a7e0234f5e7c070e3395142",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a91dda6bf3613c63532fa30",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a937738c106a1d35dee9edc",
+    "finding_text": "Protective apparel is not worn as necessary to protect drug products fro m contamination.",
+    "finding_text_ko": "의약품을 오염으로부터 보호하기 위해 필요한 보호복이 착용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a9820f06367c36c5085956b",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시한 확인, 함량, 품질 및 순도를 갖도록 보장하기 위한 생산 및 공정관리 서면 절차가 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a9ee56b5b70276aa0d079c0",
+    "finding_text": "Plumbing constitutes a source ofcontamination to food and equipment.",
+    "finding_text_ko": "배관이 식품 및 장비 오염원이 되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9aa1046c454c8103dbee4f69",
+    "finding_text": "The written stability testing program is not followed.",
+    "finding_text_ko": "서면 안정성 시험 프로그램이 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9aa7602233838a148c3f2687",
+    "finding_text": "Testing and release of drug product for distribution don not include appropriate laboratory determination of satisfactor y conformance to the final specifications prior to release.",
+    "finding_text_ko": "출하 전 의약품의 시험 및 출하승인에는 최종 규격에 대한 적합성을 확인하는 적절한 실험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ac92d8c51fe2b9e27cfdaf1",
+    "finding_text": "on the FDA 483 dated 07/26/t3.",
+    "finding_text_ko": "07/26/13자의 FDA 483에 기재된 사항과 관련되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ad001d952314d1ebe151192",
+    "finding_text": "Employees are not given training in the particular operations they perform as part of their function.",
+    "finding_text_ko": "직원에게 해당 직무의 일부로 수행하는 특정 작업에 대한 교육이 제공되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ad8318bc0818c62d75d5134",
+    "finding_text": "There is a failure to thoroughly review the failure ofa batch or any of its components to meet any ofits specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치(batch) 또는 그 구성성분이 규격에 부합하지 못한 경우에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ad962911a1aed3b35e08cc0",
+    "finding_text": "One (1) vial <Redacted B4> vials of Calm Me Injection from Lot #08032016C, BUD: 01/30/2017 was found to contain an unknown foreign material.",
+    "finding_text_ko": "Calm Me Injection Lot #08032016C, BUD: 01/30/2017의 바이알 1개에서 알 수 없는 이물이 발견되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9aec70367c26ff455ef47689",
+    "finding_text": "Control procedures fail to include adequacy ofmixing to assure uniformity and homogeneity.",
+    "finding_text_ko": "관리 절차에 균일성 및 동질성을 보장하기 위한 혼합 적절성이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9af0a85fcee4c14eeca2de27",
+    "finding_text": "Clothing of personnel engaged in the 'manufacturing, processing, packing, and holding of drug products is not appropriate for the duties they perfonn.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 및 보관에 종사하는 작업자의 복장이 수행 업무에 적합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9af97d51cd1dd7591469daba",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "원인 불명의 불일치에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b04778324d17ca40dac03f2",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+    "finding_text_ko": "배치 생산 및 관리 기록에 각 배치(batch)의 생산 및 관리와 관련된 완전한 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b08d29ae80c8d09bb5b63f1",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 생산 및 관리 기록이나 기타 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템의 적절한 관리가 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b0c7aa72bdaa854398d1bd5",
+    "finding_text": "ADDRESS 1270 Don' s Lane ESTA8USHMEHT IHSPl<C eo outsourcin facility Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination of the drug product.",
+    "finding_text_ko": "ADDRESS 1270 Don's Lane, ESTABLISHMENT INSPECTED outsourcing facility에서 용기·마개 시스템이 보관 및 사용 중 의약품의 열화 또는 오염을 유발할 수 있는 예측 가능한 외부 요인으로부터 적절한 보호를 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b1a9376d02c21631cef7667",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b1e6dbd66ca837149f54c72",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 환경 조건 모니터링 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b21f951a30cb1b0e28386dc",
+    "finding_text": "Procedures designed to prevent microbilogical contamination of drug products purporting to be sterile do not include a dequate validation of th e sterilization process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차에 멸균 공정의 적절한 validation(밸리데이션)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b581f0729f833319a5f78db",
+    "finding_text": "Written records ofinvestigations into unexplained discrepancies and the failure of a batch or any ofits components to meet, specifications do not always include the conclusions and follow-up.",
+    "finding_text_ko": "원인 불명의 불일치와 배치(batch) 또는 그 구성성분의 규격 부적합에 대한 조사 기록에 결론 및 후속조치가 항상 포함되지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b5b47cd664cf078dca27fee",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "aseptic processing area(무균 공정 구역)는 무균 조건을 만들기 위한 작업실 및 장비의 세척·소독 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b5db746337c1fc1a8b46d1b",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 생산 및 관리 기록이나 기타 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템의 적절한 관리가 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b66d8fa655099cfb5539220",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b9127c404ac012ab1a4a15b",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격의 수립을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ba499d149329b93865c70ec",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bbf7460075050397a3192ce",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products .",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bccb519374d34b0f9a24a38",
+    "finding_text": "Environmental monitoring samples were not performed to ensure recovery oforganisms.",
+    "finding_text_ko": "미생물 회수를 보장하기 위한 환경 모니터링 검체 채취가 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bd598bea7338ebdb7240b10",
+    "finding_text": "Results of stability testing are not used in determining expiration dates.",
+    "finding_text_ko": "안정성 시험 결과가 유효기간을 결정하는 데 사용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bf2be556663822daf8839cf",
+    "finding_text": "Buildings used in the manufacture, processing, packing, or holding ofa drug product do not have the suitable location to facilitate cleaning, maintenance, and proper operations.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물이 청소, 유지관리 및 적절한 작업을 용이하게 하기에 적합한 위치를 갖추지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bff61fb4520c41f1659fc7e",
+    "finding_text": "Failure to clean food-contact surfaces as frequently as necessary to protect against contamination offood.",
+    "finding_text_ko": "식품 오염을 방지하는 데 필요한 빈도로 식품 접촉 표면이 세척되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c0fc1ef6e2e98cabdbbb6ff",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed: Specifically, Your Quality Unit has failed in the responsibility and authority to monitor Quality Systems designed to assure the quality of drug products manufactured and packaged at your firm.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다. 구체적으로 품질부서는 업체에서 제조 및 포장되는 의약품의 품질을 보장하도록 설계된 품질 시스템을 모니터링할 책임과 권한을 이행하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c22f4310b4d1ee4dbeb80ca",
+    "finding_text": "Materials or supplies were not disinfected prior to entering the aseptic processing areas.",
+    "finding_text_ko": "자재 또는 소모품이 aseptic processing area(무균 공정 구역)에 반입되기 전에 소독되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c25e8d491a29ec8a95f795e",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "원인 불명의 불일치에 대해, 해당 배치가 이미 출하되었는지 여부와 관계없이 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c27315ed024dc3a2dcf5b44",
+    "finding_text": "The accuracy, sensitivity, specificity, and reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험방법의 정확성, 감도, 특이성 및 재현성이 확립 및 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c2cadb83f1466a4daf00918",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격, 기준 및 시험 절차의 수립을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

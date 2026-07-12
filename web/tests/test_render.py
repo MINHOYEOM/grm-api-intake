@@ -1947,12 +1947,31 @@ class WebFindingsRenderTest(unittest.TestCase):
         goto_fn = goto_fn[:goto_fn.index("\n  }\n") + 4]
         self.assertIn("var doScroll = pendingScrollAfterNav;", goto_fn)
         self.assertIn("pendingScrollAfterNav = false;", goto_fn)
-        self.assertIn(
-            'if (doScroll && resultsEl && typeof resultsEl.scrollIntoView === "function") {\n'
-            '        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });\n'
-            "      }",
-            goto_fn,
-        )
+        # [로딩 UX b′] sticky 툴바(.fnd-tools, top:66px) 밑에 결과 상단이 가려지지 않도록
+        # 오프셋 보정 + instant(auto) 스크롤 — smooth 는 연타 시 버튼 위치가 흘러다녀 교체.
+        self.assertIn('document.getElementById("fnd-tools")', goto_fn)
+        self.assertIn("getBoundingClientRect().bottom", goto_fn)
+        self.assertIn('behavior: "auto"', goto_fn)
+        self.assertNotIn('behavior: "smooth"', goto_fn)
+
+    def test_sticky_pnav_prev_next_in_tools_bar(self):
+        """[sticky 미니 내비] 이전/다음 버튼이 sticky 툴바(.fnd-tools) 안에 있어 스크롤
+        위치와 무관하게 같은 화면 자리에서 연타 가능해야 한다(실사용자 신고: 다음 클릭
+        후 화면이 밀려 매번 위로 되돌아가야 했음). 셸 hidden + updatePnav() 상태 관리 +
+        renderPager() 동기 + 로딩 중 잠금 계약."""
+        self.assertIn('<div class="fnd-pnav" id="fnd-pnav" hidden>', self.html)
+        self.assertIn('id="fnd-pnav-prev"', self.html)
+        self.assertIn('id="fnd-pnav-next"', self.html)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function updatePnav(current, total, moreMayExist)", js_src)
+        self.assertIn("updatePnav(current, total, moreMayExist); // [sticky 미니 내비]", js_src)
+        self.assertIn('goToPageFromPager(currentPage - 1);', js_src)
+        self.assertIn('goToPageFromPager(currentPage + 1);', js_src)
+        # 로딩 중 연타 방어 — setPagerLoading 이 pnav 도 잠근다.
+        loading_fn = js_src[js_src.index("function setPagerLoading(loading)"):]
+        loading_fn = loading_fn[:loading_fn.index("\n  }\n") + 4]
+        self.assertIn("pnavPrevBtn.disabled = true;", loading_fn)
+        self.assertIn("pnavNextBtn.disabled = true;", loading_fn)
         pager_entry_fn = js_src[js_src.index("function goToPageFromPager(n)"):]
         pager_entry_fn = pager_entry_fn[:pager_entry_fn.index("\n  }\n") + 4]
         self.assertIn("pendingScrollAfterNav = true;", pager_entry_fn)

@@ -52,6 +52,7 @@ __all__ = [
     "WebSearchIndexTest",
     "WebFindingsRenderTest",
     "WebTrendsRenderTest",
+    "WebFirmRenderTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
     "WebDeterministicDetailTest",
@@ -82,6 +83,7 @@ SINGLE_GOLDENS = [
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
+    ("findings/firm/index.html", "firm.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
@@ -1395,6 +1397,47 @@ class WebFindingsRenderTest(unittest.TestCase):
             js_src,
         )
 
+    # ── [업체 프로파일 진입] firm_key select 확장 + 013 미적용 방어 폴백 ──────────────
+    def test_firm_key_added_to_select_fields_with_dedicated_fallback(self):
+        """013_findings_firm_key.sql 의 firm_key(generated 컬럼)가 FIELDS select 목록에
+        추가돼야 하고, 013 미적용 라이브(그 컬럼만 없는 경우)에도 페이지가 깨지지 않도록
+        FIELDS_NO_FIRM_KEY 로 재시도하는 별도 폴백 단계가 있어야 한다 — 005 폴백
+        (LEGACY_FIELDS)과 독립적인 축이라 3단계 체인이 된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fields_block = js_src[js_src.index("var FIELDS = ["):js_src.index("var LEGACY_FIELDS")]
+        self.assertIn('"firm_key"', fields_block)
+        self.assertIn("var FIELDS_NO_FIRM_KEY = FIELDS.filter(function (f) {", js_src)
+        self.assertIn('return f !== "firm_key";', js_src)
+        # LEGACY_FIELDS 는 FIELDS_NO_FIRM_KEY 파생이라(FIELDS 가 아니라) firm_key 는
+        # 최종 legacy 폴백에도 전이적으로 제외된다(중복 실패 축 없음).
+        self.assertIn("var LEGACY_FIELDS = FIELDS_NO_FIRM_KEY.filter(function (f) {", js_src)
+
+    def test_findings_fetch_three_stage_fallback_chain(self):
+        """fetchFindings(FIELDS) 실패 → fetchFindings(FIELDS_NO_FIRM_KEY) 실패 →
+        fetchFindings(LEGACY_FIELDS) 순서로 재시도한다(013 만 미적용/013·005 둘 다
+        미적용 라이브 모두 방어)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        chain = js_src[js_src.index("fetchFindings(FIELDS)"):js_src.index(".catch(function () {\n      showState(\"error\");")]
+        idx_full = chain.index("fetchFindings(FIELDS)")
+        idx_no_firm = chain.index("fetchFindings(FIELDS_NO_FIRM_KEY)")
+        idx_legacy = chain.index("fetchFindings(LEGACY_FIELDS)")
+        self.assertTrue(idx_full < idx_no_firm < idx_legacy)
+
+    def test_document_card_head_links_to_firm_profile_when_key_present(self):
+        """문서 카드 헤더 업체명은 firm_key(013)가 있으면 /findings/firm/?key= 링크,
+        없으면(013 미적용 라이브) 기존처럼 링크 없는 텍스트 그대로 렌더한다(방어)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildDocHead(rows)"):]
+        fn = fn[:fn.index("var meta = el(\"div\", \"fnd-doc-meta\")")]
+        self.assertIn("if (head.firm_key) {", fn)
+        self.assertIn(
+            'firmLink.href = "firm/index.html?key=" + encodeURIComponent(head.firm_key);',
+            fn,
+        )
+        self.assertIn("firmLink.textContent = head.firm_name;", fn)
+        # firm_key 없는 방어 폴백 경로 — 기존 계약(리터럴 el() 호출) 그대로 유지.
+        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', fn)
+
     def test_group_by_document_merges_same_raw_signal_id(self):
         """groupByDocument() 는 raw_signal_id 가 같은 행을 하나의 그룹으로 병합하고,
         raw_signal_id 가 없는 방어적 케이스는 홀로 자기 그룹을 이뤄 결과 누락 없이
@@ -1813,6 +1856,129 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("이 대시보드의 수치는 전체 ", fn)
         self.assertIn('건 기준 집계입니다."', fn)
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
+
+
+# ── 업체 프로파일 (FIND-FIRM-ALIAS 웹 절반 — 셸 렌더·env-gate·sitemap·nav 배선·
+#    013 미적용 방어 폴백) ──────────────────────────────────────────────────
+class WebFirmRenderTest(unittest.TestCase):
+    """findings/firm/index.html 은 findings/trends/index.html 과 동형인 정적 셸이다
+    (런타임에 firm.js 가 013_findings_firm_key.sql 의 findings_firm_profile RPC 를
+    URL 파라미터(?key=)로 직접 fetch). 여기선 셸 자체의 결정론·env-gate·배선·013 미적용
+    방어 폴백 마커만 검증한다 — 실제 집계/문서 이력 렌더는 firm.js 소관(비골든, JS
+    단위테스트 범위 밖)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firm_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "firm" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
+        cls.findings_html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_generated(self):
+        self.assertIn("업체 프로파일", self.html)
+        self.assertIn("Firm Profile", self.html)
+        self.assertIn("AI Disclosure", self.html)
+
+    def test_cfg_div_env_gated_empty_by_default_with_root(self):
+        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
+        # (findings.js/trends.js 계약과 동일). data-root 는 rel_root 값("../../")을 그대로
+        # 담는다(카테고리 바 → findings 검색 페이지 링크 계산용, trends.js 와 동일 패턴).
+        self.assertIn(
+            'id="grm-firm-cfg" data-url="" data-key="" data-root="../../" hidden',
+            self.html,
+        )
+
+    def test_firm_js_referenced_with_content_hash(self):
+        import re as _re
+        m = _re.search(r'assets/firm\.js\?v=([0-9a-f]{8})"', self.html)
+        self.assertIsNotNone(m, "firm.js 캐시버스팅 해시 미발견")
+
+    def test_firm_js_copied_verbatim(self):
+        built = (self.single / "assets" / "firm.js").read_bytes()
+        src = (WEB_DIR / "assets" / "firm.js").read_bytes()
+        self.assertEqual(built, src, "firm.js 가 dist 에 verbatim 복사되지 않음")
+
+    def test_sitemap_includes_firm_base_path_only(self):
+        # 쿼리스트링 기반 동적 조회 페이지라 베이스 경로 1건만 등록(개별 업체 URL 미등록).
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/firm/</loc>", self.sitemap)
+        self.assertEqual(self.sitemap.count("/findings/firm/"), 1)
+        self.assertNotIn("/findings/firm/?", self.sitemap)
+
+    def test_nav_not_added_entry_only_via_link(self):
+        # 요구사항: base.html nav 에 신규 탭을 추가하지 않는다(진입은 findings.js 의 문서
+        # 카드 업체명 링크로만) — nav 링크 개수가 findings/trends 페이지와 동일(4개)해야 함.
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertEqual(nav_m.group(1).count("<a "), 4)
+        self.assertNotIn("findings/firm", nav_m.group(1))
+
+    def test_canonical_and_description(self):
+        self.assertIn(
+            f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/firm/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_category_labels_sync_with_taxonomy(self):
+        """firm.js 의 CATEGORY_LABELS 는 findings.js/trends.js 와 동일한 복제본
+        하드코딩이라 grm_findings.FINDING_TAXONOMY 20개 code/label_ko/label_en 과
+        완전히 일치해야 한다(이중 하드코딩 드리프트 방지)."""
+        import re as _re
+
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
+        self.assertIsNotNone(m, "firm.js 에 CATEGORY_LABELS 정의 미발견")
+        body = m.group(1)
+
+        entry_pat = _re.compile(
+            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
+        )
+        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
+
+        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
+        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
+        self.assertEqual(found, expected, "firm.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
+
+    def test_rpc_endpoint_and_safe_contract_present(self):
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        self.assertIn('rpcEndpoint("findings_firm_profile")', js_src)
+        self.assertIn('method: "POST"', js_src)
+        self.assertIn('apikey: key, Authorization: "Bearer " + key', js_src)
+        self.assertIn('JSON.stringify({ p_firm_key: firmKey })', js_src)
+        # 원문(finding_text/finding_text_ko)은 RPC 가 아니라 별개 anon REST 로만 가져온다.
+        self.assertIn('"/rest/v1/findings?select="', js_src)
+        self.assertIn("raw_signal_id=eq.", js_src)
+
+    def test_defensive_states_present(self):
+        """013(firm_key generated 컬럼 + findings_firm_profile RPC) 미적용 라이브(RPC
+        404·network 실패)와 key 파라미터 없음/빈 프로파일(display_name "")을 서로 다른
+        상태로 구분해 처리하는지 소스 마커로 확인한다."""
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        self.assertIn('loadingEl.textContent = "업체 프로파일 준비 중입니다."', js_src)
+        self.assertIn('showState("notfound")', js_src)
+        self.assertIn('showState("error")', js_src)
+        self.assertIn("!(data.display_name || \"\")", js_src)
+        self.assertIn("function getFirmKeyParam()", js_src)
+        self.assertIn('업체 프로파일 준비 중입니다', self.html)
+        self.assertIn('해당 업체를 찾을 수 없습니다', self.html)
+
+    def test_no_innerhtml_data_injection(self):
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        import re as _re
+        for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_no_new_external_resources(self):
+        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        self.assertNotIn("cdn.", js_src)
+        self.assertNotIn("<canvas", self.html)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

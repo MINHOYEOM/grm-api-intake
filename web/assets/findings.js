@@ -81,14 +81,22 @@
   // [문서 중심 열람] raw_signal_id = 문서 정체성 키(002_findings.sql: findings.raw_signal_id
   // → raw_signals.raw_signal_id FK). anon RLS(003)는 행 필터만 있고 컬럼 제한이 없어
   // select 목록에 추가해도 무해하다 — 같은 문서의 지적사항을 그룹핑하는 데만 쓴다.
+  // [업체 프로파일 진입] firm_key = 013_findings_firm_key.sql 의 generated 컬럼(문서 카드
+  // 헤더 업체명 → /findings/firm/?key= 링크용). 013 이 라이브 DB 에 아직 적용되지 않았을
+  // 수 있으므로(방어 설계) FIELDS_NO_FIRM_KEY 로 한 단계 더 재시도한다 — raw_signal_id
+  // 폴백(005 미적용)과 독립적인 별개 실패 축이라 3단계 폴백 체인이 된다: FIELDS(전체) →
+  // FIELDS_NO_FIRM_KEY(013 미적용, 005 는 적용) → LEGACY_FIELDS(013·005 둘 다 미적용).
   var FIELDS = [
     "finding_id", "source", "agency", "document_id", "published_date",
-    "firm_name", "category_code", "category_label_ko", "finding_text",
+    "firm_name", "firm_key", "category_code", "category_label_ko", "finding_text",
     "finding_text_ko", "translation_method",
     "finding_language", "evidence_level", "evidence_url", "cfr_refs",
     "mfds_refs", "review_status", "confidence", "raw_signal_id",
   ];
-  var LEGACY_FIELDS = FIELDS.filter(function (f) {
+  var FIELDS_NO_FIRM_KEY = FIELDS.filter(function (f) {
+    return f !== "firm_key";
+  });
+  var LEGACY_FIELDS = FIELDS_NO_FIRM_KEY.filter(function (f) {
     return f !== "finding_text_ko" && f !== "translation_method";
   });
 
@@ -755,10 +763,27 @@
   // 문서 카드 헤더 — 업체명이 주인공(기존 .fnd-firm 과 동일한 세리프 규칙, 문서 단위라
   // 조금 더 크게), 소스·발행일·지적 건수는 보조 메타. 문서 내 모든 행이 firm_name/source/
   // published_date 를 공유하므로 대표값(rows[0])만 쓴다.
+  // [업체 프로파일 진입] head.firm_key(013_findings_firm_key.sql generated 컬럼)가 있으면
+  // 업체명을 /findings/firm/?key= 링크로 만든다 — findings/index.html 과 findings/firm/
+  // index.html 은 같은 findings/ 디렉터리의 부모·자식 경로라 rel_root 계산 없이
+  // "firm/index.html" 상대경로 하나로 충분하다. 013 미적용 라이브에서는 row 에 firm_key
+  // 가 아예 없으므로(방어) 링크 없이 기존 텍스트 그대로 렌더한다(하위호환).
   function buildDocHead(rows) {
     var head = rows[0];
     var docHead = el("div", "fnd-doc-head");
-    if (head.firm_name) docHead.appendChild(el("h2", "fnd-doc-firm", head.firm_name));
+    if (head.firm_name) {
+      if (head.firm_key) {
+        var h2 = document.createElement("h2");
+        h2.className = "fnd-doc-firm";
+        var firmLink = document.createElement("a");
+        firmLink.href = "firm/index.html?key=" + encodeURIComponent(head.firm_key);
+        firmLink.textContent = head.firm_name;
+        h2.appendChild(firmLink);
+        docHead.appendChild(h2);
+      } else {
+        docHead.appendChild(el("h2", "fnd-doc-firm", head.firm_name));
+      }
+    }
     var meta = el("div", "fnd-doc-meta");
     if (head.source) meta.appendChild(el("span", "fnd-b", head.source));
     if (head.published_date) meta.appendChild(el("span", "fnd-doc-date", head.published_date));
@@ -1122,10 +1147,15 @@
   fetchFindings(FIELDS)
     .then(function (r) {
       if (r.ok) return r.json();
-      // 005(finding_text_ko/translation_method) 미적용 라이브 DB 대비 legacy FIELDS 재시도.
-      return fetchFindings(LEGACY_FIELDS).then(function (r2) {
-        if (!r2.ok) throw new Error("findings fetch " + r2.status);
-        return r2.json();
+      // 013(firm_key) 미적용 라이브 DB 대비 1차 재시도(firm_key 만 제외).
+      return fetchFindings(FIELDS_NO_FIRM_KEY).then(function (r2) {
+        if (r2.ok) return r2.json();
+        // 013·005(finding_text_ko/translation_method) 둘 다 미적용 라이브 DB 대비
+        // 최종 legacy FIELDS 재시도.
+        return fetchFindings(LEGACY_FIELDS).then(function (r3) {
+          if (!r3.ok) throw new Error("findings fetch " + r3.status);
+          return r3.json();
+        });
       });
     })
     .then(function (data) {

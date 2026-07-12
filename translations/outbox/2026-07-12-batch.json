@@ -1,0 +1,602 @@
+[
+  {
+    "finding_id": "finding-0a1df74ab174e17188c68719",
+    "finding_text": "The responsibilities and procedures applicable to the quaJity unit are not in writing and fully followed.",
+    "finding_text_ko": "품질 부서(quality unit)에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3872fd021f212ef21cd4ec89",
+    "finding_text": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
+    "finding_text_ko": "배치 또는 그 구성 성분이 규격(specifications)을 충족하지 못한 사례에 대한 조사 기록에 결론 및 후속 조치(follow-up)가 항상 포함되어 있지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67aaecc400cc54032c82ea1a",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역이 환경 조건 모니터링 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e64ac7b349e87392bc74f50",
+    "finding_text": "Equipment used in the manufacture, processing, packing, or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 원활히 수행하기에 적절한 설계로 되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a2a6921f8a297b16c0f2f47f",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic) 및 멸균공정(sterilization)에 대한 적절한 밸리데이션(validation)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a7c1faf60091c6e95586810d",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product.",
+    "finding_text_ko": "공정 중 물질(in-process material) 및 의약품 특성의 변동(variability)을 유발할 수 있는 제조공정의 산출물을 모니터링하고 그 성능을 밸리데이션하는 관리 절차가 확립되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f92727bfaadbdd21c8cb562c",
+    "finding_text": "Master production and control records lack complete manufacturing and control instructions.",
+    "finding_text_ko": "기준 제조 및 관리 기록서(master production and control records)에 완전한 제조 및 관리 지시가 누락되어 있었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb51718e46691ebddf671ca6",
+    "finding_text": "The number of containers and amount of material taken from each container is not based upon appropriate criteria.",
+    "finding_text_ko": "각 용기에서 채취하는 용기 수 및 물질의 양이 적절한 기준(criteria)에 근거하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e34636dd4b7a3cf51fec271",
+    "finding_text": "Drugs Introduced or Delivered for Introduction into Interstate Commerce Without an Approved Application in Violation of Sections 505(a) and 301(d) of the FD&C Act Certain products offered for sale by www.ketaminetrochestore.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or…",
+    "finding_text_ko": "FD&C Act 제505(a)조 및 제301(d)조 위반 — 승인된 신청(approved application) 없이 주간(州間) 거래(interstate commerce)로 반입되거나 반입을 위해 인도된 의약품. www.ketaminetrochestore.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 …에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1ed16b2b1f2355f523566bb8",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-289724d3d7d4d89c871687b3",
+    "finding_text": "Certain products offered for sale by www.ketdaxandrugs.org are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe and…",
+    "finding_text_ko": "www.ketdaxandrugs.org이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2afe0958da600bfdf03efb19",
+    "finding_text": "Drugs Introduced or Delivered for Introduction into Interstate Commerce Without an Approved Application in Violation of Sections 505(a) and 301(d) of the FD&C Act Certain products offered for sale by www.ketaminestore.org are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function…",
+    "finding_text_ko": "FD&C Act 제505(a)조 및 제301(d)조 위반 — 승인된 신청(approved application) 없이 주간(州間) 거래(interstate commerce)로 반입되거나 반입을 위해 인도된 의약품. www.ketaminestore.org이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 …에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-44507b33db2a9e693aa6d646",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-47a560a35da95026eb19bbc6",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-486407871ca8dd1248f27dbd",
+    "finding_text": "Your ketamine powder is also misbranded under section 502(f)(1) of the FD&C Act (21 U.S.C. 352(f)(1)), in that its labeling fails to bear adequate directions for its intended use(s). “Adequate directions for use” means directions under which a layman can use a drug safely and for the purposes for which it is intended (21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1)(A) of the FD&C Act (21 U.S.C. 353(b)(1)(A)), include those that, because of their toxicity…",
+    "finding_text_ko": "귀사의 케타민 분말(ketamine powder)은 그 표시(labeling)에 의도된 용도에 대한 적절한 사용지침이 기재되어 있지 않으므로 FD&C Act 제502(f)(1)조(21 U.S.C. 352(f)(1))에 따라 허위표시(misbranded)에도 해당한다. \"적절한 사용지침\"이란 일반인(layman)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5). FD&C Act 제503(b)(1)(A)조(21 U.S.C. 353(b)(1)(A))에서 정의하는 처방의약품(prescription drugs)에는 그 독성으로 인하여…한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-546a31de8951f2897a2da25c",
+    "finding_text": "Certain products offered for sale by www.extramedication.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe…",
+    "finding_text_ko": "www.extramedication.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67addaa5eb8b01cbf253c10b",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6b2af59c409e154ae79e2b03",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d6f82a5ec20bbf7cff73d8f",
+    "finding_text": "Certain products offered for sale by www.legitketaminesuppliers.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as…",
+    "finding_text_ko": "www.legitketaminesuppliers.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6f778cdeaba268b50be7a9de",
+    "finding_text": "Certain products offered for sale by www.ketacynpharma.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe and…",
+    "finding_text_ko": "www.ketacynpharma.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7656e75e29a51d197400d5b6",
+    "finding_text": "Certain products offered for sale by www.medshopinc.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe and…",
+    "finding_text_ko": "www.medshopinc.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8059dc9f1420080b9a2e33f9",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-82a3fdb61fb870185ac93cc5",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-89d842dd08e6cbaa3bf2c55e",
+    "finding_text": "Certain products offered for sale by www.ketamedlab.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe and…",
+    "finding_text_ko": "www.ketamedlab.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0bbcc1ab0f7bcbbd49e5bc8",
+    "finding_text": "Certain products offered for sale by www.arylcyclohexylamine.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as…",
+    "finding_text_ko": "www.arylcyclohexylamine.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc0512991011e5f5fa014050",
+    "finding_text": "Drugs Introduced or Delivered for Introduction into Interstate Commerce Without an Approved Application in Violation of Sections 505(a) and 301(d) of the FD&C Act Certain products offered for sale by www.buyketaonline.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function…",
+    "finding_text_ko": "FD&C Act 제505(a)조 및 제301(d)조 위반 — 승인된 신청(approved application) 없이 주간(州間) 거래(interstate commerce)로 반입되거나 반입을 위해 인도된 의약품. www.buyketaonline.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bcc5a4ffbf5046aec288fcb4",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bd39fd13e3c95063a99104d3",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c6397dcd46180ff964777323",
+    "finding_text": "Certain products offered for sale by www.allketaminehcl.com are drugs within the meaning of section 201(g) of the FD&C Act (21 U.S.C. 321(g)) because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease and/or because they are intended to affect the structure or function of the body. These drugs are also new drugs as defined by section 201(p) of the FD&C Act (21 U.S.C. 321(p)), because they are not generally recognized as safe and…",
+    "finding_text_ko": "www.allketaminehcl.com이(가) 판매하는 특정 제품은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)조(21 U.S.C. 321(g))에서 정의하는 의약품(drug)에 해당한다. 또한 이들 의약품은 안전하다고 일반적으로 인정되지 않으므로(not generally recognized as safe and…) FD&C Act 제201(p)조(21 U.S.C. 321(p))에서 정의하는 신약(new drug)에도 해당한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d7c47e2b99156168a8baecf3",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc6c773a864a9a98184d9535",
+    "finding_text": "Based on a review of your website, your ketamine powder is a drug under section 201(g)(1) of the FD&C Act (21 U.S.C. 321(g)(1)), because it is intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease, and/or intended to affect the structure or any function of the body. 4 Examples from your website labeling that provide evidence of the intended use (as defined in 21 Code of Federal Regulations (CFR) 201.128) of this product as a drug include…",
+    "finding_text_ko": "귀사 웹사이트 검토 결과, 귀사의 케타민 분말은 질병의 진단·치료·완화·처치 또는 예방에 사용될 의도이거나 신체의 구조 또는 어떠한 기능에 영향을 미칠 의도이므로 FD&C Act 제201(g)(1)조(21 U.S.C. 321(g)(1))에 따른 의약품(drug)에 해당한다. 이 제품이 의약품으로서 의도된 용도(21 CFR 201.128에서 정의)임을 입증하는 귀사 웹사이트 표시(labeling)의 예로는 다음이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f2f11782acc9afbfd8294752",
+    "finding_text": "A drug is misbranded under section 502(f)(1) of the FD&C Act if its labeling fails to bear adequate directions for use. \"Adequate directions for use\" means directions under which a layperson can use a drug safely and for the purposes for which it is intended (see 21 CFR 201.5). Prescription drugs, as defined in section 503(b)(1) of the FD&C Act include those that, because of their toxicity or other potentiality for harmful effect, or the method of their use, or the…",
+    "finding_text_ko": "의약품의 표시(labeling)에 적절한 사용지침(adequate directions for use)이 기재되어 있지 않으면 해당 의약품은 FD&C Act 제502(f)(1)조에 따라 허위표시(misbranded)에 해당한다. \"적절한 사용지침\"이란 일반인(layperson)이 의약품을 안전하게, 또한 의도된 목적에 맞게 사용할 수 있는 지침을 의미한다(21 CFR 201.5 참조). FD&C Act 제503(b)(1)조에서 정의하는 처방의약품(prescription drugs)에는 그 독성이나 기타 유해작용의 가능성, 사용 방법, 또는 …로 인하여 …한 의약품이 포함된다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0c6598abd63d3faf57011a56",
+    "finding_text": "Your facility is not maintained in a good state of repair, creating insanitary conditions whereby drug products may be contaminated with filth.",
+    "finding_text_ko": "귀사의 시설이 양호한 보수 상태로 유지되지 않아, 의약품이 오물(filth)로 오염될 수 있는 비위생적(insanitary) 상태가 초래되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ab4e3d27348680a83ef3685b",
+    "finding_text": "Your firm failed to confirm that the quality of water was suitable for its intended use in the production of non-sterile drug products.",
+    "finding_text_ko": "귀사는 비무균(non-sterile) 의약품 생산에 사용되는 용수의 품질이 의도된 용도에 적합한지 확인하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e4794e62aecfa6ca994140fe",
+    "finding_text": "Hazardous drugs were produced without providing adequate containment segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.",
+    "finding_text_ko": "교차오염(cross-contamination)을 방지하기 위한 적절한 격리(containment segregation) 및/또는 작업 표면·기구·작업자의 세척을 제공하지 않은 채 위험 의약품(hazardous drugs)이 제조되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0601c9d1b8a9cd98f2f14e73",
+    "finding_text": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 관한 문서화된 절차가 확립·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11380ccc03b94a621cfa9cfd",
+    "finding_text": "Strict control is not exercised over labeling issued for use in drug product labeling operations.",
+    "finding_text_ko": "의약품 표시(labeling) 작업에 사용하기 위해 불출된 표시자재에 대한 엄격한 관리가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11fb92ef9f600b1bfb2d27f6",
+    "finding_text": "The written stability testing program is not followed.",
+    "finding_text_ko": "문서화된 안정성 시험 프로그램(stability testing program)이 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1c62515eeae1155573c08631",
+    "finding_text": "Production areas have difficult to clean or contain porous, particle generating, or visibly dirty equipment or surfaces.",
+    "finding_text_ko": "생산 구역에 세척이 어렵거나, 다공성이거나, 입자를 발생시키거나, 육안상 오염된 설비 또는 표면이 존재하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2fe9f58c2c7ea80836f8fbfc",
+    "finding_text": "The written stability program for drug products does not include reliable, meaningful and specific test methods.",
+    "finding_text_ko": "의약품에 대한 문서화된 안정성 프로그램(stability program)에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-41796471c7e9fa5c2225f0e1",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리 부서(quality control unit)에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-45157c290b33a6842d1a5ae0",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리(laboratory controls)에, 공정 중 물질 및 의약품이 확인시험(identity)·함량(strength)·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 규격 및 시험절차의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4e005fcade1a87edd07acc8f",
+    "finding_text": "Drug products failing to meet established specifications and quality control criteria are not rejected.",
+    "finding_text_ko": "설정된 규격 및 품질관리 기준을 충족하지 못한 의약품이 부적합 처리(reject)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-72dc26e2ea2109920b57f032",
+    "finding_text": "Use of non-sterile disinfecting agents in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에서 비멸균(non-sterile) 소독제를 사용하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-849e4910b63629d428de4055",
+    "finding_text": "Smoke studies were inadequately performed under dynamic conditions.",
+    "finding_text_ko": "동적 조건(dynamic conditions)에서의 연막 시험(smoke study)이 부적절하게 수행되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8576941296a1c9fe16f42ecc",
+    "finding_text": "No measurement of room pressure differentials was observed during operations to demonstrate proper airflow.",
+    "finding_text_ko": "적절한 기류를 입증하기 위한 실내 차압(room pressure differentials) 측정이 작업 중 수행되는 것이 관찰되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a3a286521c08017869a1e583",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 확립·문서화·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ce80152860bfcda7dccbf0e9",
+    "finding_text": "Failure to appropriately and regularly clean and disinfect or sterilize equipment located in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에 위치한 설비를 적절하고 정기적으로 세척·소독 또는 멸균하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cf2615ecd4a327028e22ea07",
+    "finding_text": "Your outsourcing facility compounds drug products using bulk drug substances that cannot be used in compounding under section 503B of the Federal Food, Drug, and Cosmetic Act (FD&C Act) because they (a) are not used to compound drug products that appear on the drug shortage list in effect under section 506E of the Act and (b) do not appear on a list developed by FDA of bulk drug substances for which there is a clinical need.",
+    "finding_text_ko": "귀사의 외주조제 시설(outsourcing facility)은, (a) Act 제506E조에 따라 시행 중인 의약품 공급부족 목록(drug shortage list)에 등재된 의약품을 조제하는 데 사용되지 않고 (b) 임상적 필요성이 있는 원료의약품으로서 FDA가 작성한 목록에도 등재되어 있지 않아 연방식품의약품화장품법(FD&C Act) 제503B조에 따라 조제에 사용할 수 없는 원료의약품(bulk drug substances)을 사용하여 의약품을 조제하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d9a4c833c9c563bf6bf832e1",
+    "finding_text": "Inadequate routine environmental monitoring in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에서의 일상적 환경 모니터링(environmental monitoring)이 부적절하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e015c9eced295b296e8c4715",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리 부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e0a11d3d5a84e7bde92f90a7",
+    "finding_text": "Lack of disinfection of supplies at each transition from areas of lower quality air to areas of higher quality air.",
+    "finding_text_ko": "낮은 청정도의 공기 구역에서 높은 청정도의 공기 구역으로 이동하는 각 단계에서 물품에 대한 소독이 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fcbd67e98b2b345a5dc27a1b",
+    "finding_text": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions.",
+    "finding_text_ko": "최악의 경우이자 가장 까다롭고 부담이 큰 조건에서 무균 생산 작업을 밀접하게 모사하는 배지충전(media fill)을 수행하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-06e7c1b0160fb985f3785e33",
+    "finding_text": "Batch production and control records do not include complete info1mation relating to the production and control of each batch.",
+    "finding_text_ko": "배치 제조 및 관리 기록서에 각 배치의 제조 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-386b7af7dea837e9cdfd69b1",
+    "finding_text": "Equipment surfaces that contact components and in-process materials ai·e reactive, additive or absorptive so as to alter the safety, identity, strength, quality, or purity of the di11g product beyond the official or other established requirements.",
+    "finding_text_ko": "구성 성분 및 공정 중 물질과 접촉하는 설비 표면이 반응성·부가성 또는 흡착성을 지녀, 의약품의 안전성·확인시험·함량·품질 또는 순도를 공정서 또는 기타 설정된 요건을 벗어나도록 변화시켰다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-63a0749089c0dad2dc8b9295",
+    "finding_text": "The quality control unit lacks authority to review production records to assure that no e1Tors have occu1Ted and fully investigate e1Tors that have occmTed.",
+    "finding_text_ko": "품질관리 부서가 오류가 발생하지 않았음을 보증하기 위해 제조 기록을 검토하고, 발생한 오류를 충분히 조사할 권한을 갖고 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64b9d68c621870a86dd65b51",
+    "finding_text": "Procedures for the cleaning and maintenance of equipment ai·e deficient regai·ding the protection of clean equipment from contamination prior to use.",
+    "finding_text_ko": "설비의 세척 및 유지관리 절차가 세척된 설비를 사용 전 오염으로부터 보호하는 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-976904b07d72c6d90f703d64",
+    "finding_text": "Buildings used in the manufacture, processing, packing or holding of diug products are not maintained in a clean and sanitaiy condition and free of infestation by rodents, birds insects, and other vennin.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 건물이 청결하고 위생적인 상태로 유지되지 않았으며, 설치류·조류·곤충 및 기타 해충의 침입이 없는 상태로 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9fead26f3b4c21a93428330d",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리 부서(quality control unit)에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a1bbabac01a74d940b1338a8",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been ah eady distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(unexplained discrepancy)를 철저히 검토하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cbf2809ebb78502c79a17767",
+    "finding_text": "Written procedures are not established and followed for evaluations conducted at least annually to review records associated with a representative number of batches, whether approved or rejected.",
+    "finding_text_ko": "승인 또는 부적합 여부와 관계없이 대표성 있는 수의 배치와 관련된 기록을 검토하기 위해 최소 연 1회 수행하는 평가에 관한 문서화된 절차가 확립·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de675963b9bc2a5ad3119b9a",
+    "finding_text": "Dmg product production and control records, are not reviewed and approved by the quality control unit to dete1mine compliance with all established, approved written procedures before a batch is released or distributed.",
+    "finding_text_ko": "의약품 제조 및 관리 기록서가 배치 출하 또는 유통 전에 확립·승인된 모든 문서화된 절차의 준수 여부를 판정하기 위해 품질관리 부서에 의해 검토·승인되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-df1bdde0165990fceaa1ceec",
+    "finding_text": "Your fum failed to establish adequate written procedures for production and process controls designed to assure that the chug products have the identity, strength, purity, and quality that they are purpolied or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방되거나 나타내는 확인시험(identity)·함량(strength)·순도·품질을 갖추도록 보증하기 위한 제조 및 공정관리에 관한 적절한 문서화된 절차를 확립하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-254be2c37f7e5393ac3052ca",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdmg products purp01ting to be sterile did not include adequate validation of the aseptic process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션(validation)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-272c1c69569d08cc61f30c6e",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역이 무균 상태를 조성하기 위한 실내 및 설비의 세척·소독 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-350cdbb9fb97e4bed7cecd15",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdmg products purp01ting to be sterile are not established.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 확립되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42a9812ead93a13cc181e8f5",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any ofits components to meet any ofits specifications whether or not the batch has been already distiibuted.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치 및 배치 또는 그 구성 성분이 규격을 충족하지 못한 사례를 철저히 검토하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5ab992077bc68a25acea5edd",
+    "finding_text": "Written procedures ai·e not followed for evaluations conducted at least aimually to review records associated with a representative number ofbatches, whether approved or rejected.",
+    "finding_text_ko": "승인 또는 부적합 여부와 관계없이 대표성 있는 수의 배치와 관련된 기록을 검토하기 위해 최소 연 1회 수행하는 평가에 관한 문서화된 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-648323af727e3453c9478a98",
+    "finding_text": "Approp1iate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records ai·e instituted only by authorized personnel.",
+    "finding_text_ko": "기준 제조 및 관리 기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7dbf7053484bb751dffa4018",
+    "finding_text": "Records ai·e not kept for the maintenance and inspection ofequipment.",
+    "finding_text_ko": "설비의 유지관리 및 점검에 대한 기록이 보관되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b937bbb27dbd7448a97fafe9",
+    "finding_text": "Written procedures are not established that describe the in-process controls and examinations to be conducted on approp1iate samples ofin-process materials ofeach batch.",
+    "finding_text_ko": "각 배치의 공정 중 물질의 적절한 시료에 대해 수행할 공정 중 관리(in-process controls) 및 검사를 기술한 문서화된 절차가 확립되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e9361db93a8a78fbae9e1e8b",
+    "finding_text": "Aseptic processing ai·eas are deficient in that floors, walls and ceilings ai·e not smooth and/or hard swfaces that ai·e easily cleanable.",
+    "finding_text_ko": "무균공정 구역이 바닥·벽 및 천장이 매끄럽지 않거나 세척이 용이한 견고한 표면이 아니라는 점에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f1aa137a27e732f916a9a99d",
+    "finding_text": "Aseptic processing ai·eas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역이 환경 조건 모니터링 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-117074761840e61d179b928e",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, sampling plans and test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에, 구성 성분·공정 중 물질 및 의약품이 확인시험·함량·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 규격·기준·시료채취 계획(sampling plan) 및 시험절차의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4ecf560e176c5fa5d49901e8",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(unexplained discrepancy)를 철저히 검토하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-54b510d6a932e235427d067a",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치 및 배치 또는 그 구성 성분이 규격을 충족하지 못한 사례를 철저히 검토하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d99e28eb97c87561cb49895",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방되거나 나타내는 확인시험(identity)·함량(strength)·순도·품질을 갖추도록 보증하기 위한 제조 및 공정관리에 관한 적절한 문서화된 절차를 확립하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a35ed3d89db174214e267e25",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 확립·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3ae37af4d8d2645813ce967",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에, 의약품이 확인시험·함량·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 규격의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3b06276049b5482942ee796",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역이 환경 조건 모니터링 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e468c68e00d915ebb5af975d",
+    "finding_text": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 관한 문서화된 절차가 확립·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-121ddc7712307255dd83f49f",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purpo rting to be sterile did not include adequate validation of the aseptic process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션(validation)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-21706e832a13d7cdc23dedaa",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions.",
+    "finding_text_ko": "무균공정 구역이 무균 상태를 관리하는 데 사용되는 설비를 유지관리하기 위한 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-312d3a1c44459913862b14d3",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examination and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "시험실 기록에 설정된 규격 및 기준의 준수를 보증하는 데 필요한 모든 시험·검사 및 정량(assay)에서 도출된 완전한 데이터가 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42290e6bf690cbf9a83c080d",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile are not fully established or followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 완전히 확립되거나 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7ff3365632a4da804825d0e5",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역이 무균 상태를 조성하기 위한 실내 및 설비의 세척·소독 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8273f3d19b5c47a59d50300e",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that components and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에, 구성 성분 및 의약품이 확인시험·함량·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 규격 및 시험절차의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-84fa6dfdb21100095fd6298b",
+    "finding_text": "Written procedures for production and process controls designed to assure that the drug product has the identity, strength, purity, and quality that they are purported or represented to possess are not fully established or followed.",
+    "finding_text_ko": "의약품이 표방되거나 나타내는 확인시험·함량·순도 및 품질을 갖추도록 보증하기 위한 제조 및 공정관리에 관한 문서화된 절차가 완전히 확립되거나 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-89d9d08827b0b384a958787a",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역이 환경 조건 모니터링 시스템 측면에서 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aae37385619bf7c130ad6f4f",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+    "finding_text_ko": "배치 제조 및 관리 기록서에 각 배치의 제조 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4511c47c0e2f8f000639773",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate standards designed to assure that components and in-process materials confonn to appropriate standards of identity, strength, quality, and purity: e),f)LO'fEE1S) s,:;;N,\\ Tl.RE ~j -1/J, };...",
+    "finding_text_ko": "시험실 관리에, 구성 성분 및 공정 중 물질이 확인시험·함량·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 기준의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb03cc09add6f1588e1aabc7",
+    "finding_text": "The responsibilities and procedures applicable to the Quality Unit are inadequate: A.",
+    "finding_text_ko": "품질 부서(Quality Unit)에 적용되는 책임과 절차가 부적절하였다: A.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dcf1a6bb9a66add4e13354b9",
+    "finding_text": "There is a failure to submit a field alert report (FAR) to FDA within 3 working days of receiving information concerning bacteriological contamination in the distributed drug product.",
+    "finding_text_ko": "유통된 의약품의 세균 오염(bacteriological contamination)에 관한 정보를 입수한 후 3 영업일 이내에 FDA에 현장경보보고서(field alert report, FAR)를 제출하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e1c91f608cb1f8111d750822",
+    "finding_text": "Adequate procedural controls were not established to protect the electronic data acquisition and process control systems used for the manufacturing ofj (b)(4ps and DP in your manufacturing facility.",
+    "finding_text_ko": "귀사 제조시설에서 (b)(4) 및 완제의약품(DP) 제조에 사용되는 전자 데이터 수집 및 공정관리 시스템을 보호하기 위한 적절한 절차적 관리(procedural controls)가 확립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-faee89e0aad4d2ac83b15252",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 확립·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-03def61d9acb28ec95654ecd",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에, 의약품이 확인시험·함량·품질·순도의 적절한 기준에 부합함을 보증하기 위한 과학적으로 타당하고 적절한 시험절차의 설정이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-25f71ed86520fd9414a7b33c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션(validation)이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-458d38f79a14c2d406d99fe8",
+    "finding_text": "The stability program SOP \"FDBT-SOP-0405 (revision 10)\" is not being followed.",
+    "finding_text_ko": "안정성 프로그램 SOP \"FDBT-SOP-0405 (revision 10)\"이 준수되지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-49a3a043f7a6113f31abf655",
+    "finding_text": "_Envlmnmeptal monitoring (EM) of classified processing areas in your[ (b><j acility for the (b)( >jntermediate manufacturing operations is deficient.",
+    "finding_text_ko": "귀사 (b)(4) 시설에서 (b)(4) 중간체(intermediate) 제조 작업을 위한 등급 지정 공정 구역(classified processing areas)의 환경 모니터링(EM)이 미흡하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4acc9574f490792fe840a0ee",
+    "finding_text": "Your cleaning and sanitization program is deficient in preventing potential contamination in the controlled drug substance manufacturing areas.",
+    "finding_text_ko": "귀사의 세척 및 위생관리(sanitization) 프로그램이 관리 대상 원료의약품(drug substance) 제조 구역에서의 잠재적 오염을 방지하는 데 미흡하였다.",
+    "translation_method": "llm_assisted"
+  }
+]

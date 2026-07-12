@@ -1156,14 +1156,19 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_clear_all_filters_resets_sort_and_relies_on_render_for_url_clear(self):
         """[M15] #fnd-reset 버튼은 제거됐다 — "모두 지우기"는 clearAllFilters() 가 담당하며
-        sort 도 기본값(date_desc)으로 되돌리고, querystring 은 render()의 syncStateToUrl()
-        이 기본 state 를 반영해 자동으로 비운다(별도 URL clear 불필요)."""
+        sort 도 기본값(date_desc)으로 되돌린다. [문서 단위 페이지네이션] 전체 초기화는
+        currentPage=1 로 되돌리고 goToPage(1) 로 재렌더하며(goToPage → render()), 그
+        render()의 syncStateToUrl() 이 기본 state 를 반영해 querystring 을 자동으로 비운다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function clearAllFilters()", js_src)
-        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 300]
+        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 320]
         self.assertIn('sort: "date_desc"', fn_block)
         self.assertIn("syncControlsFromState()", fn_block)
-        self.assertIn("render()", fn_block)
+        self.assertIn("currentPage = 1", fn_block)
+        self.assertIn("goToPage(1)", fn_block)
+        # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
+        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 400]
+        self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
         """[M15] 적용 필터 칩 각각은 클릭 시 해당 조건만 해제(clearActiveFilter)하고,
@@ -1470,17 +1475,19 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_group_by_document_preserves_sort_order_no_extra_fetch(self):
         """문서 순서는 matched(정렬 완료) 배열에서 그 문서의 첫 지적사항이 나타나는
-        위치를 그대로 따른다(재정렬 없음) — 카테고리/기관 필터로 일부 obs만 fetch돼도
-        추가 fetch 없이 그 obs들이 속한 문서 카드 아래 그대로 그룹핑된다."""
+        위치를 그대로 따른다(재정렬 없음). [문서 단위 페이지네이션] 필터/정렬/검색어
+        변경은 wire() 안에서 currentPage 를 1로 리셋한 뒤 goToPage(1) 을 호출할 뿐이다
+        — wire() 함수 본문 자체는 fetchFindings 를 직접 호출하지 않는다(흔한 경우
+        goToPage(1) 이 이미 로드된 ROWS 만으로 동기적으로 끝나 새 네트워크 요청이
+        없다 — 결과가 희소한 필터일 때만 ensurePageReady() 가 추가 청크를 당길 수
+        있다는 점은 별도 스코프 주석 참조)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("var matched = sortRows(ROWS.filter(matches));", js_src)
         self.assertIn("var docs = groupByDocument(matched);", js_src)
-        # 필터 select 의 change 핸들러(SELECT_FACETS 배선)는 render() 만 재호출할 뿐,
-        # fetchFindings 를 호출하지 않는다 — 필터/그룹핑은 이미 로드된 ROWS 위에서만
-        # 클라이언트 재계산되고, 새 네트워크 요청은 발생하지 않는다.
         wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint")]
         self.assertNotIn("fetchFindings", wire_fn)
-        self.assertIn("render();", wire_fn)
+        self.assertIn("currentPage = 1", wire_fn)
+        self.assertEqual(wire_fn.count("goToPage(1)"), 3, "셀렉트·정렬·검색어 3개 핸들러 모두 goToPage(1) 호출해야 함")
 
     def test_document_card_reuses_existing_observation_card_render(self):
         """문서 카드는 새 observation 렌더를 만들지 않고 기존 buildCard() 를 그대로
@@ -1512,27 +1519,33 @@ class WebFindingsRenderTest(unittest.TestCase):
         for m in _re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', js_src):
             self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
 
-    def test_result_count_line_shows_document_and_finding_dual_count(self):
-        """결과 요약 줄(#fnd-count)은 "N건" 단일 표기가 아니라 "문서 X건 · 지적 Y건"
-        이중 표기여야 한다 — X=groupByDocument() 결과 문서 수, Y=observation(matched) 수."""
+    def test_result_count_line_shows_document_finding_and_page_summary(self):
+        """[문서 단위 페이지네이션] 결과 요약 줄(#fnd-count)은 "전체 N문서 · M지적 ·
+        페이지 X / Y" 형태여야 한다 — N=groupByDocument() 결과 문서 수, M=observation
+        (matched) 수, X=현재 페이지, Y=지금까지 알려진 총 페이지 수."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        render_fn = js_src[js_src.index("function render() {"):]
-        self.assertIn('bDocs.textContent = docs.length.toLocaleString("ko-KR");', render_fn[:1500])
-        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR");', render_fn[:1500])
-        self.assertIn('countEl.appendChild(document.createTextNode("문서 "));', render_fn[:1500])
-        self.assertIn('countEl.appendChild(document.createTextNode("건 · 지적 "));', render_fn[:1500])
+        start = js_src.index("function render() {")
+        render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
+        self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode("전체 "));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode("문서 · "));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode("지적 · 페이지 "));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode(" / "));', render_fn)
         self.assertNotIn('countEl.appendChild(document.createTextNode("총 "));', js_src)
 
     def test_result_count_line_all_numbers_use_locale_string(self):
-        """[콤마 통일] 카운트 줄(전량 로드 분기 + 부분 로드 분기) 어디에도 순수 숫자를
-        콤마 없이 넣는 String(docs.length)/String(matched.length) 표기가 남아있으면
-        안 된다 — 전부 toLocaleString('ko-KR') 로 통일(전량 로드시 "지적 1926건"처럼
-        콤마가 빠지던 회귀 방지)."""
+        """[콤마 통일] 카운트 줄의 문서수·지적수·총 페이지수는 모두 toLocaleString
+        ('ko-KR') 로 천단위 콤마를 붙인다(현재 페이지 번호만은 순수 정수라 콤마 대상이
+        아니다) — String(totalDocsKnown)/String(matched.length) 처럼 콤마 없는 표기가
+        남아있으면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertNotIn("String(docs.length)", render_fn)
+        self.assertNotIn("String(totalDocsKnown)", render_fn)
         self.assertNotIn("String(matched.length)", render_fn)
-        self.assertIn('bDocs2.textContent = docs.length.toLocaleString("ko-KR");', render_fn)
+        self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = matched.length.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bTotal.textContent = String(totalPagesKnown)', render_fn)
 
     def test_document_card_head_markers_and_css_present(self):
         """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
@@ -1555,18 +1568,41 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(".fnd-doc{", findings_html_src)
         self.assertIn(".fnd-doc-toggle{", findings_html_src)
 
-    # ── [페이지네이션] 더 보기 + 서버 정확 카운트 ─────────────────────────────────
-    def test_load_more_button_shell_present_hidden_and_defensive_lookup(self):
-        """정적 셸은 라벨 없는 hidden 버튼만 렌더(골든 결정론) — 문구/노출은
-        findings.js 가 SERVER_TOTAL/ROWS 기준으로 채운다. 엘리먼트 부재(구버전 셸)에서도
-        hasDash 관례와 동형으로 조용히 no-op 이어야 한다."""
+    # ── [문서 단위 페이지네이션] 이전/다음+페이지 번호 + 점진 로드 + 서버 정확 카운트 ──────
+    def test_pager_shell_present_hidden_and_defensive_lookup(self):
+        """정적 셸은 빈 hidden <nav> 만 렌더(골든 결정론) — 이전/다음·페이지 번호·처음/끝
+        버튼은 findings.js 의 renderPager() 가 채운다. 상단(#fnd-pager-top)·하단
+        (#fnd-pager-bottom) 둘 다 존재해야 하고, 엘리먼트 부재(구버전 셸)에서도 hasDash
+        관례와 동형으로 조용히 no-op 이어야 한다."""
         self.assertIn(
-            '<div class="fnd-load-more-wrap"><button class="fnd-load-more" id="fnd-load-more" type="button" hidden></button></div>',
+            '<nav class="fnd-pager" id="fnd-pager-top" aria-label="검색 결과 페이지 이동" hidden></nav>',
+            self.html,
+        )
+        self.assertIn(
+            '<nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>',
             self.html,
         )
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('document.getElementById("fnd-load-more")', js_src)
-        self.assertIn("if (!loadMoreBtn) return;", js_src)
+        self.assertIn('document.getElementById("fnd-pager-top")', js_src)
+        self.assertIn('document.getElementById("fnd-pager-bottom")', js_src)
+        # renderPager()/setPagerLoading()/hidePager() 전부 [pagerTopEl, pagerBottomEl] 를
+        # forEach 로 순회하며 개별 null 체크한다(부재 시 조용히 no-op).
+        self.assertIn("[pagerTopEl, pagerBottomEl].forEach(function (nav) {\n      if (!nav) return;", js_src)
+
+    def test_inline_load_more_button_removed_from_search_row(self):
+        """[문서 단위 페이지네이션] 옛 카운트 줄 옆 인라인 "더 보기" 버튼(#fnd-load-more-top
+        의 구버전 — 검색창 행 안에 있던 작은 알약형 버튼)은 완전히 제거됐다. 검색 결과
+        페이지 이동은 이제 #fnd-pager-top/#fnd-pager-bottom 전체 페이지네이션 바가
+        담당한다."""
+        self.assertNotIn("fnd-load-more-inline", self.html)
+        self.assertNotIn("fnd-load-more-wrap", self.html)
+        self.assertNotIn('id="fnd-load-more"', self.html)
+        m_search = self.html.index('<div class="fnd-search">')
+        m_close = self.html.index("</div>", m_search)
+        self.assertIn(
+            '<div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>',
+            self.html[m_search:m_close + 6],
+        )
 
     def test_content_range_prefer_header_and_parsing(self):
         """서버 exact count 확보 — fetch 헤더에 Prefer: count=exact 를 실어 보내고,
@@ -1582,30 +1618,37 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(r"/\/(\d+)$/", fn)
         self.assertIn("return isNaN(n) ? null : n;", fn)
 
-    def test_load_more_endpoint_uses_offset_and_reuses_loaded_fields(self):
-        """"더 보기" 는 최초 로드가 성공시킨 필드셋(LOADED_FIELDS)을 그대로 재사용해
-        offset=ROWS.length 로 다음 페이지를 요청한다 — 3단계 폴백을 매번 재협상하지
-        않는다. buildEndpoint 는 offset>0 일 때만 &offset= 을 덧붙인다(생략 시 기존
-        limit=1000 단일 호출과 동일 — 하위호환)."""
+    def test_next_chunk_endpoint_uses_offset_and_reuses_loaded_fields(self):
+        """페이지 이동으로 촉발된 청크 fetch 는 최초 로드가 성공시킨 필드셋
+        (LOADED_FIELDS)을 그대로 재사용해 offset=ROWS.length 로 다음 청크를 요청한다 —
+        3단계 폴백을 매번 재협상하지 않는다. buildEndpoint 는 offset>0 일 때만
+        &offset= 을 덧붙인다(생략 시 기존 limit=1000 단일 호출과 동일 — 하위호환)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function buildEndpoint(fields, offset)", js_src)
         self.assertIn('(off > 0 ? "&offset=" + off : "")', js_src)
-        self.assertIn("function loadMoreRows()", js_src)
-        fn = js_src[js_src.index("function loadMoreRows()"):]
+        self.assertIn("function fetchNextChunkFor(cb)", js_src)
+        fn = js_src[js_src.index("function fetchNextChunkFor(cb)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("fetchFindings(LOADED_FIELDS, ROWS.length)", fn)
 
-    def test_load_more_duplicate_click_guard(self):
-        """로딩 중 중복 클릭 방어 — isLoadingMore 플래그로 조기 반환하고, 버튼 자체도
-        disabled 로 이중 방어한다(버튼이 없는 구버전 셸에서도 플래그만으로 안전)."""
+    def test_duplicate_fetch_guard_queues_callbacks(self):
+        """[중복 fetch 방어] 이미 진행 중인 청크 fetch 가 있으면 새 네트워크 요청을
+        내지 않고 콜백만 큐(pendingPageCallbacks)에 편승시킨다 — 여러 페이지 이동이
+        겹쳐도 실제 fetch 는 항상 1개만 진행되고, 완료 시 대기 콜백이 한 번에 재개된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function loadMoreRows()"):]
+        fn = js_src[js_src.index("function fetchNextChunkFor(cb)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (isLoadingMore || !LOADED_FIELDS) return;", fn)
-        self.assertIn("isLoadingMore = true;", fn)
-        self.assertIn("isLoadingMore = false;", fn)
-        self.assertIn("function updateLoadMoreUI()", js_src)
-        self.assertIn("loadMoreBtn.disabled = isLoadingMore;", js_src)
+        self.assertIn("pendingPageCallbacks.push(cb);", fn)
+        self.assertIn("if (isFetchingPage) return;", fn)
+        self.assertIn("isFetchingPage = true;", fn)
+        self.assertIn("isFetchingPage = false;", fn)
+        self.assertIn("cbs.forEach(function (fn) { fn(); });", fn)
+        # 페이지 이동(goToPage) 도 navToken 세대 카운터로 연타를 방어한다 — 오래된 이동의
+        # 완료 콜백은 currentPage/render() 를 건드리지 않는다.
+        goto_fn = js_src[js_src.index("function goToPage(n)"):]
+        goto_fn = goto_fn[:goto_fn.index("\n  }\n") + 4]
+        self.assertIn("navToken += 1;", goto_fn)
+        self.assertIn("if (myToken !== navToken) return;", goto_fn)
 
     def test_merge_rows_dedupes_by_finding_id(self):
         """mergeRows() 는 finding_id 기준 중복을 제거한다 — 두 fetch 사이 새 번역이
@@ -1619,88 +1662,133 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("if (id !== undefined && id !== null && seen[id]) return;", fn)
         self.assertIn("ROWS.push(r);", fn)
 
-    def test_pagination_boundary_document_merge_via_full_regroup(self):
-        """[문서 병합 경계] "더 보기"로 불러온 행은 mergeRows() 가 전역 ROWS 에 이어붙인
-        뒤 render() 를 다시 호출한다 — render() 는 매번 ROWS 전체를 다시 정렬·그룹핑
-        (groupByDocument)하므로, 페이지 경계에서 같은 raw_signal_id 문서의 관측치가
-        두 페이지에 걸쳐 나뉘어 도착해도 다음 render() 에서 하나의 문서 카드로 재병합된다
-        (groupByDocument 는 인접성이 아니라 raw_signal_id 해시맵 기준이라 그 자체로
-        경계-안전). 별도 "문서 조각 봉합" 로직을 추가하지 않고 기존 전량 재계산에
-        의존하는 것이 설계 판단이다."""
+    def test_pagination_boundary_document_completeness_check(self):
+        """[경계 문서 완결성] ensurePageReady() 는 목표 페이지의 마지막 문서
+        (raw_signal_id)가 incompleteDocKey() 가 가리키는 "아직 obs 가 더 올 수 있는"
+        키와 같으면, 문서 수가 이미 충분해도(docs.length >= neededDocs) 그대로 렌더하지
+        않고 한 청크 더 fetch 한 뒤 재확인한다 — 페이지 경계에서 문서가 쪼개진 채
+        보이는 상태를 방지한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function loadMoreRows()"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("mergeRows(data);", fn)
-        self.assertIn("render();", fn)
-        # render() 는 항상 ROWS 전체(필터 적용 후)를 다시 정렬·그룹핑한다(부분 갱신 없음).
-        self.assertIn("var matched = sortRows(ROWS.filter(matches));", js_src)
-        self.assertIn("var docs = groupByDocument(matched);", js_src)
+        self.assertIn("function incompleteDocKey()", js_src)
+        key_fn = js_src[js_src.index("function incompleteDocKey()"):]
+        key_fn = key_fn[:key_fn.index("\n  }\n") + 4]
+        self.assertIn("if (isServerExhausted() || !ROWS.length) return null;", key_fn)
+        self.assertIn("ROWS[ROWS.length - 1].raw_signal_id", key_fn)
 
-    def test_filter_change_recomputes_total_vs_loaded_display(self):
-        """[필터 연동] 필터가 하나도 없을 때만 서버 exact count(SERVER_TOTAL) 와 로드
-        건수를 비교해 "지적 총수 중 표시" 문구로 전환한다 — 필터가 걸리면(검색어 포함)
-        필터링된 부분집합을 서버 전체수와 비교하는 게 의미가 없으므로 원래의 "문서 X건 ·
-        지적 Y건" 표기로 되돌아간다. render() 가 필터 변경마다 다시 호출되므로 이 판정도
-        매번 새로 계산된다(오프셋 자체는 필터와 무관한 전역 로드 진행률이라 리셋 대상이
-        아니다 — 이하 주석 참조)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        ready_fn = js_src[js_src.index("function ensurePageReady(pageNum, done)"):]
+        ready_fn = ready_fn[:ready_fn.index("\n  }\n") + 4]
+        self.assertIn("var neededDocs = pageNum * DOCS_PER_PAGE;", ready_fn)
+        self.assertIn("var pageSlice = docs.slice(neededDocs - DOCS_PER_PAGE, neededDocs);", ready_fn)
+        self.assertIn("var badKey = incompleteDocKey();", ready_fn)
+        self.assertIn(
+            "var unsafe = badKey !== null && pageSlice.some(function (rows) {\n"
+            "          return rows[0].raw_signal_id === badKey;\n"
+            "        });",
+            ready_fn,
+        )
+        self.assertIn("fetchNextChunkFor(attempt);", ready_fn)
+        # render() 자체는 순수 슬라이스만 한다 — 경계 안전은 페이지 이동 시점에 이미 확인됨.
         render_fn = js_src[js_src.index("function render() {"):]
         self.assertIn(
-            "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
+            "var pageDocs = docs.slice((currentPage - 1) * DOCS_PER_PAGE, currentPage * DOCS_PER_PAGE);",
             render_fn,
         )
-        self.assertIn(
-            "if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > ROWS.length) {",
-            render_fn,
-        )
-        self.assertIn('bTotal.textContent = SERVER_TOTAL.toLocaleString("ko-KR");', render_fn)
-        self.assertIn('bLoaded.textContent = ROWS.length.toLocaleString("ko-KR");', render_fn)
 
-    def test_content_range_parse_failure_falls_back_to_batch_size_heuristic(self):
+    def test_docs_per_page_constant_is_24(self):
+        """[문서 단위 페이지네이션] 문서 카드 24개 = 1페이지(스펙 상수)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var DOCS_PER_PAGE = 24;", js_src)
+
+    def test_more_may_exist_indicator_applies_regardless_of_filters(self):
+        """[+표기] moreMayExist(=!isServerExhausted())는 필터 여부와 무관하게 동일
+        기준을 쓴다 — 필터가 걸려도 ensurePageReady() 가 필요하면 계속 청크를 당겨오므로,
+        "최소 추정치일 뿐"이라는 정직한 신호(toLocaleString 뒤 "+")는 필터 유무로
+        분기하지 않는다(구버전의 filtersActive 분기 자체가 제거됨)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        start = js_src.index("function render() {")
+        render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
+        self.assertIn("var moreMayExist = !isServerExhausted();", render_fn)
+        self.assertIn('(moreMayExist ? "+" : "")', render_fn)
+        # 옛 filtersActive 기반 SERVER_TOTAL-vs-ROWS.length 분기는 render() 에서 제거됐다.
+        self.assertNotIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
+
+    def test_is_server_exhausted_falls_back_to_batch_size_heuristic(self):
         """[방어] Content-Range 파싱 실패(헤더 미노출 등)로 SERVER_TOTAL 이 null 이면,
-        "가장 최근 페이지가 PAGE_LIMIT 로 꽉 찼는지"만으로 더 보기 버튼 노출 여부를
-        판단한다(정확한 남은 건수는 생략하고 "더 보기"만 표시) — 로드 수 표시로 조용히
-        폴백하는 기존 계약과 동형."""
+        "가장 최근 청크가 PAGE_LIMIT 미만이었는지"만으로 서버 소진 여부를 판단한다
+        (fetchGaveUp 이면 무조건 소진 취급해 무한 재시도를 막는다)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function updateLoadMoreUI()"):]
+        fn = js_src[js_src.index("function isServerExhausted()"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn(
-            "var hasMore = SERVER_TOTAL !== null\n"
-            "      ? ROWS.length < SERVER_TOTAL\n"
-            "      : LAST_BATCH_SIZE === PAGE_LIMIT;",
-            fn,
-        )
-        self.assertIn('loadMoreBtn.textContent = "더 보기";', fn)
+        self.assertIn("if (fetchGaveUp) return true;", fn)
+        self.assertIn("if (SERVER_TOTAL !== null) return ROWS.length >= SERVER_TOTAL;", fn)
+        self.assertIn("return LAST_BATCH_SIZE !== null && LAST_BATCH_SIZE < PAGE_LIMIT;", fn)
 
-    # ── [페이지네이션 발견성] 카운트 줄 옆 인라인 "더 보기" ────────────────────────
-    def test_load_more_top_inline_button_shell_present_next_to_count(self):
-        """실사용자 신고(하단 #fnd-load-more 는 카드 ~200장을 지나야 보인다) 대응 —
-        카운트 줄(#fnd-count) 바로 뒤에 라벨 없는 hidden 인라인 버튼을 셸에 심는다
-        (골든 결정론 — 문구/노출은 findings.js 런타임 몫)."""
-        self.assertIn(
-            '<div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>'
-            '<button class="fnd-load-more-inline" id="fnd-load-more-top" type="button" hidden></button>',
-            self.html,
-        )
+    def test_filter_and_sort_and_search_reset_to_page_one(self):
+        """[문서 단위 페이지네이션] 필터·검색·정렬 변경은 모두 currentPage 를 1로
+        리셋한 뒤 goToPage(1) 을 호출해야 한다(대시보드 카테고리/월/업체 클릭, 적용
+        필터 칩 해제·모두 지우기 포함)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('document.getElementById("fnd-load-more-top")', js_src)
+        for fn_name in (
+            "function toggleCategoryFilter(code)", "function toggleMonthFilter(month)",
+            "function toggleFirmFilter(name)", "function clearActiveFilter(key)",
+            "function clearAllFilters()",
+        ):
+            fn = js_src[js_src.index(fn_name):]
+            fn = fn[:fn.index("\n  }\n") + 4]
+            self.assertIn("currentPage = 1;", fn, f"{fn_name} 이 페이지를 리셋하지 않음")
+            self.assertIn("goToPage(1);", fn, f"{fn_name} 이 goToPage(1) 을 호출하지 않음")
 
-    def test_load_more_top_shares_click_handler_and_expose_rule_with_bottom_button(self):
-        """상단 인라인 버튼은 하단 버튼과 완전히 같은 loadMoreRows() 를 호출해야 한다
-        (중복 클릭 방어·로딩 문구 동기화를 별도 구현 없이 그대로 공유) — wire() 배선과
-        updateLoadMoreUI() 의 hasMore 판정 재사용을 소스로 확인한다."""
+    def test_pager_renders_prev_next_first_last_and_page_window(self):
+        """[문서 단위 페이지네이션] renderPager() 는 처음/이전/페이지 번호(윈도우)/
+        다음/끝 버튼을 만들고, 현재 페이지 버튼에 aria-current="page" 를 붙인다.
+        computePageWindow() 는 7페이지 이하면 생략 없이 전부, 초과하면 "..." 로
+        축약한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        wire_fn = js_src[js_src.index("function wire() {"):]
-        wire_fn = wire_fn[:wire_fn.index("\n  function ")]
-        self.assertIn("if (loadMoreTopBtn) {\n      loadMoreTopBtn.addEventListener(\"click\", loadMoreRows);", wire_fn)
-        update_fn = js_src[js_src.index("function updateLoadMoreUI()"):]
-        update_fn = update_fn[:update_fn.index("\n  }\n") + 4]
-        # 전량 로드 시(hasMore=false) 상단 버튼도 함께 숨겨야 한다.
-        self.assertIn("if (loadMoreTopBtn) loadMoreTopBtn.hidden = true;", update_fn)
-        # 로딩 중 문구도 하단과 동일하게 동기화된다(공유 isLoadingMore 플래그).
-        self.assertIn('loadMoreTopBtn.textContent = "불러오는 중…";', update_fn)
-        self.assertIn('loadMoreTopBtn.textContent = "나머지 " + remainingTop.toLocaleString("ko-KR") + "건 불러오기";', update_fn)
-        self.assertIn("loadMoreTopBtn.disabled = isLoadingMore;", update_fn)
+        self.assertIn("function computePageWindow(current, total)", js_src)
+        win_fn = js_src[js_src.index("function computePageWindow(current, total)"):]
+        win_fn = win_fn[:win_fn.index("\n  }\n") + 4]
+        self.assertIn("if (total <= 7) {", win_fn)
+        self.assertIn('items.push("...");', win_fn)
+
+        pager_fn = js_src[js_src.index("function renderPager(current, total, moreMayExist)"):]
+        pager_fn = pager_fn[:pager_fn.index("\n  }\n") + 4]
+        self.assertIn('buildPagerBtn("«", "처음 페이지로 이동"', pager_fn)
+        self.assertIn('buildPagerBtn("‹", "이전 페이지"', pager_fn)
+        self.assertIn('buildPagerBtn("›", "다음 페이지"', pager_fn)
+        self.assertIn('buildPagerBtn("»", "끝 페이지로 이동"', pager_fn)
+        self.assertIn('btn.setAttribute("aria-current", "page");', pager_fn)
+        # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정).
+        self.assertIn('var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");', pager_fn)
+
+    def test_pager_hidden_when_single_page_and_no_more_data(self):
+        """결과가 0건이거나(hidePager) 1페이지뿐이고 서버도 소진됐으면(moreMayExist=false)
+        페이지네이션 바를 완전히 숨긴다(불필요한 UI 노출 방지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function hidePager()", js_src)
+        self.assertIn("if (pagerTopEl) pagerTopEl.hidden = true;", js_src)
+        self.assertIn("if (pagerBottomEl) pagerBottomEl.hidden = true;", js_src)
+        pager_fn = js_src[js_src.index("function renderPager(current, total, moreMayExist)"):]
+        pager_fn = pager_fn[:pager_fn.index("\n  }\n") + 4]
+        self.assertIn("if (total <= 1 && !moreMayExist) {", pager_fn)
+        self.assertIn("nav.hidden = true;", pager_fn)
+        render_fn = js_src[js_src.index("function render() {"):]
+        self.assertIn("hidePager();", render_fn[:render_fn.index("showState(\"none\");")])
+
+    def test_page_url_param_deep_link_and_default_omitted(self):
+        """[?page= 딥링크] currentPage>1 일 때만 URL 에 page= 파라미터를 반영한다(1페이지
+        기본값은 URL 을 더럽히지 않음). 초기 로드는 readPageFromUrl() 로 복원하고,
+        무효/누락 값은 조용히 1로 폴백한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        sync_fn = js_src[js_src.index("function syncStateToUrl()"):]
+        sync_fn = sync_fn[:sync_fn.index("\n  }\n") + 4]
+        self.assertIn('if (currentPage > 1) params.set("page", String(currentPage));', sync_fn)
+        self.assertIn("function readPageFromUrl()", js_src)
+        read_fn = js_src[js_src.index("function readPageFromUrl()"):]
+        read_fn = read_fn[:read_fn.index("\n  }\n") + 4]
+        self.assertIn('var raw = new URLSearchParams(location.search).get("page");', read_fn)
+        self.assertIn("return !isNaN(n) && n >= 1 ? n : 1;", read_fn)
+        self.assertIn("var initialPage = readPageFromUrl();", js_src)
+        self.assertIn("goToPage(initialPage);", js_src)
 
     def test_dash_total_stat_uses_server_total_when_unfiltered(self):
         """[대시보드 "전체" 정정] SERVER_TOTAL(서버 exact count) 이 있고 필터가 하나도
@@ -1724,9 +1812,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("renderDashStats(stats);", fn)
 
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
-        """buildFacetSkeleton() 은 "더 보기" 이후에도 재호출될 수 있어(새로 드러난 값
-        옵션 추가) 이미 존재하는 옵션 값은 건너뛰어야 한다 — 그렇지 않으면 재호출 시
-        <option> 이 중복 생성된다."""
+        """buildFacetSkeleton() 은 페이지 이동으로 청크가 추가 fetch 된 이후에도
+        재호출될 수 있어(새로 드러난 값 옵션 추가) 이미 존재하는 옵션 값은 건너뛰어야
+        한다 — 그렇지 않으면 재호출 시 <option> 이 중복 생성된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildFacetSkeleton()"):]
         fn = fn[:fn.index("\n  }\n") + 4]

@@ -1023,9 +1023,12 @@
     // 그대로 문서 수로 오인되지 않도록 명시).
     countEl.innerHTML = "";
     var bDocs = document.createElement("b");
-    bDocs.textContent = String(docs.length);
+    // [콤마 통일] 카운트 줄의 모든 숫자는 toLocaleString('ko-KR') 로 천단위 콤마를
+    // 붙인다 — 아래(부분 로드 분기, 1041행~)의 bTotal/bLoaded 와 표기를 맞춘다(이전엔
+    // 이 전량 로드 분기만 String() 이라 "지적 1926건"처럼 콤마가 빠졌었다).
+    bDocs.textContent = docs.length.toLocaleString("ko-KR");
     var bObs = document.createElement("b");
-    bObs.textContent = String(matched.length);
+    bObs.textContent = matched.length.toLocaleString("ko-KR");
     countEl.appendChild(document.createTextNode("문서 "));
     countEl.appendChild(bDocs);
     countEl.appendChild(document.createTextNode("건 · 지적 "));
@@ -1050,7 +1053,7 @@
       countEl.appendChild(bLoaded);
       countEl.appendChild(document.createTextNode("건 표시 · 문서 "));
       var bDocs2 = document.createElement("b");
-      bDocs2.textContent = String(docs.length);
+      bDocs2.textContent = docs.length.toLocaleString("ko-KR");
       countEl.appendChild(bDocs2);
       countEl.appendChild(document.createTextNode("건"));
     }

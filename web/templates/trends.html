@@ -162,6 +162,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 
 /* 업체 상세 패널 — 랭킹 아래 삽입, 닫기 가능. */
 .tr-firm-detail{margin-top:22px;padding:24px 26px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas)}
+/* [업체 프로파일 진입] 패널 최상단 링크 — findings.html 의 .fnd-trends-link 관례와
+   동일한 절제된 텍스트 링크(신규 CSS, grm.css 는 무변경 — 이 페이지 스코프 <style> 에만
+   추가). 017_findings_stats_firm_key.sql 미적용 라이브에서는 렌더 자체가 생략된다. */
+.tr-fd-profile-link{display:inline-block;margin-bottom:16px;font-size:12.5px;font-weight:500;color:var(--coral-2)}
+.tr-fd-profile-link:hover{color:var(--coral)}
 .tr-firm-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
 .tr-firm-detail-name{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0 0 4px}
 .tr-firm-detail-meta{font-size:12.5px;color:var(--muted)}

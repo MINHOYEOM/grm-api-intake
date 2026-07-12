@@ -1,0 +1,68 @@
+[
+  {
+    "finding_id": "finding-6eb7553ecb63f234bd162f68",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions.",
+    "finding_text_ko": "무균공정구역(aseptic processing area)은 무균조건을 관리하는 데 사용되는 장비를 유지관리하기 위한 시스템에 관하여 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ec0373012c3f046ac0cb67e",
+    "finding_text": "Written procedures are not established and followed for the cleaning and maintenance ofequipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구(utensils)를 포함한 장비의 세척 및 유지관리에 관한 서면절차가 수립되어 있지 않았고 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ec46a9caf787c787801da95",
+    "finding_text": "Written production and process control procedures are not followed in the execution of production and p rocess control functions.",
+    "finding_text_ko": "생산 및 공정관리 기능의 수행에 있어 서면 생산 및 공정관리절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ecb94dfdf7798f6952959dc",
+    "finding_text": "Each batch of drug product purporting to be pyrogen-free is not laboratory tested to determine conformance to such req uirements.",
+    "finding_text_ko": "발열원부재(pyrogen-free)로 표방되는 의약품의 각 배치(batch)에 대해 해당 요건에 대한 적합성을 판정하기 위한 실험실 시험이 실시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6edde3cab7e7c16049390d54",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate standards and test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실관리(laboratory controls)에는 구성성분(component), 공정중물질(in-process material) 및 의약품이 적절한 확인(identity), 함량(strength), 품질(quality) 및 순도(purity) 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 기준 및 시험절차의 수립이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ee1783ef1b746f7de21cc60",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물학적 오염을 방지하기 위해 설계된 절차가 수립되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ee32f11a950e92e25fe66c2",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정중물질(in-process material) 및 의약품의 특성에 변동성(variability)을 유발할 수 있는 제조공정의 산출물을 모니터링하고 그 성능을 검증(validate)하는 관리절차가 수립되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6eed6644b43ee178b91ad419",
+    "finding_text": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality and purity at the time of use.",
+    "finding_text_ko": "의약품에 사용 시점에서 해당 확인(identity), 함량(strength), 품질(quality) 및 순도(purity) 기준에 부합함을 보장하기 위해 적절한 안정성(stability) 데이터에 근거하여 결정된 사용기한(expiration date)이 표시되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ef57698c302471675b7ffe4",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정구역(aseptic processing area)은 무균조건을 조성하기 위한 장비의 세척 및 소독 시스템에 관하여 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6efa6eac84ad95e8d055bf9a",
+    "finding_text": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균(sterile) 및 발열원부재(pyrogen-free)로 표방되는 의약품의 각 배치(batch)에 대해 해당 요건에 대한 적합성을 판정하기 위한 실험실 시험이 실시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6f068038319ee03b777d23a9",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+    "finding_text_ko": "오염 또는 혼동(mix-up)을 방지하기 위한 분리되거나 규정된 구역이 의약품의 무균공정(aseptic processing)과 관련된 작업에 관하여 미흡했다.",
+    "translation_method": "llm_assisted"
+  }
+]

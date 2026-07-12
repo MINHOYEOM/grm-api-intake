@@ -9,7 +9,9 @@ import unittest
 
 from reconciliation_service import (
     MONITORED_FLOORS,
+    classify_evidence_url,
     detect_coverage_anomalies,
+    summarize_url_contamination,
 )
 
 
@@ -94,6 +96,116 @@ class ReconciliationServiceTest(unittest.TestCase):
     def test_floors_cover_expected_high_volume_sources(self):
         for src in ("OpenFDA Recall", "MFDS", "FDA 483", "FDA Warning Letter"):
             self.assertIn(src, MONITORED_FLOORS)
+
+
+class ClassifyEvidenceUrlTest(unittest.TestCase):
+    def test_service_key_flagged(self):
+        url = "https://apis.data.go.kr/1471000/DrugRecall?serviceKey=SECRET123&pageNo=1"
+        self.assertEqual(classify_evidence_url(url), "api-key-url")
+
+    def test_apis_data_go_kr_endpoint_flagged(self):
+        self.assertEqual(
+            classify_evidence_url("https://apis.data.go.kr/1471000/MdcinGmpInfoService06"),
+            "api-endpoint",
+        )
+
+    def test_data_go_kr_dataset_page_flagged(self):
+        self.assertEqual(
+            classify_evidence_url("https://www.data.go.kr/data/15127880/openapi.do"),
+            "dataset-page",
+        )
+        self.assertEqual(
+            classify_evidence_url("https://data.go.kr/data/15127880/openapi.do"),
+            "dataset-page",
+        )
+
+    def test_non_http_flagged(self):
+        self.assertEqual(classify_evidence_url("ftp://example.com/foo"), "non-http")
+        self.assertEqual(classify_evidence_url("그냥 문자열"), "non-http")
+
+    def test_empty_flagged(self):
+        self.assertEqual(classify_evidence_url(""), "empty")
+        self.assertEqual(classify_evidence_url("   "), "empty")
+
+    def test_normal_urls_pass(self):
+        # nedrug 원본 상세 페이지
+        self.assertEqual(
+            classify_evidence_url(
+                "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=12345"
+            ),
+            "",
+        )
+        # FDA 483/미디어 PDF
+        self.assertEqual(
+            classify_evidence_url("https://www.fda.gov/media/123456/download"),
+            "",
+        )
+
+
+class SummarizeUrlContaminationTest(unittest.TestCase):
+    def test_mixed_rows_aggregate_by_source_and_reason(self):
+        rows = [
+            {
+                "source": "MFDS",
+                "document_type": "행정처분",
+                "evidence_url": "https://apis.data.go.kr/1471000/x?serviceKey=SECRET123",
+            },
+            {
+                "source": "MFDS",
+                "document_type": "행정처분",
+                "evidence_url": "https://apis.data.go.kr/1471000/y?serviceKey=SECRET456",
+            },
+            {
+                "source": "MFDS",
+                "document_type": "GMP실사",
+                "evidence_url": "https://www.data.go.kr/data/15127880/openapi.do",
+            },
+            {
+                # 정상 행 — 집계에서 제외되어야 함
+                "source": "FDA 483",
+                "document_type": "483",
+                "evidence_url": "https://www.fda.gov/media/123456/download",
+            },
+        ]
+        summary = summarize_url_contamination(rows)
+        self.assertEqual(len(summary), 2)
+
+        by_reason = {(g["source"], g["document_type"], g["reason"]): g for g in summary}
+        key = ("MFDS", "행정처분", "api-key-url")
+        self.assertIn(key, by_reason)
+        self.assertEqual(by_reason[key]["n"], 2)
+        self.assertIn("sample_url", by_reason[key])
+
+        key2 = ("MFDS", "GMP실사", "dataset-page")
+        self.assertIn(key2, by_reason)
+        self.assertEqual(by_reason[key2]["n"], 1)
+
+        # 정상행(FDA 483)은 어떤 그룹에도 나타나지 않음
+        self.assertFalse(any(g["source"] == "FDA 483" for g in summary))
+
+    def test_no_contamination_returns_empty(self):
+        rows = [
+            {"source": "FDA 483", "document_type": "483",
+             "evidence_url": "https://www.fda.gov/media/1/download"},
+        ]
+        self.assertEqual(summarize_url_contamination(rows), [])
+
+    def test_service_key_masked_in_sample_url(self):
+        rows = [
+            {
+                "source": "MFDS",
+                "document_type": "행정처분",
+                "evidence_url": "https://apis.data.go.kr/x?serviceKey=SECRET123&pageNo=1",
+            },
+        ]
+        summary = summarize_url_contamination(rows)
+        self.assertEqual(len(summary), 1)
+        sample = summary[0]["sample_url"]
+        self.assertNotIn("SECRET123", sample)
+        self.assertIn("serviceKey=***", sample)
+        # 전체 문자열 표현(리포트 라인 조립 시 실 키 미노출 확인)
+        rendered = str(summary)
+        self.assertNotIn("SECRET123", rendered)
 
 
 if __name__ == "__main__":

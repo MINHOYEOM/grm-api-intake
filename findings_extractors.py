@@ -20,13 +20,18 @@ FDA_483_LIST_URL = (
     "https://www.fda.gov/about-fda/office-inspections-and-investigations/"
     "oii-foia-electronic-reading-room"
 )
-# [findings DB 구멍 수리 2026-07-12] MFDS 행정처분(admin-action)/회수(recall-quality) 는
-# 항목별 official_url 이 없다(collect_mfds_admin_action.py/collect_mfds_recall.py 의
-# DATASET_URL 과 동일 상수 — data.go.kr 데이터셋 페이지가 최종 fallback). 실제 finding
-# evidence_url 은 source_url(수집 시점 API 응답 링크) -> nedrug_item_candidate_url(품목상세
-# 후보) -> 이 목록 URL 순으로 폴백한다(_evidence_url 헬퍼).
-MFDS_ADMIN_ACTION_LIST_URL = "https://www.data.go.kr/data/15058457/openapi.do"
-MFDS_RECALL_LIST_URL = "https://www.data.go.kr/data/15059114/openapi.do"
+# [findings DB 구멍 수리 2026-07-12 · evidence_url 정정 2026-07-12] MFDS 행정처분/회수
+# 의 "원본 확인" 링크는 nedrug 사용자 페이지여야 한다. raw_signal.official_url 은
+# data.go.kr 오픈API 데이터셋 안내 페이지(개별 사건 열람 불가)이고 source_url 은
+# serviceKey 포함 API 엔드포인트라 둘 다 부적합 — _evidence_url 을 쓰면 official_url 이
+# 최우선 반환돼 데이터셋 페이지가 나온다(초기 배선 버그). card_scaffold._official_admin/
+# _official_recall_quality 의 canonical 링크와 동일하게 직접 구성한다:
+#   admin  = 행정처분 개별 레코드 L1 (CCBAO01/getItem?dispsApplySeq=<ADM_DISPS_SEQ>)
+#            — 라이브 검증됨(card_scaffold 주석 §5.2). seq 없으면 목록 L2.
+#   recall = 회수·폐기 공표 목록 L2 (CCBAI01) — data.go.kr payload 에 건별 nedrug seq 가
+#            없어 건별 L1 불가(브리프도 동일하게 목록 인덱스 사용).
+MFDS_ADMIN_ACTION_INDEX_URL = "https://nedrug.mfds.go.kr/pbp/CCBAO01"
+MFDS_RECALL_INDEX_URL = "https://nedrug.mfds.go.kr/pbp/CCBAI01"
 
 _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*", re.I)
 
@@ -289,16 +294,20 @@ def _from_mfds_admin_action(
     bef_apply_law = _compact(raw.get("BEF_APPLY_LAW"))
     refs = _extract_mfds_refs(bef_apply_law) if bef_apply_law else _extract_mfds_refs(expose_cont)
 
+    # 원본 확인 링크 = 행정처분 개별 레코드 L1. _evidence_url 은 official_url(data.go.kr
+    # 데이터셋)을 최우선 반환하므로 쓰지 않고 직접 구성한다(card_scaffold._official_admin 동형).
+    evidence_url = (
+        f"https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq={adm_seq}"
+        if adm_seq else MFDS_ADMIN_ACTION_INDEX_URL
+    )
+
     return [gf.finding_from_raw_signal(
         raw_signal,
         finding_text=finding_text,
         ordinal=1,
         category_code=_classify_gmp_summary(expose_cont or finding_text),
         evidence_level="A",
-        evidence_url=_evidence_url(
-            raw_signal, raw, "source_url", "nedrug_item_candidate_url",
-            fallback=MFDS_ADMIN_ACTION_LIST_URL,
-        ),
+        evidence_url=evidence_url,
         finding_language=_language(row, "KO"),
         mfds_refs=refs,
         confidence=0.88,
@@ -328,10 +337,9 @@ def _from_mfds_recall(
         finding_text=finding_text,
         ordinal=1,
         evidence_level="A",
-        evidence_url=_evidence_url(
-            raw_signal, raw, "source_url", "nedrug_item_candidate_url",
-            fallback=MFDS_RECALL_LIST_URL,
-        ),
+        # 회수·폐기 공표 목록(건별 안정 URL 부재 — 브리프도 동일하게 목록 인덱스 사용).
+        # official_url(data.go.kr 데이터셋)·source_url(API 엔드포인트)은 부적합이라 미사용.
+        evidence_url=MFDS_RECALL_INDEX_URL,
         finding_language=_language(row, "KO"),
         mfds_refs=_extract_mfds_refs(reason),
         confidence=0.85,

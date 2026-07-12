@@ -102,10 +102,23 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["finding_language"], "KO")
         self.assertEqual(findings[0]["review_status"], "accepted")
         self.assertEqual(findings[0]["confidence"], 0.88)
+        # 원본 확인 링크 = 행정처분 개별 레코드 L1(ADM_DISPS_SEQ 기반). data.go.kr 데이터셋
+        # 페이지가 아니라 nedrug 행정처분정보 레코드여야 실제 사건 열람이 된다.
         self.assertEqual(
             findings[0]["evidence_url"],
-            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199800001",
+            "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=20260512",
         )
+
+    def test_mfds_admin_action_evidence_url_falls_back_to_index_without_seq(self) -> None:
+        # ADM_DISPS_SEQ 는 트리거라 없으면 finding 자체가 안 나오지만(위 missing 테스트),
+        # admin_body_full 경로에서 seq 가 유지되면 개별 레코드 L1 이 구성된다 — 방어적으로
+        # seq 존재 시 항상 getItem L1 을 쓴다는 계약을 명시.
+        fx = _load_input("mfds_admin_action")
+        raw = dict(fx["raw"])
+        raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+        findings = extractors.findings_from_raw_signal(raw_signal)
+        self.assertIn("CCBAO01/getItem?dispsApplySeq=", findings[0]["evidence_url"])
+        self.assertNotIn("data.go.kr", findings[0]["evidence_url"])
 
     def test_mfds_admin_action_falls_back_to_admin_body_full_first_line(self) -> None:
         # EXPOSE_CONT 가 비어 있으면(플래그 ENABLE_MFDS_ADMIN_BODY_FULL on 시 노출되는)
@@ -146,9 +159,10 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["finding_language"], "KO")
         self.assertEqual(findings[0]["review_status"], "accepted")
         self.assertEqual(findings[0]["confidence"], 0.85)
+        # 원본 확인 링크 = 회수·폐기 공표 목록(건별 안정 URL 부재 — 브리프도 목록 인덱스 사용).
         self.assertEqual(
             findings[0]["evidence_url"],
-            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199900002",
+            "https://nedrug.mfds.go.kr/pbp/CCBAI01",
         )
 
     def test_mfds_recall_missing_reason_returns_no_findings(self) -> None:

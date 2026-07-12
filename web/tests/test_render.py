@@ -814,6 +814,47 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function renderDash(matched)", js_src)
         self.assertIn("renderDash(matched)", js_src)  # render() 에서 호출
 
+    def test_dash_category_top8_and_rest_row(self):
+        """[그리드 균형 M2a] 카테고리 분포는 상위 8개만 개별 바로 그리고, 나머지는
+        "그 외 N건" 한 줄로 합산한다(옛 top6 에서 상향)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDashCategories(stats)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var top = stats.categories.slice(0, 8);", fn)
+        self.assertIn(
+            "var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
+            fn,
+        )
+        self.assertIn('buildCatRow("그 외", restCount, maxCount, null)', fn)
+
+    def test_dash_category_label_track_separated_from_bar(self):
+        """[라벨·바 트랙 분리 M2a] 카테고리 라벨은 고정폭(110px)+ellipsis 로 잘려 막대·
+        건수 트랙과 절대 겹치지 않는다 — 형제 컴포넌트(fnd-dash-firm-name)와 동일하게
+        overflow:hidden+white-space:nowrap+min-width:0 을 갖춰야 한다(옛 라벨 CSS 에는
+        이 3속성이 빠져 있어 긴 라벨이 자동 최소폭만큼 막대를 밀어내던 게 겹침의 원인).
+        buildCatRow() 는 title 속성으로 잘린 전체 라벨을 계속 노출한다."""
+        css = self.html[self.html.index(".fnd-dash-cat-label{"):]
+        css = css[:css.index("}") + 1]
+        self.assertIn("min-width:0", css)
+        self.assertIn("overflow:hidden", css)
+        self.assertIn("text-overflow:ellipsis", css)
+        self.assertIn("white-space:nowrap", css)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("labelEl.title = label;", fn)
+
+    def test_dash_grid_uses_minmax_zero_to_keep_columns_balanced(self):
+        """[그리드 균형 M2b] .fnd-dash-grid 의 3컬럼은 minmax(0,1fr) 이어야 한다 — 맨 1fr
+        은 자식의 min-content 가 크면(예: 라벨 오버플로) 그 컬럼이 제 몫보다 넓어지고
+        나머지 컬럼(월별 추이/업체 상위)이 눌리는 CSS Grid 기본 함정이 있다. 자식 그리드
+        아이템(.fnd-dash-block)도 min-width:0 으로 동일 계열 안전장치를 갖춘다."""
+        self.assertIn(
+            ".fnd-dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}",
+            self.html,
+        )
+        self.assertIn(".fnd-dash-block{min-width:0}", self.html)
+
     def test_dash_accessibility_markers_present(self):
         """클릭 가능한 대시보드 행(카테고리/월/업체)은 role=button+tabindex+키보드
         Enter/Space 활성화를 갖춰야 한다(마우스 전용 UI 금지)."""

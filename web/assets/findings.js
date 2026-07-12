@@ -481,8 +481,11 @@
 
   function renderDashCategories(stats) {
     dashCatEl.innerHTML = "";
-    var top = stats.categories.slice(0, 6);
-    var restCount = stats.categories.slice(6).reduce(function (s, c) { return s + c.count; }, 0);
+    // [그리드 균형 M2a] 상위 8개만 개별 바로, 나머지는 "그 외 N건" 한 줄로 합산한다(기존
+    // 6개 → 8개 — 겹침의 실제 원인은 항목 수가 아니라 라벨 CSS 였지만(buildCatRow 의
+    // .fnd-dash-cat-label 참조), 그래도 목록이 과도하게 길어지지 않도록 8개로 상향).
+    var top = stats.categories.slice(0, 8);
+    var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);
     if (!top.length) {
       dashCatEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
       return;
@@ -507,7 +510,11 @@
         toggleCategoryFilter(code);
       });
     }
-    row.appendChild(el("span", "fnd-dash-cat-label", label));
+    // [라벨·바 트랙 분리 M2a] 라벨은 CSS 로 110px+ellipsis 잘림 — title 로 전체 텍스트를
+    // 계속 확인할 수 있게 한다(잘리지 않는 라벨도 무해하게 동일 텍스트를 반복할 뿐이다).
+    var labelEl = el("span", "fnd-dash-cat-label", label);
+    labelEl.title = label;
+    row.appendChild(labelEl);
     var bar = el("div", "fnd-dash-cat-bar");
     var ratio = maxCount > 0 ? count / maxCount : 0;
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";

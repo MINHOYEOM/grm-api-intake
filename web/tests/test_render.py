@@ -1388,8 +1388,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("totals.public_findings", fn)
         self.assertIn("totals.findings", fn)
         self.assertIn('.toLocaleString("ko-KR")', fn)
-        self.assertIn("건 공개 / 전체 ", fn)
-        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        self.assertIn("건 중 ", fn)
+        self.assertIn("건 국문 열람 가능", fn)
+        # [진행형 문구 중립화 M4] "(매일 확대 중)" 진행형 문구는 완전히 제거됐다.
+        self.assertNotIn("매일 확대 중", fn)
         # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약).
         self.assertIn("coverageTextEl.textContent =", fn)
 
@@ -1404,7 +1406,8 @@ class WebFindingsRenderTest(unittest.TestCase):
     # ── [문서 수 병기] totals.documents(010_findings_scope_purity.sql) 있음/없음 두 경로 ──
     def test_coverage_note_documents_present_path_mentions_document_count(self):
         """010 적용 라이브(totals.documents 존재)에서는 "규제 문서 N건 · 지적사항 M건 중
-        P건 공개" 식으로 문서-지적 1:N 관계를 명시한다."""
+        P건 국문 열람 가능" 식으로 문서-지적 1:N 관계를 명시한다(진행형 "공개"·"매일
+        확대 중" 문구는 쓰지 않는다 — M4 중립화)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
@@ -1413,27 +1416,27 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("규제 문서 ", fn)
         self.assertIn("건 · 지적사항 ", fn)
         self.assertIn("건 중 ", fn)
-        self.assertIn("건 공개", fn)
+        self.assertIn("건 국문 열람 가능", fn)
 
     def test_coverage_note_documents_absent_path_falls_back_silently(self):
-        """010 미적용 라이브(totals.documents=undefined)에서는 기존 문안("국문 번역이
-        완료된 지적사항만 열람할 수 있습니다 — 현재 N건 공개 / 전체 M건 집계 반영")을
-        그대로 유지한다 — 레이아웃/문구 깨짐 없는 방어적 생략."""
+        """010 미적용 라이브(totals.documents=undefined)에서는 문서 수 없는 "지적사항
+        N건 중 M건 국문 열람 가능" 문안을 쓴다 — 레이아웃/구조는 그대로, 문구만 M4 에서
+        진행형("현재 N건 공개 / 전체 M건 집계 반영 (매일 확대 중)")을 중립 서술로 갈음."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
-        self.assertIn("국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 ", fn)
-        self.assertIn("건 공개 / 전체 ", fn)
-        self.assertIn("건 집계 반영 (매일 확대 중)", fn)
+        self.assertIn('"지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능"', fn)
+        self.assertNotIn("매일 확대 중", fn)
         # 두 경로 모두 삼항연산자 한 문장으로 분기(방어적 no-op 이 아니라 문구 전환) —
         # 완역 자동 전환(isComplete)이 최상위 분기, hasDocs 가 그 아래 분기다.
         self.assertIn("var hasDocs = ", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
-        """[완역 자동 전환] 미번역 잔량 5건 이하(findings-public_findings<=5)면 진행형
-        문안("매일 확대 중")이 완료형("전체를 국문으로 열람할 수 있습니다")으로 스스로
-        전환된다 — 완역 도달 시점에 별도 배포가 필요 없도록 조건을 미리 심어둔 계약."""
+        """[완역 자동 전환] 미번역 잔량 5건 이하(findings-public_findings<=5)면 미완료
+        문안("N건 중 M건 국문 열람 가능")이 완료형("전체를 국문으로 열람할 수 있습니다")
+        으로 스스로 전환된다 — 완역 도달 시점에 별도 배포가 필요 없도록 조건을 미리
+        심어둔 계약."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
@@ -2354,9 +2357,9 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
-        """[완역 자동 전환] 미번역 잔량 5건 이하면 "순차 공개·집계보다 적을 수 있음"
-        경고가 "전체 지적사항을 국문으로 열람할 수 있습니다" 완료형으로 스스로 전환된다
-        (완역 시점엔 카테고리 클릭 결과와 집계 수치가 일치해 경고가 무의미)."""
+        """[완역 자동 전환] 미번역 잔량 5건 이하면 미완료 경고가 "전체 지적사항을
+        국문으로 열람할 수 있습니다" 완료형으로 스스로 전환된다(완역 시점엔 카테고리
+        클릭 결과와 집계 수치가 일치해 경고가 무의미)."""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
@@ -2365,6 +2368,17 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("Number(totals.findings || 0) > 0", fn)
         self.assertIn("전체 지적사항을 국문으로 열람할 수 있습니다.", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
+
+    def test_coverage_note_incomplete_wording_neutralized(self):
+        """[진행형 문구 중립화 M4] 미완료 경고에서 "순차 공개되며"(계속 진행 중이라는
+        인상)를 제거하고 "국문 번역이 완료된 지적사항만 가능"이라는 현재 상태 서술로
+        바꾼다 — 집계와 클릭 결과가 다를 수 있다는 핵심 정보는 그대로 유지."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertNotIn("순차", fn)
+        self.assertIn("국문 번역이 완료된 지적사항(", fn)
+        self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
 
     # ── [업체 프로파일 진입] 017_findings_stats_firm_key.sql top_firms.firm_key 배선 ──
     def test_firm_row_click_passes_firm_key_through(self):

@@ -1572,8 +1572,8 @@
         var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
         var total = Number(totals.findings || 0).toLocaleString("ko-KR");
         // [문서 수 병기] totals.documents(010_findings_scope_purity.sql 신규 키)가 있을
-        // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 공개"로 문서-지적 관계를 명시한다.
-        // 010 미적용 라이브(undefined)에서는 기존 문안을 그대로 유지한다(방어적 생략).
+        // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 국문 열람 가능"으로 문서-지적 관계를
+        // 명시한다. 010 미적용 라이브(undefined)에서는 문서 수 없는 문안을 유지한다(방어적 생략).
         var hasDocs = typeof totals.documents === "number" && !isNaN(totals.documents);
         // [정확 총수 M1a] 페이지네이션(render())·대시보드(renderDash())가 공유하는 exact
         // 총수 — 이 fetch 는 메인 검색 fetch 와 독립적이라, 성공하면 페이지 이동/렌더
@@ -1595,11 +1595,14 @@
           SERVER_AGENCY_TOTALS = agencySums;
         }
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
-        // 완파손 등 번역 불능 원문뿐) "매일 확대 중" 진행형 문안을 완료형으로 스스로
-        // 전환한다 — 완역 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.
+        // 완파손 등 번역 불능 원문뿐) 미완료 문안을 완료형으로 스스로 전환한다 — 완역
+        // 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.
         var isComplete =
           Number(totals.findings || 0) > 0 &&
           Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
+        // [진행형 문구 중립화] "(매일 확대 중)"·"현재 N건 공개" 처럼 미완성 인상을 주는
+        // 진행형 서술을 제거하고, 지금 상태를 있는 그대로 담담하게 서술한다("N건 중 M건
+        // 국문 열람 가능") — 완역 자동 전환(isComplete) 분기 자체는 그대로 유지.
         coverageTextEl.textContent = isComplete
           ? (hasDocs
               ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
@@ -1607,10 +1610,8 @@
               : "전체 " + total + "건을 국문으로 열람할 수 있습니다.")
           : hasDocs
           ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
-            total + "건 중 " + pub + "건 공개 — 국문 번역이 완료된 지적사항만 열람할 수 " +
-            "있습니다 (매일 확대 중)"
-          : "국문 번역이 완료된 지적사항만 열람할 수 있습니다 — 현재 " + pub +
-            "건 공개 / 전체 " + total + "건 집계 반영 (매일 확대 중)";
+            total + "건 중 " + pub + "건 국문 열람 가능"
+          : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능";
         coverageNoteEl.hidden = false;
       })
       .catch(function () {

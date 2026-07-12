@@ -1,0 +1,28 @@
+{
+  "raw": {
+    "api": "data.go.kr 15058457",
+    "endpoint": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04",
+    "ADM_DISPS_SEQ": "20260512",
+    "ENTP_NAME": "한빛제약",
+    "ITEM_NAME": "한빛정 100mg",
+    "ADM_DISPS_NAME": "제조업무정지 15일",
+    "EXPOSE_CONT": "제조기록서 및 시험성적서 거짓 작성, 기준서 미준수",
+    "BEF_APPLY_LAW": "약사법 제49조제1항 및 제76조제1항, 약사법 시행규칙 [별표1의2] 3.1호",
+    "LAST_SETTLE_DATE": "20260510",
+    "ITEM_SEQ": "199800001",
+    "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199800001",
+    "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)"
+  },
+  "row": {
+    "date": "2026-05-12",
+    "document_id": "admin-20260512",
+    "firm": "한빛제약",
+    "headline": "[행정처분] 한빛정 100mg — 한빛제약",
+    "language": "KO",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 3",
+    "site_country": "대한민국",
+    "source": "MFDS",
+    "type_or_class": "admin-action"
+  }
+}

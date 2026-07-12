@@ -1,0 +1,137 @@
+name: GRM Watchlist Notify
+
+# 관심 업체 워치리스트(015_firm_watchlist.sql — 저장 계층, PR#185 라이브) 통지 절반.
+# 매주 월요일, watchlist_notify_service.py(LLM 0·결정론)가 지난 7일 내 새로 수집되고
+# (ingested_at) 지난 21일 내 발행된(published_date) scope_status='ok' findings 중
+# 사용자의 관심 업체(firm_key)와 매칭되는 것이 있으면 다이제스트 메일 1통(업체명·건수·
+# 발행일·프로파일 링크만 — 원문 미포함)을 보낸다. 뉴스레터(`grm-newsletter-send.yml`)
+# 와 완전 별도 파일·트리거·최소권한(D8 관례 계승) — 한쪽이 죽어도 다른 쪽은 무관하다.
+#
+# ── 사람 승인 게이트(불가침) ──────────────────────────────────────────────────
+# 기존 뉴스레터 발송과 **동일한 `environment: newsletter-send`** 를 재사용한다(신규
+# environment 를 만들지 않는다 — PR#61 에서 사람이 이미 이 environment 에 reviewer 를
+# 등록해 두었다). 이 job 이 `environment: newsletter-send` 를 선언하는 한, 그 environment
+# 에 등록된 reviewer 가 "Review deployments → Approve" 해야만 job 이 실제로 실행된다 —
+# `dry_run` 입력값과 무관하게 이 승인 자체가 "무승인 발송 구조 차단"의 실질 게이트다.
+# cron(스케줄) 실행은 dry_run=false(실발송 시도)로 해석되지만, 그 실행조차 이 environment
+# 승인을 통과해야 스텝이 시작된다 — 스케줄이라고 승인을 우회하지 않는다.
+#
+# workflow_dispatch 는 기본값 dry_run=true(게이트만 — 발송 0) — 사람이 명시적으로
+# false 를 선택해야 수동 실발송이 된다. 두 트리거 모두 최종적으로 environment 승인이
+# 필요하다는 점은 동일하다.
+#
+# ── 안전 설계(watchlist_notify_service.py 모듈 docstring 상세) ────────────────
+#   · 원문 미포함 — 업체명(등록 시점 스냅샷)·건수·최신 발행일·프로파일 링크만.
+#   · 이중 시간조건(ingested_at 7일 AND published_date 21일) — 백필이 옛 문서를 오늘
+#     새로 적재해도 "새 지적"으로 오통지하지 않기 위한 노이즈 방어.
+#   · 멱등 로그(`firm_watch_notification_log`, 016_watchlist_notify_log.sql PK) — 같은
+#     (user, finding) 쌍은 재실행/재스케줄에도 재발송되지 않는다.
+#   · 발송 상한 500통/실행 — 초과분은 로그에 남기지 않고 건너뛰어 다음 실행이 자연히
+#     재시도한다.
+#   · 키·개인정보 비노출 — SUPABASE_SERVICE_ROLE_KEY/Brevo 키는 리포트에 절대 등장하지
+#     않고, 이메일 주소/user_id 는 마스킹(`ab***@d***.com`)해서만 리포트에 남는다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true=게이트만 확인(발송 0) · false=실발송 시도(그래도 environment 승인 필요)'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+  schedule:
+    # 매주 월 01:30 UTC = 10:30 KST(주간 브리프 발행 ~07:30 KST 이후 여유). 스케줄은
+    # **기본 브랜치(main)에서만** 실행된다.
+    - cron: '30 1 * * 1'
+
+# 최소권한 — 콘텐츠 read 만(Supabase/Brevo 는 시크릿으로, GitHub 쓰기 권한 불필요. git 쓰기 0).
+permissions:
+  contents: read
+
+concurrency:
+  # 같은 주 동시 실행 차단(멱등 로그가 이중 안전망이지만 동시성도 끊는다).
+  group: grm-watchlist-notify
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # ★불가침: 기존 뉴스레터 발송과 동일한 environment 재사용(신규 environment 금지).
+    environment: newsletter-send
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # Brevo 키·발신자 env 이름은 grm-newsletter-send.yml 과 동일 재사용(신규 시크릿/변수
+      # 등록 불필요) — 엔드포인트만 Campaigns API 대신 트랜잭션 이메일 API 로 다르게 쓴다.
+      NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+      GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+      GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME || 'Global Regulatory Monitor' }}
+      GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Resolve dry-run flag (schedule → false·실발송 시도 / 수동 → 입력값)
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            DRY_RUN=false
+          else
+            DRY_RUN="$INPUT_DRY_RUN"
+          fi
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+          echo "해석: event=$EVENT_NAME → dry_run=$DRY_RUN(environment 승인은 이미 통과한 뒤)"
+
+      # git 쓰기 0 — Supabase(PostgREST)/Brevo 를 향한 HTTPS 요청만. 원문(finding_text 등)
+      # 은 이 스크립트가 애초에 조회하지 않는다(select 절에 없음 — provenance 불변식).
+      - name: Run watchlist notify
+        id: run
+        env:
+          DRY_RUN: ${{ steps.resolve.outputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            python watchlist_notify_service.py --dry-run --output notify_report.json
+          else
+            python watchlist_notify_service.py --output notify_report.json
+          fi
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Watchlist Notify"
+            echo ""
+            if [ -f notify_report.json ]; then
+              echo '```json'
+              cat notify_report.json
+              echo '```'
+            else
+              echo "notify_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료 -- SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report (D5 사람 검토 아티팩트 -- 마스킹된 이메일/user_id 만 포함)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grm-watchlist-notify-report
+          path: notify_report.json
+          if-no-files-found: warn

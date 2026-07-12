@@ -20,6 +20,13 @@ FDA_483_LIST_URL = (
     "https://www.fda.gov/about-fda/office-inspections-and-investigations/"
     "oii-foia-electronic-reading-room"
 )
+# [findings DB 구멍 수리 2026-07-12] MFDS 행정처분(admin-action)/회수(recall-quality) 는
+# 항목별 official_url 이 없다(collect_mfds_admin_action.py/collect_mfds_recall.py 의
+# DATASET_URL 과 동일 상수 — data.go.kr 데이터셋 페이지가 최종 fallback). 실제 finding
+# evidence_url 은 source_url(수집 시점 API 응답 링크) -> nedrug_item_candidate_url(품목상세
+# 후보) -> 이 목록 URL 순으로 폴백한다(_evidence_url 헬퍼).
+MFDS_ADMIN_ACTION_LIST_URL = "https://www.data.go.kr/data/15058457/openapi.do"
+MFDS_RECALL_LIST_URL = "https://www.data.go.kr/data/15059114/openapi.do"
 
 _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*", re.I)
 
@@ -136,6 +143,8 @@ def findings_from_raw_signal_with_report(
     findings: list[dict[str, Any]] = []
     findings.extend(_from_fda_483_observations(signal, raw, row))
     findings.extend(_from_mfds_gmp(signal, raw, row))
+    findings.extend(_from_mfds_admin_action(signal, raw, row))
+    findings.extend(_from_mfds_recall(signal, raw, row))
     findings.extend(_from_warning_letter(signal, raw, row))
     findings.extend(_from_whopir(signal, raw, row))
     return _dedupe_valid_findings_with_report(findings)
@@ -249,6 +258,85 @@ def _from_mfds_gmp_table(
             review_status="accepted",
         ))
     return out
+
+
+def _from_mfds_admin_action(
+    raw_signal: dict[str, Any],
+    raw: dict[str, Any],
+    row: dict[str, Any],
+) -> list[dict[str, Any]]:
+    # [findings DB 구멍 수리 2026-07-12] MFDS 행정처분(admin-action) raw_signal 은
+    # 지금까지 findings 로 변환하는 추출기가 없어 검색 DB(`/findings/`)가 미국 FDA 483 에
+    # 99.6% 편중되는 원인 중 하나였다(raw_signals 에는 적재되지만 findings 로 안 나감).
+    # 트리거는 row/source_kind 문자열이 아니라 raw 필드 존재로 판별한다(collect_intake.py
+    # 의 IntakeItem.type_or_class="admin-action" 이 row_json 에 "type_or_class" 로 실리지만,
+    # raw 필드 자체(ADM_DISPS_SEQ + EXPOSE_CONT/admin_body_full)가 이 소스의 더 안정적인
+    # 지문이다 -- collect_mfds_admin_action.py _document_id/_body 와 동일 필드).
+    adm_seq = _compact(raw.get("ADM_DISPS_SEQ"))
+    expose_cont = _compact(raw.get("EXPOSE_CONT"))
+    admin_body_full_raw = str(raw.get("admin_body_full") or "")
+    admin_body_full = _compact(admin_body_full_raw)
+    if not adm_seq or not (expose_cont or admin_body_full):
+        return []
+
+    # 첫 줄만 취할 때는 개행이 살아있는 원본에서 잘라야 한다 -- _compact() 는 개행도
+    # 공백 하나로 접어버려 "첫 줄" 경계 자체가 사라진다(admin_body_full 은 위반상세/
+    # 처분명/적용법령이 개행으로 구분된 다단락 텍스트, collect_mfds_admin_action._body).
+    finding_text = expose_cont or _compact(admin_body_full_raw.split("\n", 1)[0])
+    if not finding_text:
+        return []
+
+    bef_apply_law = _compact(raw.get("BEF_APPLY_LAW"))
+    refs = _extract_mfds_refs(bef_apply_law) if bef_apply_law else _extract_mfds_refs(expose_cont)
+
+    return [gf.finding_from_raw_signal(
+        raw_signal,
+        finding_text=finding_text,
+        ordinal=1,
+        category_code=_classify_gmp_summary(expose_cont or finding_text),
+        evidence_level="A",
+        evidence_url=_evidence_url(
+            raw_signal, raw, "source_url", "nedrug_item_candidate_url",
+            fallback=MFDS_ADMIN_ACTION_LIST_URL,
+        ),
+        finding_language=_language(row, "KO"),
+        mfds_refs=refs,
+        confidence=0.88,
+        review_status="accepted",
+    )]
+
+
+def _from_mfds_recall(
+    raw_signal: dict[str, Any],
+    raw: dict[str, Any],
+    row: dict[str, Any],
+) -> list[dict[str, Any]]:
+    # [findings DB 구멍 수리 2026-07-12] MFDS 회수(recall-quality) raw_signal -- admin-action
+    # 과 같은 원인(추출기 부재)으로 검색 DB에 안 들어가던 소스. collect_mfds_recall.py
+    # _to_item 은 PRDUCT 없는 항목을 애초에 수집하지 않으므로(product 없으면 IntakeItem 자체가
+    # None) 실 데이터에서 PRDUCT 는 항상 채워져 있다 -- ENTRPS 단독 존재는 방어적 트리거일 뿐.
+    reason = _compact(raw.get("RTRVL_RESN"))
+    product = _compact(raw.get("PRDUCT"))
+    firm = _compact(raw.get("ENTRPS"))
+    if not reason or not (product or firm):
+        return []
+
+    finding_text = f"{product}: {reason}" if product else reason
+
+    return [gf.finding_from_raw_signal(
+        raw_signal,
+        finding_text=finding_text,
+        ordinal=1,
+        evidence_level="A",
+        evidence_url=_evidence_url(
+            raw_signal, raw, "source_url", "nedrug_item_candidate_url",
+            fallback=MFDS_RECALL_LIST_URL,
+        ),
+        finding_language=_language(row, "KO"),
+        mfds_refs=_extract_mfds_refs(reason),
+        confidence=0.85,
+        review_status="accepted",
+    )]
 
 
 def _from_warning_letter(

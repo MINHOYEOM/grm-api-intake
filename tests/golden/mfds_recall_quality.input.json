@@ -1,0 +1,26 @@
+{
+  "raw": {
+    "api": "data.go.kr 15059114",
+    "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+    "PRDUCT": "가나정 10mg",
+    "ENTRPS": "다라제약",
+    "RTRVL_RESN": "제조 중 이물혼입 확인으로 자진회수",
+    "RECALL_COMMAND_DATE": "20260603",
+    "ENFRC_YN": "N",
+    "ITEM_SEQ": "199900002",
+    "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199900002",
+    "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)"
+  },
+  "row": {
+    "date": "2026-06-03",
+    "document_id": "recall-abc123def456",
+    "firm": "다라제약",
+    "headline": "[회수·판매중지] 가나정 10mg — 다라제약",
+    "language": "KO",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 3",
+    "site_country": "대한민국",
+    "source": "MFDS",
+    "type_or_class": "recall-quality"
+  }
+}

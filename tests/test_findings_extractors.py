@@ -83,6 +83,82 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["review_status"], "needs_review")
         self.assertEqual(findings[0]["confidence"], 0.72)
 
+    def test_mfds_admin_action_becomes_accepted_finding(self) -> None:
+        # [findings DB 구멍 수리 2026-07-12] MFDS 행정처분(admin-action) -- 지금까지
+        # findings 로 안 나가던 소스. EXPOSE_CONT(위반사유 요약)가 원문 그대로 finding_text,
+        # BEF_APPLY_LAW 에서 mfds_refs 를 뽑는다.
+        raw_signal = _raw_signal("mfds_admin_action")
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertEqual(findings[0]["agency"], "MFDS")
+        self.assertEqual(findings[0]["document_type"], "admin-action")
+        self.assertEqual(findings[0]["finding_text"], "제조기록서 및 시험성적서 거짓 작성, 기준서 미준수")
+        self.assertEqual(findings[0]["category_code"], "documentation_records")
+        self.assertEqual(findings[0]["mfds_refs"], ["[별표1의2] 3"])
+        self.assertEqual(findings[0]["evidence_level"], "A")
+        self.assertEqual(findings[0]["finding_language"], "KO")
+        self.assertEqual(findings[0]["review_status"], "accepted")
+        self.assertEqual(findings[0]["confidence"], 0.88)
+        self.assertEqual(
+            findings[0]["evidence_url"],
+            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199800001",
+        )
+
+    def test_mfds_admin_action_falls_back_to_admin_body_full_first_line(self) -> None:
+        # EXPOSE_CONT 가 비어 있으면(플래그 ENABLE_MFDS_ADMIN_BODY_FULL on 시 노출되는)
+        # admin_body_full 첫 줄을 finding_text 로 쓴다.
+        fx = _load_input("mfds_admin_action")
+        raw = dict(fx["raw"])
+        raw["EXPOSE_CONT"] = ""
+        raw["admin_body_full"] = "위반상세 첫 줄 요약\n처분명: 제조업무정지 15일\n적용법령: 약사법 제49조"
+        raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertEqual(findings[0]["finding_text"], "위반상세 첫 줄 요약")
+
+    def test_mfds_admin_action_missing_required_fields_returns_no_findings(self) -> None:
+        fx = _load_input("mfds_admin_action")
+        raw = dict(fx["raw"])
+        raw["ADM_DISPS_SEQ"] = ""
+        raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
+    def test_mfds_recall_becomes_accepted_finding(self) -> None:
+        # [findings DB 구멍 수리 2026-07-12] MFDS 회수(recall-quality) -- admin-action 과
+        # 같은 원인(추출기 부재)으로 검색 DB에 안 들어가던 소스.
+        raw_signal = _raw_signal("mfds_recall_quality")
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertEqual(findings[0]["agency"], "MFDS")
+        self.assertEqual(findings[0]["document_type"], "recall-quality")
+        self.assertEqual(findings[0]["finding_text"], "가나정 10mg: 제조 중 이물혼입 확인으로 자진회수")
+        self.assertEqual(findings[0]["evidence_level"], "A")
+        self.assertEqual(findings[0]["finding_language"], "KO")
+        self.assertEqual(findings[0]["review_status"], "accepted")
+        self.assertEqual(findings[0]["confidence"], 0.85)
+        self.assertEqual(
+            findings[0]["evidence_url"],
+            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199900002",
+        )
+
+    def test_mfds_recall_missing_reason_returns_no_findings(self) -> None:
+        fx = _load_input("mfds_recall_quality")
+        raw = dict(fx["raw"])
+        raw["RTRVL_RESN"] = ""
+        raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
     def test_warning_letter_excerpt_enters_needs_review_queue(self) -> None:
         # [FIND-1 M11] 이 픽스처(Acme, 단일 문단·번호/헤딩 앵커 없음)는 새 WL 분해 로직의
         # degrade 경로(앵커 전무 -> 통짜 1건, 기존과 동일)도 함께 검증한다.

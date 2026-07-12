@@ -1317,7 +1317,18 @@
         // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 공개"로 문서-지적 관계를 명시한다.
         // 010 미적용 라이브(undefined)에서는 기존 문안을 그대로 유지한다(방어적 생략).
         var hasDocs = typeof totals.documents === "number" && !isNaN(totals.documents);
-        coverageTextEl.textContent = hasDocs
+        // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
+        // 완파손 등 번역 불능 원문뿐) "매일 확대 중" 진행형 문안을 완료형으로 스스로
+        // 전환한다 — 완역 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.
+        var isComplete =
+          Number(totals.findings || 0) > 0 &&
+          Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
+        coverageTextEl.textContent = isComplete
+          ? (hasDocs
+              ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
+                total + "건 전체를 국문으로 열람할 수 있습니다."
+              : "전체 " + total + "건을 국문으로 열람할 수 있습니다.")
+          : hasDocs
           ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
             total + "건 중 " + pub + "건 공개 — 국문 번역이 완료된 지적사항만 열람할 수 " +
             "있습니다 (매일 확대 중)"

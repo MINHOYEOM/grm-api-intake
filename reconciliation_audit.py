@@ -18,7 +18,7 @@ from typing import Any
 
 import requests
 
-from reconciliation_service import detect_coverage_anomalies
+from reconciliation_service import detect_coverage_anomalies, summarize_url_contamination
 
 _TIMEOUT = 30
 _PAGE = 1000
@@ -45,6 +45,40 @@ def _fetch_recent_rows(base_url: str, service_key: str, since_iso: str) -> list[
             raise RuntimeError(f"raw_signals 조회 실패: {type(exc).__name__}") from None
         if resp.status_code >= 400:
             raise RuntimeError(f"raw_signals 조회 HTTP {resp.status_code}")
+        batch = resp.json() or []
+        rows.extend(batch)
+        if len(batch) < _PAGE:
+            break
+        offset += _PAGE
+    return rows
+
+
+def _fetch_all_findings_evidence(base_url: str, service_key: str) -> list[dict[str, Any]]:
+    """findings 테이블에서 (source, document_type, evidence_url) 전량 페이지네이션 취득.
+
+    [Fix B — evidence_url 오염 주간 스캔] 주간 잡이라 전량 스캔 허용(2026-07 기준
+    ~9.2k 행, 30초 내 — _fetch_recent_rows 와 같은 페이지네이션 골격/_PAGE 재사용).
+    주의: findings 행수가 10만 단위로 커지면 여기를 전량 스캔에서 서버측 필터(예:
+    updated_at/created_at 기준 최근 N일 증분)로 전환할 것 — raw_signals reconciliation
+    이 이미 시간 윈도우로 하는 것과 같은 방식.
+    """
+    url = f"{base_url}/rest/v1/findings"
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    rows: list[dict[str, Any]] = []
+    offset = 0
+    while True:
+        params = {
+            "select": "source,document_type,evidence_url",
+            "order": "finding_id.asc",
+            "limit": str(_PAGE),
+            "offset": str(offset),
+        }
+        try:
+            resp = requests.get(url, params=params, headers=headers, timeout=_TIMEOUT)
+        except requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"findings 조회 실패: {type(exc).__name__}") from None
+        if resp.status_code >= 400:
+            raise RuntimeError(f"findings 조회 HTTP {resp.status_code}")
         batch = resp.json() or []
         rows.extend(batch)
         if len(batch) < _PAGE:
@@ -130,13 +164,37 @@ def main() -> int:
 
     if not anomalies:
         _emit("\n✅ 이상 낙차 없음 — 감시 대상 소스 정상 수집.")
+    else:
+        _emit(f"\n⚠️ 이상 낙차 {len(anomalies)}건:")
+        for a in anomalies:
+            _emit(f"::warning title=coverage-{a.severity}::{a.message}")
+            _emit(f"  - [{a.severity}] {a.message}")
+    # 비차단: 이상치가 있어도 exit 0. 경보는 위 ::warning:: 주석으로 Actions UI 에 노출.
+
+    _emit("\n## evidence_url 오염 스캔")
+    try:
+        finding_rows = _fetch_all_findings_evidence(base_url, service_key)
+    except RuntimeError as exc:
+        # 조회 실패도 비차단(관측 잡이 파이프라인을 막으면 안 됨) — 단, 표면화.
+        _emit(f"::warning title=evidence-url-contamination::{exc}")
         return 0
 
-    _emit(f"\n⚠️ 이상 낙차 {len(anomalies)}건:")
-    for a in anomalies:
-        _emit(f"::warning title=coverage-{a.severity}::{a.message}")
-        _emit(f"  - [{a.severity}] {a.message}")
-    # 비차단: 이상치가 있어도 exit 0. 경보는 위 ::warning:: 주석으로 Actions UI 에 노출.
+    contamination = summarize_url_contamination(finding_rows)
+    if not contamination:
+        _emit(f"✅ evidence_url 오염 없음 ({len(finding_rows)}행 스캔)")
+        return 0
+
+    _emit(f"⚠️ evidence_url 오염 {len(contamination)}건 (사유·소스별 집계):")
+    for c in contamination:
+        _emit(
+            f"  - [{c['reason']}] {c['source']} / {c['document_type']}: "
+            f"{c['n']}건 — 예: {c['sample_url']}"
+        )
+        _emit(
+            f"::warning title=evidence-url-contamination::"
+            f"[{c['reason']}] {c['source']}/{c['document_type']} {c['n']}건 — {c['sample_url']}"
+        )
+    # 비차단 유지: 오염이 있어도 exit 0(생성층 Fix A 가 1차 방어, 이 스캔은 감시 전용).
     return 0
 
 

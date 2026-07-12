@@ -19,7 +19,9 @@
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from typing import Any
 
 
 # 감시 대상 = 주(week) 단위로 사실상 항상 데이터가 있는 고volume 소스.
@@ -115,3 +117,79 @@ def detect_coverage_anomalies(
     # silent_drop 을 먼저 노출
     out.sort(key=lambda a: (a.severity != "silent_drop", a.source))
     return out
+
+
+# ---------------------------------------------------------------------------
+# evidence_url 오염 스캔 (Fix B — 2026-07-12)
+#
+# 배경: /findings/ 의 evidence_url 이 목록/데이터셋/API 엔드포인트로 오염되는 사고가
+# 2건 발생(MFDS 행정처분·회수 21건, GMP실사 2건). 생성 시점 가드(Fix A,
+# grm_findings.EVIDENCE_URL_BLOCKLIST, 별도 병렬 PR)는 "새로 만드는" finding 을 막지만,
+# 이미 DB 에 들어간 오염과 앞으로 나타날 미지 패턴은 주기 감시가 필요하다.
+#
+# 아래 패턴은 grm_findings/findings_extractors 의 정의를 import 하지 않고 이 모듈이
+# 독립적으로 보유한다(의도적 설계) — 방어 계층을 분리해 생성층 가드가 뚫리거나
+# 회귀해도 이 감시층이 별도로 잡는다. 감시층은 비차단 WARN 전용이라 생성층 가드보다
+# 광범위해도(오탐이 있어도) 비용이 낮다 — 두 계층의 패턴이 완전히 같을 필요는 없다.
+# ---------------------------------------------------------------------------
+
+EVIDENCE_URL_BAD_PATTERNS: tuple[tuple[str, str], ...] = (
+    (r"[?&]serviceKey=", "api-key-url"),
+    (r"^https?://apis\.data\.go\.kr/", "api-endpoint"),
+    (r"^https?://(www\.)?data\.go\.kr/", "dataset-page"),
+    (r"^(?!https?://)", "non-http"),
+)
+
+# 리포트 출력용 serviceKey 마스킹. grm_common.mask_service_key 와 같은 정규식이지만
+# 이 모듈은 순수 판정 로직 전용(네트워크 의존 없음)이라 grm_common(requests 의존)을
+# import 하지 않고 여기서 독립 정의한다 — 위 EVIDENCE_URL_BAD_PATTERNS 와 같은 이유.
+_SERVICE_KEY_RE = re.compile(r"([?&]serviceKey=)[^&]+")
+
+
+def classify_evidence_url(url: str) -> str:
+    """오염이면 사유 문자열, 정상이면 ''. 빈 값은 'empty'."""
+    u = (url or "").strip()
+    if not u:
+        return "empty"
+    for pattern, reason in EVIDENCE_URL_BAD_PATTERNS:
+        if re.search(pattern, u):
+            return reason
+    return ""
+
+
+def _mask_service_key(url: str) -> str:
+    """sample_url 에 serviceKey 원문이 절대 남지 않도록 마스킹."""
+    return _SERVICE_KEY_RE.sub(r"\1***", url)
+
+
+def summarize_url_contamination(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """오염된 evidence_url 을 (source, document_type, reason) 별로 집계.
+
+    반환: [{source, document_type, reason, n, sample_url}, ...] — 정상(reason == '')
+    행은 제외. sample_url 은 그룹의 대표 URL 이며 serviceKey 는 마스킹된 채로 담긴다
+    (리포트/::warning:: 문자열에 실 키가 노출되지 않도록 이 함수 출력 시점에 마스킹).
+    """
+    groups: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in rows:
+        url = str(row.get("evidence_url") or "").strip()
+        reason = classify_evidence_url(url)
+        if not reason:
+            continue
+        source = str(row.get("source") or "").strip() or "(unknown)"
+        document_type = str(row.get("document_type") or "").strip() or "(unknown)"
+        key = (source, document_type, reason)
+        group = groups.get(key)
+        if group is None:
+            groups[key] = {
+                "source": source,
+                "document_type": document_type,
+                "reason": reason,
+                "n": 1,
+                "sample_url": _mask_service_key(url),
+            }
+        else:
+            group["n"] += 1
+    return sorted(
+        groups.values(),
+        key=lambda g: (g["reason"], g["source"], g["document_type"]),
+    )

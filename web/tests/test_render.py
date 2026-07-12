@@ -833,7 +833,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         overflow:hidden+white-space:nowrap+min-width:0 을 갖춰야 한다(옛 라벨 CSS 에는
         이 3속성이 빠져 있어 긴 라벨이 자동 최소폭만큼 막대를 밀어내던 게 겹침의 원인).
         buildCatRow() 는 title 속성으로 잘린 전체 라벨을 계속 노출한다."""
-        css = self.html[self.html.index(".fnd-dash-cat-label{"):]
+        # 정확히 이 셀렉터로 시작하는 규칙만 골라낸다(".fnd-dash-cat-label{" 부분 문자열은
+        # ".fnd-dash-cat-row:focus-visible .fnd-dash-cat-label{color:...}" 같은 결합
+        # 셀렉터 규칙 끝에도 나타나 첫 occurrence 가 엉뚱한 규칙을 집어올 수 있다).
+        anchor = "\n.fnd-dash-cat-label{"
+        css = self.html[self.html.index(anchor) + 1:]
         css = css[:css.index("}") + 1]
         self.assertIn("min-width:0", css)
         self.assertIn("overflow:hidden", css)
@@ -1663,7 +1667,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         .fnd-b/.fnd-card 스타일 계열을 재사용한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function buildDocHead(rows)", js_src)
-        self.assertIn('el("h2", "fnd-doc-firm", head.firm_name)', js_src)
+        self.assertIn('el("h2", "fnd-doc-firm", firmDisplay)', js_src)
         self.assertIn('meta.appendChild(el("span", "fnd-b", head.source));', js_src)
         self.assertIn('meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));', js_src)
         self.assertIn(".fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}", self.html)

@@ -1613,9 +1613,9 @@
         var isComplete =
           Number(totals.findings || 0) > 0 &&
           Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
-        // [진행형 문구 중립화] "(매일 확대 중)"·"현재 N건 공개" 처럼 미완성 인상을 주는
-        // 진행형 서술을 제거하고, 지금 상태를 있는 그대로 담담하게 서술한다("N건 중 M건
-        // 국문 열람 가능") — 완역 자동 전환(isComplete) 분기 자체는 그대로 유지.
+        // [진행형 문구 중립화] 계속 확대·진행 중이라는 인상을 주던 옛 괄호 안내 문구와
+        // "현재 N건 공개" 서술을 제거하고, 지금 상태를 있는 그대로 담담하게 서술한다
+        // ("N건 중 M건 국문 열람 가능") — 완역 자동 전환(isComplete) 분기 자체는 그대로 유지.
         coverageTextEl.textContent = isComplete
           ? (hasDocs
               ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +

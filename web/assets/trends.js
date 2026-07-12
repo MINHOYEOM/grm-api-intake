@@ -271,7 +271,7 @@
     var isComplete =
       Number(totals.findings || 0) > 0 &&
       Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
-    // [진행형 문구 중립화] "순차 공개되며"(계속 진행 중이라는 인상)를 "국문 번역이 완료된
+    // [진행형 문구 중립화] 계속 진행 중이라는 인상을 주던 옛 서술을 "국문 번역이 완료된
     // 지적사항만 열람 가능"이라는 현재 상태 서술로 바꾼다 — 집계 수치와 클릭 결과가 다를
     // 수 있다는 핵심 정보(사용자가 오해하지 않도록 하는 실질 안내)는 그대로 유지한다.
     coverageTextEl.textContent = isComplete

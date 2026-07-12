@@ -1529,6 +1529,145 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(".fnd-doc{", findings_html_src)
         self.assertIn(".fnd-doc-toggle{", findings_html_src)
 
+    # ── [페이지네이션] 더 보기 + 서버 정확 카운트 ─────────────────────────────────
+    def test_load_more_button_shell_present_hidden_and_defensive_lookup(self):
+        """정적 셸은 라벨 없는 hidden 버튼만 렌더(골든 결정론) — 문구/노출은
+        findings.js 가 SERVER_TOTAL/ROWS 기준으로 채운다. 엘리먼트 부재(구버전 셸)에서도
+        hasDash 관례와 동형으로 조용히 no-op 이어야 한다."""
+        self.assertIn(
+            '<div class="fnd-load-more-wrap"><button class="fnd-load-more" id="fnd-load-more" type="button" hidden></button></div>',
+            self.html,
+        )
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('document.getElementById("fnd-load-more")', js_src)
+        self.assertIn("if (!loadMoreBtn) return;", js_src)
+
+    def test_content_range_prefer_header_and_parsing(self):
+        """서버 exact count 확보 — fetch 헤더에 Prefer: count=exact 를 실어 보내고,
+        응답 Content-Range("0-999/1926" 형식)에서 총수를 파싱한다. 파싱 실패/헤더
+        미노출 시 null 폴백(기존 동작 유지) — 하드코딩 숫자 없음."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('Prefer: "count=exact"', js_src)
+        self.assertIn("function parseServerTotal(resp)", js_src)
+        fn = js_src[js_src.index("function parseServerTotal(resp)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('resp.headers.get("content-range")', fn)
+        self.assertIn("if (!cr) return null;", fn)
+        self.assertIn(r"/\/(\d+)$/", fn)
+        self.assertIn("return isNaN(n) ? null : n;", fn)
+
+    def test_load_more_endpoint_uses_offset_and_reuses_loaded_fields(self):
+        """"더 보기" 는 최초 로드가 성공시킨 필드셋(LOADED_FIELDS)을 그대로 재사용해
+        offset=ROWS.length 로 다음 페이지를 요청한다 — 3단계 폴백을 매번 재협상하지
+        않는다. buildEndpoint 는 offset>0 일 때만 &offset= 을 덧붙인다(생략 시 기존
+        limit=1000 단일 호출과 동일 — 하위호환)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function buildEndpoint(fields, offset)", js_src)
+        self.assertIn('(off > 0 ? "&offset=" + off : "")', js_src)
+        self.assertIn("function loadMoreRows()", js_src)
+        fn = js_src[js_src.index("function loadMoreRows()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("fetchFindings(LOADED_FIELDS, ROWS.length)", fn)
+
+    def test_load_more_duplicate_click_guard(self):
+        """로딩 중 중복 클릭 방어 — isLoadingMore 플래그로 조기 반환하고, 버튼 자체도
+        disabled 로 이중 방어한다(버튼이 없는 구버전 셸에서도 플래그만으로 안전)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function loadMoreRows()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (isLoadingMore || !LOADED_FIELDS) return;", fn)
+        self.assertIn("isLoadingMore = true;", fn)
+        self.assertIn("isLoadingMore = false;", fn)
+        self.assertIn("function updateLoadMoreUI()", js_src)
+        self.assertIn("loadMoreBtn.disabled = isLoadingMore;", js_src)
+
+    def test_merge_rows_dedupes_by_finding_id(self):
+        """mergeRows() 는 finding_id 기준 중복을 제거한다 — 두 fetch 사이 새 번역이
+        공개(publish gate 통과)돼 정렬 경계에서 행이 밀려도 같은 행이 두 번 들어오지
+        않는다. 병합 대상은 항상 전역 ROWS(로드된 전체) — 필터된 부분집합이 아니다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function mergeRows(newRows)", js_src)
+        fn = js_src[js_src.index("function mergeRows(newRows)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var seen = {};", fn)
+        self.assertIn("if (id !== undefined && id !== null && seen[id]) return;", fn)
+        self.assertIn("ROWS.push(r);", fn)
+
+    def test_pagination_boundary_document_merge_via_full_regroup(self):
+        """[문서 병합 경계] "더 보기"로 불러온 행은 mergeRows() 가 전역 ROWS 에 이어붙인
+        뒤 render() 를 다시 호출한다 — render() 는 매번 ROWS 전체를 다시 정렬·그룹핑
+        (groupByDocument)하므로, 페이지 경계에서 같은 raw_signal_id 문서의 관측치가
+        두 페이지에 걸쳐 나뉘어 도착해도 다음 render() 에서 하나의 문서 카드로 재병합된다
+        (groupByDocument 는 인접성이 아니라 raw_signal_id 해시맵 기준이라 그 자체로
+        경계-안전). 별도 "문서 조각 봉합" 로직을 추가하지 않고 기존 전량 재계산에
+        의존하는 것이 설계 판단이다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function loadMoreRows()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("mergeRows(data);", fn)
+        self.assertIn("render();", fn)
+        # render() 는 항상 ROWS 전체(필터 적용 후)를 다시 정렬·그룹핑한다(부분 갱신 없음).
+        self.assertIn("var matched = sortRows(ROWS.filter(matches));", js_src)
+        self.assertIn("var docs = groupByDocument(matched);", js_src)
+
+    def test_filter_change_recomputes_total_vs_loaded_display(self):
+        """[필터 연동] 필터가 하나도 없을 때만 서버 exact count(SERVER_TOTAL) 와 로드
+        건수를 비교해 "지적 총수 중 표시" 문구로 전환한다 — 필터가 걸리면(검색어 포함)
+        필터링된 부분집합을 서버 전체수와 비교하는 게 의미가 없으므로 원래의 "문서 X건 ·
+        지적 Y건" 표기로 되돌아간다. render() 가 필터 변경마다 다시 호출되므로 이 판정도
+        매번 새로 계산된다(오프셋 자체는 필터와 무관한 전역 로드 진행률이라 리셋 대상이
+        아니다 — 이하 주석 참조)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function render() {"):]
+        self.assertIn(
+            "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
+            render_fn,
+        )
+        self.assertIn(
+            "if (!filtersActive && SERVER_TOTAL !== null && SERVER_TOTAL > ROWS.length) {",
+            render_fn,
+        )
+        self.assertIn('bTotal.textContent = SERVER_TOTAL.toLocaleString("ko-KR");', render_fn)
+        self.assertIn('bLoaded.textContent = ROWS.length.toLocaleString("ko-KR");', render_fn)
+
+    def test_content_range_parse_failure_falls_back_to_batch_size_heuristic(self):
+        """[방어] Content-Range 파싱 실패(헤더 미노출 등)로 SERVER_TOTAL 이 null 이면,
+        "가장 최근 페이지가 PAGE_LIMIT 로 꽉 찼는지"만으로 더 보기 버튼 노출 여부를
+        판단한다(정확한 남은 건수는 생략하고 "더 보기"만 표시) — 로드 수 표시로 조용히
+        폴백하는 기존 계약과 동형."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function updateLoadMoreUI()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn(
+            "var hasMore = SERVER_TOTAL !== null\n"
+            "      ? ROWS.length < SERVER_TOTAL\n"
+            "      : LAST_BATCH_SIZE === PAGE_LIMIT;",
+            fn,
+        )
+        self.assertIn('loadMoreBtn.textContent = "더 보기";', fn)
+
+    def test_facet_skeleton_idempotent_for_reload_after_more(self):
+        """buildFacetSkeleton() 은 "더 보기" 이후에도 재호출될 수 있어(새로 드러난 값
+        옵션 추가) 이미 존재하는 옵션 값은 건너뛰어야 한다 — 그렇지 않으면 재호출 시
+        <option> 이 중복 생성된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildFacetSkeleton()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (existing[v]) return;", fn)
+
+    def test_doc_firm_link_affordance_visible_by_default(self):
+        """[어포던스 수정] 문서 카드 업체명 링크(.fnd-doc-firm a)는 기본 상태에서도
+        일반 텍스트와 구분되는 시각 신호(밑줄+화살표)를 가져야 한다 — hover 시에만
+        보이던 이전 규칙은 "클릭이 안 된다"는 오인 신고를 낳았다."""
+        import re as _re
+        m = _re.search(r"\.fnd-doc-firm a\{([^}]*)\}", self.html)
+        self.assertIsNotNone(m, ".fnd-doc-firm a CSS 규칙 미발견")
+        self.assertIn("text-decoration:underline", m.group(1))
+        self.assertNotIn("text-decoration:none", m.group(1))
+        after_m = _re.search(r"\.fnd-doc-firm a::after\{([^}]*)\}", self.html)
+        self.assertIsNotNone(after_m, ".fnd-doc-firm a::after 화살표 글리프 미발견")
+        self.assertIn('content:"→"', after_m.group(1))
+
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):

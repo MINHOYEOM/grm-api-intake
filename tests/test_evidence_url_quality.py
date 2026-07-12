@@ -23,26 +23,13 @@ GOLDEN = os.path.join(os.path.dirname(__file__), "golden")
 
 
 def _base_finding(evidence_url: str) -> dict:
-    """validate_finding 통과 최소 레코드(evidence_url 만 변주)."""
-    return {
-        "schema_version": gf.FINDING_SCHEMA_VERSION,
-        "taxonomy_version": "grm-finding-taxonomy/v3",
-        "finding_id": "finding-" + "0" * 24,
-        "raw_signal_id": "rawsig-" + "0" * 24,
-        "source": "MFDS",
-        "agency": "MFDS",
-        "document_type": "recall-quality",
-        "document_id": "recall-abc",
-        "published_date": "2026-07-01",
-        "firm_name": "테스트제약",
-        "category_code": "",
-        "finding_text": "테스트 위반 사유",
-        "finding_language": "KO",
-        "evidence_level": "A",
-        "evidence_url": evidence_url,
-        "extraction_method": "deterministic",
-        "review_status": "accepted",
-    }
+    """validate_finding 통과 레코드(evidence_url 만 변주). 스키마 드리프트(taxonomy 버전 등)를
+    피하려고 실제 추출 finding 을 base 로 쓴다 — mfds_recall_quality 픽스처가 내는 정상
+    finding(evidence_url=CCBAI01)의 evidence_url 만 교체한다."""
+    fx = json.load(open(os.path.join(GOLDEN, "mfds_recall_quality.input.json"), encoding="utf-8"))
+    raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+    finding = extractors.findings_from_raw_signal(raw_signal)[0]
+    return {**finding, "evidence_url": evidence_url}
 
 
 class EvidenceUrlClassifierTest(unittest.TestCase):

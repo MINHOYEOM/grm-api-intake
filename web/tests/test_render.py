@@ -53,6 +53,7 @@ __all__ = [
     "WebFindingsRenderTest",
     "WebTrendsRenderTest",
     "WebFirmRenderTest",
+    "WebFirmWatchlistTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
     "WebDeterministicDetailTest",
@@ -1980,6 +1981,132 @@ class WebFirmRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
         self.assertNotIn("cdn.", js_src)
         self.assertNotIn("<canvas", self.html)
+
+
+class WebFirmWatchlistTest(unittest.TestCase):
+    """관심 업체 워치리스트(015_firm_watchlist.sql 의 웹 절반) — 셸 배선·JS 소스 계약.
+
+    실제 등록/해제는 브라우저 런타임(supabase-js·RLS) 소관이라, 여기선 기존
+    WebFirmRenderTest/WebAdminRenderTest 의 JS 소스 문자열 단언 관례로 다음을 고정한다:
+      (1) firm.html 셸은 빈 hidden 컨테이너만(런타임 주입 전 골든 결정론),
+      (2) firm.js 가 reactions.js 의 세션 취득/로그인 판단/Authorization(supabase-js
+          from() 토큰 자동첨부) 패턴을 문자열 수준에서 그대로 재사용(새 인증 코드 0),
+      (3) 015 미적용/비로그인/env 미설정 방어 폴백 마커,
+      (4) me 페이지 관심 업체 섹션 배선(reactions.js renderMyFirms)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_watch_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "firm" / "index.html").read_text(encoding="utf-8")
+        cls.firm_js = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        cls.reactions_js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+        cls.me_tmpl = (WEB_DIR / "templates" / "me.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_shell_has_hidden_watch_container_only(self):
+        # 셸엔 빈 hidden 컨테이너만 — 버튼/안내 문구는 firm.js 런타임 주입(env 와 무관하게
+        # 템플릿 출력 byte 동일 = 골든 결정론).
+        self.assertIn('<div class="fp-watch" id="fp-watch" hidden></div>', self.html)
+        self.assertNotIn("관심 업체 등록", self.html)
+        self.assertNotIn("관심 등록됨", self.html)
+
+    def test_firm_js_reuses_reactions_session_pattern_verbatim(self):
+        # reactions.js 의 클라이언트 생성 auth 설정 4종을 문자열 수준으로 동일 재사용
+        # (같은 storageKey → localStorage 세션 공유). 두 파일 모두에 존재해야 파리티.
+        for marker in (
+            'storageKey: "grm-public-auth-v1"',
+            "persistSession: true",
+            "autoRefreshToken: true",
+            "detectSessionInUrl: false",
+            ".auth.getSession()",
+            ".auth.onAuthStateChange(",
+        ):
+            self.assertIn(marker, self.firm_js, f"firm.js 에 재사용 패턴 누락: {marker}")
+            self.assertIn(marker, self.reactions_js, f"reactions.js 원본 패턴 소실: {marker}")
+        # 로그인 상태 판단도 reactions.js 동형(session && session.user).
+        self.assertIn("!wSession || !wSession.user", self.firm_js)
+
+    def test_firm_js_db_calls_via_supabase_client_own_rows(self):
+        # DB 호출은 supabase-js from() — Authorization: Bearer <사용자 토큰> 자동 첨부
+        # (reactions.js 의 sb.from("reaction") 동형). anon-key 수동 헤더로 워치리스트를
+        # 만지지 않는다(RPC/findings REST 만 anon 유지).
+        self.assertIn('from("firm_watchlist").select("firm_key")', self.firm_js)
+        self.assertIn('from("firm_watchlist").insert({', self.firm_js)
+        self.assertIn('from("firm_watchlist").delete()', self.firm_js)
+        self.assertIn("firm_display: displayName || \"\"", self.firm_js)  # 표시명 스냅샷
+        self.assertIn("user_id: wSession.user.id, firm_key: firmKey", self.firm_js)
+        self.assertNotIn('"/rest/v1/firm_watchlist', self.firm_js)
+
+    def test_firm_js_toggle_labels_and_login_entry_reuse(self):
+        self.assertIn('"관심 업체 등록"', self.firm_js)
+        self.assertIn('"관심 등록됨 · 해제"', self.firm_js)
+        self.assertIn("로그인하면 관심 업체로 등록할 수 있습니다", self.firm_js)
+        # 로그인 진입 = reactions.js 가 헤더에 주입하는 버튼(.grm-acct-login) 클릭 위임.
+        self.assertIn('.grm-auth .grm-acct-login', self.firm_js)
+        self.assertIn('grm-acct-login', self.reactions_js)
+
+    def test_firm_js_silent_disable_and_cap_hint(self):
+        # 015 미적용(테이블 부재)·network 실패 → hidden 유지(조용한 비활성).
+        self.assertIn("function hideWatch()", self.firm_js)
+        self.assertIn("watchEl.hidden = true", self.firm_js)
+        # 프로파일 로드 성공 후에만 배선(본기능 무장애).
+        self.assertIn('initWatchlist(firmKeyParam, data.display_name || "")', self.firm_js)
+        # insert 거부 힌트에 상한(50) 명시 — 015 트리거 메시지와 정합.
+        self.assertIn("최대 50개", self.firm_js)
+
+    def test_firm_js_watch_labels_no_emoji(self):
+        import re as _re
+        # 주: ★·— 같은 기존 주석 기호(U+2600 대역 일부)는 허용 — 이모지 평면(U+1F000~)만 금지.
+        self.assertIsNone(_re.search(r"[\U0001F000-\U0001FAFF❤⭐]", self.firm_js),
+                          "firm.js 에 이모지 사용 금지(기존 버튼 톤 계승)")
+
+    def test_me_template_firm_section_wired(self):
+        self.assertIn('id="grm-my-firms"', self.me_tmpl)
+        self.assertIn("관심 업체", self.me_tmpl)
+        self.assertIn("불러오는 중…", self.me_tmpl)
+
+    def test_me_page_built_with_firm_section_when_env_on(self):
+        # me/index.html 은 reactions env-gate 뒤에서만 생성(기존 관례) — on 빌드에서 섹션 확인.
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_watchme_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            me = (out / "me" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertIn('id="grm-my-firms"', me)
+        self.assertIn("관심 업체", me)
+
+    def test_reactions_js_my_firms_renderer(self):
+        # me 페이지 관심 업체 목록 — 스크랩 목록(renderMyScraps) 관례 동형.
+        self.assertIn("function renderMyFirms()", self.reactions_js)
+        self.assertIn('getElementById("grm-my-firms")', self.reactions_js)
+        self.assertIn('from("firm_watchlist").select("firm_key,firm_display,created_at")', self.reactions_js)
+        # 015 미적용/비로그인 방어 — 오류처럼 보이지 않는 노트 폴백.
+        self.assertIn("관심 업체 목록 준비 중입니다.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+        # 빈 목록 안내 + 프로파일 링크 + 해제 버튼.
+        self.assertIn("아직 등록한 업체가 없습니다", self.reactions_js)
+        self.assertIn("업체 프로파일에서 관심 업체로 등록하세요.", self.reactions_js)
+        self.assertIn('findings/firm/index.html?key=" + encodeURIComponent(fw.firm_key)', self.reactions_js)
+        self.assertIn('from("firm_watchlist").delete().match({ user_id: session.user.id, firm_key: fw.firm_key })', self.reactions_js)
+        # 배선 — 세션 취득/변경 양쪽에서 렌더(스크랩과 동일 지점).
+        self.assertIn("renderMyScraps(); renderMyFirms();", self.reactions_js)
+
+    def test_reactions_js_firm_display_never_injected_as_html(self):
+        # firm_display 는 자유 텍스트(스냅샷) — textContent 로만 렌더(XSS 계약).
+        self.assertIn("a.textContent = fw.firm_display || fw.firm_key", self.reactions_js)
+        self.assertNotIn("fw.firm_display +", self.reactions_js)
+        self.assertNotIn("+ fw.firm_display", self.reactions_js)
 
 
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──

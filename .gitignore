@@ -50,5 +50,12 @@ grm-findings.sqlite3
 *.sqlite3-shm
 *.sqlite3-wal
 
+# Codex 번역 레인 스크래치 산출물(루트 한정) — 재생성 가능·커밋 금지
+# (과거 루트 오염·잔여물 커밋 사고의 원인 패턴 재발 차단, 컨트롤 타워 2026-07-12)
+/plan.json
+/filled.json
+/apply_report.json
+/batch*_source.json
+
 # 로컬 보관용 — git 추적 제외
 /archive/

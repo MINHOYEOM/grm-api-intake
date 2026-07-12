@@ -310,6 +310,122 @@
     documents.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
   }
 
+  // ── 관심 업체 워치리스트(015_firm_watchlist.sql — 등록/해제 토글) ────────────
+  // reactions.js 의 세션 취득/로그인 상태 판단/Authorization 헤더 사용 패턴을 그대로
+  // 재사용한다(새 인증 코드 발명 금지):
+  //   · window.supabase(lib.createClient) + auth 설정 4종(storageKey "grm-public-auth-v1"/
+  //     persistSession/autoRefreshToken/detectSessionInUrl:false)을 reactions.js 와 동일
+  //     하게 생성 — 같은 storageKey 라 localStorage 세션이 그대로 공유된다(별도 로그인 불요).
+  //   · 로그인 상태 판단 = session && session.user (reactions.js toggle()/renderMyScraps() 동형).
+  //   · DB 호출은 wsb.from("firm_watchlist") — supabase-js 가 Authorization: Bearer
+  //     <사용자 access_token> 을 자동 첨부한다(reactions.js 의 sb.from("reaction") 동형.
+  //     RLS 본인 행만 — 015 계약).
+  //   · 로그인 진입 경로 = reactions.js 가 헤더에 주입하는 로그인 버튼(.grm-acct-login →
+  //     openLogin() 팝업)을 클릭 위임으로 재사용(별도 로그인 UI 발명 0).
+  // 실패는 전부 삼켜 hidden 유지(조용한 비활성) — env 미설정·supabase-js 부재·015 미적용
+  // (테이블 부재 → PostgREST 오류)·network 실패 어느 경우에도 프로파일 본기능 무장애.
+  // 주: reactions.js 와 GoTrueClient 2개가 같은 storageKey 를 공유하면 콘솔 경고(Multiple
+  // GoTrueClient instances)가 뜰 수 있으나 동작엔 무해하다(둘 다 같은 저장소를 읽는다).
+  var watchEl = document.getElementById("fp-watch");
+
+  function initWatchlist(firmKey, displayName) {
+    if (!watchEl || !url || !key) return;
+    var lib = window.supabase;
+    if (!lib || !lib.createClient) return;
+    var wsb;
+    try {
+      wsb = lib.createClient(url, key, {
+        auth: {
+          storageKey: "grm-public-auth-v1",
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false
+        }
+      });
+    } catch (e) { return; }
+
+    var wSession = null;
+    var registered = false;
+
+    function hideWatch() { watchEl.innerHTML = ""; watchEl.hidden = true; }
+
+    // 비로그인 — 버튼 대신 안내 + 기존 로그인 진입(헤더 버튼) 재사용.
+    function renderLoggedOut() {
+      watchEl.innerHTML = "";
+      watchEl.appendChild(el("p", "fp-watch-note", "로그인하면 관심 업체로 등록할 수 있습니다"));
+      var lb = document.createElement("button");
+      lb.type = "button";
+      lb.className = "fp-watch-login";
+      lb.textContent = "로그인";
+      lb.addEventListener("click", function () {
+        var headerLogin = document.querySelector(".grm-auth .grm-acct-login");
+        if (headerLogin) headerLogin.click();
+      });
+      watchEl.appendChild(lb);
+      watchEl.hidden = false;
+    }
+
+    // 로그인 — 등록/해제 토글 버튼("관심 업체 등록" ↔ "관심 등록됨 · 해제").
+    function renderWatchButton() {
+      watchEl.innerHTML = "";
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "fp-watch-btn" + (registered ? " is-on" : "");
+      btn.textContent = registered ? "관심 등록됨 · 해제" : "관심 업체 등록";
+      btn.setAttribute("aria-pressed", registered ? "true" : "false");
+      var hint = el("p", "fp-watch-hint", "");
+      btn.addEventListener("click", function () {
+        if (!wSession || !wSession.user) { renderLoggedOut(); return; }
+        btn.disabled = true;
+        hint.textContent = "";
+        var op = registered
+          ? wsb.from("firm_watchlist").delete()
+              .match({ user_id: wSession.user.id, firm_key: firmKey })
+          : wsb.from("firm_watchlist").insert({
+              user_id: wSession.user.id,
+              firm_key: firmKey,
+              firm_display: displayName || ""
+            });
+        op.then(function (res) {
+          btn.disabled = false;
+          if (res && res.error) {
+            // insert 거부는 015 상한 트리거(사용자당 50개) 초과가 대표 경로 — 상한 안내.
+            hint.textContent = registered
+              ? "해제에 실패했습니다. 잠시 후 다시 시도해 주세요."
+              : "등록에 실패했습니다. 관심 업체는 사용자당 최대 50개까지 등록할 수 있습니다.";
+            return;
+          }
+          registered = !registered;
+          renderWatchButton();
+        }).catch(function () { btn.disabled = false; });
+      });
+      watchEl.appendChild(btn);
+      watchEl.appendChild(hint);
+      watchEl.hidden = false;
+    }
+
+    function refreshWatch() {
+      if (!wSession || !wSession.user) { renderLoggedOut(); return; }
+      wsb.from("firm_watchlist").select("firm_key").eq("firm_key", firmKey)
+        .then(function (res) {
+          // 015 미적용(테이블 부재)·권한 오류 — 조용한 비활성(hidden 유지, 오류 미노출).
+          if (res && res.error) { hideWatch(); return; }
+          registered = !!((res && res.data) || []).length;
+          renderWatchButton();
+        })
+        .catch(function () { hideWatch(); });
+    }
+
+    wsb.auth.getSession().then(function (res) {
+      wSession = (res && res.data) ? res.data.session : null;
+      refreshWatch();
+    }).catch(function () { hideWatch(); });
+    wsb.auth.onAuthStateChange(function (_evt, s) {
+      wSession = s;
+      refreshWatch();
+    });
+  }
+
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     nameEl.textContent = data.display_name || "";
@@ -355,6 +471,9 @@
         }
         renderAll(data);
         showState("content");
+        // 워치리스트는 프로파일 로드 성공 후에만 배선(실패해도 본기능 무장애 — 내부에서
+        // env/lib/세션/015 미적용을 각각 방어하고 조용히 hidden 유지).
+        initWatchlist(firmKeyParam, data.display_name || "");
       })
       .catch(function () {
         // RPC 404(013 미적용 라이브)·network 실패 — "찾을 수 없음"이 아니라 "준비 중".

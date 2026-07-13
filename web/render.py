@@ -268,6 +268,26 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# ── [업계 브리핑 노트 2026-07-13] resource note 뷰모델(표시 플래그만 산출) ────────
+def _resource_view(r: dict[str, Any]) -> dict[str, Any]:
+    """assemble_publish_brief.extract_resource_notes() 산출 dict → 렌더 뷰모델.
+
+    사실/URL 무변형 원칙(card 뷰모델과 동형) — 유일한 파생은 official_url 스킴
+    화이트리스트 게이트(_safe_url, card.html 의 sources.official 과 동일 계약).
+    info_url(RSS 피드)은 렌더에 쓰지 않는다(§1 근거).
+    """
+    src = r.get("sources") or {}
+    return {
+        "id": r.get("id", ""),
+        "title": r.get("title", ""),
+        "original_title": r.get("original_title", ""),
+        "summary": r.get("summary", ""),
+        "agency": r.get("agency", ""),
+        "type_tag": r.get("type_tag", ""),
+        "official_url": _safe_url(src.get("official_url", "")),
+    }
+
+
 def _annotate_toc_distinguishers(card_views: list[dict[str, Any]]) -> None:
     """동일 headline_target 이 2장 이상이면 목차 라벨이 중복으로 보이므로(P1-1),
     그 카드들에 한해 구분자를 단다 — title_issue 우선, 없으면 anchor(=문서번호).
@@ -363,6 +383,11 @@ def assign_issue_numbers(briefs: list[dict[str, Any]]) -> dict[str, int]:
 # ── 컨텍스트 빌더 ─────────────────────────────────────────────────────────────
 def _brief_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
     bm = brief["brief"]
+    # [업계 브리핑 노트 2026-07-13] resources 키 부재/빈값 → None(리스트 아님) — 템플릿의
+    # `{% if brief.resources %}` 게이트가 그대로 False 라 partial 이 0바이트 렌더(하드 요구:
+    # resources 없는 브리프는 바이트 불변). 값이 있을 때만 뷰모델 리스트로 변환.
+    raw_resources = bm.get("resources")
+    resources = [_resource_view(r) for r in raw_resources] if raw_resources else None
     return {
         "issue_no": issue_no,
         "run_date_kst": bm.get("run_date_kst", ""),
@@ -373,6 +398,7 @@ def _brief_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
         "tldr": bm.get("tldr") or [],
         "ai_disclosure": bool(bm.get("ai_disclosure")),
         "agencies": bm.get("agencies") or [],
+        "resources": resources,
     }
 
 

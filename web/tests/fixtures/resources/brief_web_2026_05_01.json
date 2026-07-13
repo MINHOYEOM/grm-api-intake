@@ -1,0 +1,85 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "provenance": {
+  "note": "P2 합성 픽스처(비실데이터) — '업계 브리핑 노트'(resource notes v1) 섹션 렌더 골든 전용. brief.resources 는 assemble_publish_brief.extract_resource_notes() 산출 형태(§1 자료구조)를 그대로 모사한다. 다른 골든(single/multi)과 격리된 전용 디렉터리 — 아카이브/랜딩 집계 골든에 영향 0."
+ },
+ "brief": {
+  "run_date_kst": "2026-05-01",
+  "window": "2026-04-24 ~ 2026-05-01",
+  "publish_date": "2026-05-01",
+  "agencies": ["FDA", "ECA"],
+  "categories": ["Warning Letter"],
+  "tldr": [
+   "FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부"
+  ],
+  "coverage": {"intake_total": 3, "rendered": 1, "resources": 2, "evidence": {"A": 1, "B": 0, "C": 0}},
+  "ai_disclosure": true,
+  "resources": [
+   {
+    "id": "eca-res-1",
+    "title": "TGA GMP인증서 공개 논의",
+    "original_title": "Should TGA publish GMP Certificates?",
+    "summary": "TGA의 GMP 인증서 공개 방침 변화를 다룬 해설 기사.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/should-tga-publish-gmp-certificates",
+     "official_is_pdf": false,
+     "link_check": {"info": "pending", "official": "pending"}
+    }
+   },
+   {
+    "id": "eca-res-2",
+    "title": "EU GMP 부속서 개정 동향",
+    "original_title": "EU GMP Annex Revision Trends",
+    "summary": "",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/eu-annex-trends",
+     "official_is_pdf": false,
+     "link_check": {"info": "pending", "official": "pending"}
+    }
+   }
+  ]
+ },
+ "cards": [
+  {
+   "id": "wl-syn-0501",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Synthetic Pharma Co.",
+   "title_issue": "데이터 무결성 결함",
+   "summary": "FDA가 무균 충전 공정의 데이터 무결성 결함을 이유로 경고장을 발부했다.",
+   "facts": [
+    {"label": "발행일", "value": "2026-04-28"},
+    {"label": "문서번호", "value": "wl-syn-0501"},
+    {"label": "업체/제조소", "value": "Synthetic Pharma Co."}
+   ],
+   "quotes": [],
+   "evidence_basis": "Intake raw",
+   "key_facts": ["데이터 무결성 결함 적발"],
+   "implication": "전자기록 감사추적 체계를 재점검할 필요가 있다.",
+   "checks": ["감사추적 비활성화 여부 점검"],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/synthetic-pharma-co",
+    "official_is_pdf": false,
+    "link_check": {"info": "pending", "official": "pending"}
+   }
+  }
+ ]
+}

@@ -72,6 +72,12 @@ class TestReproduceKnownGood(unittest.TestCase):
     def setUpClass(cls):
         cls.truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
         cls.delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+        # [업계 브리핑 노트 2026-07-13] truth(2026-07-06 발행본, resource notes 기능 도입 전
+        # 머지분)에는 ECA GMP News 2장이 이벤트 카드로 섞여 있다. extract_resource_notes 는
+        # 정본 함수이므로 이걸로 truth 를 분리해 "이벤트만" 기대치를 만든다(기능 도입 후
+        # assemble_publish_brief 는 이 2장을 resources 로 옮기므로, 옛 truth["cards"] 그대로와
+        # 비교하면 실패한다 — §4 정합성 점검에 따른 최소 보정).
+        cls.truth_events, cls.truth_resources = apb.extract_resource_notes(cls.truth["cards"])
 
     def _pseudo_scaffold(self):
         """truth 로부터 89-style 스캐폴드 역산: 채택 61(빈슬롯) + Tier1 가짜 3,
@@ -91,30 +97,48 @@ class TestReproduceKnownGood(unittest.TestCase):
     def test_reproduces_truth(self):
         scaffold = self._pseudo_scaffold()
         out, report = apb.assemble_publish_brief(scaffold, self.delta, strict=True)
-        self.assertEqual(report.adopted, len(self.truth["cards"]))
+        self.assertEqual(report.adopted, len(self.truth_events))
+        self.assertEqual(report.resources, len(self.truth_resources))
         self.assertEqual(report.dropped, 3)
         self.assertEqual(sorted(report.dropped_ids),
                          ["ema-ghost-0", "ema-ghost-1", "ema-ghost-2"])
         self.assertEqual([c["id"] for c in out["cards"]],
-                         [c["id"] for c in self.truth["cards"]])
+                         [c["id"] for c in self.truth_events])
         self.assertEqual([c["render_order"] for c in out["cards"]],
-                         list(range(len(self.truth["cards"]))))
-        for oc, tc in zip(out["cards"], self.truth["cards"]):
+                         list(range(len(self.truth_events))))
+        for oc, tc in zip(out["cards"], self.truth_events):
             for k in _STR_SLOTS + _LIST_SLOTS:
                 self.assertEqual(oc.get(k), tc.get(k), f"{tc['id']}.{k}")
-        self.assertEqual(out["brief"]["agencies"], self.truth["brief"]["agencies"])
+        # agencies = event 카드 + resource 노트 agency 합집합(카드 순서 우선) — truth 원본은
+        # resource 분리 이전 값이라 순서가 다를 수 있으므로, 같은 산식으로 기대치를 재계산한다.
+        expected_agencies = apb._distinct_in_order(
+            [c.get("agency", "") for c in self.truth_events]
+            + [r.get("agency", "") for r in self.truth_resources])
+        self.assertEqual(out["brief"]["agencies"], expected_agencies)
         self.assertEqual(out["brief"]["categories"], self.truth["brief"]["categories"])
-        self.assertEqual(out["brief"]["coverage"]["evidence"],
-                         self.truth["brief"]["coverage"]["evidence"])
-        self.assertEqual(out["brief"]["coverage"]["rendered"], len(self.truth["cards"]))
+        # evidence 집계는 이벤트 카드 기준(resource 는 배지 미렌더) — truth_events 로 재계산.
+        expected_evidence = {"A": 0, "B": 0, "C": 0}
+        for c in self.truth_events:
+            lvl = c.get("evidence_level")
+            if lvl in expected_evidence:
+                expected_evidence[lvl] += 1
+        self.assertEqual(out["brief"]["coverage"]["evidence"], expected_evidence)
+        self.assertEqual(out["brief"]["coverage"]["rendered"], len(self.truth_events))
         self.assertEqual(out["brief"]["coverage"]["intake_total"], 89)
         self.assertEqual(out["brief"]["tldr"], self.delta["tldr"])
+        if self.truth_resources:
+            self.assertEqual(out["brief"].get("resources"), self.truth_resources)
+            self.assertEqual(out["brief"]["coverage"].get("resources"),
+                             len(self.truth_resources))
+        else:
+            self.assertNotIn("resources", out["brief"])
+            self.assertNotIn("resources", out["brief"]["coverage"])
 
     def test_verbatim_fields_unchanged(self):
         scaffold = self._pseudo_scaffold()
         out, _ = apb.assemble_publish_brief(scaffold, self.delta, strict=True)
         byid = {c["id"]: c for c in out["cards"]}
-        for tc in self.truth["cards"]:
+        for tc in self.truth_events:
             oc = byid[tc["id"]]
             for k in ("facts", "sources", "headline_target", "signal_label", "agency",
                       "category", "evidence_level", "id"):
@@ -161,6 +185,7 @@ class TestDeepAnalysisWiring(unittest.TestCase):
     def setUpClass(cls):
         cls.truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
         cls.delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+        cls.truth_events, _truth_resources = apb.extract_resource_notes(cls.truth["cards"])
 
     def _scaffold(self):
         return _blank_scaffold_from(self.truth)
@@ -193,7 +218,7 @@ class TestDeepAnalysisWiring(unittest.TestCase):
             s, self.delta, strict=True,
             deep_deltas={"no-such-card-id": {"deep_analysis": {}, "source_text": ""}})
         self.assertTrue(report.ok)
-        self.assertEqual(report.adopted, len(self.truth["cards"]))
+        self.assertEqual(report.adopted, len(self.truth_events))
 
 
 if __name__ == "__main__":
@@ -243,5 +268,105 @@ class MergeFda483DisclosuresTest(unittest.TestCase):
     def test_single_content_less_483_unchanged(self):
         cards = [self._card("fda483-1", "Alpha", "01/01/2024")]
         self.assertEqual(apb.merge_fda483_disclosures(cards), cards)  # 1건 무변화
+
+
+class ExtractResourceNotesTest(unittest.TestCase):
+    """[업계 브리핑 노트 2026-07-13] extract_resource_notes 단위 테스트(순수 함수)."""
+
+    @staticmethod
+    def _card(cid, agency, type_tag="", card_type="", **extra):
+        c = {"id": cid, "agency": agency, "type_tag": type_tag, "card_type": card_type,
+             "title_issue": f"{cid}-issue", "headline_target": f"{cid}-target",
+             "summary": f"{cid}-summary",
+             "sources": {"info_url": "https://rss.example/feed.xml",
+                        "official_url": f"https://example.com/{cid}"}}
+        c.update(extra)
+        return c
+
+    def test_eca_news_separated_events_remain(self):
+        # ① ECA GMP News → resource 분리, 그 외 카드는 이벤트로 잔존(순서보존).
+        cards = [
+            self._card("fda-1", "FDA", card_type="Warning Letter"),
+            self._card("eca-1", "ECA", type_tag="GMP News", card_type="규제 소식"),
+            self._card("mfds-1", "MFDS", card_type="행정처분"),
+        ]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual([c["id"] for c in events], ["fda-1", "mfds-1"])
+        self.assertEqual(len(resources), 1)
+        r = resources[0]
+        self.assertEqual(r["id"], "eca-1")
+        self.assertEqual(r["title"], "eca-1-issue")
+        self.assertEqual(r["original_title"], "eca-1-target")
+        self.assertEqual(r["summary"], "eca-1-summary")
+        self.assertEqual(r["agency"], "ECA")
+        self.assertEqual(r["type_tag"], "GMP News")
+        self.assertEqual(r["sources"], cards[1]["sources"])
+
+    def test_eca_card_type_variant_also_separated(self):
+        # card_type=='규제 소식' 만으로도(type_tag 부재) resource 판정(OR 조건).
+        cards = [self._card("eca-2", "ECA", type_tag="", card_type="규제 소식")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, [])
+        self.assertEqual(len(resources), 1)
+
+    def test_non_resource_agency_unchanged(self):
+        # ② RESOURCE_AGENCIES 외 기관은 type_tag/card_type 이 같아도 무변화(agency 게이트 우선).
+        cards = [self._card("x-1", "RAPS", type_tag="GMP News", card_type="규제 소식")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, cards)
+        self.assertEqual(resources, [])
+
+    def test_eca_wrong_type_unchanged(self):
+        # agency=ECA 라도 type_tag/card_type 조건을 만족 못하면 이벤트로 남는다.
+        cards = [self._card("eca-3", "ECA", type_tag="Recall", card_type="회수")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, cards)
+        self.assertEqual(resources, [])
+
+    def test_no_resources_returns_all_as_events(self):
+        cards = [self._card("fda-1", "FDA"), self._card("mfds-1", "MFDS")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, cards)
+        self.assertEqual(resources, [])
+
+
+class ResourceNotesPipelineTest(unittest.TestCase):
+    """[업계 브리핑 노트 2026-07-13] assemble_publish_brief 배선 — 0건/합집합 케이스.
+
+    truth(2026-07-06 발행본)에는 ECA GMP News 2장이 실제로 섞여 있어(§1 실데이터 근거)
+    이를 필터링해 '0건' 케이스를 합성하고, 원본으로 '합집합' 케이스를 검증한다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
+        cls.delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+
+    def test_zero_resources_key_omitted(self):
+        # ③ ECA 카드를 제거한 truth/delta → resources 0건이면 brief.resources/
+        # coverage.resources 키 자체가 없어야 한다(하위호환 — 기존 소비자 무영향).
+        truth = copy.deepcopy(self.truth)
+        delta = copy.deepcopy(self.delta)
+        eca_ids = {c["id"] for c in truth["cards"] if c.get("agency") == "ECA"}
+        self.assertTrue(eca_ids)  # 전제 확인(고정 fixture 회귀 가드 — 0건이면 이 테스트 무의미)
+        truth["cards"] = [c for c in truth["cards"] if c["id"] not in eca_ids]
+        for cid in eca_ids:
+            delta["cards"].pop(cid, None)
+        s = _blank_scaffold_from(truth)
+        out, report = apb.assemble_publish_brief(s, delta, strict=True)
+        self.assertEqual(report.resources, 0)
+        self.assertNotIn("resources", out["brief"])
+        self.assertNotIn("resources", out["brief"]["coverage"])
+        self.assertNotIn("ECA", out["brief"]["agencies"])
+
+    def test_agencies_union_includes_resource_agency(self):
+        # ④ agencies = event 카드 + resource 노트 agency 합집합(중복 제거, 이벤트 순서 우선) —
+        # ECA 가 리소스로 빠져도 헤더 기관 목록에서 사라지지 않는다.
+        s = _blank_scaffold_from(self.truth)
+        out, report = apb.assemble_publish_brief(s, self.delta, strict=True)
+        self.assertGreater(report.resources, 0)
+        self.assertIn("ECA", out["brief"]["agencies"])
+        event_agencies = {c.get("agency") for c in out["cards"]}
+        self.assertNotIn("ECA", event_agencies)  # ECA 는 이벤트 카드 목록엔 없다(리소스로 이동)
 
 

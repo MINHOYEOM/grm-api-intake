@@ -1,0 +1,37 @@
+{#- resource_notes.html — '업계 브리핑 노트' 전용 섹션(v1, 2026-07-13). 해설·교육성 2차
+    소스(ECA GMP News 등, assemble_publish_brief.extract_resource_notes 산출)를 이벤트
+    카드 목록과 분리해 브리프 하단에 별도 렌더한다. 순수 렌더(사실/URL 무변형) — 값은
+    render._resource_view() 가 카드 기존 값 그대로 통과시킨 것만 사용한다.
+
+    하드 요구: resources 가 없는 브리프는 이 partial 전체(스타일 포함)가 렌더 0바이트여야
+    한다 — 그래서 <style> 도 이 {% if %} 안에 둔다(grm.css 무접촉 원칙, PR#166 류 골든
+    재동결 유발 방지). 기존 `.sec-h`/`.sec-body`/`.b.ag` 어휘를 재사용해 섹션
+    접기(JS, brief.html 의 `.sec-h` querySelectorAll)·스크롤 스파이(`#cards [id]`)와
+    자연히 맞물리게 한다(신규 JS 배선 0). -#}
+{%- if brief.resources %}
+<style>
+.res-sub{font-size:13px;color:var(--muted);margin:2px 0 14px}
+.res-list{display:flex;flex-direction:column}
+.res-item{padding:14px 0;border-top:1px solid var(--line)}
+.res-item:first-child{border-top:none}
+.res-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.res-link{font-weight:500;color:var(--ink)}
+a.res-link:hover{color:var(--coral)}
+.res-orig{color:var(--muted);font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res-sum{margin:5px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
+</style>
+<h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>업계 브리핑 노트 <span class="n">{{ brief.resources|length }}건</span></h2>
+<div class="sec-body" id="secbody-resources">
+  <p class="res-sub">해설·교육 자료 {{ brief.resources|length }}건 — 규제 변경 아님</p>
+  <div class="res-list">
+  {%- for r in brief.resources %}
+    <div class="res-item">
+      <div class="res-head"><span class="b ag">{{ r.agency }}</span>{% if r.official_url %}<a class="res-link" href="{{ r.official_url }}" target="_blank" rel="noopener">{{ r.title }}</a>{% else %}<span class="res-link">{{ r.title }}</span>{% endif %}{% if r.original_title %}<span class="res-orig">· {{ r.original_title }}</span>{% endif %}</div>
+      {%- if r.summary %}
+      <p class="res-sum">{{ r.summary }}</p>
+      {%- endif %}
+    </div>
+  {%- endfor %}
+  </div>
+</div>
+{%- endif %}

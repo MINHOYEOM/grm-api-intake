@@ -37,6 +37,10 @@ TESTS_DIR = pathlib.Path(__file__).resolve().parent
 GOLDEN_DIR = TESTS_DIR / "golden"
 MULTI_FIXTURES = TESTS_DIR / "fixtures" / "multi"            # 합성 2건만
 SINGLE_FIXTURES = TESTS_DIR / "fixtures" / "single"          # 실 발행본 동결 스냅샷(골든 입력)
+# [업계 브리핑 노트 2026-07-13] resources 섹션 전용 격리 픽스처(단일 브리프) — single/multi
+# 아카이브·랜딩 집계 골든(카드 수·issue 수 의존)에 영향 0. brief.resources 는
+# assemble_publish_brief.extract_resource_notes() 산출 형태를 그대로 모사(§1 자료구조).
+RESOURCE_FIXTURES = TESTS_DIR / "fixtures" / "resources"
 DATA_DIR = WEB_DIR / "data" / "briefs"                       # 라이브 발행 디렉터리(스모크 렌더 전용)
 REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 
@@ -61,6 +65,8 @@ __all__ = [
     "WebFda483DeepAnalysisTest",
     "WebMonoLabelsContractTest",
     "WebBriefFirmLinkTest",
+    "WebResourceNotesRenderTest",
+    "WebResourceNotesGoldenInvarianceTest",
 ]
 
 
@@ -77,6 +83,17 @@ def _build_multi(out: pathlib.Path, scratch: pathlib.Path) -> None:
         shutil.copyfile(fp, data / fp.name)
     shutil.copyfile(REAL_FIXTURE, data / REAL_FIXTURE.name)
     render.render_site(data, out)
+
+
+def _build_resources(out: pathlib.Path) -> None:
+    """[업계 브리핑 노트] 격리 픽스처(1건) 단독 빌드 — single/multi 와 완전 분리."""
+    render.render_site(RESOURCE_FIXTURES, out)
+
+
+# (built_relpath, golden_filename)
+RESOURCE_GOLDENS = [
+    ("briefs/2026-05-01/index.html", "brief_resources.expected.html"),
+]
 
 
 # (built_relpath, golden_filename)
@@ -145,8 +162,10 @@ class WebRenderGoldenTest(unittest.TestCase):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_g_"))
         cls.single = cls._tmp / "single"
         cls.multi = cls._tmp / "multi"
+        cls.resources = cls._tmp / "resources"
         _build_single(cls.single)
         _build_multi(cls.multi, cls._tmp)
+        _build_resources(cls.resources)
 
     @classmethod
     def tearDownClass(cls):
@@ -178,6 +197,12 @@ class WebRenderGoldenTest(unittest.TestCase):
         for rel, name in MULTI_GOLDENS:
             with self.subTest(golden=name):
                 self._assert_golden(self.multi, rel, name)
+
+    def test_resource_goldens(self):
+        # [업계 브리핑 노트 2026-07-13] resources 섹션 렌더 스냅샷(격리 픽스처).
+        for rel, name in RESOURCE_GOLDENS:
+            with self.subTest(golden=name):
+                self._assert_golden(self.resources, rel, name)
 
     def test_css_copied_verbatim(self):
         built = (self.single / "assets" / "grm.css").read_bytes()
@@ -3291,13 +3316,18 @@ def freeze() -> None:
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_freeze_"))
     try:
         single, multi = tmp / "single", tmp / "multi"
+        resources = tmp / "resources"
         _build_single(single)
         _build_multi(multi, tmp)
+        _build_resources(resources)
         for rel, name in SINGLE_GOLDENS:
             shutil.copyfile(single / rel, GOLDEN_DIR / name)
             print(f"  froze {name}")
         for rel, name in MULTI_GOLDENS:
             shutil.copyfile(multi / rel, GOLDEN_DIR / name)
+            print(f"  froze {name}")
+        for rel, name in RESOURCE_GOLDENS:
+            shutil.copyfile(resources / rel, GOLDEN_DIR / name)
             print(f"  froze {name}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -3721,6 +3751,93 @@ class WebBriefFirmLinkTest(unittest.TestCase):
     def test_js_reuses_grm_ca_pill_class_no_new_css(self):
         # grm.css 변경 금지 — 기존 공유버튼과 동일한 .grm-ca 클래스 재사용.
         self.assertIn("a.className='grm-ca';", self.detail)
+
+
+# ── [업계 브리핑 노트 2026-07-13] resources 섹션 — 구조·게이트·바이트 불변 ───────
+class WebResourceNotesRenderTest(unittest.TestCase):
+    """assemble_publish_brief.extract_resource_notes() 산출(brief.resources)을
+    render.py 가 '업계 브리핑 노트' 전용 섹션으로 렌더하는지 확인. 격리 픽스처
+    (tests/fixtures/resources) 사용 — single/multi 아카이브·랜딩 집계 골든과 분리.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_resnotes_"))
+        cls.out = cls._tmp / "out"
+        _build_resources(cls.out)
+        cls.detail = (cls.out / "briefs" / "2026-05-01" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_section_header_and_subtitle(self):
+        self.assertIn('id="sec-resources"', self.detail)
+        self.assertIn('업계 브리핑 노트', self.detail)
+        self.assertIn('<span class="n">2건</span>', self.detail)
+        self.assertIn('해설·교육 자료 2건 — 규제 변경 아님', self.detail)
+
+    def test_item_link_target_blank_noopener(self):
+        self.assertIn(
+            '<a class="res-link" '
+            'href="https://www.gmp-compliance.org/gmp-news/should-tga-publish-gmp-certificates" '
+            'target="_blank" rel="noopener">TGA GMP인증서 공개 논의</a>',
+            self.detail)
+
+    def test_original_title_and_summary_present(self):
+        self.assertIn('Should TGA publish GMP Certificates?', self.detail)
+        self.assertIn('TGA의 GMP 인증서 공개 방침 변화를 다룬 해설 기사.', self.detail)
+
+    def test_info_url_rss_feed_not_rendered(self):
+        # info_url(RSS 피드)은 렌더에 쓰지 않는다(§1 근거) — 값 자체가 나타나면 안 됨.
+        self.assertNotIn('eca_newsfeed.xml', self.detail)
+
+    def test_empty_summary_item_omits_paragraph(self):
+        # 두 리소스 중 summary="" 인 항목은 <p class="res-sum"> 자체가 안 나온다.
+        self.assertEqual(self.detail.count('class="res-sum"'), 1)
+
+    def test_agency_badge_reuses_card_vocabulary(self):
+        section = self.detail[self.detail.index('id="sec-resources"'):]
+        self.assertEqual(section.count('<span class="b ag">ECA</span>'), 2)
+
+    def test_toc_single_entry_no_per_item_links(self):
+        toc = self.detail[self.detail.index('id="toc"'):self.detail.index('</aside>')]
+        self.assertEqual(toc.count('href="#sec-resources"'), 1)
+        self.assertNotIn('eca-res-1', toc)
+        self.assertNotIn('eca-res-2', toc)
+
+    def test_section_collapse_js_wiring_reused(self):
+        # `.sec-h`/`.sec-body` 어휘 재사용 — brief.html 의 섹션 접기 JS 가 그대로 집는다
+        # (신규 JS 배선 0). id 쌍이 `sec-{slug}`/`secbody-{slug}` 계약을 따르는지 확인.
+        self.assertIn('<h2 class="sec-h" id="sec-resources">', self.detail)
+        self.assertIn('<div class="sec-body" id="secbody-resources">', self.detail)
+
+    def test_no_grm_css_touched(self):
+        # 하드 요구 — partial 내부 <style> 만 쓰고 grm.css 원본과 dist 복사본이 byte 동일.
+        built = (self.out / "assets" / "grm.css").read_bytes()
+        src = (WEB_DIR / "assets" / "grm.css").read_bytes()
+        self.assertEqual(built, src)
+
+
+class WebResourceNotesGoldenInvarianceTest(unittest.TestCase):
+    """하드 요구 — resources 가 없는 브리프는 이 기능 도입 이후에도 바이트 불변.
+
+    기존 골든(SINGLE_GOLDENS/MULTI_GOLDENS, 전부 무-resources 픽스처)이 재동결 없이
+    그대로 통과한다는 사실 자체가 증거다(WebRenderGoldenTest 가 매 실행 검증) —
+    여기서는 그 계약을 명시적으로 한 번 더 단언(회귀 의도 문서화 목적, 골든 중복 X).
+    """
+
+    def test_context_key_is_none_when_absent(self):
+        # bm.get("resources") 부재 → ctx["resources"] 는 빈 리스트가 아니라 None
+        # (템플릿 `{% if brief.resources %}` 게이트 대상 — §3 계약).
+        base = json.loads((MULTI_FIXTURES / "brief_web_2026_06_08.json").read_text(encoding="utf-8"))
+        ctx = render._brief_context(base, issue_no=1)
+        self.assertIsNone(ctx["resources"])
+
+    def test_partial_renders_empty_bytes_when_absent(self):
+        env = render._make_env()
+        html = env.get_template("partials/resource_notes.html").render(brief={"resources": None})
+        self.assertEqual(html, "")
 
 
 if __name__ == "__main__":

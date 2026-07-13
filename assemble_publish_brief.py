@@ -40,6 +40,11 @@ import inject_slots
 _REQUIRED_STR_SLOTS = ("title_issue", "summary", "implication")
 _REQUIRED_LIST_SLOTS = ("key_facts", "checks")
 
+# [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(전문 매체) — 이벤트 카드가 아닌
+# '업계 브리핑 노트'로 렌더. 향후 RAPS·European Pharmaceutical Review 등 수집 추가 시
+# 여기에 기관명만 추가.
+RESOURCE_AGENCIES = ("ECA",)
+
 
 @dataclass
 class AssembleReport:
@@ -49,6 +54,7 @@ class AssembleReport:
     adopted: int = 0
     dropped: int = 0
     dropped_ids: list[str] = field(default_factory=list)
+    resources: int = 0
 
     @property
     def ok(self) -> bool:
@@ -138,6 +144,37 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
     return out
 
 
+def extract_resource_notes(cards: list[dict[str, Any]]
+                           ) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
+    """(event_cards, resources). resource 판정 = agency ∈ RESOURCE_AGENCIES ∧
+    (type_tag=='GMP News' or card_type=='규제 소식'). 순수·순서보존.
+
+    해설·교육성 2차 소스(현재 ECA GMP News 7장 유형)를 이벤트 카드 목록에서 분리해
+    브리프 하단 '업계 브리핑 노트' 전용 섹션으로 렌더하기 위한 결정론 변환. 카드 dict 에서
+    사실 재작성 0 으로 추출(§1 자료구조) — sources 는 그대로 통과하되, 렌더는 official_url
+    (실기사)만 쓰고 info_url(RSS 피드)은 쓰지 않는다(렌더 쪽 책임).
+    """
+    events: list[dict[str, Any]] = []
+    resources: list[dict[str, Any]] = []
+    for c in cards:
+        is_resource = (c.get("agency") in RESOURCE_AGENCIES
+                       and (c.get("type_tag") == "GMP News"
+                            or c.get("card_type") == "규제 소식"))
+        if is_resource:
+            resources.append({
+                "id": c["id"],
+                "title": c["title_issue"],
+                "original_title": c.get("headline_target", ""),
+                "summary": c.get("summary", ""),
+                "agency": c["agency"],
+                "type_tag": c.get("type_tag", ""),
+                "sources": c.get("sources") or {},
+            })
+        else:
+            events.append(c)
+    return events, resources
+
+
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                            *, strict: bool = True,
                            deep_deltas: dict[str, dict[str, Any]] | None = None
@@ -184,6 +221,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
     adopted_cards = merge_fda483_disclosures(adopted_cards)
 
+    # [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(ECA GMP News 등) → 이벤트 카드에서
+    # 분리해 브리프 하단 전용 섹션으로. 아래 render_order 재부여·빈슬롯 게이트·adopted 집계는
+    # 남은 이벤트 카드에만 적용된다(resource 는 별도 브리프 메타로 실린다).
+    adopted_cards, resource_notes = extract_resource_notes(adopted_cards)
+
     # render_order 0..N-1 연속 재부여(원 상대순서 보존).
     for i, c in enumerate(adopted_cards):
         c["render_order"] = i
@@ -198,6 +240,7 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                 report.errors.append(f"채택 카드 {c.get('id')!r}: 빈 슬롯 {k}")
 
     report.adopted = len(adopted_cards)
+    report.resources = len(resource_notes)
 
     # 브리프 메타 재계산(assemble_web_brief 규약 미러) — 채택분 기준.
     out = copy.deepcopy(injected)
@@ -214,7 +257,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         for e in deep_report.errors:
             report.warnings.append(f"[deep] {e}")
 
-    agencies = _distinct_in_order([c.get("agency", "") for c in adopted_cards])
+    # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
+    # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
+    agencies = _distinct_in_order(
+        [c.get("agency", "") for c in adopted_cards]
+        + [r.get("agency", "") for r in resource_notes])
     categories = _distinct_in_order([c.get("category", "") for c in adopted_cards])
     evidence = {"A": 0, "B": 0, "C": 0}
     for c in adopted_cards:
@@ -223,13 +270,17 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
             evidence[lvl] += 1
     brief["agencies"] = agencies
     brief["categories"] = categories
+    if resource_notes:
+        brief["resources"] = resource_notes
 
     coverage = brief.setdefault("coverage", {})
-    # intake_total = 실수집 총건(진실값) 보존. rendered = 채택 수. evidence = 채택 재집계.
+    # intake_total = 실수집 총건(진실값) 보존. rendered = 채택(이벤트) 수. evidence = 채택 재집계.
     coverage["rendered"] = len(adopted_cards)
     coverage["evidence"] = evidence
     coverage.setdefault("intake_total", scaffold.get("brief", {})
                         .get("coverage", {}).get("intake_total", len(adopted_cards)))
+    if resource_notes:
+        coverage["resources"] = len(resource_notes)
 
     if strict and report.errors:
         raise AssembleError("발행본 조립 검증 실패:\n  - " + "\n  - ".join(report.errors))
@@ -277,6 +328,7 @@ def main(argv: list[str] | None = None) -> int:
     cov = out["brief"]["coverage"]
     deep_merged = sum(1 for c in out["cards"] if c.get("deep_analysis"))
     print(f"조립 완료: 채택 {report.adopted}카드 (스킵 {report.dropped}) → {args.out}")
+    print(f"  브리핑 노트 {report.resources}건")
     if args.deep:
         print(f"  deep_analysis: 병합 {deep_merged}카드 (게이트 보류는 위 WARN 참고)")
     print(f"  coverage: 수집 {cov.get('intake_total')} · 카드 {cov['rendered']} · "

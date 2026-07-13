@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.119` |
-| 최종 수정일 | 2026-07-12 |
+| 문서 버전 | `v1.120` |
+| 최종 수정일 | 2026-07-13 |
 | 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -85,12 +85,12 @@ flowchart TD
 
 **③ 저장 — Notion `GRM API Intake` (staging).** 수집한 모든 항목이 1차로 쌓이는 임시 DB. 각 행에 분류 태그가 붙고, 본문에 원본 API 응답 JSON 전체를 보존합니다(재검증용). 트랙 B(Findings)는 여기에 더해 **Supabase**에도 적재됩니다(§4).
 
-**④ 분석·생성 — 클라우드 Claude Routine.** 매주 월요일, 클라우드 "Routines" 제품("Global Regulatory Monitoring [GRM]", 커넥터=Notion)이 프롬프트(`docs/prompts/GRM_Prompt_v16.md`)에 따라 자동 실행됩니다. 수집기가 만든 카드 골격(handoff)을 받아 카드별 산문 슬롯만 채웁니다. WebSearch(이벤트 탐지)·WebFetch(보조 출처 흡수)를 씁니다.
+**④ 분석·생성 — 클라우드 Claude Routine.** 매주 월요일, 클라우드 "Routines" 제품("Global Regulatory Monitoring [GRM]", 커넥터=Notion)이 프롬프트(`docs/prompts/GRM_Prompt_v16.md`)에 따라 자동 실행됩니다. 수집기가 만든 카드 골격(handoff)을 받아 카드별 산문 슬롯을 채우고, deep-ready 카드(WL·행정처분·483)가 있으면 **심층분석 4섹션도 직접 생성**합니다(검증은 델타 브릿지의 `verify_deep_analysis` 게이트가 담당 — 생성/검증 역할 분리). WebSearch(이벤트 탐지)·WebFetch(보조 출처 흡수)를 씁니다.
 
 **⑤ 발행 — 웹 정적 사이트 + 이메일 (주 채널).**
 - **웹:** `web/render.py`(순수·결정론)가 정적 멀티페이지 사이트를 생성 → `grm-web-deploy.yml`이 Cloudflare Pages로 배포. production 머지만 라이브(사람 승인 게이트).
 - **웹 발행 조립:** Routine이 만든 델타(슬롯만)를 빈슬롯 스캐폴드(전 수집 카드)와 `assemble_publish_brief.py`가 합쳐 **채택분만** 남기고 메타(기관·카테고리·커버리지)를 재계산합니다. "수집 89 · 카드 61" 같은 표기의 근거.
-- **뉴스레터:** 회원 없이 구독(Brevo SaaS)하고, 그 호 요약 + 웹 링크를 담은 티저 메일을 `grm-newsletter-send.yml`이 **매주 자동 준비 + 1클릭 승인**으로 발송합니다. 발송 게이트 4겹(발행검증·링크체크·멱등·승인).
+- **뉴스레터:** 회원 없이 구독(Brevo SaaS)하고, 그 호 요약 + 웹 링크를 담은 티저 메일을 `grm-newsletter-send.yml`이 **매주 월 14:00 KST 자동 발송**합니다(Admin 콘솔 수동 실행 병행). 발송 게이트 3겹(발행검증·링크체크=발송 보류 게이트·멱등 캠페인명) — environment 사람 승인은 관심업체 통지(`grm-watchlist-notify.yml`)에만 적용됩니다.
 - **Admin 콘솔:** `/admin` 단일 페이지 운영 UI(Supabase Edge Function 호출). 주간 운영자는 여기서 미리보기 확인 후 **승인 버튼 하나**만 누릅니다.
 - **참고 — Notion `🌐 GRM Weekly Brief` DB는 레거시:** 예전 발행 채널이었으나 2026-06-22 이후 웹 파이프라인으로 대체됨(신규 쓰기 중단, 과거 페이지만 보존).
 
@@ -122,18 +122,22 @@ flowchart TD
 
 ### 3.2 주간 발행 생애주기 — 단계별 실행 장치
 
-"매주 월요일 카드가 웹사이트에 올라가기까지" 각 단계가 실제로 무엇으로 실행되는지의 단일 기준입니다. **①~⑤·⑦은 전부 클라우드에서 실행**되어 사람 컴퓨터가 꺼져 있어도 진행됩니다. **사람의 역할은 ⑥(승인 버튼) 하나로 수렴합니다.**
+"매주 월요일 카드가 웹사이트에 올라가기까지" 각 단계가 실제로 무엇으로 실행되는지의 단일 기준입니다. **①~⑤·⑦은 전부 클라우드에서 실행**되어 사람 컴퓨터가 꺼져 있어도 진행됩니다. **사람의 역할은 ⑥(승인 버튼) + 관심업체 통지 승인으로 수렴합니다.** 전 자동화의 상세 인벤토리(트리거·시크릿·실패모드·월요일 타임라인)는 `docs/GRM_자동화지도_2026-07.md` 참조.
 
 | # | 단계 | 실행 장치 | 트리거 | 사람 |
 |---|---|---|---|---|
-| ① | 매일 수집 + 빈슬롯 스캐폴드 산출 | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
-| ② | 월요일 카드 분석 → 슬롯 델타 작성 | 클라우드 Routine | cron 매주 월 07:30 KST | 없음 |
-| ③ | 델타를 git 저장소로 이관 | `grm-delta-bridge.yml` | cron 월 ~09:30 KST | 없음 |
-| ④ | 스캐폴드+델타 → 발행본 조립 + PR | `grm-web-publish.yml` | ③ 델타 커밋 | 없음 |
+| ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
+| ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 Routine | 매주 월 07:30 KST | 없음 |
+| ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `grm-delta-bridge.yml` | cron 월 09:30 KST(PAT push) | 없음 |
+| ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
 | ⑤ | 발행본 렌더 → 미리보기 URL | `grm-web-deploy.yml` | ④ PR 생성 | 없음 |
-| ⑥ | **미리보기 확인 후 승인 = PR 머지** | Admin 승인 버튼 → `admin-github` | 사람 클릭 | **있음(유일)** |
+| ⑥ | **미리보기 확인 후 승인 = PR 머지** | Admin 승인 버튼 → `admin-github`(check-runs green 게이트) | 사람 클릭 | **있음(유일)** |
 | ⑦ | production 반영 → 라이브 | `grm-web-deploy.yml` | ⑥ 머지 | 없음 |
 | 보조 | 델타 부재 감지 → 경보 | `grm-publish-watchdog.yml` | cron 월 10:00 KST | 없음 |
+| 보조 | 발행 준비 백업(예치검증·복구·deep 백필·파이프 선구동) | 로컬 태스크 `grm-monday-brief-publish` | 월 09:05 KST(데스크톱 ON 전제) | 없음 |
+| 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
+| 보조 | 관심업체 통지(environment 승인 필요) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | **있음(승인)** |
+| 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST | 없음 |
 
 ### 3.3 핵심 개념
 - **Signal Tier(신호 강도):** Tier 3(우선 카드화·고위험) / Tier 2(참고) / Tier 1(로그만).
@@ -262,14 +266,16 @@ grm-api-intake/
 ├─ translations/outbox/            # [FIND-1 M9] 주간 번역 배치 큐(CI가 읽어 Supabase 반영)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
 ├─ docs/  (prompts/·specs/ 포함)
+│  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
 │  └─ copilot/  (grm_findings_connector.swagger.json, COPILOT_SETUP_GUIDE.md, QA_SCENARIOS.md)  # [FIND-1 F4a]
 └─ .github/workflows/
    ├─ grm-intake.yml, grm-ci.yml
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
-   ├─ grm-newsletter-send.yml, grm-admin-backend-deploy.yml
-   ├─ grm-brief-audit.yml, grm-supabase-keepalive.yml
+   ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
+   ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml
    ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
    ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
+   ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
    └─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
 ```
 

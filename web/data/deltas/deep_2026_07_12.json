@@ -1,0 +1,279 @@
+{
+ "fda483-193451": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "ISO 5 무균구역에서 작업자의 손 위치가 HEPA 필터로부터의 단일방향 first air 를 가로막아 무균조작의 핵심 보호를 무력화했다.",
+     "original": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted.",
+     "citation": "21 CFR 211.42",
+     "risk": "임계 작업면의 무균 보증이 훼손돼 무균 완제(TPN 등)의 오염 위험이 직접 커진다."
+    },
+    {
+     "observation": "작업자가 눈·이마 등 피부를 노출한 채 ISO 5 무균조작을 수행했다.",
+     "original": "Personnel performed aseptic manipulations with exposed hair or skin.",
+     "risk": "인체 유래 입자·미생물이 임계 구역으로 유입돼 무균성이 저하될 수 있다."
+    },
+    {
+     "observation": "동적(작업 재현) 조건에서 스모크 스터디(기류 가시화)가 수행되지 않았다.",
+     "original": "Smoke studies were not performed under dynamic conditions.",
+     "citation": "21 CFR 211.113",
+     "risk": "실제 작업 동작 하의 단일방향 기류 유지가 입증되지 않아 무균공정 설계의 타당성 근거가 부족하다."
+    }
+   ],
+   "inspectional_significance": "무균조작 동선·기류·소독·설비 청결에 걸친 다수(8건) 관찰이 확인된 체계적(systemic) 무균보증 결함으로, 개별 단발성 실수가 아니라 무균공정 관리 전반의 취약성을 시사한다. 조사관이 실제 조제 장면을 반복 관찰해 기록한 만큼 중대도가 높으며, 시정이 불충분할 경우 Warning Letter 로 승격될 가능성이 있다.",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "ISO 5 구역 작업자 동선·손 위치가 first air 를 차단하지 않도록 무균조작 절차·훈련을 개정하고 재자격을 실시한다.",
+     "동적 조건 스모크 스터디를 재수행해 단일방향 기류 유지를 입증하고 기록화한다.",
+     "구역 전환 시 소독·설비 청결 절차의 적정성을 재검증하고 CAPA 를 문서화한다."
+    ]
+   },
+   "administrative_risks": "미시정·불충분 응답 시 Warning Letter, OAI(Official Action Indicated) 분류, 후속 재실사로 이어질 수 있으며, 무균보증 결함의 성격상 해당 제조소 무균제제의 공급 신뢰성에 영향을 줄 수 있다."
+  },
+  "source_text": "OBSERVATION 1: Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted.\nSpecifically, On 05/05/2026, a compounding technician was observed preparing the following prescription in Buffer Room lH-ll0A: R R X <Redacted B4> TPN, 2000 mL IV Bag During the preparation of RX# <Redacted B4> the following deficiency was observed: While injecting components into the 2000mL IV bag, the technician's hand placement was observed blocking the bag port and needle. The technician's hands were positioned in a manner that obstructed the unidirectional first air between the HEPA filter face and the critical work surface, thereby compromising the sterility assurance of the critical area.\n\nOBSERVATION 2: Personnel performed aseptic manipulations with exposed hair or skin.\nSpecifically, a. The compounding technician was observed leaning into the ISO 5 Laminar Airflow Workbench (LAFW). with exposed skin around the eyes and forehead while performing aseptic manipulations of <Redacted B4> TPN, 2000 mL IV Bag, increasing the risk of contamination to the critical work surface.\n\nOBSERVATION 3: Lack of disinfection of equipment at each transition from areas of lower quality air to areas of higher quality air.\nSpecifically, On 05/05/2026, compounding technician was observed preparing the following prescription in Sterile Buffer Room lH-ll0A: • RX# <Redacted B4> TPN, 2000mL IV bag During TPN compounding, the technician was observed operating a <Redacted B4> scanner connected to the <Redacted B4> TPN Compounder Computer while entering multiple times into and out of the ISO 5 LAFW without disinfecting the scanner or gloves each time. Additionally, the technician was observed touching the TPN formulation via the <Redacted B4> (Control Panel (Version <Redacted B4>) touchscreen on the <Redacted B4> TPN Compounder Computer touchscreen, which is located outside of the ISO 5 LAFW, then going back into the ISO 5 hood to perform aseptic manipulations without disinfecting their gloves.\n\nOBSERVATION 4: Personnel were observed moving quickly in a critical area or in an area immediately adjacent to a critical area likely causing disruption of unidirectional airflow.\nSpecifically, On 05/05/2026, compounding technician was observed preparing the following prescriptions in Buffer Room l H-ll0A: • RX# <Redacted B4> Remicade (Infliximab) 500mg/0.9%NS, 250mL IV bag The compounding technician was observed moving quickly within the ISO 5 LAFW workspace during aseptic manipulations, disrupting unidirectional airflow and increasing the risk of introducing lesser-quality air into the ISO 5 critical area.\n\nOBSERVATION 5: Use of a disinfectant in a manner insufficient to achieve adequate levels of disinfection.\nSpecifically, On 5/6/2026 during <Redacted B4> cleaning operations, cleaning performed within the ISO 5 classified laminar airflow hood (LAFH), cleaning procedures were found to be inadequate in the following respects: a. A compounding technician was observed wiping the interior surfaces of the ISO 5 LAFH without using overlapping wipe passes during the cleaning procedure. The absence of overlapping strokes resulted in visible gaps in surface contact, with some interior surface areas visibly not contacted or wetted by the disinfectant wipe. b. The compounding technician was observed using a back-and-forth scrubbing motion while wiping the interior surfaces of the ISO 5 classified LAFH, rather than the required unidirectional wiping technique potentially spreading contaminants to previously cleaned areas and negating the effectiveness o fthe disinfection process.\n\nOBSERVATION 6: Use of a sporicidal agent in the facility's ISO 5 areas was improper.\nSpecifically, The compounding technician was observed performing the <Redacted B4> cleaning of the ISO 5 classified laminar airflow hoods and ISO 7 classified buffer room. The technician applied a wetted sterile wipes treated with sterile <Redacted B4> (manufactured by <Redacted B4> to the <Redacted B4> ) workbench and the <Redacted B4> and <Redacted B4> or surfaces of the laminar airflow hoods. Following application, all treated surfaces were observed to air-dry within a couple of seconds. This is inconsistent with the sterile <Redacted B4> manufacturer's <Redacted B4> specified dwell time of <Redacted B4> for sporicidal effect.. r17\n\nOBSERVATION 7: Failure to appropriately and regularly clean and disinfect or sterilize equipment located in the ISO 5 area.\nSpecifically, A <Redacted B4> light fixture housing in the ISO 5 laminar flow hood (LFH) is not properly seated, creating a gap between the housing and the surrounding surface. This gap constitutes a hard-to-clean area that may harbor particulate matter and microbial contamination, posing a risk to product quality.\n\nOBSERVATION 8: Smoke studies were not performed under dynamic conditions."
+ },
+ "fda483-193454": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "베타락탐 의약품을 비베타락탐 무균 제품과 동일한 ISO 5 후드에서 생산해 교차오염 방지를 위한 격리·전용화가 미흡했다.",
+     "original": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.",
+     "citation": "21 CFR 211.42",
+     "risk": "베타락탐 교차오염은 과민반응 위험이 커 환자안전에 직접적 위해가 된다."
+    },
+    {
+     "observation": "ISO 5 비위해 생산 후드의 HEPA 필터에서 원인 불명의 갈색 얼룩이 관찰됐고 출처·필터 건전성 영향 여부를 규명하지 못했다.",
+     "original": "unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood",
+     "citation": "21 CFR 211.42",
+     "risk": "필터 건전성·공기질에 대한 보증이 불확실해 무균 환경 신뢰성이 저하된다."
+    },
+    {
+     "observation": "무균조작 중 만료된(2022-01 제조) 멸균 장갑을 착용해 장갑의 무균성 보증이 없었다.",
+     "original": "Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg",
+     "risk": "장갑 무균성 미보증으로 임계 조작 중 오염 유입 가능성이 커진다."
+    }
+   ],
+   "inspectional_significance": "베타락탐 교차오염 방지 미흡, HEPA 오염 미규명, 소독·동선·복장 등 무균실무 전반에 걸친 다수(10건) 관찰로, 무균제제 제조소의 오염관리전략(CCS)이 체계적으로 취약함을 보여준다. 베타락탐 교차오염은 규제상 특히 중대하게 다뤄져 Warning Letter·후속 조치로 승격될 가능성이 있다.",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "베타락탐과 비베타락탐 무균 제품의 생산 설비·구역을 전용화·격리하고 세척 검증을 재수립한다.",
+     "HEPA 필터 얼룩의 원인을 조사하고 필터 건전성·공기질 영향에 대한 소급 위해평가를 실시한다.",
+     "멸균 장갑 등 무균 소모품의 유효기한 관리·사용 통제를 강화하고 CAPA 를 문서화한다."
+    ]
+   },
+   "administrative_risks": "베타락탐 교차오염 관련 지적은 규제 당국이 엄격히 보는 항목으로, 미시정 시 Warning Letter, Import Alert(해당 시), OAI 분류, 재실사로 이어질 수 있다."
+  },
+  "source_text": "OBSERVATION 2: Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.\nSpecifically, Beta-Lactam drug products are produced in the same ISO 5 hoods as non-beta-lactam drug products intended to be sterile. The following beta-lactam drugs were observed being produced in your LAFH hood include, but are not limited to: - - - - - - ceftaroline fosamil 300 mg in D5W 100 mL ampicillin 2 gm in Normal Saline Mini-Bag 100 mL ampicillin/sulbactam 3 gm in Normal Saline Mini-Bag I00 mL ertapenem I gm in Normal Saline Mini-Bag 50 mL meropenem 1000 mg in Normal Saline Mini-Bag 50 mL meropenem 2000 mg in Normal Saline 100 mL Your firm performs cleaning with only '(bl <41 between the production ofbeta-lactam and non-beta lactam drug products intended to be sterile in the same ISO 5 area and uses[(I:)) (4) I, with a [(I:)) (4) I~ time, as the cleaning/sanitizing agent to inactivate beta-lactam residues only[(I:)) (4) Ion[(I:)) (4) Iin the non-hazardous production area. This frequency is inadequate to prevent cross-contamination. Add Continuation Page\n\nOBSERVATION 3: Contamination was observed in your production area.\nSpecifically, On 04/29/2026, unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood (SN: <Redacted B4>. Your firm was unable to identify the source of the staining or confirm whether it affected filter integrity, air quality, or aseptic conditions in the ISO 5 area. The duration of this condition is unknown. Add Continuation Page\n\nOBSERVATION 4: Lack of disinfection of supplies at each transition from areas of lower quality air to areas of higher quality air.\nSpecifically, A) On 04/27/2026, 04/28/2026, and 04/29/2026, <Redacted B4> operators in both the hazardous and non-hazardous production rooms failed to wipe down materials with an appropriate disinfectant (e.g., <Redacted B4> when transitioning those materials from the ISO 7 buffer room environment into the ISO 5 critical zone during the production of luspatercept aamt 50mg, label # <Redacted B4> B) On 04/28/2026, a re-purposed <Redacted B4> bottle, labeled <Redacted B4> used to discard leftover fluid generated during aseptic processing operations, was observed used within the ISO 5 critical zone without observed disinfection upon transfer from the ISO 7 buffer room after being emptied. The bottle was reused and stored in the ISO 5 hood over multiple days. During aseptic processing activities, the cap has to be removed by the technician, and the bottle handled each time liquid is deposited inside. The operator was observed discarding liquid into the reused bottle. On <Redacted B4> bortezomib 2.7mg, label <Redacted B4> was produced with the re-used fluid discard bottle present in the ISO 5 critical area. C) The wearable, <Redacted B4> communication device is inconsistently worn by op\n\nOBSERVATION 5: An operator rested their arms on the work surface of the hood during aseptic production.\nThis practice may introduce contamination into the ISO 5 work area. Specifically, A) In the non-hazardous production room <Redacted B4> operators were observed resting their hands directly on the ISO 5 workbench surface on 04/29/2026 during the production of micafungin 100mg in normal saline 1OOmL. B) On 04/28/2026, the operator's elbows were observed resting on the edge of the front grille of the ISO 5 Biological Safety Cabinet (BSC). Add Continuation Page\n\nOBSERVATION 6: Personnel were observed touching equipment or other surfaces located outside of the ISO 5 area with gloved hands and then proceeding with aseptic processing without changing or sanitizing gloves.\nSpecifically, On 04/28/2026 during the production of bortezomib 2.7mg, label # <Redacted B4> an operator failed to sanitize or change their gloved hands with <Redacted B4> after touching the computer keyboard and mouse within the ISO 7 buffer room prior to going back into the ISO 5 critical area to continue aseptically processing drug product intended to be sterile. Your SOP only specifies <Redacted B4> surfaces. We did not observe your third party cleaners cleaning and sanitizing your keyboards, mouse, and handheld scanner. Add Continuation Page\n\nOBSERVATION 7: Personnel were observed moving quickly in a critical area or in an area immediately adjacent to a critical area likely causing disruption of unidirectional airflow.\nSpecifically, An operator was observed spraying their gloved hands with (bl <4> under the ISO 5 hood and then rapidly moved their hands to dry within the critical area, causing disruption of unidirectional airflow on 04/28/2026 during the production of bortezomib 2.7mg, label li(o) (4) The operator's hands moved rapidly over materials and components used during production.\n\nOBSERVATION 8: Production areas have difficult to clean or contain porous, particle generating, or visibly dirty equipment or surfaces.\nSpecifically, A) The <Redacted B4> plate and washer located on the front grille of BSC SN: <Redacted B4> and <Redacted B4> (hazardous room <Redacted B4> ) are difficult to clean and may harbor and shed particulates and microbial contamination into the ISO 5 environment. This screw and washer were left by the firm's engineering to the BSC grill and not part of the smoke studies, therefore there is no assurance that this is not interfering in the functionality or causing turbulence in the BSC. B) On 04/30/2026, during the production of doxorubicin 48mg in normal saline 250 mL, chipped and protruding paint was observed on the walls ofthe ISO 7 buffer room. C) At least <Redacted B4> protruding fire sprinklers located in the ISO 7 ante and buffer rooms were observed not cleaned since around 2020. Additionally, the screw, cameras, and WiFi device on the ceilings of the buffer rooms (room <Redacted B4> were not documented as cleaned. The buffer rooms contain the ISO 5 areas that are used to produce drug products intended to be sterile. D) On 04/28/2026, Bluetooth speakers were observed on the workbench of the ISO 7 buffer room, across from the ISO 5 laminar airflow hood (LAFH) used for ha\n\nOBSERVATION 9: Personnel performed aseptic manipulations with exposed hair or skin.\nSpecifically, A) On 04/27/2026 and 04/29/2026, multiple operators were observed aseptically processing drug products intended to be sterile in the ISO 5 laminar airflow hood (LAFH) with exposed hair, including during the production of daptomycin 670 mg in sodium chloride 0.9%, 36.6 mL, label # <Redacted B4> in room <Redacted B4> B) On 04/29/2026, one operator was observed inserting their head, including the exposed skin of their forehead, and eyeglasses into the ISO 5 critical zone during the production of luspatercept-aamt 50mg, label <Redacted B4>. These eyeglasses are only cleaned with <Redacted B4> before being brought into the ISO 7 buffer area and are worn throughout the hospital and patient care areas. No sporicidal agent was used to clean these items and no environmental monitoring was performed to assess the contamination risk they may introduce. Add Continuation Page\n\nOBSERVATION 10: Materials were exposed to lower than ISO 5 quality air.\nSpecifically, A) Sterile, lint-fre.e wipes stored in an exposed, open condition were observed on the wall of the ISO 7 buffer rooms. At least <Redacted B4> of the transparent boxes on the wall had broken hinges and were left open during production. The wipes, which were difficult to pull from the box, were sprayed with sterile <Redacted B4> in the ISO 7 buffer and then used to clean the ISO 5 workbench surface and to wipe materials transitioning from areas of lower quality air into the ISO 5 critical areas. B) Sterile, lint-free wipes were observed on the wall of the unclassified areas of the segregated ICU room <Redacted B4> by the sink. Add Continuation Page\n\nOBSERVATION 11: Personnel engaged in aseptic processing were observed wearing non-sterile gloves.\nSpecifically, Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg, label # <Redacted B4> on 04/28/2026. There is no assurance that the gloves are intact and remain sterile. Your sterile glove manufacturer suggested that the gloves be used within <Redacte d B4> of the manufacturer date. Add Continuation Page"
+ },
+ "fda483-193455": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "무균 완제에서 포유류 모발 등 이물이 반복 검출됐으나 조사가 적시에 완료되지 않았고 근본원인 규명·시정이 입증되지 않았다.",
+     "original": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
+     "citation": "21 CFR 211.192",
+     "risk": "반복 이물 혼입에 대한 근본원인 미규명은 무균성·제품품질의 지속적 위해를 방치하는 결과가 된다."
+    },
+    {
+     "observation": "육안검사의 검출 민감도·결함 검출성이 적절히 적격성평가되지 않아 공정 변동을 감시·검증하는 관리절차가 미비했다.",
+     "original": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product.",
+     "citation": "21 CFR 211.110",
+     "risk": "검사 신뢰성이 입증되지 않아 불량 유출 위험이 커진다."
+    },
+    {
+     "observation": "무균 표방 제품의 미생물 오염 방지 절차에 무균·멸균 공정의 적절한 밸리데이션이 포함되지 않았다.",
+     "original": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.",
+     "citation": "21 CFR 211.113",
+     "risk": "무균공정 밸리데이션 미흡은 최종 제품 무균성 보증의 근거를 약화시킨다."
+    }
+   ],
+   "inspectional_significance": "반복 이물 혼입에 대한 조사 완결성 부족, 검사 적격성평가·환경모니터링·품질부서 책임 문서화 미흡 등 품질시스템 전반의 체계적 결함을 지적한다. 반복성·근본원인 미규명은 데이터·품질 신뢰성 문제로 확대될 수 있어 중대도가 높고, Warning Letter 로 승격될 가능성이 있다.",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "반복 이물(모발) 혼입에 대한 조사를 결론·후속조치까지 완결하고 근본원인 규명·시정을 입증한다.",
+     "육안검사 등 검사 방법의 검출 민감도·결함 검출성을 적격성평가하고 재검증한다.",
+     "무균·멸균 공정 밸리데이션과 환경모니터링·트렌드 분석 체계를 보강하고 CAPA 를 문서화한다."
+    ]
+   },
+   "administrative_risks": "품질시스템 전반의 체계적 결함과 반복성은 미시정 시 Warning Letter, OAI 분류, 후속 재실사로 이어질 수 있으며, 무균제제 공급의 규제 리스크를 높인다."
+  },
+  "source_text": "OBSERVATION 1: Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.\nSpecifically, A. Extrinsic biological particulates (mammalian hair) have continued to be identified in finished sterile drug products. However, investigations into these events have not been completed in a timely manner and do not demonstrate that the root cause has been adequately identified and corrected. From approximately 08/30/2025 to present, you have identified mammalian hair in finished units in at least <Redacted B4> batches, including three identified in 2026, representing a recurring contamination issue (approximately <Redacted B4>) <Redacted B4> batches out of <Redacted B4> inspected in 2026). Probable root cause has been attributed to stopper components; however, this conclusion is based on an ongoing, aggregated trend investigation (REC 1093464), that was opened on 08/28/2025, and has not been substantiated through complete, batch specific investigations. All <Redacted B4> deviations are currently open. You stated that closure of those deviations is pending completion of this trend investigation. Despite implementation of multiple corrective and preventative actions, you continue to observe mammalian hair in finished drug products. I EMPi.OY1:E($) SIGJ'IAl\\lRE /I SEE\n\nOBSERVATION 2: Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product.\nSpecifically, A. Visual inspection methods have been implemented without adequately qualifying inspection sensitivity, defect detectability, or comparability between methods. For example: Your threshold <Redacted B4> studies failed to generate <Redacted B4> across the full visible range of defects and failed to establish <Redacted B4> based on defect size at which defects become reliably detectable. Without establishing <Redacted B4> supported by <Redacted B4> you have not demonstrated that inspection sensitivity has been adequately qualified or that the visual inspection process is capable of consistently detecting and rejecting critical defects. Additionally, MVI studies were conducted using aggregated \"particulate\" defect categories that combined multiple particulate defect types (ex: glass, metal, rubber, fibers). Further, defect units were characterized by using broad size ranges rather than actual measured particle sizes, which does not allow for evaluation of detection capability as function of particle size. Review of your threshold studies supporting the manual baseline demonstrated that certain particulate defect types, such as glass, black fiber, and hair, exhibited low\n\nOBSERVATION 3: Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.\n\nOBSERVATION 4: The number of containers and amount of material taken from each container is not based upon appropriate criteria.\n\nOBSERVATION 5: Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.\nSpecifically, Environmental monitoring is not always performed in response to interventions located and/ or impacting critical surfaces. Examples include but are not limited to: <Redacted B4>, tools to include <Redacted B4>.\n\nOBSERVATION 6: The responsibilities and procedures applicable to the quaJity unit are not in writing and fully followed.\nSpecifically, You lack comprehensive trending analysis regarding your environmental monitoring program as well as your <Redacted B4> and <Redacted B4> decontamination <Redacted B4> program. Both programs lack adequate spatial analysis such as intra and inter location requirements over justified periods.\n\nOBSERVATION 7: Master production and control records lack complete manufacturing and control instructions.\n\nOBSERVATION 8: Equipment used in the manufacture, processing, packing, or holding of drug products is not of appropriate design to facilitate operations for its intended use.\nSpecifically, The <Redacted B4> Assembly Machine (Equipment ID# <Redacted B4>) is utilized to assemble and label sterile drug product <Redacted B4> into <Redacted B4>. The firm assembles and labels the sterile drug roducts <Redacted B4> and <Redacted B4> on the <Redacted B4> assembly machine <Redacted B4> The equipment performance qualification studies titled' <Redacted B4> Assembly Machine (System <Redacted B4> Performance Qualification Protocol Summary Report-VL-087 JUN2 l, VPQ- <Redacted B4> S-VL-087JUN21, Client <Redacted B4>\" effective: 01/23/2023,' b 4 Assembly Machine System <Redacted B4> Performance Qualification Protocol Summary Report-VL-087JUN21, Client <Redacted B4> Addendum 11, VP 6 4 -00019-S-VL-087JUN21-ADD1 l,\" effective: 01/27/2026, and <Redacted B4> Assembly and Labeling Machine (System <Redacted B4> Performance Qualification Protocol, A-VPQ-00061-P,\" effective: 04/08/2025, do not assess the assembly and labeling functionality as indicated in the production of <Redacted B4> and <Redacted B4> for the production batch sizes of <Redacted B4> and <Redacted B4> finished drug product <Redacted B4> EMPt..oYEECS) SIGNATURE SEE Joohi Castelvetere, Investigator 04/24/2026 R"
+ },
+ "admin-2026005515": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「의약품 등의 안전에 관한 규칙」 제95조",
+     "original": "제조기록서 및 시험성적서 거짓 작성, 기준서 미준수",
+     "description": "다수 원료·완제 품목의 제조기록서 및 시험성적서를 사실과 다르게 거짓으로 작성하고 자사 기준서를 미준수했다.",
+     "risk": "제조·시험 기록의 진실성(데이터 무결성)이 다수 품목에 걸쳐 훼손돼 제품 품질 판단의 신뢰 근거가 무너진다."
+    },
+    {
+     "citation": "[별표 8]",
+     "original": "해당품목 제조업무정지 4개월 15일",
+     "description": "위반 품목별로 제조업무정지 및 일부 품목은 과징금으로 갈음하는 처분이 부과됐다.",
+     "risk": "데이터 무결성 위반은 가장 중대한 행정처분 사유군에 속해 품목 전반의 공급·신뢰에 영향을 준다."
+    }
+   ],
+   "disposition_basis": "제조기록서·시험성적서 거짓 작성 및 기준서 미준수를 사유로, 세포티암염산염 등 다수 품목에 제조업무정지 최대 4개월 15일이 부과됐고, 세포페라존나트륨 등 일부 품목은 이에 갈음해 총 과징금 6,900만원이 부과됐다. 처분 수위는 「의약품 등의 안전에 관한 규칙」 [별표 8] 행정처분의 기준 개별기준 제25호 다목에 근거한다.",
+   "required_remediation": {
+    "deadline": "처분에 명시된 각 품목별 제조업무정지 기간(2026. 7. 23. 이후) 및 과징금 부과 처분의 이행",
+    "items": [
+     "제조기록서·시험성적서 작성 시점과 실제 작업 시점의 일치 여부 및 원본성 검증 체계를 전면 점검한다.",
+     "데이터 무결성(ALCOA+) 원칙에 대한 자체감사를 실시하고 품질책임자의 기록 검토·승인 이력을 재점검한다.",
+     "부과된 과징금 납부 및 품목별 제조업무정지 처분을 이행한다."
+    ]
+   },
+   "administrative_risks": "데이터 무결성 위반은 재위반 시 가중처분·품목허가 취소·형사고발 및 후속 실태조사로 이어질 수 있는 중대 사유다."
+  },
+  "source_text": "제조기록서 및 시험성적서 거짓 작성, 기준서 미준수\n처분명: ○ 해당품목 제조업무정지 4개월 15일(2026. 7. 23. ~ 2026. 12. 7.): 세포티암염산염·건조탄산나트륨(제20151126-117-G-132-08호), 세포티암염산염(제20140912-117-G-124-07호)\n○ 해당품목 제조업무정지 3개월(2026. 7. 23. ~ 2026. 10. 22.): 에스피씨L-아스파르트산-L-아르기닌수화물(원료), 세프트리악손나트륨수화물(제20150501-116-G-126-12호), 에르도스테인(제20200714-138-H-378-15호)\n○ 해당품목 제조업무정지 1개월(2026. 7. 23. ~ 2026. 8. 22.): 에스피씨메브로페닌(원료)\n○ 설박탐나트륨·세포페라존나트륨(제20170803-150-I-536-09호)에 대하여 해당품목 제조업무정지 4개월 15일, 세포테탄(제20221117-210-J-1405호) 및 세파제돈나트륨(제20200310-210-J-579호)에 대하여 해당품목 제조업무정지 3개월 15일, 에스피씨세포페라존나트륨(원료)에 대하여 해당품목 제조업무정지 3개월에 갈음한 총 과징금 금69,000,000원(금육천구백만원) 부과 처분\n적용법령: ○ 「의약품 등의 안전에 관한 규칙」 제95조 [별표 8] 행정처분의 기준 Ⅰ.일반기준 제1호 가목\n○ 「약사법」 제81조, 「약사법 시행령」 제33조 [별표 2] '과징금 산정기준', 「식품의약품안전처 과징금 부과처분 기준 등에 관한 규정(훈령)」 제3조제2항 [별표] '과징금 부과대상의 세부 기준' 2. 개별 기준 가목\n○ 「약사법」 제37조제1항, 제38조제1항, 「의약품 등의 안전에 관한 규칙」 제43조제1항제3호, 제43조제1항제5호, 제48조제9호\n○ 「약사법」 제76조, 「의약품 등의 안전에 관한 규칙」 제95조 [별표 8] 행정처분의 기준 Ⅱ. 개별기준 제25호 다목 2)\n○ 「약사법」 제37조제1항, 제38조제1항, 「의약품 등의 안전에 관한 규칙」 제43조제1항제3호, 제48조제9호\n○ 「약사법」 제76조 「의약품 등의 안전에 관한 규칙」 제95조 [별표 8] 행정처분의 기준 Ⅱ. 개별기준 제25호 다목 3)\n최종처분일자: 20260709"
+ },
+ "admin-2026005554": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」 제62조제11호",
+     "original": "시험검사 결과 품질부적합",
+     "description": "멀티브큐골드정·헤파코엔정 등 다수 품목이 시험검사 결과 품질부적합으로 확인됐다.",
+     "risk": "한 업체의 여러 품목이 동시에 품질부적합으로 적발된 것은 개별 배치 문제가 아니라 품질관리 시스템 전반의 취약성을 시사한다."
+    },
+    {
+     "citation": "[별표8]",
+     "original": "해당품목 신고취소",
+     "description": "일부 품목은 제조업무정지, 다른 일부 품목은 신고취소 처분이 부과됐다.",
+     "risk": "다품목 품질부적합은 출하시험·품질관리 체계 전반의 재점검을 요한다."
+    }
+   ],
+   "disposition_basis": "시험검사 결과 품질부적합을 사유로 멀티브큐골드정에 제조업무정지 2개월, 헤파코엔정에 5개월이 부과됐고, 브이타민큐정 등 다수 품목은 신고취소 처분이 내려졌다. 처분 수위는 「의약품 등의 안전에 관한 규칙」 [별표8] 행정처분의 기준 개별기준 제39호에 근거한다.",
+   "required_remediation": {
+    "deadline": "처분에 명시된 각 품목별 제조업무정지 기간 및 신고취소 효력일(2026. 7. 23. 이후) 이행",
+    "items": [
+     "품목 전반의 출하시험 성적을 재검토하고 부적합 원인을 조사한다.",
+     "품질관리 시스템(QMS)을 전사적으로 점검하고 CAPA 를 수립한다.",
+     "제조업무정지·신고취소 처분을 이행한다."
+    ]
+   },
+   "administrative_risks": "다수 품목의 동시 품질부적합은 재발 시 가중처분 및 후속 실태조사로 이어질 수 있으며, 품질시스템 전반의 신뢰 문제로 확대될 수 있다."
+  },
+  "source_text": "시험검사 결과 품질부적합\n처분명: ○ 해당품목 제조업무정지 2개월(2026. 7. 23. ~ 2026. 9. 22.): 멀티브큐골드정\n ○ 해당품목 제조업무정지 5개월(2026. 7. 23. ~ 2026. 12. 22.): 헤파코엔정\n ○ 해당품목 신고취소(2026. 7. 23.자): 브이타민큐정, 유코빅포르테정\n ○ 해당품목 신고취소(2026. 8. 2.자): 셀비다정, 트루액티비오정\n ○ 해당품목 신고취소(2026. 10. 2.자): 헤파코엔플러스정\n적용법령: ○  「약사법」 제62조제11호\n○  「약사법」 제76조제1항제4호, 제76조제3항 「의약품 등의 안전에 관한 규칙」 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제39호 다목 2), 제39호 아목 2), 제39호 바목 2)\n최종처분일자: 20260709"
+ },
+ "admin-2026005454": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」 제31조제1항",
+     "original": "수탁자에 대한 관리·감독을 철저히 하지 아니하였음",
+     "description": "위탁자가 수탁자(비보존제약)의 제조관리 미흡을 철저히 관리·감독하지 않았고, 수탁자는 설비가동·청소일지를 작업과 동시에 작성하지 않고 실제 작업자가 작성하지도 않았다.",
+     "risk": "위탁 제조 구조에서 위탁자의 관리·감독 책임까지 행정처분 대상이 되며, 기록의 동시성·작성자 진정성 결여는 데이터 무결성 훼손이다."
+    },
+    {
+     "citation": "[별표 8]",
+     "original": "해당품목 제조업무정지 3개월 7일",
+     "description": "레푸로진시럽에 대해 제조업무정지 3개월 7일이 부과됐다.",
+     "risk": "회수계획서 지연 제출 등 사후조치 미흡도 함께 처분 사유가 됐다."
+    }
+   ],
+   "disposition_basis": "위탁자가 수탁자의 제조관리 미흡을 철저히 관리·감독하지 않았고 회수계획서를 기한 내 제출하지 않은 점을 사유로, 레푸로진시럽에 제조업무정지 3개월 7일이 부과됐다. 처분 근거는 「의약품 등의 안전에 관한 규칙」 [별표 8] 행정처분의 기준 개별기준 제2호 자목이다.",
+   "required_remediation": {
+    "deadline": "레푸로진시럽 제조업무정지 기간(2026. 7. 21. ~ 2026. 10. 27.) 이행",
+    "items": [
+     "수탁자의 문서관리·기록작성 규정 준수 여부를 정기적으로 감사한다.",
+     "위탁자-수탁자 간 관리·감독 절차서의 실효성을 점검하고 기록의 동시성·작성자 진정성을 확보한다.",
+     "회수 의심 시 판매중지 및 회수계획서 기한 내 제출 절차를 재정비한다."
+    ]
+   },
+   "administrative_risks": "위탁 제조 관리·감독 책임 미이행은 재위반 시 가중처분으로 이어질 수 있고, 회수 사후조치 지연은 별도 처분 사유가 된다."
+  },
+  "source_text": "○ 의약품 제조 또는 시험의 위탁자는 제조 또는 시험이 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 아래와 같이 수탁자가 제조관리를 적절하게 수행하지 않은 사실이 있음에도 불구하고, 수탁자에 대한 관리·감독을 철저히 하지 아니하였음 \n   - 수탁자 비보존제약(주)는 의약품 '레푸로진시럽(레보드로프로피진)'(제조번호: 24011)을 수탁 제조함에 있어 자사기준서 「문서관리규정(문서번호 VG-012)」 및 「제조(포장)지시 및 기록서 작성 및 운영규정(문서번호 VM-004)」에 따라 문서의 기록은 작업과 동시에 이루어지며, 공정을 수행한 작업자가 직접 작성하고 확인자가 그 결과를 확인하여 성명 또는 서명을 기록하도록 규정하였음에도 불구하고, 충전기, 액제 캡핑기, 자동중량 선별기의 설비가동 및 청소일지를 작업과 동시에 작성하지 않았고, 실제 공정을 수행한 작업자가 작성하지 않은 사실이 있음\n처분명: 해당품목 제조업무정지 3개월 7일(2026. 7. 21. ~ 2026. 10. 27.): 레푸로진시럽(레보드로프로피진)\n적용법령: ○ 「약사법」 제31조제1항, 「의약품 등의 제조업 및 수입자의 시설기준령」 제4조, 「의약품 등의 제조업 및 수입자의 시설기준령 시행규칙」 제11조제3항제1호\n○「약사법」 제76조제1항제3호 및 제3항, 「의약품 등의 안전에 관한 규칙」 제95조 [별표 8] 행정처분의 기준 Ⅱ. 개별기준 제2호 자목 1) \n최종처분일자: 20260707"
+ },
+ "admin-2026005455": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」 제31조제1항",
+     "original": "함량시험이 모두 종료되었으나 시험일지에는 어떠한 기록도 없는 등 시험일지를 실시간으로 기록하지 않았고",
+     "description": "수탁 제조 의약품(모메타손푸로에이트 제제)의 함량시험을 수행하며 자사 기준서를 미준수해, 시험을 실시간으로 기록하지 않고 표준품·검액 칭량값을 추가로 만들어 출력했으며 확인자가 이를 확인하지 못했다.",
+     "risk": "시험 기록의 실시간성·진정성 결여와 데이터 임의 생성은 시험결과 신뢰성을 훼손하는 데이터 무결성 위반이다."
+    },
+    {
+     "citation": "[별표 8]",
+     "original": "해당제형(점비액제) 제조업무정지 15일",
+     "description": "해당 제형(점비액제)에 제조업무정지 15일이 부과됐다.",
+     "risk": "동일 유효성분 여러 위탁 제품에 걸친 기준서 미준수는 시험 절차의 제품군 적용 일관성 취약을 시사한다."
+    }
+   ],
+   "disposition_basis": "수탁 제조 의약품의 함량시험 시 자사 기준서를 미준수한 점을 사유로 해당 제형(점비액제)에 제조업무정지 15일이 부과됐다. 처분 근거는 「의약품 등의 안전에 관한 규칙」 [별표 8] 행정처분의 기준 개별기준 제2호 자목이다.",
+   "required_remediation": {
+    "deadline": "점비액제 제조업무정지 기간(2026. 7. 21. ~ 2026. 8. 4.) 이행",
+    "items": [
+     "함량시험 기준서의 제품별 적용 일관성을 점검하고 위탁 제품군 전체의 시험기록을 재검토한다.",
+     "시험 데이터의 실시간 기록·확인자 검토 절차를 강화하고 임의 데이터 생성 방지 통제를 수립한다.",
+     "제조업무정지 처분을 이행한다."
+    ]
+   },
+   "administrative_risks": "시험기록 관련 데이터 무결성 위반은 재위반 시 가중처분·후속 실태조사로 이어질 수 있다."
+  },
+  "source_text": "○ 의약품 제조의 수탁자는 제품마다 제조관리기준서 및 품질관리기준서를 작성하고 그 기준서에 따라 제조 및 품질관리를 실시하여야 하나, 다음과 같이 기준서의 내용을 미준수 하였음\n    - 수탁하여 제조하는 의약품 '모메원점비액(모메타손푸로에이트)'(제조번호: 25008, 25009)[위탁자: 에이치엘비제약(주)], '모베타스프레이(모메타손푸로에이트)'(제조번호: 25023)[위탁자: ㈜마더스제약], '모메씨티나잘스프레이액(모메타손푸로에이트)'(제조번호: 25005)[위탁자: ㈜씨티씨바이오]의 함량시험을 진행함에 있어 자사기준서 「Good Laboratory practices를 위한 SOP(문서번호 QS-140)」의 6항에 따라 분석을 수행할 때 그 즉시 분석 데이터를 기록하여야 하고, 「시험관리 SOP(문서번호: QS-107)」의 5항에 따라 시험자는 시험을 담당 및 시행하는 사람으로 시험 결과에 대한 신뢰성 및 정확성에 책임이 있으며 이상 발생 시 확인자에게 보고하고, 확인자는 지도·감독하며, 시험기록의 정확성 및 완결성을 확인하는 책임이 있음에도 불구하고, 함량시험이 모두 종료되었으나 시험일지에는 어떠한 기록도 없는 등 시험일지를 실시간으로 기록하지 않았고, 시험자는 표준품 및 검액의 칭량값을 추가로 만들어 출력하였으며, 확인자는 이를 확인하지 못한 사실이 있음\n처분명: 해당제형(점비액제) 제조업무정지 15일(2026. 7. 21. ~ 2026. 8. 4.)\n적용법령: ○ 「약사법」 제31조제1항, 제38조제1항, 「의약품 등의 제조업 및 수입자의 시설기준령」 제4조, 「의약품 등의 제조업 및 수입자의 시설기준령 시행규칙」 제11조제3항제2호\n○ 「약사법」 제76조, 「의약품 등의 안전에 관한 규칙」 제95조 [별표 8] 행정처분의 기준 Ⅱ. 개별기준 제2호 자목 2) 나)\n최종처분일자: 20260707"
+ },
+ "admin-2026005334": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」 제38조제1항",
+     "original": "기준서 미준수",
+     "description": "바미드정(레바미피드) 제조에서 제조·품질관리기준서를 준수하지 않았다.",
+     "risk": "기준서와 실제 제조·시험 기록의 불일치는 반복되는 행정처분 사유로, 제품 품질 일관성을 저해한다."
+    },
+    {
+     "citation": "[별표8]",
+     "original": "해당 품목 제조업무정지 1개월",
+     "description": "바미드정에 대해 제조업무정지 1개월이 부과됐다.",
+     "risk": "기준서 미준수는 개별기준상 제조업무정지 처분 대상이다."
+    }
+   ],
+   "disposition_basis": "제조·품질관리기준서 미준수를 사유로 바미드정(레바미피드)에 제조업무정지 1개월(2026. 7. 20.~8. 19.)이 부과됐다. 처분 근거는 「의약품 등의 안전에 관한 규칙」 [별표8] Ⅱ.개별기준 제25호다목이다.",
+   "required_remediation": {
+    "deadline": "바미드정 제조업무정지 기간(2026. 7. 20. ~ 2026. 8. 19.) 이행",
+    "items": [
+     "자사 제조·품질관리기준서와 실제 작업기록의 일치 여부를 정기 점검한다.",
+     "기준서 개정 이력 관리의 적정성을 확인하고 준수 여부를 자체감사한다.",
+     "제조업무정지 처분을 이행한다."
+    ]
+   },
+   "administrative_risks": "기준서 미준수는 반복 시 가중처분으로 이어질 수 있으며 후속 실태조사 대상이 될 수 있다."
+  },
+  "source_text": "기준서 미준수\n처분명: ○ 해당 품목 제조업무정지 1개월(2026. 7. 20. ∼ 2026. 8. 19.)\n     ※해당 품목 : 바미드정(레바미피드)\n적용법령: ○ 「약사법」 제38조제1항\n○ 「의약품 등의 안전에 관한 규칙」 제48조제9호, \n    [별표8] Ⅱ.개별기준 제25호다목 3)\n최종처분일자: 20260706"
+ },
+ "admin-2026005314": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」 제56조제1항제3호",
+     "original": "1차 포장에 제조번호와 유효기한 또는 사용기한을 기재하지 아니한 사실이 있음",
+     "description": "한약재 '온누리바이오생약녹용' 24개 제조번호의 1차 포장에 제조번호와 유효기한(사용기한)을 기재하지 않았다.",
+     "risk": "제조번호·유효기한 미기재는 추적성·사용안전 정보를 결여시켜 유통·회수 관리에 지장을 준다."
+    },
+    {
+     "citation": "「의약품 등의 안전에 관한 규칙」 제62조제5호",
+     "original": "규격품 한약의 경우 원산지명(국가명 등)을 기재하여야 하나",
+     "description": "규격품 한약재의 1차 포장에 원산지명(국가명)을 기재하지 않았다.",
+     "risk": "원산지 미표기는 한약재 규격 표시 요건 위반으로 소비자 정보권을 침해한다."
+    }
+   ],
+   "disposition_basis": "한약재 24개 제조번호의 1차 포장에 제조번호·유효기한 및 원산지명을 기재하지 않은 점을 사유로, 판매업무정지 1개월 7일에 갈음한 과징금 20,535,000원이 부과됐다. 처분 근거는 「의약품 등의 안전에 관한 규칙」 [별표8] 행정처분의 기준 개별기준 제38호이다.",
+   "required_remediation": {
+    "deadline": "과징금 20,535,000원 부과 처분 이행",
+    "items": [
+     "1차 포장 표시사항(제조번호·유효기한·원산지명)을 전수 점검한다.",
+     "한약재 규격품의 원산지 표기 규정 준수 여부를 확인하고 출하 전 라벨 검수 절차를 보강한다.",
+     "부과된 과징금을 납부한다."
+    ]
+   },
+   "administrative_risks": "표시기재 위반은 재발 시 가중처분 대상이 되며 판매업무정지 등으로 확대될 수 있다."
+  },
+  "source_text": "○ 의약품 품목 허가를 받은 자는 의약품의 용기나 포장에 '제조번호와 유효기한 또는 사용기한'을 적어야 하나,\n    - 의약품(한약재) '온누리바이오생약녹용'[HKO-N082-4 등 24개 제조번호(붙임 참조)]을 제조·판매함에 있어 1차 포장에 제조번호와 유효기한 또는 사용기한을 기재하지 아니한 사실이 있음\n  ○ 의약품 품목허가를 받은 자는 규격품 한약의 경우 원산지명(국가명 등)을 기재하여야 하나,\n    - 의약품(한약재) '온누리바이오생약녹용'[HKO-N082-4 등 24개 제조번호(붙임 참조)]을 제조·판매함에 있어 1차 포장에 '원산지'를 기재하지 아니한 사실이 있음\n처분명: 해당품목 판매업무정지 1개월 7일에 갈음한 과징금 금20,535,000원(금이천오십삼만오천원) 부과 처분\n적용법령: ○ 「약사법」 제56조제1항제3호 및 제10호, 「의약품 등의 안전에 관한 규칙」 제62조제5호, 제69조제1항제7호\n○ 「약사법」 제76조, 「의약품 등의 안전에 관한 규칙」 제95조 [별표8] 행정처분의 기준 Ⅰ. 일반기준 제2호, Ⅱ. 개별기준 제38호 나목 및 라목\n최종처분일자: 20260706"
+ }
+}

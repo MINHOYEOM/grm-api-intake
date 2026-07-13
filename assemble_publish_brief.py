@@ -40,9 +40,9 @@ import inject_slots
 _REQUIRED_STR_SLOTS = ("title_issue", "summary", "implication")
 _REQUIRED_LIST_SLOTS = ("key_facts", "checks")
 
-# [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(전문 매체) — 이벤트 카드가 아닌
-# '업계 브리핑 노트'로 렌더. 향후 RAPS·European Pharmaceutical Review 등 수집 추가 시
-# 여기에 기관명만 추가.
+# [업계 브리핑 노트 2026-07-13, v2 명칭개편 2026-07-13] 해설·교육성 2차 소스(전문 매체) —
+# 이벤트 카드가 아닌 '전문지 브리핑'으로 렌더(구 '업계 브리핑 노트'). 향후 RAPS·European
+# Pharmaceutical Review 등 수집 추가 시 여기에 기관명만 추가.
 RESOURCE_AGENCIES = ("ECA",)
 
 
@@ -150,9 +150,15 @@ def extract_resource_notes(cards: list[dict[str, Any]]
     (type_tag=='GMP News' or card_type=='규제 소식'). 순수·순서보존.
 
     해설·교육성 2차 소스(현재 ECA GMP News 7장 유형)를 이벤트 카드 목록에서 분리해
-    브리프 하단 '업계 브리핑 노트' 전용 섹션으로 렌더하기 위한 결정론 변환. 카드 dict 에서
+    브리프 하단 '전문지 브리핑' 전용 섹션으로 렌더하기 위한 결정론 변환. 카드 dict 에서
     사실 재작성 0 으로 추출(§1 자료구조) — sources 는 그대로 통과하되, 렌더는 official_url
     (실기사)만 쓰고 info_url(RSS 피드)은 쓰지 않는다(렌더 쪽 책임).
+
+    [전문지 브리핑 v2 2026-07-13 §3 정직성 게이트] `summary` 는 카드에 본문 흡수 흔적
+    (`source_excerpt_present is True` — §4 ECA 기사 excerpt fetch 성공 신호)이 있을 때만
+    포함한다. 수집 RSS 가 제목만 준 얇은 입력을 LLM 이 "원문에 없다"고 오서술하는 문제(§3
+    배경)를 근본 차단 — 흡수 흔적이 없으면 summary 키 자체를 note 에서 제거한다(partial 의
+    `{% if r.summary %}` 게이트가 그대로 요지 줄을 생략).
     """
     events: list[dict[str, Any]] = []
     resources: list[dict[str, Any]] = []
@@ -161,15 +167,17 @@ def extract_resource_notes(cards: list[dict[str, Any]]
                        and (c.get("type_tag") == "GMP News"
                             or c.get("card_type") == "규제 소식"))
         if is_resource:
-            resources.append({
+            note = {
                 "id": c["id"],
                 "title": c["title_issue"],
                 "original_title": c.get("headline_target", ""),
-                "summary": c.get("summary", ""),
                 "agency": c["agency"],
                 "type_tag": c.get("type_tag", ""),
                 "sources": c.get("sources") or {},
-            })
+            }
+            if c.get("source_excerpt_present"):
+                note["summary"] = c.get("summary", "")
+            resources.append(note)
         else:
             events.append(c)
     return events, resources

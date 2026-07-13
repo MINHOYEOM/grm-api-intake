@@ -1531,6 +1531,55 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         self.assertFalse(card.deep_analysis_ready)
 
 
+class EcaArticleExcerptCardTest(unittest.TestCase):
+    """[전문지 브리핑 v2 §4] `raw.eca_article_excerpt` 배선 — prose_input 풍부화 +
+    웹카드 `source_excerpt_present` boolean(정직성 게이트 §3 입력 신호).
+
+    rss_news_mhra fixture(kind='rss-news', collect_eca_rss 와 동일 kind 공유 — §3 배경 참조)
+    를 재사용해 raw 에 키만 추가/제거한 대조로 검증한다. 실제 raw 키는 ECA 수집기만 채우지만
+    (collect_intake._fetch_eca_article_excerpt), 이 배선 자체는 kind='rss-news' 공통이라
+    fixture 의 agency 는 무관하다.
+    """
+
+    def test_source_excerpt_present_when_key_set(self) -> None:
+        fx = _load_input("rss_news_mhra")
+        raw = dict(fx["raw"])
+        raw["eca_article_excerpt"] = ("Should TGA publish GMP certificates? The debate "
+                                      "over transparency has intensified.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        webcard = card.to_web_card()
+        self.assertIs(webcard["source_excerpt_present"], True)
+
+    def test_source_excerpt_present_absent_without_key(self) -> None:
+        # golden 불변 하드 요구(§4) — 키 부재 시 웹카드에 이 필드 자체가 없다.
+        fx = _load_input("rss_news_mhra")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        self.assertNotIn("source_excerpt_present", card.to_web_card())
+
+    def test_eca_article_excerpt_feeds_issue_or_reason_and_body(self) -> None:
+        fx = _load_input("rss_news_mhra")
+        raw = dict(fx["raw"])
+        excerpt = ("Should TGA publish GMP certificates? The debate over transparency "
+                   "in regulatory disclosure has intensified in recent months.")
+        raw["eca_article_excerpt"] = excerpt
+        card = cs.build_card_scaffold(fx["row"], raw)
+        # excerpt 가 RSS 요약(raw['summary'])보다 우선해 issue_or_reason/body_excerpt 선두.
+        self.assertTrue(excerpt.startswith(card.prose_input["issue_or_reason"][:30]))
+        self.assertNotEqual(card.prose_input["issue_or_reason"], fx["raw"]["summary"])
+        self.assertTrue(card.prose_input["body_excerpt"])
+
+    def test_eca_article_excerpt_does_not_change_rendered_markdown(self) -> None:
+        # excerpt 는 prose_input(JSON 슬롯 입력)만 바꾸고 렌더 markdown 은 불변(§4 골든 불변).
+        fx = _load_input("rss_news_mhra")
+        without_excerpt = cs.build_card_scaffold(fx["row"], fx["raw"])
+        raw_with = dict(fx["raw"])
+        raw_with["eca_article_excerpt"] = "Some fetched article body excerpt text."
+        with_excerpt = cs.build_card_scaffold(fx["row"], raw_with)
+        self.assertEqual(with_excerpt.markdown, without_excerpt.markdown)
+        self.assertNotEqual(with_excerpt.prose_input["issue_or_reason"],
+                            without_excerpt.prose_input["issue_or_reason"])
+
+
 class DeterministicDetailTest(unittest.TestCase):
     """[상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 슬롯 additive 회귀.
 

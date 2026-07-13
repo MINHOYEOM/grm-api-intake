@@ -13,6 +13,13 @@ name: GRM Brief Audit (post-publish provenance detective)
 on:
   schedule:
     - cron: '0 2 * * 1'
+  # 발행 머지(=사람 승인) 직후 그 호를 즉시 감사한다 — cron(월 11:00 KST)만으로는 승인이
+  # 그보다 늦은 주에 지난 호를 재감사하게 되는 시점 결합 약점이 있었다(2026-07-13 진단 B4).
+  # cron 은 안전망으로 병존(감사는 읽기 전용·멱등).
+  push:
+    branches: [main]
+    paths:
+      - 'web/data/briefs/**'
   workflow_dispatch:
     inputs:
       no_verify:
@@ -72,8 +79,9 @@ jobs:
             const path = require('path');
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            // 스케줄 실행에서만 인프라 침묵 실패를 경보한다(수동 dispatch 실험은 로그만 → 과알림 0).
-            const isSchedule = context.eventName === 'schedule';
+            // 자동 실행(schedule cron + 발행 머지 push)에서만 인프라 침묵 실패를 경보한다
+            // (수동 dispatch 실험은 로그만 → 과알림 0).
+            const isSchedule = ['schedule', 'push'].includes(context.eventName);
             const title = 'GRM Intake 운영 경고';
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 

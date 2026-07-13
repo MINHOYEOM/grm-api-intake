@@ -30,6 +30,9 @@
       <a href="#{{ card.anchor }}">{{ card.headline_target }}{% if card.toc_distinguisher %} <span class="toc-sub">· {{ card.toc_distinguisher }}</span>{% endif %}</a>
       {%- endfor %}
       {%- endfor %}
+      {%- if brief.resources %}
+      <a class="sec" href="#sec-resources">업계 브리핑 노트</a>
+      {%- endif %}
     </div></aside>
     <div id="cards" data-issue-no="{{ brief.issue_no }}" data-date="{{ brief.publish_date }}">
       {#- [브리프→업체 프로파일 브릿지] findings.html/firm.html 관례와 동일 — env
@@ -55,6 +58,7 @@
       {%- endfor %}
       </div>
       {%- endfor %}
+      {% include "partials/resource_notes.html" %}
     </div>
   </div>
   <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>목차</button>

@@ -198,3 +198,50 @@ class TestDeepAnalysisWiring(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class MergeFda483DisclosuresTest(unittest.TestCase):
+    """[2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장."""
+
+    @staticmethod
+    def _card(cid, firm, insp, detail=None, deep=None):
+        c = {"id": cid, "type_tag": "483", "render_order": 0,
+             "title_issue": "x", "summary": "s", "key_facts": ["k"],
+             "implication": "i", "checks": ["c"],
+             "headline_target": firm,
+             "facts": [{"label": "제조소/업체", "value": firm},
+                       {"label": "실사일", "value": insp}]}
+        if detail:
+            c["deterministic_detail"] = detail
+        if deep:
+            c["deep_analysis"] = deep
+        return c
+
+    def test_content_less_483_folded_into_one(self):
+        cards = [
+            self._card("fda483-2", "Beta Corp", "01/01/2024"),
+            self._card("fda483-1", "Alpha Corp", "02/02/2024"),
+            self._card("fda483-3", "Gamma Corp", "03/03/2024"),
+            self._card("fda483-9", "Rich Corp", "04/04/2026",
+                       detail={"type": "fda_483_observations", "count": 2}),  # 상세有 → 유지
+            {"id": "admin-1", "type_tag": "admin", "facts": []},              # 483 아님 → 유지
+        ]
+        out = apb.merge_fda483_disclosures(cards)
+        ids = [c["id"] for c in out]
+        # content-less 3장 → 1장(id 오름차순 대표=fda483-1), 상세483·admin 유지
+        self.assertEqual(len(out), 3)
+        self.assertIn("fda483-1", ids)      # 대표
+        self.assertIn("fda483-9", ids)      # 상세 483 유지
+        self.assertIn("admin-1", ids)       # 비483 유지
+        self.assertNotIn("fda483-2", ids)   # 접힘
+        rep = next(c for c in out if c["id"] == "fda483-1")
+        self.assertEqual(rep["merged_count"], 3)
+        self.assertEqual(rep["merged_noun"], "건")
+        self.assertEqual(len(rep["merged_items"]), 3)
+        self.assertIn("3건", rep["summary"])
+
+    def test_single_content_less_483_unchanged(self):
+        cards = [self._card("fda483-1", "Alpha", "01/01/2024")]
+        self.assertEqual(apb.merge_fda483_disclosures(cards), cards)  # 1건 무변화
+
+

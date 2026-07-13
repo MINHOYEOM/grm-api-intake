@@ -67,6 +67,77 @@ def _distinct_in_order(values: list[str]) -> list[str]:
     return seen
 
 
+def _is_content_less_483(c: dict[str, Any]) -> bool:
+    """관찰 원문이 없는 FDA 483 공개 카드(스캔·비공개 PDF → 상세/심층 없음)인가.
+    시설·실사일 메타만 있는 '공개 알림' 카드 — 분석된 483(deterministic_detail·deep_analysis
+    보유)과 구별해 목록카드 1장으로 접는 대상(2026-07-13)."""
+    is483 = (c.get("type_tag") == "483") or str(c.get("id", "")).startswith("fda483-")
+    return bool(is483 and not c.get("deterministic_detail") and not c.get("deep_analysis"))
+
+
+def _fda483_facility_line(c: dict[str, Any]) -> str:
+    """카드 facts 에서 '제조소/업체' + 실사일을 목록 항목 1줄로(결정론·사실 재작성 0)."""
+    firm = ""
+    insp = ""
+    for f in c.get("facts") or []:
+        lab = f.get("label", "")
+        if ("제조소" in lab) or ("업체" in lab):
+            firm = f.get("value", "")
+        elif "실사" in lab:
+            insp = f.get("value", "")
+    firm = firm or c.get("headline_target", "") or str(c.get("id", ""))
+    return f"{firm} · 실사 {insp}" if insp else firm
+
+
+def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """관찰 원문 없는 FDA 483 공개 카드 다건을 목록 카드 1장으로 접는다(순수·결정론).
+
+    2건 미만이면 무변화. 대표 = `id` 오름차순 첫 카드 — 슬롯을 디제스트 문안으로 결정론
+    재작성하고 `merged_count`/`merged_items`(시설·실사일 목록)/`merged_noun='건'` 을 실어
+    렌더러의 '전체 N건' 토글이 목록을 편다. 나머지 멤버는 발행본에서 제외(그 카드들의
+    Notion Status 는 Routine 이 이미 Processed 처리 — 유실 아님). 분석된 483(상세/심층 보유)
+    과 회수 병합은 대상 아님(이 함수는 content-less 483 만)."""
+    idxs = [i for i, c in enumerate(cards) if _is_content_less_483(c)]
+    if len(idxs) < 2:
+        return cards
+    idxs.sort(key=lambda i: str(cards[i].get("id", "")))
+    rep_src = cards[idxs[0]]
+    n = len(idxs)
+    facilities = [_fda483_facility_line(cards[i]) for i in idxs]
+    rep_fac = _fda483_facility_line(rep_src).split(" · 실사")[0]
+    rep = dict(rep_src)
+    rep["title_issue"] = "483 실사기록 다건 공개"
+    rep["summary"] = (
+        f"FDA OII FOIA 전자열람실에 483 실사기록 {n}건이 공개됐다. 개별 관찰 원문은 "
+        "스캔·비공개로 상세가 제공되지 않아 시설·실사일 목록만 확인 가능하다.")
+    rep["key_facts"] = [
+        f"공개 건수: {n}건 (개별 관찰 상세 미공개)",
+        f"대표 시설: {rep_fac} 외 {n - 1}곳",
+        "출처: FDA OII FOIA 전자열람실",
+    ]
+    rep["implication"] = (
+        "개별 관찰 내용이 공개되지 않은 실사기록 공개는 그 자체로 조치 신호는 아니다. "
+        "국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 "
+        "열람할 필요가 있다.")
+    rep["checks"] = [
+        "목록에 자사 공급망·수급처 시설이 있는지 확인",
+        "해당 시 FDA FOIA 원문(PDF) 직접 열람",
+    ]
+    rep["merged_count"] = n
+    rep["merged_items"] = facilities
+    rep["merged_noun"] = "건"
+    rep.pop("quotes_translation", None)  # 디제스트엔 부적합(대표 1건의 번역 슬롯 제거)
+    drop_ids = {str(cards[i].get("id")) for i in idxs[1:]}
+    rep_id = str(rep_src.get("id"))
+    out: list[dict[str, Any]] = []
+    for c in cards:
+        cid = str(c.get("id"))
+        if cid in drop_ids:
+            continue
+        out.append(rep if cid == rep_id else c)
+    return out
+
+
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                            *, strict: bool = True,
                            deep_deltas: dict[str, dict[str, Any]] | None = None
@@ -109,6 +180,9 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         else:
             report.dropped += 1
             report.dropped_ids.append(c.get("id"))
+
+    # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
+    adopted_cards = merge_fda483_disclosures(adopted_cards)
 
     # render_order 0..N-1 연속 재부여(원 상대순서 보존).
     for i, c in enumerate(adopted_cards):

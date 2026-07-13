@@ -32,7 +32,7 @@
   </table>
   {%- endif %}
   {%- if card.merged %}
-  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 {{ card.merged_count }}품목</summary>
+  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 {{ card.merged_count }}{{ card.merged_noun }}</summary>
     <ul class="facts2">
       {%- for item in card.merged_items %}
       <li>{{ item }}</li>

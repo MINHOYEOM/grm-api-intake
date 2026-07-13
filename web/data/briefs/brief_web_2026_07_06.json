@@ -343,7 +343,7 @@
       "citation": "21 CFR 211.192",
       "description": "무균 의약품에 대한 고객 불만(용기 팁과 내부 캡의 곰팡이, 검은 반점, 변색 등 오염 흔적)을 충분히 조사하지 않았으며, 조사 범위를 적절히 확대하지 않고 과학적으로 뒷받침되는 근본원인 분석 없이 대부분의 원인을 고객의 부적절한 취급으로 결론지었다. 특히 실패한 불만 샘플에서 검출된 Alternaria alternata 균주가 해당 배치 제조 전후의 환경모니터링(EM/PM)에서도 동일하게 검출되었음에도 이 사실이 조사보고서에 포함되지 않았다.",
       "risk": "최근 3년간 9건의 무균성 시험 실패 사례가 반복되고 있어 근본원인이 규명·차단되지 않은 채 오염된 무균제품이 지속 출하될 위험이 있다.",
-      "original": "Visible evidence of contamination included mold, black specks, and discoloration on the tips and inner caps of containers for your (b)(4) drug product, (b)(4). Several complaint samples subsequently failed sterility testing. Notably, nine such non-sterility events have occurred in the last three years."
+      "original": "Visible evidence of contamination included mold, black specks, and discoloration on the tips and inner caps of containers for your (b)(4) drug product, (b)(4). Several complaint samples subsequently failed sterility testing. Notably, nine such non-sterility events have occurred in the last three years. You also failed to adequately assess potential sources of contamination from the manufacturing process as you neglected to evaluate relevant environmental and personnel monitoring (EM/PM) data. For example, the microorganism recovered from the failed complaint sample sterility test involving (b)(4) batch (b)(4) was identified as Alternaria alternata. This was the same microorganism recovered in EM/PM samples collected both before and after this batch was manufactured, including in the room where this batch was filled. Your complaint investigation report did not include this critical information. Instead of conducting a thorough, scientifically supported, and evidence-based root cause analysis, your firm attributed most of the root causes to inadequate handling by customers who used your products and concluded that no further action was necessary."
      },
      {
       "citation": "21 CFR 211.113(b)",
@@ -355,7 +355,7 @@
       "citation": "21 CFR 211.42(c)(10)(i)",
       "description": "무균 작업구역의 바닥, 벽, 천장이 매끄럽고 단단하며 세척이 용이한 표면으로 구성되지 않았고, 2024년 1월부터 2026년 1월 사이 등급구역 내 다수의 누수 및 곰팡이 검출이 발생했으며, 충전 시 멸균 캡을 담는 캡보울 위 손잡이에 페인트가 벗겨진 검은 도장과 부식된 장비가 확인되었다.",
       "risk": "시설·장비의 정기점검 체계와 종합적인 개선 완료 전 제조 중단 계획이 없어 오염원이 상존하는 환경에서 계속 생산이 이루어질 위험이 있다.",
-      "original": "The floors, walls, and ceilings in your aseptic processing area are not constructed of smooth, hard surfaces that can be easily cleaned, or were not adequately maintained."
+      "original": "The floors, walls, and ceilings in your aseptic processing area are not constructed of smooth, hard surfaces that can be easily cleaned, or were not adequately maintained. This is especially concerning considering the numerous water incursions you have had in the (b)(4) classified areas between January 2024 and January 2026, along with numerous mold recoveries in the routine production data available between January 2024 and March 2025. A handle above the cap bowl that holds sterile caps during filling was coated with what appeared to be flaking black paint. The (b)(4) for the (b)(4), which are adjacent to sterile (b)(4) and open bottles, appeared to be corroded."
      },
      {
       "citation": "21 CFR 211.42(c)(10)(v)",
@@ -446,7 +446,7 @@
       "citation": "21 CFR 211.194(a)",
       "description": "다수 배치에서 발생한 비생육 입자 이탈 및 반복적 시험 실패가 기기 이력에는 남아있음에도 실험실 기록에 문서화되어 검토·조사가 이루어지지 않았으며, 최대 11회까지 재시험이 문서화 없이 반복되었다. 또한 환경모니터링 기록상 활성 공기 샘플 수가 해당 샘플러의 기기 이력과 추적 일치하지 않았고, 품질관리 담당자가 비공식 검토용 체크리스트(uncontrolled Review Checklists)를 사용한 뒤 폐기하여 실험실 기록이 불완전했다.",
       "risk": "시험 결과의 은폐 및 데이터 완전성 훼손으로 배치 방출 결정의 신뢰성이 무너지고, 데이터 인테그리티 위반으로 규제조치가 확대될 위험이 있다.",
-      "original": "Multiple non-viable particulate excursions and repeated (b)(4) test failures across multiple batches present in instrument histories were not documented in laboratory records for review and investigation. (b)(4) testing was repeated up to 11 times without documentation."
+      "original": "Multiple non-viable particulate excursions and repeated (b)(4) test failures across multiple batches present in instrument histories were not documented in laboratory records for review and investigation. (b)(4) testing was repeated up to 11 times without documentation. On multiple occasions, the number of active air monitoring samples documented in environmental monitoring records was not directly traceable to the instrument histories of the specific air samplers identified on those records. Your laboratory records were incomplete because quality control personnel used uncontrolled Review Checklists to unofficially document laboratory record reviews, which were subsequently discarded."
      },
      {
       "citation": "21 CFR 211.192",

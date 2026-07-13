@@ -436,5 +436,101 @@ class Fda483GateTest(unittest.TestCase):
                             for f in result.findings))
 
 
+# ── [FDA 483 원문절단 결함 2026-07-13] D5a/D5b — 원문·국문 병기 정합성 ──────────────────
+_483_TRUNC_SOURCE = (
+    "OBSERVATION 1: Your firm failed to adequately investigate an unexplained "
+    "discrepancy in a batch that failed to meet its specifications before releasing "
+    "the batch for follow-up. Specifically, A. Extrinsic biological particulates "
+    "(mammalian hair) were identified in Lot 12345 during microscopic examination."
+)
+
+_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY = (
+    "Your firm failed to adequately investigate an unexplained discrepancy in a "
+    "batch that failed to meet its specifications before releasing the batch for "
+    "follow-up."
+)
+
+_483_TRUNC_ORIGINAL_FULL = (
+    _483_TRUNC_ORIGINAL_DEFICIENCY_ONLY + " Specifically, A. Extrinsic biological "
+    "particulates (mammalian hair) were identified in Lot 12345 during microscopic "
+    "examination."
+)
+
+
+def _make_483_da(original: str) -> dict:
+    return {
+        "key_violations": [
+            {"citation": "21 CFR 211.192", "original": original,
+             "observation": "예기치 못한 불일치 조사가 미흡했으며, 구체적으로 mammalian hair 등 "
+                           "이물이 로트 12345 에서 검출됨",
+             "risk": "불량 배치가 시장에 유통될 위험"},
+        ],
+        "inspectional_significance": (
+            "본 483 은 데이터 무결성 결함을 지적하며, 회사의 응답이 미흡할 경우 Warning Letter 로 "
+            "승격될 가능성이 있다."),
+        "required_remediation": {
+            "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+            "items": ["불일치 조사 절차를 재수립하고 소급 검토를 수행",
+                      "이물 관리 프로그램을 강화하고 CAPA 를 문서화"],
+        },
+        "administrative_risks": "미시정 시 Warning Letter·Import Alert 로 이어질 수 있다.",
+    }
+
+
+class Fda483TruncationTest(unittest.TestCase):
+    def test_deficiency_only_original_before_specifically_fails(self) -> None:
+        # 1) original 이 결함 문장만 발췌하고 뒤이은 "Specifically, ..." 상세를 잘라냄 → D5b FAIL.
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        result = vda.run_deep_analysis_gate(da, _483_TRUNC_SOURCE, card_type="fda-483")
+        self.assertFalse(result.ok)
+        fails = [f for f in result.findings if f.severity == vda.SEV_FAIL]
+        self.assertTrue(any(f.code == "D5-483-ORIGINAL-TRUNCATED" for f in fails))
+
+    def test_full_original_including_specifically_passes(self) -> None:
+        # 2) original 이 결함 + "Specifically…" 상세 전체를 포함 → D5b 미발생, gate PASS.
+        da = _make_483_da(_483_TRUNC_ORIGINAL_FULL)
+        result = vda.run_deep_analysis_gate(da, _483_TRUNC_SOURCE, card_type="fda-483")
+        self.assertFalse(any(f.code == "D5-483-ORIGINAL-TRUNCATED" for f in result.findings))
+        self.assertTrue(result.ok, result.report)
+
+    def test_original_not_in_source_no_d5b(self) -> None:
+        # 5) original 이 source_text 안에서 아예 발견 안 되면 D5b 는 관여하지 않음(D4 영역).
+        da = _make_483_da("This exact phrase does not appear anywhere in the source text.")
+        result = vda.run_deep_analysis_gate(da, _483_TRUNC_SOURCE, card_type="fda-483")
+        self.assertFalse(any(f.code == "D5-483-ORIGINAL-TRUNCATED" for f in result.findings))
+        # D4 (원문 병기 미근거) 는 WARN 으로 남아야 함 — D5b 만 관여하지 않는다는 뜻.
+        self.assertTrue(any(f.code == "D4-ORIGINAL-UNGROUNDED" for f in result.findings))
+
+
+class KoreanSpecificGroundingTest(unittest.TestCase):
+    def test_ungrounded_latin_specific_warns_not_blocks(self) -> None:
+        # 3) WL 카드: 국문 해석에 원문(original) 밖 라틴 단어("Alternaria")가 등장 → D5a WARN,
+        # 그러나 WARN 은 비차단이라 gate 는 여전히 ok True.
+        da = dict(_GOOD_DEEP_ANALYSIS)
+        da["key_violations"] = [
+            {"citation": "21 CFR 211.192",
+             "original": "failure to thoroughly investigate unexplained discrepancies",
+             "description": "예기치 못한 불일치 조사 부실(Alternaria 균 오염 포함)",
+             "risk": "재발 방지 실패로 불량 제품 유통 위험"},
+        ] + list(da["key_violations"][1:])
+        result = vda.run_deep_analysis_gate(da, _SOURCE)
+        warns = [f for f in result.findings if f.code == "D5-KO-SPECIFIC-UNGROUNDED"]
+        self.assertTrue(any("Alternaria" in f.detail for f in warns))
+        self.assertTrue(result.ok, result.report)
+
+    def test_allowlisted_acronyms_no_warning(self) -> None:
+        # 4) 흔한 규제 약어(HEPA·ISO)는 원문 밖에 있어도 D5a 미발생(allowlist).
+        da = dict(_GOOD_DEEP_ANALYSIS)
+        da["key_violations"] = [
+            {"citation": "21 CFR 211.192",
+             "original": "failure to thoroughly investigate unexplained discrepancies",
+             "description": "예기치 못한 불일치 조사 부실(HEPA 필터 및 ISO 등급 관련 기록 포함)",
+             "risk": "재발 방지 실패로 불량 제품 유통 위험"},
+        ] + list(da["key_violations"][1:])
+        result = vda.run_deep_analysis_gate(da, _SOURCE)
+        self.assertFalse(any(f.code == "D5-KO-SPECIFIC-UNGROUNDED" for f in result.findings))
+        self.assertTrue(result.ok, result.report)
+
+
 if __name__ == "__main__":
     unittest.main()

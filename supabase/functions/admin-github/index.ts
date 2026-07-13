@@ -261,10 +261,17 @@ async function checkRunsForSha(sha: string): Promise<{
 
   const statusRes = await githubFetch(`/commits/${encodeURIComponent(sha)}/status`);
   let combinedState: string | null = null;
+  // ★ legacy commit-status(context)가 실제로 하나라도 있을 때만 combinedState 를 신뢰한다.
+  //   GitHub 은 status context 가 0개면 combined state 를 항상 "pending" 으로 반환하는데
+  //   (문서화된 기본값), check-runs 기반 저장소(=이 repo, Actions 만 사용)는 legacy status 가
+  //   0개라 combined 가 늘 "pending" 이다. 이걸 CI 미통과로 보면 check-runs 가 전부 green 이어도
+  //   승인 버튼이 영구히 잠긴다(2026-07-13 실장애). → status context 가 있을 때만 반영.
+  let hadStatuses = false;
   if (statusRes.ok) {
     const payload = statusRes.payload as Record<string, unknown>;
     combinedState = (payload.state as string) || null;
     const statuses = (payload.statuses as Array<Record<string, unknown>> | undefined) || [];
+    hadStatuses = statuses.length > 0;
     if (statuses.length) sawAny = true;
     if (combinedState && combinedState !== "success" && statuses.length) {
       for (const s of statuses) {
@@ -276,7 +283,7 @@ async function checkRunsForSha(sha: string): Promise<{
   if (!sawAny) return { state: "none", failing: [], pending: [] };
   if (failing.length) return { state: "red", failing, pending };
   if (pending.length) return { state: "pending", failing, pending };
-  if (combinedState && !["success"].includes(combinedState)) {
+  if (combinedState && hadStatuses && !["success"].includes(combinedState)) {
     return { state: combinedState === "pending" ? "pending" : "red", failing, pending };
   }
   return { state: "green", failing: [], pending: [] };

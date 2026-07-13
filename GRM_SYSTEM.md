@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.121` |
+| 문서 버전 | `v1.122` |
 | 최종 수정일 | 2026-07-13 |
-| 현재 상태 | 매일 자동 수집·발행 가동 중. 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -110,14 +110,16 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[GitHub Actions<br/>매일 03:17 KST] --> B[Python 수집기 11종]
-    B --> C[(Notion GRM API Intake<br/>raw 적재 + 태그)]
-    C --> D[Status=New 행만 모아<br/>Handoff 페이지 생성]
-    D --> E[클라우드 Claude Routine<br/>매주 월 07:30 KST]
-    E --> F[WebSearch/WebFetch로 보강<br/>중복 제거·병합·카드화]
-    F --> G[델타 → 웹 발행 조립<br/>채택분 필터·메타 재계산]
-    G --> H[Cloudflare Pages 배포<br/>사람 승인 후 라이브]
-    H --> I[QA 담당자가 웹/이메일로 열람]
+    A[GitHub Actions grm-intake<br/>매일 03:17 KST] --> B[Python 수집기 11종]
+    B --> C[(Notion GRM API Intake<br/>raw 적재 + handoff v2 + 빈슬롯 스캐폴드)]
+    C --> D[클라우드 Claude Routine<br/>매주 월 07:30 KST]
+    D --> E[6슬롯 산문 + 심층분석 생성<br/>→ Notion web-delta 행 예치·자기검증]
+    E --> F[grm-delta-bridge 월 09:30·12:30<br/>델타 git 커밋 — deep은 근거 게이트 통과분만]
+    F --> G[grm-web-publish 자동 조립<br/>발행 PR publish/brief-날짜]
+    G --> H[grm-web-deploy<br/>Cloudflare 프리뷰 URL]
+    H --> I{{사람: Admin 승인 1클릭<br/>= 유일한 사람 개입}}
+    I --> J[main 머지 → 라이브<br/>grm-solutions.com]
+    J --> K[뉴스레터 월 14:00 · 관심업체 알림 월 10:30<br/>무승인 자동 발송 + 발행 후 감사]
 ```
 
 ### 3.2 주간 발행 생애주기 — 단계별 실행 장치

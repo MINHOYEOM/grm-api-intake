@@ -7,18 +7,15 @@ name: GRM Watchlist Notify
 # 발행일·프로파일 링크만 — 원문 미포함)을 보낸다. 뉴스레터(`grm-newsletter-send.yml`)
 # 와 완전 별도 파일·트리거·최소권한(D8 관례 계승) — 한쪽이 죽어도 다른 쪽은 무관하다.
 #
-# ── 사람 승인 게이트(불가침) ──────────────────────────────────────────────────
-# 기존 뉴스레터 발송과 **동일한 `environment: newsletter-send`** 를 재사용한다(신규
-# environment 를 만들지 않는다 — PR#61 에서 사람이 이미 이 environment 에 reviewer 를
-# 등록해 두었다). 이 job 이 `environment: newsletter-send` 를 선언하는 한, 그 environment
-# 에 등록된 reviewer 가 "Review deployments → Approve" 해야만 job 이 실제로 실행된다 —
-# `dry_run` 입력값과 무관하게 이 승인 자체가 "무승인 발송 구조 차단"의 실질 게이트다.
-# cron(스케줄) 실행은 dry_run=false(실발송 시도)로 해석되지만, 그 실행조차 이 environment
-# 승인을 통과해야 스텝이 시작된다 — 스케줄이라고 승인을 우회하지 않는다.
+# ── 발송 게이트(2026-07-13 개정 — environment 사람 승인 제거) ─────────────────
+# 당초 `environment: newsletter-send` reviewer 승인을 매주 요구했으나, 뉴스레터 발송이
+# 2026-07-05 부터 무승인 자동(멱등 게이트)으로 전환된 것과 동형화해 제거했다(사용자 결정
+# 2026-07-13 — 수신 품질 확인 완료). 무해성은 기계 게이트가 담보한다: ①멱등 로그(같은
+# user×finding 재발송 0) ②원문 미포함(업체명·건수·링크만) ③500통/실행 상한 ④이중
+# 시간조건(ingested 7일 ∧ published 21일 — 백필 오통지 차단).
 #
 # workflow_dispatch 는 기본값 dry_run=true(게이트만 — 발송 0) — 사람이 명시적으로
-# false 를 선택해야 수동 실발송이 된다. 두 트리거 모두 최종적으로 environment 승인이
-# 필요하다는 점은 동일하다.
+# false 를 선택해야 수동 실발송이 된다. cron(스케줄)은 실발송이다.
 #
 # ── 안전 설계(watchlist_notify_service.py 모듈 docstring 상세) ────────────────
 #   · 원문 미포함 — 업체명(등록 시점 스냅샷)·건수·최신 발행일·프로파일 링크만.
@@ -35,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'true=게이트만 확인(발송 0) · false=실발송 시도(그래도 environment 승인 필요)'
+        description: 'true=게이트만 확인(발송 0) · false=실발송'
         required: true
         default: 'true'
         type: choice
@@ -60,8 +57,6 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # ★불가침: 기존 뉴스레터 발송과 동일한 environment 재사용(신규 environment 금지).
-    environment: newsletter-send
     env:
       SUPABASE_URL: ${{ vars.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -98,7 +93,7 @@ jobs:
             DRY_RUN="$INPUT_DRY_RUN"
           fi
           echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
-          echo "해석: event=$EVENT_NAME → dry_run=$DRY_RUN(environment 승인은 이미 통과한 뒤)"
+          echo "해석: event=$EVENT_NAME → dry_run=$DRY_RUN"
 
       # git 쓰기 0 — Supabase(PostgREST)/Brevo 를 향한 HTTPS 요청만. 원문(finding_text 등)
       # 은 이 스크립트가 애초에 조회하지 않는다(select 절에 없음 — provenance 불변식).

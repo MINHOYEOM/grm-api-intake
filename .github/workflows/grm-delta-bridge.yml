@@ -21,6 +21,9 @@ on:
   schedule:
     # 00:30 UTC 월 = 09:30 KST(Routine 07:30 KST 이후·워치독 10:00 KST 이전).
     - cron: '30 0 * * 1'
+    # 2회차 03:30 UTC 월 = 12:30 KST — GitHub cron 지연(+3~4h 실측)·Routine 지연으로 1회차가
+    # OPEN 델타 예치 전에 돌아 클린 skip 한 주를 재수습한다(멱등 — 이미 이관됐으면 무해 skip).
+    - cron: '30 3 * * 1'
   workflow_dispatch:
     inputs:
       publish_date:

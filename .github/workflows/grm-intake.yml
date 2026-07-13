@@ -265,7 +265,7 @@ jobs:
             if [ -n "$GRM_SOURCES" ]; then
               # 쉼표도 공백으로 처리. 허용된 source 토큰만 --sources 인자로 전달.
               read -r -a SOURCE_TOKENS <<< "$(printf '%s' "$GRM_SOURCES" | tr ',' ' ')"
-              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc ispe none)
+              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe none)
               source_args=()
               for src in "${SOURCE_TOKENS[@]}"; do
                 ok=false

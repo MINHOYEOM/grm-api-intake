@@ -38,7 +38,7 @@ GRM은 FDA·EMA·MHRA·PIC/S·ICH·WHO·Health Canada·식약처(MFDS) 등 **흩
 
 ```mermaid
 flowchart TD
-    S[매일 자동 수집<br/>규제 소스 11종]
+    S[매일 자동 수집<br/>규제 소스 13종]
     S --> A[트랙 A · 주간 브리프]
     S --> B[트랙 B · Findings 검색]
     A --> A1["이번 주 규제 동향을<br/>카드형 다이제스트로 재구성<br/>(사람이 읽는 뉴스레터)"]
@@ -71,7 +71,7 @@ flowchart TD
 
 | 계층 | 역할 | 기술 / 위치 |
 |---|---|---|
-| ① 수집 | 규제 소스 11종에서 원시 데이터 수집 | Python 3.12 (`requests`, `PyMuPDF`) |
+| ① 수집 | 규제 소스 13종에서 원시 데이터 수집 | Python 3.12 (`requests`, `PyMuPDF`) |
 | ② 실행·스케줄 | 수집기를 정시 자동 실행 | GitHub Actions (cron) |
 | ③ 저장 | raw 데이터 + 분류 태그 적재 | Notion `GRM API Intake` / Supabase |
 | ④ 분석·생성 | 신호를 읽어 카드형 다이제스트로 가공 | 클라우드 Claude Routine |
@@ -110,7 +110,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[GitHub Actions grm-intake<br/>매일 03:17 KST] --> B[Python 수집기 11종]
+    A[GitHub Actions grm-intake<br/>매일 03:17 KST] --> B[Python 수집기 13종]
     B --> C[(Notion GRM API Intake<br/>raw 적재 + handoff v2 + 빈슬롯 스캐폴드)]
     C --> D[클라우드 Claude Routine<br/>매주 월 07:30 KST]
     D --> E[6슬롯 산문 + 심층분석 생성<br/>→ Notion web-delta 행 예치·자기검증]

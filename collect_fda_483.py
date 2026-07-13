@@ -130,11 +130,19 @@ _WE_OBSERVED_RE = re.compile(r"\b(?:I\s*/\s*)?WE\s+OBSERVED\b", re.I)
 # 백슬래시)까지는 못 건너뛰었고, 그 앞에 붙는 낱자 노이즈("I EMPi.OY1:E($) SIGJ'IAl\lRE")도
 # 미흡수였다 → EMP~OY~E 사이 갭 클래스를 `[A-Z0-9.:'\\]`로 넓히고 선행 고립 I/l 을 옵션으로
 # 흡수한다. ④ Observation 별 "Add Continuation Page" 연속페이지 마커도 신규 추가.
+# [2026-07-12 Catalent(2번째 483) obs#8 실측 추가결함] ⑤ OCR 이 "EMPLOYEE(S)" 를 여는 괄호
+# `(` 까지 통째로 삼켜(EMPLOYEE(S)→EMPt..oYEECS), 여닫는 괄호 중 여는 쪽이 아예 사라짐)
+# 옛 패턴의 `\s*\([S$]\)`(여는 괄호 필수)가 못 잡았다 → 첫 EMP 마커 전체를 "EMP 로 시작해
+# OY 를 거쳐 마지막 ')' 로 끝나는 임의 잡음"으로 재정의(여는 괄호 유무 무관, 갭 클래스에
+# 공백·괄호류까지 포함). 대문자 EMP 고정((?-i:EMP))은 그대로 유지해 소문자 산문
+# ("our employees)" 등)은 여전히 오탐하지 않는다.
 # 아래는 가장 이른 푸터 마커에서 잘라내며, EMPLOYEE(S)/($) 는 소문자 산문("employees were
-# observed")과 달리 반드시 괄호 (S)/($) 를 동반하므로 오탐 없이 서명블록 시작을 잡는다.
+# observed")과 달리 반드시 대문자 EMP 로 시작하므로 오탐 없이 서명블록 시작을 잡는다.
 _FDA483_FOOTER_RE = re.compile(
-    r"(?:\b[IlL]\s+)?EMP[LI][A-Z0-9.:'\\]{0,6}?OY[A-Z0-9.:'\\]{0,4}?E\s*\([S$]\)"
+    r"(?:\b[IlL]\s+)?(?-i:EMP)[A-Za-z0-9.:'\\ ]{0,6}?OY[A-Za-z0-9.:'\\ ]{0,5}?E"
+    r"[A-Za-z0-9.:'()$\\]{0,4}?\)"
     #   EMPLOYEE(S) / EMPLOYEE($) / EMPI..OYEE(S) / "I EMPi.OY1:E($)"(2026-07 Catalent 실측)
+    #   / "EMPt..oYEECS)"(2026-07-12 Catalent 2번째 483 obs#8 실측 — 여는 괄호 소실)
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"                         # FORM FDA 483 / FORM FDA 4&3
     r"|PREVIOUS[\s.]*EDITION"

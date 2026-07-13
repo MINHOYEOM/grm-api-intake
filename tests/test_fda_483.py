@@ -443,6 +443,35 @@ class ObservationExtractionTest(unittest.TestCase):
         self.assertIn("employees followed gowning procedures", cleaned)
         self.assertTrue(cleaned.endswith("aseptic core."), cleaned)
 
+    def test_footer_ocr_missing_open_paren_marker_stripped(self):
+        # [2026-07-12 Catalent(2번째 483) obs#8 실측] OCR 이 "EMPLOYEE(S)" 의 여는 괄호 '(' 까지
+        # 삼켜 "EMPt..oYEECS)" 로 깨뜨림(닫는 ')' 만 남음). 옛 패턴은 여는 괄호 `\(` 를 필수로
+        # 요구해 이 변형을 통째로 놓쳤다(서명블록·조사관 실명이 detail 에 그대로 노출).
+        garbage_tail = ("EMPt..oYEECS) SIGNATURE SEE Joohi Castelvetere, "
+                        "Investigator 04/24/2026 R")
+        # 실질 본문이 얇으면(§_DETAIL_MIN_ALPHA) 잔여 전체를 비운다 — 그 자체가 안전한 결과
+        # (서명블록 잔재가 절대 노출되지 않음).
+        thin = f"...<Redacted B4> {garbage_tail}"
+        cleaned_thin = f._clean_observation_detail(thin)
+        for residue in ("EMP", "SIGNATURE", "Castelvetere", "Investigator"):
+            self.assertNotIn(residue, cleaned_thin)
+
+        # 실질 본문이 충분하면 footer 마커 직전까지만 남고 그 뒤는 전부 절단.
+        rich = ("Specifically, the firm failed to document the operator who performed the "
+                "batch record correction after the deviation was discovered during the "
+                f"inspection. {garbage_tail}")
+        cleaned_rich = f._clean_observation_detail(rich)
+        self.assertIn("batch record correction", cleaned_rich)
+        for residue in ("EMP", "SIGNATURE", "Castelvetere", "Investigator"):
+            self.assertNotIn(residue, cleaned_rich)
+
+        # 오탐 방지 회귀: 소문자 "our employees)" 산문(괄호 있어도 소문자 EMP 는 대문자 고정
+        # (?-i:EMP) 에 안 걸린다)은 절단되면 안 된다.
+        lower_prose = ("Specifically, our employees) were not properly trained on the "
+                       "corrective procedure outlined in the current SOP revision.")
+        cleaned_prose = f._clean_observation_detail(lower_prose)
+        self.assertIn("our employees) were not properly trained", cleaned_prose)
+
     def test_observation_flag_off_does_not_write_raw(self):
         with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false"}), \
                 _Patched(json_rows=[_json_row(6101)], html_rows=[], pdf_text=self.SAMPLE):

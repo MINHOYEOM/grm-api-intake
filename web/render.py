@@ -33,6 +33,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -942,11 +943,87 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "briefs": len(briefs), "latest": latest_slug}
 
 
+class Fda483ObservationValidationError(ValueError):
+    """483 Observation 발행 게이트 위반(§16) — fail-closed. main() 전용(하단 참조)."""
+
+
+# ── [483 발행 게이트 2026-07-14] Observation 상세 영문전용/서명푸터 오탐 차단 ──────────
+# 실사고: 7/13 발행본에서 전 카드 deficiency_ko/detail_ko 백필 누락(조용한 결손)이 그대로
+# 나갔고, 한 observation 의 detail 에 서명블록 OCR 잔재(EMPt..oYEECS) SIGNATURE ... 등)가
+# 남아 원문(영문)조차 아닌 깨진 텍스트가 발행됐다. render_site()/build 헬퍼(=web/tests/
+# test_render.py 가 fixture 로 직접 호출)에는 절대 넣지 않는다 — 여기 넣으면 골든/픽스처
+# 테스트가 이 게이트에 얽매인다. 대신 main()(=배포 워크플로가 실행하는 `python web/render.py`
+# 유일 경로) 안에서만, 실제 배포 대상 데이터를 검증한다.
+_FOOTER_GARBAGE_RE = re.compile(
+    r"(?-i:EMP)\S{0,6}?OY"           # 서명블록 EMPLOYEE(S) 마커(OCR 변형 포함) — 대문자 EMP 고정
+    r"|(?-i:SIGNATURE|SIGJ)"          # SIGNATURE / OCR 변형 SIGJ… — 대문자 고정(소문자 산문 오탐 방지)
+    r"|\bSEE\s+REVERSE\b"
+    r"|\bFORM\s+FDA\s*4"
+    r"|\bInvestigator\b"
+    r"|\bPAGE\s+\d+\s+OF\s+\d+\b",
+    re.I,
+)
+
+
+def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
+    """FDA 483 Observation 카드 발행 게이트 — 브리프 리스트(각 {"brief":…, "cards":[...]}
+    형태, load_briefs() 산출 그대로) 또는 카드 리스트를 받아 위반 목록(사람이 읽을 문자열)을
+    돌려준다. 위반 0건이면 빈 리스트(호출측이 raise 여부 결정 — 순수 함수, 부작용 없음).
+
+    검사 대상 = deterministic_detail.type == "fda_483_observations" 인 카드의 observations
+    각 건:
+      1. deficiency_ko 비어있음 → MISSING_DEFICIENCY_KO
+      2. detail 비어있지 않은데 detail_ko 비어있음 → MISSING_DETAIL_KO
+      3. detail 에 서명/양식 푸터 OCR 잔재(_FOOTER_GARBAGE_RE) 검출 → FOOTER_GARBAGE
+    """
+    violations: list[str] = []
+
+    def _check_card(card: dict[str, Any], brief_label: str) -> None:
+        dd = card.get("deterministic_detail")
+        if not isinstance(dd, dict) or dd.get("type") != "fda_483_observations":
+            return
+        card_id = card.get("id") or card.get("render_order") or "?"
+        for obs in (dd.get("observations") or []):
+            num = obs.get("number", "?")
+            loc = f"{brief_label} / card {card_id} / obs #{num}"
+            if not (isinstance(obs.get("deficiency_ko"), str) and obs.get("deficiency_ko").strip()):
+                violations.append(f"{loc}: MISSING_DEFICIENCY_KO")
+            detail = obs.get("detail")
+            if isinstance(detail, str) and detail.strip():
+                if not (isinstance(obs.get("detail_ko"), str) and obs.get("detail_ko").strip()):
+                    violations.append(f"{loc}: MISSING_DETAIL_KO")
+                if _FOOTER_GARBAGE_RE.search(detail):
+                    violations.append(f"{loc}: FOOTER_GARBAGE")
+
+    for item in cards_or_briefs:
+        if "brief" in item and "cards" in item:
+            label = item["brief"].get("publish_date") or item["brief"].get("run_date_kst") or "?"
+            for card in (item.get("cards") or []):
+                _check_card(card, label)
+        else:
+            _check_card(item, "?")
+
+    return violations
+
+
+def _validate_briefs_or_raise(data_dir: Path) -> None:
+    """main() 전용 fail-closed 게이트 호출부. 실제 배포 대상(`--data`) 브리프를 로드해
+    검증하고, 위반이 하나라도 있으면 즉시 raise(빌드 전체 실패 → CI red)."""
+    briefs = load_briefs(data_dir)
+    violations = validate_483_observations(briefs)
+    if violations:
+        raise Fda483ObservationValidationError(
+            "483 Observation 발행 게이트 위반 — 발행 차단(brief file / card id / "
+            "observation number / fail code):\n" + "\n".join(f"  · {v}" for v in violations)
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="GRM 웹 렌더러 (JSON → 정적 사이트)")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
     ap.add_argument("--out", type=Path, default=DIST_DIR, help="정적 사이트 출력 디렉터리")
     args = ap.parse_args(argv)
+    _validate_briefs_or_raise(args.data)  # fail-closed — 위반 시 여기서 raise, exit 0 도달 안 함
     meta = render_site(args.data, args.out)
     print(f"빌드 완료: {meta['briefs']}개 브리프 → {meta['out_dir']}  "
           f"(최신호 {meta['latest']}, {len(meta['written'])}개 파일)")

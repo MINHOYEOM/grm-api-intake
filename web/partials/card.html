@@ -87,7 +87,7 @@
           있으면 원문(세리프)→국문 해석 쌍으로 렌더하고 "국문 해석" 라벨을 해석 앞에 붙여 짝을 명시한다.
           original 미보유 카드(백필 전·구데이터)는 두 {% if v.original %} 가 모두 falsy → 기존 출력
           바이트 불변(additive·골든 fixture 무영향). -#}
-      <div class="viol">{% if v.citation %}<span class="viol-cite">{{ v.citation }}</span>{% endif %}{% if v.original %}<div class="viol-orig"><span class="viol-lang">원문 · 규제 원어</span><p class="viol-o">{{ v.original }}</p></div>{% endif %}{% if v.description or v.summary or v.observation %}<p class="viol-desc">{% if v.original %}<span class="viol-lang ko">국문 해석</span>{% endif %}{{ v.description or v.summary or v.observation }}</p>{% endif %}{% if v.risk %}<p class="viol-risk"><i class="ti ti-alert-triangle"></i> {{ v.risk }}</p>{% endif %}</div>
+      <div class="viol">{% if v.citation %}<span class="viol-cite">{{ v.citation }}</span>{% endif %}{% if v.original and not da_fda483 %}<div class="viol-orig"><span class="viol-lang">원문 · 규제 원어</span><p class="viol-o">{{ v.original }}</p></div>{% endif %}{% if v.description or v.summary or v.observation %}<p class="viol-desc">{% if v.original and not da_fda483 %}<span class="viol-lang ko">국문 해석</span>{% endif %}{{ v.description or v.summary or v.observation }}</p>{% endif %}{% if v.risk %}<p class="viol-risk"><i class="ti ti-alert-triangle"></i> {{ v.risk }}</p>{% endif %}</div>
       {%- else %}
       <div class="viol"><p class="viol-desc">{{ v }}</p></div>
       {%- endif %}

@@ -246,6 +246,8 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "merged": (card.get("merged_count") or 1) > 1,
         "merged_count": card.get("merged_count", 1),
         "merged_items": card.get("merged_items") or [],
+        # 병합 목록 단위 명사(기본 '품목' — 회수 골든 불변). 483 실사기록 다건 공개 디제스트는 '건'.
+        "merged_noun": card.get("merged_noun") or "품목",
         "quotes": quotes,
         "quote_label": (("원문 및 번역" if any_trans else "원문") if quotes_in else None),
         "key_facts": card.get("key_facts") or [],

@@ -58,6 +58,7 @@ SOURCE_ICH = "ICH"
 SOURCE_WHO = "WHO"
 SOURCE_HC = "Health Canada"
 SOURCE_FDA_483 = "FDA 483"   # WHY-1 #3 — FDA 483/EIR 실사 관찰사항
+SOURCE_ISPE = "ISPE"   # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그
 
 # MFDS 하위 유형(type_or_class)
 TYPE_ADMIN_ACTION = "admin-action"
@@ -336,10 +337,12 @@ class CardScaffold:
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
             # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
-            **({"source_excerpt_present": True} if raw.get("eca_article_excerpt") else {}),
+            **({"source_excerpt_present": True}
+               if raw.get("eca_article_excerpt") or raw.get("article_excerpt") else {}),
             # ^ [전문지 브리핑 v2 2026-07-13] resource note 요지 정직성 게이트(§3)용 boolean만—
             # 영문 원문 대량 포함 금지(발행물 경량 유지). ENABLE_ECA_ARTICLE_EXCERPT off/부재
             # 시 이 키 자체가 없다(기존 golden 바이트 불변).
+            # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -467,7 +470,7 @@ def resolve_kind(row: dict[str, Any]) -> str:
         return "mfds-notice"          # MFDS guidance-industry/internal RSS → Evidence B
     if source == SOURCE_FR:
         return "guidance"             # FR(abstract) → Evidence A 가능
-    if source in (SOURCE_EMA, SOURCE_MHRA, SOURCE_PICS, SOURCE_ECA):
+    if source in (SOURCE_EMA, SOURCE_MHRA, SOURCE_PICS, SOURCE_ECA, SOURCE_ISPE):
         return "rss-news"             # RSS 요약만 → Evidence B
     return "rss-news"
 
@@ -1019,6 +1022,7 @@ _REGULATOR_LABEL = {
     SOURCE_EMA: "EMA", SOURCE_MHRA: "MHRA", SOURCE_PICS: "PIC/S",
     SOURCE_ECA: "ECA", SOURCE_MFDS: "MFDS", SOURCE_ICH: "ICH",
     SOURCE_WHO: "WHO", SOURCE_HC: "Health Canada", SOURCE_FDA_483: "FDA",
+    SOURCE_ISPE: "ISPE",   # [전문지 브리핑 소스확장 2026-07-13]
 }
 
 
@@ -1165,6 +1169,8 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         # on 시만 부재 → 기존 golden 불변). rss-news 카드의 RSS 요약(description)보다 우선해
         # Routine summary 가 실기사 본문을 근거로 쓰도록 한다.
         raw.get("eca_article_excerpt"),
+        # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
+        raw.get("article_excerpt"),
         raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
         raw.get("anchor_text"), raw.get("description"),
     )
@@ -1192,6 +1198,8 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "body_excerpt": _truncate_at_sentence(
             _first(raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
                    raw.get("fda483_excerpt"), raw.get("eca_article_excerpt"),
+                   # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
+                   raw.get("article_excerpt"),
                    raw.get("description"), raw.get("summary"), row.get("body")), 300),
     }
 

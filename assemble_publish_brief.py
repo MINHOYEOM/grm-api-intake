@@ -43,7 +43,9 @@ _REQUIRED_LIST_SLOTS = ("key_facts", "checks")
 # [업계 브리핑 노트 2026-07-13, v2 명칭개편 2026-07-13] 해설·교육성 2차 소스(전문 매체) —
 # 이벤트 카드가 아닌 '전문지 브리핑'으로 렌더(구 '업계 브리핑 노트'). 향후 RAPS·European
 # Pharmaceutical Review 등 수집 추가 시 여기에 기관명만 추가.
-RESOURCE_AGENCIES = ("ECA",)
+# [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 추가 — card_scaffold._REGULATOR_LABEL 의
+# agency="ISPE" 와 일치.
+RESOURCE_AGENCIES = ("ECA", "ISPE")
 
 
 @dataclass

@@ -129,17 +129,24 @@ jobs:
           GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
         run: |
           set -euo pipefail
+          # ★ 발행일당 캐노니컬 짧은 브랜치 하나만 쓴다(재실행 시 -run_id 접미 금지). 긴 브랜치는
+          #   Cloudflare Pages 프리뷰 별칭(publish-brief-YYYY-MM-DD-...)이 잘려 404 가 나기 때문(2026-07-13).
+          #   재실행(예: deep_analysis 백필 후)은 같은 브랜치를 force-update → 프리뷰 별칭·PR 이 안정 유지.
           BR="publish/brief-${{ steps.r.outputs.pub }}"
-          if git ls-remote --exit-code --heads origin "$BR" >/dev/null 2>&1; then
-            BR="publish/brief-${{ steps.r.outputs.pub }}-${GITHUB_RUN_ID}"
-            echo "::notice::publish branch already exists; using $BR"
-          fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BR"
           git add "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" web/tests/golden
           git commit -m "publish(web): ${{ steps.r.outputs.pub }} 주간 브리프 (자동 조립)"
-          git push -u origin "$BR"
-          gh pr create -R "${{ github.repository }}" -B main -H "$BR" \
-            -t "publish(web): ${{ steps.r.outputs.pub }} 주간 브리프" \
-            -b "assemble_publish_brief 자동 조립(채택 필터·render_order 재배열·coverage/agencies/categories/evidence 재계산) + 골든 재동결. 프리뷰 확인 후 머지 = 라이브(D5)."
+          git push -u origin "$BR" --force
+          # 열린 PR 이 있으면 재사용(force-push 로 갱신됨), 닫혀 있으면 재오픈, 없으면 생성.
+          STATE=$(gh pr view "$BR" --json state -q .state 2>/dev/null || echo NONE)
+          if [ "$STATE" = "OPEN" ]; then
+            echo "::notice::기존 열린 발행 PR 재사용(force-push 로 갱신) — $BR"
+          elif [ "$STATE" = "CLOSED" ]; then
+            gh pr reopen "$BR" && echo "::notice::닫힌 발행 PR 재오픈 — $BR"
+          else
+            gh pr create -R "${{ github.repository }}" -B main -H "$BR" \
+              -t "publish(web): ${{ steps.r.outputs.pub }} 주간 브리프" \
+              -b "assemble_publish_brief 자동 조립(채택 필터·render_order 재배열·coverage/agencies/categories/evidence 재계산) + 골든 재동결. 프리뷰 확인 후 머지 = 라이브(D5)."
+          fi

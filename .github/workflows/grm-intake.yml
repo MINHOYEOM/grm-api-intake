@@ -86,10 +86,9 @@ on:
         description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
         type: boolean
         default: false
-      enable_ispe:
-        description: 'ISPE iSpeak RSS 수집 활성화 (기본: vars.ENABLE_ISPE 또는 false)'
-        type: boolean
-        default: false
+      # (enable_ispe input 없음 — workflow_dispatch inputs GitHub 상한 25개 도달로 input 을
+      #  두지 않는다. 수동 opt-in 은 `sources: ispe` 토큰(RunConfig `or "ispe" in active`),
+      #  상시 활성은 vars.ENABLE_ISPE. 2026-07-13 dispatch 422 실측 교훈.)
       enable_moleg_api:
         description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
         type: boolean
@@ -208,7 +207,8 @@ jobs:
           # [483 분석층] 483 전문 확보 = deep_analysis fan-out 대상. Observation 결정론과 독립·기본 off(활성=repo 변수).
           ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
           # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS 수집 — opt-in Expert Secondary.
-          ENABLE_ISPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_ispe) || vars.ENABLE_ISPE || 'false' }}
+          # input 없음(dispatch inputs 25개 상한) — 수동은 sources=ispe 토큰, 상시는 vars.
+          ENABLE_ISPE: ${{ vars.ENABLE_ISPE || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).

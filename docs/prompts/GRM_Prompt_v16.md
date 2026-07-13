@@ -490,29 +490,39 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 발행 후 `verify_published_brief`(독립 재검증)가 결정론으로 돌고, FAIL 이면 발행하지 않는다. LLM 은
 이 게이트의 통과/FAIL 을 브리프 슬롯·run-log 에 자기판정으로 서술하지 않는다(사실만).
 
-[2단계 (선택·additive) — 심층분석 deep_analysis fan-out (WL·MFDS 행정처분·FDA 483)]
-⚠️ [환경 가드 — 클라우드 Routines 전용 주의, 2026-07-07] 이 fan-out 절차는 python CLI·서브에이전트
-(Task) 도구가 있는 Claude Code 세션 전용이다. 네 실행 환경이 클라우드 Routines(커넥터=Notion 뿐,
-python/git/Task 없음)이면 이 단계를 **통째로 건너뛰고 6슬롯 델타만 예치**한다 — deep_analysis
-4섹션 JSON 을 게이트(verify_deep_analysis) 없이 손으로 작성해 deep 델타 블록에 넣지 않는다
-(deep_analysis 는 도구 있는 세션에서 수행된 것만 합류; 없으면 6슬롯만 발행 = 정상 graceful).
-run-log 에 "deep fan-out 환경 미지원 — skip {N}건" 한 줄만 남긴다.
-위 6슬롯 델타를 만든 뒤, 아래 [산출물] 발행(커밋·미리보기·사람 승인) 전에 수행한다. handoff 카드 중
-`deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 카드(FDA WL · MFDS 행정처분 · FDA 483)가 **있을 때만** — 없으면 이 단계를
-통째로 건너뛰고 6슬롯만 발행한다(정상·대다수 주). 절차 정본 = `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`. 요지:
-  ① `python -m deep_analysis_fanout build-jobs --handoff <handoff.json> --out jobs.json`
-     (deep_analysis_ready 카드만 추출; 유형무관으로 WL·행정처분·483 모두 수집; 각 job 에 `card_type`=kind 동봉; 0건이면 이 단계 종료).
-  ② jobs.json 의 각 항목마다 Claude Code 서브에이전트(Task) 1개 — 그 job 의 `body_full` +
-     **카드 유형별 생성 프롬프트**(WL=`docs/prompts/GRM_Prompt_DeepWL_v1.md` · 행정처분=`docs/prompts/GRM_Prompt_DeepAdmin_v1.md` · FDA 483=`docs/prompts/GRM_Prompt_DeepFda483_v1.md`) **딱 하나만** 준다(다른 카드·맥락 금지 = 격리; 유형은 job 의 `card_type`/`document_id`(`fda483-…`=483)로 판별).
-     4섹션 JSON 하나 반환 — 스키마·한글 섹션명은 `verify_deep_analysis.resolve_required_sections` 가 카드 유형으로 자동 선택(WL=②`fda_evaluation` / 행정처분=②`disposition_basis` / 483=②`inspectional_significance`). ★483 은 CFR 인용이 원문에 없어도 D2 는 WARN(비차단) — 정당한 규제 해석 허용.
-     신규 API·과금 없음 — 이 세션의 구독 서브에이전트로 처리(6슬롯과 동일 실행 모델).
-  ③ 반환들을 `{document_id: 4섹션JSON}` responses.json 으로 저장.
-  ④ `python -m deep_analysis_fanout assemble --jobs jobs.json --responses responses.json --out deep_deltas.json`
-     — `verify_deep_analysis` 게이트(D1 구조·D2 인용 근거대조·D3 숫자) PASS 만 싣는다.
-     stderr `병합 N·보류 M` 리포트(카드별 FAIL 사유)를 run-log 에 반드시 남긴다.
-  ⑤ [산출물] 주입 단계에서 `inject_slots.py … --deep-analysis-deltas deep_deltas.json` 로 6슬롯과 함께 병합.
-게이트 FAIL 카드는 deep_analysis 없이 6슬롯만으로 발행(카드 단위 graceful degrade — 브리프는 안 막힘).
-이 단계는 6슬롯 산출물·규칙을 전혀 바꾸지 않는다(순수 additive·별도 트랙, 비-WL·전문 미확보 카드 무영향).
+[2단계 (선택·additive) — 심층분석 deep_analysis 생성 (WL·MFDS 행정처분·FDA 483)]
+★ [생성=너(클라우드 LLM) · 검증=델타 브릿지(python), 2026-07-13 클라우드화] 심층분석은 **네가
+직접 생성**한다(python/서브에이전트 불필요) — 예전엔 클라우드에서 이 단계를 건너뛰라고 했으나,
+이제 **너가 4섹션 JSON 을 생성·예치하면 델타 브릿지(GitHub Actions·python)가 `verify_deep_analysis`
+게이트를 돌려 근거 통과분만 발행**한다(근거 없는 분석 차단은 브릿지가 담당 = 너는 손으로 게이트를
+돌리지 않아도 된다). 이로써 심층분석도 6슬롯과 똑같이 **클라우드에서 완성**된다(데스크톱 무관).
+handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 카드(FDA WL·MFDS
+행정처분·FDA 483)가 **있을 때만** 수행 — 없으면 이 단계 통째로 생략(정상·대다수 주).
+
+수행(위 6슬롯 델타를 만든 뒤, [산출물 예치] 전에):
+  ① `deep_analysis_ready=true` 카드를 모은다. 각 카드는 **그 카드의 `deep_analysis_input.body_full`
+     원문 하나만** 근거로 처리한다 — 다른 카드·6슬롯 산문·일반지식을 섞지 않는다(카드 간 격리·1건씩).
+  ② 카드 유형별로 아래 **4섹션 JSON** 을 생성한다(유형 판별: `document_id` 가 `fda483-…`=483 ·
+     handoff `kind` 가 `admin-action`=행정처분 · `warning-letter`=WL). 섹션 상세 규칙은 각 정본
+     프롬프트를 따른다(WL=`docs/prompts/GRM_Prompt_DeepWL_v1.md` · 행정처분=`GRM_Prompt_DeepAdmin_v1.md` ·
+     483=`GRM_Prompt_DeepFda483_v1.md`). ②번 섹션 키가 유형을 결정한다(브릿지가 그 키로 스키마 자동판별):
+     · WL       : `{key_violations:[{citation,original,description,risk}], fda_evaluation, required_remediation:{deadline,items[]}, administrative_risks}`
+     · 행정처분  : `{key_violations:[{citation,original,description,risk}], disposition_basis, required_remediation:{deadline,items[]}, administrative_risks}`
+     · FDA 483  : `{key_violations:[{observation,original,citation(선택),risk}], inspectional_significance, required_remediation:{deadline,items[]}, administrative_risks, observations_ko(선택)}`
+     ⚠️ **근거 규칙(브릿지 게이트가 검사)**: `citation`(WL·행정처분)은 그 카드 `body_full` 에 **글자
+     그대로 있는 조항/법령/[별표N]만** 인용한다(원문에 없는 조항·다른 법령 = D2 하드 FAIL → 그
+     카드 심층분석 통째 drop). 483 의 CFR `citation` 은 원문에 없어도 WARN(비차단·정당한 해석 허용).
+     `original` 은 `body_full` 문장을 verbatim 발췌(없으면 생략). 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
+     `required_remediation` 은 반드시 `{deadline, items[]}` 객체(문자열 금지·items 비면 FAIL). 산문은 한국어.
+  ③ 생성한 카드들을 **deep 델타 dict** 로 모은다 — 각 카드마다 반드시 `source_text` 에 **그 카드의
+     `body_full` 원문을 그대로** 넣는다(브릿지가 이 `source_text` 로 인용 근거대조를 하므로, 빠지면
+     그 카드는 근거 미검증으로 drop 된다):
+       `{"<card.id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
+     이 dict 를 [산출물 예치]의 **두 번째 코드 블록**(deep 델타)으로 예치한다(아래 예치 규약).
+브릿지 게이트에서 FAIL 한 카드는 심층분석 없이 6슬롯만으로 발행된다(카드 단위 graceful degrade —
+브리프는 안 막힌다). 이 단계는 6슬롯 산출물·규칙을 전혀 바꾸지 않는다(순수 additive).
+(참고: python·서브에이전트가 있는 Claude Code 세션이라면 격리 fan-out CLI
+`deep_analysis_fanout build-jobs/assemble` 로 대신 생성해도 된다 — 절차 `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`. 산출 deep 델타 형태는 동일.)
 
 [산출물 — 슬롯 델타 JSON → grm-web-card/v1 브리프 JSON]
 네 산출물은 [출력] envelope 의 **슬롯 델타 JSON**(`cards`=card.id 키 + `tldr`)이다. 코드(주입 헬퍼)가
@@ -591,6 +601,7 @@ run-log 에 "deep fan-out 환경 미지원 — skip {N}건" 한 줄만 남긴다
 | 2026-06-26 | **웹 이관 — LLM 출력 grm-web-card/v1 JSON 슬롯 전환(§B 전반, 헤드리스 정리 · 코드·card_scaffold·골든·렌더러·web 불변)**: routine 의 LLM 산문 단계를 "Notion 마크업 토큰 치환"에서 "`grm-web-card/v1` JSON 슬롯 채움"으로 개정. LLM 출력 = 카드별 `title_issue`·`summary`·`key_facts[]`·`implication`·`checks[]`·(비KO)`quotes[].translation` + 브리프 `tldr[]` **값만**(코드가 슬롯 주입). 변경: [역할]·[핵심 원칙 1] 코드 필드 불변(facts·quotes.original·sources·headline_target·배지) · [출력=JSON 슬롯] 신설(마크업 0·평문) · [한국어 번역] W4→`quotes[].translation`(KO=null·인덱스 1:1) · [실행일·타임존] 날짜·요일·기간=코드 brief 메타 · [2단계] 토큰 6종→슬롯 6종(R2/R3 가드·등급/성분/수치/슬롯모순/facts 우선 인용 전부 보존, key_facts·checks=평문 리스트) · [3단계 페이지 조립]·[검색 카드 미니 템플릿]·[🔮 표]·[페이지 고정 블록] 마크업 산출 폐지(코드·렌더러) · [브리프 슬롯 tldr] 신설 · [Publish Lint 1~17]→[발행 전 산문 자가 점검] 의미 항목만(기계·구조·요일·URL 항목은 코드 게이트로) · [발행 게이트]→[출처 근거=코드 sources](LLM 링크 미산출) · [발송]→[산출물 JSON]. v1 미포함(신규 검색 카드·🔮 Watch·M2/M3 메타)=run-log/v1.1 `watch[]` deferred(은닉 삭제 아님)·M2/M3=run-log 규약. 데이터 수명주기(handoff·Tier·불건 불변식·PL-10/10b·Status·링크 근거) JSON 맥락 유지. 가드 4종 명시(생성금지 양방향·facts/quotes 인용·KO null·길이 §13.1-12 W5 3/max4·W7 2~3·W6 2문장·tldr 3). 기준 `grm-web-card/v1` 동결(`GRM_웹이관_결정+실행계획_2026-06-24.md` §4)·P1 §3.8·card_spec §9·§13.1-12. 지시 `GRM_웹이관_v16프롬프트_JSON슬롯개정_ClaudeCode지시문_2026-06-25.md`. branch `feat/v16-json-slot-contract-2026-06-26`. Codex 프롬프트 검토·사람 운영 routine 재-붙여넣기 후 적용. |
 | 2026-06-26 | **출력 envelope 명시 + 예시 1개 동봉(재작업, §B [출력]·[2단계]·[한국어 번역]·[자가 점검]·[산출물] 만 · 코드·card_scaffold·골든·렌더러·web 불변)**: fe5ff23 가 슬롯을 나열만 하고 LLM 이 산출할 **출력 형태(envelope)** 를 못박지 않아, 주입 헬퍼가 소비할 결정론 모양이 모호했다. [출력] 을 **순수 JSON 델타** `{"cards":{"<card.id>":{title_issue·summary·key_facts·implication·checks·quotes_translation}},"tldr":[...]}` 로 명시(렌더 후보만 키·`needs_llm_slots` 슬롯만·없는 키 생략·`cards`/`tldr` 밖 키 금지) + **형태 고정용 예시 카드 1장**(값=예시·실데이터 아님) 동봉. `quotes[j].translation`(코드 필드) → 출력은 **`quotes_translation` 평문 배열**(그 카드 `quotes[]` positional·KO 자리=`null`·없으면 키 생략)로 통일([한국어 번역]·[2단계]·자가 점검 1·[산출물] 정합). 슬롯 의미·가드(R2/R3·등급/성분/수치·슬롯모순·facts 우선 인용·길이)·데이터 수명주기 전부 불변(envelope 모양만 추가). 지시 `GRM_웹이관_v16프롬프트_JSON슬롯출력_재작업_ClaudeCode지시문_2026-06-26.md`. Codex 슬롯 정합·마크업 잔재 0 검토·사람 운영 routine 재-붙여넣기 후 적용. |
 | 2026-07-02 | **stage-2 자동 연결 추가(§B 끝 `[2단계]` 절 순수 추가 — 기존 6슬롯 지시문 한 글자도 무접촉)**: 월요일 Routine 이 1단계(6슬롯) 완료 후, handoff 에 `deep_analysis_ready=true` WL 카드가 있으면 발행 전 deep_analysis fan-out(카드당 서브에이전트 → `verify_deep_analysis` 게이트 → `inject_slots.py --deep-analysis-deltas` 병합)을 이어서 수행하도록 배선 — 매주 수동 트리거 불필요(스케줄 실행이 6슬롯+deep_analysis 둘 다 자동 수행). 절차 정본 = `docs/prompts/GRM_DeepWL_fanout_실행프롬프트.md`, 카드당 프롬프트 = `GRM_Prompt_DeepWL_v1.md`. deep_analysis_ready 카드 없으면 통째로 건너뜀(6슬롯만 발행·대다수 주). 실 handoff dry-run(build-jobs → assemble) 검증. deep_analysis 머지(PR #47, main) 후속 §6-B. scaffold·collector·golden·6슬롯 슬롯 규칙 불변(순수 additive·별도 트랙). 순서: 프롬프트 반영 → `ENABLE_WL_BODY_FULL=true` → 7/6 자동 실행 관찰. |
+| 2026-07-13 | **심층분석 클라우드화 — 생성=Routine LLM·검증=브릿지(§B `[2단계]` 절 전면개정 · 6슬롯·[출력]·코드 불변)**: 예전 "클라우드 Routines 는 python 없어 deep 스킵"(=매주 deep null) 구조 해소. 클라우드 Routine 이 deep_analysis 4섹션을 **직접 생성**(각 카드 `body_full` 만·격리)해 deep 델타(`{card.id:{deep_analysis,source_text}}`)로 예치하고, **델타 브릿지(`delta_bridge._gate_deep_analysis`, GitHub Actions·python)가 `verify_deep_analysis` 게이트로 근거 통과분만 커밋** — 생성/검증 역할 분리로 심층분석도 데스크톱 무관 클라우드 완성. 유형별 4섹션 스키마·근거규칙(citation=body verbatim·D2 하드[WL/admin]·483 CFR WARN·`source_text` 필수) 명시. 코드=`delta_bridge.py`(+`tests/test_delta_bridge.py` deep 게이트). tooled 세션은 fan-out CLI 대안 유지. 사람 운영 routine 재-붙여넣기 후 반영. |
 | 2026-07-13 | **델타 예치 형식 강제 + 자기검증(§B `[산출물]` 델타 예치 절만 · 6슬롯·[출력]·[2단계]·코드·골든 불변)**: 2026-07-12 실장애 원인 해소 — Routine 이 슬롯 델타를 **Intake DB 행이 아닌 워크스페이스 최상위 독립 페이지**로 예치해(부모 data source 미지정·`Type or Class`/`Status` 속성 미설정), 브릿지의 DB 쿼리(`Type or Class`=web-delta ∧ `Status`=New)에 안 잡혀 조용히 유실 → 그 주 발행 PR 미생성. 예치 지시를 강화: ① 페이지 부모를 반드시 이 DB 의 **data source**(`d5b9634a-2bd7-4036-ba06-e4ad17ede288`)로 지정해 **DB 행**으로 만들 것(독립 페이지 금지·이유 명시) ② 세 속성(`Source`/`Type or Class`/`Status`)은 **필수**(옵션 이미 등록됨) ③ **예치 후 자기검증 필수** — DB 를 web-delta∧New 로 재쿼리해 방금 만든 페이지가 잡히는지 확인, 안 잡히면 data source 로 이동+속성 설정 후 재확인, 잡히기 전엔 종료 금지. 순수 doc 문구(프롬프트 예치 블록만) — 6슬롯 규칙·나머지 절·코드·테스트·골든 불변. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영). |
 | 2026-07-02 | **fan-out 절 행정처분 반영(카드 유형별 프롬프트 DeepWL/DeepAdmin·스키마 자동선택). 6슬롯·코드 불변.** `ENABLE_MFDS_ADMIN_BODY_FULL=true` 활성으로 MFDS 행정처분 카드도 `deep_analysis_ready=true` 로 fan-out 에 유입 → `[2단계]` 절을 WL 전용→유형인식으로 수정: ②단계 생성 프롬프트를 카드 유형별 분기(WL=`GRM_Prompt_DeepWL_v1.md`·행정처분=`GRM_Prompt_DeepAdmin_v1.md`), 4섹션 스키마·한글 섹션명은 `verify_deep_analysis.resolve_required_sections` 가 카드 유형으로 자동선택(행정처분 ②섹션=`disposition_basis`). 절차 정본 `GRM_DeepWL_fanout_실행프롬프트.md` 은 이미 행정처분 분기 반영(무변경). 순수 doc 문구 수정 — 6슬롯 규칙·나머지 절·코드·테스트·골든 불변. 7/6 자동 Routine 반영 목표. |
 | 2026-07-02 | **fan-out 절 FDA 483 반영(§B `[2단계]` 절 유형 추가 — 6슬롯·나머지 절 무접촉)**: `ENABLE_FDA_483_DEEP=true` 활성 시 FDA 483 카드(`fda483-…`)도 `deep_analysis_ready=true` 로 fan-out 에 유입 → 대상 목록에 **FDA 483** 추가, ②단계 생성 프롬프트 매핑에 **483=`GRM_Prompt_DeepFda483_v1.md`**(신규) 추가, 스키마 자동선택에 483 ②섹션=`inspectional_significance`(WL/Import Alert 승격 가능성) 추가. 483 은 실사 종료 문서라 응답 평가 없음. ★483 D2 = CFR 인용이 원문(관찰사항)에 없어도 **WARN(비차단)** — 정당한 규제 해석 허용(WL 하드 FAIL 과 다름). build-jobs 가 job 에 `card_type`(kind) 동봉해 오케스트레이터가 유형별 프롬프트 선택. 483 = 결정론 Observation 상세 + 분석층 둘 다(층 혼용). 지시 `GRM_CC지시문_FDA483_분석층_2026-07-02.md`. 순수 doc 문구 수정 — 6슬롯 규칙·코드·골든 불변. 7/6 자동 Routine 반영 목표(머지+`ENABLE_FDA_483_DEEP=true`+운영 Routine 프롬프트 재-붙여넣기). |

@@ -174,6 +174,33 @@ class ExtractDeltaTest(unittest.TestCase):
         self.assertIn("mfds-1", delta["cards"])
         self.assertEqual(deep["mfds-1"]["deep_analysis"], {"x": "y"})
 
+    def test_deep_gate_keeps_grounded_drops_ungrounded(self) -> None:
+        """[클라우드화] _gate_deep_analysis: 근거 있는 deep 은 통과, 미근거 인용은 drop."""
+        good = {"admin-1": {
+            "deep_analysis": {
+                "key_violations": [{
+                    "citation": "약사법 제38조제1항",
+                    "original": "기준서 미준수",
+                    "description": "제조·품질관리기준서를 준수하지 않았다는 지적이 확인됨.",
+                    "risk": "제품 품질 일관성 저하 위험이 있다.",
+                }],
+                "disposition_basis": "기준서 미준수를 사유로 제조업무정지 1개월이 부과됐다([별표8] 근거).",
+                "required_remediation": {"deadline": "제조업무정지 기간 이행",
+                                          "items": ["기준서와 실제 작업기록 일치 여부 점검"]},
+                "administrative_risks": "재위반 시 가중처분으로 이어질 수 있는 리스크가 있다.",
+            },
+            "source_text": "기준서 미준수. 적용법령: 약사법 제38조제1항. [별표8] 개별기준.",
+        }}
+        kept = db._gate_deep_analysis(good)
+        self.assertIn("admin-1", kept)  # 근거 있는 카드는 유지
+
+        bad = {"admin-2": dict(good["admin-1"])}
+        bad["admin-2"]["deep_analysis"] = dict(good["admin-1"]["deep_analysis"])
+        bad["admin-2"]["deep_analysis"]["key_violations"] = [{
+            "citation": "「화장품법」 제999조",  # source_text 에 없음 — D2 하드 FAIL
+            "original": "x", "description": "a" * 24, "risk": "b" * 24}]
+        self.assertIsNone(db._gate_deep_analysis(bad))  # 전건 drop → None
+
     def test_garbage_blocks_fail_loud(self) -> None:
         page = _delta_page("p1", "2026-07-13")
         page["_code_blocks"] = ["not json at all", "{broken"]

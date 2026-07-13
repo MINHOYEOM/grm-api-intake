@@ -172,16 +172,25 @@ if(_nt&&_nm){
   var targets=[].filter.call(document.querySelectorAll('#cards [id]'),function(el){return links[el.id];});
   if(!targets.length || !('IntersectionObserver' in window)) return;
   var current=null, visible={};
+  var grps=[].slice.call(toc.querySelectorAll('details.toc-grp'));
+  grps.forEach(function(g){
+    var s=g.querySelector('summary'); if(!s) return;
+    s.addEventListener('click',function(){ g.dataset.manual = g.open ? '' : '1'; });
+  });
   function setActive(id){
     if(id===current) return;
     if(current && links[current]) links[current].classList.remove('on');
     current=id;
     var a=links[id]; if(!a) return;
     a.classList.add('on');
-    /* [전문지 브리핑 v2 §1] 활성 카드가 속한 <details class="toc-grp"> 를 auto-open —
-       사용자가 수동으로 연 다른 그룹을 강제로 닫지는 않는다(auto-open 만, auto-close 없음). */
+    /* [전문지 브리핑 v2 §1] 활성 카드가 속한 <details class="toc-grp"> 를 auto-open.
+       단일 활성 아코디언: 스파이가 열었던(수동 아님) 다른 그룹은 닫는다 —
+       사용자가 summary 클릭으로 수동으로 연 그룹은 강제로 닫지 않는다. */
     var grp=a.closest('details.toc-grp');
-    if(grp && !grp.open) grp.open=true;
+    grps.forEach(function(g){
+      if(g!==grp && g.open && g.dataset.spy==='1' && g.dataset.manual!=='1'){ g.open=false; g.dataset.spy=''; }
+    });
+    if(grp && !grp.open){ grp.open=true; grp.dataset.spy='1'; }
     var ar=a.getBoundingClientRect(), tr=toc.getBoundingClientRect();
     if(ar.top<tr.top || ar.bottom>tr.bottom){
       toc.scrollTop += (ar.top - tr.top) - (toc.clientHeight/2 - ar.height/2);

@@ -23,15 +23,22 @@
     {%- endif %}
   </div>
   <div class="wrap layout">
+    {#- [전문지 브리핑 v2 §1 TOC 대목차] 섹션별 카드 링크를 <details class="toc-grp"> 로
+        묶어 초기 전부 접힘 2단 목차로 전환(카드 30장+ 스크롤 벽 해소). summary = 섹션명 +
+        카드 수 배지 — 네이티브 details 마커는 CSS 로 숨기고 .toc-grp-chev(회전)로 대체
+        (JS scripts 블록의 스크롤 스파이가 active 카드의 details 를 auto-open, auto-close
+        없음). 스타일은 이 파일 <style>(TOC 관련 블록 아래)에만 — grm.css 무접촉. -#}
     <aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>
       {%- for section in sections %}
-      <a class="sec" href="#sec-{{ section.slug }}">{{ section.name }}</a>
-      {%- for card in section.cards %}
-      <a href="#{{ card.anchor }}">{{ card.headline_target }}{% if card.toc_distinguisher %} <span class="toc-sub">· {{ card.toc_distinguisher }}</span>{% endif %}</a>
-      {%- endfor %}
+      <details class="toc-grp" data-slug="{{ section.slug }}">
+        <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">{{ section.name }}</span><span class="n">{{ section.count }}</span></summary>
+        {%- for card in section.cards %}
+        <a href="#{{ card.anchor }}">{{ card.headline_target }}{% if card.toc_distinguisher %} <span class="toc-sub">· {{ card.toc_distinguisher }}</span>{% endif %}</a>
+        {%- endfor %}
+      </details>
       {%- endfor %}
       {%- if brief.resources %}
-      <a class="sec" href="#sec-resources">업계 브리핑 노트</a>
+      <a class="sec" href="#sec-resources">전문지 브리핑</a>
       {%- endif %}
     </div></aside>
     <div id="cards" data-issue-no="{{ brief.issue_no }}" data-date="{{ brief.publish_date }}">
@@ -44,7 +51,7 @@
           무관하게 항상 계산되는 전역값이다(render.py render_site 참조). -#}
       <div id="grm-brief-firm-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체</button><button type="button" data-view="summary">요약</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
         <div class="right"><span class="count">카드 <b>{{ brief.coverage.rendered }}</b>장</span></div>
       </div>
       {%- for section in sections %}
@@ -64,6 +71,24 @@
   <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>목차</button>
   <div class="toc-backdrop" id="tocBackdrop"></div>
 </main>
+<style>
+/* [전문지 브리핑 v2 §1] TOC 대목차 — 섹션 링크 묶음을 <details> 로 접어 초기 전부 접힘
+   2단 목차로 전환(카드 30장+ 스크롤 벽 해소). 이 페이지 스코프 전용 — grm.css 무접촉.
+   카드 <a> 자체는 grm.css `.toc a`/`.toc a.on` 를 그대로 상속(신규 CSS 불요) — 여기서는
+   <summary>(구 `.toc a.sec` 대체)와 카운트 배지·셰브런만 새로 정의한다. */
+.toc-grp{border:0;margin:0}
+.toc-grp summary{display:flex;align-items:baseline;gap:8px;cursor:pointer;list-style:none;
+  color:var(--ink);font-family:var(--serif);font-size:15px;font-weight:500;
+  border-left:1px solid var(--coral);padding:16px 0 6px 14px;margin-top:7px}
+.toc-grp summary::-webkit-details-marker{display:none}
+.toc-grp summary::marker{display:none}
+.toc-grp summary:hover{color:var(--coral-2)}
+.toc-grp-label{flex:1}
+.toc-grp summary .n{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500}
+.toc-grp-chev{font-size:14px;color:var(--coral);flex:none;transition:var(--tr);transform:rotate(-90deg)}
+.toc-grp[open] .toc-grp-chev{transform:rotate(0deg)}
+@media(prefers-reduced-motion:reduce){.toc-grp-chev{transition:none}}
+</style>
 {% endblock %}
 {% block ai_disclosure %}
 {%- if brief.ai_disclosure %}
@@ -114,6 +139,10 @@
     current=id;
     var a=links[id]; if(!a) return;
     a.classList.add('on');
+    /* [전문지 브리핑 v2 §1] 활성 카드가 속한 <details class="toc-grp"> 를 auto-open —
+       사용자가 수동으로 연 다른 그룹을 강제로 닫지는 않는다(auto-open 만, auto-close 없음). */
+    var grp=a.closest('details.toc-grp');
+    if(grp && !grp.open) grp.open=true;
     var ar=a.getBoundingClientRect(), tr=toc.getBoundingClientRect();
     if(ar.top<tr.top || ar.bottom>tr.bottom){
       toc.scrollTop += (ar.top - tr.top) - (toc.clientHeight/2 - ar.height/2);

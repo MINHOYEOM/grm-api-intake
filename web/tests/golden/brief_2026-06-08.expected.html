@@ -52,11 +52,11 @@
       <span>수집 <b>27</b>건 · 카드 <b>2</b>장</span>
       <span>Evidence <b class="mono">A 1 · B 1 · C 0</b></span>
     </div>    <div class="tldr"><div class="l">이번 주 핵심</div><ul>      <li>FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부</li>      <li>MHRA, 안정성 프로그램 미흡 지적 다수</li>      <li>공통적으로 CAPA 종결 증빙 미비가 반복 관찰됨</li>    </ul></div>    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>AI 자동 생성 안내</b><p>요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.</p><a href="#ai-notice">전문 보기 ↓</a></div></div>  </div>
-  <div class="wrap layout">
-    <aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>      <a class="sec" href="#sec-글로벌">글로벌</a>      <a href="#wl-syn-0608">Synthetic Pharma Co.</a>      <a href="#rss-syn-mhra">MHRA stability programme deficiencies</a>    </div></aside>
+  <div class="wrap layout"><aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>      <details class="toc-grp" data-slug="글로벌">
+        <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">글로벌</span><span class="n">2</span></summary>        <a href="#wl-syn-0608">Synthetic Pharma Co.</a>        <a href="#rss-syn-mhra">MHRA stability programme deficiencies</a>      </details>    </div></aside>
     <div id="cards" data-issue-no="1" data-date="2026-06-08"><div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체</button><button type="button" data-view="summary">요약</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
         <div class="right"><span class="count">카드 <b>2</b>장</span></div>
       </div>      <h2 class="sec-h" id="sec-글로벌"><i class="ti ti-world" style="color:var(--coral);font-size:20px"></i>글로벌 <span class="n">2장</span></h2>
       <div class="sec-body" id="secbody-글로벌">      <div class="grp-h">💊 합성의약품</div><article class="card evA" id="wl-syn-0608" data-card-type="Warning Letter" data-signal-tier="3" data-evidence="A" data-firm-key="synthetic pharma">
@@ -77,6 +77,24 @@
   <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>목차</button>
   <div class="toc-backdrop" id="tocBackdrop"></div>
 </main>
+<style>
+/* [전문지 브리핑 v2 §1] TOC 대목차 — 섹션 링크 묶음을 <details> 로 접어 초기 전부 접힘
+   2단 목차로 전환(카드 30장+ 스크롤 벽 해소). 이 페이지 스코프 전용 — grm.css 무접촉.
+   카드 <a> 자체는 grm.css `.toc a`/`.toc a.on` 를 그대로 상속(신규 CSS 불요) — 여기서는
+   <summary>(구 `.toc a.sec` 대체)와 카운트 배지·셰브런만 새로 정의한다. */
+.toc-grp{border:0;margin:0}
+.toc-grp summary{display:flex;align-items:baseline;gap:8px;cursor:pointer;list-style:none;
+  color:var(--ink);font-family:var(--serif);font-size:15px;font-weight:500;
+  border-left:1px solid var(--coral);padding:16px 0 6px 14px;margin-top:7px}
+.toc-grp summary::-webkit-details-marker{display:none}
+.toc-grp summary::marker{display:none}
+.toc-grp summary:hover{color:var(--coral-2)}
+.toc-grp-label{flex:1}
+.toc-grp summary .n{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500}
+.toc-grp-chev{font-size:14px;color:var(--coral);flex:none;transition:var(--tr);transform:rotate(-90deg)}
+.toc-grp[open] .toc-grp-chev{transform:rotate(0deg)}
+@media(prefers-reduced-motion:reduce){.toc-grp-chev{transition:none}}
+</style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
   <h2>콘텐츠 생성 방식 및 유의사항</h2>
@@ -149,6 +167,10 @@ if(_nt&&_nm){
     current=id;
     var a=links[id]; if(!a) return;
     a.classList.add('on');
+    /* [전문지 브리핑 v2 §1] 활성 카드가 속한 <details class="toc-grp"> 를 auto-open —
+       사용자가 수동으로 연 다른 그룹을 강제로 닫지는 않는다(auto-open 만, auto-close 없음). */
+    var grp=a.closest('details.toc-grp');
+    if(grp && !grp.open) grp.open=true;
     var ar=a.getBoundingClientRect(), tr=toc.getBoundingClientRect();
     if(ar.top<tr.top || ar.bottom>tr.bottom){
       toc.scrollTop += (ar.top - tr.top) - (toc.clientHeight/2 - ar.height/2);

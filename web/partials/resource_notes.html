@@ -1,7 +1,10 @@
-{#- resource_notes.html — '업계 브리핑 노트' 전용 섹션(v1, 2026-07-13). 해설·교육성 2차
-    소스(ECA GMP News 등, assemble_publish_brief.extract_resource_notes 산출)를 이벤트
-    카드 목록과 분리해 브리프 하단에 별도 렌더한다. 순수 렌더(사실/URL 무변형) — 값은
-    render._resource_view() 가 카드 기존 값 그대로 통과시킨 것만 사용한다.
+{#- resource_notes.html — '전문지 브리핑' 전용 섹션(v1 2026-07-13 신설, v2 2026-07-13
+    명칭·정직성 개편). 해설·교육성 2차 소스(ECA GMP News 등,
+    assemble_publish_brief.extract_resource_notes 산출)를 이벤트 카드 목록과 분리해 브리프
+    하단에 별도 렌더한다. 순수 렌더(사실/URL 무변형) — 값은 render._resource_view() 가 카드
+    기존 값 그대로 통과시킨 것만 사용한다. summary 는 upstream(extract_resource_notes §3
+    정직성 게이트)이 본문 흡수 흔적이 있을 때만 실어보내므로, 여기서는 있으면 그대로 렌더하고
+    없으면 요지 줄을 생략하기만 한다(오서술 방지 로직은 렌더러 무관심).
 
     하드 요구: resources 가 없는 브리프는 이 partial 전체(스타일 포함)가 렌더 0바이트여야
     한다 — 그래서 <style> 도 이 {% if %} 안에 둔다(grm.css 무접촉 원칙, PR#166 류 골든
@@ -20,9 +23,9 @@ a.res-link:hover{color:var(--coral)}
 .res-orig{color:var(--muted);font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .res-sum{margin:5px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
 </style>
-<h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>업계 브리핑 노트 <span class="n">{{ brief.resources|length }}건</span></h2>
+<h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>전문지 브리핑 <span class="n">{{ brief.resources|length }}건</span></h2>
 <div class="sec-body" id="secbody-resources">
-  <p class="res-sub">해설·교육 자료 {{ brief.resources|length }}건 — 규제 변경 아님</p>
+  <p class="res-sub">업계 전문지의 해설·교육 자료 {{ brief.resources|length }}건 · 규제 변경 아님</p>
   <div class="res-list">
   {%- for r in brief.resources %}
     <div class="res-item">

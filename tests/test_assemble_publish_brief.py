@@ -285,9 +285,11 @@ class ExtractResourceNotesTest(unittest.TestCase):
 
     def test_eca_news_separated_events_remain(self):
         # ① ECA GMP News → resource 분리, 그 외 카드는 이벤트로 잔존(순서보존).
+        # source_excerpt_present=True(§3 정직성 게이트 통과) → summary 포함.
         cards = [
             self._card("fda-1", "FDA", card_type="Warning Letter"),
-            self._card("eca-1", "ECA", type_tag="GMP News", card_type="규제 소식"),
+            self._card("eca-1", "ECA", type_tag="GMP News", card_type="규제 소식",
+                       source_excerpt_present=True),
             self._card("mfds-1", "MFDS", card_type="행정처분"),
         ]
         events, resources = apb.extract_resource_notes(cards)
@@ -301,6 +303,23 @@ class ExtractResourceNotesTest(unittest.TestCase):
         self.assertEqual(r["agency"], "ECA")
         self.assertEqual(r["type_tag"], "GMP News")
         self.assertEqual(r["sources"], cards[1]["sources"])
+
+    def test_summary_omitted_without_source_excerpt_present(self):
+        # [전문지 브리핑 v2 §3 정직성 게이트] source_excerpt_present 가 없으면(=수집 RSS가
+        # 제목만 준 얇은 입력) summary 키 자체가 note 에서 제거된다 — LLM 의 "원문에 규정
+        # 변경이 없다" 식 오서술을 렌더에 실어보내지 않기 위함(§3 배경).
+        cards = [self._card("eca-4", "ECA", type_tag="GMP News", card_type="규제 소식")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, [])
+        self.assertEqual(len(resources), 1)
+        self.assertNotIn("summary", resources[0])
+
+    def test_summary_omitted_when_source_excerpt_present_false(self):
+        # source_excerpt_present=False(명시적 False, 흡수 시도했으나 실패) 도 동일하게 제거.
+        cards = [self._card("eca-5", "ECA", type_tag="GMP News", card_type="규제 소식",
+                            source_excerpt_present=False)]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertNotIn("summary", resources[0])
 
     def test_eca_card_type_variant_also_separated(self):
         # card_type=='규제 소식' 만으로도(type_tag 부재) resource 판정(OR 조건).

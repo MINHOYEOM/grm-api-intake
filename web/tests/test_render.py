@@ -3756,7 +3756,7 @@ class WebBriefFirmLinkTest(unittest.TestCase):
 # ── [업계 브리핑 노트 2026-07-13] resources 섹션 — 구조·게이트·바이트 불변 ───────
 class WebResourceNotesRenderTest(unittest.TestCase):
     """assemble_publish_brief.extract_resource_notes() 산출(brief.resources)을
-    render.py 가 '업계 브리핑 노트' 전용 섹션으로 렌더하는지 확인. 격리 픽스처
+    render.py 가 '전문지 브리핑'(구 '업계 브리핑 노트') 전용 섹션으로 렌더하는지 확인. 격리 픽스처
     (tests/fixtures/resources) 사용 — single/multi 아카이브·랜딩 집계 골든과 분리.
     """
 
@@ -3772,10 +3772,11 @@ class WebResourceNotesRenderTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_section_header_and_subtitle(self):
+        # [전문지 브리핑 v2 §2] 명칭 '업계 브리핑 노트' → '전문지 브리핑'.
         self.assertIn('id="sec-resources"', self.detail)
-        self.assertIn('업계 브리핑 노트', self.detail)
+        self.assertIn('전문지 브리핑', self.detail)
         self.assertIn('<span class="n">2건</span>', self.detail)
-        self.assertIn('해설·교육 자료 2건 — 규제 변경 아님', self.detail)
+        self.assertIn('업계 전문지의 해설·교육 자료 2건 · 규제 변경 아님', self.detail)
 
     def test_item_link_target_blank_noopener(self):
         self.assertIn(

@@ -7,6 +7,7 @@
 무네트워크: _fetch_html_rows·http_get_bytes·_extract_pdf_text 스텁.
 """
 import os
+import re
 import sys
 import unittest
 from datetime import date
@@ -407,6 +408,40 @@ class ObservationExtractionTest(unittest.TestCase):
         prose = ("Specifically, the minimum garb is required. However, employees were observed "
                  "donning gloves upon entry through the back door.")
         self.assertIn("employees were observed", f._clean_observation_detail(prose))  # 산문 미절단
+
+    def test_footer_ocr_mangled_employee_marker_stripped(self):
+        # [2026-07-12 Catalent Indiana 실측] OCR 이 EMPLOYEE(S) SIGNATURE 를
+        # "I EMPi.OY1:E($) SIGJ'IAl\lRE /I SEE" 로 깨뜨림 — 옛 정규식은 "OYEE" 리터럴이 깨져
+        # (OY1:E) 못 잡았다. 선행 고립 "I " 도 함께 절단되고 마침표는 보존돼야 한다.
+        mangled = ("...you continue to observe mammalian hair in finished drug products. "
+                   "I EMPi.OY1:E($) SIGJ'IAl\\lRE /I SEE")
+        cleaned = f._clean_observation_detail(mangled)
+        self.assertTrue(cleaned.endswith("finished drug products."), cleaned)
+        for residue in ("EMP", "OY1", "SIGJ"):
+            self.assertNotIn(residue, cleaned)
+        self.assertFalse(re.search(r"(?:^|\s)[IlL]$", cleaned), cleaned)  # 고립 낱자 I/l 잔존 없음
+
+    def test_footer_add_continuation_page_marker_stripped(self):
+        # [2026-07-12 실측] Observation 별 "Add Continuation Page" 연속페이지 마커도 절단 대상.
+        text = ("...inadequate to prevent cross-contamination. Add Continuation Page")
+        cleaned = f._clean_observation_detail(text)
+        self.assertTrue(cleaned.endswith("cross-contamination."), cleaned)
+        self.assertNotIn("Continuation", cleaned)
+
+    def test_footer_clean_employee_marker_still_stripped_regression(self):
+        # 회귀: 깨지지 않은 정상 폼 푸터도 여전히 절단돼야 한다.
+        text = "...text here EMPLOYEE(S) SIGNATURE SEE REVERSE"
+        cleaned = f._clean_observation_detail(text)
+        self.assertNotIn("EMPLOYEE", cleaned)
+        self.assertNotIn("SIGNATURE", cleaned)
+
+    def test_footer_lowercase_employees_prose_not_truncated(self):
+        # 오탐 방지: 괄호 없는 소문자 "employees" 산문은 절단되면 안 된다.
+        text = ("Specifically, the firm failed to ensure employees followed gowning procedures "
+                "before entering the aseptic core.")
+        cleaned = f._clean_observation_detail(text)
+        self.assertIn("employees followed gowning procedures", cleaned)
+        self.assertTrue(cleaned.endswith("aseptic core."), cleaned)
 
     def test_observation_flag_off_does_not_write_raw(self):
         with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false"}), \

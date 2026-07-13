@@ -284,7 +284,7 @@
      {
       "number": "1",
       "deficiency": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
-      "detail": "Specifically, A. Extrinsic biological particulates (mammalian hair) have continued to be identified in finished sterile drug products. However, investigations into these events have not been completed in a timely manner and do not demonstrate that the root cause has been adequately identified and corrected. From approximately 08/30/2025 to present, you have identified mammalian hair in finished units in at least <Redacted B4> batches, including three identified in 2026, representing a recurring contamination issue (approximately <Redacted B4>) <Redacted B4> batches out of <Redacted B4> inspected in 2026). Probable root cause has been attributed to stopper components; however, this conclusion is based on an ongoing, aggregated trend investigation (REC 1093464), that was opened on 08/28/2025, and has not been substantiated through complete, batch specific investigations. All <Redacted B4> deviations are currently open. You stated that closure of those deviations is pending completion of this trend investigation. Despite implementation of multiple corrective and preventative actions, you continue to observe mammalian hair in finished drug products. I EMPi.OY1:E($) SIGJ'IAl\\lRE /I SEE"
+      "detail": "Specifically, A. Extrinsic biological particulates (mammalian hair) have continued to be identified in finished sterile drug products. However, investigations into these events have not been completed in a timely manner and do not demonstrate that the root cause has been adequately identified and corrected. From approximately 08/30/2025 to present, you have identified mammalian hair in finished units in at least <Redacted B4> batches, including three identified in 2026, representing a recurring contamination issue (approximately <Redacted B4>) <Redacted B4> batches out of <Redacted B4> inspected in 2026). Probable root cause has been attributed to stopper components; however, this conclusion is based on an ongoing, aggregated trend investigation (REC 1093464), that was opened on 08/28/2025, and has not been substantiated through complete, batch specific investigations. All <Redacted B4> deviations are currently open. You stated that closure of those deviations is pending completion of this trend investigation. Despite implementation of multiple corrective and preventative actions, you continue to observe mammalian hair in finished drug products."
      },
      {
       "number": "2",
@@ -327,13 +327,13 @@
     "key_violations": [
      {
       "observation": "무균 완제에서 포유류 모발 등 이물이 반복 검출됐으나 조사가 적시에 완료되지 않았고 근본원인 규명·시정이 입증되지 않았다.",
-      "original": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
+      "original": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up. Specifically, A. Extrinsic biological particulates (mammalian hair) have continued to be identified in finished sterile drug products. However, investigations into these events have not been completed in a timely manner and do not demonstrate that the root cause has been adequately identified and corrected. From approximately 08/30/2025 to present, you have identified mammalian hair in finished units in at least <Redacted B4> batches, including three identified in 2026, representing a recurring contamination issue (approximately <Redacted B4>) <Redacted B4> batches out of <Redacted B4> inspected in 2026). Probable root cause has been attributed to stopper components; however, this conclusion is based on an ongoing, aggregated trend investigation (REC 1093464), that was opened on 08/28/2025, and has not been substantiated through complete, batch specific investigations. All <Redacted B4> deviations are currently open. You stated that closure of those deviations is pending completion of this trend investigation. Despite implementation of multiple corrective and preventative actions, you continue to observe mammalian hair in finished drug products.",
       "citation": "21 CFR 211.192",
       "risk": "반복 이물 혼입에 대한 근본원인 미규명은 무균성·제품품질의 지속적 위해를 방치하는 결과가 된다."
      },
      {
       "observation": "육안검사의 검출 민감도·결함 검출성이 적절히 적격성평가되지 않아 공정 변동을 감시·검증하는 관리절차가 미비했다.",
-      "original": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product.",
+      "original": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product. Specifically, A. Visual inspection methods have been implemented without adequately qualifying inspection sensitivity, defect detectability, or comparability between methods. For example: Your threshold <Redacted B4> studies failed to generate <Redacted B4> across the full visible range of defects and failed to establish <Redacted B4> based on defect size at which defects become reliably detectable. Without establishing <Redacted B4> supported by <Redacted B4> you have not demonstrated that inspection sensitivity has been adequately qualified or that the visual inspection process is capable of consistently detecting and rejecting critical defects. Additionally, MVI studies were conducted using aggregated \"particulate\" defect categories that combined multiple particulate defect types (ex: glass, metal, rubber, fibers). Further, defect units were characterized by using broad size ranges rather than actual measured particle sizes, which does not allow for evaluation of detection capability as function of particle size. Review of your threshold studies supporting the manual baseline demonstrated that certain particulate defect types, such as glass, black fiber, and hair, exhibited low.",
       "citation": "21 CFR 211.110",
       "risk": "검사 신뢰성이 입증되지 않아 불량 유출 위험이 커진다."
      },
@@ -467,13 +467,13 @@
     "key_violations": [
      {
       "observation": "ISO 5 무균구역에서 작업자의 손 위치가 HEPA 필터로부터의 단일방향 first air 를 가로막아 무균조작의 핵심 보호를 무력화했다.",
-      "original": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted.",
+      "original": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted. Specifically, On 05/05/2026, a compounding technician was observed preparing the following prescription in Buffer Room lH-ll0A: R R X <Redacted B4> TPN, 2000 mL IV Bag During the preparation of RX# <Redacted B4> the following deficiency was observed: While injecting components into the 2000mL IV bag, the technician's hand placement was observed blocking the bag port and needle. The technician's hands were positioned in a manner that obstructed the unidirectional first air between the HEPA filter face and the critical work surface, thereby compromising the sterility assurance of the critical area.",
       "citation": "21 CFR 211.42",
       "risk": "임계 작업면의 무균 보증이 훼손돼 무균 완제(TPN 등)의 오염 위험이 직접 커진다."
      },
      {
       "observation": "작업자가 눈·이마 등 피부를 노출한 채 ISO 5 무균조작을 수행했다.",
-      "original": "Personnel performed aseptic manipulations with exposed hair or skin.",
+      "original": "Personnel performed aseptic manipulations with exposed hair or skin. Specifically, a. The compounding technician was observed leaning into the ISO 5 Laminar Airflow Workbench (LAFW). with exposed skin around the eyes and forehead while performing aseptic manipulations of <Redacted B4> TPN, 2000 mL IV Bag, increasing the risk of contamination to the critical work surface.",
       "risk": "인체 유래 입자·미생물이 임계 구역으로 유입돼 무균성이 저하될 수 있다."
      },
      {
@@ -563,12 +563,12 @@
      {
       "number": "2",
       "deficiency": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.",
-      "detail": "Specifically, Beta-Lactam drug products are produced in the same ISO 5 hoods as non-beta-lactam drug products intended to be sterile. The following beta-lactam drugs were observed being produced in your LAFH hood include, but are not limited to: - - - - - - ceftaroline fosamil 300 mg in D5W 100 mL ampicillin 2 gm in Normal Saline Mini-Bag 100 mL ampicillin/sulbactam 3 gm in Normal Saline Mini-Bag I00 mL ertapenem I gm in Normal Saline Mini-Bag 50 mL meropenem 1000 mg in Normal Saline Mini-Bag 50 mL meropenem 2000 mg in Normal Saline 100 mL Your firm performs cleaning with only '(bl <41 between the production ofbeta-lactam and non-beta lactam drug products intended to be sterile in the same ISO 5 area and uses[(I:)) (4) I, with a [(I:)) (4) I~ time, as the cleaning/sanitizing agent to inactivate beta-lactam residues only[(I:)) (4) Ion[(I:)) (4) Iin the non-hazardous production area. This frequency is inadequate to prevent cross-contamination. Add Continuation Page"
+      "detail": "Specifically, Beta-Lactam drug products are produced in the same ISO 5 hoods as non-beta-lactam drug products intended to be sterile. The following beta-lactam drugs were observed being produced in your LAFH hood include, but are not limited to: - - - - - - ceftaroline fosamil 300 mg in D5W 100 mL ampicillin 2 gm in Normal Saline Mini-Bag 100 mL ampicillin/sulbactam 3 gm in Normal Saline Mini-Bag I00 mL ertapenem I gm in Normal Saline Mini-Bag 50 mL meropenem 1000 mg in Normal Saline Mini-Bag 50 mL meropenem 2000 mg in Normal Saline 100 mL Your firm performs cleaning with only '(bl <41 between the production ofbeta-lactam and non-beta lactam drug products intended to be sterile in the same ISO 5 area and uses[(I:)) (4) I, with a [(I:)) (4) I~ time, as the cleaning/sanitizing agent to inactivate beta-lactam residues only[(I:)) (4) Ion[(I:)) (4) Iin the non-hazardous production area. This frequency is inadequate to prevent cross-contamination."
      },
      {
       "number": "3",
       "deficiency": "Contamination was observed in your production area.",
-      "detail": "Specifically, On 04/29/2026, unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood (SN: <Redacted B4>. Your firm was unable to identify the source of the staining or confirm whether it affected filter integrity, air quality, or aseptic conditions in the ISO 5 area. The duration of this condition is unknown. Add Continuation Page"
+      "detail": "Specifically, On 04/29/2026, unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood (SN: <Redacted B4>. Your firm was unable to identify the source of the staining or confirm whether it affected filter integrity, air quality, or aseptic conditions in the ISO 5 area. The duration of this condition is unknown."
      },
      {
       "number": "4",
@@ -578,12 +578,12 @@
      {
       "number": "5",
       "deficiency": "An operator rested their arms on the work surface of the hood during aseptic production.",
-      "detail": "This practice may introduce contamination into the ISO 5 work area. Specifically, A) In the non-hazardous production room <Redacted B4> operators were observed resting their hands directly on the ISO 5 workbench surface on 04/29/2026 during the production of micafungin 100mg in normal saline 1OOmL. B) On 04/28/2026, the operator's elbows were observed resting on the edge of the front grille of the ISO 5 Biological Safety Cabinet (BSC). Add Continuation Page"
+      "detail": "This practice may introduce contamination into the ISO 5 work area. Specifically, A) In the non-hazardous production room <Redacted B4> operators were observed resting their hands directly on the ISO 5 workbench surface on 04/29/2026 during the production of micafungin 100mg in normal saline 1OOmL. B) On 04/28/2026, the operator's elbows were observed resting on the edge of the front grille of the ISO 5 Biological Safety Cabinet (BSC)."
      },
      {
       "number": "6",
       "deficiency": "Personnel were observed touching equipment or other surfaces located outside of the ISO 5 area with gloved hands and then proceeding with aseptic processing without changing or sanitizing gloves.",
-      "detail": "Specifically, On 04/28/2026 during the production of bortezomib 2.7mg, label # <Redacted B4> an operator failed to sanitize or change their gloved hands with <Redacted B4> after touching the computer keyboard and mouse within the ISO 7 buffer room prior to going back into the ISO 5 critical area to continue aseptically processing drug product intended to be sterile. Your SOP only specifies <Redacted B4> surfaces. We did not observe your third party cleaners cleaning and sanitizing your keyboards, mouse, and handheld scanner. Add Continuation Page"
+      "detail": "Specifically, On 04/28/2026 during the production of bortezomib 2.7mg, label # <Redacted B4> an operator failed to sanitize or change their gloved hands with <Redacted B4> after touching the computer keyboard and mouse within the ISO 7 buffer room prior to going back into the ISO 5 critical area to continue aseptically processing drug product intended to be sterile. Your SOP only specifies <Redacted B4> surfaces. We did not observe your third party cleaners cleaning and sanitizing your keyboards, mouse, and handheld scanner."
      },
      {
       "number": "7",
@@ -598,17 +598,17 @@
      {
       "number": "9",
       "deficiency": "Personnel performed aseptic manipulations with exposed hair or skin.",
-      "detail": "Specifically, A) On 04/27/2026 and 04/29/2026, multiple operators were observed aseptically processing drug products intended to be sterile in the ISO 5 laminar airflow hood (LAFH) with exposed hair, including during the production of daptomycin 670 mg in sodium chloride 0.9%, 36.6 mL, label # <Redacted B4> in room <Redacted B4> B) On 04/29/2026, one operator was observed inserting their head, including the exposed skin of their forehead, and eyeglasses into the ISO 5 critical zone during the production of luspatercept-aamt 50mg, label <Redacted B4>. These eyeglasses are only cleaned with <Redacted B4> before being brought into the ISO 7 buffer area and are worn throughout the hospital and patient care areas. No sporicidal agent was used to clean these items and no environmental monitoring was performed to assess the contamination risk they may introduce. Add Continuation Page"
+      "detail": "Specifically, A) On 04/27/2026 and 04/29/2026, multiple operators were observed aseptically processing drug products intended to be sterile in the ISO 5 laminar airflow hood (LAFH) with exposed hair, including during the production of daptomycin 670 mg in sodium chloride 0.9%, 36.6 mL, label # <Redacted B4> in room <Redacted B4> B) On 04/29/2026, one operator was observed inserting their head, including the exposed skin of their forehead, and eyeglasses into the ISO 5 critical zone during the production of luspatercept-aamt 50mg, label <Redacted B4>. These eyeglasses are only cleaned with <Redacted B4> before being brought into the ISO 7 buffer area and are worn throughout the hospital and patient care areas. No sporicidal agent was used to clean these items and no environmental monitoring was performed to assess the contamination risk they may introduce."
      },
      {
       "number": "10",
       "deficiency": "Materials were exposed to lower than ISO 5 quality air.",
-      "detail": "Specifically, A) Sterile, lint-fre.e wipes stored in an exposed, open condition were observed on the wall of the ISO 7 buffer rooms. At least <Redacted B4> of the transparent boxes on the wall had broken hinges and were left open during production. The wipes, which were difficult to pull from the box, were sprayed with sterile <Redacted B4> in the ISO 7 buffer and then used to clean the ISO 5 workbench surface and to wipe materials transitioning from areas of lower quality air into the ISO 5 critical areas. B) Sterile, lint-free wipes were observed on the wall of the unclassified areas of the segregated ICU room <Redacted B4> by the sink. Add Continuation Page"
+      "detail": "Specifically, A) Sterile, lint-fre.e wipes stored in an exposed, open condition were observed on the wall of the ISO 7 buffer rooms. At least <Redacted B4> of the transparent boxes on the wall had broken hinges and were left open during production. The wipes, which were difficult to pull from the box, were sprayed with sterile <Redacted B4> in the ISO 7 buffer and then used to clean the ISO 5 workbench surface and to wipe materials transitioning from areas of lower quality air into the ISO 5 critical areas. B) Sterile, lint-free wipes were observed on the wall of the unclassified areas of the segregated ICU room <Redacted B4> by the sink."
      },
      {
       "number": "11",
       "deficiency": "Personnel engaged in aseptic processing were observed wearing non-sterile gloves.",
-      "detail": "Specifically, Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg, label # <Redacted B4> on 04/28/2026. There is no assurance that the gloves are intact and remain sterile. Your sterile glove manufacturer suggested that the gloves be used within <Redacte d B4> of the manufacturer date. Add Continuation Page"
+      "detail": "Specifically, Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg, label # <Redacted B4> on 04/28/2026. There is no assurance that the gloves are intact and remain sterile. Your sterile glove manufacturer suggested that the gloves be used within <Redacte d B4> of the manufacturer date."
      }
     ]
    },
@@ -616,19 +616,19 @@
     "key_violations": [
      {
       "observation": "베타락탐 의약품을 비베타락탐 무균 제품과 동일한 ISO 5 후드에서 생산해 교차오염 방지를 위한 격리·전용화가 미흡했다.",
-      "original": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.",
+      "original": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination. Specifically, Beta-Lactam drug products are produced in the same ISO 5 hoods as non-beta-lactam drug products intended to be sterile. The following beta-lactam drugs were observed being produced in your LAFH hood include, but are not limited to: - - - - - - ceftaroline fosamil 300 mg in D5W 100 mL ampicillin 2 gm in Normal Saline Mini-Bag 100 mL ampicillin/sulbactam 3 gm in Normal Saline Mini-Bag I00 mL ertapenem I gm in Normal Saline Mini-Bag 50 mL meropenem 1000 mg in Normal Saline Mini-Bag 50 mL meropenem 2000 mg in Normal Saline 100 mL Your firm performs cleaning with only '(bl <41 between the production ofbeta-lactam and non-beta lactam drug products intended to be sterile in the same ISO 5 area and uses[(I:)) (4) I, with a [(I:)) (4) I~ time, as the cleaning/sanitizing agent to inactivate beta-lactam residues only[(I:)) (4) Ion[(I:)) (4) Iin the non-hazardous production area. This frequency is inadequate to prevent cross-contamination.",
       "citation": "21 CFR 211.42",
       "risk": "베타락탐 교차오염은 과민반응 위험이 커 환자안전에 직접적 위해가 된다."
      },
      {
       "observation": "ISO 5 비위해 생산 후드의 HEPA 필터에서 원인 불명의 갈색 얼룩이 관찰됐고 출처·필터 건전성 영향 여부를 규명하지 못했다.",
-      "original": "unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood",
+      "original": "Contamination was observed in your production area. Specifically, On 04/29/2026, unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood (SN: <Redacted B4>. Your firm was unable to identify the source of the staining or confirm whether it affected filter integrity, air quality, or aseptic conditions in the ISO 5 area. The duration of this condition is unknown.",
       "citation": "21 CFR 211.42",
       "risk": "필터 건전성·공기질에 대한 보증이 불확실해 무균 환경 신뢰성이 저하된다."
      },
      {
       "observation": "무균조작 중 만료된(2022-01 제조) 멸균 장갑을 착용해 장갑의 무균성 보증이 없었다.",
-      "original": "Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg",
+      "original": "Personnel engaged in aseptic processing were observed wearing non-sterile gloves. Specifically, Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg, label # <Redacted B4> on 04/28/2026. There is no assurance that the gloves are intact and remain sterile. Your sterile glove manufacturer suggested that the gloves be used within <Redacte d B4> of the manufacturer date.",
       "risk": "장갑 무균성 미보증으로 임계 조작 중 오염 유입 가능성이 커진다."
      }
     ],

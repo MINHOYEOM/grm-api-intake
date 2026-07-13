@@ -125,20 +125,31 @@ _WE_OBSERVED_RE = re.compile(r"\b(?:I\s*/\s*)?WE\s+OBSERVED\b", re.I)
 # FORM FDA 4&3), 심지어 Observation 본문 자리로 흘려보내(본문을 통째로 대체) 서명블록이
 # detail 로 들어온다(2026-07 Mixlab Obs2·5 실측 결함). 옛 정규식은 ① `EMPLOYEE\(S\)\b` 의
 # 후행 `\b` 가 `)` 뒤에서 성립하지 않아 이 마커를 아예 못 잡고 ② OCR 변형에 취약했다.
+# [2026-07-12 Catalent Indiana 실측 추가결함] ③ OCR 이 "OYEE" 내부까지 깨뜨려(문자 대신
+# 숫자/콜론 삽입: OYEE→OY1:E) 옛 `[A-Z.]{0,4}` 갭이 문자 클래스 밖(숫자·콜론·아포스트로피·
+# 백슬래시)까지는 못 건너뛰었고, 그 앞에 붙는 낱자 노이즈("I EMPi.OY1:E($) SIGJ'IAl\lRE")도
+# 미흡수였다 → EMP~OY~E 사이 갭 클래스를 `[A-Z0-9.:'\\]`로 넓히고 선행 고립 I/l 을 옵션으로
+# 흡수한다. ④ Observation 별 "Add Continuation Page" 연속페이지 마커도 신규 추가.
 # 아래는 가장 이른 푸터 마커에서 잘라내며, EMPLOYEE(S)/($) 는 소문자 산문("employees were
 # observed")과 달리 반드시 괄호 (S)/($) 를 동반하므로 오탐 없이 서명블록 시작을 잡는다.
 _FDA483_FOOTER_RE = re.compile(
-    r"EMP[LI][A-Z.]{0,4}OYEE\s*\([S$]\)"       # EMPLOYEE(S) / EMPI..OYEE(S) / EMPLOYEE($)
+    r"(?:\b[IlL]\s+)?EMP[LI][A-Z0-9.:'\\]{0,6}?OY[A-Z0-9.:'\\]{0,4}?E\s*\([S$]\)"
+    #   EMPLOYEE(S) / EMPLOYEE($) / EMPI..OYEE(S) / "I EMPi.OY1:E($)"(2026-07 Catalent 실측)
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"                         # FORM FDA 483 / FORM FDA 4&3
     r"|PREVIOUS[\s.]*EDITION"
     r"|\bINSPECTIONAL\s+OBSERVATIONS?\b"
     r"|\bDEPARTMENT\s+OF\s+HEAL(?:TH)?"
     r"|\bDATE\s+ISSUED\b"
-    r"|\bPAGE\s+\d+\s+OF\s+\d+\b",
+    r"|\bPAGE\s+\d+\s+OF\s+\d+\b"
+    r"|\bAdd\s+Continuation\s+Page\b",           # Observation 별 연속페이지 마커(2026-07-12 실측)
     re.I,
 )
 _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안전)
+# 위 EMPLOYEE 마커가 선행 고립 I/l 을 흡수하지 못하는 잔여 경우를 대비한 안전망(가벼운 후처리).
+# 실제 산문에서 문장이 고립된 단일 I/l 로 끝나는 경우는 사실상 없어(대명사 "I"는 문장 중간),
+# 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
+_TRAILING_STRAY_LETTER_RE = re.compile(r"\s+[IlL]$")
 _DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으면 detail 을 비운다
 _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
@@ -480,6 +491,7 @@ def _clean_observation_chunk(chunk: str) -> str:
     m = _FDA483_FOOTER_RE.search(text)
     if m:
         text = text[:m.start()]
+    text = _TRAILING_STRAY_LETTER_RE.sub("", text)
     text = re.sub(r"\s+", " ", text).strip(" :-\t\n")
     return text
 
@@ -492,7 +504,9 @@ def _clean_observation_detail(detail: str) -> str:
     text = re.sub(r"\s+", " ", detail or "").strip()
     m = _FDA483_FOOTER_RE.search(text)
     if m:
-        text = text[:m.start()].rstrip(" :-.\t")
+        # 주의: 여기서 `.` 를 rstrip 대상에서 제외한다(구버전은 " :-.\t" 로 마침표까지 잘라
+        # 정상 문장의 종결 마침표까지 날리는 부작용이 있었다 — 2026-07-12 hardening 에서 수정).
+        text = _TRAILING_STRAY_LETTER_RE.sub("", text[:m.start()]).rstrip(" :-\t")
     core = re.sub(r"^\s*specifically[,:]?\s*", "", text, flags=re.I)
     if len(re.sub(r"[^A-Za-z]", "", core)) < _DETAIL_MIN_ALPHA:
         return ""

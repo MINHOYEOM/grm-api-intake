@@ -336,6 +336,10 @@ class CardScaffold:
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
             # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
+            **({"source_excerpt_present": True} if raw.get("eca_article_excerpt") else {}),
+            # ^ [전문지 브리핑 v2 2026-07-13] resource note 요지 정직성 게이트(§3)용 boolean만—
+            # 영문 원문 대량 포함 금지(발행물 경량 유지). ENABLE_ECA_ARTICLE_EXCERPT off/부재
+            # 시 이 키 자체가 없다(기존 golden 바이트 불변).
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -1157,6 +1161,10 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         # (있으면 우선). 구조화 사유(위) 뒤 · 링크텍스트/표지(subject·anchor_text 등) 앞 —
         # "왜"를 살린다. 세 키는 WHO-inspection/WL/FDA-483 외엔 부재 → 기존 golden _first 불변.
         raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"), raw.get("fda483_excerpt"),
+        # [전문지 브리핑 v2 2026-07-13] ECA 기사 본문 excerpt(ENABLE_ECA_ARTICLE_EXCERPT
+        # on 시만 부재 → 기존 golden 불변). rss-news 카드의 RSS 요약(description)보다 우선해
+        # Routine summary 가 실기사 본문을 근거로 쓰도록 한다.
+        raw.get("eca_article_excerpt"),
         raw.get("abstract"), raw.get("subject"), raw.get("section_title"),
         raw.get("anchor_text"), raw.get("description"),
     )
@@ -1183,7 +1191,7 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "w2_facts": {label: value for label, value in _w2_rows(kind, row, raw)},
         "body_excerpt": _truncate_at_sentence(
             _first(raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
-                   raw.get("fda483_excerpt"),
+                   raw.get("fda483_excerpt"), raw.get("eca_article_excerpt"),
                    raw.get("description"), raw.get("summary"), row.get("body")), 300),
     }
 

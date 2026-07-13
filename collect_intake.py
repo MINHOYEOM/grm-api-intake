@@ -356,6 +356,17 @@ WL_BODY_FETCH_TIMEOUT = 20
 # Actions) 단계 비용은 HTTP GET 1회뿐이라 상한을 넉넉히 잡아도 부담이 없다(LLM 비용은 fan-out
 # 단계에서 카드별로 격리 — collect_intake 는 저장만 한다). 실패는 graceful(키 미기록).
 WL_BODY_FULL_MAX_CHARS = 20000
+
+# [전문지 브리핑 v2 2026-07-13] ECA 기사(gmp-compliance.org) 본문 흡수 — Routine summary 가
+# 실기사 본문을 근거로 작성되도록 prose_input 을 풍부화(flag 게이트 ENABLE_ECA_ARTICLE_EXCERPT,
+# 기본 off). off 면 collect_eca_rss 는 기존과 완전 동일(호출 자체가 없음 → 골든 바이트 불변).
+# on 이어도 403/timeout 은 조용히 skip(WARN 로그 1줄, 카드는 기존 메타 그대로) — Routine 환경
+# 403 이력이 있어 runner 에서도 막힐 가능성을 대비한 graceful 필수 요구.
+ECA_ARTICLE_EXCERPT_MAX_CHARS = 1200
+ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT = 15
+ECA_ARTICLE_EXCERPT_DELAY_SECONDS = 1.0
+ECA_ARTICLE_EXCERPT_CAP = 10          # 실행당 fetch 상한(ECA 는 주 소수 항목 — 비용 낮음)
+
 # 표지/머리말 보일러플레이트를 건너뛰고 위반 서술부터 자르기 위한 영문 앵커. 대소문자 무시(re.I).
 # 2-tier 선별(2026-06-18): 위반 서술을 직접 가리키는 1차 앵커가 본문에 있으면 그 가장 이른
 # 위치를 쓰고, 없을 때만 일반 머리말 폴백 앵커로 내려간다. (종전엔 전 앵커 통합 최이른 위치라
@@ -1604,10 +1615,72 @@ def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | No
     return collect_rss_feed(_PICS_FEED_SPEC, start, end)
 
 
+def _extract_eca_article_excerpt(html_text: str) -> str:
+    """gmp-compliance.org 기사 HTML → 본문 excerpt(≤1200자).
+
+    간단·보수적 추출: script/style/nav/header/footer 제거 후 `<p>` 태그 텍스트만 이어붙인다
+    (구조 파싱 불요 — 사이트 마크업 변경에 강건). 앵커 탐색 없이 문서 처음부터 순서대로 결합.
+    """
+    text = html_text or ""
+    text = re.sub(r"(?is)<(script|style|nav|header|footer)[^>]*>.*?</\1>", " ", text)
+    paras = re.findall(r"(?is)<p[^>]*>(.*?)</p>", text)
+    parts: list[str] = []
+    for p in paras:
+        t = re.sub(r"(?s)<[^>]+>", " ", p)
+        t = _html_unescape(t)
+        t = re.sub(r"\s+", " ", t).strip()
+        if t:
+            parts.append(t)
+    joined = " ".join(parts).strip()
+    return joined[:ECA_ARTICLE_EXCERPT_MAX_CHARS].strip()
+
+
+def _fetch_eca_article_excerpt(url: str) -> str:
+    """ECA 기사 페이지 fetch → 본문 excerpt. 실패(403/timeout/네트워크)는 graceful("")."""
+    try:
+        resp = requests.get(url, timeout=ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT, headers={
+            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+            "Accept": "text/html",
+        })
+        if resp.status_code == 403:
+            log("WARN", f"ECA 기사 본문 403 — excerpt 건너뜀(카드 그대로): {truncate(url, 80)}")
+            return ""
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        log("WARN", f"ECA 기사 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
+        return ""
+    excerpt = _extract_eca_article_excerpt(resp.text)
+    if not excerpt:
+        log("INFO", f"ECA 기사 본문 <p> 텍스트 미발견 — 카드 그대로: {truncate(url, 80)}")
+    return excerpt
+
+
 def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """ECA Academy(gmp-compliance.org) RSS 수집. Source Type: Expert Secondary.
-    403 발생 시 운영 경고 없이 진행(Expert Secondary 허용 정책)."""
-    return collect_rss_feed(_ECA_FEED_SPEC, start, end)
+    403 발생 시 운영 경고 없이 진행(Expert Secondary 허용 정책).
+
+    [전문지 브리핑 v2 2026-07-13] ENABLE_ECA_ARTICLE_EXCERPT=true 시 항목별 기사 URL
+    (official_url)을 추가 fetch 해 본문 excerpt(≤1200자)를 raw_payload["eca_article_excerpt"]
+    에 싣는다(cap 10건·per-item delay 1s·403/timeout 은 조용히 skip). 기본 off — off 면 이
+    블록 자체가 실행되지 않아 산출물이 기존과 byte 동일(§4 골든 불변 하드 요구).
+    """
+    items, err = collect_rss_feed(_ECA_FEED_SPEC, start, end)
+    if items and env_flag("ENABLE_ECA_ARTICLE_EXCERPT"):
+        capped = False
+        for i, item in enumerate(items):
+            if i >= ECA_ARTICLE_EXCERPT_CAP:
+                if not capped:
+                    log("WARN", f"ECA 기사 excerpt cap({ECA_ARTICLE_EXCERPT_CAP}) 도달 — "
+                                "나머지 항목은 excerpt 없이 유지")
+                    capped = True
+                break
+            if not item.official_url:
+                continue
+            time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
+            excerpt = _fetch_eca_article_excerpt(item.official_url)
+            if excerpt:
+                item.raw_payload["eca_article_excerpt"] = excerpt
+    return items, err
 
 
 # ─────────────────────────────────────────────────────────────────────────────

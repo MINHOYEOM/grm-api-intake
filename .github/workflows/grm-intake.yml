@@ -212,6 +212,10 @@ jobs:
           ENABLE_WL_BODY_FULL: ${{ vars.ENABLE_WL_BODY_FULL || 'false' }}
           # [소스확장 2026-07-02] 행정처분 다단락 Body 확보 = deep_analysis(admin) 대상. WL_BODY_FULL 과 동형·기본 off(활성=repo 변수).
           ENABLE_MFDS_ADMIN_BODY_FULL: ${{ vars.ENABLE_MFDS_ADMIN_BODY_FULL || 'false' }}
+          # [전문지 브리핑 v2 2026-07-13] ECA 기사(gmp-compliance.org) 본문 흡수 = Routine
+          # summary 입력 풍부화(§ECA 본문 흡수). WL_BODY_FULL 과 동형·기본 off(활성=repo 변수).
+          # 실패(403/timeout)는 collect_eca_rss 내부에서 graceful — 이 워크플로 단계는 무관.
+          ENABLE_ECA_ARTICLE_EXCERPT: ${{ vars.ENABLE_ECA_ARTICLE_EXCERPT || 'false' }}
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
@@ -365,7 +369,7 @@ jobs:
                 '2. Notion DB 스키마 (속성 이름·타입)',
                 '3. Federal Register / OpenFDA / RSS / FDA WL / MFDS / ICH / WHO / Health Canada 상태',
                 '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY, MFDS_HTTP_PROXY, LAW_GO_KR_OC)',
-                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_LAW, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_CERT, ENABLE_MFDS_SAFETY_LETTER, ENABLE_MFDS_GMP_INSPECTION, ENABLE_GMP_DEFICIENCY_TABLE, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_FDA_483, ENABLE_FDA_483_OBSERVATIONS, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_WHOPIR_EXCERPT, ENABLE_WL_BODY, ENABLE_WL_BODY_FULL, ENABLE_MFDS_ADMIN_BODY_FULL, ENABLE_MODALITY_TAG, MFDS_RSS_BOARD_MODE, MFDS_RSS_BOARD_IDS) 설정 확인',
+                '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_LAW, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_CERT, ENABLE_MFDS_SAFETY_LETTER, ENABLE_MFDS_GMP_INSPECTION, ENABLE_GMP_DEFICIENCY_TABLE, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_FDA_483, ENABLE_FDA_483_OBSERVATIONS, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_WHOPIR_EXCERPT, ENABLE_WL_BODY, ENABLE_WL_BODY_FULL, ENABLE_MFDS_ADMIN_BODY_FULL, ENABLE_ECA_ARTICLE_EXCERPT, ENABLE_MODALITY_TAG, MFDS_RSS_BOARD_MODE, MFDS_RSS_BOARD_IDS) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',

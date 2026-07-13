@@ -133,7 +133,7 @@ jobs:
       # §1-B 영구배선: job-level 로 둬 collector(산출)와 upload 스텝(조건/경로)이 동일 값을
       # 본다(step-scoped env 는 타 스텝서 미해석 — grm-web-deploy runner.temp 버그 교훈).
       # inputs/vars/github 컨텍스트는 job-level env 에서 해석 가능(runner.* 는 불가와 구분).
-      ENABLE_WEB_BRIEF_EMIT: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_web_brief_emit) || vars.ENABLE_WEB_BRIEF_EMIT || 'false' }}
+      ENABLE_WEB_BRIEF_EMIT: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_web_brief_emit) && 'true' || vars.ENABLE_WEB_BRIEF_EMIT || 'false' }}
       GRM_WEB_BRIEF_DIR: ${{ vars.GRM_WEB_BRIEF_DIR || '.' }}
 
     steps:
@@ -215,8 +215,10 @@ jobs:
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
-          # K3 handoff v2 (scaffold/slots). 기본 off — schedule는 vars 미설정 시 v1 경로 유지.
-          ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_handoff_v2) || vars.ENABLE_HANDOFF_V2 || 'false' }}
+          # K3 handoff v2 (scaffold/slots). ★수동 dispatch 도 입력 미설정 시 vars 로 폴백한다
+          # (2026-07-13: 수집 실패 후 수동 재실행이 입력 없이 v1 handoff 를 만들어 v16 Routine 이
+          # schema v1 하드가드로 중단됐다 — schedule 은 vars=true 로 v2 인데 수동만 v1 로 갈리는 함정).
+          ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_handoff_v2) && 'true' || vars.ENABLE_HANDOFF_V2 || 'false' }}
           # PL-10b/B1 멱등성 근본해결 (Handoff Ref 상태기계). 기본 off — schedule는 vars
           # 미설정 시 v1(날짜 윈도우+K4-1) 유지. 속성 미생성 상태로 켜도 preflight 가
           # 그 실행만 v1 폴백(graceful degrade) + health warning.

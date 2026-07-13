@@ -23,7 +23,7 @@ on:
         type: string
         default: '7'
       sources:
-        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds ich who hc none). 비우면 전체'
+        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe none). 비우면 전체'
         type: string
         default: ''
       handoff_doc_ids:
@@ -84,6 +84,10 @@ on:
         default: true
       enable_fda483_observations:
         description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
+        type: boolean
+        default: false
+      enable_ispe:
+        description: 'ISPE iSpeak RSS 수집 활성화 (기본: vars.ENABLE_ISPE 또는 false)'
         type: boolean
         default: false
       enable_moleg_api:
@@ -203,6 +207,8 @@ jobs:
           ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_observations) || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           # [483 분석층] 483 전문 확보 = deep_analysis fan-out 대상. Observation 결정론과 독립·기본 off(활성=repo 변수).
           ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
+          # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS 수집 — opt-in Expert Secondary.
+          ENABLE_ISPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_ispe) || vars.ENABLE_ISPE || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
@@ -216,6 +222,8 @@ jobs:
           # summary 입력 풍부화(§ECA 본문 흡수). WL_BODY_FULL 과 동형·기본 off(활성=repo 변수).
           # 실패(403/timeout)는 collect_eca_rss 내부에서 graceful — 이 워크플로 단계는 무관.
           ENABLE_ECA_ARTICLE_EXCERPT: ${{ vars.ENABLE_ECA_ARTICLE_EXCERPT || 'false' }}
+          # [전문지 브리핑 소스확장] ISPE 기사 본문 흡수 — ECA_ARTICLE_EXCERPT 와 동형·기본 off(활성=repo 변수).
+          ENABLE_ISPE_ARTICLE_EXCERPT: ${{ vars.ENABLE_ISPE_ARTICLE_EXCERPT || 'false' }}
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
@@ -257,7 +265,7 @@ jobs:
             if [ -n "$GRM_SOURCES" ]; then
               # 쉼표도 공백으로 처리. 허용된 source 토큰만 --sources 인자로 전달.
               read -r -a SOURCE_TOKENS <<< "$(printf '%s' "$GRM_SOURCES" | tr ',' ' ')"
-              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc none)
+              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc ispe none)
               source_args=()
               for src in "${SOURCE_TOKENS[@]}"; do
                 ok=false

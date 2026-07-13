@@ -139,6 +139,8 @@ flowchart TD
 | 보조 | 관심업체 통지(environment 승인 필요) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | **있음(승인)** |
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST | 없음 |
 
+**사람 개입 지점은 정확히 3개다**: ⓐ claude.ai Routine 주간 스케줄(월 07:30 KST)이 활성인지 주기 확인(세션·코드에서 접근 불가 — 사람만 볼 수 있음) ⓑ 월요일 낮 **Admin 승인 1클릭**(프리뷰 확인 후 머지 = 라이브) ⓒ 백업 레이어를 쓰는 주라면 월요일 아침 데스크톱 ON(로컬 예약 태스크 전제). 이 밖의 모든 단계는 무인이며, 각 단계의 방어선·멱등성은 `docs/GRM_자동화지도_2026-07.md` §7~§9 참조.
+
 ### 3.3 핵심 개념
 - **Signal Tier(신호 강도):** Tier 3(우선 카드화·고위험) / Tier 2(참고) / Tier 1(로그만).
 - **Evidence Level(근거 등급):** A(1차 공식문서 직접 확인 — 원문 인용 허용) / B(공식 인덱스+보조) / C(보조 단독) / D(예정·Watch).

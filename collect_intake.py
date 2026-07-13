@@ -142,6 +142,7 @@ from grm_common import (
     SOURCE_HANDOFF,
     SOURCE_HC,
     SOURCE_ICH,
+    SOURCE_ISPE,
     SOURCE_MFDS,
     SOURCE_MHRA,
     SOURCE_PICS,
@@ -318,6 +319,8 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_BRAVE:   SRC_TYPE_SEARCH_RESULT,
     SOURCE_RAPS:    SRC_TYPE_EXPERT_SECONDARY,
     SOURCE_EPR:     SRC_TYPE_EXPERT_SECONDARY,
+    # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그 — ECA 와 동일 분류
+    SOURCE_ISPE:    SRC_TYPE_EXPERT_SECONDARY,
 }
 
 # RSS / HTML 엔드포인트 (v15.1 추가)
@@ -336,6 +339,9 @@ MHRA_RSS_URL = "https://mhrainspectorate.blog.gov.uk/feed/"   # Atom 형식
 MHRA_ALERT_RSS_URL = "https://www.gov.uk/drug-device-alerts.atom"
 PICS_RSS_URL = "https://picscheme.org/rss/general_en.rss"
 ECA_RSS_URL  = "https://app.gxp-services.net/eca_newsfeed.xml"
+# [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그(Drupal RSS 2.0). excerpt cap/delay/
+# max-chars 는 별도 상수를 만들지 않고 ECA_ARTICLE_EXCERPT_* 를 그대로 재사용(값 동일 정책).
+ISPE_RSS_URL = "https://ispe.org/pharmaceutical-engineering/ispeak-blogs/rss.xml"
 FDA_WL_URL   = (
     "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations"
     "/compliance-actions-and-activities/warning-letters"
@@ -644,6 +650,13 @@ class CollectionStats:
     fda483_observations_extracted: int = 0
     fda483_observations_failed: int = 0
     fda483_observations_warnings: list[str] = field(default_factory=list)
+    # ── [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS (ENABLE_ISPE, 기본 off) ──────
+    ispe_fetched: int = 0
+    ispe_inserted: int = 0
+    ispe_skipped_dup: int = 0
+    ispe_insert_failed: int = 0
+    ispe_error: bool = False
+    ispe_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -660,6 +673,7 @@ class CollectionStats:
             + self.who_insert_failed
             + self.hc_insert_failed
             + self.fda483_insert_failed
+            + self.ispe_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -686,6 +700,7 @@ class CollectionStats:
             or self.who_error
             or self.hc_error
             or self.fda483_error
+            or self.ispe_error
         )
 
     def summary(self) -> str:
@@ -758,6 +773,9 @@ class CollectionStats:
             f"483  fetched={self.fda483_fetched}  inserted={self.fda483_inserted}  "
             f"skip_dup={self.fda483_skipped_dup}  failed={self.fda483_insert_failed}  "
             f"error={self.fda483_error}",
+            f"ISPE fetched={self.ispe_fetched}  inserted={self.ispe_inserted}  "
+            f"skip_dup={self.ispe_skipped_dup}  failed={self.ispe_insert_failed}  "
+            f"error={self.ispe_error}",
         ]
         return "\n".join(lines)
 
@@ -800,6 +818,7 @@ class RunConfig:
     enable_hc: bool
     enable_fda483: bool
     enable_fda483_observations: bool
+    enable_ispe: bool
     enable_moleg_api: bool
     enable_scrape: bool
     modality_requested: bool
@@ -850,6 +869,7 @@ class RunConfig:
             enable_hc=env_flag("ENABLE_HC") or "hc" in active,
             enable_fda483=env_flag("ENABLE_FDA_483") or "fda483" in active,
             enable_fda483_observations=env_flag("ENABLE_FDA_483_OBSERVATIONS"),
+            enable_ispe=env_flag("ENABLE_ISPE") or "ispe" in active,
             enable_moleg_api=env_flag("ENABLE_MOLEG_API"),
             enable_scrape=env_flag("ENABLE_SCRAPE"),
             modality_requested=env_flag("ENABLE_MODALITY_TAG"),
@@ -1563,6 +1583,90 @@ def _extract_eca(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemField
     )
 
 
+# [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak(Drupal) RSS teaser <description> 정제.
+# 실측 구조: 저자 span·<time>·story-type div("iSpeak Blog")·<h1> 제목 중복·배너 <img> 가
+# 섞인 노드 teaser HTML 전체이며, 실제 요약문은 field--name-field-description div 안에 있다.
+_ISPE_FIELD_DESCRIPTION_RE = re.compile(
+    r'(?is)<div[^>]*class="[^"]*field--name-field-description[^"]*"[^>]*>(.*?)</div>'
+)
+
+
+def _ispe_teaser_text(html: str) -> str:
+    """ISPE Drupal teaser HTML → 정제 요약 텍스트(≤800자, 순수 함수·무의존).
+
+    1) field--name-field-description div 내부 텍스트를 regex 로 우선 추출(dotall·태그
+       제거·`_html_unescape`·공백 collapse) — 실제 요약문 위치.
+    2) 미발견 시 전체에서 태그 제거 후 정제하는 폴백. 저자명/날짜/story-type("iSpeak
+       Blog")/제목 중복이 앞쪽에 섞일 수 있으나, 이 폴백 경로는 완벽 제거를 시도하지
+       않는다(보수적·결정론 우선) — 800자 절단으로 노이즈 비중을 낮춘다.
+    """
+    text = html or ""
+    m = _ISPE_FIELD_DESCRIPTION_RE.search(text)
+    if m:
+        inner = re.sub(r"(?s)<[^>]+>", " ", m.group(1))
+        inner = _html_unescape(inner)
+        inner = re.sub(r"\s+", " ", inner).strip()
+        if inner:
+            return inner[:800].strip()
+    fallback = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", text)
+    fallback = re.sub(r"(?s)<[^>]+>", " ", fallback)
+    fallback = _html_unescape(fallback)
+    fallback = re.sub(r"\s+", " ", fallback).strip()
+    return fallback[:800].strip()
+
+
+def _extract_ispe(el: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
+    # RSS 2.0 태그 우선, Atom 폴백(_extract_eca 와 동형 — ISPE 는 실측상 RSS2 전용이나
+    # 방어적으로 동일 패턴 유지).
+    title = (
+        _rss_text(el.find("title"))
+        or _atom_text(el, "title")
+    )
+    link = (
+        _rss_text(el.find("link"))
+        or _atom_link(el)
+    )
+    pub_raw = (
+        _rss_text(el.find("pubDate"))
+        or _rss_text(el.find("pubdate"))
+        or _rss_text(el.find(f"{{{_NS_ATOM}}}published"))
+        or _rss_text(el.find("published"))
+    )
+    date_iso = (
+        _parse_rss2_date(pub_raw) if pub_raw
+        else _parse_atom_date(pub_raw)
+    )
+    description_raw = (
+        _rss_text(el.find("description"))
+        or _atom_text(el, "summary")
+    )
+    description = _ispe_teaser_text(description_raw)
+    guid_el = el.find("guid")
+    guid    = _rss_text(guid_el) or link
+    return _RssItemFields(
+        title=title, link=link, date_iso=date_iso, description=description,
+        category="", type_or_class="GMP News", guid=guid,
+        raw_payload={
+            "title": title, "link": link,
+            "pubDate": pub_raw, "description": description, "guid": guid,
+        },
+    )
+
+
+def _is_ispe_gmp_relevant(f: _RssItemFields) -> bool:
+    """ISPE iSpeak keep_item — 협회 홍보성 항목(Board of Directors 후보 소개·Member
+    Spotlight·Affiliate 소식·컨퍼런스 홍보 등, 실측 약 55%)을 걸러내고 GMP/품질 관련
+    항목(water system GMP·batch disposition·GxP validation·Part 11 audit trail·QRM 등,
+    약 45%)만 채택한다.
+
+    새 키워드 리스트를 발명하지 않고 grm_taxonomy.compute_relevance 어휘를 그대로
+    재사용한다(어휘 단일원천). MHRA alert keep_item(_is_mhra_medicines_alert) 선례와
+    동일 철학으로 정밀도를 우선 — Board 후보/Member Spotlight 류는 카테고리 키워드
+    미매칭 → "Pending" 판정 → 탈락.
+    """
+    return compute_relevance(f.title, f.description) in ("Likely", "Possible")
+
+
 _EMA_FEED_SPEC = RssFeedSpec(
     source=SOURCE_EMA, source_type=SRC_TYPE_OFFICIAL_API, label="EMA RSS",
     feeds=tuple(EMA_RSS_FEEDS.items()),
@@ -1591,6 +1695,14 @@ _ECA_FEED_SPEC = RssFeedSpec(
     feeds=(("eca", ECA_RSS_URL),),
     iter_items=_rss2_or_atom_items, extract=_extract_eca,
     http_silent=True,
+)
+# [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그 — ECA 와 동일 분류(Expert
+# Secondary)이되 keep_item 으로 협회 홍보성 항목을 걸러낸다(설계 결정 §2 정밀도 우선).
+_ISPE_FEED_SPEC = RssFeedSpec(
+    source=SOURCE_ISPE, source_type=SRC_TYPE_EXPERT_SECONDARY, label="ISPE RSS",
+    feeds=(("ispe", ISPE_RSS_URL),),
+    iter_items=_rss2_or_atom_items, extract=_extract_ispe,
+    http_silent=True, keep_item=_is_ispe_gmp_relevant,
 )
 
 
@@ -1635,24 +1747,38 @@ def _extract_eca_article_excerpt(html_text: str) -> str:
     return joined[:ECA_ARTICLE_EXCERPT_MAX_CHARS].strip()
 
 
-def _fetch_eca_article_excerpt(url: str) -> str:
-    """ECA 기사 페이지 fetch → 본문 excerpt. 실패(403/timeout/네트워크)는 graceful("")."""
+def _fetch_article_excerpt(url: str, log_label: str) -> str:
+    """전문지 기사 페이지 fetch → 본문 excerpt(_extract_eca_article_excerpt 재사용 — 내용
+    무관 제네릭 <p> 결합 방식이라 ECA 외 소스에도 그대로 쓸 수 있다). 실패(403/timeout/
+    네트워크)는 graceful("").
+
+    [전문지 브리핑 소스확장 2026-07-13] `_fetch_eca_article_excerpt` 본문을 여기로
+    옮기고 log_label 로 소스별 로그 문구를 조립한다 — ECA 는 f"{log_label} 기사 본문 403
+    — ..." = "ECA 기사 본문 403 — ..." 로 기존과 byte 동일(회귀 tests/test_eca_article_excerpt.py
+    보존).
+    """
     try:
         resp = requests.get(url, timeout=ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
             "Accept": "text/html",
         })
         if resp.status_code == 403:
-            log("WARN", f"ECA 기사 본문 403 — excerpt 건너뜀(카드 그대로): {truncate(url, 80)}")
+            log("WARN", f"{log_label} 기사 본문 403 — excerpt 건너뜀(카드 그대로): {truncate(url, 80)}")
             return ""
         resp.raise_for_status()
     except requests.RequestException as e:
-        log("WARN", f"ECA 기사 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
+        log("WARN", f"{log_label} 기사 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
         return ""
     excerpt = _extract_eca_article_excerpt(resp.text)
     if not excerpt:
-        log("INFO", f"ECA 기사 본문 <p> 텍스트 미발견 — 카드 그대로: {truncate(url, 80)}")
+        log("INFO", f"{log_label} 기사 본문 <p> 텍스트 미발견 — 카드 그대로: {truncate(url, 80)}")
     return excerpt
+
+
+def _fetch_eca_article_excerpt(url: str) -> str:
+    """ECA 기사 페이지 fetch → 본문 excerpt. 얇은 래퍼 — tests/test_eca_article_excerpt.py
+    가 이 심볼명을 직접 호출/패치하므로 시그니처 불변 유지."""
+    return _fetch_article_excerpt(url, "ECA")
 
 
 def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -1680,6 +1806,36 @@ def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             excerpt = _fetch_eca_article_excerpt(item.official_url)
             if excerpt:
                 item.raw_payload["eca_article_excerpt"] = excerpt
+    return items, err
+
+
+def collect_ispe_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+    """ISPE iSpeak(ispe.org) 블로그 RSS 수집. Source Type: Expert Secondary. keep_item
+    관련성 필터(_is_ispe_gmp_relevant)로 협회 홍보성 항목을 배제한다(설계 결정 §2).
+
+    [전문지 브리핑 소스확장 2026-07-13] ENABLE_ISPE_ARTICLE_EXCERPT=true 시 항목별 기사
+    URL(official_url)을 추가 fetch 해 본문 excerpt(≤1200자)를
+    raw_payload["article_excerpt"](제네릭 키 — 설계 결정 §3, ECA 의 "eca_article_excerpt"
+    와 별개)에 싣는다. cap/delay/max-chars 는 ECA_ARTICLE_EXCERPT_* 상수를 그대로
+    재사용한다(별도 상수 미신설 — 값 동일 정책: cap 10건·delay 1s·1200자). 기본 off —
+    off 면 이 블록 자체가 실행되지 않아 산출물이 기존과 byte 동일(§4 골든 불변 하드 요구).
+    """
+    items, err = collect_rss_feed(_ISPE_FEED_SPEC, start, end)
+    if items and env_flag("ENABLE_ISPE_ARTICLE_EXCERPT"):
+        capped = False
+        for i, item in enumerate(items):
+            if i >= ECA_ARTICLE_EXCERPT_CAP:
+                if not capped:
+                    log("WARN", f"ISPE 기사 excerpt cap({ECA_ARTICLE_EXCERPT_CAP}) 도달 — "
+                                "나머지 항목은 excerpt 없이 유지")
+                    capped = True
+                break
+            if not item.official_url:
+                continue
+            time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
+            excerpt = _fetch_article_excerpt(item.official_url, "ISPE")
+            if excerpt:
+                item.raw_payload["article_excerpt"] = excerpt
     return items, err
 
 
@@ -2193,7 +2349,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
 # ich/mfds 는 opt-in feature flag 소스라 _ALL_SOURCES(기본 all)엔 넣지 않되,
 # --sources 선택지와 handoff source 매핑에는 포함한다.
-_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "fda483", "none"]
+_SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "fda483", "ispe", "none"]
 _SOURCE_TOKEN_TO_NOTION = {
     "fr": SOURCE_FR,
     "recall": SOURCE_RECALL,
@@ -2207,6 +2363,7 @@ _SOURCE_TOKEN_TO_NOTION = {
     "who": SOURCE_WHO,
     "hc": SOURCE_HC,
     "fda483": SOURCE_FDA_483,
+    "ispe": SOURCE_ISPE,
 }
 
 
@@ -2277,6 +2434,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     enable_who = cfg.enable_who
     enable_hc = cfg.enable_hc
     enable_fda483 = cfg.enable_fda483
+    enable_ispe = cfg.enable_ispe
     stats = CollectionStats()
 
     # ── Phase 1: Official API ──────────────────────────────────────────────
@@ -2610,6 +2768,21 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     else:
         log("INFO", "ENABLE_FDA_483=false — FDA 483 수집 건너뜀")
 
+    # ── [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS (ENABLE_ISPE=true 또는
+    # --sources ispe) — opt-in Expert Secondary. keep_item 관련성 필터로 협회 홍보성
+    # 항목(Board 후보·Member Spotlight 등)을 차단한다(정밀도 우선). ────────────────
+    ispe_items: list[IntakeItem] = []
+    if enable_ispe:
+        log("INFO", "=== ISPE 수집 시작 ===")
+        ispe_items, ispe_err = collect_ispe_rss(start, end)
+        stats.ispe_fetched = len(ispe_items)
+        if ispe_err:
+            stats.ispe_error = True
+            stats.ispe_error_msg = ispe_err
+            log("WARN", f"ISPE 오류: {ispe_err}")
+    else:
+        log("INFO", "ENABLE_ISPE=false — ISPE 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.mhra_alert_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
@@ -2621,7 +2794,8 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
                      + stats.ich_fetched
                      + stats.who_fetched
                      + stats.hc_fetched
-                     + stats.fda483_fetched)
+                     + stats.fda483_fetched
+                     + stats.ispe_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
@@ -2635,9 +2809,12 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         f"MFDS-SafetyLetter={stats.mfds_safety_letter_fetched} · "
         f"MFDS-GMPInspection={stats.mfds_gmp_inspection_fetched} · "
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
-        f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · 합계={total_fetched}건"
+        f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · "
+        f"ISPE={stats.ispe_fetched} · 합계={total_fetched}건"
     ))
-    return (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items)
+    # ★배선 주의(PR#201/#233 교훈) — 반환 tuple 끝에 추가한 신규 소스 항목은
+    # main() 언패킹(~하단)에도 동일 위치로 반드시 반영할 것(누락 시 매 실행 NameError).
+    return (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items, ispe_items)
 
 
 def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
@@ -2656,6 +2833,7 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
     enable_who = cfg.enable_who
     enable_hc = cfg.enable_hc
     enable_fda483 = cfg.enable_fda483
+    enable_ispe = cfg.enable_ispe
     enable_search = cfg.enable_search
     health_json_path = cfg.health_json_path
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
@@ -2742,6 +2920,10 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                     f.write(_src_line("FDA 483", stats.fda483_fetched, stats.fda483_inserted,
                                       stats.fda483_skipped_dup, stats.fda483_insert_failed,
                                       stats.fda483_error, stats.fda483_error_msg))
+                if enable_ispe:
+                    f.write(_src_line("ISPE iSpeak RSS", stats.ispe_fetched, stats.ispe_inserted,
+                                      stats.ispe_skipped_dup, stats.ispe_insert_failed,
+                                      stats.ispe_error, stats.ispe_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -2832,6 +3014,7 @@ def main() -> int:
     enable_hc = cfg.enable_hc
     enable_fda483 = cfg.enable_fda483
     enable_fda483_observations = cfg.enable_fda483_observations
+    enable_ispe = cfg.enable_ispe
     enable_moleg_api = cfg.enable_moleg_api
     enable_scrape = cfg.enable_scrape
     event_name = cfg.event_name
@@ -2906,7 +3089,7 @@ def main() -> int:
      pics_items, eca_items,
      wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
      mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
-     ich_items, who_items, hc_items, fda483_items) = _run_collection(
+     ich_items, who_items, hc_items, fda483_items, ispe_items) = _run_collection(
         cfg, active, run_date, start, end, enf_start)
 
     # 3) Notion 기존 row (중복 제거)
@@ -3004,6 +3187,7 @@ def main() -> int:
         "mfds_gmp_inspection": mfds_gmp_inspection_items,
         "ich": ich_items, "who": who_items, "hc": hc_items,
         "fda483": fda483_items,
+        "ispe": ispe_items,
     }
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
@@ -3084,7 +3268,7 @@ def main() -> int:
                     wl_items, mfds_items, mfds_law_items, mfds_recall_items,
                     mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
                     mfds_gmp_inspection_items, ich_items, who_items, hc_items,
-                    fda483_items, search_items)
+                    fda483_items, search_items, ispe_items)
                 # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
                 # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
                 web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
@@ -3134,6 +3318,7 @@ def main() -> int:
         "ENABLE_HC": enable_hc,
         "ENABLE_FDA_483": enable_fda483,
         "ENABLE_FDA_483_OBSERVATIONS": enable_fda483_observations,
+        "ENABLE_ISPE": enable_ispe,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,

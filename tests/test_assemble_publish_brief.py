@@ -348,6 +348,39 @@ class ExtractResourceNotesTest(unittest.TestCase):
         self.assertEqual(events, cards)
         self.assertEqual(resources, [])
 
+    def test_ispe_news_separated_with_summary_present(self):
+        # [전문지 브리핑 소스확장 2026-07-13] ISPE 는 ECA 와 동일 조건(agency 게이트만 확장 —
+        # RESOURCE_AGENCIES=("ECA","ISPE"))으로 resource 분리된다. source_excerpt_present=True
+        # → summary 포함(§3 정직성 게이트 통과).
+        cards = [
+            self._card("fda-1", "FDA", card_type="Warning Letter"),
+            self._card("ispe-1", "ISPE", type_tag="GMP News", card_type="규제 소식",
+                       source_excerpt_present=True),
+        ]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual([c["id"] for c in events], ["fda-1"])
+        self.assertEqual(len(resources), 1)
+        r = resources[0]
+        self.assertEqual(r["id"], "ispe-1")
+        self.assertEqual(r["agency"], "ISPE")
+        self.assertEqual(r["type_tag"], "GMP News")
+        self.assertEqual(r["summary"], "ispe-1-summary")
+
+    def test_ispe_summary_omitted_when_source_excerpt_present_false(self):
+        cards = [self._card("ispe-2", "ISPE", type_tag="GMP News", card_type="규제 소식",
+                            source_excerpt_present=False)]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, [])
+        self.assertNotIn("summary", resources[0])
+
+    def test_ispe_summary_omitted_without_source_excerpt_present_key(self):
+        # 키 자체가 없는 경우(수집 RSS 가 제목만 준 얇은 입력)도 동일하게 summary 제거.
+        cards = [self._card("ispe-3", "ISPE", type_tag="GMP News", card_type="규제 소식")]
+        events, resources = apb.extract_resource_notes(cards)
+        self.assertEqual(events, [])
+        self.assertEqual(len(resources), 1)
+        self.assertNotIn("summary", resources[0])
+
 
 class ResourceNotesPipelineTest(unittest.TestCase):
     """[업계 브리핑 노트 2026-07-13] assemble_publish_brief 배선 — 0건/합집합 케이스.

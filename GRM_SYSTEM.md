@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.122` |
+| 문서 버전 | `v1.123` |
 | 최종 수정일 | 2026-07-13 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -149,7 +149,7 @@ flowchart TD
 - **듀얼 링크:** 모든 카드에 정보 출처(📰) + 공식 원본(📎). 모든 링크는 수집 근거(provenance)가 있어야 하며, 근거 없는 링크는 **발행 차단**(발행 전 게이트 + 발행 후 감사 이중 방어).
 - **Graceful degradation:** 수집기·Notion 장애로 handoff가 없어도 Routine은 WebSearch 단독 모드로 계속 동작.
 
-### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483)
+### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483 + ISPE)
 
 | # | 소스 | 채널 | 상태 |
 |---|---|---|---|
@@ -162,6 +162,7 @@ flowchart TD
 | 10 | WHO Prequalification (WHOPIR 실사보고서 등) | RSS + Drupal | 활성 |
 | 11 | Health Canada (약품 recall·safety) | 오픈데이터 JSON | 활성 |
 | 12 | FDA 483 (실사 Observation = 가장 깊은 결함 원본) | OII FOIA Reading Room + PDF | 활성 |
+| 13 | ISPE iSpeak (전문지 브리핑 — GMP/품질 관련 항목만 keep_item 필터) | RSS(Drupal) | Expert Secondary · `ENABLE_ISPE`(기본 off) |
 
 > **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용).
 

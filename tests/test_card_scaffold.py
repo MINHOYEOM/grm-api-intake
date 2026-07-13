@@ -1580,6 +1580,63 @@ class EcaArticleExcerptCardTest(unittest.TestCase):
                             without_excerpt.prose_input["issue_or_reason"])
 
 
+class IspeArticleExcerptCardTest(unittest.TestCase):
+    """[전문지 브리핑 소스확장 2026-07-13] `raw.article_excerpt`(제네릭 키 — 설계 결정 §3,
+    ECA 의 "eca_article_excerpt" 와 별개) 배선 — EcaArticleExcerptCardTest 와 동형이나
+    비ECA 전문지(ISPE 등)가 쓰는 제네릭 키를 검증한다. 실제로는 collect_ispe_rss 만
+    채우지만 배선 자체는 kind='rss-news' 공통이라 fixture agency 는 무관.
+    """
+
+    def test_source_excerpt_present_when_generic_key_set(self) -> None:
+        fx = _load_input("rss_news_mhra")
+        raw = dict(fx["raw"])
+        raw["article_excerpt"] = ("Pharmaceutical water systems require a lifecycle "
+                                  "approach to GMP compliance.")
+        card = cs.build_card_scaffold(fx["row"], raw)
+        webcard = card.to_web_card()
+        self.assertIs(webcard["source_excerpt_present"], True)
+
+    def test_source_excerpt_present_absent_without_any_key(self) -> None:
+        # golden 불변 하드 요구 — eca_article_excerpt/article_excerpt 둘 다 없으면
+        # 웹카드에 이 필드 자체가 없다.
+        fx = _load_input("rss_news_mhra")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        self.assertNotIn("source_excerpt_present", card.to_web_card())
+
+    def test_article_excerpt_feeds_issue_or_reason_and_body(self) -> None:
+        fx = _load_input("rss_news_mhra")
+        raw = dict(fx["raw"])
+        excerpt = ("Pharmaceutical water systems require a lifecycle approach to GMP "
+                   "compliance, from design qualification through ongoing monitoring.")
+        raw["article_excerpt"] = excerpt
+        card = cs.build_card_scaffold(fx["row"], raw)
+        # excerpt 가 RSS 요약(raw['summary'])보다 우선해 issue_or_reason/body_excerpt 선두.
+        self.assertTrue(excerpt.startswith(card.prose_input["issue_or_reason"][:30]))
+        self.assertNotEqual(card.prose_input["issue_or_reason"], fx["raw"]["summary"])
+        self.assertTrue(card.prose_input["body_excerpt"])
+
+    def test_eca_key_still_takes_priority_over_generic_key(self) -> None:
+        # _first 체인 순서 — eca_article_excerpt 가 article_excerpt 보다 앞(§3 설계 결정,
+        # ECA 전용 키 이름 유지 요구와 일관).
+        fx = _load_input("rss_news_mhra")
+        raw = dict(fx["raw"])
+        raw["eca_article_excerpt"] = "ECA excerpt text takes priority."
+        raw["article_excerpt"] = "Generic excerpt text should not win."
+        card = cs.build_card_scaffold(fx["row"], raw)
+        self.assertTrue(card.prose_input["issue_or_reason"].startswith("ECA excerpt text"))
+
+    def test_article_excerpt_does_not_change_rendered_markdown(self) -> None:
+        # excerpt 는 prose_input(JSON 슬롯 입력)만 바꾸고 렌더 markdown 은 불변(골든 불변).
+        fx = _load_input("rss_news_mhra")
+        without_excerpt = cs.build_card_scaffold(fx["row"], fx["raw"])
+        raw_with = dict(fx["raw"])
+        raw_with["article_excerpt"] = "Some fetched ISPE article body excerpt text."
+        with_excerpt = cs.build_card_scaffold(fx["row"], raw_with)
+        self.assertEqual(with_excerpt.markdown, without_excerpt.markdown)
+        self.assertNotEqual(with_excerpt.prose_input["issue_or_reason"],
+                            without_excerpt.prose_input["issue_or_reason"])
+
+
 class DeterministicDetailTest(unittest.TestCase):
     """[상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 슬롯 additive 회귀.
 

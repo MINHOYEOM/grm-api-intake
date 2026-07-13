@@ -27,6 +27,7 @@ from grm_common import (
     SOURCE_EPR,
     SOURCE_FDA_WL,
     SOURCE_FR,
+    SOURCE_ISPE,
     SOURCE_MFDS,
     SOURCE_MHRA,
     SOURCE_PICS,
@@ -416,6 +417,8 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         SOURCE_BRAVE:   "BRV",
         SOURCE_RAPS:    "RAPS",
         SOURCE_EPR:     "EPR",
+        # [전문지 브리핑 소스확장 2026-07-13]
+        SOURCE_ISPE:    "ISPE",
     }
     prefix = _prefix_map.get(item.source, item.source)
     if item.source in (SOURCE_RECALL, SOURCE_FDA_WL):

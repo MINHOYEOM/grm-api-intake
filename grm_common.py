@@ -425,6 +425,7 @@ SOURCE_HANDOFF = "GRM Handoff"
 SOURCE_BRAVE = "Brave Search"
 SOURCE_RAPS  = "RAPS"
 SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
+SOURCE_ISPE  = "ISPE"   # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그 RSS
 NOTION_RICH_TEXT_CHUNK = 1900  # 2000 한도, 여유 100
 
 
@@ -470,6 +471,7 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("who", "WHO"),
     IntakeSourceSpec("hc", "Health Canada"),
     IntakeSourceSpec("fda483", "FDA 483"),
+    IntakeSourceSpec("ispe", "ISPE iSpeak RSS"),
     IntakeSourceSpec("search", "Brave Search"),
 )
 

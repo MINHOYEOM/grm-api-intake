@@ -44,8 +44,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "클린룸 구축 시 혼동되기 쉬운 커미셔닝(기술적 작동성 확인)·분류(ISO 14644-1 입자농도 측정)·적격성평가(실제 공정조건 종합평가)의 개념 차이를 정리한 해설."
+    }
    },
    {
     "id": "1bec7d3ecad4",
@@ -61,8 +60,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "ICH Q7 가이드라인 Part 2 해설로, 원료의약품(API) 제조의 공정관리·오염관리·검증·변경관리·일탈·불만처리·위탁업체 관리 등 GMP 요건을 정리."
+    }
    },
    {
     "id": "40e62cabf593",
@@ -78,8 +76,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "EU GMP Annex 1의 무균의약품 제조 요건 해설. 품질위험관리(QRM)·오염관리전략(CCS) 도입과 PUPSIT 의무화 등 검사 중심에서 예방적 오염관리로의 전환을 설명."
+    }
    },
    {
     "id": "68f38648a6cf",
@@ -95,8 +92,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "FDA가 유럽 제약사 Excelvision-Fareva(불만 근본원인분석·CAPA 미흡)와 Genzyme Ireland(품질부서 감시 부족·일탈 임의취소)에 발부한 경고서한을 소개."
+    }
    },
    {
     "id": "7bd7e629ff54",
@@ -112,8 +108,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "FDA가 멕시코 Laboratorios Jaloma에 발부한 경고서한(가스크로마토그래프 감사추적 미활성화 등)을 토대로 설비적격성·CSV·감사추적 미흡 사례와 CAPA 요건을 정리한 해설."
+    }
    },
    {
     "id": "719672de08cf",
@@ -129,8 +124,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "ICH Q7 가이드라인 Part 1 해설로, 원료의약품(API) 제조업체의 적용범위·품질관리·인력·시설·장비·문서화·물질흐름 등 기본 GMP 요건을 정리."
+    }
    },
    {
     "id": "a6f70e5ac331",
@@ -146,8 +140,7 @@
       "info": "pending",
       "official": "pending"
      }
-    },
-    "summary": "'GMP meets AI' 교육과정 참가자 질의응답 정리. AI 도구 접근통제·예측분석 데이터 출처·배치추적 등을 다루며 최종 판단은 인간의 책임임을 강조."
+    }
    }
   ]
  },

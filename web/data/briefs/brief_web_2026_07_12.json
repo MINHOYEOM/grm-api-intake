@@ -6,9 +6,9 @@
   "publish_date": "2026-07-12",
   "agencies": [
    "FDA",
-   "ECA",
    "MFDS",
-   "Health Canada"
+   "Health Canada",
+   "ECA"
   ],
   "categories": [
    "Other"
@@ -20,14 +20,136 @@
   ],
   "coverage": {
    "intake_total": 85,
-   "rendered": 37,
+   "rendered": 30,
    "evidence": {
     "A": 26,
-    "B": 11,
+    "B": 4,
     "C": 0
-   }
+   },
+   "resources": 7
   },
-  "ai_disclosure": true
+  "ai_disclosure": true,
+  "resources": [
+   {
+    "id": "0ceda2e417ce",
+    "title": "클린룸 등급·적격성평가 관계",
+    "original_title": "The Relationship between Commissioning, Classification and Q…",
+    "summary": "ECA 가 GMP 클린룸의 커미셔닝·등급분류·적격성평가(Qualification) 간 관계를 다루는 기술 자료를 게시했다. 구체적 규정 변경이나 사건은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/the-relationship-between-commissioning-classification-and-qualification-in-gmp-cleanrooms",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "1bec7d3ecad4",
+    "title": "원료의약품 GMP 해설(2편)",
+    "original_title": "GMP for Active Substances - What are the fundamental Require…",
+    "summary": "ECA 가 원료의약품(API) GMP 기본 요건을 다루는 ICH Q7 해설 시리즈 2편을 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-for-active-substances-what-are-the-fundamental-requirements-of-the-ich-q7-guideline-part-2",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "40e62cabf593",
+    "title": "Annex 1 무균생산 요건 해설",
+    "original_title": "What are the GMP Requirements for Sterile Production accordi…",
+    "summary": "ECA 가 Annex 1 기준 무균 생산 GMP 요건을 다루는 해설 자료를 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/what-are-the-gmp-requirements-for-sterile-production-according-to-annex-1",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "68f38648a6cf",
+    "title": "유럽 업체 경고서한(CAPA 미흡)",
+    "original_title": "Root Cause Analysis and CAPA: Two more Warning Letters issue…",
+    "summary": "ECA 가 유럽 소재 업체 2곳에 근본원인분석(Root Cause Analysis)·CAPA 미흡을 사유로 추가 경고서한(Warning Letter)이 발부된 사례를 다룬 해설 기사를 게시했다. 개별 업체명·구체 지적사항은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/root-cause-analysis-and-capa-two-more-warning-letters-issued-to-companies-in-europe",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "7bd7e629ff54",
+    "title": "설비적격성·CSV·감사추적 해설",
+    "original_title": "Equipment Qualification, Computer System Validation and Audi…",
+    "summary": "ECA 가 FDA 경고서한 사례를 배경으로 설비 적격성평가(Equipment Qualification), 전산시스템밸리데이션(CSV), 감사추적(Audit Trail) 요건을 다루는 해설 기사를 게시했다. 개별 경고서한 업체명은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/equipment-qualification-computer-system-validation-and-audit-trail-in-the-context-of-an-fda-warning-letter",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "719672de08cf",
+    "title": "원료의약품 GMP 해설(1편)",
+    "original_title": "GMP for Active Substances - What are the fundamental Require…",
+    "summary": "ECA 가 원료의약품(API) GMP 기본 요건을 다루는 ICH Q7 해설 시리즈 1편을 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-for-active-substances-what-are-the-fundamental-requirements-of-the-ich-q7-guideline-part-1",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   },
+   {
+    "id": "a6f70e5ac331",
+    "title": "GMP-AI 활용 Q&A",
+    "original_title": "Q&As on \"GMP meets AI - How to Use Artificial Intelligence i…",
+    "summary": "ECA 가 품질보증(QA)·품질관리(QC)에서 AI 를 활용하는 방법에 대한 Q&A 해설 자료를 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
+    "agency": "ECA",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+     "official_url": "https://www.gmp-compliance.org/gmp-news/q-as-on-gmp-meets-ai-how-to-use-artificial-intelligence-in-quality-assurance-and-quality-control",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    }
+   }
+  ]
  },
  "cards": [
   {
@@ -534,414 +656,8 @@
    }
   },
   {
-   "id": "0ceda2e417ce",
-   "render_order": 4,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "The Relationship between Commissioning, Classification and Q…",
-   "title_issue": "클린룸 등급·적격성평가 관계",
-   "summary": "ECA 가 GMP 클린룸의 커미셔닝·등급분류·적격성평가(Qualification) 간 관계를 다루는 기술 자료를 게시했다. 구체적 규정 변경이나 사건은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "0ceda2e417ce"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "The Relationship between Commissioning, Classification and Qualification in GMP…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: GMP 클린룸의 커미셔닝-등급분류-적격성평가 관계",
-    "발행: ECA, 2026-07-10",
-    "성격: 기술 해설 자료(규제 변경 아님)"
-   ],
-   "implication": "클린룸 적격성평가 단계 구분에 대한 실무 혼선이 업계에서 계속 다뤄지고 있음을 보여준다. 국내 무균·비무균 제조소는 자사 클린룸 커미셔닝·등급분류·적격성평가 문서 간 경계가 명확한지 점검할 필요가 있다.",
-   "checks": [
-    "클린룸 커미셔닝-등급분류-적격성평가 문서 구분 명확성 확인",
-    "클린룸 등급별 적격성평가(IQ/OQ/PQ) 문서 최신성 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/the-relationship-between-commissioning-classification-and-qualification-in-gmp-cleanrooms",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "1bec7d3ecad4",
-   "render_order": 5,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "GMP for Active Substances - What are the fundamental Require…",
-   "title_issue": "원료의약품 GMP 해설(2편)",
-   "summary": "ECA 가 원료의약품(API) GMP 기본 요건을 다루는 ICH Q7 해설 시리즈 2편을 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "1bec7d3ecad4"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "GMP for Active Substances - What are the fundamental Requirements of the ICH Q7…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: ICH Q7(원료의약품 GMP) 기본 요건 해설 – Part 2",
-    "발행: ECA, 2026-07-10",
-    "성격: 기술 해설 자료(규제 변경 아님)"
-   ],
-   "implication": "ICH Q7 기본 요건에 대한 반복 해설은 업계의 실무 이해도 격차가 여전함을 시사한다. 국내 원료의약품 제조소는 자사 교육자료가 ICH Q7 최신 해설 흐름을 반영하는지 점검할 필요가 있다.",
-   "checks": [
-    "ICH Q7 관련 사내 교육자료 최신성 확인",
-    "해설 시리즈 Part 1 과의 연속성 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-for-active-substances-what-are-the-fundamental-requirements-of-the-ich-q7-guideline-part-2",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "40e62cabf593",
-   "render_order": 6,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "What are the GMP Requirements for Sterile Production accordi…",
-   "title_issue": "Annex 1 무균생산 요건 해설",
-   "summary": "ECA 가 Annex 1 기준 무균 생산 GMP 요건을 다루는 해설 자료를 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "40e62cabf593"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "What are the GMP Requirements for Sterile Production according to Annex 1?"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: EU GMP Annex 1 기준 무균 생산 요건 해설",
-    "발행: ECA, 2026-07-10",
-    "성격: 기술 해설 자료(규제 변경 아님)"
-   ],
-   "implication": "Annex 1 요건에 대한 해설이 계속 나온다는 것은 무균 제조소들의 이행 부담이 여전히 크다는 신호다. 국내 무균제제 제조소는 최신 Annex 1 요건과 자사 오염관리전략(CCS) 문서의 정합성을 재점검할 필요가 있다.",
-   "checks": [
-    "오염관리전략(CCS) 문서와 Annex 1 최신 요건 정합성 점검",
-    "무균생산 관련 자사 교육자료 최신성 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/what-are-the-gmp-requirements-for-sterile-production-according-to-annex-1",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "68f38648a6cf",
-   "render_order": 7,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "Root Cause Analysis and CAPA: Two more Warning Letters issue…",
-   "title_issue": "유럽 업체 경고서한(CAPA 미흡)",
-   "summary": "ECA 가 유럽 소재 업체 2곳에 근본원인분석(Root Cause Analysis)·CAPA 미흡을 사유로 추가 경고서한(Warning Letter)이 발부된 사례를 다룬 해설 기사를 게시했다. 개별 업체명·구체 지적사항은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "68f38648a6cf"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "Root Cause Analysis and CAPA: Two more Warning Letters issued to Companies in Eu…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: 유럽 소재 업체 2곳에 근본원인분석·CAPA 미흡 관련 경고서한 추가 발부",
-    "발행: ECA, 2026-07-10",
-    "개별 업체명·구체 지적사항: 원문 미기재"
-   ],
-   "implication": "근본원인분석과 CAPA 의 실효성 부족이 반복적인 경고서한 사유로 지적되고 있음을 보여준다. 국내 제조소는 CAPA 종결 시 근본원인분석이 재발방지로 이어지는지 재확인할 필요가 있다.",
-   "checks": [
-    "CAPA 종결 건의 근본원인분석 적정성 재검토",
-    "원문에서 개별 경고서한 세부 지적사항 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/root-cause-analysis-and-capa-two-more-warning-letters-issued-to-companies-in-europe",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "7bd7e629ff54",
-   "render_order": 8,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "Equipment Qualification, Computer System Validation and Audi…",
-   "title_issue": "설비적격성·CSV·감사추적 해설",
-   "summary": "ECA 가 FDA 경고서한 사례를 배경으로 설비 적격성평가(Equipment Qualification), 전산시스템밸리데이션(CSV), 감사추적(Audit Trail) 요건을 다루는 해설 기사를 게시했다. 개별 경고서한 업체명은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-08"
-    },
-    {
-     "label": "문서번호",
-     "value": "7bd7e629ff54"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "Equipment Qualification, Computer System Validation and Audit Trail in the Conte…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: 설비 적격성평가·CSV·감사추적을 FDA 경고서한 맥락에서 해설",
-    "발행: ECA, 2026-07-08",
-    "개별 경고서한 업체명: 원문 미기재"
-   ],
-   "implication": "감사추적(Audit Trail) 검토 미흡이 CSV·설비 적격성평가와 함께 FDA 지적의 반복 축임을 보여준다. 국내 제조소는 전산시스템의 감사추적 정기 검토 절차가 실제로 운영되는지 점검할 필요가 있다.",
-   "checks": [
-    "전산시스템 감사추적(Audit Trail) 정기 검토 절차 운영 여부 확인",
-    "설비 적격성평가 문서와 CSV 문서 간 정합성 점검"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/equipment-qualification-computer-system-validation-and-audit-trail-in-the-context-of-an-fda-warning-letter",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "719672de08cf",
-   "render_order": 9,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "GMP for Active Substances - What are the fundamental Require…",
-   "title_issue": "원료의약품 GMP 해설(1편)",
-   "summary": "ECA 가 원료의약품(API) GMP 기본 요건을 다루는 ICH Q7 해설 시리즈 1편을 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "719672de08cf"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "GMP for Active Substances - What are the fundamental Requirements of the ICH Q7…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: ICH Q7(원료의약품 GMP) 기본 요건 해설 – Part 1",
-    "발행: ECA, 2026-07-06",
-    "성격: 기술 해설 자료(규제 변경 아님)"
-   ],
-   "implication": "시리즈 형태의 ICH Q7 해설 게시는 원료의약품 GMP 실무 교육 수요가 꾸준함을 보여준다. 국내 원료의약품 제조소는 최신 해설을 참고해 자사 GMP 교육 커리큘럼을 점검할 필요가 있다.",
-   "checks": [
-    "원료의약품 GMP 교육 커리큘럼과 ICH Q7 최신 해설 비교",
-    "해설 시리즈 Part 2 후속 게시 여부 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-for-active-substances-what-are-the-fundamental-requirements-of-the-ich-q7-guideline-part-1",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "a6f70e5ac331",
-   "render_order": 10,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "ECA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "Q&As on \"GMP meets AI - How to Use Artificial Intelligence i…",
-   "title_issue": "GMP-AI 활용 Q&A",
-   "summary": "ECA 가 품질보증(QA)·품질관리(QC)에서 AI 를 활용하는 방법에 대한 Q&A 해설 자료를 게시했다. 구체적 규정 변경 사항은 원문에 포함되어 있지 않다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "a6f70e5ac331"
-    },
-    {
-     "label": "발행기관",
-     "value": "ECA"
-    },
-    {
-     "label": "주제",
-     "value": "Q&As on \"GMP meets AI - How to Use Artificial Intelligence in Quality Assurance…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "주제: 품질보증·품질관리에서의 AI 활용 Q&A",
-    "발행: ECA, 2026-07-06",
-    "성격: 기술 해설 자료(규제 변경 아님)"
-   ],
-   "implication": "GMP 영역에서 AI 활용 Q&A 수요가 늘고 있는 것은 PIC/S 가 준비 중인 AI 관련 Annex 22 초안 논의와도 맞물려 있다(검색 확인). 국내 제조소는 AI 도구 도입 시 QA/QC 적용 범위와 검증 책임 소재를 미리 정리해 둘 필요가 있다.",
-   "checks": [
-    "AI 도구 QA/QC 적용 시 검증·책임소재 내부 기준 마련 여부 확인",
-    "PIC/S Annex 22(AI) 초안 동향 모니터링"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
-    "official_url": "https://www.gmp-compliance.org/gmp-news/q-as-on-gmp-meets-ai-how-to-use-artificial-intelligence-in-quality-assurance-and-quality-control",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
    "id": "admin-2026005515",
-   "render_order": 11,
+   "render_order": 4,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1031,7 +747,7 @@
   },
   {
    "id": "admin-2026005554",
-   "render_order": 12,
+   "render_order": 5,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1120,7 +836,7 @@
   },
   {
    "id": "gmpinspect-1Pz0eO3IuUQ",
-   "render_order": 13,
+   "render_order": 6,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1183,7 +899,7 @@
   },
   {
    "id": "admin-2026005454",
-   "render_order": 14,
+   "render_order": 7,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1272,7 +988,7 @@
   },
   {
    "id": "admin-2026005455",
-   "render_order": 15,
+   "render_order": 8,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1361,7 +1077,7 @@
   },
   {
    "id": "admin-2026005334",
-   "render_order": 16,
+   "render_order": 9,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1450,7 +1166,7 @@
   },
   {
    "id": "gmpinspect-1Pz07CdM5Qk",
-   "render_order": 17,
+   "render_order": 10,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1513,7 +1229,7 @@
   },
   {
    "id": "admin-2026005314",
-   "render_order": 18,
+   "render_order": 11,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1602,7 +1318,7 @@
   },
   {
    "id": "recall-eba8d230d8c4",
-   "render_order": 19,
+   "render_order": 12,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1665,7 +1381,7 @@
   },
   {
    "id": "recall-b76f35d25486",
-   "render_order": 20,
+   "render_order": 13,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1728,7 +1444,7 @@
   },
   {
    "id": "recall-014a35631d78",
-   "render_order": 21,
+   "render_order": 14,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1791,7 +1507,7 @@
   },
   {
    "id": "recall-7d0e60ca9008",
-   "render_order": 22,
+   "render_order": 15,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1854,7 +1570,7 @@
   },
   {
    "id": "recall-89ece30dcd58",
-   "render_order": 23,
+   "render_order": 16,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1917,7 +1633,7 @@
   },
   {
    "id": "recall-df585a46d831",
-   "render_order": 24,
+   "render_order": 17,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1980,7 +1696,7 @@
   },
   {
    "id": "recall-f6fd433d744f",
-   "render_order": 25,
+   "render_order": 18,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2043,7 +1759,7 @@
   },
   {
    "id": "D-0617-2026",
-   "render_order": 26,
+   "render_order": 19,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2110,7 +1826,7 @@
   },
   {
    "id": "hc-82286",
-   "render_order": 27,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2177,7 +1893,7 @@
   },
   {
    "id": "D-0609-2026",
-   "render_order": 28,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2244,7 +1960,7 @@
   },
   {
    "id": "D-0611-2026",
-   "render_order": 29,
+   "render_order": 22,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2311,7 +2027,7 @@
   },
   {
    "id": "D-0612-2026",
-   "render_order": 30,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2384,7 +2100,7 @@
   },
   {
    "id": "D-0618-2026",
-   "render_order": 31,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2451,7 +2167,7 @@
   },
   {
    "id": "D-0621-2026",
-   "render_order": 32,
+   "render_order": 25,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2518,7 +2234,7 @@
   },
   {
    "id": "D-0622-2026",
-   "render_order": 33,
+   "render_order": 26,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2590,7 +2306,7 @@
   },
   {
    "id": "D-0626-2026",
-   "render_order": 34,
+   "render_order": 27,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2657,7 +2373,7 @@
   },
   {
    "id": "D-0627-2026",
-   "render_order": 35,
+   "render_order": 28,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2724,7 +2440,7 @@
   },
   {
    "id": "D-0628-2026",
-   "render_order": 36,
+   "render_order": 29,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

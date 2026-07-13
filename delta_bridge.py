@@ -49,6 +49,11 @@ try:
 except ImportError:  # pragma: no cover — inject_slots 는 항상 동봉되지만 방어적으로.
     inject_slots = None  # type: ignore[assignment]
 
+try:
+    import verify_deep_analysis as _vda
+except ImportError:  # pragma: no cover — 항상 동봉되지만 방어적으로.
+    _vda = None  # type: ignore[assignment]
+
 
 TYPE_WEB_DELTA = "web-delta"
 
@@ -213,6 +218,40 @@ def _validate_deep(obj: Any) -> dict[str, Any]:
     return obj
 
 
+def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
+    """deep 델타 각 카드를 `verify_deep_analysis` 게이트에 통과시켜 **PASS 만** 남긴다.
+
+    [클라우드화 2026-07-13] 심층분석 생성은 클라우드 Routine 의 LLM 이(python·서브에이전트
+    없이) 하고, **근거 검증(D1 구조·D2 조항 근거대조·D3 숫자)은 python 이 도는 이 브릿지가**
+    담당한다 — 근거 없는(날조·미근거) 분석의 발행을 차단한다(생성=클라우드·검증=여기). 각 카드
+    entry 는 `{"deep_analysis": {...4섹션...}, "source_text": "<그 카드 원문>", ...}`(예치 규약);
+    `source_text` 로 D2/D4 근거대조를 한다. 게이트 FAIL 카드는 조용히 drop(그 카드만 6슬롯으로
+    graceful degrade). 게이트 모듈 부재 시(방어) 구조검증만 하고 원본 통과. PASS 0건이면 None."""
+    if _vda is None:  # pragma: no cover — 항상 동봉
+        log("WARN", "verify_deep_analysis 미탑재 — deep 게이트 skip(구조검증만 적용됨)")
+        return deep
+    kept: dict[str, Any] = {}
+    for doc, entry in deep.items():
+        if not isinstance(entry, dict):
+            continue
+        da = entry.get("deep_analysis") if "deep_analysis" in entry else entry
+        source = entry.get("source_text", "") if "deep_analysis" in entry else ""
+        try:
+            gate = _vda.run_deep_analysis_gate(da, source, card_type=None)
+        except Exception as e:  # noqa: BLE001 — 게이트 자체 오류는 그 카드만 drop(브리프 비차단)
+            log("WARN", f"deep 게이트 실행 오류 — 카드 drop: {doc} ({e})")
+            continue
+        if getattr(gate, "ok", False):
+            kept[doc] = entry
+        else:
+            log("WARN", f"deep 게이트 FAIL — 카드 drop: {doc}\n{getattr(gate, 'report', '')}")
+    if not kept:
+        log("INFO", "deep 게이트 통과 카드 0건 — deep 델타 없음 처리(6슬롯만 발행)")
+        return None
+    log("INFO", f"deep 게이트 통과 {len(kept)}/{len(deep)} 카드 병합")
+    return kept
+
+
 def _try_json_dict(text: str) -> dict[str, Any] | None:
     try:
         obj = json.loads(text)
@@ -278,7 +317,7 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
         raise DeltaBridgeError(
             f"페이지 {title!r}: 델타 envelope(cards+tldr)를 어떤 결합으로도 못 찾음 — {diag}")
     if deep is not None:
-        deep = _validate_deep(deep)
+        deep = _validate_deep(deep)  # 구조 파싱만(게이트는 write 직전 main 에서 — 파싱/검증 분리)
 
     publish_date = delta.get("publish_date") or title_date
     if not isinstance(publish_date, str) or not _DATE_RE.match(publish_date):
@@ -440,6 +479,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         page = _attach_code_blocks(token, page)
         delta, deep, date_str = extract_delta(page)
+        if deep is not None:
+            deep = _gate_deep_analysis(deep)  # 클라우드 생성 deep 근거 검증(write 직전)
         wrote = write_delta(delta, deep, date_str)
     except DeltaBridgeError as e:
         print(f"ERROR: {e}", file=sys.stderr)

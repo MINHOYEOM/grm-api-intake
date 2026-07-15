@@ -2214,6 +2214,26 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('if (targetEl.classList.contains("fnd-collapsed")) {', fn)
         self.assertIn('targetEl.classList.remove("fnd-collapsed");', fn)
 
+    def test_deeplink_finalize_has_settimeout_fallback_and_order(self):
+        """[자동 도달 견고성] renderDeepLinkDoc() 의 마무리는 rAF 단독이 아니라
+        setTimeout 폴백과 이중 스케줄(finalized 가드 1회 실행)이어야 한다 — rAF 는
+        백그라운드 탭(공유 링크 새 탭 열기)·헤드리스 환경에서 유예/미발화된다(프리뷰
+        실측). 또한 clamp 측정(moreBtn 표시/제거)은 hidden 요소에서 scrollHeight 가
+        0이 되므로, "N건 모두 보기" 래퍼 펼침이 측정보다 먼저 와야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDeepLinkDoc() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var finalized = false;", fn)
+        self.assertIn("if (finalized) return;", fn)
+        self.assertIn("requestAnimationFrame(finalizeDeepLinkDoc);", fn)
+        self.assertIn("setTimeout(finalizeDeepLinkDoc, 120);", fn)
+        # 순서 계약: 래퍼 펼침 → clamp 측정 → revealAndFocusTarget.
+        unhide_pos = fn.index("moreWrap.hidden = false;")
+        measure_pos = fn.index("scrollHeight - item.textEl.clientHeight")
+        reveal_pos = fn.index("revealAndFocusTarget(doc.built, targetId);")
+        self.assertLess(unhide_pos, measure_pos)
+        self.assertLess(measure_pos, reveal_pos)
+
     def test_deeplink_scroll_offset_focus_and_transient_highlight(self):
         """[자동 도달] sticky 툴바 오프셋 보정 스크롤(goToPage() 의 기존 공식과 동일
         패턴)+tabindex=-1 focus+일시 강조(2초 후 인라인 스타일 제거, grm.css 불가침)."""

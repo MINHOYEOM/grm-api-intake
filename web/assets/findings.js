@@ -1384,18 +1384,37 @@
     resultsEl.appendChild(doc.card);
     showDeepLinkFoundBanner();
     var targetId = deepLinkParam;
-    if (typeof requestAnimationFrame === "function") {
-      requestAnimationFrame(function () {
-        doc.built.forEach(function (item) {
-          var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
-          var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
-          if (overflow || hasExtra) { item.moreBtn.hidden = false; } else { item.moreBtn.remove(); }
-        });
-        revealAndFocusTarget(doc.built, targetId);
+    // 마무리(펼침·측정·도달)는 rAF + setTimeout 이중 스케줄(finalized 가드로 1회만 실행)
+    // — rAF 단독이면 백그라운드 탭(공유 링크를 새 탭으로 여는 흔한 경로)·헤드리스 환경에서
+    // 유예/미발화되어 자동 도달이 죽는다. setTimeout 은 그 두 경우 모두에서 발화한다.
+    // 실행 순서 계약: ①대상이 "N건 모두 보기" 래퍼 뒤면 래퍼부터 펼친다 — hidden 요소는
+    // scrollHeight/clientHeight 가 0이라, 펼치기 전에 ②의 clamp 측정을 하면 래퍼 안 전
+    // 카드의 "자세히 보기" 버튼이 오판(remove)된다 ②clamp 측정으로 moreBtn 표시/제거
+    // ③대상 카드 펼침+스크롤+포커스+강조(revealAndFocusTarget — ①과 겹치는 래퍼 처리는
+    // 멱등이라 무해).
+    var finalized = false;
+    function finalizeDeepLinkDoc() {
+      if (finalized) return;
+      finalized = true;
+      var targetEl = document.getElementById("f-" + targetId);
+      var moreWrap = targetEl && targetEl.closest ? targetEl.closest(".fnd-doc-obs-more") : null;
+      if (moreWrap && moreWrap.hidden) {
+        moreWrap.hidden = false;
+        var toggleBtn = moreWrap.parentNode ? moreWrap.parentNode.querySelector(".fnd-doc-toggle") : null;
+        if (toggleBtn) {
+          toggleBtn.setAttribute("aria-expanded", "true");
+          toggleBtn.textContent = "접기";
+        }
+      }
+      doc.built.forEach(function (item) {
+        var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
+        var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
+        if (overflow || hasExtra) { item.moreBtn.hidden = false; } else { item.moreBtn.remove(); }
       });
-    } else {
       revealAndFocusTarget(doc.built, targetId);
     }
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(finalizeDeepLinkDoc);
+    setTimeout(finalizeDeepLinkDoc, 120);
   }
 
   // ROWS 로드(rowsReady)와 딥링크 해석(!deepLinkPending) 이 둘 다 끝나야 최종 렌더를

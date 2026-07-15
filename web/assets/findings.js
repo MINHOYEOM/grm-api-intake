@@ -199,6 +199,18 @@
   var rowsReady = false;
   var bannerEl = null;
 
+  // [FIND-1 S1] 유사 문구 검색(렉시컬, 018_findings_similar_lexical.sql RPC 소비) — 정직
+  // 표기: trigram+FTS 하이브리드 매칭일 뿐, 뜻을 이해해 찾아주는 방식이 아니다(마이그레이션
+  // 주석과 동일 원칙 — UI 명칭은 반드시 "유사 문구 검색" 고정). RPC 는 아직 라이브 DB 에 미적용일 수 있어
+  // (컨트롤타워가 별도 적용) 실패/빈 결과는 조용히 기존 키워드 검색으로 폴백한다 — 토글이
+  // 켜져 있어도 페이지는 항상 정상 동작해야 한다(§ RPC 미적용 방어). similarFetchToken 은
+  // 연타/모드전환 시 오래된 응답을 무시하는 세대 카운터(goToPage() 의 navToken 관례와 동형).
+  var SIMILAR_MIN_QUERY_LEN = 2;
+  var SIMILAR_LIMIT = 20;
+  var similarMode = false;
+  var similarToggleBtn = null;
+  var similarFetchToken = 0;
+
   var qInput = document.getElementById("fnd-q");
   var sortSel = document.getElementById("fnd-sort");
   var filtersEl = document.getElementById("fnd-filters");
@@ -474,6 +486,7 @@
   // 클릭 시 대응하는 select.value 도 동기화해 드롭다운·행 클릭 상태가 항상 일치하게 한다.
   function toggleCategoryFilter(code) {
     exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 필터 조작 → 유사검색 모드 종료(§6)
     var sel = document.getElementById("fnd-f-category");
     state.category_code = state.category_code === code ? "" : code;
     if (sel) sel.value = state.category_code;
@@ -483,6 +496,7 @@
 
   function toggleMonthFilter(month) {
     exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 필터 조작 → 유사검색 모드 종료(§6)
     var sel = document.getElementById("fnd-f-month");
     state.month = state.month === month ? "" : month;
     if (sel) sel.value = state.month;
@@ -492,6 +506,7 @@
 
   function toggleFirmFilter(name) {
     exitDeepLinkMode(); // [PR-0 딥링크] 검색 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 검색 조작 → 유사검색 모드 종료(§6)
     state.q = state.q === name ? "" : name;
     if (qInput) qInput.value = state.q;
     currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
@@ -1127,6 +1142,7 @@
   // 컨테이너 자체를 hidden 처리한다. 전부 textContent/createElement(XSS 계약).
   function clearActiveFilter(key) {
     exitDeepLinkMode(); // [PR-0 딥링크] 필터 해제 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 필터 해제 조작 → 유사검색 모드 종료(§6)
     state[key] = "";
     syncControlsFromState();
     currentPage = 1; // [페이지네이션] 필터 해제 → 1페이지로 리셋
@@ -1135,6 +1151,7 @@
 
   function clearAllFilters() {
     exitDeepLinkMode(); // [PR-0 딥링크] 필터 전체 초기화 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 필터 전체 초기화 조작 → 유사검색 모드 종료(§6)
     state = {
       q: "", agency: "", category_code: "", source: "", evidence_level: "",
       review_status: "", month: "", sort: "date_desc",
@@ -1431,6 +1448,196 @@
     goToPage(readPageFromUrl());
   }
 
+  // ── [FIND-1 S1] 유사 문구 검색(렉시컬) — findings_similar RPC 소비 ──────────────────────
+  // 서버(018)가 공개 게이트·중복 붕괴·정렬을 전부 처리한다 — 클라이언트는 재정렬·재필터를
+  // 하지 않는다(계약). 결과는 문서 그룹핑 없이 finding 단위 카드 목록으로, 기존 buildCard()
+  // 를 그대로 재사용해 렌더한다(신규 렌더러 금지 — §2).
+
+  // RPC item(finding_id/raw_signal_id/source/agency/published_date/firm_name/category_code/
+  // text/score/dup_documents/dup_findings) → buildCard() 가 기대하는 row 모양 최소 어댑터.
+  // RPC 의 text 는 원문/국문 구분이 없는 단일 텍스트라 finding_text_ko 에만 채우고
+  // finding_text 는 비운다 — appendOrigAndNote() 는 row.finding_text 가 falsy 면 즉시
+  // return 이라(파일 상단 §XSS 계약 인접 로직 재확인) "원문 보기" 접기가 조용히 나타나지
+  // 않는다(깨진 접기 없음). evidence_level/review_status/cfr_refs/mfds_refs/document_id/
+  // confidence/evidence_url 은 RPC 가 반환하지 않으므로 undefined 로 남고, buildCard() 의
+  // 기존 방어적 조건부(if (row.xxx))가 각각 조용히 생략한다(카드 깨짐 없음).
+  function mapSimilarItemToRow(item) {
+    return {
+      finding_id: item.finding_id,
+      raw_signal_id: item.raw_signal_id,
+      source: item.source,
+      agency: item.agency,
+      published_date: item.published_date,
+      firm_name: item.firm_name,
+      category_code: item.category_code,
+      // 신뢰도 배지 2종(M13 — Evidence 등급/검토 필요 경계)은 목록 모드와 동일하게
+      // 유지해야 한다. RPC 가 이 두 서지 필드를 반환하지 않으면 유사검색 결과에서만
+      // "검토 필요" 경고가 조용히 사라진다(018 주석의 반환 계약 참조).
+      evidence_level: item.evidence_level || "",
+      review_status: item.review_status || "",
+      finding_text_ko: item.text || "",
+      finding_text: "",
+    };
+  }
+
+  // [S1 중복 배지] dup_findings>1 인 경우에만 "동일 문구 N개 문서"(N=dup_documents) 배지를
+  // 카드 헤드에 추가한다 — grm.css 불가침이라 인라인 style 뿐(§4 한글안전: letter-spacing/
+  // text-transform/mono 미사용). date 배지(margin-left:auto, 항상 head 끝)보다 앞에 꽂아
+  // 우측 끝 고정을 깨지 않는다.
+  function appendSimilarDupBadge(card, item) {
+    if (!item || !(Number(item.dup_findings) > 1)) return;
+    var head = card.querySelector(".fnd-card-head");
+    if (!head) return;
+    var badge = document.createElement("span");
+    badge.style.cssText =
+      "display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;" +
+      "line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid rgba(194,96,63,.22);" +
+      "background:var(--coral-tint);color:var(--coral-2)";
+    badge.textContent = "동일 문구 " + (item.dup_documents || 0) + "개 문서";
+    var dateBadge = head.querySelector(".fnd-b.date");
+    if (dateBadge) head.insertBefore(badge, dateBadge);
+    else head.appendChild(badge);
+  }
+
+  // [딥링크 연계 §4] PR-0 이 만든 /findings/?finding_id=<id> 공유 링크를 그대로 재사용 —
+  // 각 결과 카드에서 해당 finding 이 속한 문서로 이동할 수 있는 착지점. buildCard() 자체는
+  // 건드리지 않고(§2 재사용 원칙), actions 푸터에 링크 하나만 추가로 꽂는다.
+  function similarItemDeepLinkUrl(id) {
+    return location.pathname + "?" + DEEP_LINK_PARAM + "=" + encodeURIComponent(id);
+  }
+
+  function appendSimilarDeepLink(card, findingId) {
+    if (!findingId) return;
+    var actions = card.querySelector(".fnd-actions");
+    if (!actions) return;
+    var a = document.createElement("a");
+    a.className = "fnd-link";
+    a.href = similarItemDeepLinkUrl(findingId);
+    var icon = document.createElement("i");
+    icon.className = "ti ti-file-text";
+    icon.setAttribute("aria-hidden", "true");
+    a.appendChild(icon);
+    a.appendChild(document.createTextNode("해당 문서 보기"));
+    actions.insertBefore(a, actions.firstChild);
+  }
+
+  function fetchSimilarItems(q, limit) {
+    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_query: q, p_limit: limit }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_similar " + r.status);
+      return r.json();
+    });
+  }
+
+  // 결과 렌더 — 문서 그룹핑 없이 finding 단위 카드 목록(서버 정렬 순서 그대로, 재정렬 없음).
+  // 대시보드·페이저는 이 모드와 무관하므로 숨긴다(딥링크 단독 렌더(renderDeepLinkDoc)와
+  // 동일한 관례).
+  function renderSimilarResults(items) {
+    showState("none");
+    hidePager();
+    if (hasDash) dashEl.hidden = true;
+    resultsEl.textContent = "";
+    countEl.textContent = "";
+    countEl.appendChild(document.createTextNode("유사 문구 " + items.length.toLocaleString("ko-KR") + "건"));
+    var frag = document.createDocumentFragment();
+    items.forEach(function (item) {
+      var row = mapSimilarItemToRow(item);
+      var built = buildCard(row, "");
+      appendSimilarDupBadge(built.card, item);
+      appendSimilarDeepLink(built.card, item.finding_id);
+      frag.appendChild(built.card);
+    });
+    resultsEl.appendChild(frag);
+  }
+
+  // 토글 아이콘/on-상태만 갱신(DOM 재생성 없음) — buildFacetSkeleton() 옵션 갱신 관례와 동형.
+  function updateSimilarToggleUI() {
+    if (!similarToggleBtn) return;
+    similarToggleBtn.setAttribute("aria-pressed", similarMode ? "true" : "false");
+    if (similarMode) {
+      similarToggleBtn.style.background = "var(--coral-tint)";
+      similarToggleBtn.style.borderColor = "rgba(194,96,63,.35)";
+      similarToggleBtn.style.color = "var(--coral-2)";
+    } else {
+      similarToggleBtn.style.background = "var(--canvas)";
+      similarToggleBtn.style.borderColor = "var(--line-2)";
+      similarToggleBtn.style.color = "var(--body)";
+    }
+  }
+
+  // 질의 2자 미만이면 목록 모드로(§ 모드 이탈 "질의 삭제"). 그 외엔 RPC 를 호출하고,
+  // 실패든 빈 결과든 전부 조용히 goToPage(1)(기존 키워드 검색, 토글 OFF 상태와 동일 동작)
+  // 로 폴백한다 — 콘솔 에러 노출도, 사용자에게 보이는 에러 상태도 없다(§5 폴백 계약).
+  function runSimilarSearch() {
+    var q = state.q.trim();
+    currentPage = 1;
+    if (q.length < SIMILAR_MIN_QUERY_LEN) {
+      goToPage(1);
+      return;
+    }
+    similarFetchToken += 1;
+    var myToken = similarFetchToken;
+    fetchSimilarItems(q, SIMILAR_LIMIT)
+      .then(function (data) {
+        if (myToken !== similarFetchToken) return; // 더 최근 토글/입력으로 취소됨
+        var items = (data && Array.isArray(data.items)) ? data.items : [];
+        if (!items.length) {
+          goToPage(1); // 조용한 폴백(§5) — 빈 결과
+          return;
+        }
+        renderSimilarResults(items);
+      })
+      .catch(function () {
+        if (myToken !== similarFetchToken) return;
+        goToPage(1); // 조용한 폴백(§5) — RPC 미적용(404)/네트워크 오류 전부 여기로 수렴
+      });
+  }
+
+  function setSimilarMode(on) {
+    if (similarMode === on) return;
+    similarMode = on;
+    similarFetchToken += 1; // 진행 중이던 이전 모드의 fetch 응답을 무시
+    updateSimilarToggleUI();
+    if (similarMode) runSimilarSearch();
+    else { currentPage = 1; goToPage(1); } // §6 모드 이탈 — 기존 목록 모드로 복귀
+  }
+
+  // §6 모드 이탈 — 필터/정렬/페이지 조작 시 유사검색 모드를 끄고 목록 모드로 복귀한다.
+  // exitDeepLinkMode() 와 동형 관례(비활성 상태면 즉시 no-op, 회귀 0).
+  function exitSimilarMode() {
+    if (!similarMode) return;
+    similarMode = false;
+    similarFetchToken += 1;
+    updateSimilarToggleUI();
+  }
+
+  // 검색창 옆(sticky 툴바 .fnd-tools 내부) 토글 버튼 — findings.html 템플릿엔 자리가 없어
+  // (§ 템플릿 최소 변경 원칙, PR-0 딥링크 배너와 동일 관례) findings.js 가 런타임에 DOM
+  // 삽입한다. 명칭은 반드시 "유사 문구 검색"으로 고정한다 — trigram+FTS 렉시컬 매칭일 뿐
+  // 뜻을 이해해 찾아주는 방식이 아니므로, 그렇게 오인시키는 다른 표현은 쓰지 않는다.
+  function buildSimilarToggle() {
+    if (!qInput || !qInput.parentNode || document.getElementById("fnd-similar-toggle")) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "fnd-similar-toggle";
+    btn.setAttribute("aria-pressed", "false");
+    btn.setAttribute("aria-label", "유사 문구 검색 켜기/끄기");
+    btn.textContent = "유사 문구 검색";
+    btn.style.cssText =
+      "flex:none;height:34px;padding:0 14px;font:inherit;font-size:12.5px;font-weight:600;" +
+      "color:var(--body);background:var(--canvas);border:1.5px solid var(--line-2);" +
+      "border-radius:999px;cursor:pointer;white-space:nowrap";
+    btn.addEventListener("click", function () {
+      exitDeepLinkMode(); // [S1] 유사검색 진입 → 딥링크 모드 종료(자연스러운 모드 전환)
+      setSimilarMode(!similarMode);
+    });
+    qInput.parentNode.insertBefore(btn, countEl || null);
+    similarToggleBtn = btn;
+  }
+
   function render() {
     var matched = sortRows(ROWS.filter(matches));
     var docs = groupByDocument(matched); // [문서 중심 열람] raw_signal_id 로 문서 단위 그룹핑
@@ -1538,6 +1745,7 @@
   }
 
   function wire() {
+    buildSimilarToggle(); // [FIND-1 S1] 검색창 옆 "유사 문구 검색" 토글(런타임 DOM 삽입)
     // [M15] 6개 셀렉트(소스·증거등급·검토상태·카테고리·발행월·정렬 중 정렬 제외 5개)가
     // 전부 SELECT_FACETS 단일 경로로 change 배선된다(칩 그룹 배선 없음).
     SELECT_FACETS.forEach(function (def) {
@@ -1545,6 +1753,7 @@
       if (!sel) return;
       sel.addEventListener("change", function () {
         exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
+        exitSimilarMode(); // [FIND-1 S1] 필터 조작 → 유사검색 모드 종료(§6)
         state[def[1]] = sel.value;
         currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
         goToPage(1);
@@ -1553,6 +1762,7 @@
     if (sortSel) {
       sortSel.addEventListener("change", function () {
         exitDeepLinkMode(); // [PR-0 딥링크] 정렬 조작 → 딥링크 모드 종료(§4)
+        exitSimilarMode(); // [FIND-1 S1] 정렬 조작 → 유사검색 모드 종료(§6)
         state.sort = sortSel.value;
         currentPage = 1; // [페이지네이션] 정렬 변경 → 1페이지로 리셋
         goToPage(1);
@@ -1564,6 +1774,8 @@
         state.q = qInput.value;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function () {
+          // [FIND-1 S1] 유사검색 모드면 RPC 로, 아니면 기존 키워드 검색 목록 모드로.
+          if (similarMode) { runSimilarSearch(); return; }
           currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
           goToPage(1);
         }, 150);
@@ -1784,13 +1996,19 @@
   // 다수가 공유하므로 변경하지 않는다).
   function goToPageFromPager(n) {
     exitDeepLinkMode(); // [PR-0 딥링크] 페이지 조작 → 딥링크 모드 종료(§4)
+    exitSimilarMode(); // [FIND-1 S1] 페이지 조작 → 유사검색 모드 종료(§6)
     pendingScrollAfterNav = true;
     goToPage(n);
   }
 
+  // [단독 렌더 모드 공통] 페이저 3종을 함께 숨긴다 — 상/하단 페이저 + sticky 미니 내비
+  // (#fnd-pnav, PR#231). ★pnav 를 빼먹으면 딥링크·유사검색처럼 "페이지가 없는" 단독
+  // 렌더 모드에서 sticky 툴바에 ‹ › 화살표만 덩그러니 남는다(프리뷰 실측으로 발견).
+  // 복귀는 render()→renderPager()→updatePnav() 가 상태 기준으로 되살린다.
   function hidePager() {
     if (pagerTopEl) pagerTopEl.hidden = true;
     if (pagerBottomEl) pagerBottomEl.hidden = true;
+    if (pnavEl) pnavEl.hidden = true;
   }
 
   // 페이지 이동 중(네트워크 대기) 버튼을 비활성화한다 — render() 가 뒤이어 pager 를

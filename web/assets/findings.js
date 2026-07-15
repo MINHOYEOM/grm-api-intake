@@ -100,6 +100,12 @@
     return f !== "finding_text_ko" && f !== "translation_method";
   });
 
+  // [PR-0 딥링크] /findings/?finding_id=finding-<24hex> 공유 URL. 형식은 grm_findings.py:706
+  // "finding-" + stable_hash(...)[:24] (sha256 hexdigest 앞 24자, 항상 소문자 hex)와 일치해야
+  // 한다 — 형식 불일치는 fetch 없이 곧장 "찾을 수 없음"으로 처리한다(§1).
+  var FINDING_ID_RE = /^finding-[0-9a-f]{24}$/;
+  var DEEP_LINK_PARAM = "finding_id";
+
   // [M15] 전면 재설계 — 소스·증거등급·검토상태 칩 그룹을 카테고리·발행월과 동일한
   // <select> 로 통일했다(균일 셀렉트 행). state 키 구조·URL 파라미터·매칭 로직은 M3c
   // 이후 불변 — DOM 배선만 단일 경로(SELECT_FACETS)로 단순화됐다. 옛 칩 파셋 정의는 제거.
@@ -179,6 +185,19 @@
   // 콜백이 소비 후 즉시 리셋한다. 필터/검색/정렬 변경발 goToPage(1) 리셋은 스크롤하지
   // 않는다(검색창에 타이핑할 때마다 화면이 튀는 것을 방지).
   var pendingScrollAfterNav = false;
+
+  // [PR-0 딥링크] deepLinkParam=URL 에서 읽은 원본 finding_id 값 — exitDeepLinkMode() 가
+  // 지울 때까지 유지되며(found/notfound 상태와 무관하게 "이 세션에 딥링크 관심사가 아직
+  // 살아있다"는 단일 플래그), 파라미터 자체가 없으면 처음부터 null 이라 이하 전 로직이
+  // no-op 로 남아 일반 모드 회귀가 0이다. deepLinkStatus="found"|"notfound"|""(미확정/비활성).
+  // rowsReady=일반 목록 fetch 완료 여부 — maybeFinishInit() 이 딥링크 해석 완료와 함께
+  // 둘 다 기다렸다가 깜빡임 없이 한 번만 최종 렌더를 확정한다.
+  var deepLinkParam = null;
+  var deepLinkStatus = "";
+  var deepLinkDocRows = null;
+  var deepLinkPending = false;
+  var rowsReady = false;
+  var bannerEl = null;
 
   var qInput = document.getElementById("fnd-q");
   var sortSel = document.getElementById("fnd-sort");
@@ -454,6 +473,7 @@
   // ── [FIND-1 M7] 대시보드 클릭 연동 — 기존 state/select 재사용, 별도 상태 저장소 없음.
   // 클릭 시 대응하는 select.value 도 동기화해 드롭다운·행 클릭 상태가 항상 일치하게 한다.
   function toggleCategoryFilter(code) {
+    exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
     var sel = document.getElementById("fnd-f-category");
     state.category_code = state.category_code === code ? "" : code;
     if (sel) sel.value = state.category_code;
@@ -462,6 +482,7 @@
   }
 
   function toggleMonthFilter(month) {
+    exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
     var sel = document.getElementById("fnd-f-month");
     state.month = state.month === month ? "" : month;
     if (sel) sel.value = state.month;
@@ -470,6 +491,7 @@
   }
 
   function toggleFirmFilter(name) {
+    exitDeepLinkMode(); // [PR-0 딥링크] 검색 조작 → 딥링크 모드 종료(§4)
     state.q = state.q === name ? "" : name;
     if (qInput) qInput.value = state.q;
     currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
@@ -821,6 +843,9 @@
 
   function buildCard(row, query) {
     var card = el("article", "fnd-card");
+    // [PR-0 딥링크] 안정 DOM id — 일반 모드 포함 항상 부여한다(무해). 딥링크 자동 도달
+    // (revealAndFocusTarget)이 document.getElementById("f-"+finding_id) 로 대상을 찾는다.
+    if (row.finding_id) card.id = "f-" + row.finding_id;
     if (row.review_status === "needs_review") card.classList.add("fnd-card--review");
     card.classList.add("fnd-collapsed"); // 기본 접힘(카드 단위 로컬 상태, 재렌더시 초기화 허용)
 
@@ -1051,6 +1076,10 @@
     // [문서 단위 페이지네이션] 1페이지(기본값)는 URL 을 더럽히지 않는다 — 딥링크/뒤로가기는
     // 2페이지 이상일 때만 의미가 있다.
     if (currentPage > 1) params.set("page", String(currentPage));
+    // [PR-0 딥링크] finding_id 는 URL_KEYS 필터 파라미터가 아니라 exitDeepLinkMode() 가
+    // 지울 때까지 보존해야 하는 별도 계약이다 — 여기서 챙기지 않으면 이 함수가 새로
+    // 만드는 URLSearchParams 가 기존 finding_id 를 조용히 지워버린다(§6).
+    if (deepLinkParam) params.set(DEEP_LINK_PARAM, deepLinkParam);
     var qs = params.toString();
     var newUrl = location.pathname + (qs ? "?" + qs : "") + location.hash;
     history.replaceState(null, "", newUrl);
@@ -1097,6 +1126,7 @@
   // 가능한 칩으로 보여주고, 끝에 "모두 지우기" 텍스트 버튼을 붙인다. 활성 필터가 0개면
   // 컨테이너 자체를 hidden 처리한다. 전부 textContent/createElement(XSS 계약).
   function clearActiveFilter(key) {
+    exitDeepLinkMode(); // [PR-0 딥링크] 필터 해제 조작 → 딥링크 모드 종료(§4)
     state[key] = "";
     syncControlsFromState();
     currentPage = 1; // [페이지네이션] 필터 해제 → 1페이지로 리셋
@@ -1104,6 +1134,7 @@
   }
 
   function clearAllFilters() {
+    exitDeepLinkMode(); // [PR-0 딥링크] 필터 전체 초기화 조작 → 딥링크 모드 종료(§4)
     state = {
       q: "", agency: "", category_code: "", source: "", evidence_level: "",
       review_status: "", month: "", sort: "date_desc",
@@ -1148,6 +1179,237 @@
     clearAllBtn.addEventListener("click", clearAllFilters);
     activeEl.appendChild(clearAllBtn);
     activeEl.hidden = false;
+  }
+
+  // ── [PR-0 딥링크] /findings/?finding_id=finding-<24hex> 공유 링크 ──────────────────────
+  // 우선순위: ①형식 불일치 → fetch 없이 즉시 notfound ②단건 조회(FIELDS 3단계 폴백
+  // 재사용) → 빈 결과(RLS 비공개 포함) = notfound ③raw_signal_id 로 같은 문서 전체
+  // 재조회 → groupByDocument()+buildDocCard() 로 문서 카드 1장 렌더. found/notfound 는
+  // 사용자가 필터·검색·정렬·페이지를 조작하는 순간 exitDeepLinkMode() 로 종료되고 일반
+  // 모드로 전환된다(§4). 비공개·미존재·형식오류는 전부 동일한 notfound 배너로 수렴한다
+  // (§7, 존재 여부 정보 누설 금지).
+  function isValidFindingId(id) {
+    return typeof id === "string" && FINDING_ID_RE.test(id);
+  }
+
+  function getDeepLinkParam() {
+    if (typeof URLSearchParams === "undefined") return null;
+    var v = new URLSearchParams(location.search).get(DEEP_LINK_PARAM);
+    v = v ? v.trim() : "";
+    return v || null;
+  }
+
+  function urlWithoutDeepLink() {
+    if (typeof URLSearchParams === "undefined") return location.pathname;
+    var params = new URLSearchParams(location.search);
+    params.delete(DEEP_LINK_PARAM);
+    var qs = params.toString();
+    return location.pathname + (qs ? "?" + qs : "") + location.hash;
+  }
+
+  // 결과 영역(#fnd-loading 위) 상단에 삽입하는 안내 바 — grm.css 는 불가침이라 인라인
+  // style.cssText 로만 꾸민다(§4 한글안전: letter-spacing/text-transform/mono 미사용,
+  // 순수 배경·보더·패딩뿐). findings.html 템플릿은 건드리지 않는다(§8).
+  function ensureDeepLinkBanner() {
+    if (bannerEl) return bannerEl;
+    bannerEl = document.createElement("div");
+    bannerEl.id = "fnd-deeplink-banner";
+    bannerEl.hidden = true;
+    bannerEl.style.cssText =
+      "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" +
+      "background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);" +
+      "padding:12px 16px;margin:0 0 16px;font-size:13px;color:var(--body)";
+    var text = document.createElement("span");
+    text.id = "fnd-deeplink-banner-text";
+    bannerEl.appendChild(text);
+    var link = document.createElement("a");
+    link.id = "fnd-deeplink-banner-link";
+    link.style.cssText = "font-weight:600;color:var(--coral-2)";
+    link.textContent = "전체 목록 보기";
+    link.hidden = true;
+    bannerEl.appendChild(link);
+    if (loadingEl && loadingEl.parentNode) loadingEl.parentNode.insertBefore(bannerEl, loadingEl);
+    return bannerEl;
+  }
+
+  function hideDeepLinkBanner() {
+    if (bannerEl) bannerEl.hidden = true;
+  }
+
+  function showDeepLinkFoundBanner() {
+    var b = ensureDeepLinkBanner();
+    document.getElementById("fnd-deeplink-banner-text").textContent = "공유된 지적사항의 문서를 표시 중입니다.";
+    var link = document.getElementById("fnd-deeplink-banner-link");
+    link.href = urlWithoutDeepLink(); // [4] finding_id 파라미터 제거한 URL
+    link.hidden = false;
+    b.hidden = false;
+  }
+
+  function showDeepLinkNotFoundBanner() {
+    var b = ensureDeepLinkBanner();
+    document.getElementById("fnd-deeplink-banner-text").textContent =
+      "공유된 지적사항을 찾을 수 없습니다(비공개이거나 존재하지 않는 항목일 수 있습니다). 전체 목록을 표시합니다.";
+    document.getElementById("fnd-deeplink-banner-link").hidden = true;
+    b.hidden = false;
+  }
+
+  // 필터·검색·정렬·페이지 조작 진입점(wire()/clearAllFilters()/clearActiveFilter()/
+  // toggleXFilter()/goToPageFromPager())이 공통으로 호출한다 — deepLinkParam 이 없으면
+  // (일반 모드) 즉시 no-op 이라 기존 동작에 회귀가 없다(§7).
+  function exitDeepLinkMode() {
+    if (!deepLinkParam) return;
+    deepLinkParam = null;
+    deepLinkStatus = "";
+    deepLinkDocRows = null;
+    hideDeepLinkBanner();
+  }
+
+  function fetchFindingsFiltered(fields, filterQS) {
+    var cols = fields.join(",");
+    var endpoint =
+      url.replace(/\/$/, "") + "/rest/v1/findings?select=" +
+      encodeURIComponent(cols).replace(/%2C/g, ",") + "&" + filterQS +
+      "&order=published_date.desc,finding_id.asc";
+    return fetch(endpoint, { headers: { apikey: key, Authorization: "Bearer " + key } });
+  }
+
+  // 기존 3단계 FIELDS 폴백 체인(findings.js 파일 상단 §FIELDS 주석 계약)과 동일한 구조를
+  // finding_id/raw_signal_id 필터 조회에도 그대로 재사용한다(§2·§3).
+  function fetchDeepLinkFiltered(filterQS) {
+    return fetchFindingsFiltered(FIELDS, filterQS).then(function (r) {
+      if (r.ok) return r.json();
+      return fetchFindingsFiltered(FIELDS_NO_FIRM_KEY, filterQS).then(function (r2) {
+        if (r2.ok) return r2.json();
+        return fetchFindingsFiltered(LEGACY_FIELDS, filterQS).then(function (r3) {
+          if (!r3.ok) throw new Error("findings deep link fetch " + r3.status);
+          return r3.json();
+        });
+      });
+    });
+  }
+
+  function resolveDeepLink(id) {
+    if (!isValidFindingId(id)) {
+      deepLinkStatus = "notfound";
+      deepLinkPending = false;
+      maybeFinishInit();
+      return;
+    }
+    fetchDeepLinkFiltered("finding_id=eq." + encodeURIComponent(id))
+      .then(function (rows) {
+        if (!Array.isArray(rows) || !rows.length) {
+          deepLinkStatus = "notfound";
+          deepLinkPending = false;
+          maybeFinishInit();
+          return;
+        }
+        var target = rows[0];
+        var rsid = target.raw_signal_id;
+        if (!rsid) {
+          // 방어적 폴백 — raw_signal_id 가 없는 행(legacy 등)은 단건 자체를 문서로 취급.
+          deepLinkDocRows = [target];
+          deepLinkStatus = "found";
+          deepLinkPending = false;
+          maybeFinishInit();
+          return;
+        }
+        return fetchDeepLinkFiltered("raw_signal_id=eq." + encodeURIComponent(rsid)).then(function (docRows) {
+          deepLinkDocRows = (Array.isArray(docRows) && docRows.length) ? docRows : [target];
+          deepLinkStatus = "found";
+          deepLinkPending = false;
+          maybeFinishInit();
+        });
+      })
+      .catch(function () {
+        deepLinkStatus = "notfound";
+        deepLinkPending = false;
+        maybeFinishInit();
+      });
+  }
+
+  // 대상 observation 요소(#f-<finding_id>)까지 자동 도달 — ①"N건 모두 보기" 뒤에 숨어
+  // 있으면 펼침 ②카드 기본 접힘(3줄 요약)이면 펼침 ③goToPage() 의 기존 sticky 오프셋
+  // 보정 스크롤 공식(§5)을 재사용 ④tabindex=-1 focus + 2초 일시 강조(인라인 style —
+  // grm.css 불가침, 순수 outline 이라 §4 한글안전과 무관).
+  function revealAndFocusTarget(built, targetId) {
+    var item = null;
+    for (var i = 0; i < built.length; i++) {
+      if (built[i].card && built[i].card.id === "f-" + targetId) { item = built[i]; break; }
+    }
+    var targetEl = item ? item.card : document.getElementById("f-" + targetId);
+    if (!targetEl) return;
+    var moreWrap = targetEl.closest ? targetEl.closest(".fnd-doc-obs-more") : null;
+    if (moreWrap && moreWrap.hidden) {
+      moreWrap.hidden = false;
+      var toggleBtn = moreWrap.parentNode ? moreWrap.parentNode.querySelector(".fnd-doc-toggle") : null;
+      if (toggleBtn) {
+        toggleBtn.setAttribute("aria-expanded", "true");
+        toggleBtn.textContent = "접기";
+      }
+    }
+    if (targetEl.classList.contains("fnd-collapsed")) {
+      targetEl.classList.remove("fnd-collapsed");
+      if (item && item.moreBtn) {
+        item.moreBtn.hidden = false;
+        item.moreBtn.setAttribute("aria-expanded", "true");
+        item.moreBtn.textContent = "접기";
+      }
+    }
+    var toolsBar = document.getElementById("fnd-tools");
+    var stickyBottom = toolsBar ? toolsBar.getBoundingClientRect().bottom : 0;
+    var scrollTarget = window.scrollY + targetEl.getBoundingClientRect().top - stickyBottom - 10;
+    window.scrollTo({ top: Math.max(0, scrollTarget), behavior: "auto" });
+    targetEl.setAttribute("tabindex", "-1");
+    targetEl.focus({ preventScroll: true });
+    targetEl.style.outline = "2px solid var(--coral)";
+    targetEl.style.outlineOffset = "2px";
+    setTimeout(function () {
+      targetEl.style.outline = "";
+      targetEl.style.outlineOffset = "";
+    }, 2000);
+  }
+
+  // 문서 카드 1장 단독 렌더 — 페이지네이션·대시보드와 무관(§2: 딥링크 모드가 페이지네이션과
+  // 무관하게 단독 렌더). groupByDocument() 로 재확인 후(방어적) buildDocCard() 를 그대로
+  // 재사용한다(§3 — 신규 렌더러를 만들지 않는다).
+  function renderDeepLinkDoc() {
+    showState("none");
+    hidePager();
+    if (hasDash) dashEl.hidden = true; // 문서 1건뿐이라 대시보드는 의미가 없다(파괴 아님 — 숨김만)
+    resultsEl.textContent = "";
+    countEl.textContent = "";
+    var groups = groupByDocument(deepLinkDocRows);
+    var rows = groups.length ? groups[0] : deepLinkDocRows;
+    var doc = buildDocCard(rows, "");
+    resultsEl.appendChild(doc.card);
+    showDeepLinkFoundBanner();
+    var targetId = deepLinkParam;
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () {
+        doc.built.forEach(function (item) {
+          var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
+          var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
+          if (overflow || hasExtra) { item.moreBtn.hidden = false; } else { item.moreBtn.remove(); }
+        });
+        revealAndFocusTarget(doc.built, targetId);
+      });
+    } else {
+      revealAndFocusTarget(doc.built, targetId);
+    }
+  }
+
+  // ROWS 로드(rowsReady)와 딥링크 해석(!deepLinkPending) 이 둘 다 끝나야 최종 렌더를
+  // 확정한다 — 어느 쪽이 먼저 끝나든(네트워크 순서 무관) 깜빡임 없이 한 번만 렌더한다.
+  // finding_id 파라미터가 애초에 없었으면 deepLinkPending 은 시작부터 false 라 이 함수는
+  // rowsReady 만 기다리는 기존 흐름과 완전히 동일하게 동작한다(§7 회귀 0).
+  function maybeFinishInit() {
+    if (!rowsReady || deepLinkPending) return;
+    if (deepLinkStatus === "found") {
+      renderDeepLinkDoc();
+      return;
+    }
+    if (deepLinkStatus === "notfound") showDeepLinkNotFoundBanner();
+    goToPage(readPageFromUrl());
   }
 
   function render() {
@@ -1263,6 +1525,7 @@
       var sel = document.getElementById(def[0]);
       if (!sel) return;
       sel.addEventListener("change", function () {
+        exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
         state[def[1]] = sel.value;
         currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
         goToPage(1);
@@ -1270,6 +1533,7 @@
     });
     if (sortSel) {
       sortSel.addEventListener("change", function () {
+        exitDeepLinkMode(); // [PR-0 딥링크] 정렬 조작 → 딥링크 모드 종료(§4)
         state.sort = sortSel.value;
         currentPage = 1; // [페이지네이션] 정렬 변경 → 1페이지로 리셋
         goToPage(1);
@@ -1277,6 +1541,7 @@
     }
     if (qInput) {
       qInput.addEventListener("input", function () {
+        exitDeepLinkMode(); // [PR-0 딥링크] 검색 조작 → 딥링크 모드 종료(§4, 디바운스 전 즉시)
         state.q = qInput.value;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function () {
@@ -1499,6 +1764,7 @@
   // 위임하되, 완료 후 스크롤 플래그만 세팅한다(goToPage() 자체 시그니처는 다른 호출부
   // 다수가 공유하므로 변경하지 않는다).
   function goToPageFromPager(n) {
+    exitDeepLinkMode(); // [PR-0 딥링크] 페이지 조작 → 딥링크 모드 종료(§4)
     pendingScrollAfterNav = true;
     goToPage(n);
   }
@@ -1685,6 +1951,16 @@
   var loadedFieldsUsed = null;
   showState("loading");
   fetchCoverageNote();
+  // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 단건+문서 조회를
+  // 시작한다 — 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정
+  // 렌더한다(깜빡임 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래
+  // 로직 전체가 기존 동작과 완전히 동일하게(no-op) 흘러간다(§7 회귀 0).
+  var requestedFindingId = getDeepLinkParam();
+  if (requestedFindingId) {
+    deepLinkParam = requestedFindingId;
+    deepLinkPending = true;
+    resolveDeepLink(requestedFindingId);
+  }
   fetchFindings(FIELDS)
     .then(function (r) {
       if (r.ok) {
@@ -1720,13 +1996,16 @@
       // [FIND-1 M10c] URL→state 복원은 facet 값 목록(collectFacetValues)이 필요해
       // buildFacetSkeleton() 다음, 첫 render() 이전에 수행한다.
       readStateFromUrl();
-      // [문서 단위 페이지네이션] ?page= 도 초기 1회만 복원한다(무효/누락 값은 조용히 1).
-      var initialPage = readPageFromUrl();
       syncControlsFromState();
       wire();
-      goToPage(initialPage); // 필요하면 목표 페이지까지 청크를 이어서 fetch 한 뒤 render()
+      rowsReady = true;
+      // [PR-0 딥링크] goToPage(초기 페이지) 는 maybeFinishInit() 이 상황에 맞게 호출한다
+      // (found=문서 카드 단독 렌더, notfound/일반=기존과 동일한 페이지 목록 렌더 — ?page=
+      // 초기 1회 복원은 그 안에서 readPageFromUrl() 로 그대로 수행된다).
+      maybeFinishInit();
     })
     .catch(function () {
-      showState("error");
+      // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
+      if (deepLinkStatus !== "found") showState("error");
     });
 })();

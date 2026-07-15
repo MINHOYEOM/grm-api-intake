@@ -1231,7 +1231,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         render()의 syncStateToUrl() 이 기본 state 를 반영해 querystring 을 자동으로 비운다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function clearAllFilters()", js_src)
-        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 320]
+        # [PR-0 딥링크] exitDeepLinkMode() 호출 한 줄이 앞에 추가돼 고정폭 320 이 goToPage(1)
+        # 을 담기엔 부족해졌다 — 400 으로 상향(함수 본문 전체를 여전히 넉넉히 담는다).
+        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 400]
         self.assertIn('sort: "date_desc"', fn_block)
         self.assertIn("syncControlsFromState()", fn_block)
         self.assertIn("currentPage = 1", fn_block)
@@ -1405,7 +1407,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("showState(", catch_body)
         self.assertNotIn("coverageNoteEl.hidden = false", catch_body)
         # 메인 검색 fetch 호출 앞에 독립적으로 1회 호출된다(둘 다 showState("loading") 직후).
-        self.assertIn('fetchCoverageNote();\n  fetchFindings(FIELDS)', js_src)
+        # [PR-0 딥링크] fetchCoverageNote() 와 fetchFindings(FIELDS) 사이에 딥링크 해석
+        # 킥오프가 끼어들어 더 이상 텍스트상 바로 인접하지 않는다 — 순서(전자가 먼저)만
+        # 확인한다(둘 다 여전히 정확히 1회, showState("loading") 직후 영역에서 호출됨).
+        self.assertIn("fetchCoverageNote();", js_src)
+        self.assertLess(js_src.index("fetchCoverageNote();"), js_src.index("fetchFindings(FIELDS)\n"))
 
     def test_coverage_note_numbers_not_hardcoded_and_locale_formatted(self):
         """숫자(공개/전체 건수)는 findings_stats RPC 응답의 totals.public_findings/
@@ -1512,7 +1518,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         fetchFindings(LEGACY_FIELDS) 순서로 재시도한다(013 만 미적용/013·005 둘 다
         미적용 라이브 모두 방어)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        chain = js_src[js_src.index("fetchFindings(FIELDS)"):js_src.index(".catch(function () {\n      showState(\"error\");")]
+        # [PR-0 딥링크] catch 콜백에 deepLinkStatus 가드가 추가돼 showState("error") 가
+        # catch 여는 줄에 바로 붙어있지 않으므로, showState("error") 자체를 종점으로 삼는다
+        # (파일 전체에서 유일하게 이 catch 콜백에만 등장).
+        chain = js_src[js_src.index("fetchFindings(FIELDS)"):js_src.index('showState("error");')]
         idx_full = chain.index("fetchFindings(FIELDS)")
         idx_no_firm = chain.index("fetchFindings(FIELDS_NO_FIRM_KEY)")
         idx_legacy = chain.index("fetchFindings(LEGACY_FIELDS)")
@@ -1944,8 +1953,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         read_fn = read_fn[:read_fn.index("\n  }\n") + 4]
         self.assertIn('var raw = new URLSearchParams(location.search).get("page");', read_fn)
         self.assertIn("return !isNaN(n) && n >= 1 ? n : 1;", read_fn)
-        self.assertIn("var initialPage = readPageFromUrl();", js_src)
-        self.assertIn("goToPage(initialPage);", js_src)
+        # [PR-0 딥링크] 초기 페이지 복원은 더 이상 별도 initialPage 변수에 담기지 않고,
+        # ROWS 로드 완료 후 maybeFinishInit() 이 상황에 맞게(found=문서 단독 렌더로 건너뜀,
+        # 그 외=readPageFromUrl() 값으로 goToPage) 호출하는 형태로 위임됐다.
+        finish_fn = js_src[js_src.index("function maybeFinishInit() {"):]
+        finish_fn = finish_fn[:finish_fn.index("\n  }\n") + 4]
+        self.assertIn("goToPage(readPageFromUrl());", finish_fn)
 
     def test_pager_loading_shows_status_text_and_disables_buttons(self):
         """[로딩 UX b] 미로드 페이지 이동 중에는 버튼을 disabled 처리하고, 현재 페이지
@@ -2098,6 +2111,238 @@ class WebFindingsRenderTest(unittest.TestCase):
         after_m = _re.search(r"\.fnd-doc-firm a::after\{([^}]*)\}", self.html)
         self.assertIsNotNone(after_m, ".fnd-doc-firm a::after 화살표 글리프 미발견")
         self.assertIn('content:"→"', after_m.group(1))
+
+    # ── PR-0: /findings/?finding_id=finding-<24hex> 딥링크 ──────────────────────────
+    def test_deeplink_template_untouched(self):
+        """§8 — 템플릿 최소 변경 원칙: 딥링크는 findings.js 단독 구현이라
+        findings.html 소스 자체엔 새 마크업/id 가 없어야 한다(안내 바는 JS 가
+        런타임에 DOM 삽입)."""
+        tmpl_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertNotIn("finding_id", tmpl_src)
+        self.assertNotIn("fnd-deeplink", tmpl_src)
+
+    def test_deeplink_finding_id_regex_matches_stable_hash_format(self):
+        """grm_findings.py:706 finding_id = "finding-" + stable_hash(...)[:24] 는
+        sha256 hexdigest 앞 24자(항상 소문자 hex)다 — findings.js 의 검증 정규식이
+        정확히 이 형식과 일치해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('var FINDING_ID_RE = /^finding-[0-9a-f]{24}$/;', js_src)
+        self.assertIn('var DEEP_LINK_PARAM = "finding_id";', js_src)
+
+    def test_deeplink_invalid_format_shortcircuits_without_fetch(self):
+        """[①형식 검증] resolveDeepLink() 는 isValidFindingId() 가 거짓이면 어떤
+        fetch 함수도 호출하지 않고 곧장 notfound 로 확정해야 한다(§1 — fetch 없이
+        즉시 '찾을 수 없음')."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
+        invalid_branch = fn[:fn.index("fetchDeepLinkFiltered(")]
+        self.assertIn("if (!isValidFindingId(id)) {", invalid_branch)
+        self.assertIn('deepLinkStatus = "notfound";', invalid_branch)
+        self.assertIn("maybeFinishInit();", invalid_branch)
+        self.assertNotIn("fetch", invalid_branch.split("if (!isValidFindingId(id)) {")[1].split("}")[0])
+
+    def test_deeplink_single_record_fetch_reuses_fields_fallback_chain(self):
+        """[②단건 조회] fetchDeepLinkFiltered() 는 기존 3단계 FIELDS 폴백 체인
+        (FIELDS → FIELDS_NO_FIRM_KEY → LEGACY_FIELDS)과 동일한 구조를 그대로
+        재사용해야 한다(findings.js:81-99 계약 재사용, §2)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchDeepLinkFiltered(filterQS) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("fetchFindingsFiltered(FIELDS, filterQS)", fn)
+        self.assertIn("fetchFindingsFiltered(FIELDS_NO_FIRM_KEY, filterQS)", fn)
+        self.assertIn("fetchFindingsFiltered(LEGACY_FIELDS, filterQS)", fn)
+        # resolveDeepLink() 의 단건 조회는 finding_id=eq.<id> 필터를 쓴다(anon REST 단건).
+        resolve_fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
+        self.assertIn('fetchDeepLinkFiltered("finding_id=eq." + encodeURIComponent(id))', resolve_fn)
+        # 빈 결과(RLS 비공개 포함)는 별도 구분 없이 notfound.
+        empty_branch = resolve_fn[resolve_fn.index("!Array.isArray(rows) || !rows.length"):]
+        empty_branch = empty_branch[:empty_branch.index("}")]
+        self.assertIn('deepLinkStatus = "notfound";', empty_branch)
+
+    def test_deeplink_document_fetch_uses_raw_signal_id_and_default_order(self):
+        """[③문서 전체 조회] 대상의 raw_signal_id 로 같은 문서의 finding 전체를
+        추가 조회하고, 정렬은 기존 서버 정렬 관례(published_date.desc,
+        finding_id.asc)를 그대로 유지해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        resolve_fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
+        self.assertIn(
+            'fetchDeepLinkFiltered("raw_signal_id=eq." + encodeURIComponent(rsid))', resolve_fn
+        )
+        endpoint_fn = js_src[js_src.index("function fetchFindingsFiltered(fields, filterQS) {"):]
+        endpoint_fn = endpoint_fn[:endpoint_fn.index("\n  }\n") + 4]
+        self.assertIn("&order=published_date.desc,finding_id.asc", endpoint_fn)
+
+    def test_deeplink_renders_via_groupbydocument_and_builddoccard_reuse(self):
+        """[③렌더] 문서 조회 결과는 기존 groupByDocument()+buildDocCard() 를 그대로
+        재사용해 완전한 문서 카드 1장으로 렌더해야 한다(신규 렌더러 금지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderDeepLinkDoc() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("groupByDocument(deepLinkDocRows)", fn)
+        self.assertIn('buildDocCard(rows, "")', fn)
+
+    def test_deeplink_independent_of_pagination(self):
+        """[먼 페이지 대상] 딥링크 found 모드는 페이지네이션과 완전히 무관하게
+        단독 렌더한다 — renderDeepLinkDoc() 는 페이저를 숨기고(hidePager()) 페이지
+        번호/goToPage 를 전혀 참조하지 않으며, maybeFinishInit() 은 found 상태면
+        goToPage 를 아예 호출하지 않고 즉시 return 해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function renderDeepLinkDoc() {"):]
+        render_fn = render_fn[:render_fn.index("\n  }\n") + 4]
+        self.assertIn("hidePager();", render_fn)
+        self.assertNotIn("goToPage", render_fn)
+        self.assertNotIn("currentPage", render_fn)
+        finish_fn = js_src[js_src.index("function maybeFinishInit() {"):]
+        finish_fn = finish_fn[:finish_fn.index("\n  }\n") + 4]
+        found_branch = finish_fn[finish_fn.index('deepLinkStatus === "found"'):]
+        found_branch = found_branch[:found_branch.index("}") + 1]
+        self.assertIn("renderDeepLinkDoc();", found_branch)
+        self.assertIn("return;", found_branch)
+        self.assertNotIn("goToPage", found_branch)
+
+    def test_deeplink_auto_expands_collapsed_card_and_more_wrap(self):
+        """[접힌 6번째 이후 observation 자동 펼침] revealAndFocusTarget() 은 대상이
+        "N건 모두 보기" 뒤(.fnd-doc-obs-more, hidden)에 숨어 있으면 먼저 그 wrap 을
+        펼치고, 카드 자체가 기본 접힘(.fnd-collapsed, 3줄 요약)이면 그 클래스도
+        제거해 본문 전체가 보이게 해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function revealAndFocusTarget(built, targetId) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('targetEl.closest(".fnd-doc-obs-more")', fn)
+        self.assertIn("if (moreWrap && moreWrap.hidden) {", fn)
+        self.assertIn("moreWrap.hidden = false;", fn)
+        self.assertIn('if (targetEl.classList.contains("fnd-collapsed")) {', fn)
+        self.assertIn('targetEl.classList.remove("fnd-collapsed");', fn)
+
+    def test_deeplink_scroll_offset_focus_and_transient_highlight(self):
+        """[자동 도달] sticky 툴바 오프셋 보정 스크롤(goToPage() 의 기존 공식과 동일
+        패턴)+tabindex=-1 focus+일시 강조(2초 후 인라인 스타일 제거, grm.css 불가침)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function revealAndFocusTarget(built, targetId) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('document.getElementById("fnd-tools")', fn)
+        self.assertIn("stickyBottom", fn)
+        self.assertIn('targetEl.setAttribute("tabindex", "-1");', fn)
+        self.assertIn("targetEl.focus({ preventScroll: true });", fn)
+        self.assertIn('targetEl.style.outline = "2px solid var(--coral)";', fn)
+        self.assertIn("setTimeout(function () {", fn)
+        self.assertIn('targetEl.style.outline = "";', fn)
+        self.assertIn(", 2000);", fn)
+        # goToPage() 의 기존 스크롤 오프셋 보정 공식(§5 재사용 요구)과 동일 계산식.
+        goto_fn = js_src[js_src.index("function goToPage(n) {"):]
+        goto_fn = goto_fn[:goto_fn.index("function goToPageFromPager")]
+        self.assertIn("getBoundingClientRect().bottom : 0;", goto_fn)
+        self.assertIn("getBoundingClientRect().bottom : 0;", fn)
+
+    def test_deeplink_stable_dom_id_present_unconditionally(self):
+        """[안정 DOM id] buildCard() 는 딥링크 모드 여부와 무관하게(일반 모드
+        포함) 항상 id="f-<finding_id>" 를 부여해야 한다 — 딥링크 조건부 게이트가
+        없어야 무해하게 항상 존재한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildCard(row, query) {"):]
+        fn = fn[:fn.index("\n    if (row.review_status === \"needs_review\") card.classList.add")]
+        self.assertIn('if (row.finding_id) card.id = "f-" + row.finding_id;', fn)
+        self.assertNotIn("deepLink", fn)  # 딥링크 상태를 참조하는 조건부가 아니다.
+
+    def test_deeplink_uniform_notfound_for_invalid_missing_and_private(self):
+        """[§7 불가침] 형식오류·미존재·비공개(RLS 차단으로 빈 결과) 3가지 경로가
+        전부 동일한 deepLinkStatus="notfound" 로 수렴해야 한다 — 존재 여부 정보를
+        구분해 누설하는 별도 상태/문구가 없어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        resolve_fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
+        resolve_fn = resolve_fn[:resolve_fn.index("\n  }\n") + 4]
+        self.assertEqual(resolve_fn.count('deepLinkStatus = "notfound";'), 3,
+                          "형식오류·빈결과·fetch실패(catch) 3개 경로 모두 동일한 notfound 대입이어야 함")
+        # 배너 문구도 단일 — 사유별 분기 텍스트가 없다(showDeepLinkNotFoundBanner 는
+        # textContent 대입이 정확히 1회뿐이어야 한다).
+        banner_fn = js_src[js_src.index("function showDeepLinkNotFoundBanner() {"):]
+        banner_fn = banner_fn[:banner_fn.index("\n  }\n") + 4]
+        self.assertEqual(banner_fn.count(".textContent ="), 1)
+
+    def test_deeplink_exits_on_filter_search_sort_page_interaction(self):
+        """[§4] 필터·검색·정렬·페이지 조작 시 exitDeepLinkMode() 가 호출돼 딥링크
+        모드를 종료해야 한다 — wire() 의 셀렉트 5개·정렬·검색어 핸들러, 적용 필터
+        칩 제거(clearActiveFilter/clearAllFilters), 대시보드 클릭(toggleXFilter),
+        페이지네이션(goToPageFromPager) 전부가 진입점이다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3,
+                          "셀렉트·정렬·검색어 3개 핸들러 모두 exitDeepLinkMode() 호출해야 함")
+        for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",
+                         "function toggleCategoryFilter(code) {", "function toggleMonthFilter(month) {",
+                         "function toggleFirmFilter(name) {", "function goToPageFromPager(n) {"):
+            fn = js_src[js_src.index(fn_name):]
+            fn = fn[:fn.index("\n  }\n") + 4]
+            self.assertIn("exitDeepLinkMode();", fn, f"{fn_name} 이 exitDeepLinkMode() 를 호출하지 않음")
+
+    def test_deeplink_exit_is_noop_when_no_active_param(self):
+        """exitDeepLinkMode() 는 deepLinkParam 이 없으면(일반 모드) 즉시 return —
+        일반 /findings/ 경로에서 필터 조작 시 부작용이 전혀 없어야 한다(§7 회귀 0)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function exitDeepLinkMode() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!deepLinkParam) return;", fn)
+
+    def test_deeplink_normal_path_unaffected_when_param_absent(self):
+        """[일반 경로 회귀] finding_id 파라미터가 없으면 deepLinkPending 은 처음부터
+        false 로 시작해(requestedFindingId 가 없을 때만 진입하는 if 블록 밖) 신규
+        코드가 초기화 흐름에 개입하지 않고, maybeFinishInit() 의 비-found 분기는
+        기존과 동일하게 goToPage(readPageFromUrl()) 하나로 귀결돼야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var deepLinkPending = false;", js_src)
+        tail = js_src[js_src.index("var requestedFindingId = getDeepLinkParam();"):]
+        guarded = tail[:tail.index("fetchFindings(FIELDS)")]
+        self.assertIn("if (requestedFindingId) {", guarded)
+        self.assertIn("deepLinkPending = true;", guarded)
+        finish_fn = js_src[js_src.index("function maybeFinishInit() {"):]
+        finish_fn = finish_fn[:finish_fn.index("\n  }\n") + 4]
+        self.assertIn("goToPage(readPageFromUrl());", finish_fn)
+        # ROWS 로드 성공 콜백은 더 이상 goToPage 를 직접 호출하지 않고 maybeFinishInit() 로
+        # 위임한다("ROWS = data;" 는 이 콜백에서만 대입돼 유일하게 그 위치를 특정한다 —
+        # 동일한 "findings shape" 에러 문구는 fetchNextChunkFor() 에도 있어 그걸로는
+        # 앵커할 수 없다).
+        rows_then = js_src[js_src.index("ROWS = data;"):]
+        rows_then = rows_then[:rows_then.index(".catch(function () {")]
+        self.assertIn("rowsReady = true;", rows_then)
+        self.assertIn("maybeFinishInit();", rows_then)
+        self.assertNotIn("goToPage(initialPage)", rows_then)
+
+    def test_deeplink_list_fetch_failure_does_not_override_found_render(self):
+        """목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더(found)는 에러 상태로
+        덮어써지지 않아야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        catch_block = js_src[js_src.index('.catch(function () {\n      // [PR-0 딥링크]'):]
+        catch_block = catch_block[:catch_block.index("})();")]
+        self.assertIn('if (deepLinkStatus !== "found") showState("error");', catch_block)
+
+    def test_deeplink_url_sync_preserves_finding_id_param(self):
+        """[§6] syncStateToUrl() 은 새 URLSearchParams 를 처음부터 만들기 때문에
+        별도 보존 로직이 없으면 finding_id 를 조용히 지운다 — deepLinkParam 이
+        활성인 동안 그 값을 그대로 params 에 반영해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function syncStateToUrl() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (deepLinkParam) params.set(DEEP_LINK_PARAM, deepLinkParam);", fn)
+
+    def test_deeplink_found_banner_link_strips_param(self):
+        """[§4] 안내 바의 "전체 목록 보기" 링크는 finding_id 파라미터를 제거한
+        URL 이어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function urlWithoutDeepLink() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("params.delete(DEEP_LINK_PARAM);", fn)
+        banner_fn = js_src[js_src.index("function showDeepLinkFoundBanner() {"):]
+        banner_fn = banner_fn[:banner_fn.index("\n  }\n") + 4]
+        self.assertIn("link.href = urlWithoutDeepLink();", banner_fn)
+        self.assertIn('"전체 목록 보기"', js_src)
+
+    def test_deeplink_no_innerhtml_data_injection(self):
+        """딥링크 신규 함수들도 기존 XSS 계약(innerHTML 데이터 삽입 금지, 파일 상단
+        주석 계약)을 따라야 한다 — 전부 createElement/textContent 로만 DOM 을
+        구성한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        deeplink_block = js_src[js_src.index("function isValidFindingId(id) {"):js_src.index("function render() {")]
+        self.assertNotIn("innerHTML", deeplink_block)
 
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────

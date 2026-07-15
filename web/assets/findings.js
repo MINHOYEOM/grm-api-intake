@@ -1657,18 +1657,20 @@
         var isComplete =
           Number(totals.findings || 0) > 0 &&
           Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
-        // [진행형 문구 중립화] 계속 확대·진행 중이라는 인상을 주던 옛 괄호 안내 문구와
-        // "현재 N건 공개" 서술을 제거하고, 지금 상태를 있는 그대로 담담하게 서술한다
-        // ("N건 중 M건 국문 열람 가능") — 완역 자동 전환(isComplete) 분기 자체는 그대로 유지.
+        // 미완료 분기는 2026-07-15 백로그 완역 이후엔 당일 수집분이 다음 날 아침 번역
+        // 배치를 기다리는 짧은 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이
+        // 번역 중"으로 읽히도록 지연 사유를 덧붙인다("N건 중 M건 국문 열람 가능" 골격과
+        // 완역 자동 전환(isComplete) 분기 자체는 그대로 유지).
         coverageTextEl.textContent = isComplete
           ? (hasDocs
               ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
                 total + "건 전체를 국문으로 열람할 수 있습니다."
               : "전체 " + total + "건을 국문으로 열람할 수 있습니다.")
-          : hasDocs
-          ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
-            total + "건 중 " + pub + "건 국문 열람 가능"
-          : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능";
+          : (hasDocs
+              ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
+                total + "건 중 " + pub + "건 국문 열람 가능"
+              : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능") +
+            " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
         coverageNoteEl.hidden = false;
       })
       .catch(function () {

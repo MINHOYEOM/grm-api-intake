@@ -2454,6 +2454,22 @@ class WebFindingsRenderTest(unittest.TestCase):
         orig_fn = orig_fn[:orig_fn.index("\n  }\n") + 4]
         self.assertIn("if (!ko || !row.finding_text) return;", orig_fn)
 
+    def test_similar_adapter_keeps_trust_badges(self):
+        """[신뢰도 배지 M13] 어댑터가 evidence_level/review_status 를 넘겨야 유사검색
+        결과에서도 Evidence 등급·"검토 필요" 경계가 목록 모드와 동일하게 보인다 —
+        누락 시 buildCard() 의 두 배지 분기가 조용히 죽는다(컨트롤타워 검수 발견 결함).
+        018 RPC 도 이 두 필드를 반환한다(tests/test_findings_similar_lexical.py 가 고정)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function mapSimilarItemToRow(item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('evidence_level: item.evidence_level || "",', fn)
+        self.assertIn('review_status: item.review_status || "",', fn)
+        # buildCard() 가 실제로 이 두 필드로 배지를 그리는지(계약의 반대편) 확인.
+        card_fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        card_fn = card_fn[:card_fn.index("\n  }\n") + 4]
+        self.assertIn("EVIDENCE_LABEL[row.evidence_level]", card_fn)
+        self.assertIn('if (row.review_status === "needs_review") {', card_fn)
+
     def test_similar_dup_badge_only_when_dup_findings_gt_1(self):
         """[중복 배지] dup_findings>1 인 카드에만 "동일 문구 N개 문서"(N=dup_documents)
         배지를 부착한다."""

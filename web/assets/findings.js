@@ -1470,6 +1470,11 @@
       published_date: item.published_date,
       firm_name: item.firm_name,
       category_code: item.category_code,
+      // 신뢰도 배지 2종(M13 — Evidence 등급/검토 필요 경계)은 목록 모드와 동일하게
+      // 유지해야 한다. RPC 가 이 두 서지 필드를 반환하지 않으면 유사검색 결과에서만
+      // "검토 필요" 경고가 조용히 사라진다(018 주석의 반환 계약 참조).
+      evidence_level: item.evidence_level || "",
+      review_status: item.review_status || "",
       finding_text_ko: item.text || "",
       finding_text: "",
     };

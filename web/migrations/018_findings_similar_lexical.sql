@@ -80,7 +80,7 @@ as $$
     -- 공개 술어(010)를 후보 단계에서 즉시 적용해 비공개 행이 랭킹에도 못 들어오게 한다.
     select
       f.finding_id, f.raw_signal_id, f.source, f.agency, f.published_date,
-      f.firm_name, f.category_code,
+      f.firm_name, f.category_code, f.evidence_level, f.review_status,
       coalesce(nullif(f.finding_text_ko, ''), f.finding_text) as search_text,
       similarity(coalesce(nullif(f.finding_text_ko, ''), f.finding_text), i.q) as sim,
       coalesce(ts_rank(
@@ -116,7 +116,7 @@ as $$
   collapsed as (
     -- 동일 문구 붕괴: 대표 = 최신 발행일 → finding_id 오름차순(결정론 타이브레이크).
     select r.finding_id, r.raw_signal_id, r.source, r.agency, r.published_date,
-      r.firm_name, r.category_code, r.search_text,
+      r.firm_name, r.category_code, r.evidence_level, r.review_status, r.search_text,
       g.dup_documents, g.dup_findings, g.group_score
     from (
       select distinct on (md5(search_text)) *, md5(search_text) as grp
@@ -136,6 +136,11 @@ as $$
           'published_date', published_date,
           'firm_name', firm_name,
           'category_code', category_code,
+          -- 신뢰도 배지 2종(M13) 유지에 필요 — 둘 다 row 조회(FIELDS)로 이미 anon 에
+          -- 공개되는 서지 메타이고, 007 안전 계약도 evidence_level 을 명시 허용한다.
+          -- 이게 없으면 유사검색 결과에서 "검토 필요" 경계 표시가 사라진다.
+          'evidence_level', evidence_level,
+          'review_status', review_status,
           'text', search_text,
           'score', round(group_score::numeric, 4),
           'dup_documents', dup_documents,

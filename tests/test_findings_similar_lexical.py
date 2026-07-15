@@ -140,14 +140,29 @@ class ReturnContractTest(unittest.TestCase):
     def test_returned_keys_are_the_declared_surface(self) -> None:
         """반환 키 목록이 계약의 유일한 표면(007 주석 관례) -- 예상 키 집합 고정."""
         build = self.code[self.code.index("'items', coalesce(("):]
-        keys = set(re.findall(r"'([a-z_]+)',\s+(?:finding_id|raw_signal_id|source|agency|published_date|firm_name|category_code|search_text|round|dup_documents|dup_findings)", build))
+        keys = set(re.findall(
+            r"'([a-z_]+)',\s+(?:finding_id|raw_signal_id|source|agency|published_date"
+            r"|firm_name|category_code|evidence_level|review_status|search_text|round"
+            r"|dup_documents|dup_findings)",
+            build,
+        ))
         self.assertEqual(
             keys,
             {
                 "finding_id", "raw_signal_id", "source", "agency", "published_date",
-                "firm_name", "category_code", "text", "score", "dup_documents", "dup_findings",
+                "firm_name", "category_code", "evidence_level", "review_status",
+                "text", "score", "dup_documents", "dup_findings",
             },
         )
+
+    def test_trust_badge_fields_returned(self) -> None:
+        """신뢰도 배지 2종(M13)은 유사검색 결과에서도 유지돼야 한다 -- RPC 가
+        evidence_level/review_status 를 반환하지 않으면 "검토 필요" 경계가 조용히
+        사라진다(검수 발견 결함). 둘 다 row 조회(FIELDS)로 이미 anon 공개되는 서지
+        메타이고 007 안전 계약도 evidence_level 을 명시 허용한다."""
+        build = self.code[self.code.index("'items', coalesce(("):]
+        self.assertIn("'evidence_level', evidence_level", build)
+        self.assertIn("'review_status', review_status", build)
 
 
 class RankingAndGuardsTest(unittest.TestCase):

@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.126` |
+| 문서 버전 | `v1.127` |
 | 최종 수정일 | 2026-07-15 |
-| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현 완료 — `ENABLE_FINDINGS_EMBED` 플래그 off·CI 실측 전이라 비활성**(활성화는 컨트롤타워가 dry-run 실측 후 별도 판단). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -201,6 +201,7 @@ flowchart TD
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
 - **주간 번역(M8·M9):** 매주 월요일 예약된 Claude Code 세션(구독 사용량·API 비용 0)이 미번역분을 추출→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영.
 - **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 원문 접기 + 대시보드(기관·카테고리·기간·업체 통계)를 제공. M10 검증 브랜치에서는 카드 기본 접힘(3줄 요약→자세히 보기), 칩 필터(건수 병기), 정렬, 매칭어 하이라이트, 검토 필요 시각 경계, URL 쿼리 공유, 화면표시값 검색을 보강했다. `/findings/?finding_id=finding-<24hex>` 딥링크(PR-0)는 페이지 위치와 무관하게 대상 finding 이 속한 문서 카드 1장을 단독 렌더하고 해당 observation 까지 자동 펼침·스크롤·강조하며, 비공개/미존재/형식오류는 구분 없이 동일한 "찾을 수 없음" 안내로 수렴한다(findings.js 단독 구현). "유사 문구 검색"(S1) 토글은 `findings_similar` RPC(018, trigram+FTS 렉시컬 매칭 — 의미 매칭 아님)를 호출해 문서 그룹핑 없이 finding 단위로 결과를 보여주고 동일 문구 중복 배지·PR-0 딥링크 착지를 제공하며, RPC 실패/미적용 시 조용히 기존 키워드 검색으로 폴백한다.
+- **임베딩 저장층(S2, 구현 완료·비활성):** `findings_embed_service.py`(LLM 미관여 순수 스크립트)가 공개 게이트 통과분을 로컬 모델(`intfloat/multilingual-e5-small`, 384차원, GitHub Actions CPU)로 임베딩해 `finding_embeddings`(019, embedding_version·finding_id 복합 PK)에 upsert한다. 아이템-투-아이템 대칭 유사도라 양쪽 모두 `"query: "` prefix(019 주석·서비스가 함께 고정). embed_input B(483 전용)는 `raw_signals.raw_json`의 Observation deficiency+detail 재조합을 시도하고 모호/무매치/detail없음이면 A(finding_text 단독)로 결정론 폴백한다. `findings_similar_by_id` RPC(019)가 `embedding_config.active_version`과 일치하는 벡터만 서빙 — 적재(이 서비스)와 원자 전환(컨트롤타워가 검증 후 별도 수행)이 분리돼 있다. 워크플로 `grm-findings-embed.yml`은 `ENABLE_FINDINGS_EMBED`(기본 false) 플래그가 꺼져 있으면 매일 cron 을 조용히 skip하고, `workflow_dispatch`는 플래그 무관하게 dry-run 검증이 가능하다. **CI 실측(모델 다운로드 시간·임베딩 소요) 전이라 아직 활성화 전 단계.**
 
 ### 4.3 데이터 계약
 - **`raw_signals`** (원본 보존층): 재추출 가능한 원본. `raw_json`은 원문 byte 그대로 보존해 해시 재검증 가능. **비공개**(service_role 전용).
@@ -208,6 +209,7 @@ flowchart TD
 - **taxonomy v4:** 20개 카테고리(코드·한국어·영문 라벨 고정, v1~v4 전부 불변). 분류기는 단어경계 키워드 매칭 + 카테고리별 선택적 명시 정규식(`patterns`, 부정어/활용형/유연 인접 표현)을 병행한다. v3(2026-07-12 층화 감사, 실질 정확도 71%→89%)가 범용 "written procedure" 가로채기·"computer system" 경직 구문·"non-sterile" 부정어 오탐 등 구조적 오분류를 고쳤고, v4(동일 감사의 사후 재감사)는 잔여 wrong 9건을 근거로 ①확인된 2개 OCR 오탈자 혼동쌍 한정 내성(quality/quaJity, sterile/sterih) ②캐치올로 새는 CFR 조항 어휘 보강(연차제품검토·보류샘플·스모크스터디) ③원자재 샘플링/CPV 어순변형 보강을 추가했다(`findings_reclassify_service.py`가 라이브 재분류 담당, workflow_dispatch 전용, LLM 0). `finding_id`는 내용 해시 기반 안정 ID(번역·재분류로 안 바뀜).
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
 - **집계 RPC(007/008, 카운트 전용 안전 계약):** `findings_stats`/`findings_firm_stats`(007)·`findings_category_matrix`(008)는 공개 게이트(006)를 우회해 **전량** 집계(건수·연도·카테고리·업체 통계)를 서빙하되, 원문 텍스트(`finding_text`/`finding_text_ko`)는 어떤 경로로도 반환하지 않습니다. `/findings/trends/`가 이 두 RPC만 소비.
+- **`finding_embeddings`/`embedding_config`(S2, 019):** 벡터 저장층(비공개, service_role 전용) + 활성 버전 스위치 1행. `findings_similar_by_id` RPC가 활성 버전과 raw_signal_id 배제·공개 게이트를 적용해 "이 지적과 유사한 사례"(의미 매칭)를 서빙하되 벡터 자체는 어떤 경로로도 반환하지 않는다. 인덱스(HNSW)는 의도적으로 미생성(8.5k 규모 exact cosine 순차 스캔으로 먼저 품질 검증).
 
 ### 4.4 구현 마일스톤 요약 (M1~M14, 전부 완료·라이브)
 
@@ -262,11 +264,13 @@ grm-api-intake/
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
 ├─ findings_reclassify_service.py  # taxonomy 라이브 재분류(현재 v4, workflow_dispatch 전용, LLM 0)
+├─ findings_embed_service.py       # [FIND-1 S2] 공개 findings 임베딩 → finding_embeddings upsert(LLM 0)
+├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql, 013_findings_firm_key.sql)
+│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql, 013_findings_firm_key.sql, 018_findings_similar_lexical.sql, 019_findings_embeddings.sql)
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
@@ -283,7 +287,8 @@ grm-api-intake/
    ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
    ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
-   └─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
+   ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
+   └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)
 ```
 
 ### 5.2 주요 실행 파일
@@ -308,6 +313,7 @@ grm-api-intake/
 | `ENABLE_FINDINGS_SUPABASE_APPEND` (M4 raw 적재) | `true` |
 | `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND` (M4 findings 적재) | `true` (2026-07-08 활성) |
 | `ENABLE_FINDINGS_SQLITE_APPEND` / `_FINDINGS_APPEND` (로컬 개발용) | `false` |
+| `ENABLE_FINDINGS_EMBED` (S2 임베딩 cron 게이트 — `workflow_dispatch`는 플래그 무관 dry-run 가능) | `false`(CI 실측 전) |
 
 > 운영 기본값은 `grm-intake.yml`의 `vars.* || 'true/false'` fallback으로 정해집니다.
 

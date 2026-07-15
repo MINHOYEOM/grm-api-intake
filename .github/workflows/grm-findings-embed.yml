@@ -1,0 +1,151 @@
+name: GRM Findings Embed (S2)
+
+# [FIND-1 S2] 임베딩 저장층 적재 -- 매일 공개 findings 를 로컬 모델(multilingual-e5-small,
+# GitHub Actions CPU)로 임베딩해 finding_embeddings(019_findings_embeddings.sql)에
+# upsert 한다. LLM 은 이 워크플로에 전혀 관여하지 않는다 -- findings_embed_service.py 는
+# 순수 결정론 스크립트(모델 자체는 결정론적 함수)이며, "임베딩 계산"과 "DB 쓰기"를
+# 한 스크립트가 함께 하되 판단(어느 텍스트를 쓸지)은 --embed-input 인자로 코드가
+# 결정한다 -- 사람/LLM 의 실시간 판단 없음.
+#
+# ★비용·운영 계약(019 주석): 신규 시크릿 0 -- SUPABASE_URL(vars)·SUPABASE_SERVICE_ROLE_KEY
+# 는 grm-intake.yml(M4)·grm-findings-translate-apply.yml(M9b) 이 이미 쓰는 동일 값 재사용.
+#
+# ★embedding_config(활성 버전 스위치)는 이 워크플로가 절대 건드리지 않는다 -- 이 스크립트는
+# 019 §전환순서의 ①적재만 수행한다. ②검증 ③원자 전환 ④구버전 삭제는 컨트롤타워가 별도
+# 수행(dry-run 실측 결과를 보고 판단).
+#
+# ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 -- checkout(read-only) 이후
+# 커밋/푸시/PR 생성 스텝이 없다.
+#
+# 트리거 2종:
+#   - schedule: 매일 20:00 UTC(=익일 05:00 KST) -- 매일 03:17 KST intake 이후 여유를 둔다.
+#     vars.ENABLE_FINDINGS_EMBED(§1-B 관례, 기본 false)이 꺼져 있으면 job 자체를 스킵한다
+#     (조용히 스킵 -- 실패가 아니라 "skipped"로 표시).
+#   - workflow_dispatch: 플래그와 무관하게 항상 실행 가능(검증 경로) -- dry_run 기본값 true.
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true=임베딩 계산·리포트만(DB 쓰기 없음), false=실제 upsert"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      embed_input:
+        description: "'A'=finding_text 단독 / 'B'=483 deficiency+detail 재조합(폴백 포함)"
+        required: true
+        default: "B"
+        type: choice
+        options:
+          - "A"
+          - "B"
+      embedding_version:
+        description: "finding_embeddings.embedding_version(019 복합 PK 축)"
+        required: true
+        default: "1"
+      limit:
+        description: "이번 실행에서 고려할 최대 findings 건수(비우면 전량)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-embed
+  cancel-in-progress: false
+
+jobs:
+  embed:
+    name: Embed public findings → finding_embeddings (S2)
+    # cron 은 ENABLE_FINDINGS_EMBED=true 일 때만 실행(조용히 skip). workflow_dispatch 는
+    # 플래그와 무관하게 항상 실행 가능(dry_run 기본 true 이므로 검증 용도로 안전).
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.ENABLE_FINDINGS_EMBED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-embed.txt
+
+      # sentence-transformers/torch 는 모델 fp32 ≈ 471MB(설계 실측) -- CI 시간의 주
+      # 요인이므로 pip 캐시(위 setup-python)에 더해 HF Hub 모델 캐시도 별도로 캐시한다.
+      - name: Cache Hugging Face model cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: ${{ runner.os }}-hf-${{ hashFiles('requirements-embed.txt') }}-e5-small
+          restore-keys: |
+            ${{ runner.os }}-hf-${{ hashFiles('requirements-embed.txt') }}-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-embed.txt
+
+      # 읽기(findings·raw_signals) + upsert(finding_embeddings 만) -- git add/commit/push
+      # 없음. embedding_config 는 절대 건드리지 않는다(활성 전환은 컨트롤타워 별도 수행).
+      - name: Run findings embed (no git writes -- read + finding_embeddings upsert only)
+        id: embed
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # cron 경로는 dispatch 입력이 없다 -- 기본값(embed_input=B, version=1, 전량,
+            # 실제 upsert)으로 실행한다. 여기까지 온다는 것은 이미 위 job-level if 에서
+            # ENABLE_FINDINGS_EMBED=true 를 확인했다는 뜻이다.
+            DRY_RUN="false"
+            EMBED_INPUT="B"
+            EMBEDDING_VERSION="1"
+            LIMIT=""
+          else
+            DRY_RUN="${{ inputs.dry_run }}"
+            EMBED_INPUT="${{ inputs.embed_input }}"
+            EMBEDDING_VERSION="${{ inputs.embedding_version }}"
+            LIMIT="${{ inputs.limit }}"
+          fi
+
+          ARGS=(--embedding-version "$EMBEDDING_VERSION" --embed-input "$EMBED_INPUT" --output embed_report.json)
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ -n "$LIMIT" ]; then
+            ARGS+=(--limit "$LIMIT")
+          fi
+          python findings_embed_service.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Embed (S2)"
+            echo ""
+            echo "event: \`${{ github.event_name }}\`"
+            if [ "${{ github.event_name }}" != "schedule" ]; then
+              echo ""
+              echo "dry_run=${{ inputs.dry_run }} embed_input=${{ inputs.embed_input }} embedding_version=${{ inputs.embedding_version }} limit=${{ inputs.limit }}"
+            fi
+            echo ""
+            if [ -f embed_report.json ]; then
+              echo '```json'
+              cat embed_report.json
+              echo '```'
+            else
+              echo "embed_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 -- SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

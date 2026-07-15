@@ -2001,9 +2001,14 @@
     goToPage(n);
   }
 
+  // [단독 렌더 모드 공통] 페이저 3종을 함께 숨긴다 — 상/하단 페이저 + sticky 미니 내비
+  // (#fnd-pnav, PR#231). ★pnav 를 빼먹으면 딥링크·유사검색처럼 "페이지가 없는" 단독
+  // 렌더 모드에서 sticky 툴바에 ‹ › 화살표만 덩그러니 남는다(프리뷰 실측으로 발견).
+  // 복귀는 render()→renderPager()→updatePnav() 가 상태 기준으로 되살린다.
   function hidePager() {
     if (pagerTopEl) pagerTopEl.hidden = true;
     if (pagerBottomEl) pagerBottomEl.hidden = true;
+    if (pnavEl) pnavEl.hidden = true;
   }
 
   // 페이지 이동 중(네트워크 대기) 버튼을 비활성화한다 — render() 가 뒤이어 pager 를

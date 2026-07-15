@@ -2454,6 +2454,24 @@ class WebFindingsRenderTest(unittest.TestCase):
         orig_fn = orig_fn[:orig_fn.index("\n  }\n") + 4]
         self.assertIn("if (!ko || !row.finding_text) return;", orig_fn)
 
+    def test_hide_pager_also_hides_sticky_mininav(self):
+        """[단독 렌더 모드 공통] hidePager() 는 상/하단 페이저 + sticky 미니 내비
+        (#fnd-pnav, PR#231) 셋을 함께 숨겨야 한다 — pnav 를 빼먹으면 딥링크(PR-0)·
+        유사검색(S1)처럼 페이지 개념이 없는 단독 렌더 모드에서 sticky 툴바에 ‹ ›
+        화살표만 남는다(프리뷰 실측 발견 결함). 두 모드가 공유하는 단일 진입점이라
+        여기서 한 번만 막는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function hidePager() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (pagerTopEl) pagerTopEl.hidden = true;", fn)
+        self.assertIn("if (pagerBottomEl) pagerBottomEl.hidden = true;", fn)
+        self.assertIn("if (pnavEl) pnavEl.hidden = true;", fn)
+        # 두 단독 렌더 모드가 실제로 이 진입점을 쓰는지(계약의 반대편).
+        for mode_fn in ("function renderDeepLinkDoc() {", "function renderSimilarResults(items) {"):
+            body = js_src[js_src.index(mode_fn):]
+            body = body[:body.index("\n  }\n") + 4]
+            self.assertIn("hidePager();", body)
+
     def test_similar_adapter_keeps_trust_badges(self):
         """[신뢰도 배지 M13] 어댑터가 evidence_level/review_status 를 넘겨야 유사검색
         결과에서도 Evidence 등급·"검토 필요" 경계가 목록 모드와 동일하게 보인다 —

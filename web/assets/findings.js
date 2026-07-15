@@ -972,14 +972,16 @@
       block.hidden = !opening;
       btn.setAttribute("aria-expanded", opening ? "true" : "false");
       if (!opening || fetched) return; // 접는 조작이거나 이미 fetch 완료 — 재요청 금지
-      fetched = true;
       renderSimilarToState(block, null); // 로딩 표시
+      // [F-08] fetched=true 는 성공(then)에서만 세운다 — 클릭 시점에 미리 세우면 일시 오류 후 재클릭이 새로고침 전까지 영구 봉쇄된다.
       fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)
         .then(function (data) {
+          fetched = true;
           var items = (data && Array.isArray(data.items)) ? data.items : [];
           renderSimilarToState(block, items);
         })
         .catch(function () {
+          fetched = false; // [F-08] 재시도 허용(404 RPC 미존재도 멱등 GET성 POST라 무해) — 표시는 종전과 동일한 조용한 폴백
           renderSimilarToState(block, []); // §3 조용한 폴백 — RPC 미적용(404)/네트워크
           // 오류 전부 0건과 동일 문구로 수렴한다(재발생·콘솔 에러 로그 없음).
         });
@@ -1423,7 +1425,8 @@
     var endpoint =
       url.replace(/\/$/, "") + "/rest/v1/findings?select=" +
       encodeURIComponent(cols).replace(/%2C/g, ",") + "&" + filterQS +
-      "&order=published_date.desc,finding_id.asc";
+      // [F-10] PostgREST 서버 기본 상한(max-rows) 의존 제거 — 딥링크 단건+문서 조회 공용이라 명시 limit=200(현재 문서 최대 46행 대비 여유 4배).
+      "&order=published_date.desc,finding_id.asc&limit=200";
     return fetch(endpoint, { headers: { apikey: key, Authorization: "Bearer " + key } });
   }
 

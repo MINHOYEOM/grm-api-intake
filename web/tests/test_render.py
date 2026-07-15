@@ -2174,6 +2174,16 @@ class WebFindingsRenderTest(unittest.TestCase):
         endpoint_fn = endpoint_fn[:endpoint_fn.index("\n  }\n") + 4]
         self.assertIn("&order=published_date.desc,finding_id.asc", endpoint_fn)
 
+    def test_f10_deep_link_document_fetch_has_explicit_limit(self):
+        """[F-10] 딥링크 단건+문서 조회 공용 fetchFindingsFiltered() 에 명시 limit=200 —
+        PostgREST 서버 기본 상한(max-rows) 의존을 제거한다(현재 문서 최대 46행 대비 여유
+        4배)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        endpoint_fn = js_src[js_src.index("function fetchFindingsFiltered(fields, filterQS) {"):]
+        endpoint_fn = endpoint_fn[:endpoint_fn.index("\n  }\n") + 4]
+        self.assertIn("&limit=200", endpoint_fn)
+        self.assertIn("&order=published_date.desc,finding_id.asc&limit=200", endpoint_fn)
+
     def test_deeplink_renders_via_groupbydocument_and_builddoccard_reuse(self):
         """[③렌더] 문서 조회 결과는 기존 groupByDocument()+buildDocCard() 를 그대로
         재사용해 완전한 문서 카드 1장으로 렌더해야 한다(신규 렌더러 금지)."""
@@ -2607,13 +2617,17 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_similar_to_cached_after_first_fetch_no_refetch(self):
         """[1회 fetch 후 캐시] fetched 플래그가 true 로 굳으면 이후 클릭은 토글만 하고
-        fetchSimilarTo 를 다시 호출하지 않는다(재요청 금지)."""
+        fetchSimilarTo 를 다시 호출하지 않는다(재요청 금지). F-08 수리 후 fetched=true 는
+        성공(then) 안에서만 세워진다 — 클릭 시점(fetch 호출 전)에는 아직 세우지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("var fetched = false;", fn)
         self.assertIn("if (!opening || fetched) return;", fn)
-        self.assertIn("fetched = true;", fn)
+        before_fetch_call = fn[:fn.index("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)")]
+        self.assertNotIn("fetched = true;", before_fetch_call)  # [F-08] 클릭 시점 선(先)확정 금지
+        then_branch = fn[fn.index(".then(function (data) {"):fn.index(".catch(function () {")]
+        self.assertIn("fetched = true;", then_branch)
 
     def test_similar_to_toggle_collapses_on_second_click(self):
         """[토글] block.hidden 뒤집기로 펼침/접힘을 표현하고 aria-expanded 를 동기화한다."""
@@ -2648,6 +2662,23 @@ class WebFindingsRenderTest(unittest.TestCase):
         state_fn = state_fn[:state_fn.index("\n  }\n") + 4]
         self.assertIn('"불러오는 중…"', state_fn)
         self.assertIn('"유사 사례를 찾지 못했습니다"', state_fn)
+
+    def test_f08_similar_cases_retry_allowed_after_transient_failure(self):
+        """[F-08] "유사 사례" 재시도 불가 수리 — fetched=true 는 성공(then)에서만 세워
+        캐시를 확정하고, catch 에서는 false 로 되돌려 다음 클릭이 재시도하게 한다(일시
+        네트워크 오류·404(RPC 미존재) 후에도 새로고침 없이 재시도 가능). catch 의 사용자
+        표시는 종전과 동일한 조용한 폴백(콘솔 로그·throw 없음)이어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        then_branch = fn[fn.index(".then(function (data) {"):fn.index(".catch(function () {")]
+        catch_branch = fn[fn.index(".catch(function () {"):]
+        catch_branch = catch_branch[:catch_branch.index("});") + 3]
+        self.assertIn("fetched = true;", then_branch)  # 성공 시에만 캐시 확정
+        self.assertIn("fetched = false;", catch_branch)  # 실패 시 재시도 허용
+        self.assertNotIn("console.error", catch_branch)
+        self.assertNotIn("throw", catch_branch)
+        self.assertIn("renderSimilarToState(block, []);", catch_branch)
 
     def test_similar_to_dup_badge_only_when_dup_findings_gt_1(self):
         """[중복 배지] dup_findings>1 인 항목에만 "동일 문구 N개 문서"(N=dup_documents)

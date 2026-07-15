@@ -21,13 +21,17 @@ under --outbox-dir and issues HTTPS PATCH requests. It never moves, renames,
 or deletes outbox files, and never stages, commits, or pushes anything. PATCH
 is idempotent by construction here (the WHERE-equivalent filter pins both
 finding_id and the original finding_text), so leaving already-applied outbox
-files in place is safe: re-running this script re-PATCHes them to the same
-values (a harmless no-op write) or matches zero rows if finding_text no
-longer matches live data (also harmless -- counted as matched_zero, not an
-error). Outbox files therefore accumulate over time by design; that is a
-deliberately out-of-scope, low-stakes piece of housekeeping (see the module
-docstring companion notes in the M9b task writeup) rather than something this
-script manages.
+files in place is *correct* but not *free*: re-running this script re-PATCHes
+them to the same values (a harmless no-op write) or matches zero rows if
+finding_text no longer matches live data (also harmless -- counted as
+matched_zero, not an error). The cost is wall-clock: the CI workflow has a
+10-minute timeout, and on 2026-07-13 dozens of accumulated already-applied
+batches pushed every run past it, starving the newest batch. Two mitigations
+exist: (1) this script processes outbox files newest-first (see
+_load_outbox_files), and (2) the M9c translation session archives
+already-applied batches from translations/outbox/ to translations/applied/
+in the same PR that adds a new batch, so the outbox normally holds only the
+batch(es) not yet confirmed applied.
 
 The service-role key is never included in any log line, exception message,
 or report field -- only exception type names and HTTP status codes are
@@ -61,11 +65,20 @@ def _normalize_base_url(base_url: str) -> str | None:
 
 
 def _load_outbox_files(outbox_dir: str | Path) -> tuple[list[Path], list[str]]:
-    """Return (sorted file paths, errors). Missing directory is not an error."""
+    """Return (newest-first file paths, errors). Missing directory is not an error.
+
+    Outbox file names are date-prefixed (e.g. 2026-07-15-batch.json), so reverse
+    lexicographic order processes the newest batch first. This is a starvation
+    defense: the workflow has a hard 10-minute timeout, and if applied batches
+    ever accumulate in the outbox again (2026-07-13 incident: 42 stale files
+    re-PATCHed on every run pushed the newest batch past the timeout, so merged
+    translations never reached Supabase), the newest — i.e. the only not-yet-
+    applied — batch still lands before the deadline.
+    """
     directory = Path(outbox_dir)
     if not directory.is_dir():
         return [], []
-    paths = sorted(p for p in directory.glob("*.json") if p.is_file())
+    paths = sorted((p for p in directory.glob("*.json") if p.is_file()), reverse=True)
     return paths, []
 
 

@@ -7,9 +7,14 @@ name: GRM Findings Translate Apply (M9b)
 # 끝난 뒤 outbox JSON 으로 고정되어 여기 도달한다.
 #
 # ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 — checkout(read-only) 이후
-# 커밋/푸시/PR 생성 스텝이 없다. outbox 파일은 이동·삭제되지 않고 그대로 남는다(PATCH 는
+# 커밋/푸시/PR 생성 스텝이 없다. outbox 파일 이동·삭제도 여기서 하지 않는다(PATCH 는
 # finding_id+finding_text 로 필터링해 멱등이므로 재실행 시 이미 반영된 항목은 매칭 0건
-# 또는 동일값 재반영으로 무해 — outbox 누적은 의도적으로 다루지 않는 사소한 이월 항목).
+# 또는 동일값 재반영으로 무해).
+#
+# ★outbox 누적 금지(2026-07-13 기아 장애): 적용 완료 배치가 outbox 에 수십 개 쌓이면
+# 매 실행 전량 재PATCH 가 timeout-minutes(10분)를 초과해 최신 배치가 영구 미반영된다.
+# 방어 2겹 — ①스크립트가 최신 파일 우선(역순) 처리 ②M9c 번역 세션이 새 배치 PR 에서
+# 직전 apply 성공이 확인된 기존 outbox 배치를 translations/applied/ 로 아카이브.
 on:
   push:
     branches: [main]
@@ -49,10 +54,11 @@ jobs:
       # 재사용이며, 이 워크플로를 위한 신규 secret 등록은 필요 없다.
       # FIND-1 M13b: items_errored>0 (or any other report["errors"] entry,
       # e.g. a malformed SUPABASE_URL) now makes the script exit 1 -- PATCH
-      # retry semantics are unchanged (outbox files are never removed, so a
-      # future scheduled run naturally re-processes anything that failed
-      # this time), but the run now goes red instead of silently green so a
-      # human notices without having to open the report JSON by hand.
+      # retry semantics are unchanged (a failed run's outbox files stay in
+      # place — M9c archives a batch only after the apply run that covered
+      # it went green — so a future run naturally re-processes anything that
+      # failed this time), but the run now goes red instead of silently
+      # green so a human notices without having to open the report JSON.
       - name: Apply translation outbox (no git writes — read + PATCH only)
         id: apply
         env:

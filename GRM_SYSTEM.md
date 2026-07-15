@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.130` |
-| 최종 수정일 | 2026-07-15 |
+| 문서 버전 | `v1.131` |
+| 최종 수정일 | 2026-07-16 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,187건·문서 1,358건·업체 980곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -201,7 +201,7 @@ flowchart TD
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
 - **주간 번역(M8·M9):** 매주 월요일 예약된 Claude Code 세션(구독 사용량·API 비용 0)이 미번역분을 추출→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영.
 - **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 원문 접기 + 대시보드(기관·카테고리·기간·업체 통계)를 제공. M10 검증 브랜치에서는 카드 기본 접힘(3줄 요약→자세히 보기), 칩 필터(건수 병기), 정렬, 매칭어 하이라이트, 검토 필요 시각 경계, URL 쿼리 공유, 화면표시값 검색을 보강했다. `/findings/?finding_id=finding-<24hex>` 딥링크(PR-0)는 페이지 위치와 무관하게 대상 finding 이 속한 문서 카드 1장을 단독 렌더하고 해당 observation 까지 자동 펼침·스크롤·강조하며, 비공개/미존재/형식오류는 구분 없이 동일한 "찾을 수 없음" 안내로 수렴한다(findings.js 단독 구현). "유사 문구 검색"(S1) 토글은 `findings_similar` RPC(018, trigram+FTS 렉시컬 매칭 — 의미 매칭 아님)를 호출해 문서 그룹핑 없이 finding 단위로 결과를 보여주고 동일 문구 중복 배지·PR-0 딥링크 착지를 제공하며, RPC 실패/미적용 시 조용히 기존 키워드 검색으로 폴백한다. 각 카드의 "유사 사례" 버튼은 `findings_similar_to` RPC(021, finding_id 기준 S1 렉시컬)를 on-demand(클릭 전 fetch 없음)로 호출해 같은 문서를 제외한 상위 5건을 카드 내부에 인라인으로 보여주며, 1회 fetch 후 캐시(재클릭은 토글만)·RPC 실패 시 조용한 빈 결과 폴백을 적용한다(021 라이브 적용 완료).
-- **임베딩 저장층(S2, 구현 완료·웹 공개 중단):** `findings_embed_service.py`(LLM 미관여 순수 스크립트)가 공개 게이트 통과분을 로컬 모델(`intfloat/multilingual-e5-small`, 384차원, GitHub Actions CPU)로 임베딩해 `finding_embeddings`(019, embedding_version·finding_id 복합 PK)에 upsert한다. 아이템-투-아이템 대칭 유사도라 양쪽 모두 `"query: "` prefix(019 주석·서비스가 함께 고정). embed_input B(483 전용)는 `raw_signals.raw_json`의 Observation deficiency+detail 재조합을 시도하고 모호/무매치/detail없음이면 A(finding_text 단독)로 결정론 폴백한다. `findings_similar_by_id` RPC(019)가 `embedding_config.active_version`과 일치하는 벡터만 서빙하지만, **A/B 평가 실측(2026-07-15, 평가셋 40건·블라인드 pooled 판정·부트스트랩 95% CI)에서 S1(렉시컬) 대비 유의한 개선을 입증하지 못해(P@5/nDCG 동률 또는 오히려 열세 — 공개 483 의 59.4%가 CFR 조항을 옮긴 동일 문구라 렉시컬이 이미 정답을 찾는다) §4.3 공개 게이트를 불통과, S2 웹 공개는 중단됐다.** 저장층·서비스 자체는 유지하되 `findings_similar_by_id` 는 호출하지 않는다(inert) — 웹의 "유사 사례" 기능은 021(S1 렉시컬) 이 전담한다.
+- **임베딩 저장층(S2, 구현 완료·웹 공개 중단):** `findings_embed_service.py`(LLM 미관여 순수 스크립트)가 공개 게이트 통과분을 로컬 모델(`intfloat/multilingual-e5-small`, 384차원, GitHub Actions CPU)로 임베딩해 `finding_embeddings`(019, embedding_version·finding_id 복합 PK)에 upsert한다. 아이템-투-아이템 대칭 유사도라 양쪽 모두 `"query: "` prefix(019 주석·서비스가 함께 고정). embed_input B(483 전용)는 `raw_signals.raw_json`의 Observation deficiency+detail 재조합을 시도하고 모호/무매치/detail없음이면 A(finding_text 단독)로 결정론 폴백한다. `findings_similar_by_id` RPC(019)가 `embedding_config.active_version`과 일치하는 벡터만 서빙하지만, **A/B 평가 실측(2026-07-15, 평가셋 40건·블라인드 pooled 판정·부트스트랩 95% CI)에서 S1(렉시컬) 대비 유의한 개선을 입증하지 못해(P@5/nDCG 동률 또는 오히려 열세 — 공개 483 의 59.4%가 CFR 조항을 옮긴 동일 문구라 렉시컬이 이미 정답을 찾는다) §4.3 공개 게이트를 불통과, S2 웹 공개는 중단됐다.** 저장층·서비스 자체는 유지하되 `findings_similar_by_id` 는 호출하지 않는다(inert) — 웹의 "유사 사례" 기능은 021(S1 렉시컬) 이 전담한다. **F-04(재실행 주의, 미수리):** 재임베딩 시 기존 저장 벡터의 모델 `revision`을 신규 실행의 `revision`과 대조하지 않는 결함이 있어, 수리 전에는 `findings_embed_service.py`를 재실행하지 않는다. **F-09(잔존 무해):** 과거 실행에서 남은 비공개 벡터 358×2건이 `finding_embeddings`에 남아 있으나 §4.3 공개 게이트가 걸러내 웹 서빙에는 영향이 없다.
 
 ### 4.3 데이터 계약
 - **범위 순도(`scope_status`, 010→**020 현행**):** GRM 범위는 의약품 전반(의료기기·식품 제외, §1.1)인데 FDA 483 코퍼스에는 식품·기기·병원 483이 섞여 들어온다. `grm_classify_483_scope()`가 `'ok'`/`'non_pharma'`/`'fragment'` 3종으로 판정하고 공개 게이트·집계 RPC가 `'ok'`만 취한다(**삭제가 아니라 노출 차단** — row 는 전부 보존). 020이 010의 est_type **부정목록**을 **허용목록 우선 + 가드된 본문·업체명 폴백**으로 교체했다: FDA가 일반값(`Manufacturer`·빈값 등)을 쓰면 부정목록이 그대로 통과시켰기 때문이다(2026-07-15 실측 누출 375건/4.39% — Blue Bell·Plainview Milk·Hill-Rom·Boston Scientific·병원 MDR 등). 단순 배제는 정당 제약 392건을 함께 숨기므로(과잉 차단) 일반값은 본문 신호로 2차 판정한다. **허용목록이 부정목록보다 먼저** 오는 순서가 핵심 — FDA 복합 라벨("Pharmaceutical and Medical Device Manufacturer" 등)을 살린다(순서를 뒤집으면 과잉 차단 4→42건). 라이브 적용 결과: 공개 8,545→**8,187**(358건 차단), 정당 제약(Hospira·Teva·Gilead·Genentech·Catalent·Baxter) 전량 `'ok'` 유지 실측.
@@ -272,7 +272,7 @@ grm-api-intake/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 020_findings_scope_allowlist — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020))
+│  ├─ migrations/  (001_reaction ~ 023_findings_scope_tiered — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020)·유사검색 사실값(022)·범위 3계층(023))
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
@@ -315,7 +315,7 @@ grm-api-intake/
 | `ENABLE_FINDINGS_SUPABASE_APPEND` (M4 raw 적재) | `true` |
 | `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND` (M4 findings 적재) | `true` (2026-07-08 활성) |
 | `ENABLE_FINDINGS_SQLITE_APPEND` / `_FINDINGS_APPEND` (로컬 개발용) | `false` |
-| `ENABLE_FINDINGS_EMBED` (S2 임베딩 cron 게이트 — `workflow_dispatch`는 플래그 무관 dry-run 가능) | `false`(CI 실측 전) |
+| `ENABLE_FINDINGS_EMBED` (S2 임베딩 cron 게이트 — `workflow_dispatch`는 플래그 무관 dry-run 가능) | `false`(CI 실측(콜드 117초·전량 적재 24분·HF 캐시 적중 시 일일 델타 1~2분 예상) 완료) |
 
 > 운영 기본값은 `grm-intake.yml`의 `vars.* || 'true/false'` fallback으로 정해집니다.
 
@@ -343,8 +343,8 @@ grm-api-intake/
 | ID | 내용 | 상태 |
 |---|---|---|
 | FIND-483-SIGNER | FDA 483 실사관(서명자) 추출기 미구현 — `inspector_names` 전량 빈값. F3 실사관 프로파일의 선결 조건 | 🔲 이월 |
-| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) — 백엔드(`firm_key` generated 컬럼 + `grm_normalize_firm_name`/`findings_firm_profile` RPC, `013_findings_firm_key.sql`, 실측 982→855 업체 수렴) PR 제출·라이브 DB 미적용. 업체 프로파일 웹 페이지는 후속 PR | 🟡 백엔드 구현 완료(검수 대기) |
-| MIGRATION-008 | `008_findings_category_matrix.sql` 라이브 DB 적용 대기(사람이 Supabase SQL Editor에서 실행) — 미적용 상태에서도 웹은 폴백으로 무장애 | 🟡 적용 대기 |
+| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) — 백엔드(`firm_key` generated 컬럼 + `grm_normalize_firm_name`/`findings_firm_profile` RPC, `013_findings_firm_key.sql`+`017_findings_stats_firm_key.sql`, 실측 982→855 업체 수렴) + 업체 프로파일 웹 페이지(`/findings/firm/?key=`) 전부 라이브(2026-07-16 실측: findings REST `firm_key` select 200·`findings_firm_profile`/`findings_stats.top_firms` 정상 응답·프로파일 페이지 200 확인) | ✅ 적용·라이브(013+017)·프로파일 페이지 운영 |
+| MIGRATION-008 | `008_findings_category_matrix.sql` — anon `POST /rest/v1/rpc/findings_category_matrix` 실측(2026-07-16) 유효 jsonb(`cells` 배열) 응답 확인, "적용 대기" 서술은 낡은 기록이었다 | ✅ 적용됨 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
 | ROUTINE-AUTO | 클라우드 Routine 실행 자체의 완전 자동화(현재 델타 브릿지까지 자동, 실행은 클라우드 Routines 의존) | 🟡 부분 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
@@ -364,7 +364,7 @@ FIND-1의 원래 목표는 검색 DB 하나가 아니라 **"규제 지적사항 
 | 단계 | 목표 | 시기 | 현황 |
 |---|---|---|---|
 | (원 M1) 스키마+내부 백필 | grm-finding/v1 동결, 이중 적재, 검색·번역 자동화 | 7월 | ✅ 완료(§4.4 구현 M1~M14) |
-| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지 | 7월 중순~8월 말 | ✅ **목표 초과 달성**(`collect_fda_backfill.py`+매일 07:17 UTC cron — 공개 findings 8,187건·업체 980곳·**2018~2026년 8년 커버리지**, 매일 증가. 범위 내 미번역 0이라 집계=row 공개 일치. WL 백필은 483 완주 후 착수 예정. MFDS는 robots 정책상 제외) |
+| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지 | 7월 중순~8월 말 | ✅ **목표 초과 달성**(`collect_fda_backfill.py`+매일 07:17 UTC cron — 공개 findings 8,187건·업체 980곳(2026-07-15 실측)·**2018~2026년 8년 커버리지**, 매일 증가. 범위 내 미번역 0이라 집계=row 공개 일치. WL 백필은 483 완주 후 착수 예정. MFDS는 robots 정책상 제외) |
 | **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 핵심 라이브(`/findings/trends/` 스탯·카테고리·히트맵·연도추이·업체 Top30 라이브; 실사관 프로파일=FIND-483-SIGNER 미구현으로 보류) |
 | **F4** 에이전트·검증 | Copilot Studio 커넥터+Q&A + 생산·품질·RA 3부서 파일럿(효과 정량화 4종) | 9월 중순~10월 말 | 🟡 자산 완료·파일럿 대기(F4a: `docs/copilot/` Swagger 커넥터 스펙+셋업 가이드+Q&A 시나리오 12건 완료; Studio 등록·부서 파일럿=사람 수행 대기) |
 | **F5** 패키징 | 효과 정리·데모·발표자료 | 11월~공모전 | 🔲 D-day 확정 필요 |

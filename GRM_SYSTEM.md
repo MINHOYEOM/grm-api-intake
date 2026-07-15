@@ -270,7 +270,7 @@ grm-api-intake/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 010_findings_scope_purity, 011_findings_taxonomy_v3.sql, 012_findings_taxonomy_v4.sql, 013_findings_firm_key.sql, 018_findings_similar_lexical.sql, 019_findings_embeddings.sql)
+│  ├─ migrations/  (001_reaction ~ 020_findings_scope_allowlist — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020))
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지

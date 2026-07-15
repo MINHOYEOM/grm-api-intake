@@ -1,0 +1,12 @@
+# [FIND-1 S2] 임베딩 계산 전용 의존성 -- grm-findings-embed.yml 워크플로에서만 설치한다.
+# ★requirements.txt(매일 도는 intake CI)에는 절대 추가하지 마라 -- 그러면 매일 수집
+# 워크플로가 torch 를 받게 된다(현행 requirements.txt 는 requests/PyMuPDF/Jinja2 뿐).
+#
+# CPU 전용 torch 휠을 쓰도록 PyTorch 공식 CPU 인덱스를 추가 지정해 다운로드 크기를
+# 줄인다(GPU/CUDA 휠 대비 수 GB 절감). sentence-transformers 가 huggingface_hub·
+# transformers·numpy·torch 를 함께 끌고 온다(설계 실측: 모델 fp32 ≈ 471MB -- CI 시간의
+# 주 요인이므로 워크플로에서 pip + huggingface 캐시를 반드시 병행한다).
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch>=2.2,<3
+sentence-transformers>=3.0,<4

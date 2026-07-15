@@ -2572,6 +2572,169 @@ class WebFindingsRenderTest(unittest.TestCase):
         similar_block = js_src[js_src.index("function mapSimilarItemToRow(item) {"):js_src.index("function render() {")]
         self.assertNotIn("innerHTML", similar_block)
 
+    # ── FIND-1 "이 지적과 유사한 사례"(렉시컬, 021_findings_similar_to.sql RPC) ──────────
+    # A/B 평가(2026-07-15, 021 마이그레이션 주석)로 임베딩(S2)이 S1 렉시컬을 못 이겨
+    # S2 웹 공개가 중단됐다 — 이 버튼은 021(finding_id 기준)을 소비하고 019 의
+    # findings_similar_by_id(임베딩) 는 절대 호출하지 않는다(inert 유지 계약).
+    def test_similar_to_rpc_call_contract(self):
+        """[RPC 계약] POST {url}/rest/v1/rpc/findings_similar_to, body={p_finding_id,p_limit}."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchSimilarTo(findingId, limit) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('"/rest/v1/rpc/findings_similar_to"', fn)
+        self.assertIn('method: "POST"', fn)
+        self.assertIn("JSON.stringify({ p_finding_id: findingId, p_limit: limit })", fn)
+        self.assertIn("apikey: key", fn)
+        self.assertIn('Authorization: "Bearer " + key', fn)
+
+    def test_similar_to_never_calls_embedding_rpc(self):
+        """[평가 결과 반영, 핵심 계약] S2 임베딩(019 findings_similar_by_id) 는 A/B 평가
+        (021 마이그레이션 주석: nDCG CI 가 0 을 포함=동률 또는 유의하게 열세)로 웹 공개가
+        중단됐다 — findings.js 소스 어디에도 그 RPC 이름이 있으면 안 된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertNotIn("findings_similar_by_id", js_src)
+
+    def test_similar_to_on_demand_no_fetch_before_click(self):
+        """[on-demand] 카드 89개 전체에 자동 조회하지 않는다 — buildSimilarCasesControl()
+        은 버튼을 만들 때 fetchSimilarTo 를 호출하지 않고, click 리스너 안에서만 호출한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        before_listener = fn[:fn.index("addEventListener")]
+        self.assertNotIn("fetchSimilarTo(", before_listener)
+        self.assertIn("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)", fn)
+        self.assertIn("var SIMILAR_TO_LIMIT = 5;", js_src)
+
+    def test_similar_to_cached_after_first_fetch_no_refetch(self):
+        """[1회 fetch 후 캐시] fetched 플래그가 true 로 굳으면 이후 클릭은 토글만 하고
+        fetchSimilarTo 를 다시 호출하지 않는다(재요청 금지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var fetched = false;", fn)
+        self.assertIn("if (!opening || fetched) return;", fn)
+        self.assertIn("fetched = true;", fn)
+
+    def test_similar_to_toggle_collapses_on_second_click(self):
+        """[토글] block.hidden 뒤집기로 펼침/접힘을 표현하고 aria-expanded 를 동기화한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var opening = block.hidden;", fn)
+        self.assertIn("block.hidden = !opening;", fn)
+        self.assertIn('btn.setAttribute("aria-expanded", opening ? "true" : "false");', fn)
+
+    def test_similar_to_finding_id_missing_skips_button(self):
+        """[방어] finding_id 없는 행은 버튼 자체를 만들지 않는다(evidence_url 조건부와
+        동형 관례) — 카드 렌더가 절대 깨지지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!findingId) return null;", fn)
+
+    def test_similar_to_silent_failure_and_state_wording(self):
+        """[§3 조용한 폴백] 실패(.catch)도 0건과 동일하게 renderSimilarToState(block, [])
+        로 수렴한다 — throw 재발생·console.error 없음. 로딩/0건 문구도 명세와 정확히
+        일치해야 한다(RPC 미적용(404) 상태에서도 페이지가 정상 동작해야 하는 계약)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertNotIn("console.error", fn)
+        catch_branch = fn[fn.index(".catch(function () {"):]
+        catch_branch = catch_branch[:catch_branch.index("});") + 3]
+        self.assertIn("renderSimilarToState(block, []);", catch_branch)
+        self.assertNotIn("throw", catch_branch)
+        state_fn = js_src[js_src.index("function renderSimilarToState(block, items) {"):]
+        state_fn = state_fn[:state_fn.index("\n  }\n") + 4]
+        self.assertIn('"불러오는 중…"', state_fn)
+        self.assertIn('"유사 사례를 찾지 못했습니다"', state_fn)
+
+    def test_similar_to_dup_badge_only_when_dup_findings_gt_1(self):
+        """[중복 배지] dup_findings>1 인 항목에만 "동일 문구 N개 문서"(N=dup_documents)
+        배지를 부착한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarToItem(item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (Number(item.dup_findings) > 1) {", fn)
+        self.assertIn('"동일 문구 " + (item.dup_documents || 0) + "개 문서"', fn)
+
+    def test_similar_to_needs_review_visual_distinction_inline_no_css_edit(self):
+        """[검토 필요 시각 경계] .fnd-card--review 관례(왼쪽 3px coral 보더)를 grm.css
+        를 건드리지 않고 인라인 스타일로 재현한다(§7 grm.css 불가침)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarToItem(item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('item.review_status === "needs_review"', fn)
+        self.assertIn("border-left:3px solid var(--coral)", fn)
+        css_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertNotIn("fnd-simto", css_src)  # 템플릿/CSS 신규 규칙 없음(전부 인라인)
+
+    def test_similar_to_deeplink_landing_reuses_pr0_param(self):
+        """[딥링크 착지] 각 항목은 S1 이 이미 만든 similarItemDeepLinkUrl() (PR-0 재사용
+        헬퍼)로 해당 문서에 도달한다 — 신규 URL 스킴을 만들지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarToItem(item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("similarItemDeepLinkUrl(item.finding_id)", fn)
+        self.assertIn('link.textContent = "해당 문서 보기";', fn)
+
+    def test_similar_to_no_client_side_resort_or_refilter(self):
+        """[서버 순서 그대로] renderSimilarToState() 는 items 를 재정렬·재필터하지 않고
+        반환 순서 그대로 forEach 렌더한다(021 RPC 가 정렬·중복 붕괴를 전부 서버에서 처리)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderSimilarToState(block, items) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertNotIn(".sort(", fn)
+        self.assertNotIn(".filter(", fn)
+        self.assertIn("items.forEach(function (item) {", fn)
+
+    def test_similar_to_wired_next_to_more_toggle_no_conflict(self):
+        """[진입점] buildCard() 는 evidence_url 링크 뒤·moreBtn("자세히 보기") 앞에
+        "유사 사례" 버튼을 actions 행에 나란히 붙이고, 펼침 블록은 actions 뒤에 붙인다 —
+        finding_id 없는 방어적 행은 simCases 가 null 이라 아무것도 추가되지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var simCases = buildSimilarCasesControl(row);", fn)
+        self.assertIn("if (simCases) actions.appendChild(simCases.btn);", fn)
+        self.assertIn("if (simCases) card.appendChild(simCases.block);", fn)
+        self.assertLess(fn.index("simCases.btn"), fn.index("var moreBtn = buildMoreToggle(card);"))
+        self.assertLess(fn.index("card.appendChild(actions);"), fn.index("simCases.block"))
+
+    def test_similar_to_reused_across_all_buildcard_render_paths(self):
+        """[§4/§5 자연스러운 확산, 신규 렌더러 금지] buildCard() 를 재사용하는 모든 경로
+        (일반 문서 카드·PR-0 딥링크 문서 카드·S1 유사검색 결과)에 신규 렌더러 없이 버튼이
+        자동으로 함께 나타난다 — renderSimilarResults()/buildDocCard() 자체는 무변경이라야
+        한다(둘 다 buildCard(row, ...) 를 그대로 호출)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_src[js_src.index("function renderSimilarResults(items) {"):]
+        render_fn = render_fn[:render_fn.index("\n  }\n") + 4]
+        self.assertIn('buildCard(row, "")', render_fn)
+        doc_fn = js_src[js_src.index("function buildDocCard(rows, query) {"):]
+        doc_fn = doc_fn[:doc_fn.index("\n  }\n") + 4]
+        self.assertEqual(doc_fn.count("buildCard(row, query)"), 2)
+
+    def test_similar_to_regression_buildcard_return_shape_unchanged(self):
+        """[§6 회귀 0] buildCard() 의 반환 계약({card,textEl,extraEl,moreBtn})은 신규
+        기능 추가로 바뀌지 않는다 — render()/renderDeepLinkDoc() 등 기존 소비자가
+        item.textEl/item.extraEl/item.moreBtn 을 그대로 읽는 계약을 깨면 안 된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn(
+            "return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };", fn
+        )
+
+    def test_similar_to_no_innerhtml_data_injection(self):
+        """신규 함수들도 기존 XSS 계약(innerHTML 데이터 삽입 금지)을 따른다 — 전부
+        createElement/textContent 로만 DOM 을 구성한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        block = js_src[
+            js_src.index("function fetchSimilarTo(findingId, limit) {"):
+            js_src.index("  function buildCard(row, query) {")
+        ]
+        self.assertNotIn("innerHTML", block)
+
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):

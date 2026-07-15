@@ -856,6 +856,137 @@
     return btn;
   }
 
+  // ── ["이 지적과 유사한 사례"] findings_similar_to RPC(021_findings_similar_to.sql) 소비 ──
+  // A/B 평가 실측(2026-07-15, 021 마이그레이션 주석 참조)으로 임베딩(S2)이 렉시컬(S1)을 못
+  // 이겨 S2 웹 공개가 중단됐다 — 이 버튼은 021(finding_id 기준 렉시컬)을 소비하고,
+  // 019(임베딩) 의 단건 유사도 RPC 는 호출하지 않는다(inert 유지 — 그 함수명은 이 파일에
+  // 등장하지 않아야 한다, 평가 결과 반영 계약). 서버가 공개 게이트·
+  // 같은 문서 제외·중복 붕괴·정렬을 전부 처리하므로 클라이언트는 재정렬·재필터를 하지
+  // 않는다(§ S1 관례와 동일 — renderSimilarToState() 는 반환 순서 그대로 렌더). RPC 는
+  // 라이브 DB 에 아직 미적용일 수 있어(컨트롤타워가 별도 적용) 실패는 조용히 0건과
+  // 동일하게 처리한다 — 콘솔 에러도 화면 에러 상태도 없다. 카드 89개 전체에 자동 조회하지
+  // 않도록 on-demand(클릭 전 fetch 없음) + 1회 fetch 후 캐시(재클릭은 토글만)로 구현한다.
+  var SIMILAR_TO_LIMIT = 5;
+
+  function fetchSimilarTo(findingId, limit) {
+    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar_to", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_finding_id: findingId, p_limit: limit }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_similar_to " + r.status);
+      return r.json();
+    });
+  }
+
+  // 항목 1개 — 업체명·발행일·본문(2줄 클램프)·중복 배지("동일 문구 N개 문서", N=
+  // dup_documents, dup_findings>1 인 경우만)·해당 문서 보기(PR-0 딥링크, S1 이 이미 만든
+  // similarItemDeepLinkUrl() 재사용 — 신규 URL 스킴 없음). 신뢰도 배지(Evidence 등급)는
+  // 공간 제약상 표시하지 않는다(§2 명세). review_status==='needs_review' 는 .fnd-card--review
+  // 관례(왼쪽 3px coral 보더)를 grm.css 를 건드리지 않고 인라인 스타일로 재현한다(§7 XSS
+  // 계약 — textContent/createElement 만, HTML 문자열 데이터 주입 금지).
+  function buildSimilarToItem(item) {
+    var row = document.createElement("div");
+    row.className = "fnd-simto-item";
+    var needsReview = item.review_status === "needs_review";
+    row.style.cssText =
+      "margin-top:9px;padding:9px 0 0 " + (needsReview ? "9px" : "0") + ";" +
+      "border-top:1px solid var(--line)" +
+      (needsReview ? ";border-left:3px solid var(--coral)" : "");
+    var head = document.createElement("div");
+    head.style.cssText = "display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:4px";
+    if (item.firm_name) {
+      var firm = el("span", null, decodeFirmDisplay(item.firm_name));
+      firm.style.cssText = "font-weight:600;font-size:12.5px;color:var(--ink)";
+      head.appendChild(firm);
+    }
+    if (item.published_date) {
+      var date = el("span", null, item.published_date);
+      date.style.cssText = "font-family:var(--mono);font-size:11.5px;color:var(--muted)";
+      head.appendChild(date);
+    }
+    if (Number(item.dup_findings) > 1) {
+      var badge = el("span", null, "동일 문구 " + (item.dup_documents || 0) + "개 문서");
+      badge.style.cssText =
+        "display:inline-flex;align-items:center;height:20px;font-size:11px;font-weight:600;" +
+        "line-height:1;border-radius:var(--rad-s);padding:0 7px;border:1px solid rgba(194,96,63,.22);" +
+        "background:var(--coral-tint);color:var(--coral-2)";
+      head.appendChild(badge);
+    }
+    row.appendChild(head);
+    var text = el("p", null, item.text || "");
+    text.style.cssText =
+      "font-size:12.5px;line-height:1.5;color:var(--body);margin:0 0 6px;" +
+      "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden";
+    row.appendChild(text);
+    if (item.finding_id) {
+      var link = document.createElement("a");
+      link.href = similarItemDeepLinkUrl(item.finding_id);
+      link.textContent = "해당 문서 보기";
+      link.style.cssText = "font-size:12px;font-weight:600;color:var(--coral-2);text-decoration:none";
+      row.appendChild(link);
+    }
+    return row;
+  }
+
+  // 상태 렌더 — items===null 이면 로딩 문구, 빈 배열이면 0건 문구(실패도 이 경로로
+  // 수렴, §3). items 를 재정렬·재필터하지 않고 서버가 반환한 순서 그대로 forEach 렌더한다.
+  function renderSimilarToState(block, items) {
+    block.textContent = "";
+    if (items === null) {
+      var loading = el("p", null, "불러오는 중…");
+      loading.style.cssText = "font-size:12.5px;color:var(--muted);margin:0";
+      block.appendChild(loading);
+      return;
+    }
+    if (!items.length) {
+      var empty = el("p", null, "유사 사례를 찾지 못했습니다");
+      empty.style.cssText = "font-size:12.5px;color:var(--muted);margin:0";
+      block.appendChild(empty);
+      return;
+    }
+    items.forEach(function (item) { block.appendChild(buildSimilarToItem(item)); });
+  }
+
+  // 카드 액션 행에 붙는 "유사 사례" 토글 — on-demand(클릭 전 fetch 없음), 1회 fetch 후
+  // 캐시(재클릭은 접기/펼치기만, 재요청 금지). finding_id 가 없는 방어적 행(레거시 폴백
+  // 등)은 버튼 자체를 만들지 않는다(evidence_url 조건부와 동형 관례 — 카드 깨짐 없음).
+  function buildSimilarCasesControl(row) {
+    var findingId = row.finding_id;
+    if (!findingId) return null;
+    var block = document.createElement("div");
+    block.className = "fnd-simto";
+    block.hidden = true;
+    block.style.cssText = "margin-top:12px;padding-top:12px;border-top:1px solid var(--line)";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-simto-btn";
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "유사 사례";
+    btn.style.cssText =
+      "font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);" +
+      "background:transparent;border:0;padding:0;cursor:pointer";
+    var fetched = false; // [on-demand+캐시] 1회 fetch 이후 재클릭은 토글만(재요청 금지)
+    btn.addEventListener("click", function () {
+      var opening = block.hidden;
+      block.hidden = !opening;
+      btn.setAttribute("aria-expanded", opening ? "true" : "false");
+      if (!opening || fetched) return; // 접는 조작이거나 이미 fetch 완료 — 재요청 금지
+      fetched = true;
+      renderSimilarToState(block, null); // 로딩 표시
+      fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)
+        .then(function (data) {
+          var items = (data && Array.isArray(data.items)) ? data.items : [];
+          renderSimilarToState(block, items);
+        })
+        .catch(function () {
+          renderSimilarToState(block, []); // §3 조용한 폴백 — RPC 미적용(404)/네트워크
+          // 오류 전부 0건과 동일 문구로 수렴한다(재발생·콘솔 에러 로그 없음).
+        });
+    });
+    return { btn: btn, block: block };
+  }
+
   function buildCard(row, query) {
     var card = el("article", "fnd-card");
     // [PR-0 딥링크] 안정 DOM id — 일반 모드 포함 항상 부여한다(무해). 딥링크 자동 도달
@@ -917,9 +1048,15 @@
       a.appendChild(document.createTextNode("원문 보기"));
       actions.appendChild(a);
     }
+    // ["이 지적과 유사한 사례"] 기존 "자세히 보기"(moreBtn) 관례와 나란히, 그 앞에 배치
+    // (원문 보기 링크 뒤·자세히 보기 앞) — finding_id 없는 방어적 행은 null 이라 버튼이
+    // 생기지 않는다(evidence_url 조건부와 동형, 카드 깨짐 없음).
+    var simCases = buildSimilarCasesControl(row);
+    if (simCases) actions.appendChild(simCases.btn);
     var moreBtn = buildMoreToggle(card);
     actions.appendChild(moreBtn);
     card.appendChild(actions);
+    if (simCases) card.appendChild(simCases.block); // actions 바로 아래 인라인 펼침 블록
 
     return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };
   }

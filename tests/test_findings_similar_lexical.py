@@ -52,9 +52,23 @@ class SimilarMigrationFileTest(unittest.TestCase):
     def test_idempotent_ddl_only(self) -> None:
         """전부 멱등 -- 재실행이 안전해야 한다(007/010 관례)."""
         self.assertIn("create extension if not exists pg_trgm", self.code)
-        self.assertIn("create index if not exists idx_findings_search_trgm", self.code)
         self.assertIn("create index if not exists idx_findings_search_fts", self.code)
         self.assertIn("create or replace function public.findings_similar(", self.code)
+
+    def test_no_unused_trgm_index(self) -> None:
+        """★라이브 실측(2026-07-15 프로덕션 적용 중) -- trgm 후보 팔 폐기에 따라 trgm
+        GIN 인덱스를 만들지 않는다: ⓐ전 코퍼스 최대 similarity 0.1111(기본 임계값 0.3
+        에서 후보 0건) ⓑ임계값 0.1 로 낮춰도 후보 2건 ⓒSupabase 에서 함수 SET 으로
+        pg_trgm.similarity_threshold 설정 권한 거부(역할·DB 전역 설정은 승인 범위 밖).
+        쓰이지 않는 GIN 인덱스는 매일 백필 insert 마다 쓰기 증폭만 유발한다.
+        pg_trgm 확장 자체는 유지 -- similarity() 를 재랭킹 점수로 쓴다(GUC 불요)."""
+        self.assertNotIn("idx_findings_search_trgm", self.code)
+        self.assertNotIn("gin_trgm_ops", self.code)
+        # 함수 SET 으로 임계값을 잡으려는 시도가 되살아나면 라이브에서 적용이 거부된다.
+        self.assertNotIn("pg_trgm.similarity_threshold", self.code)
+        # 역할·DB 전역 설정은 모든 세션에 영향 -- RPC 하나를 위해 쓰지 않는다.
+        self.assertNotIn("alter role", self.code.lower())
+        self.assertNotIn("alter database", self.code.lower())
 
     def test_does_not_touch_existing_objects(self) -> None:
         """기존 테이블·RLS·정책·다른 RPC 를 건드리지 않는다(설계 §4.2 롤백 계약)."""
@@ -87,15 +101,19 @@ class SearchTextContractTest(unittest.TestCase):
         self.assertNotIn("to_tsvector('simple', finding_text_ko)", self.code)
         self.assertNotIn("to_tsvector('simple', f.finding_text_ko)", self.code)
 
-    def test_index_expressions_match_rpc_expression_bytewise(self) -> None:
-        """④인덱스 표현식 == RPC 표현식 byte 일치(불일치 = 인덱스 미사용)."""
-        trgm_idx = self.code[self.code.index("create index if not exists idx_findings_search_trgm"):]
-        trgm_idx = trgm_idx[: trgm_idx.index(";") + 1]
-        self.assertIn(f"(({_SEARCH_EXPR}) extensions.gin_trgm_ops)", trgm_idx)
+    def test_index_expression_matches_rpc_expression_bytewise(self) -> None:
+        """④인덱스 표현식 == RPC 표현식 byte 일치(불일치 = 인덱스 미사용).
 
+        라이브 실측 확인: Bitmap Index Scan on idx_findings_search_fts (42ms) vs
+        전량 seq scan (244ms) -- 표현식이 어긋나면 이 이점이 조용히 사라진다.
+        """
         fts_idx = self.code[self.code.index("create index if not exists idx_findings_search_fts"):]
         fts_idx = fts_idx[: fts_idx.index(";") + 1]
         self.assertIn(f"to_tsvector('simple', {_SEARCH_EXPR})", fts_idx)
+        # RPC 후보 술어가 같은 표현식을 쓰는지(인덱스가 실제로 걸리는 지점).
+        cand = self.code[self.code.index("candidates as ("):]
+        cand = cand[: cand.index("scored as (")]
+        self.assertIn(f"to_tsvector('simple', {_SEARCH_EXPR_QUALIFIED}) @@ t.tq", cand)
 
 
 class PublicGateContractTest(unittest.TestCase):
@@ -172,13 +190,29 @@ class RankingAndGuardsTest(unittest.TestCase):
         self.code = _strip_sql_comments(_SIMILAR_PATH.read_text(encoding="utf-8"))
 
     def test_candidate_then_rerank_two_stage(self) -> None:
-        """similarity() 단일 ORDER BY 는 인덱스를 못 탄다 -- 후보를 %/@@ 로 좁힌 뒤 재랭킹."""
+        """ts_rank/similarity 단일 ORDER BY 는 인덱스를 못 탄다 -- 후보를 @@(FTS 인덱스)로
+        좁힌 뒤 상위 200 만 재랭킹한다. 후보 절단 order by 도 인덱스가 받치는 ts_rank 로
+        해야 한다(similarity 로 자르면 인덱스 결과 전체에 similarity 계산 -- 이점 소멸)."""
         cand = self.code[self.code.index("candidates as ("):]
         cand = cand[: cand.index("scored as (")]
-        self.assertIn("%", cand)          # trgm 후보(인덱스 가용)
-        self.assertIn("@@", cand)         # FTS 후보(인덱스 가용)
-        self.assertIn("limit 200", cand)  # 재랭킹 대상 상한
+        self.assertIn("@@ t.tq", cand)     # FTS 후보(인덱스 가용)
+        self.assertIn("limit 200", cand)   # 재랭킹 대상 상한
+        self.assertIn("order by ts_rank(", cand)   # 후보 절단은 ts_rank 기준
+        self.assertNotIn("order by similarity(", cand)
         self.assertIn("0.6 * sim + 0.4 * fts_rank", self.code)  # 재랭킹 가중치
+
+    def test_similarity_used_for_rerank_only_no_operator(self) -> None:
+        """similarity() 는 함수 호출이라 GUC 불요 -- 200 후보 대상 재랭킹 점수로만 쓴다.
+        %(임계값 GUC 의존) 연산자는 쓰지 않는다(라이브에서 설정 권한 거부·후보 2건)."""
+        self.assertIn("similarity(", self.code)
+        scored = self.code[self.code.index("scored as ("):]
+        scored = scored[: scored.index("groups as (")]
+        self.assertIn("0.6 * sim + 0.4 * fts_rank", scored)
+        cand = self.code[self.code.index("candidates as ("):]
+        cand = cand[: cand.index("scored as (")]
+        # ') % ' 형태의 trgm 유사 연산자 술어가 없어야 한다(모듈로 연산자와 구분).
+        self.assertNotIn(") % i.q", cand)
+        self.assertNotIn("<%", cand)
 
     def test_fts_query_uses_or_semantics(self) -> None:
         """★라이브 실측(2026-07-15): 한국어는 조사 때문에 websearch 기본 AND 로는 표본
@@ -186,10 +220,11 @@ class RankingAndGuardsTest(unittest.TestCase):
         self.assertIn("replace(websearch_to_tsquery('simple', i.q)::text, ' & ', ' | ')", self.code)
 
     def test_empty_tsquery_guarded(self) -> None:
-        """to_tsquery('') 는 에러 -- 빈 질의는 null 로 우회하고 @@/ts_rank 는 null-안전."""
+        """to_tsquery('') 는 에러 -- 빈 질의는 null 로 우회하고, 후보 술어가 tq null 이면
+        아예 매치되지 않게 막는다(FTS 단독 후보라 tq is not null 이 곧 빈 결과 경로).
+        라이브 실측: 빈/공백/null/2자 미만/구두점 전용 질의 전부 {"items": []} 반환."""
         self.assertIn("websearch_to_tsquery('simple', i.q)::text = '' then null", self.code)
         self.assertIn("t.tq is not null", self.code)
-        self.assertIn("coalesce(ts_rank(", self.code)
 
     def test_input_guards_clamp_not_error(self) -> None:
         """007 관례 -- 이상 입력은 에러가 아니라 클램프/빈 결과."""
@@ -222,12 +257,8 @@ class SecurityDefinerConventionTest(unittest.TestCase):
         fn = fn[: fn.index("$$;") + 3]
         self.assertIn("security definer", fn)
         self.assertIn("stable", fn)
-        # pg_trgm 이 extensions 스키마라 %/similarity() 해석에 필요 -- 고정 목록(mutable 아님).
+        # pg_trgm 이 extensions 스키마라 similarity() 해석에 필요 -- 고정 목록(mutable 아님).
         self.assertIn("set search_path = public, extensions", fn)
-
-    def test_similarity_threshold_lowered_via_function_set(self) -> None:
-        """기본 0.3 은 짧은 지적문 대 문장형 질의에서 후보를 과도하게 잘라낸다."""
-        self.assertIn("set pg_trgm.similarity_threshold = 0.1", self.code)
 
     def test_revoke_then_grant_execute(self) -> None:
         self.assertIn("revoke all on function public.findings_similar(text, int) from public;", self.code)

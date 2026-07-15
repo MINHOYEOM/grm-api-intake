@@ -17,35 +17,50 @@
 --   실측) — 동일 search_text 는 대표 1행으로 접고 dup_documents(문서 수)·dup_findings
 --   (행 수)를 병기해 상투문구가 결과를 도배하는 것을 서버에서 차단한다.
 --
+-- ★★후보 팔 = FTS 단독(라이브 실측으로 설계 정정, 2026-07-15). 설계 v1.1.1 은 "trgm(%)
+--   OR FTS(@@)" 2중 후보였으나 프로덕션 적용 중 실측한 결과 trgm 후보 팔을 폐기했다:
+--   ⓐ이 코퍼스의 기하학 — 질의(문장)는 길고 지적문은 짧아(EN 평균 145자) 길이 불균형
+--     탓에 전 코퍼스 최대 similarity 가 0.1111 에 불과. 기본 임계값 0.3 에서 후보 0건.
+--   ⓑ임계값을 0.1 로 낮춰도 후보 2건 — 있으나 마나(word_similarity 도 최대 0.3333 대
+--     기본 0.6 이라 동일 결론).
+--   ⓒSupabase 에서 `alter function ... set pg_trgm.similarity_threshold` 은 권한 거부.
+--     역할·DB 전역 설정(alter role/database)은 모든 세션에 영향을 주므로 RPC 하나를
+--     위해 쓰지 않는다(승인 범위 밖·나쁜 설계).
+--   → trgm GIN 인덱스도 만들지 않는다(쓰이지 않는데 매일 백필 insert 마다 쓰기 증폭만
+--     유발). pg_trgm 확장 자체는 유지 — similarity() 를 재랭킹 점수로 쓴다(GUC 불요).
+--   실측 근거: FTS 단독 후보 = Bitmap Index Scan on idx_findings_search_fts, 42ms
+--   (전량 seq scan 244ms 대비 6배). EXPLAIN 첨부는 PR 본문.
+--
+-- ★알려진 한계(정직 고지): FTS 'simple' 은 공백 토큰 완전일치라, 조사가 붙어 어떤 토큰도
+--   정확히 일치하지 않는 질의("무균실에서" vs 본문 "무균")는 0건 → 웹은 기존 키워드
+--   검색으로 조용히 폴백한다. 형태 변형·의미 매칭은 S2(임베딩)의 몫이며 S1 은 그 전
+--   단계의 무료 MVP 다("유사 문구 검색"이라는 정직한 명칭이 이 한계를 그대로 반영).
+--
 -- search_path 주의: pg_trgm 은 Supabase 관례대로 extensions 스키마에 설치한다. 007 의
 --   `set search_path = public` 관례를 이 함수만 `public, extensions` 로 확장한다 —
---   %(유사 연산자)·similarity() 해석에 필요하며, 고정 목록이라 mutable search_path
---   취약점과 무관하다(001/007 과 동일한 고정 원칙).
+--   similarity() 해석에 필요하며, 고정 목록이라 mutable search_path 취약점과 무관하다
+--   (001/007 과 동일한 고정 원칙).
 --
 -- 전제: 002(스키마)+006(공개 게이트)+010(scope_status 게이트)이 적용되어 있어야 한다.
---   이 파일은 확장 1개·인덱스 2개·함수 1개만 추가하며 기존 테이블·RLS·정책은 건드리지
+--   이 파일은 확장 1개·인덱스 1개·함수 1개만 추가하며 기존 테이블·RLS·정책은 건드리지
 --   않는다. 전부 멱등(if not exists / or replace).
 
 create extension if not exists pg_trgm with schema extensions;
 
--- 후보 검색용 expression GIN 인덱스 2개(공개행 ~8.5k, 수 MB 규모).
--- ①trigram: `search_text % p_query` 후보 검색이 사용. opclass 는 확장 스키마를 명시.
-create index if not exists idx_findings_search_trgm
-  on public.findings using gin
-  ((coalesce(nullif(finding_text_ko, ''), finding_text)) extensions.gin_trgm_ops);
-
--- ②FTS(simple 사전 — 언어 불문 공백 토큰화): websearch_to_tsquery 후보 검색이 사용.
+-- 후보 검색용 expression GIN 인덱스(공개행 ~8.5k). FTS(simple 사전 — 언어 불문 공백
+-- 토큰화)를 websearch_to_tsquery 후보 검색이 사용한다. 표현식은 RPC 본문과 byte 일치
+-- 해야 한다(불일치 = 인덱스 미사용 — Bitmap Index Scan 확인은 PR 본문 EXPLAIN 첨부).
 create index if not exists idx_findings_search_fts
   on public.findings using gin
   (to_tsvector('simple', coalesce(nullif(finding_text_ko, ''), finding_text)));
 
 -- public.findings_similar(p_query, p_limit): 후보 검색(인덱스 가용 술어) → 재랭킹 2단.
---   similarity() 단일 ORDER BY 는 인덱스를 못 타므로(설계 §4.2 Codex 정정), 후보를
---   `%`(trgm 인덱스) OR `@@`(FTS 인덱스)로 좁힌 뒤 상위 200개만 유사도로 재랭킹한다.
---   pg_trgm.similarity_threshold 는 함수 SET 으로 0.1 로 낮춘다 — 기본 0.3 은 짧은
---   지적문 대 문장형 질의에서 후보를 과도하게 잘라낸다(한국어 표본 질의 실측 근거는
---   PR 본문 첨부). 입력 가드: 2자 미만은 빈 결과, 500자 초과는 앞 500자로 절단,
---   p_limit 은 1..50 클램프(에러가 아니라 클램프 — 007 "미존재 업체도 유효 jsonb" 관례).
+--   ts_rank/similarity 단일 ORDER BY 는 인덱스를 못 타므로(설계 §4.2 Codex 정정), 후보를
+--   `@@`(FTS 인덱스)로 좁힌 뒤 상위 200개만 재랭킹한다. 재랭킹 점수 = 0.6*similarity +
+--   0.4*ts_rank — similarity() 는 함수 호출이라 GUC(임계값)가 필요 없고, 200행 대상이라
+--   비용도 무시할 수준이다(위 ★★ 주석: % 연산자 후보 팔은 실측으로 폐기).
+--   입력 가드: 2자 미만은 빈 결과, 500자 초과는 앞 500자로 절단, p_limit 은 1..50
+--   클램프(에러가 아니라 클램프 — 007 "미존재 업체도 유효 jsonb" 관례).
 create or replace function public.findings_similar(
   p_query text,
   p_limit int default 20
@@ -55,7 +70,6 @@ language sql
 stable
 security definer
 set search_path = public, extensions
-set pg_trgm.similarity_threshold = 0.1
 as $$
   with input as (
     select
@@ -76,28 +90,28 @@ as $$
     from input i
   ),
   candidates as (
-    -- 후보: trgm(%) OR FTS(@@) — 둘 다 위 expression GIN 인덱스가 받친다.
+    -- 후보: FTS(@@) 단독 — 위 expression GIN 인덱스가 받친다(Bitmap Index Scan 실측).
     -- 공개 술어(010)를 후보 단계에서 즉시 적용해 비공개 행이 랭킹에도 못 들어오게 한다.
     select
       f.finding_id, f.raw_signal_id, f.source, f.agency, f.published_date,
       f.firm_name, f.category_code, f.evidence_level, f.review_status,
       coalesce(nullif(f.finding_text_ko, ''), f.finding_text) as search_text,
       similarity(coalesce(nullif(f.finding_text_ko, ''), f.finding_text), i.q) as sim,
-      coalesce(ts_rank(
+      ts_rank(
         to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text)),
         t.tq
-      ), 0) as fts_rank
+      ) as fts_rank
     from public.findings f, input i, tsq t
     where char_length(i.q) >= 2
       and (f.finding_text_ko <> '' or f.finding_language = 'KO')
       and f.scope_status = 'ok'
-      and (
-        coalesce(nullif(f.finding_text_ko, ''), f.finding_text) % i.q
-        or (t.tq is not null
-            and to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text))
-                @@ t.tq)
-      )
-    order by similarity(coalesce(nullif(f.finding_text_ko, ''), f.finding_text), i.q) desc
+      and t.tq is not null
+      and to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text)) @@ t.tq
+    -- 후보 절단 기준은 인덱스가 받치는 ts_rank 로 한다(similarity 로 order by 하면
+    -- 인덱스 스캔 결과 전체에 similarity 를 계산해야 해 후보 절단의 이점이 사라진다).
+    order by ts_rank(
+      to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text)), t.tq
+    ) desc
     limit 200
   ),
   scored as (

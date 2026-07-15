@@ -235,6 +235,14 @@
     return typeof totals.documents === "number" && !isNaN(totals.documents);
   }
 
+  // [완역 자동 전환] 미번역 잔량 판정 — 2026-07-15 백로그 완역 이후 잔량은 당일
+  // 수집분(다음 날 아침 번역 배치가 처리) 또는 OCR 완파손뿐이므로, 잔량이 작으면
+  // 미번역 백로그가 있는 것처럼 읽히는 보조 문구를 스스로 감춘다. renderCoverageNote()
+  // 의 완료형 전환과 같은 기준을 공유한다.
+  function untranslatedGap(totals) {
+    return Number(totals.findings || 0) - Number(totals.public_findings || 0);
+  }
+
   function renderStats(totals) {
     statsEl.innerHTML = "";
     statsEl.appendChild(buildStat(fmtNum(totals.findings), "총 지적사항"));
@@ -244,7 +252,9 @@
     statsEl.appendChild(buildStat(fmtNum(totals.firms), "업체"));
     statsEl.appendChild(buildStat(fmtNum(totals.raw_signals), "원문서"));
     var pub = buildStat(fmtNum(totals.public_findings), "국문 열람 가능");
-    pub.appendChild(el("span", "tr-stat-note", "나머지는 집계에만 반영(원문 영문)"));
+    if (Number(totals.findings || 0) > 0 && untranslatedGap(totals) > 5) {
+      pub.appendChild(el("span", "tr-stat-note", "나머지는 집계에만 반영(원문 영문)"));
+    }
     statsEl.appendChild(pub);
   }
 
@@ -265,19 +275,18 @@
       ? "이 대시보드의 수치는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
         "건에서 추출한 개별 지적사항 " + total + "건 기준 집계입니다(문서당 평균 여러 건)."
       : "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다.";
-    // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 — 잔여는 OCR 완파손 등
-    // 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔 카테고리
-    // 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
-    var isComplete =
-      Number(totals.findings || 0) > 0 &&
-      Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
-    // [진행형 문구 중립화] 계속 진행 중이라는 인상을 주던 옛 서술을 "국문 번역이 완료된
-    // 지적사항만 열람 가능"이라는 현재 상태 서술로 바꾼다 — 집계 수치와 클릭 결과가 다를
-    // 수 있다는 핵심 정보(사용자가 오해하지 않도록 하는 실질 안내)는 그대로 유지한다.
+    // [완역 자동 전환] 미번역 잔량이 5건 이하면(2026-07-15 백로그 완역 — 잔여는 OCR
+    // 완파손 등 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔
+    // 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
+    var isComplete = Number(totals.findings || 0) > 0 && untranslatedGap(totals) <= 5;
+    // 미완료 분기는 완역 이후엔 당일 수집분이 다음 날 아침 번역 배치를 기다리는 짧은
+    // 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이 번역 중"으로 읽히도록
+    // 지연 사유를 명시한다. 집계 수치와 클릭 결과가 다를 수 있다는 실질 안내는 유지.
     coverageTextEl.textContent = isComplete
       ? intro + " 전체 지적사항을 국문으로 열람할 수 있습니다."
-      : intro + " 개별 원문 열람은 국문 번역이 완료된 지적사항(" + pub + "건)만 가능하며, " +
-        "카테고리를 클릭해 이동한 검색 결과는 집계 수치보다 적을 수 있습니다.";
+      : intro + " 개별 원문 열람은 국문 번역이 완료된 지적사항(" + pub + "건)만 가능합니다 — " +
+        "신규 수집분은 국문 번역을 거쳐 다음 날 공개되며, 그동안 카테고리 클릭 결과가 " +
+        "집계 수치보다 적을 수 있습니다.";
     coverageNoteEl.hidden = false;
   }
 

@@ -274,8 +274,12 @@
 
     var canExpand = (doc.public_obs_cnt || 0) > 0;
     var obsCnt = doc.obs_cnt || 0;
+    // [완역 자동 전환] 문서의 지적이 전부 국문 열람 가능하면 병기 괄호가 동어반복이자
+    // 미번역이 남은 듯한 인상만 주므로 생략 — 일부만 공개된 문서(신규 수집 직후 등)에만
+    // "(국문 열람 가능 M건)"을 남긴다.
+    var partiallyPublic = canExpand && (doc.public_obs_cnt || 0) < obsCnt;
     var countText = "지적 " + fmtNum(obsCnt) + "건" +
-      (canExpand ? "(국문 열람 가능 " + fmtNum(doc.public_obs_cnt) + "건)" : "");
+      (partiallyPublic ? "(국문 열람 가능 " + fmtNum(doc.public_obs_cnt) + "건)" : "");
     main.appendChild(el("span", "fp-doc-count", countText));
 
     var detail = document.createElement("div");

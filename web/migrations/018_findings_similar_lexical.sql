@@ -1,3 +1,10 @@
+-- ※ 2026-07-15: public.findings_similar(text, int) 의 함수 바디가
+-- 022_findings_similar_truth.sql 에서 create or replace 되어 이 파일의 정의를
+-- **supersede** 한다(F-01/F-02 수리 — 절단 후 붕괴를 붕괴 후 절단으로 교체 + 전 절단
+-- 결정론 타이브레이크). 프로덕션 현행 정의는 022 를 참조하라(007/008/009→010 관례와
+-- 동형). 아래 함수 바디는 git 히스토리·원복용 원본으로 남긴다. pg_trgm 확장과
+-- idx_findings_search_fts 인덱스는 022 가 그대로 재사용하므로 이 파일이 여전히 현행이다.
+--
 -- [FIND-1 S1] 유사 문구 검색(렉시컬) RPC — 설계: GRM_규제인텔리전스_업그레이드_설계 v1.1.1 §4.2.
 -- "의미검색"이 아니라 pg_trgm(trigram)+FTS 하이브리드의 "유사 문구 검색"이다(웹 UI 명칭 동일).
 --

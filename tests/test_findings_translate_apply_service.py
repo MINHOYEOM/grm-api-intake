@@ -64,9 +64,12 @@ class OutboxDiscoveryTest(unittest.TestCase):
         self.assertEqual(report["items_total"], 0)
         self.assertEqual(report["items_errored"], 0)
 
-    def test_files_processed_in_name_sorted_order(self) -> None:
-        _write_outbox_file(self._tmp.name, "b.json", [_outbox_item(2)])
-        _write_outbox_file(self._tmp.name, "a.json", [_outbox_item(1)])
+    def test_files_processed_newest_first(self) -> None:
+        # Date-prefixed names sort lexicographically by date; the newest batch
+        # must be PATCHed first so it beats the CI timeout even if stale
+        # already-applied batches accumulate (2026-07-13 starvation incident).
+        _write_outbox_file(self._tmp.name, "2026-07-14-batch.json", [_outbox_item(1)])
+        _write_outbox_file(self._tmp.name, "2026-07-15-batch.json", [_outbox_item(2)])
 
         seen_ids: list[str] = []
 
@@ -80,7 +83,7 @@ class OutboxDiscoveryTest(unittest.TestCase):
             report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY)
 
         self.assertEqual(report["files_scanned"], 2)
-        self.assertEqual(seen_ids, ["eq.f-001", "eq.f-002"])  # a.json (f-001) before b.json
+        self.assertEqual(seen_ids, ["eq.f-002", "eq.f-001"])  # 07-15 before 07-14
 
 
 class ApplySuccessTest(unittest.TestCase):

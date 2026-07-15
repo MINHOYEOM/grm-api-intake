@@ -1,3 +1,14 @@
+-- ※ 2026-07-16: public.grm_classify_483_scope(text, integer, text, text) 의 (A) 함수
+-- 바디가 023_findings_scope_tiered.sql 에서 create or replace 되어 이 파일의 정의를
+-- **supersede** 한다(Codex 감사 F-03 — 허용목록의 넓은 토큰 sterile|plasma|blood|tissue|
+-- own label|(control|contract) testing laborator 가 명백한 기기/식품 라벨을 선점하는 결함
+-- 수리: 허용목록을 강/약 2계층으로 나누고 그 사이에 부정목록을 끼운 3계층 판정으로 교체).
+-- 프로덕션 현행 분류 규칙은 023 을 참조하라(007/008/009→010, 018/021→022 관례와 동형).
+-- 시그니처(4-인자)가 불변이므로 아래 (C) 트리거는 재배선 없이 023 의 함수를 계속 호출한다
+-- — 즉 (C) 트리거·(D) 010 2-인자 함수 drop 은 여전히 프로덕션 현행 사실이고, (B) 백필도
+-- 여전히 역사적 사실이다(023 은 방어적 재정렬을 위해 동형의 멱등 백필을 별도로 포함한다).
+-- 아래 (A) 함수 바디는 git 히스토리·원복용 원본으로 남긴다.
+--
 -- FIND-1 데이터 순도 2차 마이그레이션 — 010 의 est_type **부정목록(denylist)** 을
 -- **허용목록(allowlist) 우선 + 가드된 본문/업체명 폴백** 으로 교체한다.
 --

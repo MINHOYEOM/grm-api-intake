@@ -1233,7 +1233,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function clearAllFilters()", js_src)
         # [PR-0 딥링크] exitDeepLinkMode() 호출 한 줄이 앞에 추가돼 고정폭 320 이 goToPage(1)
         # 을 담기엔 부족해졌다 — 400 으로 상향(함수 본문 전체를 여전히 넉넉히 담는다).
-        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 400]
+        # [FIND-1 S1] exitSimilarMode() 호출 한 줄이 추가로 앞에 붙어 400 도 부족해졌다 —
+        # 480 으로 재상향(함수 본문 전체를 여전히 넉넉히 담는다).
+        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 480]
         self.assertIn('sort: "date_desc"', fn_block)
         self.assertIn("syncControlsFromState()", fn_block)
         self.assertIn("currentPage = 1", fn_block)
@@ -2363,6 +2365,178 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         deeplink_block = js_src[js_src.index("function isValidFindingId(id) {"):js_src.index("function render() {")]
         self.assertNotIn("innerHTML", deeplink_block)
+
+    # ── FIND-1 S1: 유사 문구 검색(렉시컬, 018_findings_similar_lexical.sql RPC) ─────────
+    def test_similar_toggle_label_is_honest_lexical_not_semantic(self):
+        """[정직 표기] UI 명칭은 반드시 "유사 문구 검색"이어야 하고, "의미검색"/"시맨틱"
+        표현은 findings.js 어디에도 있으면 안 된다 — trigram+FTS 렉시컬이지 의미 매칭이
+        아니다(018 마이그레이션 주석과 동일 원칙)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('btn.textContent = "유사 문구 검색";', js_src)
+        self.assertNotIn("의미검색", js_src)
+        self.assertNotIn("시맨틱", js_src)
+
+    def test_similar_toggle_injected_next_to_search_input_no_template_change(self):
+        """[템플릿 최소 변경] 토글은 findings.html 에 자리가 없고(§ 템플릿 무변경),
+        findings.js 가 #fnd-q(검색창) 옆에 런타임 DOM 삽입한다(PR-0 딥링크 배너와
+        동일 관례)."""
+        tmpl_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertNotIn("fnd-similar", tmpl_src)
+        self.assertNotIn("유사 문구 검색", tmpl_src)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarToggle() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('qInput.parentNode.insertBefore(btn, countEl || null);', fn)
+        self.assertIn('btn.id = "fnd-similar-toggle";', fn)
+        # wire() 가 초기화 시점에 1회 호출한다.
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        self.assertIn("buildSimilarToggle();", wire_fn)
+
+    def test_similar_rpc_call_contract(self):
+        """[RPC 계약] POST {url}/rest/v1/rpc/findings_similar, body={p_query,p_limit}."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function fetchSimilarItems(q, limit) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('"/rest/v1/rpc/findings_similar"', fn)
+        self.assertIn('method: "POST"', fn)
+        self.assertIn('JSON.stringify({ p_query: q, p_limit: limit })', fn)
+        self.assertIn("apikey: key", fn)
+        self.assertIn('Authorization: "Bearer " + key', fn)
+
+    def test_similar_min_query_length_and_default_limit(self):
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var SIMILAR_MIN_QUERY_LEN = 2;", js_src)
+        self.assertIn("var SIMILAR_LIMIT = 20;", js_src)
+        fn = js_src[js_src.index("function runSimilarSearch() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (q.length < SIMILAR_MIN_QUERY_LEN) {", fn)
+        self.assertIn("fetchSimilarItems(q, SIMILAR_LIMIT)", fn)
+
+    def test_similar_silent_fallback_on_failure_and_empty_items(self):
+        """[§5 폴백, 중요] RPC 실패(404 미적용 포함)·빈 items 배열 둘 다 조용히
+        goToPage(1)(기존 키워드 검색, 토글 OFF 상태와 동일 동작)로 귀결돼야 한다 —
+        throw 재발생·console.error·사용자 노출 에러 상태가 없어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function runSimilarSearch() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertNotIn("console.error", fn)
+        self.assertNotIn("showState(\"error\")", fn)
+        empty_branch = fn[fn.index("if (!items.length) {"):]
+        empty_branch = empty_branch[:empty_branch.index("}") + 1]
+        self.assertIn("goToPage(1);", empty_branch)
+        catch_branch = fn[fn.index(".catch(function () {"):]
+        catch_branch = catch_branch[:catch_branch.index("});") + 3]
+        self.assertIn("goToPage(1);", catch_branch)
+        self.assertNotIn("throw", catch_branch)
+
+    def test_similar_reuses_buildcard_no_new_renderer(self):
+        """[§2] 기존 buildCard(row, query) 렌더러를 그대로 재사용해야 한다(신규
+        렌더러 금지) — 문서 그룹핑 없이 finding 단위 카드 목록(서버 정렬 순서 유지,
+        재정렬 없음)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderSimilarResults(items) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('buildCard(row, "")', fn)
+        self.assertNotIn("groupByDocument", fn)
+        self.assertNotIn(".sort(", fn)  # 서버 정렬 순서 그대로 — 클라이언트 재정렬 금지
+        self.assertIn("hidePager();", fn)  # 대시보드/페이저와 무관(딥링크 단독렌더와 동형)
+
+    def test_similar_text_field_mapped_without_breaking_original_toggle(self):
+        """[매핑] RPC 의 text(원문/국문 구분 없는 단일 텍스트)는 finding_text_ko 에만
+        채우고 finding_text 는 비운다 — appendOrigAndNote() 가 row.finding_text 없으면
+        조용히 no-op 이라("원문 보기" 접기가 나타나지 않음) 카드가 깨지지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function mapSimilarItemToRow(item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("finding_text_ko: item.text || \"\",", fn)
+        self.assertIn('finding_text: "",', fn)
+        orig_fn = js_src[js_src.index("function appendOrigAndNote(extra, row, query) {"):]
+        orig_fn = orig_fn[:orig_fn.index("\n  }\n") + 4]
+        self.assertIn("if (!ko || !row.finding_text) return;", orig_fn)
+
+    def test_similar_dup_badge_only_when_dup_findings_gt_1(self):
+        """[중복 배지] dup_findings>1 인 카드에만 "동일 문구 N개 문서"(N=dup_documents)
+        배지를 부착한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function appendSimilarDupBadge(card, item) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!item || !(Number(item.dup_findings) > 1)) return;", fn)
+        self.assertIn('badge.textContent = "동일 문구 " + (item.dup_documents || 0) + "개 문서";', fn)
+
+    def test_similar_deeplink_landing_reuses_pr0_param(self):
+        """[딥링크 연계 §4] 각 결과 카드는 PR-0 딥링크(/findings/?finding_id=<id>)로
+        해당 문서에 도달할 수 있어야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function similarItemDeepLinkUrl(id) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("location.pathname + \"?\" + DEEP_LINK_PARAM + \"=\" + encodeURIComponent(id)", fn)
+        link_fn = js_src[js_src.index("function appendSimilarDeepLink(card, findingId) {"):]
+        link_fn = link_fn[:link_fn.index("\n  }\n") + 4]
+        self.assertIn("similarItemDeepLinkUrl(findingId)", link_fn)
+        render_fn = js_src[js_src.index("function renderSimilarResults(items) {"):]
+        render_fn = render_fn[:render_fn.index("\n  }\n") + 4]
+        self.assertIn("appendSimilarDeepLink(built.card, item.finding_id);", render_fn)
+
+    def test_similar_toggle_off_by_default_normal_path_unaffected(self):
+        """[§7 회귀 0] similarMode 는 기본 false — 토글을 누르지 않으면 기존
+        /findings/ 동작(목록·페이지네이션·대시보드·필터·딥링크)이 완전히 동일해야
+        한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var similarMode = false;", js_src)
+        qinput_fn = js_src[js_src.index("if (qInput) {\n      qInput.addEventListener(\"input\""):]
+        qinput_fn = qinput_fn[:qinput_fn.index("\n    }\n") + 6]
+        self.assertIn("if (similarMode) { runSimilarSearch(); return; }", qinput_fn)
+        self.assertIn("goToPage(1);", qinput_fn)
+
+    def test_similar_mode_exits_on_filter_sort_page_interaction(self):
+        """[§6 모드 이탈] 필터·정렬·페이지 조작 시 exitSimilarMode() 가 호출돼 유사검색
+        모드를 끄고 목록 모드로 복귀해야 한다 — exitDeepLinkMode() 와 동일한 진입점
+        전부에 나란히 배선된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        self.assertEqual(wire_fn.count("exitSimilarMode();"), 2,
+                          "셀렉트·정렬 2개 핸들러 모두 exitSimilarMode() 호출해야 함")
+        for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",
+                         "function toggleCategoryFilter(code) {", "function toggleMonthFilter(month) {",
+                         "function toggleFirmFilter(name) {", "function goToPageFromPager(n) {"):
+            fn = js_src[js_src.index(fn_name):]
+            fn = fn[:fn.index("\n  }\n") + 4]
+            self.assertIn("exitSimilarMode();", fn, f"{fn_name} 이 exitSimilarMode() 를 호출하지 않음")
+
+    def test_similar_mode_is_noop_when_already_off(self):
+        """exitSimilarMode() 는 similarMode 가 이미 false 면 즉시 return — 일반 모드에서
+        필터 조작 시 부작용이 전혀 없어야 한다(exitDeepLinkMode() 와 동형 관례)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function exitSimilarMode() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!similarMode) return;", fn)
+
+    def test_similar_toggle_click_exits_deeplink_mode(self):
+        """[§7] 딥링크 모드 진입 시 유사검색 모드는 꺼진 상태여야 자연스럽다 — 반대
+        방향으로, 토글 클릭은 exitDeepLinkMode() 를 호출해 딥링크 모드를 정리한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildSimilarToggle() {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("exitDeepLinkMode();", fn)
+        self.assertIn("setSimilarMode(!similarMode);", fn)
+
+    def test_similar_pr0_deeplink_contract_untouched(self):
+        """[§7 불가침] PR-0 딥링크 계약(syncStateToUrl 의 finding_id 보존·
+        exitDeepLinkMode 의 no-op 가드)이 S1 추가로 훼손되지 않았는지 재확인한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        sync_fn = js_src[js_src.index("function syncStateToUrl() {"):]
+        sync_fn = sync_fn[:sync_fn.index("\n  }\n") + 4]
+        self.assertIn("if (deepLinkParam) params.set(DEEP_LINK_PARAM, deepLinkParam);", sync_fn)
+        exit_fn = js_src[js_src.index("function exitDeepLinkMode() {"):]
+        exit_fn = exit_fn[:exit_fn.index("\n  }\n") + 4]
+        self.assertIn("if (!deepLinkParam) return;", exit_fn)
+
+    def test_similar_no_innerhtml_data_injection(self):
+        """S1 신규 함수들도 기존 XSS 계약(innerHTML 데이터 삽입 금지)을 따른다 —
+        전부 createElement/textContent 로만 DOM 을 구성한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        similar_block = js_src[js_src.index("function mapSimilarItemToRow(item) {"):js_src.index("function render() {")]
+        self.assertNotIn("innerHTML", similar_block)
 
 
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────

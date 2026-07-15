@@ -37,6 +37,15 @@
 -- 전제: 002_findings.sql + 006_findings_publish_gate.sql + 007_findings_stats_rpc.sql +
 -- 008_findings_category_matrix.sql + 009_findings_translation_bridge.sql 이 먼저 적용되어
 -- 있어야 한다.
+--
+-- ★2026-07: 아래 (B) 분류 함수와 (D) 트리거 함수는 020_findings_scope_allowlist.sql 이
+-- supersede 한다 — 019 가 est_type **부정목록**을 **허용목록 우선 + 문서 본문/firm_name
+-- 폴백**으로 교체하고(일반값 est_type 누출 375건/62문서 실측), 이 파일의 2-인자
+-- grm_classify_483_scope 를 4-인자 버전으로 대체한 뒤 drop 한다. 프로덕션 현행 분류
+-- 규칙은 019 를 봐야 한다. 이 파일의 (B)/(D) 바디는 git 히스토리·원복용 원본으로 그대로
+-- 남긴다(019 헤더의 "되돌리는 법" 이 이 파일을 재실행하라고 가리킨다).
+-- (A) 컬럼·check 제약, (E) 공개 정책, (F) RPC 5종은 019 가 건드리지 않으므로 이 파일이
+-- 계속 프로덕션 현행 정의다(단 findings_stats().top_firms 는 017 이 재정의 — 아래 참조).
 
 -- ============================================================================
 -- (A) 컬럼 + 제약 추가 — scope_status 기본값 'ok'(전량 무영향 시작점), 허용값 3종.

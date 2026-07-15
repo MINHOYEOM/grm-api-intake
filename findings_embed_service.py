@@ -35,7 +35,7 @@ embed_input:
 E5 prefix contract (unbreakable, fixed together with 019's comment): both the
 base finding and every candidate in findings_similar_by_id are embedded with
 the *same* symmetric "query: " prefix (E5 model card guidance for item-to-
-item similarity -- not the asymmetric "passage: " prefix meant for retrieval).
+item similarity -- not the asymmetric passage-prefix meant for retrieval).
 Breaking this means the corpus is no longer in one vector space.
 
 text_sha256 is computed over the input text *before* the "query: " prefix is
@@ -78,7 +78,7 @@ EMBED_DIM = 384
 FDA_483_SOURCE = "FDA 483"
 
 # ★E5 prefix 계약(불가침) -- 아이템-투-아이템은 대칭 유사도이므로 양쪽 모두 이 prefix.
-# 019 주석·findings_similar_by_id 와 함께 고정한다. 비대칭 검색용 "passage: " 아님.
+# 019 주석·findings_similar_by_id 와 함께 고정한다. 비대칭 검색용 passage-prefix 아님.
 E5_QUERY_PREFIX = "query: "
 
 _FINDING_SELECT = (

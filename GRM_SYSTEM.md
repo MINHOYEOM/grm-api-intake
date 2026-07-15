@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.128` |
+| 문서 버전 | `v1.129` |
 | 최종 수정일 | 2026-07-15 |
-| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(findings 2,775건+·업체 428곳·매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 DB 적용은 컨트롤타워 별도 수행 대기). |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,545건·문서 1,419건·업체 1,033곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -197,10 +197,10 @@ flowchart TD
 ```
 
 - **매일 적재(M4):** `collect_intake.py`가 Notion 적재 성공분을 Supabase `findings`에 직행 append(기본 off 플래그, 현재 활성).
-- **외부 백필(F2):** `collect_fda_backfill.py`(+ `grm-findings-backfill-fetch.yml`)가 FDA 483(총 2,002건)·Warning Letter(3,608건, 2021년~)의 과거분을 Notion을 우회해 Supabase에 직행 적재. robots.txt `Crawl-Delay: 30`초를 완전 준수하며, 매일 07:17 UTC cron이 `--auto` 모드로 1청크씩 소진합니다(483→WL 순, 완료되면 자가 종료 후 신규 문서 2차 안전망으로 전환). MFDS는 nedrug robots `Disallow: /` 정책 판단에 따라 백필 대상에서 제외(일일 수집만 유지). 스케줄 배치 번역은 주당 최대 40건·최신 우선이라 백필 미번역분은 당분간 웹 row로는 안 보이고 집계로만 소비됩니다.
+- **외부 백필(F2):** `collect_fda_backfill.py`(+ `grm-findings-backfill-fetch.yml`)가 FDA 483(총 2,002건)·Warning Letter(3,608건, 2021년~)의 과거분을 Notion을 우회해 Supabase에 직행 적재. robots.txt `Crawl-Delay: 30`초를 완전 준수하며, 매일 07:17 UTC cron이 `--auto` 모드로 1청크씩 소진합니다(483→WL 순, 완료되면 자가 종료 후 신규 문서 2차 안전망으로 전환). MFDS는 nedrug robots `Disallow: /` 정책 판단에 따라 백필 대상에서 제외(일일 수집만 유지). 진척(2026-07-15): 483 문서 1,886건 수집(WL 백필은 483 완주 후 착수 — 현재 WL 문서는 일일 수집분 위주).
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
 - **주간 번역(M8·M9):** 매주 월요일 예약된 Claude Code 세션(구독 사용량·API 비용 0)이 미번역분을 추출→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영.
-- **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 원문 접기 + 대시보드(기관·카테고리·기간·업체 통계)를 제공. M10 검증 브랜치에서는 카드 기본 접힘(3줄 요약→자세히 보기), 칩 필터(건수 병기), 정렬, 매칭어 하이라이트, 검토 필요 시각 경계, URL 쿼리 공유, 화면표시값 검색을 보강했다. `/findings/?finding_id=finding-<24hex>` 딥링크(PR-0)는 페이지 위치와 무관하게 대상 finding 이 속한 문서 카드 1장을 단독 렌더하고 해당 observation 까지 자동 펼침·스크롤·강조하며, 비공개/미존재/형식오류는 구분 없이 동일한 "찾을 수 없음" 안내로 수렴한다(findings.js 단독 구현). "유사 문구 검색"(S1) 토글은 `findings_similar` RPC(018, trigram+FTS 렉시컬 매칭 — 의미 매칭 아님)를 호출해 문서 그룹핑 없이 finding 단위로 결과를 보여주고 동일 문구 중복 배지·PR-0 딥링크 착지를 제공하며, RPC 실패/미적용 시 조용히 기존 키워드 검색으로 폴백한다. 각 카드의 "유사 사례" 버튼은 `findings_similar_to` RPC(021, finding_id 기준 S1 렉시컬)를 on-demand(클릭 전 fetch 없음)로 호출해 같은 문서를 제외한 상위 5건을 카드 내부에 인라인으로 보여주며, 1회 fetch 후 캐시(재클릭은 토글만)·RPC 미적용(021 은 아직 라이브 미적용) 시 조용한 빈 결과 폴백을 적용한다.
+- **웹 표시(M6·M7·M10):** `/findings/`가 국문 우선 + 원문 접기 + 대시보드(기관·카테고리·기간·업체 통계)를 제공. M10 검증 브랜치에서는 카드 기본 접힘(3줄 요약→자세히 보기), 칩 필터(건수 병기), 정렬, 매칭어 하이라이트, 검토 필요 시각 경계, URL 쿼리 공유, 화면표시값 검색을 보강했다. `/findings/?finding_id=finding-<24hex>` 딥링크(PR-0)는 페이지 위치와 무관하게 대상 finding 이 속한 문서 카드 1장을 단독 렌더하고 해당 observation 까지 자동 펼침·스크롤·강조하며, 비공개/미존재/형식오류는 구분 없이 동일한 "찾을 수 없음" 안내로 수렴한다(findings.js 단독 구현). "유사 문구 검색"(S1) 토글은 `findings_similar` RPC(018, trigram+FTS 렉시컬 매칭 — 의미 매칭 아님)를 호출해 문서 그룹핑 없이 finding 단위로 결과를 보여주고 동일 문구 중복 배지·PR-0 딥링크 착지를 제공하며, RPC 실패/미적용 시 조용히 기존 키워드 검색으로 폴백한다. 각 카드의 "유사 사례" 버튼은 `findings_similar_to` RPC(021, finding_id 기준 S1 렉시컬)를 on-demand(클릭 전 fetch 없음)로 호출해 같은 문서를 제외한 상위 5건을 카드 내부에 인라인으로 보여주며, 1회 fetch 후 캐시(재클릭은 토글만)·RPC 실패 시 조용한 빈 결과 폴백을 적용한다(021 라이브 적용 완료).
 - **임베딩 저장층(S2, 구현 완료·웹 공개 중단):** `findings_embed_service.py`(LLM 미관여 순수 스크립트)가 공개 게이트 통과분을 로컬 모델(`intfloat/multilingual-e5-small`, 384차원, GitHub Actions CPU)로 임베딩해 `finding_embeddings`(019, embedding_version·finding_id 복합 PK)에 upsert한다. 아이템-투-아이템 대칭 유사도라 양쪽 모두 `"query: "` prefix(019 주석·서비스가 함께 고정). embed_input B(483 전용)는 `raw_signals.raw_json`의 Observation deficiency+detail 재조합을 시도하고 모호/무매치/detail없음이면 A(finding_text 단독)로 결정론 폴백한다. `findings_similar_by_id` RPC(019)가 `embedding_config.active_version`과 일치하는 벡터만 서빙하지만, **A/B 평가 실측(2026-07-15, 평가셋 40건·블라인드 pooled 판정·부트스트랩 95% CI)에서 S1(렉시컬) 대비 유의한 개선을 입증하지 못해(P@5/nDCG 동률 또는 오히려 열세 — 공개 483 의 59.4%가 CFR 조항을 옮긴 동일 문구라 렉시컬이 이미 정답을 찾는다) §4.3 공개 게이트를 불통과, S2 웹 공개는 중단됐다.** 저장층·서비스 자체는 유지하되 `findings_similar_by_id` 는 호출하지 않는다(inert) — 웹의 "유사 사례" 기능은 021(S1 렉시컬) 이 전담한다.
 
 ### 4.3 데이터 계약
@@ -210,7 +210,7 @@ flowchart TD
 - **번역 도구(`findings_translate.py`):** `--source {sqlite,supabase}` export/apply. 적용 시 원문 byte 대조 all-or-nothing 검증(원문 변조·미번역·번역=원문 동일 등 거부).
 - **집계 RPC(007/008, 카운트 전용 안전 계약):** `findings_stats`/`findings_firm_stats`(007)·`findings_category_matrix`(008)는 공개 게이트(006)를 우회해 **전량** 집계(건수·연도·카테고리·업체 통계)를 서빙하되, 원문 텍스트(`finding_text`/`finding_text_ko`)는 어떤 경로로도 반환하지 않습니다. `/findings/trends/`가 이 두 RPC만 소비.
 - **`finding_embeddings`/`embedding_config`(S2, 019, inert):** 벡터 저장층(비공개, service_role 전용) + 활성 버전 스위치 1행. `findings_similar_by_id` RPC는 활성 버전과 raw_signal_id 배제·공개 게이트를 적용하도록 구현돼 있으나, A/B 평가 결과 웹에서 호출하지 않는다(§4.2 S2 항목 참조) — 인덱스(HNSW)도 의도적으로 미생성 상태로 남아 있다.
-- **`findings_similar_to` RPC(021, S1 렉시컬, finding_id 기준):** 웹 카드의 "이 지적과 유사한 사례" 버튼이 소비하는 실제 서빙 경로. 기준 finding 의 공개 게이트를 재확인한 뒤 같은 문서(raw_signal_id)를 붕괴 전에 제외하고, 018 과 동일한 trigram+FTS 재랭킹·동일 문구 그룹 붕괴(`dup_documents`/`dup_findings`)·결정론 정렬을 적용해 상위 N건을 반환한다. 반환 필드·안전 계약은 018 과 동일(서지+본문+score/중복 카운트뿐, evidence_url/raw_json 미반환). 라이브 DB 적용은 컨트롤타워가 별도 수행.
+- **`findings_similar_to` RPC(021, S1 렉시컬, finding_id 기준):** 웹 카드의 "이 지적과 유사한 사례" 버튼이 소비하는 실제 서빙 경로(라이브 적용 완료). 기준 finding 의 공개 게이트를 재확인한 뒤 같은 문서(raw_signal_id)를 **붕괴 전에** 제외하고, 018 과 동일한 trigram+FTS 재랭킹·동일 문구 그룹 붕괴(`dup_documents`/`dup_findings`)·결정론 정렬을 적용해 상위 N건을 반환한다. **제외 순서가 계약의 핵심** — 018 을 그대로 호출하고 클라이언트가 같은 문서를 걸러내면, 기준이 자기 중복 그룹의 대표로 뽑힌 경우 그 그룹 전체가 사라진다(평가셋 40건 실측: top-1 이 같은 문서라 버려짐 21건, 그중 5건은 동일 위반 보유 문서 최대 12곳이 통째 소실). 반환 필드·안전 계약은 018 과 동일(서지+본문+score/중복 카운트뿐, evidence_url/raw_json 미반환).
 
 ### 4.4 구현 마일스톤 요약 (M1~M14, 전부 완료·라이브)
 
@@ -236,7 +236,7 @@ flowchart TD
 ### 4.5 트렌드 대시보드 (`/findings/trends/`, F3b·H1)
 `web/templates/trends.html` + `web/assets/trends.js`가 007/008 집계 RPC를 직접 fetch해 그리는 전량 통계 페이지입니다. 스탯 스트립·카테고리 상위 10 바·카테고리×연도 히트맵(008)·연도별 추이·업체 Top 30(클릭 시 `?firm=` 상세 패널·URL 공유)·증거등급/소스 구성을 보여줍니다. 공개 게이트(006)와 무충돌 — 카운트·서지 메타만 반환하고 원문은 어떤 경로로도 내려주지 않습니다(§4.3). 렌더러는 빈 셸만 결정론적으로 출력하고 실데이터는 클라이언트 JS가 채웁니다(env 미설정 시 "준비 중" 안내로 조용히 종료).
 
-> **운영 지위:** 신규 유입분의 정본은 Supabase. 로컬 SQLite sidecar(`grm-findings.sqlite3`)는 7월 백필 스냅샷 + 로컬 개발용. **findings 2,775건+·업체 428곳**(F2 외부 백필 진행 중, 매일 증가) — §6.4의 F2(볼륨) 단계가 가동 중이며, row 단위 공개는 주당 번역 상한(최대 40건)에 따라 점진적으로 늘어나고 집계(트렌드 대시보드)는 이미 전량을 반영합니다.
+> **운영 지위:** 신규 유입분의 정본은 Supabase. 로컬 SQLite sidecar(`grm-findings.sqlite3`)는 7월 백필 스냅샷 + 로컬 개발용. **공개 findings 8,545건 · 문서 1,419건 · 업체 1,033곳 · 2018~2026년**(2026-07-15 실측, F2 외부 백필 진행 중이라 매일 증가) — §6.4의 F2(볼륨) 단계가 가동 중입니다. **범위 내(`scope_status='ok'`) 미번역은 0건**이라 집계와 row 공개가 일치합니다(미번역 744건은 전부 범위 밖 — 비제약·단편이라 애초에 번역·공개 대상이 아닙니다). 업체 수는 `firm_name` 기준(트렌드 대시보드 표기와 동일)이며, `firm_key` 정규화 기준으로는 900곳입니다(표기 정규화 잔여 과제).
 
 ---
 
@@ -363,7 +363,7 @@ FIND-1의 원래 목표는 검색 DB 하나가 아니라 **"규제 지적사항 
 | 단계 | 목표 | 시기 | 현황 |
 |---|---|---|---|
 | (원 M1) 스키마+내부 백필 | grm-finding/v1 동결, 이중 적재, 검색·번역 자동화 | 7월 | ✅ 완료(§4.4 구현 M1~M14) |
-| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지. **공개·번역 정책 게이트**(집계=전량/row 노출=주당 최대 40건·최신 우선 번역) 포함 | 7월 중순~8월 말 | ✅ 가동(`collect_fda_backfill.py`+매일 07:17 UTC cron, findings 2,775건+·업체 428곳, 매일 증가. MFDS는 robots 정책상 제외) |
+| **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지 | 7월 중순~8월 말 | ✅ **목표 초과 달성**(`collect_fda_backfill.py`+매일 07:17 UTC cron — 공개 findings 8,545건·업체 1,033곳·**2018~2026년 8년 커버리지**, 매일 증가. 범위 내 미번역 0이라 집계=row 공개 일치. WL 백필은 483 완주 후 착수 예정. MFDS는 robots 정책상 제외) |
 | **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 핵심 라이브(`/findings/trends/` 스탯·카테고리·히트맵·연도추이·업체 Top30 라이브; 실사관 프로파일=FIND-483-SIGNER 미구현으로 보류) |
 | **F4** 에이전트·검증 | Copilot Studio 커넥터+Q&A + 생산·품질·RA 3부서 파일럿(효과 정량화 4종) | 9월 중순~10월 말 | 🟡 자산 완료·파일럿 대기(F4a: `docs/copilot/` Swagger 커넥터 스펙+셋업 가이드+Q&A 시나리오 12건 완료; Studio 등록·부서 파일럿=사람 수행 대기) |
 | **F5** 패키징 | 효과 정리·데모·발표자료 | 11월~공모전 | 🔲 D-day 확정 필요 |

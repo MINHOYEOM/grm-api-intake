@@ -260,38 +260,74 @@ class GrantExecuteTest(unittest.TestCase):
         )
 
 
-class NestedLoopAvoidanceTest(unittest.TestCase):
-    """⑩nested-loop 회피 형태 -- any (array(select …)) 를 써야 한다. any (select
-    array_agg(…)) 는 서브쿼리 형태로 해석돼 text = text[] 타입 에러가 난다(dry-run 이
-    실제로 잡은 버그). 이 형태는 동시에 planner 가 nested loop O(n×m) 로 푸는 것을 막는다
-    (실측 Rows Removed by Join Filter: 58,848)."""
+class PageRowsLateTextFetchTest(unittest.TestCase):
+    """⑩본문 텍스트는 **페이지분만 늦게** findings 에서 PK 로 되읽어야 한다.
+
+    page_rows 가 filtered∩page_docs 를 findings 에 finding_id(=PK)로 join 하는 형태를
+    고정한다. 이 형태가 두 가지를 동시에 해결한다:
+      · 넓은 텍스트가 앞선 CTE 들을 통과하지 않는다(아래 SearchedCteIsNarrowTest 참조)
+      · planner 가 PK Index Scan 을 쓴다(실측 Index Scan using findings_pkey, 65행)
+    초안은 filtered 를 page_docs 에 직접 걸어 CTE 간 nested loop O(n×m) 가 됐었다
+    (실측 Rows Removed by Join Filter: 58,848).
+    """
 
     def setUp(self) -> None:
-        self.code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        self.code = code
+        self.page_rows_block = _slice_between(code, "page_rows as (", "page_docs_full as (")
 
-    def test_uses_any_array_select_form(self) -> None:
-        self.assertIn(
-            "any (array(select pd.raw_signal_id from page_docs pd))", self.code
-        )
+    def test_page_rows_joins_findings_by_primary_key(self) -> None:
+        self.assertIn("join public.findings f on f.finding_id = fl.finding_id", self.page_rows_block)
+
+    def test_page_rows_restricted_to_page_docs(self) -> None:
+        self.assertIn("join page_docs pd on pd.raw_signal_id = fi.raw_signal_id", self.page_rows_block)
 
     def test_does_not_use_any_select_array_agg_form(self) -> None:
+        """any (select array_agg(…)) 는 서브쿼리로 해석돼 `text = text[]` 타입 에러를
+        낸다 -- dry-run 이 실제로 잡은 버그라 되살아나면 함수가 아예 안 돈다."""
         self.assertNotIn("any (select array_agg", self.code)
         self.assertNotIn("any(select array_agg", self.code)
 
 
-class NoSelectStarInSearchedCteTest(unittest.TestCase):
-    """⑪searched CTE 는 컬럼을 명시 투영해야 한다(select * 금지) -- 초안이 select
-    *(width=753)라 CTE 가 temp 파일로 스필했다(실측 temp read=9,773 -> 수정 후 0)."""
+class SearchedCteIsNarrowTest(unittest.TestCase):
+    """⑪searched CTE 는 **좁아야** 한다 -- 본문 텍스트를 싣지 않고 컬럼을 명시 투영한다.
+
+    ★이 계약이 이 파일에서 가장 비싸게 배운 것이다. 본문(finding_text/finding_text_ko)을
+    이 CTE 에 실었더니 **무검색 랜딩**(q='' 이라 8,168행 전량이 통과하는 최빈·최악 경로)에서
+    CTE materialize 가 temp 파일로 스필해 659ms 가 나왔다(temp read=3,714 written=1,238).
+    검색이 있을 때는 2,454행만 남아 메모리에 들어가므로 **검색만 재보면 통과하는 함정**이었다.
+    좁힌 뒤 127.7ms·스필 0. 본문은 page_rows 가 페이지분만 PK 로 되읽는다.
+
+    blob 에 쓰이는 컬럼(category_label_ko·document_id·translation_method·cfr_refs·
+    mfds_refs)은 WHERE 절이 f 를 직접 참조하므로 select 목록에 없어야 정상이다.
+    """
+
+    _WIDE_COLUMNS = ("finding_text", "finding_text_ko")
 
     def setUp(self) -> None:
         code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
-        self.searched_block = _slice_between(code, "searched as (", "filtered as (")
+        block = _slice_between(code, "searched as (", "filtered as (")
+        # select 목록만 본다 -- blob(ILIKE 대상)은 where 절이라 넓은 컬럼을 참조하는 게 정상.
+        self.select_list = _slice_between(block, "select", "from public.findings f")
+        self.block = block
 
     def test_searched_cte_does_not_select_star(self) -> None:
-        self.assertNotIn("select *", self.searched_block)
+        self.assertNotIn("select *", self.block)
 
     def test_searched_cte_explicitly_projects_columns(self) -> None:
-        self.assertIn("f.finding_id, f.raw_signal_id, f.source, f.agency", self.searched_block)
+        self.assertIn("f.finding_id, f.raw_signal_id, f.source, f.agency", self.select_list)
+
+    def test_searched_cte_omits_wide_text_columns(self) -> None:
+        for col in self._WIDE_COLUMNS:
+            self.assertNotIn(
+                f"f.{col}",
+                self.select_list,
+                msg=(
+                    f"searched CTE select 목록에 f.{col} 이 있다. 넓은 텍스트를 CTE 로 물고 "
+                    "다니면 무검색 랜딩에서 temp 스필이 나 5배 느려진다(659ms vs 127ms). "
+                    "본문은 page_rows 가 페이지분만 PK 로 되읽어야 한다."
+                ),
+            )
 
 
 class MigrationNumberSequenceTest(unittest.TestCase):

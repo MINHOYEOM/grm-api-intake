@@ -180,6 +180,21 @@
   // {agency: count} — 무필터 대시보드 스탯의 소스별(FDA/MFDS) 분해를 정확화한다. null 이면
   // (RPC 실패 등) 대시보드는 기존처럼 로드된 데이터 기준(computeAgencyDist)으로 폴백한다.
   var SERVER_AGENCY_TOTALS = null;
+  // [025 파셋 전역 truth 2026-07-16] 무필터·무검색 랜딩에서 파셋 옵션 (N) 카운트·대시보드
+  // 분포를 findings_stats RPC 전역 truth 로 채운다 — ROWS 는 로드분(최초 1,000행, 최신순)
+  // 뿐이라 전역 비율을 왜곡한다(실측: 화면 FDA 483 (910) vs DB 진실 8,078). fetchCoverageNote()
+  // 가 채우고, computeFacetCounts()/renderDash() 가 소비한다. source/evidence/review_status
+  // 는 findings_stats 최상위 배열을 {value: cnt} 로 평탄화, month/category_code 는 agency
+  // 교차 배열(by_month/by_agency_category)을 agency 기준으로 합산해 얻는다(SERVER_AGENCY_
+  // TOTALS 와 동일 유도 패턴). review_status 는 025(by_review_status) 미적용 라이브 DB 에서
+  // null 로 남아 소비 측이 안전하게 기존 ROWS 폴백으로 떨어진다(죽지 않음).
+  var RPC_BY_SOURCE = null;
+  var RPC_BY_EVIDENCE = null;
+  var RPC_BY_REVIEW_STATUS = null;
+  var RPC_BY_MONTH = null;
+  var RPC_BY_CATEGORY = null;
+  var RPC_TOP_FIRMS = null; // findings_stats().top_firms verbatim([{firm_key,firm_name,cnt,public_cnt}], cnt desc — 007/017 계약)
+  var RPC_MONTH_VALUES = null; // Object.keys(RPC_BY_MONTH) 최신월 우선 정렬 — collectFacetValues("month") 가 ROWS 대신 이걸 우선한다.
   // [선로딩 c] 페이지네이션 버튼(처음/이전/번호/다음/끝) 클릭으로 촉발된 이동에서만 완료
   // 후 결과 목록 상단으로 스크롤한다 — goToPageFromPager() 가 세팅, goToPage() 의 완료
   // 콜백이 소비 후 즉시 리셋한다. 필터/검색/정렬 변경발 goToPage(1) 리셋은 스크롤하지
@@ -235,6 +250,12 @@
   var dashMonthEl = document.getElementById("fnd-dash-month");
   var dashFirmEl = document.getElementById("fnd-dash-firm");
   var hasDash = !!(dashEl && dashStatsEl && dashCatEl && dashMonthEl && dashFirmEl);
+  // [025 §요구2] 필터·검색이 하나라도 활성이면 renderDash() 가 true 로 세팅 — 하위 렌더
+  // 함수(renderDashStats/buildCatRow/renderDashMonths/renderDashFirms)가 파라미터 추가
+  // 없이(기존 단일 인자 시그니처 불가침 — 소스마커 테스트 다수가 정확히 고정) 클로저로
+  // 읽어 숫자만 지운다(라벨/바 구조는 유지) — ROWS(로드분) 기준 부분집합 숫자를 사실값
+  // 처럼 보여주지 않는다는 원칙.
+  var dashHideNumbers = false;
 
   // [문서 단위 페이지네이션] 상단(#fnd-pager-top)·하단(#fnd-pager-bottom) 페이지네이션
   // 바 — 완전히 동일한 goToPage()/renderPager() 로직을 공유한다. 구버전 셸(엘리먼트
@@ -282,6 +303,12 @@
   // 값 전체 목록(현재 필터와 무관, ROWS 전체 기준) — 칩/옵션 자체는 한 번만 만들고,
   // 이후 render() 마다 건수·disabled·on 상태만 갱신한다(DOM 재생성 없음).
   function collectFacetValues(key2) {
+    // [025 §요구1] 발행월 옵션은 ROWS(로드분, 최초 1,000행) 대신 findings_stats RPC
+    // by_month 전역 값을 우선한다 — 최신순 로드+시간축 특성상 오래된 월은 첫 청크 밖에
+    // 있어 옵션 자체가 아예 안 보이는 문제를 없앤다. RPC 미확보(fetchCoverageNote 실패/
+    // 025 미적용)면 기존처럼 ROWS 기준으로 조용히 폴백한다.
+    if (key2 === "month" && RPC_MONTH_VALUES) return RPC_MONTH_VALUES.slice();
+    if (!ROWS) return []; // RPC 가 메인 fetch 보다 먼저 도착한 순간 등 방어적 가드
     var vals = {};
     ROWS.forEach(function (r) {
       var v = key2 === "month" ? monthOf(r) : r[key2];
@@ -384,10 +411,20 @@
     return rowMatchesFilters(row, null);
   }
 
-  // key2 값별 건수 — "검색어 + 그 파셋을 제외한 나머지 활성 필터" 적용 결과 기준(표준
-  // 파세팅). 셀렉트/칩 렌더 갱신(refreshFacetUI)이 render() 마다 호출한다.
+  // key2 값별 건수 — 무필터·무검색 랜딩(§요구1)에서는 findings_stats RPC 전역 truth 를
+  // 그대로 반환한다(ROWS 는 로드분 1,000행뿐이라 전역 비율을 왜곡 — 2026-07-16 실측
+  // 결함 수리). 필터·검색이 하나라도 활성이면(§요구2) 기존과 동일하게 "검색어 + 그
+  // 파셋을 제외한 나머지 활성 필터" 적용 결과(표준 파세팅, ROWS 기준 부분집합)를
+  // 반환한다 — 이 값은 옵션 활성/비활성 판정에만 쓰이고, refreshFacetUI() 가 화면
+  // 숫자로는 노출하지 않는다(라벨만).
   function computeFacetCounts(key2) {
+    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
+    if (!filtersActive) {
+      var rpcCounts = rpcFacetCounts(key2);
+      if (rpcCounts) return rpcCounts;
+    }
     var counts = {};
+    if (!ROWS) return counts;
     ROWS.forEach(function (r) {
       if (!rowMatchesFilters(r, key2)) return;
       var v = key2 === "month" ? monthOf(r) : r[key2];
@@ -397,9 +434,26 @@
     return counts;
   }
 
+  // [025] key2 → findings_stats RPC 유도값 매핑. review_status 는 025(by_review_status)
+  // 미적용 라이브 DB 에서 RPC_BY_REVIEW_STATUS 가 null 로 남아 있는 그대로 반환해
+  // computeFacetCounts() 가 자연히 ROWS 폴백으로 떨어진다(안전 폴백 — 죽지 않음).
+  function rpcFacetCounts(key2) {
+    if (key2 === "source") return RPC_BY_SOURCE;
+    if (key2 === "evidence_level") return RPC_BY_EVIDENCE;
+    if (key2 === "review_status") return RPC_BY_REVIEW_STATUS;
+    if (key2 === "month") return RPC_BY_MONTH;
+    if (key2 === "category_code") return RPC_BY_CATEGORY;
+    return null;
+  }
+
   // [M15] 셀렉트 옵션 라벨(건수 병기)을 매 render() 마다 갱신한다 — DOM 엘리먼트는
-  // buildFacetSkeleton()이 1회 만든 것을 재사용(재생성 없음).
+  // buildFacetSkeleton()이 1회 만든 것을 재사용(재생성 없음). [025 §요구2] 필터·검색이
+  // 하나라도 활성이면 건수 자체를 표시하지 않는다(라벨만) — ROWS(로드분) 기준 부분집합
+  // 건수를 사실값처럼 보여주지 않는다("로드분 기준" 툴팁으로 얼버무리는 것도 금지).
+  // 옵션 활성/비활성 판정에는 여전히 computeFacetCounts() 값을 쓴다(표시가 아니라
+  // 상호작용 편의라 무해).
   function refreshFacetUI() {
+    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
@@ -408,7 +462,7 @@
       Array.prototype.forEach.call(sel.options, function (opt) {
         if (!opt.value) return; // "전체" 옵션은 건수 병기 대상 아님
         var count = counts[opt.value] || 0;
-        opt.textContent = opt.dataset.label + " (" + count + ")";
+        opt.textContent = filtersActive ? opt.dataset.label : (opt.dataset.label + " (" + count + ")");
         opt.disabled = count === 0 && sel.value !== opt.value;
       });
     });
@@ -558,6 +612,13 @@
     if (stats.needsReview > 0) {
       dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), "검토 필요", true));
     }
+    // [025 §요구2] 필터·검색 활성 시 숫자만 지운다(라벨·블록 구조는 그대로) — dashHideNumbers
+    // 는 renderDash() 가 세팅하는 클로저 플래그(기존 단일 인자 시그니처 불가침 유지).
+    if (dashHideNumbers) {
+      Array.prototype.forEach.call(dashStatsEl.querySelectorAll(".fnd-dash-stat-num"), function (n) {
+        n.textContent = "";
+      });
+    }
   }
 
   function renderDashCategories(stats) {
@@ -587,9 +648,13 @@
     row.className = "fnd-dash-cat-row";
     if (code) {
       if (state.category_code === code) row.classList.add("on");
-      makeClickableRow(row, label + " 카테고리로 필터: " + count + "건", function () {
-        toggleCategoryFilter(code);
-      });
+      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) 건수를 aria-label 에서도 뺀다 —
+      // 화면엔 숫자를 숨기면서 스크린리더에만 부분집합 건수를 흘리면 일관성이 깨진다.
+      makeClickableRow(
+        row,
+        label + " 카테고리로 필터" + (dashHideNumbers ? "" : ": " + count + "건"),
+        function () { toggleCategoryFilter(code); }
+      );
     }
     // [라벨·바 트랙 분리 M2a] 라벨은 CSS 로 110px+ellipsis 잘림 — title 로 전체 텍스트를
     // 계속 확인할 수 있게 한다(잘리지 않는 라벨도 무해하게 동일 텍스트를 반복할 뿐이다).
@@ -600,7 +665,7 @@
     var ratio = maxCount > 0 ? count / maxCount : 0;
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
     row.appendChild(bar);
-    row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
+    row.appendChild(el("span", "fnd-dash-cat-count", dashHideNumbers ? "" : String(count)));
     return row;
   }
 
@@ -620,10 +685,14 @@
       var col = document.createElement("div");
       col.className = "fnd-dash-month-col";
       if (state.month === x.month) col.classList.add("on");
-      makeClickableRow(col, x.month + " " + x.count + "건", function () {
+      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) title/aria-label 에서도 건수를
+      // 뺀다 — 이 숫자는 시각적으로는 title 속성(호버)에만 있었지만, "툴팁으로 얼버무리지
+      // 말라"는 원칙은 화면 표시가 없다고 툴팁에 부분집합 숫자를 남겨도 된다는 뜻이 아니다.
+      var monthLabelText = x.month + (dashHideNumbers ? "" : " " + x.count + "건");
+      makeClickableRow(col, monthLabelText, function () {
         toggleMonthFilter(x.month);
       });
-      col.title = x.month + " " + x.count + "건";
+      col.title = monthLabelText;
       var barwrap = el("div", "fnd-dash-month-barwrap");
       var bar = el("div", "fnd-dash-month-bar");
       bar.style.height = Math.max(6, Math.round((x.count / maxCount) * 100)) + "%";
@@ -650,11 +719,12 @@
       // [firm_name 엔티티 디코드 M5] 클릭/필터는 raw f.name(DB 원본값) 그대로 써야 검색
       // state.q·rowMatchesFilters 매칭이 어긋나지 않는다 — 디코드는 표시(라벨·툴팁)에만.
       var firmDisplay = decodeFirmDisplay(f.name);
-      makeClickableRow(row, firmDisplay + " 검색: " + f.count + "건", function () {
+      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) aria-label·표시 건수 둘 다 뺀다.
+      makeClickableRow(row, firmDisplay + (dashHideNumbers ? " 검색" : " 검색: " + f.count + "건"), function () {
         toggleFirmFilter(f.name);
       });
       row.appendChild(el("span", "fnd-dash-firm-name", firmDisplay));
-      row.appendChild(el("span", "fnd-dash-firm-count", String(f.count)));
+      row.appendChild(el("span", "fnd-dash-firm-count", dashHideNumbers ? "" : String(f.count)));
       dashFirmEl.appendChild(row);
     });
   }
@@ -672,6 +742,9 @@
     // matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버 총수로 바꾸면
     // 오히려 더 오해를 만든다 — countActiveFilters()/state.q.trim() 로 자체 판정한다.
     var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
+    // [025 §요구2] 필터·검색 활성 시 대시보드 숫자를 숨긴다(라벨·바 구조는 유지) — 하위
+    // 렌더 함수 시그니처는 바꾸지 않고 클로저 플래그로 전달한다(위 dashHideNumbers 선언 참조).
+    dashHideNumbers = filtersActive;
     if (!filtersActive) {
       // 전체(지적) — RPC exact 우선, 실패 시 Content-Range exact(SERVER_TOTAL) 폴백,
       // 그마저 없으면 로드 수(stats.total 원래값) 유지.
@@ -691,6 +764,32 @@
           .map(function (a) { return { agency: a, count: SERVER_AGENCY_TOTALS[a] }; })
           .sort(function (x, y) { return y.count - x.count || x.agency.localeCompare(y.agency); });
         stats.agenciesExact = true;
+      }
+      // [025 §요구1] 카테고리·월별·업체 분포도 같은 원칙으로 RPC 전역 truth 로 교체한다
+      // (by_agency_category/by_month/top_firms — fetchCoverageNote() 가 채운다). RPC
+      // 미확보(null)면 기존처럼 로드 기준(computeStats 원래값)을 그대로 둔다.
+      if (RPC_BY_CATEGORY !== null) {
+        stats.categories = Object.keys(RPC_BY_CATEGORY)
+          .map(function (code) {
+            var cat = CATEGORY_LABELS[code];
+            return { code: code, ko: cat ? cat.ko : code, count: RPC_BY_CATEGORY[code] };
+          })
+          .sort(function (a, b) { return b.count - a.count || a.code.localeCompare(b.code); });
+      }
+      if (RPC_BY_MONTH !== null) {
+        var rpcMonths = Object.keys(RPC_BY_MONTH).sort(); // 오름차순(computeMonthTrend 관례와 동일)
+        if (rpcMonths.length > 12) rpcMonths = rpcMonths.slice(rpcMonths.length - 12);
+        stats.months = rpcMonths.map(function (m) { return { month: m, count: RPC_BY_MONTH[m] }; });
+      }
+      if (RPC_TOP_FIRMS !== null) {
+        stats.firms = RPC_TOP_FIRMS.slice(0, 5).map(function (f) {
+          return { name: f.firm_name, count: f.cnt };
+        });
+      }
+      // review_status 는 025 미적용 라이브 DB 에서 RPC_BY_REVIEW_STATUS 가 null 로 남아
+      // 자연히 기존 로드 기준(computeStats 원래값)으로 폴백한다.
+      if (RPC_BY_REVIEW_STATUS !== null) {
+        stats.needsReview = RPC_BY_REVIEW_STATUS.needs_review || 0;
       }
     }
     renderDashStats(stats);
@@ -1532,6 +1631,7 @@
   function renderDeepLinkDoc() {
     showState("none");
     hidePager();
+    ensureLoadMoreNotice().hidden = true; // [025] 단독 문서 렌더 — 목록 로딩 진행 문구는 무관(hidePager 와 동형)
     if (hasDash) dashEl.hidden = true; // 문서 1건뿐이라 대시보드는 의미가 없다(파괴 아님 — 숨김만)
     resultsEl.textContent = "";
     countEl.textContent = "";
@@ -1678,6 +1778,7 @@
   function renderSimilarResults(items) {
     showState("none");
     hidePager();
+    ensureLoadMoreNotice().hidden = true; // [025] 유사검색 단독 렌더 — 목록 로딩 진행 문구는 무관(hidePager 와 동형)
     if (hasDash) dashEl.hidden = true;
     resultsEl.textContent = "";
     countEl.textContent = "";
@@ -1778,6 +1879,45 @@
     similarToggleBtn = btn;
   }
 
+  // [025 §요구3] 결과 영역에 항상 보이는 문구(툴팁 아님) — 서버 obs 청크가 아직 소진되지
+  // 않았으면(!isServerExhausted()) 상시 노출하고, 전량 로드가 끝나면 사라진다. findings.html
+  // 템플릿엔 자리가 없어(§템플릿 최소 변경 원칙, PR-0 딥링크 배너·S1 토글과 동일 관례)
+  // findings.js 가 런타임에 1회만 DOM 삽입한다 — #fnd-pager-top(결과 목록 최상단) 바로
+  // 앞이라 필터/정렬/페이지 상태와 무관하게 결과 영역의 첫 요소로 항상 눈에 띈다.
+  var loadMoreNoticeEl = null;
+  function ensureLoadMoreNotice() {
+    if (loadMoreNoticeEl) return loadMoreNoticeEl;
+    loadMoreNoticeEl = document.createElement("p");
+    loadMoreNoticeEl.id = "fnd-loadmore-notice";
+    loadMoreNoticeEl.setAttribute("role", "status");
+    loadMoreNoticeEl.setAttribute("aria-live", "polite");
+    loadMoreNoticeEl.style.cssText = "margin:0 0 14px;font-size:12.5px;color:var(--muted)";
+    loadMoreNoticeEl.textContent = "데이터를 추가로 불러오는 동안 결과가 갱신됩니다.";
+    var anchor = pagerTopEl || resultsEl;
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(loadMoreNoticeEl, anchor);
+    return loadMoreNoticeEl;
+  }
+
+  // [025 §요구4] 오래된순·업체명순은 전량 로드(서버 obs 청크 소진) 전에는 전역 정렬을
+  // 보장할 수 없다 — 선택(b) 채택: 전량 로드 전에는 두 옵션을 disabled 처리하고 이유를
+  // title 로 남긴다(전역 정렬인 것처럼 보이는 부분 정렬을 절대 보여주지 않는다). 선택(a)
+  // (정렬 선택 시 전량 선로딩 후 정렬)를 채택하지 않은 근거 — 코퍼스 전체(8천+행)를
+  // 사용자가 실제로 그 정렬을 고르지 않는 흔한 경로에서까지 강제로 끌어와야 해 무겁고,
+  // "숨기거나 비활성화한다"는 이 수리 전반의 보수적 원칙(부분 데이터를 사실처럼 보여주지
+  // 않는다)과 더 일관된다. 서버가 소진되면 자동으로 재활성화된다(조용한 정렬 자동전환은
+  // 하지 않는다 — 이미 선택돼 있었다면 그대로 유지, 사용자가 다시 고르게 한다).
+  function updateSortAvailability() {
+    if (!sortSel) return;
+    var exhausted = isServerExhausted();
+    var reason = "전체 데이터를 불러오는 중에는 전역 정렬을 보장할 수 없어 비활성화됩니다.";
+    Array.prototype.forEach.call(sortSel.options, function (opt) {
+      if (opt.value === "date_asc" || opt.value === "firm_asc") {
+        opt.disabled = !exhausted;
+        opt.title = exhausted ? "" : reason;
+      }
+    });
+  }
+
   function render() {
     var matched = sortRows(ROWS.filter(matches));
     var docs = groupByDocument(matched); // [문서 중심 열람] raw_signal_id 로 문서 단위 그룹핑
@@ -1791,6 +1931,11 @@
     // 걸려도 ensurePageReady() 가 필요할 때 계속 다음 청크를 당겨오므로, "아직 최소
     // 추정치일 뿐"이라는 신호는 필터 여부와 상관없이 항상 정직해야 한다.
     var moreMayExist = !isServerExhausted();
+    // [025 §요구3] 결과 영역 상시 문구 — 전량 로드 전(moreMayExist)이면 노출, 소진되면
+    // 사라진다(필터/검색/페이지 상태와 무관하게 항상 동일 기준). [025 §요구4] 정렬 옵션
+    // 가용성도 같은 소진 여부로 갱신한다(오래된순/업체명순은 전량 로드 후에만 활성).
+    ensureLoadMoreNotice().hidden = !moreMayExist;
+    updateSortAvailability();
     // [정확 총수 M1a] 무필터(검색어·필터 전부 비어있음) + 서버 미소진 구간에서는 지금까지
     // 로드된 docs.length 대신 findings_stats RPC 의 exact 총수(SERVER_DOC_TOTAL/
     // SERVER_FINDINGS_TOTAL — fetchCoverageNote() 가 독립적으로 채운다)를 그대로 쓴다 —
@@ -2256,6 +2401,20 @@
   // 반환한다(trends.js 와 동일 계약, 원문 텍스트는 내려주지 않는 안전 계약도 동일). 이
   // 페이지의 anon SELECT(공개 게이트 통과분만)와 이 RPC 의 전량 집계 사이 간극을 사용자에게
   // 정직하게 알리는 것이 목적이다 — 실패해도 독립적으로 조용히 숨김 유지(아래 .catch()).
+  // [025] findings_stats RPC 도착이 메인 목록 fetch 보다 늦을 수 있어(네트워크 순서
+  // 무관), 도착 시점에 이미 목록이 그려져 있으면(rowsReady) 새로 확보된 RPC truth 를
+  // 곧장 반영한다 — 월 옵션(buildFacetSkeleton, 멱등)과 파셋 카운트·대시보드 분포
+  // (render())가 로드 순서와 무관하게 항상 정확해야 한다. ROWS 가 아직 없으면 최초
+  // render()/buildFacetSkeleton() 호출이 이미 채워진 RPC_* 값을 자연히 반영하므로
+  // (순서 무관 설계) 여기선 아무것도 하지 않는다. 딥링크 단독 문서 렌더·유사검색 모드는
+  // render() 와 다른 렌더 경로라 건드리지 않는다(§ 단독 렌더 모드 불가침).
+  function refreshAfterRpcStatsArrival() {
+    if (!rowsReady) return;
+    buildFacetSkeleton(); // 새로 확보된 월 옵션 반영(idempotent)
+    if (deepLinkPending || deepLinkStatus === "found" || similarMode) return;
+    render();
+  }
+
   function fetchCoverageNote() {
     if (!coverageNoteEl || !coverageTextEl) return;
     fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
@@ -2288,11 +2447,55 @@
         // 파생한다(RPC 실패/010 미적용이면 null 유지 — renderDash() 가 로드 기준으로 폴백).
         if (Array.isArray(data.by_agency_category)) {
           var agencySums = {};
+          var categorySums = {};
           data.by_agency_category.forEach(function (row) {
-            if (!row || !row.agency) return;
-            agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);
+            if (!row) return;
+            if (row.agency) agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);
+            // [025 §요구1] 카테고리 파셋·대시보드 분포도 같은 교차표에서 category_code
+            // 기준으로 합산한다(agency 기준 SERVER_AGENCY_TOTALS 와 동일 유도 패턴).
+            if (row.category_code) {
+              categorySums[row.category_code] = (categorySums[row.category_code] || 0) + (row.cnt || 0);
+            }
           });
           SERVER_AGENCY_TOTALS = agencySums;
+          RPC_BY_CATEGORY = categorySums;
+        }
+        // [025 파셋 전역 truth] source/evidence/review_status 는 findings_stats 최상위
+        // 배열을 그대로 {value: cnt} 로 평탄화한다. review_status(by_review_status)는
+        // 025 신규 키라 미적용 라이브 DB 에서 undefined 일 수 있다 — Array.isArray 가드가
+        // 자연히 RPC_BY_REVIEW_STATUS=null(폴백)로 남겨 죽지 않는다.
+        if (Array.isArray(data.by_source)) {
+          var srcSums = {};
+          data.by_source.forEach(function (row) {
+            if (row && row.source) srcSums[row.source] = row.cnt || 0;
+          });
+          RPC_BY_SOURCE = srcSums;
+        }
+        if (Array.isArray(data.by_evidence)) {
+          var evSums = {};
+          data.by_evidence.forEach(function (row) {
+            if (row && row.evidence_level) evSums[row.evidence_level] = row.cnt || 0;
+          });
+          RPC_BY_EVIDENCE = evSums;
+        }
+        if (Array.isArray(data.by_review_status)) {
+          var statusSums = {};
+          data.by_review_status.forEach(function (row) {
+            if (row && row.review_status) statusSums[row.review_status] = row.cnt || 0;
+          });
+          RPC_BY_REVIEW_STATUS = statusSums;
+        }
+        if (Array.isArray(data.by_month)) {
+          var monthSums = {};
+          data.by_month.forEach(function (row) {
+            if (!row || !row.month) return;
+            monthSums[row.month] = (monthSums[row.month] || 0) + (row.cnt || 0);
+          });
+          RPC_BY_MONTH = monthSums;
+          RPC_MONTH_VALUES = Object.keys(monthSums).sort().reverse(); // 최신월 우선(collectFacetValues 관례와 동일)
+        }
+        if (Array.isArray(data.top_firms)) {
+          RPC_TOP_FIRMS = data.top_firms; // 이미 cnt desc, firm_key asc 정렬(007/017 계약 — 재정렬 없음)
         }
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
         // 완파손 등 번역 불능 원문뿐) 미완료 문안을 완료형으로 스스로 전환한다 — 완역
@@ -2315,6 +2518,10 @@
               : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능") +
             " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
         coverageNoteEl.hidden = false;
+        // [025] 이 RPC 도착 시점은 메인 fetch(fetchFindings)와 독립적이라 순서가 뒤바뀔
+        // 수 있다 — ROWS 가 이미 로드돼 화면이 그려진 뒤에 도착한 경우, 새로 확보한
+        // RPC truth(월 옵션·파셋 카운트·대시보드 분포)를 곧장 반영한다.
+        refreshAfterRpcStatsArrival();
       })
       .catch(function () {
         // 조용히 숨김 유지 — 검색 페이지 본기능(검색·필터)과 무관한 독립 폴백.

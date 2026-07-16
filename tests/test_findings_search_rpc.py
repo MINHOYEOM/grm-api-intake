@@ -40,6 +40,7 @@ from pathlib import Path
 
 _MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _SEARCH_PATH = _MIGRATIONS_DIR / "026_findings_search.sql"
+_DASH_PATH = _MIGRATIONS_DIR / "027_findings_search_dash_axes.sql"
 
 _FN_SEARCH_SIG = "create or replace function public.findings_search(\n"
 _FN_DOCUMENT_SIG = "create or replace function public.findings_document(p_finding_id text)\n"
@@ -331,19 +332,210 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 
 
 class MigrationNumberSequenceTest(unittest.TestCase):
-    """⑫026 이 추가되며 025 가 더 이상 마지막이 아니게 됐다 -- 마이그레이션 번호가
-    001~026 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+    """⑫026 에 이어 027 이 findings_search 를 supersede 하며 마지막 번호가 갱신됐다 --
+    마이그레이션 번호가 001~027 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_026(self) -> None:
+    def test_027_file_exists(self) -> None:
+        self.assertTrue(_DASH_PATH.is_file(), f"missing {_DASH_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_027(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 27)))
+        self.assertEqual(numbers, list(range(1, 28)))
+
+
+# ============================================================================
+# 027_findings_search_dash_axes.sql -- findings_search 를 supersede 해 대시보드
+# 축(agency 파셋 + dash 블록)을 추가하는 마이그레이션의 정적 계약.
+#
+# 026 은 그 시점의 정본 기록으로 위에 그대로 남아 있다(findings_document 정의의 정본은
+# 계속 026). 027 은 findings_search 만 재선언하므로 아래 클래스들은 026 클래스를 건드리지
+# 않고 027 전용 파일을 대상으로 별도 검사한다.
+# ============================================================================
+
+
+class DashAxesRedeclarationScopeTest(unittest.TestCase):
+    """②027 은 findings_search 만 재선언하고 findings_document 는 재선언하지 않는다 --
+    딥링크 해석(findings_document)은 대시보드 축과 무관하므로 불필요한 재선언은 diff 를
+    부풀리고 "무엇이 바뀌었나"를 흐린다(027 헤더 (B) 절 근거)."""
+
+    def setUp(self) -> None:
+        self.assertTrue(_DASH_PATH.is_file(), f"missing {_DASH_PATH}")
+        self.code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+
+    def test_redeclares_findings_search(self) -> None:
+        self.assertIn(_FN_SEARCH_SIG, self.code)
+
+    def test_does_not_redeclare_findings_document(self) -> None:
+        self.assertNotIn("create or replace function public.findings_document", self.code)
+
+
+class DashSecurityInvokerCarryoverTest(unittest.TestCase):
+    """③027 의 findings_search 도 security invoker + search_path 고정을 유지한다 --
+    supersede 과정에서 026 이 확립한 "RLS(010)가 유일한 게이트" 원칙이 뒤집히면 안 된다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+        self.fn_search = _slice_function(code, _FN_SEARCH_SIG)
+
+    def test_is_security_invoker(self) -> None:
+        self.assertIn("security invoker", self.fn_search)
+        self.assertNotIn("security definer", self.fn_search)
+
+    def test_pins_search_path(self) -> None:
+        self.assertIn("set search_path = public", self.fn_search)
+
+
+class DashSearchedCteCarryoverTest(unittest.TestCase):
+    """④좁은 searched CTE 계약이 027 에서도 승계된다 -- select 목록에 finding_text/
+    finding_text_ko 가 없어야 무검색 랜딩 659ms->127ms 개선(026 실측)이 유지된다.
+    다만 f.firm_key 는 있어야 한다 -- 027 이 top_firms 집계를 위해 추가한 것으로,
+    027 헤더가 밝히듯 짧은 generated 컬럼이라 본문 텍스트와 달리 스필을 유발하지 않는다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "searched as (", "filtered as (")
+        self.select_list = _slice_between(block, "select", "from public.findings f")
+
+    def test_omits_wide_text_columns(self) -> None:
+        for col in ("finding_text", "finding_text_ko"):
+            self.assertNotIn(
+                f"f.{col}",
+                self.select_list,
+                msg=f"027 searched CTE select 목록에 f.{col} 이 있다 -- 026 의 스필 방지 계약 위반.",
+            )
+
+    def test_includes_firm_key_for_top_firms(self) -> None:
+        self.assertIn("f.firm_key", self.select_list)
+
+
+class FacetsAndDashAxesPresentTest(unittest.TestCase):
+    """⑤반환 jsonb 의 facets 블록에 6축(source/category/month/evidence/review_status/
+    agency), dash 블록에 4축(agency/category/month/top_firms)이 있어야 한다 -- PR-B 가
+    요구하는 findings.js 렌더 전환(agency 분포·top firms)이 이 데이터 계약에 의존한다."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+
+    def test_facets_block_has_six_axes(self) -> None:
+        block = _slice_between(
+            self.code, "'facets', jsonb_build_object(", "'dash', jsonb_build_object("
+        )
+        for key in (
+            "by_source", "by_category", "by_month",
+            "by_evidence", "by_review_status", "by_agency",
+        ):
+            self.assertIn(f"'{key}'", block)
+
+    def test_dash_block_has_four_axes(self) -> None:
+        block = _slice_between(self.code, "'dash', jsonb_build_object(", "'page',")
+        for key in ("by_agency", "by_category", "by_month", "top_firms"):
+            self.assertIn(f"'{key}'", block)
+
+
+class FacetsVsDashPopulationTest(unittest.TestCase):
+    """⑥facets 축(fac_*)은 검색만 적용한 'searched' 를, dash 축(dash_*)은 필터 전량
+    적용한 'filtered' 를 모집단으로 삼는다 -- 뒤바뀌면 "소스를 MFDS 로 바꾸면 몇 건?"
+    (파셋)과 "현재 결과의 분포"(대시보드)가 서로 다른 질문에 틀린 답을 낸다(027 헤더 근거)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+
+    def test_fac_ctes_use_searched_base(self) -> None:
+        bounds = [
+            ("fac_source as (", "fac_cat as ("),
+            ("fac_cat as (", "fac_month as ("),
+            ("fac_month as (", "fac_ev as ("),
+            ("fac_ev as (", "fac_rs as ("),
+            ("fac_rs as (", "fac_agency as ("),
+            ("fac_agency as (", "dash_agency as ("),
+        ]
+        for start, end in bounds:
+            block = _slice_between(self.code, start, end)
+            self.assertIn("from searched s, p", block, msg=f"{start} block")
+
+    def test_dash_ctes_use_filtered_base(self) -> None:
+        bounds = [
+            ("dash_agency as (", "dash_cat as ("),
+            ("dash_cat as (", "dash_month as ("),
+            ("dash_month as (", "dash_firms as ("),
+        ]
+        for start, end in bounds:
+            block = _slice_between(self.code, start, end)
+            self.assertIn("from filtered f", block, msg=f"{start} block")
+
+
+class FacAgencyExcludesOwnAxisTest(unittest.TestCase):
+    """⑦fac_agency 는 자기 축(agency)의 필터 술어를 제외한다(표준 파세팅) -- 넣으면
+    "기관을 X 로 바꾸면 몇 건?" 질문이 항상 현재 선택값으로만 필터링되어 무의미해진다.
+    같은 원리로 fac_source 도 p.f_source 를 제외해야 한다."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+
+    def test_fac_agency_omits_agency_predicate_but_keeps_others(self) -> None:
+        block = _slice_between(self.code, "fac_agency as (", "dash_agency as (")
+        self.assertNotIn("p.f_agency", block)
+        for other in ("p.f_source", "p.f_cat", "p.f_month", "p.f_ev", "p.f_rs"):
+            self.assertIn(other, block)
+
+    def test_fac_source_omits_source_predicate_but_keeps_others(self) -> None:
+        block = _slice_between(self.code, "fac_source as (", "fac_cat as (")
+        self.assertNotIn("p.f_source", block)
+        for other in ("p.f_cat", "p.f_month", "p.f_ev", "p.f_rs", "p.f_agency"):
+            self.assertIn(other, block)
+
+
+class TopFirmsRepresentativeNameLateralTest(unittest.TestCase):
+    """⑧top_firms 대표 표시명은 025 와 동일한 lateral 규칙(최빈 -> 최장 -> 알파벳)을 써야
+    한다 -- min(firm_name) 으로 골랐더니 025 와 건수·순서는 같은데 표기만 갈렸다(실측:
+    `Hospira Inc` vs 025 의 `Hospira Inc.`). 같은 블록이 필터 유무로 표기가 바뀌면 사용자
+    에겐 다른 회사처럼 보인다."""
+
+    def test_dash_firms_lateral_orders_by_count_then_length_then_alpha(self) -> None:
+        code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "dash_firms as (", "select jsonb_build_object(")
+        self.assertIn(
+            "order by count(*) desc, length(f2.firm_name) desc, f2.firm_name asc",
+            block,
+        )
+
+
+class TopFirmsGroupedByFirmKeyTest(unittest.TestCase):
+    """⑨top_firms 는 firm_name 이 아니라 firm_key 로 묶는다 -- 017/025 가 정규화한 기준.
+    종전 클라이언트는 무필터=firm_key(RPC), 필터=firm_name(computeFirmTop) 으로 기준이
+    갈리는 잠복 불일치가 있었다 -- 서버 일원화로 이 불일치를 없앤다."""
+
+    def test_dash_firms_groups_by_firm_key_not_firm_name(self) -> None:
+        code = _strip_sql_comments(_DASH_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "dash_firms as (", "select jsonb_build_object(")
+        self.assertIn("group by f.firm_key", block)
+        self.assertNotIn("group by f.firm_name", block)
+
+
+class DashGrantScopeTest(unittest.TestCase):
+    """⑩027 은 findings_search 의 grant 를 재선언하고(단독으로 fresh DB 에 적용해도
+    성립하도록, create or replace 자체는 멱등), findings_document 의 grant 는 하지
+    않는다 -- 그 함수를 만들지 않은 이 파일이 아니라 026 이 계속 담당한다."""
+
+    def setUp(self) -> None:
+        self.sql = _DASH_PATH.read_text(encoding="utf-8")
+
+    def test_grants_findings_search_execute_to_anon_and_authenticated(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_search(text, text, text, text, text, "
+            "text, text, text, int, int) to anon, authenticated;",
+            self.sql,
+        )
+
+    def test_does_not_grant_findings_document(self) -> None:
+        self.assertNotIn("grant execute on function public.findings_document", self.sql)
 
 
 if __name__ == "__main__":  # pragma: no cover

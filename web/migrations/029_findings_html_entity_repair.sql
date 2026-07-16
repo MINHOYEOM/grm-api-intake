@@ -171,7 +171,14 @@ select public.grm_html_unescape(d.firm_name) as after_name, count(*) as would_me
 -- ============================================================================
 -- (C) findings 정정 — firm_name/site_name. firm_key 는 generated 라 자동 재계산된다.
 --     finding_text 는 건드리지 않는다 → findings_rawsig_text_md5_uq 무관.
+--
+-- ★(C)+(D) 5개 update 는 **한 트랜잭션**으로 묶는다(begin ~ commit). 중간에 하나가
+--   실패했을 때 findings 만 고쳐지고 raw_signals 는 옛 표기로 남는 반쪽 상태를 막는다
+--   — 그 상태로 재백필이 돌면 오염이 되살아난다((D) 주석 참조). SQL Editor 에 (C)(D) 를
+--   통째로 붙여넣어 한 번에 실행하라(begin 만 실행하고 멈추지 말 것).
 -- ============================================================================
+
+begin;
 
 update public.findings
    set firm_name = public.grm_html_unescape(firm_name)
@@ -208,11 +215,13 @@ update public.raw_signals
  where source = 'FDA 483'
    and title ~ '&(#[0-9]+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]{1,31});';
 
+commit;
+
 -- ============================================================================
 -- (E) 검증(적용 직후 실행)
 -- ============================================================================
 
--- (E)-1 잔여 오염 0 — 소스/컬럼 무관 전수. 기대치: 0행.
+-- (E)-1 잔여 오염 0 — 소스/컬럼 무관 전수. 기대치: 5행 전부 remaining = 0.
 select 'findings.firm_name' as target, count(*) as remaining from public.findings
  where firm_name ~ '&(#[0-9]+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]{1,31});'
 union all
@@ -229,8 +238,14 @@ select 'raw_signals.title', count(*) from public.raw_signals
  where title ~ '&(#[0-9]+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]{1,31});';
 
 -- (E)-2 firm_key 불변 재확인 — 대표 업체가 정정 후에도 같은 key 를 유지하고 건수도 그대로.
---        기대치: firm_name='H & P Industries, Inc.' / firm_key='h & p industries' / 128행.
-select firm_name, firm_key, count(*) as rows
+--   기대치: 1행만 나온다 — firm_name='H & P Industries, Inc.'(엔티티 사라짐) /
+--           firm_key='h & p industries'(불변) / rows=133 · public_rows=128.
+--   ★rows 는 133 이다(128 아님). SQL Editor 는 postgres 로 실행돼 RLS 를 우회하므로
+--     비공개(scope_status<>'ok') 5행까지 함께 센다 — 128 은 사이트에 보이는 공개분이다.
+--     이 구분을 안 적어두면 "128 이어야 하는데 133 이 나온다"고 오판하게 된다.
+--   ★2행 이상 나오면 멈춰라 — 정정 전/후 표기가 공존한다는 뜻(= update 가 일부만 적용됨).
+select firm_name, firm_key, count(*) as rows,
+       count(*) filter (where scope_status = 'ok') as public_rows
   from public.findings
  where firm_key = 'h & p industries'
  group by 1, 2;

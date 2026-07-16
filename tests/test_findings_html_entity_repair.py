@@ -131,6 +131,23 @@ class MigrationTextContractTest(unittest.TestCase):
         for stmt in self._update_statements():
             self.assertNotIn("set finding_text", stmt)
 
+    def test_updates_are_wrapped_in_one_transaction(self):
+        """(C)+(D) 5개 update 가 begin ~ commit 안에 전부 들어 있어야 한다.
+
+        반쪽 적용(findings 만 정정되고 raw_signals 는 옛 표기) 상태로 재백필이 돌면
+        오염이 되살아난다 — 원자성이 그 상태를 구조적으로 막는다.
+        """
+        begin_at = self.sql.index("\nbegin;")
+        commit_at = self.sql.index("\ncommit;")
+        self.assertLess(begin_at, commit_at)
+        for stmt in self._update_statements():
+            at = self.sql.index(stmt)
+            self.assertTrue(begin_at < at < commit_at,
+                            f"update 가 트랜잭션 밖에 있다: {stmt[:48]!r}")
+        # dry-run(B)/검증(E) 은 트랜잭션 밖 — 읽기라 묶을 이유가 없다.
+        self.assertLess(self.sql.index("DRY-RUN"), begin_at)
+        self.assertLess(commit_at, self.sql.index("-- (E)-1"))
+
     def test_dry_run_block_present_before_updates(self):
         """(B) dry-run 이 (C) update 보다 먼저 있어야 한다(사람이 눈으로 확인 후 적용)."""
         self.assertLess(self.sql.index("DRY-RUN"), self.sql.index("update public.findings"))

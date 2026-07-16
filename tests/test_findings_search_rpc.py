@@ -28,7 +28,11 @@ Mirrors the style of test_findings_similar_lexical.py (018/021/022 supersede
   ⑩nested-loop 회피 형태(any (array(select …)) -- any (select array_agg(…)) 는
     타입 에러(dry-run 실측)이자 O(n×m) planner 회피 실패.
   ⑪searched CTE select * 금지 -- 초안이 select *(width=753)로 temp 스필(9,773) 실측.
-  ⑫파일 번호 연속성(001~026, 결번 없음).
+  ⑫파일 번호 연속성(001~028, 결번 없음).
+  ⑬028: 클라이언트가 FIELDS 로 선언한 필드는 두 RPC 의 findings[] 투영에 전부 실린다
+    -- 026/027 이 firm_key/translation_method/confidence 를 빠뜨려 업체 프로파일 링크·
+    AI 번역 고지·신뢰도가 **조용히** 소실됐다(방어적 분기라 크래시 없음). 클라이언트가
+    잡을 수 없는 결함이므로 가드는 서버측 투영에 둔다.
 """
 
 from __future__ import annotations
@@ -41,6 +45,19 @@ from pathlib import Path
 _MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _SEARCH_PATH = _MIGRATIONS_DIR / "026_findings_search.sql"
 _DASH_PATH = _MIGRATIONS_DIR / "027_findings_search_dash_axes.sql"
+_PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
+_CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
+
+# ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
+#   findings.js:1200 head.firm_key / :899 row.translation_method / :931 row.confidence.
+_RESTORED_BY_028 = ("firm_key", "translation_method", "confidence")
+
+# ⑬-b 클라이언트 FIELDS 중 RPC 투영에서 **의도적으로** 빠지는 필드.
+#   finding_language 는 공개 게이트 술어(010: finding_text_ko <> '' or finding_language='KO')
+#   에만 쓰이고 findings.js 가 렌더에서 읽지 않는다(row.finding_language 참조 0건). 게이트는
+#   invoker+RLS 가 서버에서 강제하므로 클라이언트로 내보낼 이유가 없다.
+#   ★이 집합에 필드를 추가하려면 "클라이언트가 읽지 않음"을 grep 으로 확인하고 근거를 적어라.
+_FIELDS_NOT_PROJECTED = {"finding_language"}
 
 _FN_SEARCH_SIG = "create or replace function public.findings_search(\n"
 _FN_DOCUMENT_SIG = "create or replace function public.findings_document(p_finding_id text)\n"
@@ -332,8 +349,9 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 
 
 class MigrationNumberSequenceTest(unittest.TestCase):
-    """⑫026 에 이어 027 이 findings_search 를 supersede 하며 마지막 번호가 갱신됐다 --
-    마이그레이션 번호가 001~027 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+    """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede)로 체인이 이어지며
+    마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~028 까지 결번 없이 연속인지(파일명
+    접두 3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
@@ -341,13 +359,16 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_027_file_exists(self) -> None:
         self.assertTrue(_DASH_PATH.is_file(), f"missing {_DASH_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_027(self) -> None:
+    def test_028_file_exists(self) -> None:
+        self.assertTrue(_PROJ_PATH.is_file(), f"missing {_PROJ_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_028(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 28)))
+        self.assertEqual(numbers, list(range(1, 29)))
 
 
 # ============================================================================
@@ -536,6 +557,212 @@ class DashGrantScopeTest(unittest.TestCase):
 
     def test_does_not_grant_findings_document(self) -> None:
         self.assertNotIn("grant execute on function public.findings_document", self.sql)
+
+
+# ============================================================================
+# 028_findings_rpc_projection.sql -- 026/027 의 **반환 계약 결함** 수리.
+#
+# 결함: 클라이언트 카드 조립부가 읽는 firm_key/translation_method/confidence 가 두 RPC 의
+# 투영(jsonb_build_object)에 없었다. 셋 다 방어적 분기(013·005 미적용 라이브 DB 하위호환
+# 폴백)로 읽히므로 크래시 없이 **조용히** 링크·AI 고지·신뢰도만 빠졌다.
+#
+# ★아래 ProjectionCoversClientFieldsTest 가 이 결함군의 정본 가드다. 3필드를 하드코딩하는
+#   대신 findings.js 의 FIELDS 선언(클라이언트가 "무엇이 필요한가"를 스스로 밝힌 목록)을
+#   파싱해 교차검증한다 -- 이번 3필드뿐 아니라 **다음에 추가될 필드의 투영 누락**까지 잡는다.
+#   이 결함이 조용했던 이유가 "클라이언트가 못 잡는다"였으므로 가드는 서버측에 있어야 한다.
+# ============================================================================
+
+
+def _parse_client_fields() -> list[str]:
+    """findings.js 의 `var FIELDS = [ ... ];` 선언에서 필드명 목록을 뽑는다."""
+    js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
+    block = _slice_between(js, "var FIELDS = [", "];")
+    return re.findall(r'"([a-z_]+)"', block)
+
+
+class ClientFieldsParseTest(unittest.TestCase):
+    """가드의 입력(FIELDS 파싱)이 살아 있는지부터 고정한다 -- 파싱이 조용히 빈 목록을
+    반환하면 아래 교차검증이 **전부 공허하게 통과**한다(가드가 죽은 줄도 모른다)."""
+
+    def test_client_js_exists(self) -> None:
+        self.assertTrue(_CLIENT_JS_PATH.is_file(), f"missing {_CLIENT_JS_PATH}")
+
+    def test_fields_parse_is_non_empty_and_plausible(self) -> None:
+        fields = _parse_client_fields()
+        self.assertGreaterEqual(len(fields), 15, msg=f"FIELDS 파싱 결과가 빈약하다: {fields}")
+        self.assertIn("finding_id", fields)
+
+    def test_restored_three_are_declared_by_client(self) -> None:
+        # 028 이 복원한 3종이 실제로 클라이언트 선언 목록에 있어야 근거가 성립한다.
+        fields = _parse_client_fields()
+        for col in _RESTORED_BY_028:
+            self.assertIn(col, fields)
+
+
+class ProjectionMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_PROJ_PATH.is_file(), f"missing {_PROJ_PATH}")
+        self.sql = _PROJ_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _PROJ_PATH.read_bytes())
+
+    def test_redeclares_both_functions(self) -> None:
+        """028 은 027 과 달리 findings_document 도 재선언한다 -- 같은 결함이 두 함수에
+        동일하게 있고, 한쪽만 고치면 "목록에선 보이는데 딥링크로 열면 사라지는" 불일치가
+        된다(028 헤더 (B) 절 근거)."""
+        self.assertIn("create or replace function public.findings_search(", self.code)
+        self.assertIn("create or replace function public.findings_document(", self.code)
+
+
+class ProjectionCoversClientFieldsTest(unittest.TestCase):
+    """★정본 가드: 클라이언트가 FIELDS 로 선언한 필드는 두 RPC 의 findings[] 투영에 전부
+    실려야 한다(_FIELDS_NOT_PROJECTED 예외 제외). 이 결함(3필드 조용한 소실)이 애초에
+    통과한 이유가 "서버 투영과 클라이언트 소비를 아무도 대조하지 않았다" 이므로, 그 대조를
+    테스트로 만든다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_PROJ_PATH.read_text(encoding="utf-8"))
+        # findings_search 쪽 findings[] 투영 = page_docs_full 의 jsonb_agg 블록.
+        self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
+        # findings_document 쪽 findings[] 투영 = 함수 정의 전체(rows_out jsonb_agg 포함).
+        self.document_fn = _slice_function(code, _FN_DOCUMENT_SIG)
+        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+
+    def test_findings_search_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.search_rows,
+                msg=f"findings_search 의 findings[] 투영에 '{col}' 이 없다 -- 클라이언트가 "
+                    f"FIELDS 로 선언한 필드다. 조용히 소실된다(방어적 분기라 크래시 없음).",
+            )
+
+    def test_findings_document_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.document_fn,
+                msg=f"findings_document 의 findings[] 투영에 '{col}' 이 없다 -- 목록/딥링크 "
+                    f"불일치가 된다.",
+            )
+
+    def test_exempt_fields_are_actually_unread_by_client(self) -> None:
+        """예외 목록이 알리바이로 쓰이지 않게 한다 -- 클라이언트가 실제로 읽는 필드를
+        _FIELDS_NOT_PROJECTED 에 넣어 가드를 무력화하는 것을 막는다."""
+        js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
+        for col in _FIELDS_NOT_PROJECTED:
+            for reader in (f"row.{col}", f"head.{col}"):
+                self.assertNotIn(
+                    reader,
+                    js,
+                    msg=f"{reader} 를 클라이언트가 읽는데 _FIELDS_NOT_PROJECTED 에 있다 -- "
+                        f"예외가 아니라 투영해야 할 필드다.",
+                )
+
+
+class ProjectionRestoredFieldsTest(unittest.TestCase):
+    """⑬028 이 복원한 3종을 명시적으로도 고정한다 -- 위 교차검증은 FIELDS 선언에 의존하므로,
+    누군가 FIELDS 에서 3종을 지우면(예: "안 쓰는 것 같아서") 가드가 조용히 헐거워진다.
+    이 클래스는 그 경우에도 실패해서 결함 재발을 막는다(가드의 이중화)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_PROJ_PATH.read_text(encoding="utf-8"))
+        self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
+        self.document_fn = _slice_function(code, _FN_DOCUMENT_SIG)
+
+    def test_restored_fields_present_in_both_functions(self) -> None:
+        for col in _RESTORED_BY_028:
+            self.assertIn(f"'{col}',", self.search_rows, msg=f"findings_search: {col}")
+            self.assertIn(f"'{col}',", self.document_fn, msg=f"findings_document: {col}")
+
+    def test_page_rows_selects_restored_fields(self) -> None:
+        """투영에 앞서 page_rows 가 세 컬럼을 실제로 읽어야 한다(jsonb 키만 있고 소스가
+        없으면 SQL 자체가 깨진다)."""
+        code = _strip_sql_comments(_PROJ_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "page_rows as (", "page_docs_full as (")
+        for col in _RESTORED_BY_028:
+            self.assertIn(f"f.{col}", block)
+
+    def test_document_level_firm_key_present(self) -> None:
+        """문서 대표값 묶음에도 firm_key 를 싣는다 -- buildDocHead 는 rows[0] 을 읽으므로
+        렌더에는 findings[] 만 있어도 되지만, 대표값 묶음에 firm_name 만 있고 firm_key 가
+        빠지면 계약이 불명확하다(028 헤더 근거)."""
+        code = _strip_sql_comments(_PROJ_PATH.read_text(encoding="utf-8"))
+        docs_block = _slice_between(code, "'documents', coalesce(", "'totals', jsonb_build_object(")
+        self.assertIn("'firm_key',", docs_block)
+        self.assertIn("min(pr.firm_key)", code)
+        self.assertIn("min(firm_key) from rows_out", code)
+
+
+class ProjectionNarrowWorkingSetCarryoverTest(unittest.TestCase):
+    """★026 의 좁은 작업집합 계약이 028 에서도 승계된다 -- 세 필드는 searched 가 아니라
+    page_rows(페이지 24문서분)에만 추가해야 한다. searched 에 본문 텍스트를 실었을 때
+    무검색 랜딩이 659ms(temp 스필)였고 좁힌 뒤 127.7ms 였다(026 실측).
+    translation_method/confidence 는 짧은 컬럼이라 스필 위험은 없지만, searched 에 넣을
+    이유가 없다 -- 계약은 "필요한 범위에서만 읽는다" 이지 "짧으면 아무 데나" 가 아니다.
+    ※firm_key 는 예외다: 027 이 top_firms 집계 목적으로 이미 searched 에 넣었고 028 은 그
+      결정을 승계한다(같은 컬럼, 독립된 두 소비처)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_PROJ_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "searched as (", "filtered as (")
+        self.select_list = _slice_between(block, "select", "from public.findings f")
+
+    def test_searched_omits_wide_text_columns(self) -> None:
+        for col in ("finding_text", "finding_text_ko"):
+            self.assertNotIn(
+                f"f.{col}",
+                self.select_list,
+                msg=f"028 searched CTE select 목록에 f.{col} 이 있다 -- 026 의 스필 방지 계약 위반.",
+            )
+
+    def test_searched_does_not_gain_card_only_columns(self) -> None:
+        for col in ("translation_method", "confidence"):
+            self.assertNotIn(
+                f"f.{col}",
+                self.select_list,
+                msg=f"f.{col} 은 카드 렌더 전용이라 page_rows 에만 있어야 한다 -- searched 는 "
+                    f"필터·파셋·문서묶음용 좁은 작업집합이다(028 헤더 근거).",
+            )
+
+    def test_searched_keeps_firm_key_for_top_firms(self) -> None:
+        self.assertIn("f.firm_key", self.select_list)
+
+
+class ProjectionInvokerAndGrantCarryoverTest(unittest.TestCase):
+    """①②⑨ 026/027 의 보안·권한 계약이 028 에서도 승계된다 -- 재선언이 계약을 조용히
+    되돌리는(definer 회귀·게이트 복제 부활·grant 누락) 것을 막는다. 028 은 findings_document
+    도 만드므로 027 과 달리 **양쪽** grant 가 있어야 한다(없으면 딥링크가 백지)."""
+
+    def setUp(self) -> None:
+        self.sql = _PROJ_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_both_functions_are_security_invoker(self) -> None:
+        for sig in (_FN_SEARCH_SIG, _FN_DOCUMENT_SIG):
+            self.assertIn("security invoker", _slice_function(self.code, sig))
+
+    def test_both_functions_pin_search_path(self) -> None:
+        for sig in (_FN_SEARCH_SIG, _FN_DOCUMENT_SIG):
+            self.assertIn("set search_path = public", _slice_function(self.code, sig))
+
+    def test_gate_predicates_absent_from_function_bodies(self) -> None:
+        # ②RLS(010)가 유일한 게이트여야 한다 -- 투영 수리를 하면서 게이트를 복제하지 않았는지.
+        for sig in (_FN_SEARCH_SIG, _FN_DOCUMENT_SIG):
+            body = _slice_function(self.code, sig)
+            self.assertNotIn("scope_status", body)
+            self.assertNotIn("finding_language = 'KO'", body)
+
+    def test_grants_both_functions_to_anon_and_authenticated(self) -> None:
+        for sig in (
+            "grant execute on function public.findings_search"
+            "(text, text, text, text, text, text, text, text, int, int) to anon, authenticated;",
+            "grant execute on function public.findings_document(text) to anon, authenticated;",
+        ):
+            self.assertIn(sig, self.sql)
 
 
 if __name__ == "__main__":  # pragma: no cover

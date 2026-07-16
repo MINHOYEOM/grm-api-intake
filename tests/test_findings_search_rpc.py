@@ -332,8 +332,8 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 
 
 class MigrationNumberSequenceTest(unittest.TestCase):
-    """⑫026 에 이어 027 이 findings_search 를 supersede 하며 마지막 번호가 갱신됐다 --
-    마이그레이션 번호가 001~027 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+    """⑫027 에 이어 028(HTML 엔티티 오염 정정)이 추가되며 마지막 번호가 갱신됐다 --
+    마이그레이션 번호가 001~028 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
@@ -341,13 +341,13 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_027_file_exists(self) -> None:
         self.assertTrue(_DASH_PATH.is_file(), f"missing {_DASH_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_027(self) -> None:
+    def test_migration_numbers_are_contiguous_from_001_to_028(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 28)))
+        self.assertEqual(numbers, list(range(1, 29)))
 
 
 # ============================================================================

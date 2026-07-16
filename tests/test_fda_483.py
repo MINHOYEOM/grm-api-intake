@@ -764,6 +764,81 @@ class ItemShapeTest(unittest.TestCase):
         self.assertEqual(it.region_jurisdiction, "USA (FDA)")
 
 
+class HtmlEntityContractTest(unittest.TestCase):
+    """엔티티가 수집기를 통과하지 못하게 고정(2026-07-16 라이브 사고 회귀).
+
+    사고: `_strip` 이 태그만 제거하고 복원을 안 해 `H &amp; P Industries, Inc.` 가 그대로
+    Supabase findings.firm_name/site_name 439행에 적재됐다(전량 source='FDA 483').
+    화면(findings.js)은 textContent 렌더라 엔티티가 literal 로 노출됐다.
+    원인은 FDA 원본이 escape 해서 내려주는 것 — 라이브 3079행 중 217셀에 실재
+    (`&amp;` 129 / `&#039;` 95 / `&quot;` 2). JSON 경로만 새고 HTML 경로는 HTMLParser 가
+    이미 복원하므로 무사했다 → 아래 테스트는 **JSON 경로**(현행 라이브)를 직접 친다.
+    """
+
+    # 엔티티 형태 일반 탐지 — 특정 엔티티 화이트리스트가 아니라 '엔티티 자체'를 금지한다.
+    ENTITY_RE = re.compile(r"&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]{1,31});")
+
+    def test_strip_unescapes_entities(self):
+        # 라이브 실측 표기 그대로.
+        self.assertEqual(f._strip("H &amp; P Industries, Inc."), "H & P Industries, Inc.")
+        self.assertEqual(f._strip("Dr. Reddy&#039;s Laboratories Ltd."),
+                         "Dr. Reddy's Laboratories Ltd.")
+        self.assertEqual(f._strip("Aunt Mid&#039;s Produce Company"),
+                         "Aunt Mid's Produce Company")
+        self.assertEqual(f._strip("A &quot;B&quot; Pharma"), 'A "B" Pharma')
+
+    def test_strip_order_tag_then_unescape(self):
+        # 복원이 태그 제거보다 뒤여야 `&lt;b&gt;` 가 태그로 오인돼 삭제되지 않는다.
+        self.assertEqual(f._strip("<b>Acme</b> &lt;b&gt;X&lt;/b&gt;"), "Acme <b>X</b>")
+        # 복원된 &nbsp;(\xa0) 는 뒤따르는 공백 축약이 흡수한다.
+        self.assertEqual(f._strip("Acme&nbsp;&nbsp;Pharma"), "Acme Pharma")
+
+    def test_strip_single_level_unescape_only(self):
+        # 이중 복원 금지 — `&amp;amp;` 는 한 단계만 풀려 리터럴 `&amp;` 로 남아야 한다.
+        self.assertEqual(f._strip("A &amp;amp; B"), "A &amp; B")
+
+    def test_datatable_norm_rows_unescape(self):
+        # 현행 라이브 경로(DataTables `data` 셀) — 여기서 새던 구멍.
+        raw = [[
+            "04/17/2026",
+            "H &amp; P Industries, Inc.",
+            "1234567",
+            '<a href="/media/9001/download">483</a>',
+            "Wisconsin",
+            "",
+            "Drug Manufacturer",
+            "05/27/2026",
+            "",
+        ]]
+        rows = f._datatable_norm_rows(raw)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["company"], "H & P Industries, Inc.")
+
+    def test_json_norm_rows_unescape(self):
+        rows = f._json_norm_rows([_json_row(9002, company="Nature&#039;s Pharmacy &amp; Co")])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["company"], "Nature's Pharmacy & Co")
+
+    def test_no_entity_survives_to_item(self):
+        # 계약: 수집기 산출물(업체명·헤드라인·본문)에 엔티티가 단 하나도 남지 않는다.
+        raw = [[
+            "04/17/2026", "H &amp; P Industries, Inc.", "1234567",
+            '<a href="/media/9003/download">483</a>', "Wisconsin", "",
+            "Drug Manufacturer", "05/27/2026", "",
+        ]]
+        nrows = f._datatable_norm_rows(raw)
+        with _Patched(html_rows=[], pdf_text="OBSERVATION 1 aseptic."):
+            with patch.object(f, "_fetch_html_rows", lambda start_date=None: (nrows, 1, False)):
+                items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        it = items[0]
+        self.assertEqual(it.firm, "H & P Industries, Inc.")
+        for field in (it.firm, it.headline, it.body):
+            self.assertIsNone(self.ENTITY_RE.search(field),
+                              f"엔티티가 산출물에 남았다: {field!r}")
+
+
 class OrchestrationWiringTest(unittest.TestCase):
     def test_source_token_registered(self):
         self.assertIn("fda483", ci._SOURCE_CHOICES)

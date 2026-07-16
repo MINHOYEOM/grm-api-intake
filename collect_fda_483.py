@@ -37,6 +37,7 @@ import json
 import re
 import time
 from datetime import date
+from html import unescape as _html_unescape
 from typing import Any
 from urllib.parse import urlencode, urljoin
 
@@ -163,8 +164,20 @@ _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
 def _strip(value: Any) -> str:
-    """HTML 태그 제거 + 공백 정규화(셀/필드 값 정리, 순수 함수)."""
-    return re.sub(r"\s+", " ", _TAG_RE.sub(" ", str(value or ""))).strip()
+    """HTML 태그 제거 + 엔티티 복원 + 공백 정규화(셀/필드 값 정리, 순수 함수).
+
+    엔티티 복원이 필수인 이유(2026-07-16 실측): 이 함수의 입력은 전부 JSON 문자열이다
+    (`_json_norm_rows` 는 `.json` 필드, `_datatable_norm_rows` 는 DataTables `data` 셀).
+    FDA 원본이 이미 escape 해서 내려준다 — 라이브 3079행 중 217셀에 `&amp;`(129)·
+    `&#039;`(95)·`&quot;`(2) 가 실재한다. HTML 표 경로(`_html_norm_rows`)는 HTMLParser
+    (convert_charrefs=True)가 이미 복원하므로 무관 — JSON 경로만 새던 구멍이다.
+
+    순서 고정(태그 제거 → 복원 → 공백 축약):
+      - 복원을 뒤에 두어야 `&lt;b&gt;` 가 태그로 오인돼 삭제되지 않고 리터럴로 남는다.
+      - 공백 축약을 맨 뒤에 두어야 `&nbsp;`(\\xa0) 가 복원된 뒤 정규 공백으로 흡수된다.
+    """
+    text = _TAG_RE.sub(" ", str(value or ""))
+    return re.sub(r"\s+", " ", _html_unescape(text)).strip()
 
 
 def _observations_enabled() -> bool:

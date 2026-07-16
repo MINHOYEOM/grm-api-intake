@@ -10,18 +10,27 @@
 --   이 파일은 **이미 적재된 행의 정정**만 담당한다(상류 수리 없이 이 파일만 돌리면 다음
 --   수집에서 다시 오염된다 — 반드시 함께 배포).
 --
--- ★영향 실측(2026-07-16 라이브, anon 조회 — 공개 findings 8168행 기준):
---     findings.firm_name  439행 / 45개 고유 표기 / 전량 source='FDA 483'
---     findings.site_name  439행 (동일 행 — site_name 은 raw.company 에서 파생돼 firm_name 과 동행)
---     엔티티 종류: `&amp;` 311 · `&#039;` 137 (그 외 0)
---     대표: 'H &amp; P Industries, Inc.'(128행 — 상위 2위 업체라 대시보드 노출) ·
+-- ★영향 실측(2026-07-16 라이브 dry-run, service_role 전수 — FDA 483 은 문서 1,895건·
+--   findings 9,202건):
+--     findings.firm_name    495행 / 53개 고유 표기  ← 공개 439 + 비공개 56(scope_status<>'ok')
+--     findings.site_name    495행 (동일 행 — site_name 은 raw.company 파생이라 firm_name 과 동행)
+--     raw_signals(firm_name/site_name/title)  각 95행 / 69개 고유 표기
+--       (findings 보다 표기가 많다 — 483 문서 중 findings 를 만들지 못한 건이 있어서다.
+--        raw_signals 가 상위집합이므로 (D) 를 빼면 재백필 시 오염이 되살아난다.)
+--     엔티티 종류: findings.firm_name `&amp;` 339 · `&#039;` 165(한 행에 둘 다 있는 경우 존재)
+--                  raw_signals.title  `&amp;` 45 · `&#039;` 52 · **`&quot;` 2**
+--       → `&quot;` 가 실재하므로 (A) 는 특정 엔티티 2종만 푸는 게 아니라 **일반 복원**이어야 한다.
+--     대표: 'H &amp; P Industries, Inc.'(133행 = 공개 128 — 상위 2위 업체라 대시보드 노출) ·
 --           'California Pharmacy &amp; Compounding Center'(30) ·
+--           'Pacific Healthcare, Inc. dba B &amp; B Pharmacy'(22) ·
 --           'Dr. Reddy&#039;s Laboratories Ltd.'(16)
 --   다른 텍스트 컬럼(site_country/product_family/finding_text/finding_text_ko/
 --   category_label_ko/document_id/evidence_url/entity_id/modality)은 전부 0행 — 오염은
---   업체명 축에만 있다. 다른 source(MFDS/HC/WHO/ICH…)도 0행.
---   ※ raw_signals 는 anon 차단(002 계약)이라 이 실측에 포함되지 않았다 — (D) 가 같은
---     술어로 함께 정정한다(건수는 (B) dry-run 으로 적용 직전에 확인하라).
+--   업체명 축에만 있다.
+--   ★술어 커버리지 확인 완료: 오염 행 중 `source <> 'FDA 483'` 인 것은 두 테이블 모두
+--     **0행** — 아래 update 의 source 술어는 아무것도 놓치지 않는다(다른 수집기의 같은 계열
+--     결함은 잠복 상태이고 라이브 발현이 없다).
+--   ★dry-run 실측: double_escaped 0 · key_moves 0 · 병합충돌 0 · 정정 후 잔여 엔티티 0.
 --
 -- ★안전성 — 적용 전 확인 끝난 3가지:
 --   1) `findings_rawsig_text_md5_uq` unique 제약은 `(raw_signal_id, md5(finding_text))` 다.
@@ -30,21 +39,22 @@
 --   2) `findings.firm_key` 는 `grm_normalize_firm_name(firm_name)` generated stored 라
 --      자동 재계산되지만 **값은 안 바뀐다** — 013 의 정규화 규칙 1번이 이미 `&amp;`→`&`,
 --      `&#039;`→`'` 를 복원하고 있어서다(그래서 firm_key='h & p industries' 는 처음부터
---      정상이었고, 이 오염이 firm_key 축에서는 안 보였다). 45개 고유 표기 전수를 파이썬
---      정본 `normalize_firm_name` 으로 재현 검증: firm_key 변동 0건. → firm_key 로 묶인
---      워치리스트/유사도/임베딩/RPC 는 전부 무영향. (E)-2 가 라이브에서 재확인한다.
---   3) 정정 후 이름이 기존 행과 충돌(병합)하지 않는다 — 45개 표기의 unescape 결과를
---      전수 조회한 결과 이미 그 이름으로 존재하는 행 0건. 즉 순수 표기 정정이고
+--      정상이었고, 이 오염이 firm_key 축에서는 안 보였다). **라이브 dry-run 전수 검증:
+--      495행 중 key_moves 0행**(53개 고유 표기 전부 firm_key 불변). → firm_key 로 묶인
+--      워치리스트/유사도/임베딩/RPC 는 전부 무영향. (E)-2 가 적용 후 재확인한다.
+--   3) 정정 후 이름이 기존 행과 충돌(병합)하지 않는다 — 53개 표기의 unescape 결과로
+--      이미 존재하는 행이 있는지 라이브 조회: **0행**. 즉 순수 표기 정정이고
 --      업체 통합/분할이 아니다(대시보드 top_firms 순위 불변, 건수 이동 없음).
 --
 -- ★023 사고(대량 update 커넥터 타임아웃) 대응 — 범위를 두 겹으로 좁힌다:
 --   `source = 'FDA 483'`(오염이 실재하는 유일 소스) **AND** 엔티티 정규식 매치 행만.
---   439행(+raw_signals 동급) 규모라 단발 실행으로 충분하다. 전량 스캔·무조건 update 금지.
+--   findings 495행 + raw_signals 95행 규모라 단발 실행으로 충분하다(dry-run 실측).
+--   전량 스캔·무조건 update 금지.
 --
 -- ★멱등성: 술어가 "엔티티를 포함한 행" 이므로 정정 후 재실행은 0행 no-op 다. 단
---   이중 이스케이프(`&amp;amp;`)가 있다면 재실행이 한 겹 더 풀 수 있다 — 실측 결과 45개
---   표기 전부 단일 이스케이프이고 이중은 0건이다((B) dry-run 의 double_escaped 열로 매번
---   재확인하라. 0 이 아니면 멈추고 사람이 판단한다).
+--   이중 이스케이프(`&amp;amp;`)가 있다면 재실행이 한 겹 더 풀 수 있다 — 라이브 dry-run
+--   결과 **double_escaped 0행**(495행 전수 단일 이스케이프)이다((B) 의 double_escaped 열로
+--   매번 재확인하라. 0 이 아니면 멈추고 사람이 판단한다).
 --
 -- 전제: 002(테이블)·013(firm_key) 적용 완료. 이 파일은 기존 함수/정책/제약을 안 건드린다.
 --   028(findings_rpc_projection)과는 완전 독립이다 — 그 쪽은 RPC 투영(읽기 경로),
@@ -89,8 +99,12 @@ $$;
 
 -- ============================================================================
 -- (B) DRY-RUN — (C)(D) 실행 **전에** 이것부터 돌려 영향 범위를 눈으로 확인한다.
---     기대치(2026-07-16 실측): findings 439행 / 45 표기 / double_escaped 0.
---     double_escaped 가 0 이 아니면 멈춘다(위 멱등성 주석 참조).
+--     기대치(2026-07-16 라이브 dry-run 실측):
+--       findings.firm_name  495행 / 53 표기 / double_escaped 0   (공개 439 + 비공개 56)
+--       findings.site_name  495행 / 53 표기
+--       raw_signals 3컬럼   각 95행 / 69 표기
+--       (B)-2 key_moves 전부 false · (B)-3 병합충돌 0행.
+--     double_escaped 가 0 이 아니거나 key_moves 가 하나라도 true 면 멈춘다(사람 판단).
 -- ============================================================================
 
 -- (B)-1 영향 행 수 — 테이블·컬럼별
@@ -129,7 +143,7 @@ select 'raw_signals.title', count(*), count(distinct title), 0
    and title ~ '&(#[0-9]+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]{1,31});';
 
 -- (B)-2 before → after 표기 대조 + firm_key 이동 여부(핵심 안전성 확인).
---        기대치: 45행 전부 firm_key_after = firm_key_now (key_moves 없음).
+--        기대치: 53개 표기 전부 firm_key_after = firm_key_now (key_moves 전부 false).
 select firm_name                                              as before_name,
        public.grm_html_unescape(firm_name)                     as after_name,
        firm_key                                                as firm_key_now,

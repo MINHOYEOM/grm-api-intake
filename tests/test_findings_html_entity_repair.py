@@ -87,6 +87,9 @@ class MigrationTextContractTest(unittest.TestCase):
         self.assertTrue(_MIGRATION_PATH.exists())
         self.assertGreaterEqual(self.sql.count("--"), 20)
         # 실측 수치가 근거로 박혀 있어야 한다(추정 금지 규율).
+        # 495 = 라이브 dry-run 전수(service_role). 439 = 그 중 공개분(anon 가시 범위) —
+        # 두 수를 함께 적어야 "왜 두 관측이 다른가"가 문서에 남는다.
+        self.assertIn("495", self.sql)
         self.assertIn("439", self.sql)
         self.assertIn("H &amp; P Industries, Inc.", self.sql)
 

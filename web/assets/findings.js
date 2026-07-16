@@ -2,12 +2,21 @@
  * 카드 UX 오버홀 M10b, 탐색 툴바 오버홀 M10c, 문서 중심 열람 재편) — 정적·클라이언트사이드,
  * 순수 fetch(PostgREST 직접 호출).
  *
- * [문서 중심 열람] 열람 단위는 observation 조각이 아니라 문서·업체다(Redica 등 상용
- * 규제 인텔리전스 검증 패턴) — 같은 문서(raw_signal_id 동일)의 지적사항을 groupByDocument()
- * 로 묶어 buildDocCard() 문서 카드 1장으로 렌더한다. observation 단위 카드(buildCard())
- * 자체는 무변경으로 문서 카드 내부에 재사용된다.
+ * [서버 canonical search] 검색·필터·정렬·문서묶음·페이지네이션·파셋·대시보드 집계의 정본은
+ * findings_search RPC(026/027)다 — 이 파일은 **결과를 소비만** 한다. 클라이언트가 코퍼스
+ * 일부를 로드해 그 위에서 집계하면 화면 숫자가 DB 진실과 갈린다(실측: 화면 FDA 483 (910)
+ * vs DB 8,078). 따라서 전역 행 배열을 두지 않는다 — 화면은 LAST.documents(서버가 이미
+ * 잘라 보낸 현재 페이지)만 그린다. 검색어/필터/정렬/페이지가 바뀌면 새로 요청한다.
  *
- * supabase-js CDN 미사용 — 인증 불필요한 anon SELECT 뿐이라 REST 엔드포인트를 직접 fetch 한다.
+ * [문서 중심 열람] 열람 단위는 observation 조각이 아니라 문서·업체다(Redica 등 상용
+ * 규제 인텔리전스 검증 패턴) — 서버가 raw_signal_id 로 묶어 보낸 문서 1건을 buildDocCard()
+ * 문서 카드 1장으로 렌더한다. observation 단위 카드(buildCard()) 자체는 무변경으로 문서
+ * 카드 내부에 재사용된다. documents[].findings 는 **매치된 지적만** 담는다(문서 전체가
+ * 아니다) — matched_findings 가 그 개수다.
+ *
+ * supabase-js CDN 미사용 — 인증 불필요한 anon 호출 뿐이라 REST 엔드포인트를 직접 fetch 한다.
+ * findings_search/findings_document 는 security invoker 라 공개 게이트를 RLS(010)가 강제한다
+ * — 클라이언트가 게이트 술어를 복제하지 않는다.
  * cfg(url/key) 는 템플릿의 #grm-findings-cfg data-속성(env-param, 미설정이면 빈 문자열)에서
  * 읽는다. 둘 중 하나라도 없으면 오류가 아니라 "준비 중" 안내로 조용히 종료한다(정적 페이지
  * 골든 결정론 — env 값과 무관하게 findings.html 자체 출력은 항상 동일 byte).
@@ -74,32 +83,6 @@
     other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
   };
 
-  // 신규(M6d) 필드 포함 전체 목록. 라이브 DB 에 005(finding_text_ko/translation_method)가
-  // 아직 적용되지 않은 경우 PostgREST 가 알 수 없는 컬럼에 400 을 반환하므로, 그 경우에만
-  // LEGACY_FIELDS(신규 2컬럼 제외)로 1회 재시도한다 — 배포 순서와 무관하게 페이지가 절대
-  // 깨지지 않도록 하는 폴백이다.
-  // [문서 중심 열람] raw_signal_id = 문서 정체성 키(002_findings.sql: findings.raw_signal_id
-  // → raw_signals.raw_signal_id FK). anon RLS(003)는 행 필터만 있고 컬럼 제한이 없어
-  // select 목록에 추가해도 무해하다 — 같은 문서의 지적사항을 그룹핑하는 데만 쓴다.
-  // [업체 프로파일 진입] firm_key = 013_findings_firm_key.sql 의 generated 컬럼(문서 카드
-  // 헤더 업체명 → /findings/firm/?key= 링크용). 013 이 라이브 DB 에 아직 적용되지 않았을
-  // 수 있으므로(방어 설계) FIELDS_NO_FIRM_KEY 로 한 단계 더 재시도한다 — raw_signal_id
-  // 폴백(005 미적용)과 독립적인 별개 실패 축이라 3단계 폴백 체인이 된다: FIELDS(전체) →
-  // FIELDS_NO_FIRM_KEY(013 미적용, 005 는 적용) → LEGACY_FIELDS(013·005 둘 다 미적용).
-  var FIELDS = [
-    "finding_id", "source", "agency", "document_id", "published_date",
-    "firm_name", "firm_key", "category_code", "category_label_ko", "finding_text",
-    "finding_text_ko", "translation_method",
-    "finding_language", "evidence_level", "evidence_url", "cfr_refs",
-    "mfds_refs", "review_status", "confidence", "raw_signal_id",
-  ];
-  var FIELDS_NO_FIRM_KEY = FIELDS.filter(function (f) {
-    return f !== "firm_key";
-  });
-  var LEGACY_FIELDS = FIELDS_NO_FIRM_KEY.filter(function (f) {
-    return f !== "finding_text_ko" && f !== "translation_method";
-  });
-
   // [PR-0 딥링크] /findings/?finding_id=finding-<24hex> 공유 URL. 형식은 grm_findings.py:706
   // "finding-" + stable_hash(...)[:24] (sha256 hexdigest 앞 24자, 항상 소문자 hex)와 일치해야
   // 한다 — 형식 불일치는 fetch 없이 곧장 "찾을 수 없음"으로 처리한다(§1).
@@ -111,8 +94,8 @@
   // 이후 불변 — DOM 배선만 단일 경로(SELECT_FACETS)로 단순화됐다. 옛 칩 파셋 정의는 제거.
   // [M14] 기관(agency) 은 이미 DOM 에서 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가
   // 이미 기관을 포함하는 상위 구분이라 "MFDS" 가 기관·소스 양쪽에 중복 노출되던 혼란을
-  // 없앤다. state.agency·URL param(agency)·rowMatchesFilters/searchTermsFor 의 매칭 로직은
-  // 그대로 유지한다 — URL 로 agency 파라미터가 들어오면 여전히 필터가 적용된다(하위호환).
+  // 없앤다. state.agency·URL param(agency)·서버 필터 인자(p_agency)는 그대로 유지한다 —
+  // URL 로 agency 파라미터가 들어오면 여전히 필터가 적용된다(하위호환).
   var SELECT_FACETS = [
     ["fnd-f-source", "source"],
     ["fnd-f-evidence", "evidence_level"],
@@ -143,58 +126,29 @@
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
     review_status: "", month: "", sort: "date_desc",
   };
-  var ROWS = null; // fetch 성공 시 findings 배열
   var debounceTimer = null;
 
-  // [문서 단위 페이지네이션] "더 보기" 무한로드 → 문서 24개=1페이지 이전/다음 페이지네이션
-  // 으로 전환(§목표: 페이지 경계에서 문서가 절대 쪼개지지 않는다). PAGE_LIMIT=서버 청크
-  // fetch 단위(obs 행 기준, 기존 limit=1000 그대로 유지 — 서버 왕복 최소화). DOCS_PER_PAGE=
-  // 화면에 보여줄 문서 카드 수. SERVER_TOTAL=Content-Range 헤더(Prefer: count=exact 응답)
-  // 에서 파싱한 서버측 obs exact count — 파싱 실패/헤더 미노출 환경이면 null(폴백).
-  // LOADED_FIELDS=최초 3단계 폴백 체인 중 실제로 성공한 필드 리스트(로드 완료 후 고정 —
-  // 페이지 이동으로 인한 추가 fetch 는 매번 재협상하지 않고 이 필드셋을 재사용한다).
-  // LAST_BATCH_SIZE=가장 최근 fetch 가 반환한 행 수(SERVER_TOTAL 미확보 환경에서 "이번
-  // 청크가 PAGE_LIMIT 로 꽉 찼으니 더 있을 수 있다"는 방어적 휴리스틱에 쓴다). fetchGaveUp=
-  // 청크 fetch 실패 시 영구 플래그(무한 재시도 방지 — 이후 로드된 데이터만으로 계속
-  // 동작). isFetchingPage/pendingPageCallbacks=중복 fetch 방어(여러 페이지 이동이 겹쳐도
-  // 실제 네트워크 요청은 1개만 진행, 나머지는 그 결과에 편승). currentPage=1-based 현재
-  // 페이지. navToken=페이지 이동 연타 방어용 세대 카운터(오래된 이동의 완료 콜백 무시).
-  var PAGE_LIMIT = 1000;
+  // [서버 canonical search] LAST=가장 최근 findings_search 응답 전체(documents/totals/
+  // facets/dash/page/pages/sort). 화면의 모든 숫자·옵션·카드가 여기서만 나온다 — 별도
+  // 파생 캐시를 두면 그 순간 두 진실이 생기고, 그게 "화면 910 vs DB 8,078"의 구조적
+  // 원인이었다. null=첫 응답 도착 전(가드 필요).
+  // DOCS_PER_PAGE=문서 카드 수(서버 p_docs_per_page 로 그대로 넘긴다 — 서버가 1~100 으로
+  // 클램프한다). currentPage=1-based 현재 페이지. navToken=연타 방어용 세대 카운터 —
+  // ★LAST 대입은 이 토큰 검사를 통과한 응답만 한다(먼저 나간 요청이 늦게 도착해 최신
+  // 결과를 덮어쓰는 것을 막는 유일한 장치).
+  var LAST = null;
   var DOCS_PER_PAGE = 24;
-  var SERVER_TOTAL = null;
-  var LOADED_FIELDS = null;
-  var LAST_BATCH_SIZE = null;
-  var fetchGaveUp = false;
-  var isFetchingPage = false;
-  var pendingPageCallbacks = [];
   var currentPage = 1;
   var navToken = 0;
-  // [정확 총수 M1a] findings_stats RPC(fetchCoverageNote() 가 독립적으로 fetch)의
-  // totals.documents/totals.findings — 무필터 기준 exact 값(로드 진행과 무관). 무필터 +
-  // 서버 미소진 구간에서 render() 가 이 값으로 문서수·지적수·총 페이지를 정확히 표시하고,
-  // 끝(») 점프의 목표 페이지로도 그대로 쓴다(더 이상 "로드된 만큼"이 아니라 진짜 마지막
-  // 페이지 1클릭). RPC 실패/010 미적용 라이브에서는 null 유지 — 기존 로드 기준 폴백.
-  var SERVER_DOC_TOTAL = null;
-  var SERVER_FINDINGS_TOTAL = null;
-  // [대시보드 실총수 M3] findings_stats RPC 의 by_agency_category 를 agency 기준으로 합산한
-  // {agency: count} — 무필터 대시보드 스탯의 소스별(FDA/MFDS) 분해를 정확화한다. null 이면
-  // (RPC 실패 등) 대시보드는 기존처럼 로드된 데이터 기준(computeAgencyDist)으로 폴백한다.
-  var SERVER_AGENCY_TOTALS = null;
-  // [025 파셋 전역 truth 2026-07-16] 무필터·무검색 랜딩에서 파셋 옵션 (N) 카운트·대시보드
-  // 분포를 findings_stats RPC 전역 truth 로 채운다 — ROWS 는 로드분(최초 1,000행, 최신순)
-  // 뿐이라 전역 비율을 왜곡한다(실측: 화면 FDA 483 (910) vs DB 진실 8,078). fetchCoverageNote()
-  // 가 채우고, computeFacetCounts()/renderDash() 가 소비한다. source/evidence/review_status
-  // 는 findings_stats 최상위 배열을 {value: cnt} 로 평탄화, month/category_code 는 agency
-  // 교차 배열(by_month/by_agency_category)을 agency 기준으로 합산해 얻는다(SERVER_AGENCY_
-  // TOTALS 와 동일 유도 패턴). review_status 는 025(by_review_status) 미적용 라이브 DB 에서
-  // null 로 남아 소비 측이 안전하게 기존 ROWS 폴백으로 떨어진다(죽지 않음).
-  var RPC_BY_SOURCE = null;
-  var RPC_BY_EVIDENCE = null;
-  var RPC_BY_REVIEW_STATUS = null;
-  var RPC_BY_MONTH = null;
-  var RPC_BY_CATEGORY = null;
-  var RPC_TOP_FIRMS = null; // findings_stats().top_firms verbatim([{firm_key,firm_name,cnt,public_cnt}], cnt desc — 007/017 계약)
-  var RPC_MONTH_VALUES = null; // Object.keys(RPC_BY_MONTH) 최신월 우선 정렬 — collectFacetValues("month") 가 ROWS 대신 이걸 우선한다.
+  // state 키 → findings_search facets/dash 축 이름. 서버 응답의 축 배열은 [{v,c}] 형태다.
+  var FACET_AXIS = {
+    source: "by_source",
+    category_code: "by_category",
+    month: "by_month",
+    evidence_level: "by_evidence",
+    review_status: "by_review_status",
+    agency: "by_agency",
+  };
   // [선로딩 c] 페이지네이션 버튼(처음/이전/번호/다음/끝) 클릭으로 촉발된 이동에서만 완료
   // 후 결과 목록 상단으로 스크롤한다 — goToPageFromPager() 가 세팅, goToPage() 의 완료
   // 콜백이 소비 후 즉시 리셋한다. 필터/검색/정렬 변경발 goToPage(1) 리셋은 스크롤하지
@@ -205,8 +159,8 @@
   // 지울 때까지 유지되며(found/notfound 상태와 무관하게 "이 세션에 딥링크 관심사가 아직
   // 살아있다"는 단일 플래그), 파라미터 자체가 없으면 처음부터 null 이라 이하 전 로직이
   // no-op 로 남아 일반 모드 회귀가 0이다. deepLinkStatus="found"|"notfound"|""(미확정/비활성).
-  // rowsReady=일반 목록 fetch 완료 여부 — maybeFinishInit() 이 딥링크 해석 완료와 함께
-  // 둘 다 기다렸다가 깜빡임 없이 한 번만 최종 렌더를 확정한다.
+  // rowsReady=첫 findings_search 응답 도착 여부 — maybeFinishInit() 이 딥링크 해석 완료와
+  // 함께 둘 다 기다렸다가 깜빡임 없이 한 번만 최종 렌더를 확정한다.
   var deepLinkParam = null;
   var deepLinkStatus = "";
   var deepLinkDocRows = null;
@@ -235,9 +189,9 @@
   var dashToggleBtn = document.getElementById("fnd-dash-toggle");
   var dashGridEl = document.getElementById("fnd-dash-grid");
 
-  // [공개 범위 투명성] 커버리지 노트 — 메인 fetchFindings() 와 완전히 독립된 별도 fetch
-  // (findings_stats RPC, trends.js 와 동일 엔드포인트). 성공 시에만 노트를 채우고 노출한다
-  // — 실패(RPC 미존재 등)해도 이 노트만 hidden 유지, 검색 페이지 본기능엔 영향 없다.
+  // [공개 범위 투명성] 커버리지 노트 — 메인 검색(findings_search)과 완전히 독립된 별도
+  // fetch(findings_stats RPC, trends.js 와 동일 엔드포인트). 성공 시에만 노트를 채우고
+  // 노출한다 — 실패(RPC 미존재 등)해도 이 노트만 hidden 유지, 검색 본기능엔 영향 없다.
   var coverageNoteEl = document.getElementById("fnd-coverage-note");
   var coverageTextEl = document.getElementById("fnd-coverage-text");
 
@@ -250,12 +204,6 @@
   var dashMonthEl = document.getElementById("fnd-dash-month");
   var dashFirmEl = document.getElementById("fnd-dash-firm");
   var hasDash = !!(dashEl && dashStatsEl && dashCatEl && dashMonthEl && dashFirmEl);
-  // [025 §요구2] 필터·검색이 하나라도 활성이면 renderDash() 가 true 로 세팅 — 하위 렌더
-  // 함수(renderDashStats/buildCatRow/renderDashMonths/renderDashFirms)가 파라미터 추가
-  // 없이(기존 단일 인자 시그니처 불가침 — 소스마커 테스트 다수가 정확히 고정) 클로저로
-  // 읽어 숫자만 지운다(라벨/바 구조는 유지) — ROWS(로드분) 기준 부분집합 숫자를 사실값
-  // 처럼 보여주지 않는다는 원칙.
-  var dashHideNumbers = false;
 
   // [문서 단위 페이지네이션] 상단(#fnd-pager-top)·하단(#fnd-pager-bottom) 페이지네이션
   // 바 — 완전히 동일한 goToPage()/renderPager() 로직을 공유한다. 구버전 셸(엘리먼트
@@ -295,26 +243,27 @@
     pnavNextBtn.setAttribute("aria-label", "다음 페이지 (현재 " + current + " / " + total + ")");
   }
 
-  function monthOf(row) {
-    var d = row.published_date || "";
-    return d.length >= 7 ? d.slice(0, 7) : "";
+  // LAST.facets 의 축 배열([{v,c}]) → {v: c} 평탄화. 축 자체가 없으면(구버전 RPC 등
+  // 방어) 빈 객체 — 소비 측이 건수 0 으로 자연히 떨어진다.
+  function facetCounts(key2) {
+    var counts = {};
+    if (!LAST || !LAST.facets) return counts;
+    var axis = LAST.facets[FACET_AXIS[key2]];
+    if (!Array.isArray(axis)) return counts;
+    axis.forEach(function (e) {
+      if (e && e.v) counts[e.v] = e.c || 0;
+    });
+    return counts;
   }
 
-  // 값 전체 목록(현재 필터와 무관, ROWS 전체 기준) — 칩/옵션 자체는 한 번만 만들고,
-  // 이후 render() 마다 건수·disabled·on 상태만 갱신한다(DOM 재생성 없음).
+  // 옵션 값 목록 — 서버 파셋 축이 정본이다. 파셋은 **자기 축을 뺀** 나머지 필터 기준이라
+  // (표준 파세팅) 자기 축 필터가 걸려 있어도 그 축의 선택지 전체가 그대로 보인다 = 다른
+  // 값으로 갈아타는 길이 항상 열려 있다.
+  // 정렬은 서버 순서(건수 desc 등)를 따르지 않고 값 자체로 재정렬한다 — 드롭다운 항목이
+  // 건수 변동에 따라 자리를 옮기면 같은 항목을 두 번 고르기 어렵다(월만 최신 우선).
   function collectFacetValues(key2) {
-    // [025 §요구1] 발행월 옵션은 ROWS(로드분, 최초 1,000행) 대신 findings_stats RPC
-    // by_month 전역 값을 우선한다 — 최신순 로드+시간축 특성상 오래된 월은 첫 청크 밖에
-    // 있어 옵션 자체가 아예 안 보이는 문제를 없앤다. RPC 미확보(fetchCoverageNote 실패/
-    // 025 미적용)면 기존처럼 ROWS 기준으로 조용히 폴백한다.
-    if (key2 === "month" && RPC_MONTH_VALUES) return RPC_MONTH_VALUES.slice();
-    if (!ROWS) return []; // RPC 가 메인 fetch 보다 먼저 도착한 순간 등 방어적 가드
-    var vals = {};
-    ROWS.forEach(function (r) {
-      var v = key2 === "month" ? monthOf(r) : r[key2];
-      if (v) vals[v] = true;
-    });
-    var sorted = Object.keys(vals).sort();
+    var counts = facetCounts(key2);
+    var sorted = Object.keys(counts).sort();
     if (key2 === "month") sorted.reverse(); // 최신월 우선
     return sorted;
   }
@@ -339,33 +288,13 @@
     return Object.keys(CATEGORY_LABELS).filter(function (code) { return avail[code]; });
   }
 
-  function arrayTerms(v) {
-    return Array.isArray(v) ? v : [];
-  }
-
-  // [FIND-1 M10c P0] 사용자가 화면에서 보는 배지·칩·드롭다운 라벨도 검색 대상이다.
-  // "MFDS", "FDA 483", "Evidence A", "검토 필요", "문서화", "2026-07" 처럼
-  // 가시 메타데이터로 찾는 흐름을 보장한다.
-  function searchTermsFor(row) {
-    var cat = CATEGORY_LABELS[row.category_code] || {};
-    var evidence = EVIDENCE_LABEL[row.evidence_level] || "";
-    var status = STATUS_LABEL[row.review_status] || "";
-    var reviewStatusPlain = row.review_status ? String(row.review_status).replace(/_/g, " ") : "";
-    return [
-      row.finding_text, row.finding_text_ko, row.firm_name, row.document_id,
-      row.agency, row.source, row.published_date, monthOf(row),
-      row.evidence_level, evidence, row.evidence_level ? "증거 " + row.evidence_level : "",
-      row.review_status, reviewStatusPlain, status,
-      row.category_code, row.category_label_ko, cat.ko, cat.en,
-      row.translation_method,
-    ].concat(arrayTerms(row.cfr_refs), arrayTerms(row.mfds_refs));
-  }
-
-  // [M15] 소스/증거등급/검토상태/카테고리/발행월 <select> 5개의 DOM 골격(옵션)을 데이터
-  // 로드 직후 1회만 만든다. change 배선은 wire()에서(전 필드 동일 경로 — SELECT_FACETS 단일).
-  // [페이지네이션] 페이지 이동으로 청크가 추가 fetch 돼 ROWS 가 늘어난 뒤에도 새로 드러난
-  // 값을 옵션으로 추가할 수 있도록 재호출 가능(idempotent)하게 만든다 — 이미 존재하는
-  // 옵션 값은 건너뛰어 중복 <option> 이 생기지 않는다.
+  // [M15] 소스/증거등급/검토상태/카테고리/발행월 <select> 5개의 DOM 골격(옵션)을 만든다.
+  // change 배선은 wire()에서(전 필드 동일 경로 — SELECT_FACETS 단일).
+  // ★멱등(재호출 가능)이어야 한다: 파셋 축은 자기 축을 제외한 나머지 필터 기준이라, 다른
+  // 필터를 풀면 이전 응답에 없던 값이 새로 드러날 수 있다 — render() 마다 다시 불러 옵션을
+  // 누적시킨다. 이미 존재하는 값은 건너뛰므로 중복 <option> 이 생기지 않고, 사라진 값의
+  // 옵션은 지우지 않는다(refreshFacetUI 가 건수 0 + disabled 로 표시 — 선택지가 눈앞에서
+  // 사라져 사용자가 방금 본 항목을 다시 찾지 못하는 것보다 낫다).
   function buildFacetSkeleton() {
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
@@ -386,154 +315,24 @@
     });
   }
 
-  // rowMatchesFilters(row, exclude) — exclude 로 지정한 파셋 키 하나만 제외하고 나머지
-  // 활성 필터+검색어를 적용한다. matches(row)=exclude 없이 전체 적용(기존 계약과 동일).
-  // 표준 파세팅 건수(옆 칩/옵션이 "이 값을 골랐다면 몇 건" 인지)는 이 함수로 계산한다.
-  function rowMatchesFilters(row, exclude) {
-    if (exclude !== "agency" && state.agency && row.agency !== state.agency) return false;
-    if (exclude !== "category_code" && state.category_code && row.category_code !== state.category_code) return false;
-    if (exclude !== "source" && state.source && row.source !== state.source) return false;
-    if (exclude !== "evidence_level" && state.evidence_level && row.evidence_level !== state.evidence_level) return false;
-    if (exclude !== "review_status" && state.review_status && row.review_status !== state.review_status) return false;
-    if (exclude !== "month" && state.month && monthOf(row) !== state.month) return false;
-    var q = state.q.trim().toLowerCase();
-    if (q) {
-      var hay = searchTermsFor(row)
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      if (hay.indexOf(q) === -1) return false;
-    }
-    return true;
-  }
-
-  function matches(row) {
-    return rowMatchesFilters(row, null);
-  }
-
-  // key2 값별 건수 — 무필터·무검색 랜딩(§요구1)에서는 findings_stats RPC 전역 truth 를
-  // 그대로 반환한다(ROWS 는 로드분 1,000행뿐이라 전역 비율을 왜곡 — 2026-07-16 실측
-  // 결함 수리). 필터·검색이 하나라도 활성이면(§요구2) 기존과 동일하게 "검색어 + 그
-  // 파셋을 제외한 나머지 활성 필터" 적용 결과(표준 파세팅, ROWS 기준 부분집합)를
-  // 반환한다 — 이 값은 옵션 활성/비활성 판정에만 쓰이고, refreshFacetUI() 가 화면
-  // 숫자로는 노출하지 않는다(라벨만).
-  function computeFacetCounts(key2) {
-    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
-    if (!filtersActive) {
-      var rpcCounts = rpcFacetCounts(key2);
-      if (rpcCounts) return rpcCounts;
-    }
-    var counts = {};
-    if (!ROWS) return counts;
-    ROWS.forEach(function (r) {
-      if (!rowMatchesFilters(r, key2)) return;
-      var v = key2 === "month" ? monthOf(r) : r[key2];
-      if (!v) return;
-      counts[v] = (counts[v] || 0) + 1;
-    });
-    return counts;
-  }
-
-  // [025] key2 → findings_stats RPC 유도값 매핑. review_status 는 025(by_review_status)
-  // 미적용 라이브 DB 에서 RPC_BY_REVIEW_STATUS 가 null 로 남아 있는 그대로 반환해
-  // computeFacetCounts() 가 자연히 ROWS 폴백으로 떨어진다(안전 폴백 — 죽지 않음).
-  function rpcFacetCounts(key2) {
-    if (key2 === "source") return RPC_BY_SOURCE;
-    if (key2 === "evidence_level") return RPC_BY_EVIDENCE;
-    if (key2 === "review_status") return RPC_BY_REVIEW_STATUS;
-    if (key2 === "month") return RPC_BY_MONTH;
-    if (key2 === "category_code") return RPC_BY_CATEGORY;
-    return null;
-  }
-
   // [M15] 셀렉트 옵션 라벨(건수 병기)을 매 render() 마다 갱신한다 — DOM 엘리먼트는
-  // buildFacetSkeleton()이 1회 만든 것을 재사용(재생성 없음). [025 §요구2] 필터·검색이
-  // 하나라도 활성이면 건수 자체를 표시하지 않는다(라벨만) — ROWS(로드분) 기준 부분집합
-  // 건수를 사실값처럼 보여주지 않는다("로드분 기준" 툴팁으로 얼버무리는 것도 금지).
-  // 옵션 활성/비활성 판정에는 여전히 computeFacetCounts() 값을 쓴다(표시가 아니라
-  // 상호작용 편의라 무해).
+  // buildFacetSkeleton() 이 만든 것을 재사용(재생성 없음).
+  // ★건수는 **항상** 표시한다. 종전엔 필터가 걸리면 건수를 숨겼는데, 그건 숫자가 로드분
+  // 기준 부분집합이라 **틀렸기 때문**이지 숨기는 게 옳아서가 아니었다. 서버 파셋은 검색어
+  // + 자기 축을 뺀 나머지 필터를 적용한 exact 값이라 숨길 이유가 사라졌다.
   function refreshFacetUI() {
-    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
       var sel = document.getElementById(selId);
       if (!sel) return;
-      var counts = computeFacetCounts(key2);
+      var counts = facetCounts(key2);
       Array.prototype.forEach.call(sel.options, function (opt) {
         if (!opt.value) return; // "전체" 옵션은 건수 병기 대상 아님
         var count = counts[opt.value] || 0;
-        opt.textContent = filtersActive ? opt.dataset.label : (opt.dataset.label + " (" + count + ")");
+        opt.textContent = opt.dataset.label + " (" + count + ")";
         opt.disabled = count === 0 && sel.value !== opt.value;
       });
     });
-  }
-
-  // ── [FIND-1 M7] 대시보드 집계 — 순수 함수(입력=현재 필터 결과 rows, 부작용 없음). ──────
-  function computeAgencyDist(rows) {
-    var counts = {};
-    rows.forEach(function (r) {
-      var a = r.agency || "";
-      if (!a) return;
-      counts[a] = (counts[a] || 0) + 1;
-    });
-    return Object.keys(counts)
-      .map(function (a) { return { agency: a, count: counts[a] }; })
-      .sort(function (x, y) { return y.count - x.count || x.agency.localeCompare(y.agency); });
-  }
-
-  function computeCategoryDist(rows) {
-    var counts = {};
-    rows.forEach(function (r) {
-      var code = r.category_code || "";
-      if (!code) return;
-      counts[code] = (counts[code] || 0) + 1;
-    });
-    return Object.keys(counts)
-      .map(function (code) {
-        var cat = CATEGORY_LABELS[code];
-        return { code: code, ko: cat ? cat.ko : code, count: counts[code] };
-      })
-      .sort(function (a, b) { return b.count - a.count || a.code.localeCompare(b.code); });
-  }
-
-  function computeMonthTrend(rows) {
-    var counts = {};
-    rows.forEach(function (r) {
-      var m = monthOf(r);
-      if (!m) return;
-      counts[m] = (counts[m] || 0) + 1;
-    });
-    var months = Object.keys(counts).sort(); // published_month 오름차순
-    if (months.length > 12) months = months.slice(months.length - 12); // 최근 12개월
-    return months.map(function (m) { return { month: m, count: counts[m] }; });
-  }
-
-  function computeFirmTop(rows) {
-    var counts = {};
-    rows.forEach(function (r) {
-      var f = (r.firm_name || "").trim();
-      if (!f) return;
-      counts[f] = (counts[f] || 0) + 1;
-    });
-    return Object.keys(counts)
-      .map(function (name) { return { name: name, count: counts[name] }; })
-      .sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name); })
-      .slice(0, 5);
-  }
-
-  function computeStats(rows) {
-    // [FIND-1 M9a] 미번역 건수 집계는 여기서 더 이상 계산하지 않는다 — 공개 게이트
-    // (006_findings_publish_gate.sql)가 DB 레벨에서 국문 해석이 없는(finding_text_ko=''
-    // 이고 finding_language!='KO') 행을 anon fetch 결과 자체에서 차단하므로, 클라이언트가
-    // 세는 값은 항상 0에 수렴해 오해를 일으킨다.
-    return {
-      total: rows.length,
-      agencies: computeAgencyDist(rows),
-      needsReview: rows.filter(function (r) { return r.review_status === "needs_review"; }).length,
-      categories: computeCategoryDist(rows),
-      months: computeMonthTrend(rows),
-      firms: computeFirmTop(rows),
-    };
   }
 
   // ── [FIND-1 M7] 대시보드 클릭 연동 — 기존 state/select 재사용, 별도 상태 저장소 없음.
@@ -593,9 +392,7 @@
   function renderDashStats(stats) {
     dashStatsEl.innerHTML = "";
     dashStatsEl.appendChild(buildStatBlock(String(stats.total), "전체", false));
-    // [대시보드 실총수 M3] renderDash() 가 무필터+SERVER_DOC_TOTAL 확보 시에만 채우는
-    // 값 — 필터 상태·RPC 미확보에서는 stats.documents 자체가 없어(undefined) 조용히
-    // 생략된다(레이아웃 깨짐 없음, 기존 옵셔널 스탯들과 동일한 방어적 관례).
+    // 옵셔널 스탯 관례 유지 — 값이 없으면 블록 자체를 생략한다(레이아웃 깨짐 없음).
     if (stats.documents !== undefined && stats.documents !== null) {
       dashStatsEl.appendChild(buildStatBlock(String(stats.documents), "문서", false));
     }
@@ -611,13 +408,6 @@
     });
     if (stats.needsReview > 0) {
       dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), "검토 필요", true));
-    }
-    // [025 §요구2] 필터·검색 활성 시 숫자만 지운다(라벨·블록 구조는 그대로) — dashHideNumbers
-    // 는 renderDash() 가 세팅하는 클로저 플래그(기존 단일 인자 시그니처 불가침 유지).
-    if (dashHideNumbers) {
-      Array.prototype.forEach.call(dashStatsEl.querySelectorAll(".fnd-dash-stat-num"), function (n) {
-        n.textContent = "";
-      });
     }
   }
 
@@ -648,11 +438,9 @@
     row.className = "fnd-dash-cat-row";
     if (code) {
       if (state.category_code === code) row.classList.add("on");
-      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) 건수를 aria-label 에서도 뺀다 —
-      // 화면엔 숫자를 숨기면서 스크린리더에만 부분집합 건수를 흘리면 일관성이 깨진다.
       makeClickableRow(
         row,
-        label + " 카테고리로 필터" + (dashHideNumbers ? "" : ": " + count + "건"),
+        label + " 카테고리로 필터: " + count + "건",
         function () { toggleCategoryFilter(code); }
       );
     }
@@ -665,7 +453,7 @@
     var ratio = maxCount > 0 ? count / maxCount : 0;
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
     row.appendChild(bar);
-    row.appendChild(el("span", "fnd-dash-cat-count", dashHideNumbers ? "" : String(count)));
+    row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
     return row;
   }
 
@@ -685,10 +473,7 @@
       var col = document.createElement("div");
       col.className = "fnd-dash-month-col";
       if (state.month === x.month) col.classList.add("on");
-      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) title/aria-label 에서도 건수를
-      // 뺀다 — 이 숫자는 시각적으로는 title 속성(호버)에만 있었지만, "툴팁으로 얼버무리지
-      // 말라"는 원칙은 화면 표시가 없다고 툴팁에 부분집합 숫자를 남겨도 된다는 뜻이 아니다.
-      var monthLabelText = x.month + (dashHideNumbers ? "" : " " + x.count + "건");
+      var monthLabelText = x.month + " " + x.count + "건";
       makeClickableRow(col, monthLabelText, function () {
         toggleMonthFilter(x.month);
       });
@@ -716,82 +501,72 @@
       var row = document.createElement("div");
       row.className = "fnd-dash-firm-row";
       if (state.q === f.name) row.classList.add("on");
-      // [firm_name 엔티티 디코드 M5] 클릭/필터는 raw f.name(DB 원본값) 그대로 써야 검색
-      // state.q·rowMatchesFilters 매칭이 어긋나지 않는다 — 디코드는 표시(라벨·툴팁)에만.
+      // [firm_name 엔티티 디코드 M5] 클릭/필터는 raw f.name(DB 원본값) 그대로 써야 서버
+      // 검색어(state.q → p_q) 매칭이 어긋나지 않는다 — 디코드는 표시(라벨·툴팁)에만.
       var firmDisplay = decodeFirmDisplay(f.name);
-      // [025 §요구2] 필터·검색 활성 시(dashHideNumbers) aria-label·표시 건수 둘 다 뺀다.
-      makeClickableRow(row, firmDisplay + (dashHideNumbers ? " 검색" : " 검색: " + f.count + "건"), function () {
+      makeClickableRow(row, firmDisplay + " 검색: " + f.count + "건", function () {
         toggleFirmFilter(f.name);
       });
       row.appendChild(el("span", "fnd-dash-firm-name", firmDisplay));
-      row.appendChild(el("span", "fnd-dash-firm-count", dashHideNumbers ? "" : String(f.count)));
+      row.appendChild(el("span", "fnd-dash-firm-count", String(f.count)));
       dashFirmEl.appendChild(row);
     });
   }
 
-  function renderDash(matched) {
+  // LAST.dash 의 축 배열([{v,c}]) → 서버 순서 그대로 반환(건수 desc, 값 asc — 027 계약).
+  // 재정렬하지 않는다: 서버가 이미 결정론 순서로 보낸다.
+  function dashAxis(name) {
+    if (!LAST || !LAST.dash) return [];
+    var axis = LAST.dash[name];
+    return Array.isArray(axis) ? axis : [];
+  }
+
+  // 검토 필요 건수 — LAST.dash 에는 review_status 축이 없다(027). facets.by_review_status
+  // 로 유도하되, 파셋은 **자기 축을 뺀** 모집단이라 검토상태 필터가 걸리면 현재 결과보다
+  // 넓은 집합을 센다. 그 경우엔 필터 자체가 답을 확정한다:
+  //   · review_status=needs_review 로 좁혔다 → 결과 전량이 needs_review = totals.findings
+  //   · 다른 상태로 좁혔다                   → 결과에 needs_review 는 0건
+  // 필터가 없을 때만 파셋 값을 쓴다(자기 축 제외가 no-op 이라 모집단이 결과와 정확히 일치).
+  // 세 경로 모두 exact 다 — 추정치가 섞이지 않는다.
+  function dashNeedsReview() {
+    if (state.review_status) {
+      return state.review_status === "needs_review" ? LAST.totals.findings : 0;
+    }
+    return facetCounts("review_status").needs_review || 0;
+  }
+
+  // 대시보드 = **현재 결과 집합의 분포**(필터 전량 적용, LAST.dash). 드롭다운 파셋
+  // (LAST.facets, 자기 축 제외)과 모집단이 달라 서로 바꿔 쓸 수 없다 — 027 이 두 블록을
+  // 따로 내려주는 이유다.
+  function renderDash() {
     if (!hasDash) return;
-    if (!matched.length) {
+    if (!LAST.totals.findings) {
       dashEl.hidden = true;
       return;
     }
-    var stats = computeStats(matched);
-    // [대시보드 실총수 M3] 필터가 하나도 없을 때만(=matched 가 로드된 전체라는 모집단)
-    // findings_stats RPC 의 exact 총수로 스탯을 바꿔치기한다 — "전체 1000" 처럼 로드된
-    // 행 수가 서버 총수(예: 2,272+)로 오인되는 신고에 대응. 필터가 걸린 상태에서는
-    // matched.length 자체가 "필터링된 결과 전체"라는 다른 모집단이라 서버 총수로 바꾸면
-    // 오히려 더 오해를 만든다 — countActiveFilters()/state.q.trim() 로 자체 판정한다.
-    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
-    // [025 §요구2] 필터·검색 활성 시 대시보드 숫자를 숨긴다(라벨·바 구조는 유지) — 하위
-    // 렌더 함수 시그니처는 바꾸지 않고 클로저 플래그로 전달한다(위 dashHideNumbers 선언 참조).
-    dashHideNumbers = filtersActive;
-    if (!filtersActive) {
-      // 전체(지적) — RPC exact 우선, 실패 시 Content-Range exact(SERVER_TOTAL) 폴백,
-      // 그마저 없으면 로드 수(stats.total 원래값) 유지.
-      if (SERVER_FINDINGS_TOTAL !== null) {
-        stats.total = SERVER_FINDINGS_TOTAL;
-      } else if (SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {
-        stats.total = SERVER_TOTAL;
-      }
-      // 문서 — RPC 에만 있는 값이라 폴백 없음(미확보면 스탯 자체를 생략, renderDashStats 참조).
-      if (SERVER_DOC_TOTAL !== null) {
-        stats.documents = SERVER_DOC_TOTAL;
-      }
-      // FDA/MFDS 소스별 분해 — RPC 확보 시 exact 로 교체하고 시각적으로 구분
-      // (agenciesExact=false 이면 renderDashStats() 가 "로드된 데이터 기준" 툴팁을 단다).
-      if (SERVER_AGENCY_TOTALS !== null) {
-        stats.agencies = Object.keys(SERVER_AGENCY_TOTALS)
-          .map(function (a) { return { agency: a, count: SERVER_AGENCY_TOTALS[a] }; })
-          .sort(function (x, y) { return y.count - x.count || x.agency.localeCompare(y.agency); });
-        stats.agenciesExact = true;
-      }
-      // [025 §요구1] 카테고리·월별·업체 분포도 같은 원칙으로 RPC 전역 truth 로 교체한다
-      // (by_agency_category/by_month/top_firms — fetchCoverageNote() 가 채운다). RPC
-      // 미확보(null)면 기존처럼 로드 기준(computeStats 원래값)을 그대로 둔다.
-      if (RPC_BY_CATEGORY !== null) {
-        stats.categories = Object.keys(RPC_BY_CATEGORY)
-          .map(function (code) {
-            var cat = CATEGORY_LABELS[code];
-            return { code: code, ko: cat ? cat.ko : code, count: RPC_BY_CATEGORY[code] };
-          })
-          .sort(function (a, b) { return b.count - a.count || a.code.localeCompare(b.code); });
-      }
-      if (RPC_BY_MONTH !== null) {
-        var rpcMonths = Object.keys(RPC_BY_MONTH).sort(); // 오름차순(computeMonthTrend 관례와 동일)
-        if (rpcMonths.length > 12) rpcMonths = rpcMonths.slice(rpcMonths.length - 12);
-        stats.months = rpcMonths.map(function (m) { return { month: m, count: RPC_BY_MONTH[m] }; });
-      }
-      if (RPC_TOP_FIRMS !== null) {
-        stats.firms = RPC_TOP_FIRMS.slice(0, 5).map(function (f) {
-          return { name: f.firm_name, count: f.cnt };
-        });
-      }
-      // review_status 는 025 미적용 라이브 DB 에서 RPC_BY_REVIEW_STATUS 가 null 로 남아
-      // 자연히 기존 로드 기준(computeStats 원래값)으로 폴백한다.
-      if (RPC_BY_REVIEW_STATUS !== null) {
-        stats.needsReview = RPC_BY_REVIEW_STATUS.needs_review || 0;
-      }
-    }
+    // [FIND-1 M9a] 미번역 건수는 집계하지 않는다 — 공개 게이트(006/010)가 국문 해석이 없는
+    // 행을 RLS 단계에서 이미 차단하므로 클라이언트가 세면 항상 0에 수렴해 오해만 만든다.
+    var stats = {
+      total: LAST.totals.findings,
+      documents: LAST.totals.documents,
+      agencies: dashAxis("by_agency").map(function (e) {
+        return { agency: e.v, count: e.c };
+      }),
+      agenciesExact: true, // 서버 집계라 항상 exact — "로드된 데이터 기준" 툴팁이 붙지 않는다
+      needsReview: dashNeedsReview(),
+      categories: dashAxis("by_category").map(function (e) {
+        var cat = CATEGORY_LABELS[e.v];
+        return { code: e.v, ko: cat ? cat.ko : e.v, count: e.c };
+      }),
+      months: [],
+      firms: dashAxis("top_firms").slice(0, 5).map(function (f) {
+        return { name: f.firm_name, count: f.c };
+      }),
+    };
+    // 월 추이는 최근 12개월만 — 서버는 오름차순 전량을 주므로 뒤에서 자른다(027 계약).
+    var months = dashAxis("by_month");
+    if (months.length > 12) months = months.slice(months.length - 12);
+    stats.months = months.map(function (e) { return { month: e.v, count: e.c }; });
     renderDashStats(stats);
     renderDashCategories(stats);
     renderDashMonths(stats);
@@ -1162,28 +937,6 @@
     return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };
   }
 
-  // ── [문서 중심 열람] observation 조각이 아니라 문서·업체 단위로 열람한다(Redica 등
-  // 상용 규제 인텔리전스의 검증된 패턴 — observation 조각은 집계 엔진 내부용). 같은
-  // 문서(raw_signal_id 동일)의 지적사항을 문서 카드 1장으로 묶는다. ────────────────────
-  // matched(정렬 완료) 배열의 순서를 그대로 보존하며 병합만 한다 — 문서 순서는 그 문서의
-  // 첫 지적사항이 정렬 결과에서 나타나는 위치로 결정되고(published_date 최신순 등 기존
-  // 정렬 그대로), 문서 내부 지적사항 순서도 기존 정렬을 그대로 유지한다(재정렬 없음).
-  // raw_signal_id 가 없는 행(legacy fetch 폴백 등 방어적 케이스)은 홀로 자기 그룹을
-  // 이룬다 — 그룹핑 실패가 검색 결과 누락으로 이어지지 않게 한다.
-  function groupByDocument(rows) {
-    var order = [];
-    var byKey = {};
-    rows.forEach(function (row) {
-      var key = row.raw_signal_id || ("__standalone__" + (row.finding_id || order.length));
-      if (!byKey[key]) {
-        byKey[key] = [];
-        order.push(key);
-      }
-      byKey[key].push(row);
-    });
-    return order.map(function (key) { return byKey[key]; });
-  }
-
   // 문서 카드 헤더 — 업체명이 주인공(기존 .fnd-firm 과 동일한 세리프 규칙, 문서 단위라
   // 조금 더 크게), 소스·발행일·지적 건수는 보조 메타. 문서 내 모든 행이 firm_name/source/
   // published_date 를 공유하므로 대표값(rows[0])만 쓴다.
@@ -1239,7 +992,7 @@
   }
 
   // 문서 카드 1장 조립 — 헤더 + 소속 observation 카드들(기존 buildCard() 렌더를 그대로
-  // 재사용: 카테고리 칩·국문 우선·원문 details 접기·LEGACY_FIELDS 폴백 전부 무변경).
+  // 재사용: 카테고리 칩·국문 우선·원문 details 접기 전부 무변경).
   // 반환한 built 배열은 render() 의 rAF 오버플로 판정(자세히 보기 버튼 표시 여부)에 쓰인다.
   function buildDocCard(rows, query) {
     var doc = el("article", "fnd-doc");
@@ -1272,32 +1025,6 @@
     }
 
     return { card: doc, built: built };
-  }
-
-  // [FIND-1 M10c] 정렬 — 최신순(기본, published_date desc → finding_id asc)/오래된순/
-  // 업체명순(localeCompare, 동순위는 published_date desc). 순수 함수(원본 배열 비파괴).
-  function sortRows(rows) {
-    var sorted = rows.slice();
-    if (state.sort === "date_asc") {
-      sorted.sort(function (a, b) {
-        var d = (a.published_date || "").localeCompare(b.published_date || "");
-        if (d !== 0) return d;
-        return String(a.finding_id || "").localeCompare(String(b.finding_id || ""));
-      });
-    } else if (state.sort === "firm_asc") {
-      sorted.sort(function (a, b) {
-        var c = (a.firm_name || "").localeCompare(b.firm_name || "");
-        if (c !== 0) return c;
-        return (b.published_date || "").localeCompare(a.published_date || "");
-      });
-    } else {
-      sorted.sort(function (a, b) {
-        var d = (b.published_date || "").localeCompare(a.published_date || "");
-        if (d !== 0) return d;
-        return String(a.finding_id || "").localeCompare(String(b.finding_id || ""));
-      });
-    }
-    return sorted;
   }
 
   // [FIND-1 M10c] 활성 필터 개수(검색어·정렬 제외) — 모바일 "필터·정렬 (N)" 배지에 쓴다.
@@ -1338,8 +1065,18 @@
     history.replaceState(null, "", newUrl);
   }
 
-  // URL→state(초기 로드 1회) — 알 수 없는/무효한 값은 조용히 무시한다(오류 없이 기본값 유지).
-  // ROWS·buildFacetSkeleton() 이후에 호출해야 collectFacetValues 로 유효값 검증이 가능하다.
+  // URL→state(초기 로드 1회). ★첫 fetch **이전**에 호출한다 — 이 state 가 곧 첫 요청의
+  // 파라미터이기 때문이다(URL 상태 없이 한 번 요청하고 다시 요청하면 왕복 2회 + 깜빡임).
+  // 그래서 파셋 값 목록(collectFacetValues)에 의존할 수 없다: 그 목록은 서버 응답에만 있고,
+  // 응답은 이 함수가 만든 state 로 요청해야 온다(순환).
+  // 필터 값은 검증 없이 그대로 싣는다 — 서버가 모르는 값이면 결과가 0건이 되고, 적용 필터
+  // 칩 행(#fnd-active)에 그 값이 그대로 드러나 한 번의 클릭으로 해제된다. 종전처럼 조용히
+  // 무시하면 URL 이 말하는 필터와 화면이 어긋난다(URL 은 걸렸다는데 결과는 전량). 파셋
+  // 목록으로 사후 검증하는 방법도 있으나 축은 자기 자신을 제외하므로 "다른 필터 때문에
+  // 0건이라 축에서 빠진 정상 값"과 "존재하지 않는 값"을 구분하지 못한다 = 사용자가 건
+  // 필터를 임의로 푸는 오검출이 생긴다.
+  // sort 만 예외로 클라이언트에서 검증한다 — 서버도 클램프하지만 sortSel.value 대입이
+  // 성립하려면 <option> 에 있는 값이어야 하고, 그 목록은 정적 셸에 있어 이미 안다.
   function readStateFromUrl() {
     if (typeof URLSearchParams === "undefined") return;
     var params = new URLSearchParams(location.search);
@@ -1347,8 +1084,7 @@
     if (qv !== null) state.q = qv;
     ["agency", "category_code", "source", "evidence_level", "review_status", "month"].forEach(function (k) {
       var raw = params.get(URL_KEYS[k]);
-      if (raw === null) return;
-      if (collectFacetValues(k).indexOf(raw) !== -1) state[k] = raw;
+      if (raw !== null) state[k] = raw;
     });
     var sortRaw = params.get(URL_KEYS.sort);
     if (sortRaw !== null && SORT_VALUES.indexOf(sortRaw) !== -1) state.sort = sortRaw;
@@ -1437,12 +1173,11 @@
   }
 
   // ── [PR-0 딥링크] /findings/?finding_id=finding-<24hex> 공유 링크 ──────────────────────
-  // 우선순위: ①형식 불일치 → fetch 없이 즉시 notfound ②단건 조회(FIELDS 3단계 폴백
-  // 재사용) → 빈 결과(RLS 비공개 포함) = notfound ③raw_signal_id 로 같은 문서 전체
-  // 재조회 → groupByDocument()+buildDocCard() 로 문서 카드 1장 렌더. found/notfound 는
-  // 사용자가 필터·검색·정렬·페이지를 조작하는 순간 exitDeepLinkMode() 로 종료되고 일반
-  // 모드로 전환된다(§4). 비공개·미존재·형식오류는 전부 동일한 notfound 배너로 수렴한다
-  // (§7, 존재 여부 정보 누설 금지).
+  // 우선순위: ①형식 불일치 → fetch 없이 즉시 notfound ②findings_document RPC 1회 →
+  // null(RLS 비공개 포함) = notfound ③문서 전체를 buildDocCard() 로 카드 1장 렌더.
+  // found/notfound 는 사용자가 필터·검색·정렬·페이지를 조작하는 순간 exitDeepLinkMode()
+  // 로 종료되고 일반 모드로 전환된다(§4). 비공개·미존재·형식오류는 전부 동일한 notfound
+  // 배너로 수렴한다(§7, 존재 여부 정보 누설 금지).
   function isValidFindingId(id) {
     return typeof id === "string" && FINDING_ID_RE.test(id);
   }
@@ -1519,28 +1254,17 @@
     hideDeepLinkBanner();
   }
 
-  function fetchFindingsFiltered(fields, filterQS) {
-    var cols = fields.join(",");
-    var endpoint =
-      url.replace(/\/$/, "") + "/rest/v1/findings?select=" +
-      encodeURIComponent(cols).replace(/%2C/g, ",") + "&" + filterQS +
-      // [F-10] PostgREST 서버 기본 상한(max-rows) 의존 제거 — 딥링크 단건+문서 조회 공용이라 명시 limit=200(현재 문서 최대 46행 대비 여유 4배).
-      "&order=published_date.desc,finding_id.asc&limit=200";
-    return fetch(endpoint, { headers: { apikey: key, Authorization: "Bearer " + key } });
-  }
-
-  // 기존 3단계 FIELDS 폴백 체인(findings.js 파일 상단 §FIELDS 주석 계약)과 동일한 구조를
-  // finding_id/raw_signal_id 필터 조회에도 그대로 재사용한다(§2·§3).
-  function fetchDeepLinkFiltered(filterQS) {
-    return fetchFindingsFiltered(FIELDS, filterQS).then(function (r) {
-      if (r.ok) return r.json();
-      return fetchFindingsFiltered(FIELDS_NO_FIRM_KEY, filterQS).then(function (r2) {
-        if (r2.ok) return r2.json();
-        return fetchFindingsFiltered(LEGACY_FIELDS, filterQS).then(function (r3) {
-          if (!r3.ok) throw new Error("findings deep link fetch " + r3.status);
-          return r3.json();
-        });
-      });
+  // findings_document RPC(026) — finding_id 로 그 지적이 속한 문서 전체를 **1회 왕복**으로
+  // 받는다. 비공개/부재는 구분 없이 null 이다(존재 여부 누설 금지 계약을 서버가 RLS 로
+  // 강제한다 — 클라이언트가 두 경우를 구분할 수단 자체가 없다).
+  function fetchDocument(findingId) {
+    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_document", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_finding_id: findingId }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_document " + r.status);
+      return r.json();
     });
   }
 
@@ -1551,30 +1275,19 @@
       maybeFinishInit();
       return;
     }
-    fetchDeepLinkFiltered("finding_id=eq." + encodeURIComponent(id))
-      .then(function (rows) {
-        if (!Array.isArray(rows) || !rows.length) {
+    fetchDocument(id)
+      .then(function (doc) {
+        // null(비공개/부재) · 빈 findings · 네트워크 실패 — 전부 같은 notfound 로 수렴한다(§7).
+        if (!doc || !Array.isArray(doc.findings) || !doc.findings.length) {
           deepLinkStatus = "notfound";
           deepLinkPending = false;
           maybeFinishInit();
           return;
         }
-        var target = rows[0];
-        var rsid = target.raw_signal_id;
-        if (!rsid) {
-          // 방어적 폴백 — raw_signal_id 가 없는 행(legacy 등)은 단건 자체를 문서로 취급.
-          deepLinkDocRows = [target];
-          deepLinkStatus = "found";
-          deepLinkPending = false;
-          maybeFinishInit();
-          return;
-        }
-        return fetchDeepLinkFiltered("raw_signal_id=eq." + encodeURIComponent(rsid)).then(function (docRows) {
-          deepLinkDocRows = (Array.isArray(docRows) && docRows.length) ? docRows : [target];
-          deepLinkStatus = "found";
-          deepLinkPending = false;
-          maybeFinishInit();
-        });
+        deepLinkDocRows = doc.findings;
+        deepLinkStatus = "found";
+        deepLinkPending = false;
+        maybeFinishInit();
       })
       .catch(function () {
         deepLinkStatus = "notfound";
@@ -1626,18 +1339,15 @@
   }
 
   // 문서 카드 1장 단독 렌더 — 페이지네이션·대시보드와 무관(§2: 딥링크 모드가 페이지네이션과
-  // 무관하게 단독 렌더). groupByDocument() 로 재확인 후(방어적) buildDocCard() 를 그대로
-  // 재사용한다(§3 — 신규 렌더러를 만들지 않는다).
+  // 무관하게 단독 렌더). findings_document 가 이미 문서 1건의 지적만 묶어 보내므로 클라이언트
+  // 그룹핑 없이 buildDocCard() 를 그대로 재사용한다(§3 — 신규 렌더러를 만들지 않는다).
   function renderDeepLinkDoc() {
     showState("none");
     hidePager();
-    ensureLoadMoreNotice().hidden = true; // [025] 단독 문서 렌더 — 목록 로딩 진행 문구는 무관(hidePager 와 동형)
     if (hasDash) dashEl.hidden = true; // 문서 1건뿐이라 대시보드는 의미가 없다(파괴 아님 — 숨김만)
     resultsEl.textContent = "";
     countEl.textContent = "";
-    var groups = groupByDocument(deepLinkDocRows);
-    var rows = groups.length ? groups[0] : deepLinkDocRows;
-    var doc = buildDocCard(rows, "");
+    var doc = buildDocCard(deepLinkDocRows, "");
     resultsEl.appendChild(doc.card);
     showDeepLinkFoundBanner();
     var targetId = deepLinkParam;
@@ -1674,10 +1384,12 @@
     setTimeout(finalizeDeepLinkDoc, 120);
   }
 
-  // ROWS 로드(rowsReady)와 딥링크 해석(!deepLinkPending) 이 둘 다 끝나야 최종 렌더를
+  // 첫 검색 응답(rowsReady)과 딥링크 해석(!deepLinkPending) 이 둘 다 끝나야 최종 렌더를
   // 확정한다 — 어느 쪽이 먼저 끝나든(네트워크 순서 무관) 깜빡임 없이 한 번만 렌더한다.
   // finding_id 파라미터가 애초에 없었으면 deepLinkPending 은 시작부터 false 라 이 함수는
   // rowsReady 만 기다리는 기존 흐름과 완전히 동일하게 동작한다(§7 회귀 0).
+  // ★render() 를 직접 부른다(goToPage 가 아니다) — 첫 응답이 이미 LAST 에 있으므로
+  // goToPage 를 부르면 같은 페이지를 한 번 더 요청하게 된다(왕복 2회).
   function maybeFinishInit() {
     if (!rowsReady || deepLinkPending) return;
     if (deepLinkStatus === "found") {
@@ -1685,7 +1397,15 @@
       return;
     }
     if (deepLinkStatus === "notfound") showDeepLinkNotFoundBanner();
-    goToPage(readPageFromUrl());
+    // URL ?page= 가 범위를 넘었으면(옛 북마크 등 — 첫 요청은 pages 를 모른 채 나간다)
+    // 마지막 페이지를 다시 요청한다. 그대로 그리면 빈 목록 + 페이저 숨김이라 되돌아갈
+    // 길이 없다(goToPage 의 동일 보정과 같은 이유). 아직 "불러오는 중" 상태이므로
+    // 중간 깜빡임도 없다.
+    if (!LAST.documents.length && LAST.totals.documents > 0 && currentPage > LAST.pages) {
+      goToPage(LAST.pages);
+      return;
+    }
+    render();
   }
 
   // ── [FIND-1 S1] 유사 문구 검색(렉시컬) — findings_similar RPC 소비 ──────────────────────
@@ -1778,7 +1498,6 @@
   function renderSimilarResults(items) {
     showState("none");
     hidePager();
-    ensureLoadMoreNotice().hidden = true; // [025] 유사검색 단독 렌더 — 목록 로딩 진행 문구는 무관(hidePager 와 동형)
     if (hasDash) dashEl.hidden = true;
     resultsEl.textContent = "";
     countEl.textContent = "";
@@ -1879,138 +1598,63 @@
     similarToggleBtn = btn;
   }
 
-  // [025 §요구3] 결과 영역에 항상 보이는 문구(툴팁 아님) — 서버 obs 청크가 아직 소진되지
-  // 않았으면(!isServerExhausted()) 상시 노출하고, 전량 로드가 끝나면 사라진다. findings.html
-  // 템플릿엔 자리가 없어(§템플릿 최소 변경 원칙, PR-0 딥링크 배너·S1 토글과 동일 관례)
-  // findings.js 가 런타임에 1회만 DOM 삽입한다 — #fnd-pager-top(결과 목록 최상단) 바로
-  // 앞이라 필터/정렬/페이지 상태와 무관하게 결과 영역의 첫 요소로 항상 눈에 띈다.
-  var loadMoreNoticeEl = null;
-  function ensureLoadMoreNotice() {
-    if (loadMoreNoticeEl) return loadMoreNoticeEl;
-    loadMoreNoticeEl = document.createElement("p");
-    loadMoreNoticeEl.id = "fnd-loadmore-notice";
-    loadMoreNoticeEl.setAttribute("role", "status");
-    loadMoreNoticeEl.setAttribute("aria-live", "polite");
-    loadMoreNoticeEl.style.cssText = "margin:0 0 14px;font-size:12.5px;color:var(--muted)";
-    loadMoreNoticeEl.textContent = "데이터를 추가로 불러오는 동안 결과가 갱신됩니다.";
-    var anchor = pagerTopEl || resultsEl;
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(loadMoreNoticeEl, anchor);
-    return loadMoreNoticeEl;
-  }
-
-  // [025 §요구4] 오래된순·업체명순은 전량 로드(서버 obs 청크 소진) 전에는 전역 정렬을
-  // 보장할 수 없다 — 선택(b) 채택: 전량 로드 전에는 두 옵션을 disabled 처리하고 이유를
-  // title 로 남긴다(전역 정렬인 것처럼 보이는 부분 정렬을 절대 보여주지 않는다). 선택(a)
-  // (정렬 선택 시 전량 선로딩 후 정렬)를 채택하지 않은 근거 — 코퍼스 전체(8천+행)를
-  // 사용자가 실제로 그 정렬을 고르지 않는 흔한 경로에서까지 강제로 끌어와야 해 무겁고,
-  // "숨기거나 비활성화한다"는 이 수리 전반의 보수적 원칙(부분 데이터를 사실처럼 보여주지
-  // 않는다)과 더 일관된다. 서버가 소진되면 자동으로 재활성화된다(조용한 정렬 자동전환은
-  // 하지 않는다 — 이미 선택돼 있었다면 그대로 유지, 사용자가 다시 고르게 한다).
-  function updateSortAvailability() {
-    if (!sortSel) return;
-    var exhausted = isServerExhausted();
-    var reason = "전체 데이터를 불러오는 중에는 전역 정렬을 보장할 수 없어 비활성화됩니다.";
-    Array.prototype.forEach.call(sortSel.options, function (opt) {
-      if (opt.value === "date_asc" || opt.value === "firm_asc") {
-        opt.disabled = !exhausted;
-        opt.title = exhausted ? "" : reason;
-      }
-    });
-  }
-
+  // LAST(가장 최근 서버 응답)만으로 화면 전체를 그린다 — 재필터·재정렬·재집계·슬라이스가
+  // 전부 없다(서버가 이미 이 페이지의 문서만 잘라 보냈다).
   function render() {
-    var matched = sortRows(ROWS.filter(matches));
-    var docs = groupByDocument(matched); // [문서 중심 열람] raw_signal_id 로 문서 단위 그룹핑
-    renderDash(matched); // [FIND-1 M7] 필터 결과 기준 대시보드 재계산(데이터 없으면 hidden, obs 기준 불변)
+    buildFacetSkeleton(); // 이번 응답에서 새로 드러난 파셋 값 반영(멱등)
+    renderDash(); // [FIND-1 M7] 현재 결과 집합 기준 대시보드(LAST.dash, 결과 0건이면 hidden)
     refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     updateFiltersToggleBadge();
 
-    // [문서 단위 페이지네이션] moreMayExist=서버에 아직 더 받아올 obs 청크가 남아있을 수
-    // 있다(isServerExhausted() 참조) — 필터 여부와 무관하게 동일 기준을 쓴다: 필터가
-    // 걸려도 ensurePageReady() 가 필요할 때 계속 다음 청크를 당겨오므로, "아직 최소
-    // 추정치일 뿐"이라는 신호는 필터 여부와 상관없이 항상 정직해야 한다.
-    var moreMayExist = !isServerExhausted();
-    // [025 §요구3] 결과 영역 상시 문구 — 전량 로드 전(moreMayExist)이면 노출, 소진되면
-    // 사라진다(필터/검색/페이지 상태와 무관하게 항상 동일 기준). [025 §요구4] 정렬 옵션
-    // 가용성도 같은 소진 여부로 갱신한다(오래된순/업체명순은 전량 로드 후에만 활성).
-    ensureLoadMoreNotice().hidden = !moreMayExist;
-    updateSortAvailability();
-    // [정확 총수 M1a] 무필터(검색어·필터 전부 비어있음) + 서버 미소진 구간에서는 지금까지
-    // 로드된 docs.length 대신 findings_stats RPC 의 exact 총수(SERVER_DOC_TOTAL/
-    // SERVER_FINDINGS_TOTAL — fetchCoverageNote() 가 독립적으로 채운다)를 그대로 쓴다 —
-    // 로드 진행과 무관하게 항상 정확하다. 서버가 소진되면(전량 로드 완료) 로드된
-    // docs.length 자체가 이미 ground truth 이므로 그쪽으로 자연 전환된다(exactUnfiltered
-    // 는 moreMayExist 가 꺼지면 함께 꺼진다 — RPC 추정치와의 미세한 오차가 있어도 소진
-    // 시점에 스스로 교정됨). 필터가 걸리면 matched 자체가 "필터링된 결과 전체"라는 다른
-    // 모집단이라 RPC 총수로 바꿔치기하지 않는다(로드 기준 유지, renderDash() 의 filtersActive
-    // 판정과 동일 조건).
-    var filtersActive = countActiveFilters() > 0 || !!state.q.trim();
-    var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;
-    var totalDocsKnown = docs.length;
-    var totalFindingsKnown = matched.length;
-    var totalPagesKnown;
-    if (exactUnfiltered) {
-      totalDocsKnown = SERVER_DOC_TOTAL;
-      if (SERVER_FINDINGS_TOTAL !== null) totalFindingsKnown = SERVER_FINDINGS_TOTAL;
-      totalPagesKnown = Math.max(1, Math.ceil(SERVER_DOC_TOTAL / DOCS_PER_PAGE));
-    } else {
-      totalPagesKnown = Math.max(1, Math.ceil(totalDocsKnown / DOCS_PER_PAGE));
-    }
-    if (currentPage > totalPagesKnown) currentPage = totalPagesKnown; // 방어적 클램프(필터 변경 등)
+    // totals 는 검색·필터 적용 후 exact 다(추정치가 아니다) — "이상" 접미사 같은 불확실성
+    // 표기가 존재할 이유가 없다. pages 도 서버가 같은 모집단에서 계산해 보낸다.
+    var totalDocs = LAST.totals.documents;
+    var totalFindings = LAST.totals.findings;
+    var totalPages = Math.max(1, LAST.pages || 1);
+    if (currentPage > totalPages) currentPage = totalPages; // 방어적 클램프(표시용 — goToPage 가 범위 밖 요청을 이미 되돌린다)
     if (currentPage < 1) currentPage = 1;
 
-    // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y" — exactUnfiltered 면 N/M/Y 모두
-    // findings_stats RPC 의 exact 값이라 접미사를 붙이지 않는다. 그 외(필터 적용 중이거나
-    // RPC 미확보)이고 moreMayExist 면 아직 최소 추정치일 뿐이라는 정직한 신호로 숫자 뒤에
-    // " 이상"을 붙인다 — 구버전의 "+" 기호보다 명확한 표기(필터 상태에서도 동일하게 적용).
-    var uncertain = moreMayExist && !exactUnfiltered;
+    // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y"
     countEl.textContent = "";
     countEl.appendChild(document.createTextNode("전체 "));
     var bDocs = document.createElement("b");
-    bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR");
+    bDocs.textContent = totalDocs.toLocaleString("ko-KR");
     countEl.appendChild(bDocs);
-    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
     countEl.appendChild(document.createTextNode("문서 · "));
     var bObs = document.createElement("b");
-    bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR");
+    bObs.textContent = totalFindings.toLocaleString("ko-KR");
     countEl.appendChild(bObs);
-    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
     countEl.appendChild(document.createTextNode("지적 · 페이지 "));
     var bCur = document.createElement("b");
     bCur.textContent = String(currentPage);
     countEl.appendChild(bCur);
     countEl.appendChild(document.createTextNode(" / "));
     var bTotal = document.createElement("b");
-    bTotal.textContent = String(totalPagesKnown);
+    bTotal.textContent = String(totalPages);
     countEl.appendChild(bTotal);
-    if (uncertain) countEl.appendChild(document.createTextNode(" 이상"));
 
     syncStateToUrl(); // [페이지네이션] ?page= 도 여기서 함께 반영(currentPage 확정 이후)
 
     resultsEl.textContent = "";
-    if (!matched.length) {
+    if (!LAST.documents.length) {
       showState("empty");
       hidePager();
       return;
     }
     showState("none");
-    // [문서 단위 페이지네이션] 문서 24개=1페이지 슬라이스 — obs 가 아니라 문서 경계로
-    // 자른다(페이지 경계에서 같은 raw_signal_id 문서가 절대 쪼개지지 않는다. 경계 문서
-    // 완결성 보장은 ensurePageReady()/incompleteDocKey() 가 페이지 이동 시점에 이미
-    // 확인했으므로, 여기서는 순수 슬라이스만 한다).
-    var pageDocs = docs.slice((currentPage - 1) * DOCS_PER_PAGE, currentPage * DOCS_PER_PAGE);
     var query = state.q.trim().toLowerCase(); // [M10b P1] 하이라이트 검색어(trim+대소문자무시)
     var frag = document.createDocumentFragment();
     var built = [];
-    pageDocs.forEach(function (rows) {
-      var d = buildDocCard(rows, query);
+    // doc.findings = 이 문서에서 **매치된 지적만**(문서 전체가 아니다). 페이지 경계에서
+    // 문서가 쪼개지지 않는 것은 서버가 문서 단위로 페이지를 나눈 결과다.
+    LAST.documents.forEach(function (doc) {
+      var d = buildDocCard(doc.findings, query);
       frag.appendChild(d.card);
       built = built.concat(d.built);
     });
     resultsEl.appendChild(frag);
-    renderPager(currentPage, totalPagesKnown, uncertain);
-    schedulePrefetch(docs.length, moreMayExist); // [선로딩 c] 다음 청크 lookahead 1개
+    renderPager(currentPage, totalPages, false); // moreMayExist=false — 총 페이지가 exact 라 "+" 표기가 성립하지 않는다
     // [M10b P1] "자세히 보기" 버튼 표시 여부 — DOM 삽입 후(레이아웃 확정) 1회 rAF 로 판정.
     // 본문이 3줄을 넘겨 잘렸거나(scrollHeight>clientHeight) 부가 섹션이 있으면 노출,
     // 둘 다 아니면 DOM 에서 제거한다(버튼 없음).
@@ -2063,7 +1707,9 @@
           if (similarMode) { runSimilarSearch(); return; }
           currentPage = 1; // [페이지네이션] 검색어 변경 → 1페이지로 리셋
           goToPage(1);
-        }, 150);
+          // 250ms — 매 입력이 서버 왕복이라 종전 150ms 보다 길게 잡는다(로컬 배열 필터링
+          // 이던 시절의 값이라 그대로 두면 타이핑 중 요청이 과하게 나간다).
+        }, 250);
       });
     }
     // [M15] 전체 초기화는 #fnd-reset 버튼이 아니라 적용 필터 칩 행의 "모두 지우기"
@@ -2091,163 +1737,46 @@
     }
   }
 
-  // [페이지네이션] offset(2번째 인자)이 있으면 &offset= 을 덧붙인다 — 생략(단일 인자
-  // 호출, 기존 3단계 폴백 체인이 그대로 쓰는 형태)하면 offset=0 과 동일(기존 동작 불변).
-  function buildEndpoint(fields, offset) {
-    var cols = fields.join(",");
-    var off = offset || 0;
-    return (
-      url.replace(/\/$/, "") +
-      "/rest/v1/findings?select=" +
-      encodeURIComponent(cols).replace(/%2C/g, ",") +
-      "&order=published_date.desc,finding_id.asc&limit=" + PAGE_LIMIT +
-      (off > 0 ? "&offset=" + off : "")
-    );
-  }
-
-  // [페이지네이션] Prefer: count=exact — PostgREST 가 응답 Content-Range 헤더(예:
-  // "0-999/1926")에 서버 exact total 을 실어 보낸다. parseServerTotal() 이 그 헤더를
-  // 읽어 SERVER_TOTAL 을 채운다(헤더 미노출/파싱 실패 시 null 폴백 — 아래 §5 방어 참조).
-  function fetchFindings(fields, offset) {
-    return fetch(buildEndpoint(fields, offset), {
-      headers: { apikey: key, Authorization: "Bearer " + key, Prefer: "count=exact" },
-    });
-  }
-
-  // Content-Range: "0-999/1926" → 1926. 형식이 다르거나(예: "*/*") 헤더 자체가 없으면
-  // (CORS 로 노출되지 않는 환경 포함) null 을 반환해 호출부가 조용히 폴백하게 한다.
-  function parseServerTotal(resp) {
-    var cr = resp && resp.headers ? resp.headers.get("content-range") : null;
-    if (!cr) return null;
-    var m = /\/(\d+)$/.exec(cr);
-    if (!m) return null;
-    var n = parseInt(m[1], 10);
-    return isNaN(n) ? null : n;
-  }
-
-  // [페이지네이션] 페이지 이동으로 이어서 불러온 다음 청크를 ROWS 에 병합한다.
-  // finding_id 기준 중복 제거 — 두 fetch 사이 새 번역이 공개(publish gate 통과)돼 정렬
-  // 경계에서 행이 밀리더라도 같은 행이 두 번 들어오지 않게 방어한다.
-  function mergeRows(newRows) {
-    var seen = {};
-    ROWS.forEach(function (r) {
-      if (r.finding_id !== undefined && r.finding_id !== null) seen[r.finding_id] = true;
-    });
-    newRows.forEach(function (r) {
-      var id = r.finding_id;
-      if (id !== undefined && id !== null && seen[id]) return;
-      ROWS.push(r);
-      if (id !== undefined && id !== null) seen[id] = true;
-    });
-  }
-
-  // ── [문서 단위 페이지네이션] 점진 로드 + 페이지 요구 기반 fetch ─────────────────────
-  // 전량을 한 번에 받지 않는다 — 이미 로드된 페이지는 서버 왕복 0(ROWS 슬라이스만), 아직
-  // 로드 안 된 페이지로 이동할 때만 필요한 만큼 청크(PAGE_LIMIT=1000)를 이어서 fetch 한다.
-
-  // 서버 obs 청크가 소진됐는지 — SERVER_TOTAL(exact count) 이 있으면 정확히 비교하고,
-  // 없으면(헤더 미노출 환경) "가장 최근 청크가 PAGE_LIMIT 미만이었다"는 휴리스틱으로
-  // 판단한다(초기 로드 전=LAST_BATCH_SIZE null 이면 미확정 → false, 즉 "아직 더 있을
-  // 수 있다"). fetchGaveUp(청크 fetch 실패)이면 무조건 소진 취급해 무한 재시도를 막는다.
-  function isServerExhausted() {
-    if (fetchGaveUp) return true;
-    if (SERVER_TOTAL !== null) return ROWS.length >= SERVER_TOTAL;
-    return LAST_BATCH_SIZE !== null && LAST_BATCH_SIZE < PAGE_LIMIT;
-  }
-
-  // [경계 문서 완결성] 서버가 아직 소진되지 않았다면, 가장 최근에 로드된 obs 행의
-  // raw_signal_id 를 가진 문서는 다음 청크에 같은 문서의 obs 가 더 있을 수 있어
-  // "미완결"로 간주한다 — 서버 fetch 가 published_date.desc, finding_id.asc 로 안정
-  // 정렬되므로 같은 문서(raw_signal_id)의 obs 들은 서버 응답에서 서로 인접하게 도착한다는
-  // 전제다. ensurePageReady() 가 이 키를 가진 문서가 목표 페이지 안에 있으면 한 청크
-  // 더 당겨 재확인한다(클라이언트 정렬(state.sort)과 무관하게 항상 raw_signal_id 로만
-  // 판정하므로 오래된순/업체명순 등 다른 정렬에서도 동일하게 안전하다).
-  function incompleteDocKey() {
-    if (isServerExhausted() || !ROWS.length) return null;
-    var lastKey = ROWS[ROWS.length - 1].raw_signal_id;
-    return lastKey === undefined || lastKey === null || lastKey === "" ? null : lastKey;
-  }
-
-  // pageNum 페이지를 안전하게 그릴 수 있을 만큼 ROWS 가 찼는지 확인하고, 부족하면 fetch
-  // 를 이어서 한 뒤 done() 을 호출한다(충분하거나 서버가 소진됐으면 done() 을 동기
-  // 호출 — 흔한 경우엔 네트워크 지연 없이 즉시 진행). 필터가 걸려 있어도 동일 로직을
-  // 그대로 쓴다 — ROWS(원본)에 계속 청크를 채우고 그 위에서 매번 새로 필터링하므로,
-  // 결과가 희소한 필터라면 여러 청크를 연달아 당길 수 있다(별도 최적화는 스코프 밖).
-  function ensurePageReady(pageNum, done) {
-    function attempt() {
-      var matched = sortRows(ROWS.filter(matches));
-      var docs = groupByDocument(matched);
-      var neededDocs = pageNum * DOCS_PER_PAGE;
-      if (docs.length >= neededDocs) {
-        var pageSlice = docs.slice(neededDocs - DOCS_PER_PAGE, neededDocs);
-        var badKey = incompleteDocKey();
-        var unsafe = badKey !== null && pageSlice.some(function (rows) {
-          return rows[0].raw_signal_id === badKey;
-        });
-        if (!unsafe) { done(); return; }
-      }
-      if (isServerExhausted()) { done(); return; }
-      fetchNextChunkFor(attempt);
-    }
-    attempt();
-  }
-
-  // [중복 fetch 방어] 이미 진행 중인 청크 fetch 가 있으면 새 요청을 내지 않고 콜백만
-  // 큐에 편승시킨다 — 여러 페이지 이동(연타)이 겹쳐도 실제 네트워크 요청은 항상 1개만
-  // 진행되고, 그 결과가 도착하면 대기 중이던 콜백이 전부 한 번에 재개된다.
-  function fetchNextChunkFor(cb) {
-    if (!LOADED_FIELDS) { cb(); return; }
-    pendingPageCallbacks.push(cb);
-    if (isFetchingPage) return;
-    isFetchingPage = true;
-    fetchFindings(LOADED_FIELDS, ROWS.length)
+  // findings_search RPC(026/027) — 검색·필터·정렬·페이지네이션·파셋·대시보드의 단일 정본.
+  // 인자는 전부 기본값이 있어 생략 가능하지만 명시적으로 전부 싣는다(서버가 클램프·정규화
+  // 하므로 클라이언트 검증은 불필요 — 신뢰 경계는 서버다).
+  // 응답을 LAST 에 대입하지 않고 그대로 반환한다 — 대입 시점은 호출부가 navToken 세대
+  // 검사를 통과시킨 뒤여야 한다(늦게 도착한 옛 응답이 최신 결과를 덮어쓰는 것 방지).
+  function fetchSearch(page) {
+    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        p_q: state.q.trim(),
+        p_source: state.source,
+        p_category: state.category_code,
+        p_month: state.month,
+        p_evidence: state.evidence_level,
+        p_review_status: state.review_status,
+        p_agency: state.agency,
+        p_sort: state.sort,
+        p_page: page,
+        p_docs_per_page: DOCS_PER_PAGE,
+      }),
+    })
       .then(function (r) {
-        if (!r.ok) throw new Error("findings fetch more " + r.status);
-        var total = parseServerTotal(r);
-        if (total !== null) SERVER_TOTAL = total;
+        if (!r.ok) throw new Error("findings_search " + r.status);
         return r.json();
       })
       .then(function (data) {
-        if (!Array.isArray(data)) throw new Error("findings shape");
-        LAST_BATCH_SIZE = data.length;
-        mergeRows(data);
-        buildFacetSkeleton(); // 새로 드러난 파셋 값 옵션 추가(중복 방지는 자체 보장)
-      })
-      .catch(function () {
-        // 조용히 포기 — 이미 로드된 데이터만으로 계속 진행한다(무한 재시도 방지).
-        fetchGaveUp = true;
-      })
-      .then(function () {
-        isFetchingPage = false;
-        var cbs = pendingPageCallbacks;
-        pendingPageCallbacks = [];
-        cbs.forEach(function (fn) { fn(); });
+        // 봉투 계약 검증 — 형태가 어긋나면 부분 렌더로 화면을 망가뜨리지 말고 실패로 다룬다.
+        if (!data || !Array.isArray(data.documents) || !data.totals) {
+          throw new Error("findings_search shape");
+        }
+        return data;
       });
   }
 
-  // [선로딩 c] 현재 페이지 렌더 후 idle 시간에 다음 청크 1개만 미리 fetch한다(lookahead
-  // 1 — 완역 시 수 MB 가 될 수 있는 전량 eager 로드는 절대 하지 않는다). 아직 여유가
-  // 있으면(로드된 문서 기준 페이지 수가 현재 페이지보다 1 이상 남아있으면) 아무 것도
-  // 하지 않는다 — PAGE_LIMIT=1000 obs 청크 하나가 보통 여러 페이지 분량을 이미 커버하므로
-  // 실제로는 로드된 데이터의 마지막·마지막 직전 페이지에 있을 때만 net 요청이 나간다.
-  // 렌더를 트리거하지 않는 순수 선로딩(fetchNextChunkFor 의 콜백은 no-op) — 다음 실제
-  // 페이지 이동(goToPage)이 이 데이터를 즉시 재사용한다.
-  function schedulePrefetch(loadedDocsCount, uncertainLoad) {
-    if (!uncertainLoad || isFetchingPage) return;
-    var loadedPages = Math.max(1, Math.ceil(loadedDocsCount / DOCS_PER_PAGE));
-    if (currentPage < loadedPages - 1) return; // 아직 여유 있음 — lookahead 불필요
-    var idle = (typeof requestIdleCallback === "function")
-      ? requestIdleCallback
-      : function (fn) { return setTimeout(fn, 200); };
-    idle(function () {
-      if (isFetchingPage || isServerExhausted()) return;
-      fetchNextChunkFor(function () {}); // 선로딩만 — 렌더 트리거 없음(다음 이동 시 즉시 반영)
-    });
-  }
-
-  // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 이동의
-  // 완료 콜백은 currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
-  // 최근 클릭"만 화면에 반영된다.
+  // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 요청의
+  // 응답은 LAST/currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
+  // 최근 조작"만 화면에 반영된다.
+  // ★진행 중에 이전 결과를 지우지 않는다 — setPagerLoading(true) 로 진행만 알리고, 교체는
+  // 응답이 도착한 뒤 render() 가 한 번에 한다(입력할 때마다 목록이 사라졌다 나타나는 깜빡임 방지).
   function goToPage(n) {
     var target = Math.max(1, Math.floor(n) || 1);
     navToken += 1;
@@ -2255,25 +1784,43 @@
     var doScroll = pendingScrollAfterNav;
     pendingScrollAfterNav = false;
     setPagerLoading(true);
-    ensurePageReady(target, function () {
-      if (myToken !== navToken) return; // 더 최근 이동에 의해 취소됨
-      currentPage = target;
-      render(); // render() 가 pager 를 통째로 재생성하므로 로딩 상태는 자연히 정리된다.
-      // [로딩 UX b′] fetch 완료 후 목표 페이지 렌더가 끝나면 결과 목록 상단으로 스크롤한다
-      // — 페이지네이션 바 클릭(goToPageFromPager())에서만(doScroll), 필터/검색/정렬 변경발
-      // goToPage(1) 리셋은 스크롤하지 않는다. ★실사용자 신고 반영 2건: ①.fnd-tools 가
-      // sticky(top:66px)라 단순 scrollIntoView(start)는 결과 상단이 sticky 툴바 밑에
-      // 가려지고 상단 페이저는 화면 위로 밀려나 "매번 위로 되돌아가 다음을 눌러야" 했다
-      // → 결과 상단을 sticky 툴바 바닥 바로 아래에 정렬(오프셋 보정). ②smooth 애니메이션
-      // 은 연타 시 버튼 위치가 흘러다녀 instant(auto)로 교체 — sticky 미니 내비(#fnd-pnav)
-      // 와 결합하면 커서를 움직이지 않고 같은 자리에서 연속으로 페이지를 넘길 수 있다.
-      if (doScroll && resultsEl) {
-        var toolsBar = document.getElementById("fnd-tools");
-        var stickyBottom = toolsBar ? toolsBar.getBoundingClientRect().bottom : 0;
-        var scrollTarget = window.scrollY + resultsEl.getBoundingClientRect().top - stickyBottom - 10;
-        window.scrollTo({ top: Math.max(0, scrollTarget), behavior: "auto" });
-      }
-    });
+    fetchSearch(target)
+      .then(function (data) {
+        if (myToken !== navToken) return; // 더 최근 조작에 의해 취소됨
+        // 범위 밖 페이지(옛 북마크·손으로 고친 ?page= 등): 서버는 빈 documents 를 준다.
+        // 그대로 그리면 "결과 없음"에 페이저까지 숨겨져 되돌아갈 길이 사라진다 — 결과가
+        // 존재하는데 페이지만 넘친 경우에 한해 마지막 페이지로 1회 되돌린다(재귀 아님:
+        // 목표가 pages 라 두 번째 응답은 범위 안이다).
+        if (!data.documents.length && data.totals.documents > 0 && target > data.pages) {
+          goToPage(data.pages);
+          return;
+        }
+        LAST = data;
+        currentPage = target;
+        render(); // render() 가 pager 를 통째로 재생성하므로 로딩 상태는 자연히 정리된다.
+        // [로딩 UX b′] fetch 완료 후 목표 페이지 렌더가 끝나면 결과 목록 상단으로 스크롤한다
+        // — 페이지네이션 바 클릭(goToPageFromPager())에서만(doScroll), 필터/검색/정렬 변경발
+        // goToPage(1) 리셋은 스크롤하지 않는다. ★실사용자 신고 반영 2건: ①.fnd-tools 가
+        // sticky(top:66px)라 단순 scrollIntoView(start)는 결과 상단이 sticky 툴바 밑에
+        // 가려지고 상단 페이저는 화면 위로 밀려나 "매번 위로 되돌아가 다음을 눌러야" 했다
+        // → 결과 상단을 sticky 툴바 바닥 바로 아래에 정렬(오프셋 보정). ②smooth 애니메이션
+        // 은 연타 시 버튼 위치가 흘러다녀 instant(auto)로 교체 — sticky 미니 내비(#fnd-pnav)
+        // 와 결합하면 커서를 움직이지 않고 같은 자리에서 연속으로 페이지를 넘길 수 있다.
+        if (doScroll && resultsEl) {
+          var toolsBar = document.getElementById("fnd-tools");
+          var stickyBottom = toolsBar ? toolsBar.getBoundingClientRect().bottom : 0;
+          var scrollTarget = window.scrollY + resultsEl.getBoundingClientRect().top - stickyBottom - 10;
+          window.scrollTo({ top: Math.max(0, scrollTarget), behavior: "auto" });
+        }
+      })
+      .catch(function () {
+        if (myToken !== navToken) return;
+        // 이전 결과가 있으면 그대로 두고 조용히 실패한다 — 일시적 네트워크 오류로 사용자가
+        // 보던 목록을 통째로 날리지 않는다. render() 재호출은 로딩 표시(setPagerLoading)를
+        // 되돌리기 위한 것이다. 그릴 것이 아예 없을 때만 오류 상태로 간다.
+        if (!LAST) { showState("error"); return; }
+        render();
+      });
   }
 
   // [로딩 UX b] 페이지네이션 바(처음/이전/번호/다음/끝) 전용 진입점 — goToPage() 를 그대로
@@ -2399,22 +1946,12 @@
 
   // [공개 범위 투명성] findings_stats RPC(007) — 공개 게이트(006)를 우회해 전량 집계를
   // 반환한다(trends.js 와 동일 계약, 원문 텍스트는 내려주지 않는 안전 계약도 동일). 이
-  // 페이지의 anon SELECT(공개 게이트 통과분만)와 이 RPC 의 전량 집계 사이 간극을 사용자에게
-  // 정직하게 알리는 것이 목적이다 — 실패해도 독립적으로 조용히 숨김 유지(아래 .catch()).
-  // [025] findings_stats RPC 도착이 메인 목록 fetch 보다 늦을 수 있어(네트워크 순서
-  // 무관), 도착 시점에 이미 목록이 그려져 있으면(rowsReady) 새로 확보된 RPC truth 를
-  // 곧장 반영한다 — 월 옵션(buildFacetSkeleton, 멱등)과 파셋 카운트·대시보드 분포
-  // (render())가 로드 순서와 무관하게 항상 정확해야 한다. ROWS 가 아직 없으면 최초
-  // render()/buildFacetSkeleton() 호출이 이미 채워진 RPC_* 값을 자연히 반영하므로
-  // (순서 무관 설계) 여기선 아무것도 하지 않는다. 딥링크 단독 문서 렌더·유사검색 모드는
-  // render() 와 다른 렌더 경로라 건드리지 않는다(§ 단독 렌더 모드 불가침).
-  function refreshAfterRpcStatsArrival() {
-    if (!rowsReady) return;
-    buildFacetSkeleton(); // 새로 확보된 월 옵션 반영(idempotent)
-    if (deepLinkPending || deepLinkStatus === "found" || similarMode) return;
-    render();
-  }
-
+  // 페이지의 공개분(게이트 통과분만)과 이 RPC 의 전량 집계 사이 간극을 사용자에게 정직하게
+  // 알리는 것이 목적이다 — 실패해도 독립적으로 조용히 숨김 유지(아래 .catch()).
+  // ★이 RPC 는 **커버리지 노트 전용**이다. 파셋·대시보드·총수는 findings_search 가 정본이며
+  // (검색·필터가 반영된 값이 필요하다) 여기서 파생시키면 두 진실이 생긴다. 이 노트가
+  // findings_search 로 대체되지 않는 이유는 딱 하나 — 비공개분을 포함한 전량(raw_signals
+  // 총계 등 findings 밖 정보)은 공개 게이트를 통과하는 findings_search 로는 볼 수 없다.
   function fetchCoverageNote() {
     if (!coverageNoteEl || !coverageTextEl) return;
     fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
@@ -2434,69 +1971,6 @@
         // 때만 "규제 문서 N건 · 지적사항 M건 중 P건 국문 열람 가능"으로 문서-지적 관계를
         // 명시한다. 010 미적용 라이브(undefined)에서는 문서 수 없는 문안을 유지한다(방어적 생략).
         var hasDocs = typeof totals.documents === "number" && !isNaN(totals.documents);
-        // [정확 총수 M1a] 페이지네이션(render())·대시보드(renderDash())가 공유하는 exact
-        // 총수 — 이 fetch 는 메인 검색 fetch 와 독립적이라, 성공하면 페이지 이동/렌더
-        // 시점과 무관하게 항상 최신값을 들고 있다(실패하면 null 유지 — 기존 로드 기준 폴백).
-        if (hasDocs) SERVER_DOC_TOTAL = totals.documents;
-        if (typeof totals.findings === "number" && !isNaN(totals.findings)) {
-          SERVER_FINDINGS_TOTAL = totals.findings;
-        }
-        // [대시보드 실총수 M3] by_agency_category(agency×category_code 교차 집계)를
-        // agency 기준으로만 합산해 무필터 대시보드 스탯의 FDA/MFDS 소스별 분해를
-        // 정확화한다 — findings_stats 에 agency 단독 집계 키가 없어 이 교차표에서
-        // 파생한다(RPC 실패/010 미적용이면 null 유지 — renderDash() 가 로드 기준으로 폴백).
-        if (Array.isArray(data.by_agency_category)) {
-          var agencySums = {};
-          var categorySums = {};
-          data.by_agency_category.forEach(function (row) {
-            if (!row) return;
-            if (row.agency) agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);
-            // [025 §요구1] 카테고리 파셋·대시보드 분포도 같은 교차표에서 category_code
-            // 기준으로 합산한다(agency 기준 SERVER_AGENCY_TOTALS 와 동일 유도 패턴).
-            if (row.category_code) {
-              categorySums[row.category_code] = (categorySums[row.category_code] || 0) + (row.cnt || 0);
-            }
-          });
-          SERVER_AGENCY_TOTALS = agencySums;
-          RPC_BY_CATEGORY = categorySums;
-        }
-        // [025 파셋 전역 truth] source/evidence/review_status 는 findings_stats 최상위
-        // 배열을 그대로 {value: cnt} 로 평탄화한다. review_status(by_review_status)는
-        // 025 신규 키라 미적용 라이브 DB 에서 undefined 일 수 있다 — Array.isArray 가드가
-        // 자연히 RPC_BY_REVIEW_STATUS=null(폴백)로 남겨 죽지 않는다.
-        if (Array.isArray(data.by_source)) {
-          var srcSums = {};
-          data.by_source.forEach(function (row) {
-            if (row && row.source) srcSums[row.source] = row.cnt || 0;
-          });
-          RPC_BY_SOURCE = srcSums;
-        }
-        if (Array.isArray(data.by_evidence)) {
-          var evSums = {};
-          data.by_evidence.forEach(function (row) {
-            if (row && row.evidence_level) evSums[row.evidence_level] = row.cnt || 0;
-          });
-          RPC_BY_EVIDENCE = evSums;
-        }
-        if (Array.isArray(data.by_review_status)) {
-          var statusSums = {};
-          data.by_review_status.forEach(function (row) {
-            if (row && row.review_status) statusSums[row.review_status] = row.cnt || 0;
-          });
-          RPC_BY_REVIEW_STATUS = statusSums;
-        }
-        if (Array.isArray(data.by_month)) {
-          var monthSums = {};
-          data.by_month.forEach(function (row) {
-            if (!row || !row.month) return;
-            monthSums[row.month] = (monthSums[row.month] || 0) + (row.cnt || 0);
-          });
-          RPC_BY_MONTH = monthSums;
-          RPC_MONTH_VALUES = Object.keys(monthSums).sort().reverse(); // 최신월 우선(collectFacetValues 관례와 동일)
-        }
-        if (Array.isArray(data.top_firms)) {
-          RPC_TOP_FIRMS = data.top_firms; // 이미 cnt desc, firm_key asc 정렬(007/017 계약 — 재정렬 없음)
-        }
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
         // 완파손 등 번역 불능 원문뿐) 미완료 문안을 완료형으로 스스로 전환한다 — 완역
         // 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.
@@ -2518,74 +1992,45 @@
               : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능") +
             " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
         coverageNoteEl.hidden = false;
-        // [025] 이 RPC 도착 시점은 메인 fetch(fetchFindings)와 독립적이라 순서가 뒤바뀔
-        // 수 있다 — ROWS 가 이미 로드돼 화면이 그려진 뒤에 도착한 경우, 새로 확보한
-        // RPC truth(월 옵션·파셋 카운트·대시보드 분포)를 곧장 반영한다.
-        refreshAfterRpcStatsArrival();
       })
       .catch(function () {
         // 조용히 숨김 유지 — 검색 페이지 본기능(검색·필터)과 무관한 독립 폴백.
       });
   }
 
-  // [페이지네이션] 3단계 폴백 체인 중 실제로 성공한 Response·필드셋을 기억해뒀다가
-  // (아래 .then 에서) SERVER_TOTAL/LOADED_FIELDS 를 채운다 — 어느 단계가 성공했든
-  // 동일하게 처리한다(체인 흐름 자체는 §3 fallback 계약과 무변경).
-  var loadedResp = null;
-  var loadedFieldsUsed = null;
   showState("loading");
   fetchCoverageNote();
-  // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 단건+문서 조회를
-  // 시작한다 — 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정
-  // 렌더한다(깜빡임 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래
-  // 로직 전체가 기존 동작과 완전히 동일하게(no-op) 흘러간다(§7 회귀 0).
+  // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 문서 조회를 시작한다 —
+  // 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정 렌더한다(깜빡임
+  // 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래 로직 전체가 기존
+  // 동작과 완전히 동일하게(no-op) 흘러간다(§7 회귀 0).
   var requestedFindingId = getDeepLinkParam();
   if (requestedFindingId) {
     deepLinkParam = requestedFindingId;
     deepLinkPending = true;
     resolveDeepLink(requestedFindingId);
   }
-  fetchFindings(FIELDS)
-    .then(function (r) {
-      if (r.ok) {
-        loadedResp = r;
-        loadedFieldsUsed = FIELDS;
-        return r.json();
-      }
-      // 013(firm_key) 미적용 라이브 DB 대비 1차 재시도(firm_key 만 제외).
-      return fetchFindings(FIELDS_NO_FIRM_KEY).then(function (r2) {
-        if (r2.ok) {
-          loadedResp = r2;
-          loadedFieldsUsed = FIELDS_NO_FIRM_KEY;
-          return r2.json();
-        }
-        // 013·005(finding_text_ko/translation_method) 둘 다 미적용 라이브 DB 대비
-        // 최종 legacy FIELDS 재시도.
-        return fetchFindings(LEGACY_FIELDS).then(function (r3) {
-          if (!r3.ok) throw new Error("findings fetch " + r3.status);
-          loadedResp = r3;
-          loadedFieldsUsed = LEGACY_FIELDS;
-          return r3.json();
-        });
-      });
-    })
+  // ★초기화 순서: URL 읽기 → 첫 fetch → 파셋 골격 → 컨트롤 동기화 → 배선 → 확정 렌더.
+  // 종전엔 fetch 가 맨 앞이었지만(로드분 위에서 필터링했으므로 URL 상태가 요청과 무관),
+  // 이제 state 가 곧 요청 파라미터라 URL 을 **먼저** 읽어야 첫 요청이 옳게 나간다.
+  // 파셋 골격은 반대로 서버 응답(LAST.facets)이 있어야 만들 수 있어 fetch 뒤로 간다 —
+  // 그래서 readStateFromUrl() 은 파셋 값 검증 의존을 끊었다(해당 함수 주석 참조).
+  // 컨트롤 동기화(select.value 대입)는 반드시 골격 **뒤**여야 한다 — <option> 이 없는
+  // 값을 대입하면 조용히 무시된다(종전에도 같은 순서였다).
+  readStateFromUrl();
+  currentPage = readPageFromUrl();
+  navToken += 1;
+  var initToken = navToken;
+  fetchSearch(currentPage)
     .then(function (data) {
-      if (!Array.isArray(data)) throw new Error("findings shape");
-      ROWS = data;
-      LOADED_FIELDS = loadedFieldsUsed;
-      LAST_BATCH_SIZE = data.length;
-      var total = parseServerTotal(loadedResp);
-      if (total !== null) SERVER_TOTAL = total;
+      if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
+      LAST = data;
       buildFacetSkeleton();
-      // [FIND-1 M10c] URL→state 복원은 facet 값 목록(collectFacetValues)이 필요해
-      // buildFacetSkeleton() 다음, 첫 render() 이전에 수행한다.
-      readStateFromUrl();
       syncControlsFromState();
       wire();
       rowsReady = true;
-      // [PR-0 딥링크] goToPage(초기 페이지) 는 maybeFinishInit() 이 상황에 맞게 호출한다
-      // (found=문서 카드 단독 렌더, notfound/일반=기존과 동일한 페이지 목록 렌더 — ?page=
-      // 초기 1회 복원은 그 안에서 readPageFromUrl() 로 그대로 수행된다).
+      // [PR-0 딥링크] 최종 렌더는 maybeFinishInit() 이 상황에 맞게 부른다(found=문서 카드
+      // 단독 렌더, notfound/일반=목록 렌더 — 첫 응답이 이미 LAST 에 있어 재요청 없음).
       maybeFinishInit();
     })
     .catch(function () {

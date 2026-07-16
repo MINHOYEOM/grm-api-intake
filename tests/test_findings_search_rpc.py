@@ -1,0 +1,314 @@
+#!/usr/bin/env python3
+"""FIND-1 026(026_findings_search.sql) 서버 canonical search 마이그레이션 tests.
+
+Offline source-text checks only -- no network, no real Postgres connection.
+Mirrors the style of test_findings_similar_lexical.py (018/021/022 supersede
+케이스)의 정본 패턴을 따른다: comment 를 제거한 code 위에서 문자열/구조 계약을
+고정하고, 필요하면 함수 정의를 부분 슬라이스해 스코프를 좁힌다.
+
+026 은 025 §⑤ 이월 항목(검색/필터/정렬/페이지네이션/파셋의 서버 정본화)의 이행이다.
+파일 자체 헤더 주석("★security invoker", "★검색 semantics", "정렬 결정론", "한글 정렬")
+이 이 파일이 고정하는 계약의 "왜"를 이미 상세히 서술하므로, 각 테스트는 그 이유를
+요약한 한국어 독스트링만 붙인다.
+
+이 파일이 고정하는 불가침 계약:
+  ①findings_search/findings_document 모두 security invoker + search_path 고정
+    -- definer 로 뒤집히면 RLS 우회, 6중복 게이트 부활(파일 헤더 "★security invoker").
+  ②함수 본문이 공개 게이트 술어(scope_status/finding_text_ko<>'')를 복제하지 않음
+    -- RLS(010)가 유일한 게이트여야 한다.
+  ③검색은 ILIKE 부분일치, FTS 미사용 -- `무균` 이 `무균실`/`무균의` 를 놓치는 조용한
+    검색 축소 방지(파일 헤더 "★검색 semantics").
+  ④LIKE 와일드카드(%·_·\\) 이스케이프 -- indexOf 리터럴 취급과 semantics 일치.
+  ⑤검색 blob 컬럼 14종 고정 -- "무엇이 검색되는가"를 조용히 넓히거나 좁히지 않는다.
+  ⑥정렬 결정론(d.tie 최종 타이브레이크) + 허용 정렬 3종 고정 -- 022 fp16 동률 결함 재발 방지.
+  ⑦firm_asc 에 ko-KR-x-icu collate -- DB 기본 collate(en_US.UTF-8)와 클라이언트
+    localeCompare 불일치 방지.
+  ⑧입력 클램프(p_page/p_docs_per_page/p_sort) -- 클라이언트 불신 원칙.
+  ⑨grant execute to anon, authenticated 양쪽 함수 -- 미부여 시 사이트 백지.
+  ⑩nested-loop 회피 형태(any (array(select …)) -- any (select array_agg(…)) 는
+    타입 에러(dry-run 실측)이자 O(n×m) planner 회피 실패.
+  ⑪searched CTE select * 금지 -- 초안이 select *(width=753)로 temp 스필(9,773) 실측.
+  ⑫파일 번호 연속성(001~026, 결번 없음).
+"""
+
+from __future__ import annotations
+
+import re
+import unittest
+from pathlib import Path
+
+
+_MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
+_SEARCH_PATH = _MIGRATIONS_DIR / "026_findings_search.sql"
+
+_FN_SEARCH_SIG = "create or replace function public.findings_search(\n"
+_FN_DOCUMENT_SIG = "create or replace function public.findings_document(p_finding_id text)\n"
+
+# ⑤검색 blob 이 반드시 담아야 하는 컬럼 14종(정본 -- 조용한 축소/확대 방지).
+_EXPECTED_BLOB_COLUMNS = {
+    "finding_text_ko", "finding_text", "firm_name", "category_code",
+    "category_label_ko", "document_id", "agency", "source", "published_date",
+    "evidence_level", "review_status", "translation_method", "cfr_refs", "mfds_refs",
+}
+
+# ⑥허용 정렬 3종(정본).
+_EXPECTED_SORTS = {"date_desc", "date_asc", "firm_asc"}
+
+
+def _strip_sql_comments(sql: str) -> str:
+    kept = [line for line in sql.splitlines() if not line.strip().startswith("--")]
+    return "\n".join(kept)
+
+
+def _slice_function(code: str, signature: str) -> str:
+    """comment 제거된 code 에서 signature 로 시작하는 함수 정의 전체(닫는 $$; 까지)를 뽑는다."""
+    start = code.index(signature)
+    end = code.index("$$;", start) + len("$$;")
+    return code[start:end]
+
+
+def _slice_between(text: str, start_marker: str, end_marker: str) -> str:
+    """text 안에서 start_marker 부터(포함) 그 뒤 첫 end_marker 직전까지를 뽑는다."""
+    start = text.index(start_marker)
+    return text[start: text.index(end_marker, start)]
+
+
+class SearchMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
+        self.sql = _SEARCH_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _SEARCH_PATH.read_bytes())
+
+    def test_has_korean_block_comments(self) -> None:
+        self.assertGreaterEqual(self.sql.count("--"), 20)
+
+    def test_defines_both_functions(self) -> None:
+        self.assertIn("create or replace function public.findings_search(", self.code)
+        self.assertIn("create or replace function public.findings_document(", self.code)
+
+
+class SecurityInvokerContractTest(unittest.TestCase):
+    """①공개 게이트의 단일 진실을 RLS(010)로 되돌리는 이 파일의 핵심 이탈 결정 --
+    security definer 로 조용히 뒤집히면 RLS 가 우회돼 6중복 게이트가 되살아난다
+    (파일 헤더 "★security invoker" 근거). search_path 고정은 invoker 에서도 유지."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        self.fn_search = _slice_function(self.code, _FN_SEARCH_SIG)
+        self.fn_document = _slice_function(self.code, _FN_DOCUMENT_SIG)
+
+    def test_both_functions_are_security_invoker(self) -> None:
+        for fn in (self.fn_search, self.fn_document):
+            self.assertIn("security invoker", fn)
+            self.assertNotIn("security definer", fn)
+
+    def test_both_functions_pin_search_path(self) -> None:
+        for fn in (self.fn_search, self.fn_document):
+            self.assertIn("set search_path = public", fn)
+
+
+class PublicGateNotDuplicatedTest(unittest.TestCase):
+    """②함수 본문이 공개 게이트 술어를 복제하지 않는다 -- RLS(010)가 유일한 게이트다.
+    ★주의: 파일 헤더/하단 검증 주석에는 이 문자열이 설명으로 등장하므로, comment 를
+    제거한 code 위에서 검사해야 한다(주석 포함 원문에는 존재함을 별도로 확인)."""
+
+    def setUp(self) -> None:
+        self.sql = _SEARCH_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+        self.fn_search = _slice_function(self.code, _FN_SEARCH_SIG)
+        self.fn_document = _slice_function(self.code, _FN_DOCUMENT_SIG)
+
+    def test_gate_predicates_documented_in_raw_comments(self) -> None:
+        """이 테스트 자체가 comment-strip 이 필요한 이유의 증거 -- 원문(주석 포함)에는
+        게이트 문자열이 설명으로 실제 존재한다."""
+        self.assertIn("scope_status = 'ok'", self.sql)
+        self.assertIn("finding_text_ko <> ''", self.sql)
+
+    def test_gate_predicates_absent_from_function_bodies(self) -> None:
+        for fn in (self.fn_search, self.fn_document):
+            self.assertNotIn("scope_status", fn)
+            self.assertNotIn("finding_text_ko <> ''", fn)
+            self.assertNotIn("finding_language = 'KO'", fn)
+
+
+class IlikeNotFtsTest(unittest.TestCase):
+    """③검색 semantics = ILIKE 부분일치 유지, FTS 미사용 -- D1: FTS 로 바꾸면 한국어
+    `무균` 질의가 `무균실`·`무균의` 를 놓쳐 조용한 검색 축소가 된다(018 이미 실측)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+
+    def test_uses_ilike(self) -> None:
+        self.assertIn("ilike", self.code)
+
+    def test_does_not_use_full_text_search_functions(self) -> None:
+        for forbidden in ("to_tsvector", "websearch_to_tsquery", "to_tsquery"):
+            self.assertNotIn(forbidden, self.code, f"026 must not use FTS function: {forbidden!r}")
+
+
+class LikeWildcardEscapeTest(unittest.TestCase):
+    """④LIKE 와일드카드(%·_·\\) 이스케이프 -- 없으면 사용자가 `%` 를 입력했을 때
+    와일드카드로 동작해 클라이언트 indexOf(리터럴 취급)와 semantics 가 갈린다."""
+
+    def test_replace_chain_escapes_backslash_percent_underscore_in_order(self) -> None:
+        sql = _SEARCH_PATH.read_text(encoding="utf-8")
+        # 백슬래시를 먼저 치환해야 뒤에 삽입한 이스케이프 문자를 다시 이스케이프하지
+        # 않는다(파일 주석 명시) -- 순서까지 포함해 정확한 replace 체인을 고정한다.
+        self.assertIn(
+            "replace(replace(replace(coalesce(btrim(p_q), ''), '\\', '\\\\'), '%', '\\%'), "
+            "'_', '\\_')",
+            sql,
+        )
+
+
+class SearchBlobColumnsTest(unittest.TestCase):
+    """⑤검색 blob 컬럼 목록 고정 -- "무엇이 검색되는가"를 문서화된 사실로 고정해
+    조용한 축소/확대를 막는다(정본 = 14 컬럼)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        self.blob_block = _slice_between(
+            code,
+            "coalesce(f.finding_text_ko, '')",
+            ") ilike '%' || p.q_esc || '%'",
+        )
+
+    def test_blob_columns_are_exactly_the_declared_fourteen(self) -> None:
+        found = set(re.findall(r"coalesce\(f\.(\w+)(?:::text)?, ''\)", self.blob_block))
+        self.assertEqual(found, _EXPECTED_BLOB_COLUMNS)
+
+    def test_blob_column_count_is_fourteen(self) -> None:
+        self.assertEqual(len(_EXPECTED_BLOB_COLUMNS), 14)
+
+
+class SortDeterminismTest(unittest.TestCase):
+    """⑥정렬 결정론 -- 전 정렬 공통 최종 타이브레이크(d.tie asc)가 있어야 022 가 데인
+    결함(fp16 동률 -> 평가 29슬롯 미판정)이 재발하지 않는다. 허용 정렬은 정확히
+    date_desc/date_asc/firm_asc 3종이어야 한다(클램프 위반 시 조용히 무시되면 안 됨)."""
+
+    def setUp(self) -> None:
+        self.sql = _SEARCH_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_ordered_cte_has_final_tiebreak(self) -> None:
+        ordered_block = _slice_between(self.code, "ordered as (", "tot as (")
+        self.assertIn("d.tie asc", ordered_block)
+
+    def test_allowed_sorts_are_exactly_the_declared_three(self) -> None:
+        match = re.search(r"p_sort in \(([^)]*)\)", self.sql)
+        self.assertIsNotNone(match, "p_sort allowlist not found")
+        allowed = set(re.findall(r"'([a-z_]+)'", match.group(1)))
+        self.assertEqual(allowed, _EXPECTED_SORTS)
+
+    def test_unrecognized_sort_falls_back_to_date_desc(self) -> None:
+        self.assertIn("then p_sort else 'date_desc' end", self.code)
+
+
+class KoreanCollationTest(unittest.TestCase):
+    """⑦firm_asc 경로는 ko-KR-x-icu collate 를 써야 한다 -- DB 기본 collate 는
+    en_US.UTF-8 이라 없으면 한글 업체명 순서가 클라이언트 localeCompare 와 갈린다."""
+
+    def test_firm_asc_order_key_uses_icu_collation(self) -> None:
+        code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        ordered_block = _slice_between(code, "ordered as (", "tot as (")
+        self.assertIn(
+            '(case when p.sort = \'firm_asc\' then d.firm end) collate "ko-KR-x-icu" asc',
+            ordered_block,
+        )
+
+
+class InputClampTest(unittest.TestCase):
+    """⑧입력 클램프 -- 클라이언트를 신뢰하지 않는다: 페이지 하한 1, 페이지당 문서 수
+    상한 100(하한 1), 정렬은 허용목록 case(위 SortDeterminismTest 와 상호보완)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+
+    def test_page_is_clamped_to_at_least_one(self) -> None:
+        self.assertIn("greatest(coalesce(p_page, 1), 1)", self.code)
+
+    def test_docs_per_page_is_clamped_between_one_and_hundred(self) -> None:
+        self.assertIn("least(greatest(coalesce(p_docs_per_page, 24), 1), 100)", self.code)
+
+    def test_sort_has_case_based_allowlist(self) -> None:
+        self.assertIn("case when p_sort in (", self.code)
+
+
+class GrantExecuteTest(unittest.TestCase):
+    """⑨grant execute to anon, authenticated 양쪽 함수 -- 미부여 시 사이트 전체 백지
+    (invoker 라 execute 권한만으로 열리지 않고, RLS(010)+findings select(003)이 실제
+    게이트지만 execute 자체가 없으면 그 앞 단계에서 막힌다)."""
+
+    def setUp(self) -> None:
+        self.sql = _SEARCH_PATH.read_text(encoding="utf-8")
+
+    def test_findings_search_granted_to_anon_and_authenticated(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_search(text, text, text, text, text, "
+            "text, text, text, int, int) to anon, authenticated;",
+            self.sql,
+        )
+
+    def test_findings_document_granted_to_anon_and_authenticated(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_document(text) to anon, authenticated;",
+            self.sql,
+        )
+
+
+class NestedLoopAvoidanceTest(unittest.TestCase):
+    """⑩nested-loop 회피 형태 -- any (array(select …)) 를 써야 한다. any (select
+    array_agg(…)) 는 서브쿼리 형태로 해석돼 text = text[] 타입 에러가 난다(dry-run 이
+    실제로 잡은 버그). 이 형태는 동시에 planner 가 nested loop O(n×m) 로 푸는 것을 막는다
+    (실측 Rows Removed by Join Filter: 58,848)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+
+    def test_uses_any_array_select_form(self) -> None:
+        self.assertIn(
+            "any (array(select pd.raw_signal_id from page_docs pd))", self.code
+        )
+
+    def test_does_not_use_any_select_array_agg_form(self) -> None:
+        self.assertNotIn("any (select array_agg", self.code)
+        self.assertNotIn("any(select array_agg", self.code)
+
+
+class NoSelectStarInSearchedCteTest(unittest.TestCase):
+    """⑪searched CTE 는 컬럼을 명시 투영해야 한다(select * 금지) -- 초안이 select
+    *(width=753)라 CTE 가 temp 파일로 스필했다(실측 temp read=9,773 -> 수정 후 0)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
+        self.searched_block = _slice_between(code, "searched as (", "filtered as (")
+
+    def test_searched_cte_does_not_select_star(self) -> None:
+        self.assertNotIn("select *", self.searched_block)
+
+    def test_searched_cte_explicitly_projects_columns(self) -> None:
+        self.assertIn("f.finding_id, f.raw_signal_id, f.source, f.agency", self.searched_block)
+
+
+class MigrationNumberSequenceTest(unittest.TestCase):
+    """⑫026 이 추가되며 025 가 더 이상 마지막이 아니게 됐다 -- 마이그레이션 번호가
+    001~026 까지 결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+
+    def test_026_file_exists(self) -> None:
+        self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_026(self) -> None:
+        numbers = sorted(
+            int(m.group(1))
+            for p in _MIGRATIONS_DIR.glob("*.sql")
+            if (m := re.match(r"^(\d{3})_", p.name))
+        )
+        self.assertEqual(numbers, list(range(1, 27)))
+
+
+if __name__ == "__main__":  # pragma: no cover
+    unittest.main()

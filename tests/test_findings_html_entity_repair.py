@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""FIND-1 HTML 엔티티 오염 정정(028_findings_html_entity_repair.sql) tests.
+"""FIND-1 HTML 엔티티 오염 정정(029_findings_html_entity_repair.sql) tests.
 
 무네트워크·무 Postgres — 013/010/007 관례와 동일하게 마이그레이션 SQL 을 **텍스트 계약**
 으로 고정하고, 치환 순서 의미론은 파이썬 시뮬레이션으로 `html.unescape`(수집기 정본)와의
@@ -18,9 +18,9 @@ import unittest
 from pathlib import Path
 
 _MIGRATION_PATH = (Path(__file__).resolve().parent.parent / "web" / "migrations"
-                   / "028_findings_html_entity_repair.sql")
+                   / "029_findings_html_entity_repair.sql")
 
-# 028 (A) grm_html_unescape 의 중첩 replace 순서를 그대로 재현한 시뮬레이터.
+# 029 (A) grm_html_unescape 의 중첩 replace 순서를 그대로 재현한 시뮬레이터.
 _SQL_REPLACEMENTS = (
     ("&#039;", "'"),
     ("&#39;", "'"),

@@ -2101,6 +2101,178 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (existing[v]) return;", fn)
 
+    # ── [025] "부분 로드가 전역처럼 행동" 표시 오류 수리(2026-07-16) ──────────────────────
+    # 실측: 화면 FDA 483 (910) vs DB 진실 8,078(11.3%). MFDS(50)·WL(40)은 최신순 정렬
+    # 상단이라 100% 로드분에 잡혀 비율까지 왜곡됐다(MFDS 를 코퍼스의 ~5%로 오인 — 실제
+    # 0.6%). 계약: ①무필터·무검색 랜딩=findings_stats RPC 전역 truth ②필터·검색 활성=
+    # 숫자 숨김(라벨만) ③결과 영역 상시 로딩 문구 ④오래된순/업체명순은 전량 로드 전
+    # 비활성화(선택 b) ⑤by_review_status(025 신규) 안전 폴백.
+    def test_facet_counts_use_rpc_truth_when_unfiltered_not_rows(self):
+        """[§요구1] computeFacetCounts() 는 무필터·무검색 랜딩에서 findings_stats RPC
+        전역 truth(rpcFacetCounts)를 곧장 반환하고 ROWS 를 순회하지 않는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function computeFacetCounts(key2)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", fn)
+        self.assertIn("if (!filtersActive) {", fn)
+        self.assertIn("var rpcCounts = rpcFacetCounts(key2);", fn)
+        self.assertIn("if (rpcCounts) return rpcCounts;", fn)
+        # 무필터 RPC 조기 반환이 ROWS.forEach 보다 먼저 나타나야 한다(구조적 보장 — 무필터
+        # +RPC 확보 시 ROWS 순회 없이 곧장 반환).
+        self.assertLess(fn.index("if (rpcCounts) return rpcCounts;"), fn.index("ROWS.forEach"))
+        self.assertIn("function rpcFacetCounts(key2)", js_src)
+        rpc_fn = js_src[js_src.index("function rpcFacetCounts(key2)"):]
+        rpc_fn = rpc_fn[:rpc_fn.index("\n  }\n") + 4]
+        for mapping in (
+            'if (key2 === "source") return RPC_BY_SOURCE;',
+            'if (key2 === "evidence_level") return RPC_BY_EVIDENCE;',
+            'if (key2 === "review_status") return RPC_BY_REVIEW_STATUS;',
+            'if (key2 === "month") return RPC_BY_MONTH;',
+            'if (key2 === "category_code") return RPC_BY_CATEGORY;',
+        ):
+            self.assertIn(mapping, rpc_fn)
+
+    def test_facet_option_counts_hidden_when_filters_or_search_active(self):
+        """[§요구2] 필터·검색이 하나라도 활성이면 셀렉트 옵션은 라벨만 남고 "(N)" 건수를
+        표시하지 않는다 — ROWS(로드분) 기준 부분집합 건수를 사실값처럼 보여주지 않는다는
+        원칙("로드분 기준" 툴팁으로 얼버무리는 것도 금지)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function refreshFacetUI()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", fn)
+        self.assertIn(
+            'opt.textContent = filtersActive ? opt.dataset.label : (opt.dataset.label + " (" + count + ")");',
+            fn,
+        )
+
+    def test_month_options_populated_from_rpc_not_rows(self):
+        """[§요구1] 발행월 옵션은 findings_stats RPC by_month 전역 값(RPC_MONTH_VALUES)을
+        우선한다 — 최신순 로드+시간축 특성상 오래된 월이 첫 청크(ROWS 최초 1,000행) 밖에
+        있어 옵션 자체가 누락되는 문제를 없앤다. RPC 미확보면 조용히 ROWS 기준 폴백."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function collectFacetValues(key2)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('if (key2 === "month" && RPC_MONTH_VALUES) return RPC_MONTH_VALUES.slice();', fn)
+        self.assertIn("if (!ROWS) return [];", fn)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (Array.isArray(data.by_month)) {", cov_fn)
+        self.assertIn("RPC_BY_MONTH = monthSums;", cov_fn)
+        self.assertIn("RPC_MONTH_VALUES = Object.keys(monthSums).sort().reverse();", cov_fn)
+
+    def test_dash_category_month_firm_use_rpc_truth_and_hide_numbers_when_filtered(self):
+        """[§요구1+2] renderDash() 는 무필터일 때 카테고리·월별·업체 분포도 RPC 전역
+        truth(by_agency_category/by_month/top_firms)로 교체하고, 필터·검색이 하나라도
+        활성이면 dashHideNumbers 클로저 플래그를 세워 하위 렌더 함수들이 숫자만 지우게
+        한다(라벨·바 구조는 유지, 기존 단일 인자 시그니처는 불변 — 다수 소스마커 테스트가
+        정확히 고정하고 있어 파라미터를 추가하지 않았다)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var dashHideNumbers = false;", js_src)
+        dash_fn = js_src[js_src.index("function renderDash(matched)"):]
+        dash_fn = dash_fn[:dash_fn.index("\n  }\n") + 4]
+        self.assertIn("dashHideNumbers = filtersActive;", dash_fn)
+        self.assertIn("if (RPC_BY_CATEGORY !== null) {", dash_fn)
+        self.assertIn("if (RPC_BY_MONTH !== null) {", dash_fn)
+        self.assertIn("if (RPC_TOP_FIRMS !== null) {", dash_fn)
+        # 하위 렌더 함수 시그니처는 그대로(단일 인자).
+        for sig in ("function renderDashStats(stats)", "function renderDashCategories(stats)",
+                    "function renderDashMonths(stats)", "function renderDashFirms(stats)"):
+            self.assertIn(sig, js_src)
+        stats_fn = js_src[js_src.index("function renderDashStats(stats)"):]
+        stats_fn = stats_fn[:stats_fn.index("\n  }\n") + 4]
+        self.assertIn("if (dashHideNumbers) {", stats_fn)
+        cat_row_fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        cat_row_fn = cat_row_fn[:cat_row_fn.index("\n  }\n") + 4]
+        self.assertIn("dashHideNumbers", cat_row_fn)
+        months_fn = js_src[js_src.index("function renderDashMonths(stats)"):]
+        months_fn = months_fn[:months_fn.index("\n  }\n") + 4]
+        self.assertIn("dashHideNumbers", months_fn)
+        firms_fn = js_src[js_src.index("function renderDashFirms(stats)"):]
+        firms_fn = firms_fn[:firms_fn.index("\n  }\n") + 4]
+        self.assertIn("dashHideNumbers", firms_fn)
+
+    def test_loadmore_notice_always_visible_until_server_exhausted(self):
+        """[§요구3] 결과 영역에 항상 보이는 문구(툴팁 아님) — 서버 obs 청크가 아직
+        소진되지 않았으면 render() 마다 노출하고, isServerExhausted() 가 참이 되면
+        사라진다. 딥링크·유사검색 단독 렌더 모드는 목록 페이지네이션과 무관하므로
+        hidePager() 와 동형으로 숨긴다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("function ensureLoadMoreNotice()", js_src)
+        self.assertIn(
+            'loadMoreNoticeEl.textContent = "데이터를 추가로 불러오는 동안 결과가 갱신됩니다.";',
+            js_src,
+        )
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("ensureLoadMoreNotice().hidden = !moreMayExist;", render_fn)
+        deeplink_fn = js_src[js_src.index("function renderDeepLinkDoc()"):]
+        deeplink_fn = deeplink_fn[:deeplink_fn.index("var finalized = false;")]
+        self.assertIn("ensureLoadMoreNotice().hidden = true;", deeplink_fn)
+        similar_fn = js_src[js_src.index("function renderSimilarResults(items)"):]
+        similar_fn = similar_fn[:similar_fn.index("\n  }\n") + 4]
+        self.assertIn("ensureLoadMoreNotice().hidden = true;", similar_fn)
+
+    def test_sort_options_disabled_until_server_exhausted(self):
+        """[§요구4 선택(b)] 오래된순·업체명순은 서버 obs 청크가 소진되기(전량 로드) 전에는
+        전역 정렬을 보장할 수 없으므로 비활성화하고 이유를 title 로 남긴다. 전량 선로딩
+        후 정렬(선택 a)은 사용자가 그 정렬을 아예 고르지 않는 흔한 경로에서까지 코퍼스
+        전체(8천+행)를 강제로 끌어와야 해 채택하지 않았다(updateSortAvailability() 주석
+        참조) — 서버가 소진되면 자동으로 재활성화된다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function updateSortAvailability()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("var exhausted = isServerExhausted();", fn)
+        self.assertIn('if (opt.value === "date_asc" || opt.value === "firm_asc") {', fn)
+        self.assertIn("opt.disabled = !exhausted;", fn)
+        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
+        self.assertIn("updateSortAvailability();", render_fn)
+
+    def test_review_status_facet_uses_new_rpc_key_with_safe_fallback(self):
+        """[§요구5] by_review_status 는 025 신규 키다 — 아직 반환하지 않는 라이브 DB(025
+        미적용)에서도 fetchCoverageNote() 는 죽지 않고 RPC_BY_REVIEW_STATUS 를 null 로
+        남겨(Array.isArray 가드), rpcFacetCounts()/renderDash() 가 자연히 기존 ROWS 기준
+        폴백으로 떨어진다 — 페이지는 025 적용 여부와 무관하게 항상 정상 동작해야 한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var RPC_BY_REVIEW_STATUS = null;", js_src)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
+        self.assertIn("if (Array.isArray(data.by_review_status)) {", cov_fn)
+        self.assertIn("RPC_BY_REVIEW_STATUS = statusSums;", cov_fn)
+        dash_fn = js_src[js_src.index("function renderDash(matched)"):]
+        dash_fn = dash_fn[:dash_fn.index("\n  }\n") + 4]
+        self.assertIn("if (RPC_BY_REVIEW_STATUS !== null) {", dash_fn)
+        self.assertIn("stats.needsReview = RPC_BY_REVIEW_STATUS.needs_review || 0;", dash_fn)
+
+    def test_rpc_stats_arrival_refresh_skips_standalone_render_modes(self):
+        """[§순서 무관] findings_stats RPC 는 메인 목록 fetch 와 독립적으로 fetch 돼
+        도착 순서가 뒤바뀔 수 있다 — refreshAfterRpcStatsArrival() 은 ROWS 가 아직 없으면
+        아무 것도 하지 않고(최초 render()/buildFacetSkeleton() 이 이미 채워진 RPC_* 값을
+        자연히 반영), 딥링크 단독 문서 렌더·유사검색 모드에서는 render() 를 호출하지
+        않는다(단독 렌더 모드 불가침)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function refreshAfterRpcStatsArrival()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (!rowsReady) return;", fn)
+        self.assertIn("buildFacetSkeleton();", fn)
+        self.assertIn('if (deepLinkPending || deepLinkStatus === "found" || similarMode) return;', fn)
+        self.assertIn("render();", fn)
+        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
+        cov_fn = cov_fn[:cov_fn.index("\n  }\n") + 4]
+        self.assertIn("refreshAfterRpcStatsArrival();", cov_fn)
+
+    def test_deeplink_s1_hidepager_contracts_unchanged_by_025(self):
+        """[§7 회귀] 025 파셋 전역 truth 수리가 PR-0 딥링크(exitDeepLinkMode 3회 호출)·
+        S1 토글(exitSimilarMode 2회 호출)·hidePager(pnav 포함 은닉) 계약을 훼손하지
+        않았는지 재확인한다(기존 계약과 동일 수치 — 회귀 0)."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3)
+        self.assertEqual(wire_fn.count("exitSimilarMode();"), 2)
+        hidepager_fn = js_src[js_src.index("function hidePager() {"):]
+        hidepager_fn = hidepager_fn[:hidepager_fn.index("\n  }\n") + 4]
+        self.assertIn("if (pagerTopEl) pagerTopEl.hidden = true;", hidepager_fn)
+        self.assertIn("if (pagerBottomEl) pagerBottomEl.hidden = true;", hidepager_fn)
+        self.assertIn("if (pnavEl) pnavEl.hidden = true;", hidepager_fn)
+
     def test_doc_firm_link_affordance_visible_by_default(self):
         """[어포던스 수정] 문서 카드 업체명 링크(.fnd-doc-firm a)는 기본 상태에서도
         일반 텍스트와 구분되는 시각 신호(밑줄+화살표)를 가져야 한다 — hover 시에만

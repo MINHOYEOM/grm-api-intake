@@ -93,8 +93,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-embed.txt
+          # [F-05 완결] 전이 의존성까지 sha256 고정된 lock 에서만 설치한다.
+          # --require-hashes 는 **한 invocation 안의 모든 요구사항**이 해시를 가져야 하므로,
+          # requirements.txt 를 따로 설치하면 그 경로가 hash 미검증으로 남는다 -> requests 를
+          # requirements-embed.txt(소스 spec)에 편입해 lock 하나로만 설치한다.
+          # lock 재생성은 grm-findings-embed-lock.yml(dispatch) -- 러너가 같아야 정확하다.
+          pip install --require-hashes -r requirements-embed.lock
 
       # 읽기(findings·raw_signals) + upsert(finding_embeddings 만) -- git add/commit/push
       # 없음. embedding_config 는 절대 건드리지 않는다(활성 전환은 컨트롤타워 별도 수행).

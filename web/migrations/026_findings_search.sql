@@ -109,14 +109,22 @@ with p as (
 ),
 -- 검색만 적용한 공통 베이스. 필터는 아직 걸지 않는다 — 파셋이 "자기 축만 제외하고 나머지
 -- 필터 적용"(표준 파세팅)을 하려면 검색이 공통 베이스여야 하기 때문이다.
--- ★select * 금지: 초안에서 select *(width=753)로 두었더니 CTE 가 temp 파일로 스필했다
---   (실측 temp read=9,773). 필요한 컬럼만 투영한다.
+--
+-- ★★좁은 작업집합이 핵심이다. 이 CTE 는 **본문 텍스트(finding_text/finding_text_ko)를
+--   싣지 않는다** — 필터·파셋·문서묶음에 필요한 식별/분류 컬럼만 투영한다. 본문은 페이지의
+--   24문서분만 아래 page_rows 에서 PK 로 되읽는다.
+--   근거(라이브 실측): 본문을 이 CTE 에 실었더니 **무검색 랜딩**(= q='' 이라 8,168행 전량이
+--   통과하는 최악·최빈 경로)에서 CTE materialize 가 temp 파일로 스필해 **659ms**가 나왔다
+--   (temp read=3,714 written=1,238). 검색 시에는 2,454행만 남아 메모리에 들어가서 이 결함이
+--   숨어 있었다 — 즉 "검색만 재보면 통과하는" 함정이었다. 좁힌 뒤 **127.7ms·스필 0**.
+--   교훈: 넓은 텍스트를 CTE 로 물고 다니지 말고, 페이지분만 늦게 가져와라.
+-- ★blob 에 쓰이는 컬럼(category_label_ko·document_id·translation_method·cfr_refs·
+--   mfds_refs)은 WHERE 절에서 f 를 직접 참조하므로 select 목록에 없어도 된다.
 -- ★공개 게이트를 여기 쓰지 않는다 — security invoker 라 RLS(010)가 자동 적용된다.
 searched as (
   select
-    f.finding_id, f.raw_signal_id, f.source, f.agency, f.document_id, f.published_date,
-    f.firm_name, f.category_code, f.category_label_ko, f.finding_text, f.finding_text_ko,
-    f.evidence_level, f.review_status, f.evidence_url, f.cfr_refs, f.mfds_refs,
+    f.finding_id, f.raw_signal_id, f.source, f.agency, f.published_date, f.firm_name,
+    f.category_code, f.evidence_level, f.review_status,
     left(f.published_date, 7) as month
   from public.findings f, p
   where p.q = ''
@@ -190,19 +198,26 @@ page_docs as (
   where o.rn > (p.page - 1) * p.per
     and o.rn <= p.page * p.per
 ),
--- ★초안 결함 수정: filtered 를 page_docs 에 직접 join 하면 CTE 에 인덱스가 없어 planner
---   가 nested loop 로 풀어 O(n×m) 가 된다(실측 Rows Removed by Join Filter: 58,848).
---   페이지 문서 id 를 배열 하나로 접어 = any() 로 조회한다(24개 원소 대상 in-memory 비교).
---   ★array(select …) 생성자를 쓴다. any(select array_agg(…)) 로 쓰면 서브쿼리 형태로
---     해석돼 `text = text[]` 타입 에러가 난다(dry-run 이 잡은 실제 버그).
+-- 페이지에 실제로 나갈 행 = (매치된 지적) ∩ (이 페이지의 24문서). 여기서 **처음으로**
+-- 본문 텍스트를 findings 에서 PK 로 되읽는다 — 65행 안팎이라 Index Scan 이고, 넓은 텍스트가
+-- 앞선 CTE 들을 통과하지 않으므로 스필이 없다(실측 Index Scan using findings_pkey).
+-- ★findings 를 다시 읽으므로 RLS 가 한 번 더 적용된다 = 게이트 일관성이 공짜로 보장된다.
 page_rows as (
-  select f.*
-  from filtered f
-  where f.raw_signal_id = any (array(select pd.raw_signal_id from page_docs pd))
+  select
+    fl.rn,
+    f.finding_id, f.raw_signal_id, f.source, f.agency, f.document_id, f.published_date,
+    f.firm_name, f.category_code, f.category_label_ko, f.finding_text, f.finding_text_ko,
+    f.evidence_level, f.review_status, f.evidence_url, f.cfr_refs, f.mfds_refs
+  from (
+    select fi.finding_id, fi.raw_signal_id, pd.rn
+    from filtered fi
+    join page_docs pd on pd.raw_signal_id = fi.raw_signal_id
+  ) fl
+  join public.findings f on f.finding_id = fl.finding_id
 ),
 page_docs_full as (
   select
-    pd.rn,
+    pr.rn,
     pr.raw_signal_id,
     min(pr.firm_name)      as firm_name,
     min(pr.source)         as source,
@@ -234,8 +249,7 @@ page_docs_full as (
       ) order by pr.finding_id
     ) as findings
   from page_rows pr
-  join page_docs pd on pd.raw_signal_id = pr.raw_signal_id
-  group by pd.rn, pr.raw_signal_id
+  group by pr.rn, pr.raw_signal_id
 ),
 -- 파셋 = 표준 파세팅: 각 축은 **자기 자신을 뺀** 나머지 필터를 적용해 센다.
 -- 클라이언트 computeFacetCounts(row, exclude) 와 동일 의미다.

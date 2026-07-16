@@ -724,11 +724,23 @@ def _resolve_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
 
 
 def _write_report(path: str | None, report: dict[str, Any]) -> None:
+    """리포트를 **항상 로그(stdout)에 출력**하고, path 가 있으면 파일로도 남긴다.
+
+    ★왜 항상 로그인가: 종전에는 --output 이 있으면 파일로만 나가서 job 로그에 카운터가
+      전혀 안 보였다. 그래서 dry-run 의 to_embed=0 같은 핵심 사실을 사람이 "로그 정황 +
+      DB 상태"로 추론해야 했다(Codex 감사 지적). 리포트를 로그에 직접 찍으면 그 추론이
+      관찰로 바뀐다.
+
+    ★시크릿 안전성: 리포트는 카운터·메타뿐이며 자격증명을 담지 않는다. service_key 는
+      HTTP 헤더로만 쓰이고 리포트에 들어가는 경로가 없다. errors 도 자유 텍스트가 아니라
+      http_<status>·retry_exhausted 류 고정 문자열이다(응답 본문·URL 미포함).
+      이 계약은 test_findings_embed_service.py 가 키 허용목록으로 고정한다 — 새 키를
+      추가하면 테스트가 깨지므로, 시크릿이 리포트에 스며드는 변경은 CI 에서 막힌다.
+    """
     text = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2)
+    print(text)
     if path:
         Path(path).write_text(text + "\n", encoding="utf-8")
-    else:
-        print(text)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -794,14 +794,25 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(".fnd-tr-note", self.html)
         self.assertIn("summary", self.html)  # .fnd-orig summary{...} 셀렉터
 
-    def test_legacy_fetch_fallback_marker_present(self):
-        """005(finding_text_ko/translation_method) 미적용 라이브 DB 에서도 페이지가 깨지지
-        않도록, 비-200 응답 시 legacy FIELDS 로 재시도하는 폴백 로직이 배선돼 있어야 한다."""
+    # [서버 canonical search] LEGACY_FIELDS/fetchFindings(LEGACY_FIELDS) 005 폴백은
+    # 사라졌다 — findings_search RPC 가 반환 컬럼의 정본이라 005(finding_text_ko/
+    # translation_method) 미적용 방어는 이제 서버 함수 쪽 책임이다.
+
+    def test_server_canonical_search_is_sole_data_source(self):
+        """[서버 canonical search 계약 고정] findings.js 는 검색·필터·정렬·문서묶음·
+        페이지네이션·파셋·대시보드 집계를 전부 findings_search RPC 하나에 위임한다 —
+        /rest/v1/findings?select= 직접 조회(구버전 클라이언트측 부분 로드+집계
+        아키텍처)는 완전히 사라졌다. findings_document(딥링크)·findings_similar/
+        findings_similar_to(유사검색)·findings_stats(커버리지 노트)는 각각 독립된
+        보조 RPC 라 계속 호출되는 것이 정상이다(오탐 방지 — 그 이름들은 제외 대상이
+        아니다). 총수는 항상 exact 라 " 이상" 같은 불확실성 접미사가 존재할 이유가
+        없다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("LEGACY_FIELDS", js_src)
-        self.assertIn("finding_text_ko", js_src)
-        self.assertIn("translation_method", js_src)
-        self.assertIn("fetchFindings(LEGACY_FIELDS)", js_src)
+        self.assertIn('"/rest/v1/rpc/findings_search"', js_src)
+        self.assertNotIn("/rest/v1/findings?select=", js_src)
+        self.assertIn('"/rest/v1/rpc/findings_document"', js_src)
+        self.assertNotIn(' 이상"', js_src)
+        self.assertNotIn("filtersActive", js_src)
 
     # ── FIND-1 M7: 대시보드 밴드(정적 셸=hidden 빈 컨테이너, 로직=findings.js) ──────────
     def test_dash_shell_present_and_hidden_by_default(self):
@@ -823,21 +834,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('id="fnd-dash-month" class="fnd-dash-month"></div>', self.html)
         self.assertIn('id="fnd-dash-firm" class="fnd-dash-firm"></div>', self.html)
 
-    def test_dash_compute_and_click_wiring_markers_present(self):
-        """집계는 순수 함수(computeStats 등)로 분리돼 있고, 카테고리/월/업체 클릭이 기존
-        state·select 값을 재사용해 render() 를 재호출하는 경로인지 소스 마커로 확인."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        for fn in ("computeStats", "computeAgencyDist", "computeCategoryDist",
-                   "computeMonthTrend", "computeFirmTop"):
-            self.assertIn("function " + fn + "(", js_src)
-        # 클릭 = 기존 state 필드 재사용(별도 상태 저장소 없음) + 기존 render() 재호출.
-        self.assertIn("state.category_code = state.category_code === code", js_src)
-        self.assertIn("state.month = state.month === month", js_src)
-        self.assertIn("state.q = state.q === name", js_src)
-        self.assertIn('document.getElementById("fnd-f-category")', js_src)
-        self.assertIn('document.getElementById("fnd-f-month")', js_src)
-        self.assertIn("function renderDash(matched)", js_src)
-        self.assertIn("renderDash(matched)", js_src)  # render() 에서 호출
+    # [서버 canonical search] computeStats/computeAgencyDist/computeCategoryDist/
+    # computeMonthTrend/computeFirmTop 순수 집계 함수는 사라졌다 — 대시보드 집계는
+    # findings_search RPC 의 LAST.dash 가 정본이고 renderDash() 는 인자 없이 그 값만
+    # 소비한다(코드 자체가 클라이언트 집계를 하지 않으므로 이 클래스의 마커 테스트는
+    # 전제 소멸). 클릭 시 기존 state·select 재사용 계약은
+    # test_filter_and_sort_and_search_reset_to_page_one 이 이미 커버한다.
 
     def test_dash_category_top8_and_rest_row(self):
         """[그리드 균형 M2a] 카테고리 분포는 상위 8개만 개별 바로 그리고, 나머지는
@@ -895,9 +897,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('ev.key === " "', js_src)
 
     def test_dash_hides_when_zero_results(self):
-        """데이터 로드 실패/0건이면 밴드 자체를 숨긴다(빈 필터 결과에서도 동일)."""
+        """데이터 로드 실패/0건이면 밴드 자체를 숨긴다(빈 필터 결과에서도 동일) — [서버
+        canonical search] 판정 기준은 클라이언트가 센 matched.length 가 아니라 서버
+        exact 총수(LAST.totals.findings)다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("if (!matched.length) {\n      dashEl.hidden = true;", js_src)
+        self.assertIn("if (!LAST.totals.findings) {\n      dashEl.hidden = true;", js_src)
 
     def test_dash_no_innerhtml_data_injection(self):
         """대시보드 렌더 함수도 기존 계약(innerHTML 데이터 삽입 금지)을 따른다 — innerHTML
@@ -1106,12 +1110,14 @@ class WebFindingsRenderTest(unittest.TestCase):
         )
 
     def test_agency_state_and_url_matching_retained_without_chip_dom(self):
-        """[M14] 기관 칩 UI 는 사라졌지만 state.agency·URL param(agency)·매칭 로직은
-        findings.js 소스에 남아 있어야 한다 — URL 로 agency 가 들어오면 여전히 필터링된다."""
+        """[M14] 기관 칩 UI 는 사라졌지만 state.agency·URL param(agency)은 findings.js
+        소스에 남아 있어야 한다 — URL 로 agency 가 들어오면 여전히 필터링된다. [서버
+        canonical search] 매칭은 더 이상 클라이언트 row 비교(row.agency !== state.agency)
+        가 아니라 findings_search RPC 의 p_agency 인자로 서버에 위임된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn('agency: "", category_code: "", source: ""', js_src)
         self.assertIn('agency: "agency"', js_src)  # URL_KEYS
-        self.assertIn("state.agency && row.agency !== state.agency", js_src)
+        self.assertIn("p_agency: state.agency,", js_src)
         self.assertNotIn('"fnd-f-agency"', js_src)
 
     def test_select_facet_skeleton_and_refresh_wiring_present(self):
@@ -1129,31 +1135,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function refreshFacetUI()", js_src)
         self.assertIn("refreshFacetUI()", js_src[js_src.index("function render()"):], "render() 가 refreshFacetUI 호출 안 함")
 
-    def test_facet_counts_use_standard_faceting_exclude_self(self):
-        """칩/옵션 건수는 '검색어 + 그 파셋을 제외한 나머지 활성 필터' 기준(표준 파세팅) —
-        자기 자신 필터는 제외하고 계산해야 칩이 항상 의미 있는 건수를 보여준다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function computeFacetCounts(key2)", js_src)
-        self.assertIn("function rowMatchesFilters(row, exclude)", js_src)
-        self.assertIn("rowMatchesFilters(r, key2)", js_src)
-        # matches(row) 는 exclude 없이(=전체 적용) rowMatchesFilters 를 재사용(기존 계약 유지).
-        self.assertIn("return rowMatchesFilters(row, null)", js_src)
-
-    def test_search_haystack_includes_visible_facets_and_labels(self):
-        """사용자가 화면에서 보는 메타데이터도 검색 대상이다 — 기관/소스/증거/검토상태/
-        카테고리/월/refs 가 빠지면 '보이는데 검색 0건' UX 회귀가 난다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function searchTermsFor(row)", js_src)
-        self.assertIn("searchTermsFor(row)", js_src[js_src.index("function rowMatchesFilters"):])
-        for marker in (
-            "row.agency", "row.source", "row.published_date", "monthOf(row)",
-            "row.evidence_level", "EVIDENCE_LABEL[row.evidence_level]",
-            '"증거 " + row.evidence_level',
-            "row.review_status", "reviewStatusPlain", "STATUS_LABEL[row.review_status]",
-            "row.category_code", "row.category_label_ko", "cat.ko", "cat.en",
-            "arrayTerms(row.cfr_refs)", "arrayTerms(row.mfds_refs)",
-        ):
-            self.assertIn(marker, js_src)
+    # [서버 canonical search] computeFacetCounts()/rowMatchesFilters()/searchTermsFor() 는
+    # 사라졌다 — 표준 파세팅(자기 축 제외)·검색어 매칭·보이는 메타데이터 검색 대상 포함은
+    # 전부 findings_search RPC(SQL)가 수행한다. facetCounts() 는 서버가 이미 계산한
+    # LAST.facets 를 그대로 평탄화할 뿐 자체 매칭 로직이 없다(파일 상단 §서버 canonical
+    # search 주석 참조) — 이 두 테스트가 고정하던 클라이언트 함수 자체가 없다.
 
     def test_sort_select_present_with_three_options(self):
         self.assertIn('<select id="fnd-sort">', self.html)
@@ -1161,7 +1147,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('<option value="date_asc">오래된순</option>', self.html)
         self.assertIn('<option value="firm_asc">업체명순</option>', self.html)
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function sortRows(rows)", js_src)
+        # [서버 canonical search] sortRows() 클라이언트 정렬은 사라졌다 — 정렬은
+        # findings_search RPC 의 p_sort 인자로 서버가 수행하고, 3종 전부 항상 활성이다
+        # (옛 updateSortAvailability() 비활성화 회피책도 함께 제거됨).
+        self.assertNotIn("function sortRows(rows)", js_src)
+        self.assertIn('var SORT_VALUES = ["date_desc", "date_asc", "firm_asc"];', js_src)
         self.assertIn('sort: "date_desc"', js_src)
 
     def test_tools_sticky_below_nav_and_below_nav_z_index(self):
@@ -1218,11 +1208,19 @@ class WebFindingsRenderTest(unittest.TestCase):
                      'evidence_level: "ev"', 'review_status: "status"', 'month: "m"', 'sort: "sort"'):
             self.assertIn(pair, js_src)
 
-    def test_url_sync_ignores_unknown_values_silently(self):
-        """URL 의 알 수 없는/무효한 파셋 값·정렬 값은 조용히 무시한다(오류·크래시 없이)."""
+    def test_url_sync_sort_validated_but_filter_values_passed_through(self):
+        """[서버 canonical search] 종전엔 URL 의 알 수 없는 파셋 값을 collectFacetValues()
+        로 사후 검증해 조용히 무시했다 — 이제는 검증 없이 그대로 실어 서버(findings_search)
+        에 보낸다: 서버가 모르는 값이면 결과가 0건이 되고, 적용 필터 칩 행(#fnd-active)에
+        그 값이 그대로 노출돼 한 번의 클릭으로 해제할 수 있다(readStateFromUrl() 주석 —
+        "URL 이 말하는 필터와 화면이 어긋나면 안 된다"). sort 값만은 여전히 클라이언트에서
+        검증한다 — <select> 에 없는 값을 대입하면 조용히 무시되기 때문이다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("collectFacetValues(k).indexOf(raw) !== -1", js_src)
-        self.assertIn("SORT_VALUES.indexOf(sortRaw) !== -1", js_src)
+        fn = js_src[js_src.index("function readStateFromUrl()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("SORT_VALUES.indexOf(sortRaw) !== -1", fn)
+        self.assertNotIn("collectFacetValues", fn)
+        self.assertIn("if (raw !== null) state[k] = raw;", fn)
 
     def test_clear_all_filters_resets_sort_and_relies_on_render_for_url_clear(self):
         """[M15] #fnd-reset 버튼은 제거됐다 — "모두 지우기"는 clearAllFilters() 가 담당하며
@@ -1241,7 +1239,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("currentPage = 1", fn_block)
         self.assertIn("goToPage(1)", fn_block)
         # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
-        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 600]
+        # [서버 canonical search] fetchSearch().then() 콜백 안에 페이지 경계 방어 주석·분기가
+        # 추가돼 render() 호출까지의 거리가 길어졌다 — 600 으로는 부족해 900 으로 재상향.
+        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 900]
         self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
@@ -1409,11 +1409,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("showState(", catch_body)
         self.assertNotIn("coverageNoteEl.hidden = false", catch_body)
         # 메인 검색 fetch 호출 앞에 독립적으로 1회 호출된다(둘 다 showState("loading") 직후).
-        # [PR-0 딥링크] fetchCoverageNote() 와 fetchFindings(FIELDS) 사이에 딥링크 해석
-        # 킥오프가 끼어들어 더 이상 텍스트상 바로 인접하지 않는다 — 순서(전자가 먼저)만
+        # [PR-0 딥링크] fetchCoverageNote() 와 첫 fetchSearch(currentPage) 사이에 딥링크
+        # 해석 킥오프가 끼어들어 더 이상 텍스트상 바로 인접하지 않는다 — 순서(전자가 먼저)만
         # 확인한다(둘 다 여전히 정확히 1회, showState("loading") 직후 영역에서 호출됨).
         self.assertIn("fetchCoverageNote();", js_src)
-        self.assertLess(js_src.index("fetchCoverageNote();"), js_src.index("fetchFindings(FIELDS)\n"))
+        self.assertLess(js_src.index("fetchCoverageNote();"), js_src.index("fetchSearch(currentPage)\n"))
 
     def test_coverage_note_numbers_not_hardcoded_and_locale_formatted(self):
         """숫자(공개/전체 건수)는 findings_stats RPC 응답의 totals.public_findings/
@@ -1486,48 +1486,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('전체 " + total + "건을 국문으로 열람할 수 있습니다.', fn)
 
     # ── [문서 중심 열람] observation 조각 → 문서 카드 재편 ─────────────────────────────
-    def test_raw_signal_id_added_to_select_fields(self):
-        """문서 그룹핑 키(raw_signal_id, 002_findings.sql FK)가 FIELDS/LEGACY_FIELDS
-        select 목록에 추가돼야 한다 — anon RLS(003)는 행 필터만 있고 컬럼 제한이 없어
-        select 확장 자체는 안전하다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fields_block = js_src[js_src.index("var FIELDS = ["):js_src.index("var LEGACY_FIELDS")]
-        self.assertIn('"raw_signal_id"', fields_block)
-        # LEGACY_FIELDS 는 finding_text_ko/translation_method 두 필드만 제외한 파생 배열이라
-        # (필터 목록에 raw_signal_id 가 없으면) raw_signal_id 는 자동으로 포함된다.
-        self.assertIn(
-            'return f !== "finding_text_ko" && f !== "translation_method";',
-            js_src,
-        )
-
-    # ── [업체 프로파일 진입] firm_key select 확장 + 013 미적용 방어 폴백 ──────────────
-    def test_firm_key_added_to_select_fields_with_dedicated_fallback(self):
-        """013_findings_firm_key.sql 의 firm_key(generated 컬럼)가 FIELDS select 목록에
-        추가돼야 하고, 013 미적용 라이브(그 컬럼만 없는 경우)에도 페이지가 깨지지 않도록
-        FIELDS_NO_FIRM_KEY 로 재시도하는 별도 폴백 단계가 있어야 한다 — 005 폴백
-        (LEGACY_FIELDS)과 독립적인 축이라 3단계 체인이 된다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fields_block = js_src[js_src.index("var FIELDS = ["):js_src.index("var LEGACY_FIELDS")]
-        self.assertIn('"firm_key"', fields_block)
-        self.assertIn("var FIELDS_NO_FIRM_KEY = FIELDS.filter(function (f) {", js_src)
-        self.assertIn('return f !== "firm_key";', js_src)
-        # LEGACY_FIELDS 는 FIELDS_NO_FIRM_KEY 파생이라(FIELDS 가 아니라) firm_key 는
-        # 최종 legacy 폴백에도 전이적으로 제외된다(중복 실패 축 없음).
-        self.assertIn("var LEGACY_FIELDS = FIELDS_NO_FIRM_KEY.filter(function (f) {", js_src)
-
-    def test_findings_fetch_three_stage_fallback_chain(self):
-        """fetchFindings(FIELDS) 실패 → fetchFindings(FIELDS_NO_FIRM_KEY) 실패 →
-        fetchFindings(LEGACY_FIELDS) 순서로 재시도한다(013 만 미적용/013·005 둘 다
-        미적용 라이브 모두 방어)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        # [PR-0 딥링크] catch 콜백에 deepLinkStatus 가드가 추가돼 showState("error") 가
-        # catch 여는 줄에 바로 붙어있지 않으므로, showState("error") 자체를 종점으로 삼는다
-        # (파일 전체에서 유일하게 이 catch 콜백에만 등장).
-        chain = js_src[js_src.index("fetchFindings(FIELDS)"):js_src.index('showState("error");')]
-        idx_full = chain.index("fetchFindings(FIELDS)")
-        idx_no_firm = chain.index("fetchFindings(FIELDS_NO_FIRM_KEY)")
-        idx_legacy = chain.index("fetchFindings(LEGACY_FIELDS)")
-        self.assertTrue(idx_full < idx_no_firm < idx_legacy)
+    # [서버 canonical search] FIELDS/FIELDS_NO_FIRM_KEY/LEGACY_FIELDS select 목록과
+    # fetchFindings() 3단 폴백 체인은 사라졌다 — findings_search RPC 가 반환 컬럼(raw_signal_id/
+    # firm_key 포함)의 정본이라 클라이언트가 select 목록을 협상할 이유가 없다(005/013
+    # 미적용 방어는 이제 서버 함수 쪽 책임). 문서 그룹핑 키(raw_signal_id)·업체 프로파일
+    # 링크(firm_key)가 여전히 응답에 실려 오는지는 buildDocHead()/render() 소비 마커
+    # (test_document_card_head_links_to_firm_profile_when_key_present 등)가 계속 확인한다.
 
     def test_document_card_head_links_to_firm_profile_when_key_present(self):
         """문서 카드 헤더 업체명은 firm_key(013)가 있으면 /findings/firm/?key= 링크,
@@ -1569,34 +1533,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         # 클릭 핸들러는 여전히 raw f.name 을 넘겨 state.q 비교/검색 매칭이 어긋나지 않는다.
         self.assertIn("toggleFirmFilter(f.name);", dash_firms_fn)
 
-    def test_group_by_document_merges_same_raw_signal_id(self):
-        """groupByDocument() 는 raw_signal_id 가 같은 행을 하나의 그룹으로 병합하고,
-        raw_signal_id 가 없는 방어적 케이스는 홀로 자기 그룹을 이뤄 결과 누락 없이
-        렌더되게 한다(그룹핑 실패=검색 결과 실종 방지)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function groupByDocument(rows)", js_src)
-        fn = js_src[js_src.index("function groupByDocument(rows)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("row.raw_signal_id ||", fn)
-        self.assertIn("byKey[key].push(row)", fn)
-        self.assertIn("order.push(key)", fn)
-        self.assertIn("return order.map(function (key) { return byKey[key]; });", fn)
-
-    def test_group_by_document_preserves_sort_order_no_extra_fetch(self):
-        """문서 순서는 matched(정렬 완료) 배열에서 그 문서의 첫 지적사항이 나타나는
-        위치를 그대로 따른다(재정렬 없음). [문서 단위 페이지네이션] 필터/정렬/검색어
-        변경은 wire() 안에서 currentPage 를 1로 리셋한 뒤 goToPage(1) 을 호출할 뿐이다
-        — wire() 함수 본문 자체는 fetchFindings 를 직접 호출하지 않는다(흔한 경우
-        goToPage(1) 이 이미 로드된 ROWS 만으로 동기적으로 끝나 새 네트워크 요청이
-        없다 — 결과가 희소한 필터일 때만 ensurePageReady() 가 추가 청크를 당길 수
-        있다는 점은 별도 스코프 주석 참조)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var matched = sortRows(ROWS.filter(matches));", js_src)
-        self.assertIn("var docs = groupByDocument(matched);", js_src)
-        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint")]
-        self.assertNotIn("fetchFindings", wire_fn)
-        self.assertIn("currentPage = 1", wire_fn)
-        self.assertEqual(wire_fn.count("goToPage(1)"), 3, "셀렉트·정렬·검색어 3개 핸들러 모두 goToPage(1) 호출해야 함")
+    # [서버 canonical search] groupByDocument() 클라이언트 그룹핑은 사라졌다 — 서버가
+    # raw_signal_id 로 이미 묶어 documents[] 배열로 보내므로(§ 파일 상단 [문서 중심 열람]
+    # 주석) 클라이언트가 재그룹핑·재정렬할 이유가 없다. wire() 가 필터/정렬/검색어 변경
+    # 시 currentPage=1 로 리셋 후 goToPage(1) 을 호출하는 계약은
+    # test_deeplink_exits_on_filter_search_sort_page_interaction 등이 계속 커버한다.
 
     def test_document_card_reuses_existing_observation_card_render(self):
         """문서 카드는 새 observation 렌더를 만들지 않고 기존 buildCard() 를 그대로
@@ -1630,14 +1571,14 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_result_count_line_shows_document_finding_and_page_summary(self):
         """[문서 단위 페이지네이션] 결과 요약 줄(#fnd-count)은 "전체 N문서 · M지적 ·
-        페이지 X / Y" 형태여야 한다 — N=totalDocsKnown, M=totalFindingsKnown(무필터+RPC
-        확보 시 findings_stats exact 총수, 그 외엔 groupByDocument()/matched 로드 기준),
-        X=현재 페이지, Y=지금까지 알려진(또는 exact) 총 페이지 수."""
+        페이지 X / Y" 형태여야 한다 — [서버 canonical search] N=totalDocs/M=totalFindings
+        는 이제 findings_search RPC 가 반환하는 LAST.totals 그대로(항상 exact, 로드분
+        추정 아님), X=현재 페이지, Y=LAST.pages(서버가 계산한 exact 총 페이지 수)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         start = js_src.index("function render() {")
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
-        self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bDocs.textContent = totalDocs.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindings.toLocaleString("ko-KR")', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("전체 "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("문서 · "));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode("지적 · 페이지 "));', render_fn)
@@ -1647,55 +1588,22 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_result_count_line_all_numbers_use_locale_string(self):
         """[콤마 통일] 카운트 줄의 문서수·지적수·총 페이지수는 모두 toLocaleString
         ('ko-KR') 로 천단위 콤마를 붙인다(현재 페이지 번호만은 순수 정수라 콤마 대상이
-        아니다) — String(totalDocsKnown)/String(totalFindingsKnown) 처럼 콤마 없는 표기가
-        남아있으면 안 된다."""
+        아니다) — [서버 canonical search] 값은 항상 exact 라 String(totalDocs)/
+        String(totalFindings) 처럼 콤마 없는 표기가 남아있으면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertNotIn("String(totalDocsKnown)", render_fn)
-        self.assertNotIn("String(totalFindingsKnown)", render_fn)
-        self.assertIn('bDocs.textContent = totalDocsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bObs.textContent = totalFindingsKnown.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('bTotal.textContent = String(totalPagesKnown)', render_fn)
+        self.assertNotIn("String(totalDocs)", render_fn)
+        self.assertNotIn("String(totalFindings)", render_fn)
+        self.assertIn('bDocs.textContent = totalDocs.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bObs.textContent = totalFindings.toLocaleString("ko-KR")', render_fn)
+        self.assertIn('bTotal.textContent = String(totalPages)', render_fn)
 
-    def test_exact_totals_shared_from_coverage_rpc_and_used_when_unfiltered(self):
-        """[정확 총수 M1a] fetchCoverageNote() 가 findings_stats RPC 의 totals.documents/
-        totals.findings 를 전역(SERVER_DOC_TOTAL/SERVER_FINDINGS_TOTAL)에 공유하고,
-        render() 는 무필터(검색어·필터 전부 비었음) + 서버 미소진 구간에서만 그 exact
-        값으로 문서수·지적수·총 페이지를 계산한다(exactUnfiltered) — 필터가 걸리면
-        로드 기준(docs.length/matched.length)을 그대로 쓴다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var SERVER_DOC_TOTAL = null;", js_src)
-        self.assertIn("var SERVER_FINDINGS_TOTAL = null;", js_src)
-        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
-        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
-        self.assertIn("if (hasDocs) SERVER_DOC_TOTAL = totals.documents;", cov_fn)
-        self.assertIn(
-            'if (typeof totals.findings === "number" && !isNaN(totals.findings)) {\n'
-            "          SERVER_FINDINGS_TOTAL = totals.findings;\n"
-            "        }",
-            cov_fn,
-        )
-        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertIn(
-            "var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;",
-            render_fn,
-        )
-        self.assertIn("totalDocsKnown = SERVER_DOC_TOTAL;", render_fn)
-        self.assertIn("if (SERVER_FINDINGS_TOTAL !== null) totalFindingsKnown = SERVER_FINDINGS_TOTAL;", render_fn)
-        self.assertIn(
-            "totalPagesKnown = Math.max(1, Math.ceil(SERVER_DOC_TOTAL / DOCS_PER_PAGE));",
-            render_fn,
-        )
-
-    def test_uncertain_suffix_replaces_old_plus_sign_in_count_line(self):
-        """[정확 표기] 무필터+exact 확보 시("exactUnfiltered")에는 접미사가 전혀 붙지
-        않는다. 필터가 걸려있거나 RPC 를 아직 확보하지 못했으면서 서버가 아직 소진되지
-        않았을 때만(uncertain) 숫자 뒤에 옛 "+" 기호 대신 " 이상"을 붙인다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
-        self.assertEqual(render_fn.count('countEl.appendChild(document.createTextNode(" 이상"));'), 3)
-        self.assertNotIn('toLocaleString("ko-KR") + (moreMayExist ? "+" : "")', render_fn)
+    # [서버 canonical search] SERVER_DOC_TOTAL/SERVER_FINDINGS_TOTAL/exactUnfiltered/
+    # uncertain(" 이상" 접미사) 는 전부 사라졌다 — findings_search RPC 가 필터 여부와
+    # 무관하게 항상 exact totals/pages 를 반환하므로("totals 는 검색·필터 적용 후 exact
+    # 다" — render() 상단 주석), 로드분 기준 추정치와 서버 exact 값을 조건부로 바꿔치기할
+    # 필요 자체가 없다. test_result_count_line_* 이 그 결과(totalDocs/totalFindings 를
+    # 조건 없이 그대로 표시)를 계속 검증한다.
 
     def test_document_card_head_markers_and_css_present(self):
         """문서 헤더 = 업체명(세리프, .fnd-firm 관례 계승) + 소스·발행일·지적 건수 메타.
@@ -1754,125 +1662,41 @@ class WebFindingsRenderTest(unittest.TestCase):
             self.html[m_search:m_close + 6],
         )
 
-    def test_content_range_prefer_header_and_parsing(self):
-        """서버 exact count 확보 — fetch 헤더에 Prefer: count=exact 를 실어 보내고,
-        응답 Content-Range("0-999/1926" 형식)에서 총수를 파싱한다. 파싱 실패/헤더
-        미노출 시 null 폴백(기존 동작 유지) — 하드코딩 숫자 없음."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('Prefer: "count=exact"', js_src)
-        self.assertIn("function parseServerTotal(resp)", js_src)
-        fn = js_src[js_src.index("function parseServerTotal(resp)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn('resp.headers.get("content-range")', fn)
-        self.assertIn("if (!cr) return null;", fn)
-        self.assertIn(r"/\/(\d+)$/", fn)
-        self.assertIn("return isNaN(n) ? null : n;", fn)
+    # [서버 canonical search] Prefer: count=exact/parseServerTotal()/buildEndpoint()/
+    # fetchNextChunkFor()/LOADED_FIELDS 는 사라졌다 — findings_search RPC 응답 바디의
+    # totals/pages 가 정본이라(항상 exact) PostgREST Content-Range 헤더를 직접 파싱하거나
+    # 다음 "청크"를 별도 offset 으로 이어 fetch 할 필요가 없다(서버가 요청한 페이지의
+    # 문서만 정확히 잘라 보낸다).
 
-    def test_next_chunk_endpoint_uses_offset_and_reuses_loaded_fields(self):
-        """페이지 이동으로 촉발된 청크 fetch 는 최초 로드가 성공시킨 필드셋
-        (LOADED_FIELDS)을 그대로 재사용해 offset=ROWS.length 로 다음 청크를 요청한다 —
-        3단계 폴백을 매번 재협상하지 않는다. buildEndpoint 는 offset>0 일 때만
-        &offset= 을 덧붙인다(생략 시 기존 limit=1000 단일 호출과 동일 — 하위호환)."""
+    def test_goto_page_navtoken_guards_against_stale_responses(self):
+        """[구조 변경] 청크 단위 중복 fetch 방어(fetchNextChunkFor/pendingPageCallbacks
+        콜백 큐)는 서버 canonical search 전환으로 사라졌다 — goToPage() 1회 호출이
+        findings_search RPC 1왕복으로 끝나 별도 큐가 필요 없다. 대신 navToken 세대
+        카운터가 연타(빠른 재클릭)를 막는다 — 오래된 요청의 응답은 myToken !== navToken
+        이면 LAST/currentPage/render() 를 건드리지 않고 조용히 버려진다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function buildEndpoint(fields, offset)", js_src)
-        self.assertIn('(off > 0 ? "&offset=" + off : "")', js_src)
-        self.assertIn("function fetchNextChunkFor(cb)", js_src)
-        fn = js_src[js_src.index("function fetchNextChunkFor(cb)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("fetchFindings(LOADED_FIELDS, ROWS.length)", fn)
-
-    def test_duplicate_fetch_guard_queues_callbacks(self):
-        """[중복 fetch 방어] 이미 진행 중인 청크 fetch 가 있으면 새 네트워크 요청을
-        내지 않고 콜백만 큐(pendingPageCallbacks)에 편승시킨다 — 여러 페이지 이동이
-        겹쳐도 실제 fetch 는 항상 1개만 진행되고, 완료 시 대기 콜백이 한 번에 재개된다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function fetchNextChunkFor(cb)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("pendingPageCallbacks.push(cb);", fn)
-        self.assertIn("if (isFetchingPage) return;", fn)
-        self.assertIn("isFetchingPage = true;", fn)
-        self.assertIn("isFetchingPage = false;", fn)
-        self.assertIn("cbs.forEach(function (fn) { fn(); });", fn)
-        # 페이지 이동(goToPage) 도 navToken 세대 카운터로 연타를 방어한다 — 오래된 이동의
-        # 완료 콜백은 currentPage/render() 를 건드리지 않는다.
+        self.assertNotIn("fetchNextChunkFor", js_src)
+        self.assertNotIn("pendingPageCallbacks", js_src)
         goto_fn = js_src[js_src.index("function goToPage(n)"):]
         goto_fn = goto_fn[:goto_fn.index("\n  }\n") + 4]
         self.assertIn("navToken += 1;", goto_fn)
         self.assertIn("if (myToken !== navToken) return;", goto_fn)
 
-    def test_merge_rows_dedupes_by_finding_id(self):
-        """mergeRows() 는 finding_id 기준 중복을 제거한다 — 두 fetch 사이 새 번역이
-        공개(publish gate 통과)돼 정렬 경계에서 행이 밀려도 같은 행이 두 번 들어오지
-        않는다. 병합 대상은 항상 전역 ROWS(로드된 전체) — 필터된 부분집합이 아니다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function mergeRows(newRows)", js_src)
-        fn = js_src[js_src.index("function mergeRows(newRows)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var seen = {};", fn)
-        self.assertIn("if (id !== undefined && id !== null && seen[id]) return;", fn)
-        self.assertIn("ROWS.push(r);", fn)
-
-    def test_pagination_boundary_document_completeness_check(self):
-        """[경계 문서 완결성] ensurePageReady() 는 목표 페이지의 마지막 문서
-        (raw_signal_id)가 incompleteDocKey() 가 가리키는 "아직 obs 가 더 올 수 있는"
-        키와 같으면, 문서 수가 이미 충분해도(docs.length >= neededDocs) 그대로 렌더하지
-        않고 한 청크 더 fetch 한 뒤 재확인한다 — 페이지 경계에서 문서가 쪼개진 채
-        보이는 상태를 방지한다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function incompleteDocKey()", js_src)
-        key_fn = js_src[js_src.index("function incompleteDocKey()"):]
-        key_fn = key_fn[:key_fn.index("\n  }\n") + 4]
-        self.assertIn("if (isServerExhausted() || !ROWS.length) return null;", key_fn)
-        self.assertIn("ROWS[ROWS.length - 1].raw_signal_id", key_fn)
-
-        ready_fn = js_src[js_src.index("function ensurePageReady(pageNum, done)"):]
-        ready_fn = ready_fn[:ready_fn.index("\n  }\n") + 4]
-        self.assertIn("var neededDocs = pageNum * DOCS_PER_PAGE;", ready_fn)
-        self.assertIn("var pageSlice = docs.slice(neededDocs - DOCS_PER_PAGE, neededDocs);", ready_fn)
-        self.assertIn("var badKey = incompleteDocKey();", ready_fn)
-        self.assertIn(
-            "var unsafe = badKey !== null && pageSlice.some(function (rows) {\n"
-            "          return rows[0].raw_signal_id === badKey;\n"
-            "        });",
-            ready_fn,
-        )
-        self.assertIn("fetchNextChunkFor(attempt);", ready_fn)
-        # render() 자체는 순수 슬라이스만 한다 — 경계 안전은 페이지 이동 시점에 이미 확인됨.
-        render_fn = js_src[js_src.index("function render() {"):]
-        self.assertIn(
-            "var pageDocs = docs.slice((currentPage - 1) * DOCS_PER_PAGE, currentPage * DOCS_PER_PAGE);",
-            render_fn,
-        )
+    # [서버 canonical search] mergeRows()/incompleteDocKey()/ensurePageReady() 는 사라졌다
+    # — 문서 경계 완결성(한 문서가 페이지 사이에서 쪼개지지 않게 하는 것)은 이제
+    # findings_search RPC 가 문서 단위로 페이지를 나눠 보내는 서버 책임이라, 클라이언트가
+    # "이 페이지 마지막 문서가 아직 안 끝났는지" 추가 fetch 로 재확인할 필요가 없다.
 
     def test_docs_per_page_constant_is_24(self):
         """[문서 단위 페이지네이션] 문서 카드 24개 = 1페이지(스펙 상수)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("var DOCS_PER_PAGE = 24;", js_src)
 
-    def test_more_may_exist_indicator_narrows_to_uncertain_state(self):
-        """[정확 총수 M1a] moreMayExist(=!isServerExhausted())는 여전히 필터 여부와
-        무관하게 동일 기준을 쓴다. 다만 카운트 줄의 "이상" 접미사(구버전 "+")는
-        moreMayExist 만이 아니라 exactUnfiltered(무필터+RPC exact 확보)가 아닐 때만
-        붙는다(uncertain = moreMayExist && !exactUnfiltered) — 무필터+exact 확보 시에는
-        moreMayExist 가 true 여도(서버 청크가 아직 안 끝났어도) 접미사를 붙이지 않는다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        start = js_src.index("function render() {")
-        render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
-        self.assertIn("var moreMayExist = !isServerExhausted();", render_fn)
-        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", render_fn)
-        self.assertIn("var exactUnfiltered = !filtersActive && moreMayExist && SERVER_DOC_TOTAL !== null;", render_fn)
-        self.assertIn("var uncertain = moreMayExist && !exactUnfiltered;", render_fn)
-
-    def test_is_server_exhausted_falls_back_to_batch_size_heuristic(self):
-        """[방어] Content-Range 파싱 실패(헤더 미노출 등)로 SERVER_TOTAL 이 null 이면,
-        "가장 최근 청크가 PAGE_LIMIT 미만이었는지"만으로 서버 소진 여부를 판단한다
-        (fetchGaveUp 이면 무조건 소진 취급해 무한 재시도를 막는다)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function isServerExhausted()"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (fetchGaveUp) return true;", fn)
-        self.assertIn("if (SERVER_TOTAL !== null) return ROWS.length >= SERVER_TOTAL;", fn)
-        self.assertIn("return LAST_BATCH_SIZE !== null && LAST_BATCH_SIZE < PAGE_LIMIT;", fn)
+    # [서버 canonical search] isServerExhausted()/moreMayExist/exactUnfiltered/uncertain/
+    # SERVER_TOTAL/LAST_BATCH_SIZE/PAGE_LIMIT/fetchGaveUp 는 전부 사라졌다 — "서버 obs
+    # 청크가 아직 소진되지 않았을 수 있다"는 불확실성 자체가 없다. findings_search RPC
+    # 는 매 요청마다 exact totals/pages 를 반환하므로 render() 는 항상 정확한 문서수·
+    # 지적수·총 페이지를 안다(로드 진행 상태를 추정할 필요가 없다).
 
     def test_filter_and_sort_and_search_reset_to_page_one(self):
         """[문서 단위 페이지네이션] 필터·검색·정렬 변경은 모두 currentPage 를 1로
@@ -1945,7 +1769,10 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_page_url_param_deep_link_and_default_omitted(self):
         """[?page= 딥링크] currentPage>1 일 때만 URL 에 page= 파라미터를 반영한다(1페이지
         기본값은 URL 을 더럽히지 않음). 초기 로드는 readPageFromUrl() 로 복원하고,
-        무효/누락 값은 조용히 1로 폴백한다."""
+        무효/누락 값은 조용히 1로 폴백한다. [서버 canonical search] 페이지 복원은 이제
+        첫 fetchSearch() 호출 **이전**에 확정된다(state 가 곧 요청 파라미터라 첫 요청
+        자체가 이미 옳은 페이지를 받는다) — maybeFinishInit() 의 비-found 분기가 별도로
+        goToPage(readPageFromUrl()) 를 다시 호출해 보정하던 구버전 왕복이 사라졌다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         sync_fn = js_src[js_src.index("function syncStateToUrl()"):]
         sync_fn = sync_fn[:sync_fn.index("\n  }\n") + 4]
@@ -1955,12 +1782,15 @@ class WebFindingsRenderTest(unittest.TestCase):
         read_fn = read_fn[:read_fn.index("\n  }\n") + 4]
         self.assertIn('var raw = new URLSearchParams(location.search).get("page");', read_fn)
         self.assertIn("return !isNaN(n) && n >= 1 ? n : 1;", read_fn)
-        # [PR-0 딥링크] 초기 페이지 복원은 더 이상 별도 initialPage 변수에 담기지 않고,
-        # ROWS 로드 완료 후 maybeFinishInit() 이 상황에 맞게(found=문서 단독 렌더로 건너뜀,
-        # 그 외=readPageFromUrl() 값으로 goToPage) 호출하는 형태로 위임됐다.
+        tail = js_src[js_src.index("readStateFromUrl();"):]
+        tail = tail[:tail.index("fetchSearch(currentPage)")]
+        self.assertIn("currentPage = readPageFromUrl();", tail)
+        # maybeFinishInit() 의 비-found 분기는 currentPage 를 이미 신뢰하므로 render() 로
+        # 곧장 귀결된다(별도 goToPage(readPageFromUrl()) 재호출 없음).
         finish_fn = js_src[js_src.index("function maybeFinishInit() {"):]
         finish_fn = finish_fn[:finish_fn.index("\n  }\n") + 4]
-        self.assertIn("goToPage(readPageFromUrl());", finish_fn)
+        self.assertIn("render();", finish_fn)
+        self.assertNotIn("goToPage(readPageFromUrl())", finish_fn)
 
     def test_pager_loading_shows_status_text_and_disables_buttons(self):
         """[로딩 UX b] 미로드 페이지 이동 중에는 버튼을 disabled 처리하고, 현재 페이지
@@ -2017,67 +1847,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("pendingScrollAfterNav = true;", pager_entry_fn)
         self.assertIn("goToPage(n);", pager_entry_fn)
 
-    def test_schedule_prefetch_looks_ahead_one_chunk_near_loaded_edge(self):
-        """[선로딩 c] render() 후 idle 시간에 다음 청크 1개만 미리 fetch한다(전체 eager
-        로드 금지) — 이미 로드된 데이터로 현재 페이지보다 1페이지 이상 여유가 있으면
-        아무 것도 하지 않고, 서버가 이미 소진됐거나(uncertainLoad=false) 이미 fetch 중이면
-        스킵한다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function schedulePrefetch(loadedDocsCount, uncertainLoad)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (!uncertainLoad || isFetchingPage) return;", fn)
-        self.assertIn("if (currentPage < loadedPages - 1) return;", fn)
-        self.assertIn("requestIdleCallback", fn)
-        self.assertIn("fetchNextChunkFor(function () {});", fn)
-        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertIn("schedulePrefetch(docs.length, moreMayExist);", render_fn)
-
-    def test_dash_total_stat_uses_server_total_when_unfiltered(self):
-        """[대시보드 실총수 M3] 필터가 하나도 없을 때만 대시보드 스탯을 findings_stats
-        RPC exact 총수로 바꿔치기한다 — "전체"는 SERVER_FINDINGS_TOTAL 우선(없으면
-        Content-Range SERVER_TOTAL 폴백), "문서"는 SERVER_DOC_TOTAL(폴백 없음 — 미확보면
-        스탯 자체 생략), 소스별(agencies)은 SERVER_AGENCY_TOTALS 확보 시 exact 로 교체
-        (agenciesExact=true). 필터가 걸리면 matched.length 가 "필터링된 전체"라는 다른
-        모집단이므로 전부 로드 기준(computeStats 원래값)을 그대로 둔다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function renderDash(matched)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn(
-            "var filtersActive = countActiveFilters() > 0 || !!state.q.trim();",
-            fn,
-        )
-        self.assertIn("if (!filtersActive) {", fn)
-        self.assertIn(
-            "if (SERVER_FINDINGS_TOTAL !== null) {\n"
-            "        stats.total = SERVER_FINDINGS_TOTAL;\n"
-            "      } else if (SERVER_TOTAL !== null && SERVER_TOTAL > matched.length) {\n"
-            "        stats.total = SERVER_TOTAL;\n"
-            "      }",
-            fn,
-        )
-        self.assertIn(
-            "if (SERVER_DOC_TOTAL !== null) {\n"
-            "        stats.documents = SERVER_DOC_TOTAL;\n"
-            "      }",
-            fn,
-        )
-        self.assertIn("stats.agenciesExact = true;", fn)
-        self.assertIn("renderDashStats(stats);", fn)
-
-    def test_dash_agency_totals_derived_from_by_agency_category_rpc(self):
-        """[대시보드 실총수 M3] findings_stats 에는 agency 단독 집계 키가 없어(by_source/
-        by_agency_category 만 존재), fetchCoverageNote() 가 by_agency_category(agency×
-        category_code 교차표)를 agency 기준으로만 합산해 SERVER_AGENCY_TOTALS 를 채운다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var SERVER_AGENCY_TOTALS = null;", js_src)
-        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
-        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
-        self.assertIn("if (Array.isArray(data.by_agency_category)) {", cov_fn)
-        self.assertIn(
-            "agencySums[row.agency] = (agencySums[row.agency] || 0) + (row.cnt || 0);",
-            cov_fn,
-        )
-        self.assertIn("SERVER_AGENCY_TOTALS = agencySums;", cov_fn)
+    # [서버 canonical search] schedulePrefetch()(선로딩)와 SERVER_AGENCY_TOTALS/조건부
+    # exact 바꿔치기(renderDash() 의 filtersActive 분기)는 사라졌다 — findings_search
+    # RPC 가 매 요청마다 LAST.dash 로 이미 exact 대시보드 집계(전체·문서·기관·카테고리·
+    # 월·업체)를 통째로 반환하므로, 무필터일 때만 별도 findings_stats RPC 값을 조건부로
+    # 끼워 넣거나 다음 청크를 미리 당겨올 필요가 없다(renderDash() 는 이제 인자도 없다).
 
     def test_dash_stats_documents_and_agency_estimate_tooltip(self):
         """[대시보드 실총수 M3] renderDashStats() 는 stats.documents 가 있을 때만 "문서"
@@ -2101,170 +1875,22 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (existing[v]) return;", fn)
 
-    # ── [025] "부분 로드가 전역처럼 행동" 표시 오류 수리(2026-07-16) ──────────────────────
-    # 실측: 화면 FDA 483 (910) vs DB 진실 8,078(11.3%). MFDS(50)·WL(40)은 최신순 정렬
-    # 상단이라 100% 로드분에 잡혀 비율까지 왜곡됐다(MFDS 를 코퍼스의 ~5%로 오인 — 실제
-    # 0.6%). 계약: ①무필터·무검색 랜딩=findings_stats RPC 전역 truth ②필터·검색 활성=
-    # 숫자 숨김(라벨만) ③결과 영역 상시 로딩 문구 ④오래된순/업체명순은 전량 로드 전
-    # 비활성화(선택 b) ⑤by_review_status(025 신규) 안전 폴백.
-    def test_facet_counts_use_rpc_truth_when_unfiltered_not_rows(self):
-        """[§요구1] computeFacetCounts() 는 무필터·무검색 랜딩에서 findings_stats RPC
-        전역 truth(rpcFacetCounts)를 곧장 반환하고 ROWS 를 순회하지 않는다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function computeFacetCounts(key2)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", fn)
-        self.assertIn("if (!filtersActive) {", fn)
-        self.assertIn("var rpcCounts = rpcFacetCounts(key2);", fn)
-        self.assertIn("if (rpcCounts) return rpcCounts;", fn)
-        # 무필터 RPC 조기 반환이 ROWS.forEach 보다 먼저 나타나야 한다(구조적 보장 — 무필터
-        # +RPC 확보 시 ROWS 순회 없이 곧장 반환).
-        self.assertLess(fn.index("if (rpcCounts) return rpcCounts;"), fn.index("ROWS.forEach"))
-        self.assertIn("function rpcFacetCounts(key2)", js_src)
-        rpc_fn = js_src[js_src.index("function rpcFacetCounts(key2)"):]
-        rpc_fn = rpc_fn[:rpc_fn.index("\n  }\n") + 4]
-        for mapping in (
-            'if (key2 === "source") return RPC_BY_SOURCE;',
-            'if (key2 === "evidence_level") return RPC_BY_EVIDENCE;',
-            'if (key2 === "review_status") return RPC_BY_REVIEW_STATUS;',
-            'if (key2 === "month") return RPC_BY_MONTH;',
-            'if (key2 === "category_code") return RPC_BY_CATEGORY;',
-        ):
-            self.assertIn(mapping, rpc_fn)
-
-    def test_facet_option_counts_hidden_when_filters_or_search_active(self):
-        """[§요구2] 필터·검색이 하나라도 활성이면 셀렉트 옵션은 라벨만 남고 "(N)" 건수를
-        표시하지 않는다 — ROWS(로드분) 기준 부분집합 건수를 사실값처럼 보여주지 않는다는
-        원칙("로드분 기준" 툴팁으로 얼버무리는 것도 금지)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function refreshFacetUI()"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var filtersActive = countActiveFilters() > 0 || !!state.q.trim();", fn)
-        self.assertIn(
-            'opt.textContent = filtersActive ? opt.dataset.label : (opt.dataset.label + " (" + count + ")");',
-            fn,
-        )
-
-    def test_month_options_populated_from_rpc_not_rows(self):
-        """[§요구1] 발행월 옵션은 findings_stats RPC by_month 전역 값(RPC_MONTH_VALUES)을
-        우선한다 — 최신순 로드+시간축 특성상 오래된 월이 첫 청크(ROWS 최초 1,000행) 밖에
-        있어 옵션 자체가 누락되는 문제를 없앤다. RPC 미확보면 조용히 ROWS 기준 폴백."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function collectFacetValues(key2)"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn('if (key2 === "month" && RPC_MONTH_VALUES) return RPC_MONTH_VALUES.slice();', fn)
-        self.assertIn("if (!ROWS) return [];", fn)
-        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
-        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
-        self.assertIn("if (Array.isArray(data.by_month)) {", cov_fn)
-        self.assertIn("RPC_BY_MONTH = monthSums;", cov_fn)
-        self.assertIn("RPC_MONTH_VALUES = Object.keys(monthSums).sort().reverse();", cov_fn)
-
-    def test_dash_category_month_firm_use_rpc_truth_and_hide_numbers_when_filtered(self):
-        """[§요구1+2] renderDash() 는 무필터일 때 카테고리·월별·업체 분포도 RPC 전역
-        truth(by_agency_category/by_month/top_firms)로 교체하고, 필터·검색이 하나라도
-        활성이면 dashHideNumbers 클로저 플래그를 세워 하위 렌더 함수들이 숫자만 지우게
-        한다(라벨·바 구조는 유지, 기존 단일 인자 시그니처는 불변 — 다수 소스마커 테스트가
-        정확히 고정하고 있어 파라미터를 추가하지 않았다)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var dashHideNumbers = false;", js_src)
-        dash_fn = js_src[js_src.index("function renderDash(matched)"):]
-        dash_fn = dash_fn[:dash_fn.index("\n  }\n") + 4]
-        self.assertIn("dashHideNumbers = filtersActive;", dash_fn)
-        self.assertIn("if (RPC_BY_CATEGORY !== null) {", dash_fn)
-        self.assertIn("if (RPC_BY_MONTH !== null) {", dash_fn)
-        self.assertIn("if (RPC_TOP_FIRMS !== null) {", dash_fn)
-        # 하위 렌더 함수 시그니처는 그대로(단일 인자).
-        for sig in ("function renderDashStats(stats)", "function renderDashCategories(stats)",
-                    "function renderDashMonths(stats)", "function renderDashFirms(stats)"):
-            self.assertIn(sig, js_src)
-        stats_fn = js_src[js_src.index("function renderDashStats(stats)"):]
-        stats_fn = stats_fn[:stats_fn.index("\n  }\n") + 4]
-        self.assertIn("if (dashHideNumbers) {", stats_fn)
-        cat_row_fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
-        cat_row_fn = cat_row_fn[:cat_row_fn.index("\n  }\n") + 4]
-        self.assertIn("dashHideNumbers", cat_row_fn)
-        months_fn = js_src[js_src.index("function renderDashMonths(stats)"):]
-        months_fn = months_fn[:months_fn.index("\n  }\n") + 4]
-        self.assertIn("dashHideNumbers", months_fn)
-        firms_fn = js_src[js_src.index("function renderDashFirms(stats)"):]
-        firms_fn = firms_fn[:firms_fn.index("\n  }\n") + 4]
-        self.assertIn("dashHideNumbers", firms_fn)
-
-    def test_loadmore_notice_always_visible_until_server_exhausted(self):
-        """[§요구3] 결과 영역에 항상 보이는 문구(툴팁 아님) — 서버 obs 청크가 아직
-        소진되지 않았으면 render() 마다 노출하고, isServerExhausted() 가 참이 되면
-        사라진다. 딥링크·유사검색 단독 렌더 모드는 목록 페이지네이션과 무관하므로
-        hidePager() 와 동형으로 숨긴다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("function ensureLoadMoreNotice()", js_src)
-        self.assertIn(
-            'loadMoreNoticeEl.textContent = "데이터를 추가로 불러오는 동안 결과가 갱신됩니다.";',
-            js_src,
-        )
-        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertIn("ensureLoadMoreNotice().hidden = !moreMayExist;", render_fn)
-        deeplink_fn = js_src[js_src.index("function renderDeepLinkDoc()"):]
-        deeplink_fn = deeplink_fn[:deeplink_fn.index("var finalized = false;")]
-        self.assertIn("ensureLoadMoreNotice().hidden = true;", deeplink_fn)
-        similar_fn = js_src[js_src.index("function renderSimilarResults(items)"):]
-        similar_fn = similar_fn[:similar_fn.index("\n  }\n") + 4]
-        self.assertIn("ensureLoadMoreNotice().hidden = true;", similar_fn)
-
-    def test_sort_options_disabled_until_server_exhausted(self):
-        """[§요구4 선택(b)] 오래된순·업체명순은 서버 obs 청크가 소진되기(전량 로드) 전에는
-        전역 정렬을 보장할 수 없으므로 비활성화하고 이유를 title 로 남긴다. 전량 선로딩
-        후 정렬(선택 a)은 사용자가 그 정렬을 아예 고르지 않는 흔한 경로에서까지 코퍼스
-        전체(8천+행)를 강제로 끌어와야 해 채택하지 않았다(updateSortAvailability() 주석
-        참조) — 서버가 소진되면 자동으로 재활성화된다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function updateSortAvailability()"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var exhausted = isServerExhausted();", fn)
-        self.assertIn('if (opt.value === "date_asc" || opt.value === "firm_asc") {', fn)
-        self.assertIn("opt.disabled = !exhausted;", fn)
-        render_fn = js_src[js_src.index("function render() {"):js_src.index("\n  function ", js_src.index("function render() {") + 20)]
-        self.assertIn("updateSortAvailability();", render_fn)
-
-    def test_review_status_facet_uses_new_rpc_key_with_safe_fallback(self):
-        """[§요구5] by_review_status 는 025 신규 키다 — 아직 반환하지 않는 라이브 DB(025
-        미적용)에서도 fetchCoverageNote() 는 죽지 않고 RPC_BY_REVIEW_STATUS 를 null 로
-        남겨(Array.isArray 가드), rpcFacetCounts()/renderDash() 가 자연히 기존 ROWS 기준
-        폴백으로 떨어진다 — 페이지는 025 적용 여부와 무관하게 항상 정상 동작해야 한다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var RPC_BY_REVIEW_STATUS = null;", js_src)
-        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
-        cov_fn = cov_fn[:cov_fn.index("\n  showState(\"loading\");")]
-        self.assertIn("if (Array.isArray(data.by_review_status)) {", cov_fn)
-        self.assertIn("RPC_BY_REVIEW_STATUS = statusSums;", cov_fn)
-        dash_fn = js_src[js_src.index("function renderDash(matched)"):]
-        dash_fn = dash_fn[:dash_fn.index("\n  }\n") + 4]
-        self.assertIn("if (RPC_BY_REVIEW_STATUS !== null) {", dash_fn)
-        self.assertIn("stats.needsReview = RPC_BY_REVIEW_STATUS.needs_review || 0;", dash_fn)
-
-    def test_rpc_stats_arrival_refresh_skips_standalone_render_modes(self):
-        """[§순서 무관] findings_stats RPC 는 메인 목록 fetch 와 독립적으로 fetch 돼
-        도착 순서가 뒤바뀔 수 있다 — refreshAfterRpcStatsArrival() 은 ROWS 가 아직 없으면
-        아무 것도 하지 않고(최초 render()/buildFacetSkeleton() 이 이미 채워진 RPC_* 값을
-        자연히 반영), 딥링크 단독 문서 렌더·유사검색 모드에서는 render() 를 호출하지
-        않는다(단독 렌더 모드 불가침)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function refreshAfterRpcStatsArrival()"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (!rowsReady) return;", fn)
-        self.assertIn("buildFacetSkeleton();", fn)
-        self.assertIn('if (deepLinkPending || deepLinkStatus === "found" || similarMode) return;', fn)
-        self.assertIn("render();", fn)
-        cov_fn = js_src[js_src.index("function fetchCoverageNote()"):]
-        cov_fn = cov_fn[:cov_fn.index("\n  }\n") + 4]
-        self.assertIn("refreshAfterRpcStatsArrival();", cov_fn)
+    # ── [025→서버 canonical search] 부분 로드 augmentation 전체가 서버 이관으로 소멸 ──────
+    # 025 는 "부분 로드가 전역처럼 행동" 문제(화면 FDA 483 910 vs DB 8,078)를 findings_stats
+    # RPC 로 보정하는 과도기 조치였다(computeFacetCounts/rpcFacetCounts/RPC_BY_*/
+    # dashHideNumbers/ensureLoadMoreNotice/updateSortAvailability/refreshAfterRpcStatsArrival).
+    # 서버 canonical search(findings_search RPC)로 전환되며 클라이언트가 부분집합을 로드하는
+    # 구조 자체가 사라졌으므로 이 augmentation 계층 전체가 불필요해졌다 — 파셋·대시보드가
+    # 항상 exact 이고(facetCounts()/renderDash() 가 매 요청 응답에서 직접 읽음), 정렬 3종은
+    # 항상 활성, 필터 유무와 무관하게 건수를 숨기지 않는다(파일 상단 [서버 canonical
+    # search] 주석 참조).
 
     def test_deeplink_s1_hidepager_contracts_unchanged_by_025(self):
-        """[§7 회귀] 025 파셋 전역 truth 수리가 PR-0 딥링크(exitDeepLinkMode 3회 호출)·
-        S1 토글(exitSimilarMode 2회 호출)·hidePager(pnav 포함 은닉) 계약을 훼손하지
-        않았는지 재확인한다(기존 계약과 동일 수치 — 회귀 0)."""
+        """[§7 회귀] 025 이후 서버 canonical search 전환도 PR-0 딥링크(exitDeepLinkMode
+        3회 호출)·S1 토글(exitSimilarMode 2회 호출)·hidePager(pnav 포함 은닉) 계약을
+        훼손하지 않았는지 재확인한다(기존 계약과 동일 수치 — 회귀 0)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
         self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3)
         self.assertEqual(wire_fn.count("exitSimilarMode();"), 2)
         hidepager_fn = js_src[js_src.index("function hidePager() {"):]
@@ -2306,64 +1932,34 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_deeplink_invalid_format_shortcircuits_without_fetch(self):
         """[①형식 검증] resolveDeepLink() 는 isValidFindingId() 가 거짓이면 어떤
         fetch 함수도 호출하지 않고 곧장 notfound 로 확정해야 한다(§1 — fetch 없이
-        즉시 '찾을 수 없음')."""
+        즉시 '찾을 수 없음'). [서버 canonical search] 단건 조회는 이제 findings_document
+        RPC 1회(구버전 3단계 FIELDS 폴백 fetchDeepLinkFiltered() 대체) — 경계 anchor 도
+        그에 맞춰 갱신한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
-        invalid_branch = fn[:fn.index("fetchDeepLinkFiltered(")]
+        invalid_branch = fn[:fn.index("fetchDocument(")]
         self.assertIn("if (!isValidFindingId(id)) {", invalid_branch)
         self.assertIn('deepLinkStatus = "notfound";', invalid_branch)
         self.assertIn("maybeFinishInit();", invalid_branch)
         self.assertNotIn("fetch", invalid_branch.split("if (!isValidFindingId(id)) {")[1].split("}")[0])
 
-    def test_deeplink_single_record_fetch_reuses_fields_fallback_chain(self):
-        """[②단건 조회] fetchDeepLinkFiltered() 는 기존 3단계 FIELDS 폴백 체인
-        (FIELDS → FIELDS_NO_FIRM_KEY → LEGACY_FIELDS)과 동일한 구조를 그대로
-        재사용해야 한다(findings.js:81-99 계약 재사용, §2)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function fetchDeepLinkFiltered(filterQS) {"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("fetchFindingsFiltered(FIELDS, filterQS)", fn)
-        self.assertIn("fetchFindingsFiltered(FIELDS_NO_FIRM_KEY, filterQS)", fn)
-        self.assertIn("fetchFindingsFiltered(LEGACY_FIELDS, filterQS)", fn)
-        # resolveDeepLink() 의 단건 조회는 finding_id=eq.<id> 필터를 쓴다(anon REST 단건).
-        resolve_fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
-        self.assertIn('fetchDeepLinkFiltered("finding_id=eq." + encodeURIComponent(id))', resolve_fn)
-        # 빈 결과(RLS 비공개 포함)는 별도 구분 없이 notfound.
-        empty_branch = resolve_fn[resolve_fn.index("!Array.isArray(rows) || !rows.length"):]
-        empty_branch = empty_branch[:empty_branch.index("}")]
-        self.assertIn('deepLinkStatus = "notfound";', empty_branch)
+    # [서버 canonical search] fetchDeepLinkFiltered()/fetchFindingsFiltered() 의 3단계
+    # FIELDS 폴백 체인·raw_signal_id 2차 조회·명시 limit=200 은 사라졌다 — findings_document
+    # RPC(026) 1회 왕복이 "단건 조회 → 소속 문서 전체 조회 → 정렬"을 서버(SQL) 안에서 전부
+    # 처리하고 완결된 문서 하나를 돌려준다(파일 상단 [서버 canonical search]·[딥링크] 주석).
+    # 클라이언트는 더 이상 select 필드셋을 협상하거나 명시 limit 을 붙일 필요가 없다.
 
-    def test_deeplink_document_fetch_uses_raw_signal_id_and_default_order(self):
-        """[③문서 전체 조회] 대상의 raw_signal_id 로 같은 문서의 finding 전체를
-        추가 조회하고, 정렬은 기존 서버 정렬 관례(published_date.desc,
-        finding_id.asc)를 그대로 유지해야 한다."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        resolve_fn = js_src[js_src.index("function resolveDeepLink(id) {"):]
-        self.assertIn(
-            'fetchDeepLinkFiltered("raw_signal_id=eq." + encodeURIComponent(rsid))', resolve_fn
-        )
-        endpoint_fn = js_src[js_src.index("function fetchFindingsFiltered(fields, filterQS) {"):]
-        endpoint_fn = endpoint_fn[:endpoint_fn.index("\n  }\n") + 4]
-        self.assertIn("&order=published_date.desc,finding_id.asc", endpoint_fn)
-
-    def test_f10_deep_link_document_fetch_has_explicit_limit(self):
-        """[F-10] 딥링크 단건+문서 조회 공용 fetchFindingsFiltered() 에 명시 limit=200 —
-        PostgREST 서버 기본 상한(max-rows) 의존을 제거한다(현재 문서 최대 46행 대비 여유
-        4배)."""
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        endpoint_fn = js_src[js_src.index("function fetchFindingsFiltered(fields, filterQS) {"):]
-        endpoint_fn = endpoint_fn[:endpoint_fn.index("\n  }\n") + 4]
-        self.assertIn("&limit=200", endpoint_fn)
-        self.assertIn("&order=published_date.desc,finding_id.asc&limit=200", endpoint_fn)
-
-    def test_deeplink_renders_via_groupbydocument_and_builddoccard_reuse(self):
-        """[③렌더] 문서 조회 결과는 기존 groupByDocument()+buildDocCard() 를 그대로
-        재사용해 완전한 문서 카드 1장으로 렌더해야 한다(신규 렌더러 금지)."""
+    def test_deeplink_renders_via_builddoccard_reuse_no_client_grouping(self):
+        """[③렌더] findings_document RPC 가 이미 문서 단위로 묶어 보낸 deepLinkDocRows 는
+        클라이언트 재그룹핑 없이 기존 buildCard() 기반 buildDocCard() 를 그대로 재사용해
+        문서 카드 1장으로 렌더해야 한다(신규 렌더러 금지 — 종전 groupByDocument() 클라이언트
+        그룹핑은 서버 canonical search 전환으로 사라졌다: 서버가 이미 문서 단위 배열을
+        보내므로 재그룹핑할 대상 자체가 없다)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDeepLinkDoc() {"):]
-        fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("groupByDocument(deepLinkDocRows)", fn)
-        self.assertIn('buildDocCard(rows, "")', fn)
+        fn = fn[:fn.index("var finalized = false;")]
+        self.assertIn('var doc = buildDocCard(deepLinkDocRows, "");', fn)
+        self.assertNotIn("groupByDocument", fn)
 
     def test_deeplink_independent_of_pagination(self):
         """[먼 페이지 대상] 딥링크 found 모드는 페이지네이션과 완전히 무관하게
@@ -2469,7 +2065,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         칩 제거(clearActiveFilter/clearAllFilters), 대시보드 클릭(toggleXFilter),
         페이지네이션(goToPageFromPager) 전부가 진입점이다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
         self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3,
                           "셀렉트·정렬·검색어 3개 핸들러 모두 exitDeepLinkMode() 호출해야 함")
         for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",
@@ -2490,26 +2086,28 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_deeplink_normal_path_unaffected_when_param_absent(self):
         """[일반 경로 회귀] finding_id 파라미터가 없으면 deepLinkPending 은 처음부터
         false 로 시작해(requestedFindingId 가 없을 때만 진입하는 if 블록 밖) 신규
-        코드가 초기화 흐름에 개입하지 않고, maybeFinishInit() 의 비-found 분기는
-        기존과 동일하게 goToPage(readPageFromUrl()) 하나로 귀결돼야 한다."""
+        코드가 초기화 흐름에 개입하지 않는다. [서버 canonical search] 페이지 복원은
+        이제 첫 fetchSearch() 호출 이전에 확정되므로, maybeFinishInit() 의 비-found
+        분기는 별도 goToPage 보정 없이 render() 하나로 귀결된다(구버전의
+        goToPage(readPageFromUrl()) 재호출 왕복이 사라졌다)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("var deepLinkPending = false;", js_src)
         tail = js_src[js_src.index("var requestedFindingId = getDeepLinkParam();"):]
-        guarded = tail[:tail.index("fetchFindings(FIELDS)")]
+        guarded = tail[:tail.index("fetchSearch(currentPage)")]
         self.assertIn("if (requestedFindingId) {", guarded)
         self.assertIn("deepLinkPending = true;", guarded)
         finish_fn = js_src[js_src.index("function maybeFinishInit() {"):]
         finish_fn = finish_fn[:finish_fn.index("\n  }\n") + 4]
-        self.assertIn("goToPage(readPageFromUrl());", finish_fn)
-        # ROWS 로드 성공 콜백은 더 이상 goToPage 를 직접 호출하지 않고 maybeFinishInit() 로
-        # 위임한다("ROWS = data;" 는 이 콜백에서만 대입돼 유일하게 그 위치를 특정한다 —
-        # 동일한 "findings shape" 에러 문구는 fetchNextChunkFor() 에도 있어 그걸로는
-        # 앵커할 수 없다).
-        rows_then = js_src[js_src.index("ROWS = data;"):]
-        rows_then = rows_then[:rows_then.index(".catch(function () {")]
-        self.assertIn("rowsReady = true;", rows_then)
-        self.assertIn("maybeFinishInit();", rows_then)
-        self.assertNotIn("goToPage(initialPage)", rows_then)
+        self.assertIn("render();", finish_fn)
+        self.assertNotIn("goToPage(readPageFromUrl())", finish_fn)
+        # 첫 응답 성공 콜백은 LAST 대입 후 rowsReady=true, maybeFinishInit() 로 위임한다
+        # ("if (initToken !== navToken) return;" 는 초기화 fetch 콜백에만 있어 goToPage()
+        # 의 동형 "LAST = data;" 대입(navToken 가드)과 구분되는 유일한 앵커다).
+        last_then = js_src[js_src.index("if (initToken !== navToken) return;"):]
+        last_then = last_then[:last_then.index(".catch(function () {")]
+        self.assertIn("rowsReady = true;", last_then)
+        self.assertIn("maybeFinishInit();", last_then)
+        self.assertNotIn("goToPage(initialPage)", last_then)
 
     def test_deeplink_list_fetch_failure_does_not_override_found_render(self):
         """목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더(found)는 에러 상태로
@@ -2571,7 +2169,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('qInput.parentNode.insertBefore(btn, countEl || null);', fn)
         self.assertIn('btn.id = "fnd-similar-toggle";', fn)
         # wire() 가 초기화 시점에 1회 호출한다.
-        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
         self.assertIn("buildSimilarToggle();", wire_fn)
 
     def test_similar_rpc_call_contract(self):
@@ -2709,7 +2307,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         모드를 끄고 목록 모드로 복귀해야 한다 — exitDeepLinkMode() 와 동일한 진입점
         전부에 나란히 배선된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function buildEndpoint(")]
+        wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
         self.assertEqual(wire_fn.count("exitSimilarMode();"), 2,
                           "셀렉트·정렬 2개 핸들러 모두 exitSimilarMode() 호출해야 함")
         for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",

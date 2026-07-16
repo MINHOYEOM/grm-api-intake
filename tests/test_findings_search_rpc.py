@@ -577,27 +577,57 @@ class DashGrantScopeTest(unittest.TestCase):
 # ============================================================================
 
 
+#: findings 테이블의 실제 컬럼(002 fresh-install + 010 scope_status + 013 firm_key).
+#   아래 파싱이 `row.length`·`row.className` 같은 비-컬럼 접근을 걸러내는 화이트리스트다.
+_FINDINGS_COLUMNS = {
+    "schema_version", "taxonomy_version", "finding_id", "raw_signal_id", "source",
+    "agency", "document_type", "document_id", "published_date", "firm_name", "entity_id",
+    "site_name", "site_country", "product_family", "modality", "category_code",
+    "category_label_ko", "finding_text", "finding_language", "evidence_level",
+    "evidence_url", "inspector_names", "cfr_refs", "mfds_refs", "extraction_method",
+    "confidence", "review_status", "ingested_at", "finding_text_ko",
+    "translation_method", "scope_status", "firm_key",
+}
+
+
 def _parse_client_fields() -> list[str]:
-    """findings.js 의 `var FIELDS = [ ... ];` 선언에서 필드명 목록을 뽑는다."""
+    """findings.js 의 카드 조립부가 **행 객체에서 실제로 읽는** findings 컬럼을 뽑는다.
+
+    ★앵커가 옮겨졌다: 종전에는 `var FIELDS = [ ... ];` 선언을 파싱했다. 그 선언은
+    클라이언트가 PostgREST 로 직접 조회하며 "무엇을 select 할지" 밝히던 목록인데,
+    서버 canonical search 전환으로 클라이언트가 더 이상 select 를 결정하지 않게 되어
+    선언 자체가 사라졌다.
+
+    그래서 **선언 대신 사용(row.X / head.X / r.X 접근)** 을 읽는다. 이게 원래 지키려던
+    진짜 계약이기도 하다 — "클라이언트가 선언한 것"이 아니라 "**렌더러가 읽는 것**"이
+    투영돼야 기능이 살아있기 때문이다. 선언은 낡을 수 있지만 사용은 낡지 않는다.
+
+    비-컬럼 접근(row.length 등)은 _FINDINGS_COLUMNS 화이트리스트로 걸러낸다.
+    """
     js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
-    block = _slice_between(js, "var FIELDS = [", "];")
-    return re.findall(r'"([a-z_]+)"', block)
+    used = set(re.findall(r"\b(?:row|head|r|f)\.([a-z_]+)\b", js))
+    return sorted(used & _FINDINGS_COLUMNS)
 
 
 class ClientFieldsParseTest(unittest.TestCase):
-    """가드의 입력(FIELDS 파싱)이 살아 있는지부터 고정한다 -- 파싱이 조용히 빈 목록을
-    반환하면 아래 교차검증이 **전부 공허하게 통과**한다(가드가 죽은 줄도 모른다)."""
+    """가드의 입력(필드 파싱)이 살아 있는지부터 고정한다 -- 파싱이 조용히 빈 목록을
+    반환하면 아래 교차검증이 **전부 공허하게 통과**한다(가드가 죽은 줄도 모른다).
+
+    ★이 클래스가 있어야 하는 이유가 이번에 실증됐다: 앵커였던 `var FIELDS` 선언이
+    전환으로 사라졌는데, 파싱이 조용히 빈 목록을 냈다면 투영 누락 가드가 죽은 채로
+    green 이었을 것이다."""
 
     def test_client_js_exists(self) -> None:
         self.assertTrue(_CLIENT_JS_PATH.is_file(), f"missing {_CLIENT_JS_PATH}")
 
     def test_fields_parse_is_non_empty_and_plausible(self) -> None:
         fields = _parse_client_fields()
-        self.assertGreaterEqual(len(fields), 15, msg=f"FIELDS 파싱 결과가 빈약하다: {fields}")
+        self.assertGreaterEqual(len(fields), 12, msg=f"필드 파싱 결과가 빈약하다: {fields}")
         self.assertIn("finding_id", fields)
+        self.assertIn("finding_text_ko", fields)
 
-    def test_restored_three_are_declared_by_client(self) -> None:
-        # 028 이 복원한 3종이 실제로 클라이언트 선언 목록에 있어야 근거가 성립한다.
+    def test_restored_three_are_read_by_client(self) -> None:
+        # 028 이 복원한 3종을 렌더러가 실제로 읽어야 그 수리의 근거가 성립한다.
         fields = _parse_client_fields()
         for col in _RESTORED_BY_028:
             self.assertIn(col, fields)

@@ -1,5 +1,10 @@
 -- [FIND-1] HCT/P(인체 세포·조직) 범위 제외 — 사용자 범위 결정(2026-07-16).
 --
+-- ※ 이 파일이 023_findings_scope_tiered.sql 의 (A) 분류 함수를 create or replace 로
+--   **supersede** 한다(007/008/009→010, 018/021→022, 020→023 관례와 동형). 프로덕션
+--   현행 분류 규칙은 이 파일이다. 시그니처(4-인자)가 불변이라 020(C) 트리거는 재배선
+--   없이 이 함수를 계속 호출한다.
+--
 -- ★배경: 023 트리거의 첫 실동작(2026-07-16 04:37 KST intake)에서 들어온 신규 483 이
 --   난임클리닉(Center for Assisted Reproduction)의 **HCT/P 483**(21 CFR 1271 — 기증자
 --   적격성·감염병 위험 표시)이었고 'ok' 로 공개됐다. 확인 결과 020 도 동일 판정이라
@@ -33,7 +38,7 @@
 --
 -- ★영향(dry-run 실측): ok → non_pharma **22건**뿐 — 'Human Tissue Establishment' 13 ·
 --   'Human Tissue and Medical Device Manufacturer' 6 · 'Reproductive Human Tissue' 3
---   (+ 'Tissue Testing Laboratory' 은 OII 표에만 있고 findings 0). 공개 8,187 → 8,165 예정.
+--   (+ 'Tissue Testing Laboratory' 은 OII 표에만 있고 findings 0). 공개 8,187 → 8,168 실측(적용 전 신규 intake 3건 유입분 포함: 8,187+3-22).
 --   그 외 라벨의 판정은 전량 023 과 동일하다.
 --
 -- 시그니처(4-인자) 불변 → 020(C) 트리거는 재배선 없이 이 함수를 계속 호출한다.
@@ -112,4 +117,4 @@ where rs.raw_signal_id = f.raw_signal_id
 -- ② 혈액제제 보존: 'Blood Bank'·'Plasma Derivative Manufacturer'·'American National Red Cross'
 --    ·'Biological Drug Manufacturer' → ok
 -- ③ 본문 축 불변: Celltex/Liveyon(세포치료·FDA 가 미승인 생물의약품으로 규제) 29건 ok 유지
--- ④ 공개 총수 8,187 → 8,165(-22)
+-- ④ 공개 총수 8,168 실측(적용 직전 8,190 = 8,187 + 신규 intake 3건, -22)

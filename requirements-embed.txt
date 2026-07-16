@@ -12,9 +12,18 @@
 # 성공한 실행(run 29406523575, 2026-07-16 조회)의 pip install 로그에서 실측한 값이다
 # (torch 휠 = torch-2.13.0+cpu-cp312). huggingface_hub 는 resolver 가 1.23.0 에서
 # backtrack 해 최종 선택한 값 -- 명시 pin 이 그 backtracking 자체를 없애 설치도 빨라진다.
-# ★잔여 한계(정직하게 남김): 이 5개 직접 의존성만 고정하며, 전이 의존성 전체의
-# hash-lock(`pip install --require-hashes`)은 아직 아니다 -- 하려면 CI 에서
-# `pip-compile --generate-hashes` 로 lockfile 을 생성해야 한다(미착수 과제로 남김).
+#
+# ★이 파일은 **소스 spec(.in 역할)**이다 -- 워크플로가 실제로 설치하는 것은
+# `requirements-embed.lock`(전이 의존성 전체 + sha256, `pip install --require-hashes`)이다.
+# F-05 완결: 직접 의존성 5종 pin 만으로는 전이 의존성이 floating 이라 원 finding 의
+# 공급망 위험이 남았다(Codex 후속 감사 "부분 종결") -> lock 도입으로 닫는다.
+# 버전을 올릴 때: 아래 == 를 고치고 `grm-findings-embed-lock.yml` 을 workflow_dispatch 로
+# 실행해 lock 을 재생성한 뒤 함께 커밋한다(lock 은 ubuntu/cp312 러너에서 해상해야 정확).
+#
+# requests 는 findings_embed_service.py 가 쓴다. embed job 이 **lock 하나로만** 설치하도록
+# 여기에 포함한다(requirements.txt 를 따로 설치하면 그 경로가 hash 미검증으로 남는다).
+# ★그래도 requirements.txt(매일 도는 intake) 자체는 건드리지 않는다 -- 위 경고 유지.
+requests==2.34.2
 torch==2.13.0
 sentence-transformers==3.4.1
 transformers==4.57.6

@@ -273,7 +273,7 @@ grm-api-intake/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
-│  ├─ migrations/  (001_reaction ~ 025_findings_stats_review_status — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025))
+│  ├─ migrations/  (001_reaction ~ 029_findings_html_entity_repair — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영 supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프))
 │  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지

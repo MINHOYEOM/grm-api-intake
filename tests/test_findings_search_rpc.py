@@ -28,7 +28,7 @@ Mirrors the style of test_findings_similar_lexical.py (018/021/022 supersede
   ⑩nested-loop 회피 형태(any (array(select …)) -- any (select array_agg(…)) 는
     타입 에러(dry-run 실측)이자 O(n×m) planner 회피 실패.
   ⑪searched CTE select * 금지 -- 초안이 select *(width=753)로 temp 스필(9,773) 실측.
-  ⑫파일 번호 연속성(001~028, 결번 없음).
+  ⑫파일 번호 연속성(001~029, 결번 없음).
   ⑬028: 클라이언트가 FIELDS 로 선언한 필드는 두 RPC 의 findings[] 투영에 전부 실린다
     -- 026/027 이 firm_key/translation_method/confidence 를 빠뜨려 업체 프로파일 링크·
     AI 번역 고지·신뢰도가 **조용히** 소실됐다(방어적 분기라 크래시 없음). 클라이언트가
@@ -46,6 +46,7 @@ _MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _SEARCH_PATH = _MIGRATIONS_DIR / "026_findings_search.sql"
 _DASH_PATH = _MIGRATIONS_DIR / "027_findings_search_dash_axes.sql"
 _PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
+_ENTITY_REPAIR_PATH = _MIGRATIONS_DIR / "029_findings_html_entity_repair.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -349,9 +350,9 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 
 
 class MigrationNumberSequenceTest(unittest.TestCase):
-    """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede)로 체인이 이어지며
-    마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~028 까지 결번 없이 연속인지(파일명
-    접두 3자리 번호 기준) 고정한다."""
+    """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede) → 029(HTML 엔티티
+    오염 정정)로 체인이 이어지며 마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~029 까지
+    결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
@@ -362,13 +363,16 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_028_file_exists(self) -> None:
         self.assertTrue(_PROJ_PATH.is_file(), f"missing {_PROJ_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_028(self) -> None:
+    def test_029_file_exists(self) -> None:
+        self.assertTrue(_ENTITY_REPAIR_PATH.is_file(), f"missing {_ENTITY_REPAIR_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_029(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 29)))
+        self.assertEqual(numbers, list(range(1, 30)))
 
 
 # ============================================================================

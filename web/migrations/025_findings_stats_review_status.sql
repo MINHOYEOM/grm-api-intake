@@ -1,5 +1,11 @@
 -- [FIND-1] findings_stats() 에 by_review_status 추가 — Codex 후속 감사 신규 Major 수리.
 --
+-- ※ 2026-07-16 후속: 아래 §⑤(canonical search 이전)가 **이행 완료**됐다(026→027→028,
+--   전부 프로덕션 라이브). 그에 따라 §①~④의 클라이언트측 회피책(무필터만 truth·필터 시
+--   숫자 숨김·상시 로딩 문구·정렬 비활성화)은 findings.js 에서 **제거**됐다 — 이제 모든
+--   상태에서 exact 라 회피할 부분집합이 없다. findings_stats 는 커버리지 노트·
+--   /findings/trends/ 전용으로 역할이 좁혀졌다(파셋·대시보드 정본은 findings_search).
+--
 -- ★결함: `/findings/` 의 파셋 카운트·대시보드 바가 `computeFacetCounts()`/`renderDash(matched)`
 --   에서 **클라이언트에 로드된 ROWS(최초 1,000행)만** 집계하면서 전체 통계처럼 표시됐다.
 --   라이브 실측(2026-07-16): 화면 `FDA 483 (910)` vs DB 진실 **8,078** — 11.3% 만 반영.

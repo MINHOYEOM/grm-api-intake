@@ -287,6 +287,14 @@ def resolve_model_revision(model_name: str) -> str:
     return str(revision)
 
 
+def build_model_tag(model_name: str, revision: str) -> str:
+    """Canonical `finding_embeddings.model` value ('<model_name>@<revision>') --
+    single source of truth (F-04) so the value written on upsert and the value
+    the skip-decision loop compares `existing` rows against can never drift
+    apart into two independently-assembled strings."""
+    return f"{model_name}@{revision}"
+
+
 def load_model(model_name: str, revision: str) -> Any:
     from sentence_transformers import SentenceTransformer
     return SentenceTransformer(model_name, revision=revision)
@@ -454,17 +462,34 @@ def fetch_existing_embeddings(
     base_url: str,
     service_key: str,
     embedding_version: int,
-) -> dict[str, str]:
-    """finding_id -> text_sha256 for every row already stored at this
-    embedding_version -- the re-embedding-decision baseline."""
+) -> dict[str, tuple[str, str]]:
+    """finding_id -> (text_sha256, model) for every row already stored at this
+    embedding_version -- the re-embedding-decision baseline.
+
+    ★F-04: both fields are required for that decision. text_sha256 alone
+    cannot detect a model-revision bump on a row whose source text hasn't
+    changed -- that row would be skipped forever, leaving its old-revision
+    vector sitting next to new-revision vectors inside the *same*
+    embedding_version (019's one-version-one-space contract broken). Callers
+    must compare *both* text_sha256 and model before treating a row as
+    already current."""
     base = _normalize_base_url(base_url)
     if base is None:
         raise ValueError("findings_embed_service: SUPABASE_URL must start with https://")
     rows = _fetch_all_pages(
         base, service_key, "finding_embeddings",
-        params={"select": "finding_id,text_sha256", "embedding_version": f"eq.{embedding_version}"},
+        params={
+            "select": "finding_id,text_sha256,model",
+            "embedding_version": f"eq.{embedding_version}",
+        },
     )
-    return {str(row.get("finding_id") or ""): str(row.get("text_sha256") or "") for row in rows}
+    return {
+        str(row.get("finding_id") or ""): (
+            str(row.get("text_sha256") or ""),
+            str(row.get("model") or ""),
+        )
+        for row in rows
+    }
 
 
 def _upsert_embeddings_batch(
@@ -541,6 +566,7 @@ def run_embed(
         "candidates_total": 0,
         "already_current": 0,
         "to_embed": 0,
+        "revision_changed": 0,
         "embedded": 0,
         "upserted": 0,
         "b_input_used": 0,
@@ -585,6 +611,24 @@ def run_embed(
         report["errors"].append(str(exc))
         return report
 
+    # ★F-04 fix: resolve the model revision *before* the skip decision below,
+    # not after it. The skip predicate needs today's model tag to tell "same
+    # text, same model" (truly current) apart from "same text, different
+    # model" (revision bumped -- must re-embed even though the text didn't
+    # change, or this row's vector silently stays in the old space forever).
+    # Model *loading* (heavy -- instantiates the full sentence-transformers
+    # model) is intentionally left below, gated on to_process being non-empty,
+    # exactly as before.
+    try:
+        revision = resolve_model_revision(MODEL_NAME)
+    except RuntimeError as exc:
+        report["errors"].append(str(exc))
+        report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
+        return report
+
+    model_tag = build_model_tag(MODEL_NAME, revision)
+    report["model"] = model_tag
+
     to_process: list[tuple[str, str, str, str]] = []  # (finding_id, text, actual_mode, sha256)
     text_lengths: list[int] = []
     for finding in findings:
@@ -597,9 +641,14 @@ def run_embed(
             report["b_fallback_to_a"] += 1
 
         sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
-        if existing.get(finding_id) == sha256:
+        existing_sha256, existing_model = existing.get(finding_id, ("", ""))
+        if existing_sha256 == sha256 and existing_model == model_tag:
             report["already_current"] += 1
             continue
+        if existing_sha256 == sha256 and existing_sha256 != "" and existing_model != model_tag:
+            # Same input text, different model revision -- text_sha256 alone
+            # would have called this "current"; it must be re-embedded.
+            report["revision_changed"] += 1
         to_process.append((finding_id, text, actual_mode, sha256))
 
     report["to_embed"] = len(to_process)
@@ -611,15 +660,11 @@ def run_embed(
         return report
 
     try:
-        revision = resolve_model_revision(MODEL_NAME)
         model = load_model(MODEL_NAME, revision)
     except RuntimeError as exc:
         report["errors"].append(str(exc))
         report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
         return report
-
-    model_tag = f"{MODEL_NAME}@{revision}"
-    report["model"] = model_tag
 
     texts = [item[1] for item in to_process]
     vectors: list[list[float]] = []
@@ -769,6 +814,7 @@ __all__ = [
     "build_embed_text",
     "sanity_check_embeddings",
     "resolve_model_revision",
+    "build_model_tag",
     "load_model",
     "embed_texts",
     "fetch_target_findings",

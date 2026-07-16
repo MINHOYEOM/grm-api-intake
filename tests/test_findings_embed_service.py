@@ -23,6 +23,22 @@ _MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _EMBEDDINGS_PATH = _MIGRATIONS_DIR / "019_findings_embeddings.sql"
 _SIMILAR_LEXICAL_PATH = _MIGRATIONS_DIR / "018_findings_similar_lexical.sql"
 _REQUIREMENTS_PATH = Path(__file__).resolve().parent.parent / "requirements.txt"
+_REQUIREMENTS_EMBED_PATH = Path(__file__).resolve().parent.parent / "requirements-embed.txt"
+_WORKFLOW_PATH = (
+    Path(__file__).resolve().parent.parent / ".github" / "workflows" / "grm-findings-embed.yml"
+)
+
+
+def _fixed_test_finding() -> dict[str, Any]:
+    return {
+        "finding_id": "finding-1",
+        "finding_text": "text one",
+        "source": "FDA Warning Letter",
+        "raw_signal_id": "rawsig-1",
+    }
+
+
+_FIXED_TEXT_SHA256 = hashlib.sha256(b"text one").hexdigest()
 
 
 def _strip_sql_comments(sql: str) -> str:
@@ -610,6 +626,291 @@ class DoesNotTouchExistingObjectsTest(unittest.TestCase):
             "drop function public.findings_similar(", "drop function public.findings_stats",
         ):
             self.assertNotIn(forbidden, self.code.lower(), f"019 must not contain: {forbidden}")
+
+
+# ---------------------------------------------------------------------------
+# 10) F-04 (Codex 감사) -- 모델 revision 을 재임베딩 판정에 포함
+# ---------------------------------------------------------------------------
+
+
+class _RunEmbedFixture(unittest.TestCase):
+    """Shared monkeypatch scaffolding for run_embed orchestration tests --
+    saves/restores every module-level collaborator run_embed calls, mirroring
+    the inline save/restore dance SanityCheckTest/DryRunTest already use
+    (factored out here because the F-04 tests need several similarly-shaped
+    variants)."""
+
+    def setUp(self) -> None:
+        self._originals = {
+            "_upsert_embeddings_batch": svc._upsert_embeddings_batch,
+            "fetch_target_findings": svc.fetch_target_findings,
+            "fetch_raw_signals_by_ids": svc.fetch_raw_signals_by_ids,
+            "fetch_existing_embeddings": svc.fetch_existing_embeddings,
+            "load_model": svc.load_model,
+            "resolve_model_revision": svc.resolve_model_revision,
+            "embed_texts": svc.embed_texts,
+        }
+        # Default stand-ins shared by every test in this fixture; individual
+        # tests override whichever of these their scenario needs.
+        svc.fetch_target_findings = lambda base, key: [_fixed_test_finding()]
+        svc.fetch_raw_signals_by_ids = lambda base, key, ids: {}
+
+    def tearDown(self) -> None:
+        for name, value in self._originals.items():
+            setattr(svc, name, value)
+
+    def _run(self, **overrides):
+        return svc.run_embed(
+            "https://example.supabase.co", "fake-key",
+            embedding_version=1, embed_input="A", dry_run=False,
+            **overrides,
+        )
+
+
+class RevisionChangeForcesReembedTest(_RunEmbedFixture):
+    """F-04 핵심: text_sha256 은 같지만 model 이 다른 revision 이면 재임베딩 경로를 탄다."""
+
+    def test_same_text_different_model_reembeds_and_counts_revision_changed(self) -> None:
+        embed_calls: list[list[str]] = []
+        upsert_calls: list[object] = []
+
+        old_tag = svc.build_model_tag(svc.MODEL_NAME, "old-revision-sha")
+        svc.fetch_existing_embeddings = lambda base, key, version: {
+            "finding-1": (_FIXED_TEXT_SHA256, old_tag),
+        }
+        svc.resolve_model_revision = lambda name: "new-revision-sha"
+        svc.load_model = lambda name, revision: object()
+
+        def _fake_embed_texts(model, texts, *, batch_size):
+            embed_calls.append(list(texts))
+            return [[0.1] * svc.EMBED_DIM for _ in texts]
+
+        svc.embed_texts = _fake_embed_texts
+
+        def _fake_upsert(*_args, **_kwargs):
+            upsert_calls.append(True)
+            return 200, [], ""
+
+        svc._upsert_embeddings_batch = _fake_upsert
+
+        report = self._run()
+
+        self.assertEqual(report["already_current"], 0)
+        self.assertEqual(report["to_embed"], 1)
+        self.assertEqual(report["revision_changed"], 1)
+        self.assertEqual(len(embed_calls), 1)  # actual embedding path was taken
+        self.assertEqual(len(upsert_calls), 1)
+        self.assertEqual(report["upserted"], 1)
+        self.assertEqual(report["errors"], [])
+        new_tag = svc.build_model_tag(svc.MODEL_NAME, "new-revision-sha")
+        self.assertEqual(report["model"], new_tag)
+
+
+class SameTextAndModelSkipsReembedTest(_RunEmbedFixture):
+    """반대 방향: sha256·model 둘 다 같으면 already_current 이고 임베딩·upsert 는 0회."""
+
+    def test_same_text_and_model_skips_with_zero_embed_or_upsert_calls(self) -> None:
+        embed_calls: list[object] = []
+        upsert_calls: list[object] = []
+        load_calls: list[object] = []
+
+        current_tag = svc.build_model_tag(svc.MODEL_NAME, "same-revision-sha")
+        svc.fetch_existing_embeddings = lambda base, key, version: {
+            "finding-1": (_FIXED_TEXT_SHA256, current_tag),
+        }
+        svc.resolve_model_revision = lambda name: "same-revision-sha"
+
+        def _fake_load_model(name, revision):
+            load_calls.append(True)
+            return object()
+
+        svc.load_model = _fake_load_model
+
+        def _fake_embed_texts(model, texts, *, batch_size):
+            embed_calls.append(True)
+            return [[0.1] * svc.EMBED_DIM for _ in texts]
+
+        svc.embed_texts = _fake_embed_texts
+
+        def _fake_upsert(*_args, **_kwargs):
+            upsert_calls.append(True)
+            return 200, [], ""
+
+        svc._upsert_embeddings_batch = _fake_upsert
+
+        report = self._run()
+
+        self.assertEqual(report["already_current"], 1)
+        self.assertEqual(report["to_embed"], 0)
+        self.assertEqual(report["revision_changed"], 0)
+        self.assertEqual(load_calls, [])
+        self.assertEqual(embed_calls, [])
+        self.assertEqual(upsert_calls, [])
+        self.assertEqual(report["upserted"], 0)
+        self.assertEqual(report["errors"], [])
+
+
+class ResolverCalledBeforeSkipDecisionTest(_RunEmbedFixture):
+    """resolve_model_revision 은 skip 판정보다 먼저 호출된다 -- to_process 가 빈
+    상황(모두 already_current)에서도 resolver 는 호출됐어야 한다(호출 카운터로 검증)."""
+
+    def test_resolver_called_even_when_to_process_ends_up_empty(self) -> None:
+        resolve_calls: list[str] = []
+
+        def _resolve(name: str) -> str:
+            resolve_calls.append(name)
+            return "rev-x"
+
+        svc.resolve_model_revision = _resolve
+        current_tag = svc.build_model_tag(svc.MODEL_NAME, "rev-x")
+        svc.fetch_existing_embeddings = lambda base, key, version: {
+            "finding-1": (_FIXED_TEXT_SHA256, current_tag),
+        }
+
+        # Defensive: these must never be reached once to_process is empty --
+        # fail loudly (rather than falling through to the real, network/heavy
+        # sentence-transformers path) if a regression calls them anyway.
+        def _unexpected(*_args, **_kwargs):
+            raise AssertionError("must not be called when to_process is empty")
+
+        svc.load_model = _unexpected
+        svc.embed_texts = _unexpected
+        svc._upsert_embeddings_batch = _unexpected
+
+        report = self._run()
+
+        self.assertEqual(resolve_calls, [svc.MODEL_NAME])
+        self.assertEqual(report["to_embed"], 0)
+        self.assertEqual(report["already_current"], 1)
+        self.assertEqual(report["model"], current_tag)
+        self.assertEqual(report["errors"], [])
+
+
+class ResolveFailurePropagatesTest(_RunEmbedFixture):
+    """resolve_model_revision 실패 시 예외가 errors 로 반영되고, 빈 model 문자열로
+    임베딩을 진행하지 않는다(모델 로드/임베딩/upsert 어느 것도 호출되지 않음)."""
+
+    def test_resolve_failure_aborts_before_any_model_load(self) -> None:
+        svc.fetch_existing_embeddings = lambda base, key, version: {}
+
+        def _raise(name: str) -> str:
+            raise RuntimeError(
+                f"findings_embed_service: could not resolve model revision for {name} (boom)"
+            )
+
+        svc.resolve_model_revision = _raise
+
+        def _unexpected(*_args, **_kwargs):
+            raise AssertionError("must not be called when resolve_model_revision fails")
+
+        svc.load_model = _unexpected
+        svc.embed_texts = _unexpected
+        svc._upsert_embeddings_batch = _unexpected
+
+        report = self._run()
+
+        self.assertTrue(report["errors"])
+        self.assertEqual(report["model"], "")  # never overwritten with a blank placeholder
+        self.assertEqual(report["upserted"], 0)
+        self.assertEqual(report["embedded"], 0)
+
+
+class FetchExistingEmbeddingsIncludesModelTest(unittest.TestCase):
+    """fetch_existing_embeddings 가 select 에 model 을 포함하는지 소스 검사(소스마커)."""
+
+    def test_select_includes_model_column(self) -> None:
+        import inspect
+        source = inspect.getsource(svc.fetch_existing_embeddings)
+        self.assertIn('"select": "finding_id,text_sha256,model"', source)
+
+    def test_return_type_is_sha256_and_model_tuple(self) -> None:
+        import inspect
+        source = inspect.getsource(svc.fetch_existing_embeddings)
+        self.assertIn("dict[str, tuple[str, str]]", source)
+
+
+# ---------------------------------------------------------------------------
+# 11) F-05 (Codex 감사) -- 공급망 pin: action SHA + 의존성 정확 버전 고정
+# ---------------------------------------------------------------------------
+
+
+class WorkflowActionPinningTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_WORKFLOW_PATH.is_file(), f"missing {_WORKFLOW_PATH}")
+        self.workflow = _WORKFLOW_PATH.read_text(encoding="utf-8")
+        self.uses_lines = [line.strip() for line in self.workflow.splitlines() if "uses:" in line]
+
+    def test_at_least_three_actions_present(self) -> None:
+        self.assertGreaterEqual(len(self.uses_lines), 3)
+
+    def test_every_action_pinned_to_a_full_commit_sha(self) -> None:
+        for line in self.uses_lines:
+            self.assertRegex(
+                line, r"@[0-9a-f]{40}\b",
+                f"not pinned to a full 40-hex-char commit SHA: {line}",
+            )
+
+    def test_no_bare_version_tag_references_remain(self) -> None:
+        for forbidden in ("actions/checkout@v", "actions/setup-python@v", "actions/cache@v"):
+            self.assertNotIn(forbidden, self.workflow, f"floating tag reference found: {forbidden}")
+
+    def test_pinned_actions_carry_a_trailing_version_comment(self) -> None:
+        for name in ("actions/checkout@", "actions/setup-python@", "actions/cache@"):
+            line = next(l for l in self.uses_lines if name in l)
+            self.assertIn("# v", line, f"missing trailing version comment: {line}")
+
+    def test_expected_shas_match_the_audited_commits(self) -> None:
+        # ★2026-07-16 GitHub API 조회로 확인한 실제 SHA(Codex 감사 F-05 지시값).
+        self.assertIn("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd", self.workflow)
+        self.assertIn("actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405", self.workflow)
+        self.assertIn("actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830", self.workflow)
+
+
+class RequirementsEmbedExactPinningTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_REQUIREMENTS_EMBED_PATH.is_file(), f"missing {_REQUIREMENTS_EMBED_PATH}")
+        self.text = _REQUIREMENTS_EMBED_PATH.read_text(encoding="utf-8")
+        self.dependency_lines = [
+            line.strip() for line in self.text.splitlines()
+            if line.strip() and not line.strip().startswith("#") and not line.strip().startswith("--")
+        ]
+
+    def test_at_least_five_pinned_dependencies(self) -> None:
+        self.assertGreaterEqual(len(self.dependency_lines), 5)
+
+    def test_every_dependency_line_is_an_exact_pin(self) -> None:
+        for line in self.dependency_lines:
+            self.assertIn("==", line, f"not pinned to an exact version: {line}")
+
+    def test_no_floating_range_operators_remain(self) -> None:
+        for line in self.dependency_lines:
+            self.assertNotIn(">=", line, f"floating lower bound remains: {line}")
+            self.assertNotIn("<", line, f"floating upper bound remains: {line}")
+
+    def test_expected_pinned_versions_present(self) -> None:
+        for expected in (
+            "torch==2.13.0",
+            "sentence-transformers==3.4.1",
+            "transformers==4.57.6",
+            "huggingface_hub==0.36.2",
+            "numpy==2.5.1",
+        ):
+            self.assertIn(expected, self.text)
+
+    def test_cpu_extra_index_url_preserved(self) -> None:
+        # F-05 pin 은 CPU 전용 torch 휠 인덱스(기존 설계 계약)를 건드리지 않는다.
+        self.assertIn("--extra-index-url https://download.pytorch.org/whl/cpu", self.text)
+
+
+class IntakeRequirementsStillIsolatedFromMlDepsTest(unittest.TestCase):
+    """회귀 방지(기존 계약 유지) -- requirements.txt(intake) 에 torch·
+    sentence-transformers 가 여전히 없어야 한다. RequirementsIsolationTest(#8)와
+    같은 계약을 F-05 정확 버전 고정 이후에도 다시 고정한다."""
+
+    def test_requirements_txt_still_has_no_ml_dependencies(self) -> None:
+        text = _REQUIREMENTS_PATH.read_text(encoding="utf-8").lower()
+        for forbidden in ("sentence-transformers", "torch", "transformers", "huggingface"):
+            self.assertNotIn(forbidden, text, f"requirements.txt must not pull in {forbidden!r}")
 
 
 if __name__ == "__main__":  # pragma: no cover

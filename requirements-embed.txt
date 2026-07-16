@@ -8,5 +8,15 @@
 # 주 요인이므로 워크플로에서 pip + huggingface 캐시를 반드시 병행한다).
 --extra-index-url https://download.pytorch.org/whl/cpu
 
-torch>=2.2,<3
-sentence-transformers>=3.0,<4
+# ★F-05(공급망 pin, Codex 감사) -- floating range 대신 정확 버전 고정. 추측이 아니라
+# 성공한 실행(run 29406523575, 2026-07-16 조회)의 pip install 로그에서 실측한 값이다
+# (torch 휠 = torch-2.13.0+cpu-cp312). huggingface_hub 는 resolver 가 1.23.0 에서
+# backtrack 해 최종 선택한 값 -- 명시 pin 이 그 backtracking 자체를 없애 설치도 빨라진다.
+# ★잔여 한계(정직하게 남김): 이 5개 직접 의존성만 고정하며, 전이 의존성 전체의
+# hash-lock(`pip install --require-hashes`)은 아직 아니다 -- 하려면 CI 에서
+# `pip-compile --generate-hashes` 로 lockfile 을 생성해야 한다(미착수 과제로 남김).
+torch==2.13.0
+sentence-transformers==3.4.1
+transformers==4.57.6
+huggingface_hub==0.36.2
+numpy==2.5.1

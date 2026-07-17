@@ -1,0 +1,422 @@
+[
+  {
+    "id": "q-001",
+    "question_ko": "의약품이 허가사항과 용도에 맞는 품질로 일관되게 생산·관리되도록 하며, 시설 관리부터 출하까지 전 과정에 적용되는 기준은 무엇인가요?",
+    "choices": [
+      "시정 및 예방조치(CAPA)",
+      "의약품 제조 및 품질관리기준(GMP)",
+      "표준작업절차서(SOP)",
+      "배치기록"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "GMP는 의약품이 정해진 품질로 일관되게 생산·관리되도록 하는 품질보증의 일부이며 시설, 제조, 시험, 기록과 출하 전 과정에 적용됩니다. CAPA·SOP·배치기록은 이 전 과정을 포괄하는 기준 자체가 아닙니다.",
+    "source_type": "glossary",
+    "source_ref": "gmp",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-002",
+    "question_ko": "FDA 조사관이 실사 중 규제 요건 위반 가능성을 나타내는 상태나 관행을 확인했을 때 업체에 제시하지만, 최종 위반 판정 자체는 아닌 문서는 무엇인가요?",
+    "choices": [
+      "FDA 실사 관찰사항 통지서(Form 483)",
+      "FDA 경고서한",
+      "FDA 제조소 실사보고서(EIR)",
+      "회수 통지"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "Form 483은 실사 중 확인된 관찰사항의 목록이며 FDA의 최종 위반 판정이나 최종 행정결정은 아닙니다. 경고서한·EIR·회수 통지는 서로 목적과 발행 단계가 다른 문서입니다.",
+    "source_type": "glossary",
+    "source_ref": "fda-form-483",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-003",
+    "question_ko": "FDA가 연방 요건의 중대한 위반이라고 판단한 사항을 알리고, 정해진 기간 안에 설명과 시정계획을 제출할 기회를 주는 서한은 무엇인가요?",
+    "choices": [
+      "FDA 경고서한",
+      "FDA 실사 관찰사항 통지서(Form 483)",
+      "FDA 제조소 실사보고서(EIR)",
+      "회수 등급"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "FDA 경고서한은 중대한 연방 요건 위반을 당사자에게 알리고 설명과 시정계획 제출 기회를 주는 서한입니다. 그 자체가 법원의 판결이나 최종 행정결정은 아닙니다.",
+    "source_type": "glossary",
+    "source_ref": "warning-letter",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-004",
+    "question_ko": "GRM이 한 규제 문서에서 검색·비교할 수 있도록 분리해 정리한 개별 관찰사항이나 품질 지적사항을 무엇이라고 하나요?",
+    "choices": [
+      "주간 브리프",
+      "공식원본 링크",
+      "개별 지적사항(finding)",
+      "신호 우선순위"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "Finding은 한 규제 문서의 관찰사항이나 품질 지적사항을 검색·비교할 수 있도록 분리한 단위입니다. 한 문서에는 여러 finding이 포함될 수 있습니다.",
+    "source_type": "glossary",
+    "source_ref": "finding",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-005",
+    "question_ko": "GRM 카드가 어떤 근거자료에 연결되어 있는지를 A부터 D까지 나타내며, 정보의 중요도나 법적 위험도를 뜻하지 않는 내부 분류는 무엇인가요?",
+    "choices": [
+      "신호 우선순위",
+      "회수 등급",
+      "근거 수준(Evidence Level)",
+      "검토 상태"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "Evidence Level은 카드가 연결된 근거자료의 상태를 A부터 D까지 나타내는 GRM 내부 분류입니다. Signal Tier처럼 반영 우선순위를 나타내거나 법적 위험도를 평가하는 등급이 아닙니다.",
+    "source_type": "glossary",
+    "source_ref": "evidence-level",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-006",
+    "question_ko": "수집된 정보의 검토 및 주간 브리프 반영 우선순위를 Tier 1부터 3까지 나타내며, 법적 심각도나 업체 위험등급과는 다른 분류는 무엇인가요?",
+    "choices": [
+      "근거 수준",
+      "신호 우선순위(Signal Tier)",
+      "회수 등급",
+      "검토 상태"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "Signal Tier는 검토와 주간 브리프 반영 우선순위를 Tier 1부터 3까지 나타내는 GRM 내부 분류입니다. Evidence Level이나 규제기관의 법적 심각도 분류와는 목적이 다릅니다.",
+    "source_type": "glossary",
+    "source_ref": "signal-tier",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-007",
+    "question_ko": "GRM 카드에서 정보를 발견한 경로인 '정보출처'와 실제 규제기관 문서인 '공식원본'을 구분해 제공하는 방식은 무엇인가요?",
+    "choices": [
+      "근거 수준",
+      "신호 우선순위",
+      "지적사항 검색",
+      "듀얼 링크"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "듀얼 링크는 정보출처와 공식원본을 구분해 제공하는 방식입니다. 두 링크가 같은 페이지라면 하나로 합쳐 표시될 수 있습니다.",
+    "source_type": "glossary",
+    "source_ref": "dual-links",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-008",
+    "question_ko": "이미 발생한 부적합의 원인을 제거해 재발을 막고, 잠재적 문제의 원인을 제거해 발생을 막는 조치 체계는 무엇인가요?",
+    "choices": [
+      "시정 및 예방조치(CAPA)",
+      "근본원인분석(RCA)",
+      "변경관리",
+      "일탈"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "CAPA는 재발 방지를 위한 시정조치와 발생 방지를 위한 예방조치를 함께 관리하며 조치 실행과 효과 확인까지 포함합니다. RCA는 원인을 찾는 분석으로 CAPA의 한 과정이 될 수 있지만 조치 체계 전체와 같지는 않습니다.",
+    "source_type": "glossary",
+    "source_ref": "capa",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-009",
+    "question_ko": "문제가 발생한 방식뿐 아니라 그 밑의 원인과 기여 요인을 구조적으로 찾고, 확인된 원인에 맞는 조치를 세우는 분석은 무엇인가요?",
+    "choices": [
+      "일탈",
+      "변경관리",
+      "시정 및 예방조치(CAPA)",
+      "근본원인분석(RCA)"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "RCA는 문제 밑에 있는 원인과 기여 요인을 구조적으로 찾아 반복 방지 조치에 연결하는 분석입니다. CAPA는 그 분석 결과를 바탕으로 조치를 실행하고 효과를 확인하는 더 넓은 체계입니다.",
+    "source_type": "glossary",
+    "source_ref": "root-cause-analysis",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-010",
+    "question_ko": "승인된 지시사항이나 정해진 기준에서 벗어난 상황을 무엇이라고 하나요?",
+    "choices": [
+      "변경관리",
+      "일탈",
+      "규격이탈 결과(OOS)",
+      "배치 출하승인"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "일탈은 승인된 지시사항이나 정해진 기준에서 벗어난 상황이며 기록과 영향평가가 필요합니다. OOS는 그중에서도 정해진 규격이나 허용기준을 벗어난 시험결과를 가리킵니다.",
+    "source_type": "glossary",
+    "source_ref": "deviation",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-011",
+    "question_ko": "제품허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어나 과학적이고 문서화된 조사가 필요한 시험결과는 무엇인가요?",
+    "choices": [
+      "경향이탈 결과(OOT)",
+      "일탈",
+      "규격이탈 결과(OOS)",
+      "변경관리"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "OOS는 정해진 규격이나 허용기준을 벗어난 시험결과로, 단순 재시험이 아니라 과학적이고 문서화된 조사가 필요합니다. OOT는 허용기준 안에 있으면서 과거 경향에서 벗어난 결과라는 점이 다릅니다.",
+    "source_type": "glossary",
+    "source_ref": "oos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-012",
+    "question_ko": "검증된 상태에 영향을 줄 수 있는 변경을 자격 있는 담당자가 공식적으로 검토하고, 변경 뒤에도 품질과 공정 관리 상태가 유지되도록 하는 체계는 무엇인가요?",
+    "choices": [
+      "근본원인분석",
+      "일탈",
+      "시정 및 예방조치",
+      "변경관리"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "변경관리는 검증된 상태에 영향을 줄 수 있는 변경을 공식 검토하고 필요한 후속 조치를 정하는 체계입니다. 일탈·RCA·CAPA는 각각 기준 이탈, 원인 분석, 시정·예방조치에 초점이 있습니다.",
+    "source_type": "glossary",
+    "source_ref": "change-control",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-013",
+    "question_ko": "특정 제품에만 한정되지 않는 작업 수행 방법을 승인된 형태로 작성한 절차서는 무엇인가요?",
+    "choices": [
+      "배치기록",
+      "표준작업절차서(SOP)",
+      "변경관리",
+      "규격"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "SOP는 특정 제품에만 한정되지 않는 작업 방법을 승인된 형태로 작성한 절차서입니다. 배치기록은 특정 배치의 제조 이력을 추적하는 문서라는 점에서 다릅니다.",
+    "source_type": "glossary",
+    "source_ref": "sop",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-014",
+    "question_ko": "한 배치의 벌크제품 또는 완제품 제조와 관련된 모든 문서로, 해당 배치의 제조 과정과 품질 영향 상황을 추적하게 하는 것은 무엇인가요?",
+    "choices": [
+      "표준작업절차서",
+      "일탈",
+      "배치기록",
+      "시정 및 예방조치"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "배치기록은 특정 한 배치의 제조와 관련된 모든 문서로서 제조 과정과 품질에 영향을 줄 수 있는 상황을 추적하게 합니다. SOP는 여러 작업에 공통으로 적용되는 승인된 수행 방법입니다.",
+    "source_type": "glossary",
+    "source_ref": "batch-record",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-015",
+    "question_ko": "데이터가 전체 수명주기 동안 완전하고 일관되며 정확하고, 누가 언제 무엇을 기록했는지 추적할 수 있는 상태를 무엇이라고 하나요?",
+    "choices": [
+      "데이터 완전성",
+      "공정 밸리데이션",
+      "변경관리",
+      "배치 출하승인"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "데이터 완전성은 데이터가 전체 수명주기 동안 완전하고 일관되며 정확한 상태를 뜻합니다. 공정 밸리데이션이나 변경관리는 각각 공정의 재현성과 변경의 공식 검토를 다루는 별도 개념입니다.",
+    "source_type": "glossary",
+    "source_ref": "data-integrity",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-016",
+    "question_ko": "정해진 공정 조건으로 운전했을 때 미리 정한 규격과 품질특성을 만족하는 의약품을 효과적이고 재현성 있게 생산할 수 있음을 문서로 입증하는 활동은 무엇인가요?",
+    "choices": [
+      "세척 밸리데이션",
+      "공정 밸리데이션",
+      "적격성평가",
+      "안정성시험"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "공정 밸리데이션은 정해진 공정이 요구 품질의 의약품을 효과적이고 재현성 있게 생산함을 문서로 입증합니다. 세척 밸리데이션·적격성평가·안정성시험은 각각 다른 검증 대상을 다룹니다.",
+    "source_type": "glossary",
+    "source_ref": "process-validation",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-017",
+    "question_ko": "한 원료나 제품이 다른 원료 또는 제품에 의해 오염되는 것을 무엇이라고 하나요?",
+    "choices": [
+      "교차오염",
+      "바이오버든",
+      "환경 모니터링",
+      "라인 클리어런스"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "교차오염은 한 원료나 제품이 다른 원료 또는 제품에 의해 오염되는 상황입니다. 바이오버든은 미생물 오염부하이고 환경 모니터링과 라인 클리어런스는 오염·혼입을 관리하는 활동입니다.",
+    "source_type": "glossary",
+    "source_ref": "cross-contamination",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q-018",
+    "question_ko": "2026년 6월 4주차 GRM 브리프에서 FDA CDER가 완제의약품 CGMP 위반 경고서한을 발부한 대상으로 확인된 업체는 어디인가요?",
+    "choices": [
+      "Huons Co., Ltd.",
+      "Pharmaneek Inc",
+      "Golden State Medical Supply Inc.",
+      "SUN PHARMACEUTICAL INDUSTRIES INC"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "해당 카드에는 FDA CDER가 Huons Co., Ltd.에 완제의약품 CGMP 위반을 이유로 경고서한을 발부했다고 명시되어 있습니다. 나머지 업체는 같은 호의 다른 실사·회수 카드에 등장합니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#eb5152bfcf02",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-019",
+    "question_ko": "FDA가 Pharmaneek Inc의 비무균 완제의약품 제조소 실사에서 관찰한 핵심 이슈는 무엇인가요?",
+    "choices": [
+      "장기안정성시험의 용출 OOS",
+      "위험의약품 취급 시 격리·세척 등 교차오염 방지 미흡",
+      "마약류 취급내역 보고 지연",
+      "주사제의 유리 이물 검출"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "Pharmaneek Inc의 Form 483 카드에는 위험의약품 취급 시 격리, 작업면, 기구와 인원에 대한 교차오염 방지 조치가 미흡했다고 적혀 있습니다. 다른 선택지는 이 카드가 아니라 별도의 회수·행정처분 사례에 해당합니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#fda483-193232",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-020",
+    "question_ko": "식약처의 화순전남대학병원 GMP 실사에서 확인된 지적사항 중 하나는 무엇인가요?",
+    "choices": [
+      "주사제의 유리 이물 검출",
+      "24시간 시점 용출 OOS",
+      "데이터완전성 담당자 업무분장 범위의 문서화 미흡",
+      "포장단위 정제 수량 오기"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "브리프는 데이터완전성 담당자 업무분장 범위 문서화 미흡을 지적사항으로 명시하며, 일탈처리 절차 재검토와 변경관리 기록 미흡도 함께 제시합니다. 나머지 선택지는 다른 공개 사례의 이슈입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1Pxznco5TX7",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-021",
+    "question_ko": "식약처의 Shanghai Ethypharm Pharmaceuticals GMP 실사에서 함께 지적된 두 항목은 무엇인가요?",
+    "choices": [
+      "마약류 보고기한과 제품 표시 수량",
+      "배지성능시험과 필터 완전성시험",
+      "주사제 유리 이물과 용기 밀봉",
+      "보관소 온습도 모니터링과 제조장비 세척 후 유지시간 검증"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "해당 카드에는 보관소 온습도 모니터링 미흡과 제조장비 세척 후 유지시간 검증 미흡 두 건이 명시되어 있습니다. 다른 조합은 이 제조소의 해당 실사 지적사항이 아닙니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxtsjZTS6w",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-022",
+    "question_ko": "서울대학교병원 GMP 실사 카드에서 '중요' 지적사항으로 분류된 것은 무엇인가요?",
+    "choices": [
+      "환경 모니터링 관리기준 미흡",
+      "이송튜빙 세척 밸리데이션 미흡",
+      "배지성능시험 기준서 미준수와 일부 시험항목 미실시",
+      "보관소 온습도 모니터링 미흡"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "배지성능시험 기준서 미준수와 배지 품질관리 시 일부 시험항목 미실시는 '중요' 지적으로 기재되어 있습니다. 같은 카드의 환경 모니터링 기준과 이송튜빙 세척 밸리데이션 지적은 '기타'로 구분됩니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxzwRCkCdX",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-023",
+    "question_ko": "FDA 회수 D-0580-2026에서 DOXOrubicin Hydrochloride Liposome 주사제가 Class I으로 회수된 이유는 무엇인가요?",
+    "choices": [
+      "장기안정성시험의 저용출 OOS",
+      "유리로 확인된 이물 검출",
+      "품목 혼동",
+      "용기 밀봉불량"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "해당 카드의 원문 인용과 핵심 사실은 검출된 미립자가 유리로 확인됐다고 명시합니다. 용출 OOS·품목 혼동·용기 밀봉불량은 각각 다른 회수 사유입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#D-0580-2026",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-024",
+    "question_ko": "식약처가 유니메드제약에 마약류제조업자 업무정지 3일을 처분한 이유는 무엇인가요?",
+    "choices": [
+      "안정성시험의 용출 OOS",
+      "제조설비 세척기준서 미준수",
+      "미생물한도시험 부적합",
+      "마약류 취급내역을 보고기한 안에 보고하지 않음"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "카드는 옥시코돈염 낱개수량 오기 정정·삭제 등 마약류 취급내역을 보고기한 안에 보고하지 않은 사실을 처분 사유로 제시합니다. 나머지는 이 행정처분 카드의 사유가 아닙니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#admin-2026004034",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-025",
+    "question_ko": "Golden State Medical Supply의 Niacin Extended-Release Tablets 회수 사유로 카드에 명시된 것은 무엇인가요?",
+    "choices": [
+      "유리로 확인된 이물 검출",
+      "포장단위 표시사항 불일치",
+      "12개월 장기안정성시험의 24시간 시점 3단계 용출 OOS(저용출)",
+      "미생물한도시험 부적합"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "해당 Class II 회수 카드는 12개월 장기안정성시험에서 24시간 시점 3단계 용출이 기준 미달로 확인됐다고 명시합니다. 다른 선택지는 별도 제품의 품질 이슈입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#D-0587-2026",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-026",
+    "question_ko": "공개 findings에서 Turbare Manufacturing이 준수하지 않은 것으로 지적된 절차는 무엇인가요?",
+    "choices": [
+      "보관소 온습도 모니터링 절차",
+      "시판 후 이상사례 보고 절차",
+      "제품 표시 수량 확인 절차",
+      "무균 의약품의 미생물 오염 방지 절차"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "해당 finding은 무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않았다고 명시합니다. 다른 선택지는 이 finding의 지적 내용이 아닙니다.",
+    "source_type": "finding",
+    "source_ref": "https://grm-solutions.com/findings/?finding_id=finding-1f0fe4407b7ee8ee31682324",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-027",
+    "question_ko": "공개 findings에서 안정성시험의 미생물한도 부적합으로 영업자 회수 대상이 된 삼성제약 제품은 무엇인가요?",
+    "choices": [
+      "쓸기담액50밀리그람",
+      "크레젯정10/5밀리그램",
+      "바른인진호",
+      "농림해방풍"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "해당 finding은 쓸기담액50밀리그람이 안정성시험의 미생물한도 부적합에 따라 영업자 회수 대상이었다고 명시합니다. 나머지 제품명은 다른 공개 회수 사례에 해당합니다.",
+    "source_type": "finding",
+    "source_ref": "https://grm-solutions.com/findings/?finding_id=finding-5ae252bdbbb77c3fdd90a46f",
+    "difficulty": "normal"
+  },
+  {
+    "id": "q-028",
+    "question_ko": "공개 findings에서 Catalent Indiana의 규격 미충족 사례 조사 기록에 항상 포함되지 않았다고 지적된 것은 무엇인가요?",
+    "choices": [
+      "업체명 및 소재지",
+      "제품 표시사항 및 정제 수량",
+      "회수 등급 및 유통기한",
+      "결론 및 후속 조치"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "해당 finding은 배치 또는 구성 성분이 규격을 충족하지 못한 사례의 조사 기록에 결론과 후속 조치가 항상 포함되지는 않았다고 명시합니다. 다른 선택지는 이 조사 기록 지적의 대상이 아닙니다.",
+    "source_type": "finding",
+    "source_ref": "https://grm-solutions.com/findings/?finding_id=finding-3872fd021f212ef21cd4ec89",
+    "difficulty": "normal"
+  }
+]

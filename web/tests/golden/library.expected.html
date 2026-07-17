@@ -9,15 +9,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>규제뉴스 · GRM</title>
-<meta name="description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<link rel="canonical" href="https://grm-solutions.com/archive/" />
+<title>자료실 · GRM</title>
+<meta name="description" content="ICH 가이드라인 카탈로그와 식약처 지침·고시 아카이브를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요." />
+<link rel="canonical" href="https://grm-solutions.com/library/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="규제뉴스 · GRM" />
-<meta property="og:description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<meta property="og:url" content="https://grm-solutions.com/archive/" />
+<meta property="og:title" content="자료실 · GRM" />
+<meta property="og:description" content="ICH 가이드라인 카탈로그와 식약처 지침·고시 아카이브를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요." />
+<meta property="og:url" content="https://grm-solutions.com/library/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -35,52 +35,62 @@
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html" class="on">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a></nav>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html" class="on">자료실</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
-  <a class="btn coral" href="../briefs/2026-06-22/index.html">이번 주 소식</a>
+  <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
 <main>
   <div class="wrap page-head">
-    <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제뉴스 모아보기</h1>
-    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
-    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
-      <i class="ti ti-search lead"></i>
-      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="규제뉴스 카드 검색" />
-      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="panel reveal" id="panel" style="animation-delay:.26s">
-      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
-      <div class="facets" id="facets"></div>
-    </div>
-    <div class="bar reveal" id="bar" style="animation-delay:.32s">
-      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간</button><button type="button" data-view="cards">카드 전체</button></div>
-      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
-    </div>
+    <span class="kick reveal" style="animation-delay:.02s">Reference Library</span>
+    <h1 class="reveal" style="animation-delay:.08s">자료실</h1>
+    <p class="reveal" style="animation-delay:.14s">규제 실무에서 자주 되짚는 참조 문서를 한곳에 모았습니다. 매주 흘러가는 브리프와 달리, 필요할 때 언제든 다시 찾아볼 수 있도록 카탈로그 형태로 정리하고 공식 원문 링크를 함께 제공합니다.</p>
   </div>
   <div class="wrap">
-    <div id="results">
-      <div id="static-issues">        <a class="issue latest" href="../briefs/2026-06-22/index.html">
-          <div class="vol">Vol.<b>3</b></div>
-          <div><span class="badge"><span class="live"></span>이번 주 · LIVE</span><h3>2026년 6월 4주차</h3>
-            <div class="row"><span class="tag date">2026-06-22</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">EMA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
-          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A15 · B21</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-15/index.html">
-          <div class="vol">Vol.<b>2</b></div>
-          <div><h3>2026년 6월 3주차</h3>
-            <div class="row"><span class="tag date">2026-06-15</span><span class="tag">MFDS</span></div></div>
-          <div class="stat"><b>1</b><span class="u">건</span><span class="ev mono">A1 · B0</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-08/index.html">
-          <div class="vol">Vol.<b>1</b></div>
-          <div><h3>FDA, 무균 충전 공정 데이터 무결성 결함으로 경고장 발부</h3>
-            <div class="row"><span class="tag date">2026-06-08</span><span class="tag">FDA</span><span class="tag">MHRA</span></div></div>
-          <div class="stat"><b>2</b><span class="u">건</span><span class="ev mono">A1 · B1</span></div>
-        </a>      </div>
+    <div class="lib-cats">
+      <a class="lib-cat reveal" style="animation-delay:0.20s" href="../library/ich/index.html">
+        <div class="lib-cat-h">
+          <h2>ICH 가이드라인 카탈로그</h2>
+          <span class="lib-cat-n">31<span class="u">토픽</span></span>
+        </div>
+        <p>FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽과 공식 원문.</p>
+        <div class="lib-cat-f">
+          <span class="lib-asof">기준 2026-06-05</span>
+          <span class="lib-go">바로가기 <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+      </a>
+      <a class="lib-cat reveal" style="animation-delay:0.26s" href="../library/mfds/index.html">
+        <div class="lib-cat-h">
+          <h2>MFDS 지침·고시 아카이브</h2>
+          <span class="lib-cat-n">31<span class="u">건</span></span>
+        </div>
+        <p>식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.</p>
+        <div class="lib-cat-f">
+          <span class="lib-asof">기준 2026-07-17</span>
+          <span class="lib-go">바로가기 <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+      </a>
     </div>
   </div>
 </main>
+<style>
+/* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드. */
+.lib-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding:24px 0 60px}
+.lib-cat{display:flex;flex-direction:column;gap:12px;padding:26px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--ink);transition:border-color .16s var(--ease),transform .16s var(--ease),box-shadow .16s var(--ease)}
+.lib-cat:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:var(--shadow)}
+.lib-cat-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.lib-cat-h h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;color:var(--ink);margin:0}
+.lib-cat-n{flex:none;font-family:var(--serif);font-size:28px;font-weight:600;color:var(--coral-2);line-height:1}
+.lib-cat-n .u{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
+.lib-cat p{color:var(--body);font-size:15px;line-height:1.62;margin:0;flex:1}
+.lib-cat-f{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:2px;padding-top:14px;border-top:1px solid var(--line)}
+.lib-asof{font-family:var(--mono);font-size:11.5px;color:var(--lo)}
+.lib-go{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.lib-go .ti{font-size:15px;transition:transform .16s var(--ease)}
+.lib-cat:hover .lib-go .ti{transform:translateX(3px)}
+@media (max-width:640px){ .lib-cats{padding:18px 0 44px} .lib-cat{padding:22px 20px} }
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
@@ -109,7 +119,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="/assets/archive.js?v=2c499bbb" defer></script><style>
+<style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
@@ -138,7 +148,7 @@ if(_nt&&_nm){
 @media (max-width:760px){ #grm-mascot{display:none} }
 @media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
 </style>
-<div id="grm-mascot" data-page="board" aria-hidden="true">
+<div id="grm-mascot" data-page="library" aria-hidden="true">
   <span class="owl-msg"></span>
   <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>

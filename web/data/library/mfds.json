@@ -1,0 +1,328 @@
+{
+ "meta": {
+  "source": "MFDS",
+  "title": "MFDS 지침·고시 아카이브",
+  "detection_basis": "mfds.go.kr RSS 보드 수집 (지침·안내서·고시·행정예고)",
+  "latest_collected_date": "2026-07-17",
+  "item_count": 31,
+  "type_counts": {
+   "guidance-internal": 12,
+   "guidance-industry": 11,
+   "legislative-notice": 6,
+   "notice-final": 2
+  },
+  "note": "식약처가 공개한 지침·안내서·고시·행정예고를 수집순으로 누적한 목록입니다. 주간 브리프에서 한 번 다룬 뒤에도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력·최신본은 반드시 원문에서 확인하세요."
+ },
+ "items": [
+  {
+   "title": "한약(생약) 규격 개정에 대한 작성검토 지침",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258",
+   "document_id": "data0010-15258",
+   "published_date": "2026-07-16",
+   "collected_date": "2026-07-17",
+   "is_latest_batch": true
+  },
+  {
+   "title": "「식품의약품안전평가원 연구개발사업 관련 제재처분 검토 절차」",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255",
+   "document_id": "data0010-15255",
+   "published_date": "2026-07-16",
+   "collected_date": "2026-07-17",
+   "is_latest_batch": true
+  },
+  {
+   "title": "한약(생약) 추출물 품질 자료 작성 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888",
+   "document_id": "data0011-15888",
+   "published_date": "2026-07-03",
+   "collected_date": "2026-07-06",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 유사 용기·포장 및 표시 개선 사례집",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887",
+   "document_id": "data0011-15887",
+   "published_date": "2026-07-01",
+   "collected_date": "2026-07-06",
+   "is_latest_batch": false
+  },
+  {
+   "title": "분자유전학적 조직적합성항원(HLA) 검사시약의 허가·심사 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883",
+   "document_id": "data0011-15883",
+   "published_date": "2026-06-30",
+   "collected_date": "2026-07-06",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품등 안정성시험기준 질의응답집",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882",
+   "document_id": "data0011-15882",
+   "published_date": "2026-06-30",
+   "collected_date": "2026-07-06",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 수입자 약사감시 수행 절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253",
+   "document_id": "data0010-15253",
+   "published_date": "2026-06-30",
+   "collected_date": "2026-07-06",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품등 회수·폐기 처리 운영 지침",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251",
+   "document_id": "data0010-15251",
+   "published_date": "2026-06-29",
+   "collected_date": "2026-06-30",
+   "is_latest_batch": false
+  },
+  {
+   "title": "한약(생약)제제 비교용출시험 사례집",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877",
+   "document_id": "data0011-15877",
+   "published_date": "2026-06-29",
+   "collected_date": "2026-06-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "한약(생약)제제 임상시험 가이드라인-일반적 고려사항-(민원인안내서)",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876",
+   "document_id": "data0011-15876",
+   "published_date": "2026-06-26",
+   "collected_date": "2026-06-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "디지털의료기기 변경관리 계획서 허가 심사 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874",
+   "document_id": "data0011-15874",
+   "published_date": "2026-06-26",
+   "collected_date": "2026-06-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "줄기세포치료제 종양원성 평가 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873",
+   "document_id": "data0011-15873",
+   "published_date": "2026-06-24",
+   "collected_date": "2026-06-26",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 병용금기 성분 등의 지정에 관한 규정 일부개정고시(안) 행정예고(식품의약품안전처 공고 제2026-292호)",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256",
+   "document_id": "data0009-44256",
+   "published_date": "2026-06-19",
+   "collected_date": "2026-06-26",
+   "is_latest_batch": false
+  },
+  {
+   "title": "바이오의약품 전문수탁 제조업체 GMP 평가 절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249",
+   "document_id": "data0010-15249",
+   "published_date": "2026-06-15",
+   "collected_date": "2026-06-17",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 심사 지침서등의 운영",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248",
+   "document_id": "data0010-15248",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 우수심사기준 업무수행편람(GRP-MaPP) 제·개정 및 운영",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247",
+   "document_id": "data0010-15247",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품심사부 민원상담 처리절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246",
+   "document_id": "data0010-15246",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 심사자문단 구성 및 운영",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245",
+   "document_id": "data0010-15245",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품 심층검토(Peer Review) 진행절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244",
+   "document_id": "data0010-15244",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "「의료기기 제조 및 품질관리 관련 기관 지정 등에 관한 규정」 제정고시(안) 행정예고(공고 제2026-283호)",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255",
+   "document_id": "data0009-44255",
+   "published_date": "2026-06-12",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "「의료기기 제조 및 품질관리 기준」 일부개정고시(안) 행정예고(공고 제2026-282호)",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254",
+   "document_id": "data0009-44254",
+   "published_date": "2026-06-12",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "「의약외품에 관한 기준 및 시험방법」 고시 전문(제2026-15호, 2026.2.25.)",
+   "type": "notice-final",
+   "type_label": "고시 전문",
+   "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974",
+   "document_id": "data0005-14974",
+   "published_date": "2026-06-11",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "의약품등 생산 및 수출ㆍ수입 실적 보고에 관한 규정(식약처 고시 제2026-42호, 2026.6.5.)",
+   "type": "notice-final",
+   "type_label": "고시 전문",
+   "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972",
+   "document_id": "data0005-14972",
+   "published_date": "2026-06-09",
+   "collected_date": "2026-06-13",
+   "is_latest_batch": false
+  },
+  {
+   "title": "「의약품의 품목허가·신고·심사 규정」 일부개정고시(안) 행정예고 알림",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251",
+   "document_id": "data0009-44251",
+   "published_date": "2026-06-05",
+   "collected_date": "2026-06-05",
+   "is_latest_batch": false
+  },
+  {
+   "title": "오·남용우려의약품 지정에 관한 규정 일부개정 행정예고(식약처공고 제2026-275호, 2026.6.5.)",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250",
+   "document_id": "data0009-44250",
+   "published_date": "2026-06-05",
+   "collected_date": "2026-06-05",
+   "is_latest_batch": false
+  },
+  {
+   "title": "생균치료제의 임상시험 시 품질·비임상 평가 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865",
+   "document_id": "data0011-15865",
+   "published_date": "2026-05-29",
+   "collected_date": "2026-06-01",
+   "is_latest_batch": false
+  },
+  {
+   "title": "2025년도 의약품 품목 갱신 보고서",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716",
+   "document_id": "data0013-33716",
+   "published_date": "2026-05-28",
+   "collected_date": "2026-05-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "한약(생약)제제 비임상시험 가이드라인",
+   "type": "guidance-industry",
+   "type_label": "민원인 안내서·지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860",
+   "document_id": "data0011-15860",
+   "published_date": "2026-05-28",
+   "collected_date": "2026-05-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "신약 품목허가·심사 업무절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243",
+   "document_id": "data0010-15243",
+   "published_date": "2026-05-26",
+   "collected_date": "2026-05-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "동등생물의약품 품목허가·심사 업무절차",
+   "type": "guidance-internal",
+   "type_label": "공무원 지침서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242",
+   "document_id": "data0010-15242",
+   "published_date": "2026-05-26",
+   "collected_date": "2026-05-29",
+   "is_latest_batch": false
+  },
+  {
+   "title": "「생물학적제제 등의 품목허가·심사 규정」 일부개정고시안 행정예고(제2026-251호, 2026.5.28)",
+   "type": "legislative-notice",
+   "type_label": "입법·행정예고",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248",
+   "document_id": "data0009-44248",
+   "published_date": "2026-05-28",
+   "collected_date": "2026-05-29",
+   "is_latest_batch": false
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 자료실 허브(트랙 C) — 참조형 카탈로그(ICH·MFDS)로 가는 정적 진입 페이지.
+    브리프/findings 와 달리 라이브 데이터가 아니라 커밋 스냅샷을 결정론 렌더한다.
+    grm.css 프리즈 보존을 위해 레이아웃은 기존 토큰만 쓰는 스코프 <style>(base 선례). -#}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Reference Library</span>
+    <h1 class="reveal" style="animation-delay:.08s">자료실</h1>
+    <p class="reveal" style="animation-delay:.14s">규제 실무에서 자주 되짚는 참조 문서를 한곳에 모았습니다. 매주 흘러가는 브리프와 달리, 필요할 때 언제든 다시 찾아볼 수 있도록 카탈로그 형태로 정리하고 공식 원문 링크를 함께 제공합니다.</p>
+  </div>
+  <div class="wrap">
+    <div class="lib-cats">
+      {% for c in catalogs %}
+      <a class="lib-cat reveal" style="animation-delay:{{ '%.2f'|format(0.2 + loop.index0 * 0.06) }}s" href="{{ rel_root }}library/{{ c.href }}">
+        <div class="lib-cat-h">
+          <h2>{{ c.title }}</h2>
+          <span class="lib-cat-n">{{ c.count }}<span class="u">{{ c.unit }}</span></span>
+        </div>
+        <p>{{ c.blurb }}</p>
+        <div class="lib-cat-f">
+          <span class="lib-asof">기준 {{ c.asof }}</span>
+          <span class="lib-go">바로가기 <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+<style>
+/* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드. */
+.lib-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding:24px 0 60px}
+.lib-cat{display:flex;flex-direction:column;gap:12px;padding:26px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--ink);transition:border-color .16s var(--ease),transform .16s var(--ease),box-shadow .16s var(--ease)}
+.lib-cat:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:var(--shadow)}
+.lib-cat-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.lib-cat-h h2{font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.2;color:var(--ink);margin:0}
+.lib-cat-n{flex:none;font-family:var(--serif);font-size:28px;font-weight:600;color:var(--coral-2);line-height:1}
+.lib-cat-n .u{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
+.lib-cat p{color:var(--body);font-size:15px;line-height:1.62;margin:0;flex:1}
+.lib-cat-f{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:2px;padding-top:14px;border-top:1px solid var(--line)}
+.lib-asof{font-family:var(--mono);font-size:11.5px;color:var(--lo)}
+.lib-go{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.lib-go .ti{font-size:15px;transition:transform .16s var(--ease)}
+.lib-cat:hover .lib-go .ti{transform:translateX(3px)}
+@media (max-width:640px){ .lib-cats{padding:18px 0 44px} .lib-cat{padding:22px 20px} }
+</style>
+{% endblock %}

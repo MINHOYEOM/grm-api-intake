@@ -55,6 +55,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -538,6 +539,42 @@ def _upsert_embeddings_batch(
 
 
 # ---------------------------------------------------------------------------
+# Error message sanitization (pure) -- Codex Minor 3
+#
+# report["errors"] 의 키 자체는 §13 의 닫힌 허용목록(ReportKeySetIsClosedAllowlistTest)
+# 이 고정하지만, 그 목록은 **키**만 닫았지 **값**은 아무것도 제한하지 않는다. errors[]
+# 항목은 대부분 str(exc) -- requests/urllib3 등 우리가 내용을 통제할 수 없는 라이브러리가
+# 만드는 유일한 자유 텍스트 경로라서, 예외 메시지에 URL 자격증명(`https://u:p@host/...`)
+# 이나 쿼리스트링 토큰(`?token=...`)이 실려 있으면 그대로 _write_report() 의 stdout 까지
+# 찍힌다(Codex 실증: `https://u:p@proxy.invalid/token` 주입 재현). 이 함수는 report["errors"]
+# 에 들어가는 모든 문자열이 거치는 단일 관문이다.
+# ---------------------------------------------------------------------------
+
+_ERROR_MAX_LEN = 500
+# ://user:pass@ 형태의 URL 내장 자격증명.
+_CRED_URL_RE = re.compile(r"(://)[^/\s@]+:[^/\s@]+@")
+# key=value / token=value / secret=value 등 쿼리스트링·헤더류 토큰(대소문자 무시).
+_KV_SECRET_RE = re.compile(r"(?i)(key|token|secret|password|apikey|authorization)=[^&\s]+")
+# JWT(세 개의 base64url 세그먼트, "eyJ" 로 시작하는 헤더부).
+_JWT_RE = re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}")
+
+
+def _sanitize_error(text: str) -> str:
+    """report["errors"] 항목 하나를 마스킹한다 -- 순서 고정: URL 자격증명 ->
+    key=value 토큰 -> JWT -> 길이 상한. URL 자격증명을 먼저 지워야 그 자리에
+    남은 `secret=...` 류가 key=value 규칙에 걸려 통째로 `***` 로 뭉개져도
+    무방하다(자격증명이 사라지는 것이 목적이므로 과도 마스킹 쪽으로 실패하는
+    것이 안전하다). 길이 상한은 예외 메시지가 HTTP 응답 본문 전체를 물고 오는
+    경우(예: requests 의 일부 예외)를 방어한다."""
+    masked = _CRED_URL_RE.sub(r"\1***@", text)
+    masked = _KV_SECRET_RE.sub(r"\1=***", masked)
+    masked = _JWT_RE.sub("***jwt***", masked)
+    if len(masked) > _ERROR_MAX_LEN:
+        masked = masked[:_ERROR_MAX_LEN] + "…"
+    return masked
+
+
+# ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
 
@@ -578,7 +615,7 @@ def run_embed(
 
     base = _normalize_base_url(base_url)
     if base is None:
-        report["errors"].append("SUPABASE_URL must start with https://")
+        report["errors"].append(_sanitize_error("SUPABASE_URL must start with https://"))
         return report
 
     t0 = time.monotonic()
@@ -586,7 +623,7 @@ def run_embed(
     try:
         findings = fetch_target_findings(base, service_key)
     except (RuntimeError, ValueError) as exc:
-        report["errors"].append(str(exc))
+        report["errors"].append(_sanitize_error(str(exc)))
         return report
 
     if limit is not None and limit >= 0:
@@ -602,13 +639,13 @@ def run_embed(
         try:
             raw_signals_by_id = fetch_raw_signals_by_ids(base, service_key, needed_ids)
         except (RuntimeError, ValueError) as exc:
-            report["errors"].append(str(exc))
+            report["errors"].append(_sanitize_error(str(exc)))
             return report
 
     try:
         existing = fetch_existing_embeddings(base, service_key, embedding_version)
     except (RuntimeError, ValueError) as exc:
-        report["errors"].append(str(exc))
+        report["errors"].append(_sanitize_error(str(exc)))
         return report
 
     # ★F-04 fix: resolve the model revision *before* the skip decision below,
@@ -622,7 +659,7 @@ def run_embed(
     try:
         revision = resolve_model_revision(MODEL_NAME)
     except RuntimeError as exc:
-        report["errors"].append(str(exc))
+        report["errors"].append(_sanitize_error(str(exc)))
         report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
         return report
 
@@ -662,7 +699,7 @@ def run_embed(
     try:
         model = load_model(MODEL_NAME, revision)
     except RuntimeError as exc:
-        report["errors"].append(str(exc))
+        report["errors"].append(_sanitize_error(str(exc)))
         report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
         return report
 
@@ -676,7 +713,7 @@ def run_embed(
     violations = sanity_check_embeddings(vectors)
     if violations:
         # 019 §전환순서 ② -- 하나라도 위반이면 전체 중단(부분 적재 금지).
-        report["errors"].extend(f"sanity check failed: {v}" for v in violations)
+        report["errors"].extend(_sanitize_error(f"sanity check failed: {v}") for v in violations)
         report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
         return report
 
@@ -701,7 +738,7 @@ def run_embed(
         batch = rows[start:start + _DB_UPSERT_BATCH_SIZE]
         _status, _resp_rows, err = _upsert_embeddings_batch(base, service_key, batch)
         if err:
-            report["errors"].append(f"upsert batch failed at offset {start} ({err})")
+            report["errors"].append(_sanitize_error(f"upsert batch failed at offset {start} ({err})"))
             continue
         upserted += len(batch)
 
@@ -732,9 +769,12 @@ def _write_report(path: str | None, report: dict[str, Any]) -> None:
       관찰로 바뀐다.
 
     ★시크릿 안전성: 리포트는 카운터·메타뿐이며 자격증명을 담지 않는다. service_key 는
-      HTTP 헤더로만 쓰이고 리포트에 들어가는 경로가 없다. errors 도 자유 텍스트가 아니라
-      http_<status>·retry_exhausted 류 고정 문자열이다(응답 본문·URL 미포함).
-      이 계약은 test_findings_embed_service.py 가 키 허용목록으로 고정한다 — 새 키를
+      HTTP 헤더로만 쓰이고 리포트에 들어가는 경로가 없다. errors 의 대다수는
+      http_<status>·retry_exhausted 류 고정 문자열이지만, 일부는 str(exc)(라이브러리가
+      만드는 자유 텍스트)를 담는다 -- 그 자유 텍스트는 report["errors"].append() 호출부에서
+      전부 _sanitize_error() 를 거쳐 URL 자격증명/key=value 토큰/JWT 를 마스킹하고
+      길이를 자른 뒤에만 이 dict 에 들어간다(Codex Minor 3, run_embed 참조).
+      키 집합 자체는 test_findings_embed_service.py 의 §13 허용목록이 고정한다 — 새 키를
       추가하면 테스트가 깨지므로, 시크릿이 리포트에 스며드는 변경은 CI 에서 막힌다.
     """
     text = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2)

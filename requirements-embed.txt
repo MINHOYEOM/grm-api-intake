@@ -15,7 +15,7 @@
 #
 # ★이 파일은 **소스 spec(.in 역할)**이다 -- 워크플로가 실제로 설치하는 것은
 # `requirements-embed.lock`(전이 의존성 전체 + sha256, `pip install --require-hashes`)이다.
-# F-05 완결: 직접 의존성 5종 pin 만으로는 전이 의존성이 floating 이라 원 finding 의
+# F-05 완결: 직접 의존성 6종 pin 만으로는 전이 의존성이 floating 이라 원 finding 의
 # 공급망 위험이 남았다(Codex 후속 감사 "부분 종결") -> lock 도입으로 닫는다.
 # 버전을 올릴 때: 아래 == 를 고치고 `grm-findings-embed-lock.yml` 을 workflow_dispatch 로
 # 실행해 lock 을 재생성한 뒤 함께 커밋한다(lock 은 ubuntu/cp312 러너에서 해상해야 정확).

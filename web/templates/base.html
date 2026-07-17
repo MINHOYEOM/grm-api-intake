@@ -53,7 +53,7 @@
 <header class="nav" id="nav"><div class="wrap nav-in">
   {# 헤더 브랜드 락업(B안) — favicon.svg(올빼미) 재사용(단일원천) + GRM/서브타이틀. grm.css 프리즈 보존 위해 인라인 스타일(정렬·크기)만; .brand-full 은 기존 ≤640px 반응형 은닉 클래스 재사용(서브타이틀=구 전체명 대체). #}
   <a class="brand" href="{{ rel_root }}index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>모아보기</a><a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>찾아보기</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>트렌드</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>자료실</a></nav>
+  <nav id="navmenu"><a href="{{ about_href }}"{% if nav_active == 'home' %} class="on"{% endif %}>소개</a><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>모아보기</a><a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>찾아보기</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>트렌드</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>자료실</a><a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>이용안내</a></nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
@@ -124,7 +124,7 @@
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}findings/index.html">찾아보기</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a></div>
+    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}findings/index.html">찾아보기</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a><a href="{{ rel_root }}guide/index.html">이용안내</a><a href="{{ rel_root }}glossary/index.html">용어사전</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="{{ notice_href }}">AI 자동 생성 고지</a><a href="{{ notice_href }}">원문 확인 안내</a></div>
   </div>

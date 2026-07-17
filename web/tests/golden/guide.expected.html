@@ -9,15 +9,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>규제뉴스 · GRM</title>
-<meta name="description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<link rel="canonical" href="https://grm-solutions.com/archive/" />
+<title>이용 안내 · GRM</title>
+<meta name="description" content="GRM 이용 안내 — 주간 브리프 카드 읽는 법, Evidence Level·Signal Tier, findings 검색 사용법과 이용 시 유의사항을 한곳에 정리했습니다." />
+<link rel="canonical" href="https://grm-solutions.com/guide/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="규제뉴스 · GRM" />
-<meta property="og:description" content="GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 주차별로 모아 기관·기간으로 검색·필터." />
-<meta property="og:url" content="https://grm-solutions.com/archive/" />
+<meta property="og:title" content="이용 안내 · GRM" />
+<meta property="og:description" content="GRM 이용 안내 — 주간 브리프 카드 읽는 법, Evidence Level·Signal Tier, findings 검색 사용법과 이용 시 유의사항을 한곳에 정리했습니다." />
+<meta property="og:url" content="https://grm-solutions.com/guide/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -35,7 +35,7 @@
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html" class="on">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../guide/index.html">이용안내</a></nav>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../guide/index.html" class="on">이용안내</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
@@ -43,44 +43,88 @@
 
 <main>
   <div class="wrap page-head">
-    <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제뉴스 모아보기</h1>
-    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
-    <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
-      <i class="ti ti-search lead"></i>
-      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="규제뉴스 카드 검색" />
-      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="panel reveal" id="panel" style="animation-delay:.26s">
-      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
-      <div class="facets" id="facets"></div>
-    </div>
-    <div class="bar reveal" id="bar" style="animation-delay:.32s">
-      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간</button><button type="button" data-view="cards">카드 전체</button></div>
-      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
-    </div>
+    <span class="kick reveal" style="animation-delay:.02s">User Guide</span>
+    <h1 class="reveal" style="animation-delay:.08s">GRM 이용 안내</h1>
+    <p class="reveal" style="animation-delay:.14s">GRM을 처음 보는 분도 핵심을 빠르게 파악할 수 있도록, 브리프 카드 읽는 법부터 findings 검색 사용법, 이용 시 유의사항까지 정리했습니다.</p>
   </div>
-  <div class="wrap">
-    <div id="results">
-      <div id="static-issues">        <a class="issue latest" href="../briefs/2026-07-06/index.html">
-          <div class="vol">Vol.<b>3</b></div>
-          <div><span class="badge"><span class="live"></span>이번 주 · LIVE</span><h3>케이보은제약, 금속이물 혼입으로 치약 40개 브랜드 일괄 회수</h3>
-            <div class="row"><span class="tag date">2026-07-06</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
-          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A29 · B7</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-26/index.html">
-          <div class="vol">Vol.<b>2</b></div>
-          <div><h3>국내 N-nitroso-meglumine 불순물 회수 2건 — 텔미사르탄·리나글립틴 복합정 4품목 영업자 회수</h3>
-            <div class="row"><span class="tag date">2026-06-26</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">MFDS</span></div></div>
-          <div class="stat"><b>27</b><span class="u">건</span><span class="ev mono">A23 · B4</span></div>
-        </a>        <a class="issue" href="../briefs/2026-06-22/index.html">
-          <div class="vol">Vol.<b>1</b></div>
-          <div><h3>2026년 6월 4주차</h3>
-            <div class="row"><span class="tag date">2026-06-22</span><span class="tag">FDA</span><span class="tag">ECA</span><span class="tag">EMA</span><span class="tag">MFDS</span><span class="tag">Health Canada</span></div></div>
-          <div class="stat"><b>36</b><span class="u">건</span><span class="ev mono">A15 · B21</span></div>
-        </a>      </div>
-    </div>
+  <div class="wrap guide-body reveal" style="animation-delay:.2s">
+    <p>GRM(Global Regulatory Monitor)은 글로벌 규제기관과 식품의약품안전처가 공개하는 의약품 GMP·품질 정보를 업무에 활용하기 쉽게 모아 보여주는 사이트입니다. 규제 비전문가도 핵심을 빠르게 파악할 수 있도록 주간 브리프와 지적사항(<code>findings</code>) 검색을 제공합니다.</p>
+<h2>① 이 사이트가 해주는 일</h2>
+<p>GRM은 규제기관의 공개 문서와 업데이트를 매일 수집하고, 업무상 의미가 있는 내용을 선별해 주간 카드형 브리프로 정리합니다. 브리프를 보면 다음 질문의 답을 빠르게 찾을 수 있습니다.</p>
+<ul><li>이번 주에 어떤 규제 문서나 조치가 공개되었는가?</li><li>어느 기관·업체·제품·품질 영역과 관련된 내용인가?</li><li>실무자가 먼저 살펴볼 사안은 무엇인가?</li><li>요약의 근거와 공식 원문은 어디에서 확인할 수 있는가?</li></ul>
+<p><code>findings</code>는 수집한 문서 안의 개별 지적사항을 검색·비교할 수 있도록 정리한 데이터베이스입니다. 예를 들어 <code>데이터 완전성</code>, <code>무균</code>, <code>CAPA</code>, <code>OOS</code> 같은 주제로 여러 문서의 지적사항을 찾아볼 수 있습니다.</p>
+<p>GRM의 역할은 규제정보의 탐색과 1차 검토를 돕는 것입니다. 최종 판단이나 대응 결정이 필요한 경우에는 반드시 공식 원문과 해당 규제기관의 최신 기준을 확인해야 합니다.</p>
+<h2>② 주간 브리프 읽는 법</h2>
+<h3>카드 구조</h3>
+<p>각 카드는 하나의 규제 문서나 주요 업데이트를 요약합니다. 다음 순서로 읽으면 빠르게 핵심을 파악할 수 있습니다.</p>
+<ol><li><strong>제목·요약</strong>에서 어떤 일이 있었는지 확인합니다.</li><li><strong>Evidence·기관·Signal·유형 배지</strong>에서 근거 수준과 검토 우선순위를 확인합니다.</li><li><strong>핵심 사실</strong>에서 발행일, 문서번호, 업체·제품, 주요 관찰사항 등 원문에서 확인된 사실을 봅니다.</li><li><strong>시사점·점검 사항</strong>에서 우리 업무와 연결해 살펴볼 질문을 확인합니다. 이 부분은 GRM의 해석이므로 원문 사실과 구분해 읽어야 합니다.</li><li><strong>출처 링크</strong>에서 공개 맥락과 공식 원문을 직접 확인합니다.</li></ol>
+<p>카드의 요약은 원문 전체를 대체하지 않습니다. 위반 내용, 적용 대상, 제출 기한, 규제기관의 요구사항처럼 판단에 직접 영향을 주는 내용은 원문에서 다시 확인하십시오.</p>
+<h3>📰 정보출처와 📎 공식원본</h3>
+<p>카드에는 두 종류의 링크가 표시될 수 있습니다.</p>
+<ul><li><strong>📰 정보출처</strong>: GRM이 해당 정보를 발견하거나 수집한 경로입니다. 규제기관의 목록·색인, 공개 게시판, RSS 또는 문서 안내 페이지일 수 있습니다.</li><li><strong>📎 공식원본</strong>: 규제기관이 공개한 실제 문서 파일이나 원문 페이지입니다. 정확한 표현, 적용 범위와 요구사항을 확인할 때 우선 검토해야 합니다.</li></ul>
+<p>두 링크가 같은 페이지를 가리키면 <code>정보출처/공식원본</code> 하나로 합쳐 표시될 수 있습니다. 링크가 둘 다 있으면 정보출처에서 공개 맥락을 확인하고, 공식원본에서 문서 내용을 검토하십시오.</p>
+<h3>Evidence Level 읽는 법</h3>
+<p>Evidence Level은 카드가 어떤 근거자료에 연결되어 있는지를 나타내는 <strong>GRM 내부 근거 분류</strong>입니다. 사안의 중요도나 법적 위험도를 뜻하지 않습니다.</p>
+<ul><li><strong>Evidence A</strong>: 수집 원시자료와 함께, 문서 유형에 맞는 인용 가능한 1차 원문 정보가 확보된 경우</li><li><strong>Evidence B</strong>: 공식 색인과 보조자료를 확인했거나, 공식 근거는 있지만 인용 가능한 수집 원문이 확보되지 않은 경우</li><li><strong>Evidence C</strong>: 보조 출처만 확보된 경우</li><li><strong>Evidence D</strong>: 공개 예정·진행 중 등 아직 확인이 끝나지 않은 Watch 성격의 정보</li></ul>
+<p>현재 일반 카드에는 주로 A~C가 표시되고, D는 후보·Watch 단계에서 사용될 수 있습니다. Evidence가 낮은 항목은 공식 원문의 공개 여부와 후속 업데이트를 더 주의해서 확인하십시오. Evidence가 높더라도 번역·요약이나 규제적 의미까지 자동으로 확정되는 것은 아닙니다.</p>
+<h3>Signal Tier 읽는 법</h3>
+<p>Signal Tier는 수집된 정보 가운데 무엇을 먼저 검토하고 브리프에 반영할지를 정하는 <strong>GRM 내부 우선순위</strong>입니다. 규제기관이 정한 법적 위험등급이나 위반 심각도 판정이 아닙니다.</p>
+<ul><li><strong>Tier 3 · High</strong>: 최우선 검토 대상이며 주간 브리프에 반드시 채택하는 신호</li><li><strong>Tier 2 · Medium</strong>: 기본적으로 주간 브리프에 채택하는 신호</li><li><strong>Tier 1 · Low</strong>: 계속 모니터링하지만 통상적인 주간 카드에서는 생략할 수 있는 신호</li></ul>
+<p>Tier가 높다는 이유만으로 해당 업체나 제품의 법적 위험이 높다고 단정하지 마십시오. 실제 규제상 의미는 문서 종류, 원문의 표현, 절차 진행 단계와 적용 범위를 함께 살펴 판단해야 합니다.</p>
+<h2>③ findings 검색 사용법</h2>
+<p><code>findings</code>에서는 문서 안의 개별 지적사항을 키워드와 필터로 찾을 수 있습니다.</p>
+<ol><li>검색창에 관심 있는 표현을 입력합니다. 검색은 부분일치 방식이므로 <code>무균</code>을 입력하면 <code>무균실</code>, <code>무균 공정</code>처럼 해당 글자가 포함된 결과도 찾을 수 있습니다.</li><li>결과가 많으면 소스·품질 카테고리·업체·발행월·검토상태 등의 필터를 조합합니다.</li><li>목적에 맞게 최신순, 오래된순 또는 업체명순으로 정렬합니다.</li><li>결과 문서를 열어 개별 지적사항의 문맥과 연결된 공식 원문을 확인합니다.</li></ol>
+<p>한글과 영문 표현이 다르게 쓰일 수 있으므로 <code>데이터 완전성</code>과 <code>data integrity</code>, <code>무균</code>과 <code>aseptic</code>, <code>규격이탈</code>과 <code>OOS</code>처럼 동의어·영문 용어를 바꿔 검색해 보십시오. 결과가 적으면 긴 문장보다 짧은 핵심어가 유용합니다.</p>
+<p>검색 결과는 <strong>문서 묶음 단위</strong>로 표시됩니다. 한 문서에 여러 지적사항이 들어갈 수 있으므로 <strong>지적 건수</strong>와 <strong>문서 수</strong>는 다를 수 있습니다. 지적사항 10건이 검색되었다고 해서 반드시 서로 다른 문서 10개를 뜻하지는 않습니다.</p>
+<p>검색 결과는 유사 사례를 찾는 출발점입니다. 같은 표현이라도 제품, 공정, 규정, 실사 범위에 따라 의미가 달라질 수 있으므로 단순 건수 비교만으로 결론을 내리지 마십시오.</p>
+<h2>④ 자주 나오는 문서 종류</h2>
+<h3>FDA Form 483</h3>
+<p>FDA 조사관이 현장실사 종료 시, 관찰한 상태나 관행이 관련 법령 위반 가능성을 나타낸다고 판단하면 업체 경영진에게 제시하는 문서입니다. 흔히 <code>483</code>이라고 부릅니다.</p>
+<p>Form 483은 조사관의 관찰사항을 알리는 문서이며 <strong>FDA의 최종 위반 판정이 아닙니다</strong>. 업체 답변, FDA의 Establishment Inspection Report(EIR)와 후속 검토, Warning Letter 발행 여부는 서로 구분해서 보아야 합니다. 483이 공개되었다는 사실만으로 후속 조치가 확정되었다고 해석해서는 안 됩니다.</p>
+<h3>FDA Warning Letter</h3>
+<p>FDA가 연방 요건의 중대한 위반이라고 판단한 사항을 당사자에게 알리고, 정해진 기간 안에 설명과 시정계획을 제출할 기회를 주는 서한입니다. 제조관리 미흡, 데이터 완전성 문제, 부적절한 표시·광고 등 사안에 따라 내용이 달라집니다.</p>
+<p>Warning Letter는 단순한 업계 조언은 아니지만, 그 자체가 법원의 판결이나 최종 행정결정을 뜻하지도 않습니다. FDA도 서한의 쟁점이 이후 당사자와의 소통이나 후속 조치로 달라질 수 있음을 안내합니다. 지적 범위, 업체 답변, Close-Out Letter와 추가 규제조치를 각각 확인하십시오.</p>
+<h3>식약처 GMP 실태조사</h3>
+<p>식품의약품안전처 또는 지방식품의약품안전청이 의약품 제조소의 시설, 제조·품질관리 체계와 기록 등이 GMP 기준에 맞게 운영되는지를 확인하는 조사입니다. 허가·등록 단계의 평가, GMP 적합판정·연장, 정기 또는 필요에 따른 조사 등 목적과 범위가 다를 수 있습니다.</p>
+<p>실태조사에서 확인된 보완·지적사항은 자료 보완, 시정조치 또는 적합 여부 판단으로 이어질 수 있습니다. 조사 사실만으로 최종 결과를 추정하지 말고 조사 범위, 후속 판정과 공식 통지를 함께 확인하십시오.</p>
+<h3>WHOPIR</h3>
+<p>WHOPIR은 <strong>WHO Public Inspection Report</strong>의 약어입니다. WHO 사전적격성평가 과정의 현장실사 또는 서면평가 결과, 대상 제조소·시험기관 등이 국제 기준과 제출자료에 부합한다고 판단된 경우 공개되는 요약 보고서입니다. 평가 일자·범위, 관련 제품·시설, 주요 관찰사항과 결론을 확인할 수 있지만 기밀·독점 정보는 제외됩니다.</p>
+<p>WHOPIR은 평가 당시의 상태와 특정 범위를 반영합니다. WHOPIR 공개가 제조소 자체의 사전적격성 인정이나 그 제조소의 모든 제품에 대한 승인을 뜻하지는 않습니다. 최신 보고서와 WHO의 제품별 사전적격성 목록을 함께 확인하십시오.</p>
+<h2>⑤ 한계 및 이용 시 유의사항</h2>
+<p>GRM의 번역·요약과 시사점 작성에는 AI가 사용될 수 있습니다. AI 번역·요약은 문서 탐색과 초기 검토를 돕는 참고자료이며, 공식 번역이나 법률·규제 자문이 아닙니다.</p>
+<p>번역·요약 과정에서 전문용어, 부정 표현, 조건, 수치, 날짜 또는 적용 범위가 원문과 다르게 전달될 가능성이 있습니다. 중요한 의사결정에 사용할 때는 다음 사항을 반드시 확인하십시오.</p>
+<ul><li>규제기관이 공개한 공식 원문</li><li>문서의 발행일과 최신 개정 여부</li><li>적용 대상 제품·제조소·공정과 관할 범위</li><li>규제기관이 사용한 정확한 표현과 제출·시정 기한</li><li>후속 답변, 정정, 철회, Close-Out 또는 추가 조치의 존재 여부</li></ul>
+<p>법적·규제적 판단은 공식 원문과 최신 법령·가이드라인을 기준으로 해야 합니다. 허가, 품질, 법무 또는 규제 대응에 영향을 주는 사안은 관련 전문부서와 검토한 뒤 결정하십시오.</p>
+    <aside class="guide-x">
+      <div class="guide-x-t">
+        <b>규제 용어가 낯설다면</b>
+        <span>GMP·CAPA·데이터 완전성·무균 공정 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.</span>
+      </div>
+      <a class="guide-x-go" href="../glossary/index.html">용어사전 열기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+    </aside>
   </div>
 </main>
+<style>
+/* [이용안내] 본문 프로즈 — grm.css 토큰만 사용(프리즈 보존). */
+.guide-body{max-width:74ch;padding:8px 0 64px;font-family:var(--sans);color:var(--body);font-size:16px;line-height:1.72}
+.guide-body h2{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.28;color:var(--ink);margin:46px 0 12px;padding-top:18px;border-top:1px solid var(--line)}
+.guide-body h2:first-of-type{margin-top:20px;padding-top:0;border-top:0}
+.guide-body h3{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.35;color:var(--ink);margin:30px 0 8px}
+.guide-body p{margin:0 0 14px}
+.guide-body ul,.guide-body ol{margin:0 0 16px;padding-left:22px}
+.guide-body li{margin:0 0 7px;line-height:1.68}
+.guide-body strong{font-weight:600;color:var(--ink)}
+.guide-body code{font-family:var(--mono);font-size:.88em;color:var(--coral-2);background:var(--soft);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;white-space:nowrap}
+.guide-x{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:40px;padding:20px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+.guide-x-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.guide-x-t b{font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink)}
+.guide-x-t span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.guide-x-go{flex:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:14px;font-weight:500;color:#fff;background:var(--coral);border-radius:var(--rad-s);padding:10px 16px;text-decoration:none;transition:background .16s var(--ease)}
+.guide-x-go:hover{background:var(--coral-2)}
+.guide-x-go .ti{font-size:16px;transition:transform .16s var(--ease)}
+.guide-x-go:hover .ti{transform:translateX(3px)}
+@media (max-width:640px){ .guide-body{font-size:15.5px} .guide-body h2{font-size:21px} }
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
@@ -109,7 +153,7 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<script src="/assets/archive.js?v=2c499bbb" defer></script><style>
+<style>
 #grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
 #grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
@@ -138,7 +182,7 @@ if(_nt&&_nm){
 @media (max-width:760px){ #grm-mascot{display:none} }
 @media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
 </style>
-<div id="grm-mascot" data-page="board" aria-hidden="true">
+<div id="grm-mascot" data-page="guide" aria-hidden="true">
   <span class="owl-msg"></span>
   <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>

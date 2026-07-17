@@ -25,6 +25,13 @@
       </a>
       {% endfor %}
     </div>
+    <aside class="lib-x reveal">
+      <div class="lib-x-t">
+        <b>규제 용어사전</b>
+        <span>GMP·CAPA·데이터 완전성·무균 공정·ICH 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.</span>
+      </div>
+      <a class="lib-x-go" href="{{ rel_root }}glossary/index.html">용어사전 열기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+    </aside>
   </div>
 </main>
 <style>
@@ -42,6 +49,14 @@
 .lib-go{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .lib-go .ti{font-size:15px;transition:transform .16s var(--ease)}
 .lib-cat:hover .lib-go .ti{transform:translateX(3px)}
+.lib-x{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 60px;padding:20px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+.lib-x-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lib-x-t b{font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink)}
+.lib-x-t span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.lib-x-go{flex:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:14px;font-weight:500;color:#fff;background:var(--coral);border-radius:var(--rad-s);padding:10px 16px;text-decoration:none;transition:background .16s var(--ease)}
+.lib-x-go:hover{background:var(--coral-2)}
+.lib-x-go .ti{font-size:16px;transition:transform .16s var(--ease)}
+.lib-x-go:hover .ti{transform:translateX(3px)}
 @media (max-width:640px){ .lib-cats{padding:18px 0 44px} .lib-cat{padding:22px 20px} }
 </style>
 {% endblock %}

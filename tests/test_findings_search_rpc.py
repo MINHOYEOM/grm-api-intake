@@ -48,6 +48,7 @@ _DASH_PATH = _MIGRATIONS_DIR / "027_findings_search_dash_axes.sql"
 _PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
 _ENTITY_REPAIR_PATH = _MIGRATIONS_DIR / "029_findings_html_entity_repair.sql"
 _HARDENING_PATH = _MIGRATIONS_DIR / "030_findings_search_hardening.sql"
+_REACTIONS_TOP_PATH = _MIGRATIONS_DIR / "031_reactions_weekly_top.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -353,8 +354,9 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 class MigrationNumberSequenceTest(unittest.TestCase):
     """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede) → 029(HTML 엔티티
     오염 정정) → 030(findings_search 재supersede -- work_mem/p_page 클램프/blob semantics)
-    로 체인이 이어지며 마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~030 까지 결번
-    없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+    로 체인이 이어지며, 031(reactions_weekly_top -- findings 밖 반응 주간 집계 count-only
+    RPC)이 추가됐다 -- 마이그레이션 번호가 001~031 까지 결번 없이 연속인지(파일명 접두
+    3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
@@ -371,13 +373,16 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_030_file_exists(self) -> None:
         self.assertTrue(_HARDENING_PATH.is_file(), f"missing {_HARDENING_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_030(self) -> None:
+    def test_031_file_exists(self) -> None:
+        self.assertTrue(_REACTIONS_TOP_PATH.is_file(), f"missing {_REACTIONS_TOP_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_031(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 31)))
+        self.assertEqual(numbers, list(range(1, 32)))
 
 
 # ============================================================================

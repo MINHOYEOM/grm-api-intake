@@ -118,6 +118,14 @@ _FDA483_EXCERPT_PATTERNS = (
 # excerpt·소스 관측용(dry-run 검증·운영 health). collect_who.LAST_HEALTH 패턴.
 LAST_HEALTH: dict[str, Any] = {}
 
+# 직전 _fetch_html_rows 가 실제 사용한 백본(관측용 — LAST_HEALTH["backbone"] 로 표면화).
+# collect_fda_483() 진입 시 "datatables" 로 리셋 — 테스트가 _fetch_html_rows 를 스텁해도
+# 이전 실호출 값이 새 실행에 새지 않는다.
+BACKBONE_DATATABLES = "datatables"
+BACKBONE_LEGACY_JSON = "legacy-json"
+BACKBONE_STATIC_HTML = "static-html"
+_LAST_BACKBONE = BACKBONE_DATATABLES
+
 _TAG_RE = re.compile(r"<[^>]+>")
 _MEDIA_RE = re.compile(r"/media/(\d+)/download")
 _MDY_RE = re.compile(r"(\d{1,2})/(\d{1,2})/(\d{4})")
@@ -431,8 +439,12 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
     """백본 3단 fetch → (정규화 행, 데이터행 수, 부분 fallback 여부).
 
     1차 DataTables AJAX → 2차 전수 JSON → 3차 정적 HTML 10행. 부분 fallback 여부(True)는
-    3차(정적 10행)만 — 2차 JSON 은 전수라 degraded 아님(WARN 로그로만 표면화).
+    3차(정적 10행)와 **2차 JSON 동결(stale) 의심** — 2차 JSON 이 신선하면 전수라 degraded
+    아님(WARN 로그로만 표면화). stale 판정: 윈도우 시작 이전에서 최신 publish 가 멈춘 경우
+    (한번 사망했던 레거시 엔드포인트라 "살아있되 갱신 정지"가 현실 위험 — 침묵 누락 금지).
+    사용 백본은 module 전역 `_LAST_BACKBONE` 에 기록(관측용).
     """
+    global _LAST_BACKBONE
     static_rows: list[dict[str, str]] = []
     static_count = 0
     config = None
@@ -471,16 +483,29 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
                         "전수 JSON 백본 시도")
         else:
             if rows:
+                _LAST_BACKBONE = BACKBONE_DATATABLES
                 return rows, total or len(rows), False
             log("WARN", "FDA 483 DataTables 응답 483 행 0(이상) — 전수 JSON 백본 시도")
 
     json_rows, json_total = _fetch_legacy_json_rows()
     if json_rows:
+        _LAST_BACKBONE = BACKBONE_LEGACY_JSON
+        # 동결(stale) 가드: 최신 publish 가 윈도우 시작 이전 → 갱신 정지 의심. 행은 그대로
+        # 쓰되 degraded=True 로 fda483-source-degraded warning 을 태워 완전성 리스크를
+        # 표면화한다(진짜 발행 공백 주간이면 드문 무해 경보 — 침묵 누락보다 낫다).
+        newest = max((p for p in (_parse_mdy(r["publish_date"]) for r in json_rows) if p),
+                     default="")
+        if start_date and newest and newest < start_date.isoformat():
+            log("WARN", f"FDA 483 전수 JSON 백본 동결 의심 — 최신 publish {newest} < "
+                        f"윈도우 시작 {start_date.isoformat()} → 부분 수집으로 표면화")
+            return json_rows, json_total, True
         log("WARN", f"FDA 483 전수 JSON 백본으로 수집(전체 {json_total}레코드 중 483 "
-                    f"{len(json_rows)}행) — 1차 DataTables 복구 시 자동 원복")
+                    f"{len(json_rows)}행·최신 publish {newest or '?'}) — "
+                    "1차 DataTables 복구 시 자동 원복")
         return json_rows, json_total, False
 
     log("WARN", "FDA 483 전수 JSON 백본도 실패 — 정적 HTML 10행 fallback(부분 수집)")
+    _LAST_BACKBONE = BACKBONE_STATIC_HTML
     return static_rows, static_count, True
 
 
@@ -783,7 +808,8 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     - 윈도우 내 0건 → 정상(빈 리스트·error 없음).
     - PDF excerpt/Observation 실패는 graceful(키 미기록·메타 카드 유지·LAST_HEALTH 경고).
     """
-    global LAST_HEALTH
+    global LAST_HEALTH, _LAST_BACKBONE
+    _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
     excerpt_health: dict[str, Any] = {
         "attempted": 0, "ok": 0, "failed": 0, "capped": False, "warnings": [],
     }
@@ -812,6 +838,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             "fda_483_observations": observations_health,
             "fda_483_deep": deep_health,
             "source_degraded": source_degraded,
+            "backbone": _LAST_BACKBONE,
         }
         return [], ("FDA 483 수집 실패: 백본 3단(DataTables/전수JSON/정적HTML) 모두 483 행 0 — "
                     "소스 구조 변경 또는 일시 장애(수동 확인 필요)")
@@ -901,13 +928,14 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "fda_483_observations": observations_health,
         "fda_483_deep": deep_health,
         "source_degraded": source_degraded,
+        "backbone": _LAST_BACKBONE,
     }
     if excerpt_health["capped"]:
         log("WARN", f"FDA 483 excerpt cap({FDA483_EXCERPT_MAX_ITEMS}) 도달 — "
                     "나머지 항목은 excerpt/detail 없이 메타 카드로 유지")
     log("INFO", f"FDA 483 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
                 f"483 행 {len(keep_rows)}/{html_data_count}, "
-                f"source={'HTML정적폴백(부분)' if source_degraded else '전수(DataTables/JSON)'}) "
+                f"source={_LAST_BACKBONE}{'·부분/동결의심' if source_degraded else ''}) "
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "
                 f"failed={excerpt_health['failed']} · observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "

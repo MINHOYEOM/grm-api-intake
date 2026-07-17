@@ -477,15 +477,34 @@ def _evaluate_health(
             f"extracted={stats.fda483_observations_extracted} "
             f"warnings={stats.fda483_observations_warnings[:3]}",
         )
-    # 완전성 표면화: DataTables AJAX 실패 → 정적 HTML 10행 fallback 으로 부분 수집했음을
-    # 알린다. warning-only — 수집 자체는 정상이나 이번 실행은 윈도우 전수성 미보장.
+    # 완전성 표면화(백본 3단 — 2026-07-17 Akamai 봇차단 대응): warning-only.
+    # degraded = 3차 정적 HTML(부분) 또는 2차 JSON 동결(stale) 의심 — 전수성 미보장.
+    # degraded 아님 + legacy-json = 2차 백본이 전수 수집을 대신함(수집 자체는 완전) —
+    # 1차 차단 고착 여부를 지켜보라는 관측 신호.
     if stats.fda483_source_degraded:
+        if stats.fda483_backbone == "legacy-json":
+            health.add_warning(
+                "fda483-source-degraded",
+                "FDA 483",
+                "483 전수 JSON 백본 동결(stale) 의심 — 최신 publish 가 윈도우 시작 이전(완전성 미보장)",
+                "1차 DataTables 불가 상태에서 2차 전수 JSON 의 최신 발행일이 수집 윈도우보다 "
+                "오래됨 — 엔드포인트 갱신 정지 가능성. in-window 483 누락 위험, 수동 점검 권장.",
+            )
+        else:
+            health.add_warning(
+                "fda483-source-degraded",
+                "FDA 483",
+                "483 DataTables·전수 JSON 모두 실패 — 정적 HTML 10행 fallback 으로 부분 수집(완전성 미보장)",
+                "OII 리딩룸 DataTables AJAX 와 전수 JSON 백본이 모두 응답하지 않아 HTML 본문 "
+                "10행으로 폴백. in-window 483 이 누락됐을 수 있음 — 다음 실행 복구 확인/수동 점검 권장.",
+            )
+    elif stats.fda483_backbone == "legacy-json":
         health.add_warning(
-            "fda483-source-degraded",
+            "fda483-backbone-json-fallback",
             "FDA 483",
-            "483 DataTables 페이지네이션 실패 — 정적 HTML 10행 fallback 으로 부분 수집(완전성 미보장)",
-            "OII 리딩룸 DataTables AJAX 가 응답하지 않아 HTML 본문 10행으로 폴백. "
-            "in-window 483 이 누락됐을 수 있음 — 다음 실행 복구 확인/수동 점검 권장.",
+            "483 1차 DataTables 불가 — 2차 전수 JSON 백본으로 수집(전수·신선도 정상)",
+            "리딩룸 페이지/AJAX 접근 실패(Akamai 봇차단 계열)로 2차 백본이 가동됨. 수집 완전성은 "
+            "유지 — 지속되면 차단 고착 여부 점검(1차 복구 시 자동 원복).",
         )
 
     return health.finalize()

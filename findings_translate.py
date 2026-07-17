@@ -62,6 +62,10 @@ import requests
 import findings_views as views
 import grm_findings as gf
 from findings_supabase import pg_quote_text
+from grm_cli import header_ci as _header_ci
+from grm_cli import load_json_object as _load_json
+from grm_cli import normalize_supabase_url as _normalize_supabase_url
+from grm_cli import write_json as _write_json
 
 
 TRANSLATION_PLAN_SCHEMA_VERSION = "grm-findings-translation-plan/v1"
@@ -148,23 +152,6 @@ def build_translation_plan(db_path: str | Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Mode A2: --source supabase (read-only, live PostgREST via anon key)
 # ---------------------------------------------------------------------------
-
-
-def _normalize_supabase_url(base_url: str) -> str | None:
-    text = str(base_url or "").strip()
-    if not text.lower().startswith("https://"):
-        return None
-    return text.rstrip("/")
-
-
-def _header_ci(headers: dict[str, Any], name: str) -> str:
-    """Case-insensitive header lookup (requests' CaseInsensitiveDict already is
-    one, but callers/tests may pass a plain dict)."""
-    name_lower = name.lower()
-    for key, value in headers.items():
-        if str(key).lower() == name_lower:
-            return str(value)
-    return ""
 
 
 def _supabase_get(
@@ -843,25 +830,6 @@ def apply_translations_supabase(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-
-
-def _load_json(path: str | Path) -> dict[str, Any]:
-    with Path(path).open(encoding="utf-8") as f:
-        data = json.load(f)
-    if not isinstance(data, dict):
-        raise ValueError(f"{path}: JSON root must be an object")
-    return data
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def _resolve_supabase_credentials(args: argparse.Namespace) -> tuple[str, str] | None:

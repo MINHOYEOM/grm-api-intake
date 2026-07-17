@@ -47,7 +47,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from collections import Counter
 from typing import Any
@@ -56,6 +55,7 @@ import requests
 
 import findings_supabase_backfill as fsb
 import grm_findings as gf
+from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 
 DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
@@ -273,14 +273,6 @@ def run_reclassify(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-
-
-def _resolve_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
-    url = (args.supabase_url or os.environ.get("SUPABASE_URL") or "").strip()
-    key = (args.service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
-    if not url or not key:
-        return None
-    return url, key
 
 
 def _write_report(path: str | None, report: dict[str, Any]) -> None:

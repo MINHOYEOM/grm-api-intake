@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.138` |
+| 문서 버전 | `v1.139` |
 | 최종 수정일 | 2026-07-17 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -23,6 +23,7 @@
 - **누적하지 말고 갱신한다.** 과거 단계별 기록을 계속 쌓지 않습니다. 낡은 내용은 **과감히 삭제**하고 현재 사실로 대체합니다. 상세 이력이 필요하면 git 로그를 봅니다.
 - **파일·폴더가 바뀌면 §5.1 폴더 구조를 함께 갱신합니다.**
 - 상단 "문서 메타"의 버전·수정일을 같이 갱신합니다.
+- **Git 정본은 `main` 하나다.** worktree의 이 파일은 브랜치 스냅샷이며, 독립 명세로 유지하지 않습니다. 명세 변경은 코드와 함께 검증한 뒤 `main`에 합쳐야 현재 상태가 됩니다.
 
 ---
 
@@ -62,6 +63,21 @@ flowchart TD
 - **신뢰도 등급화:** Evidence Level(A/B/C)과 Signal Tier(1/2/3)를 표기합니다.
 - **장애에 강하게:** 수집기 하나가 실패해도 나머지는 계속 동작합니다.
 - **완성본만 공개:** 미완성(예: 번역 안 된 항목)은 DB 레벨에서 웹 노출을 차단합니다.
+
+### 1.4 현재 개발 단계와 성숙도
+
+GRM은 **기술적으로는 프로덕션 운영 단계**, 조직·제품 측면에서는 **통제된 파일럿 단계**입니다. "기능이 아직 만들어지는 초기 MVP"는 아니지만, 대규모 사용자·다인 운영을 전제로 한 상용 SaaS 완성 단계도 아닙니다.
+
+| 축 | 단계 | 근거 / 남은 과제 |
+|---|---|---|
+| 수집·발행 코어 | **Production** | 일일 수집·주간 웹 발행·뉴스레터 자동화 가동, 실패 격리·health 경보·발행 게이트 운영 |
+| Findings 데이터 제품 | **Production** | 검색·필터·정렬·집계 서버 정본화, RLS 공개 게이트, 번역·백필 자동화 라이브 |
+| UI·회귀 안전성 | **Production-grade** | 결정론 렌더러와 골든 테스트, 2026-07-17 `main` 전체 2,583 테스트 통과 |
+| 운영 자동화 | **Late beta** | 정기 실행은 자동이나 Admin 승인 1클릭, Claude Routine 활성 상태 육안 확인, 일부 로컬 백업 의존이 남음 |
+| 제품 검증 | **Pilot** | Copilot 자산은 완료됐지만 3부서 파일럿·효과 정량화(EVAL-1)·공모전 패키징은 미완료 |
+| 조직 성숙도 | **Single-operator** | runbook은 있으나 bus factor 1, 운영 권한·지식의 다인 인수인계가 필요 |
+
+따라서 다음 개발의 우선순위는 기능 수를 늘리는 것보다 **운영 관측성, 내용 품질 Eval, 업체명·실사관 데이터 품질, 파일럿 효과 검증**입니다.
 
 ---
 
@@ -256,6 +272,7 @@ grm-api-intake/
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ grm_common.py                   # 공통 HTTP·유틸
+├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
@@ -280,8 +297,9 @@ grm-api-intake/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
-├─ docs/  (prompts/·specs/ 포함)
+├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
+│  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계
 │  └─ copilot/  (grm_findings_connector.swagger.json, COPILOT_SETUP_GUIDE.md, QA_SCENARIOS.md)  # [FIND-1 F4a]
 └─ .github/workflows/
    ├─ grm-intake.yml, grm-ci.yml
@@ -323,7 +341,8 @@ grm-api-intake/
 
 ### 5.4 이 저장소 작업 환경 메모
 - Python 전체경로: `C:\Users\user\AppData\Local\Programs\Python\Python313\python.exe` (`python` 별칭은 스텁이라 미동작). pytest 9.1.1.
-- 실 repo worktree = `v15.0-implementation/`. FIND-1 작업 worktree = `_wt-findings-m1/`. 작업 전 `git fetch origin main` 먼저.
+- 로컬 정본 = `v15.0-implementation/`의 `main`. 작업 전 `git fetch origin --prune` → `git status` → `git worktree list` 순으로 확인합니다.
+- 기능 worktree는 동시 작업이 꼭 필요할 때만 만들고, 머지 후 즉시 제거합니다. dirty worktree와 로컬 작업공간 현황은 저장소 밖 `WORKSPACE_INDEX.md`가 관리합니다.
 - 라이브 Supabase 쓰기(마이그레이션·데이터)는 세션 권한 게이트상 사람이 SQL Editor에서 실행하거나 CI가 수행합니다(대화 세션 직접 쓰기 회피).
 
 ---
@@ -345,10 +364,8 @@ grm-api-intake/
 | ID | 내용 | 상태 |
 |---|---|---|
 | FIND-483-SIGNER | FDA 483 실사관(서명자) 추출기 미구현 — `inspector_names` 전량 빈값. F3 실사관 프로파일의 선결 조건 | 🔲 이월 |
-| FIND-FIRM-ALIAS | 업체명 표기·별칭 정규화(트렌드 업체 랭킹·상세 패널 정확도 개선) — 백엔드(`firm_key` generated 컬럼 + `grm_normalize_firm_name`/`findings_firm_profile` RPC, `013_findings_firm_key.sql`+`017_findings_stats_firm_key.sql`, 실측 982→855 업체 수렴) + 업체 프로파일 웹 페이지(`/findings/firm/?key=`) 전부 라이브(2026-07-16 실측: findings REST `firm_key` select 200·`findings_firm_profile`/`findings_stats.top_firms` 정상 응답·프로파일 페이지 200 확인) | ✅ 적용·라이브(013+017)·프로파일 페이지 운영 |
-| MIGRATION-008 | `008_findings_category_matrix.sql` — anon `POST /rest/v1/rpc/findings_category_matrix` 실측(2026-07-16) 유효 jsonb(`cells` 배열) 응답 확인, "적용 대기" 서술은 낡은 기록이었다 | ✅ 적용됨 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
-| ROUTINE-AUTO | 클라우드 Routine 실행 자체의 완전 자동화(현재 델타 브릿지까지 자동, 실행은 클라우드 Routines 의존) | 🟡 부분 |
+| ROUTINE-VISIBILITY | Claude Routine 활성·최근 실행 상태가 저장소/운영 콘솔에서 직접 관측되지 않아 사람이 주기 확인해야 함 | 🟡 관측성 보강 필요 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
 | GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 | 🔲 후보 |
 | WHY-1 | 결함 내용 표출 감사(FDA 483/WHOPIR/WL/MFDS GMP로 사실상 확보, 지속 관찰) | 🟡 진행 |

@@ -37,7 +37,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -46,6 +45,9 @@ import requests
 
 import findings_extractors
 import findings_supabase_append as fsa
+from grm_cli import header_ci as _header_ci
+from grm_cli import parse_content_range as _parse_content_range
+from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 
 DEFAULT_TIMEOUT_SECONDS = fsa.DEFAULT_TIMEOUT_SECONDS
@@ -66,27 +68,6 @@ class BackfillReport:
 
 def _normalize_base_url(base_url: str) -> str | None:
     return fsa._normalize_base_url(base_url)
-
-
-def _header_ci(headers: dict[str, Any], name: str) -> str:
-    name_lower = name.lower()
-    for key, value in headers.items():
-        if str(key).lower() == name_lower:
-            return str(value)
-    return ""
-
-
-def _parse_content_range(value: str) -> int | None:
-    """Return the total row count from a PostgREST Content-Range header, or
-    None if it is absent/unparseable (e.g. "0-999/1234" -> 1234; "*/0" -> 0;
-    "0-999/*" -> None, PostgREST could not compute an exact count).
-    """
-    if "/" not in value:
-        return None
-    total_part = value.rsplit("/", 1)[-1]
-    if not total_part.isdigit():
-        return None
-    return int(total_part)
 
 
 def _get_page(
@@ -329,14 +310,6 @@ def run_backfill(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-
-
-def _resolve_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
-    url = (args.supabase_url or os.environ.get("SUPABASE_URL") or "").strip()
-    key = (args.service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
-    if not url or not key:
-        return None
-    return url, key
 
 
 def main(argv: list[str] | None = None) -> int:

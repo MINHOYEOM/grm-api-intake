@@ -20,6 +20,7 @@ from typing import Any, Iterable
 import findings_store
 import findings_views
 import grm_findings as gf
+from grm_cli import write_json as _write_json
 
 
 SUPABASE_LOAD_SCHEMA_VERSION = "grm-findings-supabase-load/v1"
@@ -309,17 +310,6 @@ def build_supabase_load_plan(db_path: str | Path) -> dict[str, Any]:
             "ready_for_apply": blocking_errors == 0,
         },
     }
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

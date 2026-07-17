@@ -18,17 +18,12 @@ from typing import Any
 import findings_backfill
 import findings_store
 import grm_findings as gf
+from grm_cli import load_json_object as _load_json
+from grm_cli import parse_input_spec as _parse_input_spec
+from grm_cli import write_json as _write_json
 
 
 SQLITE_BACKFILL_DRY_RUN_SCHEMA_VERSION = "grm-findings-sqlite-backfill-dry-run/v1"
-
-
-def _load_json(path: str | Path) -> dict[str, Any]:
-    with Path(path).open(encoding="utf-8") as f:
-        data = json.load(f)
-    if not isinstance(data, dict):
-        raise ValueError(f"{path}: JSON root must be an object")
-    return data
 
 
 def _count_rows(conn: sqlite3.Connection) -> dict[str, int]:
@@ -197,14 +192,6 @@ def sqlite_transaction_dry_run(plan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _parse_input_spec(spec: str) -> tuple[str, Path]:
-    if "=" in spec:
-        name, path = spec.split("=", 1)
-        return name.strip() or Path(path).stem, Path(path)
-    path = Path(spec)
-    return path.stem, path
-
-
 def _plan_from_args(args: argparse.Namespace) -> dict[str, Any]:
     selected = sum(1 for value in (args.plan, args.manifest, bool(args.input)) if value)
     if selected != 1:
@@ -219,17 +206,6 @@ def _plan_from_args(args: argparse.Namespace) -> dict[str, Any]:
             for name, path in (_parse_input_spec(spec) for spec in args.input)
         ]
     return findings_backfill.build_internal_backfill_dry_run(inputs)
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

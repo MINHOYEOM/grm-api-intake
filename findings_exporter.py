@@ -16,6 +16,7 @@ from typing import Any
 
 import findings_extractors
 import grm_findings as gf
+from grm_cli import write_json as _write_json
 
 
 EXPORT_SCHEMA_VERSION = "grm-findings-raw-export/v1"
@@ -228,17 +229,6 @@ def export_from_input(data: dict[str, Any], *, include_findings: bool | None = N
         collected_at=str(data.get("collected_at") or ""),
         include_findings=bool(data.get("include_findings")) if include_findings is None else include_findings,
     )
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

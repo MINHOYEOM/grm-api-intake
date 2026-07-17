@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Any
 
 import grm_findings as gf
+from grm_cli import write_json as _write_json
 
 
 TRANSLATION_MIGRATE_SCHEMA_VERSION = "grm-findings-translation-migrate/v1"
@@ -217,17 +218,6 @@ def migrate_translation_columns_sqlite(
         "ready": verified,
         "committed": True,
     }
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

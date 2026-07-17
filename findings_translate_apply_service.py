@@ -42,12 +42,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Any
 
 import requests
+
+from grm_cli import normalize_supabase_url as _normalize_base_url
+from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 
 DEFAULT_OUTBOX_DIR = "translations/outbox"
@@ -55,13 +57,6 @@ DEFAULT_TIMEOUT_SECONDS = 15
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 
 _REQUIRED_ITEM_KEYS = ("finding_id", "finding_text", "finding_text_ko", "translation_method")
-
-
-def _normalize_base_url(base_url: str) -> str | None:
-    text = str(base_url or "").strip()
-    if not text.lower().startswith("https://"):
-        return None
-    return text.rstrip("/")
 
 
 def _load_outbox_files(outbox_dir: str | Path) -> tuple[list[Path], list[str]]:
@@ -251,14 +246,6 @@ def apply_outbox(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-
-
-def _resolve_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
-    url = (args.supabase_url or os.environ.get("SUPABASE_URL") or "").strip()
-    key = (args.service_role_key or os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
-    if not url or not key:
-        return None
-    return url, key
 
 
 def _write_report(path: str | None, report: dict[str, Any]) -> None:

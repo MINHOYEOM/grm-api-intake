@@ -19,6 +19,7 @@
 ## 핵심 위치
 - 수집기 단일 진입점(오케스트레이터): `collect_intake.py` (워크플로우가 호출하는 유일 파일)
 - 식약처 수집기: `collect_mfds*.py` / 공통 헬퍼: `grm_common.py`
+- CLI·PostgREST 경계 공통 헬퍼: `grm_cli.py` (JSON object I/O·URL/헤더/Content-Range·service-role 자격증명 해석)
 - 자동 실행: `.github/workflows/grm-intake.yml` (매일 18:17 UTC = 익일 03:17 KST 수집, Routine 발행은 매주 월 07:30 KST)
 - 현행 Routine 프롬프트: `docs/prompts/GRM_Prompt_v16.md` (내부 버전 v16)
 - 저장: Notion `GRM API Intake`(수집 staging) + Supabase `grm-reactions`(FIND-1 findings·웹 반응). `🌐 GRM Weekly Brief` DB는 레거시(웹 발행으로 대체).

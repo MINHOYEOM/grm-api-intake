@@ -84,6 +84,8 @@ import collect_intake as ci
 import findings_store
 import findings_supabase_append as fsa
 import grm_findings as gf
+from grm_cli import header_ci as _header_ci
+from grm_cli import parse_content_range as _parse_content_range
 from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html
 
 
@@ -145,23 +147,6 @@ Sleeper = Callable[[float], None]
 # findings_supabase_backfill._get_page/_fetch_all_pages, reimplemented locally because
 # that helper does not accept an extra `source=eq....` filter param alongside `select`.
 # ---------------------------------------------------------------------------
-
-
-def _parse_content_range(value: str) -> int | None:
-    if "/" not in value:
-        return None
-    total_part = value.rsplit("/", 1)[-1]
-    if not total_part.isdigit():
-        return None
-    return int(total_part)
-
-
-def _header_ci(headers: dict[str, Any], name: str) -> str:
-    name_lower = name.lower()
-    for key, value in headers.items():
-        if str(key).lower() == name_lower:
-            return str(value)
-    return ""
 
 
 def _get_existing_ids_page(

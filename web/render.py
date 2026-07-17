@@ -51,6 +51,7 @@ DATA_DIR = WEB_DIR / "data" / "briefs"
 LIBRARY_DIR = WEB_DIR / "data" / "library"      # [자료실] ICH/MFDS 참조 카탈로그 커밋 데이터
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
+QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
 
@@ -533,6 +534,63 @@ def build_glossary_view(terms: list[dict[str, Any]]) -> dict[str, Any]:
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
 
 
+# ── [주간 퀴즈] 문항 뱅크 로드·뷰모델(결정론 — 값 무변형, 파생은 근거 링크/라벨뿐) ────
+# "이번 주" 문항 선택은 렌더러가 하지 않는다(now() 금지·결정론 불가침). 렌더러는 정본
+# 뱅크 전 문항을 순서 그대로 페이지에 embed 하고, 클라이언트(assets/quiz.js)가 ISO 주차
+# 키로 결정론 회전 선택한다(같은 주 = 전 직원 동일 세트). 사실/정답/해설은 무변형 통과.
+_QUIZ_DIFFICULTY_LABEL = {"easy": "기본", "normal": "심화"}
+# source_type → 근거 진입 라벨(어디로 가는지). glossary=자체 딥링크, brief/finding=공개 URL.
+_QUIZ_SOURCE_KIND = {"glossary": "용어사전", "brief": "주간 브리프", "finding": "지적사항 검색"}
+# 기본 노출 문항 수(운영설계 §2.3 — 주 4문항 기본, 운영자가 3~5 범위 조정). 이 상수만
+# 바꾸면 클라이언트 회전 로직이 easy 과반·normal 1~2 구성을 자동으로 맞춘다(코드 수정 0).
+WEEKLY_QUIZ_COUNT = 4
+
+
+def load_quiz_bank(path: Path = QUIZ_FILE) -> list[dict[str, Any]] | None:
+    """[주간 퀴즈] 정본 문항 뱅크 로드(파일 부재 시 None → 페이지 조용히 생략)."""
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+
+def _quiz_question_view(q: dict[str, Any]) -> dict[str, Any]:
+    """문항 1건 → 렌더 뷰모델. 값(질문/선택지/정답/해설)은 무변형, 파생은 난이도 라벨과
+    근거 링크 구성뿐. glossary 는 자체 용어사전 딥링크 id(무변형 통과 — 템플릿이 rel_root
+    로 조립), brief/finding 은 공개 URL(_safe_url 스킴 게이트만). 순수·결정론."""
+    st = q.get("source_type", "")
+    ref = str(q.get("source_ref") or "")
+    is_glossary = st == "glossary"
+    return {
+        "id": q.get("id", ""),
+        "question_ko": q.get("question_ko", ""),
+        "choices": list(q.get("choices") or []),
+        "answer_index": q.get("answer_index"),
+        "explanation_ko": q.get("explanation_ko", ""),
+        "difficulty": q.get("difficulty", ""),
+        "difficulty_label": _QUIZ_DIFFICULTY_LABEL.get(q.get("difficulty", ""),
+                                                       q.get("difficulty", "")),
+        "source_type": st,
+        "source_kind": _QUIZ_SOURCE_KIND.get(st, st),
+        # glossary → 용어사전 앵커 id(템플릿이 rel_root+glossary/#id 로 조립), 그 외는 "".
+        "source_glossary_id": ref if is_glossary else "",
+        # brief/finding → 공개 절대 URL(스킴 화이트리스트 통과분만; 비허용은 ""→링크 생략).
+        "source_url": (_safe_url(ref) if not is_glossary else ""),
+    }
+
+
+def build_quiz_view(bank: list[dict[str, Any]]) -> dict[str, Any]:
+    """문항 뱅크 → 렌더 뷰모델(무변형 — 값 재작성 0). 전 문항을 뱅크 순서 그대로 embed
+    (클라이언트 결정론 회전용). 난이도 집계는 클라이언트 주차 회전이 easy 과반·normal 1~2
+    구성을 맞추는 데 쓰는 파생 메타다."""
+    questions = [_quiz_question_view(q) for q in bank]
+    easy_total = sum(1 for q in questions if q["difficulty"] == "easy")
+    return {
+        "questions": questions,
+        "total": len(questions),
+        "weekly_count": WEEKLY_QUIZ_COUNT,
+        "easy_total": easy_total,
+        "normal_total": len(questions) - easy_total,
+    }
+
+
 def assign_issue_numbers(briefs: list[dict[str, Any]]) -> dict[str, int]:
     """publish_date 오름차순 순위로 issue 번호 부여(가장 오래된=1).
 
@@ -777,6 +835,8 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # 분리된 상설 참조 콘텐츠라 lastmod 는 생략(정적 커밋 데이터).
         f"  <url><loc>{base_url}/guide/</loc></url>",
         f"  <url><loc>{base_url}/glossary/</loc></url>",
+        # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
+        f"  <url><loc>{base_url}/quiz/</loc></url>",
     ]
     for pub in pubs:
         lines.append(
@@ -845,6 +905,8 @@ GUIDE_DESCRIPTION = ("GRM 이용 안내 — 주간 브리프 카드 읽는 법, 
                      "findings 검색 사용법과 이용 시 유의사항을 한곳에 정리했습니다.")
 GLOSSARY_DESCRIPTION = ("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
                         "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
+QUIZ_DESCRIPTION = ("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 "
+                    "전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요.")
 
 
 def _abs_url(rel_path: str = "") -> str:
@@ -942,6 +1004,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["trendsjs_ver"] = _asset_ver("trends.js")
     env.globals["firmjs_ver"] = _asset_ver("firm.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
+    env.globals["quizjs_ver"] = _asset_ver("quiz.js")
     # 반응 계층 공개 설정 주입 — url 이 https(_safe_url 통과)이고 anon key 가 있을 때만 활성.
     # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.
     _supa_url = _safe_url(SUPABASE_URL)
@@ -1157,6 +1220,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         _write(out_dir / "glossary" / "index.html", glossary_html)
         written.append("glossary/index.html")
+
+    # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
+    # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
+    # 선택한다(같은 주 = 전 직원 동일 세트). 파일 부재 시 조용히 생략.
+    quiz_bank = load_quiz_bank()
+    if quiz_bank:
+        quiz_html = env.get_template("quiz.html").render(
+            page_title="주간 퀴즈 · GRM",
+            rel_root="../",
+            nav_active="guide",
+            latest_slug=latest_slug,
+            description=QUIZ_DESCRIPTION,
+            canonical=_abs_url("quiz/"),
+            quiz=build_quiz_view(quiz_bank),
+        )
+        _write(out_dir / "quiz" / "index.html", quiz_html)
+        written.append("quiz/index.html")
 
     # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
     search_index = build_search_index(briefs, issue_no_by_date, latest_slug)

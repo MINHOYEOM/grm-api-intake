@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 주간 퀴즈(트랙 C) — web/data/quiz_bank.json(정본) 전 문항을 결정론 embed. "이번 주"
+    문항 선택은 렌더러가 하지 않고(now() 금지·결정론 불가침) 클라이언트 assets/quiz.js 가
+    ISO 주차 키로 결정론 회전 선택한다(같은 주 = 전 직원 동일 세트). 채점·해설·근거 링크도
+    전부 클라이언트(즉시 피드백)이며, 정답/해설/근거는 무변형(값 재작성 0). v1 비목표:
+    랭킹·참여기록·서버 저장 없음(점수는 화면 표시만). grm.css 프리즈 보존 위해 스코프
+    <style>(glossary 선례). JS 미로드 시 전 문항이 그대로 보이고 링크·해시 열람 무영향. -#}
+{%- set marks = ['①', '②', '③', '④'] -%}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Weekly Quiz</span>
+    <h1 class="reveal" style="animation-delay:.08s">주간 퀴즈</h1>
+    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위나 기록은 남기지 않으니 부담 없이 풀어 보세요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
+  </div>
+
+  <div class="wrap qz-tools reveal" style="animation-delay:.2s"
+       id="grm-qz" data-weekly-count="{{ quiz.weekly_count }}" data-total="{{ quiz.total }}">
+    <div class="qz-head">
+      <h2 class="qz-set-title" id="grm-qz-title">이번 주 퀴즈</h2>
+      <p class="qz-set-sub" id="grm-qz-sub">이번 주에 뽑은 문항이에요. 같은 주에는 모두 같은 문제를 풀어요.</p>
+    </div>
+    <div class="qz-bar">
+      <p class="qz-score" id="grm-qz-score" aria-live="polite">맞힌 문제 <b id="grm-qz-correct">0</b> · 푼 문제 <b id="grm-qz-answered">0</b></p>
+      <button class="qz-toggle" id="grm-qz-toggle" type="button" aria-pressed="false">전체 {{ quiz.total }}문항 풀기</button>
+    </div>
+  </div>
+
+  <div class="wrap qz-body">
+    {% for q in quiz.questions %}
+    <article class="qz-card" id="{{ q.id }}"
+             data-index="{{ loop.index0 }}"
+             data-difficulty="{{ q.difficulty }}"
+             data-answer="{{ q.answer_index }}">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">{{ loop.index }}</span></span>
+        {% if q.difficulty_label %}<span class="qz-diff qz-diff-{{ q.difficulty }}">{{ q.difficulty_label }}</span>{% endif %}
+        <span class="qz-src-kind">{{ q.source_kind }}</span>
+      </div>
+      <h3 class="qz-q">{{ q.question_ko }}</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        {% for c in q.choices %}
+        <button class="qz-choice" type="button" data-i="{{ loop.index0 }}">
+          <span class="qz-mark" aria-hidden="true">{{ marks[loop.index0] }}</span>
+          <span class="qz-choice-t">{{ c }}</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        {% endfor %}
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">{{ q.explanation_ko }}</p>
+        {% if q.source_glossary_id %}
+        <a class="qz-src-link" href="{{ rel_root }}glossary/index.html#{{ q.source_glossary_id }}">
+          <i class="ti ti-book-2" aria-hidden="true"></i>{{ q.source_kind }}에서 근거 보기</a>
+        {% elif q.source_url %}
+        <a class="qz-src-link" href="{{ q.source_url }}">
+          <i class="ti ti-external-link" aria-hidden="true"></i>{{ q.source_kind }}에서 근거 보기</a>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</main>
+<style>
+/* [주간 퀴즈] 문항 카드·선택지·피드백 — grm.css 토큰만 사용(프리즈 보존). */
+.qz-tools{margin-top:6px}
+.qz-head{margin-bottom:14px}
+.qz-set-title{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--coral-2);margin:0 0 4px}
+.qz-set-sub{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
+.qz-bar{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.qz-score{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
+.qz-score b{color:var(--coral-2);font-variant-numeric:tabular-nums}
+.qz-toggle{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 14px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
+.qz-toggle:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
+.qz-toggle[aria-pressed="true"]{color:var(--coral-2);background:var(--coral-tint);border-color:rgba(194,96,63,.3)}
+.qz-body{padding:16px 0 64px;display:flex;flex-direction:column;gap:18px}
+.qz-card{padding:22px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);scroll-margin-top:88px}
+.qz-card[hidden]{display:none}
+.qz-card:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.qz-no{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--lo)}
+.qz-no-n{font-variant-numeric:tabular-nums}
+.qz-diff{font-family:var(--sans);font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px}
+.qz-diff-easy{color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22)}
+.qz-diff-normal{color:var(--muted);background:var(--soft);border:1px solid var(--line-2)}
+.qz-src-kind{font-family:var(--sans);font-size:11.5px;color:var(--lo);margin-left:auto}
+.qz-q{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 16px}
+.qz-choices{display:flex;flex-direction:column;gap:9px}
+.qz-choice{display:flex;align-items:flex-start;gap:11px;width:100%;box-sizing:border-box;text-align:left;font-family:var(--sans);font-size:14.5px;line-height:1.5;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 15px;cursor:pointer;transition:border-color .14s var(--ease),background .14s var(--ease),color .14s var(--ease)}
+.qz-choice:hover:not(:disabled){border-color:var(--coral);background:var(--soft)}
+.qz-choice:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-choice:disabled{cursor:default}
+.qz-mark{flex:none;font-size:15px;color:var(--lo);line-height:1.5}
+.qz-choice-t{flex:1}
+.qz-state{flex:none;font-family:var(--sans);font-size:12.5px;font-weight:600;line-height:1.5}
+/* 채점 후 상태 — 색 + 아이콘 텍스트(qz-state) 병행으로 색맹 접근성 확보(§2.5). */
+.qz-choice.is-correct{border-color:var(--ok,#3E7C5A);background:rgba(62,124,90,.08);color:var(--ink)}
+.qz-choice.is-correct .qz-mark{color:var(--ok,#3E7C5A)}
+.qz-choice.is-correct .qz-state{color:var(--ok,#3E7C5A)}
+.qz-choice.is-wrong{border-color:var(--coral-2);background:rgba(161,75,48,.06)}
+.qz-choice.is-wrong .qz-state{color:var(--coral-2)}
+.qz-choice.is-picked{font-weight:500}
+.qz-fb{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.qz-fb[hidden]{display:none}
+.qz-verdict{font-family:var(--sans);font-size:14.5px;font-weight:600;margin:0 0 8px}
+.qz-verdict.is-correct{color:var(--ok,#3E7C5A)}
+.qz-verdict.is-wrong{color:var(--coral-2)}
+.qz-exp{font-family:var(--sans);font-size:14px;line-height:1.7;color:var(--body);margin:0 0 12px}
+.qz-src-link{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:8px 14px;border-radius:999px;text-decoration:none;transition:background .14s var(--ease),border-color .14s var(--ease)}
+.qz-src-link:hover{background:var(--soft);border-color:var(--coral)}
+.qz-src-link .ti{font-size:15px}
+@media (max-width:640px){ .qz-card{padding:18px 16px} .qz-bar{align-items:stretch} }
+</style>
+{% endblock %}
+{% block scripts %}
+<script src="/assets/quiz.js?v={{ quizjs_ver }}" defer></script>
+{% endblock %}

@@ -57,6 +57,7 @@ __all__ = [
     "WebFindingsRenderTest",
     "WebTrendsRenderTest",
     "WebFirmRenderTest",
+    "WebLibraryRenderTest",
     "WebFirmWatchlistTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
@@ -103,6 +104,9 @@ SINGLE_GOLDENS = [
     ("findings/index.html", "findings.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
     ("findings/firm/index.html", "firm.expected.html"),
+    ("library/index.html", "library.expected.html"),
+    ("library/ich/index.html", "library_ich.expected.html"),
+    ("library/mfds/index.html", "library_mfds.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
@@ -747,7 +751,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 4, "nav 탭은 소개·모아보기·찾아보기·트렌드 4개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 5, "nav 탭은 소개·모아보기·찾아보기·트렌드·자료실 5개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
@@ -2627,7 +2631,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn('class="on">찾아보기', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 4)
+        self.assertEqual(nav_m.group(1).count("<a "), 5)  # 소개·모아보기·찾아보기·트렌드·자료실
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
@@ -3078,7 +3082,7 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 4)
+        self.assertEqual(nav_m.group(1).count("<a "), 5)  # 소개·모아보기·찾아보기·트렌드·자료실
         self.assertNotIn("findings/firm", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -3780,6 +3784,103 @@ class WebSeoMetaTest(unittest.TestCase):
 
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────
+class WebLibraryRenderTest(unittest.TestCase):
+    """[자료실 트랙 C] /library/ 허브 + ICH 카탈로그 + MFDS 아카이브 정적 렌더.
+
+    findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷(web/data/library/*.json)을
+    결정론 렌더한다(주간 발행 게이트와 무관한 독립 섹션). 셸이 아니라 실데이터가 빌드시
+    HTML 에 박히므로 골든이 정본이고, 여기선 구조·배선·데이터 정합만 보강 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_lib_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.hub = (cls.single / "library" / "index.html").read_text(encoding="utf-8")
+        cls.ich = (cls.single / "library" / "ich" / "index.html").read_text(encoding="utf-8")
+        cls.mfds = (cls.single / "library" / "mfds" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.ich_data = json.loads((render.LIBRARY_DIR / "ich.json").read_text(encoding="utf-8"))
+        cls.mfds_data = json.loads((render.LIBRARY_DIR / "mfds.json").read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_pages_generated(self):
+        self.assertIn("자료실", self.hub)
+        self.assertIn("ICH 가이드라인 카탈로그", self.ich)
+        self.assertIn("MFDS 지침·고시 아카이브", self.mfds)
+
+    def test_hub_links_both_catalogs(self):
+        self.assertIn('href="../library/ich/index.html"', self.hub)
+        self.assertIn('href="../library/mfds/index.html"', self.hub)
+
+    def test_nav_link_present_and_active(self):
+        # 자료실 페이지에서만 nav 'on' 이 붙는다. 타 페이지엔 링크만.
+        self.assertIn('library/index.html" class="on">자료실</a>', self.hub)
+        self.assertIn('library/index.html" class="on">자료실</a>', self.ich)
+        self.assertIn('library/index.html" class="on">자료실</a>', self.mfds)
+        self.assertIn('href="library/index.html">자료실</a>', self.landing)
+        self.assertNotIn('class="on">자료실</a>', self.landing)
+
+    def test_sitemap_includes_library(self):
+        for path in ("/library/", "/library/ich/", "/library/mfds/"):
+            self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap)
+
+    def test_ich_all_topics_rendered_with_official_links(self):
+        topic_total = sum(len(s["topics"]) for s in self.ich_data["series"])
+        self.assertEqual(topic_total, self.ich_data["meta"]["topic_count"])
+        self.assertEqual(self.ich.count('<li class="lib-topic">'), topic_total)
+        # 공식 링크는 계열별 www.ich.org/page/<slug> 로 새 탭 연결.
+        for s in self.ich_data["series"]:
+            self.assertIn(f'href="{s["official_url"]}"', self.ich)
+        self.assertNotIn("admin.ich.org", self.ich)  # 사람이 보는 URL 은 공개 페이지만
+        self.assertIn('target="_blank" rel="noopener"', self.ich)
+
+    def test_ich_tier_chips_match_data(self):
+        for tier, cls in (("Tier 3", "t3"), ("Tier 2", "t2"), ("Tier 1", "t1")):
+            n = sum(1 for s in self.ich_data["series"]
+                    for t in s["topics"] if t["signal_tier"] == tier)
+            self.assertEqual(self.ich.count(f'lib-tier {cls}">'), n,
+                             f"{tier} 칩 수 불일치")
+
+    def test_mfds_all_items_rendered_with_official_links(self):
+        items = self.mfds_data["items"]
+        self.assertEqual(len(items), self.mfds_data["meta"]["item_count"])
+        self.assertEqual(self.mfds.count('<li class="lib-item'), len(items))
+        for it in items:
+            self.assertIn(f'href="{it["official_url"]}"', self.mfds)
+
+    def test_mfds_latest_batch_badge_is_deterministic(self):
+        # "최신 수집분" 배지 = 최대 수집일 배치(now() 미사용, 데이터 파생).
+        latest = self.mfds_data["meta"]["latest_collected_date"]
+        n_latest = sum(1 for it in self.mfds_data["items"] if it["collected_date"] == latest)
+        self.assertEqual(self.mfds.count(">최신 수집분</span>"), n_latest)
+        self.assertTrue(all(it["is_latest_batch"] == (it["collected_date"] == latest)
+                            for it in self.mfds_data["items"]))
+
+    def test_canonical_and_description(self):
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/" />', self.hub)
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/ich/" />', self.ich)
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/mfds/" />', self.mfds)
+        for html in (self.hub, self.ich, self.mfds):
+            self.assertIn('<meta name="description" content="', html)
+
+    def test_grm_css_untouched_by_library(self):
+        # 자료실은 스코프 <style>(템플릿 인라인)만 쓰고 grm.css 를 편집하지 않는다.
+        for html in (self.hub, self.ich, self.mfds):
+            self.assertIn("<style>", html)
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        for rel in ("library/index.html", "library/ich/index.html", "library/mfds/index.html"):
+            self.assertEqual((self.single / rel).read_bytes(),
+                             (out2 / rel).read_bytes(), f"비결정론 렌더: {rel}")
+
+
 def freeze() -> None:
     GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_freeze_"))

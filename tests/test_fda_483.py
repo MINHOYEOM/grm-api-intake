@@ -6,6 +6,7 @@
 
 무네트워크: _fetch_html_rows·http_get_bytes·_extract_pdf_text 스텁.
 """
+import json
 import os
 import re
 import sys
@@ -278,6 +279,135 @@ class SourceDegradeTest(unittest.TestCase):
         with _Patched(json_rows=[_json_row(5203)], html_rows=[]):
             f.collect_fda_483(START, END)
         self.assertFalse(f.LAST_HEALTH["source_degraded"])
+
+
+def _drupal_settings_html(rows):
+    """정적 표 + 유효 DataTables 설정(drupal-settings-json) 포함 리딩룸 HTML."""
+    settings = {"datatables": {"view-x": {"ajax": {
+        "url": "/datatables/views/ajax",
+        "data": {"view_name": "ora_foia_electronic_reading_room_solr",
+                 "view_display_id": "reading_room", "total_items": 100},
+    }}}}
+    return (_html(rows)
+            + '<script type="application/json" data-drupal-selector="drupal-settings-json">'
+            + json.dumps(settings) + "</script>")
+
+
+def _dt_row(media_id, rtype="483", publish="05/27/2026"):
+    """DataTables AJAX data 배열 행(9컬럼·col3 에 media href)."""
+    rt = f'<a href="/media/{media_id}/download">{rtype}</a>'
+    return ["04/17/2026", "Acme Pharma Ltd", "1234567", rt, "Florida", "",
+            "Drug Manufacturer", publish, ""]
+
+
+_APOLOGY_HTML = "<html><head><title>Page Not Found | FDA</title></head><body>apology</body></html>"
+
+
+class BackboneChainTest(unittest.TestCase):
+    """백본 3단 폴백 체인(_fetch_html_rows 실경로) — 2026-07-17 Akamai 봇차단 대응.
+
+    1차 DataTables(HTML 설정) → 2차 전수 JSON(구 backbone 부활) → 3차 정적 HTML 10행(부분).
+    실측 장애 모드: 리딩룸 HTML 이 봇매니저 미끼 302→apology 404 로 대체되어 설정/표가 모두
+    없는 200 응답이 온다(fetch 예외 없음) — 이때 2차 JSON 이 전수 수집을 대신해야 한다.
+    """
+
+    def _run(self, html=None, html_exc=None, dt_pages=None, dt_exc=None,
+             json_data=None, json_exc=None):
+        calls = {"json": 0}
+
+        def stub_html(url, **kw):
+            if html_exc:
+                raise html_exc
+            return html or ""
+
+        def stub_dt(config, *, start, length, draw):
+            if dt_exc:
+                raise dt_exc
+            pages = dt_pages or []
+            idx = start // length
+            data = pages[idx] if idx < len(pages) else []
+            return {"data": data, "recordsFiltered": sum(len(p) for p in pages)}
+
+        def stub_json(url, **kw):
+            calls["json"] += 1
+            if json_exc:
+                raise json_exc
+            return json_data if json_data is not None else []
+
+        with patch.object(f, "http_get_html", stub_html), \
+             patch.object(f, "_fetch_datatable_page", stub_dt), \
+             patch.object(f, "http_get_json", stub_json):
+            rows, count, degraded = f._fetch_html_rows(START)
+        return rows, count, degraded, calls
+
+    def test_akamai_blocked_html_falls_back_to_full_json(self):
+        # 봇차단 apology 200(설정·표 없음) → 전수 JSON 백본이 전수 수집(EIR 은 제외).
+        rows, count, degraded, calls = self._run(
+            html=_APOLOGY_HTML,
+            json_data=[_json_row(9001), _json_row(9002, EIR_TYPE), _json_row(9003)])
+        self.assertEqual([r["media_id"] for r in rows], ["9001", "9003"])
+        self.assertEqual(count, 3)
+        self.assertFalse(degraded)          # 전수 백본 — 부분 fallback 아님
+        self.assertEqual(calls["json"], 1)
+
+    def test_html_fetch_exception_falls_back_to_full_json(self):
+        rows, _, degraded, _ = self._run(
+            html_exc=RuntimeError("boom"), json_data=[_json_row(9101)])
+        self.assertEqual([r["media_id"] for r in rows], ["9101"])
+        self.assertFalse(degraded)
+
+    def test_datatables_healthy_short_circuits_json(self):
+        # 1차 정상 → 2차 JSON 은 호출조차 없음(현행 정상경로 불변).
+        rows, _, degraded, calls = self._run(
+            html=_drupal_settings_html([_html_row(1)]),
+            dt_pages=[[_dt_row(9201)]])
+        self.assertEqual([r["media_id"] for r in rows], ["9201"])
+        self.assertFalse(degraded)
+        self.assertEqual(calls["json"], 0)
+
+    def test_datatables_error_falls_back_to_json_before_static(self):
+        rows, _, degraded, calls = self._run(
+            html=_drupal_settings_html([_html_row(9301)]),
+            dt_exc=RuntimeError("503"), json_data=[_json_row(9302)])
+        self.assertEqual([r["media_id"] for r in rows], ["9302"])
+        self.assertFalse(degraded)
+        self.assertEqual(calls["json"], 1)
+
+    def test_datatables_zero_rows_falls_back_to_json(self):
+        rows, _, degraded, _ = self._run(
+            html=_drupal_settings_html([_html_row(9401)]),
+            dt_pages=[[]], json_data=[_json_row(9402)])
+        self.assertEqual([r["media_id"] for r in rows], ["9402"])
+        self.assertFalse(degraded)
+
+    def test_json_dead_falls_back_to_static_html_partial(self):
+        # 2차까지 죽으면 기존 3차(정적 10행·부분) 동작 보존 — degraded 표면화.
+        rows, count, degraded, _ = self._run(
+            html=_html([_html_row(9501)]), json_exc=RuntimeError("404"))
+        self.assertEqual([r["media_id"] for r in rows], ["9501"])
+        self.assertEqual(count, 1)
+        self.assertTrue(degraded)
+
+    def test_json_non_list_falls_back_to_static(self):
+        rows, _, degraded, _ = self._run(
+            html=_html([_html_row(9601)]), json_data={"unexpected": "shape"})
+        self.assertEqual([r["media_id"] for r in rows], ["9601"])
+        self.assertTrue(degraded)
+
+    def test_all_backbones_dead_yields_collect_error(self):
+        # 3단 전부 사망 → collect_fda_483 이 error 로 표면화(침묵 금지 불변).
+        def stub_html(url, **kw):
+            return _APOLOGY_HTML
+
+        def stub_json(url, **kw):
+            raise RuntimeError("404")
+
+        with patch.object(f, "http_get_html", stub_html), \
+             patch.object(f, "http_get_json", stub_json):
+            items, err = f.collect_fda_483(START, END)
+        self.assertEqual(items, [])
+        self.assertIsNotNone(err)
+        self.assertIn("수집 실패", err)
 
 
 class NoiseGateTest(unittest.TestCase):

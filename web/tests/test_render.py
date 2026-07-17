@@ -70,6 +70,7 @@ __all__ = [
     "WebBriefFirmLinkTest",
     "WebResourceNotesRenderTest",
     "WebResourceNotesGoldenInvarianceTest",
+    "WebGurumiWidgetTest",
 ]
 
 
@@ -4588,6 +4589,80 @@ class WebResourceNotesGoldenInvarianceTest(unittest.TestCase):
         env = render._make_env()
         html = env.get_template("partials/resource_notes.html").render(brief={"resources": None})
         self.assertEqual(html, "")
+
+
+# ── [구르미 위젯] 랜딩 히어로 coverage 칩 — 렌더타임 임베드·전용 게이트·모션 계약 ──────
+class WebGurumiWidgetTest(unittest.TestCase):
+    """[구르미 위젯] 랜딩 전용 coverage 칩(설계조사 §5.1 안 A + §6 연출 A).
+
+    a) 단독 픽스처(최신호 2026-07-06, intake 89/rendered 36) 수치가 랜딩에 정확히 반영.
+    b) 위젯은 landing(index.html) 전용 — 브리프 상세·아카이브에는 미출력.
+    c) coverage 부재 브리프 → 위젯 전체 미출력(byte 0, 폴백 게이트).
+    d) 접근성(aria-hidden 장식 scene)·모션 계약(reduced-motion 최종상태 고정, 비반복).
+    결정론(동일 입력 2회 빌드 byte 동일)은 WebRenderDeterminismTest 가 전 파일(랜딩 포함)
+    이미 전역 커버 — 여기서 별도 추가하지 않음.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gurumi_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.brief_detail = (cls.single / "briefs" / "2026-06-26" / "index.html").read_text(
+            encoding="utf-8")
+        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_widget_shows_latest_brief_counts(self):
+        self.assertIn("이번 주 구르미가 규제 소식 <b>89</b>건을 먹고", self.landing)
+        self.assertIn("핵심 카드 <b>36</b>장으로 정리했어요", self.landing)
+        self.assertIn("2026-07-06</span> 발행 기준", self.landing)
+
+    def test_widget_is_landing_only(self):
+        self.assertNotIn("gurumi", self.brief_detail)
+        self.assertNotIn("gurumi", self.archive)
+
+    def test_widget_omitted_when_coverage_absent(self):
+        # 3440줄 부근 기존 하드닝 테스트(_minimal_brief)와 동일 스키마에서 coverage 키만 제거.
+        brief = _minimal_brief("2026-07-13")
+        del brief["brief"]["coverage"]
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gurumi_nocov_"))
+        try:
+            data, out = tmp / "data", tmp / "out"
+            data.mkdir(parents=True, exist_ok=True)
+            (data / "brief_web_2026_07_13.json").write_text(
+                json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+            render.render_site(data, out)
+            landing = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertNotIn("gurumi", landing)
+
+    def test_scene_is_decorative_and_aria_hidden(self):
+        self.assertIn('class="gurumi-scene" aria-hidden="true"', self.landing)
+
+    def test_reduced_motion_locks_final_state(self):
+        marker = "구르미 상태 위젯"
+        self.assertIn(marker, self.landing)
+        css = self.landing[self.landing.index(marker):]
+        css = css[:css.index("</style>")]
+        self.assertIn("prefers-reduced-motion:reduce", css)
+        rm_block = css[css.index("prefers-reduced-motion:reduce"):]
+        self.assertIn(".g-scraps", rm_block)
+        self.assertIn(".g-cards", rm_block)
+        self.assertIn("animation:none", rm_block)
+
+    def test_motion_runs_once_not_infinite(self):
+        marker = "구르미 상태 위젯"
+        css = self.landing[self.landing.index(marker):]
+        css = css[:css.index("</style>")]
+        self.assertIn("@keyframes gurumiEat", css)
+        self.assertIn("@keyframes gurumiCards", css)
+        self.assertNotIn("infinite", css)
 
 
 if __name__ == "__main__":

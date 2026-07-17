@@ -44,6 +44,54 @@
       <div><b>A·B·C</b><span>신뢰 등급</span></div>
       <div><b>100%</b><span>원문 추적</span></div>
     </div>
+    {#- 구르미 상태 위젯(설계조사 §5.1 안 A + §6 연출 A) — 최신 브리프 coverage 렌더타임 임베드.
+        외부 fetch·RPC 0. coverage 부재/0 브리프 → 아래 게이트로 위젯 전체 미출력(폴백).
+        일러스트는 장식이라 aria-hidden, 수치·기준일은 텍스트로 제공. grm.css 프리즈 보존 위해
+        스코프 <style>. 모션은 CSS 1회(그릇의 종이 조각이 사라지고 카드 묶음 등장),
+        prefers-reduced-motion 에서는 제거하고 최종 상태 고정. -#}
+    {%- if cover.intake_total and cover.rendered and cover.publish_date %}
+    <div class="gurumi reveal" style="animation-delay:.48s">
+      <span class="gurumi-scene" aria-hidden="true">
+        <svg class="gurumi-svg" viewBox="0 0 92 56" xmlns="http://www.w3.org/2000/svg">
+          <g class="g-scraps">
+            <rect x="26" y="6" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-12 30.5 9.5)" />
+            <rect x="42" y="3" width="9" height="7" rx="1" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(8 46.5 6.5)" />
+            <rect x="56" y="7" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-4 60.5 10.5)" />
+          </g>
+          <path class="g-bowl" d="M20,30 C20,42 31,49 46,49 C61,49 72,42 72,30 L63,30 C63,39 55,43 46,43 C37,43 29,39 29,30 Z" fill="var(--soft)" stroke="var(--line-2)" stroke-width="1.1" />
+          <g class="g-cards">
+            <rect x="54" y="20" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(-7 66 28.5)" />
+            <rect x="51" y="17" width="24" height="17" rx="3" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(4 63 25.5)" />
+            <rect x="48" y="14" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--coral)" stroke-width="1" transform="rotate(-2 60 22.5)" />
+            <line x1="52" y1="20" x2="66" y2="20" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
+            <line x1="52" y1="24" x2="62" y2="24" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
+          </g>
+        </svg>
+      </span>
+      <p class="gurumi-txt">이번 주 구르미가 규제 소식 <b>{{ cover.intake_total }}</b>건을 먹고, 핵심 카드 <b>{{ cover.rendered }}</b>장으로 정리했어요. <span class="gurumi-date"><span class="mono">{{ cover.publish_date }}</span> 발행 기준</span></p>
+    </div>
+    <style>
+    /* 구르미 상태 위젯 — grm.css 토큰만(프리즈 보존). 마크업과 같은 게이트 안에 둬 폴백 시
+       CSS 도 함께 미출력(위젯 완전 미출력 = byte 0 계약을 문자열 하나까지 지킴). */
+    .gurumi{display:flex;align-items:center;gap:16px;margin-top:14px;padding:14px 18px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
+    .gurumi-scene{flex:none;width:64px;line-height:0}
+    .gurumi-svg{width:100%;height:auto;display:block}
+    .gurumi-txt{font-family:var(--sans);font-size:14.5px;line-height:1.6;color:var(--body);margin:0}
+    .gurumi-txt b{color:var(--ink);font-weight:600}
+    .gurumi-date{color:var(--muted);font-size:12.5px;margin-left:2px}
+    /* 연출 A(1회): 종이 조각이 그릇 쪽으로 사라지고, 뒤이어 카드 묶음이 떠오르며 등장. */
+    @keyframes gurumiEat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(10px)}}
+    @keyframes gurumiCards{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+    .g-scraps{animation:gurumiEat .8s var(--ease) .9s forwards}
+    .g-cards{opacity:0;animation:gurumiCards .6s var(--ease) 1.6s forwards}
+    @media (prefers-reduced-motion:reduce){
+      .g-scraps,.g-cards{animation:none}
+      .g-scraps{opacity:0}
+      .g-cards{opacity:1}
+    }
+    @media (max-width:640px){ .gurumi{padding:12px 14px;gap:12px} .gurumi-scene{width:50px} }
+    </style>
+    {%- endif %}
     <div class="srcs reveal" style="animation-delay:.44s">
       <span class="l">수집 대상 — 11 sources</span>
       <div class="marquee"><div class="track">

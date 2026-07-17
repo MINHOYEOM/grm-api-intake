@@ -445,6 +445,29 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
         self.assertEqual(health.failures, [])
         self.assertEqual(health.exit_code, 0)
 
+    def test_fda483_json_backbone_fallback_is_warning(self) -> None:
+        # 2차 전수 JSON 백본 가동(신선) — 전수 유지이므로 warning-only 관측 신호.
+        stats = ci.CollectionStats()
+        stats.fda483_backbone = "legacy-json"
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-backbone-json-fallback", _codes(health.warnings))
+        self.assertNotIn("fda483-source-degraded", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_fda483_stale_json_backbone_is_degraded_warning(self) -> None:
+        # 2차 JSON 동결(stale) 의심 → degraded warning(전용 문구)·fallback warning 미중복.
+        stats = ci.CollectionStats()
+        stats.fda483_source_degraded = 1
+        stats.fda483_backbone = "legacy-json"
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-source-degraded", _codes(health.warnings))
+        self.assertNotIn("fda483-backbone-json-fallback", _codes(health.warnings))
+        warning = next(w for w in health.warnings if w.code == "fda483-source-degraded")
+        self.assertIn("동결", warning.message)
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
     def test_fda483_observations_failed_is_warning(self) -> None:
         stats = ci.CollectionStats()
         stats.fda483_observations_enabled = True
@@ -466,6 +489,7 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
                     stats=stats, enable_fda483=True))
                 self.assertNotIn("fda483-excerpt-degraded", _codes(health.warnings))
                 self.assertNotIn("fda483-source-degraded", _codes(health.warnings))
+                self.assertNotIn("fda483-backbone-json-fallback", _codes(health.warnings))
                 self.assertNotIn("fda483-observations-degraded", _codes(health.warnings))
                 self.assertEqual(health.status, "ok")
                 self.assertEqual(health.exit_code, 0)

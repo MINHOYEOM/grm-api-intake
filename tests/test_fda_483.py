@@ -394,6 +394,29 @@ class BackboneChainTest(unittest.TestCase):
         self.assertEqual([r["media_id"] for r in rows], ["9601"])
         self.assertTrue(degraded)
 
+    def test_stale_json_backbone_is_marked_degraded(self):
+        # 2차 JSON 이 살아있되 갱신 정지(최신 publish < 윈도우 시작) → 행은 쓰되
+        # degraded=True 로 완전성 리스크 표면화(침묵 누락 금지).
+        rows, _, degraded, _ = self._run(
+            html=_APOLOGY_HTML, json_data=[_json_row(9701, publish="01/17/2024")])
+        self.assertEqual([r["media_id"] for r in rows], ["9701"])
+        self.assertTrue(degraded)
+        self.assertEqual(f._LAST_BACKBONE, f.BACKBONE_LEGACY_JSON)
+
+    def test_fresh_json_backbone_is_not_degraded(self):
+        rows, _, degraded, _ = self._run(
+            html=_APOLOGY_HTML, json_data=[_json_row(9702, publish="05/27/2026")])
+        self.assertEqual([r["media_id"] for r in rows], ["9702"])
+        self.assertFalse(degraded)
+
+    def test_backbone_marker_records_active_tier(self):
+        self._run(html=_drupal_settings_html([_html_row(1)]), dt_pages=[[_dt_row(9801)]])
+        self.assertEqual(f._LAST_BACKBONE, f.BACKBONE_DATATABLES)
+        self._run(html=_APOLOGY_HTML, json_data=[_json_row(9802)])
+        self.assertEqual(f._LAST_BACKBONE, f.BACKBONE_LEGACY_JSON)
+        self._run(html=_html([_html_row(9803)]), json_exc=RuntimeError("404"))
+        self.assertEqual(f._LAST_BACKBONE, f.BACKBONE_STATIC_HTML)
+
     def test_all_backbones_dead_yields_collect_error(self):
         # 3단 전부 사망 → collect_fda_483 이 error 로 표면화(침묵 금지 불변).
         def stub_html(url, **kw):
@@ -408,6 +431,7 @@ class BackboneChainTest(unittest.TestCase):
         self.assertEqual(items, [])
         self.assertIsNotNone(err)
         self.assertIn("수집 실패", err)
+        self.assertEqual(f.LAST_HEALTH["backbone"], f.BACKBONE_STATIC_HTML)
 
 
 class NoiseGateTest(unittest.TestCase):

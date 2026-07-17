@@ -642,7 +642,8 @@ class CollectionStats:
     fda483_excerpt_attempted: int = 0
     fda483_excerpt_failed: int = 0
     fda483_excerpt_capped: int = 0    # cap 도달 여부(0/1)
-    fda483_source_degraded: int = 0   # DataTables AJAX 실패→정적 HTML fallback 여부(0/1)
+    fda483_source_degraded: int = 0   # 부분/동결의심 수집 여부(0/1 — 정적 HTML 폴백·stale JSON)
+    fda483_backbone: str = "datatables"   # 실사용 백본(datatables|legacy-json|static-html)
     # [FDA 483 상세보기 2026-07-02] Observation 구조 추출 관측 — 실패는 상세만 생략하고
     # 요약카드 유지. ENABLE_FDA_483_OBSERVATIONS=false 면 enabled=false·카운터 0.
     fda483_observations_enabled: bool = False
@@ -2755,6 +2756,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.fda483_excerpt_failed = int(fda483_excerpt_health.get("failed") or 0)
         stats.fda483_excerpt_capped = int(bool(fda483_excerpt_health.get("capped")))
         stats.fda483_source_degraded = int(bool(fda483_health.get("source_degraded")))
+        stats.fda483_backbone = str(fda483_health.get("backbone") or "datatables")
         fda483_obs_health = fda483_health.get("fda_483_observations") or {}
         stats.fda483_observations_enabled = bool(fda483_obs_health.get("enabled"))
         stats.fda483_observations_attempted = int(fda483_obs_health.get("attempted") or 0)

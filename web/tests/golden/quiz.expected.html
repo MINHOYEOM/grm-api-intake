@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
+<meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
+<title>주간 퀴즈 · GRM</title>
+<meta name="description" content="GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요." />
+<link rel="canonical" href="https://grm-solutions.com/quiz/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Global Regulatory Monitor" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="주간 퀴즈 · GRM" />
+<meta property="og:description" content="GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요." />
+<meta property="og:url" content="https://grm-solutions.com/quiz/" />
+<meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://grm-solutions.com/assets/og-image.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/fonts/tabler-icons.woff2?v3.7.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/grm.css?v=cdd24069">
+</head>
+<body>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
+  <nav id="navmenu"><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../guide/index.html" class="on">이용안내</a></nav>
+  <span class="sp"></span>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
+</div></header>
+
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Weekly Quiz</span>
+    <h1 class="reveal" style="animation-delay:.08s">주간 퀴즈</h1>
+    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위나 기록은 남기지 않으니 부담 없이 풀어 보세요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
+  </div>
+
+  <div class="wrap qz-tools reveal" style="animation-delay:.2s"
+       id="grm-qz" data-weekly-count="4" data-total="28">
+    <div class="qz-head">
+      <h2 class="qz-set-title" id="grm-qz-title">이번 주 퀴즈</h2>
+      <p class="qz-set-sub" id="grm-qz-sub">이번 주에 뽑은 문항이에요. 같은 주에는 모두 같은 문제를 풀어요.</p>
+    </div>
+    <div class="qz-bar">
+      <p class="qz-score" id="grm-qz-score" aria-live="polite">맞힌 문제 <b id="grm-qz-correct">0</b> · 푼 문제 <b id="grm-qz-answered">0</b></p>
+      <button class="qz-toggle" id="grm-qz-toggle" type="button" aria-pressed="false">전체 28문항 풀기</button>
+    </div>
+  </div>
+
+  <div class="wrap qz-body">
+    <article class="qz-card" id="q-001"
+             data-index="0"
+             data-difficulty="easy"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">1</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">의약품이 허가사항과 용도에 맞는 품질로 일관되게 생산·관리되도록 하며, 시설 관리부터 출하까지 전 과정에 적용되는 기준은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">시정 및 예방조치(CAPA)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">의약품 제조 및 품질관리기준(GMP)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">표준작업절차서(SOP)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">배치기록</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">GMP는 의약품이 정해진 품질로 일관되게 생산·관리되도록 하는 품질보증의 일부이며 시설, 제조, 시험, 기록과 출하 전 과정에 적용됩니다. CAPA·SOP·배치기록은 이 전 과정을 포괄하는 기준 자체가 아닙니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#gmp">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-002"
+             data-index="1"
+             data-difficulty="easy"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">2</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">FDA 조사관이 실사 중 규제 요건 위반 가능성을 나타내는 상태나 관행을 확인했을 때 업체에 제시하지만, 최종 위반 판정 자체는 아닌 문서는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">FDA 실사 관찰사항 통지서(Form 483)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">FDA 경고서한</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">FDA 제조소 실사보고서(EIR)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">회수 통지</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">Form 483은 실사 중 확인된 관찰사항의 목록이며 FDA의 최종 위반 판정이나 최종 행정결정은 아닙니다. 경고서한·EIR·회수 통지는 서로 목적과 발행 단계가 다른 문서입니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#fda-form-483">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-003"
+             data-index="2"
+             data-difficulty="easy"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">3</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">FDA가 연방 요건의 중대한 위반이라고 판단한 사항을 알리고, 정해진 기간 안에 설명과 시정계획을 제출할 기회를 주는 서한은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">FDA 경고서한</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">FDA 실사 관찰사항 통지서(Form 483)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">FDA 제조소 실사보고서(EIR)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">회수 등급</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">FDA 경고서한은 중대한 연방 요건 위반을 당사자에게 알리고 설명과 시정계획 제출 기회를 주는 서한입니다. 그 자체가 법원의 판결이나 최종 행정결정은 아닙니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#warning-letter">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-004"
+             data-index="3"
+             data-difficulty="easy"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">4</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">GRM이 한 규제 문서에서 검색·비교할 수 있도록 분리해 정리한 개별 관찰사항이나 품질 지적사항을 무엇이라고 하나요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">주간 브리프</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">공식원본 링크</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">개별 지적사항(finding)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">신호 우선순위</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">Finding은 한 규제 문서의 관찰사항이나 품질 지적사항을 검색·비교할 수 있도록 분리한 단위입니다. 한 문서에는 여러 finding이 포함될 수 있습니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#finding">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-005"
+             data-index="4"
+             data-difficulty="easy"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">5</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">GRM 카드가 어떤 근거자료에 연결되어 있는지를 A부터 D까지 나타내며, 정보의 중요도나 법적 위험도를 뜻하지 않는 내부 분류는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">신호 우선순위</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">회수 등급</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">근거 수준(Evidence Level)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">검토 상태</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">Evidence Level은 카드가 연결된 근거자료의 상태를 A부터 D까지 나타내는 GRM 내부 분류입니다. Signal Tier처럼 반영 우선순위를 나타내거나 법적 위험도를 평가하는 등급이 아닙니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#evidence-level">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-006"
+             data-index="5"
+             data-difficulty="easy"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">6</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">수집된 정보의 검토 및 주간 브리프 반영 우선순위를 Tier 1부터 3까지 나타내며, 법적 심각도나 업체 위험등급과는 다른 분류는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">근거 수준</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">신호 우선순위(Signal Tier)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">회수 등급</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">검토 상태</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">Signal Tier는 검토와 주간 브리프 반영 우선순위를 Tier 1부터 3까지 나타내는 GRM 내부 분류입니다. Evidence Level이나 규제기관의 법적 심각도 분류와는 목적이 다릅니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#signal-tier">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-007"
+             data-index="6"
+             data-difficulty="easy"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">7</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">GRM 카드에서 정보를 발견한 경로인 &#39;정보출처&#39;와 실제 규제기관 문서인 &#39;공식원본&#39;을 구분해 제공하는 방식은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">근거 수준</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">신호 우선순위</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">지적사항 검색</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">듀얼 링크</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">듀얼 링크는 정보출처와 공식원본을 구분해 제공하는 방식입니다. 두 링크가 같은 페이지라면 하나로 합쳐 표시될 수 있습니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#dual-links">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-008"
+             data-index="7"
+             data-difficulty="easy"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">8</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">이미 발생한 부적합의 원인을 제거해 재발을 막고, 잠재적 문제의 원인을 제거해 발생을 막는 조치 체계는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">시정 및 예방조치(CAPA)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">근본원인분석(RCA)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">CAPA는 재발 방지를 위한 시정조치와 발생 방지를 위한 예방조치를 함께 관리하며 조치 실행과 효과 확인까지 포함합니다. RCA는 원인을 찾는 분석으로 CAPA의 한 과정이 될 수 있지만 조치 체계 전체와 같지는 않습니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#capa">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-009"
+             data-index="8"
+             data-difficulty="easy"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">9</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">문제가 발생한 방식뿐 아니라 그 밑의 원인과 기여 요인을 구조적으로 찾고, 확인된 원인에 맞는 조치를 세우는 분석은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">시정 및 예방조치(CAPA)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">근본원인분석(RCA)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">RCA는 문제 밑에 있는 원인과 기여 요인을 구조적으로 찾아 반복 방지 조치에 연결하는 분석입니다. CAPA는 그 분석 결과를 바탕으로 조치를 실행하고 효과를 확인하는 더 넓은 체계입니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#root-cause-analysis">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-010"
+             data-index="9"
+             data-difficulty="easy"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">10</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">승인된 지시사항이나 정해진 기준에서 벗어난 상황을 무엇이라고 하나요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">규격이탈 결과(OOS)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">배치 출하승인</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">일탈은 승인된 지시사항이나 정해진 기준에서 벗어난 상황이며 기록과 영향평가가 필요합니다. OOS는 그중에서도 정해진 규격이나 허용기준을 벗어난 시험결과를 가리킵니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#deviation">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-011"
+             data-index="10"
+             data-difficulty="easy"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">11</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">제품허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어나 과학적이고 문서화된 조사가 필요한 시험결과는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">경향이탈 결과(OOT)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">규격이탈 결과(OOS)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">OOS는 정해진 규격이나 허용기준을 벗어난 시험결과로, 단순 재시험이 아니라 과학적이고 문서화된 조사가 필요합니다. OOT는 허용기준 안에 있으면서 과거 경향에서 벗어난 결과라는 점이 다릅니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#oos">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-012"
+             data-index="11"
+             data-difficulty="easy"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">12</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">검증된 상태에 영향을 줄 수 있는 변경을 자격 있는 담당자가 공식적으로 검토하고, 변경 뒤에도 품질과 공정 관리 상태가 유지되도록 하는 체계는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">근본원인분석</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">시정 및 예방조치</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">변경관리는 검증된 상태에 영향을 줄 수 있는 변경을 공식 검토하고 필요한 후속 조치를 정하는 체계입니다. 일탈·RCA·CAPA는 각각 기준 이탈, 원인 분석, 시정·예방조치에 초점이 있습니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#change-control">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-013"
+             data-index="12"
+             data-difficulty="easy"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">13</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">특정 제품에만 한정되지 않는 작업 수행 방법을 승인된 형태로 작성한 절차서는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">배치기록</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">표준작업절차서(SOP)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">규격</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">SOP는 특정 제품에만 한정되지 않는 작업 방법을 승인된 형태로 작성한 절차서입니다. 배치기록은 특정 배치의 제조 이력을 추적하는 문서라는 점에서 다릅니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#sop">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-014"
+             data-index="13"
+             data-difficulty="easy"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">14</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">한 배치의 벌크제품 또는 완제품 제조와 관련된 모든 문서로, 해당 배치의 제조 과정과 품질 영향 상황을 추적하게 하는 것은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">표준작업절차서</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">일탈</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">배치기록</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">시정 및 예방조치</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">배치기록은 특정 한 배치의 제조와 관련된 모든 문서로서 제조 과정과 품질에 영향을 줄 수 있는 상황을 추적하게 합니다. SOP는 여러 작업에 공통으로 적용되는 승인된 수행 방법입니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#batch-record">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-015"
+             data-index="14"
+             data-difficulty="easy"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">15</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">데이터가 전체 수명주기 동안 완전하고 일관되며 정확하고, 누가 언제 무엇을 기록했는지 추적할 수 있는 상태를 무엇이라고 하나요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">데이터 완전성</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">공정 밸리데이션</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">변경관리</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">배치 출하승인</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">데이터 완전성은 데이터가 전체 수명주기 동안 완전하고 일관되며 정확한 상태를 뜻합니다. 공정 밸리데이션이나 변경관리는 각각 공정의 재현성과 변경의 공식 검토를 다루는 별도 개념입니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#data-integrity">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-016"
+             data-index="15"
+             data-difficulty="easy"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">16</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">정해진 공정 조건으로 운전했을 때 미리 정한 규격과 품질특성을 만족하는 의약품을 효과적이고 재현성 있게 생산할 수 있음을 문서로 입증하는 활동은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">세척 밸리데이션</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">공정 밸리데이션</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">적격성평가</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">안정성시험</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">공정 밸리데이션은 정해진 공정이 요구 품질의 의약품을 효과적이고 재현성 있게 생산함을 문서로 입증합니다. 세척 밸리데이션·적격성평가·안정성시험은 각각 다른 검증 대상을 다룹니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#process-validation">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-017"
+             data-index="16"
+             data-difficulty="easy"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">17</span></span>
+<span class="qz-diff qz-diff-easy">기본</span>        <span class="qz-src-kind">용어사전</span>
+      </div>
+      <h3 class="qz-q">한 원료나 제품이 다른 원료 또는 제품에 의해 오염되는 것을 무엇이라고 하나요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">교차오염</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">바이오버든</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">환경 모니터링</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">라인 클리어런스</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">교차오염은 한 원료나 제품이 다른 원료 또는 제품에 의해 오염되는 상황입니다. 바이오버든은 미생물 오염부하이고 환경 모니터링과 라인 클리어런스는 오염·혼입을 관리하는 활동입니다.</p>
+        <a class="qz-src-link" href="../glossary/index.html#cross-contamination">
+          <i class="ti ti-book-2" aria-hidden="true"></i>용어사전에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-018"
+             data-index="17"
+             data-difficulty="normal"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">18</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">2026년 6월 4주차 GRM 브리프에서 FDA CDER가 완제의약품 CGMP 위반 경고서한을 발부한 대상으로 확인된 업체는 어디인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">Huons Co., Ltd.</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">Pharmaneek Inc</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">Golden State Medical Supply Inc.</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">SUN PHARMACEUTICAL INDUSTRIES INC</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 카드에는 FDA CDER가 Huons Co., Ltd.에 완제의약품 CGMP 위반을 이유로 경고서한을 발부했다고 명시되어 있습니다. 나머지 업체는 같은 호의 다른 실사·회수 카드에 등장합니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#eb5152bfcf02">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-019"
+             data-index="18"
+             data-difficulty="normal"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">19</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">FDA가 Pharmaneek Inc의 비무균 완제의약품 제조소 실사에서 관찰한 핵심 이슈는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">장기안정성시험의 용출 OOS</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">위험의약품 취급 시 격리·세척 등 교차오염 방지 미흡</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">마약류 취급내역 보고 지연</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">주사제의 유리 이물 검출</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">Pharmaneek Inc의 Form 483 카드에는 위험의약품 취급 시 격리, 작업면, 기구와 인원에 대한 교차오염 방지 조치가 미흡했다고 적혀 있습니다. 다른 선택지는 이 카드가 아니라 별도의 회수·행정처분 사례에 해당합니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#fda483-193232">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-020"
+             data-index="19"
+             data-difficulty="normal"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">20</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">식약처의 화순전남대학병원 GMP 실사에서 확인된 지적사항 중 하나는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">주사제의 유리 이물 검출</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">24시간 시점 용출 OOS</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">데이터완전성 담당자 업무분장 범위의 문서화 미흡</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">포장단위 정제 수량 오기</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">브리프는 데이터완전성 담당자 업무분장 범위 문서화 미흡을 지적사항으로 명시하며, 일탈처리 절차 재검토와 변경관리 기록 미흡도 함께 제시합니다. 나머지 선택지는 다른 공개 사례의 이슈입니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1Pxznco5TX7">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-021"
+             data-index="20"
+             data-difficulty="normal"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">21</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">식약처의 Shanghai Ethypharm Pharmaceuticals GMP 실사에서 함께 지적된 두 항목은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">마약류 보고기한과 제품 표시 수량</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">배지성능시험과 필터 완전성시험</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">주사제 유리 이물과 용기 밀봉</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">보관소 온습도 모니터링과 제조장비 세척 후 유지시간 검증</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 카드에는 보관소 온습도 모니터링 미흡과 제조장비 세척 후 유지시간 검증 미흡 두 건이 명시되어 있습니다. 다른 조합은 이 제조소의 해당 실사 지적사항이 아닙니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxtsjZTS6w">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-022"
+             data-index="21"
+             data-difficulty="normal"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">22</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">서울대학교병원 GMP 실사 카드에서 &#39;중요&#39; 지적사항으로 분류된 것은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">환경 모니터링 관리기준 미흡</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">이송튜빙 세척 밸리데이션 미흡</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">배지성능시험 기준서 미준수와 일부 시험항목 미실시</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">보관소 온습도 모니터링 미흡</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">배지성능시험 기준서 미준수와 배지 품질관리 시 일부 시험항목 미실시는 &#39;중요&#39; 지적으로 기재되어 있습니다. 같은 카드의 환경 모니터링 기준과 이송튜빙 세척 밸리데이션 지적은 &#39;기타&#39;로 구분됩니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxzwRCkCdX">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-023"
+             data-index="22"
+             data-difficulty="normal"
+             data-answer="1">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">23</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">FDA 회수 D-0580-2026에서 DOXOrubicin Hydrochloride Liposome 주사제가 Class I으로 회수된 이유는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">장기안정성시험의 저용출 OOS</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">유리로 확인된 이물 검출</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">품목 혼동</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">용기 밀봉불량</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 카드의 원문 인용과 핵심 사실은 검출된 미립자가 유리로 확인됐다고 명시합니다. 용출 OOS·품목 혼동·용기 밀봉불량은 각각 다른 회수 사유입니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#D-0580-2026">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-024"
+             data-index="23"
+             data-difficulty="normal"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">24</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">식약처가 유니메드제약에 마약류제조업자 업무정지 3일을 처분한 이유는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">안정성시험의 용출 OOS</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">제조설비 세척기준서 미준수</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">미생물한도시험 부적합</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">마약류 취급내역을 보고기한 안에 보고하지 않음</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">카드는 옥시코돈염 낱개수량 오기 정정·삭제 등 마약류 취급내역을 보고기한 안에 보고하지 않은 사실을 처분 사유로 제시합니다. 나머지는 이 행정처분 카드의 사유가 아닙니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#admin-2026004034">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-025"
+             data-index="24"
+             data-difficulty="normal"
+             data-answer="2">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">25</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">주간 브리프</span>
+      </div>
+      <h3 class="qz-q">Golden State Medical Supply의 Niacin Extended-Release Tablets 회수 사유로 카드에 명시된 것은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">유리로 확인된 이물 검출</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">포장단위 표시사항 불일치</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">12개월 장기안정성시험의 24시간 시점 3단계 용출 OOS(저용출)</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">미생물한도시험 부적합</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 Class II 회수 카드는 12개월 장기안정성시험에서 24시간 시점 3단계 용출이 기준 미달로 확인됐다고 명시합니다. 다른 선택지는 별도 제품의 품질 이슈입니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/briefs/2026-06-26/#D-0587-2026">
+          <i class="ti ti-external-link" aria-hidden="true"></i>주간 브리프에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-026"
+             data-index="25"
+             data-difficulty="normal"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">26</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">지적사항 검색</span>
+      </div>
+      <h3 class="qz-q">공개 findings에서 Turbare Manufacturing이 준수하지 않은 것으로 지적된 절차는 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">보관소 온습도 모니터링 절차</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">시판 후 이상사례 보고 절차</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">제품 표시 수량 확인 절차</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">무균 의약품의 미생물 오염 방지 절차</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 finding은 무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않았다고 명시합니다. 다른 선택지는 이 finding의 지적 내용이 아닙니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/findings/?finding_id=finding-1f0fe4407b7ee8ee31682324">
+          <i class="ti ti-external-link" aria-hidden="true"></i>지적사항 검색에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-027"
+             data-index="26"
+             data-difficulty="normal"
+             data-answer="0">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">27</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">지적사항 검색</span>
+      </div>
+      <h3 class="qz-q">공개 findings에서 안정성시험의 미생물한도 부적합으로 영업자 회수 대상이 된 삼성제약 제품은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">쓸기담액50밀리그람</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">크레젯정10/5밀리그램</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">바른인진호</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">농림해방풍</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 finding은 쓸기담액50밀리그람이 안정성시험의 미생물한도 부적합에 따라 영업자 회수 대상이었다고 명시합니다. 나머지 제품명은 다른 공개 회수 사례에 해당합니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/findings/?finding_id=finding-5ae252bdbbb77c3fdd90a46f">
+          <i class="ti ti-external-link" aria-hidden="true"></i>지적사항 검색에서 근거 보기</a>
+      </div>
+    </article>
+    <article class="qz-card" id="q-028"
+             data-index="27"
+             data-difficulty="normal"
+             data-answer="3">
+      <div class="qz-meta">
+        <span class="qz-no">Q<span class="qz-no-n">28</span></span>
+<span class="qz-diff qz-diff-normal">심화</span>        <span class="qz-src-kind">지적사항 검색</span>
+      </div>
+      <h3 class="qz-q">공개 findings에서 Catalent Indiana의 규격 미충족 사례 조사 기록에 항상 포함되지 않았다고 지적된 것은 무엇인가요?</h3>
+      <div class="qz-choices" role="group" aria-label="선택지">
+        <button class="qz-choice" type="button" data-i="0">
+          <span class="qz-mark" aria-hidden="true">①</span>
+          <span class="qz-choice-t">업체명 및 소재지</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="1">
+          <span class="qz-mark" aria-hidden="true">②</span>
+          <span class="qz-choice-t">제품 표시사항 및 정제 수량</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="2">
+          <span class="qz-mark" aria-hidden="true">③</span>
+          <span class="qz-choice-t">회수 등급 및 유통기한</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+        <button class="qz-choice" type="button" data-i="3">
+          <span class="qz-mark" aria-hidden="true">④</span>
+          <span class="qz-choice-t">결론 및 후속 조치</span>
+          <span class="qz-state" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="qz-fb" hidden>
+        <p class="qz-verdict" role="status" aria-live="polite"></p>
+        <p class="qz-exp">해당 finding은 배치 또는 구성 성분이 규격을 충족하지 못한 사례의 조사 기록에 결론과 후속 조치가 항상 포함되지는 않았다고 명시합니다. 다른 선택지는 이 조사 기록 지적의 대상이 아닙니다.</p>
+        <a class="qz-src-link" href="https://grm-solutions.com/findings/?finding_id=finding-3872fd021f212ef21cd4ec89">
+          <i class="ti ti-external-link" aria-hidden="true"></i>지적사항 검색에서 근거 보기</a>
+      </div>
+    </article>
+  </div>
+</main>
+<style>
+/* [주간 퀴즈] 문항 카드·선택지·피드백 — grm.css 토큰만 사용(프리즈 보존). */
+.qz-tools{margin-top:6px}
+.qz-head{margin-bottom:14px}
+.qz-set-title{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--coral-2);margin:0 0 4px}
+.qz-set-sub{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
+.qz-bar{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.qz-score{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
+.qz-score b{color:var(--coral-2);font-variant-numeric:tabular-nums}
+.qz-toggle{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 14px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
+.qz-toggle:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
+.qz-toggle[aria-pressed="true"]{color:var(--coral-2);background:var(--coral-tint);border-color:rgba(194,96,63,.3)}
+.qz-body{padding:16px 0 64px;display:flex;flex-direction:column;gap:18px}
+.qz-card{padding:22px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);scroll-margin-top:88px}
+.qz-card[hidden]{display:none}
+.qz-card:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.qz-no{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--lo)}
+.qz-no-n{font-variant-numeric:tabular-nums}
+.qz-diff{font-family:var(--sans);font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px}
+.qz-diff-easy{color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22)}
+.qz-diff-normal{color:var(--muted);background:var(--soft);border:1px solid var(--line-2)}
+.qz-src-kind{font-family:var(--sans);font-size:11.5px;color:var(--lo);margin-left:auto}
+.qz-q{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 16px}
+.qz-choices{display:flex;flex-direction:column;gap:9px}
+.qz-choice{display:flex;align-items:flex-start;gap:11px;width:100%;box-sizing:border-box;text-align:left;font-family:var(--sans);font-size:14.5px;line-height:1.5;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 15px;cursor:pointer;transition:border-color .14s var(--ease),background .14s var(--ease),color .14s var(--ease)}
+.qz-choice:hover:not(:disabled){border-color:var(--coral);background:var(--soft)}
+.qz-choice:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-choice:disabled{cursor:default}
+.qz-mark{flex:none;font-size:15px;color:var(--lo);line-height:1.5}
+.qz-choice-t{flex:1}
+.qz-state{flex:none;font-family:var(--sans);font-size:12.5px;font-weight:600;line-height:1.5}
+/* 채점 후 상태 — 색 + 아이콘 텍스트(qz-state) 병행으로 색맹 접근성 확보(§2.5). */
+.qz-choice.is-correct{border-color:var(--ok,#3E7C5A);background:rgba(62,124,90,.08);color:var(--ink)}
+.qz-choice.is-correct .qz-mark{color:var(--ok,#3E7C5A)}
+.qz-choice.is-correct .qz-state{color:var(--ok,#3E7C5A)}
+.qz-choice.is-wrong{border-color:var(--coral-2);background:rgba(161,75,48,.06)}
+.qz-choice.is-wrong .qz-state{color:var(--coral-2)}
+.qz-choice.is-picked{font-weight:500}
+.qz-fb{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.qz-fb[hidden]{display:none}
+.qz-verdict{font-family:var(--sans);font-size:14.5px;font-weight:600;margin:0 0 8px}
+.qz-verdict.is-correct{color:var(--ok,#3E7C5A)}
+.qz-verdict.is-wrong{color:var(--coral-2)}
+.qz-exp{font-family:var(--sans);font-size:14px;line-height:1.7;color:var(--body);margin:0 0 12px}
+.qz-src-link{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:8px 14px;border-radius:999px;text-decoration:none;transition:background .14s var(--ease),border-color .14s var(--ease)}
+.qz-src-link:hover{background:var(--soft);border-color:var(--coral)}
+.qz-src-link .ti{font-size:15px}
+@media (max-width:640px){ .qz-card{padding:18px 16px} .qz-bar{align-items:stretch} }
+</style>
+<footer class="site"><div class="wrap">
+  <div class="foot">
+    <div class="b1"><b>Global Regulatory Monitor</b>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+    <div><h5>둘러보기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">모아보기</a><a href="../findings/index.html">찾아보기</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../guide/index.html">이용안내</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
+    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
+    <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
+  </div>
+  <div class="foot-legal">
+    <div class="foot-copy">
+      <span>© 2026 Global Regulatory Monitor</span>
+      <span class="prov">AI-generated from primary sources · verify against the original</span>
+    </div>
+    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+  </div>
+</div></footer>
+
+<script>
+// 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
+const _nav=document.getElementById('nav');
+addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
+</script>
+<script src="/assets/quiz.js?v=49f371bd" defer></script>
+<style>
+#grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
+#grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
+#grm-mascot .lid{transform-box:fill-box;transform-origin:center top;transform:scaleY(0);transition:transform .09s ease}
+#grm-mascot.is-blink .lid{transform:scaleY(1)}
+#grm-mascot .wingL,#grm-mascot .wingR{transform-box:fill-box;transform-origin:top center}
+#grm-mascot.is-flap .wingL{animation:grmOwlFlapL .26s ease-in-out 3}
+#grm-mascot.is-flap .wingR{animation:grmOwlFlapR .26s ease-in-out 3}
+#grm-mascot.is-bounce .owl{animation:grmOwlBounce .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes grmOwlBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes grmOwlFlapL{0%,100%{transform:rotate(0)}50%{transform:rotate(28deg)}}
+@keyframes grmOwlFlapR{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
+@keyframes grmOwlBounce{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-9px) scale(1.06,.94)}60%{transform:translateY(2px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
+#grm-mascot .owl-msg{position:absolute;top:calc(100% + 9px);right:0;text-align:left;background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 12px;border-radius:11px;width:max-content;max-width:none;white-space:nowrap;opacity:0;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;box-shadow:0 10px 22px -10px rgba(0,0,0,.42)}
+#grm-mascot .owl-msg.show{opacity:1;transform:translateY(0)}
+#grm-mascot .owl-msg::after{content:"";position:absolute;top:-11px;right:22px;border:6px solid transparent;border-bottom-color:var(--ink)}
+#grm-mascot .burst{position:absolute;left:50%;top:16%;font-size:17px;line-height:1;pointer-events:none;will-change:transform,opacity}
+#grm-mascot .burst.v-float{animation:grmBurstFloat .85s cubic-bezier(.2,.7,.3,1) forwards}
+#grm-mascot .burst.v-wobble{animation:grmBurstWobble 1s ease-out forwards}
+#grm-mascot .burst.v-spin{animation:grmBurstSpin .9s cubic-bezier(.34,1.56,.64,1) forwards}
+#grm-mascot .burst.v-pop{animation:grmBurstPop .7s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes grmBurstFloat{0%{transform:translate(-50%,0) scale(.4) rotate(var(--r0,0deg));opacity:0}18%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-58px) scale(1) rotate(var(--r1,0deg));opacity:0}}
+@keyframes grmBurstWobble{0%{transform:translate(-50%,0) scale(.5);opacity:0}15%{opacity:1}30%{transform:translate(calc(-50% - var(--dx,0px)),-14px) scale(.9)}50%{transform:translate(calc(-50% + var(--dx,0px)),-28px) scale(1)}70%{transform:translate(calc(-50% - var(--dx,0px)),-42px) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-60px) scale(.9);opacity:0}}
+@keyframes grmBurstSpin{0%{transform:translate(-50%,0) scale(.3) rotate(0deg);opacity:0}20%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-56px) scale(1.1) rotate(360deg);opacity:0}}
+@keyframes grmBurstPop{0%{transform:translate(-50%,0) scale(.2);opacity:0}40%{transform:translate(-50%,-10px) scale(1.3);opacity:1}60%{transform:translate(-50%,-6px) scale(.9)}80%{transform:translate(-50%,-16px) scale(1.08)}100%{transform:translate(-50%,-34px) scale(.85);opacity:0}}
+@media (max-width:760px){ #grm-mascot{display:none} }
+@media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
+</style>
+<div id="grm-mascot" data-page="guide" aria-hidden="true">
+  <span class="owl-msg"></span>
+  <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>
+    <path d="M30 30 L52 30 L36 8 Z" fill="#CE6E4C"/><path d="M90 30 L68 30 L84 8 Z" fill="#CE6E4C"/>
+    <rect x="18" y="22" width="84" height="92" rx="34" fill="url(#grmOwlGrad)"/>
+    <ellipse cx="60" cy="86" rx="26" ry="24" fill="#F4E7DF" opacity=".85"/>
+    <path class="wingR" d="M100 52 q16 6 12 30 q-3 14 -14 16 q6 -22 2 -46 Z" fill="#B9542F"/>
+    <path class="wingL" d="M20 52 q-16 6 -12 30 q3 14 14 16 q-6 -22 -2 -46 Z" fill="#B9542F"/>
+    <g class="eyes">
+      <circle cx="43" cy="56" r="18" fill="#FAF6EE"/><circle cx="77" cy="56" r="18" fill="#FAF6EE"/>
+      <circle cx="43" cy="57" r="7" fill="#22303F"/><circle cx="77" cy="57" r="7" fill="#22303F"/>
+      <circle cx="45.4" cy="54.6" r="2.1" fill="#FAF6EE"/><circle cx="79.4" cy="54.6" r="2.1" fill="#FAF6EE"/>
+      <rect class="lid" x="24" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+      <rect class="lid" x="58" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
+    </g>
+    <path d="M53 68 L67 68 L60 80 Z" fill="#E8B04A"/>
+  </svg>
+</div>
+<script>
+(function(){
+  var m=document.getElementById('grm-mascot'); if(!m) return;
+  var msg=m.querySelector('.owl-msg'), eyes=m.querySelector('.eyes');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HEARTS=['💛','💕','✨','🧡','⭐'];
+  var VARIANTS=['v-float','v-wobble','v-spin','v-pop'];
+  function burst(){
+    if(reduce) return;
+    var n=2+(Math.random()<0.4?1:0);
+    for(var k=0;k<n;k++){
+      (function(){
+        setTimeout(function(){
+          var el=document.createElement('span');
+          el.className='burst '+VARIANTS[Math.floor(Math.random()*VARIANTS.length)];
+          el.textContent=HEARTS[Math.floor(Math.random()*HEARTS.length)];
+          el.style.setProperty('--dx', (Math.random()*44-22).toFixed(1)+'px');
+          el.style.setProperty('--r0', (Math.random()*30-15).toFixed(1)+'deg');
+          el.style.setProperty('--r1', (Math.random()*50-25).toFixed(1)+'deg');
+          m.appendChild(el);
+          el.addEventListener('animationend', function(){ el.remove(); });
+          setTimeout(function(){ if(el.parentNode) el.remove(); }, 1300);
+        }, k*70);
+      })();
+    }
+  }
+  function bounce(){ if(reduce) return; m.classList.remove('is-bounce'); void m.offsetWidth; m.classList.add('is-bounce'); }
+  var sets={
+    home:{greet:'안녕하세요, 구름이예요! 이번 주 규제 소식이 왔어요 🦉',msgs:['구름 위에서 규제 소식을 살펴보고 있어요 ☁️','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
+    board:{greet:'구름이예요! 찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
+    detail:{greet:'구름이가 이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
+  };
+  var set=sets[m.getAttribute('data-page')]||sets.home, i=0, t;
+  function blink(){ m.classList.add('is-blink'); setTimeout(function(){m.classList.remove('is-blink');},140); }
+  function flap(){ if(reduce) return; m.classList.remove('is-flap'); void m.offsetWidth; m.classList.add('is-flap'); }
+  function say(txt){ msg.textContent=txt; msg.classList.add('show'); clearTimeout(t); t=setTimeout(function(){msg.classList.remove('show');},3600); }
+  (function amb(){ setTimeout(function(){ blink(); if(!reduce&&Math.random()<0.25) flap(); amb(); }, 2800+Math.random()*3600); })();
+  if(!reduce&&eyes){ window.addEventListener('mousemove', function(e){
+    var r=eyes.getBoundingClientRect(); if(!r.width) return;
+    var cx=r.left+r.width/2, cy=r.top+r.height/2, dx=e.clientX-cx, dy=e.clientY-cy;
+    var a=Math.atan2(dy,dx), d=Math.min(3, Math.hypot(dx,dy)/70);
+    eyes.style.transform='translate('+(Math.cos(a)*d).toFixed(2)+'px,'+(Math.sin(a)*d).toFixed(2)+'px)';
+  }, {passive:true}); }
+  m.addEventListener('click', function(){ flap(); blink(); bounce(); burst(); say(set.msgs[i++%set.msgs.length]); });
+  m.addEventListener('mouseenter', function(){ if(!msg.classList.contains('show')) say(set.msgs[i++%set.msgs.length]); });
+  setTimeout(function(){ say(set.greet); }, 1200);
+})();
+</script>
+
+<style>
+.grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
+body.grm-has-share .grm-card-actions{display:flex}
+.grm-ca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.grm-ca:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-ca .ti{font-size:15px}
+.grm-ca.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-card-actions');
+  if(!rows.length) return;
+  document.body.classList.add('grm-has-share');
+  var isMobileOS=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  function done(btn){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent='복사됨'; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  for(var i=0;i<rows.length;i++){ (function(row){
+    var btn=row.querySelector('[data-share]'); if(!btn) return;
+    btn.addEventListener('click', function(){
+      var anchor=row.getAttribute('data-anchor')||'';
+      var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
+      var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
+      var title=tEl?tEl.textContent.trim():document.title;
+      if(isMobileOS&&navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
+      else { fallback(url); }
+    });
+  })(rows[i]); }
+})();
+</script>
+</body>
+</html>

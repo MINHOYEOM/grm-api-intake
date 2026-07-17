@@ -111,6 +111,7 @@ SINGLE_GOLDENS = [
     ("library/mfds/index.html", "library_mfds.expected.html"),
     ("guide/index.html", "guide.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
+    ("quiz/index.html", "quiz.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),

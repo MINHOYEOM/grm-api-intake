@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.139` |
-| 최종 수정일 | 2026-07-17 |
-| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). |
+| 문서 버전 | `v1.140` |
+| 최종 수정일 | 2026-07-18 |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-18 자료실(트랙 C) v1 라이브**(`/library/` — ICH 카탈로그·MFDS 지침·고시 아카이브, §1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -56,6 +56,8 @@ flowchart TD
 | 읽는 법 | 처음부터 읽는 다이제스트 | 조건으로 검색·필터 |
 | 저장 | Notion → 웹 정적 사이트 | Supabase(Postgres) → 웹 |
 | 웹 위치 | `/`, `/archive/` | `/findings/`, `/findings/trends/`(전량 집계 대시보드) |
+
+> **트랙 C — 자료실 (`/library/`, 2026-07-18 신설):** 뉴스(카드)도 위반(findings)도 아닌 **참조형 콘텐츠**의 상설 표면. v1 = ICH 가이드라인 카탈로그(`/library/ich/`, Q/M 시리즈 31토픽·공식 링크)와 MFDS 지침·고시 아카이브(`/library/mfds/`, 31건·원문 링크). 데이터 정본은 Notion `GRM API Intake` 스냅샷을 커밋한 `web/data/library/*.json`(1회 생성 — 자동 갱신 미구현, 갱신 시 재생성 커밋)이며 결정론 렌더러가 골든으로 고정한다. 새 공개 RPC·RLS 없음, 주간 발행 게이트와 무관한 독립 정적 섹션.
 
 ### 1.3 핵심 설계 원칙
 - **원문 우선·추적 가능:** 모든 카드/항목에 정보 출처와 공식 원문 링크를 붙입니다. 요약·번역이 있어도 법적 판단은 항상 원문 기준.
@@ -289,10 +291,10 @@ grm-api-intake/
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
-│  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base)
+│  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base·library{,_ich,_mfds})
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js)
 │  ├─ migrations/  (001_reaction ~ 029_findings_html_entity_repair — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프))
-│  ├─ data/  (briefs·deltas)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
+│  ├─ data/  (briefs·deltas·library/ 자료실 커밋 데이터·glossary.json/guide_content.md 웹통합 대기 콘텐츠)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)

@@ -3,25 +3,31 @@
 
 ENABLE_FDA_483=true 또는 --sources fda483 일 때 collect_intake.main() 에서 호출된다.
 
-데이터 소스 (2026-07-02 실측 보정):
-  FDA OII FOIA Electronic Reading Room 현행 HTML/DataTables 표.
-  - 구 `https://www.fda.gov/datatables-json/ora-foia-reading.json` backbone 은 더 이상 신뢰하지
-    않는다(404/timeout 계열 사망). 현재 공식 리딩룸 페이지의 서버사이드 DataTables AJAX
-    (`/datatables/views/ajax`)가 Record Date·Company Name·FEI Number·Record Type·State·
-    Country·Establishment Type·Publish Date + `/media/<id>/download` 링크를 준다.
-  - 정적 HTML 본문은 최신 10행만 들어 있어 AJAX 페이지네이션을 우선 사용한다. AJAX 설정을
-    찾지 못하거나 실패하면 정적 10행 파싱으로 degrade 하되 health warning 을 남긴다.
+데이터 소스 (2026-07-17 실측 보정 — 백본 3단):
+  FDA OII FOIA Electronic Reading Room. 백본 우선순위:
+  1차 = 리딩룸 페이지의 서버사이드 DataTables AJAX(`/datatables/views/ajax`) — Record Date·
+    Company Name·FEI Number·Record Type·State·Country·Establishment Type·Publish Date +
+    `/media/<id>/download` 링크(유일하게 Country 포함).
+  2차 = 구 전수 JSON `https://www.fda.gov/datatables-json/ora-foia-reading.json`.
+    2026-07-02 시점 404/timeout 으로 사망 판정했으나 2026-07-17 부활 실측(runner UA 200·
+    전 레코드·publish 전일까지 최신). ★2026-07-16 부터 리딩룸 HTML 페이지가 Akamai Bot
+    Manager 에 막혀(비브라우저 TLS 클라이언트 → `/core/install.php` 미끼 302 → apology 404,
+    UA 무관·브라우저 UA 흉내도 차단) DataTables 설정 자체를 얻을 수 없게 됐다 — 이때 이
+    JSON 이 전수 백본을 대신한다. Country 컬럼만 없어 site_country 는 State 기반
+    ('United States'/'') 추정으로 degrade(그 외 필드 동일).
+  3차 = 정적 HTML 본문 10행(부분 수집 — health warning 으로 완전성 리스크 표면화).
   - XLSX export 는 media id 가 없어 건별 PDF dedup/source 로 부적합. media id 패턴
-    https://www.fda.gov/media/<id>/download 는 안정(직접 합성).
+    https://www.fda.gov/media/<id>/download 는 안정(직접 합성·Akamai 차단 무관 실측).
 
 수집 흐름:
-  HTML/DataTables fetch → Record Type == 483 필터 → Publish Date 윈도우 → 노이즈/관련성
+  백본 fetch(3단) → Record Type == 483 필터 → Publish Date 윈도우 → 노이즈/관련성
   게이트 → media id dedup → 건별 483 PDF 결함 excerpt + (옵션) Observation 구조 추출
   (P6 _extract_pdf_text 재사용·최신 N건 cap·graceful) → IntakeItem.
 
 설계 역할:
-  - 전수성: HTML DataTables AJAX 를 Publish Date desc 로 페이지네이션한다. 정적 HTML fallback 은
-    부분 소스이므로 fda483-source-degraded warning 으로 완전성 리스크를 표면화한다.
+  - 전수성: DataTables AJAX 를 Publish Date desc 로 페이지네이션, 실패 시 전수 JSON(2차),
+    그것도 실패 시 정적 HTML 10행(3차) — 3차만 부분 소스이므로 fda483-source-degraded
+    warning 으로 완전성 리스크를 표면화한다.
   - 483 = Tier 3(무균 시설/신호는 Tier 3 floor). distributor-only 는 하향(§4).
   - Site Country(HOLD②): Country(해외, HTML 보강) 우선 · 공란+State(미국) → "United States" ·
     둘 다 공란 → ""(미상). State(주)는 절대 Site Country 아님(raw site_state 분리).
@@ -234,7 +240,7 @@ def _media_id_from(cell_html: str) -> str:
 # ── 정규화 행 dict 스키마(JSON·HTML 공통) ───────────────────────────────────────
 #   {record_date, company, fei, record_type, media_id, state, country, publish_date}
 def _json_norm_rows(data: list[Any]) -> list[dict[str, str]]:
-    """레거시 DataTables JSON(list[dict]) → 정규화 행. 현행 수집 경로에서는 사용하지 않는다."""
+    """전수 JSON(list[dict]) → 정규화 행. 2차 백본(_fetch_legacy_json_rows)이 사용한다."""
     rows: list[dict[str, str]] = []
     for r in data:
         if not isinstance(r, dict):
@@ -401,44 +407,81 @@ def _fetch_datatable_page(config: dict[str, Any], *, start: int, length: int, dr
     return data if isinstance(data, dict) else {}
 
 
+def _fetch_legacy_json_rows() -> tuple[list[dict[str, str]], int]:
+    """2차 백본: 전수 JSON fetch → (정규화 483 행, 전체 레코드 수). 실패 시 ([], 0).
+
+    [2026-07-17 실측] 리딩룸 HTML 이 Akamai 봇매니저에 막힌 날에도 이 JSON 은 runner UA 로
+    정상 응답하며 publish_date 전일까지의 전 레코드를 담는다(부활 확인 — 모듈 docstring 참조).
+    `_json_norm_rows` 는 EIR 도 통과시키므로 여기서 483 만 남긴다(1·3차 백본과 동일 계약).
+    """
+    try:
+        data = http_get_json(FDA_483_JSON_URL, timeout=FDA_483_JSON_TIMEOUT,
+                             retries=HTTP_RETRIES)
+    except Exception as e:  # noqa: BLE001
+        log("WARN", f"FDA 483 전수 JSON 백본 fetch 실패: {str(e)[:120]}")
+        return [], 0
+    if not isinstance(data, list):
+        log("WARN", f"FDA 483 전수 JSON 백본 형식 이상(list 아님: {type(data).__name__})")
+        return [], 0
+    rows = [r for r in _json_norm_rows(data) if r["record_type"] == RECORD_TYPE_483]
+    return rows, len(data)
+
+
 def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str]], int, bool]:
-    """현행 HTML/DataTables 표 fetch → (정규화 행, 데이터행 수, 부분 fallback 여부)."""
+    """백본 3단 fetch → (정규화 행, 데이터행 수, 부분 fallback 여부).
+
+    1차 DataTables AJAX → 2차 전수 JSON → 3차 정적 HTML 10행. 부분 fallback 여부(True)는
+    3차(정적 10행)만 — 2차 JSON 은 전수라 degraded 아님(WARN 로그로만 표면화).
+    """
+    static_rows: list[dict[str, str]] = []
+    static_count = 0
+    config = None
     try:
         html_text = http_get_html(OII_READING_ROOM_URL, timeout=FDA_483_HTML_TIMEOUT,
                                   retries=HTTP_RETRIES, label="FDA 483 HTML")
     except Exception as e:  # noqa: BLE001
-        log("WARN", f"FDA 483 HTML fetch 실패: {str(e)[:120]}")
-        return [], 0, True
+        log("WARN", f"FDA 483 HTML fetch 실패: {str(e)[:120]} — 전수 JSON 백본 시도")
+    else:
+        static_rows, static_count = _html_norm_rows(html_text)
+        config = _datatable_ajax_config(html_text)
+        if not config:
+            log("WARN", "FDA 483 DataTables 설정 없음(봇차단/구조변경 의심) — 전수 JSON 백본 시도")
 
-    static_rows, static_count = _html_norm_rows(html_text)
-    config = _datatable_ajax_config(html_text)
-    if not config:
-        log("WARN", "FDA 483 DataTables 설정 없음 — 정적 HTML 10행 fallback(부분 수집)")
-        return static_rows, static_count, True
-
-    rows: list[dict[str, str]] = []
-    total = 0
-    try:
-        for page in range(FDA_483_HTML_MAX_PAGES):
-            start = page * FDA_483_HTML_PAGE_LENGTH
-            data = _fetch_datatable_page(
-                config, start=start, length=FDA_483_HTML_PAGE_LENGTH, draw=page + 1)
-            raw_rows = data.get("data") if isinstance(data.get("data"), list) else []
-            total = int(data.get("recordsFiltered") or data.get("recordsTotal") or total or 0)
-            page_rows = _datatable_norm_rows(raw_rows)
-            rows.extend(page_rows)
-            if not raw_rows or len(raw_rows) < FDA_483_HTML_PAGE_LENGTH:
-                break
-            if start_date and page_rows:
-                dates = [_parse_mdy(r.get("publish_date", "")) for r in page_rows]
-                valid = [d for d in dates if d]
-                if valid and min(valid) < start_date.isoformat():
+    if config:
+        rows: list[dict[str, str]] = []
+        total = 0
+        try:
+            for page in range(FDA_483_HTML_MAX_PAGES):
+                start = page * FDA_483_HTML_PAGE_LENGTH
+                data = _fetch_datatable_page(
+                    config, start=start, length=FDA_483_HTML_PAGE_LENGTH, draw=page + 1)
+                raw_rows = data.get("data") if isinstance(data.get("data"), list) else []
+                total = int(data.get("recordsFiltered") or data.get("recordsTotal") or total or 0)
+                page_rows = _datatable_norm_rows(raw_rows)
+                rows.extend(page_rows)
+                if not raw_rows or len(raw_rows) < FDA_483_HTML_PAGE_LENGTH:
                     break
-    except Exception as e:  # noqa: BLE001
-        log("WARN", f"FDA 483 DataTables 페이지 fetch 실패: {str(e)[:160]} — "
-                    "정적 HTML fallback(부분 수집)")
-        return static_rows, static_count, True
-    return rows, total or len(rows), False
+                if start_date and page_rows:
+                    dates = [_parse_mdy(r.get("publish_date", "")) for r in page_rows]
+                    valid = [d for d in dates if d]
+                    if valid and min(valid) < start_date.isoformat():
+                        break
+        except Exception as e:  # noqa: BLE001
+            log("WARN", f"FDA 483 DataTables 페이지 fetch 실패: {str(e)[:160]} — "
+                        "전수 JSON 백본 시도")
+        else:
+            if rows:
+                return rows, total or len(rows), False
+            log("WARN", "FDA 483 DataTables 응답 483 행 0(이상) — 전수 JSON 백본 시도")
+
+    json_rows, json_total = _fetch_legacy_json_rows()
+    if json_rows:
+        log("WARN", f"FDA 483 전수 JSON 백본으로 수집(전체 {json_total}레코드 중 483 "
+                    f"{len(json_rows)}행) — 1차 DataTables 복구 시 자동 원복")
+        return json_rows, json_total, False
+
+    log("WARN", "FDA 483 전수 JSON 백본도 실패 — 정적 HTML 10행 fallback(부분 수집)")
+    return static_rows, static_count, True
 
 
 def _extract_fda483_excerpt(text: str) -> str:
@@ -733,8 +776,9 @@ def _to_item(nrow: dict[str, str], excerpt: str,
 def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """FDA 483 수집 진입점. (items, error_msg).
 
-    전수 backbone = 현행 OII HTML/DataTables. AJAX 사망 시 정적 HTML 폴백(부분) + warning.
-    - HTML/DataTables 모두 실패 → error.
+    전수 backbone = DataTables AJAX(1차) → 전수 JSON(2차). 둘 다 사망 시에만 정적 HTML
+    폴백(부분) + warning.
+    - 백본 3단 모두 실패 → error.
     - 483 행 0 → 구조 변경 의심 error(침묵 금지).
     - 윈도우 내 0건 → 정상(빈 리스트·error 없음).
     - PDF excerpt/Observation 실패는 graceful(키 미기록·메타 카드 유지·LAST_HEALTH 경고).
@@ -760,7 +804,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "source_degraded": False,
     }
 
-    log("INFO", f"FDA 483 수집(현행 HTML/DataTables): {OII_READING_ROOM_URL}")
+    log("INFO", f"FDA 483 수집(백본 3단 DataTables→전수JSON→정적HTML): {OII_READING_ROOM_URL}")
     keep_rows, html_data_count, source_degraded = _fetch_html_rows(start)
     if not keep_rows:
         LAST_HEALTH = {
@@ -769,7 +813,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             "fda_483_deep": deep_health,
             "source_degraded": source_degraded,
         }
-        return [], ("FDA 483 수집 실패: HTML/DataTables 483 행 0 — "
+        return [], ("FDA 483 수집 실패: 백본 3단(DataTables/전수JSON/정적HTML) 모두 483 행 0 — "
                     "소스 구조 변경 또는 일시 장애(수동 확인 필요)")
 
     # Publish Date 윈도우 필터(전수 평가·정렬 비의존). 최신 N건 excerpt cap 위해 publish desc 정렬.
@@ -863,7 +907,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                     "나머지 항목은 excerpt/detail 없이 메타 카드로 유지")
     log("INFO", f"FDA 483 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
                 f"483 행 {len(keep_rows)}/{html_data_count}, "
-                f"source={'HTML정적폴백' if source_degraded else 'DataTables'}) "
+                f"source={'HTML정적폴백(부분)' if source_degraded else '전수(DataTables/JSON)'}) "
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "
                 f"failed={excerpt_health['failed']} · observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "

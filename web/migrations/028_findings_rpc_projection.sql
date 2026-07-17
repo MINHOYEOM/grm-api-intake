@@ -1,6 +1,17 @@
 -- ============================================================================
 -- 028_findings_rpc_projection.sql — [FIND-1] RPC 반환에서 누락된 클라이언트 소비 필드 3종 복원
 --
+-- ※ 2026-07-16 후속 2건:
+--   ① findings_search 는 이후 **030**(hardening: work_mem·p_page 상한·blob semantics)이
+--     create or replace 로 supersede 했다 — findings_search 의 프로덕션 현행 정의는 030,
+--     findings_document 의 현행 정의는 이 파일(028)이다.
+--   ② 프로덕션 마이그레이션 이력에는 028 이 **두 번** 기록돼 있다:
+--     `findings_search_row_projection_028`(레인B 의 부분 적용본 — 문서 레벨 firm_key 누락)
+--     → `028_findings_rpc_projection`(이 파일 정본 재적용, 레인A 가 pg_get_functiondef
+--     마커 대조로 표류를 발견해 수렴). 라이브 함수는 이 파일과 동등하며 이중 기록은
+--     이력 사실일 뿐 런타임 영향이 없다 — 병렬 두 세션이 같은 결함을 각자 고치다 생긴
+--     흔적이므로 지우지 않고 기록한다.
+--
 -- supersede 체인: 026(원본 정의) → 027(findings_search 에 대시보드 축 추가) → 이 파일(028)이
 --   findings_search 와 findings_document 를 **둘 다** create or replace 로 supersede 한다.
 --   027 과 달리 findings_document 도 재선언하는 이유는 아래 결함이 두 함수에 **동일하게**

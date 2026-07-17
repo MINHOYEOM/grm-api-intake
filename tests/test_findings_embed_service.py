@@ -1064,13 +1064,17 @@ class WorkflowInstallUsesLockWithRequireHashesTest(unittest.TestCase):
 
 
 class WorkflowHasNoUnhashedInstallPathTest(unittest.TestCase):
-    """F-05 완결 계약 5/6 -- 워크플로 본문에 hash 미검증 설치 경로가 남아있지 않다.
-    `--require-hashes` 는 같은 invocation 안의 요구사항에만 강제되므로, 별도 줄/스텝으로
-    hash 없는 `pip install -r requirements.txt` 나 `pip install -r
-    requirements-embed.txt` 가 하나라도 섞여 들면 그 경로로 공급망 검증이 조용히
-    우회된다. `python -m pip install --upgrade pip` 만 예외로 허용한다 -- pip 자체를
-    올리는 것으로(PyPI 서명·TLS 로 이미 보호됨) requirements 파일을 통한 3rd-party
-    의존성 설치가 아니기 때문이다."""
+    """F-05 완결 계약 5/6, Codex Major 2 로 강화됨 -- 워크플로 본문에 hash 미검증
+    설치 경로가 **전혀** 남아있지 않다. `--require-hashes` 는 같은 invocation 안의
+    요구사항에만 강제되므로, 별도 줄/스텝으로 hash 없는 `pip install -r
+    requirements.txt` 나 `pip install -r requirements-embed.txt` 가 하나라도 섞여
+    들면 그 경로로 공급망 검증이 조용히 우회된다.
+
+    ★Codex Major 2: 종전에는 `python -m pip install --upgrade pip` 를 "PyPI
+    서명·TLS 로 이미 보호됨"이라는 이유로 예외 허용했지만, 이 job 은 곧이어
+    SUPABASE_SERVICE_ROLE_KEY 를 쥔다 -- 그 한 줄이 "hash 미검증 설치 경로 없음"
+    이라는 주장을 문자 그대로 반박했다. 이제 그 문자열은 워크플로 본문에
+    아예 있어서는 안 된다(예외 없음)."""
 
     def setUp(self) -> None:
         self.assertTrue(_WORKFLOW_PATH.is_file(), f"missing {_WORKFLOW_PATH}")
@@ -1082,17 +1086,20 @@ class WorkflowHasNoUnhashedInstallPathTest(unittest.TestCase):
     def test_no_unhashed_requirements_embed_txt_install(self) -> None:
         self.assertNotIn("pip install -r requirements-embed.txt", self.workflow)
 
-    def test_only_permitted_unhashed_pip_invocation_is_the_upgrade_pip_line(self) -> None:
+    def test_no_unhashed_pip_bootstrap_line_at_all(self) -> None:
+        """Codex Major 2 완결 -- `python -m pip install --upgrade pip` 는 더 이상
+        예외가 아니라, 워크플로 본문에 문자열 자체가 없어야 한다."""
+        self.assertNotIn("pip install --upgrade pip", self.workflow)
+
+    def test_every_pip_install_line_is_hash_verified(self) -> None:
         pip_install_lines = [
             line.strip() for line in self.workflow.splitlines() if "pip install" in line
         ]
         self.assertTrue(pip_install_lines)  # sanity: the step exists at all
         for line in pip_install_lines:
-            if "--upgrade pip" in line:
-                continue
             self.assertIn(
                 "--require-hashes", line,
-                f"unhashed pip install line found (only '--upgrade pip' is exempt): {line}",
+                f"unhashed pip install line found: {line}",
             )
 
 
@@ -1285,6 +1292,106 @@ class WriteReportAlwaysPrintsToStdoutTest(unittest.TestCase):
         for sentinel in (_SENTINEL_SERVICE_KEY, _SENTINEL_BASE_URL):
             self.assertNotIn(sentinel, stdout_text)
             self.assertNotIn(sentinel, file_text)
+
+
+# ---------------------------------------------------------------------------
+# 14) Codex Minor 3 -- errors[] 자유 텍스트(str(exc)) 마스킹
+#
+# 배경: report 의 키 허용목록(§13)은 **키**만 닫았고 **값**은 제한하지 않았다. errors[]
+# 항목의 상당수는 str(exc) -- requests/urllib3 등 우리가 내용을 통제할 수 없는 라이브러리가
+# 만드는 자유 텍스트라서, 예외 메시지에 URL 자격증명이나 쿼리스트링 토큰이 실려 있으면
+# 그대로 _write_report() 의 stdout 까지 찍힌다(Codex 실증: `https://u:p@proxy.invalid/token`
+# 주입). _sanitize_error() 가 report["errors"].append()/.extend() 의 모든 호출부에서
+# 이를 마스킹한다 -- 이 절은 단위 테스트(패턴별)와 run_embed 경로 전체를 통한 회귀
+# 테스트(§13 하네스 재사용) 양쪽을 고정한다.
+# ---------------------------------------------------------------------------
+
+
+class SanitizeErrorUnitTest(unittest.TestCase):
+    def test_url_credentials_masked(self) -> None:
+        self.assertEqual(
+            svc._sanitize_error("connect to https://u:p@proxy.invalid/token failed"),
+            "connect to https://***@proxy.invalid/token failed",
+        )
+
+    def test_query_token_masked_case_insensitive(self) -> None:
+        self.assertEqual(
+            svc._sanitize_error("GET /x?TOKEN=abc123&other=1"),
+            "GET /x?TOKEN=***&other=1",
+        )
+
+    def test_secret_key_password_apikey_authorization_all_masked(self) -> None:
+        for key in ("key", "token", "secret", "password", "apikey", "authorization"):
+            with self.subTest(key=key):
+                self.assertEqual(
+                    svc._sanitize_error(f"boom {key}=super-secret-value end"),
+                    f"boom {key}=*** end",
+                )
+
+    def test_jwt_masked(self) -> None:
+        jwt = (
+            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0."
+            "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+        )
+        self.assertEqual(svc._sanitize_error(f"bad token {jwt}"), "bad token ***jwt***")
+
+    def test_long_message_truncated_at_500_chars_plus_ellipsis(self) -> None:
+        text = "x" * 600
+        result = svc._sanitize_error(text)
+        self.assertEqual(len(result), svc._ERROR_MAX_LEN + 1)  # 500 chars + "…"
+        self.assertTrue(result.endswith("…"))
+        self.assertEqual(result[:-1], "x" * svc._ERROR_MAX_LEN)
+
+    def test_normal_messages_pass_through_unchanged(self) -> None:
+        for normal in ("http_500", "retry_exhausted", "timeout", "TypeError"):
+            self.assertEqual(svc._sanitize_error(normal), normal)
+
+
+_SENTINEL_EXCEPTION_TEXT = "SENTINEL-EXCEPTION-TEXT-secret=https://u:p@proxy.invalid/token"
+
+
+class ReportErrorsSanitizeExceptionMessagesTest(unittest.TestCase):
+    """Codex Minor 3 회귀 테스트 -- fetch_target_findings 가 URL 자격증명 + key=value
+    토큰을 담은 예외를 던지도록 monkeypatch 한 뒤(§13 의 save/restore 하네스와 동일한
+    패턴), run_embed() 의 반환값 직렬화 결과와 _write_report() 의 stdout 출력 양쪽 모두에
+    원문 자격증명(`u:p@`, 원본 `secret=https://...token` 전체)이 없고 마스킹 흔적(`***`)이
+    있는지 확인한다."""
+
+    def setUp(self) -> None:
+        self._original_fetch_targets = svc.fetch_target_findings
+
+    def tearDown(self) -> None:
+        svc.fetch_target_findings = self._original_fetch_targets
+
+    def test_injected_exception_credentials_are_masked_in_report_and_stdout(self) -> None:
+        import contextlib
+        import io
+        import json
+
+        def _raise(base, key):
+            raise RuntimeError(_SENTINEL_EXCEPTION_TEXT)
+
+        svc.fetch_target_findings = _raise
+
+        report = svc.run_embed(
+            "https://example.supabase.co", "fake-key",
+            embedding_version=1, embed_input="A", dry_run=True,
+        )
+
+        self.assertTrue(report["errors"])
+        serialized = json.dumps(report, ensure_ascii=False, sort_keys=True)
+        self.assertNotIn("u:p@", serialized)
+        self.assertNotIn("secret=https://u:p@proxy.invalid/token", serialized)
+        self.assertIn("***", serialized)
+
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured):
+            svc._write_report(None, report)
+        stdout_text = captured.getvalue()
+
+        self.assertNotIn("u:p@", stdout_text)
+        self.assertNotIn("secret=https://u:p@proxy.invalid/token", stdout_text)
+        self.assertIn("***", stdout_text)
 
 
 if __name__ == "__main__":  # pragma: no cover

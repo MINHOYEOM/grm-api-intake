@@ -47,6 +47,7 @@ _SEARCH_PATH = _MIGRATIONS_DIR / "026_findings_search.sql"
 _DASH_PATH = _MIGRATIONS_DIR / "027_findings_search_dash_axes.sql"
 _PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
 _ENTITY_REPAIR_PATH = _MIGRATIONS_DIR / "029_findings_html_entity_repair.sql"
+_HARDENING_PATH = _MIGRATIONS_DIR / "030_findings_search_hardening.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -351,8 +352,9 @@ class SearchedCteIsNarrowTest(unittest.TestCase):
 
 class MigrationNumberSequenceTest(unittest.TestCase):
     """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede) → 029(HTML 엔티티
-    오염 정정)로 체인이 이어지며 마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~029 까지
-    결번 없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
+    오염 정정) → 030(findings_search 재supersede -- work_mem/p_page 클램프/blob semantics)
+    로 체인이 이어지며 마지막 번호가 갱신됐다 -- 마이그레이션 번호가 001~030 까지 결번
+    없이 연속인지(파일명 접두 3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
         self.assertTrue(_SEARCH_PATH.is_file(), f"missing {_SEARCH_PATH}")
@@ -366,13 +368,16 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_029_file_exists(self) -> None:
         self.assertTrue(_ENTITY_REPAIR_PATH.is_file(), f"missing {_ENTITY_REPAIR_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_029(self) -> None:
+    def test_030_file_exists(self) -> None:
+        self.assertTrue(_HARDENING_PATH.is_file(), f"missing {_HARDENING_PATH}")
+
+    def test_migration_numbers_are_contiguous_from_001_to_030(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 30)))
+        self.assertEqual(numbers, list(range(1, 31)))
 
 
 # ============================================================================
@@ -590,6 +595,23 @@ _FINDINGS_COLUMNS = {
 }
 
 
+#: 파서가 dot-access 로 인식하는 수신 변수명 -- 이 튜플이 유일한 진실이다.
+#   _parse_fields_from_source() 의 정규식과 ReceiverVariableNamingConventionTest 의
+#   교차검증이 전부 이 상수를 읽는다. 각자 사본을 하드코딩하면 한쪽만 바뀌었을 때
+#   조용히 어긋난다(Major 3 수리 ② -- Codex 통합 정밀점검 2026-07-16).
+_RECEIVER_NAMES = ("row", "head", "r", "f")
+
+
+def _parse_fields_from_source(js: str) -> list[str]:
+    """js 소스 문자열(전체 파일 또는 뮤테이션된 사본)에서 findings 컬럼 dot-access 를 뽑는다.
+
+    _parse_client_fields() 의 실제 로직 -- 문자열을 인자로 받도록 분리해 뮤테이션
+    자기검증 테스트(MutationSelfVerificationTest)가 파일을 실제로 바꾸지 않고도 같은
+    파싱 로직을 사본 위에서 재실행할 수 있게 한다."""
+    used = set(re.findall(rf"\b(?:{'|'.join(_RECEIVER_NAMES)})\.([a-z_]+)\b", js))
+    return sorted(used & _FINDINGS_COLUMNS)
+
+
 def _parse_client_fields() -> list[str]:
     """findings.js 의 카드 조립부가 **행 객체에서 실제로 읽는** findings 컬럼을 뽑는다.
 
@@ -603,10 +625,34 @@ def _parse_client_fields() -> list[str]:
     투영돼야 기능이 살아있기 때문이다. 선언은 낡을 수 있지만 사용은 낡지 않는다.
 
     비-컬럼 접근(row.length 등)은 _FINDINGS_COLUMNS 화이트리스트로 걸러낸다.
+
+    ★Major 3(Codex 통합 정밀점검 2026-07-16): 이 파서는 dot-access 만 읽는 구조적
+    사각지대가 있다 -- `row.document_id` 를 `row["document_id"]` 로 바꾸고 투영에서
+    document_id 를 빼도 이 파서는 여전히 "document_id 를 안 읽는다"고 (틀리게) 보고해
+    ProjectionCoversClientFieldsTest 가 66/66 green 으로 우회됐다(Codex 실증). 완벽한
+    JS 정적 분석은 불가능하므로, 아래 NoBracketAccessOnFindingsColumnsTest 가 "이
+    사각지대로 통하는 문법(bracket-access) 자체가 존재하지 않는다"를 별도 계약으로
+    고정해 보완한다.
     """
     js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
-    used = set(re.findall(r"\b(?:row|head|r|f)\.([a-z_]+)\b", js))
-    return sorted(used & _FINDINGS_COLUMNS)
+    return _parse_fields_from_source(js)
+
+
+#: bracket-access(`["col"]`/`['col']`) 로 findings 컬럼을 읽는 표기 전부를 잡는 정규식.
+#   컬럼명 알파벳 목록은 _FINDINGS_COLUMNS 화이트리스트를 그대로 재사용한다(32종).
+_BRACKET_ACCESS_RE = re.compile(
+    r"\[\s*[\"'](" + "|".join(sorted(_FINDINGS_COLUMNS)) + r")[\"']\s*\]"
+)
+
+
+def _bracket_access_violations(js: str) -> list[str]:
+    """js 소스 문자열에서 findings 컬럼에 대한 bracket-access 표기를 전부 찾는다.
+
+    _parse_fields_from_source() 가 dot-access(row.col) 만 읽으므로, 같은 데이터를
+    bracket-access(row["col"])로 읽으면 투영 가드의 사각지대가 된다 -- Codex 가
+    `row.confidence` -> `row["confidence"]` 뮤테이션으로 이 우회를 실증했다(66/66
+    green 유지, 투영에서 confidence 를 빼도 가드 미발화)."""
+    return _BRACKET_ACCESS_RE.findall(js)
 
 
 class ClientFieldsParseTest(unittest.TestCase):
@@ -797,6 +843,297 @@ class ProjectionInvokerAndGrantCarryoverTest(unittest.TestCase):
             "grant execute on function public.findings_document(text) to anon, authenticated;",
         ):
             self.assertIn(sig, self.sql)
+
+
+# ============================================================================
+# Major 3(Codex 통합 정밀점검 2026-07-16) -- 투영 패리티 가드(ProjectionCoversClientFieldsTest)
+# 의 입력인 _parse_client_fields() 가 dot-access(row.X)만 읽는 정적 파서라는 구조적 한계를
+# Codex 가 뮤테이션으로 실증했다: findings.js 에서 `row.document_id` -> `row["document_id"]`
+# 로 바꾸고 두 RPC 투영에서 document_id 를 빼도 66/66 green(가드가 우회됨).
+#
+# 완벽한 JS 정적 분석은 불가능하다. 실용적 정답 = 접근 문법 자체를 계약으로 제약하고
+# (①②) 그 제약이 실제로 발화하는지 뮤테이션으로 자기검증한다(③).
+# ============================================================================
+
+
+class NoBracketAccessOnFindingsColumnsTest(unittest.TestCase):
+    """①bracket-access 금지 계약 -- findings.js 전체에서 findings 컬럼명(32종 화이트
+    리스트)에 대한 `["col"]`/`['col']` 표기가 **존재하지 않는다**를 고정한다.
+
+    왜: _parse_client_fields 는 dot-access 만 읽으므로, bracket-access 가 생기면 그
+    필드는 투영 가드의 사각지대가 된다 -- Codex 가 뮤테이션으로 실증한 우회로(위 섹션
+    헤더 참조)를 문법 계약으로 봉쇄한다. 렌더러가 정말 동적 접근이 필요해지면 이 테스트를
+    의도적으로 갱신하며 _parse_fields_from_source()/_BRACKET_ACCESS_RE 도 함께 확장하라는
+    안내를 남긴다."""
+
+    def test_findings_js_has_no_bracket_access_on_findings_columns(self) -> None:
+        js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
+        violations = _bracket_access_violations(js)
+        self.assertEqual(
+            violations, [],
+            msg=(
+                f"findings.js 에 findings 컬럼 bracket-access 발견: {violations} -- "
+                f"dot-access(row.X)로 바꾸거나, 정말 필요하면 _parse_fields_from_source() "
+                f"정규식을 확장하고 이 테스트를 의도적으로 갱신하라(투영 가드의 사각지대가 "
+                f"되지 않도록)."
+            ),
+        )
+
+
+class ReceiverVariableNamingConventionTest(unittest.TestCase):
+    """②변수명 관례 계약 -- 파서가 인식하는 수신 변수(_RECEIVER_NAMES = row/head/r/f) 밖의
+    이름으로 findings 행이 흐르는 것도 사각지대다. 완전 차단은 불가능하니, findings_search/
+    findings_document RPC 응답(documents[].findings[])을 실제로 받는 지역 변수명을 실측해
+    파서 whitelist(_RECEIVER_NAMES -- 파서 정규식이 실제로 읽는 소스)에 전부 포함되는지
+    교차확인한다.
+
+    실측(2026-07-17): buildDocCard(rows, query) 의 두 `.forEach(function (row) {...})`·
+    buildDocHead(rows) 의 `var head = rows[0];`·buildCard(row, query) 의 파라미터명 --
+    전부 row/head 이며 _RECEIVER_NAMES 안에 있다.
+
+    ★잔여 사각지대(정직하게): findings_similar/findings_similar_to RPC(018/021/022, 026~030
+    findings_search/findings_document 와 무관한 별도 마이그레이션) 소비부는 `item` 이라는
+    이름을 쓴다(mapSimilarItemToRow(item)/buildSimilarToItem(item)/renderSimilarResults 의
+    `items.forEach(function (item) {...})`). 이 RPC 는 이 가드의 대상이 아니라서 위반으로
+    잡지 않지만, "item" 자체는 파서 whitelist 밖이다 -- 만약 향후 findings_search 결과가
+    "item" 이라는 이름으로 흐르게 리팩터링되면 이 교차검증도 파서도 그 사실을 모른 채
+    통과한다(자동 탐지 불가능한 구조적 한계)."""
+
+    def setUp(self) -> None:
+        self.js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
+
+    def test_build_doc_card_foreach_params_are_within_whitelist(self) -> None:
+        fn = self.js[self.js.index("function buildDocCard(rows, query) {"):]
+        fn = fn[: fn.index("\n  }\n") + 4]
+        params = re.findall(r"\.forEach\(function \((\w+)\)", fn)
+        self.assertTrue(params, "buildDocCard 의 forEach 콜백 파라미터를 찾지 못함")
+        for name in params:
+            self.assertIn(name, _RECEIVER_NAMES)
+
+    def test_build_doc_head_rows_zero_assignment_is_within_whitelist(self) -> None:
+        fn = self.js[self.js.index("function buildDocHead(rows) {"):]
+        fn = fn[: fn.index("\n  }\n") + 4]
+        match = re.search(r"var (\w+) = rows\[0\];", fn)
+        self.assertIsNotNone(match, "buildDocHead 의 rows[0] 대입 변수를 찾지 못함")
+        self.assertIn(match.group(1), _RECEIVER_NAMES)
+
+    def test_build_card_param_name_is_within_whitelist(self) -> None:
+        match = re.search(r"function buildCard\((\w+), query\)", self.js)
+        self.assertIsNotNone(match, "buildCard 의 첫 파라미터명을 찾지 못함")
+        self.assertIn(match.group(1), _RECEIVER_NAMES)
+
+
+class MutationSelfVerificationTest(unittest.TestCase):
+    """③뮤테이션 자기검증 -- Codex 의 우회 시나리오(`row.confidence` -> `row["confidence"]`)
+    를 findings.js 를 실제로 바꾸지 않고 **문자열 사본**에서 재현해, 위 ①②가 "말로만"
+    방어가 아니라 실제로 발화하는지 실행으로 증명한다."""
+
+    def setUp(self) -> None:
+        self.original_js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
+        self.assertIn(
+            "row.confidence", self.original_js,
+            "전제 조건 불충족: findings.js 가 row.confidence 를 dot-access 로 읽고 있어야 "
+            "이 뮤테이션 시나리오가 성립한다(전제가 깨졌으면 findings.js 구조가 바뀐 것).",
+        )
+        # Codex 실증 그대로: dot-access 를 bracket-access 로 치환한 가상 소스(사본 -- 파일은 불변).
+        self.mutated_js = self.original_js.replace("row.confidence", 'row["confidence"]')
+        self.assertNotEqual(self.mutated_js, self.original_js, "치환이 실제로 일어나지 않았음")
+
+    def test_mutation_makes_confidence_vanish_from_dot_access_parse(self) -> None:
+        """파서(dot-access 전용)의 진짜 사각지대 실증 -- 뮤테이션 후 confidence 가
+        파싱 결과에서 조용히 빠진다(투영 가드가 죽은 채로 green 이 될 수 있었던 이유)."""
+        original_fields = _parse_fields_from_source(self.original_js)
+        mutated_fields = _parse_fields_from_source(self.mutated_js)
+        self.assertIn("confidence", original_fields)
+        self.assertNotIn("confidence", mutated_fields)
+
+    def test_bracket_access_ban_detects_the_mutation(self) -> None:
+        """①bracket-access 금지 계약이 이 사본에서 실제로 실패를 감지해야 한다 --
+        원본에서는 위반 0건, 뮤테이션 후에는 confidence 위반이 잡혀야 한다(가드가
+        Codex 의 우회 시나리오를 실제로 막는다는 증거)."""
+        self.assertEqual(_bracket_access_violations(self.original_js), [])
+        violations = _bracket_access_violations(self.mutated_js)
+        self.assertIn("confidence", violations)
+
+
+# ============================================================================
+# 030_findings_search_hardening.sql -- Major 1(무검색 랜딩 temp spill)+Minor 1(검색
+# semantics 표류)+Minor 2(p_page int overflow) 수리(Codex 통합 정밀점검 2026-07-16).
+# findings_search 만 재선언한다 -- findings_document 는 028 정의가 현행 그대로다(이
+# 파일의 결함 3종 모두 페이지네이션·blob·집계 관련이라 findings_document 와 무관).
+# ============================================================================
+
+
+class HardeningMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_HARDENING_PATH.is_file(), f"missing {_HARDENING_PATH}")
+        self.sql = _HARDENING_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _HARDENING_PATH.read_bytes())
+
+    def test_redeclares_only_findings_search(self) -> None:
+        self.assertIn("create or replace function public.findings_search(", self.code)
+        self.assertNotIn("create or replace function public.findings_document(", self.code)
+
+
+class HardeningWorkMemTest(unittest.TestCase):
+    """Major 1 수리: `set work_mem = '8MB'` -- 없으면 CTE materialize(≈3MiB)가 인스턴스
+    기본 2184kB 를 넘겨 temp 스필한다. 실측: 스필 시 anon temp read=4095(웜 ~127ms),
+    work_mem 8MB 적용 후 스필 완전 소멸(shared hit 만, 웜 ~119ms). 027 이 대시보드 축
+    (dash_* 4개 = filtered CTE 다중 소비)을 얹은 뒤 재측정을 빠뜨린 것이 026b 스필-0
+    검증과 지금 실측이 어긋난 원인이다."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        self.fn_search = _slice_function(self.code, _FN_SEARCH_SIG)
+
+    def test_sets_work_mem_to_8mb(self) -> None:
+        self.assertIn("set work_mem = '8MB'", self.fn_search)
+
+
+class HardeningPageClampTest(unittest.TestCase):
+    """Minor 2 수리: p_page 상한 클램프 400,000 -- p_page=2147483647 입력 시
+    (page-1)*per 의 int 연산이 22003(integer out of range)으로 HTTP 400 이 되던 결함.
+    400,000 × per 최대 100 = 4천만 < 2^31 로 overflow 를 원천 차단하면서 실 코퍼스
+    (~1,400 페이지)의 280배 여유를 남긴다. 범위 밖 페이지는 종전처럼 빈 documents."""
+
+    def test_page_is_clamped_between_one_and_four_hundred_thousand(self) -> None:
+        code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        self.assertIn("least(greatest(coalesce(p_page, 1), 1), 400000)", code)
+
+
+class HardeningBlobRefsElementsOnlyTest(unittest.TestCase):
+    """Minor 1① 수리(확대 결함): blob 이 `cfr_refs::text`/`mfds_refs::text` 를 실으면
+    JSON 구두점 자체가 검색 대상이 된다 -- `[]` 질의가 빈 배열 리터럴과 매치해 8,168건
+    전량과 매치하던 결함(실측). 수리 = jsonb_array_elements_text 로 배열 **원소만**
+    추출(빈 배열은 '' -- 종전 클라이언트 join 과 동치). blob 이 refs 컬럼을 통째로
+    ::text 캐스팅하지 않는다는 것과, 원소 추출 함수를 쓴다는 것을 함께 고정한다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        self.blob_block = _slice_between(code, "searched as (", "filtered as (")
+
+    def test_does_not_cast_refs_columns_to_text_directly(self) -> None:
+        self.assertNotIn("f.cfr_refs::text", self.blob_block)
+        self.assertNotIn("f.mfds_refs::text", self.blob_block)
+
+    def test_uses_jsonb_array_elements_text_for_both_refs(self) -> None:
+        self.assertIn("jsonb_array_elements_text(f.cfr_refs)", self.blob_block)
+        self.assertIn("jsonb_array_elements_text(f.mfds_refs)", self.blob_block)
+
+
+class HardeningReviewStatusSpaceVariantTest(unittest.TestCase):
+    """Minor 1② 수리(축소 결함): blob 에 `review_status` 의 '_'→' ' 표기 변형이 빠져
+    "needs review"(공백) 검색이 42건 매치하던 종전 클라이언트 semantics 가 축소돼
+    있었다(실측). `replace(coalesce(f.review_status, ''), '_', ' ')` 복원으로
+    되살린다(원값 review_status 도 그대로 유지 -- 밑줄 표기 질의도 계속 매치)."""
+
+    def test_blob_includes_review_status_space_variant(self) -> None:
+        code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        self.assertIn("replace(coalesce(f.review_status, ''), '_', ' ')", code)
+
+
+class HardeningBlobFieldOrderTest(unittest.TestCase):
+    """Minor 1④ 수리: blob 필드 순서를 종전 searchTermsFor 순서(finding_text 가
+    finding_text_ko 보다 선두)로 재정렬한다. blob 은 공백 결합이라 필드 경계를 넘는
+    우연 매치(cross-field)가 존재하는데(종전부터 그랬음), 순서가 다르면 우연 매치의
+    **집합이 달라진다**(실측: "Baxalta US Inc. documentation_records" 종전 0건 vs
+    순서가 바뀐 상태에서 1건 -- firm_name 뒤 필드가 document_id 에서 category_code 로
+    바뀐 탓). 순서 자체를 position 비교로 고정해 이 표류를 막는다."""
+
+    def test_finding_text_precedes_finding_text_ko_in_blob(self) -> None:
+        code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        block = _slice_between(code, "searched as (", "filtered as (")
+        self.assertLess(
+            block.index("f.finding_text,"),
+            block.index("f.finding_text_ko,"),
+            msg="blob 에서 finding_text 가 finding_text_ko 보다 앞에 와야 한다(종전 순서 승계).",
+        )
+
+
+class HardeningCarryoverInvariantsTest(unittest.TestCase):
+    """026~028 불가침 계약이 030(findings_search 를 통째로 재선언하는 supersede 파일)
+    에서도 승계되는지 030 파일 자체를 대상으로 재검사한다 -- create or replace 재선언은
+    구조적으로 계약을 조용히 되돌릴 수 있는 지점이다. 승계 대상: security invoker +
+    search_path 고정 · 게이트 술어 비복제(RLS 010 이 유일한 게이트) · 좁은 searched CTE
+    (select 목록에 finding_text 계열 없음 -- WHERE 절 blob 은 예외) · d.tie asc 최종
+    타이브레이크 · firm_asc ko-KR-x-icu collate · ILIKE 전용(FTS 함수 부재) ·
+    grant execute to anon, authenticated."""
+
+    def setUp(self) -> None:
+        self.assertTrue(_HARDENING_PATH.is_file(), f"missing {_HARDENING_PATH}")
+        self.sql = _HARDENING_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+        self.fn_search = _slice_function(self.code, _FN_SEARCH_SIG)
+
+    def test_is_security_invoker_and_pins_search_path(self) -> None:
+        self.assertIn("security invoker", self.fn_search)
+        self.assertNotIn("security definer", self.fn_search)
+        self.assertIn("set search_path = public", self.fn_search)
+
+    def test_gate_predicates_absent_from_function_body(self) -> None:
+        self.assertNotIn("scope_status", self.fn_search)
+        self.assertNotIn("finding_language = 'KO'", self.fn_search)
+
+    def test_searched_cte_select_list_omits_wide_text_columns(self) -> None:
+        block = _slice_between(self.code, "searched as (", "filtered as (")
+        select_list = _slice_between(block, "select", "from public.findings f")
+        for col in ("finding_text", "finding_text_ko"):
+            self.assertNotIn(f"f.{col}", select_list)
+
+    def test_ordered_cte_has_final_tiebreak(self) -> None:
+        ordered_block = _slice_between(self.code, "ordered as (", "tot as (")
+        self.assertIn("d.tie asc", ordered_block)
+
+    def test_firm_asc_uses_icu_collation(self) -> None:
+        ordered_block = _slice_between(self.code, "ordered as (", "tot as (")
+        self.assertIn(
+            '(case when p.sort = \'firm_asc\' then d.firm end) collate "ko-KR-x-icu" asc',
+            ordered_block,
+        )
+
+    def test_uses_ilike_not_fts(self) -> None:
+        self.assertIn("ilike", self.code)
+        for forbidden in ("to_tsvector", "websearch_to_tsquery", "to_tsquery"):
+            self.assertNotIn(forbidden, self.code, f"030 must not use FTS function: {forbidden!r}")
+
+    def test_grants_execute_to_anon_and_authenticated(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_search(text, text, text, text, text, "
+            "text, text, text, int, int) to anon, authenticated;",
+            self.sql,
+        )
+
+
+class HardeningProjectionCoversClientFieldsTest(unittest.TestCase):
+    """★투영 패리티 가드(ProjectionCoversClientFieldsTest) 확장 -- 그 클래스는 028 을 대상
+    으로 검사하는데, 030 이 findings_search 를 다시 supersede 해 **현행 정본은 030**이다.
+    028 검사는 역사 기록으로 그대로 두고(그 시점 결함의 증거), 030 을 대상으로 같은 교차
+    검증(클라이언트가 실제로 읽는 필드가 findings[] 투영에 전부 실리는가)을 추가한다.
+    findings_document 는 030 이 재선언하지 않으므로(028 정의가 현행 그대로) 검사 대상에서
+    제외한다(위 HardeningMigrationFileTest.test_redeclares_only_findings_search 참조)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
+        self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
+        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+
+    def test_findings_search_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.search_rows,
+                msg=f"030 findings_search 의 findings[] 투영에 '{col}' 이 없다 -- 클라이언트가 "
+                    f"실제로 읽는 필드다(조용히 소실되면 방어적 분기라 크래시 없이 링크·고지· "
+                    f"신뢰도 등이 사라진다).",
+            )
+
+    def test_restored_by_028_still_present_in_030(self) -> None:
+        for col in _RESTORED_BY_028:
+            self.assertIn(f"'{col}',", self.search_rows, msg=f"030: {col}")
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -92,7 +92,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          # [Codex Major 2 완결] 이 스텝에 종전 있었던, pip 자체를 최신으로 올리는
+          # 부트스트랩 줄을 뺐다 -- 그 한 줄이 이 job 안에서 유일하게 버전·해시
+          # 검증 없이 PyPI 에서 최신 pip 를 받아 실행하는 경로였고, 같은 러너가
+          # 곧이어 아래에서 SUPABASE_SERVICE_ROLE_KEY 를 쥔다. 러너 내장 pip
+          # (actions/setup-python 이 제공)만으로 `--require-hashes` 설치는 충분하다.
+          # pip 최신 기능이 필요해지면 lock 재생성 워크플로(grm-findings-embed-lock.yml)
+          # 에서 pip 도 lock 에 편입하는 것이 정도다(그 job 은 시크릿을 쓰지 않는다).
+          # ★설치 실패 시 1차 의심 = 러너 내장 pip 버전이 lock 이 요구하는 해시
+          # 형식/기능(예: --require-hashes 자체는 pip 8+ 이면 지원되지만 신형 해시
+          # 알고리즘 등)에 못 미치는 경우다 -- 대응은 actions/setup-python 버전을
+          # 갱신하는 것(SHA pin 은 유지).
+          #
           # [F-05 완결] 전이 의존성까지 sha256 고정된 lock 에서만 설치한다.
           # --require-hashes 는 **한 invocation 안의 모든 요구사항**이 해시를 가져야 하므로,
           # requirements.txt 를 따로 설치하면 그 경로가 hash 미검증으로 남는다 -> requests 를

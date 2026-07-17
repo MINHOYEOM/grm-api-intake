@@ -1713,6 +1713,38 @@ class WebFindingsRenderTest(unittest.TestCase):
             self.assertIn("currentPage = 1;", fn, f"{fn_name} 이 페이지를 리셋하지 않음")
             self.assertIn("goToPage(1);", fn, f"{fn_name} 이 goToPage(1) 을 호출하지 않음")
 
+    def test_toggle_filters_actually_toggle_state(self):
+        """[Minor 4 -- Codex 통합 정밀점검 2026-07-16] 대시보드 클릭 배선(존재)만 고정하고
+        상태 변경(내용)을 안 고정하면 no-op 회귀가 green 으로 통과한다 -- Codex 실증:
+        `state.category_code = state.category_code === code ? "" : code;` 를 no-op 으로
+        바꿔도(클릭해도 필터가 실제로 걸리지 않아도) 144/144 green 이었다. PR-B 테스트
+        정리에서 click-wiring 테스트가 재앵커되며 이 상태-토글 assertion 이 소실됐던 것을
+        복원한다 -- 위 test_filter_and_sort_and_search_reset_to_page_one 은 "리셋+재조회"
+        만 보고 "실제로 토글되는가"는 안 본다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+
+        cat_fn = js_src[js_src.index("function toggleCategoryFilter(code) {"):]
+        cat_fn = cat_fn[:cat_fn.index("\n  }\n") + 4]
+        self.assertIn('state.category_code = state.category_code === code ? "" : code;', cat_fn)
+
+        month_fn = js_src[js_src.index("function toggleMonthFilter(month) {"):]
+        month_fn = month_fn[:month_fn.index("\n  }\n") + 4]
+        self.assertIn('state.month = state.month === month ? "" : month;', month_fn)
+
+        # 업체(firm) 클릭은 별도 필터 축이 없다 -- 검색어(state.q)를 업체명으로 설정/해제
+        # 하는 것이 계약이다(드롭다운 필터가 아니라 검색창 재사용).
+        firm_fn = js_src[js_src.index("function toggleFirmFilter(name) {"):]
+        firm_fn = firm_fn[:firm_fn.index("\n  }\n") + 4]
+        self.assertIn('state.q = state.q === name ? "" : name;', firm_fn)
+
+        for fn_name, fn in (
+            ("toggleCategoryFilter", cat_fn),
+            ("toggleMonthFilter", month_fn),
+            ("toggleFirmFilter", firm_fn),
+        ):
+            self.assertIn("currentPage = 1;", fn, f"{fn_name} 이 페이지를 리셋하지 않음")
+            self.assertIn("goToPage(1);", fn, f"{fn_name} 이 goToPage(1) 을 호출하지 않음")
+
     def test_pager_renders_prev_next_first_last_and_page_window(self):
         """[문서 단위 페이지네이션] renderPager() 는 처음/이전/페이지 번호(윈도우)/
         다음/끝 버튼을 만들고, 현재 페이지 버튼에 aria-current="page" 를 붙인다.

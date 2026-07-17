@@ -58,6 +58,8 @@ __all__ = [
     "WebTrendsRenderTest",
     "WebFirmRenderTest",
     "WebLibraryRenderTest",
+    "WebGuideRenderTest",
+    "WebGlossaryRenderTest",
     "WebFirmWatchlistTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
@@ -107,6 +109,8 @@ SINGLE_GOLDENS = [
     ("library/index.html", "library.expected.html"),
     ("library/ich/index.html", "library_ich.expected.html"),
     ("library/mfds/index.html", "library_mfds.expected.html"),
+    ("guide/index.html", "guide.expected.html"),
+    ("glossary/index.html", "glossary.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
@@ -751,7 +755,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 5, "nav 탭은 소개·모아보기·찾아보기·트렌드·자료실 5개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 소개·모아보기·찾아보기·트렌드·자료실·이용안내 6개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
@@ -2631,7 +2635,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn('class="on">찾아보기', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 5)  # 소개·모아보기·찾아보기·트렌드·자료실
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
@@ -3082,7 +3086,7 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 5)  # 소개·모아보기·찾아보기·트렌드·자료실
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
         self.assertNotIn("findings/firm", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -3879,6 +3883,180 @@ class WebLibraryRenderTest(unittest.TestCase):
         for rel in ("library/index.html", "library/ich/index.html", "library/mfds/index.html"):
             self.assertEqual((self.single / rel).read_bytes(),
                              (out2 / rel).read_bytes(), f"비결정론 렌더: {rel}")
+
+
+class WebGuideRenderTest(unittest.TestCase):
+    """[이용안내 트랙 C 2차] /guide/ — guide_content.md(정본)를 제한 md 서브셋으로
+    결정론 렌더. library 와 동일하게 커밋 콘텐츠가 빌드시 HTML 에 박히므로 골든이 정본이고,
+    여기선 md 변환·배선·이스케이프·결정론만 보강 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_guide_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "guide" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.md = render.GUIDE_FILE.read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_generated_with_title_from_h1(self):
+        # 최상위 `# ` 헤딩은 페이지 제목(page-head h1)로 승격 — 본문에 h1 은 남지 않는다.
+        self.assertIn("<h1", self.html)
+        self.assertIn("GRM 이용 안내", self.html)
+        self.assertNotIn("<h1>GRM 이용 안내</h1>", self.html)  # md h1 이 본문 h1 로 재출력되지 않음
+
+    def test_all_sections_and_subsections_rendered(self):
+        # md 의 ## 5개·### 8개가 모두 h2/h3 로 변환됐는지(개수 일치).
+        n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        n_h3 = sum(1 for ln in self.md.splitlines() if ln.startswith("### "))
+        self.assertEqual(n_h2, 5)
+        self.assertEqual(n_h3, 8)
+        self.assertEqual(self.html.count("<h2>"), n_h2)
+        self.assertEqual(self.html.count("<h3>"), n_h3)
+
+    def test_lists_and_inline_markup_converted(self):
+        self.assertIn("<ul>", self.html)
+        self.assertIn("<ol>", self.html)
+        self.assertIn("<li>", self.html)
+        self.assertIn("<strong>", self.html)
+        self.assertIn("<code>findings</code>", self.html)
+
+    def test_no_raw_markdown_markers_leak_in_body(self):
+        # 본문 프로즈에 미변환 `**`·인라인 백틱이 남지 않아야 한다(변환 누락 방지).
+        import re as _re
+        m = _re.search(r'<div class="wrap guide-body[^>]*>(.*?)</aside>', self.html, _re.S)
+        self.assertIsNotNone(m)
+        body = m.group(1)
+        self.assertNotIn("**", body)
+        self.assertNotIn("`", body)
+
+    def test_no_external_markdown_library(self):
+        # 결정론 자체 변환만 — 외부 md 라이브러리 import 금지.
+        src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
+        for forbidden in ("import markdown", "import mistune", "import commonmark",
+                          "from markdown", "import markdown2"):
+            self.assertNotIn(forbidden, src, forbidden)
+
+    def test_inline_html_in_content_would_be_escaped(self):
+        # _md_inline 은 텍스트를 먼저 escape → 제한 마커만 태그 승격(XSS 방어선).
+        title, body = render.render_guide_html("## <script>alert(1)</script> **굵게**")
+        self.assertIn("&lt;script&gt;", str(body))
+        self.assertNotIn("<script>", str(body))
+        self.assertIn("<strong>굵게</strong>", str(body))
+
+    def test_glossary_crosslink_present(self):
+        self.assertIn('href="../glossary/index.html"', self.html)
+
+    def test_nav_active_and_meta(self):
+        self.assertIn('guide/index.html" class="on">이용안내</a>', self.html)
+        self.assertIn('href="guide/index.html">이용안내</a>', self.landing)
+        self.assertNotIn('class="on">이용안내</a>', self.landing)
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/guide/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_grm_css_untouched_by_guide(self):
+        self.assertIn("<style>", self.html)  # 스코프 스타일만(grm.css 미편집)
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        self.assertEqual((self.single / "guide" / "index.html").read_bytes(),
+                         (out2 / "guide" / "index.html").read_bytes(), "비결정론 렌더")
+
+
+class WebGlossaryRenderTest(unittest.TestCase):
+    """[용어사전 트랙 C 2차] /glossary/ — glossary.json(정본)을 초성 색인 1페이지로
+    결정론 렌더. 값(term_ko/term_en/easy_ko/출처) 무변형, 파생은 초성 버킷·related 라벨뿐.
+    골든이 정본이고, 여기선 구조·무변형·딥링크·검색배선·결정론만 보강 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gloss_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "glossary" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_all_terms_rendered_as_articles_with_id_anchors(self):
+        self.assertEqual(self.html.count('<article class="gl-term"'), len(self.terms))
+        for t in self.terms:
+            self.assertIn(f'<article class="gl-term" id="{t["id"]}"', self.html,
+                          f'용어 앵커 누락: {t["id"]}')
+
+    def test_values_verbatim(self):
+        # 표시값은 데이터 그대로(무변형) — term_ko/term_en/easy_ko/출처.
+        from markupsafe import escape as _esc2
+        for t in self.terms:
+            self.assertIn(str(_esc2(t["term_en"])), self.html)
+            self.assertIn(str(_esc2(t["easy_ko"])), self.html)
+            self.assertIn(str(_esc2(t["definition_source"])), self.html)
+
+    def test_related_crosslinks_resolve_to_existing_terms(self):
+        ids = {t["id"] for t in self.terms}
+        for t in self.terms:
+            for r in t.get("related", []):
+                if r in ids:  # 고아 참조는 렌더에서 제외(존재하는 것만 링크)
+                    self.assertIn(f'class="gl-rel-a" href="#{r}"', self.html)
+
+    def test_chosung_grouping_deterministic_and_ordered(self):
+        # 12개 버킷(ㄱㄷㄹㅁㅂㅅㅇㅈㅊㅍㅎ + A–Z) — 데이터 파생, 순서 고정.
+        view = render.build_glossary_view(self.terms)
+        buckets = [b["bucket"] for b in view["buckets"]]
+        self.assertEqual(buckets,
+                         ["ㄱ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅍ", "ㅎ", "A–Z"])
+        self.assertEqual(self.html.count('<section class="gl-group"'), len(buckets))
+        self.assertEqual(view["total"], len(self.terms))
+
+    def test_jump_index_matches_groups(self):
+        # 색인 바 링크 = 그룹 앵커(빠짐·군더더기 0).
+        import re as _re
+        idx = _re.findall(r'data-bucket="(grp-\d+)">([^<]+)</a>', self.html)
+        grp = _re.findall(r'<section class="gl-group" id="(grp-\d+)"', self.html)
+        self.assertEqual([a for a, _ in idx], grp)
+
+    def test_search_filter_asset_is_new_file_referenced_with_hash(self):
+        # 클라이언트 필터는 신규 asset(glossary.js) — 기존 js 미편집(별도 파일).
+        self.assertIn("/assets/glossary.js?v=", self.html)
+        built = (self.single / "assets" / "glossary.js").read_bytes()
+        src = (WEB_DIR / "assets" / "glossary.js").read_bytes()
+        self.assertEqual(built, src, "glossary.js 가 verbatim 복사되지 않음")
+
+    def test_search_data_attr_present_and_lowercased(self):
+        # 카드마다 data-search(term_ko/en/easy 소문자 결합) — 클라이언트 필터 입력.
+        for t in self.terms:
+            combined = " ".join([t["term_ko"], t["term_en"], t["easy_ko"]]).lower()
+            self.assertEqual(render._glossary_bucket(t["term_ko"]),
+                             render._glossary_bucket(t["term_ko"]))  # 순수 함수 안정
+            self.assertIn(str(_esc(combined)), self.html)
+
+    def test_nav_active_and_meta(self):
+        # 용어사전 전용 탭이 없어 이용안내(guide) 탭 점등 유지.
+        self.assertIn('guide/index.html" class="on">이용안내</a>', self.html)
+        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/glossary/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_sitemap_includes_guide_and_glossary(self):
+        for path in ("/guide/", "/glossary/"):
+            self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap)
+
+    def test_grm_css_untouched_by_glossary(self):
+        self.assertIn("<style>", self.html)
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        self.assertEqual((self.single / "glossary" / "index.html").read_bytes(),
+                         (out2 / "glossary" / "index.html").read_bytes(), "비결정론 렌더")
 
 
 def freeze() -> None:

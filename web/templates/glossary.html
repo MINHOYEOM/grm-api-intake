@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 용어사전(트랙 C 2차 웨이브) — web/data/glossary.json(정본)을 초성 색인 1페이지로
+    결정론 렌더. 값(term_ko/term_en/easy_ko/출처)은 무변형, 파생은 초성 버킷·related 라벨
+    해석뿐. 클라이언트 필터는 신규 assets/glossary.js(기존 js 미편집). grm.css 프리즈
+    보존 위해 스코프 <style>. URL 해시(#<id>) 딥링크는 각 용어 article id 로 성립. -#}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Glossary</span>
+    <h1 class="reveal" style="animation-delay:.08s">규제 용어사전</h1>
+    <p class="reveal" style="animation-delay:.14s">GMP·규제 문서에서 자주 나오는 용어를 쉬운 우리말 풀이와 공식 출처로 정리했습니다. 한글 또는 영문으로 검색하거나 초성 색인으로 바로 찾아보세요. 최종 판단은 언제나 공식 원문과 최신 기준을 확인하세요.</p>
+  </div>
+  <div class="wrap gl-tools reveal" style="animation-delay:.2s">
+    <div class="gl-search">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input id="grm-gl-q" type="search" autocomplete="off" placeholder="용어 검색 (예: 무균, data integrity, CAPA)" aria-label="용어 검색" />
+    </div>
+    <p class="gl-count" id="grm-gl-count" data-total="{{ glossary.total }}">전체 <b>{{ glossary.total }}</b>개 용어</p>
+  </div>
+  <nav class="wrap gl-index" id="grm-gl-index" aria-label="초성 색인">
+    {% for b in glossary.buckets %}
+    <a href="#{{ b.anchor }}" data-bucket="{{ b.anchor }}">{{ b.bucket }}</a>
+    {% endfor %}
+  </nav>
+  <div class="wrap gl-body">
+    <p class="gl-empty" id="grm-gl-empty" hidden>검색어와 일치하는 용어가 없습니다. 다른 표현(한글↔영문)으로 다시 검색해 보세요.</p>
+    {% for g in glossary.groups %}
+    <section class="gl-group" id="{{ g.anchor }}" data-bucket="{{ g.anchor }}">
+      <h2 class="gl-group-h">{{ g.bucket }}</h2>
+      <div class="gl-terms">
+        {% for t in g.terms %}
+        <article class="gl-term" id="{{ t.id }}" data-search="{{ t.search }}">
+          <div class="gl-term-h">
+            <h3 class="gl-term-ko">{{ t.term_ko }}<a class="gl-anchor" href="#{{ t.id }}" aria-label="이 용어로 바로가기">#</a></h3>
+            <span class="gl-term-en">{{ t.term_en }}</span>
+          </div>
+          <p class="gl-def">{{ t.easy_ko }}</p>
+          <p class="gl-src"><span class="gl-src-k">출처</span>{{ t.definition_source }}</p>
+          {% if t.related %}
+          <div class="gl-rel">
+            <span class="gl-rel-k">관련 용어</span>
+            {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.term_ko }}</a>{% endfor %}
+          </div>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</main>
+<style>
+/* [용어사전] 초성 색인·용어 카드 — grm.css 토큰만 사용(프리즈 보존). */
+.gl-tools{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-top:6px}
+.gl-search{position:relative;flex:1;min-width:240px;max-width:460px}
+.gl-search .ti{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--lo);pointer-events:none}
+.gl-search input{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:15px;color:var(--ink);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:11px 14px 11px 38px}
+.gl-search input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.gl-search input::-webkit-search-cancel-button{cursor:pointer}
+.gl-count{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
+.gl-count b{color:var(--coral-2);font-variant-numeric:tabular-nums}
+.gl-index{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px;padding-bottom:6px}
+.gl-index a{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 8px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);text-decoration:none;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
+.gl-index a:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
+.gl-index a[hidden]{display:none}
+.gl-body{padding:12px 0 64px}
+.gl-empty{font-family:var(--sans);font-size:15px;color:var(--muted);padding:28px 0}
+.gl-group{margin-top:14px;scroll-margin-top:88px}
+.gl-group-h{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--coral-2);margin:26px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--line-2)}
+.gl-group[hidden]{display:none}
+.gl-terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:16px}
+.gl-term{display:flex;flex-direction:column;gap:8px;padding:20px 22px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);scroll-margin-top:88px}
+.gl-term[hidden]{display:none}
+.gl-term:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.gl-term-h{display:flex;flex-direction:column;gap:2px}
+.gl-term-ko{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.3;color:var(--ink);margin:0}
+.gl-anchor{margin-left:7px;font-family:var(--mono);font-size:13px;font-weight:400;color:var(--line-2);text-decoration:none;opacity:0;transition:opacity .14s var(--ease),color .14s var(--ease)}
+.gl-term:hover .gl-anchor{opacity:1}
+.gl-anchor:hover{color:var(--coral)}
+.gl-term-en{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.4}
+.gl-def{font-family:var(--sans);font-size:14.5px;line-height:1.66;color:var(--body);margin:2px 0 0}
+.gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--lo);margin:4px 0 0}
+.gl-src-k{display:inline-block;font-weight:600;color:var(--muted);margin-right:6px}
+.gl-rel{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
+.gl-rel-k{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--muted);margin-right:2px}
+.gl-rel-a{font-family:var(--sans);font-size:12.5px;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:3px 9px;border-radius:999px;text-decoration:none;transition:background .14s var(--ease)}
+.gl-rel-a:hover{background:var(--soft);border-color:var(--coral)}
+@media (max-width:640px){ .gl-terms{grid-template-columns:1fr} .gl-tools{flex-direction:column;align-items:stretch} .gl-search{max-width:none} }
+</style>
+{% endblock %}
+{% block scripts %}
+<script src="/assets/glossary.js?v={{ glossaryjs_ver }}" defer></script>
+{% endblock %}

@@ -34,6 +34,7 @@ import requests
 import findings_extractors
 import findings_store
 import grm_findings as gf
+from grm_cli import normalize_supabase_url as _normalize_base_url
 
 
 DEFAULT_TIMEOUT_SECONDS = 15
@@ -62,13 +63,6 @@ class SupabaseRawSignalWithFindingsAppendResult:
     findings_duplicate: int = 0
     findings_invalid: int = 0
     errors: tuple[str, ...] = ()
-
-
-def _normalize_base_url(base_url: str) -> str | None:
-    text = str(base_url or "").strip()
-    if not text.lower().startswith("https://"):
-        return None
-    return text.rstrip("/")
 
 
 def _raw_signal_payload(record: dict[str, Any]) -> dict[str, Any]:

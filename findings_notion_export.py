@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from grm_cli import write_json as _write_json
 from grm_common import SOURCE_HANDOFF
 from grm_handoff import TYPE_ROUTINE_HANDOFF, _intake_page_snapshot, fetch_intake_raw_payload
 from grm_notion import (
@@ -220,17 +221,6 @@ def export_notion_intake(
             },
         },
     }
-
-
-def _write_json(path: str | Path, data: dict[str, Any], *, pretty: bool) -> None:
-    text = json.dumps(
-        data,
-        ensure_ascii=False,
-        sort_keys=True,
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-    )
-    Path(path).write_text(text + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

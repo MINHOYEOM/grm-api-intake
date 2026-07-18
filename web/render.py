@@ -759,6 +759,10 @@ def _quiz_question_view(q: dict[str, Any]) -> dict[str, Any]:
         "source_glossary_id": ref if is_glossary else "",
         # brief/finding → 공개 절대 URL(스킴 화이트리스트 통과분만; 비허용은 ""→링크 생략).
         "source_url": (_safe_url(ref) if not is_glossary else ""),
+        # [9차 G3] week(YYYYWW) — 월 13:00 자동 생성 파이프라인이 붙이는 선택 필드. 있으면
+        # data-week 로 embed(문자열 정규화만 — 값 무변형), 없으면 "" → 템플릿이 조용히 생략
+        # (현 데이터 경로 = 기존 회전 그대로). 선택 로직은 클라이언트 quiz.js 소관.
+        "week": str(q.get("week") or ""),
     }
 
 

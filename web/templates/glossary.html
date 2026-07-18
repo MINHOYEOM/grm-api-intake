@@ -35,10 +35,14 @@
             <span class="gl-term-en">{{ t.term_en }}</span>
           </div>
           <p class="gl-def">{{ t.easy_ko }}</p>
+          {% if t.detail_ko %}<p class="gl-detail"><span class="gl-detail-k">실무 맥락</span>{{ t.detail_ko }}</p>{% endif %}
           {% if t.source_url %}
           <p class="gl-src"><span class="gl-src-k">출처</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
           {% else %}
           <p class="gl-src"><span class="gl-src-k">출처</span>{{ t.definition_source }}</p>
+          {% endif %}
+          {% if t.reg_refs %}
+          <div class="gl-refs"><span class="gl-refs-k">관련 조항</span>{% for r in t.reg_refs %}{% if r.url %}<a class="gl-refs-a" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gl-refs-a">{{ r.label }}</span>{% endif %}{% endfor %}</div>
           {% endif %}
           {% if t.related %}
           <div class="gl-rel">
@@ -53,6 +57,7 @@
     {% endfor %}
   </div>
 </main>
+{% include "backtotop.html" %}
 <style>
 /* [용어사전] 초성 색인·용어 카드 — grm.css 토큰만 사용(프리즈 보존).
    폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
@@ -85,6 +90,8 @@
 .gl-anchor:hover{color:var(--coral)}
 .gl-term-en{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.4}
 .gl-def{font-family:var(--sans);font-size:14.5px;line-height:1.66;color:var(--body);margin:2px 0 0;word-break:keep-all}
+.gl-detail{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:8px 0 0;padding:10px 12px;background:var(--soft);border-left:2px solid var(--line-2);border-radius:0 var(--rad-s) var(--rad-s) 0;word-break:keep-all}
+.gl-detail-k{display:block;font-weight:600;font-size:11.5px;color:var(--muted);margin-bottom:3px}
 .gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--lo);margin:4px 0 0;word-break:keep-all;overflow-wrap:anywhere}
 .gl-src-k{display:inline-block;font-weight:600;color:var(--muted);margin-right:6px}
 .gl-src-a{color:var(--lo);text-decoration:none;border-bottom:1px dotted var(--line-2);transition:color .14s var(--ease),border-color .14s var(--ease)}
@@ -94,6 +101,11 @@
 .gl-rel-k{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--muted);margin-right:2px}
 .gl-rel-a{font-family:var(--sans);font-size:12.5px;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:3px 9px;border-radius:999px;text-decoration:none;transition:background .14s var(--ease)}
 .gl-rel-a:hover{background:var(--soft);border-color:var(--coral)}
+.gl-refs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.gl-refs-k{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--muted);margin-right:2px}
+.gl-refs-a{display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-size:12.5px;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);padding:3px 9px;border-radius:999px;text-decoration:none;transition:border-color .14s var(--ease),color .14s var(--ease)}
+a.gl-refs-a:hover{color:var(--coral-2);border-color:var(--coral)}
+.gl-refs-a .ti{font-size:12px}
 @media (max-width:640px){ .gl-terms{grid-template-columns:1fr} .gl-tools{flex-direction:column;align-items:stretch} .gl-search{max-width:none} }
 </style>
 {% endblock %}

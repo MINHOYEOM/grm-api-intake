@@ -60,6 +60,7 @@ __all__ = [
     "WebLibraryRenderTest",
     "WebGuideRenderTest",
     "WebGlossaryRenderTest",
+    "WebGlossaryDeepFieldsTest",
     "WebFirmWatchlistTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
@@ -70,7 +71,7 @@ __all__ = [
     "WebBriefFirmLinkTest",
     "WebResourceNotesRenderTest",
     "WebResourceNotesGoldenInvarianceTest",
-    "WebGurumiWidgetTest",
+    "WebGurumiWidgetRemovedTest",
     "WebPopularCardsTest",
 ]
 
@@ -764,7 +765,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 소개·모아보기·찾아보기·트렌드·자료실·이용안내 6개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내 6개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
@@ -2644,7 +2645,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn('class="on">찾아보기', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
@@ -3095,7 +3096,7 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
         self.assertNotIn("findings/firm", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -4195,8 +4196,9 @@ class WebGlossaryRenderTest(unittest.TestCase):
             self.assertIn(str(_esc(combined)), self.html)
 
     def test_nav_active_and_meta(self):
-        # 용어사전 전용 탭이 없어 이용안내(guide) 탭 점등 유지.
-        self.assertIn('guide/index.html" class="on">이용안내</a>', self.html)
+        # [8차 웨이브 A] 용어사전 전용 nav 탭 신설 — glossary 탭이 점등된다(이용안내 아님).
+        self.assertIn('glossary/index.html" class="on">용어사전</a>', self.html)
+        self.assertNotIn('guide/index.html" class="on">이용안내</a>', self.html)
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/glossary/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
 
@@ -4212,6 +4214,95 @@ class WebGlossaryRenderTest(unittest.TestCase):
         _build_single(out2)
         self.assertEqual((self.single / "glossary" / "index.html").read_bytes(),
                          (out2 / "glossary" / "index.html").read_bytes(), "비결정론 렌더")
+
+
+class WebGlossaryDeepFieldsTest(unittest.TestCase):
+    """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
+    참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔
+    없다(부재해도 기존 렌더와 byte 동일해야 함) — "필드가 있으면 렌더" 조건부 배선만
+    이번에 구현한다. 무네트워크·결정론(합성 데이터만 사용)."""
+
+    def test_reg_refs_normalizes_mixed_input_and_drops_unsafe_or_blank(self):
+        synthetic = {
+            "id": "syn1", "term_ko": "합성용어", "term_en": "Synthetic Term",
+            "easy_ko": "테스트용 합성 용어입니다", "definition_source": "테스트",
+            "detail_ko": "실무에서는 이렇게 씁니다",
+            "reg_refs": [
+                "21 CFR 211.100",                                    # 문자열 → label 만
+                {"label": "ICH Q7", "url": "https://ich.org/q7"},    # dict + 안전 URL
+                {"label": "무링크 조항"},                              # dict, url 없음
+                {"label": "  ", "url": "https://x.com"},              # label 공백뿐 → 제외
+                {"url": "https://y.com"},                             # label 없음 → 제외
+                {"label": "위험스킴", "url": "javascript:alert(1)"},   # 비안전 URL → ""로 게이트
+            ],
+        }
+        view = render.build_glossary_view([synthetic])
+        t = view["groups"][0]["terms"][0]
+        self.assertEqual(t["detail_ko"], "실무에서는 이렇게 씁니다")
+        self.assertEqual(t["reg_refs"], [
+            {"label": "21 CFR 211.100", "url": ""},
+            {"label": "ICH Q7", "url": "https://ich.org/q7"},
+            {"label": "무링크 조항", "url": ""},
+            {"label": "위험스킴", "url": ""},
+        ])
+        self.assertIn("실무에서는 이렇게 씁니다", t["search"])
+
+    def test_fields_absent_matches_existing_shape_with_no_extra_whitespace_in_search(self):
+        plain = {
+            "id": "syn2", "term_ko": "평범용어", "term_en": "Plain Term",
+            "easy_ko": "필드가 없는 용어입니다", "definition_source": "테스트",
+        }
+        view = render.build_glossary_view([plain])
+        t = view["groups"][0]["terms"][0]
+        self.assertEqual(t["detail_ko"], "")
+        self.assertEqual(t["reg_refs"], [])
+        expected_search = " ".join([plain["term_ko"], plain["term_en"], plain["easy_ko"]]).lower()
+        self.assertEqual(t["search"], expected_search)
+        self.assertNotIn("  ", t["search"])  # 잉여 공백(이중 스페이스) 0
+
+    def test_template_renders_deep_fields_conditionally(self):
+        # glossary.json(정본)을 건드리지 않고 render.load_glossary 만 임시 스왑 — load_glossary
+        # 의 path 인자 기본값(GLOSSARY_FILE)은 정의 시점에 바인딩돼 모듈 속성 재대입으론 안
+        # 바뀌므로, 반환값 자체를 대체한다(popular.js 테스트의 SUPABASE_URL monkeypatch 관례
+        # 동형). full render_site 로 실제 base.html 배선(nav/globals)까지 통과한 glossary.html
+        # 렌더 결과를 검증한다.
+        terms = [
+            {
+                "id": "tpl1", "term_ko": "다카", "term_en": "Template Term A",
+                "easy_ko": "템플릿 검증용 설명 A", "definition_source": "테스트 출처",
+                "detail_ko": "실무 맥락 설명 예시입니다",
+                "reg_refs": ["21 CFR 211", {"label": "ICH Q7", "url": "https://ich.org/q7"}],
+            },
+            {
+                "id": "tpl2", "term_ko": "다나", "term_en": "Template Term B",
+                "easy_ko": "템플릿 검증용 설명 B", "definition_source": "테스트 출처",
+            },
+        ]
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gldeep_tpl_"))
+        orig_load = render.load_glossary
+        try:
+            render.load_glossary = lambda *a, **kw: terms
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            html = (out / "glossary" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.load_glossary = orig_load
+            shutil.rmtree(tmp, ignore_errors=True)
+
+        # 두 용어는 초성순 정렬로 다나(tpl2)가 다카(tpl1)보다 먼저 오므로(그룹 정렬 결정론),
+        # id 위치 순서에 기대지 않고 각자 </article> 까지 독립적으로 슬라이스한다.
+        block1 = html[html.index('id="tpl1"'):]
+        block1 = block1[:block1.index("</article>")]
+        self.assertIn('class="gl-detail"', block1)
+        self.assertIn("실무 맥락 설명 예시입니다", block1)
+        self.assertIn('class="gl-refs"', block1)
+        self.assertIn("21 CFR 211", block1)
+        self.assertIn('href="https://ich.org/q7"', block1)
+
+        block2 = html[html.index('id="tpl2"'):]
+        block2 = block2[:block2.index("</article>")]
+        self.assertNotIn('class="gl-detail"', block2)
+        self.assertNotIn('class="gl-refs"', block2)
 
 
 def freeze() -> None:
@@ -4744,78 +4835,39 @@ class WebResourceNotesGoldenInvarianceTest(unittest.TestCase):
         self.assertEqual(html, "")
 
 
-# ── [구르미 위젯] 랜딩 히어로 coverage 칩 — 렌더타임 임베드·전용 게이트·모션 계약 ──────
-class WebGurumiWidgetTest(unittest.TestCase):
-    """[구르미 위젯] 랜딩 전용 coverage 칩(설계조사 §5.1 안 A + §6 연출 A).
-
-    a) 단독 픽스처(최신호 2026-07-06, intake 89/rendered 36) 수치가 랜딩에 정확히 반영.
-    b) 위젯은 landing(index.html) 전용 — 브리프 상세·아카이브에는 미출력.
-    c) coverage 부재 브리프 → 위젯 전체 미출력(byte 0, 폴백 게이트).
-    d) 접근성(aria-hidden 장식 scene)·모션 계약(reduced-motion 최종상태 고정, 비반복).
-    결정론(동일 입력 2회 빌드 byte 동일)은 WebRenderDeterminismTest 가 전 파일(랜딩 포함)
-    이미 전역 커버 — 여기서 별도 추가하지 않음.
-    """
+# ── [구름이 위젯] 철거 확인 — 8차 웨이브 A(2026-07-18) 랜딩 재구성으로 완전 삭제 ────────
+class WebGurumiWidgetRemovedTest(unittest.TestCase):
+    """구름이 상태 위젯(coverage 칩)은 8차 웨이브 A 랜딩 재구성에서 완전 철거됐다(내부
+    개념 노출 대비 효과 낮음 판단). 과거 WebGurumiWidgetTest(위젯 존재를 전제하던 회귀
+    가드)를 대체 — 이제는 마크업·클래스·모션 키프레임이 전혀 남지 않았음을 확인한다.
+    render.py 는 이 건으로 미수정(cover.publish_date 는 다른 곳에서도 쓰여 그대로 둠)."""
 
     @classmethod
     def setUpClass(cls):
-        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gurumi_"))
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_nogurumi_"))
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
-        cls.brief_detail = (cls.single / "briefs" / "2026-06-26" / "index.html").read_text(
-            encoding="utf-8")
-        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    def test_widget_shows_latest_brief_counts(self):
-        self.assertIn("이번 주 구름이가 규제 소식 <b>89</b>건을 먹고", self.landing)
-        self.assertIn("핵심 카드 <b>36</b>장으로 정리했어요", self.landing)
-        self.assertIn("2026-07-06</span> 발행 기준", self.landing)
+    def test_gurumi_markup_and_classes_absent(self):
+        self.assertNotIn("gurumi", self.landing)
 
-    def test_widget_is_landing_only(self):
-        self.assertNotIn("gurumi", self.brief_detail)
-        self.assertNotIn("gurumi", self.archive)
+    def test_gurumi_keyframes_absent(self):
+        self.assertNotIn("@keyframes gurumiEat", self.landing)
+        self.assertNotIn("@keyframes gurumiCards", self.landing)
 
-    def test_widget_omitted_when_coverage_absent(self):
-        # 3440줄 부근 기존 하드닝 테스트(_minimal_brief)와 동일 스키마에서 coverage 키만 제거.
-        brief = _minimal_brief("2026-07-13")
-        del brief["brief"]["coverage"]
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gurumi_nocov_"))
-        try:
-            data, out = tmp / "data", tmp / "out"
-            data.mkdir(parents=True, exist_ok=True)
-            (data / "brief_web_2026_07_13.json").write_text(
-                json.dumps(brief, ensure_ascii=False), encoding="utf-8")
-            render.render_site(data, out)
-            landing = (out / "index.html").read_text(encoding="utf-8")
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
-        self.assertNotIn("gurumi", landing)
-
-    def test_scene_is_decorative_and_aria_hidden(self):
-        self.assertIn('class="gurumi-scene" aria-hidden="true"', self.landing)
-
-    def test_reduced_motion_locks_final_state(self):
-        marker = "구름이 상태 위젯"
-        self.assertIn(marker, self.landing)
-        css = self.landing[self.landing.index(marker):]
-        css = css[:css.index("</style>")]
-        self.assertIn("prefers-reduced-motion:reduce", css)
-        rm_block = css[css.index("prefers-reduced-motion:reduce"):]
-        self.assertIn(".g-scraps", rm_block)
-        self.assertIn(".g-cards", rm_block)
-        self.assertIn("animation:none", rm_block)
-
-    def test_motion_runs_once_not_infinite(self):
-        marker = "구름이 상태 위젯"
-        css = self.landing[self.landing.index(marker):]
-        css = css[:css.index("</style>")]
-        self.assertIn("@keyframes gurumiEat", css)
-        self.assertIn("@keyframes gurumiCards", css)
-        self.assertNotIn("infinite", css)
+    def test_this_week_zone_present_with_callout_and_popular(self):
+        # "이번 주" 통합 존 — This Week 콜아웃 + 인기 카드가 한 섹션(#this-week)에 응집.
+        self.assertIn('<section class="section" id="this-week">', self.landing)
+        zone = self.landing[self.landing.index('id="this-week"'):]
+        zone = zone[:zone.index("</section>")]
+        self.assertIn('class="callout"', zone)
+        self.assertIn('id="popular"', zone)
+        self.assertIn('id="grm-popular"', zone)
 
 
 # ── 인기 카드(Weekly Reactions) — 랜딩 정적 섹션 + popular.js 배선 ────────────────

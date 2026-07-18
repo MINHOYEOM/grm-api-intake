@@ -2,7 +2,11 @@
 {% block content %}
 {#- 랜딩 = v6 크림 에디토리얼 정적 카피. 데이터 바인딩은 히어로 다크 이슈카드(.issuecard)와
     코럴 콜아웃(.callout) 수치·CTA 링크뿐(spec §3.2). 카피는 v6 기반 + 2026-06-29 카피 정리
-    (나열·중복·표기 일관성) — 포커스는 기관 집약·기관별 정렬·시사점/점검(한국어 강조 최소화). -#}
+    (나열·중복·표기 일관성) — 포커스는 기관 집약·기관별 정렬·시사점/점검(한국어 강조 최소화).
+    섹션 순서(재배치 2026-07-18 — 8차 웨이브 A): 히어로 → "이번 주" 통합 존(This Week
+    콜아웃 + 인기 카드) → #why → 기능 6종(soft) → Card Anatomy → 퀴즈 CTA. 구름이 상태
+    위젯은 완전 철거(2회 배치 실패 판정 — 내용이 This Week 콜아웃 수치와 전면 중복이라
+    이동처 없음. render.py cover.publish_date 는 다른 곳에서도 쓰여 그대로 둠). -#}
 <main>
   <div class="wrap hero">
     <div class="hero-top"><span>제약 GMP · 품질 규제소식</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
@@ -52,6 +56,58 @@
       </div></div>
     </div>
   </div>
+
+  {#- "이번 주" 통합 존(재배치 2026-07-18 · Phase 0 안 A) — This Week 콜아웃과 인기 카드를
+      히어로 직후 한 섹션으로 응집(가치 제안 → 이번 주 소식 순 서사). 인기 카드(Weekly
+      Reactions) 계약 불변: 게이트 없이 항상 정적 렌더(빈 상태 = 골든 정본). popular.js
+      (비골든)가 런타임에 031 RPC(reactions_weekly_top)와 search-index.json 을 교차해
+      상위 3장을 채운다 — 실패/빈 집계 시 아래 정적 유도 문구를 그대로 유지(reactions.js
+      와 동일한 조용한 폴백 관례). RPC 는 card_id·distinct_user_count 두 필드만 반환
+      (불가침) — 화면 텍스트는 전부 인덱스 파생 + 숫자뿐. 섹션 하나에 h2 를 둘 두지 않기
+      위해 인기 카드 제목은 h3(.sec-title 로 시각 위계 유지). grm.css 프리즈 보존 위해
+      스코프 <style>. -#}
+  <section class="section" id="this-week"><div class="wrap">
+    <div class="callout">
+      <span class="kick">This Week</span>
+      <h2>이번 주, 무엇이 바뀌었을까요?</h2>
+      <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, <span style="white-space:nowrap">Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</span>. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
+      <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
+    </div>
+    <div id="popular">
+      <span class="kick">Weekly Reactions</span>
+      <h3 class="sec-title">이번 주 반응이 모인 카드</h3>
+      <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
+      <div id="grm-popular" data-index="/assets/search-index.json">
+        <div class="popular-empty">
+          <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
+          <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
+          <a class="btn" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 카드 보러 가기 <i class="ti ti-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <style>
+  /* "이번 주" 통합 존 — grm.css 토큰만(프리즈 보존). #this-week/.popular-* 스코프 한정.
+     .section 이 이미 96px 상하 패딩+상단 보더를 주므로 .callout 자체 margin(96px 0)은
+     0 으로 정리(겹쳐서 여백이 과대해지는 문제 방지), 콜아웃과 인기 카드는 28px 로 근접
+     배치해 한 존으로 읽히게 한다. */
+  #this-week .callout{margin:0}
+  #this-week #popular{margin-top:28px}
+  .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}
+  .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
+  .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px;word-break:keep-all}
+  .popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0 0 16px;word-break:keep-all}
+  .popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+  .popular-item:first-child{border-color:var(--coral)}
+  .popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
+  .popular-item:first-child .popular-rank{color:var(--coral)}
+  .popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none;word-break:keep-all}
+  .popular-title:hover{color:var(--coral)}
+  .popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+  @media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
+  </style>
 
   <section class="section" id="why"><div class="wrap lead">
     <div><span class="kick">Why GRM</span><h2>기관별 사이트 방문 없이,<br>한곳에서 확인합니다.</h2></div>
@@ -116,103 +172,6 @@
       </article>
     </div>
   </div></section>
-
-  {#- "이번 주" 존(재배치 2026-07-18 · Phase 0 안 A) — 구름이 상태 위젯을 히어로에서 분리해
-      동일 수치(수집 N·카드 M)를 말하는 This Week 콜아웃 바로 위로 응집. 위젯 계약 불변:
-      최신 브리프 coverage 렌더타임 임베드(외부 fetch·RPC 0), coverage 부재/0 브리프 →
-      게이트로 위젯·CSS 전체 미출력(byte 0 폴백 — 콜아웃 여백은 원형 유지). 일러스트는
-      장식(aria-hidden), 모션 CSS 1회·reduced-motion 존중. grm.css 프리즈 보존 위해 스코프
-      <style>. -#}
-  <div class="wrap">
-    {%- if cover.intake_total and cover.rendered and cover.publish_date %}
-    <div class="gurumi reveal">
-      <span class="gurumi-scene" aria-hidden="true">
-        <svg class="gurumi-svg" viewBox="0 0 92 56" xmlns="http://www.w3.org/2000/svg">
-          <g class="g-scraps">
-            <rect x="26" y="6" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-12 30.5 9.5)" />
-            <rect x="42" y="3" width="9" height="7" rx="1" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(8 46.5 6.5)" />
-            <rect x="56" y="7" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-4 60.5 10.5)" />
-          </g>
-          <path class="g-bowl" d="M20,30 C20,42 31,49 46,49 C61,49 72,42 72,30 L63,30 C63,39 55,43 46,43 C37,43 29,39 29,30 Z" fill="var(--soft)" stroke="var(--line-2)" stroke-width="1.1" />
-          <g class="g-cards">
-            <rect x="54" y="20" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(-7 66 28.5)" />
-            <rect x="51" y="17" width="24" height="17" rx="3" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(4 63 25.5)" />
-            <rect x="48" y="14" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--coral)" stroke-width="1" transform="rotate(-2 60 22.5)" />
-            <line x1="52" y1="20" x2="66" y2="20" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
-            <line x1="52" y1="24" x2="62" y2="24" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
-          </g>
-        </svg>
-      </span>
-      <p class="gurumi-txt">이번 주 구름이가 규제 소식 <b>{{ cover.intake_total }}</b>건을 먹고, 핵심 카드 <b>{{ cover.rendered }}</b>장으로 정리했어요. <span class="gurumi-date"><span class="mono">{{ cover.publish_date }}</span> 발행 기준</span></p>
-    </div>
-    <style>
-    /* 구름이 상태 위젯 — grm.css 토큰만(프리즈 보존). 마크업과 같은 게이트 안에 둬 폴백 시
-       CSS 도 함께 미출력(위젯 완전 미출력 = byte 0 계약을 문자열 하나까지 지킴).
-       재배치: 위젯이 콜아웃 상단 섹션 여백(96px)을 이어받고, 뒤따르는 콜아웃과는 밀착(18px)
-       — 위젯 미출력 시 이 오버라이드도 함께 사라져 콜아웃 여백이 원형(96px 0)으로 복원. */
-    .gurumi{display:flex;align-items:center;gap:16px;margin:96px 0 0;padding:16px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
-    .gurumi ~ .callout{margin-top:18px}
-    .gurumi-scene{flex:none;width:64px;line-height:0}
-    .gurumi-svg{width:100%;height:auto;display:block}
-    .gurumi-txt{font-family:var(--sans);font-size:14.5px;line-height:1.6;color:var(--body);margin:0;word-break:keep-all}
-    .gurumi-txt b{color:var(--ink);font-weight:600}
-    .gurumi-date{color:var(--muted);font-size:12.5px;margin-left:2px}
-    /* 연출 A(1회): 종이 조각이 그릇 쪽으로 사라지고, 뒤이어 카드 묶음이 떠오르며 등장. */
-    @keyframes gurumiEat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(10px)}}
-    @keyframes gurumiCards{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
-    .g-scraps{animation:gurumiEat .8s var(--ease) .9s forwards}
-    .g-cards{opacity:0;animation:gurumiCards .6s var(--ease) 1.6s forwards}
-    @media (prefers-reduced-motion:reduce){
-      .g-scraps,.g-cards{animation:none}
-      .g-scraps{opacity:0}
-      .g-cards{opacity:1}
-    }
-    @media (max-width:640px){ .gurumi{padding:12px 14px;gap:12px} .gurumi-scene{width:50px} }
-    </style>
-    {%- endif %}
-    <div class="callout">
-    <span class="kick">This Week</span>
-    <h2>이번 주, 무엇이 바뀌었을까요?</h2>
-    <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, <span style="white-space:nowrap">Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</span>. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
-    <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
-  </div></div>
-
-  {#- 인기 카드(Weekly Reactions) — 재배치 2026-07-18(Phase 0 안 A): 히어로 직후 → This Week
-      존 뒤·퀴즈 CTA 앞(가치 제안 → 이번 주 → 참여 순 서사). 계약 불변: 게이트 없이 항상
-      정적 렌더(빈 상태 = 골든 정본). popular.js(비골든)가 런타임에 031 RPC
-      (reactions_weekly_top)와 search-index.json 을 교차해 상위 3장을 채운다 — 실패/빈
-      집계 시 아래 정적 유도 문구를 그대로 유지(reactions.js 와 동일한 조용한 폴백 관례).
-      RPC 는 card_id·distinct_user_count 두 필드만 반환(불가침) — 화면 텍스트는 전부
-      인덱스 파생 + 숫자뿐. grm.css 프리즈 보존 위해 스코프 <style>(quiz-cta 선례). -#}
-  <section class="section" id="popular"><div class="wrap">
-    <span class="kick">Weekly Reactions</span>
-    <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
-    <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
-    <div id="grm-popular" data-index="/assets/search-index.json">
-      <div class="popular-empty">
-        <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
-        <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
-        <a class="btn" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 카드 보러 가기 <i class="ti ti-arrow-right"></i></a>
-      </div>
-    </div>
-  </div></section>
-  <style>
-  /* 인기 카드 섹션 — grm.css 토큰만(프리즈 보존). #popular/.popular-* 스코프 한정. */
-  .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}
-  .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
-  .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px;word-break:keep-all}
-  .popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0 0 16px;word-break:keep-all}
-  .popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
-  .popular-item:first-child{border-color:var(--coral)}
-  .popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
-  .popular-item:first-child .popular-rank{color:var(--coral)}
-  .popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
-  .popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none;word-break:keep-all}
-  .popular-title:hover{color:var(--coral)}
-  .popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
-  @media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
-  </style>
 
   {#- 주간 퀴즈 진입 배너(트랙 C) — 정적 카피 + CTA 링크뿐(데이터 바인딩 0). 전 직원
       대중 접근성 강화용 소형 스트립. grm.css 프리즈 보존 위해 스코프 <style>. -#}

@@ -1,0 +1,24 @@
+{#- 맨 위로 버튼(8차 웨이브 A 2026-07-18) — 공용 파셜. library_catalog.html·glossary.html·
+    quiz.html 3곳에서 include(목록/카드형 스크롤이 긴 페이지). scrollY>600 에서만 노출·
+    클릭 시 최상단 스무스 스크롤(prefers-reduced-motion:reduce 면 즉시 이동). 결정론
+    (now()/난수 0) — 스크롤 위치만 참조하는 순수 클라이언트 UI. grm.css 프리즈 보존 위해
+    스코프 <style>. -#}
+<button class="grm-top" id="grmTop" type="button" aria-label="맨 위로" hidden><i class="ti ti-arrow-up" aria-hidden="true"></i></button>
+<style>
+.grm-top{position:fixed;right:22px;bottom:26px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--canvas);border:1px solid var(--line-2);color:var(--muted);border-radius:50%;box-shadow:0 10px 24px -12px rgba(0,0,0,.28);cursor:pointer;z-index:50;transition:color .14s var(--ease),border-color .14s var(--ease),box-shadow .14s var(--ease)}
+.grm-top:hover{color:var(--coral-2);border-color:var(--coral)}
+.grm-top .ti{font-size:19px}
+.grm-top[hidden]{display:none}
+@media (max-width:640px){ .grm-top{width:40px;height:40px;right:16px;bottom:18px} .grm-top .ti{font-size:17px} }
+</style>
+<script>
+(function(){
+  var btn=document.getElementById('grmTop');
+  if(!btn) return;
+  addEventListener('scroll', function(){ btn.hidden = scrollY <= 600; }, {passive:true});
+  btn.addEventListener('click', function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    window.scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+  });
+})();
+</script>

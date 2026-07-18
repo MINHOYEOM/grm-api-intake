@@ -13,6 +13,10 @@
     <style>. 폭 기준(2026-07-18): 표준 wrap 전폭·좁은 캡 금지·한글 word-break:keep-all. -#}
 <main>
   <div class="wrap page-head lib-head">
+    {#- breadcrumb(8차 웨이브 A 2026-07-18) — registry 전 카탈로그(8개)가 이 공통 템플릿
+        하나로 렌더되므로 여기 1곳 수정으로 전파된다. guide/glossary/quiz 는 최상위 섹션
+        판단으로 breadcrumb 미부착(설계 확정). -#}
+    <nav class="lib-crumb reveal" aria-label="상위로"><a href="{{ rel_root }}library/index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i>자료실</a></nav>
     <span class="kick reveal" style="animation-delay:.02s">{{ lib.kick }}</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ lib.title }}</h1>
     <p class="reveal" style="animation-delay:.14s">{{ lib.intro }}</p>
@@ -77,10 +81,15 @@
     {% if lib.note %}<p class="lib-foot-note reveal">{{ lib.note }}</p>{% endif %}
   </div>
 </main>
+{% include "backtotop.html" %}
 <style>
 /* [자료실] 공통 카탈로그 — grm.css 토큰만 사용(프리즈 보존).
    폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
 .lib-head p{max-width:none;word-break:keep-all}  /* 공용 .page-head p 62ch 캡 해제 — 표준 wrap 전폭 */
+.lib-crumb{display:block;margin-bottom:14px}
+.lib-crumb a{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--muted);text-decoration:none}
+.lib-crumb a:hover{color:var(--coral-2)}
+.lib-crumb .ti{font-size:15px}
 .lib-body{padding-bottom:64px}
 .lib-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:22px}
 .lib-meta-i{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted)}

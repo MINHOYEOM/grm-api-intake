@@ -1,0 +1,292 @@
+{
+  "items": [
+    {
+      "id": "pics-pe-009-17-intro",
+      "code": "PE 009-17 (Intro)",
+      "title_en": "PIC/S GMP Guide: Introduction",
+      "doc_type": "GMP Guide",
+      "published_date": "2023-08-25",
+      "official_url": "https://picscheme.org/docview/6605",
+      "pdf_url": "https://picscheme.org/docview/6605"
+    },
+    {
+      "id": "pics-pe-009-17-part1",
+      "code": "PE 009-17 (Part I)",
+      "title_en": "PIC/S GMP Guide: Part I — Basic Requirements for Medicinal Products",
+      "doc_type": "GMP Guide",
+      "published_date": "2023-08-25",
+      "official_url": "https://picscheme.org/docview/6606",
+      "pdf_url": "https://picscheme.org/docview/6606"
+    },
+    {
+      "id": "pics-pe-009-17-part2",
+      "code": "PE 009-17 (Part II)",
+      "title_en": "PIC/S GMP Guide: Part II — Basic Requirements for Active Pharmaceutical Ingredients",
+      "doc_type": "GMP Guide",
+      "published_date": "2023-08-25",
+      "official_url": "https://picscheme.org/docview/6607",
+      "pdf_url": "https://picscheme.org/docview/6607"
+    },
+    {
+      "id": "pics-pe-009-17-annexes",
+      "code": "PE 009-17 (Annexes)",
+      "title_en": "PIC/S GMP Guide: Annexes",
+      "doc_type": "GMP Guide",
+      "published_date": "2023-08-25",
+      "official_url": "https://picscheme.org/docview/8881",
+      "pdf_url": "https://picscheme.org/docview/8881"
+    },
+    {
+      "id": "pics-pi-056-1",
+      "code": "PI 056-1",
+      "title_en": "PIC/S Guidance on Remote Assessments",
+      "doc_type": "Guidance",
+      "published_date": "2025-01-01",
+      "official_url": "https://picscheme.org/docview/9256",
+      "pdf_url": "https://picscheme.org/docview/9256"
+    },
+    {
+      "id": "pics-pi-057-1",
+      "code": "PI 057-1",
+      "title_en": "PIC/S Aide-Memoire on Remote Assessments",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2025-01-01",
+      "official_url": "https://picscheme.org/docview/9257",
+      "pdf_url": "https://picscheme.org/docview/9257"
+    },
+    {
+      "id": "pics-pi-054-1",
+      "code": "PI 054-1",
+      "title_en": "How to Evaluate and Demonstrate the Effectiveness of a Pharmaceutical Quality System with Regard to Risk-Based Change Management",
+      "doc_type": "Recommendation",
+      "published_date": "2021-07-15",
+      "official_url": "https://picscheme.org/docview/4294",
+      "pdf_url": "https://picscheme.org/docview/4294"
+    },
+    {
+      "id": "pics-pi-041-1",
+      "code": "PI 041-1",
+      "title_en": "Good Practices for Data Management and Integrity in Regulated GMP/GDP Environments",
+      "doc_type": "Guidance",
+      "published_date": "2021-07-01",
+      "official_url": "https://picscheme.org/docview/4234",
+      "pdf_url": "https://picscheme.org/docview/4234"
+    },
+    {
+      "id": "pics-pi-038-2",
+      "code": "PI 038-2",
+      "title_en": "Assessment of Quality Risk Management Implementation",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2021-01-01",
+      "official_url": "https://picscheme.org/docview/3823",
+      "pdf_url": "https://picscheme.org/docview/3823"
+    },
+    {
+      "id": "pics-pi-053-1",
+      "code": "PI 053-1",
+      "title_en": "Questions and Answers on the Implementation of Risk-Based Prevention of Cross-Contamination and Health-Based Exposure Limits",
+      "doc_type": "Guidance Q&A",
+      "published_date": "2020-06-01",
+      "official_url": "https://picscheme.org/docview/1948",
+      "pdf_url": "https://picscheme.org/docview/1948"
+    },
+    {
+      "id": "pics-pi-052-1",
+      "code": "PI 052-1",
+      "title_en": "Inspection of Health-Based Exposure Limit Assessments and Use in Quality Risk Management",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2020-06-01",
+      "official_url": "https://picscheme.org/docview/1947",
+      "pdf_url": "https://picscheme.org/docview/1947"
+    },
+    {
+      "id": "pics-pi-040-1",
+      "code": "PI 040-1",
+      "title_en": "Guidance on Classification of GMP Deficiencies",
+      "doc_type": "Guidance",
+      "published_date": "2019-01-01",
+      "official_url": "https://picscheme.org/docview/2303",
+      "pdf_url": "https://picscheme.org/docview/2303"
+    },
+    {
+      "id": "pics-pi-043-1",
+      "code": "PI 043-1",
+      "title_en": "Cross-Contamination in Shared Facilities",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2018-07-01",
+      "official_url": "https://picscheme.org/docview/2270",
+      "pdf_url": "https://picscheme.org/docview/2270"
+    },
+    {
+      "id": "pics-pi-047-1",
+      "code": "PI 047-1",
+      "title_en": "Guidelines on Good Distribution Practice of Active Substances for Medicinal Products for Human Use",
+      "doc_type": "Guidance",
+      "published_date": "2018-07-01",
+      "official_url": "https://picscheme.org/docview/2466",
+      "pdf_url": "https://picscheme.org/docview/2466"
+    },
+    {
+      "id": "pics-pi-046-1",
+      "code": "PI 046-1",
+      "title_en": "Guideline on Setting Health-Based Exposure Limits for Use in Risk Identification in the Manufacture of Different Medicinal Products in Shared Facilities",
+      "doc_type": "Guidance",
+      "published_date": "2018-07-01",
+      "official_url": "https://picscheme.org/docview/2467",
+      "pdf_url": "https://picscheme.org/docview/2467"
+    },
+    {
+      "id": "pics-pi-045-1",
+      "code": "PI 045-1",
+      "title_en": "Guidelines on the Formalised Risk Assessment for Ascertaining the Appropriate Good Manufacturing Practice for Excipients",
+      "doc_type": "Guidance",
+      "published_date": "2018-07-01",
+      "official_url": "https://picscheme.org/docview/2465",
+      "pdf_url": "https://picscheme.org/docview/2465"
+    },
+    {
+      "id": "pics-pi-048-1",
+      "code": "PI 048-1",
+      "title_en": "Guidance on GMP Inspection Reliance",
+      "doc_type": "Guidance",
+      "published_date": "2018-06-01",
+      "official_url": "https://picscheme.org/docview/2475",
+      "pdf_url": "https://picscheme.org/docview/2475"
+    },
+    {
+      "id": "pics-pi-010-5",
+      "code": "PI 010-5",
+      "title_en": "Procedure for Handling Rapid Alerts and Recalls Arising from Quality Defects",
+      "doc_type": "Procedure",
+      "published_date": "2017-07-01",
+      "official_url": "https://picscheme.org/docview/2681",
+      "pdf_url": "https://picscheme.org/docview/2681"
+    },
+    {
+      "id": "pics-pe-011-1",
+      "code": "PE 011-1",
+      "title_en": "PIC/S Guide to Good Distribution Practice for Medicinal Products",
+      "doc_type": "GDP Guide",
+      "published_date": "2014-06-01",
+      "official_url": "https://picscheme.org/docview/3450",
+      "pdf_url": "https://picscheme.org/docview/3450"
+    },
+    {
+      "id": "pics-pe-010-4",
+      "code": "PE 010-4",
+      "title_en": "Guide to Good Practices for the Preparation of Medicinal Products in Healthcare Establishments",
+      "doc_type": "Guidance",
+      "published_date": "2014-03-01",
+      "official_url": "https://picscheme.org/docview/3443",
+      "pdf_url": "https://picscheme.org/docview/3443"
+    },
+    {
+      "id": "pics-pi-007-6",
+      "code": "PI 007-6",
+      "title_en": "Validation of Aseptic Processes",
+      "doc_type": "Recommendation",
+      "published_date": "2011-01-01",
+      "official_url": "https://picscheme.org/docview/3446",
+      "pdf_url": "https://picscheme.org/docview/3446"
+    },
+    {
+      "id": "pics-pe-008-4",
+      "code": "PE 008-4",
+      "title_en": "Explanatory Notes for Pharmaceutical Manufacturers on the Preparation of a Site Master File",
+      "doc_type": "Guidance",
+      "published_date": "2011-01-01",
+      "official_url": "https://picscheme.org/docview/3463",
+      "pdf_url": "https://picscheme.org/docview/3463"
+    },
+    {
+      "id": "pics-pi-030-1",
+      "code": "PI 030-1",
+      "title_en": "Inspection of Active Pharmaceutical Ingredients",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2009-01-13",
+      "official_url": "https://picscheme.org/docview/3452",
+      "pdf_url": "https://picscheme.org/docview/3452"
+    },
+    {
+      "id": "pics-pi-011-3",
+      "code": "PI 011-3",
+      "title_en": "Good Practices for Computerised Systems in Regulated GxP Environments",
+      "doc_type": "Guidance",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3444",
+      "pdf_url": "https://picscheme.org/docview/3444"
+    },
+    {
+      "id": "pics-pi-006-3",
+      "code": "PI 006-3",
+      "title_en": "Validation Master Plan, Installation and Operational Qualification, Non-Sterile Process Validation and Cleaning Validation",
+      "doc_type": "Recommendation",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3447",
+      "pdf_url": "https://picscheme.org/docview/3447"
+    },
+    {
+      "id": "pics-pi-005-3",
+      "code": "PI 005-3",
+      "title_en": "Guidance on Parametric Release",
+      "doc_type": "Guidance",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3448",
+      "pdf_url": "https://picscheme.org/docview/3448"
+    },
+    {
+      "id": "pics-pi-014-3",
+      "code": "PI 014-3",
+      "title_en": "Isolators Used for Aseptic Processing and Sterility Testing",
+      "doc_type": "Recommendation",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3441",
+      "pdf_url": "https://picscheme.org/docview/3441"
+    },
+    {
+      "id": "pics-pi-012-3",
+      "code": "PI 012-3",
+      "title_en": "Recommendation on Sterility Testing",
+      "doc_type": "Recommendation",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3442",
+      "pdf_url": "https://picscheme.org/docview/3442"
+    },
+    {
+      "id": "pics-pi-023-2",
+      "code": "PI 023-2",
+      "title_en": "Inspection of Pharmaceutical Quality Control Laboratories",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3455",
+      "pdf_url": "https://picscheme.org/docview/3455"
+    },
+    {
+      "id": "pics-pi-024-3",
+      "code": "PI 024-3",
+      "title_en": "Inspection of Biotechnology Manufacturers",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2021-01-01",
+      "official_url": "https://picscheme.org/docview/3821",
+      "pdf_url": "https://picscheme.org/docview/3821"
+    },
+    {
+      "id": "pics-pi-009-4",
+      "code": "PI 009-4",
+      "title_en": "Inspection of Utilities",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2021-01-01",
+      "official_url": "https://picscheme.org/docview/3820",
+      "pdf_url": "https://picscheme.org/docview/3820"
+    },
+    {
+      "id": "pics-pi-021-2",
+      "code": "PI 021-2",
+      "title_en": "GMP Particularities for Clinical Trial Products",
+      "doc_type": "Aide-Memoire",
+      "published_date": "2007-09-25",
+      "official_url": "https://picscheme.org/docview/3456",
+      "pdf_url": "https://picscheme.org/docview/3456"
+    }
+  ]
+}

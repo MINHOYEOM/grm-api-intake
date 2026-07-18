@@ -1,0 +1,184 @@
+{
+  "items": [
+    {
+      "id": "fda-control-nitrosamine-impurities",
+      "title_en": "Control of Nitrosamine Impurities in Human Drugs",
+      "doc_type": "Final revised guidance",
+      "published_date": "2024-09-05",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/control-nitrosamine-impurities-human-drugs"
+    },
+    {
+      "id": "fda-q9-r1-quality-risk-management",
+      "code": "Q9(R1)",
+      "title_en": "Q9(R1) Quality Risk Management",
+      "doc_type": "Final guidance",
+      "published_date": "2023-05-03",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q9r1-quality-risk-management"
+    },
+    {
+      "id": "fda-testing-high-risk-components-deg-eg",
+      "title_en": "Testing of Glycerin, Propylene Glycol, Maltitol Solution, Hydrogenated Starch Hydrolysate, Sorbitol Solution, and Other High-Risk Drug Components for Diethylene Glycol and Ethylene Glycol",
+      "doc_type": "Final guidance",
+      "published_date": "2023-05-08",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/testing-glycerin-propylene-glycol-maltitol-solution-hydrogenated-starch-hydrolysate-sorbitol"
+    },
+    {
+      "id": "fda-q13-continuous-manufacturing",
+      "code": "Q13",
+      "title_en": "Q13 Continuous Manufacturing of Drug Substances and Drug Products",
+      "doc_type": "Final guidance",
+      "published_date": "2023-03-01",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q13-continuous-manufacturing-drug-substances-and-drug-products"
+    },
+    {
+      "id": "fda-comparability-protocols-postapproval-cmc",
+      "title_en": "Comparability Protocols for Postapproval Changes to the Chemistry, Manufacturing, and Controls Information in an NDA, ANDA, or BLA",
+      "doc_type": "Final guidance",
+      "published_date": "2022-10-13",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/comparability-protocols-postapproval-changes-chemistry-manufacturing-and-controls-information-nda"
+    },
+    {
+      "id": "fda-q3d-r2-elemental-impurities",
+      "code": "Q3D(R2)",
+      "title_en": "Q3D(R2) Guideline for Elemental Impurities",
+      "doc_type": "Final guidance",
+      "published_date": "2022-09-14",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3dr2-guideline-elemental-impurities"
+    },
+    {
+      "id": "fda-investigating-oos-test-results",
+      "title_en": "Investigating Out-of-Specification (OOS) Test Results for Pharmaceutical Production",
+      "doc_type": "Final revised guidance",
+      "published_date": "2022-05-16",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/investigating-out-specification-oos-test-results-pharmaceutical-production-level-2-revision"
+    },
+    {
+      "id": "fda-field-alert-report-submission-qa",
+      "title_en": "Field Alert Report Submission: Questions and Answers",
+      "doc_type": "Final guidance",
+      "published_date": "2021-07-22",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/field-alert-report-submission-questions-and-answers-guidance-industry"
+    },
+    {
+      "id": "fda-q12-product-lifecycle-management-annex",
+      "code": "Q12",
+      "title_en": "Q12 Technical and Regulatory Considerations for Pharmaceutical Product Lifecycle Management Annex",
+      "doc_type": "Final guidance",
+      "published_date": "2021-05-11",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-annex"
+    },
+    {
+      "id": "fda-cgmp-compounding-outsourcing-facilities",
+      "title_en": "Current Good Manufacturing Practice—Guidance for Human Drug Compounding Outsourcing Facilities Under Section 503B of the FD&C Act",
+      "doc_type": "Final guidance",
+      "published_date": "2020-01-22",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-guidance-human-drug-compounding-outsourcing-facilities-under"
+    },
+    {
+      "id": "fda-data-integrity-drug-cgmp-qa",
+      "title_en": "Data Integrity and Compliance With Drug CGMP: Questions and Answers",
+      "doc_type": "Final guidance",
+      "published_date": "2018-12-13",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-integrity-and-compliance-drug-cgmp-questions-and-answers"
+    },
+    {
+      "id": "fda-medical-gases-cgmp",
+      "title_en": "Medical Gases—Current Good Manufacturing Practice",
+      "doc_type": "Final guidance",
+      "published_date": "2017-06-29",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/medical-gases-current-good-manufacturing-practice"
+    },
+    {
+      "id": "fda-cgmp-combination-products",
+      "title_en": "Current Good Manufacturing Practice Requirements for Combination Products",
+      "doc_type": "Final guidance",
+      "published_date": "2017-01-11",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-requirements-combination-products"
+    },
+    {
+      "id": "fda-contract-manufacturing-quality-agreements",
+      "title_en": "Contract Manufacturing Arrangements for Drugs: Quality Agreements",
+      "doc_type": "Final guidance",
+      "published_date": "2016-11-23",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/contract-manufacturing-arrangements-drugs-quality-agreements-guidance-industry"
+    },
+    {
+      "id": "fda-q7-gmp-active-pharmaceutical-ingredients",
+      "code": "Q7",
+      "title_en": "Q7 Good Manufacturing Practice Guidance for Active Pharmaceutical Ingredients",
+      "doc_type": "Final guidance",
+      "published_date": "2016-09-30",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-guidance-industry"
+    },
+    {
+      "id": "fda-pyrogen-endotoxins-testing-qa",
+      "title_en": "Pyrogen and Endotoxins Testing: Questions and Answers",
+      "doc_type": "Final guidance",
+      "published_date": "2012-06-01",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pyrogen-and-endotoxins-testing-questions-and-answers"
+    },
+    {
+      "id": "fda-process-validation-general-principles",
+      "title_en": "Process Validation: General Principles and Practices",
+      "doc_type": "Final guidance",
+      "published_date": "2011-01-25",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/process-validation-general-principles-and-practices"
+    },
+    {
+      "id": "fda-parametric-release-moist-heat",
+      "title_en": "Submission of Documentation in Applications for Parametric Release of Human and Veterinary Drug Products Terminally Sterilized by Moist Heat Processes",
+      "doc_type": "Final guidance",
+      "published_date": "2010-02-26",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-applications-parametric-release-human-and-veterinary-drug-products"
+    },
+    {
+      "id": "fda-pharmaceutical-components-melamine",
+      "title_en": "Pharmaceutical Components at Risk for Melamine Contamination",
+      "doc_type": "Final guidance",
+      "published_date": "2009-08-06",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pharmaceutical-components-risk-melamine-contamination"
+    },
+    {
+      "id": "fda-container-closure-integrity-sterility-testing",
+      "title_en": "Container and Closure System Integrity Testing in Lieu of Sterility Testing as a Component of the Stability Protocol for Sterile Products",
+      "doc_type": "Final guidance",
+      "published_date": "2009-02-25",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-and-closure-system-integrity-testing-lieu-sterility-testing-component-stability-protocol"
+    },
+    {
+      "id": "fda-quality-systems-pharmaceutical-cgmp",
+      "title_en": "Quality Systems Approach to Pharmaceutical Current Good Manufacturing Practice Regulations",
+      "doc_type": "Final guidance",
+      "published_date": "2006-10-02",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/quality-systems-approach-pharmaceutical-current-good-manufacturing-practice-regulations"
+    },
+    {
+      "id": "fda-pat-framework",
+      "title_en": "PAT—A Framework for Innovative Pharmaceutical Development, Manufacturing, and Quality Assurance",
+      "doc_type": "Final guidance",
+      "published_date": "2004-10-04",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pat-framework-innovative-pharmaceutical-development-manufacturing-and-quality-assurance"
+    },
+    {
+      "id": "fda-sterile-drug-products-aseptic-processing",
+      "title_en": "Sterile Drug Products Produced by Aseptic Processing—Current Good Manufacturing Practice",
+      "doc_type": "Final guidance",
+      "published_date": "2004-10-04",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/sterile-drug-products-produced-aseptic-processing-current-good-manufacturing-practice"
+    },
+    {
+      "id": "fda-container-closure-systems-packaging",
+      "title_en": "Container Closure Systems for Packaging Human Drugs and Biologics",
+      "doc_type": "Final guidance",
+      "published_date": "1999-07-07",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics"
+    },
+    {
+      "id": "fda-sterilization-process-validation-submission",
+      "title_en": "Submission Documentation for Sterilization Process Validation in Applications for Human and Veterinary Drug Products",
+      "doc_type": "Final guidance",
+      "published_date": "1994-11-01",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-sterilization-process-validation-applications-human-and-veterinary-drug"
+    }
+  ]
+}

@@ -373,77 +373,134 @@ def load_briefs(data_dir: Path) -> list[dict[str, Any]]:
 
 
 # ── [자료실] 카탈로그 registry — 카탈로그 1개 추가 = 데이터 파일 1개 + 아래 항목 1개 ──
-# file 은 web/data/library/ 상대 파일명. 표시 카피(kick/blurb/intro/desc)는 데이터 스냅샷
-# 재생성과 독립인 카탈로그 고정 속성이라 registry 가 소유한다. 렌더는 전 카탈로그가 공통
-# 템플릿(library_catalog.html) 하나를 쓴다 — 템플릿·render_site 는 추가 시 무수정.
-LIBRARY_REGISTRY: list[dict[str, str]] = [
+# file 은 web/data/library/ 상대 파일명(v2 스키마: 평면 items[]·meta 없음 — 표시 카피는
+# 전부 registry 소유). 렌더는 전 카탈로그가 공통 템플릿(library_catalog.html) 하나를 쓴다
+# — 템플릿·render_site 는 추가 시 무수정. 선택 키:
+#   sort="published_desc"  발행일 내림차순 뷰 정렬(무날짜 항목은 뒤, 동일 날짜는 데이터 순).
+#                          미지정 = 데이터 순서 유지(ICH=코드순·EU GMP=Part/Annex 구조순).
+#   link_label             항목 official_url 이 개별 문서가 아니라 카탈로그 페이지로 수렴할 때
+#                          (ICH: 전 31토픽 → 공식 카탈로그 2페이지) 제목 링크 대신 그룹/항목
+#                          레벨의 정직한 라벨 링크로 렌더한다(개별 문서 링크로 오인 방지).
+#   groups_by_url          평면 items 를 official_url 부분일치로 계열 그룹핑(결정론 파생).
+#   public_base            상단 메타의 "공식 사이트" 링크.
+#   doc_type_labels        doc_type 표시층 매핑(데이터 무수정 — 뷰만). 내부 슬러그
+#                          (guidance-internal 등)를 한국어 라벨로, ""로 매핑하면 칩 숨김.
+#                          미등재 값은 원문 그대로 표시.
+LIBRARY_REGISTRY: list[dict[str, Any]] = [
     {"slug": "ich", "file": "ich.json", "unit": "토픽", "kick": "ICH · Guidelines",
-     "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽과 공식 원문.",
-     "intro": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 정리했으며, 각 토픽의 최신 Step·개정본·원문 PDF는 ICH 공식 페이지에서 확인하실 수 있습니다.",
-     "desc": "ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 계열별 토픽 목록과 ICH 공식 페이지 링크."},
+     "title": "ICH 가이드라인 카탈로그",
+     "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽을 한글 명칭과 함께 정리.",
+     "intro": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 한글 명칭을 병기해 정리했습니다. 각 토픽의 최신 Step·개정본·원문 PDF는 계열별 ICH 공식 카탈로그 페이지에서 확인하실 수 있습니다.",
+     "desc": "ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 코드·한글 명칭 병기와 ICH 공식 카탈로그 링크.",
+     "public_base": "https://www.ich.org/",
+     "link_label": "ICH 공식 카탈로그",
+     "doc_type_labels": {"guideline-topic": ""},
+     "groups_by_url": [
+         {"contains": "quality-guidelines", "badge": "Q", "label": "품질", "label_en": "Quality"},
+         {"contains": "multidisciplinary-guidelines", "badge": "M", "label": "다분야", "label_en": "Multidisciplinary"},
+     ]},
     {"slug": "mfds", "file": "mfds.json", "unit": "건", "kick": "MFDS · Guidance",
+     "title": "MFDS 지침·고시 아카이브",
      "blurb": "식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.",
-     "intro": "식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "식약처(MFDS) 지침·안내서·고시·행정예고 아카이브 — 제목·유형·발행일·공식 원문 링크."},
+     "intro": "식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 발행일 순으로 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "식약처(MFDS) 지침·안내서·고시·행정예고 아카이브 — 제목·유형·발행일·공식 원문 링크.",
+     "sort": "published_desc",
+     "doc_type_labels": {"guidance-internal": "공무원 지침서", "guidance-industry": "민원인 안내서·지침",
+                         "legislative-notice": "입법·행정예고", "notice-final": "고시 전문"}},
+    {"slug": "eu-gmp", "file": "eu_gmp.json", "unit": "건", "kick": "EU · EudraLex Vol 4",
+     "title": "EU GMP 기준서 (EudraLex Vol 4)",
+     "blurb": "유럽연합 의약품 GMP 기준서. Part I·II·III 각 장과 부속서(Annex)를 구조 순서대로 정리.",
+     "intro": "유럽연합 의약품 GMP 기준서(EudraLex Volume 4)의 문서 목록입니다. Part I(기본 요건)·Part II(원료의약품)·Part III(보조 문서)과 부속서(Annex)를 기준서 구조 순서대로 정리했으며, 각 문서의 공식 원문 PDF로 바로 연결됩니다. 법적 효력과 최신 개정본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "EU GMP 기준서(EudraLex Volume 4) 문서 목록 — Part I·II·III과 부속서(Annex), 공식 원문 PDF 링크."},
+    {"slug": "pics", "file": "pics.json", "unit": "건", "kick": "PIC/S · GMP Guide",
+     "title": "PIC/S GMP 가이드",
+     "blurb": "의약품실사상호협력기구(PIC/S)의 GMP 가이드(PE 009)와 부속서·가이던스 문서 목록.",
+     "intro": "의약품실사상호협력기구(PIC/S)가 공개한 GMP 가이드(PE 009) 각 부와 부속서, 관련 가이던스 문서를 발행일 순으로 정리했습니다. 식약처를 포함한 PIC/S 가입 규제기관의 실사 기준과 맞닿아 있는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "PIC/S GMP 가이드(PE 009)·부속서·가이던스 문서 목록 — 발행일·공식 원문 링크.",
+     "sort": "published_desc"},
+    {"slug": "who", "file": "who.json", "unit": "건", "kick": "WHO · TRS Annexes",
+     "title": "WHO TRS 부속서 모음",
+     "blurb": "WHO 전문가위원회 기술보고서(TRS) 부속서 중 GMP·품질 관련 문서 선별 목록.",
+     "intro": "세계보건기구(WHO) 의약품 표준 전문가위원회 기술보고서(TRS)의 부속서 가운데 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. WHO 사전적격성평가(PQ)나 국제 조달 요건을 다룰 때 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "WHO 기술보고서(TRS) 부속서 중 GMP·품질 문서 선별 목록 — 발행일·공식 원문 링크.",
+     "sort": "published_desc"},
+    {"slug": "fda-guidance", "file": "fda_guidance.json", "unit": "건", "kick": "FDA · Guidance",
+     "title": "FDA 가이던스 문서",
+     "blurb": "FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서 선별 목록.",
+     "intro": "미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요.",
+     "desc": "FDA 의약품 GMP·품질 가이던스 문서 선별 목록 — 발행일·유형·공식 원문 링크.",
+     "sort": "published_desc"},
 ]
 
 
-def _library_item_view(it: dict[str, Any], *, fallback_url: str = "") -> dict[str, Any]:
-    """카탈로그 항목 → 공통 항목 뷰 — 스키마 v2 우선·구 스키마 키 수용(값 무변형 통과).
+def _library_item_view(it: dict[str, Any]) -> dict[str, Any]:
+    """카탈로그 항목 → 공통 항목 뷰 — 스키마 v2(값 무변형 통과).
 
-    v2 선택 필드(code·title_ko·doc_type·published_date·ko_url·pdf_url)는 있으면 표시,
-    없으면 빈 문자열 → 템플릿이 조용히 생략. 날짜는 **발행일(published_date)만** 노출 —
-    수집일(collected_date)은 내부 운영 개념이라 사용자 표기 금지(품질 기준 2026-07-18)."""
-    title = it.get("title_en") or it.get("title") or ""
-    code = it.get("code") or ""
-    # 구 ICH 스키마: title 이 "Q1A - Q1F Stability" 처럼 code 를 접두로 중복 포함 — 제거.
-    if code and title.startswith(code):
-        title = title[len(code):].strip() or title
+    표시 제목은 한국어 우선: title_ko 가 있으면 주 제목, title_en 은 병기 줄(sub)로
+    내린다(한국어 사이트 — MFDS/ICH 병기). 선택 필드(code·doc_type·published_date·
+    ko_url·pdf_url)는 있으면 표시, 없으면 빈 문자열 → 템플릿이 조용히 생략. 날짜는
+    **발행일(published_date)만** 노출 — 수집일 등 내부 운영 개념은 사용자 표기 금지
+    (품질 기준 2026-07-18)."""
+    title_en = it.get("title_en") or it.get("title") or ""
+    title_ko = it.get("title_ko") or ""
     return {
-        "title": title,
-        "title_ko": it.get("title_ko") or "",
-        "code": code,
-        "doc_type": it.get("doc_type") or it.get("type_label") or "",
+        "title": title_ko or title_en,
+        "sub": title_en if title_ko else "",
+        "code": it.get("code") or "",
+        "doc_type": it.get("doc_type") or "",
         "published_date": it.get("published_date") or "",
-        "official_url": _safe_url(it.get("official_url") or fallback_url),
+        "official_url": _safe_url(it.get("official_url") or ""),
         "ko_url": _safe_url(it.get("ko_url") or ""),
         "pdf_url": _safe_url(it.get("pdf_url") or ""),
     }
 
 
-def _catalog_view(entry: dict[str, str], raw: dict[str, Any]) -> dict[str, Any]:
-    """카탈로그 raw(구·v2 스키마) → 공통 템플릿 뷰모델(결정론 — 데이터 파생, 창작 0).
+def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
+    """카탈로그 raw(v2 평면 items[]) → 공통 템플릿 뷰모델(결정론 — 데이터 파생, 창작 0).
 
-    그룹형(구 ICH `series[]`)은 계열 헤더·계열 공식 링크를 유지하고, 평면형(`items[]` —
-    구 MFDS·v2 공통)은 무라벨 단일 그룹으로 흡수한다. Tier/QA 등 내부 운영 필드는 뷰에
-    올리지 않는다(사용자 노출 금지)."""
-    meta = raw.get("meta", {})
+    - sort="published_desc": 발행일 내림차순 뷰 정렬(값 무수정 — 표시 순서만). 무날짜
+      항목은 뒤로, 동일 날짜는 데이터 순 유지(안정 정렬).
+    - groups_by_url: official_url 부분일치로 계열 그룹핑(ICH Q/M — 결정론 파생). 그룹
+      공식 링크 = 그룹 내 공유 URL. 매칭 실패 항목은 무라벨 그룹으로 뒤에 둔다.
+    - Tier/QA·수집일 등 내부 운영 필드는 뷰에 올리지 않는다(사용자 노출 금지)."""
+    items = [_library_item_view(it) for it in raw.get("items", [])]
+    labels = entry.get("doc_type_labels") or {}
+    for it in items:
+        it["doc_type"] = labels.get(it["doc_type"], it["doc_type"])
+    if entry.get("sort") == "published_desc":
+        items = sorted(items, key=lambda it: it["published_date"], reverse=True)
     groups: list[dict[str, Any]] = []
-    if raw.get("series"):
-        for s in raw["series"]:
+    if entry.get("groups_by_url"):
+        rest = list(items)
+        for spec in entry["groups_by_url"]:
+            matched = [it for it in rest if spec["contains"] in it["official_url"]]
+            rest = [it for it in rest if it not in matched]
             groups.append({
-                "badge": s.get("letter", ""),
-                "label": s.get("label_ko", ""),
-                "label_en": s.get("label_en", ""),
-                "blurb": s.get("blurb", ""),
-                "official_url": _safe_url(s.get("official_url", "")),
-                "items": [_library_item_view(t, fallback_url=s.get("official_url", ""))
-                          for t in s.get("topics", [])],
+                "badge": spec.get("badge", ""),
+                "label": spec.get("label", ""),
+                "label_en": spec.get("label_en", ""),
+                "blurb": spec.get("blurb", ""),
+                "official_url": matched[0]["official_url"] if matched else "",
+                "items": matched,
             })
+        if rest:
+            groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
+                           "official_url": "", "items": rest})
     else:
         groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
-                       "official_url": "",
-                       "items": [_library_item_view(it) for it in raw.get("items", [])]})
-    dates = [it["published_date"] for g in groups for it in g["items"] if it["published_date"]]
+                       "official_url": "", "items": items})
+    dates = [it["published_date"] for it in items if it["published_date"]]
+    meta = raw.get("meta", {})
     return {
         "slug": entry["slug"], "unit": entry["unit"], "kick": entry["kick"],
         "intro": entry["intro"], "blurb": entry["blurb"], "desc": entry["desc"],
-        "title": meta.get("title", ""),
+        "title": entry.get("title") or meta.get("title", ""),
         "note": meta.get("note", ""),
-        "public_base": _safe_url(meta.get("public_base", "")),
-        "count": sum(len(g["items"]) for g in groups),
+        "public_base": _safe_url(entry.get("public_base") or meta.get("public_base", "")),
+        "link_label": entry.get("link_label", ""),
+        "count": len(items),
         "latest_published": max(dates) if dates else "",
-        "grouped": bool(raw.get("series")),
+        "grouped": bool(entry.get("groups_by_url")),
         "groups": groups,
     }
 
@@ -596,6 +653,8 @@ def build_glossary_view(terms: list[dict[str, Any]]) -> dict[str, Any]:
             "term_en": t["term_en"],
             "easy_ko": t["easy_ko"],
             "definition_source": t["definition_source"],
+            # v2: 출처 공식 링크(있으면 출처 표기를 새 탭 링크로 — 값 무변형·안전 URL 만).
+            "source_url": _safe_url(t.get("source_url") or ""),
             "related": related,
             "bucket": _glossary_bucket(t["term_ko"]),
             "search": " ".join([t["term_ko"], t["term_en"], t["easy_ko"]]).lower(),

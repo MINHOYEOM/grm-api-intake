@@ -111,6 +111,10 @@ SINGLE_GOLDENS = [
     ("library/index.html", "library.expected.html"),
     ("library/ich/index.html", "library_ich.expected.html"),
     ("library/mfds/index.html", "library_mfds.expected.html"),
+    ("library/eu-gmp/index.html", "library_eu_gmp.expected.html"),
+    ("library/pics/index.html", "library_pics.expected.html"),
+    ("library/who/index.html", "library_who.expected.html"),
+    ("library/fda-guidance/index.html", "library_fda_guidance.expected.html"),
     ("guide/index.html", "guide.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),
@@ -3792,7 +3796,7 @@ class WebSeoMetaTest(unittest.TestCase):
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────
 class WebLibraryRenderTest(unittest.TestCase):
-    """[자료실 트랙 C] /library/ 허브 + ICH 카탈로그 + MFDS 아카이브 정적 렌더.
+    """[자료실 트랙 C] /library/ 허브 + registry 6카탈로그(v2 스키마) 정적 렌더.
 
     findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷(web/data/library/*.json)을
     결정론 렌더한다(주간 발행 게이트와 무관한 독립 섹션). 셸이 아니라 실데이터가 빌드시
@@ -3804,79 +3808,124 @@ class WebLibraryRenderTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.hub = (cls.single / "library" / "index.html").read_text(encoding="utf-8")
-        cls.ich = (cls.single / "library" / "ich" / "index.html").read_text(encoding="utf-8")
-        cls.mfds = (cls.single / "library" / "mfds" / "index.html").read_text(encoding="utf-8")
+        cls.pages = {e["slug"]: (cls.single / "library" / e["slug"] / "index.html")
+                     .read_text(encoding="utf-8") for e in render.LIBRARY_REGISTRY}
+        cls.data = {e["slug"]: json.loads((render.LIBRARY_DIR / e["file"])
+                    .read_text(encoding="utf-8")) for e in render.LIBRARY_REGISTRY}
+        cls.ich = cls.pages["ich"]
+        cls.mfds = cls.pages["mfds"]
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
-        cls.ich_data = json.loads((render.LIBRARY_DIR / "ich.json").read_text(encoding="utf-8"))
-        cls.mfds_data = json.loads((render.LIBRARY_DIR / "mfds.json").read_text(encoding="utf-8"))
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    def test_pages_generated(self):
+    def test_pages_generated_with_registry_titles(self):
         self.assertIn("자료실", self.hub)
-        self.assertIn("ICH 가이드라인 카탈로그", self.ich)
-        self.assertIn("MFDS 지침·고시 아카이브", self.mfds)
+        for e in render.LIBRARY_REGISTRY:
+            self.assertIn(e["title"], self.pages[e["slug"]], f"{e['slug']} 제목 누락")
 
-    def test_hub_links_both_catalogs(self):
-        self.assertIn('href="../library/ich/index.html"', self.hub)
-        self.assertIn('href="../library/mfds/index.html"', self.hub)
+    def test_hub_links_and_counts_all_catalogs(self):
+        # 허브 = registry 전 카탈로그 카드(6종) — 링크·건수 정합.
+        self.assertEqual(self.hub.count('class="lib-cat '), len(render.LIBRARY_REGISTRY))
+        for e in render.LIBRARY_REGISTRY:
+            self.assertIn(f'href="../library/{e["slug"]}/index.html"', self.hub)
+            n = len(self.data[e["slug"]]["items"])
+            self.assertIn(f'>{n}<span class="u">{e["unit"]}</span>', self.hub,
+                          f"{e['slug']} 허브 건수 표기 불일치")
 
     def test_nav_link_present_and_active(self):
         # 자료실 페이지에서만 nav 'on' 이 붙는다. 타 페이지엔 링크만.
         self.assertIn('library/index.html" class="on">자료실</a>', self.hub)
-        self.assertIn('library/index.html" class="on">자료실</a>', self.ich)
-        self.assertIn('library/index.html" class="on">자료실</a>', self.mfds)
+        for html in self.pages.values():
+            self.assertIn('library/index.html" class="on">자료실</a>', html)
         self.assertIn('href="library/index.html">자료실</a>', self.landing)
         self.assertNotIn('class="on">자료실</a>', self.landing)
 
-    def test_sitemap_includes_library(self):
-        for path in ("/library/", "/library/ich/", "/library/mfds/"):
+    def test_sitemap_includes_all_catalogs(self):
+        for path in ["/library/"] + [f"/library/{e['slug']}/" for e in render.LIBRARY_REGISTRY]:
             self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap)
 
-    def test_ich_all_topics_rendered_with_official_links(self):
-        topic_total = sum(len(s["topics"]) for s in self.ich_data["series"])
-        self.assertEqual(topic_total, self.ich_data["meta"]["topic_count"])
-        self.assertEqual(self.ich.count('<li class="lib-item">'), topic_total)
-        # 공식 링크는 계열별 www.ich.org/page/<slug> 로 새 탭 연결.
-        for s in self.ich_data["series"]:
-            self.assertIn(f'href="{s["official_url"]}"', self.ich)
-        self.assertNotIn("admin.ich.org", self.ich)  # 사람이 보는 URL 은 공개 페이지만
-        self.assertIn('target="_blank" rel="noopener"', self.ich)
+    def test_all_items_rendered_per_catalog(self):
+        for e in render.LIBRARY_REGISTRY:
+            n = len(self.data[e["slug"]]["items"])
+            self.assertEqual(self.pages[e["slug"]].count('<li class="lib-item">'), n,
+                             f"{e['slug']} 항목 수 불일치")
+
+    def test_flat_catalogs_link_every_official_url(self):
+        # link_label 카탈로그(ICH)를 제외한 전 카탈로그는 항목 제목이 공식 원문으로 직결.
+        for e in render.LIBRARY_REGISTRY:
+            if e.get("link_label"):
+                continue
+            html = self.pages[e["slug"]]
+            for it in self.data[e["slug"]]["items"]:
+                self.assertIn(f'href="{_esc(it["official_url"])}"', html,
+                              f"{e['slug']} 원문 링크 누락: {it['id']}")
+            self.assertIn('target="_blank" rel="noopener"', html)
+
+    def test_ich_honest_catalog_links(self):
+        # ICH v2: 전 토픽 official_url 이 공식 카탈로그 2페이지로 수렴 → 제목을 개별 문서
+        # 링크처럼 만들지 않고(항목 앵커 0), Q/M 그룹 헤더의 "ICH 공식 카탈로그" 라벨
+        # 링크로만 연결한다(정직한 링크 표기 — 품질 기준 2026-07-18).
+        self.assertNotIn('<a class="lib-item-a"', self.ich)
+        self.assertEqual(self.ich.count(">ICH 공식 카탈로그 <"), 2)
+        for url in sorted({it["official_url"] for it in self.data["ich"]["items"]}):
+            self.assertIn(f'class="lib-series-link" href="{url}"', self.ich)
+        # 코드·한글 병기: code 칩 + title_ko 주 제목 + title_en 병기 줄.
+        self.assertEqual(self.ich.count('class="lib-code"'), len(self.data["ich"]["items"]))
+        self.assertIn('<span class="lib-item-title">안정성</span>', self.ich)
+        self.assertIn('<p class="lib-item-sub">Stability</p>', self.ich)
+        # Q13 한글 번역본(ko_url) 칩 — v2 선택 필드 실전 소비.
+        ko = [it for it in self.data["ich"]["items"] if it.get("ko_url")]
+        self.assertTrue(ko, "ICH ko_url 항목(Q13) 기대")
+        for it in ko:
+            self.assertIn(f'href="{_esc(it["ko_url"])}"', self.ich)
+        self.assertIn("한글 번역본</a>", self.ich)
+
+    def test_published_desc_sort_applied(self):
+        # sort="published_desc" 카탈로그는 화면 순서가 발행일 내림차순(뷰 정렬 — 값 무수정).
+        import re as _re
+        for e in render.LIBRARY_REGISTRY:
+            html = self.pages[e["slug"]]
+            shown = _re.findall(r">발행 (\d{4}-\d{2}-\d{2})<", html)
+            n_pub = sum(1 for it in self.data[e["slug"]]["items"] if it.get("published_date"))
+            self.assertEqual(len(shown), n_pub, f"{e['slug']} 발행일 표기 수 불일치")
+            if e.get("sort") == "published_desc":
+                self.assertEqual(shown, sorted(shown, reverse=True),
+                                 f"{e['slug']} 발행일 내림차순 위반")
 
     def test_no_internal_ops_concepts_exposed(self):
-        # [품질 기준 2026-07-18] Tier/QA 칩 등 내부 운영 개념은 사용자 노출 금지.
-        for html in (self.hub, self.ich, self.mfds):
-            self.assertNotIn("Tier 1", html)
-            self.assertNotIn("Tier 2", html)
-            self.assertNotIn("Tier 3", html)
-            self.assertNotIn("QA 관련", html)
-            self.assertNotIn("signal_tier", html)
-            self.assertNotIn("qa_relevance", html)
+        # [품질 기준 2026-07-18] Tier/QA·수집일 등 내부 개념 텍스트 노출 금지. doc_type
+        # 원시 슬러그는 URL 경로에 우연히 포함될 수 있어(FDA guidance-industry 경로)
+        # 표시 칩(lib-type) 렌더로 한정해 검사한다.
+        for slug, html in {**self.pages, "hub": self.hub}.items():
+            for banned in ("Tier 1", "Tier 2", "Tier 3", "QA 관련", "signal_tier",
+                           "qa_relevance", "수집 기준", "최신 수집분", "최근 수집",
+                           "감지 기준일", "collected_date"):
+                self.assertNotIn(banned, html, f"{slug}: 내부 개념 노출 — {banned}")
+            for raw_slug in ("guidance-internal", "guidance-industry", "legislative-notice",
+                             "notice-final", "guideline-topic"):
+                self.assertNotIn(f'class="lib-type">{raw_slug}<', html,
+                                 f"{slug}: doc_type 원시 슬러그 칩 노출 — {raw_slug}")
 
-    def test_mfds_all_items_rendered_with_official_links(self):
-        items = self.mfds_data["items"]
-        self.assertEqual(len(items), self.mfds_data["meta"]["item_count"])
-        self.assertEqual(self.mfds.count('<li class="lib-item">'), len(items))
-        for it in items:
-            self.assertIn(f'href="{it["official_url"]}"', self.mfds)
+    def test_mfds_doc_type_labels_mapped(self):
+        # doc_type 원시 슬러그 → 한국어 표시 라벨(표시층 매핑 — 데이터 무수정).
+        import collections
+        counts = collections.Counter(it["doc_type"] for it in self.data["mfds"]["items"])
+        labels = next(e for e in render.LIBRARY_REGISTRY if e["slug"] == "mfds")["doc_type_labels"]
+        for raw, label in labels.items():
+            self.assertEqual(self.mfds.count(f'class="lib-type">{label}</span>'),
+                             counts.get(raw, 0), f"매핑 라벨 수 불일치: {raw}→{label}")
 
-    def test_dates_are_published_not_collected(self):
-        # [품질 기준 2026-07-18] 날짜 표기는 발행일(published_date)만 — "수집" 표기 금지.
-        # 데이터에 published_date 가 있는 항목만 날짜가 붙고, 없으면 날짜 자체를 감춘다.
-        n_pub = sum(1 for it in self.mfds_data["items"] if it.get("published_date"))
-        self.assertEqual(self.mfds.count(">발행 "), n_pub)
-        for html in (self.hub, self.ich, self.mfds):
-            self.assertNotIn("수집 기준", html)
-            self.assertNotIn("최신 수집분", html)
-            self.assertNotIn("최근 수집", html)
-            self.assertNotIn("감지 기준일", html)
-        for it in self.mfds_data["items"]:
-            if it.get("published_date"):
-                self.assertIn(f'발행 {it["published_date"]}', self.mfds)
-            self.assertNotIn(f'수집 {it["collected_date"]}<', self.mfds)
+    def test_redundant_pdf_chip_suppressed(self):
+        # pdf_url == official_url(PIC/S 전건)이면 중복 PDF 칩을 만들지 않는다.
+        pics = self.pages["pics"]
+        self.assertNotIn(">PDF</a>", pics)
+        # 구분되는 pdf_url(MFDS 전건)은 PDF 칩으로 노출.
+        n_mfds_pdf = sum(1 for it in self.data["mfds"]["items"]
+                         if it.get("pdf_url") and it["pdf_url"] != it["official_url"])
+        self.assertEqual(self.mfds.count('class="ti ti-file-type-pdf"'), n_mfds_pdf)
 
     def test_registry_common_template_covers_all_catalogs(self):
         # registry 기반 공통 템플릿 — 카탈로그 전 페이지가 library_catalog.html 하나로
@@ -3891,10 +3940,11 @@ class WebLibraryRenderTest(unittest.TestCase):
 
     def test_v2_optional_fields_conditionally_rendered(self):
         # 스키마 v2 선택 필드 — 있으면 표시·없으면 조용히 생략(공통 뷰 정규화 계약).
+        # 한국어 우선: title_ko 있으면 주 제목(title), title_en 은 병기(sub)로 내린다.
         v = render._catalog_view(
             {"slug": "x", "file": "x.json", "unit": "건", "kick": "X", "blurb": "b",
-             "intro": "i", "desc": "d"},
-            {"meta": {"title": "T"}, "items": [
+             "intro": "i", "desc": "d", "title": "T"},
+            {"items": [
                 {"id": "a", "title_en": "Guide A", "title_ko": "가이드 A",
                  "doc_type": "guidance", "published_date": "2026-01-02",
                  "official_url": "https://example.org/a",
@@ -3903,31 +3953,36 @@ class WebLibraryRenderTest(unittest.TestCase):
                 {"id": "b", "title_en": "Guide B", "official_url": "https://example.org/b"},
             ]})
         a, b = v["groups"][0]["items"]
-        self.assertEqual(a["title_ko"], "가이드 A")
+        self.assertEqual(a["title"], "가이드 A")
+        self.assertEqual(a["sub"], "Guide A")
         self.assertEqual(a["published_date"], "2026-01-02")
         self.assertEqual(a["ko_url"], "https://example.org/a-ko")
         self.assertEqual(a["pdf_url"], "https://example.org/a.pdf")
-        for k in ("title_ko", "code", "doc_type", "published_date", "ko_url", "pdf_url"):
+        self.assertEqual(b["title"], "Guide B")
+        for k in ("sub", "code", "doc_type", "published_date", "ko_url", "pdf_url"):
             self.assertEqual(b[k], "", f"선택 필드 {k} 는 부재 시 빈 문자열")
         self.assertEqual(v["latest_published"], "2026-01-02")
         self.assertEqual(v["count"], 2)
 
     def test_canonical_and_description(self):
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/" />', self.hub)
-        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/ich/" />', self.ich)
-        self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/mfds/" />', self.mfds)
-        for html in (self.hub, self.ich, self.mfds):
+        for e in render.LIBRARY_REGISTRY:
+            self.assertIn(
+                f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/{e["slug"]}/" />',
+                self.pages[e["slug"]])
+        for html in [self.hub, *self.pages.values()]:
             self.assertIn('<meta name="description" content="', html)
 
     def test_grm_css_untouched_by_library(self):
         # 자료실은 스코프 <style>(템플릿 인라인)만 쓰고 grm.css 를 편집하지 않는다.
-        for html in (self.hub, self.ich, self.mfds):
+        for html in [self.hub, *self.pages.values()]:
             self.assertIn("<style>", html)
 
     def test_render_is_deterministic(self):
         out2 = self._tmp / "single2"
         _build_single(out2)
-        for rel in ("library/index.html", "library/ich/index.html", "library/mfds/index.html"):
+        for rel in (["library/index.html"]
+                    + [f"library/{e['slug']}/index.html" for e in render.LIBRARY_REGISTRY]):
             self.assertEqual((self.single / rel).read_bytes(),
                              (out2 / rel).read_bytes(), f"비결정론 렌더: {rel}")
 
@@ -4068,13 +4123,23 @@ class WebGlossaryRenderTest(unittest.TestCase):
                     self.assertIn(f'class="gl-rel-a" href="#{r}"', self.html)
 
     def test_chosung_grouping_deterministic_and_ordered(self):
-        # 12개 버킷(ㄱㄷㄹㅁㅂㅅㅇㅈㅊㅍㅎ + A–Z) — 데이터 파생, 순서 고정.
+        # 버킷 = 데이터 파생(term_ko 초성), 순서 = _GLOSSARY_BUCKET_ORDER 고정(가나다→A–Z→#).
         view = render.build_glossary_view(self.terms)
         buckets = [b["bucket"] for b in view["buckets"]]
-        self.assertEqual(buckets,
-                         ["ㄱ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅍ", "ㅎ", "A–Z"])
+        expected_present = {render._glossary_bucket(t["term_ko"]) for t in self.terms}
+        order = {b: i for i, b in enumerate(render._GLOSSARY_BUCKET_ORDER)}
+        self.assertEqual(buckets, sorted(expected_present, key=lambda b: (order.get(b, 99), b)))
         self.assertEqual(self.html.count('<section class="gl-group"'), len(buckets))
         self.assertEqual(view["total"], len(self.terms))
+        self.assertEqual(len(self.terms), 145)  # v2 145어(교체 정합 가드)
+
+    def test_source_url_renders_source_as_link(self):
+        # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).
+        n_src = sum(1 for t in self.terms if t.get("source_url"))
+        self.assertEqual(self.html.count('class="gl-src-a"'), n_src)
+        for t in self.terms[:5]:
+            if t.get("source_url"):
+                self.assertIn(f'href="{_esc(t["source_url"])}"', self.html)
 
     def test_jump_index_matches_groups(self):
         # 색인 바 링크 = 그룹 앵커(빠짐·군더더기 0).

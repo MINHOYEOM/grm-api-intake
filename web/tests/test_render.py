@@ -4960,6 +4960,73 @@ class WebPopularCardsTest(unittest.TestCase):
             self.assertIn(cls.lstrip("."), self.popular_js)
 
 
+# ── 구름이 성장 시스템 v1(9차 G2) — /quiz/ 자리표시자 + growth.js 배선 ──────────────
+class WebGurumiGrowthTest(unittest.TestCase):
+    """구름이 성장 시스템 v1 — localStorage 단독(듀오링고식·무로그인·무랭킹). 성장 패널
+    마크업·수치는 전부 assets/growth.js 가 런타임 주입(결정론 골든 불침범) — 서버 렌더는
+    hidden 자리표시자 1줄뿐. quiz.js 는 무수정(채점·주차 회전 계약 불변 — growth.js 가
+    .qz-choice 클릭을 문서 위임으로 관찰만). 여기선 정적 셸·자산 배선·서버 전송 0 가드·
+    스키마 버전 마커를 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_growth_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.quiz = (cls.single / "quiz" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.growth_js = (WEB_DIR / "assets" / "growth.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_placeholder_static_hidden_and_before_tools(self):
+        # 자리표시자는 hidden 정적 1줄(내용 0) — JS 미로드 시 그대로 숨는다(PE).
+        self.assertIn('id="grm-growth" hidden aria-label="구름이 성장 현황"></section>', self.quiz)
+        self.assertLess(self.quiz.index('id="grm-growth"'), self.quiz.index('id="grm-qz"'))
+
+    def test_growth_js_wired_with_hash_and_copied_verbatim(self):
+        import re as _re
+        m = _re.search(r'assets/growth\.js\?v=([0-9a-f]{8})"', self.quiz)
+        self.assertIsNotNone(m, "growth.js 캐시버스팅 해시 미발견")
+        built = (self.single / "assets" / "growth.js").read_bytes()
+        src = (WEB_DIR / "assets" / "growth.js").read_bytes()
+        self.assertEqual(built, src, "growth.js 가 dist/assets 에 verbatim 복사되지 않음")
+
+    def test_growth_js_no_network_apis(self):
+        # 서버 전송 0(10차 서버 동기화 전까지 불가침) — 네트워크 API 일절 미사용.
+        for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket", "EventSource"):
+            self.assertNotIn(banned, self.growth_js, f"growth.js 네트워크 API 금지 위반: {banned}")
+
+    def test_growth_js_schema_version_and_storage_key(self):
+        # 스키마 version 필드(10차 서버 동기화 대비)·전용 키 — 마커 가드.
+        self.assertIn("SCHEMA_VERSION = 1", self.growth_js)
+        self.assertIn('"grm-gurumi-growth"', self.growth_js)
+        self.assertIn("localStorage", self.growth_js)
+
+    def test_growth_js_respects_reduced_motion_and_decorative_art(self):
+        self.assertIn("prefers-reduced-motion", self.growth_js)
+        self.assertIn('aria-hidden="true"', self.growth_js)   # 단계 아트 = 장식(수치는 텍스트 병행)
+
+    def test_growth_js_observes_quiz_without_touching_grading(self):
+        # quiz.js 채점 계약 불변 — growth.js 는 data-answer/data-i 읽기와 위임 수신만.
+        self.assertIn('closest(".qz-choice")', self.growth_js)
+        self.assertNotIn("data-done", self.growth_js)          # 채점 상태 마킹은 quiz.js 소유
+        self.assertNotIn("is-correct", self.growth_js)         # 채점 UI 클래스 미조작
+
+    def test_quiz_and_landing_copy_reflect_local_records(self):
+        # "기록 미저장" 카피는 성장 시스템과 모순 — 로컬 저장 명시 카피로 교체됐다.
+        self.assertNotIn("순위나 기록은 남기지 않으니", self.quiz)
+        self.assertIn("이 브라우저에만 저장", self.quiz)
+        self.assertIn("풀수록 구름이가 자라나요", self.landing)
+
+    def test_stage_ladder_five_stages(self):
+        # 5단계 사다리(알→아기→소년→어른→전설) — 명칭·순서 가드(카피 조정 시 의도 확인).
+        for name in ("알", "아기 구름이", "소년 구름이", "어른 구름이", "전설 구름이"):
+            self.assertIn(name, self.growth_js)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

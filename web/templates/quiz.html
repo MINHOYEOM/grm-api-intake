@@ -3,16 +3,22 @@
 {#- 주간 퀴즈(트랙 C) — web/data/quiz_bank.json(정본) 전 문항을 결정론 embed. "이번 주"
     문항 선택은 렌더러가 하지 않고(now() 금지·결정론 불가침) 클라이언트 assets/quiz.js 가
     ISO 주차 키로 결정론 회전 선택한다(같은 주 = 전 직원 동일 세트). 채점·해설·근거 링크도
-    전부 클라이언트(즉시 피드백)이며, 정답/해설/근거는 무변형(값 재작성 0). v1 비목표:
-    랭킹·참여기록·서버 저장 없음(점수는 화면 표시만). grm.css 프리즈 보존 위해 스코프
-    <style>(glossary 선례). JS 미로드 시 전 문항이 그대로 보이고 링크·해시 열람 무영향. -#}
+    전부 클라이언트(즉시 피드백)이며, 정답/해설/근거는 무변형(값 재작성 0). 랭킹·로그인·
+    서버 저장 없음 — 구름이 성장 시스템(9차 G2·assets/growth.js)이 localStorage 단독으로
+    풀이 기록을 적립한다(자리표시자 #grm-growth 는 hidden 정적 1줄 — JS 미로드 시 그대로
+    숨고 퀴즈 기본 동작 무영향). grm.css 프리즈 보존 위해 스코프 <style>(glossary 선례).
+    JS 미로드 시 전 문항이 그대로 보이고 링크·해시 열람 무영향. -#}
 {%- set marks = ['①', '②', '③', '④'] -%}
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Weekly Quiz</span>
     <h1 class="reveal" style="animation-delay:.08s">주간 퀴즈</h1>
-    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위나 기록은 남기지 않으니 부담 없이 풀어 보세요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
+    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위 경쟁은 없어요 — 풀이 기록은 이 브라우저에만 저장되어 구름이가 자라나요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
   </div>
+
+  {#- 구름이 성장 패널 자리표시자(9차 G2) — 마크업·수치는 전부 assets/growth.js 가 런타임
+      주입(localStorage 파생 — 결정론 골든 불침범). JS 미로드 시 hidden 그대로 = 무영향. -#}
+  <section class="wrap qz-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>
 
   <div class="wrap qz-tools reveal" style="animation-delay:.2s"
        id="grm-qz" data-weekly-count="{{ quiz.weekly_count }}" data-total="{{ quiz.total }}">
@@ -114,8 +120,34 @@
 .qz-src-link:hover{background:var(--soft);border-color:var(--coral)}
 .qz-src-link .ti{font-size:15px}
 @media (max-width:640px){ .qz-card{padding:18px 16px} .qz-bar{align-items:stretch} }
+/* [구름이 성장 패널 9차 G2] 마크업은 growth.js 런타임 주입 — 스타일만 정적(골든 안정).
+   grm.css 토큰만 사용(프리즈 보존)·한글 keep-all·자간/대문자/mono 미사용(§4). */
+.qz-growth{margin-top:18px}
+.qzg{display:flex;align-items:center;gap:18px;padding:18px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+.qzg-art{flex:none;width:84px;line-height:0}
+.qzg-art svg{width:100%;height:auto;display:block}
+.qzg-art.is-pulse svg{animation:qzgPulse .5s var(--ease)}
+@keyframes qzgPulse{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ .qzg-art.is-pulse svg{animation:none} }
+.qzg-main{flex:1;min-width:0}
+.qzg-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qzg-name{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--ink)}
+.qzg-lv{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.qzg-streak{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--med);background:rgba(176,125,23,.11);border:1px solid rgba(176,125,23,.24);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.qzg-streak[hidden]{display:none}
+.qzg-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin:3px 0 0;word-break:keep-all}
+.qzg-barwrap{margin-top:10px;height:8px;background:var(--canvas);border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+.qzg-bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--coral-2));border-radius:999px;transition:width .4s var(--ease)}
+@media (prefers-reduced-motion:reduce){ .qzg-bar{transition:none} }
+.qzg-meta{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:8px 0 0;word-break:keep-all}
+.qzg-meta > span:first-child{color:var(--coral-2);font-weight:600}
+.qzg-note{color:var(--lo)}
+.qzg-reset{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.qzg-reset:hover{color:var(--coral-2)}
+@media (max-width:640px){ .qzg{flex-direction:column;align-items:flex-start;gap:12px;padding:16px} .qzg-art{width:72px} }
 </style>
 {% endblock %}
 {% block scripts %}
 <script src="/assets/quiz.js?v={{ quizjs_ver }}" defer></script>
+<script src="/assets/growth.js?v={{ growthjs_ver }}" defer></script>
 {% endblock %}

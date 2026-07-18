@@ -60,6 +60,7 @@ __all__ = [
     "WebLibraryRenderTest",
     "WebGuideRenderTest",
     "WebGlossaryRenderTest",
+    "WebGlossaryDeepFieldsTest",
     "WebFirmWatchlistTest",
     "WebKoreanSafetyTest",
     "WebSeoMetaTest",
@@ -4213,6 +4214,95 @@ class WebGlossaryRenderTest(unittest.TestCase):
         _build_single(out2)
         self.assertEqual((self.single / "glossary" / "index.html").read_bytes(),
                          (out2 / "glossary" / "index.html").read_bytes(), "비결정론 렌더")
+
+
+class WebGlossaryDeepFieldsTest(unittest.TestCase):
+    """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
+    참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔
+    없다(부재해도 기존 렌더와 byte 동일해야 함) — "필드가 있으면 렌더" 조건부 배선만
+    이번에 구현한다. 무네트워크·결정론(합성 데이터만 사용)."""
+
+    def test_reg_refs_normalizes_mixed_input_and_drops_unsafe_or_blank(self):
+        synthetic = {
+            "id": "syn1", "term_ko": "합성용어", "term_en": "Synthetic Term",
+            "easy_ko": "테스트용 합성 용어입니다", "definition_source": "테스트",
+            "detail_ko": "실무에서는 이렇게 씁니다",
+            "reg_refs": [
+                "21 CFR 211.100",                                    # 문자열 → label 만
+                {"label": "ICH Q7", "url": "https://ich.org/q7"},    # dict + 안전 URL
+                {"label": "무링크 조항"},                              # dict, url 없음
+                {"label": "  ", "url": "https://x.com"},              # label 공백뿐 → 제외
+                {"url": "https://y.com"},                             # label 없음 → 제외
+                {"label": "위험스킴", "url": "javascript:alert(1)"},   # 비안전 URL → ""로 게이트
+            ],
+        }
+        view = render.build_glossary_view([synthetic])
+        t = view["groups"][0]["terms"][0]
+        self.assertEqual(t["detail_ko"], "실무에서는 이렇게 씁니다")
+        self.assertEqual(t["reg_refs"], [
+            {"label": "21 CFR 211.100", "url": ""},
+            {"label": "ICH Q7", "url": "https://ich.org/q7"},
+            {"label": "무링크 조항", "url": ""},
+            {"label": "위험스킴", "url": ""},
+        ])
+        self.assertIn("실무에서는 이렇게 씁니다", t["search"])
+
+    def test_fields_absent_matches_existing_shape_with_no_extra_whitespace_in_search(self):
+        plain = {
+            "id": "syn2", "term_ko": "평범용어", "term_en": "Plain Term",
+            "easy_ko": "필드가 없는 용어입니다", "definition_source": "테스트",
+        }
+        view = render.build_glossary_view([plain])
+        t = view["groups"][0]["terms"][0]
+        self.assertEqual(t["detail_ko"], "")
+        self.assertEqual(t["reg_refs"], [])
+        expected_search = " ".join([plain["term_ko"], plain["term_en"], plain["easy_ko"]]).lower()
+        self.assertEqual(t["search"], expected_search)
+        self.assertNotIn("  ", t["search"])  # 잉여 공백(이중 스페이스) 0
+
+    def test_template_renders_deep_fields_conditionally(self):
+        # glossary.json(정본)을 건드리지 않고 render.load_glossary 만 임시 스왑 — load_glossary
+        # 의 path 인자 기본값(GLOSSARY_FILE)은 정의 시점에 바인딩돼 모듈 속성 재대입으론 안
+        # 바뀌므로, 반환값 자체를 대체한다(popular.js 테스트의 SUPABASE_URL monkeypatch 관례
+        # 동형). full render_site 로 실제 base.html 배선(nav/globals)까지 통과한 glossary.html
+        # 렌더 결과를 검증한다.
+        terms = [
+            {
+                "id": "tpl1", "term_ko": "다카", "term_en": "Template Term A",
+                "easy_ko": "템플릿 검증용 설명 A", "definition_source": "테스트 출처",
+                "detail_ko": "실무 맥락 설명 예시입니다",
+                "reg_refs": ["21 CFR 211", {"label": "ICH Q7", "url": "https://ich.org/q7"}],
+            },
+            {
+                "id": "tpl2", "term_ko": "다나", "term_en": "Template Term B",
+                "easy_ko": "템플릿 검증용 설명 B", "definition_source": "테스트 출처",
+            },
+        ]
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_gldeep_tpl_"))
+        orig_load = render.load_glossary
+        try:
+            render.load_glossary = lambda *a, **kw: terms
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            html = (out / "glossary" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.load_glossary = orig_load
+            shutil.rmtree(tmp, ignore_errors=True)
+
+        # 두 용어는 초성순 정렬로 다나(tpl2)가 다카(tpl1)보다 먼저 오므로(그룹 정렬 결정론),
+        # id 위치 순서에 기대지 않고 각자 </article> 까지 독립적으로 슬라이스한다.
+        block1 = html[html.index('id="tpl1"'):]
+        block1 = block1[:block1.index("</article>")]
+        self.assertIn('class="gl-detail"', block1)
+        self.assertIn("실무 맥락 설명 예시입니다", block1)
+        self.assertIn('class="gl-refs"', block1)
+        self.assertIn("21 CFR 211", block1)
+        self.assertIn('href="https://ich.org/q7"', block1)
+
+        block2 = html[html.index('id="tpl2"'):]
+        block2 = block2[:block2.index("</article>")]
+        self.assertNotIn('class="gl-detail"', block2)
+        self.assertNotIn('class="gl-refs"', block2)
 
 
 def freeze() -> None:

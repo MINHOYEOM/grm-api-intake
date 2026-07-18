@@ -655,17 +655,41 @@ def load_glossary(path: Path = GLOSSARY_FILE) -> list[dict[str, Any]] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
+def _reg_ref_view(item: Any) -> dict[str, str] | None:
+    """[용어사전 심화] reg_refs 항목 1건 → {"label","url"} 정규화(무변형·안전 URL 게이트만).
+
+    문자열이면 label=문자열·url="". dict 면 label/url 을 각각 strip/_safe_url 게이트만
+    거쳐 통과. label 이 빈 항목(빈 문자열·공백뿐)은 조용히 제외(None) — 호출부가 필터."""
+    if isinstance(item, str):
+        label = item.strip()
+        return {"label": label, "url": ""} if label else None
+    if isinstance(item, dict):
+        label = (item.get("label") or "").strip()
+        if not label:
+            return None
+        return {"label": label, "url": _safe_url(item.get("url") or "")}
+    return None
+
+
 def build_glossary_view(terms: list[dict[str, Any]]) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
     related 는 데이터 순서 그대로 유지하며 존재하는 id 만 term_ko 라벨과 함께 통과(고아
-    참조는 조용히 제외). search 는 term_ko/term_en/easy_ko 를 소문자 결합(클라이언트 필터
-    입력값 — 표시 텍스트 무변형, 검색 대상 문자열만 별도 파생). 그룹·용어 정렬 결정론."""
+    참조는 조용히 제외). search 는 term_ko/term_en/easy_ko(+detail_ko 있을 때만)를 소문자
+    결합(클라이언트 필터 입력값 — 표시 텍스트 무변형, 검색 대상 문자열만 별도 파생).
+    detail_ko(실무 맥락 설명)·reg_refs(관련 조항 참조)는 병렬 작업자가 데이터에 추가할
+    선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로 정규화), 없으면 빈 값이라
+    기존 렌더와 byte 동일(search 에도 잉여 공백 미추가). 그룹·용어 정렬 결정론."""
     label_by_id = {t["id"]: t["term_ko"] for t in terms}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
         related = [{"id": r, "term_ko": label_by_id[r]}
                    for r in (t.get("related") or []) if r in label_by_id]
+        reg_refs = [v for v in (_reg_ref_view(r) for r in (t.get("reg_refs") or [])) if v]
+        search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
+        detail_ko = t.get("detail_ko") or ""
+        if detail_ko:
+            search_parts.append(detail_ko)
         return {
             "id": t["id"],
             "term_ko": t["term_ko"],
@@ -676,7 +700,10 @@ def build_glossary_view(terms: list[dict[str, Any]]) -> dict[str, Any]:
             "source_url": _safe_url(t.get("source_url") or ""),
             "related": related,
             "bucket": _glossary_bucket(t["term_ko"]),
-            "search": " ".join([t["term_ko"], t["term_en"], t["easy_ko"]]).lower(),
+            "search": " ".join(search_parts).lower(),
+            # v3(8차 웨이브 A): 심화 필드 — 부재 시 ""/[] 라 템플릿 {% if %} 게이트로 조용히 생략.
+            "detail_ko": detail_ko,
+            "reg_refs": reg_refs,
         }
 
     views = [_term_view(t) for t in terms]

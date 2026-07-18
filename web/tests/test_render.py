@@ -764,7 +764,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 소개·모아보기·찾아보기·트렌드·자료실·이용안내 6개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내 6개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
@@ -2644,7 +2644,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn('class="on">찾아보기', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
@@ -3095,7 +3095,7 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 소개·모아보기·찾아보기·트렌드·자료실·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
         self.assertNotIn("findings/firm", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -4195,8 +4195,9 @@ class WebGlossaryRenderTest(unittest.TestCase):
             self.assertIn(str(_esc(combined)), self.html)
 
     def test_nav_active_and_meta(self):
-        # 용어사전 전용 탭이 없어 이용안내(guide) 탭 점등 유지.
-        self.assertIn('guide/index.html" class="on">이용안내</a>', self.html)
+        # [8차 웨이브 A] 용어사전 전용 nav 탭 신설 — glossary 탭이 점등된다(이용안내 아님).
+        self.assertIn('glossary/index.html" class="on">용어사전</a>', self.html)
+        self.assertNotIn('guide/index.html" class="on">이용안내</a>', self.html)
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/glossary/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
 

@@ -1341,12 +1341,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.
+    # nav_active="glossary"(8차 웨이브 A 2026-07-18 — nav 에 용어사전 전용 탭 신설).
     glossary_terms = load_glossary()
     if glossary_terms:
         glossary_html = env.get_template("glossary.html").render(
             page_title="규제 용어사전 · GRM",
             rel_root="../",
-            nav_active="guide",
+            nav_active="glossary",
             latest_slug=latest_slug,
             description=GLOSSARY_DESCRIPTION,
             canonical=_abs_url("glossary/"),

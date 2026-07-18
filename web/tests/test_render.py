@@ -3839,34 +3839,78 @@ class WebLibraryRenderTest(unittest.TestCase):
     def test_ich_all_topics_rendered_with_official_links(self):
         topic_total = sum(len(s["topics"]) for s in self.ich_data["series"])
         self.assertEqual(topic_total, self.ich_data["meta"]["topic_count"])
-        self.assertEqual(self.ich.count('<li class="lib-topic">'), topic_total)
+        self.assertEqual(self.ich.count('<li class="lib-item">'), topic_total)
         # 공식 링크는 계열별 www.ich.org/page/<slug> 로 새 탭 연결.
         for s in self.ich_data["series"]:
             self.assertIn(f'href="{s["official_url"]}"', self.ich)
         self.assertNotIn("admin.ich.org", self.ich)  # 사람이 보는 URL 은 공개 페이지만
         self.assertIn('target="_blank" rel="noopener"', self.ich)
 
-    def test_ich_tier_chips_match_data(self):
-        for tier, cls in (("Tier 3", "t3"), ("Tier 2", "t2"), ("Tier 1", "t1")):
-            n = sum(1 for s in self.ich_data["series"]
-                    for t in s["topics"] if t["signal_tier"] == tier)
-            self.assertEqual(self.ich.count(f'lib-tier {cls}">'), n,
-                             f"{tier} 칩 수 불일치")
+    def test_no_internal_ops_concepts_exposed(self):
+        # [품질 기준 2026-07-18] Tier/QA 칩 등 내부 운영 개념은 사용자 노출 금지.
+        for html in (self.hub, self.ich, self.mfds):
+            self.assertNotIn("Tier 1", html)
+            self.assertNotIn("Tier 2", html)
+            self.assertNotIn("Tier 3", html)
+            self.assertNotIn("QA 관련", html)
+            self.assertNotIn("signal_tier", html)
+            self.assertNotIn("qa_relevance", html)
 
     def test_mfds_all_items_rendered_with_official_links(self):
         items = self.mfds_data["items"]
         self.assertEqual(len(items), self.mfds_data["meta"]["item_count"])
-        self.assertEqual(self.mfds.count('<li class="lib-item'), len(items))
+        self.assertEqual(self.mfds.count('<li class="lib-item">'), len(items))
         for it in items:
             self.assertIn(f'href="{it["official_url"]}"', self.mfds)
 
-    def test_mfds_latest_batch_badge_is_deterministic(self):
-        # "최신 수집분" 배지 = 최대 수집일 배치(now() 미사용, 데이터 파생).
-        latest = self.mfds_data["meta"]["latest_collected_date"]
-        n_latest = sum(1 for it in self.mfds_data["items"] if it["collected_date"] == latest)
-        self.assertEqual(self.mfds.count(">최신 수집분</span>"), n_latest)
-        self.assertTrue(all(it["is_latest_batch"] == (it["collected_date"] == latest)
-                            for it in self.mfds_data["items"]))
+    def test_dates_are_published_not_collected(self):
+        # [품질 기준 2026-07-18] 날짜 표기는 발행일(published_date)만 — "수집" 표기 금지.
+        # 데이터에 published_date 가 있는 항목만 날짜가 붙고, 없으면 날짜 자체를 감춘다.
+        n_pub = sum(1 for it in self.mfds_data["items"] if it.get("published_date"))
+        self.assertEqual(self.mfds.count(">발행 "), n_pub)
+        for html in (self.hub, self.ich, self.mfds):
+            self.assertNotIn("수집 기준", html)
+            self.assertNotIn("최신 수집분", html)
+            self.assertNotIn("최근 수집", html)
+            self.assertNotIn("감지 기준일", html)
+        for it in self.mfds_data["items"]:
+            if it.get("published_date"):
+                self.assertIn(f'발행 {it["published_date"]}', self.mfds)
+            self.assertNotIn(f'수집 {it["collected_date"]}<', self.mfds)
+
+    def test_registry_common_template_covers_all_catalogs(self):
+        # registry 기반 공통 템플릿 — 카탈로그 전 페이지가 library_catalog.html 하나로
+        # 렌더되고(전용 템플릿 0), registry 항목 수 = 생성된 카탈로그 페이지 수.
+        tpl_dir = WEB_DIR / "templates"
+        self.assertTrue((tpl_dir / "library_catalog.html").is_file())
+        self.assertFalse((tpl_dir / "library_ich.html").exists())
+        self.assertFalse((tpl_dir / "library_mfds.html").exists())
+        for e in render.LIBRARY_REGISTRY:
+            self.assertTrue((self.single / "library" / e["slug"] / "index.html").is_file(),
+                            f"registry 카탈로그 미생성: {e['slug']}")
+
+    def test_v2_optional_fields_conditionally_rendered(self):
+        # 스키마 v2 선택 필드 — 있으면 표시·없으면 조용히 생략(공통 뷰 정규화 계약).
+        v = render._catalog_view(
+            {"slug": "x", "file": "x.json", "unit": "건", "kick": "X", "blurb": "b",
+             "intro": "i", "desc": "d"},
+            {"meta": {"title": "T"}, "items": [
+                {"id": "a", "title_en": "Guide A", "title_ko": "가이드 A",
+                 "doc_type": "guidance", "published_date": "2026-01-02",
+                 "official_url": "https://example.org/a",
+                 "ko_url": "https://example.org/a-ko",
+                 "pdf_url": "https://example.org/a.pdf"},
+                {"id": "b", "title_en": "Guide B", "official_url": "https://example.org/b"},
+            ]})
+        a, b = v["groups"][0]["items"]
+        self.assertEqual(a["title_ko"], "가이드 A")
+        self.assertEqual(a["published_date"], "2026-01-02")
+        self.assertEqual(a["ko_url"], "https://example.org/a-ko")
+        self.assertEqual(a["pdf_url"], "https://example.org/a.pdf")
+        for k in ("title_ko", "code", "doc_type", "published_date", "ko_url", "pdf_url"):
+            self.assertEqual(b[k], "", f"선택 필드 {k} 는 부재 시 빈 문자열")
+        self.assertEqual(v["latest_published"], "2026-01-02")
+        self.assertEqual(v["count"], 2)
 
     def test_canonical_and_description(self):
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/library/" />', self.hub)
@@ -3913,20 +3957,30 @@ class WebGuideRenderTest(unittest.TestCase):
         self.assertNotIn("<h1>GRM 이용 안내</h1>", self.html)  # md h1 이 본문 h1 로 재출력되지 않음
 
     def test_all_sections_and_subsections_rendered(self):
-        # md 의 ## 5개·### 8개가 모두 h2/h3 로 변환됐는지(개수 일치).
+        # md 의 ## 8개·### 11개가 모두 h2/h3 로 변환됐는지(개수 일치). h2 는 목차 앵커
+        # id(sec-N)를 달고 나온다(2026-07-18 개편).
         n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
         n_h3 = sum(1 for ln in self.md.splitlines() if ln.startswith("### "))
-        self.assertEqual(n_h2, 5)
-        self.assertEqual(n_h3, 8)
-        self.assertEqual(self.html.count("<h2>"), n_h2)
+        self.assertEqual(n_h2, 8)
+        self.assertEqual(n_h3, 11)
+        self.assertEqual(self.html.count('<h2 id="sec-'), n_h2)
         self.assertEqual(self.html.count("<h3>"), n_h3)
+
+    def test_toc_derived_from_h2(self):
+        # 상단 목차 = 렌더러가 h2 에서 결정론 파생(id="sec-N" ↔ href="#sec-N" 쌍 일치).
+        n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        self.assertIn('class="wrap guide-toc', self.html)
+        for i in range(1, n_h2 + 1):
+            self.assertIn(f'href="#sec-{i}"', self.html)
+            self.assertIn(f'<h2 id="sec-{i}">', self.html)
+        self.assertNotIn(f'href="#sec-{n_h2 + 1}"', self.html)
 
     def test_lists_and_inline_markup_converted(self):
         self.assertIn("<ul>", self.html)
         self.assertIn("<ol>", self.html)
         self.assertIn("<li>", self.html)
         self.assertIn("<strong>", self.html)
-        self.assertIn("<code>findings</code>", self.html)
+        self.assertIn("<code>OOS</code>", self.html)
 
     def test_no_raw_markdown_markers_leak_in_body(self):
         # 본문 프로즈에 미변환 `**`·인라인 백틱이 남지 않아야 한다(변환 누락 방지).
@@ -3946,10 +4000,12 @@ class WebGuideRenderTest(unittest.TestCase):
 
     def test_inline_html_in_content_would_be_escaped(self):
         # _md_inline 은 텍스트를 먼저 escape → 제한 마커만 태그 승격(XSS 방어선).
-        title, body = render.render_guide_html("## <script>alert(1)</script> **굵게**")
+        title, toc, body = render.render_guide_html("## <script>alert(1)</script> **굵게**")
         self.assertIn("&lt;script&gt;", str(body))
         self.assertNotIn("<script>", str(body))
         self.assertIn("<strong>굵게</strong>", str(body))
+        # 목차 라벨은 마커 제거 평문(태그 승격 없음 — 템플릿 autoescape 경로).
+        self.assertEqual(toc, [{"id": "sec-1", "title": "<script>alert(1)</script> 굵게"}])
 
     def test_glossary_crosslink_present(self):
         self.assertIn('href="../glossary/index.html"', self.html)
@@ -4647,7 +4703,7 @@ class WebGurumiWidgetTest(unittest.TestCase):
         self.assertIn('class="gurumi-scene" aria-hidden="true"', self.landing)
 
     def test_reduced_motion_locks_final_state(self):
-        marker = "구르미 상태 위젯"
+        marker = "구름이 상태 위젯"
         self.assertIn(marker, self.landing)
         css = self.landing[self.landing.index(marker):]
         css = css[:css.index("</style>")]
@@ -4658,7 +4714,7 @@ class WebGurumiWidgetTest(unittest.TestCase):
         self.assertIn("animation:none", rm_block)
 
     def test_motion_runs_once_not_infinite(self):
-        marker = "구르미 상태 위젯"
+        marker = "구름이 상태 위젯"
         css = self.landing[self.landing.index(marker):]
         css = css[:css.index("</style>")]
         self.assertIn("@keyframes gurumiEat", css)

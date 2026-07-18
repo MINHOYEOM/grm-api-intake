@@ -89,82 +89,15 @@
       <div><b>주 1회</b><span>정기 발행</span></div>
       <div><b>A·B·C</b><span>신뢰 등급</span></div>
       <div><b>100%</b><span>원문 추적</span></div>
-    </div>    <div class="gurumi reveal" style="animation-delay:.48s">
-      <span class="gurumi-scene" aria-hidden="true">
-        <svg class="gurumi-svg" viewBox="0 0 92 56" xmlns="http://www.w3.org/2000/svg">
-          <g class="g-scraps">
-            <rect x="26" y="6" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-12 30.5 9.5)" />
-            <rect x="42" y="3" width="9" height="7" rx="1" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(8 46.5 6.5)" />
-            <rect x="56" y="7" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-4 60.5 10.5)" />
-          </g>
-          <path class="g-bowl" d="M20,30 C20,42 31,49 46,49 C61,49 72,42 72,30 L63,30 C63,39 55,43 46,43 C37,43 29,39 29,30 Z" fill="var(--soft)" stroke="var(--line-2)" stroke-width="1.1" />
-          <g class="g-cards">
-            <rect x="54" y="20" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(-7 66 28.5)" />
-            <rect x="51" y="17" width="24" height="17" rx="3" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(4 63 25.5)" />
-            <rect x="48" y="14" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--coral)" stroke-width="1" transform="rotate(-2 60 22.5)" />
-            <line x1="52" y1="20" x2="66" y2="20" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
-            <line x1="52" y1="24" x2="62" y2="24" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
-          </g>
-        </svg>
-      </span>
-      <p class="gurumi-txt">이번 주 구름이가 규제 소식 <b>89</b>건을 먹고, 핵심 카드 <b>36</b>장으로 정리했어요. <span class="gurumi-date"><span class="mono">2026-07-06</span> 발행 기준</span></p>
     </div>
-    <style>
-    /* 구르미 상태 위젯 — grm.css 토큰만(프리즈 보존). 마크업과 같은 게이트 안에 둬 폴백 시
-       CSS 도 함께 미출력(위젯 완전 미출력 = byte 0 계약을 문자열 하나까지 지킴). */
-    .gurumi{display:flex;align-items:center;gap:16px;margin-top:14px;padding:14px 18px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
-    .gurumi-scene{flex:none;width:64px;line-height:0}
-    .gurumi-svg{width:100%;height:auto;display:block}
-    .gurumi-txt{font-family:var(--sans);font-size:14.5px;line-height:1.6;color:var(--body);margin:0}
-    .gurumi-txt b{color:var(--ink);font-weight:600}
-    .gurumi-date{color:var(--muted);font-size:12.5px;margin-left:2px}
-    /* 연출 A(1회): 종이 조각이 그릇 쪽으로 사라지고, 뒤이어 카드 묶음이 떠오르며 등장. */
-    @keyframes gurumiEat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(10px)}}
-    @keyframes gurumiCards{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
-    .g-scraps{animation:gurumiEat .8s var(--ease) .9s forwards}
-    .g-cards{opacity:0;animation:gurumiCards .6s var(--ease) 1.6s forwards}
-    @media (prefers-reduced-motion:reduce){
-      .g-scraps,.g-cards{animation:none}
-      .g-scraps{opacity:0}
-      .g-cards{opacity:1}
-    }
-    @media (max-width:640px){ .gurumi{padding:12px 14px;gap:12px} .gurumi-scene{width:50px} }
-    </style>    <div class="srcs reveal" style="animation-delay:.44s">
+    <div class="srcs reveal" style="animation-delay:.44s">
       <span class="l">수집 대상 — 11 sources</span>
       <div class="marquee"><div class="track">
         <span>FDA</span><span>EMA</span><span>MHRA</span><span>PIC/S</span><span>ICH</span><span>MFDS</span><span>WHO</span><span>Health&nbsp;Canada</span><span>ECA</span><span>OpenFDA</span><span>TGA</span>
         <span aria-hidden="true">FDA</span><span aria-hidden="true">EMA</span><span aria-hidden="true">MHRA</span><span aria-hidden="true">PIC/S</span><span aria-hidden="true">ICH</span><span aria-hidden="true">MFDS</span><span aria-hidden="true">WHO</span><span aria-hidden="true">Health&nbsp;Canada</span><span aria-hidden="true">ECA</span><span aria-hidden="true">OpenFDA</span><span aria-hidden="true">TGA</span>
       </div></div>
     </div>
-  </div><section class="section" id="popular"><div class="wrap">
-    <span class="kick">Weekly Reactions</span>
-    <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
-    <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
-    <div id="grm-popular" data-index="/assets/search-index.json">
-      <div class="popular-empty">
-        <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
-        <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
-        <a class="btn" href="briefs/2026-07-06/index.html">이번 주 카드 보러 가기 <i class="ti ti-arrow-right"></i></a>
-      </div>
-    </div>
-  </div></section>
-  <style>
-  /* 인기 카드 섹션 — grm.css 토큰만(프리즈 보존). #popular/.popular-* 스코프 한정. */
-  .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0}
-  .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
-  .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px}
-  .popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0 0 16px}
-  .popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
-  .popular-item:first-child{border-color:var(--coral)}
-  .popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
-  .popular-item:first-child .popular-rank{color:var(--coral)}
-  .popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
-  .popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none}
-  .popular-title:hover{color:var(--coral)}
-  .popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
-  @media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
-  </style>
+  </div>
 
   <section class="section" id="why"><div class="wrap lead">
     <div><span class="kick">Why GRM</span><h2>기관별 사이트 방문 없이,<br>한곳에서 확인합니다.</h2></div>
@@ -223,14 +156,83 @@
         </div>
       </article>
     </div>
-  </div></section>
-
-  <div class="wrap"><div class="callout">
+  </div></section><div class="wrap">    <div class="gurumi reveal">
+      <span class="gurumi-scene" aria-hidden="true">
+        <svg class="gurumi-svg" viewBox="0 0 92 56" xmlns="http://www.w3.org/2000/svg">
+          <g class="g-scraps">
+            <rect x="26" y="6" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-12 30.5 9.5)" />
+            <rect x="42" y="3" width="9" height="7" rx="1" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(8 46.5 6.5)" />
+            <rect x="56" y="7" width="9" height="7" rx="1" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.6" transform="rotate(-4 60.5 10.5)" />
+          </g>
+          <path class="g-bowl" d="M20,30 C20,42 31,49 46,49 C61,49 72,42 72,30 L63,30 C63,39 55,43 46,43 C37,43 29,39 29,30 Z" fill="var(--soft)" stroke="var(--line-2)" stroke-width="1.1" />
+          <g class="g-cards">
+            <rect x="54" y="20" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(-7 66 28.5)" />
+            <rect x="51" y="17" width="24" height="17" rx="3" fill="var(--soft)" stroke="var(--line-2)" stroke-width="0.8" transform="rotate(4 63 25.5)" />
+            <rect x="48" y="14" width="24" height="17" rx="3" fill="var(--canvas)" stroke="var(--coral)" stroke-width="1" transform="rotate(-2 60 22.5)" />
+            <line x1="52" y1="20" x2="66" y2="20" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
+            <line x1="52" y1="24" x2="62" y2="24" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" transform="rotate(-2 60 22.5)" />
+          </g>
+        </svg>
+      </span>
+      <p class="gurumi-txt">이번 주 구름이가 규제 소식 <b>89</b>건을 먹고, 핵심 카드 <b>36</b>장으로 정리했어요. <span class="gurumi-date"><span class="mono">2026-07-06</span> 발행 기준</span></p>
+    </div>
+    <style>
+    /* 구름이 상태 위젯 — grm.css 토큰만(프리즈 보존). 마크업과 같은 게이트 안에 둬 폴백 시
+       CSS 도 함께 미출력(위젯 완전 미출력 = byte 0 계약을 문자열 하나까지 지킴).
+       재배치: 위젯이 콜아웃 상단 섹션 여백(96px)을 이어받고, 뒤따르는 콜아웃과는 밀착(18px)
+       — 위젯 미출력 시 이 오버라이드도 함께 사라져 콜아웃 여백이 원형(96px 0)으로 복원. */
+    .gurumi{display:flex;align-items:center;gap:16px;margin:96px 0 0;padding:16px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
+    .gurumi ~ .callout{margin-top:18px}
+    .gurumi-scene{flex:none;width:64px;line-height:0}
+    .gurumi-svg{width:100%;height:auto;display:block}
+    .gurumi-txt{font-family:var(--sans);font-size:14.5px;line-height:1.6;color:var(--body);margin:0;word-break:keep-all}
+    .gurumi-txt b{color:var(--ink);font-weight:600}
+    .gurumi-date{color:var(--muted);font-size:12.5px;margin-left:2px}
+    /* 연출 A(1회): 종이 조각이 그릇 쪽으로 사라지고, 뒤이어 카드 묶음이 떠오르며 등장. */
+    @keyframes gurumiEat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(10px)}}
+    @keyframes gurumiCards{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+    .g-scraps{animation:gurumiEat .8s var(--ease) .9s forwards}
+    .g-cards{opacity:0;animation:gurumiCards .6s var(--ease) 1.6s forwards}
+    @media (prefers-reduced-motion:reduce){
+      .g-scraps,.g-cards{animation:none}
+      .g-scraps{opacity:0}
+      .g-cards{opacity:1}
+    }
+    @media (max-width:640px){ .gurumi{padding:12px 14px;gap:12px} .gurumi-scene{width:50px} }
+    </style>    <div class="callout">
     <span class="kick">This Week</span>
     <h2>이번 주, 무엇이 바뀌었을까요?</h2>
     <p>2026년 7월 1주차 — 수집 89건, 카드 36장, <span style="white-space:nowrap">Evidence A 29 · B 7</span>. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
     <a class="btn cream lg" href="briefs/2026-07-06/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
-  </div></div><div class="wrap"><div class="quiz-cta">
+  </div></div><section class="section" id="popular"><div class="wrap">
+    <span class="kick">Weekly Reactions</span>
+    <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
+    <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
+    <div id="grm-popular" data-index="/assets/search-index.json">
+      <div class="popular-empty">
+        <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
+        <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
+        <a class="btn" href="briefs/2026-07-06/index.html">이번 주 카드 보러 가기 <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+  </div></section>
+  <style>
+  /* 인기 카드 섹션 — grm.css 토큰만(프리즈 보존). #popular/.popular-* 스코프 한정. */
+  .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}
+  .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
+  .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px;word-break:keep-all}
+  .popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0 0 16px;word-break:keep-all}
+  .popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+  .popular-item:first-child{border-color:var(--coral)}
+  .popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
+  .popular-item:first-child .popular-rank{color:var(--coral)}
+  .popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none;word-break:keep-all}
+  .popular-title:hover{color:var(--coral)}
+  .popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+  @media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
+  </style><div class="wrap"><div class="quiz-cta">
     <div class="quiz-cta-txt">
       <span class="kick">Weekly Quiz</span>
       <h2>이번 주 규제 퀴즈, 3분이면 충분해요.</h2>

@@ -4618,7 +4618,7 @@ class WebGurumiWidgetTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_widget_shows_latest_brief_counts(self):
-        self.assertIn("이번 주 구르미가 규제 소식 <b>89</b>건을 먹고", self.landing)
+        self.assertIn("이번 주 구름이가 규제 소식 <b>89</b>건을 먹고", self.landing)
         self.assertIn("핵심 카드 <b>36</b>장으로 정리했어요", self.landing)
         self.assertIn("2026-07-06</span> 발행 기준", self.landing)
 

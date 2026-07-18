@@ -1178,7 +1178,9 @@
   </div>
 </main>
 <style>
-/* [용어사전] 초성 색인·용어 카드 — grm.css 토큰만 사용(프리즈 보존). */
+/* [용어사전] 초성 색인·용어 카드 — grm.css 토큰만 사용(프리즈 보존).
+   데스크톱 우선: 인트로 720px(공용 62ch 조기 wrap 해소)·한글 keep-all. */
+.page-head p{max-width:720px;word-break:keep-all}
 .gl-tools{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-top:6px}
 .gl-search{position:relative;flex:1;min-width:240px;max-width:460px}
 .gl-search .ti{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--lo);pointer-events:none}
@@ -1206,8 +1208,8 @@
 .gl-term:hover .gl-anchor{opacity:1}
 .gl-anchor:hover{color:var(--coral)}
 .gl-term-en{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.4}
-.gl-def{font-family:var(--sans);font-size:14.5px;line-height:1.66;color:var(--body);margin:2px 0 0}
-.gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--lo);margin:4px 0 0}
+.gl-def{font-family:var(--sans);font-size:14.5px;line-height:1.66;color:var(--body);margin:2px 0 0;word-break:keep-all}
+.gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--lo);margin:4px 0 0;word-break:keep-all;overflow-wrap:anywhere}
 .gl-src-k{display:inline-block;font-weight:600;color:var(--muted);margin-right:6px}
 .gl-rel{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
 .gl-rel-k{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--muted);margin-right:2px}

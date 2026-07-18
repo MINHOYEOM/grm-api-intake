@@ -372,16 +372,91 @@ def load_briefs(data_dir: Path) -> list[dict[str, Any]]:
     return briefs
 
 
-def load_library(library_dir: Path = LIBRARY_DIR) -> dict[str, Any]:
-    """[자료실] 커밋 데이터(ich.json·mfds.json) 로드 — 결정론(파일 byte 파생, 네트워크 0).
+# ── [자료실] 카탈로그 registry — 카탈로그 1개 추가 = 데이터 파일 1개 + 아래 항목 1개 ──
+# file 은 web/data/library/ 상대 파일명. 표시 카피(kick/blurb/intro/desc)는 데이터 스냅샷
+# 재생성과 독립인 카탈로그 고정 속성이라 registry 가 소유한다. 렌더는 전 카탈로그가 공통
+# 템플릿(library_catalog.html) 하나를 쓴다 — 템플릿·render_site 는 추가 시 무수정.
+LIBRARY_REGISTRY: list[dict[str, str]] = [
+    {"slug": "ich", "file": "ich.json", "unit": "토픽", "kick": "ICH · Guidelines",
+     "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽과 공식 원문.",
+     "intro": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 정리했으며, 각 토픽의 최신 Step·개정본·원문 PDF는 ICH 공식 페이지에서 확인하실 수 있습니다.",
+     "desc": "ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 계열별 토픽 목록과 ICH 공식 페이지 링크."},
+    {"slug": "mfds", "file": "mfds.json", "unit": "건", "kick": "MFDS · Guidance",
+     "blurb": "식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.",
+     "intro": "식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "식약처(MFDS) 지침·안내서·고시·행정예고 아카이브 — 제목·유형·발행일·공식 원문 링크."},
+]
 
-    파일 부재 시 해당 키는 None → render_site 가 그 카탈로그 페이지를 조용히 건너뛴다
-    (허브는 존재하는 카탈로그만 노출). v1 데이터는 1회 생성 커밋(Notion 스냅샷 파생).
-    """
-    def _load(name: str) -> dict[str, Any] | None:
-        p = library_dir / name
-        return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
-    return {"ich": _load("ich.json"), "mfds": _load("mfds.json")}
+
+def _library_item_view(it: dict[str, Any], *, fallback_url: str = "") -> dict[str, Any]:
+    """카탈로그 항목 → 공통 항목 뷰 — 스키마 v2 우선·구 스키마 키 수용(값 무변형 통과).
+
+    v2 선택 필드(code·title_ko·doc_type·published_date·ko_url·pdf_url)는 있으면 표시,
+    없으면 빈 문자열 → 템플릿이 조용히 생략. 날짜는 **발행일(published_date)만** 노출 —
+    수집일(collected_date)은 내부 운영 개념이라 사용자 표기 금지(품질 기준 2026-07-18)."""
+    title = it.get("title_en") or it.get("title") or ""
+    code = it.get("code") or ""
+    # 구 ICH 스키마: title 이 "Q1A - Q1F Stability" 처럼 code 를 접두로 중복 포함 — 제거.
+    if code and title.startswith(code):
+        title = title[len(code):].strip() or title
+    return {
+        "title": title,
+        "title_ko": it.get("title_ko") or "",
+        "code": code,
+        "doc_type": it.get("doc_type") or it.get("type_label") or "",
+        "published_date": it.get("published_date") or "",
+        "official_url": _safe_url(it.get("official_url") or fallback_url),
+        "ko_url": _safe_url(it.get("ko_url") or ""),
+        "pdf_url": _safe_url(it.get("pdf_url") or ""),
+    }
+
+
+def _catalog_view(entry: dict[str, str], raw: dict[str, Any]) -> dict[str, Any]:
+    """카탈로그 raw(구·v2 스키마) → 공통 템플릿 뷰모델(결정론 — 데이터 파생, 창작 0).
+
+    그룹형(구 ICH `series[]`)은 계열 헤더·계열 공식 링크를 유지하고, 평면형(`items[]` —
+    구 MFDS·v2 공통)은 무라벨 단일 그룹으로 흡수한다. Tier/QA 등 내부 운영 필드는 뷰에
+    올리지 않는다(사용자 노출 금지)."""
+    meta = raw.get("meta", {})
+    groups: list[dict[str, Any]] = []
+    if raw.get("series"):
+        for s in raw["series"]:
+            groups.append({
+                "badge": s.get("letter", ""),
+                "label": s.get("label_ko", ""),
+                "label_en": s.get("label_en", ""),
+                "blurb": s.get("blurb", ""),
+                "official_url": _safe_url(s.get("official_url", "")),
+                "items": [_library_item_view(t, fallback_url=s.get("official_url", ""))
+                          for t in s.get("topics", [])],
+            })
+    else:
+        groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
+                       "official_url": "",
+                       "items": [_library_item_view(it) for it in raw.get("items", [])]})
+    dates = [it["published_date"] for g in groups for it in g["items"] if it["published_date"]]
+    return {
+        "slug": entry["slug"], "unit": entry["unit"], "kick": entry["kick"],
+        "intro": entry["intro"], "blurb": entry["blurb"], "desc": entry["desc"],
+        "title": meta.get("title", ""),
+        "note": meta.get("note", ""),
+        "public_base": _safe_url(meta.get("public_base", "")),
+        "count": sum(len(g["items"]) for g in groups),
+        "latest_published": max(dates) if dates else "",
+        "grouped": bool(raw.get("series")),
+        "groups": groups,
+    }
+
+
+def load_library(library_dir: Path = LIBRARY_DIR) -> list[dict[str, Any]]:
+    """[자료실] registry 순서대로 커밋 데이터를 로드해 공통 뷰 리스트로 반환 — 결정론
+    (파일 byte 파생, 네트워크 0). 파일 부재 카탈로그는 조용히 건너뛴다(허브는 존재분만)."""
+    views = []
+    for entry in LIBRARY_REGISTRY:
+        p = library_dir / entry["file"]
+        if p.is_file():
+            views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8"))))
+    return views
 
 
 # ── [이용안내] 제한 마크다운 서브셋 → 결정론 HTML ──────────────────────────────
@@ -407,13 +482,16 @@ def _md_inline(text: str) -> str:
     return esc
 
 
-def render_guide_html(md_text: str) -> tuple[str, Markup]:
-    """제한 md 서브셋 → (페이지 제목, 본문 HTML). 순수·결정론(같은 입력 → byte 동일).
+def render_guide_html(md_text: str) -> tuple[str, list[dict[str, str]], Markup]:
+    """제한 md 서브셋 → (페이지 제목, h2 목차, 본문 HTML). 순수·결정론(같은 입력 → byte 동일).
 
     최상위 `# ` 헤딩은 페이지 제목으로 빼고 본문에는 넣지 않는다(템플릿 page-head 가 렌더).
+    `## ` 헤딩은 등장 순서 기반 안정 앵커(id="sec-N")를 부여하고 목차 리스트
+    [{id, title(마커 제거 평문)}] 로도 반환한다 — 템플릿 상단 목차가 소비(결정론 파생).
     반환 본문은 Markup 이라 Jinja autoescape 가 다시 이스케이프하지 않는다 — 단, 모든
     사용자 표시 텍스트는 _md_inline 이 이미 escape 했으므로 안전(제한 태그만 raw)."""
     title = ""
+    toc: list[dict[str, str]] = []
     blocks: list[str] = []
     para: list[str] = []
 
@@ -436,7 +514,10 @@ def render_guide_html(md_text: str) -> tuple[str, Markup]:
             i += 1
         elif line.startswith("## "):
             flush_para()
-            blocks.append(f"<h2>{_md_inline(line[3:])}</h2>")
+            sec_id = f"sec-{len(toc) + 1}"
+            plain = _MD_CODE_RE.sub(r"\1", _MD_BOLD_RE.sub(r"\1", line[3:])).strip()
+            toc.append({"id": sec_id, "title": plain})
+            blocks.append(f'<h2 id="{sec_id}">{_md_inline(line[3:])}</h2>')
             i += 1
         elif line.startswith("# "):
             flush_para()
@@ -460,7 +541,7 @@ def render_guide_html(md_text: str) -> tuple[str, Markup]:
             para.append(line.strip())
             i += 1
     flush_para()
-    return title, Markup("\n".join(blocks))
+    return title, toc, Markup("\n".join(blocks))
 
 
 def load_guide(path: Path = GUIDE_FILE) -> str | None:
@@ -829,8 +910,8 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # [자료실] 정적 참조 카탈로그(주간 발행과 무관한 독립 섹션). lastmod 는 브리프
         # publish_date 와 분리된 별개 데이터라 최신 브리프 날짜를 재사용하지 않고 생략.
         f"  <url><loc>{base_url}/library/</loc></url>",
-        f"  <url><loc>{base_url}/library/ich/</loc></url>",
-        f"  <url><loc>{base_url}/library/mfds/</loc></url>",
+        *(f"  <url><loc>{base_url}/library/{e['slug']}/</loc></url>"
+          for e in LIBRARY_REGISTRY),
         # [이용안내·용어사전] 트랙 C 2차 웨이브 — library 와 동일하게 브리프 발행일과
         # 분리된 상설 참조 콘텐츠라 lastmod 는 생략(정적 커밋 데이터).
         f"  <url><loc>{base_url}/guide/</loc></url>",
@@ -897,12 +978,8 @@ FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·식약처 GMP 지
                     "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
 LIBRARY_DESCRIPTION = ("ICH 가이드라인 카탈로그와 식약처 지침·고시 아카이브를 한곳에 모은 "
                        "규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
-LIBRARY_ICH_DESCRIPTION = ("ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 계열별 토픽 목록과 "
-                           "ICH 공식 페이지 링크, Signal Tier·관련도 표시.")
-LIBRARY_MFDS_DESCRIPTION = ("식약처(MFDS) 지침·안내서·고시·행정예고를 수집순으로 누적한 아카이브 — "
-                            "제목·유형·수집일·공식 원문 링크.")
-GUIDE_DESCRIPTION = ("GRM 이용 안내 — 주간 브리프 카드 읽는 법, Evidence Level·Signal Tier, "
-                     "findings 검색 사용법과 이용 시 유의사항을 한곳에 정리했습니다.")
+GUIDE_DESCRIPTION = ("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
+                     "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
 GLOSSARY_DESCRIPTION = ("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
                         "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
 QUIZ_DESCRIPTION = ("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 "
@@ -1128,28 +1205,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 자료실(트랙 C) — findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷
     # (web/data/library/*.json)을 결정론 렌더한다(주간 발행 게이트와 무관한 독립 정적
     # 섹션). 데이터 파일이 없으면 해당 카탈로그·허브 항목을 조용히 건너뛴다.
-    library = load_library()
-    ich_data, mfds_data = library.get("ich"), library.get("mfds")
-    if ich_data or mfds_data:
-        hub_catalogs = []
-        if ich_data:
-            hub_catalogs.append({
-                "href": "ich/index.html",
-                "title": ich_data["meta"]["title"],
-                "count": ich_data["meta"]["topic_count"],
-                "unit": "토픽",
-                "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽과 공식 원문.",
-                "asof": ich_data["meta"]["collected_date"],
-            })
-        if mfds_data:
-            hub_catalogs.append({
-                "href": "mfds/index.html",
-                "title": mfds_data["meta"]["title"],
-                "count": mfds_data["meta"]["item_count"],
-                "unit": "건",
-                "blurb": "식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.",
-                "asof": mfds_data["meta"]["latest_collected_date"],
-            })
+    catalogs = load_library()
+    if catalogs:
+        hub_catalogs = [{
+            "href": f"{v['slug']}/index.html",
+            "title": v["title"],
+            "count": v["count"],
+            "unit": v["unit"],
+            "blurb": v["blurb"],
+            "latest_published": v["latest_published"],
+        } for v in catalogs]
         library_html = env.get_template("library.html").render(
             page_title="자료실 · GRM",
             rel_root="../",
@@ -1162,37 +1227,26 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _write(out_dir / "library" / "index.html", library_html)
         written.append("library/index.html")
 
-    if ich_data:
-        ich_html = env.get_template("library_ich.html").render(
-            page_title="ICH 가이드라인 카탈로그 · GRM",
+    # 카탈로그 상세 — registry 전 항목을 공통 템플릿(library_catalog.html) 하나로 렌더.
+    # 카탈로그 1개 추가 = 데이터 파일 + LIBRARY_REGISTRY 1항목(여기·템플릿 무수정).
+    for v in catalogs:
+        catalog_html = env.get_template("library_catalog.html").render(
+            page_title=f"{v['title']} · GRM",
             rel_root="../../",
             nav_active="library",
             latest_slug=latest_slug,
-            description=LIBRARY_ICH_DESCRIPTION,
-            canonical=_abs_url("library/ich/"),
-            lib=ich_data,
+            description=v["desc"],
+            canonical=_abs_url(f"library/{v['slug']}/"),
+            lib=v,
         )
-        _write(out_dir / "library" / "ich" / "index.html", ich_html)
-        written.append("library/ich/index.html")
-
-    if mfds_data:
-        mfds_html = env.get_template("library_mfds.html").render(
-            page_title="MFDS 지침·고시 아카이브 · GRM",
-            rel_root="../../",
-            nav_active="library",
-            latest_slug=latest_slug,
-            description=LIBRARY_MFDS_DESCRIPTION,
-            canonical=_abs_url("library/mfds/"),
-            lib=mfds_data,
-        )
-        _write(out_dir / "library" / "mfds" / "index.html", mfds_html)
-        written.append("library/mfds/index.html")
+        _write(out_dir / "library" / v["slug"] / "index.html", catalog_html)
+        written.append(f"library/{v['slug']}/index.html")
 
     # 이용 안내(트랙 C 2차 웨이브) — guide_content.md(정본)를 제한 md 서브셋으로 결정론
     # 렌더. 라이브 데이터가 아니라 커밋 콘텐츠라 골든으로 고정된다. 파일 부재 시 조용히 생략.
     guide_md = load_guide()
     if guide_md:
-        guide_title, guide_body = render_guide_html(guide_md)
+        guide_title, guide_toc, guide_body = render_guide_html(guide_md)
         guide_html = env.get_template("guide.html").render(
             page_title="이용 안내 · GRM",
             rel_root="../",
@@ -1201,6 +1255,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=GUIDE_DESCRIPTION,
             canonical=_abs_url("guide/"),
             guide_title=guide_title,
+            guide_toc=guide_toc,
             guide_body=guide_body,
         )
         _write(out_dir / "guide" / "index.html", guide_html)

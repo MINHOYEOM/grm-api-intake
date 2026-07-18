@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-{#- 이용 안내(트랙 C 2차 웨이브) — web/data/guide_content.md(정본)를 render.py 의 제한
-    md 서브셋 변환기로 결정론 렌더한 본문(guide_body=Markup). grm.css 프리즈 보존 위해
-    레이아웃은 기존 토큰만 쓰는 스코프 <style>(자료실 선례). -#}
+{#- 이용 안내(트랙 C — 2026-07-18 전면 개편) — web/data/guide_content.md(정본)를 render.py 의
+    제한 md 서브셋 변환기로 결정론 렌더한 본문(guide_body=Markup). 목차(guide_toc)는
+    렌더러가 h2 에서 결정론 파생(id="sec-N"). grm.css 프리즈 보존 위해 레이아웃은 기존
+    토큰만 쓰는 스코프 <style>(자료실 선례). 데스크톱 우선: 본문 780px(74ch≈650px 조기
+    wrap 해소)·한글 word-break:keep-all. -#}
 <main>
-  <div class="wrap page-head">
+  <div class="wrap page-head guide-head">
     <span class="kick reveal" style="animation-delay:.02s">User Guide</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ guide_title }}</h1>
-    <p class="reveal" style="animation-delay:.14s">GRM을 처음 보는 분도 핵심을 빠르게 파악할 수 있도록, 브리프 카드 읽는 법부터 findings 검색 사용법, 이용 시 유의사항까지 정리했습니다.</p>
+    <p class="reveal" style="animation-delay:.14s">GRM을 어떻게 업무에 활용하면 되는지 — 월요일 브리프 3분 활용법부터 findings 검색 실전 예시, 자료실·용어사전·퀴즈 활용까지 실사용 순서로 정리했습니다.</p>
   </div>
-  <div class="wrap guide-body reveal" style="animation-delay:.2s">
+  {% if guide_toc %}
+  <nav class="wrap guide-toc reveal" style="animation-delay:.2s" aria-label="이용 안내 목차">
+    <span class="guide-toc-k">목차</span>
+    <ol>
+      {% for s in guide_toc %}
+      <li><a href="#{{ s.id }}">{{ s.title }}</a></li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+  <div class="wrap guide-body reveal" style="animation-delay:.26s">
     {{ guide_body }}
     <aside class="guide-x">
       <div class="guide-x-t">
@@ -21,10 +33,18 @@
   </div>
 </main>
 <style>
-/* [이용안내] 본문 프로즈 — grm.css 토큰만 사용(프리즈 보존). */
-.guide-body{max-width:74ch;padding:8px 0 64px;font-family:var(--sans);color:var(--body);font-size:16px;line-height:1.72}
-.guide-body h2{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.28;color:var(--ink);margin:46px 0 12px;padding-top:18px;border-top:1px solid var(--line)}
-.guide-body h2:first-of-type{margin-top:20px;padding-top:0;border-top:0}
+/* [이용안내] 목차·본문 프로즈 — grm.css 토큰만 사용(프리즈 보존). 데스크톱 우선 폭. */
+.guide-head p{max-width:720px;word-break:keep-all}  /* 공용 .page-head p 62ch 조기 wrap 해소 — 이 페이지 한정 */
+.guide-toc{margin-top:10px}
+.guide-toc-k{display:block;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px}
+.guide-toc ol{list-style:none;margin:0;padding:18px 22px;max-width:780px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;counter-reset:gtoc}
+.guide-toc li{counter-increment:gtoc;min-width:0}
+.guide-toc a{display:flex;align-items:baseline;gap:9px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--body);padding:5px 2px;border-radius:var(--rad-s);word-break:keep-all;transition:color .14s var(--ease)}
+.guide-toc a::before{content:counter(gtoc,decimal-leading-zero);font-family:var(--mono);font-size:11.5px;color:var(--lo);flex:none}
+.guide-toc a:hover{color:var(--coral-2)}
+.guide-body{max-width:780px;padding:14px 0 64px;font-family:var(--sans);color:var(--body);font-size:16px;line-height:1.72;word-break:keep-all}
+.guide-body h2{font-family:var(--serif);font-weight:600;font-size:25px;line-height:1.28;color:var(--ink);margin:48px 0 12px;padding-top:20px;border-top:1px solid var(--line);scroll-margin-top:88px}
+.guide-body h2:first-of-type{margin-top:16px;padding-top:0;border-top:0}
 .guide-body h3{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.35;color:var(--ink);margin:30px 0 8px}
 .guide-body p{margin:0 0 14px}
 .guide-body ul,.guide-body ol{margin:0 0 16px;padding-left:22px}
@@ -34,11 +54,11 @@
 .guide-x{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:40px;padding:20px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
 .guide-x-t{display:flex;flex-direction:column;gap:3px;min-width:0}
 .guide-x-t b{font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink)}
-.guide-x-t span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.guide-x-t span{font-size:13.5px;color:var(--muted);line-height:1.55;word-break:keep-all}
 .guide-x-go{flex:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:14px;font-weight:500;color:#fff;background:var(--coral);border-radius:var(--rad-s);padding:10px 16px;text-decoration:none;transition:background .16s var(--ease)}
 .guide-x-go:hover{background:var(--coral-2)}
 .guide-x-go .ti{font-size:16px;transition:transform .16s var(--ease)}
 .guide-x-go:hover .ti{transform:translateX(3px)}
-@media (max-width:640px){ .guide-body{font-size:15.5px} .guide-body h2{font-size:21px} }
+@media (max-width:640px){ .guide-body{font-size:15.5px} .guide-body h2{font-size:21px} .guide-toc ol{grid-template-columns:1fr} }
 </style>
 {% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 자료실 · 공통 카탈로그 템플릿(트랙 C 고도화 2026-07-18) — registry(render.LIBRARY_REGISTRY)
+    전 카탈로그가 이 템플릿 하나로 렌더된다(카탈로그 추가 = 데이터 파일 + registry 1항목).
+    뷰모델은 render._catalog_view 가 구(ich series·mfds items)·v2 스키마를 공통 형태로
+    정규화한 것. 선택 필드(code·title_ko·doc_type·published_date·ko_url·pdf_url)는 있으면
+    표시·없으면 조용히 생략. 날짜는 발행일만(수집일 표기 금지 — 품질 기준 2026-07-18).
+    Tier/QA 등 내부 운영 개념은 뷰모델에 없다(노출 금지). grm.css 프리즈 보존 위해 스코프
+    <style>. 데스크톱 우선: 인트로 720px·평면 리스트 880px 캡·한글 word-break:keep-all. -#}
+<main>
+  <div class="wrap page-head lib-head">
+    <span class="kick reveal" style="animation-delay:.02s">{{ lib.kick }}</span>
+    <h1 class="reveal" style="animation-delay:.08s">{{ lib.title }}</h1>
+    <p class="reveal" style="animation-delay:.14s">{{ lib.intro }}</p>
+    <div class="lib-meta reveal" style="animation-delay:.2s">
+      <span class="lib-meta-i"><i class="ti ti-list-details" aria-hidden="true"></i>총 {{ lib.count }}{{ lib.unit }}</span>
+      {% if lib.latest_published %}<span class="lib-meta-i"><i class="ti ti-calendar-event" aria-hidden="true"></i>최근 발행 {{ lib.latest_published }}</span>{% endif %}
+      {% if lib.public_base %}<a class="lib-meta-link" href="{{ lib.public_base }}" target="_blank" rel="noopener">공식 사이트 <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
+    </div>
+  </div>
+  <div class="wrap lib-body">
+    {% for g in lib.groups %}
+    {% if lib.grouped %}
+    <section class="lib-series">
+      <div class="lib-series-h">
+        {% if g.badge %}<span class="lib-series-badge">{{ g.badge }}</span>{% endif %}
+        <div class="lib-series-t">
+          <h2>{{ g.label }}{% if g.label_en %} <span>{{ g.label_en }}</span>{% endif %}</h2>
+          {% if g.blurb %}<p>{{ g.blurb }}</p>{% endif %}
+        </div>
+        {% if g.official_url %}<a class="lib-series-link" href="{{ g.official_url }}" target="_blank" rel="noopener">공식 페이지 <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
+      </div>
+      <ul class="lib-items lib-items-grid">
+    {% else %}
+      <ul class="lib-items">
+    {% endif %}
+        {% for it in g['items'] %}
+        <li class="lib-item">
+          {% if it.official_url %}
+          <a class="lib-item-a" href="{{ it.official_url }}" target="_blank" rel="noopener">
+            {% if it.code %}<span class="lib-code">{{ it.code }}</span>{% endif %}
+            <span class="lib-item-title">{{ it.title }}</span>
+            <i class="ti ti-external-link lib-item-ext" aria-hidden="true"></i>
+          </a>
+          {% else %}
+          <span class="lib-item-a">
+            {% if it.code %}<span class="lib-code">{{ it.code }}</span>{% endif %}
+            <span class="lib-item-title">{{ it.title }}</span>
+          </span>
+          {% endif %}
+          {% if it.title_ko %}<p class="lib-item-ko">{{ it.title_ko }}</p>{% endif %}
+          {% if it.doc_type or it.published_date or it.ko_url or it.pdf_url %}
+          <div class="lib-item-meta">
+            {% if it.doc_type %}<span class="lib-type">{{ it.doc_type }}</span>{% endif %}
+            {% if it.published_date %}<span class="lib-date"><i class="ti ti-calendar" aria-hidden="true"></i>발행 {{ it.published_date }}</span>{% endif %}
+            {% if it.ko_url %}<a class="lib-extra" href="{{ it.ko_url }}" target="_blank" rel="noopener"><i class="ti ti-language" aria-hidden="true"></i>한글 번역본</a>{% endif %}
+            {% if it.pdf_url %}<a class="lib-extra" href="{{ it.pdf_url }}" target="_blank" rel="noopener"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</a>{% endif %}
+          </div>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    {% if lib.grouped %}</section>{% endif %}
+    {% endfor %}
+    {% if lib.note %}<p class="lib-foot-note reveal">{{ lib.note }}</p>{% endif %}
+  </div>
+</main>
+<style>
+/* [자료실] 공통 카탈로그 — grm.css 토큰만 사용(프리즈 보존). 데스크톱 우선 폭·한글 keep-all. */
+.lib-head p{max-width:720px;word-break:keep-all}  /* 공용 .page-head p 62ch(≈510px) 조기 wrap 해소 — 이 페이지 한정 오버라이드 */
+.lib-body{padding-bottom:64px}
+.lib-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:22px}
+.lib-meta-i{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted)}
+.lib-meta-i .ti{font-size:15px;color:var(--lo)}
+.lib-meta-link{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.lib-meta-link:hover{text-decoration:underline}
+.lib-meta-link .ti{font-size:14px}
+/* 계열(그룹) 헤더 — 그룹형 카탈로그(구 ICH)만 출력 */
+.lib-series{margin-top:34px}
+.lib-series-h{display:flex;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line-2)}
+.lib-series-badge{flex:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:20px;color:#fff;background:var(--coral);border-radius:var(--rad-s)}
+.lib-series-t{flex:1;min-width:0}
+.lib-series-t h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.2;color:var(--ink);margin:0;word-break:keep-all}
+.lib-series-t h2 span{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--lo);margin-left:6px}
+.lib-series-t p{font-size:14px;color:var(--muted);margin:5px 0 0;line-height:1.55;word-break:keep-all;max-width:720px}
+.lib-series-link{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none;white-space:nowrap;margin-top:4px}
+.lib-series-link:hover{text-decoration:underline}
+.lib-series-link .ti{font-size:14px}
+/* 항목 리스트 — 평면형=단일 컬럼 880px 캡(1180px 전폭 스캔라인 과장 제거), 그룹형=2컬럼 그리드 */
+.lib-items{list-style:none;padding:0;margin:22px 0 0;max-width:880px}
+.lib-items-grid{max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:2px 24px;margin-top:8px}
+.lib-item{display:flex;flex-direction:column;gap:7px;padding:15px 2px 14px;border-bottom:1px solid var(--line)}
+.lib-item-a{display:inline-flex;align-items:baseline;gap:9px;text-decoration:none;color:var(--ink);min-width:0}
+a.lib-item-a:hover{color:var(--coral-2)}
+.lib-code{flex:none;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);background:var(--strong);border-radius:5px;padding:2px 8px;white-space:nowrap;align-self:center}
+.lib-item-title{font-family:var(--sans);font-size:15.5px;line-height:1.5;font-weight:500;word-break:keep-all;overflow-wrap:anywhere}
+.lib-item-ext{flex:none;font-size:13px;color:var(--lo);align-self:center;opacity:0;transition:opacity .14s var(--ease)}
+a.lib-item-a:hover .lib-item-ext{opacity:1}
+.lib-item-ko{font-family:var(--sans);font-size:13.5px;color:var(--body);line-height:1.55;margin:0;word-break:keep-all}
+.lib-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:7px 14px}
+.lib-type{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--med);background:rgba(176,125,23,.11);border:1px solid rgba(176,125,23,.24);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.lib-date{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+.lib-date .ti{font-size:13px;color:var(--lo)}
+.lib-extra{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none;border:1px solid rgba(194,96,63,.22);background:var(--coral-tint);padding:3px 10px;border-radius:999px;white-space:nowrap;transition:border-color .14s var(--ease)}
+.lib-extra:hover{border-color:var(--coral)}
+.lib-extra .ti{font-size:13px}
+.lib-foot-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.65;max-width:720px;word-break:keep-all}
+@media (max-width:900px){ .lib-items-grid{grid-template-columns:1fr;gap:0} .lib-series-h{flex-wrap:wrap} }
+@media (max-width:640px){ .lib-item-title{font-size:15px} }
+</style>
+{% endblock %}

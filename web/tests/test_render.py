@@ -71,6 +71,7 @@ __all__ = [
     "WebResourceNotesRenderTest",
     "WebResourceNotesGoldenInvarianceTest",
     "WebGurumiWidgetTest",
+    "WebPopularCardsTest",
 ]
 
 
@@ -4663,6 +4664,92 @@ class WebGurumiWidgetTest(unittest.TestCase):
         self.assertIn("@keyframes gurumiEat", css)
         self.assertIn("@keyframes gurumiCards", css)
         self.assertNotIn("infinite", css)
+
+
+# ── 인기 카드(Weekly Reactions) — 랜딩 정적 섹션 + popular.js 배선 ────────────────
+class WebPopularCardsTest(unittest.TestCase):
+    """랜딩 '이번 주 반응이 모인 카드' 섹션 — 정적 빈 상태(골든 정본)는 reactions_enabled
+    게이트와 무관하게 항상 렌더된다. popular.js 로드만 reactions_enabled 로 게이트된다
+    (reactions.js/admin.js 관례 동형). 031 RPC(reactions_weekly_top) 교차·렌더 로직은
+    popular.js 소관(비골든) — 여기선 정적 셸·env-gate·자산 배선·가벼운 계약 가드만 검증."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_popular_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.popular_js = (WEB_DIR / "assets" / "popular.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_static_section_present_on_landing(self):
+        self.assertIn('id="grm-popular"', self.landing)
+        self.assertIn("이번 주 반응이 모인 카드", self.landing)
+        self.assertIn("하트·스크랩 기준", self.landing)
+        self.assertIn("아직 이번 주 하트·스크랩이 없어요.", self.landing)
+        self.assertIn("관심 있는 카드에 ♥를 눌러 주세요", self.landing)
+
+    def test_no_view_count_framing(self):
+        # "가장 많이 본"·조회수 기준 표현 금지 — 반응(하트·스크랩) 기준만.
+        self.assertNotIn("가장 많이 본", self.landing)
+        self.assertNotIn("조회수 Top", self.landing)
+
+    def test_popular_js_script_env_gated(self):
+        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정(reactions_enabled=False) — 기본 렌더엔
+        # popular.js 스크립트 태그가 없다(reactions.js 관례 동형).
+        self.assertNotIn("assets/popular.js", self.landing)
+
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_popular_on_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+        import re as _re
+        m = _re.search(r'assets/popular\.js\?v=([0-9a-f]{8})"', landing_on)
+        self.assertIsNotNone(m, "popular.js 캐시버스팅 해시 미발견(활성 렌더)")
+        # 활성 렌더에서도 정적 빈 상태 마크업은 그대로(런타임 교체는 popular.js 소관).
+        self.assertIn('id="grm-popular"', landing_on)
+
+    def test_popular_js_copied_to_dist(self):
+        built = (self.single / "assets" / "popular.js").read_bytes()
+        src = (WEB_DIR / "assets" / "popular.js").read_bytes()
+        self.assertEqual(built, src, "popular.js 가 dist/assets 에 verbatim 복사되지 않음")
+
+    def test_popular_js_calls_weekly_top_rpc_via_get(self):
+        self.assertIn("reactions_weekly_top", self.popular_js)
+        self.assertIn("rest/v1/rpc/reactions_weekly_top", self.popular_js)
+        # GET(fetch 기본 메서드) — 031 이 stable 이라 PostgREST 허용, method:"POST" 미사용.
+        self.assertNotIn('method: "POST"', self.popular_js)
+        self.assertNotIn("method:'POST'", self.popular_js)
+
+    def test_popular_js_reads_only_allowlisted_rpc_fields(self):
+        # 031 RPC 반환 계약(불가침) — card_id·distinct_user_count 두 필드만. row.<field> 형태로
+        # 그 외 필드(예: hearts/scraps/user_id/created_at)를 참조하지 않는다.
+        import re as _re
+        fields = set(_re.findall(r"row\.([a-zA-Z_]+)", self.popular_js))
+        self.assertEqual(fields, {"card_id", "distinct_user_count"})
+
+    def test_popular_js_never_prints_rpc_text_verbatim(self):
+        # card_id 를 포함해 RPC 응답 텍스트를 화면에 직접 출력하지 않는다 — 제목/기관은
+        # 전부 search-index 파생(e.target/e.issue/e.agency), card_id 는 조회 키로만 사용.
+        self.assertNotIn("row.card_id +", self.popular_js)
+        self.assertNotIn("+ row.card_id", self.popular_js)
+        self.assertNotIn("textContent = row.card_id", self.popular_js)
+
+    def test_popular_js_scoped_selectors_only(self):
+        # 스타일 스코프 계약 대조(가벼운 정적 가드) — landing.html 의 클래스명과 정합.
+        for cls in (".popular-list", ".popular-item", ".popular-rank",
+                    ".popular-agency", ".popular-title", ".popular-count"):
+            self.assertIn(cls.lstrip("."), self.popular_js)
 
 
 if __name__ == "__main__":

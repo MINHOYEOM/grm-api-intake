@@ -101,6 +101,42 @@
     </div>
   </div>
 
+  {#- 인기 카드(Weekly Reactions) — 하트·스크랩 반응 기준 랜딩 섹션. 게이트 없이
+      항상 정적 렌더(빈 상태 = 골든 정본). popular.js(비골든)가 런타임에 031 RPC
+      (reactions_weekly_top)와 search-index.json 을 교차해 상위 3장을 채운다 — 실패/빈
+      집계 시 아래 정적 유도 문구를 그대로 유지(reactions.js 와 동일한 조용한 폴백 관례).
+      RPC 는 card_id·distinct_user_count 두 필드만 반환(불가침) — 화면 텍스트는 전부
+      인덱스 파생 + 숫자뿐. grm.css 프리즈 보존 위해 스코프 <style>(quiz-cta 선례). -#}
+  <section class="section" id="popular"><div class="wrap">
+    <span class="kick">Weekly Reactions</span>
+    <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
+    <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
+    <div id="grm-popular" data-index="/assets/search-index.json">
+      <div class="popular-empty">
+        <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
+        <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
+        <a class="btn" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 카드 보러 가기 <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+  </div></section>
+  <style>
+  /* 인기 카드 섹션 — grm.css 토큰만(프리즈 보존). #popular/.popular-* 스코프 한정. */
+  .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0}
+  .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
+  .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px}
+  .popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0 0 16px}
+  .popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+  .popular-item:first-child{border-color:var(--coral)}
+  .popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
+  .popular-item:first-child .popular-rank{color:var(--coral)}
+  .popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none}
+  .popular-title:hover{color:var(--coral)}
+  .popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+  @media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
+  </style>
+
   <section class="section" id="why"><div class="wrap lead">
     <div><span class="kick">Why GRM</span><h2>기관별 사이트 방문 없이,<br>한곳에서 확인합니다.</h2></div>
     <p>국내외 제약 규제 동향을 파악하기 위해 FDA, EMA, 식약처 등 여러 사이트를 일일이 찾아다닐 필요가 없습니다. GRM은 분산된 규제 정보를 한데 모아
@@ -191,6 +227,7 @@
 .quiz-cta-txt p{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--body);margin:0}
 @media (max-width:640px){ .quiz-cta{padding:22px 20px} }
 </style>
+{% if reactions_enabled %}<script src="/assets/popular.js?v={{ popularjs_ver }}" defer></script>{% endif %}
 {% endblock %}
 {% block ai_disclosure %}
 <section class="ai-disclosure" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap">

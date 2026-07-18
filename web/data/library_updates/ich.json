@@ -1,0 +1,307 @@
+{
+  "items": [
+    {
+      "id": "ich-156da584415e",
+      "code": "Q1A-Q1F",
+      "title_en": "Q1A(R2) Stability Testing of New Drug Substances and Products",
+      "title_ko": "안정성",
+      "doc_type": "guideline-topic",
+      "published_date": "2003-02-06",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q1A%28R2%29%20Guideline.pdf",
+      "ko_url": "https://nedrug.mfds.go.kr/bbs/117/14"
+    },
+    {
+      "id": "ich-36c41a7af7f9",
+      "code": "Q2",
+      "title_en": "Q2(R2) Validation of Analytical Procedures",
+      "title_ko": "분석법 밸리데이션",
+      "doc_type": "guideline-topic",
+      "published_date": "2023-11-01",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q2%28R2%29_Guideline_2023_1130_ErrorCorrection_2025.pdf"
+    },
+    {
+      "id": "ich-b01162b4fff3",
+      "code": "Q3A-Q3E",
+      "title_en": "Q3C(R9) Guideline for Residual Solvents",
+      "title_ko": "불순물",
+      "doc_type": "guideline-topic",
+      "published_date": "2024-01-24",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q3C%28R9%29_Guideline_MinorRevision_2024_2024_Approved.pdf"
+    },
+    {
+      "id": "ich-f4aa58f5e2ee",
+      "code": "Q4A-Q4B",
+      "title_en": "Q4B(R1) Evaluation and Recommendation of Pharmacopoeial Texts for Use in ICH Regions",
+      "title_ko": "약전",
+      "doc_type": "guideline-topic",
+      "published_date": "2024-06-05",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q4B%28R1%29_Guideline_2024_0605.pdf"
+    },
+    {
+      "id": "ich-e7f3a99dfc9d",
+      "code": "Q5A-Q5E",
+      "title_en": "Q5A(R2) Viral Safety Evaluation of Biotechnology Products Derived from Cell Lines of Human or Animal Origin",
+      "title_ko": "생명공학의약품 품질",
+      "doc_type": "guideline-topic",
+      "published_date": "2023-11-01",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q5A%28R2%29_Guideline_2023_1101.pdf"
+    },
+    {
+      "id": "ich-22f1bbd580d6",
+      "code": "Q6A-Q6B",
+      "title_en": "Q6A Specifications: Test Procedures and Acceptance Criteria for New Drug Substances and New Drug Products: Chemical Substances",
+      "title_ko": "규격",
+      "doc_type": "guideline-topic",
+      "published_date": "1999-10-06",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q6A%20Guideline.pdf"
+    },
+    {
+      "id": "ich-998a75651186",
+      "code": "Q7",
+      "title_en": "Q7 Good Manufacturing Practice Guide for Active Pharmaceutical Ingredients",
+      "title_ko": "의약품 제조 및 품질관리기준",
+      "doc_type": "guideline-topic",
+      "published_date": "2000-11-10",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q7%20Guideline.pdf",
+      "ko_url": "https://nedrug.mfds.go.kr/bbs/117/13"
+    },
+    {
+      "id": "ich-460133fa7e5a",
+      "code": "Q8",
+      "title_en": "Q8(R2) Pharmaceutical Development",
+      "title_ko": "의약품 개발",
+      "doc_type": "guideline-topic",
+      "published_date": "2009-08-01",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q8%28R2%29%20Guideline.pdf",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831"
+    },
+    {
+      "id": "ich-aeb86aaa5b68",
+      "code": "Q9",
+      "title_en": "Q9(R1) Quality Risk Management",
+      "title_ko": "품질위험관리",
+      "doc_type": "guideline-topic",
+      "published_date": "2023-01-18",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2025_0115_0.pdf",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831"
+    },
+    {
+      "id": "ich-2b5388c2ca85",
+      "code": "Q10",
+      "title_en": "Q10 Pharmaceutical Quality System",
+      "title_ko": "의약품 품질시스템",
+      "doc_type": "guideline-topic",
+      "published_date": "2008-06-04",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q10%20Guideline.pdf",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831"
+    },
+    {
+      "id": "ich-7126bd90d285",
+      "code": "Q11",
+      "title_en": "Q11 Development and Manufacture of Drug Substances (Chemical Entities and Biotechnological/Biological Entities)",
+      "title_ko": "원료의약품 개발 및 제조",
+      "doc_type": "guideline-topic",
+      "published_date": "2012-05-01",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q11%20Guideline.pdf"
+    },
+    {
+      "id": "ich-ffb664fc3118",
+      "code": "Q12",
+      "title_en": "Q12 Technical and Regulatory Considerations for Pharmaceutical Product Lifecycle Management",
+      "title_ko": "의약품 전주기 관리",
+      "doc_type": "guideline-topic",
+      "published_date": "2019-11-20",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/Q12_Guideline_Step4_2019_1119.pdf"
+    },
+    {
+      "id": "ich-4132442706bc",
+      "code": "Q13",
+      "title_en": "Q13 Continuous Manufacturing of Drug Substances and Drug Products",
+      "title_ko": "원료의약품과 완제의약품의 연속제조공정",
+      "doc_type": "guideline-topic",
+      "published_date": "2022-11-16",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q13_Step4_Guideline_2022_1116.pdf",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363"
+    },
+    {
+      "id": "ich-e34212ef863f",
+      "code": "Q14",
+      "title_en": "Q14 Analytical Procedure Development",
+      "title_ko": "분석절차 개발",
+      "doc_type": "guideline-topic",
+      "published_date": "2023-11-01",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Q14_Guideline_2023_1130_ErrorCorrection_2025.pdf"
+    },
+    {
+      "id": "ich-c2b1654f64f0",
+      "code": "M1",
+      "title_en": "MedDRA Terminology",
+      "title_ko": "MedDRA 용어",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-610d68a74e43",
+      "code": "M2",
+      "title_en": "Electronic Standards",
+      "title_ko": "전자표준",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-153842524174",
+      "code": "M3",
+      "title_en": "M3(R2) Nonclinical Safety Studies for the Conduct of Human Clinical Trials and Marketing Authorization for Pharmaceuticals",
+      "title_ko": "비임상 안전성시험",
+      "doc_type": "guideline-topic",
+      "published_date": "2009-06-11",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/M3_R2__Guideline.pdf"
+    },
+    {
+      "id": "ich-ecb76a0de0c7",
+      "code": "M4",
+      "title_en": "M4(R4) Organisation of the Common Technical Document for the Registration of Pharmaceuticals for Human Use",
+      "title_ko": "국제공통기술문서",
+      "doc_type": "guideline-topic",
+      "published_date": "2016-06-15",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/M4_R4__Guideline.pdf",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14782"
+    },
+    {
+      "id": "ich-72a894e41380",
+      "code": "M5",
+      "title_en": "Data Elements and Standards for Drug Dictionaries",
+      "title_ko": "의약품 사전 데이터 요소 및 표준",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-471b24c9ff89",
+      "code": "M6",
+      "title_en": "Gene Therapy",
+      "title_ko": "유전자치료",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-78bb22895033",
+      "code": "M7",
+      "title_en": "M7(R2) Assessment and Control of DNA Reactive (Mutagenic) Impurities in Pharmaceuticals to Limit Potential Carcinogenic Risk",
+      "title_ko": "의약품 중 DNA 반응성(변이원성) 불순물의 평가 및 관리",
+      "doc_type": "guideline-topic",
+      "published_date": "2023-04-03",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_M7%28R2%29_Guideline_Step4_2023_0216_0.pdf"
+    },
+    {
+      "id": "ich-a81d3327de7b",
+      "code": "M8",
+      "title_en": "Electronic Common Technical Document (eCTD)",
+      "title_ko": "전자국제공통기술문서(eCTD)",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-f3eead0cb20e",
+      "code": "M9",
+      "title_en": "M9 Biopharmaceutics Classification System-Based Biowaivers",
+      "title_ko": "생물약제학적 분류체계 기반 생물학적동등성시험 면제",
+      "doc_type": "guideline-topic",
+      "published_date": "2019-11-20",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/M9_Guideline_Step4_2019_1116.pdf"
+    },
+    {
+      "id": "ich-9df26b867704",
+      "code": "M10",
+      "title_en": "M10 Bioanalytical Method Validation and Study Sample Analysis",
+      "title_ko": "생체시료 분석법 밸리데이션 및 시험검체 분석",
+      "doc_type": "guideline-topic",
+      "published_date": "2022-05-24",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/M10_Guideline_Step4_2022_0524.pdf"
+    },
+    {
+      "id": "ich-78ad02fa1c9a",
+      "code": "M11",
+      "title_en": "M11 Clinical electronic Structured Harmonised Protocol (CeSHarP)",
+      "title_ko": "임상시험계획서 조화 구조(CeSHarP)",
+      "doc_type": "guideline-topic",
+      "published_date": "2025-11-19",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_Step4_M11_Final_Guideline_2025_1119.pdf"
+    },
+    {
+      "id": "ich-dc7f8293bbe3",
+      "code": "M12",
+      "title_en": "M12 Drug Interaction Studies",
+      "title_ko": "약물상호작용시험",
+      "doc_type": "guideline-topic",
+      "published_date": "2024-05-21",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf"
+    },
+    {
+      "id": "ich-1540e16abffc",
+      "code": "M13",
+      "title_en": "M13A Bioequivalence for Immediate-Release Solid Oral Dosage Forms",
+      "title_ko": "속방성 경구 고형제의 생물학적동등성",
+      "doc_type": "guideline-topic",
+      "published_date": "2024-07-23",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_M13A_Step4_Final_Guideline_2024_0723.pdf"
+    },
+    {
+      "id": "ich-3cc6b109ec1e",
+      "code": "M14",
+      "title_en": "M14 General Principles on Plan, Design, and Analysis of Pharmacoepidemiological Studies That Utilize Real-World Data for Safety Assessment of Medicines",
+      "title_ko": "의약품 안전성 평가를 위한 실제임상자료 활용",
+      "doc_type": "guideline-topic",
+      "published_date": "2025-09-04",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_M14_Step4_Final_Guideline_2025_0905.pdf"
+    },
+    {
+      "id": "ich-d6e47b547297",
+      "code": "M15",
+      "title_en": "M15 General Principles for Model-Informed Drug Development",
+      "title_ko": "모델 기반 의약품 개발의 일반 원칙",
+      "doc_type": "guideline-topic",
+      "published_date": "2026-01-29",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "pdf_url": "https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf"
+    },
+    {
+      "id": "ich-fa6678dc5db9",
+      "code": "M16",
+      "title_en": "Structured Product Quality Submissions",
+      "title_ko": "구조화된 의약품 품질 제출",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-4b7af106ee25",
+      "code": "M18",
+      "title_en": "Framework for Determining the Utility of Comparative Efficacy Studies in Biosimilar Development Programs",
+      "title_ko": "바이오시밀러 개발에서 비교유효성시험 유용성 판단 체계",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "items": [
+    {
+      "id": "who-trs1067-annex2",
+      "code": "TRS 1067 Annex 2",
+      "title_en": "WHO points to consider in continuous manufacturing of pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2026-06-09",
+      "official_url": "https://www.who.int/publications/m/item/trs-1067---annex-2--who-points-to-consider-in-continuous-manufacturing-of-pharmaceutical-products"
+    },
+    {
+      "id": "who-trs1060-annex4",
+      "code": "TRS 1060 Annex 4",
+      "title_en": "Good practices for blood establishments",
+      "doc_type": "Technical document",
+      "published_date": "2025-04-15",
+      "official_url": "https://www.who.int/publications/m/item/trs-1060---annex-4--good-practices-for-blood-establishments"
+    },
+    {
+      "id": "who-trs1060-annex3",
+      "code": "TRS 1060 Annex 3",
+      "title_en": "WHO good manufacturing practices for excipients used in pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2025-04-15",
+      "official_url": "https://www.who.int/publications/m/item/trs-1060---annex-3--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products"
+    },
+    {
+      "id": "who-trs1060-annex2",
+      "code": "TRS 1060 Annex 2",
+      "title_en": "WHO good practice considerations for the prevention and control of nitrosamines in pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2025-04-15",
+      "official_url": "https://www.who.int/publications/m/item/trs-1060---annex-2--who-good-practice-considerations-for-the-prevention-and-control-of-nitrosamines-in-pharmaceutical-products"
+    },
+    {
+      "id": "who-trs1052-annex3",
+      "code": "TRS 1052 Annex 3",
+      "title_en": "IAEA/WHO good manufacturing practices for in-house cold kits for radiopharmaceutical preparations",
+      "doc_type": "Technical document",
+      "published_date": "2024-04-26",
+      "official_url": "https://www.who.int/publications/m/item/trs-1052---annex-3--iaea-who-good-manufacturing-practices-for-in-house-cold-kits-for-radiopharmaceutical-preparations"
+    },
+    {
+      "id": "who-trs1044-annex5",
+      "code": "TRS 1044 Annex 5",
+      "title_en": "WHO good manufacturing practices for medicinal gases",
+      "doc_type": "Technical document",
+      "published_date": "2022-11-14",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex5"
+    },
+    {
+      "id": "who-trs1044-annex2",
+      "code": "TRS 1044 Annex 2",
+      "title_en": "WHO good manufacturing practices for sterile pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2022-10-31",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex2"
+    },
+    {
+      "id": "who-trs1044-annex6",
+      "code": "TRS 1044 Annex 6",
+      "title_en": "WHO good practices for research and development facilities of pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2022-09-30",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex6"
+    },
+    {
+      "id": "who-trs1044-annex7",
+      "code": "TRS 1044 Annex 7",
+      "title_en": "WHO good manufacturing practices for investigational products",
+      "doc_type": "Technical document",
+      "published_date": "2022-08-31",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex7"
+    },
+    {
+      "id": "who-trs1044-annex3",
+      "code": "TRS 1044 Annex 3",
+      "title_en": "IAEA/WHO guideline on good manufacturing practices for investigational radiopharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2022-07-31",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex3"
+    },
+    {
+      "id": "who-trs1044-annex4",
+      "code": "TRS 1044 Annex 4",
+      "title_en": "WHO guidelines on technology transfer in pharmaceutical manufacturing",
+      "doc_type": "Technical document",
+      "published_date": "2022-04-30",
+      "official_url": "https://www.who.int/publications/m/item/trs1044-annex4"
+    },
+    {
+      "id": "who-trs1033-annex3",
+      "code": "TRS 1033 Annex 3",
+      "title_en": "Good manufacturing practices: water for pharmaceutical use",
+      "doc_type": "Technical document",
+      "published_date": "2021-11-17",
+      "official_url": "https://www.who.int/publications/m/item/annex-3-trs-1033"
+    },
+    {
+      "id": "who-trs1033-annex4",
+      "code": "TRS 1033 Annex 4",
+      "title_en": "WHO guideline on data integrity",
+      "doc_type": "Technical document",
+      "published_date": "2021-10-10",
+      "official_url": "https://www.who.int/publications/m/item/annex-4-trs-1033"
+    },
+    {
+      "id": "who-trs1033-annex2",
+      "code": "TRS 1033 Annex 2",
+      "title_en": "Points to consider when including health-based exposure limits (HBELs) in cleaning validation",
+      "doc_type": "Technical document",
+      "published_date": "2021-10-10",
+      "official_url": "https://www.who.int/publications/m/item/annex-2-trs-1033"
+    },
+    {
+      "id": "who-trs1025-annex2",
+      "code": "TRS 1025 Annex 2",
+      "title_en": "IAEA/WHO good manufacturing practices for radiopharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2020-09-30",
+      "official_url": "https://www.who.int/publications/m/item/trs1025-annex2"
+    },
+    {
+      "id": "who-trs1025-annex6",
+      "code": "TRS 1025 Annex 6",
+      "title_en": "Points to consider for manufacturers and inspectors: environmental aspects of manufacturing for the prevention of antimicrobial resistance",
+      "doc_type": "Technical document",
+      "published_date": "2020-04-20",
+      "official_url": "https://www.who.int/publications/m/item/trs-1025-annex-6"
+    },
+    {
+      "id": "who-trs1025-annex3",
+      "code": "TRS 1025 Annex 3",
+      "title_en": "Production of water for injection by means other than distillation",
+      "doc_type": "Technical document",
+      "published_date": "2020-04-20",
+      "official_url": "https://www.who.int/publications/m/item/trs-1025-annex-3-water-for-injection"
+    },
+    {
+      "id": "who-trs1019-annex2",
+      "code": "TRS 1019 Annex 2",
+      "title_en": "WHO good manufacturing practices for heating, ventilation and air-conditioning systems for non-sterile pharmaceutical products (part 2): interpretation of guidelines",
+      "doc_type": "Technical document",
+      "published_date": "2019-09-30",
+      "official_url": "https://www.who.int/publications/m/item/trs1019-annex2"
+    },
+    {
+      "id": "who-trs1019-annex3",
+      "code": "TRS 1019 Annex 3",
+      "title_en": "Good manufacturing practices: guidelines on validation",
+      "doc_type": "Technical document",
+      "published_date": "2019-01-25",
+      "official_url": "https://www.who.int/publications/m/item/trs1019-annex3"
+    },
+    {
+      "id": "who-trs1010-annex8",
+      "code": "TRS 1010 Annex 8",
+      "title_en": "Guidelines on heating, ventilation and air-conditioning systems for non-sterile pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2018-10-10",
+      "official_url": "https://www.who.int/publications/m/item/Annex-8-trs-1010"
+    },
+    {
+      "id": "who-trs1010-annex1",
+      "code": "TRS 1010 Annex 1",
+      "title_en": "WHO good manufacturing practices for the manufacture of herbal medicines",
+      "doc_type": "Technical document",
+      "published_date": "2018-09-30",
+      "official_url": "https://www.who.int/publications/m/item/trs1010-annex1"
+    },
+    {
+      "id": "who-trs996-annex3",
+      "code": "TRS 996 Annex 3",
+      "title_en": "WHO good manufacturing practices for biological products (jointly with the Expert Committee on Biological Standardization)",
+      "doc_type": "Technical document",
+      "published_date": "2016-04-14",
+      "official_url": "https://www.who.int/publications/m/item/trs996-annex3"
+    },
+    {
+      "id": "who-trs992-annex4",
+      "code": "TRS 992 Annex 4",
+      "title_en": "General guidance on hold-time studies",
+      "doc_type": "Technical document",
+      "published_date": "2015-10-31",
+      "official_url": "https://www.who.int/publications/m/item/trs992-annex4"
+    },
+    {
+      "id": "who-trs986-annex2",
+      "code": "TRS 986 Annex 2",
+      "title_en": "WHO good manufacturing practices for pharmaceutical products: main principles",
+      "doc_type": "Technical document",
+      "published_date": "2014-10-01",
+      "official_url": "https://www.who.int/publications/m/item/trs986-annex2"
+    },
+    {
+      "id": "who-trs981-annex2",
+      "code": "TRS 981 Annex 2",
+      "title_en": "WHO guidelines on quality risk management",
+      "doc_type": "Technical document",
+      "published_date": "2013-01-25",
+      "official_url": "https://www.who.int/publications/m/item/trs981-annex2"
+    },
+    {
+      "id": "who-trs957-annex2",
+      "code": "TRS 957 Annex 2",
+      "title_en": "WHO good manufacturing practices for active pharmaceutical ingredients (bulk drug substances)",
+      "doc_type": "Technical document",
+      "published_date": "2010-10-01",
+      "official_url": "https://www.who.int/publications/m/item/annex-2-trs-957"
+    },
+    {
+      "id": "who-trs957-annex3",
+      "code": "TRS 957 Annex 3",
+      "title_en": "WHO good manufacturing practices for pharmaceutical products containing hazardous substances",
+      "doc_type": "Technical document",
+      "published_date": "2010-09-30",
+      "official_url": "https://www.who.int/publications/m/item/trs957-annex3"
+    },
+    {
+      "id": "who-trs902-annex9",
+      "code": "TRS 902 Annex 9",
+      "title_en": "Guidelines on packaging for pharmaceutical products",
+      "doc_type": "Technical document",
+      "published_date": "2002-10-10",
+      "official_url": "https://www.who.int/publications/m/item/annex-9-trs-902"
+    }
+  ]
+}

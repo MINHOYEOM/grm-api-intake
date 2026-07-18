@@ -68,8 +68,9 @@
   </div>
 </main>
 <style>
-/* [자료실] 공통 카탈로그 — grm.css 토큰만 사용(프리즈 보존). 데스크톱 우선 폭·한글 keep-all. */
-.lib-head p{max-width:720px;word-break:keep-all}  /* 공용 .page-head p 62ch(≈510px) 조기 wrap 해소 — 이 페이지 한정 오버라이드 */
+/* [자료실] 공통 카탈로그 — grm.css 토큰만 사용(프리즈 보존).
+   폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
+.lib-head p{max-width:none;word-break:keep-all}  /* 공용 .page-head p 62ch 캡 해제 — 표준 wrap 전폭 */
 .lib-body{padding-bottom:64px}
 .lib-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:22px}
 .lib-meta-i{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted)}
@@ -84,13 +85,13 @@
 .lib-series-t{flex:1;min-width:0}
 .lib-series-t h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.2;color:var(--ink);margin:0;word-break:keep-all}
 .lib-series-t h2 span{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--lo);margin-left:6px}
-.lib-series-t p{font-size:14px;color:var(--muted);margin:5px 0 0;line-height:1.55;word-break:keep-all;max-width:720px}
+.lib-series-t p{font-size:14px;color:var(--muted);margin:5px 0 0;line-height:1.55;word-break:keep-all}
 .lib-series-link{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none;white-space:nowrap;margin-top:4px}
 .lib-series-link:hover{text-decoration:underline}
 .lib-series-link .ti{font-size:14px}
-/* 항목 리스트 — 평면형=단일 컬럼 880px 캡(1180px 전폭 스캔라인 과장 제거), 그룹형=2컬럼 그리드 */
-.lib-items{list-style:none;padding:0;margin:22px 0 0;max-width:880px}
-.lib-items-grid{max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:2px 24px;margin-top:8px}
+/* 항목 리스트 — 평면형=단일 컬럼 전폭, 그룹형=2컬럼 그리드 */
+.lib-items{list-style:none;padding:0;margin:22px 0 0}
+.lib-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:2px 24px;margin-top:8px}
 .lib-item{display:flex;flex-direction:column;gap:7px;padding:15px 2px 14px;border-bottom:1px solid var(--line)}
 .lib-item-a{display:inline-flex;align-items:baseline;gap:9px;text-decoration:none;color:var(--ink);min-width:0}
 a.lib-item-a:hover{color:var(--coral-2)}
@@ -106,7 +107,7 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 .lib-extra{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none;border:1px solid rgba(194,96,63,.22);background:var(--coral-tint);padding:3px 10px;border-radius:999px;white-space:nowrap;transition:border-color .14s var(--ease)}
 .lib-extra:hover{border-color:var(--coral)}
 .lib-extra .ti{font-size:13px}
-.lib-foot-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.65;max-width:720px;word-break:keep-all}
+.lib-foot-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.65;word-break:keep-all}
 @media (max-width:900px){ .lib-items-grid{grid-template-columns:1fr;gap:0} .lib-series-h{flex-wrap:wrap} }
 @media (max-width:640px){ .lib-item-title{font-size:15px} }
 </style>

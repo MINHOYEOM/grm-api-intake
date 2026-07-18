@@ -223,7 +223,9 @@ button{font-family:inherit;cursor:pointer}
 .callout p{color:var(--on-coral);opacity:.92;font-size:17px;max-width:72ch;margin:0 auto 28px;word-break:keep-all;text-wrap:balance}
 
 /* ── 아카이브 게시판 헤더 ───────────────────────────────────────────────── */
-.page-head{padding:62px 0 10px}
+/* P0-1 동류: shorthand(62px 0 10px)는 .wrap 좌우 36px 패딩을 0 으로 덮어써
+   헤딩·인트로만 본문 대비 36px 좌측으로 밀리던 오프셋. longhand 로 좌우 패딩(.wrap) 보존. */
+.page-head{padding-top:62px;padding-bottom:10px}
 .page-head .kick{display:block;margin-bottom:16px}
 .page-head h1{font-family:var(--serif);font-weight:400;font-size:50px;letter-spacing:-.02em;line-height:1.12;color:var(--ink)}
 .page-head p{color:var(--body);margin-top:16px;font-size:16.5px;max-width:62ch;line-height:1.65}

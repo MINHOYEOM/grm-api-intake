@@ -37,7 +37,7 @@
     <article class="qz-card" id="{{ q.id }}"
              data-index="{{ loop.index0 }}"
              data-difficulty="{{ q.difficulty }}"
-             data-answer="{{ q.answer_index }}">
+             data-answer="{{ q.answer_index }}"{% if q.week %} data-week="{{ q.week }}"{% endif %}>
       <div class="qz-meta">
         <span class="qz-no">Q<span class="qz-no-n">{{ loop.index }}</span></span>
         {% if q.difficulty_label %}<span class="qz-diff qz-diff-{{ q.difficulty }}">{{ q.difficulty_label }}</span>{% endif %}

@@ -5027,6 +5027,95 @@ class WebGurumiGrowthTest(unittest.TestCase):
             self.assertIn(name, self.growth_js)
 
 
+# ── 주간 퀴즈 week 필드(9차 G3) — 파이프라인 지정 주차 우선 + 회전 보충 ────────────
+class WebQuizWeekFieldTest(unittest.TestCase):
+    """뱅크 항목 선택 필드 week(YYYYWW): 있으면 해당 주차 문항을 "이번 주"로 우선 선정
+    +부족분은 기존 회전 보충, 없으면(현 데이터) 기존 회전과 완전 동일(무회귀). 서버는
+    week 를 data-week 로 무변형 embed 만 하고 선택은 quiz.js 순수 함수(pickWeeklyIndexes)
+    소관 — 두 경로는 node 로 실제 quiz.js 를 실행해 고정한다(node 부재 환경은 skip —
+    CI ubuntu 러너는 node 내장)."""
+
+    def test_view_passes_week_string_only_when_present(self):
+        with_week = render._quiz_question_view({"id": "q-w", "week": 202629})
+        without = render._quiz_question_view({"id": "q-n"})
+        self.assertEqual(with_week["week"], "202629")   # int → 문자열 정규화(값 무변형)
+        self.assertEqual(without["week"], "")
+
+    def test_template_emits_data_week_only_when_present(self):
+        synthetic = [
+            {"id": "q-w1", "question_ko": "주차 지정 문항?", "choices": ["a", "b", "c", "d"],
+             "answer_index": 0, "explanation_ko": "설명.", "difficulty": "easy",
+             "source_type": "glossary", "source_ref": "gmp", "week": 202629},
+            {"id": "q-n1", "question_ko": "무주차 문항?", "choices": ["a", "b", "c", "d"],
+             "answer_index": 1, "explanation_ko": "설명.", "difficulty": "normal",
+             "source_type": "glossary", "source_ref": "gmp"},
+        ]
+        orig = render.load_quiz_bank
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_quizweek_"))
+        try:
+            render.load_quiz_bank = lambda *a, **k: synthetic
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            html = (out / "quiz" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.load_quiz_bank = orig
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertIn('id="q-w1"', html)
+        self.assertIn('data-week="202629"', html)
+        # 무주차 카드엔 data-week 자체가 없다(속성 생략 — 기존 마크업 모양 보존).
+        card_n = html[html.index('id="q-n1"'):html.index('id="q-n1"') + 400]
+        self.assertNotIn('data-week="', card_n)
+
+    def test_current_bank_has_no_week_and_golden_has_no_data_week(self):
+        # 현 정본 데이터 경로 = 기존 회전 그대로 — 뱅크·골든 모두 week 무흔적.
+        bank = json.loads(render.QUIZ_FILE.read_text(encoding="utf-8"))
+        self.assertTrue(all("week" not in q for q in bank))
+        golden = (GOLDEN_DIR / "quiz.expected.html").read_text(encoding="utf-8")
+        self.assertNotIn('data-week="', golden)   # data-weekly-count(별개 속성)와 구분
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 선택 로직 경로 고정은 CI에서 수행")
+    def test_pick_weekly_indexes_both_paths_pinned_via_node(self):
+        import subprocess
+        driver = r"""
+global.window = {};
+global.document = { getElementById: function () { return null; },
+                    querySelectorAll: function () { return []; } };
+require(process.argv[2]);            // quiz.js — GRM_QUIZ 부착 후 root 가드에서 조기 종료
+var f = global.window.GRM_QUIZ.pickWeeklyIndexes;
+function mk() { var a = []; for (var i = 0; i < 12; i++)
+  a.push({ index: i, difficulty: i < 8 ? "easy" : "normal", week: "" }); return a; }
+var out = {};
+out.noweek = f(mk(), 4, 202629);                    // week 전무 → 기존 회전 경로
+var w = mk(); w[5].week = "202629"; w[10].week = "202629";
+out.week = f(w, 4, 202629);                         // 지정 2 + 회전 보충 2
+var o = mk(); o[5].week = "202629"; o[10].week = "202629"; o[3].week = "202630";
+out.other = f(o, 4, 202629);                        // 타 주차 지정은 rest 취급
+var all = mk(); all.forEach(function (it) { it.week = "202629"; });
+out.overflow = f(all, 4, 202629);                   // 지정 초과 → 뱅크 순 상위 count
+console.log(JSON.stringify(out));
+"""
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_quizjs_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(
+                ["node", str(drv), str(WEB_DIR / "assets" / "quiz.js")],
+                capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+        # 기존 회전 경로(무week) — G3 이전 알고리즘 산출과 동일한 고정값(무회귀 앵커):
+        # easy 8·normal 4, seed 202629 → baseE=mod(607887,8)=7 → easy 7,0,1 · baseN=1 → normal idx9.
+        self.assertEqual(out["noweek"], [0, 1, 7, 9])
+        # 지정 2(5·10) + 보충: poolE 7건 baseE=mod(607887,7)=0 → idx0 · poolN 3건 baseN=0 → idx8.
+        self.assertEqual(out["week"], [0, 5, 8, 10])
+        # 타 주차(202630) 지정 문항은 이번 주 선정에 영향 없음(rest 로만 참여).
+        self.assertEqual(out["other"], [0, 5, 8, 10])
+        # 전 문항 지정 → 뱅크 순 상위 4.
+        self.assertEqual(out["overflow"], [0, 1, 2, 3])
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

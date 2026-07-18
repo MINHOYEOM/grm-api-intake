@@ -3,10 +3,46 @@
  * 채점해 정답·해설·근거 링크를 보여준다. 결정론 렌더(골든) 불침범: 이 스크립트는 런타임에
  * 클래스/hidden/텍스트만 토글하며 문항·정답·해설·링크 콘텐츠를 만들지 않는다(전부 서버가
  * 렌더한 DOM 값). JS 미로드 시 전 문항이 그대로 보이고 근거 링크·해시 딥링크 무영향
- * (progressive enhancement). v1 비목표: 랭킹·참여기록·서버 저장 없음 — 점수는 화면 표시만
- * 이며 어떤 저장소에도 남기지 않는다(now()/난수는 주차 회전에만 쓰고 서버로 보내지 않음). */
+ * (progressive enhancement). 랭킹·서버 저장 없음(성장 적립은 별도 growth.js 레이어 소관).
+ * [9차 G3] week(YYYYWW) 필드: 뱅크 항목에 week 가 있으면 해당 주차 문항을 "이번 주"로
+ * 우선 선정하고 부족분만 기존 회전으로 보충한다(월 13:00 자동 생성 파이프라인 계약).
+ * week 가 하나도 없으면(현 데이터) 기존 회전과 완전 동일 경로 — node 테스트가 두 경로 고정. */
 (function () {
   "use strict";
+  function mod(n, m) { return ((n % m) + m) % m; }
+
+  // [9차 G3] 주간 선택 — 순수 함수(DOM 무접촉·테스트 대상). items = [{index(뱅크순),
+  // difficulty("easy"|"normal"), week("YYYYWW"|"")}]. 반환 = 선정 문항 index 오름차순.
+  // 규칙: ① week===String(seed) 문항을 뱅크 순으로 최대 count 개 우선(초과분은 잘림 —
+  // 지정분 난이도 구성은 생성 파이프라인 책임) ② 부족분은 나머지 문항에서 기존 회전
+  // (normal 1~2 제한·easy 과반·seed 기반 결정론)으로 보충 ③ week 미보유 뱅크(현 데이터)는
+  // ①이 공집합이라 기존 회전과 산식·결과 동일(무회귀).
+  function pickWeeklyIndexes(items, weeklyCount, seed) {
+    var count = Math.min(weeklyCount, items.length);
+    var wk = String(seed);
+    var pinned = items.filter(function (it) { return it.week === wk; }).slice(0, count);
+    var inPinned = {};
+    pinned.forEach(function (it) { inPinned[it.index] = true; });
+    var chosen = pinned.slice();
+    var need = count - pinned.length;
+    if (need > 0) {
+      var poolE = items.filter(function (it) { return it.difficulty === "easy" && !inPinned[it.index]; });
+      var poolN = items.filter(function (it) { return it.difficulty !== "easy" && !inPinned[it.index]; });
+      var normalCount = Math.min(need >= 5 ? 2 : 1, poolN.length, need);
+      var easyCount = Math.min(need - normalCount, poolE.length);
+      normalCount = Math.min(need - easyCount, poolN.length);
+      var i, baseE = mod(seed * 3, Math.max(poolE.length, 1));
+      for (i = 0; i < easyCount; i++) chosen.push(poolE[mod(baseE + i, poolE.length)]);
+      var baseN = mod(seed, Math.max(poolN.length, 1));
+      for (i = 0; i < normalCount; i++) chosen.push(poolN[mod(baseN + i, poolN.length)]);
+    }
+    chosen.sort(function (a, b) { return a.index - b.index; });
+    return chosen.map(function (it) { return it.index; });
+  }
+  // 테스트(node)·후속 파이프라인 검증용 노출 — DOM 부재 환경에서도 순수 함수만 쓸 수 있게
+  // root 가드보다 먼저 부착한다.
+  if (typeof window !== "undefined") window.GRM_QUIZ = { pickWeeklyIndexes: pickWeeklyIndexes };
+
   var root = document.getElementById("grm-qz");
   if (!root) return;
   var cards = Array.prototype.slice.call(document.querySelectorAll(".qz-card"));
@@ -18,8 +54,6 @@
   var subEl = document.getElementById("grm-qz-sub");
   var titleEl = document.getElementById("grm-qz-title");
   var toggle = document.getElementById("grm-qz-toggle");
-
-  function mod(n, m) { return ((n % m) + m) % m; }
 
   // ISO 8601 주차 키(연*100 + 주차) — 클라이언트 now() 기준. 같은 달력 주에는 모든 사용자가
   // 동일 seed 를 얻어 같은 문항 세트를 본다(렌더러 결정론과 무관 — 서버는 회전하지 않는다).
@@ -34,32 +68,18 @@
     return d.getUTCFullYear() * 100 + week;
   }
 
-  // 난이도별 분할(DOM 순 = 정본 뱅크 순 유지). 주차 회전이 easy 과반·normal 1~2 를 맞춘다.
-  var easy = cards.filter(function (c) { return c.getAttribute("data-difficulty") === "easy"; });
-  var normal = cards.filter(function (c) { return c.getAttribute("data-difficulty") !== "easy"; });
+  // DOM 카드 → 순수 항목 서술자(뱅크 순 index·난이도·주차) — 선택은 pickWeeklyIndexes 소관.
+  var items = cards.map(function (c) {
+    return {
+      index: parseInt(c.getAttribute("data-index"), 10),
+      difficulty: c.getAttribute("data-difficulty") === "easy" ? "easy" : "normal",
+      week: c.getAttribute("data-week") || ""
+    };
+  });
 
-  function pickWeekly(seed) {
-    var count = Math.min(weeklyCount, cards.length);
-    // normal 은 1~2문항으로 제한(운영설계 §2.3), 나머지는 easy(과반 자동 충족).
-    var normalCount = Math.min(count >= 5 ? 2 : 1, normal.length, count);
-    var easyCount = Math.min(count - normalCount, easy.length);
-    // easy 가 부족하면 normal 로 보충(뱅크가 작아지는 방어적 경로 — v1 데이터엔 미발생).
-    normalCount = Math.min(count - easyCount, normal.length);
-    var chosen = [];
-    var i, baseE = mod(seed * 3, Math.max(easy.length, 1));
-    for (i = 0; i < easyCount; i++) chosen.push(easy[mod(baseE + i, easy.length)]);
-    var baseN = mod(seed, Math.max(normal.length, 1));
-    for (i = 0; i < normalCount; i++) chosen.push(normal[mod(baseN + i, normal.length)]);
-    // 읽기 순서 안정화 — 정본 뱅크 순(data-index)으로 정렬.
-    chosen.sort(function (a, b) {
-      return parseInt(a.getAttribute("data-index"), 10) - parseInt(b.getAttribute("data-index"), 10);
-    });
-    return chosen;
-  }
-
-  var weekly = pickWeekly(isoWeekSeed(new Date()));
   var weeklySet = {};
-  weekly.forEach(function (c) { weeklySet[c.getAttribute("data-index")] = true; });
+  pickWeeklyIndexes(items, weeklyCount, isoWeekSeed(new Date())).forEach(function (i) { weeklySet[i] = true; });
+  var weekly = cards.filter(function (c) { return !!weeklySet[c.getAttribute("data-index")]; });
   var mode = "weekly";
 
   function applyMode() {

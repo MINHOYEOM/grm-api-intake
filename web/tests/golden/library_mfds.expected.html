@@ -34,15 +34,14 @@
 </head>
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
-  <nav id="navmenu"><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html" class="on">자료실</a><a href="../../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html" class="on">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
 <main>
-  <div class="wrap page-head lib-head">
+  <div class="wrap page-head lib-head"><nav class="lib-crumb reveal" aria-label="상위로"><a href="../../library/index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i>자료실</a></nav>
     <span class="kick reveal" style="animation-delay:.02s">MFDS · Guidance</span>
     <h1 class="reveal" style="animation-delay:.08s">MFDS 지침·고시 아카이브</h1>
     <p class="reveal" style="animation-delay:.14s">식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 발행일 순으로 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.</p>
@@ -623,10 +622,33 @@
       </ul>
   </div>
 </main>
+<button class="grm-top" id="grmTop" type="button" aria-label="맨 위로" hidden><i class="ti ti-arrow-up" aria-hidden="true"></i></button>
+<style>
+.grm-top{position:fixed;right:22px;bottom:26px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--canvas);border:1px solid var(--line-2);color:var(--muted);border-radius:50%;box-shadow:0 10px 24px -12px rgba(0,0,0,.28);cursor:pointer;z-index:50;transition:color .14s var(--ease),border-color .14s var(--ease),box-shadow .14s var(--ease)}
+.grm-top:hover{color:var(--coral-2);border-color:var(--coral)}
+.grm-top .ti{font-size:19px}
+.grm-top[hidden]{display:none}
+@media (max-width:640px){ .grm-top{width:40px;height:40px;right:16px;bottom:18px} .grm-top .ti{font-size:17px} }
+</style>
+<script>
+(function(){
+  var btn=document.getElementById('grmTop');
+  if(!btn) return;
+  addEventListener('scroll', function(){ btn.hidden = scrollY <= 600; }, {passive:true});
+  btn.addEventListener('click', function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    window.scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+  });
+})();
+</script>
 <style>
 /* [자료실] 공통 카탈로그 — grm.css 토큰만 사용(프리즈 보존).
    폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
 .lib-head p{max-width:none;word-break:keep-all}  /* 공용 .page-head p 62ch 캡 해제 — 표준 wrap 전폭 */
+.lib-crumb{display:block;margin-bottom:14px}
+.lib-crumb a{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--muted);text-decoration:none}
+.lib-crumb a:hover{color:var(--coral-2)}
+.lib-crumb .ti{font-size:15px}
 .lib-body{padding-bottom:64px}
 .lib-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:22px}
 .lib-meta-i{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted)}
@@ -671,7 +693,7 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../guide/index.html">이용안내</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
+    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
   </div>

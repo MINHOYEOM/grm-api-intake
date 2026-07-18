@@ -4163,7 +4163,7 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertEqual(buckets, sorted(expected_present, key=lambda b: (order.get(b, 99), b)))
         self.assertEqual(self.html.count('<section class="gl-group"'), len(buckets))
         self.assertEqual(view["total"], len(self.terms))
-        self.assertEqual(len(self.terms), 145)  # v2 145어(교체 정합 가드)
+        self.assertEqual(len(self.terms), 200)  # v3 200어(교체 정합 가드 — 9차 자율 런 G1)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).
@@ -4188,9 +4188,13 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertEqual(built, src, "glossary.js 가 verbatim 복사되지 않음")
 
     def test_search_data_attr_present_and_lowercased(self):
-        # 카드마다 data-search(term_ko/en/easy 소문자 결합) — 클라이언트 필터 입력.
+        # 카드마다 data-search(term_ko/en/easy+detail_ko(있을 때만) 소문자 결합) — 클라이언트
+        # 필터 입력. v3 부터 전 용어가 detail_ko 보유 — render 결합식과 동일하게 파생 대조.
         for t in self.terms:
-            combined = " ".join([t["term_ko"], t["term_en"], t["easy_ko"]]).lower()
+            parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
+            if t.get("detail_ko"):
+                parts.append(t["detail_ko"])
+            combined = " ".join(parts).lower()
             self.assertEqual(render._glossary_bucket(t["term_ko"]),
                              render._glossary_bucket(t["term_ko"]))  # 순수 함수 안정
             self.assertIn(str(_esc(combined)), self.html)

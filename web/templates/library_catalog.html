@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 {#- 자료실 · 공통 카탈로그 템플릿(트랙 C 고도화 2026-07-18) — registry(render.LIBRARY_REGISTRY)
-    전 카탈로그가 이 템플릿 하나로 렌더된다(카탈로그 추가 = 데이터 파일 + registry 1항목).
-    뷰모델은 render._catalog_view 가 구(ich series·mfds items)·v2 스키마를 공통 형태로
-    정규화한 것. 선택 필드(code·title_ko·doc_type·published_date·ko_url·pdf_url)는 있으면
-    표시·없으면 조용히 생략. 날짜는 발행일만(수집일 표기 금지 — 품질 기준 2026-07-18).
+    전 카탈로그(6종)가 이 템플릿 하나로 렌더된다(카탈로그 추가 = 데이터 파일 + registry 1항목).
+    뷰모델은 render._catalog_view 가 v2 평면 스키마를 정규화한 것: 한국어 제목 우선(title_ko
+    있으면 주 제목·title_en 병기 줄), 선택 필드(code·doc_type·published_date·ko_url·pdf_url)는
+    있으면 표시·없으면 조용히 생략. 날짜는 발행일만(수집일 표기 금지 — 품질 기준 2026-07-18).
+    lib.link_label 이 있으면(ICH — 항목 official_url 이 개별 문서가 아니라 공식 카탈로그
+    2페이지로 수렴) 제목을 링크로 만들지 않고 그룹 헤더의 라벨 링크로만 정직하게 연결한다.
     Tier/QA 등 내부 운영 개념은 뷰모델에 없다(노출 금지). grm.css 프리즈 보존 위해 스코프
     <style>. 데스크톱 우선: 인트로 720px·평면 리스트 880px 캡·한글 word-break:keep-all. -#}
 <main>
@@ -28,7 +30,7 @@
           <h2>{{ g.label }}{% if g.label_en %} <span>{{ g.label_en }}</span>{% endif %}</h2>
           {% if g.blurb %}<p>{{ g.blurb }}</p>{% endif %}
         </div>
-        {% if g.official_url %}<a class="lib-series-link" href="{{ g.official_url }}" target="_blank" rel="noopener">공식 페이지 <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
+        {% if g.official_url %}<a class="lib-series-link" href="{{ g.official_url }}" target="_blank" rel="noopener">{{ lib.link_label or "공식 페이지" }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
       </div>
       <ul class="lib-items lib-items-grid">
     {% else %}
@@ -36,7 +38,7 @@
     {% endif %}
         {% for it in g['items'] %}
         <li class="lib-item">
-          {% if it.official_url %}
+          {% if it.official_url and not lib.link_label %}
           <a class="lib-item-a" href="{{ it.official_url }}" target="_blank" rel="noopener">
             {% if it.code %}<span class="lib-code">{{ it.code }}</span>{% endif %}
             <span class="lib-item-title">{{ it.title }}</span>
@@ -48,13 +50,13 @@
             <span class="lib-item-title">{{ it.title }}</span>
           </span>
           {% endif %}
-          {% if it.title_ko %}<p class="lib-item-ko">{{ it.title_ko }}</p>{% endif %}
+          {% if it.sub %}<p class="lib-item-sub">{{ it.sub }}</p>{% endif %}
           {% if it.doc_type or it.published_date or it.ko_url or it.pdf_url %}
           <div class="lib-item-meta">
             {% if it.doc_type %}<span class="lib-type">{{ it.doc_type }}</span>{% endif %}
             {% if it.published_date %}<span class="lib-date"><i class="ti ti-calendar" aria-hidden="true"></i>발행 {{ it.published_date }}</span>{% endif %}
             {% if it.ko_url %}<a class="lib-extra" href="{{ it.ko_url }}" target="_blank" rel="noopener"><i class="ti ti-language" aria-hidden="true"></i>한글 번역본</a>{% endif %}
-            {% if it.pdf_url %}<a class="lib-extra" href="{{ it.pdf_url }}" target="_blank" rel="noopener"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</a>{% endif %}
+            {% if it.pdf_url and it.pdf_url != it.official_url %}<a class="lib-extra" href="{{ it.pdf_url }}" target="_blank" rel="noopener"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</a>{% endif %}
           </div>
           {% endif %}
         </li>
@@ -96,7 +98,7 @@ a.lib-item-a:hover{color:var(--coral-2)}
 .lib-item-title{font-family:var(--sans);font-size:15.5px;line-height:1.5;font-weight:500;word-break:keep-all;overflow-wrap:anywhere}
 .lib-item-ext{flex:none;font-size:13px;color:var(--lo);align-self:center;opacity:0;transition:opacity .14s var(--ease)}
 a.lib-item-a:hover .lib-item-ext{opacity:1}
-.lib-item-ko{font-family:var(--sans);font-size:13.5px;color:var(--body);line-height:1.55;margin:0;word-break:keep-all}
+.lib-item-sub{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.5;margin:0;word-break:keep-all;overflow-wrap:anywhere}
 .lib-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:7px 14px}
 .lib-type{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--med);background:rgba(176,125,23,.11);border:1px solid rgba(176,125,23,.24);padding:3px 9px;border-radius:999px;white-space:nowrap}
 .lib-date{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}

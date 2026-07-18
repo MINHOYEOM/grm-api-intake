@@ -1,281 +1,253 @@
 {
- "meta": {
-  "source": "ICH",
-  "title": "ICH 가이드라인 카탈로그",
-  "public_base": "https://www.ich.org/page/",
-  "detection_basis": "admin.ich.org 섹션 제목 스냅샷 (구조 비의존 코드패턴)",
-  "collected_date": "2026-06-05",
-  "topic_count": 31,
-  "note": "ICH 공식 페이지의 토픽 섹션 제목을 스냅샷으로 수집한 정적 카탈로그입니다. 각 계열의 최신 Step·개정본·PDF·의견수렴 마감일 등 변동 정보는 공식 페이지에서 확인하세요."
- },
- "series": [
-  {
-   "slug": "quality-guidelines",
-   "letter": "Q",
-   "label_en": "Quality",
-   "label_ko": "품질 가이드라인",
-   "blurb": "의약품 품질·안정성·불순물·밸리데이션·품질시스템 등 CMC 핵심 계열",
-   "official_url": "https://www.ich.org/page/quality-guidelines",
-   "topics": [
+  "items": [
     {
-     "code": "Q1A - Q1F",
-     "title": "Q1A - Q1F Stability",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-156da584415e"
+      "id": "ich-156da584415e",
+      "code": "Q1A-Q1F",
+      "title_en": "Stability",
+      "title_ko": "안정성",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q2",
-     "title": "Q2 Analytical Validation",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-36c41a7af7f9"
+      "id": "ich-36c41a7af7f9",
+      "code": "Q2",
+      "title_en": "Analytical Validation",
+      "title_ko": "분석법 밸리데이션",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q3A - Q3E",
-     "title": "Q3A - Q3E Impurities",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-b01162b4fff3"
+      "id": "ich-b01162b4fff3",
+      "code": "Q3A-Q3E",
+      "title_en": "Impurities",
+      "title_ko": "불순물",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q4A - Q4B",
-     "title": "Q4A - Q4B Pharmacopoeias",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-f4aa58f5e2ee"
+      "id": "ich-f4aa58f5e2ee",
+      "code": "Q4A-Q4B",
+      "title_en": "Pharmacopoeias",
+      "title_ko": "약전",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q5A - Q5E",
-     "title": "Q5A - Q5E Quality of Biotechnological Products",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-e7f3a99dfc9d"
+      "id": "ich-e7f3a99dfc9d",
+      "code": "Q5A-Q5E",
+      "title_en": "Quality of Biotechnological Products",
+      "title_ko": "생명공학의약품 품질",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q6A - Q6B",
-     "title": "Q6A- Q6B Specifications",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-22f1bbd580d6"
+      "id": "ich-22f1bbd580d6",
+      "code": "Q6A-Q6B",
+      "title_en": "Specifications",
+      "title_ko": "규격",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q7",
-     "title": "Q7 Good Manufacturing Practice",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-998a75651186"
+      "id": "ich-998a75651186",
+      "code": "Q7",
+      "title_en": "Good Manufacturing Practice",
+      "title_ko": "의약품 제조 및 품질관리기준",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q8",
-     "title": "Q8 Pharmaceutical Development",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-460133fa7e5a"
+      "id": "ich-460133fa7e5a",
+      "code": "Q8",
+      "title_en": "Pharmaceutical Development",
+      "title_ko": "의약품 개발",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q9",
-     "title": "Q9 Quality Risk Management",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-aeb86aaa5b68"
+      "id": "ich-aeb86aaa5b68",
+      "code": "Q9",
+      "title_en": "Quality Risk Management",
+      "title_ko": "품질위험관리",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q10",
-     "title": "Q10 Pharmaceutical Quality System",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-2b5388c2ca85"
+      "id": "ich-2b5388c2ca85",
+      "code": "Q10",
+      "title_en": "Pharmaceutical Quality System",
+      "title_ko": "의약품 품질시스템",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q11",
-     "title": "Q11 Development and Manufacture of Drug Substances",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-7126bd90d285"
+      "id": "ich-7126bd90d285",
+      "code": "Q11",
+      "title_en": "Development and Manufacture of Drug Substances",
+      "title_ko": "원료의약품 개발 및 제조",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q12",
-     "title": "Q12 Lifecycle Management",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-ffb664fc3118"
+      "id": "ich-ffb664fc3118",
+      "code": "Q12",
+      "title_en": "Pharmaceutical Product Lifecycle Management",
+      "title_ko": "의약품 전주기 관리",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
     },
     {
-     "code": "Q13",
-     "title": "Q13 Continuous Manufacturing of Drug Substances and Drug Products",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-4132442706bc"
+      "id": "ich-4132442706bc",
+      "code": "Q13",
+      "title_en": "Continuous Manufacturing of Drug Substances and Drug Products",
+      "title_ko": "원료의약품과 완제의약품의 연속제조공정",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines",
+      "ko_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363"
     },
     {
-     "code": "Q14",
-     "title": "Q14 Analytical Procedure Development",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-e34212ef863f"
+      "id": "ich-e34212ef863f",
+      "code": "Q14",
+      "title_en": "Analytical Procedure Development",
+      "title_ko": "분석절차 개발",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/quality-guidelines"
+    },
+    {
+      "id": "ich-c2b1654f64f0",
+      "code": "M1",
+      "title_en": "MedDRA Terminology",
+      "title_ko": "MedDRA 용어",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-610d68a74e43",
+      "code": "M2",
+      "title_en": "Electronic Standards",
+      "title_ko": "전자표준",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-153842524174",
+      "code": "M3",
+      "title_en": "Nonclinical Safety Studies",
+      "title_ko": "비임상 안전성시험",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-ecb76a0de0c7",
+      "code": "M4",
+      "title_en": "Common Technical Document",
+      "title_ko": "국제공통기술문서",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-72a894e41380",
+      "code": "M5",
+      "title_en": "Data Elements and Standards for Drug Dictionaries",
+      "title_ko": "의약품 사전 데이터 요소 및 표준",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-471b24c9ff89",
+      "code": "M6",
+      "title_en": "Gene Therapy",
+      "title_ko": "유전자치료",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-78bb22895033",
+      "code": "M7",
+      "title_en": "Assessment and Control of DNA Reactive (Mutagenic) Impurities in Pharmaceuticals",
+      "title_ko": "의약품 중 DNA 반응성(변이원성) 불순물의 평가 및 관리",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-a81d3327de7b",
+      "code": "M8",
+      "title_en": "Electronic Common Technical Document (eCTD)",
+      "title_ko": "전자국제공통기술문서(eCTD)",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-f3eead0cb20e",
+      "code": "M9",
+      "title_en": "Biopharmaceutics Classification System-based Biowaivers",
+      "title_ko": "생물약제학적 분류체계 기반 생물학적동등성시험 면제",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-9df26b867704",
+      "code": "M10",
+      "title_en": "Bioanalytical Method Validation and Study Sample Analysis",
+      "title_ko": "생체시료 분석법 밸리데이션 및 시험검체 분석",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-78ad02fa1c9a",
+      "code": "M11",
+      "title_en": "Clinical electronic Structured Harmonised Protocol (CeSHarP)",
+      "title_ko": "임상시험계획서 조화 구조(CeSHarP)",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-dc7f8293bbe3",
+      "code": "M12",
+      "title_en": "Drug Interaction Studies",
+      "title_ko": "약물상호작용시험",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-1540e16abffc",
+      "code": "M13",
+      "title_en": "Bioequivalence for Immediate-Release Solid Oral Dosage Forms",
+      "title_ko": "속방성 경구 고형제의 생물학적동등성",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-3cc6b109ec1e",
+      "code": "M14",
+      "title_en": "Use of Real-World Data for Safety Assessment of Medicines",
+      "title_ko": "의약품 안전성 평가를 위한 실제임상자료 활용",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-d6e47b547297",
+      "code": "M15",
+      "title_en": "General Principles for Model-Informed Drug Development",
+      "title_ko": "모델 기반 의약품 개발의 일반 원칙",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-fa6678dc5db9",
+      "code": "M16",
+      "title_en": "Structured Product Quality Submissions",
+      "title_ko": "구조화된 의약품 품질 제출",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
+    },
+    {
+      "id": "ich-4b7af106ee25",
+      "code": "M18",
+      "title_en": "Framework for Determining the Utility of Comparative Efficacy Studies in Biosimilar Development Programs",
+      "title_ko": "바이오시밀러 개발에서 비교유효성시험 유용성 판단 체계",
+      "doc_type": "guideline-topic",
+      "official_url": "https://www.ich.org/page/multidisciplinary-guidelines"
     }
-   ]
-  },
-  {
-   "slug": "multidisciplinary-guidelines",
-   "letter": "M",
-   "label_en": "Multidisciplinary",
-   "label_ko": "다분야 가이드라인",
-   "blurb": "CTD·전자표준·변이원성 불순물·생물학적동등성 등 여러 분야에 걸친 계열",
-   "official_url": "https://www.ich.org/page/multidisciplinary-guidelines",
-   "topics": [
-    {
-     "code": "M1",
-     "title": "M1 MedDRA Terminology",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-c2b1654f64f0"
-    },
-    {
-     "code": "M2",
-     "title": "M2 Electronic Standards",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-610d68a74e43"
-    },
-    {
-     "code": "M3",
-     "title": "M3 Nonclinical Safety Studies",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-153842524174"
-    },
-    {
-     "code": "M4",
-     "title": "M4 Common Technical Document",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-ecb76a0de0c7"
-    },
-    {
-     "code": "M5",
-     "title": "M5 Data Elements and Standards for Drug Dictionaries",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-72a894e41380"
-    },
-    {
-     "code": "M6",
-     "title": "M6 Gene Therapy",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-471b24c9ff89"
-    },
-    {
-     "code": "M7",
-     "title": "M7 Mutagenic Impurities",
-     "signal_tier": "Tier 3",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-78bb22895033"
-    },
-    {
-     "code": "M8",
-     "title": "M8 Electronic Common Technical Document (eCTD)",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-a81d3327de7b"
-    },
-    {
-     "code": "M9",
-     "title": "M9 Biopharmaceutics Classification System-based Biowaivers",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-f3eead0cb20e"
-    },
-    {
-     "code": "M10",
-     "title": "M10 Bioanalytical Method Validation and Study Sample Analysis",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-9df26b867704"
-    },
-    {
-     "code": "M11",
-     "title": "M11 Clinical electronic Structured Harmonised Protocol (CeSHarP)",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-78ad02fa1c9a"
-    },
-    {
-     "code": "M12",
-     "title": "M12 Drug Interaction Studies",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-dc7f8293bbe3"
-    },
-    {
-     "code": "M13",
-     "title": "M13 Bioequivalence for Immediate-Release Solid Oral Dosage Forms",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-1540e16abffc"
-    },
-    {
-     "code": "M14",
-     "title": "M14 Use of real-world data for safety assessment of medicines",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-3cc6b109ec1e"
-    },
-    {
-     "code": "M15",
-     "title": "M15 General Principles for Model-Informed Drug Development",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-d6e47b547297"
-    },
-    {
-     "code": "M16",
-     "title": "M16 Structured Product Quality Submissions",
-     "signal_tier": "Tier 2",
-     "qa_relevance": "Likely",
-     "status": "stable",
-     "document_id": "ich-fa6678dc5db9"
-    },
-    {
-     "code": "M18",
-     "title": "M18 Framework for Determining the Utility of Comparative Efficacy Studies in Biosimilar Development Programs",
-     "signal_tier": "Tier 1",
-     "qa_relevance": "Possible",
-     "status": "stable",
-     "document_id": "ich-4b7af106ee25"
-    }
-   ]
-  }
- ]
+  ]
 }

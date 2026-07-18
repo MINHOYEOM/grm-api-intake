@@ -1,0 +1,162 @@
+{
+  "items": [
+    {
+      "id": "health-canada-gui-0001",
+      "code": "GUI-0001",
+      "title_en": "Good manufacturing practices guide for drug products",
+      "doc_type": "guidance",
+      "published_date": "2020-07-01",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-0001.html"
+    },
+    {
+      "id": "health-canada-gui-0002",
+      "code": "GUI-0002",
+      "title_en": "Guidance on Drug Establishment Licences",
+      "doc_type": "guidance",
+      "published_date": "2020-04-01",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-drug-establishment-licences-drug-establishment-licensing-fees-0002.html"
+    },
+    {
+      "id": "health-canada-gui-0005",
+      "code": "GUI-0005",
+      "title_en": "Explanatory notes for drug establishments on the preparation of a site master file",
+      "doc_type": "guidance",
+      "published_date": "2026-04-10",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html"
+    },
+    {
+      "id": "health-canada-gui-0012",
+      "code": "GUI-0012",
+      "title_en": "Guidance Document Annex 4 to the Current Edition of the Good Manufacturing Practices Guidelines - Veterinary Drugs",
+      "doc_type": "guidance",
+      "published_date": "2024-11-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html"
+    },
+    {
+      "id": "health-canada-gui-0023",
+      "code": "GUI-0023",
+      "title_en": "Risk classification guide for drug good manufacturing practices observations",
+      "doc_type": "guidance",
+      "published_date": "2020-08-31",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/risk-classification-drug-gmp-observations-0023.html"
+    },
+    {
+      "id": "health-canada-gui-0026",
+      "code": "GUI-0026",
+      "title_en": "Annex 3A to the Good manufacturing practices guide - Schedule C drugs",
+      "doc_type": "guidance",
+      "published_date": "2024-07-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-3-current-edition-guidelines-schedule-drugs-0026.html"
+    },
+    {
+      "id": "health-canada-gui-0027",
+      "code": "GUI-0027",
+      "title_en": "Annex 2 to the Good manufacturing practices guide - Manufacture of biologics",
+      "doc_type": "guidance",
+      "published_date": "2024-07-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-2-current-edition-guidelines-schedule-drugs-biological-drugs-0027.html"
+    },
+    {
+      "id": "health-canada-gui-0028",
+      "code": "GUI-0028",
+      "title_en": "Cleaning validation guide",
+      "doc_type": "guidance",
+      "published_date": "2021-06-29",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html"
+    },
+    {
+      "id": "health-canada-gui-0029",
+      "code": "GUI-0029",
+      "title_en": "Guide to validation - drugs and supporting activities",
+      "doc_type": "guidance",
+      "published_date": "2021-06-29",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/validation-guidelines-pharmaceutical-dosage-forms-0029.html"
+    },
+    {
+      "id": "health-canada-gui-0031",
+      "code": "GUI-0031",
+      "title_en": "Good manufacturing practices for medical gases",
+      "doc_type": "guidance",
+      "published_date": "2026-03-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/medical-gases.html"
+    },
+    {
+      "id": "health-canada-gui-0036",
+      "code": "GUI-0036",
+      "title_en": "Annex 13 to the Good manufacturing practices guide for drugs used in clinical trials",
+      "doc_type": "guidance",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-13-guide-drugs-clinical-trials-0036.html"
+    },
+    {
+      "id": "health-canada-gui-0039",
+      "code": "GUI-0039",
+      "title_en": "Drug, natural health product and biocide recall guide",
+      "doc_type": "guidance",
+      "published_date": "2024-12-13",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/recalls/guidance-drug-natural-health-products.html"
+    },
+    {
+      "id": "health-canada-gui-0066",
+      "code": "GUI-0066",
+      "title_en": "Annex 7 to the Good manufacturing practices guide - Selected non-prescription drugs",
+      "doc_type": "guidance",
+      "published_date": "2023-09-29",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-7-good-manufacturing-practices-guide-selected-non-prescription-drugs-gui-0066-overview.html"
+    },
+    {
+      "id": "health-canada-gui-0069",
+      "code": "GUI-0069",
+      "title_en": "Guidelines for environmental control of drugs during storage and transportation",
+      "doc_type": "guidance",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidelines-temperature-control-drug-products-storage-transportation-0069.html"
+    },
+    {
+      "id": "health-canada-gui-0071",
+      "code": "GUI-0071",
+      "title_en": "Annex 3B to the Good manufacturing practices guide - Positron-emitting radiopharmaceuticals",
+      "doc_type": "guidance",
+      "published_date": "2020-09-15",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html"
+    },
+    {
+      "id": "health-canada-gui-0080",
+      "code": "GUI-0080",
+      "title_en": "How to demonstrate foreign building compliance with drug good manufacturing practices",
+      "doc_type": "guidance",
+      "published_date": "2025-07-02",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidance-evidence-demonstrate-drug-compliance-foreign-sites-0080.html"
+    },
+    {
+      "id": "health-canada-gui-0104",
+      "code": "GUI-0104",
+      "title_en": "Good manufacturing practices guidelines for active pharmaceutical ingredients",
+      "doc_type": "guidance",
+      "published_date": "2022-02-10",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/information-health-product/drugs/guidelines-active-pharmaceutical-ingredients-0104.html"
+    },
+    {
+      "id": "health-canada-gui-0119",
+      "code": "GUI-0119",
+      "title_en": "Annex 1 to the Good manufacturing practices guide - Manufacture of sterile drugs",
+      "doc_type": "guidance",
+      "published_date": "2023-09-11",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-annex-1-manufacture-sterile-drugs-0119.html"
+    },
+    {
+      "id": "health-canada-gui-0127",
+      "code": "GUI-0127",
+      "title_en": "Applications and service standards for drug establishment licences",
+      "doc_type": "guidance",
+      "published_date": "2024-12-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/management-applications-performance-drug-establishment-licences-0127.html"
+    },
+    {
+      "id": "health-canada-gui-0158",
+      "code": "GUI-0158",
+      "title_en": "Good manufacturing practices guide for natural health products",
+      "doc_type": "guidance",
+      "published_date": "2025-09-04",
+      "official_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-natural-health-products-0158.html"
+    }
+  ]
+}

@@ -115,6 +115,8 @@ SINGLE_GOLDENS = [
     ("library/pics/index.html", "library_pics.expected.html"),
     ("library/who/index.html", "library_who.expected.html"),
     ("library/fda-guidance/index.html", "library_fda_guidance.expected.html"),
+    ("library/ema/index.html", "library_ema.expected.html"),
+    ("library/health-canada/index.html", "library_health_canada.expected.html"),
     ("guide/index.html", "guide.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),
@@ -3796,7 +3798,7 @@ class WebSeoMetaTest(unittest.TestCase):
 
 # ── 골든 동결 (개발용) ───────────────────────────────────────────────────────
 class WebLibraryRenderTest(unittest.TestCase):
-    """[자료실 트랙 C] /library/ 허브 + registry 6카탈로그(v2 스키마) 정적 렌더.
+    """[자료실 트랙 C] /library/ 허브 + registry 전 카탈로그(v2 스키마) 정적 렌더.
 
     findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷(web/data/library/*.json)을
     결정론 렌더한다(주간 발행 게이트와 무관한 독립 섹션). 셸이 아니라 실데이터가 빌드시
@@ -3827,7 +3829,7 @@ class WebLibraryRenderTest(unittest.TestCase):
             self.assertIn(e["title"], self.pages[e["slug"]], f"{e['slug']} 제목 누락")
 
     def test_hub_links_and_counts_all_catalogs(self):
-        # 허브 = registry 전 카탈로그 카드(6종) — 링크·건수 정합.
+        # 허브 = registry 전 카탈로그 카드 — 링크·건수 정합.
         self.assertEqual(self.hub.count('class="lib-cat '), len(render.LIBRARY_REGISTRY))
         for e in render.LIBRARY_REGISTRY:
             self.assertIn(f'href="../library/{e["slug"]}/index.html"', self.hub)
@@ -3865,23 +3867,38 @@ class WebLibraryRenderTest(unittest.TestCase):
             self.assertIn('target="_blank" rel="noopener"', html)
 
     def test_ich_honest_catalog_links(self):
-        # ICH v2: 전 토픽 official_url 이 공식 카탈로그 2페이지로 수렴 → 제목을 개별 문서
-        # 링크처럼 만들지 않고(항목 앵커 0), Q/M 그룹 헤더의 "ICH 공식 카탈로그" 라벨
-        # 링크로만 연결한다(정직한 링크 표기 — 품질 기준 2026-07-18).
-        self.assertNotIn('<a class="lib-item-a"', self.ich)
+        # ICH 확장 데이터(2026-07-18): official_url 은 여전히 공식 카탈로그 2페이지로
+        # 수렴하므로 제목을 official_url 로 링크하지 않는다. 단 pdf_url 이 있는 토픽은
+        # title 이 현행 문서명을 명시하므로 제목=문서 PDF 직결(PDF 아이콘), pdf_url 이
+        # 없는 토픽(M1·M2 등 7건)은 기존 정직 처리(무링크 제목 + 그룹 헤더 라벨 링크만).
+        items = self.data["ich"]["items"]
+        pdf = [it for it in items if it.get("pdf_url")]
+        no_pdf = [it for it in items if not it.get("pdf_url")]
+        self.assertTrue(pdf and no_pdf, "ICH pdf 유/무 토픽 둘 다 기대")
+        self.assertEqual(self.ich.count('<a class="lib-item-a"'), len(pdf))
+        self.assertEqual(self.ich.count('<span class="lib-item-a">'), len(no_pdf))
+        for it in pdf:
+            self.assertIn(f'class="lib-item-a" href="{_esc(it["pdf_url"])}"', self.ich,
+                          f"ICH PDF 직링크 누락: {it['code']}")
+        # 제목 anchor 아이콘 = PDF(외부 카탈로그 링크로 오인 방지) · 중복 PDF 칩은 억제.
+        self.assertEqual(self.ich.count('ti-file-type-pdf lib-item-ext'), len(pdf))
+        self.assertNotIn(">PDF</a>", self.ich)
+        # official_url(카탈로그 페이지)로의 항목 레벨 앵커는 여전히 0 — 그룹 헤더 라벨만.
         self.assertEqual(self.ich.count(">ICH 공식 카탈로그 <"), 2)
-        for url in sorted({it["official_url"] for it in self.data["ich"]["items"]}):
+        for url in sorted({it["official_url"] for it in items}):
             self.assertIn(f'class="lib-series-link" href="{url}"', self.ich)
-        # 코드·한글 병기: code 칩 + title_ko 주 제목 + title_en 병기 줄.
-        self.assertEqual(self.ich.count('class="lib-code"'), len(self.data["ich"]["items"]))
+            self.assertNotIn(f'class="lib-item-a" href="{url}"', self.ich)
+        # 코드·한글 병기: code 칩 + title_ko 주 제목 + title_en 병기 줄(현행 문서명).
+        self.assertEqual(self.ich.count('class="lib-code"'), len(items))
         self.assertIn('<span class="lib-item-title">안정성</span>', self.ich)
-        self.assertIn('<p class="lib-item-sub">Stability</p>', self.ich)
-        # Q13 한글 번역본(ko_url) 칩 — v2 선택 필드 실전 소비.
-        ko = [it for it in self.data["ich"]["items"] if it.get("ko_url")]
-        self.assertTrue(ko, "ICH ko_url 항목(Q13) 기대")
+        self.assertIn('<p class="lib-item-sub">Q1A(R2) Stability Testing of New Drug '
+                      'Substances and Products</p>', self.ich)
+        # 식약처 한글 번역본(ko_url) 칩 — 7토픽(Q1A-Q1F·Q7~Q10·Q13·M4) 기존 규약 유지.
+        ko = [it for it in items if it.get("ko_url")]
+        self.assertEqual(len(ko), 7, "ICH ko_url 7토픽 기대")
         for it in ko:
             self.assertIn(f'href="{_esc(it["ko_url"])}"', self.ich)
-        self.assertIn("한글 번역본</a>", self.ich)
+        self.assertEqual(self.ich.count("한글 번역본</a>"), len(ko))
 
     def test_published_desc_sort_applied(self):
         # sort="published_desc" 카탈로그는 화면 순서가 발행일 내림차순(뷰 정렬 — 값 무수정).
@@ -3905,18 +3922,32 @@ class WebLibraryRenderTest(unittest.TestCase):
                            "감지 기준일", "collected_date"):
                 self.assertNotIn(banned, html, f"{slug}: 내부 개념 노출 — {banned}")
             for raw_slug in ("guidance-internal", "guidance-industry", "legislative-notice",
-                             "notice-final", "guideline-topic"):
+                             "notice-final", "guideline-topic",
+                             "regulatory-procedural-guideline", "scientific-guideline",
+                             "questions-and-answers", "guidance"):
                 self.assertNotIn(f'class="lib-type">{raw_slug}<', html,
                                  f"{slug}: doc_type 원시 슬러그 칩 노출 — {raw_slug}")
 
-    def test_mfds_doc_type_labels_mapped(self):
+    def test_doc_type_labels_mapped(self):
         # doc_type 원시 슬러그 → 한국어 표시 라벨(표시층 매핑 — 데이터 무수정).
+        # doc_type_labels 를 선언한 전 카탈로그(MFDS·EMA·Health Canada·ICH) 공통 검증.
+        # ""로 매핑된 값(ICH guideline-topic)은 칩 숨김이므로 건수 대조에서 제외.
         import collections
-        counts = collections.Counter(it["doc_type"] for it in self.data["mfds"]["items"])
-        labels = next(e for e in render.LIBRARY_REGISTRY if e["slug"] == "mfds")["doc_type_labels"]
-        for raw, label in labels.items():
-            self.assertEqual(self.mfds.count(f'class="lib-type">{label}</span>'),
-                             counts.get(raw, 0), f"매핑 라벨 수 불일치: {raw}→{label}")
+        checked = 0
+        for e in render.LIBRARY_REGISTRY:
+            labels = e.get("doc_type_labels")
+            if not labels:
+                continue
+            counts = collections.Counter(it["doc_type"] for it in self.data[e["slug"]]["items"])
+            html = self.pages[e["slug"]]
+            for raw, label in labels.items():
+                if not label:
+                    continue
+                self.assertEqual(html.count(f'class="lib-type">{_esc(label)}</span>'),
+                                 counts.get(raw, 0),
+                                 f"{e['slug']} 매핑 라벨 수 불일치: {raw}→{label}")
+                checked += 1
+        self.assertGreaterEqual(checked, 8, "doc_type 매핑 검증 대상 라벨 수 기대 미달")
 
     def test_redundant_pdf_chip_suppressed(self):
         # pdf_url == official_url(PIC/S 전건)이면 중복 PDF 칩을 만들지 않는다.

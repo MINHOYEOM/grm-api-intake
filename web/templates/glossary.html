@@ -55,8 +55,8 @@
 </main>
 <style>
 /* [용어사전] 초성 색인·용어 카드 — grm.css 토큰만 사용(프리즈 보존).
-   데스크톱 우선: 인트로 720px(공용 62ch 조기 wrap 해소)·한글 keep-all. */
-.page-head p{max-width:720px;word-break:keep-all}
+   폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
+.page-head p{max-width:none;word-break:keep-all}  /* 공용 62ch 캡 해제 — 표준 wrap 전폭 */
 .gl-tools{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-top:6px}
 .gl-search{position:relative;flex:1;min-width:240px;max-width:460px}
 .gl-search .ti{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--lo);pointer-events:none}
@@ -69,7 +69,7 @@
 .gl-index a{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 8px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);text-decoration:none;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
 .gl-index a:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
 .gl-index a[hidden]{display:none}
-.gl-body{padding:12px 0 64px}
+.gl-body{padding-top:12px;padding-bottom:64px}  /* longhand — .wrap 좌우 패딩 보존(P0-1 동류) */
 .gl-empty{font-family:var(--sans);font-size:15px;color:var(--muted);padding:28px 0}
 .gl-group{margin-top:14px;scroll-margin-top:88px}
 .gl-group-h{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--coral-2);margin:26px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--line-2)}

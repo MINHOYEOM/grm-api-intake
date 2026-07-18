@@ -64,10 +64,9 @@
 </main>
 <style>
 /* [주간 퀴즈] 문항 카드·선택지·피드백 — grm.css 토큰만 사용(프리즈 보존).
-   데스크톱 우선: 인트로 720px(공용 62ch 조기 wrap 해소)·문항 컬럼 820px 캡(1180px 전폭
-   질문 카드의 과장된 스캔라인 제거)·한글 keep-all. */
-.page-head p{max-width:720px;word-break:keep-all}
-.qz-tools{margin-top:6px;max-width:820px}
+   폭 기준(2026-07-18): 인트로·문항 컬럼은 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
+.page-head p{max-width:none;word-break:keep-all}  /* 공용 62ch 캡 해제 — 표준 wrap 전폭 */
+.qz-tools{margin-top:6px}
 .qz-head{margin-bottom:14px}
 .qz-set-title{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--coral-2);margin:0 0 4px}
 .qz-set-sub{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0}
@@ -77,7 +76,7 @@
 .qz-toggle{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 14px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
 .qz-toggle:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
 .qz-toggle[aria-pressed="true"]{color:var(--coral-2);background:var(--coral-tint);border-color:rgba(194,96,63,.3)}
-.qz-body{padding:16px 0 64px;display:flex;flex-direction:column;gap:18px;max-width:820px}
+.qz-body{padding-top:16px;padding-bottom:64px;display:flex;flex-direction:column;gap:18px}  /* longhand — .wrap 좌우 패딩 보존(P0-1 동류) */
 .qz-card{padding:22px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);scroll-margin-top:88px}
 .qz-card[hidden]{display:none}
 .qz-card:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}

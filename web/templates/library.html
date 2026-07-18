@@ -36,8 +36,8 @@
 </main>
 <style>
 /* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드.
-   데스크톱 우선: 인트로 720px(공용 62ch 조기 wrap 해소)·한글 keep-all. */
-.page-head p{max-width:720px;word-break:keep-all}
+   폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
+.page-head p{max-width:none;word-break:keep-all}  /* 공용 62ch 캡 해제 — 표준 wrap 전폭 */
 .lib-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding:24px 0 60px}
 .lib-cat{display:flex;flex-direction:column;gap:12px;padding:26px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--ink);transition:border-color .16s var(--ease),transform .16s var(--ease),box-shadow .16s var(--ease)}
 .lib-cat:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:var(--shadow)}

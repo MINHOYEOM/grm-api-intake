@@ -3,8 +3,8 @@
 {#- 이용 안내(트랙 C — 2026-07-18 전면 개편) — web/data/guide_content.md(정본)를 render.py 의
     제한 md 서브셋 변환기로 결정론 렌더한 본문(guide_body=Markup). 목차(guide_toc)는
     렌더러가 h2 에서 결정론 파생(id="sec-N"). grm.css 프리즈 보존 위해 레이아웃은 기존
-    토큰만 쓰는 스코프 <style>(자료실 선례). 데스크톱 우선: 본문 780px(74ch≈650px 조기
-    wrap 해소)·한글 word-break:keep-all. -#}
+    토큰만 쓰는 스코프 <style>(자료실 선례). 폭 기준(2026-07-18): 인트로·목차·본문은
+    표준 wrap 전폭 — 좁은 max-width 캡 금지·좌정렬 일관·한글 word-break:keep-all. -#}
 <main>
   <div class="wrap page-head guide-head">
     <span class="kick reveal" style="animation-delay:.02s">User Guide</span>
@@ -33,16 +33,18 @@
   </div>
 </main>
 <style>
-/* [이용안내] 목차·본문 프로즈 — grm.css 토큰만 사용(프리즈 보존). 데스크톱 우선 폭. */
-.guide-head p{max-width:720px;word-break:keep-all}  /* 공용 .page-head p 62ch 조기 wrap 해소 — 이 페이지 한정 */
+/* [이용안내] 목차·본문 프로즈 — grm.css 토큰만 사용(프리즈 보존).
+   폭 기준(2026-07-18): 표준 wrap 전폭 — 좁은 max-width 캡 금지(캡+margin:0 auto 중앙정렬이
+   목차 대비 본문 우측 오프셋을 만들던 원인). */
+.guide-head p{max-width:none;word-break:keep-all}  /* 공용 .page-head p 62ch 캡 해제 — 표준 wrap 전폭 */
 .guide-toc{margin-top:10px}
 .guide-toc-k{display:block;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px}
-.guide-toc ol{list-style:none;margin:0;padding:18px 22px;max-width:780px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;counter-reset:gtoc}
+.guide-toc ol{list-style:none;margin:0;padding:18px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;counter-reset:gtoc}
 .guide-toc li{counter-increment:gtoc;min-width:0}
 .guide-toc a{display:flex;align-items:baseline;gap:9px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--body);padding:5px 2px;border-radius:var(--rad-s);word-break:keep-all;transition:color .14s var(--ease)}
 .guide-toc a::before{content:counter(gtoc,decimal-leading-zero);font-family:var(--mono);font-size:11.5px;color:var(--lo);flex:none}
 .guide-toc a:hover{color:var(--coral-2)}
-.guide-body{max-width:780px;padding:14px 0 64px;font-family:var(--sans);color:var(--body);font-size:16px;line-height:1.72;word-break:keep-all}
+.guide-body{padding-top:14px;padding-bottom:64px;font-family:var(--sans);color:var(--body);font-size:16px;line-height:1.72;word-break:keep-all}  /* longhand — .wrap 좌우 패딩 보존(P0-1 동류) */
 .guide-body h2{font-family:var(--serif);font-weight:600;font-size:25px;line-height:1.28;color:var(--ink);margin:48px 0 12px;padding-top:20px;border-top:1px solid var(--line);scroll-margin-top:88px}
 .guide-body h2:first-of-type{margin-top:16px;padding-top:0;border-top:0}
 .guide-body h3{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.35;color:var(--ink);margin:30px 0 8px}

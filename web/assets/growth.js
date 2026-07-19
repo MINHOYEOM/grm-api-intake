@@ -284,6 +284,10 @@
     }
   });
 
+  // [11차 서버 동기화] growth-sync.js 가 병합본을 localStorage 에 쓴 뒤 통지 — 메모리
+  // 사본을 재적재해 이후 record() 가 병합 사실을 덮어쓰지 않게 한다(비로그인·미로드 무영향).
+  window.addEventListener("grm:gurumi-sync", function () { data = load(); refresh(false); });
+
   var resetBtn = document.getElementById("grm-qzg-reset");
   if (resetBtn) {
     resetBtn.addEventListener("click", function () {

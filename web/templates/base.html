@@ -305,6 +305,15 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/reactions.js?v={{ reactionsjs_ver }}" defer></script>
+{# [11차 구름이 서버 동기화] 로그인 시 growth v1 로컬 데이터를 gurumi_growth(032)로 보관(하이브리드 — 비로그인·032 미적용·실패는 전부 조용한 로컬 폴백). 펫 패널 보관 CTA/상태는 growth-sync.js 런타임 주입 — 스타일은 reactions 관례대로 게이트 안 인라인(골든·grm.css 무변형). §4 한글안전: letter-spacing/text-transform 미사용. #}
+<style>
+.grm-pet-sync{margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));display:flex;flex-direction:column;gap:6px}
+.grm-pet-sync-cta{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;background:var(--coral,#C2603F);border:0;border-radius:var(--rad-s,8px);padding:9px 14px;cursor:pointer;transition:background .15s ease}
+.grm-pet-sync-cta:hover{background:var(--coral-2,#A14B30)}
+.grm-pet-sync-on{display:flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--coral,#B9542F);margin:0}
+.grm-pet-sync-s{font-family:var(--sans);font-size:12px;color:var(--muted);margin:0}
+</style>
+<script src="/assets/growth-sync.js?v={{ growthsyncjs_ver }}" defer></script>
 {% endif %}
 </body>
 </html>

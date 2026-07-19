@@ -1203,6 +1203,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["supabase_url"] = _supa_url
     env.globals["supabase_anon_key"] = SUPABASE_ANON_KEY
     env.globals["reactionsjs_ver"] = _asset_ver("reactions.js")
+    env.globals["growthsyncjs_ver"] = _asset_ver("growth-sync.js")
     env.globals["adminjs_ver"] = _asset_ver("admin.js")
     briefs = load_briefs(data_dir)
     if not briefs:

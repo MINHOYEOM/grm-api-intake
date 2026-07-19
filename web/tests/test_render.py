@@ -5020,11 +5020,13 @@ class WebPopularCardsTest(unittest.TestCase):
 
 # ── 구름이 성장 시스템 v1(9차 G2) — /quiz/ 자리표시자 + growth.js 배선 ──────────────
 class WebGurumiGrowthTest(unittest.TestCase):
-    """구름이 성장 시스템 v1 — localStorage 단독(듀오링고식·무로그인·무랭킹). 성장 패널
-    마크업·수치는 전부 assets/growth.js 가 런타임 주입(결정론 골든 불침범) — 서버 렌더는
-    hidden 자리표시자 1줄뿐. quiz.js 는 무수정(채점·주차 회전 계약 불변 — growth.js 가
-    .qz-choice 클릭을 문서 위임으로 관찰만). 여기선 정적 셸·자산 배선·서버 전송 0 가드·
-    스키마 버전 마커를 검증한다."""
+    """구름이 성장 시스템 v1 — 게스트 기본은 localStorage(듀오링고식·무랭킹). 11차부터
+    로그인 시 서버 보관(growth-sync.js — WebGurumiGrowthSyncTest)이 얹히지만 growth.js
+    자체는 네트워크 0 을 유지한다(비로그인 시 전송 0 계약). 성장 패널 마크업·수치는 전부
+    assets/growth.js 가 런타임 주입(결정론 골든 불침범) — 서버 렌더는 hidden 자리표시자
+    1줄뿐. quiz.js 는 무수정(채점·주차 회전 계약 불변 — growth.js 가 .qz-choice 클릭을
+    문서 위임으로 관찰만). 여기선 정적 셸·자산 배선·비로그인 전송 0 가드·스키마 버전
+    마커를 검증한다."""
 
     @classmethod
     def setUpClass(cls):
@@ -5053,12 +5055,18 @@ class WebGurumiGrowthTest(unittest.TestCase):
         self.assertEqual(built, src, "growth.js 가 dist/assets 에 verbatim 복사되지 않음")
 
     def test_growth_js_no_network_apis(self):
-        # 서버 전송 0(10차 서버 동기화 전까지 불가침) — 네트워크 API 일절 미사용.
+        # 비로그인 시 전송 0(하이브리드 계약) — 게스트 저장 경로(growth.js)는 네트워크 API
+        # 일절 미사용. 로그인 시 push 는 growth-sync.js(reactions_enabled 게이트) 전용 경로다.
         for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket", "EventSource"):
             self.assertNotIn(banned, self.growth_js, f"growth.js 네트워크 API 금지 위반: {banned}")
 
+    def test_growth_js_reloads_memory_copy_on_sync(self):
+        # [11차] growth-sync.js 병합 통지 수신 — 메모리 사본 재적재(이후 record() 가 병합
+        # 사실을 덮어쓰지 않게). 비로그인·growth-sync 미로드 환경에선 이벤트가 없어 무영향.
+        self.assertIn('addEventListener("grm:gurumi-sync"', self.growth_js)
+
     def test_growth_js_schema_version_and_storage_key(self):
-        # 스키마 version 필드(10차 서버 동기화 대비)·전용 키 — 마커 가드.
+        # 스키마 version 필드(서버 동기화 v1 도 같은 스키마 계약)·전용 키 — 마커 가드.
         self.assertIn("SCHEMA_VERSION = 1", self.growth_js)
         self.assertIn('"grm-gurumi-growth"', self.growth_js)
         self.assertIn("localStorage", self.growth_js)
@@ -5096,6 +5104,121 @@ class WebGurumiGrowthTest(unittest.TestCase):
             self.assertIn(detail, self.growth_js)
         self.assertIn("prefers-reduced-motion:reduce", self.quiz)
         self.assertIn("animation:none!important", self.quiz)
+
+
+# ── 구름이 서버 동기화(11차) — growth-sync.js 배선 + 하이브리드 계약 가드 ──────────
+class WebGurumiGrowthSyncTest(unittest.TestCase):
+    """구름이 서버 동기화(11차) — 하이브리드: 게스트는 localStorage 만으로 완전 동작하고,
+    로그인하면 growth v1 데이터를 gurumi_growth(032)에 보관해 기기 간 유지한다.
+    growth-sync.js 는 reactions_enabled 게이트 안에서만 로드되고(reactions.js 관례 동형)
+    비로그인·supabase-js 부재·032 미적용·네트워크 실패는 전부 조용한 로컬 폴백 —
+    032 적용 전에 머지돼도 사이트 완전 정상(디커플링 계약). 병합·전송은 브라우저 런타임
+    소관이라 여기선 자산 배선·env-gate·세션 재사용·사실만 저장·병합 결정론·펫 패널 CTA
+    카피의 정적 계약 마커를 가드한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_growthsync_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.sync_js = (WEB_DIR / "assets" / "growth-sync.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_script_env_gated_after_reactions(self):
+        # 테스트 환경엔 SUPABASE 미설정(reactions_enabled=False) — 기본 렌더엔 무흔적
+        # (골든 불침범, popular.js/reactions.js 관례 동형).
+        self.assertNotIn("assets/growth-sync.js", self.landing)
+        self.assertNotIn("grm-pet-sync", self.landing)
+
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_growthsync_on_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out)
+            landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+        import re as _re
+        m = _re.search(r'assets/growth-sync\.js\?v=([0-9a-f]{8})"', landing_on)
+        self.assertIsNotNone(m, "growth-sync.js 캐시버스팅 해시 미발견(활성 렌더)")
+        # supabase-js 라이브러리·reactions.js(세션 인프라) 로드 뒤에 온다.
+        self.assertLess(landing_on.index("assets/reactions.js"),
+                        landing_on.index("assets/growth-sync.js"))
+
+    def test_sync_js_copied_to_dist(self):
+        built = (self.single / "assets" / "growth-sync.js").read_bytes()
+        src = (WEB_DIR / "assets" / "growth-sync.js").read_bytes()
+        self.assertEqual(built, src, "growth-sync.js 가 dist/assets 에 verbatim 복사되지 않음")
+
+    def test_reuses_reactions_session_infra_and_only_032_table(self):
+        # firm.js 관례 — 같은 storageKey 로 세션 공유(신규 인증 코드·secret 0).
+        self.assertIn('storageKey: "grm-public-auth-v1"', self.sync_js)
+        self.assertIn("detectSessionInUrl: false", self.sync_js)
+        # DB 접근은 032 테이블 하나뿐(reaction 등 타 테이블 미접근).
+        import re as _re
+        self.assertEqual(set(_re.findall(r'\.from\((\w+)\)', self.sync_js)), {"TABLE"})
+        self.assertIn('var TABLE = "gurumi_growth";', self.sync_js)
+
+    def test_server_payload_is_facts_only_v1(self):
+        # 서버엔 사실만(version·weeks — growth.js v1 스키마 그대로). 파생값(점수·단계·
+        # 이름·스트릭)은 페이로드에 없다 — 재계산 원칙 유지.
+        self.assertIn("user_id: session.user.id, version: SCHEMA_VERSION, weeks: merged", self.sync_js)
+        self.assertIn("var SCHEMA_VERSION = 1;", self.sync_js)
+        for banned in ("points:", "stage:", "streak:", "stageIndex"):
+            self.assertNotIn(banned, self.sync_js, f"파생값 서버 저장 금지 위반: {banned}")
+
+    def test_guest_zero_transmission_guards(self):
+        # 비로그인 전송 0 — sync()·schedulePush() 모두 session.user 가드로 시작(이중 방어:
+        # 게이트 밖 기본 렌더에선 스크립트 자체가 미로드).
+        self.assertEqual(self.sync_js.count("if (!session || !session.user) return;"), 2)
+
+    def test_merge_rule_deterministic_union(self):
+        # 병합 = week×문항 union(유실 0), 동일 키 충돌 = Math.max(정답 1 우선 — 교환·결합·
+        # 멱등이라 병합 순서 무관 수렴), idx 충돌 = Math.min(손상 대비 결정론 규칙).
+        self.assertIn("function mergeWeeks(", self.sync_js)
+        self.assertIn("Math.max(out[k].q[id], v)", self.sync_js)
+        self.assertIn("Math.min(out[k].idx, w.idx)", self.sync_js)
+        # push 는 항상 pull→병합→upsert(수렴 업서트) — 맹목 덮어쓰기 경로 없음.
+        self.assertIn('.select("version,weeks").maybeSingle()', self.sync_js)
+        self.assertIn('{ onConflict: "user_id" }', self.sync_js)
+
+    def test_sync_notifies_growth_and_pet(self):
+        # 병합 반영 통지 — growth.js 메모리 재적재(grm:gurumi-sync)·pet.js 재파생
+        # (grm:gurumi-change). 자기 통지로 push 재스케줄 안 함(selfNotify).
+        self.assertIn('dispatchEvent(new CustomEvent("grm:gurumi-sync"))', self.sync_js)
+        self.assertIn('dispatchEvent(new CustomEvent("grm:gurumi-change"))', self.sync_js)
+        self.assertIn("selfNotify", self.sync_js)
+
+    def test_pet_panel_cta_copy_no_pressure(self):
+        # 펫 패널 CTA — 확정 카피(보관 프레이밍). 강요 톤·게스트 경험 폄하 문구 금지.
+        self.assertIn("구름이 안전하게 보관하기", self.sync_js)
+        self.assertIn("로그인하면 어느 기기에서든 이어서 키울 수 있어요", self.sync_js)
+        self.assertIn("구름이가 계정에 안전하게 보관되고 있어요", self.sync_js)
+        for banned in ("로그인해야", "사라져요", "잃어버", "지워져요"):
+            self.assertNotIn(banned, self.sync_js, f"강요 톤 금지 위반: {banned}")
+        # 기존 로그인 플로우 재사용(firm.js 관례 — 헤더 로그인 버튼 클릭 위임).
+        self.assertIn('".grm-auth .grm-acct-login"', self.sync_js)
+
+    def test_migration_032_contract_markers(self):
+        # 032 는 작성만(적용은 컨트롤타워 dry-run 후) — 접근 계약 마커를 정적 가드한다.
+        sql = (WEB_DIR / "migrations" / "032_gurumi_growth_sync.sql").read_text(encoding="utf-8")
+        self.assertIn("create table if not exists public.gurumi_growth", sql)
+        self.assertIn("alter table public.gurumi_growth enable row level security", sql)
+        for pol in ("gurumi_growth_select_own", "gurumi_growth_insert_own", "gurumi_growth_update_own"):
+            self.assertIn(pol, sql)
+        self.assertNotIn("for delete", sql)                     # delete 정책 없음(경로 봉쇄)
+        self.assertIn("revoke all on public.gurumi_growth from anon", sql)
+        self.assertIn("grant select, insert, update on public.gurumi_growth to authenticated", sql)
+        self.assertNotIn("to anon", sql)                        # anon 재부여 없음(공개 read 0)
+        self.assertIn("check (version = 1)", sql)               # v1 스키마 고정
+        self.assertIn("jsonb_typeof(weeks) = 'object'", sql)
 
 
 # ── 주간 퀴즈 week 필드(9차 G3) — 파이프라인 지정 주차 우선 + 회전 보충 ────────────

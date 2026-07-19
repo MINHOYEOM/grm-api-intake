@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="/assets/grm.css?v=77f34844">
+<link rel="stylesheet" href="/assets/pet.css?v=d03f0c79">
 <script type="application/ld+json">[
  {
   "@context": "https://schema.org",
@@ -248,102 +249,24 @@ if(_nt&&_nm){
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
 </script>
-<style>
-#grm-mascot{position:fixed;top:94px;right:18px;width:62px;z-index:40;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#grm-mascot .owl{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 13px rgba(26,24,21,.2));animation:grmOwlBreathe 3.6s ease-in-out infinite}
-#grm-mascot .eyes{transform-box:fill-box;transform-origin:center;transition:transform .12s cubic-bezier(.2,.7,.3,1)}
-#grm-mascot .lid{transform-box:fill-box;transform-origin:center top;transform:scaleY(0);transition:transform .09s ease}
-#grm-mascot.is-blink .lid{transform:scaleY(1)}
-#grm-mascot .wingL,#grm-mascot .wingR{transform-box:fill-box;transform-origin:top center}
-#grm-mascot.is-flap .wingL{animation:grmOwlFlapL .26s ease-in-out 3}
-#grm-mascot.is-flap .wingR{animation:grmOwlFlapR .26s ease-in-out 3}
-#grm-mascot.is-bounce .owl{animation:grmOwlBounce .45s cubic-bezier(.34,1.56,.64,1)}
-@keyframes grmOwlBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-@keyframes grmOwlFlapL{0%,100%{transform:rotate(0)}50%{transform:rotate(28deg)}}
-@keyframes grmOwlFlapR{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
-@keyframes grmOwlBounce{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-9px) scale(1.06,.94)}60%{transform:translateY(2px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
-#grm-mascot .owl-msg{position:absolute;top:calc(100% + 9px);right:0;text-align:left;background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:12.5px;line-height:1.4;padding:8px 12px;border-radius:11px;width:max-content;max-width:none;white-space:nowrap;opacity:0;transform:translateY(-6px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;box-shadow:0 10px 22px -10px rgba(0,0,0,.42)}
-#grm-mascot .owl-msg.show{opacity:1;transform:translateY(0)}
-#grm-mascot .owl-msg::after{content:"";position:absolute;top:-11px;right:22px;border:6px solid transparent;border-bottom-color:var(--ink)}
-#grm-mascot .burst{position:absolute;left:50%;top:16%;font-size:17px;line-height:1;pointer-events:none;will-change:transform,opacity}
-#grm-mascot .burst.v-float{animation:grmBurstFloat .85s cubic-bezier(.2,.7,.3,1) forwards}
-#grm-mascot .burst.v-wobble{animation:grmBurstWobble 1s ease-out forwards}
-#grm-mascot .burst.v-spin{animation:grmBurstSpin .9s cubic-bezier(.34,1.56,.64,1) forwards}
-#grm-mascot .burst.v-pop{animation:grmBurstPop .7s cubic-bezier(.34,1.56,.64,1) forwards}
-@keyframes grmBurstFloat{0%{transform:translate(-50%,0) scale(.4) rotate(var(--r0,0deg));opacity:0}18%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-58px) scale(1) rotate(var(--r1,0deg));opacity:0}}
-@keyframes grmBurstWobble{0%{transform:translate(-50%,0) scale(.5);opacity:0}15%{opacity:1}30%{transform:translate(calc(-50% - var(--dx,0px)),-14px) scale(.9)}50%{transform:translate(calc(-50% + var(--dx,0px)),-28px) scale(1)}70%{transform:translate(calc(-50% - var(--dx,0px)),-42px) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-60px) scale(.9);opacity:0}}
-@keyframes grmBurstSpin{0%{transform:translate(-50%,0) scale(.3) rotate(0deg);opacity:0}20%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-56px) scale(1.1) rotate(360deg);opacity:0}}
-@keyframes grmBurstPop{0%{transform:translate(-50%,0) scale(.2);opacity:0}40%{transform:translate(-50%,-10px) scale(1.3);opacity:1}60%{transform:translate(-50%,-6px) scale(.9)}80%{transform:translate(-50%,-16px) scale(1.08)}100%{transform:translate(-50%,-34px) scale(.85);opacity:0}}
-@media (max-width:760px){ #grm-mascot{display:none} }
-@media (prefers-reduced-motion:reduce){ #grm-mascot .owl{animation:none} #grm-mascot.is-flap .wingL,#grm-mascot.is-flap .wingR{animation:none} #grm-mascot.is-bounce .owl{animation:none} #grm-mascot .burst{animation:none;display:none} }
-</style>
-<div id="grm-mascot" data-page="home" aria-hidden="true">
-  <span class="owl-msg"></span>
-  <svg class="owl" viewBox="0 0 120 128" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="grmOwlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CE6E4C"/><stop offset="1" stop-color="#B9542F"/></linearGradient></defs>
-    <path d="M30 30 L52 30 L36 8 Z" fill="#CE6E4C"/><path d="M90 30 L68 30 L84 8 Z" fill="#CE6E4C"/>
-    <rect x="18" y="22" width="84" height="92" rx="34" fill="url(#grmOwlGrad)"/>
-    <ellipse cx="60" cy="86" rx="26" ry="24" fill="#F4E7DF" opacity=".85"/>
-    <path class="wingR" d="M100 52 q16 6 12 30 q-3 14 -14 16 q6 -22 2 -46 Z" fill="#B9542F"/>
-    <path class="wingL" d="M20 52 q-16 6 -12 30 q3 14 14 16 q-6 -22 -2 -46 Z" fill="#B9542F"/>
-    <g class="eyes">
-      <circle cx="43" cy="56" r="18" fill="#FAF6EE"/><circle cx="77" cy="56" r="18" fill="#FAF6EE"/>
-      <circle cx="43" cy="57" r="7" fill="#22303F"/><circle cx="77" cy="57" r="7" fill="#22303F"/>
-      <circle cx="45.4" cy="54.6" r="2.1" fill="#FAF6EE"/><circle cx="79.4" cy="54.6" r="2.1" fill="#FAF6EE"/>
-      <rect class="lid" x="24" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
-      <rect class="lid" x="58" y="38" width="38" height="20" rx="10" fill="#C2603F"/>
-    </g>
-    <path d="M53 68 L67 68 L60 80 Z" fill="#E8B04A"/>
-  </svg>
+<div class="grm-pet" id="grm-pet" data-page="home">
+  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel">
+    <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
+    <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true"><span class="grm-pet-dot" aria-hidden="true"></span>
+  </button>
+  <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
+  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
+    <header class="grm-pet-head"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></header>
+    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
+    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
+    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
+    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
+    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
+  </section>
 </div>
-<script>
-(function(){
-  var m=document.getElementById('grm-mascot'); if(!m) return;
-  var msg=m.querySelector('.owl-msg'), eyes=m.querySelector('.eyes');
-  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var HEARTS=['💛','💕','✨','🧡','⭐'];
-  var VARIANTS=['v-float','v-wobble','v-spin','v-pop'];
-  function burst(){
-    if(reduce) return;
-    var n=2+(Math.random()<0.4?1:0);
-    for(var k=0;k<n;k++){
-      (function(){
-        setTimeout(function(){
-          var el=document.createElement('span');
-          el.className='burst '+VARIANTS[Math.floor(Math.random()*VARIANTS.length)];
-          el.textContent=HEARTS[Math.floor(Math.random()*HEARTS.length)];
-          el.style.setProperty('--dx', (Math.random()*44-22).toFixed(1)+'px');
-          el.style.setProperty('--r0', (Math.random()*30-15).toFixed(1)+'deg');
-          el.style.setProperty('--r1', (Math.random()*50-25).toFixed(1)+'deg');
-          m.appendChild(el);
-          el.addEventListener('animationend', function(){ el.remove(); });
-          setTimeout(function(){ if(el.parentNode) el.remove(); }, 1300);
-        }, k*70);
-      })();
-    }
-  }
-  function bounce(){ if(reduce) return; m.classList.remove('is-bounce'); void m.offsetWidth; m.classList.add('is-bounce'); }
-  var sets={
-    home:{greet:'안녕하세요, 구름이예요! 이번 주 규제 소식이 왔어요 🦉',msgs:['구름 위에서 규제 소식을 살펴보고 있어요 ☁️','매주 규제 소식을 모아드려요','이번 주 브리핑을 확인해 보세요']},
-    board:{greet:'구름이예요! 찾으시는 규제 소식이 있으세요? 🔍',msgs:['기관·키워드로 검색해 보세요','지난 소식도 모두 모여 있어요 📚','필터로 기관만 골라볼 수 있어요']},
-    detail:{greet:'구름이가 이번 주 핵심만 모았어요 👀',msgs:['AI 요약이에요 · 원문도 꼭 확인하세요','기관별로 정리해 뒀어요','시사점·점검 포인트도 있어요 ✓']}
-  };
-  var set=sets[m.getAttribute('data-page')]||sets.home, i=0, t;
-  function blink(){ m.classList.add('is-blink'); setTimeout(function(){m.classList.remove('is-blink');},140); }
-  function flap(){ if(reduce) return; m.classList.remove('is-flap'); void m.offsetWidth; m.classList.add('is-flap'); }
-  function say(txt){ msg.textContent=txt; msg.classList.add('show'); clearTimeout(t); t=setTimeout(function(){msg.classList.remove('show');},3600); }
-  (function amb(){ setTimeout(function(){ blink(); if(!reduce&&Math.random()<0.25) flap(); amb(); }, 2800+Math.random()*3600); })();
-  if(!reduce&&eyes){ window.addEventListener('mousemove', function(e){
-    var r=eyes.getBoundingClientRect(); if(!r.width) return;
-    var cx=r.left+r.width/2, cy=r.top+r.height/2, dx=e.clientX-cx, dy=e.clientY-cy;
-    var a=Math.atan2(dy,dx), d=Math.min(3, Math.hypot(dx,dy)/70);
-    eyes.style.transform='translate('+(Math.cos(a)*d).toFixed(2)+'px,'+(Math.sin(a)*d).toFixed(2)+'px)';
-  }, {passive:true}); }
-  m.addEventListener('click', function(){ flap(); blink(); bounce(); burst(); say(set.msgs[i++%set.msgs.length]); });
-  m.addEventListener('mouseenter', function(){ if(!msg.classList.contains('show')) say(set.msgs[i++%set.msgs.length]); });
-  setTimeout(function(){ say(set.greet); }, 1200);
-})();
-</script>
+<script src="/assets/pet.js?v=8cfb675b" defer></script>
 
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}

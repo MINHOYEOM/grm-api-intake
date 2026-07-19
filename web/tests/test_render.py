@@ -71,7 +71,7 @@ __all__ = [
     "WebBriefFirmLinkTest",
     "WebResourceNotesRenderTest",
     "WebResourceNotesGoldenInvarianceTest",
-    "WebGurumiWidgetRemovedTest",
+    "WebGurumiPetTest",
     "WebPopularCardsTest",
 ]
 
@@ -4839,14 +4839,13 @@ class WebResourceNotesGoldenInvarianceTest(unittest.TestCase):
         self.assertEqual(html, "")
 
 
-# ── [구름이 위젯] 철거 확인 + 랜딩 섹션 확정 순서(10차, 2026-07-18) ────────────────
-class WebGurumiWidgetRemovedTest(unittest.TestCase):
-    """구름이 상태 위젯(coverage 칩)은 8차 웨이브 A 랜딩 재구성에서 완전 철거됐다(내부
-    개념 노출 대비 효과 낮음 판단). 과거 WebGurumiWidgetTest(위젯 존재를 전제하던 회귀
-    가드)를 대체 — 이제는 마크업·클래스·모션 키프레임이 전혀 남지 않았음을 확인한다.
-    render.py 는 이 건으로 미수정(cover.publish_date 는 다른 곳에서도 쓰여 그대로 둠).
+# ── [구름이 펫] 전 페이지 공통 위젯 + 랜딩 섹션 확정 순서(10차) 가드 ────────────────
+class WebGurumiPetTest(unittest.TestCase):
+    """구름이 펫은 전 페이지 공통 관리 UI다(2026-07-18 도입 — 기존 인라인 SVG 마스코트
+    grm-mascot 를 대체). 과거 랜딩 coverage 칩(8차 철거)은 되살리지 않고, 독립된 #grm-pet
+    위젯과 로컬 성장 데이터만 제공하는 계약을 고정한다.
 
-    10차(사용자 확정 재배치)부터 랜딩 섹션 순서·CTA 중복 가드도 이 클래스가 지킨다:
+    10차(사용자 확정 재배치)의 랜딩 섹션 순서·CTA 중복 가드도 이 클래스가 지킨다:
     히어로 → #why → 기능 6종 → Card Anatomy → 참여 존(#engage) → This Week 콜아웃
     (#this-week, 뉴스레터 직전) / 브리프행 CTA 는 히어로·하단 콜아웃 2개뿐."""
 
@@ -4856,17 +4855,36 @@ class WebGurumiWidgetRemovedTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.pet_js = (WEB_DIR / "assets" / "pet.js").read_text(encoding="utf-8")
+        cls.pet_css = (WEB_DIR / "assets" / "pet.css").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    def test_gurumi_markup_and_classes_absent(self):
-        self.assertNotIn("gurumi", self.landing)
+    def test_sitewide_pet_markup_and_assets_present(self):
+        self.assertIn('id="grm-pet"', self.landing)
+        self.assertIn('id="grm-pet-panel"', self.landing)
+        self.assertIn('assets/pet.js?v=', self.landing)
+        self.assertIn('assets/pet.css?v=', self.landing)
+        self.assertIn('assets/gurumi-egg.png', self.landing)
 
-    def test_gurumi_keyframes_absent(self):
-        self.assertNotIn("@keyframes gurumiEat", self.landing)
-        self.assertNotIn("@keyframes gurumiCards", self.landing)
+    def test_old_inline_mascot_is_replaced(self):
+        self.assertNotIn('id="grm-mascot"', self.landing)
+        self.assertNotIn("@keyframes grmOwlBreathe", self.landing)
+
+    def test_pet_assets_copied_verbatim(self):
+        for name in ("pet.js", "pet.css", "gurumi-egg.png", "gurumi-baby.png",
+                     "gurumi-youth.png", "gurumi-adult.png", "gurumi-legend.png"):
+            self.assertEqual((self.single / "assets" / name).read_bytes(),
+                             (WEB_DIR / "assets" / name).read_bytes())
+
+    def test_pet_is_local_only_and_motion_safe(self):
+        for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket"):
+            self.assertNotIn(banned, self.pet_js)
+        self.assertIn('"grm-gurumi-growth"', self.pet_js)
+        self.assertIn("prefers-reduced-motion", self.pet_js)
+        self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
     def test_landing_section_order_final(self):
         # 확정 재배치(10차, 2026-07-18 사용자 확정): 히어로 → #why → 기능 6종(soft) →
@@ -5065,6 +5083,19 @@ class WebGurumiGrowthTest(unittest.TestCase):
         # 5단계 사다리(알→아기→소년→어른→전설) — 명칭·순서 가드(카피 조정 시 의도 확인).
         for name in ("알", "아기 구름이", "소년 구름이", "어른 구름이", "전설 구름이"):
             self.assertIn(name, self.growth_js)
+
+    def test_growth_atlas_is_local_accessible_and_motion_safe(self):
+        # 성장 도감은 같은 정적 SVG를 재사용하고, 키보드 토글·ESC 닫기·모션 최소화를 지원한다.
+        self.assertIn('id="grm-qzg-atlas-toggle"', self.growth_js)
+        self.assertIn('aria-expanded="false"', self.growth_js)
+        self.assertIn('aria-controls="grm-qzg-atlas"', self.growth_js)
+        self.assertIn('e.key === "Escape"', self.growth_js)
+        for stage in ("egg", "baby", "youth", "adult", "legend"):
+            self.assertIn(f"qzg-character-{stage}", self.growth_js)
+        for detail in ("qzg-crack-glow", "qzg-baby-shell", "qzg-first-card", "qzg-brief", "qzg-legend-halo"):
+            self.assertIn(detail, self.growth_js)
+        self.assertIn("prefers-reduced-motion:reduce", self.quiz)
+        self.assertIn("animation:none!important", self.quiz)
 
 
 # ── 주간 퀴즈 week 필드(9차 G3) — 파이프라인 지정 주차 우선 + 회전 보충 ────────────

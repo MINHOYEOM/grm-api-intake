@@ -27,6 +27,18 @@
  * 기존 상세 패널 자체는 그대로 유지 — firm_key 는 오직 이 링크에만 쓴다). 017 미적용
  * 라이브(top_firms 에 firm_key 없음)에서는 링크 렌더를 조용히 생략한다(방어 폴백 —
  * 구버전 top_firms 형태와 신규 형태 둘 다 깨짐 없이 렌더되어야 한다).
+ *
+ * ── [13차 정직화] 무엇을 말할 수 있고 무엇은 말하면 안 되는가 ────────────────────
+ * published_date 는 실사 발생일이 아니라 **문서 공개일**이고, FOIA 대량 공개가 특정
+ * 연도에 뭉치는 데다 외부 백필도 진행 중이다. 여기서 파생되는 규칙 셋:
+ *   (1) 연도 간 비교는 **구성비(%)** 로만 한다 — 연도별 확보량이 10배 넘게 차이나므로
+ *       건수 비교는 규제 활동이 아니라 우리 수집 이력을 비교하는 것이 된다.
+ *   (2) 공개일 기반 시계열 증감(전년 대비 %)은 **계산하지 않는다** — 공개 배치 크기를
+ *       규제 추세로 오독시키는 대표적 지표라, 12차까지 있던 YoY 문장을 제거했다.
+ *   (3) 분포로서 정보가 없는 차트는 렌더하지 않는다 — 증거 등급(A 99% 이상 단일값)
+ *       섹션을 이 원칙으로 삭제했다(내부 QA 개념 비노출 원칙과도 정합).
+ *   (4) 표본이 작은 구간은 결론을 지지하지 못하므로 빼되, **뺐다는 사실을 화면에 적는다**
+ *       (renderHeatmap 의 MIN_YEAR_BASE / tr-heatmap-note).
  */
 (function () {
   "use strict";
@@ -46,14 +58,16 @@
   var catEl = document.getElementById("tr-cat");
   var heatmapBlockEl = document.getElementById("tr-heatmap-block");
   var heatmapEl = document.getElementById("tr-heatmap");
+  // 표본 부족으로 제외한 연도를 적는 자리(구버전 셸엔 없을 수 있어 방어적 조회 — 없으면
+  // 제외 사실을 못 적으므로 아예 제외도 하지 않는다, renderHeatmap 참조).
+  var heatmapNoteEl = document.getElementById("tr-heatmap-note");
   var yearEl = document.getElementById("tr-year");
   var firmsEl = document.getElementById("tr-firms");
   var firmDetailEl = document.getElementById("tr-firm-detail");
-  var evidenceEl = document.getElementById("tr-evidence");
   var sourceEl = document.getElementById("tr-source");
   if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl || !headlineEl ||
       !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
-      !evidenceEl || !sourceEl) return;
+      !sourceEl) return;
 
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
@@ -88,14 +102,22 @@
     other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
   };
 
-  var EVIDENCE_ORDER = ["A", "B", "C"];
+  // [표본 하한] 그 해 총 지적이 이 값 미만이면 구성비를 말하지 않는다 — 수집 첫 해처럼
+  // 문서 한두 건만 있는 연도는 한 건이 20%가 되어 색·비율이 전부 노이즈가 된다. 연도별
+  // 구성비 히트맵의 열 제외와 헤드라인 일관성 판정이 같은 기준을 공유한다.
+  var MIN_YEAR_BASE = 30;
 
   // 업체 상세 패널이 열려 있는지(?firm=)·직전 렌더의 top_firms(업체 랭킹 재렌더용)를
   // 여기 담는다 — findings.js 의 단일 state 객체 관례와 동형(별도 저장소 난립 금지).
   // openFirmKey — [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서만
   // top_firms 행에 firm_key 가 실려온다. 013 미적용/017 미적용 라이브(구버전 top_firms,
   // firm_name 만 있는 형태)에서는 빈 문자열로 남아 프로필 링크를 방어적으로 생략한다.
-  var state = { openFirm: "", openFirmKey: "", lastFirms: [] };
+  // headline/topCode/matrix — 헤드라인 문장2(연도별 일관성)는 두 RPC(007 통계 + 008
+  // 매트릭스)가 **둘 다** 도착해야 계산된다. 두 fetch 는 독립 병렬이라 도착 순서가 정해져
+  // 있지 않으므로, 각자 자기 결과만 state 에 넣고 tryConsistencyLine() 을 호출한다 —
+  // 늦게 온 쪽이 실제로 문장을 만든다(consistencyDone 으로 중복 append 차단).
+  var state = { openFirm: "", openFirmKey: "", lastFirms: [], headline: [], topCode: "",
+                matrix: null, consistencyDone: false };
 
   // ── 공용 헬퍼 ────────────────────────────────────────────────────────────
   function el(tag, className, text) {
@@ -171,50 +193,74 @@
   }
 
   // ── 한눈 요약(에디토리얼 헤드라인) — 결정론 생성, 억지 통계 금지 ────────────────
-  // 규칙: 문장1=최다 카테고리(항상). 문장2=최근12개월 vs 그 이전12개월 증감(24개월
-  // 이상 커버리지 + 두 구간 모두 0건이 아닐 때만) — 조건 미충족이면 최다 업체 문장으로
-  // 대체한다(억지로 %를 만들지 않는다).
-  function shiftMonth(ym, delta) {
-    var y = parseInt(ym.slice(0, 4), 10), m = parseInt(ym.slice(5, 7), 10);
-    var total = y * 12 + (m - 1) + delta;
-    var ny = Math.floor(total / 12), nm = (total % 12) + 1;
-    return ny + "-" + (nm < 10 ? "0" + nm : "" + nm);
+  // 문장1 = 최다 카테고리 + 전체 대비 구성비(항상, 건수만으론 규모감이 안 잡힌다).
+  // 문장2 = 그 카테고리가 **연도마다도** 1위인지(appendConsistencyLine — 008 매트릭스가
+  //         도착한 뒤 조건부로 덧붙임). 조건 미충족이면 문장2 없이 끝낸다.
+  //
+  // 12차까지 있던 두 문장을 뺐다:
+  //   · YoY 증감 — 공개일 기준이라 "규제가 늘었다"가 아니라 "그 해 공개가 많았다"를 잰다.
+  //   · 최다 업체 — 공개 문서가 많은 업체가 1위로 잡히는 같은 편향이라, 업체 순위는
+  //     "품질 순위가 아니다"라는 읽는 법을 붙인 랭킹 섹션에서만 다룬다.
+  function catTotal(cats) {
+    return cats.reduce(function (s, c) { return s + (c.cnt || 0); }, 0);
   }
 
-  function computeYoy(byMonth) {
-    var sums = {};
-    (byMonth || []).forEach(function (r) { sums[r.month] = (sums[r.month] || 0) + (r.cnt || 0); });
-    var months = Object.keys(sums).sort();
-    if (!months.length) return null;
-    var last = months[months.length - 1];
-    var recentStart = shiftMonth(last, -11);
-    var prevEnd = shiftMonth(recentStart, -1);
-    var prevStart = shiftMonth(recentStart, -12);
-    if (months[0] > prevStart) return null; // 24개월 미만 커버리지 → 계산 보류
-    var recentSum = 0, prevSum = 0;
-    months.forEach(function (m) {
-      if (m >= recentStart && m <= last) recentSum += sums[m];
-      else if (m >= prevStart && m <= prevEnd) prevSum += sums[m];
-    });
-    if (prevSum <= 0 || recentSum <= 0) return null;
-    return { pct: Math.round(((recentSum - prevSum) / prevSum) * 100) };
+  // 표시용 반올림 — 1% 미만을 "0%"로 적으면 없는 것처럼 읽히므로 소수 1자리로 내린다.
+  function pctText(part, whole) {
+    if (!whole) return "0%";
+    var p = (part / whole) * 100;
+    return (p > 0 && p < 10 ? Math.round(p * 10) / 10 : Math.round(p)) + "%";
   }
 
   function buildHeadline(data) {
     var lines = [];
     var cats = aggregateCategories(data.by_agency_category || []);
-    if (cats.length) {
-      lines.push("가장 많이 지적된 영역은 " + cats[0].ko + "(" + fmtNum(cats[0].cnt) + "건)입니다.");
-    }
-    var yoy = computeYoy(data.by_month || []);
-    if (yoy) {
-      var dir = yoy.pct >= 0 ? "증가" : "감소";
-      lines.push("최근 12개월 지적은 전년 동기 대비 " + Math.abs(yoy.pct) + "% " + dir + "했습니다.");
-    } else if ((data.top_firms || []).length) {
-      var f = data.top_firms[0];
-      lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");
+    var total = catTotal(cats);
+    if (cats.length && total > 0) {
+      state.topCode = cats[0].code;
+      lines.push("가장 많이 지적된 영역은 " + cats[0].ko + "으로, 전체의 " +
+        pctText(cats[0].cnt, total) + "(" + fmtNum(cats[0].cnt) + "건)입니다.");
     }
     return lines;
+  }
+
+  // [연도별 일관성] "1위 카테고리가 특정 연도에 몰려서 생긴 순위인가?"에 답하는 문장.
+  // 008 매트릭스가 있어야 판정 가능하므로, 두 fetch 가 모두 끝난 뒤 늦게 온 쪽이 호출한다
+  // (008 미적용·실패 라이브에서는 영원히 호출되지 않고 문장1만 남는다).
+  // 판정은 보수적이다 — 표본이 충분한(MIN_YEAR_BASE 이상) 연도가 3개 이상이고 그 **전부**
+  // 에서 1위일 때만 말한다. 하나라도 아니면 아무 말도 만들지 않는다(억지 해석 금지).
+  function tryConsistencyLine() {
+    if (state.consistencyDone) return;
+    if (!state.matrix || !state.topCode || !state.headline.length) return;
+    state.consistencyDone = true;
+    appendConsistencyLine(state.matrix);
+  }
+
+  function appendConsistencyLine(matrix) {
+    var years = matrix.years || [];
+    if (!years.length) return;
+    var byYear = {};
+    (matrix.cells || []).forEach(function (c) {
+      byYear[c.year] = byYear[c.year] || { total: 0, top: null, mine: 0 };
+      var y = byYear[c.year];
+      y.total += c.cnt || 0;
+      if (!y.top || (c.cnt || 0) > y.top.cnt) y.top = { code: c.category_code, cnt: c.cnt || 0 };
+      if (c.category_code === state.topCode) y.mine = c.cnt || 0;
+    });
+    var shares = [], n = 0;
+    for (var i = 0; i < years.length; i++) {
+      var y = byYear[years[i]];
+      if (!y || y.total < MIN_YEAR_BASE) continue;
+      n++;
+      if (!y.top || y.top.code !== state.topCode) return;   // 한 해라도 1위가 아니면 침묵
+      shares.push(Math.round((y.mine / y.total) * 100));
+    }
+    if (n < 3) return;
+    var lo = Math.min.apply(null, shares), hi = Math.max.apply(null, shares);
+    var range = lo === hi ? (lo + "%") : (lo + "~" + hi + "%");
+    state.headline.push("연도별로 나눠 봐도 " + n + "개 연도 모두에서 1위이며 그 해 지적의 " +
+      range + "를 차지합니다 — 특정 연도에 몰려서 생긴 순위가 아닙니다.");
+    renderHeadline(state.headline);
   }
 
   // ── 스탯 스트립 ──────────────────────────────────────────────────────────
@@ -291,7 +337,9 @@
   }
 
   // ── 카테고리 순위(메인 시각) — 상위 10, 순위별 opacity 100→40% 농도 단계 ─────────
-  function buildCatRow(entry, idx, maxCnt) {
+  // 건수 옆에 전체 대비 구성비를 항상 병기한다(13차) — "2,405건"만으로는 그게 전체의
+  // 3%인지 30%인지 알 수 없어, 순위표가 규모감 없는 숫자 나열로 읽혔다.
+  function buildCatRow(entry, idx, maxCnt, total) {
     var a = document.createElement("a");
     a.className = "tr-cat-row";
     a.href = findingsHref("cat", entry.code);
@@ -308,58 +356,74 @@
     track.appendChild(bar);
     a.appendChild(track);
     a.appendChild(el("span", "tr-cat-count", fmtNum(entry.cnt) + "건"));
+    a.appendChild(el("span", "tr-cat-share", pctText(entry.cnt, total)));
     return a;
   }
 
   function renderCategoryRanking(byAgencyCategory) {
     catEl.innerHTML = "";
-    var cats = aggregateCategories(byAgencyCategory).slice(0, 10);
+    var all = aggregateCategories(byAgencyCategory);
+    var total = catTotal(all);              // 구성비 분모는 상위 10이 아니라 전체 카테고리
+    var cats = all.slice(0, 10);
     if (!cats.length) {
       catEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
       return;
     }
     var maxCnt = cats[0].cnt || 1;
-    cats.forEach(function (c, i) { catEl.appendChild(buildCatRow(c, i, maxCnt)); });
+    cats.forEach(function (c, i) { catEl.appendChild(buildCatRow(c, i, maxCnt, total)); });
   }
 
-  // ── 카테고리 × 연도 히트맵(H1) ───────────────────────────────────────────
+  // ── 연도별 구성비 히트맵(H1) ─────────────────────────────────────────────
   // findings_stats()(007)엔 카테고리×시간 매트릭스가 없어 findings_category_matrix()
   // (008)를 별도 RPC 로 병렬 fetch 한다 — 실패해도(008 미적용 라이브 포함) 이 섹션만
   // 조용히 숨겨진 채로 남고 다른 섹션엔 전혀 영향이 없다(§ 오케스트레이션 하단 참조).
-  // 셀 농도는 opacity 5단계 정적 버킷(0.08/0.25/0.45/0.7/1.0, 행렬 전체 최댓값 대비 비율
-  // 기준) — 0건 셀은 --line 톤의 빈 셀로 렌더한다.
+  //
+  // [13차] 셀 값 = 건수 → **그 해 전체 대비 비율(%)**, 즉 열 정규화(각 열의 합 = 100%).
+  // 이유: 공개 배치 편중으로 연도별 확보량이 10배 넘게 차이나, 건수 히트맵은 한 해 열만
+  // 진하게 타오르고 나머지는 전부 흐린 "공개량 지도"였다. 열을 정규화하면 연도끼리 모양을
+  // 비교할 수 있게 되고, 특정 영역이 매년 반복되는 구조적 패턴인지 한 해짜리 잡음인지가
+  // 비로소 보인다.
+  //
+  // 농도 버킷도 행렬 최댓값 상대 → **비율 절대 기준**으로 바꿨다. 상대 기준이면 같은 색이
+  // 표마다 다른 뜻이 되지만, 절대 기준이면 "진한 칸 = 그 해의 25% 이상"으로 어느 열에서나
+  // 같은 의미를 갖는다.
   var HEATMAP_OPACITY_STEPS = [0.08, 0.25, 0.45, 0.7, 1.0];
+  var HEATMAP_SHARE_BREAKS = [25, 15, 8, 3];   // % 기준 — 위에서부터 진한 단계
 
-  function heatmapOpacity(cnt, maxCnt) {
-    if (!cnt || maxCnt <= 0) return 0;
-    var ratio = cnt / maxCnt;
-    if (ratio > 0.8) return HEATMAP_OPACITY_STEPS[4];
-    if (ratio > 0.6) return HEATMAP_OPACITY_STEPS[3];
-    if (ratio > 0.35) return HEATMAP_OPACITY_STEPS[2];
-    if (ratio > 0.15) return HEATMAP_OPACITY_STEPS[1];
+  function shareOpacity(share) {
+    if (!share || share <= 0) return 0;
+    if (share >= HEATMAP_SHARE_BREAKS[0]) return HEATMAP_OPACITY_STEPS[4];
+    if (share >= HEATMAP_SHARE_BREAKS[1]) return HEATMAP_OPACITY_STEPS[3];
+    if (share >= HEATMAP_SHARE_BREAKS[2]) return HEATMAP_OPACITY_STEPS[2];
+    if (share >= HEATMAP_SHARE_BREAKS[3]) return HEATMAP_OPACITY_STEPS[1];
     return HEATMAP_OPACITY_STEPS[0];
   }
 
   function renderHeatmap(data) {
     heatmapEl.innerHTML = "";
-    var years = data.years || [];
+    var allYears = data.years || [];
     var cats = (data.category_totals || []).slice(0, 12);
-    if (!cats.length || !years.length) {
+    if (!cats.length || !allYears.length) {
       heatmapEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
       heatmapBlockEl.hidden = false;
       return;
     }
-    var cellMap = {};
+    var cellMap = {}, yearBase = {};
+    // 분모(그 해 총 지적)는 표에 그리는 상위 12개가 아니라 **전 카테고리** 합이어야 한다 —
+    // 상위 12개만으로 나누면 각 열의 비율이 실제보다 부풀려진다.
     (data.cells || []).forEach(function (c) {
       cellMap[c.category_code + "|" + c.year] = c.cnt || 0;
+      yearBase[c.year] = (yearBase[c.year] || 0) + (c.cnt || 0);
     });
-    var maxCnt = 0;
-    cats.forEach(function (c) {
-      years.forEach(function (y) {
-        var v = cellMap[c.category_code + "|" + y] || 0;
-        if (v > maxCnt) maxCnt = v;
-      });
-    });
+
+    // 표본이 얇은 연도는 열 자체를 뺀다 — 다만 뺐다는 사실을 적을 자리가 없으면(구버전 셸)
+    // 침묵 절단이 되므로 아예 빼지 않는다(조용한 축소 금지).
+    var years = allYears, dropped = [];
+    if (heatmapNoteEl) {
+      years = allYears.filter(function (y) { return (yearBase[y] || 0) >= MIN_YEAR_BASE; });
+      dropped = allYears.filter(function (y) { return (yearBase[y] || 0) < MIN_YEAR_BASE; });
+      if (!years.length) { years = allYears; dropped = []; }
+    }
 
     var scroll = document.createElement("div");
     scroll.className = "tr-heatmap-scroll";
@@ -368,7 +432,7 @@
 
     var caption = document.createElement("caption");
     caption.className = "tr-heatmap-caption";
-    caption.textContent = "카테고리별 연도별 지적 건수 히트맵(코럴 농도가 건수를 나타냅니다)";
+    caption.textContent = "연도별 지적 구성비(각 연도를 100%로 본 비율 — 코럴 농도가 그 해에서의 비중을 나타냅니다)";
     table.appendChild(caption);
 
     var thead = document.createElement("thead");
@@ -382,7 +446,9 @@
       var th = document.createElement("th");
       th.setAttribute("scope", "col");
       th.className = "tr-heatmap-yearhead";
-      th.textContent = y;
+      th.appendChild(el("span", "", y));
+      // 분모 병기 — %만 있으면 표본 크기를 알 수 없어 얇은 해의 큰 %를 과대해석하게 된다.
+      th.appendChild(el("span", "tr-heatmap-yearbase", fmtNum(yearBase[y] || 0) + "건"));
       headRow.appendChild(th);
     });
     thead.appendChild(headRow);
@@ -400,14 +466,17 @@
       row.appendChild(rowTh);
       years.forEach(function (y) {
         var cnt = cellMap[c.category_code + "|" + y] || 0;
+        var base = yearBase[y] || 0;
+        var share = base > 0 ? (cnt / base) * 100 : 0;
         var td = document.createElement("td");
         td.className = "tr-heatmap-cell";
-        td.title = ko + " · " + y + " · " + fmtNum(cnt) + "건";
+        td.title = ko + " · " + y + " · " + fmtNum(cnt) + "건(그 해 " + fmtNum(base) +
+          "건 중 " + pctText(cnt, base) + ")";
         if (cnt > 0) {
-          var opacity = heatmapOpacity(cnt, maxCnt);
+          var opacity = shareOpacity(share);
           td.style.backgroundColor = "rgba(194,96,63," + opacity + ")";
           td.style.color = opacity > 0.45 ? "var(--on-coral)" : "var(--ink)";
-          td.textContent = fmtNum(cnt);
+          td.textContent = pctText(cnt, base);
         } else {
           td.classList.add("tr-heatmap-cell-empty");
         }
@@ -418,10 +487,21 @@
     table.appendChild(tbody);
     scroll.appendChild(table);
     heatmapEl.appendChild(scroll);
+
+    if (heatmapNoteEl) {
+      heatmapNoteEl.textContent = dropped.length
+        ? ("표에는 지적이 " + MIN_YEAR_BASE + "건 이상 쌓인 연도만 넣었습니다 — " +
+           dropped.join("·") + "년은 자료가 너무 적어 비율이 의미를 갖지 못해 뺐습니다.")
+        : "";
+      heatmapNoteEl.hidden = !dropped.length;
+    }
     heatmapBlockEl.hidden = false;
   }
 
-  // ── 연도별 추이 ──────────────────────────────────────────────────────────
+  // ── 연도별 공개량(참고) ──────────────────────────────────────────────────
+  // 이 차트만은 절대 건수를 그대로 둔다 — 여기서 재는 것이 규제 활동이 아니라 "연도별로
+  // 우리가 확보한 자료의 양" 자체이기 때문이다(제목·읽는 법이 그렇게 못박는다). 대신 전체
+  // 대비 비중을 병기해, 한 해가 전체의 몇 %를 차지하는지(=공개 배치 편중)를 드러낸다.
   function renderYearTrend(byMonth) {
     yearEl.innerHTML = "";
     var years = aggregateYears(byMonth);
@@ -430,6 +510,7 @@
       return;
     }
     var maxCnt = years.reduce(function (m, y) { return Math.max(m, y.cnt); }, 0) || 1;
+    var total = years.reduce(function (s, y) { return s + y.cnt; }, 0);
     var wrap = document.createElement("div");
     wrap.className = "tr-year-bars";
     years.forEach(function (y) {
@@ -444,6 +525,7 @@
       col.appendChild(barwrap);
       col.appendChild(el("span", "tr-year-lbl", y.year));
       col.appendChild(el("span", "tr-year-count", fmtNum(y.cnt)));
+      col.appendChild(el("span", "tr-year-share", pctText(y.cnt, total)));
       wrap.appendChild(col);
     });
     yearEl.appendChild(wrap);
@@ -517,7 +599,9 @@
 
   function buildFirmDetailYearCol(byMonth) {
     var col = document.createElement("div");
-    col.appendChild(el("h4", "tr-fd-h", "연도별 추이"));
+    // "추이"가 아니라 "공개량" — 이 막대도 실사 시점이 아니라 공개 시점 분포다(페이지 전체
+    // 규칙과 같은 이유, 파일 머리 §13차 (1)). 업체 단위라 표본이 더 작으니 더욱 그렇다.
+    col.appendChild(el("h4", "tr-fd-h", "연도별 공개량"));
     var years = aggregateYears(byMonth);
     if (!years.length) {
       col.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
@@ -672,46 +756,12 @@
     if (f) openFirm(f, findFirmKeyByName(f));
   }
 
-  // ── 하단: 증거등급 구성(A/B/C 스택 바) · 소스 구성 ───────────────────────────
-  function renderEvidence(byEvidence) {
-    evidenceEl.innerHTML = "";
-    var map = {};
-    (byEvidence || []).forEach(function (r) { map[r.evidence_level] = r.cnt || 0; });
-    var total = EVIDENCE_ORDER.reduce(function (s, k) { return s + (map[k] || 0); }, 0);
-    if (!total) {
-      evidenceEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
-      return;
-    }
-    var bar = document.createElement("div");
-    bar.className = "tr-evidence-bar";
-    EVIDENCE_ORDER.forEach(function (k, i) {
-      var cnt = map[k] || 0;
-      if (!cnt) return;
-      var seg = document.createElement("div");
-      seg.className = "tr-evidence-seg";
-      seg.style.opacity = String(Math.max(0.35, 1 - i * 0.32));
-      seg.style.width = ((cnt / total) * 100) + "%";
-      seg.title = "Evidence " + k + " " + fmtNum(cnt) + "건";
-      bar.appendChild(seg);
-    });
-    evidenceEl.appendChild(bar);
-    var legend = document.createElement("div");
-    legend.className = "tr-evidence-legend";
-    EVIDENCE_ORDER.forEach(function (k, i) {
-      var cnt = map[k] || 0;
-      var item = document.createElement("span");
-      item.className = "tr-evidence-item";
-      var sw = document.createElement("i");
-      sw.className = "tr-evidence-swatch";
-      sw.setAttribute("aria-hidden", "true");
-      sw.style.opacity = String(Math.max(0.35, 1 - i * 0.32));
-      item.appendChild(sw);
-      item.appendChild(document.createTextNode("Evidence " + k + " " + fmtNum(cnt) + "건"));
-      legend.appendChild(item);
-    });
-    evidenceEl.appendChild(legend);
-  }
-
+  // ── 소스 구성 ────────────────────────────────────────────────────────────
+  // 구성비를 병기한다 — 소스 편중(현재 FDA 483 이 98% 이상)은 이 페이지 전체 해석의
+  // 전제라, 건수만 적어 두면 독자가 스스로 나눠 봐야 알 수 있다.
+  //
+  // 13차에 이 옆에 있던 "증거 등급 구성"(A/B/C 스택 바)은 삭제했다: 실데이터가 A 99% 이상
+  // 단일값이라 분포 차트로서 정보가 0이고, 증거 등급 자체가 내부 QA 개념이다.
   function renderSource(bySource) {
     sourceEl.innerHTML = "";
     var sorted = (bySource || []).slice().sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
@@ -720,6 +770,7 @@
       return;
     }
     var maxCnt = sorted[0].cnt || 1;
+    var total = sorted.reduce(function (s, r) { return s + (r.cnt || 0); }, 0);
     sorted.forEach(function (s) {
       var row = document.createElement("div");
       row.className = "tr-src-row";
@@ -732,6 +783,7 @@
       track.appendChild(bar);
       row.appendChild(track);
       row.appendChild(el("span", "tr-src-count", fmtNum(s.cnt)));
+      row.appendChild(el("span", "tr-src-share", pctText(s.cnt, total)));
       sourceEl.appendChild(row);
     });
   }
@@ -741,12 +793,13 @@
     var totals = data.totals || {};
     renderStats(totals);
     renderCoverageNote(totals);
-    renderHeadline(buildHeadline(data));
+    state.headline = buildHeadline(data);       // 문장2는 008 매트릭스가 도착해야 붙는다
+    renderHeadline(state.headline);
+    tryConsistencyLine();                       // 008 이 먼저 도착해 있었다면 여기서 붙는다
     renderCategoryRanking(data.by_agency_category || []);
     renderYearTrend(data.by_month || []);
     state.lastFirms = data.top_firms || [];
     renderFirmRanking(state.lastFirms);
-    renderEvidence(data.by_evidence || []);
     renderSource(data.by_source || []);
   }
 
@@ -810,6 +863,12 @@
   // 체인). 실패해도(008 미적용 라이브 포함) tr-heatmap-block 은 정적 셸의 기본값인
   // hidden 상태 그대로 남는다 — 다른 섹션엔 전혀 영향이 없다.
   fetchCategoryMatrix()
-    .then(function (data) { renderHeatmap(data); })
+    .then(function (data) {
+      renderHeatmap(data);
+      // 헤드라인 문장2도 이 매트릭스로 판정한다 — fetchStats 보다 먼저/나중에 도착하는
+      // 두 경우 모두 tryConsistencyLine() 이 조건을 다시 확인하므로 순서에 안전하다.
+      state.matrix = data;
+      tryConsistencyLine();
+    })
     .catch(function () { /* 조용히 숨김 유지 */ });
 })();

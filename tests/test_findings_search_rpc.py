@@ -355,7 +355,8 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     """⑫026 → 027(findings_search supersede) → 028(두 함수 supersede) → 029(HTML 엔티티
     오염 정정) → 030(findings_search 재supersede -- work_mem/p_page 클램프/blob semantics)
     로 체인이 이어지며, 031(reactions_weekly_top -- findings 밖 반응 주간 집계 count-only
-    RPC)이 추가됐다 -- 마이그레이션 번호가 001~031 까지 결번 없이 연속인지(파일명 접두
+    RPC)이 추가됐고, 032(gurumi_growth -- 구름이 성장 데이터 로그인 보관 테이블·본인 행
+    RLS)가 뒤따랐다 -- 마이그레이션 번호가 001~032 까지 결번 없이 연속인지(파일명 접두
     3자리 번호 기준) 고정한다."""
 
     def test_026_file_exists(self) -> None:
@@ -376,13 +377,13 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_031_file_exists(self) -> None:
         self.assertTrue(_REACTIONS_TOP_PATH.is_file(), f"missing {_REACTIONS_TOP_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_031(self) -> None:
+    def test_migration_numbers_are_contiguous_from_001_to_032(self) -> None:
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 32)))
+        self.assertEqual(numbers, list(range(1, 33)))
 
 
 # ============================================================================

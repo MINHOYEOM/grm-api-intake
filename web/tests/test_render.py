@@ -2703,19 +2703,102 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertEqual(html_src.count("<script"), 1)
 
     def test_headline_generation_rules_present(self):
-        """한눈 요약 생성 규칙 — 문장1=최다 카테고리(항상), 문장2=YoY 증감(24개월 커버리지
-        + 두 구간 모두 0건 아닐 때만) 아니면 최다 업체 문장으로 대체(억지 통계 금지)."""
+        """한눈 요약 생성 규칙(13차) — 문장1=최다 카테고리 + 전체 대비 구성비(항상),
+        문장2=그 카테고리가 연도마다도 1위인지(008 매트릭스 도착 시에만·조건부)."""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         self.assertIn("function buildHeadline(data)", js_src)
-        self.assertIn("function computeYoy(byMonth)", js_src)
-        self.assertIn("if (months[0] > prevStart) return null;", js_src)
-        self.assertIn("if (prevSum <= 0 || recentSum <= 0) return null;", js_src)
         self.assertIn("가장 많이 지적된 영역은", js_src)
-        self.assertIn("지적 건수가 가장 많은 업체는", js_src)
+        self.assertIn("function appendConsistencyLine(matrix)", js_src)
+        self.assertIn("특정 연도에 몰려서 생긴 순위가 아닙니다.", js_src)
+
+    def test_headline_has_no_disclosure_date_yoy(self):
+        """[13차 정직화] published_date 는 공개일이라 전년 동기 대비 증감은 규제 추세가
+        아니라 공개 배치 크기를 재는 지표다 — YoY 문장·계산을 통째로 제거했고, 같은 편향을
+        갖는 '최다 업체' 문장도 헤드라인에서 뺐다(업체 순위는 읽는 법을 붙인 섹션에만)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        for gone in ("computeYoy", "shiftMonth", "전년 동기 대비",
+                     "지적 건수가 가장 많은 업체는"):
+            self.assertNotIn(gone, js_src, f"제거 대상이 남아 있음: {gone}")
+
+    def test_consistency_line_is_conservative_and_order_safe(self):
+        """문장2 판정은 보수적이어야 한다 — 표본이 충분한 연도가 3개 미만이거나 그중 한
+        해라도 1위가 아니면 아무 문장도 만들지 않는다(억지 해석 금지). 또 007/008 두 fetch
+        는 병렬이라 도착 순서가 정해져 있지 않으므로, 양쪽에서 tryConsistencyLine() 을
+        호출하고 consistencyDone 으로 중복 append 를 막는다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("var MIN_YEAR_BASE = 30;", js_src)
+        fn = js_src[js_src.index("function appendConsistencyLine(matrix)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("if (n < 3) return;", fn)
+        self.assertIn("y.top.code !== state.topCode) return;", fn)  # 한 해라도 1위 아니면 침묵
+        self.assertIn("y.total < MIN_YEAR_BASE", fn)
+        # 순서 안전 — 두 체인 모두 tryConsistencyLine() 을 부르고, 중복 실행은 차단된다.
+        self.assertIn("function tryConsistencyLine()", js_src)
+        self.assertIn("if (state.consistencyDone) return;", js_src)
+        self.assertEqual(js_src.count("tryConsistencyLine();"), 2)
+
+    def test_composition_share_axis_on_every_count_chart(self):
+        """[13차] 절대 건수만 보여 주던 차트에 전부 구성비(%)를 병기한다 — 카테고리 순위·
+        연도별 공개량·소스 구성. 반올림은 공용 pctText() 하나로만(1% 미만이 '0%'로 뭉개져
+        없는 것처럼 읽히지 않도록 10% 미만은 소수 1자리)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        self.assertIn("function pctText(part, whole)", js_src)
+        self.assertIn('el("span", "tr-cat-share", pctText(entry.cnt, total))', js_src)
+        self.assertIn('el("span", "tr-year-share", pctText(y.cnt, total))', js_src)
+        self.assertIn('el("span", "tr-src-share", pctText(s.cnt, total))', js_src)
+        # 카테고리 구성비 분모는 상위 10이 아니라 전체 카테고리 합이어야 한다.
+        fn = js_src[js_src.index("function renderCategoryRanking(byAgencyCategory)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("var total = catTotal(all);", fn)
+        self.assertIn("var cats = all.slice(0, 10);", fn)
+
+    def test_evidence_grade_section_removed(self):
+        """[13차] 증거 등급 구성 — 실데이터가 A 99% 이상 단일값이라 분포 차트로서 정보가
+        없고, 등급 자체가 내부 QA 개념이다(트랙C 품질 기준: 내부개념 비노출). 셸·CSS·
+        렌더 경로를 모두 제거했다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        for gone in ("tr-evidence", "renderEvidence", "EVIDENCE_ORDER", "by_evidence"):
+            self.assertNotIn(gone, js_src, f"trends.js 에 잔존: {gone}")
+        # 템플릿에서는 CSS 규칙 선언만 본다(jinja 주석엔 제거 근거가 남아 있고, 그 주석은
+        # 렌더 출력에 실리지 않는다).
+        for rule in (".tr-evidence", ".tr-bottom{"):
+            self.assertNotIn(rule, html_src, f"trends.html 에 CSS 규칙 잔존: {rule}")
+        # 렌더 출력(스코프 <style> 의 CSS 주석 포함)엔 흔적이 전혀 없어야 한다 —
+        # CSS 주석은 사용자에게 그대로 전달되므로 제거된 UI 를 거기 남기지 않는다.
+        for gone in ("tr-evidence", "tr-bottom", "증거 등급", "Evidence "):
+            self.assertNotIn(gone, self.html, f"렌더 출력에 잔존: {gone}")
+
+    def test_read_the_chart_note_on_every_section(self):
+        """[13차] 각 차트에 '이 그래프를 읽는 법' 1~2문장(.tr-read) — 전 직원 대상이라
+        정적 텍스트로 두어 골든에 남기고 리뷰 가능하게 한다(5개 섹션 전부)."""
+        self.assertEqual(self.html.count('<p class="tr-read">'), 5)
+        for section_cue in ("전체 기간을 합친 순위입니다.",
+                             "각 연도를 100%로 놓고",
+                             "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
+                             "품질이 나쁜 순서가 아닙니다.",
+                             "FDA 483의 경향으로 읽으셔야 합니다."):
+            self.assertIn(section_cue, self.html)
+
+    def test_publication_date_semantics_disclosed_up_front(self):
+        """오독의 근원(날짜=공개일)은 히어로와 '먼저 알아두세요' 박스 양쪽에서 먼저 밝힌다 —
+        런타임 fetch 성공 여부와 무관하게 정적 텍스트로 존재해야 한다."""
+        self.assertIn("날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.", self.html)
+        self.assertIn('<span class="lab">먼저 알아두세요</span>', self.html)
+        self.assertIn("특정 연도의 건수가 많다고 해서 그 해에 지적이 늘어난 것은 아닙니다.", self.html)
+
+    def test_source_mix_skew_disclosed(self):
+        """소스 편중(FDA 483 압도)은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성
+        섹션에서 명시하고, 각 행에 구성비를 병기한다."""
+        self.assertIn("지금은 FDA 483이 대부분입니다.", self.html)
+        self.assertIn("수집을 시작한 지 얼마 되지 않아", self.html)
 
     def test_year_trend_caveat_note_present(self):
-        self.assertIn("백필이 진행 중입니다", self.html)
+        self.assertIn("과거 연도는 아직 채워 넣는 중입니다", self.html)
         self.assertIn("하한치", self.html)
+        # 제목 자체가 "추이"(=규제 활동 변화)로 읽히지 않게 "공개량(참고)"로 강등했다.
+        self.assertIn('<h2 class="tr-h">연도별 공개량(참고)</h2>', self.html)
+        self.assertNotIn("연도별 추이</h2>", self.html)
 
     def test_stat_strip_note_present(self):
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
@@ -2728,23 +2811,53 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('<div class="tr-state tr-state-error" id="tr-error" hidden>', self.html)
         self.assertIn('<div class="tr-state" id="tr-loading" role="status" aria-live="polite">', self.html)
 
-    # ── H1 카테고리×연도 히트맵 ─────────────────────────────────────────────
+    # ── H1 연도별 구성비 히트맵 ─────────────────────────────────────────────
     def test_heatmap_section_shell_present_and_hidden(self):
-        """정적 셸에 히트맵 섹션이 '카테고리 순위'와 '연도별 추이' 사이에 존재하며
+        """정적 셸에 구성비 섹션이 '카테고리 순위'와 '연도별 공개량' 사이에 존재하며
         기본 hidden(008 미적용 라이브·fetch 실패 시 trends.js 가 그대로 두는 상태와
         일치 — 골든 결정론)."""
         self.assertIn(
             '<section class="tr-block tr-heatmap-block" id="tr-heatmap-block" '
-            'aria-label="카테고리 × 연도 히트맵" hidden>',
+            'aria-label="연도별 구성비" hidden>',
             self.html,
         )
-        self.assertIn('<h2 class="tr-h">카테고리 × 연도 히트맵</h2>', self.html)
+        self.assertIn('<h2 class="tr-h">연도별 구성비</h2>', self.html)
         self.assertIn('<div id="tr-heatmap" class="tr-heatmap"></div>', self.html)
+        # 표본 부족으로 제외한 연도를 적을 자리도 셸에 hidden 으로 있어야 한다.
+        self.assertIn('<p class="tr-note" id="tr-heatmap-note" hidden></p>', self.html)
         cat_idx = self.html.index('aria-label="카테고리 순위"')
         heatmap_idx = self.html.index('id="tr-heatmap-block"')
-        year_idx = self.html.index('aria-label="연도별 추이"')
+        year_idx = self.html.index('aria-label="연도별 공개량"')
         self.assertTrue(cat_idx < heatmap_idx < year_idx,
-                         "히트맵 섹션이 카테고리 순위와 연도별 추이 사이에 있지 않음")
+                         "구성비 섹션이 카테고리 순위와 연도별 공개량 사이에 있지 않음")
+
+    def test_heatmap_cells_are_column_normalised_share(self):
+        """[13차] 셀 값 = 건수 → 그 해 전체 대비 비율(열 정규화). 분모는 표에 그리는 상위
+        12개가 아니라 **전 카테고리 합**이어야 한다(상위 12개로 나누면 비율이 부풀려진다).
+        연도 헤더엔 그 분모(건수)를 함께 적어 표본 크기를 감춘 %가 되지 않게 한다."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderHeatmap(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        # 분모 누적은 cells 전체 순회에서 이뤄진다(상위 12개 슬라이스와 무관).
+        self.assertIn("yearBase[c.year] = (yearBase[c.year] || 0) + (c.cnt || 0);", fn)
+        self.assertIn("var share = base > 0 ? (cnt / base) * 100 : 0;", fn)
+        self.assertIn("td.textContent = pctText(cnt, base);", fn)
+        self.assertIn('el("span", "tr-heatmap-yearbase", fmtNum(yearBase[y] || 0) + "건")', fn)
+        # 툴팁은 건수·분모·비율을 모두 보여 준다(원 수치 은폐 금지).
+        self.assertIn('"건(그 해 "', fn)
+
+    def test_heatmap_thin_years_dropped_but_disclosed(self):
+        """표본이 얇은 연도는 비율이 노이즈라 열에서 빼되, **뺐다는 사실을 화면에 적는다**.
+        적을 자리가 없는 구버전 셸에서는 아예 빼지 않는다(조용한 축소 금지)."""
+        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function renderHeatmap(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("var years = allYears, dropped = [];", fn)
+        self.assertIn("if (heatmapNoteEl) {", fn)
+        self.assertIn(">= MIN_YEAR_BASE", fn)
+        self.assertIn("자료가 너무 적어 비율이 의미를 갖지 못해 뺐습니다.", fn)
+        # 전부 걸러지는 극단(초기 라이브)에서는 필터를 포기하고 원본 연도를 그대로 쓴다.
+        self.assertIn("if (!years.length) { years = allYears; dropped = []; }", fn)
 
     def test_heatmap_rpc_endpoint_present(self):
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
@@ -2770,10 +2883,14 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('rowTh.setAttribute("scope", "row")', js_src)
 
     def test_heatmap_five_step_opacity_buckets(self):
+        """농도 버킷은 행렬 최댓값 상대 → **비율 절대 기준**(13차). 상대 기준이면 같은 색이
+        표마다 다른 뜻이 되지만, 절대 기준이면 어느 열에서나 같은 의미를 갖는다."""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         self.assertIn(
             "var HEATMAP_OPACITY_STEPS = [0.08, 0.25, 0.45, 0.7, 1.0];", js_src)
-        self.assertIn("function heatmapOpacity(cnt, maxCnt)", js_src)
+        self.assertIn("var HEATMAP_SHARE_BREAKS = [25, 15, 8, 3];", js_src)
+        self.assertIn("function shareOpacity(share)", js_src)
+        self.assertNotIn("function heatmapOpacity(", js_src)   # 최댓값 상대 버킷은 제거
         self.assertIn('td.style.color = opacity > 0.45 ? "var(--on-coral)" : "var(--ink)";',
                        js_src)
         self.assertIn("tr-heatmap-cell-empty", js_src)
@@ -2784,13 +2901,12 @@ class WebTrendsRenderTest(unittest.TestCase):
 
     # ── [공개 범위 투명성] 트렌드 페이지 커버리지 노트 ───────────────────────────
     def test_coverage_note_shell_present_hidden_and_positioned(self):
-        """정적 셸은 hidden 빈 노트만 렌더(골든 결정론) — trends.js 가 런타임에 채운다.
-        기존 .imp(시사점) 토큰을 재사용하므로 신규 CSS 는 0 이어야 한다. 위치는 스탯
-        스트립 직하단·한눈 요약 헤드라인 위."""
-        self.assertIn(
-            '<div class="imp" id="tr-coverage-note" hidden><p id="tr-coverage-text"></p></div>',
-            self.html,
-        )
+        """정적 셸은 hidden 노트만 렌더(골든 결정론). 13차부터 데이터와 무관한 첫 문단
+        (날짜=공개일)은 정적 텍스트로 두고, 수치가 들어가는 둘째 문단만 trends.js 가
+        런타임에 채운다. 기존 .imp(시사점) 토큰 재사용 — 신규 CSS 0. 위치는 스탯 스트립
+        직하단·한눈 요약 헤드라인 위."""
+        self.assertIn('<div class="imp" id="tr-coverage-note" hidden>', self.html)
+        self.assertIn('<p id="tr-coverage-text"></p>', self.html)
         stats_idx = self.html.index('id="tr-stats"')
         note_idx = self.html.index('id="tr-coverage-note"')
         headline_idx = self.html.index('id="tr-headline"')
@@ -2914,9 +3030,10 @@ class WebTrendsRenderTest(unittest.TestCase):
 
     def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):
         """[firm_name 엔티티 디코드 M5] 업체 랭킹(buildFirmRow)·상세 패널 헤더
-        (renderFirmDetail)·헤드라인(buildHeadline) 모두 decodeFirmDisplay() 를 거쳐
-        표시한다 — 클릭/state 비교(openFirm 호출·state.openFirm===f.firm_name)는
-        findings_firm_stats RPC exact-match 파라미터라 raw f.firm_name 그대로 유지한다."""
+        (renderFirmDetail) 모두 decodeFirmDisplay() 를 거쳐 표시한다 — 클릭/state 비교
+        (openFirm 호출·state.openFirm===f.firm_name)는 findings_firm_stats RPC exact-match
+        파라미터라 raw f.firm_name 그대로 유지한다. (13차부터 헤드라인엔 업체명이 등장하지
+        않는다 — test_headline_has_no_disclosure_date_yoy 참조.)"""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function decodeFirmDisplay(s)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
@@ -2929,10 +3046,6 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("else openFirm(f.firm_name, f.firm_key);", row_fn)  # 클릭은 raw 그대로
         self.assertIn(
             'idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));',
-            js_src,
-        )
-        self.assertIn(
-            'lines.push("지적 건수가 가장 많은 업체는 " + decodeFirmDisplay(f.firm_name) + "(" + fmtNum(f.cnt) + "건)입니다.");',
             js_src,
         )
 

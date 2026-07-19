@@ -14,7 +14,7 @@ import collect_ich
 import collect_mfds
 
 CATALOG_FIELDS = (
-    "id", "title_en", "title_ko", "doc_type", "published_date",
+    "id", "code", "title_en", "title_ko", "doc_type", "published_date",
     "official_url", "ko_url", "pdf_url",
 )
 MFDS_TYPES = {"guidance-industry", "guidance-internal", "notice-final"}
@@ -69,11 +69,14 @@ def _load_catalog(path: Path) -> list[dict[str, Any]]:
 
 
 def _public_only(item: dict[str, Any]) -> dict[str, Any]:
+    unknown = set(item) - set(CATALOG_FIELDS)
+    if unknown:
+        raise ValueError(f"unsupported catalog fields: {', '.join(sorted(unknown))}")
     return {key: item[key] for key in CATALOG_FIELDS if item.get(key) not in (None, "")}
 
 
 def merge_candidate(
-    baseline: list[dict[str, Any]], derived: Iterable[dict[str, str]], *, source: str,
+    baseline: list[dict[str, Any]], derived: Iterable[dict[str, str]],
 ) -> list[dict[str, Any]]:
     by_id = {str(item.get("id") or ""): _public_only(item) for item in baseline}
     original_order = [str(item.get("id") or "") for item in baseline]
@@ -81,12 +84,12 @@ def merge_candidate(
     for incoming in derived:
         item_id = incoming["id"]
         current = dict(by_id.get(item_id, {}))
-        update = dict(incoming)
-        if (source == "mfds" and item_id in by_id
-                and update.get("title_en") == update.get("title_ko")
-                and current.get("title_en")):
-            update.pop("title_en", None)
-        current.update(update)
+        if item_id in by_id:
+            for key, value in _public_only(dict(incoming)).items():
+                if current.get(key) in (None, ""):
+                    current[key] = value
+        else:
+            current = _public_only(dict(incoming))
         by_id[item_id] = _public_only(current)
         if item_id not in original_order:
             new_ids.append(item_id)
@@ -132,7 +135,7 @@ def build(
     for source, raw_items in source_inputs.items():
         baseline = _load_catalog(baseline_dir / f"{source}.json")
         derived = [row for row in (derive_item(item, source) for item in raw_items) if row]
-        candidate = merge_candidate(baseline, derived, source=source)
+        candidate = merge_candidate(baseline, derived)
         _write(staging_dir / f"{source}.json", {"items": candidate})
         detail = diff_catalog(baseline, candidate)
         detail["collector_items"] = len(raw_items)

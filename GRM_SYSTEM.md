@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.147` |
-| 최종 수정일 | 2026-07-18 |
-| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-18 트랙 C 고도화 완결 — 자료실 8카탈로그 271건(ICH PDF 직링크 24·식약처 번역본 7토픽·EMA·Health Canada 신설·MFDS 71건)·GMP 용어사전 145어·이용안내 개편·주간 퀴즈·landing 구름이 위젯/인기 카드 라이브**(§1.2). |
+| 문서 버전 | `v1.148` |
+| 최종 수정일 | 2026-07-19 |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 8카탈로그 271건(ICH PDF 직링크·식약처 번역본 7토픽)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -57,7 +57,7 @@ flowchart TD
 | 저장 | Notion → 웹 정적 사이트 | Supabase(Postgres) → 웹 |
 | 웹 위치 | `/`, `/archive/` | `/findings/`, `/findings/trends/`(전량 집계 대시보드) |
 
-> **트랙 C — 자료실 (`/library/`, 2026-07-18 신설):** 뉴스(카드)도 위반(findings)도 아닌 **참조형 콘텐츠**의 상설 표면. 카탈로그 8종·총 271건 — ICH(31토픽)·MFDS 지침·고시(71)·EU GMP/EudraLex Vol.4(38)·PIC/S(32)·WHO(28)·FDA 가이던스(25)·EMA(26)·Health Canada(20). 데이터는 전 링크 실검증(HTTP 200·문서 일치)된 커밋 JSON `web/data/library/*.json`(자동 갱신 미구현 — 갱신 시 재생성 커밋)이고, 렌더는 `LIBRARY_REGISTRY`+공통 템플릿 `library_catalog.html` 1장(카탈로그 추가 = 데이터 파일+registry 1항목, 선택 키 = sort 발행일 내림차순 뷰정렬·link_label·groups_by_url·doc_type_labels·pdf==official 중복 칩 억제). 표기 규약: 발행일만 표기(수집일 노출 금지)·내부 운영 개념(Tier 등) 미노출·한국어 우선 병기(title_ko 주 제목·title_en 병기)·ICH는 현행 문서 PDF 직링크 보유 24토픽 = 제목이 database.ich.org PDF로 직결, 미보유 7토픽(M1·M2·M5·M6·M8·M16·M18) = 무링크 + Q/M 그룹 헤더 "ICH 공식 카탈로그" 링크로만 연결. 식약처 공식 번역본·주제 Q&A 확인 7토픽(Q1A-Q1F·Q7·Q8/Q9/Q10·Q13·M4)은 ko_url 칩. 데스크톱 우선 폭 규약(인트로 720px·프로즈 780px·리스트 820~880px·keep-all, ch 캡 금지). 새 공개 RPC·RLS 없음, 주간 발행 게이트와 무관한 독립 정적 섹션. 2차 웨이브(2026-07-18)로 **이용안내(`/guide/` — 실사용 관점 8섹션·h2 파생 결정론 목차)와 GMP 용어사전(`/glossary/`, 공식 용어집 기반 145어·전 용어 출처 링크·가나다 초성 색인·클라이언트 검색 `glossary.js`)** 이 합류했다 — nav 6번째 "이용안내", 용어사전은 이용안내·자료실 허브·footer 교차링크 진입. guide 본문은 `web/data/guide_content.md`를 render.py의 제한 md 서브셋 결정론 변환(`render_guide_html()`, 외부 라이브러리 0)으로 렌더한다. 3차 웨이브(2026-07-18)로 **주간 퀴즈(`/quiz/`)** 합류 — 문항 뱅크(`web/data/quiz_bank.json` 28문항, 전 문항 근거 링크·`docs/specs/GRM_퀴즈_운영설계_2026-07-18.md`)를 페이지에 embed하고 신규 `quiz.js`가 ISO 주차 키로 "이번 주 세트"(easy 3+normal 1)를 결정론 회전(같은 주 전 직원 동일), 클라이언트 즉시 채점·해설·근거 링크 표시(랭킹·서버 저장 없음). 진입 = landing 배너 + footer. 4차 웨이브(2026-07-18)로 landing에 **구름이 상태 위젯**("이번 주 구름이가 규제 소식 N건을 먹고, 핵심 카드 M장으로 정리했어요" — 마스코트 공식 표기는 "구름이", 2026-07-18 확정) 합류 — 최신 브리프 coverage(`intake_total`/`rendered`/`publish_date`)를 렌더타임 임베드(외부 fetch·RPC 0, coverage 부재 시 미표시), CSS 1회 모션·reduced-motion 존중. 5차로 landing **인기 카드 섹션**("이번 주 반응이 모인 카드") 합류 — `reactions_weekly_top`(031 count-only RPC)의 첫 소비자. 정적 정본 = 빈 상태 유도 문구("아직 하트·스크랩이 없어요")이고, `popular.js`가 anon GET 호출이 성공하고 1건 이상일 때만 상위 ≤3장으로 교체한다(제목·링크는 커밋된 search-index.json 교차·미등록 card_id 제외, 실패·빈 집계는 조용히 정적 유지). "가장 많이 본" 표현은 쓰지 않는다(조회수 계측 없음).
+> **트랙 C — 자료실 (`/library/`, 2026-07-18 신설):** 뉴스(카드)도 위반(findings)도 아닌 **참조형 콘텐츠**의 상설 표면. 카탈로그 8종·총 271건 — ICH(31토픽)·MFDS 지침·고시(71)·EU GMP/EudraLex Vol.4(38)·PIC/S(32)·WHO(28)·FDA 가이던스(25)·EMA(26)·Health Canada(20). 데이터는 전 링크 실검증(HTTP 200·문서 일치)된 커밋 JSON `web/data/library/*.json`(자동 갱신 미구현 — 갱신 시 재생성 커밋)이고, 렌더는 `LIBRARY_REGISTRY`+공통 템플릿 `library_catalog.html` 1장(카탈로그 추가 = 데이터 파일+registry 1항목, 선택 키 = sort 발행일 내림차순 뷰정렬·link_label·groups_by_url·doc_type_labels·pdf==official 중복 칩 억제). 표기 규약: 발행일만 표기(수집일 노출 금지)·내부 운영 개념(Tier 등) 미노출·한국어 우선 병기(title_ko 주 제목·title_en 병기)·ICH는 현행 문서 PDF 직링크 보유 24토픽 = 제목이 database.ich.org PDF로 직결, 미보유 7토픽(M1·M2·M5·M6·M8·M16·M18) = 무링크 + Q/M 그룹 헤더 "ICH 공식 카탈로그" 링크로만 연결. 식약처 공식 번역본·주제 Q&A 확인 7토픽(Q1A-Q1F·Q7·Q8/Q9/Q10·Q13·M4)은 ko_url 칩. 데스크톱 우선 폭 규약(인트로 720px·프로즈 780px·리스트 820~880px·keep-all, ch 캡 금지). 새 공개 RPC·RLS 없음, 주간 발행 게이트와 무관한 독립 정적 섹션. 부속 표면(전부 라이브): **이용안내**(`/guide/` — 실사용 관점 8섹션·h2 파생 결정론 목차, 본문은 `web/data/guide_content.md`를 render.py 제한 md 서브셋 결정론 변환으로 렌더) · **GMP 용어사전**(`/glossary/` — 공식 용어집 기반 200어: 쉬운 풀이+실무 맥락 `detail_ko`+관련 조항 `reg_refs`+출처 링크, 초성 색인·검색 `glossary.js`) · **주간 퀴즈**(`/quiz/` — 뱅크 33문항(그 주 브리프 카드 연동형·GRM 내부 개념 금지·전 문항 근거 링크)을 embed하고 `quiz.js`가 week(YYYYWW) 지정 문항 우선+ISO 주차 결정론 회전으로 "이번 주 세트" 선택, 즉시 채점·랭킹/서버 저장 없음. **매주 월 13:00 KST 예약 세션이 그 주 라이브 브리프에서 신규 문항을 생성·append하는 자동 출제 파이프라인** 가동 — 게이트 `quiz_lint.py`·정본 규율 `docs/prompts/GRM_주간퀴즈생성_프롬프트_v1.md`) · **구름이 성장 시스템+펫**(`growth.js` 성장 데이터 = localStorage v1 단독·서버 전송 0, 포인트=정답×10+참여주×20+스트릭 보너스·5단계 / `pet.js`·`pet.css`·단계별 투명 PNG 5종이 **전 페이지 우측 하단 펫 위젯**(관리 패널·성장 도감·쓰다듬기)으로 표면화 — 구 인라인 SVG 마스코트 대체, 공식 표기 "구름이"). nav 6탭 = 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내(소개 탭 제거·용어사전 승격), 자료실 하위 페이지는 breadcrumb("← 자료실")·맨위로 버튼. **랜딩 확정 구성(사용자 확정)**: 히어로 → Why → 기능 6종 → Card Anatomy → 참여 존 `#engage`(인기 카드+퀴즈 CTA) → This Week 콜아웃(마감 CTA·뉴스레터 직전) — 브리프행 CTA는 히어로·콜아웃 2개뿐(불가침). **인기 카드 섹션**은 `reactions_weekly_top`(031 count-only RPC) 소비: 정적 정본 = 빈 상태 유도 문구, `popular.js`가 anon GET 성공·1건 이상일 때만 상위 ≤3장으로 교체(search-index 교차·미등록 card_id 제외·조용한 폴백), "가장 많이 본" 표현 금지(조회수 계측 없음).
 
 ### 1.3 핵심 설계 원칙
 - **원문 우선·추적 가능:** 모든 카드/항목에 정보 출처와 공식 원문 링크를 붙입니다. 요약·번역이 있어도 법적 판단은 항상 원문 기준.
@@ -155,6 +155,7 @@ flowchart TD
 | ⑦ | production 반영 → 라이브 | `grm-web-deploy.yml` | ⑥ 머지 | 없음 |
 | 보조 | 델타 부재 감지 → 경보 | `grm-publish-watchdog.yml` | cron 월 10:00 KST | 없음 |
 | 보조 | 발행 준비 검증+가속(클라우드 산출 확인·부재 시만 백필) | 로컬 태스크 `grm-monday-brief-publish` | 월 09:05 KST(데스크톱 ON 전제) | 없음 |
+| 보조 | 주간 퀴즈 자동 출제(그 주 브리프 연동 문항 생성→quiz_lint→PR→CI 머지, 미라이브 시 스킵) | 로컬 태스크 `grm-monday-quiz-gen` | 월 13:00 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
 | 보조 | 관심업체 통지 자동 발송(멱등 로그·상한) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | 없음 |
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST + 발행 머지 직후 | 없음 |
@@ -288,13 +289,14 @@ grm-api-intake/
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
 ├─ findings_reclassify_service.py  # taxonomy 라이브 재분류(현재 v4, workflow_dispatch 전용, LLM 0)
 ├─ findings_embed_service.py       # [FIND-1 S2] 공개 findings 임베딩 → finding_embeddings upsert(LLM 0)
+├─ quiz_lint.py                    # 주간 퀴즈 뱅크 검증 게이트(스키마·source_ref 실재·week — CI·예약 세션 공용)
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base·library·library_catalog·guide·glossary·quiz)
-│  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js·glossary.js·quiz.js·popular.js)
+│  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js·glossary.js·quiz.js·popular.js·growth.js·pet.js·pet.css·gurumi-{egg,baby,youth,adult,legend}.png)
 │  ├─ migrations/  (001_reaction ~ 031_reactions_weekly_top — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프)·반응 주간 Top(031 count-only RPC — 2026-07-18 라이브 적용, 웹 통합은 반응 데이터 축적 대기))
-│  ├─ data/  (briefs·deltas·library/ 8카탈로그 271건·glossary.json 145어·guide_content.md·quiz_bank.json — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
+│  ├─ data/  (briefs·deltas·library/ 8카탈로그 271건·glossary.json 200어·guide_content.md·quiz_bank.json 33문항 — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
@@ -305,6 +307,8 @@ grm-api-intake/
 │  ├─ specs/GRM_퀴즈_운영설계_2026-07-18.md               # 주간 퀴즈 v1 운영 설계(/quiz/ 라이브)
 │  ├─ specs/GRM_인기카드_구르미위젯_설계조사_2026-07-18.md   # 인기 카드 랭킹·구르미 위젯 설계 조사(위젯=라이브, 인기카드=RPC 적용 완료·웹 통합 대기)
 │  ├─ specs/GRM_031_적용검증계획_2026-07-18.md             # 031 RPC 적용 전 검증 절차·롤백(2026-07-18 적용 완료)
+│  ├─ specs/GRM_퀴즈_운영설계_addendum_week회전_성장시스템_2026-07-18.md  # week 회전·성장 시스템 운영 규칙
+│  ├─ prompts/GRM_주간퀴즈생성_프롬프트_v1.md              # 월 13:00 예약 퀴즈 생성 세션 정본 규율
 │  └─ copilot/  (grm_findings_connector.swagger.json, COPILOT_SETUP_GUIDE.md, QA_SCENARIOS.md)  # [FIND-1 F4a]
 └─ .github/workflows/
    ├─ grm-intake.yml, grm-ci.yml

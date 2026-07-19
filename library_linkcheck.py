@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import threading
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,7 @@ SCHEMA_VERSION = "grm-library-health/v1"
 URL_FIELDS = ("official_url", "pdf_url", "ko_url")
 DEFAULT_USER_AGENT = "GRM-Library-Linkcheck/1.0 (+https://github.com/MINHOYEOM/grm-api-intake)"
 BOT_SENSITIVE_HOSTS = ("fda.gov", "canada.ca")
+DEFAULT_WORKERS = 12
 
 
 @dataclass
@@ -29,6 +32,27 @@ class Probe:
     attempts: int
     reason: str
     final_url: str
+
+
+class HostPacer:
+    """Reserve request-start slots at least `delay` apart per host."""
+
+    def __init__(self, *, monotonic: Callable[[], float] = time.monotonic,
+                 sleeper: Callable[[float], None] = time.sleep) -> None:
+        self._monotonic = monotonic
+        self._sleeper = sleeper
+        self._lock = threading.Lock()
+        self._next: dict[str, float] = {}
+
+    def wait(self, url: str, delay: float) -> None:
+        host = (urlparse(url).hostname or "").lower()
+        with self._lock:
+            now = self._monotonic()
+            slot = max(now, self._next.get(host, now))
+            self._next[host] = slot + delay
+        wait_for = slot - now
+        if wait_for > 0:
+            self._sleeper(wait_for)
 
 
 def _utc_now() -> str:
@@ -141,17 +165,30 @@ def build_report(
     user_agent: str = DEFAULT_USER_AGENT,
     session: requests.Session | None = None,
     sleeper: Callable[[float], None] = time.sleep,
+    max_workers: int = DEFAULT_WORKERS,
 ) -> dict[str, Any]:
     refs, source_files = collect_urls(library_dir)
-    sess = session or requests.Session()
-    sess.headers.update({"User-Agent": user_agent, "Accept": "*/*"})
     checked_at = _utc_now()
     results: dict[str, Any] = {}
     counts: Counter[str] = Counter()
-    for url in sorted(refs):
-        probe = probe_url(
-            url, session=sess, delay=delay, timeout=timeout, sleeper=sleeper,
+    pacer = HostPacer(sleeper=sleeper)
+
+    def check(url: str) -> tuple[str, Probe]:
+        sess = session or requests.Session()
+        sess.headers.update({"User-Agent": user_agent, "Accept": "*/*"})
+        return url, probe_url(
+            url, session=sess, delay=delay, timeout=timeout,
+            sleeper=lambda seconds: pacer.wait(url, seconds),
         )
+
+    completed: dict[str, Probe] = {}
+    with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
+        futures = [pool.submit(check, url) for url in sorted(refs)]
+        for future in as_completed(futures):
+            url, probe = future.result()
+            completed[url] = probe
+    for url in sorted(completed):
+        probe = completed[url]
         counts[probe.status] += 1
         results[url] = {
             "status": probe.status,
@@ -169,6 +206,8 @@ def build_report(
         "policy": {
             "head_first": True, "get_fallback": True, "failure_retries": 1,
             "request_delay_seconds": delay,
+            "delay_scope": "per_host_request_start",
+            "max_workers": max_workers,
             "bot_sensitive_hosts": list(BOT_SENSITIVE_HOSTS),
         },
         "source_files": source_files,
@@ -189,11 +228,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=Path("web/data/library_health.json"))
     parser.add_argument("--delay", type=float, default=1.0)
     parser.add_argument("--timeout", type=float, default=20.0)
+    parser.add_argument("--max-workers", type=int, default=DEFAULT_WORKERS)
     parser.add_argument("--user-agent", default=DEFAULT_USER_AGENT)
     args = parser.parse_args(argv)
     report = build_report(
         args.library_dir, delay=max(args.delay, 0), timeout=args.timeout,
-        user_agent=args.user_agent,
+        user_agent=args.user_agent, max_workers=args.max_workers,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

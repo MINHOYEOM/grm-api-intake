@@ -21,6 +21,15 @@ class _Response:
 
 
 class LibraryLinkcheckTest(unittest.TestCase):
+    def test_host_pacer_reserves_per_host_slots(self):
+        clock = mock.MagicMock(side_effect=[0.0, 0.0, 0.0])
+        sleeps = []
+        pacer = lc.HostPacer(monotonic=clock, sleeper=sleeps.append)
+        pacer.wait("https://a.test/1", 1.0)
+        pacer.wait("https://a.test/2", 1.0)
+        pacer.wait("https://b.test/1", 1.0)
+        self.assertEqual(sleeps, [1.0])
+
     def test_collects_supported_fields_and_reference_locations(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -82,4 +91,3 @@ class LibraryLinkcheckTest(unittest.TestCase):
         )
         self.assertEqual(result.status, "broken")
         self.assertEqual(session.request.call_count, 1)
-

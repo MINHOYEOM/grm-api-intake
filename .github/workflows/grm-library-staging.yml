@@ -1,0 +1,62 @@
+name: GRM Library Staging Refresh
+
+on:
+  schedule:
+    - cron: '23 4 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-library-staging
+  cancel-in-progress: false
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Collect and build review-only candidates
+        run: python library_staging_build.py
+      - name: Publish staging-only PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: automation/library-staging
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add -- web/data/library_staging web/data/library_staging_diff.json
+          if git diff --cached --quiet; then
+            echo "No staging changes"
+            exit 0
+          fi
+          git commit -m "chore: refresh library staging candidates"
+          git push --force origin "HEAD:$BRANCH"
+          STATE=$(gh pr view "$BRANCH" --json state -q .state 2>/dev/null || echo NONE)
+          if [ "$STATE" = "OPEN" ]; then
+            echo "Updated existing staging PR"
+          else
+            gh pr create --base main --head "$BRANCH" \
+              --title "chore: refresh library staging candidates" \
+              --body "Review-only MFDS/ICH catalogue candidates and diff report. This PR does not modify web/data/library/*.json. A follow-up integration must review and apply selected changes."
+          fi
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f web/data/library_staging_diff.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat web/data/library_staging_diff.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi

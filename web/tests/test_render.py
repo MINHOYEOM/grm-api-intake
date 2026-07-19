@@ -4839,12 +4839,16 @@ class WebResourceNotesGoldenInvarianceTest(unittest.TestCase):
         self.assertEqual(html, "")
 
 
-# ── [구름이 위젯] 철거 확인 — 8차 웨이브 A(2026-07-18) 랜딩 재구성으로 완전 삭제 ────────
+# ── [구름이 위젯] 철거 확인 + 랜딩 섹션 확정 순서(10차, 2026-07-18) ────────────────
 class WebGurumiWidgetRemovedTest(unittest.TestCase):
     """구름이 상태 위젯(coverage 칩)은 8차 웨이브 A 랜딩 재구성에서 완전 철거됐다(내부
     개념 노출 대비 효과 낮음 판단). 과거 WebGurumiWidgetTest(위젯 존재를 전제하던 회귀
     가드)를 대체 — 이제는 마크업·클래스·모션 키프레임이 전혀 남지 않았음을 확인한다.
-    render.py 는 이 건으로 미수정(cover.publish_date 는 다른 곳에서도 쓰여 그대로 둠)."""
+    render.py 는 이 건으로 미수정(cover.publish_date 는 다른 곳에서도 쓰여 그대로 둠).
+
+    10차(사용자 확정 재배치)부터 랜딩 섹션 순서·CTA 중복 가드도 이 클래스가 지킨다:
+    히어로 → #why → 기능 6종 → Card Anatomy → 참여 존(#engage) → This Week 콜아웃
+    (#this-week, 뉴스레터 직전) / 브리프행 CTA 는 히어로·하단 콜아웃 2개뿐."""
 
     @classmethod
     def setUpClass(cls):
@@ -4864,14 +4868,50 @@ class WebGurumiWidgetRemovedTest(unittest.TestCase):
         self.assertNotIn("@keyframes gurumiEat", self.landing)
         self.assertNotIn("@keyframes gurumiCards", self.landing)
 
-    def test_this_week_zone_present_with_callout_and_popular(self):
-        # "이번 주" 통합 존 — This Week 콜아웃 + 인기 카드가 한 섹션(#this-week)에 응집.
-        self.assertIn('<section class="section" id="this-week">', self.landing)
-        zone = self.landing[self.landing.index('id="this-week"'):]
+    def test_landing_section_order_final(self):
+        # 확정 재배치(10차, 2026-07-18 사용자 확정): 히어로 → #why → 기능 6종(soft) →
+        # Card Anatomy → 참여 존(#engage: 인기 카드 + 퀴즈 CTA) → This Week 콜아웃
+        # (#this-week: 마감 CTA, 뉴스레터 직전) → 뉴스레터 → AI 고지.
+        order = [
+            'class="wrap hero"',
+            '<section class="section" id="why">',
+            '<section class="section soft">',
+            ">Card Anatomy</span>",
+            '<section class="section" id="engage">',
+            '<section class="section" id="this-week">',
+        ]
+        pos = [self.landing.index(m) for m in order]
+        self.assertEqual(pos, sorted(pos), "랜딩 섹션 순서가 확정안과 다름")
+
+    def test_engage_zone_popular_then_quiz(self):
+        # 참여 존(#engage) — 인기 카드가 먼저, 퀴즈 CTA 가 뒤(한 섹션 응집).
+        zone = self.landing[self.landing.index('id="engage"'):]
         zone = zone[:zone.index("</section>")]
-        self.assertIn('class="callout"', zone)
         self.assertIn('id="popular"', zone)
         self.assertIn('id="grm-popular"', zone)
+        self.assertIn('class="quiz-cta"', zone)
+        self.assertLess(zone.index('id="popular"'), zone.index('class="quiz-cta"'))
+
+    def test_this_week_callout_is_closing_cta(self):
+        # This Week 콜아웃(#this-week) — 콜아웃 단독 섹션(인기 카드는 #engage 로 분리),
+        # content 블록 마지막(=뉴스레터 직전). 수치 문구·CTA 는 유지.
+        zone = self.landing[self.landing.index('<section class="section" id="this-week">'):]
+        zone = zone[:zone.index("</section>")]
+        self.assertIn('class="callout"', zone)
+        self.assertIn("이번 주 소식 보기", zone)
+        self.assertNotIn('id="popular"', zone)
+        self.assertNotIn('id="grm-popular"', zone)
+        # #this-week 이후 </main> 까지 다른 섹션이 없다(마감 CTA).
+        tail = self.landing[self.landing.index('<section class="section" id="this-week">'):]
+        tail = tail[:tail.index("</main>")]
+        self.assertEqual(tail.count("<section"), 1)
+
+    def test_brief_ctas_exactly_two(self):
+        # CTA 중복 정리(불가침) — 같은 브리프로 가는 버튼은 히어로("이번 주 소식 읽기")와
+        # 하단 콜아웃("이번 주 소식 보기") 2개만. 인기 카드 빈 상태의 이동 버튼은 제거.
+        self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
+        self.assertEqual(self.landing.count("이번 주 소식 보기"), 1)
+        self.assertNotIn("이번 주 카드 보러 가기", self.landing)
 
 
 # ── 인기 카드(Weekly Reactions) — 랜딩 정적 섹션 + popular.js 배선 ────────────────

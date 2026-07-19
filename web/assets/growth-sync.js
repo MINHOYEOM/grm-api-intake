@@ -167,8 +167,9 @@
 
   // ── 펫 패널 보관 상태/CTA(런타임 주입 — 정적 HTML·골든 무변형) ──────────────
   // 강요 톤 금지: 게스트 저장 안내(.grm-pet-local)는 그대로 두고, 로그인 시에만
-  // "계정 보관" 상태로 교대한다. CTA 는 기존 로그인 플로우(reactions.js 가 헤더에
-  // 주입하는 .grm-acct-login → openLogin() 팝업)를 클릭 위임으로 재사용(firm.js 관례).
+  // "계정 보관" 상태로 교대한다. CTA 는 기존 로그인 플로우(reactions.js)를 재사용한다 —
+  // 별도 로그인 UI 발명 0. 12차부터는 window.GRM_AUTH.open({mode:"signup"}) 로 가입 폼에
+  // 직행하고(계정이 없는 게스트가 이 CTA 를 누르므로), 폴백은 기존 헤더 클릭 위임(firm.js 관례).
   function renderSlot() {
     var panel = document.getElementById("grm-pet-panel");
     if (!panel) return;
@@ -199,6 +200,12 @@
       btn.className = "grm-pet-sync-cta";
       btn.innerHTML = '<i class="ti ti-cloud-up" aria-hidden="true"></i>구름이 안전하게 보관하기';
       btn.addEventListener("click", function () {
+        // 가입 의도가 분명한 진입점 → 가입 폼 직행(로그인 화면 경유 1클릭 제거).
+        // GRM_AUTH 부재(reactions.js 미로드)면 기존 헤더 위임으로 폴백.
+        if (window.GRM_AUTH && typeof window.GRM_AUTH.open === "function") {
+          window.GRM_AUTH.open({ mode: "signup" });
+          return;
+        }
         var headerLogin = document.querySelector(".grm-auth .grm-acct-login");
         if (headerLogin) headerLogin.click();
       });

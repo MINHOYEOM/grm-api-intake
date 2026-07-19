@@ -5,6 +5,28 @@
    provenance: 카드 사실·원문 URL 미참조 — 불투명 card_id(=card.anchor)만 취급. */
 (function () {
   "use strict";
+
+  // ── 인증 오류 분류(순수 함수 — DOM·Supabase 무의존) ───────────────────────────
+  // Supabase Auth 는 공식 오류 코드를 준다(email_not_confirmed·user_already_exists·
+  // otp_expired·over_email_send_rate_limit·invalid_credentials). code 를 1순위로 쓰고,
+  // code 필드가 없는 옛 supabase-js 를 위해 message 정규식을 보조로만 둔다(추측 분기 0 —
+  // 매칭 실패는 전부 "unknown" 으로 떨어져 기존 뭉뚱그린 문구와 동일하게 동작한다).
+  // env-gate 로 조기 종료하기 전에 window.GRM_AUTH 에 붙여 node 로 경로를 고정한다.
+  function classifyAuthError(err) {
+    var code = (err && err.code) || "";
+    var msg = (err && err.message) || "";
+    if (code === "email_not_confirmed" || /email not confirmed/i.test(msg)) return "unconfirmed";
+    if (code === "user_already_exists" || /already registered|already exists|user already/i.test(msg)) return "exists";
+    if (code === "weak_password" || /password should be|weak password/i.test(msg)) return "weak_password";
+    if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit" ||
+        /rate limit|too many requests/i.test(msg)) return "rate_limit";
+    if (code === "otp_expired" || /token has expired|otp.*expired/i.test(msg)) return "expired_code";
+    if (code === "invalid_credentials" || /invalid login credentials/i.test(msg)) return "invalid_credentials";
+    return "unknown";
+  }
+  window.GRM_AUTH = window.GRM_AUTH || {};
+  window.GRM_AUTH.classifyAuthError = classifyAuthError;
+
   var cfg = document.getElementById("grm-reactions-cfg");
   var lib = window.supabase;
   if (!cfg || !lib || !lib.createClient) return;
@@ -129,14 +151,39 @@
   // (Brevo sendibt3)이 확인 링크를 선방문해 1회용 토큰을 소모하는 문제를 피한다. Supabase
   // "Confirm signup"·"Reset Password" 이메일 템플릿은 {{ .Token }}(코드)만 담고
   // {{ .ConfirmationURL }} 링크는 제거해야 한다.
+  // 마찰 개선(12차): ① openLogin({mode:"signup"}) 가입 직행 ② 가입 진행 상태 sessionStorage
+  // 복원 ③ 미확인 계정 로그인 실패 → 확인 코드 단계로 이어주기. 세 가지 모두 기존 로그인
+  // 성공 경로·세션 저장소(grm-public-auth-v1)·하트/스크랩 로직은 건드리지 않는다.
   var pop, resetEmail = "", pendingSignupEmail = "", resendTimer = null;
   var MODE_COPY = {
-    login:   { title: "로그인",          sub: "이메일과 비밀번호로 로그인하세요." },
-    signup:  { title: "회원가입",        sub: "이메일과 비밀번호로 가입하세요. 확인 코드를 메일로 보내드립니다." },
-    confirm: { title: "이메일 인증",      sub: "가입을 마치려면 메일로 받은 코드를 입력하세요." },
+    login:   { title: "로그인",          sub: "이메일과 비밀번호만 있으면 됩니다." },
+    signup:  { title: "회원가입",        sub: "이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다." },
+    confirm: { title: "확인 코드 입력",   sub: "메일로 받은 코드를 넣으면 가입이 끝나요." },
     reqcode: { title: "비밀번호 재설정",   sub: "가입한 이메일로 재설정 코드를 보내드립니다." },
     newpw:   { title: "새 비밀번호 설정",  sub: "메일로 받은 코드와 새 비밀번호를 입력하세요." }
   };
+
+  // 가입 진행 상태 보존(팝업을 닫아도 코드 입력 단계로 복원) ─────────────────────
+  // sessionStorage 에 "어느 이메일이 코드 입력을 기다리는가"만 둔다 — 비밀번호·토큰·세션은
+  // 절대 저장하지 않는다(세션 정본은 supabase-js 의 grm-public-auth-v1 그대로·불침범).
+  // 탭을 닫으면 사라지고(sessionStorage), 30분이 지나도 만료로 버린다. 저장 실패
+  // (사파리 프라이빗 등)는 조용히 삼켜 기존 동작으로 폴백한다.
+  var SIGNUP_KEY = "grm-signup-progress-v1";
+  var SIGNUP_TTL_MS = 30 * 60 * 1000;
+  function saveSignupProgress(email) {
+    try { sessionStorage.setItem(SIGNUP_KEY, JSON.stringify({ email: email, ts: Date.now() })); } catch (e) {}
+  }
+  function loadSignupProgress() {
+    try {
+      var d = JSON.parse(sessionStorage.getItem(SIGNUP_KEY));
+      if (!d || !EMAIL_RE.test(d.email || "")) return "";
+      if (typeof d.ts !== "number" || (Date.now() - d.ts) > SIGNUP_TTL_MS) { clearSignupProgress(); return ""; }
+      return d.email;
+    } catch (e) { return ""; }
+  }
+  function clearSignupProgress() {
+    try { sessionStorage.removeItem(SIGNUP_KEY); } catch (e) {}
+  }
 
   function pwField(ph, ac) {
     return '<span class="grm-pw-wrap"><input type="password" required minlength="6" autocomplete="' + ac +
@@ -174,7 +221,7 @@
       '<p class="grm-login-hint" role="alert"></p>' +
       '<p class="grm-login-msg" role="status" aria-live="polite"></p>' +
       '<button type="button" class="grm-login-resend" style="display:none"></button>' +
-      '<p class="grm-login-note" style="display:none">가입 시 최소한의 정보(이메일)만 수집하며, 비밀번호는 안전하게 암호화되어 저장됩니다.</p>' +
+      '<p class="grm-login-note" style="display:none">가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 이메일 외에는 아무것도 받지 않으며, 비밀번호는 안전하게 암호화되어 저장됩니다.</p>' +
       '<div class="grm-login-alt"></div>' +
       '</div>';
     document.body.appendChild(pop);
@@ -221,12 +268,19 @@
         setBusy(authForm, false);
         if (res && res.error) {
           m.textContent = "";
-          hint.textContent = signup ? signupErr(res.error) : "이메일 또는 비밀번호가 올바르지 않습니다.";
+          // 미확인 계정 로그인 시도 → 막다른 오류 대신 코드 입력 단계로 이어준다.
+          if (!signup && classifyAuthError(res.error) === "unconfirmed") {
+            pendingSignupEmail = email; saveSignupProgress(email);
+            setMode("confirm");
+            m.textContent = "가입 확인이 아직이에요 — " + email + " 로 보낸 확인 코드를 입력해 주세요. 코드가 없으면 아래에서 다시 받을 수 있어요.";
+            return;
+          }
+          hint.textContent = authErr(res.error, signup);
           return;
         }
         if (signup) {
-          if (res.data && res.data.session) { m.textContent = "가입되었습니다."; }
-          else { pendingSignupEmail = email; setMode("confirm"); m.textContent = "확인 코드를 " + email + " 로 보냈습니다."; }
+          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = "가입되었습니다."; }
+          else { pendingSignupEmail = email; saveSignupProgress(email); setMode("confirm"); m.textContent = "확인 코드를 " + email + " 로 보냈습니다."; }
         } else { m.textContent = "로그인되었습니다."; }
       }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = "요청에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
     });
@@ -240,7 +294,8 @@
       setBusy(confirmForm, true); m.textContent = "확인 중…";
       sb.auth.verifyOtp({ email: pendingSignupEmail, token: token, type: "signup" }).then(function (res) {
         setBusy(confirmForm, false);
-        if (res && res.error) { m.textContent = ""; hint.textContent = "코드가 올바르지 않거나 만료됐습니다. 다시 시도하거나 코드를 재전송해 주세요."; return; }
+        if (res && res.error) { m.textContent = ""; hint.textContent = "코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."; return; }
+        clearSignupProgress();
         m.textContent = "가입이 완료되었습니다.";
       }).catch(function () { setBusy(confirmForm, false); m.textContent = ""; hint.textContent = "확인에 실패했습니다. 다시 시도해 주세요."; });
     });
@@ -269,7 +324,7 @@
       if (!resetEmail) { setMode("reqcode"); return; }
       setBusy(newpwForm, true); m.textContent = "확인 중…";
       sb.auth.verifyOtp({ email: resetEmail, token: token, type: "recovery" }).then(function (res) {
-        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = "코드가 올바르지 않거나 만료됐습니다. 다시 시도하거나 코드를 재전송해 주세요."; return; }
+        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = "코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."; return; }
         return sb.auth.updateUser({ password: pw }).then(function (up) {
           setBusy(newpwForm, false);
           if (up && up.error) { m.textContent = ""; hint.textContent = "비밀번호 변경에 실패했습니다. 다시 시도해 주세요."; return; }
@@ -287,16 +342,29 @@
         ? sb.auth.resend({ type: "signup", email: email })
         : sb.auth.resetPasswordForEmail(email);
       startResendCooldown();
+      if (mode === "confirm") saveSignupProgress(email);   // 재전송 = 진행 중 → 만료 시계 갱신
       m.textContent = "코드를 다시 보냈습니다.";
-      call.then(function (res) { if (res && res.error) { m.textContent = "재전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; } }).catch(function () {});
+      call.then(function (res) {
+        if (res && res.error) {
+          m.textContent = classifyAuthError(res.error) === "rate_limit"
+            ? "메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요."
+            : "재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+      }).catch(function () {});
     });
   }
 
-  function signupErr(err) {
-    var msg = (err && err.message) || "";
-    if (/registered|exists|already/i.test(msg)) return "이미 가입된 이메일입니다. 로그인하거나 비밀번호를 재설정해 주세요.";
-    if (/password/i.test(msg)) return "비밀번호가 정책에 맞지 않습니다. (6자 이상)";
-    return "가입에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+  // 분류 결과 → 사용자 문구(대중성 톤·다음 행동을 알려주는 한 문장). unknown 이면
+  // 맥락별 기본 문구로 떨어진다(가입/로그인 각각 기존 문구 그대로 — 무회귀).
+  function authErr(err, signup) {
+    switch (classifyAuthError(err)) {
+      case "exists":         return "이미 가입된 이메일이에요. 로그인하거나 비밀번호를 재설정해 주세요.";
+      case "weak_password":  return "비밀번호는 6자 이상으로 정해 주세요.";
+      case "rate_limit":     return "메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.";
+      case "unconfirmed":    return "가입 확인이 아직이에요. 메일로 받은 확인 코드를 입력해 주세요.";
+      default:               return signup ? "가입에 실패했습니다. 잠시 후 다시 시도해 주세요."
+                                           : "이메일 또는 비밀번호가 올바르지 않습니다.";
+    }
   }
 
   function setBusy(form, busy) {
@@ -322,6 +390,8 @@
     if (!pop) return;
     pop.setAttribute("data-mode", mode);
     var copy = MODE_COPY[mode] || MODE_COPY.login;
+    var dlg = pop.querySelector(".grm-login-card");
+    if (dlg) dlg.setAttribute("aria-label", copy.title);
     pop.querySelector(".grm-login-title").textContent = copy.title;
     pop.querySelector(".grm-login-sub").textContent = copy.sub;
     pop.querySelector(".grm-login-hint").textContent = "";
@@ -352,14 +422,22 @@
     // 하단 전환 링크
     var alt = pop.querySelector(".grm-login-alt");
     alt.innerHTML = "";
-    function addLink(label, target) {
+    function addLink(label, target, before) {
       var b = document.createElement("button");
       b.type = "button"; b.className = "grm-login-link"; b.textContent = label;
-      b.addEventListener("click", function () { setMode(target); pop.querySelector(".grm-login-msg").textContent = ""; });
+      b.addEventListener("click", function () {
+        if (before) before();
+        setMode(target); pop.querySelector(".grm-login-msg").textContent = "";
+      });
       alt.appendChild(b);
     }
     if (mode === "login") { addLink("회원가입", "signup"); addLink("비밀번호를 잊으셨나요?", "reqcode"); }
     else if (mode === "signup") { addLink("이미 계정이 있어요 · 로그인", "login"); }
+    else if (mode === "confirm") {
+      // 복원된 가입 흐름에서 빠져나갈 두 출구(막다른 길 0) — "다른 이메일"은 진행 상태를 버린다.
+      addLink("로그인으로 돌아가기", "login");
+      addLink("다른 이메일로 가입", "signup", function () { clearSignupProgress(); pendingSignupEmail = ""; });
+    }
     else { addLink("로그인으로 돌아가기", "login"); }
 
     var focusForm = isAuth ? authForm
@@ -368,19 +446,35 @@
     if (first) setTimeout(function () { first.focus(); }, 30);
   }
 
-  function openLogin(msg) {
+  // openLogin(opts) — opts 는 문자열(기존 호출부: 안내 문구) 또는 {mode, msg}.
+  //   · mode:"signup" → 가입 의도가 분명한 진입점(펫 "구름이 안전하게 보관하기" 등)은
+  //     로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다(하단에 "이미 계정이 있어요" 상시).
+  //   · 진행 중인 가입(sessionStorage)이 있으면 요청 모드보다 **복원이 우선**한다 —
+  //     팝업을 닫았다 다시 열어도 코드 입력 단계로 돌아오고, 재전송 버튼(쿨다운 30초)이 그대로 있다.
+  function openLogin(opts) {
     if (!pop) buildPop();
+    var o = (typeof opts === "string") ? { msg: opts } : (opts || {});
     Array.prototype.forEach.call(pop.querySelectorAll("input"), function (i) { i.value = ""; });
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-wrap input"), function (i) { i.type = "password"; });
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-toggle"), function (t) { t.innerHTML = EYE; t.setAttribute("aria-label", "비밀번호 표시"); });
     resetEmail = ""; pendingSignupEmail = "";
     if (resendTimer) { clearInterval(resendTimer); resendTimer = null; }
     var rs = pop.querySelector(".grm-login-resend"); rs.disabled = false;
-    setMode("login");
-    pop.querySelector(".grm-login-msg").textContent = msg || "";
+    var resume = loadSignupProgress();
+    var msg = o.msg || "";
+    if (resume) {
+      pendingSignupEmail = resume;
+      setMode("confirm");
+      msg = "가입을 이어서 마무리할 수 있어요 — " + resume + " 로 보낸 확인 코드를 입력해 주세요.";
+    } else {
+      setMode(o.mode === "signup" ? "signup" : "login");
+    }
+    pop.querySelector(".grm-login-msg").textContent = msg;
     pop.classList.add("show");
   }
   function closeLogin() { if (pop) pop.classList.remove("show"); }
+  // 다른 자산(growth-sync.js 펫 CTA 등)이 별도 로그인 UI 발명 없이 모드를 지정해 여는 공개 진입점.
+  window.GRM_AUTH.open = openLogin;
 
   // ── 하트 공개 집계(인기) ─────────────────────────────────────────────────
   function loadCounts() {
@@ -614,7 +708,7 @@
   }).catch(function () { renderAuth(); renderMyScraps(); renderMyFirms(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
     session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms();
-    if (s && s.user) closeLogin();
+    if (s && s.user) { clearSignupProgress(); closeLogin(); }   // 세션 성립 = 가입 흐름 종료
   });
   if (rows.length) loadCounts();
 })();

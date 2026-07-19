@@ -44,36 +44,8 @@ RESOURCE_FIXTURES = TESTS_DIR / "fixtures" / "resources"
 DATA_DIR = WEB_DIR / "data" / "briefs"                       # 라이브 발행 디렉터리(스모크 렌더 전용)
 REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 
-__all__ = [
-    "WebRenderGoldenTest",
-    "WebLiveBriefsRenderSmokeTest",
-    "WebRenderStructureTest",
-    "WebRenderFidelityTest",
-    "WebRenderDeterminismTest",
-    "WebRenderPurityTest",
-    "WebRenderHardeningTest",
-    "WebAdminRenderTest",
-    "WebSearchIndexTest",
-    "WebFindingsRenderTest",
-    "WebTrendsRenderTest",
-    "WebFirmRenderTest",
-    "WebLibraryRenderTest",
-    "WebGuideRenderTest",
-    "WebGlossaryRenderTest",
-    "WebGlossaryDeepFieldsTest",
-    "WebFirmWatchlistTest",
-    "WebKoreanSafetyTest",
-    "WebSeoMetaTest",
-    "WebDeterministicDetailTest",
-    "WebFda483DeterministicDetailTest",
-    "WebFda483DeepAnalysisTest",
-    "WebMonoLabelsContractTest",
-    "WebBriefFirmLinkTest",
-    "WebResourceNotesRenderTest",
-    "WebResourceNotesGoldenInvarianceTest",
-    "WebGurumiPetTest",
-    "WebPopularCardsTest",
-]
+# CI shim(tests/test_web_render.py)은 이 모듈의 TestCase 하위클래스를 **전수 자동** 수집한다.
+# (예전엔 __all__ 수동 목록이라 새 클래스를 적는 걸 잊으면 CI 에서 조용히 실행되지 않았다.)
 
 
 # ── 빌드 헬퍼 (테스트·freeze 공용 — 동일 입력 보장) ───────────────────────────
@@ -5319,6 +5291,115 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["other"], [0, 5, 8, 10])
         # 전 문항 지정 → 뱅크 순 상위 4.
         self.assertEqual(out["overflow"], [0, 1, 2, 3])
+
+
+# ── 로그인/가입 마찰 개선(12차) ───────────────────────────────────────────────
+class WebLoginFrictionTest(unittest.TestCase):
+    """가입 마찰 3종 개선의 정적 계약을 가드한다.
+    ① openLogin({mode:"signup"}) 가입 직행(펫 CTA) — 로그인 화면 경유 1클릭 제거,
+       단 "이미 계정이 있어요" 전환은 가입 화면에 상시.
+    ② 가입 진행 상태 sessionStorage 보존 → 팝업을 닫았다 열어도 코드 입력 단계로 복원
+       (재전송 쿨다운 30초 유지·세션 정본 grm-public-auth-v1 불침범·비밀번호/토큰 미저장).
+    ③ 미확인 계정 로그인 실패 분기 — Supabase 공식 코드 email_not_confirmed 기반
+       (분류는 순수 함수 classifyAuthError, 두 경로를 node 로 실제 실행해 고정).
+    하트/스크랩 반응 로직은 무수정이어야 한다(회귀 앵커)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+        cls.sync_js = (WEB_DIR / "assets" / "growth-sync.js").read_text(encoding="utf-8")
+
+    def test_signup_direct_mode_and_public_entry(self):
+        self.assertIn("window.GRM_AUTH.open = openLogin;", self.js)
+        self.assertIn('setMode(o.mode === "signup" ? "signup" : "login");', self.js)
+        # 가입 화면엔 로그인 전환이 항상 있다(막다른 길 0).
+        self.assertIn('addLink("이미 계정이 있어요 · 로그인", "login")', self.js)
+        # 펫 CTA(가입 의도 분명) → 가입 직행 + reactions.js 미로드 시 기존 헤더 위임 폴백.
+        self.assertIn('window.GRM_AUTH.open({ mode: "signup" })', self.sync_js)
+        self.assertIn('querySelector(".grm-auth .grm-acct-login")', self.sync_js)
+
+    def test_signup_progress_restore_contract(self):
+        self.assertIn('var SIGNUP_KEY = "grm-signup-progress-v1";', self.js)
+        self.assertIn("var resume = loadSignupProgress();", self.js)
+        self.assertIn('setMode("confirm");', self.js)
+        # 성공(세션 성립)·명시적 이탈에서 진행 상태를 지운다 — 유령 복원 0.
+        self.assertIn("clearSignupProgress(); closeLogin();", self.js)
+        self.assertIn('addLink("다른 이메일로 가입", "signup"', self.js)
+        # 저장 대상은 이메일+시각뿐(비밀번호·토큰·세션 미저장) + 30분 만료.
+        self.assertIn("JSON.stringify({ email: email, ts: Date.now() })", self.js)
+        self.assertIn("var SIGNUP_TTL_MS = 30 * 60 * 1000;", self.js)
+        self.assertNotIn("sessionStorage.setItem(SIGNUP_KEY, JSON.stringify({ email: email, pw", self.js)
+
+    def test_session_and_reaction_logic_untouched(self):
+        # 세션 정본(공유 storageKey)·로그인 성공 경로·하트/스크랩 토글은 불변.
+        self.assertIn('storageKey: "grm-public-auth-v1"', self.js)
+        self.assertIn("sb.auth.signInWithPassword({ email: email, password: pw })", self.js)
+        self.assertIn('sb.from("reaction").insert({ user_id: uid, card_id: id, kind: kind })', self.js)
+        self.assertIn('sb.from("reaction").delete().match({ user_id: uid, card_id: id, kind: kind })', self.js)
+        # 이메일 코드 방식 유지(매직링크 전환 금지 — 스캐너 토큰 선소모 회피 설계).
+        self.assertIn('type: "signup"', self.js)
+        self.assertIn('type: "recovery"', self.js)
+        self.assertNotIn("signInWithOtp", self.js)
+        self.assertNotIn("signInWithOAuth", self.js)
+        # 재전송 쿨다운 30초 유지.
+        self.assertIn("var left = 30;", self.js)
+
+    def test_copy_tone_has_no_threat_or_jargon(self):
+        # 검사 대상은 **화면에 나가는 문구**뿐 — 개발자 주석(설계 근거라 규제·API 용어가
+        # 정상적으로 등장한다)은 제외한다. reactions.js 엔 "://" 가 없어(URL 0) 줄 주석
+        # 제거가 문자열을 훼손하지 않는다.
+        import re as _re
+        body = _re.sub(r"/\*.*?\*/", "", self.js, flags=_re.S)
+        body = "\n".join(ln.split("//")[0] for ln in body.splitlines())
+        for bad in ["오류 코드", "인증 토큰", "OTP", "실패했습니다. 관리자", "차단"]:
+            self.assertNotIn(bad, body, f"대중성 톤 위반 후보: {bad}")
+        self.assertIn("가입 확인이 아직이에요", self.js)
+        self.assertIn("코드가 맞지 않거나 시간이 지났어요", self.js)
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 분류 경로 고정은 CI에서 수행")
+    def test_classify_auth_error_paths_pinned_via_node(self):
+        import subprocess
+        driver = r"""
+global.window = {};
+global.document = { getElementById: function () { return null; },
+                    querySelectorAll: function () { return []; } };
+require(process.argv[2]);      // reactions.js — GRM_AUTH 부착 후 env-gate 에서 조기 종료
+var f = global.window.GRM_AUTH.classifyAuthError;
+var out = {};
+out.code_unconfirmed = f({ code: "email_not_confirmed", message: "" });
+out.msg_unconfirmed   = f({ message: "Email not confirmed" });          // code 없는 옛 클라이언트
+out.invalid           = f({ code: "invalid_credentials", message: "Invalid login credentials" });
+out.msg_invalid       = f({ message: "Invalid login credentials" });
+out.exists            = f({ code: "user_already_exists", message: "" });
+out.rate              = f({ code: "over_email_send_rate_limit", message: "" });
+out.expired           = f({ code: "otp_expired", message: "" });
+out.weak              = f({ code: "weak_password", message: "" });
+out.unknown           = f({ code: "something_new", message: "Boom" });
+out.empty             = f(null);
+console.log(JSON.stringify(out));
+"""
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_authjs_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(
+                ["node", str(drv), str(WEB_DIR / "assets" / "reactions.js")],
+                capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+        self.assertEqual(out["code_unconfirmed"], "unconfirmed")
+        self.assertEqual(out["msg_unconfirmed"], "unconfirmed")
+        self.assertEqual(out["invalid"], "invalid_credentials")
+        self.assertEqual(out["msg_invalid"], "invalid_credentials")
+        self.assertEqual(out["exists"], "exists")
+        self.assertEqual(out["rate"], "rate_limit")
+        self.assertEqual(out["expired"], "expired_code")
+        self.assertEqual(out["weak"], "weak_password")
+        # 미지 오류는 뭉뚱그린 기존 문구로 떨어진다(추측 분기 0).
+        self.assertEqual(out["unknown"], "unknown")
+        self.assertEqual(out["empty"], "unknown")
 
 
 if __name__ == "__main__":

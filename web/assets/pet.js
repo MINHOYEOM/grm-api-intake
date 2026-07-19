@@ -12,7 +12,7 @@
     { min: 700, slug: "legend", name: "전설 구름이", mood: "규제의 하늘을 든든하게 지켜요" }
   ];
   var $ = function (id) { return document.getElementById(id); };
-  var toggle = $("grm-pet-toggle"), panel = $("grm-pet-panel"), close = $("grm-pet-close"), resetPos = $("grm-pet-reset-pos");
+  var toggle = $("grm-pet-toggle"), panel = $("grm-pet-panel"), close = $("grm-pet-close"), resetPos = $("grm-pet-reset-pos"), panelDragHandle = $("grm-pet-drag-handle");
   var sprite = $("grm-pet-sprite"), hero = $("grm-pet-hero-img"), talk = $("grm-pet-talk");
   var stateChip = root.querySelector("#grm-pet-state-chip b"), stateName = $("grm-pet-state-name"), stateCopy = $("grm-pet-state-copy");
   var currentStage = -1, talkTimer, stateTimer, blinkTimer, scrollTimer, previewStage = null, drag = null, suppressClick = false, activeDock = null, nearDock = null;
@@ -182,29 +182,24 @@
   }
   atlas(); refresh(); restorePosition(); setPetState("idle"); scheduleBlink();
   (function ambient() { setTimeout(function () { if (panel.hidden && !reduce) { root.classList.add("is-curious"); setTimeout(function () { root.classList.remove("is-curious"); }, 1000); } ambient(); }, 6500 + Math.random() * 5500); })();
-  toggle.addEventListener("pointerdown", function (e) {
+  function startDrag(e) {
     if (e.button !== undefined && e.button !== 0) return;
-    var r = root.getBoundingClientRect(); drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, x: r.left, y: r.top, moved: false };
-    if (toggle.setPointerCapture) toggle.setPointerCapture(e.pointerId);
-  });
-  toggle.addEventListener("pointermove", function (e) {
+    if (e.currentTarget === panelDragHandle && e.target.closest("button,a,input,select,textarea")) return;
+    var r = root.getBoundingClientRect(), source = e.currentTarget;
+    drag = { id: e.pointerId, source: source, sx: e.clientX, sy: e.clientY, x: r.left, y: r.top, moved: false };
+    if (source.setPointerCapture) source.setPointerCapture(e.pointerId);
+  }
+  function moveDrag(e) {
     if (!drag || drag.id !== e.pointerId) return;
     var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     if (!drag.moved) { drag.moved = true; activeDock = null; renderDocks(); dockLayer.classList.add("show"); setPetState("moving"); }
     root.classList.add("is-dragging"); e.preventDefault(); setPosition(drag.x + dx, drag.y + dy); selectNearestDock();
-  });
-  window.addEventListener("pointermove", function (e) {
-    if (!drag || drag.id !== e.pointerId || e.target === toggle || toggle.contains(e.target)) return;
-    var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
-    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
-    if (!drag.moved) { drag.moved = true; activeDock = null; renderDocks(); dockLayer.classList.add("show"); setPetState("moving"); }
-    root.classList.add("is-dragging"); e.preventDefault(); setPosition(drag.x + dx, drag.y + dy); selectNearestDock();
-  }, { passive: false });
+  }
   function endDrag(e) {
     if (!drag || drag.id !== e.pointerId) return;
-    var moved = drag.moved, dock = nearDock; drag = null; root.classList.remove("is-dragging"); dockLayer.classList.remove("show");
-    if (toggle.releasePointerCapture && toggle.hasPointerCapture && toggle.hasPointerCapture(e.pointerId)) toggle.releasePointerCapture(e.pointerId);
+    var moved = drag.moved, dock = nearDock, source = drag.source; drag = null; root.classList.remove("is-dragging"); dockLayer.classList.remove("show");
+    if (source.releasePointerCapture && source.hasPointerCapture && source.hasPointerCapture(e.pointerId)) source.releasePointerCapture(e.pointerId);
     if (moved) {
       if (dock) { setDock(dock, true); root.classList.add("is-docking"); say("여기에 앉아 있을게요"); setTimeout(function () { root.classList.remove("is-docking"); }, 650); }
       else { savePosition(); say("여기에 자리 잡을게요"); }
@@ -212,8 +207,10 @@
       setPetState(restingState(), 900); suppressClick = true; setTimeout(function () { suppressClick = false; }, 0);
     }
   }
-  toggle.addEventListener("pointerup", endDrag); toggle.addEventListener("pointercancel", endDrag); toggle.addEventListener("lostpointercapture", endDrag);
+  [toggle, panelDragHandle].forEach(function (handle) { handle.addEventListener("pointerdown", startDrag); handle.addEventListener("pointerup", endDrag); handle.addEventListener("pointercancel", endDrag); handle.addEventListener("lostpointercapture", endDrag); });
+  window.addEventListener("pointermove", moveDrag, { passive: false });
   window.addEventListener("pointerup", endDrag); window.addEventListener("pointercancel", endDrag);
+  sprite.addEventListener("dragstart", function (e) { e.preventDefault(); });
   toggle.addEventListener("keydown", function (e) {
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home"].indexOf(e.key) < 0) return;
     e.preventDefault(); if (e.key === "Home") { resetPosition(); return; }

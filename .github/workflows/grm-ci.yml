@@ -30,6 +30,6 @@ jobs:
             grm_health.py grm_taxonomy.py grm_notion.py grm_handoff.py \
             inject_slots.py deep_analysis_fanout.py \
             brief_lint.py verify_published_brief.py card_scaffold.py \
-            library_linkcheck.py
+            library_linkcheck.py library_staging_build.py
       - name: unittest
         run: python -m unittest discover -s tests -v

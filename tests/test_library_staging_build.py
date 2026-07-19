@@ -22,20 +22,50 @@ class LibraryStagingBuildTest(unittest.TestCase):
         excluded = dict(item, document_id="x", type_or_class="safety-letter")
         self.assertIsNone(builder.derive_item(excluded, "mfds"))
 
-    def test_merge_preserves_curated_english_and_optional_links(self):
-        baseline = [{
-            "id": "data0011-1", "title_en": "Quality Guide", "title_ko": "옛 제목",
-            "doc_type": "guidance-industry", "official_url": "https://old",
-            "pdf_url": "https://pdf",
-        }]
+    def test_existing_curated_fields_win_for_every_source(self):
+        for source in ("mfds", "ich"):
+            with self.subTest(source=source):
+                item_id = f"{source}-curated"
+                baseline = [{
+                    "id": item_id, "code": "CURATED-CODE",
+                    "title_en": "Curated English title", "title_ko": "큐레이션 제목",
+                    "doc_type": "curated-type", "official_url": "https://curated/official",
+                    "pdf_url": "https://curated/pdf", "ko_url": "https://curated/ko",
+                }]
+                incoming = [{
+                    "id": item_id, "code": "COLLECTOR-CODE",
+                    "title_en": "Collector title", "title_ko": "수집기 제목",
+                    "doc_type": "collector-type", "official_url": "https://collector/official",
+                    "pdf_url": "https://collector/pdf", "ko_url": "https://collector/ko",
+                    "published_date": "2026-07-20",
+                }]
+                candidate = builder.merge_candidate(baseline, incoming)
+                self.assertEqual(candidate[0], {
+                    **baseline[0], "published_date": "2026-07-20",
+                })
+
+    def test_new_item_keeps_collector_fields(self):
         incoming = [{
-            "id": "data0011-1", "title_en": "새 제목", "title_ko": "새 제목",
-            "doc_type": "guidance-industry", "official_url": "https://new",
+            "id": "ich-new", "code": "Q99", "title_en": "New title",
+            "doc_type": "ich-guideline", "official_url": "https://new",
+            "pdf_url": "https://new/pdf",
         }]
-        candidate = builder.merge_candidate(baseline, incoming, source="mfds")
-        self.assertEqual(candidate[0]["title_en"], "Quality Guide")
-        self.assertEqual(candidate[0]["title_ko"], "새 제목")
-        self.assertEqual(candidate[0]["pdf_url"], "https://pdf")
+        self.assertEqual(builder.merge_candidate([], incoming), incoming)
+
+    def test_unknown_catalog_fields_fail_instead_of_being_silently_dropped(self):
+        with self.assertRaisesRegex(ValueError, "future_field"):
+            builder.merge_candidate(
+                [{"id": "existing", "future_field": "curated"}], [],
+            )
+
+    def test_catalog_fields_cover_all_live_library_item_fields(self):
+        library_dir = Path(__file__).parents[1] / "web" / "data" / "library"
+        live_fields = set()
+        for path in library_dir.glob("*.json"):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            for item in payload["items"]:
+                live_fields.update(item)
+        self.assertEqual(live_fields, set(builder.CATALOG_FIELDS))
 
     def test_build_writes_staging_and_diff_without_live_swap(self):
         with tempfile.TemporaryDirectory() as td:
@@ -58,4 +88,3 @@ class LibraryStagingBuildTest(unittest.TestCase):
         self.assertEqual(report["sources"]["ich"]["new_count"], 1)
         self.assertEqual(len(staged["items"]), 2)
         self.assertFalse(report["live_catalog_swapped"])
-

@@ -638,7 +638,8 @@ def _auto_rep(source: str, **kw) -> backfill.BackfillFetchReport:
 
 
 def _run_auto(*, existing_483=frozenset(), existing_wl=frozenset(),
-              run_483_side=(), run_wl_side=(), dry_run=False, max_docs=500):
+              run_483_side=(), run_wl_side=(), dry_run=False, max_docs=500,
+              fetch_budget=300):
     """run_auto with mocked existing-id fetch and mocked per-source runners;
     returns (merged_report_dict, exit_code, run_483_mock, run_wl_mock)."""
     def fake_existing(base, key, source, **_kw):
@@ -652,6 +653,7 @@ def _run_auto(*, existing_483=frozenset(), existing_wl=frozenset(),
          mock.patch.dict(backfill._RUNNERS, {"fda483": r483, "fda_wl": rwl}):
         merged, code = backfill.run_auto(
             max_docs=max_docs, delay=0, dry_run=dry_run,
+            fetch_budget=fetch_budget,
             base_url=_BASE_URL, service_key=_SERVICE_KEY,
         )
     return merged, code, r483, rwl
@@ -663,12 +665,12 @@ class AutoModeBudgetCapTest(unittest.TestCase):
         rep = _auto_rep("fda483", offset=100, listed=500, fetched=5, appended=5,
                         next_offset=600, exhausted=False)
         merged, code, r483, rwl = _run_auto(
-            existing_483=existing, run_483_side=[(rep, 0)],
+            existing_483=existing, run_483_side=[(rep, 0)], fetch_budget=5,
         )
         self.assertEqual(code, 0)
         self.assertEqual(r483.call_count, 1)
         kwargs = r483.call_args.kwargs
-        self.assertEqual(kwargs["offset"], 100)  # offset = len(existing 483 ids)
+        self.assertEqual(kwargs["offset"], 0)  # raw count is not a safe WL cursor
         self.assertEqual(kwargs["max_docs"], 500)
         self.assertEqual(kwargs["existing_ids"], existing)
         rwl.assert_not_called()  # budget cap: 483 did the day's real fetching
@@ -692,11 +694,12 @@ class AutoModeSourceTransitionTest(unittest.TestCase):
         merged, code, r483, rwl = _run_auto(
             existing_wl=existing_wl,
             run_483_side=[(rep483, 0)], run_wl_side=[(repwl, 0)],
+            fetch_budget=3,
         )
         self.assertEqual(code, 0)
         self.assertEqual(r483.call_count, 1)
         self.assertEqual(rwl.call_count, 1)
-        self.assertEqual(rwl.call_args.kwargs["offset"], 200)  # len(existing WL ids)
+        self.assertEqual(rwl.call_args.kwargs["offset"], 0)
         self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
         self.assertFalse(merged["auto_complete"])  # WL fetched -> not complete
         self.assertEqual(merged["appended"], 3)
@@ -717,43 +720,32 @@ class AutoModeSourceTransitionTest(unittest.TestCase):
         self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
 
 
-class AutoModeOffsetDriftRetryTest(unittest.TestCase):
-    def _overshoot(self, offset: int) -> backfill.BackfillFetchReport:
-        # listed > 0, all skip_existing, NOT exhausted -> offset overshot.
-        return _auto_rep("fda483", offset=offset, listed=500, skipped_existing=500,
-                         next_offset=offset + 500, exhausted=False)
-
-    def test_all_skip_not_exhausted_advances_offset_up_to_cap_then_stops(self) -> None:
-        existing = {f"fda483-{i}" for i in range(1000)}
-        side_483 = [(self._overshoot(off), 0) for off in (1000, 1500, 2000, 2500)]
-        repwl = _auto_rep("fda_wl", exhausted=True)
+class AutoModeForwardScanTest(unittest.TestCase):
+    def test_existing_and_gated_pages_do_not_stall_cursor(self) -> None:
+        page1 = _auto_rep("fda483", offset=0, listed=500, skipped_existing=450,
+                          skipped_gated=50, next_offset=500, exhausted=False)
+        page2 = _auto_rep("fda483", offset=500, listed=500, skipped_gated=490,
+                          fetched=10, appended=10, next_offset=1000, exhausted=False)
         merged, code, r483, rwl = _run_auto(
-            existing_483=existing, run_483_side=side_483, run_wl_side=[(repwl, 0)],
+            run_483_side=[(page1, 0), (page2, 0)], fetch_budget=10,
         )
         self.assertEqual(code, 0)
-        # Initial read + exactly 3 advances -- never a 5th call (no infinite loop).
-        self.assertEqual(r483.call_count, 4)
-        offsets = [c.kwargs["offset"] for c in r483.call_args_list]
-        self.assertEqual(offsets, [1000, 1500, 2000, 2500])
-        # Gave up on 483 with nothing new found -> still proceeds to WL this run,
-        # but 483 was never confirmed exhausted so the run is not auto_complete.
-        self.assertEqual(rwl.call_count, 1)
-        self.assertFalse(merged["auto_complete"])
-        self.assertEqual(merged["auto_source_order"], ["fda483", "fda_wl"])
-        self.assertEqual(len(merged["auto_attempts"]), 5)
-
-    def test_retry_stops_early_once_new_documents_found(self) -> None:
-        found = _auto_rep("fda483", offset=1500, listed=500, skipped_existing=490,
-                          fetched=10, appended=10, next_offset=2000, exhausted=False)
-        merged, code, r483, rwl = _run_auto(
-            existing_483={f"fda483-{i}" for i in range(1000)},
-            run_483_side=[(self._overshoot(1000), 0), (found, 0)],
-        )
-        self.assertEqual(code, 0)
-        self.assertEqual(r483.call_count, 2)
+        self.assertEqual([c.kwargs["offset"] for c in r483.call_args_list], [0, 500])
         rwl.assert_not_called()
-        self.assertEqual(merged["appended"], 10)
-        self.assertFalse(merged["auto_complete"])
+        self.assertEqual(merged["fetched"], 10)
+        self.assertIn("fda483:fetch_budget_reached:10/10", merged["auto_transitions"])
+
+    def test_exhausted_483_logs_and_transitions_to_wl(self) -> None:
+        rep483 = _auto_rep("fda483", listed=2, skipped_existing=2,
+                           next_offset=2, exhausted=True, source_total=2, remaining=0)
+        repwl = _auto_rep("fda_wl", listed=1, fetched=1, appended=1,
+                          next_offset=1, exhausted=False, source_total=3608, remaining=3607)
+        merged, code, _r483, _rwl = _run_auto(
+            run_483_side=[(rep483, 0)], run_wl_side=[(repwl, 0)], fetch_budget=1,
+        )
+        self.assertEqual(code, 0)
+        self.assertIn("fda483:exhausted->fda_wl", merged["auto_transitions"])
+        self.assertEqual(merged["source_progress"]["fda_wl"]["remaining"], 3607)
 
 
 class AutoCliExclusionTest(unittest.TestCase):
@@ -790,6 +782,7 @@ class AutoReportSchemaTest(unittest.TestCase):
         "listed": int, "skipped_existing": int, "skipped_gated": int,
         "fetched": int, "appended": int, "invalid": int, "errors": list,
         "next_offset": int, "exhausted": bool, "would_fetch": list,
+        "source_total": (int, type(None)), "remaining": (int, type(None)),
     }
 
     def test_merged_report_keeps_existing_fields_and_adds_auto_fields(self) -> None:
@@ -833,6 +826,7 @@ class AutoReportSchemaTest(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             run_auto_mock.assert_called_once()
             self.assertEqual(run_auto_mock.call_args.kwargs["max_docs"], 200)
+            self.assertEqual(run_auto_mock.call_args.kwargs["fetch_budget"], 300)
             with open(out_path, encoding="utf-8") as f:
                 data = json.load(f)
         self.assertIs(data["auto"], True)

@@ -5345,8 +5345,14 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn("var left = 30;", self.js)
 
     def test_copy_tone_has_no_threat_or_jargon(self):
+        # 검사 대상은 **화면에 나가는 문구**뿐 — 개발자 주석(설계 근거라 규제·API 용어가
+        # 정상적으로 등장한다)은 제외한다. reactions.js 엔 "://" 가 없어(URL 0) 줄 주석
+        # 제거가 문자열을 훼손하지 않는다.
+        import re as _re
+        body = _re.sub(r"/\*.*?\*/", "", self.js, flags=_re.S)
+        body = "\n".join(ln.split("//")[0] for ln in body.splitlines())
         for bad in ["오류 코드", "인증 토큰", "OTP", "실패했습니다. 관리자", "차단"]:
-            self.assertNotIn(bad, self.js, f"대중성 톤 위반 후보: {bad}")
+            self.assertNotIn(bad, body, f"대중성 톤 위반 후보: {bad}")
         self.assertIn("가입 확인이 아직이에요", self.js)
         self.assertIn("코드가 맞지 않거나 시간이 지났어요", self.js)
 

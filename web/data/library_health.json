@@ -1,0 +1,5851 @@
+{
+  "checked_at": "2026-07-19T17:04:59+00:00",
+  "policy": {
+    "bot_sensitive_hosts": [
+      "fda.gov",
+      "canada.ca"
+    ],
+    "delay_scope": "per_host_request_start",
+    "failure_retries": 1,
+    "get_fallback": true,
+    "head_first": true,
+    "max_workers": 12,
+    "request_delay_seconds": 1.0
+  },
+  "schema_version": "grm-library-health/v1",
+  "source_files": [
+    "ema.json",
+    "eu_gmp.json",
+    "fda_guidance.json",
+    "health_canada.json",
+    "ich.json",
+    "mfds.json",
+    "pics.json",
+    "who.json"
+  ],
+  "summary": {
+    "broken": 0,
+    "needs_review": 73,
+    "ok": 275,
+    "references": 467,
+    "unique_urls": 348
+  },
+  "urls": {
+    "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-dc7f8293bbe3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_M13A_Step4_Final_Guideline_2024_0723.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_M13A_Step4_Final_Guideline_2024_0723.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-1540e16abffc"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_M14_Step4_Final_Guideline_2025_0905.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_M14_Step4_Final_Guideline_2025_0905.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-3cc6b109ec1e"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-d6e47b547297"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_M7%28R2%29_Guideline_Step4_2023_0216_0.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_M7%28R2%29_Guideline_Step4_2023_0216_0.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-78bb22895033"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q13_Step4_Guideline_2022_1116.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q13_Step4_Guideline_2022_1116.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-4132442706bc"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q14_Guideline_2023_1130_ErrorCorrection_2025.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q14_Guideline_2023_1130_ErrorCorrection_2025.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-e34212ef863f"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q2%28R2%29_Guideline_2023_1130_ErrorCorrection_2025.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q2%28R2%29_Guideline_2023_1130_ErrorCorrection_2025.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-36c41a7af7f9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q3C%28R9%29_Guideline_MinorRevision_2024_2024_Approved.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q3C%28R9%29_Guideline_MinorRevision_2024_2024_Approved.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-b01162b4fff3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q4B%28R1%29_Guideline_2024_0605.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q4B%28R1%29_Guideline_2024_0605.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-f4aa58f5e2ee"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q5A%28R2%29_Guideline_2023_1101.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q5A%28R2%29_Guideline_2023_1101.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-e7f3a99dfc9d"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2025_0115_0.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2025_0115_0.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-aeb86aaa5b68"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/ICH_Step4_M11_Final_Guideline_2025_1119.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/ICH_Step4_M11_Final_Guideline_2025_1119.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-78ad02fa1c9a"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/M10_Guideline_Step4_2022_0524.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/M10_Guideline_Step4_2022_0524.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-9df26b867704"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/M3_R2__Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/M3_R2__Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-153842524174"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/M4_R4__Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/M4_R4__Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-ecb76a0de0c7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/M9_Guideline_Step4_2019_1116.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/M9_Guideline_Step4_2019_1116.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-f3eead0cb20e"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q10%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q10%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-2b5388c2ca85"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q11%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q11%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-7126bd90d285"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q12_Guideline_Step4_2019_1119.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q12_Guideline_Step4_2019_1119.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-ffb664fc3118"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q1A%28R2%29%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q1A%28R2%29%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-156da584415e"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q6A%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q6A%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-22f1bbd580d6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q7%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q7%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-998a75651186"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://database.ich.org/sites/default/files/Q8%28R2%29%20Guideline.pdf": {
+      "attempts": 1,
+      "final_url": "https://database.ich.org/sites/default/files/Q8%28R2%29%20Guideline.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ich.json",
+          "item_id": "ich-460133fa7e5a"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)": {
+      "attempts": 1,
+      "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-excipient-risk-assessment"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)": {
+      "attempts": 1,
+      "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-excipient-risk-assessment"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/07195808-d02e-4d7a-b8f4-f84a83278b62_en?filename=cap9_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/07195808-d02e-4d7a-b8f4-f84a83278b62_en?filename=cap9_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch9"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/104b3eb8-81a7-4858-9419-cb06562adb66_en?filename=chapter4_01-2011_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/104b3eb8-81a7-4858-9419-cb06562adb66_en?filename=chapter4_01-2011_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch4"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/11f4f8e6-a6e9-4897-afe3-f21e1dc56cb8_en?filename=2014-03_chapter_2.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/11f4f8e6-a6e9-4897-afe3-f21e1dc56cb8_en?filename=2014-03_chapter_2.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-mra-batch-certificate"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-mra-batch-certificate"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/20c41532-33d5-4635-ae80-8735d3d09fe0_en?filename=v4_an16_201510_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/20c41532-33d5-4635-ae80-8735d3d09fe0_en?filename=v4_an16_201510_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex16"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex16"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/22d03c04-8512-4336-89dd-556771fca388_en?filename=anx08_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/22d03c04-8512-4336-89dd-556771fca388_en?filename=anx08_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex8"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex8"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex10"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex10"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex12"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex12"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/3b293ba6-c7f9-4a63-8121-303a18c30120_en?filename=template_imp_batch_certification.docx": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/3b293ba6-c7f9-4a63-8121-303a18c30120_en?filename=template_imp_batch_certification.docx",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-imp-batch-release-template"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex9"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/4a1fdb4f-6f6f-49c4-b264-8056e5bbe078_en?filename=chapter_5.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/4a1fdb4f-6f6f-49c4-b264-8056e5bbe078_en?filename=chapter_5.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch5"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch7"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-imp-handling-shipping"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-imp-handling-shipping"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex17"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex17"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex15"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex15"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex19-2026"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex19-2026"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex11"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex11"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/95af86f8-c82d-4ad0-85cb-27c7f56531b4_en?filename=2011_site_master_file_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/95af86f8-c82d-4ad0-85cb-27c7f56531b4_en?filename=2011_site_master_file_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-site-master-file"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-site-master-file"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex13"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex13"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex14"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex14"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-written-confirmation"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-written-confirmation"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/b1eb2292-cb0d-4e3f-aea9-e3fe79faf6e3_en?filename=2014-08_gmp_chap8.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/b1eb2292-cb0d-4e3f-aea9-e3fe79faf6e3_en?filename=2014-08_gmp_chap8.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch8"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch8"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex19-2005"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex19-2005"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex6"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/bd537ccf-9271-4230-bca1-2d8cb655fd83_en?filename=2014-08_gmp_part1.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/bd537ccf-9271-4230-bca1-2d8cb655fd83_en?filename=2014-08_gmp_part1.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part2-active-substances"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part2-active-substances"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-mah-reflection-paper"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-mah-reflection-paper"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/c74c8720-27bf-4252-808f-d65a206a90bb_en?filename=2014-11_vol4_chapter_6.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/c74c8720-27bf-4252-808f-d65a206a90bb_en?filename=2014-11_vol4_chapter_6.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch6"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/d77ad692-97ae-4a5f-acfa-e853193ef6aa_en?filename=mp_ich_q9guideline-ra_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/d77ad692-97ae-4a5f-acfa-e853193ef6aa_en?filename=mp_ich_q9guideline-ra_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-q9"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-q9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex21"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex21"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part1-ch1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex7"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-annex7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://nedrug.mfds.go.kr/bbs/117/13": {
+      "attempts": 1,
+      "final_url": "https://nedrug.mfds.go.kr/bbs/117/13",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-998a75651186"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://nedrug.mfds.go.kr/bbs/117/14": {
+      "attempts": 1,
+      "final_url": "https://nedrug.mfds.go.kr/bbs/117/14",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-156da584415e"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/1947": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/1947",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-052-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-052-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/1948": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/1948",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-053-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-053-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2270": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2270",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-043-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-043-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2303": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2303",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-040-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-040-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2465": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2465",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-045-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-045-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2466": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2466",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-047-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-047-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2467": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2467",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-046-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-046-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2475": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2475",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-048-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-048-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2681": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2681",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-010-5"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-010-5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3441": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3441",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-014-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-014-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3442": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3442",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-012-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-012-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3443": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3443",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-010-4"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-010-4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3444": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3444",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-011-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-011-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3446": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3446",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-007-6"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-007-6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3447": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3447",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-006-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-006-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3448": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3448",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-005-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-005-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3450": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3450",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-011-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-011-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3452": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3452",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-030-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-030-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3455": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3455",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-023-2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-023-2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3456": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3456",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-021-2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-021-2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3463": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3463",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-008-4"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-008-4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3820": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3820",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-009-4"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-009-4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3821": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3821",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-024-3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-024-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3823": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3823",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-038-2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-038-2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/4234": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/4234",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-041-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-041-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/4294": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/4294",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-054-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-054-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/6605": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/6605",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-intro"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-intro"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/6606": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/6606",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-part1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-part1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/6607": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/6607",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-part2"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-part2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/8881": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/8881",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-annexes"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-17-annexes"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/9256": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/9256",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-056-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-056-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/9257": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/9257",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-057-1"
+        },
+        {
+          "field": "pdf_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-057-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0005"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-drug-establishment-licences-drug-establishment-licensing-fees-0002.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0002"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/management-applications-performance-drug-establishment-licences-0127.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0127"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-13-guide-drugs-clinical-trials-0036.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0036"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-2-current-edition-guidelines-schedule-drugs-biological-drugs-0027.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0027"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-3-current-edition-guidelines-schedule-drugs-0026.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0026"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0012"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-7-good-manufacturing-practices-guide-selected-non-prescription-drugs-gui-0066-overview.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0066"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0071"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-0001.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0001"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-annex-1-manufacture-sterile-drugs-0119.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-annex-1-manufacture-sterile-drugs-0119.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0119"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidance-evidence-demonstrate-drug-compliance-foreign-sites-0080.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0080"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-natural-health-products-0158.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0158"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidelines-temperature-control-drug-products-storage-transportation-0069.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidelines-temperature-control-drug-products-storage-transportation-0069.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0069"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/medical-gases.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0031"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/risk-classification-drug-gmp-observations-0023.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0023"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0028"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/validation-guidelines-pharmaceutical-dosage-forms-0029.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0029"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/information-health-product/drugs/guidelines-active-pharmaceutical-ingredients-0104.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/information-health-product/drugs/guidelines-active-pharmaceutical-ingredients-0104.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0104"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/recalls/guidance-drug-natural-health-products.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/errors/404.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0039"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/other/questions-and-answers-design-space-verification_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/other/questions-and-answers-design-space-verification_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-023"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-023"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/other/questions-and-answers-implementation-risk-based-prevention-cross-contamination-production-and-guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/other/questions-and-answers-implementation-risk-based-prevention-cross-contamination-production-and-guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-025"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-025"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-012"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-012"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/conduct-inspections-pharmaceutical-manufacturers-or-importers_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/conduct-inspections-pharmaceutical-manufacturers-or-importers_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-004"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-004"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/eu-eea-programme-maintenance-equivalence-supervision-good-manufacturing-practice-compliance-pharmaceutical-companies_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/eu-eea-programme-maintenance-equivalence-supervision-good-manufacturing-practice-compliance-pharmaceutical-companies_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-014"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-014"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guidance-occasions-when-it-appropriate-competent-authorities-conduct-inspections-premises-manufacturers-importers-distributors-active-substances-manufacturers-or-importers-excipients-used-starting_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guidance-occasions-when-it-appropriate-competent-authorities-conduct-inspections-premises-manufacturers-importers-distributors-active-substances-manufacturers-or-importers-excipients-used-starting_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-007"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-007"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guideline-training-qualifications-good-manufacturing-practice-gmp-inspectors_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guideline-training-qualifications-good-manufacturing-practice-gmp-inspectors_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-006"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-006"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-016"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-016"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-manufacturer-importer-authorisation_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-manufacturer-importer-authorisation_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-015"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-015"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/issue-update-good-manufacturing-practice-gmp-certificates_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/issue-update-good-manufacturing-practice-gmp-certificates_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-008"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-008"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-classification-reports-suspected-quality-defects-medicinal-products-risk-based-decision-making_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-classification-reports-suspected-quality-defects-medicinal-products-risk-based-decision-making_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-002"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-002"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-rapid-alerts-arising-quality-defects-risk-assessment_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-rapid-alerts-arising-quality-defects-risk-assessment_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-003"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-003"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/model-risk-based-planning-inspections-pharmaceutical-manufacturers_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/model-risk-based-planning-inspections-pharmaceutical-manufacturers_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-009"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-009"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/outline-procedure-co-ordinating-verification-gmp-status-manufacturers-third-countries_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/outline-procedure-co-ordinating-verification-gmp-status-manufacturers-third-countries_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-005"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-005"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-compliance-management_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-compliance-management_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-013"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-013"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-information-originating-third-country-authorities-or-international-organisations_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-information-originating-third-country-authorities-or-international-organisations_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-010"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-010"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-requiring-co-ordinated-measures-protect-public-or-animal-health_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-requiring-co-ordinated-measures-protect-public-or-animal-health_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-011"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-011"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/quality-systems-framework-good-manufacturing-practice-gmp-inspectorates_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/quality-systems-framework-good-manufacturing-practice-gmp-inspectorates_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-001"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-001"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-manufacture-finished-dosage-form-revision-1_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-manufacture-finished-dosage-form-revision-1_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-017"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-process-validation-finished-products-information-and-data-be-provided-regulatory-submissions-revision-1_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-process-validation-finished-products-information-and-data-be-provided-regulatory-submissions-revision-1_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-018"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-022"
+        },
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-hbel"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-sterilisation-medicinal-product-active-substance-excipient-and-primary-container_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-sterilisation-medicinal-product-active-substance-excipient-and-primary-container_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-020"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/international-conference-harmonisation-technical-requirements-registration-pharmaceuticals-human-guideline-q10-pharmaceutical-quality-system-step-5_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/international-conference-harmonisation-technical-requirements-registration-pharmaceuticals-human-guideline-q10-pharmaceutical-quality-system-step-5_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-q10"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/note-guidance-start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/note-guidance-start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-019"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/questions-and-answers-improving-understanding-normal-operating-range-nor-proven-acceptable-range-par-design-space-dsp-and-normal-variability-process-parameters_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/questions-and-answers-improving-understanding-normal-operating-range-nor-proven-acceptable-range-par-design-space-dsp-and-normal-variability-process-parameters_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-024"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-024"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/scientific-guideline/use-ionising-radiation-manufacture-medicinal-products_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/use-ionising-radiation-manufacture-medicinal-products_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-021"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/guidance-good-manufacturing-practice-good-distribution-practice-questions-answers": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/guidance-good-manufacturing-practice-good-distribution-practice-questions-answers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-026"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-q10"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-017"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-018"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-022"
+        },
+        {
+          "field": "official_url",
+          "file": "eu_gmp.json",
+          "item_id": "eu-gmp-part3-hbel"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-019"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/sterilisation-medicinal-product-active-substance-excipient-primary-container-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/sterilisation-medicinal-product-active-substance-excipient-primary-container-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-020"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/use-ionizing-radiation-manufacture-medicinal-products-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/use-ionizing-radiation-manufacture-medicinal-products-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-021"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/comparability-protocols-postapproval-changes-chemistry-manufacturing-and-controls-information-nda": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/comparability-protocols-postapproval-changes-chemistry-manufacturing-and-controls-information-nda",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-comparability-protocols-postapproval-cmc"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-and-closure-system-integrity-testing-lieu-sterility-testing-component-stability-protocol": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-and-closure-system-integrity-testing-lieu-sterility-testing-component-stability-protocol",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-container-closure-integrity-sterility-testing"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-container-closure-systems-packaging"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/contract-manufacturing-arrangements-drugs-quality-agreements-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/contract-manufacturing-arrangements-drugs-quality-agreements-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-contract-manufacturing-quality-agreements"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/control-nitrosamine-impurities-human-drugs": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/control-nitrosamine-impurities-human-drugs",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-control-nitrosamine-impurities"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-guidance-human-drug-compounding-outsourcing-facilities-under": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-guidance-human-drug-compounding-outsourcing-facilities-under",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-cgmp-compounding-outsourcing-facilities"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-requirements-combination-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-requirements-combination-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-cgmp-combination-products"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-integrity-and-compliance-drug-cgmp-questions-and-answers": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-integrity-and-compliance-drug-cgmp-questions-and-answers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-data-integrity-drug-cgmp-qa"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/field-alert-report-submission-questions-and-answers-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/field-alert-report-submission-questions-and-answers-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-field-alert-report-submission-qa"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/investigating-out-specification-oos-test-results-pharmaceutical-production-level-2-revision": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/investigating-out-specification-oos-test-results-pharmaceutical-production-level-2-revision",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-investigating-oos-test-results"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/medical-gases-current-good-manufacturing-practice": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/medical-gases-current-good-manufacturing-practice",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-medical-gases-cgmp"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pat-framework-innovative-pharmaceutical-development-manufacturing-and-quality-assurance": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pat-framework-innovative-pharmaceutical-development-manufacturing-and-quality-assurance",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-pat-framework"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pharmaceutical-components-risk-melamine-contamination": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pharmaceutical-components-risk-melamine-contamination",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-pharmaceutical-components-melamine"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/process-validation-general-principles-and-practices": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/process-validation-general-principles-and-practices",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-process-validation-general-principles"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pyrogen-and-endotoxins-testing-questions-and-answers": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pyrogen-and-endotoxins-testing-questions-and-answers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-pyrogen-endotoxins-testing-qa"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-annex": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-annex",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-q12-product-lifecycle-management-annex"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q13-continuous-manufacturing-drug-substances-and-drug-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q13-continuous-manufacturing-drug-substances-and-drug-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-q13-continuous-manufacturing"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3dr2-guideline-elemental-impurities": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3dr2-guideline-elemental-impurities",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-q3d-r2-elemental-impurities"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-q7-gmp-active-pharmaceutical-ingredients"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q9r1-quality-risk-management": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q9r1-quality-risk-management",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-q9-r1-quality-risk-management"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/quality-systems-approach-pharmaceutical-current-good-manufacturing-practice-regulations": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/quality-systems-approach-pharmaceutical-current-good-manufacturing-practice-regulations",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-quality-systems-pharmaceutical-cgmp"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/sterile-drug-products-produced-aseptic-processing-current-good-manufacturing-practice": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/sterile-drug-products-produced-aseptic-processing-current-good-manufacturing-practice",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-sterile-drug-products-aseptic-processing"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-applications-parametric-release-human-and-veterinary-drug-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-applications-parametric-release-human-and-veterinary-drug-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-parametric-release-moist-heat"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-sterilization-process-validation-applications-human-and-veterinary-drug": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-documentation-sterilization-process-validation-applications-human-and-veterinary-drug",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-sterilization-process-validation-submission"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/testing-glycerin-propylene-glycol-maltitol-solution-hydrogenated-starch-hydrolysate-sorbitol": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/testing-glycerin-propylene-glycol-maltitol-solution-hydrogenated-starch-hydrolysate-sorbitol",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-testing-high-risk-components-deg-eg"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ich.org/page/multidisciplinary-guidelines": {
+      "attempts": 1,
+      "final_url": "https://www.ich.org/page/multidisciplinary-guidelines",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-c2b1654f64f0"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-610d68a74e43"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-153842524174"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-ecb76a0de0c7"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-72a894e41380"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-471b24c9ff89"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-78bb22895033"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-a81d3327de7b"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-f3eead0cb20e"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-9df26b867704"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-78ad02fa1c9a"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-dc7f8293bbe3"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-1540e16abffc"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-3cc6b109ec1e"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-d6e47b547297"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-fa6678dc5db9"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-4b7af106ee25"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ich.org/page/quality-guidelines": {
+      "attempts": 1,
+      "final_url": "https://www.ich.org/page/quality-guidelines",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-156da584415e"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-36c41a7af7f9"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-b01162b4fff3"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-f4aa58f5e2ee"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-e7f3a99dfc9d"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-22f1bbd580d6"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-998a75651186"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-460133fa7e5a"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-aeb86aaa5b68"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-2b5388c2ca85"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-7126bd90d285"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-ffb664fc3118"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-4132442706bc"
+        },
+        {
+          "field": "official_url",
+          "file": "ich.json",
+          "item_id": "ich-e34212ef863f"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15242&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15242&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15242"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15243&data_tp=A&file_seq=7": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15243&data_tp=A&file_seq=7",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15243"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15244&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15244&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15244"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15245&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15245&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15245"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15246&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15246&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15246"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15247&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15247&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15247"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15248&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15248&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15248"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15249&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15249&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15249"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15251&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15251&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15251"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15253&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15253&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15253"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15255&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15255&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15255"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15258&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15258&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15258"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15242"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15243"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15244"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15245"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15246"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15247"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15248"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15249"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15251"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15253"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15255"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15258"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14290"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14395&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14395&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14395"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14396&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14396&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14396"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14444&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14444&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14444"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14455&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14455&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14455"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14484&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14484&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14484"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14579&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14579&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14579"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14608&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14608&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14608"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14637&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14637&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14637"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14638&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14638&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14638"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14672&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14672&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14672"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14737&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14737&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14737"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14816&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14816&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14816"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14831&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14831&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14831"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14852&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14852&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14852"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14912&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14912&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14912"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14997&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14997&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14997"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15121&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15121&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15121"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15162&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15162&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15162"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15208&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15208&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15208"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15277&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15277&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15277"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15344&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15344&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15344"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15349&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15349&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15349"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15360&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15360&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15360"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15371&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15371&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15371"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15403&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15403&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15403"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15404&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15404&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15404"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15454&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15454&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15454"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15541&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15541&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15541"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15589&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15589&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15589"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15635&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15635&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15635"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15682&data_tp=A&file_seq=4": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15682&data_tp=A&file_seq=4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15682"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15698&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15698&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15698"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15716&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15716&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15716"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15753&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15753&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15753"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15754&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15754&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15754"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15783&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15783&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15783"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15790&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15790&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15790"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15798&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15798&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15798"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15802&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15802&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15802"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15860&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15860&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15860"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15865&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15865&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15865"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15873&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15873&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15873"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15874&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15874&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15874"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15876&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15876&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15876"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15877&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15877&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15877"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15882&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15882&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15882"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15883&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15883&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15883"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15887&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15887&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15887"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15888&data_tp=A&file_seq=3": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15888&data_tp=A&file_seq=3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15888"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14290": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14290",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14290"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14395": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14395",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14395"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14396": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14396",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14396"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14444": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14444",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14444"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14455": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14455",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14455"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14484": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14484",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14484"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14579": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14579",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14579"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14608": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14608",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14608"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14637": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14637",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14637"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14638": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14638",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14638"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14672": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14672",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14672"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14737": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14737",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14737"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14782": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14782",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-ecb76a0de0c7"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14816": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14816",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14816"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-460133fa7e5a"
+        },
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-aeb86aaa5b68"
+        },
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-2b5388c2ca85"
+        },
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14831"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14852": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14852",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14852"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14912": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14912",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14912"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14997": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14997",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-14997"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15121": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15121",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15121"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15162": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15162",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15162"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15208": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15208",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15208"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15277": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15277",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15277"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15344": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15344",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15344"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15349": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15349",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15349"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15360": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15360",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15360"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "ko_url",
+          "file": "ich.json",
+          "item_id": "ich-4132442706bc"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15371": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15371",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15371"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15403": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15403",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15403"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15404": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15404",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15404"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15454": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15454",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15454"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15541"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15589"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15635": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15635",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15635"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15682": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15682",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15682"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15698": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15698",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15698"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15716": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15716",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15716"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15753": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15753",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15753"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15754": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15754",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15754"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15783": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15783",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15783"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15790": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15790",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15790"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15798": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15798",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15798"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15802": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15802",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15802"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15860"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15865"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15873"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15874"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15876"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15877"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15882"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15883"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15887"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15888"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44248"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44250&data_tp=A&file_seq=2": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44250&data_tp=A&file_seq=2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44250"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44251&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44251&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44251"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44254&data_tp=A&file_seq=3": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44254&data_tp=A&file_seq=3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44254"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44255&data_tp=A&file_seq=4": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44255&data_tp=A&file_seq=4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44255"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44256&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44256&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44256"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44248"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44250"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44251"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44254"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44255"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0009-44256"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14972&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14972&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14972"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14974&data_tp=A&file_seq=1": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14974&data_tp=A&file_seq=1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14974"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14972"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14974"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3": {
+      "attempts": 1,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "pdf_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33716"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33716"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.who.int/publications/m/item/Annex-8-trs-1010": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/Annex-8-trs-1010",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1010-annex8"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-2-trs-1033": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-2-trs-1033",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1033-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-2-trs-957": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-2-trs-957",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs957-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-3-trs-1033": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-3-trs-1033",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1033-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-4-trs-1033": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-4-trs-1033",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1033-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-9-trs-902": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-9-trs-902",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs902-annex9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1025-annex-3-water-for-injection": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1025-annex-3-water-for-injection",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1025-annex-6": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1025-annex-6",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1052---annex-3--iaea-who-good-manufacturing-practices-for-in-house-cold-kits-for-radiopharmaceutical-preparations": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1052---annex-3--iaea-who-good-manufacturing-practices-for-in-house-cold-kits-for-radiopharmaceutical-preparations",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1052-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1060---annex-2--who-good-practice-considerations-for-the-prevention-and-control-of-nitrosamines-in-pharmaceutical-products": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1060---annex-2--who-good-practice-considerations-for-the-prevention-and-control-of-nitrosamines-in-pharmaceutical-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1060-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1060---annex-3--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1060---annex-3--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1060-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1060---annex-4--good-practices-for-blood-establishments": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1060---annex-4--good-practices-for-blood-establishments",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1060-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1067---annex-2--who-points-to-consider-in-continuous-manufacturing-of-pharmaceutical-products": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1067---annex-2--who-points-to-consider-in-continuous-manufacturing-of-pharmaceutical-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1067-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1010-annex1": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1010-annex1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1010-annex1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1019-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1019-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1019-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1019-annex3": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1019-annex3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1019-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1025-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1025-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex3": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex4": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex5": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex5",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex6": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex6",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1044-annex7": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1044-annex7",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1044-annex7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs957-annex3": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs957-annex3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs957-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs981-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs981-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs981-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs986-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs986-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs986-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs992-annex4": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs992-annex4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs992-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs996-annex3": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs996-annex3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs996-annex3"
+        }
+      ],
+      "status": "ok"
+    }
+  },
+  "user_agent": "GRM-Library-Linkcheck/1.0 (+https://github.com/MINHOYEOM/grm-api-intake)"
+}

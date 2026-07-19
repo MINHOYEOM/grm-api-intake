@@ -114,8 +114,10 @@
         '<span class="grm-acct-id"><span class="grm-acct-label">로그인 계정</span>' +
         '<span class="grm-acct-email">' + esc(email) + '</span></span></div>' +
         '<div class="grm-acct-div"></div>' +
+        // 13차: /me 가 스크랩 전용에서 개인 홈(스크랩·구름이·관심 업체)으로 넓어져
+        // 메뉴 이름도 실제와 맞췄다 — 링크·아이콘·위치는 그대로(새 표면 0).
         '<a class="grm-acct-item" role="menuitem" href="' + esc(cfgRoot) + 'me/index.html">' +
-        '<i class="ti ti-bookmark" aria-hidden="true"></i>내 스크랩</a>' +
+        '<i class="ti ti-bookmark" aria-hidden="true"></i>마이페이지</a>' +
         '<button type="button" class="grm-acct-item grm-acct-out" role="menuitem">' +
         '<i class="ti ti-logout" aria-hidden="true"></i>로그아웃</button></div>';
       el.appendChild(wrap);
@@ -542,12 +544,33 @@
     op.then(function (res) { if (res && res.error) rollback(); }).catch(rollback);
   }
 
-  // ── /me 페이지: 내 스크랩 목록(호를 넘나들며) ─────────────────────────────
+  // ── /me 마이페이지 ───────────────────────────────────────────────────────
+  // [비로그인 불침번] 13차부터 /me 는 로그인 게이트가 아니라 개인 홈이다 — 게스트로 와도
+  // 구름이 성장 현황(localStorage)은 그대로 보이고, 계정 카드는 빈칸이 아니라 "무엇이
+  // 보관되는지 + 가입" 안내로 채운다. 가입 CTA 는 이 카드 한 곳에만 두고(페이지에 로그인
+  // 버튼이 세 개씩 생기지 않게), 진입점은 기존 openLogin 을 재사용한다 — 새 인증 UI 0.
+  function renderMeGuestHead(head) {
+    head.innerHTML =
+      '<div class="grm-me-card grm-me-guest">' +
+      '<span class="grm-acct-av grm-acct-av-xl" aria-hidden="true"><i class="ti ti-user"></i></span>' +
+      '<div class="grm-me-idbox"><div class="grm-me-label">게스트</div>' +
+      '<div class="grm-me-email">아직 로그인하지 않았어요</div>' +
+      '<p class="grm-me-guest-s">가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.</p>' +
+      '<div class="grm-me-metaline">' +
+      '<button type="button" class="grm-me-signup">가입하고 시작하기</button>' +
+      '<button type="button" class="grm-me-out grm-me-login">이미 계정이 있어요 · 로그인</button>' +
+      '</div></div></div>';
+    // 가입 의도가 분명한 진입점이라 로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다
+    // (growth-sync.js 펫 CTA 와 동일 계약 — window.GRM_AUTH.open({mode:"signup"})).
+    head.querySelector(".grm-me-signup").addEventListener("click", function () { openLogin({ mode: "signup" }); });
+    head.querySelector(".grm-me-login").addEventListener("click", function () { openLogin(); });
+  }
+
   // /me 계정 헤더(아바타·이메일·스크랩 수) — 런타임 주입.
   function renderMeHead(count) {
     var head = document.getElementById("grm-me-head");
     if (!head) return;
-    if (!session || !session.user) { head.innerHTML = ""; return; }
+    if (!session || !session.user) { renderMeGuestHead(head); return; }
     var email = session.user.email || "회원", ini = acctInitial(email);
     var stat = (count == null) ? "" : ('<span class="grm-me-stat"><b>' + count + '</b> 스크랩</span>');
     head.innerHTML =
@@ -566,11 +589,9 @@
     if (!myScrapsEl) return;
     renderMeHead(null);
     if (!session || !session.user) {
-      myScrapsEl.innerHTML = '<p class="grm-my-note">로그인하면 스크랩한 카드를 모아볼 수 있어요.</p>';
-      var lb = document.createElement("button");
-      lb.type = "button"; lb.className = "grm-my-login"; lb.textContent = "로그인";
-      lb.addEventListener("click", function () { openLogin(); });
-      myScrapsEl.appendChild(lb);
+      // 로그인 버튼은 상단 게스트 카드 하나로 모았다(같은 화면에 CTA 난립 금지) —
+      // 여기선 무엇이 모이는지만 알려 주고 조용히 폴백한다. 관심 업체 섹션과 동형.
+      myScrapsEl.innerHTML = '<p class="grm-my-note">로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.</p>';
       return;
     }
     myScrapsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';

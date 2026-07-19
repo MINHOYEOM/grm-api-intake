@@ -1,0 +1,80 @@
+/* [구름이 성장 패널 9차 G2] 마크업은 growth.js 런타임 주입 — 스타일만 정적(골든 안정).
+   grm.css 토큰만 사용(프리즈 보존)·한글 keep-all·자간/대문자/mono 미사용(§4). */
+.qz-growth{margin-top:18px}
+.qzg{display:flex;align-items:center;gap:18px;padding:18px 22px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+.qzg-art{flex:none;width:84px;line-height:0}
+.qzg-art svg,.qzg-art img{width:100%;height:auto;display:block}
+.qzg-art.is-pulse svg,.qzg-art.is-pulse img{animation:qzgPulse .5s var(--ease)}
+@keyframes qzgPulse{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ .qzg-art.is-pulse svg{animation:none} }
+.qzg-main{flex:1;min-width:0}
+.qzg-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qzg-name{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--ink)}
+.qzg-lv{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.qzg-streak{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--med);background:rgba(176,125,23,.11);border:1px solid rgba(176,125,23,.24);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.qzg-streak[hidden]{display:none}
+.qzg-atlas-toggle{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--coral-2);background:var(--canvas);border:1px solid rgba(194,96,63,.25);border-radius:999px;padding:5px 11px;cursor:pointer;transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease)}
+.qzg-atlas-toggle:hover{background:var(--coral-tint);border-color:var(--coral);transform:translateY(-1px)}
+.qzg-atlas-toggle:focus-visible,.qzg-stage-card:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+.qzg-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin:3px 0 0;word-break:keep-all}
+.qzg-barwrap{margin-top:10px;height:8px;background:var(--canvas);border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+.qzg-bar{height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--coral-2));border-radius:999px;transition:width .4s var(--ease)}
+@media (prefers-reduced-motion:reduce){ .qzg-bar{transition:none} }
+.qzg-meta{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:8px 0 0;word-break:keep-all}
+.qzg-meta > span:first-child{color:var(--coral-2);font-weight:600}
+.qzg-note{color:var(--lo)}
+.qzg-reset{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.qzg-reset:hover{color:var(--coral-2)}
+/* 성장 도감 — 현재 캐릭터 원형은 유지하고, 단계 차이는 자세·행동·상징으로 보여준다. */
+.qzg-atlas[hidden]{display:none}
+.qzg-atlas{margin-top:10px;padding:20px 20px 18px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:0 16px 36px -32px rgba(26,24,21,.34);animation:qzgAtlasIn .24s var(--ease)}
+.qzg-atlas-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:17px}
+.qzg-atlas-head b{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink)}
+.qzg-atlas-head p{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:3px 0 0;word-break:keep-all}
+.qzg-atlas-head > span{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.qzg-stage-track{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.qzg-stage-track::before{content:"";position:absolute;left:9%;right:9%;top:57px;height:1px;background:linear-gradient(90deg,rgba(194,96,63,.18),rgba(232,176,74,.5));z-index:0}
+.qzg-stage-card{position:relative;z-index:1;display:flex;min-width:0;flex-direction:column;align-items:center;text-align:center;padding:12px 8px 13px;background:var(--soft);border:1px solid transparent;border-radius:12px;cursor:default;transition:transform .2s var(--ease),border-color .2s var(--ease),background .2s var(--ease),box-shadow .2s var(--ease)}
+.qzg-stage-card:hover,.qzg-stage-card:focus-visible{transform:translateY(-3px);background:#fff;border-color:rgba(194,96,63,.28);box-shadow:0 12px 24px -20px rgba(26,24,21,.5)}
+.qzg-stage-card.is-current{background:#fff;border-color:var(--coral);box-shadow:0 0 0 3px rgba(206,110,76,.08)}
+.qzg-stage-card.is-reached{border-color:rgba(194,96,63,.16)}
+.qzg-stage-card.is-future{background:rgba(245,239,230,.58)}
+.qzg-stage-art{display:block;width:84px;height:84px;line-height:0;margin-bottom:5px}
+.qzg-stage-art svg,.qzg-stage-art img{display:block;width:100%;height:100%;object-fit:contain;overflow:visible;filter:drop-shadow(0 7px 7px rgba(26,24,21,.09))}
+.qzg-stage-step{position:absolute;top:8px;left:8px;font-family:var(--sans);font-size:10px;font-weight:700;color:var(--coral-2)}
+.qzg-stage-card b{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);word-break:keep-all}
+.qzg-stage-card small{font-family:var(--sans);font-size:10.5px;color:var(--coral-2);margin-top:2px}
+.qzg-stage-copy{font-family:var(--sans);font-size:11px;line-height:1.45;color:var(--muted);margin-top:6px;word-break:keep-all}
+.qzg-stage-card.is-current::after{content:"현재";position:absolute;top:7px;right:7px;font-family:var(--sans);font-size:9.5px;font-weight:700;color:#fff;background:var(--coral);border-radius:999px;padding:2px 6px}
+.qzg-wing-l,.qzg-wing-r,.qzg-crown,.qzg-spark,.qzg-baby-shell,.qzg-first-card,.qzg-brief,.qzg-crack-glow,.qzg-crack-dot,.qzg-crown-gem{transform-box:fill-box;transform-origin:center}
+.qzg-stage-card:hover .qzg-character-egg,.qzg-stage-card:focus-visible .qzg-character-egg{animation:qzgEggPeek .62s var(--ease)}
+.qzg-stage-card:hover .qzg-character-egg .qzg-crack-glow,.qzg-stage-card:focus-visible .qzg-character-egg .qzg-crack-glow{animation:qzgCrackLight .62s ease-out}
+.qzg-stage-card:hover .qzg-character-egg .qzg-crack-dot,.qzg-stage-card:focus-visible .qzg-character-egg .qzg-crack-dot{animation:qzgDetailPop .62s ease-out}
+.qzg-stage-card:hover .qzg-character-baby,.qzg-stage-card:focus-visible .qzg-character-baby{animation:qzgBabyHello .62s cubic-bezier(.34,1.56,.64,1)}
+.qzg-stage-card:hover .qzg-character-baby .qzg-baby-shell-l,.qzg-stage-card:focus-visible .qzg-character-baby .qzg-baby-shell-l{animation:qzgShellL .62s var(--ease)}
+.qzg-stage-card:hover .qzg-character-baby .qzg-baby-shell-r,.qzg-stage-card:focus-visible .qzg-character-baby .qzg-baby-shell-r{animation:qzgShellR .62s var(--ease)}
+.qzg-stage-card:hover .qzg-character-youth .qzg-wing-l,.qzg-stage-card:focus-visible .qzg-character-youth .qzg-wing-l{animation:qzgWingL .52s ease-in-out 2}
+.qzg-stage-card:hover .qzg-character-youth .qzg-wing-r,.qzg-stage-card:focus-visible .qzg-character-youth .qzg-wing-r{animation:qzgWingR .52s ease-in-out 2}
+.qzg-stage-card:hover .qzg-character-youth .qzg-first-card,.qzg-stage-card:focus-visible .qzg-character-youth .qzg-first-card{animation:qzgCardPeek .72s cubic-bezier(.34,1.56,.64,1)}
+.qzg-stage-card:hover .qzg-character-adult,.qzg-stage-card:focus-visible .qzg-character-adult{animation:qzgAdultNod .72s var(--ease)}
+.qzg-stage-card:hover .qzg-character-adult .qzg-brief,.qzg-stage-card:focus-visible .qzg-character-adult .qzg-brief{animation:qzgBriefReady .72s var(--ease)}
+.qzg-stage-card:hover .qzg-character-legend .qzg-crown,.qzg-stage-card:focus-visible .qzg-character-legend .qzg-crown{animation:qzgCrownRise .72s cubic-bezier(.34,1.56,.64,1)}
+.qzg-stage-card:hover .qzg-character-legend .qzg-spark,.qzg-stage-card:focus-visible .qzg-character-legend .qzg-spark{animation:qzgSparkTwinkle .62s ease-in-out 2}.qzg-stage-card:hover .qzg-character-legend .qzg-spark-r{animation-delay:.12s}
+.qzg-stage-card:hover .qzg-character-legend .qzg-legend-halo,.qzg-stage-card:focus-visible .qzg-character-legend .qzg-legend-halo{transform-box:fill-box;transform-origin:center;animation:qzgHaloTurn 2.8s linear infinite}
+.qzg-stage-card:hover .qzg-character-legend .qzg-crown-gem,.qzg-stage-card:focus-visible .qzg-character-legend .qzg-crown-gem{animation:qzgGemGlow .72s ease-in-out 2}
+@keyframes qzgAtlasIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes qzgEggPeek{0%,100%{transform:rotate(0)}24%{transform:rotate(-4deg)}52%{transform:rotate(4deg)}76%{transform:rotate(-2deg)}}
+@keyframes qzgCrackLight{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.58;transform:scale(1.08)}}
+@keyframes qzgDetailPop{0%,100%{transform:scale(1)}50%{transform:scale(1.8)}}
+@keyframes qzgBabyHello{0%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(-7px) scale(1.04,.96)}70%{transform:translateY(1px) scale(.98,1.02)}}
+@keyframes qzgShellL{0%,100%{transform:rotate(0) translate(0,0)}50%{transform:rotate(-6deg) translate(-2px,2px)}}@keyframes qzgShellR{0%,100%{transform:rotate(0) translate(0,0)}50%{transform:rotate(6deg) translate(2px,2px)}}
+@keyframes qzgWingL{0%,100%{transform:rotate(0)}50%{transform:rotate(24deg)}}@keyframes qzgWingR{0%,100%{transform:rotate(0)}50%{transform:rotate(-24deg)}}
+@keyframes qzgCardPeek{0%,100%{transform:translate(0,0) rotate(0)}48%{transform:translate(3px,-5px) rotate(4deg)}}
+@keyframes qzgAdultNod{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-3px) rotate(-1.5deg)}70%{transform:translateY(0) rotate(1deg)}}
+@keyframes qzgBriefReady{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(3px,-3px) rotate(7deg)}}
+@keyframes qzgCrownRise{0%,100%{transform:translateY(0) scale(1)}48%{transform:translateY(-5px) scale(1.08)}}
+@keyframes qzgSparkTwinkle{0%,100%{transform:scale(1) rotate(0);opacity:.55}50%{transform:scale(1.45) rotate(45deg);opacity:1}}
+@keyframes qzgHaloTurn{to{transform:rotate(360deg)}}@keyframes qzgGemGlow{0%,100%{filter:none;transform:scale(1)}50%{filter:drop-shadow(0 0 3px #FFF6C9);transform:scale(1.25)}}
+@media (prefers-reduced-motion:reduce){.qzg-atlas,.qzg-stage-card,.qzg-stage-card *{animation:none!important;transition:none!important}.qzg-atlas-toggle{transition:none}}
+@media (max-width:760px){.qzg-atlas-toggle{margin-left:0}.qzg-stage-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:3px 2px 9px}.qzg-stage-track::before{display:none}.qzg-stage-card{flex:0 0 152px;scroll-snap-align:start}}
+@media (max-width:640px){ .qzg{flex-direction:column;align-items:flex-start;gap:12px;padding:16px} .qzg-art{width:72px} .qzg-atlas{padding:16px 12px 12px}.qzg-atlas-head{margin-bottom:12px} }

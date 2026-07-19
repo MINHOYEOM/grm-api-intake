@@ -129,7 +129,8 @@
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}findings/index.html">찾아보기</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a><a href="{{ rel_root }}glossary/index.html">용어사전</a><a href="{{ rel_root }}quiz/index.html">주간 퀴즈</a><a href="{{ rel_root }}guide/index.html">이용안내</a></div>
+    {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
+    <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}findings/index.html">찾아보기</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a><a href="{{ rel_root }}glossary/index.html">용어사전</a><a href="{{ rel_root }}quiz/index.html">주간 퀴즈</a><a href="{{ rel_root }}guide/index.html">이용안내</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">마이페이지</a>{% endif %}</div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
     <div><h5>안내</h5><a href="{{ notice_href }}">AI 자동 생성 고지</a><a href="{{ notice_href }}">원문 확인 안내</a></div>
   </div>

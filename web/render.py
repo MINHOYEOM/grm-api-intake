@@ -1413,14 +1413,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write_json(dist_assets / "search-index.json", search_index)
     written.append("assets/search-index.json")
 
-    # 내 스크랩(마이페이지) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
-    # 로그인 게이트·개인화라 sitemap/canonical 제외(비색인). 목록은 런타임에 reactions.js 가
-    # Supabase 스크랩 + search-index.json 으로 렌더(정적 셸·콘텐츠 골든 불침범).
+    # 마이페이지(/me) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
+    # 개인화 페이지라 sitemap/canonical 제외(비색인). 스크랩·관심 업체는 reactions.js 가,
+    # 구름이 성장 현황은 growth.js 가 런타임 렌더(정적 셸·콘텐츠 골든 불침범).
+    # nav_active="me" — nav 6탭 중 어느 것도 이 페이지를 대표하지 않으므로 아무 탭도 켜지
+    # 않는다(13차 이전엔 "board"라 무관한 '모아보기'가 활성으로 보였다).
     if env.globals.get("reactions_enabled"):
         me_html = env.get_template("me.html").render(
-            page_title="내 스크랩 · GRM",
+            page_title="마이페이지 · GRM",
             rel_root="../",
-            nav_active="board",
+            nav_active="me",
             latest_slug=latest_slug,
         )
         _write(out_dir / "me" / "index.html", me_html)

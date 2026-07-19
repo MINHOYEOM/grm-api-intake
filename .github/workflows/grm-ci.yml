@@ -29,6 +29,7 @@ jobs:
             collect_hc.py collect_search.py grm_common.py grm_cli.py \
             grm_health.py grm_taxonomy.py grm_notion.py grm_handoff.py \
             inject_slots.py deep_analysis_fanout.py \
-            brief_lint.py verify_published_brief.py card_scaffold.py
+            brief_lint.py verify_published_brief.py card_scaffold.py \
+            library_linkcheck.py
       - name: unittest
         run: python -m unittest discover -s tests -v

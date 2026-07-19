@@ -1,0 +1,92 @@
+name: GRM Library Link Health
+
+on:
+  schedule:
+    - cron: '43 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      delay:
+        description: 'Delay before every HTTP request (seconds)'
+        default: '1.0'
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: grm-library-linkcheck
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: main
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Check every library URL
+        env:
+          CHECK_DELAY: ${{ inputs.delay || '1.0' }}
+        run: python library_linkcheck.py --delay "$CHECK_DELAY"
+      - name: Commit health snapshot only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- web/data/library_health.json
+          if git diff --cached --quiet; then
+            echo "No health snapshot change"
+          else
+            git commit -m "chore: refresh library link health"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Create/update broken-link issue
+        if: always()
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'web/data/library_health.json';
+            if (!fs.existsSync(path)) throw new Error('library_health.json missing');
+            const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const broken = Object.entries(report.urls)
+              .filter(([, value]) => value.status === 'broken');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM 자료실 링크 헬스 경고';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
+            });
+            const existing = issues.find(issue => issue.title === title);
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: 'automation-warning' });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner, repo, name: 'automation-warning',
+                color: 'fbca04', description: 'GRM automation warning' });
+            }
+            if (!broken.length) {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `링크 헬스체크가 정상화되었습니다. Broken 0건.\n\n- Run: ${runUrl}` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+              return;
+            }
+            const rows = broken.slice(0, 50).map(([url, value]) =>
+              `- ${value.http_status || '000'} [${url}](${url}) — ${value.references.map(r => `${r.file}:${r.item_id}:${r.field}`).join(', ')}`);
+            const body = [`Broken 링크 **${broken.length}건**이 탐지되었습니다. 자동 수정하지 않았습니다.`, '', ...rows,
+              broken.length > 50 ? `\n(나머지 ${broken.length - 50}건은 library_health.json 참조)` : '', '', `- Run: ${runUrl}`].join('\n');
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body, labels: ['automation-warning'] });
+            }

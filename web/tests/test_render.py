@@ -4865,6 +4865,9 @@ class WebGurumiPetTest(unittest.TestCase):
     def test_sitewide_pet_markup_and_assets_present(self):
         self.assertIn('id="grm-pet"', self.landing)
         self.assertIn('id="grm-pet-panel"', self.landing)
+        self.assertIn('class="grm-pet-face-rig"', self.landing)
+        self.assertIn('id="grm-pet-state-chip"', self.landing)
+        self.assertIn('id="grm-pet-state-name"', self.landing)
         self.assertIn('assets/pet.js?v=', self.landing)
         self.assertIn('assets/pet.css?v=', self.landing)
         self.assertIn('assets/gurumi-egg.png', self.landing)
@@ -4883,6 +4886,14 @@ class WebGurumiPetTest(unittest.TestCase):
         for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket"):
             self.assertNotIn(banned, self.pet_js)
         self.assertIn('"grm-gurumi-growth"', self.pet_js)
+        self.assertIn('"grm-gurumi-position-v1"', self.pet_js)
+        self.assertIn('addEventListener("pointermove"', self.pet_js)
+        self.assertIn('e.key === "ArrowLeft"', self.pet_js)
+        self.assertIn('className = "grm-pet-docks"', self.pet_js)
+        self.assertIn('function setDock(', self.pet_js)
+        self.assertIn('data-pet-state', self.pet_js)
+        self.assertIn('is-blink', self.pet_js)
+        self.assertIn('id="grm-pet-reset-pos"', self.landing)
         self.assertIn("prefers-reduced-motion", self.pet_js)
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 

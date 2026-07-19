@@ -44,36 +44,8 @@ RESOURCE_FIXTURES = TESTS_DIR / "fixtures" / "resources"
 DATA_DIR = WEB_DIR / "data" / "briefs"                       # 라이브 발행 디렉터리(스모크 렌더 전용)
 REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 
-__all__ = [
-    "WebRenderGoldenTest",
-    "WebLiveBriefsRenderSmokeTest",
-    "WebRenderStructureTest",
-    "WebRenderFidelityTest",
-    "WebRenderDeterminismTest",
-    "WebRenderPurityTest",
-    "WebRenderHardeningTest",
-    "WebAdminRenderTest",
-    "WebSearchIndexTest",
-    "WebFindingsRenderTest",
-    "WebTrendsRenderTest",
-    "WebFirmRenderTest",
-    "WebLibraryRenderTest",
-    "WebGuideRenderTest",
-    "WebGlossaryRenderTest",
-    "WebGlossaryDeepFieldsTest",
-    "WebFirmWatchlistTest",
-    "WebKoreanSafetyTest",
-    "WebSeoMetaTest",
-    "WebDeterministicDetailTest",
-    "WebFda483DeterministicDetailTest",
-    "WebFda483DeepAnalysisTest",
-    "WebMonoLabelsContractTest",
-    "WebBriefFirmLinkTest",
-    "WebResourceNotesRenderTest",
-    "WebResourceNotesGoldenInvarianceTest",
-    "WebGurumiPetTest",
-    "WebPopularCardsTest",
-]
+# CI shim(tests/test_web_render.py)은 이 모듈의 TestCase 하위클래스를 **전수 자동** 수집한다.
+# (예전엔 __all__ 수동 목록이라 새 클래스를 적는 걸 잊으면 CI 에서 조용히 실행되지 않았다.)
 
 
 # ── 빌드 헬퍼 (테스트·freeze 공용 — 동일 입력 보장) ───────────────────────────

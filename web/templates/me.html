@@ -1,13 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
+{#- 개인 홈 /me (13차 G2) — 로그인 사용자의 스크랩·구름이·관심 업체를 한 화면에 모은다.
+
+    [비로그인 불침범] 이 페이지는 로그인 게이트가 아니다. 세 섹션 중 구름이는 게스트도
+    localStorage 기록 그대로 보이고(강제 로그인 0), 나머지 둘은 "로그인하면 모입니다"
+    안내로 조용히 폴백한다. 가입 유도는 상단 계정 카드 한 곳에만 두고
+    GRM_AUTH.open({mode:"signup"})(#351 진입점)을 재사용한다 — 새 로그인 UI 발명 0.
+
+    [셸만 정적] 계정 카드·스크랩 목록·관심 업체 목록은 전부 reactions.js 런타임 주입,
+    구름이 패널은 growth.js 런타임 주입(로그인 시 growth-sync.js 가 서버 병합본을
+    localStorage 에 쓰고 grm:gurumi-sync 로 통지 → growth.js 가 재렌더). 서버는 빈
+    컨테이너만 낸다. 신규 RPC·마이그레이션 0(기존 reaction·firm_watchlist·gurumi_growth
+    경로만 사용).
+
+    [스타일 단일원천] .qzg* 패널 CSS 는 주간 퀴즈와 공유한다 — growth.js 가 두 페이지에
+    같은 마크업을 주입하므로 사본을 두면 반드시 어긋난다. templates/growth_panel_style.html
+    를 quiz.html 과 이 파일이 함께 include 한다(그 파일은 quiz.html 에서 잘라낸 원본
+    그대로 — 한 글자도 더하지 않아야 quiz 골든 byte 가 보존된다). -#}
 <main class="wrap" id="grm-me">
   <h1 class="grm-my-h">마이페이지</h1>
+  <p class="grm-my-sub">스크랩한 카드와 구름이, 관심 업체를 한 화면에 모았습니다.</p>
   <div id="grm-me-head" class="grm-me-head"></div>
+
+  {#- 구름이를 스크랩보다 위에 둔다: 로그인 여부와 무관하게 항상 내용이 있는 유일한
+      섹션이라, 처음 들어온 게스트에게 빈 화면 대신 자기 기록을 먼저 보여 준다. -#}
+  <h2 class="grm-my-h2">구름이 성장 현황</h2>
+  <p class="grm-my-sub">주간 퀴즈를 풀면 구름이가 자랍니다. 로그인하지 않아도 이 브라우저에 기록이 쌓여요.</p>
+  <section class="me-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>
+  {#- growth.js 미로드·localStorage 차단 시 위 섹션은 hidden 그대로 남는다 — 제목만 덩그러니
+      남지 않도록 정적 폴백 문단을 두고, 패널이 뜨면 CSS 인접 선택자로 감춘다(JS 0). -#}
+  <p class="grm-my-note me-growth-fb">성장 기록은 이 브라우저에 저장됩니다 — 표시되지 않으면 브라우저에서 저장이 차단된 상태일 수 있어요.</p>
+  <p class="me-growth-go"><a href="{{ rel_root }}quiz/index.html">주간 퀴즈 풀러 가기 →</a></p>
+
   <h2 class="grm-my-h2">내 스크랩</h2>
   <p class="grm-my-sub">관심 있게 저장한 카드를 한곳에 모았습니다.</p>
   <div id="grm-my-scraps" data-index="/assets/search-index.json">
     <p class="grm-my-note">불러오는 중…</p>
   </div>
+
   {#- 관심 업체(015_firm_watchlist.sql) — 스크랩 목록과 동일 관례: 셸은 로딩 노트만,
       목록은 reactions.js(renderMyFirms)가 런타임 렌더. 015 미적용/비로그인 방어도
       스크랩 섹션과 동형(오류처럼 보이지 않는 노트로 조용히 폴백). -#}
@@ -17,4 +47,31 @@
     <p class="grm-my-note">불러오는 중…</p>
   </div>
 </main>
+<style>
+/* [마이페이지] 구름이 패널 스타일은 주간 퀴즈와 공유(단일원천) — 아래 include 가 정본. */
+{% include "growth_panel_style.html" %}
+/* 이 페이지 전용 — 한글 keep-all, grm.css 토큰만(프리즈 보존), 자간/대문자/mono 미사용(§4). */
+#grm-me{word-break:keep-all}
+.me-growth{margin:2px 0 0}
+.me-growth[hidden]{display:none}
+/* 패널이 실제로 뜨면 정적 폴백 문단은 숨긴다(중복 안내 방지) — 순수 CSS, JS 관여 0. */
+.me-growth:not([hidden]) + .me-growth-fb{display:none}
+.me-growth-fb{margin:6px 0 0}
+.me-growth-go{margin:12px 0 0}
+.me-growth-go a{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.me-growth-go a:hover{color:var(--coral)}
+/* 게스트 계정 카드 — 로그인 카드(.grm-me-card)와 같은 골격에 안내문 + CTA 2개. */
+.grm-me-guest-s{font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);margin:6px 0 0}
+.grm-me-guest .grm-me-metaline{flex-wrap:wrap;margin-top:10px}
+.grm-me-guest .grm-acct-av-xl .ti{font-size:24px}
+.grm-me-signup{font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;background:var(--coral,#C2603F);border:0;border-radius:var(--rad-s,8px);padding:9px 16px;cursor:pointer}
+.grm-me-signup:hover{background:var(--coral-2,#A14B30)}
+@media (max-width:640px){ .grm-me-guest{align-items:flex-start} }
+</style>
+{% endblock %}
+{% block scripts %}
+{#- 구름이 패널 — 주간 퀴즈와 같은 자산을 그대로 재사용한다(#grm-growth 자리표시자만 있으면
+    동작). 이 페이지엔 .qz-choice 가 없어 채점 관찰 리스너는 자연히 무동작이고, 서버 동기화
+    (growth-sync.js)는 base.html reactions 게이트에서 이미 전 페이지에 로드된다. -#}
+<script src="/assets/growth.js?v={{ growthjs_ver }}" defer></script>
 {% endblock %}

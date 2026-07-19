@@ -3393,6 +3393,159 @@ class WebFirmWatchlistTest(unittest.TestCase):
         self.assertIn('.replace(/&#039;/g, "\'")', fn)
 
 
+class WebMePageTest(unittest.TestCase):
+    """개인 홈 /me (13차 G2) — 스크랩·구름이 성장 현황·관심 업체를 한 화면에.
+
+    핵심 계약 두 가지를 고정한다:
+      (1) **비로그인 불침범** — /me 는 로그인 게이트가 아니다. 게스트로 들어와도 페이지가
+          깨지지 않고, 구름이 섹션은 localStorage 기록 그대로 보이며, 로그인은 유도만 한다.
+      (2) **구름이 패널 CSS 단일원천** — growth.js 가 퀴즈/마이페이지 두 곳에 같은 마크업을
+          주입하므로 .qzg* 스타일 사본이 생기면 반드시 어긋난다. 두 템플릿이 같은 partial 을
+          include 해야 한다(그 partial 은 quiz.html 에서 잘라낸 원본 그대로 — 한 글자라도
+          달라지면 quiz 골든이 깨진다).
+
+    me/index.html 은 reactions env-gate 뒤에서만 생성되므로(기존 관례) env-on 빌드로 본다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_me_"))
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = cls._tmp / "on"
+            render.render_site(SINGLE_FIXTURES, out)
+            cls.me = (out / "me" / "index.html").read_text(encoding="utf-8")
+            cls.landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+        cls.off = cls._tmp / "off"
+        _build_single(cls.off)
+        cls.landing_off = (cls.off / "index.html").read_text(encoding="utf-8")
+        cls.me_tmpl = (WEB_DIR / "templates" / "me.html").read_text(encoding="utf-8")
+        cls.quiz_tmpl = (WEB_DIR / "templates" / "quiz.html").read_text(encoding="utf-8")
+        cls.partial = (WEB_DIR / "templates" / "growth_panel_style.html").read_text(encoding="utf-8")
+        cls.reactions_js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_title_and_no_nav_tab_activated(self):
+        """스크랩 전용에서 개인 홈으로 넓어져 제목도 '마이페이지'. nav 6탭 중 어느 것도 이
+        페이지를 대표하지 않으므로 아무 탭도 켜지 않는다(이전엔 nav_active='board' 라
+        무관한 '모아보기'가 활성으로 보였다)."""
+        self.assertIn("<title>마이페이지 · GRM</title>", self.me)
+        self.assertIn('<h1 class="grm-my-h">마이페이지</h1>', self.me)
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.me, _re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertNotIn('class="on"', nav_m.group(1), "/me 에서 무관한 nav 탭이 활성화됨")
+
+    def test_three_sections_present_in_order(self):
+        """구름이를 스크랩보다 위에 둔다 — 로그인 여부와 무관하게 항상 내용이 있는 유일한
+        섹션이라, 처음 들어온 게스트에게 빈 화면 대신 자기 기록을 먼저 보여 준다."""
+        for h in ("구름이 성장 현황", "내 스크랩", "관심 업체"):
+            self.assertIn(f'<h2 class="grm-my-h2">{h}</h2>', self.me)
+        gurumi = self.me.index("구름이 성장 현황")
+        scraps = self.me.index('<h2 class="grm-my-h2">내 스크랩</h2>')
+        firms = self.me.index('<h2 class="grm-my-h2">관심 업체</h2>')
+        self.assertTrue(gurumi < scraps < firms, "섹션 순서(구름이→스크랩→관심 업체) 불일치")
+        self.assertIn('id="grm-my-scraps"', self.me)
+        self.assertIn('id="grm-my-firms"', self.me)
+
+    def test_growth_placeholder_and_script_wired(self):
+        """셸은 hidden 자리표시자 1줄만 — 마크업·수치는 전부 growth.js 런타임 주입
+        (퀴즈 페이지와 동일 계약). 서버 동기화(growth-sync.js)는 base.html reactions
+        게이트에서 이미 전 페이지에 로드되므로 여기서 또 싣지 않는다."""
+        self.assertIn(
+            '<section class="me-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>',
+            self.me)
+        import re as _re
+        self.assertIsNotNone(_re.search(r'assets/growth\.js\?v=([0-9a-f]{8})"', self.me),
+                             "growth.js 캐시버스팅 해시 미발견")
+        self.assertEqual(self.me.count("assets/growth.js"), 1)
+        self.assertIn("assets/growth-sync.js", self.me)   # base.html 게이트에서 1회
+
+    def test_growth_panel_css_single_source_shared_with_quiz(self):
+        """.qzg* 규칙은 partial 하나에만 존재하고, quiz.html·me.html 이 그것을 include 한다.
+        어느 한쪽이 사본을 인라인하면 growth.js 가 주입하는 같은 마크업이 두 페이지에서
+        다르게 보이기 시작한다."""
+        inc = '{% include "growth_panel_style.html" %}'
+        self.assertIn(inc, self.quiz_tmpl)
+        self.assertIn(inc, self.me_tmpl)
+        self.assertIn(".qzg{", self.partial)
+        self.assertIn(".qzg-atlas{", self.partial)
+        for tmpl, name in ((self.quiz_tmpl, "quiz.html"), (self.me_tmpl, "me.html")):
+            self.assertNotIn(".qzg{", tmpl, f"{name} 에 .qzg 사본 인라인(단일원천 위반)")
+        # 두 페이지 렌더 출력엔 동일한 규칙이 실제로 실려야 한다.
+        quiz_html = (self.off / "quiz" / "index.html").read_text(encoding="utf-8")
+        for rule in (".qzg{", ".qzg-atlas{", ".qzg-stage-card{"):
+            self.assertIn(rule, quiz_html, f"quiz 출력에 {rule} 누락")
+            self.assertIn(rule, self.me, f"me 출력에 {rule} 누락")
+
+    def test_guest_is_not_gated_and_sees_own_gurumi(self):
+        """비로그인도 페이지가 깨지지 않아야 한다 — 정적 셸에 로그인 강제/차단 마크업이 없고,
+        구름이 자리표시자는 세션과 무관하게 존재한다(growth.js 는 localStorage 만 읽는다)."""
+        self.assertIn('id="grm-growth"', self.me)
+        self.assertIn("로그인하지 않아도 이 브라우저에 기록이 쌓여요", self.me)
+        # 게스트 카드는 런타임 주입이지만, 정적 셸이 로그인 없이는 못 보게 막지 않는다.
+        self.assertNotIn("로그인이 필요합니다", self.me)
+        self.assertNotIn("로그인 후 이용", self.me)
+
+    def test_guest_head_card_uses_shared_signup_entry(self):
+        """게스트 계정 카드는 가입 CTA 를 한 곳에만 두고, 진입점은 #351 의 기존
+        openLogin({mode:"signup"}) 을 재사용한다 — 새 인증 UI 발명 0."""
+        self.assertIn("function renderMeGuestHead(head)", self.reactions_js)
+        fn = self.reactions_js[self.reactions_js.index("function renderMeGuestHead(head)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("가입하고 시작하기", fn)
+        self.assertIn("이미 계정이 있어요 · 로그인", fn)
+        self.assertIn('openLogin({ mode: "signup" })', fn)
+        # 비로그인 분기가 빈 카드로 남지 않는다(13차 이전 동작 회귀 방지).
+        head_fn = self.reactions_js[self.reactions_js.index("function renderMeHead(count)"):]
+        head_fn = head_fn[:head_fn.index("\n  }")]
+        self.assertIn("renderMeGuestHead(head); return;", head_fn)
+        self.assertNotIn('head.innerHTML = ""; return;', head_fn)
+
+    def test_login_cta_not_duplicated_across_sections(self):
+        """같은 화면에 로그인 버튼이 여러 개 뜨지 않게, 스크랩 섹션의 비로그인 버튼은
+        제거하고 상단 게스트 카드 하나로 모았다(문구 안내는 유지)."""
+        self.assertNotIn('className = "grm-my-login"', self.reactions_js)
+        self.assertIn("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+
+    def test_growth_fallback_note_hidden_by_css_when_panel_renders(self):
+        """growth.js 미로드·localStorage 차단 시 제목만 덩그러니 남지 않도록 정적 폴백
+        문단을 두고, 패널이 뜨면 인접 선택자로 감춘다(JS 관여 0)."""
+        self.assertIn('<p class="grm-my-note me-growth-fb">', self.me)
+        self.assertIn(".me-growth:not([hidden]) + .me-growth-fb{display:none}", self.me)
+
+    def test_entry_point_footer_only_and_env_gated(self):
+        """진입점은 헤더 계정 메뉴(로그인 시)와 footer(상시) 두 곳 — nav 탭은 늘리지 않는다.
+        footer 링크는 me/index.html 과 같은 env-gate 로 묶어, env-off 빌드에서 404 링크가
+        남지 않고 전 페이지 골든 byte-diff 가 0 이 되게 한다."""
+        self.assertIn('<a href="me/index.html">마이페이지</a>', self.landing_on)
+        self.assertNotIn("마이페이지", self.landing_off)   # env-off = 링크 자체가 없다
+        # nav 탭 수는 그대로 6개(과밀 금지).
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
+        self.assertEqual(nav_m.group(1).count("<a "), 6)
+        self.assertNotIn("마이페이지", nav_m.group(1))
+        # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
+        self.assertIn('<i class="ti ti-bookmark" aria-hidden="true"></i>마이페이지</a>',
+                      self.reactions_js)
+
+    def test_no_new_backend_surface(self):
+        """신규 RPC·마이그레이션 0 — 기존 reaction·firm_watchlist·gurumi_growth 경로만
+        쓴다. me.html 셸 자체는 네트워크 호출을 하지 않는다(전부 기존 자산 소관)."""
+        self.assertNotIn("/rest/v1/rpc/", self.me_tmpl)
+        self.assertNotIn("fetch(", self.me_tmpl)
+        self.assertNotIn("<script>", self.me_tmpl)   # 인라인 스크립트 0
+        for table in ('from("reaction")', 'from("firm_watchlist")'):
+            self.assertIn(table, self.reactions_js)
+
+
 # ── 하드닝 (스킴·링크상태·면책·중복일자·방어필터·다크밴드 — 적대적 리뷰 보강) ──
 def _card(render_order: int = 0, **ov) -> dict:
     c = {

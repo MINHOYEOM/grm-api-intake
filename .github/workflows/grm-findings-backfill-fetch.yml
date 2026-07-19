@@ -10,9 +10,9 @@ name: GRM Findings Backfill Fetch (F2b/F2c)
 #   - workflow_dispatch (F2b, manual): human picks source/offset/max_docs/dry_run.
 #   - schedule, or dispatch with auto=true (F2c, unattended): collect_fda_backfill.py
 #     --auto computes everything itself -- offset per source = count of already-
-#     collected document_ids, 483 first then WL, at most ONE source actually
-#     fetches documents per run (fda.gov request budget), and WL is only attempted
-#     when 483 found nothing new. Once BOTH backlogs are exhausted the run exits
+#     collected document_ids, scans forward through cheap existing/gated rows,
+#     fetches up to a bounded real-document budget, and attempts WL only after 483
+#     is exhausted. Once BOTH backlogs are exhausted the run exits
 #     cleanly after a couple of list requests with auto_complete=true in the
 #     report -- no document fetches, no wasted work. Leaving the daily cron
 #     enabled after backfill completes is therefore harmless and INTENTIONAL: it
@@ -36,7 +36,10 @@ on:
   # daily collection cron (grm-intake.yml, 18:17 UTC) so the two workflows never
   # share the same fda.gov request-budget window.
   schedule:
-    - cron: '17 7 * * *'
+    # Three bounded runs/day. With 300 real fetches/run and mandatory 30s delay,
+    # worst-case fetch sleeping is 150 minutes/run; these windows stay clear of
+    # the 18:17 UTC daily intake job.
+    - cron: '17 0,6,12 * * *'
   workflow_dispatch:
     inputs:
       source:
@@ -106,10 +109,10 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto }}" = "true" ]; then
             # F2c auto mode: never uses the manual source/offset dispatch inputs
             # (on schedule they are empty anyway). The collector computes each
-            # source's offset itself and fetches at most one source's chunk; when
+            # source's scan position and enforces a real-document fetch budget; when
             # both backlogs are exhausted it exits 0 after a couple of list
             # requests with auto_complete=true (cheap steady state -- see header).
-            ARGS=(--auto --max-docs 500 --delay 30 --output fetch_report.json)
+            ARGS=(--auto --max-docs 100 --auto-fetch-budget 300 --delay 30 --output fetch_report.json)
           else
             ARGS=(--source "${{ inputs.source }}"
                   --offset "${{ inputs.offset }}"

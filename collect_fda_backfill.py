@@ -16,10 +16,10 @@ and appends new `raw_signals` rows directly to Supabase -- Notion is never touch
 weekly brief queue must not see backfill noise). MFDS/nedrug is out of scope (robots
 Disallow: /).
 
-F2c adds an unattended `--auto` mode on top (daily cron): no --source/--offset needed --
-the run computes each source's resume offset from the count of already-collected
-document_ids, works through at most ONE source's chunk per run (fda.gov request budget),
-falls through 483 -> WL only when 483 found nothing new, and once both backlogs are
+F2c adds an unattended `--auto` mode on top: no --source/--offset needed -- the run
+scans list pages from the head (existing/gated rows require no document GET), continues
+until a bounded real-document fetch budget, falls through 483 -> WL when 483 is
+exhausted, and once both backlogs are
 exhausted it exits cleanly after just the list requests with `auto_complete=true` -- so
 leaving the daily cron enabled forever is harmless and doubles as a safety net for any
 old documents that appear outside the daily collection window. See `run_auto`.
@@ -129,6 +129,8 @@ class BackfillFetchReport:
     errors: list[str] = field(default_factory=list)
     next_offset: int = 0
     exhausted: bool = False
+    source_total: int | None = None
+    remaining: int | None = None
     # dry-run only: first 10 document_ids that *would* be fetched (populated only when
     # --dry-run; empty list otherwise so the schema stays stable either way).
     would_fetch: list[str] = field(default_factory=list)
@@ -299,6 +301,9 @@ def run_483(
 
     report.listed = len(nrows)
     report.next_offset = offset + len(raw_rows)
+    if isinstance(total, (int, float)):
+        report.source_total = int(total)
+        report.remaining = max(int(total) - report.next_offset, 0)
     if len(raw_rows) < max_docs:
         report.exhausted = True
     elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
@@ -563,6 +568,9 @@ def run_wl(
 
     report.listed = len(nrows)
     report.next_offset = offset + len(raw_rows)
+    if isinstance(total, (int, float)):
+        report.source_total = int(total)
+        report.remaining = max(int(total) - report.next_offset, 0)
     if len(raw_rows) < max_docs:
         report.exhausted = True
     elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
@@ -643,9 +651,9 @@ _AUTO_SOURCES: tuple[tuple[str, str], ...] = (
     ("fda483", SOURCE_FDA_483),
     ("fda_wl", SOURCE_FDA_WL),
 )
-# Hard cap on offset += max_docs re-reads per source per run (overshoot recovery) --
-# prevents any possibility of an unbounded list-request loop against fda.gov.
-_AUTO_MAX_OFFSET_ADVANCES = 3
+# Defensive cap for malformed/non-advancing listing responses. Normal termination is
+# exhaustion or the real-document fetch budget, not this cap.
+_AUTO_MAX_PAGES = 100
 
 
 def _auto_no_new(report: BackfillFetchReport) -> bool:
@@ -680,21 +688,19 @@ def run_auto(
     dry_run: bool,
     base_url: str,
     service_key: str,
+    fetch_budget: int = 300,
     sleeper: Sleeper | None = None,
 ) -> tuple[dict[str, Any], int]:
     """One unattended backfill chunk (deterministic; designed for a daily cron).
 
     Per source (483 first, then WL):
-      1. offset = len(existing document_ids for that source). The listing is
-         newest-first, so skipping that many lands near the start of the uncollected
-         tail; exactness is not required because skip_existing absorbs drift.
-      2. If the window came back all-skip_existing and not exhausted (offset overshot
-         into already-collected territory), advance offset by max_docs and retry the
-         same source -- at most _AUTO_MAX_OFFSET_ADVANCES advances per run.
-      3. Budget cap: at most ONE source does real document fetching per run (fda.gov
-         daily request budget). As soon as a source finds anything new (fetched/
-         appended >= 1, or would_fetch under --dry-run), stop -- the next source
-         continues tomorrow. Only fall through 483 -> WL when 483 found nothing new.
+      1. Start each source at offset zero and scan forward. Existing/gated rows need
+         no document GET, so they are cheap; this avoids confusing stored-row count
+         with a durable cursor.
+      2. Continue through list pages until source exhaustion or the bounded real-
+         document fetch budget. Every list/document request still sleeps `delay` first.
+      3. Fall through 483 -> WL only after 483 exhaustion. Dry-run stops at the first
+         page that would fetch documents so it remains a cheap probe.
       4. auto_complete=true only when every source was attempted and each ended
          exhausted-with-nothing-new: the whole backlog is done and this run cost only
          a couple of list requests. Leaving the cron enabled in that steady state is
@@ -709,6 +715,8 @@ def run_auto(
     """
     attempts: list[BackfillFetchReport] = []
     order: list[str] = []
+    transitions: list[str] = []
+    existing_counts: dict[str, int] = {}
     exit_code = 0
     caught_up_all = True
 
@@ -723,25 +731,37 @@ def run_auto(
             exit_code = 2
             caught_up_all = False
             break
+        existing_counts[cli_name] = len(existing_ids)
 
         runner = _RUNNERS[cli_name]
-        offset = len(existing_ids)
-        advances = 0
-        while True:
+        # Always scan from the head. Existing/gated rows require no document GET, so
+        # this costs one politely delayed list request per page and avoids treating
+        # raw row count as a cursor (invalid for WL because many rows are gated out).
+        offset = 0
+        source_fetched = 0
+        pages = 0
+        while pages < _AUTO_MAX_PAGES:
             report, code = runner(
                 offset=offset, max_docs=max_docs, delay=delay, dry_run=dry_run,
                 base_url=base_url, service_key=service_key, sleeper=sleeper,
                 existing_ids=existing_ids,
             )
             attempts.append(report)
+            pages += 1
             if code != 0:
                 exit_code = code
                 break
-            if _auto_offset_overshot(report) and advances < _AUTO_MAX_OFFSET_ADVANCES:
-                advances += 1
-                offset += max_docs
-                continue
-            break
+            source_fetched += report.fetched
+            if report.exhausted or report.next_offset <= offset:
+                break
+            if dry_run and report.would_fetch:
+                break
+            if not dry_run and source_fetched >= fetch_budget:
+                transitions.append(
+                    f"{cli_name}:fetch_budget_reached:{source_fetched}/{fetch_budget}"
+                )
+                break
+            offset = report.next_offset
 
         if exit_code != 0:
             caught_up_all = False
@@ -749,8 +769,11 @@ def run_auto(
         last = attempts[-1]
         if not _auto_caught_up(last):
             caught_up_all = False
-        if not _auto_no_new(last):
-            # Budget cap: this source did (or, dry-run, would do) the day's real work.
+        if last.exhausted and cli_name != _AUTO_SOURCES[-1][0]:
+            transitions.append(f"{cli_name}:exhausted->fda_wl")
+        if (dry_run and any(r.would_fetch for r in attempts if r.source == cli_name)) or (
+            not dry_run and source_fetched >= fetch_budget
+        ):
             break
 
     auto_complete = caught_up_all and exit_code == 0 and len(order) == len(_AUTO_SOURCES)
@@ -772,10 +795,33 @@ def run_auto(
         "next_offset": last.next_offset,
         "exhausted": last.exhausted,
         "would_fetch": [d for r in attempts for d in r.would_fetch][:10],
+        "source_total": last.source_total,
+        "remaining": last.remaining,
         # F2c additive fields.
         "auto": True,
         "auto_source_order": order,
         "auto_complete": auto_complete,
+        "auto_fetch_budget": fetch_budget,
+        "auto_transitions": transitions,
+        "source_progress": {
+            name: {
+                "existing_before": existing_counts.get(name, 0),
+                "listed_through": max(
+                    (r.next_offset for r in attempts if r.source == name), default=0
+                ),
+                "total": next(
+                    (r.source_total for r in reversed(attempts)
+                     if r.source == name and r.source_total is not None), None
+                ),
+                "remaining": next(
+                    (r.remaining for r in reversed(attempts)
+                     if r.source == name and r.remaining is not None), None
+                ),
+                "fetched": sum(r.fetched for r in attempts if r.source == name),
+                "appended": sum(r.appended for r in attempts if r.source == name),
+            }
+            for name in order
+        },
         "auto_attempts": [asdict(r) for r in attempts],
     }
     return merged, exit_code
@@ -792,6 +838,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--source", choices=("fda483", "fda_wl"))
     parser.add_argument("--offset", type=int, default=None)  # manual mode default: 0
     parser.add_argument("--max-docs", type=int, default=200)
+    parser.add_argument(
+        "--auto-fetch-budget", type=int, default=300,
+        help="Auto mode only: maximum real document fetches per source/run; list pages "
+        "continue until this budget or source exhaustion (default: 300).",
+    )
     parser.add_argument(
         "--auto", action="store_true", default=False,
         help="F2c unattended mode (daily cron): computes offset per source from the "
@@ -843,6 +894,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.auto:
         report_dict, exit_code = run_auto(
             max_docs=args.max_docs, delay=args.delay,
+            fetch_budget=args.auto_fetch_budget,
             dry_run=args.dry_run, base_url=base, service_key=key,
         )
     else:

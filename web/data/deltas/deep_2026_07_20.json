@@ -1,211 +1,259 @@
 {
- "fda483-193675": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "observation": "품질시스템 항목으로, 자사 SOP QA200-07.02 Vendor Audits(시행일 2020-08-19)가 공급업체 적격성 평가의 일부로 서면감사(paper audit) 수행을 요구하고 있음에도, 완제의약품 제조에 사용되는 원자재(component) 공급업체에 대해 서면감사가 실시되지 않았다.",
-     "citation": "21 CFR 211.100(b)",
-     "risk": "자사가 정한 공급업체 적격성 평가 절차가 실제로 이행되지 않아, 제조에 투입되는 원자재의 품질 보증 근거가 문서로 성립하지 않는다."
+  "fda483-193675": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "observation": "품질시스템 항목으로, 자사 SOP QA200-07.02 Vendor Audits(시행일 2020-08-19)가 공급업체 적격성 평가의 일부로 서면감사(paper audit) 수행을 요구하고 있음에도, 완제의약품 제조에 사용되는 원자재(component) 공급업체에 대해 서면감사가 실시되지 않았다.",
+          "citation": "21 CFR 211.100(b)",
+          "risk": "자사가 정한 공급업체 적격성 평가 절차가 실제로 이행되지 않아, 제조에 투입되는 원자재의 품질 보증 근거가 문서로 성립하지 않는다."
+        },
+        {
+          "observation": "원자재 공급업체가 사용 전에 품질부서(Quality Unit)에 의해 평가·승인되었음을 입증하는 문서가 없었으며, 실사 중 검토한 모든 원자재 공급업체에 대해 사용 전 평가·승인 문서가 확인되지 않았다.",
+          "citation": "21 CFR 211.22(a)",
+          "risk": "품질부서의 사전 승인 없이 원자재가 제조에 투입될 수 있어, 부적합·미검증 원자재가 완제의약품 품질에 미치는 영향을 통제·추적할 수 없다."
+        },
+        {
+          "observation": "검토 가능한 공급업체 설문서(supplier questionnaire) 작성본이나 감사 문서가 존재하지 않았다.",
+          "risk": "공급업체의 제조·품질관리 수준을 평가한 객관적 근거가 없어, 공급망 리스크를 식별하거나 실사 시 적격성 판단 근거를 제시할 수 없다."
+        },
+        {
+          "observation": "공급업체의 책임 범위나 품질 요구사항(quality expectations)을 규정한 문서가 마련되어 있지 않았다.",
+          "risk": "원자재 규격·일탈 통보·변경 관리 등에 대한 책임 경계가 불명확해, 공급업체 측 변경이나 품질 문제가 적시에 자사 품질시스템으로 유입되지 않을 수 있다."
+        }
+      ],
+      "inspectional_significance": "이 483은 단일 관찰사항이지만, 그 내용이 특정 배치·특정 공급업체에 국한된 단발성(isolated) 결함이 아니라 공급업체 적격성 관리 체계 전반의 미작동을 지적한다는 점에서 체계적(systemic) 성격을 띤다. 실사 중 검토한 '모든' 원자재 공급업체에 대해 사용 전 평가·승인 문서가 없었고, 설문서·감사 문서·공급업체 책임 정의 문서까지 전부 부재하여 자사 SOP(QA200-07.02)가 문서상으로만 존재하고 실제로는 이행되지 않은 상태로 볼 수 있다. 원문 관찰에는 시험결과 조작·기록 소급 수정 등 데이터 무결성(data integrity) 위반을 직접 시사하는 서술은 없으며, 결함의 성격은 '요구 문서의 부재(미실시)'에 가깝다. 다만 품질부서의 원자재 승인 기능이 작동하지 않은 것은 cGMP 품질시스템의 근간에 해당하므로, 회신이 불충분하거나 시정이 지연될 경우 Warning Letter로 승격될 가능성이 있으며, 해외 제조소인 경우 후속 조치로 Import Alert로 이어질 가능성도 배제할 수 없다.",
+      "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
+        "items": [
+          "SOP QA200-07.02(Vendor Audits)가 요구하는 서면감사가 왜 원자재 공급업체에 대해 실시되지 않았는지 근본원인을 조사하고, 절차 미이행 기간과 범위를 규명한다.",
+          "현재 사용 중인 전 원자재 공급업체에 대해 소급 평가를 실시하고, 품질부서의 평가·승인 기록을 문서화하여 사용 전 승인 체계를 복원한다.",
+          "공급업체 설문서·서면감사 기록을 확보·작성하고, 공급업체별 책임 범위와 품질 요구사항(규격, 일탈·변경 통보 의무 등)을 문서로 확정한다.",
+          "미승인 공급업체 원자재가 사용된 제조 배치에 대한 품질영향 평가를 수행하고, 재발방지를 위한 CAPA(절차 이행 점검·교육·주기적 자체점검 포함)를 수립·문서화한다."
+        ]
+      },
+      "administrative_risks": "483 응답이 불충분하거나 시정 조치가 실행되지 않을 경우, 해당 실사는 OAI(Official Action Indicated)로 분류될 수 있고 Warning Letter 발부로 이어질 가능성이 있다. 공급업체 적격성 관리 부재는 원자재 품질 보증의 기반 결함이므로, 해외 제조소의 경우 미시정 상태가 지속되면 Import Alert(수입경보) 등재를 통한 미국 수입 차단 조치로 확대될 위험이 있다. 또한 시정 이행 여부를 확인하기 위한 후속 재실사(follow-up inspection)가 실시될 수 있으며, 반복·장기 미시정 시에는 consent decree 등 보다 강한 행정·사법 조치로 이어질 가능성도 있다."
     },
-    {
-     "observation": "원자재 공급업체가 사용 전에 품질부서(Quality Unit)에 의해 평가·승인되었음을 입증하는 문서가 없었으며, 실사 중 검토한 모든 원자재 공급업체에 대해 사용 전 평가·승인 문서가 확인되지 않았다.",
-     "citation": "21 CFR 211.22(a)",
-     "risk": "품질부서의 사전 승인 없이 원자재가 제조에 투입될 수 있어, 부적합·미검증 원자재가 완제의약품 품질에 미치는 영향을 통제·추적할 수 없다."
-    },
-    {
-     "observation": "검토 가능한 공급업체 설문서(supplier questionnaire) 작성본이나 감사 문서가 존재하지 않았다.",
-     "risk": "공급업체의 제조·품질관리 수준을 평가한 객관적 근거가 없어, 공급망 리스크를 식별하거나 실사 시 적격성 판단 근거를 제시할 수 없다."
-    },
-    {
-     "observation": "공급업체의 책임 범위나 품질 요구사항(quality expectations)을 규정한 문서가 마련되어 있지 않았다.",
-     "risk": "원자재 규격·일탈 통보·변경 관리 등에 대한 책임 경계가 불명확해, 공급업체 측 변경이나 품질 문제가 적시에 자사 품질시스템으로 유입되지 않을 수 있다."
-    }
-   ],
-   "inspectional_significance": "이 483은 단일 관찰사항이지만, 그 내용이 특정 배치·특정 공급업체에 국한된 단발성(isolated) 결함이 아니라 공급업체 적격성 관리 체계 전반의 미작동을 지적한다는 점에서 체계적(systemic) 성격을 띤다. 실사 중 검토한 '모든' 원자재 공급업체에 대해 사용 전 평가·승인 문서가 없었고, 설문서·감사 문서·공급업체 책임 정의 문서까지 전부 부재하여 자사 SOP(QA200-07.02)가 문서상으로만 존재하고 실제로는 이행되지 않은 상태로 볼 수 있다. 원문 관찰에는 시험결과 조작·기록 소급 수정 등 데이터 무결성(data integrity) 위반을 직접 시사하는 서술은 없으며, 결함의 성격은 '요구 문서의 부재(미실시)'에 가깝다. 다만 품질부서의 원자재 승인 기능이 작동하지 않은 것은 cGMP 품질시스템의 근간에 해당하므로, 회신이 불충분하거나 시정이 지연될 경우 Warning Letter로 승격될 가능성이 있으며, 해외 제조소인 경우 후속 조치로 Import Alert로 이어질 가능성도 배제할 수 없다.",
-   "required_remediation": {
-    "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
-    "items": [
-     "SOP QA200-07.02(Vendor Audits)가 요구하는 서면감사가 왜 원자재 공급업체에 대해 실시되지 않았는지 근본원인을 조사하고, 절차 미이행 기간과 범위를 규명한다.",
-     "현재 사용 중인 전 원자재 공급업체에 대해 소급 평가를 실시하고, 품질부서의 평가·승인 기록을 문서화하여 사용 전 승인 체계를 복원한다.",
-     "공급업체 설문서·서면감사 기록을 확보·작성하고, 공급업체별 책임 범위와 품질 요구사항(규격, 일탈·변경 통보 의무 등)을 문서로 확정한다.",
-     "미승인 공급업체 원자재가 사용된 제조 배치에 대한 품질영향 평가를 수행하고, 재발방지를 위한 CAPA(절차 이행 점검·교육·주기적 자체점검 포함)를 수립·문서화한다."
+    "source_text": "OBSERVATION 1: (QUALITY SYSTEM) Written procedures for the qualification and approval of suppliers of components were not adequately implemented.\nSpecifically, Your firm's SOP QA200-07.02 Vendor Audits effective date 8/19/2020, requires the performance of paper audits as part of supplier qualification. However, paper audits were not conducted for suppliers of components used in the manufacture of drug products. a. There was no documentation demonstrating that suppliers of components were evaluated and approved by the Quality Unit prior to use. b. For all component suppliers reviewed during the inspection, there was no documentation demonstrating evaluation and approval prior to use. c. No completed supplier questionnaires or audit documentation were available for review. d. There was no documentation establishing defined supplier responsibilities or quality expectations.",
+    "observations_ko": [
+      {
+        "number": "1",
+        "deficiency_ko": "(품질시스템) 원료·자재(components) 공급업체의 적격성 평가 및 승인에 관한 문서화된 절차가 적절히 이행되지 않았다.",
+        "detail_ko": "구체적으로, 귀사의 SOP QA200-07.02 「Vendor Audits」(시행일 2020년 8월 19일)는 공급업체 적격성 평가의 일부로 서류감사(paper audit)를 수행하도록 요구하고 있다. 그러나 의약품 제조에 사용되는 원료·자재 공급업체에 대해서는 서류감사가 수행되지 않았다. a. 원료·자재 공급업체가 사용 전에 품질부서(Quality Unit)에 의해 평가되고 승인되었음을 입증하는 문서가 없었다. b. 실사 중 검토한 모든 원료·자재 공급업체에 대하여, 사용 전 평가 및 승인을 입증하는 문서가 없었다. c. 작성 완료된 공급업체 질의서(supplier questionnaire)나 감사 문서가 검토 가능하도록 제시되지 않았다. d. 공급업체의 책임 범위나 품질 요구사항을 정의하여 규정한 문서가 없었다."
+      }
     ]
-   },
-   "administrative_risks": "483 응답이 불충분하거나 시정 조치가 실행되지 않을 경우, 해당 실사는 OAI(Official Action Indicated)로 분류될 수 있고 Warning Letter 발부로 이어질 가능성이 있다. 공급업체 적격성 관리 부재는 원자재 품질 보증의 기반 결함이므로, 해외 제조소의 경우 미시정 상태가 지속되면 Import Alert(수입경보) 등재를 통한 미국 수입 차단 조치로 확대될 위험이 있다. 또한 시정 이행 여부를 확인하기 위한 후속 재실사(follow-up inspection)가 실시될 수 있으며, 반복·장기 미시정 시에는 consent decree 등 보다 강한 행정·사법 조치로 이어질 가능성도 있다."
   },
-  "source_text": "OBSERVATION 1: (QUALITY SYSTEM) Written procedures for the qualification and approval of suppliers of components were not adequately implemented.\nSpecifically, Your firm's SOP QA200-07.02 Vendor Audits effective date 8/19/2020, requires the performance of paper audits as part of supplier qualification. However, paper audits were not conducted for suppliers of components used in the manufacture of drug products. a. There was no documentation demonstrating that suppliers of components were evaluated and approved by the Quality Unit prior to use. b. For all component suppliers reviewed during the inspection, there was no documentation demonstrating evaluation and approval prior to use. c. No completed supplier questionnaires or audit documentation were available for review. d. There was no documentation establishing defined supplier responsibilities or quality expectations."
- },
- "fda483-193644": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "observation": "스크리닝 결과 부적격(ineligible)으로 판정된 기증자의 HCT/P를 제한적 사용(limited use)으로 출고하면서, 기록 요약서(summary of records)에 부적격 사유를 기재하지 않았다. 아프리카 특정 국가 관련 위험평가, 신체검사(피어싱·성병 이력), 남성 간 성접촉 위험평가, HBV(core) 양성 등 사유가 있는 정자·난자 지정기증자 건들에서 사유 기재가 누락됐다.",
-     "citation": "21 CFR 1271.55",
-     "risk": "수혜자와 담당 의료진이 해당 조직에 어떤 감염질환 위험이 있는지 알 수 없게 되어, 감염 위험을 인지하지 못한 상태에서 부적격 조직이 사용될 수 있다."
+  "fda483-193644": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "observation": "스크리닝 결과 부적격(ineligible)으로 판정된 기증자의 HCT/P를 제한적 사용(limited use)으로 출고하면서, 기록 요약서(summary of records)에 부적격 사유를 기재하지 않았다. 아프리카 특정 국가 관련 위험평가, 신체검사(피어싱·성병 이력), 남성 간 성접촉 위험평가, HBV(core) 양성 등 사유가 있는 정자·난자 지정기증자 건들에서 사유 기재가 누락됐다.",
+          "citation": "21 CFR 1271.55",
+          "risk": "수혜자와 담당 의료진이 해당 조직에 어떤 감염질환 위험이 있는지 알 수 없게 되어, 감염 위험을 인지하지 못한 상태에서 부적격 조직이 사용될 수 있다."
+        },
+        {
+          "observation": "기증자 적격성 판정 완료 이후의 동반 기록(accompanying records)과 기록 요약서를 어떻게 작성·완결하는지를 규정한 절차를 수립·유지하지 않았다.",
+          "citation": "21 CFR 1271.47",
+          "risk": "기록 작성 기준이 없어 요약서 내용이 담당자·시점에 따라 달라지고, 필수 정보 누락이 반복적으로 발생·재발한다."
+        },
+        {
+          "observation": "절차 부재의 결과로 기록 요약서에 필수 정보가 장기간 누락됐다. 2/24/23~7/1/24 기간의 요약서에는 검사가 CLIA 인증 시험실에서 수행됐다는 진술이 빠져 있었고, 12/4/19~1/25/23 기간의 요약서에는 B형간염 바이러스 핵산검사(HBV NAT)의 결과와 해석이 빠져 있었다(정자·난자, 익명·지정 기증자 요약서에서 관찰됨).",
+          "citation": "21 CFR 1271.55",
+          "risk": "감염질환 검사가 적법한 인증 시험실에서 수행됐는지, HBV 감염 여부가 어떻게 판정됐는지를 기록만으로는 확인할 수 없어 기증자 적격성 판정의 신뢰성 자체가 검증 불가능해진다."
+        },
+        {
+          "observation": "부적격 기증자로부터 유래해 제한적 사용으로 제공된 정자·난자·복합 생식조직에 감염질환 위험을 경고하는 표시(\"WARNING: Advise patient of communicable disease risks.\")를 눈에 띄게 부착하지 않았다.",
+          "citation": "21 CFR 1271.65(b)(2)",
+          "risk": "취급·사용 단계에서 해당 조직이 부적격 기증자 유래임을 식별할 수 없어, 경고 없이 사용되거나 적격 조직과 혼용될 위험이 있다."
+        }
+      ],
+      "inspectional_significance": "세 건의 관찰사항이 모두 기증자 적격성(donor eligibility) 관리라는 동일한 축에 걸쳐 있고, 그 중심에 \"기록 요약서·동반 기록 절차 자체가 수립·유지되지 않았다\"는 시스템 결함이 있다는 점에서 단발성(isolated)이 아니라 체계적(systemic) 성격으로 평가될 가능성이 있다. 원문에 따르면 요약서의 CLIA 인증 진술 누락은 2/24/23~7/1/24, HBV NAT 결과·해석 누락은 12/4/19~1/25/23에 걸쳐 있고, 12/4/2019 이후 난자(지정·익명) 및 지정 정자 기증자에 대해 적격성 판정과 요약서 작성을 계속해 왔음에도 절차가 없었다고 지적돼, 결함이 수년에 걸쳐 다수 기증자·다수 조직 유형에 반복된 것으로 보인다. 결함의 성격은 데이터 조작·기록 위·변조 같은 전형적 데이터 무결성 사안이라기보다 필수 기록의 결여·불완전이지만, 검사 수행 주체(CLIA 인증 여부)와 HBV NAT 결과·해석이 기록에서 확인되지 않는다는 점에서 적격성 판정의 근거를 사후 재구성할 수 없는 기록 신뢰성 문제로 확대 해석될 여지가 있다. 또한 HBV(core) 양성 등 실제 감염질환 위험이 확인된 기증자 건에서 사유 기재와 경고 표시가 모두 빠졌다는 점은 환자 안전에 직접 연결되는 사안이어서, 시정 응답이 불충분할 경우 Warning Letter로 승격될 가능성이 있다.",
+      "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
+        "items": [
+          "기증자 적격성 판정 이후의 기록 요약서와 동반 기록 작성·완결 방법을 규정한 문서화된 절차를 수립하고, 부적격 사유 기재·CLIA 인증 시험실 수행 진술·HBV NAT 결과 및 해석 등 필수 항목을 절차에 명시한 뒤 담당자 교육을 완료할 것.",
+          "12/4/2019 이후 작성된 정자·난자(지정·익명) 기증자의 기록 요약서를 소급 전수 검토하여 부적격 사유, CLIA 인증 진술, HBV NAT 결과·해석 누락 건을 식별하고 그 목록과 보완 결과를 문서화할 것.",
+          "제한적 사용으로 제공된 부적격 기증자 유래 정자·난자·복합 생식조직에 대해 \"WARNING: Advise patient of communicable disease risks.\" 경고 표시가 부착되도록 라벨링 절차·양식을 정비하고, 이미 출고·보관 중인 재고에 대한 조치 계획을 마련할 것.",
+          "절차 부재와 기록 누락이 장기간 발견되지 않은 근본원인을 조사해 CAPA를 수립·문서화하고, 자체 점검(내부감사) 주기 등 재발 방지 조치와 그 유효성 확인 방법을 회신에 포함할 것."
+        ]
+      },
+      "administrative_risks": "15영업일 내 회신이 없거나 근본원인 조사·소급 검토 없이 개별 건 보완에 그친 응답을 제출할 경우, 이번 실사가 OAI(Official Action Indicated)로 분류되고 Warning Letter가 발부될 가능성이 있다. 부적격 사유 미기재·경고 표시 누락은 감염질환 전파 위험과 직접 연결되는 사안이어서 후속 재실사(follow-up inspection) 대상이 될 가능성이 높고, 시정이 계속 지연되면 해당 HCT/P의 회수·사용 중단 요구나 그 이상의 강제조치로 이어질 수 있다. 절차 자체의 부재가 장기간 지속됐다는 점이 확인되면 반복 위반으로 취급되어 행정조치의 강도가 올라갈 수 있다."
     },
-    {
-     "observation": "기증자 적격성 판정 완료 이후의 동반 기록(accompanying records)과 기록 요약서를 어떻게 작성·완결하는지를 규정한 절차를 수립·유지하지 않았다.",
-     "citation": "21 CFR 1271.47",
-     "risk": "기록 작성 기준이 없어 요약서 내용이 담당자·시점에 따라 달라지고, 필수 정보 누락이 반복적으로 발생·재발한다."
-    },
-    {
-     "observation": "절차 부재의 결과로 기록 요약서에 필수 정보가 장기간 누락됐다. 2/24/23~7/1/24 기간의 요약서에는 검사가 CLIA 인증 시험실에서 수행됐다는 진술이 빠져 있었고, 12/4/19~1/25/23 기간의 요약서에는 B형간염 바이러스 핵산검사(HBV NAT)의 결과와 해석이 빠져 있었다(정자·난자, 익명·지정 기증자 요약서에서 관찰됨).",
-     "citation": "21 CFR 1271.55",
-     "risk": "감염질환 검사가 적법한 인증 시험실에서 수행됐는지, HBV 감염 여부가 어떻게 판정됐는지를 기록만으로는 확인할 수 없어 기증자 적격성 판정의 신뢰성 자체가 검증 불가능해진다."
-    },
-    {
-     "observation": "부적격 기증자로부터 유래해 제한적 사용으로 제공된 정자·난자·복합 생식조직에 감염질환 위험을 경고하는 표시(\"WARNING: Advise patient of communicable disease risks.\")를 눈에 띄게 부착하지 않았다.",
-     "citation": "21 CFR 1271.65(b)(2)",
-     "risk": "취급·사용 단계에서 해당 조직이 부적격 기증자 유래임을 식별할 수 없어, 경고 없이 사용되거나 적격 조직과 혼용될 위험이 있다."
-    }
-   ],
-   "inspectional_significance": "세 건의 관찰사항이 모두 기증자 적격성(donor eligibility) 관리라는 동일한 축에 걸쳐 있고, 그 중심에 \"기록 요약서·동반 기록 절차 자체가 수립·유지되지 않았다\"는 시스템 결함이 있다는 점에서 단발성(isolated)이 아니라 체계적(systemic) 성격으로 평가될 가능성이 있다. 원문에 따르면 요약서의 CLIA 인증 진술 누락은 2/24/23~7/1/24, HBV NAT 결과·해석 누락은 12/4/19~1/25/23에 걸쳐 있고, 12/4/2019 이후 난자(지정·익명) 및 지정 정자 기증자에 대해 적격성 판정과 요약서 작성을 계속해 왔음에도 절차가 없었다고 지적돼, 결함이 수년에 걸쳐 다수 기증자·다수 조직 유형에 반복된 것으로 보인다. 결함의 성격은 데이터 조작·기록 위·변조 같은 전형적 데이터 무결성 사안이라기보다 필수 기록의 결여·불완전이지만, 검사 수행 주체(CLIA 인증 여부)와 HBV NAT 결과·해석이 기록에서 확인되지 않는다는 점에서 적격성 판정의 근거를 사후 재구성할 수 없는 기록 신뢰성 문제로 확대 해석될 여지가 있다. 또한 HBV(core) 양성 등 실제 감염질환 위험이 확인된 기증자 건에서 사유 기재와 경고 표시가 모두 빠졌다는 점은 환자 안전에 직접 연결되는 사안이어서, 시정 응답이 불충분할 경우 Warning Letter로 승격될 가능성이 있다.",
-   "required_remediation": {
-    "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
-    "items": [
-     "기증자 적격성 판정 이후의 기록 요약서와 동반 기록 작성·완결 방법을 규정한 문서화된 절차를 수립하고, 부적격 사유 기재·CLIA 인증 시험실 수행 진술·HBV NAT 결과 및 해석 등 필수 항목을 절차에 명시한 뒤 담당자 교육을 완료할 것.",
-     "12/4/2019 이후 작성된 정자·난자(지정·익명) 기증자의 기록 요약서를 소급 전수 검토하여 부적격 사유, CLIA 인증 진술, HBV NAT 결과·해석 누락 건을 식별하고 그 목록과 보완 결과를 문서화할 것.",
-     "제한적 사용으로 제공된 부적격 기증자 유래 정자·난자·복합 생식조직에 대해 \"WARNING: Advise patient of communicable disease risks.\" 경고 표시가 부착되도록 라벨링 절차·양식을 정비하고, 이미 출고·보관 중인 재고에 대한 조치 계획을 마련할 것.",
-     "절차 부재와 기록 누락이 장기간 발견되지 않은 근본원인을 조사해 CAPA를 수립·문서화하고, 자체 점검(내부감사) 주기 등 재발 방지 조치와 그 유효성 확인 방법을 회신에 포함할 것."
+    "source_text": "OBSERVATION 1: The summary of records for HCT/Ps from donors determined to be ineligible based on screening and released for limited use did not contain a statement noting the reason(s) for the ineligibility.\nSpecifically, you fail to state the reason (s) of ineligibility for the following directed donors: Donor initials or number Eligibility determination Donated Tissue Reason for ineligibility Ineligible 1/31/20 Semen Risk assessment (born or sexually intimate with someone from certain countries in Africa) Ineligible 2/13/20 Oocyte Risk assessment (born or sexually intimate with someone from certain countries in Africa) Ineligible 11/16/22 Oocyte Physical exam (body piercing – ); risk assessment (tattoo, body piercing – Ineligible 12/5/24 Semen Physical exam (history of sexually transmitted diseases); risk assessment (Men who have had sex with another man in the preceding 5 years) Ineligible 12/16/24 Semen Risk assessment (born or sexually intimate with someone from certain countries in Africa), positive HBV (core)\n\nOBSERVATION 2: You did not establish and maintain procedures that address the accompanying records after the donor eligibility determination is complete of HCT/Ps.\nSpecifically, you fail to have procedures established that describe how to complete a summary of record and accompanying records. From 2/24/23 – 7/1/24, your summary of records were missing the statement that testing was performed by a Clinical Laboratory Improvement Amendments certified laboratory. I observed summary of records for directed semen and oocyte donors where the statement was missing. From 12/4/19 – 1/25/23, your summary of records were missing the results and interpretation of the Hepatitis B virus Nucleic Acid Test. I observed summary of records for semen and oocyte donors (anonymous and directed) where the results and interpretation of the HBV NAT testing were missing. Since 12/4/2019, you have determined donor eligibility and created summary of records for oocyte (directed and anonymous) donors and directed semen donors. From to current, you did and do not have established or maintained a procedure for the summary of record and accompanying records.\n\nOBSERVATION 3: HCT/Ps from ineligible donors which were made available for limited use were not prominently labeled with a statement warning of communicable disease risks.\nSpecifically, semen, oocytes, or combined reproductive tissue from directed ineligible donors did not include the label “WARNING: Advise patient of communicable disease risks.”",
+    "observations_ko": [
+      {
+        "number": "1",
+        "deficiency_ko": "선별검사(screening) 결과 부적격(ineligible)으로 판정된 기증자로부터 유래하여 제한적 사용(limited use)으로 출고된 HCT/Ps의 기록 요약서(summary of records)에 부적격 사유를 기재한 진술이 포함되어 있지 않았다.",
+        "detail_ko": "구체적으로, 귀사는 다음의 지정(directed) 기증자에 대하여 부적격 사유를 기재하지 않았습니다: 기증자 이니셜 또는 번호 / 적격성 판정 / 기증 조직 / 부적격 사유 — 부적격 1/31/20 정자 위험도 평가(아프리카 특정 국가 출신이거나 그 지역 출신자와 성적 접촉이 있었음); 부적격 2/13/20 난자 위험도 평가(아프리카 특정 국가 출신이거나 그 지역 출신자와 성적 접촉이 있었음); 부적격 11/16/22 난자 신체검사(피어싱 – ); 위험도 평가(문신, 피어싱 – ; 부적격 12/5/24 정자 신체검사(성병 병력); 위험도 평가(최근 5년 이내 남성과 성관계를 가진 남성); 부적격 12/16/24 정자 위험도 평가(아프리카 특정 국가 출신이거나 그 지역 출신자와 성적 접촉이 있었음), HBV(core) 양성"
+      },
+      {
+        "number": "2",
+        "deficiency_ko": "귀사는 HCT/Ps의 기증자 적격성 판정이 완료된 이후의 첨부 기록(accompanying records)에 관한 절차를 수립·유지하지 않았다.",
+        "detail_ko": "구체적으로, 귀사는 기록 요약서(summary of record) 및 첨부 기록을 어떻게 작성·완결하는지를 기술한 절차를 수립하지 않았습니다. 2023년 2월 24일부터 2024년 7월 1일까지, 귀사의 기록 요약서에는 검사가 CLIA(Clinical Laboratory Improvement Amendments) 인증 시험실에서 수행되었다는 진술이 누락되어 있었습니다. 본 조사관은 해당 진술이 누락된 지정 정자 및 난자 기증자의 기록 요약서를 확인하였습니다. 2019년 12월 4일부터 2023년 1월 25일까지, 귀사의 기록 요약서에는 B형간염 바이러스 핵산검사(Hepatitis B virus Nucleic Acid Test)의 결과 및 해석이 누락되어 있었습니다. 본 조사관은 HBV NAT 검사의 결과 및 해석이 누락된 정자 및 난자 기증자(익명 및 지정)의 기록 요약서를 확인하였습니다. 2019년 12월 4일 이후 귀사는 난자 기증자(지정 및 익명) 및 지정 정자 기증자에 대하여 기증자 적격성을 판정하고 기록 요약서를 작성해 왔습니다. 부터 현재까지, 귀사는 기록 요약서 및 첨부 기록에 관한 절차를 수립하거나 유지하지 않았고 현재도 그러합니다."
+      },
+      {
+        "number": "3",
+        "deficiency_ko": "제한적 사용(limited use)으로 제공된 부적격 기증자 유래 HCT/Ps에 전염성 질환 위험을 경고하는 진술이 눈에 잘 띄게 표시(prominently labeled)되어 있지 않았다.",
+        "detail_ko": "구체적으로, 지정 부적격 기증자로부터 유래한 정자, 난자 또는 복합 생식조직에 “WARNING: Advise patient of communicable disease risks.”(경고: 환자에게 전염성 질환 위험을 고지할 것) 라벨이 포함되어 있지 않았습니다."
+      }
     ]
-   },
-   "administrative_risks": "15영업일 내 회신이 없거나 근본원인 조사·소급 검토 없이 개별 건 보완에 그친 응답을 제출할 경우, 이번 실사가 OAI(Official Action Indicated)로 분류되고 Warning Letter가 발부될 가능성이 있다. 부적격 사유 미기재·경고 표시 누락은 감염질환 전파 위험과 직접 연결되는 사안이어서 후속 재실사(follow-up inspection) 대상이 될 가능성이 높고, 시정이 계속 지연되면 해당 HCT/P의 회수·사용 중단 요구나 그 이상의 강제조치로 이어질 수 있다. 절차 자체의 부재가 장기간 지속됐다는 점이 확인되면 반복 위반으로 취급되어 행정조치의 강도가 올라갈 수 있다."
   },
-  "source_text": "OBSERVATION 1: The summary of records for HCT/Ps from donors determined to be ineligible based on screening and released for limited use did not contain a statement noting the reason(s) for the ineligibility.\nSpecifically, you fail to state the reason (s) of ineligibility for the following directed donors: Donor initials or number Eligibility determination Donated Tissue Reason for ineligibility Ineligible 1/31/20 Semen Risk assessment (born or sexually intimate with someone from certain countries in Africa) Ineligible 2/13/20 Oocyte Risk assessment (born or sexually intimate with someone from certain countries in Africa) Ineligible 11/16/22 Oocyte Physical exam (body piercing – ); risk assessment (tattoo, body piercing – Ineligible 12/5/24 Semen Physical exam (history of sexually transmitted diseases); risk assessment (Men who have had sex with another man in the preceding 5 years) Ineligible 12/16/24 Semen Risk assessment (born or sexually intimate with someone from certain countries in Africa), positive HBV (core)\n\nOBSERVATION 2: You did not establish and maintain procedures that address the accompanying records after the donor eligibility determination is complete of HCT/Ps.\nSpecifically, you fail to have procedures established that describe how to complete a summary of record and accompanying records. From 2/24/23 – 7/1/24, your summary of records were missing the statement that testing was performed by a Clinical Laboratory Improvement Amendments certified laboratory. I observed summary of records for directed semen and oocyte donors where the statement was missing. From 12/4/19 – 1/25/23, your summary of records were missing the results and interpretation of the Hepatitis B virus Nucleic Acid Test. I observed summary of records for semen and oocyte donors (anonymous and directed) where the results and interpretation of the HBV NAT testing were missing. Since 12/4/2019, you have determined donor eligibility and created summary of records for oocyte (directed and anonymous) donors and directed semen donors. From to current, you did and do not have established or maintained a procedure for the summary of record and accompanying records.\n\nOBSERVATION 3: HCT/Ps from ineligible donors which were made available for limited use were not prominently labeled with a statement warning of communicable disease risks.\nSpecifically, semen, oocytes, or combined reproductive tissue from directed ineligible donors did not include the label “WARNING: Advise patient of communicable disease risks.”"
- },
- "fda483-193490": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "observation": "품질부서(Quality Unit)가 환경모니터링용 settle plate가 건조·균열된 상태로 사용된 뒤 배양된 사안에 대해 시정 및 예방조치(CAPA)를 적시에 이행하지 못했고, 환경모니터링(EM)·작업자모니터링(PM) 일탈에 대한 충분한 근본원인조사와 시행된 CAPA의 효과성 확인(effectiveness check)도 수행하지 않았다. 또한 충전된 주사기 1차 100% 육안검사 실패의 근본원인을 조사하지 않았고, 클린룸 내 ISO 5 등급 BSC 캐비닛의 동적(dynamic) 조건 기류 패턴 평가도 수행하지 않았다.",
-     "citation": "21 CFR 211.22",
-     "risk": "품질부서의 감독·CAPA 폐쇄 기능이 작동하지 않아 무균 공정의 일탈이 반복적으로 방치되며, 오염된 제품이 시장에 출하될 위험이 통제되지 않는다."
+  "fda483-193490": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "observation": "품질부서(Quality Unit)가 환경모니터링용 settle plate가 건조·균열된 상태로 사용된 뒤 배양된 사안에 대해 시정 및 예방조치(CAPA)를 적시에 이행하지 못했고, 환경모니터링(EM)·작업자모니터링(PM) 일탈에 대한 충분한 근본원인조사와 시행된 CAPA의 효과성 확인(effectiveness check)도 수행하지 않았다. 또한 충전된 주사기 1차 100% 육안검사 실패의 근본원인을 조사하지 않았고, 클린룸 내 ISO 5 등급 BSC 캐비닛의 동적(dynamic) 조건 기류 패턴 평가도 수행하지 않았다.",
+          "citation": "21 CFR 211.22",
+          "risk": "품질부서의 감독·CAPA 폐쇄 기능이 작동하지 않아 무균 공정의 일탈이 반복적으로 방치되며, 오염된 제품이 시장에 출하될 위험이 통제되지 않는다."
+        },
+        {
+          "observation": "무균 표방 제품의 미생물 오염 방지 절차가 준수되지 않았다. 환경모니터링 프로그램이 ISO 5 1차 공학적 제어구역(PEC)에 인접한 ISO 7·ISO 8 등급 구역의 반복적인 진균(곰팡이) 오염을 예방하거나 적절히 해소하지 못했으며, 2025년 7월~2026년 4월 EM 데이터에는 ISO 8 구역(Room 4, 7, 8)에서 최소 22건의 진균 일탈이 기록되어 무균 조제 작업을 지원하는 청정실 환경에 곰팡이 오염이 지속·미해결 상태로 반복되고 있음을 보여준다.",
+          "citation": "21 CFR 211.113(b)",
+          "risk": "무균 조제 구역 인접부의 곰팡이 오염이 장기간 해소되지 않아 제품 무균성 보증(SAL)이 훼손되고, 환자에게 진균 감염 위험이 있는 제품이 투여될 수 있다."
+        },
+        {
+          "observation": "생산 작업자의 위생·건강 습관 관리가 미흡했다. ISO 5·ISO 7·ISO 8 등급 구역에서 작업자모니터링(PM) 중 반복적인 유해(objectionable) 미생물 검출을 막을 적절한 관리가 확립·유지되지 않았고, 2025년 4월~2026년 2월 사이 가운(가슴·이마·전완)·손가락 표면 검체에서 세균 오염과 관련된 11건의 PM 일탈이 기록되었다. 다수 일탈에 유해 그람음성균이 포함되었으며, 배정된 근본원인은 대체로 무균 가운착의 기술 미흡, 부적절한 자재 이송, 청소 또는 작업자 동선이었다.",
+          "citation": "21 CFR 211.28",
+          "risk": "작업자 유래 오염, 특히 그람음성균 검출이 반복되어 무균조작 중 제품 직접 오염과 내독소 유입 가능성이 높고, 가운착의·동선 관리 체계의 근본적 결함을 시사한다."
+        },
+        {
+          "observation": "설명되지 않은 불일치 및 규격 부적합에 대한 철저한 조사가 이루어지지 않았다. 1차 육안검사 실패 후 근본원인 조사를 수행·문서화하지 않은 채 2차·3차 검사로 진행했으며, 2025년 3월부터 2026년 초까지의 안과용(ophthalmic) 로트 육안검사 기록 검토 결과 주요 불량률이 허용한계를 초과하거나 1차 AQL 단계에서 major defect가 발견된 44개 로트가 조사 없이 2차 검사로 곧바로 넘어갔고, 일부 로트는 2차 검사도 실패한 뒤 문서화된 조사 없이 3차 검사로 진행되었다. 주된 불량 유형은 내인성 이물(intrinsic particulate)과 제품 충전량 불량이었다.",
+          "citation": "21 CFR 211.192",
+          "risk": "이물·충전량 불량의 원인을 규명하지 않고 재검사로 합격시키는 관행은 불량 로트의 출하로 이어질 수 있으며, 안과용 제제의 이물은 환자에게 직접적인 안구 손상 위험을 초래한다."
+        }
+      ],
+      "inspectional_significance": "본 483은 무균 조제·충전 시설의 오염 관리와 품질부서 감독 전반에 걸친 중대한 지적으로 판단된다. 지적사항 4건이 서로 독립적이지 않고, Observation 1이 나머지 세 관찰(EM/PM 일탈 근본원인 미흡, 육안검사 실패 미조사, ISO 5 BSC 동적 기류 미평가)을 품질부서의 감독 실패로 묶고 있어 단발성(isolated)이 아니라 체계적(systemic) 결함의 성격이 강하다. 특히 2025년 7월~2026년 4월 사이 ISO 8 구역에서 22건의 진균 일탈, 2025년 4월~2026년 2월 사이 11건의 작업자모니터링 일탈(유해 그람음성균 포함)이 시정조치 시행에도 불구하고 지속된 점은 오염관리전략 자체가 유효하지 않음을 시사하며, 무균 표방 제품의 품질에 직접 영향을 줄 수 있다. 또한 44개 로트에서 1차 육안검사 실패 후 조사 없이 재검사로 진행한 사실은 조사 기록의 부재라는 점에서 문서화·조사 충실성의 문제로도 읽힐 수 있다(원문에는 기록의 위·변조 등 데이터 무결성 위반을 명시한 서술은 없다). 반복성·미해결성·무균 공정 관련성을 감안하면, 회사의 483 회신이 불충분할 경우 Warning Letter로 승격될 가능성이 있으며, 해당 제조소가 해외 소재인 경우 Import Alert로 이어질 가능성도 배제할 수 없다.",
+      "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
+        "items": [
+          "ISO 8 구역(Room 4, 7, 8)의 22건 진균 일탈과 11건의 작업자모니터링 세균 일탈에 대해 개별·통합(트렌드) 근본원인조사를 재수행하고, 균종 동정 결과와 오염원(자재 이송·동선·청소·가운착의)을 연결한 조사보고서를 문서화한다.",
+          "기시행 CAPA의 효과성 확인(effectiveness check) 기준과 일정을 정의하여 실행하고, 건조·균열된 settle plate 사용 등 미종결 CAPA를 기한 내 완결하여 품질부서의 CAPA 적시 이행·검토 절차를 강화한다.",
+          "클린룸 내 모든 ISO 5 등급 BSC 캐비닛에 대해 동적(dynamic) 조건에서의 기류 패턴 평가(스모크 스터디)를 수행하고, 그 결과에 따라 무균조작 방법·동선을 재검증한다.",
+          "1차 육안검사 실패 시 2차·3차 검사 진행 전 근본원인조사를 의무화하도록 절차를 개정하고, 조사 없이 재검사로 진행된 44개 로트(및 3차 검사로 진행된 로트)에 대해 내인성 이물·충전량 불량 관점의 소급 품질영향평가를 수행해 출하 로트의 처분 타당성을 재검토한다.",
+          "작업자 무균 가운착의·동선·자재 이송에 대한 재교육 및 재적격성 평가(gowning qualification)를 실시하고, 유해 그람음성균 검출에 대한 관리·경보 기준과 조치 절차를 재정립한다."
+        ]
+      },
+      "administrative_risks": "무균 제품의 오염 관리 실패가 장기간 반복되고 품질부서의 감독 기능 결함까지 지적되었으므로, 회신이 미흡하거나 시정이 지연될 경우 실사 결과가 OAI(Official Action Indicated)로 분류될 가능성이 있다. 이 경우 Warning Letter 발부, 후속 재실사(follow-up inspection)로 이어질 수 있으며, 해외 제조소라면 Import Alert(수입경보)에 의한 미국 수입 보류 조치를 받을 가능성도 있다. 진균·그람음성균 오염이 지속되는 상황에서 제품 품질영향평가 결과에 따라 자발적 회수(recall)나 출하 보류가 요구될 수 있고, 반복 위반이 시정되지 않으면 consent decree 등 사법적 조치로 확대될 가능성도 배제하기 어렵다. 또한 정부조달·해외 규제기관의 GMP 적합 판정에도 부정적 영향이 미칠 수 있다."
     },
-    {
-     "observation": "무균 표방 제품의 미생물 오염 방지 절차가 준수되지 않았다. 환경모니터링 프로그램이 ISO 5 1차 공학적 제어구역(PEC)에 인접한 ISO 7·ISO 8 등급 구역의 반복적인 진균(곰팡이) 오염을 예방하거나 적절히 해소하지 못했으며, 2025년 7월~2026년 4월 EM 데이터에는 ISO 8 구역(Room 4, 7, 8)에서 최소 22건의 진균 일탈이 기록되어 무균 조제 작업을 지원하는 청정실 환경에 곰팡이 오염이 지속·미해결 상태로 반복되고 있음을 보여준다.",
-     "citation": "21 CFR 211.113(b)",
-     "risk": "무균 조제 구역 인접부의 곰팡이 오염이 장기간 해소되지 않아 제품 무균성 보증(SAL)이 훼손되고, 환자에게 진균 감염 위험이 있는 제품이 투여될 수 있다."
+    "source_text": "OBSERVATION 1: The responsibilities and procedures applicable to the quality control unit are not fully followed.\nSpecifically, lA. Your Quality Unit failed to: a. Ensure the timely implementation of corrective and preventive actions for the observed dried and cracked: <Redacted B4> settle plates used for environmental monitoring and then incubated in a <Redacted B4> incubator. Please refer to\n\nOBSERVATION 1: .\nb. Conduct adequate root-cause analyses for the ongoing Environmental Monitoring (EM) and Personnel Monitoring (PM) excursions. The Quality unit also failed to perform effectiveness checks on the implemented corrective and preventive actions. as evident by persistent fungal and bacterial recoveries despite implementing corrective actions in the clean room areas. Please refer to OBSERVATlON 2 and\n\nOBSERVATION 3: .\nc Investigate the root cause of visual inspection failure during initial 100% inspection before proceeding to secondary/tertiary inspection of the filled syringes. Please refer to\n\nOBSERVATION 4: .\nd. Evaluate air flow patterns under dynamic conditions in all ISO 5 classified BSC cabinets in the clean room. Please refer to OBSERVATTON 3. AMENDMENT 1 Et,40LOYE£ SIS G•.,-.n,,~ oi:.1e 1ssueo\n\nOBSERVATION 2: Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed.\nSpecifically, 2A. Your firm's environmental monitoring program failed to prevent or adequately address repeated fungaJ (mold) contamination in ISO Class 7 and ISO Class 8 classified areas adjacent to ISO Class 5 Primary Engineering Controls. The environmental monitoring data collected between July 2025 and April 2026 document at least twenty-two (22) separate fungal excursion events across ISO 8 rooms (Rooms 4, 7, and 8) representing a recurring and unresolved pattern of mold contamination in the classified cleanroom environment supporting aseptic compounding operations. The following is the list of twenty-two (22) documented fungal contamination events in the clean room area: AMENDMENT 1 EMPLOYEE(S, $1GNA':'UR: OATE ISSUED\n\nOBSERVATION 3: Production personnel were not practicing good sanitation and health habits.\nSpecifically, Your firm failed to establish and maintain adequate controls to prevent repeated objectionable microorganism recoveries during personnel monitoring (PM) activities in TSO Class 5, ISO Class 7, and ISO Class 8 classified areas. Environmental monitoring records document eleven (11) personnel monitoring excursion events involving bacterial contamination from personnel gowning samples (chest. forehead, forearm) and fingertip samples collected between April 2025 and February 2026. Multiple excursions involved objectionable gram-negative organisms. The assigned root causes were generally insufficient aseptic gowning technique, improper material transfer, cleaning or personnel movement The following is the list of eleven (11) documented contamination events: Investigation Date of Sampl e Operator Sample Type Room ISO Cl ass CFl Count Organism(s) I dentified Lot Impacted Units R ejected Root Cause EM-25-001 NCR-25-013 16 Apr 2025 <Redact ed B4> <Redacted B4> Chest Room 2 / ISO 7 15 CFU Corynebacterum segmentosum Actinomyces oris/naesiundi Staphyloccus epidermis Staphyloccus captis <Redacted B4> Ineffective aseptic echnique during gowning and personnel movement EM-25-002 NCR-2\n\nOBSERVATION 4: There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.\nSpecifically, Your firm failed to conduct, or document, an investigation into the root cause of visual inspection failures prior to proceeding with secondary and/or tertiary inspections. A review of ophthalmic lot visual inspection records spanning from March 2025 through early 2026 identified forty-four (44) lots in which the firm proceeded directly to secondary inspection following a primary visual inspection failure which was characterized by major reject rates exceeding the <Redacted B4> acceptance limit and/or major defects found at the primary AQL stage. There was no documented investigation and root cause analysis into the source and cause of these recurring defect types prior to reinspection. In addition <Redacted B4> lots <Redacted B4> proceeded to tertiary inspection after secondary inspection also failed, again without a documented investigation. The predominant defect types identified were intrinsic particulate and product fill volume defects. AMENDMENTl EJ·.tP!.OYEE{S) Sa'.:;!l.'ATI..RE OA\"E SSUED"
+  },
+  "fda483-193603": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "observation": "복합제(의약품+의료기기) Vonvendi 의 기기 구성부(동결건조 제품 재용해용 Mix2Vial)에 대해 명백한 오작동(malfunction) 사례를 MDR 로 보고하지 않았다. 구체적으로 \"Incomplete Diluent Transfer\"(희석액이 기기를 통해 불완전하게 이송됨) 관련 다수 불만과 \"Defective Device\" 관련 불만 1건에 대해 Medical Device Report 가 제출되지 않았다.",
+          "citation": "21 CFR 803.50",
+          "risk": "시판 기기 구성부의 오작동 신호가 FDA 에 전달되지 않아 재발 시 사망·중상으로 이어질 수 있는 위해가 규제당국 감시망에서 누락되고, 자사 내부에서도 오작동 추세 분석·시정 기회를 상실한다."
+        },
+        {
+          "observation": "배치생산·관리기록서에 사용된 주요 설비 및 라인의 식별정보가 포함되어 있지 않았다. 예로 ADVATE® 완제 배치 및 그에 대응하는 BAXJECT III® 완제의약품(FDP) 배치의 배치생산기록서 전반에 걸쳐 중요 설비의 식별 기재가 누락되어 있었다.",
+          "citation": "21 CFR 211.188(b)(1)",
+          "risk": "배치별로 어떤 설비·라인이 사용됐는지 추적할 수 없어, 설비 기인 품질 이슈(교차오염·설비 고장·세척 부적합) 발생 시 영향 배치 범위를 특정한 조사·회수 판단이 불가능해진다."
+        }
+      ],
+      "inspectional_significance": "이 483 은 2025년 9월 10일부터 9월 18일까지 진행된 실사에서 발부된 것으로, 서로 다른 두 규제 영역(복합제의 기기 구성부 시판 후 안전성 보고 의무 및 완제의약품 cGMP 기록 요건)에 걸쳐 지적이 제기되었다. 관찰사항 1 은 단일 사례가 아니라 \"Incomplete Diluent Transfer\" 라는 동일 유형의 복수 불만 건과 별도의 \"Defective Device\" 불만 건에 대해 반복적으로 MDR 이 제출되지 않은 것이어서, 불만처리·보고성 판정(reportability decision) 절차 자체의 체계적(systemic) 결함일 가능성이 있다. 관찰사항 2 역시 특정 기록 1건이 아니라 배치생산기록서 \"전반에 걸쳐(throughout)\" 중요 설비 식별이 누락됐다고 기술돼 있어 기록 양식·문서화 체계 수준의 결함으로 확대 해석될 가능성이 있다. 기록 자체의 위·변조나 데이터 조작을 시사하는 서술은 원문에 없으나, 배치기록의 필수 항목이 구조적으로 비어 있다는 점에서 기록 완전성(completeness) 측면의 문제로 다뤄질 수 있다. 원문에 FDA 의 분류나 후속 조치 결정은 기재돼 있지 않으나, 시판 후 보고 누락과 cGMP 기록 결함이 병존하고 두 지적 모두 반복성을 시사한다는 점에서 회사의 483 응답이 불충분할 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소인 경우 Import Alert 로 이어질 가능성도 배제할 수 없다.",
+      "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+        "items": [
+          "지적된 \"Incomplete Diluent Transfer\" 및 \"Defective Device\" 불만 건에 대해 보고성(reportability) 재판정을 수행하고, 보고 대상으로 확인된 건은 지연 사유를 명시하여 즉시 MDR 을 제출한다.",
+          "Vonvendi 를 포함한 복합제의 기기 구성부 관련 과거 불만 전체를 소급 검토하여 미보고 MDR 대상 건이 추가로 있는지 확인하고, 그 결과를 회신에 포함한다.",
+          "불만처리·MDR 보고성 판정 절차(기기 구성부가 포함된 복합제에 대한 적용 범위·30일 기한 관리·판정 근거 문서화)를 개정하고 담당자 재교육을 실시하는 CAPA 를 수립·문서화한다.",
+          "배치생산·관리기록서 양식에 주요 설비 및 라인 식별란을 반영하고, ADVATE® 및 BAXJECT III® 를 포함한 해당 제품군의 기존 배치기록을 소급 검토하여 설비 식별 누락 범위와 배치 추적 가능성에 대한 영향평가(회수·시장조치 필요 여부 포함)를 수행한다."
+        ]
+      },
+      "administrative_risks": "483 에 대한 회신이 미흡하거나 시정이 지연될 경우, 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 가 발부될 수 있다. 관찰사항 1 은 시판 후 안전성 보고(MDR) 의무 위반에 해당하므로 기기 구성부를 포함한 복합제에 대한 별도의 시판 후 보고 관련 행정조치로 이어질 수 있으며, 해당 제조소가 해외에 소재할 경우 Import Alert 에 따른 수입경보·통관 보류 가능성이 있다. 관찰사항 2 와 같이 배치기록의 필수 기재사항이 구조적으로 누락된 cGMP 결함은 후속 재실사(follow-up inspection) 의 직접적 사유가 되며, 동일·유사 지적이 반복 확인될 경우 consent decree 를 포함한 강제조치로 확대될 가능성도 있다. 또한 설비 식별 부재로 배치 추적성이 확보되지 않는 점은 향후 품질 이슈 발생 시 영향 범위 특정이 어려워 회수 범위가 불필요하게 확대되는 행정 부담으로 이어질 수 있다."
     },
-    {
-     "observation": "생산 작업자의 위생·건강 습관 관리가 미흡했다. ISO 5·ISO 7·ISO 8 등급 구역에서 작업자모니터링(PM) 중 반복적인 유해(objectionable) 미생물 검출을 막을 적절한 관리가 확립·유지되지 않았고, 2025년 4월~2026년 2월 사이 가운(가슴·이마·전완)·손가락 표면 검체에서 세균 오염과 관련된 11건의 PM 일탈이 기록되었다. 다수 일탈에 유해 그람음성균이 포함되었으며, 배정된 근본원인은 대체로 무균 가운착의 기술 미흡, 부적절한 자재 이송, 청소 또는 작업자 동선이었다.",
-     "citation": "21 CFR 211.28",
-     "risk": "작업자 유래 오염, 특히 그람음성균 검출이 반복되어 무균조작 중 제품 직접 오염과 내독소 유입 가능성이 높고, 가운착의·동선 관리 체계의 근본적 결함을 시사한다."
-    },
-    {
-     "observation": "설명되지 않은 불일치 및 규격 부적합에 대한 철저한 조사가 이루어지지 않았다. 1차 육안검사 실패 후 근본원인 조사를 수행·문서화하지 않은 채 2차·3차 검사로 진행했으며, 2025년 3월부터 2026년 초까지의 안과용(ophthalmic) 로트 육안검사 기록 검토 결과 주요 불량률이 허용한계를 초과하거나 1차 AQL 단계에서 major defect가 발견된 44개 로트가 조사 없이 2차 검사로 곧바로 넘어갔고, 일부 로트는 2차 검사도 실패한 뒤 문서화된 조사 없이 3차 검사로 진행되었다. 주된 불량 유형은 내인성 이물(intrinsic particulate)과 제품 충전량 불량이었다.",
-     "citation": "21 CFR 211.192",
-     "risk": "이물·충전량 불량의 원인을 규명하지 않고 재검사로 합격시키는 관행은 불량 로트의 출하로 이어질 수 있으며, 안과용 제제의 이물은 환자에게 직접적인 안구 손상 위험을 초래한다."
-    }
-   ],
-   "inspectional_significance": "본 483은 무균 조제·충전 시설의 오염 관리와 품질부서 감독 전반에 걸친 중대한 지적으로 판단된다. 지적사항 4건이 서로 독립적이지 않고, Observation 1이 나머지 세 관찰(EM/PM 일탈 근본원인 미흡, 육안검사 실패 미조사, ISO 5 BSC 동적 기류 미평가)을 품질부서의 감독 실패로 묶고 있어 단발성(isolated)이 아니라 체계적(systemic) 결함의 성격이 강하다. 특히 2025년 7월~2026년 4월 사이 ISO 8 구역에서 22건의 진균 일탈, 2025년 4월~2026년 2월 사이 11건의 작업자모니터링 일탈(유해 그람음성균 포함)이 시정조치 시행에도 불구하고 지속된 점은 오염관리전략 자체가 유효하지 않음을 시사하며, 무균 표방 제품의 품질에 직접 영향을 줄 수 있다. 또한 44개 로트에서 1차 육안검사 실패 후 조사 없이 재검사로 진행한 사실은 조사 기록의 부재라는 점에서 문서화·조사 충실성의 문제로도 읽힐 수 있다(원문에는 기록의 위·변조 등 데이터 무결성 위반을 명시한 서술은 없다). 반복성·미해결성·무균 공정 관련성을 감안하면, 회사의 483 회신이 불충분할 경우 Warning Letter로 승격될 가능성이 있으며, 해당 제조소가 해외 소재인 경우 Import Alert로 이어질 가능성도 배제할 수 없다.",
-   "required_remediation": {
-    "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
-    "items": [
-     "ISO 8 구역(Room 4, 7, 8)의 22건 진균 일탈과 11건의 작업자모니터링 세균 일탈에 대해 개별·통합(트렌드) 근본원인조사를 재수행하고, 균종 동정 결과와 오염원(자재 이송·동선·청소·가운착의)을 연결한 조사보고서를 문서화한다.",
-     "기시행 CAPA의 효과성 확인(effectiveness check) 기준과 일정을 정의하여 실행하고, 건조·균열된 settle plate 사용 등 미종결 CAPA를 기한 내 완결하여 품질부서의 CAPA 적시 이행·검토 절차를 강화한다.",
-     "클린룸 내 모든 ISO 5 등급 BSC 캐비닛에 대해 동적(dynamic) 조건에서의 기류 패턴 평가(스모크 스터디)를 수행하고, 그 결과에 따라 무균조작 방법·동선을 재검증한다.",
-     "1차 육안검사 실패 시 2차·3차 검사 진행 전 근본원인조사를 의무화하도록 절차를 개정하고, 조사 없이 재검사로 진행된 44개 로트(및 3차 검사로 진행된 로트)에 대해 내인성 이물·충전량 불량 관점의 소급 품질영향평가를 수행해 출하 로트의 처분 타당성을 재검토한다.",
-     "작업자 무균 가운착의·동선·자재 이송에 대한 재교육 및 재적격성 평가(gowning qualification)를 실시하고, 유해 그람음성균 검출에 대한 관리·경보 기준과 조치 절차를 재정립한다."
+    "source_text": "OBSERVATION 1: An MDR report was not submitted within 30 days ofreceiving or otherwise becoming aware of information that reasonably suggests that a marketed device has malfunctioned and would be likely to cause or contribute to a death or serious injury if the malfunction were to recur.\nSpecifically, your firm has not reported apparent malfunctions for the device constituent part of your firm's combination drug and medical device product (Vonvendi). The combination product's primary mode of action relates to the biologic drug product (recombinant von Willebrand factor). The medical device constituent part (Mix2Vial) is used for reconstituting the lyophilized drug product. Medical Device Reports (MD Rs) were not submitted for the following complaints regarding \"Incomnlete Diluent Transfer:' (i.e., incomplete transfer of diluent via the device): product code (product code (product code ; (product code (product code and (product code In addition, an MDR was not submitted for the following complaint regarding a \"Defective Device\": product code .\n\nOBSERVATION 2: The batch production and control records are deficient in that they do not include the identity of major equipment and lines used.\nSpecifically, there was no identification of critical equipment throughout batch production records. For example, the batch production records for ADV ATE®, Drug Product Batch and its corresponding BAXJECT III®, Finished Drug Product (FDP) Batch failed to include identification of: A. B. C. (b) (4) *DATES OF INSPECTION 9/10/2025(Wed), 9/11/2025(Thu), 9/12/2025(Fri), 9/15/2025(Mon), 9/16/2025(Tue), 9/17/2025(Wed), 9/18/2025(Thu) Annotations to Observations",
+    "observations_ko": [
+      {
+        "number": "1",
+        "deficiency_ko": "시판 중인 의료기기가 오작동하였고 그 오작동이 재발할 경우 사망 또는 중대한 상해를 유발하거나 이에 기여할 가능성이 있다고 합리적으로 시사하는 정보를 접수하거나 그 밖의 방법으로 인지한 날로부터 30일 이내에 MDR(의료기기 보고서)을 제출하지 않았다.",
+        "detail_ko": "구체적으로, 귀사는 귀사의 의약품·의료기기 복합제품(Vonvendi)의 의료기기 구성부에 대한 명백한 오작동을 보고하지 않았다. 해당 복합제품의 주된 작용기전은 생물학적 의약품(재조합 폰빌레브란트인자)에 기인한다. 의료기기 구성부(Mix2Vial)는 동결건조된 의약품을 재용해(reconstitution)하는 데 사용된다. \"Incomplete Diluent Transfer\"(즉, 기기를 통한 희석제의 불완전한 이송)에 관한 다음 불만사항들에 대하여 의료기기 보고서(MDR)가 제출되지 않았다: 제품코드 (제품코드 (제품코드 ; (제품코드 (제품코드 및 (제품코드 . 또한 \"Defective Device\"(결함 있는 기기)에 관한 다음 불만사항에 대해서도 MDR이 제출되지 않았다: 제품코드 ."
+      },
+      {
+        "number": "2",
+        "deficiency_ko": "배치 생산·관리 기록서(batch production and control records)에 사용된 주요 설비 및 라인의 식별 정보가 포함되어 있지 않아 미흡하다.",
+        "detail_ko": "구체적으로, 배치 생산 기록서 전반에 걸쳐 중요 설비(critical equipment)에 대한 식별 정보가 없었다. 예를 들어, ADVATE® 완제의약품 배치 및 이에 대응하는 BAXJECT III® 최종 완제의약품(FDP) 배치의 배치 생산 기록서에는 다음 항목의 식별 정보가 포함되어 있지 않았다: A. B. C. (b) (4)"
+      }
     ]
-   },
-   "administrative_risks": "무균 제품의 오염 관리 실패가 장기간 반복되고 품질부서의 감독 기능 결함까지 지적되었으므로, 회신이 미흡하거나 시정이 지연될 경우 실사 결과가 OAI(Official Action Indicated)로 분류될 가능성이 있다. 이 경우 Warning Letter 발부, 후속 재실사(follow-up inspection)로 이어질 수 있으며, 해외 제조소라면 Import Alert(수입경보)에 의한 미국 수입 보류 조치를 받을 가능성도 있다. 진균·그람음성균 오염이 지속되는 상황에서 제품 품질영향평가 결과에 따라 자발적 회수(recall)나 출하 보류가 요구될 수 있고, 반복 위반이 시정되지 않으면 consent decree 등 사법적 조치로 확대될 가능성도 배제하기 어렵다. 또한 정부조달·해외 규제기관의 GMP 적합 판정에도 부정적 영향이 미칠 수 있다."
   },
-  "source_text": "OBSERVATION 1: The responsibilities and procedures applicable to the quality control unit are not fully followed.\nSpecifically, lA. Your Quality Unit failed to: a. Ensure the timely implementation of corrective and preventive actions for the observed dried and cracked: <Redacted B4> settle plates used for environmental monitoring and then incubated in a <Redacted B4> incubator. Please refer to\n\nOBSERVATION 1: .\nb. Conduct adequate root-cause analyses for the ongoing Environmental Monitoring (EM) and Personnel Monitoring (PM) excursions. The Quality unit also failed to perform effectiveness checks on the implemented corrective and preventive actions. as evident by persistent fungal and bacterial recoveries despite implementing corrective actions in the clean room areas. Please refer to OBSERVATlON 2 and\n\nOBSERVATION 3: .\nc Investigate the root cause of visual inspection failure during initial 100% inspection before proceeding to secondary/tertiary inspection of the filled syringes. Please refer to\n\nOBSERVATION 4: .\nd. Evaluate air flow patterns under dynamic conditions in all ISO 5 classified BSC cabinets in the clean room. Please refer to OBSERVATTON 3. AMENDMENT 1 Et,40LOYE£ SIS G•.,-.n,,~ oi:.1e 1ssueo\n\nOBSERVATION 2: Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed.\nSpecifically, 2A. Your firm's environmental monitoring program failed to prevent or adequately address repeated fungaJ (mold) contamination in ISO Class 7 and ISO Class 8 classified areas adjacent to ISO Class 5 Primary Engineering Controls. The environmental monitoring data collected between July 2025 and April 2026 document at least twenty-two (22) separate fungal excursion events across ISO 8 rooms (Rooms 4, 7, and 8) representing a recurring and unresolved pattern of mold contamination in the classified cleanroom environment supporting aseptic compounding operations. The following is the list of twenty-two (22) documented fungal contamination events in the clean room area: AMENDMENT 1 EMPLOYEE(S, $1GNA':'UR: OATE ISSUED\n\nOBSERVATION 3: Production personnel were not practicing good sanitation and health habits.\nSpecifically, Your firm failed to establish and maintain adequate controls to prevent repeated objectionable microorganism recoveries during personnel monitoring (PM) activities in TSO Class 5, ISO Class 7, and ISO Class 8 classified areas. Environmental monitoring records document eleven (11) personnel monitoring excursion events involving bacterial contamination from personnel gowning samples (chest. forehead, forearm) and fingertip samples collected between April 2025 and February 2026. Multiple excursions involved objectionable gram-negative organisms. The assigned root causes were generally insufficient aseptic gowning technique, improper material transfer, cleaning or personnel movement The following is the list of eleven (11) documented contamination events: Investigation Date of Sampl e Operator Sample Type Room ISO Cl ass CFl Count Organism(s) I dentified Lot Impacted Units R ejected Root Cause EM-25-001 NCR-25-013 16 Apr 2025 <Redact ed B4> <Redacted B4> Chest Room 2 / ISO 7 15 CFU Corynebacterum segmentosum Actinomyces oris/naesiundi Staphyloccus epidermis Staphyloccus captis <Redacted B4> Ineffective aseptic echnique during gowning and personnel movement EM-25-002 NCR-2\n\nOBSERVATION 4: There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.\nSpecifically, Your firm failed to conduct, or document, an investigation into the root cause of visual inspection failures prior to proceeding with secondary and/or tertiary inspections. A review of ophthalmic lot visual inspection records spanning from March 2025 through early 2026 identified forty-four (44) lots in which the firm proceeded directly to secondary inspection following a primary visual inspection failure which was characterized by major reject rates exceeding the <Redacted B4> acceptance limit and/or major defects found at the primary AQL stage. There was no documented investigation and root cause analysis into the source and cause of these recurring defect types prior to reinspection. In addition <Redacted B4> lots <Redacted B4> proceeded to tertiary inspection after secondary inspection also failed, again without a documented investigation. The predominant defect types identified were intrinsic particulate and product fill volume defects. AMENDMENTl EJ·.tP!.OYEE{S) Sa'.:;!l.'ATI..RE OA\"E SSUED"
- },
- "fda483-193603": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "observation": "복합제(의약품+의료기기) Vonvendi 의 기기 구성부(동결건조 제품 재용해용 Mix2Vial)에 대해 명백한 오작동(malfunction) 사례를 MDR 로 보고하지 않았다. 구체적으로 \"Incomplete Diluent Transfer\"(희석액이 기기를 통해 불완전하게 이송됨) 관련 다수 불만과 \"Defective Device\" 관련 불만 1건에 대해 Medical Device Report 가 제출되지 않았다.",
-     "citation": "21 CFR 803.50",
-     "risk": "시판 기기 구성부의 오작동 신호가 FDA 에 전달되지 않아 재발 시 사망·중상으로 이어질 수 있는 위해가 규제당국 감시망에서 누락되고, 자사 내부에서도 오작동 추세 분석·시정 기회를 상실한다."
+  "fda483-193616": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "observation": "채혈(phlebotomy) 부위를 무균 혈액 용기를 최대한 보장하는 방법으로 소독하지 않았다. 정맥천자 부위 소독에 \"Non-sterile Solution\"(비멸균 용액)으로 표시된 제품을 사용했다.",
+          "citation": "21 CFR 640.4(f)",
+          "risk": "비멸균 소독제 사용으로 채혈 부위 피부 상재균이 제거되지 않아 수집 혈액이 오염될 수 있고, 수혈 환자에게 패혈성 수혈반응 등 직접적 안전 위해가 발생할 수 있다."
+        },
+        {
+          "observation": "소독액이 아직 마르지 않은 상태에서 Specialist 들이 정맥천자 부위에 곧바로 접촉물을 올려놓는 것이 관찰되었고, 2025년 8월 28일에는 한 Specialist 가 제조사 사용설명서(IFU)가 지시한 절차를 이행하지 않고 공여자의 정맥천자 부위를 소독하는 것이 관찰되었다.",
+          "citation": "21 CFR 640.4(f)",
+          "risk": "소독제의 필요 접촉시간(건조시간)이 확보되지 않고 제조사 IFU 를 따르지 않아 소독 효과가 검증되지 않으며, 채혈 부위 오염 및 혈액제제 무균성 결함으로 이어질 수 있다."
+        },
+        {
+          "observation": "동종수혈 및 추가 제조 목적의 혈액·혈액성분 수집·처리의 모든 단계를 포함하는 문서화된 표준작업절차(SOP)가 항상 수립·유지되지는 않았다. 구체적으로 헌혈 과정에서 이상반응(adverse reaction)을 경험한 공여자에 대한 사후관리(donor follow-up) 활동을 규정한 문서화된 절차가 존재하지 않는다.",
+          "citation": "21 CFR 606.100(b)",
+          "risk": "이상반응 공여자에 대한 후속 조치가 절차로 규정되지 않아 담당자별로 대응이 달라지고, 공여자 안전관리 누락 및 이상반응 추적·기록의 결손이 발생할 수 있다."
+        },
+        {
+          "observation": "시험 절차서 \"Anti-Hepatitis C Virus System\"(Version 1.0, 시행일 2021년 1월 19일)에 시험 수행을 위한 상세 지시사항이 포함되어 있지 않고, 대신 담당자에게 System Operations Manual 을 참조하도록 지시하고 있다.",
+          "citation": "21 CFR 606.100(b)",
+          "risk": "감염인자(HCV) 선별시험의 수행 단계가 승인된 절차서로 통제되지 않아 시험 수행의 일관성·재현성이 보장되지 않으며, 선별시험 오류 시 감염 위험 혈액이 유통될 수 있다."
+        }
+      ],
+      "inspectional_significance": "이 483 은 혈액 수집·처리 시설에 대한 실사에서 발부된 것으로, 두 개의 축(채혈 부위 무균 소독 실무, 수집·시험 절차의 문서화)에 걸쳐 지적이 이루어졌다. 첫째, 정맥천자 부위 소독은 수집 혈액의 무균성을 좌우하는 핵심 통제로, 비멸균 표시 용액 사용·소독액 건조 전 접촉·제조사 IFU 미준수가 서로 다른 Specialist 및 서로 다른 공여자에 대해 반복 관찰되었다는 점에서 개인의 단발성 실수보다는 절차·교육·감독 수준의 systemic(체계적) 결함일 가능성이 있다. 둘째, 이상반응 공여자 사후관리 절차의 부재와 Anti-HCV 시험 절차서의 상세 지시 결여는 품질시스템 문서체계 자체의 공백을 시사하며, 이는 첫째 지적의 근본 원인과도 연결될 가능성이 있다. 원문 관찰에는 기록의 조작·소급 변경 등 데이터 무결성(data integrity) 위반을 직접 시사하는 서술은 없다. 다만 수혈용 혈액의 무균성과 감염인자 선별이라는 환자안전 직결 영역의 지적이므로, 응답이 불충분하거나 시정이 지연될 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소일 경우 Import Alert 로 이어질 가능성도 배제할 수 없다.",
+      "required_remediation": {
+        "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+        "items": [
+          "정맥천자 부위 소독에 사용 중인 모든 제품의 표시·규격을 전수 확인하여 \"Non-sterile Solution\" 표시 제품의 사용을 중단하고, 무균 혈액 용기 확보를 보장하는 소독제로 즉시 전환한 근거를 문서화한다.",
+          "제조사 사용설명서(IFU)에 따른 소독 절차(적용 방법·필요 건조/접촉 시간·건조 전 부위 접촉 금지)를 SOP 에 반영하고, 전 Specialist 대상 재교육 및 실무 적격성 평가(observation-based competency)를 실시·기록한다.",
+          "이상반응을 경험한 공여자에 대한 사후관리(donor follow-up) 활동을 규정한 문서화된 절차를 신규 수립하고, 지적 이전 기간의 이상반응 사례에 대해 사후관리 누락 여부를 소급 검토한다.",
+          "\"Anti-Hepatitis C Virus System\"(Version 1.0, 2021-01-19) 절차서를 시험 수행의 모든 단계를 포함하도록 개정하고, 동일하게 외부 매뉴얼 참조로 대체된 다른 절차서가 있는지 전수 점검한 뒤 근본원인 조사와 CAPA 를 수립·문서화한다."
+        ]
+      },
+      "administrative_risks": "지적사항에 대한 회신이 15영업일 내에 제출되지 않거나 근본원인·소급 검토·CAPA 가 불충분하다고 평가될 경우, 해당 실사는 OAI(Official Action Indicated) 로 분류되고 Warning Letter 발부로 이어질 수 있다. 채혈 부위 무균 소독과 감염인자 선별시험 절차라는 환자안전 직결 항목이 포함되어 있어 FDA 의 후속 재실사(follow-up inspection) 가능성이 높은 편이며, 시정이 반복적으로 미흡할 경우 혈액제제의 출하·유통 제한, 해외 제조소인 경우 Import Alert 등재, 나아가 반복·중대한 미시정 시 consent decree 등 사법적 조치로 확대될 가능성도 있다. 또한 절차 문서화 결여는 개별 관찰의 시정만으로 종결되기 어려워, 품질시스템 전반에 대한 추가 검토 요구로 확대될 수 있다."
     },
-    {
-     "observation": "배치생산·관리기록서에 사용된 주요 설비 및 라인의 식별정보가 포함되어 있지 않았다. 예로 ADVATE® 완제 배치 및 그에 대응하는 BAXJECT III® 완제의약품(FDP) 배치의 배치생산기록서 전반에 걸쳐 중요 설비의 식별 기재가 누락되어 있었다.",
-     "citation": "21 CFR 211.188(b)(1)",
-     "risk": "배치별로 어떤 설비·라인이 사용됐는지 추적할 수 없어, 설비 기인 품질 이슈(교차오염·설비 고장·세척 부적합) 발생 시 영향 배치 범위를 특정한 조사·회수 판단이 불가능해진다."
-    }
-   ],
-   "inspectional_significance": "이 483 은 2025년 9월 10일부터 9월 18일까지 진행된 실사에서 발부된 것으로, 서로 다른 두 규제 영역(복합제의 기기 구성부 시판 후 안전성 보고 의무 및 완제의약품 cGMP 기록 요건)에 걸쳐 지적이 제기되었다. 관찰사항 1 은 단일 사례가 아니라 \"Incomplete Diluent Transfer\" 라는 동일 유형의 복수 불만 건과 별도의 \"Defective Device\" 불만 건에 대해 반복적으로 MDR 이 제출되지 않은 것이어서, 불만처리·보고성 판정(reportability decision) 절차 자체의 체계적(systemic) 결함일 가능성이 있다. 관찰사항 2 역시 특정 기록 1건이 아니라 배치생산기록서 \"전반에 걸쳐(throughout)\" 중요 설비 식별이 누락됐다고 기술돼 있어 기록 양식·문서화 체계 수준의 결함으로 확대 해석될 가능성이 있다. 기록 자체의 위·변조나 데이터 조작을 시사하는 서술은 원문에 없으나, 배치기록의 필수 항목이 구조적으로 비어 있다는 점에서 기록 완전성(completeness) 측면의 문제로 다뤄질 수 있다. 원문에 FDA 의 분류나 후속 조치 결정은 기재돼 있지 않으나, 시판 후 보고 누락과 cGMP 기록 결함이 병존하고 두 지적 모두 반복성을 시사한다는 점에서 회사의 483 응답이 불충분할 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소인 경우 Import Alert 로 이어질 가능성도 배제할 수 없다.",
-   "required_remediation": {
-    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-    "items": [
-     "지적된 \"Incomplete Diluent Transfer\" 및 \"Defective Device\" 불만 건에 대해 보고성(reportability) 재판정을 수행하고, 보고 대상으로 확인된 건은 지연 사유를 명시하여 즉시 MDR 을 제출한다.",
-     "Vonvendi 를 포함한 복합제의 기기 구성부 관련 과거 불만 전체를 소급 검토하여 미보고 MDR 대상 건이 추가로 있는지 확인하고, 그 결과를 회신에 포함한다.",
-     "불만처리·MDR 보고성 판정 절차(기기 구성부가 포함된 복합제에 대한 적용 범위·30일 기한 관리·판정 근거 문서화)를 개정하고 담당자 재교육을 실시하는 CAPA 를 수립·문서화한다.",
-     "배치생산·관리기록서 양식에 주요 설비 및 라인 식별란을 반영하고, ADVATE® 및 BAXJECT III® 를 포함한 해당 제품군의 기존 배치기록을 소급 검토하여 설비 식별 누락 범위와 배치 추적 가능성에 대한 영향평가(회수·시장조치 필요 여부 포함)를 수행한다."
+    "source_text": "OBSERVATION 1: The phlebotomy site is not prepared by a method that gives maximum assurance of a sterile container of blood.\nDuring observations of collection procedures, Specialists were individually observed preparing venipuncture sites for separate donors. The following deficiencies were observed: A. The venipuncture sites were prepared using and that are labeled as \"Non-sterile Solution.\" B. After preparing the venipuncture sites with the and , the Specialists were observed placing directly onto the venipuncture sites while the solution was still drying. Additionally, on 8/28/2025, a Specialist was also observed preparing a donor's venipuncture site without utilizing as directed by the manufacturer. The manufacturer's instructions for use specify: \"\n\nOBSERVATION 3: Written standard operating procedures including all steps to be followed in the collection and processing of blood and blood components for allogeneic transfusion and further manufacturing purposes were not always established and maintained.\nSpecifically, A. Your firm does not have written procedures governing donor follow-up activities for donors who experienced adverse reactions during the donation process. B.Your firm’s current procedure titled, “Anti- Hepatitis C Virus System” (Version 1.0, Effective date: 1/19/2021), does not contain detailed instructions for performing testing operations. Instead, your procedure instructs personnel to reference the System Operations Manual.",
+    "observations_ko": [
+      {
+        "number": "1",
+        "deficiency_ko": "정맥천자(phlebotomy) 부위가 무균 혈액 용기를 최대한 보증하는 방법으로 소독·준비되지 않았다.",
+        "detail_ko": "채혈 절차를 관찰하는 과정에서, 각각의 헌혈자에 대해 정맥천자 부위를 준비하는 전문요원(Specialist)들을 개별적으로 관찰하였다. 다음과 같은 결함이 관찰되었다: A. 정맥천자 부위를        및        을 사용하여 준비하였는데, 해당 제품들은 \"Non-sterile Solution(비멸균 용액)\"으로 표시되어 있다. B. 전문요원들이        및        으로 정맥천자 부위를 준비한 후, 용액이 아직 마르는 중인 상태에서        을(를) 정맥천자 부위에 직접 올려놓는 것이 관찰되었다. 또한 2025년 8월 28일에는, 한 전문요원이 제조사 지시대로        을(를) 사용하지 않은 채 헌혈자의 정맥천자 부위를 준비하는 것도 관찰되었다. 제조사의 사용지침(instructions for use)에는 다음과 같이 규정되어 있다: \""
+      },
+      {
+        "number": "3",
+        "deficiency_ko": "동종수혈(allogeneic transfusion) 및 추가 제조 목적의 혈액·혈액성분의 채혈과 처리 시 따라야 할 모든 단계를 포함하는 문서화된 표준작업절차(SOP)가 항상 수립·유지되지는 않았다.",
+        "detail_ko": "구체적으로, A. 귀사는 헌혈 과정에서 이상반응(adverse reaction)을 경험한 헌혈자에 대한 헌혈자 추적관리(follow-up) 활동을 규율하는 문서화된 절차를 보유하고 있지 않다. B. 귀사의 현행 절차서인 \"Anti-Hepatitis C Virus        System\"(Version 1.0, 시행일: 2021년 1월 19일)에는 시험 작업 수행에 대한 상세 지시사항이 포함되어 있지 않다. 대신 해당 절차서는 담당자에게        System Operations Manual 을 참조하도록 지시하고 있다."
+      }
     ]
-   },
-   "administrative_risks": "483 에 대한 회신이 미흡하거나 시정이 지연될 경우, 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 가 발부될 수 있다. 관찰사항 1 은 시판 후 안전성 보고(MDR) 의무 위반에 해당하므로 기기 구성부를 포함한 복합제에 대한 별도의 시판 후 보고 관련 행정조치로 이어질 수 있으며, 해당 제조소가 해외에 소재할 경우 Import Alert 에 따른 수입경보·통관 보류 가능성이 있다. 관찰사항 2 와 같이 배치기록의 필수 기재사항이 구조적으로 누락된 cGMP 결함은 후속 재실사(follow-up inspection) 의 직접적 사유가 되며, 동일·유사 지적이 반복 확인될 경우 consent decree 를 포함한 강제조치로 확대될 가능성도 있다. 또한 설비 식별 부재로 배치 추적성이 확보되지 않는 점은 향후 품질 이슈 발생 시 영향 범위 특정이 어려워 회수 범위가 불필요하게 확대되는 행정 부담으로 이어질 수 있다."
   },
-  "source_text": "OBSERVATION 1: An MDR report was not submitted within 30 days ofreceiving or otherwise becoming aware of information that reasonably suggests that a marketed device has malfunctioned and would be likely to cause or contribute to a death or serious injury if the malfunction were to recur.\nSpecifically, your firm has not reported apparent malfunctions for the device constituent part of your firm's combination drug and medical device product (Vonvendi). The combination product's primary mode of action relates to the biologic drug product (recombinant von Willebrand factor). The medical device constituent part (Mix2Vial) is used for reconstituting the lyophilized drug product. Medical Device Reports (MD Rs) were not submitted for the following complaints regarding \"Incomnlete Diluent Transfer:' (i.e., incomplete transfer of diluent via the device): product code (product code (product code ; (product code (product code and (product code In addition, an MDR was not submitted for the following complaint regarding a \"Defective Device\": product code .\n\nOBSERVATION 2: The batch production and control records are deficient in that they do not include the identity of major equipment and lines used.\nSpecifically, there was no identification of critical equipment throughout batch production records. For example, the batch production records for ADV ATE®, Drug Product Batch and its corresponding BAXJECT III®, Finished Drug Product (FDP) Batch failed to include identification of: A. B. C. (b) (4) *DATES OF INSPECTION 9/10/2025(Wed), 9/11/2025(Thu), 9/12/2025(Fri), 9/15/2025(Mon), 9/16/2025(Tue), 9/17/2025(Wed), 9/18/2025(Thu) Annotations to Observations"
- },
- "fda483-193616": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "observation": "채혈(phlebotomy) 부위를 무균 혈액 용기를 최대한 보장하는 방법으로 소독하지 않았다. 정맥천자 부위 소독에 \"Non-sterile Solution\"(비멸균 용액)으로 표시된 제품을 사용했다.",
-     "citation": "21 CFR 640.4(f)",
-     "risk": "비멸균 소독제 사용으로 채혈 부위 피부 상재균이 제거되지 않아 수집 혈액이 오염될 수 있고, 수혈 환자에게 패혈성 수혈반응 등 직접적 안전 위해가 발생할 수 있다."
+  "admin-2026005761": {
+    "deep_analysis": {
+      "key_violations": [
+        {
+          "citation": "「약사법 」제62조제3호",
+          "original": " -「약사법 」제62조제3호에 따라 누구든지 같은 법 제52조제1항에 따라 기준이 정하여진 의약외품으로서 정한 기준에 맞지 아니한 의약외품을 판매하거나, 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)’의 수거·검사 결과, 미생물한도시험에서 부적합(총 호기성세균수 97,000)한 제품을 제조하여 판매한 사실이 있음",
+          "description": "기준이 정하여진 의약외품은 그 기준에 맞아야 판매·제조가 가능함에도, 동 업체는 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'의 수거·검사에서 미생물한도시험 부적합(총 호기성세균수 97,000) 판정을 받은 제품을 제조하여 실제로 판매했다. 즉 출하 전 미생물 품질기준 적합 여부가 담보되지 않은 상태로 완제품이 시중에 유통된 것이다.",
+          "risk": "미생물한도 기준을 크게 초과한 소독·살균 목적 의약외품이 그대로 사용될 경우 오염된 제품에 의한 2차 감염·상처 감염 등 사용자 건강 피해로 직결되며, 제조공정·용수·보존력 관리 전반의 통제 실패를 시사한다."
+        },
+        {
+          "citation": "「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)",
+          "original": "처분명: ○ 해당 품목 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.)\n * (대상품목) 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)(허가번호: 제5013, 허가일자: 2016.3.2.)\n적용법령: ○「약사법」제62조\n ○「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)",
+          "description": "동 위반에 대해 해당 품목인 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'(허가번호: 제5013, 허가일자: 2016.3.2.)에 대하여 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.) 처분이 확정되었고, 그 근거로 행정처분 기준 [별표8]의 개별기준이 적용되었다.",
+          "risk": "정지기간 동안 해당 품목의 제조가 전면 중단되어 공급 차질과 매출 손실이 발생하고, 처분 이력이 공개되어 향후 동일·유사 위반 시 가중된 기준이 적용될 근거가 남는다."
+        }
+      ],
+      "disposition_basis": "확정된 처분은 해당 품목(퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%), 허가번호: 제5013)에 대한 제조업무정지 3개월이며, 집행기간은 2026. 7. 30.부터 2026. 10. 29.까지다. 처분 사유는 유통 의약외품 수거·검사에서 미생물한도시험 부적합(총 호기성세균수 97,000)이 확인되어, 정한 기준에 맞지 아니한 의약외품을 제조·판매한 것이다. 적용법령으로 「약사법」제62조가 제시되었고, 처분 수위는 「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)에 따라 산정되었다. 최종처분일자는 20260716, 공개종료일자는 20270128이다. 원문에 과징금 갈음 등 다른 처분 형태는 명시되어 있지 않다.",
+      "required_remediation": {
+        "deadline": "제조업무정지 이행기간은 2026. 7. 30. ~ 2026. 10. 29.(3개월)이며, 해당 기간 동안 대상 품목의 제조업무를 중단해야 한다(처분 공개종료일자: 20270128).",
+        "items": [
+          "2026. 7. 30.부터 2026. 10. 29.까지 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'(허가번호: 제5013)의 제조업무를 전면 중단하고, 정지기간 중 제조행위가 없음을 입증할 수 있도록 제조·출하 기록을 관리한다.",
+          "미생물한도시험 부적합(총 호기성세균수 97,000)의 원인을 제조용수·원료·설비 세척 및 보존력 관점에서 조사하고, 동일 원인이 다른 제조번호·품목에 파급되었는지 확인한다.",
+          "이미 출하되어 유통 중인 해당 제품에 대해 회수 필요 여부를 판단하고, 시장 재고 현황을 파악하여 후속 조치를 결정한다.",
+          "출하 전 미생물한도시험 결과가 기준에 적합할 때만 출하되도록 완제품 시험·출하판정 절차를 점검하고, 정지기간 종료 후 재개 전 개선 조치의 유효성을 검증한다."
+        ]
+      },
+      "administrative_risks": "처분 수위가 「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)의 개별기준에 따라 정해진 만큼, 동일·유사 위반이 반복되면 같은 기준 체계 안에서 정지기간이 가중되거나 더 무거운 처분으로 이어질 수 있다. 정지기간 중 제조업무를 계속하는 등 처분을 이행하지 않으면 별도의 추가 행정처분 대상이 될 수 있고, 처분 사실이 20270128까지 공개되어 거래처 실사·입찰 등에서 불이익 요인으로 작용한다. 또한 수거·검사 부적합 이력이 남아 향후 유통품 수거·검사 및 후속 실태조사에서 우선 점검 대상이 될 가능성이 크다."
     },
-    {
-     "observation": "소독액이 아직 마르지 않은 상태에서 Specialist 들이 정맥천자 부위에 곧바로 접촉물을 올려놓는 것이 관찰되었고, 2025년 8월 28일에는 한 Specialist 가 제조사 사용설명서(IFU)가 지시한 절차를 이행하지 않고 공여자의 정맥천자 부위를 소독하는 것이 관찰되었다.",
-     "citation": "21 CFR 640.4(f)",
-     "risk": "소독제의 필요 접촉시간(건조시간)이 확보되지 않고 제조사 IFU 를 따르지 않아 소독 효과가 검증되지 않으며, 채혈 부위 오염 및 혈액제제 무균성 결함으로 이어질 수 있다."
-    },
-    {
-     "observation": "동종수혈 및 추가 제조 목적의 혈액·혈액성분 수집·처리의 모든 단계를 포함하는 문서화된 표준작업절차(SOP)가 항상 수립·유지되지는 않았다. 구체적으로 헌혈 과정에서 이상반응(adverse reaction)을 경험한 공여자에 대한 사후관리(donor follow-up) 활동을 규정한 문서화된 절차가 존재하지 않는다.",
-     "citation": "21 CFR 606.100(b)",
-     "risk": "이상반응 공여자에 대한 후속 조치가 절차로 규정되지 않아 담당자별로 대응이 달라지고, 공여자 안전관리 누락 및 이상반응 추적·기록의 결손이 발생할 수 있다."
-    },
-    {
-     "observation": "시험 절차서 \"Anti-Hepatitis C Virus System\"(Version 1.0, 시행일 2021년 1월 19일)에 시험 수행을 위한 상세 지시사항이 포함되어 있지 않고, 대신 담당자에게 System Operations Manual 을 참조하도록 지시하고 있다.",
-     "citation": "21 CFR 606.100(b)",
-     "risk": "감염인자(HCV) 선별시험의 수행 단계가 승인된 절차서로 통제되지 않아 시험 수행의 일관성·재현성이 보장되지 않으며, 선별시험 오류 시 감염 위험 혈액이 유통될 수 있다."
-    }
-   ],
-   "inspectional_significance": "이 483 은 혈액 수집·처리 시설에 대한 실사에서 발부된 것으로, 두 개의 축(채혈 부위 무균 소독 실무, 수집·시험 절차의 문서화)에 걸쳐 지적이 이루어졌다. 첫째, 정맥천자 부위 소독은 수집 혈액의 무균성을 좌우하는 핵심 통제로, 비멸균 표시 용액 사용·소독액 건조 전 접촉·제조사 IFU 미준수가 서로 다른 Specialist 및 서로 다른 공여자에 대해 반복 관찰되었다는 점에서 개인의 단발성 실수보다는 절차·교육·감독 수준의 systemic(체계적) 결함일 가능성이 있다. 둘째, 이상반응 공여자 사후관리 절차의 부재와 Anti-HCV 시험 절차서의 상세 지시 결여는 품질시스템 문서체계 자체의 공백을 시사하며, 이는 첫째 지적의 근본 원인과도 연결될 가능성이 있다. 원문 관찰에는 기록의 조작·소급 변경 등 데이터 무결성(data integrity) 위반을 직접 시사하는 서술은 없다. 다만 수혈용 혈액의 무균성과 감염인자 선별이라는 환자안전 직결 영역의 지적이므로, 응답이 불충분하거나 시정이 지연될 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소일 경우 Import Alert 로 이어질 가능성도 배제할 수 없다.",
-   "required_remediation": {
-    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-    "items": [
-     "정맥천자 부위 소독에 사용 중인 모든 제품의 표시·규격을 전수 확인하여 \"Non-sterile Solution\" 표시 제품의 사용을 중단하고, 무균 혈액 용기 확보를 보장하는 소독제로 즉시 전환한 근거를 문서화한다.",
-     "제조사 사용설명서(IFU)에 따른 소독 절차(적용 방법·필요 건조/접촉 시간·건조 전 부위 접촉 금지)를 SOP 에 반영하고, 전 Specialist 대상 재교육 및 실무 적격성 평가(observation-based competency)를 실시·기록한다.",
-     "이상반응을 경험한 공여자에 대한 사후관리(donor follow-up) 활동을 규정한 문서화된 절차를 신규 수립하고, 지적 이전 기간의 이상반응 사례에 대해 사후관리 누락 여부를 소급 검토한다.",
-     "\"Anti-Hepatitis C Virus System\"(Version 1.0, 2021-01-19) 절차서를 시험 수행의 모든 단계를 포함하도록 개정하고, 동일하게 외부 매뉴얼 참조로 대체된 다른 절차서가 있는지 전수 점검한 뒤 근본원인 조사와 CAPA 를 수립·문서화한다."
-    ]
-   },
-   "administrative_risks": "지적사항에 대한 회신이 15영업일 내에 제출되지 않거나 근본원인·소급 검토·CAPA 가 불충분하다고 평가될 경우, 해당 실사는 OAI(Official Action Indicated) 로 분류되고 Warning Letter 발부로 이어질 수 있다. 채혈 부위 무균 소독과 감염인자 선별시험 절차라는 환자안전 직결 항목이 포함되어 있어 FDA 의 후속 재실사(follow-up inspection) 가능성이 높은 편이며, 시정이 반복적으로 미흡할 경우 혈액제제의 출하·유통 제한, 해외 제조소인 경우 Import Alert 등재, 나아가 반복·중대한 미시정 시 consent decree 등 사법적 조치로 확대될 가능성도 있다. 또한 절차 문서화 결여는 개별 관찰의 시정만으로 종결되기 어려워, 품질시스템 전반에 대한 추가 검토 요구로 확대될 수 있다."
-  },
-  "source_text": "OBSERVATION 1: The phlebotomy site is not prepared by a method that gives maximum assurance of a sterile container of blood.\nDuring observations of collection procedures, Specialists were individually observed preparing venipuncture sites for separate donors. The following deficiencies were observed: A. The venipuncture sites were prepared using and that are labeled as \"Non-sterile Solution.\" B. After preparing the venipuncture sites with the and , the Specialists were observed placing directly onto the venipuncture sites while the solution was still drying. Additionally, on 8/28/2025, a Specialist was also observed preparing a donor's venipuncture site without utilizing as directed by the manufacturer. The manufacturer's instructions for use specify: \"\n\nOBSERVATION 3: Written standard operating procedures including all steps to be followed in the collection and processing of blood and blood components for allogeneic transfusion and further manufacturing purposes were not always established and maintained.\nSpecifically, A. Your firm does not have written procedures governing donor follow-up activities for donors who experienced adverse reactions during the donation process. B.Your firm’s current procedure titled, “Anti- Hepatitis C Virus System” (Version 1.0, Effective date: 1/19/2021), does not contain detailed instructions for performing testing operations. Instead, your procedure instructs personnel to reference the System Operations Manual."
- },
- "admin-2026005761": {
-  "deep_analysis": {
-   "key_violations": [
-    {
-     "citation": "「약사법 」제62조제3호",
-     "original": " -「약사법 」제62조제3호에 따라 누구든지 같은 법 제52조제1항에 따라 기준이 정하여진 의약외품으로서 정한 기준에 맞지 아니한 의약외품을 판매하거나, 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)’의 수거·검사 결과, 미생물한도시험에서 부적합(총 호기성세균수 97,000)한 제품을 제조하여 판매한 사실이 있음",
-     "description": "기준이 정하여진 의약외품은 그 기준에 맞아야 판매·제조가 가능함에도, 동 업체는 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'의 수거·검사에서 미생물한도시험 부적합(총 호기성세균수 97,000) 판정을 받은 제품을 제조하여 실제로 판매했다. 즉 출하 전 미생물 품질기준 적합 여부가 담보되지 않은 상태로 완제품이 시중에 유통된 것이다.",
-     "risk": "미생물한도 기준을 크게 초과한 소독·살균 목적 의약외품이 그대로 사용될 경우 오염된 제품에 의한 2차 감염·상처 감염 등 사용자 건강 피해로 직결되며, 제조공정·용수·보존력 관리 전반의 통제 실패를 시사한다."
-    },
-    {
-     "citation": "「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)",
-     "original": "처분명: ○ 해당 품목 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.)\n * (대상품목) 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)(허가번호: 제5013, 허가일자: 2016.3.2.)\n적용법령: ○「약사법」제62조\n ○「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)",
-     "description": "동 위반에 대해 해당 품목인 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'(허가번호: 제5013, 허가일자: 2016.3.2.)에 대하여 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.) 처분이 확정되었고, 그 근거로 행정처분 기준 [별표8]의 개별기준이 적용되었다.",
-     "risk": "정지기간 동안 해당 품목의 제조가 전면 중단되어 공급 차질과 매출 손실이 발생하고, 처분 이력이 공개되어 향후 동일·유사 위반 시 가중된 기준이 적용될 근거가 남는다."
-    }
-   ],
-   "disposition_basis": "확정된 처분은 해당 품목(퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%), 허가번호: 제5013)에 대한 제조업무정지 3개월이며, 집행기간은 2026. 7. 30.부터 2026. 10. 29.까지다. 처분 사유는 유통 의약외품 수거·검사에서 미생물한도시험 부적합(총 호기성세균수 97,000)이 확인되어, 정한 기준에 맞지 아니한 의약외품을 제조·판매한 것이다. 적용법령으로 「약사법」제62조가 제시되었고, 처분 수위는 「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)에 따라 산정되었다. 최종처분일자는 20260716, 공개종료일자는 20270128이다. 원문에 과징금 갈음 등 다른 처분 형태는 명시되어 있지 않다.",
-   "required_remediation": {
-    "deadline": "제조업무정지 이행기간은 2026. 7. 30. ~ 2026. 10. 29.(3개월)이며, 해당 기간 동안 대상 품목의 제조업무를 중단해야 한다(처분 공개종료일자: 20270128).",
-    "items": [
-     "2026. 7. 30.부터 2026. 10. 29.까지 '퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)'(허가번호: 제5013)의 제조업무를 전면 중단하고, 정지기간 중 제조행위가 없음을 입증할 수 있도록 제조·출하 기록을 관리한다.",
-     "미생물한도시험 부적합(총 호기성세균수 97,000)의 원인을 제조용수·원료·설비 세척 및 보존력 관점에서 조사하고, 동일 원인이 다른 제조번호·품목에 파급되었는지 확인한다.",
-     "이미 출하되어 유통 중인 해당 제품에 대해 회수 필요 여부를 판단하고, 시장 재고 현황을 파악하여 후속 조치를 결정한다.",
-     "출하 전 미생물한도시험 결과가 기준에 적합할 때만 출하되도록 완제품 시험·출하판정 절차를 점검하고, 정지기간 종료 후 재개 전 개선 조치의 유효성을 검증한다."
-    ]
-   },
-   "administrative_risks": "처분 수위가 「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)의 개별기준에 따라 정해진 만큼, 동일·유사 위반이 반복되면 같은 기준 체계 안에서 정지기간이 가중되거나 더 무거운 처분으로 이어질 수 있다. 정지기간 중 제조업무를 계속하는 등 처분을 이행하지 않으면 별도의 추가 행정처분 대상이 될 수 있고, 처분 사실이 20270128까지 공개되어 거래처 실사·입찰 등에서 불이익 요인으로 작용한다. 또한 수거·검사 부적합 이력이 남아 향후 유통품 수거·검사 및 후속 실태조사에서 우선 점검 대상이 될 가능성이 크다."
-  },
-  "source_text": "○ 유통 의약외품 수거·검사 부적합\n -「약사법 」제62조제3호에 따라 누구든지 같은 법 제52조제1항에 따라 기준이 정하여진 의약외품으로서 정한 기준에 맞지 아니한 의약외품을 판매하거나, 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)’의 수거·검사 결과, 미생물한도시험에서 부적합(총 호기성세균수 97,000)한 제품을 제조하여 판매한 사실이 있음\n처분명: ○ 해당 품목 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.)\n * (대상품목) 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)(허가번호: 제5013, 허가일자: 2016.3.2.)\n적용법령: ○「약사법」제62조\n ○「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)\n최종처분일자: 20260716\n공개종료일자: 20270128\n업체주소: 충청남도 천안시 서북구 입장면 연곡길 651\n업체번호: 20100525\n사업자등록번호: 3128614037"
- }
+    "source_text": "○ 유통 의약외품 수거·검사 부적합\n -「약사법 」제62조제3호에 따라 누구든지 같은 법 제52조제1항에 따라 기준이 정하여진 의약외품으로서 정한 기준에 맞지 아니한 의약외품을 판매하거나, 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)’의 수거·검사 결과, 미생물한도시험에서 부적합(총 호기성세균수 97,000)한 제품을 제조하여 판매한 사실이 있음\n처분명: ○ 해당 품목 제조업무정지 3개월(2026. 7. 30. ~ 2026. 10. 29.)\n * (대상품목) 퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)(허가번호: 제5013, 허가일자: 2016.3.2.)\n적용법령: ○「약사법」제62조\n ○「약사법」제76조 및 제95조 관련 [별표8] Ⅱ.개별기준제39호라목7)\n최종처분일자: 20260716\n공개종료일자: 20270128\n업체주소: 충청남도 천안시 서북구 입장면 연곡길 651\n업체번호: 20100525\n사업자등록번호: 3128614037"
+  }
 }

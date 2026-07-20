@@ -78,7 +78,8 @@ HC_INDEX_HTML = """
 <ul>
 <li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-0001.html">Good manufacturing practices guide for drug products (GUI-0001)</a></li>
 <li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/gmp-guidelines-summary-0001.html">GUI-0001 summary</a></li>
-<li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidelines-temperature-control-drug-products-storage-transportation-0069.html">Guidelines for temperature control of drug products during storage and transportation</a></li>
+<li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidelines-temperature-control-drug-products-storage-transportation-0069-summary.html">Guidelines for environmental control of drugs during storage and transportation (GUIDE-0069)</a></li>
+<li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-11-computerized-systems-0050.html">Annex 11 to the good manufacturing practices guide: Computerized Systems</a></li>
 <li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/medical-device-licensing-0016.html">Guidance on medical device establishment licensing (GUI-0016)</a></li>
 <li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-pharmacovigilance-practices-0102.html">Good Pharmacovigilance Practices (GVP) Guidelines (GUI-0102)</a></li>
 <li><a href="/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/audit-report-form-0211.html">Good Manufacturing Practices - Audit Report Form (FRM-0211)</a></li>
@@ -97,6 +98,11 @@ HC_DOC_PAGE_HTML = """
 HC_FORM_PAGE_HTML = """
 <meta name="dcterms.title" content="Good Manufacturing Practices - Audit Report Form (FRM-0211)">
 <meta name="dcterms.type" content="forms">
+"""
+
+HC_GUIDE_VARIANT_PAGE_HTML = """
+<meta name="dcterms.title" content="Guidelines for environmental control of drugs during storage and transportation (GUIDE-0069)">
+<meta name="dcterms.type" content="guidance">
 """
 
 HC_URL_CODED_PAGE_HTML = """
@@ -216,12 +222,17 @@ class HealthCanadaTest(unittest.TestCase):
     def test_index_parser_keeps_gui_coded_drug_documents_only(self):
         entries = hc.parse_index(HC_INDEX_HTML)
         self.assertEqual(sorted({code for code, _, _, _ in entries}),
-                         ["GUI-0001", "GUI-0069", "GUI-0211"])
+                         ["GUI-0001", "GUI-0050", "GUI-0069", "GUI-0211"])
+
+    def test_guide_prefix_variant_counts_as_an_explicit_label_code(self):
+        by_code = hc.select_documents(hc.parse_index(HC_INDEX_HTML))
+        self.assertTrue(by_code["GUI-0069"][2])
+        self.assertIn("0069-summary.html", by_code["GUI-0069"][0])
+        self.assertTrue(hc.keep_document("GUI-0069", HC_GUIDE_VARIANT_PAGE_HTML, True))
 
     def test_code_is_recovered_from_url_when_label_has_none(self):
         by_code = hc.select_documents(hc.parse_index(HC_INDEX_HTML))
-        self.assertIn("0069.html", by_code["GUI-0069"][0])
-        self.assertFalse(by_code["GUI-0069"][2])
+        self.assertFalse(by_code["GUI-0050"][2])
         self.assertTrue(by_code["GUI-0001"][2])
 
     def test_duplicate_codes_resolve_to_the_gmp_path_url(self):

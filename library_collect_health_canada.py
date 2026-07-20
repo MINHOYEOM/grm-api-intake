@@ -60,14 +60,16 @@ DEFAULT_DOC_TYPE = "guidance"
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _LINK_RE = re.compile(r'<a[^>]+href="([^"\'<>]+?\.html)"[^>]*>(.*?)</a>', re.S)
-_LABEL_CODE_RE = re.compile(r"\bGUI[\s‐-―-]?(\d{4})\b", re.I)
-_URL_CODE_RE = re.compile(r"-(0\d{3})\.html$")
-_ANY_CODE_RE = re.compile(r"\b([A-Z]{3})[\s‐-―-]?(\d{4})\b")
+# Health Canada 는 같은 문서를 GUI-0001·GUIDE-0069 두 표기로 쓴다(실측). 둘 다 받는다.
+_LABEL_CODE_RE = re.compile(r"\bGUI(?:DE)?[\s‐-―-]?(\d{4})\b", re.I)
+_URL_CODE_RE = re.compile(r"-(0\d{3})(?:-summary)?\.html$")
+_ANY_CODE_RE = re.compile(r"\b([A-Z]{3,5})[\s‐-―-]?(\d{4})\b")
+_CODE_PREFIX_ALIASES = {"GUIDE": "GUI"}
 _KEPT_DOC_TYPE_PREFIX = "guidance"
 _META_RE = re.compile(r'<meta[^>]+name="(dcterms\.[a-z]+)"[^>]+content="([^"]*)"', re.I)
 _ISO_DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})")
 _TITLE_TAIL_RE = re.compile(r"\s*[-–—]\s*summary\s*$", re.I)
-_TITLE_CODE_TAIL_RE = re.compile(r"\s*\(\s*GUI[\s‐-―-]?\d{4}\s*\)\s*$", re.I)
+_TITLE_CODE_TAIL_RE = re.compile(r"\s*\(\s*GUI(?:DE)?[\s‐-―-]?\d{4}\s*\)\s*$", re.I)
 
 # GMP·품질 범위 밖(의료기기·약물감시·생식세포 등) — 라벨/URL 부분일치로 제외
 _EXCLUDE_TERMS = (
@@ -141,10 +143,10 @@ def keep_document(code: str, page_html: str, label_has_code: bool) -> bool:
     """문서 페이지 메타 2차 검증 — 코드 접두 오인·비가이던스 문서 제외(네트워크 없음)."""
     meta = _metadata(page_html)
     title = meta.get("dcterms.title") or ""
-    codes = _ANY_CODE_RE.findall(title.upper())
+    codes = [(_CODE_PREFIX_ALIASES.get(prefix, prefix), digits)
+             for prefix, digits in _ANY_CODE_RE.findall(title.upper())]
     if codes:
-        digits = code.split("-")[-1]
-        if ("GUI", digits) not in codes:
+        if ("GUI", code.split("-")[-1]) not in codes:
             return False
     elif not label_has_code:
         return False           # 라벨·제목 어디에도 GUI 코드 근거가 없다 → 추정 폐기

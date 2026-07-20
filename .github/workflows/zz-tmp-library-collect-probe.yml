@@ -1,0 +1,35 @@
+name: TMP Library Collector Reachability Probe
+
+# 임시 워크플로 — GitHub Actions 러너(Azure US IP)에서 3개 소스가 실제로 열리는지
+# 판정하기 위한 1회성 프로브. 판정이 끝나면 이 파일은 삭제한다(PR 에 포함하지 않는다).
+on:
+  push:
+    branches: ['claude/lib-collect-b-*']
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Probe collectors live
+        run: |
+          python - <<'PY'
+          from datetime import date
+          import library_collect_fda_guidance as fda
+          import library_collect_ema as ema
+          import library_collect_health_canada as hc
+
+          for mod in (fda, ema, hc):
+              items, err = mod.collect_library_items(date.today())
+              print(f"RESULT source={mod.LIBRARY_SOURCE} keep={len(items)} error={err!r}")
+              for it in items[:3]:
+                  print("   sample:", it["id"], it.get("published_date", "-"), it["title_en"][:60])
+          PY

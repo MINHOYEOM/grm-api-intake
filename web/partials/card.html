@@ -163,6 +163,26 @@
     </div>
     {%- endfor %}
   </details>
+  {%- elif card.deterministic_detail.type == 'wl_violations' %}
+  {#- [WL 위반항목 상세 2026-07-20] Warning Letter 조항별 위반 표제 — 수집기가 편지 원문에서
+      결정론 추출(LLM 0·환각 0). 483 Observation 블록과 동형 마크업/클래스라 CSS 추가 없음.
+      이 블록의 존재 이유: WL 은 결정론 층이 없어 deep_analysis(fan-out)가 안 돈 주에 상세가
+      통째로 비었고, 그 빈 입력이 "원문 미기재" 오서술까지 낳았다. 이제 fan-out 성패와 무관하게
+      조항별 위반이 항상 남는다. statement_ko(선택)가 있으면 원문→국문 병기. -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>위반항목 상세 <span class="sub">· {{ dd.count }}건 · 원문 기반</span></summary>
+    {%- for r in dd.violations %}
+    <div class="dt-row obs-row">
+      <div class="dt-h"><span class="obs-num">위반 {{ r.number }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}</div>
+      {%- if r.statement_ko %}
+      <div class="obs-orig"><span class="viol-lang">원문 · FDA Warning Letter</span><p class="obs-en">{{ r.statement }}</p></div>
+      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ r.statement_ko }}</p></div>
+      {%- else %}
+      <p class="obs-en">{{ r.statement }}</p>
+      {%- endif %}
+    </div>
+    {%- endfor %}
+  </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}

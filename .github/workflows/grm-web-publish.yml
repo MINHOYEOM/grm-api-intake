@@ -26,6 +26,11 @@ on:
         required: false
         type: string
   push:
+    # [2026-07-20] branches 필터 필수 — 종전엔 필터가 없어 **어느 브랜치든** 델타 파일을 건드리면
+    # 발행이 돌았다(작업 브랜치에서 델타를 고치는 정정 PR 이 발행 PR 을 앞질러 여는 위험).
+    # 델타는 delta-bridge 가 main 에 커밋하는 것이 정상 경로이므로 main 으로 좁힌다.
+    branches:
+      - main
     paths:
       - 'web/data/deltas/delta_*.json'
 
@@ -93,9 +98,12 @@ jobs:
           RID="${{ github.event.inputs.intake_run_id }}"
           if [ -z "$RID" ]; then
             # KST 발행일 스케줄 run = UTC 전날 18:17. createdAt 이 발행일±1일 UTC 로 시작하는 최신 성공 run.
+            # ★ headBranch=main 필수(2026-07-20) — 작업 브랜치에서 dispatch 한 intake run 이 더 최신이면
+            #   그쪽이 뽑혔고, 그런 run 에는 grm-web-brief 아티팩트가 없어 "no valid artifacts found" 로
+            #   죽었다. 스캐폴드는 main 스케줄 run 이 내는 것이 정본이다.
             PREV=$(date -u -d "${{ steps.r.outputs.pub }} -1 day" +%Y-%m-%d)
             RID=$(gh run list -R "${{ github.repository }}" --workflow grm-intake.yml \
-                    --status success --json databaseId,createdAt -L 40 \
+                    --status success --branch main --json databaseId,createdAt -L 40 \
                     -q "[.[] | select((.createdAt|startswith(\"$PREV\")) or (.createdAt|startswith(\"${{ steps.r.outputs.pub }}\")))][0].databaseId")
           fi
           [ -n "$RID" ] || { echo "::error::intake run 미발견 — intake_run_id 입력으로 지정"; exit 1; }

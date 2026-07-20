@@ -566,6 +566,7 @@ def _quote_source(kind: str, raw: dict[str, Any] | None) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup")
 _FDA483_OBSERVATION_ROW_KEYS = ("number", "deficiency", "detail")
+_WL_VIOLATION_ROW_KEYS = ("number", "statement", "citation")
 
 
 # per-kind 결정론 상세 슬롯 생성기 — SourceSpec.detail 로 배선. WL `deep_analysis`(LLM 분석층·
@@ -622,6 +623,39 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
         "type": "fda_483_observations",
         "count": len(norm),
         "observations": norm,
+    }
+
+
+def _detail_wl_violations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """[2026-07-20] Warning Letter 위반 표제 목록(`raw.wl_violations`) — 483 관찰 슬롯 동형.
+
+    왜 필요한가 — WL 은 유일하게 결정론 상세층이 없어, 위반 상세를 카드에 싣는 경로가
+    `deep_analysis` fan-out(LLM) **하나뿐**이었다. fan-out 이 안 돈 주에는 6슬롯 LLM 이 300자로
+    잘린 도입구만 보고 "세부 위반내용은 원문에 명시되지 않았다"고 쓰는 일까지 벌어졌다
+    (2026-07-20 발행분 2건). 이 슬롯이 그 **바닥**이다 — fan-out 성패와 무관하게, 수집된 편지
+    원문에서 뽑은 조항별 위반 표제가 항상 카드에 남는다(생성 0 → 환각 0).
+
+    `번역(statement_ko)`은 있을 때만 보존한다(483 의 deficiency_ko/detail_ko 동형 — 부재 시
+    키 미추가로 기존 골든 바이트 불변).
+    """
+    rows = raw.get("wl_violations")
+    if not (isinstance(rows, list) and rows):
+        return None
+    norm: list[dict[str, str]] = []
+    for v in rows:
+        if not isinstance(v, dict):
+            continue
+        r = {k: str(v.get(k, "") or "") for k in _WL_VIOLATION_ROW_KEYS}
+        if v.get("statement_ko"):                    # 있을 때만 — 없으면 키 미추가(골든 불변)
+            r["statement_ko"] = str(v["statement_ko"])
+        norm.append(r)
+    norm = [v for v in norm if v["statement"]]
+    if not norm:
+        return None
+    return {
+        "type": "wl_violations",
+        "count": len(norm),
+        "violations": norm,
     }
 
 
@@ -886,7 +920,8 @@ _REGISTRY: dict[str, SourceSpec] = {
     "warning-letter": SourceSpec(
         "🟧", "Warning Letter", "CGMP",
         category="Warning Letter", deep_body_key="wl_body_full",
-        extra_rows=_w2_extra_wl, official=_official_wl),
+        extra_rows=_w2_extra_wl, official=_official_wl,
+        detail=_detail_wl_violations),
     "admin-action": SourceSpec(
         "🟦", "행정처분", "행정처분",
         a_eligible=True, deep_body_key="admin_body_full",

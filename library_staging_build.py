@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
+import subprocess
 from dataclasses import asdict, is_dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -19,6 +21,7 @@ CATALOG_FIELDS = (
 )
 MFDS_TYPES = {"guidance-industry", "guidance-internal", "notice-final"}
 SCHEMA_VERSION = "grm-library-staging-diff/v1"
+CURATED_FIELDS = ("code", "title_en", "pdf_url", "ko_url", "doc_type")
 
 
 def _value(item: Any, name: str, default: Any = "") -> Any:
@@ -116,6 +119,52 @@ def diff_catalog(baseline: list[dict[str, Any]], candidate: list[dict[str, Any]]
     }
 
 
+def assert_curation_preserved(
+    baseline: list[dict[str, Any]], candidate: list[dict[str, Any]], *, source: str,
+) -> None:
+    """Fail closed if an existing curated value is removed or overwritten."""
+    current = {str(item.get("id") or ""): item for item in candidate}
+    for old in baseline:
+        item_id = str(old.get("id") or "")
+        if item_id not in current:
+            raise ValueError(f"{source}: existing item removed: {item_id}")
+        for field in CURATED_FIELDS:
+            old_value = old.get(field)
+            if old_value not in (None, "") and current[item_id].get(field) != old_value:
+                raise ValueError(f"{source}:{item_id}: curated field changed: {field}")
+
+
+def evaluate_gates(
+    report: dict[str, Any], *, max_change_count: int, max_change_percent: float,
+) -> list[str]:
+    """Return human-review reasons; an empty list permits automatic merge."""
+    if max_change_count < 0 or max_change_percent < 0:
+        raise ValueError("change thresholds must be non-negative")
+    reasons: list[str] = []
+    errors = report.get("collector_errors") or {}
+    if errors:
+        reasons.append("collector_errors: " + ", ".join(sorted(errors)))
+    for source, detail in sorted(report["sources"].items()):
+        removed = int(detail["removed_count"])
+        changed = int(detail["new_count"]) + int(detail["changed_count"])
+        baseline = int(detail["baseline_count"])
+        percent = (changed / baseline * 100.0) if baseline else (100.0 if changed else 0.0)
+        detail["change_count"] = changed
+        detail["change_percent"] = round(percent, 2)
+        if removed:
+            reasons.append(f"{source}: removed_count={removed} (automatic deletion forbidden)")
+        if changed > max_change_count:
+            reasons.append(
+                f"{source}: change_count={changed} exceeds max_change_count={max_change_count}"
+            )
+        if percent > max_change_percent:
+            reasons.append(
+                f"{source}: change_percent={percent:.2f}% exceeds "
+                f"max_change_percent={max_change_percent:.2f}%"
+            )
+    return reasons
+
+
 def _write(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -136,6 +185,7 @@ def build(
         baseline = _load_catalog(baseline_dir / f"{source}.json")
         derived = [row for row in (derive_item(item, source) for item in raw_items) if row]
         candidate = merge_candidate(baseline, derived)
+        assert_curation_preserved(baseline, candidate, source=source)
         _write(staging_dir / f"{source}.json", {"items": candidate})
         detail = diff_catalog(baseline, candidate)
         detail["collector_items"] = len(raw_items)
@@ -145,23 +195,86 @@ def build(
     return report
 
 
+def prepare_live_swap(
+    *, baseline_dir: Path, staging_dir: Path, report_path: Path,
+    max_change_count: int, max_change_percent: float,
+) -> dict[str, Any]:
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    reasons = evaluate_gates(
+        report, max_change_count=max_change_count,
+        max_change_percent=max_change_percent,
+    )
+    # A collector error must never produce or copy a partial candidate.
+    if report.get("collector_errors"):
+        raise ValueError("collector errors forbid live candidate preparation")
+    for source in report["sources"]:
+        baseline = _load_catalog(baseline_dir / f"{source}.json")
+        candidate = _load_catalog(staging_dir / f"{source}.json")
+        assert_curation_preserved(baseline, candidate, source=source)
+    for source in report["sources"]:
+        shutil.copyfile(staging_dir / f"{source}.json", baseline_dir / f"{source}.json")
+    report["live_catalog_swapped"] = True
+    report["gate"] = {
+        "max_change_count": max_change_count,
+        "max_change_percent": max_change_percent,
+        "automatic_merge_allowed": not reasons,
+        "review_reasons": reasons,
+    }
+    _write(report_path, report)
+    return report
+
+
+def verify_curation_against_git_ref(*, ref: str, live_dir: Path) -> None:
+    """Re-run the preservation guard immediately before PR merge eligibility."""
+    for path in sorted(live_dir.glob("*.json")):
+        rel = path.as_posix()
+        proc = subprocess.run(
+            ["git", "show", f"{ref}:{rel}"], capture_output=True, text=True,
+            encoding="utf-8", check=False,
+        )
+        if proc.returncode != 0:
+            raise ValueError(f"cannot read baseline {ref}:{rel}: {proc.stderr.strip()}")
+        payload = json.loads(proc.stdout.lstrip("\ufeff"))
+        baseline = payload if isinstance(payload, list) else payload.get("items", [])
+        assert_curation_preserved(baseline, _load_catalog(path), source=path.stem)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-dir", type=Path, default=Path("web/data/library"))
     parser.add_argument("--staging-dir", type=Path, default=Path("web/data/library_staging"))
     parser.add_argument("--report", type=Path, default=Path("web/data/library_staging_diff.json"))
     parser.add_argument("--days", type=int, default=120)
+    parser.add_argument("--swap", action="store_true")
+    parser.add_argument("--max-change-count", type=int, default=20)
+    parser.add_argument("--max-change-percent", type=float, default=30.0)
+    parser.add_argument("--verify-curation-ref")
     args = parser.parse_args(argv)
+    if args.verify_curation_ref:
+        verify_curation_against_git_ref(ref=args.verify_curation_ref, live_dir=args.baseline_dir)
+        return 0
     today = date.today()
     mfds_items, mfds_error = collect_mfds.collect_mfds(today - timedelta(days=args.days), today)
     ich_items, ich_error = collect_ich.collect_ich(today)
+    collector_errors = {
+        source: error for source, error in (("mfds", mfds_error), ("ich", ich_error)) if error
+    }
+    if collector_errors:
+        print(json.dumps({"collector_errors": collector_errors}, ensure_ascii=False, sort_keys=True))
+        return 1
     report = build(
         baseline_dir=args.baseline_dir, staging_dir=args.staging_dir,
         report_path=args.report, mfds_items=mfds_items, ich_items=ich_items,
-        run_date=today, collector_errors={"mfds": mfds_error, "ich": ich_error},
+        run_date=today, collector_errors=collector_errors,
     )
+    if args.swap:
+        report = prepare_live_swap(
+            baseline_dir=args.baseline_dir, staging_dir=args.staging_dir,
+            report_path=args.report, max_change_count=args.max_change_count,
+            max_change_percent=args.max_change_percent,
+        )
     print(json.dumps(report, ensure_ascii=False, sort_keys=True))
-    return 1 if mfds_error or ich_error else 0
+    return 0
 
 
 if __name__ == "__main__":

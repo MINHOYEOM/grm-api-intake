@@ -1,22 +1,44 @@
-name: GRM Library Staging Refresh
+name: GRM Library Automatic Refresh
 
 on:
+  # 월요일 03:23 KST. 주간 cadence는 최신성/사이트 부하의 균형점이며 아래 게이트가 급변을 차단한다.
   schedule:
-    - cron: '23 4 1 * *'
+    - cron: '23 18 * * 0'
   workflow_dispatch:
+    inputs:
+      max_change_count:
+        description: '카탈로그별 신규+변경 허용 상한(초과 시 사람 검토)'
+        required: true
+        default: '20'
+      max_change_percent:
+        description: '카탈로그별 신규+변경 비율 상한 %(초과 시 사람 검토)'
+        required: true
+        default: '30'
+      days:
+        description: 'MFDS 수집 lookback 일수'
+        required: true
+        default: '120'
 
 permissions:
+  actions: write
   contents: write
+  issues: write
   pull-requests: write
 
 concurrency:
-  group: grm-library-staging
+  group: grm-library-auto-refresh
   cancel-in-progress: false
 
 jobs:
-  stage:
+  refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      MAX_CHANGE_COUNT: ${{ inputs.max_change_count || '20' }}
+      MAX_CHANGE_PERCENT: ${{ inputs.max_change_percent || '30' }}
+      LOOKBACK_DAYS: ${{ inputs.days || '120' }}
+      BRANCH: automation/library-auto-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v6.0.2
         with:
@@ -27,31 +49,96 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Collect and build review-only candidates
-        run: python library_staging_build.py
-      - name: Publish staging-only PR
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: automation/library-staging
+      - name: Create isolated candidate branch
+        run: git switch -c "$BRANCH"
+      - name: Collect, stage, gate, and prepare live swap
         run: |
+          set -euo pipefail
+          python library_staging_build.py --swap --days "$LOOKBACK_DAYS" \
+            --max-change-count "$MAX_CHANGE_COUNT" \
+            --max-change-percent "$MAX_CHANGE_PERCENT"
+      - name: Detect meaningful live changes
+        id: changes
+        run: |
+          if git diff --quiet -- web/data/library; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No live catalogue changes; no PR will be created." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Freeze renderer-produced goldens
+        if: steps.changes.outputs.changed == 'true'
+        run: python web/tests/test_render.py --freeze
+      - name: Re-check curated fields immediately before publishing
+        if: steps.changes.outputs.changed == 'true'
+        run: python library_staging_build.py --verify-curation-ref origin/main
+      - name: Read gate decision
+        if: steps.changes.outputs.changed == 'true'
+        id: gate
+        run: |
+          echo "allowed=$(jq -r '.gate.automatic_merge_allowed' web/data/library_staging_diff.json)" >> "$GITHUB_OUTPUT"
+          jq -r '.gate.review_reasons[]?' web/data/library_staging_diff.json > /tmp/review-reasons.txt
+      - name: Commit and open candidate PR
+        if: steps.changes.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -C "$BRANCH"
-          git add -- web/data/library_staging web/data/library_staging_diff.json
-          if git diff --cached --quiet; then
-            echo "No staging changes"
-            exit 0
-          fi
-          git commit -m "chore: refresh library staging candidates"
-          git push --force origin "HEAD:$BRANCH"
-          STATE=$(gh pr view "$BRANCH" --json state -q .state 2>/dev/null || echo NONE)
-          if [ "$STATE" = "OPEN" ]; then
-            echo "Updated existing staging PR"
-          else
-            gh pr create --base main --head "$BRANCH" \
-              --title "chore: refresh library staging candidates" \
-              --body "Review-only MFDS/ICH catalogue candidates and diff report. This PR does not modify web/data/library/*.json. A follow-up integration must review and apply selected changes."
-          fi
+          git add -- web/data/library web/data/library_staging \
+            web/data/library_staging_diff.json web/tests/golden
+          git commit -m "chore: refresh live regulatory library"
+          git push -u origin "$BRANCH"
+          REASONS=$(jq -r 'if (.gate.review_reasons | length) == 0 then "- None (automatic merge eligible)" else .gate.review_reasons | map("- " + .) | join("\n") end' web/data/library_staging_diff.json)
+          COUNTS=$(jq -r '.sources | to_entries | map("- " + .key + ": " + (.value.baseline_count|tostring) + " → " + (.value.candidate_count|tostring) + " (new=" + (.value.new_count|tostring) + ", changed=" + (.value.changed_count|tostring) + ", removed=" + (.value.removed_count|tostring) + ")") | join("\n")' web/data/library_staging_diff.json)
+          cat > /tmp/pr-body.md <<EOF
+          Automated weekly regulatory-library refresh.
+
+          ## Catalogue changes
+          $COUNTS
+
+          ## Safety gates
+          - Thresholds: max ${MAX_CHANGE_COUNT} items or ${MAX_CHANGE_PERCENT}% per catalogue
+          - Collector errors: none
+          - Existing curated fields (`code`, `title_en`, `pdf_url`, `ko_url`, `doc_type`): preserved
+
+          ## Review reasons
+          $REASONS
+
+          Live catalogues and renderer-produced goldens are committed together. Automatic merge occurs only after the explicit GRM CI dispatch succeeds.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh live regulatory library" \
+            --body-file /tmp/pr-body.md
+          PR_NUMBER=$(gh pr view "$BRANCH" --json number -q .number)
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+      - name: Mark review-required candidate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed != 'true'
+        run: gh pr edit "${{ steps.pr.outputs.number }}" --add-label automation-warning
+      - name: Dispatch CI gate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        id: ci
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run grm-ci.yml --ref "$BRANCH"
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID=$(gh run list --workflow grm-ci.yml --branch "$BRANCH" \
+              --event workflow_dispatch --limit 10 \
+              --json databaseId,headSha,createdAt \
+              --jq ".[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$STARTED\") | .databaseId" \
+              | head -n 1)
+            [ -n "$RUN_ID" ] && break
+            sleep 5
+          done
+          [ -n "$RUN_ID" ] || { echo "CI dispatch run not found" >&2; exit 1; }
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          gh run watch "$RUN_ID" --exit-status
+      - name: Merge only after green CI
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
       - name: Summary
         if: always()
         run: |

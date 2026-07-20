@@ -1492,6 +1492,10 @@ class Fda483ObservationValidationError(ValueError):
 _FOOTER_GARBAGE_RE = re.compile(
     r"(?-i:EMP)\S{0,6}?OY"           # 서명블록 EMPLOYEE(S) 마커(OCR 변형 포함) — 대문자 EMP 고정
     r"|(?-i:SIGNATURE|SIGJ)"          # SIGNATURE / OCR 변형 SIGJ… — 대문자 고정(소문자 산문 오탐 방지)
+    r"|(?-i:AMENDMENT)"               # 483 양식 하단 개정 스탬프. EMP/SIGNATURE/DATE ISSUED 가
+    #   OCR 로 완전히 파괴된 서명블록("AMENDMENT 1 Et,40LOYE£ SIS G•.,-.n,,~ oi:.1e 1ssueo",
+    #   "AMENDMENTl EJ·.tP!.OYEE{S) Sa'.:;!l.\'ATI..RE OA\"E SSUED" — 2026-07-20 193490 실측)은
+    #   위 마커가 전부 실패해 **게이트를 통과했다**(잔재가 그대로 발행될 뻔한 침묵 결함).
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"
     r"|\bInvestigator\b"

@@ -1,0 +1,134 @@
+name: GRM Announce Send
+
+# 서비스 업데이트 안내 발송 — 우리 **사이트 자체의 변화**(신규 기능·새 소스 편입)를 알리는
+# 독립 공지 메일. 주간 뉴스레터(`grm-newsletter-send.yml`)·수집·웹배포와 **완전 별도 파일·
+# 별도 트리거·최소권한**(D8). 입력은 사람이 큐레이션한 `web/data/announcements/{id}.json`.
+#
+# ## 스케줄이 없다 — 의도적이다
+# 주간 뉴스레터는 매주 자동으로 나가지만 공지는 그러면 안 된다. 자잘한 변화까지 매주 별도
+# 메일로 나가면 해지를 부른다. 2단 구성의 기본선은 **주간 티저에 얹는 "서비스 소식" 블록**
+# (`weekly_publish_date` 스위치 — 추가 발송 0건)이고, 이 워크플로는 기능군 단위 마일스톤에만
+# 사람이 직접 dispatch 한다.
+#
+# ## 게이트 4겹(되돌릴 수 없는 발송)
+#   ① 스키마 — id/date/제목/항목 1~6/경로 형식(사이트 상대경로만).            → validate-build
+#   ② provenance — 메일이 우리 페이지만 링크하고 추적 파라미터 0(뉴스레터 게이트 재사용).
+#   ③ 링크 실존 — 공지한 경로를 실제로 조회해 broken 이면 보류. **없는 기능 홍보 차단**.
+#   ④ 멱등 — 캠페인명(`GRM Update — {id}`) 키. 이미 발송된 공지면 재발송 0. read-only 로
+#      판정해 `should_send` 를 내므로, 보낼 게 없으면 send 잡에 아예 도달하지 않는다.
+#
+# 비용(D9): GitHub Actions 무료분 + Brevo 무료 티어. 유료 서비스 0.
+
+on:
+  workflow_dispatch:
+    inputs:
+      announce_id:
+        description: '공지 id (web/data/announcements/{id}.json 에 존재해야 함)'
+        required: true
+        type: string
+      mode:
+        description: 'validate=게이트만(발송 0) · test=테스트 발송(GRM_NEWSLETTER_TEST_EMAILS) · send=실발송'
+        required: true
+        default: 'validate'
+        type: choice
+        options:
+          - validate
+          - test
+          - send
+
+# 최소권한 — 콘텐츠 read 만(발송은 SaaS 시크릿으로, GitHub 쓰기 권한 불필요).
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-announce-${{ github.event.inputs.announce_id }}
+  cancel-in-progress: false
+
+jobs:
+  # ── 게이트 ①②③ + 멱등 사전점검 ④ + 메일 HTML 아티팩트(사람 검토) ──
+  validate-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      should_send: ${{ steps.precheck.outputs.should_send }}
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate + build announcement (gates ①②③)
+        env:
+          # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
+          ANNOUNCE_ID: ${{ github.event.inputs.announce_id }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
+        run: |
+          mkdir -p email_preview
+          python web/announce.py \
+            --id "$ANNOUNCE_ID" \
+            --mode validate \
+            --out "email_preview/announce_${ANNOUNCE_ID}.html"
+
+      - name: Upload email preview (사람 검토)
+        uses: actions/upload-artifact@v4
+        with:
+          name: grm-announce-preview
+          path: email_preview
+          if-no-files-found: error
+
+      - name: Idempotency precheck (gate ④) — should_send 결정
+        id: precheck
+        env:
+          MODE: ${{ github.event.inputs.mode }}
+          ANNOUNCE_ID: ${{ github.event.inputs.announce_id }}
+          # 멱등 조회(GET /emailCampaigns)는 발송 전 **read-only**.
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+        run: |
+          case "$MODE" in
+            send)
+              # 이미 발송된 공지면 should_send=false(클린 skip·exit 0) → send 잡 미도달·발송 0.
+              python web/announce.py --mode precheck --id "$ANNOUNCE_ID"
+              ;;
+            test)
+              echo "should_send=true" >> "$GITHUB_OUTPUT"
+              echo "test 모드 — 멱등 미적용(테스트 발송은 반복 가능). should_send=true"
+              ;;
+            *)
+              echo "should_send=false" >> "$GITHUB_OUTPUT"
+              echo "validate 모드 — 발송 잡 없음(게이트만). should_send=false"
+              ;;
+          esac
+
+  # ── 발송(test/send) ────────────────────────────────────────────────────────
+  send:
+    needs: validate-build
+    if: ${{ needs.validate-build.outputs.should_send == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+      GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
+      GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+      GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME || 'Global Regulatory Monitor' }}
+      GRM_NEWSLETTER_TEST_EMAILS: ${{ vars.GRM_NEWSLETTER_TEST_EMAILS }}
+      GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send (gate ④ 멱등 재확인 → 캠페인 생성·발송)
+        env:
+          ANNOUNCE_ID: ${{ github.event.inputs.announce_id }}
+          MODE: ${{ github.event.inputs.mode }}
+        run: |
+          python web/announce.py \
+            --id "$ANNOUNCE_ID" \
+            --mode "$MODE"

@@ -29,6 +29,7 @@
     ],
     "regulator": "MFDS",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`recall-2026003474`",
       "발행일": "2026-06-02",

@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "WHO",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`who-whopir-2026-11`",
       "발행기관": "WHO",

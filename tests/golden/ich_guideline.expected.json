@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "ICH",
     "signal": "Tier 1",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`ich-q5a-r2`",
       "발행기관": "ICH",

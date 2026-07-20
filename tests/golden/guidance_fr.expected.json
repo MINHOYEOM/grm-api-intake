@@ -32,6 +32,7 @@
     ],
     "regulator": "Federal Register",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`FR-2026-04578`",
       "발행기관": "FDA",

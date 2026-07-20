@@ -58,8 +58,12 @@ RESOURCE_AGENCIES = ("ECA", "ISPE")
 # 판정 = ① 이 카드에 원문 확보 증거가 있고(결정론 상세 블록 또는 심층분석) ② 산문 슬롯에
 # "위반/관찰/지적/결함"의 부재 주장이 함께 있을 때만 FAIL. 원문이 실제로 없는 카드
 # (스캔 483 등)의 정직한 "원문 미기재" 서술은 ①이 성립하지 않아 걸리지 않는다.
+#
+# [주어 확장 2026-07-20] 전수 점검에서 "근거: 21 U.S.C.(세부 **조항** 원문 미기재)" 가 처음
+# 목록(위반/관찰/지적/결함)에 안 걸려 빠져나갔다 — Genzyme WL 은 21 U.S.C. § 331(a)·§ 351(a)
+# 를 명시하고 있었다. 부재 주장의 주어는 "위반"만이 아니다.
 _FALSE_ABSENCE_RE = re.compile(
-    r"(?:위반|관찰|지적|결함)[^.\n]{0,24}?"
+    r"(?:위반|관찰|지적|결함|조항|근거|사유|처분|상세)[^.\n]{0,24}?"
     r"(?:원문|본문|공개)[^.\n]{0,12}?"
     r"(?:미기재|미공개|명시되(?:어\s*있)?지\s*않|기재되(?:어\s*있)?지\s*않|"
     r"공개되(?:어\s*있)?지\s*않|나와\s*있지\s*않|없)")
@@ -77,6 +81,10 @@ class AssembleReport:
     dropped: int = 0
     dropped_ids: list[str] = field(default_factory=list)
     resources: int = 0
+    # [2026-07-20] 이번 조립에서 관찰 블록을 새로 만들거나 갱신한 483 카드 id.
+    # 국문 병기 게이트(`_lint_483_observation_ko`)의 **적용 범위**다 — 손대지 않고 통과시킨
+    # 과거 발행분까지 소급 검사하면 병기 기능(2026-07-09) 이전 브리프가 통째로 막힌다.
+    refreshed_483_ids: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -135,9 +143,11 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
     rep_fac = _fda483_facility_line(rep_src).split(" · 실사")[0]
     rep = dict(rep_src)
     rep["title_issue"] = "483 실사기록 다건 공개"
+    # [문구 정확화 2026-07-20] 종전 "스캔·비공개로" 는 단정이 지나쳤다 — 전수 점검(70건) 결과
+    # 텍스트층은 정상인데 관찰 상세가 수록되지 않은 PDF 도 다수였다. 사유를 단정하지 않는다.
     rep["summary"] = (
-        f"FDA OII FOIA 전자열람실에 483 실사기록 {n}건이 공개됐다. 개별 관찰 원문은 "
-        "스캔·비공개로 상세가 제공되지 않아 시설·실사일 목록만 확인 가능하다.")
+        f"FDA OII FOIA 전자열람실에 483 실사기록 {n}건이 공개됐다. 개별 관찰 원문이 제공되지 "
+        "않아(스캔본이거나 관찰 상세 미수록) 시설·실사일 목록만 확인 가능하다.")
     rep["key_facts"] = [
         f"공개 건수: {n}건 (개별 관찰 상세 미공개)",
         f"대표 시설: {rep_fac} 외 {n - 1}곳",
@@ -248,6 +258,27 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
             report.dropped += 1
             report.dropped_ids.append(c.get("id"))
 
+    # [심층분석 fan-out 배선] deep_deltas 지정 시 채택분 카드에 한해 게이트 검증 후 주입.
+    # additive·선택 — 미지정 시 기존 동작과 완전 동일. 게이트 FAIL 은 발행을 막지 않는다
+    # (해당 카드는 deep_analysis=null 그대로 6슬롯만 발행 — inject_deep_analysis 자체 규약).
+    #
+    # ★ 디제스트 접기(`merge_fda483_disclosures`) **앞**이어야 한다(2026-07-20 순서 수정).
+    #   접기 판정이 "결정론 상세도 심층분석도 없음"이므로, 원문 재추출로 관찰이 되살아나는
+    #   카드를 접은 **뒤에** 주입하면 그 카드는 이미 사라진 뒤다 — 실제로 관찰이 있는 483 이
+    #   "스캔·비공개" 목록으로 접혀 나갔다(전수 점검 실측 2건).
+    if deep_deltas:
+        # ★ 번역(observations_ko) 병합 **전에** 483 관찰을 원문에서 재추출한다 — 순서 불가침.
+        #   병합이 number 를 키로 쓰므로, 스캐폴드의 관찰 번호가 틀린 채로 병합하면 번역이
+        #   엉뚱한 관찰에 붙는다(2026-07-20 193490: 번호 `1,1,3,4,2,3,4`).
+        staged = {"cards": adopted_cards}
+        _refresh_483_observations(staged, deep_deltas, report)
+        _refresh_wl_violations(staged, deep_deltas, report)
+        deep_report = inject_slots.inject_deep_analysis(staged, deep_deltas)
+        for w in deep_report.warnings:
+            report.warnings.append(f"[deep] {w}")
+        for e in deep_report.errors:
+            report.warnings.append(f"[deep] {e}")
+
     # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
     adopted_cards = merge_fda483_disclosures(adopted_cards)
 
@@ -277,20 +308,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     out["cards"] = adopted_cards
     brief = out.setdefault("brief", {})
 
-    # [심층분석 fan-out 배선] deep_deltas 지정 시 채택분 카드에 한해 게이트 검증 후 주입.
-    # additive·선택 — 미지정 시 기존 동작과 완전 동일. 게이트 FAIL 은 발행을 막지 않는다
-    # (해당 카드는 deep_analysis=null 그대로 6슬롯만 발행 — inject_deep_analysis 자체 규약).
-    if deep_deltas:
-        # ★ 번역(observations_ko) 병합 **전에** 483 관찰을 원문에서 재추출한다 — 순서 불가침.
-        #   병합이 number 를 키로 쓰므로, 스캐폴드의 관찰 번호가 틀린 채로 병합하면 번역이
-        #   엉뚱한 관찰에 붙는다(2026-07-20 193490: 번호 `1,1,3,4,2,3,4`).
-        _refresh_483_observations(out, deep_deltas, report)
-        _refresh_wl_violations(out, deep_deltas, report)
-        deep_report = inject_slots.inject_deep_analysis(out, deep_deltas)
-        for w in deep_report.warnings:
-            report.warnings.append(f"[deep] {w}")
-        for e in deep_report.errors:
-            report.warnings.append(f"[deep] {e}")
+    # 게이트 4: 483 관찰 블록의 국문 병기 결손 — 발행 차단(render fail-closed 게이트 선행 검출).
+    # `web/render.py` 의 `validate_483_observations` 가 배포 단계에서 같은 검사를 하지만, 거기서
+    # 죽으면 원인이 조립에서 멀어 진단이 오래 걸린다. 같은 규약을 조립에서 먼저 확인한다.
+    report.errors.extend(
+        _lint_483_observation_ko(out.get("cards") or [], report.refreshed_483_ids))
 
     # 게이트 3: 원문을 확보한 카드의 거짓 부재 서술(2026-07-20 사고) — 발행 차단.
     # deep/결정론 주입이 **끝난 뒤** 검사해야 확보 증거를 정확히 본다(순서 불가침).
@@ -347,18 +369,29 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
     그래서 조립 시점에 원문에서 다시 뽑는다. `source_text` 는 deep 델타에 이미 커밋돼 있으므로
     (fan-out 이 원문 전문을 싣는다) 입력·코드 모두 저장소 안에 있고 **재현 가능**하다.
 
+    **[신설도 한다 2026-07-20]** 종전엔 이미 관찰 블록이 있는 카드만 갱신했다. 그런데 수집
+    시점에 추출이 실패하면 블록 자체가 없고, 그 카드는 "관찰 원문 없음"으로 디제스트에 접혀
+    "스캔·비공개" 라고 발행된다 — 실제로는 원문에 관찰이 있는데도. 전수 점검(70건) 결과 그런
+    카드가 실재했다(193570·193583). 그래서 `source_text` 만 있으면 **없던 블록도 만든다**.
+    블록이 생기면 그 카드는 `merge_fda483_disclosures` 의 접힘 대상에서 자동으로 빠진다.
+
     안전 규약(하나라도 어긋나면 스캐폴드 값을 그대로 둔다 — 데이터를 지우지 않는 방향):
-      · `deterministic_detail.type == "fda_483_observations"` 인 카드만 대상
+      · 483 카드만 대상(`deterministic_detail.type == "fda_483_observations"` 이거나,
+        블록이 아예 없는 `fda483-` 카드)
       · deep 델타에 그 카드의 비어있지 않은 `source_text` 가 있을 때만
       · 재추출 결과가 **비어있지 않을 때만** 교체(파서가 degrade 해도 기존 관찰 보존)
+      · 다른 타입의 `deterministic_detail` 을 덮어쓰지 않는다
     바뀐 카드는 report 에 남긴다 — 조용한 교체 금지(발행 로그로 육안 확인 가능).
     """
     import collect_fda_483 as _f          # 지연 import — 조립 경로가 수집기 로드에 묶이지 않게
 
     for card in out.get("cards", []):
         dd = card.get("deterministic_detail")
-        if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
-            continue
+        if isinstance(dd, dict):
+            if dd.get("type") != "fda_483_observations":
+                continue                  # 다른 결정론 블록 보유 — 덮어쓰지 않는다
+        elif not str(card.get("id", "")).startswith("fda483-"):
+            continue                      # 블록 없음 + 483 아님 — 대상 아님
         payload = deep_deltas.get(card.get("id")) or {}
         source_text = payload.get("source_text") if isinstance(payload, dict) else None
         if not (isinstance(source_text, str) and source_text.strip()):
@@ -367,15 +400,18 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         if not fresh:
             continue                      # degrade — 기존 관찰 유지
         before = [(o.get("number"), o.get("deficiency"), o.get("detail"))
-                  for o in dd.get("observations", []) if isinstance(o, dict)]
+                  for o in (dd or {}).get("observations", []) if isinstance(o, dict)]
         after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
         if before == after:
             continue
-        dd["observations"] = fresh
-        dd["count"] = len(fresh)
+        card["deterministic_detail"] = {
+            "type": "fda_483_observations", "count": len(fresh), "observations": fresh,
+        }
+        report.refreshed_483_ids.append(str(card.get("id")))
         report.warnings.append(
             f"[483] {card.get('id')}: 관찰 원문 재추출 — 번호 "
-            f"{[b[0] for b in before]} → {[a[0] for a in after]} (스캐폴드가 낡은 파서 산출)")
+            f"{[b[0] for b in before]} → {[a[0] for a in after]} "
+            f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
 
 
 def _card_has_source_body(card: dict[str, Any]) -> bool:
@@ -407,6 +443,35 @@ def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
                 errs.append(
                     f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
                     f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+    return errs
+
+
+def _lint_483_observation_ko(cards: list[dict[str, Any]],
+                             only_ids: "list[str] | None" = None) -> list[str]:
+    """483 관찰 블록의 국문 병기 결손을 조립 단계에서 잡는다(발행 차단 사유 목록 반환).
+
+    정본 규약은 `web/render.validate_483_observations`(배포 fail-closed)다. 여기서는 같은
+    규약을 **먼저** 확인만 한다 — 결정론 관찰을 새로 되살린 카드가 번역 없이 조립을 통과하면
+    배포 단계에서 브리프 전체가 막히고, 그때는 원인이 조립에서 멀어 진단이 오래 걸린다.
+
+    `only_ids` 를 주면 그 카드들만 본다(운영 기본 = 이번 조립에서 관찰을 새로 만든 카드).
+    소급 검사를 하지 않는 이유: 원문·국문 병기는 2026-07-09 에 생긴 요구라, 그 이전 발행분을
+    지금 기준으로 재검사하면 손대지도 않은 과거 브리프가 통째로 막힌다.
+    """
+    errs: list[str] = []
+    targets = set(only_ids) if only_ids is not None else None
+    for c in cards:
+        if targets is not None and str(c.get("id")) not in targets:
+            continue
+        dd = c.get("deterministic_detail")
+        if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
+            continue
+        for obs in dd.get("observations") or []:
+            num = obs.get("number", "?")
+            if not str(obs.get("deficiency_ko") or "").strip():
+                errs.append(f"카드 {c.get('id')!r} 관찰 #{num}: deficiency_ko 없음")
+            if str(obs.get("detail") or "").strip() and not str(obs.get("detail_ko") or "").strip():
+                errs.append(f"카드 {c.get('id')!r} 관찰 #{num}: detail 이 있는데 detail_ko 없음")
     return errs
 
 

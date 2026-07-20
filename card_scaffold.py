@@ -1236,7 +1236,30 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
                    # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
                    raw.get("article_excerpt"),
                    raw.get("description"), raw.get("summary"), row.get("body")), 300),
+        # [정직성 신호 2026-07-20] 이 카드에 대해 **원문 본문을 실제로 확보했는지**를 LLM 에게
+        # 명시적으로 알린다. 종전엔 LLM 이 자기가 받은 300자 입력만 보고 원문의 존재 여부를
+        # 추측해야 했고, 그 추측이 틀려 "세부 위반내용은 원문에 명시되지 않았다"는 거짓 요약이
+        # 나갔다(WL 2건·행정처분 1건·GMP실사 1건 실측). 확보한 원문 전문은 300자 입력에
+        # 담기지 않으므로 **입력 길이로는 판별이 불가능**하다 — 그래서 별도 신호가 필요하다.
+        # 프롬프트 규약: 이 값과 무관하게 "원문에 없다"는 서술 자체를 금지하고, 입력이 얇으면
+        # "원문 확인이 필요하다"로 쓴다. 조립 게이트(`lint_false_absence_claims`)가 강제한다.
+        "source_body_captured": _has_source_body(raw),
     }
+
+
+# 원문 본문 확보를 뜻하는 raw 키 — 소스별 이름이 다르므로 한곳에 모은다. 새 소스에서 본문을
+# 확보하는 키를 추가하면 여기에도 넣어야 한다(안 넣으면 그 소스만 신호가 꺼져 있다).
+_SOURCE_BODY_KEYS = (
+    "wl_body_excerpt", "wl_body_full", "wl_violations",
+    "fda483_excerpt", "fda483_body_full", "fda_483_observations",
+    "whopir_excerpt", "gmp_deficiencies", "attachment_deficiency_excerpt",
+    "admin_body_full", "eca_article_excerpt", "article_excerpt",
+)
+
+
+def _has_source_body(raw: dict[str, Any]) -> bool:
+    """이 카드가 원문 본문(발췌·전문·구조화 상세 중 하나)을 확보했는가."""
+    return any(raw.get(k) for k in _SOURCE_BODY_KEYS)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

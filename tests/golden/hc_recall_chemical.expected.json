@@ -30,6 +30,7 @@
     ],
     "regulator": "Health Canada",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "Class": "Type II",
       "문서번호": "`hc-rsam-88421`",

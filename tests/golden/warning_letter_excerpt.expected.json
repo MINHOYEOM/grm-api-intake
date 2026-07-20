@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "FDA Warning Letter",
     "signal": "Tier 3",
+    "source_body_captured": true,
     "w2_facts": {
       "문서번호": "`WL-CMS-660124`",
       "발행 부서/일자": "Center for Drug Evaluation and Research (CDER) · 05/15/2026",

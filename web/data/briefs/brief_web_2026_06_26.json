@@ -74,7 +74,7 @@
    "key_facts": [
     "발행일: 2026-06-23 (CDER 발행 06/15/2026)",
     "대상: Huons Co., Ltd.",
-    "위반유형: CGMP 위반 — 세부 위반사항 원문 미기재"
+    "위반조항 4건: 21 CFR 211.194(a)(시험기록) · 211.192(일탈조사) · 211.113(b)(무균공정) · 211.42(c)(10)(vi)(설비 유지)"
    ],
    "implication": "FDA가 국내 완제의약품 제조소에 경고서한을 발부한 것은 수출용 GMP 준수 수준에 대한 직접 집행 신호다. 동종 해외 수출 제조소는 현 CGMP 준수 상태와 최근 FDA 실사 지적사항을 재검토할 필요가 있다.",
    "checks": [
@@ -91,6 +91,32 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 4,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)).",
+      "citation": "21 CFR 211.194(a)"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)"
+     },
+     {
+      "number": "4",
+      "statement": "Your firm failed to establish an adequate system for maintaining equipment used to control the aseptic conditions (21 CFR 211.42(c)(10)(vi)).",
+      "citation": "21 CFR 211.42(c)(10)(vi)"
+     }
+    ]
    }
   },
   {

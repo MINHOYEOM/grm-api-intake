@@ -19,11 +19,21 @@ name: GRM Delta Bridge (Notion → git)
 
 on:
   schedule:
-    # 00:30 UTC 월 = 09:30 KST(Routine 07:30 KST 이후·워치독 10:00 KST 이전).
-    - cron: '30 0 * * 1'
-    # 2회차 03:30 UTC 월 = 12:30 KST — GitHub cron 지연(+3~4h 실측)·Routine 지연으로 1회차가
-    # OPEN 델타 예치 전에 돌아 클린 skip 한 주를 재수습한다(멱등 — 이미 이관됐으면 무해 skip).
-    - cron: '30 3 * * 1'
+    # ★ 2회 → 30분 간격 다회 + **비정각**으로 확대(2026-07-20). GitHub 예약 크론은 보장이
+    #   아니라 best-effort고, 실측된 실패 양상은 "드롭"보다 **수 시간 지각**이다:
+    #     07-13  00:30 미발화 · 03:30 → 04:07Z 발화(37분 지각)
+    #     07-20  00:30 미발화 · 03:30 → 04:12Z 발화(42분 지각) · 워치독 01:00 → 04:28Z(3h28m 지각)
+    #   두 주 모두 04:0x~04:2xZ 에 몰려 발화했다 = 정각/30분이 부하 피크라 큐가 그때야 풀린다.
+    #   09:30 KST 를 약속하는데 13:12 KST 에 도는 크론은 없는 것과 같다.
+    #
+    #   그래서 ① 분을 **비정각(:07/:37)** 으로 옮기고(grm-intake.yml 이 `:17` 을 쓰는 것과 같은
+    #   이유 — GitHub 의 부하 분산 권장) ② 기회 수를 늘린다. 백업 크론 하나를 더 다는 방식은
+    #   같은 메커니즘에 기대므로 근본 대책이 아니다. 각 회차는 OPEN 델타가 없거나 이미
+    #   이관됐으면 wrote=false 로 1분 내 무해 종료(delta_bridge.main: return 0)라 비용이 낮다.
+    #   일 22:07~23:37 UTC = 월 07:07~08:37 KST (Routine 예치 07:30 KST 전후를 감싼다)
+    - cron: '7,37 22-23 * * 0'
+    #   월 00:07~04:37 UTC = 월 09:07~13:37 KST (예치 지연·크론 지각을 흡수)
+    - cron: '7,37 0-4 * * 1'
   workflow_dispatch:
     inputs:
       publish_date:
@@ -35,7 +45,12 @@ permissions:
   contents: write   # 델타 커밋
 
 concurrency:
-  group: grm-delta-bridge-${{ github.event.inputs.publish_date || github.run_id }}
+  # ★ 예약 run 은 **하나의 그룹으로 직렬화**한다(2026-07-20). 옛 폴백은 run_id 라 회차마다
+  #   그룹이 갈려 병렬 실행됐는데, 30분 간격 다회 크론에서 두 회차가 겹치면 같은 OPEN 델타를
+  #   양쪽이 집어 write+push 가 충돌하고(non-fast-forward) CONSUMED 이중 처리 위험도 있다.
+  #   직렬화하면 뒤 회차는 앞 회차가 끝난 뒤 돌아 "이미 이관됨"으로 무해 skip 한다.
+  #   cancel-in-progress:false 유지 — 진행 중 이관을 중간에 끊지 않는다.
+  group: grm-delta-bridge-${{ github.event.inputs.publish_date || github.event_name }}
   cancel-in-progress: false
 
 jobs:

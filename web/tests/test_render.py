@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import shutil
 import sys
 import tempfile
@@ -5513,12 +5514,16 @@ class WebQuizWeekFieldTest(unittest.TestCase):
         card_n = html[html.index('id="q-n1"'):html.index('id="q-n1"') + 400]
         self.assertNotIn('data-week="', card_n)
 
-    def test_current_bank_has_no_week_and_golden_has_no_data_week(self):
-        # 현 정본 데이터 경로 = 기존 회전 그대로 — 뱅크·골든 모두 week 무흔적.
+    def test_current_bank_weeks_are_valid_and_golden_matches_bank(self):
+        # 주간 생성이 시작된 뒤에도 week 는 YYYYWW 문자열만 허용하고, 골든의
+        # data-week 는 뱅크에 실재하는 주차만 담는다(임의 주차 혼입 방지).
         bank = json.loads(render.QUIZ_FILE.read_text(encoding="utf-8"))
-        self.assertTrue(all("week" not in q for q in bank))
+        weeks = {str(q["week"]) for q in bank if "week" in q}
+        for week in sorted(weeks):
+            self.assertRegex(week, r"^\d{4}(0[1-9]|[1-4]\d|5[0-3])$")
         golden = (GOLDEN_DIR / "quiz.expected.html").read_text(encoding="utf-8")
-        self.assertNotIn('data-week="', golden)   # data-weekly-count(별개 속성)와 구분
+        # data-weekly-count(별개 속성)와 구분되도록 값까지 포함해 추출한다.
+        self.assertEqual(set(re.findall(r'data-week="(\d+)"', golden)) - weeks, set())
 
     @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 선택 로직 경로 고정은 CI에서 수행")
     def test_pick_weekly_indexes_both_paths_pinned_via_node(self):

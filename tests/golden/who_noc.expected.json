@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "WHO",
     "signal": "Tier 3",
+    "source_body_absent_reason": "",
     "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`who-noc-2026-04`",

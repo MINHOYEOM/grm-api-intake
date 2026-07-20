@@ -2071,8 +2071,22 @@ def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
 LAST_WL_HEALTH: dict[str, Any] = {}
 
 
-def _fetch_wl_body_excerpt(url: str) -> str:
-    """WL 편지 페이지 fetch → 위반 excerpt. 실패(403/timeout/네트워크)는 graceful("")."""
+# [사유 전파 2026-07-20] 수집기는 본문을 왜 확보 못했는지 정확히 안다(403·timeout·앵커
+# 미발견)인데 그 사유가 하류로 전달되지 않아 코드/LLM 이 이유를 지어내는 사고가 있었다
+# (예: "스캔·비공개로 상세가 제공되지 않아" — 우리가 못 받았다는 사실에서 원문 상태까지
+# 단정). 아래 고정 어휘만 status 로 쓴다 — 새 값을 함부로 추가하지 말 것(하류 매핑 계약).
+WL_BODY_STATUS_OK = "ok"
+WL_BODY_STATUS_403 = "fetch-403"
+WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
+
+
+def _fetch_wl_body_excerpt(url: str) -> tuple[str, str]:
+    """WL 편지 페이지 fetch → (위반 excerpt, status). 실패(403/timeout/네트워크)는 graceful(("", status)).
+
+    status 고정 어휘: "ok"(성공) | "fetch-403" | "fetch-fail:<예외 요약 120자>" |
+    "no-anchor"(fetch 는 성공했으나 위반 앵커 미발견). 기존 로그(WARN/INFO)와 graceful
+    동작(예외를 올리지 않음)은 그대로 유지 — 반환 형태만 str → tuple[str, str] 로 바뀐다.
+    """
     try:
         resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -2080,22 +2094,24 @@ def _fetch_wl_body_excerpt(url: str) -> str:
         })
         if resp.status_code == 403:
             log("WARN", f"FDA WL 본문 403 — excerpt 건너뜀(메타 카드 유지): {truncate(url, 80)}")
-            return ""
+            return "", WL_BODY_STATUS_403
         resp.raise_for_status()
     except requests.RequestException as e:
         log("WARN", f"FDA WL 본문 fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
-        return ""
+        return "", f"fetch-fail:{truncate(str(e), 120)}"
     excerpt = _extract_wl_body_excerpt(resp.text)
     if not excerpt:
         log("INFO", f"FDA WL 본문 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
-    return excerpt
+        return "", WL_BODY_STATUS_NO_ANCHOR
+    return excerpt, WL_BODY_STATUS_OK
 
 
-def _fetch_wl_body_full(url: str) -> str:
-    """[WL 심층분석 fan-out] WL 편지 페이지 fetch → 본문 전문. 실패는 graceful("").
+def _fetch_wl_body_full(url: str) -> tuple[str, str]:
+    """[WL 심층분석 fan-out] WL 편지 페이지 fetch → (본문 전문, status). 실패는 graceful(("", status)).
 
     `_fetch_wl_body_excerpt` 와 별도 GET(단순성·격리 우선 — in-window WL 은 주 소수라
     중복 fetch 비용 무시 가능). 두 플래그가 모두 켜져도 서로 독립적으로 동작한다.
+    status 어휘는 `_fetch_wl_body_excerpt` 와 동일(고정 어휘 — 하류 매핑 계약).
     """
     try:
         resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
@@ -2104,15 +2120,16 @@ def _fetch_wl_body_full(url: str) -> str:
         })
         if resp.status_code == 403:
             log("WARN", f"FDA WL 본문(전문) 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
-            return ""
+            return "", WL_BODY_STATUS_403
         resp.raise_for_status()
     except requests.RequestException as e:
         log("WARN", f"FDA WL 본문(전문) fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
-        return ""
+        return "", f"fetch-fail:{truncate(str(e), 120)}"
     full = _extract_wl_body_full(resp.text)
     if not full:
         log("INFO", f"FDA WL 본문(전문) 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
-    return full
+        return "", WL_BODY_STATUS_NO_ANCHOR
+    return full, WL_BODY_STATUS_OK
 
 
 def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -2236,20 +2253,23 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
+        # [사유 전파 2026-07-20] 본문을 확보하지 못한 경우에만 wl_body_status 를 남긴다 —
+        # 성공은 사유가 없다(골든 additive, 기존 카드는 키가 안 생겨 불변).
         if wl_body_enabled and wl_href:
             wl_body_health["attempted"] += 1
-            body_excerpt = _fetch_wl_body_excerpt(wl_href)
+            body_excerpt, wl_body_status = _fetch_wl_body_excerpt(wl_href)
             if body_excerpt:
                 wl_raw["wl_body_excerpt"] = body_excerpt
             else:
                 wl_body_health["failed"] += 1
+                wl_raw.setdefault("wl_body_status", wl_body_status)   # 왜 비었는지 — 하류가 이유를 지어내지 않게
 
         # [WL 심층분석 fan-out 2026-07-01] 전문 확보(flag on 시) — 카드별 fan-out 심층분석
         # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
         # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
         if wl_body_full_enabled and wl_href:
             wl_body_full_health["attempted"] += 1
-            body_full = _fetch_wl_body_full(wl_href)
+            body_full, wl_body_full_status = _fetch_wl_body_full(wl_href)
             if body_full:
                 wl_raw["wl_body_full"] = body_full
                 # [WL 위반항목 결정론 추출 2026-07-20] 전문에서 위반 표제를 결정론 추출해
@@ -2260,6 +2280,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
                     wl_raw["wl_violations"] = violations
             else:
                 wl_body_full_health["failed"] += 1
+                # excerpt 가 이미 사유를 남겼으면 덮어쓰지 않는다(setdefault) — 같은 편지
+                # 이니 사유도 같을 확률이 높지만, excerpt 쪽 사유가 우선(먼저 시도됨).
+                wl_raw.setdefault("wl_body_status", wl_body_full_status)
 
         items.append(IntakeItem(
             source=SOURCE_FDA_WL,

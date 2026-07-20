@@ -123,12 +123,21 @@ class TestP8FirmMapping(unittest.TestCase):
         self.assertEqual(item.firm, "BD Canada")
         self.assertEqual(item.raw_payload.get("company"), "BD Canada")
 
-    def test_brand_label_is_not_treated_as_company(self):
-        # 'Brand' 셀은 제품 브랜드(=회사 아님)일 수 있어 firm 으로 쓰지 않는다.
-        det = lambda u: {"brand": "Hizentra", "product name": "Hizentra",
+    def test_brand_label_not_preferred_over_real_company_label(self):
+        # 'Brand' 셀은 제품 브랜드일 수 있어 실제 회사 라벨보다 우선하지 않는다(판단 유지).
+        det = lambda u: {"brand": "Hizentra", "company": "CSL Behring Canada Inc.",
                          "strength": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL"}
         item = hc._to_item(_rec(), START, END, detail_fetcher=det)
-        self.assertEqual(item.firm, "")
+        self.assertEqual(item.firm, "CSL Behring Canada Inc.")
+
+    def test_brand_only_used_as_last_resort_fallback(self):
+        # [폴백 2026-07-20] 실제 회사 라벨이 전혀 없을 때만 Brand(s) 를 최후 폴백으로 쓴다 —
+        # 실측 HC 회수 7건 중 6건이 Brand(s) 칸에 회사명(Apotex Inc. 등)을 담고 있었다.
+        # 폴백이 없으면 카드가 "업체: 원문 미기재"라는 거짓을 발행한다(원문에는 있었다).
+        det = lambda u: {"brand": "Apotex Inc.", "product name": "Hizentra",
+                         "strength": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL"}
+        item = hc._to_item(_rec(), START, END, detail_fetcher=det)
+        self.assertEqual(item.firm, "Apotex Inc.")
 
 
 class TestDetailParser(unittest.TestCase):
@@ -151,6 +160,18 @@ class TestDetailParser(unittest.TestCase):
 
     def test_empty_html_returns_empty(self):
         self.assertEqual(hc._parse_detail_html(""), {})
+
+    # ── [폴백 2026-07-20] _detail_company 3갈래: 라벨 우선 · brand 최후 폴백 · 둘 다 없음 ──
+    def test_brand_fallback_used_when_no_company_label(self):
+        self.assertEqual(hc._detail_company({"brand": "Apotex Inc."}), "Apotex Inc.")
+
+    def test_company_label_wins_over_brand_fallback(self):
+        self.assertEqual(
+            hc._detail_company({"brand": "Retail Brand", "manufacturer": "Acme Pharma"}),
+            "Acme Pharma")
+
+    def test_neither_company_nor_brand_label_returns_empty(self):
+        self.assertEqual(hc._detail_company({"product name": "X"}), "")
 
 
 class TestDetailFetchStats(unittest.TestCase):

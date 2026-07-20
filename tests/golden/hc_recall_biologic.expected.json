@@ -1,6 +1,6 @@
 {
   "card_id": "Health Canada::hc-82142",
-  "card_scaffold": "### [Recall(HC) · Health Canada] Hizentra: out of specification — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence A` · `Health Canada` · `Signal Med (T2)` · `🧬 바이오의약품` · `Recall`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-06-03</td></tr>\n<tr><td>**문서번호**</td><td>`hc-82142`</td></tr>\n<tr><td>**업체**</td><td>원문 미기재</td></tr>\n<tr><td>**제품**</td><td>Hizentra</td></tr>\n<tr><td>**Class**</td><td>Type II</td></tr>\n</table>\n\n**원문 및 번역**\n> The appearance is out of specification in the affected lot.\n{{W4}}\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: Intake raw`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos)\n</callout>",
+  "card_scaffold": "### [Recall(HC) · Health Canada] Hizentra: out of specification — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence A` · `Health Canada` · `Signal Med (T2)` · `🧬 바이오의약품` · `Recall`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-06-03</td></tr>\n<tr><td>**문서번호**</td><td>`hc-82142`</td></tr>\n<tr><td>**업체**</td><td>미확인</td></tr>\n<tr><td>**제품**</td><td>Hizentra</td></tr>\n<tr><td>**Class**</td><td>Type II</td></tr>\n</table>\n\n**원문 및 번역**\n> The appearance is out of specification in the affected lot.\n{{W4}}\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: Intake raw`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos)\n</callout>",
   "date": "2026-06-03",
   "evidence": "A",
   "kind": "hc-recall",
@@ -30,12 +30,13 @@
     ],
     "regulator": "Health Canada",
     "signal": "Tier 2",
+    "source_body_absent_reason": "",
     "source_body_captured": false,
     "w2_facts": {
       "Class": "Type II",
       "문서번호": "`hc-82142`",
       "발행일": "2026-06-03",
-      "업체": "원문 미기재",
+      "업체": "미확인",
       "제품": "Hizentra"
     }
   },

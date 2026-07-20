@@ -8,7 +8,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-06-03</td></tr>
 <tr><td>**문서번호**</td><td>`hc-82142`</td></tr>
-<tr><td>**업체**</td><td>원문 미기재</td></tr>
+<tr><td>**업체**</td><td>미확인</td></tr>
 <tr><td>**제품**</td><td>Hizentra</td></tr>
 <tr><td>**Class**</td><td>Type II</td></tr>
 </table>

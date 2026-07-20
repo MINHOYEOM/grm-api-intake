@@ -130,7 +130,13 @@ golden(legislative 카드)·v16 프롬프트와 정합. 🔮 표는 비카드 Wa
 
 ## 8. 빈 필드 · 결측 표기 (Python 규칙)
 
-- 필드 없음 → 해당 행/구절 생략(빈 callout·빈 표행 금지) 또는 "원문 미기재".
+- 필드 없음 → 해당 행/구절 생략(빈 callout·빈 표행 금지) 또는 **`card_scaffold.VALUE_UNKNOWN`("미확인")**.
+  ⚠️ **"원문 미기재" 를 쓰지 마라(2026-07-20 근본원인).** 그 표현은 *원문에 대한 단정*인데, 코드는
+  원문을 **필드 단위로 확인하지 않는다** — 값이 비었다는 사실이 말해주는 건 우리 상태뿐이다.
+  실제로 Health Canada 회수 6건이 `업체: 원문 미기재` 로 발행됐는데 원문에는 업체명이 명시돼
+  있었다(Apotex Inc.·Servier Canada Inc. 등 — 수집기가 그 칸을 읽지 않았을 뿐이다).
+  원문을 확인하고 실제로 없음을 아는 경로만 부존재를 말할 수 있고, 현재 그런 경로는 없다.
+  발행 게이트 `assemble_publish_brief.lint_unverified_absence_labels` 가 이를 강제한다.
 - L1 URL 없음 → L2 인덱스 + ⚠️. 둘 다 없음 → L3 기관 홈 + ⚠️.
 - raw payload 파싱 실패 → Evidence A 불가 → B 강등(`evidence_hint='B'`) + v2 row 에 **`status_hint='Error'` 기록**(기존 옵션 어휘) + health warning. **실제 Notion `Status` 전이는 K2 범위 아님** — Status 관리의 Python 마감은 K4 에서.
   (~~Needs Review~~ → **정정 2026-06-05, Codex 사전검증**: `Needs Review` 는 Intake DB Status 옵션(New/Processed/Skipped/Error)에 없음 — 미등록 Select 옵션 400 전례(Source 옵션 건). 옵션 신설 검토는 K4 이월. `Status=Error` 표기 → `status_hint` 로 용어 정정 2026-06-05, Codex B~D 검토 P2-4.)
@@ -140,7 +146,12 @@ golden(legislative 카드)·v16 프롬프트와 정합. 🔮 표는 비카드 Wa
 LLM 산문 슬롯을 채울 때 **카드 1장치 최소 정보만** 전달(raw 전체 금지). 필드:
 `type · modality · firm/product · 핵심사유(reason/EXPOSE_CONT/지적요약) · 조항/결론 · route/dosage(있으면) ·
 규제기관 · evidence · signal`. LLM 출력 = `{핵심이슈, W1문장, W5_bullets, W6, W7, (비KO)W4}` JSON.
-LLM 은 이 입력에 없는 사실을 만들지 않는다("원문 미기재"/"확인 불가" 사용).
+LLM 은 이 입력에 없는 사실을 만들지 않는다(그 자리는 "확인 불가"로 둔다 — **"원문 미기재"는
+쓰지 않는다**: 우리가 못 받은 것과 원문에 없는 것은 다른 사실이고, 300자로 잘린 입력은 후자를
+판별할 근거가 되지 못한다. §8 참조).
+`prose_input` 은 이 판단을 LLM 에게 떠넘기지 않기 위해 두 신호를 함께 싣는다 —
+`source_body_captured`(원문 본문 확보 여부)와 `source_body_absent_reason`(못 받았다면 그 사유:
+스캔본·403·앵커 미발견 등). 사유를 실어야 하류가 이유를 **지어내지** 않는다.
 **W4 토큰 인덱싱(2026-06-05, K2 구현 확정)**: 인용 1개 → `{{W4}}`, 2개 이상 → `{{W4_1}}`·`{{W4_2}}`… —
 ①② 원문과 1:1 positional 매핑의 모호성 제거. K3 프롬프트는 인덱스별로 채운다.
 **(웹 이관, 2026-06-26) JSON 슬롯 매핑 — 마크업 토큰 폐지**: LLM 출력은 이제 `grm-web-card/v1` 슬롯
@@ -619,6 +630,7 @@ official_url=HTML 페이지만 노출)·gmp-inspection `download_url` 폴백. fd
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-07-20 | **부재 어휘 분리 — WL/483 사고의 근본 원인 제거.** 앞선 두 웨이브가 증상(거짓 서술 탐지·차단)을 고쳤다면 이번엔 원인을 고친다. 조사 결과 **시스템에 "우리가 확보하지 못했다"를 말하는 어휘가 없었다** — 있는 것은 `"원문 미기재"` 하나뿐이고 그건 우리 상태가 아니라 **원문에 대한 단정**이다. 이 어휘 오류가 코드→명세→프롬프트→LLM 전 계층에 복제됐다: ①`card_scaffold` 13곳이 `raw` 에 필드가 없으면 "원문에 기재되어 있지 않다"고 출력 ②이 §8/§9 가 LLM 에게 같은 문구를 지시 ③프롬프트 규칙 2 가 재지시 ④LLM 이 산문으로 일반화("세부 위반내용은 원문에 명시되지 않았다") ⑤LLM 없는 코드도 같은 추론(483 디제스트 "스캔·비공개로"). **실측 반증**: `업체 \| 원문 미기재` 로 발행된 Health Canada 회수 7건의 원문을 전부 열어보니 **6건에 업체명이 명시**돼 있었다(Apotex Inc.·Servier Canada Inc.·Kao Canada Inc.·Becton Dickinson Canada Inc.·Jamp Pharma·BC Cancer) — 수집기가 `Brand(s)` 칸을 읽지 않았을 뿐이다. 즉 **코드-verbatim 층이 이미 거짓을 발행 중**이었고, 게이트 3 이 facts 를 "정직한 표기"라며 면제한 설계 가정 자체가 틀렸다. 수리: **(1)** `VALUE_UNKNOWN`("미확인") 신설·전 지점 교체(§8) — 표기는 우리 상태만 말한다. **(2)** 결손 **사유** 전파 — 수집기가 `wl_body_status`/`fda483_text_status`(scan-no-text·fetch-403·no-anchor·not-attempted 등)를 raw 에 남기고, `prose_input.source_body_absent_reason` 이 사람 문장으로 실어 하류가 이유를 **지어내지** 않게 한다. **(3)** 게이트 5(`lint_unverified_absence_labels`) — facts·`merged_items` 의 부재 단정 차단(값 전체 일치만 — "관찰 1: 부적격 사유 미기재" 같은 사실 서술은 통과). 낡은 스캐폴드는 차단 대신 `_normalize_legacy_absence_labels` 가 **접기 전에** 교정하고 전건 보고(그러지 않으면 그 주 브리프를 영영 재조립할 수 없다). **(4)** HC `_COMPANY_FALLBACK_LABELS`(brand 최후 폴백) — `_COMPANY_LABELS` 는 그대로 두고 폴백만 추가. **(5)** ECA/ISPE 전용 `source_excerpt_present` 를 전 소스 공통 `source_body_captured` 로 흡수(같은 결함이 2026-07-13 에 한 소스에서 이미 진단·수리됐는데 일반화하지 않아 일주일 뒤 WL 에서 재발했다). CI 스윕에 **단일 불변식** 추가: 발행물 어디에도 `"원문 미기재"` 문자열이 없어야 한다. 데이터 정정 12건(HC 업체 7·산문 10문구). 골든 33종 재동결, 전체 3009 green. |
 | 2026-07-20 | **483 전수 점검(70건) + 원문 무결성 3층 방어** — WL 사고의 같은 결함 클래스를 483 까지 전수 확인. 결과: **483 8건이 원문에 관찰이 있는데 "관찰 원문 없음"으로 발행돼 있었다**(그중 2건은 당주 발행분·디제스트에 "스캔·비공개"로 접힘). 원인이 셋이었다 — ①`merge_fda483_disclosures`(접기)가 deep 주입 **앞**에 있어, 원문 재추출로 관찰이 되살아나는 카드를 이미 접은 뒤였다(**순서 교정**) ②PDF 서브셋 폰트 합자가 정상 유니코드 문자로 나와(`iniƟal`=initial·`wriƩen`=written·`ﬁ`=fi) `_text_corruption_ratio` 를 통과했다(**`normalize_pdf_ligatures` 신설** — 수집 경로와 파서 양쪽에 적용해 이미 커밋된 `source_text` 도 복원) ③문장 중간에 낀 관찰 참조("…, OBSERVATION 1 and the Discussion Items, had already been discussed…")가 `_select_observation_anchors` 의 두 신호를 다 통과해 가짜 관찰을 만들었다(**신호 ③ 추가 — 표제 뒤 첫 문장이 소문자로 시작하면 기각**. 실측 9문서·29관찰 중 소문자 시작 0건). 부수 수리: `_refresh_483_observations` 가 **없던 블록도 신설**, `inject_deep_analysis` 의 `observations_ko` 병합을 심층분석 게이트에서 **분리**(deep-ready 아닌 카드의 번역이 버려져 배포 fail-closed 게이트에 걸리던 문제), 조립 게이트 4(`_lint_483_observation_ko`, 이번 조립에서 손댄 카드만), 거짓 부재 규칙 주어 확장(`조항·근거·사유·처분·상세` — "근거: 21 U.S.C.(세부 조항 원문 미기재)" 형태를 놓치고 있었다), 디제스트 문안에서 "스캔·비공개" 단정 제거. **예방 3층**: (1) 조립 게이트(그 주 발행분) (2) CI 스윕 `tests/test_published_briefs_integrity.py`(**전 발행본** 상시 재검사 — 한 번 새어 나간 거짓이 영영 남는 것을 차단) (3) 주간 워크플로 `grm-source-verification.yml`+`verify_published_sources.py`(**원문 재수집 대조** — 저장소 안에서는 알 수 없는 "처음부터 못 받은 누락"을 잡는 유일한 층). 프롬프트 규칙 2-1 신설(부재 주장 금지) + `prose_input.source_body_captured` 신호 추가(골든 21종 재동결). 과거 발행분 7장 정정(06-26 1·07-06 5·07-12 1). 신규 회귀 `tests/test_source_integrity.py`·`test_published_briefs_integrity.py`. |
 | 2026-07-20 | **WL 결정론 위반항목 슬롯(§16 `wl_violations`) + 거짓 부재 서술 차단 게이트** — 2026-07-20 발행분 사고 대응. 사고: 수집기가 WL 원문 전문(2만자·조항별 위반 3~5건)을 정상 확보했는데 카드는 "세부 위반내용은 원문에 명시되지 않았다"고 발행됐다. 세 겹의 결함이 겹쳤다 — ①WL 만 결정론 상세층이 없어 상세 경로가 §15 deep_analysis(LLM·조건부) 하나뿐 ②그 fan-out 이 안 돈 주, 폴백인 6슬롯 LLM 에 전달된 입력은 `prose_input` 300자 문장경계 절단을 거쳐 도입구 **118자뿐**("…including, but not limited to, the following. 1.") ③그 거짓 서술을 막는 게이트 부재. 수리: **(1)** `collect_intake._skip_wl_leadin` — 내용 없는 도입구 뒤에서 자른다(뒤에 실질 본문이 남을 때만 이동하는 보수적 게이트). `WL_BODY_FULL_MAX_CHARS` 20000→30000(실측 21.4k·24.1k — 회신 기한 문단이 잘리고 있었다). **(2)** `extract_wl_violations_from_text`(순수·3신호 판별) → `raw.wl_violations` → `card_scaffold._detail_wl_violations` → §16 `type:"wl_violations"` → `card.html` 분기(CSS 추가 0). fan-out 성패와 무관한 **바닥**이 생겼다. **(3)** `assemble_publish_brief._refresh_wl_violations` — 조립 시점에 deep 델타의 `source_text` 에서 재추출해 **블록이 없던 스캐폴드에도 신설**한다(#373 483 재추출과 같은 이유 + 슬롯 신설분 대응). **(4)** `lint_false_absence_claims` — 원문 확보 증거(결정론 블록 또는 deep_analysis)가 있는 카드가 위반/관찰/지적의 부재를 주장하면 **발행 차단**(`report.errors`). 이 게이트가 도입 즉시 같은 결함의 3번째 카드(MFDS GMP실사 — 지적표 3행을 싣고도 "원문 미기재")를 잡아냈다. 신규 회귀 `tests/test_wl_violations.py` 27건, 기존 골든 바이트 불변(전 소스 flag/키 부재 시 additive). |
 | 2026-07-13 | **전문지 브리핑 소스확장 — ISPE iSpeak**: ECA 에 이은 두 번째 '전문지 브리핑' 소스로 ISPE iSpeak 블로그(RSS·Drupal) 추가(`SOURCE_ISPE`·`ENABLE_ISPE` 기본 off). `RESOURCE_AGENCIES`=("ECA","ISPE")로 확장(§ `brief.resources[]` 판정 조건은 무변경 — agency 게이트만 확장). `keep_item`(`_is_ispe_gmp_relevant`)이 `grm_taxonomy.compute_relevance` 어휘를 그대로 재사용해 협회 홍보성 항목(Board of Directors 후보·Member Spotlight 등)을 배제. 기사 본문 흡수는 ECA 와 동형이나 `raw_payload` 키는 제네릭 `article_excerpt`(`eca_article_excerpt` 는 기존 적재행 호환을 위해 유지) — `card_scaffold` excerpt 소비 3곳(`source_excerpt_present`·`issue_or_reason`·`body_excerpt`)에 폴백 추가. `ENABLE_ISPE_ARTICLE_EXCERPT`(기본 off) 게이트. 전부 flag off 시 골든 바이트 불변. |

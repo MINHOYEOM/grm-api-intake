@@ -140,20 +140,32 @@ class WlExtractExcerptTest(unittest.TestCase):
 
 
 class WlFetchExcerptTest(unittest.TestCase):
+    """_fetch_wl_body_excerpt → (text, status) — status 는 고정 어휘(사유 전파 2026-07-20)."""
+
     def test_fetch_success_returns_excerpt(self) -> None:
         with patch.object(ci.requests, "get", return_value=_Resp(_WL_BODY_HTML)):
-            ex = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
+            ex, status = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
         self.assertTrue(ex.startswith("During our inspection"))
+        self.assertEqual(status, "ok")
 
     def test_fetch_403_is_graceful_empty(self) -> None:
         with patch.object(ci.requests, "get", return_value=_Resp("", 403)):
-            ex = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
+            ex, status = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
         self.assertEqual(ex, "")
+        self.assertEqual(status, "fetch-403")
 
     def test_fetch_timeout_is_graceful_empty(self) -> None:
         with patch.object(ci.requests, "get", side_effect=requests.Timeout("slow")):
-            ex = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
+            ex, status = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
         self.assertEqual(ex, "")
+        self.assertTrue(status.startswith("fetch-fail:"))
+
+    def test_fetch_no_anchor_is_graceful_empty(self) -> None:
+        html = "<html><body><p>Generic page with no enforcement narrative.</p></body></html>"
+        with patch.object(ci.requests, "get", return_value=_Resp(html)):
+            ex, status = ci._fetch_wl_body_excerpt("https://www.fda.gov/.../acme-660999")
+        self.assertEqual(ex, "")
+        self.assertEqual(status, "no-anchor")
 
 
 class WlCollectBodyGateTest(unittest.TestCase):
@@ -178,6 +190,8 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
         excerpt = items[0].raw_payload.get("wl_body_excerpt", "")
         self.assertTrue(excerpt.startswith("During our inspection"))
+        # [사유 전파 2026-07-20] 성공은 사유가 없다 — wl_body_status 키 자체가 안 생긴다.
+        self.assertNotIn("wl_body_status", items[0].raw_payload)
         # P1: 성공도 attempted 로 집계(LAST_WL_HEALTH → stats 배선용).
         self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
                          {"enabled": True, "attempted": 1, "failed": 0})
@@ -192,9 +206,28 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)                 # 목록 메타 카드 유지
         self.assertNotIn("wl_body_excerpt", items[0].raw_payload)
+        # [사유 전파 2026-07-20] 왜 비었는지가 raw 에 남는다(하류가 이유를 지어내지 않게).
+        self.assertTrue(items[0].raw_payload["wl_body_status"].startswith("fetch-fail:"))
         # P1: 조용한 실패 금지 — 실패가 카운터에 남아 health warning 으로 표면화된다.
         self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
                          {"enabled": True, "attempted": 1, "failed": 1})
+
+    def test_flag_on_403_records_fetch_403_status(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WL_BODY": "true"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_Resp("", 403))):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        self.assertEqual(items[0].raw_payload["wl_body_status"], "fetch-403")
+
+    def test_flag_on_no_anchor_records_no_anchor_status(self) -> None:
+        html = "<html><body><p>Generic page with no enforcement narrative.</p></body></html>"
+        with patch.dict(os.environ, {"ENABLE_WL_BODY": "true"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_Resp(html))):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        self.assertEqual(items[0].raw_payload["wl_body_status"], "no-anchor")
 
     def test_flag_off_skips_body_fetch(self) -> None:
         def _must_not_fetch_letter(url):
@@ -207,6 +240,8 @@ class WlCollectBodyGateTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)
         self.assertNotIn("wl_body_excerpt", items[0].raw_payload)
+        # 플래그가 꺼져 시도 자체가 없으면 사유도 남기지 않는다(수집 정책이지 결손이 아님).
+        self.assertNotIn("wl_body_status", items[0].raw_payload)
         # P1: flag off 면 카운터 0 → _evaluate_health warning 미발생(무변경 경로).
         self.assertEqual(ci.LAST_WL_HEALTH["wl_body"],
                          {"enabled": False, "attempted": 0, "failed": 0})
@@ -245,20 +280,32 @@ class WlExtractBodyFullTest(unittest.TestCase):
 
 
 class WlFetchBodyFullTest(unittest.TestCase):
+    """_fetch_wl_body_full → (text, status) — status 어휘는 excerpt 와 동일(사유 전파)."""
+
     def test_fetch_success_returns_full_body(self) -> None:
         with patch.object(ci.requests, "get", return_value=_Resp(_WL_BODY_HTML)):
-            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+            full, status = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
         self.assertTrue(full.startswith("During our inspection"))
+        self.assertEqual(status, "ok")
 
     def test_fetch_403_is_graceful_empty(self) -> None:
         with patch.object(ci.requests, "get", return_value=_Resp("", 403)):
-            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+            full, status = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
         self.assertEqual(full, "")
+        self.assertEqual(status, "fetch-403")
 
     def test_fetch_timeout_is_graceful_empty(self) -> None:
         with patch.object(ci.requests, "get", side_effect=requests.Timeout("slow")):
-            full = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+            full, status = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
         self.assertEqual(full, "")
+        self.assertTrue(status.startswith("fetch-fail:"))
+
+    def test_fetch_no_anchor_is_graceful_empty(self) -> None:
+        html = "<html><body><p>Generic page with no enforcement narrative.</p></body></html>"
+        with patch.object(ci.requests, "get", return_value=_Resp(html)):
+            full, status = ci._fetch_wl_body_full("https://www.fda.gov/.../acme-660999")
+        self.assertEqual(full, "")
+        self.assertEqual(status, "no-anchor")
 
 
 class WlCollectBodyFullGateTest(unittest.TestCase):
@@ -283,6 +330,7 @@ class WlCollectBodyFullGateTest(unittest.TestCase):
         raw = items[0].raw_payload
         self.assertNotIn("wl_body_excerpt", raw)              # excerpt 플래그 off → 미기록
         self.assertTrue(raw.get("wl_body_full", "").startswith("During our inspection"))
+        self.assertNotIn("wl_body_status", raw)               # 성공은 사유가 없다
         self.assertEqual(ci.LAST_WL_HEALTH["wl_body_full"],
                          {"enabled": True, "attempted": 1, "failed": 0})
 
@@ -295,6 +343,21 @@ class WlCollectBodyFullGateTest(unittest.TestCase):
         raw = items[0].raw_payload
         self.assertIn("wl_body_excerpt", raw)
         self.assertIn("wl_body_full", raw)
+        self.assertNotIn("wl_body_status", raw)               # 둘 다 성공 → 사유 없음
+
+    def test_both_flags_on_excerpt_status_wins_over_full_status(self) -> None:
+        # excerpt 블록이 먼저 실행돼 wl_body_status 를 남기면, full 블록의 실패는
+        # setdefault 라 덮어쓰지 않는다(과제 지시: "excerpt 가 이미 사유를 남겼으면
+        # 덮어쓰지 않는다"). 둘 다 403 이라 사유는 사실 같지만 우선순위 규약을 고정한다.
+        with patch.dict(os.environ, {"ENABLE_WL_BODY_FULL": "true", "ENABLE_WL_BODY": "true"}):
+            with patch.object(ci.requests, "get",
+                              side_effect=self._dispatch(body=_Resp("", 403))):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        raw = items[0].raw_payload
+        self.assertNotIn("wl_body_excerpt", raw)
+        self.assertNotIn("wl_body_full", raw)
+        self.assertEqual(raw["wl_body_status"], "fetch-403")
 
     def test_flag_off_skips_full_body_fetch(self) -> None:
         def _must_not_fetch_letter(url):

@@ -32,5 +32,5 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  출처 링크 원문 미기재
+	**출처**  출처 링크 미확인
 </callout>

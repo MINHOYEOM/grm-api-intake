@@ -59,6 +59,27 @@ class NoLigatureArtifactsInPublishedBriefs(unittest.TestCase):
                                            "collect_fda_483.normalize_pdf_ligatures 미적용분")
 
 
+class NoUnverifiedAbsenceVocabularyInPublishedBriefs(unittest.TestCase):
+    """발행물 어디에도 `"원문 미기재"` 가 없어야 한다 — 근본 원인의 단일 불변식.
+
+    이 문자열은 *원문에 대한 단정*인데, 우리 파이프라인에는 원문을 필드 단위로 확인하는 경로가
+    없다. 그래서 어떤 계층(코드 facts·LLM 산문·디제스트 목록)에서 나오든 근거가 없다. 값이
+    비었다는 우리 상태는 `card_scaffold.VALUE_UNKNOWN`("미확인")으로 말한다.
+
+    문자열 하나를 금지하는 조잡해 보이는 검사지만, 2026-07-20 근본원인 조사에서 확인된 사실이
+    정확히 이것이다 — 이 한 어휘가 코드→명세→프롬프트→LLM 전 계층에 복제되며 거짓을 낳았다.
+    """
+
+    def test_no_unverified_absence_vocabulary(self):
+        for path in BRIEFS:
+            with self.subTest(brief=path.name):
+                text = path.read_text(encoding="utf-8")
+                self.assertNotIn(
+                    "원문 미기재", text,
+                    f"{path.name}: 근거 없는 원문 부재 단정 표기 — "
+                    "card_scaffold.VALUE_UNKNOWN(\"미확인\") 을 쓸 것")
+
+
 class NoEmptyProseSlotsInPublishedBriefs(unittest.TestCase):
     """발행 카드에 빈 산문 슬롯이 없어야 한다(조립 게이트 2 의 사후 스윕).
 

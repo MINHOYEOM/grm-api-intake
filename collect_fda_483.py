@@ -812,11 +812,16 @@ def _site_country(country: str, state: str) -> str:
 
 def _to_item(nrow: dict[str, str], excerpt: str,
              observations: list[dict[str, str]] | None = None,
-             body_full: str = "") -> IntakeItem | None:
+             body_full: str = "", text_status: str = "") -> IntakeItem | None:
     """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭).
 
     `body_full`(비공백)이면 raw 에 `fda483_body_full` 로 실어 deep_analysis fan-out 입력으로 쓴다
-    (ENABLE_FDA_483_DEEP 게이트 산출 — WL wl_body_full 동형). 결정론 Observation 상세와 별개 층."""
+    (ENABLE_FDA_483_DEEP 게이트 산출 — WL wl_body_full 동형). 결정론 Observation 상세와 별개 층.
+
+    `text_status` 는 PDF 텍스트층 확보 결과 코드다. **아무 본문층도 못 얻은 경우에만**
+    `fda483_text_status` 로 raw 에 남긴다 — 하류(card_scaffold.`_absent_reason`)가 "왜 비었는지"를
+    사람 문장으로 바꿔 prose_input 에 실어, 코드와 LLM 이 사유를 **지어내지** 않게 하기 위해서다.
+    본문을 얻었으면 사유가 없으므로 키 자체를 달지 않는다(골든 additive)."""
     record_type = nrow["record_type"]
     media_id = nrow["media_id"]
     company = nrow["company"]
@@ -863,6 +868,8 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         raw_payload["fda_483_observations"] = observations
     if body_full:
         raw_payload["fda483_body_full"] = body_full   # deep_analysis fan-out 입력(전문)
+    if text_status and text_status not in ("ok", "") and not (excerpt or observations or body_full):
+        raw_payload["fda483_text_status"] = text_status   # 결손 사유(본문 전무일 때만)
 
     # Modality 는 insert 시 notion_create_page 가 raw_payload(product_type)+headline/body 로
     # compute_modality 한다(IntakeItem 에 저장 필드 없음 — 타 수집기와 동일).
@@ -870,7 +877,9 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     locale = country or (f"{state}, United States" if state else "")
     body = (
         f"FDA {record_type} — OII FOIA Electronic Reading Room 공개 실사 기록.\n"
-        f"제조소/업체: {company or '원문 미기재'}"
+        # [어휘 분리 2026-07-20] '원문 미기재'는 원문에 없다는 단정이라 거짓일 수 있다 —
+        # 여기서는 우리가 확보 못 했다는 사실만 말한다(card_scaffold.VALUE_UNKNOWN 과 동일 취지).
+        f"제조소/업체: {company or '미확인'}"
         + (f" (FEI {fei})" if fei else "")
         + (f"\n시설 유형: {establishment_type}" if establishment_type else "")
         + (f"\n소재: {locale}" if locale else "")
@@ -962,6 +971,11 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         excerpt = ""
         observations: list[dict[str, str]] = []
         body_full = ""
+        # [결손 사유 전파 2026-07-20] 본문을 못 얻었을 때 **왜** 못 얻었는지. 종전엔 이 사유가
+        # health 카운터에만 남고 카드로는 "없음"만 갔고, 이유를 모르는 하류가 이유를 지어냈다
+        # (디제스트가 "스캔·비공개로 상세가 제공되지 않아" 라고 단정한 사례). cap 에 걸려 아예
+        # 시도하지 못한 경우도 결손이므로 사유를 남긴다.
+        text_status = "not-attempted"
         pdf_url = _pdf_url(media_id)
         # [FIND-1 M10a] Observation 추출의 페이지헤더 스크럽 힌트 — 이 행(nrow)의 시설유형/
         # FEI/업체명을 strip_fda483_page_header 에 그대로 넘겨 OCR 공백변형까지 흡수한다.
@@ -981,6 +995,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 # 뒤 Observation 까지 담기게(공유 엔진 12000 기본이 절단하던 것 보완). excerpt 는
                 # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
                 text, status = _fetch_fda483_pdf_text(pdf_url)
+                text_status = status if not text else "ok"
                 excerpt = _extract_fda483_excerpt(text) if text else ""
                 if excerpt:
                     excerpt_health["ok"] += 1
@@ -1020,7 +1035,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                         deep_health["warnings"].append(warn)
                         log("WARN", warn + " — 분석층 없이 발행(결정론 상세·요약카드는 유지)")
 
-        item = _to_item(nrow, excerpt, observations, body_full)   # None = 수의/기기/식품 도메인 드롭
+        item = _to_item(nrow, excerpt, observations, body_full, text_status)
         if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 

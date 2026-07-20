@@ -1533,7 +1533,9 @@ class DeepAnalysisReadyTest(unittest.TestCase):
 
 class EcaArticleExcerptCardTest(unittest.TestCase):
     """[전문지 브리핑 v2 §4] `raw.eca_article_excerpt` 배선 — prose_input 풍부화 +
-    웹카드 `source_excerpt_present` boolean(정직성 게이트 §3 입력 신호).
+    웹카드 `source_body_captured` boolean(정직성 신호). [2026-07-20] 구 키
+    `source_excerpt_present`(ECA/ISPE 전용)를 전 소스 공통 신호로 일반화하면서 이름이 바뀌었다 —
+    같은 결함이 다른 소스에서 재발했기 때문에 소스별 반창고를 걷어냈다.
 
     rss_news_mhra fixture(kind='rss-news', collect_eca_rss 와 동일 kind 공유 — §3 배경 참조)
     를 재사용해 raw 에 키만 추가/제거한 대조로 검증한다. 실제 raw 키는 ECA 수집기만 채우지만
@@ -1541,20 +1543,20 @@ class EcaArticleExcerptCardTest(unittest.TestCase):
     fixture 의 agency 는 무관하다.
     """
 
-    def test_source_excerpt_present_when_key_set(self) -> None:
+    def test_source_body_captured_when_key_set(self) -> None:
         fx = _load_input("rss_news_mhra")
         raw = dict(fx["raw"])
         raw["eca_article_excerpt"] = ("Should TGA publish GMP certificates? The debate "
                                       "over transparency has intensified.")
         card = cs.build_card_scaffold(fx["row"], raw)
         webcard = card.to_web_card()
-        self.assertIs(webcard["source_excerpt_present"], True)
+        self.assertIs(webcard["source_body_captured"], True)
 
-    def test_source_excerpt_present_absent_without_key(self) -> None:
+    def test_source_body_captured_absent_without_key(self) -> None:
         # golden 불변 하드 요구(§4) — 키 부재 시 웹카드에 이 필드 자체가 없다.
         fx = _load_input("rss_news_mhra")
         card = cs.build_card_scaffold(fx["row"], fx["raw"])
-        self.assertNotIn("source_excerpt_present", card.to_web_card())
+        self.assertNotIn("source_body_captured", card.to_web_card())
 
     def test_eca_article_excerpt_feeds_issue_or_reason_and_body(self) -> None:
         fx = _load_input("rss_news_mhra")
@@ -1587,21 +1589,21 @@ class IspeArticleExcerptCardTest(unittest.TestCase):
     채우지만 배선 자체는 kind='rss-news' 공통이라 fixture agency 는 무관.
     """
 
-    def test_source_excerpt_present_when_generic_key_set(self) -> None:
+    def test_source_body_captured_when_generic_key_set(self) -> None:
         fx = _load_input("rss_news_mhra")
         raw = dict(fx["raw"])
         raw["article_excerpt"] = ("Pharmaceutical water systems require a lifecycle "
                                   "approach to GMP compliance.")
         card = cs.build_card_scaffold(fx["row"], raw)
         webcard = card.to_web_card()
-        self.assertIs(webcard["source_excerpt_present"], True)
+        self.assertIs(webcard["source_body_captured"], True)
 
-    def test_source_excerpt_present_absent_without_any_key(self) -> None:
+    def test_source_body_captured_absent_without_any_key(self) -> None:
         # golden 불변 하드 요구 — eca_article_excerpt/article_excerpt 둘 다 없으면
         # 웹카드에 이 필드 자체가 없다.
         fx = _load_input("rss_news_mhra")
         card = cs.build_card_scaffold(fx["row"], fx["raw"])
-        self.assertNotIn("source_excerpt_present", card.to_web_card())
+        self.assertNotIn("source_body_captured", card.to_web_card())
 
     def test_article_excerpt_feeds_issue_or_reason_and_body(self) -> None:
         fx = _load_input("rss_news_mhra")

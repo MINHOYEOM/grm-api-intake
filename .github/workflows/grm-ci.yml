@@ -21,15 +21,18 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: py_compile all collectors
+      # 루트 평면 배치(CLAUDE.md §구조 원칙)를 그대로 신뢰해 *.py 전수 컴파일한다.
+      # 수동 열거는 새 모듈이 조용히 게이트를 빠져나가므로 금지 — 목록을 늘리지 말 것.
+      - name: py_compile all root modules
         run: |
-          python -m py_compile collect_intake.py collect_mfds.py \
-            collect_mfds_admin_action.py collect_mfds_gmp_inspection.py \
-            collect_mfds_recall.py collect_ich.py collect_who.py \
-            collect_hc.py collect_search.py grm_common.py grm_cli.py \
-            grm_health.py grm_taxonomy.py grm_notion.py grm_handoff.py \
-            inject_slots.py deep_analysis_fanout.py \
-            brief_lint.py verify_published_brief.py card_scaffold.py \
-            library_linkcheck.py library_staging_build.py
+          shopt -s nullglob
+          files=(*.py)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "::error::루트 .py 를 하나도 찾지 못했다 — 글롭이 무너졌다(침묵 통과 방지)"
+            exit 1
+          fi
+          echo "compiling ${#files[@]} root modules:"
+          printf '  %s\n' "${files[@]}"
+          python -m py_compile "${files[@]}"
       - name: unittest
         run: python -m unittest discover -s tests -v

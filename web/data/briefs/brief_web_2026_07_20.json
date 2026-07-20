@@ -25,10 +25,10 @@
   ],
   "coverage": {
    "intake_total": 135,
-   "rendered": 36,
+   "rendered": 38,
    "evidence": {
     "A": 23,
-    "B": 13,
+    "B": 15,
     "C": 0
    },
    "resources": 5
@@ -970,8 +970,168 @@
    }
   },
   {
-   "id": "fda483-193529",
+   "id": "fda483-193570",
    "render_order": 7,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Ascendis Pharma LLC",
+   "title_issue": "이상사례 15일 보고 지연 등 2건",
+   "summary": "Ascendis Pharma LLC(FEI 3022069968)는 Yorvipath 사용 후 입원을 기술한 소비자 자발보고를 자체 트리아지에서 중대·예상외·신속보고로 분류하고도 15일 이내 FDA에 보고하지 않았고, 소셜미디어 모니터링으로 확인되는 시판 후 이상사례의 감시·보고 문서화 절차도 갖추지 않아 FDA 483 관찰 2건을 받았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-13"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-193570"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Ascendis Pharma LLC · FEI 3022069968"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "483"
+    },
+    {
+     "label": "실사일",
+     "value": "03/06/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Ascendis Pharma LLC (FEI 3022069968) · 실사일 03/06/2026",
+    "관찰 1: 중대·예상외 이상약물반응의 15일 이내 FDA 보고 누락(사례 2025US009908)",
+    "관찰 2: 시판 후 이상사례 감시·접수·평가·보고 문서화 절차 부재(SKYTROFA·YORVIPATH)",
+    "발행일: 2026년 7월 13일"
+   ],
+   "implication": "자체 트리아지에서 이미 '중대·예상외·신속보고'로 판정한 사례를 환자 식별정보 부재를 이유로 무효(non-valid)로 재분류해 보고하지 않은 점이 지적됐다는 것이 핵심이다. 국내 안전관리책임자는 자발보고의 유효성 판단 기준이 보고 회피로 작동하지 않는지, 소셜미디어 등 비정형 경로로 수집되는 이상사례에 대한 문서화된 절차가 있는지 점검할 필요가 있다.",
+   "checks": [
+    "자발보고 유효성 판단(식별 가능한 환자 등) 기준과 재분류 이력 점검",
+    "소셜미디어 모니터링 등 비정형 경로 이상사례의 접수·평가 SOP 보유 여부 확인",
+    "중대·예상외 사례의 15일 신속보고 기한 준수 현황 자체점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/193570/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Not all adverse drug experiences that are both serious and unexpected have been reported to FDA within 15 calendar days of initial receipt of the information.",
+      "detail": "Specifically, On 13 Jun 2025, the firm received a spontaneous consumer report (case 2025US009908) describing hospitalization following Yorvipath use. The firm's own triage, completed 16 Jun 2025, identified the case as serious (hospitalization), unexpected, and expedited. The firm subsequently classified case 2025US009908 as non-valid on the basis that no patient identifier was available. The firm's own case narrative documented a single patient's sequential 12-day clinical course including laboratory values, emergency care at a hospital, and inpatient treatment — meeting the threshold for an identifiable patient. No 15-day expedited report was submitted to FDA for case 2025US009908. Furthermore, internal firm correspondence dated 18 Jun 2025 confirms that the firm applied the same non-valid classification collectively to three additional adverse event reports from the same social media source, each previously identified by the firm's own operations team as individual patient adverse event reports, on the basis of absent reporter email address and patient details — without individual medical review of each case.",
+      "deficiency_ko": "중대하고(serious) 동시에 예상하지 못한(unexpected) 이상약물반응 전부가 해당 정보를 최초 접수한 날로부터 15일(달력일) 이내에 FDA에 보고되지는 않았다.",
+      "detail_ko": "구체적으로, 2025년 6월 13일 귀사는 Yorvipath 사용 후의 입원을 기술한 소비자 자발보고(사례 2025US009908)를 접수하였다. 2025년 6월 16일에 완료된 귀사 자체의 트리아지(triage)에서 해당 사례는 중대(입원)·예상하지 못함·신속보고(expedited) 대상으로 판정되었다. 그 후 귀사는 환자 식별정보가 없다는 이유로 사례 2025US009908을 유효하지 않은 사례(non-valid)로 분류하였다. 그러나 귀사 자체의 사례 서술(case narrative)에는 검사수치, 병원에서의 응급진료 및 입원 치료를 포함한 단일 환자의 12일간 순차적 임상 경과가 기록되어 있어 식별 가능한 환자(identifiable patient)의 요건을 충족하였다. 사례 2025US009908에 대하여 15일 신속보고는 FDA에 제출되지 않았다. 또한 2025년 6월 18일자 사내 서신은, 귀사가 동일한 소셜미디어 출처에서 나온 3건의 추가 이상사례 보고 — 각각 귀사 운영팀이 이미 개별 환자의 이상사례 보고로 확인한 건 — 에 대하여 보고자 이메일 주소와 환자 정보가 없다는 이유로 개별 사례에 대한 의학적 검토 없이 동일한 non-valid 분류를 일괄 적용하였음을 확인해 준다."
+     },
+     {
+      "number": "2",
+      "deficiency": "There are no written procedures for the surveillance, receipt, evaluation and reporting of post-marketing adverse experiences to FDA.",
+      "detail": "Specifically, No written procedures to ensure systematic surveillance, receipt, and reporting of post-marketing adverse experiences identified through social media monitoring to FDA for SKYTROFA and YORVIPATH.",
+      "deficiency_ko": "시판 후 이상사례의 감시(surveillance)·접수·평가 및 FDA 보고에 관한 문서화된 절차가 없다.",
+      "detail_ko": "구체적으로, SKYTROFA 및 YORVIPATH에 대하여 소셜미디어 모니터링을 통해 확인된 시판 후 이상사례를 체계적으로 감시·접수하고 FDA에 보고하기 위한 문서화된 절차가 없었다."
+     }
+    ]
+   }
+  },
+  {
+   "id": "fda483-193583",
+   "render_order": 8,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Eduardo Patricio Yanez Ruiz, MD",
+   "title_issue": "부적격 대상자 등록 지적",
+   "summary": "칠레 소재 임상시험자 Eduardo Patricio Yáñez Ruiz, MD(FEI 3022159116)가 두 건의 연구에서 선정기준을 충족하지 못하거나 제외기준에 해당하는 대상자를 등록해, 서명된 시험자 서약서에 따라 임상시험을 수행하지 않았다는 FDA 483 관찰을 받았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-13"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-193583"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Eduardo Patricio Yanez Ruiz, MD · FEI 3022159116"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Clinical Investigator · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/22/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "시험자: Eduardo Patricio Yáñez Ruiz, MD (FEI 3022159116) · 칠레",
+    "실사일: 01/22/2026",
+    "관찰 1: 서명된 시험자 서약서 미준수 — 선별기준 미충족 대상자 등록",
+    "시설 유형: Clinical Investigator"
+   ],
+   "implication": "선정·제외 기준 위반 등록은 해당 시험 자료의 신뢰성 자체를 흔드는 지적이다. 해당 연구자가 참여한 임상자료를 국내 허가·심사 근거로 활용하고 있다면, 문제가 된 대상자 데이터의 포함 여부와 그 영향을 확인할 필요가 있다.",
+   "checks": [
+    "해당 연구자 참여 임상자료의 국내 허가·심사 활용 여부 확인",
+    "선정·제외 기준 검증 절차와 등록 전 적격성 확인 기록 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/193583/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 1,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "An investigation was not conducted in accordance with the signed statement of investigator.",
+      "detail": "Specifically, in each of two studies, and subjects were enrolled despite ineligibility due to not meeting all inclusion criteria or by meeting an exclusion criterion. Due to not meeting all of the screening criteria, the following subjects were not eligible to be enrolled in their respective studies as follows: Study Subject Number Screening Criteria # Screening Criteria Finding Exclusion 13 Patients with active Hepatitis B or Hepatitis C The subject was not tested for Hepatitis C at screening. Inclusion 2ai “***Patients who received taxane, gemcitabine, or other platinum agents in the (neo)adjuvant chemotherapy setting can be treated with the same class of chemotherapy (taxane or gemcitabine/carboplatin if  12 months have elapsed between the completion of treatment with curative intent (eg, date of primary breast tumor surgery or date of last (neo) adjuvant chemotherapy administration, whichever occurred last) and first The subject received their last dose of docetaxel on 05/30/2023, and was diagnosed with metastatic triple-negative breast cancer on . (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (6) (b) (6) Establishment Inspection Report FEI: 3022159116 Eduardo Patricio Y",
+      "deficiency_ko": "임상시험이 서명된 시험자 서약서(statement of investigator)에 따라 수행되지 않았다.",
+      "detail_ko": "구체적으로, 두 건의 연구 각각에서 대상자들이 모든 선정기준(inclusion criteria)을 충족하지 못하거나 제외기준(exclusion criterion)에 해당함에도 불구하고 등록되었다. 선별검사 기준을 모두 충족하지 못하여 다음 대상자들은 각 해당 연구에 등록될 자격이 없었다: 연구 / 대상자 번호 / 선별기준 번호 / 선별기준 / 확인사항 — 제외기준 13 「활동성 B형간염 또는 C형간염이 있는 환자」: 해당 대상자는 선별검사 시 C형간염 검사를 받지 않았다. 선정기준 2ai 「***(신)보조요법 항암화학요법 상황에서 탁산(taxane), 젬시타빈(gemcitabine) 또는 기타 백금계 약제를 투여받은 환자는, 근치적 목적의 치료 완료(예: 원발 유방종양 수술일 또는 마지막 (신)보조 항암화학요법 투여일 중 나중에 해당하는 날)와 국소 또는 원격 질병 재발이 최초로 문서화된 시점 사이에 12개월이 경과하였다면 동일 계열의 항암화학요법(탁산 또는 젬시타빈/카보플라틴)으로 치료할 수 있다」: 해당 대상자는 2023년 5월 30일에 도세탁셀(docetaxel) 마지막 투여를 받았고, 전이성 삼중음성 유방암으로 진단되었다(진단일 비공개)."
+     }
+    ]
+   }
+  },
+  {
+   "id": "fda483-193529",
+   "render_order": 9,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -984,7 +1144,7 @@
    "type_tag": "483",
    "headline_target": "SGS North America Inc.",
    "title_issue": "483 실사기록 다건 공개",
-   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 41건이 공개됐다. 개별 관찰 원문은 스캔·비공개로 상세가 제공되지 않아 시설·실사일 목록만 확인 가능하다.",
+   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 39건이 공개됐다. 개별 관찰 원문이 제공되지 않아(스캔본이거나 관찰 상세 미수록) 시설·실사일 목록만 확인 가능하다.",
    "facts": [
     {
      "label": "발행일",
@@ -1010,8 +1170,8 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "공개 건수: 41건 (개별 관찰 상세 미공개)",
-    "대표 시설: SGS North America Inc. · FEI 1418028 외 40곳",
+    "공개 건수: 39건 (개별 관찰 상세 미공개)",
+    "대표 시설: SGS North America Inc. · FEI 1418028 외 38곳",
     "출처: FDA OII FOIA 전자열람실"
    ],
    "implication": "개별 관찰 내용이 공개되지 않은 실사기록 공개는 그 자체로 조치 신호는 아니다. 국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 열람할 필요가 있다.",
@@ -1019,7 +1179,7 @@
     "목록에 자사 공급망·수급처 시설이 있는지 확인",
     "해당 시 FDA FOIA 원문(PDF) 직접 열람"
    ],
-   "merged_count": 41,
+   "merged_count": 39,
    "merged_items": [
     "SGS North America Inc. · FEI 1418028 · 실사 03/20/2026",
     "PETNET Solutions Inc · FEI 3011121261 · 실사 02/17/2026",
@@ -1038,7 +1198,6 @@
     "Abbisko Therapeutics Co., Ltd. · FEI 3020982471 · 실사 03/20/2026",
     "Sheng Kee of California, Inc dba Sheng Kee Bakery · FEI 3002363195 · 실사 03/26/2025",
     "원문 미기재 · 실사 02/13/2026",
-    "Ascendis Pharma LLC · FEI 3022069968 · 실사 03/06/2026",
     "BeOne Medicines USA, Inc. · FEI 3028672933 · 실사 02/17/2026",
     "Enemeez LLC · FEI 3005641023 · 실사 02/12/2026",
     "RayzeBio, Inc · FEI 3030530655 · 실사 02/24/2026",
@@ -1048,7 +1207,6 @@
     "Biotechnologines farmacijos centras Biotechpharma UAB · FEI 3013580641 · 실사 09/18/2025",
     "Cliantha Research Limited · FEI 3017682080 · 실사 04/17/2026",
     "MSN Laboratories Private Limited · FEI 3035592613 · 실사 12/11/2025",
-    "Eduardo Patricio Yanez Ruiz, MD · FEI 3022159116 · 실사 01/22/2026",
     "Frederick J. Raal · FEI 3009568404 · 실사 09/04/2025",
     "BioChem Sioux City, Inc. · FEI 1910218 · 실사 03/19/2026",
     "Bentley Laboratories LLC · FEI 2244819 · 실사 03/27/2026",
@@ -1076,7 +1234,7 @@
   },
   {
    "id": "511e4b6d6538",
-   "render_order": 8,
+   "render_order": 10,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "PIC/S",
@@ -1134,7 +1292,7 @@
   },
   {
    "id": "58856a70fc65",
-   "render_order": 9,
+   "render_order": 11,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -1192,7 +1350,7 @@
   },
   {
    "id": "2f5d7d8e29fa",
-   "render_order": 10,
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -1250,7 +1408,7 @@
   },
   {
    "id": "625fc2215ae3",
-   "render_order": 11,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "MHRA",
@@ -1310,7 +1468,7 @@
   },
   {
    "id": "93f98fe39f5c",
-   "render_order": 12,
+   "render_order": 14,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "MHRA",
@@ -1370,7 +1528,7 @@
   },
   {
    "id": "admin-2026005761",
-   "render_order": 13,
+   "render_order": 15,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1462,7 +1620,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-NZn",
-   "render_order": 14,
+   "render_order": 16,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1612,7 +1770,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-ORx",
-   "render_order": 15,
+   "render_order": 17,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1707,7 +1865,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-SIF",
-   "render_order": 16,
+   "render_order": 18,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1770,7 +1928,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-SxA",
-   "render_order": 17,
+   "render_order": 19,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1890,7 +2048,7 @@
   },
   {
    "id": "recall-117f512e15b2",
-   "render_order": 18,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1955,7 +2113,7 @@
   },
   {
    "id": "recall-c5a24b0b2d9c",
-   "render_order": 19,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2020,7 +2178,7 @@
   },
   {
    "id": "D-0661-2026",
-   "render_order": 20,
+   "render_order": 22,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2093,7 +2251,7 @@
   },
   {
    "id": "recall-b0b313a5979f",
-   "render_order": 21,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2158,7 +2316,7 @@
   },
   {
    "id": "recall-0c507fba0be3",
-   "render_order": 22,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2223,7 +2381,7 @@
   },
   {
    "id": "recall-8b39059b5cbc",
-   "render_order": 23,
+   "render_order": 25,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2288,7 +2446,7 @@
   },
   {
    "id": "recall-8a6da91bb7dc",
-   "render_order": 24,
+   "render_order": 26,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2357,7 +2515,7 @@
   },
   {
    "id": "hc-82324",
-   "render_order": 25,
+   "render_order": 27,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2424,7 +2582,7 @@
   },
   {
    "id": "hc-82325",
-   "render_order": 26,
+   "render_order": 28,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2491,7 +2649,7 @@
   },
   {
    "id": "hc-82326",
-   "render_order": 27,
+   "render_order": 29,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2558,7 +2716,7 @@
   },
   {
    "id": "hc-82327",
-   "render_order": 28,
+   "render_order": 30,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2625,7 +2783,7 @@
   },
   {
    "id": "D-0643-2026",
-   "render_order": 29,
+   "render_order": 31,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2705,7 +2863,7 @@
   },
   {
    "id": "D-0653-2026",
-   "render_order": 30,
+   "render_order": 32,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2774,7 +2932,7 @@
   },
   {
    "id": "D-0655-2026",
-   "render_order": 31,
+   "render_order": 33,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2843,7 +3001,7 @@
   },
   {
    "id": "D-0656-2026",
-   "render_order": 32,
+   "render_order": 34,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2912,7 +3070,7 @@
   },
   {
    "id": "D-0657-2026",
-   "render_order": 33,
+   "render_order": 35,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2981,7 +3139,7 @@
   },
   {
    "id": "D-0658-2026",
-   "render_order": 34,
+   "render_order": 36,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3053,7 +3211,7 @@
   },
   {
    "id": "D-0660-2026",
-   "render_order": 35,
+   "render_order": 37,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

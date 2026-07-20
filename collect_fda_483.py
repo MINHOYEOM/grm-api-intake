@@ -196,6 +196,35 @@ _XREF_PREFIX_RE = re.compile(
 _HEADING_MIN_ALPHA = 6   # 표제 뒤 첫 문장의 최소 알파벳 수(참조문 잔재 '.' 는 0)
 _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
+# \u2500\u2500 [PDF \ub9ac\uac00\ucc98 \ubcf5\uc6d0 2026-07-20] \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+# 483 PDF \ub294 \uc11c\ube0c\uc14b \ud3f0\ud2b8\ub97c \uc4f0\ub294 \uacbd\uc6b0\uac00 \uc788\uc5b4 \ud14d\uc2a4\ud2b8\uce35\uc5d0\uc11c \ud569\uc790(ligature)\uac00 **\uc5c9\ub6b1\ud55c \uc720\ub2c8\ucf54\ub4dc
+# \ubb38\uc790**\ub85c \ub098\uc628\ub2e4. \uc2e4\uce21(193570): "ini\u019fal receipt of the informa\u019fon" \u00b7 "wri\u01a9en procedures" \u00b7
+# "Speci\ufb01cally" \u00b7 "iden\u019f\ufb01ed". U+019F=ti \u00b7 U+01A9=tt \u00b7 U+FB01=fi.
+# \uc804\ubd80 **\uc815\uc0c1 \uc720\ub2c8\ucf54\ub4dc \ubb38\uc790**\ub77c `_text_corruption_ratio`(replacement/control \ubb38\uc790 \uae30\ubc18)\uc5d0
+# \uac78\ub9ac\uc9c0 \uc54a\ub294\ub2e4 \u2014 \uae68\uc9d0 \ud310\uc815\uc744 \ud1b5\uacfc\ud574 \uadf8\ub300\ub85c \ubc1c\ud589\ub420 \uc218 \uc788\ub294 \uce68\ubb35 \uacb0\ud568\uc774\ub2e4.
+# NFKC \ub97c \uc4f0\uc9c0 \uc54a\ub294 \uc774\uc720: \ud45c\uc900 \ud569\uc790 \ube14\ub85d(U+FB0x)\ub9cc \ud480\uace0 U+019F/U+01A9 \ub294 \uadf8\ub300\ub85c \ub450\uba74\uc11c
+# \ub2e4\ub978 \uae30\ud638\ub294 \uc608\uc0c1 \ubc16\uc73c\ub85c \ubc14\uafbc\ub2e4. \uc2e4\uce21\ub41c \ubb38\uc790\ub9cc \uba85\uc2dc \ub9e4\ud551\ud55c\ub2e4(\uacb0\uc815\ub860\u00b7\uac80\uc99d \uac00\ub2a5).
+_PDF_LIGATURES = {
+    "\u019f": "ti",   # \uc11c\ube0c\uc14b \ud3f0\ud2b8\uc758 ti \ud569\uc790
+    "\u01a9": "tt",   # tt \ud569\uc790
+    "\u0296": "",     # \uae00\uba38\ub9ac \uae30\ud638 \uc794\uc7ac
+    "\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl",
+    "\ufb03": "ffi", "\ufb04": "ffl", "\ufb05": "st", "\ufb06": "st",
+}
+_PDF_LIGATURE_RE = re.compile("[" + "".join(_PDF_LIGATURES) + "]")
+
+
+def normalize_pdf_ligatures(text: str) -> str:
+    """PDF \uc11c\ube0c\uc14b \ud3f0\ud2b8\uac00 \ub0a8\uae34 \ud569\uc790 \ubb38\uc790\ub97c \uc6d0\ub798 \uc54c\ud30c\ubcb3\uc73c\ub85c \ub418\ub3cc\ub9b0\ub2e4(\uc21c\uc218\u00b7\uacb0\uc815\ub860).
+
+    \uc218\uc9d1 \uacbd\ub85c(`_fetch_fda483_pdf_text`)\uc640 \ud30c\uc11c(`_extract_483_observations_from_text`) \uc591\ucabd\uc5d0
+    \uac74\ub2e4 \u2014 \ud30c\uc11c\uc5d0\ub3c4 \uac70\ub294 \uc774\uc720\ub294 **\uc774\ubbf8 \ucee4\ubc0b\ub41c `source_text`**(deep \ub378\ud0c0)\ub97c \uc870\ub9bd \uc2dc\uc810\uc5d0 \ub2e4\uc2dc
+    \ud30c\uc2f1\ud560 \ub54c\ub3c4 \ubcf5\uc6d0\ub3fc\uc57c \ud558\uae30 \ub54c\ubb38\uc774\ub2e4(\ub0a1\uc740 \ud14d\uc2a4\ud2b8\ub97c \uc7ac\uc218\uc9d1 \uc5c6\uc774 \uace0\uce58\ub294 \uc720\uc77c\ud55c \uc9c0\uc810).
+    """
+    if not text:
+        return text
+    return _PDF_LIGATURE_RE.sub(lambda m: _PDF_LIGATURES[m.group(0)], text)
+
 
 def _strip(value: Any) -> str:
     """HTML 태그 제거 + 엔티티 복원 + 공백 정규화(셀/필드 값 정리, 순수 함수).
@@ -567,7 +596,8 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
-    return _extract_pdf_text(data, max_chars=max_chars)
+    text, status = _extract_pdf_text(data, max_chars=max_chars)
+    return normalize_pdf_ligatures(text), status   # [2026-07-20] 서브셋 폰트 합자 복원
 
 
 def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
@@ -664,10 +694,21 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
       · 진짜 표제 뒤에는 **실질 deficiency 문장**이 온다 — ': The responsibili…' ': Written standard…'
       · 상호참조 뒤에는 **참조문의 종결 마침표만** 남는다 — ': .' (다음 줄부터 하위항목 b./c./d.)
 
-    그래서 두 가지 **양성 검출**로만 기각한다(정상 항목을 버리지 않는 방향):
+    [3번째 신호 2026-07-20 — 193583 실측] 위 두 신호를 **둘 다 통과하는** 문장 속 참조가 있다:
+    "...the Form FDA 483, OBSERVATION 1 and the Discussion Items, had already been discussed
+    with Dr. Yáñez..." — 앞이 "refer to/see/per" 가 아니고(①통과), 뒤에 실질 문장이 이어진다
+    (②통과). 그 결과 번호 1 이 **중복**된 가짜 관찰이 하나 더 생겼다. 갈리는 신호는 하나:
+      · 진짜 표제 뒤 문장은 **대문자로 시작**한다 — 실측 9개 문서·29개 관찰 전건
+        ("There is a failure…" "The quality control unit…" "An investigation was not…").
+      · 문장 중간에 낀 참조 뒤는 **소문자 연결어**로 이어진다("and the Discussion Items…").
+    그래서 ③ 뒤따르는 첫 실질 문장이 소문자로 시작하면 기각한다. 실측 29개 정상 관찰 중
+    소문자로 시작하는 것은 0건이라 정상 항목을 버리지 않는다.
+
+    그래서 세 가지 **양성 검출**로만 기각한다(정상 항목을 버리지 않는 방향):
       ① 앵커 앞이 참조 문구("refer to" / "see" / "per", 중간에 낀 다른 참조 포함)로 끝난다
       ② 앵커 뒤 첫 문장에 실질 알파벳 내용이 없다(마침표·기호뿐)
-    둘 다 결함의 직접 증거라, 번호가 건너뛰거나 중복돼도 **정상 관찰은 그대로 살아남는다**.
+      ③ 앵커 뒤 첫 문장이 소문자로 시작한다(문장 중간에 낀 참조)
+    셋 다 결함의 직접 증거라, 번호가 건너뛰거나 중복돼도 **정상 관찰은 그대로 살아남는다**.
     """
     selected: list[re.Match[str]] = []
     for i, m in enumerate(matches):
@@ -678,6 +719,9 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
         head, _ = _first_sentence(body[m.end():nxt].lstrip(" :\t\r\n"))
         if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
             continue                                   # ② 뒤따르는 실질 문장 없음
+        first_alpha = next((c for c in head if c.isalpha()), "")
+        if first_alpha and first_alpha.islower():
+            continue                                   # ③ 문장 중간에 낀 참조
         selected.append(m)
     return selected
 
@@ -700,7 +744,7 @@ def _extract_483_observations_from_text(
     if not text or _text_corruption_ratio(text) > FDA483_TEXT_CORRUPTION_RATIO_MAX:
         return []
     hints = _header_hint_kwargs(header_hints)
-    body = text
+    body = normalize_pdf_ligatures(text)   # [2026-07-20] 커밋된 낡은 source_text 도 여기서 복원
     m = _WE_OBSERVED_RE.search(body)
     if m:
         body = body[m.end():]

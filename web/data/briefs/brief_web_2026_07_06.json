@@ -233,7 +233,7 @@
    "key_facts": [
     "구분: CGMP/완제의약품/불량(Adulterated)",
     "발행: CDER, 2026-06-24",
-    "세부 위반 내용: 원문 미기재(요약문만 확인)"
+    "위반조항 4건: 21 CFR 211.194(a)(시험기록) · 211.42(c)(10)(무균구역) · 211.113(b)(무균공정) · 211.67(a)(설비 세척·유지)"
    ],
    "implication": "완제의약품의 불량(Adulterated) 판정은 CGMP 기본 요건 미준수를 뜻하는 중대 지적이다. 국내 수출용 제조소도 유사 지적을 피하기 위해 CGMP 기본 준수 상태를 재점검할 필요가 있다.",
    "checks": [
@@ -289,6 +289,32 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 4,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)).",
+      "citation": "21 CFR 211.194(a)"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10).",
+      "citation": "21 CFR 211.42(c)(10)"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)"
+     },
+     {
+      "number": "4",
+      "statement": "Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements (21 CFR 211.67(a)).",
+      "citation": "21 CFR 211.67(a)"
+     }
+    ]
    }
   },
   {
@@ -330,7 +356,7 @@
    "key_facts": [
     "구분: CGMP/완제의약품/불량(Adulterated)",
     "발행: CDER, 2026-06-25",
-    "세부 위반 내용: 원문 미기재(요약문만 확인)"
+    "위반조항 4건: 21 CFR 211.192(일탈조사) · 211.113(b)(무균공정) · 211.42(c)(10)(i)(구역 표면) · 211.42(c)(10)(v)(세척·소독)"
    ],
    "implication": "동일 분류(CGMP/완제의약품/불량)의 경고서한이 같은 주에 복수 발부된 것은 FDA가 완제의약품 CGMP 기본 요건 위반에 대한 단속을 이어가고 있음을 보여준다. 미국向 수출 완제의약품 제조소는 실사 대응 체계와 CAPA 이력을 미리 점검할 필요가 있다.",
    "checks": [
@@ -386,6 +412,32 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 4,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to maintain floors, walls, and ceilings of smooth, hard surfaces that are easily cleanable in aseptic processing areas and establish an adequate system for maintaining equipment used to control the aseptic conditions (21 CFR 211.42(c)(10)(i) and 211.42(c)(10)(vi)).",
+      "citation": "21 CFR 211.42(c)(10)(i)"
+     },
+     {
+      "number": "4",
+      "statement": "Your firm failed to establish an adequate system for cleaning and disinfecting the room and equipment to produce aseptic conditions (21 CFR 211.42(c)(10)(v)).",
+      "citation": "21 CFR 211.42(c)(10)(v)"
+     }
+    ]
    }
   },
   {
@@ -427,7 +479,7 @@
    "key_facts": [
     "구분: CGMP/이탈(Deviations)/BLA 대상",
     "발행: CBER, 2026-06-22",
-    "근거: 21 U.S.C.(세부 조항 원문 미기재)"
+    "근거: 불량(Adulterated) FD&C Act §501(a)(2)(B)(21 U.S.C. §351(a)(2)(B)) · 금지행위 §301(a)(21 U.S.C. §331(a))"
    ],
    "implication": "바이오의약품 제조공정의 CGMP 이탈은 품질시스템 전반에 대한 규제 신뢰도에 영향을 미친다. 국내 바이오의약품 제조소도 공정 이탈(Deviation) 관리와 BLA 조건 준수 여부를 재확인할 필요가 있다.",
    "checks": [
@@ -477,6 +529,17 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 1,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm’s quality control unit failed to exercise its responsibility to ensure that drug products are manufactured in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity, as required by 21 CFR 211.22. Specifically, your quality unit failed to exercise its responsibility to ensure compliance with the following CGMP requirements: a. Failure to ensure that laboratory records include complete data derived from all tests necessary to assure compliance with established specifications and standards, as required by 21 CFR 211.194(a).",
+      "citation": "21 CFR 211.22 · 21 CFR 211.194(a)"
+     }
+    ]
    }
   },
   {
@@ -775,7 +838,7 @@
    "type_tag": "행정처분",
    "headline_target": "원광제약(주)",
    "title_issue": "기준서 미준수",
-   "summary": "원광제약이 원광우황청심원액(사향대체물질 엘-무스콘 함유) 제조 시 기준서를 준수하지 않아 제조업무정지 1개월 처분을 받았다(세부 위반내용 원문 미기재).",
+   "summary": "원광제약이 원광우황청심원액(사향대체물질 엘-무스콘 함유) 제조 시 해당 품목의 기준서를 준수하지 않아 제조업무정지 1개월 처분을 받았다.",
    "facts": [
     {
      "label": "발행일",
@@ -802,7 +865,7 @@
    ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "위반: 기준서 미준수(세부 내용 원문 미기재)",
+    "위반: 품목 기준서 미준수 제조(약사법 제38조제1항)",
     "처분: 제조업무정지 1개월(2026.7.16~8.15)",
     "대상품목: 원광우황청심원액(사향대체물질 엘-무스콘 함유)"
    ],

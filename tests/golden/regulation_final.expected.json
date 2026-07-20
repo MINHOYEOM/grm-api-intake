@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "MFDS",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`mfds-reg-2026-7`",
       "발행기관": "MFDS",

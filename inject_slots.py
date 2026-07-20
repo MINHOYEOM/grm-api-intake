@@ -266,13 +266,20 @@ def inject_deep_analysis(brief: dict[str, Any],
         if card is None:
             report.warnings.append(f"deep_analysis[{doc_id!r}]: 브리프에 없는 카드 id (무시됨)")
             continue
+        if not isinstance(payload, dict):
+            report.errors.append(f"deep_analysis[{doc_id!r}]: 델타는 객체여야 함")
+            continue
+        # [순서 분리 2026-07-20] 관찰 국문 번역은 **심층분석과 독립**이다 — deterministic_detail
+        # 에 붙는 값이라 deep-ready 여부와 무관하다. 종전엔 deep-ready 게이트 뒤에 있어, 결정론
+        # 관찰만 되살린 카드(fan-out 없이 `source_text`+`observations_ko` 만 실은 항목)의 번역이
+        # 통째로 버려졌고 그대로 두면 `render.validate_483_observations` 가 발행을 막았다.
+        _merge_observation_translations(card, payload.get("observations_ko"), report, doc_id)
+        if "deep_analysis" not in payload:
+            continue          # 결정론 재추출·번역 전용 항목(정상) — 심층분석 없음
         if "deep_analysis" not in card:
             report.warnings.append(
                 f"deep_analysis[{doc_id!r}]: 이 카드는 대상이 아님"
                 "(deep_analysis_ready=False, 무시됨)")
-            continue
-        if not isinstance(payload, dict):
-            report.errors.append(f"deep_analysis[{doc_id!r}]: 델타는 객체여야 함")
             continue
         da = payload.get("deep_analysis")
         source_text = payload.get("source_text", "")

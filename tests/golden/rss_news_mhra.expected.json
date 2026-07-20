@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "MHRA Inspectorate",
     "signal": "Tier 2",
+    "source_body_captured": false,
     "w2_facts": {
       "문서번호": "`mhra-blog-512`",
       "발행기관": "MHRA",

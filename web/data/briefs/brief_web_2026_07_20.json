@@ -246,8 +246,8 @@
    "signal_label": "High",
    "type_tag": "CGMP",
    "headline_target": "International Medication Systems Limited",
-   "title_issue": "완제의약품 cGMP 위반",
-   "summary": "International Medication Systems Limited는 FDA 실사에서 구체적 위반사항이 다수 확인되어 경고서한(Warning Letter)을 받았으며, 세부 위반내용은 원문에 명시되지 않았다.",
+   "title_issue": "무균공정 오염조사 부실 등 3개 조항 위반",
+   "summary": "International Medication Systems Limited는 에피네프린 주사제 제조 중 ISO 5 무균 충전구역의 환경모니터링 배지에서 곤충 유충을 동반한 계수불가(TNTC) 오염이 확인됐음에도 근본원인을 규명하지 못한 채 조사를 종결한 점 등 3개 조항 위반으로 FDA 경고서한을 받았다.",
    "facts": [
     {
      "label": "발행일",
@@ -269,18 +269,50 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "발행기관: CDER(Center for Drug Evaluation and Research)",
-    "발행일자: 2026.07.14(실사일 2026.07.02)",
-    "위반유형: 완제의약품 cGMP 위반(Adulterated)",
-    "세부 위반사항: 원문 미기재"
+    "발행기관: CDER · 발행일자 2026.07.14(실사일 2026.07.02)",
+    "위반조항 3건: 21 CFR 211.192(일탈조사) · 211.42(c)(10)/211.113(b)(무균공정) · 211.63(설비)",
+    "핵심 지적: ISO 5 환경모니터링 배지 TNTC(곤충 유충 동반) 조사 종결 · RABS 요건 미충족 무균라인의 반복적 수작업 개입 · 용수계통 저장탱크 내부 침착물",
+    "회신 기한: 서한 수령 후 15영업일 이내 서면 회신"
    ],
-   "implication": "세부 위반내용이 공개되지 않았음에도 완제의약품 cGMP 위반으로 경고서한이 발행된 것은 FDA가 해당 사안을 중대하게 판단했음을 시사한다. 국내 QA/RA는 경고서한 원문 전문을 확인하여 자사 제조공정과 유사한 위반유형이 있는지 점검할 필요가 있다.",
+   "implication": "무균 주사제 제조소에서 환경모니터링 이상을 '고립된 사건'으로 종결하고 시정조치를 하지 않은 판단 자체가 오염관리 감독 부재로 평가됐다는 점이 핵심이다. 국내 QA/RA는 환경모니터링 TNTC·이상 검출 시 근본원인 규명과 배치 영향평가가 절차상 강제되는지, 무균 임계구역의 수작업 개입이 기류 시험으로 실제 검증되는지 점검할 필요가 있다.",
    "checks": [
-    "FDA 경고서한 원문 전문 확인",
-    "자사 완제의약품 cGMP 준수 현황 자체점검",
-    "해당 업체와의 공급망/위탁제조 연계 여부 확인"
+    "환경모니터링 이상결과(TNTC 포함)의 근본원인 조사·배치 영향평가 절차 강제 여부 확인",
+    "무균 임계구역 수작업 개입 목록화 및 동적 조건 연막(스모크) 시험 재검증",
+    "제조용수·세척수 계통의 위생 설계(데드레그·나사식 연결부·실런트 보수) 실사"
    ],
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "For example, you inadequately investigated multiple too-numerous-to-count (TNTC) microbial findings during the manufacture of epinephrine injection, lot EA038A5. Specifically, a viable air environmental monitoring plate, located next to the (b)(4) in your ISO 5 aseptic filling area, yielded a too-numerous-to-count result with confluent bacterial growth and numerous insect larvae. On the same day, personnel monitoring plates for an individual in the adjacent ISO 7 (b)(4) also yielded TNTC results and contained insect larvae. Your investigation failed to identify a scientifically-supported root cause, instead attributing these exceedingly high environmental monitoring findings to an unsubstantiated hypothesis involving insect infiltration of sealed monitoring plates. Notably, written procedures require inspection of plates before use to ensure they are not contaminated or defective, and also require very strict handling measures following sampling (e.g., (b)(4) bags, sterile tape). The microbiological growth media batch also passed negative control testing. Although your deviation report lacked evidence of defects or sampling error, you assessed the contamination risk as “low” based on overreliance on passing sterility test results, and the quality unit approved the release of epinephrine injection, lot EA038A5.",
+      "description": "에피네프린 주사제 로트 EA038A5 제조 중 ISO 5 무균 충전구역의 부유균 환경모니터링 배지에서 융합성 세균 증식과 다수의 곤충 유충이 함께 검출된 계수불가(TNTC) 결과가 나왔고, 같은 날 인접한 ISO 7 구역 작업자의 인원 모니터링 배지에서도 유충이 들어 있는 TNTC 결과가 나왔다. 그럼에도 회사는 과학적으로 뒷받침되는 근본원인을 규명하지 못한 채 밀봉된 배지에 곤충이 침입했다는 입증되지 않은 가설로 조사를 종결했고, 일탈보고서에 배지 결함이나 채취 오류의 증거가 없었음에도 무균시험 적합 결과에 과도하게 의존해 오염 위험을 낮음으로 평가했으며, 품질부서는 해당 로트의 출하를 승인했다.",
+      "risk": "무균공정 구역의 오염관리 체계가 근본적으로 무너졌음을 보여주며, 근본원인 미규명 상태에서 출하된 무균 주사제가 환자에게 투여될 경우 미생물 오염으로 인한 중대한 감염 위험을 초래한다(해당 로트는 이후 무균성 보증 결여를 사유로 자진 회수됐다)."
+     },
+     {
+      "citation": "21 CFR 211.42(c)(10) and 21 CFR 211.113(b)",
+      "original": "Your firm refers to your aseptic processing lines as restricted access barrier systems (RABS). However, your equipment lacks fundamental design elements of a RABS, including (b)(4) . Without this basic feature, as well as other design provisions, your processing lines cannot be categorized as RABS. In addition to (b)(4) , RABS include various design elements that are essential for minimizing or eliminating direct gowned personnel interventions ( (b)(4) interactions) into the critical (ISO 5) area during batch manufacturing. Your current process requires an operator to stand within a (b)(4) ISO 5 area. The operator manually cuts open numerous (e.g., approximately (b)(4) ) stopper bags per batch and transfers stoppers using a (b)(4) scoop. These manually-intensive interventions pose a significant and repeated risk of microbial contamination. Despite the critical nature of this activity, your firm failed to conduct environmental monitoring in this area to evaluate its impact on the aseptic environment. This represents a serious gap in environmental control oversight. Your firm also failed to adequately evaluate unidirectional airflow in the critical area, as the smoke studies conducted were fundamentally flawed. The placement and movement of the wand as well as other factors precluded meaningful assessment of airflow directionality.",
+      "description": "회사는 무균 충전라인을 RABS라고 부르지만 해당 설비에는 RABS의 기본 설계 요소가 없어 RABS로 분류할 수 없는 수준이며, 작업자가 ISO 5 임계구역 안에 직접 서서 배치마다 다수의 마개(스토퍼) 봉지를 손으로 잘라 열고 스쿱으로 옮기는 등 사람의 직접 개입이 반복된다. 이처럼 중대한 작업 구역인데도 환경모니터링을 전혀 수행하지 않았고, 임계구역의 단방향 기류를 확인하는 연막(스모크) 시험도 분사기구의 위치와 움직임 등의 문제로 기류 방향성을 유의미하게 평가할 수 없는 수준으로 수행됐다.",
+      "risk": "무균공정 설계 자체가 오염 위험을 안고 있는데 감시(환경모니터링)와 기류 검증까지 부재해, 오염 사건이 발생해도 탐지되지 않은 채 무균 표방 제품이 계속 생산·출하될 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.63",
+      "original": "Your (b)(4) system was inadequately designed, monitored, and maintained. You use (b)(4) for cleaning drug manufacturing equipment, and the same system feeds your (b)(4) system. During the inspection, we observed gross contamination in the (b)(4) storage tank feeding the (b)(4) system with interior surfaces coated in dark-colored plaques. Further compounding these concerns, investigators observed that (b)(4) had been repaired with (b)(4) sealant material, and that threaded connections with seal tape were used in place of sanitary fittings. These systems failed to adhere to appropriate (b)(4) system design and maintenance standards.",
+      "description": "의약품 제조설비 세척에 사용되고 동일 계통이 다른 공정 시스템에도 공급되는 (b)(4) 시스템이 부적절하게 설계·모니터링·유지관리됐다. 실사 중 해당 시스템에 공급하는 저장탱크 내부 표면이 짙은 색 침착물(plaques)로 뒤덮인 심각한 오염 상태가 관찰됐고, 배관 일부가 실런트(sealant) 재료로 보수돼 있었으며 위생용 피팅 대신 실테이프를 감은 나사식 연결부가 사용된 것도 확인됐다.",
+      "risk": "공급원 탱크가 생물학적 오염의 저장소가 되면 발생한 바이오버든이 하류 처리 단계의 처리 능력을 초과할 수 있어, 세척 및 후속 공정 전반의 품질 보증 기반이 무너진다."
+     }
+    ],
+    "fda_evaluation": "FDA는 회사의 회신 3건을 모두 불충분하다고 평가했다. ① 환경 오염이 충전실 외부에서 발생한 사후(post-exposure) 우발적 오염이며 두 사건은 고립된 사건이므로 시정조치가 필요 없다는 결론은 데이터로 뒷받침되지 않으며, 같은 날 인접한 두 방에서 심각한 오염 사건이 동시에 발생한 것은 오염관리의 중대한 붕괴를 뜻한다고 지적했다. 시정조치를 전혀 실시하지 않은 점은 조사의 중대한 결함이자 무균공정 관리상태에 대한 감독 부재를 보여준다고 봤다. ② 새 환경모니터링 지점 추가와 기류 시험 실시, 2년 내 시설 개선이라는 장기계획은 광범위한 수작업 개입이라는 근본적 설계 결함을 다루지 못하고, 2년짜리 계획은 현재 운영이 초래하는 즉각적·지속적 위험을 어떻게 완화할지 답하지 못한다고 평가했다. ③ 탱크 청소만을 시정조치로 제시한 것은 오염을 방치한 설계·유지관리 결함을 해소하지 못하며, 하류 시험 적합 결과를 근거로 심하게 오염된 공급원 탱크의 사용을 정당화하는 논리는 기본적인 시스템 설계·관리 기준에 어긋난다고 했다. 아울러 FDA는 2021년 3월부터 2026년 3월까지 무균 제품 관련 필드 얼럿 리포트 3건이 제출됐고 2023년 12월 이후 유리 파손·바이알 균열 등 용기·마개 결함을 포함한 고객 불만이 90건을 넘었으나 다수의 조사가 근본원인을 규명하지 못한 채 종결됐다는 점을 문제로 짚었다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(15영업일 내 시정 완료가 불가능하면 지연 사유와 완료 일정을 제시)",
+     "items": [
+      "일탈·불일치·불만·OOS·규격이탈·실패 조사 시스템 전반에 대한 제3자 종합 평가와 개선 실행계획 제출(조사 역량, 조사 범위 설정, 근본원인 평가, CAPA 유효성, 품질부서 감독, 문서화된 절차 개선 포함).",
+      "CAPA 프로그램에 대한 제3자 평가·개선계획과, 유효기간 내 제품의 모든 필드 얼럿 리포트 및 고객 불만에 대한 독립적 재검토(오염·용기 마개 결함 관련 불만은 재조사, 검토한 근본원인과 배제 근거·잠정 관리조치까지 문서화).",
+      "무균공정·설비·시설의 모든 오염 위험요인에 대한 독립적 위험평가(ISO 5 내 사람의 개입, 설비 적합성과 청정실 공간, 공기 질과 기류, 시설 배치, 인원·자재 동선)와 일정이 포함된 개선계획 수립, 그리고 해당 무균구역에서 제조돼 유효기간이 남은 배치에 대한 회고적 검토·비무균 위험평가 및 고객 통보·회수 등 후속조치 보고.",
+      "적격한 컨설턴트의 지원 아래 동적 조건에서 개입 동작까지 포함한 연막 시험을 재수행해 기류 단방향성을 재평가하고, 방충(pest control) 프로그램과 (b)(4) 시스템 설계·관리·유지보수에 대한 제3자 평가 및 개선계획(취약점 요약, 개선 기간 중 잠정 품질보증 방안, 설치·운전·성능 적격성 평가를 포함한 밸리데이션 보고서)을 제출."
+     ]
+    },
+    "administrative_risks": "위반을 신속하고 충분하게 시정하지 않으면 별도 통지 없이 압류(seizure)와 사용금지명령(injunction)을 포함한 규제·법적 조치가 취해질 수 있다. 미해결 위반은 다른 연방기관의 계약 수주를 막을 수 있고, FDA가 수출증명서 발급을 보류하는 사유가 될 수 있으며, 해당 사업장을 제조소로 기재한 신규 허가신청·보충신청의 승인이 위반 해소와 CGMP 적합성 확인 시점까지 보류될 수 있다. FDA는 시정조치 완료 여부를 확인하기 위해 재실사할 수 있다. 이미 해당 에피네프린 주사제 로트는 무균성 보증 결여로 자진 회수돼 FDA 집행보고(Enforcement Report)에 게재됐고, FDA는 품질부서가 적절한 권한을 행사하지 못하고 있다고 판단해 경영진이 글로벌 제조 운영 전반을 즉시 종합 점검할 것과 21 CFR 211.34 기준을 충족하는 적격 컨설턴트를 선임해 6개 시스템 전반 감사를 받을 것을 권고했다. 생산 차질이 예상되면 CDER 의약품 공급부족 담당부서에 즉시 연락해야 한다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -291,6 +323,27 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 3,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas. Your firm also failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile and that include validation of all aseptic and sterilization processes (21 CFR 211.42(c)(10) and 21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.42(c)(10) · 21 CFR 211.113(b)"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to use equipment in the manufacture, processing, packing, or holding of drug products that is of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance (21 CFR 211.63).",
+      "citation": "21 CFR 211.63"
+     }
+    ]
    }
   },
   {
@@ -307,8 +360,8 @@
    "signal_label": "High",
    "type_tag": "CGMP",
    "headline_target": "Spa De Soleil, Inc.",
-   "title_issue": "완제의약품 cGMP 위반",
-   "summary": "Spa De Soleil, Inc.는 FDA 실사에서 구체적 위반사항이 다수 확인되어 경고서한(Warning Letter)을 받았으며, 세부 위반내용은 원문에 명시되지 않았다.",
+   "title_issue": "제조용수 규격초과 조사 부실 등 5개 조항",
+   "summary": "Spa De Soleil, Inc.는 2024년 5월부터 2025년 7월까지 일반의약품 제조용수의 미생물 한도초과·규격초과 51건을 충분히 조사하지 않고 합격이 나올 때까지 재시험해 사용을 계속한 점 등 5개 조항 위반으로 FDA 경고서한을 받았으며, 2021년 실사 때와 유사한 시정 확약을 반복해 이행하지 않은 점도 지적됐다.",
    "facts": [
     {
      "label": "발행일",
@@ -330,18 +383,64 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "발행기관: CDER(Center for Drug Evaluation and Research)",
-    "발행일자: 2026.07.14(실사일 2026.07.08)",
-    "위반유형: 완제의약품 cGMP 위반(Adulterated)",
-    "세부 위반사항: 원문 미기재"
+    "발행기관: CDER · 발행일자 2026.07.14(실사일 2026.07.08)",
+    "위반조항 5건: 21 CFR 211.192(일탈조사) · 211.84(d)(1)·(2)(원료 확인시험) · 211.100(a)(제조·공정관리 절차) · 211.160(b)(시험실 관리) · 211.22(a)(품질부서)",
+    "핵심 지적: 제조용수 OOL/OOS 51건 미조사(그람음성균 미동정) · 메탄올·DEG/EG 고위험 성분의 약전 확인시험 누락 · 대체 미생물 시험 시스템 밸리데이션 결함",
+    "회신 기한: 서한 수령 후 15영업일 이내 서면 회신(고위험 성분 DEG·EG 시험 결과는 30일 이내)"
    ],
-   "implication": "동일 유형(CGMP/Finished Pharmaceuticals/Adulterated)의 경고서한이 짧은 기간 내 재차 발행되는 것은 FDA가 완제의약품 cGMP 감시를 지속적으로 강화하고 있음을 보여준다. 국내 QA/RA는 동일 유형 경고서한 발행추이를 모니터링하고 실사 대응체계를 재점검할 필요가 있다.",
+   "implication": "제조용수 규격초과를 재시험으로 넘기고 공급업체 성적서에 의존해 확인시험을 생략하는 관행이 반복 지적으로 이어졌다는 점이 핵심이다. 국내 QA/RA는 용수 OOS/OOL 처리 절차가 재시험 합격으로 종결되지 않는지, 글리세린 등 DEG/EG 고위험 성분에 약전 확인시험이 로트별로 적용되는지 점검할 필요가 있다.",
    "checks": [
-    "FDA 경고서한 원문 전문 확인",
-    "동일 유형 경고서한 발행추이 모니터링",
-    "실사 대응 매뉴얼(483 대응체계) 재점검"
+    "제조용수 OOL/OOS 처리 절차의 재시험 종결 금지·미생물 동정 요건 확인",
+    "글리세린 등 DEG/EG 고위험 성분의 로트별 약전 확인시험 이행 점검",
+    "위탁시험기관 적격성 평가와 연간 제품품질평가(APR) 기록 완결성 확인"
    ],
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "You failed to adequately investigate multiple microbiological out-of-limit (OOL) and chemical out-of-specification (OOS) results from testing the water you used to manufacture over-the-counter (OTC) (b)(4) drug products, including (b)(4) and (b)(4) . For example, from May 2024 through July 2025, you did not adequately investigate 51 OOL/OOS results from testing your (b)(4) . These included results for conductivity and total organic carbon testing that exceeded specifications, as well as the recovery of gram-negative microorganisms from multiple points of use. Your investigations did not include identification of the recovered microorganisms (e.g., genus, species). You resampled and retested the (b)(4) for microbiological quality to obtain passing results and continued to use the (b)(4) . Following an OOL recovery, you also placed certain point-of-use valves on hold until you obtained a passing result. However, this practice did not prevent you from using other valves on the same system. Microbiological recoveries from a (b)(4) system are not uniform, and results obtained at any point in the system can be an indicator of the quality of (b)(4) in the system as a whole. Your identified corrective actions did not adequately prevent the use of (b)(4) with potentially objectionable microbial contamination in the manufacture of your drug products. Furthermore, your (b)(4) system was not adequately designed or maintained, which could foster the development of biofilms. Specifically, your (b)(4) system included non-sanitary components such as dead legs, threaded fittings, Teflon tape, and ball valves. You also did not demonstrate that you adequately monitored your (b)(4) system to ensure it consistently produced (b)(4) that met appropriate chemical and microbial attributes. For instance, your sampling frequencies were not reflective of batch production schedules.",
+      "description": "일반의약품 제조에 사용한 물의 미생물 한도초과(OOL)·화학 규격초과(OOS) 결과를 제대로 조사하지 않았다. 2024년 5월부터 2025년 7월까지 51건의 OOL/OOS 결과가 충분히 조사되지 않았고, 여기에는 전도도·총유기탄소 규격 초과와 여러 사용지점에서의 그람음성균 검출이 포함됐으나 검출 미생물의 속·종 동정조차 하지 않았다. 합격 결과가 나올 때까지 재채취·재시험해 그대로 사용을 계속했고, 특정 사용지점 밸브만 보류했을 뿐 같은 계통의 다른 밸브 사용은 막지 못했다. 또한 데드레그·나사식 피팅·테플론 테이프·볼밸브 같은 비위생적 구성품이 포함돼 바이오필름 형성을 조장할 수 있는 설계였고, 배치 생산일정을 반영하지 못한 채취 주기로 모니터링했다.",
+      "risk": "오염 원인을 규명하지 않은 채 유해 미생물이 존재할 수 있는 제조용수를 계속 사용해, 이미 유통된 일반의약품 로트의 미생물 오염 여부를 사후에 입증할 수 없는 상태가 된다."
+     },
+     {
+      "citation": "21 CFR 211.84(d)(1) and 211.84(d)(2)",
+      "original": "You failed to perform adequate identity testing on each shipment of each lot of incoming components (e.g., (b)(4) ) used in the manufacture of your OTC topical drug products. In addition, you relied on your suppliers’ certificates of analysis (COA) without establishing the reliability of your component suppliers’ test analyses at appropriate intervals. Products Containing (b)(4) You failed to adequately test your incoming component (b)(4) at risk of methanol contamination for identity before using it as an active pharmaceutical ingredient (API) in manufacturing your OTC topical drug products. The use of (b)(4) contaminated with methanol has resulted in various lethal poisoning incidents in humans worldwide. See FDA’s guidance document (b)(4) to help you meet the CGMP requirements when manufacturing drugs containing (b)(4). Furthermore, you failed to demonstrate that the component (b)(4) you used to manufacture your (b)(4) drug products meets United States Pharmacopeia (USP) monograph specifications or is of adequate quality for its intended use. Products Containing Ingredients at Risk for Diethylene Glycol or Ethylene Glycol Contamination You also failed to adequately test your incoming components at high risk of diethylene glycol (DEG) or ethylene glycol (EG) contamination for identity before using them to manufacture your drug products. This includes, but is not limited to, testing glycerin to determine its appropriate identity prior to use in manufacturing your OTC topical drug products. Identity testing for glycerin and certain other high-risk drug components includes a limit test in the USP to ensure the component meets the relevant safety limits for DEG or EG levels. Because you did not perform identity testing on each shipment of each lot using the USP identification test that detects these hazardous impurities, you failed to assure the acceptability of these components for use in the manufacture of your drug products.",
+      "description": "입고 성분의 각 선적·각 로트에 대한 확인시험을 수행하지 않고 공급업체 시험성적서에 의존하면서, 그 공급업체 시험 결과의 신뢰성을 적절한 주기로 검증하지 않았다. 특히 메탄올 오염 위험이 있는 원료를 확인시험 없이 국소용 일반의약품의 주성분으로 사용했고, 해당 성분이 미국약전 각조 규격에 적합하거나 사용 목적에 적합한 품질임을 입증하지 못했다. 디에틸렌글리콜(DEG)·에틸렌글리콜(EG) 오염 고위험 성분(글리세린 포함)에 대해서도 유해 불순물을 검출하는 약전 확인시험을 각 선적·각 로트마다 수행하지 않아 성분 사용 적합성을 보증하지 못했다.",
+      "risk": "전 세계적으로 치명적 중독 사고를 일으킨 전례가 있는 메탄올·DEG·EG 오염 원료가 걸러지지 않은 채 제품에 투입될 수 있어, 유통 제품에서 직접적인 환자 안전 위해가 발생할 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.100(a)",
+      "original": "You failed to ensure adequate validation for each of the manufacturing processes used to produce your OTC drug products. Additionally, your completed batch records did not include details pertaining to critical processing steps subject to variation (e.g., (b)(4) times, speeds) or identification of certain equipment including scales used for your weight-based manufacturing processes.",
+      "description": "일반의약품 제조에 사용하는 각 제조공정에 대해 적절한 밸리데이션이 수행되도록 보장하지 못했다. 또한 완결된 배치기록에 변동 가능성이 있는 핵심 공정 단계(예: 공정 시간·속도)의 상세 내용이 없었고, 중량 기준 제조공정에 사용한 저울 등 일부 설비의 식별 정보도 기재되지 않았다.",
+      "risk": "공정이 관리상태에 있음을 입증할 근거가 없고 배치기록만으로는 실제 수행 조건과 사용 설비를 재현·추적할 수 없어, 배치 간 품질 편차가 발생해도 원인을 규명하거나 영향 범위를 특정할 수 없다."
+     },
+     {
+      "citation": "21 CFR 211.160(b)",
+      "original": "You failed to adequately validate your alternative (b)(4) microbiological test methods. Your firm used the (b)(4) system for (b)(4) microbiological testing of your (b)(4) , raw materials, and finished drug products (e.g., total counts, objectionable microorganisms). However, you failed to demonstrate that this system was equivalent to or better than USP compendial methods and suitable for its intended use. Specifically, your method validation was fundamentally flawed because you treated a quantitative test as a qualitative limit test, which resulted in unsubstantiated USP <61> equivalency claims.",
+      "description": "제조용수·원자재·완제품의 총균수 및 유해미생물 시험에 사용한 대체 미생물 시험 시스템을 적절히 밸리데이션하지 않았다. 이 시스템이 약전 공정서 방법과 동등하거나 그 이상이며 사용 목적에 적합함을 입증하지 못했고, 정량시험을 정성 한도시험처럼 취급한 근본적 결함 때문에 USP <61> 동등성 주장이 뒷받침되지 않았다.",
+      "risk": "미생물 시험 결과 자체의 신뢰성이 확보되지 않아 원자재·완제품의 미생물 규격 적합 판정 근거가 무너지고, 유해미생물이 오염된 제품이 걸러지지 않은 채 출하될 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.22(a)",
+      "original": "The records and information you provided demonstrate that your quality unit (QU) did not effectively exercise its responsibilities to oversee the quality of your drug manufacturing operations. Specifically, your quality unit failed to ensure: The adequacy and qualification of contract laboratories used for microbiological testing of raw materials, in-process materials, and finished drug products (21 CFR 211.22(b)). Evaluation of the quality standards of each of your (b)(4) drug products at least annually to determine the need for changes in drug product specifications, manufacturing, or control procedures (21 CFR 211.180(e)). Proper validation of procedures for cleaning and maintenance of common equipment (21 CFR 211.67(b)). In your response, you state that you have established a formal contract laboratory qualification program that includes a review of historical data. You also state that you have implemented an annual drug product review written procedure and that you will complete a formal cleaning validation by December 2026. However, your response is inadequate because you provide no supporting documentation to verify your proposed corrective actions. Additionally, your written commitments are similar to those you submitted in response to the FDA inspections conducted in 2021, demonstrating repetitive failures to follow through on implementing your proposed corrective actions.",
+      "description": "품질부서(QU)가 제조 품질을 감독할 책임과 권한을 실효적으로 행사하지 못했다. 미생물 시험을 맡긴 위탁시험기관의 적합성·적격성 확인(21 CFR 211.22(b)), 제품별 연 1회 이상 품질기준 평가(21 CFR 211.180(e)), 공용 설비의 세척·유지관리 절차 밸리데이션(21 CFR 211.67(b))을 모두 보장하지 못했다. 회사가 제시한 위탁시험기관 적격성 프로그램·연간 제품 평가 절차·2026년 12월 세척 밸리데이션 완료 계획은 이를 입증할 근거 문서가 없었고, 2021년 FDA 실사 대응에서 제출한 확약과 유사해 시정 이행 실패가 반복되고 있음을 보여준다.",
+      "risk": "품질부서가 실질 권한을 행사하지 못해 위탁시험·연간 품질평가·세척 검증 등 기본 통제가 작동하지 않으며, 동일 결함이 이전 실사 이후에도 반복돼 경영진의 감독 부재가 구조적 문제로 판정된다."
+     }
+    ],
+    "fda_evaluation": "FDA는 회사 회신을 전 항목에서 불충분하다고 평가했다. 용수 관련 회신은 시정조치를 뒷받침하는 자료가 전혀 없었고, 향후 OOS/OOL 조사의 범위 적정성과 근본원인 규명 방안, 영향 가능 제품에 대한 포괄적 검토도 제시되지 않았다. 회사는 과거 OOS/OOL 사건의 소급 검토 결과 품질·안전에 악영향이 확인되지 않았다고 밝혔으나, FDA는 그 소급조사가 적절한 CAPA를 도출하지 못했고 모니터링 주기 변경이나 검출 미생물의 동정·정량에 대한 확약이 없으며 시스템 설계·통제·유지관리의 근본 결함이 결과에 미친 영향도 고려되지 않았다고 지적했다. 원료 관련 회신(입고 원료의 확인·순도시험 신설, 시험성적서 검증 확약)은 각 선적·각 로트·각 용기 단위 시험을 다루지 않고 공정서 요건 충족을 입증할 자료가 없어 불충분하다고 봤다. 2026년 4월 완료를 목표로 한 공정 밸리데이션 회신도 밸리데이션 계획과 핵심 공정 속성이 빠지고 유효기간 내 유통 제품에 대한 소급 영향평가가 없어 미흡하다고 평가했다. 품질부서 관련 회신은 뒷받침 문서가 전혀 없는 데다 2021년 실사 대응에서 낸 확약과 유사해, FDA는 이를 시정 이행의 반복적 실패이자 경영진 감독·통제의 부적절성을 보여주는 근거로 명시했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(전자 회신 주소 CDER-OC-OMQ-Communications@fda.hhs.gov, FEI 3003876848 및 담당자 ATTN: Matthew R. Dionne 명기). 15영업일 내 시정 완료가 불가하면 지연 사유와 완료 일정을 함께 제출해야 하며, 고위험 성분의 DEG·EG 시험 결과 제출 확약은 서한 일자로부터 30일(달력일) 이내가 별도 기한이다.",
+     "items": [
+      "OOS·OOL 결과 조사체계 전반에 대한 종합 검토·개선계획 제출: 품질부서의 시험실 조사 감독, 시험실 관리 이상 추세 식별, 시험실 변동 원인의 해소, 시험실 원인이 확정되지 않을 때 제조 원인에 대한 철저한 조사 착수, 각 조사와 CAPA의 적정 범위 설정, 이를 반영한 OOS 조사 절차 개정, 조치한계 이탈(OOL) 처리 체계에 대한 동일 수준의 검토를 포함할 것.",
+      "용수 시스템 설계·통제·유지관리 종합 개선계획 제출: 시스템 온도, 재질, 경사, 데드레그, 정체 구간, 비위생적 피팅, 유속 등 평가 항목을 명시한 취약성 평가와 발견된 결함 요약, 설계 결함 시정 및 정비 완료 후 수행한 밸리데이션 프로토콜·전체 시험결과·최종 밸리데이션 보고서, 제품별 사용 적합성 판단을 위한 총균수 한도 설정.",
+      "고위험 성분 보관검체에 대한 DEG·EG 시험 결과를 서한 일자로부터 30일 내 제출하겠다는 확약(보관검체가 없으면 해당 완제품 배치 보관검체 시험), 유효기간 내 제품 전체에 대한 위험평가와 그 결과에 따른 고객 통지·회수 등 즉각적 조치, 향후 공급망 확보를 위한 CAPA 제시.",
+      "성분 로트별 확인·함량·품질·순도 시험 방안 제시: 공급업체 성적서를 활용할 경우 초기 밸리데이션과 주기적 재검증으로 신뢰성을 확립하는 방법, 로트마다 최소 1개 특이 확인시험을 항상 수행한다는 확약, 글리세린·프로필렌글리콜 등 고위험 성분에 대한 약전 각조 A·B·C 항 수행, 고위험 성분 로트별 화학 품질관리 규격, 공급업체·용기·마개 적격성과 입고 자재 관리의 적정성에 대한 독립적 종합 검토.",
+      "제품별 공정 성능 적격성평가(PPQ) 일정과 전 생애주기 관리상태 유지를 위한 밸리데이션 프로그램 요약, 배치 내·배치 간 변동 모니터링 계획, 설비·시설 적격성 프로그램과 관련 프로토콜·절차, 공정 밸리데이션 없이 유통된 제품에 대한 위험평가 및 후속 조치.",
+      "제조 운영의 설계·통제에 대한 독립적 종합 평가와 미생물학적 위해 전반 검토, 유해미생물 오염 가능 제품 유통에 따른 위험평가와 고객 통지·회수 등 후속 조치, 오염 또는 미생물 OOS가 있었던(사후 무효화 포함) 전 배치 조사 완료, 제품별 미생물 출하 규격과 시험법 및 유효기간 내 전 배치 보관검체의 미생물 시험 결과 요약."
+     ]
+    },
+    "administrative_risks": "위반이 신속·충분히 시정되지 않으면 추가 통지 없이 압류(seizure)와 사용금지명령(injunction)을 포함한 규제·법적 조치가 취해질 수 있다. 미해결 위반은 다른 연방기관의 계약 체결을 막을 수 있고, FDA는 수출증명서 발급을 보류할 수 있으며, 해당 업소를 제조소로 기재한 신규 허가신청·변경신청의 승인도 위반이 완전히 해소되고 CGMP 준수가 확인될 때까지 보류될 수 있다. 시정조치 완료 확인을 위한 재실사도 예고돼 있다. 아울러 이 업소가 만드는 일부 제품은 section 201(i) of the FD&C Act 에 정의된 화장품으로 규제될 수 있어, 부정·오표시 화장품의 주간 거래 반입을 금지하는 section 301(a) [21 U.S.C. 331(a)] 위반 위험과 2022년 제정된 화장품 규제 현대화법(MoCRA)상 제조시설 신규 요건 준수 의무가 함께 적용된다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -352,6 +451,37 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 5,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "citation": "21 CFR 211.84(d)(1)"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm’s quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)).",
+      "citation": "21 CFR 211.100(a)"
+     },
+     {
+      "number": "4",
+      "statement": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)).",
+      "citation": "21 CFR 211.160(b)"
+     },
+     {
+      "number": "5",
+      "statement": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products and the authority to review production records to assure that no errors have occurred or, if errors have occurred, that they have been fully investigated (21 CFR 211.22(a)).",
+      "citation": "21 CFR 211.22(a)"
+     }
+    ]
    }
   },
   {
@@ -1494,8 +1624,8 @@
    "signal_label": "Med",
    "type_tag": "GMP실사",
    "headline_target": "석전의료공업(주)",
-   "title_issue": "GMP 실사 지적사항",
-   "summary": "MFDS가 석전의료공업(주)에 대한 사후 실사를 실시했으며, 지적사항은 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 등 GMP 감시 6개 분야를 기준으로 중대·중요·기타로 구분되나 구체적 지적 내용은 원문에 명시되어 있지 않다.",
+   "title_issue": "GMP 실사 지적 3건(전부 기타)",
+   "summary": "MFDS는 석전의료공업(주)에 대한 사후 실사(2026.03.10~03.12)에서 품질경영·제조·시험실 3개 분야에 '기타' 등급 지적 3건을 통보했으며, 교육훈련 평가방법·공정밸리데이션 재검증 주기·시험기록 관리에 대한 추가 자료 제출 요구로 모두 보완 완료됐다.",
    "facts": [
     {
      "label": "발행일",
@@ -1522,15 +1652,16 @@
    ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "제조소: 석전의료공업(주)",
-    "실사기간: 2026-03-10~2026-03-12",
-    "GMP 감시분야: 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시(6개)",
-    "구체적 지적사항: 원문 미기재"
+    "제조소: 석전의료공업(주) · 실사기간 2026-03-10~2026-03-12",
+    "지적 3건 전부 '기타' 등급 — 중대·중요 지적 없음",
+    "지적 분야: 품질경영(교육훈련 평가방법) · 제조(공정밸리데이션 재검증 주기) · 시험실(시험기록 관리)",
+    "조치결과: 3건 모두 보완 완료"
    ],
-   "implication": "지적사항이 PIC/S 기준에 따라 중대·중요·기타로 구분되어 관리되며, 중대·중요 지적은 행정처분으로 이어질 수 있는 체계임을 보여준다. 국내 QA/RA는 원문 실사결과 확인을 통해 구체적 지적분야와 등급을 파악할 필요가 있다.",
+   "implication": "중대·중요 없이 '기타' 등급 3건에 그친 실사 결과로, 모두 추가 자료 제출로 보완이 종결됐다. 다만 지적 분야가 교육훈련 평가·공정밸리데이션 재검증 주기·시험기록 관리로 문서화 근거의 충분성에 몰려 있어, 국내 QA/RA는 자사 해당 절차가 실사 시 근거 자료로 즉시 제시 가능한 상태인지 점검할 필요가 있다.",
    "checks": [
-    "원문 실사결과 다운로드하여 구체적 지적사항 확인",
-    "지적사항 등급(중대·중요·기타) 및 후속조치 현황 확인"
+    "교육훈련 평가방법의 문서화 수준과 유효성 평가 기록 확인",
+    "공정밸리데이션 재검증 주기 설정 근거 문서화 여부 점검",
+    "시액 조제 등 시험기록 관리 절차의 기록 완결성 확인"
    ],
    "deterministic_detail": {
     "type": "gmp_deficiencies",

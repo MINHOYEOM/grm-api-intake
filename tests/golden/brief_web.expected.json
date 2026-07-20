@@ -503,6 +503,7 @@
       "render_order": 8,
       "signal_label": "Med",
       "signal_tier": 2,
+      "source_body_captured": true,
       "sources": {
         "info_url": "",
         "link_check": {
@@ -687,7 +688,7 @@
         },
         {
           "label": "업체",
-          "value": "원문 미기재"
+          "value": "미확인"
         },
         {
           "label": "제품",
@@ -863,7 +864,7 @@
         },
         {
           "label": "업체",
-          "value": "원문 미기재"
+          "value": "미확인"
         },
         {
           "label": "제품",

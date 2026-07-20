@@ -36,6 +36,7 @@
   "render_order": null,
   "signal_label": "High",
   "signal_tier": 3,
+  "source_body_captured": true,
   "sources": {
     "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
     "link_check": {

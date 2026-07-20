@@ -227,5 +227,132 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         self.assertIn("source_text", out)          # 조치 안내가 붙는다
 
 
+class UnverifiedAbsenceLabelTest(unittest.TestCase):
+    """게이트 5 — facts 칸 근거 없는 원문 부재 단정(HC 회수 카드 6건 실측 재발 방지)."""
+
+    def test_exact_label_flags_with_card_id_and_label(self):
+        card = {"id": "hc-recall-1", "facts": [{"label": "업체", "value": "원문 미기재"}]}
+        errs = apb.lint_unverified_absence_labels([card])
+        self.assertEqual(len(errs), 1)
+        self.assertIn("hc-recall-1", errs[0])
+        self.assertIn("업체", errs[0])
+
+    def test_value_unknown_placeholder_passes(self):
+        # 코드가 확보 못 한 값의 정직한 표기(VALUE_UNKNOWN)는 걸리지 않는다.
+        card = {"id": "c", "facts": [{"label": "업체", "value": "미확인"}]}
+        self.assertEqual(apb.lint_unverified_absence_labels([card]), [])
+
+    def test_embedded_within_larger_sentence_passes(self):
+        # 업체가 실제로 사유를 기재하지 않았다는 사실 서술 — 코드의 부재 단정이 아니다.
+        card = {"id": "c", "facts": [
+            {"label": "관찰 요약", "value": "관찰 1: 부적격 사유 미기재"}]}
+        self.assertEqual(apb.lint_unverified_absence_labels([card]), [])
+
+    def test_no_facts_or_empty_facts_passes(self):
+        self.assertEqual(apb.lint_unverified_absence_labels([{"id": "c"}]), [])
+        self.assertEqual(apb.lint_unverified_absence_labels([{"id": "c", "facts": []}]), [])
+
+    def test_variant_wordings_flag(self):
+        for value in ("원문에 없음", "원문 미상", "원문 미표기"):
+            with self.subTest(value=value):
+                card = {"id": "c", "facts": [{"label": "업체", "value": value}]}
+                self.assertTrue(apb.lint_unverified_absence_labels([card]))
+
+    def test_legacy_label_is_repaired_not_published(self):
+        """낡은 스캐폴드는 **차단이 아니라 교정**된다 — 그 주 브리프를 못 내면 안 되기 때문.
+
+        게이트 5 는 교정 뒤에 도는 사후 조건이라 정상 흐름에선 발화하지 않는다. 그 사실을
+        여기서 고정한다(교정이 사라지면 이 테스트가 AssembleError 로 깨진다).
+        """
+        scaffold = {"brief": {}, "cards": [{
+            "id": "hc-recall-1", "card_type": "Health Canada 회수", "render_order": 0,
+            "title_issue": "", "summary": "", "implication": "",
+            "key_facts": [], "checks": [],
+            "facts": [{"label": "업체", "value": "원문 미기재"}],
+        }]}
+        delta = {"cards": {"hc-recall-1": {
+            "title_issue": "t", "implication": "i", "checks": ["c1", "c2"],
+            "summary": "s", "key_facts": ["k"],
+        }}}
+        out, report = apb.assemble_publish_brief(scaffold, delta, strict=True)
+        self.assertEqual(out["cards"][0]["facts"][0]["value"], cs.VALUE_UNKNOWN)
+        self.assertTrue(any("[표기]" in w for w in report.warnings))
+
+    def test_merged_items_absence_label_is_caught(self):
+        """디제스트 목록에 구 어휘가 남으면 잡는다 — 실제로 발행된 적 있는 형태.
+
+        ('원문 미기재 · 실사 02/13/2026' — facts 교정이 접기보다 늦으면 이렇게 샌다.)
+        """
+        card = {"id": "fda483-1",
+                "merged_items": ["원문 미기재 · 실사 02/13/2026", "정상 시설 · 실사 03/01/2026"]}
+        errs = apb.lint_unverified_absence_labels([card])
+        self.assertEqual(len(errs), 1)
+        self.assertIn("merged_items[0]", errs[0])
+
+
+class ResourceNoteSignalTest(unittest.TestCase):
+    """게이트 5 배경과 짝을 이루는 정직성 신호 일반화 — `source_body_captured` 우선·구키 폴백."""
+
+    def _card(self, **extra):
+        base = {"id": "eca-1", "agency": "ECA", "type_tag": "GMP News",
+                "title_issue": "t", "headline_target": "h", "summary": "s",
+                "sources": {}}
+        base.update(extra)
+        return base
+
+    def test_new_key_includes_summary(self):
+        _, resources = apb.extract_resource_notes([self._card(source_body_captured=True)])
+        self.assertEqual(len(resources), 1)
+        self.assertIn("summary", resources[0])
+        self.assertEqual(resources[0]["summary"], "s")
+
+    def test_legacy_key_still_falls_back(self):
+        # 구 발행본 재조립 호환 — source_excerpt_present 만 있어도 summary 를 포함해야 한다.
+        _, resources = apb.extract_resource_notes([self._card(source_excerpt_present=True)])
+        self.assertEqual(len(resources), 1)
+        self.assertIn("summary", resources[0])
+
+    def test_neither_key_omits_summary(self):
+        _, resources = apb.extract_resource_notes([self._card()])
+        self.assertEqual(len(resources), 1)
+        self.assertNotIn("summary", resources[0])
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+class LegacyAbsenceLabelNormalizationTest(unittest.TestCase):
+    """낡은 스캐폴드의 구 어휘 교정 — 게이트 5 가 과거 스캐폴드를 영영 막지 않게 한다.
+
+    스캐폴드는 수집 시점에 굳는다. 어휘를 고쳐도 이미 만들어진 그 주 스캐폴드는 `"원문 미기재"`
+    를 그대로 들고 있어, 교정이 없으면 그 주 브리프를 다시 조립할 수 없다(2026-07-20 실측 HC 4장).
+    """
+
+    def test_rewrites_and_reports(self):
+        cards = [{"id": "hc-1", "facts": [{"label": "업체", "value": "원문 미기재"},
+                                          {"label": "제품", "value": "X 정"}]}]
+        rep = apb.AssembleReport()
+        apb._normalize_legacy_absence_labels(cards, rep)
+        self.assertEqual(cards[0]["facts"][0]["value"], cs.VALUE_UNKNOWN)
+        self.assertEqual(cards[0]["facts"][1]["value"], "X 정")   # 실제 값은 불변
+        self.assertTrue(any("hc-1" in w and "업체" in w for w in rep.warnings))
+
+    def test_silent_rewrite_is_forbidden(self):
+        cards = [{"id": "c", "facts": [{"label": "업체", "value": "원문 미기재"}]}]
+        rep = apb.AssembleReport()
+        apb._normalize_legacy_absence_labels(cards, rep)
+        self.assertEqual(len(rep.warnings), 1)                    # 바꿨으면 반드시 보고
+
+    def test_noop_when_nothing_to_fix(self):
+        cards = [{"id": "c", "facts": [{"label": "업체", "value": cs.VALUE_UNKNOWN}]},
+                 {"id": "d"}]
+        rep = apb.AssembleReport()
+        apb._normalize_legacy_absence_labels(cards, rep)
+        self.assertEqual(rep.warnings, [])
+
+    def test_normalized_cards_pass_gate5(self):
+        cards = [{"id": "c", "facts": [{"label": "업체", "value": "원문 미기재"}]}]
+        rep = apb.AssembleReport()
+        apb._normalize_legacy_absence_labels(cards, rep)
+        self.assertEqual(apb.lint_unverified_absence_labels(cards), [])

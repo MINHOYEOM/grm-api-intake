@@ -76,6 +76,7 @@
   "render_order": null,
   "signal_label": "High",
   "signal_tier": 3,
+  "source_body_captured": true,
   "sources": {
     "info_url": "",
     "link_check": {

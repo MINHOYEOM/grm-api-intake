@@ -71,6 +71,29 @@ _FALSE_ABSENCE_RE = re.compile(
 # 그 칸의 값이 실제로 원문에 없다는 정직한 표기다).
 _FALSE_ABSENCE_SLOTS = ("summary", "implication", "title_issue")
 
+# ── [게이트 5 — facts 칸 근거 없는 원문 부재 단정 2026-07-20] ──────────────────
+# 위 게이트 3(`lint_false_absence_claims`)은 산문 슬롯만 본다. facts 는 "코드 verbatim 필드라
+# 그 칸의 '원문 미기재'는 그 값이 실제로 원문에 없다는 정직한 표기"라는 가정으로 일부러
+# 검사에서 뺐었는데, 그 가정이 반증됐다 — Health Canada 회수 카드 6건이 `업체 | 원문 미기재`
+# 로 발행됐지만 원문에는 업체명(Apotex Inc.·Servier Canada Inc.·Kao Canada Inc.·Becton
+# Dickinson Canada Inc.·Jamp Pharma·BC Cancer)이 분명히 적혀 있었다. facts 값은 수집기가
+# 원문 dict 에서 특정 키를 못 찾았을 때 채우는 자리표시자일 뿐 원문을 필드 단위로 대조한
+# 결과가 아니므로, "이 칸이 비었으니 원문에도 없다"고 말할 자격이 코드에는 없다.
+#
+# 값 **전체**가 부재 단정 표기일 때만 잡는다(앵커 fullmatch) — 값 안에 섞여 등장하는 서술
+# (예: "관찰 1: 부적격 사유 미기재")은 업체가 실제로 기재를 누락했다는 **사실**이라 대상이
+# 아니다. 새로 확보를 못 한 값은 이 표기 대신 `card_scaffold.VALUE_UNKNOWN`("미확인" — 우리
+# 상태만 말하는 표기)을 쓰라는 뜻이다.
+_UNVERIFIED_ABSENCE_RE = re.compile(
+    r"^\s*(?:원문|본문)\s*(?:에는?|은|이)?\s*(?:"
+    r"미기재|미상|미표기|미공개|"
+    r"명시되(?:어\s*있)?지\s*않(?:음|다)?|"
+    r"기재되(?:어\s*있)?지\s*않(?:음|다)?|"
+    r"공개되(?:어\s*있)?지\s*않(?:음|다)?|"
+    r"나와\s*있지\s*않(?:음|다)?|"
+    r"없(?:음|다)?"
+    r")\s*$")
+
 
 @dataclass
 class AssembleReport:
@@ -186,11 +209,17 @@ def extract_resource_notes(cards: list[dict[str, Any]]
     사실 재작성 0 으로 추출(§1 자료구조) — sources 는 그대로 통과하되, 렌더는 official_url
     (실기사)만 쓰고 info_url(RSS 피드)은 쓰지 않는다(렌더 쪽 책임).
 
-    [전문지 브리핑 v2 2026-07-13 §3 정직성 게이트] `summary` 는 카드에 본문 흡수 흔적
-    (`source_excerpt_present is True` — §4 ECA 기사 excerpt fetch 성공 신호)이 있을 때만
-    포함한다. 수집 RSS 가 제목만 준 얇은 입력을 LLM 이 "원문에 없다"고 오서술하는 문제(§3
+    [전문지 브리핑 v2 2026-07-13 §3 정직성 게이트] `summary` 는 카드에 본문 흡수 흔적이 있을
+    때만 포함한다. 수집 RSS 가 제목만 준 얇은 입력을 LLM 이 "원문에 없다"고 오서술하는 문제(§3
     배경)를 근본 차단 — 흡수 흔적이 없으면 summary 키 자체를 note 에서 제거한다(partial 의
     `{% if r.summary %}` 게이트가 그대로 요지 줄을 생략).
+
+    [신호 일반화 2026-07-20] 판정은 `source_body_captured`(card_scaffold 전 소스 공통 신호)
+    우선, 없으면 구 `source_excerpt_present`(ECA/전문지 소스 1곳에만 붙던 반창고)로 폴백한다.
+    같은 결함(원문 확보 여부를 하류가 알 방법이 없음)이 Health Canada 회수 카드 6건에서
+    재발한 것을 계기로 소스별 반창고를 걷어내고 전 소스 공통 신호로 옮겼다 — 구 키는 이미
+    발행된 브리프(스캐폴드에 `source_excerpt_present` 만 있는 과거 발행분)를 재조립할 때도
+    깨지지 않도록 호환 폴백으로만 남긴다.
     """
     events: list[dict[str, Any]] = []
     resources: list[dict[str, Any]] = []
@@ -207,7 +236,7 @@ def extract_resource_notes(cards: list[dict[str, Any]]
                 "type_tag": c.get("type_tag", ""),
                 "sources": c.get("sources") or {},
             }
-            if c.get("source_excerpt_present"):
+            if c.get("source_body_captured") or c.get("source_excerpt_present"):
                 note["summary"] = c.get("summary", "")
             resources.append(note)
         else:
@@ -257,6 +286,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         else:
             report.dropped += 1
             report.dropped_ids.append(c.get("id"))
+
+    # 낡은 스캐폴드가 들고 있는 구 어휘를 **가장 먼저** 교정한다 — 아래 483 디제스트 접기가
+    # facts 에서 시설 줄(`merged_items`)을 만들어내므로, 여기서 안 고치면 구 어휘가 목록으로
+    # 복제된다(2026-07-20 실측: '원문 미기재 · 실사 02/13/2026').
+    _normalize_legacy_absence_labels(adopted_cards, report)
 
     # [심층분석 fan-out 배선] deep_deltas 지정 시 채택분 카드에 한해 게이트 검증 후 주입.
     # additive·선택 — 미지정 시 기존 동작과 완전 동일. 게이트 FAIL 은 발행을 막지 않는다
@@ -317,6 +351,12 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 게이트 3: 원문을 확보한 카드의 거짓 부재 서술(2026-07-20 사고) — 발행 차단.
     # deep/결정론 주입이 **끝난 뒤** 검사해야 확보 증거를 정확히 본다(순서 불가침).
     report.errors.extend(lint_false_absence_claims(out.get("cards") or []))
+
+    # 게이트 5: 근거 없는 원문 부재 단정(facts 칸) — 발행 차단.
+    # 게이트 3 이 산문만 보던 사각을 메운다 — facts 는 코드 verbatim 이라 검사 대상에서
+    # 뺐었는데, 그 칸 값 자체가 근거 없는 부재 단정일 수 있다는 게 HC 회수 카드 6건 실측으로
+    # 드러났다(lint_unverified_absence_labels docstring 참고).
+    report.errors.extend(lint_unverified_absence_labels(out.get("cards") or []))
 
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
@@ -443,6 +483,77 @@ def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
                 errs.append(
                     f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
                     f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+    return errs
+
+
+def _normalize_legacy_absence_labels(cards: list[dict[str, Any]],
+                                     report: "AssembleReport") -> None:
+    """스캐폴드에 굳어 있는 구 어휘(`"원문 미기재"` 등)를 값 부재 표기로 교정한다.
+
+    왜 필요한가 — 스캐폴드는 수집 시점에 굳는 아티팩트라, 어휘를 고쳐도 **이미 만들어진 그 주
+    스캐폴드는 낡은 문자열을 그대로 들고 있다**. 그대로 발행하면 거짓이고(원문에 값이 있는데도
+    "원문에 없다"고 말한다), 게이트 5 가 막으면 그 주 브리프를 **영영 재조립할 수 없다**
+    (2026-07-20 실측: 07-20 스캐폴드에 HC 4장).
+
+    이 교정은 **사실을 바꾸지 않는다** — 값이 비어 있다는 사실은 그대로이고, 그 사실에 대한
+    거짓 진술("원문에 없다")을 참인 진술("우리가 확인하지 못했다")로 바꿀 뿐이다. 그래서
+    코드-verbatim 불변식(사실 보존)을 깨지 않는다. 원문이 실제로 무엇을 담았는지는 수집기
+    수정으로만 회복되며(예: HC `Brand(s)` 폴백), 이 함수는 그 회복을 대신하지 않는다.
+
+    바뀐 항목은 전부 report 에 남긴다 — 조용한 교정 금지.
+    """
+    from card_scaffold import VALUE_UNKNOWN     # 지연 import — 표기 값의 단일 출처
+
+    for card in cards:
+        for fact in card.get("facts") or []:
+            value = fact.get("value")
+            if isinstance(value, str) and _UNVERIFIED_ABSENCE_RE.match(value):
+                fact["value"] = VALUE_UNKNOWN
+                report.warnings.append(
+                    f"[표기] {card.get('id')}: facts[{fact.get('label')}] {value!r} → "
+                    f"{VALUE_UNKNOWN!r} (낡은 스캐폴드의 구 어휘 교정 — 원문 부재 단정 제거)")
+
+
+def lint_unverified_absence_labels(cards: list[dict[str, Any]]) -> list[str]:
+    """facts 칸 값이 "원문에 이 값이 없다"를 근거 없이 단정하면 사유 목록을 돌려준다.
+
+    [게이트 5, 2026-07-20] 게이트 3(`lint_false_absence_claims`)는 summary·implication·
+    title_issue·key_facts 같은 산문 슬롯만 검사한다 — facts 칸은 "코드 verbatim 필드라 그 칸의
+    '원문 미기재'는 그 값이 실제로 원문에 없다는 정직한 표기"라는 가정 아래 일부러 검사 대상에서
+    뺐다. **그 가정이 반증됐다**: Health Canada 회수 카드 6건이 `업체 | 원문 미기재` 로
+    발행됐는데(Apotex Inc.·Servier Canada Inc.·Kao Canada Inc.·Becton Dickinson Canada
+    Inc.·Jamp Pharma·BC Cancer), 원문에는 업체명이 분명히 명시돼 있었다. facts 값은 수집기가
+    원문 dict 에서 특정 키를 못 찾았을 때 채우는 자리표시자일 뿐 원문을 필드 단위로 대조한
+    결과가 아니므로, 코드는 애초에 "원문에 없다"고 단정할 자격이 없다.
+
+    그래서 facts 값이 **그 값 전체로서** 원문/본문 부재 단정 표기(원문 미기재·원문에 없음·
+    원문 미상·원문 미표기 등, `_UNVERIFIED_ABSENCE_RE`)이면 발행을 막는다. 값 **안에** 그런
+    문구가 섞여 있을 뿐인 경우(예: "관찰 1: 부적격 사유 미기재" — 업체가 실제로 사유를 안
+    적었다는 **사실** 서술)는 정상 통과해야 하므로 부분일치가 아니라 값 전체 일치만 잡는다.
+
+    `merged_items`(483 디제스트가 facts 에서 만들어내는 시설 목록)도 함께 본다. 정상 흐름에선
+    `_normalize_legacy_absence_labels` 가 접기 **전에** facts 를 고쳐 이 목록이 오염되지 않지만,
+    실제로 오염된 채 발행된 전례가 있다("원문 미기재 · 실사 02/13/2026"). 두 장치가 어긋나면
+    조용히 새는 자리라 **사후 조건**으로 한 번 더 확인한다.
+    """
+    errs: list[str] = []
+    for c in cards:
+        for f in c.get("facts") or []:
+            if not isinstance(f, dict):
+                continue
+            label = f.get("label", "")
+            value = f.get("value", "")
+            if isinstance(value, str) and _UNVERIFIED_ABSENCE_RE.match(value):
+                errs.append(
+                    f"카드 {c.get('id')!r}: facts[{label}] 가 원문 부재를 단정 — {value!r}. "
+                    f"코드는 원문을 필드 단위로 확인하지 않는다(card_scaffold.VALUE_UNKNOWN 사용)")
+        for i, item in enumerate(c.get("merged_items") or []):
+            # 목록 항목은 "<업체> · 실사 <일자>" 형태라 앞부분만 떼어 값 전체 일치로 본다.
+            head = str(item).split(" · ")[0] if isinstance(item, str) else ""
+            if head and _UNVERIFIED_ABSENCE_RE.match(head):
+                errs.append(
+                    f"카드 {c.get('id')!r}: merged_items[{i}] 가 원문 부재를 단정 — {item!r}. "
+                    f"접기 전 facts 교정이 누락됐다(_normalize_legacy_absence_labels)")
     return errs
 
 

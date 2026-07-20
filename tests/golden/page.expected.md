@@ -318,7 +318,7 @@
 </callout>
 
 <callout icon="🔖" color="gray_bg">
-	**출처**  출처 링크 원문 미기재
+	**출처**  출처 링크 미확인
 </callout>
 
 ### [지침·안내서 · MFDS] 데이터 완전성 평가 가이드라인 — **{{TITLE_ISSUE}}**
@@ -467,7 +467,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-06-03</td></tr>
 <tr><td>**문서번호**</td><td>`hc-82142`</td></tr>
-<tr><td>**업체**</td><td>원문 미기재</td></tr>
+<tr><td>**업체**</td><td>미확인</td></tr>
 <tr><td>**제품**</td><td>Hizentra</td></tr>
 <tr><td>**Class**</td><td>Type II</td></tr>
 </table>
@@ -579,7 +579,7 @@
 <table>
 <tr><td>**발행일**</td><td>2026-05-10</td></tr>
 <tr><td>**문서번호**</td><td>`hc-rsam-88421`</td></tr>
-<tr><td>**업체**</td><td>원문 미기재</td></tr>
+<tr><td>**업체**</td><td>미확인</td></tr>
 <tr><td>**제품**</td><td>Drug X 50 mg tablets</td></tr>
 <tr><td>**Class**</td><td>Type II</td></tr>
 </table>

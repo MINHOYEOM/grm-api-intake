@@ -60,6 +60,12 @@ _DETAIL_TAG_RE = re.compile(r"<[^>]+>")
 _COMPANY_LABELS = ("company", "recalling firm", "manufacturer", "distributor",
                    "marketed by", "importer")
 
+# [폴백 2026-07-20] HC 상세표의 Brand(s) 는 실무상 시판허가권자(회사)가 들어가는 칸이다 —
+# 실측 6건 전부 회사명이었다(Apotex Inc.·Servier Canada Inc.·Kao Canada Inc. 등).
+# 그래도 브랜드가 곧 회사는 아니므로 _COMPANY_LABELS 에 합치지 않고 **최후 폴백**으로만 쓴다.
+# 이 폴백이 없던 동안 카드가 "업체: 원문 미기재" 라고 거짓을 발행했다(원문에는 있었다).
+_COMPANY_FALLBACK_LABELS = ("brand", "brand(s)", "brands")
+
 TARGET_ORG = "drugs and health products"     # Organization 필터 (소문자 비교)
 # 같은 Organization 안에도 수의약품/의료기기가 섞여 있어 Category로 추가 배제 (CODEX 검증).
 _EXCLUDED_CATEGORIES = {
@@ -138,8 +144,13 @@ def _parse_detail_html(html: str) -> dict[str, str]:
 
 
 def _detail_company(detail: dict[str, str]) -> str:
-    """상세 셀에서 '실제 회사/제조사' 라벨만 회사로 인정. 없으면 ""(→ 원문 미기재)."""
+    """상세 셀에서 회사명을 뽑는다. 우선 '실제 회사/제조사' 라벨(_COMPANY_LABELS), 없으면
+    최후 폴백으로 Brand(s)(_COMPANY_FALLBACK_LABELS — 실무상 회사명이 들어가는 칸, 위 상수
+    주석 참조). 둘 다 없으면 ""(→ 카드에서 값 부재로 표기)."""
     for key in _COMPANY_LABELS:
+        if detail.get(key):
+            return detail[key]
+    for key in _COMPANY_FALLBACK_LABELS:
         if detail.get(key):
             return detail[key]
     return ""
@@ -202,7 +213,7 @@ def _to_item(
     detail = detail_fetcher(url) if detail_fetcher else {}
     ingredient = detail.get("strength", "")        # 유효성분·함량(생물 원료 단서)
     dosage_form = detail.get("dosage form", "")   # 파서 키 = label.lower() — 공백 유지
-    firm = _detail_company(detail)                 # 실제 회사만; Organization 은 회사 아님
+    firm = _detail_company(detail)                 # 실제 회사 라벨 우선, 없으면 Brand(s) 최후 폴백; Organization 은 회사 아님
 
     blob = f"{title} {product} {issue} {ingredient}".lower()
     tier = _signal_tier(recall_class, blob)
@@ -242,7 +253,7 @@ def _to_item(
         headline=f"[HC] {title}"[:240],
         official_url=url,                       # 항목별 공식 URL(절대)
         type_or_class=TYPE_HC_RECALL,
-        firm=firm,                              # 실제 회사(없으면 "" → 카드 '원문 미기재')
+        firm=firm,                              # 회사(라벨 우선·Brand(s) 폴백); 둘 다 없으면 "" → 카드에서 값 부재로 표기
         body="\n".join(p for p in body_parts if p),
         api_query=HC_OPENDATA_URL,
         qa_relevance=relevance,

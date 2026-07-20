@@ -37,7 +37,7 @@ Identity with the daily collector (the whole point of this tool): a raw_signal's
 `(source, document_id)` guarantees a byte-identical `raw_signal_id`, which is what makes
 this backfill idempotent against (and mergeable with) whatever the daily collector has
 already inserted or will insert later for the same document.
-  - FDA 483: this module calls `collect_fda_483._to_item(nrow, excerpt, observations, "")`
+  - FDA 483: this module calls `collect_fda_483._to_item(nrow, excerpt, observations, "", status)`
     directly -- the exact function `collect_fda_483.collect_fda_483()` uses per row -- so
     the resulting `IntakeItem` (and therefore its `document_id=f"fda483-{media_id}"`) is
     byte-for-byte what the daily collector would have produced for that row. The only
@@ -331,7 +331,7 @@ def run_483(
         try:
             sleeper(delay)
             pdf_url = fda483._pdf_url(media_id)
-            text, _status = fda483._fetch_fda483_pdf_text(pdf_url)
+            text, text_status = fda483._fetch_fda483_pdf_text(pdf_url)
             excerpt = fda483._extract_fda483_excerpt(text) if text else ""
             header_hints = {
                 "establishment_type": nrow.get("establishment_type", ""),
@@ -347,7 +347,9 @@ def run_483(
 
         # Same construction function the daily collector calls -- guarantees identical
         # IntakeItem (headline/body/raw_payload/document_id/signal_tier/etc.) for this row.
-        item = fda483._to_item(nrow, excerpt, observations, "")
+        # [결손 사유 전파 2026-07-20] `text_status` 도 넘긴다 — 일일 수집 경로와 raw_payload
+        # 가 **바이트 동일**해야 하는 계약(Fda483IdentityTest)이라, 한쪽만 사유를 실으면 깨진다.
+        item = fda483._to_item(nrow, excerpt, observations, "", text_status)
         if item is None:
             # Domain-excluded by the shared QA gate inside _to_item (veterinary/device/food
             # -- same drop the daily collector performs). Not an error; not appended.

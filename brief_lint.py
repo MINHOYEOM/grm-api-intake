@@ -269,7 +269,9 @@ _SCAFFOLD_CELL_RE = re.compile(
     r"<tr>\s*<td>\s*\*\*(?P<label>.*?)\*\*\s*</td>\s*<td>(?P<value>.*?)</td>\s*</tr>", re.S)
 # 대조 제외 값: 의도적 빈칸 placeholder(생성 금지 신호) + 무신호 기호. 이런 값은 발행본에
 # 그대로 없을 수도 있고(LLM 이 동일 placeholder 를 다른 칸에 쓰기도 함) 신호가 없어 과알림만 낸다.
-_SCAFFOLD_CELL_SKIP_VALUES = frozenset({"", "—", "-", "원문 미기재", "N/A"})
+# [어휘 분리 2026-07-20] "미확인"=신형(card_scaffold.VALUE_UNKNOWN) 추가. "원문 미기재"는
+# 과거 발행분(신형 배포 전 발행본) 호환을 위해 남겨둔다 — 신형 코드는 더 이상 이 값을 찍지 않는다.
+_SCAFFOLD_CELL_SKIP_VALUES = frozenset({"", "—", "-", "원문 미기재", "미확인", "N/A"})
 # authoritative identity 셀 라벨(정규화형) — 수집기가 원문에서 박은 정본, 전 소스 verbatim.
 # 제조소/업체·업체/제조소 셀은 'FEI {n}' 를 동반하므로 FEI 전사오류가 여기서 잡힌다.
 _IDENTITY_CELL_LABELS = frozenset({

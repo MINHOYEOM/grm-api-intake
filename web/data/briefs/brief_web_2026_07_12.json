@@ -1899,7 +1899,7 @@
     },
     {
      "label": "업체",
-     "value": "원문 미기재"
+     "value": "Jamp Pharma"
     },
     {
      "label": "제품",
@@ -2052,7 +2052,7 @@
    ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "사유: CGMP 일탈(세부 내용 원문 미기재)",
+    "사유: CGMP 일탈(세부 내용 미확인)",
     "제품: Fenofibrate Capsules, USP 200 mg(인도 Ajanta Pharma Limited 제조)",
     "회수 등급: Class II"
    ],

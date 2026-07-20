@@ -337,12 +337,13 @@ class CardScaffold:
             # ^ [WL 심층분석 fan-out] 7번째·선택적 슬롯(6종 동결 슬롯과 별개) — placeholder
             # None 은 "fan-out 검증 통과 전" 신호. deep_analysis_ready=False 인 카드(대다수)는
             # 이 키 자체가 없다 — 기존 20+ golden web-card 픽스처 바이트 불변(additive).
-            **({"source_excerpt_present": True}
-               if raw.get("eca_article_excerpt") or raw.get("article_excerpt") else {}),
-            # ^ [전문지 브리핑 v2 2026-07-13] resource note 요지 정직성 게이트(§3)용 boolean만—
-            # 영문 원문 대량 포함 금지(발행물 경량 유지). ENABLE_ECA_ARTICLE_EXCERPT off/부재
-            # 시 이 키 자체가 없다(기존 golden 바이트 불변).
-            # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
+            **({"source_body_captured": True} if _has_source_body(raw) else {}),
+            # ^ [정직성 신호 일반화 2026-07-20] 구 `source_excerpt_present` 는 ECA/전문지 소스
+            # 한 곳(eca_article_excerpt·article_excerpt)에만 붙인 반창고였다 — 같은 결함(원문
+            # 확보 여부를 하류가 알 방법이 없음)이 WL·행정처분·GMP실사·483 등 다른 소스에서도
+            # 재발했다(Health Canada 회수 6건 실측). `_has_source_body`(§13b, `_prose_input` 의
+            # `source_body_captured` 와 동일 판정)로 전 소스 공통 신호로 일반화한다. 값이 True 일
+            # 때만 키를 싣는 방식은 그대로 유지(부재 시 키 미추가 — 기존 golden 바이트 불변).
             "merged_count": self.merged_count,
             "merged_items": list(self.merged_items),
             "sources": {
@@ -778,9 +779,17 @@ def resolve_section(kind: str, row: dict[str, Any]) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 10. W2 메타표 (§3 + §12(B) + §13.1-3: 발행일·문서번호·유형별 2행 = 4행)
 # ─────────────────────────────────────────────────────────────────────────────
+# [어휘 분리 2026-07-20] 값이 비었을 때 카드에 찍는 표기.
+# 우리가 확보하지 못한 것과 원문에 실제로 없는 것은 **다른 사실**이다. 코드는 원문을 필드
+# 단위로 확인하지 않으므로 후자를 주장할 자격이 없다 — 그래서 표기는 항상 우리 상태만 말한다.
+# (종전 값 "원문 미기재" 는 원문에 대한 단정이라 실제로 거짓을 발행했다: Health Canada 회수
+#  6건이 "업체: 원문 미기재" 로 나갔는데 원문에는 Apotex Inc. 등 업체명이 명시돼 있었다.)
+VALUE_UNKNOWN = "미확인"
+
+
 def _doc_number(kind: str, row: dict[str, Any]) -> str:
     """문서번호 행 값(§13.1-3): MARCS·admin-seq·FR docket 등 식별자."""
-    return _code(row.get("document_id", "")) if row.get("document_id") else "원문 미기재"
+    return _code(row.get("document_id", "")) if row.get("document_id") else VALUE_UNKNOWN
 
 
 # per-kind W2 유형별 사실 행(발행일·문서번호 이후) 생성기 — SourceSpec.extra_rows 로 배선.
@@ -788,19 +797,19 @@ def _doc_number(kind: str, row: dict[str, Any]) -> str:
 # safety-letter·legislative·regulation)는 extra_rows=None → dispatcher 가 _w2_extra_default.
 def _w2_extra_wl(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §12(B): Site Country·issue_date·CFR 조항 없음 → letter_date, 조항행 생략
-    rows = [("업체/제조소", _first(raw.get("firm"), row.get("firm")) or "원문 미기재")]
+    rows = [("업체/제조소", _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN)]
     ld = _first(raw.get("letter_date"), raw.get("posted_date"))
     if ld:
         rows.append(("발행 부서/일자", _first(raw.get("issuing_office")) + (f" · {ld}" if ld else "")))
     else:
-        rows.append(("발행 부서", _first(raw.get("issuing_office")) or "원문 미기재"))
+        rows.append(("발행 부서", _first(raw.get("issuing_office")) or VALUE_UNKNOWN))
     return rows
 
 
 def _w2_extra_admin(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     firm = _first(raw.get("firm"), row.get("firm"))
     sc = row.get("site_country", "")
-    rows = [("업체", firm + (f" ({sc})" if sc else "") or "원문 미기재")]
+    rows = [("업체", firm + (f" ({sc})" if sc else "") or VALUE_UNKNOWN)]
     if raw.get("ADM_DISPS_NAME"):
         rows.append(("처분", raw["ADM_DISPS_NAME"]))
     elif raw.get("ITEM_NAME"):
@@ -809,14 +818,14 @@ def _w2_extra_admin(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str,
 
 
 def _w2_extra_recall_quality(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
-    rows = [("업체", _first(raw.get("ENTRPS"), row.get("firm")) or "원문 미기재")]
+    rows = [("업체", _first(raw.get("ENTRPS"), row.get("firm")) or VALUE_UNKNOWN)]
     if raw.get("PRDUCT"):  # §12(B): product→PRDUCT, class 없음
         rows.append(("제품", raw["PRDUCT"]))
     return rows
 
 
 def _w2_extra_gmp_inspection(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
-    rows = [("제조소", _first(raw.get("manufacturer"), row.get("firm")) or "원문 미기재")]
+    rows = [("제조소", _first(raw.get("manufacturer"), row.get("firm")) or VALUE_UNKNOWN)]
     period = ""
     if raw.get("inspection_start") or raw.get("inspection_end"):
         period = f"{raw.get('inspection_start', '')}~{raw.get('inspection_end', '')}".strip("~")
@@ -828,7 +837,7 @@ def _w2_extra_gmp_inspection(row: dict[str, Any], raw: dict[str, Any]) -> list[t
 
 
 def _w2_extra_gmp_certificate(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
-    rows = [("업체", _first(raw.get("BSSH_NM"), row.get("firm")) or "원문 미기재")]
+    rows = [("업체", _first(raw.get("BSSH_NM"), row.get("firm")) or VALUE_UNKNOWN)]
     if raw.get("KGMP_BGMP_NAME"):
         rows.append(("구분", str(raw["KGMP_BGMP_NAME"])))
     if raw.get("VLD_PRD_YMD"):
@@ -837,7 +846,7 @@ def _w2_extra_gmp_certificate(row: dict[str, Any], raw: dict[str, Any]) -> list[
 
 
 def _w2_extra_openfda_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
-    rows = [("업체", _first(raw.get("recalling_firm"), row.get("firm")) or "원문 미기재")]
+    rows = [("업체", _first(raw.get("recalling_firm"), row.get("firm")) or VALUE_UNKNOWN)]
     if raw.get("product_description"):
         rows.append(("제품", _truncate_at_sentence(str(raw["product_description"]), 80)))
     if raw.get("classification"):
@@ -848,7 +857,7 @@ def _w2_extra_openfda_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[t
 def _w2_extra_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # Organization 은 HC 부서명("Drugs and health products")이라 회사가 아님 → 사용 금지.
     # 실제 회사는 collect_hc 가 상세 페이지에서 끌어와 firm/company 에 채운다(P8).
-    rows = [("업체", _first(raw.get("company"), row.get("firm")) or "원문 미기재")]
+    rows = [("업체", _first(raw.get("company"), row.get("firm")) or VALUE_UNKNOWN)]
     product = _first(raw.get("Product"), raw.get("product_description"))
     if product:
         rows.append(("제품", _truncate_at_sentence(str(product), 80)))
@@ -859,7 +868,7 @@ def _w2_extra_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[
 
 def _w2_extra_fda_483(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §6: 회사·FEI·Establishment Type·Record Type·실사일(발행일=Publish 은 발행일 행).
-    firm = _first(raw.get("firm"), row.get("firm")) or "원문 미기재"
+    firm = _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN
     fei = raw.get("fei_number", "")
     rows = [("제조소/업체", firm + (f" · FEI {fei}" if fei else ""))]
     meta = " · ".join(p for p in (raw.get("establishment_type", ""),
@@ -890,7 +899,7 @@ def _w2_extra_ich(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, s
 
 def _w2_extra_default(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # guidance(FR)·rss-news·mfds-notice·safety-letter·legislative·regulation
-    rows = [("발행기관", _regulator(row.get("source", "")) or "원문 미기재")]
+    rows = [("발행기관", _regulator(row.get("source", "")) or VALUE_UNKNOWN)]
     if row.get("comments_close"):
         rows.append(("의견기한", row["comments_close"]))
     else:
@@ -904,7 +913,7 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
     """W2 사실표(§3·§12B·§13.1-3): 발행일·문서번호 + 유형별 행(≤5). `SourceSpec.extra_rows` 디스패치."""
     raw = raw or {}
     rows: list[tuple[str, str]] = [
-        ("발행일", row.get("date", "") or "원문 미기재"),
+        ("발행일", row.get("date", "") or VALUE_UNKNOWN),
         ("문서번호", _doc_number(kind, row)),
     ]
     rows += (_spec(kind).extra_rows or _w2_extra_default)(row, raw)
@@ -1177,7 +1186,9 @@ def _footer_block(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
             warn = " ⚠️" if fallback else ""
             parts.append(f"📎 {_official_label(official, fallback)} [링크]({official}){warn}")
     if not parts:
-        parts.append("출처 링크 원문 미기재")
+        # [어휘 분리 2026-07-20] 문맥에 맞는 우리 상태 표현(§ VALUE_UNKNOWN 과 같은 취지,
+        # 문장 구조상 label:value 가 아니라 하드코딩) — 원문에 없다는 단정 금지.
+        parts.append("출처 링크 미확인")
     return _callout(["**출처**  " + "   ·   ".join(parts)], icon="🔖", color=cfg.color_footer)
 
 
@@ -1244,6 +1255,7 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         # 프롬프트 규약: 이 값과 무관하게 "원문에 없다"는 서술 자체를 금지하고, 입력이 얇으면
         # "원문 확인이 필요하다"로 쓴다. 조립 게이트(`lint_false_absence_claims`)가 강제한다.
         "source_body_captured": _has_source_body(raw),
+        "source_body_absent_reason": _absent_reason(raw) if not _has_source_body(raw) else "",
     }
 
 
@@ -1260,6 +1272,39 @@ _SOURCE_BODY_KEYS = (
 def _has_source_body(raw: dict[str, Any]) -> bool:
     """이 카드가 원문 본문(발췌·전문·구조화 상세 중 하나)을 확보했는가."""
     return any(raw.get(k) for k in _SOURCE_BODY_KEYS)
+
+
+# [결손 사유 2026-07-20] 수집기가 남긴 상태 코드 → 사람이 읽는 사유. 코드에 `:` 뒤 상세가
+# 붙으면 앞부분만 본다.
+_ABSENT_REASON_LABELS = {
+    "scan-no-text": "원문 PDF 에 텍스트층이 없음(스캔본)",
+    "no-anchor": "원문에서 본문 시작점을 찾지 못함",
+    "no-excerpt": "원문에서 해당 구간을 찾지 못함",
+    "fetch-403": "원문 페이지 접근이 차단됨(403)",
+    "fetch-fail": "원문을 받아오지 못함",
+    "engine-missing": "PDF 텍스트 추출 엔진 없음",
+    "not-attempted": "본문 수집을 시도하지 않음",
+}
+_ABSENT_STATUS_KEYS = ("fda483_text_status", "wl_body_status")
+
+
+def _absent_reason(raw: dict[str, Any]) -> str:
+    """원문 본문이 비었을 때, **왜** 비었는지 사람이 읽는 사유(§9 `source_body_absent_reason`).
+
+    수집기는 본문이 왜 비었는지 안다(스캔본이라 텍스트가 없다·403 차단·엔진 없음 등) —
+    하지만 그 사유가 하류(카드·LLM)로 전달되지 않았고, 그 결과 코드와 LLM 이 이유를 지어냈다
+    (디제스트가 근거 없이 '스캔·비공개'라고 단정한 사례). `_ABSENT_STATUS_KEYS` 를 순서대로
+    보고 첫 비어있지 않은 값을 찾아 `:` 앞 토큰으로 라벨을 조회한다. 매핑에 없는 코드거나
+    상태 키가 아예 없으면 "" — `pdf-ok` 처럼 성공을 뜻하는 코드는 매핑에 없으므로 자연히
+    "" 가 된다(이 함수는 `_has_source_body(raw)` 가 False 일 때만 호출되지만, 방어적으로
+    성공 코드가 와도 안전하다).
+    """
+    for key in _ABSENT_STATUS_KEYS:
+        status = raw.get(key)
+        if status:
+            token = str(status).split(":", 1)[0]
+            return _ABSENT_REASON_LABELS.get(token, "")
+    return ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -36,6 +36,7 @@
   "render_order": null,
   "signal_label": "Med",
   "signal_tier": 2,
+  "source_body_captured": true,
   "sources": {
     "info_url": "https://extranet.who.int/pqweb/inspection/whopir-site-z",
     "link_check": {

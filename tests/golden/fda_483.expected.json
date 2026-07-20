@@ -27,6 +27,7 @@
     "quote_lines": [],
     "regulator": "FDA 483",
     "signal": "Tier 3",
+    "source_body_absent_reason": "",
     "source_body_captured": true,
     "w2_facts": {
       "문서번호": "`fda483-192439`",

@@ -6,9 +6,9 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.150` |
+| 문서 버전 | `v1.151` |
 | 최종 수정일 | 2026-07-20 |
-| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·크론 이중화, 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 8카탈로그 271건(ICH PDF 직링크·식약처 번역본 7토픽)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
+| 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 8카탈로그 271건(ICH PDF 직링크·식약처 번역본 7토픽)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
 | 변경 이력 | 상세 이력은 **git 로그**로 확인합니다. 이 문서는 "현재 상태"만 유지하고, 오래된 단계별 기록은 남기지 않습니다. |
@@ -132,7 +132,7 @@ flowchart TD
     B --> C[(Notion GRM API Intake<br/>raw 적재 + handoff v2 + 빈슬롯 스캐폴드)]
     C --> D[클라우드 Claude Routine<br/>매주 월 07:30 KST]
     D --> E[6슬롯 산문 + 심층분석 생성<br/>→ Notion web-delta 행 예치·자기검증]
-    E --> F[grm-delta-bridge 월 09:30·12:30<br/>델타 git 커밋 — deep은 근거 게이트 통과분만]
+    E --> F[grm-delta-bridge 월 07:07~13:37 30분 간격<br/>델타 git 커밋 — deep은 근거 게이트 통과분만]
     F --> G[grm-web-publish 자동 조립<br/>발행 PR publish/brief-날짜]
     G --> H[grm-web-deploy<br/>Cloudflare 프리뷰 URL]
     H --> I{{사람: Admin 승인 1클릭<br/>= 유일한 사람 개입}}
@@ -148,12 +148,12 @@ flowchart TD
 |---|---|---|---|---|
 | ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
 | ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 Routine | 매주 월 07:30 KST | 없음 |
-| ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `grm-delta-bridge.yml` | cron 월 09:30 KST(PAT push) | 없음 |
+| ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `grm-delta-bridge.yml` | cron 월 07:07~13:37 KST **30분 간격 14회**(PAT push) | 없음 |
 | ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
 | ⑤ | 발행본 렌더 → 미리보기 URL | `grm-web-deploy.yml` | ④ PR 생성 | 없음 |
 | ⑥ | **미리보기 확인 후 승인 = PR 머지** | Admin 승인 버튼 → `admin-github`(check-runs green 게이트) | 사람 클릭 | **있음(유일)** |
 | ⑦ | production 반영 → 라이브 | `grm-web-deploy.yml` | ⑥ 머지 | 없음 |
-| 보조 | 델타 부재 감지 → 경보 | `grm-publish-watchdog.yml` | cron 월 10:00 KST | 없음 |
+| 보조 | 델타 부재 감지 → **브릿지 자가 기동 후 재확인**, 복구 실패 시에만 경보 | `grm-publish-watchdog.yml` | cron 월 09:13·11:13·13:13 KST | 없음 |
 | 보조 | 발행 준비 검증+가속(클라우드 산출 확인·부재 시만 백필) | 로컬 태스크 `grm-monday-brief-publish` | 월 09:05 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | 주간 퀴즈 자동 출제(그 주 브리프 연동 문항 생성→quiz_lint→PR→CI 머지, 미라이브 시 스킵) | 로컬 태스크 `grm-monday-quiz-gen` | 월 13:00 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
@@ -161,6 +161,10 @@ flowchart TD
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST + 발행 머지 직후 | 없음 |
 
 **사람 개입 지점은 정확히 3개다**: ⓐ claude.ai Routine 주간 스케줄(월 07:30 KST)이 활성인지 주기 확인(세션·코드에서 접근 불가 — 사람만 볼 수 있음) ⓑ 월요일 낮 **Admin 승인 1클릭**(프리뷰 확인 후 머지 = 라이브) ⓒ 백업 레이어를 쓰는 주라면 월요일 아침 데스크톱 ON(로컬 예약 태스크 전제). 이 밖의 모든 단계는 무인이며, 각 단계의 방어선·멱등성은 `docs/GRM_자동화지도_2026-07.md` §7~§9 참조.
+
+**월요일 크론 지각과 자가 복구(2026-07-20).** GitHub 예약 크론은 보장이 아니라 best-effort이고, 실측된 실패 양상은 드롭이 아니라 **수 시간 지각**이다(07-13·07-20 두 주 모두 목표 09:30 KST 브릿지가 13:1x KST에 발화 — 정각·30분이 부하 피크라 큐가 그때야 풀린다). 발행 약속 시각을 지키기 위해 세 겹으로 대응한다: ⓐ 크론 분을 **비정각**으로 옮기고(`grm-intake.yml`의 `:17`과 같은 이유) ⓑ 브릿지 기회를 30분 간격 **14회**로 늘리며(OPEN 델타가 없거나 이미 이관됐으면 1분 내 무해 skip) ⓒ 워치독이 델타 부재를 감지하면 경보에 그치지 않고 **브릿지를 직접 기동**해 최대 10분 재확인한다. 판정은 워크플로 bash가 아니라 `publish_watchdog.py`(순수 함수·단위 테스트)가 담당하며 안전 계약은 **멱등**(델타 또는 발행 브랜치가 있으면 기동 금지)·**유한**(당일 브릿지 dispatch 상한 2회 — 사람이 손으로 돌린 횟수 포함)·**관측성**(기동 여부·사유를 step summary와 경보 이슈에 기록 — 조용한 복구 금지)이다. 자가 복구는 **델타 이관까지만** 하므로 ⑥ 승인 게이트는 불변이다(무인 라이브 0).
+
+> **한계(과장 금지):** 워치독 자신도 예약 크론이라, 워치독 크론이 늦거나 드롭된 주에는 자가 복구도 그만큼 늦거나 아예 돌지 않는다. 이 구조는 크론 지각으로 인한 미발행을 **줄일 뿐 없애지 못한다.** 최후 수단은 사람의 한 줄 — `gh workflow run grm-delta-bridge.yml`(멱등).
 
 ### 3.3 핵심 개념
 - **Signal Tier(신호 강도):** Tier 3(우선 카드화·고위험) / Tier 2(참고) / Tier 1(로그만).
@@ -279,6 +283,7 @@ grm-api-intake/
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
+├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ grm_findings.py                 # [FIND-1] 스키마 계약·taxonomy·validator·SQLite DDL
 ├─ findings_extractors.py          # raw_signal → findings 변환
 ├─ findings_store.py, findings_views.py

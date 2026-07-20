@@ -361,7 +361,10 @@ WL_BODY_FETCH_TIMEOUT = 20
 # docs/prompts/GRM_Prompt_DeepWL_v1.md)의 입력 컨텍스트용 전문을 담는다. 수집(Python·GitHub
 # Actions) 단계 비용은 HTTP GET 1회뿐이라 상한을 넉넉히 잡아도 부담이 없다(LLM 비용은 fan-out
 # 단계에서 카드별로 격리 — collect_intake 는 저장만 한다). 실패는 graceful(키 미기록).
-WL_BODY_FULL_MAX_CHARS = 20000
+# [상한 상향 2026-07-20] 20000 → 30000. 실측(2026-07-20 WL 2건) 앵커~편지끝 21.4k·24.1k 로
+# 종전 상한이 **회신 기한·시정요구 문단(편지 뒷부분)을 잘라내고 있었다** — fan-out 의
+# `required_remediation.deadline` 이 근거를 잃는 자리다. 비용은 여전히 HTTP GET 1회.
+WL_BODY_FULL_MAX_CHARS = 30000
 
 # [전문지 브리핑 v2 2026-07-13] ECA 기사(gmp-compliance.org) 본문 흡수 — Routine summary 가
 # 실기사 본문을 근거로 작성되도록 prose_input 을 풍부화(flag 게이트 ENABLE_ECA_ARTICLE_EXCERPT,
@@ -396,6 +399,19 @@ _WL_BODY_ANCHORS_FALLBACK = (
 )
 # 하위호환: 통합 앵커 집합도 노출(외부 참조 안전망). 추출 선별은 PRIMARY→FALLBACK 순.
 _WL_BODY_ANCHORS = _WL_BODY_ANCHORS_PRIMARY + _WL_BODY_ANCHORS_FALLBACK
+
+# [리드인 건너뛰기 2026-07-20] 1차 앵커가 잡는 첫 문장이 정작 **내용이 없는 도입구**인 경우가
+# 있다: "During our inspection, our investigators observed specific violations including, but not
+# limited to, the following." — "아래와 같다"까지만 말하고 실제 위반은 그 뒤 번호 항목부터다.
+# 이 한 문장이 excerpt 앞을 차지하면 하류(card_scaffold.prose_input)의 300자 문장경계 절단이
+# **그 도입구 하나만 남기고 실제 위반을 통째로 버린다**(2026-07-20 실측 118자 — 이 때문에 LLM 이
+# "세부 위반내용은 원문에 명시되지 않았다"는 거짓 요약을 썼다). 그래서 도입구가 확인되면 그
+# **뒤**에서 자른다. 안전규약: 뒤에 실질 본문이 남을 때만 이동한다(아래 _WL_LEADIN_MIN_TAIL).
+_WL_LEADIN_RE = re.compile(
+    r"violations?\s+(?:were\s+observed\s+)?including,?\s+but\s+not\s+limited\s+to,?"
+    r"\s+the\s+following\s*[.:]\s*", re.I)
+_WL_LEADIN_MAX_OFFSET = 400   # 도입구는 앵커 직후에 온다 — 그보다 멀면 다른 문장이므로 무시
+_WL_LEADIN_MIN_TAIL = 200     # 건너뛴 뒤 남는 본문이 이보다 짧으면 이동하지 않는다(정보 손실 금지)
 
 # Signal Tier 자동 분류 키워드 (lowercase, 단어 경계 매칭 — _kw_match 사용)
 # Tier 3 = 최고 신호 (CGMP 강제조치 · nitrosamine · 핵심 ICH), Tier 2 = 일반 GMP/품질 신호
@@ -1961,7 +1977,26 @@ def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
         start = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
     if start is None:
         return ""
+    start = _skip_wl_leadin(text, start)
     return text[start:start + max_chars].strip()
+
+
+def _skip_wl_leadin(text: str, start: int) -> int:
+    """앵커가 잡은 위치가 내용 없는 도입구면 그 **뒤**로 시작점을 옮긴다(못 옮기면 그대로).
+
+    "…observed specific violations including, but not limited to, the following." 는 실제 위반을
+    한 글자도 담지 않은 도입구다. 이게 excerpt 맨 앞을 차지하면 하류 300자 절단이 그 한 문장만
+    남기고 실제 위반을 다 버린다(상수 주석의 2026-07-20 사고). 도입구를 앵커 직후
+    (`_WL_LEADIN_MAX_OFFSET`) 에서만 찾고, 건너뛴 뒤 실질 본문이 `_WL_LEADIN_MIN_TAIL` 이상
+    남을 때만 이동한다 — 형식이 다른 편지(번호 목록이 없는 미승인의약품 WL 등)에서 본문을
+    잃지 않기 위한 보수적 게이트다.
+    """
+    m = _WL_LEADIN_RE.search(text, start, start + _WL_LEADIN_MAX_OFFSET)
+    if not m:
+        return start
+    if len(text) - m.end() < _WL_LEADIN_MIN_TAIL:
+        return start
+    return m.end()
 
 
 def _extract_wl_body_excerpt(html_text: str) -> str:
@@ -1977,6 +2012,58 @@ def _extract_wl_body_full(html_text: str) -> str:
     심층분석(docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력 컨텍스트가 된다.
     """
     return _extract_wl_body_span(html_text, WL_BODY_FULL_MAX_CHARS)
+
+
+# ── [WL 위반항목 결정론 추출 2026-07-20] ────────────────────────────────────────
+# FDA cGMP Warning Letter 는 위반을 "번호 + 조항 표제문" 형태로 나열한다:
+#     1. Your firm failed to thoroughly investigate any unexplained discrepancy … (21 CFR 211.192).
+# 이 표제문을 원문 그대로 뽑아 카드의 **결정론 상세 슬롯**(환각 0)에 싣는다 — FDA 483 의
+# `fda_483_observations` 와 완전 동형이다. WL 이 483 과 달리 상세를 못 보여주던 근본 원인이
+# "결정론 층 부재 → LLM(deep_analysis fan-out) 단일 경로 의존"이었고, fan-out 이 안 돈 주에는
+# 카드가 통째로 비었다(2026-07-20 사고). 이 파서가 그 **바닥**을 만든다.
+#
+# 표제 판별 신호(실측 2건으로 확정 — 번호만으로는 각주 번호와 구별되지 않는다):
+#   ① 번호 뒤 도입부가 "Your firm failed / You failed / … did not …" 계열이고
+#   ② 그 문장 안에 근거 조항 `21 CFR …` 인용이 있으며
+#   ③ 인용 괄호가 닫힌 뒤 마침표로 표제문이 끝난다
+# 셋을 모두 만족할 때만 위반으로 인정한다. 하나라도 없으면 건너뛴다(과소추출 우선 —
+# 잘못된 표제를 카드에 싣는 것보다 안전). 번호가 역행/중복하면 버린다(각주 오인식 차단).
+_WL_VIOLATION_HEAD_RE = re.compile(
+    r"(?<![\w.)])(\d{1,2})\.\s+(?=(?:Your firm|Your|You)\b[^.]{0,80}?\b(?:failed|did not)\b)")
+_WL_VIOLATION_CFR_RE = re.compile(r"21 CFR\b")
+_WL_VIOLATION_END_RE = re.compile(r"\)\s*\.")
+_WL_VIOLATION_CITE_RE = re.compile(r"21 CFR \d+\.\d+(?:\([^()\s]{1,6}\))*")
+_WL_VIOLATION_LOOKAHEAD = 1200   # 표제문 1개의 최대 길이(그 안에 조항 인용이 없으면 표제 아님)
+
+
+def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
+    """WL 본문 텍스트 → 위반 표제 목록 `[{number, statement, citation}]`(순수·결정론).
+
+    `statement` 는 원문 영어 **그대로**(요약·의역 0), `citation` 은 표제문 안의 `21 CFR` 조항을
+    등장 순서대로 ` · ` 로 이은 문자열(없으면 ""). 형식이 다른 편지(번호 목록 없는 미승인의약품
+    WL 등)에서는 빈 리스트를 돌려준다 — 호출부는 그때 상세 슬롯을 아예 달지 않는다.
+    """
+    if not text:
+        return []
+    out: list[dict[str, str]] = []
+    last_num = 0
+    for m in _WL_VIOLATION_HEAD_RE.finditer(text):
+        seg = text[m.end():m.end() + _WL_VIOLATION_LOOKAHEAD]
+        cfr = _WL_VIOLATION_CFR_RE.search(seg)
+        if not cfr:
+            continue                       # ② 조항 인용 없음 → 표제 아님
+        end = _WL_VIOLATION_END_RE.search(seg, cfr.end())
+        if not end:
+            continue                       # ③ 표제문 종결 미확인 → 버린다
+        num = int(m.group(1))
+        if num <= last_num:
+            continue                       # 번호 역행/중복 → 각주 등 오인식
+        last_num = num
+        statement = " ".join(seg[:end.end()].split())
+        cites = list(dict.fromkeys(_WL_VIOLATION_CITE_RE.findall(statement)))
+        out.append({"number": str(num), "statement": statement,
+                    "citation": " · ".join(cites)})
+    return out
 
 
 # WHY-1 #2 P1: WL 본문 excerpt 관측용 — collect_who.LAST_HEALTH 동형 패턴.
@@ -2165,6 +2252,12 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
             body_full = _fetch_wl_body_full(wl_href)
             if body_full:
                 wl_raw["wl_body_full"] = body_full
+                # [WL 위반항목 결정론 추출 2026-07-20] 전문에서 위반 표제를 결정론 추출해
+                # 함께 싣는다(FDA 483 의 `fda_483_observations` 동형 — 네트워크 0·순수 함수).
+                # 카드 상세 슬롯의 입력. 형식이 달라 못 뽑으면 키 자체를 달지 않는다.
+                violations = extract_wl_violations_from_text(body_full)
+                if violations:
+                    wl_raw["wl_violations"] = violations
             else:
                 wl_body_full_health["failed"] += 1
 

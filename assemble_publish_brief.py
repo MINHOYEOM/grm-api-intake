@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from typing import Any
@@ -46,6 +47,25 @@ _REQUIRED_LIST_SLOTS = ("key_facts", "checks")
 # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 추가 — card_scaffold._REGULATOR_LABEL 의
 # agency="ISPE" 와 일치.
 RESOURCE_AGENCIES = ("ECA", "ISPE")
+
+# ── [거짓 부재 서술 차단 2026-07-20] ──────────────────────────────────────────
+# 2026-07-20 발행분 사고: 수집기가 Warning Letter 원문 전문(21k자·조항별 위반 3~5건)을 정상
+# 확보했는데도 카드가 "세부 위반내용은 원문에 명시되지 않았다"고 발행됐다. 원인은 LLM 이 아니라
+# 그 LLM 에게 **도입구 118자만 전달된 입력**이었지만, 결과물은 독자에게 그냥 거짓말이다.
+# 그래서 입력 결함을 고치는 것(리드인 건너뛰기·결정론 위반항목 슬롯)과 별개로, **원문을 손에
+# 쥔 카드가 "원문에 없다"고 주장하면 발행을 막는다.** 정직성은 재발 방지 장치가 필요하다.
+#
+# 판정 = ① 이 카드에 원문 확보 증거가 있고(결정론 상세 블록 또는 심층분석) ② 산문 슬롯에
+# "위반/관찰/지적/결함"의 부재 주장이 함께 있을 때만 FAIL. 원문이 실제로 없는 카드
+# (스캔 483 등)의 정직한 "원문 미기재" 서술은 ①이 성립하지 않아 걸리지 않는다.
+_FALSE_ABSENCE_RE = re.compile(
+    r"(?:위반|관찰|지적|결함)[^.\n]{0,24}?"
+    r"(?:원문|본문|공개)[^.\n]{0,12}?"
+    r"(?:미기재|미공개|명시되(?:어\s*있)?지\s*않|기재되(?:어\s*있)?지\s*않|"
+    r"공개되(?:어\s*있)?지\s*않|나와\s*있지\s*않|없)")
+# 검사 대상 산문 슬롯(코드 verbatim 필드인 facts 는 제외 — 거기서의 "원문 미기재"는
+# 그 칸의 값이 실제로 원문에 없다는 정직한 표기다).
+_FALSE_ABSENCE_SLOTS = ("summary", "implication", "title_issue")
 
 
 @dataclass
@@ -265,11 +285,16 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         #   병합이 number 를 키로 쓰므로, 스캐폴드의 관찰 번호가 틀린 채로 병합하면 번역이
         #   엉뚱한 관찰에 붙는다(2026-07-20 193490: 번호 `1,1,3,4,2,3,4`).
         _refresh_483_observations(out, deep_deltas, report)
+        _refresh_wl_violations(out, deep_deltas, report)
         deep_report = inject_slots.inject_deep_analysis(out, deep_deltas)
         for w in deep_report.warnings:
             report.warnings.append(f"[deep] {w}")
         for e in deep_report.errors:
             report.warnings.append(f"[deep] {e}")
+
+    # 게이트 3: 원문을 확보한 카드의 거짓 부재 서술(2026-07-20 사고) — 발행 차단.
+    # deep/결정론 주입이 **끝난 뒤** 검사해야 확보 증거를 정확히 본다(순서 불가침).
+    report.errors.extend(lint_false_absence_claims(out.get("cards") or []))
 
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
@@ -351,6 +376,84 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         report.warnings.append(
             f"[483] {card.get('id')}: 관찰 원문 재추출 — 번호 "
             f"{[b[0] for b in before]} → {[a[0] for a in after]} (스캐폴드가 낡은 파서 산출)")
+
+
+def _card_has_source_body(card: dict[str, Any]) -> bool:
+    """이 카드가 원문 본문을 실제로 확보했는가(결정론 상세 블록 또는 심층분석 보유)."""
+    dd = card.get("deterministic_detail")
+    if isinstance(dd, dict) and dd.get("count"):
+        return True
+    return isinstance(card.get("deep_analysis"), dict) and bool(card["deep_analysis"])
+
+
+def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
+    """원문을 확보한 카드가 "원문에 위반내용이 없다"고 주장하면 그 사유 목록을 돌려준다.
+
+    반환이 비어있지 않으면 호출부가 `report.errors` 로 올려 **발행을 차단**한다(strict).
+    상수 `_FALSE_ABSENCE_RE` 주석의 2026-07-20 사고 재발 방지 게이트.
+    """
+    errs: list[str] = []
+    for c in cards:
+        if not _card_has_source_body(c):
+            continue
+        for slot in _FALSE_ABSENCE_SLOTS:
+            v = c.get(slot)
+            if isinstance(v, str) and _FALSE_ABSENCE_RE.search(v):
+                errs.append(
+                    f"카드 {c.get('id')!r}: 원문을 확보했는데 {slot} 가 부재를 주장 — "
+                    f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+        for i, v in enumerate(c.get("key_facts") or []):
+            if isinstance(v, str) and _FALSE_ABSENCE_RE.search(v):
+                errs.append(
+                    f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
+                    f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+    return errs
+
+
+def _refresh_wl_violations(out: dict[str, Any], deep_deltas: dict[str, Any],
+                           report: "AssembleReport") -> None:
+    """[2026-07-20] Warning Letter 카드의 **결정론 위반항목 블록을 조립 시점에 원문에서 만든다.**
+
+    `_refresh_483_observations` 와 같은 이유(스캐폴드는 수집 시점 파서로 굳는다)에 더해, WL 은
+    한 발 더 나간다 — 결정론 상세층 자체가 2026-07-20 에야 생겼으므로 그 이전 스캐폴드에는
+    `deterministic_detail` **키가 아예 없다.** 그래서 이 함수는 갱신뿐 아니라 **신설**도 한다.
+    입력(`source_text`)은 deep 델타로 저장소에 커밋돼 있고 파서도 저장소 안에 있으므로
+    산출은 재현 가능하다(사람이 아티팩트를 손으로 고치는 경로를 만들지 않는다 — 그 경로가
+    2026-07-20 미발행 브리프 유입 사고의 원인이었다).
+
+    안전 규약(하나라도 어긋나면 카드를 그대로 둔다):
+      · `card_type == "Warning Letter"` 인 카드만 대상
+      · deep 델타에 그 카드의 비어있지 않은 `source_text` 가 있을 때만
+      · 추출 결과가 비어있지 않을 때만(형식이 다른 편지 → 블록 없이 발행)
+      · 이미 다른 타입의 `deterministic_detail` 이 있으면 건드리지 않는다(덮어쓰기 금지)
+    바뀐 카드는 report 에 남긴다 — 조용한 주입 금지.
+    """
+    import collect_intake as _ci          # 지연 import — 조립 경로가 수집기 로드에 묶이지 않게
+
+    for card in out.get("cards", []):
+        if card.get("card_type") != "Warning Letter":
+            continue
+        dd = card.get("deterministic_detail")
+        if isinstance(dd, dict) and dd.get("type") != "wl_violations":
+            continue                      # 다른 결정론 블록 보유 — 덮어쓰지 않는다
+        payload = deep_deltas.get(card.get("id")) or {}
+        source_text = payload.get("source_text") if isinstance(payload, dict) else None
+        if not (isinstance(source_text, str) and source_text.strip()):
+            continue
+        fresh = _ci.extract_wl_violations_from_text(source_text)
+        if not fresh:
+            continue                      # degrade — 기존 상태 유지
+        before = [(v.get("number"), v.get("statement")) for v in (dd or {}).get("violations", [])
+                  if isinstance(v, dict)]
+        after = [(v["number"], v["statement"]) for v in fresh]
+        if before == after:
+            continue
+        card["deterministic_detail"] = {
+            "type": "wl_violations", "count": len(fresh), "violations": fresh,
+        }
+        report.warnings.append(
+            f"[WL] {card.get('id')}: 위반항목 {len(fresh)}건을 원문에서 결정론 추출 "
+            f"(조항 {[v['citation'] for v in fresh]}) — 스캐폴드에 {'낡은 블록' if before else '블록 없음'}")
 
 
 def _load_json(path: str) -> Any:

@@ -261,6 +261,10 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # additive·선택 — 미지정 시 기존 동작과 완전 동일. 게이트 FAIL 은 발행을 막지 않는다
     # (해당 카드는 deep_analysis=null 그대로 6슬롯만 발행 — inject_deep_analysis 자체 규약).
     if deep_deltas:
+        # ★ 번역(observations_ko) 병합 **전에** 483 관찰을 원문에서 재추출한다 — 순서 불가침.
+        #   병합이 number 를 키로 쓰므로, 스캐폴드의 관찰 번호가 틀린 채로 병합하면 번역이
+        #   엉뚱한 관찰에 붙는다(2026-07-20 193490: 번호 `1,1,3,4,2,3,4`).
+        _refresh_483_observations(out, deep_deltas, report)
         deep_report = inject_slots.inject_deep_analysis(out, deep_deltas)
         for w in deep_report.warnings:
             report.warnings.append(f"[deep] {w}")
@@ -302,6 +306,51 @@ def _write_json(path: str, payload: dict[str, Any]) -> None:
     text = json.dumps(payload, ensure_ascii=False, indent=1) + "\n"
     with open(path, "wb") as f:
         f.write(text.encode("utf-8"))
+
+
+def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
+                              report: "AssembleReport") -> None:
+    """483 카드의 결정론 관찰을 deep 델타의 `source_text` 로 **재추출**해 최신 파서 결과로 맞춘다.
+
+    왜 필요한가 — 스캐폴드(grm-intake 아티팩트)는 수집 시점의 파서로 굳은 산출물이라, 그 뒤
+    파서를 고쳐도 **이미 만들어진 그 주 스캐폴드는 영영 낡은 채로 남는다**. 재수집으로는 못
+    고친다(스캐폴드는 Notion 의 New 행에서만 생성되는데 그 행들은 Routine 이 이미 소비했다 —
+    2026-07-20 실측: 재수집 시 `handoff 후보 New row 0건`). 그러면 남는 길은 사람이 아티팩트를
+    손으로 고쳐 로컬 조립하는 것뿐인데, 그 경로가 바로 이날 미발행 브리프를 main 에 흘려 사이트
+    배포를 4시간 멈춘 사고의 원인이다.
+
+    그래서 조립 시점에 원문에서 다시 뽑는다. `source_text` 는 deep 델타에 이미 커밋돼 있으므로
+    (fan-out 이 원문 전문을 싣는다) 입력·코드 모두 저장소 안에 있고 **재현 가능**하다.
+
+    안전 규약(하나라도 어긋나면 스캐폴드 값을 그대로 둔다 — 데이터를 지우지 않는 방향):
+      · `deterministic_detail.type == "fda_483_observations"` 인 카드만 대상
+      · deep 델타에 그 카드의 비어있지 않은 `source_text` 가 있을 때만
+      · 재추출 결과가 **비어있지 않을 때만** 교체(파서가 degrade 해도 기존 관찰 보존)
+    바뀐 카드는 report 에 남긴다 — 조용한 교체 금지(발행 로그로 육안 확인 가능).
+    """
+    import collect_fda_483 as _f          # 지연 import — 조립 경로가 수집기 로드에 묶이지 않게
+
+    for card in out.get("cards", []):
+        dd = card.get("deterministic_detail")
+        if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
+            continue
+        payload = deep_deltas.get(card.get("id")) or {}
+        source_text = payload.get("source_text") if isinstance(payload, dict) else None
+        if not (isinstance(source_text, str) and source_text.strip()):
+            continue
+        fresh = _f._extract_483_observations_from_text(source_text)
+        if not fresh:
+            continue                      # degrade — 기존 관찰 유지
+        before = [(o.get("number"), o.get("deficiency"), o.get("detail"))
+                  for o in dd.get("observations", []) if isinstance(o, dict)]
+        after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
+        if before == after:
+            continue
+        dd["observations"] = fresh
+        dd["count"] = len(fresh)
+        report.warnings.append(
+            f"[483] {card.get('id')}: 관찰 원문 재추출 — 번호 "
+            f"{[b[0] for b in before]} → {[a[0] for a in after]} (스캐폴드가 낡은 파서 산출)")
 
 
 def _load_json(path: str) -> Any:

@@ -221,8 +221,95 @@ class TestDeepAnalysisWiring(unittest.TestCase):
         self.assertEqual(report.adopted, len(self.truth_events))
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+class Refresh483ObservationsTest(unittest.TestCase):
+    """조립 시점 483 관찰 재추출(_refresh_483_observations) — 낡은 스캐폴드 자가 교정.
+
+    2026-07-20: 스캐폴드는 수집 시점 파서로 굳는데, 그 뒤 파서를 고쳐도 그 주 스캐폴드는
+    낡은 채 남고 재수집으로도 못 고친다(Notion New 행 소진). 사람이 아티팩트를 손으로 고쳐
+    로컬 조립하는 우회가 곧 사고였으므로, 조립이 원문에서 다시 뽑도록 했다.
+    """
+    SRC = ("I/WE OBSERVED:\n\n"
+           "OBSERVATION 1: The quality unit did not follow its written procedures. "
+           "Specifically, the firm failed to document the deviation. Please refer to\n\n"
+           "OBSERVATION 3: .\nb. Conduct adequate root cause analysis for the "
+           "recurring environmental monitoring excursions observed.\n\n"
+           "OBSERVATION 2: Procedures to prevent microbiological contamination are "
+           "not followed. Specifically, monitoring data document repeated excursions.\n\n")
+
+    def _card(self, observations):
+        return {"id": "fda483-1", "deterministic_detail": {
+            "type": "fda_483_observations", "count": len(observations),
+            "observations": observations}}
+
+    def _report(self):
+        return apb.AssembleReport()
+
+    def test_stale_scaffold_numbers_are_corrected(self):
+        # 낡은 파서가 낸 중복 번호(상호참조 오분할)가 원문 재추출로 교정된다.
+        card = self._card([{"number": "1", "deficiency": "old", "detail": ""},
+                           {"number": "3", "deficiency": ".", "detail": "b. Conduct"},
+                           {"number": "2", "deficiency": "old2", "detail": ""}])
+        out = {"cards": [card]}
+        rep = self._report()
+        apb._refresh_483_observations(out, {"fda483-1": {"source_text": self.SRC}}, rep)
+        nums = [o["number"] for o in card["deterministic_detail"]["observations"]]
+        self.assertEqual(nums, ["1", "2"])
+        self.assertEqual(card["deterministic_detail"]["count"], 2)
+        self.assertTrue(any("[483]" in w and "재추출" in w for w in rep.warnings),
+                        "조용한 교체 금지 — report 에 남아야 한다")
+
+    def test_no_source_text_leaves_scaffold_untouched(self):
+        obs = [{"number": "7", "deficiency": "keep me", "detail": ""}]
+        card = self._card(obs)
+        rep = self._report()
+        apb._refresh_483_observations({"cards": [card]}, {"fda483-1": {"source_text": ""}}, rep)
+        self.assertEqual(card["deterministic_detail"]["observations"], obs)
+        self.assertEqual(rep.warnings, [])
+
+    def test_unparseable_source_does_not_wipe_observations(self):
+        # 재추출이 빈 결과면 기존 관찰을 보존한다(데이터를 지우지 않는 방향).
+        obs = [{"number": "1", "deficiency": "keep me", "detail": ""}]
+        card = self._card(obs)
+        rep = self._report()
+        apb._refresh_483_observations({"cards": [card]},
+                                      {"fda483-1": {"source_text": "no anchors here"}}, rep)
+        self.assertEqual(card["deterministic_detail"]["observations"], obs)
+
+    def test_non_483_card_is_ignored(self):
+        card = {"id": "x-1", "deterministic_detail": {"type": "gmp_table", "rows": []}}
+        rep = self._report()
+        apb._refresh_483_observations({"cards": [card]},
+                                      {"x-1": {"source_text": self.SRC}}, rep)
+        self.assertEqual(card["deterministic_detail"], {"type": "gmp_table", "rows": []})
+
+    def test_runs_before_translation_merge(self):
+        """번호 교정이 observations_ko 병합보다 **먼저** 일어나야 번역이 제 관찰에 붙는다.
+
+        병합은 number 를 키로 쓴다(inject_slots._merge_observation_translations). 낡은 번호
+        `3,2` 상태로 병합하면 '2번' 번역이 **원문의 관찰 2 가 아닌 다른 관찰**에 붙는다.
+        """
+        stale = [{"number": "3", "deficiency": ".", "detail": "b. Conduct"},
+                 {"number": "2", "deficiency": "old2", "detail": ""}]
+        obs_ko = [{"number": "2", "deficiency_ko": "2번 국문", "detail_ko": "2번 상세"}]
+
+        # 교정 후 병합(정상 순서) — 원문 관찰 2 에 정확히 붙는다.
+        card = self._card(copy.deepcopy(stale))
+        apb._refresh_483_observations({"cards": [card]},
+                                      {"fda483-1": {"source_text": self.SRC}}, self._report())
+        inject_slots._merge_observation_translations(
+            card, obs_ko, inject_slots.InjectionReport(), "fda483-1")
+        by_num = {o["number"]: o for o in card["deterministic_detail"]["observations"]}
+        self.assertEqual(by_num["2"]["deficiency_ko"], "2번 국문")
+        self.assertIn("Procedures to prevent", by_num["2"]["deficiency"])
+        self.assertNotIn("deficiency_ko", by_num["1"])
+
+        # 교정 없이 병합(역순서) — 같은 번역이 엉뚱한 본문에 붙는다(이 순서를 금지하는 근거).
+        bad = self._card(copy.deepcopy(stale))
+        inject_slots._merge_observation_translations(
+            bad, obs_ko, inject_slots.InjectionReport(), "fda483-1")
+        bad_by_num = {o["number"]: o for o in bad["deterministic_detail"]["observations"]}
+        self.assertEqual(bad_by_num["2"]["deficiency"], "old2")     # 원문과 무관한 조각
+        self.assertEqual(bad_by_num["2"]["deficiency_ko"], "2번 국문")
 
 
 class MergeFda483DisclosuresTest(unittest.TestCase):

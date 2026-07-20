@@ -183,6 +183,17 @@ _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안
 # 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
 _TRAILING_STRAY_LETTER_RE = re.compile(r"\s+[IlL]$")
 _DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으면 detail 을 비운다
+# `OBSERVATION N` 이 표제가 아니라 본문 속 상호참조인지 가리는 신호(→ _select_observation_anchors).
+# 앵커 **앞** 문맥: "...Please refer to" / "see" / "per" 로 끝나면 참조다. 중간에 다른 참조가
+# 끼는 실측 형태("Please refer to OBSERVATlON 2 and" — OCR 로 깨진 것은 앵커로 안 잡힌다)까지
+# 흡수하도록 참조 대상 나열을 옵션으로 둔다.
+_XREF_LOOKBEHIND = 60
+_XREF_PREFIX_RE = re.compile(
+    r"(?:refer(?:red|ring)?\s+to|see|per)\s*"
+    r"(?:OBSERVAT\w*\s*\d*\s*(?:and|,|&)?\s*)*$",
+    re.I,
+)
+_HEADING_MIN_ALPHA = 6   # 표제 뒤 첫 문장의 최소 알파벳 수(참조문 잔재 '.' 는 0)
 _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
@@ -634,7 +645,7 @@ def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
     }
 
 
-def _select_observation_anchors(matches: list[re.Match[str]]) -> list[re.Match[str]]:
+def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list[re.Match[str]]:
     """`OBSERVATION N` 매치 중 **진짜 항목 표제**만 남긴다(순수 함수).
 
     결함(2026-07-20 193490 실측): 483 본문은 다른 관찰을 상호참조한다 —
@@ -644,25 +655,30 @@ def _select_observation_anchors(matches: list[re.Match[str]]) -> list[re.Match[s
     deficiency 가 "." 가 된다. 중복 번호는 하류(inject_slots 의 번역 병합)가 number 를 키로
     쓰기 때문에 번역 오배치까지 유발한다.
 
-    판정 규칙 — **번호가 1부터 정확히 1씩 증가할 때만 표제로 인정**한다. 483 의 관찰은 항상
-    1..N 순차 번호이므로, 순서를 벗어난 매치는 상호참조다. 위 실측에 적용하면
-    `1(채택) 1(기각) 3(기각) 4(기각) 2(채택) 3(채택) 4(채택)` → 1,2,3,4 로 정확히 복원되고,
-    기각된 참조문은 자신이 속한 관찰 본문에 그대로 남는다(a./b./c./d. 하위 항목 보존).
+    판정 근거 — 5개 문서 전수 실측(193490/193644/193675/193603/193616)에서 다음이 확인됐다.
+    쓸 수 없는 신호:
+      · 번호 순차성 — 193616 은 원문에 **관찰 1 과 3 만** 존재(2 없음), 193644 는 1,2,3.
+        "1부터 +1" 규칙은 193616 의 관찰 3 을 통째로 **유실**시킨다.
+      · 콜론 / 앞선 빈 줄 — 상호참조에도 똑같이 붙는다(`refer to\\n\\nOBSERVATION 3: .`).
+    유일하게 갈리는 신호(전수 일치):
+      · 진짜 표제 뒤에는 **실질 deficiency 문장**이 온다 — ': The responsibili…' ': Written standard…'
+      · 상호참조 뒤에는 **참조문의 종결 마침표만** 남는다 — ': .' (다음 줄부터 하위항목 b./c./d.)
 
-    OCR 이 표제를 통째로 삼켜 번호가 건너뛰면(예: 2 유실) 이후 표제도 기각돼 앞 관찰에
-    흡수된다 — 항목이 합쳐질 뿐 **다른 관찰의 내용이 섞이지는 않는다**(안전한 degrade).
-    번호를 오배치해 잘못된 근거를 붙이는 쪽이 훨씬 위험하므로 이 방향을 택한다.
+    그래서 두 가지 **양성 검출**로만 기각한다(정상 항목을 버리지 않는 방향):
+      ① 앵커 앞이 참조 문구("refer to" / "see" / "per", 중간에 낀 다른 참조 포함)로 끝난다
+      ② 앵커 뒤 첫 문장에 실질 알파벳 내용이 없다(마침표·기호뿐)
+    둘 다 결함의 직접 증거라, 번호가 건너뛰거나 중복돼도 **정상 관찰은 그대로 살아남는다**.
     """
     selected: list[re.Match[str]] = []
-    expected = 1
-    for m in matches:
-        try:
-            num = int(m.group(1))
-        except (TypeError, ValueError):
-            continue
-        if num == expected:
-            selected.append(m)
-            expected += 1
+    for i, m in enumerate(matches):
+        before = body[max(0, m.start() - _XREF_LOOKBEHIND):m.start()]
+        if _XREF_PREFIX_RE.search(before):
+            continue                                   # ① 문장 속 상호참조
+        nxt = matches[i + 1].start() if i + 1 < len(matches) else len(body)
+        head, _ = _first_sentence(body[m.end():nxt].lstrip(" :\t\r\n"))
+        if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
+            continue                                   # ② 뒤따르는 실질 문장 없음
+        selected.append(m)
     return selected
 
 
@@ -688,7 +704,7 @@ def _extract_483_observations_from_text(
     m = _WE_OBSERVED_RE.search(body)
     if m:
         body = body[m.end():]
-    matches = _select_observation_anchors(list(_OBS_RE.finditer(body)))
+    matches = _select_observation_anchors(body, list(_OBS_RE.finditer(body)))
     if not matches:
         return []
 

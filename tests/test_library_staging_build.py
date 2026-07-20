@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import tempfile
 import unittest
 from datetime import date
@@ -104,6 +105,103 @@ class LibraryStagingBuildTest(unittest.TestCase):
         self.assertEqual(len(staged["items"]), 2)
         self.assertFalse(report["live_catalog_swapped"])
 
+
+class PluginDiscoveryTest(unittest.TestCase):
+    def test_discovers_every_library_collector_module_in_the_repo(self):
+        root = Path(builder.__file__).resolve().parent
+        expected = {path.stem[len(builder.PLUGIN_PREFIX):]
+                    for path in root.glob(f"{builder.PLUGIN_PREFIX}*.py")}
+        discovered = builder.discover_collectors()
+        self.assertEqual(set(discovered), expected)
+        self.assertTrue(expected, "자료실 수집기 플러그인이 하나도 없다")
+        for source, module in discovered.items():
+            with self.subTest(source=source):
+                self.assertEqual(module.LIBRARY_SOURCE, source)
+                self.assertTrue(callable(module.collect_library_items))
+
+    def test_plugin_without_contract_fails_loudly_instead_of_being_skipped(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "library_collect_broken.py").write_text("VALUE = 1\n", encoding="utf-8")
+            sys.path.insert(0, str(root))
+            self.addCleanup(sys.path.remove, str(root))
+            self.addCleanup(sys.modules.pop, "library_collect_broken", None)
+            with self.assertRaisesRegex(ValueError, "계약 위반"):
+                builder.discover_collectors(root)
+
+    def test_run_collectors_converts_exceptions_into_source_errors(self):
+        class Boom:
+            LIBRARY_SOURCE = "boom"
+
+            @staticmethod
+            def collect_library_items(run_date):
+                raise RuntimeError("network gone")
+
+        items, errors = builder.run_collectors(date(2026, 7, 20), collectors={"boom": Boom})
+        self.assertEqual(items, {"boom": []})
+        self.assertIn("network gone", errors["boom"])
+
+
+class PluginBuildTest(unittest.TestCase):
+    def _catalog(self, root: Path, source: str, items: list[dict]) -> Path:
+        live = root / "library"
+        live.mkdir(exist_ok=True)
+        (live / f"{source}.json").write_text(json.dumps({"items": items}), encoding="utf-8")
+        return live
+
+    def test_plugin_items_merge_without_touching_curated_fields(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            live = self._catalog(root, "who", [{
+                "id": "who-trs1067-annex2", "code": "TRS 1067 Annex 2",
+                "title_en": "Curated title", "official_url": "https://curated",
+            }])
+            report = builder.build(
+                baseline_dir=live, staging_dir=root / "staging",
+                report_path=root / "diff.json", run_date=date(2026, 7, 20),
+                plugin_items={"who": [
+                    {"id": "who-trs1067-annex2", "title_en": "Collector title",
+                     "official_url": "https://collector", "published_date": "2026-06-09"},
+                    {"id": "who-trs1060-annex3", "title_en": "New doc",
+                     "official_url": "https://new"},
+                    {"id": "", "title_en": "no id", "official_url": "https://x"},
+                ]},
+            )
+            staged = json.loads((root / "staging" / "who.json").read_text(encoding="utf-8"))
+        detail = report["sources"]["who"]
+        self.assertEqual((detail["new_count"], detail["changed_count"],
+                          detail["removed_count"]), (1, 1, 0))
+        self.assertEqual(detail["dropped_items"], 1)          # id 없는 행은 버려진다
+        self.assertEqual(staged["items"][0], {
+            "id": "who-trs1067-annex2", "code": "TRS 1067 Annex 2",
+            "title_en": "Curated title", "published_date": "2026-06-09",
+            "official_url": "https://curated",
+        })
+        self.assertNotIn("mfds", report["sources"])           # 안 돌린 소스는 리포트에 없다
+
+    def test_collector_error_is_recorded_per_source(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            live = self._catalog(root, "pics", [{"id": "pics-pi-056-1", "title_en": "T",
+                                                 "official_url": "https://x"}])
+            report = builder.build(
+                baseline_dir=live, staging_dir=root / "staging",
+                report_path=root / "diff.json", run_date=date(2026, 7, 20),
+                plugin_items={"pics": []}, collector_errors={"pics": "표 0행"},
+            )
+        self.assertEqual(report["sources"]["pics"]["collector_error"], "표 0행")
+        self.assertEqual(report["sources"]["pics"]["removed_count"], 0)
+
+    def test_source_collision_between_legacy_and_plugin_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            live = self._catalog(root, "ich", [])
+            with self.assertRaisesRegex(ValueError, "충돌"):
+                builder.build(
+                    baseline_dir=live, staging_dir=root / "staging",
+                    report_path=root / "diff.json", run_date=date(2026, 7, 20),
+                    ich_items=[], plugin_items={"ich": []},
+                )
     def test_gate_blocks_deletion_and_either_change_ceiling(self):
         report = {"collector_errors": {}, "sources": {
             "mfds": {"baseline_count": 100, "new_count": 21, "changed_count": 0,

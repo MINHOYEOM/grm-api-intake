@@ -1,0 +1,83 @@
+{
+ "@odata.count": 13,
+ "value": [
+  {
+   "ItemDefaultUrl": "/trs1044-annex4",
+   "Title": "TRS 1044 - Annex 4: WHO guidelines on technology transfer in pharmaceutical manufacturing",
+   "FormatedDate": "30 April 2022",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/annex-4-trs-1033",
+   "Title": "TRS 1033 - Annex 4: WHO Guideline on data integrity",
+   "FormatedDate": "10 October 2021",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs-1067---annex-10--regulatory-considerations-for-the-life-cycle-of-medicinal-oxygen",
+   "Title": "TRS 1067 - Annex 10: Regulatory considerations for the life cycle of medicinal oxygen",
+   "FormatedDate": "9 June 2026",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/annex-4-trs-1003",
+   "Title": "TRS 1003 - Annex 4: WHO Global Model Regulatory Framework for Medical Devices including in vitro diagnostic medical devices",
+   "FormatedDate": "10 October 2017",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs-1060---annex-3--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products",
+   "Title": "TRS 1060 - Annex 3: WHO good manufacturing practices for excipients used in pharmaceutical products",
+   "FormatedDate": "15 April 2025",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs-1067---annex-2--who-points-to-consider-in-continuous-manufacturing-of-pharmaceutical-products",
+   "Title": "TRS 1067 - Annex 2: WHO points to consider in continuous manufacturing of pharmaceutical products",
+   "FormatedDate": "9 June 2026",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs-1052---annex-6--who-biowaiver-list--proposal-to-waive-in-vivobioequivalence-requirements-for-who-model-listof-essential-medicines-immediate-release--solid-oraldosage-forms",
+   "Title": "TRS 1052 - Annex 6: WHO Biowaiver List: proposal to waive in vivobioequivalence requirements for WHO Model Listof Essential Medicines immediate-release, solid oraldosage forms",
+   "FormatedDate": "26 April 2024",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs1025-annex4",
+   "Title": "TRS 1025 - Annex 4: WHO good chromatography practices",
+   "FormatedDate": "20 May 2021",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/annex-2-trs-957",
+   "Title": "TRS 957 - Annex 2: WHO good manufacturing practices for active pharmaceutical ingredients (bulk drug substances)",
+   "FormatedDate": "1 October 2010",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs-1067---annex-6--world-health-organization-united-nations-population-fund-specifications-for-personal-lubricants",
+   "Title": "TRS 1067 - Annex 6: World Health Organization/United Nations Population Fund specifications for personal lubricants",
+   "FormatedDate": "9 June 2026",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/who-good-chromatography-practices---trs-1025---annex-4",
+   "Title": "TRS 1025 - Annex 4: WHO good chromatography practices",
+   "FormatedDate": "30 September 2020",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/trs957-annex2",
+   "Title": "TRS 957 - Annex 2: WHO good manufacturing practices for active pharmaceutical ingredients",
+   "FormatedDate": "1 October 2010",
+   "Tag": "Technical document"
+  },
+  {
+   "ItemDefaultUrl": "/meningococcal-polysaccharide-vaccine-annex-6-trs-no-658",
+   "Title": "Requirements for meningococcal polysaccharide vaccine, Annex 6, TRS No 658",
+   "FormatedDate": "1 January 2002",
+   "Tag": "Technical document"
+  }
+ ]
+}

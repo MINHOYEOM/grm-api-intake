@@ -1,0 +1,675 @@
+{
+  "items": [
+    {
+      "id": "data0010-15258",
+      "title_en": "Guideline for Drafting and Reviewing Revisions to Herbal Medicine (Crude Drug) Specifications",
+      "title_ko": "한약(생약) 규격 개정에 대한 작성검토 지침",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-07-15",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15258&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15255",
+      "title_en": "Procedure for Reviewing Sanctions Related to NIFDS Research and Development Projects",
+      "title_ko": "「식품의약품안전평가원 연구개발사업 관련 제재처분 검토 절차」",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-07-15",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15255&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15888",
+      "title_en": "Guideline for Preparing Quality Data for Herbal Medicine (Crude Drug) Extracts",
+      "title_ko": "한약(생약) 추출물 품질 자료 작성 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-02",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15888&data_tp=A&file_seq=3"
+    },
+    {
+      "id": "data0011-15887",
+      "title_en": "Casebook on Improving Look-Alike Pharmaceutical Containers, Packaging and Labeling",
+      "title_ko": "의약품 유사 용기·포장 및 표시 개선 사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-01",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15887&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15883",
+      "title_en": "Guideline on Approval and Review of Molecular Genetic Histocompatibility Antigen (HLA) Test Reagents",
+      "title_ko": "분자유전학적 조직적합성항원(HLA) 검사시약의 허가·심사 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15883&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15882",
+      "title_en": "Questions and Answers on Stability Testing Standards for Pharmaceuticals",
+      "title_ko": "의약품등 안정성시험기준 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15882&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15253",
+      "title_en": "Procedure for Pharmaceutical Inspections of Drug Importers",
+      "title_ko": "의약품 수입자 약사감시 수행 절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15253&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0010-15251",
+      "title_en": "Operational Guideline for Recall and Disposal of Pharmaceuticals",
+      "title_ko": "의약품등 회수·폐기 처리 운영 지침",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15251&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15877",
+      "title_en": "Casebook on Comparative Dissolution Testing of Herbal Medicinal Products",
+      "title_ko": "한약(생약)제제 비교용출시험 사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15877&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15876",
+      "title_en": "Guideline on Clinical Trials of Herbal Medicinal Products: General Considerations",
+      "title_ko": "한약(생약)제제 임상시험 가이드라인-일반적 고려사항-(민원인안내서)",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-24",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15876&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15874",
+      "title_en": "Guideline on Approval and Review of Digital Medical Device Change Management Plans",
+      "title_ko": "디지털의료기기 변경관리 계획서 허가 심사 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-26",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15874&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15873",
+      "title_en": "Guideline on Tumorigenicity Evaluation of Stem Cell Therapy Products",
+      "title_ko": "줄기세포치료제 종양원성 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-06-24",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15873&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0009-44256",
+      "title_en": "Administrative Notice of Proposed Partial Amendment to the Regulation on Designation of Contraindicated Drug Combinations, etc. (MFDS Public Notice No. 2026-292)",
+      "title_ko": "의약품 병용금기 성분 등의 지정에 관한 규정 일부개정고시(안) 행정예고(식품의약품안전처 공고 제2026-292호)",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-06-19",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44256&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15249",
+      "title_en": "GMP Evaluation Procedure for Biopharmaceutical Contract Manufacturing Organizations",
+      "title_ko": "바이오의약품 전문수탁 제조업체 GMP 평가 절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-15",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15249&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15248",
+      "title_en": "Operation of Drug Review Guidelines, etc.",
+      "title_ko": "의약품 심사 지침서등의 운영",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15248&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15247",
+      "title_en": "Establishment, Revision and Operation of the Good Review Practice Manual of Policies and Procedures (GRP-MaPP)",
+      "title_ko": "의약품 우수심사기준 업무수행편람(GRP-MaPP) 제·개정 및 운영",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15247&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15246",
+      "title_en": "Procedure for Handling Consultations by the Drug Evaluation Department",
+      "title_ko": "의약품심사부 민원상담 처리절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15246&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15245",
+      "title_en": "Organization and Operation of the Drug Review Advisory Panel",
+      "title_ko": "의약품 심사자문단 구성 및 운영",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15245&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0010-15244",
+      "title_en": "Procedure for In-Depth Review (Peer Review) of Pharmaceuticals",
+      "title_ko": "의약품 심층검토(Peer Review) 진행절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15244&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0009-44255",
+      "title_en": "Administrative Notice of a Proposed Regulation on Designation of Institutions Related to Medical Device Manufacturing and Quality Management (MFDS Public Notice No. 2026-283)",
+      "title_ko": "「의료기기 제조 및 품질관리 관련 기관 지정 등에 관한 규정」 제정고시(안) 행정예고(공고 제2026-283호)",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-06-12",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44255&data_tp=A&file_seq=4"
+    },
+    {
+      "id": "data0009-44254",
+      "title_en": "Administrative Notice of a Proposed Partial Amendment to the Standards for Medical Device Manufacturing and Quality Management (MFDS Public Notice No. 2026-282)",
+      "title_ko": "「의료기기 제조 및 품질관리 기준」 일부개정고시(안) 행정예고(공고 제2026-282호)",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-06-12",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44254&data_tp=A&file_seq=3"
+    },
+    {
+      "id": "data0005-14974",
+      "title_en": "Full Text of the Standards and Test Methods for Quasi-Drugs (MFDS Notice No. 2026-15, 25 February 2026)",
+      "title_ko": "「의약외품에 관한 기준 및 시험방법」 고시 전문(제2026-15호, 2026.2.25.)",
+      "doc_type": "notice-final",
+      "published_date": "2026-02-25",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14974&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0005-14972",
+      "title_en": "Regulation on Reporting Production and Export/Import Performance of Pharmaceuticals, etc. (MFDS Notice No. 2026-42, 5 June 2026)",
+      "title_ko": "의약품등 생산 및 수출ㆍ수입 실적 보고에 관한 규정(식약처 고시 제2026-42호, 2026.6.5.)",
+      "doc_type": "notice-final",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14972&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0009-44251",
+      "title_en": "Administrative Notice of a Proposed Partial Amendment to the Regulation on Pharmaceutical Approval, Notification and Review",
+      "title_ko": "「의약품의 품목허가·신고·심사 규정」 일부개정고시(안) 행정예고 알림",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44251&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0009-44250",
+      "title_en": "Administrative Notice of a Proposed Partial Amendment to the Regulation on Designation of Drugs of Abuse Concern (MFDS Public Notice No. 2026-275, 5 June 2026)",
+      "title_ko": "오·남용우려의약품 지정에 관한 규정 일부개정 행정예고(식약처공고 제2026-275호, 2026.6.5.)",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-06-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44250&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15865",
+      "title_en": "Guideline on Quality and Nonclinical Evaluation for Clinical Trials of Live Biotherapeutic Products",
+      "title_ko": "생균치료제의 임상시험 시 품질·비임상 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-05-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15865&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0013-33716",
+      "title_en": "2025 Report on Renewal of Pharmaceutical Product Approvals",
+      "title_ko": "2025년도 의약품 품목 갱신 보고서",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-05-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3"
+    },
+    {
+      "id": "data0011-15860",
+      "title_en": "Nonclinical Study Guideline for Herbal Medicinal Products",
+      "title_ko": "한약(생약)제제 비임상시험 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-05-28",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15860&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0010-15243",
+      "title_en": "Procedure for New Drug Approval and Review",
+      "title_ko": "신약 품목허가·심사 업무절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-05-26",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15243&data_tp=A&file_seq=7"
+    },
+    {
+      "id": "data0010-15242",
+      "title_en": "Procedure for Biosimilar Product Approval and Review",
+      "title_ko": "동등생물의약품 품목허가·심사 업무절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-05-26",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15242&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0009-44248",
+      "title_en": "Administrative Notice of a Proposed Partial Amendment to the Regulation on Approval and Review of Biological Products (MFDS Public Notice No. 2026-251, 28 May 2026)",
+      "title_ko": "「생물학적제제 등의 품목허가·심사 규정」 일부개정고시안 행정예고(제2026-251호, 2026.5.28)",
+      "doc_type": "legislative-notice",
+      "published_date": "2026-05-28",
+      "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3"
+    },
+    {
+      "id": "data0011-15802",
+      "title_ko": "원료의약품 (변경)등록 및 연계심사 가이드라인(종전 완제의약품 중심 허가·심사 운영 관리 방안 관련 질의응답집)",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-12-26",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15802",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15802&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15798",
+      "title_ko": "첨단바이오의약품 제조 및 품질관리기준 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-12-23",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15798",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15798&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15790",
+      "title_ko": "의약품 연속제조공정 해설서",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-12-15",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15790",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15790&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15783",
+      "title_ko": "매개변수기반 출하 관련 GMP 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-12-04",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15783",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15783&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15754",
+      "title_ko": "의약품 허가 후 제조방법 변경관리 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-11-12",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15754",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15754&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15753",
+      "title_ko": "의약품 허가 후 제조방법 변경관리 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-11-12",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15753",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15753&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15716",
+      "title_ko": "저분자 합성펩타이드 의약품 품질평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-09-23",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15716",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15716&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15698",
+      "title_ko": "임상시험용의약품의 품질 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-08-04",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15698",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15698&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15682",
+      "title_ko": "의약품 중 변이원성·발암성 불순물 안전관리 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-07-01",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15682",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15682&data_tp=A&file_seq=4"
+    },
+    {
+      "id": "data0011-15635",
+      "title_ko": "제조소 총람 작성 안내",
+      "doc_type": "guidance-industry",
+      "published_date": "2025-02-20",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15635",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15635&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15589",
+      "title_ko": "제조방법 CTD 도입에 따른 허가사항 관리 안내",
+      "doc_type": "guidance-industry",
+      "published_date": "2024-12-18",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15589&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15541",
+      "title_ko": "제네릭의약품 품질심사 주요 보완사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2024-10-31",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15541&data_tp=A&file_seq=2"
+    },
+    {
+      "id": "data0011-15454",
+      "title_ko": "이화학적동등성시험 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2024-05-03",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15454",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15454&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15404",
+      "title_ko": "의약품 중 유전독성 불순물 평가 사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-11-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15404",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15404&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15403",
+      "title_ko": "의약품 중 유전독성 불순물 평가 및 관리 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-11-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15403",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15403&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15371",
+      "title_ko": "합성 올리고뉴클레오티드 임상시험용의약품 품질 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-10-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15371",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15371&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15360",
+      "title_ko": "의약품 금속불순물 관리 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-10-24",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15360",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15360&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15349",
+      "title_ko": "융복합 의료제품 중 의약품 품질심사 사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-09-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15349",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15349&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15344",
+      "title_ko": "의약품 불순물 유전독성 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-09-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15344",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15344&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15277",
+      "title_ko": "의약품 용기 포장 적합성 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-07-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15277",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15277&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15208",
+      "title_ko": "비교용출시험 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2023-05-18",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15208",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15208&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15162",
+      "title_ko": "유산균제제 품질확보를 위한 규격설정 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2022-12-02",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15162",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15162&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-15121",
+      "title_ko": "임상시험용의약품 GMP 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2022-10-28",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15121",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15121&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14997",
+      "title_ko": "의약품 금속불순물 평가 및 관리 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2022-04-05",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14997",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14997&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14912",
+      "title_ko": "실시간 출하시험 적용 의약품 품질심사 안내서",
+      "doc_type": "guidance-industry",
+      "published_date": "2021-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14912",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14912&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14852",
+      "title_ko": "완제의약품 제조 및 품질관리기준(GMP) 가이던스",
+      "doc_type": "guidance-industry",
+      "published_date": "2021-06-09",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14852",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14852&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14831",
+      "title_ko": "ICH Q8, Q9, 및 Q10 가이드라인 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2021-04-19",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14831&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14816",
+      "title_ko": "폐흡입제 품질 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2021-03-23",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14816",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14816&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14737",
+      "title_ko": "[의약품] 제네릭의약품 국제공통기술문서 주요 고려사항(품질)",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-12-14",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14737",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14737&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14672",
+      "title_ko": "의약품 국제공통기술문서(CTD) 해설서",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-11-03",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14672",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14672&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14638",
+      "title_ko": "신약 규격설정 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-10-06",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14638",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14638&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14637",
+      "title_ko": "의약품 국제공통기술문서 작성을 위한 질의응답집(품질)",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-10-06",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14637",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14637&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14608",
+      "title_ko": "설계기반 품질고도화(QbD) 도입 대비를 위한 품질심사 안내서",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-09-16",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14608",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14608&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14579",
+      "title_ko": "품질협약에 의한 의약품 위·수탁 제조 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-07-08",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14579",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14579&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14484",
+      "title_ko": "원료의약품 제조 및 품질관리기준 가이던스",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-03-23",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14484",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14484&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14455",
+      "title_ko": "공결정 의약품 품질평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-01-29",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14455",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14455&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14444",
+      "title_ko": "지능화 제조공정 의약품 개발 사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2020-01-08",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14444",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14444&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14396",
+      "title_ko": "방사성의약품 제조 및 품질관리기준 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2019-10-16",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14396",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14396&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14395",
+      "title_ko": "의료용고압가스 제조 및 품질관리기준 질의응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2019-10-16",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14395",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14395&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0011-14290",
+      "title_ko": "의약품 품질 시스템 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2018-09-20",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14290",
+      "pdf_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1"
+    },
+    {
+      "id": "data0005-14978",
+      "title_en": "「의료기기 제조 및 품질관리 관련 기관 지정 등에 관한 규정」(제2026-47호)",
+      "title_ko": "「의료기기 제조 및 품질관리 관련 기관 지정 등에 관한 규정」(제2026-47호)",
+      "doc_type": "notice-final",
+      "published_date": "2026-06-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14978"
+    },
+    {
+      "id": "data0005-14977",
+      "title_en": "「의료기기 제조 및 품질관리 기준」(제2026-46호)",
+      "title_ko": "「의료기기 제조 및 품질관리 기준」(제2026-46호)",
+      "doc_type": "notice-final",
+      "published_date": "2026-06-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14977"
+    },
+    {
+      "id": "data0013-33714",
+      "title_en": "2025년 의약외품 허가보고서",
+      "title_ko": "2025년 의약외품 허가보고서",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-04-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33714"
+    },
+    {
+      "id": "data0013-33713",
+      "title_en": "2025년 의약품 허가보고서",
+      "title_ko": "2025년 의약품 허가보고서",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-04-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33713"
+    },
+    {
+      "id": "data0010-15240",
+      "title_en": "매개변수기반 출하 적용 의약품 품질평가자료 심사 시 일반적 고려사항",
+      "title_ko": "매개변수기반 출하 적용 의약품 품질평가자료 심사 시 일반적 고려사항",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-04-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15240"
+    },
+    {
+      "id": "data0013-33709",
+      "title_en": "제2차 의약품 안전관리 2차년도('26년) 시행계획",
+      "title_ko": "제2차 의약품 안전관리 2차년도('26년) 시행계획",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-04-13",
+      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33709"
+    },
+    {
+      "id": "data0005-14964",
+      "title_en": "생물학적제제등 품목허가심사 규정 고시 전문(제2026-29호, 2026.4.6.)",
+      "title_ko": "생물학적제제등 품목허가심사 규정 고시 전문(제2026-29호, 2026.4.6.)",
+      "doc_type": "notice-final",
+      "published_date": "2026-04-06",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14964"
+    },
+    {
+      "id": "data0005-14963",
+      "title_en": "「생물학적제제 기준 및 시험방법」 전문(식품의약품안전처 고시 제2026-28호, 2026.4.2.)",
+      "title_ko": "「생물학적제제 기준 및 시험방법」 전문(식품의약품안전처 고시 제2026-28호, 2026.4.2.)",
+      "doc_type": "notice-final",
+      "published_date": "2026-04-03",
+      "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14963"
+    },
+    {
+      "id": "data0010-15238",
+      "title_en": "생물의약품의 국제표준품 확보 및 관리 절차",
+      "title_ko": "생물의약품의 국제표준품 확보 및 관리 절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-03-31",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15238"
+    }
+  ]
+}

@@ -5,15 +5,24 @@ name: GRM Publish Watchdog (routine 침묵실패 탐지)
 # 없으면 = 그 주 Routine 이 안 돌았거나 실패했다는 뜻 — 기존 "GRM Intake 운영 경고" 이슈
 # 패턴(라벨·본문 형식)을 재사용해 표면화한다. 과알림 0(경고 있을 때만 코멘트).
 #
-# 월 10:00 KST = 월 01:00 UTC (Routine 07:30 KST + 2.5h 여유 — 지연·재시도 흡수).
+# ★ 2026-07-20 개편 — 경보만 하고 복구는 사람이 하던 구조에서 **자가 복구**로.
+#   델타가 없으면 grm-delta-bridge 를 직접 dispatch 하고, 이관을 기다렸다가 다시 확인한다.
+#   그래도 없을 때만 이슈로 표면화한다(과알림 0 유지 — 스스로 고친 주는 조용히 지나간다).
+#
+#   회차도 1회 → 3회로, 분은 **비정각**으로 옮긴다. 이 워치독 자신이 예약 크론이라 1회만
+#   걸어두면 그 크론이 늦거나 드롭된 주엔 복구 로직이 아예 안 돈다 — 실측(2026-07-20):
+#   `0 1 * * 1`(10:00 KST 목표)이 04:28Z=13:28 KST 에 발화, **3시간 28분 지각**.
+#   정각은 GitHub 부하 피크라 큐가 늦게 풀린다(grm-intake.yml 이 `:17` 을 쓰는 것과 같은 이유).
+#   월 01:13 / 03:13 / 05:13 UTC = 10:13 / 12:13 / 14:13 KST.
 on:
   schedule:
-    - cron: '0 1 * * 1'
+    - cron: '13 1,3,5 * * 1'
   workflow_dispatch: {}
 
 permissions:
   contents: read
   issues: write
+  actions: write   # 자가 복구 — grm-delta-bridge.yml workflow_dispatch
 
 concurrency:
   group: grm-publish-watchdog
@@ -23,19 +32,24 @@ jobs:
   check:
     name: delta_{date}.json 존재 확인(그 주 Routine 발행 여부)
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20   # 자가 복구 대기(최대 10분) + 브릿지 기동 여유
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
       - name: 발행 예정일(KST) 계산 + delta 존재 확인
         id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           PUB_DATE_KST=$(TZ='Asia/Seoul' date '+%Y-%m-%d')
           UNDER=$(echo "$PUB_DATE_KST" | tr '-' '_')
           DELTA="web/data/deltas/delta_${UNDER}.json"
-          if [ -f "$DELTA" ]; then
+          # ★ 로컬 파일이 아니라 **원격 main** 을 본다. 복구 후 재확인(아래 recover 스텝)이
+          #   같은 판정 함수를 써야 하는데, checkout 트리는 run 시작 시점 스냅샷이라 브릿지가
+          #   방금 push 한 델타를 영영 못 본다.
+          if gh api "repos/${GITHUB_REPOSITORY}/contents/${DELTA}?ref=main" --silent 2>/dev/null; then
             echo "found=true" >> "$GITHUB_OUTPUT"
             echo "델타 존재: $DELTA — Routine 정상 발행"
           else
@@ -45,8 +59,38 @@ jobs:
           echo "pub_date=$PUB_DATE_KST" >> "$GITHUB_OUTPUT"
           echo "delta_path=$DELTA" >> "$GITHUB_OUTPUT"
 
-      - name: 운영 경고 이슈 생성/갱신(델타 없을 때만)
+      - name: 자가 복구 — 델타 브릿지 직접 기동 후 재확인
+        id: recover
         if: steps.check.outputs.found == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DELTA: ${{ steps.check.outputs.delta_path }}
+        run: |
+          set -euo pipefail
+          # 델타 부재의 가장 흔한 원인은 Routine 실패가 아니라 **브릿지 크론 미발화**다
+          # (2026-07-20 실측: 월요일 크론 3개 전부 유실). 그렇다면 브릿지를 그냥 돌리면
+          # 복구된다 — Notion 의 OPEN 델타는 그대로 남아 있기 때문. 예치 자체가 없으면
+          # 브릿지가 무해 skip 하고 아래 재확인이 실패해 기존 경보 경로로 넘어간다.
+          echo "브릿지 기동 시도 — $DELTA 부재"
+          if ! gh workflow run grm-delta-bridge.yml --ref main; then
+            echo "::warning::브릿지 dispatch 실패 — 경보로 전환"
+            echo "recovered=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 최대 10분(30초 × 20) 대기하며 원격 main 에 델타가 나타나는지 본다.
+          for i in $(seq 1 20); do
+            sleep 30
+            if gh api "repos/${GITHUB_REPOSITORY}/contents/${DELTA}?ref=main" --silent 2>/dev/null; then
+              echo "::notice::자가 복구 성공 — $DELTA 확인(${i}회차)"
+              echo "recovered=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::warning::브릿지 기동했으나 10분 내 델타 미확인 — 경보로 전환"
+          echo "recovered=false" >> "$GITHUB_OUTPUT"
+
+      - name: 운영 경고 이슈 생성/갱신(자가 복구까지 실패했을 때만)
+        if: steps.check.outputs.found == 'false' && steps.recover.outputs.recovered != 'true'
         uses: actions/github-script@v9.0.0
         with:
           script: |
@@ -86,7 +130,12 @@ jobs:
               `- Health status: warning`,
               '',
               '현재 경고:',
-              `- [PUBLISH-WATCHDOG] routine: 발행 예정일 ${pubDate} 기준 ${deltaPath} 없음 — 이번 주 Claude Routine(월 07:30 KST 자동 실행)이 미실행되었거나 실패했을 가능성. 예약 작업 상태·MCP 연결·Notion OPEN handoff 를 확인하세요.`,
+              `- [PUBLISH-WATCHDOG] routine: 발행 예정일 ${pubDate} 기준 ${deltaPath} 없음 — **자가 복구(델타 브릿지 직접 기동)까지 시도했으나 10분 내 델타가 확보되지 않았습니다.**`,
+              '',
+              '자가 복구가 실패했다는 것은 크론 미발화가 아니라 **Notion 에 OPEN 델타 자체가 없다**는 뜻일 가능성이 높습니다(브릿지는 예치가 있으면 기동만으로 복구된다). 다음을 확인하세요:',
+              '- Claude Routine(월 07:30 KST 예약 에이전트) 실행 여부 · MCP 연결 상태',
+              '- Notion Intake DB 에 `OPEN GRM Web Delta` 페이지가 예치됐는지(Status=New)',
+              '- 델타 브릿지 run 로그 — 예치가 있는데도 실패했다면 그쪽이 원인입니다',
               '',
               `<!-- grm-warn-sig: ${sig} -->`,
             ].join('\n');
@@ -112,8 +161,8 @@ jobs:
               console.log(`signature unchanged (${sig}); body updated silently, no comment`);
             }
 
-      - name: 이슈 해소 처리(델타 있으면 기존 워치독 경고만 정리)
-        if: steps.check.outputs.found == 'true'
+      - name: 이슈 해소 처리(델타 확인 — 처음부터 있었거나 자가 복구로 확보)
+        if: steps.check.outputs.found == 'true' || steps.recover.outputs.recovered == 'true'
         uses: actions/github-script@v9.0.0
         with:
           script: |

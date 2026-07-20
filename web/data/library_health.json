@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-07-19T17:04:59+00:00",
+  "checked_at": "2026-07-20T05:55:34+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -25,10 +25,10 @@
   ],
   "summary": {
     "broken": 0,
-    "needs_review": 73,
-    "ok": 275,
-    "references": 467,
-    "unique_urls": 348
+    "needs_review": 155,
+    "ok": 306,
+    "references": 583,
+    "unique_urls": 461
   },
   "urls": {
     "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf": {
@@ -1117,11 +1117,11 @@
       "status": "ok"
     },
     "https://nedrug.mfds.go.kr/bbs/117/13": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://nedrug.mfds.go.kr/bbs/117/13",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "ko_url",
@@ -1129,14 +1129,14 @@
           "item_id": "ich-998a75651186"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://nedrug.mfds.go.kr/bbs/117/14": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://nedrug.mfds.go.kr/bbs/117/14",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "ko_url",
@@ -1144,7 +1144,7 @@
           "item_id": "ich-156da584415e"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://picscheme.org/docview/1947": {
       "attempts": 1,
@@ -1186,6 +1186,21 @@
       ],
       "status": "ok"
     },
+    "https://picscheme.org/docview/1951": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/1951",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-026-2"
+        }
+      ],
+      "status": "ok"
+    },
     "https://picscheme.org/docview/2270": {
       "attempts": 1,
       "final_url": "https://picscheme.org/docview/2270",
@@ -1222,6 +1237,36 @@
           "field": "pdf_url",
           "file": "pics.json",
           "item_id": "pics-pi-040-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2405": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2405",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-020-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/2406": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/2406",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-019-3"
         }
       ],
       "status": "ok"
@@ -1322,6 +1367,51 @@
           "field": "pdf_url",
           "file": "pics.json",
           "item_id": "pics-pi-010-5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3034": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3034",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-025-2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3035": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3035",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-039-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3439": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3439",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-037-1"
         }
       ],
       "status": "ok"
@@ -1546,6 +1636,51 @@
       ],
       "status": "ok"
     },
+    "https://picscheme.org/docview/3460": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3460",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-031-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3461": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3461",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-013-3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/3462": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3462",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-002-3"
+        }
+      ],
+      "status": "ok"
+    },
     "https://picscheme.org/docview/3463": {
       "attempts": 1,
       "final_url": "https://picscheme.org/docview/3463",
@@ -1606,6 +1741,21 @@
       ],
       "status": "ok"
     },
+    "https://picscheme.org/docview/3822": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/3822",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-028-2"
+        }
+      ],
+      "status": "ok"
+    },
     "https://picscheme.org/docview/3823": {
       "attempts": 1,
       "final_url": "https://picscheme.org/docview/3823",
@@ -1622,6 +1772,36 @@
           "field": "pdf_url",
           "file": "pics.json",
           "item_id": "pics-pi-038-2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/4212": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/4212",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-005-4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/4214": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/4214",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-008-4"
         }
       ],
       "status": "ok"
@@ -1662,6 +1842,36 @@
           "field": "pdf_url",
           "file": "pics.json",
           "item_id": "pics-pi-054-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/4295": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/4295",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-055-1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/6234": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/6234",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-044-1"
         }
       ],
       "status": "ok"
@@ -1788,7 +1998,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1801,9 +2011,24 @@
       ],
       "status": "ok"
     },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-application-certificate-pharmaceutical-product-0024/document.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-application-certificate-pharmaceutical-product-0024/document.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0024"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-drug-establishment-licences-drug-establishment-licensing-fees-0002.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/guidance-drug-establishment-licences-drug-establishment-licensing-fees-0002.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1818,7 +2043,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/management-applications-performance-drug-establishment-licences-0127.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/management-applications-performance-drug-establishment-licences-0127.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1831,9 +2056,39 @@
       ],
       "status": "ok"
     },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/forms/alternate-sample-retention-site-guidelines-0014.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/forms/alternate-sample-retention-site-guidelines-0014.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0014"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-11-guide-computerized-systems-gui-0050.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-11-guide-computerized-systems-gui-0050.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0050"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-13-guide-drugs-clinical-trials-0036.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-13-guide-drugs-clinical-trials-0036.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1848,7 +2103,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-2-current-edition-guidelines-schedule-drugs-biological-drugs-0027.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-2-current-edition-guidelines-schedule-drugs-biological-drugs-0027.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1863,7 +2118,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-3-current-edition-guidelines-schedule-drugs-0026.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-3-current-edition-guidelines-schedule-drugs-0026.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1878,7 +2133,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1893,7 +2148,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-7-good-manufacturing-practices-guide-selected-non-prescription-drugs-gui-0066-overview.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-7-good-manufacturing-practices-guide-selected-non-prescription-drugs-gui-0066-overview.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1908,7 +2163,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1921,9 +2176,24 @@
       ],
       "status": "ok"
     },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/conditions-provision-packaging-labelling-services-drugs-foreign-ownership-guide-0067.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/conditions-provision-packaging-labelling-services-drugs-foreign-ownership-guide-0067.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0067"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-0001.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/gmp-guidelines-0001.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1953,7 +2223,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidance-evidence-demonstrate-drug-compliance-foreign-sites-0080.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guidance-evidence-demonstrate-drug-compliance-foreign-sites-0080.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1968,7 +2238,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-natural-health-products-0158.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-natural-health-products-0158.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -1977,6 +2247,21 @@
           "field": "official_url",
           "file": "health_canada.json",
           "item_id": "health-canada-gui-0158"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-validation-terminal-sterilization-process-drugs-gui-0074.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-validation-terminal-sterilization-process-drugs-gui-0074.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0074"
         }
       ],
       "status": "ok"
@@ -1996,9 +2281,24 @@
       ],
       "status": "ok"
     },
+    "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/manufacturing-exportation-notifications-canada-access-medicines-regime-guide-0072.html": {
+      "attempts": 1,
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/manufacturing-exportation-notifications-canada-access-medicines-regime-guide-0072.html",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "health_canada.json",
+          "item_id": "health-canada-gui-0072"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/medical-gases.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/medical-gases.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2013,7 +2313,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/risk-classification-drug-gmp-observations-0023.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/risk-classification-drug-gmp-observations-0023.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2028,7 +2328,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2043,7 +2343,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/validation-guidelines-pharmaceutical-dosage-forms-0029.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/validation-guidelines-pharmaceutical-dosage-forms-0029.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2073,7 +2373,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/recalls/guidance-drug-natural-health-products.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/errors/404.html",
+      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/recalls/guidance-drug-natural-health-products.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2226,6 +2526,26 @@
       ],
       "status": "ok"
     },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/history-changes-compilation-procedures_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/history-changes-compilation-procedures_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-bd3d03a4ab3c"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-bd3d03a4ab3c"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf": {
       "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf",
@@ -2262,6 +2582,26 @@
           "field": "pdf_url",
           "file": "ema.json",
           "item_id": "ema-gmp-015"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/introduction-compilation-union-procedures-inspections-exchange-information_en.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/introduction-compilation-union-procedures-inspections-exchange-information_en.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-d82e72955ef3"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-d82e72955ef3"
         }
       ],
       "status": "ok"
@@ -2591,6 +2931,21 @@
       ],
       "status": "ok"
     },
+    "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-355a641be612"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline": {
       "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline",
@@ -2600,8 +2955,58 @@
       "references": [
         {
           "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-fd4923e4ce8d"
+        },
+        {
+          "field": "official_url",
           "file": "eu_gmp.json",
           "item_id": "eu-gmp-part3-q10"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-c2268063be73"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/ich-q8-r2-pharmaceutical-development-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/ich-q8-r2-pharmaceutical-development-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-9f5df91aaf2e"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/ich-q9-quality-risk-management-scientific-guideline": {
+      "attempts": 1,
+      "final_url": "https://www.ema.europa.eu/en/ich-q9-quality-risk-management-scientific-guideline",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-da8e168adf7c"
         }
       ],
       "status": "ok"
@@ -2731,6 +3136,21 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-system-and-component-changes-glass-vials-and-stoppers": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-system-and-component-changes-glass-vials-and-stoppers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-842f4ac92ef6"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics",
@@ -2742,6 +3162,21 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-container-closure-systems-packaging"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics-questions-and-answers": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-packaging-human-drugs-and-biologics-questions-and-answers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-e5daabfc8fb7"
         }
       ],
       "status": "ok"
@@ -2776,6 +3211,36 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-450100-cgmp-enforcement-policy-otc-vs-rx-drugs": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-450100-cgmp-enforcement-policy-otc-vs-rx-drugs",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-e76d5a88bc15"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-490100-process-validation-requirements-drug-products-and-active-pharmaceutical-ingredients-0": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-490100-process-validation-requirements-drug-products-and-active-pharmaceutical-ingredients-0",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-eec728f4b14f"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-guidance-human-drug-compounding-outsourcing-facilities-under": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-guidance-human-drug-compounding-outsourcing-facilities-under",
@@ -2787,6 +3252,21 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-cgmp-compounding-outsourcing-facilities"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-phase-1-investigational-drugs": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/current-good-manufacturing-practice-phase-1-investigational-drugs",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-f694707e861b"
         }
       ],
       "status": "ok"
@@ -2821,6 +3301,36 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-integrity-in-vivo-bioavailability-and-bioequivalence-studies": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-integrity-in-vivo-bioavailability-and-bioequivalence-studies",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6e1dc76c2ced"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/elemental-impurities-drug-products-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/elemental-impurities-drug-products-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-3861b0adc23f"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/field-alert-report-submission-questions-and-answers-guidance-industry": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/field-alert-report-submission-questions-and-answers-guidance-industry",
@@ -2832,6 +3342,36 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-field-alert-report-submission-qa"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/formal-dispute-resolution-scientific-and-technical-issues-related-pharmaceutical-cgmp": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/formal-dispute-resolution-scientific-and-technical-issues-related-pharmaceutical-cgmp",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-c0cf2e3dbef5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/insanitary-conditions-compounding-facilities-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/insanitary-conditions-compounding-facilities-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-76dd68d5fe1b"
         }
       ],
       "status": "ok"
@@ -2851,6 +3391,36 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m7r2-addendum-application-principles-ich-m7-guideline-calculation-compound-specific-acceptable": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m7r2-addendum-application-principles-ich-m7-guideline-calculation-compound-specific-acceptable",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6bdaa828236f"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/media-fills-validation-aseptic-preparations-positron-emission-tomography": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/media-fills-validation-aseptic-preparations-positron-emission-tomography",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-d14fc272e7e9"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/medical-gases-current-good-manufacturing-practice": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/medical-gases-current-good-manufacturing-practice",
@@ -2866,6 +3436,51 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/microbiological-quality-considerations-non-sterile-drug-manufacturing": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/microbiological-quality-considerations-non-sterile-drug-manufacturing",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-4050e2794b70"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/non-penicillin-beta-lactam-drugs-cgmp-framework-preventing-cross-contamination": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/non-penicillin-beta-lactam-drugs-cgmp-framework-preventing-cross-contamination",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-e67a796080f3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/non-penicillin-beta-lactam-drugs-cgmp-framework-preventing-cross-contamination-0": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/non-penicillin-beta-lactam-drugs-cgmp-framework-preventing-cross-contamination-0",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-20851cd5561c"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pat-framework-innovative-pharmaceutical-development-manufacturing-and-quality-assurance": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pat-framework-innovative-pharmaceutical-development-manufacturing-and-quality-assurance",
@@ -2877,6 +3492,36 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-pat-framework"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pet-drug-products-current-good-manufacturing-practice-cgmp": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pet-drug-products-current-good-manufacturing-practice-cgmp",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6891e5d13dd3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pet-drugs-current-good-manufacturing-practice-cgmp-small-entity-compliance-guide": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/pet-drugs-current-good-manufacturing-practice-cgmp-small-entity-compliance-guide",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-653ad543e583"
         }
       ],
       "status": "ok"
@@ -2926,6 +3571,66 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1-stability-testing-drug-substances-and-drug-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1-stability-testing-drug-substances-and-drug-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-58f4de643c63"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q10-pharmaceutical-quality-system": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q10-pharmaceutical-quality-system",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-82d02f79b2bc"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q11-development-and-manufacture-drug-substances": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q11-development-and-manufacture-drug-substances",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-0f53a6923b03"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q11-development-and-manufacture-drug-substances-questions-and-answers-chemical-entities-and": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q11-development-and-manufacture-drug-substances-questions-and-answers-chemical-entities-and",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-9d23f89b9cb3"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-annex": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-annex",
@@ -2937,6 +3642,21 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-q12-product-lifecycle-management-annex"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-guidance": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q12-technical-and-regulatory-considerations-pharmaceutical-product-lifecycle-management-guidance",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-cd24ee5eafa9"
         }
       ],
       "status": "ok"
@@ -2956,6 +3676,291 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q14-analytical-procedure-development": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q14-analytical-procedure-development",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-45b517d6b3a0"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1ar2-stability-testing-new-drug-substances-and-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1ar2-stability-testing-new-drug-substances-and-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-3dc8dbd65506"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1b-photostability-testing-new-drug-substances-and-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1b-photostability-testing-new-drug-substances-and-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6f10a8dfd1b5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1c-stability-testing-new-dosage-forms": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1c-stability-testing-new-dosage-forms",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-719c42977104"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1d-bracketing-and-matrixing-designs-stability-testing-new-drug-substances-and-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1d-bracketing-and-matrixing-designs-stability-testing-new-drug-substances-and-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6d97af3fff69"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1e-evaluation-stability-data": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q1e-evaluation-stability-data",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-711c1e4bc0d3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2a-text-validation-analytical-procedures": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2a-text-validation-analytical-procedures",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-f38d8588ba2c"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2b-validation-analytical-procedures-methodology": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2b-validation-analytical-procedures-methodology",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-8a7a24342e36"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2r1-validation-analytical-procedures-text-and-methodology-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2r1-validation-analytical-procedures-text-and-methodology-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-de0affa8a258"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2r2-validation-analytical-procedures": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2r2-validation-analytical-procedures",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-b855253f2bcd"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3ar-impurities-new-drug-substances": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3ar-impurities-new-drug-substances",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-c25ae242f869"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3br-impurities-new-drug-products-revision-3": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3br-impurities-new-drug-products-revision-3",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-602c62de1f27"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-4": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-05d593959209"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-5": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-5",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-0f79f3f377ca"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-6": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-appendix-6",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-4eb9e3e918a2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-impurities-residual-solvents_2011": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-impurities-residual-solvents_2011",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-3a8632596f2c"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-maintenance-procedures": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-maintenance-procedures",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-0fdebb5124a4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-tables-and-list-rev-4": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3c-tables-and-list-rev-4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-26df5ad2456b"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-3c8a677ad850"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3dr2-guideline-elemental-impurities": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3dr2-guideline-elemental-impurities",
@@ -2971,6 +3976,141 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-e49e88e2b0a5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables-supporting-documentation-class-3-leachable-monographs": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables-supporting-documentation-class-3-leachable-monographs",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-94462baaf386"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5ar2-viral-safety-evaluation-biotechnology-products-derived-cell-lines-human-or-animal-origin": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5ar2-viral-safety-evaluation-biotechnology-products-derived-cell-lines-human-or-animal-origin",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-0d5a1221c4a8"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5b-quality-biotechnological-products-analysis-expression-construct-cells-used-production-r-dna": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5b-quality-biotechnological-products-analysis-expression-construct-cells-used-production-r-dna",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-55ece9b56a4b"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5c-quality-biotechnological-products-stability-testing-biotechnologicalbiological-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5c-quality-biotechnological-products-stability-testing-biotechnologicalbiological-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6680e3159fa8"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5d-quality-biotechnologicalbiological-products-derivation-and-characterization-cell-substrates-used": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5d-quality-biotechnologicalbiological-products-derivation-and-characterization-cell-substrates-used",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6ae1e3bf830b"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5e-comparability-biotechnologicalbiological-products-subject-changes-their-manufacturing-process": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5e-comparability-biotechnologicalbiological-products-subject-changes-their-manufacturing-process",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-cde13a8e431d"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q6a-specifications-test-procedures-and-acceptance-criteria-new-drug-substances-and-new-drug-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q6a-specifications-test-procedures-and-acceptance-criteria-new-drug-substances-and-new-drug-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-3f19d4d5daa3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q6b-specifications-test-procedures-and-acceptance-criteria-biotechnologicalbiological-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q6b-specifications-test-procedures-and-acceptance-criteria-biotechnologicalbiological-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-96ed417795a9"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-guidance-industry": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-guidance-industry",
@@ -2982,6 +4122,66 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-q7-gmp-active-pharmaceutical-ingredients"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-questions-and-answers": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q7-good-manufacturing-practice-guidance-active-pharmaceutical-ingredients-questions-and-answers",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-dd1cba05af96"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8-q9-and-q10-questions-and-answers-r5": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8-q9-and-q10-questions-and-answers-r5",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-ad92eaabc6a1"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8-q9-q10-questions-and-answers-appendix-qas-training-sessions-q8-q9-q10-points-consider": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8-q9-q10-questions-and-answers-appendix-qas-training-sessions-q8-q9-q10-points-consider",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-7092ff426a17"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8r2-pharmaceutical-development": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q8r2-pharmaceutical-development",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-6b8e25bfa8de"
         }
       ],
       "status": "ok"
@@ -3012,6 +4212,81 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-quality-systems-pharmaceutical-cgmp"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/questions-and-answers-current-good-manufacturing-practice-questions-and-answers-current-good": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/questions-and-answers-current-good-manufacturing-practice-questions-and-answers-current-good",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-581b27b19486"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/questions-and-answers-current-good-manufacturing-practices-drugs": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/questions-and-answers-current-good-manufacturing-practices-drugs",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-9553587cc015"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/recommended-acceptable-intake-limits-nitrosamine-drug-substance-related-impurities": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/recommended-acceptable-intake-limits-nitrosamine-drug-substance-related-impurities",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-0d9ca118e1e9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/responding-fda-form-483-observations-conclusion-drug-cgmp-inspection": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/responding-fda-form-483-observations-conclusion-drug-cgmp-inspection",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-67ead165f91b"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/setting-endotoxin-limits-during-development-investigational-oncology-drugs-and-biological-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/setting-endotoxin-limits-during-development-investigational-oncology-drugs-and-biological-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-183d8f593c60"
         }
       ],
       "status": "ok"
@@ -3061,6 +4336,21 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-quality-metrics-data-guidance-industry": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/submission-quality-metrics-data-guidance-industry",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-4e6d0b36b223"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/testing-glycerin-propylene-glycol-maltitol-solution-hydrogenated-starch-hydrolysate-sorbitol": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/testing-glycerin-propylene-glycol-maltitol-solution-hydrogenated-starch-hydrolysate-sorbitol",
@@ -3072,6 +4362,21 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-testing-high-risk-components-deg-eg"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/use-mechanical-calibration-dissolution-apparatus-1-and-2-current-good-manufacturing-practice-cgmp": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/use-mechanical-calibration-dissolution-apparatus-1-and-2-current-good-manufacturing-practice-cgmp",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-cdfd75769fca"
         }
       ],
       "status": "ok"
@@ -3252,11 +4557,11 @@
       "status": "ok"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15242&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15242&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3264,14 +4569,14 @@
           "item_id": "data0010-15242"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15243&data_tp=A&file_seq=7": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15243&data_tp=A&file_seq=7",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3279,14 +4584,14 @@
           "item_id": "data0010-15243"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15244&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15244&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3294,14 +4599,14 @@
           "item_id": "data0010-15244"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15245&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15245&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3309,14 +4614,14 @@
           "item_id": "data0010-15245"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15246&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15246&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3324,14 +4629,14 @@
           "item_id": "data0010-15246"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15247&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15247&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3339,14 +4644,14 @@
           "item_id": "data0010-15247"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15248&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15248&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3354,14 +4659,14 @@
           "item_id": "data0010-15248"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15249&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15249&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3369,14 +4674,14 @@
           "item_id": "data0010-15249"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15251&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15251&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3384,14 +4689,14 @@
           "item_id": "data0010-15251"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15253&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15253&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3399,14 +4704,14 @@
           "item_id": "data0010-15253"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15255&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15255&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3414,14 +4719,14 @@
           "item_id": "data0010-15255"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15258&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/down.do?brd_id=data0010&seq=15258&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3429,14 +4734,44 @@
           "item_id": "data0010-15258"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15238": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15238",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15238"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15240": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15240",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15240"
+        }
+      ],
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15242",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3449,9 +4784,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15243",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3464,9 +4799,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15244",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3479,9 +4814,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15245",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3494,9 +4829,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15246",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3509,9 +4844,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15247",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3524,9 +4859,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15248",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3539,9 +4874,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15249",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3554,9 +4889,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3569,9 +4904,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3584,9 +4919,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15255",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3599,9 +4934,9 @@
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15258",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3612,11 +4947,11 @@
       "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3624,14 +4959,14 @@
           "item_id": "data0011-14290"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14395&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14395&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3639,14 +4974,14 @@
           "item_id": "data0011-14395"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14396&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14396&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3654,14 +4989,14 @@
           "item_id": "data0011-14396"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14444&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14444&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3669,14 +5004,14 @@
           "item_id": "data0011-14444"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14455&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14455&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3684,14 +5019,14 @@
           "item_id": "data0011-14455"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14484&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14484&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3699,14 +5034,14 @@
           "item_id": "data0011-14484"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14579&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14579&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3714,14 +5049,14 @@
           "item_id": "data0011-14579"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14608&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14608&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3729,14 +5064,14 @@
           "item_id": "data0011-14608"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14637&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14637&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3744,14 +5079,14 @@
           "item_id": "data0011-14637"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14638&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14638&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3759,14 +5094,14 @@
           "item_id": "data0011-14638"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14672&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14672&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3774,14 +5109,14 @@
           "item_id": "data0011-14672"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14737&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14737&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3789,14 +5124,14 @@
           "item_id": "data0011-14737"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14816&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14816&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3804,14 +5139,14 @@
           "item_id": "data0011-14816"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14831&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14831&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3819,14 +5154,14 @@
           "item_id": "data0011-14831"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14852&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14852&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3834,14 +5169,14 @@
           "item_id": "data0011-14852"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14912&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14912&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3849,14 +5184,14 @@
           "item_id": "data0011-14912"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14997&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14997&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3864,14 +5199,14 @@
           "item_id": "data0011-14997"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15121&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15121&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3879,14 +5214,14 @@
           "item_id": "data0011-15121"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15162&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15162&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3894,14 +5229,14 @@
           "item_id": "data0011-15162"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15208&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15208&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3909,14 +5244,14 @@
           "item_id": "data0011-15208"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15277&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15277&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3924,14 +5259,14 @@
           "item_id": "data0011-15277"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15344&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15344&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3939,14 +5274,14 @@
           "item_id": "data0011-15344"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15349&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15349&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3954,14 +5289,14 @@
           "item_id": "data0011-15349"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15360&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15360&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3969,14 +5304,14 @@
           "item_id": "data0011-15360"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15371&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15371&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3984,14 +5319,14 @@
           "item_id": "data0011-15371"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15403&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15403&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -3999,14 +5334,14 @@
           "item_id": "data0011-15403"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15404&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15404&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4014,14 +5349,14 @@
           "item_id": "data0011-15404"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15454&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15454&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4029,14 +5364,14 @@
           "item_id": "data0011-15454"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15541&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15541&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4044,14 +5379,14 @@
           "item_id": "data0011-15541"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15589&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15589&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4059,14 +5394,14 @@
           "item_id": "data0011-15589"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15635&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15635&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4074,14 +5409,14 @@
           "item_id": "data0011-15635"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15682&data_tp=A&file_seq=4": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15682&data_tp=A&file_seq=4",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4089,14 +5424,14 @@
           "item_id": "data0011-15682"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15698&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15698&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4104,14 +5439,14 @@
           "item_id": "data0011-15698"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15716&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15716&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4119,14 +5454,14 @@
           "item_id": "data0011-15716"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15753&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15753&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4134,14 +5469,14 @@
           "item_id": "data0011-15753"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15754&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15754&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4149,14 +5484,14 @@
           "item_id": "data0011-15754"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15783&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15783&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4164,14 +5499,14 @@
           "item_id": "data0011-15783"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15790&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15790&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4179,14 +5514,14 @@
           "item_id": "data0011-15790"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15798&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15798&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4194,14 +5529,14 @@
           "item_id": "data0011-15798"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15802&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15802&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4209,14 +5544,14 @@
           "item_id": "data0011-15802"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15860&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15860&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4224,14 +5559,14 @@
           "item_id": "data0011-15860"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15865&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15865&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4239,14 +5574,14 @@
           "item_id": "data0011-15865"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15873&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15873&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4254,14 +5589,14 @@
           "item_id": "data0011-15873"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15874&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15874&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4269,14 +5604,14 @@
           "item_id": "data0011-15874"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15876&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15876&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4284,14 +5619,14 @@
           "item_id": "data0011-15876"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15877&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15877&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4299,14 +5634,14 @@
           "item_id": "data0011-15877"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15882&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15882&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4314,14 +5649,14 @@
           "item_id": "data0011-15882"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15883&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15883&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4329,14 +5664,14 @@
           "item_id": "data0011-15883"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15887&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15887&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4344,14 +5679,14 @@
           "item_id": "data0011-15887"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15888&data_tp=A&file_seq=3": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=15888&data_tp=A&file_seq=3",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -4359,14 +5694,14 @@
           "item_id": "data0011-15888"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14290": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14290",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4379,9 +5714,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14395": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14395",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4394,9 +5729,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14396": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14396",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4409,9 +5744,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14444": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14444",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4424,9 +5759,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14455": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14455",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4439,9 +5774,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14484": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14484",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4454,9 +5789,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14579": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14579",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4469,9 +5804,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14608": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14608",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4484,9 +5819,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14637": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14637",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4499,9 +5834,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14638": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14638",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4514,9 +5849,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14672": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14672",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4529,9 +5864,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14737": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14737",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4544,9 +5879,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14782": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14782",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "ko_url",
@@ -4559,9 +5894,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14816": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14816",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4574,9 +5909,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14831",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "ko_url",
@@ -4604,9 +5939,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14852": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14852",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4619,9 +5954,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14912": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14912",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4634,9 +5969,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14997": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=14997",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4649,9 +5984,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15121": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15121",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4664,9 +5999,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15162": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15162",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4679,9 +6014,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15208": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15208",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4694,9 +6029,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15277": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15277",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4709,9 +6044,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15344": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15344",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4724,9 +6059,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15349": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15349",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4739,9 +6074,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15360": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15360",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4754,9 +6089,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15363",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "ko_url",
@@ -4769,9 +6104,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15371": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15371",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4784,9 +6119,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15403": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15403",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4799,9 +6134,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15404": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15404",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4814,9 +6149,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15454": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15454",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4829,9 +6164,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4844,9 +6179,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4859,9 +6194,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15635": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15635",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4874,9 +6209,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15682": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15682",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4889,9 +6224,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15698": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15698",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4904,9 +6239,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15716": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15716",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4919,9 +6254,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15753": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15753",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4934,9 +6269,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15754": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15754",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4949,9 +6284,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15783": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15783",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4964,9 +6299,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15790": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15790",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4979,9 +6314,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15798": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15798",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -4994,9 +6329,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15802": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15802",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5009,9 +6344,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15860",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5024,9 +6359,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15865",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5039,9 +6374,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15873",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5054,9 +6389,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15874",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5069,9 +6404,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15876",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5084,9 +6419,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15877",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5099,9 +6434,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15882",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5114,9 +6449,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15883",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5129,9 +6464,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15887",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5144,9 +6479,9 @@
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15888",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5157,11 +6492,11 @@
       "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5169,14 +6504,14 @@
           "item_id": "data0009-44248"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44250&data_tp=A&file_seq=2": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44250&data_tp=A&file_seq=2",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5184,14 +6519,14 @@
           "item_id": "data0009-44250"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44251&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44251&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5199,14 +6534,14 @@
           "item_id": "data0009-44251"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44254&data_tp=A&file_seq=3": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44254&data_tp=A&file_seq=3",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5214,14 +6549,14 @@
           "item_id": "data0009-44254"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44255&data_tp=A&file_seq=4": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44255&data_tp=A&file_seq=4",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5229,14 +6564,14 @@
           "item_id": "data0009-44255"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44256&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44256&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5244,14 +6579,14 @@
           "item_id": "data0009-44256"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44248",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5264,9 +6599,9 @@
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44250",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5279,9 +6614,9 @@
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44251",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5294,9 +6629,9 @@
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44254",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5309,9 +6644,9 @@
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44255",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5324,9 +6659,9 @@
     "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44256",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5337,11 +6672,11 @@
       "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14972&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14972&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5349,14 +6684,14 @@
           "item_id": "data0005-14972"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14974&data_tp=A&file_seq=1": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_211/down.do?brd_id=data0005&seq=14974&data_tp=A&file_seq=1",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5364,14 +6699,44 @@
           "item_id": "data0005-14974"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14963": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14963",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14963"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14964": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14964",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14964"
+        }
+      ],
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14972",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5384,9 +6749,9 @@
     "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14974",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5396,12 +6761,42 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14977": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14977",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14977"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14978": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14978",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14978"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "pdf_url",
@@ -5409,14 +6804,59 @@
           "item_id": "data0013-33716"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_218/view.do?seq=33709": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33709",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33709"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_218/view.do?seq=33713": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33713",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33713"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_218/view.do?seq=33714": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33714",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33714"
+        }
+      ],
+      "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33716",
-      "http_status": 500,
+      "http_status": null,
       "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "reason": "network_or_tls:ConnectTimeout",
       "references": [
         {
           "field": "official_url",
@@ -5501,6 +6941,36 @@
       ],
       "status": "ok"
     },
+    "https://www.who.int/publications/m/item/annex-4-trs-929": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-4-trs-929",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs929-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/annex-6-trs-996": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/annex-6-trs-996",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs996-annex6"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.who.int/publications/m/item/annex-9-trs-902": {
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/annex-9-trs-902",
@@ -5512,6 +6982,36 @@
           "field": "official_url",
           "file": "who.json",
           "item_id": "who-trs902-annex9"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/guidance-on-good-manufacturing-practices-inspection-report": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/guidance-on-good-manufacturing-practices-inspection-report",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs996-annex4"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1025---annex-5-quality-system-requirements-for-national-good-manufacturing-practice-inspectorates": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1025---annex-5-quality-system-requirements-for-national-good-manufacturing-practice-inspectorates",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex5"
         }
       ],
       "status": "ok"
@@ -5542,6 +7042,36 @@
           "field": "official_url",
           "file": "who.json",
           "item_id": "who-trs1025-annex6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1025-annex-7": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1025-annex-7",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs-1052---annex-2--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs-1052---annex-2--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1052-annex2"
         }
       ],
       "status": "ok"
@@ -5636,6 +7166,51 @@
       ],
       "status": "ok"
     },
+    "https://www.who.int/publications/m/item/trs1010-annex10": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1010-annex10",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1010-annex10"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1010-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1010-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1010-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1010-annex9": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1010-annex9",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1010-annex9"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.who.int/publications/m/item/trs1019-annex2": {
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs1019-annex2",
@@ -5677,6 +7252,21 @@
           "field": "official_url",
           "file": "who.json",
           "item_id": "who-trs1025-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs1025-annex4": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs1025-annex4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1025-annex4"
         }
       ],
       "status": "ok"
@@ -5771,6 +7361,66 @@
       ],
       "status": "ok"
     },
+    "https://www.who.int/publications/m/item/trs823-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs823-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs823-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs885-annex5": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs885-annex5",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs885-annex5"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs902-annex7": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs902-annex7",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs902-annex7"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs957-annex1": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs957-annex1",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs957-annex1"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.who.int/publications/m/item/trs957-annex3": {
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs957-annex3",
@@ -5782,6 +7432,51 @@
           "field": "official_url",
           "file": "who.json",
           "item_id": "who-trs957-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs961-annex14": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs961-annex14",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs961-annex14"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs961-annex2": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs961-annex2",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs961-annex2"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/trs961-annex4": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/trs961-annex4",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs961-annex4"
         }
       ],
       "status": "ok"
@@ -5842,6 +7537,21 @@
           "field": "official_url",
           "file": "who.json",
           "item_id": "who-trs996-annex3"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.who.int/publications/m/item/who-good-practices-for-pharmaceutical-quality-control-laboratories": {
+      "attempts": 1,
+      "final_url": "https://www.who.int/publications/m/item/who-good-practices-for-pharmaceutical-quality-control-laboratories",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "who.json",
+          "item_id": "who-trs1052-annex4"
         }
       ],
       "status": "ok"

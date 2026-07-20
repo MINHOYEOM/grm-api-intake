@@ -120,11 +120,21 @@ class PluginContractTest(unittest.TestCase):
                 self.assertTrue(callable(module.collect_library_items))
                 self.assertTrue((CATALOG_DIR / f"{module.LIBRARY_SOURCE}.json").exists())
 
-    def test_anchor_maps_cover_every_curated_id_of_their_catalog(self):
+    def test_anchor_maps_stay_resolvable_against_their_catalog(self):
+        """앵커는 '수기 큐레이션 id 를 수집기가 재현'하기 위한 대조표다 — 앵커 값이
+        카탈로그에 전부 살아 있어야 재수집 시 중복 항목이 생기지 않는다.
+
+        역방향("카탈로그의 모든 id 가 앵커에 있다")은 단언하지 않는다: 2026-07-20 대량
+        편입 이후 카탈로그에는 수집기가 자체 규칙으로 만든 신규 항목(FDA +60·EMA +7)이
+        포함되며, 그 id 는 앵커 대상이 아니다(수집기 규칙이 결정론이라 재현된다).
+        """
         for module in (fda, ema):
             with self.subTest(module=module.__name__):
-                curated = {item["id"] for item in _catalog(module.LIBRARY_SOURCE)}
-                self.assertEqual(curated - set(module._ID_ANCHORS.values()), set())
+                catalog_ids = {item["id"] for item in _catalog(module.LIBRARY_SOURCE)}
+                anchors = set(module._ID_ANCHORS.values())
+                self.assertTrue(anchors, "앵커 표가 비어 있다")
+                self.assertEqual(anchors - catalog_ids, set(),
+                                 "앵커가 가리키는 큐레이션 id 가 카탈로그에서 사라졌다")
 
     def test_health_canada_id_rule_reproduces_every_curated_id(self):
         for item in _catalog("health_canada"):

@@ -1,0 +1,332 @@
+{
+  "items": [
+    {
+      "id": "eu-gmp-part1-ch1",
+      "code": "Part I, Chapter 1",
+      "title_en": "Pharmaceutical Quality System",
+      "doc_type": "Part I",
+      "official_url": "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch2",
+      "code": "Part I, Chapter 2",
+      "title_en": "Personnel",
+      "doc_type": "Part I",
+      "published_date": "2014-03-26",
+      "official_url": "https://health.ec.europa.eu/document/download/11f4f8e6-a6e9-4897-afe3-f21e1dc56cb8_en?filename=2014-03_chapter_2.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/11f4f8e6-a6e9-4897-afe3-f21e1dc56cb8_en?filename=2014-03_chapter_2.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch3",
+      "code": "Part I, Chapter 3",
+      "title_en": "Premises and Equipment",
+      "doc_type": "Part I",
+      "published_date": "2015-01-23",
+      "official_url": "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch4",
+      "code": "Part I, Chapter 4",
+      "title_en": "Documentation",
+      "doc_type": "Part I",
+      "official_url": "https://health.ec.europa.eu/document/download/104b3eb8-81a7-4858-9419-cb06562adb66_en?filename=chapter4_01-2011_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/104b3eb8-81a7-4858-9419-cb06562adb66_en?filename=chapter4_01-2011_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch5",
+      "code": "Part I, Chapter 5",
+      "title_en": "Production",
+      "doc_type": "Part I",
+      "published_date": "2014-08-13",
+      "official_url": "https://health.ec.europa.eu/document/download/4a1fdb4f-6f6f-49c4-b264-8056e5bbe078_en?filename=chapter_5.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/4a1fdb4f-6f6f-49c4-b264-8056e5bbe078_en?filename=chapter_5.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch6",
+      "code": "Part I, Chapter 6",
+      "title_en": "Quality Control",
+      "doc_type": "Part I",
+      "published_date": "2014-03-28",
+      "official_url": "https://health.ec.europa.eu/document/download/c74c8720-27bf-4252-808f-d65a206a90bb_en?filename=2014-11_vol4_chapter_6.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/c74c8720-27bf-4252-808f-d65a206a90bb_en?filename=2014-11_vol4_chapter_6.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch7",
+      "code": "Part I, Chapter 7",
+      "title_en": "Outsourced Activities",
+      "doc_type": "Part I",
+      "published_date": "2012-06-28",
+      "official_url": "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch8",
+      "code": "Part I, Chapter 8",
+      "title_en": "Complaints, Quality Defects and Product Recalls",
+      "doc_type": "Part I",
+      "published_date": "2014-08-13",
+      "official_url": "https://health.ec.europa.eu/document/download/b1eb2292-cb0d-4e3f-aea9-e3fe79faf6e3_en?filename=2014-08_gmp_chap8.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/b1eb2292-cb0d-4e3f-aea9-e3fe79faf6e3_en?filename=2014-08_gmp_chap8.pdf"
+    },
+    {
+      "id": "eu-gmp-part1-ch9",
+      "code": "Part I, Chapter 9",
+      "title_en": "Self Inspection",
+      "doc_type": "Part I",
+      "official_url": "https://health.ec.europa.eu/document/download/07195808-d02e-4d7a-b8f4-f84a83278b62_en?filename=cap9_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/07195808-d02e-4d7a-b8f4-f84a83278b62_en?filename=cap9_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part2-active-substances",
+      "code": "Part II",
+      "title_en": "Basic Requirements for Active Substances Used as Starting Materials",
+      "doc_type": "Part II",
+      "published_date": "2014-08-13",
+      "official_url": "https://health.ec.europa.eu/document/download/bd537ccf-9271-4230-bca1-2d8cb655fd83_en?filename=2014-08_gmp_part1.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/bd537ccf-9271-4230-bca1-2d8cb655fd83_en?filename=2014-08_gmp_part1.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-site-master-file",
+      "code": "Part III",
+      "title_en": "Explanatory Notes on the Preparation of a Site Master File",
+      "doc_type": "Part III",
+      "official_url": "https://health.ec.europa.eu/document/download/95af86f8-c82d-4ad0-85cb-27c7f56531b4_en?filename=2011_site_master_file_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/95af86f8-c82d-4ad0-85cb-27c7f56531b4_en?filename=2011_site_master_file_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-q9",
+      "code": "Part III, ICH Q9(R1)",
+      "title_en": "Quality Risk Management",
+      "doc_type": "Part III",
+      "published_date": "2023-02-03",
+      "official_url": "https://health.ec.europa.eu/document/download/d77ad692-97ae-4a5f-acfa-e853193ef6aa_en?filename=mp_ich_q9guideline-ra_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/d77ad692-97ae-4a5f-acfa-e853193ef6aa_en?filename=mp_ich_q9guideline-ra_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-q10",
+      "code": "Part III, ICH Q10",
+      "title_en": "Pharmaceutical Quality System",
+      "doc_type": "Part III",
+      "official_url": "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline",
+      "pdf_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/international-conference-harmonisation-technical-requirements-registration-pharmaceuticals-human-guideline-q10-pharmaceutical-quality-system-step-5_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-mra-batch-certificate",
+      "code": "Part III",
+      "title_en": "MRA Batch Certificate",
+      "doc_type": "Part III",
+      "published_date": "2011-06-01",
+      "official_url": "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-written-confirmation",
+      "code": "Part III",
+      "title_en": "Template for the Written Confirmation for Active Substances Exported to the European Union for Medicinal Products for Human Use",
+      "doc_type": "Part III",
+      "published_date": "2013-01-28",
+      "official_url": "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-hbel",
+      "code": "Part III",
+      "title_en": "Guideline on Setting Health Based Exposure Limits for Use in Risk Identification in the Manufacture of Different Medicinal Products in Shared Facilities",
+      "doc_type": "Part III",
+      "published_date": "2014-11-20",
+      "official_url": "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline",
+      "pdf_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-excipient-risk-assessment",
+      "code": "Part III, 2015/C 95/02",
+      "title_en": "Guidelines on the Formalised Risk Assessment for Ascertaining the Appropriate Good Manufacturing Practice for Excipients of Medicinal Products for Human Use",
+      "doc_type": "Part III",
+      "published_date": "2015-03-19",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)",
+      "pdf_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)"
+    },
+    {
+      "id": "eu-gmp-part3-imp-batch-release-template",
+      "code": "Part III",
+      "title_en": "Template for IMP Batch Release",
+      "doc_type": "Part III template",
+      "published_date": "2017-12-11",
+      "official_url": "https://health.ec.europa.eu/document/download/3b293ba6-c7f9-4a63-8121-303a18c30120_en?filename=template_imp_batch_certification.docx"
+    },
+    {
+      "id": "eu-gmp-part3-imp-handling-shipping",
+      "code": "Part III",
+      "title_en": "Guideline on the Responsibilities of the Sponsor with Regard to Handling and Shipping of Investigational Medicinal Products for Human Use in Accordance with Good Clinical Practice and Good Manufacturing Practice",
+      "doc_type": "Part III",
+      "published_date": "2022-09-14",
+      "official_url": "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf"
+    },
+    {
+      "id": "eu-gmp-part3-mah-reflection-paper",
+      "code": "Part III",
+      "title_en": "Reflection Paper on Good Manufacturing Practice and Marketing Authorisation Holders",
+      "doc_type": "Part III reflection paper",
+      "published_date": "2022-01-10",
+      "official_url": "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex1",
+      "code": "Annex 1",
+      "title_en": "Manufacture of Sterile Medicinal Products",
+      "doc_type": "Annex",
+      "published_date": "2022-08-22",
+      "official_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf"
+    },
+    {
+      "id": "eu-gmp-annex2",
+      "code": "Annex 2",
+      "title_en": "Manufacture of Biological Active Substances and Medicinal Products for Human Use",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex3",
+      "code": "Annex 3",
+      "title_en": "Manufacture of Radiopharmaceuticals",
+      "doc_type": "Annex",
+      "published_date": "2008-09-01",
+      "official_url": "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex6",
+      "code": "Annex 6",
+      "title_en": "Manufacture of Medicinal Gases",
+      "doc_type": "Annex",
+      "published_date": "2010-02-03",
+      "official_url": "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf"
+    },
+    {
+      "id": "eu-gmp-annex7",
+      "code": "Annex 7",
+      "title_en": "Manufacture of Herbal Medicinal Products",
+      "doc_type": "Annex",
+      "published_date": "2008-09-01",
+      "official_url": "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex8",
+      "code": "Annex 8",
+      "title_en": "Sampling of Starting and Packaging Materials",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/22d03c04-8512-4336-89dd-556771fca388_en?filename=anx08_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/22d03c04-8512-4336-89dd-556771fca388_en?filename=anx08_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex9",
+      "code": "Annex 9",
+      "title_en": "Manufacture of Liquids, Creams and Ointments",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex10",
+      "code": "Annex 10",
+      "title_en": "Manufacture of Pressurised Metered Dose Aerosol Preparations for Inhalation",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex11",
+      "code": "Annex 11",
+      "title_en": "Computerised Systems",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex12",
+      "code": "Annex 12",
+      "title_en": "Use of Ionising Radiation in the Manufacture of Medicinal Products",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex13",
+      "code": "Annex 13",
+      "title_en": "Detailed Commission Guideline on Good Manufacturing Practice for Investigational Medicinal Products",
+      "doc_type": "Annex",
+      "published_date": "2017-12-08",
+      "official_url": "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf"
+    },
+    {
+      "id": "eu-gmp-annex14",
+      "code": "Annex 14",
+      "title_en": "Manufacture of Products Derived from Human Blood or Human Plasma",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex15",
+      "code": "Annex 15",
+      "title_en": "Qualification and Validation",
+      "doc_type": "Annex",
+      "published_date": "2015-03-30",
+      "official_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf"
+    },
+    {
+      "id": "eu-gmp-annex16",
+      "code": "Annex 16",
+      "title_en": "Certification by a Qualified Person and Batch Release",
+      "doc_type": "Annex",
+      "published_date": "2015-10-12",
+      "official_url": "https://health.ec.europa.eu/document/download/20c41532-33d5-4635-ae80-8735d3d09fe0_en?filename=v4_an16_201510_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/20c41532-33d5-4635-ae80-8735d3d09fe0_en?filename=v4_an16_201510_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex17",
+      "code": "Annex 17",
+      "title_en": "Real Time Release Testing and Parametric Release",
+      "doc_type": "Annex",
+      "official_url": "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex19-2005",
+      "code": "Annex 19 (2005 version)",
+      "title_en": "Reference and Retention Samples",
+      "doc_type": "Annex",
+      "published_date": "2005-12-14",
+      "official_url": "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex19-2026",
+      "code": "Annex 19 (2026 revision)",
+      "title_en": "Reference and Retention Samples",
+      "doc_type": "Annex",
+      "published_date": "2026-06-23",
+      "official_url": "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf",
+      "pdf_url": "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf"
+    },
+    {
+      "id": "eu-gmp-annex21",
+      "code": "Annex 21",
+      "title_en": "Importation of Medicinal Products",
+      "doc_type": "Annex",
+      "published_date": "2022-02-16",
+      "official_url": "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en",
+      "pdf_url": "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en"
+    }
+  ]
+}

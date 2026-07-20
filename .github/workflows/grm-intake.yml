@@ -31,92 +31,113 @@ on:
         type: string
         default: ''
       enable_search:
-        description: 'Brave Search 수집 활성화 (기본: vars.ENABLE_SEARCH 또는 false)'
-        type: boolean
-        default: false
+        description: 'Brave Search 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds:
-        description: 'MFDS 수집 활성화 (기본: vars.ENABLE_MFDS 또는 true)'
-        type: boolean
-        default: true
+        description: 'MFDS 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_law:
-        description: 'MFDS 법제처 행정규칙·법령 API 수집 활성화 (기본 off)'
-        type: boolean
-        default: false
+        description: 'MFDS 법제처 행정규칙·법령 API 수집 활성화 (기본 off) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_recall:
-        description: 'MFDS 회수·판매중지 API 수집 활성화 (기본: vars.ENABLE_MFDS_RECALL 또는 true)'
-        type: boolean
-        default: true
+        description: 'MFDS 회수·판매중지 API 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_admin:
-        description: 'MFDS 행정처분 API 수집 활성화 (기본: vars.ENABLE_MFDS_ADMIN 또는 true)'
-        type: boolean
-        default: true
+        description: 'MFDS 행정처분 API 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_gmp_cert:
-        description: 'MFDS GMP 적합판정서 API 수집 활성화 (기본 off)'
-        type: boolean
-        default: false
+        description: 'MFDS GMP 적합판정서 API 수집 활성화 (기본 off) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_safety_letter:
-        description: 'MFDS 안전성서한 API 수집 활성화 (기본 off)'
-        type: boolean
-        default: false
+        description: 'MFDS 안전성서한 API 수집 활성화 (기본 off) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_mfds_gmp_inspection:
-        description: 'MFDS GMP 실태조사 결과 수집 활성화 (기본: vars.ENABLE_MFDS_GMP_INSPECTION 또는 true)'
-        type: boolean
-        default: true
+        description: 'MFDS GMP 실태조사 결과 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_gmp_deficiency_table:
-        description: 'MFDS GMP 정기실태조사 지적 표 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_GMP_DEFICIENCY_TABLE 또는 false)'
-        type: boolean
-        default: false
+        description: 'MFDS GMP 정기실태조사 지적 표 결정론 추출 → deterministic_detail 상세보기 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_ich:
-        description: 'ICH 수집 활성화 (기본: vars.ENABLE_ICH 또는 false)'
-        type: boolean
-        default: false
+        description: 'ICH 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_who:
-        description: 'WHO Prequalification 수집 활성화 (기본: vars.ENABLE_WHO 또는 false)'
-        type: boolean
-        default: false
+        description: 'WHO Prequalification 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_hc:
-        description: 'Health Canada 수집 활성화 (기본: vars.ENABLE_HC 또는 false)'
-        type: boolean
-        default: false
+        description: 'Health Canada 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_fda483:
-        description: 'FDA 483 실사 관찰사항 수집 활성화 (기본: vars.ENABLE_FDA_483 또는 true)'
-        type: boolean
-        default: true
+        description: 'FDA 483 실사 관찰사항 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_fda483_observations:
-        description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (기본: vars.ENABLE_FDA_483_OBSERVATIONS 또는 false)'
-        type: boolean
-        default: false
+        description: 'FDA 483 Observation 목록 결정론 추출 → deterministic_detail 상세보기 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       # (enable_ispe input 없음 — workflow_dispatch inputs GitHub 상한 25개 도달로 input 을
       #  두지 않는다. 수동 opt-in 은 `sources: ispe` 토큰(RunConfig `or "ispe" in active`),
       #  상시 활성은 vars.ENABLE_ISPE. 2026-07-13 dispatch 422 실측 교훈.)
       enable_moleg_api:
-        description: '법제처 ogLmPp API opt-in (기본: vars.ENABLE_MOLEG_API 또는 false)'
-        type: boolean
-        default: false
+        description: '법제처 ogLmPp API opt-in (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_scrape:
-        description: 'Web Scrape 수집 활성화 (기본: vars.ENABLE_SCRAPE 또는 false)'
-        type: boolean
-        default: false
+        description: 'Web Scrape 수집 활성화 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_whopir_excerpt:
-        description: 'WHOPIR PDF 결함 excerpt 추출 (ENABLE_WHO 전제, 기본: vars.ENABLE_WHOPIR_EXCERPT 또는 false)'
-        type: boolean
-        default: false
+        description: 'WHOPIR PDF 결함 excerpt 추출 (ENABLE_WHO 전제, 기본: vars.ENABLE_WHOPIR_EXCERPT 또는 false) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_wl_body:
-        description: 'FDA WL 편지 본문 위반 excerpt 추출 (기본: vars.ENABLE_WL_BODY 또는 false)'
-        type: boolean
-        default: false
+        description: 'FDA WL 편지 본문 위반 excerpt 추출 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_modality_tag:
-        description: '제품군(Modality) 태그 기록 — Notion에 Modality 속성 생성 후 켤 것 (기본: vars.ENABLE_MODALITY_TAG 또는 false)'
-        type: boolean
-        default: false
+        description: '제품군(Modality) 태그 기록 — Notion에 Modality 속성 생성 후 켤 것 (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_handoff_v2:
-        description: 'handoff v2 생성 (K3 — scaffold/slots)'
-        type: boolean
-        default: false
+        description: 'handoff v2 생성 (K3 — scaffold/slots) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
       enable_web_brief_emit:
-        description: '§1-B: 빈슬롯 web brief(grm-web-card/v1) 자동 산출 → artifact (ENABLE_HANDOFF_V2 전제)'
-        type: boolean
-        default: false
+        description: '§1-B: 빈슬롯 web brief(grm-web-card/v1) 자동 산출 → artifact (ENABLE_HANDOFF_V2 전제) (inherit=repo 변수 상속·기본)'
+        type: choice
+        options: ['inherit', 'true', 'false']
+        default: 'inherit'
 
 permissions:
   contents: read
@@ -136,7 +157,7 @@ jobs:
       # §1-B 영구배선: job-level 로 둬 collector(산출)와 upload 스텝(조건/경로)이 동일 값을
       # 본다(step-scoped env 는 타 스텝서 미해석 — grm-web-deploy runner.temp 버그 교훈).
       # inputs/vars/github 컨텍스트는 job-level env 에서 해석 가능(runner.* 는 불가와 구분).
-      ENABLE_WEB_BRIEF_EMIT: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_web_brief_emit) && 'true' || vars.ENABLE_WEB_BRIEF_EMIT || 'false' }}
+      ENABLE_WEB_BRIEF_EMIT: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_web_brief_emit != 'inherit') && inputs.enable_web_brief_emit || vars.ENABLE_WEB_BRIEF_EMIT || 'false' }}
       GRM_WEB_BRIEF_DIR: ${{ vars.GRM_WEB_BRIEF_DIR || '.' }}
 
     steps:
@@ -182,38 +203,55 @@ jobs:
           GRM_HANDOFF_DOC_IDS: ${{ inputs.handoff_doc_ids }}
           # github.event_name을 env로 노출 — shell 본문 ${{ }} 직접 삽입 방지 (W2)
           GRM_EVENT_NAME: ${{ github.event_name }}
-          # Phase 2a feature flags:
-          # workflow_dispatch: (event_name == 'workflow_dispatch') && format('{0}', inputs.*) 로
-          #   boolean false를 "false" 문자열(non-empty=truthy)로 변환 후 short-circuit
-          #   → 사용자가 명시적으로 false 설정 시 vars.ENABLE_* 로 override되는 버그 방지
-          # schedule: event_name != 'workflow_dispatch' → false → vars.* || 'false' fallback
-          ENABLE_SEARCH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_search) || vars.ENABLE_SEARCH || 'false' }}
-          ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds) || vars.ENABLE_MFDS || 'true' }}
-          ENABLE_MFDS_LAW: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_law) || vars.ENABLE_MFDS_LAW || 'false' }}
-          ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_recall) || vars.ENABLE_MFDS_RECALL || 'true' }}
-          ENABLE_MFDS_ADMIN: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_admin) || vars.ENABLE_MFDS_ADMIN || 'true' }}
-          ENABLE_MFDS_GMP_CERT: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_cert) || vars.ENABLE_MFDS_GMP_CERT || 'false' }}
-          ENABLE_MFDS_SAFETY_LETTER: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_safety_letter) || vars.ENABLE_MFDS_SAFETY_LETTER || 'false' }}
-          ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_mfds_gmp_inspection) || vars.ENABLE_MFDS_GMP_INSPECTION || 'true' }}
+          # Phase 2a feature flags — **3-상태 입력**(inherit/true/false) 해석. 불가침 계약 3가지:
+          #   ① 입력 미지정(inherit) dispatch = 예약 실행과 동일 = vars.ENABLE_* 상속
+          #   ② 사용자가 명시적으로 'false' 지정 = false 유지(vars 가 켜 뒀어도 덮지 않음)
+          #   ③ schedule 경로 무변경 = vars.* || 기본값
+          #
+          # 왜 boolean 을 못 쓰나(2026-07-20 실장애로 확정) — boolean 입력은 "미지정"과
+          # "명시적 false"를 구분할 수 없다. 미지정 시 선언된 default(대개 false)가 그대로
+          # 들어오기 때문이다. 그래서 옛 관용구
+          #     (event_name == 'workflow_dispatch') && format('{0}', inputs.*) || vars.* || '…'
+          # 는 format('{0}', false) = 문자열 "false" = **truthy** 라 거기서 short-circuit 되어,
+          # **입력을 아무것도 주지 않은 dispatch 가 vars 로 켜 둔 기능을 조용히 껐다**
+          # (실제 피해: 2026-07-20 수동 재실행이 ENABLE_FDA_483_OBSERVATIONS 를 false 로 뒤집어
+          #  483 관찰 추출이 통째로 빠졌다 → 그 주 스캐폴드가 못 쓰게 됐다).
+          # 2026-07-13 에 handoff v2 계열만 쓰던 대안
+          #     (event_name == 'workflow_dispatch' && inputs.*) && 'true' || vars.* || '…'
+          # 은 ①은 지키지만 **②를 깬다** — 명시적 false 가 다시 vars 로 덮인다.
+          # 두 결함을 동시에 없애려면 "미지정"을 표현할 제3의 값이 필요하다 → 'inherit'.
+          #
+          # 입력 개수는 GitHub 상한 25개에 이미 도달해 있으므로(현재 정확히 25),
+          # boolean → choice **교체**로 개수를 늘리지 않는다. 새 플래그 추가 시 input 없이
+          # vars 전용으로 두는 기존 관례(ENABLE_ISPE 등)를 따를 것.
+          # 이 관용구는 tests/test_workflow_flag_resolution.py 가 전수 스캔으로 강제한다.
+          ENABLE_SEARCH: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_search != 'inherit') && inputs.enable_search || vars.ENABLE_SEARCH || 'false' }}
+          ENABLE_MFDS: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds != 'inherit') && inputs.enable_mfds || vars.ENABLE_MFDS || 'true' }}
+          ENABLE_MFDS_LAW: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_law != 'inherit') && inputs.enable_mfds_law || vars.ENABLE_MFDS_LAW || 'false' }}
+          ENABLE_MFDS_RECALL: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_recall != 'inherit') && inputs.enable_mfds_recall || vars.ENABLE_MFDS_RECALL || 'true' }}
+          ENABLE_MFDS_ADMIN: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_admin != 'inherit') && inputs.enable_mfds_admin || vars.ENABLE_MFDS_ADMIN || 'true' }}
+          ENABLE_MFDS_GMP_CERT: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_gmp_cert != 'inherit') && inputs.enable_mfds_gmp_cert || vars.ENABLE_MFDS_GMP_CERT || 'false' }}
+          ENABLE_MFDS_SAFETY_LETTER: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_safety_letter != 'inherit') && inputs.enable_mfds_safety_letter || vars.ENABLE_MFDS_SAFETY_LETTER || 'false' }}
+          ENABLE_MFDS_GMP_INSPECTION: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_mfds_gmp_inspection != 'inherit') && inputs.enable_mfds_gmp_inspection || vars.ENABLE_MFDS_GMP_INSPECTION || 'true' }}
           # [상세보기 결정론 승격 §16] 정기실태조사 지적 표 → deterministic_detail. ENABLE_MFDS_GMP_INSPECTION 전제·기본 off(추출 실패는 graceful=요약카드 유지).
-          ENABLE_GMP_DEFICIENCY_TABLE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_gmp_deficiency_table) || vars.ENABLE_GMP_DEFICIENCY_TABLE || 'false' }}
-          ENABLE_ICH: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_ich) || vars.ENABLE_ICH || 'false' }}
-          ENABLE_WHO: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_who) || vars.ENABLE_WHO || 'false' }}
-          ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_hc) || vars.ENABLE_HC || 'false' }}
+          ENABLE_GMP_DEFICIENCY_TABLE: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_gmp_deficiency_table != 'inherit') && inputs.enable_gmp_deficiency_table || vars.ENABLE_GMP_DEFICIENCY_TABLE || 'false' }}
+          ENABLE_ICH: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_ich != 'inherit') && inputs.enable_ich || vars.ENABLE_ICH || 'false' }}
+          ENABLE_WHO: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_who != 'inherit') && inputs.enable_who || vars.ENABLE_WHO || 'false' }}
+          ENABLE_HC: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_hc != 'inherit') && inputs.enable_hc || vars.ENABLE_HC || 'false' }}
           # FDA 483 실사 관찰사항 — 현행 OII HTML/DataTables 소스로 부활. repo var 로 false override 가능.
-          ENABLE_FDA_483: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483) || vars.ENABLE_FDA_483 || 'true' }}
+          ENABLE_FDA_483: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_fda483 != 'inherit') && inputs.enable_fda483 || vars.ENABLE_FDA_483 || 'true' }}
           # FDA 483 Observation 번호 목록 결정론 상세보기. 기본 off — 실패는 graceful=요약카드 유지.
-          ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_fda483_observations) || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
+          ENABLE_FDA_483_OBSERVATIONS: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_fda483_observations != 'inherit') && inputs.enable_fda483_observations || vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           # [483 분석층] 483 전문 확보 = deep_analysis fan-out 대상. Observation 결정론과 독립·기본 off(활성=repo 변수).
           ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
           # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS 수집 — opt-in Expert Secondary.
           # input 없음(dispatch inputs 25개 상한) — 수동은 sources=ispe 토큰, 상시는 vars.
           ENABLE_ISPE: ${{ vars.ENABLE_ISPE || 'false' }}
-          ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_moleg_api) || vars.ENABLE_MOLEG_API || 'false' }}
-          ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_scrape) || vars.ENABLE_SCRAPE || 'false' }}
+          ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_moleg_api != 'inherit') && inputs.enable_moleg_api || vars.ENABLE_MOLEG_API || 'false' }}
+          ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_scrape != 'inherit') && inputs.enable_scrape || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
-          ENABLE_WHOPIR_EXCERPT: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_whopir_excerpt) || vars.ENABLE_WHOPIR_EXCERPT || 'false' }}
-          ENABLE_WL_BODY: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_wl_body) || vars.ENABLE_WL_BODY || 'false' }}
+          ENABLE_WHOPIR_EXCERPT: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_whopir_excerpt != 'inherit') && inputs.enable_whopir_excerpt || vars.ENABLE_WHOPIR_EXCERPT || 'false' }}
+          ENABLE_WL_BODY: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_wl_body != 'inherit') && inputs.enable_wl_body || vars.ENABLE_WL_BODY || 'false' }}
           # [WL 심층분석 fan-out] 편지 전문(全文) 확보 = deep_analysis 대상. ENABLE_WL_BODY(excerpt)와 독립·기본 off.
           ENABLE_WL_BODY_FULL: ${{ vars.ENABLE_WL_BODY_FULL || 'false' }}
           # [소스확장 2026-07-02] 행정처분 다단락 Body 확보 = deep_analysis(admin) 대상. WL_BODY_FULL 과 동형·기본 off(활성=repo 변수).
@@ -226,11 +264,11 @@ jobs:
           ENABLE_ISPE_ARTICLE_EXCERPT: ${{ vars.ENABLE_ISPE_ARTICLE_EXCERPT || 'false' }}
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
-          ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch') && format('{0}', inputs.enable_modality_tag) || vars.ENABLE_MODALITY_TAG || 'false' }}
+          ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_modality_tag != 'inherit') && inputs.enable_modality_tag || vars.ENABLE_MODALITY_TAG || 'false' }}
           # K3 handoff v2 (scaffold/slots). ★수동 dispatch 도 입력 미설정 시 vars 로 폴백한다
           # (2026-07-13: 수집 실패 후 수동 재실행이 입력 없이 v1 handoff 를 만들어 v16 Routine 이
           # schema v1 하드가드로 중단됐다 — schedule 은 vars=true 로 v2 인데 수동만 v1 로 갈리는 함정).
-          ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_handoff_v2) && 'true' || vars.ENABLE_HANDOFF_V2 || 'false' }}
+          ENABLE_HANDOFF_V2: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_handoff_v2 != 'inherit') && inputs.enable_handoff_v2 || vars.ENABLE_HANDOFF_V2 || 'false' }}
           # PL-10b/B1 멱등성 근본해결 (Handoff Ref 상태기계). 기본 off — schedule는 vars
           # 미설정 시 v1(날짜 윈도우+K4-1) 유지. 속성 미생성 상태로 켜도 preflight 가
           # 그 실행만 v1 폴백(graceful degrade) + health warning.

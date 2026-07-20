@@ -865,6 +865,90 @@ class ObservationTruncationTest(unittest.TestCase):
         self.assertTrue(any(lvl == "WARN" and "상한 도달" in msg for lvl, msg in logged))
 
 
+class ObservationCrossReferenceTest(unittest.TestCase):
+    """본문 속 "Please refer to Observation N" 상호참조가 표제로 오인돼 관찰이 찢기던 결함 가드.
+
+    2026-07-20 fda483-193490(실측): 관찰 1 의 하위항목 a./b./c./d. 사이에 상호참조가 섞여 있어
+    앵커가 `1,1,3,4,2,3,4` 로 잡혔다 → ① 관찰 1 이 4조각으로 분해 ② 조각의 deficiency 가 참조문
+    끝 마침표뿐인 "." ③ **번호 중복** 탓에 하류 번역 병합(number 키)이 오배치. 발행 게이트가
+    브리프 전체를 막아 그 주 발행이 멈췄다.
+    """
+    # 실측 구조를 그대로 축약(상호참조 3건이 하위항목 사이에 끼어 있음).
+    SAMPLE = (
+        "I/WE OBSERVED:\n\n"
+        "OBSERVATION 1: The responsibilities applicable to the quality control unit "
+        "are not fully followed. Specifically, your Quality Unit failed to: "
+        "a. Ensure the timely implementation of corrective actions for the settle "
+        "plates used for environmental monitoring. Please refer to\n\n"
+        "OBSERVATION 1 b. Conduct adequate root-cause analyses for the ongoing "
+        "Environmental Monitoring excursions across the classified areas. Please refer to\n\n"
+        "OBSERVATION 3 c. Investigate the root cause of visual inspection failure "
+        "during the initial full inspection of the filled syringes. Please refer to\n\n"
+        "OBSERVATION 4 d. Evaluate air flow patterns under dynamic conditions in all "
+        "ISO 5 classified cabinets in the clean room.\n\n"
+        "OBSERVATION 2: Procedures designed to prevent microbiological contamination "
+        "of drug products purporting to be sterile are not followed. Specifically, the "
+        "environmental monitoring program failed to address repeated contamination.\n\n"
+        "OBSERVATION 3: Production personnel were not practicing good sanitation and "
+        "health habits. Specifically, your firm failed to maintain adequate controls.\n\n"
+        "OBSERVATION 4: There is a failure to thoroughly review any unexplained "
+        "discrepancy. Specifically, your firm failed to document an investigation.\n\n"
+    )
+
+    def test_cross_references_do_not_split_observations(self):
+        rows = f._extract_483_observations_from_text(self.SAMPLE)
+        self.assertEqual([r["number"] for r in rows], ["1", "2", "3", "4"])
+
+    def test_numbers_are_unique(self):
+        # 중복 번호는 하류 번역 병합(number 키)을 오배치시키므로 계약으로 고정한다.
+        nums = [r["number"] for r in f._extract_483_observations_from_text(self.SAMPLE)]
+        self.assertEqual(len(nums), len(set(nums)))
+
+    def test_no_punctuation_only_deficiency(self):
+        # 찢긴 조각의 표식이던 deficiency="." 가 사라졌는지.
+        for row in f._extract_483_observations_from_text(self.SAMPLE):
+            self.assertGreater(len(re.sub(r"[^A-Za-z]", "", row["deficiency"])), 10)
+
+    def test_sub_items_stay_with_their_observation(self):
+        # 하위항목 a~d 는 관찰 1 본문에 남아야 한다(기각된 참조문과 함께 흡수).
+        rows = f._extract_483_observations_from_text(self.SAMPLE)
+        body = rows[0]["deficiency"] + " " + rows[0]["detail"]
+        for marker in ("a. Ensure", "b. Conduct", "c. Investigate", "d. Evaluate"):
+            self.assertIn(marker, body)
+
+    def test_missing_heading_degrades_by_merging_not_misattributing(self):
+        # OCR 이 표제 2 를 삼키면 이후가 앞 관찰로 흡수될 뿐, 번호를 오배치하지 않는다.
+        text = ("I/WE OBSERVED:\n\nOBSERVATION 1: First deficiency sentence here. "
+                "Body of the first observation.\n\n"
+                "OBSERVATION 3: Third deficiency sentence here. Body of the third.\n\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1"])
+
+
+class FooterGarbageMarkerTest(unittest.TestCase):
+    """서명블록이 OCR 로 완전히 파괴돼도 AMENDMENT 스탬프로 절단되는지(2026-07-20 실측 3종)."""
+    # 셋 다 193490 원문 그대로 — 앞 둘은 옛 마커가 전부 실패했다.
+    GARBAGE = (
+        "AMENDMENT 1 Et,40LOYE£ SIS G•.,-.n,,~ oi:.1e 1ssueo",
+        "AMENDMENT 1 EMPLOYEE(S, $1GNA':'UR: OATE ISSUED",
+        "AMENDMENTl EJ·.tP!.OYEE{S) Sa'.:;!l.\\'ATI..RE OA\"E SSUED",
+    )
+
+    def test_collector_cuts_all_ocr_variants(self):
+        for tail in self.GARBAGE:
+            chunk = ("The firm failed to evaluate air flow patterns under dynamic "
+                     "conditions in the clean room. " + tail)
+            cleaned = f._clean_observation_chunk(chunk)
+            self.assertNotIn("AMENDMENT", cleaned.upper(), f"미절단: {tail!r}")
+            self.assertIn("air flow patterns", cleaned)   # 본문은 보존
+
+    def test_lowercase_amendment_prose_not_cut(self):
+        # 소문자 "amendment"(규정 개정 언급)는 산문이므로 절단하지 않는다 — 오탐 가드.
+        chunk = ("Your firm did not implement the amendment to the standard operating "
+                 "procedure within the required timeframe after approval.")
+        self.assertIn("amendment", f._clean_observation_chunk(chunk))
+
+
 class TierTest(unittest.TestCase):
     def test_483_tier3(self):
         json_rows = [_json_row(8001, "483", est="Drug Manufacturer")]

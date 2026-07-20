@@ -158,6 +158,15 @@ _FDA483_FOOTER_RE = re.compile(
     r"[A-Za-z0-9.:'()$\\]{0,4}?\)"
     #   EMPLOYEE(S) / EMPLOYEE($) / EMPI..OYEE(S) / "I EMPi.OY1:E($)"(2026-07 Catalent 실측)
     #   / "EMPt..oYEECS)"(2026-07-12 Catalent 2번째 483 obs#8 실측 — 여는 괄호 소실)
+    r"|(?-i:EMP)\S{0,6}?OY"                      # 게이트(render._FOOTER_GARBAGE_RE)와 동일한
+    #   느슨한 EMP..OY 마커. 위 ①패턴은 닫는 괄호 `)` 로 끝나야 하는데 OCR 이 그 자리를 쉼표로
+    #   깨뜨리면("EMPLOYEE(S," — 2026-07-20 193490 obs#2 실측) 못 잡았다. 게이트는 잡고 수집기는
+    #   못 잡는 비대칭이 곧 "발행 직전에야 터지는 차단"이므로 수집기를 게이트 수준으로 맞춘다.
+    r"|(?-i:AMENDMENT)"                          # 483 양식 하단 개정 스탬프 — 서명블록 바로 위에
+    #   찍히며, EMP/SIGNATURE/DATE ISSUED 가 OCR 로 완전히 파괴돼도(“Et,40LOYE£ SIS G•.,-.n,,~
+    #   oi:.1e 1ssueo” / “EJ·.tP!.OYEE{S) Sa'.:;!l.\'ATI..RE OA"E SSUED” — 둘 다 실측) 이 토큰만은
+    #   살아남는 관찰이 반복됐다(2026-07-20 193490 obs#1·#4 는 기존 마커 전부 실패). 대문자 고정 —
+    #   산문의 소문자 "amendment"(규정 개정 언급)는 오탐하지 않는다.
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"                         # FORM FDA 483 / FORM FDA 4&3
     r"|PREVIOUS[\s.]*EDITION"
@@ -625,6 +634,38 @@ def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
     }
 
 
+def _select_observation_anchors(matches: list[re.Match[str]]) -> list[re.Match[str]]:
+    """`OBSERVATION N` 매치 중 **진짜 항목 표제**만 남긴다(순수 함수).
+
+    결함(2026-07-20 193490 실측): 483 본문은 다른 관찰을 상호참조한다 —
+    "...Please refer to Observation 3." 옛 코드는 이 **문장 속 상호참조**까지 표제로 보고
+    분할해, 관찰 1 하나가 4조각으로 찢어졌다. 찢긴 조각의 번호는 참조 대상 번호를 그대로
+    물려받아 `1,1,3,4,2,3,4` 처럼 **중복**되고, 조각의 첫 문장은 참조문 끝의 마침표뿐이라
+    deficiency 가 "." 가 된다. 중복 번호는 하류(inject_slots 의 번역 병합)가 number 를 키로
+    쓰기 때문에 번역 오배치까지 유발한다.
+
+    판정 규칙 — **번호가 1부터 정확히 1씩 증가할 때만 표제로 인정**한다. 483 의 관찰은 항상
+    1..N 순차 번호이므로, 순서를 벗어난 매치는 상호참조다. 위 실측에 적용하면
+    `1(채택) 1(기각) 3(기각) 4(기각) 2(채택) 3(채택) 4(채택)` → 1,2,3,4 로 정확히 복원되고,
+    기각된 참조문은 자신이 속한 관찰 본문에 그대로 남는다(a./b./c./d. 하위 항목 보존).
+
+    OCR 이 표제를 통째로 삼켜 번호가 건너뛰면(예: 2 유실) 이후 표제도 기각돼 앞 관찰에
+    흡수된다 — 항목이 합쳐질 뿐 **다른 관찰의 내용이 섞이지는 않는다**(안전한 degrade).
+    번호를 오배치해 잘못된 근거를 붙이는 쪽이 훨씬 위험하므로 이 방향을 택한다.
+    """
+    selected: list[re.Match[str]] = []
+    expected = 1
+    for m in matches:
+        try:
+            num = int(m.group(1))
+        except (TypeError, ValueError):
+            continue
+        if num == expected:
+            selected.append(m)
+            expected += 1
+    return selected
+
+
 def _extract_483_observations_from_text(
     text: str, header_hints: dict[str, str] | None = None,
 ) -> list[dict[str, str]]:
@@ -647,7 +688,7 @@ def _extract_483_observations_from_text(
     m = _WE_OBSERVED_RE.search(body)
     if m:
         body = body[m.end():]
-    matches = list(_OBS_RE.finditer(body))
+    matches = _select_observation_anchors(list(_OBS_RE.finditer(body)))
     if not matches:
         return []
 

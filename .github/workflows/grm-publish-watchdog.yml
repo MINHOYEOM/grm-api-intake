@@ -188,7 +188,7 @@ jobs:
             const deltaPath = '${{ steps.check.outputs.delta_path }}';
             const dispatchDecision = '${{ steps.decide.outputs.dispatch }}';
             const dispatchReason = `${{ steps.decide.outputs.dispatch_reason }}`;
-            const recovered = '${{ steps.recover.outputs.recovered || "n/a" }}';
+            const recovered = '${{ steps.recover.outputs.recovered || 'n/a' }}';
             const dispatchesToday = '${{ steps.check.outputs.dispatches_today }}';
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 

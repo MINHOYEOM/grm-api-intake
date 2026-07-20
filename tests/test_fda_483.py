@@ -873,18 +873,20 @@ class ObservationCrossReferenceTest(unittest.TestCase):
     끝 마침표뿐인 "." ③ **번호 중복** 탓에 하류 번역 병합(number 키)이 오배치. 발행 게이트가
     브리프 전체를 막아 그 주 발행이 멈췄다.
     """
-    # 실측 구조를 그대로 축약(상호참조 3건이 하위항목 사이에 끼어 있음).
+    # 실측 구조 그대로 축약 — 상호참조 뒤에 `: .` (참조문의 종결 마침표)만 남고 다음 줄부터
+    # 하위항목이 이어지는 형태가 핵심이다. 콜론·앞선 빈 줄은 진짜 표제와 **구별되지 않는다**.
     SAMPLE = (
         "I/WE OBSERVED:\n\n"
         "OBSERVATION 1: The responsibilities applicable to the quality control unit "
         "are not fully followed. Specifically, your Quality Unit failed to: "
         "a. Ensure the timely implementation of corrective actions for the settle "
         "plates used for environmental monitoring. Please refer to\n\n"
-        "OBSERVATION 1 b. Conduct adequate root-cause analyses for the ongoing "
-        "Environmental Monitoring excursions across the classified areas. Please refer to\n\n"
-        "OBSERVATION 3 c. Investigate the root cause of visual inspection failure "
+        "OBSERVATION 1: .\nb. Conduct adequate root-cause analyses for the ongoing "
+        "Environmental Monitoring excursions across the classified areas. Please refer to "
+        "OBSERVATlON 2 and\n\n"
+        "OBSERVATION 3: .\nc. Investigate the root cause of visual inspection failure "
         "during the initial full inspection of the filled syringes. Please refer to\n\n"
-        "OBSERVATION 4 d. Evaluate air flow patterns under dynamic conditions in all "
+        "OBSERVATION 4: .\nd. Evaluate air flow patterns under dynamic conditions in all "
         "ISO 5 classified cabinets in the clean room.\n\n"
         "OBSERVATION 2: Procedures designed to prevent microbiological contamination "
         "of drug products purporting to be sterile are not followed. Specifically, the "
@@ -916,13 +918,37 @@ class ObservationCrossReferenceTest(unittest.TestCase):
         for marker in ("a. Ensure", "b. Conduct", "c. Investigate", "d. Evaluate"):
             self.assertIn(marker, body)
 
-    def test_missing_heading_degrades_by_merging_not_misattributing(self):
-        # OCR 이 표제 2 를 삼키면 이후가 앞 관찰로 흡수될 뿐, 번호를 오배치하지 않는다.
-        text = ("I/WE OBSERVED:\n\nOBSERVATION 1: First deficiency sentence here. "
-                "Body of the first observation.\n\n"
-                "OBSERVATION 3: Third deficiency sentence here. Body of the third.\n\n")
+    def test_non_sequential_numbering_is_preserved(self):
+        """번호가 순차가 아니어도 진짜 표제는 전부 남는다 — fda483-193616 실측(원문에 1 과 3 만).
+
+        "1부터 +1 증가할 때만 표제" 규칙을 쓰면 관찰 3 이 통째로 유실된다. 상호참조는
+        번호 순서가 아니라 **뒤따르는 실질 문장의 유무**로 가려야 한다는 근거 테스트.
+        """
+        text = ("I/WE OBSERVED:\n\n"
+                "OBSERVATION 1: The phlebotomy site is not prepared by a method that "
+                "gives maximum assurance of a sterile container of blood.\n\n"
+                "OBSERVATION 3: Written standard operating procedures including all "
+                "steps to be followed in the collection of blood are not maintained.\n\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "3"])
+
+    def test_reference_phrase_rejects_even_with_substantive_text(self):
+        # 신호② 가 못 잡는 경우(참조 뒤에 실질 문장이 이어짐)는 신호①(앞선 참조 문구)이 잡는다.
+        text = ("I/WE OBSERVED:\n\n"
+                "OBSERVATION 1: The quality unit failed to follow its procedures. "
+                "The firm did not document the deviation. Please refer to "
+                "OBSERVATION 2 for the related environmental monitoring findings.\n\n")
         rows = f._extract_483_observations_from_text(text)
         self.assertEqual([r["number"] for r in rows], ["1"])
+
+    def test_ordinary_heading_without_colon_still_accepted(self):
+        # 콜론은 판별 신호가 아니다(상호참조에도 붙는다) — 콜론 없는 표제도 정상 인식.
+        text = ("I/WE OBSERVED: OBSERVATION 1 Deficiency one concerns inadequate "
+                "control of the process. Body one.\n\n"
+                "OBSERVATION 2 Deficiency two concerns inadequate cleaning "
+                "validation. Body two.\n\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
 
 
 class FooterGarbageMarkerTest(unittest.TestCase):

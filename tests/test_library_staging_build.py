@@ -6,11 +6,26 @@ import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
+from unittest import mock
 
 import library_staging_build as builder
 
 
 class LibraryStagingBuildTest(unittest.TestCase):
+    def test_collector_error_exits_before_writing_any_candidate(self):
+        with tempfile.TemporaryDirectory() as td, \
+                mock.patch.object(builder.collect_mfds, "collect_mfds", return_value=([], "down")), \
+                mock.patch.object(builder.collect_ich, "collect_ich", return_value=([], None)):
+            root = Path(td)
+            result = builder.main([
+                "--baseline-dir", str(root / "live"),
+                "--staging-dir", str(root / "staging"),
+                "--report", str(root / "diff.json"), "--swap",
+            ])
+            self.assertEqual(result, 1)
+            self.assertFalse((root / "staging").exists())
+            self.assertFalse((root / "diff.json").exists())
+
     def test_derives_only_mfds_guidance_and_notice_with_public_fields(self):
         item = {
             "document_id": "data0011-1", "headline": "품질 가이드",
@@ -187,3 +202,66 @@ class PluginBuildTest(unittest.TestCase):
                     report_path=root / "diff.json", run_date=date(2026, 7, 20),
                     ich_items=[], plugin_items={"ich": []},
                 )
+    def test_gate_blocks_deletion_and_either_change_ceiling(self):
+        report = {"collector_errors": {}, "sources": {
+            "mfds": {"baseline_count": 100, "new_count": 21, "changed_count": 0,
+                     "removed_count": 0},
+            "ich": {"baseline_count": 10, "new_count": 3, "changed_count": 1,
+                    "removed_count": 1},
+        }}
+        reasons = builder.evaluate_gates(
+            report, max_change_count=20, max_change_percent=30,
+        )
+        self.assertTrue(any("change_count=21" in reason for reason in reasons))
+        self.assertTrue(any("change_percent=40.00%" in reason for reason in reasons))
+        self.assertTrue(any("automatic deletion forbidden" in reason for reason in reasons))
+
+    def test_gate_allows_mfds_nine_of_seventy_one(self):
+        report = {"collector_errors": {}, "sources": {
+            "mfds": {"baseline_count": 71, "new_count": 9, "changed_count": 0,
+                     "removed_count": 0},
+            "ich": {"baseline_count": 31, "new_count": 0, "changed_count": 0,
+                    "removed_count": 0},
+        }}
+        self.assertEqual(builder.evaluate_gates(
+            report, max_change_count=20, max_change_percent=30,
+        ), [])
+        self.assertEqual(report["sources"]["mfds"]["change_percent"], 12.68)
+
+    def test_curation_guard_rejects_loss_overwrite_and_removed_item(self):
+        old = [{"id": "x", "code": "Q1", "title_en": "Curated",
+                "pdf_url": "https://pdf", "ko_url": "https://ko",
+                "doc_type": "guideline"}]
+        for candidate, marker in (
+            ([{"id": "x", **{k: v for k, v in old[0].items() if k != "code"}}], "code"),
+            ([{**old[0], "title_en": "Collector"}], "title_en"),
+            ([], "existing item removed"),
+        ):
+            with self.subTest(marker=marker), self.assertRaisesRegex(ValueError, marker):
+                builder.assert_curation_preserved(old, candidate, source="ich")
+
+    def test_prepare_swap_copies_candidates_and_records_review_decision(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            live, staging = root / "library", root / "staging"
+            live.mkdir(); staging.mkdir()
+            for source in ("mfds", "ich"):
+                base = {"items": [{"id": f"{source}-old", "title_en": "Old",
+                                   "official_url": "https://old"}]}
+                (live / f"{source}.json").write_text(json.dumps(base), encoding="utf-8")
+                candidate = {"items": base["items"] + [{"id": f"{source}-new",
+                    "title_en": "New", "official_url": "https://new"}]}
+                (staging / f"{source}.json").write_text(json.dumps(candidate), encoding="utf-8")
+            report_path = root / "diff.json"
+            report_path.write_text(json.dumps({"collector_errors": {}, "sources": {
+                source: {"baseline_count": 1, "candidate_count": 2, "new_count": 1,
+                         "changed_count": 0, "removed_count": 0}
+                for source in ("mfds", "ich")
+            }}), encoding="utf-8")
+            report = builder.prepare_live_swap(
+                baseline_dir=live, staging_dir=staging, report_path=report_path,
+                max_change_count=20, max_change_percent=100,
+            )
+            self.assertEqual(len(json.loads((live / "mfds.json").read_text())["items"]), 2)
+            self.assertTrue(report["live_catalog_swapped"])
+            self.assertTrue(report["gate"]["automatic_merge_allowed"])

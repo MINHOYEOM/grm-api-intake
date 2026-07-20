@@ -86,12 +86,15 @@ _WRAP = ("font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvet
 
 
 def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int,
-                 unsubscribe_html: str = "") -> dict[str, Any]:
+                 unsubscribe_html: str = "", updates_html: str = "") -> dict[str, Any]:
     """web-card/v1 브리프 1건 → 티저 메일(subject + HTML). 순수.
 
     담는 것: 제목(=tldr[0] 또는 날짜파생)·발행일·호수·tldr(verbatim)·전체보기 CTA·섹션 앵커
     링크·면책 캐논. 담지 않는 것: 카드 사실/원문 인용/카드 출처 URL(무변형·provenance).
     `unsubscribe_html` = SaaS-특정 수신거부 스니펫(어댑터가 주입; 본문 빌더는 SaaS-무관).
+    `updates_html` = 그 호에 얹을 "서비스 소식" 블록(`announce.render_weekly_block` 산출).
+    **기본값 빈 문자열 → 출력 바이트 불변**(공지 없는 주는 기존 메일과 완전히 동일). 우리
+    사이트 변화 안내를 별도 발송 없이 주간호에 태우는 경로다(2단 구성의 기본선).
     """
     bm = brief_obj["brief"]
     pub = bm.get("publish_date", "")
@@ -143,6 +146,9 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
                 'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
                 f'border-radius:9999px;padding:7px 15px;margin:0 8px 8px 0">{e(g)} →</a>')
         parts.append("</div>")
+    # 서비스 소식(선택) — 규제 소식 뒤·면책 앞. 주인공은 그 주 규제 소식이므로 뒤에 붙인다.
+    if updates_html:
+        parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).
     parts.append('<div style="border-top:1px solid #E6DFD8;margin-top:8px;padding-top:18px;'
                  'font-size:12px;line-height:1.7;color:#6C6A64">')
@@ -168,9 +174,12 @@ def idempotency_campaign_name(publish_date: str, issue_no: int) -> str:
 class GateReport:
     ok: bool
     reasons: list[str] = field(default_factory=list)   # 통과·실패 사유(사람 읽기)
+    # 어느 발송 경로의 게이트인지(로그 식별용). 공지(`announce.py`)가 같은 리포트를 재사용한다.
+    label: str = "뉴스레터"
 
     def text(self) -> str:
-        head = "[PASS] 뉴스레터 발송 게이트" if self.ok else "[FAIL] 뉴스레터 발송 게이트 — 발송 보류"
+        head = (f"[PASS] {self.label} 발송 게이트" if self.ok
+                else f"[FAIL] {self.label} 발송 게이트 — 발송 보류")
         return "\n".join([head, *(f"  · {r}" for r in self.reasons)])
 
 
@@ -242,10 +251,15 @@ def gate_linkcheck(brief_obj: dict[str, Any], *,
 
 def run_gates(brief_obj: dict[str, Any], *, expected_date: str, site_base_url: str,
               issue_no: int, checker: Callable[[str], str] | None = None,
-              run_linkcheck: bool = True) -> tuple[GateReport, dict[str, Any]]:
+              run_linkcheck: bool = True,
+              updates_html: str = "") -> tuple[GateReport, dict[str, Any]]:
     """발행검증(구조·provenance) + (선택)링크체크 게이트를 1회 실행하고 티저를 만든다.
-    반환=(GateReport, teaser). 멱등(③)·사람승인(④)은 발송 워크플로/어댑터 레이어."""
-    teaser = build_teaser(brief_obj, site_base_url=site_base_url, issue_no=issue_no)
+    반환=(GateReport, teaser). 멱등(③)·사람승인(④)은 발송 워크플로/어댑터 레이어.
+
+    `updates_html` 이 실린 호는 provenance 게이트가 그 블록의 링크까지 함께 훑는다(공지
+    블록이 외부 호스트·추적 파라미터를 들여오면 주간 발송 자체가 보류된다)."""
+    teaser = build_teaser(brief_obj, site_base_url=site_base_url, issue_no=issue_no,
+                          updates_html=updates_html)
     reasons: list[str] = []
     struct_fails = gate_publishable(brief_obj, expected_date)
     reasons.append(f"구조 검증: {'OK' if not struct_fails else 'FAIL'}")
@@ -456,9 +470,25 @@ def main(argv: "list[str] | None" = None) -> int:
         _emit_should_send(should, reason)
         return 0
 
+    # 그 호에 얹을 "서비스 소식"(있을 때만). announce 는 newsletter 를 import 하므로 여기서
+    # 지연 import 로 순환을 끊는다 — 공지가 없으면 updates_html="" → 메일 바이트 불변.
+    import announce
+    ann = announce.find_for_weekly(announce.DATA_DIR, args.publish_date)
+    updates_html = ""
+    if ann is not None:
+        ann_fails = announce.gate_schema(ann)
+        if ann_fails:                  # 깨진 공지가 주간 발송을 오염시키지 않도록 즉시 차단
+            print("[FAIL] 주간호에 얹을 공지 스키마 오류 — 발송 보류", file=sys.stderr)
+            for f in ann_fails:
+                print(f"  · {f}", file=sys.stderr)
+            return 1
+        updates_html = announce.render_weekly_block(ann, site_base_url=site_base_url)
+        print(f"서비스 소식 블록 삽입: {ann['id']} (항목 {len(ann.get('items') or [])}건)")
+
     report, teaser = run_gates(brief_obj, expected_date=args.publish_date,
                                site_base_url=site_base_url, issue_no=issue_no,
-                               run_linkcheck=not args.no_linkcheck)
+                               run_linkcheck=not args.no_linkcheck,
+                               updates_html=updates_html)
     print(report.text())
     if args.out is not None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -485,7 +515,7 @@ def main(argv: "list[str] | None" = None) -> int:
     # 발송본은 수신거부 스니펫(SaaS-특정·어댑터 책임)을 넣어 재빌드. 게이트는 정본(무-수신거부)
     # 티저로 통과했고, 수신거부 추가는 무변형/provenance 와 무관(우리 카드 URL 불변).
     teaser2 = build_teaser(brief_obj, site_base_url=site_base_url, issue_no=issue_no,
-                           unsubscribe_html=BREVO_UNSUBSCRIBE_HTML)
+                           unsubscribe_html=BREVO_UNSUBSCRIBE_HTML, updates_html=updates_html)
 
     if args.mode == "test":
         test_emails = [x for x in _env("GRM_NEWSLETTER_TEST_EMAILS").replace(";", ",").split(",")

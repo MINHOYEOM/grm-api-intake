@@ -13,10 +13,24 @@ name: GRM Publish Watchdog (routine 침묵실패 탐지)
 #   걸어두면 그 크론이 늦거나 드롭된 주엔 복구 로직이 아예 안 돈다 — 실측(2026-07-20):
 #   `0 1 * * 1`(10:00 KST 목표)이 04:28Z=13:28 KST 에 발화, **3시간 28분 지각**.
 #   정각은 GitHub 부하 피크라 큐가 늦게 풀린다(grm-intake.yml 이 `:17` 을 쓰는 것과 같은 이유).
-#   월 01:13 / 03:13 / 05:13 UTC = 10:13 / 12:13 / 14:13 KST.
+#
+#   ★ 감지 시각 앞당김(2026-07-20 2차) — 10:13 → **09:13** KST 부터.
+#   브릿지 크론이 07:07 KST 부터 30분 간격으로 도니 09:13 이면 이미 5회차가 지났고,
+#   Routine 예치(07:30)도 끝났어야 할 시각이다. 그때까지 델타가 없으면 복구를 시작하는
+#   편이 오전 안에 발행을 끝낼 확률을 높인다. 다만 이른 부재는 **Routine 예치 지연과
+#   구분되지 않으므로** 첫 회차는 복구만 하고 경보하지 않는다(publish_watchdog.
+#   DEFAULT_QUIET_BEFORE_KST_HOUR) — "일찍 고치고, 늦게 소리친다".
+#   월 00:13 / 02:13 / 04:13 UTC = 09:13 / 11:13 / 13:13 KST.
+#
+# ⚠️ 한계(과장 금지) — 이 워치독 **자신도 예약 크론**이라, 워치독 크론이 늦거나 드롭된
+#   주에는 자가 복구도 그만큼 늦거나 아예 돌지 않는다. 이 구조는 "크론 지각으로 인한
+#   미발행"을 줄일 뿐 **없애지 못한다.** 최후 수단은 사람의 한 줄:
+#     gh workflow run grm-delta-bridge.yml     (멱등 — 이미 이관됐으면 무해 skip)
+#   또한 자가 복구는 **델타 이관까지만** 한다 — 발행 게이트·Admin 승인 흐름은 불변이며
+#   자동으로 라이브까지 가지 않는다.
 on:
   schedule:
-    - cron: '13 1,3,5 * * 1'
+    - cron: '13 0,2,4 * * 1'
   workflow_dispatch: {}
 
 permissions:
@@ -37,6 +51,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      # 판정 로직(publish_watchdog.py)은 표준 라이브러리만 쓴다 — 의존성 설치 불필요.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: 발행 예정일(KST) 계산 + delta 존재 확인
         id: check
         env:
@@ -50,28 +69,64 @@ jobs:
           #   같은 판정 함수를 써야 하는데, checkout 트리는 run 시작 시점 스냅샷이라 브릿지가
           #   방금 push 한 델타를 영영 못 본다.
           if gh api "repos/${GITHUB_REPOSITORY}/contents/${DELTA}?ref=main" --silent 2>/dev/null; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
+            FOUND=true
             echo "델타 존재: $DELTA — Routine 정상 발행"
           else
-            echo "found=false" >> "$GITHUB_OUTPUT"
+            FOUND=false
             echo "::warning::델타 없음: $DELTA — 이번 주 Routine 미실행/실패 의심"
           fi
-          echo "pub_date=$PUB_DATE_KST" >> "$GITHUB_OUTPUT"
-          echo "delta_path=$DELTA" >> "$GITHUB_OUTPUT"
+
+          # 멱등 계약 ② — 발행 PR(publish/brief-{date})이 이미 있으면 조립까지 끝난 것이므로
+          # 델타 판정과 무관하게 기동하지 않는다(브랜치 존재로 본다 — PR 이 닫혔다 열렸다
+          # 하는 상태 변화에 흔들리지 않게).
+          PUB_BRANCH="publish/brief-${PUB_DATE_KST}"
+          if gh api "repos/${GITHUB_REPOSITORY}/branches/${PUB_BRANCH}" --silent 2>/dev/null; then
+            PR_EXISTS=true
+            echo "발행 브랜치 존재: $PUB_BRANCH — 조립 완료"
+          else
+            PR_EXISTS=false
+          fi
+
+          # 유한 계약 — 오늘(UTC) 브릿지가 workflow_dispatch 로 몇 번 돌았는지 센다.
+          # 사람이 손으로 돌린 것도 함께 세므로 사람·워치독이 겹쳐 때리는 경우도 상한에 걸린다.
+          TODAY_UTC=$(date -u '+%Y-%m-%d')
+          N=$(gh run list -R "${GITHUB_REPOSITORY}" --workflow grm-delta-bridge.yml \
+                --event workflow_dispatch --limit 30 --json createdAt \
+                --jq "[.[] | select(.createdAt | startswith(\"$TODAY_UTC\"))] | length" 2>/dev/null || echo 0)
+          echo "오늘 브릿지 dispatch 횟수: $N"
+
+          KST_HOUR=$(TZ='Asia/Seoul' date '+%-H')
+          {
+            echo "found=$FOUND"
+            echo "pr_exists=$PR_EXISTS"
+            echo "dispatches_today=$N"
+            echo "kst_hour=$KST_HOUR"
+            echo "pub_date=$PUB_DATE_KST"
+            echo "delta_path=$DELTA"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 기동 판정(멱등·상한) — publish_watchdog.decide_dispatch
+        id: decide
+        run: |
+          set -euo pipefail
+          ARGS=(dispatch --dispatches-today "${{ steps.check.outputs.dispatches_today }}")
+          [ "${{ steps.check.outputs.found }}"     = "true" ] && ARGS+=(--delta-exists)      || true
+          [ "${{ steps.check.outputs.pr_exists }}" = "true" ] && ARGS+=(--publish-pr-exists) || true
+          python publish_watchdog.py "${ARGS[@]}" | tee -a "$GITHUB_OUTPUT"
 
       - name: 자가 복구 — 델타 브릿지 직접 기동 후 재확인
         id: recover
-        if: steps.check.outputs.found == 'false'
+        if: steps.decide.outputs.dispatch == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           DELTA: ${{ steps.check.outputs.delta_path }}
         run: |
           set -euo pipefail
-          # 델타 부재의 가장 흔한 원인은 Routine 실패가 아니라 **브릿지 크론 미발화**다
-          # (2026-07-20 실측: 월요일 크론 3개 전부 유실). 그렇다면 브릿지를 그냥 돌리면
-          # 복구된다 — Notion 의 OPEN 델타는 그대로 남아 있기 때문. 예치 자체가 없으면
-          # 브릿지가 무해 skip 하고 아래 재확인이 실패해 기존 경보 경로로 넘어간다.
-          echo "브릿지 기동 시도 — $DELTA 부재"
+          # 델타 부재의 가장 흔한 원인은 Routine 실패가 아니라 **브릿지 크론 지각**이다
+          # (2026-07-20 실측: 목표 09:30 KST 크론이 13:12 KST 에 발화). 그렇다면 브릿지를
+          # 그냥 돌리면 복구된다 — Notion 의 OPEN 델타는 그대로 남아 있기 때문. 예치 자체가
+          # 없으면 브릿지가 무해 skip 하고 아래 재확인이 실패해 경보 경로로 넘어간다.
+          echo "브릿지 기동 시도 — $DELTA 부재 · 사유: ${{ steps.decide.outputs.dispatch_reason }}"
           if ! gh workflow run grm-delta-bridge.yml --ref main; then
             echo "::warning::브릿지 dispatch 실패 — 경보로 전환"
             echo "recovered=false" >> "$GITHUB_OUTPUT"
@@ -89,8 +144,40 @@ jobs:
           echo "::warning::브릿지 기동했으나 10분 내 델타 미확인 — 경보로 전환"
           echo "recovered=false" >> "$GITHUB_OUTPUT"
 
+      - name: 경보 판정 — publish_watchdog.decide_escalate
+        id: alarm
+        run: |
+          set -euo pipefail
+          ARGS=(escalate --kst-hour "${{ steps.check.outputs.kst_hour }}")
+          [ "${{ steps.check.outputs.found }}"       = "true" ] && ARGS+=(--delta-exists)      || true
+          [ "${{ steps.check.outputs.pr_exists }}"   = "true" ] && ARGS+=(--publish-pr-exists) || true
+          [ "${{ steps.recover.outputs.recovered }}" = "true" ] && ARGS+=(--recovered)         || true
+          python publish_watchdog.py "${ARGS[@]}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: 실행 요약(step summary) — 조용한 복구 방지
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "## 발행 워치독 — ${{ steps.check.outputs.pub_date }} (${{ steps.check.outputs.kst_hour }}시 KST)"
+            echo ""
+            echo "| 항목 | 값 |"
+            echo "|---|---|"
+            echo "| 델타 존재 | \`${{ steps.check.outputs.found }}\` (${{ steps.check.outputs.delta_path }}) |"
+            echo "| 발행 브랜치 존재 | \`${{ steps.check.outputs.pr_exists }}\` |"
+            echo "| 오늘 브릿지 dispatch | ${{ steps.check.outputs.dispatches_today }}회 |"
+            echo "| **복구 기동** | \`${{ steps.decide.outputs.dispatch }}\` — ${{ steps.decide.outputs.dispatch_reason }} |"
+            echo "| 복구 결과 | \`${{ steps.recover.outputs.recovered || 'n/a' }}\` |"
+            echo "| **경보** | \`${{ steps.alarm.outputs.escalate }}\` — ${{ steps.alarm.outputs.escalate_reason }} |"
+            echo ""
+            if [ "${{ steps.recover.outputs.recovered }}" = "true" ]; then
+              echo "> ⚙️ **자가 복구가 실제로 작동했습니다.** 델타가 제때 없었다는 뜻이므로,"
+              echo "> 브릿지 크론 지각이 반복되는지 확인하세요(경보는 내지 않았습니다)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: 운영 경고 이슈 생성/갱신(자가 복구까지 실패했을 때만)
-        if: steps.check.outputs.found == 'false' && steps.recover.outputs.recovered != 'true'
+        if: steps.alarm.outputs.escalate == 'true'
         uses: actions/github-script@v9.0.0
         with:
           script: |
@@ -99,6 +186,10 @@ jobs:
             const title = 'GRM Intake 운영 경고';
             const pubDate = '${{ steps.check.outputs.pub_date }}';
             const deltaPath = '${{ steps.check.outputs.delta_path }}';
+            const dispatchDecision = '${{ steps.decide.outputs.dispatch }}';
+            const dispatchReason = `${{ steps.decide.outputs.dispatch_reason }}`;
+            const recovered = '${{ steps.recover.outputs.recovered || 'n/a' }}';
+            const dispatchesToday = '${{ steps.check.outputs.dispatches_today }}';
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
             async function ensureLabel(name, color, description) {
@@ -130,12 +221,19 @@ jobs:
               `- Health status: warning`,
               '',
               '현재 경고:',
-              `- [PUBLISH-WATCHDOG] routine: 발행 예정일 ${pubDate} 기준 ${deltaPath} 없음 — **자가 복구(델타 브릿지 직접 기동)까지 시도했으나 10분 내 델타가 확보되지 않았습니다.**`,
+              `- [PUBLISH-WATCHDOG] routine: 발행 예정일 ${pubDate} 기준 ${deltaPath} 없음.`,
               '',
-              '자가 복구가 실패했다는 것은 크론 미발화가 아니라 **Notion 에 OPEN 델타 자체가 없다**는 뜻일 가능성이 높습니다(브릿지는 예치가 있으면 기동만으로 복구된다). 다음을 확인하세요:',
+              '**자가 복구 시도 내역**(이 워치독이 스스로 한 일):',
+              `- 복구 기동: \`${dispatchDecision}\` — ${dispatchReason}`,
+              `- 복구 결과: \`${recovered}\` (기동 시 원격 main 을 최대 10분 폴링해 재확인)`,
+              `- 오늘 브릿지 dispatch 누적: ${dispatchesToday}회 (상한 도달 시 추가 기동을 중단합니다)`,
+              '',
+              '복구까지 실패했다면 크론 지각이 아니라 **Notion 에 OPEN 델타 자체가 없다**는 뜻일 가능성이 높습니다(브릿지는 예치가 있으면 기동만으로 복구된다). 다음을 확인하세요:',
               '- Claude Routine(월 07:30 KST 예약 에이전트) 실행 여부 · MCP 연결 상태',
               '- Notion Intake DB 에 `OPEN GRM Web Delta` 페이지가 예치됐는지(Status=New)',
               '- 델타 브릿지 run 로그 — 예치가 있는데도 실패했다면 그쪽이 원인입니다',
+              '',
+              '사람 복구(멱등 — 이미 이관됐으면 무해 skip): `gh workflow run grm-delta-bridge.yml`',
               '',
               `<!-- grm-warn-sig: ${sig} -->`,
             ].join('\n');

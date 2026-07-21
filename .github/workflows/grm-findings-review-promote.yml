@@ -1,0 +1,104 @@
+name: GRM Findings Review Promote
+
+# [FIND-1 P2 · 2026-07-21 RCA 원인 C] 검수 자동승격 — needs_review→accepted 승격 경로.
+# findings_review_promote_service.py 가 PostgREST 서버측 필터로 scope_status='ok' AND
+# review_status='needs_review' AND source∈(FDA Warning Letter, FDA 483) 행만 가져와,
+# 순수 결정론 신호(저장 cfr_refs 조항 인용 AND finding_text 위반/조건 신호 AND 길이≥60)로
+# 고신뢰 지적만 accepted 로 PATCH 한다. 그 외는 needs_review 유지(애매하면 유지). LLM 0.
+# 라이브 3,144 accepted WL 대조에서 이 규칙 만족하는 rejected 는 0건(정밀도 검증됨).
+#
+# ★핵심 제약: git 쓰기 전무(checkout read-only). review_status **만** PATCH 하고 가드
+# review_status=eq.needs_review 로 멱등·경합 안전. schedule 실행은 apply(자동 승격),
+# dispatch 는 dry_run 기본 true(수동 점검). SUPABASE_SERVICE_ROLE_KEY 기존 secret 재사용.
+on:
+  schedule:
+    # 매일 20:30 UTC = 05:30 KST. 백로그 모니터(21:00 UTC)보다 먼저 돌려 승격 결과가 그날
+    # 모니터에 반영되게 한다. 신규 needs_review 를 ~1일 내 자동 승격(SLA).
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true=승격/반려 예정 건수만(PATCH 없음), false=실제 PATCH. schedule 은 항상 apply."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      enable_reject:
+        description: "명백한 오추출(조항·신호 전무 + 초단문)을 rejected 로도 반려(기본 false — 보수적)."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      limit:
+        description: "PATCH 를 적용할 최대 건수(비우면 전체). dry_run=false 일 때만 의미 있음."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-review-promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Promote high-confidence needs_review → accepted
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 읽기(needs_review WL/483 GET) + PATCH(review_status 만) — git add/commit/push 없음.
+      # schedule 이벤트는 inputs 가 비어 apply 로 실행된다(신규 needs_review 자동 승격).
+      # dispatch 는 dry_run 기본 true(사람이 false 로 명시할 때만 실제 PATCH).
+      - name: Promote review status (no git writes — read + review_status PATCH only)
+        id: promote
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--output review_promote_report.json"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.enable_reject }}" = "true" ]; then
+            ARGS="$ARGS --enable-reject"
+          fi
+          if [ -n "${{ inputs.limit }}" ]; then
+            ARGS="$ARGS --limit ${{ inputs.limit }}"
+          fi
+          python findings_review_promote_service.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Review Promote"
+            echo ""
+            echo "dry_run=${{ inputs.dry_run }} enable_reject=${{ inputs.enable_reject }} limit=${{ inputs.limit }}"
+            echo ""
+            if [ -f review_promote_report.json ]; then
+              echo '```json'
+              cat review_promote_report.json
+              echo '```'
+            else
+              echo "review_promote_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

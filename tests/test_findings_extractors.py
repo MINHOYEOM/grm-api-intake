@@ -321,6 +321,73 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["finding_text"], body)  # 산문 소문자 conclusion 보존
         self.assertIn("21 CFR 211.22", findings[0]["cfr_refs"])  # 잘리지 않아 조항 살아있음
 
+    def test_wl_block_is_regulatory_signal_gate(self) -> None:
+        # [FIND-1 P1 A-S1] 품질 게이트 헬퍼 직접 검증. 제품 라벨 사용법·2인칭 명령형 인용은
+        # 조항도 위반 문형도 없어 False(드랍), 실제 위반/조항 신호는 True(유지).
+        for label_quote in (
+            "Use thick amount of the cream on the treatment area.",  # SeeNext 실측
+            "Allow to absorb for 5-10 minutes.",
+            "Use plastic wrap to cover the area overnight.",
+            "Massage gently until fully absorbed.",
+        ):
+            self.assertFalse(
+                extractors._wl_block_is_regulatory(label_quote),
+                f"라벨 인용이 규제 신호로 오판정됨: {label_quote!r}",
+            )
+        for regulatory in (
+            "Your firm failed to establish written procedures.",   # 위반 문형
+            "These products are unapproved new drugs and misbranded.",
+            "The drug products were not validated for sterility.",
+            "See 21 CFR 211.22 for the quality unit's responsibilities.",  # 조항 인용만
+            "Your firm did not investigate the deviation.",
+            # GMP 환경/시설 조건 신호(문형 없이 상태만 서술 — 라이브 accepted WL 실측 패턴)
+            "An operator blocked first air by placing gloved hands over open containers.",
+            "Your aseptic processing areas had difficult to clean and visibly dirty surfaces.",
+            "Vermin were observed in an area immediately adjacent to the production area.",
+            "One of your ISO 5 classified areas contained HEPA filters that were stained.",
+            "Production areas and equipment were visibly dirty.",
+        ):
+            self.assertTrue(
+                extractors._wl_block_is_regulatory(regulatory),
+                f"규제 신호가 누락 판정됨: {regulatory!r}",
+            )
+
+    def test_warning_letter_label_instruction_block_is_dropped(self) -> None:
+        # [FIND-1 P1 A-S1] 번호 리스트에 실제 위반(조항+문형)과 제품 라벨 사용법 인용이 섞이면
+        # 라벨 인용 블록만 드랍되고 실제 위반은 그대로 남는다("Use thick amount..." = SeeNext
+        # 실측 오추출 패턴). 문서가 전부 사라지지 않는다.
+        body = (
+            "During our inspection, our investigators observed the following. "
+            "1. Your firm failed to establish written procedures for cleaning and "
+            "maintenance of equipment (21 CFR 211.67). Residue was observed on shared "
+            "equipment surfaces. "
+            "2. Use thick amount of the cream on the treatment area and allow to absorb."
+        )
+
+        findings = self._wl_findings({"wl_body_excerpt": body, "wl_body_full": ""})
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertTrue(findings[0]["finding_text"].startswith("Your firm failed to establish"))
+        self.assertEqual(findings[0]["cfr_refs"], ["21 CFR 211.67"])
+        self.assertNotIn("thick amount", findings[0]["finding_text"])  # 라벨 인용 드랍
+
+    def test_warning_letter_all_label_blocks_degrade_to_document_fallback(self) -> None:
+        # [FIND-1 P1 A-S1] 분해된 블록이 전부 신호 없는 라벨 인용이면(유효 위반 0) 통짜 1건
+        # 폴백으로 되돌아간다 — 정당 문서를 통째로 잃지 않는 안전망(회귀 0 우선). 이 통짜는
+        # needs_review 로 남아 P2 자동승격에서 신호 부재로 accepted 되지 않는다.
+        body = (
+            "Product application guidance. 1. Use thick amount of the cream on the "
+            "affected area. 2. Allow to absorb for five to ten minutes before dressing."
+        )
+
+        findings = self._wl_findings({"wl_body_excerpt": body, "wl_body_full": ""})
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertEqual(findings[0]["finding_text"], body)  # 통짜 폴백(전체 본문 보존)
+        self.assertEqual(findings[0]["review_status"], "needs_review")
+
     def test_extract_us_legal_refs_covers_cfr_usc_and_fdc_sections(self) -> None:
         # [FIND-1 M11] 21 CFR(범위 전개 포함) / 21 U.S.C.(§ 유무) / FD&C section(콤마+and 목록
         # 전개) 3계열을 모두 잡고 정규화·dedup 한다.

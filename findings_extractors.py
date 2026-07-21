@@ -369,10 +369,17 @@ def _from_warning_letter(
 
     body = _cut_wl_footer(text) or text
     raw_blocks = _split_wl_violation_blocks(body)
-    payload = [parts for parts in (_wl_block_parts(block) for block in raw_blocks) if parts]
+    parts = [parts for parts in (_wl_block_parts(block) for block in raw_blocks) if parts]
+    # [FIND-1 P1 A-S1] 품질 게이트 — 규제 지적 신호(조항 인용 or 위반 문형)가 있는 블록만
+    # 방출한다. 화장품/OTC WL 이 인용한 제품 라벨 사용법·2인칭 명령형 지시문은 신호가 없어
+    # 여기서 드랍된다(scope_status='ok' 오추출 유입 차단). 정당 위반 블록은 조항/문형을
+    # 거의 항상 가지므로 통과한다.
+    payload = [part for part in parts if _wl_block_is_regulatory(part[0])]
     if not payload:
         # degrade -- 앵커(번호/헤딩)가 없거나 유효 블록이 하나도 안 남으면 현행 동작 그대로
-        # 통짜 1건(길이 상한도 적용하지 않는다 -- 회귀 0 이 우선).
+        # 통짜 1건(길이 상한도 적용하지 않는다 -- 회귀 0 이 우선). 문서 단위로 유효 위반이
+        # 하나도 안 남는 경우의 안전망: 정당 위반을 통째로 잃지 않는다(needs_review 로 남아
+        # 검수/승격 대상이 되고, 신호 없는 통짜는 P2 자동승격에서 accepted 되지 않는다).
         payload = [(body, body)]
 
     evidence_url = _evidence_url(raw_signal, raw, "url", "source_url")
@@ -427,6 +434,57 @@ _WL_HEADING_RE = re.compile(r"((?:[A-Z][A-Za-z]*\s+){2,5}Violations)(?=\s+[A-Z])
 
 _WL_BLOCK_CHAR_CAP = 480
 _WL_FRAGMENT_MIN_CHARS = 40
+
+# [FIND-1 P1 A-S1 · 2026-07-21 RCA 원인 A] WL 블록 품질 게이트의 "규제 지적 신호". 화장품/OTC WL 이
+# 본문에 인용하는 **제품 라벨 사용법·2인칭 명령형 지시문**("Use thick amount of the cream on the
+# treatment area." · "Allow to absorb for 5-10 minutes." 등, SeeNext Venture 실측)은 조항 인용도,
+# 아래 문형/조건 신호도 갖지 않아 finding 으로 방출되지 않는다(_wl_block_is_regulatory 에서 조항
+# 인용과 OR 로 묶인다). 게이트는 "블록을 살릴지"를 permissive 하게 판정한다 — 신호를 놓쳐도(false
+# negative) 문서 단위 통짜 폴백이 받으므로 정당 위반이 통째로 사라지지 않는다(회귀 0 우선).
+#
+# ★교정(라이브 3,144 accepted WL 대조): 두 그룹으로 나눈다.
+#   (1) 위반 서술 문형("failed to"/"misbranded"/"your firm"…),
+#   (2) GMP 환경/시설 조건 신호 — 무균·청정 관찰형 위반은 위 문형 없이 상태만 서술한다("aseptic
+#       areas had visibly dirty surfaces" · "operator blocked first air" · "vermin were observed").
+#   (2) 없이 (1)만 두면 이 조건형 위반 ~26건을 놓쳐 드랍한다. (2)를 더하면 accepted WL 의
+#   99.9%가 신호를 갖고(2건만 경계형 미스), 화장품 라벨 어휘는 (1)(2) 어디에도 없어 판별력이
+#   오히려 는다. re.I 로 대소문자 무관.
+_WL_VIOLATION_SIGNAL_RE = re.compile(
+    # (1) 위반 서술 문형
+    r"fail(?:ed|s|ure)\b"
+    r"|\b(?:did|does|do|was|were|is|are|has|have|had)\s+not\b"
+    r"|\bnot\s+(?:be\s+)?(?:establish|validat|maintain|clean|document|adequate|"
+    r"qualif|verif|approv|conduct|perform|in\s+compliance)"
+    r"|adulterat|misbrand|\bviolat|unapproved|deviat|inadequate|contaminat"
+    r"|\byour\s+(?:firm|response|quality|written|drug|product)"
+    r"|\bC?GMP\b|current\s+good\s+manufacturing"
+    r"|\b(?:we|fda|investigators?)\s+(?:observed|identified|documented|noted|found)"
+    r"|inspection\s+(?:revealed|found|documented|identified)"
+    r"|\b(?:is|are)\s+required\b|\brequired\s+to\b"
+    r"|\black(?:ed|ing|s)?\s+of\b|\bnot\s+in\s+compliance\b|noncompliance"
+    # (2) GMP 환경/시설 조건 신호 (무균/청정 관찰형 위반)
+    r"|\bobserved\b|visibly\s+dirty|difficult\s+to\s+clean|particle[-\s]?generating"
+    r"|\baseptic\b|\bsterile\b|\bnon-?sterile\b|\bfirst\s+air\b|\bclean[-\s]?room\b"
+    r"|\bHEPA\b|\bISO[\s-]*(?:classified|\d)|\bvermin\b"
+    r"|\bforeign\s+(?:matter|substance|material)|\bresidues?\b|\bdebris\b|\brust"
+    r"|\bexposed\s+(?:skin|hair)",
+    re.I,
+)
+
+
+def wl_violation_signal_present(text: str) -> bool:
+    """text 에 WL 위반 서술/조건 신호(_WL_VIOLATION_SIGNAL_RE)가 있는지. A-S1 드랍 게이트와
+    P2 검수 자동승격 서비스(findings_review_promote_service)가 **동일 신호 원천**을 공유하도록
+    공개한다 — 승격은 저장 cfr_refs(조항 신호) AND 이 함수(위반 신호)로 판정한다(둘 다 있을 때만
+    고신뢰). 조항 신호는 저장 열을 쓰므로 여기서 재추출하지 않는다."""
+    return bool(_WL_VIOLATION_SIGNAL_RE.search(text or ""))
+
+
+def _wl_block_is_regulatory(full_block: str) -> bool:
+    """블록이 규제 지적 신호(21 CFR/U.S.C/FD&C 조항 인용 **또는** 위반 서술 문형)를 하나라도
+    갖는지. 둘 다 없으면 인용된 제품 라벨 사용법·실질 없는 파편으로 보고 방출하지 않는다(A-S1).
+    조항 추출은 방출 경로가 이미 계산하는 _extract_us_legal_refs 를 그대로 재사용한다."""
+    return bool(_extract_us_legal_refs(full_block)) or wl_violation_signal_present(full_block)
 
 
 def _cut_wl_footer(text: str) -> str:

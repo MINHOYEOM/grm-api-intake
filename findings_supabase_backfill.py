@@ -79,11 +79,17 @@ def _get_page(
     offset: int,
     limit: int,
     order: str | None = None,
+    extra_params: dict[str, str] | None = None,
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
 ) -> tuple[int, list[dict[str, Any]] | None, dict[str, Any], str]:
     """GET one page of a PostgREST resource with the service-role key,
     paginated via the Range/Range-Unit headers (not limit/offset query
     params) so callers can read past PostgREST's default 1000-row cap.
+
+    extra_params (optional) are added to the query string as-is -- callers use
+    it for PostgREST row filters (e.g. {"review_status": "eq.needs_review"}),
+    which compose with count=exact so Content-Range reports the *filtered*
+    total. select/order are reserved (extra_params must not override them).
 
     Returns (status_code, rows_or_None, response_headers, error_summary).
     error_summary is "" on 2xx, else "timeout", an exception type name, or
@@ -101,7 +107,8 @@ def _get_page(
         "Range": f"{offset}-{offset + limit - 1}",
         "Prefer": "count=exact",
     }
-    params: dict[str, str] = {"select": select}
+    params: dict[str, str] = dict(extra_params or {})
+    params["select"] = select
     if order:
         params["order"] = order
 
@@ -140,8 +147,13 @@ def _fetch_all_pages(
     select: str,
     page_size: int,
     order: str | None = None,
+    extra_params: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     """Page through a PostgREST resource to completion via Range headers.
+
+    extra_params (optional) are PostgREST row filters applied to every page
+    (see _get_page); Content-Range then reports the filtered total so
+    pagination terminates on the filtered set.
 
     Raises RuntimeError (never the service key) if any page fails after
     retries. Stops when Content-Range reports the exact total has been
@@ -153,7 +165,8 @@ def _fetch_all_pages(
     total: int | None = None
     while True:
         _status, page_rows, headers, err = _get_page(
-            base_url, service_key, table, select=select, offset=offset, limit=page_size, order=order,
+            base_url, service_key, table, select=select, offset=offset,
+            limit=page_size, order=order, extra_params=extra_params,
         )
         if err:
             raise RuntimeError(f"findings_supabase_backfill: GET {table} failed ({err})")

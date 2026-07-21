@@ -1952,6 +1952,10 @@
   // (검색·필터가 반영된 값이 필요하다) 여기서 파생시키면 두 진실이 생긴다. 이 노트가
   // findings_search 로 대체되지 않는 이유는 딱 하나 — 비공개분을 포함한 전량(raw_signals
   // 총계 등 findings 밖 정보)은 공개 게이트를 통과하는 findings_search 로는 볼 수 없다.
+  // 커버리지 배너 지연 사유 분기 임계 — 격차가 이보다 크면 "다음 날 공개"(일일 유입 가정)
+  // 대신 "과거 자료를 순차 공개 중"(대량 백필은 하루로 소진되지 않음). 정상 일일 유입은 소량.
+  var _COVERAGE_BACKLOG_GAP = 50;
+
   function fetchCoverageNote() {
     if (!coverageNoteEl || !coverageTextEl) return;
     fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
@@ -1974,13 +1978,19 @@
         // [완역 자동 전환] 미번역 잔량이 5건 이하면(번역 3레인 소진 시점 — 잔여는 OCR
         // 완파손 등 번역 불능 원문뿐) 미완료 문안을 완료형으로 스스로 전환한다 — 완역
         // 도달에 맞춘 별도 배포가 필요 없도록 조건을 미리 심어둔 것.
-        var isComplete =
-          Number(totals.findings || 0) > 0 &&
-          Number(totals.findings || 0) - Number(totals.public_findings || 0) <= 5;
-        // 미완료 분기는 2026-07-15 백로그 완역 이후엔 당일 수집분이 다음 날 아침 번역
-        // 배치를 기다리는 짧은 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이
-        // 번역 중"으로 읽히도록 지연 사유를 덧붙인다("N건 중 M건 국문 열람 가능" 골격과
-        // 완역 자동 전환(isComplete) 분기 자체는 그대로 유지).
+        var gap = Math.max(
+          0,
+          Number(totals.findings || 0) - Number(totals.public_findings || 0)
+        );
+        var isComplete = Number(totals.findings || 0) > 0 && gap <= 5;
+        // 미완료 지연 사유는 격차 규모에 따라 정직하게 분기한다. 소량(일일 유입 규모)이면
+        // 당일 수집분이 다음 날 아침 번역 배치를 기다리는 짧은 구간이라 "다음 날 공개"가
+        // 사실이지만, 대량 백필(수백~수천)은 하루로 소진되지 않으므로 "다음 날"이 실태와
+        // 어긋난다 — 그때는 "과거 자료를 순차 공개 중"으로 정직하게 알린다. 어느 쪽도 미공개
+        // 원문 내용을 단정하지 않는다(VALUE_UNKNOWN 규율 — 사유만, 원문 단정 없음).
+        var pendingNote = gap > _COVERAGE_BACKLOG_GAP
+          ? " — 과거 수집분을 국문으로 순차 공개하고 있습니다."
+          : " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
         coverageTextEl.textContent = isComplete
           ? (hasDocs
               ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
@@ -1990,7 +2000,7 @@
               ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
                 total + "건 중 " + pub + "건 국문 열람 가능"
               : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능") +
-            " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
+            pendingNote;
         coverageNoteEl.hidden = false;
       })
       .catch(function () {

@@ -1,0 +1,174 @@
+name: GRM Findings Backlog Monitor
+
+# [FIND-1 P0 · 2026-07-21 RCA 원인 B-2/C-3] 미번역 격차·검수 백로그 임계 감시.
+# findings_backlog_monitor.py 가 라이브 public.findings_stats() RPC 를 한 번 읽어
+# untranslated_gap(findings−public_findings)·needs_review 백로그를 산출하고 임계를 넘으면
+# exit 1(red). 임계 초과 시 이 워크플로가 운영 이슈를 열거나 갱신하고(label: findings-backlog),
+# 정상 복귀 시 자동으로 닫는다 — 대량 백필이 조용히 쌓여도 다음 스파이크는 알림으로 포착된다.
+#
+# ★읽기 전용: findings 를 write 하지 않고 git 도 건드리지 않는다(checkout read-only). RPC 는
+# 카운트·서지 메타만 반환한다(025 안전 계약). SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml 등이
+# 이미 쓰는 동일 secret 재사용 — 신규 secret 등록 불필요.
+on:
+  schedule:
+    # 매일 21:00 UTC = 06:00 KST. 야간 수집(18:17 UTC)·번역 적용이 끝난 뒤 하루 상태를 본다.
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+    inputs:
+      gap_threshold:
+        description: '미번역 격차 임계(초과 시 알림). 비우면 기본 300.'
+        required: false
+        default: ''
+      needs_review_threshold:
+        description: 'needs_review 백로그 임계(초과 시 알림). 비우면 기본 300.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write        # 백로그 임계 초과 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-backlog-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: Monitor translation gap + review backlog
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 임계 초과(exit 1)는 job 하드 실패가 아니라 이슈로 처리한다 — outcome 을 뒤에서 분기.
+      - name: Read backlog stats (read-only)
+        id: monitor
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--output backlog_report.json"
+          if [ -n "${{ inputs.gap_threshold }}" ]; then
+            ARGS="$ARGS --gap-threshold ${{ inputs.gap_threshold }}"
+          fi
+          if [ -n "${{ inputs.needs_review_threshold }}" ]; then
+            ARGS="$ARGS --needs-review-threshold ${{ inputs.needs_review_threshold }}"
+          fi
+          python findings_backlog_monitor.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Backlog Monitor"
+            echo ""
+            if [ -f backlog_report.json ]; then
+              echo '```json'
+              cat backlog_report.json
+              echo '```'
+            else
+              echo "backlog_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update backlog issue
+        if: steps.monitor.outcome == 'failure'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('backlog_report.json', 'utf8')); }
+            catch (e) { report = { status: 'error', errors: ['backlog_report.json 파싱 실패'] }; }
+
+            const title = '[findings-backlog] 번역/검수 백로그가 임계를 초과했습니다';
+            const label = 'findings-backlog';
+
+            const lines = [];
+            if ((report.errors || []).length) {
+              lines.push('**모니터 오류** — 이번 실행은 지표를 읽지 못했습니다:');
+              for (const e of report.errors) lines.push(`- ${e}`);
+            } else {
+              lines.push(`- 미번역 격차(untranslated_gap): **${report.untranslated_gap}** (임계 ${report.thresholds?.gap})`);
+              lines.push(`- 검수 대기(needs_review): **${report.needs_review}** (임계 ${report.thresholds?.needs_review})`);
+              lines.push(`- 반려(rejected): ${report.rejected}`);
+              lines.push(`- findings(scope ok): ${report.totals?.findings} · 공개(public_findings): ${report.totals?.public_findings}`);
+              lines.push('');
+              lines.push('**임계 초과 항목:**');
+              for (const b of (report.breaches || [])) lines.push(`- \`${b.code}\` — ${b.message}`);
+            }
+            const body = lines.join('\n')
+              + `\n\n검사시각(UTC): ${report.checked_at_utc || '?'} · 실행: ${context.runId}`
+              + `\n워크플로 \`grm-findings-backlog-monitor.yml\` · 정상 복귀 시 자동으로 닫힙니다.`;
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', 'findings 번역/검수 백로그 임계 초과');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close backlog issue on recovery
+        if: steps.monitor.outcome == 'success'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const title = '[findings-backlog] 번역/검수 백로그가 임계를 초과했습니다';
+            const label = 'findings-backlog';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `백로그가 임계 이내로 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }
+
+      # 임계 초과/오류면 run 도 red 로 남긴다(이슈와 별개의 2차 가시성). dispatch·schedule 공통.
+      - name: Propagate red on breach
+        if: steps.monitor.outcome == 'failure'
+        run: |
+          echo "백로그 임계 초과 또는 모니터 오류 — 상세는 위 이슈/step summary 참조."
+          exit 1

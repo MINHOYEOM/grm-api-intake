@@ -377,13 +377,17 @@ class MigrationNumberSequenceTest(unittest.TestCase):
     def test_031_file_exists(self) -> None:
         self.assertTrue(_REACTIONS_TOP_PATH.is_file(), f"missing {_REACTIONS_TOP_PATH}")
 
-    def test_migration_numbers_are_contiguous_from_001_to_032(self) -> None:
+    def test_migration_numbers_are_contiguous_no_gaps(self) -> None:
+        # 파일명 3자리 접두 번호가 001부터 최댓값까지 결번 없이 연속인지 고정한다. 최댓값을
+        # 하드코딩하지 않는다 — 새 마이그레이션마다 이 테스트가 깨지지 않게(마찰 제거) 하되,
+        # 중간 결번(누락/오타)은 여전히 잡는다. 032(gurumi_growth) 이후 033(WL scope 비제약
+        # 분류)·034(rejected 공개 게이트 숨김)가 이어진다.
         numbers = sorted(
             int(m.group(1))
             for p in _MIGRATIONS_DIR.glob("*.sql")
             if (m := re.match(r"^(\d{3})_", p.name))
         )
-        self.assertEqual(numbers, list(range(1, 33)))
+        self.assertEqual(numbers, list(range(1, max(numbers) + 1)))
 
 
 # ============================================================================

@@ -471,7 +471,16 @@ def resolve_kind(row: dict[str, Any]) -> str:
         return "mfds-notice"          # MFDS guidance-industry/internal RSS → Evidence B
     if source == SOURCE_FR:
         return "guidance"             # FR(abstract) → Evidence A 가능
-    if source in (SOURCE_EMA, SOURCE_MHRA, SOURCE_PICS, SOURCE_ECA, SOURCE_ISPE):
+    if source == SOURCE_MHRA:
+        # [MHRA 회수 포지션 정렬 2026-07-22] gov.uk drug-device-alerts 로 인입된 의약품
+        # 회수/결함(type_or_class="Class N Medicines Recall/Defect …")은 FDA·HC·MFDS 회수와
+        # 동일 포지션(Recall 섹션·Evidence A)으로 라우팅한다. 인스펙터 블로그(type_or_class=
+        # "Blog"/기타)는 기존대로 rss-news(글로벌·GMP News) 유지. 수집기가 _extract_mhra_alert
+        # 에서 남긴 회수 신호(_is_mhra_medicines_alert 와 동일 판정)를 여기서 소비한다.
+        if re.search(r"medicines?\s+(recall|defect)", toc):
+            return "mhra-recall"
+        return "rss-news"             # 인스펙터 블로그 등 비회수 → Evidence B
+    if source in (SOURCE_EMA, SOURCE_PICS, SOURCE_ECA, SOURCE_ISPE):
         return "rss-news"             # RSS 요약만 → Evidence B
     return "rss-news"
 
@@ -543,6 +552,12 @@ def _quote_openfda_recall(raw: dict[str, Any]) -> str:
 
 def _quote_hc_recall(raw: dict[str, Any]) -> str:
     return _truncate_at_sentence(_first(raw.get("Issue"), raw.get("What you should do")), 250)
+
+
+def _quote_mhra_recall(raw: dict[str, Any]) -> str:
+    # gov.uk drug-device-alerts Atom 의 summary 는 회수 사유 문장(항상 채워짐 — 실측 58/58).
+    # 부재 시 title 폴백 없이 "" → determine_evidence 가 Evidence B 로 강등(graceful).
+    return _truncate_at_sentence(_first(raw.get("summary"), raw.get("description")), 250)
 
 
 def _quote_guidance(raw: dict[str, Any]) -> str:  # FR 전용 — abstract(없으면 title)
@@ -866,6 +881,24 @@ def _w2_extra_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[
     return rows
 
 
+def _w2_extra_mhra_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
+    # MHRA alert 는 구조화 필드가 없어(firm/product 컬럼 부재) category·title 문자열에서
+    # 결정론 파싱(§13.1 최소정보 원칙 — 얕은 소스라도 최소 사실은 담는다). 파싱 실패는
+    # graceful(발행기관 행으로 폴백). W2 표는 발행일·문서번호 뒤에 최대 3행 더 붙는다.
+    rows: list[tuple[str, str]] = []
+    cat = str(raw.get("category") or row.get("type_or_class") or "")
+    m = re.search(r"Class\s+\d+", cat)
+    if m:
+        rows.append(("Class", m.group(0)))
+    # gov.uk 제목 형식은 "Class N Medicines Recall/Defect …: <업체>, <제품>, <참조>" 로 안정.
+    title = str(raw.get("title") or row.get("headline") or "")
+    after = title.split(":", 1)[1].strip() if ":" in title else ""
+    firm = after.split(",", 1)[0].strip() if after else ""
+    if firm:
+        rows.append(("업체", _truncate_at_sentence(firm, 80)))
+    return rows or [("발행기관", "MHRA")]
+
+
 def _w2_extra_fda_483(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §6: 회사·FEI·Establishment Type·Record Type·실사일(발행일=Publish 은 발행일 행).
     firm = _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN
@@ -949,6 +982,10 @@ _REGISTRY: dict[str, SourceSpec] = {
         "🟧", "Recall(HC)", "Recall",
         a_eligible=True, section="recall_table",
         quote=_quote_hc_recall, extra_rows=_w2_extra_hc_recall),
+    "mhra-recall": SourceSpec(
+        "🟧", "Recall(UK)", "Recall",
+        a_eligible=True, section="recall_table",
+        quote=_quote_mhra_recall, extra_rows=_w2_extra_mhra_recall),
     "gmp-inspection": SourceSpec(
         "🟦", "GMP실사", "GMP실사",
         a_eligible=True,

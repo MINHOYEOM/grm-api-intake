@@ -1,0 +1,44 @@
+{
+  "card_id": "MHRA Inspectorate::el26a34",
+  "card_scaffold": "### [Recall(UK) · MHRA] Cutaneous solution applicator recall — **{{TITLE_ISSUE}}**\n\n<callout icon=\"📌\" color=\"blue_bg\">\n\t{{W1}}\n\t`Evidence A` · `MHRA Inspectorate` · `Signal Med (T2)` · `Recall`\n</callout>\n\n<table>\n<tr><td>**발행일**</td><td>2026-07-13</td></tr>\n<tr><td>**문서번호**</td><td>`el26a34`</td></tr>\n<tr><td>**Class**</td><td>Class 2</td></tr>\n<tr><td>**업체**</td><td>Example Pharma UK Ltd</td></tr>\n</table>\n\n**원문 및 번역**\n> A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process.\n{{W4}}\n\n<callout icon=\"🔍\">\n\t**핵심 사실**  `근거: Intake raw`\n\t{{W5}}\n</callout>\n\n<callout icon=\"💡\" color=\"yellow_bg\">\n\t**시사점**\n\t{{W6}}\n</callout>\n\n<callout icon=\"✅\" color=\"green_bg\">\n\t**점검 사항**\n\t{{W7}}\n</callout>\n\n<callout icon=\"🔖\" color=\"gray_bg\">\n\t**출처**  정보출처/공식원본 [링크](https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-el-26-a-34)\n</callout>",
+  "date": "2026-07-13",
+  "evidence": "A",
+  "kind": "mhra-recall",
+  "modality": "",
+  "needs_llm_slots": [
+    "{{TITLE_ISSUE}}",
+    "{{W1}}",
+    "{{W5}}",
+    "{{W6}}",
+    "{{W7}}",
+    "{{W4}}"
+  ],
+  "prose_input": {
+    "action": "",
+    "body_excerpt": "A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process.",
+    "deadline": "",
+    "evidence": "A",
+    "firm_or_product": "",
+    "headline": "Cutaneous solution applicator recall",
+    "issue_or_reason": "",
+    "kind": "mhra-recall",
+    "language": "EN",
+    "modality": "",
+    "product": "",
+    "quote_lines": [
+      "A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process."
+    ],
+    "regulator": "MHRA Inspectorate",
+    "signal": "Tier 2",
+    "source_body_absent_reason": "",
+    "source_body_captured": false,
+    "w2_facts": {
+      "Class": "Class 2",
+      "문서번호": "`el26a34`",
+      "발행일": "2026-07-13",
+      "업체": "Example Pharma UK Ltd"
+    }
+  },
+  "section": "recall_table",
+  "signal_tier": "Tier 2"
+}

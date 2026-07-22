@@ -29,6 +29,7 @@ FIXTURES = [
     "openfda_recall_chemical",
     "hc_recall_chemical",
     "hc_recall_biologic",
+    "mhra_recall_chemical",
     "who_noc",
     "who_inspection",
     "who_news",
@@ -1323,6 +1324,45 @@ class Brief2026_06_22WebFixtureTest(unittest.TestCase):
                                   f"{c['id']}: {key} 가 scaffold 와 불일치(절단?): {url}")
 
 
+class MhraRecallPositionTest(unittest.TestCase):
+    """[MHRA 회수 포지션 정렬 2026-07-22] gov.uk drug-device-alerts 로 인입된 의약품
+    회수/결함이 FDA·HC·MFDS 회수와 동일 포지션(Recall 섹션·Evidence A·회수 태그)으로
+    라우팅되고, 인스펙터 블로그(비회수)는 rss-news(글로벌·Evidence B) 로 남는지 고정."""
+
+    def _row(self, toc: str) -> dict:
+        return {"source": cs.SOURCE_MHRA, "type_or_class": toc,
+                "document_id": "el26a34", "date": "2026-07-13",
+                "headline": "recall", "signal_tier": "Tier 2"}
+
+    def test_recall_and_defect_route_to_mhra_recall(self) -> None:
+        for toc in ("Class 2 Medicines Recall", "Class 3 Medicines Recall",
+                    "Class 4 Medicines Defect Notification"):
+            with self.subTest(toc=toc):
+                self.assertEqual(cs.resolve_kind(self._row(toc)), "mhra-recall")
+
+    def test_blog_stays_rss_news_global(self) -> None:
+        # 비회수(인스펙터 블로그·기타 category)는 기존대로 rss-news 유지
+        for toc in ("Blog", "GMP", "Field Safety Notice", ""):
+            with self.subTest(toc=toc):
+                self.assertEqual(cs.resolve_kind(self._row(toc)), "rss-news")
+
+    def test_position_matches_peer_recall_sources(self) -> None:
+        # 실 alert payload 로 카드 생성 → Recall 섹션·Evidence A·회수 인용 존재
+        fx = _load_input("mhra_recall_chemical")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        self.assertEqual(card.section, "recall_table")   # → group "Recall"
+        self.assertEqual(card.evidence, "A")             # peer(FDA/HC/MFDS)와 동일
+        self.assertIn("\n> ", card.markdown)             # A → W3 인용 렌더
+        # merge 는 recall-quality·openfda-recall 만 대상 → HC 와 동일하게 단독(빈 group_key).
+        self.assertEqual(card.recall_group_key, "")
+
+    def test_web_card_group_is_recall(self) -> None:
+        fx = _load_input("mhra_recall_chemical")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+        self.assertEqual(wc["group"], "Recall")
+        self.assertEqual(wc["type_tag"], "Recall")
+
+
 class CategoryMappingTest(unittest.TestCase):
     """Codex 보정 #1 — _category 전 발현 kind 망라 + 휴면 gmp-guideline 가드(죽은 매핑 금지)."""
 
@@ -1332,7 +1372,8 @@ class CategoryMappingTest(unittest.TestCase):
         "guidance": "Guidance", "mfds-notice": "Guidance",
         "regulation": "Guidance", "legislative": "Guidance",
         "ich": "Guideline",
-        "openfda-recall": "Other", "hc-recall": "Other", "fda-483": "Other",
+        "openfda-recall": "Other", "hc-recall": "Other", "mhra-recall": "Other",
+        "fda-483": "Other",
         "who-noc": "Other", "who-inspection": "Other", "who-news": "Other",
         "admin-action": "Other", "recall-quality": "Other",
         "gmp-inspection": "Other", "gmp-certificate": "Other",

@@ -1,0 +1,602 @@
+[
+  {
+    "finding_id": "finding-9368332ec2fa4b34ef0517fa",
+    "finding_text": "You did not perform adequate product evaluation and take appropriate corrective action after microbial contamination was recovered within the ISO 5 aseptic processing area.",
+    "finding_text_ko": "귀사는 ISO 5 무균 공정 구역 내에서 미생물 오염이 검출된 후 적절한 제품 평가를 수행하고 적절한 시정조치를 취하지 않았습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96daf71bfba562b66bd295a2",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Based on the records and information you provided, you did not demonstrate that you used an…",
+    "finding_text_ko": "귀사는 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(b)). 귀사가 제출한 기록과 정보에 따르면, 귀사는 다음을 사용했음을 입증하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a8ee352d84806ba4c6ed216",
+    "finding_text": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+    "finding_text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 배치 또는 그 구성성분이 규격을 충족하지 못한 경우나 설명되지 않은 불일치에 대해 철저히 조사하지 않았습니다(21 CFR 211.192).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a3fe18bcedda251f9558ffae",
+    "finding_text": "Failure of your quality unit to ensure that drugs are appropriately tested and the results are reported. You failed to establish a quality unit (QU), including defining responsibilities and procedures applicable to a QU. Additionally, when asked during the inspection whether you track any deviations and laboratory errors, you responded that you only provide testing results. Your laboratory director stated that the firm is not involved in CGMP activities, however, your…",
+    "finding_text_ko": "귀사의 품질부서는 의약품이 적절히 시험되고 그 결과가 보고되도록 보장하지 않았습니다. 귀사는 품질부서(QU)에 적용되는 책임과 절차의 정의를 포함하여 QU를 수립하지 않았습니다. 또한 실사 중 일탈 및 시험실 오류를 추적하는지 질문받았을 때, 귀사는 시험 결과만 제공한다고 답변했습니다. 귀사의 시험실 책임자는 귀사가 CGMP 활동에 관여하지 않는다고 진술했으나, 귀사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b58ff5ba593150e8814baf4d",
+    "finding_text": "Failure to have laboratory control records that include complete data derived from all laboratory tests conducted to ensure your API and intermediates complies with established specifications and standards. Your firm is a contract testing laboratory that analyzes APIs and intermediates, including samples of crude (b)(4) , (b)(4) , and (b)(4) USP, for the presence of (b)(4) using 1 H Nuclear Magnetic Resonance spectroscopy (NMR). Your firm failed to ensure that laboratory…",
+    "finding_text_ko": "귀사의 원료의약품(API) 및 중간체가 확립된 규격과 기준에 부합하도록 보장하기 위해 수행된 모든 시험실 시험에서 도출된 완전한 자료를 포함하는 시험실 관리 기록을 갖추지 않았습니다. 귀사는 조 (b)(4), (b)(4) 및 (b)(4) USP 검체를 포함한 API와 중간체를 1 H 핵자기공명 분광법(NMR)을 사용하여 (b)(4)의 존재 여부에 관해 분석하는 계약 시험실입니다. 귀사는 시험실이 다음을 수행하도록 보장하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5d1a9d727bb24a44509affe",
+    "finding_text": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Outsourcing facilities must comply with CGMP requirements under section 501(a)(2)(B) of the FDCA. FDA’s regulations regarding CGMP requirements for the preparation of drug products have been established in 21 CFR…",
+    "finding_text_ko": "귀사는 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 않았습니다(21 CFR 211.113(b)). 아웃소싱 시설은 FDCA 501(a)(2)(B)조에 따른 CGMP 요건을 준수해야 합니다. 의약품 조제에 관한 FDA의 CGMP 요건 규정은 21 CFR에 규정되어 있습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43c1dac5096d6b4646bdeed9",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products (21 CFR 211.22(a)). The records and information you provided did not demonstrate that your quality unit (QU) effectively exercised its responsibilities to oversee the quality of your drug manufacturing operations. For example, your QU…",
+    "finding_text_ko": "귀사는 모든 구성성분, 의약품 용기, 마개, 공정 중 자재, 포장재, 표시자재 및 의약품을 승인하거나 반려할 책임과 권한을 지닌 적절한 품질관리부서를 수립하지 않았습니다(21 CFR 211.22(a)). 귀사가 제출한 기록과 정보는 귀사의 품질부서(QU)가 의약품 제조 작업의 품질을 감독할 책임을 효과적으로 이행했음을 입증하지 못했습니다. 예를 들어, 귀사의 QU는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67b019c4480cfc216d55dca9",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)). Based on the records and information you provided, you did not demonstrate that you adequately tested your drug products for the identity and strength of the active ingredients prior to release and…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다(21 CFR 211.165(a)). 귀사가 제출한 기록과 정보에 따르면, 귀사는 출하 전에 의약품 유효성분의 확인 및 함량을 적절히 시험했음을 입증하지 못했으며…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b740beb5805fee0dcd55402e",
+    "finding_text": "Your firm failed to establish a quality unit with the responsibility and authority to approve or reject all labeling and drug products, and the responsibilities and procedures applicable to the quality control unit are not in writing and followed, as required by 21 CFR 211.22(a) and 211.22(d). Your firm is a manufacturer subject to CGMP requirements. See 21 CFR 210.3(b)(12). For example, at the time of the inspection, your firm relabeled, stored, and distributed CharaCore…",
+    "finding_text_ko": "귀사는 모든 표시자재 및 의약품을 승인하거나 반려할 책임과 권한을 지닌 품질부서를 수립하지 않았으며, 21 CFR 211.22(a) 및 211.22(d)에서 요구하는 바와 달리 품질관리부서에 적용되는 책임과 절차를 문서화하고 준수하지 않았습니다. 귀사는 CGMP 요건의 적용을 받는 제조업체입니다. 21 CFR 210.3(b)(12)를 참조하십시오. 예를 들어, 실사 당시 귀사는 CharaCore를 재표시하고 보관 및 유통했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3b3d26d876edd6bad74466b",
+    "finding_text": "Documentation of the donor-eligibility determination, including the name of the responsible person who made the determination and the date of the determination, was not maintained, as required by 21 CFR 1271.55(d)(1)(iii). Specifically, Chara did not maintain documentation of the donor eligibility determination, including the name of the responsible person who made the determination and the date of the determination, for donors of umbilical cord. Umbilical cord is used to…",
+    "finding_text_ko": "21 CFR 1271.55(d)(1)(iii)에서 요구하는 바와 달리, 적격성 판정을 내린 책임자의 이름과 판정일을 포함한 공여자 적격성 판정 문서를 유지하지 않았습니다. 구체적으로 Chara는 제대 공여자에 대해 적격성 판정을 내린 책임자의 이름과 판정일을 포함한 공여자 적격성 판정 문서를 유지하지 않았습니다. 제대는 다음에 사용됩니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11ece477b6b847c806324ad5",
+    "finding_text": "Failure of your quality unit to exercise its responsibility to ensure the API manufactured at your facility are in compliance with CGMP. Our inspection documented approximately 84 open and past due deviation investigations existed as of June 21, 2024. For example: A. QE-000270 (187 days past due) B. QE-004069 (179 days past due) C. QE-004896 (129 days past due) D. QE-023790 (45 days past due) Multiple past due investigations also lacked procedurally required extensions to…",
+    "finding_text_ko": "귀사의 품질부서는 귀사 시설에서 제조되는 원료의약품(API)이 CGMP를 준수하도록 보장할 책임을 이행하지 않았습니다. 당국의 실사 결과, 2024년 6월 21일 현재 약 84건의 미종결 및 기한 경과 일탈 조사가 존재하는 것으로 기록되었습니다. 예시는 다음과 같습니다. A. QE-000270(기한 187일 경과) B. QE-004069(기한 179일 경과) C. QE-004896(기한 129일 경과) D. QE-023790(기한 45일 경과) 기한이 경과한 여러 조사에는 절차상 요구되는 연장도 없었습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17c6da657dd68985d120fea6",
+    "finding_text": "Written procedures are not for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 장비의 세척 및 유지관리에 관한 문서화된 절차가 마련되어 있지 않습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d9a8f842bcdab495235f504",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use and cleaning and maintenance.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 장비가 의도된 용도의 작업과 세척 및 유지관리를 용이하게 하도록 적절히 설계되어 있지 않습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-56950ba828b14cc70ee846ff",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)). Your firm failed to adequately test your drug products for the identity and strength of the active ingredient, benzalkonium chloride (BZK), prior to release and distribution. Full release testing, including…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다(21 CFR 211.165(a)). 귀사는 출하 및 유통 전에 유효성분인 벤잘코늄염화물(BZK)의 확인 및 함량에 대해 의약품을 적절히 시험하지 않았습니다. 다음을 포함한 전체 출하 시험은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62dacc7c800087df2305ef57",
+    "finding_text": "Failure to demonstrate that your manufacturing process can reproducibly manufacture an API meeting its predetermined quality attributes. You repeatedly deviated from your validated manufacturing process for the production of (b)(4) . For example: A. You performed (b)(4) of the (b)(4) during (b)(4) of the (b)(4) bioreactor runs while the manufacturing process was validated with (b)(4) . You identified the (b)(4) process as increasing the risk of microbiological contamination…",
+    "finding_text_ko": "귀사의 제조공정이 사전에 정한 품질 특성을 충족하는 원료의약품(API)을 재현성 있게 제조할 수 있음을 입증하지 않았습니다. 귀사는 (b)(4)의 생산을 위해 밸리데이션된 제조공정에서 반복적으로 일탈했습니다. 예시는 다음과 같습니다. A. 제조공정은 (b)(4)로 밸리데이션되었으나, 귀사는 (b)(4) 생물반응기 가동의 (b)(4) 중에 (b)(4)의 (b)(4)을 수행했습니다. 귀사는 해당 (b)(4) 공정이 미생물 오염 위험을 증가시키는 것으로 확인했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-80f65c3e2354358e88b873bd",
+    "finding_text": "Failure to ensure all production deviations are reported and evaluated, and that critical deviations are investigated, and the conclusions are recorded. Multiple production deviations went unaddressed until our investigators informed facility personnel of the issues. For example: A. An (b)(4) line used for aseptic processing was observed to be touching the floor during (b)(4) setup activities. The batch record specifically includes an instruction for personnel to ensure…",
+    "finding_text_ko": "모든 생산 일탈이 보고 및 평가되고, 중대한 일탈이 조사되며, 그 결론이 기록되도록 보장하지 않았습니다. 여러 생산 일탈은 당국 조사관이 시설 직원에게 문제를 알릴 때까지 처리되지 않았습니다. 예시는 다음과 같습니다. A. 무균 공정에 사용되는 (b)(4) 라인이 (b)(4) 설치 작업 중 바닥에 닿아 있는 것이 관찰되었습니다. 배치 기록에는 직원이 다음을 보장하도록 하는 지침이 구체적으로 포함되어 있습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b9e3c7b80f2f9ba29b77164",
+    "finding_text": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하거나 표시된 확인, 함량, 순도 및 품질을 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a1e1eb92201aa81f6c907f27",
+    "finding_text": "Failure to establish and follow appropriate written procedures designed to prevent microbiological contamination of drug products purporting to be sterile, including procedures for validation of all aseptic and sterilization processes [21 CFR211.113(b)]. For example, the aseptic processes used to manufacture your product have not been validated (e.g., by performing media fill simulations) since your firm’s manufacturing operations for the subject product began in February…",
+    "finding_text_ko": "모든 무균 공정 및 멸균 공정의 밸리데이션 절차를 포함하여, 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 적절한 문서화된 절차를 수립하고 준수하지 않았습니다[21 CFR211.113(b)]. 예를 들어, 귀사가 해당 제품의 제조 작업을 2월에 시작한 이후 제품 제조에 사용되는 무균 공정은 밸리데이션되지 않았습니다(예: 배지충전 모의시험 수행)…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bb451490310745b90d404a00",
+    "finding_text": "Failure to investigate all critical deviations. FDA documented that approximately 20 percent of bioreactor runs attempted between January 2022 and July 2024 were rejected for contamination or other quality failures. This rate is excessive and calls into question the state of control of your process. You failed to conduct adequate investigations into critical deviations, including multiple microbiological contamination events recorded in this timeframe. For example: A. Two…",
+    "finding_text_ko": "모든 중대한 일탈을 조사하지 않았습니다. FDA는 2022년 1월부터 2024년 7월 사이에 시도된 생물반응기 가동의 약 20퍼센트가 오염 또는 기타 품질 부적합으로 인해 거부되었음을 기록했습니다. 이 비율은 과도하며 귀사 공정의 관리 상태에 의문을 제기합니다. 귀사는 이 기간에 기록된 여러 미생물 오염 사건을 포함한 중대한 일탈에 대해 적절한 조사를 수행하지 않았습니다. 예시는 다음과 같습니다. A. 2건의…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9ee14e12e1aa985b21f0846",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality (21 CFR 211.84(d)(1) and 211.84(d)(2)). You failed to conduct an identity test on each shipment of each lot of components used in the manufacture of your drug products, (e.g., BZK, (b)(4) ). You also failed to determine whether each component conformed with all appropriate written specifications for purity, strength, and…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 의약품 제조에 사용되는 구성성분(예: BZK, (b)(4))의 각 로트별 모든 입고분에 대해 확인시험을 실시하지 않았습니다. 또한 귀사는 각 구성성분이 순도, 함량 및 다음에 관한 모든 적절한 문서화된 규격에 부합하는지 판단하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eef82eaf0d93d20170d9f017",
+    "finding_text": "Failure to establish a written testing program designed to assess the stability characteristics of drug products and to use results of such stability testing to determine appropriate storage conditions and expiration dates [21 CFR 211.166(a)]. Specifically, your certificate of analysis for your product states that the expiry period is (b)(4) , while your instructions for use (IFU) labels your product as having a “ (b)(4) .” You therefore assigned (b)(4) expiration dates to…",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하고 해당 안정성 시험 결과를 사용하여 적절한 보관 조건과 사용기한을 결정하도록 설계된 문서화된 시험 프로그램을 수립하지 않았습니다[21 CFR 211.166(a)]. 구체적으로, 귀사 제품의 시험성적서에는 유효기간이 (b)(4)라고 기재되어 있으나, 사용설명서(IFU)에는 제품이 ‘ (b)(4) ’인 것으로 표시되어 있습니다. 따라서 귀사는 (b)(4)의 사용기한을 다음에 부여했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0609eed90ba9f776d978796c",
+    "finding_text": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your investigations into product quality defect complaints are not consistently and scientifically supported and rely on flawed analyses to reach conclusions on product quality impact. For example: A. Your investigation into complaints of dispensing tip…",
+    "finding_text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 배치 또는 그 구성성분이 규격을 충족하지 못한 경우나 설명되지 않은 불일치에 대해 철저히 조사하지 않았습니다(21 CFR 211.192). 제품 품질 결함 불만에 대한 귀사의 조사는 일관되게 과학적 근거로 뒷받침되지 않으며, 제품 품질 영향에 관한 결론을 도출하는 데 결함 있는 분석에 의존합니다. 예시는 다음과 같습니다. A. 토출구에 관한 불만에 대한 귀사의 조사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1231f6a1b15e0e3707ae6f41",
+    "finding_text": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Our review found deficiencies in video recordings of airflow (smoke) studies executed in the ISO 5 areas including on Line (b)(4) at the empty vial (b)(4) and the nozzle (b)(4) . Specifically, the presence of…",
+    "finding_text_ko": "귀사는 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 않았습니다(21 CFR 211.113(b)). 당국의 검토 결과, 빈 바이알 (b)(4) 및 노즐 (b)(4)에 있는 라인 (b)(4)을 포함한 ISO 5 구역에서 수행된 기류(연기) 시험 영상 기록에서 결함이 발견되었습니다. 구체적으로 다음의 존재가…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-550f7278f75b139305fcc3bc",
+    "finding_text": "Your firm failed to establish an adequate system for maintaining equipment used to control the aseptic conditions (21 CFR 211.42(c)(10)(vi)). Our review found unsuitable conditions in ISO 5 areas where aseptic processing is conducted. For example: A. Rough metal surfaces and an incomplete (b)(4) were observed on the Line (b)(4) Restricted Access Barrier System (RABS) framework in the area above the stopper loading chute. B. (b)(4) or (b)(4) were observed protruding through…",
+    "finding_text_ko": "귀사는 무균 조건 관리에 사용되는 장비를 유지관리하기 위한 적절한 시스템을 수립하지 않았습니다(21 CFR 211.42(c)(10)(vi)). 당국의 검토 결과, 무균 공정이 수행되는 ISO 5 구역에서 부적합한 상태가 확인되었습니다. 예시는 다음과 같습니다. A. 마개 투입 슈트 위 구역에 있는 라인 (b)(4) 제한접근 차단시스템(RABS) 프레임에서 거친 금속 표면과 불완전한 (b)(4)이 관찰되었습니다. B. (b)(4) 또는 (b)(4)이 다음을 관통해 돌출된 것이 관찰되었습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-68493e14d63aa6a10399fedb",
+    "finding_text": "Your experimental study compared the effect of atmospheric exposure of a freshly prepared solution by your research and development group against samples of innovator product that expired approximately 2.5 years earlier. B. Your investigations into complaints of (b)(4) and (b)(4) drug products missing tips or being received empty by patients were repeatedly determined to have no impact on product quality. This conclusion conflicts with the finished product quality attributes…",
+    "finding_text_ko": "귀사의 실험 연구는 연구개발 부서가 새로 조제한 용액이 대기에 노출될 때의 영향을 약 2.5년 전에 사용기한이 만료된 오리지널 제품 검체와 비교했습니다. B. 팁이 누락되거나 환자가 빈 상태로 수령한 (b)(4) 및 (b)(4) 의약품에 관한 불만 조사는 제품 품질에 영향이 없는 것으로 반복해서 판단되었습니다. 이 결론은 완제품 품질 특성과 상충합니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6cfdf462df58d217142034ca",
+    "finding_text": "Your firm failed to record and justify any deviations from required laboratory control mechanisms (21 CFR 211.160(a)). You lacked adequate controls to assure the reliability of microbiological testing results. For example: A. Numerous non-viable dark particles were observed in (b)(4) plates used for microbiological analyses in your laboratory. B. Non-viable dark particles were observed on filter (b)(4) used for (b)(4) microbiological testing. C. Media plates prepared…",
+    "finding_text_ko": "귀사는 요구되는 시험실 관리 체계에서 발생한 모든 일탈을 기록하고 정당화하지 않았습니다(21 CFR 211.160(a)). 귀사는 미생물 시험 결과의 신뢰성을 보장하기 위한 적절한 관리가 부족했습니다. 예시는 다음과 같습니다. A. 귀사 시험실의 미생물 분석에 사용되는 (b)(4) 배지에서 다수의 비생균성 암색 입자가 관찰되었습니다. B. (b)(4) 미생물 시험에 사용되는 필터 (b)(4)에서 비생균성 암색 입자가 관찰되었습니다. C. 조제된 배지는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-92af49945bb59b9f2fd45251",
+    "finding_text": "Your firm failed to establish an adequate quality unit and the responsibilities and procedures applicable to the quality control unit are not in writing and fully followed (21 CFR 211.22(a) and 211.22(d)). Warning and error messages in the Empower Message Center included in your chromatography data software are not reviewed. For example, during the 20-day period between December 26, 2023, and January 15, 2024, the following error messages were registered in the Empower…",
+    "finding_text_ko": "귀사는 적절한 품질부서를 수립하지 않았으며, 품질관리부서에 적용되는 책임과 절차를 문서화하고 완전히 준수하지 않았습니다(21 CFR 211.22(a) 및 211.22(d)). 귀사의 크로마토그래피 데이터 소프트웨어에 포함된 Empower Message Center의 경고 및 오류 메시지를 검토하지 않았습니다. 예를 들어, 2023년 12월 26일부터 2024년 1월 15일까지 20일의 기간 동안 Empower에 다음 오류 메시지가 등록되었습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-15c1f97fda679e3ef8614e50",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products and the authority to review production records to assure that no errors have occurred or, if errors have occurred, that they have been fully investigated (21 CFR 211.22(a)). Your quality unit (QU) did not provide adequate oversight for…",
+    "finding_text_ko": "귀사는 모든 구성성분, 의약품 용기, 마개, 공정 중 자재, 포장재, 표시자재 및 의약품을 승인하거나 반려할 책임과 권한 및 오류가 발생하지 않았거나 오류가 발생한 경우 철저히 조사되었음을 보장하기 위해 생산 기록을 검토할 권한을 지닌 적절한 품질관리부서를 수립하지 않았습니다(21 CFR 211.22(a)). 귀사의 품질부서(QU)는 다음에 대해 적절한 감독을 제공하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2447432f67097cf53c8628d2",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm failed to adequately test incoming components, including active pharmaceutical ingredients (APIs), for identity before using them in the…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 입고된 구성성분을 다음에 사용하기 전에 원료의약품(API)을 포함하여 확인시험을 적절히 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7781531e3a835e0ab373e175",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Your firm failed to demonstrate that your microbiological test methods were appropriate to assure…",
+    "finding_text_ko": "귀사는 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(b)). 귀사는 미생물 시험방법이 다음을 보장하는 데 적절함을 입증하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8184fd33c4900534a9f04590",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). You did not adequately establish laboratory controls to ensure all drug products you manufactured…",
+    "finding_text_ko": "귀사는 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(b)). 귀사는 제조한 모든 의약품이 다음을 충족하도록 보장하기 위한 시험실 관리를 적절히 수립하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8594f23e27791bb97d2c804e",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). Inadequate Water System You manufacture over-the-counter (OTC) drug products such as topical analgesic creams and hand sanitizers. Your firm used water as a component in your OTC drug product manufacturing and…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 적절한 문서화된 절차를 수립하지 않았습니다(21 CFR 211.100(a)). 부적절한 용수 시스템 귀사는 국소 진통 크림 및 손 소독제와 같은 일반의약품(OTC)을 제조합니다. 귀사는 OTC 의약품 제조에 용수를 구성성분으로 사용했으며…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8873d40d30107cc013727775",
+    "finding_text": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit and to follow written procedures applicable to the quality control unit (21 CFR 211.22(d)). You failed to ensure the reliability and integrity of quality control data during component release testing at your facility. Our investigators identified anomalies in four worksheets that reported passing results for (b)(4) identification testing by chemical analysis…",
+    "finding_text_ko": "귀사는 품질관리부서에 적용되는 적절한 책임과 절차를 문서화하고 해당 절차를 준수하지 않았습니다(21 CFR 211.22(d)). 귀사는 시설에서 구성성분 출하 시험을 수행하는 동안 품질관리 자료의 신뢰성과 완전성을 보장하지 않았습니다. 당국 조사관들은 화학 분석을 통한 (b)(4) 확인시험에서 적합 결과를 보고한 4개의 작업지에서 이상을 확인했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-973bfd7a1880ad859b90f443",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)). You failed to adequately test drug products you manufactured, including the identity and strength of each active ingredient prior to release and distribution into the U.S. market. For example, your QU released…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다(21 CFR 211.165(a)). 귀사는 미국 시장에 출하 및 유통하기 전에 각 유효성분의 확인 및 함량을 포함하여 제조한 의약품을 적절히 시험하지 않았습니다. 예를 들어, 귀사의 QU는 다음을 출하했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a64f1bf2328f0ff807eb4ae",
+    "finding_text": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your investigations into discrepancies and out-of-specification (OOS) results lacked adequate scientific rationale to support root cause determinations. Specifically, A. (b)(4) mg tablets, batches (b)(4) and (b)(4) , exhibited OOS and out-of-trend (OOT)…",
+    "finding_text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 배치 또는 그 구성성분이 규격을 충족하지 못한 경우나 설명되지 않은 불일치에 대해 철저히 조사하지 않았습니다(21 CFR 211.192). 불일치 및 규격일탈(OOS) 결과에 관한 귀사의 조사에는 근본 원인 판단을 뒷받침하는 적절한 과학적 근거가 부족했습니다. 구체적으로, A. (b)(4) mg 정제의 배치 (b)(4) 및 (b)(4)에서 OOS 및 추세일탈(OOT)이 나타났습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b1cded0ea300f47666117566",
+    "finding_text": "Your firm failed to have buildings used in the manufacture, processing, packing, or holding of drug products with adequate space for the orderly placement of equipment and materials to prevent mixups and contamination (21 CFR 211.42(b)). Your drug manufacturing facility lacked adequate controls. For example: A. Material storage Investigators observed approximately (b)(4) truck trailers on your property used for the storage of components, finished products, and other items…",
+    "finding_text_ko": "귀사는 혼입과 오염을 방지하도록 장비와 자재를 질서 있게 배치하기 위한 충분한 공간을 의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물에 확보하지 않았습니다(21 CFR 211.42(b)). 귀사의 의약품 제조시설에는 적절한 관리가 부족했습니다. 예시는 다음과 같습니다. A. 자재 보관 조사관들은 구성성분, 완제품 및 기타 물품의 보관에 사용되는 약 (b)(4)대의 트럭 트레일러가 귀사 부지에 있는 것을 관찰했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f9c53dd62dfc40f6f821cc48",
+    "finding_text": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). You lacked a QU with appropriate oversight for the manufacture of your drug products. For example, we observed the following deficiencies: A. You failed to establish and implement adequate procedures to validate your processes and qualify the…",
+    "finding_text_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인, 함량, 품질 및 순도에 관한 확립된 규격을 충족하도록 보장할 책임을 이행하지 않았습니다(21 CFR 211.22). 귀사는 의약품 제조를 적절히 감독하는 품질부서(QU)가 부족했습니다. 예를 들어, 당국은 다음 결함을 관찰했습니다. A. 귀사는 공정을 밸리데이션하고 다음을 적격성평가하기 위한 적절한 절차를 수립하고 시행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa612082187df614d42cdea2",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). You failed to perform adequate identity testing for each component lot used in the production of your OTC drug products, including your active…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 유효성분을 포함하여 OTC 의약품 생산에 사용되는 각 구성성분 로트에 대해 적절한 확인시험을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0695f0d2382df563f5eb095e",
+    "finding_text": "Failure to prepare, review, and approve documents related to the manufacturing of API in accordance with written procedures. You failed to document all CGMP related manufacturing activities at the time they were performed. Our investigator observed numerous unlabeled (b)(4) drums in your manufacturing areas. Your personnel indicated these drums contained (b)(4) from various processes but were unable to identify what products and processes they were associated with. In…",
+    "finding_text_ko": "문서화된 절차에 따라 원료의약품(API) 제조 관련 문서를 작성, 검토 및 승인하지 않았습니다. 귀사는 모든 CGMP 관련 제조 활동을 수행 시점에 문서화하지 않았습니다. 당국 조사관은 귀사의 제조 구역에서 표시가 없는 다수의 (b)(4) 드럼을 관찰했습니다. 귀사 직원은 이 드럼에 여러 공정에서 나온 (b)(4)이 들어 있다고 설명했으나, 어떤 제품 및 공정과 관련되었는지 확인하지 못했습니다. 또한…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f13b96d772543c0bf2a42de",
+    "finding_text": "Failure of your quality unit to exercise its responsibility to ensure the API manufactured at your facility are in compliance with CGMP. Your firm’s quality unit (QU) failed to perform routine QU functions to ensure drug manufacturing operations were adequate. For example, your QU failed to: • Follow your change control procedure for drugs shipped to the United States. You failed to evaluate the use of different (b)(4) in your (b)(4) manufacturing process through your…",
+    "finding_text_ko": "귀사의 품질부서는 귀사 시설에서 제조되는 원료의약품(API)이 CGMP를 준수하도록 보장할 책임을 이행하지 않았습니다. 귀사의 품질부서(QU)는 의약품 제조 작업이 적절하도록 보장하기 위한 통상적인 QU 기능을 수행하지 않았습니다. 예를 들어, 귀사의 QU는 다음을 수행하지 않았습니다. • 미국으로 출하되는 의약품에 대해 귀사의 변경관리 절차를 준수하지 않았습니다. 귀사는 (b)(4) 제조공정에서 서로 다른 (b)(4)을 사용하는 것을 변경관리 절차를 통해 평가하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-53c6fdb1a07c6caa84d427f0",
+    "finding_text": "Failure to design a documented, on-going stability testing program to monitor the stability characteristics of API and to use the results to confirm appropriate storage conditions and retest or expiry dates. Your firm’s stability program was inadequate. Your firm failed to place at least one batch of each API manufactured in 2021, 2022, and 2023 on stability. Additionally, there were no stability chambers nor stability and reserve samples available at your facility. In your…",
+    "finding_text_ko": "원료의약품(API)의 안정성 특성을 모니터링하고 그 결과를 사용하여 적절한 보관 조건과 재시험일 또는 사용기한을 확인하도록 설계된 문서화된 지속적 안정성 시험 프로그램을 수립하지 않았습니다. 귀사의 안정성 프로그램은 부적절했습니다. 귀사는 2021년, 2022년 및 2023년에 제조한 각 API의 최소 1개 배치를 안정성 시험에 투입하지 않았습니다. 또한 귀사 시설에는 안정성 챔버나 안정성 및 보관 검체가 없었습니다. 귀사의…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3e792f947c394443ac10867",
+    "finding_text": "Failure to adequately validate written procedures for the cleaning and maintenance of equipment. You failed to adequately validate cleaning procedures for your non-dedicated manufacturing equipment to ensure it is fit for its intended use. You also failed to properly maintain your equipment as they were observed to be in a state of disrepair. Your quality assurance personnel stated that your firm has not carried out cleaning validation for non-dedicated manufacturing…",
+    "finding_text_ko": "장비의 세척 및 유지관리에 관한 문서화된 절차를 적절히 밸리데이션하지 않았습니다. 귀사는 비전용 제조장비가 의도된 용도에 적합하도록 보장하기 위한 세척 절차를 적절히 밸리데이션하지 않았습니다. 또한 장비가 파손된 상태로 관찰되는 등 이를 적절히 유지관리하지 않았습니다. 귀사의 품질보증 담당자는 귀사가 비전용 제조장비에 대한 세척 밸리데이션을 수행하지 않았다고 진술했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f8cb01ab24e5a147bc83ab4a",
+    "finding_text": "Failure to demonstrate your manufacturing process can reproducibly produce an API that meets its predetermined quality attributes. Also, there is no assurance that your facilities, equipment, and testing methods are suitable for their intended use. Your firm failed to establish a protocol and implement a plan to ensure all API manufacturing processes, equipment and facilities are fit for use. For example, • Your firm could not provide records that process performance…",
+    "finding_text_ko": "귀사의 제조공정이 사전에 정한 품질 특성을 충족하는 원료의약품(API)을 재현성 있게 생산할 수 있음을 입증하지 않았습니다. 또한 귀사의 시설, 장비 및 시험방법이 의도된 용도에 적합하다는 보장이 없습니다. 귀사는 모든 API 제조공정, 장비 및 시설이 사용에 적합하도록 보장하는 프로토콜을 수립하고 계획을 시행하지 않았습니다. 예를 들어, • 귀사는 공정 성능에 관한 기록을 제출하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e1575b5e5844345334fdea9",
+    "finding_text": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your firm failed to establish an adequate quality unit (QU) with responsibilities to ensure adequate oversight for the manufacture of your drug products. For example, your QU failed to ensure: • Appropriate production and process controls…",
+    "finding_text_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인, 함량, 품질 및 순도에 관한 확립된 규격을 충족하도록 보장할 책임을 이행하지 않았습니다(21 CFR 211.22). 귀사는 의약품 제조를 적절히 감독할 책임이 있는 적절한 품질부서(QU)를 수립하지 않았습니다. 예를 들어, 귀사의 QU는 다음을 보장하지 않았습니다. • 적절한 생산 및 공정 관리…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98dd33553613f272039851fa",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct, for each batch of drug product, appropriate laboratory testing, as necessary, required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)). Your firm failed to conduct…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다. 또한 귀사는 각 의약품 배치에 대해 위해성 미생물이 없어야 한다는 요건에 필요한 적절한 시험실 시험을 수행하지 않았습니다(21 CFR 211.165(a) 및 211.165(b)). 귀사는 다음을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0971800c2205fd478843a81a",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). You contract manufacture over-the-counter (OTC) drug products such as anticavity mouthwash. You failed to conduct an adequate identity test on each…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 충치 예방 구강청결제와 같은 일반의약품(OTC)을 위탁 제조합니다. 귀사는 각 구성성분에 대해 적절한 확인시험을 실시하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e1ad47b8c319dac0e55888b",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). You manufacture over-the-counter (OTC) drug products such as (b)(4) . Based on the records and information you provided, you did not demonstrate that…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 (b)(4)와 같은 일반의약품(OTC)을 제조합니다. 귀사가 제출한 기록과 정보에 따르면 귀사는 다음을 입증하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1db4345756eb843a64577bc",
+    "finding_text": "For any new trial, Applied Therapeutics will create a data process map that clearly shows the flow and storage of collected data, to ensure that source data is maintained at both the site and at the sponsor.",
+    "finding_text_ko": "Applied Therapeutics는 모든 신규 시험에 대해 수집된 자료의 흐름과 저장을 명확히 보여주는 자료 처리 맵을 작성하여 원자료가 시험기관과 의뢰자 양측에 유지되도록 할 것입니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ded3095a53e16fee3443023a",
+    "finding_text": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your quality unit (QU) did not provide adequate oversight for the manufacture of your drug products. For example, your QU failed to ensure: Adequate procedures describing roles and responsibilities of the QU, including the handling of vendor…",
+    "finding_text_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인, 함량, 품질 및 순도에 관한 확립된 규격을 충족하도록 보장할 책임을 이행하지 않았습니다(21 CFR 211.22). 귀사의 품질부서(QU)는 의약품 제조를 적절히 감독하지 않았습니다. 예를 들어, 귀사의 QU는 다음을 보장하지 않았습니다. 공급업체 처리 등을 포함하여 QU의 역할과 책임을 설명하는 적절한 절차…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e3b5d41be1bb19688f302286",
+    "finding_text": "Appropriate electronic audit trails will be maintained such that any changes to electronic data will be identifiable and auditable. FDA acknowledges that, in an August 27, 2024, written response to FDA’s August 20, 2024, Information Request, Applied Therapeutics stated that an export of the (b)(4) data from the backup Q-global® system is maintained with a third-party statistical consulting vendor; however, the data is no longer available in Q-global®. FDA also acknowledges…",
+    "finding_text_ko": "전자 자료의 모든 변경사항을 식별하고 감사할 수 있도록 적절한 전자 감사 추적을 유지할 것입니다. FDA는 Applied Therapeutics가 2024년 8월 20일자 FDA 정보 요청에 대한 2024년 8월 27일자 서면 답변에서 백업 Q-global® 시스템의 (b)(4) 자료 내보내기 사본을 제3자 통계 자문업체가 보관하고 있으나 해당 자료는 더 이상 Q-global®에서 이용할 수 없다고 진술한 점을 확인합니다. FDA는 또한…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f5079a5ba1a2bd13d17725bd",
+    "finding_text": "Failure to provide FDA [with] a description and analysis of any other data or information relevant to an evaluation of the safety and effectiveness of the drug product obtained or otherwise received by the applicant from any source, foreign or domestic, including information derived from clinical investigations, including controlled and uncontrolled studies of uses of the drug other than those proposed in the application, commercial marketing experience, reports in the…",
+    "finding_text_ko": "신청자가 국내외의 모든 출처에서 입수하거나 달리 수령한 의약품의 안전성 및 유효성 평가와 관련된 기타 자료 또는 정보에 대한 설명과 분석을 FDA에 제공하지 않았습니다. 여기에는 신청서에서 제안한 용도 이외의 의약품 사용에 관한 대조 및 비대조 연구를 포함한 임상시험에서 도출된 정보, 상업적 시판 경험 및 다음의 보고가 포함됩니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-677fad26993473082fdf1107",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products (21 CFR 211.22(a)). Your quality unit (QU) did not provide adequate oversight for the manufacture of your drug products. For example, your QU failed to ensure: Appropriate written records of major equipment cleaning, maintenance, and…",
+    "finding_text_ko": "귀사는 모든 구성성분, 의약품 용기, 마개, 공정 중 자재, 포장재, 표시자재 및 의약품을 승인하거나 반려할 책임과 권한을 지닌 적절한 품질관리부서를 수립하지 않았습니다(21 CFR 211.22(a)). 귀사의 품질부서(QU)는 의약품 제조를 적절히 감독하지 않았습니다. 예를 들어, 귀사의 QU는 다음을 보장하지 않았습니다. 주요 장비의 세척, 유지관리 및 다음에 관한 적절한 문서 기록…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81579dd81f40639667fd4121",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm manufactures topical drug products including (b)(4) and pain patches. You failed to perform adequate identity testing of each component lot used in the manufacture of your drug products. You…",
+    "finding_text_ko": "귀사는 의약품의 각 구성성분의 확인을 검증하기 위한 시험을 최소 1회 수행하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 (b)(4) 및 진통 패치를 포함한 국소용 의약품을 제조합니다. 귀사는 의약품 제조에 사용되는 각 구성성분 로트에 대해 적절한 확인시험을 수행하지 않았습니다. 귀사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-87c6dfd13ae00ffdb15d9e78",
+    "finding_text": "Your firm failed to establish written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). The information provided did not demonstrate that your manufacturing processes are reproducible and controlled to yield a product of uniform character and quality. Specifically, you stated that your firm does not have…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았습니다(21 CFR 211.100(a)). 제출된 정보는 귀사의 제조공정이 균일한 특성과 품질의 제품을 생산하도록 재현성 있게 관리된다는 것을 입증하지 못했습니다. 구체적으로, 귀사는 다음을 보유하고 있지 않다고 진술했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-afa74ad6c66f97849152a6d6",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products (21 CFR 211.22(a)). The records and information you provided demonstrate that your quality unit (QU) did not effectively exercise its responsibilities to oversee the quality of your drug manufacturing operations. For example, your QU…",
+    "finding_text_ko": "귀사는 모든 구성성분, 의약품 용기, 마개, 공정 중 자재, 포장재, 표시자재 및 의약품을 승인하거나 반려할 책임과 권한을 지닌 적절한 품질관리부서를 수립하지 않았습니다(21 CFR 211.22(a)). 귀사가 제출한 기록과 정보는 귀사의 품질부서(QU)가 의약품 제조 작업의 품질을 감독할 책임을 효과적으로 이행하지 않았음을 보여줍니다. 예를 들어, 귀사의 QU는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d4399e506bde6d4ac527517e",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products (21 CFR 211.22(a)). The records and information you provided, demonstrate that your quality unit (QU) did not effectively exercise its responsibilities to oversee the quality of your drug manufacturing operations. For example, your QU…",
+    "finding_text_ko": "귀사는 모든 구성성분, 의약품 용기, 마개, 공정 중 자재, 포장재, 표시자재 및 의약품을 승인하거나 반려할 책임과 권한을 지닌 적절한 품질관리부서를 수립하지 않았습니다(21 CFR 211.22(a)). 귀사가 제출한 기록과 정보는 귀사의 품질부서(QU)가 의약품 제조 작업의 품질을 감독할 책임을 효과적으로 이행하지 않았음을 보여줍니다. 예를 들어, 귀사의 QU는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d78f8caf96d6bd22e7de498a",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product (21 CFR 211.84(d)(1)). Your firm manufactures OTC drug products, including gel hand sanitizers containing ethyl alcohol. Based on the records and information you provided, you did not demonstrate that you adequately tested the identity of incoming components used in the manufacture of your drug products. For example, in your response, you state that you do not verify the…",
+    "finding_text_ko": "귀사는 의약품의 각 구성성분의 확인을 검증하기 위한 시험을 최소 1회 수행하지 않았습니다(21 CFR 211.84(d)(1)). 귀사는 에틸알코올을 함유한 젤형 손 소독제를 포함한 OTC 의약품을 제조합니다. 귀사가 제출한 기록과 정보에 따르면, 귀사는 의약품 제조에 사용되는 입고 구성성분의 확인시험을 적절히 수행했음을 입증하지 못했습니다. 예를 들어, 귀사는 답변서에서 다음을 확인하지 않는다고 진술했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eb4fbb99549bc3b49b29b442",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)). Based on the records and information you provided, you did not demonstrate that you adequately tested your finished drug products for the identity and strength of the active ingredient, ethanol prior to…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다(21 CFR 211.165(a)). 귀사가 제출한 기록과 정보에 따르면, 귀사는 출하 전에 완제의약품의 유효성분인 에탄올의 확인 및 함량을 적절히 시험했음을 입증하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f341ccd9d3e4aa3c8a8a0138",
+    "finding_text": "Your firm failed to establish and follow an adequate written testing program designed to assess the stability characteristics of drug products and to use results of stability testing to determine appropriate storage conditions and expiration dates (21 CFR 211.166(a)). Based on the records and information provided, you did not demonstrate that your drug products remain acceptable throughout their assigned shelf life. For example, you indicated that potency and assay testing…",
+    "finding_text_ko": "귀사는 의약품의 안정성 특성을 평가하고 안정성 시험 결과를 사용하여 적절한 보관 조건과 사용기한을 결정하도록 설계된 적절한 문서화된 시험 프로그램을 수립하고 준수하지 않았습니다(21 CFR 211.166(a)). 제출된 기록과 정보에 따르면, 귀사는 의약품이 부여된 유효기간 전체에 걸쳐 허용 가능한 상태를 유지함을 입증하지 못했습니다. 예를 들어, 귀사는 역가 및 함량 시험이 다음과 같다고 밝혔습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-430ece0d94a6fceb4ca3a4b1",
+    "finding_text": "Failure to establish and follow a written testing program designed to assess the stability characteristics of drug products and to use results of such stability testing to determine appropriate storage conditions and expiration dates, as required by 21 CFR 211.166(a). Specifically, you assigned a (b)(4) expiration date to your products without supporting data. Response to the Form FDA-483 We have reviewed your response, dated March 28, 2024, to FDA’s Form FDA-483 in detail…",
+    "finding_text_ko": "21 CFR 211.166(a)에서 요구하는 바와 같이, 의약품의 안정성 특성을 평가하고 해당 안정성 시험 결과를 사용하여 적절한 보관 조건과 사용기한을 결정하도록 설계된 문서화된 시험 프로그램을 수립하고 준수하지 않았습니다. 구체적으로, 귀사는 근거 자료 없이 제품에 (b)(4)의 사용기한을 부여했습니다. FDA-483 서식에 대한 답변 당국은 FDA-483 서식에 대한 귀사의 2024년 3월 28일자 답변을 상세히 검토했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61b54761404b6533e09455fb",
+    "finding_text": "Your firm failed to maintain buildings used in the manufacture, processing, packing, or holding of drug products in a good state of repair (21 CFR 211.58). Our investigator observed a black mold-like substance at the base of the hose reel and behind the water storage tank in the (b)(4) clean out of place (b)(4) room. The black substance was within one foot of stainless-steel pails and other product-contact equipment used for OTC drug production. The base of the wall behind…",
+    "finding_text_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물을 양호한 수리 상태로 유지하지 않았습니다(21 CFR 211.58). 당국 조사관은 (b)(4) 비정치 세척 (b)(4) 작업실의 호스 릴 바닥과 용수 저장 탱크 뒤에서 검은 곰팡이 유사 물질을 관찰했습니다. 이 검은 물질은 OTC 의약품 생산에 사용되는 스테인리스강 통 및 기타 제품 접촉 장비에서 1피트 이내에 있었습니다. 뒤쪽 벽의 하단은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-744f440732993faac4990361",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a). You failed to validate your manufacturing processes for your OTC drug products and provide assurance that you are capable of consistently manufacturing a drug product with defined quality attributes. Process…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 적절한 문서화된 절차를 수립하지 않았습니다(21 CFR 211.100(a). 귀사는 OTC 의약품의 제조공정을 밸리데이션하지 않았으며, 정의된 품질 특성을 지닌 의약품을 일관되게 제조할 수 있다는 보장을 제공하지 못했습니다. 공정은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-845ac954f078bb69a02fe4f1",
+    "finding_text": "Your firm failed to establish and follow an adequate written testing program designed to assess the stability characteristics of drug products and to use results of stability testing to determine appropriate storage conditions and expiration dates (21 CFR 211.166(a)). Your firm did not have adequate stability data to demonstrate that the chemical and microbiological properties of your drug products met established specifications and remain acceptable throughout their…",
+    "finding_text_ko": "귀사는 의약품의 안정성 특성을 평가하고 안정성 시험 결과를 사용하여 적절한 보관 조건과 사용기한을 결정하도록 설계된 적절한 문서화된 시험 프로그램을 수립하고 준수하지 않았습니다(21 CFR 211.166(a)). 귀사는 의약품의 화학적 및 미생물학적 특성이 확립된 규격을 충족하고 다음의 전체 기간 동안 허용 가능한 상태를 유지함을 입증할 적절한 안정성 자료가 없었습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8672164a4ffaf4da607361ee",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). Based on the limitation of the inspection described above, you failed to provide data to demonstrate that you adequately validated your manufacturing processes used to manufacture your OTC drug product and to…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 적절한 문서화된 절차를 수립하지 않았습니다(21 CFR 211.100(a)). 위에 기술된 실사의 제한을 고려할 때, 귀사는 OTC 의약품 제조에 사용되는 제조공정을 적절히 밸리데이션했음을 입증하는 자료와 다음을 제출하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a07333a0dcf6e270fb5654d6",
+    "finding_text": "You firm failed to establish required laboratory control mechanisms (21 CFR 211.160(a)), including those related to stability studies (21 CFR 211.166). The analytical method used for the release and stability testing of your drug product “ (b)(4) ” is not stability indicating. Also, your firm has not performed forced degradation studies to identify degradants that may be present in sufficient quantities to require testing during stability studies. In your response, you…",
+    "finding_text_ko": "귀사는 안정성 시험 관련 관리(21 CFR 211.166)를 포함하여 요구되는 시험실 관리 체계를 수립하지 않았습니다(21 CFR 211.160(a)). 귀사의 의약품 ‘ (b)(4) ’의 출하 및 안정성 시험에 사용되는 분석법은 안정성 지시성이 없습니다. 또한 귀사는 안정성 시험 중 시험이 필요할 만큼 충분한 양으로 존재할 수 있는 분해산물을 확인하기 위한 강제분해 시험을 수행하지 않았습니다. 귀사의 답변에서 귀사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3a29a19024e89fce12f1697",
+    "finding_text": "Your firm failed to follow appropriate written procedures, designed to prevent objectionable microorganisms in drug products not required to be sterile (21 CFR 211.113(a)). Microbiological Results in Water Samples and Finished Product Your firm produced (b)(4) water and used it as a component in your OTC drug products and as a final rinse after equipment cleaning. A. You recovered Pseudomonas aeruginosa in multiple (b)(4) water samples, from June 2021 to October 2022. This…",
+    "finding_text_ko": "귀사는 무균일 필요가 없는 의약품에서 위해성 미생물을 방지하도록 설계된 적절한 문서화된 절차를 준수하지 않았습니다(21 CFR 211.113(a)). 용수 검체 및 완제품의 미생물 시험 결과 귀사는 (b)(4) 용수를 생산하여 OTC 의약품의 구성성분 및 장비 세척 후 최종 헹굼용으로 사용했습니다. A. 2021년 6월부터 2022년 10월까지 여러 (b)(4) 용수 검체에서 Pseudomonas aeruginosa가 검출되었습니다. 이는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d003aaa9a1da269d8c3216db",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for environmental monitoring to prevent contamination, as required by 21 CFR 211.42(c)(10)(iv). For example, you have not performed non-viable particulate monitoring, personnel monitoring, active or passive viable air sampling, or sampling of critical surfaces for microorganisms in the aseptic processing area in association with each production batch.",
+    "finding_text_ko": "무균 공정 구역은 21 CFR 211.42(c)(10)(iv)에서 요구하는 오염 방지용 환경 모니터링 시스템 측면에서 미흡합니다. 예를 들어, 귀사는 각 생산 배치와 관련하여 무균 공정 구역에서 비생균성 입자 모니터링, 작업자 모니터링, 능동 또는 수동 생균 공기 채취 또는 중요 표면의 미생물 검체 채취를 수행하지 않았습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d0b8cfd7190dc5ad8e4abf4b",
+    "finding_text": "Failure to establish and follow appropriate written procedures designed to prevent microbiological contamination of drug products purporting to be sterile, including procedures for validation of all aseptic and sterilization processes, as required by 21 CFR 211.113(b). For example, you failed to adequately validate (i.e., by performing media fill simulations) the aseptic process used to manufacture your Purified Fluid Allograft product. Your product purports to be sterile…",
+    "finding_text_ko": "21 CFR 211.113(b)에서 요구하는 바와 같이, 모든 무균 공정 및 멸균 공정의 밸리데이션 절차를 포함하여 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 적절한 문서화된 절차를 수립하고 준수하지 않았습니다. 예를 들어, 귀사는 Purified Fluid Allograft 제품 제조에 사용되는 무균 공정을 적절히 밸리데이션하지 않았습니다(즉, 배지충전 모의시험 수행). 귀사 제품은 무균임을 표방합니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd93569a48aa834ab5c8b848",
+    "finding_text": "Written records are not always made of investigations into unexplained discrepancies or the failure of a batch or any of its components to meet specifications whether or not the batch has already been distributed , as required by 21 CFR 211.192. For example, from March 2023 and June 2023, your firm had two sterility failures during finished product testing of your Purified Fluid Allograft product. Although you identified the contaminating organisms, you failed to conduct an…",
+    "finding_text_ko": "21 CFR 211.192에서 요구하는 바와 달리, 배치가 이미 유통되었는지 여부와 관계없이 배치 또는 그 구성성분이 규격을 충족하지 못한 경우나 설명되지 않은 불일치에 관한 조사 기록이 항상 작성되지는 않습니다. 예를 들어, 2023년 3월부터 2023년 6월 사이 귀사는 Purified Fluid Allograft 제품의 완제품 시험 중 2건의 무균시험 부적합을 경험했습니다. 귀사는 오염 미생물을 확인했으나 다음을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f11699934d247f5fab6484d9",
+    "finding_text": "Your firm failed to establish and follow adequate written procedures describing the handling of all written and oral complaints regarding a drug product, including provisions for review by the quality control unit of any complaint involving the possible failure of a drug product to meet any of its specifications and, for such drug products, a determination as to the need for an investigation in accordance with 21 CFR 211.192 (21 CFR 211.198(a)). Your complaint procedure is…",
+    "finding_text_ko": "귀사는 의약품이 규격을 충족하지 못했을 가능성과 관련된 모든 불만을 품질관리부서가 검토하도록 하고, 해당 의약품에 대해 21 CFR 211.192에 따른 조사의 필요성을 판단하도록 하는 조항을 포함하여, 의약품에 관한 모든 서면 및 구두 불만의 처리 방법을 설명하는 적절한 문서화된 절차를 수립하고 준수하지 않았습니다(21 CFR 211.198(a)). 귀사의 불만 처리 절차는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fee26d224e9c4b65c4f15564",
+    "finding_text": "Failure to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess, as required by 21 CFR 211.100(a). Specifically, a. The manufacturing process for your Purified Fluid Allograft product has not been adequately validated with respect to identity, strength, quality, and purity. During the inspection, you provided a validation study for…",
+    "finding_text_ko": "21 CFR 211.100(a)에서 요구하는 바와 같이, 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았습니다. 구체적으로, a. 귀사의 Purified Fluid Allograft 제품 제조공정은 확인, 함량, 품질 및 순도 측면에서 적절히 밸리데이션되지 않았습니다. 실사 중 귀사는 다음에 관한 밸리데이션 연구를 제출했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-24684a0918b06945a5091401",
+    "finding_text": "Your firm failed to use equipment in the manufacture, processing, packing, or holding of drug products that is of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance (21 CFR 211.63). Your firm uses purified water as a component to manufacture your OTC drug product. The (b)(4) water system was not designed and maintained appropriately for its intended use. For example, your non-circulating…",
+    "finding_text_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용되는 장비가 의도된 용도의 작업과 세척 및 유지관리를 용이하게 할 수 있도록 적절하게 설계되고, 충분한 크기를 갖추며, 적합한 위치에 설치되도록 하지 않았습니다(21 CFR 211.63). 귀사는 OTC 의약품 제조에 정제수를 구성성분으로 사용합니다. (b)(4) 용수 시스템은 의도된 용도에 맞게 적절히 설계 및 유지관리되지 않았습니다. 예를 들어, 귀사의 비순환식…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-537817a55099d6e12159bdcf",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. (21 CFR 211.84(d)(1)). Based on the records and information you provided, you did not demonstrate that you adequately tested the identity of your incoming components including glycerin, propylene glycol, ethanol, and IPA that are used in the manufacture of your OTC drug products. For example, your May 6, 2024 response…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다(21 CFR 211.84(d)(1)). 귀사가 제출한 기록과 정보에 따르면, 귀사는 OTC 의약품 제조에 사용되는 글리세린, 프로필렌글리콜, 에탄올 및 IPA를 포함한 입고 구성성분의 확인시험을 적절히 수행했음을 입증하지 못했습니다. 예를 들어, 귀사의 2024년 5월 6일자 답변은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5378883f660a46effc831165",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). You manufacture a topical over-the-counter (OTC) drug product for the U.S. market. You failed to adequately test your incoming components, including…",
+    "finding_text_ko": "귀사는 각 구성성분의 검체에 대해 확인시험 및 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격과의 적합성 시험을 실시하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 미국 시장용 국소용 일반의약품(OTC)을 제조합니다. 귀사는 다음을 포함한 입고 구성성분을 적절히 시험하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1f2d327c96188c2f9c4aeeb",
+    "finding_text": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your firm manufactured over-the-counter (OTC) isopropyl alcohol (IPA) prep pad drug products, labeled as sterile, that are intended as an antiseptic for preparation of the skin prior to an injection. Based on the records and information you…",
+    "finding_text_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인, 함량, 품질 및 순도에 관한 확립된 규격을 충족하도록 보장할 책임을 이행하지 않았습니다(21 CFR 211.22). 귀사는 주사 전 피부 소독용이며 무균으로 표시된 일반의약품(OTC) 이소프로필알코올(IPA) 준비용 패드 의약품을 제조했습니다. 귀사가 제출한 기록과 정보에 따르면…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ee0109ea59436a4bafa734ac",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Your firm failed to demonstrate that your chemical and microbiological test methods were…",
+    "finding_text_ko": "귀사는 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(b)). 귀사는 화학 및 미생물 시험방법이 다음과 같음을 입증하지 못했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2e275e06bba23b165ce2ce0b",
+    "finding_text": "Your firm failed to establish and follow required laboratory control mechanisms, and to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(a) and 211.160(b)). Lack of method…",
+    "finding_text_ko": "귀사는 요구되는 시험실 관리 체계를 수립하고 준수하지 않았으며, 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(a) 및 211.160(b)). 시험방법의 부족은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-013114efa16a5ce15ab279a7",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release, and for each batch of drug product required to be free of objectionable microorganisms, appropriate laboratory testing, as necessary (21 CFR 211.165(a) and 211.165(b)). Your firm failed to perform appropriate testing on your…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았으며, 위해성 미생물이 없어야 하는 각 의약품 배치에 대해 필요한 적절한 시험실 시험을 수행하지 않았습니다(21 CFR 211.165(a) 및 211.165(b)). 귀사는 다음에 대해 적절한 시험을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10dbb021745004f28350c7f0",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm’s quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)). Your firm failed to adequately validate the manufacturing processes and qualify the equipment used to…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 적절한 문서화된 절차를 수립하지 않았으며, 귀사의 품질관리부서는 모든 변경사항을 포함한 해당 절차를 검토 및 승인하지 않았습니다(21 CFR 211.100(a)). 귀사는 제조공정을 적절히 밸리데이션하고 다음에 사용되는 장비를 적격성평가하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4efc53c66e2c8680d30dd618",
+    "finding_text": "Your firm failed to maintain the buildings used in the manufacture, processing, packing, or holding of a drug product in a clean and sanitary condition and to keep them free of infestation by rodents, birds, insects, and other vermin (21 CFR 211.56(a)). Your firm manufactures over-the-counter (OTC) topical drug products. Our investigator observed pest activity in your raw material storage area, and evidence of water leaks and missing ceiling tiles in your drug manufacturing…",
+    "finding_text_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물을 청결하고 위생적인 상태로 유지하고 설치류, 조류, 곤충 및 기타 해충의 침입이 없도록 하지 않았습니다(21 CFR 211.56(a)). 귀사는 국소용 일반의약품(OTC)을 제조합니다. 당국 조사관은 원료 보관 구역에서 해충 활동을 관찰했으며, 귀사의 의약품 제조 구역에서 누수 흔적과 누락된 천장 타일을 확인했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b9d4dcb061a5c76dd50b940a",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct, for each batch of drug product, appropriate laboratory testing, as necessary, required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)). Your firm failed to…",
+    "finding_text_ko": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인 및 함량을 포함하여 의약품이 최종 규격에 적합함을 확인하는 적절한 시험실 판정을 실시하지 않았습니다. 또한 귀사는 위해성 미생물이 없어야 하는 각 의약품 배치에 대해 필요한 적절한 시험실 시험을 수행하지 않았습니다(21 CFR 211.165(a) 및 211.165(b)). 귀사는 다음을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e85727bf67695e3c258e62bc",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm failed to adequately test incoming components, including your active pharmaceutical ingredients (APIs), for identity before using the components to manufacture your drug products…",
+    "finding_text_ko": "귀사는 의약품의 각 구성성분의 확인을 검증하기 위한 시험을 최소 1회 수행하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 의약품 제조에 사용하기 전에 원료의약품(API)을 포함한 입고 구성성분에 대해 적절한 확인시험을 수행하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f00197c0459551b6131e015c",
+    "finding_text": "Your firm failed to assure that the drug product bore an expiration date that was supported by appropriate stability testing (21 CFR 211.137(a)). You failed to establish and maintain an ongoing stability testing program to support the labeled expiry on your distributed drug products. There is no assurance that your drug products will remain acceptable throughout their labeled expiry period without an ongoing stability program. In your response, you state that you are in the…",
+    "finding_text_ko": "귀사는 적절한 안정성 시험으로 뒷받침되는 사용기한이 의약품에 표시되도록 보장하지 않았습니다(21 CFR 211.137(a)). 귀사는 유통된 의약품에 표시된 사용기한을 뒷받침하는 지속적 안정성 시험 프로그램을 수립하고 유지하지 않았습니다. 지속적 안정성 프로그램 없이는 귀사의 의약품이 표시된 유효기간 전체에 걸쳐 허용 가능한 상태를 유지한다는 보장이 없습니다. 귀사의 답변에서 귀사는 다음 과정에 있다고 진술했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-01851b39ddb8b0a6b3c740c3",
+    "finding_text": "In your response, you provided an executed potency test method validation protocol for your Tacrolimus AQ human drug products; however, this test method remains unvalidated because the validation study: a. Lacked scientific rationale to justify establishing some of the relative standard deviations limits at (b)(4) ; b. Documented significant intra-batch potency variability; c. Did not record chromatography column temperature information for specificity, limit of…",
+    "finding_text_ko": "귀사는 답변서에 Tacrolimus AQ 인체용 의약품의 역가 시험방법 밸리데이션 프로토콜 실행본을 제출했습니다. 그러나 해당 밸리데이션 연구가 다음과 같으므로 이 시험방법은 여전히 밸리데이션되지 않았습니다. a. 일부 상대표준편차 한계를 (b)(4)로 설정한 과학적 근거가 부족함, b. 상당한 배치 내 역가 변동성을 기록함, c. 특이성, 검출한계 등에 대한 크로마토그래피 컬럼 온도 정보를 기록하지 않음…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0b6e41c006d6fdc246309eb3",
+    "finding_text": "Failure to establish and follow a written testing program designed to assess the stability characteristics of drug products and to use the results of such stability testing to determine appropriate storage conditions and expiration dates [21 CFR 211.166(a)]. Specifically, your firm has assigned a two-year expiration date to your products without adequate data demonstrating the stability characteristics of the products. For example, in your study protocol for PalinGen® Flow®…",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하고 해당 안정성 시험 결과를 사용하여 적절한 보관 조건과 사용기한을 결정하도록 설계된 문서화된 시험 프로그램을 수립하고 준수하지 않았습니다[21 CFR 211.166(a)]. 구체적으로, 귀사는 제품의 안정성 특성을 입증하는 충분한 자료 없이 제품에 2년의 사용기한을 부여했습니다. 예를 들어, PalinGen® Flow®에 대한 귀사의 시험 프로토콜에서는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2d8d73be02f4ba4c439bd156",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm manufactures an over-the-counter (OTC) topical drug product, (b)(4) . You failed to perform adequate identity testing of each component lot used in the manufacture of your drug product. You…",
+    "finding_text_ko": "귀사는 의약품의 각 구성성분의 확인을 검증하기 위한 시험을 최소 1회 수행하지 않았습니다. 또한 귀사는 적절한 주기로 구성성분 공급업체의 시험 분석을 밸리데이션하고 그 신뢰성을 확립하지 않았습니다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 일반의약품(OTC) 국소용 의약품인 (b)(4)을 제조합니다. 귀사는 의약품 제조에 사용되는 각 구성성분 로트에 대해 적절한 확인시험을 수행하지 않았습니다. 귀사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35c5fdca7f13f384202862be",
+    "finding_text": "Failure to follow written procedures describing the handling of all written and oral complaints regarding a drug product [21 CFR 211.198(a)]. For example, the report for consumer complaint CC-000159 related to PalinGen® Flow® indicated that the incident involved a communicable disease and required medical/surgical intervention; however, you did not report this event to FDA within 15 days, as required by your written complaint procedure. We acknowledge receipt of your letters…",
+    "finding_text_ko": "의약품에 관한 모든 서면 및 구두 불만의 처리 방법을 설명하는 문서화된 절차를 준수하지 않았습니다[21 CFR 211.198(a)]. 예를 들어, PalinGen® Flow®와 관련된 소비자 불만 CC-000159 보고서에는 해당 사건이 전염성 질환과 관련되고 의학적/외과적 개입이 필요했다고 기재되어 있었으나, 귀사는 문서화된 불만 처리 절차에서 요구하는 15일 이내에 이 사건을 FDA에 보고하지 않았습니다. 당국은 귀사의 서신을 접수했음을 확인합니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-369b72910fcf3dab679dac13",
+    "finding_text": "Failure to ensure that an investigation is conducted according to the signed investigator statement, the investigational plan, and applicable regulations. [21 CFR § 312.60]. A. Subjects were consented and enrolled in the study despite failing to meet required eligibility criteria outlined in the protocol. i. Subject (b)(6) participated in the study despite meeting exclusion criterion #13 for participation in another clinical trial within 30 days prior to their screening…",
+    "finding_text_ko": "서명된 시험자 진술서, 임상시험 계획 및 적용 규정에 따라 임상시험이 수행되도록 보장하지 않았습니다[21 CFR § 312.60]. A. 시험대상자들은 시험계획서에 명시된 필수 적격성 기준을 충족하지 못했음에도 동의 절차를 거쳐 시험에 등록되었습니다. i. 시험대상자 (b)(6)은 스크리닝 전 30일 이내 다른 임상시험에 참여하여 제외기준 #13에 해당했음에도 시험에 참여했습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3b35376673954326fc095f04",
+    "finding_text": "Your firm failed to conduct (b)(4) testing on (b)(4) used to sterilize the human drug product Fluorouracil PF. Therefore, you do not have assurance that the (b)(4) was integral throughout use.",
+    "finding_text_ko": "귀사는 인체용 의약품 Fluorouracil PF의 멸균에 사용되는 (b)(4)에 대해 (b)(4) 시험을 수행하지 않았습니다. 따라서 귀사는 사용 전반에 걸쳐 해당 (b)(4)의 완전성이 유지되었다는 보장이 없습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-49b401e6824d7ef401de014c",
+    "finding_text": "In your response, you commit to completing new media fill studies; however, the provided media fill protocol does not include simulating the high-risk step of (b)(4) drug product suspension.",
+    "finding_text_ko": "귀사는 답변서에서 새로운 배지충전시험을 완료하겠다고 약속했으나, 제출된 배지충전시험 프로토콜에는 (b)(4) 의약품 현탁액의 고위험 단계를 모사하는 내용이 포함되어 있지 않습니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4df626f5b8b1ec10fe13d62f",
+    "finding_text": "Failure to prepare and maintain adequate and accurate case histories [21 CFR § 312.62(b)]. A. You failed to record all adverse events (AEs) pertinent to the investigation for the following: i. Subject (b)(6) reported vomiting during a visit on (b)(6) and called to report significant pain after a gastrostomy procedure on (b)(6) . Neither AE was reported on the subject’s AE log. ii. Subject (b)(6) reported swelling on the ball of foot and cheek on January 14, 2019 that…",
+    "finding_text_ko": "적절하고 정확한 증례기록을 작성하고 유지하지 않았습니다[21 CFR § 312.62(b)]. A. 귀사는 다음 시험대상자의 임상시험 관련 모든 유해사례(AE)를 기록하지 않았습니다. i. 시험대상자 (b)(6)은 (b)(6) 방문 중 구토를 보고했고, (b)(6) 위루술 후 심한 통증을 신고하기 위해 전화했습니다. 두 AE 모두 해당 시험대상자의 AE 기록에 보고되지 않았습니다. ii. 시험대상자 (b)(6)은 2019년 1월 14일 발바닥 앞부분과 뺨의 부종을 보고했으며…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f100700ba77aabd5561c308",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)).",
+    "finding_text_ko": "귀사는 구성성분, 의약품 용기, 마개, 공정 중 자재, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 규격, 표준, 검체 채취 계획 및 시험절차를 포함하는 시험실 관리를 수립하지 않았습니다(21 CFR 211.160(b)).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5065f920e4048556e344a679",
+    "finding_text": "Failure to establish written procedures for production and process control designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess [21 CFR 211.100(a)]. Specifically, your firm did not validate the manufacturing processes for PalinGen® Flow® or PalinGen® InovōFlo® with respect to identity, strength, quality, and purity.Your firm’s validation protocol is insufficient as it does not include supporting…",
+    "finding_text_ko": "의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖추도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았습니다[21 CFR 211.100(a)]. 구체적으로, 귀사는 PalinGen® Flow® 또는 PalinGen® InovōFlo®의 제조공정을 확인, 함량, 품질 및 순도 측면에서 밸리데이션하지 않았습니다. 귀사의 밸리데이션 프로토콜에는 뒷받침하는 다음 사항이 포함되어 있지 않아 불충분합니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-52055fb8fa50968884e50423",
+    "finding_text": "Failure to assure that an IRB that complies with the requirements set forth in 21 CFR part 56 is responsible for initial and continuing review and approval of the proposed clinical study and failure to obtain IRB approval prior to changes in research activity. [21 CFR § 312.66]. A. You failed to ensure that study personnel who were also IRB members did not participate in IRB reviews that may present conflicting interests, as required by 21 CFR § 56.107(e). (b)(6), (b)(4) was…",
+    "finding_text_ko": "21 CFR part 56에 명시된 요건을 준수하는 임상시험심사위원회(IRB)가 제안된 임상시험의 최초 및 지속적 검토와 승인을 담당하도록 보장하지 않았으며, 연구 활동을 변경하기 전에 IRB 승인을 받지 않았습니다[21 CFR § 312.66]. A. 귀사는 21 CFR § 56.107(e)에서 요구하는 바와 같이 IRB 위원이기도 한 시험 담당자가 이해상충 가능성이 있는 IRB 검토에 참여하지 않도록 보장하지 않았습니다. (b)(6), (b)(4)은…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-59f365e5063da9e1d4e42403",
+    "finding_text": "In your response, you stated that your firm’s media fill studies, smoke studies, and environmental monitoring program are supporting indicators that your HEPA filter airflow velocities are adequate; however, the current FDA inspection found deficiencies in each of these areas. As such, you have not provided scientific evidence to demonstrate that the wide ranges of airflow velocities generated by your HEPA filters do not adversely impact the airflow patterns inside your ISO…",
+    "finding_text_ko": "귀사는 답변서에서 배지충전시험, 연기시험 및 환경 모니터링 프로그램이 HEPA 필터 기류 속도의 적절성을 뒷받침하는 지표라고 진술했습니다. 그러나 이번 FDA 실사에서는 각 영역에서 결함이 발견되었습니다. 따라서 귀사는 HEPA 필터가 생성하는 넓은 범위의 기류 속도가 ISO 내부 기류 패턴에 부정적 영향을 미치지 않음을 입증하는 과학적 증거를 제공하지 않았습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5b2344dd06b78950401c3ad4",
+    "finding_text": "Your firm failed to perform adequate smoke studies under dynamic conditions to demonstrate unidirectional airflow within the ISO 5 classified critical area, in that you did not include production steps that may impede airflow such as mixing drug lots in (b)(4) vessels. Therefore, your products intended to be sterile are produced in an environment that may not provide adequate protection against the risk of contamination.",
+    "finding_text_ko": "귀사는 (b)(4) 용기에서 의약품 로트를 혼합하는 등 기류를 방해할 수 있는 생산 단계를 포함하지 않아, ISO 5 등급 중요 구역 내 단방향 기류를 입증하기 위한 동적 조건의 적절한 연기시험을 수행하지 않았습니다. 따라서 무균 상태를 표방하는 귀사의 제품은 오염 위험으로부터 충분한 보호를 제공하지 못할 수 있는 환경에서 생산됩니다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5eff7a32f81328e62f4f42da",
+    "finding_text": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+    "finding_text_ko": "귀사는 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 않았습니다(21 CFR 211.113(b)).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5f77a1f797ea1229878c5371",
+    "finding_text": "In your response, you commit to performing (b)(4) testing; however, your firm did not provide evidence that you have purchased the referenced (b)(4) Tester, or revised your standard operating procedures and master batch records. Additionally, while you stated you would perform additional sterility testing, the sterility test in itself is not indicative that the batch is sterile, because when contamination is present, it is not uniformly distributed throughout the batch…",
+    "finding_text_ko": "귀사는 답변서에서 (b)(4) 시험을 수행하겠다고 약속했으나, 언급한 (b)(4) 시험기를 구매했거나 표준작업절차 및 마스터 배치 기록을 개정했다는 증거를 제출하지 않았습니다. 또한 추가 무균시험을 수행하겠다고 진술했으나, 오염이 존재할 때 배치 전체에 균일하게 분포하지 않으므로 무균시험 자체만으로 해당 배치가 무균임을 나타내지는 않습니다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-60664e5e6cd9b0a48893f8b5",
+    "finding_text": "Failure to establish and follow appropriate written procedures designed to prevent microbiological contamination of drug products purporting to be sterile, including procedures for validation of all aseptic and sterilization processes [21 CFR 211.113(b)]. For example, your firm failed to adequately validate the aseptic process used to manufacture over (b)(4) units of PalinGen® (b)(4) and PalinGen® (b)(4) since your manufacturing operations began in March 2020. More…",
+    "finding_text_ko": "모든 무균 공정 및 멸균 공정의 밸리데이션 절차를 포함하여 무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 적절한 문서화된 절차를 수립하고 준수하지 않았습니다[21 CFR 211.113(b)]. 예를 들어, 귀사는 2020년 3월 제조 작업을 시작한 이후 (b)(4)개가 넘는 PalinGen® (b)(4) 및 PalinGen® (b)(4)의 제조에 사용된 무균 공정을 적절히 밸리데이션하지 않았습니다. 추가로…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-623f5599275492af3c1f3b25",
+    "finding_text": "Your firm failed to establish written responsibilities and procedures applicable to the quality control unit and to follow such written procedures (21 CFR 211.22(d)).",
+    "finding_text_ko": "귀사는 품질관리부서에 적용되는 책임과 절차를 문서화하고 해당 문서화된 절차를 준수하지 않았습니다(21 CFR 211.22(d)).",
+    "translation_method": "llm_assisted"
+  }
+]

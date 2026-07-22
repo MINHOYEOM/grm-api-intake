@@ -1,0 +1,109 @@
+{
+  "items": [
+    {
+      "id": "pmda-000264540",
+      "code": "",
+      "title_en": "Failure to confirm adequacy of raw materials",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000264540.pdf"
+    },
+    {
+      "id": "pmda-000266952",
+      "code": "",
+      "title_en": "Risks associated with handling substances with unknown pharmacological activities and toxicities",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266952.pdf"
+    },
+    {
+      "id": "pmda-000266000",
+      "code": "",
+      "title_en": "Overlooked risks to the quality of products due to insufficient CAPA",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266000.pdf"
+    },
+    {
+      "id": "pmda-000266953",
+      "code": "",
+      "title_en": "Importance of thorough management of outsourced activities",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266953.pdf"
+    },
+    {
+      "id": "pmda-000266390",
+      "code": "",
+      "title_en": "Improper recording",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266390.pdf"
+    },
+    {
+      "id": "pmda-000266391",
+      "code": "",
+      "title_en": "Improper modification of records to align with instructions",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266391.pdf"
+    },
+    {
+      "id": "pmda-000266389",
+      "code": "",
+      "title_en": "Mislabeling of the products caused by the violation of procedures",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266389.pdf"
+    },
+    {
+      "id": "pmda-000266954",
+      "code": "",
+      "title_en": "Environmental monitoring in aseptic processing areas",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266954.pdf"
+    },
+    {
+      "id": "pmda-000266955",
+      "code": "",
+      "title_en": "Handling of stability monitoring results",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000266955.pdf"
+    },
+    {
+      "id": "pmda-000280045",
+      "code": "",
+      "title_en": "Communication within the Organization (From the Manufacturing Floor to Management)",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000280045.pdf"
+    },
+    {
+      "id": "pmda-000280046",
+      "code": "",
+      "title_en": "Communication within the Organization (From Management to the Manufacturing Floor)",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000280046.pdf"
+    },
+    {
+      "id": "pmda-000280043",
+      "code": "",
+      "title_en": "Development of a Risk-Based Validation Plan",
+      "doc_type": "inspection-observation",
+      "official_url": "https://www.pmda.go.jp/files/000280043.pdf"
+    },
+    {
+      "id": "pmda-000276919",
+      "code": "",
+      "title_en": "GMP / GCTP Annual Report FY 2024",
+      "doc_type": "annual-report",
+      "official_url": "https://www.pmda.go.jp/files/000276919.pdf"
+    },
+    {
+      "id": "pmda-000273637",
+      "code": "",
+      "title_en": "GMP / GCTP Annual Report FY 2023",
+      "doc_type": "annual-report",
+      "official_url": "https://www.pmda.go.jp/files/000273637.pdf"
+    },
+    {
+      "id": "pmda-000267517",
+      "code": "",
+      "title_en": "GMP / GCTP Annual Report FY 2022",
+      "doc_type": "annual-report",
+      "official_url": "https://www.pmda.go.jp/files/000267517.pdf"
+    }
+  ]
+}

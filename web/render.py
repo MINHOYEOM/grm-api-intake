@@ -456,6 +456,10 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "intro": "일본 의약품의료기기종합기구(PMDA)가 공개한 GMP 실사 지적사례(ORANGE Letter)의 영문판과 GMP/GCTP 연차보고서를 정리했습니다. ORANGE Letter는 특정 업체가 아니라 실사에서 반복 확인되는 결함 유형(기록 부적정·CAPA 미흡·무균 환경모니터링 등)의 배경·위험·점검 포인트를 익명 케이스로 설명하는 자료입니다. 각 문서의 공식 원문 PDF로 바로 연결됩니다. 영문판은 일본어 원문 대비 시차가 있을 수 있으며, 최신 현황은 공식 원문에서 확인하세요.",
      "desc": "일본 PMDA GMP 실사 지적사례(ORANGE Letter) 영문판·GMP/GCTP 연차보고서 목록 — 제목·유형·공식 원문 PDF 링크.",
      "public_base": "https://www.pmda.go.jp/english/review-services/gmp-qms-gctp/0007.html",
+     "groups_by_doc_type": [
+         {"doc_type": "inspection-observation", "label": "실사 지적사례", "label_en": "Inspection Cases"},
+         {"doc_type": "annual-report", "label": "연차보고서", "label_en": "Annual Reports"},
+     ],
      "doc_type_labels": {"inspection-observation": "실사 지적사례", "annual-report": "연차보고서"}},
 ]
 
@@ -492,8 +496,6 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
     - Tier/QA·수집일 등 내부 운영 필드는 뷰에 올리지 않는다(사용자 노출 금지)."""
     items = [_library_item_view(it) for it in raw.get("items", [])]
     labels = entry.get("doc_type_labels") or {}
-    for it in items:
-        it["doc_type"] = labels.get(it["doc_type"], it["doc_type"])
     if entry.get("sort") == "published_desc":
         items = sorted(items, key=lambda it: it["published_date"], reverse=True)
     groups: list[dict[str, Any]] = []
@@ -513,9 +515,30 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
         if rest:
             groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
                            "official_url": "", "items": rest})
+    elif entry.get("groups_by_doc_type"):
+        # doc_type(원 slug) 기준 계열 그룹핑 — URL 로 안 갈리는 카탈로그(PMDA 실사사례/연차보고서)용.
+        # 라벨 치환 전 slug 로 매칭하므로 이 블록은 반드시 아래 doc_type 라벨 치환보다 앞에 온다.
+        rest = list(items)
+        for spec in entry["groups_by_doc_type"]:
+            matched = [it for it in rest if it["doc_type"] == spec["doc_type"]]
+            rest = [it for it in rest if it not in matched]
+            groups.append({
+                "badge": spec.get("badge", ""),
+                "label": spec.get("label", ""),
+                "label_en": spec.get("label_en", ""),
+                "blurb": spec.get("blurb", ""),
+                "official_url": "",
+                "items": matched,
+            })
+        if rest:
+            groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
+                           "official_url": "", "items": rest})
     else:
         groups.append({"badge": "", "label": "", "label_en": "", "blurb": "",
                        "official_url": "", "items": items})
+    # doc_type 표시 라벨은 그룹핑(원 slug 매칭) 이후 적용 — groups_by_doc_type 가 slug 로 나뉘도록.
+    for it in items:
+        it["doc_type"] = labels.get(it["doc_type"], it["doc_type"])
     dates = [it["published_date"] for it in items if it["published_date"]]
     meta = raw.get("meta", {})
     return {
@@ -527,7 +550,7 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
         "link_label": entry.get("link_label", ""),
         "count": len(items),
         "latest_published": max(dates) if dates else "",
-        "grouped": bool(entry.get("groups_by_url")),
+        "grouped": bool(entry.get("groups_by_url") or entry.get("groups_by_doc_type")),
         "groups": groups,
     }
 

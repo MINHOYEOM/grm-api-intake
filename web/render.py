@@ -449,6 +449,14 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "sort": "published_desc",
      "public_base": "https://www.canada.ca/en/health-canada.html",
      "doc_type_labels": {"guidance": "가이던스"}},
+    {"slug": "pmda", "file": "pmda.json", "unit": "건",
+     "kick": "PMDA · Inspection Cases",
+     "title": "PMDA 실사 지적사례 (ORANGE Letter)",
+     "blurb": "일본 PMDA가 공개한 GMP 실사 지적사례(ORANGE Letter) 영문판과 GMP/GCTP 연차보고서 목록.",
+     "intro": "일본 의약품의료기기종합기구(PMDA)가 공개한 GMP 실사 지적사례(ORANGE Letter)의 영문판과 GMP/GCTP 연차보고서를 정리했습니다. ORANGE Letter는 특정 업체가 아니라 실사에서 반복 확인되는 결함 유형(기록 부적정·CAPA 미흡·무균 환경모니터링 등)의 배경·위험·점검 포인트를 익명 케이스로 설명하는 자료입니다. 각 문서의 공식 원문 PDF로 바로 연결됩니다. 영문판은 일본어 원문 대비 시차가 있을 수 있으며, 최신 현황은 공식 원문에서 확인하세요.",
+     "desc": "일본 PMDA GMP 실사 지적사례(ORANGE Letter) 영문판·GMP/GCTP 연차보고서 목록 — 제목·유형·공식 원문 PDF 링크.",
+     "public_base": "https://www.pmda.go.jp/english/review-services/gmp-qms-gctp/0007.html",
+     "doc_type_labels": {"inspection-observation": "실사 지적사례", "annual-report": "연차보고서"}},
 ]
 
 

@@ -1,0 +1,42 @@
+{
+  "raw": {
+    "api": "EudraGMDP GMP Non-Compliance",
+    "report_no": "PE010-5017",
+    "doc_ref": "186339",
+    "mia_number": "6558",
+    "site_name": "Laboratorios Eurisko S.L.",
+    "site_address": "Nave 3, Poligono Industrial El Moli, Sant Iscle De Vallalta, 08359, Spain",
+    "oms_location": "LOC-100037468",
+    "city": "Sant Iscle De Vallalta",
+    "postcode": "08359",
+    "country": "Spain",
+    "authority_country": "Spain",
+    "product_scope": "Veterinary Medicinal Products",
+    "inspection_end_date": "2026-06-17",
+    "issue_date": "2026-07-13",
+    "ncr_operations": "1 NON-COMPLIANT MANUFACTURING OPERATIONS 1.2 Non-sterile products 1.2.1.6 Liquids for internal use 1.2.2 Batch certification 1.5 Packaging 1.6 Quality control testing 1.6.3 Chemical/Physical",
+    "ncr_nature": "During the visit, critical and major deficiencies in compliance with EU Good Manufacturing Practices (GMP) were observed in the authorised facilities in building 3. In general, these deficiencies were related to a non-existent Pharmaceutical Quality System and, consequently, a lack of control over manufacturing and quality control operations.",
+    "ncr_action": "Suspension of the manufacturing authorisation No. 6558 in Full. Recall of batches already released. Recall of any medicinal product manufactured at Laboratorios Eurisko, S.L. is proposed. Prohibition of supply.",
+    "ncr_additional": "The activity of manufacturing and distribution of medicinal products and active substances was immediately suspended onsite as a precautionary measure. This measure has been adopted due to the possible risk to animal/public health.",
+    "eudragmdp_search_url": "https://eudragmdp.ema.europa.eu/inspections/gmpc/searchGMPNonCompliance.do",
+    "pdf_archived_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186339.pdf",
+    "pdf_archived": true,
+    "product_type": "Veterinary Medicinal Products",
+    "product_description": "1 NON-COMPLIANT MANUFACTURING OPERATIONS 1.2 Non-sterile products"
+  },
+  "row": {
+    "date": "2026-07-13",
+    "document_id": "186339",
+    "firm": "Laboratorios Eurisko S.L.",
+    "headline": "Laboratorios Eurisko S.L. — GMP Non-Compliance (Spain)",
+    "language": "EN",
+    "modality": "Chemical",
+    "official_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186339.pdf",
+    "signal_tier": "Tier 3",
+    "site_country": "Spain",
+    "source": "EU GMP NCR (EudraGMDP)",
+    "source_url": "https://eudragmdp.ema.europa.eu/inspections/gmpc/searchGMPNonCompliance.do",
+    "api_query": "https://eudragmdp.ema.europa.eu/inspections/gmpc/searchGMPNonCompliance.do",
+    "type_or_class": "gmp-non-compliance"
+  }
+}

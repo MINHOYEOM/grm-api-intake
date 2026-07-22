@@ -23,7 +23,7 @@ on:
         type: string
         default: '7'
       sources:
-        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe none). 비우면 전체'
+        description: '수집 소스 제한(공백/쉼표 구분: fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe eu_gmp_ncr none). 비우면 전체'
         type: string
         default: ''
       handoff_doc_ids:
@@ -247,6 +247,9 @@ jobs:
           # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak RSS 수집 — opt-in Expert Secondary.
           # input 없음(dispatch inputs 25개 상한) — 수동은 sources=ispe 토큰, 상시는 vars.
           ENABLE_ISPE: ${{ vars.ENABLE_ISPE || 'false' }}
+          # [EU GMP NCR 2026-07-23] EudraGMDP GMP 비준수 — dispatch 입력 없이 vars 전용
+          # (입력 25 상한 회피·ISPE 관례). 상시 활성은 vars.ENABLE_EU_GMP_NCR=true.
+          ENABLE_EU_GMP_NCR: ${{ vars.ENABLE_EU_GMP_NCR || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_moleg_api != 'inherit') && inputs.enable_moleg_api || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_scrape != 'inherit') && inputs.enable_scrape || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
@@ -303,7 +306,7 @@ jobs:
             if [ -n "$GRM_SOURCES" ]; then
               # 쉼표도 공백으로 처리. 허용된 source 토큰만 --sources 인자로 전달.
               read -r -a SOURCE_TOKENS <<< "$(printf '%s' "$GRM_SOURCES" | tr ',' ' ')"
-              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe none)
+              valid_sources=(fr recall ema mhra pics eca wl mfds ich who hc fda483 ispe eu_gmp_ncr none)
               source_args=()
               for src in "${SOURCE_TOKENS[@]}"; do
                 ok=false

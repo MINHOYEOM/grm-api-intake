@@ -27,8 +27,8 @@
    "intake_total": 135,
    "rendered": 38,
    "evidence": {
-    "A": 23,
-    "B": 15,
+    "A": 25,
+    "B": 13,
     "C": 0
    },
    "resources": 5
@@ -1407,128 +1407,8 @@
    }
   },
   {
-   "id": "625fc2215ae3",
-   "render_order": 13,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "MHRA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "Class 2 Medicines Recall: Beckton Dickson UK Ltd, ChloraPrep…",
-   "title_issue": "멸균 포장 결함 회수",
-   "summary": "영국 Becton Dickinson UK Ltd가 포장 공정상의 멸균성 침해 가능성으로 인해 ChloraPrep 2% w/v/70% v/v 피부용 소독액 1mL 어플리케이터 일부 배치를 클래스2 등급으로 회수했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-13"
-    },
-    {
-     "label": "문서번호",
-     "value": "625fc2215ae3"
-    },
-    {
-     "label": "발행기관",
-     "value": "MHRA"
-    },
-    {
-     "label": "주제",
-     "value": "Class 2 Medicines Recall: Beckton Dickson UK Ltd, ChloraPrep 1mL applicator, EL(…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "제품: ChloraPrep 2% w/v / 70% v/v cutaneous solution 1mL applicator",
-    "회수 등급: Class 2",
-    "사유: 포장 공정상 멸균성 침해(breach of sterility) 가능성",
-    "공고번호: EL(26)A/34, 발행일 2026-07-13"
-   ],
-   "implication": "포장 공정에서의 멸균성 침해 가능성은 무균제제 포장라인의 실링 및 공정관리 이슈와 일반적으로 연관될 수 있다. 국내에서 유사 소독제·무균 어플리케이터 제품을 취급하는 업체는 포장공정의 실링 밸리데이션 및 용기완전성시험(CCIT) 기록을 점검할 필요가 있다.",
-   "checks": [
-    "포장 실링 공정 밸리데이션 기록 확인",
-    "용기완전성시험(CCIT) 결과 검토",
-    "해당 배치 유통 현황 확인"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.gov.uk/drug-device-alerts.atom",
-    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-beckton-dickson-uk-ltd-chloraprep-1ml-applicator-el-26-a-slash-34",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
-   "id": "93f98fe39f5c",
-   "render_order": 14,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "MHRA",
-   "card_type": "규제 소식",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP News",
-   "headline_target": "Class 2 Medicines Recall: Bristol Laboratories Limited, Phen…",
-   "title_issue": "라벨링 결함 회수",
-   "summary": "영국 Bristol Laboratories Limited가 제품 라벨링 문제로 인해 Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free 1개 배치(7124002)를 클래스2 등급으로 회수했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-07-09"
-    },
-    {
-     "label": "문서번호",
-     "value": "93f98fe39f5c"
-    },
-    {
-     "label": "발행기관",
-     "value": "MHRA"
-    },
-    {
-     "label": "주제",
-     "value": "Class 2 Medicines Recall: Bristol Laboratories Limited, Phenoxymethylpenicillin…"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "제품: Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free BP",
-    "배치번호: 7124002",
-    "회수 등급: Class 2",
-    "사유: 제품 라벨링 문제(product labelling issues), 공고번호 EL(26)A/33"
-   ],
-   "implication": "라벨링 오류로 인한 회수는 표시사항 검증 및 인쇄공정 관리의 중요성을 보여준다. 국내에서 유사 경구용 항생제 제제를 취급하는 업체는 라벨 교정 및 인쇄물 대조 절차를 재점검할 필요가 있다.",
-   "checks": [
-    "라벨 인쇄물 대조 검증 절차 확인",
-    "해당 배치(7124002) 유통 현황 확인",
-    "라벨링 관리 SOP 점검"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.gov.uk/drug-device-alerts.atom",
-    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-bristol-laboratories-limited-phenoxymethylpenicillin-250-mg-slash-5ml-sugar-free-oral-solution-bp-el-26-a-slash-33",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   }
-  },
-  {
    "id": "admin-2026005761",
-   "render_order": 15,
+   "render_order": 13,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1620,7 +1500,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-NZn",
-   "render_order": 16,
+   "render_order": 14,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1770,7 +1650,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-ORx",
-   "render_order": 17,
+   "render_order": 15,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1865,7 +1745,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-SIF",
-   "render_order": 18,
+   "render_order": 16,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1928,7 +1808,7 @@
   },
   {
    "id": "gmpinspect-1PzTi7L-SxA",
-   "render_order": 19,
+   "render_order": 17,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -2048,7 +1928,7 @@
   },
   {
    "id": "recall-117f512e15b2",
-   "render_order": 20,
+   "render_order": 18,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2113,7 +1993,7 @@
   },
   {
    "id": "recall-c5a24b0b2d9c",
-   "render_order": 21,
+   "render_order": 19,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2178,7 +2058,7 @@
   },
   {
    "id": "D-0661-2026",
-   "render_order": 22,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2251,7 +2131,7 @@
   },
   {
    "id": "recall-b0b313a5979f",
-   "render_order": 23,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2316,7 +2196,7 @@
   },
   {
    "id": "recall-0c507fba0be3",
-   "render_order": 24,
+   "render_order": 22,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2381,7 +2261,7 @@
   },
   {
    "id": "recall-8b39059b5cbc",
-   "render_order": 25,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2446,7 +2326,7 @@
   },
   {
    "id": "recall-8a6da91bb7dc",
-   "render_order": 26,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2506,6 +2386,136 @@
    "sources": {
     "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
     "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "625fc2215ae3",
+   "render_order": 25,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MHRA",
+   "card_type": "Recall(UK)",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Class 2 Medicines Recall: Beckton Dickson UK Ltd, ChloraPrep…",
+   "title_issue": "멸균 포장 결함 회수",
+   "summary": "영국 Becton Dickinson UK Ltd가 포장 공정상의 멸균성 침해 가능성으로 인해 ChloraPrep 2% w/v/70% v/v 피부용 소독액 1mL 어플리케이터 일부 배치를 클래스2 등급으로 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-13"
+    },
+    {
+     "label": "문서번호",
+     "value": "625fc2215ae3"
+    },
+    {
+     "label": "Class",
+     "value": "Class 2"
+    },
+    {
+     "label": "업체",
+     "value": "Beckton Dickson UK Ltd"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Becton Dickinson UK Ltd are recalling batches of ChloraPrep 2% w/v / 70% v/v cutaneous solution 1mL applicators due to a potential breach of sterility in the packaging process.",
+     "translation": "Becton Dickinson UK Ltd는 포장 공정상의 멸균성 침해 가능성으로 인해 ChloraPrep 2% w/v / 70% v/v 피부용 소독액 1mL 어플리케이터 배치를 회수하고 있다."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "제품: ChloraPrep 2% w/v / 70% v/v cutaneous solution 1mL applicator",
+    "회수 등급: Class 2",
+    "사유: 포장 공정상 멸균성 침해(breach of sterility) 가능성",
+    "공고번호: EL(26)A/34, 발행일 2026-07-13"
+   ],
+   "implication": "포장 공정에서의 멸균성 침해 가능성은 무균제제 포장라인의 실링 및 공정관리 이슈와 일반적으로 연관될 수 있다. 국내에서 유사 소독제·무균 어플리케이터 제품을 취급하는 업체는 포장공정의 실링 밸리데이션 및 용기완전성시험(CCIT) 기록을 점검할 필요가 있다.",
+   "checks": [
+    "포장 실링 공정 밸리데이션 기록 확인",
+    "용기완전성시험(CCIT) 결과 검토",
+    "해당 배치 유통 현황 확인"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.gov.uk/drug-device-alerts.atom",
+    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-beckton-dickson-uk-ltd-chloraprep-1ml-applicator-el-26-a-slash-34",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "93f98fe39f5c",
+   "render_order": 26,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MHRA",
+   "card_type": "Recall(UK)",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Class 2 Medicines Recall: Bristol Laboratories Limited, Phen…",
+   "title_issue": "라벨링 결함 회수",
+   "summary": "영국 Bristol Laboratories Limited가 제품 라벨링 문제로 인해 Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free 1개 배치(7124002)를 클래스2 등급으로 회수했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-07-13"
+    },
+    {
+     "label": "문서번호",
+     "value": "93f98fe39f5c"
+    },
+    {
+     "label": "Class",
+     "value": "Class 2"
+    },
+    {
+     "label": "업체",
+     "value": "Bristol Laboratories Limited"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Bristol Laboratories Limited is recalling one batch (7124002) of Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free due to product labelling issues.",
+     "translation": "Bristol Laboratories Limited는 제품 라벨링 문제로 인해 Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free 1개 배치(7124002)를 회수하고 있다."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "제품: Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free BP",
+    "배치번호: 7124002",
+    "회수 등급: Class 2",
+    "사유: 제품 라벨링 문제(product labelling issues), 공고번호 EL(26)A/33"
+   ],
+   "implication": "라벨링 오류로 인한 회수는 표시사항 검증 및 인쇄공정 관리의 중요성을 보여준다. 국내에서 유사 경구용 항생제 제제를 취급하는 업체는 라벨 교정 및 인쇄물 대조 절차를 재점검할 필요가 있다.",
+   "checks": [
+    "라벨 인쇄물 대조 검증 절차 확인",
+    "해당 배치(7124002) 유통 현황 확인",
+    "라벨링 관리 SOP 점검"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.gov.uk/drug-device-alerts.atom",
+    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-bristol-laboratories-limited-phenoxymethylpenicillin-250-mg-slash-5ml-sugar-free-oral-solution-bp-el-26-a-slash-33",
     "official_is_pdf": false,
     "link_check": {
      "info": "pending",

@@ -1,0 +1,56 @@
+{
+  "agency": "MHRA",
+  "card_type": "Recall(UK)",
+  "category": "Other",
+  "checks": [],
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2026-07-13"
+    },
+    {
+      "label": "문서번호",
+      "value": "el26a34"
+    },
+    {
+      "label": "Class",
+      "value": "Class 2"
+    },
+    {
+      "label": "업체",
+      "value": "Example Pharma UK Ltd"
+    }
+  ],
+  "group": "Recall",
+  "group_label": null,
+  "headline_target": "Cutaneous solution applicator recall",
+  "id": "el26a34",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [
+    {
+      "original": "A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process.",
+      "translation": ""
+    }
+  ],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "sources": {
+    "info_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-el-26-a-34",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-el-26-a-34"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "Recall"
+}

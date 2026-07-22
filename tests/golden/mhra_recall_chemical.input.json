@@ -1,0 +1,21 @@
+{
+  "raw": {
+    "category": "Class 2 Medicines Recall",
+    "id": "el26a34",
+    "published": "2026-07-13",
+    "summary": "A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process.",
+    "title": "Class 2 Medicines Recall: Example Pharma UK Ltd, Cutaneous solution 1mL applicator, EL(26)A/34"
+  },
+  "row": {
+    "date": "2026-07-13",
+    "document_id": "el26a34",
+    "headline": "Cutaneous solution applicator recall",
+    "language": "",
+    "modality": "",
+    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-el-26-a-34",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MHRA Inspectorate",
+    "type_or_class": "Class 2 Medicines Recall"
+  }
+}

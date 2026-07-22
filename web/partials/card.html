@@ -183,6 +183,30 @@
     </div>
     {%- endfor %}
   </details>
+  {%- elif card.deterministic_detail.type == 'eu_gmp_ncr_statement' %}
+  {#- [EU GMP NCR 상세 2026-07-23] EudraGMDP Statement of Non-Compliance 전문 — 수집기가
+      상세 페이지에서 결정론 추출(LLM 0·환각 0). W3 인용은 위반내용 250자만 보여주므로 완결된
+      위반내용·당국조치 전문을 여기 verbatim(영문·EudraGMDP 원문). 공식 원문 PDF 는 공식원본
+      링크로 별도. 값 부재 카드는 이 블록 미렌더(수집기 게이트). 483/WL 블록과 동형 클래스라
+      CSS 추가 없음. 한글안전(§4): 셀에 mono/code 클래스 미사용. -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>비준수 상세 <span class="sub">· 원문 기반 · EudraGMDP</span></summary>
+    {%- if dd.authority_country or dd.product_scope %}
+    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행 NCA · {{ dd.authority_country }}</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
+    {%- endif %}
+    {%- if dd.operations %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">비준수 운영항목</span></div><p class="obs-en">{{ dd.operations }}</p></div>
+    {%- endif %}
+    {%- if dd.nature %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">위반내용 (Nature of non-compliance)</span></div><div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.nature }}</p></div></div>
+    {%- endif %}
+    {%- if dd.action %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">당국 조치 (Action taken/proposed)</span></div><div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.action }}</p></div></div>
+    {%- endif %}
+    {%- if dd.additional %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">추가 코멘트</span></div><p class="obs-en">{{ dd.additional }}</p></div>
+    {%- endif %}
+  </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}

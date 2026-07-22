@@ -50,6 +50,10 @@ WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
     # periodic(지적 표 有 → deterministic_detail) + pre_market(표 無 → 필드 부재). web-card 전용
     # (FIXTURES 미포함 → brief golden·intake_total 불변).
     "gmp_inspection_periodic", "gmp_inspection_pre_market",
+    # [EU GMP NCR 2026-07-23] EudraGMDP GMP 비준수 — Evidence A(위반내용 인용) + 결정론
+    # 상세슬롯(eu_gmp_ncr_statement) + 아카이브 PDF official. web-card 전용(FIXTURES 미포함
+    # → brief golden·intake_total 불변).
+    "eu_gmp_ncr",
 ]
 
 # assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).

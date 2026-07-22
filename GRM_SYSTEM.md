@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.155` |
-| 최종 수정일 | 2026-07-21 |
+| 문서 버전 | `v1.156` |
+| 최종 수정일 | 2026-07-23 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 실전 검증 완료·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 8카탈로그 271건(ICH PDF 직링크·식약처 번역본 7토픽)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -175,7 +175,7 @@ flowchart TD
 - **듀얼 링크:** 모든 카드에 정보 출처(📰) + 공식 원본(📎). 모든 링크는 수집 근거(provenance)가 있어야 하며, 근거 없는 링크는 **발행 차단**(발행 전 게이트 + 발행 후 감사 이중 방어).
 - **Graceful degradation:** 수집기·Notion 장애로 handoff가 없어도 Routine은 WebSearch 단독 모드로 계속 동작.
 
-### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483 + ISPE)
+### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483 + ISPE + EU GMP NCR)
 
 | # | 소스 | 채널 | 상태 |
 |---|---|---|---|
@@ -189,8 +189,11 @@ flowchart TD
 | 11 | Health Canada (약품 recall·safety) | 오픈데이터 JSON | 활성 |
 | 12 | FDA 483 (실사 Observation = 가장 깊은 결함 원본) | OII FOIA Reading Room(백본 3단: DataTables→전수 JSON→정적 HTML) + PDF | 활성 |
 | 13 | ISPE iSpeak (전문지 브리핑 — GMP/품질 관련 항목만 keep_item 필터) | RSS(Drupal) | Expert Secondary · `ENABLE_ISPE`(기본 off) |
+| 14 | EU GMP NCR (EudraGMDP — EU/EEA 업체별 GMP 비준수 보고서) | Struts `.do` 서버렌더 스크래핑 + 공식 Statement PDF | 활성 · `ENABLE_EU_GMP_NCR`(기본 off) |
 
-> **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용).
+> **소스 14 상세(EudraGMDP GMP Non-Compliance):** FDA WL/483 과 동일하게 **News 카드(kind `eu-gmp-ncr`·Evidence A·발행 NCA·위반내용·당국조치 전문) + Findings 이중 편입**. `eudragmdp_client.py`(requests 전용·세션 쿠키 → POST 날짜창 → `action=Page&param=N` 절대 페이징 → `action=Drilldown&param=<doc_ref>` 상세 → `generateGMPCPDF.do` 공식 PDF)를 `collect_eu_gmp_ncr.py`가 IntakeItem 으로 변환. **dedup 키 = doc_ref**(1 NCR 이 다중 사이트로 여러 행 반복 가능 — report_no 부적합). 발행일 지연공개형 + 성긴 소스(4년 61건)라 enforcement 윈도우(30일) 수집. **출처 durability**: drilldown/PDF 가 세션상태 의존이라 URL 저장 불가 → 수집 시점에 공식 Statement PDF 를 Supabase Storage 공개버킷 `eudragmdp-ncr` 에 아카이브하고 그 공개 URL 을 official_url 로(아카이브 실패 시 EudraGMDP 검색 페이지 폴백). Findings 는 `grm_classify_483_scope` 우회 자동(트리거가 FDA 483/WL 만 분기 → EU NCR 은 scope_status 기본 `'ok'`).
+
+> **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용 — 자료실로 완결).
 
 ### 3.5 운영 모니터링 (health check)
 수집기 실행 말미에 `_evaluate_health()`가 단일 기준으로 판정합니다.
@@ -283,6 +286,8 @@ grm-api-intake/
 ├─ collect_intake.py               # 수집 오케스트레이터(단일 진입점)
 ├─ collect_mfds*.py                # 식약처 수집기(recall/admin/gmp_inspection/law/gmp_cert/safety_letter)
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
+├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
+├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ grm_common.py                   # 공통 HTTP·유틸
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스

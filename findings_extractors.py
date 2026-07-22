@@ -32,6 +32,9 @@ FDA_483_LIST_URL = (
 #            없어 건별 L1 불가(브리프도 동일하게 목록 인덱스 사용).
 MFDS_ADMIN_ACTION_INDEX_URL = "https://nedrug.mfds.go.kr/pbp/CCBAO01"
 MFDS_RECALL_INDEX_URL = "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+EU_GMP_NCR_SEARCH_URL = (
+    "https://eudragmdp.ema.europa.eu/inspections/gmpc/searchGMPNonCompliance.do"
+)
 
 _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*", re.I)
 
@@ -152,6 +155,7 @@ def findings_from_raw_signal_with_report(
     findings.extend(_from_mfds_recall(signal, raw, row))
     findings.extend(_from_warning_letter(signal, raw, row))
     findings.extend(_from_whopir(signal, raw, row))
+    findings.extend(_from_eu_gmp_ncr(signal, raw, row))
     return _dedupe_valid_findings_with_report(findings)
 
 
@@ -208,6 +212,40 @@ def _from_fda_483_observations(
             review_status="accepted",
         ))
     return out
+
+
+def _from_eu_gmp_ncr(
+    raw_signal: dict[str, Any],
+    raw: dict[str, Any],
+    row: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """EudraGMDP GMP 비준수(NCR) → 1 레코드 1 finding.
+
+    게이트 = raw.ncr_nature(위반내용 원문·수집기가 상세 페이지에서 결정론 추출). finding_text
+    = 위반내용 + 당국조치(둘 다 verbatim). evidence_url = 수집 시점에 아카이브한 공식 Statement
+    PDF(pdf_archived_url), 부재 시 EudraGMDP 검색 페이지 폴백. `grm_classify_483_scope` 우회는
+    자동(트리거가 source='FDA 483'/'FDA Warning Letter' 만 분기 → EU NCR 은 scope_status 기본 'ok').
+    """
+    nature = _compact(raw.get("ncr_nature"))
+    if not nature:
+        return []
+    action = _compact(raw.get("ncr_action"))
+    finding_text = nature
+    if action:
+        finding_text = f"{nature}\n\nAction taken/proposed by the NCA: {action}"
+    evidence_url = _evidence_url(
+        raw_signal, raw, "pdf_archived_url", "eudragmdp_search_url",
+        fallback=EU_GMP_NCR_SEARCH_URL)
+    return [gf.finding_from_raw_signal(
+        raw_signal,
+        finding_text=finding_text,
+        ordinal=1,
+        evidence_level="A",
+        evidence_url=evidence_url,
+        finding_language=_language(row, "EN"),
+        confidence=0.9,
+        review_status="accepted",
+    )]
 
 
 def _from_mfds_gmp(

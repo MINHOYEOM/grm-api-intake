@@ -53,6 +53,41 @@ class FindingsExtractorsTest(unittest.TestCase):
             [f["finding_id"] for f in again],
         )
 
+    def test_eu_gmp_ncr_becomes_accepted_finding(self) -> None:
+        raw_signal = _raw_signal("eu_gmp_ncr")
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)      # 1 NCR = 1 finding
+        self.assertValidFindings(findings)
+        f = findings[0]
+        self.assertEqual(f["agency"], "EMA")
+        self.assertEqual(f["evidence_level"], "A")
+        self.assertEqual(f["review_status"], "accepted")
+        self.assertEqual(f["finding_language"], "EN")
+        self.assertEqual(f["firm_name"], "Laboratorios Eurisko S.L.")
+        self.assertEqual(f["site_country"], "Spain")
+        self.assertEqual(f["published_date"], "2026-07-13")
+        # finding_text = 위반내용(Nature) + 당국조치(Action) 병기
+        self.assertIn("critical and major deficiencies", f["finding_text"])
+        self.assertIn("Action taken/proposed by the NCA", f["finding_text"])
+        # evidence_url = 아카이브한 공식 Statement PDF(품질필터 통과)
+        self.assertTrue(f["evidence_url"].endswith("/ncr/186339.pdf"))
+        self.assertEqual(gf.evidence_url_quality_error(f["evidence_url"]), "")
+
+        again = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(
+            [x["finding_id"] for x in findings],
+            [x["finding_id"] for x in again],
+        )
+
+    def test_eu_gmp_ncr_without_nature_extracts_nothing(self) -> None:
+        # 게이트 = ncr_nature. 없으면(수집 실패·구조변경) finding 0건(침묵 아님 — 상위에서 error).
+        fx = _load_input("eu_gmp_ncr")
+        fx["raw"].pop("ncr_nature", None)
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
     def test_mfds_gmp_deficiency_table_becomes_accepted_findings(self) -> None:
         raw_signal = _raw_signal("gmp_inspection_periodic")
 

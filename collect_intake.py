@@ -2892,7 +2892,10 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     ispe_items: list[IntakeItem] = []
     if enable_ispe:
         log("INFO", "=== ISPE 수집 시작 ===")
-        ispe_items, ispe_err = collect_ispe_rss(start, end)
+        # ISPE iSpeak 는 GMP 관련 글이 월 몇 편뿐인 성긴 블로그 → 기본 7일 창에서는
+        # keep_item 통과분이 대부분 창 밖으로 빠져 만성 0 (실측 재현: 7일→0·14일→2·30일→5).
+        # HC·FDA483 과 동일하게 enforcement 윈도우(기본 30일)를 사용한다. 재수집은 dedup 처리.
+        ispe_items, ispe_err = collect_ispe_rss(enf_start, end)
         stats.ispe_fetched = len(ispe_items)
         if ispe_err:
             stats.ispe_error = True

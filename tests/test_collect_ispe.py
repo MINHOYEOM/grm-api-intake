@@ -10,6 +10,7 @@ keep_item 관련성 필터(_is_ispe_gmp_relevant, grm_taxonomy.compute_relevance
 story-type div("iSpeak Blog")·<h1> 제목 중복·배너 <img> 가 앞쪽에 섞이고, 실제 요약문은
 field--name-field-description div 안에 있다.
 """
+import ast
 import os
 import sys
 import unittest
@@ -350,6 +351,36 @@ class IspeArticleExcerptGateTest(unittest.TestCase):
         self.assertEqual(len(calls), ci.ECA_ARTICLE_EXCERPT_CAP)    # fetch 만 cap 적용
         with_excerpt = sum(1 for it in items if it.raw_payload.get("article_excerpt"))
         self.assertEqual(with_excerpt, ci.ECA_ARTICLE_EXCERPT_CAP)
+
+
+class IspeEnforcementWindowWiringTest(unittest.TestCase):
+    """오케스트레이터(_run_collection)가 ISPE 를 enforcement 윈도우(enf_start)로 수집하는지 잠근다.
+
+    ISPE iSpeak 는 GMP 관련 글이 월 몇 편뿐인 성긴 블로그라 기본 7일 창에서는 keep_item 통과분이
+    대부분 창 밖으로 빠져 만성 0 이다(실측 재현: 7일→0·14일→2·30일→5, 2026-07-22). HC·FDA483 과
+    동일하게 enf_start(MFDS_ENFORCEMENT_WINDOW_DAYS, 기본 30일)로 넘겨야 한다. 기본 창(start=7일)
+    으로 회귀하면 FAIL — 침묵의 0(fetched=0·error=False) 재발 잠금."""
+
+    def test_run_collection_passes_enf_start_to_ispe(self) -> None:
+        src_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "collect_intake.py")
+        with open(src_path, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
+        calls = [
+            node for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "collect_ispe_rss"
+        ]
+        self.assertEqual(len(calls), 1, "collect_ispe_rss 호출부는 오케스트레이터 1곳이어야 한다")
+        first_arg = calls[0].args[0] if calls[0].args else None
+        self.assertIsInstance(first_arg, ast.Name,
+                              "collect_ispe_rss 첫 인자가 위치 Name 이 아님")
+        self.assertEqual(
+            first_arg.id, "enf_start",
+            "ISPE 는 enforcement 윈도우(enf_start)로 수집해야 한다 — "
+            "기본 창(start=7일)은 성긴 블로그라 만성 0 (HC·FDA483 동형)")
 
 
 if __name__ == "__main__":

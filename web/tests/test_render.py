@@ -5663,6 +5663,48 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["empty"], "unknown")
 
 
+class WebSourceCopyConsistencyTest(unittest.TestCase):
+    """[재발 방지 가드 2026-07] 새 규제 소스를 추가할 때 코드(수집기·DB)만 고치고 사이트
+    설명·마퀴 갱신을 빠뜨리던 문제를 CI 에서 잡는다 — EU/영국 GMP 비준수(EudraGMDP·MHRA)
+    편입 후 findings 계열 카피에 소스가 누락됐던 사례(2026-07)의 회귀 잠금."""
+
+    def test_marquee_source_count_matches_chips(self):
+        """랜딩 마퀴 '수집 대상 — N sources' 의 N 이 실제 표기 소스 칩 수와 일치해야 한다
+        — 마퀴에 소스를 넣고 카운트를 안 고치거나(불일치), 없는 소스를 광고하던(TGA 사고)
+        재발을 막는다."""
+        tpl = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
+        m = re.search(r"수집 대상 — (\d+) sources", tpl)
+        self.assertIsNotNone(m, "마퀴 '수집 대상 — N sources' 문구를 찾지 못함")
+        declared = int(m.group(1))
+        track = re.search(r'class="track">(.*?)</div>', tpl, re.S)
+        self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
+        chips = re.findall(r"<span>([^<]+)</span>", track.group(1))   # 보이는 칩(비 aria-hidden)만
+        self.assertEqual(declared, len(chips),
+                         f"마퀴 카운트({declared}) ≠ 실제 칩 수({len(chips)}): {chips}")
+
+    def test_findings_source_keywords_present_in_all_copy(self):
+        """findings 계열(검색·업체·트렌드)의 소스 설명이 서로·메타와 어긋나지 않게 강제한다.
+        새 findings 소스를 추가하면 아래 REQUIRED 에 대표 키워드를 넣어야 하고, 그러면 6개
+        카피 위치(3 인트로/고지 + 3 메타 설명)가 전부 그 소스를 언급하는지 개별 검증된다 —
+        소스 추가 시 수집기·DB 만 고치고 설명을 빠뜨리던 재발 방지."""
+        REQUIRED = ["FDA 483", "Warning Letter", "식약처", "GMP 비준수"]   # 마지막 = EU/영국 NCR 대표
+        # ① 템플릿(인트로·고지) — 파일 전체 텍스트에 전부 존재해야 한다.
+        for label, rel in (("findings 템플릿", "findings.html"),
+                           ("firm 템플릿", "firm.html"),
+                           ("trends 템플릿", "trends.html")):
+            text = (WEB_DIR / "templates" / rel).read_text(encoding="utf-8")
+            for kw in REQUIRED:
+                self.assertIn(kw, text, f"{label} 에 소스 키워드 '{kw}' 누락 — 신규 소스 카피 갱신 필요")
+        # ② render.py 메타 설명 3종 — 상수 본문을 개별 검증(하나만 고치고 나머지 빠뜨리는 것 방지).
+        render_src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
+        for const in ("FINDINGS_DESCRIPTION", "TRENDS_DESCRIPTION", "FIRM_DESCRIPTION"):
+            m = re.search(const + r"\s*=\s*\((.*?)\)", render_src, re.S)
+            self.assertIsNotNone(m, f"{const} 정의를 찾지 못함")
+            body = m.group(1)
+            for kw in REQUIRED:
+                self.assertIn(kw, body, f"{const} 에 소스 키워드 '{kw}' 누락 — 신규 소스 카피 갱신 필요")
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

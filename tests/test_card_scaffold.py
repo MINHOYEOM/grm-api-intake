@@ -54,6 +54,9 @@ WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
     # 상세슬롯(eu_gmp_ncr_statement) + 아카이브 PDF official. web-card 전용(FIXTURES 미포함
     # → brief golden·intake_total 불변).
     "eu_gmp_ncr",
+    # [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 — EU NCR 의 영국판. Evidence A + 결정론
+    # 상세슬롯(mhra_gmp_ncr_statement) + 세션독립 상세페이지 official(아카이브 없음).
+    "mhra_gmp_ncr",
 ]
 
 # assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).

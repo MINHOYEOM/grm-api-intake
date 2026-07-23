@@ -1,0 +1,69 @@
+{
+  "agency": "MHRA",
+  "card_type": "UK GMP 비준수",
+  "category": "Other",
+  "checks": [],
+  "deterministic_detail": {
+    "action": "Withdrawal of current valid GMP certificates: N/a – none issued for EU GMP.\nMarketing authorisation action: The UK MAA has been withdrawn by the applicant.\nRecall of batches: No batches have been supplied to the UK or EU\nProhibition of supply: No batches to be supplied to EU markets whilst this statement of non-compliance remains in force.",
+    "additional": "The scope of this statement of non-compliance is limited to Sterile medicinal Oncology products manufactured on the 5th Floor of the No.50 Kenyan Road facility.",
+    "authority_country": "Medicines and Healthcare products Regulatory Agency (United Kingdom)",
+    "nature": "The inspection identified a critical finding regarding sterility assurance of product. The controls in place were such that there was a significant risk that product may not be sterile and that this would not be detected due to lack of robust and repeatable aseptic and sterilisation processes. A second critical finding was identified related to contamination and degradation controls.",
+    "operations": "[ 1.1 ] Sterile Products; [ 1.1.1 ] Aseptically prepared (processing operations for the following dosage forms); [ 1.1.1.2 ] Lyophilisates; [ 1.1.1.4 ] Small volume liquids; [ 1.4 ] Other products or manufacturing activity; [ 1.4.2 ] Sterilisation of active substances/excipients/finished products:; [ 1.4.2.1 ] Filtration",
+    "product_scope": "Human Medicinal Products",
+    "type": "mhra_gmp_ncr_statement"
+  },
+  "evidence_basis": "Intake raw",
+  "evidence_level": "A",
+  "facts": [
+    {
+      "label": "발행일",
+      "value": "2023-08-30"
+    },
+    {
+      "label": "문서번호",
+      "value": "Insp GMP 51747/18953344-0001 NCR"
+    },
+    {
+      "label": "제조소/업체",
+      "value": "Genovior Biotech Corporation (TAIWAN)"
+    },
+    {
+      "label": "발행기관",
+      "value": "MHRA (영국)"
+    },
+    {
+      "label": "제품유형",
+      "value": "Human Medicinal Products"
+    }
+  ],
+  "group": "글로벌",
+  "group_label": null,
+  "headline_target": "Genovior Biotech Corporation",
+  "id": "Insp GMP 51747/18953344-0001 NCR",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": "Biological",
+  "quotes": [
+    {
+      "original": "The inspection identified a critical finding regarding sterility assurance of product.",
+      "translation": ""
+    }
+  ],
+  "render_order": null,
+  "signal_label": "High",
+  "signal_tier": 3,
+  "sources": {
+    "info_url": "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": false,
+    "official_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmp-5174718953344-0001-ncr"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "GMP 비준수"
+}

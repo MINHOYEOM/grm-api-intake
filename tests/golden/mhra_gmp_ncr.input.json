@@ -1,0 +1,38 @@
+{
+  "raw": {
+    "api": "MHRA GMDP Non-Compliance",
+    "report_no": "Insp GMP 51747/18953344-0001 NCR",
+    "slug": "insp-gmp-5174718953344-0001-ncr",
+    "site_name": "Genovior Biotech Corporation",
+    "site_address": "Genovior Biotech Corporation , Floors 4 & 5 (5F:50-9, 5F:50-8, 4F:50-3), No.50 Keyan Rd, Zhunan Township, Miaoli County, 35053, TAIWAN",
+    "country": "TAIWAN",
+    "authority_country": "Medicines and Healthcare products Regulatory Agency (United Kingdom)",
+    "regulatory_basis": "Regulation 331 of The Human Medicines Regulations 2012 (SI 2012/1916)",
+    "product_scope": "Human Medicinal Products",
+    "inspection_end_date": "2023-03-27",
+    "issue_date": "2023-08-30",
+    "ncr_operations": "[ 1.1 ] Sterile Products; [ 1.1.1 ] Aseptically prepared (processing operations for the following dosage forms); [ 1.1.1.2 ] Lyophilisates; [ 1.1.1.4 ] Small volume liquids; [ 1.4 ] Other products or manufacturing activity; [ 1.4.2 ] Sterilisation of active substances/excipients/finished products:; [ 1.4.2.1 ] Filtration",
+    "ncr_nature": "The inspection identified a critical finding regarding sterility assurance of product. The controls in place were such that there was a significant risk that product may not be sterile and that this would not be detected due to lack of robust and repeatable aseptic and sterilisation processes. A second critical finding was identified related to contamination and degradation controls.",
+    "ncr_action": "Withdrawal of current valid GMP certificates: N/a – none issued for EU GMP.\nMarketing authorisation action: The UK MAA has been withdrawn by the applicant.\nRecall of batches: No batches have been supplied to the UK or EU\nProhibition of supply: No batches to be supplied to EU markets whilst this statement of non-compliance remains in force.",
+    "ncr_additional": "The scope of this statement of non-compliance is limited to Sterile medicinal Oncology products manufactured on the 5th Floor of the No.50 Kenyan Road facility.",
+    "mhra_search_url": "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant",
+    "mhra_detail_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmp-5174718953344-0001-ncr",
+    "product_type": "Human Medicinal Products",
+    "product_description": "[ 1.1 ] Sterile Products; [ 1.1.1 ] Aseptically prepared (processing operations for the following dosage forms)"
+  },
+  "row": {
+    "date": "2023-08-30",
+    "document_id": "Insp GMP 51747/18953344-0001 NCR",
+    "firm": "Genovior Biotech Corporation",
+    "headline": "Genovior Biotech Corporation — GMP Non-Compliance (TAIWAN)",
+    "language": "EN",
+    "modality": "Biological",
+    "official_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmp-5174718953344-0001-ncr",
+    "signal_tier": "Tier 3",
+    "site_country": "TAIWAN",
+    "source": "MHRA GMP NCR",
+    "source_url": "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant",
+    "api_query": "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant",
+    "type_or_class": "gmp-non-compliance"
+  }
+}

@@ -47,11 +47,9 @@
           노트) 토큰 재사용 — 신규 CSS 0. -#}
       <div class="imp" id="tr-coverage-note" hidden>
         <span class="lab">먼저 알아두세요</span>
-        <p>여기 쓰인 날짜는 실사를 나간 날이 아니라 <b>문서가 공개된 날</b>입니다. 공개는 한꺼번에 몰아서 이뤄지기 때문에, 특정 연도의 건수가 많다고 해서 그 해에 지적이 늘어난 것은 아닙니다.</p>
+        <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>이에요. 공개가 한꺼번에 몰리다 보니, 특정 해에 건수가 많아 보여도 그 해에 지적이 늘어난 건 아닙니다.</p>
         <p id="tr-coverage-text"></p>
       </div>
-
-      <p class="tr-headline" id="tr-headline"></p>
 
       <section class="tr-block" aria-label="카테고리 순위">
         <h2 class="tr-h">카테고리 순위</h2>
@@ -123,11 +121,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-stat{display:flex;flex-direction:column;gap:4px;position:relative}
 .tr-stat-num{display:block;font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);line-height:1.05;font-variant-numeric:lining-nums}
 .tr-stat-lbl{display:block;font-size:12.5px;color:var(--muted)}
-.tr-stat-note{display:block;font-size:11px;color:var(--muted-2);margin-top:3px;max-width:22ch;line-height:1.4;text-wrap:balance}
+.tr-stat-note{display:block;font-size:11px;color:var(--muted-2);margin-top:3px;white-space:nowrap}
 
 /* 한눈 요약 헤드라인 — 세리프 풀쿼트 톤. */
-.tr-headline{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--body-s);margin:0 0 44px;text-wrap:balance}
-.tr-headline:empty{display:none}
 
 .tr-block{margin:0 0 46px}
 .tr-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 6px}

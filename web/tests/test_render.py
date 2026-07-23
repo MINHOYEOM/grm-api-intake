@@ -2703,14 +2703,18 @@ class WebTrendsRenderTest(unittest.TestCase):
             self.assertNotIn(forbidden, js_src, forbidden)
         self.assertEqual(html_src.count("<script"), 1)
 
-    def test_headline_generation_rules_present(self):
-        """한눈 요약 생성 규칙(13차) — 문장1=최다 카테고리 + 전체 대비 구성비(항상),
-        문장2=그 카테고리가 연도마다도 1위인지(008 매트릭스 도착 시에만·조건부)."""
+    def test_headline_removed(self):
+        """[헤드라인 제거 2026-07] "가장 많이 지적된 영역은…" 요약 + "연도별로 나눠 봐도…"
+        일관성 문장을 제거했다 — 바로 아래 카테고리 순위·연도별 구성비가 시각적으로 이미
+        보여줘 중복. 렌더 함수·연동 기계장치·셸 요소가 모두 없어야 한다(코드 주석은 예외)."""
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
-        self.assertIn("function buildHeadline(data)", js_src)
-        self.assertIn("가장 많이 지적된 영역은", js_src)
-        self.assertIn("function appendConsistencyLine(matrix)", js_src)
-        self.assertIn("특정 연도에 몰려서 생긴 순위가 아닙니다.", js_src)
+        # 실행 코드에서 제거(주석은 제거 근거로 남을 수 있어 함수 정의·호출로만 판정).
+        for gone in ("function buildHeadline", "function renderHeadline",
+                     "function appendConsistencyLine", "function tryConsistencyLine",
+                     "state.headline"):
+            self.assertNotIn(gone, js_src, f"제거 대상이 남아 있음: {gone}")
+        # 정적 셸에도 헤드라인 자리(<p class="tr-headline">)가 없어야 한다.
+        self.assertNotIn('class="tr-headline"', self.html)
 
     def test_headline_has_no_disclosure_date_yoy(self):
         """[13차 정직화] published_date 는 공개일이라 전년 동기 대비 증감은 규제 추세가
@@ -2720,23 +2724,6 @@ class WebTrendsRenderTest(unittest.TestCase):
         for gone in ("computeYoy", "shiftMonth", "전년 동기 대비",
                      "지적 건수가 가장 많은 업체는"):
             self.assertNotIn(gone, js_src, f"제거 대상이 남아 있음: {gone}")
-
-    def test_consistency_line_is_conservative_and_order_safe(self):
-        """문장2 판정은 보수적이어야 한다 — 표본이 충분한 연도가 3개 미만이거나 그중 한
-        해라도 1위가 아니면 아무 문장도 만들지 않는다(억지 해석 금지). 또 007/008 두 fetch
-        는 병렬이라 도착 순서가 정해져 있지 않으므로, 양쪽에서 tryConsistencyLine() 을
-        호출하고 consistencyDone 으로 중복 append 를 막는다."""
-        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
-        self.assertIn("var MIN_YEAR_BASE = 30;", js_src)
-        fn = js_src[js_src.index("function appendConsistencyLine(matrix)"):]
-        fn = fn[:fn.index("\n  }")]
-        self.assertIn("if (n < 3) return;", fn)
-        self.assertIn("y.top.code !== state.topCode) return;", fn)  # 한 해라도 1위 아니면 침묵
-        self.assertIn("y.total < MIN_YEAR_BASE", fn)
-        # 순서 안전 — 두 체인 모두 tryConsistencyLine() 을 부르고, 중복 실행은 차단된다.
-        self.assertIn("function tryConsistencyLine()", js_src)
-        self.assertIn("if (state.consistencyDone) return;", js_src)
-        self.assertEqual(js_src.count("tryConsistencyLine();"), 2)
 
     def test_composition_share_axis_on_every_count_chart(self):
         """[13차] 절대 건수만 보여 주던 차트에 전부 구성비(%)를 병기한다 — 카테고리 순위·
@@ -2786,7 +2773,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         런타임 fetch 성공 여부와 무관하게 정적 텍스트로 존재해야 한다."""
         self.assertIn("날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.", self.html)
         self.assertIn('<span class="lab">먼저 알아두세요</span>', self.html)
-        self.assertIn("특정 연도의 건수가 많다고 해서 그 해에 지적이 늘어난 것은 아닙니다.", self.html)
+        self.assertIn("특정 해에 건수가 많아 보여도 그 해에 지적이 늘어난 건 아닙니다.", self.html)
 
     def test_source_mix_skew_disclosed(self):
         """소스 편중(FDA 483 압도)은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성
@@ -2905,14 +2892,14 @@ class WebTrendsRenderTest(unittest.TestCase):
         """정적 셸은 hidden 노트만 렌더(골든 결정론). 13차부터 데이터와 무관한 첫 문단
         (날짜=공개일)은 정적 텍스트로 두고, 수치가 들어가는 둘째 문단만 trends.js 가
         런타임에 채운다. 기존 .imp(시사점) 토큰 재사용 — 신규 CSS 0. 위치는 스탯 스트립
-        직하단·한눈 요약 헤드라인 위."""
+        직하단·카테고리 순위 위."""
         self.assertIn('<div class="imp" id="tr-coverage-note" hidden>', self.html)
         self.assertIn('<p id="tr-coverage-text"></p>', self.html)
         stats_idx = self.html.index('id="tr-stats"')
         note_idx = self.html.index('id="tr-coverage-note"')
-        headline_idx = self.html.index('id="tr-headline"')
-        self.assertTrue(stats_idx < note_idx < headline_idx,
-                         "커버리지 노트가 스탯 스트립~헤드라인 사이에 있지 않음")
+        cat_idx = self.html.index('aria-label="카테고리 순위"')
+        self.assertTrue(stats_idx < note_idx < cat_idx,
+                         "커버리지 노트가 스탯 스트립~카테고리 순위 사이에 있지 않음")
 
     def test_coverage_note_reuses_fetched_totals_no_extra_network_call(self):
         """카테고리 클릭 → 검색 페이지 이동 결과가 이 페이지의 집계 수치보다 적을 수 있음을
@@ -2936,10 +2923,9 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertIn("totals.findings", fn)
-        self.assertIn("totals.public_findings", fn)
         self.assertIn('.toLocaleString("ko-KR")', fn)
-        self.assertIn("이 대시보드의 수치는 전체 ", fn)
-        self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
+        self.assertIn("숫자는 전체 ", fn)
+        self.assertIn("영어 원문으로만 보여요.", fn)
         # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약, 파일 상단 XSS 계약 참조).
         self.assertIn("coverageTextEl.textContent =", fn)
 
@@ -2992,8 +2978,8 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }")]
         self.assertIn("hasDocumentsCount(totals)", fn)
         self.assertIn("규제 문서 ", fn)
-        self.assertIn("건에서 추출한 개별 지적사항 ", fn)
-        self.assertIn("문서당 평균 여러 건", fn)
+        self.assertIn("건에서 뽑은 지적사항 ", fn)
+        self.assertIn("건 기준이에요.", fn)
 
     def test_coverage_note_documents_absent_path_falls_back_silently(self):
         """010 미적용 라이브(totals.documents=undefined)에서는 기존 "이 대시보드의 수치는
@@ -3001,8 +2987,8 @@ class WebTrendsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
-        self.assertIn("이 대시보드의 수치는 전체 ", fn)
-        self.assertIn('건 기준 집계입니다."', fn)
+        self.assertIn("숫자는 전체 ", fn)
+        self.assertIn('건 기준이에요."', fn)
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
@@ -3015,7 +3001,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("var isComplete =", fn)
         self.assertIn("<= 5", fn)
         self.assertIn("Number(totals.findings || 0) > 0", fn)
-        self.assertIn("전체 지적사항을 국문으로 열람할 수 있습니다.", fn)
+        self.assertIn("모두 국문으로 볼 수 있어요.", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
 
     def test_coverage_note_incomplete_wording_neutralized(self):
@@ -3026,8 +3012,8 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertNotIn("순차", fn)
-        self.assertIn("국문 번역이 완료된 지적사항(", fn)
-        self.assertIn("집계 수치보다 적을 수 있습니다.", fn)
+        self.assertIn("번역 전이라", fn)
+        self.assertIn("영어 원문으로만 보여요.", fn)
 
     def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):
         """[firm_name 엔티티 디코드 M5] 업체 랭킹(buildFirmRow)·상세 패널 헤더

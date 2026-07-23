@@ -250,6 +250,9 @@ jobs:
           # [EU GMP NCR 2026-07-23] EudraGMDP GMP 비준수 — dispatch 입력 없이 vars 전용
           # (입력 25 상한 회피·ISPE 관례). 상시 활성은 vars.ENABLE_EU_GMP_NCR=true.
           ENABLE_EU_GMP_NCR: ${{ vars.ENABLE_EU_GMP_NCR || 'false' }}
+          # [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 — EU NCR 과 동일(vars 전용·입력 없음).
+          # 상시 활성은 vars.ENABLE_MHRA_GMP_NCR=true. 과거분은 grm-mhra-ncr-backfill.yml.
+          ENABLE_MHRA_GMP_NCR: ${{ vars.ENABLE_MHRA_GMP_NCR || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_moleg_api != 'inherit') && inputs.enable_moleg_api || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_scrape != 'inherit') && inputs.enable_scrape || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).

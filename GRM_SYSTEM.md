@@ -293,6 +293,7 @@ grm-api-intake/
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_mhra_gmp_ncr.py         # MHRA GMP NCR 수집기 — EU NCR 영국판(News+Findings·아카이브 없음)
 ├─ mhra_gmdp_client.py             # MHRA GMDP 비준수 requests 클라이언트(세션 독립·필터→상세)
+├─ collect_mhra_ncr_backfill.py    # MHRA GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ collect_eu_ncr_backfill.py      # [FIND-1] EU GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
 ├─ grm_common.py                   # 공통 HTTP·유틸
@@ -343,6 +344,7 @@ grm-api-intake/
    ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
    ├─ grm-eu-ncr-backfill.yml            # [FIND-1] EU GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
+   ├─ grm-mhra-ncr-backfill.yml          # [FIND-1] MHRA GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)
 ```

@@ -54,7 +54,6 @@
   // 가 조용히 no-op 하도록 방어적으로 조회한다(findings.js 의 hasDash 관례와 동형).
   var coverageNoteEl = document.getElementById("tr-coverage-note");
   var coverageTextEl = document.getElementById("tr-coverage-text");
-  var headlineEl = document.getElementById("tr-headline");
   var catEl = document.getElementById("tr-cat");
   var heatmapBlockEl = document.getElementById("tr-heatmap-block");
   var heatmapEl = document.getElementById("tr-heatmap");
@@ -65,7 +64,7 @@
   var firmsEl = document.getElementById("tr-firms");
   var firmDetailEl = document.getElementById("tr-firm-detail");
   var sourceEl = document.getElementById("tr-source");
-  if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl || !headlineEl ||
+  if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl ||
       !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
       !sourceEl) return;
 
@@ -112,12 +111,7 @@
   // openFirmKey — [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서만
   // top_firms 행에 firm_key 가 실려온다. 013 미적용/017 미적용 라이브(구버전 top_firms,
   // firm_name 만 있는 형태)에서는 빈 문자열로 남아 프로필 링크를 방어적으로 생략한다.
-  // headline/topCode/matrix — 헤드라인 문장2(연도별 일관성)는 두 RPC(007 통계 + 008
-  // 매트릭스)가 **둘 다** 도착해야 계산된다. 두 fetch 는 독립 병렬이라 도착 순서가 정해져
-  // 있지 않으므로, 각자 자기 결과만 state 에 넣고 tryConsistencyLine() 을 호출한다 —
-  // 늦게 온 쪽이 실제로 문장을 만든다(consistencyDone 으로 중복 append 차단).
-  var state = { openFirm: "", openFirmKey: "", lastFirms: [], headline: [], topCode: "",
-                matrix: null, consistencyDone: false };
+  var state = { openFirm: "", openFirmKey: "", lastFirms: [] };
 
   // ── 공용 헬퍼 ────────────────────────────────────────────────────────────
   function el(tag, className, text) {
@@ -212,56 +206,10 @@
     return (p > 0 && p < 10 ? Math.round(p * 10) / 10 : Math.round(p)) + "%";
   }
 
-  function buildHeadline(data) {
-    var lines = [];
-    var cats = aggregateCategories(data.by_agency_category || []);
-    var total = catTotal(cats);
-    if (cats.length && total > 0) {
-      state.topCode = cats[0].code;
-      lines.push("가장 많이 지적된 영역은 " + cats[0].ko + "으로, 전체의 " +
-        pctText(cats[0].cnt, total) + "(" + fmtNum(cats[0].cnt) + "건)입니다.");
-    }
-    return lines;
-  }
-
-  // [연도별 일관성] "1위 카테고리가 특정 연도에 몰려서 생긴 순위인가?"에 답하는 문장.
-  // 008 매트릭스가 있어야 판정 가능하므로, 두 fetch 가 모두 끝난 뒤 늦게 온 쪽이 호출한다
-  // (008 미적용·실패 라이브에서는 영원히 호출되지 않고 문장1만 남는다).
-  // 판정은 보수적이다 — 표본이 충분한(MIN_YEAR_BASE 이상) 연도가 3개 이상이고 그 **전부**
-  // 에서 1위일 때만 말한다. 하나라도 아니면 아무 말도 만들지 않는다(억지 해석 금지).
-  function tryConsistencyLine() {
-    if (state.consistencyDone) return;
-    if (!state.matrix || !state.topCode || !state.headline.length) return;
-    state.consistencyDone = true;
-    appendConsistencyLine(state.matrix);
-  }
-
-  function appendConsistencyLine(matrix) {
-    var years = matrix.years || [];
-    if (!years.length) return;
-    var byYear = {};
-    (matrix.cells || []).forEach(function (c) {
-      byYear[c.year] = byYear[c.year] || { total: 0, top: null, mine: 0 };
-      var y = byYear[c.year];
-      y.total += c.cnt || 0;
-      if (!y.top || (c.cnt || 0) > y.top.cnt) y.top = { code: c.category_code, cnt: c.cnt || 0 };
-      if (c.category_code === state.topCode) y.mine = c.cnt || 0;
-    });
-    var shares = [], n = 0;
-    for (var i = 0; i < years.length; i++) {
-      var y = byYear[years[i]];
-      if (!y || y.total < MIN_YEAR_BASE) continue;
-      n++;
-      if (!y.top || y.top.code !== state.topCode) return;   // 한 해라도 1위가 아니면 침묵
-      shares.push(Math.round((y.mine / y.total) * 100));
-    }
-    if (n < 3) return;
-    var lo = Math.min.apply(null, shares), hi = Math.max.apply(null, shares);
-    var range = lo === hi ? (lo + "%") : (lo + "~" + hi + "%");
-    state.headline.push("연도별로 나눠 봐도 " + n + "개 연도 모두에서 1위이며 그 해 지적의 " +
-      range + "를 차지합니다 — 특정 연도에 몰려서 생긴 순위가 아닙니다.");
-    renderHeadline(state.headline);
-  }
+  // [헤드라인 제거 2026-07] "가장 많이 지적된 영역은…" 요약 + "연도별로 나눠 봐도…"
+  // 연도별 일관성 문장을 통째로 제거했다 — 바로 아래 "카테고리 순위"(구성비 병기)와
+  // "연도별 구성비" 히트맵이 1위 영역·연도별 일관성을 시각적으로 이미 보여줘 중복이었다.
+  // (008 매트릭스는 히트맵 렌더 전용으로만 쓰인다.)
 
   // ── 스탯 스트립 ──────────────────────────────────────────────────────────
   function buildStat(num, label) {
@@ -304,9 +252,6 @@
     statsEl.appendChild(pub);
   }
 
-  function renderHeadline(lines) {
-    headlineEl.textContent = lines.join(" ");
-  }
 
   // [공개 범위 투명성] totals 는 fetchStats() 가 이미 fetch 한 findings_stats RPC 응답 —
   // 추가 네트워크 호출 없이 재사용한다. 요소가 없으면(구버전 셸) 조용히 no-op.
@@ -316,11 +261,10 @@
   function renderCoverageNote(totals) {
     if (!coverageNoteEl || !coverageTextEl) return;
     var total = Number(totals.findings || 0).toLocaleString("ko-KR");
-    var pub = Number(totals.public_findings || 0).toLocaleString("ko-KR");
     var intro = hasDocumentsCount(totals)
-      ? "이 대시보드의 수치는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
-        "건에서 추출한 개별 지적사항 " + total + "건 기준 집계입니다(문서당 평균 여러 건)."
-      : "이 대시보드의 수치는 전체 " + total + "건 기준 집계입니다.";
+      ? "숫자는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
+        "건에서 뽑은 지적사항 " + total + "건 기준이에요."
+      : "숫자는 전체 " + total + "건 기준이에요.";
     // [완역 자동 전환] 미번역 잔량이 5건 이하면(2026-07-15 백로그 완역 — 잔여는 OCR
     // 완파손 등 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔
     // 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
@@ -329,10 +273,8 @@
     // 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이 번역 중"으로 읽히도록
     // 지연 사유를 명시한다. 집계 수치와 클릭 결과가 다를 수 있다는 실질 안내는 유지.
     coverageTextEl.textContent = isComplete
-      ? intro + " 전체 지적사항을 국문으로 열람할 수 있습니다."
-      : intro + " 개별 원문 열람은 국문 번역이 완료된 지적사항(" + pub + "건)만 가능합니다 — " +
-        "신규 수집분은 국문 번역을 거쳐 다음 날 공개되며, 그동안 카테고리 클릭 결과가 " +
-        "집계 수치보다 적을 수 있습니다.";
+      ? intro + " 모두 국문으로 볼 수 있어요."
+      : intro + " 갓 수집된 신규 건은 번역 전이라 목록에서 영어 원문으로만 보여요.";
     coverageNoteEl.hidden = false;
   }
 
@@ -793,9 +735,6 @@
     var totals = data.totals || {};
     renderStats(totals);
     renderCoverageNote(totals);
-    state.headline = buildHeadline(data);       // 문장2는 008 매트릭스가 도착해야 붙는다
-    renderHeadline(state.headline);
-    tryConsistencyLine();                       // 008 이 먼저 도착해 있었다면 여기서 붙는다
     renderCategoryRanking(data.by_agency_category || []);
     renderYearTrend(data.by_month || []);
     state.lastFirms = data.top_firms || [];
@@ -865,10 +804,6 @@
   fetchCategoryMatrix()
     .then(function (data) {
       renderHeatmap(data);
-      // 헤드라인 문장2도 이 매트릭스로 판정한다 — fetchStats 보다 먼저/나중에 도착하는
-      // 두 경우 모두 tryConsistencyLine() 이 조건을 다시 확인하므로 순서에 안전하다.
-      state.matrix = data;
-      tryConsistencyLine();
     })
     .catch(function () { /* 조용히 숨김 유지 */ });
 })();

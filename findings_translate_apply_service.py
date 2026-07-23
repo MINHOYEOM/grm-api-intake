@@ -17,18 +17,35 @@ This script is the second half of the FIND-1 translation automation pipeline
       RLS-bypass mechanism the nightly M4 ingestion already uses safely).
 
 This module performs no git operations whatsoever -- it only reads files
-under --outbox-dir and issues HTTPS PATCH requests. It never moves, renames,
-or deletes outbox files, and never stages, commits, or pushes anything. PATCH
-is idempotent by construction here (the WHERE-equivalent filter pins both
-finding_id and the original finding_text), so leaving already-applied outbox
-files in place is *correct* but not *free*: re-running this script re-PATCHes
-them to the same values (a harmless no-op write) or matches zero rows if
-finding_text no longer matches live data (also harmless -- counted as
-matched_zero, not an error). The cost is wall-clock: the CI workflow has a
-10-minute timeout, and on 2026-07-13 dozens of accumulated already-applied
-batches pushed every run past it, starving the newest batch. Two mitigations
-exist: (1) this script processes outbox files newest-first (see
-_load_outbox_files), and (2) the M9c translation session archives
+under --outbox-dir and issues HTTPS GET/PATCH requests. It never moves,
+renames, or deletes outbox files, and never stages, commits, or pushes
+anything. Each item is applied read-before-write, keyed on finding_id (the
+findings primary key, web/migrations/002_findings.sql): a short GET fetches
+the live finding_text, it is compared byte-for-byte against the outbox item
+in-process, and only on a match is a PATCH issued -- also keyed on finding_id
+only. This keeps the apply idempotent (re-running re-PATCHes an already-
+applied row to the same values, a harmless no-op) and TOCTOU-safe (if the
+source finding_text changed since the batch was built the comparison fails
+and nothing is written -- counted as matched_zero, not an error), exactly as
+the previous single-PATCH design did.
+
+The reason the finding_text equality is a client-side comparison rather than
+a query-string filter (as it was before 2026-07-23): finding_text can be up
+to 30,000 characters (FDA warning-letter full text). Carrying it in the PATCH
+URL as `finding_text=eq.<30k chars>` produced a request URI of ~35-45 KB,
+past the Supabase edge's ~32 KB URL limit, which returned a bare-text HTTP
+400 "Bad Request" before the request ever reached PostgREST. Under the M13b
+policy that made the run go red -- and because the request was rejected the
+Korean text was never written, so the four longest findings in a batch stayed
+untranslated and re-failed on every run. Keying every URL on finding_id (a
+~32-char PK) removes finding_text from the wire path entirely.
+
+Leaving already-applied outbox files in place is *correct* but not *free*:
+re-running re-issues the GET/PATCH pair per item. The cost is wall-clock: the
+CI workflow has a 10-minute timeout, and on 2026-07-13 dozens of accumulated
+already-applied batches pushed every run past it, starving the newest batch.
+Two mitigations exist: (1) this script processes outbox files newest-first
+(see _load_outbox_files), and (2) the M9c translation session archives
 already-applied batches from translations/outbox/ to translations/applied/
 in the same PR that adds a new batch, so the outbox normally holds only the
 batch(es) not yet confirmed applied.
@@ -102,44 +119,44 @@ def _parse_outbox_file(path: Path) -> tuple[list[dict[str, Any]], str]:
     return items, ""
 
 
-def _patch_finding(
+def _send_findings_request(
+    verb: str,
     base_url: str,
     service_key: str,
-    item: dict[str, Any],
     *,
+    params: dict[str, str],
+    json_body: dict[str, Any] | None = None,
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
 ) -> tuple[int, list[dict[str, Any]] | None, str]:
-    """PATCH one findings row via PostgREST, filtered by finding_id + finding_text.
+    """Issue one GET or PATCH to /rest/v1/findings and return
+    (status_code, rows_or_None, error_summary).
 
-    Returns (status_code, returned_rows_or_None, error_summary). error_summary
-    is "" on 2xx. On failure it is "timeout", an exception type name, or
-    "http_{status}" -- never exception text, so the service-role key embedded
-    in a lower-level transport error can never leak through it.
+    error_summary is "" on 2xx. On failure it is "timeout", an exception type
+    name, or "http_{status}" -- never exception text, so the service-role key
+    embedded in a lower-level transport error can never leak through it. On
+    2xx, rows is the decoded JSON array (or [] if the body is absent/not a
+    list).
 
     Retries once (total 2 attempts) for 5xx responses or a request timeout.
-    Any other exception or 4xx status fails immediately without retry.
+    Any other exception or 4xx status fails immediately without retry. `verb`
+    is resolved to requests.get/requests.patch at call time so test doubles
+    patched onto the module's `requests` are honoured.
     """
-    finding_id = str(item.get("finding_id") or "")
-    finding_text = str(item.get("finding_text") or "")
+    request_fn = requests.get if verb == "get" else requests.patch
     url = f"{base_url}/rest/v1/findings"
     headers = {
         "apikey": service_key,
         "Authorization": f"Bearer {service_key}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
     }
-    params = {
-        "finding_id": f"eq.{finding_id}",
-        "finding_text": f"eq.{finding_text}",
-    }
-    body = {
-        "finding_text_ko": str(item.get("finding_text_ko") or ""),
-        "translation_method": str(item.get("translation_method") or ""),
-    }
+    if json_body is not None:
+        headers["Content-Type"] = "application/json"
+        headers["Prefer"] = "return=representation"
 
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
-            resp = requests.patch(url, params=params, json=body, headers=headers, timeout=timeout)
+            resp = request_fn(
+                url, params=params, json=json_body, headers=headers, timeout=timeout
+            )
         except requests.exceptions.Timeout:
             if attempt < _MAX_ATTEMPTS:
                 continue
@@ -161,6 +178,87 @@ def _patch_finding(
         return resp.status_code, (data if isinstance(data, list) else []), ""
 
     return 0, None, "retry_exhausted"  # unreachable safety net
+
+
+def _apply_one_finding(
+    base_url: str,
+    service_key: str,
+    item: dict[str, Any],
+    *,
+    timeout: int = DEFAULT_TIMEOUT_SECONDS,
+) -> tuple[str, str]:
+    """Read-before-write apply of one outbox item, keyed on finding_id only.
+
+    Returns (outcome, error_detail) where outcome is one of "succeeded",
+    "matched_zero", or "errored" -- the same three-way accounting the previous
+    single-PATCH design produced. No request URL ever carries finding_text
+    (see the module docstring: it can be 30k chars and blew past the ~32 KB
+    edge URL limit). Instead a short GET fetches the live finding_text by
+    primary key, it is compared in-process, and only a still-matching row is
+    PATCHed by primary key. error_detail carries no service-role key -- only
+    finding_id, HTTP codes, exception type names, and row counts.
+    """
+    finding_id = str(item.get("finding_id") or "")
+    finding_text = str(item.get("finding_text") or "")
+
+    # 1) Fetch the live row by primary key (short URL). finding_id is the
+    #    findings PK, so this returns 0 or 1 rows.
+    _status, rows, err = _send_findings_request(
+        "get",
+        base_url,
+        service_key,
+        params={"finding_id": f"eq.{finding_id}", "select": "finding_text"},
+        timeout=timeout,
+    )
+    if err:
+        return "errored", f"finding_id={finding_id} GET failed ({err})"
+
+    # Only a row whose live finding_text still byte-matches the outbox item is
+    # eligible -- this reproduces the original finding_id+finding_text eq
+    # filter as an in-process comparison instead of a URL predicate.
+    live_matches = [
+        r for r in (rows or []) if str(r.get("finding_text") or "") == finding_text
+    ]
+    if not live_matches:
+        # finding_id absent, or the source finding_text changed since the batch
+        # was built -- a TOCTOU-safe no-op, counted as matched_zero exactly as
+        # the previous eq-filter-matches-zero case.
+        return "matched_zero", ""
+    if len(live_matches) > 1:
+        # Impossible under the finding_id primary key, but keep the anomaly
+        # guard rather than silently over-writing.
+        return (
+            "errored",
+            f"finding_id={finding_id} live rows matched {len(live_matches)} (expected 0 or 1)",
+        )
+
+    # 2) Write by primary key only (short URL). return=representation lets us
+    #    confirm exactly one row was updated.
+    _status, prows, perr = _send_findings_request(
+        "patch",
+        base_url,
+        service_key,
+        params={"finding_id": f"eq.{finding_id}"},
+        json_body={
+            "finding_text_ko": str(item.get("finding_text_ko") or ""),
+            "translation_method": str(item.get("translation_method") or ""),
+        },
+        timeout=timeout,
+    )
+    if perr:
+        return "errored", f"finding_id={finding_id} PATCH failed ({perr})"
+
+    matched = len(prows or [])
+    if matched == 0:
+        # Row changed/removed between the GET and the PATCH -- a TOCTOU-safe
+        # no-op, not an error.
+        return "matched_zero", ""
+    if matched == 1:
+        return "succeeded", ""
+    return (
+        "errored",
+        f"finding_id={finding_id} PATCH matched {matched} rows (expected 0 or 1)",
+    )
 
 
 def apply_outbox(
@@ -203,42 +301,29 @@ def apply_outbox(
 
         for item in items:
             report["items_total"] += 1
-            finding_id = str(item.get("finding_id") or "")
 
             if dry_run:
                 report["items_succeeded"] += 1
                 continue
 
-            status, rows, err = _patch_finding(base, service_key, item)
-            if err:
-                report["items_errored"] += 1
-                report["errors"].append(
-                    f"{path.name}: finding_id={finding_id} PATCH failed ({err})"
-                )
-                continue
-
-            matched = len(rows or [])
-            if matched == 0:
-                # 0 rows matched -- either already applied (finding_text_ko
-                # already equals the desired value from a prior run) or the
-                # live finding_text no longer byte-matches the outbox item
-                # (source row changed/removed since the batch was built).
-                # Both are TOCTOU-safe no-ops, not errors -- the outbox file
-                # is left in place either way and this is not retried
-                # specially; the next scheduled run naturally revisits it.
-                report["items_matched_zero"] += 1
-            elif matched == 1:
+            # Read-before-write apply keyed on finding_id only (see
+            # _apply_one_finding). The three outcomes map 1:1 onto the report
+            # counters the previous single-PATCH design produced:
+            #   - matched_zero: already-applied no-op, or the live
+            #     finding_text no longer matches the outbox item (source row
+            #     changed/removed since the batch was built). Both are
+            #     TOCTOU-safe -- the outbox file is left in place and the next
+            #     scheduled run naturally revisits it.
+            #   - errored: a transport/HTTP failure or an anomalous row count.
+            #   - succeeded: exactly one row updated.
+            outcome, detail = _apply_one_finding(base, service_key, item)
+            if outcome == "succeeded":
                 report["items_succeeded"] += 1
+            elif outcome == "matched_zero":
+                report["items_matched_zero"] += 1
             else:
-                # >1 rows matched: finding_id should be unique -- this signals
-                # a data-integrity anomaly, not the expected idempotent
-                # no-op/success cases above. Counted as an error; the outbox
-                # file is left in place unchanged either way.
                 report["items_errored"] += 1
-                report["errors"].append(
-                    f"{path.name}: finding_id={finding_id} PATCH matched {matched} rows "
-                    "(expected 0 or 1)"
-                )
+                report["errors"].append(f"{path.name}: {detail}")
 
     return report
 

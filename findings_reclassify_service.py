@@ -143,7 +143,7 @@ def _patch_finding(
     rows rather than clobbering an already-current value).
 
     Returns (status_code, returned_rows_or_None, error_summary), mirroring
-    findings_translate_apply_service._patch_finding's contract exactly:
+    findings_translate_apply_service._send_findings_request's contract exactly:
     error_summary is "" on 2xx, else "timeout", an exception type name, or
     "http_{status}" -- never exception text, so the service-role key embedded
     in a lower-level transport error can never leak through it. Retries once

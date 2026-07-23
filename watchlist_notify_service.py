@@ -316,7 +316,7 @@ def _request_with_retry(method: str, url: str, *, headers: dict[str, str],
                         params: dict[str, Any] | None = None,
                         json_body: Any = None,
                         timeout: int = DEFAULT_TIMEOUT_SECONDS) -> tuple[int, Any, str]:
-    """공용 재시도 래퍼(findings_translate_apply_service._patch_finding 관례) —
+    """공용 재시도 래퍼(findings_translate_apply_service._send_findings_request 관례) —
     5xx/timeout 1회 재시도, 4xx 즉시 실패. 반환=(status, parsed_json_or_None, error).
     error 는 ""(성공)·"timeout"·예외 타입명·"http_{status}" 뿐 — 키/원문 절대 미노출."""
     for attempt in range(1, _MAX_ATTEMPTS + 1):

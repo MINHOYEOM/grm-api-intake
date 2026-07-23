@@ -7,9 +7,11 @@ name: GRM Findings Translate Apply (M9b)
 # 끝난 뒤 outbox JSON 으로 고정되어 여기 도달한다.
 #
 # ★핵심 제약: 이 워크플로는 git 쓰기를 전혀 하지 않는다 — checkout(read-only) 이후
-# 커밋/푸시/PR 생성 스텝이 없다. outbox 파일 이동·삭제도 여기서 하지 않는다(PATCH 는
-# finding_id+finding_text 로 필터링해 멱등이므로 재실행 시 이미 반영된 항목은 매칭 0건
-# 또는 동일값 재반영으로 무해).
+# 커밋/푸시/PR 생성 스텝이 없다. outbox 파일 이동·삭제도 여기서 하지 않는다. 적용은
+# read-before-write(finding_id=PK 로 GET → 원문 대조 → finding_id 로만 PATCH)라 멱등이며,
+# 이미 반영된 항목은 동일값 재반영, 원문이 바뀐 항목은 매칭 0건으로 무해하다. finding_text
+# 를 URL 에 싣지 않으므로 30,000자급 지적(FDA 경고서한 전문)도 엣지 URL 한도(~32KB)를
+# 넘지 않는다 — 2026-07-23 이전에는 이 초과가 HTTP 400 → red + 해당 지적 영구 미반영을 냈다.
 #
 # ★outbox 누적 금지(2026-07-13 기아 장애): 적용 완료 배치가 outbox 에 수십 개 쌓이면
 # 매 실행 전량 재PATCH 가 timeout-minutes(10분)를 초과해 최신 배치가 영구 미반영된다.

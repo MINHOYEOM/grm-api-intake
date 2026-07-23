@@ -1,0 +1,97 @@
+name: GRM EU GMP NCR Deep Backfill (findings)
+
+# EudraGMDP EU GMP 비준수(NCR) 과거분 findings 딥 백필 — 1회성 수동 실행.
+#
+# 배경: 매일 크론(grm-intake.yml)은 window_days 상한 [1,90] 이라 최근 90일만 본다.
+# EudraGMDP NCR 은 2019년부터 누적된 성긴 소스(총 ~73건)라, 과거분 ~65건은 그 경로로는
+# 절대 안 들어온다 → FDA 483/WL 딥백필(collect_fda_backfill)과 같은 패턴으로 넓은 발행일
+# 창을 한 번에 수집해 Supabase 에 직접 적재한다(collect_eu_ncr_backfill.py).
+#
+# ★핵심 제약:
+#   - git 쓰기 없음(checkout=read-only, 커밋/푸시/PR 스텝 없음). Notion 무접촉
+#     (append 함수가 raw_signals + findings 를 PostgREST 로 직접 적재) → 주간 브리프
+#     파이프라인 무간섭. 과거분은 7일 창 밖이라 News 카드로도 안 나간다.
+#   - 멱등: raw_signal_id / finding_id 는 (source, doc_ref) 해시라 이미 공개된 최근 8건
+#     재적재도 중복 0. 실패 시 잔여만 재적재하면 됨.
+#   - dry_run=true(기본값)로 먼저 실행해 "수집 N건"을 확인한 뒤, dry_run=false 로 재실행해
+#     실적재한다(광고 전 데이터 확인 원칙).
+#   - ★적재 후 번역 필수(이 워크플로 밖): findings 공개 RLS 게이트가 finding_text_ko /
+#     finding_language='KO' 를 요구하므로, 번역 전에는 anon 검색에 안 잡힌다.
+on:
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: '발행일 창 시작(ISO). 전량 커버 기본값.'
+        type: string
+        default: '2015-01-01'
+      to_date:
+        description: '발행일 창 끝(ISO). 빈값이면 오늘.'
+        type: string
+        default: ''
+      dry_run:
+        description: 'true = 수집 + PDF 아카이브만(Supabase 적재 없음). 먼저 이걸로 검증.'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # 매일 크론(eu_gmp_ncr 수집)과 EudraGMDP 세션/Storage 를 놓고 경합하지 않도록 직렬화.
+  group: eu-gmp-ncr-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Deep-backfill EudraGMDP NCR into findings (raw + findings, no git writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 수집 + PDF Storage 아카이브 + (dry_run 아님) raw_signals + findings 직접 적재.
+      # SUPABASE_* 는 grm-intake.yml 이 이미 쓰는 동일 secret/var 재사용 — 신규 등록 불필요.
+      - name: Run EU NCR deep backfill
+        id: backfill
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=(--from-date "${{ inputs.from_date }}" --output backfill_report.json)
+          if [ -n "${{ inputs.to_date }}" ]; then
+            ARGS+=(--to-date "${{ inputs.to_date }}")
+          fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          python collect_eu_ncr_backfill.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM EU GMP NCR Deep Backfill"
+            echo ""
+            echo "from_date: \`${{ inputs.from_date }}\` / to_date: \`${{ inputs.to_date }}\` / dry_run: \`${{ inputs.dry_run }}\`"
+            echo ""
+            if [ -f backfill_report.json ]; then
+              echo '```json'
+              cat backfill_report.json
+              echo '```'
+            else
+              echo "backfill_report.json 미생성 — 인자/인증/수집 실패로 조기 종료 가능"
+              echo "(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

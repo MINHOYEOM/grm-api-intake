@@ -191,7 +191,7 @@ flowchart TD
 | 13 | ISPE iSpeak (전문지 브리핑 — GMP/품질 관련 항목만 keep_item 필터) | RSS(Drupal) | Expert Secondary · `ENABLE_ISPE`(기본 off) |
 | 14 | EU GMP NCR (EudraGMDP — EU/EEA 업체별 GMP 비준수 보고서) | Struts `.do` 서버렌더 스크래핑 + 공식 Statement PDF | 활성 · `ENABLE_EU_GMP_NCR`(기본 off) |
 
-> **소스 14 상세(EudraGMDP GMP Non-Compliance):** FDA WL/483 과 동일하게 **News 카드(kind `eu-gmp-ncr`·Evidence A·발행 NCA·위반내용·당국조치 전문) + Findings 이중 편입**. `eudragmdp_client.py`(requests 전용·세션 쿠키 → POST 날짜창 → `action=Page&param=N` 절대 페이징 → `action=Drilldown&param=<doc_ref>` 상세 → `generateGMPCPDF.do` 공식 PDF)를 `collect_eu_gmp_ncr.py`가 IntakeItem 으로 변환. **dedup 키 = doc_ref**(1 NCR 이 다중 사이트로 여러 행 반복 가능 — report_no 부적합). 발행일 지연공개형 + 성긴 소스(4년 61건)라 enforcement 윈도우(30일) 수집. **출처 durability**: drilldown/PDF 가 세션상태 의존이라 URL 저장 불가 → 수집 시점에 공식 Statement PDF 를 Supabase Storage 공개버킷 `eudragmdp-ncr` 에 아카이브하고 그 공개 URL 을 official_url 로(아카이브 실패 시 EudraGMDP 검색 페이지 폴백). Findings 는 `grm_classify_483_scope` 우회 자동(트리거가 FDA 483/WL 만 분기 → EU NCR 은 scope_status 기본 `'ok'`).
+> **소스 14 상세(EudraGMDP GMP Non-Compliance):** FDA WL/483 과 동일하게 **News 카드(kind `eu-gmp-ncr`·Evidence A·발행 NCA·위반내용·당국조치 전문) + Findings 이중 편입**. `eudragmdp_client.py`(requests 전용·세션 쿠키 → POST 날짜창 → `action=Page&param=N` 절대 페이징 → `action=Drilldown&param=<doc_ref>` 상세 → `generateGMPCPDF.do` 공식 PDF)를 `collect_eu_gmp_ncr.py`가 IntakeItem 으로 변환. **dedup 키 = doc_ref**(1 NCR 이 다중 사이트로 여러 행 반복 가능 — report_no 부적합). 발행일 지연공개형 + 성긴 소스(4년 61건)라 enforcement 윈도우(30일) 수집. **출처 durability**: drilldown/PDF 가 세션상태 의존이라 URL 저장 불가 → 수집 시점에 공식 Statement PDF 를 Supabase Storage 공개버킷 `eudragmdp-ncr` 에 아카이브하고 그 공개 URL 을 official_url 로(아카이브 실패 시 EudraGMDP 검색 페이지 폴백). Findings 는 `grm_classify_483_scope` 우회 자동(트리거가 FDA 483/WL 만 분기 → EU NCR 은 scope_status 기본 `'ok'`). **과거분(2019~) 딥백필**: 매일 크론은 window_days 상한 [1,90] 이라 최근 90일만 봐서 과거 ~65건은 안 들어온다 → `collect_eu_ncr_backfill.py`(+`grm-eu-ncr-backfill.yml`, workflow_dispatch 1회성)가 넓은 발행일 창을 한 번에 수집해 `append_intake_item_with_findings_to_supabase` 로 raw+findings 직행 적재(멱등·Notion 무접촉). 적재 후 finding_text 는 영어라 **RLS 공개 게이트(finding_text_ko/finding_language='KO') 통과를 위해 번역 필요**.
 
 > **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용 — 자료실로 완결).
 
@@ -289,6 +289,7 @@ grm-api-intake/
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
+├─ collect_eu_ncr_backfill.py      # [FIND-1] EU GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
 ├─ grm_common.py                   # 공통 HTTP·유틸
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
@@ -336,6 +337,7 @@ grm-api-intake/
    ├─ grm-findings-translate-apply.yml   # [FIND-1 M9] 번역 outbox → Supabase 반영
    ├─ grm-findings-backfill-fetch.yml    # [FIND-1 F2] 외부 백필 매일 07:17 UTC cron(--auto)
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
+   ├─ grm-eu-ncr-backfill.yml            # [FIND-1] EU GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)
 ```

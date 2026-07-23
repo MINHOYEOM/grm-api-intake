@@ -146,6 +146,7 @@ from grm_common import (
     SOURCE_ISPE,
     SOURCE_MFDS,
     SOURCE_MHRA,
+    SOURCE_MHRA_GMP_NCR,
     SOURCE_PICS,
     SOURCE_RAPS,
     SOURCE_RECALL,
@@ -324,6 +325,8 @@ SOURCE_TYPE_MAP: dict[str, str] = {
     SOURCE_ISPE:    SRC_TYPE_EXPERT_SECONDARY,
     # [EU GMP NCR 2026-07-23] EudraGMDP 공식 규제 DB — FDA WL/PIC/S 와 동일 분류
     SOURCE_EU_GMP_NCR: SRC_TYPE_OFFICIAL_PAGE,
+    # [MHRA GMP NCR 2026-07-23] MHRA GMDP 등록부 공식 규제 DB — EU NCR 과 동일 분류
+    SOURCE_MHRA_GMP_NCR: SRC_TYPE_OFFICIAL_PAGE,
 }
 
 # RSS / HTML 엔드포인트 (v15.1 추가)
@@ -684,6 +687,13 @@ class CollectionStats:
     eu_gmp_ncr_insert_failed: int = 0
     eu_gmp_ncr_error: bool = False
     eu_gmp_ncr_error_msg: str = ""
+    # ── [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 (ENABLE_MHRA_GMP_NCR, 기본 off) ──────
+    mhra_gmp_ncr_fetched: int = 0
+    mhra_gmp_ncr_inserted: int = 0
+    mhra_gmp_ncr_skipped_dup: int = 0
+    mhra_gmp_ncr_insert_failed: int = 0
+    mhra_gmp_ncr_error: bool = False
+    mhra_gmp_ncr_error_msg: str = ""
 
     def total_insert_failures(self) -> int:
         return (
@@ -702,6 +712,7 @@ class CollectionStats:
             + self.fda483_insert_failed
             + self.ispe_insert_failed
             + self.eu_gmp_ncr_insert_failed
+            + self.mhra_gmp_ncr_insert_failed
         )
 
     def has_insert_failures(self) -> bool:
@@ -730,6 +741,7 @@ class CollectionStats:
             or self.fda483_error
             or self.ispe_error
             or self.eu_gmp_ncr_error
+            or self.mhra_gmp_ncr_error
         )
 
     def summary(self) -> str:
@@ -808,6 +820,9 @@ class CollectionStats:
             f"EU-NCR fetched={self.eu_gmp_ncr_fetched}  inserted={self.eu_gmp_ncr_inserted}  "
             f"skip_dup={self.eu_gmp_ncr_skipped_dup}  failed={self.eu_gmp_ncr_insert_failed}  "
             f"error={self.eu_gmp_ncr_error}",
+            f"MHRA-NCR fetched={self.mhra_gmp_ncr_fetched}  inserted={self.mhra_gmp_ncr_inserted}  "
+            f"skip_dup={self.mhra_gmp_ncr_skipped_dup}  failed={self.mhra_gmp_ncr_insert_failed}  "
+            f"error={self.mhra_gmp_ncr_error}",
         ]
         return "\n".join(lines)
 
@@ -852,6 +867,7 @@ class RunConfig:
     enable_fda483_observations: bool
     enable_ispe: bool
     enable_eu_gmp_ncr: bool
+    enable_mhra_gmp_ncr: bool
     enable_moleg_api: bool
     enable_scrape: bool
     modality_requested: bool
@@ -904,6 +920,7 @@ class RunConfig:
             enable_fda483_observations=env_flag("ENABLE_FDA_483_OBSERVATIONS"),
             enable_ispe=env_flag("ENABLE_ISPE") or "ispe" in active,
             enable_eu_gmp_ncr=env_flag("ENABLE_EU_GMP_NCR") or "eu_gmp_ncr" in active,
+            enable_mhra_gmp_ncr=env_flag("ENABLE_MHRA_GMP_NCR") or "mhra_gmp_ncr" in active,
             enable_moleg_api=env_flag("ENABLE_MOLEG_API"),
             enable_scrape=env_flag("ENABLE_SCRAPE"),
             modality_requested=env_flag("ENABLE_MODALITY_TAG"),
@@ -2484,7 +2501,7 @@ _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
 # ich/mfds 는 opt-in feature flag 소스라 _ALL_SOURCES(기본 all)엔 넣지 않되,
 # --sources 선택지와 handoff source 매핑에는 포함한다.
 _SOURCE_CHOICES = _ALL_SOURCES + ["mfds", "ich", "who", "hc", "fda483", "ispe",
-                                  "eu_gmp_ncr", "none"]
+                                  "eu_gmp_ncr", "mhra_gmp_ncr", "none"]
 _SOURCE_TOKEN_TO_NOTION = {
     "fr": SOURCE_FR,
     "recall": SOURCE_RECALL,
@@ -2500,6 +2517,7 @@ _SOURCE_TOKEN_TO_NOTION = {
     "fda483": SOURCE_FDA_483,
     "ispe": SOURCE_ISPE,
     "eu_gmp_ncr": SOURCE_EU_GMP_NCR,
+    "mhra_gmp_ncr": SOURCE_MHRA_GMP_NCR,
 }
 
 
@@ -2572,6 +2590,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     enable_fda483 = cfg.enable_fda483
     enable_ispe = cfg.enable_ispe
     enable_eu_gmp_ncr = cfg.enable_eu_gmp_ncr
+    enable_mhra_gmp_ncr = cfg.enable_mhra_gmp_ncr
     stats = CollectionStats()
 
     # ── Phase 1: Official API ──────────────────────────────────────────────
@@ -2941,6 +2960,23 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     else:
         log("INFO", "ENABLE_EU_GMP_NCR=false — EU GMP NCR 수집 건너뜀")
 
+    # ── [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 성명서 (ENABLE_MHRA_GMP_NCR=true 또는
+    # --sources mhra_gmp_ncr) — opt-in Official Page. EU NCR 의 영국판. 영국 MHRA 업체별 GMP
+    # 부적합을 FDA WL/483·EU NCR 과 동일하게 News 카드 + Findings 로 편입. 발행일 지연공개형 +
+    # 성긴 소스(7년 6건)라 enforcement 윈도우(기본 30일). 재수집은 dedup(report_no) 처리. ──
+    mhra_gmp_ncr_items: list[IntakeItem] = []
+    if enable_mhra_gmp_ncr:
+        log("INFO", "=== MHRA GMP NCR 수집 시작 ===")
+        from collect_mhra_gmp_ncr import collect_mhra_gmp_ncr
+        mhra_gmp_ncr_items, mhra_gmp_ncr_err = collect_mhra_gmp_ncr(enf_start, end)
+        stats.mhra_gmp_ncr_fetched = len(mhra_gmp_ncr_items)
+        if mhra_gmp_ncr_err:
+            stats.mhra_gmp_ncr_error = True
+            stats.mhra_gmp_ncr_error_msg = mhra_gmp_ncr_err
+            log("WARN", f"MHRA GMP NCR 오류: {mhra_gmp_ncr_err}")
+    else:
+        log("INFO", "ENABLE_MHRA_GMP_NCR=false — MHRA GMP NCR 수집 건너뜀")
+
     total_fetched = (stats.fr_fetched + stats.recall_fetched + stats.ema_fetched
                      + stats.mhra_fetched + stats.mhra_alert_fetched + stats.pics_fetched
                      + stats.eca_fetched + stats.wl_fetched
@@ -2954,7 +2990,8 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
                      + stats.hc_fetched
                      + stats.fda483_fetched
                      + stats.ispe_fetched
-                     + stats.eu_gmp_ncr_fetched)
+                     + stats.eu_gmp_ncr_fetched
+                     + stats.mhra_gmp_ncr_fetched)
     log("INFO", (
         f"수집 완료: FR={stats.fr_fetched} · Recall={stats.recall_fetched} · "
         f"EMA={stats.ema_fetched} · MHRA={stats.mhra_fetched} · "
@@ -2970,11 +3007,12 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         f"ICH={stats.ich_fetched} · WHO={stats.who_fetched} · "
         f"HC={stats.hc_fetched} · FDA483={stats.fda483_fetched} · "
         f"ISPE={stats.ispe_fetched} · EU-NCR={stats.eu_gmp_ncr_fetched} · "
+        f"MHRA-NCR={stats.mhra_gmp_ncr_fetched} · "
         f"합계={total_fetched}건"
     ))
     # ★배선 주의(PR#201/#233 교훈) — 반환 tuple 끝에 추가한 신규 소스 항목은
     # main() 언패킹(~하단)에도 동일 위치로 반드시 반영할 것(누락 시 매 실행 NameError).
-    return (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items, ispe_items, eu_gmp_ncr_items)
+    return (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items, eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items, ispe_items, eu_gmp_ncr_items, mhra_gmp_ncr_items)
 
 
 def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
@@ -2995,6 +3033,7 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
     enable_fda483 = cfg.enable_fda483
     enable_ispe = cfg.enable_ispe
     enable_eu_gmp_ncr = cfg.enable_eu_gmp_ncr
+    enable_mhra_gmp_ncr = cfg.enable_mhra_gmp_ncr
     enable_search = cfg.enable_search
     health_json_path = cfg.health_json_path
     # GitHub Actions 가 읽을 수 있는 GITHUB_STEP_SUMMARY 출력
@@ -3090,6 +3129,11 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                                       stats.eu_gmp_ncr_inserted, stats.eu_gmp_ncr_skipped_dup,
                                       stats.eu_gmp_ncr_insert_failed,
                                       stats.eu_gmp_ncr_error, stats.eu_gmp_ncr_error_msg))
+                if enable_mhra_gmp_ncr:
+                    f.write(_src_line("MHRA GMP NCR", stats.mhra_gmp_ncr_fetched,
+                                      stats.mhra_gmp_ncr_inserted, stats.mhra_gmp_ncr_skipped_dup,
+                                      stats.mhra_gmp_ncr_insert_failed,
+                                      stats.mhra_gmp_ncr_error, stats.mhra_gmp_ncr_error_msg))
                 if enable_search:
                     f.write(_src_line("Brave Search", stats.search_fetched, stats.search_inserted,
                                       stats.search_skipped_dup, stats.search_insert_failed,
@@ -3182,6 +3226,7 @@ def main() -> int:
     enable_fda483_observations = cfg.enable_fda483_observations
     enable_ispe = cfg.enable_ispe
     enable_eu_gmp_ncr = cfg.enable_eu_gmp_ncr
+    enable_mhra_gmp_ncr = cfg.enable_mhra_gmp_ncr
     enable_moleg_api = cfg.enable_moleg_api
     enable_scrape = cfg.enable_scrape
     event_name = cfg.event_name
@@ -3257,7 +3302,7 @@ def main() -> int:
      wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
      mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
      ich_items, who_items, hc_items, fda483_items, ispe_items,
-     eu_gmp_ncr_items) = _run_collection(
+     eu_gmp_ncr_items, mhra_gmp_ncr_items) = _run_collection(
         cfg, active, run_date, start, end, enf_start)
 
     # 3) Notion 기존 row (중복 제거)
@@ -3357,6 +3402,7 @@ def main() -> int:
         "fda483": fda483_items,
         "ispe": ispe_items,
         "eu_gmp_ncr": eu_gmp_ncr_items,
+        "mhra_gmp_ncr": mhra_gmp_ncr_items,
     }
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
@@ -3437,7 +3483,8 @@ def main() -> int:
                     wl_items, mfds_items, mfds_law_items, mfds_recall_items,
                     mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
                     mfds_gmp_inspection_items, ich_items, who_items, hc_items,
-                    fda483_items, search_items, ispe_items, eu_gmp_ncr_items)
+                    fda483_items, search_items, ispe_items, eu_gmp_ncr_items,
+                    mhra_gmp_ncr_items)
                 # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
                 # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
                 web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
@@ -3489,6 +3536,7 @@ def main() -> int:
         "ENABLE_FDA_483_OBSERVATIONS": enable_fda483_observations,
         "ENABLE_ISPE": enable_ispe,
         "ENABLE_EU_GMP_NCR": enable_eu_gmp_ncr,
+        "ENABLE_MHRA_GMP_NCR": enable_mhra_gmp_ncr,
         "ENABLE_MOLEG_API": enable_moleg_api,
         "ENABLE_SCRAPE": enable_scrape,
         "ENABLE_MODALITY_TAG_REQUESTED": modality_requested,

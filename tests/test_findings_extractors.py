@@ -88,6 +88,41 @@ class FindingsExtractorsTest(unittest.TestCase):
         raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
         self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
 
+    def test_mhra_gmp_ncr_becomes_accepted_finding(self) -> None:
+        raw_signal = _raw_signal("mhra_gmp_ncr")
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)      # 1 NCR = 1 finding
+        self.assertValidFindings(findings)
+        f = findings[0]
+        self.assertEqual(f["agency"], "MHRA")
+        self.assertEqual(f["evidence_level"], "A")
+        self.assertEqual(f["review_status"], "accepted")
+        self.assertEqual(f["finding_language"], "EN")
+        self.assertEqual(f["firm_name"], "Genovior Biotech Corporation")
+        self.assertEqual(f["site_country"], "TAIWAN")
+        self.assertEqual(f["published_date"], "2023-08-30")
+        # finding_text = 위반내용(Nature) + 당국조치(Action) 병기
+        self.assertIn("critical finding regarding sterility assurance", f["finding_text"])
+        self.assertIn("Action taken/proposed by the NCA", f["finding_text"])
+        # evidence_url = 세션 독립 상세 페이지(품질필터 통과)
+        self.assertTrue(f["evidence_url"].endswith("/mhra/gmp/insp-gmp-5174718953344-0001-ncr"))
+        self.assertEqual(gf.evidence_url_quality_error(f["evidence_url"]), "")
+
+        again = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(
+            [x["finding_id"] for x in findings],
+            [x["finding_id"] for x in again],
+        )
+
+    def test_mhra_gmp_ncr_without_nature_extracts_nothing(self) -> None:
+        # 게이트 = ncr_nature. 없으면 finding 0건(침묵 아님 — 상위에서 error).
+        fx = _load_input("mhra_gmp_ncr")
+        fx["raw"].pop("ncr_nature", None)
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
     def test_mfds_gmp_deficiency_table_becomes_accepted_findings(self) -> None:
         raw_signal = _raw_signal("gmp_inspection_periodic")
 

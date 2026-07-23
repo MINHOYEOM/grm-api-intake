@@ -756,6 +756,8 @@ def agency_from_source(source: str) -> str:
         return "ICH"
     if "eudragmdp" in source_norm or "eu gmp ncr" in source_norm:
         return "EMA"
+    if "mhra" in source_norm:
+        return "MHRA"
     return source
 
 

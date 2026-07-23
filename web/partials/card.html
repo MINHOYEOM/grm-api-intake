@@ -207,6 +207,29 @@
     <div class="dt-row"><div class="dt-h"><span class="dt-area">추가 코멘트</span></div><p class="obs-en">{{ dd.additional }}</p></div>
     {%- endif %}
   </details>
+  {%- elif card.deterministic_detail.type == 'mhra_gmp_ncr_statement' %}
+  {#- [MHRA GMP NCR 상세 2026-07-23] MHRA Statement of Non-Compliance 전문 — EU NCR 블록과
+      동형이나 출처 라벨이 "MHRA"라 별도 분기(EU 골든 불변). 수집기가 세션 독립 상세 페이지
+      에서 결정론 추출(LLM 0·환각 0). 위반내용·당국조치 전문 verbatim(영문·MHRA 원문). 공식
+      원문(상세 페이지)은 공식원본 링크로 별도. 값 부재 카드는 미렌더(수집기 게이트). -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>비준수 상세 <span class="sub">· 원문 기반 · MHRA</span></summary>
+    {%- if dd.authority_country or dd.product_scope %}
+    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행기관 · MHRA</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
+    {%- endif %}
+    {%- if dd.operations %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">비준수 운영항목</span></div><p class="obs-en">{{ dd.operations }}</p></div>
+    {%- endif %}
+    {%- if dd.nature %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">위반내용 (Nature of non-compliance)</span></div><div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.nature }}</p></div></div>
+    {%- endif %}
+    {%- if dd.action %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">당국 조치 (Action taken/proposed)</span></div><div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.action }}</p></div></div>
+    {%- endif %}
+    {%- if dd.additional %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">제한사항</span></div><p class="obs-en">{{ dd.additional }}</p></div>
+    {%- endif %}
+  </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}

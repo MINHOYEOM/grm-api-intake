@@ -427,6 +427,7 @@ SOURCE_RAPS  = "RAPS"
 SOURCE_EPR   = "European Pharma Review"   # European Pharmaceutical Review
 SOURCE_ISPE  = "ISPE"   # [전문지 브리핑 소스확장 2026-07-13] ISPE iSpeak 블로그 RSS
 SOURCE_EU_GMP_NCR = "EU GMP NCR (EudraGMDP)"   # EU/EEA 업체별 GMP 비준수 보고서(EudraGMDP)
+SOURCE_MHRA_GMP_NCR = "MHRA GMP NCR"   # 영국 MHRA 업체별 GMP 비준수 성명서(GMDP 등록부)
 NOTION_RICH_TEXT_CHUNK = 1900  # 2000 한도, 여유 100
 
 
@@ -475,6 +476,7 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("ispe", "ISPE iSpeak RSS"),
     IntakeSourceSpec("search", "Brave Search"),
     IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)"),
+    IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR"),
 )
 
 

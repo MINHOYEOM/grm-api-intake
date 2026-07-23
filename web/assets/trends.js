@@ -274,7 +274,7 @@
     // 지연 사유를 명시한다. 집계 수치와 클릭 결과가 다를 수 있다는 실질 안내는 유지.
     coverageTextEl.textContent = isComplete
       ? intro + " 모두 국문으로 볼 수 있습니다."
-      : intro + " 갓 수집된 신규 건은 번역 전이라 목록에서 영어 원문으로만 표시됩니다.";
+      : intro + " 신규 수집분은 번역 완료 전까지 목록에서 영어 원문으로만 표시됩니다.";
     coverageNoteEl.hidden = false;
   }
 

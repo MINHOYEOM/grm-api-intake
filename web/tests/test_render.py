@@ -2773,7 +2773,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         런타임 fetch 성공 여부와 무관하게 정적 텍스트로 존재해야 한다."""
         self.assertIn("날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.", self.html)
         self.assertIn('<span class="lab">먼저 알아두세요</span>', self.html)
-        self.assertIn("특정 해에 건수가 많아 보여도 그 해에 지적이 늘어난 건 아닙니다.", self.html)
+        self.assertIn("날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.", self.html)
 
     def test_source_mix_skew_disclosed(self):
         """소스 편중(FDA 483 압도)은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성
@@ -3012,7 +3012,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertNotIn("순차", fn)
-        self.assertIn("번역 전이라", fn)
+        self.assertIn("번역 완료 전까지", fn)
         self.assertIn("영어 원문으로만 표시됩니다.", fn)
 
     def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):

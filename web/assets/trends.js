@@ -263,8 +263,8 @@
     var total = Number(totals.findings || 0).toLocaleString("ko-KR");
     var intro = hasDocumentsCount(totals)
       ? "숫자는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
-        "건에서 뽑은 지적사항 " + total + "건 기준이에요."
-      : "숫자는 전체 " + total + "건 기준이에요.";
+        "건에서 뽑은 지적사항 " + total + "건 기준입니다."
+      : "숫자는 전체 " + total + "건 기준입니다.";
     // [완역 자동 전환] 미번역 잔량이 5건 이하면(2026-07-15 백로그 완역 — 잔여는 OCR
     // 완파손 등 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔
     // 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
@@ -273,8 +273,8 @@
     // 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이 번역 중"으로 읽히도록
     // 지연 사유를 명시한다. 집계 수치와 클릭 결과가 다를 수 있다는 실질 안내는 유지.
     coverageTextEl.textContent = isComplete
-      ? intro + " 모두 국문으로 볼 수 있어요."
-      : intro + " 갓 수집된 신규 건은 번역 전이라 목록에서 영어 원문으로만 보여요.";
+      ? intro + " 모두 국문으로 볼 수 있습니다."
+      : intro + " 갓 수집된 신규 건은 번역 전이라 목록에서 영어 원문으로만 표시됩니다.";
     coverageNoteEl.hidden = false;
   }
 

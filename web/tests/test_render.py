@@ -2925,7 +2925,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("totals.findings", fn)
         self.assertIn('.toLocaleString("ko-KR")', fn)
         self.assertIn("숫자는 전체 ", fn)
-        self.assertIn("영어 원문으로만 보여요.", fn)
+        self.assertIn("영어 원문으로만 표시됩니다.", fn)
         # textContent 로만 채운다(innerHTML 데이터 삽입 금지 계약, 파일 상단 XSS 계약 참조).
         self.assertIn("coverageTextEl.textContent =", fn)
 
@@ -2979,7 +2979,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("hasDocumentsCount(totals)", fn)
         self.assertIn("규제 문서 ", fn)
         self.assertIn("건에서 뽑은 지적사항 ", fn)
-        self.assertIn("건 기준이에요.", fn)
+        self.assertIn("건 기준입니다.", fn)
 
     def test_coverage_note_documents_absent_path_falls_back_silently(self):
         """010 미적용 라이브(totals.documents=undefined)에서는 기존 "이 대시보드의 수치는
@@ -2988,7 +2988,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderCoverageNote(totals)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertIn("숫자는 전체 ", fn)
-        self.assertIn('건 기준이에요."', fn)
+        self.assertIn('건 기준입니다."', fn)
         self.assertIn("var intro = hasDocumentsCount(totals)", fn)
 
     def test_coverage_note_complete_state_switches_wording(self):
@@ -3001,7 +3001,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("var isComplete =", fn)
         self.assertIn("<= 5", fn)
         self.assertIn("Number(totals.findings || 0) > 0", fn)
-        self.assertIn("모두 국문으로 볼 수 있어요.", fn)
+        self.assertIn("모두 국문으로 볼 수 있습니다.", fn)
         self.assertIn("coverageTextEl.textContent = isComplete", fn)
 
     def test_coverage_note_incomplete_wording_neutralized(self):
@@ -3013,7 +3013,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }")]
         self.assertNotIn("순차", fn)
         self.assertIn("번역 전이라", fn)
-        self.assertIn("영어 원문으로만 보여요.", fn)
+        self.assertIn("영어 원문으로만 표시됩니다.", fn)
 
     def test_firm_name_html_entity_decode_applied_at_ranking_and_detail_panel(self):
         """[firm_name 엔티티 디코드 M5] 업체 랭킹(buildFirmRow)·상세 패널 헤더

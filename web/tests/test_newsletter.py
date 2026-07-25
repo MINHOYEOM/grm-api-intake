@@ -23,14 +23,8 @@ REAL_FIXTURE = DATA_DIR / "brief_web_2026_06_26.json"
 BRIEF_TEMPLATE = WEB_DIR / "templates" / "brief.html"
 BASE = "https://grm.example"
 
-__all__ = [
-    "NewsletterTeaserTest",
-    "NewsletterGateTest",
-    "NewsletterDisclosureDriftTest",
-    "BrevoSenderTest",
-    "NewsletterLoadTest",
-    "NewsletterScheduleSendTest",
-]
+# CI shim(tests/test_web_newsletter.py)은 이 모듈의 TestCase 하위클래스를 **전수 자동**
+# 수집한다(예전 수동 __all__ 목록은 새 클래스를 빠뜨리면 조용히 미실행됐다 — 렌더 shim 선례).
 
 
 def _real() -> dict:
@@ -175,6 +169,104 @@ class NewsletterGateTest(unittest.TestCase):
     def test_idempotency_name_deterministic(self):
         self.assertEqual(newsletter.idempotency_campaign_name("2026-06-26", 2),
                          "GRM Weekly Brief — 2026-06-26 (No.2)")
+
+
+# ── 자료실 업데이트 블록(그 주 자료 유입을 주간호에 태우는 경로) ───────────────
+_LIB_ENTRY = {
+    "date": "2026-07-27",
+    "sources": {
+        "mfds": {"new_ids": ["m1", "m2"], "changed_ids": [], "removed_ids": [],
+                 "total_count": 81, "truncated": False},
+        "pmda": {"new_ids": ["p1"], "changed_ids": ["p2"], "removed_ids": [],
+                 "total_count": 15, "truncated": False},
+    },
+}
+# 카탈로그 뷰 스텁 — render._catalog_view 산출 중 이 블록이 쓰는 키만(외부 원문 URL 포함:
+# 메일이 그 URL 을 링크로 새지 않는지 확인하려면 뷰에 실제로 들어 있어야 한다).
+_LIB_CATALOGS = [
+    {"source": "mfds", "slug": "mfds", "short": "식약처", "title": "MFDS 지침·고시 아카이브",
+     "items_by_id": {
+         "m1": {"title": "고시 A", "sub": "", "official_url": "https://www.mfds.go.kr/a"},
+         "m2": {"title": "고시 B", "sub": "", "official_url": "https://www.mfds.go.kr/b"}}},
+    {"source": "pmda", "slug": "pmda", "short": "PMDA", "title": "PMDA 실사 지적사례",
+     "items_by_id": {
+         "p1": {"title": "Orange Letter C", "sub": "", "official_url": "https://www.pmda.go.jp/c"},
+         "p2": {"title": "Annual Report D", "sub": "", "official_url": "https://www.pmda.go.jp/d"}}},
+]
+
+
+def _lib_view(cap: int = newsletter.LIBRARY_UPDATE_ITEM_CAP):
+    return newsletter.render.build_library_update_view(_LIB_ENTRY, _LIB_CATALOGS, cap=cap)
+
+
+class NewsletterLibraryBlockTest(unittest.TestCase):
+    """자료실 업데이트 블록 — 웹과 같은 이력을 싣되 메일 규칙(우리 링크만·신선도)을 지킨다."""
+
+    def test_block_links_only_to_our_own_pages(self):
+        """provenance 불변식 — 문서 원문 URL 은 제목 옆에 링크로 새지 않는다."""
+        html = newsletter.render_library_block(_lib_view(), site_base_url=BASE)
+        hrefs = re.findall(r'href="([^"]+)"', html)
+        self.assertTrue(hrefs)
+        for h in hrefs:
+            self.assertTrue(h.startswith(BASE + "/library/"), f"우리 페이지가 아님: {h}")
+        self.assertNotIn("mfds.go.kr", html)
+        self.assertNotIn("pmda.go.jp", html)
+
+    def test_block_shows_titles_and_per_catalog_counts(self):
+        html = newsletter.render_library_block(_lib_view(), site_base_url=BASE)
+        for title in ("고시 A", "고시 B", "Orange Letter C", "Annual Report D"):
+            self.assertIn(title, html)
+        self.assertIn("식약처", html)
+        self.assertIn("신규 2건", html)
+        self.assertIn("신규 1건 · 변경 1건", html)
+        self.assertIn(f'href="{BASE}/library/mfds/"', html)
+
+    def test_display_cap_admits_what_it_hid(self):
+        html = newsletter.render_library_block(_lib_view(cap=2), site_base_url=BASE)
+        self.assertIn("외 1건", html)      # 4건 중 2건만 표시 → 카탈로그별 잔여 표기
+
+    def test_teaser_embeds_the_block_and_passes_provenance(self):
+        html = newsletter.render_library_block(_lib_view(), site_base_url=BASE)
+        teaser = newsletter.build_teaser(_minimal(tldr=["a"]), site_base_url=BASE,
+                                         issue_no=1, library_html=html)
+        self.assertIn("자료실 업데이트", teaser["html"])
+        self.assertEqual(newsletter.gate_provenance(teaser, BASE), [])
+
+    def test_library_block_precedes_service_news(self):
+        """콘텐츠(자료 유입)가 제품 공지보다 앞 — 순서 계약."""
+        teaser = newsletter.build_teaser(
+            _minimal(tldr=["a"]), site_base_url=BASE, issue_no=1,
+            library_html='<div id="lib"></div>', updates_html='<div id="ann"></div>')
+        self.assertLess(teaser["html"].index('id="lib"'), teaser["html"].index('id="ann"'))
+
+    def test_absent_block_keeps_the_mail_byte_identical(self):
+        """실을 게 없는 주는 기존 메일과 완전히 동일해야 한다."""
+        brief = _minimal(tldr=["a"])
+        self.assertEqual(
+            newsletter.build_teaser(brief, site_base_url=BASE, issue_no=1)["html"],
+            newsletter.build_teaser(brief, site_base_url=BASE, issue_no=1,
+                                    library_html="")["html"])
+
+    def test_freshness_window_is_measured_from_the_issue_not_today(self):
+        """지난 호를 다시 빌드해도 같은 결과 — now() 를 쓰지 않는다(결정론)."""
+        tmp = pathlib.Path(TESTS_DIR / "_tmp_library_updates.json")
+        tmp.write_text(json.dumps({"schema_version": "grm-library-updates/v1",
+                                   "entries": [_LIB_ENTRY]}), encoding="utf-8")
+        try:
+            def view(pub):
+                return newsletter.library_update_for_issue(
+                    pub, catalogs=_LIB_CATALOGS, updates_file=tmp)
+            self.assertIsNotNone(view("2026-07-27"))          # 당일
+            self.assertIsNotNone(view("2026-08-03"))          # 7일 뒤(경계 포함)
+            self.assertIsNone(view("2026-08-04"))             # 창 밖 — 같은 소식 반복 발송 방지
+            self.assertIsNone(view("2026-07-26"))             # 그 호보다 나중 변경은 소급 금지
+        finally:
+            tmp.unlink()
+
+    def test_missing_history_yields_no_block(self):
+        self.assertIsNone(newsletter.library_update_for_issue(
+            "2026-07-27", catalogs=_LIB_CATALOGS,
+            updates_file=pathlib.Path(TESTS_DIR / "_absent.json")))
 
 
 # ── 면책 캐논 drift 가드(메일 = brief.html 동일 문안) ──────────────────────────

@@ -5705,6 +5705,138 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
                 self.assertIn(kw, body, f"{const} 에 소스 키워드 '{kw}' 누락 — 신규 소스 카피 갱신 필요")
 
 
+class WebNewSourceRenderTest(unittest.TestCase):
+    """[신규 소스 3종 발행 경로 회귀 2026-07-25] EU GMP NCR·UK(MHRA) GMP NCR·ISPE.
+
+    왜 이 클래스가 있나 — 세 소스는 `ENABLE_EU_GMP_NCR`(07-22)·`ENABLE_ISPE`(07-22)·
+    `ENABLE_MHRA_GMP_NCR`(07-23) 로 **07-20 발행 이후에** 켜졌다. 즉 07-27 호가 이들이
+    발행 파이프를 통과하는 **첫 주**인데, 수집기 골든(`tests/golden/*.webcard.json`)만
+    있고 **렌더 경로 커버리지는 0** 이었다. 카드 타입이 늘 때 `card.html` 분기를 빠뜨리면
+    상세 블록이 조용히 사라진다(게이트가 없어 발행은 되고 내용만 빈다) — 이 클래스가
+    "분기가 실제로 그려지는가"를 고정한다.
+
+    함께 고정하는 것: MHRA NCR 의 `document_id` 는 `Insp GMP 52165/19076958-0001` 처럼
+    **공백·슬래시를 포함**한다(EudraGMDP/MHRA 등록부 원 표기). 이 id 는 `_card_anchor`
+    를 거쳐 상세 article 의 HTML id·TOC href·search-index href 로 **동시에** 나가므로,
+    렌더가 죽지 않고 세 곳이 같은 값으로 일치하는지 검증한다(2026-07-25 헤드리스 실측:
+    앵커 점프 정상 — 사이트 JS 가 getElementById 경로만 쓴다).
+    """
+
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_ncr_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    # 실 수집기 산출 형태를 그대로 본뜬 최소 카드(값은 합성이나 키·타입은 동형).
+    EU_DETAIL = {
+        "type": "eu_gmp_ncr_statement",
+        "authority_country": "Austria",
+        "product_scope": "Human Medicinal Products",
+        "operations": "Manufacture of active substance Diosmin",
+        "nature": "Critical deficiency regarding data integrity of QC chromatographic records.",
+        "action": "Prohibition of supply. Recall of affected batches from the EU market.",
+        "additional": "The site may request a re-inspection after remediation.",
+    }
+    MHRA_DETAIL = {
+        "type": "mhra_gmp_ncr_statement",
+        "authority_country": "United Kingdom",
+        "product_scope": "Human Medicinal Products",
+        "operations": "Sterile manufacture of small volume parenterals",
+        "nature": "Failure to maintain aseptic conditions in grade A filling zone.",
+        "action": "GMP certificate withdrawn; UK supply suspended.",
+        "additional": "Restricted to non-sterile operations pending re-inspection.",
+    }
+    MHRA_ID = "Insp GMP 52165/19076958-0001"
+
+    def _brief(self):
+        eu = _card(0, id="186143", agency="EMA", card_type="EU GMP 비준수",
+                   type_tag="GMP 비준수", group_label="💊 합성의약품",
+                   evidence_level="A", signal_tier=3, signal_label="High",
+                   headline_target="Sichuan New Hawk Biotechnology Co. Ltd.",
+                   title_issue="원료의약품 GMP 비준수", summary="EU NCR 요약.",
+                   key_facts=["a"], implication="시사점.", checks=["점검"],
+                   deterministic_detail=self.EU_DETAIL)
+        uk = _card(1, id=self.MHRA_ID, agency="MHRA", card_type="UK GMP 비준수",
+                   type_tag="GMP 비준수", group_label="🧬 바이오의약품",
+                   evidence_level="A", signal_tier=3, signal_label="High",
+                   headline_target="Geno Pharmaceuticals Private Limited",
+                   title_issue="무균 공정 GMP 비준수", summary="UK NCR 요약.",
+                   key_facts=["a"], implication="시사점.", checks=["점검"],
+                   deterministic_detail=self.MHRA_DETAIL)
+        ispe = _card(2, id="b10549ee6d97", agency="ISPE", card_type="규제 소식",
+                     type_tag="News", group_label="▫️ 기타",
+                     evidence_level="B", signal_tier=2, signal_label="Med",
+                     headline_target="ISPE iSpeak", title_issue="업계 동향",
+                     summary="ISPE 블로그 요약.", key_facts=["a"],
+                     implication="시사점.", checks=["점검"])
+        br = _minimal_brief("2026-07-27", cards=[eu, uk, ispe],
+                            coverage={"intake_total": 3, "rendered": 3,
+                                      "evidence": {"A": 2, "B": 1, "C": 0}})
+        br["brief"]["agencies"] = ["EMA", "MHRA", "ISPE"]
+        return br
+
+    def _render(self):
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        br = self._brief()
+        (data / "brief_web_2026-07-27.json").write_text(
+            json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        return out, (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+
+    def test_eu_gmp_ncr_detail_block_rendered_verbatim(self):
+        """EU NCR 상세 분기가 실제로 그려지고 원문이 절단·유실 없이 실린다."""
+        _, html = self._render()
+        self.assertIn("비준수 상세", html)
+        self.assertIn("EudraGMDP", html)
+        self.assertIn("발행 NCA · Austria", html)
+        self.assertIn("비준수 운영항목", html)
+        self.assertIn("위반내용 (Nature of non-compliance)", html)
+        self.assertIn("당국 조치 (Action taken/proposed)", html)
+        for key in ("operations", "nature", "action", "additional"):
+            self.assertIn(self.EU_DETAIL[key], html,
+                          f"EU NCR 상세 '{key}' 원문이 렌더에서 빠졌다")
+
+    def test_mhra_gmp_ncr_detail_block_rendered_with_mhra_label(self):
+        """UK NCR 은 EU 와 동형이되 출처 라벨이 MHRA 여야 한다(분기 뒤바뀜 방지)."""
+        _, html = self._render()
+        self.assertIn("발행기관 · MHRA", html)
+        self.assertIn("원문 · MHRA", html)
+        for key in ("operations", "nature", "action", "additional"):
+            self.assertIn(self.MHRA_DETAIL[key], html,
+                          f"MHRA NCR 상세 '{key}' 원문이 렌더에서 빠졌다")
+
+    def test_ispe_card_renders_as_news(self):
+        """ISPE 는 결정론 상세가 없는 소식 카드 — 상세 블록 없이도 정상 렌더된다."""
+        _, html = self._render()
+        self.assertIn("ISPE iSpeak", html)
+        self.assertIn("ISPE 블로그 요약.", html)
+
+    def test_mhra_card_id_with_space_keeps_anchor_consistent(self):
+        """공백·슬래시가 든 document_id 도 렌더를 깨뜨리지 않고
+        article id·search-index href 가 **같은 값**으로 일치한다(드리프트 0)."""
+        out, html = self._render()
+        self.assertIn(f'id="{self.MHRA_ID}"', html,
+                      "MHRA 카드의 상세 앵커가 document_id 와 다르다")
+        idx = json.loads((out / "assets" / "search-index.json").read_text(encoding="utf-8"))
+        rows = idx["cards"] if isinstance(idx, dict) and "cards" in idx else idx
+        hit = [r for r in rows if r.get("target") == "Geno Pharmaceuticals Private Limited"]
+        self.assertEqual(len(hit), 1, "MHRA 카드가 검색 인덱스에 1건으로 안 잡힌다")
+        self.assertTrue(hit[0]["href"].endswith("#" + self.MHRA_ID),
+                        f"search-index href 가 앵커와 불일치: {hit[0]['href']}")
+
+    def test_new_sources_reach_search_index(self):
+        """세 소스 전부 검색 인덱스에 편입된다(발행은 됐는데 검색에서 사라지는 것 방지)."""
+        out, _ = self._render()
+        idx = json.loads((out / "assets" / "search-index.json").read_text(encoding="utf-8"))
+        rows = idx["cards"] if isinstance(idx, dict) and "cards" in idx else idx
+        types = {r.get("card_type") for r in rows}
+        for ct in ("EU GMP 비준수", "UK GMP 비준수"):
+            self.assertIn(ct, types, f"검색 인덱스에 '{ct}' 카드가 없다")
+        self.assertIn("ISPE", {r.get("agency") for r in rows})
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

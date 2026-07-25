@@ -4379,6 +4379,42 @@ class WebLibraryUpdateTest(unittest.TestCase):
         self.assertEqual(self._original.parent, render.LIBRARY_DIR.parent)
 
 
+class WebGuideLibraryCopyTest(unittest.TestCase):
+    """[재발 방지 가드 2026-07-25] 이용안내의 자료실 설명이 카탈로그 증설을 못 따라가던 문제.
+
+    실제로 자료실이 9개 카탈로그로 늘어난 뒤에도 이용안내는 "ICH 가이드라인 카탈로그,
+    식약처 지침·고시"**2개만 열거**해 실제보다 축소해 설명하고 있었다(사용자 지적으로 발견).
+
+    수리는 가드가 아니라 **구조**로 했다 — 이용안내에서 카탈로그 열거를 없애고 범위를
+    일반 서술 + 자료실 첫 화면 유도로 바꿨다(허브는 registry 로 자동 생성되므로 늘어나도
+    낡지 않는다). 이 테스트는 그 구조가 되돌아가는 것을 막는다: **열거하려면 전부** 하라."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.guide = render.load_guide()
+        cls.shorts = [e["short"] for e in render.LIBRARY_REGISTRY]
+
+    def _library_lines(self) -> list[str]:
+        return [ln for ln in (self.guide or "").splitlines()
+                if ln.lstrip().startswith("- **자료실")]
+
+    def test_guide_has_a_library_section(self):
+        self.assertTrue(self._library_lines(), "이용안내에 자료실 설명 줄이 없다")
+
+    def test_library_copy_names_either_no_catalog_or_all_of_them(self):
+        """일부만 열거하면 카탈로그가 늘 때마다 조용히 낡는다 — 0개 아니면 전부."""
+        blob = "\n".join(self._library_lines())
+        named = [s for s in self.shorts if s in blob]
+        self.assertIn(len(named), (0, len(self.shorts)),
+                      f"자료실 설명이 카탈로그를 일부만 열거한다({named}) — "
+                      "열거를 빼고 일반 서술로 두거나, 전부 적어야 한다")
+
+    def test_library_copy_states_the_weekly_auto_refresh(self):
+        """자동 갱신은 사용자가 알아야 할 동작이다(왜 목록이 저절로 늘어나는지)."""
+        blob = "\n".join(self._library_lines())
+        self.assertIn("자동", blob, "자료실 자동 갱신 설명이 없다")
+
+
 class WebGuideRenderTest(unittest.TestCase):
     """[이용안내 트랙 C 2차] /guide/ — guide_content.md(정본)를 제한 md 서브셋으로
     결정론 렌더. library 와 동일하게 커밋 콘텐츠가 빌드시 HTML 에 박히므로 골든이 정본이고,

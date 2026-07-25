@@ -36,6 +36,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
+from datetime import date as _date
 from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import quote, urlsplit
@@ -80,21 +81,104 @@ def brief_anchor_href(base_url: str, publish_date: str, group: str | None = None
     return url
 
 
+# ── 자료실 업데이트 블록(그 주에 자료실로 새로 들어온 규제기관 자료) ──────────
+# 웹(§자료실 허브·모아보기 스트립)과 **같은 이력 파일**(web/data/library_updates.json)을
+# 읽어 같은 사실을 메일에도 싣는다. 다만 두 가지가 웹과 다르다.
+#   1. **링크는 우리 페이지만.** gate_provenance 가 메일 내 외부 호스트 링크를 전면 차단한다
+#      (설계 불변식 ①). 그래서 문서 제목은 텍스트로 두고 링크는 우리 카탈로그 페이지로 건다
+#      — 원문 링크는 그 카탈로그 페이지에 이미 있다.
+#   2. **신선도 창.** 이력의 최신 항목이 그 호 발행일 기준 오래됐으면 싣지 않는다. 안 그러면
+#      자료실이 몇 주 조용할 때 같은 소식을 매주 반복 발송하게 된다.
+LIBRARY_UPDATE_MAX_AGE_DAYS = 7      # 주간 발행 주기 = 창 크기
+LIBRARY_UPDATE_ITEM_CAP = 6          # 메일에 싣는 문서 제목 상한(카탈로그 라운드로빈 배분)
+
+
+def _days_between(earlier: str, later: str) -> int | None:
+    """YYYY-MM-DD 두 날짜의 일수 차(later - earlier). 파싱 실패 시 None."""
+    try:
+        a = _date.fromisoformat(earlier)
+        b = _date.fromisoformat(later)
+    except ValueError:
+        return None
+    return (b - a).days
+
+
+def library_update_for_issue(
+    publish_date: str, *, catalogs: list[dict[str, Any]] | None = None,
+    updates_file: Path | None = None, cap: int = LIBRARY_UPDATE_ITEM_CAP,
+    max_age_days: int = LIBRARY_UPDATE_MAX_AGE_DAYS,
+) -> dict[str, Any] | None:
+    """그 호에 실을 자료실 변경 뷰(없으면 None). 순수(파일 읽기만·now() 0).
+
+    신선도 판정은 **그 호의 발행일 기준**이다(오늘 기준이 아니다) — 지난 호를 다시 빌드해도
+    같은 결과가 나와야 하고(결정론), 재발송이 나중의 변경 소식을 소급해 싣지도 않는다."""
+    entries = render.load_library_update_entries(updates_file)
+    if not entries:
+        return None
+    age = _days_between(str(entries[0].get("date") or ""), publish_date)
+    if age is None or not (0 <= age <= max_age_days):
+        return None
+    return render.build_library_update_view(
+        entries[0], catalogs if catalogs is not None else render.load_library(), cap=cap)
+
+
+def render_library_block(update: dict[str, Any], *, site_base_url: str) -> str:
+    """자료실 변경 뷰 → 주간 티저에 얹는 "자료실 업데이트" HTML 조각.
+
+    호출부는 update 가 None 이면 빈 문자열을 넘기므로 여기선 내용이 있다고 본다. 문서 제목은
+    **텍스트**(외부 원문 링크 금지 — gate_provenance), 링크는 우리 카탈로그·허브 페이지뿐."""
+    e = _html.escape
+    base = site_base_url.rstrip("/")
+    parts = [
+        '<div style="border:1px solid #E6DFD8;border-radius:10px;padding:16px 18px;'
+        'margin:0 0 26px;background:#FFFFFF">',
+        '<div style="font-size:12px;font-weight:600;letter-spacing:.04em;color:#A14B30;'
+        'margin-bottom:10px">자료실 업데이트</div>',
+        '<div style="font-size:15px;font-weight:600;color:#141413;margin-bottom:10px">'
+        f'규제기관·전문기관 자료 {update["change_count"]}건이 새로 들어왔습니다</div>',
+    ]
+    for s in update["sources"]:
+        href = f"{base}/library/{quote(s['slug'])}/"
+        counts = " · ".join(f"{label} {n}건" for label, n in
+                            (("신규", s["new_count"]), ("변경", s["changed_count"]),
+                             ("내림", s["removed_count"])) if n)
+        parts.append(
+            '<div style="font-size:14px;line-height:1.6;color:#3D3D3A;margin:8px 0 0">'
+            f'<a href="{e(href)}" style="color:#A14B30;text-decoration:none;font-weight:600">'
+            f'{e(s["short"])}</a> <span style="color:#6C6A64;font-size:13px">{e(counts)}</span></div>')
+        for it in s["items"]:
+            parts.append(
+                '<div style="font-size:13.5px;line-height:1.55;color:#3D3D3A;'
+                f'margin:3px 0 0;padding-left:10px">· {e(it["title"])}</div>')
+        if s["hidden_count"]:
+            parts.append(
+                '<div style="font-size:13px;line-height:1.55;color:#8E8B82;'
+                f'margin:3px 0 0;padding-left:10px">· 외 {s["hidden_count"]}건</div>')
+    parts.append(
+        f'<div style="margin:14px 0 0"><a href="{e(base)}/library/" '
+        'style="color:#A14B30;text-decoration:none;font-size:14px;font-weight:600">'
+        '자료실에서 원문 보기 →</a></div>')
+    parts.append("</div>")
+    return "".join(parts)
+
+
 # ── 티저 메일 빌더(순수·결정론·무변형) ────────────────────────────────────────
 _WRAP = ("font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',"
          "Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif")
 
 
 def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int,
-                 unsubscribe_html: str = "", updates_html: str = "") -> dict[str, Any]:
+                 unsubscribe_html: str = "", updates_html: str = "",
+                 library_html: str = "") -> dict[str, Any]:
     """web-card/v1 브리프 1건 → 티저 메일(subject + HTML). 순수.
 
     담는 것: 제목(=tldr[0] 또는 날짜파생)·발행일·호수·tldr(verbatim)·전체보기 CTA·섹션 앵커
     링크·면책 캐논. 담지 않는 것: 카드 사실/원문 인용/카드 출처 URL(무변형·provenance).
     `unsubscribe_html` = SaaS-특정 수신거부 스니펫(어댑터가 주입; 본문 빌더는 SaaS-무관).
+    `library_html` = 그 호에 얹을 "자료실 업데이트" 블록(`render_library_block` 산출).
     `updates_html` = 그 호에 얹을 "서비스 소식" 블록(`announce.render_weekly_block` 산출).
-    **기본값 빈 문자열 → 출력 바이트 불변**(공지 없는 주는 기존 메일과 완전히 동일). 우리
-    사이트 변화 안내를 별도 발송 없이 주간호에 태우는 경로다(2단 구성의 기본선).
+    **둘 다 기본값 빈 문자열 → 출력 바이트 불변**(실을 게 없는 주는 기존 메일과 완전히
+    동일). 우리 사이트 변화·자료 유입을 별도 발송 없이 주간호에 태우는 경로다.
     """
     bm = brief_obj["brief"]
     pub = bm.get("publish_date", "")
@@ -146,7 +230,10 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
                 'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
                 f'border-radius:9999px;padding:7px 15px;margin:0 8px 8px 0">{e(g)} →</a>')
         parts.append("</div>")
-    # 서비스 소식(선택) — 규제 소식 뒤·면책 앞. 주인공은 그 주 규제 소식이므로 뒤에 붙인다.
+    # 자료실 업데이트 → 서비스 소식(둘 다 선택) — 규제 소식 뒤·면책 앞. 주인공은 그 주 규제
+    # 소식이므로 뒤에 붙이고, 그 안에서는 콘텐츠(자료 유입)가 제품 공지보다 앞이다.
+    if library_html:
+        parts.append(library_html)
     if updates_html:
         parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).
@@ -252,14 +339,15 @@ def gate_linkcheck(brief_obj: dict[str, Any], *,
 def run_gates(brief_obj: dict[str, Any], *, expected_date: str, site_base_url: str,
               issue_no: int, checker: Callable[[str], str] | None = None,
               run_linkcheck: bool = True,
-              updates_html: str = "") -> tuple[GateReport, dict[str, Any]]:
+              updates_html: str = "",
+              library_html: str = "") -> tuple[GateReport, dict[str, Any]]:
     """발행검증(구조·provenance) + (선택)링크체크 게이트를 1회 실행하고 티저를 만든다.
     반환=(GateReport, teaser). 멱등(③)·사람승인(④)은 발송 워크플로/어댑터 레이어.
 
-    `updates_html` 이 실린 호는 provenance 게이트가 그 블록의 링크까지 함께 훑는다(공지
-    블록이 외부 호스트·추적 파라미터를 들여오면 주간 발송 자체가 보류된다)."""
+    `updates_html`·`library_html` 이 실린 호는 provenance 게이트가 그 블록의 링크까지 함께
+    훑는다(붙임 블록이 외부 호스트·추적 파라미터를 들여오면 주간 발송 자체가 보류된다)."""
     teaser = build_teaser(brief_obj, site_base_url=site_base_url, issue_no=issue_no,
-                          updates_html=updates_html)
+                          updates_html=updates_html, library_html=library_html)
     reasons: list[str] = []
     struct_fails = gate_publishable(brief_obj, expected_date)
     reasons.append(f"구조 검증: {'OK' if not struct_fails else 'FAIL'}")
@@ -485,10 +573,18 @@ def main(argv: "list[str] | None" = None) -> int:
         updates_html = announce.render_weekly_block(ann, site_base_url=site_base_url)
         print(f"서비스 소식 블록 삽입: {ann['id']} (항목 {len(ann.get('items') or [])}건)")
 
+    # 그 주 자료실 유입(있을 때만) — 신선도 창 밖이거나 변경 0이면 library_html="" → 바이트 불변.
+    lib_update = library_update_for_issue(args.publish_date)
+    library_html = ""
+    if lib_update is not None:
+        library_html = render_library_block(lib_update, site_base_url=site_base_url)
+        print(f"자료실 업데이트 블록 삽입: {lib_update['date']} "
+              f"({lib_update['change_count']}건 / 카탈로그 {lib_update['catalog_count']}종)")
+
     report, teaser = run_gates(brief_obj, expected_date=args.publish_date,
                                site_base_url=site_base_url, issue_no=issue_no,
                                run_linkcheck=not args.no_linkcheck,
-                               updates_html=updates_html)
+                               updates_html=updates_html, library_html=library_html)
     print(report.text())
     if args.out is not None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -515,7 +611,8 @@ def main(argv: "list[str] | None" = None) -> int:
     # 발송본은 수신거부 스니펫(SaaS-특정·어댑터 책임)을 넣어 재빌드. 게이트는 정본(무-수신거부)
     # 티저로 통과했고, 수신거부 추가는 무변형/provenance 와 무관(우리 카드 URL 불변).
     teaser2 = build_teaser(brief_obj, site_base_url=site_base_url, issue_no=issue_no,
-                           unsubscribe_html=BREVO_UNSUBSCRIBE_HTML, updates_html=updates_html)
+                           unsubscribe_html=BREVO_UNSUBSCRIBE_HTML,
+                           updates_html=updates_html, library_html=library_html)
 
     if args.mode == "test":
         test_emails = [x for x in _env("GRM_NEWSLETTER_TEST_EMAILS").replace(";", ",").split(",")

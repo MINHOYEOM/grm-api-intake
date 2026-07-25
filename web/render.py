@@ -670,13 +670,8 @@ def _library_update_view(
     }
 
 
-def load_library_updates(
-    catalogs: list[dict[str, Any]], updates_file: Path | None = None,
-) -> dict[str, Any]:
-    """최근 자료실 변경 1건을 두 화면(자료실 허브·모아보기)용 뷰로 반환.
-
-    반환 dict 는 항상 존재한다 — 이력이 없거나(첫 가동 전) 최근 변경이 0이면
-    latest/compact 가 None 이고, 템플릿은 "최근 변경 없음"으로 정직하게 표시한다.
+def load_library_update_entries(updates_file: Path | None = None) -> list[dict[str, Any]]:
+    """변경 이력 항목을 최신 우선으로 반환(파일 없으면 빈 리스트).
 
     기본 경로는 **호출 시점에** 모듈 전역에서 읽는다(기본인자로 묶으면 정의 시점 값이
     박혀 테스트의 모듈 속성 monkeypatch 가 반영되지 않는다)."""
@@ -686,13 +681,31 @@ def load_library_updates(
         payload = json.loads(updates_file.read_text(encoding="utf-8"))
         entries = [e for e in (payload.get("entries") or []) if isinstance(e, dict)]
     entries.sort(key=lambda e: str(e.get("date") or ""), reverse=True)
+    return entries
+
+
+def build_library_update_view(
+    entry: dict[str, Any] | None, catalogs: list[dict[str, Any]], *, cap: int,
+) -> dict[str, Any] | None:
+    """이력 항목 1건 → 표시 뷰(공개 진입점). **표시 상한은 부르는 쪽(채널)이 정한다** —
+    자료실 허브·모아보기 스트립·뉴스레터가 각자 다른 분량을 싣기 때문이다."""
+    return _library_update_view(entry, catalogs, cap=cap) if entry else None
+
+
+def load_library_updates(
+    catalogs: list[dict[str, Any]], updates_file: Path | None = None,
+) -> dict[str, Any]:
+    """최근 자료실 변경 1건을 두 화면(자료실 허브·모아보기)용 뷰로 반환.
+
+    반환 dict 는 항상 존재한다 — 이력이 없거나(첫 가동 전) 최근 변경이 0이면
+    latest/compact 가 None 이고, 템플릿은 "최근 변경 없음"으로 정직하게 표시한다."""
+    entries = load_library_update_entries(updates_file)
     latest = entries[0] if entries else None
     return {
-        "latest": _library_update_view(latest, catalogs, cap=LIBRARY_UPDATE_ITEM_CAP)
-                  if latest else None,
-        "compact": _library_update_view(latest, catalogs,
-                                        cap=LIBRARY_UPDATE_ITEM_CAP_COMPACT)
-                   if latest else None,
+        "latest": build_library_update_view(latest, catalogs,
+                                            cap=LIBRARY_UPDATE_ITEM_CAP),
+        "compact": build_library_update_view(latest, catalogs,
+                                             cap=LIBRARY_UPDATE_ITEM_CAP_COMPACT),
     }
 
 

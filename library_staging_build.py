@@ -16,6 +16,7 @@ import importlib
 import json
 import shutil
 import subprocess
+import sys
 from dataclasses import asdict, is_dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -198,11 +199,18 @@ def assert_curation_preserved(
 def evaluate_gates(
     report: dict[str, Any], *, max_change_count: int, max_change_percent: float,
 ) -> list[str]:
-    """Return human-review reasons; an empty list permits automatic merge."""
+    """Return human-review reasons; an empty list permits automatic merge.
+
+    **격리된 소스(skipped_sources)는 검토 사유가 아니다.** 그 소스는 이번 실행의 후보에
+    아예 들어 있지 않아 라이브를 건드리지 않는다 — 남은 소스의 변경분은 각자 아래 게이트를
+    통과한 것이므로 자동 머지를 막을 이유가 없다(막으면 소스 하나가 죽을 때마다 나머지가
+    사람을 기다린다). 격리 사실은 워크플로가 이슈로 알린다."""
     if max_change_count < 0 or max_change_percent < 0:
         raise ValueError("change thresholds must be non-negative")
     reasons: list[str] = []
-    errors = report.get("collector_errors") or {}
+    # 후보에 **포함된** 소스의 수집 오류만 검토 사유 — 격리분은 sources 에 없으므로 걸리지 않는다.
+    errors = {source: message for source, message in (report.get("collector_errors") or {}).items()
+              if message and source in (report.get("sources") or {})}
     if errors:
         reasons.append("collector_errors: " + ", ".join(sorted(errors)))
     for source, detail in sorted(report["sources"].items()):
@@ -236,6 +244,7 @@ def build(
     mfds_items: Iterable[Any] | None = None, ich_items: Iterable[Any] | None = None,
     run_date: date, collector_errors: dict[str, str | None] | None = None,
     plugin_items: dict[str, Iterable[Any]] | None = None,
+    skipped_sources: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     # None = 이번 실행에서 돌리지 않은 소스 → staging/diff 에서 아예 제외한다
     # (빈 리스트로 처리하면 "수집 0건"과 구분되지 않는다).
@@ -251,6 +260,9 @@ def build(
         "schema_version": SCHEMA_VERSION, "generated_on": run_date.isoformat(),
         "live_catalog_swapped": False, "sources": {},
         "collector_errors": collector_errors or {},
+        # 이번 실행에서 격리한 소스 {source: 사유}. 후보·스왑 대상에서 빠지므로 그 소스의
+        # 라이브 카탈로그는 지난주 그대로 남는다(삭제 아님 — 이번 주만 못 받은 것).
+        "skipped_sources": dict(skipped_sources or {}),
     }
     for source, raw_items in {**legacy, **plugins}.items():
         baseline = _load_catalog(baseline_dir / f"{source}.json")
@@ -280,9 +292,15 @@ def prepare_live_swap(
         report, max_change_count=max_change_count,
         max_change_percent=max_change_percent,
     )
-    # A collector error must never produce or copy a partial candidate.
-    if report.get("collector_errors"):
-        raise ValueError("collector errors forbid live candidate preparation")
+    # 수집 오류가 난 소스는 **절대 스왑하지 않는다**(부분 수집 결과로 라이브를 덮지 않는다).
+    # 격리된 소스는 애초에 report["sources"] 에 없어 아래 루프가 건드리지 않으므로, 여기서
+    # 막아야 할 것은 "오류가 났는데도 후보에 들어온 소스"뿐이다 — 있으면 계약 위반이다.
+    contaminated = sorted(source for source, message
+                          in (report.get("collector_errors") or {}).items()
+                          if message and source in report["sources"])
+    if contaminated:
+        raise ValueError(
+            "collector errors forbid live candidate preparation: " + ", ".join(contaminated))
     for source in report["sources"]:
         baseline = _load_catalog(baseline_dir / f"{source}.json")
         candidate = _load_catalog(staging_dir / f"{source}.json")
@@ -296,6 +314,7 @@ def prepare_live_swap(
         "automatic_merge_allowed": not reasons,
         "review_reasons": reasons,
     }
+    report["skipped_sources"] = dict(report.get("skipped_sources") or {})
     _write(report_path, report)
     return report
 
@@ -351,17 +370,40 @@ def main(argv: list[str] | None = None) -> int:
     plugin_items, plugin_errors = run_collectors(today, collectors=collectors)
     errors.update(plugin_errors)
 
-    # 수집 오류가 하나라도 있으면 후보를 만들지 않는다(부분 수집 결과로 라이브를 덮지 않는
-    # 안전 게이트 -- 자동 스왑 경로의 전제).
+    # 수집에 실패한 소스는 **그 소스만 격리**하고 나머지는 정상 진행한다.
+    #
+    # 예전엔 하나라도 실패하면 전 소스의 후보 생성을 중단했다. 그런데 실패한 소스는 어차피
+    # 이번 주에 아무것도 못 넣고(merge 는 append-only·큐레이션 불변·삭제 금지라 라이브가
+    # 손상되지도 않는다), 그 대가로 **멀쩡한 나머지 소스가 한 주를 통째로 건너뛰었다** —
+    # 보호받는 대상 없이 비용만 치르는 구조였다(2026-07-25).
+    #
+    # 다만 **과반이 실패하면 전면 중단**한다. 그건 개별 소스의 구조 변경이 아니라 러너·
+    # 네트워크 등 실행 환경 문제이고, 그 상태의 부분 결과를 "이번 주 수집"으로 남기면
+    # 다음 주 diff 가 지난주를 기준으로 잘못 계산된다.
     collector_errors = {source: error for source, error in errors.items() if error}
-    if collector_errors:
-        print(json.dumps({"collector_errors": collector_errors}, ensure_ascii=False, sort_keys=True))
+    attempted = [source for source, value in
+                 (("mfds", mfds_items), ("ich", ich_items)) if value is not None]
+    attempted += list(plugin_items)
+    if collector_errors and len(collector_errors) * 2 >= max(len(attempted), 1):
+        print(json.dumps({"aborted": "collector_errors_majority",
+                          "attempted": sorted(attempted),
+                          "collector_errors": collector_errors},
+                         ensure_ascii=False, sort_keys=True))
         return 1
+
+    skipped_sources = {source: message for source, message in collector_errors.items()}
+    if "mfds" in skipped_sources:
+        mfds_items = None            # None = 이번 실행 미수집(빈 리스트와 구분 — build 계약)
+    if "ich" in skipped_sources:
+        ich_items = None
+    plugin_items = {source: rows for source, rows in plugin_items.items()
+                    if source not in skipped_sources}
 
     report = build(
         baseline_dir=args.baseline_dir, staging_dir=args.staging_dir,
         report_path=args.report, mfds_items=mfds_items, ich_items=ich_items,
         run_date=today, collector_errors=collector_errors, plugin_items=plugin_items,
+        skipped_sources=skipped_sources,
     )
     if args.swap:
         report = prepare_live_swap(
@@ -369,6 +411,9 @@ def main(argv: list[str] | None = None) -> int:
             report_path=args.report, max_change_count=args.max_change_count,
             max_change_percent=args.max_change_percent,
         )
+    for source in sorted(skipped_sources):
+        # 로그에서 눈에 띄게 — 이 줄이 없으면 격리가 조용한 누락처럼 보인다.
+        print(f"[SKIP] 자료실 소스 격리: {source} — {skipped_sources[source]}", file=sys.stderr)
     print(json.dumps(report, ensure_ascii=False, sort_keys=True))
     return 0
 

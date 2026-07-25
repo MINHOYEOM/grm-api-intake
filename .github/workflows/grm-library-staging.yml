@@ -57,6 +57,23 @@ jobs:
           python library_staging_build.py --swap --days "$LOOKBACK_DAYS" \
             --max-change-count "$MAX_CHANGE_COUNT" \
             --max-change-percent "$MAX_CHANGE_PERCENT"
+      - name: Read quarantined sources
+        # 수집에 실패한 소스는 이번 실행에서 격리되고 나머지는 계속 간다(전면 중단 아님).
+        # 격리는 조용히 넘기면 안 되므로 여기서 뽑아 아래 이슈 스텝이 알린다.
+        id: skipped
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f web/data/library_staging_diff.json ]; then
+            LIST=$(jq -r '(.skipped_sources // {}) | keys | join(",")' web/data/library_staging_diff.json)
+          else
+            LIST=""
+          fi
+          echo "sources=$LIST" >> "$GITHUB_OUTPUT"
+          if [ -n "$LIST" ]; then
+            echo "::warning title=자료실 소스 격리::수집 실패로 이번 주 제외: $LIST"
+            echo "⚠️ 격리된 소스: \`$LIST\` (해당 카탈로그는 지난주 상태 유지)" >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Detect meaningful live changes
         id: changes
         run: |
@@ -96,6 +113,7 @@ jobs:
           git commit -m "chore: refresh live regulatory library"
           git push -u origin "$BRANCH"
           REASONS=$(jq -r 'if (.gate.review_reasons | length) == 0 then "- None (automatic merge eligible)" else .gate.review_reasons | map("- " + .) | join("\n") end' web/data/library_staging_diff.json)
+          SKIPPED=$(jq -r '(.skipped_sources // {}) | to_entries | if length == 0 then "none" else map("`" + .key + "` (" + .value + ")") | join(", ") end' web/data/library_staging_diff.json)
           COUNTS=$(jq -r '.sources | to_entries | map("- " + .key + ": " + (.value.baseline_count|tostring) + " → " + (.value.candidate_count|tostring) + " (new=" + (.value.new_count|tostring) + ", changed=" + (.value.changed_count|tostring) + ", removed=" + (.value.removed_count|tostring) + ")") | join("\n")' web/data/library_staging_diff.json)
           cat > /tmp/pr-body.md <<EOF
           Automated weekly regulatory-library refresh.
@@ -105,7 +123,7 @@ jobs:
 
           ## Safety gates
           - Thresholds: max ${MAX_CHANGE_COUNT} items or ${MAX_CHANGE_PERCENT}% per catalogue
-          - Collector errors: none
+          - Quarantined sources (excluded from this run): ${SKIPPED:-none}
           - Existing curated fields (`code`, `title_en`, `pdf_url`, `ko_url`, `doc_type`): preserved
 
           ## Review reasons
@@ -145,6 +163,97 @@ jobs:
       - name: Merge only after green CI
         if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
         run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+      - name: Open, escalate, or close the quarantine issue
+        # 격리를 알리는 유일한 경로. 제목+라벨로 이슈 1건만 유지하고(주마다 새 이슈 X),
+        # 최초 감지일은 본문의 HTML 주석에 실어 연속 실패 주수를 계산한다(저장소 상태 없이
+        # 이슈 자체가 유일 정본 — 변경 없는 주엔 커밋이 없어 파일 상태는 못 믿는다).
+        if: always()
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'web/data/library_staging_diff.json';
+            // 리포트가 없다 = 후보 생성 자체가 중단됐다(과반 실패 등). 이건 "격리 없음"이
+            // 아니라 **판정 불가**다 — 여기서 빈 객체로 읽고 이슈를 닫으면 전면 중단을
+            // 복구로 오인해 알림이 사라진다. 그 경우 잡 자체가 실패하므로 손대지 않는다.
+            if (!fs.existsSync(path)) {
+              core.warning('library_staging_diff.json 없음 — 격리 판정 건너뜀(수집 전면 중단 추정)');
+              return;
+            }
+            const skipped = JSON.parse(fs.readFileSync(path, 'utf8')).skipped_sources || {};
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM 자료실 수집기 실패 — 소스 격리';
+            const label = 'automation-warning';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label, per_page: 100,
+            });
+            const existing = issues.find(i => i.title === title);
+            const names = Object.keys(skipped).sort();
+
+            if (names.length === 0) {
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number,
+                  body: `✅ 복구 확인 — 이번 실행에서 전 소스가 정상 수집됐습니다. (${runUrl})`,
+                });
+                await github.rest.issues.update({
+                  owner, repo, issue_number: existing.number, state: 'closed',
+                });
+              }
+              return;
+            }
+
+            // 최초 감지일 — 기존 이슈 본문에서 승계(없으면 오늘). 주수 계산의 기준점.
+            const today = new Date().toISOString().slice(0, 10);
+            const marker = /<!-- first-failed: (\d{4}-\d{2}-\d{2}) -->/;
+            const firstFailed =
+              (existing && (existing.body || '').match(marker) || [])[1] || today;
+            const weeks = Math.floor(
+              (Date.parse(today) - Date.parse(firstFailed)) / (7 * 86400 * 1000)) + 1;
+
+            const lines = [
+              `<!-- first-failed: ${firstFailed} -->`,
+              `자료실 주간 자동 갱신에서 아래 소스를 **이번 실행에서 제외(격리)** 했습니다.`,
+              '',
+              '| 소스 | 실패 사유 |',
+              '|---|---|',
+              ...names.map(n => `| \`${n}\` | ${String(skipped[n]).replace(/\|/g, '\\|')} |`),
+              '',
+              `- 최초 감지: **${firstFailed}** · 연속 ${weeks}주차 · 최근 실행: ${runUrl}`,
+              '',
+              '### 지금 상태',
+              '- 격리된 소스의 라이브 카탈로그는 **마지막 정상 수집 상태 그대로**입니다(삭제·손상 아님 — 이번 주 신규분만 못 받았습니다).',
+              '- **나머지 소스는 정상 갱신**됐습니다. 사이트·뉴스레터도 그 소스들만 반영합니다.',
+              '',
+              '### 확인 방법',
+              '```bash',
+              `python library_staging_build.py --sources ${names.join(',')}`,
+              '```',
+              '원문 페이지 구조가 바뀌었으면 해당 `library_collect_<source>.py` 파서를 고치고, 일시 장애면 다음 주 실행에서 자동 복구됩니다(복구되면 이 이슈는 자동으로 닫힙니다).',
+            ];
+            if (weeks >= 3) {
+              lines.splice(1, 0,
+                `> 🚨 **${weeks}주 연속 실패** — 일시 장애가 아니라 원문 구조 변경일 가능성이 높습니다. 파서 점검이 필요합니다.`,
+                '');
+            }
+            const body = lines.join('\n');
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: existing.number, body,
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number,
+                body: `여전히 격리 중: \`${names.join('`, `')}\` (연속 ${weeks}주차 · ${runUrl})`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: [label],
+              });
+            }
       - name: Summary
         if: always()
         run: |

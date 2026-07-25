@@ -167,6 +167,33 @@ class TestGuards(unittest.TestCase):
         with self.assertRaises((apb.AssembleError, inject_slots.SlotInjectionError)):
             apb.assemble_publish_brief(s, d, strict=True)
 
+    def test_ghost_error_names_key_namespace_regression(self):
+        """[2026-07-25] 델타 키가 `Source::document_id` 로 회귀하면 오류가 그렇게 말해야 한다.
+
+        2026-07-20 실장애: 라우틴이 81건 전량을 handoff card_id 형식으로 예치해 거부됐는데,
+        오류 문구가 "스캐폴드가 다른 intake run?" 뿐이라 진단이 스캐폴드 쪽으로 샜다.
+        판정 로직은 그대로 두고(여전히 하드 거부) 원인만 지목한다.
+        """
+        s = _blank_scaffold_from(self.truth)
+        d = copy.deepcopy(self.delta)
+        d["cards"] = {f"FDA::{cid}": slots for cid, slots in d["cards"].items()}
+        _, report = apb.assemble_publish_brief(s, d, strict=False)
+        joined = "\n".join(report.errors)
+        self.assertIn("키 네임스페이스 회귀", joined)
+        self.assertIn("bare document_id", joined)
+        # 여전히 발행을 막는다 — 진단이 좋아졌다고 통과시키지 않는다.
+        with self.assertRaises(apb.AssembleError):
+            apb.assemble_publish_brief(s, d, strict=True)
+
+    def test_ghost_error_keeps_generic_message_for_real_run_mismatch(self):
+        """접두사 문제가 아닌 진짜 run 불일치는 기존 문구를 유지한다(오지목 방지)."""
+        s = _blank_scaffold_from(self.truth)
+        s["cards"] = s["cards"][:-1]
+        _, report = apb.assemble_publish_brief(s, self.delta, strict=False)
+        joined = "\n".join(report.errors)
+        self.assertIn("다른 intake run", joined)
+        self.assertNotIn("키 네임스페이스 회귀", joined)
+
     def test_determinism(self):
         """같은 입력 → 바이트 동일 출력."""
         s = _blank_scaffold_from(self.truth)

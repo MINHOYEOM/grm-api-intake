@@ -530,12 +530,22 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
      483=`GRM_Prompt_DeepFda483_v1.md`). ②번 섹션 키가 유형을 결정한다(브릿지가 그 키로 스키마 자동판별):
      · WL       : `{key_violations:[{citation,original,description,risk}], fda_evaluation, required_remediation:{deadline,items[]}, administrative_risks}`
      · 행정처분  : `{key_violations:[{citation,original,description,risk}], disposition_basis, required_remediation:{deadline,items[]}, administrative_risks}`
-     · FDA 483  : `{key_violations:[{observation,original,citation(선택),risk}], inspectional_significance, required_remediation:{deadline,items[]}, administrative_risks, observations_ko(선택)}`
+     · FDA 483  : `{key_violations:[{observation,original,citation(선택),risk}], inspectional_significance, required_remediation:{deadline,items[]}, administrative_risks, observations_ko(★필수)}`
      ⚠️ **근거 규칙(브릿지 게이트가 검사)**: `citation`(WL·행정처분)은 그 카드 `body_full` 에 **글자
      그대로 있는 조항/법령/[별표N]만** 인용한다(원문에 없는 조항·다른 법령 = D2 하드 FAIL → 그
      카드 심층분석 통째 drop). 483 의 CFR `citation` 은 원문에 없어도 WARN(비차단·정당한 해석 허용).
      `original` 은 `body_full` 문장을 verbatim 발췌(없으면 생략). 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
      `required_remediation` 은 반드시 `{deadline, items[]}` 객체(문자열 금지·items 비면 FAIL). 산문은 한국어.
+     ⛔ **483 `observations_ko` 는 필수다 — 빠지면 그 주 브리프 "전체"가 발행되지 않는다**(2026-07-20
+     실장애·2026-07-25 재현 확인). 아래 두 게이트가 카드 단위 degrade 가 아니라 **브리프 단위 차단**이다:
+       · `web/render.py: validate_483_observations` — 배포 빌드 fail-closed. 어느 Observation 이든
+         `deficiency_ko` 누락, 또는 `detail` 이 있는데 `detail_ko` 누락이면 **사이트 빌드 전체가 FAIL**.
+       · `assemble_publish_brief: _lint_483_observation_ko`(게이트 4) — 조립 단계에서 같은 규약 선행 검출.
+     형식 = 결정론 관찰 블록의 **번호(`number`)로 1:1 매칭**되는 `[{number, deficiency_ko, detail_ko}]`.
+     번역만 하고 새 사실을 만들지 않는다(서명/푸터 OCR 잡음 제외). 상세 규칙·예시는 정본
+     `GRM_Prompt_DeepFda483_v1.md` §2. **다른 4섹션이 D1/D2 게이트에서 FAIL 해 그 카드 심층분석이
+     drop 되더라도 `observations_ko` 는 별도 층으로 살아 병합된다** — 그러니 분석이 자신 없는
+     카드라도 `observations_ko` 만은 반드시 채운다(관찰 번역이 빠지는 것이 훨씬 큰 사고다).
   ③ 생성한 카드들을 **deep 델타 dict** 로 모은다 — 각 카드마다 반드시 `source_text` 에 **그 카드의
      `body_full` 원문을 그대로** 넣는다(브릿지가 이 `source_text` 로 인용 근거대조를 하므로, 빠지면
      그 카드는 근거 미검증으로 drop 된다):
@@ -606,6 +616,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 ### 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-07-25 | **483 `observations_ko` 를 `(선택)`→`★필수` 로 정정(§B `[2단계]` FDA 483 스키마 줄만 · 6슬롯·[출력]·코드·골든 불변)**: 2026-07-14 에 `render.py` fail-closed 발행 게이트(`validate_483_observations`)가 배포되면서 이 필드는 **사실상 필수**가 됐고 483 정본 프롬프트(`GRM_Prompt_DeepFda483_v1.md` §2)도 "필수·게이트 검증 대상"으로 고쳐졌으나, **클라우드 Routine 이 실제로 실행하는 이 v16 프롬프트만 `(선택)` 인 채 남아 있었다** — 2026-07-20 주간발행 3중 차단 중 하나(deep 백필이 분석 4섹션만 만들어 관찰 번역 누락 → 그 주 브리프 전체 발행 차단)의 잔여 원인. 2026-07-25 발행 리허설에서 재현 확인(관찰 20건 누락 시 사이트 빌드 전체 FAIL). 정정 내용 = 스키마 표기 `★필수` + 두 게이트(`render.py` 배포 fail-closed · `assemble_publish_brief._lint_483_observation_ko` 조립 선행)가 **카드 단위 degrade 가 아니라 브리프 단위 차단**임을 명시 + 형식(`number` 1:1 매칭 `[{number,deficiency_ko,detail_ko}]`) + **4섹션이 D1/D2 로 drop 돼도 `observations_ko` 는 별도 층으로 병합되므로 분석이 자신 없어도 관찰 번역은 반드시 채울 것** 명시. 순수 doc 문구 — 코드·테스트·골든 불변. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영). |
 | 2026-06-05 | G3 초안 작성(Cowork). 카드별 6슬롯 루프 + A안 조립(render_order/group_label) + 검색 카드 미니 템플릿 + 🔮 표 비카드 전용 + K4 경계 고지. 검색/Fetch 기계는 v15.8 이관. Codex 판정 플래그 F-1(Tier 1 생략)·F-2(Watch 비중복) |
 | 2026-06-05 | **동결** — Codex G3 조건부 GO 반영: P1 PL-10b 대조 키 `source`+`document_id`(0단계 표에 source 포함), P2 검색 카드 Signal 라벨 `Signal Med (T2)`(scaffold 동형), P2 `status_hint='Error'` 최종 Status 우선 명시. F-1·F-2 초안 채택 확정, card_spec §6 문구 정정 동반(P3) |
 | 2026-06-05 | **G4 dry-run C-1 반영(불건 해소 불변식)**: WHO Tier 2 임의 축약→보류 162건이 예정 Status=Processed 로 배정돼 조용한 유실 위험 발견. ⛔ 불변식 추가: 카드/표/멤버 미반영 row 를 Processed 로 소비 금지, 용량 초과 보류분은 Status 미변경(다음 주 재유입). Tier 2 임의 표본추출 금지·전수 채택 기본. [Status 갱신]·[Publish Lint 9] 동반 추가. (C-2 노이즈 카드는 원인 진단 중 — 별도) |

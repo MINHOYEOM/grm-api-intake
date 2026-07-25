@@ -244,6 +244,31 @@ def extract_resource_notes(cards: list[dict[str, Any]]
     return events, resources
 
 
+def diagnose_ghost_ids(ghost: list[str], scaffold_ids: "set[Any]") -> str:
+    """게이트 1 실패의 **원인**을 한 줄로 지목한다(판정 로직 불변 — 문구만).
+
+    "스캐폴드에 없는 카드 id" 는 원인이 최소 둘인데 증상이 같다:
+      (a) 스캐폴드가 다른 intake run — 진짜 run 불일치
+      (b) **키 네임스페이스 회귀** — 라우틴이 카드 키를 `Source::document_id`(handoff
+          card_id 형식)로 예치. 2026-07-20 실장애: 81건 전량이 이 이유로 거부됐는데
+          오류 문구가 (a) 만 말해서 진단이 스캐폴드/intake run 쪽으로 샜다.
+
+    (b) 는 결정론으로 구분된다 — 접두사를 떼면 스캐폴드에 있는지 보면 된다.
+    브릿지는 예치 시점에 스캐폴드가 없어 이 검사를 할 수 없으므로(구조적 한계),
+    조립이 이 판별의 유일한 지점이다. **자동 교정은 하지 않는다** — 키 형식이 틀린
+    델타는 다른 것도 틀렸을 수 있어, 조용히 고치면 회귀가 영영 안 보인다.
+    """
+    if not ghost:
+        return "델타 카드 id 불일치"
+    stripped = [cid.split("::", 1)[1] for cid in ghost if isinstance(cid, str) and "::" in cid]
+    if len(stripped) == len(ghost) and stripped and all(s in scaffold_ids for s in stripped):
+        return (f"델타 카드 id {len(ghost)}건이 **키 네임스페이스 회귀** — 라우틴이 "
+                f"`Source::document_id` 로 예치했고, 접두사를 떼면 전건이 스캐폴드에 있다. "
+                f"스캐폴드/intake run 문제가 아니라 **델타 예치 형식** 문제다(2026-07-20 동일 사고). "
+                f"조치 = 델타 `cards` 키를 bare document_id 로 다시 예치")
+    return f"델타 카드 id {len(ghost)}건이 스캐폴드에 없음(스캐폴드가 다른 intake run?)"
+
+
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                            *, strict: bool = True,
                            deep_deltas: dict[str, dict[str, Any]] | None = None
@@ -270,8 +295,8 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     ghost = sorted(cid for cid in adopted_ids if cid not in scaffold_ids)
     if ghost:
         report.errors.append(
-            f"델타 카드 id {len(ghost)}건이 스캐폴드에 없음(스캐폴드가 다른 intake run?): "
-            + ", ".join(ghost[:8]) + (" …" if len(ghost) > 8 else ""))
+            diagnose_ghost_ids(ghost, scaffold_ids)
+            + ": " + ", ".join(ghost[:8]) + (" …" if len(ghost) > 8 else ""))
 
     # 슬롯 주입(코드 가드는 inject_slots 가 수행). strict 는 상위로 위임.
     injected = inject_slots.inject_llm_slots(scaffold, delta, strict=strict)

@@ -9,6 +9,27 @@
     <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
     <h1 class="reveal" style="animation-delay:.08s">규제뉴스 모아보기</h1>
     <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
+    {#- 자료실 업데이트 스트립(2026-07-25) — 주간 자동 갱신이 반영한 자료를 짧게 알린다.
+        뷰모델은 render.load_library_updates()["compact"](제목 상한 3건). 변경이 없거나
+        이력이 아직 없으면 lib_update 가 None → 스트립 자체를 렌더하지 않는다(빈 상자 금지).
+        여긴 규제뉴스 페이지고 자료실 소식은 부차 정보 — 검색·필터를 밀어내지 않도록
+        **머리글 한 줄 + 제목 인라인 한 줄**로만 둔다(쌓아 올리면 목록이 접힌 화면 밖으로
+        밀린다 — 2026-07-25 실측 267px). ⚠️ Jinja 의 s.items 는 dict 메서드 — s['items']. -#}
+    {% if lib_update %}
+    <aside class="arc-lib reveal" style="animation-delay:.18s" aria-label="자료실 업데이트">
+      <div class="arc-lib-h">
+        <span class="arc-lib-k"><i class="ti ti-refresh" aria-hidden="true"></i>자료실 업데이트</span>
+        <span class="arc-lib-sum"><b>{{ lib_update.date }}</b> · {% for s in lib_update.sources %}{{ s.short }} {{ s.change_count }}건{% if not loop.last %} · {% endif %}{% endfor %}</span>
+        <a class="arc-lib-go" href="{{ rel_root }}library/index.html">자료실 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      </div>
+      <p class="arc-lib-l">
+        {%- for s in lib_update.sources %}{% for it in s['items'] %}
+        <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span>{{ it.title }}</a>
+        {%- endfor %}{% endfor %}
+        {%- if lib_update.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">외 {{ lib_update.hidden_count }}건</a>{% endif %}
+      </p>
+    </aside>
+    {% endif %}
     <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
       <i class="ti ti-search lead"></i>
       <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="규제뉴스 카드 검색" />
@@ -38,5 +59,28 @@
     </div>
   </div>
 </main>
+<style>
+/* [자료실 업데이트 스트립] — grm.css 토큰만 사용(프리즈 보존·스코프 style 은 base 선례).
+   머리글 한 줄(날짜·소스별 건수·자료실 링크) + 제목 인라인 한 줄. 검색·필터 위에 오므로
+   높이를 최소로 유지한다 — 쌓아 올리면 정작 규제뉴스 목록이 화면 밖으로 밀린다. */
+.arc-lib{margin:22px 0 0;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
+.arc-lib-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
+.arc-lib-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
+.arc-lib-k .ti{font-size:15px;color:var(--coral-2)}
+.arc-lib-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
+.arc-lib-sum b{font-weight:600;color:var(--ink)}
+.arc-lib-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.arc-lib-go:hover{text-decoration:underline}
+.arc-lib-go .ti{font-size:14px;transition:transform .16s var(--ease)}
+.arc-lib-go:hover .ti{transform:translateX(3px)}
+/* 제목은 인라인 흐름 — 항목 사이 가운뎃점은 CSS 로만 넣는다(마크업엔 구분자 없음). */
+.arc-lib-l{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:0}
+.arc-lib-l a{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);text-decoration:none;word-break:keep-all;overflow-wrap:anywhere}
+.arc-lib-l a:hover{color:var(--coral-2);text-decoration:underline}
+.arc-lib-l a + a::before{content:"·";color:var(--lo);margin:0 8px;text-decoration:none;display:inline-block}
+.arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
+.arc-lib-more{color:var(--muted)!important;font-weight:500}
+@media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
+</style>
 {% endblock %}
 {% block scripts %}<script src="/assets/archive.js?v={{ archivejs_ver }}" defer></script>{% endblock %}

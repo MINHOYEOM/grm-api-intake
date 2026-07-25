@@ -49,6 +49,7 @@ TEMPLATES_DIR = WEB_DIR / "templates"
 PARTIALS_PARENT = WEB_DIR                  # "partials/card.html" 해석용
 DATA_DIR = WEB_DIR / "data" / "briefs"
 LIBRARY_DIR = WEB_DIR / "data" / "library"      # [자료실] ICH/MFDS 참조 카탈로그 커밋 데이터
+LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 주간 자동 갱신 변경 이력
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
@@ -387,7 +388,7 @@ def load_briefs(data_dir: Path) -> list[dict[str, Any]]:
 #                          (guidance-internal 등)를 한국어 라벨로, ""로 매핑하면 칩 숨김.
 #                          미등재 값은 원문 그대로 표시.
 LIBRARY_REGISTRY: list[dict[str, Any]] = [
-    {"slug": "ich", "file": "ich.json", "unit": "토픽", "kick": "ICH · Guidelines",
+    {"slug": "ich", "short": "ICH", "file": "ich.json", "unit": "토픽", "kick": "ICH · Guidelines",
      "title": "ICH 가이드라인 카탈로그",
      "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽을 한글 명칭과 함께 정리.",
      "intro": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 한글 명칭을 병기해 정리했으며, 현행 문서가 공개된 토픽은 공식 원문 PDF로 바로 연결됩니다. 식약처 한글 번역본이 있는 토픽은 번역본 링크를 함께 제공합니다. 최신 Step·개정 현황은 계열별 ICH 공식 카탈로그 페이지에서 확인하실 수 있습니다.",
@@ -399,7 +400,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
          {"contains": "quality-guidelines", "badge": "Q", "label": "품질", "label_en": "Quality"},
          {"contains": "multidisciplinary-guidelines", "badge": "M", "label": "다분야", "label_en": "Multidisciplinary"},
      ]},
-    {"slug": "mfds", "file": "mfds.json", "unit": "건", "kick": "MFDS · Guidance",
+    {"slug": "mfds", "short": "식약처", "file": "mfds.json", "unit": "건", "kick": "MFDS · Guidance",
      "title": "MFDS 지침·고시 아카이브",
      "blurb": "식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.",
      "intro": "식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 발행일 순으로 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
@@ -407,30 +408,30 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "sort": "published_desc",
      "doc_type_labels": {"guidance-internal": "공무원 지침서", "guidance-industry": "민원인 안내서·지침",
                          "legislative-notice": "입법·행정예고", "notice-final": "고시 전문"}},
-    {"slug": "eu-gmp", "file": "eu_gmp.json", "unit": "건", "kick": "EU · EudraLex Vol 4",
+    {"slug": "eu-gmp", "short": "EU GMP", "file": "eu_gmp.json", "unit": "건", "kick": "EU · EudraLex Vol 4",
      "title": "EU GMP 기준서 (EudraLex Vol 4)",
      "blurb": "유럽연합 의약품 GMP 기준서. Part I·II·III 각 장과 부속서(Annex)를 구조 순서대로 정리.",
      "intro": "유럽연합 의약품 GMP 기준서(EudraLex Volume 4)의 문서 목록입니다. Part I(기본 요건)·Part II(원료의약품)·Part III(보조 문서)과 부속서(Annex)를 기준서 구조 순서대로 정리했으며, 각 문서의 공식 원문 PDF로 바로 연결됩니다. 법적 효력과 최신 개정본은 반드시 공식 원문에서 확인하세요.",
      "desc": "EU GMP 기준서(EudraLex Volume 4) 문서 목록 — Part I·II·III과 부속서(Annex), 공식 원문 PDF 링크."},
-    {"slug": "pics", "file": "pics.json", "unit": "건", "kick": "PIC/S · GMP Guide",
+    {"slug": "pics", "short": "PIC/S", "file": "pics.json", "unit": "건", "kick": "PIC/S · GMP Guide",
      "title": "PIC/S GMP 가이드",
      "blurb": "의약품실사상호협력기구(PIC/S)의 GMP 가이드(PE 009)와 부속서·가이던스 문서 목록.",
      "intro": "의약품실사상호협력기구(PIC/S)가 공개한 GMP 가이드(PE 009) 각 부와 부속서, 관련 가이던스 문서를 발행일 순으로 정리했습니다. 식약처를 포함한 PIC/S 가입 규제기관의 실사 기준과 맞닿아 있는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
      "desc": "PIC/S GMP 가이드(PE 009)·부속서·가이던스 문서 목록 — 발행일·공식 원문 링크.",
      "sort": "published_desc"},
-    {"slug": "who", "file": "who.json", "unit": "건", "kick": "WHO · TRS Annexes",
+    {"slug": "who", "short": "WHO", "file": "who.json", "unit": "건", "kick": "WHO · TRS Annexes",
      "title": "WHO TRS 부속서 모음",
      "blurb": "WHO 전문가위원회 기술보고서(TRS) 부속서 중 GMP·품질 관련 문서 선별 목록.",
      "intro": "세계보건기구(WHO) 의약품 표준 전문가위원회 기술보고서(TRS)의 부속서 가운데 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. WHO 사전적격성평가(PQ)나 국제 조달 요건을 다룰 때 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
      "desc": "WHO 기술보고서(TRS) 부속서 중 GMP·품질 문서 선별 목록 — 발행일·공식 원문 링크.",
      "sort": "published_desc"},
-    {"slug": "fda-guidance", "file": "fda_guidance.json", "unit": "건", "kick": "FDA · Guidance",
+    {"slug": "fda-guidance", "short": "FDA", "file": "fda_guidance.json", "unit": "건", "kick": "FDA · Guidance",
      "title": "FDA 가이던스 문서",
      "blurb": "FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서 선별 목록.",
      "intro": "미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요.",
      "desc": "FDA 의약품 GMP·품질 가이던스 문서 선별 목록 — 발행일·유형·공식 원문 링크.",
      "sort": "published_desc"},
-    {"slug": "ema", "file": "ema.json", "unit": "건", "kick": "EMA · Guidance",
+    {"slug": "ema", "short": "EMA", "file": "ema.json", "unit": "건", "kick": "EMA · Guidance",
      "title": "EMA GMP·품질 가이드라인",
      "blurb": "유럽의약품청(EMA)이 공개한 GMP 관련 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록.",
      "intro": "유럽의약품청(EMA)이 공개한 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. 실사 당국 품질 시스템, 품질 결함 보고·신속 경보 처리 등 규제 절차 가이드라인과 과학 가이드라인, 질의응답(Q&A)을 포함합니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
@@ -440,7 +441,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "doc_type_labels": {"regulatory-procedural-guideline": "규제·절차 가이드라인",
                          "scientific-guideline": "과학 가이드라인",
                          "questions-and-answers": "질의응답(Q&A)"}},
-    {"slug": "health-canada", "file": "health_canada.json", "unit": "건",
+    {"slug": "health-canada", "short": "Health Canada", "file": "health_canada.json", "unit": "건",
      "kick": "Health Canada · GMP",
      "title": "Health Canada GMP 가이드",
      "blurb": "캐나다 보건부(Health Canada)의 GMP 가이드(GUI 시리즈) 문서 목록.",
@@ -449,7 +450,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "sort": "published_desc",
      "public_base": "https://www.canada.ca/en/health-canada.html",
      "doc_type_labels": {"guidance": "가이던스"}},
-    {"slug": "pmda", "file": "pmda.json", "unit": "건",
+    {"slug": "pmda", "short": "PMDA", "file": "pmda.json", "unit": "건",
      "kick": "PMDA · Inspection Cases",
      "title": "PMDA 실사 지적사례 (ORANGE Letter)",
      "blurb": "일본 PMDA가 공개한 GMP 실사 지적사례(ORANGE Letter) 영문판과 GMP/GCTP 연차보고서 목록.",
@@ -475,6 +476,9 @@ def _library_item_view(it: dict[str, Any]) -> dict[str, Any]:
     title_en = it.get("title_en") or it.get("title") or ""
     title_ko = it.get("title_ko") or ""
     return {
+        # id 는 화면에 쓰지 않는다 — 변경이력(library_updates.json)이 id 만 저장하고
+        # 제목·링크는 렌더 시점에 이 뷰에서 join 하므로 조인 키로만 싣는다.
+        "id": it.get("id") or "",
         "title": title_ko or title_en,
         "sub": title_en if title_ko else "",
         "code": it.get("code") or "",
@@ -543,6 +547,9 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
     meta = raw.get("meta", {})
     return {
         "slug": entry["slug"], "unit": entry["unit"], "kick": entry["kick"],
+        # source = 카탈로그 파일 stem — 수집기 LIBRARY_SOURCE·변경이력 키와 같은 값.
+        "source": entry["file"].rsplit(".", 1)[0], "short": entry.get("short", ""),
+        "items_by_id": {it["id"]: it for it in items},
         "intro": entry["intro"], "blurb": entry["blurb"], "desc": entry["desc"],
         "title": entry.get("title") or meta.get("title", ""),
         "note": meta.get("note", ""),
@@ -564,6 +571,129 @@ def load_library(library_dir: Path = LIBRARY_DIR) -> list[dict[str, Any]]:
         if p.is_file():
             views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8"))))
     return views
+
+
+# ── [자료실] 최근 변경 알림 — 주간 자동 갱신이 무엇을 바꿨는지 ────────────────
+# 데이터(web/data/library_updates.json)는 **id 와 개수만** 갖는다(library_updates.py).
+# 표시 제목·링크는 여기서 라이브 카탈로그 뷰와 join 한다 — 카탈로그가 표시 카피의
+# 단일 출처라는 규칙을 지키기 위해서다. 이미 사라진 id 는 조용히 건너뛴다(이력이
+# 없는 문서를 지어내지 않는다). 표시 상한을 넘기면 "외 N건"으로 정직하게 남긴다.
+LIBRARY_UPDATE_ITEM_CAP = 12       # 자료실 허브 — 한 화면에 남는 분량
+# 모아보기 스트립은 검색·필터 위에 오는 부차 정보 — 제목 인라인 한 줄을 넘기지 않는 값.
+LIBRARY_UPDATE_ITEM_CAP_COMPACT = 3
+
+
+def _library_update_view(
+    entry: dict[str, Any], catalogs: list[dict[str, Any]], *, cap: int,
+) -> dict[str, Any] | None:
+    """이력 항목 1건 + 카탈로그 뷰 → 표시 뷰모델(결정론 — 데이터 파생, 창작 0).
+
+    카탈로그 순서는 registry 순서를 따른다(사이트 전역 일관). 신규를 변경보다 앞에
+    두고, 그 안에서는 카탈로그의 표시 순서를 그대로 쓴다.
+
+    표시 상한(cap)은 **카탈로그마다 한 건씩 돌아가며** 배분한다. 앞선 카탈로그가 상한을
+    통째로 먹으면 "FDA 3건 · EMA 3건 · PMDA 1건"이라 써놓고 제목은 FDA 것만 보이는
+    화면이 된다(2026-07-25 실측) — 좁은 스트립일수록 소스가 고르게 보여야 한다."""
+    collected: list[dict[str, Any]] = []
+    new_total = changed_total = removed_total = 0
+    for view in catalogs:                       # registry 순서 유지
+        detail = (entry.get("sources") or {}).get(view["source"])
+        if not detail:
+            continue
+        # 개수는 **카탈로그에서 실제로 해소된 항목**만 센다. 이력의 id 가 지금 카탈로그에
+        # 없으면(뒤이은 큐레이션으로 정리된 항목 등) 링크를 만들 수 없는데, 그런 id 까지
+        # 세면 "신규 1건"이라 써놓고 목록은 비어 있는 화면이 된다 — 읽는 사람이 확인할 수
+        # 있는 것만 센다.
+        rows: list[dict[str, Any]] = []
+        counted = {"신규": 0, "변경": 0}
+        for state, key in (("신규", "new_ids"), ("변경", "changed_ids")):
+            for item_id in sorted(set(detail.get(key) or [])):
+                item = view["items_by_id"].get(item_id)
+                if not item:
+                    continue
+                counted[state] += 1
+                rows.append({"title": item["title"], "sub": item["sub"],
+                             "url": item["official_url"], "state": state})
+        new_count, changed_count = counted["신규"], counted["변경"]
+        # 내려간 항목은 카탈로그에 없어 링크가 없다 — 개수만 정직하게 남긴다.
+        removed_count = len(set(detail.get("removed_ids") or []))
+        if not (new_count or changed_count or removed_count):
+            continue
+        new_total += new_count
+        changed_total += changed_count
+        removed_total += removed_count
+        collected.append({
+            "view": view, "rows": rows, "truncated": bool(detail.get("truncated")),
+            "new_count": new_count, "changed_count": changed_count,
+            "removed_count": removed_count,
+        })
+    if not collected:
+        return None
+
+    # 라운드로빈 배분 — 한 바퀴에 카탈로그당 한 건씩, 상한이 차거나 더 줄 게 없을 때까지.
+    quota = [0] * len(collected)
+    remaining = cap
+    while remaining > 0 and any(quota[i] < len(c["rows"])
+                                for i, c in enumerate(collected)):
+        for index, entry_rows in enumerate(collected):
+            if remaining <= 0:
+                break
+            if quota[index] < len(entry_rows["rows"]):
+                quota[index] += 1
+                remaining -= 1
+
+    sources: list[dict[str, Any]] = []
+    for index, collected_source in enumerate(collected):
+        view, rows = collected_source["view"], collected_source["rows"]
+        new_count = collected_source["new_count"]
+        changed_count = collected_source["changed_count"]
+        removed_count = collected_source["removed_count"]
+        sources.append({
+            "slug": view["slug"], "short": view["short"], "title": view["title"],
+            "new_count": new_count, "changed_count": changed_count,
+            "removed_count": removed_count,
+            "change_count": new_count + changed_count,
+            "items": rows[:quota[index]],
+            "hidden_count": len(rows) - quota[index],
+            # truncated = 이력 저장 단계에서 id 자체가 잘린 경우(표시 상한과 별개).
+            "truncated": collected_source["truncated"],
+        })
+    return {
+        "date": entry.get("date", ""),
+        "sources": sources,
+        "new_count": new_total, "changed_count": changed_total,
+        "removed_count": removed_total,
+        "change_count": new_total + changed_total,
+        "catalog_count": len(sources),
+        # 표시 상한에 걸려 못 보여준 건수 — "외 N건"으로 반드시 드러낸다(조용한 절삭 금지).
+        "hidden_count": sum(s["hidden_count"] for s in sources),
+    }
+
+
+def load_library_updates(
+    catalogs: list[dict[str, Any]], updates_file: Path | None = None,
+) -> dict[str, Any]:
+    """최근 자료실 변경 1건을 두 화면(자료실 허브·모아보기)용 뷰로 반환.
+
+    반환 dict 는 항상 존재한다 — 이력이 없거나(첫 가동 전) 최근 변경이 0이면
+    latest/compact 가 None 이고, 템플릿은 "최근 변경 없음"으로 정직하게 표시한다.
+
+    기본 경로는 **호출 시점에** 모듈 전역에서 읽는다(기본인자로 묶으면 정의 시점 값이
+    박혀 테스트의 모듈 속성 monkeypatch 가 반영되지 않는다)."""
+    updates_file = updates_file or LIBRARY_UPDATES_FILE
+    entries: list[dict[str, Any]] = []
+    if updates_file.is_file():
+        payload = json.loads(updates_file.read_text(encoding="utf-8"))
+        entries = [e for e in (payload.get("entries") or []) if isinstance(e, dict)]
+    entries.sort(key=lambda e: str(e.get("date") or ""), reverse=True)
+    latest = entries[0] if entries else None
+    return {
+        "latest": _library_update_view(latest, catalogs, cap=LIBRARY_UPDATE_ITEM_CAP)
+                  if latest else None,
+        "compact": _library_update_view(latest, catalogs,
+                                        cap=LIBRARY_UPDATE_ITEM_CAP_COMPACT)
+                   if latest else None,
+    }
 
 
 # ── [이용안내] 제한 마크다운 서브셋 → 결정론 HTML ──────────────────────────────
@@ -1284,6 +1414,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "index.html", landing_html)
     written.append("index.html")
 
+    # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 자료실 허브와 아카이브 스트립이 함께
+    # 쓰므로 두 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
+    catalogs = load_library()
+    library_updates = load_library_updates(catalogs)
+
     # 아카이브(최신호 desc 정렬).
     issues = sorted(
         (_issue_row(b, issue_no_by_date[b["brief"].get("publish_date", "")], latest_slug)
@@ -1298,6 +1433,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         description=ARCHIVE_DESCRIPTION,
         canonical=_abs_url("archive/"),
         issues=issues,
+        lib_update=library_updates["compact"],
     )
     _write(out_dir / "archive" / "index.html", archive_html)
     written.append("archive/index.html")
@@ -1349,7 +1485,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 자료실(트랙 C) — findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷
     # (web/data/library/*.json)을 결정론 렌더한다(주간 발행 게이트와 무관한 독립 정적
     # 섹션). 데이터 파일이 없으면 해당 카탈로그·허브 항목을 조용히 건너뛴다.
-    catalogs = load_library()
     if catalogs:
         hub_catalogs = [{
             "href": f"{v['slug']}/index.html",
@@ -1367,6 +1502,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=LIBRARY_DESCRIPTION,
             canonical=_abs_url("library/"),
             catalogs=hub_catalogs,
+            lib_update=library_updates["latest"],
         )
         _write(out_dir / "library" / "index.html", library_html)
         written.append("library/index.html")

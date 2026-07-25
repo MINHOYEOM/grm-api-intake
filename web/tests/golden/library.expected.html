@@ -47,7 +47,13 @@
     <h1 class="reveal" style="animation-delay:.08s">자료실</h1>
     <p class="reveal" style="animation-delay:.14s">규제 실무에서 자주 되짚는 참조 문서를 한곳에 모았습니다. 매주 흘러가는 브리프와 달리, 필요할 때 언제든 다시 찾아볼 수 있도록 카탈로그 형태로 정리하고 공식 원문 링크를 함께 제공합니다.</p>
   </div>
-  <div class="wrap">
+  <div class="wrap"><section class="lib-upd reveal" aria-label="자료실 최근 업데이트">
+      <div class="lib-upd-h">
+        <span class="lib-upd-k"><i class="ti ti-refresh" aria-hidden="true"></i>최근 업데이트</span>
+        <span class="lib-upd-sum">최근 변경 없음</span>
+      </div>
+      <p class="lib-upd-f">규제기관·전문기관 공개 자료를 <b>매주 월요일</b> 자동으로 확인해 반영합니다 — 한 번에 크게 바뀌거나 사라지면 사람이 먼저 확인합니다.</p>
+    </section>
     <div class="lib-cats">
       <a class="lib-cat reveal" style="animation-delay:0.20s" href="../library/ich/index.html">
         <div class="lib-cat-h">
@@ -153,6 +159,30 @@
 /* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드.
    폭 기준(2026-07-18): 인트로·본문·리스트는 표준 wrap 전폭 — 좁은 max-width 캡 금지·한글 keep-all. */
 .page-head p{max-width:none;word-break:keep-all}  /* 공용 62ch 캡 해제 — 표준 wrap 전폭 */
+/* 최근 업데이트 패널 — 카탈로그 그리드 위 얇은 알림대. 색은 기존 토큰만. */
+.lib-upd{margin:24px 0 0;padding:15px 20px 13px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
+.lib-upd-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.lib-upd-k{display:inline-flex;align-items:center;gap:7px;font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink)}
+.lib-upd-k .ti{font-size:16px;color:var(--coral-2)}
+.lib-upd-sum{font-family:var(--sans);font-size:13px;color:var(--muted)}
+.lib-upd-sum b{font-weight:600;color:var(--ink)}
+.lib-upd-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4px 26px;margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
+.lib-upd-cat{min-width:0;padding:5px 0}
+.lib-upd-cat-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.lib-upd-tag{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:999px;padding:2px 10px;text-decoration:none;white-space:nowrap}
+.lib-upd-tag:hover{border-color:var(--coral)}
+.lib-upd-n{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+.lib-upd-l{list-style:none;padding:0;margin:6px 0 0}
+.lib-upd-l li{padding:2px 0}
+.lib-upd-l a{display:inline-flex;align-items:baseline;gap:7px;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--body);text-decoration:none;word-break:keep-all;overflow-wrap:anywhere}
+.lib-upd-l a:hover{color:var(--coral-2)}
+.lib-upd-st{flex:none;font-size:11px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:5px;padding:2px 7px;align-self:center}
+.lib-upd-st.is-new{color:#fff;background:var(--coral)}
+.lib-upd-l .ti{flex:none;font-size:12.5px;color:var(--lo);align-self:center;opacity:0;transition:opacity .14s var(--ease)}
+.lib-upd-l a:hover .ti{opacity:1}
+.lib-upd-more a{font-size:13px;color:var(--muted)}
+.lib-upd-f{font-family:var(--sans);font-size:12.5px;color:var(--lo);line-height:1.6;margin:11px 0 0;padding-top:10px;border-top:1px solid var(--line);word-break:keep-all}
+.lib-upd-f b{font-weight:600;color:var(--muted)}
 .lib-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding:24px 0 60px}
 .lib-cat{display:flex;flex-direction:column;gap:12px;padding:26px 24px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--ink);transition:border-color .16s var(--ease),transform .16s var(--ease),box-shadow .16s var(--ease)}
 .lib-cat:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:var(--shadow)}

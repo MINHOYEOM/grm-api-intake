@@ -5343,6 +5343,69 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertNotIn("이번 주 카드 보러 가기", self.landing)
 
 
+# ── 랜딩 자료실 카드(#engage 존) ──────────────────────────────────────────────
+class WebLandingLibraryCardTest(unittest.TestCase):
+    """랜딩 자료실 진입 카드 — 확정 배치를 흔들지 않으면서 수치가 낡지 않아야 한다.
+
+    수치를 템플릿에 손으로 적으면 카탈로그가 늘 때마다 반드시 낡는다(이용안내가 실제로
+    그렇게 낡았다 — 2026-07-25). 그래서 render 가 카탈로그에서 계산해 넘기고, 이 테스트가
+    그 계산값과 실제 카탈로그의 일치를 고정한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_libcard_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.catalogs = render.load_library()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_card_is_inside_the_engage_zone(self):
+        """확정 섹션 순서(…→#engage→#this-week→뉴스레터)를 바꾸지 않는다 —
+        새 최상위 <section> 이 아니라 기존 참여 존 안의 카드다."""
+        engage = self.landing.split('id="engage"', 1)[1].split('id="this-week"', 1)[0]
+        self.assertIn('class="quiz-cta lib-cta"', engage, "자료실 카드가 #engage 존 안에 없다")
+        self.assertIn("자료실 열기", engage)
+
+    def test_counts_are_derived_from_the_catalogs_not_hardcoded(self):
+        expected_catalogs = len(self.catalogs)
+        expected_items = sum(v["count"] for v in self.catalogs)
+        self.assertIn(f"카탈로그 {expected_catalogs}종", self.landing)
+        self.assertIn(f"총 {expected_items}건", self.landing)
+        tpl = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
+        self.assertNotIn(f"카탈로그 {expected_catalogs}종", tpl,
+                         "템플릿에 수치를 하드코딩하면 카탈로그가 늘 때 낡는다")
+
+    def test_cta_targets_the_library_not_a_brief(self):
+        """브리프행 CTA 2개 불가침 — 이 카드는 /library/ 로만 간다."""
+        self.assertIn('href="library/index.html">자료실 열기', self.landing)
+        self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
+        self.assertEqual(self.landing.count("이번 주 소식 보기"), 1)
+
+    def test_card_is_omitted_when_there_is_no_library(self):
+        """데이터가 없으면 빈 카드를 그리지 않는다(빈 상태 광고 금지).
+
+        cover 등 나머지 컨텍스트는 실제 빌드와 동일하게 채우고 library 만 비운다 —
+        가짜 컨텍스트로 렌더하면 템플릿의 다른 부분에서 터져 계약 검증이 흐려진다."""
+        briefs = render.load_briefs(SINGLE_FIXTURES)
+        latest = max(briefs, key=lambda b: b["brief"].get("publish_date", ""))
+        env = render._make_env()
+        env.globals.update({"css_ver": "0", "archivejs_ver": "0", "findingsjs_ver": "0",
+                            "trendsjs_ver": "0", "firmjs_ver": "0", "glossaryjs_ver": "0",
+                            "quizjs_ver": "0"})
+        html = env.get_template("landing.html").render(
+            page_title="t", rel_root="", nav_active="home", latest_slug="x",
+            description="d", canonical="c", json_ld="",
+            cover=render._cover_context(latest, 1),
+            library={"catalog_count": 0, "item_count": 0})
+        # 스코프 <style> 의 .lib-cta 규칙은 늘 있으므로 **마크업**으로 판정한다.
+        self.assertNotIn('class="quiz-cta lib-cta"', html)
+        self.assertNotIn("자료실 열기", html)
+
+
 # ── 인기 카드(Weekly Reactions) — 랜딩 정적 섹션 + popular.js 배선 ────────────────
 class WebPopularCardsTest(unittest.TestCase):
     """랜딩 '이번 주 반응이 모인 카드' 섹션 — 정적 빈 상태(골든 정본)는 reactions_enabled

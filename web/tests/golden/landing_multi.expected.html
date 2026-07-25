@@ -174,6 +174,13 @@
         <p>규제·품질 용어와 최근 공개 사례를 짧게 복습해 보세요. 선택하면 바로 정답과 해설, 근거 링크를 보여드립니다. 순위 경쟁은 없어요 — 풀수록 구름이가 자라나요.</p>
       </div>
       <a class="btn coral lg" href="quiz/index.html">퀴즈 풀어보기 <i class="ti ti-arrow-right"></i></a>
+    </div>    <div class="quiz-cta lib-cta">
+      <div class="quiz-cta-txt">
+        <span class="kick">Reference Library</span>
+        <h3>찾아볼 자료는 자료실에 상시 있어요.</h3>
+        <p>FDA·EMA·식약처·ICH·PIC/S·WHO 등 국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 9종, 총 401건으로 모았습니다. 전 항목이 공식 원문으로 바로 연결되고, <b>매주 월요일 자동으로 갱신</b>됩니다.</p>
+      </div>
+      <a class="btn lg" href="library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
     </div>
   </div></section><section class="section" id="this-week"><div class="wrap">
     <div class="callout">
@@ -209,6 +216,10 @@
 .quiz-cta-txt{flex:1;min-width:260px}
 .quiz-cta-txt h3{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink);margin:6px 0 8px}
 .quiz-cta-txt p{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--body);margin:0}
+/* 자료실 카드 — 퀴즈 배너와 같은 틀(.quiz-cta)에 배경만 캔버스로 바꿔 두 패널이 붙어도
+   같은 덩어리로 뭉쳐 보이지 않게. CTA 는 아웃라인 버튼(.btn) — 강조는 퀴즈가 갖는다. */
+.lib-cta{background:var(--canvas);margin-top:16px}
+.lib-cta .quiz-cta-txt p b{font-weight:600;color:var(--ink)}
 @media (max-width:640px){ .quiz-cta{padding:22px 20px} }
 </style>
 <section class="ai-disclosure" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap">

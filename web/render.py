@@ -1413,6 +1413,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "site.webmanifest", build_site_webmanifest())
     written.append("site.webmanifest")
 
+    # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 랜딩 카드·자료실 허브·아카이브 스트립이
+    # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
+    catalogs = load_library()
+    library_updates = load_library_updates(catalogs)
+    # 랜딩 자료실 카드용 집계 — **수치를 템플릿에 박지 않는다**. 카탈로그가 늘 때마다
+    # 사람이 문구를 고쳐야 하면 반드시 낡는다(이용안내가 그렇게 낡았다 — 2026-07-25).
+    library_summary = {
+        "catalog_count": len(catalogs),
+        "item_count": sum(v["count"] for v in catalogs),
+    }
+
     # 랜딩.
     landing_html = env.get_template("landing.html").render(
         page_title="GRM · Global Regulatory Monitor",
@@ -1423,14 +1434,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         canonical=_abs_url(""),
         json_ld=build_json_ld(),
         cover=_cover_context(latest_brief, latest_issue_no),
+        library=library_summary,
     )
     _write(out_dir / "index.html", landing_html)
     written.append("index.html")
-
-    # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 자료실 허브와 아카이브 스트립이 함께
-    # 쓰므로 두 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
-    catalogs = load_library()
-    library_updates = load_library_updates(catalogs)
 
     # 아카이브(최신호 desc 정렬).
     issues = sorted(

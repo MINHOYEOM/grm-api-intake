@@ -153,6 +153,21 @@
       </div>
       <a class="btn coral lg" href="{{ rel_root }}quiz/index.html">퀴즈 풀어보기 <i class="ti ti-arrow-right"></i></a>
     </div>
+    {#- 자료실 진입 카드(2026-07-25) — 퀴즈 배너와 같은 형태(.quiz-cta 재사용)로 #engage
+        존 안에 둔다. 확정 섹션 순서(히어로→why→기능→Anatomy→#engage→#this-week→뉴스레터)는
+        건드리지 않고, 브리프행 CTA 도 늘리지 않는다(히어로·콜아웃 2개 불가침 — 이 CTA 는
+        /library/ 행). 수치는 render 가 카탈로그에서 계산해 넘긴다(하드코딩 금지 — 손으로
+        적으면 카탈로그가 늘 때 반드시 낡는다). 데이터가 없으면 카드 자체를 렌더하지 않는다. -#}
+    {% if library and library.catalog_count %}
+    <div class="quiz-cta lib-cta">
+      <div class="quiz-cta-txt">
+        <span class="kick">Reference Library</span>
+        <h3>찾아볼 자료는 자료실에 상시 있어요.</h3>
+        <p>FDA·EMA·식약처·ICH·PIC/S·WHO 등 국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 {{ library.catalog_count }}종, 총 {{ library.item_count }}건으로 모았습니다. 전 항목이 공식 원문으로 바로 연결되고, <b>매주 월요일 자동으로 갱신</b>됩니다.</p>
+      </div>
+      <a class="btn lg" href="{{ rel_root }}library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
+    </div>
+    {% endif %}
   </div></section>
 
   {#- This Week 콜아웃(#this-week) — 마감 CTA 로 뉴스레터 직전 배치(디자인 유지·하단 이동).
@@ -191,6 +206,10 @@
 .quiz-cta-txt{flex:1;min-width:260px}
 .quiz-cta-txt h3{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink);margin:6px 0 8px}
 .quiz-cta-txt p{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--body);margin:0}
+/* 자료실 카드 — 퀴즈 배너와 같은 틀(.quiz-cta)에 배경만 캔버스로 바꿔 두 패널이 붙어도
+   같은 덩어리로 뭉쳐 보이지 않게. CTA 는 아웃라인 버튼(.btn) — 강조는 퀴즈가 갖는다. */
+.lib-cta{background:var(--canvas);margin-top:16px}
+.lib-cta .quiz-cta-txt p b{font-weight:600;color:var(--ink)}
 @media (max-width:640px){ .quiz-cta{padding:22px 20px} }
 </style>
 {% if reactions_enabled %}<script src="/assets/popular.js?v={{ popularjs_ver }}" defer></script>{% endif %}

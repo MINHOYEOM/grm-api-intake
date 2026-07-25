@@ -91,6 +91,7 @@ SINGLE_GOLDENS = [
     ("library/fda-guidance/index.html", "library_fda_guidance.expected.html"),
     ("library/ema/index.html", "library_ema.expected.html"),
     ("library/health-canada/index.html", "library_health_canada.expected.html"),
+    ("library/pmda/index.html", "library_pmda.expected.html"),
     ("guide/index.html", "guide.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),
@@ -4054,6 +4055,21 @@ class WebLibraryRenderTest(unittest.TestCase):
         for e in render.LIBRARY_REGISTRY:
             self.assertIn(e["title"], self.pages[e["slug"]], f"{e['slug']} 제목 누락")
 
+    def test_every_registry_entry_declares_its_display_copy(self):
+        """표시 카피는 전부 registry 소유 — 새 카탈로그가 키를 빠뜨린 채 합류하지 못하게.
+
+        특히 short(변경 알림 태그)는 값이 없어도 렌더가 죽지 않아 조용히 빈 칩이 될 수
+        있다 — 여기서 강제한다."""
+        seen: set[str] = set()
+        for e in render.LIBRARY_REGISTRY:
+            for key in ("slug", "short", "file", "unit", "kick", "title",
+                        "blurb", "intro", "desc"):
+                self.assertTrue(str(e.get(key) or "").strip(),
+                                f"{e.get('slug')}: registry 키 누락/빈값 — {key}")
+            source = e["file"].rsplit(".", 1)[0]
+            self.assertNotIn(source, seen, f"카탈로그 파일 중복: {e['file']}")
+            seen.add(source)
+
     def test_hub_links_and_counts_all_catalogs(self):
         # 허브 = registry 전 카탈로그 카드 — 링크·건수 정합.
         self.assertEqual(self.hub.count('class="lib-cat '), len(render.LIBRARY_REGISTRY))
@@ -4242,6 +4258,125 @@ class WebLibraryRenderTest(unittest.TestCase):
                     + [f"library/{e['slug']}/index.html" for e in render.LIBRARY_REGISTRY]):
             self.assertEqual((self.single / rel).read_bytes(),
                              (out2 / rel).read_bytes(), f"비결정론 렌더: {rel}")
+
+
+class WebLibraryUpdateTest(unittest.TestCase):
+    """[자료실 변경 알림 2026-07-25] 주간 자동 갱신이 무엇을 바꿨는지 두 화면에 표시.
+
+    이력 파일(web/data/library_updates.json)은 **id 와 개수만** 갖고, 표시 제목·링크는
+    렌더 시점에 라이브 카탈로그에서 join 된다. 여기선 그 join·개수 정합·정직성 계약
+    (해소 안 되는 id 는 세지 않는다 / 표시 상한 초과는 '외 N건'으로 드러낸다)을 고정한다.
+    커밋된 이력이 비어 있어도 깨지지 않아야 하므로 합성 이력으로 빌드한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_libupd_"))
+        cls.catalogs = render.load_library()
+        cls.by_source = {v["source"]: v for v in cls.catalogs}
+        # 실제 카탈로그에서 앞선 항목 id 를 빌려 합성 이력을 만든다(존재하는 id = join 성공).
+        ema = [it["id"] for it in cls.by_source["ema"]["items_by_id"].values()]
+        pmda = [it["id"] for it in cls.by_source["pmda"]["items_by_id"].values()]
+        cls.entry = {
+            "date": "2026-07-27",
+            "sources": {
+                "ema": {"new_ids": ema[:8], "changed_ids": [], "removed_ids": [],
+                        "total_count": len(ema), "truncated": False},
+                "pmda": {"new_ids": pmda[:1], "changed_ids": pmda[1:2],
+                         "removed_ids": [], "total_count": len(pmda), "truncated": False},
+                # 카탈로그에 없는 id 만 든 소스 — 화면에서 통째로 빠져야 한다.
+                "who": {"new_ids": ["who-does-not-exist"], "changed_ids": [],
+                        "removed_ids": [], "total_count": 27, "truncated": False},
+            },
+        }
+        cls.history = cls._tmp / "library_updates.json"
+        cls.history.write_text(json.dumps(
+            {"schema_version": "grm-library-updates/v1",
+             "entries": [cls.entry, {"date": "2026-07-20", "sources": {}}]},
+            ensure_ascii=False), encoding="utf-8")
+        cls._original = render.LIBRARY_UPDATES_FILE
+        render.LIBRARY_UPDATES_FILE = cls.history
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.archive = (cls.out / "archive" / "index.html").read_text(encoding="utf-8")
+        cls.hub = (cls.out / "library" / "index.html").read_text(encoding="utf-8")
+        cls.view = render.load_library_updates(cls.catalogs, cls.history)
+
+    @classmethod
+    def tearDownClass(cls):
+        render.LIBRARY_UPDATES_FILE = cls._original
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_counts_only_ids_that_resolve_to_a_catalog_item(self):
+        """카탈로그에 없는 id 는 링크를 만들 수 없다 — 세지도, 보여주지도 않는다."""
+        for key in ("latest", "compact"):
+            shorts = [s["short"] for s in self.view[key]["sources"]]
+            self.assertNotIn("WHO", shorts, f"{key}: 해소 안 되는 소스가 남았다")
+        for source in self.view["latest"]["sources"]:
+            self.assertEqual(source["new_count"] + source["changed_count"],
+                             len(source["items"]) + source["hidden_count"])
+
+    def test_hub_lists_titles_grouped_by_catalog(self):
+        self.assertIn('class="lib-upd', self.hub)
+        self.assertIn("2026-07-27", self.hub)
+        for source in self.view["latest"]["sources"]:
+            self.assertIn(f'href="../library/{source["slug"]}/index.html"', self.hub)
+            for item in source["items"]:
+                self.assertIn(str(_esc(item["title"])), self.hub)
+
+    def test_archive_strip_is_capped_and_admits_what_it_hid(self):
+        """모아보기 스트립은 '정말 간단하게' — 상한을 넘긴 건수는 '외 N건'으로 드러낸다."""
+        compact = self.view["compact"]
+        shown = sum(len(s["items"]) for s in compact["sources"])
+        self.assertLessEqual(shown, render.LIBRARY_UPDATE_ITEM_CAP_COMPACT)
+        self.assertEqual(compact["hidden_count"], compact["change_count"] - shown)
+        self.assertGreater(compact["hidden_count"], 0, "이 픽스처는 절삭이 나야 한다")
+        self.assertIn(f'외 {compact["hidden_count"]}건', self.archive)
+        self.assertIn('class="arc-lib', self.archive)
+        self.assertIn('href="../library/index.html"', self.archive)
+
+    def test_hub_shows_more_items_than_the_archive_strip(self):
+        self.assertGreater(sum(len(s["items"]) for s in self.view["latest"]["sources"]),
+                           sum(len(s["items"]) for s in self.view["compact"]["sources"]))
+
+    def test_official_links_open_in_a_new_tab(self):
+        for source in self.view["compact"]["sources"]:
+            for item in source["items"]:
+                self.assertIn(f'href="{item["url"]}" target="_blank" rel="noopener"',
+                              self.archive)
+
+    def test_latest_entry_wins_over_older_history(self):
+        self.assertEqual(self.view["latest"]["date"], "2026-07-27")
+
+    def test_empty_history_hides_the_archive_strip_and_says_so_on_the_hub(self):
+        """이력이 없으면(첫 가동 전) 빈 상자를 그리지 않고, 허브는 '변경 없음'을 말한다."""
+        empty = self._tmp / "empty.json"
+        empty.write_text('{"schema_version": "grm-library-updates/v1", "entries": []}',
+                         encoding="utf-8")
+        render.LIBRARY_UPDATES_FILE = empty
+        try:
+            out = self._tmp / "site_empty"
+            _build_single(out)
+        finally:
+            render.LIBRARY_UPDATES_FILE = self.history
+        archive = (out / "archive" / "index.html").read_text(encoding="utf-8")
+        hub = (out / "library" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn('<aside class="arc-lib', archive)
+        self.assertIn("최근 변경 없음", hub)
+
+    def test_missing_history_file_does_not_break_the_build(self):
+        render.LIBRARY_UPDATES_FILE = self._tmp / "absent.json"
+        try:
+            out = self._tmp / "site_absent"
+            _build_single(out)
+        finally:
+            render.LIBRARY_UPDATES_FILE = self.history
+        self.assertTrue((out / "archive" / "index.html").is_file())
+        self.assertTrue((out / "library" / "index.html").is_file())
+
+    def test_committed_history_is_wired_to_the_live_catalogs(self):
+        """저장소 이력 파일이 실제 렌더 경로에 물려 있는지(경로 오타 방지)."""
+        self.assertTrue(str(self._original).endswith("library_updates.json"))
+        self.assertEqual(self._original.parent, render.LIBRARY_DIR.parent)
 
 
 class WebGuideRenderTest(unittest.TestCase):

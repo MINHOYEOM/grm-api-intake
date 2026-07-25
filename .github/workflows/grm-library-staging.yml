@@ -66,7 +66,12 @@ jobs:
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Append library update history
+        if: steps.changes.outputs.changed == 'true'
+        run: python library_updates.py
       - name: Freeze renderer-produced goldens
+        # 변경 이력을 먼저 기록해야 한다 — 아카이브·자료실 허브가 그 이력을 렌더하므로
+        # 이력 기록 뒤에 동결해야 골든이 실제 발행본과 일치한다.
         if: steps.changes.outputs.changed == 'true'
         run: python web/tests/test_render.py --freeze
       - name: Re-check curated fields immediately before publishing
@@ -86,7 +91,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- web/data/library web/data/library_staging \
-            web/data/library_staging_diff.json web/tests/golden
+            web/data/library_staging_diff.json web/data/library_updates.json \
+            web/tests/golden
           git commit -m "chore: refresh live regulatory library"
           git push -u origin "$BRANCH"
           REASONS=$(jq -r 'if (.gate.review_reasons | length) == 0 then "- None (automatic merge eligible)" else .gate.review_reasons | map("- " + .) | join("\n") end' web/data/library_staging_diff.json)

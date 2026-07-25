@@ -6,13 +6,17 @@ import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 import library_staging_build as builder
 
 
 class LibraryStagingBuildTest(unittest.TestCase):
-    def test_collector_error_exits_before_writing_any_candidate(self):
+    def test_majority_collector_failure_aborts_before_writing_any_candidate(self):
+        """과반 실패 = 소스 문제가 아니라 실행 환경 문제 → 전면 중단(종전 동작 유지).
+
+        여기선 --sources 로 mfds·ich 둘만 돌리고 mfds 를 죽인다(1/2 = 과반)."""
         with tempfile.TemporaryDirectory() as td, \
                 mock.patch.object(builder.collect_mfds, "collect_mfds", return_value=([], "down")), \
                 mock.patch.object(builder.collect_ich, "collect_ich", return_value=([], None)):
@@ -21,6 +25,7 @@ class LibraryStagingBuildTest(unittest.TestCase):
                 "--baseline-dir", str(root / "live"),
                 "--staging-dir", str(root / "staging"),
                 "--report", str(root / "diff.json"), "--swap",
+                "--sources", "mfds,ich",
             ])
             self.assertEqual(result, 1)
             self.assertFalse((root / "staging").exists())
@@ -191,6 +196,89 @@ class PluginBuildTest(unittest.TestCase):
             )
         self.assertEqual(report["sources"]["pics"]["collector_error"], "표 0행")
         self.assertEqual(report["sources"]["pics"]["removed_count"], 0)
+
+    def test_quarantined_source_is_excluded_and_its_live_catalog_untouched(self):
+        """소스 하나가 죽어도 나머지는 간다 — 죽은 소스의 라이브는 그대로 남는다.
+
+        예전엔 하나만 실패해도 전 소스가 한 주를 통째로 건너뛰었다(2026-07-25 수리)."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            # baseline 5건 → 신규 1건 = 20%(변경량 게이트 30% 미만) — 이 테스트가 보려는 건
+            # 격리 동작이지 변경량 상한이 아니다.
+            self._catalog(root, "ich", [{"id": f"ich-old{n}", "title_en": "Old",
+                                         "official_url": f"https://ich/old{n}"}
+                                        for n in range(5)])
+            live = self._catalog(root, "mfds", [{"id": "mfds-keep", "title_en": "Keep",
+                                                 "official_url": "https://mfds/keep"}])
+            self._catalog(root, "pics", [])
+            before = (live / "mfds.json").read_bytes()
+            healthy_plugin = SimpleNamespace(
+                LIBRARY_SOURCE="pics", collect_library_items=lambda run_date: ([], None))
+
+            class _Row:                      # collect_ich 산출(IntakeItem) 최소 모사
+                document_id = "ich-new"
+                headline = "New topic"
+                official_url = "https://ich/new"
+                type_or_class = "guideline-topic"
+                date_iso = ""
+                raw_payload: dict = {}
+
+            with mock.patch.object(builder.collect_mfds, "collect_mfds",
+                                   return_value=([], "MFDS 목록 구조 변경 의심")), \
+                    mock.patch.object(builder.collect_ich, "collect_ich",
+                                      return_value=([_Row()], None)), \
+                    mock.patch.object(builder, "discover_collectors",
+                                      return_value={"pics": healthy_plugin}):
+                result = builder.main([
+                    "--baseline-dir", str(live),
+                    "--staging-dir", str(root / "staging"),
+                    "--report", str(root / "diff.json"), "--swap",
+                    "--sources", "mfds,ich,pics",   # 3개 시도 중 1개 실패 = 과반 아님
+                ])
+
+            self.assertEqual(result, 0, "격리는 실행 실패가 아니다")
+            report = json.loads((root / "diff.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["skipped_sources"],
+                             {"mfds": "MFDS 목록 구조 변경 의심"})
+            self.assertNotIn("mfds", report["sources"], "격리 소스는 후보에 없어야 한다")
+            self.assertIn("ich", report["sources"])
+            self.assertEqual(report["sources"]["ich"]["new_count"], 1)
+            # 죽은 소스의 라이브 카탈로그는 손대지 않는다(삭제·축소 금지).
+            self.assertEqual((live / "mfds.json").read_bytes(), before)
+            self.assertFalse((root / "staging" / "mfds.json").exists())
+            # 나머지 소스는 정상 스왑 + 자동 머지 자격 유지(격리는 검토 사유가 아니다).
+            self.assertTrue(report["live_catalog_swapped"])
+            self.assertTrue(report["gate"]["automatic_merge_allowed"])
+            self.assertEqual(report["gate"]["review_reasons"], [])
+
+    def test_quarantine_is_not_a_review_reason_but_a_contaminated_source_is(self):
+        base = {"sources": {"ich": {"baseline_count": 10, "new_count": 1,
+                                    "changed_count": 0, "removed_count": 0}}}
+        quarantined = dict(base, collector_errors={"mfds": "down"},
+                           skipped_sources={"mfds": "down"})
+        self.assertEqual(builder.evaluate_gates(quarantined, max_change_count=20,
+                                                max_change_percent=30.0), [])
+        # 오류가 났는데도 후보에 남아 있는 소스는 여전히 사람 검토 사유다.
+        contaminated = dict(base, collector_errors={"ich": "부분 수집"}, skipped_sources={})
+        self.assertTrue(builder.evaluate_gates(contaminated, max_change_count=20,
+                                               max_change_percent=30.0))
+
+    def test_swap_refuses_a_source_that_errored_yet_stayed_in_the_candidate(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            live = self._catalog(root, "pics", [])
+            (root / "staging").mkdir(parents=True, exist_ok=True)
+            (root / "staging" / "pics.json").write_text('{"items": []}', encoding="utf-8")
+            report_path = root / "diff.json"
+            report_path.write_text(json.dumps({
+                "sources": {"pics": {"baseline_count": 0, "new_count": 0,
+                                     "changed_count": 0, "removed_count": 0}},
+                "collector_errors": {"pics": "부분 수집"}, "skipped_sources": {},
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "pics"):
+                builder.prepare_live_swap(
+                    baseline_dir=live, staging_dir=root / "staging",
+                    report_path=report_path, max_change_count=20, max_change_percent=30.0)
 
     def test_source_collision_between_legacy_and_plugin_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:

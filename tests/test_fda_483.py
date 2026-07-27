@@ -1338,3 +1338,52 @@ class ObservationLegibilityTest(unittest.TestCase):
         dd = cs._detail_fda_483_observations({}, raw)
         self.assertEqual(dd["count"], 1)
         self.assertEqual([o["number"] for o in dd["observations"]], ["1"])
+
+
+class FooterMarkerParityTest(unittest.TestCase):
+    """[2026-07-27] 수집기 절단 마커와 발행 게이트 마커의 비대칭 = 발행 직전 차단.
+
+    실측 2건으로 동시에 드러났다:
+      · `fda483-193759` obs#8 — detail 끝에 "! a Mae SIGNATURE |" 잔재. 게이트에는
+        SIGNATURE 마커가 있는데 수집기에는 없어, 못 자른 채 발행 단계에서 브리프 전체 차단.
+      · `fda483-192342` obs#5 — "Investigator Piechocki noted…" 라는 **관찰 산문**을
+        게이트가 푸터로 오인. 서명블록은 `<이름>, Investigator` 어순이라 쉼표가 앞에 온다.
+    """
+
+    def test_collector_cuts_signature_residue(self):
+        detail = ("Specifically, the reference material has not been calibrated. "
+                  "! a Mae SIGNATURE |")
+        self.assertNotIn("SIGNATURE", f._clean_observation_detail(detail))
+
+    def test_collector_keeps_investigator_prose(self):
+        detail = ("Specifically, Investigator Piechocki noted materials came off "
+                  "loose along the frames in the Grade A filling room ceiling.")
+        self.assertIn("Piechocki", f._clean_observation_detail(detail))
+
+    def test_collector_cuts_signature_block_title(self):
+        detail = ("Specifically, the operator blocked first air during filling. "
+                  "Juanelma H Palmer, Investigator")
+        out = f._clean_observation_detail(detail)
+        self.assertIn("first air", out)
+        self.assertNotIn("Investigator", out)
+
+    def test_gate_agrees_with_collector(self):
+        """수집기가 통과시킨 detail 은 게이트도 통과해야 한다(비대칭 0)."""
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))), "web"))
+        import render
+        for raw in (
+            "Specifically, Investigator Piechocki noted materials came off loose.",
+            "Specifically, the reference material has not been calibrated. ! a Mae SIGNATURE |",
+            "Specifically, the operator blocked first air. Juanelma H Palmer, Investigator",
+        ):
+            cleaned = f._clean_observation_detail(raw)
+            if not cleaned:
+                continue
+            card = {"id": "x", "deterministic_detail": {
+                "type": "fda_483_observations", "count": 1,
+                "observations": [{"number": "1", "deficiency": "Aseptic failure observed.",
+                                  "deficiency_ko": "무균 실패.", "detail": cleaned,
+                                  "detail_ko": "국문."}]}}
+            self.assertEqual(render.validate_483_observations([card]), [],
+                             f"수집기 통과분을 게이트가 막았다: {cleaned!r}")

@@ -195,6 +195,14 @@ _FDA483_FOOTER_RE = re.compile(
     #   oi:.1e 1ssueo” / “EJ·.tP!.OYEE{S) Sa'.:;!l.\'ATI..RE OA"E SSUED” — 둘 다 실측) 이 토큰만은
     #   살아남는 관찰이 반복됐다(2026-07-20 193490 obs#1·#4 는 기존 마커 전부 실패). 대문자 고정 —
     #   산문의 소문자 "amendment"(규정 개정 언급)는 오탐하지 않는다.
+    r"|(?-i:SIGNATURE|SIGJ)"                     # [2026-07-27] 게이트에는 있는데 수집기에만
+    #   없던 마커. 스캔 OCR 원문에서 서명란이 "! a Mae SIGNATURE |" 형태로 detail 끝에 남았고
+    #   (fda483-193759 obs#8 실측), 수집기가 못 자른 채 게이트가 잡아 **발행 직전에 브리프
+    #   전체가 차단**됐다 — 바로 아래 EMP..OY 주석이 경고한 비대칭이 다른 토큰에서 재발한 것.
+    #   두 정규식의 마커 집합을 맞춰 둔다(대문자 고정 — 산문 "signature" 는 오탐하지 않는다).
+    r"|,\s*Investigator\b(?!\s+[A-Z][a-z])"      # 서명블록 직함(`<이름>, Investigator`).
+    #   산문 "Specifically, Investigator <이름> noted…" 는 쉼표도 앞에 오므로 쉼표만으로는
+    #   못 가른다 — 결정적 차이는 **뒤에 사람 이름이 오느냐**다. 게이트와 같은 조건.
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"                         # FORM FDA 483 / FORM FDA 4&3
     r"|PREVIOUS[\s.]*EDITION"

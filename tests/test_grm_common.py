@@ -16,6 +16,7 @@ from grm_common import (
     parse_datago_date,
     datago_normalize_items,
     datago_extract_items,
+    http_get_xml,
 )
 
 
@@ -251,6 +252,64 @@ class TestDatagoPaginate(unittest.TestCase):
         self.assertEqual(collected, [[{"a": 1}]])   # page1 은 실패 전에 yield 됨
         self.assertEqual(ctx.exception.page_no, 2)
         self.assertIsInstance(ctx.exception.cause, RuntimeError)
+
+
+class HttpGetXmlDeclarationTest(unittest.TestCase):
+    """[2026-07-27] `http_get_xml` 잡음 제거가 XML 선언을 삼키지 않아야 한다.
+
+    실장애: ECA 피드(`encoding="windows-1252"`)가 그 주 0건 수집됐다. 원인은 피드가 아니라
+    우리 잡음 제거 로직이었다 — 마커를 순서대로 훑으며 `idx > 0` 인 첫 마커에서 잘랐는데,
+    정상 문서는 `<?xml` 이 0번 위치라 통과해 버리고 다음 마커 `<rss`(항상 >0)에서 잘라
+    **선언을 통째로 버렸다.** 선언이 없으면 ElementTree 가 UTF-8 을 가정하므로 비-ASCII
+    바이트(`0x96` en-dash)에서 죽는다. 나머지 피드가 UTF-8 이라 우연히 안 걸렸을 뿐이다.
+    """
+
+    @staticmethod
+    def _resp(content: bytes):
+        r = MagicMock()
+        r.status_code = 200
+        r.content = content
+        r.raise_for_status = MagicMock()
+        return r
+
+    def _fetch(self, content: bytes):
+        with patch("grm_common.requests.get", return_value=self._resp(content)):
+            return http_get_xml("https://example.org/feed.xml")
+
+    # 회귀 본체 — 이 케이스가 수리 전 구현에서 실패한다.
+    def test_non_utf8_declaration_survives_and_parses(self):
+        body = (
+            b'<?xml version="1.0" encoding="windows-1252" ?>\r\n'
+            b"<rss version=\"2.0\"><channel><item>"
+            b"<title>Non-Sterile Medicinal Products \x96 EMA Q&amp;A</title>"
+            b"</item></channel></rss>"
+        )
+        root = self._fetch(body)
+        title = root.find("./channel/item/title")
+        self.assertIsNotNone(title, "windows-1252 선언 피드의 item 을 파싱하지 못했다")
+        # 0x96(windows-1252 en-dash)이 U+2013 으로 정확히 디코딩돼야 한다.
+        self.assertIn("–", title.text)
+
+    def test_leading_noise_before_declaration_is_stripped(self):
+        """원래 의도(WHO Drupal theme debug 주석/BOM 제거)는 그대로 살아 있어야 한다."""
+        body = (b"\xef\xbb\xbf<!-- theme debug -->\n"
+                b'<?xml version="1.0" encoding="utf-8" ?><rss version="2.0">'
+                b"<channel><item><title>ok</title></item></channel></rss>")
+        root = self._fetch(body)
+        self.assertEqual(root.find("./channel/item/title").text, "ok")
+
+    def test_noise_before_rss_without_declaration_is_stripped(self):
+        """선언이 아예 없고 잡음만 있는 피드도 종전처럼 복구된다."""
+        body = (b"garbage\n<rss version=\"2.0\">"
+                b"<channel><item><title>ok</title></item></channel></rss>")
+        root = self._fetch(body)
+        self.assertEqual(root.find("./channel/item/title").text, "ok")
+
+    def test_clean_utf8_feed_unchanged(self):
+        body = (b'<?xml version="1.0" encoding="utf-8" ?><rss version="2.0">'
+                b"<channel><item><title>\xed\x95\x9c\xea\xb8\x80</title></item></channel></rss>")
+        root = self._fetch(body)
+        self.assertEqual(root.find("./channel/item/title").text, "한글")
 
 
 if __name__ == "__main__":

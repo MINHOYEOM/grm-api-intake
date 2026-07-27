@@ -25,10 +25,10 @@
   ],
   "coverage": {
    "intake_total": 141,
-   "rendered": 95,
+   "rendered": 96,
    "evidence": {
     "A": 48,
-    "B": 47,
+    "B": 48,
     "C": 0
    },
    "resources": 2
@@ -1319,8 +1319,78 @@
    }
   },
   {
-   "id": "fda483-192222",
+   "id": "fda483-192263",
    "render_order": 11,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Allergan Pharmaceuticals Ireland Unlimited",
+   "title_issue": "483 실사기록 다건 공개",
+   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 6건이 공개됐다. 원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 시설·실사일 목록만 정리했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-05-01"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-192263"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Allergan Pharmaceuticals Ireland Unlimited · FEI 3002806285"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/30/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "공개 건수: 6건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)",
+    "대표 시설: Allergan Pharmaceuticals Ireland Unlimited · FEI 3002806285 외 5곳",
+    "출처: FDA OII FOIA 전자열람실"
+   ],
+   "implication": "관찰 본문을 확보하지 못한 실사기록 공개는 그 자체로 조치 신호는 아니다. 국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 열람할 필요가 있다.",
+   "checks": [
+    "목록에 자사 공급망·수급처 시설이 있는지 확인",
+    "해당 시 FDA FOIA 원문(PDF) 직접 열람"
+   ],
+   "merged_count": 6,
+   "merged_items": [
+    "Allergan Pharmaceuticals Ireland Unlimited · FEI 3002806285 · 실사 01/30/2025",
+    "Ajinomoto Company Inc. · FEI 3002806336 · 실사 02/21/2025",
+    "Shouguang Fukang Pharmaceutical Co., Ltd. · FEI 3003941038 · 실사 02/21/2025",
+    "Labor Augsburg MVZ GmbH · FEI 3036040213 · 실사 05/09/2025",
+    "ICON plc · FEI 3020784373 · 실사 06/13/2025",
+    "SGS France Life Sciences · FEI 3005865090 · 실사 08/29/2025"
+   ],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/192263/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "merged_noun": "건"
+  },
+  {
+   "id": "fda483-192222",
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "💊 합성의약품",
    "agency": "FDA",
@@ -1437,7 +1507,7 @@
   },
   {
    "id": "fda483-192194",
-   "render_order": 12,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "💊 합성의약품",
    "agency": "FDA",
@@ -1525,7 +1595,7 @@
   },
   {
    "id": "fda483-192134",
-   "render_order": 13,
+   "render_order": 14,
    "group": "글로벌",
    "group_label": "💊 합성의약품",
    "agency": "FDA",
@@ -1537,8 +1607,8 @@
    "signal_label": "High",
    "type_tag": "483",
    "headline_target": "Lonza AG",
-   "title_issue": "483 실사기록 다건 공개",
-   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 7건이 공개됐다. 원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 시설·실사일 목록만 정리했다.",
+   "title_issue": "원료 공정관리·완전성시험",
+   "summary": "FDA 가 스위스 소재 Lonza AG 원료(Drug Substance) 제조소를 2025년 10월 실사하고 관찰사항 4건을 발부했다. 등록자료와 다른 유효기간이 PPQ 배치에 적용됐고, 완전성 시험 절차가 공급사 권고와 어긋났으며, 중요공정파라미터 일탈과 함량 기준일탈이 함께 확인됐다.",
    "facts": [
     {
      "label": "발행일",
@@ -1564,25 +1634,17 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "공개 건수: 7건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)",
-    "대표 시설: Lonza AG · FEI 3002930340 외 6곳",
-    "출처: FDA OII FOIA 전자열람실"
+    "등록자료상 유효기간과 다른 값이 PPQ·PPQ 이후 배치에 적용",
+    "완전성 시험 절차가 공급사 권고·MES 지침과 불일치(대기시간 단계 누락)",
+    "중요공정파라미터(CPP) 일탈 + 출하 함량시험 기준일탈·경계값 · 중요 자재는 고장 기반 교체"
    ],
-   "implication": "관찰 본문을 확보하지 못한 실사기록 공개는 그 자체로 조치 신호는 아니다. 국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 열람할 필요가 있다.",
+   "implication": "주요 원료·원액 공급사 역시 FDA 실사에서 관찰사항을 받고 있다. 단일 공급처 의존도가 높은 원료는 실사 결과가 공급 중단으로 이어질 경우를 감안한 대체 공급 검토가 필요하다.",
    "checks": [
-    "목록에 자사 공급망·수급처 시설이 있는지 확인",
-    "해당 시 FDA FOIA 원문(PDF) 직접 열람"
+    "단일 공급 원료의 대체처 확보 현황",
+    "핵심 원료 공급처 실사 결과 모니터링 주기"
    ],
-   "merged_count": 7,
-   "merged_items": [
-    "Lonza AG · FEI 3002930340 · 실사 10/28/2025",
-    "Allergan Pharmaceuticals Ireland Unlimited · FEI 3002806285 · 실사 01/30/2025",
-    "Ajinomoto Company Inc. · FEI 3002806336 · 실사 02/21/2025",
-    "Shouguang Fukang Pharmaceutical Co., Ltd. · FEI 3003941038 · 실사 02/21/2025",
-    "Labor Augsburg MVZ GmbH · FEI 3036040213 · 실사 05/09/2025",
-    "ICON plc · FEI 3020784373 · 실사 06/13/2025",
-    "SGS France Life Sciences · FEI 3005865090 · 실사 08/29/2025"
-   ],
+   "merged_count": 1,
+   "merged_items": [],
    "sources": {
     "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
     "official_url": "https://www.fda.gov/media/192134/download",
@@ -1592,11 +1654,44 @@
      "official": "pending"
     }
    },
-   "merged_noun": "건"
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 4,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The information provided by the firm does not conform to the{b)(4) ~cifically, in the H4> the(b)(4) drug substance (DS) shelflife iS(bH4> at :$(b><4> C.",
+      "detail": "However, the shelflife applied to DS Process Performance Qualification (PPQ) batches (Batch(b)(4) and post- PPQ batches (Batch(b)(4) waS(b)(4)",
+      "deficiency_ko": "귀사가 제출한 정보가 등록자료와 일치하지 않는다 — 등록자료상 해당 원료의약품(DS)의 유효기간은 지정 보관온도에서 <비공개>이다.",
+      "detail_ko": "그러나 원료의약품 공정성능적격성평가(PPQ) 배치와 PPQ 이후 배치에 적용된 유효기간은 <비공개>였다. (※ 이 항목의 영문은 원문 텍스트층이 심하게 손상돼 있다 — 정확한 문구는 공식원본 PDF 를 확인한다.)"
+     },
+     {
+      "number": "2",
+      "deficiency": "The(b)(4) (b)(4) integrity test procedure used for thc(b)(4) does not follow the vendor recommendations (documenC ,n versio~ or SOP CHVI-346656 v2.0 '~H4> IOperation of(b><4> and Integrity Test of(b><4> ~(4) {,'.",
+      "detail": "For example: a. (b)(4) lversio11:(b><4> indicates to.__ _ __, <6H4> for test set-up. However thelbH4> or test set-u is in(b><4> per SOP CHVI-346656 v2.0 Figure<bH4) 'he according to the guidance shown in \\U)\\~, the(b)(4) Manufacturing Executing System (MES) guidance for the operators. b. (bH4> 1versioij(bH4> \"indicates that the(b><4> should be (bH4> ____________(b>_c4_>______, _________This step is not inc.Jnde.dj n SOP CHVI-346656 v2.0 or in th1(b)(4) ¥ES guidance for the ope~ators. c. (b)(4) version(b)(4) indicates to observe and disregarofilill 7 that occur in the(bH4> 2 (b)C4> (waiting time), and to observe the.._(b-)(4~>____] __ for:ci,>_m .-----(observation time). i. The(b)(4) lMES instructions indicate to start the timer immediately after the(b)(4) is (b)c4> ruicl.conduct the test for~ c4> 1£ohc:;er_vatio.n..time) witbou\\ r entioning any . . . (MES . . ~ h (b) o wa1tmg time mstruct1on patus1",
+      "deficiency_ko": "<비공개>에 사용되는 완전성 시험(integrity test) 절차가 공급사 권고사항을 따르지 않는다(SOP CHVI-346656 v2.0 기준).",
+      "detail_ko": "예를 들어: a. 공급사 문서는 시험 설치에 대해 특정 방식을 지시하나, 실제 설치는 SOP CHVI-346656 v2.0 의 그림에 따라 다른 방식으로 이뤄지며, 작업자용 제조실행시스템(MES) 지침도 그 방식을 따른다. b. 공급사 문서가 지시하는 단계가 SOP CHVI-346656 v2.0 에도, 작업자용 MES 지침에도 포함돼 있지 않다. c. 공급사 문서는 <비공개>(대기시간) 중 발생하는 현상은 무시하고 <비공개>(관찰시간) 동안 관찰하도록 지시한다. i. 그런데 MES 지침은 <비공개> 직후 타이머를 시작해 <비공개>(관찰시간) 동안 시험을 수행하라고만 하고 대기시간에 대한 언급이 없다. (※ 이 항목의 영문은 원문 텍스트층이 심하게 손상돼 있다 — 정확한 문구는 공식원본 PDF 를 확인한다.)"
+     },
+     {
+      "number": "3",
+      "deficiency": "Process Parameters (PPs) are not adequately controlled within established ranges iDCb><4> DS manufacturing process.",
+      "detail": "Specifically, PP deviations occurred duringr,><4> post-PPQ Batch(b)(4) and BatchCbH4>manufacturing, including deviations for Critical Process Parameters (CPPs). In addition, Batch H4> and BatchCbH4> ad out-of-specification (OOS) and borderline results, respectively, fol1\"p,><4> I assay at release. The CPP deviations observed include: a. ~_<4> ---=---c-_batcfl(b)(4) outside proven acce table range on )(4) Stage): duringCb> <4> of productiorr>(4) ,step for Batch Cb> (4) (a CPP) waS(b> <4> f chwas e PAR ofn,)(4) ~ nd NO~ ofr,><4> for:ci,>~> hCbH4>andCbH4> exceedance forCb> c4> -------=~ ;-------­ as per CHVI-626612): during(b><4> manufacturing for Batch atc%u4> _Jiad )(4) ~ Cb>~4> espectively which limit, andr)(4) halo,)(4) which exceeded the :'.SCb)(4) o ff(b)(4) limit. CbH4> fo~lbH4)___, and(bH4> are CPPs. C. (b)(4) Batch(b)C4> Excursion o:Ji(b><4> during'Cb><4> during the(b)(4) ste for Batchb><4> the (b)(4) was....r-ep_o_rt_e_d_ru_,Q(b)(4) the acceptable range iS(b)(4} Cb 4 ._____....;.-------­",
+      "deficiency_ko": "원료의약품 제조공정의 공정 파라미터(PP)가 설정된 범위 안에서 충분히 관리되지 않고 있다.",
+      "detail_ko": "구체적으로, PPQ 이후 배치들의 제조 중 중요공정파라미터(CPP)를 포함한 공정 파라미터 일탈이 발생했다. 또한 그 배치들은 출하 시 함량시험에서 각각 기준일탈(OOS)과 경계값 결과를 보였다. 확인된 CPP 일탈은 다음과 같다: a. 생산 단계 중 특정 공정단계의 CPP 값이 입증된 허용범위(PAR)와 정상운전범위(NOR)를 벗어났다. b. 다른 배치 제조에서 CPP 값이 한계를 초과했다. c. 특정 공정단계 중 보고된 값이 허용범위를 벗어난 이탈이 발생했다. (※ 이 항목의 영문은 원문 텍스트층이 심하게 손상돼 있다 — 정확한 문구는 공식원본 PDF 를 확인한다.)"
+     },
+     {
+      "number": "4",
+      "deficiency": "Critical material used to manufacture(b)(4) is-not tracked, maintained, or replaced throughout their lifetime.",
+      "detail": "SRer.i:6r.::iJ1v._·______..., a. The(b><4> ~ grity Tester used fo~(b)(4) r------, including ther,><4> (b)(4) DSCb><4> Cb/\\ 4 ) (SAP No: CbH4> installed 4 \"6etweeli1£e_,_____,_____-,...,Cb>< > to avojd,..\". o~the product(b)(4) entering and damaging the instrument. The(b)(4) is not tracked or maintained and is replaced only when damaged. During the FDA inspection oftheCb><4> internty_te~t execution on October 24, 2025, a'(bH4> __________..., coming from the(b)(4) through the(bH4> r~hm~ approx1mately(bH4> Impact ofthe(b><4> in the results ofthe(b)(4) ,.------ ~ntegritY. test c_aruiot be discarded. .....,. b. The(b)(4) .---- instrument used to sea\\(b)(4) ____,drug substance bags does not have a unique tracking number, and is not maintained or calibrated. c. The /h)/4) used for the CbH4 >'~------1or for the_(b_> <~4>~_. 1 !b> C4> do not have a preventative mamtenance program. The product contact part ofthe (b)(4) and replacedb c4> ] however, maintenance ofthe_(b>...;.<4\"\"'\">--:-:\" ~ t th is \"failure-based\" (they are used until they fail, and then they are replaced by a working(b)(4) The facility has a single spare(b><4> to be used as replacement for the,_~>_<4>___. \"\"'4' used forI!>>m a",
+      "deficiency_ko": "제조에 사용되는 중요 자재가 사용수명 전반에 걸쳐 추적·유지관리·교체되지 않고 있다.",
+      "detail_ko": "구체적으로, a. 원료의약품 완전성 시험기에 사용되는 <비공개>(SAP No. <비공개>)는 제품이 기기로 유입돼 손상시키는 것을 막기 위해 설치된 것인데, 추적·유지관리되지 않고 손상됐을 때만 교체된다. 2025년 10월 24일 FDA 실사 중 완전성 시험 수행을 관찰할 때, 제품 쪽에서 <비공개>를 통해 유입되는 것이 확인됐다. 그것이 완전성 시험 결과에 미치는 영향은 배제할 수 없다. b. 원료의약품 백을 밀봉하는 데 사용되는 기기에는 고유 추적번호가 없고, 유지관리도 교정도 되지 않는다. c. <비공개>에 사용되는 기기에는 예방정비 프로그램이 없다. <비공개>의 제품접촉부는 교체되나, 나머지 유지관리는 \"고장 기반\"이다(고장날 때까지 쓰고 그때 정상품으로 교체). (※ 이 항목의 영문은 원문 텍스트층이 심하게 손상돼 있다 — 정확한 문구는 공식원본 PDF 를 확인한다.)"
+     }
+    ]
+   }
   },
   {
    "id": "186598",
-   "render_order": 14,
+   "render_order": 15,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -1676,7 +1771,7 @@
   },
   {
    "id": "186348",
-   "render_order": 15,
+   "render_order": 16,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -1756,7 +1851,7 @@
   },
   {
    "id": "Insp GMP 52165/19076958-0001",
-   "render_order": 16,
+   "render_order": 17,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "MHRA",
@@ -1840,7 +1935,7 @@
   },
   {
    "id": "185690",
-   "render_order": 17,
+   "render_order": 18,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -1920,7 +2015,7 @@
   },
   {
    "id": "185010",
-   "render_order": 18,
+   "render_order": 19,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -1998,7 +2093,7 @@
   },
   {
    "id": "184816",
-   "render_order": 19,
+   "render_order": 20,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -2078,7 +2173,7 @@
   },
   {
    "id": "5059a021fa27",
-   "render_order": 20,
+   "render_order": 21,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -2136,7 +2231,7 @@
   },
   {
    "id": "9cadd9160225",
-   "render_order": 21,
+   "render_order": 22,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -2194,7 +2289,7 @@
   },
   {
    "id": "184851",
-   "render_order": 22,
+   "render_order": 23,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "EMA",
@@ -2272,7 +2367,7 @@
   },
   {
    "id": "fda483-193817",
-   "render_order": 23,
+   "render_order": 24,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2385,7 +2480,7 @@
   },
   {
    "id": "fda483-193819",
-   "render_order": 24,
+   "render_order": 25,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2496,7 +2591,7 @@
   },
   {
    "id": "fda483-193727",
-   "render_order": 25,
+   "render_order": 26,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2649,7 +2744,7 @@
   },
   {
    "id": "fda483-193728",
-   "render_order": 26,
+   "render_order": 27,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2766,7 +2861,7 @@
   },
   {
    "id": "fda483-193759",
-   "render_order": 27,
+   "render_order": 28,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2849,7 +2944,7 @@
   },
   {
    "id": "fda483-193733",
-   "render_order": 28,
+   "render_order": 29,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2925,7 +3020,7 @@
   },
   {
    "id": "e4b885fd9aac",
-   "render_order": 29,
+   "render_order": 30,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3018,7 +3113,7 @@
   },
   {
    "id": "ed5ec19accbe",
-   "render_order": 30,
+   "render_order": 31,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3117,7 +3212,7 @@
   },
   {
    "id": "fda483-193639",
-   "render_order": 31,
+   "render_order": 32,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3193,7 +3288,7 @@
   },
   {
    "id": "fda483-193640",
-   "render_order": 32,
+   "render_order": 33,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3269,7 +3364,7 @@
   },
   {
    "id": "fda483-193567",
-   "render_order": 33,
+   "render_order": 34,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3366,7 +3461,7 @@
   },
   {
    "id": "fda483-193575",
-   "render_order": 34,
+   "render_order": 35,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3442,7 +3537,7 @@
   },
   {
    "id": "fda483-193604",
-   "render_order": 35,
+   "render_order": 36,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3545,7 +3640,7 @@
   },
   {
    "id": "fda483-193606",
-   "render_order": 36,
+   "render_order": 37,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3635,7 +3730,7 @@
   },
   {
    "id": "fda483-193610",
-   "render_order": 37,
+   "render_order": 38,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3710,7 +3805,7 @@
   },
   {
    "id": "186339",
-   "render_order": 38,
+   "render_order": 39,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -3790,7 +3885,7 @@
   },
   {
    "id": "185129",
-   "render_order": 39,
+   "render_order": 40,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -3868,7 +3963,7 @@
   },
   {
    "id": "fda483-192260",
-   "render_order": 40,
+   "render_order": 41,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3950,7 +4045,7 @@
   },
   {
    "id": "fda483-192261",
-   "render_order": 41,
+   "render_order": 42,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4039,7 +4134,7 @@
   },
   {
    "id": "fda483-192262",
-   "render_order": 42,
+   "render_order": 43,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4128,7 +4223,7 @@
   },
   {
    "id": "fda483-192210",
-   "render_order": 43,
+   "render_order": 44,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4224,7 +4319,7 @@
   },
   {
    "id": "fda483-193611",
-   "render_order": 44,
+   "render_order": 45,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4321,7 +4416,7 @@
   },
   {
    "id": "who-whopir-08417c025f33",
-   "render_order": 45,
+   "render_order": 46,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4379,7 +4474,7 @@
   },
   {
    "id": "who-whopir-0f8b53d98f24",
-   "render_order": 46,
+   "render_order": 47,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4437,7 +4532,7 @@
   },
   {
    "id": "who-whopir-100fb487d1ed",
-   "render_order": 47,
+   "render_order": 48,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4495,7 +4590,7 @@
   },
   {
    "id": "who-whopir-4b9a8d21d22b",
-   "render_order": 48,
+   "render_order": 49,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4553,7 +4648,7 @@
   },
   {
    "id": "who-whopir-ab51cfe7901f",
-   "render_order": 49,
+   "render_order": 50,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4611,7 +4706,7 @@
   },
   {
    "id": "who-whopir-ac1e54fa27a1",
-   "render_order": 50,
+   "render_order": 51,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4669,7 +4764,7 @@
   },
   {
    "id": "who-whopir-b1fc9f600e85",
-   "render_order": 51,
+   "render_order": 52,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4727,7 +4822,7 @@
   },
   {
    "id": "who-whopir-cc2935e7e706",
-   "render_order": 52,
+   "render_order": 53,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4785,7 +4880,7 @@
   },
   {
    "id": "who-whopir-d3f7b468afd1",
-   "render_order": 53,
+   "render_order": 54,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4843,7 +4938,7 @@
   },
   {
    "id": "who-whopir-eb65f404d5ad",
-   "render_order": 54,
+   "render_order": 55,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4901,7 +4996,7 @@
   },
   {
    "id": "who-whopir-f256648f0a0b",
-   "render_order": 55,
+   "render_order": 56,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -4959,7 +5054,7 @@
   },
   {
    "id": "admin-2026005814",
-   "render_order": 56,
+   "render_order": 57,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5056,7 +5151,7 @@
   },
   {
    "id": "admin-2026005834",
-   "render_order": 57,
+   "render_order": 58,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5147,7 +5242,7 @@
   },
   {
    "id": "admin-2026004294",
-   "render_order": 58,
+   "render_order": 59,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5242,7 +5337,7 @@
   },
   {
    "id": "gmpinspect-1Pzzvm8pprt",
-   "render_order": 59,
+   "render_order": 60,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5306,7 +5401,7 @@
   },
   {
    "id": "admin-2026002975",
-   "render_order": 60,
+   "render_order": 61,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5397,7 +5492,7 @@
   },
   {
    "id": "admin-2026003114",
-   "render_order": 61,
+   "render_order": 62,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5494,7 +5589,7 @@
   },
   {
    "id": "admin-2026002715",
-   "render_order": 62,
+   "render_order": 63,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5585,7 +5680,7 @@
   },
   {
    "id": "admin-2026002775",
-   "render_order": 63,
+   "render_order": 64,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5683,7 +5778,7 @@
   },
   {
    "id": "admin-2026002794",
-   "render_order": 64,
+   "render_order": 65,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5780,7 +5875,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-orV",
-   "render_order": 65,
+   "render_order": 66,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5881,7 +5976,7 @@
   },
   {
    "id": "admin-2026002634",
-   "render_order": 66,
+   "render_order": 67,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -5976,7 +6071,7 @@
   },
   {
    "id": "admin-2026005796",
-   "render_order": 67,
+   "render_order": 68,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6067,7 +6162,7 @@
   },
   {
    "id": "gmpinspect-1Pzzvm8poTD",
-   "render_order": 68,
+   "render_order": 69,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6131,7 +6226,7 @@
   },
   {
    "id": "admin-2026002714",
-   "render_order": 69,
+   "render_order": 70,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6228,7 +6323,7 @@
   },
   {
    "id": "data0010-15240",
-   "render_order": 70,
+   "render_order": 71,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6286,7 +6381,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-nE4",
-   "render_order": 71,
+   "render_order": 72,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6394,7 +6489,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-oE9",
-   "render_order": 72,
+   "render_order": 73,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6502,7 +6597,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-pM8",
-   "render_order": 73,
+   "render_order": 74,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6596,7 +6691,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-rA1",
-   "render_order": 74,
+   "render_order": 75,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6704,7 +6799,7 @@
   },
   {
    "id": "gmpinspect-1PtR8IU-rmi",
-   "render_order": 75,
+   "render_order": 76,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6813,7 +6908,7 @@
   },
   {
    "id": "gmpinspect-1PtReFNR3Dc",
-   "render_order": 76,
+   "render_order": 77,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -6921,7 +7016,7 @@
   },
   {
    "id": "gmpinspect-1PtReFNR5go",
-   "render_order": 77,
+   "render_order": 78,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -7026,7 +7121,7 @@
   },
   {
    "id": "gmpinspect-1PtReFNR7KI",
-   "render_order": 78,
+   "render_order": 79,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -7134,7 +7229,7 @@
   },
   {
    "id": "gmpinspect-1PtSbOlpxXk",
-   "render_order": 79,
+   "render_order": 80,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -7397,7 +7492,7 @@
   },
   {
    "id": "gmpinspect-1PtSdWCaU5q",
-   "render_order": 80,
+   "render_order": 81,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -7512,7 +7607,7 @@
   },
   {
    "id": "recall-11821a98ac66",
-   "render_order": 81,
+   "render_order": 82,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7575,7 +7670,7 @@
   },
   {
    "id": "recall-73863335b83b",
-   "render_order": 82,
+   "render_order": 83,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7638,7 +7733,7 @@
   },
   {
    "id": "recall-293c444091c9",
-   "render_order": 83,
+   "render_order": 84,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7701,7 +7796,7 @@
   },
   {
    "id": "recall-e9ddec302cf6",
-   "render_order": 84,
+   "render_order": 85,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7764,7 +7859,7 @@
   },
   {
    "id": "recall-4cdb22ee1daf",
-   "render_order": 85,
+   "render_order": 86,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7830,7 +7925,7 @@
   },
   {
    "id": "recall-10d86f490b95",
-   "render_order": 86,
+   "render_order": 87,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7896,7 +7991,7 @@
   },
   {
    "id": "recall-12ea52aa8a64",
-   "render_order": 87,
+   "render_order": 88,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -7962,7 +8057,7 @@
   },
   {
    "id": "recall-7debe6ac38b2",
-   "render_order": 88,
+   "render_order": 89,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -8028,7 +8123,7 @@
   },
   {
    "id": "recall-ba7175fce96b",
-   "render_order": 89,
+   "render_order": 90,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -8091,7 +8186,7 @@
   },
   {
    "id": "recall-d47ac8f6d555",
-   "render_order": 90,
+   "render_order": 91,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -8157,7 +8252,7 @@
   },
   {
    "id": "recall-2efea6e09b3a",
-   "render_order": 91,
+   "render_order": 92,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -8220,7 +8315,7 @@
   },
   {
    "id": "hc-82367",
-   "render_order": 92,
+   "render_order": 93,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -8287,7 +8382,7 @@
   },
   {
    "id": "hc-82001",
-   "render_order": 93,
+   "render_order": 94,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -8354,7 +8449,7 @@
   },
   {
    "id": "hc-81925",
-   "render_order": 94,
+   "render_order": 95,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",

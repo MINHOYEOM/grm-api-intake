@@ -621,6 +621,12 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
                 v2row["recall_group_key"] = card.recall_group_key
             if card.status_hint:
                 v2row["status_hint"] = card.status_hint
+            # [심층분석 fan-out 입력 2026-07-27] 대상 카드에만 3키 추가(비대상은 빈 dict =
+            # 완전 무영향). 방출 정본은 `CardScaffold.deep_fields()` 하나 — `to_dict()` 와
+            # 이 빌더가 **같은 함수**를 부르므로 한쪽만 갱신되는 표류가 불가능하다.
+            # 이 줄이 없던 동안 클라우드 Routine 은 deep 대상을 영영 0건으로 봤다(§B [2단계]가
+            # `deep_analysis_ready` 를 찾는데 handoff 에 그 키가 아예 없었다).
+            v2row.update(card.deep_fields())
         out_rows.append(v2row)
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
     return {

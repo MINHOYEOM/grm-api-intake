@@ -260,17 +260,42 @@ class CardScaffold:
             d["status_hint"] = self.status_hint
         if self.merged_into:
             d["merged_into"] = self.merged_into
-        # [WL 심층분석 fan-out] 대상 카드만 전문(全文)을 별도 명시적 키로 노출 — raw 전체는
-        # 여전히 미포함(기존 원칙 불변). 6종 동결 슬롯 Routine 은 이 키를 쓰지 않는다(무관심
-        # 필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 오케스트레이터만 소비.
-        if self.deep_analysis_ready:
-            d["deep_analysis_ready"] = True
-            # 유형별 body_full raw 키 = SourceSpec.deep_body_key(WL=wl_body_full·admin-action=
-            # admin_body_full·fda-483=fda483_body_full). deep_analysis_ready 가 True 인 시점이라
-            # 그 키는 항상 채워져 있다. fan-out 오케스트레이터가 이 body_full 만 준다(카드 격리 불변).
-            d["deep_analysis_input"] = {
-                "body_full": self.raw.get(_spec(self.kind).deep_body_key, "")}
+        d.update(self.deep_fields())
         return d
+
+    def deep_fields(self) -> dict[str, Any]:
+        """심층분석 fan-out 입력 3종 — 대상 카드가 아니면 빈 dict(기존 카드 완전 무영향).
+
+        [WL 심층분석 fan-out] 대상 카드만 전문(全文)을 별도 명시적 키로 노출한다 — raw 전체는
+        여전히 미포함(기존 원칙 불변). 6종 동결 슬롯 Routine 은 이 키를 쓰지 않는다(무관심
+        필드 — 프롬프트가 참조하지 않으면 컨텍스트에 영향 없음). fan-out 소비자만 읽는다.
+
+        내보내는 키(`deep_analysis_fanout.build_jobs` 가 읽는 전부):
+          · `deep_analysis_ready` — 대상 표시
+          · `deep_analysis_input.body_full` — 유형별 raw 키(`SourceSpec.deep_body_key`:
+            WL=`wl_body_full` · admin-action=`admin_body_full` · fda-483=`fda483_body_full`).
+            `deep_analysis_ready` 가 True 인 시점이라 그 키는 항상 채워져 있다. 소비자는 이
+            body_full 하나만 서브에이전트에 준다(카드 격리 불변).
+          · `kind` — 유형별 프롬프트 선택용(WL/admin-action/fda-483). `build_jobs` 가
+            `card_type` 으로 싣는다.
+
+        ★ 2026-07-27 신설 — 종전엔 이 방출이 `to_dict()` 안에 인라인돼 있었다. 그런데
+        **실제 Notion handoff 를 만드는 `grm_handoff.build_routine_handoff_payload_v2` 는
+        `to_dict()` 를 쓰지 않고** 필드를 손으로 골라 담는다(`_HANDOFF_V2_ROW_KEEP` + 카드
+        속성 일부). 그 목록에 이 세 키가 없어서, 클라우드 Routine 이 읽는 handoff 에는
+        deep 입력이 **한 번도 실린 적이 없었다** — Routine 은 매주 "deep 대상 0건 → 단계
+        생략(정상)"으로 판단했고 그게 규정상 옳은 행동이었다(2026-07-27 실측: 실제 19건).
+        직렬화기가 둘로 갈라진 것이 원인이므로 **방출 지점을 이 함수 하나로 묶어** 재발을
+        막는다. 두 직렬화기가 같은 함수를 부르므로 한쪽만 갱신되는 표류가 구조적으로 불가능하다.
+        """
+        if not self.deep_analysis_ready:
+            return {}
+        return {
+            "deep_analysis_ready": True,
+            "deep_analysis_input": {
+                "body_full": self.raw.get(_spec(self.kind).deep_body_key, "")},
+            "kind": self.kind,
+        }
 
     def to_web_card(self, render_entry: dict[str, Any] | None = None,
                     cfg: "FixedConfig" = DEFAULT_CONFIG) -> dict[str, Any]:

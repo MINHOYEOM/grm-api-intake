@@ -108,3 +108,30 @@ class RecoverTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DigestRepresentativeTest(unittest.TestCase):
+    """[2026-07-27] 디제스트 **대표** 카드가 복구 대상에서 빠지던 구멍.
+
+    디제스트는 대표 1장만 발행본에 남기고 나머지를 드롭한다. 그런데 그 대표 역시
+    **관찰 원문이 없어서 접힌 카드**다. "발행본에 없는 것"만 고르면 대표가 빠지고,
+    나머지 멤버가 전부 복구돼 디제스트가 해체되는 순간 대표만 낡은 슬롯
+    ("구체적 관찰 사유: 원문 미기재")을 단 채 단독 카드로 발행된다 — 07-12 실측.
+    """
+
+    SCAFFOLD = {"cards": [{"id": "fda483-1"}, {"id": "fda483-2"}, {"id": "fda483-3"}]}
+    PUBLISHED = {"cards": [
+        {"id": "fda483-1", "merged_count": 3},      # 디제스트 대표(= 원문 없음)
+        {"id": "fda483-2", "merged_count": 1},      # 상세 보유 — 대상 아님
+    ]}
+
+    def test_digest_representative_is_a_target(self):
+        self.assertEqual(bf.folded_483_ids(self.SCAFFOLD, self.PUBLISHED),
+                         ["fda483-1", "fda483-3"])
+
+    def test_normal_card_still_excluded(self):
+        self.assertNotIn("fda483-2", bf.folded_483_ids(self.SCAFFOLD, self.PUBLISHED))
+
+    def test_missing_merged_count_treated_as_normal(self):
+        published = {"cards": [{"id": "fda483-1"}, {"id": "fda483-2"}]}
+        self.assertEqual(bf.folded_483_ids(self.SCAFFOLD, published), ["fda483-3"])

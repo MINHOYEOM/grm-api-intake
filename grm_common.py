@@ -152,12 +152,24 @@ def http_get_xml(
             # 일부 피드(예: WHO Drupal RSS)는 XML 선언 앞에 theme debug 주석/BOM 등 잡음이 붙어
             # "XML or text declaration not at start of entity" 로 파싱 실패한다.
             # XML 시작 토큰(<?xml / <rss / <feed) 이전 바이트를 잘라낸 뒤 파싱한다.
+            #
+            # ★ 2026-07-27 수리 — 종전 구현은 마커를 **순서대로** 훑으며 `idx > 0` 인 첫 마커에서
+            #   잘랐다. 그런데 정상 문서는 `<?xml` 이 **0번 위치**라 `idx > 0` 이 거짓이 되어
+            #   그냥 통과하고, 다음 마커 `<rss`(항상 0보다 큼)에서 잘라 **XML 선언을 통째로
+            #   버렸다.** 선언이 사라지면 ElementTree 가 UTF-8 을 가정하므로, 선언이
+            #   `encoding="windows-1252"` 처럼 비-UTF8 이고 본문에 비-ASCII 바이트가 있으면
+            #   그 바이트에서 파싱이 죽는다(2026-07-27 ECA 실장애: `0x96`=en-dash 에서
+            #   `not well-formed line 29 col 79` → 그 주 ECA 수집 0건, 7건 유실 직전).
+            #   나머지 피드가 전부 UTF-8 이라 우연히 안 걸렸을 뿐 **소스 무관 공통 결함**이었다.
+            #
+            #   수리 = "가장 먼저 나오는 마커 위치"로 자른다. 그 위치가 0이면 잡음이 없다는
+            #   뜻이므로 **아무것도 자르지 않는다**(선언 보존). 잡음이 있을 때만 그 앞을 버린다.
             content = resp.content
-            for marker in (b"<?xml", b"<rss", b"<feed"):
-                idx = content.find(marker)
+            starts = [i for i in (content.find(m) for m in (b"<?xml", b"<rss", b"<feed")) if i >= 0]
+            if starts:
+                idx = min(starts)
                 if idx > 0:
                     content = content[idx:]
-                    break
             else:
                 content = content.lstrip()
             try:

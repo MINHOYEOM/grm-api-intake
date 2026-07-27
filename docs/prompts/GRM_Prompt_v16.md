@@ -560,19 +560,12 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
        `{"<web_card_id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
      (키는 6슬롯 델타와 **같은 키 공간** — `web_card_id` 그대로, `card_id` 금지. 위 [출력] envelope 규칙 동일)
      이 dict 를 [산출물 예치]의 **두 번째 코드 블록**(deep 델타)으로 예치한다(아래 예치 규약).
-  ④ **[NCR 국문 병기 — 2026-07-27 신설]** handoff 카드 중 `ncr_translation_ready=true` 카드
-     (EU GMP 비준수 `kind=eu-gmp-ncr` · UK `kind=mhra-gmp-ncr`)가 있으면, 각 카드의
-     `ncr_translation_input` 에 실린 필드를 **번역만** 한다(심층분석 4섹션 대상 아님 — 이 카드들은
-     `deep_analysis_ready` 가 false 다). 입력 키는 `nature`·`action`·`operations`·`additional`
-     중 실린 것뿐이고, 산출은 **같은 키에 `_ko` 를 붙인 것**이다:
+  ④ **[NCR 국문 병기]** `ncr_translation_ready=true` 카드(EU/UK GMP 비준수)는 심층분석 대상이
+     아니다 — `ncr_translation_input` 의 실린 키(`nature`·`action`·`operations`·`additional`)에
+     `_ko` 를 붙여 **번역만** 하고 ③의 deep 델타에 같은 키 공간으로 담는다(카드당 한 항목):
        `{"<web_card_id>": {"ncr_ko": {"nature_ko": "...", "action_ko": "...", ...}}}`
-     이 항목도 ③의 deep 델타 dict 에 **같은 키 공간**으로 함께 담는다(카드당 한 항목 — 그 카드가
-     심층분석 대상이기도 하면 `deep_analysis`·`source_text` 와 한 객체에 합쳐 담는다).
-     ⚠️ **번역만 한다** — 새 사실·해석·요약을 만들지 않는다. 기관명·제품명·조항번호·GMP 운영항목
-     번호(예: `1.1.1.4`)는 원문 표기를 그대로 둔다. 원문에 없는 필드는 만들지 않는다(짝 없는 국문은
-     조립 단계에서 버려진다). 이 층은 카드 단위 선택 — 빠져도 브리프는 발행되며 그 카드만 영문
-     단독으로 나간다. 다만 그 상태가 곧 2026-07-27 사용자 지적("비준수 상세가 전부 영문")이므로
-     대상 카드가 있으면 반드시 채운다.
+     ⚠️ 새 사실·해석 금지. 기관명·제품명·조항번호·운영항목 번호(`1.1.1.4` 등)는 원문 표기 유지.
+     원문에 없는 필드는 만들지 않는다. 대상 카드가 있으면 반드시 채운다(빠지면 영문 단독 발행).
 브릿지 게이트에서 FAIL 한 카드는 심층분석 없이 6슬롯만으로 발행된다(카드 단위 graceful degrade —
 브리프는 안 막힌다). 이 단계는 6슬롯 산출물·규칙을 전혀 바꾸지 않는다(순수 additive).
 (참고: python·서브에이전트가 있는 Claude Code 세션이라면 격리 fan-out CLI

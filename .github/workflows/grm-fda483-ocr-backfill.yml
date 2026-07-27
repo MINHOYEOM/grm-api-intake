@@ -1,0 +1,111 @@
+name: GRM FDA 483 OCR Backfill (one-off)
+
+# 디제스트로 접혀 나간 스캔 483 의 관찰 원문을 OCR 로 되살려 deep 델타 패치를 만든다.
+# 산출물은 아티팩트로만 올린다(커밋 없음) — 조립·발행은 별도 발행 PR 경로가 담당한다.
+#
+# 왜 워크플로인가: OCR 은 tesseract 바이너리를 요구하고, 개발 PC 에는 없다(러너에는 설치한다).
+# 소급 복구는 1회성이므로 dispatch 전용 — 예약 실행 없음.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_date:
+        description: '대상 발행일(YYYY-MM-DD) — web/data/briefs/brief_web_<날짜>.json 를 발행본으로 쓴다'
+        type: string
+        required: true
+      scaffold_artifact_id:
+        description: '그 주 빈슬롯 스캐폴드 artifact id (grm-web-brief) — 접힌 카드 목록의 출처'
+        type: string
+        required: true
+      doc_ids:
+        description: '선택: 대상 문서 id 직접 지정(공백/쉼표 구분). 지정 시 scaffold 대조를 건너뛴다'
+        type: string
+        default: ''
+      limit:
+        description: '선택: 처리 상한(0=전건) — 배치 분할용'
+        type: string
+        default: '0'
+      delay_seconds:
+        description: 'PDF 요청 간 대기(초)'
+        type: string
+        default: '0.5'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: fda483-ocr-backfill      # fda.gov 동시 요청 방지(수집기와 같은 호스트)
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: OCR 복구 → deep 델타 패치
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # OCR 엔진 — 이게 없으면 이 워크플로는 존재 의미가 없으므로 실패를 숨기지 않는다
+      # (grm-intake 의 설치 스텝은 continue-on-error 로 두는 것과 의도적으로 다르다).
+      - name: Install OCR engine (tesseract)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          tesseract --version | head -1
+
+      - name: Download weekly scaffold artifact
+        if: inputs.doc_ids == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTIFACT_ID: ${{ inputs.scaffold_artifact_id }}
+        run: |
+          mkdir -p artifacts
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > artifacts/scaffold.zip
+          unzip -o artifacts/scaffold.zip -d artifacts
+          ls -la artifacts
+
+      - name: Run OCR backfill
+        env:
+          ENABLE_FDA_483_OCR: 'true'
+          PUBLISH_DATE: ${{ inputs.publish_date }}
+          DOC_IDS: ${{ inputs.doc_ids }}
+          LIMIT: ${{ inputs.limit }}
+          DELAY: ${{ inputs.delay_seconds }}
+        run: |
+          set -euo pipefail
+          under="${PUBLISH_DATE//-/_}"
+          published="web/data/briefs/brief_web_${under}.json"
+          test -f "$published" || { echo "발행본 없음: $published"; exit 1; }
+          args=(--out-deep-patch "deep_patch_${under}.json" \
+                --out-report "ocr_report_${under}.json" \
+                --delay "$DELAY" --limit "$LIMIT")
+          if [ -n "$DOC_IDS" ]; then
+            args+=(--doc-ids "$DOC_IDS")
+          else
+            args+=(--scaffold "artifacts/brief_web_${under}.json" --published "$published")
+          fi
+          python fda483_ocr_backfill.py "${args[@]}"
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: fda483-ocr-backfill-${{ inputs.publish_date }}
+          path: |
+            deep_patch_*.json
+            ocr_report_*.json
+          retention-days: 30
+          if-no-files-found: error

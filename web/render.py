@@ -1685,7 +1685,14 @@ _FOOTER_GARBAGE_RE = re.compile(
     #   위 마커가 전부 실패해 **게이트를 통과했다**(잔재가 그대로 발행될 뻔한 침묵 결함).
     r"|\bSEE\s+REVERSE\b"
     r"|\bFORM\s+FDA\s*4"
-    r"|\bInvestigator\b"
+    # [오탐 수리 2026-07-27] 종전 `\bInvestigator\b` 는 **관찰 산문 자체**를 푸터로 오인했다 —
+    # 483 본문에는 "Investigator Piechocki noted materials came off loose…" 처럼 실사관 이름을
+    # 앞세운 서술이 흔하다(fda483-192342 obs#5 실측: 이 오탐 하나로 그 주 브리프 전체 발행이
+    # 막혔다). 서명블록의 형태는 반대다 — 이름이 앞, 직함이 뒤(`Juanelma H Palmer, Investigator`).
+    # 그 어순 차이를 그대로 조건에 둔다: 쉼표 뒤에 오면서 **뒤에 사람 이름이 오지 않는**
+    # Investigator 만 푸터로 본다. (쉼표 조건만으로는 부족하다 — 산문도 "Specifically,
+    # Investigator Piechocki…" 로 쉼표가 앞에 온다. 결정적 차이는 **뒤**에 이름이 오느냐다.)
+    r"|,\s*Investigator\b(?!\s+[A-Z][a-z])"
     r"|\bPAGE\s+\d+\s+OF\s+\d+\b",
     re.I,
 )

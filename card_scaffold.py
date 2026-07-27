@@ -1518,6 +1518,7 @@ _ABSENT_REASON_LABELS = {
     # 원문(스캔 PDF)은 공개돼 있다는 사실이 문구에서 지워지지 않게 표현한다.
     "scan-ocr-unavailable": "원문이 스캔 이미지인데 OCR 엔진을 쓸 수 없었음",
     "scan-ocr-empty": "원문이 스캔 이미지이고 OCR 이 글자를 읽지 못함",
+    "scan-ocr-budget": "원문이 스캔 이미지인데 이번 실행의 OCR 예산이 소진됨",
     "pdf-encrypted": "원문 PDF 가 암호화돼 열 수 없음",
     "no-anchor": "원문에서 본문 시작점을 찾지 못함",
     "no-excerpt": "원문에서 해당 구간을 찾지 못함",

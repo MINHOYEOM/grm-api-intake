@@ -1,3 +1,27 @@
+{#- [상세 가독성 2026-07-27] NCR 본문 렌더 매크로 — EU/MHRA 두 분기가 **같은 함수**를 쓴다.
+    통짜 문단(실측 1,000~2,300자·줄바꿈 0)을 원문에 실재하는 마커(`•`·`A.`/`1.`/`a.`·GMP
+    코드)에서만 끊어 목록으로 그린다. 마커가 없으면 끊지 않는다 — 구조를 지어내지 않는다.
+    데이터(JSON)는 verbatim 그대로이고 분해는 렌더 필터(`detail_blocks`/`gmp_operations`)가
+    한다. 영문·국문에 같은 필터를 써서 두 열의 항목이 어긋나지 않는다. -#}
+{%- macro detail_body(text, cls) -%}
+{%- set blocks = text | detail_blocks -%}
+{%- set items = blocks | selectattr('kind', 'equalto', 'item') | list -%}
+{%- for b in blocks if b.kind == 'para' %}<p class="{{ cls }}">{{ b.text }}</p>{% endfor %}
+{%- if items %}<ul class="dt-list">{% for b in items %}<li>{{ b.text }}</li>{% endfor %}</ul>{% endif %}
+{%- endmacro -%}
+{%- macro ops_body(text, cls) -%}
+{%- set rows = text | gmp_operations -%}
+{%- if rows %}<ul class="dt-ops">{% for r in rows %}<li class="lv{{ r.depth if r.depth < 4 else 4 }}"><span class="dt-code">{{ r.code }}</span>{{ r.label }}</li>{% endfor %}</ul>
+{%- else %}<p class="{{ cls }}">{{ text }}</p>{% endif %}
+{%- endmacro -%}
+{#- 출처 라벨(`원문 · EudraGMDP`/`원문 · MHRA`)은 국문 유무와 무관하게 **항상** 붙인다 —
+    영문 단독 카드에서도 이 텍스트가 어느 기관 원문인지는 밝혀야 한다(종전 nature/action 동작). -#}
+{%- macro ncr_field(label, src, en, ko, kind) -%}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">{{ label }}</span></div>
+      <div class="obs-orig"><span class="viol-lang">원문 · {{ src }}</span>{% if kind == 'ops' %}{{ ops_body(en, 'obs-en') }}{% else %}{{ detail_body(en, 'obs-en') }}{% endif %}</div>
+      {%- if ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span>{% if kind == 'ops' %}{{ ops_body(ko, 'dt-sum') }}{% else %}{{ detail_body(ko, 'dt-sum') }}{% endif %}</div>{% endif %}
+    </div>
+{%- endmacro -%}
 {#- card.html — grm-web-card/v1 한 카드 → v4 카드 마크업. 순수 렌더(사실/URL 무변형).
     표시 플래그(mono·badge·quote mark·show_*·link state)는 render.py 가 산출. -#}
 {%- macro srclink(src, role_label) -%}
@@ -205,32 +229,10 @@
     {%- if dd.authority_country or dd.product_scope %}
     <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행 NCA · {{ dd.authority_country }}</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
     {%- endif %}
-    {%- if dd.operations %}
-    <div class="dt-row{% if dd.operations_ko %} obs-row{% endif %}"><div class="dt-h"><span class="dt-area">비준수 운영항목</span></div>
-      {%- if dd.operations_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.operations }}</p></div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.operations_ko }}</p></div>
-      {%- else %}<p class="obs-en">{{ dd.operations }}</p>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.nature %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">위반내용 (Nature of non-compliance)</span></div><div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.nature }}</p></div>
-      {%- if dd.nature_ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.nature_ko }}</p></div>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.action %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">당국 조치 (Action taken/proposed)</span></div><div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.action }}</p></div>
-      {%- if dd.action_ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.action_ko }}</p></div>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.additional %}
-    <div class="dt-row{% if dd.additional_ko %} obs-row{% endif %}"><div class="dt-h"><span class="dt-area">추가 코멘트</span></div>
-      {%- if dd.additional_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · EudraGMDP</span><p class="obs-en">{{ dd.additional }}</p></div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.additional_ko }}</p></div>
-      {%- else %}<p class="obs-en">{{ dd.additional }}</p>{% endif %}
-    </div>
-    {%- endif %}
+    {%- if dd.operations %}{{ ncr_field('비준수 운영항목', 'EudraGMDP', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
+    {%- if dd.nature %}{{ ncr_field('위반내용 (Nature of non-compliance)', 'EudraGMDP', dd.nature, dd.nature_ko, '') }}{% endif %}
+    {%- if dd.action %}{{ ncr_field('당국 조치 (Action taken/proposed)', 'EudraGMDP', dd.action, dd.action_ko, '') }}{% endif %}
+    {%- if dd.additional %}{{ ncr_field('추가 코멘트', 'EudraGMDP', dd.additional, dd.additional_ko, '') }}{% endif %}
   </details>
   {%- elif card.deterministic_detail.type == 'mhra_gmp_ncr_statement' %}
   {#- [MHRA GMP NCR 상세 2026-07-23] MHRA Statement of Non-Compliance 전문 — EU NCR 블록과
@@ -243,32 +245,10 @@
     {%- if dd.authority_country or dd.product_scope %}
     <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행기관 · MHRA</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
     {%- endif %}
-    {%- if dd.operations %}
-    <div class="dt-row{% if dd.operations_ko %} obs-row{% endif %}"><div class="dt-h"><span class="dt-area">비준수 운영항목</span></div>
-      {%- if dd.operations_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.operations }}</p></div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.operations_ko }}</p></div>
-      {%- else %}<p class="obs-en">{{ dd.operations }}</p>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.nature %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">위반내용 (Nature of non-compliance)</span></div><div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.nature }}</p></div>
-      {%- if dd.nature_ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.nature_ko }}</p></div>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.action %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">당국 조치 (Action taken/proposed)</span></div><div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.action }}</p></div>
-      {%- if dd.action_ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.action_ko }}</p></div>{% endif %}
-    </div>
-    {%- endif %}
-    {%- if dd.additional %}
-    <div class="dt-row{% if dd.additional_ko %} obs-row{% endif %}"><div class="dt-h"><span class="dt-area">제한사항</span></div>
-      {%- if dd.additional_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · MHRA</span><p class="obs-en">{{ dd.additional }}</p></div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ dd.additional_ko }}</p></div>
-      {%- else %}<p class="obs-en">{{ dd.additional }}</p>{% endif %}
-    </div>
-    {%- endif %}
+    {%- if dd.operations %}{{ ncr_field('비준수 운영항목', 'MHRA', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
+    {%- if dd.nature %}{{ ncr_field('위반내용 (Nature of non-compliance)', 'MHRA', dd.nature, dd.nature_ko, '') }}{% endif %}
+    {%- if dd.action %}{{ ncr_field('당국 조치 (Action taken/proposed)', 'MHRA', dd.action, dd.action_ko, '') }}{% endif %}
+    {%- if dd.additional %}{{ ncr_field('제한사항', 'MHRA', dd.additional, dd.additional_ko, '') }}{% endif %}
   </details>
   {%- endif %}
   {%- endif %}

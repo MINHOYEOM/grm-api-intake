@@ -191,6 +191,74 @@ def _detail_preview(dd: dict[str, Any] | None) -> str:
     return ""
 
 
+# ── [상세 본문 가독성 2026-07-27] 통짜 문단 → 목록 복원 ──────────────────────
+# EU/UK GMP 비준수(NCR) 상세는 1,000~2,300자가 **줄바꿈 0개**로 한 덩어리다(실측:
+# Technophage additional 2,282자·nature 1,902자). 그런데 원문에는 구조가 **이미 있다** —
+# `•` 불릿, `A.`/`1.`/`a.` 열거, GMP 운영항목의 계층 코드(`1.1.1.4`). 지금은 그 마커가
+# 글자로만 남아 한 줄로 이어져 읽을 수가 없다.
+#
+# 여기서 하는 일은 **표현층 분해뿐**이다 — 데이터(JSON)는 verbatim 그대로 두고, 렌더가
+# 원문에 실재하는 마커에서만 끊는다. 마커가 없으면 끊지 않는다(구조를 지어내지 않는다).
+# 영문 원문과 국문 번역에 같은 함수를 쓰므로 두 열의 항목 수가 어긋나지 않는다.
+_BULLET_SPLIT_RE = re.compile(r"\s*[•·]\s*")
+# 문장 끝(또는 문두) 뒤에 오는 열거 마커. `A.` `B)` `1.` `2)` `a.` `i.` 를 잡되, 소수점
+# 숫자(`0.22 µm`)·약어(`No.`)를 끊지 않도록 **마커 뒤 공백**을 필수로 둔다.
+_ENUM_SPLIT_RE = re.compile(r"(?<=[.。:])\s+(?=(?:[A-Za-z]|[ivx]{1,4}|\d{1,2})[.)]\s)")
+# GMP 운영항목 코드(`1` `1.1` `1.1.1.4`) — 코드 앞에서 끊는다.
+_GMP_CODE_RE = re.compile(r"(?=(?:^|\s)(\d+(?:\.\d+)*)\s+\D)")
+
+
+def split_detail_blocks(text: str) -> list[dict[str, Any]]:
+    """상세 본문 → 표시 블록 목록(순수 함수). 원문에 있는 마커에서만 끊는다.
+
+    반환: `[{"kind": "para"|"item", "text": str}, ...]`.
+    마커가 하나도 없으면 `[{"kind": "para", "text": <원문>}]` 그대로(무변형).
+    """
+    s = " ".join((text or "").split())
+    if not s:
+        return []
+    out: list[dict[str, Any]] = []
+    # ① 불릿이 있으면 불릿 우선(불릿 앞 도입문은 문단으로 남긴다)
+    if "•" in s or "·" in s:
+        parts = [p.strip() for p in _BULLET_SPLIT_RE.split(s)]
+        head, items = parts[0], [p for p in parts[1:] if p]
+        if head:
+            out.append({"kind": "para", "text": head})
+        out.extend({"kind": "item", "text": p} for p in items)
+        return out
+    # ② 열거 마커(A. 1. a. i.)로 끊는다 — 첫 조각은 도입문일 수 있다
+    chunks = [c.strip() for c in _ENUM_SPLIT_RE.split(s) if c.strip()]
+    if len(chunks) > 1:
+        return [{"kind": ("item" if re.match(r"^(?:[A-Za-z]|[ivx]{1,4}|\d{1,2})[.)]\s", c)
+                          else "para"), "text": c} for c in chunks]
+    return [{"kind": "para", "text": s}]
+
+
+def split_gmp_operations(text: str) -> list[dict[str, Any]]:
+    """GMP 운영항목 문자열 → `[{"code","label","depth"}]`(순수 함수).
+
+    `1 비준수 제조 작업 1.1 무균 제품 1.1.1 무균 조제 …` 처럼 계층 코드가 한 줄로 붙어
+    나오는 필드를 코드 단위로 끊고 점(.) 개수로 들여쓰기 깊이를 준다. 코드가 하나도
+    안 잡히면 빈 목록 — 호출부가 기존 문단 렌더로 폴백한다(무변형).
+    """
+    s = " ".join((text or "").split())
+    if not s:
+        return []
+    pos = [m.start() for m in _GMP_CODE_RE.finditer(s)]
+    if len(pos) < 2:
+        return []
+    rows: list[dict[str, Any]] = []
+    for i, start in enumerate(pos):
+        seg = s[start:(pos[i + 1] if i + 1 < len(pos) else len(s))].strip()
+        m = re.match(r"^(\d+(?:\.\d+)*)\s+(.*)$", seg)
+        if not m:
+            continue
+        code, label = m.group(1), m.group(2).strip()
+        if label:
+            rows.append({"code": code, "label": label, "depth": code.count(".")})
+    return rows if len(rows) >= 2 else []
+
+
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
 def _card_view(card: dict[str, Any]) -> dict[str, Any]:
     quotes_in = card.get("quotes") or []
@@ -1318,13 +1386,17 @@ def build_site_webmanifest() -> str:
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
 def _make_env() -> Environment:
-    return Environment(
+    env = Environment(
         loader=FileSystemLoader([str(TEMPLATES_DIR), str(PARTIALS_PARENT)]),
         autoescape=select_autoescape(default=True, default_for_string=True),
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
+    # [상세 가독성 2026-07-27] 표현층 전용 필터 — 데이터는 verbatim, 렌더만 분해한다.
+    env.filters["detail_blocks"] = split_detail_blocks
+    env.filters["gmp_operations"] = split_gmp_operations
+    return env
 
 
 def _write(path: Path, text: str) -> None:

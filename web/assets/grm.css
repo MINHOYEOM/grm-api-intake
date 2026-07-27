@@ -459,6 +459,21 @@ details.detail .lab{margin:0}
 .obs-ko{margin-top:10px;padding-left:12px}
 .obs-ko .dt-sum{margin-top:4px}
 .dt-sum{margin-top:8px;font-size:14px;line-height:1.6;color:var(--body-s)}
+/* [상세 가독성 2026-07-27] 통짜 문단으로 나가던 NCR 본문의 목록 복원. 원문에 실재하는
+   마커(•·A./1./a.·GMP 코드)에서만 끊으므로, 마커 없는 카드는 이 클래스가 안 나온다.
+   한글안전(§4): 목록 텍스트에 mono/자간 클래스 미사용(코드 칩만 tabular). */
+.dt-list{margin:7px 0 0;padding-left:17px;list-style:disc}
+.dt-list li{margin-top:5px;font-size:14px;line-height:1.6;color:inherit}
+.obs-orig .dt-list li{font-family:var(--serif);color:var(--ink)}
+.obs-ko .dt-list li{color:var(--body-s)}
+.dt-ops{margin:7px 0 0;padding:0;list-style:none}
+.dt-ops li{display:flex;gap:8px;align-items:baseline;margin-top:4px;font-size:13.5px;line-height:1.5}
+.dt-ops li.lv1{padding-left:14px}
+.dt-ops li.lv2{padding-left:28px}
+.dt-ops li.lv3{padding-left:42px}
+.dt-ops li.lv4{padding-left:56px}
+.dt-code{flex:none;min-width:52px;font-variant-numeric:tabular-nums;font-size:12px;
+  font-weight:600;color:var(--coral-2)}
 .dt-fu{margin-top:8px;display:flex;align-items:flex-start;gap:6px;font-size:13px;line-height:1.5;color:var(--muted)}
 .dt-fu i{flex:none;margin-top:2px;color:var(--coral-2)}
 .src{display:flex;gap:8px;flex-wrap:wrap;margin-top:19px;padding-top:17px;border-top:1px solid var(--line)}

@@ -555,3 +555,55 @@ class ResourceNotesPipelineTest(unittest.TestCase):
         self.assertNotIn("ECA", event_agencies)  # ECA 는 이벤트 카드 목록엔 없다(리소스로 이동)
 
 
+
+
+class FalseAbsenceOurSideVocabularyTest(unittest.TestCase):
+    """[2026-07-27] 어휘를 정직하게 고친 뒤에도 **그 서술이 참인지**는 별개 문제다.
+
+    2026-07-20 에 "원문에 없다"(소스 탓) → "우리가 확보하지 못했다"(우리 상태)로 어휘를
+    고쳤다. 그런데 스캔 483 을 OCR 로 복구하자 그 서술이 거짓이 됐고, 게이트가 소스 탓
+    표현만 잡고 있어 **카드 25장이 그대로 통과했다** — 관찰 상세가 바로 아래 붙어 있는데
+    "관찰사항 본문을 확보하지 못했다"고 적힌 채 발행됐다(07-27 24건·07-20 1건 실측).
+    """
+
+    @staticmethod
+    def _card(**kw):
+        c = {"id": "fda483-1",
+             "deterministic_detail": {"type": "fda_483_observations", "count": 3,
+                                      "observations": []}}
+        c.update(kw)
+        return c
+
+    def test_our_side_absence_is_blocked_when_source_captured(self):
+        for text in ("상세: 원문 PDF 에 텍스트층이 없어(스캔본) 관찰사항 본문을 확보하지 못했다",
+                     "상세: 본문 수집을 시도하지 않아 관찰사항을 확인하지 못했다",
+                     "구체적 관찰 사유: 미확인"):
+            with self.subTest(text=text):
+                errs = apb.lint_false_absence_claims([self._card(key_facts=[text])])
+                self.assertTrue(errs, f"우리 쪽 부재 서술이 차단되지 않았다: {text!r}")
+
+    def test_source_blaming_absence_still_blocked(self):
+        errs = apb.lint_false_absence_claims(
+            [self._card(summary="세부 위반내용은 원문에 명시되지 않았다")])
+        self.assertTrue(errs)
+
+    def test_real_content_passes(self):
+        errs = apb.lint_false_absence_claims([self._card(
+            key_facts=["관찰 3건 — 이상사례 불만 조사 미흡·FAR 미제출",
+                       "시설 유형: Sterile Drug Manufacturer"],
+            summary="FDA 가 무균제조소를 실사하고 관찰사항 3건을 발부했다.")])
+        self.assertEqual(errs, [])
+
+    def test_digest_card_without_source_is_exempt(self):
+        """원문을 못 얻은 디제스트는 '확보 실패'라고 **말해야 한다** — 막으면 안 된다."""
+        digest = {"id": "fda483-2", "merged_count": 7,
+                  "key_facts": ["공개 건수: 7건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)"],
+                  "summary": "원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 "
+                             "시설·실사일 목록만 정리했다."}
+        self.assertEqual(apb.lint_false_absence_claims([digest]), [])
+
+    def test_unrelated_absence_statement_not_flagged(self):
+        """원문이 실제로 그렇게 적혀 있다는 **사실 서술**은 통과해야 한다."""
+        errs = apb.lint_false_absence_claims(
+            [self._card(key_facts=["관찰 1: 부적격 사유 미기재"])])
+        self.assertEqual(errs, [])

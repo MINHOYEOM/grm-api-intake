@@ -291,8 +291,19 @@ def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
     for doc, entry in deep.items():
         if not isinstance(entry, dict):
             continue
-        da = entry.get("deep_analysis") if "deep_analysis" in entry else entry
-        source = entry.get("source_text", "") if "deep_analysis" in entry else ""
+        # [번역 전용 항목 통과 2026-07-27] `deep_analysis` 가 없고 번역/재추출 입력만 실린
+        # 항목(`observations_ko`·`ncr_ko`·`source_text`)은 **생성된 분석이 없어** 근거 게이트의
+        # 검증 대상이 아니다. 종전 코드는 이런 entry 를 통째로 `da` 로 보고 4섹션 게이트에
+        # 태워 전건 FAIL·drop 시켰다 — 관찰 국문 번역이 클라우드 경로에서 조용히 사라지는
+        # 구멍이었고, NCR 번역(`ncr_ko`)도 같은 자리에서 죽었을 것이다.
+        if "deep_analysis" not in entry:
+            if any(k in entry for k in ("observations_ko", "ncr_ko", "source_text")):
+                kept[doc] = entry
+                continue
+            log("WARN", f"deep 델타 항목에 검증 대상 키 없음 — 카드 drop: {doc}")
+            continue
+        da = entry.get("deep_analysis")
+        source = entry.get("source_text", "")
         try:
             gate = _vda.run_deep_analysis_gate(da, source, card_type=None)
         except Exception as e:  # noqa: BLE001 — 게이트 자체 오류는 그 카드만 drop(브리프 비차단)

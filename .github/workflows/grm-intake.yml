@@ -175,6 +175,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # [스캔 483 OCR 2026-07-27] FDA FOIA 483 의 대다수가 스캔 이미지라 텍스트 추출이
+      # 통째로 실패했다(실측 40건 중 35건). PyMuPDF 내장 OCR 이 tesseract 바이너리를
+      # 요구하므로 러너에 설치한다 — 새 파이썬 의존성은 없다(requirements.txt 불변).
+      # 설치가 실패해도 수집은 계속된다(collect_fda_483 이 scan-ocr-unavailable 로 degrade).
+      - name: Install OCR engine (tesseract)
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          tesseract --version | head -1
+
       - name: Show run context (KST)
         run: |
           echo "UTC now : $(date -u '+%Y-%m-%d %H:%M:%S')"

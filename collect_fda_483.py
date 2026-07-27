@@ -782,6 +782,9 @@ def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
 # 기호가 아니다 — 알파벳 실질이 이 수 미만이면 관찰로 세지 않는다. 기존 텍스트층 483 의
 # 정상 표제는 전부 수십 자 이상이라 무영향(골든 불변).
 FDA483_DEFICIENCY_MIN_ALPHA = 12
+# 483 양식에서 관찰 목록이 끝나는 지점 — 이 뒤는 시정 약속 주석이지 관찰이 아니다.
+# OCR 이 공백을 흘리는 경우가 있어 단어 사이 공백을 관대하게 둔다.
+_ANNOTATIONS_RE = re.compile(r"\bAnnotations?\s+to\s+Observations?\b", re.I)
 
 
 def _is_legible_deficiency(deficiency: str) -> bool:
@@ -926,6 +929,15 @@ def _extract_483_observations_from_text(
     m = _WE_OBSERVED_RE.search(body)
     if m:
         body = body[m.end():]
+    # [관찰목록 종료 마커 2026-07-27] 483 양식의 "Annotations to Observations" 절은 관찰이
+    # 아니라 **어느 관찰을 시정하기로 했는지에 대한 주석**이고, 그 안에서 관찰 번호가 다시
+    # 열거된다("8. Promised to correct."). 이 절까지 훑으면 같은 번호의 관찰이 **두 번**
+    # 만들어지고(fda483-193541 실측: obs 8 이 중복), 국문 병기는 번호로 매칭하므로 번역이
+    # 뒤쪽(주석) 항목에만 붙어 진짜 관찰 8 이 미번역으로 남아 발행이 막힌다.
+    # 관찰 목록은 이 표제에서 끝난다 — 여기서 자른다.
+    cut = _ANNOTATIONS_RE.search(body)
+    if cut:
+        body = body[:cut.start()]
     matches = _select_observation_anchors(body, list(_OBS_RE.finditer(body)))
     if not matches:
         return []

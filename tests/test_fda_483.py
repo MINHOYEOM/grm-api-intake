@@ -1387,3 +1387,37 @@ class FooterMarkerParityTest(unittest.TestCase):
                                   "detail_ko": "국문."}]}}
             self.assertEqual(render.validate_483_observations([card]), [],
                              f"수집기 통과분을 게이트가 막았다: {cleaned!r}")
+
+
+class AnnotationsSectionTest(unittest.TestCase):
+    """[2026-07-27] "Annotations to Observations" 절이 관찰로 파싱돼 번호가 중복되던 결함.
+
+    483 양식의 그 절은 관찰이 아니라 **어느 관찰을 시정하기로 했는지에 대한 주석**이고,
+    그 안에서 관찰 번호가 다시 열거된다("8. Promised to correct." — fda483-193541 실측).
+    같은 번호가 두 번 만들어지면 국문 병기가 번호로 매칭되므로 번역이 주석 쪽에만 붙고
+    진짜 관찰은 미번역으로 남아 **발행이 막힌다**.
+    """
+
+    BODY = ("WE OBSERVED\n"
+            "OBSERVATION 8\nPest activity was observed throughout the warehouse.\n"
+            "Specifically, rodent excreta pellets were found on pallets.\n"
+            "Annotations to Observations\n"
+            "OBSERVATION 8\nPromised to correct.\n")
+
+    def test_annotations_section_is_not_an_observation(self):
+        rows = f._extract_483_observations_from_text(self.BODY)
+        self.assertEqual([r["number"] for r in rows], ["8"], "번호가 중복 생성됐다")
+        self.assertIn("Pest activity", rows[0]["deficiency"])
+
+    def test_detail_does_not_leak_the_annotations_heading(self):
+        rows = f._extract_483_observations_from_text(self.BODY)
+        self.assertNotIn("Annotations", rows[0]["detail"])
+        self.assertNotIn("Promised to correct", rows[0]["detail"])
+
+    def test_normal_body_unaffected(self):
+        body = ("WE OBSERVED\nOBSERVATION 1\nAseptic processing was deficient.\n"
+                "Specifically, first air was blocked.\n"
+                "OBSERVATION 2\nEnvironmental monitoring was inadequate.\n"
+                "Specifically, excursions were not investigated.")
+        self.assertEqual(
+            [r["number"] for r in f._extract_483_observations_from_text(body)], ["1", "2"])

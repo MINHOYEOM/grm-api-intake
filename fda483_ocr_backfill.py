@@ -56,11 +56,20 @@ DEFAULT_DELAY_SECONDS = 0.5
 
 
 def folded_483_ids(scaffold: dict[str, Any], published: dict[str, Any]) -> list[str]:
-    """그 주 스캐폴드에는 있으나 발행본에서 사라진 `fda483-*` 카드 id(=디제스트로 접힌 것).
+    """그 주 관찰 원문을 확보하지 못한 `fda483-*` 카드 id — 디제스트 멤버 **+ 대표**.
 
-    순서는 스캐폴드 순서 보존(결정론). 발행본에 남은 카드는 이미 상세를 가졌으므로 제외한다.
+    순서는 스캐폴드 순서 보존(결정론).
+
+    ★ 대표 카드도 대상이다(2026-07-27 수리). 디제스트는 대표 1장만 발행본에 남기고 나머지를
+    드롭하는데, **그 대표 역시 관찰 원문이 없어서 접힌 카드**다. "발행본에 없는 것"만 고르면
+    대표가 통째로 빠지고, 나머지 멤버가 전부 복구돼 디제스트가 해체되는 순간 대표만 낡은
+    슬롯("구체적 관찰 사유: 원문 미기재")을 단 채 **단독 카드로 발행된다** — 07-12 소급
+    복구에서 실제로 그렇게 됐다(fda483-193530). 대표는 `merged_count > 1` 로 식별한다.
     """
-    live = {str(c.get("id")) for c in (published.get("cards") or [])}
+    digest_reps = {str(c.get("id")) for c in (published.get("cards") or [])
+                   if str(c.get("id", "")).startswith("fda483-")
+                   and int(c.get("merged_count") or 1) > 1}
+    live = {str(c.get("id")) for c in (published.get("cards") or [])} - digest_reps
     out: list[str] = []
     for card in (scaffold.get("cards") or []):
         cid = str(card.get("id") or "")

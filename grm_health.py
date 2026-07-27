@@ -102,6 +102,26 @@ _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {
 # 공개 endpoint 와 동일하게 warning(exit 0)으로 강등 — 설정·구조 오류는 마커 미포함이라 여전히
 # failure. 2026-06-05 활성화 때 누락된 스코프 확장(T1).
 _GLOBAL_PUBLIC_SOURCE_CODES = {"ich", "who", "health-canada", "fda483"}
+# ── [소스 오류 보고 누락 수리 2026-07-27] ───────────────────────────────────────
+# 아래 5종(EMA·MHRA·PIC/S·ECA·FDA WL)은 **오류가 나도 경고가 나갈 경로가 아예 없었다.**
+# `enabled_source_failures`(유일하게 소비되는 소스별 보고 리스트)에 빠져 있었고, 이들이
+# 등장하는 `phase2_source_states` 는 ① `if not phase1_fr_active and not phase1_recall_active`
+# 안에 갇혀 FR 이 도는 정상 운영에선 실행조차 안 되고 ② 실행돼도 "전 소스가 다 죽었나"
+# 집계 판정에만 쓰인다. 실제 피해: ECA RSS 가 2026-07-20~07-26 **7일 연속** 실패했는데
+# intake run 은 매번 success, 경고 이슈에도 한 줄도 안 올라왔다(발견은 사람이 브리프에서
+# ECA 카드가 사라진 걸 눈치챈 뒤였다).
+#
+# **경고 등급으로 배선한다(failure 아님)** — 의도적 선택이다:
+#   · `add_failure` 는 `exit_code=1` → intake run 적색인데, `grm-web-publish.yml` 은 스캐폴드를
+#     `gh run list --status success` 로 고른다. 즉 부차 피드 하나가 죽으면 그 날 run 이 배제돼
+#     **월요일 발행이 스캐폴드 날짜 불일치로 통째로 막힌다**(`test -f` 하드 실패).
+#     가시성을 얻으려다 발행을 멈추는 건 잘못된 교환이다.
+#   · 목적은 **차단이 아니라 표면화**다. 경고는 `GRM Intake 운영 경고` 이슈에 하루 안에
+#     올라오므로 ECA 도 07-20 당일 잡혔을 것이다.
+#   · 선례와 일관: `aged-unconsumed-new` 도 같은 이유로 warning(exit 0)이다.
+# 네트워크성 일시 오류와 구조적 오류를 문구로 구분하지 않는다 — 둘 다 경고로 올리되
+# detail 에 원문 오류를 실어 사람이 판단한다(오분류로 침묵하는 것보다 낫다).
+_WARN_ONLY_SOURCE_CODES = {"ema", "mhra", "pics", "eca", "wl"}
 _TRANSIENT_ELIGIBLE_SOURCE_CODES = _MFDS_FEATURE_SOURCE_CODES | _GLOBAL_PUBLIC_SOURCE_CODES
 # 403 transient 적격: 키 없는 공개 endpoint 만(WAF/IP 차단성). data.go.kr API 403 은
 # 키/서비스 권한 문제 가능성이 높아 failure 유지.
@@ -307,6 +327,14 @@ def _evaluate_health(
             (enable_who and stats.who_error, "who", "WHO", stats.who_error_msg),
             (enable_hc and stats.hc_error, "health-canada", "Health Canada", stats.hc_error_msg),
             (enable_fda483 and stats.fda483_error, "fda483", "FDA 483", stats.fda483_error_msg),
+            # [2026-07-27] 공개 RSS/HTML 5종 — 종전엔 이 리스트에 없어 오류가 나도 보고 경로가
+            # 없었다(ECA 7일 침묵). 게이팅은 phase2 와 동일하게 `active` 기준.
+            # 등급은 _WARN_ONLY_SOURCE_CODES 로 항상 warning — 이유는 그 상수 주석 참조.
+            ("ema" in active and stats.ema_error, "ema", "EMA RSS", stats.ema_error_msg),
+            ("mhra" in active and stats.mhra_error, "mhra", "MHRA RSS", stats.mhra_error_msg),
+            ("pics" in active and stats.pics_error, "pics", "PIC/S RSS", stats.pics_error_msg),
+            ("eca" in active and stats.eca_error, "eca", "ECA Academy RSS", stats.eca_error_msg),
+            ("wl" in active and stats.wl_error, "wl", "FDA Warning Letters", stats.wl_error_msg),
         ]
 
         if not phase1_fr_active and not phase1_recall_active:
@@ -369,7 +397,16 @@ def _evaluate_health(
 
         for failed, code, source, detail in enabled_source_failures:
             if failed:
-                if _is_transient_source_error(code, detail):
+                if code in _WARN_ONLY_SOURCE_CODES:
+                    # 표면화는 하되 run 을 적색으로 만들지 않는다(발행 스캐폴드 선택이
+                    # `--status success` 라 적색 = 그 주 발행 차단 — 상수 주석 참조).
+                    health.add_warning(
+                        f"source-error:{code}",
+                        source,
+                        f"{source} 수집 오류 — 이 실행에서 해당 소스 0건",
+                        detail[:240],
+                    )
+                elif _is_transient_source_error(code, detail):
                     health.add_warning(
                         f"transient-source-error:{code}",
                         source,

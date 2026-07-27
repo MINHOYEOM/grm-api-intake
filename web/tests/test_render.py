@@ -6060,6 +6060,40 @@ class WebNewSourceRenderTest(unittest.TestCase):
         self.assertTrue(hit[0]["href"].endswith("#" + self.MHRA_ID),
                         f"search-index href 가 앵커와 불일치: {hit[0]['href']}")
 
+    def test_ocr_derived_483_block_is_labelled_as_ocr(self):
+        """[OCR 출처 표기 2026-07-27] 판독물을 "원문 · FDA 483" 이라고 부르지 않는다."""
+        obs = [{"number": "1", "deficiency": "Aseptic failure.", "detail": "Specifically, x.",
+                "deficiency_ko": "무균 실패.", "detail_ko": "구체적으로, x."}]
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        br = self._brief()
+        br["cards"][0]["deterministic_detail"] = {
+            "type": "fda_483_observations", "count": 1, "observations": obs,
+            "text_source": "ocr"}
+        (data / "brief_web_2026-07-27.json").write_text(
+            json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("원문 · FDA 483 · OCR 판독", html)
+        self.assertIn("스캔 원문 OCR 판독", html)
+        self.assertIn("기계 판독(OCR)으로 옮겼다", html)
+
+    def test_native_483_block_keeps_original_label(self):
+        """텍스트층 산출 카드는 종전 라벨 그대로 — 골든 불변(additive)."""
+        obs = [{"number": "1", "deficiency": "Aseptic failure.", "detail": "",
+                "deficiency_ko": "무균 실패."}]
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        br = self._brief()
+        br["cards"][0]["deterministic_detail"] = {
+            "type": "fda_483_observations", "count": 1, "observations": obs}
+        (data / "brief_web_2026-07-27.json").write_text(
+            json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("원문 · FDA 483", html)
+        self.assertNotIn("OCR 판독", html)
+
     def test_ncr_detail_without_ko_stays_english_only(self):
         """`*_ko` 미보유 카드는 국문 블록이 아예 안 나온다(additive — 기존 발행분 불변)."""
         _, html = self._render()

@@ -148,13 +148,20 @@
       있으면 관찰 statement 를 원문(영문 세리프)→국문 쌍으로. 원문 상세(detail)는 verbatim
       근거로 영문 유지(detail_ko 있으면 함께). deficiency_ko 미보유 관찰은 기존 영문만 렌더 →
       골든 fixture(ko 무) 바이트 불변(additive). -#}
+  {#- [OCR 출처 표기 2026-07-27] `text_source == 'ocr'` 이면 이 영문은 원문 텍스트층이 아니라
+      **우리가 스캔 이미지를 OCR 로 판독한 결과**다. 판독물을 "원문"이라고 부르면 거짓이므로
+      라벨을 갈라 쓴다(OCR 오인식이 실제로 관찰됐다). 키 없는 기존 카드는 종전 라벨 그대로. -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· 원문 기반</span></summary>
+  {%- set obs_src = 'FDA 483 · OCR 판독' if dd.text_source == 'ocr' else 'FDA 483' %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· {% if dd.text_source == 'ocr' %}스캔 원문 OCR 판독{% else %}원문 기반{% endif %}</span></summary>
+    {%- if dd.text_source == 'ocr' %}
+    <p class="dt-fu">이 실사기록은 공개 PDF 가 스캔 이미지여서 기계 판독(OCR)으로 옮겼다. 오인식이 있을 수 있으니 정확한 문구는 공식원본 PDF 를 확인한다.</p>
+    {%- endif %}
     {%- for r in dd.observations %}
     <div class="dt-row obs-row">
       <div class="dt-h"><span class="obs-num">Observation {{ r.number }}</span></div>
       {%- if r.deficiency_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · FDA 483</span><p class="obs-en">{{ r.deficiency }}</p>{% if r.detail %}<p class="obs-en-det">{{ r.detail }}</p>{% endif %}</div>
+      <div class="obs-orig"><span class="viol-lang">원문 · {{ obs_src }}</span><p class="obs-en">{{ r.deficiency }}</p>{% if r.detail %}<p class="obs-en-det">{{ r.detail }}</p>{% endif %}</div>
       <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ r.deficiency_ko }}</p>{% if r.detail_ko %}<p class="dt-fu">{{ r.detail_ko }}</p>{% endif %}</div>
       {%- else %}
       <p class="dt-sum">{{ r.deficiency }}</p>

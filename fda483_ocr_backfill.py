@@ -104,9 +104,12 @@ def run(doc_ids: list[str], delay: float = DEFAULT_DELAY_SECONDS,
             sleeper(delay)
         row = recover_document(doc_id)
         if row["observation_count"]:
-            # 조립(`_refresh_483_observations`)이 읽는 유일한 입력. 관찰은 조립이 같은
-            # 파서로 다시 뽑으므로 패치에 싣지 않는다(단일 진실 = source_text).
-            patch[doc_id] = {"source_text": row["source_text"]}
+            # 조립(`_refresh_483_observations`)이 읽는 입력. 관찰은 조립이 같은 파서로 다시
+            # 뽑으므로 패치에 싣지 않는다(단일 진실 = source_text). `source_text_status` 는
+            # 이 영문이 **원문 텍스트층**인지 **우리 OCR 판독**인지의 출처 표기용 — 판독물을
+            # "원문"이라고 표시하지 않기 위해 조립까지 물려준다.
+            patch[doc_id] = {"source_text": row["source_text"],
+                             "source_text_status": row["status"]}
         report.append({k: v for k, v in row.items() if k != "source_text"})
         log("INFO", f"[{i + 1}/{len(doc_ids)}] {doc_id}: status={row['status']} "
                     f"text={row['text_len']} 관찰={row['observation_count']}")

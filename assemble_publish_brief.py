@@ -474,9 +474,18 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
         if before == after:
             continue
-        card["deterministic_detail"] = {
+        refreshed: dict[str, Any] = {
             "type": "fda_483_observations", "count": len(fresh), "observations": fresh,
         }
+        # [OCR 출처 표기 2026-07-27] 이 `source_text` 가 원문 텍스트층인지 우리 OCR 판독인지
+        # 그대로 물려준다 — 판독물을 "원문"이라고 표시하지 않기 위해서다. 소급 복구 패치
+        # (`fda483_ocr_backfill.py`)가 `source_text_status` 를 함께 싣는다. 없으면 기존과 동일
+        # (원문 텍스트층 가정 — 이 필드가 없던 시절 델타는 전부 PDF 텍스트층 산출이었다).
+        if str(payload.get("source_text_status") or "").split(":", 1)[0] == "pdf-ok-ocr":
+            refreshed["text_source"] = "ocr"
+        elif isinstance(dd, dict) and dd.get("text_source"):
+            refreshed["text_source"] = dd["text_source"]      # 기존 표기 보존
+        card["deterministic_detail"] = refreshed
         report.refreshed_483_ids.append(str(card.get("id")))
         report.warnings.append(
             f"[483] {card.get('id')}: 관찰 원문 재추출 — 번호 "

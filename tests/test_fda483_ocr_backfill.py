@@ -46,9 +46,11 @@ class RecoverTest(unittest.TestCase):
                           lambda url: (_OBS_TEXT, "pdf-ok-ocr")):
             patch_out, report = bf.run(["fda483-100"], delay=0)
         self.assertIn("fda483-100", patch_out)
-        self.assertEqual(list(patch_out["fda483-100"]), ["source_text"],
-                         "패치는 source_text 만 실어야 한다(단일 진실)")
+        self.assertEqual(sorted(patch_out["fda483-100"]),
+                         ["source_text", "source_text_status"],
+                         "패치는 원문과 그 출처 표기만 실어야 한다(관찰은 조립이 재추출)")
         self.assertEqual(patch_out["fda483-100"]["source_text"], _OBS_TEXT)
+        self.assertEqual(patch_out["fda483-100"]["source_text_status"], "pdf-ok-ocr")
         self.assertEqual(report[0]["observation_count"], 2)
         self.assertEqual(report[0]["status"], "pdf-ok-ocr")
 
@@ -87,6 +89,13 @@ class RecoverTest(unittest.TestCase):
             bf.run(["fda483-1", "fda483-2", "fda483-3"], delay=0.25,
                    sleeper=calls.append)
         self.assertEqual(calls, [0.25, 0.25], "첫 건 앞에는 대기하지 않는다")
+
+    def test_native_text_is_not_labelled_ocr(self):
+        """원문 텍스트층 산출은 OCR 표기를 달지 않는다(라벨 오염 방지)."""
+        with patch.object(f483, "_fetch_fda483_pdf_text",
+                          lambda url: (_OBS_TEXT, "pdf-ok")):
+            patch_out, _ = bf.run(["fda483-104"], delay=0)
+        self.assertEqual(patch_out["fda483-104"]["source_text_status"], "pdf-ok")
 
     def test_summary_counts(self):
         report = [{"status": "pdf-ok-ocr", "observation_count": 3},

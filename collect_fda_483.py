@@ -49,7 +49,7 @@ from typing import Any
 from urllib.parse import urlencode, urljoin
 
 import grm_findings as gf
-from grm_common import env_flag, http_get_bytes, http_get_html, http_get_json, log
+from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
     IntakeItem,
     SOURCE_FDA_483,
@@ -103,7 +103,16 @@ _MIN_COLS = 8
 FDA483_EXCERPT_MAX_CHARS = 1500
 FDA483_EXCERPT_FETCH_TIMEOUT = 20
 FDA483_EXCERPT_DELAY_SECONDS = 0.5
-FDA483_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(윈도우 내 newest-first → 최신 N건 우선)
+# [수집 사각 수리 2026-07-27] 종전 상한 40 은 **윈도우 후보 수(실측 108)의 3분의 1**이었다.
+# 정렬이 publish desc 라 최신 40건 밖의 483 은 **어느 날 실행에서도** PDF 를 받지 못하고, 한 번
+# Notion 에 들어가면 재시도 기회도 없다(스캐폴드는 New 행에서만 생성). 그렇게 통째로 건너뛴
+# 문서가 실제로 발행됐다 — 2026-07-27 소급 복구 24건 중 **10건이 "텍스트층 정상인데 한 번도
+# 시도되지 않은" 문서**였다(OCR 로 살린 14건과 별개의 원인). 상한을 올리되 무한정 늘리지 않고
+# OCR 페이지 예산으로 실행시간을 닫는다.
+FDA483_EXCERPT_MAX_ITEMS = _env_int("FDA483_PDF_MAX_ITEMS", 60)
+# 실행 1회당 OCR 페이지 예산 — 실측 ≈2.2s/쪽. 200쪽 ≈ 7분으로 intake 전체 예산 안에 든다.
+# 소진 후 문서는 OCR 없이 진행(상태 `scan-ocr-budget`)해 **왜** 비었는지가 카드까지 전달된다.
+FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
 FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
@@ -132,6 +141,10 @@ _FDA483_EXCERPT_PATTERNS = (
 
 # excerpt·소스 관측용(dry-run 검증·운영 health). collect_who.LAST_HEALTH 패턴.
 LAST_HEALTH: dict[str, Any] = {}
+
+# 실행 1회당 OCR 페이지 예산(모듈 전역 — collect_fda_483() 진입 시 리셋). 예산 밖 문서는
+# OCR 없이 진행하고 사유를 남긴다 — 조용히 빈 카드가 되지 않게.
+_OCR_BUDGET: dict[str, int] = {"remaining": FDA483_OCR_PAGE_BUDGET, "used": 0}
 
 # 직전 _fetch_html_rows 가 실제 사용한 백본(관측용 — LAST_HEALTH["backbone"] 로 표면화).
 # collect_fda_483() 진입 시 "datatables" 로 리셋 — 테스트가 _fetch_html_rows 를 스텁해도
@@ -673,6 +686,8 @@ def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tu
     status: `pdf-ok-ocr`(OCR 로 본문 확보) | `scan-ocr-unavailable`(엔진 없음) |
             `scan-ocr-empty`(OCR 했으나 글자 0) | `pdf-parse-fail:<Err>`
     """
+    if _OCR_BUDGET["remaining"] <= 0:
+        return "", "scan-ocr-budget"
     try:
         import fitz  # type: ignore[import-not-found]
     except ImportError:
@@ -689,9 +704,11 @@ def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tu
                 if native.strip():
                     parts.append(native)
                     continue
-                if ocr_pages >= FDA483_OCR_MAX_PAGES:
+                if ocr_pages >= FDA483_OCR_MAX_PAGES or _OCR_BUDGET["remaining"] <= 0:
                     continue
                 ocr_pages += 1
+                _OCR_BUDGET["remaining"] -= 1
+                _OCR_BUDGET["used"] += 1
                 tp = page.get_textpage_ocr(language="eng", dpi=FDA483_OCR_DPI,
                                            full=True, tessdata=_tessdata_dir())
                 parts.append(page.get_text("text", textpage=tp))
@@ -1055,8 +1072,14 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     """
     global LAST_HEALTH, _LAST_BACKBONE
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
+    _OCR_BUDGET["remaining"] = FDA483_OCR_PAGE_BUDGET   # 실행별 리셋(위와 동일 이유)
+    _OCR_BUDGET["used"] = 0
     excerpt_health: dict[str, Any] = {
         "attempted": 0, "ok": 0, "failed": 0, "capped": False, "warnings": [],
+        # [수집 사각 표면화 2026-07-27] cap 때문에 **한 번도 시도되지 않은** 윈도우 내 문서 수.
+        # 종전엔 "cap 도달" 한 줄만 남아 몇 건이 통째로 빠졌는지 아무도 몰랐고, 그 문서들이
+        # "원문 없음" 카드로 발행됐다. 숫자를 남겨야 사각이 보인다.
+        "skipped_no_attempt": 0,
     }
     observations_enabled = _observations_enabled()
     observations_health: dict[str, Any] = {
@@ -1119,9 +1142,13 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             "fei_number": nrow.get("fei", ""),
             "firm_name": nrow.get("company", ""),
         }
-        if pdf_url and not excerpt_health["capped"]:
+        # ★ `capped` 로 루프를 빠져나가지 않는다 — 종전 `and not capped` 는 상한 도달 후
+        #   첫 문서에서만 분기를 평가해 **몇 건이 통째로 빠졌는지 셀 수 없었다**. 이제 전건을
+        #   지나가며 미시도 수를 센다(작업은 여전히 상한까지만 — 비용 불변).
+        if pdf_url:
             if excerpt_health["attempted"] >= FDA483_EXCERPT_MAX_ITEMS:
                 excerpt_health["capped"] = True
+                excerpt_health["skipped_no_attempt"] += 1
             else:
                 excerpt_health["attempted"] += 1
                 if FDA483_EXCERPT_DELAY_SECONDS:
@@ -1180,15 +1207,25 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "fda_483_deep": deep_health,
         "source_degraded": source_degraded,
         "backbone": _LAST_BACKBONE,
+        "fda_483_ocr": {"pages_used": _OCR_BUDGET["used"],
+                        "budget": FDA483_OCR_PAGE_BUDGET,
+                        "exhausted": _OCR_BUDGET["remaining"] <= 0},
     }
     if excerpt_health["capped"]:
-        log("WARN", f"FDA 483 excerpt cap({FDA483_EXCERPT_MAX_ITEMS}) 도달 — "
-                    "나머지 항목은 excerpt/detail 없이 메타 카드로 유지")
+        log("WARN", f"FDA 483 PDF 상한({FDA483_EXCERPT_MAX_ITEMS}) 도달 — 윈도우 내 "
+                    f"{excerpt_health['skipped_no_attempt']}건이 **한 번도 시도되지 않았다**. "
+                    "그 문서들은 원문을 확보하지 못한 채 발행된다(FDA483_PDF_MAX_ITEMS 로 상향 가능)")
+    if _OCR_BUDGET["remaining"] <= 0:
+        log("WARN", f"FDA 483 OCR 페이지 예산({FDA483_OCR_PAGE_BUDGET}쪽) 소진 — "
+                    "이후 스캔본은 OCR 없이 진행(FDA483_OCR_PAGE_BUDGET 로 상향 가능)")
     log("INFO", f"FDA 483 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
                 f"483 행 {len(keep_rows)}/{html_data_count}, "
                 f"source={_LAST_BACKBONE}{'·부분/동결의심' if source_degraded else ''}) "
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "
-                f"failed={excerpt_health['failed']} · observations enabled={observations_enabled} "
+                f"failed={excerpt_health['failed']} "
+                f"미시도={excerpt_health['skipped_no_attempt']} "
+                f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
+                f"· observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "
                 f"extracted={observations_health['extracted']} "
                 f"failed={observations_health['failed']} · deep enabled={deep_enabled} "

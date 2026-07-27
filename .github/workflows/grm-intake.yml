@@ -151,7 +151,9 @@ jobs:
   collect:
     name: Collect sources → Notion Intake
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # [2026-07-27] 20 → 35. FDA 483 스캔본 OCR(실측 ≈2.2s/쪽·예산 200쪽 ≈ 7분)과 PDF 상한
+    # 40 → 60 상향이 이 job 안에서 돌기 때문. 예산·상한 둘 다 env 로 닫혀 있어 상한선이 있다.
+    timeout-minutes: 35
     env:
       GRM_HEALTH_JSON: grm-health.json
       # §1-B 영구배선: job-level 로 둬 collector(산출)와 upload 스텝(조건/경로)이 동일 값을

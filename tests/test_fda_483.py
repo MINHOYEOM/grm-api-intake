@@ -1218,9 +1218,86 @@ class ScannedPdfOcrFallbackTest(unittest.TestCase):
     def test_absent_reason_labels_cover_new_statuses(self):
         """새 상태코드가 사람이 읽는 사유로 반드시 번역된다(부재 어휘 규율)."""
         import card_scaffold as cs
-        for code in ("scan-ocr-unavailable", "scan-ocr-empty", "pdf-encrypted"):
+        for code in ("scan-ocr-unavailable", "scan-ocr-empty", "scan-ocr-budget",
+                     "pdf-encrypted"):
             self.assertIn(code, cs._ABSENT_REASON_LABELS)
             self.assertTrue(cs._absent_reason({"fda483_text_status": f"{code}:detail"}))
+
+    def test_ocr_page_budget_stops_further_ocr(self):
+        """실행당 OCR 페이지 예산이 소진되면 더 이상 OCR 하지 않고 사유를 남긴다."""
+        saved = dict(f._OCR_BUDGET)
+        try:
+            f._OCR_BUDGET["remaining"] = 0
+            text, status = f._ocr_483_pdf_text(b"%PDF-1.7 anything")
+            self.assertEqual((text, status), ("", "scan-ocr-budget"))
+        finally:
+            f._OCR_BUDGET.update(saved)
+
+
+class FetchCoverageTest(unittest.TestCase):
+    """[수집 사각 2026-07-27] PDF 상한 밖 문서가 **몇 건 통째로 빠졌는지** 세고 표면화한다.
+
+    종전 상한 40 은 윈도우 후보(실측 108)의 1/3 이었고, `and not capped` 단락 평가 때문에
+    상한 도달 후에는 분기 자체를 안 타서 미시도 건수를 아무도 몰랐다. 그렇게 빠진 문서가
+    "원문 없음" 카드로 발행됐다(2026-07-27 소급 복구 24건 중 10건).
+    """
+
+    def test_default_cap_covers_observed_window_volume(self):
+        """기본 상한이 실측 윈도우 후보 수에 비해 터무니없이 작지 않아야 한다."""
+        self.assertGreaterEqual(f.FDA483_EXCERPT_MAX_ITEMS, 60)
+
+    def test_cap_and_budget_are_env_tunable(self):
+        import importlib
+        with patch.dict(os.environ, {"FDA483_PDF_MAX_ITEMS": "7",
+                                     "FDA483_OCR_PAGE_BUDGET": "11"}):
+            mod = importlib.reload(f)
+            self.assertEqual(mod.FDA483_EXCERPT_MAX_ITEMS, 7)
+            self.assertEqual(mod.FDA483_OCR_PAGE_BUDGET, 11)
+        importlib.reload(f)      # 원복 — 다른 테스트에 새지 않게
+        self.assertGreaterEqual(f.FDA483_EXCERPT_MAX_ITEMS, 60)
+
+    @staticmethod
+    def _norm_rows(n):
+        """정규화 행 n개(_fetch_html_rows 산출 형태) — media id 고유·전건 윈도우 내."""
+        raw = [["04/17/2026", f"Firm {i}", f"100000{i}",
+                f'<a href="/media/{9100 + i}/download">483</a>', "Wisconsin", "",
+                "Drug Manufacturer", "05/27/2026", ""] for i in range(n)]
+        return f._datatable_norm_rows(raw)
+
+    def test_health_reports_every_skipped_document(self):
+        """상한 밖 문서가 전건 집계된다 — 1건만 세고 마는 종전 단락 평가 회귀 차단."""
+        rows = self._norm_rows(6)
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false",
+                                     "ENABLE_FDA_483_OCR": "false"}), \
+                patch.object(f, "FDA483_EXCERPT_MAX_ITEMS", 2), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_fetch_fda483_pdf_text",
+                             lambda url: ("OBSERVATION 1 x", "pdf-ok")), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), len(rows), False)):
+            f.collect_fda_483(START, END)
+        health = f.LAST_HEALTH["fda483_excerpt"]
+        self.assertTrue(health["capped"])
+        self.assertEqual(health["attempted"], 2)
+        self.assertEqual(health["skipped_no_attempt"], 4,
+                         "상한 밖 문서가 전건 집계되지 않았다")
+
+    def test_health_exposes_ocr_budget_usage(self):
+        rows = self._norm_rows(1)
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false"}), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_fetch_fda483_pdf_text",
+                             lambda url: ("OBSERVATION 1 x", "pdf-ok")), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), 1, False)):
+            f.collect_fda_483(START, END)
+        ocr = f.LAST_HEALTH["fda_483_ocr"]
+        self.assertEqual(ocr["pages_used"], 0)
+        self.assertFalse(ocr["exhausted"])
+        self.assertEqual(ocr["budget"], f.FDA483_OCR_PAGE_BUDGET)
+        self.assertEqual(f.LAST_HEALTH["fda483_excerpt"]["skipped_no_attempt"], 0)
 
 
 if __name__ == "__main__":

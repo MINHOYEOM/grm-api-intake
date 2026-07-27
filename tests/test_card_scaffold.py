@@ -1563,7 +1563,11 @@ class DeepAnalysisReadyTest(unittest.TestCase):
         fx = _load_input("fda_483")
         raw = dict(fx["raw"])
         raw["fda483_body_full"] = "During an inspection we observed OBSERVATION 1 sterile defect."
-        raw["fda_483_observations"] = [{"number": "1", "deficiency": "무균 결함", "detail": ""}]
+        raw["fda_483_observations"] = [
+            # 표제는 실측과 같은 문장 형태여야 한다 — 기호 파편 차단 기준
+            # (`_is_legible_deficiency`)이 한두 글자 합성값을 관찰로 세지 않는다.
+            {"number": "1", "deficiency": "Aseptic processing areas are deficient.",
+             "detail": ""}]
         wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
         self.assertIn("deep_analysis", wc)                     # 분석층 placeholder
         self.assertIn("deterministic_detail", wc)              # 결정론 층

@@ -768,6 +768,24 @@ def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
     return excerpt, "ok"
 
 
+# [OCR 판독 잡음 차단 2026-07-27] 관찰 표제로 인정할 최소 실질. 스캔본 OCR 이 들어오면서
+# 페이지 여백의 잡음("/T" · "‘T" 같은 파편)이 `OBSERVATION n` 앵커 뒤에 걸려 **관찰 1건으로
+# 발행되는** 사례가 소급 복구 표본에서 실측됐다(fda483-193759 obs 6 = "/T"). 표제는 문장이지
+# 기호가 아니다 — 알파벳 실질이 이 수 미만이면 관찰로 세지 않는다. 기존 텍스트층 483 의
+# 정상 표제는 전부 수십 자 이상이라 무영향(골든 불변).
+FDA483_DEFICIENCY_MIN_ALPHA = 12
+
+
+def _is_legible_deficiency(deficiency: str) -> bool:
+    """이 문자열이 관찰 표제로 읽히는가 — 글자 실질 최소치 충족 여부(순수 함수).
+
+    ASCII 가 아니라 **유니코드 글자**를 센다 — 483 표제는 영문이지만, 이 판정은 언어에
+    의존하면 안 된다(한국어 표제가 들어오는 경로가 생기면 조용히 전건 탈락한다).
+    현실 483 표제는 전부 수십 자 문장이고, 걸러내려는 대상은 1~3자 기호 파편이다.
+    """
+    return sum(1 for ch in (deficiency or "") if ch.isalpha()) >= FDA483_DEFICIENCY_MIN_ALPHA
+
+
 def _text_corruption_ratio(text: str) -> float:
     """PDF 텍스트층 깨짐률. replacement/control 문자가 과하면 상세 추출은 degrade."""
     if not text:
@@ -911,7 +929,7 @@ def _extract_483_observations_from_text(
         chunk = _clean_observation_chunk(body[start:end])
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
-        if not deficiency:
+        if not _is_legible_deficiency(deficiency):
             continue
         clean_detail = _clean_observation_detail(detail)
         clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)

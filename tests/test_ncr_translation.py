@@ -201,13 +201,17 @@ class Fda483OcrProvenanceTest(unittest.TestCase):
     """
 
     def test_scaffold_marks_ocr_derived_observations(self):
-        raw = {"fda_483_observations": [{"number": "1", "deficiency": "X", "detail": ""}],
+        raw = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Aseptic processing areas are deficient.",
+             "detail": ""}],
                "fda483_text_status": "pdf-ok-ocr"}
         self.assertEqual(cs._detail_fda_483_observations({}, raw).get("text_source"), "ocr")
 
     def test_scaffold_leaves_native_text_unlabelled(self):
         """기존 카드(텍스트층 산출)는 키 미추가 — 골든 바이트 불변(additive)."""
-        raw = {"fda_483_observations": [{"number": "1", "deficiency": "X", "detail": ""}],
+        raw = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Aseptic processing areas are deficient.",
+             "detail": ""}],
                "fda483_text_status": "pdf-ok"}
         self.assertNotIn("text_source", cs._detail_fda_483_observations({}, raw))
 

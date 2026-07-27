@@ -711,11 +711,19 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
     norm = [o for o in norm if o["deficiency"]]
     if not norm:
         return None
-    return {
+    detail: dict[str, Any] = {
         "type": "fda_483_observations",
         "count": len(norm),
         "observations": norm,
     }
+    # [OCR 출처 표기 2026-07-27] 이 영문이 **원문 텍스트층**인지 **우리가 OCR 로 판독한 것**
+    # 인지 구분한다. 스캔 483 OCR 폴백 도입 이후 두 경로가 섞이는데, 렌더는 이 블록을
+    # "원문 · FDA 483" 이라고 표시한다 — 우리 판독 결과를 원문이라고 부르면 그건 거짓이다
+    # (OCR 은 오인식이 있고 실제로 관찰됐다). 판독물임을 라벨에서 밝힌다.
+    # `pdf-ok-ocr` 이 아닌 기존 카드는 키 미추가 → 골든 바이트 불변(additive).
+    if str(raw.get("fda483_text_status") or "").split(":", 1)[0] == "pdf-ok-ocr":
+        detail["text_source"] = "ocr"
+    return detail
 
 
 def _detail_wl_violations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:

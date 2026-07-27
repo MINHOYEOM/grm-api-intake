@@ -192,6 +192,51 @@ class MergeNcrTranslationsTest(unittest.TestCase):
         self.assertFalse(rep.errors)
 
 
+class Fda483OcrProvenanceTest(unittest.TestCase):
+    """[OCR 출처 표기 2026-07-27] 우리가 OCR 로 판독한 영문을 "원문"이라고 부르지 않는다.
+
+    스캔 483 OCR 폴백이 들어오면서 관찰 블록의 영문이 두 출처로 갈렸다 — 원문 텍스트층과
+    우리 판독물. 렌더는 이 블록을 "원문 · FDA 483" 이라고 표시하는데, 판독물에 그 라벨을
+    달면 거짓이다(OCR 오인식이 실측됐다). `text_source` 로 갈라 표기한다.
+    """
+
+    def test_scaffold_marks_ocr_derived_observations(self):
+        raw = {"fda_483_observations": [{"number": "1", "deficiency": "X", "detail": ""}],
+               "fda483_text_status": "pdf-ok-ocr"}
+        self.assertEqual(cs._detail_fda_483_observations({}, raw).get("text_source"), "ocr")
+
+    def test_scaffold_leaves_native_text_unlabelled(self):
+        """기존 카드(텍스트층 산출)는 키 미추가 — 골든 바이트 불변(additive)."""
+        raw = {"fda_483_observations": [{"number": "1", "deficiency": "X", "detail": ""}],
+               "fda483_text_status": "pdf-ok"}
+        self.assertNotIn("text_source", cs._detail_fda_483_observations({}, raw))
+
+    def test_assembly_refresh_carries_provenance(self):
+        import assemble_publish_brief as apb
+        brief = {"cards": [{"id": "fda483-1"}]}
+        report = apb.AssembleReport()
+        apb._refresh_483_observations(
+            brief,
+            {"fda483-1": {"source_text": "OBSERVATION 1\nAseptic failure.\n"
+                                         "Specifically, first air was blocked.",
+                          "source_text_status": "pdf-ok-ocr"}},
+            report)
+        dd = brief["cards"][0]["deterministic_detail"]
+        self.assertEqual(dd["type"], "fda_483_observations")
+        self.assertEqual(dd["text_source"], "ocr")
+
+    def test_assembly_refresh_without_status_stays_unlabelled(self):
+        """출처 표기가 없는 옛 델타는 종전대로 — 원문 텍스트층 가정(무회귀)."""
+        import assemble_publish_brief as apb
+        brief = {"cards": [{"id": "fda483-1"}]}
+        apb._refresh_483_observations(
+            brief,
+            {"fda483-1": {"source_text": "OBSERVATION 1\nAseptic failure.\n"
+                                         "Specifically, first air was blocked."}},
+            apb.AssembleReport())
+        self.assertNotIn("text_source", brief["cards"][0]["deterministic_detail"])
+
+
 class DeltaBridgeTranslationPassthroughTest(unittest.TestCase):
     """번역 전용 항목이 심층분석 근거 게이트에 걸려 조용히 사라지지 않는다.
 

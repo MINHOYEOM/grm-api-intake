@@ -321,6 +321,51 @@ def _whopir_cut(text: str, limit: int) -> str:
     return (cut[:p + 1] if p > limit * 0.5 else cut.rstrip()) + " …"
 
 
+# 페이지 푸터 블록 — PDF 평탄화가 매 쪽 하단을 본문 한가운데로 밀어 넣는다(실측 Zhejiang
+# 항목 11·15 가 "20, AVENUE APPIA … Page 10 of 14" 로 시작했다). 주소줄부터 쪽번호까지를
+# 한 덩어리로 지운다 — 사이의 러닝헤더(업체명+실사일)까지 함께 사라진다. 줄 구조를 보존해야
+# 표제 판별의 "빈 줄" 신호가 살아남으므로 빈 줄로 치환한다.
+# 상한 800자 = 가장 긴 실측 변형(Ecron: 주소줄+러닝헤더+실사일+140자 구분선+고지 3줄+쪽번호
+# ≈ 435자)에 여유를 둔 값. 페이지 사이 간격이 2,000자 이상이라 다음 푸터까지 번지지 않는다.
+_WHOPIR_FOOTER_RE = re.compile(
+    r"20,\s*AVENUE\s+APPIA.{0,800}?Page\s+\d+\s+of\s+\d+"
+    r"(?:\s*Client\s+Confidential)?", re.S | re.I)
+_WHOPIR_AUTH_STOP = {"not specified", "not applicable", "not stated", "none", "n/a", "-"}
+_WHOPIR_AUTH_MAX_LINES = 6
+_WHOPIR_AUTH_MAX_CHARS = 80
+
+
+def _whopir_authority_before(pre: str) -> str:
+    """Part 2 표에서 `Dates of inspection` **바로 앞 셀**의 실사기관명을 복원.
+
+    PDF 평탄화가 표 셀을 여러 줄로 쪼개 놓아서(`Korean`/`Ministry of`/`Food and Drug`/
+    `Safety (MFDS`/`Korea)`) 단순 슬라이스로는 앞 행의 답변 문장 꼬리까지 딸려온다 —
+    실제로 첫 구현이 `"t to last) and comments Dutch Health…"` 같은 값을 냈다(2026-07-27
+    실측). 그래서 **뒤에서 앞으로** 줄을 모으되 기관명이 아닌 줄에서 멈춘다:
+      · 소문자로 시작 = 앞 문장의 이어짐(`facility, was not covered)`)
+      · 마침표로 끝남 = 완결된 산문
+      · 고정 답변 토큰(`Not specified` 등)
+    못 읽으면 빈 문자열 — 호출부가 그 항목을 통째로 버린다(쓰레기 기관명을 싣느니 뺀다).
+    """
+    lines = [ln.strip() for ln in pre.split("\n")]
+    out: list[str] = []
+    for ln in reversed(lines):
+        if not ln:
+            if out:                                   # 셀 사이 빈 줄 = 경계
+                break
+            continue                                  # 값 앞의 빈 줄은 건너뛴다
+        if ln.lower().rstrip(":") in _WHOPIR_AUTH_STOP or ln.endswith("."):
+            break
+        core = ln.lstrip("(").strip()
+        if not core or not core[0].isupper():
+            break
+        out.append(ln)
+        if len(out) >= _WHOPIR_AUTH_MAX_LINES:
+            break
+    auth = _whopir_squeeze(" ".join(reversed(out)))
+    return auth if 0 < len(auth) <= _WHOPIR_AUTH_MAX_CHARS else ""
+
+
 def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     """WHOPIR PDF 평탄화 텍스트 → 구조화 상세(순수 함수·LLM 0). 실패 시 None.
 
@@ -331,7 +376,7 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     Part 2/Part 3 경계를 못 찾으면 None — 호출부가 키를 안 쓰고 링크 카드로 유지한다
     (구조를 못 읽었으면 읽은 척하지 않는다).
     """
-    t = text or ""
+    t = _WHOPIR_FOOTER_RE.sub("\n\n", text or "")
     m2 = _WHOPIR_PART2_RE.search(t)
     m3 = _WHOPIR_PART3_RE.search(t, m2.end()) if m2 else None
     if not (m2 and m3):
@@ -375,9 +420,12 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
             if seg:
                 sections.append({"no": str(n), "title": title, "text": seg})
     else:
-        for m in _WHOPIR_DATES_RE.finditer(body):
-            pre = _whopir_squeeze(body[max(0, m.start() - 260):m.start()])
-            auth = pre.split("  ")[-1][-70:].strip()
+        head = _WHOPIR_RELIANCE_RE.search(body)
+        scope = body[head.end():] if head else body   # 표 머리글 제거(표제 오인 차단)
+        for m in _WHOPIR_DATES_RE.finditer(scope):
+            auth = _whopir_authority_before(scope[:m.start()])
+            if not auth:
+                continue                              # 못 읽으면 안 싣는다(쓰레기 기관명 금지)
             reliance.append({"authority": auth, "dates": _whopir_squeeze(m.group(1))})
 
     if not (outcome or sections or reliance):

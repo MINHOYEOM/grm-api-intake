@@ -200,7 +200,12 @@ def _detail_preview(dd: dict[str, Any] | None) -> str:
 # 여기서 하는 일은 **표현층 분해뿐**이다 — 데이터(JSON)는 verbatim 그대로 두고, 렌더가
 # 원문에 실재하는 마커에서만 끊는다. 마커가 없으면 끊지 않는다(구조를 지어내지 않는다).
 # 영문 원문과 국문 번역에 같은 함수를 쓰므로 두 열의 항목 수가 어긋나지 않는다.
-_BULLET_SPLIT_RE = re.compile(r"\s*[•·]\s*")
+# `•` 는 명백한 불릿이지만 `·`(가운뎃점)는 아니다 — **한국어에서 `·` 는 낱말을 잇는 정상
+# 문장부호**다("책임·권한·상호관계", "제품·서비스"). 종전 규칙(`\s*[•·]\s*`)은 공백 없는
+# 가운뎃점까지 끊어서 국문 한 문장을 세 항목으로 찢었다(2026-07-27 라이브 실측). 그래서
+# `·` 는 **앞뒤가 공백일 때만** 불릿으로 본다 — 실제 불릿은 " · " 형태로 떨어져 나온다.
+_BULLET_SPLIT_RE = re.compile(r"\s*•\s*|\s+·\s+")
+_BULLET_MARK_RE = re.compile(r"•|\s·\s")
 # 문장 끝(또는 문두) 뒤에 오는 열거 마커. `A.` `B)` `1.` `2)` `a.` `i.` 를 잡되, 소수점
 # 숫자(`0.22 µm`)·약어(`No.`)를 끊지 않도록 **마커 뒤 공백**을 필수로 둔다.
 _ENUM_SPLIT_RE = re.compile(r"(?<=[.。:])\s+(?=(?:[A-Za-z]|[ivx]{1,4}|\d{1,2})[.)]\s)")
@@ -219,7 +224,7 @@ def split_detail_blocks(text: str) -> list[dict[str, Any]]:
         return []
     out: list[dict[str, Any]] = []
     # ① 불릿이 있으면 불릿 우선(불릿 앞 도입문은 문단으로 남긴다)
-    if "•" in s or "·" in s:
+    if _BULLET_MARK_RE.search(s):
         parts = [p.strip() for p in _BULLET_SPLIT_RE.split(s)]
         head, items = parts[0], [p for p in parts[1:] if p]
         if head:

@@ -6192,6 +6192,27 @@ class WebNewSourceRenderTest(unittest.TestCase):
         # 항목이 0개면 요약 라벨에 건수 힌트를 붙이지 않는다("항목 0" 같은 빈 약속 금지).
         self.assertIn("· 원문 기반 · WHO</span>", html)
 
+    def test_korean_middle_dot_is_not_a_bullet(self):
+        """[가운뎃점 2026-07-27] 한국어에서 `·` 는 낱말을 잇는 정상 문장부호다.
+
+        라이브 실측: WHOPIR 국문 "인원의 책임·권한·상호관계를 포함한 …" 이 세 항목으로
+        찢어졌다. 실제 불릿은 " · " 처럼 공백에 둘러싸여 나오므로 그때만 끊는다.
+        """
+        ko = "인원의 책임·권한·상호관계를 포함한 시험실 조직구조는 조직도에 표시돼 있었다."
+        self.assertEqual(render.split_detail_blocks(ko),
+                         [{"kind": "para", "text": ko}])
+        paren = "측정용 물질(표준물질·인증표준물질, 화학·생물학적 표준품)과 외부 서비스"
+        self.assertEqual(len(render.split_detail_blocks(paren)), 1)
+
+    def test_spaced_middle_dot_still_splits_as_bullet(self):
+        """공백에 둘러싸인 `·` 는 여전히 불릿 — EU NCR 원문의 실제 마커."""
+        blocks = render.split_detail_blocks(
+            "The site was organized into 3 sections: · Chemical Analysis "
+            "· Microbiological Analysis · IVD Testing")
+        self.assertEqual([b["kind"] for b in blocks],
+                         ["para", "item", "item", "item"])
+        self.assertEqual(blocks[1]["text"], "Chemical Analysis")
+
     def test_new_sources_reach_search_index(self):
         """세 소스 전부 검색 인덱스에 편입된다(발행은 됐는데 검색에서 사라지는 것 방지)."""
         out, _ = self._render()

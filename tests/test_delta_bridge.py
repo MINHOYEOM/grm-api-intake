@@ -382,5 +382,80 @@ class MainIntegrationTest(unittest.TestCase):
         self.assertFalse(os.path.exists("web/data/deltas"))
 
 
+class NormalizeCardKeyNamespaceTest(unittest.TestCase):
+    """[2026-07-27] `Source::document_id` 키 회귀 자동 정규화.
+
+    2026-07-13·07-27 두 번, Routine 이 handoff 의 `card_id`(=`source::document_id`)를 델타
+    키로 예치해 발행이 전건 거부됐다(07-27 = 103장). 두 번 다 사람이 **완전히 동일한**
+    순수 rename 패치를 손으로 만들어 수습했다. `::` 는 정상 카드 id 에 없으므로(전 발행본+
+    스캐폴드 371개 중 0개) 접두사 유무만으로 회귀를 확정할 수 있고 변환은 무손실이다.
+    """
+
+    def _delta(self, cards):
+        return {"publish_date": "2026-07-27", "tldr": ["a", "b", "c"], "cards": cards}
+
+    def test_prefixed_keys_are_normalized(self):
+        d = self._delta({"FDA 483::fda483-193813": {"summary": "s"},
+                         "MFDS::admin-2026002715": {"summary": "t"}})
+        n = db.normalize_card_key_namespace(d)
+        self.assertEqual(n, 2)
+        self.assertEqual(set(d["cards"]), {"fda483-193813", "admin-2026002715"})
+
+    def test_clean_delta_untouched(self):
+        d = self._delta({"fda483-193813": {"summary": "s"}})
+        before = dict(d["cards"])
+        self.assertEqual(db.normalize_card_key_namespace(d), 0)
+        self.assertEqual(d["cards"], before)
+
+    def test_slash_and_space_ids_are_not_touched(self):
+        """MHRA NCR id 처럼 공백·슬래시가 있어도 `::` 가 없으면 정상 id 다."""
+        d = self._delta({"Insp GMP 52165/19076958-0001": {"summary": "s"}})
+        self.assertEqual(db.normalize_card_key_namespace(d), 0)
+        self.assertIn("Insp GMP 52165/19076958-0001", d["cards"])
+
+    def test_deep_delta_keys_follow(self):
+        """deep 델타를 같이 안 고치면 심층분석이 조용히 유실된다."""
+        d = self._delta({"FDA 483::fda483-193813": {"summary": "s"}})
+        deep = {"FDA 483::fda483-193813": {"deep_analysis": {}, "source_text": "x"}}
+        db.normalize_card_key_namespace(d, deep)
+        self.assertEqual(set(deep), {"fda483-193813"})
+
+    def test_collision_aborts_normalization(self):
+        """접두사 제거 시 충돌하면 **아무것도 고치지 않는다**(무손실 보장 안 되면 포기)."""
+        d = self._delta({"FDA 483::x1": {"summary": "a"}, "MFDS::x1": {"summary": "b"}})
+        self.assertEqual(db.normalize_card_key_namespace(d), 0)
+        self.assertEqual(set(d["cards"]), {"FDA 483::x1", "MFDS::x1"})
+
+    def test_collision_with_existing_bare_key_aborts(self):
+        d = self._delta({"FDA 483::x1": {"summary": "a"}, "x1": {"summary": "b"}})
+        self.assertEqual(db.normalize_card_key_namespace(d), 0)
+
+
+class HandoffWebCardIdTest(unittest.TestCase):
+    """[2026-07-27] handoff row 가 모호하지 않은 `web_card_id`(=bare document_id)를 노출한다.
+
+    `card_id` 는 `source::document_id` 라 델타 키로 쓰면 발행이 거부된다. 이름만으로
+    구분되게 같은 값을 별도 필드로 한 번 더 낸다(프롬프트가 이 필드명을 그대로 지시).
+    """
+
+    def test_web_card_id_is_bare_document_id(self):
+        import collect_intake as ci
+        from datetime import date, datetime
+        rows = [{
+            "source": "FDA Warning Letter", "document_id": "WL-CMS-660124",
+            "date": "2026-05-20", "type_or_class": "CDER", "firm": "Acme",
+            "headline": "CGMP", "page_id": "p1", "signal_tier": "Tier 3",
+            "modality": "Chemical", "language": "", "raw_fetch_ok": True,
+            "raw": {"firm": "Acme", "subject": "CGMP"},
+        }]
+        payload = ci.build_routine_handoff_payload_v2(
+            rows, date(2026, 6, 5), 7, datetime(2026, 6, 5, 3, 17))
+        row = payload["rows"][0]
+        self.assertEqual(row["web_card_id"], "WL-CMS-660124")
+        # 두 필드가 나란히 있고 **서로 다르다** — 이름으로 구분해야 한다는 사실 자체를 고정.
+        self.assertEqual(row["card_id"], "FDA Warning Letter::WL-CMS-660124")
+        self.assertNotEqual(row["web_card_id"], row["card_id"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

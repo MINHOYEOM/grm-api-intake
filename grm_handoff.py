@@ -607,6 +607,13 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
             v2row["merged_into"] = card.merged_into
         else:
             v2row["card_id"] = card.card_id
+            # [키 회귀 근원 수리 2026-07-27] `card_id` 는 `source::document_id` 인데 발행
+            # 델타의 카드 키는 **bare document_id** 여야 한다. 이름이 `card_id` 라 Routine 이
+            # 눈앞의 그 값을 델타 키로 쓰는 독법이 자연스럽고(프롬프트의 `card.id` 도 모호),
+            # 실제로 2026-07-13·07-27 두 번 그렇게 예치돼 발행이 전건 거부됐다.
+            # 모호하지 않은 이름으로 **같은 값을 한 번 더** 노출한다 — 프롬프트가 이 필드명을
+            # 그대로 지시하면 해석의 여지가 없다(값 중복 비용 = row 당 수십 바이트).
+            v2row["web_card_id"] = row.get("document_id", "")
             v2row["section"] = card.section
             v2row["evidence"] = card.evidence
             v2row["card_scaffold"] = card.markdown

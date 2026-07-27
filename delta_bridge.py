@@ -218,6 +218,63 @@ def _validate_deep(obj: Any) -> dict[str, Any]:
     return obj
 
 
+def normalize_card_key_namespace(delta: dict[str, Any],
+                                 deep: "dict[str, Any] | None" = None) -> int:
+    """델타 카드 키가 `Source::document_id` 로 예치됐으면 bare `document_id` 로 되돌린다.
+
+    **왜 자동 교정하나(조립 게이트와 다른 판단).** 2026-07-13·07-27 두 번, Routine 이 카드
+    키를 handoff 의 `card_id`(=`source::document_id`) 형식으로 예치해 발행이 전건 거부됐고
+    (07-27 은 103장) 그때마다 사람이 순수 rename 데이터 패치를 손으로 만들어 머지했다.
+    두 번 다 결과는 **완전히 동일한 결정론적 변환**이었다.
+
+    안전 근거 — `::` 는 정상 카드 id 에 **존재하지 않는다**: 전 발행본(06-22~07-27)+최신
+    스캐폴드 371개 id 중 `::` 포함 0개. 그래서 접두사 유무만으로 회귀를 확정할 수 있고,
+    변환은 무손실이다(충돌 시 아무것도 안 고치고 그대로 둔다 — 아래).
+
+    `assemble_publish_brief` 의 ghost 게이트는 계속 **거부**한다(자동 교정 안 함) — 그쪽은
+    발행 직전 최후 관문이라 조용히 고치면 회귀가 영영 안 보인다. 반면 브릿지는 외부 입력을
+    받아들이는 **수집 어댑터**라 정규화가 제 역할이고, 여기서 고치면 발행이 안 막힌다.
+    **조용히 고치지는 않는다** — WARN 로그로 건수·표본을 남기고, 호출측이 커밋 메시지·
+    step summary 에 실어 회귀 자체는 계속 보이게 한다.
+
+    Returns: 정규화한 카드 수(0 = 정상 예치).
+    """
+    cards = delta.get("cards")
+    if not isinstance(cards, dict) or not cards:
+        return 0
+    prefixed = [k for k in cards if isinstance(k, str) and "::" in k]
+    if not prefixed:
+        return 0
+
+    renamed = {k: k.split("::", 1)[1] for k in prefixed}
+    # 접두사를 뗀 뒤 서로 충돌하거나 기존 bare 키와 부딪히면 **아무것도 손대지 않는다**
+    # (무손실이 보장되지 않는 변환은 하지 않는다 — 조립 게이트가 거부하게 둔다).
+    survivors = [k for k in cards if k not in renamed]
+    new_ids = list(renamed.values())
+    if len(set(new_ids)) != len(new_ids) or set(new_ids) & set(survivors):
+        log("WARN", "카드 키 네임스페이스 회귀 감지 — 그러나 접두사 제거 시 id 충돌이 "
+                    "발생해 자동 정규화를 포기한다(조립 게이트가 거부할 것).")
+        return 0
+
+    delta["cards"] = {renamed.get(k, k): v for k, v in cards.items()}
+    if isinstance(deep, dict):
+        # deep 델타도 같은 키 공간이라 함께 맞춘다(안 맞추면 심층분석이 조용히 유실된다).
+        deep_renamed = {k: (k.split("::", 1)[1] if isinstance(k, str) and "::" in k else k)
+                        for k in deep}
+        if len(set(deep_renamed.values())) == len(deep):
+            for old, new in list(deep_renamed.items()):
+                if old != new:
+                    deep[new] = deep.pop(old)
+
+    sample = ", ".join(f"{k} → {renamed[k]}" for k in prefixed[:3])
+    log("WARN", f"카드 키 네임스페이스 회귀 자동 정규화 {len(prefixed)}건 "
+                f"(Source::document_id → document_id): {sample}"
+                + (" …" if len(prefixed) > 3 else ""))
+    log("WARN", "원인 = Routine 이 handoff 의 `card_id`(source::document_id)를 델타 키로 "
+                "썼다. 정본은 `web_card_id`(=bare document_id) — 프롬프트 §B [출력] 참조.")
+    return len(prefixed)
+
+
 def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
     """deep 델타 각 카드를 `verify_deep_analysis` 게이트에 통과시켜 **PASS 만** 남긴다.
 
@@ -323,6 +380,8 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
     if not isinstance(publish_date, str) or not _DATE_RE.match(publish_date):
         raise DeltaBridgeError(
             f"publish_date 형식 오류: {publish_date!r} — ^\\d{{4}}-\\d{{2}}-\\d{{2}}$ 필요")
+
+    normalize_card_key_namespace(delta, deep)
 
     if inject_slots is not None:
         try:

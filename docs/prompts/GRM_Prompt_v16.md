@@ -13,7 +13,7 @@
 > **출처 링크 변형 방지(2026-06-22, Publish Lint 17 보강)**: Intake footer 의 📰/📎 URL 은 scaffold 문자열을 글자 그대로 전사한다. 영문 slug 를 문법적으로 보정하지 않고, MFDS/nedrug L1 을 `mfds.go.kr/brd/*/view.do` 게시판 URL 로 재구성하지 않는다. 실제 강제선은 `brief_lint`/`verify_published_brief` 의 scaffold footer integrity + all-domain provenance audit 이며, 본 문구는 MCP 전용 세션의 보조 가드다.
 > **scaffold 고정 셀 전사(2026-06-22, [핵심 원칙] 1·2 보강 = Publish Lint 18/19)**: W2 표의 **identity 셀**(FEI·문서번호·시설유형·Class·제품·업체)은 전 소스 글자 그대로 전사 — 재생성·추론·삭제·단정 보강 금지(양방향: 과억제 삭제도 과생성도 금지). **날짜 셀은 소스별**: FDA 483·MFDS 행정처분 발행일/처분일/실사일은 정본이라 verbatim, FDA WL·FR·ECA·HC 발행일은 수집일 placeholder→WebSearch enrich 정상. Evidence 집계 헤더(`A {N}/B {N}/C {N}`)는 실제 카드 배지 수와 일치시킨다. 실제 강제선 = `brief_lint.lint_scaffold_fixed_cells`(PL18 — identity 전 소스 + 483/admin 날짜·카드영역 한정)·`lint_publish_structure` Evidence 집계(PL19) + 발행 후 `verify_published_brief`(06-22 FDA 483 FEI·시설유형/Lancora Class/admin 처분일/Evidence 집계 사고, 실데이터 FP 0/TP 8).
 > **웹 이관 — LLM 출력 grm-web-card/v1 JSON 슬롯 전환(2026-06-26, §B 전반 — 헤드리스 정리)**: routine 의 LLM 산문 단계를 "Notion 마크업 토큰(`{{W1}}`·`{{W5}}` 등) 치환"에서 "**`grm-web-card/v1` JSON 슬롯 채움**"으로 개정 — LLM 출력 = 카드별 `title_issue`·`summary`·`key_facts[]`·`implication`·`checks[]`·(비KO)`quotes[].translation` + 브리프 `tldr[]` **값만**(코드가 슬롯에 주입), 마크업·표·링크·정렬·섹션·고정 블록 산출 제거(코드·렌더러 담당). 가드 4종 유지: 사실/숫자/URL/업체명/문서번호/날짜/기관 **신규 생성 금지(양방향)**·facts/quotes **인용**·KO 원문 `translation=null`·길이(§13.1-12 W5 3/max4·W7 2~3·W6 2문장·tldr 3). 코드 verbatim 필드(facts·quotes[].original·sources·headline_target·배지·render_order/group)는 LLM 불가침. v1 미포함분(신규 검색 카드·🔮 Watch·M2/M3 운영 메타)은 본문 산출 제외 → v1.1 `watch[]`/run-log deferred(은닉 삭제 아님). 데이터 수명주기(handoff 0단계·Tier·불건 불변식·PL-10/10b 멱등성·Status 갱신·링크 근거)는 JSON 맥락으로 유지. 출력=`grm-web-card/v1` 브리프 JSON → `web/data/briefs/`(D5 미리보기 사람 승인 후 라이브). 기준=`grm-web-card/v1` 동결(`GRM_웹이관_결정+실행계획_2026-06-24.md` §4)·P1 §3.8·`GRM_card_spec_v16.md` §9·§13.1-12. **코드·card_scaffold·골든·렌더러·web 불변**(프롬프트 doc만 변경). branch `feat/v16-json-slot-contract-2026-06-26`. Codex 프롬프트 검토·사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 운영 미반영).
-> **출력 envelope 명시(2026-06-26 재작업, §B [출력]·[2단계]·[한국어 번역]·[자가 점검]·[산출물] 만)**: 위 전환에서 슬롯을 나열만 하고 LLM 산출 **형태**를 못박지 않은 갭을 보완 — [출력] 을 순수 JSON 델타 `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}` 로 명시(렌더 후보만 키·`needs_llm_slots` 슬롯만·`cards`/`tldr` 밖 키 금지) + 형태 고정용 예시 카드 1장 동봉, 출력 번역 슬롯을 `quotes[j].translation`→**`quotes_translation` 평문 배열**(positional·KO=`null`)로 통일. 슬롯 의미·가드·수명주기 불변(모양만 추가). 코드·card_scaffold·골든·렌더러·web 불변.
+> **출력 envelope 명시(2026-06-26 재작업, §B [출력]·[2단계]·[한국어 번역]·[자가 점검]·[산출물] 만)**: 위 전환에서 슬롯을 나열만 하고 LLM 산출 **형태**를 못박지 않은 갭을 보완 — [출력] 을 순수 JSON 델타 `{"cards":{"<web_card_id>":{...슬롯...}},"tldr":[...]}` 로 명시(렌더 후보만 키·`needs_llm_slots` 슬롯만·`cards`/`tldr` 밖 키 금지) + 형태 고정용 예시 카드 1장 동봉, 출력 번역 슬롯을 `quotes[j].translation`→**`quotes_translation` 평문 배열**(positional·KO=`null`)로 통일. 슬롯 의미·가드·수명주기 불변(모양만 추가). 코드·card_scaffold·골든·렌더러·web 불변.
 > F-1(Tier 1 프롬프트 생략)·F-2(Watch 비중복) 채택. `ENABLE_HANDOFF_V2=true`(2026-06-06)·매주 월 Routine 이 본 §B 사용.
 > 변경은 이 문서 + card_spec 갱신으로만. 직전 v15.8 은 archive/prompts-old 이관.
 > 기준: `GRM_card_spec_v16.md`(§12·§13.1·§14 동결) · `GRM_architecture_redesign.md`(M3) · handoff v2 스키마(K3 G1·G2 머지본, fork A안).
@@ -106,7 +106,7 @@ scaffold 가 만든 빈 슬롯 `grm-web-card/v1` 브리프에 `card.id` 로 주�
 출력 형태(이 envelope 를 그대로 따른다 — 평문 값·마크업 0):
 {
   "cards": {
-    "<card.id>": {
+    "<web_card_id>": {
       "title_issue": "...",
       "summary": "...",
       "key_facts": ["...", "..."],
@@ -119,7 +119,14 @@ scaffold 가 만든 빈 슬롯 `grm-web-card/v1` 브리프에 `card.id` 로 주�
 }
 
 envelope 규칙:
-· 카드 키 = 그 카드의 `card.id`(=`document_id`). **렌더 후보(대표/단독) 카드만** 키로 넣는다 —
+· 카드 키 = 그 handoff row 의 **`web_card_id` 필드 값을 글자 그대로** 쓴다(= `document_id` 와 같은 값).
+  ⛔ **`card_id` 를 쓰면 안 된다.** `card_id` 는 `Source::document_id` 형식이고(예:
+  `FDA 483::fda483-193813`), 그 형식으로 예치하면 발행 조립기가 **카드 전건을 거부**해 그 주
+  브리프가 아예 안 나간다(2026-07-13·2026-07-27 두 번 실제로 그렇게 막혔다 — 07-27 은 103장 전량).
+  두 필드가 같은 row 에 나란히 있으니 **이름으로 구분**한다: 키로 쓰는 것은 `web_card_id` 하나뿐이다.
+  올바른 예 `"fda483-193813"` · 잘못된 예 `"FDA 483::fda483-193813"`.
+  (혹시 `web_card_id` 가 없는 낡은 handoff 라면 `document_id` 를 쓴다 — `card_id` 는 어떤 경우에도 아니다.)
+  **렌더 후보(대표/단독) 카드만** 키로 넣는다 —
   병합 멤버(`merged_into`)·watch·Tier 1 생략 카드는 `cards` 에 넣지 않는다(코드가 렌더 대상이 아님).
 · 각 카드 객체엔 그 카드의 `needs_llm_slots` 에 있는 슬롯만 넣는다(필요 없는 슬롯 키는 생략 —
   예: KO·Evidence B/C 카드면 `quotes_translation` 키 자체를 넣지 않는다).
@@ -549,7 +556,8 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
   ③ 생성한 카드들을 **deep 델타 dict** 로 모은다 — 각 카드마다 반드시 `source_text` 에 **그 카드의
      `body_full` 원문을 그대로** 넣는다(브릿지가 이 `source_text` 로 인용 근거대조를 하므로, 빠지면
      그 카드는 근거 미검증으로 drop 된다):
-       `{"<card.id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
+       `{"<web_card_id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
+     (키는 6슬롯 델타와 **같은 키 공간** — `web_card_id` 그대로, `card_id` 금지. 위 [출력] envelope 규칙 동일)
      이 dict 를 [산출물 예치]의 **두 번째 코드 블록**(deep 델타)으로 예치한다(아래 예치 규약).
 브릿지 게이트에서 FAIL 한 카드는 심층분석 없이 6슬롯만으로 발행된다(카드 단위 graceful degrade —
 브리프는 안 막힌다). 이 단계는 6슬롯 산출물·규칙을 전혀 바꾸지 않는다(순수 additive).
@@ -585,7 +593,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
   - 본문에 **코드 블록 1개**로 네 [산출물] 슬롯 델타 JSON 을 그대로 붙여넣는다(형태 불변 —
     `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}`, `publish_date` 키를 최상위에 추가해도 무방).
   - [2단계] 심층분석(deep_analysis)을 수행했다면, **같은 페이지에 두 번째 코드 블록**으로
-    `{"<card.id>":{"deep_analysis":{...4섹션...},"source_text":"..."}}` 델타를 추가로 붙인다
+    `{"<web_card_id>":{"deep_analysis":{...4섹션...},"source_text":"..."}}` 델타를 추가로 붙인다
     (별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
     심층분석이 없으면(대다수 주) 이 블록은 생략 — 정상.
   - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
@@ -616,6 +624,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 ### 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-07-27 | **델타 카드 키를 `web_card_id` 로 명시(§B [출력] envelope 규칙·예시·[2단계] deep 키·[산출물 예치] 표기만 · 6슬롯 규칙·코드 불변)**: 카드 키 회귀가 2026-07-13·07-27 **두 번** 발생해 발행이 전건 거부됐다(07-27 = 103장 전량, 사람이 순수 rename 패치로 수습). 원인은 Routine 의 실수가 아니라 **명명 충돌**이다 — handoff row 에 `card_id` 라는 필드가 있고 그 값이 `Source::document_id`(예: `FDA 483::fda483-193813`)인데, 프롬프트는 "카드 키 = `card.id`(=`document_id`)"라고만 적어 눈앞의 `card_id` 를 쓰는 독법이 자연스러웠다. 수리 = handoff 가 **모호하지 않은 `web_card_id`(=bare document_id)를 별도 필드로 노출**하고(코드), 프롬프트가 **그 필드명을 그대로 지시**한다 + `card_id` 금지를 예시와 함께 명시. 안전망으로 델타 브릿지가 `::` 접두사 키를 자동 정규화(무손실·충돌 시 포기·WARN 로그로 회귀 가시화)하므로, 이 프롬프트 반영 전에도 발행은 막히지 않는다. 순수 doc 문구 — 슬롯 의미·가드·수명주기 불변. **사람 운영 routine 재-붙여넣기 후 적용**. |
 | 2026-07-25 | **483 `observations_ko` 를 `(선택)`→`★필수` 로 정정(§B `[2단계]` FDA 483 스키마 줄만 · 6슬롯·[출력]·코드·골든 불변)**: 2026-07-14 에 `render.py` fail-closed 발행 게이트(`validate_483_observations`)가 배포되면서 이 필드는 **사실상 필수**가 됐고 483 정본 프롬프트(`GRM_Prompt_DeepFda483_v1.md` §2)도 "필수·게이트 검증 대상"으로 고쳐졌으나, **클라우드 Routine 이 실제로 실행하는 이 v16 프롬프트만 `(선택)` 인 채 남아 있었다** — 2026-07-20 주간발행 3중 차단 중 하나(deep 백필이 분석 4섹션만 만들어 관찰 번역 누락 → 그 주 브리프 전체 발행 차단)의 잔여 원인. 2026-07-25 발행 리허설에서 재현 확인(관찰 20건 누락 시 사이트 빌드 전체 FAIL). 정정 내용 = 스키마 표기 `★필수` + 두 게이트(`render.py` 배포 fail-closed · `assemble_publish_brief._lint_483_observation_ko` 조립 선행)가 **카드 단위 degrade 가 아니라 브리프 단위 차단**임을 명시 + 형식(`number` 1:1 매칭 `[{number,deficiency_ko,detail_ko}]`) + **4섹션이 D1/D2 로 drop 돼도 `observations_ko` 는 별도 층으로 병합되므로 분석이 자신 없어도 관찰 번역은 반드시 채울 것** 명시. 순수 doc 문구 — 코드·테스트·골든 불변. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영). |
 | 2026-06-05 | G3 초안 작성(Cowork). 카드별 6슬롯 루프 + A안 조립(render_order/group_label) + 검색 카드 미니 템플릿 + 🔮 표 비카드 전용 + K4 경계 고지. 검색/Fetch 기계는 v15.8 이관. Codex 판정 플래그 F-1(Tier 1 생략)·F-2(Watch 비중복) |
 | 2026-06-05 | **동결** — Codex G3 조건부 GO 반영: P1 PL-10b 대조 키 `source`+`document_id`(0단계 표에 source 포함), P2 검색 카드 Signal 라벨 `Signal Med (T2)`(scaffold 동형), P2 `status_hint='Error'` 최종 Status 우선 명시. F-1·F-2 초안 채택 확정, card_spec §6 문구 정정 동반(P3) |

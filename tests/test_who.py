@@ -264,7 +264,7 @@ class WhopirFetchExcerptTest(unittest.TestCase):
     def test_fetch_uses_pdf_engine_and_returns_ok(self) -> None:
         orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
         w.http_get_bytes = lambda url, **kw: b"%PDF-1.7 fake"
-        g._extract_pdf_text = lambda data: (_WHOPIR_TEXT, "pdf-ok")
+        g._extract_pdf_text = lambda data, **kw: (_WHOPIR_TEXT, "pdf-ok")
         try:
             excerpt, status = w._fetch_whopir_excerpt("https://x/whopir-z.pdf")
         finally:
@@ -290,7 +290,7 @@ class WhopirFetchExcerptTest(unittest.TestCase):
         # 암호화/스캔본 등 본문 부재 → PDF 엔진 status 그대로(키 미기록 신호).
         orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
         w.http_get_bytes = lambda url, **kw: b"%PDF-1.7 fake"
-        g._extract_pdf_text = lambda data: ("", "pdf-encrypted")
+        g._extract_pdf_text = lambda data, **kw: ("", "pdf-encrypted")
         try:
             excerpt, status = w._fetch_whopir_excerpt("https://x/whopir-z.pdf")
         finally:
@@ -303,18 +303,18 @@ class WhopirCollectExcerptGateTest(unittest.TestCase):
     """_collect_whopir — flag on/off · excerpt 기록 · graceful degrade · health."""
 
     def _run(self, fetch_stub):
-        orig_fetch, orig_delay = w._fetch_whopir_excerpt, w.WHOPIR_EXCERPT_DELAY_SECONDS
-        w._fetch_whopir_excerpt = fetch_stub
+        orig_fetch, orig_delay = w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS
+        w._fetch_whopir_detail = fetch_stub
         w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
         try:
             with _Patched(_WHOPIR_HTML):
                 return w._collect_whopir(RUN)
         finally:
-            w._fetch_whopir_excerpt, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
+            w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
 
     def test_flag_on_writes_excerpt_to_raw_payload(self) -> None:
         with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
-            items, err = self._run(lambda url: ("Summary of the deficiencies …", "ok"))
+            items, err = self._run(lambda url: ("Summary of the deficiencies …", None, "ok"))
         self.assertIsNone(err)
         self.assertEqual(len(items), 2)
         for it in items:
@@ -325,7 +325,7 @@ class WhopirCollectExcerptGateTest(unittest.TestCase):
 
     def test_flag_on_failure_is_graceful_key_omitted_item_kept(self) -> None:
         with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
-            items, err = self._run(lambda url: ("", "fetch-fail:boom"))
+            items, err = self._run(lambda url: ("", None, "fetch-fail:boom"))
         self.assertIsNone(err)
         self.assertEqual(len(items), 2)                 # 항목은 링크 카드로 유지
         for it in items:
@@ -343,6 +343,167 @@ class WhopirCollectExcerptGateTest(unittest.TestCase):
         for it in items:
             self.assertNotIn("whopir_excerpt", it.raw_payload)
         self.assertFalse(w.LAST_HEALTH["whopir_excerpt"]["enabled"])
+
+
+# ── [WHOPIR 구조화 2026-07-27] extract_whopir_report ─────────────────────────
+# WHOPIR PDF 는 [Part 2 활동범위·항목별 요약 → Part 3 결론] 구조다. 종전엔 링크와
+# 1,500자 excerpt 만 실려 이 구조가 통째로 유실됐다(2026-07-27 사용자 지적).
+def _whopir_findings_text(n_sections: int = 3, noise: bool = False) -> str:
+    """실측 WHOPIR 형태의 합성 원문 — 항목 표제는 **빈 줄 뒤 `번호. 제목`** 한 줄."""
+    head = "WHO Public Inspection Report\n\nPart 1  General information\n"
+    body = "\nPart 2  Summary of the inspection\n\nBrief summary of activities.\n"
+    if noise:
+        # 항목 본문 속 중첩 문서 목록(빈 줄 없음·뒤따르는 본문 없음) — 표제 오인 금지.
+        body += ("\nDocuments reviewed during the inspection: 1. SOP index "
+                 "2. WMS Validation PQ Report 3. Deviation log\n")
+    for i in range(1, n_sections + 1):
+        body += "\n%d. Section Title %d\n" % (i, i)
+        body += ("The inspection team reviewed this system in detail. " * 8) + "\n"
+    tail = ("\nPart 3  Conclusion - Inspection outcome\n"
+            "Based on the areas inspected, the manufacturer was considered to be "
+            "operating at an acceptable level of compliance with WHO GMP.\n"
+            "\nPart 4  Annexes\nAnnex material that must not leak into the outcome.\n")
+    return head + body + tail
+
+
+_WHOPIR_RELIANCE_TEXT = (
+    "WHO Public Inspection Report\n\nPart 1  General information\n"
+    "\nPart 2  Summary of the inspection\n"
+    "This report is based on SRA/NRA inspection evidence.\n"
+    "Inspecting authority   EDQM\nDates of\ninspection: 12-15 March 2025\n"
+    "Inspecting authority   US FDA\nDates of inspection: 3-7 June 2025\n"
+    "\nPart 3  Conclusion - Inspection outcome\n"
+    "Reliance was placed on the inspections listed above.\n"
+)
+
+
+class WhopirReportStructureTest(unittest.TestCase):
+    """extract_whopir_report — 순수 함수(LLM 0). 못 읽으면 None(읽은 척 금지)."""
+
+    def test_findings_report_yields_outcome_and_numbered_sections(self) -> None:
+        rep = w.extract_whopir_report(_whopir_findings_text(3))
+        self.assertIsNotNone(rep)
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "findings")
+        self.assertIn("acceptable level of compliance", rep["outcome"])
+        self.assertEqual([s["no"] for s in rep["sections"]], ["1", "2", "3"])
+        self.assertEqual(rep["sections"][1]["title"], "Section Title 2")
+        self.assertIn("reviewed this system", rep["sections"][1]["text"])
+
+    def test_part4_annex_does_not_leak_into_outcome(self) -> None:
+        rep = w.extract_whopir_report(_whopir_findings_text(2))
+        assert rep is not None
+        self.assertNotIn("must not leak", rep["outcome"])
+
+    def test_nested_document_list_is_not_mistaken_for_a_section(self) -> None:
+        # 실측 회귀(Tianjin): 본문 속 "4. WMS Validation PQ Report" 가 진짜 항목 4를
+        # 밀어냈다. 표제는 빈 줄이 앞서거나 본문이 길게 뒤따르는 후보만 인정한다.
+        rep = w.extract_whopir_report(_whopir_findings_text(3, noise=True))
+        assert rep is not None
+        titles = [s["title"] for s in rep["sections"]]
+        self.assertNotIn("WMS Validation PQ Report", titles)
+        self.assertEqual(titles,
+                         ["Section Title 1", "Section Title 2", "Section Title 3"])
+
+    def test_section_text_is_capped_with_ellipsis(self) -> None:
+        # 상한이 없으면 브리프 JSON 이 카드 1장당 수만 자씩 불어난다(실측 68,520자).
+        long_body = ("Part 2\n\n1. Long Section\n"
+                     + ("The team reviewed the system. " * 200)
+                     + "\n\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(long_body)
+        assert rep is not None
+        self.assertLessEqual(len(rep["sections"][0]["text"]),
+                             w.WHOPIR_SECTION_MAX_CHARS + 2)
+        self.assertTrue(rep["sections"][0]["text"].endswith("…"))
+
+    def test_reliance_report_lists_authorities_and_has_no_sections(self) -> None:
+        rep = w.extract_whopir_report(_WHOPIR_RELIANCE_TEXT)
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "reliance")
+        self.assertNotIn("sections", rep)
+        self.assertEqual(len(rep["reliance"]), 2)
+        self.assertEqual(rep["reliance"][0]["dates"], "12-15 March 2025")
+
+    def test_missing_part_boundaries_returns_none(self) -> None:
+        self.assertIsNone(w.extract_whopir_report("본문에 Part 경계가 없는 문서"))
+        self.assertIsNone(w.extract_whopir_report(""))
+
+
+class WhopirFetchDetailTest(unittest.TestCase):
+    """_fetch_whopir_detail — PDF 를 **한 번만** 받아 excerpt + 구조를 함께 낸다."""
+
+    def _run(self, text: str, status: str = "pdf-ok"):
+        orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
+        w.http_get_bytes = lambda url, **kw: b"%PDF-1.7 fake"
+        g._extract_pdf_text = lambda data, **kw: (text, status)
+        try:
+            return w._fetch_whopir_detail("https://x/whopir-a.pdf")
+        finally:
+            w.http_get_bytes, g._extract_pdf_text = orig_bytes, orig_extract
+
+    def test_returns_report_and_excerpt_from_single_fetch(self) -> None:
+        calls: list[str] = []
+        orig_bytes, orig_extract = w.http_get_bytes, g._extract_pdf_text
+
+        def _get(url, **kw):
+            calls.append(url)
+            return b"%PDF-1.7 fake"
+
+        w.http_get_bytes = _get
+        g._extract_pdf_text = lambda data, **kw: (_whopir_findings_text(2), "pdf-ok")
+        try:
+            excerpt, report, status = w._fetch_whopir_detail("https://x/a.pdf")
+        finally:
+            w.http_get_bytes, g._extract_pdf_text = orig_bytes, orig_extract
+        self.assertEqual(len(calls), 1)                 # PDF 는 한 번만 받는다
+        self.assertEqual(status, "ok")
+        assert report is not None
+        self.assertEqual(len(report["sections"]), 2)
+        self.assertTrue(excerpt)
+
+    def test_unstructured_pdf_keeps_excerpt_and_omits_report(self) -> None:
+        excerpt, report, status = self._run("Summary of the deficiencies: one item.")
+        self.assertIsNone(report)
+        self.assertTrue(excerpt.startswith("Summary of the deficiencies"))
+        self.assertEqual(status, "no-structure")
+
+    def test_engine_status_propagates_when_no_text(self) -> None:
+        excerpt, report, status = self._run("", "pdf-encrypted")
+        self.assertEqual((excerpt, report, status), ("", None, "pdf-encrypted"))
+
+
+class WhopirCollectStructuredTest(unittest.TestCase):
+    """_collect_whopir — 구조가 읽히면 raw_payload.whopir_report 로 싣는다."""
+
+    def _run(self, stub):
+        orig_fetch, orig_delay = w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS
+        w._fetch_whopir_detail = stub
+        w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
+        try:
+            with _Patched(_WHOPIR_HTML):
+                return w._collect_whopir(RUN)
+        finally:
+            w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
+
+    def test_structured_report_lands_in_raw_payload(self) -> None:
+        rep = {"type": "whopir_report", "report_kind": "findings",
+               "outcome": "acceptable", "sections": [{"no": "1", "title": "T", "text": "x"}]}
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
+            items, err = self._run(lambda url: ("excerpt", rep, "ok"))
+        self.assertIsNone(err)
+        for it in items:
+            self.assertEqual(it.raw_payload["whopir_report"], rep)
+        self.assertEqual(w.LAST_HEALTH["whopir_excerpt"]["structured"], 2)
+
+    def test_unstructured_pdf_keeps_card_without_report_key(self) -> None:
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
+            items, err = self._run(lambda url: ("excerpt", None, "no-structure"))
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 2)                  # 항목은 그대로 유지
+        for it in items:
+            self.assertNotIn("whopir_report", it.raw_payload)
+            self.assertEqual(it.raw_payload["whopir_excerpt"], "excerpt")
+        self.assertEqual(w.LAST_HEALTH["whopir_excerpt"]["structured"], 0)
 
 
 def _dummy_item(tag: str):

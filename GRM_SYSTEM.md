@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.163` |
+| 문서 버전 | `v1.164` |
 | 최종 수정일 | 2026-07-27 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 9카탈로그 400건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -185,7 +185,7 @@ flowchart TD
 | 7 | FDA Warning Letters | 웹 스크래핑 | 운영 (부서 노이즈 필터 적용) |
 | 8 | MFDS 식약처 (지침·고시·법령·안전성서한·행정처분·회수·GMP 실태조사·적합판정) | RSS + data.go.kr API + nedrug | 운영 (일부 opt-in) |
 | 9 | ICH (가이드라인·공개협의) | 스냅샷 + Routine 검색 | 활성 |
-| 10 | WHO Prequalification (WHOPIR 실사보고서 등) | RSS + Drupal | 활성 |
+| 10 | WHO Prequalification (WHOPIR 실사보고서 등) | RSS + Drupal + PDF **구조화 추출**(결론·항목별 요약) | 활성 |
 | 11 | Health Canada (약품 recall·safety) | 오픈데이터 JSON | 활성 |
 | 12 | FDA 483 (실사 Observation = 가장 깊은 결함 원본) | OII FOIA Reading Room(백본 3단: DataTables→전수 JSON→정적 HTML) + PDF(**스캔본 OCR 폴백**) | 활성 |
 | 13 | ISPE iSpeak (전문지 브리핑 — GMP/품질 관련 항목만 keep_item 필터) | RSS(Drupal) | Expert Secondary · `ENABLE_ISPE`(기본 off) |
@@ -199,6 +199,10 @@ flowchart TD
 > **소스 12 상세(FDA 483 PDF 텍스트 확보 — 스캔본 OCR 폴백, 2026-07-27):** FOIA 열람실 483 의 **대다수가 스캔 이미지**다(2026-07-26 실측: PDF 시도 40건 중 텍스트층이 온전한 것은 5건뿐). 그런데 그 스캔본에도 **마지막 장**에는 FDA 정형 고지문("The observations of objectionable conditions…" ≈1133자)이 텍스트로 들어 있어서, 문서 단위로 "텍스트가 하나라도 있으면 정상"이라고 보던 종전 판정이 스캔본 21건을 **정상 텍스트 PDF 로 오분류**했다. 그 결과 관찰 0건 → `fda483_body_full` 미보존 → deep 델타에 `source_text` 없음 → 조립 시점 재추출도 불가 → 디제스트가 "원문이 제공되지 않아"로 발행(원문은 공개돼 있는데도). **수리 = 페이지 단위 판정 + OCR 폴백**: `collect_fda_483._ocr_483_pdf_text` 가 텍스트 없는 페이지만 PyMuPDF 내장 OCR(`get_textpage_ocr`)로 읽고, 텍스트가 있는 페이지는 그대로 쓴다(읽을 수 있는 글자에 OCR 오인식을 덧씌우지 않는다). 새 파이썬 의존성 0 — tesseract 바이너리만 `grm-intake.yml` 이 설치한다(`ENABLE_FDA_483_OCR` **기본 on**, 엔진 부재 시 `scan-ocr-unavailable` 로 무해 degrade). 문서당 OCR 상한 30쪽.
 
 > **NCR 상세 국문 병기(2026-07-27):** 소스 14·15 의 "비준수 상세" 블록은 도입 이래 **영문 verbatim 만** 렌더했다(483·WL 에는 `deficiency_ko`/`statement_ko` 병기 층이 있는데 NCR 만 없었다 — 원인은 문구가 아니라 파이프라인 부재로, NCR kind 는 `deep_body_key` 가 없어 fan-out 대상 자체가 아니었다). **번역 전용 층을 신설**: `CardScaffold.translation_fields()` 가 `ncr_translation_ready`/`ncr_translation_input`(결정론 상세와 **같은 producer** 산출 — 짝 안 맞는 번역 불가능)을 handoff 에 싣고, Routine §B[2단계]④ 가 `ncr_ko` 를 예치하고, `inject_slots._merge_ncr_translations` 가 원문을 보존한 채 `*_ko` 를 얹는다. 심층분석과 **독립** — NCR 은 4섹션 분석 대상이 아니므로 근거 게이트를 태우지 않고 짝 맞춤만 검사한다. `_ko` 없는 카드는 기존대로 영문 단독(additive).
+
+> **소스 10 상세(WHOPIR 공개 실사보고서 구조화, 2026-07-27):** WHOPIR PDF 는 15~40쪽(실측 29K~90K자)에 **[Part 2 활동범위·항목별 요약(최대 22항목) → Part 3 결론(Inspection outcome)]** 으로 잘 정돈돼 있는데, 카드에는 링크와 1,500자 excerpt 만 실려 그 구조가 통째로 유실됐다(2026-07-27 사용자 지적). 게다가 텍스트 추출 상한이 P6 기본값 12,000자여서 **결함 구간에 닿기도 전에 잘렸다**. **수리** = `collect_who.extract_whopir_report`(순수 함수·LLM 0)가 Part 경계로 결론과 번호 항목을 결정론 추출하고, `_fetch_whopir_detail` 이 PDF 를 **한 번만** 받아 excerpt 와 구조를 함께 낸다(`WHOPIR_TEXT_MAX_CHARS=120,000` — 읽는 범위이지 싣는 범위가 아니다. 발행 길이는 항목 600자·결론 1,200자 상한이 잡는다). 항목 표제 판별은 **빈 줄이 앞선 후보 우선 → 없으면 본문 길이(≥300자) 폴백** — 본문 속 중첩 문서 목록이 진짜 항목을 밀어내던 실측 회귀(Tianjin) 방지. SRA/NRA 실사증거 의존 보고서(`report_kind="reliance"`)는 항목 요약이 원문에 없으므로 결론 + 인용 실사기관만 싣는다(없는 항목을 만들지 않는다). Part 경계를 못 찾으면 키 자체를 안 쓰고 링크 카드로 유지 — 읽은 척하지 않는다. 카드 상세 타입 `whopir_report`, 수집 게이트 `ENABLE_WHOPIR_EXCERPT`(2026-07-27 on).
+
+> **상세 국문 병기 채널(2026-07-27):** 위 NCR 층은 **결정론 상세 일반**으로 확장됐다 — WHOPIR(소스 10)도 필요한 것이 "분석"이 아니라 "이미 확보한 원문의 국문 병기"라는 점이 같아 **같은 채널**(`ncr_translation_ready`/`ncr_ko`)을 탄다(와이어 키는 Routine 프롬프트가 참조 중이라 유지·의미는 상세 일반). 필드명은 상세 타입이 정한다(NCR=`nature`/`action`/… · WHOPIR=`outcome`/`s<번호>_title`/`s<번호>`) — WHOPIR 필드명 계약은 `card_scaffold.whopir_translation_input` **단독 정의**를 방출·병합이 함께 호출한다(한쪽만 바뀌는 표류 구조적 차단). 짝 맞춤은 **원문 섹션 번호** 기준(위치 인덱스였다면 항목 증감 시 국문이 다른 항목에 붙는다 — 2026-07-21 findings 교차연결 사고와 같은 종).
 
 > **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용 — 자료실로 완결).
 

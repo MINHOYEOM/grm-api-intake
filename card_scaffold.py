@@ -299,7 +299,7 @@ class CardScaffold:
         }
 
     def translation_fields(self) -> dict[str, Any]:
-        """[NCR 국문 병기 2026-07-27] EU/MHRA GMP 비준수 상세 전문의 **번역 입력** 방출.
+        """[상세 국문 병기 2026-07-27] 결정론 상세 전문의 **번역 입력** 방출.
 
         심층분석(`deep_fields`)과 왜 나누는가 — NCR 은 심층분석 대상이 아니다(4섹션 스키마·
         D2 근거규칙이 WL/행정처분/483 용). 필요한 건 분석이 아니라 **이미 확보한 결정론 원문의
@@ -311,17 +311,26 @@ class CardScaffold:
           · `ncr_translation_input` — 번역할 원문 필드(있는 것만: nature/action/operations/
             additional). 이 값은 결정론 상세 슬롯과 **같은 producer**(`_deterministic_detail`)
             에서 나오므로 발행 카드에 실릴 원문과 글자 단위로 같다(짝 안 맞는 번역 불가능).
-          · `kind` — 유형 표시(eu-gmp-ncr / mhra-gmp-ncr).
+          · `kind` — 유형 표시(eu-gmp-ncr / mhra-gmp-ncr / who-inspection).
+
+        ★ WHOPIR(WHO 공개 실사보고서)도 같은 채널을 탄다 — 필요한 것이 "분석"이 아니라
+        "이미 확보한 결정론 원문의 국문 병기"라는 점이 NCR 과 완전히 같기 때문이다. 와이어
+        키(`ncr_translation_*`)는 Routine 프롬프트가 이미 참조하고 있어 유지하되, 채널의
+        의미는 **NCR 전용이 아니라 결정론 상세 일반**이다(필드명은 상세 타입이 정한다).
 
         `deep_fields()` 와 같은 이유로 **방출 지점을 이 함수 하나로** 묶는다(두 직렬화기가
         같은 함수를 부른다 — 한쪽만 갱신되는 표류 구조적 차단).
         """
         detail = _deterministic_detail(self.kind, self.row, self.raw)
-        if not (isinstance(detail, dict)
-                and detail.get("type") in _NCR_TRANSLATION_DETAIL_TYPES):
+        if not isinstance(detail, dict):
             return {}
-        payload = {k: detail[k] for k in _NCR_TRANSLATION_FIELDS
-                   if str(detail.get(k) or "").strip()}
+        if detail.get("type") in _NCR_TRANSLATION_DETAIL_TYPES:
+            payload = {k: detail[k] for k in _NCR_TRANSLATION_FIELDS
+                       if str(detail.get(k) or "").strip()}
+        elif detail.get("type") == "whopir_report":
+            payload = whopir_translation_input(detail)
+        else:
+            return {}
         if not payload:
             return {}
         return {
@@ -769,6 +778,32 @@ _NCR_TRANSLATION_DETAIL_TYPES = ("eu_gmp_ncr_statement", "mhra_gmp_ncr_statement
 _NCR_TRANSLATION_FIELDS = ("nature", "action", "operations", "additional")
 
 
+def whopir_translation_input(detail: dict[str, Any]) -> dict[str, str]:
+    """WHOPIR 상세 → 번역 입력 필드맵. **필드명 계약의 단일 정의처**.
+
+    `card_scaffold.translation_fields()`(방출)와 `inject_slots._merge_whopir_translations`
+    (병합)가 같은 함수를 부른다 — 한쪽만 규칙이 바뀌는 표류를 구조적으로 막는다. 키는
+    결론 `outcome` + 항목별 `s<번호>_title`/`s<번호>`. 번호는 원문 섹션 번호 그대로라
+    항목이 늘거나 빠져도 짝이 어긋나지 않는다(위치 인덱스였다면 어긋난다).
+    """
+    out: dict[str, str] = {}
+    outcome = str(detail.get("outcome") or "").strip()
+    if outcome:
+        out["outcome"] = outcome
+    for sec in detail.get("sections") or []:
+        if not isinstance(sec, dict):
+            continue
+        no = sec.get("no")
+        text = str(sec.get("text") or "").strip()
+        if not (isinstance(no, int) and no > 0 and text):
+            continue
+        title = str(sec.get("title") or "").strip()
+        if title:
+            out[f"s{no}_title"] = title
+        out[f"s{no}"] = text
+    return out
+
+
 def _detail_eu_gmp_ncr(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
     """EU GMP NCR Statement 전문(`raw.ncr_nature`/`ncr_action`) — 결정론 상세슬롯.
 
@@ -816,6 +851,46 @@ def _detail_mhra_gmp_ncr(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, 
     additional = str(raw.get("ncr_additional") or "").strip()
     if additional:                                   # 제한사항 — 있을 때만(골든 불변)
         detail["additional"] = additional
+    return detail
+
+
+def _detail_whopir_report(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """WHOPIR 공개 실사보고서 구조(`raw.whopir_report`) — 결정론 상세슬롯.
+
+    WHOPIR PDF 는 [결론(Inspection outcome) → Part 2 활동범위 → **Part 3 항목별 요약
+    (1~22개 섹션)**] 로 잘 정돈돼 있는데, 그동안 카드에는 링크와 1,500자 excerpt 만 실려
+    이 구조가 통째로 유실됐다. 수집기(`collect_who.extract_whopir_report`)가 뽑은 결론 +
+    항목별 요약을 verbatim 으로 싣는다(생성 0 → 환각 0).
+
+    SRA/NRA 실사증거에 의존한 보고서(`report_kind == "reliance"`)는 항목 요약 자체가
+    없으므로 결론 + 인용 실사기관만 싣는다 — 없는 항목을 만들어내지 않는다."""
+    report = raw.get("whopir_report")
+    if not isinstance(report, dict):
+        return None
+    outcome = str(report.get("outcome") or "").strip()
+    sections = [
+        {"no": int(s.get("no") or 0),
+         "title": str(s.get("title") or "").strip(),
+         "text": str(s.get("text") or "").strip()}
+        for s in (report.get("sections") or [])
+        if isinstance(s, dict) and str(s.get("text") or "").strip()
+    ]
+    reliance = [
+        {"authority": str(r.get("authority") or "").strip(),
+         "dates": str(r.get("dates") or "").strip()}
+        for r in (report.get("reliance") or [])
+        if isinstance(r, dict) and str(r.get("authority") or "").strip()
+    ]
+    if not (outcome or sections or reliance):
+        return None
+    detail: dict[str, Any] = {
+        "type": "whopir_report",
+        "report_kind": "reliance" if str(report.get("report_kind")) == "reliance" else "findings",
+        "outcome": outcome,
+        "sections": sections,
+    }
+    if reliance:                                     # 있을 때만 — 없으면 키 미추가(골든 불변)
+        detail["reliance"] = reliance
     return detail
 
 
@@ -1211,7 +1286,8 @@ _REGISTRY: dict[str, SourceSpec] = {
         "🟧", "WHO", "WHO", normative=True, extra_rows=_w2_extra_who),
     "who-inspection": SourceSpec(
         "🟧", "WHO", "WHO", normative=True,
-        extra_rows=_w2_extra_who, official=_official_who_inspection),
+        extra_rows=_w2_extra_who, official=_official_who_inspection,
+        detail=_detail_whopir_report),
     "who-news": SourceSpec(
         "🟫", "WHO", "WHO", normative=True, extra_rows=_w2_extra_who),
     "ich": SourceSpec(

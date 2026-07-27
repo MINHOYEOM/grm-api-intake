@@ -4470,6 +4470,119 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory -Changhai site located at 188-1 Mid Zhiyuan Avenue, Lihai Sub-district, Yuecheng District, Shaoxing City, Zhejiang Province, 312366, P.R.China was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for three years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "Quality management for the manufacturing site Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory – Changhai site listed to manufacture the Rifampicin API was limited to only production related activities with QA activities and QC testing overseen by Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory. Pharmaceutical Quality system: Organization and Responsibilities The SOP addressed responsibilities of different site positions was available. Quality Assurance of Xinchang Pharma: Divided in three different sections, API, Finished Drug Product and Quality Management office. …",
+      "text_ko": "리팜피신 API 제조소로 등재된 Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory – Changhai 사이트의 품질경영은 생산 관련 활동으로만 한정되며, QA 활동과 QC 시험은 Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory 가 관장한다. 의약품 품질시스템: 조직과 책임 — 사이트 직위별 책임을 규정한 SOP 가 마련돼 있었다. Xinchang Pharma 의 품질보증 조직은 API·완제의약품·품질관리사무국 3개 부문으로 나뉘어 있었다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "Number of personnel involved with the manufacturing of API products at the Xinchang Pharmaceutical Factory – Changhai site, according to the presentation by the company accounted for 123 staff. Following from the June 2025 WHO PQT inspection the company introduced a new organization chart showing responsibilities and reporting lines in quality and production units. The organization chart was found acceptable. Job descriptions Adequate number of qualified trained and experienced personnel were available. Responsibilities (job descriptions) were specified in writing. …",
+      "text_ko": "회사 설명에 따르면 Xinchang Pharmaceutical Factory – Changhai 사이트의 API 제조 관련 인원은 123명이었다. 2025년 6월 WHO PQT 실사 이후 회사는 품질·생산 부문의 책임과 보고체계를 보여주는 새 조직도를 도입했고, 조직도는 적절한 것으로 확인됐다. 직무기술서 — 적절한 자격·훈련·경험을 갖춘 인원이 충분히 확보돼 있었고 책임(직무기술서)이 문서로 규정돼 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "The buildings and facilities used for manufacturing intermediates and APIs were situated, designed, and constructed to allow for appropriate cleaning, maintenance, and operations based on the type and stage of manufacture. The flow of materials and personnel through the building or facilities was designed to prevent mix- ups or contamination. Production At the Xinchang Pharmaceutical Factory – Changhai site, workshops were designated to the production of Rifampicin. There was a clean zone of Class D for final crystallization, drying and packaging. …",
+      "text_ko": "중간체·API 제조에 사용되는 건물과 시설은 제조 유형과 단계에 맞게 적절한 세척·유지보수·작업이 가능하도록 배치·설계·건설돼 있었다. 건물·시설 내 자재와 인원의 동선은 혼동이나 오염을 방지하도록 설계됐다. 생산 — Xinchang Pharmaceutical Factory – Changhai 사이트에서는 작업장이 리팜피신 생산 전용으로 지정돼 있었다. 최종 결정화·건조·포장을 위한 Class D 청정구역이 있었다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Equipment in the workshops was dedicated to produce Rifampicin API. The equipment was designed to be of appropriate size and location for use, cleaning, sanitization, and maintenance. Equipment construction ensured that surfaces contacting raw materials, intermediates, or APIs maintained the quality of these substances. The equipment in the workshops was check. Contamination controls were discussed.",
+      "text_ko": "작업장의 장비는 리팜피신 API 생산 전용이었다. 장비는 사용·세척·소독·유지보수에 적합한 크기와 위치로 설계됐다. 장비 구조는 원료·중간체·API 와 접촉하는 표면이 해당 물질의 품질을 유지하도록 보장했다. 작업장 장비를 점검했고 오염관리에 대해 논의했다.",
+      "title_ko": "공정 장비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "Documents were managed manually in a paper-based system. Documentation for the manufacture of APIs was prepared, reviewed, approved, and distributed as per established procedures. The issuance, revision, replacement, and withdrawal of all documents were regulated, with revision histories kept. The procedures set retention periods for archived documents based on document importance. Quality documents were reviewed periodically. If unchanged after review, it was stamped “REVIEWED” and the review date became the new valid date. …",
+      "text_ko": "문서는 종이 기반 체계로 수기 관리되고 있었다. API 제조 관련 문서는 수립된 절차에 따라 작성·검토·승인·배포됐다. 모든 문서의 발행·개정·교체·회수가 규정돼 있었고 개정 이력이 유지됐다. 절차는 문서 중요도에 따른 보관문서 보존기간을 정하고 있었다. 품질문서는 주기적으로 재검토됐고, 재검토 후 변경이 없으면 \"REVIEWED\" 도장을 찍고 그 재검토일이 새 유효일이 됐다. …",
+      "title_ko": "문서 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Written procedures describing the receipt, identification, quarantine, storage, handling, sampling, testing and approval or rejection of materials were available. Raw materials were accepted upon receipt of the supplier's delivery notice and COA, then checked for appearance and weight. After cleaning, samples were tested. Materials were labelled \"quarantine\" pending analysis. If approved, QA replaced the label with \"qualified.\" Supplier Qualification A list of qualified suppliers was established. Suppliers of raw materials were periodical audited and annual quality reviewed. …",
+      "text_ko": "자재의 입고·확인·검역·보관·취급·채취·시험 및 승인 또는 불합격 처리를 기술한 문서화된 절차가 마련돼 있었다. 원료는 공급업체의 납품서와 COA 를 받은 뒤 수령해 외관과 중량을 확인했다. 청소 후 시료를 시험했다. 자재는 분석 완료 전까지 \"검역\" 표시를 했고, 승인되면 QA 가 라벨을 \"적합\"으로 교체했다. 공급업체 적격성평가 — 적격 공급업체 목록이 수립돼 있었고, 원료 공급업체는 주기적으로 감사하고 연간 품질평가를 실시했다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "Raw materials for manufacturing were weighed and measured under appropriate conditions to ensure their suitability for use. The weighing and measuring devices employed were of suitable accuracy for the intended purpose. The two workshops were dedicated to the manufacturing of Rifampicin API. The production of Rifampicin was in operation at the time of inspection. The production workshops were briefly inspected.",
+      "text_ko": "제조용 원료는 사용 적합성을 보장하는 적절한 조건에서 칭량·계량됐다. 사용된 칭량·계량 기기는 의도된 용도에 적합한 정확도를 갖추고 있었다. 두 개 작업장이 리팜피신 API 제조 전용이었다. 실사 당시 리팜피신 생산이 가동 중이었고 생산 작업장을 간략히 점검했다.",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "Rifampicin was initially packed in accordance with its BPR. Each bag was labelled with the product name and batch number. The outer product label indicated the storage conditions together with the product name and batch number. The newly introduced packaging line was in operation at the time of inspection and was observed from the window. This semi-automated packaging machine largely reduced the powder contamination in the room. During the packaging process, product samples for QC testing were collected.",
+      "text_ko": "리팜피신은 배치포장기록(BPR)에 따라 1차 포장됐다. 각 백에는 제품명과 배치번호가 표시됐다. 외부 제품 라벨에는 제품명·배치번호와 함께 보관조건이 표시됐다. 새로 도입된 포장라인이 실사 당시 가동 중이었고 창을 통해 관찰했다. 이 반자동 포장기는 실내 분진 오염을 크게 줄였다. 포장 공정 중 QC 시험용 제품 시료가 채취됐다.",
+      "title_ko": "API·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Facilities were available for the storage of materials under appropriate conditions. Records were maintained of these conditions. Separate storage areas were provided for quarantine, rejected, returned or recalled products. The factory was equipped with dedicated warehouses for raw materials of drug products, finished dosage forms, chemical raw materials and APIs. The area and space of the warehouse, which had an individual material sampling area and sufficient space for materials, quarantined and finished products and met corresponding storage conditions. …",
+      "text_ko": "적절한 조건에서 자재를 보관할 수 있는 시설이 갖춰져 있었고 해당 조건의 기록이 유지됐다. 검역·불합격·반품·회수 제품을 위한 별도 보관구역이 마련돼 있었다. 공장에는 완제의약품용 원료, 완제 제형, 화학 원료, API 를 위한 전용 창고가 갖춰져 있었다. 창고는 별도의 자재 채취구역과 자재·검역품·완제품을 위한 충분한 면적·공간을 확보하고 해당 보관조건을 충족했다. …",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "QC testing is conducted across three different sites as per the following: IPQC testing laboratory at Changhai site, ZMC Xinchang Pharmaceutical Factory was briefly inspected. The testing of environment monitoring was performed by the contract QC at laboratory of Changhai Pharma. and change has been made after last inspection. The environment monitoring testing was performed in IPQC laboratory. The IPQC laboratory onsite was responsible for the testing of incoming materials and intermediate products. QC laboratory at Xinchang site, ZMC-Xinchang Pharmaceutical Factory was inspected. …",
+      "text_ko": "QC 시험은 다음과 같이 3개 사이트에 걸쳐 수행된다. Changhai 사이트 IPQC 시험실(ZMC Xinchang Pharmaceutical Factory)을 간략히 점검했다. 환경 모니터링 시험은 Changhai Pharma 시험실의 위탁 QC 가 수행해 왔으나 지난 실사 이후 변경돼 IPQC 시험실에서 수행되고 있었다. 사이트 내 IPQC 시험실은 입고 자재와 중간제품 시험을 담당했다. Xinchang 사이트 QC 시험실(ZMC-Xinchang Pharmaceutical Factory)을 점검했다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "During the most recent WHO PQT inspection conducted in June 2025, major observations were noted pertaining to VMP, PV, and analytical method validation. The corresponding CAPAs addressing these observations were reviewed and found to be satisfactory. Validation master plan (VMP) Validation Master Plan for Xinchang Pharma has been updated. Process validation Process validation (PV) utilizing Rifamycin S Sodium, supplied and manufactured by Keming Biopharma, has been conducted since the previous inspection. …",
+      "text_ko": "2025년 6월에 수행된 직전 WHO PQT 실사에서 VMP, 공정밸리데이션(PV), 분석법 밸리데이션에 관한 major 관찰사항이 지적됐다. 이에 대응한 CAPA 를 검토한 결과 만족스러운 것으로 확인됐다. 밸리데이션 마스터플랜(VMP) — Xinchang Pharma 의 VMP 가 갱신됐다. 공정밸리데이션 — Keming Biopharma 가 공급·제조한 리파마이신 S 나트륨을 사용한 공정밸리데이션(PV)이 직전 실사 이후 수행됐다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control (CC)",
+      "text": "The SOP addressing CC “Procedure of change control” SOP-QAP000024-17 effective on 30/09/2025 was verified. Changes were classified as minor, medium and major, and a CC register was kept. Since the last WHO PQT inspection in June 2025, the SOP addressing CC was updated and Change Control related to Rifampicin were introduced. Examples of changes related to Rifampicin’s manufacturing and testing were verified.",
+      "text_ko": "변경관리 SOP \"Procedure of change control\" SOP-QAP000024-17(2025-09-30 시행)을 확인했다. 변경은 minor·medium·major 로 분류됐고 변경관리 대장이 유지됐다. 2025년 6월 직전 WHO PQT 실사 이후 변경관리 SOP 가 갱신됐고 리팜피신 관련 변경관리가 도입됐다. 리팜피신 제조·시험 관련 변경 사례를 확인했다.",
+      "title_ko": "변경관리(CC)"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Reprocessing and Reworks, Returns Rejections This section was not reinspected. Recovery of Solvents Solvents were recovered following manufacturing process of Rifampicin. No mother liquor was recycled.",
+      "text_ko": "재처리·재작업, 반품, 불합격 — 이 항목은 재실사하지 않았다. 용매 회수 — 리팜피신 제조공정 후 용매가 회수됐다. 모액(mother liquor)은 재활용되지 않았다.",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "A complaints procedure was available which specified that the complaint-receiving personnel should inform QA on the complaint with QA responsible for logging, classifying and investigating complaints and preparing the reports. Complaints were categorized as critical, major or minor based on the severity and effect on public health. Based on the investigation, preventive and corrective actions are taken when necessary. A complaints register was kept by each site with corporate overseeing implementation. Following from the last WHO PQT inspection of June 2025 this section was not reinspected. …",
+      "text_ko": "불만 접수 인원이 QA 에 통보하고 QA 가 불만의 기록·분류·조사와 보고서 작성을 담당하도록 규정한 불만 처리 절차가 마련돼 있었다. 불만은 심각도와 공중보건 영향에 따라 critical·major·minor 로 분류됐다. 조사 결과에 따라 필요 시 예방조치와 시정조치를 취했다. 불만 대장은 각 사이트가 유지하고 본사가 이행을 관리했다. 2025년 6월 직전 WHO PQT 실사 이후 이 항목은 재실사하지 않았다. …",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "The production for Rifampicin in the inspection scope was not contracted. The contract labs are used for water and genotoxic impurity testing. The qualification requirements for contract laboratory service were checked.",
+      "text_ko": "실사 범위 내 리팜피신 생산은 위탁되지 않았다. 위탁 시험실은 용수 및 유전독성 불순물 시험에 사용됐다. 위탁 시험실 서비스에 대한 적격성평가 요건을 확인했다.",
+      "title_ko": "위탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 저장성 사오싱시 웨청구 리하이가 즈위안대로 중단 188-1(312366) 소재 Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory – Changhai 사이트는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4528,6 +4641,56 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Final conclusion – Inspection outcome Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Tianjin Tianyao Pharmaceuticals Co., Ltd, located at No.19 Xin Ye 9th street, Tianjin 300462 China; was considered to be operating at an acceptable level of the WHO guideline on Good Manufacturing Practices (GMP) for active pharmaceutical ingredients. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality System",
+      "text": "Principles, quality manual (QM) and quality policy (QP) An overall pharmaceutical quality system (PQS) was established at the site, apart from an overarching quality management system of the corporate company. A quality policy was available and focused on continuous improvement and customer focus towards people’s access to high quality, safe and effective medical products. …",
+      "text_ko": "원칙·품질매뉴얼(QM)·품질방침(QP) — 본사 차원의 전사 품질경영시스템과는 별도로, 사이트에 전반적인 의약품 품질시스템(PQS)이 수립돼 있었다. 품질방침이 마련돼 있었고, 지속적 개선과 고품질·안전·유효한 의약품에 대한 접근성이라는 고객 지향에 초점을 두고 있었다. …",
+      "title_ko": "품질 시스템"
+     },
+     {
+      "no": 2,
+      "title": "Production System",
+      "text": "Production activities The batch production and analytical records of a couple of batches were spot-checked.. Validation policy The SOP for validation master plan (VMP) was in place. A VMP for 2026 was established including workshop 105 comprising blocks 28 and 15 related to Dexamethasone Sodium Phosphate. Validation documentation Validation activities were well documented as per validation protocols and reports. …",
+      "text_ko": "생산 활동 — 몇 개 배치의 배치제조기록과 시험기록을 표본 점검했다. 밸리데이션 방침 — 밸리데이션 마스터플랜(VMP) 관련 SOP 가 마련돼 있었다. 덱사메타손 인산나트륨 관련 28동·15동을 포함하는 105 작업장을 포괄하는 2026년 VMP 가 수립돼 있었다. 밸리데이션 문서 — 밸리데이션 활동은 밸리데이션 프로토콜·보고서에 따라 잘 문서화돼 있었다. …",
+      "title_ko": "생산 시스템"
+     },
+     {
+      "no": 3,
+      "title": "Facilities and Equipment System",
+      "text": "Design and layout Documented layouts of the site were available. The site comprised several buildings and workshops; two production buildings were covered by this inspection being relevant to the inspection scope and at which production operations of Dexamethasone Sodium Phosphate took place. 1. Building no. 28 (Chemical area) which comprised of two floors; a. First floors for centrifuges. b. Second floor for reactors. 2. Building no. 15 including a. Chemical area for the final steps before the final crystallization. b. Clean area no. …",
+      "text_ko": "설계와 배치 — 사이트 배치도가 문서화돼 있었다. 사이트는 여러 건물과 작업장으로 구성되며, 이번 실사 범위에 해당하는 덱사메타손 인산나트륨 생산이 이뤄지는 2개 생산 건물이 대상이었다. 1. 28동(화학구역) — 2개 층으로 구성: a. 1층 원심분리기, b. 2층 반응기. 2. 15동 — a. 최종 결정화 직전 단계를 위한 화학구역, b. 청정구역. …",
+      "title_ko": "시설 및 장비 시스템"
+     },
+     {
+      "no": 4,
+      "title": "Laboratory Control System",
+      "text": "General controls The quality control laboratory being a part of the quality unit was independent from the production department. Laboratory facilities were also independent from the production facilities and, in general, adequate in terms of design, space and equipment. The laboratory was responsible for physical, chemical, microbiological, and stability testing of incoming raw and starting materials; intermediates; finished APIs; packaging and labelling materials; purified water and other utilities along with environmental monitoring; and stability programme. …",
+      "text_ko": "일반 관리 — 품질부서에 속한 품질관리(QC) 시험실은 생산부서로부터 독립돼 있었다. 시험실 시설도 생산시설과 분리돼 있었고 설계·공간·장비 면에서 대체로 적절했다. 시험실은 입고 원료·출발물질, 중간체, 완제 API, 포장·표시자재, 정제수 및 기타 유틸리티에 대한 물리·화학·미생물·안정성 시험과 환경 모니터링, 안정성 프로그램을 담당했다. …",
+      "title_ko": "시험실 관리 시스템"
+     },
+     {
+      "no": 5,
+      "title": "Materials System",
+      "text": "General controls The receipt, identification, quarantine, storage, handling, sampling, testing and approval or rejection of materials were carried out in accordance with a written procedure. There was system in place for evaluating the suppliers of critical materials and materials were purchased against an agreed specification, from suppliers approved by the quality unit. Receipt and quarantine Materials were received in the receiving bay and checked according to the purchase order, including verification of whether the material came from an approved supplier. …",
+      "text_ko": "일반 관리 — 자재의 입고·확인·검역·보관·취급·채취·시험 및 승인 또는 불합격 처리는 문서화된 절차에 따라 수행됐다. 중요 자재 공급업체를 평가하는 체계가 있었고, 자재는 품질부서가 승인한 공급업체로부터 합의된 규격에 따라 구매됐다. 입고와 검역 — 자재는 입고장에서 수령해 구매주문서에 따라 확인했으며, 승인된 공급업체로부터 온 자재인지 검증하는 절차를 포함했다. …",
+      "title_ko": "자재 시스템"
+     },
+     {
+      "no": 6,
+      "title": "Packaging and Labelling System",
+      "text": "Packaging materials A written procedures were established for describing the receipt, identification, quarantine, sampling, examination and/or testing and release and handling of packaging and labelling materials. Label issuance and control Access to the label storage area was limited to authorized personnel. Procedures were used to reconcile the quantities of labels issued, used and returned and records were maintained. …",
+      "text_ko": "포장자재 — 포장·표시자재의 입고·확인·검역·채취·검사 및/또는 시험·출고·취급을 기술한 문서화된 절차가 수립돼 있었다. 라벨 발행과 관리 — 라벨 보관구역 출입은 승인된 인원으로 제한됐다. 발행·사용·반납된 라벨 수량을 대조하는 절차가 운용됐고 기록이 유지됐다. …",
+      "title_ko": "포장 및 표시 시스템"
+     }
+    ],
+    "outcome_ko": "최종 결론 — 실사 결과. 실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 톈진시 300462 신예9가 19번지 소재 Tianjin Tianyao Pharmaceuticals Co., Ltd 는 원료의약품(API)에 대한 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4586,6 +4749,23 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection The most recent WHO onsite inspection was performed from 14 to 18 November 2022 and was closed as compliant. Before this, the site was inspected by WHO 18-21 April 2016 and was also closed as compliant. Summary of key information about the site According to the site master file: Senador Laboratories Private Limited, Ahmedabad, is engaged in the manufacture of medicinal products, including solid oral dosage forms (hormonal and non-hormonal tablets) and injectable hormonal formulations (terminally sterilised suspensions). It is located in a so called “Pharma zone”, surrounded by other pharmaceutical companies. The Ahmedabad facility was commissioned in 2009 as part of Famy Care Limited. In May 2015, Famy Care demerged its female contraceptive business into a separate entity, Jai Pharma Limited. In November 2015, Mylan Laboratories Limited (a Viatris Company) acquired Famy Care’s female contraceptive business. On 20 November 2015, Jai Pharma Limited formally became part of Mylan Laboratories Limited. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "Dutch Health and Youth Care Inspectorate (IGJ)",
+      "dates": "4-7 October 2023"
+     },
+     {
+      "authority": "USDFA",
+      "dates": "17-24 November 2025"
+     }
+    ],
+    "outcome_ko": "최근 WHO 실사 요약 — 가장 최근 WHO 현장실사는 2022년 11월 14~18일에 수행됐고 적합(compliant)으로 종결됐다. 그 이전에는 2016년 4월 18~21일에 WHO 실사를 받았고 역시 적합으로 종결됐다. 사이트 개요(Site Master File 기준): 인도 아메다바드 소재 Senador Laboratories Private Limited 는 고형 경구제(호르몬·비호르몬 정제)와 주사제 호르몬 제제(최종멸균 현탁액)를 포함한 의약품을 제조한다. 다른 제약사들에 둘러싸인 이른바 \"Pharma zone\"에 위치한다. 아메다바드 시설은 2009년 Famy Care Limited 의 일부로 가동을 시작했다. 2015년 5월 Famy Care 는 여성 피임제 사업을 별도 법인 Jai Pharma Limited 로 분할했고, 2015년 11월 Mylan Laboratories Limited(Viatris 계열)가 이를 인수했다. 2015년 11월 20일 Jai Pharma Limited 는 공식적으로 Mylan Laboratories Limited 의 일부가 됐다."
    }
   },
   {
@@ -4644,6 +4824,119 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Final conclusion – Inspection outcome Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, MSN Pharmachem Private Limited located at Plot No. 182 to 186, 192-A, 193 to 197 & 212/A, B, C, D, Phase-II, IDA Pashamylaram, Pashamylaram (Village), Patancheru (Mandal), Sangareddy District, Telangana, 502 307 India, was considered to be operating at an acceptable level of the WHO guideline on Good Manufacturing Practices (GMP) for active pharmaceutical ingredients. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "A documented system for quality assurance was established, with procedures covering key quality elements in place. The Quality Department was divided into QA and QC and was separate from the Production Department. Operations were specified in written form and critical GMP requirements were essentially met. Quality manual AQM-001/02, effective date: 28/4/2025, was reviewed. Senior management commitment was in place to ensure implementation of PQS as per objectives, roles and responsibilities. …",
+      "text_ko": "품질보증에 관한 문서화된 체계가 수립돼 있었고 핵심 품질 요소를 포괄하는 절차가 마련돼 있었다. 품질부서는 QA 와 QC 로 나뉘어 있었고 생산부서와 분리돼 있었다. 업무가 문서로 규정돼 있었으며 중요 GMP 요건이 기본적으로 충족되고 있었다. 품질매뉴얼 AQM-001/02(시행일 2025-04-28)를 검토했다. 목표·역할·책임에 따른 PQS 이행을 보장하는 최고경영진의 의지가 확인됐다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "There were approximately 1028 staff working on site. In general, personnel had the necessary qualification and practical experience. Personnel interviewed during the inspection had sufficient knowledge of GMP standards. Responsibilities of staff and their duties were well documented. Personnel qualification There was an adequate number of personnel qualified by appropriate education, training and experience to perform and supervise the manufacture of intermediates and APIs. …",
+      "text_ko": "사이트에는 약 1,028명이 근무하고 있었다. 전반적으로 인원은 필요한 자격과 실무 경험을 갖추고 있었다. 실사 중 면담한 인원은 GMP 기준에 대한 충분한 지식을 갖추고 있었다. 직원의 책임과 임무가 잘 문서화돼 있었다. 인원 적격성 — 중간체와 API 제조를 수행·감독하기에 적절한 교육·훈련·경험을 갖춘 인원이 충분히 확보돼 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "Production In general, buildings and facilities used in the manufacture of intermediates and APIs were located, designed, and constructed to facilitate cleaning, maintenance and operations as appropriate to the type and stage of manufacture. Buildings and facilities had adequate space for the orderly placement of equipment and materials to prevent mix-ups and contamination. Facilities were designed to minimize potential contamination. Cleanrooms were utilized for final processing of the finished APIs. …",
+      "text_ko": "생산 — 전반적으로 중간체·API 제조에 사용되는 건물과 시설은 제조 유형과 단계에 맞게 세척·유지보수·작업이 용이하도록 배치·설계·건설돼 있었다. 건물과 시설은 혼동과 오염을 방지하기 위해 장비와 자재를 정연하게 배치할 수 있는 충분한 공간을 갖추고 있었다. 시설은 잠재적 오염을 최소화하도록 설계됐다. 완제 API 의 최종 공정에는 청정실이 사용됐다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Design and construction Production equipment was of good standard and appeared to be well maintained. Spot-checks on differential pressure gauges indicated that equipment and devices were timely calibrated. The workflow in the facility was appropriately designed, and the equipment appeared to be installed to facilitate production and reduce the risk of contamination and mix ups. All production equipment reviewed was identified as to its content or purpose with cleanliness status identified by appropriate labels. …",
+      "text_ko": "설계와 구조 — 생산 장비는 양호한 수준이었고 잘 유지관리되는 것으로 보였다. 차압계에 대한 표본 점검 결과 장비·기기가 적시에 교정되고 있음이 확인됐다. 시설 내 작업 동선은 적절히 설계돼 있었고, 장비는 생산을 원활히 하고 오염·혼동 위험을 줄이도록 설치된 것으로 보였다. 검토한 모든 생산 장비는 내용물 또는 용도가 식별돼 있었고 청결 상태가 적절한 표시로 구분돼 있었다. …",
+      "title_ko": "공정 장비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "Documentation system and specifications In general documents were designed, prepared, reviewed, and distributed properly. Documents were approved, signed, and dated by the appropriate responsible persons. Records were made or completed when any action was taken. The documentation reviewed during the inspection indicated that there were two types of SOPs (corporate and site specific). An eDMS was in place for the issuance, revision and monitoring of SOPs. Specifications were established and documented for raw materials, intermediates, and APIs as well as labelling and packaging materials. …",
+      "text_ko": "문서 체계와 규격 — 전반적으로 문서는 적절히 설계·작성·검토·배포되고 있었다. 문서는 해당 책임자가 승인·서명·일자 기재했다. 어떤 조치가 이뤄질 때마다 기록이 작성 또는 완결됐다. 실사 중 검토한 문서에서 SOP 가 두 종류(전사용·사이트용)임이 확인됐다. SOP 의 발행·개정·모니터링을 위해 eDMS 가 운영되고 있었다. 원료·중간체·API 는 물론 표시·포장자재에 대한 규격이 수립·문서화돼 있었다. …",
+      "title_ko": "문서 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Receipt and quarantine The SOP for raw material receipt, inspection and handling at warehouse was reviewed. Handling of receiving, storage and reconciliation of key starting material (KSM) batches was done manually through bin cards. Labels for quarantine were generated by warehouse, while labels for approved and released RM were generated by QC. Example from received shipment of materials was checked as per procedure and found satisfactory for key starting material for Oseltamivir received from MSN life science Unit II. …",
+      "text_ko": "입고와 검역 — 창고에서의 원료 입고·검사·취급에 관한 SOP 를 검토했다. 핵심출발물질(KSM) 배치의 입고·보관·수불 대조는 bin card 를 통해 수기로 이뤄지고 있었다. 검역 라벨은 창고가 발행하고, 승인·출고된 원료 라벨은 QC 가 발행했다. MSN life science Unit II 로부터 입고된 오셀타미비르 핵심출발물질에 대해 절차에 따른 입고 표본을 확인했고 만족스러웠다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "In general, different production and in-process control activities were well controlled and documented in the respective batch records. Weighing and other critical operations (excluding printing and attaching finished API labels) were performed by production and witnessed by QA. Prior to use, production personnel verified that the materials were those specified in the batch record for the intended intermediate or API. Actual yields should be compared with expected yields at designated steps in the production process. Expected yields with appropriate ranges were established and verified. …",
+      "text_ko": "전반적으로 각종 생산·공정중관리 활동이 잘 통제되고 해당 배치기록에 문서화돼 있었다. 칭량 등 중요 작업(완제 API 라벨 인쇄·부착 제외)은 생산이 수행하고 QA 가 입회했다. 사용 전 생산 인원은 해당 중간체·API 의 배치기록에 규정된 자재가 맞는지 확인했다. 실수율은 생산공정의 지정 단계에서 예상수율과 대조하도록 돼 있었고, 적절한 허용범위를 갖춘 예상수율이 설정·검증돼 있었다. …",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "There were written procedures describing the receipt, identification, quarantine, sampling, examination, testing and release and handling of packaging and labelling materials. Packaging and labelling facilities were inspected immediately before use to ensure that all materials not needed for the next packaging operation had been removed. This examination (line clearance) was documented in the batch packaging records as well as the room/equipment logbooks. Labelling operations were designed and performed in such a way to prevent mix-ups. …",
+      "text_ko": "포장·표시자재의 입고·확인·검역·채취·검사·시험·출고·취급을 기술한 문서화된 절차가 있었다. 포장·표시 설비는 사용 직전에 점검해 다음 포장작업에 불필요한 자재가 모두 제거됐는지 확인했다. 이 점검(라인 클리어런스)은 배치포장기록과 룸·장비 로그북에 문서화됐다. 표시 작업은 혼동을 방지하도록 설계·수행됐다. …",
+      "title_ko": "API·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Warehousing procedures SOP for handling and storage of intermediates was in place. The procedure included steps for sampling, dispensing, packaging, and labelling. Oseltamivir intermediate ORT-1 was stored at 2C – 8C. Intermediates were packed using triple laminated bag sealer. Storage of finished API and intermediate was done in areas with controlled temperature in the range of 15C – 25C. Daily Temperature monitoring was conducted. Logbooks for monitoring temperature were checked. …",
+      "text_ko": "창고 관리 절차 — 중간체 취급·보관에 관한 SOP 가 마련돼 있었다. 절차에는 채취·분배·포장·표시 단계가 포함됐다. 오셀타미비르 중간체 ORT-1 은 2~8℃ 에서 보관됐다. 중간체는 3중 라미네이트 백 실러로 포장됐다. 완제 API 와 중간체는 15~25℃ 범위의 온도관리 구역에 보관됐다. 일일 온도 모니터링이 수행됐고 온도 모니터링 로그북을 확인했다. …",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "Adequate laboratory facilities, along with adequate equipment and instruments, were available at the disposal of the QC team. Different QC activities were performed at the QC unit or outsourced to qualified third parties (contracted laboratories) as per established procedures. The performed QC activities were documented in analytical sheets, whether in paper or in electronic format using an established LIMS. Physicochemical Laboratory The SOP for analytical data review and SOP for good chromatographic practices were established. …",
+      "text_ko": "QC 팀이 사용할 수 있는 적절한 시험실 시설과 장비·기기가 갖춰져 있었다. 각종 QC 활동은 QC 부서에서 수행하거나 수립된 절차에 따라 적격한 제3자(위탁시험실)에 위탁됐다. 수행된 QC 활동은 종이 또는 수립된 LIMS 를 이용한 전자 형식의 분석기록지에 문서화됐다. 물리화학 시험실 — 분석데이터 검토 SOP 와 우수 크로마토그래피 실무 SOP 가 수립돼 있었다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "The master validation plan was reviewed. A plan was in place on quarterly basis for different validation and qualification activities. In Q1/2026, PV and CV for Oseltamivir were planned considering the additional process equipment (addition of new blocks to meet the product demand). Validation documentation There was an established requirement for documentation of the validation and qualification activities, including through protocol and related reports. The template of the qualification and validation reports included dedicated sections for approval, conclusion and deviations (if any). …",
+      "text_ko": "밸리데이션 마스터플랜을 검토했다. 각종 밸리데이션·적격성평가 활동에 대한 분기 단위 계획이 마련돼 있었다. 2026년 1분기에는 제품 수요 대응을 위한 추가 공정장비(신규 블록 증설)를 고려해 오셀타미비르의 공정밸리데이션(PV)과 세척밸리데이션(CV)이 계획돼 있었다. 밸리데이션 문서 — 프로토콜과 관련 보고서를 통한 밸리데이션·적격성평가 활동 문서화 요건이 수립돼 있었다. 적격성평가·밸리데이션 보고서 양식에는 승인·결론·일탈(해당 시) 항목이 별도로 포함돼 있었다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control (CC)",
+      "text": "A procedure for change management was available. CC Classification according to specified matrix and timelines of CC management were in place and extension of time was allowed for only 3 times after then CC should be cancelled. Trending of CC was performed as per SOP. Trending report for 2024 was available and 2025 was under draft. CC Trends were done per product.",
+      "text_ko": "변경관리 절차가 마련돼 있었다. 규정된 매트릭스에 따른 변경 등급 분류와 변경관리 처리기한이 운영되고 있었고, 기한 연장은 3회까지만 허용되며 그 이후에는 변경관리를 취소하도록 돼 있었다. 변경관리 추이분석이 SOP 에 따라 수행됐다. 2024년 추이보고서가 있었고 2025년분은 초안 상태였다. 변경관리 추이는 제품별로 작성됐다.",
+      "title_ko": "변경관리(CC)"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Rejection The SOP for handling of rejected materials was in place and was applied to raw and packaging materials. Rejected material register for 2025 was checked and no rejection for raw and packaging material took placed in 2025. Rejected materials were stored in segregated and secured areas. Reprocessing & Reworking The SOP for reprocessing and reworking was in place. As per the mentioned procedure, quality failed returned batches, recalled batches and OOT batches can be reprocessed/reworked based on investigation, recommendation and approval by QA head. …",
+      "text_ko": "불합격 처리 — 불합격 자재 취급 SOP 가 마련돼 원료·포장자재에 적용되고 있었다. 2025년 불합격 자재 대장을 확인한 결과 2025년에는 원료·포장자재 불합격이 없었다. 불합격 자재는 분리된 보안구역에 보관됐다. 재처리 및 재작업 — 재처리·재작업 SOP 가 마련돼 있었다. 해당 절차에 따르면 품질 부적합 반품 배치, 회수 배치, OOT 배치는 조사·권고 및 QA 책임자 승인을 거쳐 재처리·재작업할 수 있다. …",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "Complaint: The SOP for market complaint management was in place. Repeated complaints were considered if repeated within 12 months period of receiving complaints. Register for complaints 2023, 2024 and 2025 were checked. No complaint for Moxifloxacin HCL monohydrate in 2023, 2024 and 2025. Annual trend analysis for market complaints for Jan-Dec 2025 was checked. Several complaints were spot-checked. Recall: The SOP for recall was in place. Mock recall was done every 3 years +/- 3 months. In general, no recalls were conducted by the manufacturer. Register for recall for 2025 was checked.",
+      "text_ko": "불만 — 시장 불만 관리 SOP 가 마련돼 있었다. 접수 후 12개월 이내에 반복되면 반복 불만으로 간주했다. 2023·2024·2025년 불만 대장을 확인했고, 목시플록사신 염산염 일수화물에 대한 불만은 3개 연도 모두 없었다. 2025년 1~12월 시장 불만 연간 추이분석을 확인했고 여러 불만 건을 표본 점검했다. 회수 — 회수 SOP 가 마련돼 있었다. 모의회수는 3년마다(±3개월) 실시됐다. 전반적으로 제조업체가 실시한 회수는 없었다. 2025년 회수 대장을 확인했다.",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "No contract manufacturing was implemented by MSN Pharmachem for the production of Moxifloxacin HCL monohydrate or Oseltamivir (phosphate). The SOP for qualification of contract service providers was in place. The QC laboratory agreement between MSN Pharmachem private LTD. and MSN central analytical laboratories located in MSN laboratories private limited manufacturing site in Rudraram. An audit report was reviewed. As per the quality agreement, API, intermediate, raw materials and working reference standards were in scope for testing. …",
+      "text_ko": "MSN Pharmachem 은 목시플록사신 염산염 일수화물 및 오셀타미비르(인산염) 생산에 위탁제조를 사용하지 않았다. 위탁 서비스 제공자 적격성평가 SOP 가 마련돼 있었다. MSN Pharmachem Private Ltd. 와 Rudraram 소재 MSN Laboratories Private Limited 제조소 내 MSN 중앙분석시험실 간의 QC 시험실 협약이 있었고 감사보고서를 검토했다. 품질협약에 따르면 API·중간체·원료·워킹 표준품이 시험 범위에 포함됐다. …",
+      "title_ko": "위탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "최종 결론 — 실사 결과. 실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 텔랑가나주 상가레디 지구 파탄체루 파샤밀라람 IDA 2단지 Plot No. 182~186, 192-A, 193~197 및 212/A·B·C·D(502 307) 소재 MSN Pharmachem Private Limited 는 원료의약품(API)에 대한 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4702,6 +4995,49 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, TMDA Quality Control Laboratory, located at Off-Mandela Road, Mabibo-External, 16106 Dar es Salaam; Tanzania was considered to be operating at an acceptable level of compliance with WHO Good Practices for Pharmaceutical Quality Control Laboratories guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the laboratory to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Organization and management system",
+      "text": "1.1. Structural and general requirements The TMDA Quality Control Laboratory located at the Sub-Head Office in Dar es Salaam was organized into 3 sections:  Medicines Chemical Analysis  Microbiological Analysis  Medical Devices and In-Vitro Diagnostics (IVDs) Testing The organizational structure of the laboratory, including responsibility, authority and interrelationship of the personnel, were indicated in the organizational chart. 1.2. Quality management system (QMS) A documented QMS was established, implemented, and maintained with procedures covering key quality elements. …",
+      "text_ko": "1.1. 구조 및 일반 요건 — 다르에스살람 부본부에 위치한 TMDA 품질관리시험실은 3개 부문으로 조직돼 있었다: 의약품 화학분석 / 미생물 분석 / 의료기기·체외진단기기(IVD) 시험. 인원의 책임·권한·상호관계를 포함한 시험실 조직구조는 조직도에 표시돼 있었다. 1.2. 품질경영시스템(QMS) — 핵심 품질 요소를 포괄하는 절차와 함께 문서화된 QMS 가 수립·이행·유지되고 있었다. …",
+      "title_ko": "조직 및 경영 시스템"
+     },
+     {
+      "no": 2,
+      "title": "Planning and strategic management",
+      "text": "2.1. Externally provided services and supplies The laboratory documented its process for selecting and purchasing required products and services. including measurement materials (e.g., Reference and Certified Reference Materials, chemical and biological reference substances, equipment, reagents), and external services (e.g., calibration, qualification, sampling, testing, maintenance, proficiency testing, assessment, and auditing). …",
+      "text_ko": "2.1. 외부 제공 서비스 및 물품 — 시험실은 필요한 제품·서비스의 선정 및 구매 프로세스를 문서화했다. 여기에는 측정용 물질(표준물질·인증표준물질, 화학·생물학적 표준품, 장비, 시약)과 외부 서비스(교정, 적격성평가, 시료채취, 시험, 유지보수, 숙련도시험, 평가, 감사)가 포함된다. …",
+      "title_ko": "계획 및 전략 관리"
+     },
+     {
+      "no": 3,
+      "title": "Resources",
+      "text": "3.1. Personnel The laboratory employed qualified personnel with documented education, training, and experience. Chemistry testing was performed and supervised by qualified personnel with experience in pharmaceutical analysis or equivalent. Microbiological testing was performed and supervised by qualified personnel with experience in microbiology or equivalent. Job descriptions and records Job descriptions were available for personnel involved in laboratory activities. …",
+      "text_ko": "3.1. 인원 — 시험실은 학력·교육훈련·경력이 문서화된 적격 인원을 고용했다. 화학 시험은 의약품 분석 또는 이에 상응하는 경험을 갖춘 적격 인원이 수행·감독했다. 미생물 시험은 미생물학 또는 이에 상응하는 경험을 갖춘 적격 인원이 수행·감독했다. 직무기술서와 기록 — 시험실 활동에 관여하는 인원에 대한 직무기술서가 마련돼 있었다. …",
+      "title_ko": "자원"
+     },
+     {
+      "no": 4,
+      "title": "Technical activities",
+      "text": "4.1. Sampling The laboratory was not involved in physical sampling. In the case of internally submitted samples, sampling was performed by inspectors. Externally submitted samples were sampled by the customers. Internally submitted samples were:  Registration samples  Port of Entry (PoE) samples  Routine Surveillance (inspection) samples  Post-Market Surveillance (PMS) program samples Externally submitted samples were samples obtained from:  International organizations e.g., WHO  Foreign nations through MRA  Government institutions in Tanzania and other domestic organizations and indivi …",
+      "text_ko": "4.1. 시료채취 — 시험실은 물리적 시료채취에는 관여하지 않았다. 내부 의뢰 시료의 경우 시료채취는 조사관이 수행했고, 외부 의뢰 시료는 의뢰자가 채취했다. 내부 의뢰 시료: 허가용 시료, 통관지점(PoE) 시료, 정기 감시(실사) 시료, 시판후 감시(PMS) 프로그램 시료. 외부 의뢰 시료: WHO 등 국제기구, MRA 를 통한 외국, 탄자니아 정부기관 및 기타 국내 조직·개인으로부터 받은 시료. …",
+      "title_ko": "기술 활동"
+     },
+     {
+      "no": 5,
+      "title": "Safety rules",
+      "text": "SOP on laboratory safety was reviewed and discussed. Environmental health and safety policies were implemented to safeguard staff, the public, and the environment. A documented laboratory safety policy, outlining general and risk-based instructions, was made available to all staff and actively enforced. A designated staff member oversaw its implementation and monitored compliance. …",
+      "text_ko": "시험실 안전에 관한 SOP 를 검토·논의했다. 직원·대중·환경을 보호하기 위한 환경보건안전 방침이 이행되고 있었다. 일반 지침과 위험기반 지침을 담은 문서화된 시험실 안전방침이 전 직원에게 제공됐고 실질적으로 시행되고 있었다. 지정된 담당자가 이행을 감독하고 준수 여부를 점검했다. …",
+      "title_ko": "안전 규정"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 탄자니아 다르에스살람 16106 Off-Mandela Road, Mabibo-External 소재 TMDA 품질관리시험실은 WHO 의약품 품질관리시험실 우수운영기준(Good Practices for Pharmaceutical Quality Control Laboratories) 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 시험실이 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4760,6 +5096,133 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met, and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Bliss GVS Pharma Limited, located at Survey No. 43-44, Vevoor Village, Palghar, Maharashtra, 401404, India, was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer to a satisfactory level, prior to the publication of the WHOPIR This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Pharmaceutical quality system",
+      "text": "The site had a quality management system (QMS) that incorporated Good Manufacturing Practices (GMP) across all areas of the facility, including manufacturing, packaging, laboratories, warehouses, and other departments. The QA, QC, and production departments reported independently to the Chief Executive Officer (CEO), and both QA and QC Site Heads reported independently to Corporate QA and Corporate QC, respectively. The CQA controls and governs the implementation and operation of the quality system. Some elements of the QMS were assisted by computerized systems such as SAP ECC version 6.0. …",
+      "text_ko": "이 사이트는 제조·포장·시험실·창고 등 시설 전 영역에 GMP 를 반영한 품질경영시스템(QMS)을 갖추고 있었다. QA·QC·생산 부서는 각각 최고경영자(CEO)에게 독립적으로 보고했고, QA·QC 사이트 책임자는 각각 전사 QA·전사 QC 에 독립적으로 보고했다. 전사 QA(CQA)가 품질시스템의 이행과 운영을 통제·관장한다. QMS 의 일부 요소는 SAP ECC 6.0 등 전산화 시스템의 지원을 받았다. …",
+      "title_ko": "의약품 품질시스템"
+     },
+     {
+      "no": 2,
+      "title": "Good manufacturing practices for pharmaceutical products",
+      "text": "Bliss GVS Pharma Limited has a multi-product manufacturing facility that produces finished pharmaceutical products of various therapeutic categories and dosage forms. In general, the manufacturing facility was well-maintained and adequately equipped with sophisticated equipment. In a number of manufacturing areas, equipment were connected with a vacuum transfer system to transfer in- process materials from one stage to another under closed conditions. The deficiencies raised in this section have been adequately addressed and will be verified during future PQ inspections.",
+      "text_ko": "Bliss GVS Pharma Limited 는 다양한 약효군과 제형의 완제의약품을 생산하는 다품목 제조시설을 보유하고 있다. 전반적으로 제조시설은 잘 유지관리되고 있었고 정밀 장비를 적절히 갖추고 있었다. 여러 제조구역에서 장비가 진공 이송 시스템으로 연결돼 공정 중 자재를 밀폐 조건으로 단계 간 이송하고 있었다. 이 항목에서 제기된 결함은 충분히 조치됐으며 향후 PQ 실사에서 검증될 예정이다.",
+      "title_ko": "의약품 GMP"
+     },
+     {
+      "no": 3,
+      "title": "Sanitation and hygiene",
+      "text": "The facility observed a high level of sanitation. There were adequate change-room facilities for gowning, handwashing, drying, and disinfection. The training curriculum provided specific training for each employee on adhering to personal hygiene and clothing requirements outlined in the standard operating procedure, as well as to the pictorial entry and exit procedures displayed in the respective change rooms.",
+      "text_ko": "시설은 높은 수준의 위생 상태를 유지하고 있었다. 갱의·손 씻기·건조·소독을 위한 탈의실 설비가 적절히 갖춰져 있었다. 교육 커리큘럼은 표준작업지침에 규정된 개인위생·복장 요건 준수와 각 탈의실에 게시된 그림 형태의 출입 절차에 대해 직원별로 구체적인 교육을 제공하고 있었다.",
+      "title_ko": "위생 관리"
+     },
+     {
+      "no": 4,
+      "title": "Qualification and validation",
+      "text": "The Validation Master Plan (VMP) was prepared for 2 years, covering 2025-2026, and included activities such as process validation, computerized system validation, qualification/requalification, and other areas. The requalification frequency was described in the VMP. Equipment requalification was performed every 3 years for critical equipment; AHUs were requalified annually and biannually. Temperature mapping covering three seasons was completed for various storage areas. The contracted services were used for the qualification and requalification of equipment and areas. …",
+      "text_ko": "밸리데이션 마스터플랜(VMP)은 2025~2026년 2년치로 작성됐고 공정밸리데이션, 전산화시스템 밸리데이션, 적격성평가·재평가 등을 포함했다. 재평가 주기는 VMP 에 기술돼 있었다. 중요 장비는 3년마다 재적격성평가를 수행했고, AHU 는 연 1회 및 반기 1회 재평가했다. 여러 보관구역에 대해 3개 계절을 포괄하는 온도 매핑이 완료됐다. 장비·구역의 적격성평가·재평가에는 위탁 서비스가 사용됐다. …",
+      "title_ko": "적격성평가 및 밸리데이션"
+     },
+     {
+      "no": 5,
+      "title": "Complaints",
+      "text": "SOP for complaints was reviewed. The site QA manager was responsible for recording complaints received. Complaints can be received by a complainant (any regulatory agency, distributor, logistics agent, retailer, stockist, field staff, customer, doctor, or patient) through letters, emails, faxes, or telephone calls. Acknowledgment of receipt of a complaint was specified to be within 3 days. Complaints were categorized as critical, major, and minor. The preliminary investigation report was expected within 3 days. The investigation team comprised the QA team and the concerned department. …",
+      "text_ko": "불만 처리 SOP 를 검토했다. 접수된 불만의 기록은 사이트 QA 매니저가 담당했다. 불만은 규제기관·유통업체·물류대행사·소매업체·재고관리업체·현장직원·고객·의사·환자 등 제기자가 서신·이메일·팩스·전화로 제기할 수 있었다. 접수 확인은 3일 이내로 규정돼 있었다. 불만은 critical·major·minor 로 분류됐고 예비조사보고서는 3일 이내에 작성하도록 돼 있었다. 조사팀은 QA 팀과 해당 부서로 구성됐다. …",
+      "title_ko": "불만"
+     },
+     {
+      "no": 6,
+      "title": "Product recalls",
+      "text": "The product recall SOP stated that the site QA Head was responsible for initiating the product recall proposal and for reviewing classification, recall depth, and CQA approval. The recalls were classified as Class I, Class II, and Class III. Depth of recalls included up to the consumer or user levels. Recalls could be triggered by any regulatory agency (statutory recalls) or by the manufacturer (voluntary recalls). No statutory recalls ever happened. One voluntary recall (initiated by Bliss GVS) took place in 2025",
+      "text_ko": "제품 회수 SOP 는 사이트 QA 책임자가 회수 제안 착수와 분류·회수 범위·CQA 승인 검토를 담당하도록 규정하고 있었다. 회수는 Class I·II·III 로 분류됐다. 회수 범위는 소비자 또는 사용자 단계까지 포함했다. 회수는 규제기관에 의해(법정 회수) 또는 제조업체에 의해(자발적 회수) 개시될 수 있었다. 법정 회수는 지금까지 없었다. 2025년에 자발적 회수(Bliss GVS 개시) 1건이 있었다.",
+      "title_ko": "제품 회수"
+     },
+     {
+      "no": 7,
+      "title": "Contract production, analysis and other activities",
+      "text": "No manufacturing processes or steps for the finished products were performed off-site. Some analytical testing was outsourced to competent laboratories. The Analytical Research and the QC departments were responsible for identifying and evaluating new external testing laboratories. These laboratories were required to have the necessary infrastructure, facilities, and equipment to carry out the required activities. A facility audit was required to qualify external testing laboratories. Quality agreements were then established between Bliss GVS Pharma Ltd. …",
+      "text_ko": "완제의약품의 제조공정이나 공정 단계가 사외에서 수행된 것은 없었다. 일부 분석시험은 적격한 시험실에 위탁됐다. 신규 외부 시험실의 발굴·평가는 분석연구부서와 QC 부서가 담당했다. 해당 시험실은 요구 활동을 수행할 수 있는 기반설비·시설·장비를 갖춰야 했다. 외부 시험실 적격성평가에는 현장 감사가 요구됐고, 이후 Bliss GVS Pharma Ltd. 와 품질협약을 체결했다. …",
+      "title_ko": "위탁 생산·분석 및 기타 활동"
+     },
+     {
+      "no": 8,
+      "title": "Self-inspection, quality audits and suppliers’ audits and approval",
+      "text": "The self-inspection SOP was reviewed. A self-inspection checklist was used. The self-inspection schedule for 2025 indicated that each department was to be audited twice. A list of qualified internal auditors included 18 self-inspection auditors. Classification of nonconformances as critical, major, or minor was used. The deficiencies raised in this section have been adequately addressed and will be verified during future PQ inspections.",
+      "text_ko": "자체점검 SOP 를 검토했고 자체점검 체크리스트가 사용되고 있었다. 2025년 자체점검 일정에 따르면 각 부서를 연 2회 감사하도록 돼 있었다. 적격 내부심사원 명단에는 18명의 자체점검 심사원이 포함돼 있었다. 부적합은 critical·major·minor 로 분류했다. 이 항목에서 제기된 결함은 충분히 조치됐으며 향후 PQ 실사에서 검증될 예정이다.",
+      "title_ko": "자체점검·품질감사 및 공급업체 감사·승인"
+     },
+     {
+      "no": 9,
+      "title": "Personnel",
+      "text": "A current organizational structure had been approved by the Plant (Site) Head. There were adequate number of personnel with the necessary qualifications and practical experience. According to the company presentation, there was a total of 466 employees, of which 169 were in OSD production, 50 in semi-solid production, 46 in QA, 100 projected in QC, 29 in the warehouse, 48 in engineering, 5 in IT+SAP, 5 in technical transfer, learning and development, 3 in human resources, and others. Duties and responsibilities were documented in up-to-date, controlled job descriptions (JDs). …",
+      "text_ko": "현행 조직구조가 공장(사이트) 책임자의 승인을 받아 마련돼 있었다. 필요한 자격과 실무 경험을 갖춘 인원이 충분히 확보돼 있었다. 회사 설명에 따르면 총 466명이 근무하며 이 중 고형경구제 생산 169명, 반고형제 생산 50명, QA 46명, QC 100명(예정), 창고 29명, 엔지니어링 48명, IT·SAP 5명, 기술이전 5명, 교육개발 및 인사 3명 등으로 구성돼 있었다. 임무와 책임은 최신 통제본 직무기술서(JD)에 문서화돼 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 10,
+      "title": "Training",
+      "text": "Implementation of the SOP for training of personnel was primarily the responsibility of the Learning and Development (L&D) Team, which was part of the HR department. The SOP provided for induction training, on-the-job training, technical and functional skill assessment, evaluation of training, and training effectiveness check. Training records were kept for each individual employee. Post-training questionnaires were used, with a pass mark of 80%. Effectiveness checks were conducted randomly, not for each individual training course/program. …",
+      "text_ko": "인원 교육 SOP 의 이행은 주로 인사부 소속 교육개발(L&D) 팀이 담당했다. SOP 는 입문교육, 현장직무교육(OJT), 기술·직무역량 평가, 교육 평가, 교육 효과성 확인을 규정하고 있었다. 교육기록은 직원 개인별로 유지됐다. 교육 후 설문이 사용됐고 합격 기준은 80% 였다. 효과성 확인은 개별 교육과정마다가 아니라 무작위로 수행됐다. …",
+      "title_ko": "교육훈련"
+     },
+     {
+      "no": 11,
+      "title": "Personal hygiene",
+      "text": "Personnel hygiene procedure provided for grooming, illness, cuts and burns, smoking, eating and chewing, and frisking. Each employee was trained in these areas. Employees with open lesions or exposed body surfaces, cuts, abrasion or burns were not allowed in the manufacturing areas. It was stated that the face biometrics access system did not allow an employee to enter a changeroom if their body temperature exceeded 38°C, which could be due to flu-like symptoms or infectious diseases. Those with diarrhea and vomiting were also prohibited from entering controlled areas (cleanrooms). …",
+      "text_ko": "개인위생 절차는 용모, 질병, 베인 상처·화상, 흡연, 취식·씹기, 소지품 검사를 규정하고 있었다. 각 직원은 이들 영역에 대해 교육받았다. 개방창이나 노출된 신체 표면, 베인 상처·찰과상·화상이 있는 직원은 제조구역 출입이 금지됐다. 안면 생체인식 출입시스템은 체온이 38℃ 를 초과하는 직원의 탈의실 출입을 차단한다고 설명됐는데, 이는 독감 유사 증상이나 감염성 질환일 수 있기 때문이다. 설사·구토가 있는 사람도 관리구역(청정실) 출입이 금지됐다. …",
+      "title_ko": "개인 위생"
+     },
+     {
+      "no": 12,
+      "title": "Premises",
+      "text": "The layout of the manufacturing facility was discussed. The manufacturing facility spanned two floors, with all manufacturing activities carried out across small-, medium-, and large-scale facilities. The ground floor (GF) houses small-, medium-, and large-scale manufacturing areas, a warehouse, and a packaging area for medium- and large-scale products. A lift was used to transfer materials from GF to FF. The first floor (FF) houses QC, QA, documentation storage, the stability section, control samples, BMS, the secondary water system, and the ointment manufacturing area. …",
+      "text_ko": "제조시설의 배치에 대해 논의했다. 제조시설은 2개 층에 걸쳐 있으며 모든 제조활동이 소·중·대규모 설비에서 수행됐다. 1층에는 소·중·대규모 제조구역, 창고, 중·대규모 제품용 포장구역이 있었다. 1층에서 2층으로의 자재 이송에는 승강기가 사용됐다. 2층에는 QC, QA, 문서보관, 안정성 시험 구역, 대조시료, BMS, 2차 용수시스템, 연고 제조구역이 있었다. …",
+      "title_ko": "건물"
+     },
+     {
+      "no": 13,
+      "title": "Equipment",
+      "text": "The manufacturing facility was equipped with sophisticated equipment and instruments. The equipment were located, designed, constructed, and maintained to suit the operations to be carried out. Equipment found inside the granulation area were installed and operated to minimize the risk of contamination. The granules were charged to the compression machine via the vacuum transfer system, whereas the compressed tablets were manually charged for blister packing. …",
+      "text_ko": "제조시설은 정밀 장비와 기기를 갖추고 있었다. 장비는 수행할 작업에 적합하도록 배치·설계·제작·유지관리되고 있었다. 과립구역 내 장비는 오염 위험을 최소화하도록 설치·운영되고 있었다. 과립은 진공 이송 시스템을 통해 타정기로 투입됐고, 타정된 정제는 블리스터 포장을 위해 수동으로 투입됐다. …",
+      "title_ko": "장비"
+     },
+     {
+      "no": 14,
+      "title": "Materials",
+      "text": "The warehousing areas were inspected. Access to the warehouse was through a limited-access biometric system, via a change room where wearing appropriate protective gowning was required. There were two separate receiving bays, one for starting materials and the other for packaging materials. Starting materials were passed through a dedusting tunnel and were then placed on plastic pallets. …",
+      "text_ko": "창고 구역을 점검했다. 창고 출입은 출입제한 생체인식 시스템을 통해 이뤄졌고, 적절한 보호복 착용이 요구되는 탈의실을 거치도록 돼 있었다. 출발물질용과 포장자재용으로 분리된 2개의 입고장이 있었다. 출발물질은 제진(dedusting) 터널을 통과한 뒤 플라스틱 팔레트에 적재됐다. …",
+      "title_ko": "자재"
+     },
+     {
+      "no": 15,
+      "title": "Documentation",
+      "text": "Documents such as change control management, SOP management, retention sample management, stability management, vendor qualification, specifications, standard testing procedures (STPs), QRM, OOS, OOT, deviations, incidents, CAPA, artwork management, and preventive maintenance were handled in the SAP system. QC recorded finished product results in the SAP system, and QA finally released the batch. Paper-based files, mainly containing records, were kept by QA in portable mobile racks with a computer-controlled filing-tracking system. …",
+      "text_ko": "변경관리, SOP 관리, 대조시료 관리, 안정성 관리, 공급업체 적격성평가, 규격, 표준시험절차(STP), QRM, OOS, OOT, 일탈, 사건, CAPA, 아트워크 관리, 예방정비 등의 문서는 SAP 시스템에서 처리됐다. QC 가 완제품 결과를 SAP 에 기록하면 QA 가 최종 배치 출고를 수행했다. 주로 기록물로 구성된 종이 문서는 QA 가 전산 파일 추적 시스템이 적용된 이동식 랙에 보관했다. …",
+      "title_ko": "문서"
+     },
+     {
+      "no": 16,
+      "title": "Good practices in production",
+      "text": "The inspector visited the production areas, including small-, medium-, and large-scale areas. Adequate gowning instructions were provided before entering the manufacturing areas. Personnel-specific gowning was provided, each labeled with the person's name. The shoe cover, 2-piece gowning, beard mask, and hairnet were available. 70% IPA was used to sanitize hands before entering the clean corridor. In general, the facility was well-maintained, with adequate lighting and cleanliness. Face recognition and biometric access were provided for the personnel working in the manufacturing areas. …",
+      "text_ko": "조사관은 소·중·대규모 구역을 포함한 생산구역을 방문했다. 제조구역 진입 전 적절한 갱의 지침이 제공됐다. 개인별 갱의복이 제공됐고 각각 이름표가 붙어 있었다. 신발커버, 2피스 갱의복, 턱수염 마스크, 헤어넷이 구비돼 있었다. 청정복도 진입 전 손 소독에는 70% IPA 가 사용됐다. 전반적으로 시설은 조명과 청결도가 적절하게 잘 유지되고 있었다. 제조구역 근무자에게는 안면인식·생체인식 출입이 적용됐다. …",
+      "title_ko": "생산 우수 실무"
+     },
+     {
+      "no": 17,
+      "title": "Good practices in quality control",
+      "text": "The inspectors visited the QC laboratory. The laboratory had 82 staff members working across sections, including physical, chemical, instrumentation, stability, microbiology, and good laboratory practices. The laboratory was equipped with 20 HPLCs, 1 UPLC, 2 GCs, 5 dissolution testers, 1 Malvern Mastersizer, and others. Samples of raw materials, semi-finished products, finished products, and for the ongoing stability program were received into the laboratory through a static passbox and stored in separate lockable stainless steel cabins. …",
+      "text_ko": "조사관은 QC 시험실을 방문했다. 시험실에는 물리·화학·기기분석·안정성·미생물·우수시험실운영 부문에 걸쳐 82명이 근무하고 있었다. 시험실은 HPLC 20대, UPLC 1대, GC 2대, 용출시험기 5대, Malvern Mastersizer 1대 등을 갖추고 있었다. 원료·반제품·완제품 및 진행 중인 안정성 프로그램용 시료는 정적 패스박스를 통해 시험실로 반입돼 별도의 잠금식 스테인리스 캐비닛에 보관됐다. …",
+      "title_ko": "품질관리 우수 실무"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마하라슈트라주 팔가르 베부르 마을 Survey No. 43-44(401404) 소재 Bliss GVS Pharma Limited 는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4818,6 +5281,119 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Initial conclusion – Inspection outcome Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Kaygee Laboratories Private Limited, located at Plot No. 06, Phase II, New Industrial Area Mandideep, District Raisen, 462046 Madhya Pradesh, India, was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. The deficiencies observed during the inspection, as listed in the full report, were addressed by the manufacturer to a satisfactory level before the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "A detailed presentation was provided at the opening meeting. The company had an established Quality Policy committed to meeting stakeholder expectations. The Quality Policy was approved by the Director and was included in the SMF (Annexure‑04). The organization was structured with clear reporting lines from corporate leadership to site‑level operations. Overall governance was provided at the corporate level, supported by senior executive roles overseeing quality, operations, and R&D. Independent Corporate QA oversight was in place, separate from manufacturing. …",
+      "text_ko": "개회 회의에서 상세한 설명이 제공됐다. 회사는 이해관계자 기대 충족을 약속하는 품질방침을 수립하고 있었다. 품질방침은 대표이사의 승인을 받았고 SMF(부속서 04)에 포함돼 있었다. 조직은 본사 리더십에서 사이트 단위 운영까지 명확한 보고체계로 구성돼 있었다. 전반적 거버넌스는 본사 차원에서 제공됐고 품질·운영·연구개발을 총괄하는 임원진이 이를 뒷받침했다. 제조로부터 독립된 전사 QA 감독체계가 마련돼 있었다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "Personnel qualification The site personnel overview indicated that staffing levels and organisational structure were established to support manufacturing, engineering, quality, warehouse, administrative, and information technology functions. The distribution of personnel across these functions demonstrated adequate resourcing to support GMP operations and quality system requirements. Records of training were maintained, and training was periodically assessed. The observation related to training was adequately addressed in the respective CAPA plan. …",
+      "text_ko": "인원 적격성 — 사이트 인력 현황을 보면 제조·엔지니어링·품질·창고·행정·정보기술 기능을 지원하도록 인력 규모와 조직구조가 수립돼 있었다. 이들 기능에 걸친 인력 배치는 GMP 운영과 품질시스템 요건을 뒷받침하기에 충분한 자원 확보를 보여줬다. 교육 기록이 유지됐고 교육은 주기적으로 평가됐다. 교육 관련 관찰사항은 해당 CAPA 계획에서 충분히 조치됐다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "Design and construction During the inspection, Block III, dedicated to the production of Isoniazid and Pyrazinamide, was visited. The buildings and facilities used for the manufacture of intermediates and APIs were appropriately located, designed, and constructed to facilitate cleaning, maintenance, and operations in accordance with the type and stage of manufacture. The facilities were designed to minimize the potential for contamination. …",
+      "text_ko": "설계와 건설 — 실사 중 이소니아지드와 피라진아미드 생산 전용인 III 블록을 방문했다. 중간체·API 제조에 사용되는 건물과 시설은 제조 유형과 단계에 맞게 세척·유지보수·작업이 용이하도록 적절히 배치·설계·건설돼 있었다. 시설은 오염 가능성을 최소화하도록 설계됐다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Design and construction Equipment used in the manufacture of APIs was of appropriate design, adequate size, and suitably located to allow for intended operation, cleaning, sanitization, where applicable, and maintenance. Equipment surfaces in contact with raw materials, intermediates, or APIs were constructed of materials that did not adversely affect product quality beyond established specifications. Production equipment was operated only within its qualified operating range. …",
+      "text_ko": "설계와 제작 — API 제조에 사용되는 장비는 의도된 작업, 세척, 해당 시 소독, 유지보수가 가능하도록 적절히 설계되고 충분한 크기와 적합한 위치를 갖추고 있었다. 원료·중간체·API 와 접촉하는 장비 표면은 수립된 규격을 벗어나 제품 품질에 악영향을 주지 않는 재질로 제작됐다. 생산 장비는 적격성이 확보된 운전 범위 내에서만 운영됐다. …",
+      "title_ko": "공정 장비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "All documents related to the manufacture of APIs were prepared, reviewed, approved, and distributed in accordance with the SOP for documentation and control. Manufacturing and quality documents were maintained in paper format at the time of inspection. It was noted that the site was in the process of implementing electronic systems. The issuance, revision, superseding, and withdrawal of all documents were controlled in accordance with the applicable SOP. Revision histories were maintained for controlled documents. …",
+      "text_ko": "API 제조 관련 모든 문서는 문서화·관리 SOP 에 따라 작성·검토·승인·배포됐다. 실사 시점에 제조·품질 문서는 종이 형태로 유지되고 있었다. 사이트가 전자시스템 도입을 진행 중임이 확인됐다. 모든 문서의 발행·개정·대체·회수는 해당 SOP 에 따라 통제됐고, 통제문서에 대한 개정 이력이 유지됐다. …",
+      "title_ko": "문서 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Receipt, identification, quarantine, storage, handling, sampling, testing, and release or rejection of materials were performed in accordance with the applicable SOP. Sampling activities were conducted in the designated sampling/dispensing room. When up to five containers were received, 100% sampling was performed. For consignments containing more than five containers, sampling was conducted in accordance with the √n+1 sampling plan. For bags received in quantities of up to ten, 100% sampling was applied, while consignments exceeding ten bags were sampled according to the √n+1 approach. …",
+      "text_ko": "자재의 입고·확인·검역·보관·취급·채취·시험 및 출고 또는 불합격 처리는 해당 SOP 에 따라 수행됐다. 시료채취는 지정된 채취·분배실에서 수행됐다. 용기가 5개 이하로 입고되면 전수 채취했고, 5개를 초과하는 경우 √n+1 채취계획에 따랐다. 백(bag)은 10개 이하이면 전수 채취, 10개를 초과하면 √n+1 방식으로 채취했다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "Production operation Process flow charts for Isoniazid and Pyrazinamide were provided and reviewed. The facility was inspected to verify the actual workflow against the documented process. The inspection commenced on the 2nd floor of Block III, where reactors were installed, including reactors used for hydrolysis and condensation steps. Crystallization activities, including cooling and chilling, were performed on the 1st floor, which was classified as a Class D clean room. Product transfer was carried out through closed lines, and equipment was opened only during batch-to-batch cleaning. …",
+      "text_ko": "생산 작업 — 이소니아지드와 피라진아미드의 공정 흐름도가 제공돼 검토됐다. 문서화된 공정 대비 실제 작업 흐름을 확인하기 위해 시설을 점검했다. 실사는 가수분해·축합 단계용 반응기를 포함한 반응기가 설치된 III 블록 3층에서 시작했다. 냉각·냉장을 포함한 결정화 작업은 Class D 청정실로 분류된 2층에서 수행됐다. 제품 이송은 밀폐 배관으로 이뤄졌고 장비는 배치 간 세척 시에만 개방됐다. …",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "General: SOP for Labelling System and Its Control in Manufacturing Area (effective 6 March 2026) was established and implemented. The SOP described the labelling system and associated controls applicable to the manufacturing area and defined the status labels used, including those for finished products, in-process samples, rinse samples, intermediates, and accessories. The approved label formats were provided in Annex 1 of the SOP. Packaging and labelling materials complied with established specifications. …",
+      "text_ko": "일반 — 제조구역 표시체계 및 관리에 관한 SOP(2026-03-06 시행)가 수립·이행되고 있었다. 이 SOP 는 제조구역에 적용되는 표시체계와 관련 관리를 기술하고, 완제품·공정중시료·린스시료·중간체·부속품에 사용되는 상태 라벨을 규정했다. 승인된 라벨 양식은 SOP 부속서 1에 제시돼 있었다. 포장·표시자재는 수립된 규격에 적합했다. …",
+      "title_ko": "API·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Warehousing procedures Facilities were available for the storage of all materials under appropriate conditions. SOP for Temperature and Humidity (effective March 2026) was reviewed. The specified storage temperature for finished APIs was NMT 30 °C. Key starting materials were stored under ambient conditions in line with MSDS requirements. Sampling and dispensing of solid raw materials were performed in a controlled booth under RLAF, with appropriate gowning and balance controls in place. …",
+      "text_ko": "창고 관리 절차 — 모든 자재를 적절한 조건에서 보관할 수 있는 시설이 갖춰져 있었다. 온습도 SOP(2026년 3월 시행)를 검토했다. 완제 API 의 규정 보관온도는 30℃ 이하였다. 핵심출발물질은 MSDS 요건에 따라 상온 조건에서 보관됐다. 고체 원료의 채취·분배는 RLAF 가 적용된 관리 부스에서 적절한 갱의와 저울 관리를 갖추고 수행됐다. …",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "An independent QC department was established and headed by the Head-QC. The QC department was responsible for conducting analytical and support activities, including raw material analysis, water testing, packing material analysis, in-process testing, microbiological analysis, finished product analysis and stability testing. The department also performed laboratory equipment and instrument calibration and verification, environmental monitoring, and provided analytical support for validation activities. …",
+      "text_ko": "QC 책임자가 이끄는 독립된 QC 부서가 설치돼 있었다. QC 부서는 원료 분석, 용수 시험, 포장자재 분석, 공정중 시험, 미생물 분석, 완제품 분석, 안정성 시험 등 분석 및 지원 활동을 담당했다. 또한 시험실 장비·기기의 교정과 검증, 환경 모니터링을 수행하고 밸리데이션 활동에 대한 분석 지원을 제공했다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "Validation documentation A VMP, effective 26 Feb 2026, was available at the site and was reviewed during the inspection. The VMP described the overall approach to qualification and validation activities. It defined the responsibilities of the relevant functional groups involved in validation activities and outlined the general principles, stepwise execution, and defined frequency for re-qualification and re-validation. The VMP addressed project-related validation activities and included installation, operation, and performance qualification of equipment. …",
+      "text_ko": "밸리데이션 문서 — 2026년 2월 26일 시행 VMP 가 사이트에 비치돼 있었고 실사 중 검토했다. VMP 는 적격성평가·밸리데이션 활동의 전반적 접근방식을 기술했다. 밸리데이션 활동에 관여하는 각 기능 조직의 책임을 규정하고, 일반 원칙과 단계별 실행, 재적격성평가·재밸리데이션의 정해진 주기를 제시했다. VMP 는 프로젝트 관련 밸리데이션 활동을 다루고 장비의 설치·운전·성능 적격성평가를 포함했다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control",
+      "text": "All system, process, equipment, and material changes were managed through the change control system in accordance with the applicable SOP. Changes were evaluated by the Technical Committee, approved by QA, and subjected to documented impact assessments to ensure that validated systems remained in a compliant state. The scope of the procedure covered all prospective changes affecting product quality and the quality system within the API manufacturing facilities. …",
+      "text_ko": "모든 시스템·공정·장비·자재 변경은 해당 SOP 에 따라 변경관리 체계를 통해 관리됐다. 변경은 기술위원회가 평가하고 QA 가 승인했으며, 밸리데이션된 시스템이 적합 상태를 유지하도록 문서화된 영향평가를 거쳤다. 절차의 적용범위는 API 제조시설 내 제품 품질과 품질시스템에 영향을 주는 모든 사전 변경을 포괄했다. …",
+      "title_ko": "변경관리"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Rejection Rejected materials were stored in a designated rejected area that was secured and physically segregated in accordance with the applicable SOP. The warehouse ensured that rejected materials were either returned to the manufacturer or supplier at the earliest opportunity or destroyed, as applicable. The Quality Control Department affixed a red sticker marked REJECTED to rejected materials. The sticker contained the material name, analytical report number, date of rejection, and initials of the QC chemist. …",
+      "text_ko": "불합격 처리 — 불합격 자재는 해당 SOP 에 따라 보안이 유지되고 물리적으로 분리된 지정 불합격 구역에 보관됐다. 창고는 불합격 자재를 가능한 빨리 제조업체 또는 공급업체에 반품하거나 해당 시 폐기하도록 관리했다. 품질관리부서는 불합격 자재에 REJECTED 표시가 된 적색 스티커를 부착했고, 스티커에는 자재명·시험보고서 번호·불합격 일자·QC 담당자 이니셜이 기재됐다. …",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "Complaints SOP on customer complaints (effective July 2025) was reviewed. The SOP defined the procedures for receipt, investigation, classification, and closure of customer complaints. Roles and responsibilities were clearly assigned across relevant departments. Complaints were classified as Critical, Major, or Other, with defined timelines for investigation and response. Critical complaints required investigation within 12 calendar days, while non-critical complaints required investigation within 40 calendar days. …",
+      "text_ko": "불만 — 고객 불만 SOP(2025년 7월 시행)를 검토했다. SOP 는 고객 불만의 접수·조사·분류·종결 절차를 규정했다. 관련 부서에 걸쳐 역할과 책임이 명확히 배정돼 있었다. 불만은 Critical·Major·기타로 분류됐고 조사·회신 기한이 정해져 있었다. Critical 불만은 12일(달력일) 이내, 그 외 불만은 40일 이내에 조사하도록 요구됐다. …",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "A list of approved contract laboratories was available. QC testing was outsourced to laboratories that were authorized to perform testing of all QC samples. The SOP on technical agreements for contract laboratories (effective September 2025) was reviewed. Valid technical agreements were in place for both laboratories, with a defined validity period of three years, and are currently effective. No contract manufacturing activities were reported. Miscellaneous Samples taken Not applicable Assessment of the site master file Site Master File effective 2 February 2026 was provided and reviewed. …",
+      "text_ko": "승인된 위탁 시험실 목록이 마련돼 있었다. QC 시험은 모든 QC 시료의 시험을 수행하도록 승인된 시험실에 위탁됐다. 위탁 시험실 기술협약 SOP(2025년 9월 시행)를 검토했다. 두 시험실 모두에 대해 유효기간 3년의 기술협약이 체결돼 현재 유효했다. 위탁 제조 활동은 없는 것으로 보고됐다. 기타 — 채취 시료: 해당 없음. 사이트 마스터 파일 평가: 2026년 2월 2일 시행 Site Master File 이 제공돼 검토됐다. …",
+      "title_ko": "위탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "1차 결론 — 실사 결과. 실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마디아프라데시주 라이센 지구 만디딥 신공업단지 2단지 Plot No. 06(462046) 소재 Kaygee Laboratories Private Limited 는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 전체 보고서에 기재된 실사 중 관찰 결함은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4876,6 +5452,119 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Pharco B International (2) for Chemicals (PBIC) located at New Borg El Arab City, Second Industrial Zone No. 5, Block 22 Alexandria, 21934 Egypt, was considered to be operating at an acceptable level of compliance with WHO good manufacturing practices guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "A documented system for quality assurance was established, with procedures covering key quality elements in place. The Quality Department was divided into QA and QC and was separate from the Production Department. Operations were specified in written form and critical GMP requirements were essentially met. The procedures reviewed and discussed during the inspection were generally of an acceptable standard; however, in some cases, improvements appear to be necessary. Product Quality Review (PQR) PQRs were performed according to an established SOP for “Annual product quality review”. …",
+      "text_ko": "품질보증에 관한 문서화된 체계가 수립돼 있었고 핵심 품질 요소를 포괄하는 절차가 마련돼 있었다. 품질부서는 QA 와 QC 로 나뉘어 있었고 생산부서와 분리돼 있었다. 업무가 문서로 규정돼 있었으며 중요 GMP 요건이 기본적으로 충족되고 있었다. 실사 중 검토·논의한 절차들은 대체로 허용 가능한 수준이었으나, 일부는 개선이 필요해 보였다. 제품품질평가(PQR) — PQR 은 \"연간 제품품질평가\" SOP 에 따라 수행됐다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "An organogram was presented at the opening meeting with clear separation between production/operations and quality-related activities. The quality assurance and quality control activities at the site were assigned to two different appointed managers. The managers reported functionally to the Corporate Quality Unit. Personnel qualification Personnel met during the inspection were adequately qualified based on education, experience and training. …",
+      "text_ko": "개회 회의에서 생산·운영과 품질 관련 활동이 명확히 분리된 조직도가 제시됐다. 사이트의 품질보증과 품질관리 활동은 별도로 임명된 두 명의 관리자에게 배정돼 있었다. 이 관리자들은 전사 품질부서에 기능적으로 보고했다. 인원 적격성 — 실사 중 면담한 인원은 학력·경력·교육훈련 면에서 적절한 자격을 갖추고 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "Production There was one production block on the site. Sofosbuvir was manufactured in the non-dedicated production facility and lines. Both chemical and clean area in the production block were inspected. QC laboratories Laboratory areas were separated from production areas. Nevertheless, laboratory areas, in particular microbiological laboratory were located within the same block of the production areas with separate access doors. Utilities In general, all utilities impacting the product quality of the products (e.g. …",
+      "text_ko": "생산 — 사이트에는 생산 블록이 하나 있었다. 소포스부비르는 전용이 아닌 생산시설과 라인에서 제조됐다. 생산 블록의 화학구역과 청정구역을 모두 점검했다. QC 시험실 — 시험실 구역은 생산구역과 분리돼 있었다. 다만 시험실 구역, 특히 미생물 시험실은 생산구역과 같은 블록 안에 별도 출입문을 두고 위치해 있었다. 유틸리티 — 전반적으로 제품 품질에 영향을 주는 모든 유틸리티가 …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Design and construction Equipment used in the manufacture of intermediates and the API was non-dedicated. Generally, the equipment was appropriately identified for its intended use and maintenance. Equipment maintenance and cleaning Written procedures were established for the cleaning of equipment and its subsequent release for use in the manufacture of intermediates and APIs. The SOP related to “Sofosbuvir equipment cleaning” was checked. Equipment was divided into three groups for cleaning. …",
+      "text_ko": "설계와 제작 — 중간체와 API 제조에 사용되는 장비는 전용이 아니었다. 전반적으로 장비는 의도된 용도와 유지보수에 맞게 적절히 식별돼 있었다. 장비 유지보수와 세척 — 장비 세척 및 중간체·API 제조에 재사용하기 위한 후속 출고에 관한 문서화된 절차가 수립돼 있었다. \"소포스부비르 장비 세척\" 관련 SOP 를 확인했다. 장비는 세척을 위해 3개 그룹으로 구분돼 있었다. …",
+      "title_ko": "공정 장비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "Documentation system and specifications Documents related to the manufacture of intermediates or APIs were prepared, reviewed, approved, and distributed according to written procedures. The issuance, revision, superseding and withdrawal of documents were controlled with maintenance of revision histories. The site used a manual record system while a computerized system limited to the material management and QC-laboratory activities, i.e., HPLC, GC, etc. The risk assessment study for data management and data integrity implementation was spot-checked. …",
+      "text_ko": "문서 체계와 규격 — 중간체 또는 API 제조 관련 문서는 문서화된 절차에 따라 작성·검토·승인·배포됐다. 문서의 발행·개정·대체·회수가 통제됐고 개정 이력이 유지됐다. 사이트는 수기 기록 체계를 사용했고, 전산화 시스템은 자재관리와 HPLC·GC 등 QC 시험실 활동에 한정돼 있었다. 데이터 관리와 데이터 완전성 이행에 관한 위험평가 연구를 표본 점검했다. …",
+      "title_ko": "문서 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Receipt and quarantine Incoming starting materials and finished API products were quarantined after receipt until released for use or distribution. The “Material supplier list” was in place. The status of raw material was indicated, with respect to material under quarantine or approved. The material label and status were checked. Sampling and testing of starting materials and finished APIs Both starting materials and finished Sofosbuvir API were sampled in the warehouses. Sampling rooms located in the warehouses were equipped with LAF and access control was in place. …",
+      "text_ko": "입고와 검역 — 입고 출발물질과 완제 API 는 사용 또는 유통 출고 전까지 입고 후 검역 상태로 관리됐다. \"자재 공급업체 목록\"이 마련돼 있었다. 원료의 상태는 검역 중인지 승인됐는지가 표시됐고, 자재 라벨과 상태를 확인했다. 출발물질·완제 API 의 채취와 시험 — 출발물질과 완제 소포스부비르 API 모두 창고에서 채취됐다. 창고 내 채취실에는 LAF 가 설치돼 있었고 출입 통제가 시행되고 있었다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "Written procedures were established to monitor the progress and control the critical and major process parameters that may cause variability in the quality characteristics of intermediates and APIs. In-process controls and their acceptance criteria were defined. Raw materials were weighed and measured using appropriately accurate devices. Three quality grades of Sofosbuvir APIs were produced, distinguished by coding, each with distinct process and specifications. …",
+      "text_ko": "중간체·API 의 품질 특성에 변동을 초래할 수 있는 중요·주요 공정변수의 진행을 감시·관리하기 위한 문서화된 절차가 수립돼 있었다. 공정중관리 항목과 그 허용기준이 규정돼 있었다. 원료는 적절한 정확도의 기기로 칭량·계량됐다. 소포스부비르 API 는 코드로 구분되는 3개 품질 등급으로 생산됐고 각각 별도의 공정과 규격을 가지고 있었다. …",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "The SOP for activities in the production finishing areas was in place. The SOP provided for line clearance prior to operation and a template for finishing area cleaning and clearance checklist was utilized. The checklist was issued by QA along with the BMR issued for each individual batch. Packaging operations were not in operation at the time of inspection. Packaging and labelling were not inspected in detail due to time constraints.",
+      "text_ko": "생산 마감구역 작업에 관한 SOP 가 마련돼 있었다. SOP 는 작업 전 라인 클리어런스를 규정했고 마감구역 세척·클리어런스 체크리스트 양식이 사용됐다. 이 체크리스트는 각 배치별로 발행되는 BMR 과 함께 QA 가 발행했다. 실사 당시 포장 작업은 가동 중이 아니었다. 시간 제약으로 포장·표시는 상세히 점검하지 않았다.",
+      "title_ko": "API·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Warehousing procedures Adequate facilities were available for the storage of materials under appropriate conditions. Records of these conditions were maintained. Distribution procedures APIs were released for distribution to third parties only after approval by the Quality Unit. WHO grade Sofosbuvir API batches were solely distributed to European Egyptian Pharmaceutical Industries (EEPI) upon the agreement between the two companies.",
+      "text_ko": "창고 관리 절차 — 적절한 조건에서 자재를 보관할 수 있는 시설이 충분히 갖춰져 있었고 해당 조건의 기록이 유지됐다. 유통 절차 — API 는 품질부서 승인 후에만 제3자 유통이 허용됐다. WHO 등급 소포스부비르 API 배치는 양사 간 합의에 따라 European Egyptian Pharmaceutical Industries(EEPI)에만 공급됐다.",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "Physicochemical Laboratory Written procedures were established for the sampling, testing, approval or rejection of materials and finished API products. Specifications, sampling plans, schedules, and test methods under the responsibility of QC were in place. Separate rooms or areas for receiving samples, GC, HPLC, Karl Fischer Titration, reference standards and retention samples were available. Several sampling and testing procedures were checked. …",
+      "text_ko": "물리화학 시험실 — 자재와 완제 API 의 채취·시험·승인 또는 불합격 처리에 관한 문서화된 절차가 수립돼 있었다. QC 책임 하의 규격·채취계획·일정·시험법이 마련돼 있었다. 시료 접수, GC, HPLC, 칼피셔 적정, 표준품, 대조시료를 위한 별도의 실 또는 구역이 갖춰져 있었다. 여러 채취·시험 절차를 확인했다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "Validation documentation There was an established requirement for documentation of the validation and qualification activities, including through protocol and related reports. The template of the qualification and validation reports included dedicated sections for approval, conclusion and deviations (if any). Qualification The SOP for equipment qualification was reviewed. The procedure provided for lifecycle management of equipment qualification, including DQ, IQ, OQ and PQ. Process Validation (PV) The SOP for PV was in place. …",
+      "text_ko": "밸리데이션 문서 — 프로토콜과 관련 보고서를 통한 밸리데이션·적격성평가 활동 문서화 요건이 수립돼 있었다. 적격성평가·밸리데이션 보고서 양식에는 승인·결론·일탈(해당 시) 항목이 별도로 포함돼 있었다. 적격성평가 — 장비 적격성평가 SOP 를 검토했다. 이 절차는 DQ·IQ·OQ·PQ 를 포함한 장비 적격성평가의 생애주기 관리를 규정하고 있었다. 공정밸리데이션(PV) — PV 관련 SOP 가 마련돼 있었다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control",
+      "text": "A change management procedure was available. Several changes were documented in the APQR.",
+      "text_ko": "변경관리 절차가 마련돼 있었다. 여러 변경 사항이 APQR(연간 제품품질평가)에 문서화돼 있었다.",
+      "title_ko": "변경관리"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Rejection Intermediates and APIs failing to meet established specifications were identified as such and quarantined. These intermediates or APIs could possibly be reprocessed or reworked as described below. Reprocessing The SOP for reprocessing and reworking was in place. The Procedure allowed reprocessing and reworking of batches not meeting preset specifications. Reworked batches were required to be validated (concurrent approach) and declared to regulatory authorities along with stability data prior to sale. The list of reprocessed batches was provided. …",
+      "text_ko": "불합격 처리 — 수립된 규격에 적합하지 않은 중간체와 API 는 그렇게 식별돼 검역 처리됐다. 이들 중간체 또는 API 는 아래와 같이 재처리 또는 재작업될 수 있었다. 재처리 — 재처리·재작업 SOP 가 마련돼 있었다. 이 절차는 사전 설정 규격에 적합하지 않은 배치의 재처리·재작업을 허용했다. 재작업 배치는 밸리데이션(동시적 접근)을 거쳐야 하고 판매 전 안정성 자료와 함께 규제기관에 신고하도록 요구됐다. 재처리된 배치 목록이 제공됐다. …",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "Customer complaint and product recalls were managed according to written procedures. No complaints and recall on Sofosbuvir were reported as there were no commercial batches of WHO grade Sofosbuvir have been distributed since last inspection.",
+      "text_ko": "고객 불만과 제품 회수는 문서화된 절차에 따라 관리됐다. 직전 실사 이후 WHO 등급 소포스부비르의 상업용 배치가 유통된 바 없어 소포스부비르에 관한 불만과 회수는 보고되지 않았다.",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "PBIC did not outsource any production activities. On the other hand, several QC activities were outsourced by PBIC to third parties. All outsourced laboratory activities were controlled through quality agreements as guided by the supplier qualification procedure.",
+      "text_ko": "PBIC 는 생산 활동을 위탁하지 않았다. 반면 여러 QC 활동은 제3자에 위탁했다. 위탁된 모든 시험실 활동은 공급업체 적격성평가 절차에 따라 품질협약으로 관리됐다.",
+      "title_ko": "위탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 이집트 알렉산드리아 뉴 보르그 엘 아랍시 제2공업지구 5번 22블록(21934) 소재 Pharco B International (2) for Chemicals(PBIC)는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -4934,6 +5623,23 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection No onsite WHO inspection has been conducted at this manufacturing site. In the absence of recent WHO onsite inspection data, reliance was placed on the January 2024 GMP inspection performed by a stringent regulatory authority (AEMPS), together with the associated GMP certificate and the follow‑up CAPA documentation and also with other supporting documents. Summary of key information about the site Laboratorios León Farma S.A. is a pharmaceutical manufacturing site located at Polígono Industrial Navatejera, C/ La Vallina s/n, 24193 Villaquilambre, León, Spain, operating under AEMPS registration number 4208‑E. The site belongs to the CHEMO / INSUD PHARMA Group, with corporate headquarters located in Madrid, Spain. The facility has been operating under a validated and continuously updated Site Master File, with the current version SMF‑MT‑53 dated March 2026. The site is authorized for the manufacture of human medicinal products, including investigational medicinal products (IMPs), and for importation of intermediates followed by further processing for export to third countries. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "Korean Ministry of Food and Drug Safety (MFDS Korea)",
+      "dates": "21 to 23 October 2025"
+     },
+     {
+      "authority": "AEMPS (Spain)",
+      "dates": "15–17 January 2024"
+     }
+    ],
+    "outcome_ko": "최근 WHO 실사 요약 — 이 제조소에 대한 WHO 현장실사는 수행된 바 없다. 최근 WHO 현장실사 자료가 없는 상황에서, 엄격규제기관(SRA)인 AEMPS 가 2024년 1월에 수행한 GMP 실사와 그에 따른 GMP 증명서·후속 CAPA 문서 및 기타 뒷받침 자료에 의존(reliance)했다. 사이트 개요: Laboratorios León Farma S.A. 는 스페인 레온주 비야킬람브레(24193) Polígono Industrial Navatejera, C/ La Vallina s/n 소재 제약 제조소로 AEMPS 등록번호 4208-E 로 운영된다. 스페인 마드리드에 본사를 둔 CHEMO / INSUD PHARMA 그룹 소속이다. 검증되고 지속적으로 갱신되는 Site Master File(현행판 SMF-MT-53, 2026년 3월)에 따라 운영해 왔다. 이 사이트는 임상시험용 의약품(IMP)을 포함한 인체용 의약품 제조와, 중간체를 수입해 추가 가공 후 제3국으로 수출하는 활동에 대해 허가를 받았다."
    }
   },
   {
@@ -4992,6 +5698,119 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory -Changhai site located at 188-1 Mid Zhiyuan Avenue, Lihai Sub-district, Yuecheng District, Shaoxing City, Zhejiang Province, 312366, P.R.China was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for three years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "Quality management for the manufacturing site Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory – Changhai site listed to manufacture the Rifampicin API was limited to only production related activities with QA activities and QC testing overseen by Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory. Pharmaceutical Quality system: Organization and Responsibilities The SOP addressed responsibilities of different site positions was available. Quality Assurance of Xinchang Pharma: Divided in three different sections, API, Finished Drug Product and Quality Management office. …",
+      "text_ko": "리팜피신 API 제조소로 등재된 Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory – Changhai 사이트의 품질경영은 생산 관련 활동으로만 한정되며, QA 활동과 QC 시험은 Zhejiang Medicine Co., Ltd. Xinchang Pharmaceutical Factory 가 관장한다. 의약품 품질시스템: 조직과 책임 — 사이트 직위별 책임을 규정한 SOP 가 마련돼 있었다. Xinchang Pharma 의 품질보증 조직은 API·완제의약품·품질관리사무국 3개 부문으로 나뉘어 있었다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "Number of personnel involved with the manufacturing of API products at the Xinchang Pharmaceutical Factory – Changhai site, according to the presentation by the company accounted for 123 staff. Following from the June 2025 WHO PQT inspection the company introduced a new organization chart showing responsibilities and reporting lines in quality and production units. The organization chart was found acceptable. Job descriptions Adequate number of qualified trained and experienced personnel were available. Responsibilities (job descriptions) were specified in writing. …",
+      "text_ko": "회사 설명에 따르면 Xinchang Pharmaceutical Factory – Changhai 사이트의 API 제조 관련 인원은 123명이었다. 2025년 6월 WHO PQT 실사 이후 회사는 품질·생산 부문의 책임과 보고체계를 보여주는 새 조직도를 도입했고, 조직도는 적절한 것으로 확인됐다. 직무기술서 — 적절한 자격·훈련·경험을 갖춘 인원이 충분히 확보돼 있었고 책임(직무기술서)이 문서로 규정돼 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "The buildings and facilities used for manufacturing intermediates and APIs were situated, designed, and constructed to allow for appropriate cleaning, maintenance, and operations based on the type and stage of manufacture. The flow of materials and personnel through the building or facilities was designed to prevent mix- ups or contamination. Production At the Xinchang Pharmaceutical Factory – Changhai site, workshops were designated to the production of Rifampicin. There was a clean zone of Class D for final crystallization, drying and packaging. …",
+      "text_ko": "중간체·API 제조에 사용되는 건물과 시설은 제조 유형과 단계에 맞게 적절한 세척·유지보수·작업이 가능하도록 배치·설계·건설돼 있었다. 건물·시설 내 자재와 인원의 동선은 혼동이나 오염을 방지하도록 설계됐다. 생산 — Xinchang Pharmaceutical Factory – Changhai 사이트에서는 작업장이 리팜피신 생산 전용으로 지정돼 있었다. 최종 결정화·건조·포장을 위한 Class D 청정구역이 있었다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Equipment in the workshops was dedicated to produce Rifampicin API. The equipment was designed to be of appropriate size and location for use, cleaning, sanitization, and maintenance. Equipment construction ensured that surfaces contacting raw materials, intermediates, or APIs maintained the quality of these substances. The equipment in the workshops was check. Contamination controls were discussed.",
+      "text_ko": "작업장의 장비는 리팜피신 API 생산 전용이었다. 장비는 사용·세척·소독·유지보수에 적합한 크기와 위치로 설계됐다. 장비 구조는 원료·중간체·API 와 접촉하는 표면이 해당 물질의 품질을 유지하도록 보장했다. 작업장 장비를 점검했고 오염관리에 대해 논의했다.",
+      "title_ko": "공정 장비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "Documents were managed manually in a paper-based system. Documentation for the manufacture of APIs was prepared, reviewed, approved, and distributed as per established procedures. The issuance, revision, replacement, and withdrawal of all documents were regulated, with revision histories kept. The procedures set retention periods for archived documents based on document importance. Quality documents were reviewed periodically. If unchanged after review, it was stamped “REVIEWED” and the review date became the new valid date. …",
+      "text_ko": "문서는 종이 기반 체계로 수기 관리되고 있었다. API 제조 관련 문서는 수립된 절차에 따라 작성·검토·승인·배포됐다. 모든 문서의 발행·개정·교체·회수가 규정돼 있었고 개정 이력이 유지됐다. 절차는 문서 중요도에 따른 보관문서 보존기간을 정하고 있었다. 품질문서는 주기적으로 재검토됐고, 재검토 후 변경이 없으면 \"REVIEWED\" 도장을 찍고 그 재검토일이 새 유효일이 됐다. …",
+      "title_ko": "문서 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Written procedures describing the receipt, identification, quarantine, storage, handling, sampling, testing and approval or rejection of materials were available. Raw materials were accepted upon receipt of the supplier's delivery notice and COA, then checked for appearance and weight. After cleaning, samples were tested. Materials were labelled \"quarantine\" pending analysis. If approved, QA replaced the label with \"qualified.\" Supplier Qualification A list of qualified suppliers was established. Suppliers of raw materials were periodical audited and annual quality reviewed. …",
+      "text_ko": "자재의 입고·확인·검역·보관·취급·채취·시험 및 승인 또는 불합격 처리를 기술한 문서화된 절차가 마련돼 있었다. 원료는 공급업체의 납품서와 COA 를 받은 뒤 수령해 외관과 중량을 확인했다. 청소 후 시료를 시험했다. 자재는 분석 완료 전까지 \"검역\" 표시를 했고, 승인되면 QA 가 라벨을 \"적합\"으로 교체했다. 공급업체 적격성평가 — 적격 공급업체 목록이 수립돼 있었고, 원료 공급업체는 주기적으로 감사하고 연간 품질평가를 실시했다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "Raw materials for manufacturing were weighed and measured under appropriate conditions to ensure their suitability for use. The weighing and measuring devices employed were of suitable accuracy for the intended purpose. The two workshops were dedicated to the manufacturing of Rifampicin API. The production of Rifampicin was in operation at the time of inspection. The production workshops were briefly inspected.",
+      "text_ko": "제조용 원료는 사용 적합성을 보장하는 적절한 조건에서 칭량·계량됐다. 사용된 칭량·계량 기기는 의도된 용도에 적합한 정확도를 갖추고 있었다. 두 개 작업장이 리팜피신 API 제조 전용이었다. 실사 당시 리팜피신 생산이 가동 중이었고 생산 작업장을 간략히 점검했다.",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "Rifampicin was initially packed in accordance with its BPR. Each bag was labelled with the product name and batch number. The outer product label indicated the storage conditions together with the product name and batch number. The newly introduced packaging line was in operation at the time of inspection and was observed from the window. This semi-automated packaging machine largely reduced the powder contamination in the room. During the packaging process, product samples for QC testing were collected.",
+      "text_ko": "리팜피신은 배치포장기록(BPR)에 따라 1차 포장됐다. 각 백에는 제품명과 배치번호가 표시됐다. 외부 제품 라벨에는 제품명·배치번호와 함께 보관조건이 표시됐다. 새로 도입된 포장라인이 실사 당시 가동 중이었고 창을 통해 관찰했다. 이 반자동 포장기는 실내 분진 오염을 크게 줄였다. 포장 공정 중 QC 시험용 제품 시료가 채취됐다.",
+      "title_ko": "API·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Facilities were available for the storage of materials under appropriate conditions. Records were maintained of these conditions. Separate storage areas were provided for quarantine, rejected, returned or recalled products. The factory was equipped with dedicated warehouses for raw materials of drug products, finished dosage forms, chemical raw materials and APIs. The area and space of the warehouse, which had an individual material sampling area and sufficient space for materials, quarantined and finished products and met corresponding storage conditions. …",
+      "text_ko": "적절한 조건에서 자재를 보관할 수 있는 시설이 갖춰져 있었고 해당 조건의 기록이 유지됐다. 검역·불합격·반품·회수 제품을 위한 별도 보관구역이 마련돼 있었다. 공장에는 완제의약품용 원료, 완제 제형, 화학 원료, API 를 위한 전용 창고가 갖춰져 있었다. 창고는 별도의 자재 채취구역과 자재·검역품·완제품을 위한 충분한 면적·공간을 확보하고 해당 보관조건을 충족했다. …",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "QC testing is conducted across three different sites as per the following: IPQC testing laboratory at Changhai site, ZMC Xinchang Pharmaceutical Factory was briefly inspected. The testing of environment monitoring was performed by the contract QC at laboratory of Changhai Pharma. and change has been made after last inspection. The environment monitoring testing was performed in IPQC laboratory. The IPQC laboratory onsite was responsible for the testing of incoming materials and intermediate products. QC laboratory at Xinchang site, ZMC-Xinchang Pharmaceutical Factory was inspected. …",
+      "text_ko": "QC 시험은 다음과 같이 3개 사이트에 걸쳐 수행된다. Changhai 사이트 IPQC 시험실(ZMC Xinchang Pharmaceutical Factory)을 간략히 점검했다. 환경 모니터링 시험은 Changhai Pharma 시험실의 위탁 QC 가 수행해 왔으나 지난 실사 이후 변경돼 IPQC 시험실에서 수행되고 있었다. 사이트 내 IPQC 시험실은 입고 자재와 중간제품 시험을 담당했다. Xinchang 사이트 QC 시험실(ZMC-Xinchang Pharmaceutical Factory)을 점검했다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "During the most recent WHO PQT inspection conducted in June 2025, major observations were noted pertaining to VMP, PV, and analytical method validation. The corresponding CAPAs addressing these observations were reviewed and found to be satisfactory. Validation master plan (VMP) Validation Master Plan for Xinchang Pharma has been updated. Process validation Process validation (PV) utilizing Rifamycin S Sodium, supplied and manufactured by Keming Biopharma, has been conducted since the previous inspection. …",
+      "text_ko": "2025년 6월에 수행된 직전 WHO PQT 실사에서 VMP, 공정밸리데이션(PV), 분석법 밸리데이션에 관한 major 관찰사항이 지적됐다. 이에 대응한 CAPA 를 검토한 결과 만족스러운 것으로 확인됐다. 밸리데이션 마스터플랜(VMP) — Xinchang Pharma 의 VMP 가 갱신됐다. 공정밸리데이션 — Keming Biopharma 가 공급·제조한 리파마이신 S 나트륨을 사용한 공정밸리데이션(PV)이 직전 실사 이후 수행됐다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control (CC)",
+      "text": "The SOP addressing CC “Procedure of change control” SOP-QAP000024-17 effective on 30/09/2025 was verified. Changes were classified as minor, medium and major, and a CC register was kept. Since the last WHO PQT inspection in June 2025, the SOP addressing CC was updated and Change Control related to Rifampicin were introduced. Examples of changes related to Rifampicin’s manufacturing and testing were verified.",
+      "text_ko": "변경관리 SOP \"Procedure of change control\" SOP-QAP000024-17(2025-09-30 시행)을 확인했다. 변경은 minor·medium·major 로 분류됐고 변경관리 대장이 유지됐다. 2025년 6월 직전 WHO PQT 실사 이후 변경관리 SOP 가 갱신됐고 리팜피신 관련 변경관리가 도입됐다. 리팜피신 제조·시험 관련 변경 사례를 확인했다.",
+      "title_ko": "변경관리(CC)"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Reprocessing and Reworks, Returns Rejections This section was not reinspected. Recovery of Solvents Solvents were recovered following manufacturing process of Rifampicin. No mother liquor was recycled.",
+      "text_ko": "재처리·재작업, 반품, 불합격 — 이 항목은 재실사하지 않았다. 용매 회수 — 리팜피신 제조공정 후 용매가 회수됐다. 모액(mother liquor)은 재활용되지 않았다.",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "A complaints procedure was available which specified that the complaint-receiving personnel should inform QA on the complaint with QA responsible for logging, classifying and investigating complaints and preparing the reports. Complaints were categorized as critical, major or minor based on the severity and effect on public health. Based on the investigation, preventive and corrective actions are taken when necessary. A complaints register was kept by each site with corporate overseeing implementation. Following from the last WHO PQT inspection of June 2025 this section was not reinspected. …",
+      "text_ko": "불만 접수 인원이 QA 에 통보하고 QA 가 불만의 기록·분류·조사와 보고서 작성을 담당하도록 규정한 불만 처리 절차가 마련돼 있었다. 불만은 심각도와 공중보건 영향에 따라 critical·major·minor 로 분류됐다. 조사 결과에 따라 필요 시 예방조치와 시정조치를 취했다. 불만 대장은 각 사이트가 유지하고 본사가 이행을 관리했다. 2025년 6월 직전 WHO PQT 실사 이후 이 항목은 재실사하지 않았다. …",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "The production for Rifampicin in the inspection scope was not contracted. The contract labs are used for water and genotoxic impurity testing. The qualification requirements for contract laboratory service were checked.",
+      "text_ko": "실사 범위 내 리팜피신 생산은 위탁되지 않았다. 위탁 시험실은 용수 및 유전독성 불순물 시험에 사용됐다. 위탁 시험실 서비스에 대한 적격성평가 요건을 확인했다.",
+      "title_ko": "위탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 저장성 사오싱시 웨청구 리하이가 즈위안대로 중단 188-1(312366) 소재 Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory – Changhai 사이트는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -5050,6 +5869,168 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the personnel interviewed, and the documents reviewed, and taking into consideration the findings of the inspection, including the observations listed in the Inspection Report Ecron Acunova Limited, (Navitas Life Sciences) located at No.52- 2, Near Kasturba Hospital OPD Block, Manipal, 576 104; India was considered to be operating at an acceptable level of compliance with WHO GCP and BE study guidelines. The deficiencies observed during the inspection, as listed in the full report, were addressed by Ecron Acunova Limited to a satisfactory level before the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Organization and management",
+      "text": "A summary of the CRO’s Phase I and bioequivalence capabilities, facilities, regulatory track record, and end-to-end clinical, bioanalytical, and regulatory services for generics and early-phase drug development was presented during the opening meeting. An organizational chart depicting key positions and the names of responsible persons was available at the CRO. The organizational chart for clinical and bioanalytical functions was dated 16 January 2026, authorized, and kept up to date. A job description, including defined responsibilities, was available for each employee. …",
+      "text_ko": "개회 회의에서 이 CRO 의 1상·생물학적동등성 수행 역량, 시설, 규제 실적, 제네릭 및 초기 개발 단계 의약품을 위한 임상·생체분석·규제 전 과정 서비스에 대한 개요가 제시됐다. 주요 직위와 책임자 성명을 표시한 조직도가 CRO 에 비치돼 있었다. 임상·생체분석 기능 조직도는 2026년 1월 16일자로 승인돼 최신 상태로 유지되고 있었다. 직원별로 책임이 규정된 직무기술서가 마련돼 있었다. …",
+      "title_ko": "조직 및 경영"
+     },
+     {
+      "no": 2,
+      "title": "Computer systems",
+      "text": "An inventory of all computerized systems connected to the network was available as an Excel sheet, with clear identification of GxP-regulated systems. Any changes to the network were documented. Procedures for Computer System Validation (and for changes to the CSV) were established to ensure that computerized systems were suitable for their intended purpose and were validated, operated, and maintained in accordance with GCP and GLP principles, as applicable. Access to software systems containing trial-related information was controlled. …",
+      "text_ko": "네트워크에 연결된 모든 전산화 시스템의 목록이 Excel 시트로 관리되고 있었고 GxP 규제 대상 시스템이 명확히 식별돼 있었다. 네트워크 변경사항은 모두 문서화됐다. 전산화 시스템이 의도된 목적에 적합하며 해당 시 GCP·GLP 원칙에 따라 밸리데이션·운영·유지관리되도록 보장하기 위해 전산시스템 밸리데이션(CSV) 및 CSV 변경 절차가 수립돼 있었다. 시험 관련 정보를 담은 소프트웨어 시스템에 대한 접근이 통제되고 있었다. …",
+      "title_ko": "전산 시스템"
+     },
+     {
+      "no": 3,
+      "title": "Quality management",
+      "text": "Appropriate QA and QC systems with written SOPs were in place to ensure that trials were conducted and that data were generated, documented, and reported in compliance with the protocol, GCP, GLP, and applicable regulatory requirements. A designated software was used to upload, approve, and authorize SOPs. On the first day of the inspection, relevant SOPs related to study activities were provided to the inspection team and were uploaded to the shared folder. The Quality Manual, Ecron Acunova Limited, was provided, and it was verified to be in accordance with WHO guidelines. …",
+      "text_ko": "시험이 프로토콜·GCP·GLP 및 해당 규제 요건에 따라 수행되고 데이터가 생성·문서화·보고되도록 보장하기 위해 문서화된 SOP 를 갖춘 적절한 QA·QC 체계가 마련돼 있었다. SOP 의 업로드·승인·인가에는 지정 소프트웨어가 사용됐다. 실사 첫날 시험 활동 관련 SOP 가 실사팀에 제공돼 공유 폴더에 업로드됐다. Ecron Acunova Limited 품질매뉴얼이 제공됐고 WHO 가이드라인에 부합함을 확인했다. …",
+      "title_ko": "품질 경영"
+     },
+     {
+      "no": 4,
+      "title": "Archive facilities",
+      "text": "The archival facility was visited during the inspection. Access to the archive was restricted to the designated archivist through an access card system, and an entry logbook was maintained. Different categories of documents were retained in the internal archive for defined minimum retention periods, ranging from immediate transfer to a minimum of three years, before being transferred to the external archive. Third-party archival services were provided. The service agreement with the service provider was available. …",
+      "text_ko": "실사 중 기록보관 시설을 방문했다. 보관실 출입은 출입카드 시스템을 통해 지정 기록관리자로 제한됐고 출입 로그북이 유지됐다. 문서는 범주별로 정해진 최소 보존기간(즉시 이관에서 최소 3년까지) 동안 내부 보관실에 보관된 뒤 외부 보관소로 이관됐다. 제3자 기록보관 서비스가 이용되고 있었고 해당 서비스 제공자와의 계약서가 비치돼 있었다. …",
+      "title_ko": "기록 보관 시설"
+     },
+     {
+      "no": 5,
+      "title": "Premises",
+      "text": "During the inspection, a tour of the facility was conducted. The facilities were maintained in a clean condition and were provided with adequate lighting, ventilation, and environmental controls. Floors, walls, and workbench surfaces were designed to allow easy cleaning and decontamination. Clinical trials were conducted under conditions that ensured the safety of subjects. The site was appropriate to the level of potential risk involved. The CRO had sufficient space to accommodate the personnel and activities required to conduct the studies. …",
+      "text_ko": "실사 중 시설 견학이 이뤄졌다. 시설은 청결하게 유지됐고 적절한 조명·환기·환경관리가 제공되고 있었다. 바닥·벽·작업대 표면은 세척과 오염제거가 쉽도록 설계돼 있었다. 임상시험은 피험자 안전을 보장하는 조건에서 수행됐다. 사이트는 관련된 잠재적 위험 수준에 적합했다. CRO 는 시험 수행에 필요한 인원과 활동을 수용할 충분한 공간을 갖추고 있었다. …",
+      "title_ko": "건물"
+     },
+     {
+      "no": 6,
+      "title": "Personnel",
+      "text": "A sufficient number of qualified medical, paramedical, technical, and clerical staff were available at the Manipal facilities to support trial conduct and to respond effectively to foreseeable emergencies. The total workforce comprised 99 employees, including 41 personnel in Clinical, 38 in Bioanalytical, 8 in Quality Assurance, 6 in Project Management and Regulatory, and 6 in the Clinical Laboratory. …",
+      "text_ko": "마니팔 시설에는 시험 수행을 지원하고 예견 가능한 응급상황에 효과적으로 대응할 수 있는 적격한 의료·준의료·기술·사무 인력이 충분히 확보돼 있었다. 총 인력은 99명으로 임상 41명, 생체분석 38명, 품질보증 8명, 프로젝트관리·규제 6명, 임상시험실 6명으로 구성돼 있었다. …",
+      "title_ko": "인원"
+     },
+     {
+      "no": 7,
+      "title": "Clinical phase",
+      "text": "The clinical phase of the studies was conducted on the premises of the CRO. A tour of the facilities was conducted. The CPU comprised five wards located on the second and third floors, with a total capacity of 148 beds; one ward was visited during the inspection. A sample processing room was available, equipped with a −70°C deep freezer monitored by a monitoring system (with probe placement based on temperature mapping) and a centrifuge. In the housing areas, bedside, toilet, and bathroom alarms were installed, tested, and found functional. …",
+      "text_ko": "시험의 임상 단계는 CRO 시설 내에서 수행됐다. 시설 견학이 이뤄졌다. 임상시험부(CPU)는 2·3층에 위치한 5개 병동으로 총 148병상 규모였고 실사 중 1개 병동을 방문했다. 시료 처리실이 마련돼 있었고 모니터링 시스템으로 감시되는 −70℃ 초저온 냉동고(온도 매핑에 근거한 프로브 배치)와 원심분리기를 갖추고 있었다. 수용 구역에는 침대 옆·화장실·욕실 경보장치가 설치돼 있었고 시험 결과 정상 작동했다. …",
+      "title_ko": "임상 단계"
+     },
+     {
+      "no": 8,
+      "title": "Clinical laboratory",
+      "text": "The inspectors visited the in-house clinical laboratory, which was used for analyzing samples. The clinical laboratory was found to be suitable. The clinical laboratory held a valid NABL accreditation in accordance with ISO 15189 requirements for medical laboratories. During the study, accreditation under ISO 15189:2012 was valid from 18 May 2022 to 17 May 2024. This was subsequently renewed from 26 July 2024 to 25 July 2026, followed by recertification to ISO 15189:2022, issued on 13 August 2025 and valid until 25 July 2026. …",
+      "text_ko": "조사관은 시료 분석에 사용되는 내부 임상시험실을 방문했다. 임상시험실은 적합한 것으로 확인됐다. 이 시험실은 의학시험실에 관한 ISO 15189 요건에 따른 유효한 NABL 인정을 보유하고 있었다. 시험 기간 중 ISO 15189:2012 인정이 2022년 5월 18일부터 2024년 5월 17일까지 유효했고, 이후 2024년 7월 26일부터 2026년 7월 25일까지 갱신됐으며, 2025년 8월 13일 발급돼 2026년 7월 25일까지 유효한 ISO 15189:2022 재인증이 이어졌다. …",
+      "title_ko": "임상시험실"
+     },
+     {
+      "no": 9,
+      "title": "Ethics",
+      "text": "Both studies were approved by the independent Ethics Committee before initiation. The committee’s independence from the sponsor, investigator, and CRO was verified, and adequate documentation of IEC review and approvals, including meeting minutes, approved protocols, informed consent forms in relevant languages, and valid subject insurance, was available for each study. Informed consent form Information was provided to study participants both orally and in writing, in vernacular languages, at an appropriate level of complexity. …",
+      "text_ko": "두 시험 모두 착수 전 독립 윤리위원회의 승인을 받았다. 위원회가 의뢰자·시험자·CRO 로부터 독립적임을 확인했고, 회의록·승인 프로토콜·해당 언어 동의서·유효한 피험자 보험을 포함한 윤리위원회 심의·승인 문서가 시험별로 충분히 확보돼 있었다. 동의서 — 시험 참여자에게 구두와 서면으로, 현지어로, 적절한 난이도 수준의 정보가 제공됐다. …",
+      "title_ko": "윤리"
+     },
+     {
+      "no": 10,
+      "title": "Monitoring",
+      "text": "The studies were monitored by qualified sponsor representatives to ensure compliance with the protocol, GCP, GLP, and applicable regulatory and ethical requirements, including verification of CRF completion and data accuracy. Pre-study, during-study, and post-study monitoring visits were conducted, and written monitoring reports were prepared following each visit. Observations were communicated promptly to the CRO and Sponsor, and corresponding responses and corrective actions were documented.",
+      "text_ko": "시험은 CRF 작성과 데이터 정확성 검증을 포함해 프로토콜·GCP·GLP 및 해당 규제·윤리 요건 준수를 보장하기 위해 적격한 의뢰자 대리인이 모니터링했다. 시험 전·중·후 모니터링 방문이 수행됐고 각 방문 후 서면 모니터링 보고서가 작성됐다. 관찰사항은 CRO 와 의뢰자에게 신속히 전달됐고 그에 따른 회신과 시정조치가 문서화됐다.",
+      "title_ko": "모니터링"
+     },
+     {
+      "no": 11,
+      "title": "Investigators",
+      "text": "The Principal Investigator was responsible for the overall clinical conduct of the study, including the clinical aspects of study design, the administration of investigational products, liaison with local authorities and the ethics committee, and the signing of the protocol and the final study report. Curricula vitae of all three PIs were available and were also reviewed. Annual GCP training records for 2025 were available through the system and were reviewed without issue. Relevant contracts were also available.",
+      "text_ko": "책임시험자(PI)는 시험 설계의 임상 측면, 시험용 의약품 투여, 지역 당국·윤리위원회와의 연락, 프로토콜 및 최종 시험보고서 서명을 포함해 시험의 전반적 임상 수행을 책임졌다. 3명의 PI 전원에 대한 이력서가 비치돼 검토됐다. 2025년 연간 GCP 교육 기록을 시스템에서 확인했고 문제가 없었다. 관련 계약서도 비치돼 있었다.",
+      "title_ko": "시험자"
+     },
+     {
+      "no": 12,
+      "title": "Receiving, storage, and handling of investigational drug products",
+      "text": "Information on the receipt, storage, handling, and accountability of investigational products at all stages of the trial was recorded. Information on shipment, delivery, receipt, description, storage (including storage conditions), dispensing, administration, and reconciliation of remaining pharmaceutical products was verified. Details of the investigational products, including dosage form and strength, lot number, and expiry date, were documented. Randomization was performed in accordance with SOP for Randomization for BA/BE Studies. …",
+      "text_ko": "시험 전 단계에 걸친 시험용 의약품의 입고·보관·취급·수불에 관한 정보가 기록됐다. 잔여 의약품의 운송·인도·입고·기술·보관(보관조건 포함)·불출·투여·수불 대조 정보를 확인했다. 제형·함량, 로트번호, 유효기한을 포함한 시험용 의약품 상세정보가 문서화됐다. 무작위배정은 BA/BE 시험 무작위배정 SOP 에 따라 수행됐다. …",
+      "title_ko": "시험용 의약품의 입고·보관·취급"
+     },
+     {
+      "no": 13,
+      "title": "Case report forms",
+      "text": "Randomly selected CRFs from the studies within the scope of the inspection were reviewed. For the inspected studies, CRFs were maintained on paper. The CRO had implemented a new electronic database, initially for screening activities starting in December 2023 and for full clinical phase activities starting in August 2024. Data collected for each volunteer were specified in the trial protocol. Copies of clinical laboratory reports and ECGs were included in the respective subject CRFs, and all relevant study information was appropriately documented.",
+      "text_ko": "실사 범위 내 시험에서 무작위로 선정한 CRF 를 검토했다. 실사 대상 시험의 CRF 는 종이 형태로 유지되고 있었다. CRO 는 새 전자 데이터베이스를 도입해 2023년 12월부터 스크리닝 활동에, 2024년 8월부터 임상 단계 전체 활동에 적용하기 시작했다. 지원자별 수집 데이터는 시험 프로토콜에 규정돼 있었다. 임상시험실 보고서와 심전도 사본이 각 피험자 CRF 에 포함됐고 모든 관련 시험 정보가 적절히 문서화돼 있었다.",
+      "title_ko": "증례기록서(CRF)"
+     },
+     {
+      "no": 14,
+      "title": "Volunteers, recruitment methods",
+      "text": "Volunteer recruitment procedures were defined in SOP for Mode of Advertisement. Permissible recruitment methods included print, radio, television, newspaper, personal or telephonic contact, email, posters, and letters. Access to the database was password- controlled to protect confidential information. Recruitment materials, including display advertisements in English and Kannada, had prior approval from the ethics committee. At the time of inspection, no active advertisements were issued, as recruitment was primarily supported by an existing volunteer pool and word-of-mouth referrals. …",
+      "text_ko": "지원자 모집 절차는 광고 방식 SOP 에 규정돼 있었다. 허용되는 모집 방법에는 인쇄물, 라디오, 텔레비전, 신문, 대면 또는 전화 접촉, 이메일, 포스터, 서신이 포함됐다. 기밀정보 보호를 위해 데이터베이스 접근은 비밀번호로 통제됐다. 영어·칸나다어 게시 광고를 포함한 모집 자료는 윤리위원회의 사전 승인을 받았다. 실사 시점에는 기존 지원자 풀과 구전 소개가 모집을 주로 뒷받침하고 있어 진행 중인 광고가 없었다. …",
+      "title_ko": "지원자 및 모집 방법"
+     },
+     {
+      "no": 15,
+      "title": "Food and fluids",
+      "text": "Meals were standardized, controlled, and scheduled during the study days. The CRO arranged standardized meals, snacks, and beverages for study subjects in accordance with the clinical trial protocol and the catering service agreement. The timing, duration, and quantity of food and fluids consumed were recorded. Standardized meals were designed by a dietitian with appropriate qualifications, training, and experience. The qualifications, training, and experience of the two dietitians were reviewed and found acceptable.",
+      "text_ko": "시험일 동안 식사는 표준화·관리되고 정해진 시간에 제공됐다. CRO 는 임상시험 프로토콜과 급식 서비스 계약에 따라 피험자에게 표준화된 식사·간식·음료를 제공했다. 섭취한 음식과 수분의 시각·소요시간·양이 기록됐다. 표준 식단은 적절한 자격·교육·경험을 갖춘 영양사가 설계했다. 영양사 2명의 자격·교육·경험을 검토한 결과 적절했다.",
+      "title_ko": "식사 및 수분"
+     },
+     {
+      "no": 16,
+      "title": "Safety, adverse events, adverse event reporting",
+      "text": "The study was planned, organized, performed, and monitored to ensure an acceptable safety profile for volunteers. A medical doctor was responsible for medical decisions in the event of adverse events and for notifying relevant health authorities, the Sponsor, and, where applicable, the ethics committee, particularly in cases of serious adverse events. First-aid equipment and appropriate rescue medication were available in the ICU and were ready for emergency use at the study site. …",
+      "text_ko": "시험은 지원자에 대한 허용 가능한 안전성 프로파일을 보장하도록 계획·조직·수행·모니터링됐다. 이상사례 발생 시 의학적 판단과, 특히 중대한 이상사례의 경우 관련 보건당국·의뢰자 및 해당 시 윤리위원회에 대한 통보는 의사가 책임졌다. 응급처치 장비와 적절한 구조 약물이 중환자실에 비치돼 시험 현장에서 응급 사용이 가능한 상태였다. …",
+      "title_ko": "안전성·이상사례 및 이상사례 보고"
+     },
+     {
+      "no": 17,
+      "title": "Method development, Method validation & Analysis of study samples",
+      "text": "Human plasma samples from the study related to the WHO application no. MA199, containing K2EDTA as anticoagulant, was analyzed for Artemether and its metabolite Dihydroartemisinin, and for Lumefantrine, in accordance with the respective standard test procedures and SOP for Study Sample Analysis. Three separate high-performance liquid chromatographic methods with mass spectrometric detection for the determination of Artemether and its metabolite Dihydroartemisinin, and of Lumefantrine in human K2EDTA plasma, were developed and validated by the CRO. …",
+      "text_ko": "WHO 신청번호 MA199 관련 시험의 K2EDTA 항응고제 함유 인체 혈장 시료에 대해 아르테메터와 그 대사체 디하이드로아르테미시닌, 그리고 루메판트린을 각 표준시험절차와 시험시료 분석 SOP 에 따라 분석했다. 인체 K2EDTA 혈장 중 아르테메터·디하이드로아르테미시닌 및 루메판트린 정량을 위한 3개의 질량분석 검출 고성능 액체크로마토그래피 분석법이 CRO 에 의해 개발·밸리데이션됐다. …",
+      "title_ko": "분석법 개발·밸리데이션 및 시험 시료 분석"
+     },
+     {
+      "no": 18,
+      "title": "Sample collection, storage, and handling of biological material",
+      "text": "Specifications for biological samples (blood plasma), including sampling method, volume, and number of samples, were defined in the clinical trial protocol and were communicated to volunteers. Collection, preparation, transport, shipment, and storage of samples were conducted in accordance with established procedures, including SOP for Handling of Biological Samples in the Bioanalytical Laboratory (Edition 3, Version 2) and SOP for Additional applicable procedures, SOP for Study Samples Segregation, Shipment and Disposal, and SOP for Transfer, Processing and Storage of Biosamples. …",
+      "text_ko": "채취 방법, 채취량, 시료 수를 포함한 생체시료(혈장) 규격이 임상시험 프로토콜에 규정돼 지원자에게 안내됐다. 시료의 채취·전처리·운반·수송·보관은 생체분석시험실 생체시료 취급 SOP(3판 2차) 및 시험시료 분리·수송·폐기 SOP, 생체시료 이관·처리·보관 SOP 등 수립된 절차에 따라 수행됐다. …",
+      "title_ko": "생체시료의 채취·보관·취급"
+     },
+     {
+      "no": 19,
+      "title": "Data processing and documentation",
+      "text": "Sample analyses were performed using validated chromatography systems. Integration settings were science-based and justified, with smoothing factors kept low enough to avoid masking potential interferences or altering peak geometry. Acceptance and exclusion criteria for calibration curve standards and QC samples, as well as batch acceptance criteria, were clearly defined in the applicable SOP. Source data for all analytical runs included complete information on the initial evaluation of runs, including those subsequently repeated and containing all calibration samples. …",
+      "text_ko": "시료 분석은 밸리데이션된 크로마토그래피 시스템으로 수행됐다. 적분 설정은 과학적 근거에 기반해 정당화됐고, 잠재적 간섭을 가리거나 피크 형태를 변형하지 않도록 평활화(smoothing) 계수를 충분히 낮게 유지했다. 검량선 표준품과 QC 시료의 허용·제외 기준 및 배치 허용기준이 해당 SOP 에 명확히 규정돼 있었다. 모든 분석 런의 원자료에는 이후 재실시된 런을 포함한 초기 평가 정보 전체와 모든 검량용 시료가 포함돼 있었다. …",
+      "title_ko": "데이터 처리 및 문서화"
+     },
+     {
+      "no": 20,
+      "title": "Good laboratory practices",
+      "text": "A tour of the bioanalytical facility was conducted to verify access control and storage arrangements. Access to chromatography software was restricted to authorised personnel through controlled user accounts and password protection. Reference standards and analytical columns were stored under defined and controlled conditions, with appropriate labelling and access control to maintain integrity and prevent unauthorised use. Deep freezers used for sample storage and refrigerators used for storage of reference standards were appropriately qualified, calibrated, and maintained. …",
+      "text_ko": "출입 통제와 보관 상태를 확인하기 위해 생체분석 시설 견학이 이뤄졌다. 크로마토그래피 소프트웨어 접근은 통제된 사용자 계정과 비밀번호로 승인된 인원에 한정돼 있었다. 표준품과 분석 컬럼은 무결성 유지와 무단 사용 방지를 위해 적절한 표시와 출입 통제 하에 규정된 관리 조건에서 보관됐다. 시료 보관용 초저온 냉동고와 표준품 보관용 냉장고는 적절히 적격성평가·교정·유지관리되고 있었다. …",
+      "title_ko": "우수시험실 운영(GLP)"
+     },
+     {
+      "no": 21,
+      "title": "Pharmacokinetic, statistical calculations",
+      "text": "This section was inspected during the previous inspection, and no changes had occurred since then. Data transfer from the clinical department regarding blood collection time points and corresponding deviations was prepared by the clinical department in scanned PDF format, signed and dated, and also maintained in Word format. The documentation was shared with the statisticians via email. Information on dropouts and withdrawals was included in the same communication. Bioanalytical data were shared with the statisticians via SharePoint, with notification via email. …",
+      "text_ko": "이 항목은 직전 실사에서 점검됐고 이후 변경사항이 없었다. 채혈 시점과 해당 일탈에 관한 임상부서의 데이터 이관은 임상부서가 스캔 PDF 형식으로 작성해 서명·일자를 기재했고 Word 형식으로도 유지됐다. 해당 문서는 이메일로 통계 담당자에게 공유됐고, 중도탈락·중단 정보도 같은 연락에 포함됐다. 생체분석 데이터는 SharePoint 로 공유되고 이메일로 통지됐다. …",
+      "title_ko": "약동학 및 통계 계산"
+     },
+     {
+      "no": 22,
+      "title": "Study report",
+      "text": "No discrepancies were identified between the results reported and the original raw data. The study report included the bioanalytical section of the trial, including a description of the bioanalytical method and the corresponding method validation report. The Principal Investigator approved the clinical study reports prior to data transfer to the statistical department. The responsible staff and management approved bioanalytical reports. Monitoring and audit reports were available prior to the release of the final study report.",
+      "text_ko": "보고된 결과와 원본 원자료 사이에 불일치는 확인되지 않았다. 시험보고서에는 생체분석법 기술과 해당 분석법 밸리데이션 보고서를 포함한 시험의 생체분석 부분이 포함됐다. 책임시험자는 통계부서로 데이터를 이관하기 전에 임상시험보고서를 승인했다. 생체분석 보고서는 담당 직원과 경영진이 승인했다. 최종 시험보고서 배포 전에 모니터링·감사 보고서가 확보돼 있었다.",
+      "title_ko": "시험 보고서"
+     }
+    ],
+    "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마니팔 카스투르바병원 외래동 인근 No.52-2(576 104) 소재 Ecron Acunova Limited(Navitas Life Sciences)는 WHO GCP 및 생물학적동등성(BE) 시험 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 전체 보고서에 기재된 실사 중 관찰 결함은 WHOPIR 공개 이전에 Ecron Acunova Limited 가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {

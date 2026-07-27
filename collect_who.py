@@ -307,6 +307,15 @@ WHOPIR_OUTCOME_MAX_CHARS = 1200
 _WHOPIR_SECTION_MIN_BODY = 300
 
 
+def _normalize_ligatures(text: str) -> str:
+    """483 수집기의 합자 정규화기를 재사용(엔진 부재 시 원문 그대로 — 비차단)."""
+    try:
+        from collect_fda_483 import normalize_pdf_ligatures
+    except Exception:  # noqa: BLE001
+        return text
+    return normalize_pdf_ligatures(text)
+
+
 def _whopir_squeeze(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip()
 
@@ -376,7 +385,9 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     Part 2/Part 3 경계를 못 찾으면 None — 호출부가 키를 안 쓰고 링크 카드로 유지한다
     (구조를 못 읽었으면 읽은 척하지 않는다).
     """
-    t = _WHOPIR_FOOTER_RE.sub("\n\n", text or "")
+    # PDF 서브셋 폰트 합자(ﬂow·qualiﬁed·identiﬁcation)를 먼저 되돌린다 — 483 과 같은 정규화기를
+    # 공유한다. 발행물 게이트(`test_no_ligature_artifacts`)가 잡는 잔재라 파싱 전에 처리해야 한다.
+    t = _WHOPIR_FOOTER_RE.sub("\n\n", _normalize_ligatures(text or ""))
     m2 = _WHOPIR_PART2_RE.search(t)
     m3 = _WHOPIR_PART3_RE.search(t, m2.end()) if m2 else None
     if not (m2 and m3):

@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-07-20T05:55:34+00:00",
+  "checked_at": "2026-07-27T06:05:58+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -21,14 +21,15 @@
     "ich.json",
     "mfds.json",
     "pics.json",
+    "pmda.json",
     "who.json"
   ],
   "summary": {
     "broken": 0,
-    "needs_review": 155,
-    "ok": 306,
-    "references": 583,
-    "unique_urls": 461
+    "needs_review": 156,
+    "ok": 321,
+    "references": 599,
+    "unique_urls": 477
   },
   "urls": {
     "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf": {
@@ -394,7 +395,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)",
-      "http_status": 200,
+      "http_status": 202,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -409,7 +410,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)",
-      "http_status": 200,
+      "http_status": 202,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -6791,6 +6792,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_211/view.do?seq=14981": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14981",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0005-14981"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_218/down.do?brd_id=data0013&seq=33716&data_tp=A&file_seq=3",
@@ -6865,6 +6881,231 @@
         }
       ],
       "status": "needs_review"
+    },
+    "https://www.pmda.go.jp/files/000264540.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000264540.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000264540"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266000.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266000.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266000"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266389.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266389.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266389"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266390.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266390.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266390"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266391.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266391.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266391"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266952.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266952.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266952"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266953.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266953.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266953"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266954.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266954"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000266955.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000266955"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000267517.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000267517"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000273637.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000273637"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000276919.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000276919.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000276919"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000280043.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000280043.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000280043"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000280045.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000280045.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000280045"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000280046.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000280046"
+        }
+      ],
+      "status": "ok"
     },
     "https://www.who.int/publications/m/item/Annex-8-trs-1010": {
       "attempts": 1,

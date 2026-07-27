@@ -634,6 +634,9 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
             # 이 줄이 없던 동안 클라우드 Routine 은 deep 대상을 영영 0건으로 봤다(§B [2단계]가
             # `deep_analysis_ready` 를 찾는데 handoff 에 그 키가 아예 없었다).
             v2row.update(card.deep_fields())
+            # [NCR 국문 병기 2026-07-27] 번역 입력도 같은 단일 방출점을 통해 싣는다 —
+            # 대상(EU/MHRA GMP 비준수) 카드에만 3키 추가, 비대상은 빈 dict = 완전 무영향.
+            v2row.update(card.translation_fields())
         out_rows.append(v2row)
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
     return {

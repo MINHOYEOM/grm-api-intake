@@ -1125,5 +1125,103 @@ class OrchestrationWiringTest(unittest.TestCase):
         self.assertTrue(ci._is_transient_source_error("fda483", "connection reset"))
 
 
+# 483 마지막 장 정형 고지문(실측 발췌 — 스캔본 21건이 전부 이 한 장만 텍스트였다).
+_NOTICE_ONLY = (
+    "The observations of objectionable conditions and practices listed on the front of "
+    "this form are reported:\n1. Pursuant to Section 704(b) of the Federal Food, Drug and "
+    "Cosmetic Act, or\n2. To assist firms inspected in complying with the Acts and "
+    "regulations enforced by the Food and Drug Administration."
+)
+
+
+class ScannedPdfOcrFallbackTest(unittest.TestCase):
+    """[스캔 483 OCR 2026-07-27] 뒷장 고지문만 있는 스캔본을 '정상 텍스트 PDF' 로 오분류하던
+    구멍과 그 OCR 폴백. 이 오분류가 2026-07-27 디제스트 오발행("원문이 제공되지 않아")의
+    직접 원인이었다 — 원문에는 관찰이 스캔 이미지로 멀쩡히 들어 있었다."""
+
+    def test_notice_only_text_is_not_body(self):
+        self.assertTrue(f._is_notice_only(_NOTICE_ONLY))
+
+    def test_real_observation_text_is_body(self):
+        real = _NOTICE_ONLY + "\nOBSERVATION 1\nAseptic processing was deficient."
+        self.assertFalse(f._is_notice_only(real))
+
+    def test_we_observed_variant_is_body(self):
+        self.assertFalse(f._is_notice_only(
+            "The observations of objectionable conditions ... WE OBSERVED the operator"))
+
+    def test_needs_ocr_on_empty_and_notice_only(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            self.assertTrue(f._needs_ocr(""))
+            self.assertTrue(f._needs_ocr(_NOTICE_ONLY))
+            self.assertFalse(f._needs_ocr("OBSERVATION 1 — something real"))
+
+    def test_ocr_disabled_never_triggers(self):
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "false"}):
+            self.assertFalse(f._needs_ocr(""))
+            self.assertFalse(f._needs_ocr(_NOTICE_ONLY))
+
+    def test_ocr_flag_defaults_on(self):
+        """다른 483 플래그와 달리 **기본 on** — off 면 FOIA 483 대다수가 계속 결손이다."""
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("ENABLE_FDA_483_OCR", None)
+            self.assertTrue(f._ocr_enabled())
+
+    def test_notice_only_pdf_falls_back_to_ocr_and_replaces_status(self):
+        """고지문만 있는 PDF → OCR 산출로 교체되고 status 가 `pdf-ok-ocr` 가 된다."""
+        recovered = "OBSERVATION 1\nSterility assurance was not established."
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 scan"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: (_NOTICE_ONLY, "pdf-ok")), \
+                patch.object(f, "_ocr_483_pdf_text",
+                             lambda data, max_chars=None: (recovered, "pdf-ok-ocr")), \
+                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")
+        self.assertEqual(status, "pdf-ok-ocr")
+        self.assertIn("OBSERVATION 1", text)
+
+    def test_ocr_failure_on_notice_only_reports_our_side_reason(self):
+        """OCR 이 못 살리면 고지문을 본문으로 내보내지 않는다 — 사유는 우리 쪽 실패 코드.
+
+        고지문을 그대로 넘기면 하류가 '텍스트 확보'로 오인해 관찰 0건을 소스 탓으로 돌린다.
+        """
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 scan"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: (_NOTICE_ONLY, "pdf-ok")), \
+                patch.object(f, "_ocr_483_pdf_text",
+                             lambda data, max_chars=None: ("", "scan-ocr-unavailable:x")), \
+                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")
+        self.assertEqual(text, "")
+        self.assertTrue(status.startswith("scan-ocr-unavailable"))
+
+    def test_real_text_pdf_never_touches_ocr(self):
+        """텍스트층이 온전한 483 은 OCR 경로에 들어가지 않는다(오인식 덧씌움 금지)."""
+        def _boom(*a, **k):
+            raise AssertionError("OCR 이 호출되면 안 된다")
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 real"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: ("OBSERVATION 1 real", "pdf-ok")), \
+                patch.object(f, "_ocr_483_pdf_text", _boom), \
+                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")
+        self.assertEqual(status, "pdf-ok")
+        self.assertEqual(text, "OBSERVATION 1 real")
+
+    def test_ocr_engine_missing_degrades_gracefully(self):
+        """PyMuPDF/tesseract 부재는 수집을 멈추지 않는다 — 사유만 남는다."""
+        text, status = f._ocr_483_pdf_text(b"not a pdf at all")
+        self.assertEqual(text, "")
+        self.assertTrue(status.startswith(("scan-ocr-unavailable", "pdf-parse-fail")),
+                        f"예상 밖 status: {status!r}")
+
+    def test_absent_reason_labels_cover_new_statuses(self):
+        """새 상태코드가 사람이 읽는 사유로 반드시 번역된다(부재 어휘 규율)."""
+        import card_scaffold as cs
+        for code in ("scan-ocr-unavailable", "scan-ocr-empty", "pdf-encrypted"):
+            self.assertIn(code, cs._ABSENT_REASON_LABELS)
+            self.assertTrue(cs._absent_reason({"fda483_text_status": f"{code}:detail"}))
+
+
 if __name__ == "__main__":
     unittest.main()

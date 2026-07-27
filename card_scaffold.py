@@ -261,6 +261,7 @@ class CardScaffold:
         if self.merged_into:
             d["merged_into"] = self.merged_into
         d.update(self.deep_fields())
+        d.update(self.translation_fields())
         return d
 
     def deep_fields(self) -> dict[str, Any]:
@@ -294,6 +295,38 @@ class CardScaffold:
             "deep_analysis_ready": True,
             "deep_analysis_input": {
                 "body_full": self.raw.get(_spec(self.kind).deep_body_key, "")},
+            "kind": self.kind,
+        }
+
+    def translation_fields(self) -> dict[str, Any]:
+        """[NCR 국문 병기 2026-07-27] EU/MHRA GMP 비준수 상세 전문의 **번역 입력** 방출.
+
+        심층분석(`deep_fields`)과 왜 나누는가 — NCR 은 심층분석 대상이 아니다(4섹션 스키마·
+        D2 근거규칙이 WL/행정처분/483 용). 필요한 건 분석이 아니라 **이미 확보한 결정론 원문의
+        국문 병기** 하나뿐이다. NCR 을 deep 대상으로 만들면 게이트가 요구하는 4섹션을 억지로
+        생성하게 되므로, 번역만 요구하는 별도 신호를 둔다.
+
+        내보내는 키(`deep_analysis_fanout.build_translation_jobs` 가 읽는 전부):
+          · `ncr_translation_ready` — 대상 표시
+          · `ncr_translation_input` — 번역할 원문 필드(있는 것만: nature/action/operations/
+            additional). 이 값은 결정론 상세 슬롯과 **같은 producer**(`_deterministic_detail`)
+            에서 나오므로 발행 카드에 실릴 원문과 글자 단위로 같다(짝 안 맞는 번역 불가능).
+          · `kind` — 유형 표시(eu-gmp-ncr / mhra-gmp-ncr).
+
+        `deep_fields()` 와 같은 이유로 **방출 지점을 이 함수 하나로** 묶는다(두 직렬화기가
+        같은 함수를 부른다 — 한쪽만 갱신되는 표류 구조적 차단).
+        """
+        detail = _deterministic_detail(self.kind, self.row, self.raw)
+        if not (isinstance(detail, dict)
+                and detail.get("type") in _NCR_TRANSLATION_DETAIL_TYPES):
+            return {}
+        payload = {k: detail[k] for k in _NCR_TRANSLATION_FIELDS
+                   if str(detail.get(k) or "").strip()}
+        if not payload:
+            return {}
+        return {
+            "ncr_translation_ready": True,
+            "ncr_translation_input": payload,
             "kind": self.kind,
         }
 
@@ -716,6 +749,12 @@ def _detail_wl_violations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str,
         "count": len(norm),
         "violations": norm,
     }
+
+
+# [NCR 국문 병기 2026-07-27] 번역 대상 상세 타입/필드 — `CardScaffold.translation_fields()` 와
+# `inject_slots._merge_ncr_translations` 가 같은 목록을 본다(한쪽만 늘어나는 표류 차단).
+_NCR_TRANSLATION_DETAIL_TYPES = ("eu_gmp_ncr_statement", "mhra_gmp_ncr_statement")
+_NCR_TRANSLATION_FIELDS = ("nature", "action", "operations", "additional")
 
 
 def _detail_eu_gmp_ncr(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
@@ -1474,6 +1513,12 @@ def _has_source_body(raw: dict[str, Any]) -> bool:
 # 붙으면 앞부분만 본다.
 _ABSENT_REASON_LABELS = {
     "scan-no-text": "원문 PDF 에 텍스트층이 없음(스캔본)",
+    # [스캔 483 OCR 2026-07-27] OCR 폴백이 도입되면서 "못 읽었다"의 사유가 갈린다 —
+    # 엔진이 없어서인지, 엔진이 돌았는데 글자를 못 읽었는지. 둘 다 **우리 쪽 결손**이고
+    # 원문(스캔 PDF)은 공개돼 있다는 사실이 문구에서 지워지지 않게 표현한다.
+    "scan-ocr-unavailable": "원문이 스캔 이미지인데 OCR 엔진을 쓸 수 없었음",
+    "scan-ocr-empty": "원문이 스캔 이미지이고 OCR 이 글자를 읽지 못함",
+    "pdf-encrypted": "원문 PDF 가 암호화돼 열 수 없음",
     "no-anchor": "원문에서 본문 시작점을 찾지 못함",
     "no-excerpt": "원문에서 해당 구간을 찾지 못함",
     "fetch-403": "원문 페이지 접근이 차단됨(403)",

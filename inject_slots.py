@@ -274,6 +274,7 @@ def inject_deep_analysis(brief: dict[str, Any],
         # 관찰만 되살린 카드(fan-out 없이 `source_text`+`observations_ko` 만 실은 항목)의 번역이
         # 통째로 버려졌고 그대로 두면 `render.validate_483_observations` 가 발행을 막았다.
         _merge_observation_translations(card, payload.get("observations_ko"), report, doc_id)
+        _merge_ncr_translations(card, payload.get("ncr_ko"), report, doc_id)
         if "deep_analysis" not in payload:
             continue          # 결정론 재추출·번역 전용 항목(정상) — 심층분석 없음
         if "deep_analysis" not in card:
@@ -330,6 +331,45 @@ def _merge_observation_translations(card: dict[str, Any], obs_ko: Any,
     if merged:
         report.warnings.append(
             f"observations_ko[{doc_id!r}]: 관찰 국문 번역 {merged}건 병합(원문+국문 병기)")
+
+
+# EU/MHRA GMP NCR 상세 블록에서 국문 병기 대상이 되는 필드(원문 키 → 국문 키).
+_NCR_KO_FIELDS = ("nature", "action", "operations", "additional")
+_NCR_DETAIL_TYPES = ("eu_gmp_ncr_statement", "mhra_gmp_ncr_statement")
+
+
+def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
+                            report: InjectionReport, doc_id: str) -> None:
+    """[NCR 국문 병기 2026-07-27] EU/MHRA GMP 비준수(NCR) 상세 전문의 국문 번역 병합.
+
+    왜 필요한가 — 이 블록은 도입 이래 EudraGMDP/MHRA **원문 영문만** 렌더했다. 483·WL 에는
+    `deficiency_ko`/`statement_ko` 병기가 있는데 NCR 만 빠져 있어서, 한국어 이용자가 정작
+    비준수의 **내용**(Nature)과 **당국 조치**(Action)를 읽을 수 없었다(2026-07-27 사용자 지적).
+
+    `ncr_ko` = {"nature_ko": str, "action_ko": str, "operations_ko": str, "additional_ko": str}
+    (전부 선택 — 있는 키만 병합). 결정론 영문 원문은 그대로 두고 국문만 additive 로 얹는다.
+    원문 필드가 없는데 번역만 온 경우는 붙이지 않는다(짝 없는 국문 = 근거 없는 문장).
+    관찰 번역과 마찬가지로 비차단 — 실패해도 카드는 영문 단독으로 발행된다.
+    """
+    if not isinstance(ncr_ko, dict) or not ncr_ko:
+        return
+    dd = card.get("deterministic_detail")
+    if not (isinstance(dd, dict) and dd.get("type") in _NCR_DETAIL_TYPES):
+        return
+    merged = 0
+    for field in _NCR_KO_FIELDS:
+        value = ncr_ko.get(f"{field}_ko")
+        if not (isinstance(value, str) and value.strip()):
+            continue
+        if not str(dd.get(field) or "").strip():
+            report.warnings.append(
+                f"ncr_ko[{doc_id!r}]: 원문 {field!r} 이 비어 있어 국문만 붙이지 않음")
+            continue
+        dd[f"{field}_ko"] = value.strip()
+        merged += 1
+    if merged:
+        report.warnings.append(
+            f"ncr_ko[{doc_id!r}]: NCR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

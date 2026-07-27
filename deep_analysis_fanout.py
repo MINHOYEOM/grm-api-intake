@@ -109,6 +109,87 @@ def build_jobs(handoff: Any) -> list[Job]:
     return jobs
 
 
+@dataclass(frozen=True)
+class TranslationJob:
+    """[NCR 국문 병기 2026-07-27] 번역 전용 작업 1건 = 카드 1건.
+
+    심층분석 `Job` 과 형제이나 **분석을 요구하지 않는다** — 이미 확보한 결정론 원문(EU/MHRA
+    GMP 비준수 상세)의 국문 병기만 만든다. `fields` = {원문키: 원문} (nature/action/
+    operations/additional 중 값이 있는 것만). 서브에이전트는 같은 키에 `_ko` 를 붙여 돌려준다.
+    """
+    document_id: str
+    fields: dict[str, str]
+    card_type: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        d: dict[str, Any] = {"document_id": self.document_id, "fields": dict(self.fields)}
+        if self.card_type:
+            d["card_type"] = self.card_type
+        return d
+
+
+def build_translation_jobs(handoff: Any) -> list[TranslationJob]:
+    """`ncr_translation_ready=True` 카드만 번역 작업으로 변환(결정론·입력 순서 보존).
+
+    `deep_analysis_ready` 와 **독립**이다 — NCR 은 심층분석 대상이 아니라서 종전에는 어떤
+    fan-out 목록에도 오르지 않았고, 그래서 상세 전문이 영문 그대로 발행됐다(2026-07-27 지적).
+    입력이 비었거나 document_id 를 못 얻으면 조용히 건너뛴다(그 카드는 영문 단독 발행 — 기존
+    동작). document_id 중복은 첫 건만.
+    """
+    jobs: list[TranslationJob] = []
+    seen: set[str] = set()
+    for card in _cards(handoff):
+        if not card.get("ncr_translation_ready"):
+            continue
+        src = card.get("ncr_translation_input") or {}
+        fields = {k: str(v) for k, v in src.items()
+                  if isinstance(v, str) and v.strip()} if isinstance(src, dict) else {}
+        doc = _document_id(card)
+        if not doc or not fields or doc in seen:
+            continue
+        seen.add(doc)
+        jobs.append(TranslationJob(document_id=doc, fields=fields,
+                                   card_type=str(card.get("kind") or "")))
+    return jobs
+
+
+def assemble_translation_deltas(jobs: Any,
+                                responses: dict[str, Any] | None) -> dict[str, Any]:
+    """번역 작업 + 응답({document_id: {"<field>_ko": str}}) → inject 델타 `{doc: {"ncr_ko": {...}}}`.
+
+    게이트는 **짝 맞춤 하나**다 — 원문이 없는 필드의 번역은 버린다(근거 없는 국문 차단).
+    분석층이 아니므로 verify_deep_analysis 를 태우지 않는다(검증 대상이 다르다: 이 층은
+    새 사실을 만들지 않고 이미 발행되는 원문을 옮길 뿐).
+    """
+    responses = responses or {}
+    out: dict[str, Any] = {}
+    for job in _as_translation_jobs(jobs):
+        resp = responses.get(job.document_id)
+        if not isinstance(resp, dict):
+            continue
+        resp = _unescape_entities(resp)
+        ko = {f"{k}_ko": str(resp[f"{k}_ko"]).strip()
+              for k in job.fields
+              if isinstance(resp.get(f"{k}_ko"), str) and str(resp[f"{k}_ko"]).strip()}
+        if ko:
+            out[job.document_id] = {"ncr_ko": ko}
+    return out
+
+
+def _as_translation_jobs(jobs: Any) -> list[TranslationJob]:
+    """TranslationJob 목록 또는 jobs.json dict 목록을 정규화."""
+    out: list[TranslationJob] = []
+    for j in jobs or []:
+        if isinstance(j, TranslationJob):
+            out.append(j)
+        elif isinstance(j, dict) and j.get("document_id") and isinstance(j.get("fields"), dict):
+            out.append(TranslationJob(
+                document_id=str(j["document_id"]),
+                fields={k: str(v) for k, v in j["fields"].items()},
+                card_type=str(j.get("card_type") or "")))
+    return out
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # assemble_deltas — 서브에이전트 응답 → 게이트 → inject 델타
 # ─────────────────────────────────────────────────────────────────────────────

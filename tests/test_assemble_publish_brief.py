@@ -383,6 +383,25 @@ class MergeFda483DisclosuresTest(unittest.TestCase):
         cards = [self._card("fda483-1", "Alpha", "01/01/2024")]
         self.assertEqual(apb.merge_fda483_disclosures(cards), cards)  # 1건 무변화
 
+    def test_digest_never_blames_the_source_for_the_absence(self):
+        """[부재 어휘 2026-07-27] 디제스트는 **소스가 안 줬다**고 말하지 않는다.
+
+        실제로 두 번 틀렸다 — 2026-07-13 "스캔·비공개로", 2026-07-20 정정본 "원문이 제공되지
+        않아". 두 문구 다 FDA 가 안 줬다는 단정인데, 그 카드들의 원문 PDF 에는 관찰이 스캔
+        이미지로 멀쩡히 들어 있었다(2026-07-26 실측 21건). 우리가 못 읽은 것을 소스 탓으로
+        돌리는 이 어휘가 반복 재발했으므로 문구를 테스트로 고정한다.
+        """
+        cards = [self._card("fda483-1", "Alpha", "01/01/2024"),
+                 self._card("fda483-2", "Beta", "02/02/2024")]
+        rep = next(c for c in apb.merge_fda483_disclosures(cards) if c["id"] == "fda483-1")
+        prose = " ".join([rep["summary"], rep["implication"], *rep["key_facts"]])
+        for banned in ("제공되지 않", "비공개", "미공개", "미수록", "공개되지 않"):
+            self.assertNotIn(banned, prose,
+                             f"디제스트가 소스의 부재를 단정한다: {banned!r}")
+        # 우리 쪽 결손 + 원문은 공개돼 있다는 사실이 둘 다 남아야 한다.
+        self.assertIn("확보하지 못", rep["summary"])
+        self.assertIn("공개돼 있", rep["summary"])
+
 
 class ExtractResourceNotesTest(unittest.TestCase):
     """[업계 브리핑 노트 2026-07-13] extract_resource_notes 단위 테스트(순수 함수)."""

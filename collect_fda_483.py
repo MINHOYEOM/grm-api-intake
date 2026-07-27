@@ -40,6 +40,7 @@ ENABLE_FDA_483=true 또는 --sources fda483 일 때 collect_intake.main() 에서
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from datetime import date
@@ -106,6 +107,20 @@ FDA483_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(윈도우 내 newes
 FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
+
+# [스캔 483 OCR 폴백 2026-07-27] FDA FOIA 전자열람실 483 의 대다수는 **스캔 이미지**다 —
+# 실측(2026-07-26 intake, 시도 40건): 텍스트층이 온전한 483 은 5건뿐이고 나머지 35건은
+# 관찰이 담긴 앞장이 전부 이미지였다. 그런데 그 스캔본에도 **마지막 장**에는 FDA 정형
+# 고지문("The observations of objectionable conditions and practices …" ≈1133자)이 텍스트로
+# 들어 있다. 종전 엔진은 문서 단위로 "텍스트가 하나라도 있으면 pdf-ok" 라 판정해, 이 고지문
+# 한 장 때문에 스캔본이 **정상 텍스트 PDF 로 오분류**됐다. 그 결과 관찰 0건 → body_full 미보존
+# → deep 델타에 source_text 없음 → 조립 시점 재추출도 불가 → 디제스트가 "원문이 제공되지
+# 않아"라고 발행했다(원문은 공개돼 있는데도). 페이지 단위로 보고, 텍스트 없는 페이지만 OCR
+# 한다. OCR 은 PyMuPDF 내장 경로(tesseract 바이너리 필요)만 쓰고 새 파이썬 의존성은 없다.
+FDA483_OCR_DPI = 300
+FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 은 10쪽 내외
+# 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
+_FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # 표지/머리말을 건너뛰고 관찰사항(findings) 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
 _FDA483_EXCERPT_PATTERNS = (
     r"observation\s+1\b",
@@ -254,6 +269,17 @@ def _deep_enabled() -> bool:
     deep off 여도 결정론 Observation 상세는 그대로 나오고, deep on 이어도 결정론 층은 불변.
     off(기본) 면 키 부재 → scaffold deep_analysis_ready=False → 골든/동작 완전 불변(활성=사람 게이트)."""
     return env_flag("ENABLE_FDA_483_DEEP")
+
+
+def _ocr_enabled() -> bool:
+    """[스캔 483 OCR 2026-07-27] `ENABLE_FDA_483_OCR` — **기본 on**.
+
+    다른 483 플래그(observations/deep)와 달리 기본을 켜 둔다. 이 경로는 새 산출물을 만드는
+    기능이 아니라 **이미 있어야 할 원문을 못 읽던 결손의 수리**이고, off 면 FOIA 483 의
+    87%(실측)가 계속 "원문 없음"으로 발행되기 때문이다. tesseract 가 없는 환경에서는
+    자동으로 무해하게 건너뛴다(상태코드 `scan-ocr-unavailable` — 없는 이유가 남는다).
+    """
+    return env_flag("ENABLE_FDA_483_OCR", default=True)
 
 
 def _parse_mdy(raw: str) -> str:
@@ -597,7 +623,116 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
     text, status = _extract_pdf_text(data, max_chars=max_chars)
-    return normalize_pdf_ligatures(text), status   # [2026-07-20] 서브셋 폰트 합자 복원
+    text = normalize_pdf_ligatures(text)           # [2026-07-20] 서브셋 폰트 합자 복원
+    if not _needs_ocr(text):
+        return text, status
+    # [스캔 483 OCR 폴백 2026-07-27] 텍스트층이 아예 없거나 뒷장 정형 고지문뿐이다 —
+    # 관찰은 이미지 안에 있다. 페이지 단위 OCR 로 되살린다. 실패해도 기존 산출은 보존.
+    ocr_text, ocr_status = _ocr_483_pdf_text(data, max_chars=max_chars)
+    if ocr_text:
+        return normalize_pdf_ligatures(ocr_text), ocr_status
+    # OCR 이 못 살렸다 — 원래 텍스트가 고지문뿐이었다면 그건 "본문 없음"이므로 사유를
+    # OCR 실패 코드로 바꿔 하류에 정확히 알린다(고지문을 본문으로 오인하지 않게).
+    return ("", ocr_status) if _is_notice_only(text) else (text, status)
+
+
+def _is_notice_only(text: str) -> bool:
+    """텍스트층이 483 마지막 장 정형 고지문뿐인가(= 본문은 스캔 이미지).
+
+    관찰 앵커(`OBSERVATION n` / `WE OBSERVED`)가 하나도 없으면서 고지문 앵커만 있는 상태.
+    이 판정이 없으면 1133자짜리 고지문 한 장이 `pdf-ok` 로 통과해 스캔본이 정상 PDF 로
+    오분류된다(2026-07-27 실측 21건 — 디제스트 오발행의 직접 원인).
+    """
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    if not compact:
+        return False
+    if _OBS_RE.search(compact) or _WE_OBSERVED_RE.search(compact):
+        return False
+    return _FDA483_NOTICE_ANCHOR in compact.lower()
+
+
+def _needs_ocr(text: str) -> bool:
+    """OCR 폴백이 필요한가 — 텍스트층 부재 또는 고지문 전용(본문 이미지)."""
+    if not _ocr_enabled():
+        return False
+    return (not (text or "").strip()) or _is_notice_only(text)
+
+
+def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
+    """스캔 483 PDF → 페이지 단위 OCR 텍스트. 반환 (text, status).
+
+    설계 원칙
+      · **페이지 단위**로 본다 — 스캔 483 은 관찰 페이지만 이미지이고 마지막 장 고지문은
+        텍스트다. 문서 단위 판정이 이 혼합 구조를 놓쳐 오분류를 냈다.
+      · 텍스트가 있는 페이지는 **그대로 쓴다**(OCR 오인식을 이미 읽을 수 있는 글자에
+        덧씌우지 않는다). 빈 페이지만 OCR.
+      · 새 파이썬 의존성 0 — PyMuPDF 내장 OCR(`get_textpage_ocr`)만 쓴다. tesseract
+        바이너리가 없으면 예외 → `scan-ocr-unavailable` 로 graceful degrade.
+      · 비용 상한: 문서당 `FDA483_OCR_MAX_PAGES` 쪽까지만.
+
+    status: `pdf-ok-ocr`(OCR 로 본문 확보) | `scan-ocr-unavailable`(엔진 없음) |
+            `scan-ocr-empty`(OCR 했으나 글자 0) | `pdf-parse-fail:<Err>`
+    """
+    try:
+        import fitz  # type: ignore[import-not-found]
+    except ImportError:
+        return "", "scan-ocr-unavailable:pymupdf"
+    _ensure_tessdata_prefix()
+    try:
+        parts: list[str] = []
+        ocr_pages = 0
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                return "", "pdf-encrypted"
+            for page in doc:
+                native = page.get_text("text")
+                if native.strip():
+                    parts.append(native)
+                    continue
+                if ocr_pages >= FDA483_OCR_MAX_PAGES:
+                    continue
+                ocr_pages += 1
+                tp = page.get_textpage_ocr(language="eng", dpi=FDA483_OCR_DPI,
+                                           full=True, tessdata=_tessdata_dir())
+                parts.append(page.get_text("text", textpage=tp))
+    except RuntimeError as e:
+        # PyMuPDF 는 tesseract 미설치/tessdata 미탐지를 RuntimeError 로 던진다.
+        return "", f"scan-ocr-unavailable:{str(e)[:80]}"
+    except Exception as e:  # noqa: BLE001 — 어떤 실패도 수집을 멈추지 않는다
+        return "", f"pdf-parse-fail:{type(e).__name__}"
+    from collect_mfds_gmp_inspection import _normalize_extracted_text
+    text = _normalize_extracted_text("\n".join(parts))
+    if not text.strip():
+        return "", "scan-ocr-empty"
+    return text[:max_chars], "pdf-ok-ocr"
+
+
+def _tessdata_dir() -> str:
+    """tessdata 디렉터리 절대경로(못 찾으면 ''). TESSDATA_PREFIX 우선, 없으면 표준 위치 탐색.
+
+    PyMuPDF 는 `TESSDATA_PREFIX` 가 없으면 OCR 을 거부한다. 러너·컨테이너마다 tesseract
+    버전 디렉터리(`/usr/share/tesseract-ocr/5/tessdata` 등)가 달라 워크플로에 경로를
+    하드코딩하면 조용히 깨진다 — 코드가 찾는다.
+    """
+    env = (os.environ.get("TESSDATA_PREFIX") or "").strip()
+    if env and os.path.isdir(env):
+        return env
+    for cand in ("/usr/share/tesseract-ocr/5/tessdata",
+                 "/usr/share/tesseract-ocr/4.00/tessdata",
+                 "/usr/share/tesseract-ocr/tessdata",
+                 "/usr/share/tessdata",
+                 "/usr/local/share/tessdata"):
+        if os.path.isdir(cand):
+            return cand
+    return ""
+
+
+def _ensure_tessdata_prefix() -> None:
+    """탐색한 tessdata 경로를 `TESSDATA_PREFIX` 로 심는다(미설정일 때만)."""
+    if not (os.environ.get("TESSDATA_PREFIX") or "").strip():
+        found = _tessdata_dir()
+        if found:
+            os.environ["TESSDATA_PREFIX"] = found
 
 
 def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:

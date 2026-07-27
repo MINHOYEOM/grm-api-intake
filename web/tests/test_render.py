@@ -6060,6 +6060,42 @@ class WebNewSourceRenderTest(unittest.TestCase):
         self.assertTrue(hit[0]["href"].endswith("#" + self.MHRA_ID),
                         f"search-index href 가 앵커와 불일치: {hit[0]['href']}")
 
+    def test_ncr_detail_without_ko_stays_english_only(self):
+        """`*_ko` 미보유 카드는 국문 블록이 아예 안 나온다(additive — 기존 발행분 불변)."""
+        _, html = self._render()
+        self.assertNotIn("국문 해석", html)
+
+    def test_ncr_detail_renders_korean_alongside_original(self):
+        """[국문 병기 2026-07-27] `*_ko` 가 있으면 원문(영문)과 국문이 **함께** 그려진다.
+
+        이 블록은 도입 이래 영문 verbatim 만 내보내 한국어 이용자가 비준수 내용을 못 읽었다
+        (2026-07-27 사용자 지적). 원문 보존은 불가침이므로 국문은 원문을 대체하지 않고 병기한다.
+        """
+        eu_ko = {
+            "nature_ko": "QC 크로마토그래피 기록의 데이터 완전성에 관한 중대결함.",
+            "action_ko": "공급 금지. EU 시장에서 해당 배치 회수.",
+            "operations_ko": "원료의약품 Diosmin 제조",
+            "additional_ko": "시정 후 재실사를 요청할 수 있다.",
+        }
+        mhra_ko = {"nature_ko": "A등급 충전구역 무균조건 유지 실패."}
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        br = self._brief()
+        br["cards"][0]["deterministic_detail"] = {**self.EU_DETAIL, **eu_ko}
+        br["cards"][1]["deterministic_detail"] = {**self.MHRA_DETAIL, **mhra_ko}
+        (data / "brief_web_2026-07-27.json").write_text(
+            json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        for ko in list(eu_ko.values()) + list(mhra_ko.values()):
+            self.assertIn(ko, html, f"국문 번역이 렌더에서 빠졌다: {ko!r}")
+        # 원문은 그대로 남아 있어야 한다 — 국문이 원문을 밀어내면 근거가 사라진다.
+        for key in ("operations", "nature", "action", "additional"):
+            self.assertIn(self.EU_DETAIL[key], html)
+            self.assertIn(self.MHRA_DETAIL[key], html)
+        # 번역이 없는 MHRA 필드는 국문 없이 원문만(부분 번역도 안전).
+        self.assertNotIn("GMP 인증서 철회", html)
+
     def test_new_sources_reach_search_index(self):
         """세 소스 전부 검색 인덱스에 편입된다(발행은 됐는데 검색에서 사라지는 것 방지)."""
         out, _ = self._render()

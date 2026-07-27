@@ -36,12 +36,19 @@ import verify_deep_analysis as vda
 # build_jobs — handoff → 서브에이전트 작업목록
 # ─────────────────────────────────────────────────────────────────────────────
 def _cards(handoff: Any) -> list[dict[str, Any]]:
-    """handoff 입력을 카드 dict 리스트로 정규화 — 리스트 그대로 / {'cards':[...]} /
-    {'handoff': {'cards':[...]}} 형태를 모두 받아 결정론으로 카드 목록만 뽑는다."""
+    """handoff 입력을 카드 dict 리스트로 정규화 — 리스트 그대로 / {'rows':[...]} /
+    {'cards':[...]} / {'handoff': {...}} 형태를 모두 받아 결정론으로 카드 목록만 뽑는다.
+
+    ★ 2026-07-27 `rows` 추가 — **실제 Notion handoff v2 payload 의 카드 배열 키는 `rows` 다**
+    (`build_routine_handoff_payload_v2` 산출). 종전 목록엔 `cards`/`handoff` 뿐이라 진짜
+    handoff 를 넣으면 항상 빈 리스트가 나왔다. `deep_analysis_ready` 누락(별건·같은 날 수리)
+    과 **독립된 두 번째 단절**이라, 한쪽만 고쳐서는 fan-out 이 여전히 0건이었다.
+    `cards` 를 먼저 보는 순서는 유지한다(기존 `to_dict()` 카드목록 입력 하위호환).
+    """
     if isinstance(handoff, list):
         return [c for c in handoff if isinstance(c, dict)]
     if isinstance(handoff, dict):
-        for key in ("cards", "handoff"):
+        for key in ("cards", "rows", "handoff"):
             v = handoff.get(key)
             if isinstance(v, list):
                 return [c for c in v if isinstance(c, dict)]

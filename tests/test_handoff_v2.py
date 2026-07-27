@@ -456,5 +456,90 @@ class WeekdayKstTest(unittest.TestCase):
         self.assertEqual(ci.weekday_kst(date(2026, 6, 21)), "일요일")
 
 
+def _deep_ready_rows() -> list[dict]:
+    """deep 대상 WL 1건 + 비대상 FR 1건. WL 은 `raw.wl_body_full` 확보 = fan-out 대상."""
+    return [
+        {
+            "source": "FDA Warning Letter", "document_id": "WL-CMS-660124",
+            "date": "2026-05-20", "type_or_class": "Center for Drug Evaluation and Research (CDER)",
+            "firm": "Acme Pharmaceuticals, LLC", "headline": "CGMP for finished pharmaceuticals",
+            "page_id": "page-wl", "signal_tier": "Tier 3", "modality": "Chemical",
+            "language": "", "raw_fetch_ok": True, "raw_source": "fetch",
+            "official_url": "https://www.fda.gov/.../acme-660124",
+            "raw": {"firm": "Acme Pharmaceuticals, LLC", "subject": "CGMP",
+                    "wl_body_full": "During our inspection, we observed violations of "
+                                    "21 CFR 211.192. Respond within 15 working days."},
+        },
+        {
+            "source": "Federal Register", "document_id": "FR-2026-04578", "date": "2026-05-22",
+            "type_or_class": "guidance-industry", "firm": "", "headline": "Guidance X",
+            "page_id": "page-fr", "signal_tier": "Tier 2", "modality": "",
+            "language": "", "raw_fetch_ok": True, "raw_source": "fetch",
+            "raw": {"title": "Guidance X", "abstract": "This draft guidance describes ..."},
+        },
+    ]
+
+
+class HandoffDeepInputTest(unittest.TestCase):
+    """[2026-07-27] handoff v2 가 심층분석 fan-out 입력을 실어야 한다.
+
+    실장애: 클라우드 Routine(§B [2단계])은 `deep_analysis_ready=true` 카드를 찾는데,
+    `build_routine_handoff_payload_v2` 가 `to_dict()` 를 쓰지 않고 필드를 손으로 골라 담아
+    그 키가 **한 번도 실린 적이 없었다.** Routine 은 매주 "대상 0건 → 생략(정상)"으로
+    판단했고 규정상 옳은 행동이었다 — 2026-07-27 실측 19건이 전부 누락됐고 사람이
+    손으로 백필해야 했다. 방출 정본을 `CardScaffold.deep_fields()` 하나로 묶어 수리.
+    """
+
+    def setUp(self) -> None:
+        self.payload = ci.build_routine_handoff_payload_v2(
+            _deep_ready_rows(), RUN_DATE, 7, GEN_AT)
+        self.by_doc = {r["document_id"]: r for r in self.payload["rows"]}
+
+    def test_deep_ready_row_carries_fanout_input(self) -> None:
+        wl = self.by_doc["WL-CMS-660124"]
+        self.assertTrue(wl.get("deep_analysis_ready"),
+                        "deep 대상인데 handoff 에 deep_analysis_ready 가 없다")
+        body = (wl.get("deep_analysis_input") or {}).get("body_full", "")
+        self.assertIn("21 CFR 211.192", body, "body_full 원문이 실리지 않았다")
+        # 유형별 프롬프트 선택용 — build_jobs 가 card_type 으로 싣는다.
+        self.assertEqual(wl.get("kind"), "warning-letter")
+
+    def test_non_deep_row_untouched(self) -> None:
+        fr = self.by_doc["FR-2026-04578"]
+        for k in ("deep_analysis_ready", "deep_analysis_input", "kind"):
+            self.assertNotIn(k, fr, f"비대상 카드에 {k} 가 새어 들어갔다")
+
+    def test_build_jobs_works_on_real_handoff_payload(self) -> None:
+        """종단 계약 — fan-out 이 **실제 handoff payload** 에서 작업을 뽑을 수 있어야 한다.
+
+        이 단언이 실장애의 본질이다. 종전 payload 로는 jobs 가 항상 0건이었다.
+        """
+        import deep_analysis_fanout as daf
+        jobs = daf.build_jobs(self.payload)
+        self.assertEqual(len(jobs), 1, "handoff payload 에서 fan-out 작업을 못 뽑는다")
+        self.assertEqual(jobs[0].document_id, "WL-CMS-660124")
+        self.assertEqual(jobs[0].card_type, "warning-letter")
+        self.assertIn("21 CFR 211.192", jobs[0].body_full)
+
+    def test_two_serializers_emit_identical_deep_keys(self) -> None:
+        """표류 방지 — `to_dict()` 와 handoff v2 행이 **같은** deep 키·값을 내야 한다.
+
+        직렬화기가 둘로 갈라진 것이 이 결함의 원인이었다. 한쪽만 갱신되면 여기서 깨진다.
+        """
+        import card_scaffold as cs
+        rows = _deep_ready_rows()
+        cards = [cs.build_card_scaffold(r, r.get("raw")) for r in rows]
+        wl_card = next(c for c in cards if c.deep_analysis_ready)
+        d = wl_card.to_dict()
+        row = self.by_doc["WL-CMS-660124"]
+        for k in ("deep_analysis_ready", "deep_analysis_input", "kind"):
+            self.assertEqual(d.get(k), row.get(k), f"{k} 가 두 직렬화기에서 다르다")
+
+    def test_raw_still_excluded(self) -> None:
+        """deep 입력을 실어도 raw 전체는 여전히 미포함(크기 폭증 방지 원칙 불변)."""
+        for r in self.payload["rows"]:
+            self.assertNotIn("raw", r)
+
+
 if __name__ == "__main__":
     unittest.main()

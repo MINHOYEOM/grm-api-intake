@@ -3389,6 +3389,25 @@ def main() -> int:
     # modality_enabled=modality_effective 를 전달해 build_notion_properties 의 row 당 env
     # 재독해를 제거(→ 아래 os.environ 변조도 불필요). 순서(=existing dedup 누적 순서)는 레지스트리
     # 순서로 기존과 byte 동일하다.
+    # [WHOPIR 보강 시점 2026-07-27] WHO 실사보고서 PDF 는 **중복 제거 뒤 신규 항목에만** 받는다.
+    # 종전엔 수집 루프 안에서 목록 순서대로 받았는데, WHO 목록은 최신순이 아니라 알파벳순이라
+    # fetch 예산(40)을 매일 같은 앞쪽 40건이 다 써버렸다 — 새로 올라온 뒤쪽 보고서는 카드는
+    # 나오되 상세가 영영 비었다. 여기(existing 확정 후)로 옮기면 목록 순서와 무관하게 신규
+    # 전수가 보강되고, 매일 같은 PDF 를 다시 받던 낭비도 사라진다. 실패는 graceful(링크 카드).
+    if enable_who and who_items:
+        try:
+            import collect_who as _who_enrich
+            _new_who = [it for it in who_items
+                        if f"{it.source}::{it.document_id}" not in existing]
+            if _new_who:
+                log("INFO", f"WHOPIR 보강 대상(신규): {len(_new_who)}건 / 수집 {len(who_items)}건")
+            _h = _who_enrich.enrich_whopir_items(_new_who)
+            stats.whopir_excerpt_attempted = int(_h.get("attempted") or 0)
+            stats.whopir_excerpt_failed = int(_h.get("failed") or 0)
+            stats.whopir_excerpt_capped = int(bool(_h.get("capped")))
+        except Exception as e:  # noqa: BLE001
+            log("WARN", f"WHOPIR 보강 실패(링크 카드로 유지): {e}")
+
     _insert_items_map = {
         "fr": fr_items, "recall": recall_items, "ema": ema_items,
         "mhra": mhra_items, "mhra_alert": mhra_alert_items,

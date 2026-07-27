@@ -708,7 +708,11 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
             if o.get(kk):
                 r[kk] = str(o[kk])
         norm.append(r)
-    norm = [o for o in norm if o["deficiency"]]
+    # [OCR 판독 잡음 차단 2026-07-27] 알파벳 실질이 없는 표제("/T" 등 스캔 여백 파편)는
+    # 관찰이 아니다 — 수집기 파서와 **같은 기준**을 여기서도 적용해, 낡은 raw 를 들고 있는
+    # 스캐폴드가 잡음을 관찰로 발행하지 않게 한다(파서만 고치면 이미 굳은 스캐폴드는 못 고친다).
+    from collect_fda_483 import _is_legible_deficiency   # 지연 import — 기준의 단일 출처
+    norm = [o for o in norm if _is_legible_deficiency(o["deficiency"])]
     if not norm:
         return None
     detail: dict[str, Any] = {

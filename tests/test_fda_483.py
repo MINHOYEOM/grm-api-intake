@@ -1302,3 +1302,39 @@ class FetchCoverageTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ObservationLegibilityTest(unittest.TestCase):
+    """[OCR 판독 잡음 2026-07-27] 스캔 여백 파편이 관찰 1건으로 발행되던 구멍.
+
+    실측: `fda483-193759` obs 6 의 표제가 `"/T"` 였다. 표제는 문장이지 기호가 아니다 —
+    OCR 폴백이 들어오면서 페이지 여백 잡음이 `OBSERVATION n` 앵커 뒤에 걸린 결과다.
+    """
+
+    def test_symbol_fragment_is_not_a_deficiency(self):
+        for junk in ("/T", "‘T", ".", "|", "X", "a b"):
+            self.assertFalse(f._is_legible_deficiency(junk), junk)
+
+    def test_real_heading_is_legible(self):
+        self.assertTrue(f._is_legible_deficiency(
+            "Aseptic processing areas are deficient."))
+
+    def test_parser_drops_noise_observation(self):
+        text = ("WE OBSERVED\n"
+                "OBSERVATION 1\nAseptic processing operations were deficient.\n"
+                "Specifically, first air was blocked.\n"
+                "OBSERVATION 2\n/T\n"
+                "OBSERVATION 3\nEnvironmental monitoring was inadequate.\n"
+                "Specifically, excursions were not investigated.")
+        nums = [o["number"] for o in f._extract_483_observations_from_text(text)]
+        self.assertEqual(nums, ["1", "3"], "잡음 관찰이 걸러지지 않았다")
+
+    def test_scaffold_applies_the_same_bar(self):
+        """낡은 raw 를 든 스캐폴드도 같은 기준 — 파서만 고치면 굳은 스캐폴드는 못 고친다."""
+        import card_scaffold as cs
+        raw = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Aseptic processing was deficient.", "detail": ""},
+            {"number": "2", "deficiency": "/T", "detail": ""}]}
+        dd = cs._detail_fda_483_observations({}, raw)
+        self.assertEqual(dd["count"], 1)
+        self.assertEqual([o["number"] for o in dd["observations"]], ["1"])

@@ -354,7 +354,12 @@ def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
     if not isinstance(ncr_ko, dict) or not ncr_ko:
         return
     dd = card.get("deterministic_detail")
-    if not (isinstance(dd, dict) and dd.get("type") in _NCR_DETAIL_TYPES):
+    if not isinstance(dd, dict):
+        return
+    if dd.get("type") == "whopir_report":            # 같은 채널, 다른 상세 타입
+        _merge_whopir_translations(dd, ncr_ko, report, doc_id)
+        return
+    if dd.get("type") not in _NCR_DETAIL_TYPES:
         return
     merged = 0
     for field in _NCR_KO_FIELDS:
@@ -370,6 +375,41 @@ def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
     if merged:
         report.warnings.append(
             f"ncr_ko[{doc_id!r}]: NCR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
+
+
+def _merge_whopir_translations(dd: dict[str, Any], ko: dict[str, Any],
+                               report: InjectionReport, doc_id: str) -> None:
+    """[WHOPIR 국문 병기 2026-07-27] WHO 공개 실사보고서 결론·항목요약의 국문 병합.
+
+    필드명 계약은 `card_scaffold.whopir_translation_input` 이 단독으로 정한다(방출·병합이
+    같은 함수를 부른다). 짝 맞춤 규칙은 NCR 형제와 동일 — **원문이 있는 자리에만** 국문을
+    얹는다. 섹션은 위치가 아니라 **원문 섹션 번호**로 맞춘다(항목 증감에 안전).
+    """
+    from card_scaffold import whopir_translation_input
+
+    expected = whopir_translation_input(dd)
+    if not expected:
+        return
+    merged = 0
+    outcome_ko = ko.get("outcome_ko")
+    if isinstance(outcome_ko, str) and outcome_ko.strip() and expected.get("outcome"):
+        dd["outcome_ko"] = outcome_ko.strip()
+        merged += 1
+    for sec in dd.get("sections") or []:
+        if not isinstance(sec, dict):
+            continue
+        no = sec.get("no")
+        if not isinstance(no, int):
+            continue
+        for src, dst in ((f"s{no}", "text_ko"), (f"s{no}_title", "title_ko")):
+            value = ko.get(f"{src}_ko")
+            if not (isinstance(value, str) and value.strip() and expected.get(src)):
+                continue
+            sec[dst] = value.strip()
+            merged += 1
+    if merged:
+        report.warnings.append(
+            f"ncr_ko[{doc_id!r}]: WHOPIR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

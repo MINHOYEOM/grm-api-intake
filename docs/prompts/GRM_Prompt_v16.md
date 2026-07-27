@@ -526,7 +526,7 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 게이트를 돌려 근거 통과분만 발행**한다(근거 없는 분석 차단은 브릿지가 담당 = 너는 손으로 게이트를
 돌리지 않아도 된다). 이로써 심층분석도 6슬롯과 똑같이 **클라우드에서 완성**된다(데스크톱 무관).
 handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 카드(FDA WL·MFDS
-행정처분·FDA 483) **또는** `ncr_translation_ready=true` 카드(EU/UK GMP 비준수 — 아래 ④)가
+행정처분·FDA 483) **또는** `ncr_translation_ready=true` 카드(GMP 비준수·WHO 실사 — 아래 ④)가
 **있을 때만** 수행 — 둘 다 없으면 이 단계 통째로 생략(정상).
 
 수행(위 6슬롯 델타를 만든 뒤, [산출물 예치] 전에):
@@ -560,10 +560,10 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
        `{"<web_card_id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
      (키는 6슬롯 델타와 **같은 키 공간** — `web_card_id` 그대로, `card_id` 금지. 위 [출력] envelope 규칙 동일)
      이 dict 를 [산출물 예치]의 **두 번째 코드 블록**(deep 델타)으로 예치한다(아래 예치 규약).
-  ④ **[NCR 국문 병기]** `ncr_translation_ready=true` 카드(EU/UK GMP 비준수)는 심층분석 대상이
-     아니다 — `ncr_translation_input` 의 실린 키(`nature`·`action`·`operations`·`additional`)에
+  ④ **[상세 국문 병기]** `ncr_translation_ready=true` 카드(EU/UK GMP 비준수 · WHO 실사보고서)는
+     심층분석 대상이 아니다 — `ncr_translation_input` 에 **실린 키 전부**(유형이 키를 정한다)에
      `_ko` 를 붙여 **번역만** 하고 ③의 deep 델타에 같은 키 공간으로 담는다(카드당 한 항목):
-       `{"<web_card_id>": {"ncr_ko": {"nature_ko": "...", "action_ko": "...", ...}}}`
+       `{"<web_card_id>": {"ncr_ko": {"<실린 키>_ko": "...", ...}}}`
      ⚠️ 새 사실·해석 금지. 기관명·제품명·조항번호·운영항목 번호(`1.1.1.4` 등)는 원문 표기 유지.
      원문에 없는 필드는 만들지 않는다. 대상 카드가 있으면 반드시 채운다(빠지면 영문 단독 발행).
 브릿지 게이트에서 FAIL 한 카드는 심층분석 없이 6슬롯만으로 발행된다(카드 단위 graceful degrade —

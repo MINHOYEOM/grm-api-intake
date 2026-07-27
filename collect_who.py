@@ -78,6 +78,10 @@ WHOPIR_EXCERPT_MAX_CHARS = 1500
 WHOPIR_EXCERPT_FETCH_TIMEOUT = 20
 WHOPIR_EXCERPT_DELAY_SECONDS = 0.5
 WHOPIR_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(목록 newest-first → 최신 N건 우선)
+# WHOPIR 본문은 15~40쪽(실측 29K~90K자)이라 P6 기본 상한 12,000자로는 결함 구간에
+# 닿기도 전에 잘린다. 텍스트 추출 상한만 WHOPIR 전용으로 올린다(발행물 길이는 아래
+# SECTION/OUTCOME cap 이 따로 잡는다 — 이 값은 "읽는 범위"이지 "싣는 범위"가 아니다).
+WHOPIR_TEXT_MAX_CHARS = 120_000
 # 표지/개요를 건너뛰고 결함·결론 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
 # WHOPIR PDF는 [표지 → general info → summary of the inspection → outcome/conclusion →
 # (non-)compliance/GMP deficiencies] 구조라, 인용보다 LLM 컨텍스트("왜")용으로 결함 구간을 우선.
@@ -264,6 +268,132 @@ def _extract_whopir_excerpt(text: str) -> str:
     return ""
 
 
+# ── [WHOPIR 구조화 상세 2026-07-27] ──────────────────────────────────────────
+# WHO 공개실사보고서(WHOPIR)는 지금까지 **본문을 한 글자도 읽지 않고** 제목만 카드로
+# 내보냈다("실사 결과 세부 내용은 확보하지 못해 원문 확인이 필요하다"). 그런데 실물 PDF 는
+# 스캔이 아니라 완전한 텍스트이고(실측 11건: 14~19쪽·3.5~5.3만자) WHO 표준 서식이라
+# 483 스캔본보다 **훨씬 쉽게** 읽어낼 수 있는 자료였다.
+#
+# 서식은 두 종류다(실측 11건 = findings 9 · reliance 2):
+#   · findings — Part 2 "Summary of the findings and comments" + 번호 매긴 GMP 항목
+#     (원료 15항목 / 시스템 6항목 / QC시험실 5항목 등 템플릿마다 다름 → 개수 고정 금지)
+#   · reliance — Part 2 "Summary of SRA/NRA inspection evidence considered"
+#     (WHO 자체 실사가 아니라 타 규제기관 실사 결과를 인용). 항목 대신 인용 실사 목록.
+# 두 종류 모두 Part 3 이 결론(적합 판정 문장)이라, **결론은 항상** 확보한다.
+_WHOPIR_PART2_RE = re.compile(r"Part\s*2\b", re.I)
+_WHOPIR_PART3_RE = re.compile(r"Part\s*3\b", re.I)
+_WHOPIR_PART4_RE = re.compile(r"Part\s*4\b", re.I)
+_WHOPIR_RELIANCE_RE = re.compile(r"SRA\s*/\s*NRA\s+inspection\s+evidence", re.I)
+_WHOPIR_HEAD_RE = re.compile(r"^[ \t]*(\d{1,2})[.)]\s+([A-Z][^\n]{2,70}?)\s*$", re.M)
+# 표제 판별의 1순위 신호 = **앞에 빈 줄**. 항목 본문 안의 중첩 번호 목록은 앞 줄에 바로
+# 붙는다(실측 Tianjin: 진짜 항목 앞은 "…WHOPIR. \n \n", 문서목록 항목 앞은
+# "…Specification \n"). 번호 순서만으로는 이 둘을 못 가른다 — 중첩 "4. WMS Validation PQ
+# Report" 가 진짜 "4. Laboratory Control System" 을 밀어냈다.
+# 다만 이 조건을 **필수**로 걸면 빈 줄이 안 나오는 레이아웃의 보고서가 통째로 0항목이
+# 된다(실측 Ecron 22→0·Pharco 15→6). 그래서 빈 줄 후보를 우선하되, 없으면 본문 길이
+# 조건으로 완화 폴백한다 — 정확도를 지키면서 회수율을 잃지 않는 절충.
+_WHOPIR_BLANK_BEFORE_RE = re.compile(r"\n[ \t]*\n[ \t]*$")
+_WHOPIR_DATES_RE = re.compile(
+    r"Dates?\s+of\s*\n?\s*inspection\s*:?\s*\n?\s*([^\n]{4,60})", re.I)
+_WHOPIR_CONCL_LEAD_RE = re.compile(
+    r"^\s*Conclusion\s*[-–—]?\s*Inspection\s+outcome\s*", re.I)
+# 항목 본문 상한 — 카드는 근거를 보여주는 자리이고 전문은 공식 PDF 링크가 담당한다.
+# (상한이 없으면 브리프 JSON 이 카드 1장당 2~7만자씩 불어난다 — 실측 Kaygee 68,520자.)
+WHOPIR_SECTION_MAX_CHARS = 600
+WHOPIR_OUTCOME_MAX_CHARS = 1200
+# 표제로 인정할 최소 본문 길이. 항목 본문 안의 **중첩 번호 목록**이 표제로 오인되던 것을
+# 막는다(실측 Tianjin: 문서 목록의 "4. WMS Validation PQ Report" 가 진짜 항목
+# "4. Laboratory Control System" 을 밀어냈다). 진짜 항목은 뒤에 본문이 길게 따라온다.
+_WHOPIR_SECTION_MIN_BODY = 300
+
+
+def _whopir_squeeze(text: str) -> str:
+    return re.sub(r"\s+", " ", text or "").strip()
+
+
+def _whopir_cut(text: str, limit: int) -> str:
+    """상한 절단 — 문장 경계 우선(문장 중간에서 끊기지 않게), 절단 시 말줄임 표기."""
+    s = _whopir_squeeze(text)
+    if len(s) <= limit:
+        return s
+    cut = s[:limit]
+    p = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
+    return (cut[:p + 1] if p > limit * 0.5 else cut.rstrip()) + " …"
+
+
+def extract_whopir_report(text: str) -> "dict[str, Any] | None":
+    """WHOPIR PDF 평탄화 텍스트 → 구조화 상세(순수 함수·LLM 0). 실패 시 None.
+
+    반환 = `{"type":"whopir_report", "report_kind":"findings"|"reliance",
+             "outcome": str, "sections":[{"no","title","text"}],
+             "reliance":[{"authority","dates"}]}`
+
+    Part 2/Part 3 경계를 못 찾으면 None — 호출부가 키를 안 쓰고 링크 카드로 유지한다
+    (구조를 못 읽었으면 읽은 척하지 않는다).
+    """
+    t = text or ""
+    m2 = _WHOPIR_PART2_RE.search(t)
+    m3 = _WHOPIR_PART3_RE.search(t, m2.end()) if m2 else None
+    if not (m2 and m3):
+        return None
+    m4 = _WHOPIR_PART4_RE.search(t, m3.end())
+    body = t[m2.end():m3.start()]
+    outcome = _WHOPIR_CONCL_LEAD_RE.sub(
+        "", _whopir_squeeze(t[m3.end():(m4.start() if m4 else len(t))]))
+    kind = "reliance" if _WHOPIR_RELIANCE_RE.search(body[:400]) else "findings"
+
+    sections: list[dict[str, str]] = []
+    reliance: list[dict[str, str]] = []
+    if kind == "findings":
+        cands = [(int(m.group(1)), m.group(2).strip(), m.start(), m.end(),
+                  bool(_WHOPIR_BLANK_BEFORE_RE.search(body[:m.start()])))
+                 for m in _WHOPIR_HEAD_RE.finditer(body)]
+
+        def _body_len(i: int) -> int:
+            nxt = cands[i + 1][2] if i + 1 < len(cands) else len(body)
+            return nxt - cands[i][3]
+
+        kept: list[tuple[int, str, int, int]] = []
+        expect, start_at = 1, 0
+        while True:
+            pool = [i for i in range(start_at, len(cands)) if cands[i][0] == expect]
+            if not pool:
+                break
+            # ① 빈 줄이 앞선 후보 우선(중첩 목록 배제) ② 없으면 본문 길이로 폴백
+            idx = next((i for i in pool if cands[i][4]), None)
+            if idx is None:
+                idx = next((i for i in pool
+                            if _body_len(i) >= _WHOPIR_SECTION_MIN_BODY), None)
+            if idx is None:
+                break
+            n, title, s, e, _strict = cands[idx]
+            kept.append((n, title, s, e))
+            expect, start_at = expect + 1, idx + 1
+        for i, (n, title, _s, e) in enumerate(kept):
+            end = kept[i + 1][2] if i + 1 < len(kept) else len(body)
+            seg = _whopir_cut(body[e:end], WHOPIR_SECTION_MAX_CHARS)
+            if seg:
+                sections.append({"no": str(n), "title": title, "text": seg})
+    else:
+        for m in _WHOPIR_DATES_RE.finditer(body):
+            pre = _whopir_squeeze(body[max(0, m.start() - 260):m.start()])
+            auth = pre.split("  ")[-1][-70:].strip()
+            reliance.append({"authority": auth, "dates": _whopir_squeeze(m.group(1))})
+
+    if not (outcome or sections or reliance):
+        return None
+    out: dict[str, Any] = {
+        "type": "whopir_report",
+        "report_kind": kind,
+        "outcome": _whopir_cut(outcome, WHOPIR_OUTCOME_MAX_CHARS),
+    }
+    if sections:
+        out["sections"] = sections
+    if reliance:
+        out["reliance"] = reliance
+    return out
+
+
 def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:
     """WHOPIR PDF fetch → 영문 결함 excerpt. 반환 (excerpt, status).
 
@@ -284,7 +414,7 @@ def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
-    text, status = _extract_pdf_text(data)
+    text, status = _extract_pdf_text(data, max_chars=WHOPIR_TEXT_MAX_CHARS)
     if not text:
         return "", status
     excerpt = _extract_whopir_excerpt(text)
@@ -293,13 +423,41 @@ def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:
     return excerpt, "ok"
 
 
+def _fetch_whopir_detail(pdf_url: str) -> tuple[str, "dict[str, Any] | None", str]:
+    """WHOPIR PDF 를 **한 번만** 받아 excerpt 와 구조화 상세를 함께 낸다.
+
+    반환 `(excerpt, report, status)`. 같은 PDF 를 두 번 받지 않기 위해 존재한다
+    (`_fetch_whopir_excerpt` 는 excerpt 단독 경로로 남겨 기존 호출·테스트 계약 유지).
+    구조화가 실패해도 excerpt 는 그대로 살린다 — 두 층은 서로 독립이다.
+    """
+    try:
+        from collect_mfds_gmp_inspection import _extract_pdf_text
+    except Exception as e:  # noqa: BLE001
+        return "", None, f"engine-missing:{type(e).__name__}"
+    try:
+        data = http_get_bytes(
+            pdf_url, timeout=WHOPIR_EXCERPT_FETCH_TIMEOUT, retries=HTTP_RETRIES,
+            headers={"Accept": "application/pdf"}, label="WHOPIR PDF",
+        )
+    except RuntimeError as e:
+        return "", None, f"fetch-fail:{str(e)[:120]}"
+    text, status = _extract_pdf_text(data, max_chars=WHOPIR_TEXT_MAX_CHARS)
+    if not text:
+        return "", None, status
+    report = extract_whopir_report(text)
+    excerpt = _extract_whopir_excerpt(text)
+    if report:
+        return excerpt, report, "ok"
+    return excerpt, None, ("no-structure" if excerpt else "no-excerpt")
+
+
 def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     items: list[IntakeItem] = []
     seen: set[str] = set()
     excerpt_enabled = _whopir_excerpt_enabled()
     excerpt_health: dict[str, Any] = {
         "enabled": excerpt_enabled, "attempted": 0, "ok": 0, "failed": 0,
-        "capped": False, "warnings": [],
+        "structured": 0, "capped": False, "warnings": [],
     }
     for page in range(WHOPIR_MAX_PAGES):
         url = WHOPIR_MED_URL if page == 0 else f"{WHOPIR_MED_URL}?page={page}"
@@ -338,7 +496,10 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                     excerpt_health["attempted"] += 1
                     if WHOPIR_EXCERPT_DELAY_SECONDS:
                         time.sleep(WHOPIR_EXCERPT_DELAY_SECONDS)
-                    excerpt, status = _fetch_whopir_excerpt(abs_url)
+                    excerpt, report, status = _fetch_whopir_detail(abs_url)
+                    if report:
+                        raw_payload["whopir_report"] = report
+                        excerpt_health["structured"] += 1
                     if excerpt:
                         raw_payload["whopir_excerpt"] = excerpt
                         excerpt_health["ok"] += 1
@@ -379,7 +540,8 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
             log("WARN", f"WHOPIR excerpt cap({WHOPIR_EXCERPT_MAX_ITEMS}) 도달 — "
                         f"나머지 항목은 excerpt 없이 링크 카드로 유지")
         log("INFO", f"WHOPIR excerpt: attempted={excerpt_health['attempted']} "
-                    f"ok={excerpt_health['ok']} failed={excerpt_health['failed']}")
+                    f"ok={excerpt_health['ok']} failed={excerpt_health['failed']} "
+                    f"structured={excerpt_health['structured']}")
     if not items:
         return [], f"WHO WHOPIR 0건({WHOPIR_MED_URL}) — 구조/렌더 변경 의심(수동 확인 필요)"
     log("INFO", f"WHO WHOPIR 완료: {len(items)}건")

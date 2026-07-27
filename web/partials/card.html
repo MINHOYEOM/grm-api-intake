@@ -250,6 +250,24 @@
     {%- if dd.action %}{{ ncr_field('당국 조치 (Action taken/proposed)', 'MHRA', dd.action, dd.action_ko, '') }}{% endif %}
     {%- if dd.additional %}{{ ncr_field('제한사항', 'MHRA', dd.additional, dd.additional_ko, '') }}{% endif %}
   </details>
+  {%- elif card.deterministic_detail.type == 'whopir_report' %}
+  {#- [WHOPIR 상세 2026-07-27] WHO 공개 실사보고서(Public Inspection Report) 구조 —
+      수집기(`collect_who.extract_whopir_report`)가 PDF 원문에서 결정론 추출(LLM 0·환각 0).
+      종전엔 링크 + 1,500자 excerpt 뿐이라 [결론 → Part 3 항목별 요약(최대 22개)]이라는
+      보고서 구조가 통째로 유실됐다(2026-07-27 사용자 지적). NCR 형제와 같은 클래스를 쓰므로
+      CSS 추가 없음. `*_ko` 있을 때만 원문→국문 병기(additive·골든 불변).
+      SRA/NRA 실사증거 의존 보고서는 항목 요약이 원문에 없다 — 결론 + 인용 실사기관만 렌더
+      한다(없는 항목을 만들지 않는다). -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>실사보고서 상세 <span class="sub">· 원문 기반 · WHO{% if dd.sections %} · 항목 {{ dd.sections | length }}{% endif %}</span></summary>
+    {%- if dd.outcome %}{{ ncr_field('실사 결론 (Inspection outcome)', 'WHOPIR', dd.outcome, dd.outcome_ko, '') }}{% endif %}
+    {%- for s in dd.reliance or [] %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">인용 실사</span></div>
+      <div class="obs-orig"><span class="viol-lang">원문 · WHOPIR</span><p class="obs-en">{{ s.authority }}{% if s.dates %} — {{ s.dates }}{% endif %}</p></div>
+    </div>
+    {%- endfor %}
+    {%- for s in dd.sections or [] %}{{ ncr_field(s.no ~ '. ' ~ (s.title_ko or s.title), 'WHOPIR', s.text, s.text_ko, '') }}{% endfor %}
+  </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}

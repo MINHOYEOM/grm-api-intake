@@ -6130,6 +6130,68 @@ class WebNewSourceRenderTest(unittest.TestCase):
         # 번역이 없는 MHRA 필드는 국문 없이 원문만(부분 번역도 안전).
         self.assertNotIn("GMP 인증서 철회", html)
 
+    # ── [WHOPIR 상세 2026-07-27] WHO 공개 실사보고서 구조 렌더 ──────────────
+    WHOPIR_DETAIL = {
+        "type": "whopir_report", "report_kind": "findings",
+        "outcome": ("Based on the areas inspected, the manufacturer was considered "
+                    "to be operating at an acceptable level of compliance."),
+        "sections": [
+            {"no": 1, "title": "Quality System",
+             "text": "The quality manual was reviewed and found to be current."},
+            {"no": 2, "title": "Production System",
+             "text": "Line clearance was observed during the inspection."},
+        ],
+    }
+
+    def _render_whopir(self, detail):
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        br = self._brief()
+        br["cards"][0]["deterministic_detail"] = detail
+        (data / "brief_web_2026-07-27.json").write_text(
+            json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out)
+        return (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+
+    def test_whopir_report_block_renders_outcome_and_sections(self):
+        """종전엔 링크와 excerpt 뿐이라 보고서 구조가 통째로 유실됐다(2026-07-27 지적)."""
+        html = self._render_whopir(self.WHOPIR_DETAIL)
+        self.assertIn("실사보고서 상세", html)
+        self.assertIn("원문 · WHOPIR", html)
+        self.assertIn("항목 2", html)
+        self.assertIn("실사 결론 (Inspection outcome)", html)
+        self.assertIn("1. Quality System", html)
+        self.assertIn("2. Production System", html)
+        self.assertIn(self.WHOPIR_DETAIL["outcome"], html)
+        for sec in self.WHOPIR_DETAIL["sections"]:
+            self.assertIn(sec["text"], html, "항목 원문이 렌더에서 빠졌다")
+
+    def test_whopir_korean_renders_alongside_original(self):
+        detail = {**self.WHOPIR_DETAIL, "outcome_ko": "적합한 수준으로 운영된다고 판단됐다.",
+                  "sections": [{**self.WHOPIR_DETAIL["sections"][0],
+                                "title_ko": "품질 시스템",
+                                "text_ko": "품질 매뉴얼을 검토했고 최신본이었다."},
+                               self.WHOPIR_DETAIL["sections"][1]]}
+        html = self._render_whopir(detail)
+        self.assertIn("적합한 수준으로 운영된다고 판단됐다.", html)
+        self.assertIn("1. 품질 시스템", html)              # 표제는 국문이 있으면 국문
+        self.assertIn("품질 매뉴얼을 검토했고 최신본이었다.", html)
+        # 원문은 그대로 — 국문이 원문을 밀어내면 근거가 사라진다.
+        self.assertIn(self.WHOPIR_DETAIL["sections"][0]["text"], html)
+        self.assertIn("2. Production System", html)        # 미번역 항목은 영문 표제 유지
+
+    def test_whopir_reliance_report_lists_authorities_without_sections(self):
+        """SRA/NRA 실사증거 의존 보고서는 항목 요약이 원문에 없다 — 만들어내지 않는다."""
+        html = self._render_whopir({
+            "type": "whopir_report", "report_kind": "reliance",
+            "outcome": "Reliance was placed on the inspections listed below.",
+            "sections": [],
+            "reliance": [{"authority": "EDQM", "dates": "12-15 March 2025"}]})
+        self.assertIn("인용 실사", html)
+        self.assertIn("EDQM — 12-15 March 2025", html)
+        # 항목이 0개면 요약 라벨에 건수 힌트를 붙이지 않는다("항목 0" 같은 빈 약속 금지).
+        self.assertIn("· 원문 기반 · WHO</span>", html)
+
     def test_new_sources_reach_search_index(self):
         """세 소스 전부 검색 인덱스에 편입된다(발행은 됐는데 검색에서 사라지는 것 방지)."""
         out, _ = self._render()

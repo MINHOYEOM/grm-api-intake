@@ -522,5 +522,62 @@ class HealthFinalizeTest(unittest.TestCase):
         self.assertEqual(r3.exit_code, 1)
 
 
+class PublicFeedSourceErrorReportingTest(unittest.TestCase):
+    """[2026-07-27] EMA·MHRA·PIC/S·ECA·WL 수집 오류가 **경고로 표면화**돼야 한다.
+
+    실피해: ECA RSS 가 2026-07-20~07-26 **7일 연속** 실패(`error=True`)했는데 intake run 은
+    매번 success 였고 `GRM Intake 운영 경고` 이슈에도 한 줄도 안 올라왔다. 이 5종이
+    `enabled_source_failures`(유일하게 소비되는 소스별 보고 리스트)에서 빠져 있었고,
+    이들이 등장하는 `phase2_source_states` 는 FR 이 도는 정상 운영에선 실행조차 안 되는
+    분기 안에 있었다. 발견은 사람이 브리프에서 ECA 가 사라진 걸 눈치챈 뒤였다.
+    """
+
+    # 운영 실제 구성 = FR·Recall 활성(그래서 phase2 분기는 죽어 있다).
+    PROD_ACTIVE = {"fr", "recall", "ema", "mhra", "pics", "eca", "wl"}
+
+    def _run(self, **stat_over):
+        st = ci.CollectionStats()
+        for k, v in stat_over.items():
+            setattr(st, k, v)
+        return ci._evaluate_health(**_health_kwargs(stats=st, active=self.PROD_ACTIVE))
+
+    def test_eca_failure_surfaces_in_production_config(self):
+        """07-20~07-26 을 그대로 재현 — 이 단언이 침묵 7일의 본질이다."""
+        h = self._run(eca_error=True,
+                      eca_error_msg="XML parse failed: not well-formed (invalid token)")
+        self.assertIn("source-error:eca", _codes(h.warnings),
+                      "ECA 수집 오류가 경고로 올라오지 않는다 — 7일 침묵의 재발")
+
+    def test_all_five_public_feeds_report(self):
+        for code, attr in (("ema", "ema_error"), ("mhra", "mhra_error"),
+                           ("pics", "pics_error"), ("eca", "eca_error"),
+                           ("wl", "wl_error")):
+            with self.subTest(source=code):
+                h = self._run(**{attr: True, f"{code}_error_msg": "boom"})
+                self.assertIn(f"source-error:{code}", _codes(h.warnings))
+
+    def test_stays_exit_zero_so_publish_is_not_blocked(self):
+        """경고 등급 불가침 — failure 로 올리면 run 이 적색이 되고,
+        `grm-web-publish.yml` 이 스캐폴드를 `--status success` 로 고르므로
+        부차 피드 하나가 그 주 발행을 통째로 막는다."""
+        h = self._run(eca_error=True, eca_error_msg="XML parse failed")
+        self.assertEqual(h.status, "warning")
+        self.assertEqual(h.exit_code, 0, "소스 오류가 intake run 을 적색으로 만들면 안 된다")
+        self.assertEqual(_codes(h.failures), [])
+
+    def test_inactive_source_does_not_warn(self):
+        """비활성 소스는 error 플래그가 남아 있어도 보고하지 않는다(오탐 0)."""
+        st = ci.CollectionStats()
+        st.eca_error = True
+        st.eca_error_msg = "stale"
+        h = ci._evaluate_health(**_health_kwargs(stats=st, active={"fr", "recall"}))
+        self.assertNotIn("source-error:eca", _codes(h.warnings))
+
+    def test_healthy_run_reports_nothing(self):
+        h = self._run()
+        self.assertEqual(h.status, "ok")
+        self.assertEqual([c for c in _codes(h.warnings) if c.startswith("source-error:")], [])
+
+
 if __name__ == "__main__":
     unittest.main()

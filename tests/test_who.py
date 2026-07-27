@@ -308,7 +308,10 @@ class WhopirCollectExcerptGateTest(unittest.TestCase):
         w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
         try:
             with _Patched(_WHOPIR_HTML):
-                return w._collect_whopir(RUN)
+                items, err = w._collect_whopir(RUN)
+            # 보강은 중복 제거 뒤 별도 단계다(collect_intake 가 신규 항목만 넘긴다).
+            w.enrich_whopir_items(items)
+            return items, err
         finally:
             w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
 
@@ -481,7 +484,10 @@ class WhopirCollectStructuredTest(unittest.TestCase):
         w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
         try:
             with _Patched(_WHOPIR_HTML):
-                return w._collect_whopir(RUN)
+                items, err = w._collect_whopir(RUN)
+            # 보강은 중복 제거 뒤 별도 단계다(collect_intake 가 신규 항목만 넘긴다).
+            w.enrich_whopir_items(items)
+            return items, err
         finally:
             w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
 
@@ -516,6 +522,87 @@ def _dummy_item(tag: str):
         raw_payload={}, source_url="s", language=w.LANGUAGE_EN,
         region_jurisdiction=w.REGION_WHO,
     )
+
+
+class WhopirEnrichAfterDedupTest(unittest.TestCase):
+    """[중복 제거 후 보강 2026-07-27] fetch 예산이 목록 순서에 먹히지 않는지 고정.
+
+    실측 회귀: WHO 목록은 최신순이 아니라 **알파벳순**이다(Accutest→ADVITY→Aizant… 사이에
+    2023-09·2024-01 이 뒤섞여 있다). 종전처럼 수집 루프에서 목록 순서대로 받으면 cap 40 을
+    매일 같은 앞쪽 40건이 다 써서, 새로 올라온 뒤쪽 보고서는 카드는 나오되 상세가 영영 빈다.
+    """
+
+    def _items(self, n):
+        out = []
+        for i in range(n):
+            it = _dummy_item(f"e{i}")
+            it.raw_payload.update({"channel": "whopir",
+                                   "pdf_url": f"https://x/whopir-{i}.pdf"})
+            out.append(it)
+        return out
+
+    def _enrich(self, items, stub):
+        orig_fetch, orig_delay = w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS
+        w._fetch_whopir_detail = stub
+        w.WHOPIR_EXCERPT_DELAY_SECONDS = 0
+        try:
+            with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "true"}):
+                return w.enrich_whopir_items(items)
+        finally:
+            w._fetch_whopir_detail, w.WHOPIR_EXCERPT_DELAY_SECONDS = orig_fetch, orig_delay
+
+    def test_only_given_items_are_fetched(self) -> None:
+        """넘겨받지 않은 항목은 절대 받지 않는다 — 호출부가 신규만 넘기므로 전수 보강."""
+        calls = []
+        rep = {"type": "whopir_report", "report_kind": "findings", "outcome": "ok",
+               "sections": [{"no": "1", "title": "T", "text": "x"}]}
+
+        def _stub(url):
+            calls.append(url)
+            return ("excerpt", rep, "ok")
+
+        items = self._items(3)
+        health = self._enrich(items[1:], _stub)          # 0번은 이미 수집된 항목이라 치고 제외
+        self.assertEqual(calls, ["https://x/whopir-1.pdf", "https://x/whopir-2.pdf"])
+        self.assertNotIn("whopir_report", items[0].raw_payload)
+        self.assertEqual(items[2].raw_payload["whopir_report"], rep)
+        self.assertEqual(health["structured"], 2)
+        self.assertFalse(health["capped"])
+
+    def test_cap_applies_to_new_items_only_and_is_reported(self) -> None:
+        orig_cap = w.WHOPIR_EXCERPT_MAX_ITEMS
+        w.WHOPIR_EXCERPT_MAX_ITEMS = 2
+        try:
+            calls = []
+            health = self._enrich(
+                self._items(5), lambda u: (calls.append(u), ("e", None, "no-structure"))[1])
+        finally:
+            w.WHOPIR_EXCERPT_MAX_ITEMS = orig_cap
+        self.assertEqual(len(calls), 2)
+        self.assertTrue(health["capped"], "cap 도달이 관측되지 않으면 조용한 누락이 된다")
+
+    def test_flag_off_fetches_nothing(self) -> None:
+        def _must_not_call(url):
+            raise AssertionError("flag off 인데 PDF fetch 가 호출됐다")
+
+        items = self._items(2)
+        orig = w._fetch_whopir_detail
+        w._fetch_whopir_detail = _must_not_call
+        try:
+            with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "false"}):
+                health = w.enrich_whopir_items(items)
+        finally:
+            w._fetch_whopir_detail = orig
+        self.assertFalse(health["enabled"])
+        self.assertEqual(health["attempted"], 0)
+
+    def test_non_whopir_items_are_ignored(self) -> None:
+        """WHO 소스에는 NOC·news 도 섞여 있다 — whopir 채널만 건드린다."""
+        other = _dummy_item("noc")
+        other.raw_payload.update({"channel": "noc", "pdf_url": "https://x/noc.pdf"})
+        calls = []
+        self._enrich([other], lambda u: (calls.append(u), ("e", None, "ok"))[1])
+        self.assertEqual(calls, [])
 
 
 if __name__ == "__main__":

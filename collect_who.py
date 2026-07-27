@@ -451,6 +451,65 @@ def _fetch_whopir_detail(pdf_url: str) -> tuple[str, "dict[str, Any] | None", st
     return excerpt, None, ("no-structure" if excerpt else "no-excerpt")
 
 
+def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
+    """[중복 제거 후 보강 2026-07-27] 넘겨받은 WHOPIR 항목만 PDF 를 받아 raw_payload 를 채운다.
+
+    왜 수집 루프에서 떼어냈는가 — 종전엔 목록을 훑으며 곧바로 PDF 를 받았는데, **cap 이
+    중복 제거보다 먼저** 걸렸다. 그리고 WHO 목록은 최신순이 아니라 **알파벳순**이다(실측
+    2026-07-27: Accutest→ADVITY→Aizant… 사이에 2023-09·2024-01 이 뒤섞여 있다). 둘이 겹치면
+    fetch 예산 40건을 매일 **같은 알파벳 앞쪽 40건**이 다 써버리고, 새로 올라온 뒤쪽 보고서
+    (Tianjin·Zhejiang 등)는 영원히 PDF 를 못 받는다 — 카드는 나오는데 상세는 영영 비는 형태다.
+    종전 주석의 "목록 newest-first" 전제가 사실이 아니었다.
+
+    그래서 호출부(`collect_intake`)가 **Notion 중복 제거를 마친 뒤 살아남은 신규 항목만**
+    넘긴다. 정상 운영에서 신규는 하루 0~3건이라 cap 에 닿지 않고, 목록 순서와 무관하게
+    전수 보강된다(덤으로 매일 165건을 다시 받던 낭비도 사라진다).
+
+    실패는 키 미기록 + warning 누적(항목은 링크 카드로 유지) — 수집 전체 실패 금지.
+    반환 = health dict(`LAST_HEALTH["whopir_excerpt"]` 에도 반영).
+    """
+    enabled = _whopir_excerpt_enabled()
+    health: dict[str, Any] = {
+        "enabled": enabled, "attempted": 0, "ok": 0, "failed": 0,
+        "structured": 0, "capped": False, "warnings": [],
+    }
+    global LAST_HEALTH
+    LAST_HEALTH = {"whopir_excerpt": health}
+    if not enabled:
+        return health
+    for item in items:
+        raw = item.raw_payload
+        if not isinstance(raw, dict) or raw.get("channel") != "whopir":
+            continue
+        url = str(raw.get("pdf_url") or "")
+        if not url:
+            continue
+        if health["attempted"] >= WHOPIR_EXCERPT_MAX_ITEMS:
+            health["capped"] = True
+            break
+        health["attempted"] += 1
+        if WHOPIR_EXCERPT_DELAY_SECONDS:
+            time.sleep(WHOPIR_EXCERPT_DELAY_SECONDS)
+        excerpt, report, status = _fetch_whopir_detail(url)
+        if report:
+            raw["whopir_report"] = report
+            health["structured"] += 1
+        if excerpt:
+            raw["whopir_excerpt"] = excerpt
+            health["ok"] += 1
+        else:
+            health["failed"] += 1
+            warn = f"WHOPIR excerpt 실패({status}): {url}"
+            health["warnings"].append(warn)
+            log("WARN", warn + " — 링크 카드로 유지(manual_review)")
+    if health["capped"]:
+        log("WARN", f"WHOPIR excerpt cap({WHOPIR_EXCERPT_MAX_ITEMS}) 도달 — "
+                    f"나머지 신규 항목은 excerpt 없이 링크 카드로 유지")
+    log("INFO", f"WHOPIR excerpt: attempted={health['attempted']} ok={health['ok']} "
+                f"failed={health['failed']} structured={health['structured']}")
+    return health
+
+
 def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     items: list[IntakeItem] = []
     seen: set[str] = set()
@@ -487,27 +546,6 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 "channel": "whopir", "anchor_text": _clean(text),
                 "pdf_url": abs_url, "list_page": url,
             }
-            # WHY-1 #1: PDF 본문에서 결함 excerpt 추출(flag on 시). 실패는 키 미기록 +
-            # warning 누적(항목은 링크 카드로 유지) — 수집 전체 실패 금지. cap 으로 fetch 상한.
-            if excerpt_enabled and not excerpt_health["capped"]:
-                if excerpt_health["attempted"] >= WHOPIR_EXCERPT_MAX_ITEMS:
-                    excerpt_health["capped"] = True
-                else:
-                    excerpt_health["attempted"] += 1
-                    if WHOPIR_EXCERPT_DELAY_SECONDS:
-                        time.sleep(WHOPIR_EXCERPT_DELAY_SECONDS)
-                    excerpt, report, status = _fetch_whopir_detail(abs_url)
-                    if report:
-                        raw_payload["whopir_report"] = report
-                        excerpt_health["structured"] += 1
-                    if excerpt:
-                        raw_payload["whopir_excerpt"] = excerpt
-                        excerpt_health["ok"] += 1
-                    else:
-                        excerpt_health["failed"] += 1
-                        warn = f"WHOPIR excerpt 실패({status}): {abs_url}"
-                        excerpt_health["warnings"].append(warn)
-                        log("WARN", warn + " — 링크 카드로 유지(manual_review)")
             items.append(IntakeItem(
                 source=SOURCE_WHO,
                 document_id="who-whopir-" + hashlib.sha1(abs_url.encode()).hexdigest()[:12],
@@ -535,13 +573,6 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
         log("WARN", f"WHO WHOPIR 페이지 cap({WHOPIR_MAX_PAGES}) 도달 — 이후 보고서 누락 가능")
     global LAST_HEALTH
     LAST_HEALTH = {"whopir_excerpt": excerpt_health}
-    if excerpt_enabled:
-        if excerpt_health["capped"]:
-            log("WARN", f"WHOPIR excerpt cap({WHOPIR_EXCERPT_MAX_ITEMS}) 도달 — "
-                        f"나머지 항목은 excerpt 없이 링크 카드로 유지")
-        log("INFO", f"WHOPIR excerpt: attempted={excerpt_health['attempted']} "
-                    f"ok={excerpt_health['ok']} failed={excerpt_health['failed']} "
-                    f"structured={excerpt_health['structured']}")
     if not items:
         return [], f"WHO WHOPIR 0건({WHOPIR_MED_URL}) — 구조/렌더 변경 의심(수동 확인 필요)"
     log("INFO", f"WHO WHOPIR 완료: {len(items)}건")

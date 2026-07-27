@@ -419,6 +419,33 @@ class WhopirReportStructureTest(unittest.TestCase):
                              w.WHOPIR_SECTION_MAX_CHARS + 2)
         self.assertTrue(rep["sections"][0]["text"].endswith("…"))
 
+    def test_page_footer_block_is_stripped_from_section_text(self) -> None:
+        """실측 회귀: PDF 평탄화가 매 쪽 하단을 본문 한가운데로 밀어 넣는다.
+
+        Zhejiang 항목 11·15 가 "20, AVENUE APPIA … Page 10 of 14" 로 시작했고, 그 쓰레기가
+        항목 본문 600자 예산까지 먹었다. 주소줄~쪽번호를 한 덩어리로 지운다(사이의 러닝헤더도
+        함께). Ecron 변형은 140자 구분선이 끼어 블록이 길다 — 상한이 짧으면 다시 샌다.
+        """
+        footer = (
+            "20, AVENUE APPIA – CH-1211 GENEVA 27 – SWITZERLAND – TEL CENTRAL "
+            "+41 22 791 2111 – FAX CENTRAL +41 22 791 3111 – WWW.WHO.INT\n"
+            "Ecron Acunova Limited, Manipal India - CRO\n\n10-13 February 2026\n"
+            + "-" * 140 + "\n"
+            "This inspection report is the property of the WHO\n"
+            "Contact: prequalinspection@who.int\n\n\nPage 11 of 24\n\n\n"
+            "Client Confidential")
+        text = ("Part 2\n\n1. Validation\n" + footer
+                + "\nThe validation master plan was reviewed and found current. "
+                + ("Details were verified. " * 12)
+                + "\n\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        body = rep["sections"][0]["text"]
+        self.assertTrue(body.startswith("The validation master plan"), body[:60])
+        for junk in ("AVENUE APPIA", "prequalinspection", "Page 11 of 24",
+                     "Client Confidential", "----"):
+            self.assertNotIn(junk, body, f"푸터 잔재가 본문에 남았다: {junk}")
+
     def test_reliance_report_lists_authorities_and_has_no_sections(self) -> None:
         rep = w.extract_whopir_report(_WHOPIR_RELIANCE_TEXT)
         assert rep is not None
@@ -426,6 +453,40 @@ class WhopirReportStructureTest(unittest.TestCase):
         self.assertNotIn("sections", rep)
         self.assertEqual(len(rep["reliance"]), 2)
         self.assertEqual(rep["reliance"][0]["dates"], "12-15 March 2025")
+
+    def test_reliance_authority_is_reassembled_from_split_table_cell(self) -> None:
+        """실측 회귀: PDF 평탄화가 표 셀을 여러 줄로 쪼개 앞 행 답변 꼬리가 딸려왔다.
+
+        첫 구현이 `"t to last) and comments Dutch Health…"` 같은 값을 냈다(2026-07-27).
+        건수만 세고 값을 안 본 검증이 놓친 결함이라 값 자체를 고정한다.
+        """
+        text = (
+            "Part 2\n"
+            "Summary of SRA/NRA inspection evidence considered (from most recent\n"
+            "to last) and comments\n"
+            "Korean\nMinistry of\nFood and Drug\nSafety (MFDS\nKorea)\n"
+            "Dates of inspection:\n21 to 23 October 2025\n"
+            "Any sections of GMP not\ncovered?\nNot specified\n"
+            "AEMPS\n(Spain)\n\nDates of inspection:\n15-17 January 2024\n"
+            "\nPart 3\nReliance was placed on the inspections listed above.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual(
+            [(r["authority"], r["dates"]) for r in rep["reliance"]],
+            [("Korean Ministry of Food and Drug Safety (MFDS Korea)", "21 to 23 October 2025"),
+             ("AEMPS (Spain)", "15-17 January 2024")])
+
+    def test_reliance_entry_dropped_when_authority_unreadable(self) -> None:
+        """못 읽으면 안 싣는다 — 쓰레기 기관명을 싣느니 항목을 뺀다."""
+        text = ("Part 2\n"
+                "Summary of SRA/NRA inspection evidence considered (from most recent\n"
+                "to last) and comments\n"
+                "the scope was comprehensive overall.\n"
+                "Dates of inspection:\n1 January 2025\n"
+                "\nPart 3\nOutcome.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertNotIn("reliance", rep)
 
     def test_missing_part_boundaries_returns_none(self) -> None:
         self.assertIsNone(w.extract_whopir_report("본문에 Part 경계가 없는 문서"))

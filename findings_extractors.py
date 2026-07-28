@@ -595,8 +595,14 @@ def mfds_finding_signal_present(text: str) -> bool:
 def _wl_block_is_regulatory(full_block: str) -> bool:
     """블록이 규제 지적 신호(21 CFR/U.S.C/FD&C 조항 인용 **또는** 위반 서술 문형)를 하나라도
     갖는지. 둘 다 없으면 인용된 제품 라벨 사용법·실질 없는 파편으로 보고 방출하지 않는다(A-S1).
-    조항 추출은 방출 경로가 이미 계산하는 _extract_us_legal_refs 를 그대로 재사용한다."""
-    return bool(_extract_us_legal_refs(full_block)) or wl_violation_signal_present(full_block)
+    조항 추출은 방출 경로가 이미 계산하는 _extract_us_legal_refs 를 그대로 재사용한다. P-B의
+    문두 강한 위반 표제도 같은 신호 원천으로 명시적으로 공유한다(현재 일반 위반 신호의 부분집합이라
+    판정 범위는 바꾸지 않음)."""
+    return (
+        bool(_extract_us_legal_refs(full_block))
+        or wl_violation_signal_present(full_block)
+        or wl_strong_violation_heading_present(full_block)
+    )
 
 
 def _cut_wl_footer(text: str) -> str:

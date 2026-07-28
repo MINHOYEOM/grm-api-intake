@@ -30,6 +30,30 @@ class FindingsExtractorsTest(unittest.TestCase):
         for finding in findings:
             self.assertEqual(gf.validate_finding(finding), [])
 
+    def test_wl_strong_violation_heading_is_anchored_at_start(self) -> None:
+        self.assertTrue(extractors.wl_strong_violation_heading_present(
+            "Failure to establish an adequate written quality unit procedure for batch release."
+        ))
+        self.assertTrue(extractors.wl_strong_violation_heading_present(
+            " Your firm failed to establish a quality system that assures CGMP compliance."
+        ))
+        self.assertFalse(extractors.wl_strong_violation_heading_present(
+            "We observed a failure to establish an adequate written procedure."
+        ))
+
+    def test_mfds_finding_signal_is_korean_specific(self) -> None:
+        self.assertTrue(extractors.mfds_finding_signal_present(
+            "\ud3c9\uac00 \uacb0\uacfc: \uc9c0\uc801(\ubcf4\uc644)\uc0ac\ud56d — "
+            "\uc81c\uc870\uc2dc\uc124\uc744 \uc801\uc808\ud788 \uad00\ub9ac\ud560 \uac83"
+        ))
+        self.assertTrue(extractors.mfds_finding_signal_present(
+            "\uc791\uc5c5\uc7a5 \uccad\uc18c \uad00\ub9ac\uac00 \ubbf8\ud761\ud558\uc5ec "
+            "\ubcf4\uc644\uc644\ub8cc\uac00 \ud544\uc694\ud568"
+        ))
+        self.assertFalse(extractors.mfds_finding_signal_present(
+            "\uc801\uc6a9 \ubc95\ub839\uc740 [\ubcc4\ud45c 1] \uc81c9\ud638\ub97c \ub530\ub978\ub2e4."
+        ))
+
     def test_fda_483_observations_become_accepted_findings(self) -> None:
         raw_signal = _raw_signal("fda_483_observations")
 

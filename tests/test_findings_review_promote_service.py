@@ -26,11 +26,18 @@ _PROMOTABLE_TEXT = (
 _LABEL_TEXT = "Use thick amount of the cream on the treatment area."  # 신호 없음, 초단문
 
 
-def _row(finding_id: str, text: str, cfr_refs, source: str = "FDA Warning Letter") -> dict:
+def _row(
+    finding_id: str,
+    text: str,
+    cfr_refs,
+    source: str = "FDA Warning Letter",
+    mfds_refs=None,
+) -> dict:
     return {
         "finding_id": finding_id,
         "finding_text": text,
         "cfr_refs": cfr_refs,
+        "mfds_refs": [] if mfds_refs is None else mfds_refs,
         "source": source,
         "review_status": "needs_review",
     }
@@ -78,6 +85,45 @@ class ReviewVerdictTest(unittest.TestCase):
         # 신호만 있고 조항 없음(환경형 위반) → 유지(사람/LLM 검수 몫).
         row = _row("f-3", "Your aseptic areas had difficult to clean and visibly dirty surfaces present.", [])
         self.assertIsNone(svc.review_verdict(row, enable_reject=False))
+
+    def test_wl_strong_heading_without_cfr_ref_promotes(self):
+        row = _row(
+            "f-pb",
+            "Failure to establish adequate written procedures for cleaning and maintenance of equipment.",
+            [],
+        )
+        self.assertEqual(svc.review_verdict(row, enable_reject=False), "accepted")
+
+    def test_unanchored_wl_failure_without_cfr_ref_is_kept(self):
+        row = _row(
+            "f-pb-negative",
+            "We observed a failure to establish adequate written procedures for cleaning equipment.",
+            [],
+        )
+        self.assertIsNone(svc.review_verdict(row, enable_reject=False))
+
+    def test_mfds_ref_and_korean_signal_promotes(self):
+        row = _row(
+            "f-pc",
+            "\ud3c9\uac00 \uacb0\uacfc: \uc9c0\uc801(\ubcf4\uc644)\uc0ac\ud56d — "
+            "\uc81c\uc870\uc2dc\uc124\uacfc \uc791\uc5c5\uc7a5\uc744 \uc801\uc808\ud788 \uad00\ub9ac\ud560 \uac83 "
+            "\ubc0f \uad00\ub828 \uc808\ucc28\ub97c \ubcf4\uc644\ud560 \uac83. Supporting inspection detail.",
+            [],
+            source="MFDS",
+            mfds_refs=["mfds-ref"],
+        )
+        self.assertEqual(svc.review_verdict(row, enable_reject=False), "accepted")
+
+    def test_mfds_legal_reference_without_korean_signal_is_kept(self):
+        row = _row(
+            "f-pc-negative",
+            "\uc801\uc6a9 \ubc95\ub839\uc740 [\ubcc4\ud45c 1] \uc81c9\ud638\uc774\uba70, "
+            "\ud574\ub2f9 \uae30\uc900\uc758 \uc801\uc6a9 \ubc94\uc704\uc640 \uc815\uc758\ub97c \uc548\ub0b4\ud569\ub2c8\ub2e4.",
+            [],
+            source="MFDS",
+            mfds_refs=["mfds-ref"],
+        )
+        self.assertIsNone(svc.review_verdict(row, enable_reject=True))
 
     def test_short_promotable_text_is_kept(self):
         row = _row("f-4", "Failed. 21 CFR 211.", ["21 CFR 211.67"])  # < _PROMOTE_MIN_LEN
@@ -178,6 +224,7 @@ class SourceFilterTest(unittest.TestCase):
         f = svc._source_filter()
         self.assertIn('"FDA Warning Letter"', f)
         self.assertIn('"FDA 483"', f)
+        self.assertIn('"MFDS"', f)
         self.assertTrue(f.startswith("in.("))
 
 

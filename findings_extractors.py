@@ -547,6 +547,25 @@ _WL_VIOLATION_SIGNAL_RE = re.compile(
     re.I,
 )
 
+# [FIND-1 P3 P-B · 2026-07-28] FDA WL 개별 항목의 정형 위반 표제. ICH Q7 API
+# Warning Letter처럼 조항 인용이 서두에만 있고 각 항목에는 없는 경우를 위한 승격 신호다.
+# 본문 중간의 failure/failed 인용·서술을 승격하지 않도록 반드시 문두에 앵커를 둔다.
+_WL_STRONG_VIOLATION_HEADING_RE = re.compile(
+    r"^\s*(?:Failure\s+(?:to|of)\b|Your\s+firm\s+failed\s+to\b|Failed\s+to\b)",
+    re.I,
+)
+
+# [FIND-1 P3 P-C · 2026-07-28] MFDS GMP 실태조사 보완 지적 문형. 영문 WL 신호를
+# 재사용하지 않고, MFDS PDF/표에서 실제로 쓰는 한국어 지적 표현만 별도 판정한다.
+_MFDS_FINDING_SIGNAL_RE = re.compile(
+    r"\uc9c0\uc801\s*\(\s*\ubcf4\uc644\s*\)\s*\uc0ac\ud56d"
+    r"|\S+\s*\ud560\s*\uac83"
+    r"|\S+\s*\ud558\uc9c0\s*\uc54a\uc558\uc74c"
+    r"|\ubbf8\ud761"
+    r"|\ubd80\uc801\ud569"
+    r"|\ubcf4\uc644\s*\uc644\ub8cc",
+)
+
 
 def wl_violation_signal_present(text: str) -> bool:
     """text 에 WL 위반 서술/조건 신호(_WL_VIOLATION_SIGNAL_RE)가 있는지. A-S1 드랍 게이트와
@@ -556,11 +575,34 @@ def wl_violation_signal_present(text: str) -> bool:
     return bool(_WL_VIOLATION_SIGNAL_RE.search(text or ""))
 
 
+def wl_strong_violation_heading_present(text: str) -> bool:
+    """FDA Warning Letter의 문두 정형 위반 표제(P-B)인지 판정한다.
+
+    이 신호는 조항 없이도 승격할 수 있으므로, 중간 문장 일치를 막기 위한 문두 앵커가 계약이다.
+    WL 파서 게이트와 자동승격 서비스가 하나의 정규식 원천을 공유한다.
+    """
+    return bool(_WL_STRONG_VIOLATION_HEADING_RE.search(text or ""))
+
+
+def mfds_finding_signal_present(text: str) -> bool:
+    """MFDS 평가 결과의 한국어 지적/보완 문형(P-C)이 있는지 판정한다.
+
+    영문 WL 위반 신호와 의도적으로 분리한다. 이 함수는 MFDS 전용 자동승격 서비스가 사용한다.
+    """
+    return bool(_MFDS_FINDING_SIGNAL_RE.search(text or ""))
+
+
 def _wl_block_is_regulatory(full_block: str) -> bool:
     """블록이 규제 지적 신호(21 CFR/U.S.C/FD&C 조항 인용 **또는** 위반 서술 문형)를 하나라도
     갖는지. 둘 다 없으면 인용된 제품 라벨 사용법·실질 없는 파편으로 보고 방출하지 않는다(A-S1).
-    조항 추출은 방출 경로가 이미 계산하는 _extract_us_legal_refs 를 그대로 재사용한다."""
-    return bool(_extract_us_legal_refs(full_block)) or wl_violation_signal_present(full_block)
+    조항 추출은 방출 경로가 이미 계산하는 _extract_us_legal_refs 를 그대로 재사용한다. P-B의
+    문두 강한 위반 표제도 같은 신호 원천으로 명시적으로 공유한다(현재 일반 위반 신호의 부분집합이라
+    판정 범위는 바꾸지 않음)."""
+    return (
+        bool(_extract_us_legal_refs(full_block))
+        or wl_violation_signal_present(full_block)
+        or wl_strong_violation_heading_present(full_block)
+    )
 
 
 def _cut_wl_footer(text: str) -> str:

@@ -2,9 +2,10 @@ name: GRM Findings Review Promote
 
 # [FIND-1 P2 · 2026-07-21 RCA 원인 C] 검수 자동승격 — needs_review→accepted 승격 경로.
 # findings_review_promote_service.py 가 PostgREST 서버측 필터로 scope_status='ok' AND
-# review_status='needs_review' AND source∈(FDA Warning Letter, FDA 483) 행만 가져와,
-# 순수 결정론 신호(저장 cfr_refs 조항 인용 AND finding_text 위반/조건 신호 AND 길이≥60)로
-# 고신뢰 지적만 accepted 로 PATCH 한다. 그 외는 needs_review 유지(애매하면 유지). LLM 0.
+# review_status='needs_review' AND source∈(FDA Warning Letter, FDA 483, MFDS) 행만 가져와,
+# 소스별 순수 결정론 신호로 고신뢰 지적만 accepted 로 PATCH 한다: FDA=저장 cfr_refs AND
+# 영문 위반/조건 신호(단, WL 문두 강한 위반 표제는 조항 불요), MFDS=mfds_refs AND 한국어
+# 지적 문형. 길이≥60은 공통이다. 그 외는 needs_review 유지(애매하면 유지). LLM 0.
 # 라이브 3,144 accepted WL 대조에서 이 규칙 만족하는 rejected 는 0건(정밀도 검증됨).
 #
 # ★핵심 제약: git 쓰기 전무(checkout read-only). review_status **만** PATCH 하고 가드
@@ -65,7 +66,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 읽기(needs_review WL/483 GET) + PATCH(review_status 만) — git add/commit/push 없음.
+      # 읽기(needs_review WL/483/MFDS GET) + PATCH(review_status 만) — git add/commit/push 없음.
       # schedule 이벤트는 inputs 가 비어 apply 로 실행된다(신규 needs_review 자동 승격).
       # dispatch 는 dry_run 기본 true(사람이 false 로 명시할 때만 실제 PATCH).
       - name: Promote review status (no git writes — read + review_status PATCH only)

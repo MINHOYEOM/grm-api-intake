@@ -7,14 +7,15 @@
 모듈이 그 승격 경로다 — **결정론·LLM 0**. findings_translate_apply_service /
 findings_reclassify_service 와 동일 보안 모델을 따른다:
 
-  - No LLM, no judgment calls. 승격 판정은 순수 결정론 신호다:
-      승격(accepted) ⇔ 저장 cfr_refs(조항 인용)가 있고 **동시에** finding_text 에 위반/조건
-      신호가 있으며(findings_extractors.wl_violation_signal_present — A-S1 드랍 게이트와 동일
-      신호 원천) 길이 ≥ _PROMOTE_MIN_LEN. 라이브 3,144 accepted WL 대조에서 이 규칙을
-      만족하는 rejected 는 0건이었다(정밀도 우선 — "애매하면 유지").
+  - No LLM, no judgment calls. 승격 판정은 소스별 순수 결정론 신호다:
+      FDA WL/483: 저장 cfr_refs(조항 인용) AND finding_text 위반/조건 신호
+      (findings_extractors.wl_violation_signal_present — A-S1 드랍 게이트와 동일 신호 원천)
+      AND 길이 ≥ _PROMOTE_MIN_LEN. FDA Warning Letter에는 조항 없이도 문두의 강한 위반
+      표제(P-B)를 만족하면 승격한다. MFDS는 mfds_refs AND 한국어 지적 문형(P-C) AND 길이
+      ≥ _PROMOTE_MIN_LEN을 별도 적용한다. 애매하면 needs_review로 유지한다.
       그 외는 needs_review 그대로 둔다(사람/LLM 검수 몫 — 과잉 승격 금지).
   - service-role 키로 PostgREST 읽기(RLS 우회, M4 야간 적재·M12 백필과 동일 안전 메커니즘),
-    Range 헤더 페이지네이션. 서버측 필터로 needs_review WL/483 만 가져온다.
+    Range 헤더 페이지네이션. 서버측 필터로 needs_review WL/483/MFDS 만 가져온다.
   - review_status='needs_review' 행만, review_status **만** PATCH 한다. 가드
     review_status=eq.needs_review 로 멱등·경합 안전(이미 바뀐 행은 매칭 0). finding_text/
     finding_text_ko/scope_status/category 는 읽지도 쓰지도 않는다.
@@ -45,11 +46,11 @@ DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 _DEFAULT_PAGE_SIZE = 1000
 
-_TARGET_SOURCES = ("FDA Warning Letter", "FDA 483")
+_TARGET_SOURCES = ("FDA Warning Letter", "FDA 483", "MFDS")
 _PROMOTE_MIN_LEN = 60   # 조항+신호가 있어도 초단문은 승격하지 않는다(파편 방어)
 _REJECT_MAX_LEN = 60    # opt-in 반려는 초단문에만(조항·신호 전무 + 이 길이 미만)
 
-_SELECT_COLUMNS = "finding_id,finding_text,cfr_refs,source,review_status"
+_SELECT_COLUMNS = "finding_id,finding_text,cfr_refs,mfds_refs,source,review_status"
 
 
 def _normalize_base_url(base_url: str) -> str | None:
@@ -69,8 +70,8 @@ def fetch_needs_review(
     page_size: int = _DEFAULT_PAGE_SIZE,
 ) -> list[dict[str, Any]]:
     """scope_status='ok' AND review_status='needs_review' AND source∈타깃 행만 서버측 필터로
-    가져온다(finding_id/finding_text/cfr_refs/source/review_status). finding_text/cfr_refs 는
-    승격 판정 입력일 뿐 PATCH body 에는 절대 넣지 않는다."""
+    가져온다(finding_id/finding_text/cfr_refs/mfds_refs/source/review_status). finding_text/법령
+    근거 열은 승격 판정 입력일 뿐 PATCH body 에는 절대 넣지 않는다."""
     base = _normalize_base_url(base_url)
     if base is None:
         raise ValueError("findings_review_promote_service: SUPABASE_URL must start with https://")
@@ -85,10 +86,13 @@ def fetch_needs_review(
     )
 
 
-def _has_legal_ref(row: dict[str, Any]) -> bool:
-    """저장 cfr_refs(조항 인용)가 하나라도 있는지. PostgREST 는 jsonb 를 list 로 반환하지만
-    방어적으로 JSON 문자열도 처리한다."""
-    refs = row.get("cfr_refs")
+def _has_legal_ref(row: dict[str, Any], column: str) -> bool:
+    """저장 법령 근거 jsonb 열에 인용이 하나라도 있는지.
+
+    PostgREST는 list를 반환하지만 방어적으로 JSON 문자열도 처리한다. FDA의 cfr_refs와
+    MFDS의 mfds_refs는 같은 형식이되, 소스별 판정 경로에서는 서로 대체하지 않는다.
+    """
+    refs = row.get(column)
     if isinstance(refs, str):
         try:
             refs = json.loads(refs)
@@ -100,17 +104,36 @@ def _has_legal_ref(row: dict[str, Any]) -> bool:
 def review_verdict(row: dict[str, Any], *, enable_reject: bool) -> str | None:
     """행 하나 → 'accepted'(승격)/'rejected'(opt-in 반려)/None(유지). 결정론·순수.
 
-    승격: 조항 인용 AND 위반/조건 신호 AND 길이≥_PROMOTE_MIN_LEN (고신뢰 규제 지적).
+    FDA WL/483 승격: cfr_refs AND 영문 위반/조건 신호 AND 길이≥_PROMOTE_MIN_LEN.
+    FDA WL P-B: cfr_refs 없이도 문두 강한 위반 표제 AND 길이≥_PROMOTE_MIN_LEN.
+    MFDS P-C: mfds_refs AND 한국어 지적 문형 AND 길이≥_PROMOTE_MIN_LEN.
     반려(opt-in): 조항·신호 전무 AND 길이<_REJECT_MAX_LEN (명백한 파편/라벨 인용).
     그 외: None(needs_review 유지 — 애매하면 유지).
     """
     text = str(row.get("finding_text") or "")
-    has_ref = _has_legal_ref(row)
-    has_signal = fx.wl_violation_signal_present(text)
+    source = str(row.get("source") or "")
+    has_cfr_ref = _has_legal_ref(row, "cfr_refs")
+    has_wl_signal = fx.wl_violation_signal_present(text)
 
-    if has_ref and has_signal and len(text) >= _PROMOTE_MIN_LEN:
+    if source == "MFDS":
+        if (
+            _has_legal_ref(row, "mfds_refs")
+            and fx.mfds_finding_signal_present(text)
+            and len(text) >= _PROMOTE_MIN_LEN
+        ):
+            return "accepted"
+        # --enable-reject은 기존 FDA 경로의 초단문 오추출에만 적용한다. MFDS 지적은
+        # 한국어 문맥을 읽는 Phase 2 대상으로 남긴다.
+        return None
+
+    if source == "FDA Warning Letter" and (
+        (has_cfr_ref and has_wl_signal)
+        or fx.wl_strong_violation_heading_present(text)
+    ) and len(text) >= _PROMOTE_MIN_LEN:
         return "accepted"
-    if enable_reject and not has_ref and not has_signal and len(text) < _REJECT_MAX_LEN:
+    if source == "FDA 483" and has_cfr_ref and has_wl_signal and len(text) >= _PROMOTE_MIN_LEN:
+        return "accepted"
+    if enable_reject and not has_cfr_ref and not has_wl_signal and len(text) < _REJECT_MAX_LEN:
         return "rejected"
     return None
 

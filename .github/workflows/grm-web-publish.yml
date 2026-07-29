@@ -17,6 +17,13 @@ name: GRM Web Publish (assemble)
 #   실패가 아니다. 델타 정정 커밋이 push 트리거를 다시 당기는 정상 경로이며, 이때 조용히
 #   성공 종료한다(::notice:: + step summary). 종전엔 `git commit` 의 exit 1 이 스텝을 죽여
 #   Admin 운영 상태 센터에 '검토용 초안 실패'로 올라왔고, 실제 장애와 구분되지 않았다.
+#
+# 회귀 가드(2026-07-29): 발행 후 수기로 보정한 내용은 발행본에만 있고 델타·스캐폴드에는 없다.
+#   그래서 재조립하면 그 보정분이 사라진 산출물이 나온다 — 실측 −117,225자(#475 WHO 카드
+#   11장 소급 복구가 통째로 되돌아감·카드당 −70~90%). 위 zero-diff 실패가 우연히 이 회귀
+#   PR 을 막고 있었을 뿐이므로, 그걸 고치면서 `assemble_regression_guard.py` 를 함께 넣는다.
+#   Admin '이번 주 발행 승인' 은 1클릭 승인을 전제로 설계돼 있어, 회귀 PR 이 거기까지 올라오면
+#   보정분이 조용히 라이브에서 사라진다. 되돌림이 감지되면 PR 을 열지 않고 붉게 세운다.
 # 수집(grm-intake)·배포(grm-web-deploy)와 별도 파일·별도 트리거·독립 재실행(D8).
 
 on:
@@ -141,6 +148,19 @@ jobs:
           python web/tests/test_render.py --freeze
           python web/render.py --data web/data/briefs --out _dist_smoke >/dev/null
           rm -rf _dist_smoke
+
+      - name: 발행 회귀 가드 — 이미 발행된 내용을 되돌리지 않는지 확인
+        run: |
+          set -euo pipefail
+          OUT="web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
+          mkdir -p _published
+          # HEAD(=main) 의 발행본을 꺼내 방금 조립한 산출물과 대조한다.
+          # 그 날짜 최초 발행이면 파일이 없고(빈 파일), 가드는 대조 없이 통과한다.
+          git show "HEAD:$OUT" > _published/prev.json 2>/dev/null || : > _published/prev.json
+          python assemble_regression_guard.py \
+            --published _published/prev.json \
+            --assembled "$OUT" \
+            --summary "$GITHUB_STEP_SUMMARY"
 
       - name: 커밋 + PR (프리뷰 트리거)
         env:

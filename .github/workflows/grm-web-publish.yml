@@ -12,6 +12,11 @@ name: GRM Web Publish (assemble)
 #         → grm-web-deploy.yml 이 프리뷰 생성 → 사람이 프리뷰 확인 후 production 머지 = 라이브(D5)
 #
 # 무인 라이브 0: 이 워크플로우는 **PR 까지만**. production 머지는 유일한 사람 게이트로 보존.
+#
+# zero-diff = 성공(2026-07-29): 재조립 결과가 main 의 발행본과 동일하면 낼 PR 이 없다는 뜻이지
+#   실패가 아니다. 델타 정정 커밋이 push 트리거를 다시 당기는 정상 경로이며, 이때 조용히
+#   성공 종료한다(::notice:: + step summary). 종전엔 `git commit` 의 exit 1 이 스텝을 죽여
+#   Admin 운영 상태 센터에 '검토용 초안 실패'로 올라왔고, 실제 장애와 구분되지 않았다.
 # 수집(grm-intake)·배포(grm-web-deploy)와 별도 파일·별도 트리거·독립 재실행(D8).
 
 on:
@@ -145,11 +150,33 @@ jobs:
           # ★ 발행일당 캐노니컬 짧은 브랜치 하나만 쓴다(재실행 시 -run_id 접미 금지). 긴 브랜치는
           #   Cloudflare Pages 프리뷰 별칭(publish-brief-YYYY-MM-DD-...)이 잘려 404 가 나기 때문(2026-07-13).
           #   재실행(예: deep_analysis 백필 후)은 같은 브랜치를 force-update → 프리뷰 별칭·PR 이 안정 유지.
+          OUT="web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
+          # ★ zero-diff 를 '정합'으로 판정하기 전 최소 보증 — 산출물이 실재하고 카드가 있는지.
+          #   (조립 스텝이 이미 fail-fast 지만, '변경 없음' 경로가 조용히 통과하는 유일한 길이므로
+          #    여기서 한 번 더 값을 읽는다. 건수는 검증이 아니지만 0장은 확실한 결함이다.)
+          test -s "$OUT" || { echo "::error::조립 산출물 없음/빈 파일: $OUT"; exit 1; }
+          python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); n=len(d.get('cards') or []); sys.exit('::error::조립 산출물 카드 0장 — 발행 중단') if n == 0 else print(f'조립 산출물 카드 {n}장')" "$OUT"
           BR="publish/brief-${{ steps.r.outputs.pub }}"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BR"
-          git add "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" web/tests/golden
+          git add "$OUT" web/tests/golden
+          # ★ [2026-07-29] zero-diff 는 실패가 아니다. 방금 조립한 결과가 main 의 발행본과
+          #   바이트 단위로 같다는 뜻 = 낼 것이 없고 정합하다는 증명이다.
+          #   종전엔 `git commit` 이 "nothing added to commit" 으로 exit 1 을 내고 set -e 가
+          #   스텝을 죽여, 델타 정정 커밋마다 워크플로가 붉게 떴다(#465·#467·#468·#470 4연속).
+          #   Admin 운영 상태 센터에도 '검토용 초안 실패'로 올라와 실제 장애와 구분되지 않았다.
+          if git diff --cached --quiet; then
+            echo "::notice::재조립 결과가 main 의 발행본과 동일 — 발행할 변경 없음(정합)"
+            {
+              echo "### 발행 조립 — 변경 없음(정합)"
+              echo ""
+              echo "\`$OUT\` 을 스캐폴드+델타로 다시 조립한 결과가 main 의 발행본과 동일합니다."
+              echo "새로 열 발행 PR 이 없습니다 — 델타 정정 커밋 등으로 재조립이 돌았지만"
+              echo "산출물이 바뀌지 않은 정상 경로입니다."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           git commit -m "publish(web): ${{ steps.r.outputs.pub }} 주간 브리프 (자동 조립)"
           git push -u origin "$BR" --force
           # 열린 PR 이 있으면 재사용(force-push 로 갱신됨), 닫혀 있으면 재오픈, 없으면 생성.

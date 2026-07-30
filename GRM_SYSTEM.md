@@ -363,6 +363,9 @@ grm-api-intake/
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)
+└─ .github/actions/
+   └─ setup-ocr/action.yml               # 스캔 483 OCR 엔진(tesseract+eng) 설치·검증 단일 정의
+                                         #   — 483 PDF 경로를 실행하는 워크플로 4종이 공유(required 로 hard/soft 구분)
 ```
 
 ### 5.2 주요 실행 파일
@@ -371,6 +374,7 @@ grm-api-intake/
 - **웹 렌더러:** `web/render.py` (순수·결정론, 골든 테스트로 고정).
 - **자료실 자동 갱신:** `library_staging_build.py`(수집·게이트·스왑) + `library_updates.py`(변경 이력) — 워크플로 `grm-library-staging.yml`.
 - **Findings 번역 루프:** `findings_translate.py`(export/apply) + `findings_translate_apply_service.py`(CI 반영).
+- **스캔 483 OCR 엔진:** `.github/actions/setup-ocr`(복합 액션) — 483 PDF 텍스트 경로(`collect_fda_483._fetch_fda483_pdf_text`)를 실행하는 워크플로 **4종**(`grm-intake` · `grm-findings-backfill-fetch` · `grm-fda483-ocr-backfill` · `grm-source-verification`)이 공유하는 단일 정의. 설치 정의를 호출지마다 복제하면 한쪽이 뒤처진다(2026-07-30 실장애: 백필·원문대조 2종이 엔진 없이 돌았다). 엔진 부재는 조용히 지나가지 않는다 — 워크플로 주석·잡 요약 + 수집 health 경보(`fda483-ocr-engine-missing`)로 드러나고, 백필은 빈 본문을 적재하지 않고 **보류**한다(`skipped_ocr_unavailable`). 배선 표류는 `tests/test_ocr_engine_wiring.py` 가 호출 그래프에서 유도해 막는다.
 
 ### 5.3 비밀값(Secrets) · 기능 플래그(Variables)
 **Secrets:** `NOTION_TOKEN` · `NOTION_DATABASE_ID` · `OPENFDA_API_KEY`(선택) · `BRAVE_API_KEY` · `DATA_GO_KR_SERVICE_KEY` · `MFDS_HTTP_PROXY`(선택) · `LAW_GO_KR_OC`(선택) · `CLOUDFLARE_*`(웹 배포) · `NEWSLETTER_API_KEY`(Brevo) · `SUPABASE_URL`(vars) · `SUPABASE_SERVICE_ROLE_KEY`(findings 적재·번역 반영, admin 배포와 공용).

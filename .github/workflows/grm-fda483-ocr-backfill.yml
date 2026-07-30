@@ -59,13 +59,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # OCR 엔진 — 이게 없으면 이 워크플로는 존재 의미가 없으므로 실패를 숨기지 않는다
-      # (grm-intake 의 설치 스텝은 continue-on-error 로 두는 것과 의도적으로 다르다).
+      # OCR 엔진 — 이게 없으면 이 워크플로는 존재 의미가 없으므로 required=true 로
+      # 하드 실패시킨다(수집 워크플로들이 required=false 로 degrade 하는 것과 의도적으로 다르다).
       - name: Install OCR engine (tesseract)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
-          tesseract --version | head -1
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'true'
 
       - name: Download weekly scaffold artifact
         if: inputs.doc_ids == ''

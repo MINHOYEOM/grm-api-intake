@@ -436,6 +436,44 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
         self.assertEqual(health.failures, [])
         self.assertEqual(health.exit_code, 0)
 
+    def test_fda483_ocr_engine_missing_is_warning(self) -> None:
+        """[2026-07-30] 엔진 부재가 경보로 올라온다 — 종전엔 아무 신호도 없었다.
+
+        failure 로 올리지 않는 이유는 다른 483 degrade 와 동일하다(수집은 graceful,
+        12개 소스의 정상분까지 실패로 물들이면 안 된다). 다만 **보이긴 해야** 한다.
+        """
+        stats = ci.CollectionStats()
+        stats.fda483_ocr_engine_unavailable = 31
+        stats.fda483_ocr_engine_reason = (
+            "scan-ocr-unavailable:No tessdata specified and Tesseract is not installed")
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-ocr-engine-missing", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings if w.code == "fda483-ocr-engine-missing")
+        self.assertIn("31건", warning.message)
+        self.assertIn("tesseract", warning.detail)
+
+    def test_fda483_ocr_budget_exhausted_is_warning(self) -> None:
+        """예산 소진도 표면화한다 — 소진 뒤 문서는 dedup 때문에 재시도 기회가 없다."""
+        stats = ci.CollectionStats()
+        stats.fda483_ocr_exhausted = 1
+        stats.fda483_ocr_pages_used = 200
+        stats.fda483_ocr_budget_skipped = 11
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        self.assertIn("fda483-ocr-budget-exhausted", _codes(health.warnings))
+        self.assertEqual(health.failures, [])
+        self.assertEqual(health.exit_code, 0)
+
+    def test_no_ocr_warning_when_engine_healthy(self) -> None:
+        """엔진 정상 + 예산 여유면 경보 0 — 상시 경보는 경보를 무의미하게 만든다."""
+        stats = ci.CollectionStats()
+        stats.fda483_ocr_pages_used = 12
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_fda483=True))
+        codes = _codes(health.warnings)
+        self.assertNotIn("fda483-ocr-engine-missing", codes)
+        self.assertNotIn("fda483-ocr-budget-exhausted", codes)
+
     def test_fda483_source_degraded_is_warning(self) -> None:
         # DataTables AJAX 실패 → 정적 HTML fallback(부분) = warning(완전성 미보장 표면화).
         stats = ci.CollectionStats()

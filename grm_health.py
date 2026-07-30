@@ -504,6 +504,34 @@ def _evaluate_health(
             f"failed={stats.fda483_excerpt_failed} "
             f"capped={bool(stats.fda483_excerpt_capped)}",
         )
+    # [OCR 침묵 제거 2026-07-30] 두 신호를 warning 으로 승격한다. 왜 warning 인가:
+    # 수집 자체는 graceful degrade 하므로(메타 카드 유지) failure 로 올리면 12개 소스의
+    # 정상 수집분까지 실패로 물든다 — 다른 483 degrade 신호들과 동형.
+    #
+    # ① engine-missing: 러너에 tesseract 가 없다. 문서 한 건의 사정이 아니라 환경 사정이고,
+    #    **환경을 고치면 되찾을 수 있는** 결손이다. 2026-07-30 실측: grm-findings-backfill-fetch
+    #    가 이 스텝을 못 받아 하루 3회 무인으로 31건을 빈 본문으로 적재했는데 신호가 없었다.
+    # ② budget-exhausted: 실행당 OCR 페이지 예산 소진. 소진 뒤 문서는 OCR 없이 지나가고
+    #    dedup 때문에 재시도 기회가 없다 — 상한이 조용히 커버리지를 깎는 것을 드러낸다.
+    if stats.fda483_ocr_engine_unavailable > 0:
+        health.add_warning(
+            "fda483-ocr-engine-missing",
+            "FDA 483",
+            f"OCR 엔진 사용 불가 — 스캔 483 {stats.fda483_ocr_engine_unavailable}건이 "
+            "본문 없이 처리됨(환경 수리로 회수 가능)",
+            f"reason={stats.fda483_ocr_engine_reason} — 러너에 tesseract-ocr + "
+            "tesseract-ocr-eng 설치 여부 확인(.github/actions/setup-ocr)",
+        )
+    if stats.fda483_ocr_exhausted:
+        health.add_warning(
+            "fda483-ocr-budget-exhausted",
+            "FDA 483",
+            f"OCR 페이지 예산 소진 — 이후 스캔 483 {stats.fda483_ocr_budget_skipped}건이 "
+            "본문 없이 처리됨(dedup 때문에 재시도 기회 없음)",
+            f"pages_used={stats.fda483_ocr_pages_used} "
+            f"budget_skipped={stats.fda483_ocr_budget_skipped} — "
+            "FDA483_OCR_PAGE_BUDGET 상향으로 조정 가능",
+        )
     if stats.fda483_observations_failed > 0:
         health.add_warning(
             "fda483-observations-degraded",

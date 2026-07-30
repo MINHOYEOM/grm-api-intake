@@ -664,6 +664,13 @@ class CollectionStats:
     fda483_excerpt_attempted: int = 0
     fda483_excerpt_failed: int = 0
     fda483_excerpt_capped: int = 0    # cap 도달 여부(0/1)
+    # 스캔 483 OCR 관측(2026-07-30) — engine_unavailable 은 "환경을 고치면 되찾을 수 있는"
+    # 결손이라 별도로 센다(scan-no-text·scan-ocr-empty 와 성격이 다르다).
+    fda483_ocr_engine_unavailable: int = 0
+    fda483_ocr_engine_reason: str = ""
+    fda483_ocr_budget_skipped: int = 0
+    fda483_ocr_pages_used: int = 0
+    fda483_ocr_exhausted: int = 0     # 실행당 페이지 예산 소진 여부(0/1)
     fda483_source_degraded: int = 0   # 부분/동결의심 수집 여부(0/1 — 정적 HTML 폴백·stale JSON)
     fda483_backbone: str = "datatables"   # 실사용 백본(datatables|legacy-json|static-html)
     # [FDA 483 상세보기 2026-07-02] Observation 구조 추출 관측 — 실패는 상세만 생략하고
@@ -2918,6 +2925,16 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.fda483_observations_extracted = int(fda483_obs_health.get("extracted") or 0)
         stats.fda483_observations_failed = int(fda483_obs_health.get("failed") or 0)
         stats.fda483_observations_warnings = list(fda483_obs_health.get("warnings") or [])
+        # [OCR 관측 2026-07-30] LAST_HEALTH["fda_483_ocr"] 는 PR #458 부터 계산돼 있었지만
+        # 여기서 **아무도 읽지 않아** 경보 경로에 오르지 못했다 — 엔진 부재도, 매 실행
+        # 예산 소진도 로그 한 줄로 끝났다. 두 신호를 stats 로 끌어올려 grm_health 가 본다.
+        fda483_ocr_health = fda483_health.get("fda_483_ocr") or {}
+        stats.fda483_ocr_engine_unavailable = int(
+            fda483_ocr_health.get("engine_unavailable") or 0)
+        stats.fda483_ocr_engine_reason = str(fda483_ocr_health.get("engine_reason") or "")
+        stats.fda483_ocr_budget_skipped = int(fda483_ocr_health.get("budget_skipped") or 0)
+        stats.fda483_ocr_pages_used = int(fda483_ocr_health.get("pages_used") or 0)
+        stats.fda483_ocr_exhausted = int(bool(fda483_ocr_health.get("exhausted")))
         if fda483_err:
             stats.fda483_error = True
             stats.fda483_error_msg = fda483_err

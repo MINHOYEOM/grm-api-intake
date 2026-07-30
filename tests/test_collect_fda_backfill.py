@@ -777,9 +777,14 @@ class AutoCliExclusionTest(unittest.TestCase):
 class AutoReportSchemaTest(unittest.TestCase):
     # Every pre-F2c consumer-visible field of the single-source report, which the
     # merged auto report must keep at the top level with the same types.
+    # `skipped_ocr_unavailable`(2026-07-30)은 순수 추가 필드다 — 기존 키·타입은 전부
+    # 그대로 두고, 병합 리포트도 같은 이름으로 합산해 워크플로가 두 모드를 분기 없이 읽는다.
+    # SCHEMA_VERSION 은 **올리지 않았다**: raw_signal_id = sha256({schema_version, source,
+    # document_id})[:24] 라 버전을 바꾸면 기존 적재분과 dedup 동일성이 깨진다.
     _EXISTING_FIELDS = {
         "schema_version": str, "source": str, "offset": int, "max_docs": int,
         "listed": int, "skipped_existing": int, "skipped_gated": int,
+        "skipped_ocr_unavailable": int,
         "fetched": int, "appended": int, "invalid": int, "errors": list,
         "next_offset": int, "exhausted": bool, "would_fetch": list,
         "source_total": (int, type(None)), "remaining": (int, type(None)),
@@ -851,6 +856,55 @@ class AutoModeExistingIdsFailureTest(unittest.TestCase):
         self.assertFalse(merged["auto_complete"])
         self.assertTrue(any("existing-ids-fetch-failed" in e for e in merged["errors"]))
         self.assertNotIn(_SERVICE_KEY, json.dumps(merged))
+
+
+class OcrEngineUnavailableTest(unittest.TestCase):
+    """[2026-07-30 실장애] OCR 엔진이 없는 러너에서 스캔 483 을 **빈 본문으로 적재하지 않는다**.
+
+    이 워크플로에는 tesseract 설치 스텝이 없었고(PR #456 이 grm-intake 에만 넣었다) 하루 3회
+    무인으로 돌면서 31건을 본문 없이 raw_signals 에 넣었다. raw_signals 는 append-only +
+    document_id dedup 이라 **한 번 빈손으로 들어간 문서는 영구히 빈손**이다 — 일일 수집처럼
+    조립 시점에 재추출할 기회조차 없다. 보류는 결손이 아니라 '아직 안 함'이다.
+    """
+
+    _ENGINE_MISSING = ("", "scan-ocr-unavailable:No tessdata specified and "
+                           "Tesseract is not installed")
+
+    def test_engine_missing_scan_483_is_not_appended(self) -> None:
+        report, code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[self._ENGINE_MISSING])
+        self.assertEqual(code, 0)                       # 잡을 죽이지 않는다(WL 백필 보존)
+        self.assertEqual(report.skipped_ocr_unavailable, 1)
+        self.assertEqual(report.appended, 0)
+        post.assert_not_called()                        # 빈 본문이 DB 로 나가지 않았다
+        self.assertEqual(report.errors, [])             # 오류가 아니라 보류다
+
+    def test_skipped_document_stays_collectable(self) -> None:
+        """보류한 문서는 적재되지 않았으므로 다음 실행의 existing_ids 에 없다 —
+        엔진이 붙으면 같은 문서를 다시 집는다(영구 결손이 아니다)."""
+        report, _code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[self._ENGINE_MISSING])
+        self.assertEqual(report.appended, 0)
+        post.assert_not_called()
+        self.assertEqual(report.skipped_existing, 0)
+
+    def test_genuine_source_absence_is_still_appended(self) -> None:
+        """`scan-no-text` 는 **원문의 사정**이다(우리 환경 문제가 아니다) — 종전대로 적재한다.
+
+        이 구분이 무너지면 정상 결손까지 영원히 보류돼 백필이 전진하지 못한다.
+        """
+        report, _code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[("", "scan-no-text")])
+        self.assertEqual(report.skipped_ocr_unavailable, 0)
+        self.assertEqual(report.appended, 1)
+        post.assert_called_once()
+
+    def test_report_exposes_skip_count(self) -> None:
+        """보류 건수가 리포트 스키마에 있다 — 워크플로가 이 키로 주석을 띄운다."""
+        from dataclasses import asdict
+        report, _code, _post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[self._ENGINE_MISSING])
+        self.assertIn("skipped_ocr_unavailable", asdict(report))
 
 
 if __name__ == "__main__":

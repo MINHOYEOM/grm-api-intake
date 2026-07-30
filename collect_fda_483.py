@@ -146,6 +146,65 @@ LAST_HEALTH: dict[str, Any] = {}
 # OCR 없이 진행하고 사유를 남긴다 — 조용히 빈 카드가 되지 않게.
 _OCR_BUDGET: dict[str, int] = {"remaining": FDA483_OCR_PAGE_BUDGET, "used": 0}
 
+# [OCR 엔진 부재 표면화 2026-07-30] OCR 결과를 **상태코드별로 센다**.
+#
+# 왜 필요한가: 종전에는 엔진이 아예 없어도 `_ocr_483_pdf_text` 가 status 문자열만 돌려주고
+# 끝났다. 그 문자열은 raw_payload 에 묻히고, 워크플로는 초록으로 끝나고, health 경보에도
+# 안 나왔다. 실제로 grm-findings-backfill-fetch 가 하루 3회 무인으로 31건을 빈 본문으로
+# 적재하는 동안 **아무 신호도 없었다**(2026-07-30 실측). 엔진 부재는 문서 한 건의 사정이
+# 아니라 **런타임 전체의 사정**이므로 실행 단위로 세어 경보 경로에 올린다.
+#
+# `engine_reason` 은 첫 실패 사유만 보관한다 — 전건이 같은 원인이므로 목록은 잡음이다.
+_OCR_HEALTH: dict[str, Any] = {"ok": 0, "engine_unavailable": 0, "engine_reason": "",
+                               "budget_skipped": 0, "empty": 0}
+
+# 엔진 부재를 뜻하는 status 접두사 — 이 판정을 문자열 비교로 흩뿌리지 않는다(백필 경로도 쓴다).
+_OCR_ENGINE_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
+
+
+def is_ocr_engine_unavailable(status: str) -> bool:
+    """이 status 가 "우리 쪽에 OCR 엔진이 없었다"를 뜻하는가(순수 함수).
+
+    스캔본이라 OCR 이 필요했는데 엔진/tessdata 가 없어 시도조차 못 한 경우다. `scan-no-text`
+    (OCR 비활성) · `scan-ocr-empty`(OCR 했으나 글자 0) · `scan-ocr-budget`(예산 소진)과
+    구별해야 한다 — 이것만이 **환경을 고치면 되찾을 수 있는** 결손이다.
+    """
+    return str(status or "").startswith(_OCR_ENGINE_UNAVAILABLE_PREFIX)
+
+
+def reset_ocr_health() -> None:
+    """OCR 관측 카운터를 실행 시작 상태로 되돌린다(collect_fda_483·백필 진입점이 호출)."""
+    _OCR_HEALTH.update({"ok": 0, "engine_unavailable": 0, "engine_reason": "",
+                        "budget_skipped": 0, "empty": 0})
+
+
+def ocr_health() -> dict[str, Any]:
+    """이번 실행의 OCR 관측치 스냅샷 — 예산 사용량 + 상태코드별 건수 + 파생 플래그."""
+    return {
+        "pages_used": _OCR_BUDGET["used"],
+        "budget": FDA483_OCR_PAGE_BUDGET,
+        "exhausted": _OCR_BUDGET["remaining"] <= 0,
+        "ok": _OCR_HEALTH["ok"],
+        "engine_unavailable": _OCR_HEALTH["engine_unavailable"],
+        "engine_reason": _OCR_HEALTH["engine_reason"],
+        "budget_skipped": _OCR_HEALTH["budget_skipped"],
+        "empty": _OCR_HEALTH["empty"],
+    }
+
+
+def _record_ocr_outcome(status: str) -> None:
+    """OCR 한 건의 결과를 카운터에 반영한다(모든 반환 경로가 여기 한 곳을 지난다)."""
+    if status == "pdf-ok-ocr":
+        _OCR_HEALTH["ok"] += 1
+    elif is_ocr_engine_unavailable(status):
+        _OCR_HEALTH["engine_unavailable"] += 1
+        if not _OCR_HEALTH["engine_reason"]:
+            _OCR_HEALTH["engine_reason"] = status
+    elif status == "scan-ocr-budget":
+        _OCR_HEALTH["budget_skipped"] += 1
+    elif status == "scan-ocr-empty":
+        _OCR_HEALTH["empty"] += 1
+
 # 직전 _fetch_html_rows 가 실제 사용한 백본(관측용 — LAST_HEALTH["backbone"] 로 표면화).
 # collect_fda_483() 진입 시 "datatables" 로 리셋 — 테스트가 _fetch_html_rows 를 스텁해도
 # 이전 실호출 값이 새 실행에 새지 않는다.
@@ -692,8 +751,17 @@ def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tu
       · 비용 상한: 문서당 `FDA483_OCR_MAX_PAGES` 쪽까지만.
 
     status: `pdf-ok-ocr`(OCR 로 본문 확보) | `scan-ocr-unavailable`(엔진 없음) |
-            `scan-ocr-empty`(OCR 했으나 글자 0) | `pdf-parse-fail:<Err>`
+            `scan-ocr-empty`(OCR 했으나 글자 0) | `scan-ocr-budget`(예산 소진) |
+            `pdf-parse-fail:<Err>`
     """
+    text, status = _ocr_483_pdf_text_uncounted(data, max_chars)
+    _record_ocr_outcome(status)
+    return text, status
+
+
+def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
+    """실제 추출 본체. 반환 경로가 여섯 갈래라 **계수는 위 래퍼가 단독으로** 맡는다 —
+    반환마다 카운터를 손으로 올리면 나중에 추가되는 경로가 반드시 하나 빠진다."""
     if _OCR_BUDGET["remaining"] <= 0:
         return "", "scan-ocr-budget"
     try:
@@ -1262,6 +1330,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
     _OCR_BUDGET["remaining"] = FDA483_OCR_PAGE_BUDGET   # 실행별 리셋(위와 동일 이유)
     _OCR_BUDGET["used"] = 0
+    reset_ocr_health()
     excerpt_health: dict[str, Any] = {
         "attempted": 0, "ok": 0, "failed": 0, "capped": False, "warnings": [],
         # [수집 사각 표면화 2026-07-27] cap 때문에 **한 번도 시도되지 않은** 윈도우 내 문서 수.
@@ -1420,10 +1489,16 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "fda483_inspectors": inspectors_health,
         "source_degraded": source_degraded,
         "backbone": _LAST_BACKBONE,
-        "fda_483_ocr": {"pages_used": _OCR_BUDGET["used"],
-                        "budget": FDA483_OCR_PAGE_BUDGET,
-                        "exhausted": _OCR_BUDGET["remaining"] <= 0},
+        "fda_483_ocr": ocr_health(),
     }
+    # [침묵 금지 2026-07-30] 엔진 부재는 문서 사정이 아니라 **환경 사정**이다 — 고치면
+    # 되찾을 수 있는 결손이므로 건수와 사유를 로그에 올리고, health 경보로도 승격시킨다
+    # (grm_health.fda483-ocr-engine-missing). 종전에는 status 문자열만 raw 에 묻혔다.
+    if _OCR_HEALTH["engine_unavailable"]:
+        log("WARN", f"FDA 483 OCR 엔진 사용 불가 — 스캔본 {_OCR_HEALTH['engine_unavailable']}건이 "
+                    f"본문 없이 처리됐다({_OCR_HEALTH['engine_reason']}). "
+                    "러너에 tesseract-ocr + tesseract-ocr-eng 가 설치됐는지 확인하라 "
+                    "(.github/actions/setup-ocr).")
     if excerpt_health["capped"]:
         log("WARN", f"FDA 483 PDF 상한({FDA483_EXCERPT_MAX_ITEMS}) 도달 — 윈도우 내 "
                     f"{excerpt_health['skipped_no_attempt']}건이 **한 번도 시도되지 않았다**. "
@@ -1438,6 +1513,8 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 f"failed={excerpt_health['failed']} "
                 f"미시도={excerpt_health['skipped_no_attempt']} "
                 f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
+                f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
+                f"예산초과={_OCR_HEALTH['budget_skipped']} "
                 f"· observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "
                 f"extracted={observations_health['extracted']} "

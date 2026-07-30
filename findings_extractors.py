@@ -193,6 +193,10 @@ def _from_fda_483_observations(
     }
 
     evidence_url = _evidence_url(raw_signal, raw, "pdf_url", "url", fallback=FDA_483_LIST_URL)
+    # [FIND-1 483 inspector_names] 실사관 명단은 문서(raw_signal) 단위 사실이다 -- 483 PDF
+    # 한 건에서 나오는 모든 observation/finding 이 동일한 리스트를 공유한다. 그래서 루프
+    # 밖에서 한 번만 정규화한다(observation 별로 달라질 이유가 없다).
+    inspector_names = _inspector_names(raw.get("fda483_inspectors"))
     out: list[dict[str, Any]] = []
     for index, observation in enumerate(observations, start=1):
         deficiency = _compact(
@@ -211,6 +215,7 @@ def _from_fda_483_observations(
             evidence_level="A",
             evidence_url=evidence_url,
             finding_language=_language(row, "EN"),
+            inspector_names=inspector_names,
             cfr_refs=refs,
             confidence=0.95,
             review_status="accepted",
@@ -719,6 +724,34 @@ def _dicts(value: Any) -> list[dict[str, Any]]:
 
 def _compact(value: Any) -> str:
     return " ".join(str(value or "").split())
+
+
+_MAX_INSPECTOR_NAMES = 6
+
+
+def _inspector_names(value: Any) -> list[str]:
+    """Defensively normalize raw.fda483_inspectors into a clean name list.
+
+    [FIND-1 483 inspector_names] `fda483_inspectors` comes from the collector
+    layer (a separate track) as a plain list of strings, or is simply absent
+    when the 483 PDF has no parseable signature block. This must never raise
+    on any upstream shape -- non-list, non-string elements, blank/whitespace
+    entries are all silently dropped rather than surfaced as errors, mirroring
+    `_dicts`/`_compact` above. Capped at `_MAX_INSPECTOR_NAMES` (a 483 rarely
+    lists more than a couple of investigators; a runaway list is a parsing
+    defect upstream, not something to fan out here).
+    """
+    if not isinstance(value, list):
+        return []
+    names: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            continue
+        name = _compact(item)
+        if not name:
+            continue
+        names.append(name)
+    return names[:_MAX_INSPECTOR_NAMES]
 
 
 def _language(row: dict[str, Any], default: str) -> str:

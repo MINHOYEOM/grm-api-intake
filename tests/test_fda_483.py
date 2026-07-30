@@ -1671,6 +1671,43 @@ class InspectorExtractionTest(unittest.TestCase):
         text = "EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE , Investigator 3/5/2026"
         self.assertEqual(f._extract_483_inspectors(text), [])
 
+    def test_dedupe_absorbs_period_variants_and_trailing_fragments(self):
+        # [2026-07-30 백필 dry-run 실측] 한 문서에서 실제로 나온 목록. 3명인데 6명으로
+        # 보였다 — 마침표 변형(Barbara A. Rusin / Barbara A Rusin)과 전자서명 레이어가
+        # 남긴 뒤쪽 조각(A. Rusin / D. Fowlkes)이 섞인 탓.
+        self.assertEqual(
+            f._dedupe_inspector_names([
+                "Barbara A. Rusin", "L'Oreal D. Fowlkes", "Sherri J. Blessman",
+                "Barbara A Rusin", "A. Rusin", "D. Fowlkes",
+            ]),
+            ["Barbara A. Rusin", "L'Oreal D. Fowlkes", "Sherri J. Blessman"],
+        )
+
+    def test_dedupe_keeps_longer_form_when_fragment_comes_first(self):
+        self.assertEqual(f._dedupe_inspector_names(["A. Rusin", "Barbara A. Rusin"]),
+                         ["Barbara A. Rusin"])
+
+    def test_dedupe_does_not_merge_distinct_people(self):
+        # 접미 관계가 아닌 서로 다른 이름은 절대 병합되지 않는다.
+        names = ["Jose F Velez", "Ivis L Negron Torres", "Amy A Johnson"]
+        self.assertEqual(f._dedupe_inspector_names(names), names)
+
+    def test_dedupe_is_order_preserving_and_safe_on_empty(self):
+        self.assertEqual(f._dedupe_inspector_names([]), [])
+        self.assertEqual(f._dedupe_inspector_names(["Amy A Johnson"]), ["Amy A Johnson"])
+
+    def test_candidate_cap_applies_after_dedupe_not_before(self):
+        """★상한(6)이 조각 정리보다 **먼저** 걸리면 조각이 자리를 차지해 진짜 이름이
+        밀려난다. 조각 4개를 앞세우고 실명 3개를 뒤에 둬(원시 7개 > 상한 6) 그 순서를
+        고정한다 — 상한이 먼저 걸렸다면 마지막 'Amy A Johnson' 이 소실되고 조각
+        'A Johnson' 이 남았을 것이다."""
+        parts = ["F Velez", "L Negron Torres", "Negron Torres", "A Johnson",
+                 "Jose F Velez", "Ivis L Negron Torres", "Amy A Johnson"]
+        block = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE "
+                 + " ".join(f"{p}, Investigator 3/5/2026" for p in parts))
+        self.assertEqual(f._extract_483_inspectors(block),
+                         ["Jose F Velez", "Ivis L Negron Torres", "Amy A Johnson"])
+
 
 class InspectorWiringTest(unittest.TestCase):
     """수집 라인 배선 — 원시 text 에서 뽑은 실사관이 raw_payload 에 조건부로 실리는지.

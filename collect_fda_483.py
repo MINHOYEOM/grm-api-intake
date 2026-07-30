@@ -965,6 +965,9 @@ _INSPECTOR_MARKER_RE = re.compile(
 )
 _INSPECTOR_MARKER_LOOKBEHIND = 200
 _INSPECTOR_MAX_RESULTS = 6
+# 중복·조각 정리 **전** 원시 후보 상한. 상한이 정리보다 먼저 걸리면 조각이 자리를 차지해
+# 진짜 이름이 밀려난다(상한을 선택보다 먼저 거는 고전적 실수) — 넉넉히 두고 정리 후 자른다.
+_INSPECTOR_MAX_CANDIDATES = 24
 # 양식 어휘 — 서명블록 주변에 흔히 나오는 대문자 단어들이 우연히 "대문자 시작 토큰"
 # 문법을 통과해 이름처럼 보이는 것을 막는다(예: "OF THIS PAGE", "DATE ISSUED").
 _INSPECTOR_FORM_VOCAB = {
@@ -972,6 +975,53 @@ _INSPECTOR_FORM_VOCAB = {
     "THIS", "AND", "THE", "OF", "FDA", "AMENDMENT", "REPORT", "FIRM", "NAME",
     "TITLE", "ADDRESS",
 }
+
+
+def _inspector_key(name: str) -> str:
+    """중복 판정용 정규화 키 — 소문자·마침표 제거·공백 정규화.
+
+    [2026-07-30 백필 dry-run 실측] 전자서명 레이어가 같은 사람을 여러 표기로 남긴다:
+    `Barbara A. Rusin` 과 `Barbara A Rusin` 이 한 문서에 함께 나온다. 마침표를 무시하지
+    않으면 같은 사람이 두 명으로 표시된다.
+    """
+    return re.sub(r"\s+", " ", (name or "").replace(".", "")).strip().lower()
+
+
+def _dedupe_inspector_names(names: list[str]) -> list[str]:
+    """부분 표기(조각)를 흡수한 최종 목록 — 등장 순서 유지.
+
+    [2026-07-30 백필 dry-run 실측] 한 문서에서 이런 목록이 나왔다:
+      ['Barbara A. Rusin', "L'Oreal D. Fowlkes", 'Sherri J. Blessman',
+       'Barbara A Rusin', 'A. Rusin', 'D. Fowlkes']
+    실제로는 **3명**인데 6명으로 보인다 — 마침표 변형(`Barbara A. Rusin`/`Barbara A Rusin`)
+    과 **뒤쪽 조각**(`A. Rusin` ⊂ `Barbara A. Rusin`, `D. Fowlkes` ⊂ `L'Oreal D. Fowlkes`)이
+    섞인 탓이다. 조각은 전자서명 필드가 이름을 짧게 다시 적으면서 생긴다.
+
+    규칙: 정규화 토큰열이 **다른 이름의 접미(suffix)이면서 더 짧으면** 조각으로 보고 버린다
+    (긴 쪽을 남긴다). 접미로 좁힌 이유 = 서명블록의 조각은 항상 "앞이 잘린" 형태이기 때문.
+    `John Smith` 가 `Mary John Smith` 의 접미라 함께 있으면 병합되는 이론적 오탐이 있으나,
+    한 서명블록 안에서 그 형태는 사실상 동일인이고, 3명을 6명으로 보여주는 쪽이 훨씬 나쁘다.
+    """
+    # ①정확 중복(마침표 변형 포함) 제거 — 첫 등장 표기를 남긴다. 추출 루프도 같은 키로
+    #   거르지만, 이 함수가 단독으로도 완결되게(테스트·재사용) 여기서 다시 수행한다.
+    uniq: list[str] = []
+    seen: set[str] = set()
+    for n in names:
+        k = _inspector_key(n)
+        if not k or k in seen:
+            continue
+        seen.add(k)
+        uniq.append(n)
+    # ②뒤쪽 조각 흡수.
+    keys = [_inspector_key(n).split(" ") for n in uniq]
+    out: list[str] = []
+    for i, name in enumerate(uniq):
+        toks = keys[i]
+        if any(j != i and len(keys[j]) > len(toks) and keys[j][-len(toks):] == toks
+               for j in range(len(uniq))):
+            continue                                   # 더 긴 이름의 뒤쪽 조각 — 버린다
+        out.append(name)
+    return out
 
 
 def _valid_inspector_name(name: str) -> bool:
@@ -1032,14 +1082,14 @@ def _extract_483_inspectors(text: str) -> list[str]:
             after = body[m.end("title"):m.end("title") + _INSPECTOR_DATE_LOOKAHEAD]
             if not (_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after)):
                 continue                                   # 확증 없음 — 산문 오탐 방지
-            key = re.sub(r"\s+", " ", name).strip().lower()
+            key = _inspector_key(name)
             if key in seen:
                 continue
             seen.add(key)
             out.append(name)
-            if len(out) >= _INSPECTOR_MAX_RESULTS:
-                break
-        return out
+            if len(out) >= _INSPECTOR_MAX_CANDIDATES:
+                break                                  # 병리적 입력 상한(중복 정리 전 원시분)
+        return _dedupe_inspector_names(out)[:_INSPECTOR_MAX_RESULTS]
     except Exception:  # noqa: BLE001 — 어떤 실패도 이름을 지어내는 대신 빈 리스트로 degrade
         return []
 

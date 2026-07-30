@@ -980,7 +980,13 @@ _INSPECTOR_MAX_CANDIDATES = 24
 # 게이트①(토큰 형태) — 토큰 중간의 대문자는 OCR 대소문자 혼동의 고전적 흔적이다
 #   (JUetlne·HUrpny·BiswaS). 실존 이름의 내부 대문자는 Mc/Mac/O'/D'/Le/De 접두나
 #   하이픈 뒤에만 온다(McDonald·O'Brien·LePage·Wilimczyk-Macri) — 그것만 허용한다.
-_INSPECTOR_INNER_CAP_OK_RE = re.compile(r"^(?:Mc|Mac|Le|De|La|Van|Von|O'|D')", re.I)
+#   ★[2026-07-30 감사 실측] 종전 구현은 `^(?:Mc|Mac|Le|De|…)` 를 **re.I 로** 매칭해
+#   접두만 맞으면 **토큰 전체를 검사에서 면제**했다 → `DemitTia J. Argiropoulos` 가
+#   그대로 통과(De 로 시작한다는 이유로 내부 대문자 T 를 아무도 안 봤다). Demitria·
+#   Denise·Leslie·Lauren·Macey… De/Le/La/Mc 로 시작하는 **모든** 이름이 우회하던 구멍이다.
+#   수리 = 면제를 토큰 단위가 아니라 **대문자가 나온 그 자리**에 준다: 접두가 정확히
+#   거기서 끝날 때만(DeJesus·McGuckin·LaBounty) 허용하고, 대소문자를 구분한다.
+_INSPECTOR_CAP_PREFIXES = ("Mc", "Mac", "Le", "La", "De", "Di", "Du", "Van", "Von", "O'", "D'")
 # 게이트②(문서 내 합의) — 같은 문서에서 **거의 같은 이름이 두 가지 철자로** 나오면 그
 #   문서의 텍스트를 신뢰할 수 없다는 직접 증거다(같은 서명을 두 번 다르게 읽었다는 뜻).
 #   한 명이라도 그런 쌍이 있으면 **그 문서의 이름 전부를 버린다** — 어느 철자가 옳은지
@@ -999,17 +1005,21 @@ _INSPECTOR_FORM_VOCAB = {
 def _inspector_token_shape_ok(token: str) -> bool:
     """토큰 형태 검사(게이트①) — 첫 글자 뒤의 대문자는 OCR 대소문자 혼동으로 본다.
 
-    허용 예외는 실존 이름 관례뿐: Mc/Mac/Le/De/La/Van/Von/O'/D' 접두, 그리고 하이픈·
-    어퍼스트로피 **바로 뒤**의 대문자(Wilimczyk-Macri·O'Brien). 그 외 위치의 대문자는
-    거부한다(JUetlne·HUrpny·BiswaS 실측).
+    허용 예외는 실존 이름 관례뿐: 하이픈·어퍼스트로피 **바로 뒤**의 대문자
+    (Wilimczyk-Macri·O'Brien), 그리고 Mc/Mac/Le/La/De/Di/Du/Van/Von/O'/D' 접두가
+    **정확히 그 자리에서 끝날 때**의 대문자(DeJesus·McGuckin·LaBounty). 그 외 위치의
+    대문자는 거부한다(JUetlne·HUrpny·BiswaS 실측).
+
+    ★면제는 **토큰 전체가 아니라 대문자 한 자리**에만 준다 — 종전처럼 접두만 보고 토큰을
+    통째로 면제하면 `DemitTia`(De 로 시작) 같은 OCR 오인식이 그대로 통과한다(실측 결함).
     """
     core = token.rstrip(".")
-    if _INSPECTOR_INNER_CAP_OK_RE.match(core):
-        return True
     for i, ch in enumerate(core):
         if i == 0 or not ch.isupper():
             continue
         if core[i - 1] in "-'":          # 하이픈·어퍼스트로피 뒤 대문자는 정상
+            continue
+        if core[:i] in _INSPECTOR_CAP_PREFIXES:   # 접두가 정확히 여기서 끝날 때만(대소문자 구분)
             continue
         return False
     return True

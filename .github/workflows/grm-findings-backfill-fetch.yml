@@ -97,6 +97,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # [OCR 엔진 누락 수리 2026-07-30] 이 워크플로는 483 PDF 를 grm-intake 와 **완전히
+      # 동일한 코드**(collect_fda_483._fetch_fda483_pdf_text)로 연다. OCR 을 도입한 PR #456 이
+      # tesseract 설치를 grm-intake 에만 넣어서, 이쪽은 하루 3회 무인으로 스캔 483 을
+      # 본문 없이 raw_signals 에 영구 적재해 왔다(실측 31건 · dedup 때문에 재시도 기회 없음).
+      # required=false: WL 백필은 OCR 과 무관하므로 잡을 죽이지 않는다. 대신 엔진이 없으면
+      # 483 은 **적재하지 않고 건너뛴다**(collect_fda_backfill.skipped_ocr_unavailable) —
+      # 빈 본문을 영구히 박아 넣는 것보다 다음 실행에 다시 시도하는 쪽이 정직하다.
+      - name: Install OCR engine (tesseract)
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'false'
+
       # 목록 조회 + (dry_run 아님) 문서 fetch + raw_signals POST. Notion/git 쓰기 없음.
       # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml(M4)·grm-findings-backfill.yml(M12)이
       # 이미 쓰는 동일 secret 재사용 -- 신규 secret/var 등록 불필요.
@@ -126,6 +138,12 @@ jobs:
           python collect_fda_backfill.py "${ARGS[@]}"
           APPENDED=$(python -c "import json; print(json.load(open('fetch_report.json'))['appended'])")
           echo "appended=${APPENDED}" >> "$GITHUB_OUTPUT"
+          # [침묵 금지 2026-07-30] OCR 엔진이 없어 483 적재를 보류한 건수를 워크플로
+          # 주석으로 띄운다. 단일 소스 리포트와 --auto 병합 리포트가 같은 키를 쓴다.
+          SKIPPED=$(python -c "import json; print(json.load(open('fetch_report.json')).get('skipped_ocr_unavailable') or 0)")
+          if [ "${SKIPPED}" != "0" ]; then
+            echo "::warning title=OCR 엔진 없음(483 적재 보류)::스캔 483 ${SKIPPED}건을 본문 없이 적재하지 않고 보류했다 — 러너 tesseract 설치를 확인하라(.github/actions/setup-ocr)."
+          fi
 
       # dry_run 이 아니고 이번 실행에서 raw_signals 가 실제 추가됐을 때만 M12 체인:
       # 방금 적재된 raw 를 같은 잡에서 findings 로 변환해 백필을 완결한다.

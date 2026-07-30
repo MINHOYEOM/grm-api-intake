@@ -123,6 +123,10 @@ class BackfillFetchReport:
     listed: int = 0
     skipped_existing: int = 0
     skipped_gated: int = 0
+    # [OCR 엔진 부재 2026-07-30] 스캔 483 인데 러너에 OCR 엔진이 없어 **적재를 보류한** 건수.
+    # raw_signals 는 append-only 이고 dedup 이 document_id 로 걸리므로, 빈 본문으로 한 번
+    # 넣으면 그 문서는 영구히 빈손이 된다(실측 31건). 보류하면 다음 실행이 다시 집는다.
+    skipped_ocr_unavailable: int = 0
     fetched: int = 0
     appended: int = 0
     invalid: int = 0
@@ -267,6 +271,7 @@ def run_483(
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda483", offset=offset, max_docs=max_docs)
+    fda483.reset_ocr_health()   # 실행별 OCR 관측 리셋(일일 경로의 collect_fda_483 과 동형)
 
     if existing_ids is None:  # --auto pre-fetches this set (to compute the offset) and passes it in.
         try:
@@ -345,6 +350,15 @@ def run_483(
             report.errors.append(f"483-document-fetch-failed({doc_id}):{type(e).__name__}")
             continue
 
+        # [빈손 적재 차단 2026-07-30] 스캔본인데 OCR 엔진이 없어 본문을 못 얻었다면
+        # **적재하지 않는다**. 여기서 넣으면 document_id dedup 때문에 그 문서는 영구히
+        # 빈 본문으로 굳는다 — 일일 수집과 달리 이 경로에는 재조립·재추출 기회가 없다.
+        # 보류는 결손이 아니라 '아직 안 함'이다: 엔진이 붙은 다음 실행이 같은 문서를
+        # 다시 집는다(존재하지 않으므로 skipped_existing 에 걸리지 않는다).
+        if fda483.is_ocr_engine_unavailable(text_status) and not text:
+            report.skipped_ocr_unavailable += 1
+            continue
+
         # Same construction function the daily collector calls -- guarantees identical
         # IntakeItem (headline/body/raw_payload/document_id/signal_tier/etc.) for this row.
         # [결손 사유 전파 2026-07-20] `text_status` 도 넘긴다 — 일일 수집 경로와 raw_payload
@@ -368,6 +382,17 @@ def run_483(
 
     if not dry_run and to_post:
         report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors)
+
+    # [침묵 금지 2026-07-30] 보류가 있었으면 stderr 로 띄운다 — 리포트 JSON 은 잡 요약을
+    # 펼쳐야 보이지만 stderr 는 로그 본문에 남는다. 이 워크플로는 무인 스케줄이라 사람이
+    # 리포트를 열 계기가 없다(그게 31건이 열흘 넘게 발각되지 않은 이유다).
+    if report.skipped_ocr_unavailable:
+        print(
+            f"WARNING: OCR 엔진 사용 불가 — 스캔 483 {report.skipped_ocr_unavailable}건 적재 보류"
+            f"(사유: {fda483.ocr_health()['engine_reason']}). 러너에 tesseract-ocr +"
+            " tesseract-ocr-eng 설치 여부를 확인하라(.github/actions/setup-ocr).",
+            file=sys.stderr,
+        )
 
     return report, 0
 
@@ -790,6 +815,9 @@ def run_auto(
         "listed": sum(r.listed for r in attempts),
         "skipped_existing": sum(r.skipped_existing for r in attempts),
         "skipped_gated": sum(r.skipped_gated for r in attempts),
+        # OCR 엔진 부재로 적재를 보류한 건수(2026-07-30) — 단일 소스 리포트와 키 이름을
+        # 맞춰 두어야 워크플로가 두 모드를 분기 없이 읽는다.
+        "skipped_ocr_unavailable": sum(r.skipped_ocr_unavailable for r in attempts),
         "fetched": sum(r.fetched for r in attempts),
         "appended": sum(r.appended for r in attempts),
         "invalid": sum(r.invalid for r in attempts),

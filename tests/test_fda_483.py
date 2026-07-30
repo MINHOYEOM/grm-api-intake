@@ -1234,6 +1234,89 @@ class ScannedPdfOcrFallbackTest(unittest.TestCase):
             f._OCR_BUDGET.update(saved)
 
 
+class OcrEngineObservabilityTest(unittest.TestCase):
+    """[침묵 제거 2026-07-30] 엔진 부재를 **실행 단위로** 센다.
+
+    종전에는 `_ocr_483_pdf_text` 가 status 문자열만 돌려주고 끝났다 — 그 문자열은
+    raw_payload 에 묻히고, 워크플로는 초록이고, health 경보에도 없었다. 엔진 부재는 문서
+    한 건의 사정이 아니라 **런타임 전체의 사정**이고, 환경을 고치면 되찾을 수 있는 유일한
+    결손 종류다. 그래서 `scan-no-text`·`scan-ocr-empty`·`scan-ocr-budget` 와 갈라 센다.
+    """
+
+    def setUp(self):
+        f.reset_ocr_health()
+
+    def tearDown(self):
+        f.reset_ocr_health()
+
+    def test_engine_unavailable_is_discriminated_from_other_absences(self):
+        self.assertTrue(f.is_ocr_engine_unavailable("scan-ocr-unavailable:pymupdf"))
+        self.assertTrue(f.is_ocr_engine_unavailable(
+            "scan-ocr-unavailable:No tessdata specified and Tesseract is not installed"))
+        for other in ("scan-no-text", "scan-ocr-empty", "scan-ocr-budget", "pdf-ok",
+                      "pdf-ok-ocr", "fetch-fail:timeout", "", None):
+            self.assertFalse(f.is_ocr_engine_unavailable(other), f"오분류: {other!r}")
+
+    def test_engine_failure_is_counted_with_reason(self):
+        """모든 반환 경로가 계수 래퍼를 지난다 — 여기서 세지 않으면 아무도 모른다."""
+        with patch.object(f, "_ocr_483_pdf_text_uncounted",
+                          lambda data, max_chars: ("", "scan-ocr-unavailable:no tessdata")):
+            f._ocr_483_pdf_text(b"%PDF-1.7 scan")
+            f._ocr_483_pdf_text(b"%PDF-1.7 scan")
+        health = f.ocr_health()
+        self.assertEqual(health["engine_unavailable"], 2)
+        self.assertEqual(health["engine_reason"], "scan-ocr-unavailable:no tessdata")
+        self.assertEqual(health["ok"], 0)
+
+    def test_success_and_budget_are_counted_separately(self):
+        with patch.object(f, "_ocr_483_pdf_text_uncounted",
+                          lambda data, max_chars: ("OBSERVATION 1 x", "pdf-ok-ocr")):
+            f._ocr_483_pdf_text(b"%PDF-1.7 scan")
+        with patch.object(f, "_ocr_483_pdf_text_uncounted",
+                          lambda data, max_chars: ("", "scan-ocr-budget")):
+            f._ocr_483_pdf_text(b"%PDF-1.7 scan")
+        health = f.ocr_health()
+        self.assertEqual(health["ok"], 1)
+        self.assertEqual(health["budget_skipped"], 1)
+        self.assertEqual(health["engine_unavailable"], 0)
+
+    def test_collect_run_resets_counters(self):
+        """실행별 리셋 — 이전 실행의 부재가 다음 실행 경보로 새면 안 된다."""
+        with patch.object(f, "_ocr_483_pdf_text_uncounted",
+                          lambda data, max_chars: ("", "scan-ocr-unavailable:x")):
+            f._ocr_483_pdf_text(b"%PDF-1.7 scan")
+        self.assertEqual(f.ocr_health()["engine_unavailable"], 1)
+        rows = FetchCoverageTest._norm_rows(1)
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false"}), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_fetch_fda483_pdf_text",
+                             lambda url: ("OBSERVATION 1 x", "pdf-ok")), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), 1, False)):
+            f.collect_fda_483(START, END)
+        self.assertEqual(f.LAST_HEALTH["fda_483_ocr"]["engine_unavailable"], 0)
+
+    def test_last_health_carries_engine_counters(self):
+        """LAST_HEALTH 가 엔진 카운터를 실어야 collect_intake→grm_health 로 이어진다."""
+        rows = FetchCoverageTest._norm_rows(2)
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false",
+                                     "ENABLE_FDA_483_OCR": "true"}), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_ocr_483_pdf_text_uncounted",
+                             lambda data, max_chars: ("", "scan-ocr-unavailable:no tessdata")), \
+                patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 scan"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: ("", "scan-no-text")), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), 2, False)):
+            f.collect_fda_483(START, END)
+        ocr = f.LAST_HEALTH["fda_483_ocr"]
+        self.assertEqual(ocr["engine_unavailable"], 2)
+        self.assertIn("tessdata", ocr["engine_reason"])
+
+
 class FetchCoverageTest(unittest.TestCase):
     """[수집 사각 2026-07-27] PDF 상한 밖 문서가 **몇 건 통째로 빠졌는지** 세고 표면화한다.
 

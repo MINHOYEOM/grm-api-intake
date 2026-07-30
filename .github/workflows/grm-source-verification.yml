@@ -40,6 +40,17 @@ jobs:
       - name: 의존성
         run: pip install -q requests pymupdf
 
+      # [OCR 엔진 누락 수리 2026-07-30] 이 워크플로는 483 원문을 collect_fda_483.
+      # _fetch_fda483_pdf_text 로 되받아 발행 카드와 대조한다. 엔진이 없으면 스캔 483 의
+      # text 가 빈 문자열이 되어 found=0 이 되고, 불일치 판정은 `found > shown` 이므로
+      # **0 은 결코 불일치를 일으키지 못한다** — 정작 검증이 가장 필요한 문서들이 전부
+      # 조용히 'ok' 로 통과했다(거짓 음성). required=false: 대조는 계속하되 엔진 부재는
+      # 액션의 주석·잡 요약으로 드러난다.
+      - name: Install OCR engine (tesseract)
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'false'
+
       - name: 원문 대조
         id: verify
         continue-on-error: true      # 불일치(exit 1)는 job 실패가 아니라 이슈로 처리한다

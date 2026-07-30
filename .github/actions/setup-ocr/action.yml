@@ -1,0 +1,99 @@
+name: 'Setup OCR engine (tesseract)'
+description: >
+  스캔 483 OCR(collect_fda_483._ocr_483_pdf_text → PyMuPDF get_textpage_ocr)이 요구하는
+  tesseract 바이너리를 러너에 설치하고, 설치 결과를 반드시 관측 가능하게 남긴다.
+
+# 왜 복합 액션인가 (2026-07-30):
+#   483 PDF 텍스트 추출 경로(`collect_fda_483._fetch_fda483_pdf_text`)는 **두 워크플로**가
+#   공유한다 — 일일 수집(grm-intake)과 과거분 백필(grm-findings-backfill-fetch). 그런데
+#   OCR 을 도입한 PR #456 은 tesseract 설치 스텝을 grm-intake 에만 넣었다. 백필은 같은 코드로
+#   PDF 를 열면서 엔진이 없어 하루 3회·무인으로 `scan-ocr-unavailable` 을 raw_signals 에
+#   영구 적재했다(실측 31건). **설치 정의가 호출지마다 복제되면 반드시 한쪽이 뒤처진다** —
+#   그래서 정의를 여기 한 곳에만 둔다. 새 워크플로가 483 PDF 경로를 쓰면 이 액션을 부른다.
+#
+# 침묵 금지 원칙:
+#   설치 실패를 삼키지 않는다. apt 출력에서 `-qq` 를 뺐고(사유가 로그에 남아야 한다),
+#   검증을 별도 스텝으로 분리해 엔진 부재를 **워크플로 주석(annotation) + 잡 요약**으로
+#   띄운다. `required` 로 "없으면 무의미한 워크플로"와 "degrade 해도 되는 워크플로"를 구분한다.
+
+inputs:
+  required:
+    description: >
+      'true'  = 엔진이 없으면 잡을 실패시킨다(OCR 이 존재 이유인 워크플로).
+      'false' = 경고·요약만 남기고 계속한다(수집 자체는 graceful degrade 로 진행).
+    required: false
+    default: 'false'
+
+outputs:
+  available:
+    description: "'true' = tesseract + eng 언어팩 사용 가능"
+    value: ${{ steps.verify.outputs.available }}
+
+runs:
+  using: composite
+  steps:
+    # 설치는 실패해도 스텝을 죽이지 않는다 — 판정은 전적으로 verify 스텝이 한다.
+    # (복합 액션의 스텝에는 continue-on-error 를 쓸 수 없어 rc 를 셸에서 흡수한다.)
+    # `-qq` 를 쓰지 않는 이유: 2026-07-30 조사에서 이 스텝의 실패 사유를 로그에서 읽을 수
+    # 없다는 점이 오진의 출발점이었다. 조용한 성공보다 시끄러운 로그가 낫다.
+    - name: Install tesseract (apt)
+      shell: bash
+      run: |
+        set +e
+        sudo apt-get update -o Acquire::Retries=3
+        rc_update=$?
+        sudo apt-get install -y -o Acquire::Retries=3 tesseract-ocr tesseract-ocr-eng
+        rc_install=$?
+        echo "apt-get update rc=${rc_update} / install rc=${rc_install}"
+        exit 0
+
+    # 설치 성공을 **바이너리와 언어팩으로** 확인한다. "tesseract 는 있는데 eng 가 없다"는
+    # 별개의 조용한 실패 모드다(PyMuPDF 는 tessdata 를 못 찾으면 RuntimeError 를 던진다).
+    - name: Verify OCR engine
+      id: verify
+      shell: bash
+      env:
+        OCR_REQUIRED: ${{ inputs.required }}
+      run: |
+        set +e
+        # 존재 확인은 `command -v` 로 한다 — `tesseract --version | head -1` 의 $? 는
+        # **head 의 종료코드**(거의 항상 0)라서 바이너리 부재를 못 잡는다(파이프 함정).
+        if command -v tesseract >/dev/null 2>&1; then
+          present=1
+        else
+          present=0
+        fi
+        version="$(tesseract --version 2>&1 | head -1)"
+        langs="$(tesseract --list-langs 2>&1 | tail -n +2 | tr '\n' ' ')"
+        set -e
+
+        # 바이너리 + eng 언어팩 둘 다 필요하다. "tesseract 는 있는데 eng 가 없다"는
+        # 별개의 조용한 실패 모드다(PyMuPDF 가 tessdata 를 못 찾아 RuntimeError).
+        ok="${present}"
+        case " ${langs} " in *" eng "*) ;; *) ok=0 ;; esac
+
+        if [ "${ok}" -eq 1 ]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "OCR 엔진 정상: ${version} / langs: ${langs}"
+          exit 0
+        fi
+
+        echo "available=false" >> "$GITHUB_OUTPUT"
+        detail="binary_present=${present} / version='${version}' / langs='${langs}'"
+        msg="OCR 엔진(tesseract+eng) 사용 불가 — 스캔 483 은 본문 없이 처리된다(scan-ocr-unavailable)."
+        echo "::warning title=OCR 엔진 없음::${msg} ${detail}"
+        {
+          echo "### ⚠️ OCR 엔진 없음 (tesseract)"
+          echo ""
+          echo "${msg}"
+          echo ""
+          echo '```'
+          echo "${detail}"
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        if [ "${OCR_REQUIRED}" = "true" ]; then
+          echo "::error title=OCR 엔진 필수::이 워크플로는 OCR 없이는 산출물이 무의미하다 — 실패로 종료한다."
+          exit 1
+        fi
+        exit 0

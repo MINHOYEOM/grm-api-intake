@@ -69,13 +69,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # OCR 엔진 — 이게 없으면 스캔 483 은 전부 빈손이므로 실패를 숨기지 않는다
-      # (grm-fda483-ocr-backfill.yml 과 동일 스텝 그대로).
+      # OCR 엔진 — 이게 없으면 스캔 483 은 전부 빈손이므로 실패를 숨기지 않는다.
+      # 설치 정의는 복합 액션 하나로 모았다(2026-07-30) — "동일 스텝 그대로" 복제가
+      # 정확히 이 사건의 원인이었다(같은 483 PDF 경로를 쓰는 워크플로 2종이 스텝을 못 받아
+      # 각각 빈 본문 적재·거짓 음성을 냈다). required=true 는 이 워크플로의 원래 의도와 같다.
       - name: Install OCR engine (tesseract)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
-          tesseract --version | head -1
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'true'
 
       # 읽기(raw_signals/findings GET) + PATCH(inspector_names 만) — git add/commit/push 없음.
       # SUPABASE_* 는 grm-intake.yml 등 기존 워크플로가 이미 쓰는 동일 secret/var 재사용

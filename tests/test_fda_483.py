@@ -1571,6 +1571,23 @@ class InspectorExtractionTest(unittest.TestCase):
         self.assertFalse(f._valid_inspector_name("Solo"))
         self.assertTrue(f._valid_inspector_name("Jose F Velez"))
 
+    def test_space_before_comma_is_tolerated(self):
+        # [2026-07-30 프로덕션 실측] 스캔 OCR 이 쉼표를 이름에서 한 칸 떼어놓는 변형이
+        # 38문서 존재한다(정상 쉼표 421문서 대비 ~9%). Catalent 실측 원문 기준.
+        # ★같은 블록의 "Joohi Castelvetere , Investigat or" 는 **직함 자체가 OCR 로 깨져**
+        #  ("Investigat or") 여전히 누락되는 게 정답이다 — 정밀도 우선 계약상 추측 복원은
+        #  하지 않는다. 이 테스트는 그 경계를 함께 고정한다.
+        text = ("EM\"'-OYEE(S) SIGNATURE SEE Joohi Castelvetere , Investigat or 04/24/2026 "
+                "REVERSE OF Robert J Ham, Investigator THIS PAGE "
+                "Brandy N LePage , Investigator FORM FDA 413")
+        self.assertEqual(f._extract_483_inspectors(text),
+                         ["Robert J Ham", "Brandy N LePage"])
+
+    def test_space_before_comma_does_not_admit_form_vocab(self):
+        # 공백-쉼표 허용이 양식 어휘를 이름으로 승격시키지 않는지(오탐 회귀 가드).
+        text = "EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE , Investigator 3/5/2026"
+        self.assertEqual(f._extract_483_inspectors(text), [])
+
 
 class InspectorWiringTest(unittest.TestCase):
     """수집 라인 배선 — 원시 text 에서 뽑은 실사관이 raw_payload 에 조건부로 실리는지.

@@ -874,8 +874,13 @@ _INSPECTOR_TOKEN_RE = r"[A-Z][a-zA-Z'\-]{0,24}\.?"
 # 임의 상한 — 성능/폭주 방지용일 뿐 의미론적 의미는 없다.
 _INSPECTOR_RUN_RE = rf"{_INSPECTOR_TOKEN_RE}(?: {_INSPECTOR_TOKEN_RE}){{0,7}}"
 _INSPECTOR_TITLE_ALT = "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
+# [2026-07-30 실측 보정] 쉼표 **앞** 공백을 허용한다(`LePage , Investigator`). 스캔 OCR 이
+# 쉼표를 이름에서 한 칸 떼어놓는 변형이 프로덕션에 38문서 존재한다(정상 쉼표 421문서 대비
+# ~9% 추가 회수). 오탐 위험은 없다 — 쉼표 앞 run 은 여전히 이름 문법(2~4토큰·양식어휘 제외)
+# 검증을 통과해야 하고, 교차 확증 (a)/(b)도 그대로 요구된다. `[ \t]*` 로 좁혀 개행은 넘지
+# 않는다(다른 줄의 토큰이 이름으로 붙는 것을 막는다).
 _INSPECTOR_CANDIDATE_RE = re.compile(
-    rf"(?P<run>{_INSPECTOR_RUN_RE}),[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
+    rf"(?P<run>{_INSPECTOR_RUN_RE})[ \t]*,[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
 )
 # 교차 확증 (a) — 직함 뒤 60자 이내 날짜. [2026-07-30 교정 확인] 서명블록 두 번째 이후
 # 서명자는 날짜가 OCR 로 깨지는 경우(`0227-2026`·`0417-2026` — 슬래시 없음)가 실측에서

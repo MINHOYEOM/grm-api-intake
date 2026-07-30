@@ -1636,15 +1636,17 @@ class InspectorExtractionTest(unittest.TestCase):
         self.assertEqual(f._extract_483_inspectors(None), [])
 
     def test_cap_at_six(self):
-        blocks = []
-        names = []
-        for i in range(8):
-            suffix = chr(ord("A") + i)          # 숫자는 이름 문법 위반이라 알파벳 접미사 사용
-            name = f"Person{suffix} A Surname{suffix}"
-            names.append(name)
-            blocks.append(f"SEE REVERSE| DATE ISSUED\n{name},\nInvestigator\n{i % 9 + 1}/1/2026\n"
-                          "OF THIS PAGE\n")
-        text = "".join(blocks)
+        # ★이름은 서로 **충분히 달라야** 한다 — 문서 내 합의 게이트(_inspector_names_are_
+        #   consistent)는 거의 같은 이름이 두 철자로 나오면 그 문서를 통째로 버리므로,
+        #   기계적으로 접미사만 바꾼 합성 이름(PersonA…/PersonB…)을 쓰면 게이트가 발화해
+        #   상한이 아니라 게이트를 시험하게 된다. 서로 무관한 실명형 8개를 쓴다.
+        names = ["Jose F Velez", "Amy A Johnson", "Timothy H Vo", "Pearl C Ozuruigbo",
+                 "Lisa R Hilliard", "Yaharn Su", "Cynthia J Tsui", "Demario L Walls"]
+        text = "".join(
+            f"SEE REVERSE| DATE ISSUED\n{name},\nInvestigator\n{i % 9 + 1}/1/2026\n"
+            "OF THIS PAGE\n"
+            for i, name in enumerate(names)
+        )
         result = f._extract_483_inspectors(text)
         self.assertEqual(len(result), 6)
         self.assertEqual(result, names[:6])
@@ -1670,6 +1672,58 @@ class InspectorExtractionTest(unittest.TestCase):
         # 공백-쉼표 허용이 양식 어휘를 이름으로 승격시키지 않는지(오탐 회귀 가드).
         text = "EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE , Investigator 3/5/2026"
         self.assertEqual(f._extract_483_inspectors(text), [])
+
+    # ── OCR 신뢰도 게이트 [2026-07-30 백필 실측 결함] ─────────────────────────
+    def test_gate1_rejects_ocr_case_confusion_tokens(self):
+        """토큰 중간 대문자는 OCR 대소문자 혼동의 흔적(실측: JUetlne·HUrpny·BiswaS)."""
+        for tok in ("JUetlne", "HUrpny", "BiswaS", "HeItmeier"):
+            self.assertFalse(f._inspector_token_shape_ok(tok), tok)
+
+    def test_gate1_allows_real_internal_caps(self):
+        """실존 이름의 내부 대문자는 Mc/Mac/Le/De/O'/D' 접두나 하이픈·어퍼스트로피 뒤에만."""
+        for tok in ("McDonald", "MacLeod", "LePage", "DeSilva", "O'Brien",
+                    "Wilimczyk-Macri", "Velez", "Hernandez"):
+            self.assertTrue(f._inspector_token_shape_ok(tok), tok)
+
+    def test_gate1_rejects_bare_initial_as_given_name(self):
+        """첫 토큰이 홑이니셜이면 이름이 잘려나간 조각(실측: I. Gaul·P. Cintron·A. Rusin).
+        483 서명블록은 항상 이름을 온전히 적으므로 이건 조각이 맞다."""
+        for name in ("I. Gaul", "P. Cintron", "A. Rusin", "H. Hunt"):
+            self.assertFalse(f._valid_inspector_name(name), name)
+        for name in ("Jose F Velez", "Eileen A. Liu", "Ivis L Negron Torres"):
+            self.assertTrue(f._valid_inspector_name(name), name)
+
+    def test_gate2_rejects_document_with_contradictory_spellings(self):
+        """같은 이름이 두 철자로 읽힌 문서는 통째로 버린다 — 어느 쪽이 옳은지 알 수 없다.
+        실측 원문(Immacule): Damaris Y. Hernandez / Damaris Y. Hemandez (rn→m 오인식)."""
+        self.assertFalse(f._inspector_names_are_consistent(
+            ["Damaris Y. Hernandez", "Angelica M. Hernandez", "Damaris Y. Hemandez"]))
+        self.assertFalse(f._inspector_names_are_consistent(
+            ["Unnee Ranjan", "Lata Mathew", "Onnee Ranjan"]))
+
+    def test_gate2_allows_distinct_people_with_shared_surname(self):
+        """성이 같은 서로 다른 사람은 병합·거부되지 않아야 한다(오탐 방지)."""
+        self.assertTrue(f._inspector_names_are_consistent(
+            ["Damaris Y. Hernandez", "Angelica M. Hernandez"]))
+        self.assertTrue(f._inspector_names_are_consistent(
+            ["Jose F Velez", "Ivis L Negron Torres", "Sarah E Venti"]))
+
+    def test_gates_reject_whole_document_end_to_end(self):
+        """실측 불량 원문(Delta Pharma 계열)이 최종 산출에서 통째로 비는지 — 한 사람이
+        세 철자로 읽힌 문서다. 틀린 실명 노출보다 빈 결과가 정답이다."""
+        text = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE "
+                "Brandon C. Hcitmcier, Investigator 1/17/2024 OF THIS PAGE "
+                "Brandon C. Heitrueier, Investigator 1/17/2024 "
+                "Brandon C. Heianeier, Investigator 1/17/2024")
+        self.assertEqual(f._extract_483_inspectors(text), [])
+
+    def test_gates_preserve_clean_multi_signer_document(self):
+        """게이트 추가가 정상 다중 서명자 문서를 깨뜨리지 않는지(회귀)."""
+        text = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE | Demario L Walls, "
+                "Investigator 3/20/2026 OF THIS PAGE | Nelson N Ayangho, Investigator "
+                "Sarah E Venti, FDA Center Employee Xx")
+        self.assertEqual(f._extract_483_inspectors(text),
+                         ["Demario L Walls", "Nelson N Ayangho", "Sarah E Venti"])
 
     def test_dedupe_absorbs_period_variants_and_trailing_fragments(self):
         # [2026-07-30 백필 dry-run 실측] 한 문서에서 실제로 나온 목록. 3명인데 6명으로

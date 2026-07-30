@@ -400,6 +400,31 @@ class LimitTest(unittest.TestCase):
         self.assertEqual(report.attempted, 1)
         self.assertEqual(report.limit, 1)
 
+    def test_limit_zero_means_all_not_nothing(self):
+        """★[2026-07-30 실사고 회귀] `limit=0` 은 **전건**이다.
+
+        종전 구현은 0 을 "0건 처리"로 받아 apply 모드에서 아무것도 안 하고 **성공으로
+        끝났다**(1,546 문서 대상 실행이 candidates=0·exit 0). 형제 워크플로
+        `grm-fda483-ocr-backfill.yml` 이 `0=전건` 규약이라 호출자가 0 을 그대로 넘긴 것이
+        원인. 침묵 무동작은 이 저장소가 가장 경계하는 실패 유형이므로 규약을 통일한다.
+        """
+        raw = [_raw_row(f"rid-{i}", f"fda483-{i}") for i in range(3)]
+        findings = [_finding_row(f"rid-{i}", []) for i in range(3)]
+
+        for value in (0, -1):
+            with self.subTest(limit=value):
+                with _mock_gets(raw, findings), \
+                     mock.patch("backfill_483_inspectors._fetch_text",
+                                return_value=("text", "pdf-ok")), \
+                     mock.patch("backfill_483_inspectors._extract_inspectors",
+                                return_value=["Jane Doe"]):
+                    report, _exit_code = bi.run(
+                        base_url=_BASE_URL, service_key=_SERVICE_KEY, dry_run=True,
+                        limit=value, sleeper=_noop_sleep,
+                    )
+                self.assertEqual(report.candidates, 3)
+                self.assertEqual(report.attempted, 3)
+
 
 # ---------------------------------------------------------------------------
 # raw_signals with no findings row at all are out of scope

@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.164` |
-| 최종 수정일 | 2026-07-27 |
+| 문서 버전 | `v1.165` |
+| 최종 수정일 | 2026-07-30 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 9카탈로그 400건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -304,6 +304,7 @@ grm-api-intake/
 ├─ collect_mhra_ncr_backfill.py    # MHRA GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ collect_eu_ncr_backfill.py      # [FIND-1] EU GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
+├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
 ├─ grm_common.py                   # 공통 HTTP·유틸
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
@@ -331,7 +332,7 @@ grm-api-intake/
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base·library·library_catalog·guide·glossary·quiz)
 │  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js·glossary.js·quiz.js·popular.js·growth.js·growth-sync.js·pet.js·pet.css·gurumi-{egg,baby,youth,adult,legend}.png)
-│  ├─ migrations/  (001_reaction ~ 032_gurumi_growth_sync — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프)·반응 주간 Top(031 count-only RPC — 2026-07-18 라이브 적용)·구름이 성장 보관(032 gurumi_growth — 2026-07-19 라이브 적용, RLS 본인 행·사실만 저장))
+│  ├─ migrations/  (001_reaction ~ 036_findings_rpc_inspector_names — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프)·반응 주간 Top(031 count-only RPC — 2026-07-18 라이브 적용)·구름이 성장 보관(032 gurumi_growth — 2026-07-19 라이브 적용, RLS 본인 행·사실만 저장)·WL 범위(033)·rejected 공개 숨김(034)·번역 큐 정합(035)·**실사관 투영(036 — 라이브 정의 베이스 자기검증 DO 블록, 2026-07-30 라이브 적용: 17종 파라미터 조합에서 새 키 제거 시 적용 전과 md5 동일 = 순수 가산 증명)**)
 │  ├─ data/  (briefs·deltas·library/ 9카탈로그 400건 + library_updates.json 변경 이력·glossary.json 200어·guide_content.md·quiz_bank.json 33문항·announcements/ 서비스 업데이트 안내 — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
@@ -357,6 +358,7 @@ grm-api-intake/
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
    ├─ grm-eu-ncr-backfill.yml            # [FIND-1] EU GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-mhra-ncr-backfill.yml          # [FIND-1] MHRA GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
+   ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·tesseract 설치·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
@@ -414,7 +416,7 @@ grm-api-intake/
 ### 6.2 잔여 작업 (OPEN)
 | ID | 내용 | 상태 |
 |---|---|---|
-| FIND-483-SIGNER | FDA 483 실사관(서명자) 추출기 미구현 — `inspector_names` 전량 빈값. F3 실사관 프로파일의 선결 조건 | 🔲 이월 |
+| FIND-483-SIGNER | FDA 483 실사관(서명자) 추출 — 파서·수집 배선·findings 전달·소급 백필·웹 사실 표기·036 투영 완료. **집계/프로파일 페이지는 의도적 미구현**(실측: 서명블록 잔존 362문서에서 실사관 409명 중 320명(78%)이 문서 1건뿐·최다 9건 → 성향 판정 표본 미달). 재검토 조건 = 문서 5건 이상 실사관이 충분히 축적될 때 | ✅ 1단계 완료 / 🔲 2단계(집계) 데이터 성숙 대기 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
 | ROUTINE-VISIBILITY | Claude Routine 활성·최근 실행 상태가 저장소/운영 콘솔에서 직접 관측되지 않아 사람이 주기 확인해야 함 | 🟡 관측성 보강 필요 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
@@ -435,7 +437,7 @@ FIND-1의 원래 목표는 검색 DB 하나가 아니라 **"규제 지적사항 
 |---|---|---|---|
 | (원 M1) 스키마+내부 백필 | grm-finding/v1 동결, 이중 적재, 검색·번역 자동화 | 7월 | ✅ 완료(§4.4 구현 M1~M14) |
 | **F2** 볼륨 — 외부 백필 | FDA 483 전수(~2,000건)·WL 수년치 → findings ≥2,000건·3년+ 커버리지 | 7월 중순~8월 말 | ✅ **목표 초과 달성**(`collect_fda_backfill.py`+매일 07:17 UTC cron — 공개 findings 8,168건·업체 978곳(2026-07-16 실측·024 범위 순도 적용 후)·**2018~2026년 8년 커버리지**, 매일 증가. 범위 내 미번역 0이라 집계=row 공개 일치. WL 백필은 483 완주 후 착수 예정. MFDS는 robots 정책상 제외) |
-| **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 핵심 라이브(`/findings/trends/` 스탯·카테고리·히트맵·연도추이·업체 Top30 라이브; 실사관 프로파일=FIND-483-SIGNER 미구현으로 보류) |
+| **F3** 인텔리전스 — 분석 대시보드 | 사전계산 집계 서빙 + 히트맵·업체 지적 이력·실사관 프로파일 | 8월 중순~9월 말 | 🟡 핵심 라이브(`/findings/trends/` 스탯·카테고리·히트맵·연도추이·업체 Top30 라이브; **실사관은 2026-07-30 "사실 표기"까지 완료**(추출·백필·문서 카드 표기) — **프로파일/집계는 표본 미달로 의도적 보류**, 근거·재검토 조건은 §6.2 FIND-483-SIGNER 참조) |
 | **F4** 에이전트·검증 | Copilot Studio 커넥터+Q&A + 생산·품질·RA 3부서 파일럿(효과 정량화 4종) | 9월 중순~10월 말 | 🟡 자산 완료·파일럿 대기(F4a: `docs/copilot/` Swagger 커넥터 스펙+셋업 가이드+Q&A 시나리오 12건 완료; Studio 등록·부서 파일럿=사람 수행 대기) |
 | **F5** 패키징 | 효과 정리·데모·발표자료 | 11월~공모전 | 🔲 D-day 확정 필요 |
 

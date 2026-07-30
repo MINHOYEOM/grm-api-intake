@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.165` |
+| 문서 버전 | `v1.166` |
 | 최종 수정일 | 2026-07-30 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 8,168건·문서 1,356건·업체 978곳·2018~2026년**, 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 9카탈로그 400건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 200어(실무 맥락·조항)·주간 퀴즈 33문항+월 13:00 자동 출제 파이프라인·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -358,14 +358,14 @@ grm-api-intake/
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
    ├─ grm-eu-ncr-backfill.yml            # [FIND-1] EU GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-mhra-ncr-backfill.yml          # [FIND-1] MHRA GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
-   ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·tesseract 설치·concurrency 는 OCR 백필과 동일 그룹)
+   ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)
 └─ .github/actions/
    └─ setup-ocr/action.yml               # 스캔 483 OCR 엔진(tesseract+eng) 설치·검증 단일 정의
-                                         #   — 483 PDF 경로를 실행하는 워크플로 4종이 공유(required 로 hard/soft 구분)
+                                         #   — 483 PDF 경로를 실행하는 워크플로 5종이 공유(required 로 hard/soft 구분)
 ```
 
 ### 5.2 주요 실행 파일
@@ -374,7 +374,7 @@ grm-api-intake/
 - **웹 렌더러:** `web/render.py` (순수·결정론, 골든 테스트로 고정).
 - **자료실 자동 갱신:** `library_staging_build.py`(수집·게이트·스왑) + `library_updates.py`(변경 이력) — 워크플로 `grm-library-staging.yml`.
 - **Findings 번역 루프:** `findings_translate.py`(export/apply) + `findings_translate_apply_service.py`(CI 반영).
-- **스캔 483 OCR 엔진:** `.github/actions/setup-ocr`(복합 액션) — 483 PDF 텍스트 경로(`collect_fda_483._fetch_fda483_pdf_text`)를 실행하는 워크플로 **4종**(`grm-intake` · `grm-findings-backfill-fetch` · `grm-fda483-ocr-backfill` · `grm-source-verification`)이 공유하는 단일 정의. 설치 정의를 호출지마다 복제하면 한쪽이 뒤처진다(2026-07-30 실장애: 백필·원문대조 2종이 엔진 없이 돌았다). 엔진 부재는 조용히 지나가지 않는다 — 워크플로 주석·잡 요약 + 수집 health 경보(`fda483-ocr-engine-missing`)로 드러나고, 백필은 빈 본문을 적재하지 않고 **보류**한다(`skipped_ocr_unavailable`). 배선 표류는 `tests/test_ocr_engine_wiring.py` 가 호출 그래프에서 유도해 막는다.
+- **스캔 483 OCR 엔진:** `.github/actions/setup-ocr`(복합 액션) — 483 PDF 텍스트 경로(`collect_fda_483._fetch_fda483_pdf_text`)를 실행하는 워크플로 **5종**(`grm-intake` · `grm-findings-backfill-fetch` · `grm-fda483-ocr-backfill` · `grm-fda483-inspector-backfill` · `grm-source-verification`)이 공유하는 단일 정의. 설치 정의를 호출지마다 복제하면 한쪽이 뒤처진다(2026-07-30 실장애: 백필·원문대조 2종이 엔진 없이 돌았다). 엔진 부재는 조용히 지나가지 않는다 — 워크플로 주석·잡 요약 + 수집 health 경보(`fda483-ocr-engine-missing`)로 드러나고, 백필은 빈 본문을 적재하지 않고 **보류**한다(`skipped_ocr_unavailable`). 배선 표류는 `tests/test_ocr_engine_wiring.py` 가 호출 그래프에서 유도해 막는다.
 
 ### 5.3 비밀값(Secrets) · 기능 플래그(Variables)
 **Secrets:** `NOTION_TOKEN` · `NOTION_DATABASE_ID` · `OPENFDA_API_KEY`(선택) · `BRAVE_API_KEY` · `DATA_GO_KR_SERVICE_KEY` · `MFDS_HTTP_PROXY`(선택) · `LAW_GO_KR_OC`(선택) · `CLOUDFLARE_*`(웹 배포) · `NEWSLETTER_API_KEY`(Brevo) · `SUPABASE_URL`(vars) · `SUPABASE_SERVICE_ROLE_KEY`(findings 적재·번역 반영, admin 배포와 공용).

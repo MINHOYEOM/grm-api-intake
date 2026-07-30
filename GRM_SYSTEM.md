@@ -330,9 +330,9 @@ grm-api-intake/
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
-│  ├─ templates/  (landing·archive·brief·findings·trends·me·admin·base·library·library_catalog·guide·glossary·quiz)
-│  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·reactions.js·admin.js·glossary.js·quiz.js·popular.js·growth.js·growth-sync.js·pet.js·pet.css·gurumi-{egg,baby,youth,adult,legend}.png)
-│  ├─ migrations/  (001_reaction ~ 036_findings_rpc_inspector_names — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프)·반응 주간 Top(031 count-only RPC — 2026-07-18 라이브 적용)·구름이 성장 보관(032 gurumi_growth — 2026-07-19 라이브 적용, RLS 본인 행·사실만 저장)·WL 범위(033)·rejected 공개 숨김(034)·번역 큐 정합(035)·**실사관 투영(036 — 라이브 정의 베이스 자기검증 DO 블록, 2026-07-30 라이브 적용: 17종 파라미터 조합에서 새 키 제거 시 적용 전과 md5 동일 = 순수 가산 증명)**)
+│  ├─ templates/  (landing·archive·brief·findings·trends·firm·**inspector**·me·admin·base·library·library_catalog·guide·glossary·quiz)
+│  ├─ assets/  (grm.css·archive.js·findings.js·trends.js·firm.js·**inspector.js**·reactions.js·admin.js·glossary.js·quiz.js·popular.js·growth.js·growth-sync.js·pet.js·pet.css·gurumi-{egg,baby,youth,adult,legend}.png)
+│  ├─ migrations/  (001_reaction ~ 037_findings_inspector_profile — findings 스키마·공개 게이트·분류/집계 RPC·업체 키·유사 문구 검색(018 렉시컬·019 임베딩)·범위 순도(010→020→023→024 HCT/P 제외)·유사검색 사실값(022)·집계 RPC 검토상태 축(025)·canonical search(026→027 대시보드 축→028 RPC 투영→030 hardening supersede)·HTML 엔티티 오염 정정(029 firm_name/site_name 언이스케이프)·반응 주간 Top(031 count-only RPC — 2026-07-18 라이브 적용)·구름이 성장 보관(032 gurumi_growth — 2026-07-19 라이브 적용, RLS 본인 행·사실만 저장)·WL 범위(033)·rejected 공개 숨김(034)·번역 큐 정합(035)·**실사관 투영(036 — 라이브 정의 베이스 자기검증 DO 블록, 2026-07-30 라이브 적용: 17종 파라미터 조합에서 새 키 제거 시 적용 전과 md5 동일 = 순수 가산 증명)**·**실사관 프로파일(037 — 코호트 게이트 ≥5문서를 UI 가 아닌 RPC 안에 둬 딥링크 우회 차단·008 의 "조사관별 집계 금지" 주석을 명시 개정)**)
 │  ├─ data/  (briefs·deltas·library/ 9카탈로그 400건 + library_updates.json 변경 이력·glossary.json 200어·guide_content.md·quiz_bank.json 33문항·announcements/ 서비스 업데이트 안내 — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함)
 ├─ translations/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
@@ -420,7 +420,7 @@ grm-api-intake/
 ### 6.2 잔여 작업 (OPEN)
 | ID | 내용 | 상태 |
 |---|---|---|
-| FIND-483-SIGNER | FDA 483 실사관(서명자) 추출·표기 **완료·라이브**(파서·수집 배선·findings 전달·소급 백필·웹 사실 표기·036 투영). **백필 실측 2026-07-30**: 1,546문서 중 1,102 성공(71%)·실패 5·findings 6,840행·**고유 실사관 922명**. 분포 = 문서 1건 579명(62.8%)·2건 154·3~4건 100·**5건 이상 89명**·최다 23건·평균 2.01. ★**집계/프로파일 페이지는 의도적 미구현** — 90%가 문서 4건 이하라 성향 판정 표본이 얇다(업체 프로파일이 성립한 조건과 정반대). 다만 5건 이상 89명 코호트가 생겨 **재검토 조건은 부분 충족** — 착수 시 그 코호트 한정으로 설계할 것. 잔여 품질 한계는 [[grm-483-inspector-names]] 의 "OCR 은 고유명사만 틀린다" 항목 참조 | ✅ 1단계 완료·라이브 / 🔲 2단계(집계) = 상위 코호트 한정 설계로 재검토 |
+| FIND-483-SIGNER | FDA 483 실사관(서명자) **1·2단계 전부 완료·라이브**. ①추출·표기(파서·수집 배선·findings 전달·소급 백필·문서 카드 표기·036 투영) ②프로파일(`/findings/inspector/?key=` · 037 RPC 3종). **백필 실측**: 1,546문서 중 1,102 성공(71%)·실패 5·findings 6,840행·표기 922 → **정규화 808명**. **코호트(문서 ≥5건) 95명**·최다 24건. ★**코호트 게이트는 UI 가 아니라 RPC 안**에 둬 딥링크로도 빈 프로파일이 열리지 않는다(미달·미존재를 **구분 없이** 동일 안내로 수렴). ★노출 범위 제한: `noindex,nofollow`·사이트맵 제외·nav 미등록 — 진입은 "보던 문서의 서명자" 경로뿐(실명 개인 집계라 검색 색인은 목적 밖). 순위·비교·성향 추론 없음(범위 가드 테스트로 고정). 잔여 품질 한계는 [[grm-483-inspector-names]] 의 "OCR 은 고유명사만 틀린다" 항목 참조 | ✅ 완료·라이브 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
 | ROUTINE-VISIBILITY | Claude Routine 활성·최근 실행 상태가 저장소/운영 콘솔에서 직접 관측되지 않아 사람이 주기 확인해야 함 | 🟡 관측성 보강 필요 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |

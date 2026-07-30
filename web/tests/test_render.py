@@ -5242,6 +5242,110 @@ class WebFda483DeepAnalysisTest(unittest.TestCase):
         self.assertNotIn("대응조치", block)
 
 
+class WebFda483InspectorLineTest(unittest.TestCase):
+    """[실사관 표기 2026-07-30] `/findings/` 검색 화면과 동일 형식("실사관: A · B")을 브리프
+    483 카드에도 낸다. card_scaffold 가 raw.fda483_inspectors 를 deterministic_detail.
+    inspectors 로 무변형 통과시키고, render._card_view() 가 방어적으로 정제한다(리스트가
+    아니면 무시·비문자열/공백 제거·strip·6개 절단) — findings.js sanitizeInspectorNames()
+    와 동일 계약의 Python 복제본(_sanitize_inspector_names)."""
+
+    def _render(self, detail_extra: dict) -> str:
+        env = render._make_env()
+        card = {
+            "id": "f483-insp", "render_order": 1, "evidence_level": "B",
+            "headline_target": "Acme 483", "agency": "FDA", "card_type": "FDA 483 실사 관찰",
+            "deterministic_detail": {
+                "type": "fda_483_observations", "count": 1,
+                "observations": [{"number": "1", "deficiency": "x", "detail": ""}],
+                **detail_extra,
+            },
+        }
+        view = render._card_view(card)
+        return env.get_template("partials/card.html").render(card=view)
+
+    def test_inspector_line_rendered_when_present(self):
+        h = self._render({"inspectors": ["Jose F Velez", "Ivis L Negron Torres"]})
+        self.assertIn('<p class="dt-fu">실사관: Jose F Velez · Ivis L Negron Torres</p>', h)
+
+    def test_no_inspector_line_when_key_absent(self):
+        # 기존 카드 전부(raw.fda483_inspectors 미보유) — 요소 자체가 생성되지 않는다.
+        h = self._render({})
+        self.assertNotIn("실사관:", h)
+
+    def test_inspector_line_absent_for_blank_or_invalid_input(self):
+        # 리스트가 아님 / 빈 리스트 / 원소가 전부 비문자열·공백뿐 → 정제 결과 빈 리스트 →
+        # 키 자체를 지운다(render._card_view) → 빈 라벨 없이 요소 미생성.
+        for bad in (None, "Jose F Velez", 42, {}, [], [None, 123, "   ", ""]):
+            with self.subTest(bad=bad):
+                h = self._render({"inspectors": bad})
+                self.assertNotIn("실사관:", h)
+
+    def test_inspector_names_stripped_and_capped_at_six(self):
+        names = [f" Name {i} " for i in range(8)]     # 8명 입력, 앞뒤 공백 포함
+        h = self._render({"inspectors": names})
+        self.assertIn(
+            "실사관: Name 0 · Name 1 · Name 2 · Name 3 · Name 4 · Name 5</p>", h)
+        self.assertNotIn("Name 6", h)
+        self.assertNotIn("Name 7", h)
+
+    def test_mixed_valid_and_invalid_elements_keep_only_valid_ones(self):
+        h = self._render({"inspectors": ["Jose F Velez", "", "   ", None, 7, "A B"]})
+        self.assertIn('<p class="dt-fu">실사관: Jose F Velez · A B</p>', h)
+
+    def test_inspector_names_are_html_escaped(self):
+        # Jinja autoescape(textContent 상당) — 각 이름을 개별 `{{ }}` 로 출력하므로
+        # HTML 특수문자가 그대로 삽입되지 않는다(findings.js 의 createTextNode 와 동형 안전성).
+        h = self._render({"inspectors": ["<script>alert(1)</script>", "A & B"]})
+        self.assertNotIn("<script>alert(1)</script>", h)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", h)
+        self.assertIn("A &amp; B", h)
+
+    def test_non_fda483_detail_type_never_gets_inspector_line(self):
+        # 방어적 입력 — gmp_deficiencies 등 다른 결정론 타입에 inspectors 가 섞여도
+        # _card_view() 정제 분기는 fda_483_observations 카드에만 적용된다(비활성 통과).
+        env = render._make_env()
+        card = {
+            "id": "gmp-x", "render_order": 1, "evidence_level": "B",
+            "headline_target": "Acme GMP", "agency": "MFDS", "card_type": "GMP 실사",
+            "deterministic_detail": {
+                "type": "gmp_deficiencies", "count": 0, "severity_summary": {}, "rows": [],
+                "inspectors": ["Should Not Render"],
+            },
+        }
+        view = render._card_view(card)
+        h = env.get_template("partials/card.html").render(card=view)
+        self.assertNotIn("실사관:", h)
+
+
+class WebSanitizeInspectorNamesUnitTest(unittest.TestCase):
+    """render._sanitize_inspector_names() 순수 함수 단위 테스트 — findings.js
+    sanitizeInspectorNames() 계약 복제본(리스트가 아니면 무시·비문자열/공백 제거·strip·
+    6개 절단). 어떤 입력에도 예외를 던지지 않는다."""
+
+    def test_valid_list_stripped(self):
+        self.assertEqual(
+            render._sanitize_inspector_names([" Jose F Velez ", "Ivis L Negron Torres"]),
+            ["Jose F Velez", "Ivis L Negron Torres"])
+
+    def test_non_list_inputs_return_empty(self):
+        for bad in (None, "name", 1, 1.5, {}, {"a": 1}, True):
+            with self.subTest(bad=bad):
+                self.assertEqual(render._sanitize_inspector_names(bad), [])
+
+    def test_non_string_and_blank_elements_dropped(self):
+        self.assertEqual(
+            render._sanitize_inspector_names(["Jose", None, 7, "", "   ", "Velez"]),
+            ["Jose", "Velez"])
+
+    def test_capped_at_six(self):
+        names = [f"N{i}" for i in range(10)]
+        self.assertEqual(render._sanitize_inspector_names(names),
+                          ["N0", "N1", "N2", "N3", "N4", "N5"])
+
+    def test_empty_list_returns_empty(self):
+        self.assertEqual(render._sanitize_inspector_names([]), [])
+
+
 class WebMonoLabelsContractTest(unittest.TestCase):
     """render.MONO_LABELS ↔ card_scaffold._w2_rows 라벨 어휘 계약(교차 모듈 드리프트 가드).
 

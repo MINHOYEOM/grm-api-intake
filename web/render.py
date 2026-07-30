@@ -191,6 +191,28 @@ def _detail_preview(dd: dict[str, Any] | None) -> str:
     return ""
 
 
+_INSPECTOR_NAMES_LIMIT = 6
+
+
+def _sanitize_inspector_names(value: Any) -> list[str]:
+    """[실사관 표기 2026-07-30] FDA 483 카드 `deterministic_detail.inspectors` 방어적 정제.
+
+    `/findings/` 검색 화면(`web/assets/findings.js` sanitizeInspectorNames())과 동일 규칙을
+    복제한다 — 별도 정적 자산·언어(JS vs Python)라 코드 공유는 불가능하지만 계약(리스트가
+    아니면 무시·비문자열/공백 원소 제거·strip·6개 절단)은 반드시 같아야 한다. 카드 JSON 이
+    상류(card_scaffold/수집기) 버전 표류나 수기 편집으로 무엇을 담고 있어도 이 함수는
+    예외를 던지지 않는다 — 순수 방어 계층."""
+    if not isinstance(value, list):
+        return []
+    out: list[str] = []
+    for item in value:
+        if len(out) >= _INSPECTOR_NAMES_LIMIT:
+            break
+        if isinstance(item, str) and item.strip():
+            out.append(item.strip())
+    return out
+
+
 # ── [상세 본문 가독성 2026-07-27] 통짜 문단 → 목록 복원 ──────────────────────
 # EU/UK GMP 비준수(NCR) 상세는 1,000~2,300자가 **줄바꿈 0개**로 한 덩어리다(실측:
 # Technophage additional 2,282자·nature 1,902자). 그런데 원문에는 구조가 **이미 있다** —
@@ -297,6 +319,21 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         },
     }
 
+    # [실사관 표기 2026-07-30] `/findings/` 화면과 동일 형식("실사관: A · B")을 브리프
+    # 카드에도 낸다. card_scaffold 는 raw.fda483_inspectors 를 그대로 옮기므로(무변형
+    # producer 원칙), 카드 JSON 값이 무엇이든 여기서 방어적으로 정제한다 — 카드 dict 자체는
+    # 복사본만 바꾸고 원본(card 인자)은 건드리지 않는다(다른 카드 뷰 파생과 동일 원칙).
+    # 정제 결과가 빈 리스트면 키를 아예 지운다 → card.html 이 `{% if dd.inspectors %}` 로
+    # 요소를 만들지 않는다(빈 라벨 금지) — 이 필드가 없던 기존 카드는 애초에 변형이 없다.
+    detail = card.get("deterministic_detail") or None
+    if isinstance(detail, dict) and detail.get("type") == "fda_483_observations":
+        detail = dict(detail)
+        inspectors = _sanitize_inspector_names(detail.get("inspectors"))
+        if inspectors:
+            detail["inspectors"] = inspectors
+        else:
+            detail.pop("inspectors", None)
+
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
@@ -340,7 +377,7 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "deep_analysis": card.get("deep_analysis") or None,
         # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
-        "deterministic_detail": card.get("deterministic_detail") or None,
+        "deterministic_detail": detail,
         # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
         "deep_preview": _deep_preview(card.get("deep_analysis")),
         "detail_preview": _detail_preview(card.get("deterministic_detail")),

@@ -1332,6 +1332,8 @@ TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 식약처 · EU/영국 GMP �
                       "카테고리 순위·연도별 구성비·업체 랭킹으로 보는 규제 지적 트렌드.")
 FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·식약처·EU/영국 GMP 비준수 지적사항 누적 이력을 "
                     "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
+INSPECTOR_DESCRIPTION = ("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 "
+                         "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일.")
 LIBRARY_DESCRIPTION = ("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내외 규제기관의 GMP 지침·고시·"
                        "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
 GUIDE_DESCRIPTION = ("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
@@ -1440,6 +1442,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["findingsjs_ver"] = _asset_ver("findings.js")
     env.globals["trendsjs_ver"] = _asset_ver("trends.js")
     env.globals["firmjs_ver"] = _asset_ver("firm.js")
+    env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
     env.globals["growthjs_ver"] = _asset_ver("growth.js")
@@ -1578,6 +1581,24 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     _write(out_dir / "findings" / "firm" / "index.html", firm_html)
     written.append("findings/firm/index.html")
+
+    # 실사관 프로파일(FDA 483 서명 실사관 집계, firm 프로파일의 미러링) — findings/firm 과
+    # 동일 이유로 라이브 데이터는 빌드시 고정할 수 없다(findings_inspector_profile RPC 를
+    # inspector.js 가 URL 파라미터(?key=)로 직접 fetch). 서버는 셸(로딩 상태)만 렌더.
+    # findings/inspector/index.html 은 findings/firm/index.html 과 같은 깊이라 rel_root 동일.
+    # ★sitemap 미등록(의도, firm 과 다름) — 실명이 적시된 개인 집계라 베이스 경로조차
+    # 넣지 않는다. noindex 는 inspector.html 자체 <head> 오버라이드(meta_robots 블록)로
+    # 배선하고, canonical 은 중복 URL 정리 목적으로 그대로 둔다.
+    inspector_html = env.get_template("inspector.html").render(
+        page_title="실사관 프로파일 · GRM",
+        rel_root="../../",
+        nav_active="findings",
+        latest_slug=latest_slug,
+        description=INSPECTOR_DESCRIPTION,
+        canonical=_abs_url("findings/inspector/"),
+    )
+    _write(out_dir / "findings" / "inspector" / "index.html", inspector_html)
+    written.append("findings/inspector/index.html")
 
     # 자료실(트랙 C) — findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷
     # (web/data/library/*.json)을 결정론 렌더한다(주간 발행 게이트와 무관한 독립 정적

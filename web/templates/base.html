@@ -17,6 +17,9 @@
 {% if description %}
 <meta name="description" content="{{ description }}" />
 {% endif %}
+{#- 개별 페이지가 색인 정책을 오버라이드할 수 있는 빈 훅(기본 무출력 — 오버라이드 없는
+    페이지는 byte 무변형). 실사관 프로파일(inspector.html)이 noindex 오버라이드에 쓴다. -#}
+{% block meta_robots %}{% endblock %}
 {% if canonical %}
 <link rel="canonical" href="{{ canonical }}" />
 <meta property="og:type" content="website" />

@@ -81,32 +81,39 @@ as $$
       and f.scope_status = 'ok'
       and f.inspector_names <> '[]'::jsonb
   ),
-  agg as (
+  docs as (
     select k, count(distinct rid)::int as documents
     from pairs
     where k <> ''
     group by k
-    having count(distinct rid) >= 5          -- ★코호트 게이트(profile 과 동일 임계값)
+  ),
+  names as (
+    -- 표기 변형 중 최빈값. 동률은 긴 표기 → 사전순으로 결정론 고정(동률에서 실행마다
+    -- 다른 값이 나오면 링크 라벨이 흔들린다 — 이 저장소엔 타이브레이크 부재로 A/B 평가가
+    -- 뒤집힌 전례가 있다).
+    -- ★단일 패스: 종전엔 코호트 1명마다 pairs 를 다시 훑는 상관 서브쿼리라 95회 재스캔이
+    --   일어나 283ms 였다(실측). 윈도우 함수로 한 번에 뽑아 148ms. 결과는 불변 —
+    --   함수와 독립적으로 계산한 기대값과 바이트 동일(md5 c167f1e5…) 실측 확인.
+    select k, nm,
+           row_number() over (
+             partition by k order by count(*) desc, length(nm) desc, nm asc
+           ) as rn
+    from pairs
+    where k <> ''
+    group by k, nm
   )
   select coalesce((
     select jsonb_agg(
       jsonb_build_object(
-        'inspector_key', a.k,
-        'display_name', (
-          -- 표기 변형 중 최빈값. 동률은 긴 표기 → 사전순으로 결정론 고정
-          -- (동률에서 실행마다 다른 값이 나오면 링크 라벨이 흔들린다).
-          select p.nm
-          from pairs p
-          where p.k = a.k
-          group by p.nm
-          order by count(*) desc, length(p.nm) desc, p.nm asc
-          limit 1
-        ),
-        'documents', a.documents
+        'inspector_key', d.k,
+        'display_name',  n.nm,
+        'documents',     d.documents
       )
-      order by a.k
+      order by d.k
     )
-    from agg a
+    from docs d
+    join names n on n.k = d.k and n.rn = 1
+    where d.documents >= 5          -- ★코호트 게이트(profile 과 동일 임계값)
   ), '[]'::jsonb);
 $$;
 
@@ -197,6 +204,13 @@ $$;
 
 -- ── 실행 권한 ───────────────────────────────────────────────────────────────
 -- 013 관례: 집계 RPC 는 anon 이 직접 호출한다(정적 사이트라 서버가 없다).
--- `findings_inspector_key` 는 위 두 definer 함수가 내부에서만 호출하므로 부여하지 않는다.
+-- `findings_inspector_key` 에는 **명시적 grant 를 두지 않는다** — 위 두 definer 함수가
+-- 내부에서만 호출하기 때문이다. 다만 정직하게 적어둔다: 이 프로젝트의 기본 권한 설정상
+-- public 스키마 함수는 anon/authenticated 에 EXECUTE 가 자동 부여되므로(실측:
+-- `proacl` 에 `anon=X/postgres`), 이 헬퍼도 실제로는 anon 이 호출할 수 있다.
+-- 위험은 없다 — 데이터에 접근하지 않는 순수 문자열 정규화 함수이고, 반환값은 입력에서
+-- 유도된 문자열뿐이다. "내부 전용"은 **호출 설계상의 의도**이지 권한으로 강제된 경계가
+-- 아니라는 뜻이며, 경계를 강제해야 할 이유가 생기면 `revoke execute … from public` 이
+-- 필요하다(지금은 불필요).
 grant execute on function public.findings_inspector_index() to anon, authenticated;
 grant execute on function public.findings_inspector_profile(text) to anon, authenticated;

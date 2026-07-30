@@ -905,6 +905,30 @@ class Fda483DeterministicDetailTest(unittest.TestCase):
         wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
         self.assertNotIn("deterministic_detail", wc)
 
+    # ── [실사관 표기 2026-07-30] raw.fda483_inspectors → deterministic_detail.inspectors ──
+    def test_inspectors_pass_through_when_present(self) -> None:
+        fx = _load_input("fda_483_observations")
+        raw = dict(fx["raw"])
+        raw["fda483_inspectors"] = ["Jose F Velez", "Ivis L Negron Torres"]
+        wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+        self.assertEqual(wc["deterministic_detail"]["inspectors"],
+                          ["Jose F Velez", "Ivis L Negron Torres"])
+
+    def test_inspectors_key_absent_when_raw_key_missing(self) -> None:
+        # 기존 fixture(raw.fda483_inspectors 미보유) → 키 자체가 없다(골든 바이트 불변 근거).
+        fx = _load_input("fda_483_observations")
+        wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card()
+        self.assertNotIn("inspectors", wc["deterministic_detail"])
+
+    def test_inspectors_key_absent_when_raw_value_is_empty_or_invalid(self) -> None:
+        fx = _load_input("fda_483_observations")
+        for bad in ([], None, "Jose F Velez", 42, {}):
+            with self.subTest(bad=bad):
+                raw = dict(fx["raw"])
+                raw["fda483_inspectors"] = bad
+                wc = cs.build_card_scaffold(fx["row"], raw).to_web_card()
+                self.assertNotIn("inspectors", wc["deterministic_detail"])
+
 
 def _callout_colors(md: str) -> list[str]:
     import re

@@ -139,6 +139,23 @@ class WebFda483PublishGateTest(unittest.TestCase):
             self.assertIn("MISSING_DEFICIENCY_KO", str(ctx.exception))
             self.assertIn("2026-07-13", str(ctx.exception))
 
+    # ── [실사관 표기 2026-07-30 회귀] deterministic_detail.inspectors 는 게이트가 보는
+    #    observations[].detail 과 무관한 별도 형제 키다 — 존재해도 게이트 판정에 영향 없음.
+    def test_inspectors_field_does_not_affect_gate_on_well_formed_card(self):
+        card = _card([
+            _obs(1, detail="A well-formed detail sentence.", detail_ko="잘 작성된 상세 문장."),
+        ])
+        card["deterministic_detail"]["inspectors"] = ["Jose F Velez", "Ivis L Negron Torres"]
+        violations = render.validate_483_observations([_brief([card])])
+        self.assertEqual(violations, [])
+
+    def test_inspectors_field_does_not_mask_real_violation(self):
+        # inspectors 존재가 실제 결함(MISSING_DEFICIENCY_KO)을 가리지 않는다.
+        card = _card([_obs(1, deficiency_ko="")])
+        card["deterministic_detail"]["inspectors"] = ["Jose F Velez"]
+        violations = render.validate_483_observations([_brief([card])])
+        self.assertTrue(any("MISSING_DEFICIENCY_KO" in v for v in violations), violations)
+
     def test_validate_briefs_or_raise_passes_on_clean_data(self):
         card = _card([_obs(1, detail="Fine detail.", detail_ko="괜찮은 상세.")])
         with tempfile.TemporaryDirectory() as td:

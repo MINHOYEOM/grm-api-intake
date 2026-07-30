@@ -178,6 +178,14 @@
   {%- set dd = card.deterministic_detail %}
   {%- set obs_src = 'FDA 483 · OCR 판독' if dd.text_source == 'ocr' else 'FDA 483' %}
   <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· {% if dd.text_source == 'ocr' %}스캔 원문 OCR 판독{% else %}원문 기반{% endif %}</span></summary>
+    {%- if dd.inspectors %}
+    {#- [실사관 표기 2026-07-30] `/findings/` 검색 화면과 동일 형식·구분자(" · "). 링크는
+        걸지 않는다(코호트 판정에 RPC 가 필요한데 브리프는 정적 렌더 — 사실 표기만). 값이
+        없으면(dd.inspectors 부재) 이 블록 자체가 렌더되지 않는다(빈 라벨 금지). 기존
+        `.dt-fu`(위 OCR 안내문과 동일 클래스)를 재사용해 신규 CSS 0. 이름은 개별 `{{ }}` 로
+        내보내 Jinja autoescape 가 각 원소를 텍스트로만 다룬다(HTML 삽입 불가). -#}
+    <p class="dt-fu">실사관: {% for name in dd.inspectors %}{% if not loop.first %} · {% endif %}{{ name }}{% endfor %}</p>
+    {%- endif %}
     {%- if dd.text_source == 'ocr' %}
     <p class="dt-fu">이 실사기록은 공개 PDF 가 스캔 이미지여서 기계 판독(OCR)으로 옮겼다. 오인식이 있을 수 있으니 정확한 문구는 공식원본 PDF 를 확인한다.</p>
     {%- endif %}

@@ -736,6 +736,15 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
     # `pdf-ok-ocr` 이 아닌 기존 카드는 키 미추가 → 골든 바이트 불변(additive).
     if str(raw.get("fda483_text_status") or "").split(":", 1)[0] == "pdf-ok-ocr":
         detail["text_source"] = "ocr"
+    # [실사관 표기 2026-07-30] 서명블록에서 뽑은 실사관 이름(`raw.fda483_inspectors` —
+    # collect_fda_483._extract_483_inspectors 산출, ENABLE_FDA_483_OBSERVATIONS/DEEP 과
+    # 독립인 순수 결정론 층). 이 함수는 raw 값을 있는 그대로 옮기기만 한다 — 방어적 정제
+    # (비문자열/공백 제거·strip·6개 절단)는 렌더 계층(web/render.py._card_view)의 몫이다
+    # (수집기가 이미 정제한 값을 여기서 다시 검증하는 이중화를 피한다). 리스트가 아니거나
+    # 비어있으면 키 자체를 달지 않는다(다른 조건부 raw 필드와 동일 관례 → 골든 바이트 불변).
+    inspectors = raw.get("fda483_inspectors")
+    if isinstance(inspectors, list) and inspectors:
+        detail["inspectors"] = inspectors
     return detail
 
 

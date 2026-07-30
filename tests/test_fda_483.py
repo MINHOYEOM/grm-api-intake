@@ -1421,3 +1421,197 @@ class AnnotationsSectionTest(unittest.TestCase):
                 "Specifically, excursions were not investigated.")
         self.assertEqual(
             [r["number"] for r in f._extract_483_observations_from_text(body)], ["1", "2"])
+
+
+class InspectorExtractionTest(unittest.TestCase):
+    """[실사관 추출 2026-07-30] `_extract_483_inspectors` — 프로덕션 DB 실측 원문 변형(A~F)
+    + 오탐/거부 픽스처(G~L). 정밀도 최우선 — 확증 없으면 형태가 맞아도 버린다."""
+
+    def test_a_two_signature_blocks_same_page(self):
+        text = ("OYEE(S) SIGNATURE\nDATE ISSUED\nSEE REVERSE| Jose F Velez,\n"
+                "Investigator\n2/27/2026\nOF THIS PAGE |} Ivis L Negron,\n"
+                "Investigator\n2/27/2026")
+        self.assertEqual(f._extract_483_inspectors(text), ["Jose F Velez", "Ivis L Negron"])
+
+    def test_b_single_signature_block(self):
+        text = ("S) SIGNATURE\nDATE ISSUED\nSEE REVERSE | Jolanna A Norton,\n"
+                "Investigator\n3/6/2026\nOF THIS PAGE")
+        self.assertEqual(f._extract_483_inspectors(text), ["Jolanna A Norton"])
+
+    def test_c_middle_initial_with_period(self):
+        text = ("a L. Flores - piavaly signed by bisa.\nSEE\nLisa L. Flores, Investigator\n"
+                "S\nDoes siz10 140022 | 12/10/2025\nREV")
+        self.assertEqual(f._extract_483_inspectors(text), ["Lisa L. Flores"])
+
+    def test_d_employee_marker_same_line(self):
+        text = (" OF THIS PAGE\nEMPLOYEE(S) SIGNATURE Christina K Theodorou, Investigator\n"
+                "DATE ISSUED 6/18/2026")
+        self.assertEqual(f._extract_483_inspectors(text), ["Christina K Theodorou"])
+
+    def test_e_four_token_name_trailing_form_marker(self):
+        text = ("DATE ISSUED\nSEE REVERSE\nOF THIS PAGE\nLesley Mae P Lutao, Investigator\n\n"
+                "X\n9/9/2025\n\nFORM FDA 483 (09/08)")
+        self.assertEqual(f._extract_483_inspectors(text), ["Lesley Mae P Lutao"])
+
+    def test_f_ocr_truncated_employee_marker(self):
+        text = ("MPLOYEE(S) SIGNATURE\nDATE ISSUED\nSEE REVERSE| Yaharn Su,\n"
+                "Investigator\n8/14/2025\nOF THIS PAGE")
+        self.assertEqual(f._extract_483_inspectors(text), ["Yaharn Su"])
+
+    def test_g_prose_false_positive_title_before_name_rejected(self):
+        # 직함이 앞, 이름이 뒤 — 서명블록과 정반대 어순. 절대 잡히면 안 된다.
+        text = ("Specifically, Investigator Piechocki noted materials came off loose "
+                "during the inspection of the filling line on 3/4/2026.")
+        self.assertEqual(f._extract_483_inspectors(text), [])
+
+    def test_h_ocr_corrupted_name_rejected(self):
+        text = ("\n05/29/2026\nSEE REVERSE\nOigi1.aUy i,.gned by AnnetRa,an\n"
+                "Investigator\nOF THIS PAGE")
+        self.assertEqual(f._extract_483_inspectors(text), [])
+
+    def test_i_repeated_footer_deduplicated(self):
+        block = ("SEE REVERSE| DATE ISSUED\nMaria T Gomez,\nInvestigator\n1/2/2026\n"
+                  "OF THIS PAGE\n")
+        text = block * 3
+        self.assertEqual(f._extract_483_inspectors(text), ["Maria T Gomez"])
+
+    def test_j_no_confirmation_rejected(self):
+        # 형태(이름, 직함)는 맞지만 날짜도 서명블록 마커도 근처에 없다 — 확증 부재로 거부.
+        text = "Report prepared by John A Smith, Investigator for internal circulation."
+        self.assertEqual(f._extract_483_inspectors(text), [])
+
+    def test_k_title_allowlist_consumer_safety_officer(self):
+        text = ("SEE REVERSE| Priya K Anand,\nConsumer Safety Officer\n4/4/2026\n"
+                "OF THIS PAGE")
+        self.assertEqual(f._extract_483_inspectors(text), ["Priya K Anand"])
+
+    def test_k_title_allowlist_microbiologist(self):
+        text = ("SEE REVERSE| David R Chen,\nMicrobiologist\n6/6/2026\nOF THIS PAGE")
+        self.assertEqual(f._extract_483_inspectors(text), ["David R Chen"])
+
+    def test_k_title_allowlist_chemist_and_analyst(self):
+        chemist = "SEE REVERSE| Wendy O Park,\nChemist\n7/7/2026\nOF THIS PAGE"
+        analyst = "SEE REVERSE| Tomas B Reyes,\nAnalyst\n8/8/2026\nOF THIS PAGE"
+        self.assertEqual(f._extract_483_inspectors(chemist), ["Wendy O Park"])
+        self.assertEqual(f._extract_483_inspectors(analyst), ["Tomas B Reyes"])
+
+    def test_k_title_allowlist_biologist_and_fda_center_employee(self):
+        # [2026-07-30 교정] EMPLOYEE(S) SIGNATURE 서명자는 전원 그 실사의 FDA 인력 —
+        # "FDA Center Employee" 서명자를 빠뜨리면 불완전한 기록이 된다.
+        biologist = "SEE REVERSE| DATE ISSUED\nOtis N Vega,\nBiologist\n9/9/2026\nOF THIS PAGE"
+        fda_emp = "SEE REVERSE| DATE ISSUED\nSarah E Venti,\nFDA Center Employee\n9/9/2026\n"
+        self.assertEqual(f._extract_483_inspectors(biologist), ["Otis N Vega"])
+        self.assertEqual(f._extract_483_inspectors(fda_emp), ["Sarah E Venti"])
+
+    # ── [2026-07-30 교정 M~P] 프로덕션 재실측 다중 서명자 원문 — 코디네이터 보정 지시 ──────
+    # 공통 함정: 두 번째 이후 서명자는 직함 뒤 날짜가 없거나 OCR 로 깨져(`0227-2026` 등
+    # 슬래시 없음) 확증 규칙 (a)가 못 잡는다 — 오직 (b)(같은 블록의 서명 마커, 200자
+    # 룩비하인드)만으로 구제돼야 한다. 이게 이번 교정의 핵심 검증 지점이다.
+
+    def test_m_hispanic_surname_two_words_and_slash_compound_title(self):
+        text = ("ical products. Filme ProneSid EMPLOYEE(S) SIGNATURE DATE ISSUED "
+                "SEE REVERSE| Jose F Velez, Investigator 2/27/2026 OF THIS PAGE |} "
+                "Ivis L Negron Torres, Chemist/Biologist a : 2000547088 xX wwe "
+                "0227-2026 FOOD AND DRUGADMINISTRATION")
+        self.assertEqual(f._extract_483_inspectors(text),
+                          ["Jose F Velez", "Ivis L Negron Torres"])
+
+    def test_n_three_signers_including_fda_center_employee(self):
+        text = ("ainst the CoC specifications. EMPLOYEE(S) SIGNATURE DATE ISSUED "
+                "SEE REVERSE | Demario L Walls, Investigator 3/20/2026 OF THIS PAGE | "
+                "Nelson N Ayangho, Investigator Sarah E Venti, FDA Center Employee Xx "
+                "FOOD AND DRUG ADMINISTRATION")
+        self.assertEqual(f._extract_483_inspectors(text),
+                          ["Demario L Walls", "Nelson N Ayangho", "Sarah E Venti"])
+
+    def test_o_second_signer_no_date_at_all(self):
+        text = ("this equipment in the last 12 EMPLOYEE(S) SIGNATURE DATE ISSUED "
+                "SEE REVERSE | Pearl C Ozuruigbo, Investigator 3/18/2026 OF THIS PAGE | "
+                "Tareq W Haddad, Investigator Bee cw wacom x Bate pect 1-5 "
+                "DEPARTMENT OF HEALTH AND HUMAN SERVICES")
+        self.assertEqual(f._extract_483_inspectors(text),
+                          ["Pearl C Ozuruigbo", "Tareq W Haddad"])
+
+    def test_p_second_signer_ocr_broken_hyphen_date(self):
+        text = (" was not extended to evaluate EMPLOYEE(S) SIGNATURE DATE ISSUED "
+                "SEE REVERSE | Anthony J Donato, Investigator 4/17/2026 OF THIS PAGE | "
+                "Daniel T Lee, Investigator fap Date Sigrod 0417-2026 x 1e3600 "
+                "FOOD AND DRUG ADMINISTRATION")
+        self.assertEqual(f._extract_483_inspectors(text),
+                          ["Anthony J Donato", "Daniel T Lee"])
+
+    def test_valid_inspector_name_allows_two_word_surname(self):
+        # 교정 1 확인 — "2~4개 토큰"은 유지되고, 4번째 토큰(복성)까지 허용된다.
+        self.assertTrue(f._valid_inspector_name("Ivis L Negron Torres"))
+
+    def test_l_empty_and_whitespace_input(self):
+        self.assertEqual(f._extract_483_inspectors(""), [])
+        self.assertEqual(f._extract_483_inspectors("   \n\t  "), [])
+
+    def test_no_exception_on_none_like_input(self):
+        # 타입힌트는 str 이지만 상류 방어를 한 겹 더 둔다 — None 이 들어와도 예외 없이 [].
+        self.assertEqual(f._extract_483_inspectors(None), [])
+
+    def test_cap_at_six(self):
+        blocks = []
+        names = []
+        for i in range(8):
+            suffix = chr(ord("A") + i)          # 숫자는 이름 문법 위반이라 알파벳 접미사 사용
+            name = f"Person{suffix} A Surname{suffix}"
+            names.append(name)
+            blocks.append(f"SEE REVERSE| DATE ISSUED\n{name},\nInvestigator\n{i % 9 + 1}/1/2026\n"
+                          "OF THIS PAGE\n")
+        text = "".join(blocks)
+        result = f._extract_483_inspectors(text)
+        self.assertEqual(len(result), 6)
+        self.assertEqual(result, names[:6])
+
+    def test_valid_inspector_name_rejects_form_vocab_and_single_token(self):
+        self.assertFalse(f._valid_inspector_name("Of This Page"))
+        self.assertFalse(f._valid_inspector_name("Solo"))
+        self.assertTrue(f._valid_inspector_name("Jose F Velez"))
+
+
+class InspectorWiringTest(unittest.TestCase):
+    """수집 라인 배선 — 원시 text 에서 뽑은 실사관이 raw_payload 에 조건부로 실리는지.
+    ENABLE_FDA_483_OBSERVATIONS/DEEP 플래그와 무관하게(둘 다 기본 off) 항상 시도된다.
+    """
+
+    def test_inspectors_present_when_signature_block_found(self):
+        text = ("Cover. WE OBSERVED OBSERVATION 1 Aseptic processing was deficient.\n"
+                "SEE REVERSE| DATE ISSUED\nJose F Velez,\nInvestigator\n2/27/2026\n"
+                "OF THIS PAGE")
+        with _Patched(json_rows=[_json_row(9101)], html_rows=[], pdf_text=text):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0].raw_payload.get("fda483_inspectors"), ["Jose F Velez"])
+        self.assertEqual(f.LAST_HEALTH["fda483_inspectors"]["extracted"], 1)
+
+    def test_inspectors_key_absent_when_none_found(self):
+        text = "Cover page only, no findings section, no signature block."
+        with _Patched(json_rows=[_json_row(9102)], html_rows=[], pdf_text=text):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        self.assertNotIn("fda483_inspectors", items[0].raw_payload)
+        self.assertEqual(f.LAST_HEALTH["fda483_inspectors"]["failed"], 1)
+
+    def test_inspectors_independent_of_observations_and_deep_flags(self):
+        # 두 플래그 모두 기본 off 인 상태에서도 실사관은 추출·배선된다(독립 순수 파서).
+        text = ("SEE REVERSE| DATE ISSUED\nLisa L. Flores,\nInvestigator\n12/10/2025\n"
+                "OF THIS PAGE")
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("ENABLE_FDA_483_OBSERVATIONS", None)
+            os.environ.pop("ENABLE_FDA_483_DEEP", None)
+            with _Patched(json_rows=[_json_row(9103)], html_rows=[], pdf_text=text):
+                items, _ = f.collect_fda_483(START, END)
+        self.assertEqual(items[0].raw_payload.get("fda483_inspectors"), ["Lisa L. Flores"])
+
+    def test_graceful_fetch_fail_keeps_inspectors_absent(self):
+        with _Patched(json_rows=[_json_row(9104)], html_rows=[],
+                      bytes_exc=RuntimeError("HTTP 403 for ...")):
+            items, err = f.collect_fda_483(START, END)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        self.assertNotIn("fda483_inspectors", items[0].raw_payload)

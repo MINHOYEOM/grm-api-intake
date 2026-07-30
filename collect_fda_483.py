@@ -833,6 +833,144 @@ def _clean_observation_detail(detail: str) -> str:
     return text.strip()
 
 
+# ── [실사관 추출 2026-07-30] 서명블록 이름 파서 ──────────────────────────────────────
+# 483 양식 하단 서명블록은 **이름이 앞, 직함이 뒤**(`Jose F Velez, Investigator`) 어순이고,
+# 관찰 산문은 정반대로 **직함이 앞**(`Investigator Piechocki noted…`)이다 — 이 어순 차이는
+# web/render.py `_FOOTER_GARBAGE_RE`(2026-07-27 오탐 수리 주석)가 이미 실측으로 문서화한
+# 판별 근거이고, 여기서도 그대로 판별 축으로 쓴다(그 파일은 발행 게이트 전용이라 건드리지
+# 않는다 — 이 함수는 수집 시점에 **원시** PDF 텍스트에서 별도로 이름을 뽑아낼 뿐이다).
+#
+# 정밀도가 최우선이다(틀린 이름 노출 > 이름 누락) — 그래서 후보는 두 겹으로 검증한다:
+#   ① 이름 문법(대문자 시작 토큰 2~4개 + 직함 허용목록)을 통과해야 "후보"가 되고,
+#   ② 그 후보가 서명블록 문맥(날짜 인접 또는 SIGNATURE/EMPLOYEE 류 마커 인접)에 있다는
+#      교차 확증까지 통과해야 "채택"된다. ①만으로는 산문 오탐을 못 막는다(예: 보고서 산문
+#      "John A Smith, Investigator" 처럼 형태만 맞는 완전 무해한 문장도 있을 수 있어 —
+#      실측 fda483-193541 류 사례에서 서명블록이 아닌 본문에 이런 형태가 낄 위험을 배제 못함).
+#   [2026-07-30 교정] 프로덕션 재실측으로 3건 보정. ①`Biologist`·`FDA Center Employee` 추가
+#   — 실측 "Sarah E Venti, FDA Center Employee"(EMPLOYEE(S) SIGNATURE 서명자는 전원 그 실사
+#   FDA 인력이므로 문서 그대로 포함하지 않으면 서명자 누락). ②슬래시 복합 직함(실측
+#   "Ivis L Negron Torres, Chemist/Biologist")은 별도 항목을 추가하지 않는다 — 아래 정규식이
+#   `\b`(단어 경계)로 끝나므로 `Chemist` 단독 항목이 "Chemist/" 앞에서 그대로 매칭되고
+#   ("t"→"/" 는 단어/비단어 경계), 직함 나머지("/Biologist")는 애초에 버리는 값이라 이름
+#   추출 결과에 영향이 없다(직함 텍스트는 저장하지 않는다 — 반환값은 이름뿐).
+_INSPECTOR_TITLES = (
+    "Investigator", "Consumer Safety Officer", "Microbiologist", "Biologist",
+    "Chemist", "Analyst", "FDA Center Employee",
+)
+# 이름 토큰 1개: 대문자 시작 + [a-zA-Z'-] 연속 + 마침표 0~1개(중간이니셜 `F.`). 길이 상한은
+# 느슨히 두고(백트래킹 폭주 방지) 정밀 검사는 `_valid_inspector_name`이 담당한다.
+_INSPECTOR_TOKEN_RE = r"[A-Z][a-zA-Z'\-]{0,24}\.?"
+# 쉼표 앞의 "대문자 시작 토큰" 연속 구간(run) — 토큰 사이는 스페이스 1개(개행/파이프 등
+# 다른 구분자가 끼면 그 자리에서 매칭이 끊긴다 — "SEE REVERSE| Jose…"의 `|`처럼 서식 잡음이
+# 이름을 오염시키지 못하게 막는 부수 효과가 있다).
+#
+# 최대 2~4토큰이 아니라 **최대 8토큰까지** 느슨히 잡는다 — 실측(fda483 서명블록)에서
+# "EMPLOYEE(S) SIGNATURE Christina K Theodorou," 처럼 양식 마커 단어가 스페이스 하나 사이로
+# 이름 바로 앞에 들러붙는 사례가 있다. 이름만 2~4토큰으로 좁게 잡으면 그리디 매칭이
+# "SIGNATURE Christina K"(4토큰, 진짜 이름이 아님)를 먼저 집어 전체를 무효 처리해버리고,
+# `finditer`는 이미 소비한 구간을 되짚어 "Christina K Theodorou"만 다시 시도하지 않는다.
+# 대신 run 전체를 잡은 뒤 `_extract_483_inspectors`가 **왼쪽부터 양식 어휘 토큰을 벗겨내고**
+# 남은 것만 이름 문법으로 검증한다(아래). 8은 실측 마커 접두어(많아야 1~2단어)에 여유를 둔
+# 임의 상한 — 성능/폭주 방지용일 뿐 의미론적 의미는 없다.
+_INSPECTOR_RUN_RE = rf"{_INSPECTOR_TOKEN_RE}(?: {_INSPECTOR_TOKEN_RE}){{0,7}}"
+_INSPECTOR_TITLE_ALT = "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
+_INSPECTOR_CANDIDATE_RE = re.compile(
+    rf"(?P<run>{_INSPECTOR_RUN_RE}),[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
+)
+# 교차 확증 (a) — 직함 뒤 60자 이내 날짜. [2026-07-30 교정 확인] 서명블록 두 번째 이후
+# 서명자는 날짜가 OCR 로 깨지는 경우(`0227-2026`·`0417-2026` — 슬래시 없음)가 실측에서
+# 흔하다. 여기서 패턴을 넓히지 않는다 — 넓히면 산문 오탐이 늘어난다. 이런 경우는 (b)
+# (같은 블록 안 서명 마커)가 구제한다 — 한 페이지 서명블록은 마커가 한 번만 등장하고
+# 서명자 여럿이 그 뒤를 잇는 구조라, 뒤쪽 서명자도 200자 룩비하인드 안에 마커가 든다.
+_INSPECTOR_DATE_RE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
+_INSPECTOR_DATE_LOOKAHEAD = 60
+# 교차 확증 (b) — 이름 앞 200자 이내 서명블록 마커. 대문자 고정(re.I 미사용) — 산문의 소문자
+# "signature"/"employee" 언급을 오탐하지 않는다. EMP…OY 는 `_FDA483_FOOTER_RE`와 동형(OCR
+# 변형 EMPLOYEE 흡수).
+_INSPECTOR_MARKER_RE = re.compile(
+    r"SIGNATURE|SIGJ|EMP\S{0,6}?OY|SEE\s+REVERSE|DATE\s+ISSUED"
+)
+_INSPECTOR_MARKER_LOOKBEHIND = 200
+_INSPECTOR_MAX_RESULTS = 6
+# 양식 어휘 — 서명블록 주변에 흔히 나오는 대문자 단어들이 우연히 "대문자 시작 토큰"
+# 문법을 통과해 이름처럼 보이는 것을 막는다(예: "OF THIS PAGE", "DATE ISSUED").
+_INSPECTOR_FORM_VOCAB = {
+    "SEE", "REVERSE", "PAGE", "FORM", "DATE", "ISSUED", "EMPLOYEE", "SIGNATURE",
+    "THIS", "AND", "THE", "OF", "FDA", "AMENDMENT", "REPORT", "FIRM", "NAME",
+    "TITLE", "ADDRESS",
+}
+
+
+def _valid_inspector_name(name: str) -> bool:
+    """이름 문법 검증(순수 함수) — 토큰 2~4개·토큰당 ≤20자·전체 4~60자·양식 어휘 제외.
+
+    정규식(`_INSPECTOR_NAME_RE`)이 이미 대부분 걸러내지만, 여기서 다시 명시적으로 검사해
+    거부 조건을 코드로 auditable 하게 남긴다(숫자·기호 오염은 애초에 정규식 문법이 막고,
+    여기서는 길이 상한·양식 어휘까지 마저 확인)."""
+    tokens = name.split(" ")
+    if not (2 <= len(tokens) <= 4):
+        return False
+    if not (4 <= len(name) <= 60):
+        return False
+    for tok in tokens:
+        if len(tok) > 20 or not re.fullmatch(r"[A-Z][a-zA-Z'\-]*\.?", tok):
+            return False
+        if tok.rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
+            return False
+    return True
+
+
+def _extract_483_inspectors(text: str) -> list[str]:
+    """483 PDF **원시**(청소 전) 텍스트 → 서명블록 실사관 이름 목록(등장 순서·중복 제거).
+
+    반드시 `_clean_observation_detail`/`_FDA483_FOOTER_RE` 로 청소하기 **전** 텍스트에서
+    호출해야 한다 — 그 청소 로직은 서명블록을 지우는 것이 목적이고(발행 게이트가 그 결과에
+    의존) 이 함수와는 반대 방향이다. 순수 함수·부작용 없음·네트워크 없음.
+
+    계약: 이름 문법(`_valid_inspector_name`)을 통과하고, 서명블록 문맥 교차 확증(직함 뒤
+    60자 이내 날짜 **또는** 이름 앞 200자 이내 서명블록 마커) 중 하나라도 만족해야 채택한다.
+    확증이 없으면 형태만 맞아도 버린다 — 관찰 산문의 "Investigator <이름> noted…"는 애초에
+    어순이 반대라 이 정규식 자체가 잡지 않지만(이름이 뒤에 오면 대상 밖), 어순이 우연히
+    맞아도 확증 없이는 채택하지 않는 것이 이 함수의 정밀도 원칙이다.
+
+    최대 `_INSPECTOR_MAX_RESULTS`명. 어떤 예외도 밖으로 던지지 않는다(입력이 비정상이어도
+    빈 리스트 — 이름을 지어내거나 추측 보정하지 않는다: 확신이 없으면 빈 리스트가 정답).
+    """
+    try:
+        body = text or ""
+        if not body.strip():
+            return []
+        out: list[str] = []
+        seen: set[str] = set()
+        for m in _INSPECTOR_CANDIDATE_RE.finditer(body):
+            tokens = m.group("run").split(" ")
+            # 왼쪽부터 양식 어휘 토큰을 벗겨낸다("SIGNATURE Christina K Theodorou" →
+            # "Christina K Theodorou") — 위 run 정규식 주석 참조. 이름 한복판/끝에 낀 양식
+            # 어휘는 여기서 안 걸러지고 `_valid_inspector_name`이 마저 거부한다.
+            offset = 0
+            while tokens and tokens[0].rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
+                offset += len(tokens[0]) + 1        # 벗겨낸 토큰 + 뒤따르는 스페이스 1개
+                tokens = tokens[1:]
+            name = " ".join(tokens)
+            if not _valid_inspector_name(name):
+                continue
+            name_start = m.start("run") + offset
+            before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
+            after = body[m.end("title"):m.end("title") + _INSPECTOR_DATE_LOOKAHEAD]
+            if not (_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after)):
+                continue                                   # 확증 없음 — 산문 오탐 방지
+            key = re.sub(r"\s+", " ", name).strip().lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(name)
+            if len(out) >= _INSPECTOR_MAX_RESULTS:
+                break
+        return out
+    except Exception:  # noqa: BLE001 — 어떤 실패도 이름을 지어내는 대신 빈 리스트로 degrade
+        return []
+
+
 def _first_sentence(text: str) -> tuple[str, str]:
     """첫 문장(deficiency)과 나머지(detail). 문장부호가 없으면 안전 길이로 잘라낸다."""
     t = re.sub(r"\s+", " ", text or "").strip()
@@ -1002,7 +1140,8 @@ def _site_country(country: str, state: str) -> str:
 
 def _to_item(nrow: dict[str, str], excerpt: str,
              observations: list[dict[str, str]] | None = None,
-             body_full: str = "", text_status: str = "") -> IntakeItem | None:
+             body_full: str = "", text_status: str = "",
+             inspectors: list[str] | None = None) -> IntakeItem | None:
     """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭).
 
     `body_full`(비공백)이면 raw 에 `fda483_body_full` 로 실어 deep_analysis fan-out 입력으로 쓴다
@@ -1011,7 +1150,11 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     `text_status` 는 PDF 텍스트층 확보 결과 코드다. **아무 본문층도 못 얻은 경우에만**
     `fda483_text_status` 로 raw 에 남긴다 — 하류(card_scaffold.`_absent_reason`)가 "왜 비었는지"를
     사람 문장으로 바꿔 prose_input 에 실어, 코드와 LLM 이 사유를 **지어내지** 않게 하기 위해서다.
-    본문을 얻었으면 사유가 없으므로 키 자체를 달지 않는다(골든 additive)."""
+    본문을 얻었으면 사유가 없으므로 키 자체를 달지 않는다(골든 additive).
+
+    `inspectors`(비어있지 않으면) raw 에 `fda483_inspectors` 로 실사관 이름 목록을 싣는다
+    (`_extract_483_inspectors` 산출 — ENABLE_FDA_483_OBSERVATIONS/DEEP 과 독립인 순수 결정론
+    층). 빈 리스트/None 이면 키 자체를 달지 않는다(다른 조건부 raw 필드와 동일 관례)."""
     record_type = nrow["record_type"]
     media_id = nrow["media_id"]
     company = nrow["company"]
@@ -1056,6 +1199,8 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         raw_payload["fda483_excerpt"] = excerpt
     if observations:
         raw_payload["fda_483_observations"] = observations
+    if inspectors:
+        raw_payload["fda483_inspectors"] = inspectors   # 서명블록 실사관 이름(결정론·정밀도 최우선)
     if body_full:
         raw_payload["fda483_body_full"] = body_full   # deep_analysis fan-out 입력(전문)
     if text_status and text_status not in ("ok", "") and not (excerpt or observations or body_full):
@@ -1129,10 +1274,17 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     deep_health: dict[str, Any] = {
         "enabled": deep_enabled, "attempted": 0, "stored": 0, "failed": 0, "warnings": [],
     }
+    # [실사관 추출 2026-07-30] 순수 결정론 파서 — ENABLE_FDA_483_OBSERVATIONS/DEEP 과 독립으로
+    # 항상 수행(네트워크 추가 요청 0, 이미 받은 text 재사용). "enabled" 키가 없는 것은 의도
+    # (플래그 게이트 자체가 없다는 뜻 — observations_health/deep_health 와의 차이).
+    inspectors_health: dict[str, Any] = {
+        "attempted": 0, "extracted": 0, "failed": 0, "warnings": [],
+    }
     LAST_HEALTH = {
         "fda483_excerpt": excerpt_health,
         "fda_483_observations": observations_health,
         "fda_483_deep": deep_health,
+        "fda483_inspectors": inspectors_health,
         "source_degraded": False,
     }
 
@@ -1143,6 +1295,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
             "fda483_excerpt": excerpt_health,
             "fda_483_observations": observations_health,
             "fda_483_deep": deep_health,
+            "fda483_inspectors": inspectors_health,
             "source_degraded": source_degraded,
             "backbone": _LAST_BACKBONE,
         }
@@ -1167,6 +1320,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         excerpt = ""
         observations: list[dict[str, str]] = []
         body_full = ""
+        inspectors: list[str] = []
         # [결손 사유 전파 2026-07-20] 본문을 못 얻었을 때 **왜** 못 얻었는지. 종전엔 이 사유가
         # health 카운터에만 남고 카드로는 "없음"만 갔고, 이유를 모르는 하류가 이유를 지어냈다
         # (디제스트가 "스캔·비공개로 상세가 제공되지 않아" 라고 단정한 사례). cap 에 걸려 아예
@@ -1196,6 +1350,20 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
                 text, status = _fetch_fda483_pdf_text(pdf_url)
                 text_status = status if not text else "ok"
+                # [실사관 추출 2026-07-30] 반드시 **청소 이전** 원시 text 에서 추출한다 —
+                # `_clean_observation_detail`/`_FDA483_FOOTER_RE` 는 서명블록을 지우는 것이
+                # 목적이라(발행 게이트가 그 결과에 의존) 그 뒤 텍스트에는 이름이 남지 않는다.
+                # 플래그와 무관(순수 파서, 추가 네트워크 요청 없음 — 이미 받은 text 재사용).
+                inspectors_health["attempted"] += 1
+                inspectors = _extract_483_inspectors(text) if text else []
+                if inspectors:
+                    inspectors_health["extracted"] += 1
+                else:
+                    inspectors_health["failed"] += 1
+                    warn = (f"FDA 483 inspectors 미확보"
+                            f"({status if not text else 'no-inspectors'}): {pdf_url}")
+                    inspectors_health["warnings"].append(warn)
+                    log("WARN", warn + " — 카드 발행에는 영향 없음(선택 슬롯)")
                 excerpt = _extract_fda483_excerpt(text) if text else ""
                 if excerpt:
                     excerpt_health["ok"] += 1
@@ -1235,7 +1403,8 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                         deep_health["warnings"].append(warn)
                         log("WARN", warn + " — 분석층 없이 발행(결정론 상세·요약카드는 유지)")
 
-        item = _to_item(nrow, excerpt, observations, body_full, text_status)
+        item = _to_item(nrow, excerpt, observations, body_full, text_status,
+                        inspectors=inspectors)
         if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 
@@ -1243,6 +1412,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "fda483_excerpt": excerpt_health,
         "fda_483_observations": observations_health,
         "fda_483_deep": deep_health,
+        "fda483_inspectors": inspectors_health,
         "source_degraded": source_degraded,
         "backbone": _LAST_BACKBONE,
         "fda_483_ocr": {"pages_used": _OCR_BUDGET["used"],
@@ -1268,5 +1438,8 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 f"extracted={observations_health['extracted']} "
                 f"failed={observations_health['failed']} · deep enabled={deep_enabled} "
                 f"attempted={deep_health['attempted']} stored={deep_health['stored']} "
-                f"failed={deep_health['failed']}")
+                f"failed={deep_health['failed']} "
+                f"· inspectors attempted={inspectors_health['attempted']} "
+                f"extracted={inspectors_health['extracted']} "
+                f"failed={inspectors_health['failed']}")
     return items, None

@@ -937,6 +937,25 @@
     return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };
   }
 
+  // [FDA 483 실사관 표기] inspector_names 는 문서 단위 사실(문서 내 모든 finding 이 동일
+  // 값)이라 published_date 와 완전히 동일하게 대표값(rows[0])만 쓴다(바로 아래 buildDocHead
+  // 주석 참조). 036(findings_search/findings_document RPC)이 아직 라이브에 없을 수 있으므로
+  // 완전히 방어적으로 정제한다 — 배열이 아니거나, 원소가 비문자열·빈 문자열(공백뿐 포함)이면
+  // 버리고, 6개를 넘으면 잘라낸다. 필드 자체가 없을 때와 완전히 동일하게(빈 배열) 취급되어
+  // 호출부가 "표시할 이름이 없으면 요소를 만들지 않는다"는 한 가지 조건만 신경 쓰면 된다 —
+  // 빈 라벨·"미확인" 같은 자리표시자는 만들지 않는다(★부재 어휘 원칙과 동일 정신: 값이
+  // 없으면 침묵한다, 가짜 값을 지어내지 않는다).
+  var INSPECTOR_NAMES_LIMIT = 6;
+  function sanitizeInspectorNames(value) {
+    if (!Array.isArray(value)) return [];
+    var out = [];
+    for (var i = 0; i < value.length && out.length < INSPECTOR_NAMES_LIMIT; i++) {
+      var name = value[i];
+      if (typeof name === "string" && name.trim()) out.push(name.trim());
+    }
+    return out;
+  }
+
   // 문서 카드 헤더 — 업체명이 주인공(기존 .fnd-firm 과 동일한 세리프 규칙, 문서 단위라
   // 조금 더 크게), 소스·발행일·지적 건수는 보조 메타. 문서 내 모든 행이 firm_name/source/
   // published_date 를 공유하므로 대표값(rows[0])만 쓴다.
@@ -966,6 +985,15 @@
     if (head.source) meta.appendChild(el("span", "fnd-b", head.source));
     if (head.published_date) meta.appendChild(el("span", "fnd-doc-date", head.published_date));
     meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));
+    // [FDA 483 실사관 표기] 값이 있을 때만 span 을 만든다(빈 라벨 금지). 기존 .fnd-doc-count
+    // 클래스를 그대로 재사용해 신규 CSS 0(§ 최소화 원칙) — 시각적으로 동일한 보조 메타
+    // 텍스트다. el() 은 textContent 로만 대입하므로 이름에 HTML 특수문자가 있어도 안전하게
+    // 이스케이프되고, elHL() 이 아니라 검색어 하이라이트 대상에도 포함되지 않는다(사람 이름은
+    // 검색 매칭 대상이 아니다).
+    var inspectors = sanitizeInspectorNames(head.inspector_names);
+    if (inspectors.length) {
+      meta.appendChild(el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · ")));
+    }
     docHead.appendChild(meta);
     return docHead;
   }
@@ -1435,6 +1463,12 @@
       // "검토 필요" 경고가 조용히 사라진다(018 주석의 반환 계약 참조).
       evidence_level: item.evidence_level || "",
       review_status: item.review_status || "",
+      // [FDA 483 실사관 표기] buildCard() (이 경로가 렌더하는 카드)는 문서 헤더가 아니라
+      // observation 카드라 inspector_names 를 화면에 그리지 않는다 — 이 필드는 현재
+      // 시각 효과가 없는 순수 계약 전달(evidence_level/review_status 와 동일한 방어적
+      // forward 관례)이다. sanitizeInspectorNames() 로 방어 정제해 undefined/비배열/
+      // 오염 원소가 row 에 그대로 새지 않게 한다.
+      inspector_names: sanitizeInspectorNames(item.inspector_names),
       finding_text_ko: item.text || "",
       finding_text: "",
     };

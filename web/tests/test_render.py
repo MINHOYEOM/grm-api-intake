@@ -2561,6 +2561,88 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("innerHTML", block)
 
 
+# ── FDA 483 문서 카드 실사관 표기(036 findings_search/findings_document inspector_names) ──
+class WebFindingsInspectorNamesTest(unittest.TestCase):
+    """문서 카드 메타행(fnd-doc-date 옆)에 rows[0].inspector_names(문서 단위 사실 —
+    published_date 와 완전히 동일하게 대표값만 사용)를 "실사관: A · B" 한 줄로 표기한다.
+    036 마이그레이션이 아직 라이브에 없을 수 있어 완전히 방어적이어야 한다 — 필드
+    부재/null/빈 배열/비배열/원소 오염은 전부 "표시할 이름 없음"으로 조용히 수렴하고
+    (빈 라벨·"미확인" 같은 자리표시자 금지), 6개를 넘으면 6개로 자른다. 집계·프로필
+    페이지·클릭 필터는 의도적으로 만들지 않는다(범위 제한 — 데이터가 아직 얇다)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+
+    def _fn(self, marker, end_marker="\n  }\n"):
+        src = self.js[self.js.index(marker):]
+        return src[:src.index(end_marker) + len(end_marker)]
+
+    def test_sanitizer_exists_and_is_fully_defensive(self):
+        js = self.js
+        self.assertIn("var INSPECTOR_NAMES_LIMIT = 6;", js)
+        fn = self._fn("function sanitizeInspectorNames(value)")
+        # 배열이 아니면 즉시 빈 배열(null/undefined/객체/문자열 등 전부 포함).
+        self.assertIn("if (!Array.isArray(value)) return [];", fn)
+        # 원소는 비문자열(숫자/객체/null 등)·공백뿐인 문자열이면 버린다.
+        self.assertIn('if (typeof name === "string" && name.trim())', fn)
+        self.assertIn("out.push(name.trim());", fn)
+        # 6개 상한은 필터링 도중(루프 조건)에 걸려 그 이후 원소를 아예 보지 않는다.
+        self.assertIn("out.length < INSPECTOR_NAMES_LIMIT", fn)
+
+    def test_doc_head_renders_line_only_when_inspectors_present(self):
+        fn = self._fn("function buildDocHead(rows)")
+        self.assertIn("var inspectors = sanitizeInspectorNames(head.inspector_names);", fn)
+        # "if (inspectors.length)" 가드 뒤에만 span 이 만들어진다 — 빈 배열이면 요소 자체가
+        # 생기지 않는다(빈 라벨 금지 계약의 핵심 분기).
+        self.assertIn("if (inspectors.length) {", fn)
+        gate = fn[fn.index("if (inspectors.length) {"):]
+        self.assertIn(
+            'meta.appendChild(el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · ")));',
+            gate,
+        )
+
+    def test_doc_head_inspector_line_uses_textcontent_helper_not_html(self):
+        """el() 헬퍼(textContent 대입)만 쓰고, 하이라이트 헬퍼 elHL() 은 쓰지 않는다 —
+        사람 이름은 검색어 하이라이트 대상이 아니다. el() 자체가 e.textContent = text
+        로만 대입하는 헬퍼임을 함께 고정해 "textContent 경로" 를 증명한다(HTML 특수문자가
+        든 이름도 그대로 이스케이프되어 표시된다는 근거). innerHTML 데이터 삽입 부재는
+        파일 전역 XSS 계약(test_document_collapse_no_innerhtml_data_injection)이 별도로도
+        가드한다."""
+        js = self.js
+        el_fn = self._fn("function el(tag, className, text)")
+        self.assertIn("e.textContent = text;", el_fn)
+        fn = self._fn("function buildDocHead(rows)")
+        self.assertNotIn('elHL("span", "fnd-doc-count"', fn)
+        # 실사관 줄은 정확히 el() 호출 한 곳에서만 만들어진다(중복 렌더 없음).
+        self.assertEqual(fn.count('"실사관: "'), 1)
+
+    def test_doc_head_reuses_existing_meta_class_no_new_css_needed(self):
+        """CSS 최소화 — 신규 클래스를 만들지 않고 기존 .fnd-doc-count(findings.html 인라인
+        <style>, 이미 muted 소형 텍스트로 정의됨)를 재사용한다."""
+        fn = self._fn("function buildDocHead(rows)")
+        self.assertIn('el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · "))', fn)
+        # 지적 건수 span 과 동일 클래스를 공유한다(신규 클래스 미도입 확인).
+        self.assertEqual(fn.count('"fnd-doc-count"'), 2)
+
+    def test_similar_search_mapping_forwards_inspector_names_defensively(self):
+        """[RPC 매핑부] findings_similar 경로(mapSimilarItemToRow)도 동일한 방어 규칙으로
+        inspector_names 를 정제해 전달한다 — evidence_level/review_status 와 동일한
+        위치·관례(이 경로가 그리는 buildCard() 관측 카드 자체는 이 필드를 화면에 쓰지
+        않지만, 계약 전달은 다른 서지 필드와 동형으로 유지한다)."""
+        fn = self._fn("function mapSimilarItemToRow(item)", end_marker="\n  }\n")
+        self.assertIn("inspector_names: sanitizeInspectorNames(item.inspector_names),", fn)
+
+    def test_inspector_names_never_used_for_aggregation_or_click_filter(self):
+        """범위 제한 가드 — 실사관 이름을 집계·프로필 페이지·클릭 필터로 확장하지
+        않는다(임무 명시 사항). findings.js 전체에 inspector 관련 클릭 핸들러/필터
+        상태 키가 새로 생기면 안 된다."""
+        js = self.js
+        self.assertNotIn("toggleInspectorFilter", js)
+        self.assertNotIn("state.inspector", js)
+        self.assertNotIn("p_inspector", js)
+
+
 # ── 트렌드 대시보드 (FIND-1 F3b — 셸 렌더·env-gate·sitemap·nav 배선·RPC 배선) ────────
 class WebTrendsRenderTest(unittest.TestCase):
     """findings/trends/index.html 은 findings/index.html 과 동형인 정적 셸이다(런타임에

@@ -968,6 +968,25 @@ _INSPECTOR_MAX_RESULTS = 6
 # 중복·조각 정리 **전** 원시 후보 상한. 상한이 정리보다 먼저 걸리면 조각이 자리를 차지해
 # 진짜 이름이 밀려난다(상한을 선택보다 먼저 거는 고전적 실수) — 넉넉히 두고 정리 후 자른다.
 _INSPECTOR_MAX_CANDIDATES = 24
+# ── OCR 신뢰도 게이트 2종 [2026-07-30 백필 실측] ──────────────────────────────────
+# 문제: 구형 스캔 483 은 **FDA 가 심어둔 텍스트층 자체가 이미 OCR 산물**이라 우리 파서가
+# `pdf-ok`(정상 텍스트층)로 판정하는데도 이름 철자가 틀린다. 알파벳·대문자 시작·2~4토큰
+# 문법은 전부 통과하므로 기존 검증으로는 못 잡는다. 실측 사례:
+#   Ameridose : ['JUetlne M. Coraon', 'Nichole B. HUrpny', 'Aahley M. Whitehurot', …]
+#   Delta     : ['Brandon C. Hcitmcier', 'Brandon C. Heitrueier', 'Brandon C. Heianeier', …]
+#   Immacule  : ['Damaris Y. Hernandez', 'Damaris Y. Hemandez', …]   ← rn→m 오인식
+# **틀린 실명을 노출하는 것은 이 기능의 최악 결과**라, 의심스러우면 문서 전체를 버린다.
+#
+# 게이트①(토큰 형태) — 토큰 중간의 대문자는 OCR 대소문자 혼동의 고전적 흔적이다
+#   (JUetlne·HUrpny·BiswaS). 실존 이름의 내부 대문자는 Mc/Mac/O'/D'/Le/De 접두나
+#   하이픈 뒤에만 온다(McDonald·O'Brien·LePage·Wilimczyk-Macri) — 그것만 허용한다.
+_INSPECTOR_INNER_CAP_OK_RE = re.compile(r"^(?:Mc|Mac|Le|De|La|Van|Von|O'|D')", re.I)
+# 게이트②(문서 내 합의) — 같은 문서에서 **거의 같은 이름이 두 가지 철자로** 나오면 그
+#   문서의 텍스트를 신뢰할 수 없다는 직접 증거다(같은 서명을 두 번 다르게 읽었다는 뜻).
+#   한 명이라도 그런 쌍이 있으면 **그 문서의 이름 전부를 버린다** — 어느 철자가 옳은지
+#   알 방법이 없기 때문. 0.82 는 실측 6개 불량 문서를 전부 잡고 정상 문서(서로 다른 사람)는
+#   건드리지 않는 값이다.
+_INSPECTOR_NEAR_DUP_RATIO = 0.82
 # 양식 어휘 — 서명블록 주변에 흔히 나오는 대문자 단어들이 우연히 "대문자 시작 토큰"
 # 문법을 통과해 이름처럼 보이는 것을 막는다(예: "OF THIS PAGE", "DATE ISSUED").
 _INSPECTOR_FORM_VOCAB = {
@@ -975,6 +994,42 @@ _INSPECTOR_FORM_VOCAB = {
     "THIS", "AND", "THE", "OF", "FDA", "AMENDMENT", "REPORT", "FIRM", "NAME",
     "TITLE", "ADDRESS",
 }
+
+
+def _inspector_token_shape_ok(token: str) -> bool:
+    """토큰 형태 검사(게이트①) — 첫 글자 뒤의 대문자는 OCR 대소문자 혼동으로 본다.
+
+    허용 예외는 실존 이름 관례뿐: Mc/Mac/Le/De/La/Van/Von/O'/D' 접두, 그리고 하이픈·
+    어퍼스트로피 **바로 뒤**의 대문자(Wilimczyk-Macri·O'Brien). 그 외 위치의 대문자는
+    거부한다(JUetlne·HUrpny·BiswaS 실측).
+    """
+    core = token.rstrip(".")
+    if _INSPECTOR_INNER_CAP_OK_RE.match(core):
+        return True
+    for i, ch in enumerate(core):
+        if i == 0 or not ch.isupper():
+            continue
+        if core[i - 1] in "-'":          # 하이픈·어퍼스트로피 뒤 대문자는 정상
+            continue
+        return False
+    return True
+
+
+def _inspector_names_are_consistent(names: list[str]) -> bool:
+    """문서 내 합의 검사(게이트②) — 거의 같은 이름이 두 철자로 있으면 False.
+
+    같은 서명을 두 번 다르게 읽었다는 직접 증거이므로, 어느 쪽이 옳은지 알 수 없다.
+    이 경우 호출측은 **그 문서의 이름 전부를 버린다**(정밀도 우선 계약).
+    """
+    from difflib import SequenceMatcher
+    keys = [_inspector_key(n) for n in names]
+    for i in range(len(keys)):
+        for j in range(i + 1, len(keys)):
+            if keys[i] == keys[j]:
+                continue                                   # 정확 중복은 이미 정리됨
+            if SequenceMatcher(None, keys[i], keys[j]).ratio() >= _INSPECTOR_NEAR_DUP_RATIO:
+                return False
+    return True
 
 
 def _inspector_key(name: str) -> str:
@@ -1035,10 +1090,17 @@ def _valid_inspector_name(name: str) -> bool:
         return False
     if not (4 <= len(name) <= 60):
         return False
+    # [2026-07-30 실측] 첫 토큰이 홑이니셜인 이름(`I. Gaul`·`P. Cintron`·`A. Rusin`)은
+    # 이름(given name)이 잘려나간 **조각**이다 — 483 서명블록은 항상 이름을 온전히 적는다.
+    # 조각은 식별에 쓸모가 없을뿐더러 같은 사람을 중복 표시하게 만든다.
+    if len(tokens[0].rstrip(".")) < 2:
+        return False
     for tok in tokens:
         if len(tok) > 20 or not re.fullmatch(r"[A-Z][a-zA-Z'\-]*\.?", tok):
             return False
         if tok.rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
+            return False
+        if not _inspector_token_shape_ok(tok):   # 게이트① OCR 대소문자 혼동
             return False
     return True
 
@@ -1089,7 +1151,13 @@ def _extract_483_inspectors(text: str) -> list[str]:
             out.append(name)
             if len(out) >= _INSPECTOR_MAX_CANDIDATES:
                 break                                  # 병리적 입력 상한(중복 정리 전 원시분)
-        return _dedupe_inspector_names(out)[:_INSPECTOR_MAX_RESULTS]
+        final = _dedupe_inspector_names(out)
+        # 게이트② 문서 내 합의 — 같은 이름이 두 철자로 읽힌 문서는 통째로 버린다.
+        # (조각 흡수 **뒤에** 판정한다: 조각은 정상적으로 부분 일치하므로 먼저 걸러야
+        #  근사 중복 판정이 오작동하지 않는다. 순서가 계약이다.)
+        if not _inspector_names_are_consistent(final):
+            return []
+        return final[:_INSPECTOR_MAX_RESULTS]
     except Exception:  # noqa: BLE001 — 어떤 실패도 이름을 지어내는 대신 빈 리스트로 degrade
         return []
 

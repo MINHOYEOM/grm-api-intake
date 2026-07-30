@@ -64,6 +64,15 @@
   var firmsEl = document.getElementById("tr-firms");
   var firmDetailEl = document.getElementById("tr-firm-detail");
   var sourceEl = document.getElementById("tr-source");
+  // [해외/미국 실사 비교] 038_findings_zone_category.sql 전용 신규 패널 엘리먼트 —
+  // coverageNoteEl/heatmapNoteEl 과 동일하게 아래 하드 게이트에는 넣지 않는다. 넣으면
+  // 이 블록이 없는(캐시 스큐 등으로) 구버전 셸을 만났을 때 스크립트 전체가 조기
+  // 리턴되어 이미 정상 동작하는 다른 패널까지 함께 죽는다 — 이 패널의 실패 반경은
+  // 이 패널 자신으로만 한정해야 한다(과제 요건: "다른 패널에 영향 0").
+  var zoneBlockEl = document.getElementById("tr-zone-block");
+  var zoneSubEl = document.getElementById("tr-zone-sub");
+  var zoneEl = document.getElementById("tr-zone");
+  var zoneCountriesEl = document.getElementById("tr-zone-countries");
   if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl ||
       !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
       !sourceEl) return;
@@ -730,6 +739,147 @@
     });
   }
 
+  // ── [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 ─────────────────────────
+  // findings_zone_category()(038, 파라미터 없음) — findings_stats/findings_category_matrix
+  // 와 독립된 별개 RPC. FDA 483 소재국(site_country)만 채워져 있어(WL 은 전량 미상) 이
+  // 함수 자체가 483 으로 범위를 한정하고, 그 사실을 응답의 scope.source 에 실어 온다.
+  // 실패해도(RPC 미배포 라이브 포함) 이 섹션만 조용히 숨겨진 채로 남고 다른 섹션엔
+  // 전혀 영향이 없다(히트맵과 동일 원칙 — § 오케스트레이션 하단 fetchZoneCategory 참조).
+  //
+  // ★비율은 서버가 안 준다(038 계약 — "서버는 센다") — 각 zone(해외/미국) 카테고리
+  // 합(Σforeign_cnt/Σus_cnt)으로 나눈 **zone 내 점유율**을 여기서 계산한다. 절대 건수를
+  // 그대로 비교하면 안 된다 — 미국(7,288건)이 해외(905건)보다 8배 커서, 건수만 보면
+  // 카테고리 크기 차이가 아니라 표본 크기 차이를 보는 꼴이 된다.
+  //
+  // 분모는 totals.foreign.findings/us.findings(RPC 응답 상단 집계값)가 아니라
+  // by_category 행 자체의 합으로 고정한다 — 화면에 그려지는 막대·배지·% 표시가 전부
+  // "이 표 안에서" 서로 정합하도록 하기 위해서다(응답 상단 totals 와 by_category 합이
+  // 어긋나는 경우가 생겨도 화면 안에서는 항상 100%가 맞아떨어진다).
+  function safeShare(part, whole) {
+    return whole > 0 ? (part || 0) / whole : 0;
+  }
+
+  // [해외 상대비 배지] 이 배수 미만이면 배지를 달지 않는다 — 1.5배 미만은 "약간 더
+  // 많다" 수준이라 배지로 못박아 강조할 근거가 약하다.
+  var ZONE_BADGE_RATIO = 1.5;
+  // [표본 하한] 해외 쪽 표본(foreign_cnt)이 이 미만인 카테고리는 배지를 달지 않는다 —
+  // 해외 전체가 905건뿐인 얇은 모집단이라, 카테고리당 건수가 한 자릿수~십여 건이면
+  // 한두 건의 증감만으로 점유율이 몇 %p 씩 흔들리고 배수(N배)는 그보다 더 크게
+  // 요동친다(예: foreign_cnt 가 5→7로 늘어도 배수가 40% 뛴다 — 표본이 얇을수록 분산이
+  // 커지는 일반 통계 성질). 미국 쪽은 표본이 7,288건으로 압도적으로 커 같은 문제가
+  // 생기지 않으므로 하한을 따로 두지 않는다.
+  var ZONE_MIN_FOREIGN_SAMPLE = 20;
+
+  function buildZoneBarLine(tag, share, maxShare, pctStr, barClass) {
+    var line = document.createElement("div");
+    line.className = "tr-zone-barline";
+    line.appendChild(el("span", "tr-zone-tag", tag));
+    var track = document.createElement("div");
+    track.className = "tr-zone-track";
+    var bar = document.createElement("div");
+    bar.className = "tr-zone-bar " + barClass;
+    var ratio = maxShare > 0 ? share / maxShare : 0;
+    bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
+    track.appendChild(bar);
+    line.appendChild(track);
+    line.appendChild(el("span", "tr-zone-pct", pctStr));
+    return line;
+  }
+
+  function buildZoneRow(r, maxShare) {
+    var row = document.createElement("div");
+    row.className = "tr-zone-row";
+    var head = document.createElement("div");
+    head.className = "tr-zone-head";
+    head.appendChild(el("span", "tr-zone-label", r.ko));
+    // isFinite 가드 — usShare 가 0(그 카테고리가 미국 쪽엔 아예 없음)이면 배수가
+    // 무한대가 되어 "N배" 형식으로 표기할 수 없다(실데이터 20개 카테고리에선 발생하지
+    // 않지만, 방어적으로 배지를 생략한다 — 억지 표기 금지).
+    if (isFinite(r.ratio) && r.ratio >= ZONE_BADGE_RATIO && r.foreignCnt >= ZONE_MIN_FOREIGN_SAMPLE) {
+      head.appendChild(el("span", "tr-zone-badge", "해외 " + (Math.round(r.ratio * 10) / 10) + "배"));
+    }
+    row.appendChild(head);
+    var bars = document.createElement("div");
+    bars.className = "tr-zone-bars";
+    bars.appendChild(buildZoneBarLine("해외", r.foreignShare, maxShare, r.foreignPctText, "tr-zone-bar-foreign"));
+    bars.appendChild(buildZoneBarLine("미국", r.usShare, maxShare, r.usPctText, "tr-zone-bar-us"));
+    row.appendChild(bars);
+    return row;
+  }
+
+  // data 는 findings_zone_category() 응답 verbatim. 구버전 캐시 셸(zoneBlockEl/zoneEl
+  // 없음)·빈 응답·0 분모는 전부 조용히 숨김 유지로 처리한다(패널을 명시적으로
+  // hidden=true 로 되돌리지 않는다 — 정적 셸 기본값을 그대로 두는 편이 안전하다).
+  // 해석·권고 문구는 만들지 않는다 — 관측된 분포만 기술한다(트랙C 품질 기준,
+  // "한국 공장은 ~해야" 류 금지).
+  function renderZonePanel(data) {
+    if (!zoneBlockEl || !zoneEl) return;
+    var d = data || {};
+    var totals = d.totals || {};
+    var foreign = totals.foreign || {};
+    var us = totals.us || {};
+    var cats = d.by_category || [];
+    if (!cats.length) return;   // 빈 응답 → 패널 숨김 유지
+
+    var foreignTotal = cats.reduce(function (s, c) { return s + (c.foreign_cnt || 0); }, 0);
+    var usTotal = cats.reduce(function (s, c) { return s + (c.us_cnt || 0); }, 0);
+    if (!(foreignTotal > 0) || !(usTotal > 0)) return;   // 0 나눗셈 방어 — 어느 zone 합계든 0 이면 비교 불성립
+
+    var rows = cats.map(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      var fCnt = c.foreign_cnt || 0, uCnt = c.us_cnt || 0;
+      var fShare = safeShare(fCnt, foreignTotal);
+      var uShare = safeShare(uCnt, usTotal);
+      return {
+        code: c.category_code,
+        ko: label ? label.ko : c.category_code,
+        foreignCnt: fCnt,
+        usCnt: uCnt,
+        foreignShare: fShare,
+        usShare: uShare,
+        foreignPctText: pctText(fCnt, foreignTotal),
+        usPctText: pctText(uCnt, usTotal),
+        ratio: uShare > 0 ? (fShare / uShare) : (fShare > 0 ? Infinity : 0),
+      };
+    }).sort(function (a, b) { return b.foreignShare - a.foreignShare; });   // 해외 점유율 내림차순
+
+    if (zoneSubEl) {
+      // [부제 필수] 숫자는 전부 이 응답(totals/scope)에서 뽑는다 — 하드코딩 금지.
+      // scope.excluded_unknown_country 는 0 이거나 없을 수 있어 방어적으로만 덧붙인다.
+      var scope = d.scope || {};
+      var sub = "FDA 483 기준 · 해외 " + fmtNum(foreign.findings) + "건(" +
+        fmtNum(foreign.documents) + "개 문서·" + fmtNum(foreign.countries) + "개국) vs 미국 내 " +
+        fmtNum(us.findings) + "건(" + fmtNum(us.documents) + "개 문서)";
+      if (typeof scope.excluded_unknown_country === "number" && scope.excluded_unknown_country > 0) {
+        sub += " · 소재국 미상 " + fmtNum(scope.excluded_unknown_country) + "건 제외";
+      }
+      zoneSubEl.textContent = sub;
+    }
+
+    zoneEl.innerHTML = "";
+    // 막대 길이는 두 zone 을 합친 공통 스케일(maxShare)로 정규화한다 — zone 마다 따로
+    // 정규화하면(자기 zone 내 최댓값 기준) 한 행 안에서 두 막대 길이를 비교해도
+    // "어느 zone 에 더 몰렸는가"를 읽을 수 없다(각기 다른 잣대이므로).
+    var maxShare = rows.reduce(function (m, r) { return Math.max(m, r.foreignShare, r.usShare); }, 0) || 1;
+    rows.forEach(function (r) { zoneEl.appendChild(buildZoneRow(r, maxShare)); });
+
+    if (zoneCountriesEl) {
+      zoneCountriesEl.innerHTML = "";
+      // [해외 국가 구성] "해외"는 균질한 덩어리가 아니다(인도가 압도적) — 이걸 안 보여
+      // 주면 독자가 "해외 = 한국"으로 오독한다. top_countries 상위 5개만 짧게 표기.
+      var top = (d.top_countries || []).slice(0, 5);
+      if (top.length) {
+        zoneCountriesEl.appendChild(document.createTextNode("해외 실사 구성: "));
+        top.forEach(function (c, i) {
+          if (i > 0) zoneCountriesEl.appendChild(document.createTextNode(" · "));
+          zoneCountriesEl.appendChild(document.createTextNode(c.country + " " + fmtNum(c.findings)));
+        });
+      }
+    }
+
+    zoneBlockEl.hidden = false;
+  }
+
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     var totals = data.totals || {};
@@ -770,6 +920,20 @@
     });
   }
 
+  // 038_findings_zone_category.sql — findings_stats/findings_category_matrix 와 별개
+  // RPC(파라미터 없음). 미배포 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로
+  // 실패 처리한다(아래 오케스트레이션, fetchCategoryMatrix 와 동일 원칙).
+  function fetchZoneCategory() {
+    return fetch(rpcEndpoint("findings_zone_category"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_zone_category " + r.status);
+      return r.json();
+    });
+  }
+
   function fetchFirmStats(firmName) {
     return fetch(rpcEndpoint("findings_firm_stats"), {
       method: "POST",
@@ -804,6 +968,15 @@
   fetchCategoryMatrix()
     .then(function (data) {
       renderHeatmap(data);
+    })
+    .catch(function () { /* 조용히 숨김 유지 */ });
+
+  // [해외/미국 실사 비교] fetchStats()/fetchCategoryMatrix() 와 독립적으로 병렬
+  // fetch — 실패해도(038 미배포 라이브 포함) tr-zone-block 은 정적 셸의 기본값인
+  // hidden 상태 그대로 남고, 다른 섹션엔 전혀 영향이 없다.
+  fetchZoneCategory()
+    .then(function (data) {
+      renderZonePanel(data);
     })
     .catch(function () { /* 조용히 숨김 유지 */ });
 })();

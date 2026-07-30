@@ -340,7 +340,13 @@ def run(
     # 결정론 순서(raw_signal_id 오름차순) — --limit 로 배치를 나눠도 재실행마다 같은 순서로
     # 잔여를 처리한다(이미 채워진 앞 배치는 already_filled 로 자연스럽게 건너뛴다).
     selected.sort(key=lambda r: str(r.get("raw_signal_id") or ""))
-    if limit is not None and limit >= 0:
+    # [2026-07-30 실사고] `limit=0` 은 **전건**을 뜻한다(0 이하 = 상한 없음).
+    #   종전 `limit >= 0` 은 0 을 "0건 처리"로 받아 apply 모드에서 아무것도 안 하고
+    #   **성공으로 끝났다**(실측: 1,546 문서 대상 실행이 candidates=0·exit 0 으로 종료).
+    #   형제 워크플로 `grm-fda483-ocr-backfill.yml` 이 `0=전건` 규약이라 호출자가 그대로
+    #   0 을 넘긴 것이 원인 — 규약을 형제와 통일해 이 침묵 무동작을 원천 제거한다.
+    #   배치를 나누려면 1 이상을 준다.
+    if limit is not None and limit > 0:
         selected = selected[:limit]
     report.candidates = len(selected)
 

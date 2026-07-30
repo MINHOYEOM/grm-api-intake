@@ -29,7 +29,7 @@ on:
         type: boolean
         default: false
       limit:
-        description: '이번 실행에서 처리할 문서 수 상한(배치 분할용). 비우면 전건.'
+        description: '이번 실행에서 처리할 문서 수 상한(배치 분할용). 비우거나 0 이면 전건(형제 OCR 백필과 동일 규약).'
         type: string
         default: ''
       delay_seconds:

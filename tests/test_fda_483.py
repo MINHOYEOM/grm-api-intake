@@ -1681,8 +1681,21 @@ class InspectorExtractionTest(unittest.TestCase):
 
     def test_gate1_allows_real_internal_caps(self):
         """실존 이름의 내부 대문자는 Mc/Mac/Le/De/O'/D' 접두나 하이픈·어퍼스트로피 뒤에만."""
-        for tok in ("McDonald", "MacLeod", "LePage", "DeSilva", "O'Brien",
-                    "Wilimczyk-Macri", "Velez", "Hernandez"):
+        for tok in ("McDonald", "MacLeod", "LePage", "DeSilva", "O'Brien", "D'Angelo",
+                    "Wilimczyk-Macri", "LaBounty", "DeJesus", "DiCarlo", "VanBuren",
+                    "Velez", "Hernandez"):
+            self.assertTrue(f._inspector_token_shape_ok(tok), tok)
+
+    def test_gate1_prefix_exemption_is_per_position_not_whole_token(self):
+        """★[2026-07-30 프로덕션 감사 실측 구멍] 접두 면제를 **토큰 전체**에 주면
+        `DemitTia`(De 로 시작) 같은 OCR 오인식이 그대로 통과한다 — 실제로 프로덕션에
+        `DemitTia J. Argiropoulos` 가 적재됐다. 면제는 **대문자가 나온 그 자리**에만
+        주고(접두가 정확히 거기서 끝날 때), 대소문자를 구분해야 한다."""
+        self.assertFalse(f._inspector_token_shape_ok("DemitTia"))
+        self.assertFalse(f._inspector_token_shape_ok("LesLie"))
+        self.assertFalse(f._inspector_token_shape_ok("MacDoNald"))
+        # 접두로 시작하지만 내부 대문자가 없는 평범한 이름은 정상 통과해야 한다.
+        for tok in ("Demitria", "Denise", "Leslie", "Lauren", "Macey", "Devon", "Larry"):
             self.assertTrue(f._inspector_token_shape_ok(tok), tok)
 
     def test_gate1_rejects_bare_initial_as_given_name(self):

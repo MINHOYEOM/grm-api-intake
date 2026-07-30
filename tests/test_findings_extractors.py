@@ -70,11 +70,68 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["review_status"], "accepted")
         self.assertEqual(findings[0]["confidence"], 0.95)
         self.assertEqual(findings[0]["evidence_url"], "https://www.fda.gov/media/192439/download")
+        # fixture 에 fda483_inspectors 키 자체가 없음 -- 기존 동작(빈 리스트) 불변.
+        self.assertEqual(findings[0]["inspector_names"], [])
+        self.assertEqual(findings[1]["inspector_names"], [])
 
         again = extractors.findings_from_raw_signal(raw_signal)
         self.assertEqual(
             [f["finding_id"] for f in findings],
             [f["finding_id"] for f in again],
+        )
+
+    def test_fda_483_inspector_names_are_shared_across_all_observations(self) -> None:
+        # 실사관 명단은 483 PDF(raw_signal) 단위 사실 -- 같은 문서에서 나온 모든 finding 이
+        # 동일한 리스트를 공유해야 한다(observation 개별 필드가 아님).
+        fx = _load_input("fda_483_observations")
+        raw = dict(fx["raw"])
+        raw["fda483_inspectors"] = ["Jose F Velez", "Ivis L Negron"]
+        raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 2)
+        self.assertValidFindings(findings)
+        for finding in findings:
+            self.assertEqual(finding["inspector_names"], ["Jose F Velez", "Ivis L Negron"])
+
+    def test_fda_483_inspector_names_normalization_is_defensive(self) -> None:
+        cases = [
+            (None, []),
+            ("Jose F Velez", []),  # 문자열 자체(리스트 아님) -- 통째로 버림
+            ({"a": 1}, []),  # dict -- 리스트 아님
+            ([1, 2], []),  # 원소가 문자열이 아님
+            (["", "  "], []),  # 빈 문자열·공백만 있는 원소는 버림
+            (["  Jose  F   Velez  ", "Ivis L Negron"], ["Jose F Velez", "Ivis L Negron"]),  # 공백 정규화
+            (["A"] * 20, ["A"] * 6),  # 최대 6개로 절단
+        ]
+        for value, expected in cases:
+            with self.subTest(value=value):
+                self.assertEqual(extractors._inspector_names(value), expected)
+
+    def test_fda_483_finding_id_is_invariant_to_inspector_names(self) -> None:
+        # 회귀 핵심: inspector_names 는 finding_id 해시 입력(raw_signal_id/ordinal/
+        # finding_text)에 포함되지 않는 non-key 필드다 -- 값이 있든 없든 finding_id 는
+        # 동일해야 한다.
+        fx = _load_input("fda_483_observations")
+        raw_signal_no_inspectors = gf.raw_signal_from_row(fx["row"], dict(fx["raw"]))
+        baseline = extractors.findings_from_raw_signal(raw_signal_no_inspectors)
+
+        raw_with_inspectors = dict(fx["raw"])
+        raw_with_inspectors["fda483_inspectors"] = ["Jose F Velez", "Ivis L Negron"]
+        raw_signal_with_inspectors = gf.raw_signal_from_row(fx["row"], raw_with_inspectors)
+        with_inspectors = extractors.findings_from_raw_signal(raw_signal_with_inspectors)
+
+        self.assertEqual(len(baseline), len(with_inspectors))
+        self.assertEqual(
+            [f["finding_id"] for f in baseline],
+            [f["finding_id"] for f in with_inspectors],
+        )
+        # 값 자체는 실제로 달라졌음을 함께 증명(해시만 우연히 같은 게 아님).
+        self.assertEqual([f["inspector_names"] for f in baseline], [[], []])
+        self.assertEqual(
+            [f["inspector_names"] for f in with_inspectors],
+            [["Jose F Velez", "Ivis L Negron"], ["Jose F Velez", "Ivis L Negron"]],
         )
 
     def test_eu_gmp_ncr_becomes_accepted_finding(self) -> None:

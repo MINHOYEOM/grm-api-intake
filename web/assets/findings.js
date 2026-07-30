@@ -946,6 +946,51 @@
   // 빈 라벨·"미확인" 같은 자리표시자는 만들지 않는다(★부재 어휘 원칙과 동일 정신: 값이
   // 없으면 침묵한다, 가짜 값을 지어내지 않는다).
   var INSPECTOR_NAMES_LIMIT = 6;
+
+  // [실사관 프로파일 진입] inspector.html/inspector.js 의 미러 대상 — 코호트(문서 5건
+  // 이상 확인된 실사관)에 있는 이름만 프로파일 페이지 링크로 바꾼다. inspectorCohort=
+  // null(아직 미도착/실패) 이면 전부 평문 렌더(기능 저하만, 오류 없음 — 이름 표시 자체는
+  // 절대 사라지지 않는다). fetchInspectorCohort() 는 페이지 진입 시 **한 번만** 호출한다
+  // (카드마다 재조회 금지 — 문서 카드가 수십 장이어도 요청은 1건).
+  var inspectorCohort = null;
+
+  // ★정체성 키 정규화 — findings_inspector_index()/findings_inspector_profile() RPC(서버)
+  // 와 반드시 동일한 규칙: 소문자 → 마침표(.) 제거 → 공백 연속을 1칸으로 → 앞뒤 공백
+  // 제거. 예) "Eileen A. Liu" → "eileen a liu". 이 함수 하나만 이 정규화를 담당한다
+  // (호출부가 각자 규칙을 재구현하지 않는다) — inspector.js 에도 동일 규칙의 독립
+  // 복제본이 있다(별도 정적 자산이라 공유 불가, 계약만 복제).
+  function normalizeInspectorKey(name) {
+    return String(name || "")
+      .toLowerCase()
+      .replace(/\./g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function fetchInspectorCohort() {
+    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_inspector_index", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error("findings_inspector_index " + r.status);
+        return r.json();
+      })
+      .then(function (list) {
+        if (!Array.isArray(list)) return;
+        var cohort = Object.create(null);
+        list.forEach(function (item) {
+          var k = normalizeInspectorKey(item && item.inspector_key);
+          if (k) cohort[k] = true;
+        });
+        inspectorCohort = cohort;
+      })
+      .catch(function () {
+        // 조용히 무시 — inspectorCohort 는 null 유지, 이름은 계속 평문으로 렌더된다.
+      });
+  }
+
   function sanitizeInspectorNames(value) {
     if (!Array.isArray(value)) return [];
     var out = [];
@@ -987,12 +1032,33 @@
     meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));
     // [FDA 483 실사관 표기] 값이 있을 때만 span 을 만든다(빈 라벨 금지). 기존 .fnd-doc-count
     // 클래스를 그대로 재사용해 신규 CSS 0(§ 최소화 원칙) — 시각적으로 동일한 보조 메타
-    // 텍스트다. el() 은 textContent 로만 대입하므로 이름에 HTML 특수문자가 있어도 안전하게
+    // 텍스트다. 이름은 textContent 로만 대입하므로 HTML 특수문자가 있어도 안전하게
     // 이스케이프되고, elHL() 이 아니라 검색어 하이라이트 대상에도 포함되지 않는다(사람 이름은
     // 검색 매칭 대상이 아니다).
+    // [실사관 프로파일 진입] 정규화한 이름이 inspectorCohort 에 있으면(코호트=문서 5건
+    // 이상 확인된 실사관, findings_inspector_index 캐시) 프로파일 페이지(inspector/
+    // index.html?key=)로 가는 링크로, 없거나 인덱스가 아직 없으면(null) 기존처럼 평문으로
+    // 렌더한다 — 인덱스 미도착/실패는 곧 "전부 평문"이라 이름 표시 자체가 사라지지 않는다.
+    // rel="nofollow" — 실명 개인 집계 페이지라 이 링크로 크롤러 탐색 신호를 보내지 않는다
+    // (inspector.html 자체엔 noindex 를 별도 배선).
     var inspectors = sanitizeInspectorNames(head.inspector_names);
     if (inspectors.length) {
-      meta.appendChild(el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · ")));
+      var inspectorSpan = el("span", "fnd-doc-count");
+      inspectorSpan.appendChild(document.createTextNode("실사관: "));
+      inspectors.forEach(function (name, idx) {
+        if (idx > 0) inspectorSpan.appendChild(document.createTextNode(" · "));
+        var ik = normalizeInspectorKey(name);
+        if (inspectorCohort && inspectorCohort[ik]) {
+          var iLink = document.createElement("a");
+          iLink.href = "inspector/index.html?key=" + encodeURIComponent(ik);
+          iLink.rel = "nofollow";
+          iLink.textContent = name;
+          inspectorSpan.appendChild(iLink);
+        } else {
+          inspectorSpan.appendChild(document.createTextNode(name));
+        }
+      });
+      meta.appendChild(inspectorSpan);
     }
     docHead.appendChild(meta);
     return docHead;
@@ -2044,6 +2110,9 @@
 
   showState("loading");
   fetchCoverageNote();
+  // [실사관 프로파일 진입] 세션당 1회만 코호트를 받아 캐시(카드마다 재조회 금지) — 다른
+  // 초기화 fetch 와 완전히 독립적이라 실패해도 검색 본기능·문서 카드 렌더에 영향 없다.
+  fetchInspectorCohort();
   // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 문서 조회를 시작한다 —
   // 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정 렌더한다(깜빡임
   // 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래 로직 전체가 기존

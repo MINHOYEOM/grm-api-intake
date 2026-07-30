@@ -82,6 +82,7 @@ SINGLE_GOLDENS = [
     ("findings/index.html", "findings.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
     ("findings/firm/index.html", "firm.expected.html"),
+    ("findings/inspector/index.html", "inspector.expected.html"),
     ("library/index.html", "library.expected.html"),
     ("library/ich/index.html", "library_ich.expected.html"),
     ("library/mfds/index.html", "library_mfds.expected.html"),
@@ -749,26 +750,6 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_canonical_and_description(self):
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
-
-    # ── FIND-1 M6d: 국문 우선표시 + 카테고리 라벨 병기 ──────────────────────────
-    def test_category_labels_sync_with_taxonomy(self):
-        """findings.js 의 CATEGORY_LABELS 는 grm_findings.FINDING_TAXONOMY 20개
-        code/label_ko/label_en 과 완전히 일치해야 한다(하드코딩 사본 드리프트 방지)."""
-        import re as _re
-
-        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
-        self.assertIsNotNone(m, "findings.js 에 CATEGORY_LABELS 정의 미발견")
-        body = m.group(1)
-
-        entry_pat = _re.compile(
-            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
-        )
-        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
-
-        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
-        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
-        self.assertEqual(found, expected, "findings.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
 
     def test_category_dropdown_never_exposes_raw_code(self):
         """카테고리 <select> 옵션 텍스트는 항상 '{ko} · {en}' — snake_case 코드가 옵션
@@ -2567,8 +2548,13 @@ class WebFindingsInspectorNamesTest(unittest.TestCase):
     published_date 와 완전히 동일하게 대표값만 사용)를 "실사관: A · B" 한 줄로 표기한다.
     036 마이그레이션이 아직 라이브에 없을 수 있어 완전히 방어적이어야 한다 — 필드
     부재/null/빈 배열/비배열/원소 오염은 전부 "표시할 이름 없음"으로 조용히 수렴하고
-    (빈 라벨·"미확인" 같은 자리표시자 금지), 6개를 넘으면 6개로 자른다. 집계·프로필
-    페이지·클릭 필터는 의도적으로 만들지 않는다(범위 제한 — 데이터가 아직 얇다)."""
+    (빈 라벨·"미확인" 같은 자리표시자 금지), 6개를 넘으면 6개로 자른다.
+
+    [실사관 프로파일 진입] 이름별로 findings_inspector_index 코호트(문서 5건 이상)에
+    있으면 inspector/index.html?key= 링크, 없으면 평문으로 갈린다(WebInspectorRenderTest
+    가 그 배선을 별도로 가드한다) — 그러나 findings.js **자체는** 여전히 실사관 이름을
+    집계하거나 이 페이지 안에서 클릭 필터로 쓰지 않는다(범위 제한 불변 — 아래
+    test_inspector_names_never_used_for_aggregation_or_click_filter)."""
 
     @classmethod
     def setUpClass(cls):
@@ -2597,10 +2583,13 @@ class WebFindingsInspectorNamesTest(unittest.TestCase):
         # 생기지 않는다(빈 라벨 금지 계약의 핵심 분기).
         self.assertIn("if (inspectors.length) {", fn)
         gate = fn[fn.index("if (inspectors.length) {"):]
-        self.assertIn(
-            'meta.appendChild(el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · ")));',
-            gate,
-        )
+        # [실사관 프로파일 진입] 각 이름을 코호트 여부에 따라 링크/평문으로 갈라 조립한다
+        # (findings_inspector_index 캐시, WebInspectorRenderTest 가 그 배선을 가드) —
+        # 이름은 join() 문자열 결합이 아니라 forEach 로 하나씩 appendChild 된다.
+        self.assertIn('var inspectorSpan = el("span", "fnd-doc-count");', gate)
+        self.assertIn('inspectorSpan.appendChild(document.createTextNode("실사관: "));', gate)
+        self.assertIn("inspectors.forEach(function (name, idx) {", gate)
+        self.assertIn("meta.appendChild(inspectorSpan);", gate)
 
     def test_doc_head_inspector_line_uses_textcontent_helper_not_html(self):
         """el() 헬퍼(textContent 대입)만 쓰고, 하이라이트 헬퍼 elHL() 은 쓰지 않는다 —
@@ -2619,9 +2608,10 @@ class WebFindingsInspectorNamesTest(unittest.TestCase):
 
     def test_doc_head_reuses_existing_meta_class_no_new_css_needed(self):
         """CSS 최소화 — 신규 클래스를 만들지 않고 기존 .fnd-doc-count(findings.html 인라인
-        <style>, 이미 muted 소형 텍스트로 정의됨)를 재사용한다."""
+        <style>, 이미 muted 소형 텍스트로 정의됨)를 재사용한다(실사관 프로파일 링크
+        도입 이후에도 불변 — 링크 유무와 무관하게 컨테이너 span 클래스는 그대로)."""
         fn = self._fn("function buildDocHead(rows)")
-        self.assertIn('el("span", "fnd-doc-count", "실사관: " + inspectors.join(" · "))', fn)
+        self.assertIn('var inspectorSpan = el("span", "fnd-doc-count");', fn)
         # 지적 건수 span 과 동일 클래스를 공유한다(신규 클래스 미도입 확인).
         self.assertEqual(fn.count('"fnd-doc-count"'), 2)
 
@@ -2714,26 +2704,6 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn(
             f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/trends/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
-
-    def test_category_labels_sync_with_taxonomy(self):
-        """trends.js 의 CATEGORY_LABELS 는 findings.js 와 동일한 복제본 하드코딩이라
-        grm_findings.FINDING_TAXONOMY 20개 code/label_ko/label_en 과 완전히 일치해야
-        한다(findings.js 의 동명 테스트와 동일한 대조 — 이중 하드코딩 드리프트 방지)."""
-        import re as _re
-
-        js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
-        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
-        self.assertIsNotNone(m, "trends.js 에 CATEGORY_LABELS 정의 미발견")
-        body = m.group(1)
-
-        entry_pat = _re.compile(
-            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
-        )
-        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
-
-        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
-        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
-        self.assertEqual(found, expected, "trends.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
 
     def test_rpc_endpoints_present(self):
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
@@ -3191,6 +3161,55 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('if (name) params.set("firm", name); else params.delete("firm");', js_src)
 
 
+# ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────
+class WebCategoryLabelsSyncTest(unittest.TestCase):
+    """findings.js/trends.js/firm.js/inspector.js 는 각자 CATEGORY_LABELS 를 독립
+    하드코딩 사본으로 복제한다(이 저장소의 확립된 방식 — 공유 파일로 빼지 않는다). 예전엔
+    파일마다 이름을 하드코딩한 개별 동기화 테스트가 있었는데(findings.js/trends.js/firm.js
+    각각 test_category_labels_sync_with_taxonomy), 그 방식은 새 복제 파일이 추가될 때마다
+    사람이 새 테스트를 빠짐없이 적어야 한다 — 이 저장소는 정확히 이 실패를 이미 두 번
+    겪었다(수동 허용목록이 낡아 웹 테스트 67건이 침묵 미실행 PR#351, 루트 모듈 36/58 이
+    게이트를 우회 PR#366). 두 번 다 **전수 자동 열거 + 0건 가드**로 근원 수리했다 — 여기도
+    같은 원칙: web/assets/*.js 를 글롭으로 훑어 'var CATEGORY_LABELS = {' 를 선언한 파일을
+    전부 자동 발견해 각각 grm_findings.FINDING_TAXONOMY 와 대조한다(개별 메서드 0개)."""
+
+    _ENTRY_PAT = re.compile(
+        r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
+    )
+
+    def test_all_category_labels_copies_match_taxonomy(self):
+        js_files = sorted(
+            p for p in (WEB_DIR / "assets").glob("*.js")
+            if "var CATEGORY_LABELS = {" in p.read_text(encoding="utf-8")
+        )
+        # 글롭이 조용히 아무것도 못 찾는 회귀 방지 — 0건이면 선언 형식/경로 자체가 깨진 것.
+        self.assertGreater(
+            len(js_files), 0,
+            "CATEGORY_LABELS 를 선언한 web/assets/*.js 파일을 하나도 찾지 못함(글롭·형식 확인)",
+        )
+        # 현재 알려진 복제 파일 4개(findings/trends/firm/inspector) 미만이면 발견 로직
+        # 자체가 무언가를 놓친 것으로 간주한다(신규 파일 추가 시 이 하한을 올린다).
+        self.assertGreaterEqual(
+            len(js_files), 4,
+            f"CATEGORY_LABELS 복제본이 4개 미만 발견됨({[p.name for p in js_files]}) — "
+            "findings.js/trends.js/firm.js/inspector.js 는 최소 존재해야 한다",
+        )
+
+        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
+        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
+
+        for path in js_files:
+            with self.subTest(file=path.name):
+                js_src = path.read_text(encoding="utf-8")
+                m = re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, re.S)
+                self.assertIsNotNone(
+                    m, f"{path.name} 에 CATEGORY_LABELS 정의 미발견(중괄호 형식 확인)")
+                found = {code: (ko, en) for code, ko, en in self._ENTRY_PAT.findall(m.group(1))}
+                self.assertEqual(
+                    found, expected,
+                    f"{path.name} CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
+
+
 # ── 업체 프로파일 (FIND-FIRM-ALIAS 웹 절반 — 셸 렌더·env-gate·sitemap·nav 배선·
 #    013 미적용 방어 폴백) ──────────────────────────────────────────────────
 class WebFirmRenderTest(unittest.TestCase):
@@ -3259,26 +3278,6 @@ class WebFirmRenderTest(unittest.TestCase):
             f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/firm/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
 
-    def test_category_labels_sync_with_taxonomy(self):
-        """firm.js 의 CATEGORY_LABELS 는 findings.js/trends.js 와 동일한 복제본
-        하드코딩이라 grm_findings.FINDING_TAXONOMY 20개 code/label_ko/label_en 과
-        완전히 일치해야 한다(이중 하드코딩 드리프트 방지)."""
-        import re as _re
-
-        js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
-        m = _re.search(r"var CATEGORY_LABELS = \{(.*?)\n  \};", js_src, _re.S)
-        self.assertIsNotNone(m, "firm.js 에 CATEGORY_LABELS 정의 미발견")
-        body = m.group(1)
-
-        entry_pat = _re.compile(
-            r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
-        )
-        found = {code: (ko, en) for code, ko, en in entry_pat.findall(body)}
-
-        expected = {c.code: (c.label_ko, c.label_en) for c in grm_findings.FINDING_TAXONOMY}
-        self.assertEqual(len(expected), 20, "FINDING_TAXONOMY 카테고리 수가 20이 아님(전제 재확인 필요)")
-        self.assertEqual(found, expected, "firm.js CATEGORY_LABELS != grm_findings.FINDING_TAXONOMY")
-
     def test_rpc_endpoint_and_safe_contract_present(self):
         js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
         self.assertIn('rpcEndpoint("findings_firm_profile")', js_src)
@@ -3323,6 +3322,233 @@ class WebFirmRenderTest(unittest.TestCase):
         self.assertIn('.replace(/&amp;/g, "&")', fn)
         self.assertIn('.replace(/&#039;/g, "\'")', fn)
         self.assertIn('nameEl.textContent = decodeFirmDisplay(data.display_name || "");', js_src)
+
+
+# ── 실사관 프로파일 (FDA 483 서명 실사관 집계 — firm.html/firm.js 의 미러링) ────────
+class WebInspectorRenderTest(unittest.TestCase):
+    """findings/inspector/index.html 은 findings/firm/index.html 과 동형인 정적 셸이다
+    (런타임에 inspector.js 가 findings_inspector_profile(p_inspector_key) RPC 를 URL
+    파라미터(?key=)로 직접 fetch). firm 과의 핵심 차이 두 가지를 여기서 고정한다:
+      (1) 실명이 적시된 개인 집계라 sitemap 미등록 + noindex 오버라이드(firm 은 베이스
+          경로만 sitemap 에 등록하고 색인은 허용 — inspector 는 그마저도 막는다),
+      (2) 코호트 미달/미존재/키 오류/fetch 실패를 **구분하지 않고** 하나의 안내로 수렴
+          (firm 은 "준비 중" vs "찾을 수 없음" 2상태로 구분하지만, 여기선 정보 누출 방지를
+          위해 구분하지 않는다)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_inspector_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "inspector" / "index.html").read_text(encoding="utf-8")
+        cls.firm_html = (cls.single / "findings" / "firm" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.archive = (cls.single / "archive" / "index.html").read_text(encoding="utf-8")
+        cls.findings_html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
+        cls.findings_js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_page_generated(self):
+        self.assertIn("실사관 프로파일", self.html)
+        self.assertIn("Inspector Profile", self.html)
+        self.assertIn("AI Disclosure", self.html)
+
+    def test_cfg_div_env_gated_empty_by_default_with_root(self):
+        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
+        # (firm.js/findings.js 계약과 동일). data-root 는 rel_root 값("../../")을 그대로
+        # 담는다 — findings/inspector/index.html 은 findings/firm/index.html 과 같은 깊이.
+        self.assertIn(
+            'id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden',
+            self.html,
+        )
+
+    def test_inspector_js_referenced_with_content_hash(self):
+        m = re.search(r'assets/inspector\.js\?v=([0-9a-f]{8})"', self.html)
+        self.assertIsNotNone(m, "inspector.js 캐시버스팅 해시 미발견")
+
+    def test_inspector_js_copied_verbatim(self):
+        built = (self.single / "assets" / "inspector.js").read_bytes()
+        src = (WEB_DIR / "assets" / "inspector.js").read_bytes()
+        self.assertEqual(built, src, "inspector.js 가 dist 에 verbatim 복사되지 않음")
+
+    def test_sitemap_excludes_inspector(self):
+        # ★firm 과 다르다 — 베이스 경로조차 sitemap 에 넣지 않는다(실명 개인 집계이므로
+        # 검색엔진 노출 표면을 아예 만들지 않는다).
+        self.assertNotIn("findings/inspector", self.sitemap)
+
+    def test_noindex_meta_present_on_inspector_only(self):
+        self.assertIn('<meta name="robots" content="noindex, nofollow" />', self.html)
+        # 회귀 가드 — 다른 페이지에는 noindex 가 새로 생기지 않아야 한다(base.html 의
+        # meta_robots 훅은 기본이 빈 블록이라 오버라이드하지 않는 페이지는 무영향이어야 함).
+        for name, page in (
+            ("landing", self.landing),
+            ("archive", self.archive),
+            ("findings", self.findings_html),
+            ("firm", self.firm_html),
+        ):
+            self.assertNotIn("noindex", page, f"{name} 페이지에 noindex 오염 발견(회귀)")
+
+    def test_nav_not_added_entry_only_via_link(self):
+        nav_m = re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
+        self.assertNotIn("findings/inspector", nav_m.group(1))
+
+    def test_canonical_and_description(self):
+        # sitemap 미등록과 별개로 canonical 은 유지한다(중복 URL 정리 목적).
+        self.assertIn(
+            f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/inspector/" />', self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_rpc_endpoint_and_safe_contract_present(self):
+        self.assertIn('rpcEndpoint("findings_inspector_profile")', self.js_src)
+        self.assertIn('method: "POST"', self.js_src)
+        self.assertIn('apikey: key, Authorization: "Bearer " + key', self.js_src)
+        self.assertIn('JSON.stringify({ p_inspector_key: inspectorKey })', self.js_src)
+        # 원문(finding_text/finding_text_ko)은 RPC 가 아니라 별개 anon REST 로만 가져온다.
+        self.assertIn('"/rest/v1/findings?select="', self.js_src)
+        self.assertIn("raw_signal_id=eq.", self.js_src)
+
+    def test_five_failure_modes_unify_into_single_state(self):
+        """firm.js 는 013 미적용(RPC 404/network 실패)과 key 없음/빈 프로파일을 서로 다른
+        상태(준비 중 vs 찾을 수 없음)로 구분하지만, inspector.js 는 코호트 미달·미존재·키
+        오류·key 파라미터 없음·fetch 실패를 **구분하지 않고** 전부 "unavailable" 하나로
+        수렴시킨다(정보 누출 방지) — showState 가 loading/unavailable/content 세 가지뿐."""
+        self.assertIn('showState("unavailable")', self.js_src)
+        self.assertNotIn('showState("notfound")', self.js_src)
+        self.assertNotIn('showState("error")', self.js_src)
+        # 최소 3개 호출 지점(no url/key/keyParam, null 프로파일, catch)이 전부 같은 상태로.
+        self.assertGreaterEqual(self.js_src.count('showState("unavailable")'), 3)
+
+    def test_mandatory_notice_text_present_verbatim(self):
+        self.assertIn(
+            "이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 "
+            "집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 "
+            "확인된 경우에만 제공됩니다.",
+            self.html,
+        )
+
+    def test_name_rendered_via_textcontent_only(self):
+        self.assertIn('nameEl.textContent = data.display_name || "";', self.js_src)
+
+    def test_no_innerhtml_data_injection(self):
+        for m in re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', self.js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_no_new_external_resources(self):
+        self.assertNotIn("cdn.", self.js_src)
+        self.assertNotIn("<canvas", self.html)
+
+    def test_firm_link_uses_sibling_relative_path(self):
+        # findings/inspector/index.html 은 findings/firm/index.html 과 같은 findings/
+        # 하위 형제 디렉터리라 rel_root 계산 없이 "../firm/index.html" 상대경로 하나로
+        # 충분하다(trends.js buildFirmProfileLink 와 동일 관례 — firm.js 자신은 이미 그
+        # 업체 페이지라 문서별 업체 링크가 없어서, 대신 형제 페이지인 trends.js 의 관례를
+        # 그대로 따른다).
+        self.assertIn(
+            'firmLink.href = "../firm/index.html?key=" + encodeURIComponent(doc.firm_key);',
+            self.js_src,
+        )
+
+    def test_scope_guard_no_directory_ranking_or_comparison_symbols(self):
+        """의도적 범위 제한(회귀 금지) — 실사관 목록/디렉터리 페이지, 실사관 간 순위·비교
+        기능은 만들지 않는다."""
+        forbidden = (
+            "renderInspectorList", "rankInspectors", "compareInspectors",
+            "listInspectors", "inspectorRanking", "inspectorDirectory",
+        )
+        for sym in forbidden:
+            self.assertNotIn(sym, self.js_src, f"범위 밖 심볼 발견(inspector.js): {sym}")
+            self.assertNotIn(sym, self.findings_js_src, f"범위 밖 심볼 발견(findings.js): {sym}")
+        # "엄격하다/까다롭다" 류 성향 해석 문구는 **화면에 보이는 텍스트**(렌더된 HTML)에만
+        # 금지한다 — 소스 주석이 "이런 문구를 만들지 않는다"고 설명하는 것 자체는 회귀가
+        # 아니다(js_src 를 검사하면 이 주석 자체가 오탐을 낸다).
+        for phrase in ("엄격", "까다롭"):
+            self.assertNotIn(phrase, self.html)
+
+    def test_normalize_inspector_key_structural_contract(self):
+        """정규화 헬퍼는 findings.js/inspector.js 양쪽에 독립 복제본으로 존재하고, 서버
+        규칙(소문자→마침표 제거→공백 연속 1칸→trim) 4종을 모두 구현해야 한다."""
+        for label, src in (("inspector.js", self.js_src), ("findings.js", self.findings_js_src)):
+            with self.subTest(file=label):
+                self.assertIn("function normalizeInspectorKey(name)", src)
+                fn = src[src.index("function normalizeInspectorKey(name)"):]
+                fn = fn[:fn.index("\n  }\n") + 4]
+                self.assertIn(".toLowerCase()", fn)
+                self.assertIn('.replace(/\\./g, "")', fn)
+                self.assertIn('.replace(/\\s+/g, " ")', fn)
+                self.assertIn(".trim()", fn)
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 정규화 동작 고정은 CI에서 수행")
+    def test_normalize_inspector_key_behavior_via_node(self):
+        """서버 규칙(소문자→마침표 제거→공백 연속 1칸→trim, 예: "Eileen A. Liu" →
+        "eileen a liu")을 두 파일의 실제 함수로 각각 실행해 고정하고, 두 복제본의 산출이
+        서로 동일한지(파리티)도 함께 확인한다."""
+        import subprocess
+
+        cases = [
+            "Eileen A. Liu",
+            "  ANASTASIA   M.  Shields  ",
+            "john.q.public",
+            "",
+            None,
+        ]
+
+        def run_for(js_path: pathlib.Path) -> list:
+            src = js_path.read_text(encoding="utf-8")
+            fn_src = src[src.index("function normalizeInspectorKey(name)"):]
+            fn_src = fn_src[:fn_src.index("\n  }\n") + 4]
+            driver = fn_src + "\nconsole.log(JSON.stringify(" + json.dumps(cases) + \
+                ".map(normalizeInspectorKey)));"
+            tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_normkey_"))
+            try:
+                drv = tmp / "driver.js"
+                drv.write_text(driver, encoding="utf-8")
+                proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+            self.assertEqual(proc.returncode, 0, f"node 실행 실패({js_path.name}): {proc.stderr}")
+            return json.loads(proc.stdout)
+
+        expected = [
+            "eileen a liu",
+            "anastasia m shields",
+            "johnqpublic",
+            "",
+            "",
+        ]
+        inspector_out = run_for(WEB_DIR / "assets" / "inspector.js")
+        findings_out = run_for(WEB_DIR / "assets" / "findings.js")
+        self.assertEqual(inspector_out, expected)
+        self.assertEqual(findings_out, expected, "findings.js normalizeInspectorKey 가 서버 규칙과 어긋남")
+        self.assertEqual(inspector_out, findings_out, "두 복제본의 정규화 결과가 서로 다름(파리티 위반)")
+
+    def test_findings_js_inspector_cohort_fetched_once_and_cached(self):
+        """findings_inspector_index() 는 세션당 1회만 호출·캐시한다(카드마다 재조회 금지)."""
+        self.assertIn("var inspectorCohort = null;", self.findings_js_src)
+        self.assertIn("function fetchInspectorCohort()", self.findings_js_src)
+        self.assertIn('"/rest/v1/rpc/findings_inspector_index"', self.findings_js_src)
+        # 호출 지점은 정확히 1곳(정의부의 "function fetchInspectorCohort()" 를 제외한
+        # 호출 "fetchInspectorCohort();" 문자열이 1회만 등장).
+        self.assertEqual(self.findings_js_src.count("fetchInspectorCohort();"), 1)
+
+    def test_findings_js_inspector_name_link_gated_by_cohort_else_plaintext(self):
+        """코호트에 있으면 링크, 없으면(또는 인덱스 미도착=null) 평문 — 두 분기 모두
+        존재해야 하고, 이름은 textContent 로만 들어가며, 링크에는 nofollow 를 단다."""
+        fn = self.findings_js_src[self.findings_js_src.index("function buildDocHead(rows)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (inspectorCohort && inspectorCohort[ik]) {", fn)
+        self.assertIn('iLink.href = "inspector/index.html?key=" + encodeURIComponent(ik);', fn)
+        self.assertIn('iLink.rel = "nofollow";', fn)
+        self.assertIn("iLink.textContent = name;", fn)
+        self.assertIn("inspectorSpan.appendChild(document.createTextNode(name));", fn)
+        # innerHTML 삽입 경로 없음(textContent/createTextNode 전용).
+        self.assertNotIn("innerHTML", fn)
 
 
 class WebFirmWatchlistTest(unittest.TestCase):

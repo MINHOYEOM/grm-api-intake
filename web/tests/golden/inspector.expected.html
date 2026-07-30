@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
+<meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
+<title>실사관 프로파일 · GRM</title>
+<meta name="description" content="공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="canonical" href="https://grm-solutions.com/findings/inspector/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Global Regulatory Monitor" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="실사관 프로파일 · GRM" />
+<meta property="og:description" content="공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일." />
+<meta property="og:url" content="https://grm-solutions.com/findings/inspector/" />
+<meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://grm-solutions.com/assets/og-image.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/fonts/tabler-icons.woff2?v3.7.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/grm.css?v=8a611777">
+<link rel="stylesheet" href="/assets/pet.css?v=6796f10e">
+</head>
+<body>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html" class="on">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
+  <span class="sp"></span>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
+</div></header>
+
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Inspector Profile</span>
+    <h1 class="reveal" style="animation-delay:.08s">실사관 프로파일</h1>
+    <p class="reveal" style="animation-delay:.14s">공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 문서 단위로 모아 보여줍니다.</p>
+  </div>
+  <div class="wrap">
+    <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden></div>
+
+    <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
+    <div class="ip-state" id="ip-unavailable" hidden>
+      <p>해당 실사관의 프로파일을 제공하지 않습니다.</p>
+      <a class="ip-back-link" href="../../findings/index.html">찾아보기로 돌아가기 →</a>
+    </div>
+
+    <div id="ip-content" hidden>
+      <div class="ip-head">
+        <h2 class="ip-name" id="ip-name"></h2>
+        <p class="ip-sub">FDA 483 서명 실사관</p>
+      </div>
+
+      <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section>
+
+      <section class="ip-block" aria-label="지적 카테고리 분포">
+        <h2 class="ip-h">지적 카테고리 분포</h2>
+        <div id="ip-cat" class="ip-cat"></div>
+      </section>
+
+      <section class="ip-block" aria-label="연도별 추이">
+        <h2 class="ip-h">연도별 추이</h2>
+        <div id="ip-year" class="ip-year"></div>
+      </section>
+
+      <section class="ip-block" aria-label="실사 문서 목록">
+        <h2 class="ip-h">실사 문서 목록</h2>
+        <div id="ip-docs" class="ip-docs"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<style>
+/* 한국어 어절 줄바꿈(§1 P0, firm/trends 페이지와 동일 스코프). */
+main{word-break:keep-all;overflow-wrap:anywhere}
+.page-head p{max-width:none;text-wrap:balance}
+
+.ip-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.ip-back-link{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.ip-back-link:hover{color:var(--coral)}
+
+.ip-head{margin:0 0 22px}
+.ip-name{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0}
+.ip-sub{font-size:13px;color:var(--muted);margin:6px 0 0}
+
+.ip-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 34px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.ip-stat{display:flex;flex-direction:column;gap:4px}
+.ip-stat-num{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.1;font-variant-numeric:lining-nums}
+.ip-stat-lbl{font-size:12px;color:var(--muted)}
+
+.ip-block{margin:0 0 42px}
+.ip-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 16px}
+.ip-empty{font-size:12.5px;color:var(--muted);margin:0}
+
+/* 카테고리 구성 — firm.html fp-cat 관례 재사용(coral 단색 막대). */
+.ip-cat{display:flex;flex-direction:column;gap:2px}
+.ip-cat-row{display:flex;align-items:center;gap:14px;padding:9px 6px;border-radius:8px;text-decoration:none}
+.ip-cat-row:hover,.ip-cat-row:focus-visible{background:var(--strong);outline:none}
+.ip-cat-row:hover .ip-cat-label,.ip-cat-row:focus-visible .ip-cat-label{color:var(--coral-2)}
+.ip-cat-label{flex:0 0 200px;max-width:200px;font-size:14px;color:var(--body-s);line-height:1.35}
+.ip-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.ip-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.ip-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+/* 연도 추이 — firm.html fp-year 관례 재사용(세로 미니 바). */
+.ip-year-bars{display:flex;align-items:flex-end;gap:8px}
+.ip-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ip-year-barwrap{height:110px;width:100%;max-width:36px;display:flex;align-items:flex-end;border-radius:6px 6px 0 0;background:var(--coral-tint);overflow:hidden}
+.ip-year-bar{width:100%;background:var(--coral)}
+.ip-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.ip-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s)}
+
+/* 문서 이력 — 최신순 리스트, public_obs_cnt>0 인 문서만 클릭 시 인라인 확장(firm.html 동형). */
+.ip-docs{display:flex;flex-direction:column;gap:0}
+.ip-doc-row{border-bottom:1px solid var(--line)}
+.ip-doc-row-main{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 6px;border-radius:8px}
+.ip-doc-row:not(.disabled) .ip-doc-row-main{cursor:pointer}
+.ip-doc-row:not(.disabled) .ip-doc-row-main:hover,
+.ip-doc-row:not(.disabled) .ip-doc-row-main:focus-visible{background:var(--strong);outline:none}
+.ip-doc-date{font-family:var(--mono);font-size:12.5px;color:var(--muted);flex:0 0 92px}
+.ip-doc-firm{font-size:13.5px;font-weight:500;color:var(--ink)}
+a.ip-doc-firm{color:var(--coral-2);text-decoration:none}
+a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
+.ip-doc-count{flex:1 1 auto;font-size:13px;color:var(--body-s)}
+.ip-doc-pending{font-size:12px;color:var(--muted-2)}
+.ip-doc-chev{flex:0 0 auto;color:var(--muted);font-size:13px;transition:transform .15s}
+.ip-doc-row.open .ip-doc-chev{transform:rotate(90deg)}
+.ip-doc-detail{padding:4px 6px 20px;display:flex;flex-direction:column;gap:14px}
+.ip-doc-detail[hidden]{display:none}
+.ip-doc-detail-loading,.ip-doc-detail-empty{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+
+/* 문서 인라인 확장 — 단순화한 국문+원문 details 카드(firm.html fp-obs 관례 동형). */
+.ip-obs{border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;background:var(--canvas)}
+.ip-obs-cat{font-size:11.5px;color:var(--muted);margin:0 0 6px}
+.ip-obs-text{font-size:13.5px;line-height:1.6;color:var(--body);margin:0;white-space:pre-wrap}
+.ip-obs-orig{margin-top:8px}
+.ip-obs-orig summary{cursor:pointer;font-size:12px;font-weight:500;color:var(--coral-2)}
+.ip-obs-orig p{font-family:var(--serif);font-size:13px;line-height:1.6;color:var(--muted);margin:6px 0 0;white-space:pre-wrap}
+.ip-obs-refs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ip-obs-ref{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:6px;padding:3px 8px}
+
+.ip-b{display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+
+@media(max-width:640px){
+  .ip-cat-label{flex-basis:120px;max-width:120px}
+  .ip-stats{gap:26px}
+  .ip-stat-num{font-size:22px}
+  .ip-doc-date{flex-basis:76px}
+}
+</style>
+<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+  <span class="kick">AI Disclosure</span>
+  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <div class="disc-body">
+    <div class="disc-sec"><p>이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.</p></div>
+    <div class="disc-sec"><p>실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+  </div>
+</div></section>
+<footer class="site"><div class="wrap">
+  <div class="foot">
+    <div class="b1"><b>Global Regulatory Monitor</b>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
+    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
+    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
+  </div>
+  <div class="foot-legal">
+    <div class="foot-copy">
+      <span>© 2026 Global Regulatory Monitor</span>
+      <span class="prov">AI-generated from primary sources · verify against the original</span>
+    </div>
+    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+  </div>
+</div></footer>
+
+<script>
+// 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
+const _nav=document.getElementById('nav');
+addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
+</script>
+<div class="grm-pet" id="grm-pet" data-page="findings">
+  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">
+    <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
+    <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
+    <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
+    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>이동</span>
+  </button>
+  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>쉬는 중</b></span>
+  <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
+  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
+    <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
+    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
+    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
+    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
+    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="../../quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
+    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
+  </section>
+</div>
+<script src="/assets/pet.js?v=e2a1d586" defer></script>
+<script src="../../assets/inspector.js?v=c9b37705" defer></script>
+<style>
+.grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
+body.grm-has-share .grm-card-actions{display:flex}
+.grm-ca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.grm-ca:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-ca .ti{font-size:15px}
+.grm-ca.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-card-actions');
+  if(!rows.length) return;
+  document.body.classList.add('grm-has-share');
+  var isMobileOS=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  function done(btn){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent='복사됨'; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  for(var i=0;i<rows.length;i++){ (function(row){
+    var btn=row.querySelector('[data-share]'); if(!btn) return;
+    btn.addEventListener('click', function(){
+      var anchor=row.getAttribute('data-anchor')||'';
+      var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
+      var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
+      var title=tEl?tEl.textContent.trim():document.title;
+      if(isMobileOS&&navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
+      else { fallback(url); }
+    });
+  })(rows[i]); }
+})();
+</script>
+</body>
+</html>

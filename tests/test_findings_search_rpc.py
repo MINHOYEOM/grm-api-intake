@@ -49,6 +49,9 @@ _PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
 _ENTITY_REPAIR_PATH = _MIGRATIONS_DIR / "029_findings_html_entity_repair.sql"
 _HARDENING_PATH = _MIGRATIONS_DIR / "030_findings_search_hardening.sql"
 _REACTIONS_TOP_PATH = _MIGRATIONS_DIR / "031_reactions_weekly_top.sql"
+# 036 = findings_search·findings_document 를 **둘 다** 다시 supersede 하는 현행 정본
+# (FIND-483-SIGNER 실사관 투영). 클라이언트 필드 전수 대조의 대상은 이 파일이다.
+_INSPECTOR_PATH = _MIGRATIONS_DIR / "036_findings_rpc_inspector_names.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -61,6 +64,13 @@ _RESTORED_BY_028 = ("firm_key", "translation_method", "confidence")
 #   invoker+RLS 가 서버에서 강제하므로 클라이언트로 내보낼 이유가 없다.
 #   ★이 집합에 필드를 추가하려면 "클라이언트가 읽지 않음"을 grep 으로 확인하고 근거를 적어라.
 _FIELDS_NOT_PROJECTED = {"finding_language"}
+
+# ⑬-c 028/030 **이후에** 도입된 필드 — 그 시점 파일들은 당연히 갖고 있지 않다(적용된 역사라
+#   소급 수정 대상이 아니다). 028/030 대상 검사에서만 제외하고, **현행 정본 036 검사에서는
+#   제외하지 않는다**(아래 InspectorProjectionCoversClientFieldsTest 가 전수 대조한다).
+#   ★이 집합에 필드를 추가할 땐 반드시 그 필드를 투영하는 **새 마이그레이션**을 함께 만들고,
+#     036 대상 검사가 그것을 잡는지 확인하라 — 여기에만 넣으면 가드에 구멍이 난다.
+_FIELDS_ADDED_AFTER_030 = {"inspector_names"}
 
 _FN_SEARCH_SIG = "create or replace function public.findings_search(\n"
 _FN_DOCUMENT_SIG = "create or replace function public.findings_document(p_finding_id text)\n"
@@ -719,7 +729,8 @@ class ProjectionCoversClientFieldsTest(unittest.TestCase):
         self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
         # findings_document 쪽 findings[] 투영 = 함수 정의 전체(rows_out jsonb_agg 포함).
         self.document_fn = _slice_function(code, _FN_DOCUMENT_SIG)
-        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+        self.expected = [f for f in _parse_client_fields()
+                         if f not in _FIELDS_NOT_PROJECTED and f not in _FIELDS_ADDED_AFTER_030]
 
     def test_findings_search_projects_every_client_field(self) -> None:
         for col in self.expected:
@@ -1129,7 +1140,8 @@ class HardeningProjectionCoversClientFieldsTest(unittest.TestCase):
     def setUp(self) -> None:
         code = _strip_sql_comments(_HARDENING_PATH.read_text(encoding="utf-8"))
         self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
-        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+        self.expected = [f for f in _parse_client_fields()
+                         if f not in _FIELDS_NOT_PROJECTED and f not in _FIELDS_ADDED_AFTER_030]
 
     def test_findings_search_projects_every_client_field(self) -> None:
         for col in self.expected:
@@ -1144,6 +1156,82 @@ class HardeningProjectionCoversClientFieldsTest(unittest.TestCase):
     def test_restored_by_028_still_present_in_030(self) -> None:
         for col in _RESTORED_BY_028:
             self.assertIn(f"'{col}',", self.search_rows, msg=f"030: {col}")
+
+
+# ============================================================================
+# 036_findings_rpc_inspector_names.sql -- findings_search·findings_document 를
+# **둘 다** supersede 하는 현행 정본(FIND-483-SIGNER 실사관 투영).
+# ============================================================================
+
+class InspectorMigrationFileTest(unittest.TestCase):
+    def test_file_exists_and_redeclares_both_functions(self) -> None:
+        self.assertTrue(_INSPECTOR_PATH.is_file(), "036 파일 부재")
+        code = _strip_sql_comments(_INSPECTOR_PATH.read_text(encoding="utf-8"))
+        # 028 과 같은 이유로 **두 함수 모두** 재선언해야 한다 — 한쪽만 고치면 "목록에선
+        # 보이는데 딥링크로 열면 사라지는" 불일치가 된다.
+        self.assertIn(_FN_SEARCH_SIG, code)
+        self.assertIn(_FN_DOCUMENT_SIG, code)
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _INSPECTOR_PATH.read_bytes())
+
+    def test_preserves_030_hardening(self) -> None:
+        """036 이 030 의 경화(work_mem·page 클램프·blob semantics)를 되돌리지 않았는지.
+        ★025 에서 실증된 함정 — 옛 파일에서 정의를 복사하다 그 사이 적용된 마이그레이션을
+        조용히 되돌리는 것 — 의 회귀 가드다."""
+        code = _strip_sql_comments(_INSPECTOR_PATH.read_text(encoding="utf-8"))
+        self.assertIn("set work_mem = '8MB'", code)          # Major 1
+        self.assertIn("400000", code)                        # Minor 2 page 클램프
+        self.assertIn("jsonb_array_elements_text(f.cfr_refs)", code)   # Minor 1 원소만
+        self.assertIn("replace(coalesce(f.review_status, ''), '_', ' ')", code)
+        for col in _RESTORED_BY_028:                         # 028 이 복원한 3종 보존
+            self.assertIn(f"'{col}',", code, msg=f"036 이 028 의 {col} 을 되돌렸다")
+
+    def test_page_rows_carries_inspector_names(self) -> None:
+        """page_rows CTE 는 컬럼을 명시 열거한다(f.* 아님) — 거기 싣지 않으면 투영에서
+        pr.inspector_names 를 참조할 수 없다(컴파일 실패)."""
+        code = _strip_sql_comments(_INSPECTOR_PATH.read_text(encoding="utf-8"))
+        page_rows = _slice_between(code, "page_rows as (", "page_docs_full as (")
+        self.assertIn("f.inspector_names", page_rows)
+
+
+class InspectorProjectionCoversClientFieldsTest(unittest.TestCase):
+    """★현행 정본 가드 — 클라이언트 렌더러가 실제로 읽는 필드가 036 의 두 투영에 **전부**
+    실리는지 전수 대조한다. 028/030 대상 검사는 그 시점 역사 기록이라 이후 도입 필드
+    (_FIELDS_ADDED_AFTER_030)를 제외하지만, 여기서는 **아무것도 제외하지 않는다** —
+    이 클래스가 뚫리면 조용한 필드 소실을 잡을 곳이 없다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_INSPECTOR_PATH.read_text(encoding="utf-8"))
+        self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
+        self.document_fn = _slice_function(code, _FN_DOCUMENT_SIG)
+        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+
+    def test_findings_search_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.search_rows,
+                msg=f"036 findings_search 의 findings[] 투영에 '{col}' 이 없다 -- 클라이언트가 "
+                    f"실제로 읽는 필드다(조용히 소실되면 방어적 분기라 크래시 없이 사라진다).",
+            )
+
+    def test_findings_document_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.document_fn,
+                msg=f"036 findings_document 의 findings[] 투영에 '{col}' 이 없다 -- 목록/딥링크 "
+                    f"불일치가 된다.",
+            )
+
+    def test_guard_actually_covers_fields_added_after_030(self) -> None:
+        """_FIELDS_ADDED_AFTER_030 예외가 이 가드까지 새어나가 구멍이 되지 않았는지.
+        그 집합의 필드가 클라이언트에 실재하면 반드시 여기 expected 에 있어야 한다."""
+        client = set(_parse_client_fields())
+        for col in _FIELDS_ADDED_AFTER_030 & client:
+            self.assertIn(col, self.expected,
+                          msg=f"{col} 이 현행 정본 검사에서까지 빠졌다 — 가드 구멍")
 
 
 if __name__ == "__main__":  # pragma: no cover

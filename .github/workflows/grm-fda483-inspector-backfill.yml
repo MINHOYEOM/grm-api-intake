@@ -1,0 +1,126 @@
+name: GRM FDA 483 Inspector Name Backfill (one-off)
+
+# FDA 483 문서의 실사관 이름(inspector_names)을 소급 백필한다. raw_signals 는 절대
+# 건드리지 않고(원문 무결성 보존) findings.inspector_names 한 컬럼만 PATCH 한다.
+# 실사관 이름은 원문 PDF 안에만 있고 저장된 텍스트(fda483_body_full)는 25건만 남아 있어
+# 나머지 ~1,500여 문서는 PDF 재fetch 가 필요하다. 스캔 483 이 다수라 tesseract 없이는
+# 절반이 빈손이므로 OCR 엔진 설치 스텝이 필수다(grm-fda483-ocr-backfill.yml 과 동일 —
+# 그대로 재사용). 1회성 소급 백필이라 dispatch 전용(예약 실행 없음).
+#
+# 재사용 배관: backfill_483_inspectors.py 가 collect_fda_483._fetch_fda483_pdf_text /
+# _extract_483_inspectors 를 지연 import 로 호출한다(라이브 라인과 동일 함수 — 신규
+# 파싱 로직 없음). PostgREST 는 raw_signals/findings 읽기 + findings.inspector_names
+# PATCH 만 한다 — git 쓰기 전무.
+#
+# concurrency: 기존 FDA 483 OCR 백필(grm-fda483-ocr-backfill.yml)과 같은 그룹을
+# 공유한다 — 둘 다 fda.gov PDF 를 대량으로 두드리므로, 같은 호스트에 동시 요청이
+# 몰리지 않게 직렬화한다(하나가 도는 동안 다른 하나는 대기).
+#
+# dry-run(기본)은 실제 PDF fetch+파싱까지 수행하고 PATCH 만 건너뛴다 — 추출률을 미리
+# 확인한 뒤 --apply(=inputs.apply=true)로 재실행해 실제로 쓴다(광고 전 데이터 확인).
+# 멱등: 이미 inspector_names 가 채워진 문서는 기본적으로 건너뛰므로, 실패/타임아웃 후
+# 재실행하면 잔여만 처리된다(--limit 로 배치 분할).
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = 실제 findings.inspector_names PATCH 수행. false(기본) = dry-run(조회+PDF fetch+파싱까지 하되 쓰기 없음) — 먼저 이걸로 추출률을 확인한다.'
+        type: boolean
+        default: false
+      limit:
+        description: '이번 실행에서 처리할 문서 수 상한(배치 분할용). 비우면 전건.'
+        type: string
+        default: ''
+      delay_seconds:
+        description: 'PDF 요청 간 대기(초) — fda.gov 예의.'
+        type: string
+        default: '0.5'
+      force:
+        description: 'true = inspector_names 가 이미 채워진 문서도 재처리한다(기본 false — 멱등 스킵).'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-ocr-backfill      # 기존 OCR 백필과 동일 그룹(fda.gov 동시 요청 방지)
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: 실사관 이름 소급 백필 → findings.inspector_names PATCH
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # OCR 엔진 — 이게 없으면 스캔 483 은 전부 빈손이므로 실패를 숨기지 않는다
+      # (grm-fda483-ocr-backfill.yml 과 동일 스텝 그대로).
+      - name: Install OCR engine (tesseract)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          tesseract --version | head -1
+
+      # 읽기(raw_signals/findings GET) + PATCH(inspector_names 만) — git add/commit/push 없음.
+      # SUPABASE_* 는 grm-intake.yml 등 기존 워크플로가 이미 쓰는 동일 secret/var 재사용
+      # (신규 등록 불필요).
+      - name: Run FDA 483 inspector name backfill
+        id: backfill
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=(--report-path inspector_backfill_report.json --delay-seconds "${{ inputs.delay_seconds }}")
+          if [ "${{ inputs.apply }}" = "true" ]; then
+            ARGS+=(--apply)
+          fi
+          if [ "${{ inputs.force }}" = "true" ]; then
+            ARGS+=(--force)
+          fi
+          if [ -n "${{ inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ inputs.limit }}")
+          fi
+          python backfill_483_inspectors.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM FDA 483 Inspector Name Backfill"
+            echo ""
+            echo "apply: \`${{ inputs.apply }}\` / force: \`${{ inputs.force }}\` / limit: \`${{ inputs.limit }}\` / delay_seconds: \`${{ inputs.delay_seconds }}\`"
+            echo ""
+            if [ -f inspector_backfill_report.json ]; then
+              echo '```json'
+              cat inspector_backfill_report.json
+              echo '```'
+            else
+              echo "inspector_backfill_report.json 미생성 — 인자/인증/조회 실패로 조기 종료 가능"
+              echo "(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fda483-inspector-backfill-report
+          path: inspector_backfill_report.json
+          retention-days: 30
+          if-no-files-found: warn

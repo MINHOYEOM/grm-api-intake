@@ -2812,13 +2812,16 @@ class WebTrendsRenderTest(unittest.TestCase):
 
     def test_read_the_chart_note_on_every_section(self):
         """[13차] 각 차트에 '이 그래프를 읽는 법' 1~2문장(.tr-read) — 전 직원 대상이라
-        정적 텍스트로 두어 골든에 남기고 리뷰 가능하게 한다(5개 섹션 전부)."""
-        self.assertEqual(self.html.count('<p class="tr-read">'), 5)
+        정적 텍스트로 두어 골든에 남기고 리뷰 가능하게 한다(5개 섹션 전부).
+        [해외/미국 실사 비교] 신규 패널 추가로 6개가 됐다(WebFindingsZoneComparisonTest
+        가 그 패널의 세부 계약을 별도로 검증한다)."""
+        self.assertEqual(self.html.count('<p class="tr-read">'), 6)
         for section_cue in ("전체 기간을 합친 순위입니다.",
                              "각 연도를 100%로 놓고",
                              "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
                              "품질이 나쁜 순서가 아닙니다.",
-                             "FDA 483의 경향으로 읽으셔야 합니다."):
+                             "FDA 483의 경향으로 읽으셔야 합니다.",
+                             "해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다."):
             self.assertIn(section_cue, self.html)
 
     def test_publication_date_semantics_disclosed_up_front(self):
@@ -3159,6 +3162,219 @@ class WebTrendsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         self.assertIn("function syncFirmUrl(name)", js_src)
         self.assertIn('if (name) params.set("firm", name); else params.delete("firm");', js_src)
+
+
+# ── [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 패널(038) ────────────────
+class WebFindingsZoneComparisonTest(unittest.TestCase):
+    """트렌드 대시보드 신규 패널 — findings_zone_category() RPC(038, 파라미터 없음)를
+    findings_stats/findings_category_matrix 와 독립적으로 fetch 한다(실패해도 다른
+    섹션에 영향 0, 히트맵과 동일 원칙). 여기선 셸 결정론·RPC 배선·점유율 계산 소스
+    (zone 합계로 나눔, 절대 건수 비교 아님)·배지 임계(1.5배)·표본 하한(foreign_cnt
+    20)·부제 숫자 비하드코딩·국가 구성 표기·해석/권고 문구 부재를 검증한다(실제
+    집계 렌더 자체는 비골든 — trends.js 소관, WebTrendsRenderTest 와 동일 원칙)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_trendszone_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        cls.html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 셸 결정론 ────────────────────────────────────────────────────────────
+    def test_panel_shell_present_hidden_after_source_section(self):
+        self.assertIn(
+            '<section class="tr-block tr-zone-block" id="tr-zone-block" '
+            'aria-label="해외 실사 vs 미국 내 실사" hidden>',
+            self.html,
+        )
+        self.assertIn('<h2 class="tr-h">해외 실사 vs 미국 내 실사</h2>', self.html)
+        self.assertIn('<p class="tr-zone-sub" id="tr-zone-sub"></p>', self.html)
+        self.assertIn('<div id="tr-zone" class="tr-zone"></div>', self.html)
+        self.assertIn('<p class="tr-note" id="tr-zone-countries"></p>', self.html)
+        source_idx = self.html.index('aria-label="소스 구성"')
+        zone_idx = self.html.index('id="tr-zone-block"')
+        self.assertLess(source_idx, zone_idx, "비교 패널이 소스 구성 섹션 뒤에 있지 않음")
+
+    def test_zone_elements_defensively_queried_not_in_hard_gate(self):
+        """구버전 캐시 셸에 이 신규 블록이 없어도 페이지 전체(다른 패널)가 죽으면
+        안 된다 — coverageNoteEl/heatmapNoteEl 관례와 동형으로 하드 게이트(if 문)에
+        tr-zone-* 엘리먼트를 넣지 않는다."""
+        for elid in ("tr-zone-block", "tr-zone-sub", "tr-zone", "tr-zone-countries"):
+            self.assertIn(f'document.getElementById("{elid}")', self.js_src)
+        gate = self.js_src[self.js_src.index("if (!cfg || !loadingEl"):]
+        gate = gate[:gate.index("return;") + len("return;")]
+        for forbidden in ("zoneBlockEl", "zoneEl", "zoneSubEl", "zoneCountriesEl"):
+            self.assertNotIn(forbidden, gate)
+
+    # ── RPC 배선 · 독립 fetch ────────────────────────────────────────────────
+    def test_rpc_endpoint_present_with_no_params(self):
+        self.assertIn('rpcEndpoint("findings_zone_category")', self.js_src)
+        self.assertIn("function fetchZoneCategory()", self.js_src)
+        fn = self.js_src[self.js_src.index("function fetchZoneCategory()"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn('method: "POST"', fn)
+        self.assertIn('body: "{}",', fn)  # 038 계약 — 파라미터 없음
+
+    def test_independent_fetch_chain_silent_fallback(self):
+        """findings_stats/findings_category_matrix 체인과 별개 promise 체인 — 실패해도
+        errorEl/contentEl 을 건드리지 않고 조용히 숨김 유지되어야 한다."""
+        chain = self.js_src[self.js_src.index("fetchZoneCategory()\n    .then"):]
+        self.assertIn("renderZonePanel(data)", chain[:200])
+        self.assertNotIn("errorEl.hidden", chain[:300])
+        self.assertIn("조용히 숨김 유지", chain[:300])
+
+    # ── 점유율 계산 소스 — zone 합계로 나눔(절대 건수 비교 아님) ───────────────
+    def test_share_computed_from_zone_totals_not_raw_counts(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn(
+            "var foreignTotal = cats.reduce(function (s, c) { return s + (c.foreign_cnt || 0); }, 0);",
+            fn,
+        )
+        self.assertIn(
+            "var usTotal = cats.reduce(function (s, c) { return s + (c.us_cnt || 0); }, 0);",
+            fn,
+        )
+        self.assertIn("var fShare = safeShare(fCnt, foreignTotal);", fn)
+        self.assertIn("var uShare = safeShare(uCnt, usTotal);", fn)
+        self.assertIn("pctText(fCnt, foreignTotal)", fn)
+        self.assertIn("pctText(uCnt, usTotal)", fn)
+        # 두 시리즈를 같은 공통 스케일(maxShare)로 정규화 — zone 마다 따로 정규화하면
+        # 한 행 안에서 "어느 zone 에 더 몰렸는가"를 막대 길이로 읽을 수 없다.
+        self.assertIn(
+            "var maxShare = rows.reduce(function (m, r) "
+            "{ return Math.max(m, r.foreignShare, r.usShare); }, 0) || 1;",
+            fn,
+        )
+
+    def test_safe_share_helper_guards_zero_denominator(self):
+        self.assertIn("function safeShare(part, whole)", self.js_src)
+        fn = self.js_src[self.js_src.index("function safeShare(part, whole)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("whole > 0 ?", fn)
+
+    def test_sort_order_is_foreign_share_descending(self):
+        self.assertIn(
+            "}).sort(function (a, b) { return b.foreignShare - a.foreignShare; });",
+            self.js_src,
+        )
+
+    # ── 0 나눗셈 방어 ────────────────────────────────────────────────────────
+    def test_zero_or_empty_response_keeps_panel_hidden(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (!cats.length) return;", fn)
+        self.assertIn("if (!(foreignTotal > 0) || !(usTotal > 0)) return;", fn)
+        # 패널을 명시적으로 hidden=true 로 되돌리지 않는다 — 정적 셸 기본값(hidden)을
+        # 그대로 두는 편이 실패 경로를 단순하게 만든다.
+        self.assertIn("zoneBlockEl.hidden = false;", fn)
+        self.assertNotIn("zoneBlockEl.hidden = true", fn)
+
+    def test_defensive_null_guard_on_render_entry(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (!zoneBlockEl || !zoneEl) return;", fn)
+
+    # ── 배지 임계(1.5배) · 표본 하한(foreign_cnt 20) ────────────────────────
+    def test_badge_ratio_threshold_is_1_5(self):
+        self.assertIn("var ZONE_BADGE_RATIO = 1.5;", self.js_src)
+        fn = self.js_src[self.js_src.index("function buildZoneRow(r, maxShare)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("r.ratio >= ZONE_BADGE_RATIO", fn)
+        self.assertIn("isFinite(r.ratio)", fn)  # uShare=0(무한대 배수) 방어
+
+    def test_badge_min_sample_threshold_is_20_with_rationale_comment(self):
+        """표본 하한(foreign_cnt < 20 이면 배지 미표시)의 근거가 코드 주석에 남아
+        있어야 한다 — 해외 표본(905건)이 얇아 소수 카테고리는 비율이 요동친다."""
+        self.assertIn("var ZONE_MIN_FOREIGN_SAMPLE = 20;", self.js_src)
+        idx = self.js_src.index("var ZONE_MIN_FOREIGN_SAMPLE = 20;")
+        preceding_comment = self.js_src[max(0, idx - 900):idx]
+        self.assertIn("표본", preceding_comment)
+        fn = self.js_src[self.js_src.index("function buildZoneRow(r, maxShare)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("r.foreignCnt >= ZONE_MIN_FOREIGN_SAMPLE", fn)
+
+    def test_badge_text_format_matches_spec_example(self):
+        """스펙 예시 형태 "해외 2.0배" — 소수 1자리 반올림."""
+        self.assertIn(
+            '"해외 " + (Math.round(r.ratio * 10) / 10) + "배"', self.js_src
+        )
+
+    # ── 부제 숫자는 응답에서(하드코딩 금지) ─────────────────────────────────
+    def test_subtitle_numbers_come_from_response_not_hardcoded(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("fmtNum(foreign.findings)", fn)
+        self.assertIn("fmtNum(foreign.documents)", fn)
+        self.assertIn("fmtNum(foreign.countries)", fn)
+        self.assertIn("fmtNum(us.findings)", fn)
+        self.assertIn("fmtNum(us.documents)", fn)
+        self.assertIn("zoneSubEl.textContent = sub;", fn)
+        # 계약 예시 수치가 소스에 리터럴로 박혀 있으면 안 된다(응답 의존 확인).
+        for literal in ("905", "175", "7288", "7,288", "1158", "1,158"):
+            self.assertNotIn(literal, fn)
+
+    def test_subtitle_mentions_fda483_scope_and_excluded_unknown(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn('"FDA 483 기준 · 해외 "', fn)
+        self.assertIn("scope.excluded_unknown_country", fn)
+        self.assertIn('"건 제외"', fn)
+
+    # ── 해외 국가 구성(오독 방지) ────────────────────────────────────────────
+    def test_top_countries_top5_rendered(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("(d.top_countries || []).slice(0, 5);", fn)
+        self.assertIn('"해외 실사 구성: "', fn)
+
+    def test_misreading_guard_note_present_in_static_shell(self):
+        """"해외"가 균질한 덩어리(≈한국)로 오독되지 않도록 하는 고정 안내문 — RPC
+        성공 여부와 무관하게 정적 텍스트로 셸에 존재해야 한다(골든 리뷰 가능)."""
+        self.assertIn(
+            '"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.', self.html
+        )
+
+    # ── 해석/권고 문구 부재(트랙C 품질 기준) ────────────────────────────────
+    def test_no_interpretive_or_prescriptive_language(self):
+        """이 패널은 관측된 분포만 보여준다 — "~해야" 류 권고·해석 문구는 **렌더
+        결과(정적 셸 HTML)** 어디에도 없어야 한다. trends.js 소스 자체는 검사 대상이
+        아니다 — 코드 주석에는 "이런 문구를 넣지 않는다"는 금지 근거 서술이 정상적으로
+        등장할 수 있다(다른 섹션 제거 근거 주석과 동일 패턴, test_evidence_grade_
+        section_removed 참조)."""
+        for forbidden in ("강화해야", "권고", "해야 합니다", "해야 한다",
+                           "한국 공장은", "준비해야"):
+            self.assertNotIn(forbidden, self.html, f"금지 문구 발견: {forbidden}")
+
+    # ── 카테고리 라벨·XSS 계약 재사용 ────────────────────────────────────────
+    def test_reuses_existing_category_labels_constant(self):
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("CATEGORY_LABELS[c.category_code]", fn)
+
+    def test_no_innerhtml_data_injection(self):
+        """innerHTML 대입은 컨테이너 비우기 "" 뿐(파일 상단 XSS 계약, findings.js/
+        trends.js 공통)."""
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        for m in re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', fn):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입 의심: {m.group(0)}")
+
+    def test_css_scoped_to_page_not_grm_css(self):
+        """grm.css 는 무변경 — 신규 스타일은 trends.html 자체 스코프 <style> 에만
+        추가된다(.tr-fd-profile-link 관례와 동형)."""
+        self.assertIn(".tr-zone-sub{", self.html_src)
+        self.assertIn(".tr-zone-badge{", self.html_src)
+        css_path = WEB_DIR / "assets" / "grm.css"
+        if css_path.is_file():
+            css_src = css_path.read_text(encoding="utf-8")
+            self.assertNotIn(".tr-zone-badge", css_src)
 
 
 # ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────

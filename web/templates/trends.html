@@ -94,6 +94,29 @@
         <p class="tr-read">지금은 FDA 483이 대부분입니다. Warning Letter·식약처·EU·영국 GMP 비준수는 수집을 시작한 지 얼마 되지 않아, 이 페이지의 경향은 사실상 FDA 483의 경향으로 읽으셔야 합니다.</p>
         <div id="tr-source" class="tr-source"></div>
       </section>
+
+      {#- [해외 vs 미국 내 실사] findings_zone_category() RPC(038, 파라미터 없음) 전용
+          섹션. findings_stats/findings_category_matrix 와 별개 엔드포인트라 정적
+          셸에서는 hidden — 038 미배포 라이브·fetch 실패·빈 응답 시 trends.js 가 이
+          블록만 조용히 숨긴 채로 두고 나머지 섹션엔 손대지 않는다(히트맵과 동일
+          원칙, 골든 결정론 — env/RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는
+          항상 동일).
+
+          이 RPC 는 FDA 483 으로 범위를 한정한다 — site_country 가 실제로 채워지는
+          소스가 483 뿐이라서다(Warning Letter 는 전량 미상). 부제는 RPC 응답
+          (totals/scope)에서 채운 숫자로 trends.js 가 채운다(하드코딩 금지).
+
+          비율은 RPC 가 안 준다 — 각 zone 카테고리 합으로 나눈 zone 내 점유율을
+          trends.js 가 계산한다. 해석·권고 문구는 넣지 않는다 — 관측된 분포만
+          보여준다(트랙C 품질 기준: 판단은 읽는 사람 몫). -#}
+      <section class="tr-block tr-zone-block" id="tr-zone-block" aria-label="해외 실사 vs 미국 내 실사" hidden>
+        <h2 class="tr-h">해외 실사 vs 미국 내 실사</h2>
+        <p class="tr-read">두 그룹을 각자 안에서 100%로 놓고 비율을 비교합니다 — 미국 쪽 지적 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요. 해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다.</p>
+        <p class="tr-zone-sub" id="tr-zone-sub"></p>
+        <div id="tr-zone" class="tr-zone"></div>
+        <p class="tr-note" id="tr-zone-countries"></p>
+        <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
+      </section>
     </div>
   </div>
 </main>
@@ -226,6 +249,26 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-src-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);opacity:.75;transform-origin:left}
 .tr-src-count{flex:0 0 auto;min-width:52px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .tr-src-share{flex:0 0 auto;min-width:48px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--coral-2)}
+
+/* [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 — 한 행에 해외/미국 점유율
+   막대를 세로로 나란히 둔다. 신규 팔레트 없이 기존 coral(해외) + ink 저채도(미국)
+   opacity 로만 두 시리즈를 구분한다. */
+.tr-zone-sub{font-size:12.5px;color:var(--muted);margin:0 0 18px;line-height:1.6}
+.tr-zone{display:flex;flex-direction:column;gap:14px}
+.tr-zone-row{padding:10px 0;border-bottom:1px solid var(--line)}
+.tr-zone-row:last-child{border-bottom:none}
+.tr-zone-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tr-zone-label{font-size:14px;color:var(--body-s);font-weight:500}
+/* [해외 상대비 배지] 1.5배 이상 · foreign_cnt 20건 이상인 카테고리에만 붙는다
+   (trends.js ZONE_BADGE_RATIO/ZONE_MIN_FOREIGN_SAMPLE 참조). */
+.tr-zone-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);padding:2px 8px;border-radius:99px}
+.tr-zone-bars{display:flex;flex-direction:column;gap:6px}
+.tr-zone-barline{display:flex;align-items:center;gap:10px}
+.tr-zone-tag{flex:0 0 32px;font-size:11px;color:var(--muted)}
+.tr-zone-track{flex:1 1 auto;height:9px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-zone-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-zone-bar-us{background:var(--ink);opacity:.35}
+.tr-zone-pct{flex:0 0 auto;min-width:44px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
 
 @media(max-width:640px){
   .tr-cat-label{flex-basis:120px;max-width:120px}

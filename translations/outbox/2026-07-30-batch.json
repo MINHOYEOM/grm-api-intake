@@ -1,0 +1,14 @@
+[
+  {
+    "finding_id": "finding-9f2419d249c4306c3d0d190b",
+    "finding_text": "2080진지발리스가글스트롱: 품질부적합(함량시험)(1제품)",
+    "finding_text_ko": "애경산업(주)의 '2080진지발리스가글스트롱' 1개 제품이 함량시험에서 기준에 적합하지 않아 품질부적합으로 판정되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d18d2df4fa6c3e7e98940d74",
+    "finding_text": "일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염): 유통 중 포장불량 우려에 따른 영업자 회수",
+    "finding_text_ko": "일동제약(주)의 '일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염)'에 대해 유통 중 포장불량 우려가 확인되어 영업자 회수가 실시되었다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -3753,7 +3753,10 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
     def test_example_panel_links_back_to_findings_search_with_cat_param(self):
         fn = self._fn("buildExamplePanel")
         self.assertIn('a.href = findingsHref("cat", code);', fn)
-        self.assertIn('"건 전체 보기 →"', fn)
+        # ★건수의 범위를 라벨에 적는다 — findings_search 가 세는 것은 전 기간 공개분인데
+        # 이 패널이 달린 행은 최근 12개월 수치라(실측 309건 vs 2,976건) 범위를 빼면 두
+        # 숫자가 어긋나 보인다. 링크가 가는 곳도 기간 필터 없는 검색이다.
+        self.assertIn('"전체 기간 " + ko + " 지적 " + fmtNum(total) + "건 보기 →"', fn)
         # 공개 게이트 밖이라 사례가 하나도 없을 수 있다 — 그 사실을 적는다.
         self.assertIn("이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다.", fn)
 

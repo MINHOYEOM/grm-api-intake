@@ -2814,15 +2814,51 @@ class WebTrendsRenderTest(unittest.TestCase):
         """[13차] 각 차트에 '이 그래프를 읽는 법' 1~2문장(.tr-read) — 전 직원 대상이라
         정적 텍스트로 두어 골든에 남기고 리뷰 가능하게 한다(5개 섹션 전부).
         [해외/미국 실사 비교] 신규 패널 추가로 6개가 됐다(WebFindingsZoneComparisonTest
-        가 그 패널의 세부 계약을 별도로 검증한다)."""
-        self.assertEqual(self.html.count('<p class="tr-read">'), 6)
+        가 그 패널의 세부 계약을 별도로 검증한다).
+        [트렌드 고도화] 최근 12개월·달라진 점·업체 찾기 3개 섹션이 더해져 9개가 됐다
+        (WebTrendsRecentWindowTest 가 그 셋의 세부 계약을 별도로 검증한다). 최근 창
+        카테고리 순위의 읽는 법(#tr-recent-cats-read)은 순위가 실제로 그려질 때만
+        노출되므로 hidden 속성을 달고 있어 이 카운트에 잡히지 않는다."""
+        self.assertEqual(self.html.count('<p class="tr-read">'), 9)
         for section_cue in ("전체 기간을 합친 순위입니다.",
                              "각 연도를 100%로 놓고",
                              "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
                              "품질이 나쁜 순서가 아닙니다.",
                              "FDA 483의 경향으로 읽으셔야 합니다.",
-                             "해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다."):
+                             "해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다.",
+                             "막대는 그 달에 공개된 문서 수입니다.",
+                             "각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다.",
+                             "거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요."):
             self.assertIn(section_cue, self.html)
+
+    def test_hero_paragraph_breaks_at_sentence_boundary(self):
+        """[줄맞춤] 히어로 설명 두 문장을 .ln 블록으로 감싸 줄바꿈을 **문장 경계**에
+        고정한다. 이전에는 text-wrap:balance 가 두 줄 길이를 맞추려고 첫 문장 한가운데
+        ("…확인된 지적사항을 / 매일 자동으로 모아…")를 끊어 목적어와 서술어를 갈라
+        놓았다. 고정 <br> 이 아니라 블록 span 이라 좁은 뷰포트에서는 각 문장이 자기
+        안에서 다시 접힌다(반응형 유지)."""
+        self.assertIn(
+            '<span class="ln">FDA 483 · Warning Letter · 식약처 · '
+            'EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.'
+            '</span>',
+            self.html,
+        )
+        self.assertIn(
+            '<span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> '
+            '기준입니다.</span>',
+            self.html,
+        )
+        html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        self.assertIn(".page-head p .ln{display:block}", html_src)
+        # balance 는 두 줄 길이를 맞추려 문장 중간을 끊는 원인이었다 — CSS 선언에서
+        # 제거되어야 한다(제거 근거를 적은 주석에는 단어가 남을 수 있다).
+        self.assertNotIn(".page-head p{max-width:none;text-wrap:balance}", html_src)
+        self.assertIn(".page-head p{max-width:none;text-wrap:pretty}", html_src)
+        # (다른 요소의 text-wrap:balance — 예: .tr-note — 는 이 결함과 무관하므로 남긴다.)
+        # 고정 줄바꿈(<br>)으로 때우지 않았는지 — 반응형이 깨지는 방식이다.
+        head = self.html[self.html.index('class="wrap page-head"'):]
+        head = head[:head.index("</div>")]
+        self.assertNotIn("<br", head)
 
     def test_publication_date_semantics_disclosed_up_front(self):
         """오독의 근원(날짜=공개일)은 히어로와 '먼저 알아두세요' 박스 양쪽에서 먼저 밝힌다 —
@@ -3427,6 +3463,366 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
         if css_path.is_file():
             css_src = css_path.read_text(encoding="utf-8")
             self.assertNotIn(".tr-zone-badge", css_src)
+
+
+# ── [트렌드 고도화] 최근 12개월 · 달라진 점 · 업체 찾기 · 사례 드릴다운 ────────
+class WebTrendsRecentWindowTest(unittest.TestCase):
+    """트렌드 대시보드 신규 3섹션 — 041_findings_recent_window.sql 의 두 RPC
+    (findings_recent_window / findings_firm_search) + 026 findings_search 재사용.
+
+    ★이 셋이 해결하는 문제: 기존 페이지는 전 기간 누적만 보여 줬는데 그 분모의 47%가
+    2024년 한 해 공개분이라, "카테고리 순위"가 사실상 그 배치의 그림자였다. 즉 페이지
+    제목이 약속하는 '트렌드'(시간에 따른 변화)를 답하는 집계가 서버에 아예 없었다.
+
+    여기선 셸 결정론·RPC 배선·독립 실패 반경·비교 단위(문서 등장률, 건수 아님)·표본
+    하한·교란 요인(소스 구성 변화) 공개·사례 문장의 출처(집계 RPC 아님)를 검증한다.
+    실제 집계 렌더 자체는 비골든 — trends.js 소관(WebTrendsRenderTest 와 동일 원칙)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_trendsrecent_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        cls.html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _fn(self, name):
+        """`function name(...)` 본문을 들여쓰기 2칸 닫는 중괄호까지 잘라 낸다."""
+        start = self.js_src.index("function " + name + "(")
+        return self.js_src[start:self.js_src.index("\n  }", start)]
+
+    # ── 셸 결정론 ────────────────────────────────────────────────────────────
+    def test_recent_and_mover_shells_present_hidden(self):
+        """041 미적용 라이브·fetch 실패 시 trends.js 가 그대로 두는 상태(hidden)가 정적
+        셸의 기본값이어야 한다 — 골든 결정론."""
+        self.assertIn(
+            '<section class="tr-block tr-recent-block" id="tr-recent-block" '
+            'aria-label="최근 12개월" hidden>',
+            self.html,
+        )
+        self.assertIn(
+            '<section class="tr-block tr-move-block" id="tr-move-block" '
+            'aria-label="달라진 점" hidden>',
+            self.html,
+        )
+        for frag in ('<h2 class="tr-h">최근 12개월</h2>',
+                     '<h2 class="tr-h">달라진 점</h2>',
+                     '<p class="tr-recent-sub" id="tr-recent-sub"></p>',
+                     '<div id="tr-recent-months" class="tr-recent-months"></div>',
+                     '<p class="tr-note" id="tr-recent-note"></p>',
+                     '<div id="tr-recent-cats" class="tr-recent-cats"></div>',
+                     '<div id="tr-move-up" class="tr-move-list"></div>',
+                     '<div id="tr-move-down" class="tr-move-list"></div>',
+                     '<p class="tr-note" id="tr-move-source"></p>',
+                     '<p class="tr-note" id="tr-move-note"></p>'):
+            self.assertIn(frag, self.html)
+
+    def test_new_sections_precede_cumulative_sections(self):
+        """최근 12개월 → 달라진 점 → 업체 찾기 → (구분선) → 전 기간 누적 순서. 누적
+        섹션이 먼저 오면 2024년 대량 공개분이 페이지의 첫인상을 지배한다."""
+        i_note = self.html.index('id="tr-coverage-note"')
+        i_recent = self.html.index('id="tr-recent-block"')
+        i_move = self.html.index('id="tr-move-block"')
+        i_find = self.html.index('aria-label="업체 찾기"')
+        i_div = self.html.index('class="tr-divider"')
+        i_cat = self.html.index('aria-label="카테고리 순위"')
+        self.assertTrue(i_note < i_recent < i_move < i_find < i_div < i_cat)
+
+    def test_cumulative_divider_discloses_different_denominator(self):
+        """같은 페이지의 두 수치가 어긋나 보이는 오독을 막는 고정 안내 — RPC 성공 여부와
+        무관하게 정적 텍스트로 존재해야 한다(골든 리뷰 가능)."""
+        self.assertIn("<h2>전체 기간 누적</h2>", self.html)
+        self.assertIn("2016년 이후 모아 둔 전량이 분모입니다.", self.html)
+        self.assertIn("47%가 2024년에 공개된 자료라", self.html)
+
+    def test_firm_find_form_shell_present_without_action(self):
+        """form 에 action 이 없어야 041 미배포 라이브에서 눌러도 페이지 이동이 없다
+        (submit 은 trends.js 가 preventDefault 로 가로챈다)."""
+        self.assertIn('<form class="tr-ff-form" id="tr-ff-form" role="search">', self.html)
+        self.assertIn('<input class="tr-ff-input" id="tr-ff-input" type="search"', self.html)
+        self.assertIn('<div id="tr-ff-result" class="tr-ff-result" aria-live="polite"></div>',
+                      self.html)
+        form = self.html[self.html.index('id="tr-ff-form"'):]
+        form = form[:form.index("</form>")]
+        self.assertNotIn("action=", form)
+        # 라벨은 시각적으로 숨기되 마크업에는 남긴다(스크린리더).
+        self.assertIn('<label class="tr-ff-label" for="tr-ff-input">업체명</label>', self.html)
+
+    def test_new_elements_defensively_queried_not_in_hard_gate(self):
+        """구버전 캐시 셸에 이 블록들이 없어도 페이지 전체가 죽으면 안 된다 — zone/heatmap
+        관례와 동형으로 하드 게이트(if 문)에 신규 엘리먼트를 넣지 않는다."""
+        for elid in ("tr-recent-block", "tr-recent-sub", "tr-recent-months", "tr-recent-note",
+                     "tr-recent-cats", "tr-move-block", "tr-move-up", "tr-move-down",
+                     "tr-move-source", "tr-move-note", "tr-ff-form", "tr-ff-input",
+                     "tr-ff-result"):
+            self.assertIn(f'document.getElementById("{elid}")', self.js_src)
+        gate = self.js_src[self.js_src.index("if (!cfg || !loadingEl"):]
+        gate = gate[:gate.index("return;") + len("return;")]
+        for forbidden in ("recentBlockEl", "moveBlockEl", "firmFindFormEl", "recentCatsEl"):
+            self.assertNotIn(forbidden, gate)
+
+    # ── RPC 배선 · 독립 실패 반경 ────────────────────────────────────────────
+    def test_recent_window_rpc_wired_with_months_param(self):
+        self.assertIn('rpcEndpoint("findings_recent_window")', self.js_src)
+        fn = self._fn("fetchRecentWindow")
+        self.assertIn('method: "POST"', fn)
+        self.assertIn("JSON.stringify({ p_months: 12 })", fn)
+
+    def test_firm_search_rpc_wired(self):
+        self.assertIn('rpcEndpoint("findings_firm_search")', self.js_src)
+        fn = self._fn("fetchFirmSearch")
+        self.assertIn("JSON.stringify({ p_q: q, p_limit: 20 })", fn)
+
+    def test_examples_come_from_findings_search_not_stats_rpc(self):
+        """★사례 문장은 집계 RPC(007/010/017/038/041 — 원문 무반환 계약)가 아니라 026
+        findings_search 에서 온다. 그 함수는 security invoker 라 공개 게이트(010 정책)를
+        통과한 행만 돌려준다 = /findings/ 검색 페이지와 완전히 같은 경로다."""
+        self.assertIn('rpcEndpoint("findings_search")', self.js_src)
+        fn = self._fn("fetchCategoryExamples")
+        self.assertIn("p_category: code", fn)
+        self.assertIn('p_sort: "date_desc"', fn)
+        self.assertIn("p_docs_per_page: EXAMPLE_ROWS", fn)
+        # 본문 텍스트를 읽는 곳은 이 한 경로뿐이어야 한다 — 집계 RPC 응답에서
+        # finding_text 를 꺼내 쓰는 코드가 생기면 계약이 조용히 깨진 것이다.
+        self.assertEqual(self.js_src.count("finding_text"), 2,
+                         "finding_text 참조는 buildExampleItem 의 국문/영문 폴백 2회뿐이어야 한다")
+        item_fn = self._fn("buildExampleItem")
+        self.assertEqual(item_fn.count("finding_text"), 2)
+        # 사례 경로의 출처가 findings_search 임을 파일 계약 주석이 못박는다.
+        self.assertIn("security invoker", self.js_src)
+
+    def test_recent_chain_independent_and_silent_fallback(self):
+        """findings_stats/category_matrix/zone 체인과 별개 promise 체인 — 실패해도
+        errorEl/contentEl 을 건드리지 않고 조용히 숨김 유지되어야 한다."""
+        chain = self.js_src[self.js_src.index("fetchRecentWindow()\n    .then"):]
+        self.assertIn("renderRecentWindow(data)", chain[:260])
+        self.assertIn("renderMovers(data)", chain[:260])
+        self.assertNotIn("errorEl.hidden", chain[:400])
+        self.assertIn("조용히 숨김 유지", chain[:400])
+
+    def test_movers_reuse_same_response_no_extra_fetch(self):
+        """달라진 점은 최근 12개월과 **같은 응답**에서 파생한다 — 추가 네트워크 호출 0."""
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertNotIn("fetch(", fn)
+        self.assertNotIn("rpcEndpoint(", fn)
+
+    # ── 비교 단위: 구성비(합이 100%로 닫히는 지표) ──────────────────────────
+    def test_movers_use_composition_share_that_sums_to_100(self):
+        """★분모의 성격이 변하는 지표는 추세를 못 잰다. 초기 구현은 '문서 등장률'
+        (그 창 문서 중 이 영역이 지적된 문서 비율)을 썼는데, 등장률은 합이 100%로
+        고정되지 않아 창마다 문서당 지적 수가 달라지면(실측 3.9 → 2.7건/문서) 전 영역이
+        한 방향으로 쏠린다 — 무균보증이 문서 119→136건으로 **늘었는데도** 등장률은
+        33%→20%로 떨어져 '줄었다'로 표시됐다. 구성비(건수 기준)는 각 창에서 합이 정확히
+        100%라 늘어난 만큼 어딘가는 줄고, 두 창의 비교가 성립한다."""
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("var cc = c.cur_cnt || 0, pc = c.prev_cnt || 0;", fn)
+        self.assertIn(
+            "deltaPp: (shareOf(cc, curFindings) - shareOf(pc, prevFindings)) * 100,", fn)
+        # 분모는 창 전체 지적 수여야 한다(문서 수 아님).
+        self.assertIn("var curFindings = Number((totals.cur || {}).findings) || 0;", fn)
+        self.assertIn("var prevFindings = Number((totals.prev || {}).findings) || 0;", fn)
+        self.assertNotIn("docShare(", self.js_src)   # 되돌린 지표가 잔존하면 안 된다
+        self.assertIn("function shareOf(part, whole)", self.js_src)
+        self.assertIn("whole > 0 ?", self._fn("shareOf"))
+
+    def test_movers_show_counts_beside_share_to_prevent_misreading(self):
+        """"비중이 줄었다"는 "건수가 줄었다"가 아니다 — 실측 무균보증은 312→309건으로
+        거의 그대로인데 비중은 22%→17%다. 각 행에 건수를 병기하고, 표제도 '줄어든'이
+        아니라 '비중이 줄어든'이며, 노트가 그 차이를 한 줄로 못박는다."""
+        row = self._fn("buildMoverRow")
+        self.assertIn('"지적 " + fmtNum(r.prevCnt) + " → " + fmtNum(r.curCnt) + "건"', row)
+        self.assertIn('el("span", "tr-mv-cnt"', row)
+        self.assertIn("<h3 class=\"tr-sub-h\">비중이 커진 영역</h3>", self.html)
+        self.assertIn("<h3 class=\"tr-sub-h\">비중이 줄어든 영역</h3>", self.html)
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("건수가 늘어도 다른 영역이 ", fn)
+        self.assertIn("더 늘면 비중은 줄어듭니다", fn)
+        # 정적 셸에도 "합이 100%" 라는 성질을 적어 둔다(골든 리뷰 가능).
+        self.assertIn("비중은 두 기간 각각에서 합이 100%라", self.html)
+
+    def test_recent_ranking_shares_the_same_unit_as_cumulative_ranking(self):
+        """최근 창 순위와 누적 순위가 서로 다른 잣대를 쓰면 나란히 놓고 비교할 수 없다 —
+        둘 다 건수 + 구성비로 통일한다(문서 수는 툴팁으로 남긴다)."""
+        fn = self.js_src[self.js_src.index("function renderRecentWindow(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("state.recentCurFindings = Number(cur.findings) || 0;", fn)
+        self.assertIn(".sort(function (a, b) { return b.cnt - a.cnt || a.code.localeCompare(b.code); })",
+                      fn)
+        self.assertIn(".slice(0, RECENT_CAT_ROWS);", fn)
+        row = self._fn("buildRecentCatRow")
+        self.assertIn('fmtNum(entry.cnt) + "건 · " + pctText(entry.cnt, curFindings)', row)
+        self.assertIn('"건 · 문서 " +', row)   # 문서 수는 툴팁으로 보존
+
+    # ── 표본 하한 · 유의 폭(억지 해석 금지) ──────────────────────────────────
+    def test_sample_and_significance_thresholds_declared_with_rationale(self):
+        """임계값은 전부 상수로 선언하고, **왜 그 값인지**를 바로 앞 주석에 남긴다 —
+        ZONE_MIN_FOREIGN_SAMPLE 이 확립한 관례(숫자만 있는 임계는 나중에 아무도 못 고친다)."""
+        for const, val in (("WINDOW_MIN_FINDINGS", "200"), ("MOVER_MIN_SAMPLE", "20"),
+                           ("MOVER_MIN_PP", "1.0"), ("MOVER_MAX_ROWS", "5")):
+            decl = f"var {const} = {val};"
+            self.assertIn(decl, self.js_src)
+            idx = self.js_src.index(decl)
+            preceding = self.js_src[max(0, idx - 500):idx]
+            self.assertIn("//", preceding, f"{const} 근거 주석 누락")
+        for const in ("WINDOW_MIN_FINDINGS", "MOVER_MIN_SAMPLE"):
+            idx = self.js_src.index(f"var {const} = ")
+            self.assertIn("표본", self.js_src[max(0, idx - 500):idx],
+                          f"{const} 표본 근거 서술 누락")
+
+    def test_thin_windows_hide_the_whole_comparison(self):
+        """두 창 중 어느 쪽이든 표본이 얇으면 비교 자체를 하지 않는다(숨김 유지)."""
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn(
+            "if (curFindings < WINDOW_MIN_FINDINGS || prevFindings < WINDOW_MIN_FINDINGS) return;",
+            fn)
+        self.assertIn("moveBlockEl.hidden = false;", fn)
+        self.assertNotIn("moveBlockEl.hidden = true", fn)
+
+    def test_dropped_thin_categories_are_disclosed_not_silently_cut(self):
+        """표본이 얇아 뺀 영역이 있으면 **몇 개를 뺐는지 화면에 적는다**(조용한 축소 금지 —
+        renderHeatmap 의 tr-heatmap-note 와 동일 원칙)."""
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("dropped += 1;", fn)
+        self.assertIn("if (dropped > 0) {", fn)
+        self.assertIn("개 영역은 비율이 흔들려 뺐습니다.", fn)
+        self.assertIn("if (r.curCnt + r.prevCnt >= MOVER_MIN_SAMPLE) return true;", fn)
+
+    def test_empty_mover_list_says_so_instead_of_rendering_nothing(self):
+        fn = self._fn("fillMoverList")
+        self.assertIn('"기준(" + MOVER_MIN_PP + "%p 이상)을 넘는 변화가 없습니다."', fn)
+
+    # ── 교란 요인 공개(소스 구성 변화) ──────────────────────────────────────
+    def test_source_mix_shift_is_disclosed_from_response(self):
+        """증감 비교의 최대 교란 요인은 소스 구성 변화다 — 한쪽 창에만 새 소스가 들어와
+        있으면 카테고리 구성이 달라진 게 아니라 모집단이 달라진 것이다. 같은 응답의
+        by_source(cur/prev)로 두 기간 구성을 나란히 적는다(하드코딩 금지)."""
+        fn = self._fn("renderMoverSourceLine")
+        self.assertIn("s.prev_cnt", fn)
+        self.assertIn('"두 기간의 소스 구성: "', fn)
+        self.assertIn("소스 구성이 달라지면 위 증감도 함께 움직입니다.", fn)
+        self.assertIn("moveSourceEl.textContent =", fn)
+        # 분모는 증감과 같은 단위(지적 건수)여야 독자가 두 수치를 견줄 수 있다.
+        self.assertIn("shareOf(s.cnt, curFindings)", fn)
+        self.assertIn("pctText(s.prev_cnt || 0, prevFindings)", fn)
+        # 실측 수치가 리터럴로 박혀 있으면 안 된다(응답 의존 확인).
+        for literal in ("682", "362", "1837", "1,837", "1421"):
+            self.assertNotIn(literal, fn)
+
+    def test_in_progress_month_disclosed(self):
+        """창의 마지막 달은 구조상 항상 진행 중이다 — 막대가 낮은 이유를 적지 않으면
+        "최근에 줄었다"로 오독된다."""
+        fn = self.js_src[self.js_src.index("function renderRecentWindow(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("아직 진행 중인 달이라 낮게 보입니다.", fn)
+        self.assertIn("recentNoteEl.textContent =", fn)
+
+    def test_subtitle_numbers_come_from_response_not_hardcoded(self):
+        fn = self.js_src[self.js_src.index("function renderRecentWindow(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        for key in ("cur.documents", "cur.findings", "cur.firms",
+                    "scope.cur_from", "scope.cur_to"):
+            self.assertIn(key, fn)
+        self.assertIn("recentSubEl.textContent =", fn)
+
+    def test_two_window_bars_are_visually_split_by_prev_to(self):
+        """막대 24개를 최근/직전 두 구간으로 나누는 기준은 응답의 scope.prev_to 다."""
+        fn = self._fn("renderRecentMonths")
+        self.assertIn('var isPrev = String(r.month || "") <= String(prevTo || "");', fn)
+        self.assertIn('"tr-rm-col" + (isPrev ? " is-prev" : "")', self._fn("buildMonthColumn"))
+        self.assertIn('"최근 12개월"', fn)
+        self.assertIn('"직전 12개월"', fn)
+
+    # ── 사례 드릴다운 ────────────────────────────────────────────────────────
+    def test_example_text_prefers_korean_falls_back_to_english(self):
+        """국문이 있으면 국문, 없으면 영어 원문 — 빈칸으로 두지 않는다(부재 어휘 규칙)."""
+        fn = self._fn("buildExampleItem")
+        self.assertIn(
+            'var body = (f.finding_text_ko || "").trim() || (f.finding_text || "").trim();', fn)
+        self.assertIn('el("p", "tr-ex-text", truncateText(body))', fn)
+
+    def test_example_panel_links_back_to_findings_search_with_cat_param(self):
+        fn = self._fn("buildExamplePanel")
+        self.assertIn('a.href = findingsHref("cat", code);', fn)
+        self.assertIn('"건 전체 보기 →"', fn)
+        # 공개 게이트 밖이라 사례가 하나도 없을 수 있다 — 그 사실을 적는다.
+        self.assertIn("이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다.", fn)
+
+    def test_example_fetch_race_is_guarded(self):
+        """사례는 비동기로 도착한다 — 그 사이 다른 행을 열었으면 늦게 온 응답을 버린다
+        (엉뚱한 영역 아래 다른 영역의 사례가 붙는 결함 방지)."""
+        fn = self.js_src[self.js_src.index("function openRecentCat(code, ko)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertEqual(fn.count("if (state.openCat !== code) return;"), 2)
+
+    def test_category_rows_are_keyboard_operable(self):
+        row = self._fn("buildRecentCatRow")
+        self.assertIn("makeClickableRow(row,", row)
+        self.assertIn("if (state.openCat === entry.code) closeRecentCat();", row)
+
+    # ── 업체 찾기 ────────────────────────────────────────────────────────────
+    def test_firm_find_row_links_to_firm_profile_sibling_path(self):
+        """결과 행은 013 업체 프로파일 페이지로 직행한다 — Top 30 을 거치지 않으면 도달할
+        수 없던 페이지의 진입로(buildFirmProfileLink 와 동일한 형제 디렉터리 상대경로)."""
+        fn = self._fn("buildFirmFindRow")
+        self.assertIn('a.href = "../firm/index.html?key=" + encodeURIComponent(item.firm_key || "");',
+                      fn)
+        self.assertIn("decodeFirmDisplay(item.firm_name)", fn)
+
+    def test_firm_find_short_query_guarded_client_side_too(self):
+        """서버(041)도 2자 미만을 빈 결과로 막지만, 클라이언트도 왕복 자체를 하지 않는다."""
+        fn = self._fn("runFirmFind")
+        self.assertIn("if (q.length < 2) {", fn)
+        self.assertIn("두 글자 이상 입력해 주세요.", fn)
+
+    def test_firm_find_empty_result_is_explained(self):
+        fn = self._fn("renderFirmFindResult")
+        self.assertIn("영문 상호의 일부만 넣어 보세요.", fn)
+        self.assertIn("이름을 누르면 업체 프로파일로 갑니다.", fn)
+
+    def test_firm_find_submit_intercepted(self):
+        self.assertIn('firmFindFormEl.addEventListener("submit", function (ev) {', self.js_src)
+        self.assertIn("ev.preventDefault();", self.js_src)
+
+    # ── 공통 계약 재확인 ─────────────────────────────────────────────────────
+    def test_no_innerhtml_data_injection_in_new_functions(self):
+        for name in ("renderRecentMonths", "renderRecentCats", "fillMoverList",
+                     "renderFirmFindResult", "runFirmFind"):
+            fn = self._fn(name)
+            for m in re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', fn):
+                self.assertEqual(m.group(1).strip(), '""',
+                                 f"{name}: innerHTML 데이터 삽입 의심 {m.group(0)}")
+
+    def test_new_css_scoped_to_page_not_grm_css(self):
+        for rule in (".tr-rm-bars{", ".tr-rc-row{", ".tr-mv-row{", ".tr-ff-form{",
+                     ".tr-ex{", ".tr-divider{"):
+            self.assertIn(rule, self.html_src)
+        css_path = WEB_DIR / "assets" / "grm.css"
+        if css_path.is_file():
+            css_src = css_path.read_text(encoding="utf-8")
+            for cls in (".tr-rm-bars", ".tr-rc-row", ".tr-mv-row", ".tr-ff-form", ".tr-ex"):
+                self.assertNotIn(cls, css_src)
+
+    def test_no_chart_library_added(self):
+        for forbidden in ("cdn.", "chart.js", "Chart.js", "d3.", "echarts", "<canvas"):
+            self.assertNotIn(forbidden, self.html_src, forbidden)
+            self.assertNotIn(forbidden, self.js_src, forbidden)
+
+    def test_no_interpretive_or_prescriptive_language_in_new_sections(self):
+        """관측된 분포만 보여 준다 — 권고/해석 문구는 렌더 결과 어디에도 없어야 한다
+        (트랙C 품질 기준, WebFindingsZoneComparisonTest 와 동일 금지 목록)."""
+        for forbidden in ("강화해야", "권고", "해야 합니다", "해야 한다",
+                          "한국 공장은", "준비해야", "대비하십시오"):
+            self.assertNotIn(forbidden, self.html, f"금지 문구 발견: {forbidden}")
 
 
 # ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────

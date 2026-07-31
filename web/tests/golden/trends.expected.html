@@ -44,8 +44,7 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
-    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다. 날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1><p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
   </div>
   <div class="wrap"><div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" hidden></div>
 
@@ -61,6 +60,42 @@
         <span class="lab">먼저 알아두세요</span>
         <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
         <p id="tr-coverage-text"></p>
+      </div><section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
+        <h2 class="tr-h">최근 12개월</h2>
+        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요 — 아래 순위와 &lsquo;달라진 점&rsquo;은 이 두 구간을 견준 결과입니다.</p>
+        <p class="tr-recent-sub" id="tr-recent-sub"></p>
+        <div id="tr-recent-months" class="tr-recent-months"></div>
+        <p class="tr-note" id="tr-recent-note"></p>
+        <h3 class="tr-sub-h" id="tr-recent-cats-h" hidden>최근 12개월에 가장 많이 지적된 영역</h3>
+        <p class="tr-read" id="tr-recent-cats-read" hidden>오른쪽 %는 최근 12개월 지적사항 중 그 영역이 차지하는 비율입니다(아래 &lsquo;전체 기간 누적&rsquo;의 순위와 같은 잣대라 나란히 비교할 수 있어요). <b>줄을 누르면 실제 지적 문장을 볼 수 있습니다.</b></p>
+        <div id="tr-recent-cats" class="tr-recent-cats"></div>
+      </section><section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
+        <h2 class="tr-h">달라진 점</h2>
+        <p class="tr-read">최근 12개월과 그 직전 12개월을 견줘, 각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.</p>
+        <div class="tr-move-cols">
+          <div>
+            <h3 class="tr-sub-h">비중이 커진 영역</h3>
+            <div id="tr-move-up" class="tr-move-list"></div>
+          </div>
+          <div>
+            <h3 class="tr-sub-h">비중이 줄어든 영역</h3>
+            <div id="tr-move-down" class="tr-move-list"></div>
+          </div>
+        </div>
+        <p class="tr-note" id="tr-move-source"></p>
+        <p class="tr-note" id="tr-move-note"></p>
+      </section><section class="tr-block" aria-label="업체 찾기">
+        <h2 class="tr-h">업체 찾기</h2>
+        <p class="tr-read">거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요. 영문 상호 일부만 넣어도 찾아집니다(예: Lupin, Catalent). 이름 표기가 조금씩 다른 사업장은 따로 나옵니다.</p>
+        <form class="tr-ff-form" id="tr-ff-form" role="search">
+          <label class="tr-ff-label" for="tr-ff-input">업체명</label>
+          <input class="tr-ff-input" id="tr-ff-input" type="search" name="firmq" placeholder="예: Lupin" autocomplete="off" spellcheck="false" />
+          <button class="tr-ff-btn" id="tr-ff-btn" type="submit">찾기</button>
+        </form>
+        <div id="tr-ff-result" class="tr-ff-result" aria-live="polite"></div>
+      </section><div class="tr-divider">
+        <h2>전체 기간 누적</h2>
+        <p>아래 수치는 2016년 이후 모아 둔 전량이 분모입니다. 그중 47%가 2024년에 공개된 자료라, 위 &lsquo;최근 12개월&rsquo;과는 다른 그림이 나오는 것이 정상입니다.</p>
       </div>
 
       <section class="tr-block" aria-label="카테고리 순위">
@@ -109,8 +144,13 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* [F3c] 히어로 설명 — grm.css .page-head p 의 62ch 캡(영문 기준 가독폭)을 이 페이지
    스코프에서만 해제. 한글은 음절당 폭이 넓어 62ch 이 실제로는 한 줄에 다 안 들어가는
    길이라 뷰포트 우측에 여백이 남는데도 불필요하게 2줄로 접혔다 — .wrap 폭까지 그대로
-   펴지게 하고, 그래도 접혀야 하는 좁은 뷰포트에서만 균형 배분(text-wrap:balance). */
-.page-head p{max-width:none;text-wrap:balance}
+   펴지게 한다.
+   [줄맞춤] balance 는 쓰지 않는다: 두 줄 길이를 맞추려고 첫 문장 한가운데를 끊어
+   목적어와 서술어를 갈라 놓았다. 대신 문장마다 .ln 블록을 두어 줄바꿈을 문장 경계에
+   고정하고, 한 문장이 한 줄에 안 들어가는 좁은 뷰포트에서는 그 문장 안에서만 접히게
+   한다(pretty — 마지막 줄에 한 어절만 남는 고아 줄 방지). */
+.page-head p{max-width:none;text-wrap:pretty}
+.page-head p .ln{display:block}
 
 /* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
 .tr-state{padding:14px 0}
@@ -142,6 +182,85 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* [13차] "이 그래프를 읽는 법" — 제목과 차트 사이 한두 문장. 전 직원 대상이라 전문용어를
    쓰지 않고, 폭 캡(ch)은 두지 않는다(한글 조기 wrap 방지 — §1 P0 관례). */
 .tr-read{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 18px;text-wrap:pretty}
+.tr-read[hidden]{display:none}
+/* 섹션 안의 소제목(최근 12개월 순위·증감 2열) — .tr-h 와 같은 톤이되 한 단계 아래. */
+.tr-sub-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:28px 0 6px}
+.tr-sub-h[hidden]{display:none}
+.tr-move-cols .tr-sub-h{margin-top:0}
+
+/* ── [최근 12개월] 월별 문서 수 막대(24개월) ──────────────────────────────
+   최근 12개월은 coral, 직전 12개월은 ink 저채도로 같은 축 위에 나란히 둔다 —
+   신규 팔레트 없이 두 구간을 구분한다(zone 패널의 2시리즈 관례와 동형). */
+.tr-recent-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
+.tr-rm-bars{display:flex;align-items:flex-end;gap:4px}
+.tr-rm-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
+.tr-rm-barwrap{height:96px;width:100%;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
+.tr-rm-bar{width:100%;background:var(--coral)}
+.tr-rm-col.is-prev .tr-rm-bar{background:var(--ink);opacity:.28}
+.tr-rm-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);white-space:nowrap}
+.tr-rm-col.is-year .tr-rm-lbl{color:var(--muted);font-weight:600}
+.tr-rm-legend{display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.tr-rm-key{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.tr-rm-key-cur{background:var(--coral)}
+.tr-rm-key-prev{background:var(--ink);opacity:.28}
+
+/* 최근 12개월 카테고리 순위 — 행 클릭 시 실제 지적 사례가 아래로 펼쳐진다. */
+.tr-recent-cats{display:flex;flex-direction:column;gap:0}
+.tr-rc-row{display:flex;align-items:center;gap:14px;padding:10px 8px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tr-rc-row:hover,.tr-rc-row:focus-visible{background:var(--strong);outline:none}
+.tr-rc-row.on{background:var(--coral-tint)}
+.tr-rc-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.tr-rc-label{flex:0 0 190px;max-width:190px;font-size:14px;color:var(--body-s);line-height:1.35}
+.tr-rc-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-rc-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-rc-docs{flex:0 0 auto;min-width:124px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tr-rc-caret{flex:0 0 14px;text-align:center;font-size:10px;color:var(--muted-2)}
+
+/* 실제 지적 사례 패널 — 026 findings_search(공개 게이트 RLS 통과분)로만 채운다. */
+.tr-ex{margin:2px 0 10px;padding:16px 18px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--soft)}
+.tr-ex-item{padding:11px 0;border-bottom:1px solid var(--line)}
+.tr-ex-item:last-of-type{border-bottom:none}
+.tr-ex-meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 5px}
+.tr-ex-text{font-size:13px;line-height:1.75;color:var(--body-s);margin:0}
+.tr-ex-foot{margin:12px 0 0;font-size:12.5px}
+.tr-ex-more{font-weight:500;color:var(--coral-2)}
+.tr-ex-more:hover{color:var(--coral)}
+
+/* ── [달라진 점] 증감 2열 ────────────────────────────────────────────────── */
+.tr-move-cols{display:grid;grid-template-columns:1fr 1fr;gap:26px 40px}
+@media(max-width:760px){.tr-move-cols{grid-template-columns:1fr}}
+.tr-mv-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.tr-mv-row:last-child{border-bottom:none}
+.tr-mv-label{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s)}
+/* 건수 병기 — "비중이 줄었다"가 "건수가 줄었다"로 읽히는 오독을 막는 자리다. */
+.tr-mv-cnt{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px}
+.tr-mv-shift{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);white-space:nowrap}
+.tr-mv-badge{flex:0 0 auto;min-width:54px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted)}
+.tr-mv-up .tr-mv-badge{color:var(--coral-2)}
+
+/* ── [업체 찾기] 검색 상자 + 결과 목록 ───────────────────────────────────── */
+.tr-ff-form{display:flex;gap:8px;margin:0 0 10px;max-width:520px}
+.tr-ff-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tr-ff-input{flex:1 1 auto;min-width:0;font:inherit;font-size:14px;padding:9px 13px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--ink)}
+.tr-ff-input:focus{outline:none;border-color:var(--coral)}
+.tr-ff-btn{font:inherit;font-size:13.5px;font-weight:500;padding:9px 20px;border:0;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral);cursor:pointer}
+.tr-ff-btn:hover{opacity:.92}
+.tr-ff-msg{font-size:12.5px;color:var(--muted);margin:0}
+.tr-ff-row{display:flex;align-items:center;gap:14px;padding:11px 8px;border-bottom:1px solid var(--line);border-radius:6px;text-decoration:none}
+.tr-ff-row:hover,.tr-ff-row:focus-visible{background:var(--strong);outline:none}
+.tr-ff-name{flex:1 1 auto;min-width:0;font-size:14px;color:var(--body-s);line-height:1.4}
+.tr-ff-row:hover .tr-ff-name{color:var(--coral-2)}
+.tr-ff-sub{display:block;font-size:11.5px;color:var(--muted-2);margin-top:3px}
+.tr-ff-meta{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+.tr-ff-meta span{display:block}
+.tr-ff-span{font-size:10.5px;color:var(--muted-2);margin-top:3px}
+@media(max-width:640px){.tr-ff-meta{display:none}}
+
+/* 전 기간 누적 구간 시작을 알리는 구분선 — 위 최근 12개월과 분모가 다르다는 사실을
+   화면에서 한 번 끊어 알린다. */
+.tr-divider{margin:6px 0 36px;padding-top:28px;border-top:1px solid var(--line-2)}
+.tr-divider h2{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 6px}
+.tr-divider p{font-size:13px;color:var(--muted);margin:0;line-height:1.65;text-wrap:pretty}
 
 /* 카테고리 순위 — 상위 10, coral 단색 순위별 농도(opacity, JS 계산). */
 .tr-cat{display:flex;flex-direction:column;gap:2px}
@@ -255,8 +374,15 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 
 @media(max-width:640px){
   .tr-cat-label{flex-basis:120px;max-width:120px}
+  .tr-rc-label{flex-basis:120px;max-width:120px}
+  .tr-rc-docs{min-width:84px}
   .tr-stats{gap:28px}
   .tr-stat-num{font-size:26px}
+  /* 24개 막대는 좁은 화면에서 라벨이 겹친다 — 막대만 남기고 눈금은 범례·툴팁으로. */
+  .tr-rm-lbl{display:none}
+  .tr-rm-bars{gap:2px}
+  /* 남은 폭이 20px 남짓이라 막대가 눈금 없는 조각이 된다 — 숫자만 남긴다. */
+  .tr-rc-track{display:none}
 }
 </style>
 <footer class="site"><div class="wrap">
@@ -309,7 +435,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/trends.js?v=9d9d82ed" defer></script>
+<script src="../../assets/trends.js?v=25d73917" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

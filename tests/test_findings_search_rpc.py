@@ -49,9 +49,13 @@ _PROJ_PATH = _MIGRATIONS_DIR / "028_findings_rpc_projection.sql"
 _ENTITY_REPAIR_PATH = _MIGRATIONS_DIR / "029_findings_html_entity_repair.sql"
 _HARDENING_PATH = _MIGRATIONS_DIR / "030_findings_search_hardening.sql"
 _REACTIONS_TOP_PATH = _MIGRATIONS_DIR / "031_reactions_weekly_top.sql"
-# 036 = findings_search·findings_document 를 **둘 다** 다시 supersede 하는 현행 정본
-# (FIND-483-SIGNER 실사관 투영). 클라이언트 필드 전수 대조의 대상은 이 파일이다.
+# 036 = findings_search·findings_document 를 **둘 다** 다시 supersede 했던 시점의 정본
+# (FIND-483-SIGNER 실사관 투영). findings_document 는 040 이 재선언하지 않으므로 036 이
+# 그 함수에 대해서는 **지금도 현행**이다. findings_search 는 040 이 다시 supersede 했으므로
+# 그쪽 클라이언트 필드 전수 대조의 현행 대상은 040 이다(아래 040 섹션 참조).
 _INSPECTOR_PATH = _MIGRATIONS_DIR / "036_findings_rpc_inspector_names.sql"
+# 040 = findings_search 만 다시 supersede 하는 현행 정본(검색 blob 에 실사관 이름 추가).
+_INSPECTOR_ALIAS_BLOB_PATH = _MIGRATIONS_DIR / "040_findings_search_inspector_blob.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -75,12 +79,20 @@ _FIELDS_ADDED_AFTER_030 = {"inspector_names"}
 _FN_SEARCH_SIG = "create or replace function public.findings_search(\n"
 _FN_DOCUMENT_SIG = "create or replace function public.findings_document(p_finding_id text)\n"
 
-# ⑤검색 blob 이 반드시 담아야 하는 컬럼 14종(정본 -- 조용한 축소/확대 방지).
-_EXPECTED_BLOB_COLUMNS = {
+# ⑤검색 blob 이 반드시 담아야 하는 컬럼 -- 026 시점 정본(14종, inspector_names 부재).
+# 026 파일 자체는 바뀌지 않으므로 그 역사 검사(SearchBlobColumnsTest)는 계속 이 얼린
+# 값을 써야 한다 -- 아래 040 이 도입한 inspector_names 를 026 검사에 소급 적용하면 026
+# 파일이 실제로는 담지 않는 컬럼을 "담아야 한다"고 잘못 요구하게 된다.
+_EXPECTED_BLOB_COLUMNS_026 = frozenset({
     "finding_text_ko", "finding_text", "firm_name", "category_code",
     "category_label_ko", "document_id", "agency", "source", "published_date",
     "evidence_level", "review_status", "translation_method", "cfr_refs", "mfds_refs",
-}
+})
+
+# 040 이 inspector_names 를 더해 15종으로 확장한 **현재** 정본(검색 blob 이 담아야 하는
+# 컬럼의 현재 진실). 026 시점 집합에서 파생시켜 "14종 + inspector_names = 15종"이라는
+# 관계를 코드로도 보이게 한다.
+_EXPECTED_BLOB_COLUMNS = _EXPECTED_BLOB_COLUMNS_026 | {"inspector_names"}
 
 # ⑥허용 정렬 3종(정본).
 _EXPECTED_SORTS = {"date_desc", "date_asc", "firm_asc"}
@@ -197,8 +209,11 @@ class LikeWildcardEscapeTest(unittest.TestCase):
 
 
 class SearchBlobColumnsTest(unittest.TestCase):
-    """⑤검색 blob 컬럼 목록 고정 -- "무엇이 검색되는가"를 문서화된 사실로 고정해
-    조용한 축소/확대를 막는다(정본 = 14 컬럼)."""
+    """⑤검색 blob 컬럼 목록 고정(026 시점 역사 기록) -- "무엇이 검색되는가"를 문서화된
+    사실로 고정해 조용한 축소/확대를 막는다(026 정본 = 14 컬럼). ★026 파일 자체는 이후
+    바뀌지 않으므로 이 검사는 040 이 추가한 inspector_names 를 반영하지 않는 얼린
+    `_EXPECTED_BLOB_COLUMNS_026` 을 쓴다 -- 040 대상의 15컬럼 검사는
+    SearchInspectorBlobColumnsTest(아래 040 섹션)가 별도로 담당한다."""
 
     def setUp(self) -> None:
         code = _strip_sql_comments(_SEARCH_PATH.read_text(encoding="utf-8"))
@@ -210,10 +225,10 @@ class SearchBlobColumnsTest(unittest.TestCase):
 
     def test_blob_columns_are_exactly_the_declared_fourteen(self) -> None:
         found = set(re.findall(r"coalesce\(f\.(\w+)(?:::text)?, ''\)", self.blob_block))
-        self.assertEqual(found, _EXPECTED_BLOB_COLUMNS)
+        self.assertEqual(found, _EXPECTED_BLOB_COLUMNS_026)
 
     def test_blob_column_count_is_fourteen(self) -> None:
-        self.assertEqual(len(_EXPECTED_BLOB_COLUMNS), 14)
+        self.assertEqual(len(_EXPECTED_BLOB_COLUMNS_026), 14)
 
 
 class SortDeterminismTest(unittest.TestCase):
@@ -1232,6 +1247,157 @@ class InspectorProjectionCoversClientFieldsTest(unittest.TestCase):
         for col in _FIELDS_ADDED_AFTER_030 & client:
             self.assertIn(col, self.expected,
                           msg=f"{col} 이 현행 정본 검사에서까지 빠졌다 — 가드 구멍")
+
+
+# ============================================================================
+# 040_findings_search_inspector_blob.sql -- 검색 blob 에 실사관 이름 추가.
+#
+# supersede 체인: findings_search = 026 → 027 → 028 → 030 → 036 → **040(현행)**.
+# findings_document 는 040 이 재선언하지 않으므로 036 정의가 그 함수에 대해서는 지금도
+# 현행이다(위 036 섹션의 InspectorMigrationFileTest/InspectorProjectionCoversClientFieldsTest
+# 가 계속 담당한다 -- 그 클래스들을 건드리지 않는다). ★findings_search 쪽 "현행 정본" 검사만
+# 이 섹션에서 040 을 대상으로 새로 추가한다(030 이 028 을 다시 supersede 했을 때
+# HardeningProjectionCoversClientFieldsTest 를 추가하고 028 대상 검사는 그대로 둔 전례와
+# 동일한 처리).
+# ============================================================================
+
+
+# 040 이후에 추가된, 040 블롭 형식(직접 coalesce(f.col) 이 아니라
+# jsonb_array_elements_text(f.col) 로 원소만 싣는 refs 계열) 컬럼을 함께 뽑는 확장 정규식.
+# 026 정본 정규식(coalesce(f.col, ''))만으로는 cfr_refs/mfds_refs/inspector_names 를 못
+# 잡는다 -- 030 이 refs 를 원소만 싣는 형태로 바꾼 뒤부터 그 세 컬럼은 이 형태로만 blob 에
+# 들어간다(HardeningBlobRefsElementsOnlyTest 참조).
+_DIRECT_BLOB_COLUMN_RE = re.compile(r"coalesce\(f\.(\w+)(?:::text)?, ''\)")
+_ELEMENTS_BLOB_COLUMN_RE = re.compile(r"jsonb_array_elements_text\(f\.(\w+)\)")
+
+
+class SearchInspectorBlobMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_INSPECTOR_ALIAS_BLOB_PATH.is_file(), f"missing {_INSPECTOR_ALIAS_BLOB_PATH}")
+        self.sql = _INSPECTOR_ALIAS_BLOB_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _INSPECTOR_ALIAS_BLOB_PATH.read_bytes())
+
+    def test_redeclares_only_findings_search(self) -> None:
+        """040 은 검색 blob 만 건드리는 변경이라 findings_search 만 재선언한다 --
+        findings_document 는 036 정의가 현행 그대로다(040 헤더 근거)."""
+        self.assertIn(_FN_SEARCH_SIG, self.code)
+        self.assertNotIn("create or replace function public.findings_document(", self.code)
+
+
+class SearchInspectorBlobUsesElementsOnlyTest(unittest.TestCase):
+    """★040 의 핵심 회귀 가드 -- 030 이 고친 결함(`cfr_refs::text` 가 JSON 구두점을 blob 에
+    실어 `[]` 질의가 전건 매치되던 것)이 `inspector_names` 로 재발하지 않게: refs 와 같은
+    방식으로 **원소만**(`jsonb_array_elements_text`) 싣고, `::text` 직접 캐스팅은 쓰지
+    않는다는 것을 고정한다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_INSPECTOR_ALIAS_BLOB_PATH.read_text(encoding="utf-8"))
+        self.blob_block = _slice_between(code, "searched as (", "filtered as (")
+
+    def test_uses_jsonb_array_elements_text_for_inspector_names(self) -> None:
+        self.assertIn("jsonb_array_elements_text(f.inspector_names)", self.blob_block)
+
+    def test_does_not_cast_inspector_names_to_text_directly(self) -> None:
+        self.assertNotIn("f.inspector_names::text", self.blob_block)
+
+
+class SearchInspectorBlobColumnsTest(unittest.TestCase):
+    """⑤검색 blob 컬럼 목록 -- 040 대상(현재 정본, 15종 = 026 의 14종 + inspector_names).
+    위 SearchBlobColumnsTest(026, 역사 기록)는 얼린 14종 그대로 남겨둔다 -- 026 파일 자체는
+    inspector_names 라는 개념이 없었으므로 소급 확대하면 그 파일이 실제로 담지 않는 컬럼을
+    "담아야 한다"고 잘못 요구하게 된다.
+
+    ★026 이후(030) refs 계열이 `jsonb_array_elements_text(f.col)` 형태로 바뀌어 026 시절
+    정규식(`coalesce(f.col, '')`)만으로는 못 잡으므로, 두 형태를 모두 뽑아 합집합으로
+    비교한다(직접 coalesce + jsonb_array_elements_text 원소 추출)."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_INSPECTOR_ALIAS_BLOB_PATH.read_text(encoding="utf-8"))
+        self.blob_block = _slice_between(
+            code,
+            "coalesce(f.finding_text, '')",
+            ") ilike '%' || p.q_esc || '%'",
+        )
+
+    def test_blob_columns_are_exactly_the_declared_fifteen(self) -> None:
+        direct = set(_DIRECT_BLOB_COLUMN_RE.findall(self.blob_block))
+        elements = set(_ELEMENTS_BLOB_COLUMN_RE.findall(self.blob_block))
+        self.assertEqual(direct | elements, _EXPECTED_BLOB_COLUMNS)
+
+    def test_blob_column_count_is_fifteen(self) -> None:
+        self.assertEqual(len(_EXPECTED_BLOB_COLUMNS), 15)
+
+    def test_inspector_names_is_the_only_addition_over_026(self) -> None:
+        self.assertEqual(_EXPECTED_BLOB_COLUMNS - _EXPECTED_BLOB_COLUMNS_026, {"inspector_names"})
+
+
+class SearchInspectorBlobCarryoverInvariantsTest(unittest.TestCase):
+    """030 경화(work_mem·page 클램프·refs 원소만·review_status 공백 변형) + 028 이 복원한
+    3종(firm_key/translation_method/confidence) + 036 이 넣은 page_rows 의
+    f.inspector_names 가 040 에서 조용히 되돌려지지 않았는지 -- 025 에서 실증된 함정(옛
+    파일에서 정의를 복사하다 그 사이 적용된 마이그레이션을 조용히 되돌리는 것)의 회귀
+    가드다(036 의 InspectorMigrationFileTest.test_preserves_030_hardening 과 동형)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_INSPECTOR_ALIAS_BLOB_PATH.read_text(encoding="utf-8"))
+
+    def test_preserves_030_hardening(self) -> None:
+        self.assertIn("set work_mem = '8MB'", self.code)                        # Major 1
+        self.assertIn("400000", self.code)                                      # Minor 2
+        self.assertIn("jsonb_array_elements_text(f.cfr_refs)", self.code)       # Minor 1 원소만
+        self.assertIn("jsonb_array_elements_text(f.mfds_refs)", self.code)      # Minor 1 원소만
+        self.assertIn("replace(coalesce(f.review_status, ''), '_', ' ')", self.code)
+        for col in _RESTORED_BY_028:                                            # 028 복원 3종
+            self.assertIn(f"'{col}',", self.code, msg=f"040 이 028 의 {col} 을 되돌렸다")
+
+    def test_page_rows_carries_inspector_names(self) -> None:
+        page_rows = _slice_between(self.code, "page_rows as (", "page_docs_full as (")
+        self.assertIn("f.inspector_names", page_rows,
+                      msg="036 이 넣은 f.inspector_names 가 040 의 page_rows 에서 빠졌다.")
+
+
+class SearchInspectorBlobProjectionCoversClientFieldsTest(unittest.TestCase):
+    """★투영 가드의 현행 정본 이동 -- 040 이 findings_search 를 다시 supersede 했으므로,
+    findings_search 투영에 대한 "현재" 클라이언트 필드 전수 대조는 이 클래스가 담당한다.
+    위 036 대상 InspectorProjectionCoversClientFieldsTest 는 역사 기록으로 그대로 둔다
+    (036 이 실제 적용된 정의였다는 증거이자, findings_document 에 대해서는 지금도 현행이라
+    그 부분 검사는 여전히 살아있는 현재 검사이기도 하다). findings_document 는 040 이
+    재선언하지 않으므로(위 SearchInspectorBlobMigrationFileTest.test_redeclares_only_
+    findings_search 참조) 이 클래스의 대상이 아니다 -- 030 이 028 을 다시 supersede 했을
+    때 HardeningProjectionCoversClientFieldsTest 가 findings_document 를 제외한 것과 동일한
+    처리(030 섹션 참조).
+
+    036 이후 findings_search/findings_document 를 건드린 마이그레이션은 038(zone_category)
+    이전까지 없다 -- 038 은 이 두 함수를 재선언하지 않는다(grep 실측 0건). 즉 036→040 사이에
+    클라이언트가 읽는 새 필드가 생기지 않았으므로, 028/030 대상 검사가 쓰는
+    `_FIELDS_ADDED_AFTER_030`(036 이 도입한 inspector_names 제외) 같은 예외 집합이 이
+    클래스엔 필요 없다 -- 036 의 현행 검사(InspectorProjectionCoversClientFieldsTest)와
+    동일하게 `_FIELDS_NOT_PROJECTED` 하나만 제외하고 전 필드를 검사한다."""
+
+    def setUp(self) -> None:
+        code = _strip_sql_comments(_INSPECTOR_ALIAS_BLOB_PATH.read_text(encoding="utf-8"))
+        self.search_rows = _slice_between(code, "page_docs_full as (", "fac_source as (")
+        self.expected = [f for f in _parse_client_fields() if f not in _FIELDS_NOT_PROJECTED]
+
+    def test_findings_search_projects_every_client_field(self) -> None:
+        for col in self.expected:
+            self.assertIn(
+                f"'{col}',",
+                self.search_rows,
+                msg=f"040 findings_search 의 findings[] 투영에 '{col}' 이 없다 -- 클라이언트가 "
+                    f"실제로 읽는 필드다(조용히 소실되면 방어적 분기라 크래시 없이 사라진다).",
+            )
+
+    def test_restored_by_028_still_present_in_040(self) -> None:
+        for col in _RESTORED_BY_028:
+            self.assertIn(f"'{col}',", self.search_rows, msg=f"040: {col}")
+
+    def test_inspector_names_still_projected_in_040(self) -> None:
+        self.assertIn("'inspector_names',", self.search_rows)
 
 
 if __name__ == "__main__":  # pragma: no cover

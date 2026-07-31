@@ -37,11 +37,15 @@ Identity with the daily collector (the whole point of this tool): a raw_signal's
 `(source, document_id)` guarantees a byte-identical `raw_signal_id`, which is what makes
 this backfill idempotent against (and mergeable with) whatever the daily collector has
 already inserted or will insert later for the same document.
-  - FDA 483: this module calls `collect_fda_483._to_item(nrow, excerpt, observations, "", status)`
-    directly -- the exact function `collect_fda_483.collect_fda_483()` uses per row -- so
-    the resulting `IntakeItem` (and therefore its `document_id=f"fda483-{media_id}"`) is
-    byte-for-byte what the daily collector would have produced for that row. The only
-    "new" code is the AJAX row source (offset-based instead of page-0-walk) and the
+  - FDA 483: this module calls `collect_fda_483._to_item(nrow, excerpt, observations, "",
+    status, inspectors=inspectors)` directly -- the exact function
+    `collect_fda_483.collect_fda_483()` uses per row -- so the resulting `IntakeItem` (and
+    therefore its `document_id=f"fda483-{media_id}"`) is byte-for-byte what the daily
+    collector would have produced for that row. `inspectors` is
+    `collect_fda_483._extract_483_inspectors(text)` run on the same raw (pre-clean) PDF
+    text already fetched for excerpt/observations -- zero extra network requests, same
+    unconditional (flag-independent) placement as the daily collector's own wiring. The
+    only "new" code is the AJAX row source (offset-based instead of page-0-walk) and the
     document fetch/dedup wiring around it.
   - FDA Warning Letter: there is no single reusable "build the IntakeItem" function in
     collect_intake.py (the construction is inline in `collect_fda_warning_letters`), so
@@ -346,6 +350,15 @@ def run_483(
             observations = (
                 fda483._extract_483_observations_from_text(text, header_hints) if text else []
             )
+            # [실사관 배선 2026-07-31] 일일 수집기(collect_fda_483.collect_fda_483)와 동일한
+            # 위치·조건으로 맞춘다 -- ENABLE_FDA_483_OBSERVATIONS/ENABLE_FDA_483_DEEP 과
+            # 무관하게 항상 수행하는 순수 결정론 파서다(네트워크 추가 요청 0 -- 위에서 이미
+            # 받은 원시 text 를 재사용). 반드시 청소(clean) **이전** 원시 text 에서 호출해야
+            # 한다(`_extract_483_inspectors` 자체 계약) -- excerpt/observations 도 이미 그
+            # 원시 text 를 그대로 쓰고 있으므로 여기서 별도 처리는 필요 없다. 예외를 던지지
+            # 않는 함수지만, 이 블록 전체를 감싸는 기존 try/except 관례(건별 실패가 백필
+            # 전체를 죽이지 않음)를 그대로 따른다.
+            inspectors = fda483._extract_483_inspectors(text) if text else []
         except Exception as e:  # noqa: BLE001
             report.errors.append(f"483-document-fetch-failed({doc_id}):{type(e).__name__}")
             continue
@@ -363,7 +376,10 @@ def run_483(
         # IntakeItem (headline/body/raw_payload/document_id/signal_tier/etc.) for this row.
         # [결손 사유 전파 2026-07-20] `text_status` 도 넘긴다 — 일일 수집 경로와 raw_payload
         # 가 **바이트 동일**해야 하는 계약(Fda483IdentityTest)이라, 한쪽만 사유를 실으면 깨진다.
-        item = fda483._to_item(nrow, excerpt, observations, "", text_status)
+        # [실사관 배선 2026-07-31] `inspectors` 도 넘긴다 — 안 넘기면 이 경로로 들어오는 483
+        # 문서만 raw_payload 에 `fda483_inspectors` 가 영구히 빠진다(daily 와의 동일성 계약).
+        item = fda483._to_item(nrow, excerpt, observations, "", text_status,
+                                inspectors=inspectors)
         if item is None:
             # Domain-excluded by the shared QA gate inside _to_item (veterinary/device/food
             # -- same drop the daily collector performs). Not an error; not appended.

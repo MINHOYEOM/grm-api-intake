@@ -110,6 +110,50 @@
     other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
   };
 
+  // [동기화 규칙] findings.site_country 실측값 23종(2026-07-31 기준) verbatim 매핑 —
+  // [해외 실사 구성] 패널(top_countries)이 영문 국가명을 그대로 노출하던 것을 한국어
+  // 사이트 표기로 바꾼다. 이 23개가 **데이터에 실제 존재하는 전부**다(web/tests/
+  // test_render.py 가 개수·한국 3표기 수렴을 대조) — 새 국가가 유입되면 이 표에 없으므로
+  // countryLabelKo() 가 영문 원문을 그대로 반환한다(빈칸·추측 번역 금지, 아래 참조).
+  // 한국 3표기(Republic of Korea/South Korea/The Republic of Korea)는 전부 "대한민국"으로
+  // 수렴한다 — 이는 **표시상** 의도된 동작이지 건수 합산이 아니다: 이 패널은 RPC
+  // (findings_zone_category, 038)가 내려준 top_countries 행을 country 당 그대로 1행씩
+  // 표시할 뿐이고, 여러 표기를 하나의 합계로 합치는 것은 서버 계약 변경이라 이 작업
+  // 범위 밖이다. ★한계: 한국 3표기 중 둘 이상이 동시에 top5 안에 들면 "대한민국"이
+  // 두 번(서로 다른 건수로) 표시될 수 있다 — 2026-07-31 기준 데이터에서 한국은 top5
+  // 밖이라 실제로는 발생하지 않지만, 이 매핑만으로는 막을 수 없는 한계로 남는다.
+  var COUNTRY_LABELS_KO = {
+    "Australia": "호주",
+    "Belgium": "벨기에",
+    "Canada": "캐나다",
+    "China": "중국",
+    "Denmark": "덴마크",
+    "France": "프랑스",
+    "Germany": "독일",
+    "Hungary": "헝가리",
+    "Iceland": "아이슬란드",
+    "India": "인도",
+    "Italy": "이탈리아",
+    "Japan": "일본",
+    "Malaysia": "말레이시아",
+    "Mexico": "멕시코",
+    "Netherlands": "네덜란드",
+    "Spain": "스페인",
+    "Switzerland": "스위스",
+    "Taiwan": "대만",
+    "Turkey": "튀르키예",
+    "United Kingdom": "영국",
+    "Republic of Korea": "대한민국",
+    "South Korea": "대한민국",
+    "The Republic of Korea": "대한민국",
+  };
+
+  // 매핑에 없는 국가는 영문 원문을 그대로 보여준다(빈칸/추측 번역 금지) — 데이터에
+  // 새 국가가 들어와도 화면이 비지 않고 최소한 영문으로라도 표시되게 하기 위해서다.
+  function countryLabelKo(country) {
+    return COUNTRY_LABELS_KO[country] || country;
+  }
+
   // [표본 하한] 그 해 총 지적이 이 값 미만이면 구성비를 말하지 않는다 — 수집 첫 해처럼
   // 문서 한두 건만 있는 연도는 한 건이 20%가 되어 색·비율이 전부 노이즈가 된다. 연도별
   // 구성비 히트맵의 열 제외와 헤드라인 일관성 판정이 같은 기준을 공유한다.
@@ -872,7 +916,9 @@
         zoneCountriesEl.appendChild(document.createTextNode("해외 실사 구성: "));
         top.forEach(function (c, i) {
           if (i > 0) zoneCountriesEl.appendChild(document.createTextNode(" · "));
-          zoneCountriesEl.appendChild(document.createTextNode(c.country + " " + fmtNum(c.findings)));
+          zoneCountriesEl.appendChild(
+            document.createTextNode(countryLabelKo(c.country) + " " + fmtNum(c.findings))
+          );
         });
       }
     }

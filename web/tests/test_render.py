@@ -3334,6 +3334,58 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
         self.assertIn("(d.top_countries || []).slice(0, 5);", fn)
         self.assertIn('"해외 실사 구성: "', fn)
 
+    # ── 국가명 한글화(findings.site_country 실측 23종) ──────────────────────
+    def test_country_labels_ko_covers_all_23_and_korea_variants_converge(self):
+        """[동기화 규칙] COUNTRY_LABELS_KO — findings.site_country 실측값 23종
+        (2026-07-31) verbatim. 한국 3표기는 전부 "대한민국"으로 수렴해야 한다."""
+        m = re.search(r"var COUNTRY_LABELS_KO = \{(.*?)\n  \};", self.js_src, re.S)
+        self.assertIsNotNone(m, "trends.js 에 COUNTRY_LABELS_KO 정의 미발견")
+        body = m.group(1)
+        pairs = dict(re.findall(r'"([^"]+)":\s*"([^"]+)",?', body))
+        self.assertEqual(len(pairs), 23, f"23개국이 아님: {sorted(pairs)}")
+        expected_non_korea = {
+            "Australia": "호주", "Belgium": "벨기에", "Canada": "캐나다", "China": "중국",
+            "Denmark": "덴마크", "France": "프랑스", "Germany": "독일", "Hungary": "헝가리",
+            "Iceland": "아이슬란드", "India": "인도", "Italy": "이탈리아", "Japan": "일본",
+            "Malaysia": "말레이시아", "Mexico": "멕시코", "Netherlands": "네덜란드",
+            "Spain": "스페인", "Switzerland": "스위스", "Taiwan": "대만", "Turkey": "튀르키예",
+            "United Kingdom": "영국",
+        }
+        for k, v in expected_non_korea.items():
+            self.assertEqual(pairs.get(k), v, f"{k} 매핑 불일치")
+        for k in ("Republic of Korea", "South Korea", "The Republic of Korea"):
+            self.assertEqual(pairs.get(k), "대한민국", f"{k} 가 대한민국으로 수렴하지 않음")
+
+    def test_country_label_helper_falls_back_to_english_when_unmapped(self):
+        """매핑에 없는 국가는 영문 원문 그대로 -- 빈칸/추측 번역 금지(폴백 계약)."""
+        self.assertIn("function countryLabelKo(country)", self.js_src)
+        fn = self.js_src[self.js_src.index("function countryLabelKo(country)"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn("COUNTRY_LABELS_KO[country] || country", fn)
+
+    def test_top_countries_render_uses_korean_label_not_raw_country(self):
+        """top_countries 렌더 루프가 원문 country 를 그대로 쓰지 않고
+        countryLabelKo() 를 거치는지(회귀 -- 실제 결함이었던 지점)."""
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        top_loop = fn[fn.index("top.forEach"):]
+        self.assertIn("countryLabelKo(c.country)", top_loop)
+        self.assertNotIn("createTextNode(c.country ", top_loop)
+
+    def test_korea_findings_not_summed_across_variants(self):
+        """한국 3표기 통합은 표시 전용 -- 이 패널은 서버가 준 top_countries 행을 그대로
+        1행씩 표시할 뿐 건수를 합산하지 않는다(범위 밖 명시 주석 확인, 서버 계약
+        변경은 이 작업 범위 밖)."""
+        idx = self.js_src.index("var COUNTRY_LABELS_KO")
+        preceding_comment = self.js_src[max(0, idx - 1400):idx]
+        self.assertIn("건수 합산이 아니다", preceding_comment.replace("\n", ""))
+        self.assertIn("합계로 합치는 것은 서버 계약 변경", preceding_comment.replace("\n", ""))
+        fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        # findings 합산 로직이 top_countries 루프 안에 없어야 한다(단순 표시만).
+        top_loop = fn[fn.index("top.forEach"):]
+        self.assertNotIn("+=", top_loop)
+
     def test_misreading_guard_note_present_in_static_shell(self):
         """"해외"가 균질한 덩어리(≈한국)로 오독되지 않도록 하는 고정 안내문 — RPC
         성공 여부와 무관하게 정적 텍스트로 셸에 존재해야 한다(골든 리뷰 가능)."""

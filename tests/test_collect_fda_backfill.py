@@ -858,6 +858,97 @@ class AutoModeExistingIdsFailureTest(unittest.TestCase):
         self.assertNotIn(_SERVICE_KEY, json.dumps(merged))
 
 
+class InspectorWiringTest(unittest.TestCase):
+    """[실사관 배선 2026-07-31] `run_483` 이 이미 받아둔 원시 PDF text 에서
+    `collect_fda_483._extract_483_inspectors` 를 호출해 `_to_item(..., inspectors=...)` 로
+    넘기는지 -- 안 넘기면 이 경로로 들어오는 483 문서만 raw_payload 에
+    `fda483_inspectors` 가 영구히 빠진다(daily collector 와의 바이트 동일성 계약 위반).
+    """
+
+    _SIGNATURE_TEXT = (
+        "SEE REVERSE| DATE ISSUED\nJose F Velez,\nInvestigator\n2/27/2026\nOF THIS PAGE"
+    )
+    _NO_SIGNATURE_TEXT = "Cover page only, no findings section, no signature block."
+
+    def test_inspectors_present_when_signature_block_found(self) -> None:
+        report, exit_code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[(self._SIGNATURE_TEXT, "ok")],
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.invalid, 0)
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        raw = json.loads(posted[0]["raw_json"])
+        self.assertEqual(raw.get("fda483_inspectors"), ["Jose F Velez"])
+
+    def test_inspectors_key_absent_when_none_found(self) -> None:
+        report, exit_code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[(self._NO_SIGNATURE_TEXT, "ok")],
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.invalid, 0)
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        raw = json.loads(posted[0]["raw_json"])
+        # 빈 리스트로 채우지 않는다 -- 키 자체가 없어야 한다(다른 조건부 raw 필드와 동일 관례).
+        self.assertNotIn("fda483_inspectors", raw)
+
+    def test_text_fetch_failure_proceeds_without_exception(self) -> None:
+        # PDF 텍스트를 아예 못 얻은 경우("scan-no-text" 는 원문 사정 -- 엔진 부재가 아니다)에도
+        # run_483 이 예외 없이 진행하고 문서를 적재한다. inspectors 는 당연히 비어 키가 없다.
+        report, exit_code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[("", "scan-no-text")],
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.errors, [])
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        raw = json.loads(posted[0]["raw_json"])
+        self.assertNotIn("fda483_inspectors", raw)
+
+    def test_identical_to_daily_collector_inspectors_field(self) -> None:
+        # 일일 수집 경로와 동일 원시 text 를 넣었을 때 fda483_inspectors 값이 바이트 동일한지
+        # (Fda483IdentityTest 의 전면 동일성 계약을 이 필드에 한해 직접 재확인).
+        with mock.patch("collect_fda_483._fetch_html_rows",
+                        return_value=([dict(_483_NROW)], 1, False)), \
+             mock.patch("collect_fda_483._fetch_fda483_pdf_text",
+                        return_value=(self._SIGNATURE_TEXT, "ok")), \
+             mock.patch("collect_fda_483.time.sleep"):
+            items, err = fda483.collect_fda_483(date(2026, 5, 1), date(2026, 6, 30))
+        self.assertIsNone(err)
+        daily_record = findings_store.raw_signal_from_intake_item(items[0])
+        daily_raw = json.loads(daily_record["raw_json"])
+
+        _report, exit_code, post, _pdf, _sleeper = _run_483(
+            pdf_side_effect=[(self._SIGNATURE_TEXT, "ok")],
+        )
+        self.assertEqual(exit_code, 0)
+        backfill_raw = json.loads(_posted_records(post)[0]["raw_json"])
+        self.assertEqual(backfill_raw.get("fda483_inspectors"),
+                          daily_raw.get("fda483_inspectors"))
+        self.assertEqual(backfill_raw.get("fda483_inspectors"), ["Jose F Velez"])
+
+
+class ToItemPositionalContractTest(unittest.TestCase):
+    """회귀 가드 -- `_to_item` 의 기존 위치인자 호출 계약(inspectors 없이 5개 위치인자)이
+    이번 수리로 깨지지 않았는지. 이 계약이 깨지면 `inspectors` 를 모르는 다른 호출자
+    (또는 이 계약을 가정하는 테스트/코드)가 조용히 잘못된 인자를 받게 된다.
+    """
+
+    def test_to_item_positional_call_without_inspectors_still_works(self) -> None:
+        item = fda483._to_item(dict(_483_NROW), "some excerpt", [], "", "ok")
+        self.assertIsNotNone(item)
+        self.assertNotIn("fda483_inspectors", item.raw_payload)
+
+    def test_to_item_positional_call_with_inspectors_as_sixth_positional(self) -> None:
+        # inspectors 는 키워드 전용으로 배선하고 있지만(collect_fda_backfill.run_483),
+        # 시그니처 자체는 여섯 번째 위치인자로도 받는다 -- 이 계약이 깨지지 않았는지 확인.
+        item = fda483._to_item(dict(_483_NROW), "some excerpt", [], "", "ok",
+                                ["Jose F Velez"])
+        self.assertIsNotNone(item)
+        self.assertEqual(item.raw_payload.get("fda483_inspectors"), ["Jose F Velez"])
+
+
 class OcrEngineUnavailableTest(unittest.TestCase):
     """[2026-07-30 실장애] OCR 엔진이 없는 러너에서 스캔 483 을 **빈 본문으로 적재하지 않는다**.
 

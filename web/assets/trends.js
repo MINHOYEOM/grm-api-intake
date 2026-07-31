@@ -39,6 +39,24 @@
  *       섹션을 이 원칙으로 삭제했다(내부 QA 개념 비노출 원칙과도 정합).
  *   (4) 표본이 작은 구간은 결론을 지지하지 못하므로 빼되, **뺐다는 사실을 화면에 적는다**
  *       (renderHeatmap 의 MIN_YEAR_BASE / tr-heatmap-note).
+ *
+ * ── [트렌드 고도화 2026-07] 누적 인구조사에서 의사결정 도구로 ────────────────────
+ * 위 (1)~(4)는 "무엇을 말하면 안 되는가"를 잘 지켰지만, 그 결과 이 페이지는 **우리가
+ * 무엇을 얼마나 모았는가**만 답하고 "지금 무엇을 보라는 것인가"에는 답하지 않았다.
+ * 누적 분모의 47%가 2024년 한 해 공개분이라 전 기간 순위는 사실상 그 배치의 그림자였다.
+ * 다음 셋을 더한다 — 셋 다 기존 섹션과 독립된 fetch 라 실패 반경이 자기 자신뿐이다:
+ *   ① 최근 12개월(renderRecentWindow) — 041 findings_recent_window. 월별 문서 수 막대
+ *      24개월(최근/직전 2색) + 최근 창 카테고리 순위.
+ *   ② 달라진 점(renderMovers) — 같은 041 응답에서 파생(추가 fetch 0). 최근 12개월 vs
+ *      직전 12개월의 **문서 등장률** 차이(%p). 건수가 아닌 이유는 renderMovers 주석 참조.
+ *      교란 요인인 소스 구성 변화는 by_source 의 cur/prev 로 화면에 함께 적는다.
+ *   ③ 업체 찾기(runFirmFind) — 041 findings_firm_search. 이름으로 찾아 013 업체 프로파일
+ *      페이지로 보낸다. 그리고 최근 창 카테고리 행을 누르면 **실제 지적 문장**을 펼친다.
+ *
+ * ★③의 사례 문장은 위 "원문 텍스트를 절대 렌더하지 않는다"의 예외가 아니라 **다른 층**이다.
+ *   그 문장은 집계 RPC(007/010/017/038/041)가 아니라 026 findings_search 에서 오고, 그
+ *   함수는 security invoker 라 공개 게이트(010 정책)를 통과한 행만 돌려준다 — /findings/
+ *   검색 페이지가 이미 쓰는 바로 그 경로다. 집계 RPC 의 무반환 계약은 그대로 불가침이다.
  */
 (function () {
   "use strict";
@@ -73,6 +91,25 @@
   var zoneSubEl = document.getElementById("tr-zone-sub");
   var zoneEl = document.getElementById("tr-zone");
   var zoneCountriesEl = document.getElementById("tr-zone-countries");
+  // [최근 12개월 · 달라진 점] 041_findings_recent_window 전용 엘리먼트. zone/heatmap 과
+  // 동일하게 아래 하드 게이트에는 넣지 않는다 — 구버전 셸(캐시 스큐)을 만나도 실패
+  // 반경이 이 패널들로만 한정되어야 한다.
+  var recentBlockEl = document.getElementById("tr-recent-block");
+  var recentSubEl = document.getElementById("tr-recent-sub");
+  var recentMonthsEl = document.getElementById("tr-recent-months");
+  var recentNoteEl = document.getElementById("tr-recent-note");
+  var recentCatsEl = document.getElementById("tr-recent-cats");
+  var recentCatsHeadEl = document.getElementById("tr-recent-cats-h");
+  var recentCatsReadEl = document.getElementById("tr-recent-cats-read");
+  var moveBlockEl = document.getElementById("tr-move-block");
+  var moveUpEl = document.getElementById("tr-move-up");
+  var moveDownEl = document.getElementById("tr-move-down");
+  var moveSourceEl = document.getElementById("tr-move-source");
+  var moveNoteEl = document.getElementById("tr-move-note");
+  // [업체 찾기] 041_findings_firm_search 전용.
+  var firmFindFormEl = document.getElementById("tr-ff-form");
+  var firmFindInputEl = document.getElementById("tr-ff-input");
+  var firmFindResultEl = document.getElementById("tr-ff-result");
   if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl ||
       !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
       !sourceEl) return;
@@ -164,7 +201,31 @@
   // openFirmKey — [업체 프로파일 진입] 017_findings_stats_firm_key.sql 적용 라이브에서만
   // top_firms 행에 firm_key 가 실려온다. 013 미적용/017 미적용 라이브(구버전 top_firms,
   // firm_name 만 있는 형태)에서는 빈 문자열로 남아 프로필 링크를 방어적으로 생략한다.
-  var state = { openFirm: "", openFirmKey: "", lastFirms: [] };
+  // openCat/recentCats/recentCurDocs/exampleNode — [최근 12개월] 카테고리 순위에서 펼쳐진
+  // 행과 그 사례 패널. 사례 패널은 비동기로 도착하므로 노드를 state 에 들고 있다가
+  // renderRecentCats() 가 매번 같은 자리에 다시 끼워 넣는다(별도 저장소 난립 금지).
+  var state = {
+    openFirm: "", openFirmKey: "", lastFirms: [],
+    openCat: "", recentCats: [], recentCurFindings: 0, exampleNode: null,
+  };
+
+  // ── [최근 12개월 · 달라진 점] 판정 상수 ─────────────────────────────────────
+  // 창 전체 표본 하한 — 두 창 중 어느 쪽이든 지적이 이보다 적으면 증감 비교 자체를
+  // 하지 않는다(패널을 숨긴다). 수십 건짜리 창에서는 한두 건이 몇 %p 를 움직여,
+  // 비교가 신호가 아니라 잡음이 된다.
+  var WINDOW_MIN_FINDINGS = 200;
+  // 카테고리별 표본 하한 — 두 창 지적 수 합이 이보다 적은 영역은 증감 목록에서 뺀다.
+  var MOVER_MIN_SAMPLE = 20;
+  // 유의 폭 — 이보다 작은 변화는 "달라졌다"고 말하지 않는다(반올림 표기로는 커 보여도
+  // 몇 건 차이인 구간이다).
+  var MOVER_MIN_PP = 1.0;
+  // 각 방향(증가/감소) 최대 표시 개수.
+  var MOVER_MAX_ROWS = 5;
+  // 최근 12개월 카테고리 순위에 그리는 행 수.
+  var RECENT_CAT_ROWS = 8;
+  // 카테고리 사례 패널에 보여 줄 지적 문장 수 / 한 문장 표시 상한(글자).
+  var EXAMPLE_ROWS = 3;
+  var EXAMPLE_MAX_CHARS = 220;
 
   // ── 공용 헬퍼 ────────────────────────────────────────────────────────────
   function el(tag, className, text) {
@@ -926,6 +987,392 @@
     zoneBlockEl.hidden = false;
   }
 
+  // ── [최근 12개월] 041_findings_recent_window ─────────────────────────────
+  // findings_stats/findings_category_matrix/findings_zone_category 와 독립된 별개 RPC.
+  // 실패해도(041 미배포 라이브 포함) 이 섹션만 조용히 숨겨진 채로 남고 다른 섹션엔 전혀
+  // 영향이 없다(히트맵·zone 과 동일 원칙 — § 오케스트레이션 하단 fetchRecentWindow 참조).
+  //
+  // ★이 페이지에서 유일하게 **시간에 따른 변화**를 말할 수 있는 자리다. 그래서 아래 세
+  //   규칙을 지킨다:
+  //   (1) 비교 단위는 **구성비(그 창 전체 지적 중 이 영역의 비율)** 다. 각 창에서 합이
+  //       정확히 100%가 되므로 늘어난 만큼 어딘가는 줄고, 두 창을 견주는 것이 성립한다.
+  //       ※ 처음엔 "문서 등장률"(그 창 문서 중 이 영역이 지적된 문서 비율)로 만들었다가
+  //         되돌렸다 — 등장률은 합이 100%로 고정되지 않아서, 창마다 **문서당 지적 수**가
+  //         달라지면(직전 3.9건/문서 → 최근 2.7건/문서) 전 영역이 한 방향으로 쏠린다.
+  //         실측에서 무균보증이 문서 119→136건으로 **늘었는데도** 등장률만 33%→20%로
+  //         떨어져 "줄었다"로 표시됐다. 분모의 성격이 변하는 지표는 추세를 못 잰다.
+  //   (2) 구성비 변화는 **건수 증감이 아니다**. 위 무균보증은 구성비가 22%→17%로 내려가도
+  //       건수는 312→309건으로 거의 그대로다 — 다른 영역이 늘어 비중이 밀린 것이다.
+  //       그래서 각 행에 건수를 함께 적고, 표제도 "줄어든"이 아니라 "비중이 줄어든"이다.
+  //   (3) 최대 교란 요인인 **소스 구성 변화**를 같은 응답(by_source 의 cur/prev)으로 화면에
+  //       함께 적는다 — 한쪽 창에만 새 소스가 들어와 있으면 카테고리 구성이 달라진 게
+  //       아니라 모집단이 달라진 것이다. 해석·권고 문구는 만들지 않는다(트랙C 품질 기준).
+
+  function monthLabelKo(ym) {
+    var s = String(ym || "");
+    if (s.length < 7) return s;
+    return s.slice(0, 4) + "년 " + String(Number(s.slice(5, 7))) + "월";
+  }
+
+  function shareOf(part, whole) {
+    return whole > 0 ? (part || 0) / whole : 0;
+  }
+
+  // 소수 1자리 고정 %p 표기(+/− 부호 포함). pctText 와 달리 **차이**를 적는 자리라
+  // 부호가 정보의 절반이다.
+  function ppText(pp) {
+    var v = Math.round(pp * 10) / 10;
+    return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%p";
+  }
+
+  function buildMonthColumn(row, maxDocs, isPrev, showYear) {
+    var col = el("div", "tr-rm-col" + (isPrev ? " is-prev" : "") + (showYear ? " is-year" : ""));
+    var barwrap = el("div", "tr-rm-barwrap");
+    var bar = el("div", "tr-rm-bar");
+    var docs = row.docs || 0;
+    bar.style.height = Math.max(3, Math.round((docs / maxDocs) * 100)) + "%";
+    barwrap.appendChild(bar);
+    col.appendChild(barwrap);
+    var mm = String(Number(String(row.month || "0000-00").slice(5, 7)));
+    col.appendChild(el("span", "tr-rm-lbl",
+      showYear ? "'" + String(row.month).slice(2, 4) + "." + mm : mm));
+    // 건수도 툴팁에 함께 둔다 — 막대는 문서 수지만 원 수치를 숨기지 않는다.
+    col.title = monthLabelKo(row.month) + " · 문서 " + fmtNum(docs) + "건 · 지적 " +
+      fmtNum(row.cnt || 0) + "건";
+    return col;
+  }
+
+  function renderRecentMonths(months, prevTo) {
+    recentMonthsEl.innerHTML = "";
+    var maxDocs = months.reduce(function (m, r) { return Math.max(m, r.docs || 0); }, 0) || 1;
+    var bars = el("div", "tr-rm-bars");
+    months.forEach(function (r, i) {
+      var isPrev = String(r.month || "") <= String(prevTo || "");
+      // 연도 표기는 1월과 첫 막대에만 — 24개 전부에 붙이면 라벨이 서로 겹친다.
+      var showYear = i === 0 || String(r.month || "").slice(5, 7) === "01";
+      bars.appendChild(buildMonthColumn(r, maxDocs, isPrev, showYear));
+    });
+    recentMonthsEl.appendChild(bars);
+
+    var legend = el("div", "tr-rm-legend");
+    [["tr-rm-key-cur", "최근 12개월"], ["tr-rm-key-prev", "직전 12개월"]].forEach(function (pair) {
+      var item = el("span", "");
+      item.appendChild(el("span", "tr-rm-key " + pair[0]));
+      item.appendChild(document.createTextNode(pair[1]));
+      legend.appendChild(item);
+    });
+    recentMonthsEl.appendChild(legend);
+  }
+
+  // 최근 창 카테고리 순위 — 행을 누르면 그 영역의 실제 지적 문장이 아래로 펼쳐진다.
+  // 단위는 아래 누적 순위(renderCategoryRanking)와 같은 **건수 + 구성비**로 맞춘다 —
+  // 같은 페이지에서 두 순위가 서로 다른 잣대를 쓰면 비교 자체가 불가능해진다. 문서 수는
+  // 툴팁으로 함께 준다(한 문서에 지적이 여러 개라는 사실을 잃지 않도록).
+  function buildRecentCatRow(entry, idx, maxCnt, curFindings) {
+    var row = el("div", "tr-rc-row" + (state.openCat === entry.code ? " on" : ""));
+    makeClickableRow(row, entry.ko + " 실제 지적 사례 보기", function () {
+      if (state.openCat === entry.code) closeRecentCat();
+      else openRecentCat(entry.code, entry.ko);
+    });
+    row.appendChild(el("span", "tr-rc-rank", String(idx + 1)));
+    row.appendChild(el("span", "tr-rc-label", entry.ko));
+    var track = el("div", "tr-rc-track");
+    var bar = el("div", "tr-rc-bar");
+    bar.style.transform = "scaleX(" + Math.max(0.02, maxCnt > 0 ? entry.cnt / maxCnt : 0) + ")";
+    track.appendChild(bar);
+    row.appendChild(track);
+    row.appendChild(el("span", "tr-rc-docs",
+      fmtNum(entry.cnt) + "건 · " + pctText(entry.cnt, curFindings)));
+    row.appendChild(el("span", "tr-rc-caret", state.openCat === entry.code ? "▲" : "▼"));
+    row.title = entry.ko + " · 최근 12개월 지적 " + fmtNum(entry.cnt) + "건 · 문서 " +
+      fmtNum(entry.docs) + "건";
+    return row;
+  }
+
+  function renderRecentCats() {
+    if (!recentCatsEl) return;
+    recentCatsEl.innerHTML = "";
+    var rows = state.recentCats || [];
+    if (!rows.length) return;
+    var maxCnt = rows[0].cnt || 1;
+    var curFindings = state.recentCurFindings || 0;
+    rows.forEach(function (entry, i) {
+      recentCatsEl.appendChild(buildRecentCatRow(entry, i, maxCnt, curFindings));
+      if (state.openCat === entry.code) {
+        recentCatsEl.appendChild(state.exampleNode || el("p", "tr-empty", "불러오는 중…"));
+      }
+    });
+    if (recentCatsHeadEl) recentCatsHeadEl.hidden = false;
+    if (recentCatsReadEl) recentCatsReadEl.hidden = false;
+  }
+
+  function renderRecentWindow(data) {
+    if (!recentBlockEl || !recentMonthsEl) return;
+    var d = data || {};
+    var scope = d.scope || {};
+    var totals = d.totals || {};
+    var cur = totals.cur || {};
+    var months = d.by_month || [];
+    if (!months.length || !(Number(cur.findings) > 0)) return;   // 빈 응답 → 숨김 유지
+
+    if (recentSubEl) {
+      recentSubEl.textContent =
+        monthLabelKo(scope.cur_from) + " ~ " + monthLabelKo(scope.cur_to) + " · 문서 " +
+        fmtNum(cur.documents) + "건 · 지적 " + fmtNum(cur.findings) + "건 · 업체 " +
+        fmtNum(cur.firms) + "곳";
+    }
+    renderRecentMonths(months, scope.prev_to);
+    if (recentNoteEl) {
+      // 마지막 달은 구조상 항상 진행 중이다(창의 끝 = 이번 달) — 막대가 낮은 이유를
+      // 화면에 적지 않으면 "최근에 줄었다"로 오독된다.
+      recentNoteEl.textContent =
+        "마지막 막대(" + monthLabelKo(scope.cur_to) + ")는 아직 진행 중인 달이라 낮게 보입니다.";
+    }
+
+    var byCat = d.by_category || [];
+    state.recentCurFindings = Number(cur.findings) || 0;
+    state.recentCats = byCat.map(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      return {
+        code: c.category_code,
+        ko: label ? label.ko : c.category_code,
+        docs: c.cur_docs || 0,
+        cnt: c.cur_cnt || 0,
+      };
+    }).filter(function (c) { return c.cnt > 0; })
+      .sort(function (a, b) { return b.cnt - a.cnt || a.code.localeCompare(b.code); })
+      .slice(0, RECENT_CAT_ROWS);
+    renderRecentCats();
+
+    recentBlockEl.hidden = false;
+  }
+
+  // ── [달라진 점] 최근 창 vs 직전 창 구성비 차이 ─────────────────────────────
+  // 각 행은 구성비 변화(%p)와 **건수**를 함께 적는다 — 둘을 같이 보여 주지 않으면
+  // "비중이 줄었다"가 "건수가 줄었다"로 읽힌다(실측: 무균보증 312→309건인데 구성비는
+  // 22%→17%). 문서 수는 툴팁에 둔다.
+  function buildMoverRow(r, isUp) {
+    var row = el("div", "tr-mv-row " + (isUp ? "tr-mv-up" : "tr-mv-down"));
+    var label = el("span", "tr-mv-label", r.ko);
+    label.appendChild(el("span", "tr-mv-cnt",
+      "지적 " + fmtNum(r.prevCnt) + " → " + fmtNum(r.curCnt) + "건"));
+    row.appendChild(label);
+    row.appendChild(el("span", "tr-mv-shift", r.prevPct + " → " + r.curPct));
+    row.appendChild(el("span", "tr-mv-badge", ppText(r.deltaPp)));
+    row.title = r.ko + " · 문서 " + fmtNum(r.prevDocs) + "건 → " + fmtNum(r.curDocs) + "건";
+    return row;
+  }
+
+  function fillMoverList(listEl, rows, isUp) {
+    if (!listEl) return;
+    listEl.innerHTML = "";
+    if (!rows.length) {
+      listEl.appendChild(el("p", "tr-empty", "기준(" + MOVER_MIN_PP + "%p 이상)을 넘는 변화가 없습니다."));
+      return;
+    }
+    rows.forEach(function (r) { listEl.appendChild(buildMoverRow(r, isUp)); });
+  }
+
+  // 두 창의 소스 구성을 나란히 적는다 — 증감 비교의 최대 교란 요인이라 감추지 않는다.
+  // 분모는 위 증감과 **같은 단위(지적 건수)** 로 맞춘다(문서 기준으로 적으면 독자가 두
+  // 수치를 같은 잣대로 견줄 수 없다). 어느 쪽 창에서든 1% 이상인 소스만 적는다.
+  function renderMoverSourceLine(bySource, curFindings, prevFindings) {
+    if (!moveSourceEl) return;
+    var parts = (bySource || []).map(function (s) {
+      return {
+        source: s.source,
+        cur: shareOf(s.cnt, curFindings),
+        prev: shareOf(s.prev_cnt, prevFindings),
+        curPct: pctText(s.cnt || 0, curFindings),
+        prevPct: pctText(s.prev_cnt || 0, prevFindings),
+      };
+    }).filter(function (s) { return s.cur >= 0.01 || s.prev >= 0.01; })
+      .sort(function (a, b) { return b.cur - a.cur; });
+    if (!parts.length) { moveSourceEl.textContent = ""; return; }
+    moveSourceEl.textContent = "두 기간의 소스 구성: " +
+      parts.map(function (s) { return s.source + " " + s.prevPct + " → " + s.curPct; }).join(" · ") +
+      ". 소스 구성이 달라지면 위 증감도 함께 움직입니다.";
+  }
+
+  function renderMovers(data) {
+    if (!moveBlockEl || !moveUpEl || !moveDownEl) return;
+    var d = data || {};
+    var totals = d.totals || {};
+    var curFindings = Number((totals.cur || {}).findings) || 0;
+    var prevFindings = Number((totals.prev || {}).findings) || 0;
+    // 창이 얇으면 비교 자체를 하지 않는다 — 숨김 유지(억지 해석 금지).
+    if (curFindings < WINDOW_MIN_FINDINGS || prevFindings < WINDOW_MIN_FINDINGS) return;
+
+    var dropped = 0;
+    var rows = (d.by_category || []).map(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      var cc = c.cur_cnt || 0, pc = c.prev_cnt || 0;
+      return {
+        code: c.category_code,
+        ko: label ? label.ko : c.category_code,
+        curCnt: cc,
+        prevCnt: pc,
+        curDocs: c.cur_docs || 0,
+        prevDocs: c.prev_docs || 0,
+        curPct: pctText(cc, curFindings),
+        prevPct: pctText(pc, prevFindings),
+        deltaPp: (shareOf(cc, curFindings) - shareOf(pc, prevFindings)) * 100,
+      };
+    }).filter(function (r) {
+      if (r.curCnt + r.prevCnt >= MOVER_MIN_SAMPLE) return true;
+      dropped += 1;
+      return false;
+    });
+
+    var up = rows.filter(function (r) { return r.deltaPp >= MOVER_MIN_PP; })
+      .sort(function (a, b) { return b.deltaPp - a.deltaPp; }).slice(0, MOVER_MAX_ROWS);
+    var down = rows.filter(function (r) { return r.deltaPp <= -MOVER_MIN_PP; })
+      .sort(function (a, b) { return a.deltaPp - b.deltaPp; }).slice(0, MOVER_MAX_ROWS);
+    fillMoverList(moveUpEl, up, true);
+    fillMoverList(moveDownEl, down, false);
+
+    renderMoverSourceLine(d.by_source, curFindings, prevFindings);
+    if (moveNoteEl) {
+      // ★"비중이 줄었다 ≠ 건수가 줄었다" — 이 한 줄이 없으면 표가 오독된다.
+      var note = "여기서 재는 것은 전체에서 차지하는 비중입니다. 건수가 늘어도 다른 영역이 " +
+        "더 늘면 비중은 줄어듭니다 — 각 줄의 건수를 함께 보세요. 비교 기준: 최근 12개월 지적 " +
+        fmtNum(curFindings) + "건 vs 직전 12개월 " + fmtNum(prevFindings) + "건.";
+      if (dropped > 0) {
+        note += " 두 기간 합이 " + MOVER_MIN_SAMPLE + "건 미만인 " + dropped +
+          "개 영역은 비율이 흔들려 뺐습니다.";
+      }
+      note += " 날짜는 자료가 공개된 날 기준이라 실사 시점과는 다릅니다.";
+      moveNoteEl.textContent = note;
+    }
+    moveBlockEl.hidden = false;
+  }
+
+  // ── [카테고리 → 실제 지적 사례] 026 findings_search 재사용 ──────────────────
+  // ★이 패널만은 집계 RPC 가 아니라 findings_search(security invoker + RLS)에서 온다 —
+  // /findings/ 검색 페이지가 이미 쓰는 공개 경로 그대로이며, 공개 게이트(010 정책)를
+  // 통과한 행만 내려온다. 즉 "집계 수치 ≥ 여기 보이는 건수"가 정상이고, 그 차이는
+  // 커버리지 노트가 이미 설명한다.
+  // 정렬은 date_desc — 최근 창의 순위 아래 붙는 패널이므로 사례도 최신부터 보여 준다.
+  function truncateText(s) {
+    var t = String(s || "").replace(/\s+/g, " ").trim();
+    return t.length > EXAMPLE_MAX_CHARS ? t.slice(0, EXAMPLE_MAX_CHARS) + "…" : t;
+  }
+
+  function buildExampleItem(f) {
+    var item = el("div", "tr-ex-item");
+    var meta = [decodeFirmDisplay(f.firm_name), f.published_date, f.source]
+      .filter(Boolean).join(" · ");
+    item.appendChild(el("p", "tr-ex-meta", meta));
+    // 국문이 있으면 국문, 없으면 영어 원문(빈칸으로 두지 않는다 — 부재 어휘 규칙).
+    var body = (f.finding_text_ko || "").trim() || (f.finding_text || "").trim();
+    item.appendChild(el("p", "tr-ex-text", truncateText(body)));
+    return item;
+  }
+
+  function buildExamplePanel(code, ko, payload) {
+    var panel = el("div", "tr-ex");
+    var docs = (payload && payload.documents) || [];
+    var picked = [];
+    docs.forEach(function (doc) {
+      (doc.findings || []).forEach(function (f) {
+        if (picked.length < EXAMPLE_ROWS && f.category_code === code) picked.push(f);
+      });
+    });
+    if (!picked.length) {
+      panel.appendChild(el("p", "tr-empty",
+        "이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다."));
+      return panel;
+    }
+    picked.forEach(function (f) { panel.appendChild(buildExampleItem(f)); });
+    var total = ((payload && payload.totals) || {}).findings || 0;
+    var foot = el("p", "tr-ex-foot");
+    var a = document.createElement("a");
+    a.className = "tr-ex-more";
+    a.href = findingsHref("cat", code);
+    a.textContent = ko + " 지적 " + fmtNum(total) + "건 전체 보기 →";
+    foot.appendChild(a);
+    panel.appendChild(foot);
+    return panel;
+  }
+
+  function openRecentCat(code, ko) {
+    state.openCat = code;
+    state.exampleNode = el("p", "tr-empty", "불러오는 중…");
+    renderRecentCats();
+    fetchCategoryExamples(code).then(function (payload) {
+      if (state.openCat !== code) return;          // 그 사이 다른 행을 열었으면 버린다
+      state.exampleNode = buildExamplePanel(code, ko, payload);
+      renderRecentCats();
+    }).catch(function () {
+      if (state.openCat !== code) return;
+      state.exampleNode = el("p", "tr-empty", "사례를 불러오지 못했습니다.");
+      renderRecentCats();
+    });
+  }
+
+  function closeRecentCat() {
+    state.openCat = "";
+    state.exampleNode = null;
+    renderRecentCats();
+  }
+
+  // ── [업체 찾기] 041 findings_firm_search ────────────────────────────────────
+  // 결과 행은 013 의 업체 프로파일 페이지(/findings/firm/?key=firm_key)로 직행한다 —
+  // 이미 존재하지만 Top 30 을 거치지 않으면 도달할 수 없던 페이지의 진입로다.
+  // 경로 계산은 buildFirmProfileLink 와 동일하게 형제 디렉터리 상대경로 하나면 된다.
+  function buildFirmFindRow(item) {
+    var a = document.createElement("a");
+    a.className = "tr-ff-row";
+    a.href = "../firm/index.html?key=" + encodeURIComponent(item.firm_key || "");
+    var name = el("span", "tr-ff-name", decodeFirmDisplay(item.firm_name));
+    var cat = CATEGORY_LABELS[item.top_category];
+    var subParts = [];
+    if (cat) subParts.push("최다 지적: " + cat.ko);
+    var sources = item.sources || [];
+    if (sources.length) subParts.push(sources.join(" · "));
+    if (subParts.length) name.appendChild(el("span", "tr-ff-sub", subParts.join("  |  ")));
+    a.appendChild(name);
+    var meta = el("span", "tr-ff-meta");
+    meta.appendChild(el("span", "",
+      "문서 " + fmtNum(item.documents) + "건 · 지적 " + fmtNum(item.findings) + "건"));
+    meta.appendChild(el("span", "tr-ff-span",
+      (item.first_seen || "?") + " ~ " + (item.last_seen || "?")));
+    a.appendChild(meta);
+    return a;
+  }
+
+  function renderFirmFindResult(payload, q) {
+    if (!firmFindResultEl) return;
+    firmFindResultEl.innerHTML = "";
+    var items = (payload && payload.items) || [];
+    if (!items.length) {
+      firmFindResultEl.appendChild(el("p", "tr-ff-msg",
+        "‘" + q + "’ (으)로 찾은 업체가 없습니다. 영문 상호의 일부만 넣어 보세요."));
+      return;
+    }
+    firmFindResultEl.appendChild(el("p", "tr-ff-msg",
+      "‘" + q + "’ 검색 결과 " + fmtNum(items.length) + "곳 — 이름을 누르면 업체 프로파일로 갑니다."));
+    items.forEach(function (it) { firmFindResultEl.appendChild(buildFirmFindRow(it)); });
+  }
+
+  function runFirmFind() {
+    if (!firmFindInputEl || !firmFindResultEl) return;
+    var q = (firmFindInputEl.value || "").trim();
+    if (q.length < 2) {
+      firmFindResultEl.innerHTML = "";
+      firmFindResultEl.appendChild(el("p", "tr-ff-msg", "두 글자 이상 입력해 주세요."));
+      return;
+    }
+    firmFindResultEl.innerHTML = "";
+    firmFindResultEl.appendChild(el("p", "tr-ff-msg", "찾는 중…"));
+    fetchFirmSearch(q).then(function (payload) {
+      renderFirmFindResult(payload, q);
+    }).catch(function () {
+      firmFindResultEl.innerHTML = "";
+      firmFindResultEl.appendChild(el("p", "tr-ff-msg", "업체 검색을 불러오지 못했습니다."));
+    });
+  }
+
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     var totals = data.totals || {};
@@ -980,6 +1427,47 @@
     });
   }
 
+  // 041_findings_recent_window.sql — findings_stats 와 별개 RPC. 041 미적용 라이브에서
+  // 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다(fetchCategoryMatrix/
+  // fetchZoneCategory 와 동일 원칙).
+  function fetchRecentWindow() {
+    return fetch(rpcEndpoint("findings_recent_window"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_months: 12 }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_recent_window " + r.status);
+      return r.json();
+    });
+  }
+
+  // 041_findings_recent_window.sql (B) — 업체명 부분일치 조회.
+  function fetchFirmSearch(q) {
+    return fetch(rpcEndpoint("findings_firm_search"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_q: q, p_limit: 20 }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_firm_search " + r.status);
+      return r.json();
+    });
+  }
+
+  // 026_findings_search.sql — 카테고리별 실제 지적 사례(공개 게이트 RLS 통과분만).
+  // 이 페이지에서 유일하게 지적 **문장**을 가져오는 경로다(집계 RPC 아님, 위 §계약 참조).
+  function fetchCategoryExamples(code) {
+    return fetch(rpcEndpoint("findings_search"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        p_category: code, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS,
+      }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_search " + r.status);
+      return r.json();
+    });
+  }
+
   function fetchFirmStats(firmName) {
     return fetch(rpcEndpoint("findings_firm_stats"), {
       method: "POST",
@@ -1025,4 +1513,24 @@
       renderZonePanel(data);
     })
     .catch(function () { /* 조용히 숨김 유지 */ });
+
+  // [최근 12개월 · 달라진 점] 위 세 체인과 독립적으로 병렬 fetch — 실패해도(041 미배포
+  // 라이브 포함) tr-recent-block/tr-move-block 은 정적 셸의 기본값인 hidden 상태 그대로
+  // 남고, 다른 섹션엔 전혀 영향이 없다. 한 번의 응답으로 두 패널을 모두 그린다(추가
+  // 네트워크 호출 0) — 그래서 renderMovers 가 renderRecentWindow 와 같은 data 를 받는다.
+  fetchRecentWindow()
+    .then(function (data) {
+      renderRecentWindow(data);
+      renderMovers(data);
+    })
+    .catch(function () { /* 조용히 숨김 유지 */ });
+
+  // [업체 찾기] 폼 submit 가로채기 — action 이 없어 041 미배포 라이브에서 눌러도 페이지
+  // 이동은 일어나지 않고 안내 문구만 남는다(다른 섹션 영향 0).
+  if (firmFindFormEl) {
+    firmFindFormEl.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      runFirmFind();
+    });
+  }
 })();

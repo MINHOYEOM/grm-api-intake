@@ -1284,12 +1284,16 @@
       return panel;
     }
     picked.forEach(function (f) { panel.appendChild(buildExampleItem(f)); });
+    // ★이 건수는 findings_search 가 센 **전 기간** 공개분이다 — 이 패널이 달린 순위 행은
+    // 최근 12개월 수치라(실측: 무균보증 309건 vs 2,976건) 범위를 안 적으면 두 숫자가
+    // 어긋나 보인다. 링크가 실제로 가는 곳도 기간 필터 없는 검색이므로 "전체 기간"이
+    // 정확한 표기다.
     var total = ((payload && payload.totals) || {}).findings || 0;
     var foot = el("p", "tr-ex-foot");
     var a = document.createElement("a");
     a.className = "tr-ex-more";
     a.href = findingsHref("cat", code);
-    a.textContent = ko + " 지적 " + fmtNum(total) + "건 전체 보기 →";
+    a.textContent = "전체 기간 " + ko + " 지적 " + fmtNum(total) + "건 보기 →";
     foot.appendChild(a);
     panel.appendChild(foot);
     return panel;

@@ -106,6 +106,11 @@
   var moveDownEl = document.getElementById("tr-move-down");
   var moveSourceEl = document.getElementById("tr-move-source");
   var moveNoteEl = document.getElementById("tr-move-note");
+  // [인용 조항] 042_findings_cfr_ranking 전용.
+  var cfrBlockEl = document.getElementById("tr-cfr-block");
+  var cfrSubEl = document.getElementById("tr-cfr-sub");
+  var cfrEl = document.getElementById("tr-cfr");
+  var cfrNoteEl = document.getElementById("tr-cfr-note");
   // [업체 찾기] 041_findings_firm_search 전용.
   var firmFindFormEl = document.getElementById("tr-ff-form");
   var firmFindInputEl = document.getElementById("tr-ff-input");
@@ -191,6 +196,66 @@
     return COUNTRY_LABELS_KO[country] || country;
   }
 
+  // [인용 조항] 21 CFR 210/211 조항 뿌리 → 국문 요지. 042_findings_cfr_ranking.sql 이
+  // 실제로 돌려주는 41개 조항 전부를 담는다(2026-07-31 실측 기준). 조항 번호만으로는
+  // 전 직원이 읽을 수 없어 "무엇을 요구하는 조항인가"를 한 줄로 적는다 — 원문 조문은
+  // 각 행의 eCFR 링크로 바로 갈 수 있으므로 여기서는 **요지만** 쓰고 요건을 옮겨 쓰지
+  // 않는다(번역문이 조문 행세를 하면 안 된다).
+  // 매핑에 없는 조항은 번호만 표시한다(추측 번역 금지 — countryLabelKo 와 동일 원칙).
+  var CFR_SECTION_LABELS = {
+    "210.3": "정의",
+    "211.22": "품질관리부서의 책임·권한",
+    "211.25": "작업자 자격·교육",
+    "211.28": "작업자 위생·복장",
+    "211.42": "건물의 설계·구조(무균 구역 포함)",
+    "211.46": "환기·공기 여과",
+    "211.56": "청소·위생 관리",
+    "211.58": "건물 유지관리",
+    "211.63": "설비의 설계·규격·설치 위치",
+    "211.67": "설비 세척·유지관리",
+    "211.68": "전산화 설비 관리(접근권한·백업)",
+    "211.80": "원자재·용기 일반 관리",
+    "211.84": "원자재·용기 시험 및 합부 판정",
+    "211.87": "승인된 원자재 재시험",
+    "211.94": "용기·마개 적합성",
+    "211.100": "생산·공정관리 절차서와 일탈 처리",
+    "211.101": "원료 칭량·투입",
+    "211.110": "공정 중 시료채취·시험",
+    "211.111": "공정 단계별 시간 제한",
+    "211.113": "미생물 오염 관리(무균공정 밸리데이션)",
+    "211.115": "재작업",
+    "211.125": "표시자재 불출 관리",
+    "211.130": "포장·표시 작업 관리",
+    "211.137": "사용기한 설정",
+    "211.142": "보관 절차",
+    "211.150": "출하·유통 절차",
+    "211.160": "시험실 관리 일반(규격·시험방법의 타당성)",
+    "211.165": "완제품 시험 및 출하 판정",
+    "211.166": "안정성 시험",
+    "211.167": "특수 시험(무균·발열성 등)",
+    "211.170": "보관용 검체",
+    "211.176": "페니실린 교차오염",
+    "211.180": "기록·보고 일반(보관기간·연간 품질평가)",
+    "211.182": "설비 사용·세척 기록",
+    "211.186": "마스터 제조지시서",
+    "211.188": "배치 제조기록서",
+    "211.192": "제조기록 검토와 일탈 조사",
+    "211.194": "시험기록",
+    "211.198": "불만 처리 기록",
+    "211.204": "반품 의약품",
+    "211.208": "회수품 재생",
+  };
+
+  function cfrSectionLabel(section) {
+    return CFR_SECTION_LABELS[section] || "";
+  }
+
+  // 조문 원문(eCFR) 딥링크 — `/current/title-21/section-211.192` 형태가 유효함을
+  // 실측 확인했다(HTTP 200). 부/서브파트 경로를 조립하지 않아 조항 이동 시에도 안 깨진다.
+  function ecfrHref(section) {
+    return "https://www.ecfr.gov/current/title-21/section-" + encodeURIComponent(section);
+  }
+
   // [표본 하한] 그 해 총 지적이 이 값 미만이면 구성비를 말하지 않는다 — 수집 첫 해처럼
   // 문서 한두 건만 있는 연도는 한 건이 20%가 되어 색·비율이 전부 노이즈가 된다. 연도별
   // 구성비 히트맵의 열 제외와 헤드라인 일관성 판정이 같은 기준을 공유한다.
@@ -207,7 +272,12 @@
   var state = {
     openFirm: "", openFirmKey: "", lastFirms: [],
     openCat: "", recentCats: [], recentCurFindings: 0, exampleNode: null,
+    openCfr: "", cfrItems: [], cfrExampleNode: null,
   };
+
+  // [인용 조항] 화면에 그리는 조항 수. 41개 전부 늘어놓으면 훑을 수 없고, 꼬리는 문서
+  // 한두 건짜리라 순위로서 의미가 없다.
+  var CFR_ROWS = 12;
 
   // ── [최근 12개월 · 달라진 점] 판정 상수 ─────────────────────────────────────
   // 창 전체 표본 하한 — 두 창 중 어느 쪽이든 지적이 이보다 적으면 증감 비교 자체를
@@ -1377,6 +1447,159 @@
     });
   }
 
+  // ── [인용 조항] 042_findings_cfr_ranking ────────────────────────────────
+  // 카테고리는 우리가 붙인 분류지만 조항은 규제기관이 적은 것이고 사내 SOP 와 1:1로
+  // 붙는다 — 그래서 각 행이 **조문 원문(eCFR)** 과 **실제 지적 문장** 양쪽으로 이어진다.
+  //
+  // 보일러플레이트 제외·부 필터·범위 한계(사실상 WL 전용)는 전부 응답의 scope 에서
+  // 읽어 화면에 적는다(하드코딩 금지) — 무엇을 뺐는지 밝히지 않으면 이 순위는 검증
+  // 불가능한 주장이 된다(renderHeatmap 의 "뺐다는 사실을 적는다"와 같은 원칙).
+  function buildCfrRow(item, idx, maxDocs) {
+    var row = el("div", "tr-cf-row" + (state.openCfr === item.section ? " on" : ""));
+    var name = cfrSectionLabel(item.section);
+    makeClickableRow(row, "21 CFR " + item.section + " 지적 사례와 조문 보기", function () {
+      if (state.openCfr === item.section) closeCfr();
+      else openCfr(item.section);
+    });
+    row.appendChild(el("span", "tr-cf-rank", String(idx + 1)));
+    row.appendChild(el("span", "tr-cf-sec", item.section));
+    row.appendChild(el("span", "tr-cf-name", name));
+    var track = el("div", "tr-cf-track");
+    var bar = el("div", "tr-cf-bar");
+    bar.style.transform = "scaleX(" + Math.max(0.02, maxDocs > 0 ? item.docs / maxDocs : 0) + ")";
+    track.appendChild(bar);
+    row.appendChild(track);
+    var docs = el("span", "tr-cf-docs", "문서 " + fmtNum(item.docs) + "건");
+    // 누적만 보면 "예전에 많이 걸렸던 조항"과 "지금도 걸리는 조항"이 구분되지 않는다.
+    docs.appendChild(el("span", "tr-cf-recent", "최근 12개월 " + fmtNum(item.recent_docs) + "건"));
+    row.appendChild(docs);
+    row.appendChild(el("span", "tr-cf-caret", state.openCfr === item.section ? "▲" : "▼"));
+    return row;
+  }
+
+  function renderCfrRows() {
+    if (!cfrEl) return;
+    cfrEl.innerHTML = "";
+    var rows = state.cfrItems || [];
+    if (!rows.length) return;
+    var maxDocs = rows[0].docs || 1;
+    rows.forEach(function (item, i) {
+      cfrEl.appendChild(buildCfrRow(item, i, maxDocs));
+      if (state.openCfr === item.section) {
+        cfrEl.appendChild(state.cfrExampleNode || el("p", "tr-empty", "불러오는 중…"));
+      }
+    });
+  }
+
+  // 사례 패널 머리에 조문 링크를 먼저 둔다 — 실무에서는 사례보다 조문 원문이 먼저
+  // 필요한 경우가 많다. 인용된 하위 항목((a)/(d) 등)도 함께 적어 어느 항이 걸렸는지
+  // 알 수 있게 한다(조항 뿌리로 합치면서 버린 정보를 여기서 돌려준다).
+  function buildCfrLinkLine(item) {
+    var wrap = el("p", "tr-cf-links");
+    var a = document.createElement("a");
+    a.className = "tr-cf-link";
+    a.href = ecfrHref(item.section);
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "21 CFR " + item.section + " 조문 원문 보기(eCFR) →";
+    wrap.appendChild(a);
+    var variants = item.variants || [];
+    if (variants.length) {
+      wrap.appendChild(el("span", "tr-cf-variants",
+        "실제 인용된 항: " + variants.join(" · ")));
+    }
+    return wrap;
+  }
+
+  function buildCfrExamplePanel(item, payload) {
+    var panel = el("div", "tr-ex");
+    panel.appendChild(buildCfrLinkLine(item));
+    var docs = (payload && payload.documents) || [];
+    var picked = [];
+    docs.forEach(function (doc) {
+      (doc.findings || []).forEach(function (f) {
+        if (picked.length >= EXAMPLE_ROWS) return;
+        // 검색은 blob ILIKE 라 본문에 번호만 스친 행도 걸린다 — 실제로 그 조항이
+        // 인용된 지적만 남긴다(cfr_refs 는 findings_search 가 행마다 함께 준다).
+        var refs = f.cfr_refs || [];
+        for (var i = 0; i < refs.length; i++) {
+          if (String(refs[i]).indexOf(item.section) >= 0) { picked.push(f); return; }
+        }
+      });
+    });
+    if (!picked.length) {
+      panel.appendChild(el("p", "tr-empty",
+        "이 조항으로 지적된 문장 중 국문으로 열람할 수 있는 것이 아직 없습니다."));
+      return panel;
+    }
+    picked.forEach(function (f) { panel.appendChild(buildExampleItem(f)); });
+    var foot = el("p", "tr-ex-foot");
+    var more = document.createElement("a");
+    more.className = "tr-ex-more";
+    more.href = findingsHref("q", item.section);
+    more.textContent = "이 조항이 인용된 지적 검색 결과 보기 →";
+    foot.appendChild(more);
+    panel.appendChild(foot);
+    return panel;
+  }
+
+  function openCfr(section) {
+    state.openCfr = section;
+    state.cfrExampleNode = el("p", "tr-empty", "불러오는 중…");
+    renderCfrRows();
+    var item = null;
+    (state.cfrItems || []).forEach(function (r) { if (r.section === section) item = r; });
+    if (!item) return;
+    fetchCfrExamples(section).then(function (payload) {
+      if (state.openCfr !== section) return;      // 그 사이 다른 행을 열었으면 버린다
+      state.cfrExampleNode = buildCfrExamplePanel(item, payload);
+      renderCfrRows();
+    }).catch(function () {
+      if (state.openCfr !== section) return;
+      state.cfrExampleNode = buildCfrExamplePanel(item, null);
+      renderCfrRows();
+    });
+  }
+
+  function closeCfr() {
+    state.openCfr = "";
+    state.cfrExampleNode = null;
+    renderCfrRows();
+  }
+
+  function renderCfrRanking(data) {
+    if (!cfrBlockEl || !cfrEl) return;
+    var d = data || {};
+    var scope = d.scope || {};
+    var items = (d.items || []).filter(function (i) { return (i.docs || 0) > 0; });
+    if (!items.length) return;                    // 빈 응답 → 숨김 유지
+
+    state.cfrItems = items.slice(0, CFR_ROWS);
+    renderCfrRows();
+
+    if (cfrSubEl) {
+      var sources = (scope.sources || []).map(function (s) {
+        return s.source + " " + fmtNum(s.docs) + "건";
+      }).join(" · ");
+      cfrSubEl.textContent = "조항이 명시된 문서 " + fmtNum(scope.docs_with_clause) +
+        "건 기준" + (sources ? " (" + sources + ")" : "") + " · 막대는 그 조항을 인용한 문서 수입니다.";
+    }
+    if (cfrNoteEl) {
+      // 무엇을 세지 않았는지 밝히지 않으면 이 순위는 검증 불가능한 주장이 된다.
+      var note = "FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없습니다 — " +
+        "이 순위는 사실상 Warning Letter 기준입니다. " +
+        (scope.part_filter ? scope.part_filter + " 조항만 셌고(표시·OTC 모노그래프·임상 조항 제외), " : "");
+      var ex = scope.excluded_sections || [];
+      if (ex.length) {
+        note += "모든 경고서한 맺음말에 붙는 권고·정의 조항(" + ex.join(" · ") +
+          ")은 위반 인용이 아니라 뺐습니다. ";
+      }
+      note += "211.22(a)처럼 항으로 갈라진 인용은 조항 단위로 합쳤습니다.";
+      cfrNoteEl.textContent = note;
+    }
+    cfrBlockEl.hidden = false;
+  }
+
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     var totals = data.totals || {};
@@ -1472,6 +1695,35 @@
     });
   }
 
+  // 042_findings_cfr_ranking.sql — findings_stats/findings_recent_window 와 별개 RPC.
+  // 042 미적용 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다.
+  function fetchCfrRanking() {
+    return fetch(rpcEndpoint("findings_cfr_ranking"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_months: 12 }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_cfr_ranking " + r.status);
+      return r.json();
+    });
+  }
+
+  // 조항별 사례 — 026 findings_search 의 검색 blob 에 cfr_refs 가 들어 있어(026 계약)
+  // 조항 번호 질의가 그 조항을 인용한 지적을 잡는다. 문서 단위 페이지네이션이라
+  // 필터 후 3건을 확보하려면 문서를 조금 넉넉히 받는다.
+  function fetchCfrExamples(section) {
+    return fetch(rpcEndpoint("findings_search"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        p_q: section, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS * 2,
+      }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_search " + r.status);
+      return r.json();
+    });
+  }
+
   function fetchFirmStats(firmName) {
     return fetch(rpcEndpoint("findings_firm_stats"), {
       method: "POST",
@@ -1526,6 +1778,14 @@
     .then(function (data) {
       renderRecentWindow(data);
       renderMovers(data);
+    })
+    .catch(function () { /* 조용히 숨김 유지 */ });
+
+  // [인용 조항] 위 체인들과 독립적으로 병렬 fetch — 실패해도(042 미배포 라이브 포함)
+  // tr-cfr-block 은 정적 셸의 기본값인 hidden 상태 그대로 남는다.
+  fetchCfrRanking()
+    .then(function (data) {
+      renderCfrRanking(data);
     })
     .catch(function () { /* 조용히 숨김 유지 */ });
 

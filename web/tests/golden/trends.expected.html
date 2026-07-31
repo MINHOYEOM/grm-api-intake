@@ -84,6 +84,12 @@
         </div>
         <p class="tr-note" id="tr-move-source"></p>
         <p class="tr-note" id="tr-move-note"></p>
+      </section><section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
+        <h2 class="tr-h">많이 인용된 조항</h2>
+        <p class="tr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
+        <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
+        <div id="tr-cfr" class="tr-cfr"></div>
+        <p class="tr-note" id="tr-cfr-note"></p>
       </section><section class="tr-block" aria-label="업체 찾기">
         <h2 class="tr-h">업체 찾기</h2>
         <p class="tr-read">거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요. 영문 상호 일부만 넣어도 찾아집니다(예: Lupin, Catalent). 이름 표기가 조금씩 다른 사업장은 따로 나옵니다.</p>
@@ -238,6 +244,27 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-mv-badge{flex:0 0 auto;min-width:54px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted)}
 .tr-mv-up .tr-mv-badge{color:var(--coral-2)}
 
+/* ── [인용 조항] 조항 순위 — 행 클릭 시 사례 + 조문 링크가 펼쳐진다 ───────── */
+.tr-cfr-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
+.tr-cfr{display:flex;flex-direction:column;gap:0}
+.tr-cf-row{display:flex;align-items:center;gap:14px;padding:10px 8px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
+.tr-cf-row:hover,.tr-cf-row:focus-visible{background:var(--strong);outline:none}
+.tr-cf-row.on{background:var(--coral-tint)}
+.tr-cf-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+/* 조항 번호는 mono 로 고정폭 — 목록에서 세로로 자릿수가 맞아야 훑어진다. */
+.tr-cf-sec{flex:0 0 86px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--coral-2)}
+.tr-cf-name{flex:0 0 250px;max-width:250px;font-size:13.5px;color:var(--body-s);line-height:1.35}
+.tr-cf-track{flex:1 1 auto;height:9px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-cf-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-cf-docs{flex:0 0 auto;min-width:138px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tr-cf-recent{display:block;font-size:10.5px;color:var(--muted-2);margin-top:2px}
+.tr-cf-caret{flex:0 0 14px;text-align:center;font-size:10px;color:var(--muted-2)}
+/* 조문 링크 줄 — 사례 패널 머리에 둔다(사례보다 조문이 먼저 필요한 경우가 많다). */
+.tr-cf-links{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:12.5px}
+.tr-cf-link{font-weight:500;color:var(--coral-2)}
+.tr-cf-link:hover{color:var(--coral)}
+.tr-cf-variants{display:block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+
 /* ── [업체 찾기] 검색 상자 + 결과 목록 ───────────────────────────────────── */
 .tr-ff-form{display:flex;gap:8px;margin:0 0 10px;max-width:520px}
 .tr-ff-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -383,6 +410,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .tr-rm-bars{gap:2px}
   /* 남은 폭이 20px 남짓이라 막대가 눈금 없는 조각이 된다 — 숫자만 남긴다. */
   .tr-rc-track{display:none}
+  .tr-cf-track{display:none}
+  /* 고정폭(250px)이면 좁은 화면에서 행 안쪽이 잘린다 — 줄여서 접히게 한다
+     (min-width:0 이 없으면 flex 항목이 콘텐츠 폭 아래로 줄지 않는다). */
+  .tr-cf-name{flex:1 1 auto;min-width:0;max-width:none}
+  .tr-cf-sec{flex:0 0 72px}
+  .tr-cf-docs{min-width:76px}
 }
 </style>
 <footer class="site"><div class="wrap">
@@ -435,7 +468,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/trends.js?v=219f0527" defer></script>
+<script src="../../assets/trends.js?v=bb375417" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

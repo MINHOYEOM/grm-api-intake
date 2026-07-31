@@ -84,6 +84,21 @@ _PROFILE_ALLOWED_KEYS = {
 # `finding_text_ko <> ''` 전부 뒤가 따옴표라 매치 안 됨).
 _THRESHOLD_RE = re.compile(r"(>=|<)\s*(\d+)\b")
 
+# ── 039_findings_inspector_alias.sql -- 별칭 병합 계약 ──────────────────────
+_ALIAS_PATH = _MIGRATIONS_DIR / "039_findings_inspector_alias.sql"
+
+_FN_PAIRS_SIG = "create or replace function public.findings_inspector_pairs()\n"
+
+# 037 은 index/profile 양쪽에서 display_name 타이브레이크가 문자 그대로
+# "count(*) desc, length(nm) desc, nm asc" 였다(각자 inline pairs CTE 가 원표기를 nm 으로
+# 통일해서 별칭했기 때문). 039 는 공유 findings_inspector_pairs() 가 컬럼명 `raw_name` 을
+# 돌려주는데, index 의 윈도우 함수(OVER ORDER BY)는 같은 SELECT 절에서 선언한 별칭 nm 을
+# 참조할 수 없어 원컬럼 raw_name 을 그대로 쓴다 -- 반면 profile 은 자체 rows_out CTE 가
+# 이미 `p.raw_name as nm` 으로 별칭을 씌운 뒤라 nm 을 쓴다. 그래서 037 처럼 리터럴 문자열
+# 하나로 두 함수를 동시에 고정할 수 없다 -- "count(*) desc, length(X) desc, X asc" 형태
+# (X 가 반복되는가)만 함수별로 독립 검사한다.
+_TIEBREAK_SHAPE_RE = re.compile(r"count\(\*\) desc, length\((\w+)\) desc, \1 asc")
+
 
 def _strip_sql_comments(sql: str) -> str:
     kept = [line for line in sql.splitlines() if not line.strip().startswith("--")]
@@ -313,6 +328,262 @@ class ScopeLimitationsDocumentedTest(unittest.TestCase):
 
     def test_header_declares_no_directory_listing_page(self) -> None:
         self.assertIn("디렉터리(목록 열람) 페이지를 만들지 않는다", self.sql)
+
+
+# ============================================================================
+# 039_findings_inspector_alias.sql -- 실사관 정체성에 모호하지 않은 별칭 병합.
+#
+# findings_inspector_index/findings_inspector_profile 을 다시 supersede 하고, 새로
+# findings_inspector_pairs() 를 도입해 index/profile 이 **그 함수 하나만** 쓰게 한다
+# (각자 alias/parts CTE 를 복제하면 한쪽만 바뀌는 표류가 생긴다 -- 이 저장소가 수동
+# 허용목록 표류로 두 번 당한 것과 같은 계열, MEMORY 참조). findings_inspector_key 는
+# 037 정의 그대로라 이 파일이 재선언하지 않는다 -- 재선언하면 037 의 정규화가 조용히
+# 바뀔 수 있어 여기서도 슬라이스하지 않는다(037 의 테스트가 이미 그 함수를 고정한다).
+# ============================================================================
+
+
+class AliasFunctionSlicesTestBase(unittest.TestCase):
+    """세 함수(pairs/index/profile) 슬라이스를 setUp 에서 공통 준비하는 베이스 --
+    findings_inspector_key 는 039 가 재선언하지 않으므로 여기서 슬라이스하지 않는다."""
+
+    def setUp(self) -> None:
+        self.assertTrue(_ALIAS_PATH.is_file(), f"missing {_ALIAS_PATH}")
+        self.sql = _ALIAS_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+        self.fn_pairs = _slice_function(self.code, _FN_PAIRS_SIG)
+        self.fn_index = _slice_function(self.code, _FN_INDEX_SIG)
+        self.fn_profile = _slice_function(self.code, _FN_PROFILE_SIG)
+
+
+class AliasMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_ALIAS_PATH.is_file(), f"missing {_ALIAS_PATH}")
+        self.sql = _ALIAS_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _ALIAS_PATH.read_bytes())
+
+    def test_has_korean_block_comments(self) -> None:
+        self.assertGreaterEqual(self.sql.count("--"), 20)
+
+    def test_defines_pairs_index_and_profile(self) -> None:
+        for sig_prefix in (
+            "create or replace function public.findings_inspector_pairs(",
+            "create or replace function public.findings_inspector_index(",
+            "create or replace function public.findings_inspector_profile(",
+        ):
+            self.assertIn(sig_prefix, self.code)
+
+    def test_does_not_redeclare_findings_inspector_key(self) -> None:
+        # 037 정의가 그대로 현행이어야 한다 -- 여기서 재선언하면 037 의 정규화 규칙이
+        # 조용히 바뀔 수 있다(039 헤더 근거).
+        self.assertNotIn(
+            "create or replace function public.findings_inspector_key(", self.code
+        )
+
+
+class AliasSingleSourceOfTruthTest(AliasFunctionSlicesTestBase):
+    """★단일 정본 -- index 와 profile 이 각자 CTE 를 복제하지 않고 둘 다
+    findings_inspector_pairs() 하나만 소비해야 한다. `alias`/`parts` 라는 CTE 이름 자체가
+    pairs 함수 슬라이스 밖(index/profile)에 나타나면, 누군가 병합 로직을 복제해 넣었다는
+    뜻이므로 표류의 시작이다(037→039 배경 주석 근거)."""
+
+    def test_index_consumes_pairs_function(self) -> None:
+        self.assertIn("public.findings_inspector_pairs()", self.fn_index)
+
+    def test_profile_consumes_pairs_function(self) -> None:
+        self.assertIn("public.findings_inspector_pairs()", self.fn_profile)
+
+    def test_alias_cte_exists_only_inside_pairs_slice(self) -> None:
+        self.assertIn("alias as (", self.fn_pairs)
+        self.assertNotIn("alias as (", self.fn_index)
+        self.assertNotIn("alias as (", self.fn_profile)
+
+    def test_parts_cte_exists_only_inside_pairs_slice(self) -> None:
+        self.assertIn("parts as (", self.fn_pairs)
+        self.assertNotIn("parts as (", self.fn_index)
+        self.assertNotIn("parts as (", self.fn_profile)
+
+
+class AliasAmbiguityGuardTest(AliasFunctionSlicesTestBase):
+    """★모호성 가드(가장 중요) -- 2토큰 이름은 같은 first/last 를 가진 3토큰 이상 후보가
+    **정확히 1개**일 때만 흡수한다(`count(*) ... = 1`). 이 비교가 빠지거나 `>= 1`(1개
+    이상)로 완화되면 후보가 2개 이상인 동명이인 케이스까지 병합돼 남의 실사 이력이
+    붙는다 -- 이 테스트가 그 회귀를 막는 유일한 장치다(임무 지시서 근거)."""
+
+    _GUARD_RE = re.compile(
+        r"count\(\*\) from parts l\s+where l\.ntok >= 3 and l\.first_tok = s\.first_tok "
+        r"and l\.last_tok = s\.last_tok\)\s*=\s*1"
+    )
+
+    def test_exactly_one_candidate_guard_present_in_pairs(self) -> None:
+        self.assertRegex(self.fn_pairs, self._GUARD_RE)
+
+    def test_guard_is_not_a_looser_at_least_one_comparison(self) -> None:
+        # `>= 1` 로 완화되면 후보 2개 이상(동명이인)도 병합 대상이 된다 -- 정확히 이
+        # 퇴행을 잡는다.
+        self.assertNotIn(
+            "l.last_tok = s.last_tok) >= 1",
+            self.fn_pairs,
+            msg=(
+                "모호성 가드가 '정확히 1개'(= 1)가 아니라 '1개 이상'(>= 1)으로 완화됐다 "
+                "-- 동명이인이 병합될 수 있다."
+            ),
+        )
+
+
+class AliasCohortThresholdSingleSourceOfTruthTest(AliasFunctionSlicesTestBase):
+    """037 의 CohortThresholdSingleSourceOfTruthTest 와 동일한 계약을 039 재선언본에 다시
+    건다 -- index/profile 이 같은 코호트 임계값(5)을 써야 "인덱스엔 있는데 열면 null"
+    (또는 그 반대) 딥링크 불일치가 재발하지 않는다."""
+
+    def test_index_slice_has_exactly_one_threshold_comparison(self) -> None:
+        matches = _THRESHOLD_RE.findall(self.fn_index)
+        self.assertEqual(
+            len(matches), 1, msg=f"index 슬라이스에서 임계 비교가 1건이 아니다: {matches}"
+        )
+
+    def test_profile_slice_has_exactly_one_threshold_comparison(self) -> None:
+        matches = _THRESHOLD_RE.findall(self.fn_profile)
+        self.assertEqual(
+            len(matches), 1, msg=f"profile 슬라이스에서 임계 비교가 1건이 아니다: {matches}"
+        )
+
+    def test_thresholds_are_numerically_identical(self) -> None:
+        (_, idx_n), = _THRESHOLD_RE.findall(self.fn_index)
+        (_, prof_n), = _THRESHOLD_RE.findall(self.fn_profile)
+        self.assertEqual(
+            idx_n, prof_n,
+            msg=f"index 임계값({idx_n}) != profile 임계값({prof_n})",
+        )
+
+    def test_threshold_value_is_five(self) -> None:
+        (_, idx_n), = _THRESHOLD_RE.findall(self.fn_index)
+        self.assertEqual(idx_n, "5")
+
+    def test_index_gate_is_inclusive_and_profile_gate_is_exclusive_complement(self) -> None:
+        (idx_op, _), = _THRESHOLD_RE.findall(self.fn_index)
+        (prof_op, _), = _THRESHOLD_RE.findall(self.fn_profile)
+        self.assertEqual(idx_op, ">=")
+        self.assertEqual(prof_op, "<")
+
+
+class AliasProfileNullGateTest(AliasFunctionSlicesTestBase):
+    """게이트가 RPC 안에 있다 -- 코호트 미달이면 profile 이 `'null'::jsonb` 로 수렴해야
+    한다(037 과 동일 계약, 039 재선언본에서도 승계 확인)."""
+
+    def test_null_jsonb_literal_present(self) -> None:
+        self.assertIn("'null'::jsonb", self.fn_profile)
+
+    def test_null_branch_is_gated_by_the_same_extracted_threshold(self) -> None:
+        (op, n), = _THRESHOLD_RE.findall(self.fn_profile)
+        self.assertIn(f"{op} {n} then 'null'::jsonb", self.fn_profile)
+
+
+class AliasSafetyContractTest(AliasFunctionSlicesTestBase):
+    """037 과 불변인 안전 계약이 039 에서도 승계되는지 -- search_path 고정(3함수) ·
+    index/profile security definer · scope_status/source 게이트가 pairs·profile 에
+    존재(index 는 pairs() 호출을 통해 상속받으므로 텍스트로 복제하지 않는다 -- 복제하면
+    위 단일 정본 계약 위반의 신호다) · 원문/URL 무반환(허용·금지 목록 양방향) · grant 범위."""
+
+    def test_all_three_functions_pin_search_path(self) -> None:
+        for fn in (self.fn_pairs, self.fn_index, self.fn_profile):
+            self.assertIn("set search_path = public", fn)
+
+    def test_index_and_profile_are_security_definer(self) -> None:
+        for fn in (self.fn_index, self.fn_profile):
+            self.assertIn("security definer", fn)
+
+    def test_pairs_is_also_security_definer(self) -> None:
+        # 037 의 findings_inspector_key(무상태 정규화 헬퍼)와 달리, pairs 는 findings
+        # 원장을 직접 읽는 정체성 정본 함수라 definer 로 선언돼 있다(039 원문 실측).
+        self.assertIn("security definer", self.fn_pairs)
+
+    def test_scope_status_and_source_gate_present_in_pairs_and_profile(self) -> None:
+        for fn in (self.fn_pairs, self.fn_profile):
+            self.assertIn("scope_status = 'ok'", fn)
+            self.assertIn("source = 'FDA 483'", fn)
+
+    def test_index_does_not_restate_scope_gate(self) -> None:
+        # index 는 pairs() 를 통해서만 게이트를 상속한다 -- 여기 다시 나타나면 CTE 복제의
+        # 신호(단일 정본 위반)다.
+        self.assertNotIn("scope_status", self.fn_index)
+        self.assertNotIn("source = 'FDA 483'", self.fn_index)
+
+    def test_no_raw_text_or_url_keys_in_index_projection(self) -> None:
+        keys = _jsonb_keys(self.fn_index)
+        leaked = keys & _FORBIDDEN_KEYS
+        self.assertEqual(leaked, set(), msg=f"index 투영에 금지 키 유출: {leaked}")
+
+    def test_no_raw_text_or_url_keys_in_profile_projection(self) -> None:
+        keys = _jsonb_keys(self.fn_profile)
+        leaked = keys & _FORBIDDEN_KEYS
+        self.assertEqual(leaked, set(), msg=f"profile 투영에 금지 키 유출: {leaked}")
+
+    def test_index_projection_keys_within_declared_allowlist(self) -> None:
+        keys = _jsonb_keys(self.fn_index)
+        self.assertTrue(keys, "index jsonb 키 파싱이 빈 목록 -- 가드가 공허하게 통과 중")
+        extra = keys - _INDEX_ALLOWED_KEYS
+        self.assertEqual(extra, set(), msg=f"index 가 허용목록 밖의 새 키를 반환: {extra}")
+
+    def test_profile_projection_keys_within_declared_allowlist(self) -> None:
+        keys = _jsonb_keys(self.fn_profile)
+        self.assertTrue(keys, "profile jsonb 키 파싱이 빈 목록 -- 가드가 공허하게 통과 중")
+        extra = keys - _PROFILE_ALLOWED_KEYS
+        self.assertEqual(extra, set(), msg=f"profile 이 허용목록 밖의 새 키를 반환: {extra}")
+
+    def test_grant_execute_present_for_pairs_index_and_profile(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_inspector_pairs() "
+            "to anon, authenticated;",
+            self.sql,
+        )
+        self.assertIn(
+            "grant execute on function public.findings_inspector_index() "
+            "to anon, authenticated;",
+            self.sql,
+        )
+        self.assertIn(
+            "grant execute on function public.findings_inspector_profile(text) "
+            "to anon, authenticated;",
+            self.sql,
+        )
+
+    def test_findings_inspector_key_is_not_granted_here(self) -> None:
+        self.assertNotIn("grant execute on function public.findings_inspector_key", self.sql)
+
+
+class AliasDisplayNameDeterminismTest(AliasFunctionSlicesTestBase):
+    """display_name 선택에 3단 결정론 타이브레이크(최빈 -> 최장 표기 -> 사전순)가 두 함수
+    모두에 있어야 한다. ★037 과 달리 039 는 index/profile 에서 타이브레이크가 참조하는
+    컬럼명이 다르다(모듈 상단 `_TIEBREAK_SHAPE_RE` 주석에 구조적 이유 설명) -- 그래서
+    리터럴 문자열 하나로 고정하지 않고 "count(*) desc, length(X) desc, X asc" 형태(X 가
+    반복되는가)만 함수별로 독립 검사한다."""
+
+    def test_index_has_three_stage_tiebreak_shape(self) -> None:
+        self.assertRegex(self.fn_index, _TIEBREAK_SHAPE_RE)
+
+    def test_profile_has_three_stage_tiebreak_shape(self) -> None:
+        self.assertRegex(self.fn_profile, _TIEBREAK_SHAPE_RE)
+
+
+class AliasInputResolutionBranchTest(AliasFunctionSlicesTestBase):
+    """★입력 해소(링크 호환) -- `profile(p_inspector_key)` 는 **해소된 키든 병합 전 짧은
+    표기든 양쪽 다** 같은 프로파일로 착지해야 한다. `inspector_key = q.qk` 와
+    `findings_inspector_key(a.raw_name) = q.qk` 양쪽 분기가 하나의 `or` 로 묶여 있어야
+    한다 -- 한쪽만 남으면 이미 배포된 링크 중 한 형태가 깨진다(039 헤더 근거)."""
+
+    def test_both_resolution_branches_present(self) -> None:
+        self.assertIn("a.inspector_key = q.qk", self.fn_profile)
+        self.assertIn("public.findings_inspector_key(a.raw_name) = q.qk", self.fn_profile)
+
+    def test_branches_are_joined_by_or(self) -> None:
+        self.assertIn(
+            "a.inspector_key = q.qk or public.findings_inspector_key(a.raw_name) = q.qk",
+            self.fn_profile,
+        )
 
 
 if __name__ == "__main__":

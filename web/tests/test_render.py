@@ -2815,11 +2815,12 @@ class WebTrendsRenderTest(unittest.TestCase):
         정적 텍스트로 두어 골든에 남기고 리뷰 가능하게 한다(5개 섹션 전부).
         [해외/미국 실사 비교] 신규 패널 추가로 6개가 됐다(WebFindingsZoneComparisonTest
         가 그 패널의 세부 계약을 별도로 검증한다).
-        [트렌드 고도화] 최근 12개월·달라진 점·업체 찾기 3개 섹션이 더해져 9개가 됐다
-        (WebTrendsRecentWindowTest 가 그 셋의 세부 계약을 별도로 검증한다). 최근 창
-        카테고리 순위의 읽는 법(#tr-recent-cats-read)은 순위가 실제로 그려질 때만
-        노출되므로 hidden 속성을 달고 있어 이 카운트에 잡히지 않는다."""
-        self.assertEqual(self.html.count('<p class="tr-read">'), 9)
+        [트렌드 고도화] 최근 12개월·달라진 점·업체 찾기 3개 섹션이 더해져 9개가 됐고,
+        [인용 조항] 섹션까지 10개가 됐다(WebTrendsRecentWindowTest·WebTrendsCfrRankingTest
+        가 세부 계약을 별도로 검증한다). 최근 창 카테고리 순위의 읽는 법
+        (#tr-recent-cats-read)은 순위가 실제로 그려질 때만 노출되므로 hidden 속성을 달고
+        있어 이 카운트에 잡히지 않는다."""
+        self.assertEqual(self.html.count('<p class="tr-read">'), 10)
         for section_cue in ("전체 기간을 합친 순위입니다.",
                              "각 연도를 100%로 놓고",
                              "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
@@ -2828,7 +2829,8 @@ class WebTrendsRenderTest(unittest.TestCase):
                              "해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다.",
                              "막대는 그 달에 공개된 문서 수입니다.",
                              "각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다.",
-                             "거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요."):
+                             "거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요.",
+                             "규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다."):
             self.assertIn(section_cue, self.html)
 
     def test_hero_paragraph_breaks_at_sentence_boundary(self):
@@ -3826,6 +3828,217 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         for forbidden in ("강화해야", "권고", "해야 합니다", "해야 한다",
                           "한국 공장은", "준비해야", "대비하십시오"):
             self.assertNotIn(forbidden, self.html, f"금지 문구 발견: {forbidden}")
+
+
+# ── [인용 조항] 보일러플레이트 제외 조항 랭킹(042) ────────────────────────────
+class WebTrendsCfrRankingTest(unittest.TestCase):
+    """트렌드 대시보드 [많이 인용된 조항] 섹션 — 042_findings_cfr_ranking.sql.
+
+    ★왜 이 섹션인가: 카테고리("무균보증/무균공정")는 우리가 붙인 분류라 그 자체로는
+    자가점검 항목이 되지 못한다. 규제기관이 실제로 인용한 **조항**은 사내 SOP 와 1:1로
+    붙는 단위라 "무엇을 확인해야 하는가"에 가장 가깝다.
+
+    ★왜 필터가 전부인가: cfr_refs 를 그대로 세면 1위가 `21 CFR 211.34`(컨설턴트)가 된다 —
+    FDA 가 모든 경고서한 맺음말에 붙이는 권고문이라 위반 인용이 아니다(라이브 실측 72/72
+    = 100% 가 "consultant ... as set forth in" 형태). 여기선 그 제외가 실제로 걸려 있는지,
+    **무엇을 뺐는지 화면이 밝히는지**, 범위 한계(사실상 WL 전용)가 응답에서 오는지를
+    검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_trendscfr_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        cls.html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        cls.sql_src = (WEB_DIR / "migrations" / "042_findings_cfr_ranking.sql").read_text(
+            encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _fn(self, name):
+        start = self.js_src.index("function " + name + "(")
+        return self.js_src[start:self.js_src.index("\n  }", start)]
+
+    # ── 셸 결정론 · 위치 ─────────────────────────────────────────────────────
+    def test_shell_present_hidden(self):
+        self.assertIn(
+            '<section class="tr-block tr-cfr-block" id="tr-cfr-block" '
+            'aria-label="많이 인용된 조항" hidden>',
+            self.html,
+        )
+        for frag in ('<h2 class="tr-h">많이 인용된 조항</h2>',
+                     '<p class="tr-cfr-sub" id="tr-cfr-sub"></p>',
+                     '<div id="tr-cfr" class="tr-cfr"></div>',
+                     '<p class="tr-note" id="tr-cfr-note"></p>'):
+            self.assertIn(frag, self.html)
+
+    def test_placed_between_movers_and_firm_find(self):
+        """달라진 점(무엇이 변했나) → 조항(무엇을 확인하나) → 업체 찾기(우리는 어떤가)
+        순서. 누적 구분선보다 위에 있어야 한다(조항 순위는 실무 도구지 아카이브가 아니다)."""
+        i_move = self.html.index('id="tr-move-block"')
+        i_cfr = self.html.index('id="tr-cfr-block"')
+        i_find = self.html.index('aria-label="업체 찾기"')
+        i_div = self.html.index('class="tr-divider"')
+        self.assertTrue(i_move < i_cfr < i_find < i_div)
+
+    def test_elements_defensively_queried_not_in_hard_gate(self):
+        for elid in ("tr-cfr-block", "tr-cfr-sub", "tr-cfr", "tr-cfr-note"):
+            self.assertIn(f'document.getElementById("{elid}")', self.js_src)
+        gate = self.js_src[self.js_src.index("if (!cfg || !loadingEl"):]
+        gate = gate[:gate.index("return;") + len("return;")]
+        for forbidden in ("cfrBlockEl", "cfrEl", "cfrSubEl", "cfrNoteEl"):
+            self.assertNotIn(forbidden, gate)
+
+    # ── 보일러플레이트 제외(이 섹션의 존재 이유) ─────────────────────────────
+    def test_sql_excludes_boilerplate_with_recorded_evidence(self):
+        """제외는 **추측이 아니라 실측 근거**로만 한다 — 근거 문구가 마이그레이션에
+        남아 있어야 나중에 사람이 검증·수정할 수 있다."""
+        self.assertIn("excluded(bad_ref) as (", self.sql_src)
+        self.assertIn("values ('21 CFR 211.34'), ('21 CFR 210.1(b)')", self.sql_src)
+        self.assertIn("72/72(100%)", self.sql_src)
+        self.assertIn("consultant is qualified as set forth in 21 CFR 211.34", self.sql_src)
+        self.assertIn("neither adulterated nor", self.sql_src)
+
+    def test_sql_part_filter_also_drops_bare_part_references(self):
+        """`21 CFR 210`·`21 CFR parts 210 and 211` 같은 부 전체 참조는 조항이 아니라
+        규정 이름이다 — 정규식이 점+숫자를 요구해 자동으로 빠진다."""
+        self.assertIn(r"'^21 CFR 21[01]\.[0-9]'", self.sql_src)
+        self.assertIn("부 전체 참조도 자동으로 배제", self.sql_src)
+
+    def test_sql_alias_collision_trap_documented(self):
+        """★실제로 밟은 함정: `excluded(ref)` + `where e.ref = ref` 는 안쪽 `e.ref` 로
+        해석돼 조건이 항상 참이 되고 NOT EXISTS 가 전량을 걸러 냈다(적용 후
+        docs_with_clause=0 으로 발각). 컬럼명 분리로 경로 자체를 없앴다 — 재발 방지를
+        위해 근거가 파일에 남아야 한다(004 관례)."""
+        self.assertIn("004 함정 실사례", self.sql_src)
+        self.assertIn("lateral jsonb_array_elements_text(f.cfr_refs) as cf(ref_txt)",
+                      self.sql_src)
+        self.assertIn("e.bad_ref = cf.ref_txt", self.sql_src)
+
+    def test_sql_counts_documents_not_findings_with_rationale(self):
+        """cfr_refs 는 위반 블록 단위 추출이고 degrade 경로에서는 편지 전체 조항이 한
+        finding 에 실린다 — 지적 문장 단위 배정은 신뢰 구간이 넓다. "이 조항을 인용한
+        문서가 몇 건인가"는 그 잡음과 무관하게 참이라 문서 수로 센다."""
+        self.assertIn("'unit',              'documents'", self.sql_src)
+        self.assertIn("count(distinct p.raw_signal_id)", self.sql_src)
+        self.assertIn("지적 문장 단위 배정은", self.sql_src)
+
+    def test_sql_rolls_subsections_up_to_section_root(self):
+        self.assertIn(r"regexp_replace(regexp_replace(cf.ref_txt, '^21 CFR ', ''), '\(.*$', '')",
+                      self.sql_src)
+        self.assertIn("'variants'", self.sql_src)   # 버린 정보를 되돌려준다
+
+    def test_sql_safety_contract_counts_and_meta_only(self):
+        for forbidden in ("finding_text", "evidence_url", "raw_json"):
+            body = self.sql_src[self.sql_src.index("create or replace function"):]
+            self.assertNotIn("'" + forbidden + "'", body)
+
+    # ── 무엇을 뺐는지 화면이 밝히는가 ────────────────────────────────────────
+    def test_exclusions_and_scope_limits_disclosed_from_response(self):
+        """무엇을 세지 않았는지 밝히지 않으면 이 순위는 검증 불가능한 주장이 된다.
+        제외 목록·부 필터·소스 구성은 전부 응답(scope)에서 읽는다(하드코딩 금지)."""
+        fn = self.js_src[self.js_src.index("function renderCfrRanking(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("scope.excluded_sections", fn)
+        self.assertIn("scope.part_filter", fn)
+        self.assertIn("scope.docs_with_clause", fn)
+        self.assertIn("scope.sources", fn)
+        self.assertIn("이 순위는 사실상 Warning Letter 기준입니다.", fn)
+        self.assertIn("위반 인용이 아니라 뺐습니다.", fn)
+        self.assertIn("조항 단위로 합쳤습니다.", fn)
+        self.assertIn("cfrNoteEl.textContent = note;", fn)
+        # 실측 수치가 리터럴로 박혀 있으면 안 된다.
+        for literal in ("477", "255", "211.22\"", "211.34\""):
+            self.assertNotIn(literal, fn)
+
+    # ── 조항 → 조문 원문 · 실제 사례 (이 섹션이 "그래서 뭘 하냐"에 답하는 지점) ──
+    def test_row_links_to_ecfr_source_text(self):
+        self.assertIn("function ecfrHref(section)", self.js_src)
+        fn = self._fn("ecfrHref")
+        self.assertIn('"https://www.ecfr.gov/current/title-21/section-" + encodeURIComponent(section)',
+                      fn)
+        link = self._fn("buildCfrLinkLine")
+        self.assertIn("a.href = ecfrHref(item.section);", link)
+        self.assertIn('a.target = "_blank";', link)
+        self.assertIn('a.rel = "noopener";', link)
+        self.assertIn("조문 원문 보기(eCFR) →", link)
+        # 조항 뿌리로 합치면서 버린 하위 항 정보를 여기서 되돌려준다.
+        self.assertIn('"실제 인용된 항: " + variants.join(" · ")', link)
+
+    def test_examples_filtered_by_actual_cfr_refs_not_blob_match(self):
+        """검색은 blob ILIKE 라 본문에 번호만 스친 행도 걸린다 — 실제로 그 조항이
+        인용된(cfr_refs 에 있는) 지적만 남긴다."""
+        fn = self._fn("buildCfrExamplePanel")
+        self.assertIn("var refs = f.cfr_refs || [];", fn)
+        self.assertIn('if (String(refs[i]).indexOf(item.section) >= 0)', fn)
+        self.assertIn("이 조항으로 지적된 문장 중 국문으로 열람할 수 있는 것이 아직 없습니다.",
+                      fn)
+
+    def test_example_fetch_uses_search_rpc_with_section_query(self):
+        fn = self._fn("fetchCfrExamples")
+        self.assertIn('rpcEndpoint("findings_search")', fn)
+        self.assertIn("p_q: section", fn)
+        # 필터 후 3건을 확보하려면 문서를 넉넉히 받아야 한다.
+        self.assertIn("p_docs_per_page: EXAMPLE_ROWS * 2", fn)
+
+    def test_example_race_guarded(self):
+        fn = self.js_src[self.js_src.index("function openCfr(section)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertEqual(fn.count("if (state.openCfr !== section) return;"), 2)
+
+    def test_recent_docs_shown_beside_cumulative(self):
+        """누적만 보면 "예전에 많이 걸렸던 조항"과 "지금도 걸리는 조항"이 구분되지 않는다."""
+        fn = self._fn("buildCfrRow")
+        self.assertIn('"문서 " + fmtNum(item.docs) + "건"', fn)
+        self.assertIn('"최근 12개월 " + fmtNum(item.recent_docs) + "건"', fn)
+
+    # ── 조항 국문 요지 ───────────────────────────────────────────────────────
+    def test_section_labels_cover_observed_sections_and_fall_back(self):
+        """조항 번호만으로는 전 직원이 읽을 수 없어 요지를 한 줄 붙인다. 매핑에 없는
+        조항은 번호만 표시한다(추측 번역 금지 — countryLabelKo 와 동일 폴백 계약)."""
+        m = re.search(r"var CFR_SECTION_LABELS = \{(.*?)\n  \};", self.js_src, re.S)
+        self.assertIsNotNone(m, "CFR_SECTION_LABELS 정의 미발견")
+        pairs = dict(re.findall(r'"([0-9.]+)":\s*"([^"]+)"', m.group(1)))
+        # 라이브 실측 상위 조항은 반드시 요지를 갖는다.
+        for sec, cue in (("211.22", "품질관리부서"), ("211.84", "원자재"),
+                         ("211.100", "생산·공정관리"), ("211.192", "일탈"),
+                         ("211.165", "완제품"), ("211.166", "안정성"),
+                         ("211.113", "무균"), ("211.67", "세척")):
+            self.assertIn(sec, pairs, f"{sec} 요지 누락")
+            self.assertIn(cue, pairs[sec], f"{sec} 요지 내용 불일치: {pairs[sec]}")
+        # 제외된 보일러플레이트 조항은 애초에 표시 대상이 아니다.
+        self.assertNotIn("211.34", pairs)
+        self.assertIn("function cfrSectionLabel(section)", self.js_src)
+        self.assertIn('CFR_SECTION_LABELS[section] || ""', self._fn("cfrSectionLabel"))
+
+    # ── 공통 계약 ────────────────────────────────────────────────────────────
+    def test_independent_fetch_chain_silent_fallback(self):
+        chain = self.js_src[self.js_src.index("fetchCfrRanking()\n    .then"):]
+        self.assertIn("renderCfrRanking(data)", chain[:200])
+        self.assertNotIn("errorEl.hidden", chain[:300])
+        self.assertIn("조용히 숨김 유지", chain[:300])
+
+    def test_no_innerhtml_data_injection(self):
+        for name in ("renderCfrRows", "renderCfrRanking"):
+            fn = self._fn(name)
+            for m in re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', fn):
+                self.assertEqual(m.group(1).strip(), '""', f"{name}: {m.group(0)}")
+
+    def test_css_scoped_to_page_not_grm_css(self):
+        for rule in (".tr-cf-row{", ".tr-cf-sec{", ".tr-cf-links{"):
+            self.assertIn(rule, self.html_src)
+        css_path = WEB_DIR / "assets" / "grm.css"
+        if css_path.is_file():
+            self.assertNotIn(".tr-cf-row", css_path.read_text(encoding="utf-8"))
+
+    def test_no_prescriptive_language(self):
+        for forbidden in ("강화해야", "권고합니다", "해야 합니다", "해야 한다",
+                          "준비해야", "대비하십시오"):
+            self.assertNotIn(forbidden, self.html, f"금지 문구: {forbidden}")
 
 
 # ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────

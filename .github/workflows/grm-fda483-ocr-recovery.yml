@@ -1,0 +1,159 @@
+name: GRM FDA 483 OCR Recovery (one-off)
+
+# OCR 엔진 부재로 **빈 본문 적재된** 스캔 483 을 소급 복구한다(2026-07-30 진단 · PR #487).
+# 대상은 `raw_signals` 중 source='FDA 483' 이고 `raw_json.fda483_text_status` 가
+# `scan-ocr-unavailable:…` 인 행 — grm-findings-backfill-fetch 가 tesseract 없이 돌던
+# 07-27~07-29 사이에 들어온 분이다. append-only + document_id dedup 이라 재수집 기회가
+# 없어 영구히 빈손이므로, 이 워크플로가 원문을 다시 읽어 행을 제자리 교체한다.
+#
+# ★grm-fda483-ocr-backfill.yml 과 다른 워크플로다. 그쪽은 **발행본 브리프** 기준으로 deep
+# 델타 패치 **아티팩트**를 만들 뿐 raw_signals 를 갱신하지 않는다. 이번 대상은 브리프에
+# 발행된 적 없는 백필 행이라 그 경로로는 닿지 않는다.
+#
+# 재사용 배관: backfill_483_ocr_recovery.py 가 collect_fda_483 의 라이브 함수
+# (_fetch_fda483_pdf_text / _extract_fda483_excerpt / _extract_483_observations_from_text /
+# _to_item)와 findings_store.raw_signal_from_intake_item 을 그대로 호출해 행을 재구성한다 —
+# 신규 파싱·해시 로직 없음. raw_signal_id 가 document_id 에만 의존하므로 DELETE 없이
+# upsert(merge-duplicates) 한 번으로 교체된다(findings CASCADE 위험 없음). git 쓰기 전무.
+#
+# concurrency: 기존 FDA 483 백필들과 같은 그룹 — 같은 fda.gov 호스트를 두드리므로 직렬화한다.
+#
+# dry-run(기본)은 PDF fetch + 행 재구성까지 수행하고 **쓰기만** 건너뛴다. 무엇이 몇 건
+# 복구되는지(관찰 수 포함) 먼저 확인한 뒤 apply=true 로 재실행한다.
+# 멱등: 복구에 성공한 행은 fda483_text_status 가 사라져 다음 실행의 후보에서 자연히 빠진다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = 실제 raw_signals upsert + findings 재생성. false(기본) = dry-run(fetch·재구성까지 하되 쓰기 없음) — 먼저 이걸로 복구 규모를 확인한다.'
+        type: boolean
+        default: false
+      limit:
+        description: '이번 실행에서 처리할 문서 수 상한(배치 분할용). 비우거나 0 이면 전건(형제 백필과 동일 규약).'
+        type: string
+        default: ''
+      delay_seconds:
+        description: 'PDF 요청 간 대기(초) — fda.gov 예의.'
+        type: string
+        default: '0.5'
+      doc_ids:
+        description: '선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). 비우면 대상 전건.'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-ocr-backfill      # 기존 483 백필들과 동일 그룹(fda.gov 동시 요청 방지)
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    name: 스캔 483 본문 복구 → raw_signals upsert → findings 재생성
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # OCR 엔진 — 이 워크플로는 **OCR 실패를 되돌리러** 왔으므로 엔진이 없으면 존재
+      # 의미가 없다(전건이 still_empty 로 끝나고 fda.gov 만 두드린다). required=true.
+      - name: Install OCR engine (tesseract)
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'true'
+
+      # dispatch 입력은 **env 로만** 받는다 — 셸 본문 직접 삽입 금지(저장소 관례).
+      - name: Run FDA 483 OCR recovery
+        id: recover
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_LIMIT: ${{ inputs.limit }}
+          IN_DELAY: ${{ inputs.delay_seconds }}
+          IN_DOC_IDS: ${{ inputs.doc_ids }}
+        run: |
+          set -euo pipefail
+          ARGS=(--report-path ocr_recovery_report.json --delay-seconds "${IN_DELAY}")
+          if [ "${IN_APPLY}" = "true" ]; then
+            ARGS+=(--apply)
+          fi
+          if [ -n "${IN_LIMIT}" ]; then
+            ARGS+=(--limit "${IN_LIMIT}")
+          fi
+          if [ -n "${IN_DOC_IDS}" ]; then
+            ARGS+=(--doc-ids "${IN_DOC_IDS}")
+          fi
+          python backfill_483_ocr_recovery.py "${ARGS[@]}"
+          RECOVERED=$(python -c "import json; print(json.load(open('ocr_recovery_report.json'))['recovered'])")
+          echo "recovered=${RECOVERED}" >> "$GITHUB_OUTPUT"
+
+      # 복구로 observations 가 채워진 raw_signals 를 findings 로 변환한다. M12 는 "findings
+      # 없는 raw_signal" 만 처리하므로 이번에 살아난 행이 그대로 대상이 된다 —
+      # grm-findings-backfill-fetch.yml 이 쓰는 체인과 동일 배관(신규 로직 없음).
+      - name: Chain M12 findings backfill (raw -> findings)
+        if: ${{ inputs.apply && steps.recover.outputs.recovered != '0' && steps.recover.outputs.recovered != '' }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python findings_supabase_backfill.py | tee m12_report.json
+
+      - name: Write step summary
+        if: always()
+        env:
+          IN_APPLY: ${{ inputs.apply }}
+          IN_LIMIT: ${{ inputs.limit }}
+          IN_DELAY: ${{ inputs.delay_seconds }}
+          IN_DOC_IDS: ${{ inputs.doc_ids }}
+        run: |
+          {
+            echo "### GRM FDA 483 OCR Recovery"
+            echo ""
+            echo "apply: \`${IN_APPLY}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
+            echo ""
+            if [ -f ocr_recovery_report.json ]; then
+              echo "#### 복구 리포트 (backfill_483_ocr_recovery.py)"
+              echo '```json'
+              cat ocr_recovery_report.json
+              echo '```'
+            else
+              echo "ocr_recovery_report.json 미생성 — 인자/인증/조회 실패로 조기 종료 가능"
+              echo "(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+            echo ""
+            if [ -f m12_report.json ]; then
+              echo "#### M12 findings 재생성 리포트"
+              echo '```json'
+              cat m12_report.json
+              echo '```'
+            else
+              echo "(M12 체인 미실행 — dry-run 이거나 recovered=0)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fda483-ocr-recovery-report
+          path: |
+            ocr_recovery_report.json
+            m12_report.json
+          retention-days: 30
+          if-no-files-found: warn

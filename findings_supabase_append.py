@@ -100,6 +100,7 @@ def _post_rows(
     on_conflict: str,
     *,
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
+    resolution: str = "ignore-duplicates",
 ) -> tuple[int, list[dict[str, Any]] | None, str]:
     """POST rows to PostgREST.
 
@@ -110,13 +111,21 @@ def _post_rows(
 
     Retries once (total 2 attempts) for 5xx responses or a request timeout.
     Any other exception or 4xx status fails immediately without retry.
+
+    `resolution` picks the PostgREST conflict policy and **defaults to the
+    append-only behaviour every collector relies on** (`ignore-duplicates`: an
+    existing row is left untouched and simply not returned). The one caller that
+    passes `merge-duplicates` is `backfill_483_ocr_recovery.py`, whose whole job
+    is to repair rows that were stored empty — there, "leave the existing row
+    alone" would be exactly the wrong outcome. Do not flip the default: silently
+    overwriting on re-collection would let a degraded run clobber good data.
     """
     url = f"{base_url}/rest/v1/{table}"
     headers = {
         "apikey": service_key,
         "Authorization": f"Bearer {service_key}",
         "Content-Type": "application/json",
-        "Prefer": "resolution=ignore-duplicates,return=representation",
+        "Prefer": f"resolution={resolution},return=representation",
     }
     params = {"on_conflict": on_conflict} if on_conflict else None
 

@@ -1,0 +1,86 @@
+[
+  {
+    "finding_id": "finding-0610dc3c3b7056d6b3b0ffde",
+    "finding_text": "기타 [별표 1의2] 제6.2호 다목 칭량 절차의 추가설명자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1의2] 제6.2호 다목에 따른 칭량 절차에 대하여 추가설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-27d36fca5040c74ebf84d4a1",
+    "finding_text": "품질경영 기타 [별표 1] 제1의2호 데이터 완전성 보증 절차의 추가설명자료를 제출할 것",
+    "finding_text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제1의2호에 따른 데이터 완전성(data integrity) 보증 절차에 대하여 추가설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3697fea9b84d9de39a7031a4",
+    "finding_text": "기타 [별표 1] 제3.3호, [별표 1의2] 제2.2호 품질(보증) 부서 업무(안정성, 자율점검 등)의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.3호 및 [별표 1의2] 제2.2호에 따른 품질(보증) 부서 업무(안정성, 자율점검 등)에 대하여 추가 설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4000accb1a39ddda520a6111",
+    "finding_text": "제조 기타 [별표 1의2] 제5호 아목 고압증기멸균기 적격성평가 관련 추가자료를 제출할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1의2] 제5호 아목에 따른 고압증기멸균기 적격성평가(qualification)와 관련한 추가자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8293c5cb8ede09c90f1bd3d4",
+    "finding_text": "품질경영 기타 [별표 1] 제13호 완제의약품 자율점검의 추가자료를 제출할 것",
+    "finding_text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제13호에 따른 완제의약품 자율점검(self-inspection)에 대하여 추가자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-870e3d5618d9c4da97b09238",
+    "finding_text": "기타 [별표 1] 제3.3호 다목 데이터완전성(백업, 권한, 감사추적 등) 관련 추가 설명자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.3호 다목에 따른 데이터완전성(data integrity — 백업, 권한, 감사추적(audit trail) 등)과 관련한 추가 설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b579985b0489da18bff38c6",
+    "finding_text": "기타 [별표 1의2] 제12.2호 공정 밸리데이션 현황에 대한 추가자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1의2] 제12.2호에 따른 공정 밸리데이션(process validation) 현황에 대한 추가자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ad6dc50403e1cdce6318947d",
+    "finding_text": "시험실 기타 [별표 1] 제4.2호 불순물 전주기 안전관리 체계의 추가설명자료를 제출할 것",
+    "finding_text_ko": "시험실 분야 기타 지적사항으로, [별표 1] 제4.2호에 따른 불순물 전주기 안전관리 체계에 대하여 추가설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b19436430d9e209b1c4336be",
+    "finding_text": "기타 [별표 1의2] 제13호 가목 변경관리 절차(제품 또는 공정에 미치는 영향 검토 등)의 추가설명자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1의2] 제13호 가목에 따른 변경관리(change control) 절차(제품 또는 공정에 미치는 영향 검토 등)에 대하여 추가설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b5fa0444cfd50e2c82c8104a",
+    "finding_text": "품질 경영 중요 [별표 1] 제3.3호 나목 출하시험 진행 및 절차의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "품질경영 분야 중요 지적사항으로, [별표 1] 제3.3호 나목에 따른 출하시험 진행 및 절차에 대하여 추가 설명자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d785f46b232148097050bca3",
+    "finding_text": "기타 [별표 1] 제3.1호 다목 품질관리 업무를 적절히 수행할 수 있도록 관련 추가 설명 자료(충분한 인원 확보 등)를 제출할 것.",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.1호 다목에 따라 품질관리 업무를 적절히 수행할 수 있도록 관련 추가 설명 자료(충분한 인원 확보 등)를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fd555f5fa65455986d5f33c4",
+    "finding_text": "기타 [별표 1의2] 제12.4호 세척 밸리데이션 현황에 대한 추가자료를 제출할 것",
+    "finding_text_ko": "기타 지적사항으로, [별표 1의2] 제12.4호에 따른 세척 밸리데이션(cleaning validation) 현황에 대한 추가자료를 제출할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd77f48654bc273779d63987",
+    "finding_text": "제조 기타 [별표 1] 6.4 제품과 접촉하는 모든 기구 및 도구에 대하여 세척밸리데이션을 실시할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 6.4에 따라 제품과 접촉하는 모든 기구 및 도구에 대하여 세척밸리데이션(cleaning validation)을 실시할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-083d84e7f07ce20d8c424b61",
+    "finding_text": "○ 의약외품 제조업자는「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나 - 의약외품인 클린방수밴드(1회용)(제조번호: HCA40001, 사용기한: 2028. 2. 2.)를 제조·판매함에 있어 제조단위별 제조관리기록서와 품질관리기록서 일체를 작성하지 아니한 사실이 있음",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서(batch record)와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년 이상 보존하고 품질검사에 합격한 제품만을 출고해야 한다. 그러나 의약외품인 클린방수밴드(1회용)(제조번호: HCA40001, 사용기한: 2028. 2. 2.)를 제조·판매하면서 제조단위별 제조관리기록서와 품질관리기록서 일체를 작성하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

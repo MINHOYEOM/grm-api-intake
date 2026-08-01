@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-bb21e1bea850ef90d094ebce",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 의약품이 동일성·함량·품질·순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bbccdb66de5c2e7567f23aad",
+    "finding_text": "T he following events were inadequately investigated, root cause was not determined and pe rmanent corrective actions not implemented: a.",
+    "finding_text_ko": "다음 사건은 조사가 부적절했고 근본 원인이 확인되지 않았으며 영구적 시정조치가 이행되지 않았다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bc04bf6178f439bb1c095e22",
+    "finding_text": "Corrective Action Plans developed to prevent the recurrence of problems are not always submitted to the Quality Assurance Department within 30 calinder days of the date of problem discovery as required.",
+    "finding_text_ko": "문제 재발 방지를 위해 수립된 시정조치 계획이 요구된 대로 문제 발견일로부터 30일 이내에 품질보증부서에 항상 제출되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bd571cd556967edfd4f7f4cd",
+    "finding_text": "Protective apparel is not worn as necessary to protect drug products from contamination.",
+    "finding_text_ko": "의약품을 오염으로부터 보호하는 데 필요한 보호복을 착용하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-be5964c503943f32c28d368f",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시하는 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-be642225196eb9e1388ddacd",
+    "finding_text": "BHQ allows the regions to take up to one year to research whether the donors on the BHQ consolidated donor file check list donated in their regions.",
+    "finding_text_ko": "BHQ는 지역이 BHQ 통합 공여자 파일 확인 목록에 있는 공여자가 해당 지역에서 헌혈했는지 조사하는 데 최대 1년이 걸리도록 허용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-be749112a64886b77fd6e654",
+    "finding_text": "The quality control unit lacks authority to review production records to assure that no errors have occurred and fully investigate errors that have occurred.",
+    "finding_text_ko": "품질관리부서는 오류가 발생하지 않았음을 보장하기 위해 제조 기록을 검토하고 발생한 오류를 충분히 조사할 권한이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bea14e14391502885d21549f",
+    "finding_text": "SOP #001-001754 “Air Pressure Differential Monitoring” instructs that individual critical alarm report suzomary will be reviewed and signed by the building engineer and ; by a Quality Control representative.",
+    "finding_text_ko": "SOP #001-001754 “공기 압력 차이 모니터링”은 개별 중요 경보 보고서 요약을 건물 엔지니어와 품질관리 담당자가 검토·서명하도록 지시한다.",
+    "translation_method": "manual"
+  }
+]

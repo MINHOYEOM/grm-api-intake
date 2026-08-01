@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-990cc25a1f8e1b9efaa69d9f",
+    "finding_text": "BSLs 01-043 and 01-147 required regions to report CMV labeling deviations noted during the manual review effectiveness check) to BHQ.",
+    "finding_text_ko": "BSL 01-043 및 01-147은 수동 검토 유효성 확인 중 발견된 CMV 라벨링 일탈을 BHQ에 보고하도록 지역에 요구했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-99716bc2902226ef14943b3d",
+    "finding_text": "Job Aid 11.4.ja0561 Timing Guidelines for Recipient Complication Investigations, requires that the DCSC complete a case investigation within three months of it being opened or document why the case remains open: In add JA 11.4.ja056 requires that REDACTION b(4) review of each opened case file be performed to ensure that actions are being appropriately managed.",
+    "finding_text_ko": "수령인 합병증 조사 시기 지침 Job Aid 11.4.ja0561은 DCSC가 사례 개시 후 3개월 이내에 사례 조사를 완료하거나 사례가 계속 열려 있는 이유를 문서화하도록 요구한다. 또한 JA 11.4.ja056은 각 개시 사례 파일을 REDACTION b(4) 검토하여 조치가 적절히 관리되고 있는지 확인하도록 요구한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-99c7270bd715f3be86195150",
+    "finding_text": "Corrective actions when atypical results are obtained during stability testing sometimes involve the removal of the failing samples from the stability program.",
+    "finding_text_ko": "안정성 시험 중 비정형 결과가 얻어질 때의 시정조치에는 때때로 실패한 검체를 안정성 프로그램에서 제외하는 것이 포함된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ad08ee5c95e4f2404740672",
+    "finding_text": "You fail to demonstrate the effectiveness ofyour media to promote the slow-growth microorganisms that may be found in your environment.",
+    "finding_text_ko": "귀사는 환경에서 발견될 수 있는 저성장 미생물의 성장을 촉진하는 배지의 유효성을 입증하지 못한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ae40c0bd5b45883b413ebef",
+    "finding_text": "Unsealed, loose ceiling tiles were observed in your cleanroom.",
+    "finding_text_ko": "귀사의 클린룸에서 밀봉되지 않은 느슨한 천장 타일이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9b1e2a1e5b53fa885f5c6980",
+    "finding_text": "Lack oftraceability ofapproximately.lbs ofpancreas'glaqds found in Freezer.on 04/28/09 that was not labeled and was stored on top ofboxes ofpancreas glands, receiving #090300185, unwrapped 'and exposed to the environment.",
+    "finding_text_ko": "2009년 4월 28일 냉동고에서 라벨이 없고 췌장선 상자(입고번호 #090300185) 위에 포장되지 않은 채 환경에 노출되어 보관된 약 .lbs의 췌장선에 대한 추적성이 부족했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9b749c24ea00e259ac6f0849",
+    "finding_text": "Clothing of personnel engaged in the manufacturing and processing ofdrug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 제조 및 가공에 종사하는 작업자의 복장이 수행 업무에 적절하지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9be9ebfd68c6e5fdec4e69f9",
+    "finding_text": "The samples taken immediately after completion of the autoclave sterilization cycle REDACTED (B) (4) are not representative of product that remains in the original REDACTED (B) (4) beaker for up to one week past the time of sampling.",
+    "finding_text_ko": "REDACTED (B)(4) 오토클레이브 멸균 주기 완료 직후 채취한 검체는 검체 채취 시점 후 최대 1주일까지 원래의 REDACTED (B)(4) 비커에 남아 있는 제품을 대표하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9bebd7bc2528a067145f3d56",
+    "finding_text": "Your laboratory investigations are inadequate in that atypical and unexpected analytical results are invalidated without adequate investigations which include examination of possible causes for the problem, determination of the root cause of the problem, possible involvement of other lots of the product or other products, and appropriate corrective actions to prevent recurrence of the problem.",
+    "finding_text_ko": "귀사의 시험실 조사가 부적절하다. 즉, 문제의 가능한 원인 검토, 근본 원인 판단, 제품의 다른 로트 또는 다른 제품의 관련 가능성 및 재발 방지를 위한 적절한 시정조치를 포함하는 충분한 조사 없이 비정형적이고 예기치 않은 분석 결과를 무효화한다.",
+    "translation_method": "manual"
+  }
+]

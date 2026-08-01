@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-7b3ac1de35dc57d88abc8958",
+    "finding_text": "The above referenced product is not tested for potency ofthe active ingredient.",
+    "finding_text_ko": "상기 참조 제품에 대해 유효성분의 역가 시험이 수행되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7b7bc4dcdb2b2c3392203876",
+    "finding_text": "There is a failure to thoroughly review any unexplained d.iscrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치를 철저히 검토하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7cb7a84ef0a589be48b700b7",
+    "finding_text": "Disinfecting agents and cleaning pads or wipes used in the ISO 5 area [aseptic processing areas] are not sterile.",
+    "finding_text_ko": "ISO 5 구역[무균 공정 구역]에서 사용되는 소독제 및 세척 패드 또는 와이프가 무균이 아닙니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7cbad6a8741240608f780645",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include validation of the sterilization process.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 멸균 공정 밸리데이션이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7ce04a41d5f53b31bf15e63e",
+    "finding_text": "Equipment and utensils are not maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity ofthe drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 장비와 기구가 적절한 간격으로 유지관리되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7d26694c7562f3f5d8e74006",
+    "finding_text": "Process validation is incomplete: (b) (4) • Microfiltration skid membrane for Cerezyme manufacturing is not validated for its reuse.",
+    "finding_text_ko": "공정 밸리데이션이 불완전합니다. (b)(4) • Cerezyme 제조용 미세여과 스키드 멤브레인은 재사용에 대해 밸리데이션되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7da86279aded0f29dfd6f656",
+    "finding_text": "A Field Alert Report was not submitted within three working days of receipt of information concerning significant chemical, physical, or other change or deterioration in a distributed drug product.",
+    "finding_text_ko": "유통된 의약품의 중대한 화학적·물리적 또는 기타 변경이나 변질에 관한 정보를 접수한 후 3영업일 이내에 Field Alert Report가 제출되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7e27aa1c3c3cd896a1da0487",
+    "finding_text": "SOP #3.300.303 entitle, \"Disinfectant Solution and <Re dacted B4>' (Effective date: 9/1/17) does not id entify the contact time used for th e < Redact ed B 4> and <Redacted B4> disinfectants.",
+    "finding_text_ko": "SOP #3.300.303 “Disinfectant Solution and <Redacted B4>”(발효일 2017년 9월 1일)는 <Redacted B4> 및 <Redacted B4> 소독제에 사용되는 접촉 시간을 식별하지 않습니다.",
+    "translation_method": "manual"
+  }
+]

@@ -21,7 +21,7 @@ def _load_input(name: str) -> dict:
 
 class FindingsTaxonomyTest(unittest.TestCase):
     def test_taxonomy_v3_is_bounded_and_unique(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v4")
+        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v5")
         self.assertEqual(
             gf.TAXONOMY_VERSIONS,
             (
@@ -29,6 +29,7 @@ class FindingsTaxonomyTest(unittest.TestCase):
                 "grm-finding-taxonomy/v2",
                 "grm-finding-taxonomy/v3",
                 "grm-finding-taxonomy/v4",
+                "grm-finding-taxonomy/v5",
             ),
         )
         self.assertGreaterEqual(len(gf.FINDING_TAXONOMY), 15)
@@ -111,14 +112,14 @@ class FindingsTaxonomyTest(unittest.TestCase):
 
 
 class FindingsTaxonomyVersionAcceptanceTest(unittest.TestCase):
-    def test_new_records_are_tagged_v4(self) -> None:
+    def test_new_records_are_tagged_v5(self) -> None:
         fx = _load_input("fda_483_observations")
         raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
         finding = gf.finding_from_raw_signal(
             raw_signal,
             finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
         )
-        self.assertEqual(finding["taxonomy_version"], "grm-finding-taxonomy/v4")
+        self.assertEqual(finding["taxonomy_version"], "grm-finding-taxonomy/v5")
         self.assertEqual(gf.validate_finding(finding), [])
 
     def test_v1_tagged_record_still_validates(self) -> None:
@@ -151,22 +152,34 @@ class FindingsTaxonomyVersionAcceptanceTest(unittest.TestCase):
         finding["taxonomy_version"] = "grm-finding-taxonomy/v3"
         self.assertEqual(gf.validate_finding(finding), [])
 
-    def test_v5_tagged_record_fails_validation(self) -> None:
+    def test_v4_tagged_record_still_validates(self) -> None:
         fx = _load_input("fda_483_observations")
         raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
         finding = gf.finding_from_raw_signal(
             raw_signal,
             finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
         )
-        finding["taxonomy_version"] = "grm-finding-taxonomy/v5"
+        finding["taxonomy_version"] = "grm-finding-taxonomy/v4"
+        self.assertEqual(gf.validate_finding(finding), [])
+
+    def test_unknown_future_taxonomy_version_fails_validation(self) -> None:
+        """수용 목록은 열려 있지 않다 -- 다음 버전은 TAXONOMY_VERSIONS 에 명시적으로
+        추가돼야 하며(+ ALTER 마이그레이션), 그 전까지는 거부된다."""
+        fx = _load_input("fda_483_observations")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        finding = gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=fx["raw"]["fda_483_observations"][0]["deficiency"],
+        )
+        finding["taxonomy_version"] = "grm-finding-taxonomy/v6"
         errors = gf.validate_finding(finding)
         self.assertTrue(any("taxonomy_version" in e for e in errors))
 
-    def test_sqlite_ddl_lists_all_four_taxonomy_versions(self) -> None:
+    def test_sqlite_ddl_lists_all_taxonomy_versions(self) -> None:
         ddl = gf.sqlite_schema_ddl()
         self.assertIn(
             "taxonomy_version IN ('grm-finding-taxonomy/v1', 'grm-finding-taxonomy/v2', "
-            "'grm-finding-taxonomy/v3', 'grm-finding-taxonomy/v4')",
+            "'grm-finding-taxonomy/v3', 'grm-finding-taxonomy/v4', 'grm-finding-taxonomy/v5')",
             ddl,
         )
 
@@ -254,7 +267,7 @@ class FindingsSchemaTest(unittest.TestCase):
         self.assertIn(
             "findings.taxonomy_version must be one of "
             "grm-finding-taxonomy/v1, grm-finding-taxonomy/v2, grm-finding-taxonomy/v3, "
-            "grm-finding-taxonomy/v4",
+            "grm-finding-taxonomy/v4, grm-finding-taxonomy/v5",
             errors,
         )
         self.assertIn("findings.category_code must be in grm-finding-taxonomy/v1", errors)

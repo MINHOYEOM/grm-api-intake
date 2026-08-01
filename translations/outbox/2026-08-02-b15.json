@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-20be970e6ea065c7f78c39d0",
+    "finding_text": "Your firm failed to provide data to demonstrate that the depyrogenation of glass vials and closures used in the compounding of sterile preparations has been conducted.",
+    "finding_text_ko": "귀사는 무균 조제품 제조에 사용되는 유리 바이알 및 마개의 발열성 물질 제거가 수행되었음을 입증하는 데이터를 제공하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-21c0ef501ac50fe89c1081c1",
+    "finding_text": "SecondarystaDdards for Amylase and,Protea,se were qualified against the USP reference standardin May 2006.",
+    "finding_text_ko": "아밀라아제 및 프로테아제의 2차 표준품은 2006년 5월 USP 참조표준품과 비교하여 적격성 평가되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-21df062c5665aeb5f1532f1d",
+    "finding_text": "Your firm uses a <Redacted B4> for the depyrogenation of glassware in the production of sterile, injectable drug products.",
+    "finding_text_ko": "귀사는 무균 주사용 의약품 생산 시 유리기구의 발열성 물질 제거를 위해 <Redacted B4>를 사용합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2259129a5d982ffb6d498b8f",
+    "finding_text": "Batch records for re-packaged Avastin do not provide complete documentation of production off each batch of d rug product.",
+    "finding_text_ko": "재포장된 Avastin의 배치기록에는 각 의약품 배치 생산에 대한 완전한 문서가 제공되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2298aae5539a647b3a047c4a",
+    "finding_text": "Growth promotion testing for environmental monitoring plates is not performed in a manner to chal leng e the test plate in that the firm's SOP for growth promotion testing allows for incubation of plates for up to REDACTION (b)(4)",
+    "finding_text_ko": "환경 모니터링 플레이트의 성장촉진시험은 시험 플레이트에 충분한 도전을 가하는 방식으로 수행되지 않습니다. 회사의 성장촉진시험 SOP는 플레이트를 REDACTION (b)(4)까지 배양할 수 있도록 허용합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-23401432be8a1f111078dc6d",
+    "finding_text": "Non-viable particulate excursion alanns are not reacted to in real time.",
+    "finding_text_ko": "비생존성 입자 이탈 경보에 실시간으로 대응하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-246f65b5907b230197f06571",
+    "finding_text": "The firm routinely stores compounded drug products in a REDACTED (b)(4) pending deliv ery to patients.",
+    "finding_text_ko": "회사는 조제 의약품을 환자에게 전달하기 전 REDACTED (b)(4)에 통상 보관합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-24cfffa993740c41abd508ed",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·준수되지 않고 있습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-24f3b9fdf92f12608bbaf26e",
+    "finding_text": "The Greater Chesapeake and Potomac Region (hereafter, region) failed to identify, investigate, correct and trend all instances in which overweight units of whole blood have been collected.",
+    "finding_text_ko": "Greater Chesapeake and Potomac 지역(이하 지역)은 과체중 전혈 단위가 채혈된 모든 사례를 식별, 조사, 시정 및 추세 분석하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-258ec5effef8f354f68ba10a",
+    "finding_text": "Process Validation ofPancreatinlPancrealipase API, Pancreatic Enzyme Concentrate (PEC) 120,8 and 1206 are deficient as , : follows: ' , .",
+    "finding_text_ko": "Pancreatin/Pancrealipase API, Pancreatic Enzyme Concentrate (PEC) 1208 및 1206의 공정 밸리데이션은 다음과 같이 미흡합니다.",
+    "translation_method": "manual"
+  }
+]

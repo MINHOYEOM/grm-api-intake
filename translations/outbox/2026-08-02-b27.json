@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-4ec879a8c66268030d1c3444",
+    "finding_text": "The firm has a protocol for the qualification of solutions used in Manufacturing.",
+    "finding_text_ko": "회사는 제조에 사용되는 용액의 적격성평가를 위한 프로토콜을 보유하고 있습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ecc47fd4d4a0cf7a3bc8f0f",
+    "finding_text": "The \"Clearance Procedure for Filling Interventions in Buildi cument #030-SOP-D-80, effective date 22 Mar 2011, \"outlines the steps to be followed for line clearances performed after interventions in sterile filling\", which are also performed during aseptic media fill processing.",
+    "finding_text_ko": "2011년 3월 22일 발효된 문서 #030-SOP-D-80 “Building의 충전 개입 후 라인 클리어런스 절차”는 무균 충전 개입 후 수행되는 라인 클리어런스 절차를 설명하며, 이는 무균 미디어 필 공정 중에도 수행됩니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ef0553828be9fc4ac34e602",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perfo rm , in that: Non-sterile gowns are used to produce sterile preparations.",
+    "finding_text_ko": "의약품 가공에 종사하는 인력의 복장은 수행 업무에 적절하지 않습니다. 즉, 무균 조제품 생산에 비무균 가운이 사용됩니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4fcef869c068247eb6a1df3d",
+    "finding_text": "The firm's validation of the autoclave cycle does not take into account the fact that the autoclaved bulk product is not transfilled into a final container/closure system (vials) for a period of up to one week.",
+    "finding_text_ko": "회사의 오토클레이브 사이클 밸리데이션은 오토클레이브 처리된 벌크 제품이 최대 1주일 동안 최종 용기/밀봉 시스템(바이알)으로 이송 충전되지 않는 사실을 고려하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-50fbc92a9a9b3bd309b0edf2",
+    "finding_text": "The firm has not conducted an investigation as a result ofthis VAERS report, B.",
+    "finding_text_ko": "회사는 이 VAERS 보고서 B의 결과로 조사를 수행하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-517a038515b1446d899b52c3",
+    "finding_text": "Out of speci fication test results are invalidated without determi ning a definitive laboratory error.",
+    "finding_text_ko": "규격 일탈 시험 결과가 명확한 실험실 오류를 확인하지 않고 무효화됩니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-51d064df7be830bf2cd14343",
+    "finding_text": "Cettificates oftesting of closures are accepted in lieu oftesting without establishing the reliability of the suppl ier's test results through appropriate validation of the test results at appropr iate interval s.",
+    "finding_text_ko": "마개 시험성적서는 적절한 간격으로 시험 결과의 적절한 밸리데이션을 통해 공급업체 시험 결과의 신뢰성을 확립하지 않은 채 시험을 대신하여 수용됩니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-51d17cac57deebef008e85c6",
+    "finding_text": "Your quality control unit lacks the responsibility for approving or rejecting all laboratory procedures impacting the identity, strength, quality, and purity of the drug product.",
+    "finding_text_ko": "귀사의 품질관리 부서는 의약품의 동일성, 함량, 품질 및 순도에 영향을 미치는 모든 실험실 절차를 승인 또는 거부할 책임이 부족합니다.",
+    "translation_method": "manual"
+  }
+]

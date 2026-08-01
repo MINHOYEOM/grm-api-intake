@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-3fc2605bd9d7f3cdba3facdc",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile are not fully established and/or followed.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 완전히 수립되지 않았고/또는 준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-40c95761aa0343eb85e6598d",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-40d21686796fc4d147a611b4",
+    "finding_text": "The ISO-classified area has difficult to clean, particle-generating, or visibJy dirty equipment or surfaces.",
+    "finding_text_ko": "ISO 등급 구역에는 세척하기 어렵거나 입자를 발생시키거나 눈에 띄게 오염된 장비 또는 표면이 있습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-414d5c21050a4f74e5f3eb51",
+    "finding_text": "Environmental monitoring practices are inadequate.",
+    "finding_text_ko": "환경 모니터링 관행이 불충분합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-41bf9d8733461dbb052570ef",
+    "finding_text": "It was not until 1/15/02 whena region submitted a potential system problem that BHQ assigned system problem (SP) #625 and prepared a corrective action plan.",
+    "finding_text_ko": "한 지역이 잠재적 시스템 문제를 제출한 2002년 1월 15일에 이르러서야 BHQ는 시스템 문제(SP) #625를 지정하고 시정조치 계획을 마련했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-41fe618c0f4796ea284834c4",
+    "finding_text": "QA has also failed to perform the effectiveness check designed for SP 616 within the established timeframe documented in SP 616.",
+    "finding_text_ko": "QA는 SP 616에 문서화된 확립된 기한 내에 SP 616을 위해 설계된 유효성 점검도 수행하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-42df11ef39c5bd14fd72a350",
+    "finding_text": "Buildings used in the manufacture, processing, packing or holding ofdrug products are not maintained in a clean and sanitary condition .",
+    "finding_text_ko": "의약품 제조, 가공, 포장 또는 보관에 사용되는 건물이 청결하고 위생적인 상태로 유지되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-43cdd7cccf0845c17dc286c4",
+    "finding_text": "Written procedures are not established for the cleaning of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 장비의 세척에 대한 서면 절차가 수립되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-43e152adfc05e8574b91489e",
+    "finding_text": "Smoke studies performed on Line REDACTION (b)(4) in Building REDACTION (b)(4) revealed the following: A.",
+    "finding_text_ko": "Building REDACTION (b)(4)의 Line REDACTION (b)(4)에서 수행된 연기 시험에서 다음이 확인되었습니다. A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-44520e61ef964bb812b69037",
+    "finding_text": "Your laboratory failure investigations are inadequate in that you re-test without any scientific © justification until passing results are obtained and/or fail to take correctiveactions to prevent recurrence of the possible assigned cause: | a.",
+    "finding_text_ko": "귀사의 실험실 실패 조사는 과학적 정당화 없이 합격 결과가 나올 때까지 재시험하고/하거나 추정된 원인의 재발을 방지하기 위한 시정조치를 취하지 않아 부적절합니다. a.",
+    "translation_method": "manual"
+  }
+]

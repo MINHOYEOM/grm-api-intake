@@ -1,0 +1,38 @@
+[
+  {
+    "finding_id": "finding-86aec9c757d52d98ff46d3cd",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ae5acc65167f60e1cff53030",
+    "finding_text": "The accuracy, sensitivity, specificity, reproducibility, of test methods have not been established.",
+    "finding_text_ko": "시험 방법의 정확성, 감도, 특이성 및 재현성이 확립되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b448f500dbed7a9c613d492d",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include validation of the sterilization process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 멸균 공정의 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b8705baea849484911cb7d2e",
+    "finding_text": "Equipment used in the manufacture, processing, packing, or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하는 적절한 설계가 아니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ce8b02df036ab3de36265166",
+    "finding_text": "The quality control unit lacks the responsibility and authority to approve, reject all components, drug product containers, closures, in process materials, packaging material, labeling, drug products.",
+    "finding_text_ko": "품질관리부서는 모든 구성품, 완제의약품 용기, 마개, 공정 중 물질, 포장 자재, 라벨링 및 의약품을 승인·거부할 책임과 권한이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-55668d1eba20d4873a6ce27f",
+    "finding_text": "As confirmed by the Assistant General Manager Project & Engineering Department, there are.no Architectural Layouts (As Build) engineering diagrams for the HVAC units in manufacturing facilities.",
+    "finding_text_ko": "프로젝트·엔지니어링부 차장이 확인한 바와 같이 제조 시설의 HVAC 장치에 대한 건축 배치도(As Built) 엔지니어링 도면이 없다.",
+    "translation_method": "manual"
+  }
+]

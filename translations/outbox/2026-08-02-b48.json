@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-9c44ea5d00c94b1d685aeb97",
+    "finding_text": "There is a failure to thoroughly investigate any unexplained discrepancy or failure of a batch, regardless of whether the batch has been distributed, or a failure to expand an investigation to assess other batches that may also be impacted.",
+    "finding_text_ko": "배치가 유통되었는지와 관계없이 설명할 수 없는 불일치 또는 배치 실패를 철저히 조사하지 못했거나, 영향을 받을 수 있는 다른 배치를 평가하도록 조사를 확대하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9c99cb5579ecec2c8a05bcc9",
+    "finding_text": "Facilities des igned to prevent contaminat ion or mix-ups are deficient regarding aseptic processing ofdrug products.",
+    "finding_text_ko": "오염 또는 혼입을 방지하도록 설계된 시설은 의약품의 무균공정과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9c9f9f27ac7997bf13afc6ff",
+    "finding_text": "Each batch of drug product purporting to be sterile is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균임을 표방하는 각 의약품 배치는 그러한 요건 적합 여부를 확인하기 위한 시험실 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9cedbfb044d738a981a629d0",
+    "finding_text": "BHQ only allows the regions to investigate a case that exceeds the ARC’s pre-established limit of ten units for litigation reasons or when contacted by a local health department.",
+    "finding_text_ko": "BHQ는 소송 사유가 있거나 지역 보건부가 연락한 경우에만 ARC가 사전에 설정한 10단위 한도를 초과하는 사례를 지역이 조사하도록 허용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9d32b3e807f4af3fe9fdf446",
+    "finding_text": "Complaint investigations are not always completed in timely manner and there is no written justification for the lack oftimely completion.",
+    "finding_text_ko": "불만 조사가 항상 적시에 완료되지 않으며, 적시 완료하지 못한 것에 대한 문서화된 정당화도 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9dac245f737fca6c0fc02bff",
+    "finding_text": "A validated process was not revalidated when changes or process deviations occurred.",
+    "finding_text_ko": "변경 또는 공정 일탈이 발생했을 때 밸리데이션된 공정을 재밸리데이션하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9dd8119e6db071b3c4d097e4",
+    "finding_text": "On 6/27/18, I observed that the magnahelic gauge monitoring differential pressure between the ISO 8 anteroom and unclassified area was at \"O\".",
+    "finding_text_ko": "2018년 6월 27일 ISO 8 전실과 비분류 구역 사이의 차압을 모니터링하는 마그나헬릭 게이지가 “0”인 것을 관찰했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ddf610ad6c394304fd19573",
+    "finding_text": "There is an inventory logbook that contains a ATCC culture index, Seed Culture List ATCC Lyophilized Cultures in Stock, Department Lyo’s in Stock, and Nitrogen Tank | ; Inventory list.",
+    "finding_text_ko": "ATCC 배양 지수, 재고 중인 ATCC 동결건조 배양물 종자배양 목록, 부서 동결건조 재고 및 질소 탱크 재고 목록이 포함된 재고 대장이 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9e51255e2038a564cd859833",
+    "finding_text": "Pressure differentials between areas with different air classifications were not monitored prior to or during sterile drug production.",
+    "finding_text_ko": "서로 다른 공기 등급 구역 간 차압은 무균 의약품 생산 전 또는 생산 중에 모니터링되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9e8aec2afadd589a38a6e3af",
+    "finding_text": "ARC uses a system known as the “Hotline” as another means in which an employee can report concers or problems related to the manufacturing of blood products, donor and patient safety as well as human resource matters.",
+    "finding_text_ko": "ARC는 직원이 혈액 제품 제조, 공여자 및 환자 안전, 인사 문제와 관련된 우려 또는 문제를 보고할 수 있는 또 다른 수단으로 “Hotline”이라는 시스템을 사용한다.",
+    "translation_method": "manual"
+  }
+]

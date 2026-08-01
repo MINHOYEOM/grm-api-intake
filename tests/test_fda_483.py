@@ -2079,3 +2079,95 @@ class Fda483LeadingNoiseTest(unittest.TestCase):
         (`_clean_observation_detail` 과 동일 관례)."""
         self.assertFalse(f.strip_leading_observation_noise.__name__.startswith("_"))
         self.assertIn("strip_leading_observation_noise", dir(f))
+
+
+# ── [OCR 마커·번호 변형 2026-08-01] 스캔 483 실측 표기 ────────────────────────
+class Fda483OcrAnchorVariantTest(unittest.TestCase):
+    """★전처리(해상도·이진화)가 아니라 **정규식**이 막고 있었다.
+
+    회수 실패 235건 중 171건은 OCR 이 이미 **읽을 수 있는 텍스트**를 뽑아냈는데도 관찰이
+    0건이었다. 저장된 excerpt 실측(171건 기준):
+      · `(I) (WE) OBSERVED`  93건 — 정상 마커 `WE\s+OBSERVED` 는 괄호 때문에 못 잡는다
+      · `| OBSERVED:`        19건 — OCR 이 대문자 I 를 `|` 로 읽는다
+      · `WE OBSERVED` 평문    15건
+      · `OBSERVATION #1`     42건 — 공백만 허용하던 앵커가 `#` 를 못 넘는다
+    마커를 못 잡으면 번호목록 폴백이 아예 켜지지 않아 문서 전체가 통째로 유실됐다.
+
+    ★격리 원칙: 정상 경로가 쓰는 `_WE_OBSERVED_RE` 는 건드리지 않는다(넓히면 오늘 잘 되는
+    문서의 컷 위치가 달라진다). 회수 경로 전용 `_OBS_MARKER_RECOVERY_RE` 를 따로 둔다."""
+
+    H = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.H)
+
+    # ── 마커 변형 ────────────────────────────────────────────────────────────
+    def test_paren_i_we_observed_marker(self):
+        """실측 최다(93건): `DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED:`"""
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: Quality system: "
+                "1. The responsibilities and procedures applicable to the quality control "
+                "unit are not fully followed. Specifically, section 4.3 was not applied. "
+                "2. Written procedures are not established for equipment cleaning. "
+                "Specifically, no cleaning record existed for three lots.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertIn("responsibilities and procedures", rows[0]["deficiency"])
+
+    def test_lowercase_paren_i_we_observed(self):
+        """실측: `During an inspection of your firm (i) (we) observed: Observation #1 …`"""
+        text = ("During an inspection of your firm (i) (we) observed: Observation #1 "
+                "Your firm has failed to thoroughly and adequately investigate biological "
+                "product deviations. Specifically, three deviations had no root cause.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+        self.assertIn("failed to thoroughly", rows[0]["deficiency"])
+
+    def test_pipe_observed_marker_from_ocr_i(self):
+        """실측(19건): OCR 이 대문자 I 를 `|` 로 읽는다 — `FIRM | OBSERVED:`"""
+        text = ("DURING AN INSPECTION OF YOUR FIRM | OBSERVED: Laboratory Controls: "
+                "1. Your laboratory failure investigations are inadequate in that you "
+                "re-test without any scientific justification until passing results are "
+                "obtained. 2. Records are not maintained for the retest decisions.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    # ── OBSERVATION #N ───────────────────────────────────────────────────────
+    def test_observation_hash_number(self):
+        """실측(42건): `OBSERVATION #1 – …` · `Observation #1: …`"""
+        for marker in ("OBSERVATION #1 –", "Observation #1:", "OBSERVATION # 1 -"):
+            text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: " + marker +
+                    " Your firm has failed to establish adequate procedures for conducting "
+                    "appropriate media fill simulations. Specifically, the last run failed.")
+            rows = self._obs(text)
+            self.assertEqual(len(rows), 1, marker)
+            self.assertIn("media fill simulations", rows[0]["deficiency"], marker)
+
+    # ── 정상 경로 불변(격리 확인) ────────────────────────────────────────────
+    def test_primary_marker_regex_untouched(self):
+        """`_WE_OBSERVED_RE` 는 확장하지 않는다 — 정상 경로 컷 위치가 달라지면 안 된다."""
+        self.assertIsNone(f._WE_OBSERVED_RE.search("(I) (WE) OBSERVED:"))
+        self.assertIsNotNone(f._WE_OBSERVED_RE.search("WE OBSERVED:"))
+        self.assertIsNotNone(f._OBS_MARKER_RECOVERY_RE.search("(I) (WE) OBSERVED:"))
+
+    def test_normal_document_still_untouched(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "OBSERVATION 1 There is a failure to thoroughly review unexplained "
+                "discrepancies. Specifically, no investigation was opened. "
+                "OBSERVATION 2 Written production procedures are not followed. "
+                "Specifically, batch records were incomplete.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("There is a failure"))
+
+    def test_numbered_fallback_still_requires_a_marker(self):
+        """마커가 전혀 없으면 번호목록을 관찰로 보지 않는다(목차·별첨 오탐 방지)."""
+        text = ("TABLE OF CONTENTS 1. Introduction to the facility and its operations. "
+                "2. Scope of the review performed by the corporate quality group.")
+        self.assertEqual(self._obs(text), [])
+
+    def test_quality_gate_still_applies_to_recovered_rows(self):
+        """마커를 넓혀도 품질 게이트는 그대로 — 양식 문구는 여전히 기각된다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+                "1. To assist firms inspected in complying with the Acts and regulations "
+                "enforced by the Food and Drug Administration this form is provided.")
+        self.assertEqual(self._obs(text), [])

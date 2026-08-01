@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-fb8d6f09b728e4c0f4949d3b",
+    "finding_text": "The March 2009 BHQ audit ofthe Charlotte DCSC facility cited untimely management of problems.",
+    "finding_text_ko": "2009년 3월 BHQ가 실시한 Charlotte DCSC 시설 감사는 문제를 적시에 관리하지 못한 점을 지적했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fba687e1eb1b3a3c0d04d6ae",
+    "finding_text": "Equipment and utensils are not maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 장비와 기구를 적절한 간격으로 유지관리하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fbf820576a86df0dc97be08c",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "의약품의 유통을 위한 시험 및 출하는 출하 전에 최종 규격과 각 유효성분의 동일성 및 함량에 대한 만족스러운 적합성을 확인하는 적절한 시험실 판정을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fc356739822b392ca030e4b8",
+    "finding_text": "Each batch of drug product required to be free of objectionable microorganisms is not tested through appropriate laboratory , testing.",
+    "finding_text_ko": "바람직하지 않은 미생물이 없어야 하는 각 의약품 배치는 적절한 시험실 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fc651e0d39b51081f6913db0",
+    "finding_text": "Air Flow pattern studies \"smoke studies\" are inadequate for the following reasons: a.",
+    "finding_text_ko": "기류 패턴 연구(“연기 시험”)는 다음 사유로 부적절하다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fd1b308ba65614b69c214ce7",
+    "finding_text": "The building Jacks adequate space for the orderly placement of equipment and materials to prevent mix-ups between different components, drug product containers, closures, in-process materials, and drug products and to prevent contamination.",
+    "finding_text_ko": "건물에는 서로 다른 구성품, 완제의약품 용기, 마개, 공정 중 물질 및 의약품 간 혼입을 방지하고 오염을 방지하기 위해 장비와 자재를 질서 있게 배치할 충분한 공간이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fd6ac646ca0e2c28e2dd77b6",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 실내 및 설비 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fdd973f2e4d17a4b28698a8a",
+    "finding_text": "There is no evidence that the <Redacted B4> preservative used to provi de <Redacted B4> blanketing for glutathione sterile drug products is of an appropriate quality for its intended use.",
+    "finding_text_ko": "글루타티온 무균 의약품에 대해 <Redacted B4> 차단을 제공하는 데 사용되는 <Redacted B4> 보존제가 의도된 용도에 적합한 품질이라는 증거가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fde907e9409bb6a67ec1afda",
+    "finding_text": "Documentation was not provided to demonstrate that your firm bas conducted media fills to validate the sterilization process for compounded sterile preparations (CSP's) for parenteral use.",
+    "finding_text_ko": "귀사가 비경구 투여용 조제 무균 제제(CSP)의 멸균 공정을 밸리데이션하기 위해 배지충전시험을 실시했음을 입증하는 문서를 제공하지 않았다.",
+    "translation_method": "manual"
+  }
+]

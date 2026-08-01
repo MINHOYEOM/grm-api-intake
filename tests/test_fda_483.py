@@ -1935,3 +1935,71 @@ class Fda483ObservationRecoveryTest(unittest.TestCase):
         self.assertNotIn("Redacted", f._strip_redaction_markers("a <Redacted B4> b"))
         self.assertNotIn("(b) (4)", f._strip_redaction_markers("a (b) (4) b"))
         self.assertIn("Consolidation", f._strip_redaction_markers("Consolidation: ARC"))
+
+
+# ── [OCR 사유 보존 2026-08-01] 텍스트층이 빈 스캔본의 실패 사유 ────────────────
+class Fda483OcrReasonPropagationTest(unittest.TestCase):
+    """`_fetch_fda483_pdf_text` 는 OCR 이 못 살렸을 때 **왜 못 살렸는지**를 하류에
+    넘겨야 한다. 종전엔 `_is_notice_only(text)` 일 때만 OCR 사유로 바꿔 돌려줘서,
+    텍스트층이 **완전히 빈** 스캔본(= `_is_notice_only("")` 는 False)은 원래 status
+    (`scan-no-text`)가 그대로 나갔다 — `scan-ocr-budget`(아직 안 함)·`scan-ocr-empty`
+    (했지만 글자 0)·`scan-ocr-unavailable`(엔진 없음)이 한 값으로 뭉개졌다.
+
+    ★영향: `backfill_483_ocr_recovery.is_ocr_unavailable_row` 는 `scan-no-text` 를
+    "엔진을 붙여도 결과가 같다"고 보고 복구 대상에서 뺀다. 사유가 뭉개지면 **예산 때문에
+    밀린 문서가 영구히 복구 대상 밖**이 된다. "우리가 못 받았다"와 "원문에 없다"는 서로
+    다른 말이어야 한다."""
+
+    def _patched(self, primary, ocr):
+        """(_extract_pdf_text, _ocr_483_pdf_text) 를 갈아끼운 상태로 fetch 실행."""
+        import collect_mfds_gmp_inspection as gmp
+        with patch.object(gmp, "_extract_pdf_text", lambda data, max_chars=0: primary), \
+             patch.object(f, "_ocr_483_pdf_text", lambda data, max_chars=0: ocr), \
+             patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.4"):
+            return f._fetch_fda483_pdf_text("https://www.fda.gov/media/1/download")
+
+    def test_empty_text_layer_keeps_budget_reason(self):
+        """예산 소진은 '아직 안 함'이다 — scan-no-text 로 덮이면 다시 시도되지 않는다."""
+        _, status = self._patched(("", "scan-no-text"), ("", "scan-ocr-budget"))
+        self.assertEqual(status, "scan-ocr-budget")
+
+    def test_empty_text_layer_keeps_engine_missing_reason(self):
+        _, status = self._patched(("", "scan-no-text"), ("", "scan-ocr-unavailable:no tessdata"))
+        self.assertEqual(status, "scan-ocr-unavailable:no tessdata")
+
+    def test_empty_text_layer_keeps_ocr_empty_reason(self):
+        """OCR 이 실제로 돌았는데 글자가 0이면 그건 '시도했지만 안 됨' — 다른 사유다."""
+        _, status = self._patched(("", "scan-no-text"), ("", "scan-ocr-empty"))
+        self.assertEqual(status, "scan-ocr-empty")
+
+    def test_notice_only_path_unchanged(self):
+        """고지문 전용 경로는 종전 그대로(회귀 없음)."""
+        notice = ("This document lists observations of objectionable conditions made by "
+                  "the FDA representative(s) during the inspection.")
+        self.assertTrue(f._is_notice_only(notice))
+        _, status = self._patched((notice, "pdf-ok"), ("", "scan-ocr-empty"))
+        self.assertEqual(status, "scan-ocr-empty")
+
+    def test_real_text_is_never_overwritten_by_ocr_failure(self):
+        """본문이 실제로 있으면 OCR 실패 사유로 덮지 않는다 — 있는 본문을 버리면 안 된다."""
+        body = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: OBSERVATION 1 "
+                "Written procedures are not followed for cleaning of equipment.")
+        text, status = self._patched((body, "pdf-ok"), ("", "scan-ocr-budget"))
+        self.assertEqual(status, "pdf-ok")
+        self.assertIn("OBSERVATION 1", text)
+
+    def test_ocr_success_still_wins(self):
+        recovered = "OBSERVATION 1 Equipment cleaning records are incomplete for three lots."
+        text, status = self._patched(("", "scan-no-text"), (recovered, "pdf-ok-ocr"))
+        self.assertEqual(status, "pdf-ok-ocr")
+        self.assertIn("OBSERVATION 1", text)
+
+    def test_budget_is_env_configurable_for_one_off_runs(self):
+        """일일 수집의 벽시계를 지키는 기본값(200)은 1회성 회수에서 스캔본 ~20건에
+        소진된다 — 워크플로가 실행별로 올릴 수 있어야 한다."""
+        self.assertEqual(f.FDA483_OCR_PAGE_BUDGET, f._env_int("FDA483_OCR_PAGE_BUDGET", 200))
+        wf = (os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           ".github", "workflows", "grm-fda483-ocr-recovery.yml"))
+        src = open(wf, encoding="utf-8").read()
+        self.assertIn("ocr_page_budget:", src)
+        self.assertIn("FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}", src)

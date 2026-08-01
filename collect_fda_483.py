@@ -761,9 +761,22 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     ocr_text, ocr_status = _ocr_483_pdf_text(data, max_chars=max_chars)
     if ocr_text:
         return normalize_pdf_ligatures(ocr_text), ocr_status
-    # OCR 이 못 살렸다 — 원래 텍스트가 고지문뿐이었다면 그건 "본문 없음"이므로 사유를
-    # OCR 실패 코드로 바꿔 하류에 정확히 알린다(고지문을 본문으로 오인하지 않게).
-    return ("", ocr_status) if _is_notice_only(text) else (text, status)
+    # OCR 이 못 살렸다 — 원래 텍스트가 고지문뿐이거나 **아예 비었다면** 그건 "본문 없음"
+    # 이므로 사유를 OCR 실패 코드로 바꿔 하류에 정확히 알린다.
+    #
+    # ★`not text.strip()` 조건이 빠져 있어 사유가 통째로 버려졌다(2026-08-01 실측):
+    #   텍스트층이 완전히 빈 스캔본은 `_is_notice_only("")` 가 False 라 이 줄이 원래
+    #   status(`scan-no-text`)를 그대로 돌려줬고, `scan-ocr-budget`(예산 소진)·
+    #   `scan-ocr-empty`(OCR 했으나 글자 0)·`scan-ocr-unavailable`(엔진 없음)이 전부
+    #   `scan-no-text` 한 값으로 뭉개졌다. 그 결과 **"아직 시도 안 함"과 "시도했지만
+    #   안 됨"이 구분되지 않았고**, `scan-no-text` 를 "엔진을 붙여도 결과가 같다"고 보고
+    #   복구 대상에서 제외하는 `backfill_483_ocr_recovery.is_ocr_unavailable_row` 가
+    #   예산 때문에 밀린 문서를 영구히 못 보게 만들었다(회수 실행 실측: 사유별 집계에
+    #   scan-no-text 135 · scan-ocr-budget 42 로 갈렸는데 앞쪽에 예산 건이 섞여 있었다).
+    #   [[부재 어휘]] 원칙 — "우리가 못 받았다"와 "원문에 없다"는 다른 말이어야 한다.
+    if _is_notice_only(text) or not (text or "").strip():
+        return "", ocr_status
+    return text, status
 
 
 def _is_notice_only(text: str) -> bool:

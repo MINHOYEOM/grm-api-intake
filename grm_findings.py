@@ -386,9 +386,18 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         ("contamination", "cross-contamination", "bioburden", "오염", "교차오염"),
         # v5: 21 CFR 211.113(a) 의 정본 귀속처. 이 조항 문장에는 "contamination" 이라는 단어가
         # 아예 없어("prevent objectionable microorganisms in drug products not required to be
-        # sterile") 기존 키워드로는 잡히지 않는다. "objectionable microorganism" 은 211.113(a)
-        # 전용 어휘라 이 패턴 하나로 과매칭 없이 닫힌다.
-        patterns=(r"\bobjectionable\s+micro\w*",),
+        # sterile") 기존 키워드로는 잡히지 않는다.
+        #
+        # ★"objectionable microorganism" 만으로 잡지 않고 **`prevent` 를 함께 요구**하는 이유:
+        # 같은 어휘가 21 CFR 211.165(b)("each batch ... required to be **free of** objectionable
+        # microorganisms is not tested through appropriate **laboratory testing**")에도 나오는데,
+        # 그쪽은 시험실 시험 실패라 qc_lab_controls 소관이다(실측 6건). 넓은 패턴을 쓰면 그 6건을
+        # 오염관리로 잘못 끌어온다 -- 조항의 **행위**(예방 vs 시험)로 가른다.
+        #
+        # OCR 내성은 실측에서 확인된 손상만 좁게 수용한다(v4 §1 보수적 원칙):
+        #   · `obj\s?ectionable`  -- PDF 텍스트층 단어 중간 공백("obj ectionable", 실측 1건)
+        #   · `[il1]?[nm]icro`    -- 선두 'm' 이 'In' 으로 오인식("Inicroorganisms", 실측 1건)
+        patterns=(r"\bprevent\w*\s+obj\s?ectionable\s+[il1]?[nm]icro\w*",),
     ),
     FindingCategory(
         "validation_qualification",

@@ -168,15 +168,54 @@ class ContaminationControlPatternTest(unittest.TestCase):
             "contamination_control",
         )
 
+    def test_211_165b_free_of_objectionable_is_not_pulled_into_contamination(self) -> None:
+        """★패턴이 `prevent` 를 함께 요구하는 이유. 21 CFR 211.165(b)("each batch ...
+        required to be **free of** objectionable microorganisms is not tested through
+        appropriate **laboratory testing**")는 같은 어휘를 쓰지만 시험실 시험 실패이지
+        오염 예방 실패가 아니다. 라이브 실측 6건 -- 넓은 패턴이면 이들이 오염관리로
+        잘못 끌려온다. 조항의 **행위**(예방 vs 시험)로 가른다."""
+        self.assertNotEqual(
+            gf.classify_finding_category(
+                "Each batch of drug product required to be free of objectionable "
+                "microorganisms is not tested through appropriate laboratory testing."
+            ),
+            "contamination_control",
+        )
+
     def test_microorganism_plural_and_singular_both_match(self) -> None:
         for text in (
-            "Objectionable microorganism control was not demonstrated.",
-            "Objectionable microorganisms were recovered from the water system.",
+            "Procedures to prevent objectionable microorganism ingress were not followed.",
+            "Written procedures designed to prevent objectionable microorganisms are absent.",
         ):
-            with self.subTest(text=text[:40]):
+            with self.subTest(text=text[:45]):
                 self.assertEqual(
                     gf.classify_finding_category(text), "contamination_control"
                 )
+
+    def test_confirmed_ocr_damage_in_the_objectionable_phrase_still_matches(self) -> None:
+        """v4 §1 과 같은 규율 -- 실측에서 **확인된** 손상만 좁게 수용한다.
+        ①`obj ectionable`(PDF 텍스트층 단어 중간 공백, 라이브 1건)
+        ②`Inicroorganisms`(선두 'm' 이 'In' 으로 오인식, 라이브 1건).
+        이 두 건은 중립화 후 갈 곳이 없어 기타 품질시스템으로 떨어지던 행이다."""
+        for text in (
+            "Procedures designed to prevent obj ectionable microorganisms in drug pro ducts "
+            "not required to be sterile are not established.",
+            "Procedures designed to prevent objectionable Inicroorganisms in drug products "
+            "not required to be sterile are not established and followed.",
+        ):
+            with self.subTest(text=text[:50]):
+                self.assertEqual(
+                    gf.classify_finding_category(text), "contamination_control"
+                )
+
+    def test_ocr_tolerance_does_not_become_fuzzy_matching(self) -> None:
+        """수용한 손상은 두 가지뿐이다 -- 임의의 유사 철자까지 열어주지 않는다."""
+        self.assertNotEqual(
+            gf.classify_finding_category(
+                "Procedures designed to prevent objection able microrganisms were absent."
+            ),
+            "contamination_control",
+        )
 
 
 class TaxonomyV5BoundedTest(unittest.TestCase):

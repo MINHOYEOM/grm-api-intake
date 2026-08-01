@@ -2003,3 +2003,79 @@ class Fda483OcrReasonPropagationTest(unittest.TestCase):
         src = open(wf, encoding="utf-8").read()
         self.assertIn("ocr_page_budget:", src)
         self.assertIn("FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}", src)
+
+
+# ── [표제 선행 잡음 2026-08-01] 관찰 표제 앞 OCR/양식 파편 제거 ────────────────
+class Fda483LeadingNoiseTest(unittest.TestCase):
+    """스캔 483 을 OCR 하면 표 테두리·괘선·글머리 기호가 본문 첫 글자 앞에 남는다
+    (라이브 실측 106건: "| There is a failure…", "_ |Procedures describing…",
+    "· • ·· The Quality Unit…"). 내용은 멀쩡하니 버릴 게 아니라 떼어낸다.
+
+    ★`_TRAILING_STRAY_LETTER_RE` 의 앞쪽 짝이며, **모든 경로**에 적용한다 — OCR 로 되살린
+    문서는 정상 앵커 경로로도 파싱되므로 회수 경로에만 걸면 잡음이 그대로 남는다."""
+
+    def test_strips_table_border_and_bullet_debris(self):
+        for raw, want in (
+            ("| There is a failure to review discrepancies.",
+             "There is a failure to review discrepancies."),
+            ("_ |Procedures describing the calibration of instruments are absent.",
+             "Procedures describing the calibration of instruments are absent."),
+            ("· • ·· The Quality Unit does not review documents.",
+             "The Quality Unit does not review documents."),
+            ("— Equipment and utensils are not cleaned at intervals.",
+             "Equipment and utensils are not cleaned at intervals."),
+            ("!· ; There is a lack of written procedures.",
+             "There is a lack of written procedures."),
+        ):
+            self.assertEqual(f.strip_leading_observation_noise(raw), want)
+
+    def test_strips_subitem_marker_and_stray_letter(self):
+        self.assertEqual(
+            f.strip_leading_observation_noise("i The quality control unit lacks authority."),
+            "The quality control unit lacks authority.")
+        self.assertEqual(
+            f.strip_leading_observation_noise("b. Written procedures are not followed."),
+            "Written procedures are not followed.")
+
+    def test_keeps_legitimate_sentence_starts(self):
+        """관사 A/a·대명사 I 로 시작하는 진짜 표제를 깎으면 안 된다."""
+        for keep in (
+            "A written procedure for cleaning was not established.",
+            "a written procedure for cleaning was not established.",
+            "I observed that the operator did not record the time.",
+            '"Sterile" products were not tested for endotoxin.',
+            "(b)(4) filters were not integrity tested after use.",
+        ):
+            self.assertEqual(f.strip_leading_observation_noise(keep), keep)
+
+    def test_keeps_redaction_marker_at_start(self):
+        """★첫 측정에서 실제로 밟은 오탐: `<Redacted B4>` 의 여는 꺾쇠를 떼면 표기가 깨진다
+        (실측 153584)."""
+        raw = "<Redacted B4> testing to the <Redacted B4> was not performed."
+        self.assertEqual(f.strip_leading_observation_noise(raw), raw)
+
+    def test_never_truncates_content(self):
+        """상한을 넘게 깎이면 잡음 제거가 아니라 내용 절단 — 원본을 그대로 둔다."""
+        long_noise = "." * (f.FDA483_LEADING_NOISE_MAX_STRIP + 5) + "Procedures are absent."
+        self.assertEqual(f.strip_leading_observation_noise(long_noise), long_noise)
+
+    def test_never_returns_empty(self):
+        self.assertEqual(f.strip_leading_observation_noise("|||"), "|||")
+        self.assertEqual(f.strip_leading_observation_noise(""), "")
+
+    def test_applied_on_every_extraction_path(self):
+        """정상 앵커 경로에서도 걸려야 한다 — 회수 경로 전용이면 OCR 문서의 잡음이 남는다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "OBSERVATION 1 | There is a failure to thoroughly review any unexplained "
+                "discrepancy. Specifically, no investigation was opened for three lots.")
+        rows = f._extract_483_observations_from_text(
+            text, {"establishment_type": "", "fei_number": "", "firm_name": ""})
+        self.assertEqual(len(rows), 1)
+        self.assertTrue(rows[0]["deficiency"].startswith("There is a failure"),
+                        rows[0]["deficiency"])
+
+    def test_public_api_for_backfill_reuse(self):
+        """이미 저장된 표제 재청소(backfill)도 같은 함수를 써야 코드와 데이터가 안 갈린다
+        (`_clean_observation_detail` 과 동일 관례)."""
+        self.assertFalse(f.strip_leading_observation_noise.__name__.startswith("_"))
+        self.assertIn("strip_leading_observation_noise", dir(f))

@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-6a454734a1f3c157a9802a6f",
+    "finding_text": "The firm has not established an acceptance range for the amount of timing solution used in the production of active stock pellets.",
+    "finding_text_ko": "회사는 활성 스톡 펠릿 생산에 사용되는 타이밍 용액 양에 대한 허용범위를 설정하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6a5ee075dcd90fd30dd30579",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6a60e244ce86fc5c40deda91",
+    "finding_text": "Although the formula worksheets state the API an d raw materials are non-sterile and the vials are sterile, pharma cy technican responsible for mixing and filling all compounded products explained that the vials and stoppers are rec ieved non-sterile.",
+    "finding_text_ko": "제조 공식 워크시트에는 API와 원자재가 비무균이고 바이알은 무균이라고 되어 있으나, 모든 조제제품의 혼합 및 충전을 담당하는 약국 기술자는 바이알과 마개가 비무균 상태로 입고된다고 설명했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6a8074eac851c59b79d776fa",
+    "finding_text": "Reserve samples for drug products are not retained for one year after the expiration date of the drug product.",
+    "finding_text_ko": "의약품 보관 검체는 의약품 유효기간 후 1년간 보관되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6aab0923165aa4e2fe2031b8",
+    "finding_text": "The firm's Quality Unit failed to evaluate and perform a risk assessment and implement applicable corrective actions for approximately 17 supplier recall notifications received January-September 2012.",
+    "finding_text_ko": "회사의 품질 부서는 2012년 1월~9월에 접수된 약 17건의 공급업체 회수 통지에 대해 평가와 위험평가를 수행하고 해당 시정조치를 시행하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6ad8d4d3616fdcb75be41b50",
+    "finding_text": "Non-sterilized and Non-depyrogenated equipment was used in sterile drug production.",
+    "finding_text_ko": "무균 의약품 생산에 멸균 및 발열성 물질 제거가 되지 않은 장비가 사용되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6c18b41b54daf232a18db465",
+    "finding_text": "The plasma disposition notification form for the Greater Chesapeake and Potomac Region, dated 9/5/02, indicates there are at least 52 out of 162 units ofplasma that could not be found for recall/market withdrawal.",
+    "finding_text_ko": "2002년 9월 5일자 Greater Chesapeake and Potomac 지역의 혈장 처분 통지 양식은 회수/시장 철회를 위해 찾을 수 없는 혈장 단위가 162개 중 최소 52개임을 나타냅니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6c9e461ac277755b20f0be63",
+    "finding_text": "Specifically, PIR USD 2005-01-01, Part IIIA, Global Medical/Clinical Assessment, did not answerthe question from the Detection section appropriately.",
+    "finding_text_ko": "구체적으로 PIR USD 2005-01-01, Part IIIA, Global Medical/Clinical Assessment는 Detection 섹션의 질문에 적절히 답변하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6cf49157d133388ecda96925",
+    "finding_text": "The investigation into the two sterility failures did not assess for possible root causes of the contamination.",
+    "finding_text_ko": "두 건의 무균 실패에 대한 조사는 오염의 가능한 근본 원인을 평가하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6d0cb8250b2bee25174b29a2",
+    "finding_text": "Quality Assurance is not responsible for reviewing and ensuring hotline records are appropriately investigated and corrective action taken.",
+    "finding_text_ko": "품질보증은 핫라인 기록이 적절히 조사되고 시정조치가 취해졌는지 검토·보장할 책임이 없습니다.",
+    "translation_method": "manual"
+  }
+]

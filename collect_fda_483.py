@@ -327,6 +327,25 @@ _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안
 # 실제 산문에서 문장이 고립된 단일 I/l 로 끝나는 경우는 사실상 없어(대명사 "I"는 문장 중간),
 # 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
 _TRAILING_STRAY_LETTER_RE = re.compile(r"\s+[IlL]$")
+
+# ── [표제 선행 잡음 2026-08-01] 관찰 표제 **앞**에 붙는 OCR/양식 파편 ──────────
+# 위 `_TRAILING_STRAY_LETTER_RE` 의 앞쪽 짝. 스캔 483 을 OCR 하면 표 테두리·페이지
+# 괘선·글머리 기호가 본문 첫 글자 앞에 남는다(라이브 실측 106건):
+#   "| There is a failure…" · "_ |Procedures describing…" · "· • ·· The Quality Unit…"
+#   "!· ; There is a lack of…" · "— Equipment and utensils…" · ")* * * Specifically,…"
+# 내용은 멀쩡한데 앞 2~6자만 잡음이라, 버릴 게 아니라 **떼어내면** 된다.
+#
+# 여는따옴표·여는괄호는 남긴다 — 실제 표제가 인용/괄호로 시작할 수 있다.
+# ★`<` 도 반드시 남긴다: FDA 마스킹 표기 `<Redacted B4>` 가 표제 첫 글자인 경우가 있어
+#   (실측 153584 "…<Redacted B4> testing to the <Redacted B4> was not performed.")
+#   떼면 멀쩡한 표기가 깨진다 — 첫 측정에서 실제로 밟은 오탐이다.
+_LEADING_SYMBOL_NOISE_RE = re.compile(r'^[^A-Za-z0-9"\'(<]+')
+# 하위항목 마커·낱자 잔재("i The quality control unit…", "b. Written procedures…").
+# 관사 "A"/"a" 와 대명사 "I" 는 진짜 문장 시작일 수 있어 **제외**한다 — 소문자 낱자가
+# 대문자로 시작하는 다음 낱말 앞에 홀로 선 경우만 잡는다.
+_LEADING_STRAY_LETTER_RE = re.compile(r"^(?!a\b)[b-z][.)]?\s+(?=[A-Z])")
+# 안전 상한 — 이보다 많이 깎이면 잡음 제거가 아니라 내용 절단이다(원본을 그대로 둔다).
+FDA483_LEADING_NOISE_MAX_STRIP = 12
 _DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으면 detail 을 비운다
 # `OBSERVATION N` 이 표제가 아니라 본문 속 상호참조인지 가리는 신호(→ _select_observation_anchors).
 # 앵커 **앞** 문맥: "...Please refer to" / "see" / "per" 로 끝나면 참조다. 중간에 다른 참조가
@@ -994,6 +1013,33 @@ def _text_corruption_ratio(text: str) -> float:
     return bad / max(len(text), 1)
 
 
+def strip_leading_observation_noise(deficiency: str) -> str:
+    """관찰 표제 앞에 붙은 OCR/양식 파편을 떼어낸다(순수 함수).
+
+    공개 API 로 둔다 — 신규 추출뿐 아니라 **이미 저장된 표제 재청소(backfill)** 에도 같은
+    규칙을 써야 코드와 데이터가 갈리지 않는다(`_clean_observation_detail` 과 동일 관례).
+
+    규칙(순서대로, 한 번만):
+      ① 앞쪽 비문자 기호 제거 — 여는따옴표·여는괄호는 남긴다(진짜 표제가 그렇게 시작할 수 있다).
+      ② 남은 것이 하위항목 마커/낱자면 제거("i The …", "b. Written …"). 관사 a/A·대명사 I 제외.
+      ③ ②가 걷힌 뒤 다시 드러난 기호 한 겹 제거("_ |Procedures" 같은 이중 파편).
+
+    ★상한(`FDA483_LEADING_NOISE_MAX_STRIP`) — 이보다 많이 깎이면 잡음 제거가 아니라 내용
+      절단이다. 그럴 땐 **원본을 그대로 돌려준다**(의심스러우면 손대지 않는다).
+    ★결과가 비면 원본을 돌려준다 — 표제를 통째로 지우는 일은 없어야 한다.
+    """
+    original = deficiency or ""
+    text = _LEADING_SYMBOL_NOISE_RE.sub("", original)
+    text = _LEADING_STRAY_LETTER_RE.sub("", text)
+    text = _LEADING_SYMBOL_NOISE_RE.sub("", text)
+    text = text.lstrip()
+    if not text:
+        return original
+    if len(original) - len(text) > FDA483_LEADING_NOISE_MAX_STRIP:
+        return original
+    return text
+
+
 def _clean_observation_chunk(chunk: str) -> str:
     """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
@@ -1431,6 +1477,11 @@ def _observations_from_anchors(
         chunk = _clean_observation_chunk(body[start:end])
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
+        # [표제 선행 잡음] **모든 경로**에 적용한다(회수 경로 전용 게이트와 달리) — OCR 로
+        # 되살린 문서는 정상 앵커 경로로도 파싱되므로, 회수 경로에만 걸면 잡음이 그대로
+        # 남는다(실측: 신규 727건 중 23건이 정상 경로로 들어오면서 "| There is a failure…"
+        # 형태로 저장됐다). 순수 접두 제거라 정상 표제에는 영향이 없다(내용 절단 상한 있음).
+        deficiency = strip_leading_observation_noise(deficiency)
         if not gate(deficiency):
             continue
         clean_detail = _clean_observation_detail(detail)

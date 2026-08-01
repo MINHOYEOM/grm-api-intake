@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-2613178e05077cdb31b93305",
+    "finding_text": "There is no established written procedure to describe restrictions to prevent cross ; contamination of other aseptic filling lines and/or products when employees have a lyophilized powder on their aseptic gown attire.",
+    "finding_text_ko": "직원이 무균 가운에 동결건조 분말이 묻은 상태일 때 다른 무균 충전 라인 및/또는 제품의 교차오염을 방지하기 위한 제한사항을 설명하는 확립된 서면 절차가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-26be7d7bf82df013abe194cd",
+    "finding_text": "The laboratory analytical balances used for the testing of your products do not comply with the USP 24 Chapter <41> Weights and Balances.",
+    "finding_text_ko": "귀사 제품 시험에 사용되는 실험실 분석 저울은 USP 24 Chapter <41> Weights and Balances를 준수하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-27873831674e45e25be39140",
+    "finding_text": "BHQ has failed to implement a software change to the NBCS to assist the regional users with manufactunng timing requirements, so that unsuilable products are not manufactured and ultimately released due to timing requirements during manufacturing.",
+    "finding_text_ko": "BHQ는 제조 중 시간 요건으로 인해 부적합한 제품이 제조되고 최종 출하되지 않도록 지역 사용자의 제조 시간 요건 준수를 지원하기 위한 NBCS 소프트웨어 변경을 시행하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-285e58671b42c580217be580",
+    "finding_text": "Corrective and preventive actions have not been verified or validated to ensure that the action is effective and does nct niversely affect the finished device.",
+    "finding_text_ko": "시정 및 예방조치는 해당 조치가 효과적이며 완제품 기기에 부정적 영향을 미치지 않는지 확인 또는 밸리데이션되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2879f10b690e6c62e07168ab",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "무균 공정 구역은 양압 하에서 고효율 미립자 공기(HEPA) 필터를 통해 여과되는 공기 공급과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-289ba6401f55686d2a9e6c27",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a) (10)(A)&(B).",
+    "finding_text_ko": "귀사 위탁제조시설 의약품의 라벨에는 503B(a)(10)(A) 및 (B)에서 요구하는 정보가 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-28a87be085897dc0af8ba431",
+    "finding_text": "Lab oratory contro ls do not include scientifically sound and appropriate specifications, stan dards, sampli ng plans, and test procedures designed to assure components and products conform to appropriate standa rds of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에는 구성품 및 제품이 적절한 동일성, 함량, 품질 및 순도 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격, 표준, 샘플링 계획 및 시험 절차가 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-293f421861bd74e44f3dd739",
+    "finding_text": "There is insufficient evidence to assure that the current processes used for manufacture of the products listed below will consistently produce a product meeting its predetermined specifications.",
+    "finding_text_ko": "아래 나열된 제품 제조에 현재 사용되는 공정이 사전 설정된 규격을 충족하는 제품을 일관되게 생산할 것임을 보장할 충분한 증거가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-294907bce12a28eec6c3cc63",
+    "finding_text": "Other regions were found to be having difficulty following the procedures.",
+    "finding_text_ko": "다른 지역들은 절차를 따르는 데 어려움을 겪는 것으로 확인되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-29983595f7bf0cfbad85df66",
+    "finding_text": "Acceptance criteria for the sampling and testing conducted by the quality control unit is not adequate to assure that batches of drug products meet each appropriate specification as a condition for their approval and release.",
+    "finding_text_ko": "품질관리 부서가 수행하는 샘플링 및 시험의 허용기준은 의약품 배치가 승인 및 출하 조건으로 각 해당 규격을 충족함을 보장하기에 적절하지 않습니다.",
+    "translation_method": "manual"
+  }
+]

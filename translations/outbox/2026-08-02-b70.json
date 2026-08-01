@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-c7b9fcde0c75afa1601435c3",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c7c4962dfd0a2f0729aac37d",
+    "finding_text": "According to management, all batches of coated tablet products are visually inspected by QA after the final coating while in bulk carton storage.",
+    "finding_text_ko": "경영진에 따르면 모든 코팅정 제품 배치는 최종 코팅 후 대량 카톤 보관 중에 품질보증부서가 육안 검사한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c7deee5668bb26b8b9fcb010",
+    "finding_text": "The I CCTV System can be used to observe the production and/or personnel activities, independently or collectively, by the Production, Physical Monitoring and Compliance Departments.",
+    "finding_text_ko": "CCTV 시스템은 제조부서, 물리적 모니터링 부서 및 규정준수 부서가 개별적으로 또는 공동으로 생산 및/또는 직원 활동을 관찰하는 데 사용할 수 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c7e4e7086e9bb91522120b5b",
+    "finding_text": "Written procedures are not established for the cleaning of equipment, including utensils used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 장비의 세척에 대한 서면 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c92c1ef8d17fc373c0972762",
+    "finding_text": "The ARC does not perform a thorough investigation ofsuspected post transfusion hepatitis (SPTHEP) cases as required in Section II.B.14.a of the May 12, 1993 Consent Decree.",
+    "finding_text_ko": "ARC는 1993년 5월 12일 동의명령 제II.B.14.a항에서 요구하는 바에 따라 수혈 후 간염 의심(SPTHEP) 사례를 철저히 조사하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cb72471b87ead1df6cd34c7c",
+    "finding_text": "There is no designated Quality Control Unit for the Nuclear Pharmacy.",
+    "finding_text_ko": "핵의학 약국을 위한 지정된 품질관리부서가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cc8aa4c5fc65d8b24db1a09a",
+    "finding_text": "The aseptic fill operators areallowed toperform the Quality ControlEM sampling,that is, self-sampling of self-monitoring prior to exiting the aseptic filling area.",
+    "finding_text_ko": "무균 충전 작업자는 무균 충전 구역을 나가기 전에 품질관리 환경모니터링(EM) 샘플링, 즉 자기 모니터링을 위한 자체 샘플링을 수행하도록 허용된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ccc9c777525d322475a08504",
+    "finding_text": "Ascptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "무균공정 구역은 양압 하에서 고효율 미립자 공기 필터를 통과한 공기 공급과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cd78055ec01a191c62f4e728",
+    "finding_text": "The number of qualified personnel is inadequate to supervise the manufacture of Allergenic Extract produc ts.Personnel engaged in manufacture of allergenic products have no definitive assigned supervisor.",
+    "finding_text_ko": "알레르겐 추출물 제품 제조를 감독할 적격 인력의 수가 부족하다. 알레르겐 제품 제조에 종사하는 인력에게는 명확히 지정된 감독자가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ce924cb18ae40cc28c74ab3e",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,296 @@
+[
+  {
+    "finding_id": "finding-616e590ce35a59a6569f704e",
+    "finding_text": "Production supervisors are given access to delete results in the [ <6TT-4jntegrity testing equipment.",
+    "finding_text_ko": "생산 감독자에게 [<6TT-4] 무결성 시험 설비에서 결과를 삭제할 수 있는 접근권한이 부여된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8554d7ca779fb65df1b600f4",
+    "finding_text": "The environmental monitoring trending program forL :poes not include evaluation ofroute of ingress into the aseptic areas grades A and B for recovered fungi/mold an gram-negative organisms.",
+    "finding_text_ko": "환경모니터링 추세 프로그램에는 무균 A·B 등급 구역으로의 유입 경로에 대해 회수된 진균·곰팡이 및 그람음성균을 평가하는 내용이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-94389f2d364ca2565aa991cf",
+    "finding_text": "Training is not regularly conducted by qualified individuals, does not cover the particular operations that employees perform and GMP as it relates to the employees' functions, and is not periodically assessed.",
+    "finding_text_ko": "적격한 개인이 교육을 정기적으로 실시하지 않으며, 직원이 수행하는 특정 작업 및 직원 기능과 관련된 GMP를 다루지 않고, 주기적으로 평가되지도 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a72ce4a0ac0f4a7583612d09",
+    "finding_text": "Ventilation systems, including equipment for control of air pressure, are not adequately designed and constructed to minimize risks of contamination.",
+    "finding_text_ko": "공기압 제어 설비를 포함한 환기 시스템이 오염 위험을 최소화하도록 적절히 설계·구축되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a83e4ea98be01728e17c81f0",
+    "finding_text": "The electronic data for thg(lon-viable patticleF2-APC-05 showed results that failed to meet acceptance criteria,, which had not been reporte in the paper records.",
+    "finding_text_ko": "비생존 입자 F2-APC-05의 전자 데이터에서 허용 기준 미충족 결과가 나타났으나 종이 기록에 보고되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c2c0288cbf83b15c45c5c9da",
+    "finding_text": "Deviations 177060, 129067, and 131819 are related to drug product spilling into the fill line through an air vent filter.",
+    "finding_text_ko": "일탈 177060, 129067 및 131819는 공기 배출 필터를 통해 충전 라인으로 완제의약품이 유출된 것과 관련된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e76aaa5130824ff6f98245a4",
+    "finding_text": "During review of equipment, there were at least 40 work orders opened for aseptic area equipment repairs",
+    "finding_text_ko": "설비 검토 중 무균 구역 설비 수리를 위해 개설된 작업지시가 최소 40건 있었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0d78d6ac9069924364a252e8",
+    "finding_text": "Production records do not contain complete information relating to the production and control of each batch.",
+    "finding_text_ko": "생산 기록에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1fbc893bc3428780bec10d00",
+    "finding_text": "An on-going testing program to monitor the stability characteristics ofAPIs is not established and followed.",
+    "finding_text_ko": "원료의약품의 안정성 특성을 모니터링하기 위한 지속 시험 프로그램이 수립되고 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-75736729a2d94cb6aba17fbc",
+    "finding_text": "Facility and equipment are not maintained in a manner that prevents contamination of APIs by other materials.",
+    "finding_text_ko": "시설 및 설비가 다른 물질에 의한 원료의약품 오염을 방지하는 방식으로 유지관리되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8d191d801f0f15e3ed5fbfa9",
+    "finding_text": "Established impurity profiles for US market APIs are inadequate.",
+    "finding_text_ko": "미국 시장용 원료의약품에 대해 확립된 불순물 프로파일이 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c1ae03adc32fb2e8b00c618b",
+    "finding_text": "Deviations from established procedures were not documented in batch records and investigated.",
+    "finding_text_ko": "확립된 절차로부터의 일탈이 배치 기록에 문서화되고 조사되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fab864bb5281fe3e63b0ec00",
+    "finding_text": "Procedures for issuance and controls of documents are not followed.",
+    "finding_text_ko": "문서의 발행 및 관리 절차가 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-eaa6d63789af9203531996b4",
+    "finding_text": "Discrepancies are not always investigated to identify the root cause to implement adequate corrective actions.",
+    "finding_text_ko": "불일치의 근본 원인을 확인하고 적절한 시정조치를 시행하기 위한 조사가 항상 수행되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fde7336261abb5b48dee7e06",
+    "finding_text": "Acceptance criteria for cleaning validation are not always justified to prevent product cross- contamination.",
+    "finding_text_ko": "제품 교차오염 방지를 위한 세척밸리데이션 허용 기준이 항상 정당화되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-39b27f9c02674952ac61e509",
+    "finding_text": "Deviation investigations are inadequate.",
+    "finding_text_ko": "일탈 조사가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02d8f522f95ce496ecf77317",
+    "finding_text": "The accuracy, sensitivity, specificity and reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험 방법의 정확성, 감도, 특이성 및 재현성이 확립되고 문서화되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b0e594a91d0ceb77495b5127",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b4c9ad965f98caefe4390400",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역의 무균 조건 조성을 위한 실내 및 설비 세척·소독 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c907ebcca25eca138008b83f",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "제조 및 관리 기준서 또는 기타 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 실시되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e1b16b9b34bfa5447e582c9d",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지 여부와 관계없이 해당 배치 또는 구성품(원자재)이 규격을 충족하지 못한 사실을 철저히 검토하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ecdf0ecb0d4e63590210fe01",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-00288526c8072a626e1cafaa",
+    "finding_text": "Beta-lactam drugs are produced without adequate cleaning procedures to prevent cross contamination.",
+    "finding_text_ko": "베타락탐 의약품이 교차오염 방지를 위한 적절한 세척 절차 없이 제조된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0110d53d9ee08cc2e0fa866e",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding the manufacturing and processing operations.",
+    "finding_text_ko": "오염 또는 혼동을 방지하기 위한 분리 또는 지정 구역이 제조 및 가공 작업과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-01197b926dd63ceebdb21f45",
+    "finding_text": "Personnel failed to disinfect or change gloves frequently enough to prevent contamination.",
+    "finding_text_ko": "직원이 오염을 방지할 만큼 충분히 자주 장갑을 소독하거나 교체하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0129c0ff8b8b6debc1a24ae1",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "완제의약품의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0185a8bb4ad6b8882c24fc21",
+    "finding_text": "On this same page it discusses the out of guideline results for lots 1-AHU-3 and 1- AHU-4.",
+    "finding_text_ko": "동일 페이지에서 로트 1-AHU-3 및 1-AHU-4의 가이드라인 이탈 결과를 논의한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02157757e7b5bda01ae9e16b",
+    "finding_text": "Each batch of drug product required to be free ofobjectionable microorganisms is not tested through appropriate laboratory testing.",
+    "finding_text_ko": "바람직하지 않은 미생물이 없어야 하는 완제의약품의 각 배치가 적절한 실험실 시험을 받지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02ad5fb9144f761001dadd69",
+    "finding_text": "Your firm uses a <Redacted B4> for the depyrogenation of glassware used in the production of sterile, injectable drug products.",
+    "finding_text_ko": "귀사는 무균 주사 완제의약품 생산에 사용되는 유리 기구의 탈발열원 처리를 위해 <Redacted B4>를 사용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02dccd6f6c1d6aba98d574b3",
+    "finding_text": "Investigations into environmental monitoring excursions are inadequate and/or inappropriate Environmental Notices (EN) are the investigations that take place when tbe firm experiences either alert or action limits for p ersonnel, active air, and surface monitoring.",
+    "finding_text_ko": "환경모니터링 이탈 조사가 불충분하거나 부적절하다. 환경통지(EN)는 인원, 능동 공기 및 표면 모니터링에서 경보 또는 조치 한계가 발생할 때 수행하는 조사이다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02e8fb5ca05169df06974ccb",
+    "finding_text": "Failure to implement, in a timely manner, the new HPLC methods for assay and 3 Chromatographic impurities of Theophylline API and finished product.",
+    "finding_text_ko": "Theophylline 원료의약품 및 완제품의 분석과 3가지 크로마토그래피 불순물에 대한 신규 HPLC 방법을 적시에 시행하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0312cbf10433f35b2dba2744",
+    "finding_text": "The control systems necessary to prevent contamination or mix-ups are deficient.",
+    "finding_text_ko": "오염 또는 혼동을 방지하는 데 필요한 관리 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-03d25fe625793bf3392f9f83",
+    "finding_text": "In 1990, large plastic HDPE bins called “Mules” were introduced into the production operations.",
+    "finding_text_ko": "1990년에 “Mules”라 불리는 대형 플라스틱 HDPE 통이 생산 작업에 도입되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-03d261e518da79a2b3c26495",
+    "finding_text": "The firm contracted the validation of disinfectants and received the results in November 2009 for a disinfection efficacy study performed by the contactor.",
+    "finding_text_ko": "회사는 소독제 밸리데이션을 계약하고 계약자가 수행한 소독 유효성 연구 결과를 2009년 11월에 받았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-03e8a03204ace8af28ea0474",
+    "finding_text": "The Medical Director review was not completed on 3 Donor Reaction and Injury Reports (DRIRs) and it was completed over 3 weeks after the reaction on 9 others.",
+    "finding_text_ko": "의료책임자 검토가 공여자 반응 및 상해 보고서(DRIR) 3건에 대해 완료되지 않았고, 다른 9건은 반응 후 3주 이상 지나 완료되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-03f9f300ae67e348e8d448ef",
+    "finding_text": "The labels of some of your outsourcing facility's drug products do not include information required by section 503B(a)(l O)(A) and (B).",
+    "finding_text_ko": "귀사 아웃소싱 시설의 일부 완제의약품 표시사항에 503B(a)(10)(A) 및 (B) 조가 요구하는 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-04398d4e44dd019e5254fa5f",
+    "finding_text": "No defined process in bow test results are distributed and accounted for by the Charlotte, NC DCSC teams",
+    "finding_text_ko": "Charlotte, NC DCSC 팀이 시험 결과를 배포하고 관리하는 정의된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-04802d98b995f2c1bf22a14c",
+    "finding_text": "The LUMAC is notperiodically reviewed for accuracy and completeness by thequality unit.",
+    "finding_text_ko": "품질관리부서가 LUMAC의 정확성과 완전성을 주기적으로 검토하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-04ee9b2d8790c91324a5b775",
+    "finding_text": "Operators working in the filling suites monitor their own gloves and garments after working in the area.",
+    "finding_text_ko": "충전 구역에서 작업하는 작업자가 구역 작업 후 자신의 장갑과 작업복을 모니터링한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-04f2d25265be109f3f187256",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions, in that: Smoke studies have not been conducted under dynamic conditions and mimicking the most challenging preparations produced by personnel on a regula...",
+    "finding_text_ko": "무균공정 구역의 무균 조건 관리 설비 유지관리 시스템이 미흡하다. 정적 조건이 아닌 동적 조건에서, 그리고 직원이 정기적으로 제조하는 가장 까다로운 조제를 모사하는 연기 연구가 수행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-056e9ea08ffd854e0469d14e",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning andd is infecting the room and eq uipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역의 무균 조건 조성을 위한 실내 및 설비 세척·소독 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0611cd50e4cf975b4b991388",
+    "finding_text": "The firm does not maintain reserve samples for any sterile drug products manufactured and distributed.",
+    "finding_text_ko": "회사는 제조·유통되는 모든 무균 완제의약품에 대해 보관 검체를 유지하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-063b781eb2bd6dcadb003407",
+    "finding_text": "Two months after closing SP 419, SP 501 was opened as a potential system problem on 9/13/00 when the Acting CEO requested an investigation of labeling problems indicating mislabeling of units is the most serious kind of tror because it can result in significant harm to the patient.",
+    "finding_text_ko": "SP 419 종결 2개월 후, 단위체 오표기가 환자에게 심각한 피해를 초래할 수 있는 가장 중대한 오류임을 나타내는 표시 문제 조사를 당시 CEO 대행이 요청하여 2000-09-13에 잠재적 시스템 문제로 SP 501이 개설되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-07a5e45bc691e79dc167ec2a",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "완제의약품 가공에 종사하는 직원의 의복이 수행 업무에 적절하지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-07eb7dcac1278eeb6a8b53b3",
+    "finding_text": "Your ISO 5/7/8 classified areas where sterile injectable drug products are produced are not adequately sanitized in that disinfectants are not REDACTION (b)(4) as per SOP 4.001 \"Env ironmental Monitoring & Cont rol Procedures\" and t he isinfectant solution REDACTION (b)(4) identified as your sporicidal agent has not been shown to have sporicidal activit y against all types ofbacterial spores.",
+    "finding_text_ko": "무균 주사 완제의약품을 생산하는 ISO 5/7/8 등급 구역이 충분히 소독되지 않는다. SOP 4.001에 따라 소독제가 REDACTION (b)(4)되지 않으며, 포자살균제로 식별된 REDACTION (b)(4) 소독액이 모든 유형의 세균 포자에 대한 포자살균 활성을 가진 것으로 입증되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-083d8d4cf9056fcdf0054bf9",
+    "finding_text": "Drug product containers and closures were not clean to assure that they are suitable for their intended use.",
+    "finding_text_ko": "완제의약품 용기 및 마개가 의도된 용도에 적합하도록 청결하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-09afef651a2ec12c58489a5b",
+    "finding_text": "A BSL 02-084 was issued on April 25, 2002, which reminded regions to resolve donor identification holds within 48 hours.",
+    "finding_text_ko": "2002-04-25에 발행된 BSL 02-084는 지역에 공여자 식별 보류를 48시간 이내 해결하도록 상기시켰다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-09f93cbea924aa8c30de8b23",
+    "finding_text": "There is no record to document that the air pressure readings (inches per water column) for the aseptic filling areas (Class 100 and 1 0,000} and the surrounding manufacturing areas are reviewed by the Physical Monitoring Department and/or the Quality Unit.",
+    "finding_text_ko": "무균 충전 구역(Class 100 및 10,000) 및 인접 제조 구역의 공기압 판독값(inches per water column)을 물리적 모니터링 부서 및/또는 품질관리부서가 검토했다는 기록이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0a27a1b58afbe850fd7b972e",
+    "finding_text": "The firm fai led to adequately evaluate product integrity incident reports, received from patients and healthcare practitioners, for injectable Progesterone produced in various solutions (e.g.",
+    "finding_text_ko": "회사는 다양한 용액으로 제조된 주사용 Progesterone에 대해 환자 및 의료전문가로부터 받은 제품 무결성 사고 보고서를 적절히 평가하지 않았다.",
+    "translation_method": "manual"
+  }
+]

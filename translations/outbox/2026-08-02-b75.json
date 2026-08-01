@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-b7101723388b6b8a46d85f28",
+    "finding_text": "There is no documentation of the examination and review of labels and labeling for conformity with established specifications.",
+    "finding_text_ko": "표시 및 라벨링이 확립된 규격에 부합하는지에 대한 검사와 검토가 문서화되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b91921d025265aacf13e3c4b",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하는 적절한 설계가 아니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1bbfe227d34a64c41835b65b",
+    "finding_text": "Your firm’s environmental monitoring sampling plan is not clearly defined and does not represent worst-case activities and conditions.",
+    "finding_text_ko": "귀사의 환경모니터링 샘플링 계획은 명확히 정의되어 있지 않고 최악 조건의 활동과 조건을 대표하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1e945444845379d9c095902d",
+    "finding_text": "Appropriate written procedures, designed to prevent microbiological contamination of drug products purporting to be sterile, shall be established and followed.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 적절한 서면 절차를 수립하고 준수해야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3604c3f44e95c594f4ca9bce",
+    "finding_text": "There shall be separate or defined areas or such other control systems for the firm's operations as are necessary to prevent contamination or mixups during the course of the following procedures: Aseptic processing, which includes as appropriate: A system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "다음 절차 중 오염이나 혼동을 방지하는 데 필요한 분리 또는 지정 구역이나 기타 관리 시스템이 회사 작업에 마련되어야 한다. 무균공정에는 필요에 따라 무균 조건을 조성하기 위한 실내 및 장비의 세척·소독 시스템이 포함된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4217828c5ff887e843d0c19f",
+    "finding_text": "Written production and process control procedures shall be followed in the execution of the various production and process control functions and shall be documented at the time of performance.",
+    "finding_text_ko": "서면 제조 및 공정관리 절차는 다양한 제조 및 공정관리 기능 수행 시 준수되어야 하며 수행 시점에 문서화되어야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5094f55b83d30f6d0c7224dd",
+    "finding_text": "Each person engaged in the manufacture, processing, packing, or holding of a drug product shall have education, training, and experience, or any combination thereof, to enable that person to perform the assigned functions.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 종사하는 각 사람은 배정된 기능을 수행할 수 있도록 교육, 훈련 및 경험 또는 이들의 조합을 갖추어야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-51355f3cb2e813083baef8e2",
+    "finding_text": "Production operations should be conducted in a manner that will prevent contamination of intermediates or APIs by other materials.",
+    "finding_text_ko": "제조 작업은 중간체 또는 API가 다른 자재에 의해 오염되는 것을 방지하는 방식으로 수행되어야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5e7ac2ee92e6e2691eb76810",
+    "finding_text": "Appropriate controls should be exercised over computer systems to assure that changes to records are instituted only by authorized personnel.",
+    "finding_text_ko": "기록 변경이 권한 있는 인력에 의해서만 이루어지도록 보장하기 위해 컴퓨터 시스템에 대한 적절한 관리가 실시되어야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-93b8e84c270d14e3ddd00993",
+    "finding_text": "Materials should be handled and stored in a manner to prevent degradation, contamination and cross- contamination.",
+    "finding_text_ko": "자재는 열화, 오염 및 교차오염을 방지하는 방식으로 취급·보관되어야 한다.",
+    "translation_method": "manual"
+  }
+]

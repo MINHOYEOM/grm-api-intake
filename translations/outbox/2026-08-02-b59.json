@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-de736c672672f022e12981ae",
+    "finding_text": "Loaded chamber cold spot determinations have not been performed for minimum and so \"maximum loads, for each vial size.",
+    "finding_text_ko": "각 바이알 크기에 대해 최소 및 최대 적재량에서 적재 챔버 냉점 측정을 수행하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-df4f4f3e0d28a29cb883191d",
+    "finding_text": "There is no job aid (or other procedure/iristruction) to assist employees in determining the total transit time for blood products received into inventocy.",
+    "finding_text_ko": "재고로 입고된 혈액 제품의 총 운송 시간을 결정하는 데 직원에게 도움을 주는 작업 보조서(또는 기타 절차·지침)가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e11421797fa567c61c26fafa",
+    "finding_text": "There is a Jack of assurance that limits set in the aseptic processing area are adequate.",
+    "finding_text_ko": "무균공정 구역에 설정된 한계가 적절하다는 보증이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e198743e007e4d5d55a676fe",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation ofthe sterilization process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 멸균 공정의 충분한 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e1e10110c79abde0b854c010",
+    "finding_text": "In July 2001, the North Central Region discovered that Red Blood Cell components were not being manufactured within eight hours of collection when held at room temperature.",
+    "finding_text_ko": "2001년 7월 North Central Region은 적혈구 구성품이 실온에서 보관될 때 채혈 후 8시간 이내에 제조되지 않은 사실을 발견했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e20131e258dbfb598cf64c2f",
+    "finding_text": "During the course of the inspection, the following records were not available for review: a.",
+    "finding_text_ko": "점검 중 다음 기록을 검토할 수 없었다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e20d236d662fc913559b7d29",
+    "finding_text": "Lar Case #73 173, dated 11/10/98, a region requested information on a database change so that their distribution records would accurately reflect the disposition when BHQ had diverted a shipment the region had made to another consignee.",
+    "finding_text_ko": "1998년 11월 10일자 Lar Case #73 173에서 한 지역은 BHQ가 해당 지역이 다른 수령인에게 보낸 선적을 전용했을 때 지역의 유통 기록이 처분 상태를 정확히 반영하도록 데이터베이스 변경에 관한 정보를 요청했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e24ce0d3466677a409a4f83b",
+    "finding_text": "BPDRs were not filed for complaints ofglass in product.",
+    "finding_text_ko": "제품 내 유리 조각 불만에 대해 BPDR을 제출하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e3832742d82bace4efc62890",
+    "finding_text": "There are no written procedures designed to assure that correct labels, labeling and packaging materials are used for drug products.",
+    "finding_text_ko": "의약품에 정확한 라벨, 표시 사항 및 포장 자재가 사용되도록 보장하기 위해 설계된 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  }
+]

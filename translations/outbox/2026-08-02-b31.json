@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-6722e91cd03173582a36d083",
+    "finding_text": "The Sterility Test Isolators were qualified and validated on 3/26/07 and 4/2/07.",
+    "finding_text_ko": "무균 시험 아이솔레이터는 2007년 3월 26일과 4월 2일에 적격성평가 및 밸리데이션되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-67b3704e441310ad52374d70",
+    "finding_text": "The use of sporicidal agents in the cleanroom and/or ISO 5 area is inadequate.",
+    "finding_text_ko": "클린룸 및/또는 ISO 5 구역에서 포자살균제를 사용하는 것이 불충분합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6800bf8953598d5acbd83fee",
+    "finding_text": "Your firm does not test all lots of intrathecal drug products for endotoxin prior to release.",
+    "finding_text_ko": "귀사는 출하 전에 모든 지주막하강내 의약품 로트에 대해 엔도톡신 시험을 수행하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-680aaedba77a5c3f32e681f6",
+    "finding_text": "Your media fills are not representative of your firm's routine aseptic processing practices and do not incorporate appropriate worst-case activities and conditions that challenge your aseptic operations.",
+    "finding_text_ko": "귀사의 미디어 필은 회사의 일상적인 무균 공정 관행을 대표하지 않으며 무균 작업에 도전이 되는 적절한 최악 조건의 활동과 조건을 포함하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-68dedc0301fd8f65b2fbca6f",
+    "finding_text": "BPDR #2002-041-000380 (11/1/01) indicates during an audit in another region 29 records in November 2001 had questions that were not answered and the omissions were not discovered during the regional review process.",
+    "finding_text_ko": "BPDR #2002-041-000380(2001년 11월 1일)은 다른 지역의 감사 중 2001년 11월 기록 29건에 답변되지 않은 질문이 있었으며, 해당 누락이 지역 검토 과정에서 발견되지 않았음을 나타냅니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-69347e4aafab21aa9199acc6",
+    "finding_text": "There are no training records associated with investigating hotline reports for individuals reportedly responsible for directing the investigations and closing the investigations of the hotline reports.",
+    "finding_text_ko": "핫라인 보고 조사 지시 및 조사 종료를 담당한 것으로 보고된 개인에 대해 핫라인 보고 조사 관련 교육기록이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-69524e9afa52d7db2839a6d9",
+    "finding_text": "The content uniformity testing performed during blend uniformity validation does not ensure a uniform blend of the Extended Release coated Potassium Chloride crystals used to manufacture K-Dur 10 and 20 mEq tablets.",
+    "finding_text_ko": "혼합 균일성 밸리데이션 중 수행된 함량 균일성 시험은 K-Dur 10 및 20 mEq 정제 제조에 사용되는 서방형 코팅 염화칼륨 결정의 균일한 혼합을 보장하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-69a3e4d05b2b6935b6f51152",
+    "finding_text": "The separate or defined areas necessary to prevent contamination or mix-ups are deficient.",
+    "finding_text_ko": "오염 또는 혼동 방지에 필요한 별도 또는 지정 구역이 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6a31358afb5df96361044583",
+    "finding_text": "Your firm has not established adequate written Standard Operating Procedures to ensure proper maintenance of aseptic processing areas and equipment used in those areas.",
+    "finding_text_ko": "귀사는 무균 공정 구역과 그 구역에서 사용되는 장비의 적절한 유지관리를 보장할 충분한 서면 표준작업절차를 수립하지 않았습니다.",
+    "translation_method": "manual"
+  }
+]

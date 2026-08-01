@@ -1,0 +1,86 @@
+[
+  {
+    "finding_id": "finding-0d63c88c8b70b8f17bfd34a7",
+    "finding_text": "SOP #009138 “GMP Computer Systems and Purchased Automated Systems in Quality Control Laboratories (FDA-Regulated)” establish validation requirements for GMP computer systems.",
+    "finding_text_ko": "SOP #009138 “GMP Computer Systems and Purchased Automated Systems in Quality Control Laboratories (FDA-Regulated)”는 GMP 컴퓨터 시스템의 밸리데이션 요건을 수립한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0d709eed42cf00e674a82bb7",
+    "finding_text": "The firm's change control program is not followed.",
+    "finding_text_ko": "회사의 변경관리 프로그램이 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e21a53140917330517d37ef",
+    "finding_text": "Testing and release of drug product for distribution do aot include appropriate laboratory determination of satisfactory conformance to the tinai specifications and identity and strength of each active mgredient prior to release.",
+    "finding_text_ko": "유통을 위한 완제의약품의 시험 및 출하에 출하 전 최종 규격과 각 유효성분의 동일성 및 함량에 대한 만족스러운 적합성을 확인하기 위한 적절한 실험실 판정이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e24f01faaf69b56f1999ca6",
+    "finding_text": "Problem reports ha ve continued to be open due to Corrective Action Plan (CAP) rejec tion, resubmission , and/or delayed QA review.",
+    "finding_text_ko": "시정조치계획(CAP)의 거부, 재제출 및/또는 QA 검토 지연으로 문제 보고서가 계속 미결 상태이다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e44dd113b54cfa72fdba4c5",
+    "finding_text": "Procedures designed to prevent microbiological contamination of sterile drug products does not include adequate validation of aseptic processing.",
+    "finding_text_ko": "무균 완제의약품의 미생물 오염을 방지하도록 설계된 절차에 무균공정의 적절한 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e816f31ebfdcd826d3ecea0",
+    "finding_text": "Equipment and utensils are not maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "설비 및 기구가 완제의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하기 위해 적절한 주기에 유지관리되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e9f125e7e2b657997b1270e",
+    "finding_text": "Drug product production and control records, are not reviewed and approved by the quality control unit to determine compliance with all established, approved written procedures before a batch is released or distributed.",
+    "finding_text_ko": "완제의약품 생산 및 관리 기록이 배치 출하 또는 유통 전에 모든 확립·승인된 문서화된 절차 준수 여부를 판단하기 위해 품질관리부서에서 검토·승인되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0f6e8bb23f149bb2310f42f7",
+    "finding_text": "Regarding aseptic operations: A.",
+    "finding_text_ko": "무균 작업과 관련하여: A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-106736e70fee280cdc51e808",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-10f4d130f452b3d363e79d12",
+    "finding_text": "The general safety test is not performed according to procedures.",
+    "finding_text_ko": "일반 안전성 시험이 절차에 따라 수행되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-11748104970bb78983d25b27",
+    "finding_text": "Routine calibration of mechanical and clectronic equipment is not performed according to a written program designed to assure proper performance.",
+    "finding_text_ko": "적절한 성능을 보장하도록 설계된 문서화된 프로그램에 따라 기계 및 전자 설비의 정기 교정이 수행되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-12d93e5e1488d385793661dc",
+    "finding_text": "Cleaning Logs and Cleaning documented in Manufacturing Instructions (i.e.",
+    "finding_text_ko": "세척 로그 및 제조 지침에 문서화된 세척(즉,",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-136c2cd3765328075826801f",
+    "finding_text": "Returned goods were not identified as such.",
+    "finding_text_ko": "반품품이 그러한 물품으로 식별되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1385f053a2555dec94de335f",
+    "finding_text": "Your firm has not ensured that your facility is suitably designed with respect to the flow of personnel, in-process materials and finished sterile drugs, the need for room segregation and process separation: and the impact from heating ventilation and air conditioning (HVAC), air pressurization, and unidirectional airflow, to prevent contamination and other hazards to sterile drugs .",
+    "finding_text_ko": "귀사는 인원, 공정중 물질 및 완성 무균 의약품의 흐름, 실 분리와 공정 분리 필요성, 그리고 HVAC, 공기 가압 및 일방향 기류의 영향을 고려하여 무균 의약품의 오염 및 기타 위해를 방지하도록 시설을 적절히 설계하지 않았다.",
+    "translation_method": "manual"
+  }
+]

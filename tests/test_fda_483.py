@@ -1819,3 +1819,119 @@ class InspectorWiringTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), 1)
         self.assertNotIn("fda483_inspectors", items[0].raw_payload)
+
+
+# ── [관찰 회수 경로 2026-08-01] 본문은 있는데 관찰 0건인 483 되찾기 ─────────────
+class Fda483ObservationRecoveryTest(unittest.TestCase):
+    """라이브 실측(2026-08-01): FDA 483 문서 2,000건 중 444건이 findings 0건이고, 그중
+    192건은 본문(excerpt)을 이미 갖고 있었다. 원인은 앵커 3종이었다 —
+      ① `WE OBSERVED` 마커가 관찰 표제 **뒤**에 있어 컷이 관찰을 통째로 버림(83305)
+      ② `OBS ERVAT ION 1` — 스캔 텍스트층이 단어 안에 공백 삽입(188080)
+      ③ `WE OBSERVED` 뒤가 `1. 2. 3.` 번호 목록이고 "OBSERVATION" 단어가 없음(133048 등)
+
+    ★불가침: 회수 경로는 **정상 경로가 0건일 때만** 돈다. 오늘 관찰이 나오는 문서의 출력은
+    byte 단위로 불변이어야 한다(측정이 아니라 구조로 보장 — 표본 40문서 실측 회귀 0)."""
+
+    HINTS = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.HINTS)
+
+    # ── 정상 경로 불변 ────────────────────────────────────────────────────────
+    def test_normal_document_untouched_by_recovery(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "OBSERVATION 1 There is a failure to thoroughly review unexplained "
+                "discrepancies. Specifically, your firm did not investigate. "
+                "OBSERVATION 2 Written production procedures are not followed. "
+                "Specifically, batch records were incomplete for three lots.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("There is a failure"))
+
+    def test_recovery_does_not_run_when_primary_yields(self):
+        """정상 경로가 1건이라도 내면 회수 경로에 진입조차 하지 않는다 — 느슨한 앵커가
+        정상 문서에 끼어들 경로 자체를 없앤다."""
+        text = ("WE OBSERVED: OBSERVATION 1 Equipment used in manufacturing is not "
+                "maintained in a clean condition as required by procedure. "
+                "1. This numbered line must not become a second observation row.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["number"], "1")
+
+    # ── ① 비파괴 컷 ──────────────────────────────────────────────────────────
+    def test_marker_after_anchor_no_longer_discards_observations(self):
+        """실측 83305: 앵커가 마커보다 앞에 있어, 마커에서 자르면 관찰이 0이 됐다."""
+        text = ("During an inspection of your firm (I)(We) observed: Observation 1 "
+                "Drug products are not stored under appropriate conditions of temperature. "
+                "Specifically, the warehouse exceeded the labeled range on three days. "
+                "IF YOU WISH TO DISCUSS WE OBSERVED THE FOLLOWING FORM TEXT.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+        self.assertIn("not stored under appropriate conditions", rows[0]["deficiency"])
+
+    # ── ② 느슨한 앵커(OCR 공백) ──────────────────────────────────────────────
+    def test_spaced_observation_word_is_recovered(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "OBS ERVAT ION 1 Laboratory controls do not include the establishment "
+                "of scientifically sound test procedures. Specifically, the method was "
+                "never validated for the finished product assay.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+        self.assertIn("Laboratory controls do not include", rows[0]["deficiency"])
+
+    # ── ③ 번호 목록 ─────────────────────────────────────────────────────────
+    def test_numbered_list_without_observation_word_is_recovered(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "1. Media fills were not performed that closely simulate aseptic "
+                "production operations. Specifically, only one run was conducted. "
+                "2. Your examination and testing of samples did not assure that the "
+                "drug product conforms to specifications. Specifically, no assay ran.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_numbered_fallback_requires_the_marker(self):
+        """마커가 없는 문서에서 번호 목록을 관찰로 보면 목차·별첨까지 관찰이 된다."""
+        text = ("TABLE OF CONTENTS 1. Introduction to the facility and its operations. "
+                "2. Scope of the review performed by the corporate quality group.")
+        self.assertEqual(self._obs(text), [])
+
+    # ── 품질 게이트 ──────────────────────────────────────────────────────────
+    def test_gate_blocks_form_boilerplate(self):
+        """실측 192341: 회수 경로가 양식 뒷면 안내문을 관찰 표제로 만들었다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "1. To assist firms inspected in complying with the Acts and regulations "
+                "enforced by the Food and Drug Administration this form is provided.")
+        self.assertEqual(self._obs(text), [])
+
+    def test_gate_blocks_ocr_garbled_heading(self):
+        """실측 190693: 'ass~re' 처럼 단어 속 기호가 섞인 표제는 공개하지 않는다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "1. Thl ttiliv director failed to ass~re that all experimentaf data "
+                "were accurately recorded in the notebooks maintained on site.")
+        self.assertEqual(self._obs(text), [])
+
+    def test_gate_keeps_redaction_markers(self):
+        """`<Redacted B4>` · `(b) (4)` 는 FDA 의 정상 마스킹이지 OCR 깨짐이 아니다 —
+        지우지 않고 기호 검사를 돌리면 멀쩡한 관찰이 통째로 기각된다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "1. Your firm failed to clean the <Redacted B4> used to hold drug "
+                "components within the (b) (4) cleanroom after each production shift.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+
+    def test_gate_helpers_are_pure_and_scoped_to_recovery(self):
+        self.assertTrue(f._is_recovered_deficiency_publishable(
+            "Drug products are not stored under appropriate conditions of temperature."))
+        self.assertFalse(f._is_recovered_deficiency_publishable(
+            "Pursuant to Section 704(b) of the Federal Food, Drug and Cosmetic Act."))
+        self.assertFalse(f._is_recovered_deficiency_publishable("short"))
+        # 단어 속 기호는 **절대 건수**로 본다 — 비율이면 긴 문장에서 희석돼 통과한다.
+        long_clean = " ".join(["controls"] * 40)
+        self.assertEqual(f._deficiency_garble(long_clean)[0], 0)
+        self.assertEqual(f._deficiency_garble(long_clean + " ass~re")[0], 1)
+        self.assertFalse(f._is_recovered_deficiency_publishable(long_clean + " ass~re"))
+
+    def test_redaction_stripper_is_pure(self):
+        self.assertNotIn("Redacted", f._strip_redaction_markers("a <Redacted B4> b"))
+        self.assertNotIn("(b) (4)", f._strip_redaction_markers("a (b) (4) b"))
+        self.assertIn("Consolidation", f._strip_redaction_markers("Consolidation: ARC"))

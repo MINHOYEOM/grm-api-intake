@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-ec8b63c6da4c52ff693c8b86",
+    "finding_text": "BHQ has failed to maintain an adequate inventory and distribution system by which the distribution of ransfusable blood products can be readily determined to facilitate recall, if necessary.",
+    "finding_text_ko": "BHQ는 필요시 회수를 용이하게 하도록 수혈용 혈액 제품의 유통을 쉽게 확인할 수 있는 적절한 재고 및 유통 시스템을 유지하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ecb0ac677eb93429b67e87ba",
+    "finding_text": "The master production and control records are deficient in that they do not include a statement concerning any calculated excess of component.",
+    "finding_text_ko": "마스터 제조 및 관리 기록은 구성품의 계산된 과잉량에 관한 설명을 포함하지 않아 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ecd72bc85afd60dbd1acd21f",
+    "finding_text": "You did not adequately evaluate your suppliers of raw ingredients.",
+    "finding_text_ko": "귀사는 원료 공급업체를 충분히 평가하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ee5476c18b7df151216e6cd2",
+    "finding_text": "Your firm has failed to thoroughly and adequately investigate, develop root cause, correct and take steps to prevent the recurrence of biological product deviations (BPD).",
+    "finding_text_ko": "귀사는 생물학적 제품 일탈(BPD)을 철저하고 충분히 조사하고, 근본 원인을 규명하며, 시정하고, 재발 방지 조치를 취하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ef1628ef28b575d572f5d711",
+    "finding_text": "The purity, strength and quality ofsome critical components in manufacturing are not tested to validate the suppliers test results.",
+    "finding_text_ko": "제조에 사용되는 일부 중요 구성품의 순도, 함량 및 품질을 공급업체 시험 결과 검증을 위해 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ef27509b6dfd89c04a6013f9",
+    "finding_text": "Written procedures are lacking for the use of cleaning and sanitizing agents designed to prevent the contamination ofdrug products.",
+    "finding_text_ko": "의약품 오염을 방지하도록 설계된 세척 및 소독제 사용에 관한 문서화된 절차가 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ef9e94623f0ad0a2d607854b",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics ofdrug products.",
+    "finding_text_ko": "완제의약품의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f03efe12f974daa9fba921a8",
+    "finding_text": "Required records are not retained for at feast 2 years from the date of release of the device for commercial distribution Specifically, the Emergency FREP Pull Lists, otherwise known as the ZV29 Forms, are discarded.",
+    "finding_text_ko": "상업적 유통을 위한 기기 출하일로부터 최소 2년간 보관해야 하는 기록을 유지하지 않는다. 구체적으로 ZV29 양식으로도 알려진 Emergency FREP Pull List를 폐기한다.",
+    "translation_method": "manual"
+  }
+]

@@ -221,6 +221,41 @@ class EvaluateExtractionGapTest(unittest.TestCase):
             self.assertEqual((breaches, summary), ([], []))
 
 
+class ExtractionGapMigrationContractTest(unittest.TestCase):
+    """045 의 **비대칭 설계**를 고정한다 — 거르는 단위는 (source, kind), 보고 단위는 source.
+
+    되돌리면 둘 중 하나가 반드시 깨진다:
+      · source 단위로 거르면 → 식약처가 영구 적색(가이던스 17건은 0건이 정상인데 섞인다).
+      · kind 단위로 보고하면 → Warning Letter 가 감시에서 사라진다(kind 가 발행부서명이라
+        49종으로 쪼개져 전부 소량 억제 임계에 걸린다).
+    """
+
+    def _sql(self) -> str:
+        import os
+        path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "web", "migrations", "045_extraction_gap_monitor.sql")
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_producing_set_is_scoped_by_source_and_kind(self):
+        sql = self._sql()
+        self.assertIn("group by source, kind having bool_or(has_finding)", sql,
+                      "대상 판정이 (source, kind) 단위여야 한다")
+        self.assertIn("p.source = d.source and p.kind = d.kind", sql,
+                      "조인이 kind 까지 맞춰야 가이던스 문서가 제외된다")
+
+    def test_reporting_is_grouped_by_source_only(self):
+        self.assertIn("group by d.source", self._sql(),
+                      "보고는 source 단위여야 WL 49개 kind 가 한 덩어리로 남는다")
+
+    def test_contract_returns_counts_only(self):
+        """원문 무반환 계약(007/041/042 동종) — 반환 키에 텍스트 필드가 없어야 한다."""
+        sql = self._sql()
+        for forbidden in ("finding_text", "evidence_url", "raw_json'", "excerpt'"):
+            self.assertNotIn(forbidden, sql.split("jsonb_build_object", 1)[1])
+
+
 class RunMonitorExtractionGapTest(unittest.TestCase):
     def _posts(self, stats_payload, gap_payload):
         return [_FakePostResponse(200, stats_payload), _FakePostResponse(200, gap_payload)]

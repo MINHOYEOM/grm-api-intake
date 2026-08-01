@@ -23,10 +23,22 @@
 --   열려 있지 않으므로 definer 여야 운영 모니터(service-role 아닌 경로 포함)가 읽는다.
 --   원문 무반환 계약을 지키므로 definer 로 안전하다.
 --
--- ★"지적사항을 만드는 소스"는 하드코딩하지 않고 **데이터에서 유도**한다 — findings 를
---   한 건이라도 낳은 적이 있는 소스만 대상이다. 뉴스형 소스(Federal Register·ECA·ISPE·
---   EMA·Health Canada·PIC/S·OpenFDA Recall)는 애초에 findings 를 만들지 않으므로
---   0건이 정상이고, 하드코딩하면 새 소스가 추가될 때 목록이 낡는다.
+-- ★"지적사항을 만드는 대상"은 하드코딩하지 않고 **데이터에서 유도**한다 — findings 를
+--   한 건이라도 낳은 적이 있는 (source, source_kind) 쌍만 대상이다. 뉴스형 소스
+--   (Federal Register·ECA·ISPE·EMA·Health Canada·PIC/S·OpenFDA Recall)는 애초에
+--   findings 를 만들지 않으므로 0건이 정상이고, 하드코딩하면 새 소스가 늘 때 목록이 낡는다.
+--
+-- ★★거르는 단위는 (source, kind)인데 **보고 단위는 source** 다. 이 비대칭이 핵심이다:
+--   · 소스 단위로만 거르면 — 식약처가 영구 적색이 된다. 한 소스 안에 성격이 다른 문서가
+--     섞여 있기 때문이다(gmp-inspection 34건은 지적사항을 내지만, "신약 품목허가·심사
+--     업무절차" 같은 guidance-industry/internal 17건은 0건이 당연하다). 무시되는 알림은
+--     진짜 신호를 가리므로 이건 감시의 실패다.
+--   · kind 단위로 보고하면 — Warning Letter 가 감시에서 통째로 사라진다. WL 의
+--     source_kind 는 문서 종류가 아니라 **발행 부서명**이라 자유 문자열 49종으로 쪼개지고,
+--     각 그룹이 소량이라 잡음 억제 임계에 전부 걸려 버린다.
+--   즉 source_kind 의 의미가 소스마다 다르다는 사실 자체를 설계에 반영해야 한다.
+--   실측 검증: 483 2000건/124(6.2%) 불변 · 식약처 96건/12(12.5%, 가이던스 17 제외) ·
+--   WL 1299건/0(49 kind 전부 유지) · EU·MHRA NCR 0.
 -- ============================================================================
 
 create or replace function public.extraction_gap_by_source()
@@ -38,6 +50,7 @@ set search_path = public
 as $$
   with per_doc as (
     select r.source,
+           coalesce(r.source_kind, '') as kind,
            r.raw_signal_id,
            exists (select 1 from public.findings f
                     where f.raw_signal_id = r.raw_signal_id) as has_finding,
@@ -51,8 +64,8 @@ as $$
                     where length(kv.value) >= 200) as has_stored_text
       from public.raw_signals r
   ),
-  producing as (        -- findings 를 낳은 적이 있는 소스만 감시 대상
-    select source from per_doc group by source having bool_or(has_finding)
+  producing as (        -- findings 를 낳은 적이 있는 (소스, 종류) 쌍만 감시 대상
+    select source, kind from per_doc group by source, kind having bool_or(has_finding)
   ),
   agg as (
     select d.source,
@@ -60,9 +73,10 @@ as $$
            count(*) filter (where d.has_finding)         as with_findings,
            count(*) filter (where not d.has_finding)     as zero_findings,
            count(*) filter (where not d.has_finding
-                              and d.has_stored_text)     as zero_with_stored_text
+                              and d.has_stored_text)     as zero_with_stored_text,
+           count(distinct d.kind)                        as kinds
       from per_doc d
-      join producing p on p.source = d.source
+      join producing p on p.source = d.source and p.kind = d.kind
      group by d.source
   )
   select jsonb_build_object(
@@ -82,6 +96,8 @@ as $$
                -- 수집 문제라는 뜻은 아니다(저장 자체를 안 했을 수 있다) — 이 값은
                -- "최소한 이만큼은 파서 문제"만 말한다. 위쪽 주석 참조.
                'zero_with_stored_text', a.zero_with_stored_text,
+               -- 이 소스에서 감시 대상으로 남은 문서 종류 수(가이던스 등 비산출 종류 제외 후).
+               'kinds',           a.kinds,
                'zero_pct',        round(100.0 * a.zero_findings / nullif(a.docs, 0), 1)
              ) order by a.zero_findings desc, a.source)
         from agg a), '[]'::jsonb)

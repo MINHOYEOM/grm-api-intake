@@ -197,7 +197,7 @@ class TaxonomyV3BoundedTest(unittest.TestCase):
     is, since there is only one live classify_finding_category(), not a v3-frozen one."""
 
     def test_taxonomy_v3_is_current_and_v1v2_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v5")
+        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v6")
         self.assertEqual(
             gf.TAXONOMY_VERSIONS,
             (
@@ -206,6 +206,7 @@ class TaxonomyV3BoundedTest(unittest.TestCase):
                 "grm-finding-taxonomy/v3",
                 "grm-finding-taxonomy/v4",
                 "grm-finding-taxonomy/v5",
+                "grm-finding-taxonomy/v6",
             ),
         )
         self.assertEqual(len(gf.FINDING_TAXONOMY), 20)

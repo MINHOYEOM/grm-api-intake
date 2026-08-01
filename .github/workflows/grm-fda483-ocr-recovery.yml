@@ -41,6 +41,10 @@ on:
         description: '선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). 비우면 대상 전건.'
         type: string
         default: ''
+      ocr_page_budget:
+        description: 'OCR 페이지 예산(실행 1회당). 기본 200 은 **일일 수집**의 벽시계 보호용이라, 1회성 회수에서는 스캔본 ~20건에서 소진되고 나머지는 다음 실행으로 밀린다(실측: 429건 중 42건이 scan-ocr-budget). 배치를 키우려면 올린다 — 300dpi 페이지당 수 초라 워크플로 타임아웃(120분)을 넘지 않게.'
+        type: string
+        default: '200'
       mode:
         description: '후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. missing-observations=관찰 키가 없는 행 — 상태 키가 없어 지금까지 어떤 복구 잡에도 안 걸리던 사각지대(2026-08-01 실측 417건). ★이 모드는 멱등이 아니다: 본문은 있는데 파서가 여전히 0건인 문서는 다음 실행에서도 후보로 남아 PDF 를 다시 읽는다.'
         type: choice
@@ -95,6 +99,7 @@ jobs:
           IN_DELAY: ${{ inputs.delay_seconds }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           IN_MODE: ${{ inputs.mode }}
+          FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -euo pipefail
           ARGS=(--report-path ocr_recovery_report.json --delay-seconds "${IN_DELAY}" --mode "${IN_MODE}")
@@ -130,11 +135,12 @@ jobs:
           IN_DELAY: ${{ inputs.delay_seconds }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           IN_MODE: ${{ inputs.mode }}
+          IN_OCR_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           {
             echo "### GRM FDA 483 OCR Recovery"
             echo ""
-            echo "apply: \`${IN_APPLY}\` / mode: \`${IN_MODE}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
+            echo "apply: \`${IN_APPLY}\` / mode: \`${IN_MODE}\` / ocr_budget: \`${IN_OCR_BUDGET}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
             echo ""
             if [ -f ocr_recovery_report.json ]; then
               echo "#### 복구 리포트 (backfill_483_ocr_recovery.py)"

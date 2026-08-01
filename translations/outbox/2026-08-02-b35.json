@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-74e96262da04421ff5c45af1",
+    "finding_text": "The Quality Assurance'review is not being completed within 5 business days.",
+    "finding_text_ko": "품질보증 검토가 영업일 기준 5일 이내에 완료되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-74eb94ed603a006295c2072a",
+    "finding_text": "For raw material: • There is no tracking or trending offailed incoming raw materials.",
+    "finding_text_ko": "원자재: 불합격 입고 원자재의 추적 또는 추세 분석이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-74fdaa80ac375cc8db80f228",
+    "finding_text": "BHQ implemented BSL 00-126 entitled “Follow Up Actions Required for Releasing Donor Identification Holds” on 6/15/2000 as part of the corrective action.",
+    "finding_text_ko": "BHQ는 시정조치의 일부로 2000년 6월 15일 “공여자 식별 보류 해제를 위해 필요한 후속 조치”라는 제목의 BSL 00-126을 시행했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-753bb9139ab84a2f49244fb0",
+    "finding_text": "According to SOP #030-SOP-J-36 (effective 12/30/08), entitled \"Training of Quality Control Analysts\" al sts and technicians in the Quality Control Laboratory must successfulfy complete er evaluation of knowledge.",
+    "finding_text_ko": "SOP #030-SOP-J-36(2008년 12월 30일 발효) “Training of Quality Control Analysts”에 따르면 품질관리 실험실의 분석가와 기술자는 지식 평가를 성공적으로 완료해야 합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-75b7bc2f8e7875d1d467ba6f",
+    "finding_text": "On 6/7/2002, the Vice President, QA Blood and Piasma Operations, recommended this pilot be conducted in ‘© additional regions to determine if the recommendations from the trial will have similar effects in other regions.",
+    "finding_text_ko": "2002년 6월 7일 QA Blood and Plasma Operations 부사장은 시험의 권고사항이 다른 지역에서도 유사한 효과를 갖는지 판단하기 위해 이 파일럿을 추가 지역에서 수행할 것을 권고했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-760c0f693d560e4525fa20ec",
+    "finding_text": "Each batch of drug product required to be free of objectionable microorganisms is not tested through appropriate laboratory testing.",
+    "finding_text_ko": "허용할 수 없는 미생물이 없어야 하는 각 의약품 배치가 적절한 실험실 시험을 통해 시험되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-76392226b7298bba2b834fb8",
+    "finding_text": "Concerning the HEPA filters in the depyrogenationI The HEPA filters in the bot zone are not jntegrity tested on a periodic base in order to assure that the HEPA filters are not compromised.",
+    "finding_text_ko": "발열성 물질 제거 구역의 HEPA 필터와 관련하여, HEPA 필터가 손상되지 않았음을 보장하기 위해 핫존의 HEPA 필터에 대한 정기 무결성 시험이 수행되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-76611777c5ce95a682d70ddb",
+    "finding_text": "Your firm failed to conduct investigations of potency failures for the following compounded sterile preparations: A.",
+    "finding_text_ko": "귀사는 다음 조제 무균 조제품의 역가 실패에 대한 조사를 수행하지 못했습니다. A.",
+    "translation_method": "manual"
+  }
+]

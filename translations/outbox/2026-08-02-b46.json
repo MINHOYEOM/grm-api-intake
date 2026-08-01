@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-951107df2cddb1133e87ea11",
+    "finding_text": "There are no written procedures pertaining to the handling of complaints, nor does your firm maintain a complaint file.",
+    "finding_text_ko": "불만 처리와 관련된 문서화된 절차가 없으며, 귀사는 불만 파일도 유지하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-955ffde4b22556b0fcbaee00",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile are not established and followed .",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-96a9771965412a9147612737",
+    "finding_text": "Written calibration procedures for instruments, apparatus, gauges, and recording devices are deficient in that they do not include specific directions, schedules, limits for accuracy and precision, and provisions for remedial action if limits are not met.",
+    "finding_text_ko": "기기, 장치, 게이지 및 기록 장치에 대한 문서화된 교정 절차가 부적절하다. 즉, 구체적인 지침, 일정, 정확성 및 정밀도 한계와 한계를 충족하지 못할 경우의 시정조치 규정을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-96bbd8ad380cd7cc21889203",
+    "finding_text": "The 100% visual inspection of REDACTION (b)(4) products filled on Line REDACTION (b)(4) is performed prior to REDACTION (b)(4) Only a cursory inspecti on of the units during REDACTION (b)(4) packaging is performed post REDACTION (b)(4) and labeling .",
+    "finding_text_ko": "Line REDACTION (b)(4)에서 충전된 REDACTION (b)(4) 제품의 100% 육안검사는 REDACTION (b)(4) 전에 수행된다. REDACTION (b)(4) 포장 중에는 REDACTION (b)(4) 및 라벨링 후 단위에 대한 개략적인 검사만 수행된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-972656875aeb6d7d036c5ef7",
+    "finding_text": "Aseptic processing deficiencies include: A.",
+    "finding_text_ko": "무균공정 결함에는 다음이 포함된다: A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9730525188e6d29404ce509a",
+    "finding_text": "Written production and process control procedures are not followed in the execution ofproduction and process control functions.",
+    "finding_text_ko": "문서화된 생산 및 공정 관리 절차가 생산 및 공정 관리 기능의 수행 시 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-97bbcc875dd3ebd2e195224a",
+    "finding_text": "BHQ does not have an adequate inventory management procedure in place to ensure that the disposition of blood products can be readily determined.",
+    "finding_text_ko": "BHQ에는 혈액 제품의 처분 상태를 쉽게 결정할 수 있도록 보장하는 적절한 재고 관리 절차가 마련되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-97ffda564388dfeb22a065fa",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 실내 및 설비 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-98bc64dd9ceb60a4bdc35769",
+    "finding_text": "During the current inspection, our review of approximately 49 deviation reports revealed that in approximately 22 cases the CMV labeling error was discovered at distribution.",
+    "finding_text_ko": "이번 점검에서 약 49건의 일탈 보고서를 검토한 결과 약 22건에서 CMV 라벨링 오류가 유통 단계에서 발견된 것으로 나타났다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-98cc6ae2553f56196aca9433",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "의약품의 유통을 위한 시험 및 출하는 출하 전에 각 유효성분의 동일성 및 함량에 대한 만족스러운 적합성을 확인하는 적절한 시험실 판정을 포함하지 않는다.",
+    "translation_method": "manual"
+  }
+]

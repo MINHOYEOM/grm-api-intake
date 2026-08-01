@@ -209,22 +209,39 @@ class ContaminationControlPatternTest(unittest.TestCase):
                 )
 
     def test_ocr_tolerance_does_not_become_fuzzy_matching(self) -> None:
-        """수용한 손상은 두 가지뿐이다 -- 임의의 유사 철자까지 열어주지 않는다."""
-        self.assertNotEqual(
-            gf.classify_finding_category(
-                "Procedures designed to prevent objection able microrganisms were absent."
-            ),
-            "contamination_control",
-        )
+        """수용한 손상은 좁게 열거된 것뿐이다 -- 임의의 유사 철자까지 열어주지 않는다.
+
+        ★2026-08-02 v6 갱신: 원래 이 테스트의 반례는 "objection able microrganisms" 였다.
+        v6(단어 중간 공백 복원)이 "objection able" 을 **정당하게** 되붙이면서(공백 1칸 1회
+        = v6 이 정확히 다루는 손상 모형) 이 문자열은 이제 contamination_control 로 간다.
+        테스트의 **의도**(퍼지매칭 금지)는 그대로이므로, v6 의 복원 모형으로도 도달할 수
+        없는 손상 -- 문자 전치·이중 분할·조인해도 신호어가 되지 않는 분할 -- 로 반례를
+        교체한다. v6 은 퍼지매칭이 아니라 '공백 1칸 되붙이기'라는 것이 여기서 드러난다."""
+        for text in (
+            # 문자 전치(objectionabel) -- 어떤 공백 복원으로도 도달 불가.
+            "Procedures designed to prevent objectionabel microrganisms were absent.",
+            # 이중 분할(object ion able) -- v6 은 1회 분할만 되붙인다.
+            "Procedures designed to prevent object ion able microrganisms were absent.",
+            # 조인 결과가 신호어가 아님(micr organisms -> microrganisms).
+            "Procedures designed to prevent objectionable micr organisms were absent.",
+        ):
+            with self.subTest(text=text[:55]):
+                self.assertNotEqual(
+                    gf.classify_finding_category(text), "contamination_control"
+                )
 
 
 class TaxonomyV5BoundedTest(unittest.TestCase):
     """v5 계약: 카테고리 집합·순서 불변, 버전 IN-list 만 확장."""
 
-    def test_taxonomy_v5_is_current_and_v1_through_v4_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v5")
+    def test_taxonomy_v5_is_still_an_accepted_taxonomy_version(self) -> None:
+        """v6(2026-08-02 split-word 수정)으로 현재 버전이 올라갔다 -- 이 클래스가 지키는
+        것은 "v5 가 현재 버전"이 아니라 **v5 로 저장된 기존 행이 계속 유효하다**는 계약이다
+        (v2->v3->v4->v5 때와 동일한 additive 규율). 현재 버전 고정은
+        tests/test_findings_taxonomy_v6.py 로 이동."""
+        self.assertIn("grm-finding-taxonomy/v5", gf.TAXONOMY_VERSIONS)
         self.assertEqual(
-            gf.TAXONOMY_VERSIONS,
+            gf.TAXONOMY_VERSIONS[:5],
             (
                 "grm-finding-taxonomy/v1",
                 "grm-finding-taxonomy/v2",

@@ -126,13 +126,73 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      진짜 무균 산문 2건(위 §1)이 함께 강등되므로 채택하지 않는다.
 #   4) v1~v4-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all five.
 #      Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v5"
+#
+# grm-finding-taxonomy/v6 change log (2026-08-02 -- v5 작업 중 발견한 **단어 중간 공백**
+# (split-word) 결함. No category is added, removed, relabeled, or reordered.
+#   1) 결함: 스캔 PDF(FDA 483/WL)의 텍스트층은 단어 중간에 공백 한 칸을 끼워 넣는다
+#      ("appropriate laborator y testing", "purporting to be steril e", "obj ectionable",
+#      "in drug pro ducts"). 분류기의 ASCII 키워드는 \b 단어경계 정규식이라 쪼개진 단어가
+#      **조용히** 매칭에 실패하고, 그 지적은 덜 구체적인 카테고리로 떨어진다.
+#      ★교훈: 이 실패는 **소리를 내지 않는다**. 키워드가 안 맞으면 캐치올(other_quality_
+#      system)이 정상 응답처럼 반환되므로, 분류 실패와 "분류할 신호가 없음"이 겉보기에
+#      구분되지 않는다. v5 의 역극성 결함과 같은 계열(신호어의 **존재**만 보고 판단하는
+#      매칭)이고, 이번에는 신호어가 아예 보이지 않게 된 쪽이다.
+#   2) 라이브 실측(2026-08-02, 공개 findings 11,844행 전수 스윕 -- 이 구현 그대로 실행):
+#      신호어가 쪼개진 행 **134건**(1.1%), 그중 복원 시 카테고리가 **바뀌는 행 48건**.
+#      최초 제보는 10건이었고 실제 규모는 그 5배였다 -- 제보된 2개 문형만 고쳤다면 나머지
+#      38건은 그대로 남았다. ★먼저 재고, 그다음에 설계한다.
+#      주요 이동: contamination_control->aseptic 8(211.113(b) "purporting to be steril e"),
+#      other_quality_system->qc_lab_controls 6(211.165(b) "laborator y testing"),
+#      other->aseptic 5, other->environmental_monitoring 5.
+#      캐치올(other_quality_system)로 **내려간 행은 0건**이다(복원이 신호를 지우지 않음).
+#   3) 수리 계층 판정 -- **분류기 haystack 정규화**(v5 의 _NEGATED_STERILE_RE 와 같은 층)이고
+#      추출/적재 시점 텍스트 수리가 아니다. 근거 셋:
+#      · 소급성: 이미 저장된 106건은 재분류(findings_reclassify_service.py)만으로 전부
+#        고쳐진다. 추출 시점 수리는 신규 행만 고치고 기존 행은 **텍스트 백필** 없이는 못 고친다.
+#      · 번역 정합: finding_text_ko 는 손상된 영문에서 번역된 것이다. finding_text 를
+#        나중에 고치면 11,844행의 국문이 존재하지 않는 원문을 가리키게 되고 재번역 트리거도
+#        없다. 재분류 서비스가 finding_text 를 **절대 쓰지 않는다**는 기존 계약과도 충돌한다.
+#      · 폭발반경: haystack 은 메모리 안 사본이라 규칙이 틀려도 최악이 오분류다. 저장된
+#        원문(수집 정본)은 바이트 불변 -- 원문 무결성 원칙을 분류 버그 때문에 깨지 않는다.
+#   4) 어휘는 **FINDING_TAXONOMY 자신에서 파생**한다(하드코딩 변형 목록이 아니다). 조인
+#      결과가 분류기가 실제로 매칭하는 신호어일 때만 공백을 지우므로 무관한 산문은 건드릴 수
+#      없다 -- "단어 안 공백을 전부 삭제"하는 광범위 휴리스틱과는 다르다. 나중에 키워드가
+#      추가돼도 복원 규칙이 자동으로 따라온다(v5 가 지적한 "하나씩 덧붙이기" 재발 방지).
+#   5) 보수적 경계(실측으로 정한 것만):
+#      · 공백은 정확히 1칸 1회. 실측 106행이 전부 그랬다.
+#      · 왼쪽 조각이 1글자 영어 단어("a"/"i")인 변형은 일반 규칙에서 제외 -- "a septic tank"가
+#        "aseptic tank"로 바뀌면 안 된다. 실측 7건이 전부 "a septic processing/conditions"
+#        였고 코퍼스에 "septic tank/system/sewer" 는 0건이라, 뒤 문맥을 요구하는 별도
+#        규칙(_SPLIT_ASEPTIC_RE)으로만 복원한다.
+#      · "back up"(동사구)은 예방적 제외 -- backup 은 CSV 키워드이고 CSV 는 매치 순서가 이르다.
+#      · `patterns` 정규식 소스는 파싱하지 않는다. 측정 단계에서 `\b` 의 'b' 가 뒷단어에 붙어
+#        "brecords"/"bmanufacturing" 유령 신호어를 만들었고 "SU¢b records"·"grade A/B
+#        manufacturing" 을 손상으로 오인했다(오탐 2건 실측·제거). 패턴 전용 어휘는 손으로 적는다.
+#   6) 알려진 한계(honesty over forcing a match -- v4/v5 관례 유지):
+#      · **사용자가 화면에서 읽는 텍스트는 여전히 손상된 채다.** 이 변경은 분류만 고친다
+#        ("laborator y testing" 은 /findings/ 에 그대로 렌더된다). 표시 계층 수리는 별건.
+#      · 손상이 2회 이상 겹친 원문("ste ri I izatio n" -- 공백 3개 + 문자 오인식)은 범위 밖.
+#      · "clean room"(10건)·"record keeping"(1건)은 OCR 손상이 아니라 **정당한 띄어쓰기**다.
+#        분류기 키워드가 "cleanroom"/"recordkeeping" 이라 같은 메커니즘에 걸리는데, 실측
+#        전건(10/10, 1/1)이 명사 용법이고 조인 결과가 의미상 정확한 카테고리라 **의도적으로
+#        허용**한다(동사+목적어 오조인 사례 0건 확인).
+#      · 48건 중 **3건**은 새 카테고리가 논쟁적이다 -- 복원된 신호어가 매치 순서상 더 앞선
+#        카테고리에 걸리기 때문이다: fda483-85460("batch r ecords" -> aseptic 에서
+#        documentation_records 로), fda483-112089("test met hods" -> stability_storage 에서
+#        qc_lab_controls 로), fda483-79433("c omplaints" -> deviation_capa 에서
+#        complaint_recall 로). 셋 다 **손상되지 않은 원문이었다면 분류기가 원래 그렇게
+#        판정했을** 결과다. 즉 이 결함의 잔여물이 아니라 매치 순서 설계의 결과이므로 그대로
+#        둔다 -- 순서 재조정은 이 변경의 범위가 아니다(별건 판단 필요).
+#   7) v1~v5-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all six.
+#      Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v6"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
     "grm-finding-taxonomy/v3",
     "grm-finding-taxonomy/v4",
     "grm-finding-taxonomy/v5",
+    "grm-finding-taxonomy/v6",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -553,22 +613,121 @@ _NEGATED_STERILE_RE = re.compile(r"not\s+requi\w*\s+to\s+be\s+steril\w*", re.IGN
 _NEGATED_STERILE_PLACEHOLDER = " "
 
 
+# ---------------------------------------------------------------------------
+# v6: 단어 중간 공백(split-word) 복원 -- 매칭 haystack 한정
+# ---------------------------------------------------------------------------
+# 스캔 PDF(FDA 483/WL)의 텍스트층은 단어 중간에 공백 한 칸을 끼워 넣는다("appropriate
+# laborator y testing", "purporting to be steril e", "obj ectionable"). 분류기는 ASCII
+# 키워드를 \b 단어경계 정규식으로 매칭하므로 쪼개진 단어는 **조용히** 매칭에 실패하고 그
+# 지적은 덜 구체적인 카테고리(대개 캐치올 other_quality_system)로 떨어진다.
+#
+# 복원 어휘는 **분류기 자신의 키워드에서 파생**한다(하드코딩 목록이 아니다). v5 교훈의 연장
+# 이다 -- 변형을 하나씩 덧붙이면 다음 달 새 손상 위치에서 같은 결함이 재발한다. 어휘를
+# FINDING_TAXONOMY 에서 뽑으면 나중에 키워드를 추가해도 복원 규칙이 따라온다(표류 불가).
+#
+# ★이 복원은 "단어 안 공백을 전부 지우는" 광범위 휴리스틱이 아니다. 조인 결과가 **분류기가
+# 실제로 매칭하는 신호어**일 때만 공백을 지운다. 그래서 무관한 산문은 건드릴 수 없다.
+_SPLIT_REPAIR_MIN_LEN = 6
+# `patterns` 정규식 **소스는 파싱하지 않는다**. 실측 함정: `\b` 의 'b' 가 뒤 단어에 붙어
+# "brecords"/"bmanufacturing" 같은 유령 신호어가 만들어졌고, 그 유령이 "SU¢b records"·
+# "grade A/B manufacturing" 을 손상으로 오인했다(측정 단계에서 2건 오탐 확인·제거).
+# 패턴으로만 도달하는 어휘는 아래에 손으로 적는다.
+_SPLIT_REPAIR_PATTERN_WORDS: tuple[str, ...] = (
+    "sterile", "sterility", "sterilized", "sterilization", "sterilizing",
+    "pyrogen", "pyrogenic", "objectionable", "microorganism",
+    "components", "excipients", "substances", "residues", "carryover",
+    "facility", "facilities", "laboratories", "variability", "manufacturing",
+    "computer", "computerized", "electronic", "annual", "evaluation",
+    "outsourcing", "monitor", "validate", "prevent",
+    # ★카테고리 신호어가 아니라 **매칭 계층 자신의 어휘**다. v5 의 `_NEGATED_STERILE_RE`
+    # ("not requi\\w* to be steril\\w*")는 온전한 단어로 쓰여 있어 "not requi red to be
+    # sterile" 처럼 그 구절이 쪼개지면 중립화가 발동하지 못한다(=역극성 결함 재발). 복원이
+    # 중립화보다 먼저 도는 순서와 합쳐져, 이 두 단어가 v5 가드를 회피 불가능하게 만든다.
+    # 어느 카테고리의 키워드도 아니므로 이 어휘 자체가 새 매칭을 만들 수는 없다.
+    "required", "requiring",
+)
+# 조인하면 **뜻이 바뀌는** 흔한 영어 구는 제외한다. 실측 코퍼스에서 확인된 오탐은 아니고
+# (0건) 예방적 제외다 -- "back up the records"(동사구)가 backup(CSV 키워드)으로 바뀌면 안 된다.
+_SPLIT_REPAIR_EXCLUDED: frozenset[str] = frozenset({"back up"})
+# 왼쪽 조각이 그 자체로 영어 단어인 1글자("a"/"i")면 조인이 문장 뜻을 바꿀 수 있다
+# ("a septic tank" -> "aseptic tank"). 일반 규칙에서 빼고, 실측 확인된 "a septic
+# processing/conditions" 만 문맥을 요구하는 별도 규칙(_SPLIT_ASEPTIC_RE)으로 복원한다.
+_SPLIT_REPAIR_WORDLIKE_HEADS: frozenset[str] = frozenset({"a", "i"})
+
+
+def _split_repair_vocabulary() -> tuple[str, ...]:
+    """분류기가 실제로 매칭하는 ASCII 신호어 집합(복원 대상 어휘)."""
+    words: set[str] = set()
+    for category in FINDING_TAXONOMY:
+        for keyword in category.keywords:
+            if keyword.isascii():
+                words.update(re.findall(r"[a-z]+", keyword.lower()))
+    words.update(_SPLIT_REPAIR_PATTERN_WORDS)
+    # _ascii_keyword_pattern 의 `s?` 복수 규칙을 그대로 반영한다("compo nents" 실측 1건 --
+    # 키워드는 단수 "component" 지만 원문은 복수형이 쪼개져 있었다).
+    words.update({word + "s" for word in list(words) if not word.endswith("s")})
+    return tuple(sorted(word for word in words if len(word) >= _SPLIT_REPAIR_MIN_LEN))
+
+
+def _build_split_word_pattern() -> "re.Pattern[str]":
+    """신호어마다 '공백 1칸이 한 번 끼어든' 변형 전체를 모아 하나의 정규식으로."""
+    variants: set[str] = set()
+    for word in _split_repair_vocabulary():
+        for index in range(1, len(word)):
+            left, right = word[:index], word[index:]
+            if left in _SPLIT_REPAIR_WORDLIKE_HEADS:
+                continue
+            if f"{left} {right}" in _SPLIT_REPAIR_EXCLUDED:
+                continue
+            variants.add(re.escape(left) + r"\s" + re.escape(right))
+    return re.compile(r"\b(?:" + "|".join(sorted(variants)) + r")\b", re.IGNORECASE)
+
+
+# 공백은 정확히 1칸(`\s` 1회)만 허용한다 -- 실측 134행이 전부 1칸이었다. 손상이 2회 이상
+# 겹친 원문("ste ri I izatio n" -- 공백 3개 + 문자 오인식)은 의도적으로 복원 범위 밖이다.
+_SPLIT_WORD_RE = _build_split_word_pattern()
+# "a septic": 실측 7건이 전부 "a septic processing" / "a septic conditions" 였고 코퍼스
+# 전체에 "septic tank/system/sewer/waste/drain" 은 **0건**이었다. 그래도 "a septic" 은
+# 그 자체로 성립하는 영어라 뒤따르는 GMP 문맥을 요구한다(단어경계 뒤 공백만 삭제).
+_SPLIT_ASEPTIC_RE = re.compile(
+    r"\ba\s(?=septic\s+(?:process|condition|area|technique|fill))", re.IGNORECASE
+)
+
+
+def _repair_split_words(haystack: str) -> str:
+    """매칭용 haystack 에서만 쪼개진 신호어를 되붙인다(저장 텍스트는 불변)."""
+    repaired = _SPLIT_ASEPTIC_RE.sub("a", haystack)
+    return _SPLIT_WORD_RE.sub(lambda m: re.sub(r"\s+", "", m.group(0)), repaired)
+
+
 def classify_finding_category(text: str) -> str:
-    """Deterministic v5 keyword+pattern classifier.
+    """Deterministic v6 keyword+pattern classifier.
 
     The order of FINDING_TAXONOMY is part of the contract.  It gives highly
     specific categories such as aseptic processing a chance to match before more
     general quality-system buckets.  A category matches if any of its `keywords`
     (word-boundary regex for ASCII, substring for Hangul) OR any of its explicit
-    `patterns` (raw regex, case-insensitive) matches the haystack.  v5 adds one
-    step before matching: reverse-polarity spans (text that names a signal word
-    only to negate it) are neutralised, so a category's signal word cannot be
-    read with the opposite of its meaning.  See the TAXONOMY_VERSION change log
-    above for what changed between v1/v2/v3/v4/v5.
+    `patterns` (raw regex, case-insensitive) matches the haystack.  Two
+    normalisation steps run before matching, in this order:
+
+      1. v6 -- signal words that a scanned-PDF text layer split with a stray
+         space ("laborator y") are re-joined, so a word-boundary keyword cannot
+         silently miss them.
+      2. v5 -- reverse-polarity spans (text that names a signal word only to
+         negate it) are neutralised, so a category's signal word cannot be read
+         with the opposite of its meaning.
+
+    The order is load-bearing: v5's `_NEGATED_STERILE_RE` is itself written in
+    whole words ("not required to be sterile"), so a split inside *that* phrase
+    would defeat it.  Repairing first makes the v5 guard strictly harder to
+    evade.  Neither step ever mutates the stored finding_text -- both operate on
+    a private in-memory haystack.  See the TAXONOMY_VERSION change log above for
+    what changed between v1..v6.
     """
     haystack = _text(text).lower()
     if not haystack:
         return "other_quality_system"
+    haystack = _repair_split_words(haystack)
     haystack = _NEGATED_STERILE_RE.sub(_NEGATED_STERILE_PLACEHOLDER, haystack)
     for category in FINDING_TAXONOMY:
         if category.code == "other_quality_system":

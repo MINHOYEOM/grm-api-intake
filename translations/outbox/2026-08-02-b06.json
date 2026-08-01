@@ -1,0 +1,296 @@
+[
+  {
+    "finding_id": "finding-a1e31d083930b32a017b59dc",
+    "finding_text": "a The quality system that approves contract laboratories to perform testing of ©@ impurities is | deficient, Specifically, Po The quality unit fails to ensure that the contract Jaboratory used to perform testing ofo@ content ino@® API (codewo@ has the capabilities, equipment, and the knowledge | to perform the required testing in an accurate, precise, and reliable way.",
+    "finding_text_ko": "계약 실험실이 ©@ 불순물 시험을 수행하도록 승인하는 품질시스템이 미흡하다. 구체적으로, 품질관리부서는 o@® API(codewo@)의 o@ 함량 시험에 사용된 계약 실험실이 요구 시험을 정확하고 정밀하며 신뢰성 있게 수행할 역량, 설비 및 지식을 갖추도록 보장하지 못한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-42695e66359354d37f4339cd",
+    "finding_text": "Written records of investigations into unexplained discrepancies do not always include the conclusion and follow- up.",
+    "finding_text_ko": "설명되지 않은 불일치에 대한 조사의 문서화된 기록에 결론과 후속조치가 항상 포함되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-720565944a49237989f7b454",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-beb34d3173a549729c085158",
+    "finding_text": "Manually managed materials in the warehouse and facilities are not separated during storage.",
+    "finding_text_ko": "창고 및 시설에서 수동 관리되는 물질이 보관 중 분리되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d175804069095129cc2eca1a",
+    "finding_text": "Document control procedures under Quality Unit oversight are inadequate.",
+    "finding_text_ko": "품질관리부서 감독하의 문서 관리 절차가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3528da902fe998002469b52a",
+    "finding_text": "Failure to maintain a backup file of data entered into the computer or related system.",
+    "finding_text_ko": "컴퓨터 또는 관련 시스템에 입력된 데이터의 백업 파일을 유지하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6b83aabd34f3942e889e06da",
+    "finding_text": "Procedures designed to prevent objectionable microorganisms in drug products not required to be sterile are not established and followed.",
+    "finding_text_ko": "무균이 요구되지 않는 완제의약품에서 바람직하지 않은 미생물을 방지하도록 설계된 절차가 수립되고 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f0bad7d42be0d84479367f0d",
+    "finding_text": "The number of containers to be sampled is not based upon appropriate criteria.",
+    "finding_text_ko": "검체채취할 용기의 수가 적절한 기준에 근거하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3db6156443d374ac04281424",
+    "finding_text": "Failure to validate a process for remediation of ATNAA (Atropine 2.1mg/0.7mL and Pralidoxime Chloride 600 mg/2 mL Injection) auto-injectors.",
+    "finding_text_ko": "ATNAA(Atropine 2.1mg/0.7mL 및 Pralidoxime Chloride 600mg/2mL Injection) 자동주사기의 개선 공정을 밸리데이션하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-58b049a509b22c9a1e03c114",
+    "finding_text": "You failed to follow the ISO 2859-1/ANSI/ASQ Zt.4 Standard.",
+    "finding_text_ko": "ISO 2859-1/ANSI/ASQ Zt.4 표준을 준수하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-83f30ede31ba359b6cce98b4",
+    "finding_text": "The quality control unit lacks authority to review production records to assure that no errors have occurred and fully investigate errors that have occurred.",
+    "finding_text_ko": "품질관리부서에 오류가 발생하지 않았음을 보장하기 위해 생산 기록을 검토하고 발생한 오류를 철저히 조사할 권한이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a7a83a8957c7cca21b37a1c0",
+    "finding_text": "Written production and process control procedures are not followed in the execution of production and process control functions.",
+    "finding_text_ko": "생산 및 공정 관리 기능 수행 시 문서화된 생산 및 공정 관리 절차가 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cd3547cd802fa22fc26c97d3",
+    "finding_text": "You failed to collect your AQL Samples randomly.",
+    "finding_text_ko": "귀사는 AQL 검체를 무작위로 채취하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f18ff601ef5e7aa55714029f",
+    "finding_text": "Failure to validate a process for remediation of ATNAA (Atropine 2.1mg/0.7mL and Pralidoxime Chloride 600 mg/2 mL Injection) auto-injectors .",
+    "finding_text_ko": "ATNAA(Atropine 2.1mg/0.7mL 및 Pralidoxime Chloride 600mg/2mL Injection) 자동주사기의 개선 공정을 밸리데이션하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-faff879889a69571cd1cae69",
+    "finding_text": "Insufficient qualification in the remediation of ATNAA (Atropine 2.1mg/0.7mL and Pralidoxime Chloride 600 mg/2 mL Injection) auto injectors.",
+    "finding_text_ko": "ATNAA(Atropine 2.1mg/0.7mL 및 Pralidoxime Chloride 600mg/2mL Injection) 자동주사기 개선에 대한 적격성평가가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-12dd42e7a1de6eb4b4b78c20",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile do not include adequate validation ofthe &ierilization process.",
+    "finding_text_ko": "무균임을 표방하는 완제의약품의 미생물 오염 방지 절차에 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-481b149b12a2fa8866502f29",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions.",
+    "finding_text_ko": "무균공정 구역에서 무균 조건을 관리하는 데 사용되는 설비의 유지관리 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-89044e62a69eddb54cdb590b",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "완제의약품이 표방하거나 표시된 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 대한 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-895ea1257a5d839e1a09ef97",
+    "finding_text": "The quality control unit lacks authority to review production records to assure that no errors have occurred.",
+    "finding_text_ko": "품질관리부서에 오류가 발생하지 않았음을 보장하기 위해 생산 기록을 검토할 권한이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a25b1c7f47a3c64918a7527f",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products confonn to appropriate standards ofidentity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에 완제의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족하도록 보장하기 위한 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e36590e7d555fa0f44570ae5",
+    "finding_text": "Equipment and utensils are not cleaned at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product 1.",
+    "finding_text_ko": "설비 및 기구가 완제의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하기 위해 적절한 주기에 세척되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bfaf50f016d92a1bf05385ca",
+    "finding_text": "A facility is not adequately maintained.",
+    "finding_text_ko": "시설이 적절히 유지관리되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-020bb2ade552cd3fcfbd0530",
+    "finding_text": "There has been no requirement to review electronic raw data in the chromatography system for any active pharmaceutical ingredient batches released to date.",
+    "finding_text_ko": "현재까지 출하된 모든 유효성분 배치에 대해 크로마토그래피 시스템의 전자 원시 데이터를 검토하도록 요구한 바 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-06ba20de2bd91c5dc957a66d",
+    "finding_text": "Established procedures for DP equipment clean ing and facility surface cleaning are not adequately documented at the time of performance.",
+    "finding_text_ko": "완제의약품 설비 세척 및 시설 표면 세척에 대한 확립된 절차가 수행 시점에 충분히 문서화되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0f147cc50d879de50eb7ac04",
+    "finding_text": "The cleaning and disinfecting of the aseptic processing areas are deficient to ensure aseptic conditions are produced.",
+    "finding_text_ko": "무균공정 구역의 세척 및 소독이 무균 조건을 조성하도록 하기에는 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-10a64af032e95b9e2447d681",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding ofdrug products is not ofappropriate design and suitably located to facilitate operations for its intended use, cleaning and maintenance.",
+    "finding_text_ko": "완제의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도, 세척 및 유지관리 작업을 용이하게 하도록 적절히 설계되고 배치되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2495226e8a1f849681425149",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에 완제의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족하도록 보장하기 위한 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-326f4cf2c8a84219b6a9d108",
+    "finding_text": "The visual inspection program for 6 4 DP vials is deficient.",
+    "finding_text_ko": "6 4 DP 바이알의 육안검사 프로그램이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-491546186bb89db06aa3087d",
+    "finding_text": "The in-process parameter setup is inadequate to ensure product quality and process consistency.",
+    "finding_text_ko": "공정중 파라미터 설정이 제품 품질 및 공정 일관성을 보장하기에 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5d517d64a154dddb3a7914a6",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역의 무균 조건 조성을 위한 설비 세척 및 소독 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6773b257b1504e940e9d149c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and fo llowed.",
+    "finding_text_ko": "무균임을 표방하는 완제의약품의 미생물 오염 방지 절차가 수립되고 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8988208e160183b1734ee729",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지 여부와 관계없이 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-99b184a28bb6c4364827b2f7",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "실험실 기록에 확립된 규격 및 기준 준수를 보장하는 데 필요한 모든 시험, 검사 및 분석에서 도출된 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a9578a53d38ace8478b5729a",
+    "finding_text": "The Quality Unit oversight is deficient.",
+    "finding_text_ko": "품질관리부서 감독이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b66d83f527d69c02b35f966b",
+    "finding_text": "Establ ished test procedures are not followed.",
+    "finding_text_ko": "확립된 시험 절차가 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b8158ba7befcc8da7e22344e",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile did not include adequate validation ofthe aseptic process.",
+    "finding_text_ko": "무균임을 표방하는 완제의약품의 미생물 오염 방지 절차에 무균공정의 적절한 밸리데이션이 포함되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bbb7983dabcbc74b4cc8838c",
+    "finding_text": "Batch production and control records do not include comp lete information relating to the production and control of each batch.",
+    "finding_text_ko": "배치 제조 및 관리 기록에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c94523d1bd442af62af1f067",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1326f8442d22a7b56820e97b",
+    "finding_text": "'ltiH•> The preventive maintenance of the tanks is inadequate.",
+    "finding_text_ko": "탱크의 예방 유지관리가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-89f248d24327c97442d1362d",
+    "finding_text": "Failure to document changes to computerized systems and provide adequate control to prevent omission or alteration of data.",
+    "finding_text_ko": "전산화 시스템의 변경을 문서화하고 데이터 누락 또는 변경을 방지하기 위한 적절한 관리를 제공하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5f146af225a759820c9d4f72",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균임을 표방하는 완제의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7358f494ed7df53b5b12f529",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "완제의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하도록 적절히 설계되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f213251881a7fbaf9375ca48",
+    "finding_text": "Drug products are not stored under appropriate conditions of temperature so that their identity, strength, quality, and purity are not affected.",
+    "finding_text_ko": "완제의약품이 동일성, 함량, 품질 및 순도에 영향을 받지 않도록 적절한 온도 조건에서 보관되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ffaa110963f11c706c467647",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-025f0fbdd9136972c1629fff",
+    "finding_text": "Facilities for the storage ofmaterials under controlled temperature and humidity conditions are not sufficiently monitored to ensure the material characteristics of items stored inside them are maintained.",
+    "finding_text_ko": "온도 및 습도 관리 조건에서 물질을 보관하는 시설이 내부 보관 물품의 물질 특성이 유지되도록 충분히 모니터링되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0b890eb1c1735c9abc94b6bc",
+    "finding_text": "Testing designed to ensure that API specifications for microbiological purity and appropriate action limits for total microbial counts and objectionable organisms are met is not conducted in a way that ensures the validity ofresults.",
+    "finding_text_ko": "총 미생물 수 및 바람직하지 않은 미생물에 대한 원료의약품 미생물 순도 규격 및 적절한 조치 한계를 충족하도록 설계된 시험이 결과의 유효성을 보장하는 방식으로 수행되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0f54a67322d09d1ad4005290",
+    "finding_text": "Audit trail review procedures for production software are general and do not contain instructions soecific to the different softwares to ensure a thorough review ofraw data.",
+    "finding_text_ko": "생산 소프트웨어의 감사추적 검토 절차가 일반적이며 원시 데이터의 철저한 검토를 보장하는 소프트웨어별 지침을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-17081626f46a328671ec26b5",
+    "finding_text": "There have been no procedures established to identify and investigate out oftrend (001) or unexpected results dw-ing stability testing.",
+    "finding_text_ko": "안정성 시험 중 추세이탈(001) 또는 예상치 못한 결과를 식별·조사하는 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2501dd754dae08dd6058265a",
+    "finding_text": "There are multiple deviations (>10) regarding exceeding hold times in drug product manufacturing.",
+    "finding_text_ko": "완제의약품 제조에서 보관시간 초과와 관련된 다수의 일탈(10건 초과)이 있다.",
+    "translation_method": "manual"
+  }
+]

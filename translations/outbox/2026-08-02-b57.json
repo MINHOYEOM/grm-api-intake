@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-cf0687b4efefdf64bb261ec4",
+    "finding_text": "Reports of analysis from component suppliers are accepted in lieu of testing each component for conformity with all appropriate written specifications, without performing at least one specific identity test on each component and establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.",
+    "finding_text_ko": "각 구성품에 대해 최소한 하나의 구체적인 동일성 시험을 수행하지 않고, 적절한 간격으로 공급업체 시험 결과를 적절히 밸리데이션하여 공급업체 분석의 신뢰성을 수립하지 않은 채, 모든 적절한 문서화된 규격 적합 여부를 시험하는 대신 구성품 공급업체의 시험성적서를 수락한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cf49947d1bab5b55196f7d4f",
+    "finding_text": "Laboratory records do not include complete records of the periodic calibration of laboratory instruments.",
+    "finding_text_ko": "시험실 기록에는 시험실 기기의 정기 교정에 대한 완전한 기록이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cf67bfe437d7b47c5c2a8761",
+    "finding_text": "Cerezyme manufacturing process has not been updated to reflect cGMP's.",
+    "finding_text_ko": "Cerezyme 제조 공정이 cGMP를 반영하도록 업데이트되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d0513100ff3ef52edc2f047e",
+    "finding_text": "The Environmental Monitoring (EM) Program does not include the use of microbial growth media that is optimum for the propagation of yeast or mold contaminates.",
+    "finding_text_ko": "환경모니터링(EM) 프로그램에는 효모 또는 곰팡이 오염물의 증식에 최적인 미생물 성장 배지 사용이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d0a4b24fe16e94e5ad98c701",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "완제의약품의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d0b771ec0dbc0e72443a68f3",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each , batch.",
+    "finding_text_ko": "배치 제조 및 관리 기록에는 각 배치의 제조 및 관리와 관련한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d11a85882270b0993e54da32",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질 및 의약품의 특성 변동을 유발할 수 있는 제조 공정의 출력을 모니터링하고 성능을 밸리데이션하는 관리 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d12a7f284a8a313c288ac728",
+    "finding_text": "The Quality Unit lacks the responsibility and authority to review and approve BVL Engineering or ContractorNendor CAD drawings.",
+    "finding_text_ko": "품질부서는 BVL Engineering 또는 Contractor/Vendor CAD 도면을 검토·승인할 책임과 권한이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d161ae04b4ea6b59ece356d2",
+    "finding_text": "Activities and movement with-in the sterile products preparation room is directed by Policy # PP­ 21, Title: Sterile Products Preparation Room.",
+    "finding_text_ko": "무균 제품 조제실 내 활동과 이동은 정책 #PP-21(제목: 무균 제품 조제실)에 의해 지시된다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-723e8bdb9d7f79015415b2c1",
+    "finding_text": "There are a number of non-approved documents or instructions that are used by personnel, for example: a.",
+    "finding_text_ko": "인력이 사용하는 승인되지 않은 문서 또는 지침이 여러 개 있습니다. 예: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-72459c5dbebd2a8ae9898c2d",
+    "finding_text": "Equipment and utensils are not cleaned and sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity ofthe drug product.",
+    "finding_text_ko": "장비 및 기구가 의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 적절한 간격으로 세척·소독되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-72e1b8d6a9644d2d6de92231",
+    "finding_text": "Results of stability testing are not used in determining expiration dates.",
+    "finding_text_ko": "안정성 시험 결과가 유효기간 결정에 사용되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-731107b2a7c7562ae4df95cf",
+    "finding_text": "Compounding sheets are inadequate.",
+    "finding_text_ko": "조제 시트가 부적절합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-743f96e5cba0ed5fb75ee173",
+    "finding_text": "Smoke testing was not performed in conjunction with allowable low and high air velocity range, for the HEPA filter bank.",
+    "finding_text_ko": "HEPA 필터 뱅크에 대해 허용되는 낮은 및 높은 공기 속도 범위와 함께 연기 시험이 수행되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7447ff55d754318d9ed50bfc",
+    "finding_text": "Clothing ofpersonnel engaged in the manufacturing and processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 제조 및 가공에 종사하는 인력의 복장은 수행 업무에 적절하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7464b52b9c8cee2c02574ab1",
+    "finding_text": "Procedures describing the handling of all written and oral complaints regarding a drug product are not followed.",
+    "finding_text_ko": "의약품에 관한 모든 서면 및 구두 불만의 처리를 설명하는 절차가 준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7472219d42315ad41eb71d50",
+    "finding_text": "Utensils used for drug preparation are potentially absorptive or additive such that they may alter the purity, identity, or strength of a drug product.",
+    "finding_text_ko": "의약품 조제에 사용되는 기구는 흡착성 또는 첨가성일 가능성이 있어 의약품의 순도, 동일성 또는 함량을 변경할 수 있습니다.",
+    "translation_method": "manual"
+  }
+]

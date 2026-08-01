@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-90124eb23d23e3012d8c4de6",
+    "finding_text": "We observed various mobile carts that are used to transfer material or equipment into the Class 10,000 manufacturing fill rooms with what appears to be rust-like, non-smooth, uncleanable surfaces on the wheel supports.",
+    "finding_text_ko": "Class 10,000 제조 충전실로 자재 또는 장비를 운반하는 데 사용되는 여러 이동식 카트에서 바퀴 지지대에 녹과 같은 것으로 보이는 매끄럽지 않고 세척할 수 없는 표면이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-90144d2c9d41cef91b33eca8",
+    "finding_text": "Variance investigation 20000482 conducted during the qualification ofPotassium Chloride manufactured byMEBs not adequate.",
+    "finding_text_ko": "MEB에서 제조한 염화칼륨의 적격성평가 중 수행된 변동 조사 20000482가 적절하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-903f879bb7866c930c652f24",
+    "finding_text": "After 2/03, the firm did not conduct testing for potency of any compounded drug products.",
+    "finding_text_ko": "2003년 2월 이후 해당 업체는 조제 의약품의 함량에 대한 시험을 수행하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9088d432ec2f8f7f3acc8ae9",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-90a5c0c4c8b3148e1ed02527",
+    "finding_text": "Stocks of finished product labeling were observed stored in the general quarantine warehouse, rather than being held within a restricted access area.",
+    "finding_text_ko": "완제품 라벨 재고가 제한 접근 구역에 보관되지 않고 일반 격리 창고에 보관된 것이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-911e126783b5755cfd61f8b3",
+    "finding_text": "Equipment for adequate control over air pressure is not provided when appropriate for the manufacture, processing, packing or holding ofa drug product.",
+    "finding_text_ko": "완제의약품의 제조·가공·포장 또는 보관에 적절한 경우, 공기 압력을 충분히 제어하기 위한 설비가 제공되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-91a5d693b6ac6ddca0849488",
+    "finding_text": "You did not adequately investigate a complaint that affected product quality and did not extend the investigation to other lots that may have been associated with the complaint.",
+    "finding_text_ko": "제품 품질에 영향을 미친 불만을 충분히 조사하지 않았고, 해당 불만과 연관되었을 수 있는 다른 로트까지 조사를 확대하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-91e38bd31ba3aaaf4d18cc40",
+    "finding_text": "Batch production and control records are not prepared for each batch ofdrug product produced and do not include compiete | information relating to the production and control ofeach batch.",
+    "finding_text_ko": "각 의약품 배치에 대한 배치 제조 및 관리 기록이 작성되지 않으며, 각 배치의 제조 및 관리와 관련한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-926d43c57292ec032c39f6c5",
+    "finding_text": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균 및 무발열성임을 표방하는 각 완제의약품 배치는 그러한 요건 적합 여부를 확인하기 위한 시험실 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-927aa69de83c5e478ef8d082",
+    "finding_text": "The procedure \"Quality Control of Microbiological Media\" SOP QC-0201, version 5.0 is used for growth promotion of redacted (b)(4) used in the environmental moni toring program.",
+    "finding_text_ko": "환경모니터링 프로그램에 사용되는 redacted (b)(4)의 성장촉진시험을 위해 절차서 “미생물 배지 품질관리” SOP QC-0201, 버전 5.0을 사용한다.",
+    "translation_method": "manual"
+  }
+]

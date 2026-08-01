@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-c9655642bca097f936905ab6",
+    "finding_text": "Personnel donned gowning apparel improperly, in a way that may have caused the gowning apparel to become contaminated.",
+    "finding_text_ko": "작업자가 가운 착용복을 부적절하게 착용하여 가운 착용복이 오염되었을 수 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c96f1af0a7168c411aa7f024",
+    "finding_text": "Gowning practices in the Nuclear Pharmacy are inappropriate for the aseptic processing ofradiopharmaceuticals intended to be sterile.",
+    "finding_text_ko": "Nuclear Pharmacy의 가운 착용 관행은 무균이어야 하는 방사성의약품의 무균공정에 부적절하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ca2e0e448864c6d3fb7929c4",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a) (10)(A).",
+    "finding_text_ko": "귀사의 외주 조제 시설 의약품 라벨에는 503B(a)(10)(A)조에서 요구하는 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ca3059b2bf26740e4b1e1527",
+    "finding_text": "Each batch ofdrug product purporting to-be sterile is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균임을 표방하는 각 의약품 배치는 그러한 요건 적합 여부를 확인하기 위한 시험실 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ca39ac38991ab84d8ddc4c6a",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 제어하는 데 사용되는 설비의 유지관리를 위한 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ca4df726ffb6c5ca312fcc53",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile do not include adequate validation ofthe sterilization process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 멸균 공정의 충분한 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ca5801213feced9c45aab4e6",
+    "finding_text": "After closure of the system problem #511 and without BHQ taking any system-wide corrective action allegations of significant record keeping irregularities continued to be received.",
+    "finding_text_ko": "시스템 문제 #511이 종결된 후 BHQ가 시스템 전반의 시정조치를 취하지 않았음에도 중대한 기록관리 부정행위 혐의가 계속 접수되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-cb50dc12aae6da833b49b8b5",
+    "finding_text": "On at least one occasion, a lot number (Lot 02 01 2002@027) was generated in the firm's computerized record keeping system, for which no associated records could be retrieved.",
+    "finding_text_ko": "최소 한 차례, 해당 업체의 전산 기록관리 시스템에서 연관 기록을 검색할 수 없는 로트 번호(Lot 02 01 2002@027)가 생성되었다.",
+    "translation_method": "manual"
+  }
+]

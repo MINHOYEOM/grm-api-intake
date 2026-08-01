@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-1997131b60d8b55dc4b7bb2b",
+    "finding_text": "Random platelet pools with positive bottle alarms are not always managed within a timely manner and accord ing to the appropriate standard operating procedur es.",
+    "finding_text_ko": "양성 병 경보가 발생한 무작위 혈소판 풀은 항상 적시에 적절한 표준작업절차에 따라 처리되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-19b1ff46340e6929d638cca6",
+    "finding_text": "You have not developed validation/qualification master plans encompassing process, cleaning, computer and analytical method validation as directed by the Corporate Quality Assurance Guideline titled Master Plans for Validation/ Qualification issued 10/12/1999.",
+    "finding_text_ko": "귀사는 1999-10-12 발행된 Corporate Quality Assurance Guideline “Master Plans for Validation/Qualification”에서 지시한 공정, 세척, 컴퓨터 및 분석 방법 밸리데이션을 포괄하는 밸리데이션/적격성평가 마스터 플랜을 개발하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1a123c52af0544847ea55858",
+    "finding_text": "During this inspection, another System Problem #646 was opened following the second occurrence Deviation #2002-002-001618) of the distribution of a component whose CMV status had been incorrectly labeled.",
+    "finding_text_ko": "이번 조사 중 CMV 상태가 잘못 표시된 구성품 유통의 두 번째 일탈 #2002-002-001618 발생 후 또 다른 시스템 문제 #646이 개설되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1a9a5c2c0525bff82e514bf6",
+    "finding_text": "Finished product sterility testing results were not recorded for the following dispensed radiopharmaceutical batches: A.",
+    "finding_text_ko": "다음 조제된 방사성의약품 배치에 대한 완제품 무균 시험 결과가 기록되지 않았다. A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1aa0b1c19ac7c1274534a3d0",
+    "finding_text": "Quality Assurance oversight ofcontrol processes is insufficient: • Cerezyme release specifications for drug substance and drug product do not reflect manufacturing history and process capability.",
+    "finding_text_ko": "품질보증의 관리 공정 감독이 불충분하다. • 원료의약품 및 완제의약품에 대한 Cerezyme 출하 규격이 제조 이력과 공정 능력을 반영하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1ad24d982f7cb18090f8be65",
+    "finding_text": "Process deviations were not recorded in a separate file or log that details both the deviation and the actions taken.",
+    "finding_text_ko": "공정 일탈 및 취한 조치를 모두 상세히 기술하는 별도 파일 또는 로그에 공정 일탈이 기록되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1afa92fb3ac84f60ff7b29d1",
+    "finding_text": "Employees are not given training in the particular operations they perform as part of their function.",
+    "finding_text_ko": "직원에게 담당 기능의 일부로 수행하는 특정 작업에 관한 교육이 제공되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1b3b12f82897446165e62a79",
+    "finding_text": "Media fills were not performed that closely simulate aseptic production operations incorporating, as appropriate, worst-case activities and conditions that provide a challenge to aseptic operations.",
+    "finding_text_ko": "무균 작업에 도전이 되는 최악 조건의 활동 및 조건을 적절히 포함하여 무균 생산 작업을 면밀히 모사하는 미디어필이 수행되지 않았다.",
+    "translation_method": "manual"
+  }
+]

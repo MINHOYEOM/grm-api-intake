@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-a3abb19d1396d7e2ac145f0d",
+    "finding_text": "The quality control unit lacks the responsibility and authority to reject all drug products.",
+    "finding_text_ko": "품질관리부서에 모든 의약품을 거부할 책임과 권한이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a490a6f577c941520e49a847",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 샘플링 계획과 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a553dd4b83a1071feceb73f6",
+    "finding_text": "Redacted (b)(4 ) addresses the performance of EC s as a measur e of corrective action effectiveness, provides guidelines as to the required frequency of ECs, in cluding sustained cor rective actions, and provides for establishment of due dates for ECs.",
+    "finding_text_ko": "삭제된 (b)(4) 문서는 시정조치 효과성의 척도로서 EC 수행을 다루고, 지속적 시정조치를 포함한 EC의 요구 빈도에 관한 지침을 제공하며, EC의 기한 설정을 규정한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a5936c7d54ad4d6a22d28bf3",
+    "finding_text": "Written reports of investigations of adverse reactions, including conclusions and follow up, are not prepared and maintai ned.",
+    "finding_text_ko": "결론과 후속조치를 포함한 이상반응 조사에 관한 서면 보고서가 작성·유지되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a5954a5c27b515391ad71298",
+    "finding_text": "ARC has identified trends related to DRIRs beginning in 6/09, but has failed to promptly and thoroughly correct and prevent recurrence ofDRIR documentation problems.",
+    "finding_text_ko": "ARC는 2009년 6월부터 DRIR 관련 경향을 파악했으나, DRIR 문서화 문제를 신속하고 철저하게 시정하고 재발을 방지하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ac85a16740dfbf949699f9ae",
+    "finding_text": "Media fills were not performed that closely simulate aseptic production operations incorporating, as appropriate, worst-case activities and conditions that provide a challenge to aseptic operations.",
+    "finding_text_ko": "무균 작업에 도전이 되는 최악 조건의 활동과 조건을 적절히 포함하여 무균 생산 작업을 밀접하게 모사하는 미디어필 시험이 수행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ad48dc490dc10885ccf5155e",
+    "finding_text": "The cleaning, disinfecting and upkeep of the equipment used to produce and prepare sterile drug products are inadequate.",
+    "finding_text_ko": "무균 의약품을 생산 및 조제하는 데 사용되는 장비의 세척, 소독 및 유지관리가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-adcfb463f227a1bc0d61c838",
+    "finding_text": "Buildings used in the manufacture, processing, packing, or holding of a drug product do not have the suitable construction to facilitate cleaning, maintenance, and proper operations.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 건물은 세척, 유지관리 및 적절한 작업을 용이하게 하는 적합한 구조를 갖추지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ae111fb8eeab1dc9ddcdb451",
+    "finding_text": "Your firm has not established adequate written S tandard Operating Procedures to ensure proper maintenance of aseptic processing areas and equipment used in those areas.",
+    "finding_text_ko": "귀사는 무균공정 구역과 그 구역에서 사용하는 장비의 적절한 유지관리를 보장하기 위한 충분한 서면 표준작업절차서를 수립하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ae5cc4d2a7d2a6de30ce9e1f",
+    "finding_text": "There is no established written procedure to describe the set-up of the capper.",
+    "finding_text_ko": "캡퍼의 설정 방법을 설명하는 확립된 서면 절차가 없다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-c3cde46bf3b71c9a44bf7459",
+    "finding_text": "There are no written procedures for production arid process controls designed to assure that the drug products have the , i identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시하는 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c441382124aea83d918c1595",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 작업자의 복장이 수행 업무에 적절하지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c451512030eb2307cbf6799c",
+    "finding_text": "The 1999 and 2000 HEPA filter integrity tests for the Isolators document that there a were “no leaks detected”.",
+    "finding_text_ko": "Isolator에 대한 1999년 및 2000년 HEPA 필터 무결성 시험은 “누출이 발견되지 않았다”고 문서화하고 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c460c66f408889983840b273",
+    "finding_text": "The ftrrn has not demonstrated that product container/closure systems are suitable to protect the dosage form throughout its shelflife.",
+    "finding_text_ko": "해당 업체는 제품 용기·마개 시스템이 사용기한 동안 제형을 보호하는 데 적합함을 입증하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c4fce1c28bd1b72524c6408a",
+    "finding_text": "Aseptic processing areas arc deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 실내 및 설비 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c5ca711639c954ec13f74d84",
+    "finding_text": "Your firm does not test finished drug products for preservative content/anti-microbial effectiveness of REDACTION (b)(4)",
+    "finding_text_ko": "귀사는 완제의약품에 대해 REDACTION (b)(4)의 보존제 함량/항미생물 유효성을 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c5feff0287e966f16dd0258b",
+    "finding_text": "Equipment and utensils are not cleaned at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 장비와 기구를 적절한 간격으로 세척하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c615c8ed16e812bbac632624",
+    "finding_text": "Sampling ofthe reaction mixture during does not follow an appropriate procedure to prevent introductionof objectionable chemicals and microorganisms.",
+    "finding_text_ko": "반응 혼합물의 검체 채취는 바람직하지 않은 화학물질 및 미생물의 유입을 방지하기 위한 적절한 절차를 따르지 않는다.",
+    "translation_method": "manual"
+  }
+]

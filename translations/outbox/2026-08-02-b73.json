@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-f1b7bdff525afdf44801f4b2",
+    "finding_text": "The sterile technique qualification (media fills) do not represent your routine operating conditions and does not evaluate worst-case activities that can provide a challenge to manual aseptic operations.",
+    "finding_text_ko": "무균기술 적격성 평가(미디어필)는 일상 작업 조건을 대표하지 않으며 수동 무균 작업에 도전이 될 수 있는 최악 조건의 활동을 평가하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f1fdd3cd4922a61826a785ab",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate sampling plans and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 샘플링 계획과 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f205badc2072902d738c650f",
+    "finding_text": "Routine calibration of equipment is not performed according to a written program designed to assure proper performance.",
+    "finding_text_ko": "적절한 성능을 보장하도록 설계된 서면 프로그램에 따라 장비의 정기 교정이 수행되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f223045bf4406de5b06e1f07",
+    "finding_text": "No finished product endotoxin testing results were recorded for the following dispensed radiopharmaceutical batches: A.",
+    "finding_text_ko": "다음 조제된 방사성의약품 배치에 대해 완제품 엔도톡신 시험 결과가 기록되지 않았다: A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f79dedab666111bbb4e25f71",
+    "finding_text": "The firm's use ofrepetitive cycles ofsubmissions and rejections ofCorrective Action Plans and the use oftime extensions without limits is suspending the 30 day time frame to provide timely corrective actions.",
+    "finding_text_ko": "회사가 시정조치 계획의 제출과 거부를 반복하고 제한 없는 기한 연장을 사용하는 것은 적시 시정조치를 위한 30일 기한을 중단시키고 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f870df0b0ac045e10e64b44b",
+    "finding_text": "Biological indicators are not used to verify the adequacy of the sterilization cycle of <Redacted B4> to sterilize your firm's glassware used in sterile operations.",
+    "finding_text_ko": "무균 작업에 사용되는 귀사 유리기구를 멸균하기 위한 삭제된 B4의 멸균 주기가 적절한지 확인하는 데 생물학적 지시제가 사용되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f96ead3b5899fc0696869735",
+    "finding_text": "Written records of investigations into unexplained discrepancies do not always include the conclusions and follow-up.",
+    "finding_text_ko": "설명할 수 없는 불일치에 대한 조사 서면 기록에 결론과 후속조치가 항상 포함되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f973e008e641a050a3db8d85",
+    "finding_text": "Analysis performed in order to accept Potassium Chloride active pharmaceutical ingredient are performed on a sample your receive from your supplier and not the actual Potassium Chloride, USP received.",
+    "finding_text_ko": "염화칼륨 원료의약품을 승인하기 위해 수행하는 분석은 실제 입고된 USP 염화칼륨이 아니라 공급업체로부터 받은 검체에 대해 수행된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fa25728a25d76400ce0e51cc",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-fa56e8dd4b34791beb2eafa5",
+    "finding_text": "ARC has identified trends related to management of confmnatory test results and DDR entry, but has failed to tpromptly and thoroughly investigate, correct, and prevent the problems.",
+    "finding_text_ko": "ARC는 확진 시험 결과 관리 및 DDR 입력과 관련된 경향을 파악했으나, 문제를 신속하고 철저하게 조사·시정하고 예방하지 못했다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-e6500df59d1aa078b21849ea",
+    "finding_text": "BHQ has failed to implement adequate labeling procedures to prevent mix ups such as discrepant blood pes, reported and determined to be caused by test tube mix up at collection; two different blood donor records with the same whole blood number; the whole blood number on primary bags not matching the whole blood number on the satellite bags and the mix during the sterile docking procedure of filters used for the leukoreduction ofblood components, During he previous inspection ofBHQ in April 2000, system problem # 419 was reviewed.",
+    "finding_text_ko": "BHQ는 채혈 시 시험관 혼입으로 발생한 것으로 보고·확인된 상이한 혈액형, 동일한 전혈 번호를 가진 서로 다른 두 공여자 기록, 1차 백의 전혈 번호와 위성 백의 전혈 번호 불일치, 혈액 구성품 백혈구감소에 사용되는 필터의 무균 접속 절차 중 혼입과 같은 문제를 방지할 충분한 라벨링 절차를 이행하지 못했다. 2000년 4월 BHQ의 이전 점검에서는 시스템 문제 #419가 검토되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e650d55dc571c33aa1e0ec3c",
+    "finding_text": "Batch manufacturing instructions for active coated stock pellets are for the most part poorly defined and/or non-specific.",
+    "finding_text_ko": "유효 코팅 스톡 펠릿의 배치 제조 지침은 대부분 잘 정의되어 있지 않거나 비구체적이다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e69a47a4d1047bc74e803d65",
+    "finding_text": "Drug products pur porting to be sterile are not tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균임을 표방하는 의약품은 그러한 요건 적합 여부를 확인하기 위한 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e6dc6ef0157f7e65545fa653",
+    "finding_text": "You changed your manufacturing process for sterile products by including a re-filtration process of different products when the filters used in the aseptic filtration failed to meet the filter integrity test.",
+    "finding_text_ko": "무균 여과에 사용된 필터가 필터 무결성 시험을 충족하지 못했을 때, 다른 제품에 대한 재여과 공정을 포함하도록 무균 제품 제조 공정을 변경했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e732a8bad64d1323fe875b0f",
+    "finding_text": "Control procedures are not established which validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질 및 의약품의 특성 변동을 유발할 수 있는 제조 공정의 성능을 밸리데이션하는 관리 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e7d3613bba4bcbbdee707bb1",
+    "finding_text": "Per 14.3.081 (Reviewing Registered Donations), the registration reviewers are required to review the \"Before Images Created During Registration Report\" to assure that former n ames listed on the BDR were created during registration.",
+    "finding_text_ko": "14.3.081(등록 기증 검토)에 따라 등록 검토자는 BDR에 기재된 이전 이름이 등록 중 생성되었는지 확인하기 위해 “등록 중 생성된 이전 이미지 보고서”를 검토해야 한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e8404be7ce364f4cc42fc773",
+    "finding_text": "On l 0/17I17, an operator engaged in aseptic processing was observed with his upper torso inside the ISO 5 area with partially exposed skin while wearing a non-sterile mask, goggles, and hairnet.",
+    "finding_text_ko": "2017년 10월 17일 무균공정 작업자가 비멸균 마스크, 고글 및 헤어넷을 착용한 채 피부 일부가 노출된 상태로 상체를 ISO 5 구역 안에 넣고 있는 것이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e88cb3919fbaa6fa55bd199a",
+    "finding_text": "Your hand washing facility does not dispense water at a suitable temperature.",
+    "finding_text_ko": "귀사의 손 씻기 시설은 적절한 온도의 물을 공급하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e8915856c7c9bee4ad5755ef",
+    "finding_text": "Disinfecting agents and wipes used in the ISO Saseptic processing area are not sterile.",
+    "finding_text_ko": "ISO 5 무균공정 구역에서 사용되는 소독제와 와이프가 멸균되어 있지 않다.",
+    "translation_method": "manual"
+  }
+]

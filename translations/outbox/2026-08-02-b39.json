@@ -1,0 +1,44 @@
+[
+  {
+    "finding_id": "finding-81b267fb081233f450bd5c0e",
+    "finding_text": "There is a failure to thoroughly investigate any unexplained discrepancy or failure of a batch, regardless of whether the batch has been distributed, or a failure to expand an investigation to assess other batches that may also be impacted.",
+    "finding_text_ko": "배치가 유통되었는지와 관계없이 설명할 수 없는 불일치 또는 배치 실패를 철저히 조사하지 못했거나, 영향을 받을 수 있는 다른 배치를 평가하도록 조사를 확대하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8238342286d1fb1d4f789038",
+    "finding_text": "BHQhad to install a software fix to address the problem that was occurring when the NDDR hits were not appearing on thesRiigiaieapremnnat queries.",
+    "finding_text_ko": "NDDR 조회 결과가 thesRiigiaieapremnnat 쿼리에 나타나지 않을 때 발생한 문제를 해결하기 위해 BHQ는 소프트웨어 수정본을 설치해야 했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-82f68c9d679154569962b574",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "무균 공정 구역은 양압 하에서 고효율 미립자 공기(HEPA) 필터를 통해 여과되는 공기 공급과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-83013eb5d82edca7d1540f9c",
+    "finding_text": "SOP MFG-031.01 \"Cleaning Procedure for Vial Production Areas\" does not contain sufficient detail e xplaining how filling equipment is to be cleaned.",
+    "finding_text_ko": "SOP MFG-031.01 “Cleaning Procedure for Vial Production Areas”에는 충전 장비를 세척하는 방법을 설명하는 충분한 세부사항이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-84a9fc09fa8ebc4c195eec95",
+    "finding_text": "Equipment and utensils are not maintained at appropriate intervals to prevent contamination that would alter the safery, identity, strength, quality or purity ofthe drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 장비와 기구가 적절한 간격으로 유지관리되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-84c3391d9dae50de85706bec",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치 및 배치 또는 그 구성품이 규격을 충족하지 못한 경우를 철저히 검토하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-85264b63ce5fb1267ff784c8",
+    "finding_text": "A review of Biological Product Deviations (those deviations which are filed with the FDA because nsuitable blood products were released) for the period 12/30/01 through 6/1/02 identified approximately 35 occurrences fin which blood products were released.",
+    "finding_text_ko": "2001년 12월 30일부터 2002년 6월 1일까지 기간의 Biological Product Deviation(부적합 혈액 제품이 출하되어 FDA에 보고되는 일탈)을 검토한 결과 혈액 제품이 출하된 사례가 약 35건 확인되었습니다.",
+    "translation_method": "manual"
+  }
+]

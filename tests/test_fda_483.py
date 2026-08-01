@@ -2258,3 +2258,43 @@ class Fda483ParenNumberingTest(unittest.TestCase):
                 "Specifically, batch records were incomplete.")
         rows = self._obs(text)
         self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+
+# ── [렌더 DPI 실행별 조절 2026-08-02] ─────────────────────────────────────────
+class Fda483OcrDpiKnobTest(unittest.TestCase):
+    """잔여 회수 대상 52건의 PDF 를 직접 열어 본 결과 **원본 스캔이 대부분 ~163dpi** 였다
+    (2026-08-01 실측: 10건 중 7건). 현재 코드는 300dpi 로 렌더해 OCR 하는데, 저해상도
+    원본에서는 렌더를 키워 글리프를 크게 하는 것이 인식률에 도움이 되는 경우가 있다.
+    1회성 회수 워크플로가 실행별로 시험할 수 있도록 env 로 뺀다.
+
+    ★기본값 300 은 그대로다 — 일상 수집 경로는 무영향이어야 한다."""
+
+    def test_default_is_unchanged(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("FDA483_OCR_DPI", None)
+            self.assertEqual(f._env_int("FDA483_OCR_DPI", 300), 300)
+
+    def test_env_overrides_within_bounds(self):
+        with patch.dict(os.environ, {"FDA483_OCR_DPI": "400"}):
+            self.assertEqual(min(max(f._env_int("FDA483_OCR_DPI", 300), 72), 600), 400)
+
+    def test_clamped_both_ends(self):
+        """업스케일은 정보를 늘리지 않는다 — 무한정 올리면 렌더 시간만 늘어난다."""
+        with patch.dict(os.environ, {"FDA483_OCR_DPI": "5000"}):
+            self.assertEqual(min(max(f._env_int("FDA483_OCR_DPI", 300), 72), 600), 600)
+        with patch.dict(os.environ, {"FDA483_OCR_DPI": "10"}):
+            self.assertEqual(min(max(f._env_int("FDA483_OCR_DPI", 300), 72), 600), 72)
+
+    def test_ocr_call_uses_the_constant(self):
+        src = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                "collect_fda_483.py"), encoding="utf-8").read()
+        self.assertIn("dpi=FDA483_OCR_DPI", src)
+        self.assertIn('FDA483_OCR_DPI = min(max(_env_int("FDA483_OCR_DPI", 300), 72), 600)', src)
+
+    def test_workflow_exposes_dpi_input(self):
+        wf = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                          ".github", "workflows", "grm-fda483-ocr-recovery.yml")
+        src = open(wf, encoding="utf-8").read()
+        self.assertIn("ocr_dpi:", src)
+        self.assertIn("FDA483_OCR_DPI: ${{ inputs.ocr_dpi }}", src)
+        self.assertIn("default: '300'", src)

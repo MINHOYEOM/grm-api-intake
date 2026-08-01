@@ -231,7 +231,28 @@ _WE_OBSERVED_RE = re.compile(r"\b(?:I\s*/\s*)?WE\s+OBSERVED\b", re.I)
 #   · `WE OBSERVED` 마커가 관찰 표제 **뒤**에 있어, 그 지점에서 자르면 관찰을 통째로 버린다.
 # 셋 다 정상 경로를 건드리지 않는다 — `_extract_483_observations_from_text` 가 기존 경로로
 # 1건이라도 얻으면 그 결과를 그대로 반환하고 회수 경로에는 진입조차 하지 않는다.
-_OBS_LOOSE_RE = re.compile(r"\bO\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\s?O\s?N\s*[.:\-]?\s*(\d{1,2})\b", re.I)
+_OBS_LOOSE_RE = re.compile(
+    # 번호 앞 구분자에 `#` 를 포함한다 — 스캔 483 실측(2026-08-01, 회수 실패 171건 중 42건)이
+    # `OBSERVATION #1` · `Observation #1:` 형태였고, 공백만 허용하는 `_OBS_RE` 가 전부 놓쳤다.
+    r"\bO\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\s?O\s?N\s*[#.:\-]?\s*(\d{1,2})\b", re.I)
+
+# [OCR 마커 변형 2026-08-01] 회수 경로 전용 "관찰 목록 시작" 마커.
+# ★`_WE_OBSERVED_RE`(정상 경로·`_is_notice_only` 공용)는 **건드리지 않는다** — 그걸 넓히면
+#   오늘 정상 파싱되는 문서의 컷 위치가 달라져 회귀 위험이 생긴다. 회수 경로에만 쓰는 별도
+#   패턴을 둔다(품질 게이트·느슨한 앵커와 같은 격리 원칙).
+# 실측 근거(회수 실패 171건, excerpt 기준): `(I) (WE) OBSERVED` 93건 · `| OBSERVED` 19건
+#   (OCR 이 대문자 I 를 `|` 로 읽는다) · 평문 `WE OBSERVED` 15건. 즉 112건이 마커를 못 읽어
+#   번호목록 폴백이 아예 켜지지 않았다 — 이 저장소에서 가장 큰 단일 결손 원인이었다.
+# 괄호 안 대명사는 `(I)`·`(i)`·`(1)`·`(|)`·`(l)` 로 다양하게 깨진다.
+_PRONOUN = r"[Ii1l|]"
+_OBS_MARKER_RECOVERY_RE = re.compile(
+    r"\(\s*" + _PRONOUN + r"\s*\)\s*\(\s*WE\s*\)\s*OBSERVED"      # (I) (WE) OBSERVED
+    r"|" + _PRONOUN + r"\s*/\s*WE\s+OBSERVED"                       # I/WE OBSERVED
+    r"|\bWE\s+OBSERVED\b"                                            # WE OBSERVED
+    r"|(?:^|[\s:])" + _PRONOUN + r"\s+OBSERVED\s*[:.]"              # I OBSERVED: · | OBSERVED:
+    r"|\bOBSERVED\s*:\s*(?=\S)",                                     # …OBSERVED: (최후 폴백)
+    re.I,
+)
 # 번호 목록 앵커 — 문장/줄 경계 뒤 "N. " + 대문자(따옴표 포함). WL 파서의
 # `_WL_NUMBERED_ITEM_RE` 와 같은 경계 요구다(조항번호 소수점 뒷자리 오탐 방지).
 _NUMBERED_OBS_RE = re.compile(r"(?:^|(?<=[.)\:])\s|\n)\s*(\d{1,2})\.\s+(?=[A-Z\"“])")
@@ -1524,17 +1545,20 @@ def _recover_483_observations(
             if found:
                 return found
 
-    scoped = _cut_at_annotations(
-        body[we_observed.end():] if we_observed is not None else body)
+    # [OCR 마커 변형] 정상 경로 마커(`_WE_OBSERVED_RE`)가 못 잡은 문서라도 회수 경로에서는
+    # 더 넓은 패턴으로 다시 찾는다 — `(I) (WE) OBSERVED` · `| OBSERVED:` 등. 실측상 회수
+    # 실패의 최대 원인이었고, 이게 안 잡히면 아래 ③ 번호목록 폴백이 아예 켜지지 않는다.
+    marker = we_observed or _OBS_MARKER_RECOVERY_RE.search(body)
+    scoped = _cut_at_annotations(body[marker.end():] if marker is not None else body)
 
-    # ② 느슨한 앵커(OCR 공백). 정상 앵커가 이미 0건인 문서에서만 여기 온다.
+    # ② 느슨한 앵커(OCR 공백·`OBSERVATION #1`). 정상 앵커가 0건인 문서에서만 여기 온다.
     found = _observations_from_anchors(
         scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate)
     if found:
         return found
 
-    # ③ 번호 목록 — 마커가 있는 문서로 한정.
-    if we_observed is None:
+    # ③ 번호 목록 — 마커가 있는 문서로 한정(없으면 목차·별첨까지 관찰이 된다).
+    if marker is None:
         return []
     return _observations_from_anchors(
         scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)

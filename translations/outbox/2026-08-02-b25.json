@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-480ca45da1196347b8b16dd8",
+    "finding_text": "Failures and deviations associated with process validation batches are not documented and investigated by Quality Assurance.",
+    "finding_text_ko": "공정 밸리데이션 배치와 관련된 실패 및 일탈이 품질보증 부서에 의해 문서화·조사되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-481a686ee74da809794ba247",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-48b81c0bc1acfd562cdb2835",
+    "finding_text": "The firm manufactures admixtures from commercially available finished products.",
+    "finding_text_ko": "회사는 상업적으로 이용 가능한 완제품으로부터 혼합 조제품을 제조합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-49b75e22a978798b1c04086e",
+    "finding_text": "There ar e no writ ten procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시한 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 대한 서면 절차가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4a4b92ce860b91b93c15c8a1",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate specifications designed to assure that components conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에는 구성품이 적절한 동일성, 함량, 품질 및 순도 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격의 설정이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4a4fcf9f1cde9bcd669743ca",
+    "finding_text": "Media fill procedures are inadequate or not always followed.",
+    "finding_text_ko": "미디어 필 절차가 부적절하거나 항상 준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ad16ccb1b3ae9cdafbe9e94",
+    "finding_text": "During FDA's review of the Hotline records documenting investigation of employee problem reports, they were found to be incomplete, inadequate or lack complete corrective action.",
+    "finding_text_ko": "직원 문제 보고 조사를 기록한 Hotline 기록에 대한 FDA 검토 중, 해당 기록은 불완전하거나 부적절했거나 완전한 시정조치가 없는 것으로 확인되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ae4d9e7f0f8945d22d623e2",
+    "finding_text": "As of June 18, 2008, there was no written documentation to support that nursing employees redacted (b)( 4) and redacted (b)(4) received training on Performing the Phys ical Exam for redacted (b)(4) Al logeneic/Directed and Autologous Apheresis Double Red Cell Donors prior to transferring from apheresis collections to whole blood collections in September 2007.",
+    "finding_text_ko": "2008년 6월 18일 현재, 간호 직원 redacted (b)(4) 및 redacted (b)(4)가 2007년 9월 성분채혈에서 전혈 채혈로 전환되기 전에 redacted (b)(4) 동종/지정 및 자가 성분채혈 이중 적혈구 공여자의 신체검사 수행에 관한 교육을 받았음을 뒷받침하는 서면 문서가 없었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4b36057000edba3474d78861",
+    "finding_text": "Testing and release ofdrug product for distribution do not include appropriate laboratory determination ofsatisfactory conformance to the final specifications and identity and strength ofeach active ingredient prior to release.",
+    "finding_text_ko": "유통을 위한 의약품 시험 및 출하에는 출하 전 최종 규격과 각 유효성분의 동일성 및 함량에 만족스럽게 적합한지에 대한 적절한 실험실 판정이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4b511bf6c9a0760c2618ad43",
+    "finding_text": "Equipment used in the manufacture (b) (4) ofAPI intennediates is not ofappropriate design and has not been qualified to ensure it does not alter the quality ofthe intennediate or API.",
+    "finding_text_ko": "API 중간체 제조(b)(4)에 사용되는 장비는 적절히 설계되지 않았으며 중간체 또는 API 품질을 변경하지 않도록 적격성 평가되지 않았습니다.",
+    "translation_method": "manual"
+  }
+]

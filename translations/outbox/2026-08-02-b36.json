@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-771036203775ab6b90cbc9ba",
+    "finding_text": "Written procedures are not established for the cleaning and maintenance ofequipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 장비의 세척 및 유지관리에 대한 서면 절차가 수립되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-773da11880f4f0454840e9d9",
+    "finding_text": "The Air Handling Unit(AHU) As-Build drawings document specific pre-filter forthe =| air tbat supplies the various xooms and ultimately theHEPA filters.",
+    "finding_text_ko": "Air Handling Unit(AHU) 준공도면은 여러 실과 궁극적으로 HEPA 필터에 공급되는 공기에 대한 특정 프리필터를 문서화합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-78339fcf2c64001cccc84f91",
+    "finding_text": "For the preparation of sterile drug products distributed by your firm (such as those intended for injection), there is no adequate documentation available to verify that they meet set standards (such as specifications and/or USP limits if applicable) at the time they are distributed or for the shelf life (expiration dating period) of these products.",
+    "finding_text_ko": "귀사가 유통하는 무균 의약품(예: 주사용)의 조제에 대해, 유통 시점 또는 제품의 보관수명(유효기간) 동안 설정된 기준(해당 시 규격 및/또는 USP 한도)을 충족함을 검증할 적절한 문서가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7896628416b043f8aac44ef9",
+    "finding_text": "Documentation was not provided to demonstrate that your firm has conducted <Redacted b4> after compounding of sterile preparations has been performed.",
+    "finding_text_ko": "무균 조제품 조제 후 <Redacted b4>를 수행했음을 입증하는 문서가 제공되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-78d77910c20e089af3321e8e",
+    "finding_text": "No limits have been established for the amount of time allergenic extracts may be exposed to ambient temperature during filling, inspection, labeling and packaging, packing for shipping.",
+    "finding_text_ko": "알레르겐 추출물이 충전, 검사, 라벨링, 포장 및 운송 포장 중 실온에 노출될 수 있는 시간에 대한 한도가 설정되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7960fa7a8e61641e81ffb70f",
+    "finding_text": "Personnel were observed conducting aseptic manipulations that blocked the movement of first pass air around an open unit, whether before or after it is filled with sterile product.",
+    "finding_text_ko": "무균 제품 충전 전후 개방된 단위 주변의 초도 공기 흐름을 차단하는 무균 조작을 인력이 수행하는 것이 관찰되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-79a03184d72bcefc0c7eb4cf",
+    "finding_text": "On 3/13/01, BHQ implemented BSL 01-044 entitled “Update #2: Follow-Up Actions Required for Releasing Donor identification Holds” to provide additional information on releasing donor identification holds and instructions for performing the monthly reviews.",
+    "finding_text_ko": "BHQ는 2001년 3월 13일 공여자 식별 보류 해제에 관한 추가 정보 및 월간 검토 수행 지침을 제공하기 위해 “Update #2: Follow-Up Actions Required for Releasing Donor Identification Holds”라는 제목의 BSL 01-044를 시행했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-79b4b0ee219581683ccbb320",
+    "finding_text": "A pilot program was approved in two regions on 7/30/2001 to study the effect of performing BDR review prior to blood collection.",
+    "finding_text_ko": "혈액 채취 전에 BDR 검토를 수행하는 효과를 연구하기 위한 파일럿 프로그램이 2001년 7월 30일 두 지역에서 승인되었습니다.",
+    "translation_method": "manual"
+  }
+]

@@ -87,6 +87,12 @@ _BROAD_FAILURE_RATIO = 0.5
 # 정합성은 tests 가 두 값이 같음을 고정한다.
 OCR_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
 
+# 선택 모드. 기본은 종전 그대로(엔진 부재로 본문을 못 받은 행) — 새 모드는 명시해야 켜진다.
+MODE_OCR_UNAVAILABLE = "ocr-unavailable"
+MODE_MISSING_OBSERVATIONS = "missing-observations"
+RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS)
+_OBSERVATIONS_KEY = "fda_483_observations"
+
 Sleeper = Callable[[float], None]
 
 
@@ -94,6 +100,7 @@ Sleeper = Callable[[float], None]
 class OcrRecoveryReport:
     schema_version: str = SCHEMA_VERSION
     mode: str = ""                      # "dry_run" | "apply"
+    select_mode: str = MODE_OCR_UNAVAILABLE   # 어떤 후보 집합을 훑었는가(리포트 정직성)
     limit: int | None = None
     delay_seconds: float = _DEFAULT_DELAY_SECONDS
     scanned: int = 0                    # source='FDA 483' raw_signals 전체(fetch 시점)
@@ -137,6 +144,29 @@ def _parse_doc_ids(value: str) -> list[str]:
     if not value:
         return []
     return [p for p in re.split(r"[,\s]+", value.strip()) if p]
+
+
+def is_missing_observations_row(raw: dict[str, Any]) -> bool:
+    """이 raw_payload 가 "본문은 받았는데 관찰이 하나도 안 만들어진" 행인가(순수 함수).
+
+    ★이 클래스는 지금까지 **어떤 복구 잡의 선택 조건에도 걸리지 않았다.** `_to_item` 은
+    `fda483_text_status` 를 본문이 전무할 때만 기록하므로(excerpt 가 있으면 기록하지 않는다),
+    excerpt 는 있는데 관찰이 0인 행은 상태 키가 없어 `is_ocr_unavailable_row` 의 시야 밖이다.
+    라이브 실측(2026-08-01): FDA 483 문서 2,000건 중 444건이 findings 0건이고, 그중 417건이
+    상태 키 없음 · 192건은 excerpt 를 이미 갖고 있었다. 자동 복구가 영원히 도달하지 못하는
+    사각지대였다.
+
+    판정은 **관찰 키 부재** 하나로 한다 — `collect_fda_483._to_item` 이 관찰이 비면 키 자체를
+    쓰지 않기 때문에(`if observations:`), 키 부재가 곧 "관찰 0건"이다.
+    """
+    return _OBSERVATIONS_KEY not in raw
+
+
+def is_recovery_candidate(raw: dict[str, Any], mode: str) -> bool:
+    """모드별 후보 판정 — `run()` 이 서버 like 로 좁힌 행을 여기서 정확히 재확인한다."""
+    if mode == MODE_MISSING_OBSERVATIONS:
+        return is_missing_observations_row(raw)
+    return is_ocr_unavailable_row(raw)
 
 
 def is_ocr_unavailable_row(raw: dict[str, Any]) -> bool:
@@ -213,21 +243,24 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
 
 def _fetch_raw_signals(
     base_url: str, service_key: str, *, page_size: int = _DEFAULT_PAGE_SIZE,
+    mode: str = MODE_OCR_UNAVAILABLE,
 ) -> list[dict[str, Any]]:
-    """source='FDA 483' raw_signals 중 **엔진 부재 표식이 있는** 행만.
+    """source='FDA 483' raw_signals 중 이번 모드의 후보 행만.
 
-    서버에서 `raw_json`(TEXT) 부분일치로 좁히고, 호출부가 파싱해 상태값을 정확히 재확인한다
-    (like 는 좁히기용 · 판정은 `is_ocr_unavailable_row`). collected_at 은 upsert 시 원본을
+    서버에서 `raw_json`(TEXT) 부분일치로 좁히고, 호출부가 파싱해 조건을 정확히 재확인한다
+    (like 는 좁히기용 · 판정은 `is_recovery_candidate`). collected_at 은 upsert 시 원본을
     보존해야 하므로 함께 읽는다.
     """
+    if mode == MODE_MISSING_OBSERVATIONS:
+        # 관찰 키가 **없는** 행. `not.like` 로 서버에서 1차로 좁힌다.
+        narrow = {"raw_json": f"not.like.*{_OBSERVATIONS_KEY}*"}
+    else:
+        narrow = {"raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*"}
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
         select="raw_signal_id,document_id,collected_at,raw_json",
         page_size=page_size, order="raw_signal_id.asc",
-        extra_params={
-            "source": f"eq.{SOURCE_FDA_483}",
-            "raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*",
-        },
+        extra_params={"source": f"eq.{SOURCE_FDA_483}", **narrow},
     )
 
 
@@ -268,6 +301,7 @@ def run(
     limit: int | None = None,
     delay_seconds: float = _DEFAULT_DELAY_SECONDS,
     doc_ids: list[str] | None = None,
+    mode: str = MODE_OCR_UNAVAILABLE,
     fetch_raw_signals: Callable[..., list[dict[str, Any]]] | None = None,
     fetch_text: Callable[[str], tuple[str, str]] | None = None,
     rebuild_item: Callable[..., Any] | None = None,
@@ -284,6 +318,7 @@ def run(
 
     report = OcrRecoveryReport(
         mode="dry_run" if dry_run else "apply", limit=limit, delay_seconds=delay_seconds,
+        select_mode=mode,
     )
 
     base = _normalize_base_url(base_url)
@@ -292,7 +327,7 @@ def run(
         return report, 2
 
     try:
-        rows = fetch_raw(base, service_key)
+        rows = fetch_raw(base, service_key, mode=mode)
     except (RuntimeError, ValueError) as exc:
         report.errors.append(str(exc))
         log("ERROR", f"483 OCR 복구 조회 실패: {exc}")
@@ -301,7 +336,7 @@ def run(
     report.scanned = len(rows)
 
     # 서버 like 는 좁히기용 — 상태값을 실제로 파싱해 대상만 남긴다.
-    marked = [r for r in rows if is_ocr_unavailable_row(_json_object(r.get("raw_json")))]
+    marked = [r for r in rows if is_recovery_candidate(_json_object(r.get("raw_json")), mode)]
     report.marked = len(marked)
 
     if doc_ids:
@@ -458,6 +493,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--doc-ids", default="",
         help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분).",
     )
+    p.add_argument(
+        "--mode", choices=list(RECOVERY_MODES), default=MODE_OCR_UNAVAILABLE,
+        help=(
+            "후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. "
+            "missing-observations=본문 유무와 무관하게 관찰 키가 없는 행 — 상태 키가 없어 "
+            "지금까지 어떤 복구 잡에도 걸리지 않던 사각지대(2026-08-01 실측 417건)."
+        ),
+    )
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
@@ -486,6 +529,7 @@ def main(argv: list[str] | None = None) -> int:
         limit=args.limit,
         delay_seconds=args.delay_seconds,
         doc_ids=_parse_doc_ids(args.doc_ids),
+        mode=args.mode,
     )
 
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)

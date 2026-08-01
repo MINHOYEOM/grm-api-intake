@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+from dataclasses import asdict
 from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -251,3 +252,63 @@ class PostResolutionTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ── [사각지대 모드 2026-08-01] 관찰 키가 없는 행 선택 ──────────────────────────
+class MissingObservationsModeTest(unittest.TestCase):
+    """`_to_item` 은 `fda483_text_status` 를 **본문이 전무할 때만** 기록한다
+    (`if text_status and ... and not (excerpt or observations or body_full)`).
+    그래서 "excerpt 는 있는데 관찰이 0" 인 행은 상태 키가 없고, 상태 키로 후보를 고르는
+    기존 선택 조건(`is_ocr_unavailable_row`)의 **시야 밖**이었다 — 어떤 자동 복구도 영원히
+    도달하지 못하는 사각지대(라이브 실측 2026-08-01: 417건).
+
+    기본 모드는 종전 그대로 두고(회귀 0), 새 모드는 명시해야 켜진다."""
+
+    def test_missing_observations_predicate(self):
+        self.assertTrue(rec.is_missing_observations_row({"fda483_excerpt": "OBSERVATION 1 ..."}))
+        self.assertFalse(rec.is_missing_observations_row({"fda_483_observations": [{"number": "1"}]}))
+        # 본문이 아예 없는 행도 이 모드의 대상이다(관찰 키가 없으므로).
+        self.assertTrue(rec.is_missing_observations_row({"fda483_text_status": "scan-no-text"}))
+
+    def test_mode_dispatch_keeps_default_behaviour(self):
+        ocr_row = {"fda483_text_status": f"{rec.OCR_UNAVAILABLE_PREFIX}:no tessdata"}
+        excerpt_row = {"fda483_excerpt": "OBSERVATION 1 ..."}
+        # 기본 모드: 종전 판정 그대로 — excerpt 행은 후보가 아니다.
+        self.assertTrue(rec.is_recovery_candidate(ocr_row, rec.MODE_OCR_UNAVAILABLE))
+        self.assertFalse(rec.is_recovery_candidate(excerpt_row, rec.MODE_OCR_UNAVAILABLE))
+        # 새 모드: 관찰 키 부재만 본다.
+        self.assertTrue(rec.is_recovery_candidate(excerpt_row, rec.MODE_MISSING_OBSERVATIONS))
+        self.assertTrue(rec.is_recovery_candidate(ocr_row, rec.MODE_MISSING_OBSERVATIONS))
+
+    def test_fetch_narrows_on_server_per_mode(self):
+        seen = {}
+
+        def fake_pages(base, key, table, **kw):
+            seen.update(kw.get("extra_params") or {})
+            return []
+
+        with mock.patch.object(rec.fsb, "_fetch_all_pages", fake_pages):
+            rec._fetch_raw_signals("https://x", "k", mode=rec.MODE_MISSING_OBSERVATIONS)
+        self.assertEqual(seen.get("raw_json"), "not.like.*fda_483_observations*")
+
+        seen.clear()
+        with mock.patch.object(rec.fsb, "_fetch_all_pages", fake_pages):
+            rec._fetch_raw_signals("https://x", "k", mode=rec.MODE_OCR_UNAVAILABLE)
+        self.assertEqual(seen.get("raw_json"), f"like.*{rec.OCR_UNAVAILABLE_PREFIX}*")
+
+    def test_report_records_which_candidate_set_was_scanned(self):
+        """리포트만 보고 "무엇을 훑었는지" 알 수 있어야 한다(정직성 — 같은 스크립트가 두
+        모집단을 처리하므로 모드를 안 적으면 0건이 어느 쪽의 0건인지 알 수 없다)."""
+        report = rec.OcrRecoveryReport()
+        self.assertEqual(report.select_mode, rec.MODE_OCR_UNAVAILABLE)
+        self.assertIn("select_mode", asdict(report))
+
+    def test_cli_exposes_mode_with_safe_default(self):
+        parser = rec.build_arg_parser()
+        self.assertEqual(parser.parse_args([]).mode, rec.MODE_OCR_UNAVAILABLE)
+        self.assertEqual(
+            parser.parse_args(["--mode", "missing-observations"]).mode,
+            rec.MODE_MISSING_OBSERVATIONS,
+        )
+        with self.assertRaises(SystemExit):
+            parser.parse_args(["--mode", "nope"])

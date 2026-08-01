@@ -45,6 +45,7 @@ import re
 import time
 from datetime import date
 from html import unescape as _html_unescape
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlencode, urljoin
 
@@ -222,6 +223,55 @@ _DRUPAL_SETTINGS_RE = re.compile(
 )
 _OBS_RE = re.compile(r"\bOBSERVATION\s+(\d+)\b", re.I)
 _WE_OBSERVED_RE = re.compile(r"\b(?:I\s*/\s*)?WE\s+OBSERVED\b", re.I)
+
+# ── [관찰 회수 경로 2026-08-01] 아래 3종은 **오늘 0건인 문서에만** 쓰인다 ──────────
+# 근거(라이브 실측 49문서 표본, 본문은 있는데 관찰 0건인 483):
+#   · `OBS ERVAT ION 1`  — 스캔 텍스트층이 단어 안에 공백을 넣어 _OBS_RE 가 못 잡는다.
+#   · `WE OBSERVED` 뒤가 `1. 2. 3.` 번호 목록이고 "OBSERVATION" 단어 자체가 없다(옛 양식).
+#   · `WE OBSERVED` 마커가 관찰 표제 **뒤**에 있어, 그 지점에서 자르면 관찰을 통째로 버린다.
+# 셋 다 정상 경로를 건드리지 않는다 — `_extract_483_observations_from_text` 가 기존 경로로
+# 1건이라도 얻으면 그 결과를 그대로 반환하고 회수 경로에는 진입조차 하지 않는다.
+_OBS_LOOSE_RE = re.compile(r"\bO\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\s?O\s?N\s*[.:\-]?\s*(\d{1,2})\b", re.I)
+# 번호 목록 앵커 — 문장/줄 경계 뒤 "N. " + 대문자(따옴표 포함). WL 파서의
+# `_WL_NUMBERED_ITEM_RE` 와 같은 경계 요구다(조항번호 소수점 뒷자리 오탐 방지).
+_NUMBERED_OBS_RE = re.compile(r"(?:^|(?<=[.)\:])\s|\n)\s*(\d{1,2})\.\s+(?=[A-Z\"“])")
+
+# 483 **양식 문구**(관찰이 아니다). 회수 경로는 앵커를 느슨하게 잡으므로 양식 보일러플레이트가
+# deficiency 자리에 들어올 수 있다 — 실측 2건: "OR PLAN TO IMPLEMENT CORRECTIVE ACTION IN
+# RESPONSE TO AN OBSERVATION…"(양식 안내문), "Pursuant to Section 704(b) of the Federal Food,
+# Drug and Cosmetic Act…"(법령 근거문). 공개 findings 에 이런 문장이 들어가면 지금의 침묵
+# (0건)보다 나쁘다.
+_FORM_BOILERPLATE_RE = re.compile(
+    r"OR\s+PLAN\s+TO\s+IMPLEMENT\s+CORRECTIVE\s+ACTION"
+    r"|PURSUANT\s+TO\s+SECTION\s+704"
+    r"|SEE\s+REVERSE\s+OF\s+THIS\s+PAGE"
+    r"|THIS\s+DOCUMENT\s+LISTS\s+OBSERVATIONS\s+MADE"
+    r"|DURING\s+AN\s+INSPECTION\s+OF\s+YOUR"
+    r"|FORM\s+FDA\s+483"
+    r"|EMPLOYEE\(S\)\s+SIGNATURE"
+    r"|ANNOTATIONS?\s+TO\s+OBSERVATIONS?"
+    r"|ADD\s+CONTINUATION\s+PAGE"
+    r"|DEPARTMENT\s+OF\s+HEALTH\s+AND\s+HUMAN\s+SERVICES"
+    r"|INSPECTIONAL\s+OBSERVATIONS?\s*$"
+    r"|NAME\s+AND\s+TITLE\s+OF\s+INDIVIDUAL"
+    # 양식 뒷면 안내문(실측 192341) — "To assist firms inspected in complying with the Acts
+    # and regulations enforced by the Food and Drug Administration…"
+    r"|TO\s+ASSIST\s+FIRMS\s+INSPECTED\s+IN\s+COMPLYING",
+    re.I,
+)
+
+# 단어가 조각난 OCR 을 잡는 지표. `_text_corruption_ratio` 는 replacement/control 문자만 세기
+# 때문에 "Thl ttiliv director failed to ass~re" · "pr eve ntion" 같은 **문자 단위 깨짐**을
+# 0.0 으로 통과시킨다(실측). 토큰 단위로 다시 센다.
+# ★기호 판정은 앞뒤 문장부호를 떼어 낸 **단어 속**에서만 한다 — 토큰 원문에 그대로 걸면
+# "Consolidation:" 같은 정상 어미 콜론까지 깨짐으로 세어 멀쩡한 표제를 버린다(실측).
+# `!`·`:`·`;` 를 포함하는 이유: OCR 이 글자를 이들로 바꿔 단어 안에 심는다
+# ("perfonned for th:1!!!!l!!!Isolators" 실측).
+_GARBLE_SYMBOL_RE = re.compile(r"[A-Za-z][~^|\\{}<>_!:;*#]|[~^|\\{}<>_!:;*#][A-Za-z]")
+_ALPHA_WITH_DIGIT_RE = re.compile(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$")
+# 실측 튜닝(49문서 표본): 0.10 이면 "Thl ttiliv director failed to ass~re"(1/12=0.083)가
+# 통과했다. 0.08 로 내리면 그 표제는 걸리고, 회수된 정상 표제 7건은 전부 0.0 이라 무영향이다.
+FDA483_DEFICIENCY_GARBLE_MAX = 0.08
 # FDA 483 페이지 하단 서명/양식 푸터 블록 시작 마커. 스캔 OCR 이 이 블록의 텍스트를 자주
 # 깨뜨리고(EMPLOYEE(S)→EMPI..OYEE(S)/EMPLOYEE($), SIGNATURE→SIGNAT\JRE, FORM FDA 483→
 # FORM FDA 4&3), 심지어 Observation 본문 자리로 흘려보내(본문을 통째로 대체) 서명블록이
@@ -865,6 +915,64 @@ def _is_legible_deficiency(deficiency: str) -> bool:
     return sum(1 for ch in (deficiency or "") if ch.isalpha()) >= FDA483_DEFICIENCY_MIN_ALPHA
 
 
+def _strip_redaction_markers(text: str) -> str:
+    """483 본문의 **정상** 마스킹 표기를 지운다(깨짐 판정 전처리, 순수 함수).
+
+    `<Redacted B4>` · `(b) (4)` 는 FDA 가 공개본에서 정보를 가린 흔적이지 OCR 깨짐이 아니다.
+    지우지 않고 기호 검사를 돌리면 멀쩡한 관찰 표제가 `<`·`(` 때문에 통째로 기각된다.
+    """
+    out = re.sub(r"<[^<>]{0,40}>", " ", text or "")
+    out = re.sub(r"\(\s*[b6]\s*\)\s*\(\s*\d\s*\)", " ", out, flags=re.I)
+    return out
+
+
+def _deficiency_garble(text: str) -> tuple[int, float]:
+    """관찰 표제의 깨짐 신호 → (단어 속 기호 토큰 수, 한 글자 조각 비율). 순수 함수.
+
+    `_text_corruption_ratio` 는 replacement/control 문자만 세어, 스캔 483 에서 흔한 문자
+    단위 깨짐을 0.0 으로 통과시킨다(실측): "…failed to ass~re that all experimentaf data",
+    "…perfonned for th:1!!!!l!!!Isolators".
+
+    ★두 신호를 **다른 단위**로 낸다. 단어 속 기호(~ : ! | 등)·영문 속 숫자는 정상 문장에
+      사실상 0이라 **절대 건수**로 봐야 한다 — 비율로 보면 긴 문장에서 희석돼(1/40=0.025)
+      기각되지 않는다(실측으로 확인한 실패). 반면 한 글자 조각("Eac h batc h")은 정상
+      문장에도 드물게 나오므로 비율로 본다.
+    """
+    cleaned = _strip_redaction_markers(text)
+    tokens = [t for t in re.split(r"\s+", cleaned.strip()) if t]
+    if not tokens:
+        return (0, 1.0)
+    symbols = 0
+    fragments = 0
+    for tok in tokens:
+        core = tok.strip(".,;:()[]\"'“”")
+        if not core:
+            continue
+        if _GARBLE_SYMBOL_RE.search(core) or _ALPHA_WITH_DIGIT_RE.match(core):
+            symbols += 1
+        elif len(core) == 1 and core.isalpha() and core.lower() not in ("a", "i"):
+            fragments += 1
+    return (symbols, fragments / len(tokens))
+
+
+def _is_recovered_deficiency_publishable(deficiency: str) -> bool:
+    """회수 경로가 만든 관찰 표제를 공개해도 되는가(순수 함수).
+
+    ★정상 경로에는 적용하지 않는다 — 오늘 관찰이 나오는 1,545개 문서의 출력은 byte 단위로
+    그대로 둔다(회귀 0을 측정이 아니라 **구조로** 보장). 이 게이트는 앵커를 느슨하게 잡는
+    회수 경로에만 걸린다. 통과 조건 셋:
+      ① 기존 가독성 하한(_is_legible_deficiency)
+      ② 483 **양식 문구**가 아니다(_FORM_BOILERPLATE_RE)
+      ③ 토큰 깨짐률이 하한 이하(_deficiency_garble_ratio)
+    """
+    if not _is_legible_deficiency(deficiency):
+        return False
+    if _FORM_BOILERPLATE_RE.search(deficiency or ""):
+        return False
+    symbols, fragment_ratio = _deficiency_garble(deficiency)
+    return symbols == 0 and fragment_ratio <= FDA483_DEFICIENCY_GARBLE_MAX
+
+
 def _text_corruption_ratio(text: str) -> float:
     """PDF 텍스트층 깨짐률. replacement/control 문자가 과하면 상세 추출은 degrade."""
     if not text:
@@ -1266,21 +1374,43 @@ def _extract_483_observations_from_text(
     hints = _header_hint_kwargs(header_hints)
     body = normalize_pdf_ligatures(text)   # [2026-07-20] 커밋된 낡은 source_text 도 여기서 복원
     m = _WE_OBSERVED_RE.search(body)
-    if m:
-        body = body[m.end():]
-    # [관찰목록 종료 마커 2026-07-27] 483 양식의 "Annotations to Observations" 절은 관찰이
-    # 아니라 **어느 관찰을 시정하기로 했는지에 대한 주석**이고, 그 안에서 관찰 번호가 다시
-    # 열거된다("8. Promised to correct."). 이 절까지 훑으면 같은 번호의 관찰이 **두 번**
-    # 만들어지고(fda483-193541 실측: obs 8 이 중복), 국문 병기는 번호로 매칭하므로 번역이
-    # 뒤쪽(주석) 항목에만 붙어 진짜 관찰 8 이 미번역으로 남아 발행이 막힌다.
-    # 관찰 목록은 이 표제에서 끝난다 — 여기서 자른다.
+    scoped = body[m.end():] if m else body
+    primary = _observations_from_anchors(
+        _cut_at_annotations(scoped),
+        lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
+        hints,
+        gate=_is_legible_deficiency,
+    )
+    if primary:
+        return primary
+    # ── 여기부터 회수 경로 ────────────────────────────────────────────────────
+    # 오늘 관찰이 **0건인 문서에만** 도달한다(위에서 1건이라도 나오면 그대로 반환했다) —
+    # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
+    return _recover_483_observations(body, m, hints)
+
+
+def _cut_at_annotations(body: str) -> str:
+    """[관찰목록 종료 마커 2026-07-27] 483 양식의 "Annotations to Observations" 절은 관찰이
+    아니라 **어느 관찰을 시정하기로 했는지에 대한 주석**이고, 그 안에서 관찰 번호가 다시
+    열거된다("8. Promised to correct."). 이 절까지 훑으면 같은 번호의 관찰이 **두 번**
+    만들어지고(fda483-193541 실측: obs 8 이 중복), 국문 병기는 번호로 매칭하므로 번역이
+    뒤쪽(주석) 항목에만 붙어 진짜 관찰 8 이 미번역으로 남아 발행이 막힌다.
+    관찰 목록은 이 표제에서 끝난다 — 여기서 자른다."""
     cut = _ANNOTATIONS_RE.search(body)
-    if cut:
-        body = body[:cut.start()]
-    matches = _select_observation_anchors(body, list(_OBS_RE.finditer(body)))
+    return body[:cut.start()] if cut else body
+
+
+def _observations_from_anchors(
+    body: str,
+    finder: Callable[[str], list[re.Match[str]]],
+    hints: dict[str, str],
+    gate: Callable[[str], bool],
+) -> list[dict[str, str]]:
+    """앵커 목록 → Observation rows. 앵커 찾기(finder)와 표제 통과 기준(gate)만 갈아끼운다
+    — 정상 경로와 회수 경로가 **같은 조립 코드**를 쓰게 해 둘이 갈라지지 않도록 한다."""
+    matches = finder(body)
     if not matches:
         return []
-
     out: list[dict[str, str]] = []
     for i, obs in enumerate(matches):
         start = obs.end()
@@ -1288,7 +1418,7 @@ def _extract_483_observations_from_text(
         chunk = _clean_observation_chunk(body[start:end])
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
-        if not _is_legible_deficiency(deficiency):
+        if not gate(deficiency):
             continue
         clean_detail = _clean_observation_detail(detail)
         clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)
@@ -1299,6 +1429,51 @@ def _extract_483_observations_from_text(
         }
         out.append(row)
     return out
+
+
+def _recover_483_observations(
+    body: str, we_observed: re.Match[str] | None, hints: dict[str, str],
+) -> list[dict[str, str]]:
+    """정상 경로가 0건일 때만 도는 회수 경로(순서대로 시도, 처음 성공한 것을 쓴다).
+
+    표제는 전부 `_is_recovered_deficiency_publishable` 를 통과해야 한다 — 앵커를 느슨하게
+    잡는 만큼 양식 문구·OCR 조각이 섞여 들어오고, 그런 문장이 공개 findings 가 되면 지금의
+    침묵(0건)보다 나쁘다.
+
+    ① 비파괴 컷 — `WE OBSERVED` 마커가 관찰 표제 **뒤**에 있으면 자르지 않는다. 오늘은 그
+       지점에서 잘라 관찰을 통째로 버린다(실측 83305: 앵커 @1151, 마커 @1345).
+    ② 느슨한 앵커 — `OBS ERVAT ION 1` 처럼 단어 안에 공백이 낀 스캔 텍스트층.
+    ③ 번호 목록 — `WE OBSERVED` 뒤가 `1. 2. 3.` 이고 "OBSERVATION" 단어가 없는 옛 양식.
+       마커가 있을 때만 켠다(문서 어디의 번호 목록이든 잡으면 목차·별첨까지 관찰이 된다).
+    """
+    gate = _is_recovered_deficiency_publishable
+
+    # ① 비파괴 컷: 자른 뒤에 앵커가 하나도 안 남으면 자르지 않는다.
+    if we_observed is not None and _OBS_RE.search(body):
+        after = body[we_observed.end():]
+        if not _OBS_RE.search(after):
+            found = _observations_from_anchors(
+                _cut_at_annotations(body),
+                lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
+                hints, gate=gate,
+            )
+            if found:
+                return found
+
+    scoped = _cut_at_annotations(
+        body[we_observed.end():] if we_observed is not None else body)
+
+    # ② 느슨한 앵커(OCR 공백). 정상 앵커가 이미 0건인 문서에서만 여기 온다.
+    found = _observations_from_anchors(
+        scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate)
+    if found:
+        return found
+
+    # ③ 번호 목록 — 마커가 있는 문서로 한정.
+    if we_observed is None:
+        return []
+    return _observations_from_anchors(
+        scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
 
 
 def _extract_483_observations(

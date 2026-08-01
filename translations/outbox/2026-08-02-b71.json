@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-d181697a513242c056faccfb",
+    "finding_text": "The corrective and preventive action procedures addressing the investigation of the cause of nonconfommities relating to Product, processes, and the qualitysystem were notimplemented.",
+    "finding_text_ko": "제품, 공정 및 품질시스템과 관련된 부적합 원인 조사에 관한 시정 및 예방조치 절차가 이행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d222cddb9468de8a6300a356",
+    "finding_text": "Your firm failed to establish and follow an Out of Specification (OOS) Procedure.",
+    "finding_text_ko": "귀사는 규격 일탈(OOS) 절차를 수립하고 준수하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d435e8e6159e6ff01c372b04",
+    "finding_text": "ARC has identified trends related to management of suspect blood products and inventory management, but has failed to promptly and thoroughly correct the problems.",
+    "finding_text_ko": "ARC는 의심 혈액제품 관리 및 재고 관리와 관련된 경향을 파악했으나, 문제를 신속하고 철저하게 시정하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d4a532a299217c1e9e41270a",
+    "finding_text": "QRBRA case #199404 was submitted by the Indiana-Ohio Region on 4/21/00 because two donors were submitted by region to the NDDR several times but were still not appearing in the NDDR.",
+    "finding_text_ko": "인디애나-오하이오 지역은 두 기증자가 해당 지역에서 NDDR에 여러 차례 제출되었음에도 NDDR에 계속 나타나지 않아 2000년 4월 21일 QRBRA 사례 #199404를 제출했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d4ee6078bb7b5d4326626b3c",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d570d249f5e73b5eebae82d2",
+    "finding_text": "The redacted (b)(4) indicates sampl ing strategies for several blood products.",
+    "finding_text_ko": "삭제된 (b)(4) 문서는 여러 혈액제품에 대한 샘플링 전략을 나타낸다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d72643c4c661de61d7092623",
+    "finding_text": "The firm applies expiration dating to all compounded sterile injectable products.",
+    "finding_text_ko": "회사는 모든 조제 무균 주사제 제품에 사용기한을 적용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-dc0cd558f74b4326d95d8374",
+    "finding_text": "On 9/17/08 rouging was seen on the outside of the chromatography column.",
+    "finding_text_ko": "2008년 9월 17일 크로마토그래피 컬럼 외부에서 루징(rouging)이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-dc3352ef2f5747d27994a55f",
+    "finding_text": "Employees engaged in the processing and packing ofa drug product lack the education, training, and experience required to perform their assigned functions.",
+    "finding_text_ko": "의약품 가공 및 포장에 종사하는 직원에게 배정된 기능을 수행하는 데 필요한 교육, 훈련 및 경험이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-dc729a25d2a2205b9d5fbe86",
+    "finding_text": "A retrospective review by the Southern California Region revealed that of the 4012 HBsAg confirmed positive donors who were identified during the review dates of 1979 through 1987, 243 ofthose were missing from the INDDR.",
+    "finding_text_ko": "남부 캘리포니아 지역의 후향적 검토 결과, 1979년부터 1987년까지의 검토 기간에 확인된 HBsAg 양성 확진 기증자 4,012명 중 243명이 INDDR에 누락되어 있었다.",
+    "translation_method": "manual"
+  }
+]

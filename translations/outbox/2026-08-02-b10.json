@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-13ade6f449b0af513ebf1370",
+    "finding_text": "Actions taken regarding non-viable particulate excursions that occur during aseptic filling on RED ACTION (b)(4) are inadequate.",
+    "finding_text_ko": "REDACTION (b)(4)에서 무균 충전 중 발생한 비생존 입자 이탈에 대해 취한 조치가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-13bab4a6d0490358515cc579",
+    "finding_text": "There is no record to document that the AHU diagrams or As-build drawings have .",
+    "finding_text_ko": "AHU 도면 또는 준공 도면에 대해 문서화한 기록이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-13d0e82e120c6620b1191cce",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균임을 표방하는 완제의약품의 미생물 오염을 방지하도록 설계된 절차가 수립되고 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-13ff7e3fcc3b3779297c396e",
+    "finding_text": "There is no assurance that training/ qualification ofall operators performing aseptic operations in the flu manufacturing area is complete.",
+    "finding_text_ko": "독감 제조 구역에서 무균 작업을 수행하는 모든 작업자의 교육·적격성평가가 완료되었다는 보장이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-145a40a58663a50e19caa56d",
+    "finding_text": "The acceptance status ofproduct was not clearly identified throughout installation and servicing ofthe product.",
+    "finding_text_ko": "제품의 설치 및 정비 전반에 걸쳐 제품의 수락 상태가 명확히 식별되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-152d6302220943be3a31d4f7",
+    "finding_text": "No written procedure describing rejection ofglands.",
+    "finding_text_ko": "선(glands)의 거부를 기술하는 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-15c7ea3c0a05f6fedf78b181",
+    "finding_text": "Equipment and utensils are not cleaned, maintained, and sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "설비 및 기구가 완제의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하기 위해 적절한 주기에 세척·유지관리·소독되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-15eceeb317b7aca25c46a9c3",
+    "finding_text": "Master production and control records lack complete manufacturing and control instructions and sampling and testing procedures.",
+    "finding_text_ko": "제조 및 관리 기준서에 완전한 제조·관리 지침 및 검체채취·시험 절차가 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-160e36055426eba560d4afa2",
+    "finding_text": "BHQ issued BSL 01-151 entitled “Final Record Review ofthe Releasing Donor Identification Hold Query” on 7/26/01 which made BSL 01-064 obsolete.",
+    "finding_text_ko": "BHQ는 2001-07-26에 BSL 01-064를 폐지한 “Final Record Review of the Releasing Donor Identification Hold Query”라는 BSL 01-151을 발행했다.",
+    "translation_method": "manual"
+  }
+]

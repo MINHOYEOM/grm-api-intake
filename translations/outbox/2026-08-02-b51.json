@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-a59acb8a538d3943a257c0fc",
+    "finding_text": "On 04/02/11, an Environmental Control technician collected a water sample from a valve in the Water for Injection Loop I, which is use in the manufacture of aseptically filled parenteral drug products.",
+    "finding_text_ko": "2011년 4월 2일 환경관리 기술자가 무균 충전 비경구 의약품 제조에 사용되는 주사용수(WFI) 루프 I의 밸브에서 물 검체를 채취했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a6837cf514348e279245090a",
+    "finding_text": "Establishment of the reliability of the component supplier's report of analyses is deficient in that the test results are not appropriately validated at appropriate intervals.",
+    "finding_text_ko": "구성품 공급업체 시험성적서의 신뢰성 수립이 미흡하다. 즉, 시험 결과가 적절한 간격으로 적절하게 밸리데이션되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a73b2bd4a222568644ef5b9d",
+    "finding_text": "Equipment and utensils are not cleaned, maintained, and sanitized at appropriate intervals to prevent malfunctions and contamination that would alter the safety, identity, strength, quality or purity ofthe drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 고장 및 오염을 방지하도록 장비와 기구를 적절한 간격으로 세척·유지관리·소독하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a75d3ad6345f104634bb56b7",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치를 철저히 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a7aedef189cc39ab8f9692a2",
+    "finding_text": "Corrective actions you commited to in your response dated October 12, 1999 to the FDA-483 issued on September 21, 1999 concerning data maintance and security in laboratory instruments have not been completed.",
+    "finding_text_ko": "시험실 기기의 데이터 유지관리 및 보안과 관련하여 1999년 9월 21일 발행된 FDA-483에 대해 1999년 10월 12일자 회신에서 약속한 시정조치가 완료되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a98e513ad7333a2143d9086a",
+    "finding_text": "BSD 43.101M, Donor Deferral Register, is inadequate because it does not include the complete Donor File eck process required to be performed by the regions.",
+    "finding_text_ko": "BSD 43.101M 공여자 보류 등록부는 지역이 수행해야 하는 완전한 공여자 파일 확인 절차를 포함하지 않아 부적절하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ac2f5d81dd36dc40749ce998",
+    "finding_text": "Post filtration integrity testing to the sterilizing filter was not performed.",
+    "finding_text_ko": "멸균 여과 필터에 대한 여과 후 무결성 시험이 수행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ac4764c2e128ac8af2b30bd3",
+    "finding_text": "Your firm does not always perform Effectiveness Checks, developed as part of the formal corrective Action Plan (CAP) for Redacted (b)(4) Problems Redacted (b)(4) Problems and for Trends by their due date.",
+    "finding_text_ko": "귀사는 Redacted (b)(4) 문제, Redacted (b)(4) 문제 및 추세에 대한 공식 시정조치 계획(CAP)의 일부로 수립된 유효성 확인을 기한까지 항상 수행하지 않는다.",
+    "translation_method": "manual"
+  }
+]

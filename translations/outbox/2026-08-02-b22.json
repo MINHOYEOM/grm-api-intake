@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-3dbbac0cfa352845450241ea",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화·준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3e29c62edeff4c0cc93ed981",
+    "finding_text": "Your firm does not test finished drug pr oducts for prese rvative content/anti-microbial effectiveness of REDACTION (b)(4) a.",
+    "finding_text_ko": "귀사는 REDACTION (b)(4)의 보존제 함량/항미생물 효능에 대해 완제품을 시험하지 않습니다. a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3e837331658685d48d143de3",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a) (10)(B).",
+    "finding_text_ko": "귀사 위탁제조시설 의약품의 라벨에는 503B(a)(10)(B)에서 요구하는 정보가 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3ec277d8ea18d7f65e353b38",
+    "finding_text": "Your firm has failed to establish and implement adequate operational procedures designed to prevent microbiological contamination of drugs purporting to be sterile.",
+    "finding_text_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 적절한 운영 절차를 수립·시행하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3f1cff2af1bf12ec820b7185",
+    "finding_text": "Tbe Quality Unit has not ensured verification ofwhether current sampling procedures for larger drummed raw materials could potentially contaminate the room in which they are sampled or other raw materials.",
+    "finding_text_ko": "품질 부서는 대형 드럼 원자재에 대한 현재의 샘플링 절차가 샘플링하는 실내나 다른 원자재를 오염시킬 가능성이 있는지 검증했음을 보장하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3f512cfc8a13340e37b80b8d",
+    "finding_text": "The firm fails to adequately and/or completely document, in equipment logbooks and/or in production records, the execution of control procedures to demonstrate that these procedures are followed.",
+    "finding_text_ko": "회사는 이러한 관리 절차가 준수됨을 입증하기 위해 장비 로그북 및/또는 생산기록에 관리 절차 수행을 충분히 및/또는 완전하게 문서화하지 못합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3f7a6f03c502c9cec2fa1070",
+    "finding_text": "The firm submission for Gentocin Solution, NADA # 38-292 dated December 18, 1996 included a Schering Plough’s guideline for HPLC impurity limits for Gentamicin Sulfate study.",
+    "finding_text_ko": "Gentocin Solution, NADA #38-292에 대한 회사 제출자료(1996년 12월 18일자)에는 Gentamicin Sulfate 연구를 위한 HPLC 불순물 한도에 관한 Schering Plough 지침이 포함되어 있었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3f94cb119e36e12c37e34b98",
+    "finding_text": "Asmoke test was performed (and videotaped) in April 1999; however, there are no records to indicate the reason, or to provide an evaluation of its acceptability and Quality Assurance : approval.",
+    "finding_text_ko": "1999년 4월 연기 시험이 수행되고 비디오 촬영되었으나, 그 사유나 허용성 평가 및 품질보증 승인을 보여주는 기록은 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3fb5c29b2acfa45a62251f4d",
+    "finding_text": "The sterility testing by R EDACTION (b)(4) which is used to test pre-filled Human Chorion ic Gonadotropin (HCG) syringes has not been validated to determine whether the HCG formulation is bacteriostatic or fungistati c.",
+    "finding_text_ko": "미리 충전된 Human Chorionic Gonadotropin(HCG) 주사기를 시험하는 데 사용되는 REDACTION (b)(4)의 무균 시험은 HCG 제형이 정균성 또는 정진균성인지 판단하도록 밸리데이션되지 않았습니다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-6da3973f6959eefbe7de6cce",
+    "finding_text": "You have no assurance that the endotoxin level ofyour intrathecal drug products are safe, since you do not have any endotoxin data and your firm doesn't perform endotoxin testing for the finished product.",
+    "finding_text_ko": "귀사는 엔도톡신 데이터가 없고 완제품에 대한 엔도톡신 시험을 수행하지 않으므로 지주막하강내 의약품의 엔도톡신 수준이 안전하다는 보증이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6dfe107482ad3fe668ae4f61",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6e0af67be3b27c6e3fd54ca4",
+    "finding_text": "In the packaging area, failure to demonstrate all requirements were met.",
+    "finding_text_ko": "포장 구역에서 모든 요건이 충족되었음을 입증하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6f623f358ddda59ce7fcbd76",
+    "finding_text": "There was no documentation available for the handling and disposition of reports of patient problems, complaints, adverse drug reactions, drug product or device defects, and other adverse events reported.",
+    "finding_text_ko": "보고된 환자 문제, 불만, 이상약물반응, 의약품 또는 기기 결함 및 기타 이상사건 보고의 취급 및 처분에 대한 이용 가능한 문서가 없었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6fad3236cfabe9642421bca6",
+    "finding_text": "There is no adequate backup storage for the following master seed lots.",
+    "finding_text_ko": "다음 마스터 시드 로트에 대한 적절한 백업 보관이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6fdbedf037c11f09f6758533",
+    "finding_text": "Protective apparel is not worn as necessary to protect drug products from contamination.",
+    "finding_text_ko": "의약품을 오염으로부터 보호하기 위해 필요한 보호복이 착용되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7094b5b740a757e28b345148",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics ofdrug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-719a97468c78003117348361",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화·준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-71a939be2669ad7741da114e",
+    "finding_text": "Differential pressure is not adequately monitored and controlled between in the controlled manufacturing areas.",
+    "finding_text_ko": "관리된 제조 구역 간 차압이 적절히 모니터링·관리되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-71ab9c4d874aec700104f796",
+    "finding_text": "Personnel donned gowning apparel improperly, in a way that may have caused the gowning apparel to become contaminated and were observed with exposed skin during aseptic processing.",
+    "finding_text_ko": "인력이 가운 복장을 오염될 수 있는 방식으로 부적절하게 착용했으며, 무균 공정 중 피부가 노출된 채 관찰되었습니다.",
+    "translation_method": "manual"
+  }
+]

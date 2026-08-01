@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-a0230a7a9ffbcb6f3ee909ab",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 설비 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a03ee8d835ebe1d5b871bffd",
+    "finding_text": "Testing and release ofdrug product for distribution do not include appropriate laboratory determination ofsatisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "의약품의 유통을 위한 시험 및 출하는 출하 전에 최종 규격과 각 유효성분의 동일성 및 함량에 대한 만족스러운 적합성을 확인하는 적절한 시험실 판정을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a110b25fca75ba1f515bfcf7",
+    "finding_text": "The firm does not perform identification ofunknown degradation products and impurities for products that are listed under product quality review program.",
+    "finding_text_ko": "해당 업체는 제품 품질 검토 프로그램에 등재된 제품에 대해 알려지지 않은 분해산물 및 불순물의 동정을 수행하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a13667ff14a0acb8e4f5dbb1",
+    "finding_text": "Corrective Actions have not been fully implemented for an identified root cause ofOOS stability results for moisture ofthe Yellow Fever Vaccine for both 1 dose and 5 dose final containers.",
+    "finding_text_ko": "1회 투여 및 5회 투여 최종 용기 모두에서 황열 백신 수분의 규격외(OOS) 안정성 결과에 대해 확인된 근본 원인에 대한 시정조치가 완전히 이행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a17a360ed49b1217e31ea7be",
+    "finding_text": "Personnel were observed to be moving rapidly in the vicinity of open sterile units or instruments which disrupted the airflow and increased the risk of bringing lesser quality air into the ISO 5 area.",
+    "finding_text_ko": "개방된 무균 단위 또는 기구 주변에서 작업자가 빠르게 이동하여 기류를 교란하고 낮은 품질의 공기가 ISO 5 구역으로 유입될 위험을 증가시키는 것이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a19cd3cd2eab9dd6ee6b31ca",
+    "finding_text": "BHQ then developed a query (SIAR to determine whether any donor records had a change in their last Mame, SSN, or DOB, did not have anfiilass assertion, and was a hit with someone on the NDDR using their current record or before image record.",
+    "finding_text_ko": "이후 BHQ는 공여자 기록 중 성, 사회보장번호(SSN) 또는 생년월일(DOB)이 변경되었고 anfiilass assertion이 없으며, 현 기록 또는 이전 이미지 기록을 사용해 NDDR에서 일치한 사람이 있는지를 확인하는 조회(SIAR)를 개발했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a1cd95d66d421d747281b600",
+    "finding_text": "Input to and output from the computer, related systems of formulas, records or data are not checked for accuracy.",
+    "finding_text_ko": "컴퓨터 및 관련 시스템의 입력과 출력, 계산식, 기록 또는 데이터의 정확성을 확인하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a1d45406e66436de155b5df8",
+    "finding_text": "FDA laboratory analysis of lot 25-03 -2014@25 (BUD 9/21/2014) of toltrazuril and pyrimethamine oral paste labeled to contain 227 mg/ml toltrazuril and 340 mg/ml pyrimethamine and dispensed under Rx #3 11791 resulted i n the following values: a.",
+    "finding_text_ko": "227 mg/ml toltrazuril 및 340 mg/ml pyrimethamine을 함유한다고 표시되고 처방전 #3 11791로 조제된 toltrazuril 및 pyrimethamine 경구 페이스트 로트 25-03-2014@25(BUD 2014년 9월 21일)에 대한 FDA 시험실 분석 결과는 다음과 같았다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a267912c1449f739c28d655e",
+    "finding_text": "The written stability testing program is not followed.",
+    "finding_text_ko": "문서화된 안정성 시험 프로그램이 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a27844ac00eef4ca8a95d962",
+    "finding_text": "Samples taken ofdrug products for determination of conformance to written specifications are not representative.",
+    "finding_text_ko": "문서화된 규격 적합 여부를 판단하기 위해 채취한 의약품 검체가 대표성이 없다.",
+    "translation_method": "manual"
+  }
+]

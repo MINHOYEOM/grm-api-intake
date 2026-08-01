@@ -247,6 +247,10 @@ _OBS_LOOSE_RE = re.compile(
 _PRONOUN = r"[Ii1l|]"
 _OBS_MARKER_RECOVERY_RE = re.compile(
     r"\(\s*" + _PRONOUN + r"\s*\)\s*\(\s*WE\s*\)\s*OBSERVED"      # (I) (WE) OBSERVED
+    # 앞의 `(I)` 없이 `(WE) OBSERVED` 만 오는 변형 — 실측 151790
+    # "DURING AN INSPECTION OF YOUR FIRM (WE) OBSERVED 1. There are no…".
+    # 괄호가 `WE` 와 `OBSERVED` 사이를 끊어 아래 평문 패턴으로는 잡히지 않는다.
+    r"|\(\s*WE\s*\)\s*OBSERVED"                                     # (WE) OBSERVED
     r"|" + _PRONOUN + r"\s*/\s*WE\s+OBSERVED"                       # I/WE OBSERVED
     r"|\bWE\s+OBSERVED\b"                                            # WE OBSERVED
     r"|(?:^|[\s:])" + _PRONOUN + r"\s+OBSERVED\s*[:.]"              # I OBSERVED: · | OBSERVED:
@@ -256,6 +260,16 @@ _OBS_MARKER_RECOVERY_RE = re.compile(
 # 번호 목록 앵커 — 문장/줄 경계 뒤 "N. " + 대문자(따옴표 포함). WL 파서의
 # `_WL_NUMBERED_ITEM_RE` 와 같은 경계 요구다(조항번호 소수점 뒷자리 오탐 방지).
 _NUMBERED_OBS_RE = re.compile(r"(?:^|(?<=[.)\:])\s|\n)\s*(\d{1,2})\.\s+(?=[A-Z\"“])")
+
+# [닫는 괄호 번호 2026-08-01] `1)` · `1.)` 형태. 잔여 39건 중 **22건**이 이 형태였다
+# (`1) Procedures designed to prevent…` · `PRODUCTION SYSTEM 1.) Blending of…`).
+# ★경계 조건이 위 패턴보다 느슨하다(단어 뒤에서도 시작 허용) — 실측 119171 은
+#   "PRODUCTION SYSTEM 1.) Blending…" 처럼 **소제목 바로 뒤**에 번호가 붙어, 문장부호
+#   뒤만 허용하는 위 경계로는 잡히지 않는다. 대신 **닫는 괄호를 필수**로 요구해 안전을
+#   확보한다 — 산문 속 숫자("within 5 days")는 괄호가 없어 애초에 매치되지 않고,
+#   뒤따르는 대문자 요구가 남은 오탐을 막는다.
+# ★`(b) (4)` 마스킹은 걸리지 않는다 — `4)` 앞이 여는 괄호라 `(?:^|\s)` 경계를 못 만족한다.
+_PAREN_NUMBERED_OBS_RE = re.compile(r"(?:^|\s)(\d{1,2})\s*\.?\)\s+(?=[A-Z\"“])")
 
 # 483 **양식 문구**(관찰이 아니다). 회수 경로는 앵커를 느슨하게 잡으므로 양식 보일러플레이트가
 # deficiency 자리에 들어올 수 있다 — 실측 2건: "OR PLAN TO IMPLEMENT CORRECTIVE ACTION IN
@@ -1560,8 +1574,15 @@ def _recover_483_observations(
     # ③ 번호 목록 — 마커가 있는 문서로 한정(없으면 목차·별첨까지 관찰이 된다).
     if marker is None:
         return []
-    return _observations_from_anchors(
+    found = _observations_from_anchors(
         scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+    if found:
+        return found
+
+    # ④ 닫는 괄호 번호(`1)` · `1.)`). ③ 이 0건일 때만 — 한 문서가 두 양식을 섞어 쓰지
+    # 않으므로 순서대로 시도하면 충분하고, 서로의 오탐을 만들지 않는다.
+    return _observations_from_anchors(
+        scoped, lambda s: list(_PAREN_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
 
 
 def _extract_483_observations(

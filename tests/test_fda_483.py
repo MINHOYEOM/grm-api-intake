@@ -2171,3 +2171,90 @@ class Fda483OcrAnchorVariantTest(unittest.TestCase):
                 "1. To assist firms inspected in complying with the Acts and regulations "
                 "enforced by the Food and Drug Administration this form is provided.")
         self.assertEqual(self._obs(text), [])
+
+
+# ── [닫는 괄호 번호 · (WE) 마커 2026-08-01] 잔여 회수 2차 ─────────────────────
+class Fda483ParenNumberingTest(unittest.TestCase):
+    """앵커 변형 1차 수정(#512) 후 남은 39건(본문 있음·제약 범위)을 다시 분해한 결과:
+      · `1)` · `1.)` 닫는 괄호 번호   22건  ← 최대 덩어리
+      · `(WE) OBSERVED`(앞 `(I)` 없음) 3건
+      · OCR 로 깨진 번호/OBSERVED      3건  ← 개별 케이스, 손대지 않는다
+      · 고지문으로 시작                8건  ← 전체 텍스트가 있어야 판정 가능
+    앞의 둘만 고친다 — 확실하고 다수인 것만."""
+
+    H = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.H)
+
+    def test_paren_numbering(self):
+        """실측 157407 · 78991: `1) Procedures designed to prevent…`"""
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+                "1) Procedures designed to prevent microbiological contamination of drug "
+                "products purporting to be sterile are not written and/or followed. "
+                "2) Records are not maintained for equipment cleaning and use.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_period_paren_numbering_after_subheading(self):
+        """실측 119171: 소제목 바로 뒤에 `1.)` — 문장부호 경계가 없다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: PRODUCTION SYSTEM "
+                "1.) Blending of in-specification with out-of-specification intermediate "
+                "batches is performed. Specifically, one batch tested out of specification. "
+                "2.) Cleaning records were not retained for the blending vessel.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("Blending of in-specification"))
+
+    def test_paren_we_marker_without_leading_i(self):
+        """실측 151790: `FIRM (WE) OBSERVED 1. …` — 괄호가 WE 와 OBSERVED 를 끊는다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM (WE) OBSERVED 1. There are no "
+                "comprehensive risk assessments conducted at this multiproduct facility to "
+                "justify the containment strategy. Specifically, no assessment existed.")
+        rows = self._obs(text)
+        self.assertEqual(len(rows), 1)
+        self.assertIn("comprehensive risk assessments", rows[0]["deficiency"])
+        self.assertIsNotNone(f._OBS_MARKER_RECOVERY_RE.search("FIRM (WE) OBSERVED 1."))
+
+    # ── 오탐 방어 ────────────────────────────────────────────────────────────
+    def test_redaction_marker_is_not_a_number_anchor(self):
+        """`(b) (4)` 의 `4)` 를 번호로 보면 마스킹마다 가짜 관찰이 생긴다 — 여는 괄호가
+        앞에 있어 경계를 만족하지 않는다."""
+        self.assertIsNone(f._PAREN_NUMBERED_OBS_RE.search("the (b) (4) System was used"))
+        self.assertIsNone(f._PAREN_NUMBERED_OBS_RE.search("within (4) Days of receipt"))
+
+    def test_prose_numbers_are_not_anchors(self):
+        """산문 속 숫자는 닫는 괄호가 없어 매치되지 않는다."""
+        for prose in ("completed within 5 days The batch", "for 3 lots Specifically"):
+            self.assertIsNone(f._PAREN_NUMBERED_OBS_RE.search(prose), prose)
+
+    def test_lowercase_after_number_is_not_an_anchor(self):
+        self.assertIsNone(f._PAREN_NUMBERED_OBS_RE.search("see 1) the attached list"))
+
+    def test_paren_fallback_only_when_period_form_yields_nothing(self):
+        """마침표 번호가 이미 나오면 괄호 폴백은 돌지 않는다(중복 앵커 방지)."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "1. Written procedures are not followed for equipment cleaning. "
+                "Specifically, the log showed 2) entries missing for March.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1"])
+
+    def test_paren_numbering_still_requires_marker(self):
+        text = ("APPENDIX 1) Facility layout diagram and equipment list. "
+                "2) Organizational chart of the quality unit.")
+        self.assertEqual(self._obs(text), [])
+
+    def test_quality_gate_still_applies(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+                "1) To assist firms inspected in complying with the Acts and regulations "
+                "enforced by the Food and Drug Administration this form is provided.")
+        self.assertEqual(self._obs(text), [])
+
+    def test_normal_document_unchanged(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED: "
+                "OBSERVATION 1 There is a failure to thoroughly review unexplained "
+                "discrepancies. Specifically, no investigation was opened. "
+                "OBSERVATION 2 Written production procedures are not followed. "
+                "Specifically, batch records were incomplete.")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])

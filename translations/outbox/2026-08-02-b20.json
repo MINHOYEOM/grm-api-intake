@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-36ad7fd09c8e06cc44d80a3b",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균 공정 구역은 무균 조건을 조성하기 위한 실내 및 장비 세척·소독 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3730422ca0fd901395c0f1a4",
+    "finding_text": "Some procedures reviewed are not reflective of the firm's current practice.",
+    "finding_text_ko": "검토된 일부 절차는 회사의 현재 관행을 반영하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3769d0957fc16f11d1b8e03d",
+    "finding_text": "Procedures related to managing the NDDR (Directive: Management o f the National Donor Deferral Register 14.2.014 and WI: Manually Updating the Nati onal Do nor De fe rral Register 14.3.160) do not instruct how to manage donors with hyp henated names.",
+    "finding_text_ko": "NDDR 관리 관련 절차(Directive: Management of the National Donor Deferral Register 14.2.014 및 WI: Manually Updating the National Donor Deferral Register 14.3.160)는 하이픈이 포함된 이름의 공여자를 관리하는 방법을 지시하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-378c70d2a502b31d09c72f4d",
+    "finding_text": "Laboratory controls do not include a determination of conformance to appropriate specifications for drug products.",
+    "finding_text_ko": "실험실 관리에는 의약품이 적절한 규격에 적합한지 판단하는 내용이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-37aa6e83d53460589e3959a0",
+    "finding_text": "Our review of deviations from 1/1/02 to 6/17/02 during this inspection revealed failure to follow procedures or properly quarantining unsuitable products identified through the MRB in at least 17 deviations and at least 35 deviations when products were not properly quarantined when post donation information was received or BDRs were incomplete.",
+    "finding_text_ko": "이번 조사에서 2002년 1월 1일부터 6월 17일까지의 일탈을 검토한 결과, 최소 17건의 일탈에서 절차 미준수 또는 MRB를 통해 확인된 부적합 제품의 적절한 격리 실패가 있었고, 공여 후 정보가 접수되었거나 BDR이 불완전할 때 제품을 적절히 격리하지 않은 일탈도 최소 35건 있었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3819f99b1e732f8c28c8e00f",
+    "finding_text": "Since 11/15/12 the firm has experienced sterility failures for 9 commercial products .",
+    "finding_text_ko": "2012년 11월 15일 이후 회사는 9개 상용 제품에서 무균 실패를 경험했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3839b8b9c38683c2dfd8f8b0",
+    "finding_text": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure.",
+    "finding_text_ko": "무균 공정 구역은 양압 하에서 고효율 미립자 공기(HEPA) 필터를 통해 여과되는 공기 공급과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-38af6e7acbfc0689944969b3",
+    "finding_text": "The \"Final Quality Review\" of the Donor Reaction and Injury Report was not performed on 11 of the 24 reactions an d was performed more than 2 months after the Medical Director Review on 4 occasions.",
+    "finding_text_ko": "Donor Reaction and Injury Report의 “최종 품질 검토”는 24건의 반응 중 11건에서 수행되지 않았고, 4건에서는 의료 책임자 검토 후 2개월이 지나서 수행되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-38bce29441f32125c5f70839",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화·준수되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-39172fae192d11ab7f5da35c",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination ofsatisfactory conformance to the identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "유통을 위한 의약품 시험 및 출하에는 출하 전에 각 유효성분의 동일성과 함량이 만족스럽게 적합한지에 대한 적절한 실험실 판정이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  }
+]

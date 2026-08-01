@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-81172e7b51cca3bd28270750",
+    "finding_text": "The accuracy, sensitivity, specificity, and reproducibility of test methods have not been established.",
+    "finding_text_ko": "시험 방법의 정확성, 감도, 특이성 및 재현성이 확립되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ac1418d6f846f80af386577",
+    "finding_text": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent malfunctions, contamination, that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 고장 및 오염을 방지하도록 장비와 기구를 적절한 간격으로 세척·유지관리하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a25e3db5b16116678e28aee0",
+    "finding_text": "Components for drug product manufacturing are not weighed and measured.",
+    "finding_text_ko": "완제의약품 제조용 구성품의 중량을 달고 계량하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c436787eb4e9d5a8e8d7cea8",
+    "finding_text": "The issuance ofdocuments is not adequately controlled.",
+    "finding_text_ko": "문서 발행이 충분히 관리되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c7127347a2f993e96a951214",
+    "finding_text": "Batch production records do not contain complete information related to the production and control of the batch.",
+    "finding_text_ko": "배치 제조 기록에는 해당 배치의 제조 및 관리와 관련한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1662528fd3958721fe450194",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 무균공정의 충분한 밸리데이션이 포함되어 있지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1e9c72c3f192ff294dbcd9ce",
+    "finding_text": "Employees engaged in the manufacture and processing of a drug product lack the training required to perform their assigned functions.",
+    "finding_text_ko": "의약품 제조 및 가공에 종사하는 직원에게 배정된 기능 수행에 필요한 교육이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3fa8514ef161cef1241c8aec",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ad8fffbbe1cd225658c23cf6",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-af488a29aab9be09967a9d53",
+    "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods of disassembly and reassembling equipment as necessary to assure proper cleaning and maintenance.",
+    "finding_text_ko": "설비 세척 및 유지관리 절차는 적절한 세척·유지관리를 보장하기 위해 필요한 세척·유지관리 작업에 사용되는 방법·설비·자재의 충분한 세부사항과 설비 분해·재조립 방법에 관해 미흡하다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-b5cad1bdaa7c15d005fb51fe",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to the receipt, identification, storage, and withholding from use of components and drug product containers pending sampling, testing, of examination by the quality control unit before release for manufacturing or packaging.",
+    "finding_text_ko": "제조 또는 포장 출하 전에 품질관리부서가 검체 채취, 시험 또는 검사를 수행할 때까지 구성품 및 완제의약품 용기의 수령, 식별, 보관 및 사용 보류와 관련된 작업에서 오염 또는 혼입을 방지하기 위한 분리 또는 지정 구역이 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b5ff5335548f46791ccc1fa6",
+    "finding_text": "Equipment, materials, and/or supplies are not disinfected prior to entering the aseptic processing areas.",
+    "finding_text_ko": "장비, 자재 및/또는 물품이 무균공정 구역에 반입되기 전에 소독되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b6e390c0e5582781f119e072",
+    "finding_text": "Procedures that describe the review and disposition process for nonconforming product were not implemented.",
+    "finding_text_ko": "부적합 제품의 검토 및 처분 절차를 기술한 절차가 이행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b7337b61977ad17dc9c22f9e",
+    "finding_text": "After obtaining an Out-of-Specification assay result during the validation the K-Dur extended release coating process, you reanalyzed the same sample preparation.",
+    "finding_text_ko": "K-Dur 서방형 코팅 공정 밸리데이션 중 규격외(OOS) 정량 결과를 얻은 후 동일한 검체 조제물을 재분석했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b82438a25f62d5d9d4d314ad",
+    "finding_text": "On 7/26/02, another region reported in Biological Product Deviation Report #2002-002-001618 the erroneous release of one component labeled incorrectly as CMV negative when the components tested CMV positive.",
+    "finding_text_ko": "2002년 7월 26일 다른 지역은 CMV 양성으로 시험된 구성품 1개가 CMV 음성으로 잘못 라벨링되어 출하된 사실을 Biological Product Deviation Report #2002-002-001618에 보고했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b82c5bf3980f1e21c0229f11",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the areas and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 구역 및 설비 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b8d8fc46e8f3468d4134a068",
+    "finding_text": "Failure to use an appropriate scientifically valid method to test the seal over plastic bottles to ensure uniformity of the sealing process across all plastic bottles.",
+    "finding_text_ko": "모든 플라스틱 병에 걸쳐 밀봉 공정의 균일성을 보장하기 위해 플라스틱 병의 밀봉 상태를 시험하는 적절하고 과학적으로 타당한 방법을 사용하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b9700c3994ec8a88a1a36eb5",
+    "finding_text": "The following OOSs occurred during the annual stability testing ofbulk products.",
+    "finding_text_ko": "벌크 제품의 연간 안정성 시험 중 다음의 규격외(OOS) 결과가 발생했다.",
+    "translation_method": "manual"
+  }
+]

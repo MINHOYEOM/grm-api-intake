@@ -1,0 +1,44 @@
+[
+  {
+    "finding_id": "finding-8bc585b831be96b49fdb6f0e",
+    "finding_text": "The firm's practices for microbial identification do not provide information related to the microbiological populations found in manufacturing areas where sterile drug products are manufactured.",
+    "finding_text_ko": "무균 완제의약품이 제조되는 제조 구역에서 발견되는 미생물 군집과 관련한 정보를 제공하지 못하는 미생물 동정 관행을 운영하고 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8c28c16d9c090eb9870e751e",
+    "finding_text": "BHQ did not provide proper guidance to the regions on how to initiate a search as instructed in the monthly IBSLs to the regions, until FDA addressed this during the inspection of the Greater Chesapeake and Potomac Region.",
+    "finding_text_ko": "BHQ는 Greater Chesapeake 및 Potomac 지역 점검 중 FDA가 이 문제를 지적할 때까지, 매월 지역에 배포하는 IBSL에 지시된 대로 검색을 개시하는 방법에 관한 적절한 지침을 지역에 제공하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8c8c61942f451a2dd7fd5fae",
+    "finding_text": "Endotoxin level is not tested on the finished drug products.",
+    "finding_text_ko": "완제의약품에 대한 엔도톡신 수준을 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8cd395cfb63dc46a0250a739",
+    "finding_text": "There are no wnitten procedures that address BHQ’s review of corrective action plans submitted by the regions when a region exceeds the established UCL.",
+    "finding_text_ko": "지역이 설정된 UCL을 초과하는 경우 지역이 제출한 시정조치 계획에 대한 BHQ의 검토를 다루는 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8ce65b27080902137c41b070",
+    "finding_text": "On 8/17/10, we (SK, DA) observed donor self-administered questions being conducted without visual privacy at a bloodmobile using two self-contained buses.",
+    "finding_text_ko": "2010년 8월 17일, 당사(SK, DA)는 독립형 버스 2대를 사용하는 헌혈버스에서 공여자가 스스로 작성하는 질문이 시각적 프라이버시 없이 실시되는 것을 관찰했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8dc099893467273a70b3f9bc",
+    "finding_text": "Your firm lacks an adequate control system for the RE DACTION (b)(4) sterilization of Testosterone cypionat e injectable in that there are no written proc edur es describing the REDACTION (b)(4) the REDAC TION (b)(4) has not been validated, and conduct of t he REDACTION (b)(4) is no t documented in the Log of Use, Maintenance and Cleaning (LUMAC) of the REDACTION (b) (4).",
+    "finding_text_ko": "귀사는 테스토스테론 시피오네이트 주사제의 REDACTION (b)(4) 멸균에 대한 적절한 관리 시스템이 부족하다. 즉, REDACTION (b)(4)을 설명하는 문서화된 절차가 없고, REDACTION (b)(4)이 밸리데이션되지 않았으며, REDACTION (b)(4)의 수행이 REDACTION (b)(4)의 사용·유지관리·세척 기록(LUMAC)에 문서화되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e25f0d2d181eb6b3286c66f",
+    "finding_text": "The phannacy is currently assigning a ninety day expiration date for the product based on contract lab sterility test results on the \"test batch\".",
+    "finding_text_ko": "해당 약국은 현재 “시험 배치”의 계약 시험실 무균시험 결과를 근거로 제품에 90일 사용기한을 부여하고 있다.",
+    "translation_method": "manual"
+  }
+]

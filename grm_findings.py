@@ -98,12 +98,41 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      known_limitation=true 로 고정.
 #   5) v1/v2/v3-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all
 #      four. Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v4"
+#
+# grm-finding-taxonomy/v5 change log (2026-08-01 사용자 제보 -- "무균공정과 관련 없어 보이는
+# 지적이 무균 카테고리에 묶여 있다", 실측 재현 firm=Gascó Industrial Corporation/Veganic SKN
+# Limited, 2026-07-28 발행분). No category is added, removed, relabeled, or reordered.
+#   1) **역극성(reverse-polarity) 결함**: 21 CFR 211.113(a) 는 "objectionable microorganisms in
+#      drug products **not required to be sterile**" -- 즉 **비무균** 제품의 미생물 관리 조항인데,
+#      aseptic_sterility_assurance 의 `\bsteril...` 패턴이 이 문장의 "sterile" 한 단어만 보고
+#      무균보증/무균공정으로 끌어갔다. 기존 부정어 방어는 `(?<!non-)(?<!non )` lookbehind 뿐이라
+#      "non-sterile" 만 막고 "not required to be sterile" 은 통과시킨다. 라이브 실측: 이 문형
+#      25건이 **전량**(25/25) 무균 버킷에 들어가 있었다.
+#      ★교훈: 카테고리 신호어의 **극성**은 단어 존재만으로 판정할 수 없다. 부정어 lookbehind 를
+#      하나씩 덧붙이는 방식은 새 부정 문형이 나올 때마다 같은 결함을 반복한다 -- 그래서 v5 는
+#      lookbehind 를 늘리는 대신 매칭 **전에** 역극성 스팬을 중립화한다(`_NEGATED_STERILE_RE`).
+#      스팬 단위 중립화라 같은 문서에 진짜 무균 신호(aseptic/media fill/purporting to be sterile
+#      등)가 따로 있으면 그 신호로 여전히 무균에 남는다 -- 실측 2건(WL 산문, endotoxin/aseptic
+#      rooms)이 이 경로로 보존됨을 확인했다.
+#   2) 중립화만 하면 이 문형은 갈 곳이 없어 other_quality_system(기타 품질시스템)으로 떨어진다
+#      (실측 확인). 그래서 contamination_control 에 `\bobjectionable\s+micro\w*` 패턴을 추가해
+#      정본 카테고리(오염/교차오염 관리)로 보낸다 -- "objectionable microorganism" 은 21 CFR
+#      211.113**(a)** 에만 등장하는 어휘다((b)는 "microbiological contamination ... purporting
+#      to be sterile"). 기존 키워드("contamination")로는 이 문장이 안 잡힌다.
+#   3) 알려진 한계(honesty over forcing a match -- v4 관례 유지): 라이브 1건은 OCR/추출 과정에서
+#      "not" 이 탈락해 원문이 literally "objectionable microorganisms in drug products required
+#      to be sterile" 이다. 저장된 텍스트만 보면 극성이 뒤집혀 있어 중립화 규칙이 발동하지 않고
+#      무균에 남는다. "objectionable micro" 를 무균 **차단** 신호로 승격하면 이 1건은 고쳐지지만
+#      진짜 무균 산문 2건(위 §1)이 함께 강등되므로 채택하지 않는다.
+#   4) v1~v4-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all five.
+#      Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v5"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
     "grm-finding-taxonomy/v3",
     "grm-finding-taxonomy/v4",
+    "grm-finding-taxonomy/v5",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -355,6 +384,11 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "오염/교차오염 관리",
         "Contamination control",
         ("contamination", "cross-contamination", "bioburden", "오염", "교차오염"),
+        # v5: 21 CFR 211.113(a) 의 정본 귀속처. 이 조항 문장에는 "contamination" 이라는 단어가
+        # 아예 없어("prevent objectionable microorganisms in drug products not required to be
+        # sterile") 기존 키워드로는 잡히지 않는다. "objectionable microorganism" 은 211.113(a)
+        # 전용 어휘라 이 패턴 하나로 과매칭 없이 닫힌다.
+        patterns=(r"\bobjectionable\s+micro\w*",),
     ),
     FindingCategory(
         "validation_qualification",
@@ -495,19 +529,38 @@ def _pattern_matches(haystack: str, pattern: str) -> bool:
     return _explicit_pattern(pattern).search(haystack) is not None
 
 
+# v5: 역극성 스팬 중립화. 21 CFR 211.113(a) 의 "(drug products) not required to be sterile" 은
+# 문자열로는 "sterile" 을 포함하지만 의미는 정반대 -- **무균이 아닌** 제품이다. 이 스팬을 매칭
+# 전에 중립 토큰으로 치환해, aseptic_sterility_assurance 의 `\bsteril...` 패턴이 여기에 걸리지
+# 않게 한다. 부정어 lookbehind 를 하나씩 늘리는 대신 스팬을 지우는 이유는 두 가지다:
+#   · lookbehind 는 고정폭이어야 해서 OCR 이 만드는 가변 공백/줄바꿈("not  required\nto be")을
+#     못 따라간다. 여기서는 `\s+` 를 쓸 수 있다.
+#   · 스팬 단위라 **문서 전체를 강등시키지 않는다** -- 같은 지적문에 진짜 무균 신호(aseptic,
+#     media fill, purporting to be sterile 등)가 따로 있으면 그 신호로 무균에 그대로 남는다.
+# `requi\w*` 는 v4 의 보수적 OCR 내성 원칙 범위 안이다(어간 고정 + 접미부만 개방).
+_NEGATED_STERILE_RE = re.compile(r"not\s+requi\w*\s+to\s+be\s+steril\w*", re.IGNORECASE)
+# 치환 토큰은 어떤 카테고리의 키워드/패턴과도 겹치지 않아야 한다(공백 1칸 -- 삭제하면 앞뒤
+# 단어가 붙어 새 단어경계 오탐이 생긴다).
+_NEGATED_STERILE_PLACEHOLDER = " "
+
+
 def classify_finding_category(text: str) -> str:
-    """Deterministic v4 keyword+pattern classifier.
+    """Deterministic v5 keyword+pattern classifier.
 
     The order of FINDING_TAXONOMY is part of the contract.  It gives highly
     specific categories such as aseptic processing a chance to match before more
     general quality-system buckets.  A category matches if any of its `keywords`
     (word-boundary regex for ASCII, substring for Hangul) OR any of its explicit
-    `patterns` (raw regex, case-insensitive) matches the haystack.  See the
-    TAXONOMY_VERSION change log above for what changed between v1/v2/v3/v4.
+    `patterns` (raw regex, case-insensitive) matches the haystack.  v5 adds one
+    step before matching: reverse-polarity spans (text that names a signal word
+    only to negate it) are neutralised, so a category's signal word cannot be
+    read with the opposite of its meaning.  See the TAXONOMY_VERSION change log
+    above for what changed between v1/v2/v3/v4/v5.
     """
     haystack = _text(text).lower()
     if not haystack:
         return "other_quality_system"
+    haystack = _NEGATED_STERILE_RE.sub(_NEGATED_STERILE_PLACEHOLDER, haystack)
     for category in FINDING_TAXONOMY:
         if category.code == "other_quality_system":
             continue

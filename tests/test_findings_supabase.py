@@ -30,6 +30,9 @@ _TAXONOMY_V3_MIGRATION_PATH = (
 _TAXONOMY_V4_MIGRATION_PATH = (
     Path(__file__).resolve().parent.parent / "web" / "migrations" / "012_findings_taxonomy_v4.sql"
 )
+_TAXONOMY_V5_MIGRATION_PATH = (
+    Path(__file__).resolve().parent.parent / "web" / "migrations" / "044_findings_taxonomy_v5.sql"
+)
 
 
 def _pair(
@@ -142,7 +145,7 @@ class PostgresSchemaDdlTest(unittest.TestCase):
         self.assertIn(f"taxonomy_version in ({taxonomy_check})", self.ddl)
 
     def test_taxonomy_check_lists_all_versions(self) -> None:
-        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 4)
+        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 5)
         for version in gf.TAXONOMY_VERSIONS:
             self.assertIn(f"'{version}'", self.ddl)
         # 002 is the fresh-install baseline (IN-list, both versions accepted from day one) --
@@ -395,7 +398,13 @@ class TaxonomyV4AlterMigrationTest(unittest.TestCase):
 
     def test_adds_named_v1v2v3v4_in_list_check(self) -> None:
         self.assertIn("findings_taxonomy_version_v1v2v3v4_check", self.sql)
-        for version in gf.TAXONOMY_VERSIONS:
+        # 적용 완료된 마이그레이션 파일은 **불변**이다 -- 그래서 이 목록은 gf.TAXONOMY_VERSIONS
+        # (현재값, v5 이후 계속 늘어난다)가 아니라 012 가 실제로 쓴 v1~v4 로 고정한다.
+        # 최신 버전 수용은 그때그때의 최신 ALTER 마이그레이션(044 = v5)이 책임진다.
+        for version in (
+            "grm-finding-taxonomy/v1", "grm-finding-taxonomy/v2",
+            "grm-finding-taxonomy/v3", "grm-finding-taxonomy/v4",
+        ):
             self.assertIn(f"'{version}'", self.sql)
         self.assertIn(
             "check (taxonomy_version in (\n      'grm-finding-taxonomy/v1', "
@@ -448,6 +457,63 @@ class TaxonomyV4AlterMigrationTest(unittest.TestCase):
         self.assertIn("grm-finding-taxonomy/v2", self.sql)
         self.assertIn("grm-finding-taxonomy/v3", self.sql)
         self.assertIn("grm-finding-taxonomy/v4", self.sql)
+
+
+class TaxonomyV5AlterMigrationTest(unittest.TestCase):
+    """044 -- v5(역극성 수정) ALTER 마이그레이션. 012 테스트와 같은 규율을 적용한다."""
+
+    def setUp(self) -> None:
+        self.assertTrue(
+            _TAXONOMY_V5_MIGRATION_PATH.is_file(), f"missing {_TAXONOMY_V5_MIGRATION_PATH}"
+        )
+        self.sql = _TAXONOMY_V5_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _TAXONOMY_V5_MIGRATION_PATH.read_bytes())
+
+    def test_targets_public_findings_taxonomy_version_column(self) -> None:
+        self.assertIn("public.findings", self.sql)
+        self.assertIn("taxonomy_version", self.sql)
+
+    def test_uses_do_block_and_pg_constraint_lookup(self) -> None:
+        self.assertIn("do $$", self.sql)
+        self.assertIn("pg_constraint", self.sql)
+
+    def test_adds_named_v1_through_v5_in_list_check(self) -> None:
+        self.assertIn("findings_taxonomy_version_v1v2v3v4v5_check", self.sql)
+        # 044 는 **현행** 마이그레이션이라 gf.TAXONOMY_VERSIONS 와 일치해야 한다 --
+        # 코드가 v6 로 올라가면 이 테스트가 새 ALTER 마이그레이션을 요구하며 깨진다(의도).
+        for version in gf.TAXONOMY_VERSIONS:
+            self.assertIn(f"'{version}'", self.sql)
+
+    def test_does_not_reclassify_existing_rows(self) -> None:
+        """재분류는 findings_reclassify_service.py 의 일이다 -- 마이그레이션은 제약만 넓힌다."""
+        self.assertNotIn("update public.findings", self.sql.lower())
+
+    def test_loop_variable_does_not_shadow_query_table_alias(self) -> None:
+        """004/011/012 와 동일한 회귀 클래스(plpgsql record 변수 = 테이블 별칭 충돌)."""
+        declare_match = re.search(r"declare\s+(\w+)\s+record;", self.sql)
+        self.assertIsNotNone(declare_match, "expected a `declare <name> record;` line")
+        record_var = declare_match.group(1)
+
+        loop_match = re.search(r"for\s+(\w+)\s+in", self.sql)
+        self.assertIsNotNone(loop_match, "expected a `for <name> in` loop")
+        self.assertEqual(loop_match.group(1), record_var)
+
+        alias_match = re.search(r"from\s+pg_constraint\s+(\w+)", self.sql)
+        self.assertIsNotNone(alias_match, "expected `from pg_constraint <alias>`")
+        self.assertNotEqual(record_var, alias_match.group(1))
+
+    def test_supersedes_012_by_expanding_not_narrowing(self) -> None:
+        """044 는 012 가 받던 버전을 하나도 잃지 않는 진부분집합 확장이어야 한다."""
+        v4_sql = _TAXONOMY_V4_MIGRATION_PATH.read_text(encoding="utf-8")
+        for version in (
+            "grm-finding-taxonomy/v1", "grm-finding-taxonomy/v2",
+            "grm-finding-taxonomy/v3", "grm-finding-taxonomy/v4",
+        ):
+            self.assertIn(f"'{version}'", v4_sql)
+            self.assertIn(f"'{version}'", self.sql)
+        self.assertIn("'grm-finding-taxonomy/v5'", self.sql)
 
 
 class TranslationColumnsMigrationTest(unittest.TestCase):

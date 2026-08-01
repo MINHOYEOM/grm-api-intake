@@ -245,10 +245,14 @@ class PatternMechanismTest(unittest.TestCase):
 
 
 class TaxonomyV4BoundedTest(unittest.TestCase):
-    def test_taxonomy_v4_is_current_and_v1v2v3_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v4")
+    def test_v4_is_still_an_accepted_taxonomy_version(self) -> None:
+        """v5(2026-08-01 역극성 수정)로 현재 버전이 올라갔다 -- 이 클래스가 지키는 것은
+        "v4 가 현재 버전"이 아니라 **v4 로 저장된 기존 행이 계속 유효하다**는 계약이다
+        (v2->v3->v4 때와 동일한 additive 규율). 현재 버전 고정은
+        tests/test_findings_taxonomy_v5.py 로 이동."""
+        self.assertIn("grm-finding-taxonomy/v4", gf.TAXONOMY_VERSIONS)
         self.assertEqual(
-            gf.TAXONOMY_VERSIONS,
+            gf.TAXONOMY_VERSIONS[:4],
             (
                 "grm-finding-taxonomy/v1",
                 "grm-finding-taxonomy/v2",

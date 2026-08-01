@@ -1,0 +1,116 @@
+[
+  {
+    "finding_id": "finding-51e3ccc81ef4fd85f570ab7a",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipmentto produce aseptic conditions.",
+    "finding_text_ko": "무균 공정 구역은 무균 조건을 조성하기 위한 실내 및 장비 세척·소독 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5223b0109233e9aa3998ad7e",
+    "finding_text": "Your firm does not maintain an approved master compounding record which documents the concentration range determination for compounded heparin service admixtures.",
+    "finding_text_ko": "귀사는 조제된 헤파린 서비스 혼합물의 농도 범위 결정을 문서화한 승인된 마스터 조제기록을 유지하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-52778122219f8b82596978b3",
+    "finding_text": "Deviation files are incomplet.e.",
+    "finding_text_ko": "일탈 파일이 불완전합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-529c4c5ac6c5713d67fe6e6f",
+    "finding_text": "The corrective action plan for SP 625 included a root cause and it was determined that the plasma recall group cannot process recalls in a timely manner because there is no electronic system in place to accurately locate units ithin a shipment, The corrective action plan indicates one of the corrective actions would be to implement a new software system by the third quarter in 2002 to track recalls on Recovered Plasma units and to manage the Recovered Plasma inventory at the plasma warehouse.",
+    "finding_text_ko": "SP 625의 시정조치 계획에는 근본 원인이 포함되어 있으며, 출하 내 단위를 정확히 찾을 전자 시스템이 없어 혈장 회수 그룹이 회수를 적시에 처리할 수 없다고 판단되었습니다. 시정조치 계획은 회수 혈장 단위의 회수를 추적하고 혈장 창고의 회수 혈장 재고를 관리하기 위해 2002년 3분기까지 새 소프트웨어 시스템을 시행하는 것을 포함합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-52f380e7ed1d92ac90606a05",
+    "finding_text": "The firm's SOPs do not address the need for conducting appropriate extended testing/ validation on batches subject to rework, formulation changes and /or significant manufacturing deviations.",
+    "finding_text_ko": "회사 SOP는 재작업, 제형 변경 및/또는 중대한 제조 일탈이 있는 배치에 대해 적절한 확대 시험/밸리데이션을 수행할 필요성을 다루지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-531beb95a7ddd9de04198f41",
+    "finding_text": "The corrective action plan indicates that BSL 02-009 was issued on 1/29/2002 on management ofproducts and donors when blood donation record information is missing or discrepant.",
+    "finding_text_ko": "시정조치 계획에는 혈액공여기록 정보가 누락되거나 불일치할 때 제품과 공여자를 관리하는 BSL 02-009가 2002년 1월 29일 발행되었다고 명시되어 있습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5336a3e08c98deba647484ea",
+    "finding_text": "There are a number of ceiling panels above the personnel corridors that are adjacent to oo _ the manufacturing rooms that appeared to be either ajar or positioned in a manner which provide for small openings in the ceiling.",
+    "finding_text_ko": "제조실에 인접한 인력 통로 위의 여러 천장 패널이 열려 있거나 천장에 작은 틈이 생기는 방식으로 배치된 것으로 보였습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-537fe31a6172589075634eb8",
+    "finding_text": "The Component Labeling Job Aid is based on a 2006 validation study titled \"Product Quality Study Plan For ABO/Rh Labeling of Blood Components Version BSL 09-286, 12/29/2005.\" The study's purpose was to alleviate documentation by providing labeling staff with maximum time limits for labeling a set number of components outside controlled storage at one time.",
+    "finding_text_ko": "Component Labeling Job Aid는 “Product Quality Study Plan For ABO/Rh Labeling of Blood Components Version BSL 09-286, 12/29/2005”라는 2006년 밸리데이션 연구에 기반합니다. 이 연구의 목적은 라벨링 담당자에게 한 번에 관리 보관 외부에서 일정 수의 구성품을 라벨링할 수 있는 최대 시간 한도를 제공하여 문서화를 완화하는 것이었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5381c1784dbb8d437e7db9b1",
+    "finding_text": "Materials were observed increasing the risk of contamination in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에서 오염 위험을 증가시키는 물질이 관찰되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5388a92281eaa1d117c1adeb",
+    "finding_text": "The corrective action plan required -for system problem #618 was to issue a field communication for management of post donation information (PDI).",
+    "finding_text_ko": "시스템 문제 #618에 요구된 시정조치는 공여 후 정보(PDI) 관리를 위한 현장 커뮤니케이션을 발행하는 것이었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5402ebd736cb13122f20bcfe",
+    "finding_text": "The corrective action for SP #545 included a cross-functional meeting on 12/14/00, 2000 to determine onversion plans for a switch from dock-on in line filters.",
+    "finding_text_ko": "SP #545에 대한 시정조치에는 도크온 인라인 필터에서 전환하기 위한 계획을 결정하는 2000년 12월 14일의 다기능 회의가 포함되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-54630b91195247864fe069d9",
+    "finding_text": "There was no preventive maintenance program, including filter inspection and replacement .",
+    "finding_text_ko": "필터 점검 및 교체를 포함한 예방정비 프로그램이 없었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-54859939374d6050310fa9a2",
+    "finding_text": "Your firm can not assure the processes used to manufacture finished pharmaceutical products can consistently produce product which meet their pre-determined specifications.",
+    "finding_text_ko": "귀사는 완제 의약품 제조에 사용되는 공정이 사전 설정된 규격을 충족하는 제품을 일관되게 생산할 수 있음을 보장할 수 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-549399021973a22247e96173",
+    "finding_text": "There is no documentation of the thorough review of failures to meet specifications impacting the identity, strength, quality, and purity of the drug products.",
+    "finding_text_ko": "의약품의 동일성, 함량, 품질 및 순도에 영향을 미치는 규격 미충족에 대한 철저한 검토 문서가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-54b3042f2bb05f1924bb59f7",
+    "finding_text": "When hotline reports (that could affect quality, safety, purity of blood products) are received indicating supervisors have been informed by the employee of the problem and failed to investigate and take corrective action, the investigation reports do not indicate that an appropriate investigation of the supervisors failure to correct the problem has * [been conducted.",
+    "finding_text_ko": "직원이 문제를 상사에게 알렸으나 상사가 조사·시정조치를 하지 않았다고 나타내는, 혈액 제품의 품질·안전성·순도에 영향을 줄 수 있는 핫라인 보고서를 접수한 경우, 조사 보고서에는 상사의 문제 시정 실패에 대한 적절한 조사가 수행되었음이 나타나지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-54bcb51f9f34e5207f2a05a3",
+    "finding_text": "Your outsourcing facility was unable to identify which batch of Avastin was dispensed to each patient due to specimens of patient-specific labels not being maintained within the batch record.",
+    "finding_text_ko": "귀사 위탁제조시설은 환자별 라벨 사본이 배치기록에 유지되지 않아 각 환자에게 조제된 Avastin의 배치를 식별할 수 없었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5547af6ed7516c8305c77ef5",
+    "finding_text": "Corrective Actions have not been fully implemented for an identified root cause ofOOS stability results for physical exam of Bulk Td Adsorbed, Bulk Tripedia, BulkTd PF Adsorbed, Bulk DT PF, Bulk Flu, and Bulk Menactra.",
+    "finding_text_ko": "Bulk Td Adsorbed, Bulk Tripedia, Bulk Td PF Adsorbed, Bulk DT PF, Bulk Flu 및 Bulk Menactra의 물리적 검사에 대한 OOS 안정성 결과의 확인된 근본 원인에 대해 시정조치가 완전히 시행되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-555da58cec64a99ae887dd9d",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-557fed5020cd2bec6e5bec0c",
+    "finding_text": "Since February 1999 all stability testing ofbatches ofGentocin otic solution (Gentamicin Sulfate (3mg/ml) w/ Betamethasone Valerate (1mg/ml)) has revealed a contamination of the product in the form of an unknown peak-in the Betamethasone Valerate assay.",
+    "finding_text_ko": "1999년 2월 이후 Gentocin 점이액(Gentamicin Sulfate 3mg/ml 및 Betamethasone Valerate 1mg/ml) 배치의 모든 안정성 시험에서 Betamethasone Valerate 분석의 미확인 피크 형태로 제품 오염이 확인되었습니다.",
+    "translation_method": "manual"
+  }
+]

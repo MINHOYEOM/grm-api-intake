@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-4478edcaab52f574cf646882",
+    "finding_text": "The firm's investigations into Soliri- microbiological contamination events are inadequate.",
+    "finding_text_ko": "회사의 Soliri 관련 미생물 오염 사건 조사가 부적절합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-44a9b3ace40af7819d798141",
+    "finding_text": "The firm has no protocol for sampling batches for sterility testing.",
+    "finding_text_ko": "회사는 무균 시험을 위한 배치 샘플링 프로토콜이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-44dceedd66d1983d6ca66de2",
+    "finding_text": "In 2007, the firm had a large walk in refrigerator installed in the warehouse.",
+    "finding_text_ko": "2007년에 회사는 창고에 대형 워크인 냉장고를 설치했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-45304b8e90659939203fa29d",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and e quipment to produce aseptic conditions.",
+    "finding_text_ko": "무균 공정 구역은 무균 조건을 조성하기 위한 실내 및 장비 세척·소독 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-453cfe710ceb6f0d8787228d",
+    "finding_text": "The DCSC does not always meet the established timeframes required in the System 10 Problem Management Procedures and in the Decree.",
+    "finding_text_ko": "DCSC는 System 10 Problem Management Procedures 및 Decree에서 요구하는 확립된 기한을 항상 충족하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-455cf9b28cbe7b5912937b5a",
+    "finding_text": "The firm did not follow their Standard Operating Procedures.",
+    "finding_text_ko": "회사는 자체 표준작업절차를 준수하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-45969cb0f524438649127723",
+    "finding_text": "The region responded to the audit findings indicating that when the MQ” assertion was added there was mo requirement to perform a lookback and place the unit in quarantine.",
+    "finding_text_ko": "해당 지역은 MQ” 확인이 추가된 경우 룩백을 수행하고 해당 단위를 격리할 요건이 없었다고 감사 결과에 응답했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4692e5f09177aa6a96c305d4",
+    "finding_text": "Raw Materials a) You have not executed the new Audit Qualification Plan 2001 to audit suppliers of active ingredients and raw materials as committed in your response to the previous FDA-483.",
+    "finding_text_ko": "원자재: 귀사는 이전 FDA-483에 대한 답변에서 약속한 대로 유효성분 및 원자재 공급업체를 감사하기 위한 새로운 Audit Qualification Plan 2001을 실행하지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-46b50cfb82c0e994e202f397",
+    "finding_text": "The following analytical method validations have not been finalized.",
+    "finding_text_ko": "다음 분석 방법 밸리데이션이 완료되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4739d70940e1f2fb25bc3dbe",
+    "finding_text": "Procedures describing the handling of written and oral complaints related to drug products are deficiently written or followed.",
+    "finding_text_ko": "의약품 관련 서면 및 구두 불만의 처리 절차가 부적절하게 작성되었거나 준수되지 않습니다.",
+    "translation_method": "manual"
+  }
+]

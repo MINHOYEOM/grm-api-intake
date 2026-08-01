@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-9ebb5dccdf7d67abdd9db435",
+    "finding_text": "Blood products from approximately 58 donors were found to be collected and distributed even though the donors had reported to the health historian information about traveling to a malarial endemic area.",
+    "finding_text_ko": "말라리아 유행 지역 여행 정보를 건강 이력 담당자에게 보고했음에도 약 58명의 공여자로부터 채혈된 혈액 제품이 수집·유통된 사실이 확인되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ef84e54edeaf2c1ea9bc483",
+    "finding_text": "The firm detected a “fourth spot” in the TLC identity test for Garamycin Cream, lot 9-HB-1, The firm’s: | tested one previous batch (5-HB-1) from its retain samples.",
+    "finding_text_ko": "해당 업체는 Garamycin Cream 로트 9-HB-1의 TLC 동일성 시험에서 “네 번째 반점”을 발견했다. 해당 업체는 보관 검체에서 이전 배치 1건(5-HB-1)을 시험했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9f5589b0f6eb4e280d838bb1",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed, .",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9fa29053cdc98d0f6bdb8dfe",
+    "finding_text": "Media fills were not performed under the most challenging or stressful conditions.",
+    "finding_text_ko": "배지충전시험은 가장 까다롭거나 가혹한 조건에서 수행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9fa6ce39fdcb611d42513b79",
+    "finding_text": "The product is not routinely or periodically tested for sterility to demonstrate process control and the consistent ability to perform aseptic fill operations.",
+    "finding_text_ko": "공정 관리와 무균충전 작업을 일관되게 수행할 수 있는 능력을 입증하기 위해 제품의 무균성을 일상적 또는 정기적으로 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9fc6b080606fc0d8668e44e4",
+    "finding_text": "Your equipment cleaning SOP for the Rigavirin production line is inadequate in that it fails to require that a mayor cleaning be executed between lots of Rivavirin obtained from an approved drug substance supplier and a non-approved supplier.",
+    "finding_text_ko": "귀사의 Rigavirin 생산 라인 설비 세척 SOP는 승인된 원료의약품 공급업체와 미승인 공급업체에서 받은 Rivavirin의 로트 사이에 대규모 세척을 수행하도록 요구하지 않아 부적절하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9fd412b935c9add697fdff71",
+    "finding_text": "Reportedly, SIP s@iMfMFwas run again on 9/28/00 as an effectiveness check.",
+    "finding_text_ko": "보고에 따르면 SIP s@iMfMF를 유효성 확인으로 2000년 9월 28일 다시 실행했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9ffa5405b3fa5dbed04cd078",
+    "finding_text": "BSL 01-064 required all regions to review the results ofa query (SIP @§@#9 to determine whether they were releasing donor identification holds in the proper sequence.",
+    "finding_text_ko": "BSL 01-064는 모든 지역이 공여자 식별 보류를 적절한 순서로 해제하고 있는지 확인하기 위해 조회 결과(SIP @§@#9)를 검토하도록 요구했다.",
+    "translation_method": "manual"
+  }
+]

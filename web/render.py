@@ -1297,6 +1297,9 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
+        # 자가점검 체크리스트 — 조회 파라미터 없이 그 자체로 완결된 도구 페이지라 등록한다
+        # (firm/inspector 와 달리 개인·업체 식별 정보가 URL 에 없다).
+        f"  <url><loc>{base_url}/findings/checklist/</loc><lastmod>{latest_pub}</lastmod></url>",
         # 업체 프로파일(FIND-FIRM-ALIAS) — 쿼리스트링 기반 동적 조회(`?key=firm_key`)라
         # 개별 업체 URL 은 넣지 않고 베이스 경로 1건만 등록한다.
         f"  <url><loc>{base_url}/findings/firm/</loc><lastmod>{latest_pub}</lastmod></url>",
@@ -1369,6 +1372,8 @@ TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 식약처 · EU/영국 GMP �
                       "카테고리 순위·연도별 구성비·업체 랭킹으로 보는 규제 지적 트렌드.")
 FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·식약처·EU/영국 GMP 비준수 지적사항 누적 이력을 "
                     "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
+CHECKLIST_DESCRIPTION = ("규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 "
+                         "지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원.")
 INSPECTOR_DESCRIPTION = ("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 "
                          "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일.")
 LIBRARY_DESCRIPTION = ("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내외 규제기관의 GMP 지침·고시·"
@@ -1479,6 +1484,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["findingsjs_ver"] = _asset_ver("findings.js")
     env.globals["trendsjs_ver"] = _asset_ver("trends.js")
     env.globals["firmjs_ver"] = _asset_ver("firm.js")
+    env.globals["checklistjs_ver"] = _asset_ver("checklist.js")
     env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
@@ -1618,6 +1624,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     _write(out_dir / "findings" / "firm" / "index.html", firm_html)
     written.append("findings/firm/index.html")
+
+    # 자가점검 체크리스트 — findings/trends 와 동일 이유로 라이브 데이터는 빌드시 고정할 수
+    # 없다(042 findings_cfr_ranking 로 조항 순위 + 043 findings_checklist 로 사례를 받아
+    # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
+    # findings/checklist/index.html 은 findings/trends/index.html 과 같은 깊이라 rel_root 동일.
+    checklist_html = env.get_template("checklist.html").render(
+        page_title="자가점검 체크리스트 · GRM",
+        rel_root="../../",
+        nav_active="trends",
+        latest_slug=latest_slug,
+        description=CHECKLIST_DESCRIPTION,
+        canonical=_abs_url("findings/checklist/"),
+    )
+    _write(out_dir / "findings" / "checklist" / "index.html", checklist_html)
+    written.append("findings/checklist/index.html")
 
     # 실사관 프로파일(FDA 483 서명 실사관 집계, firm 프로파일의 미러링) — findings/firm 과
     # 동일 이유로 라이브 데이터는 빌드시 고정할 수 없다(findings_inspector_profile RPC 를

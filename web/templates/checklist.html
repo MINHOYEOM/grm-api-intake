@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+{#- FIND-1 자가점검 체크리스트 — 042(findings_cfr_ranking) 로 조항 순위를 받고,
+    043(findings_checklist) 로 그 조항들의 실제 지적 문장을 한 번에 받아 **인쇄·복사
+    가능한 점검표**로 조립한다.
+
+    ★왜 별도 페이지인가: 트렌드 페이지의 조항 랭킹까지는 "읽는 자료"다. 자가점검은
+    회의실에 종이로 들고 가거나 엑셀에 붙여 넣어 채우는 **산출물**이라, 화면 구성이
+    다르다(설정은 화면에만·본문은 인쇄에만, 판정란·근거란이 비어 있어야 함).
+
+    ★서버는 셸만 렌더한다(트렌드·업체 프로파일과 동일 이유) — 조항 순위와 사례는
+    라이브 값이라 빌드 시점에 고정할 수 없다. env(SUPABASE_URL/ANON_KEY) 미설정이면
+    checklist.js 가 "준비 중" 안내로 조용히 종료한다(오류 아님, 골든 결정론 — env 값과
+    무관하게 이 템플릿 출력 byte 는 항상 동일).
+
+    ★안전 계약: 사례 문장은 043 이 내려주는데 그 함수는 **security invoker** 라
+    RLS(010 정책)가 공개 게이트를 강제한다 — /findings/ 검색 페이지가 이미 쓰는 경로와
+    같은 노출 범위다. 042 는 카운트만 준다(집계 RPC 무반환 계약 불변).
+
+    ★nav 에 추가하지 않는다(과밀 금지 원칙 — base.html nav 는 6탭 고정). 진입은
+    트렌드 페이지의 [많이 인용된 조항] 섹션 링크로만 한다. -#}
+<main>
+  <div class="wrap page-head cl-screen-only">
+    <span class="kick reveal" style="animation-delay:.02s">Self-Inspection</span>
+    <h1 class="reveal" style="animation-delay:.08s">자가점검 체크리스트</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">규제기관이 실제로 인용한 조항을 많이 인용된 순으로 뽑고, 조항마다 실제 지적 문장을 붙여 점검표로 만듭니다.</span> <span class="ln">인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰시면 됩니다.</span></p>
+  </div>
+  <div class="wrap">
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
+
+    {#- 설정·내보내기 — 화면 전용(인쇄에서 사라진다). form 이 아니라 버튼 묶음이라
+        자바스크립트 없이 눌러도 아무 일도 일어나지 않는다(오류 없음). -#}
+    <div class="cl-controls cl-screen-only" id="cl-controls">
+      <div class="cl-ctl-row">
+        <label class="cl-ctl">
+          <span>조항 수</span>
+          <select id="cl-count">
+            <option value="10">10개</option>
+            <option value="15" selected>15개</option>
+            <option value="20">20개</option>
+          </select>
+        </label>
+        <label class="cl-ctl">
+          <span>기준</span>
+          <select id="cl-sort">
+            <option value="docs" selected>전체 누적 인용순</option>
+            <option value="recent">최근 12개월 인용순</option>
+          </select>
+        </label>
+        <label class="cl-ctl">
+          <span>조항당 사례</span>
+          <select id="cl-examples">
+            <option value="1">1건</option>
+            <option value="2" selected>2건</option>
+            <option value="3">3건</option>
+          </select>
+        </label>
+        <button class="cl-btn cl-btn-primary" id="cl-build" type="button">다시 만들기</button>
+      </div>
+      <div class="cl-ctl-row cl-ctl-export" id="cl-export" hidden>
+        <button class="cl-btn" id="cl-print" type="button">인쇄 / PDF로 저장</button>
+        <button class="cl-btn" id="cl-copy" type="button">표로 복사(엑셀 붙여넣기)</button>
+        <button class="cl-btn" id="cl-csv" type="button">CSV 내려받기</button>
+        <span class="cl-copy-msg" id="cl-copy-msg" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="cl-state" id="cl-loading" role="status" aria-live="polite">체크리스트를 만드는 중…</div>
+    <div class="cl-state cl-state-error" id="cl-error" hidden>체크리스트 서비스 준비 중입니다.</div>
+
+    <div id="cl-doc" hidden>
+      {#- 인쇄물 머리 — 화면에서도 보이고 인쇄에도 실린다. 점검자·점검일은 손으로
+          채우는 칸이라 빈 밑줄로 둔다(값을 서버가 지어내지 않는다). -#}
+      <div class="cl-doc-head">
+        <h2 class="cl-doc-title">GMP 자가점검 체크리스트</h2>
+        <p class="cl-doc-meta" id="cl-doc-meta"></p>
+        <p class="cl-doc-fields"><span>점검 대상(사업장/공정)</span><i></i></p>
+        <p class="cl-doc-fields"><span>점검자</span><i class="short"></i><span>점검일</span><i class="short"></i></p>
+      </div>
+      <div id="cl-items" class="cl-items"></div>
+      <p class="cl-doc-foot" id="cl-doc-foot"></p>
+    </div>
+  </div>
+</main>
+<style>
+/* [체크리스트] 한국어 어절 줄바꿈(§1 P0, findings/trends 와 동일 스코프). */
+main{word-break:keep-all;overflow-wrap:anywhere}
+/* 히어로 설명 — 트렌드와 동일하게 문장 경계에서만 줄바꿈(줄맞춤 관례). */
+.page-head p{max-width:none;text-wrap:pretty}
+.page-head p .ln{display:block}
+
+.cl-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.cl-state-error{color:var(--coral-2)}
+
+/* ── 설정·내보내기 바(화면 전용) ──────────────────────────────────────────── */
+.cl-controls{margin:0 0 28px;padding:18px 20px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--soft)}
+.cl-ctl-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.cl-ctl-row + .cl-ctl-row{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.cl-ctl-export[hidden]{display:none}
+.cl-ctl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.cl-ctl select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--ink)}
+.cl-btn{font:inherit;font-size:13px;font-weight:500;padding:8px 16px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--body-s);cursor:pointer}
+.cl-btn:hover{border-color:var(--coral);color:var(--coral-2)}
+.cl-btn-primary{background:var(--coral);border-color:var(--coral);color:var(--on-coral)}
+.cl-btn-primary:hover{opacity:.92;color:var(--on-coral)}
+.cl-copy-msg{font-size:12px;color:var(--muted)}
+
+/* ── 인쇄물 본문 ─────────────────────────────────────────────────────────── */
+.cl-doc-head{margin:0 0 26px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.cl-doc-title{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.cl-doc-meta{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+.cl-doc-fields{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+.cl-doc-fields i{flex:1 1 auto;border-bottom:1px solid var(--line-2);height:16px}
+.cl-doc-fields i.short{flex:0 0 150px}
+
+.cl-items{display:flex;flex-direction:column;gap:0}
+.cl-item{padding:16px 0;border-bottom:1px solid var(--line)}
+.cl-item-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px}
+.cl-item-no{flex:0 0 22px;font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+.cl-item-id{flex:1 1 auto;min-width:0}
+.cl-item-sec{font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--coral-2)}
+.cl-item-name{font-size:14.5px;color:var(--ink);font-weight:500;margin-left:8px}
+.cl-item-cnt{display:block;font-size:11.5px;color:var(--muted-2);margin-top:4px;font-family:var(--mono)}
+/* 판정란 — 화면에서는 실제 체크박스, 인쇄에서도 네모로 찍힌다. */
+.cl-verdict{flex:0 0 auto;display:flex;gap:14px;font-size:12px;color:var(--body-s);white-space:nowrap}
+.cl-verdict label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.cl-verdict input{width:13px;height:13px;accent-color:var(--coral)}
+.cl-ex{margin:0 0 10px;padding:12px 14px;border-left:2px solid var(--coral-tint);background:var(--soft)}
+.cl-ex-h{font-size:11px;font-weight:600;color:var(--muted);margin:0 0 8px}
+.cl-ex-item{margin:0 0 9px}
+.cl-ex-item:last-child{margin-bottom:0}
+.cl-ex-meta{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin:0 0 3px}
+.cl-ex-text{font-size:12.5px;line-height:1.7;color:var(--body-s);margin:0}
+/* 같은 위반 블록이 여러 조항을 함께 인용한 사례 — 문장에 그 조항 번호가 없다는 사실을
+   적어 "왜 이게 이 조항 사례지?"에서 막히지 않게 한다(043 anchored 필드). */
+.cl-ex-loose{font-size:10.5px;color:var(--muted-2);margin-left:6px}
+.cl-note-line{display:flex;align-items:baseline;gap:10px;font-size:12px;color:var(--muted)}
+.cl-note-line i{flex:1 1 auto;border-bottom:1px solid var(--line-2);height:18px}
+.cl-doc-foot{margin:22px 0 0;font-size:11.5px;color:var(--muted-2);line-height:1.6}
+
+@media(max-width:640px){
+  .cl-item-head{flex-wrap:wrap}
+  .cl-verdict{width:100%;padding-left:36px}
+}
+
+/* ── 인쇄 ────────────────────────────────────────────────────────────────
+   화면 크롬(내비·푸터·펫 위젯·설정바·히어로)을 전부 걷어내고 본문만 남긴다.
+   항목이 페이지 경계에서 잘리면 점검표로 못 쓰므로 break-inside 를 막는다. */
+@media print{
+  .nav,.site,.grm-pet,.cl-screen-only,#backtotop{display:none !important}
+  .wrap{max-width:none;padding:0}
+  main{padding:0}
+  .cl-item{break-inside:avoid;page-break-inside:avoid;border-bottom:1px solid #ccc}
+  .cl-ex{background:transparent;border-left:2px solid #bbb}
+  .cl-doc-head{border-bottom:2px solid #000}
+  .cl-verdict input{-webkit-appearance:none;appearance:none;width:11px;height:11px;border:1px solid #333}
+  a[href]:after{content:""}
+}
+</style>
+{% endblock %}
+{% block scripts %}<script src="{{ rel_root }}assets/checklist.js?v={{ checklistjs_ver }}" defer></script>{% endblock %}

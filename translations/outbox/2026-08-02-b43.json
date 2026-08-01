@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-8e39cf7627bfe27f4998bf55",
+    "finding_text": "BHQ failed to follow LOP 10.515, Donor File Check Procedures, Effective Date 1/6/00, whichrequires monthly distribution of the Donor File Check list to all regions.",
+    "finding_text_ko": "BHQ는 모든 지역에 매월 공여자 파일 확인 목록을 배포하도록 요구하는 2000년 1월 6일 발효 LOP 10.515, 공여자 파일 확인 절차를 준수하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e7967ece77f287fe7cdf927",
+    "finding_text": "Training of employees is insufficient in that: • Personnel are performing routine job functions without being trained on the current approved procedures.",
+    "finding_text_ko": "직원 교육이 불충분하다. 즉, 인력이 현행 승인 절차에 대한 교육을 받지 않은 채 일상 업무 기능을 수행하고 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e7b607112047a946f67bb91",
+    "finding_text": "There are no written procedures for production and process controls designed (o assure that the drug products have | the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시하는 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e8377d4d2e9ec52838093c5",
+    "finding_text": "There is a lack of assurance in the environmental quality in Class 100 aseptic processing areas in that the fir m does not perform adequate environmental monitoring within these areas .",
+    "finding_text_ko": "해당 업체가 이 구역 내에서 충분한 환경모니터링을 수행하지 않아 Class 100 무균공정 구역의 환경 품질 보증이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e8f1c7d9ef45f0a5852562e",
+    "finding_text": "Following a confirmed Bacillus thuringiensis contamination in bioreactors reda cted (b)(4) and redacted (b)(4) for Soliris lot redacted (b)(4) on January 14, 2012, a routine CIP cycle was executed for redacted (b)(4) on January 18, 2012.",
+    "finding_text_ko": "2012년 1월 14일 Soliris 로트 redacted (b)(4)에 대해 생물반응기 redacted (b)(4) 및 redacted (b)(4)에서 Bacillus thuringiensis 오염이 확인된 후, 2012년 1월 18일 redacted (b)(4)에 대해 일상적인 CIP 주기가 수행되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8f5f01cb138817c4e577eaf9",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8f7a778d02d904e2c70e2111",
+    "finding_text": "The flow of drug product containers, closures, in-process materials, and drug products though the building is sot designed to prevent contamination.",
+    "finding_text_ko": "건물 내 완제의약품 용기, 마개, 공정 중 물질 및 의약품의 흐름이 오염을 방지하도록 설계되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8f885620bae64e2445217c6d",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8fa0d3c7264ea3a0c8166db3",
+    "finding_text": "Inadequate faci lity design to prevent microbiological contamination of sterile drug products.",
+    "finding_text_ko": "무균 완제의약품의 미생물 오염을 방지하기 위한 시설 설계가 부적절하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8fd897a10adb0ba61bafd7ca",
+    "finding_text": "Poor aseptic practices were observed.",
+    "finding_text_ko": "부적절한 무균 작업 관행이 관찰되었다.",
+    "translation_method": "manual"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-4465f66144478b25d03c5000",
+    "finding_text": "The 11 Facility and Equipment Qualification Master Plan\", document #030..SOP-OP-13, effective date 30 Dec 2009, \"applies to all Facilities, Utilities, and Process Equipment involved in the manufacture, packaging or holding of raw materials or drug products at BVL.",
+    "finding_text_ko": "2009년 12월 30일 발효된 문서 #030..SOP-OP-13 “시설 및 설비 적격성평가 마스터 플랜”은 BVL에서 원자재 또는 완제의약품의 제조, 포장 또는 보관에 관여하는 모든 시설, 유틸리티 및 공정 설비에 적용된다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-662cfc36097c7d86233e7163",
+    "finding_text": "The loading door in the warehouse is approximately 8 feet by 8 feet 2 inches.",
+    "finding_text_ko": "창고의 적재 출입문은 약 8피트 x 8피트 2인치이다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6632d7c6f5a2c7a0c437ad5c",
+    "finding_text": "Deviations are not required to be initiated for all visual inspection failures, for example post CIP visual inspection fa ilures.",
+    "finding_text_ko": "모든 육안검사 실패에 대해 일탈을 개시하도록 요구되지 않으며, 예를 들어 CIP 후 육안검사 실패가 그러하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6d34f57013a8beb143452398",
+    "finding_text": "Your firm has failed to establish adequate procedures for conducting appropriate media fill simulations.",
+    "finding_text_ko": "귀사는 적절한 배지충전(media fill) 모의시험을 수행하기 위한 충분한 절차를 수립하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-852c1c5b85993c37c0629786",
+    "finding_text": "Your Out of Specifications (OOS) laboratory investigations system is inadequate in that: a.",
+    "finding_text_ko": "귀사의 규격외(OOS) 시험실 조사 시스템은 다음과 같은 점에서 부적절하다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8635d05df92248358acf2f72",
+    "finding_text": "Approved drug product containers are not retested or reexamined as appropriate for identity, strength, quality and purity after storage for long periods and exposure to conditions that might have an adverse event with subsequent approval or rejection by the quality control unit.",
+    "finding_text_ko": "승인된 완제의약품 용기는 장기간 보관하거나 이후 품질관리부서의 승인 또는 거절에 부정적 영향을 줄 수 있는 조건에 노출된 후, 동일성·함량·품질·순도에 대해 적절하게 재시험 또는 재검사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8639340e155c3fbdce8fdd6c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-863d7f220211ad4e5a88d68f",
+    "finding_text": "Regarding bioburden testing ofin-process influenza vaccine: A.",
+    "finding_text_ko": "공정 중 인플루엔자 백신의 생균수(bioburden) 시험과 관련하여: A.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8671466837caa0568ddf7969",
+    "finding_text": "The Process Verification signature in Section G was missing on 4 of the 5 available Donor Status Change Records (DSCRs).",
+    "finding_text_ko": "이용 가능한 5건의 공여자 상태 변경 기록(DSCR) 중 4건에서 G절의 공정 검증 서명이 누락되어 있었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-885f4a673c122549bd9d0aba",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sierile are not established and followed.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·준수되지 않았다.",
+    "translation_method": "manual"
+  }
+]

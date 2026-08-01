@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-d7cfdfed9f5b09f44e2ebef3",
+    "finding_text": "An adequate number of batches of each drug product are not tested to determine an appropriate expiration date.",
+    "finding_text_ko": "적절한 사용기한을 결정하기 위해 각 완제의약품의 충분한 수의 배치를 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d7d60bfcbc7e09b4c1576eea",
+    "finding_text": "As per the firm’s stability program, accelerated stability studies are conducted on products for reasons including formulation revisions and changes in methed of me-ufacture.",
+    "finding_text_ko": "해당 업체의 안정성 프로그램에 따라 제형 개정 및 제조 방법 변경 등을 이유로 제품에 대해 가속 안정성 시험을 실시한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d8c06c9e1ad37cfd9bc9ae3f",
+    "finding_text": "Inspection of finished product vials for particulates is not conducted a gainst a contrasting background.",
+    "finding_text_ko": "완제품 바이알의 입자 검사는 대조 배경을 기준으로 실시되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d968dcfac653b3192ff3f617",
+    "finding_text": "BHQ has exempted donors placed in certain Category/Subcategory ‘#@ from having to be included ina monthly donor file check.",
+    "finding_text_ko": "BHQ는 특정 Category/Subcategory ‘#@에 배정된 공여자를 매월 공여자 파일 확인에 포함할 의무에서 면제했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d989b8053b0fa4e50e665d7e",
+    "finding_text": "The following poor aseptic technique was observed for manufacturing personnel during gowning operations before entering the controlled manufacturing areas: a.",
+    "finding_text_ko": "관리 제조 구역에 들어가기 전 가운 착용 작업 중 제조 작업자에게서 다음의 부적절한 무균 기술이 관찰되었다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-da623cff3c6e6b2ebdaf2b3c",
+    "finding_text": "The firm's procedures allow the release of allergenic extracts exhibiting cloudiness.",
+    "finding_text_ko": "해당 업체의 절차는 혼탁이 나타나는 알레르겐 추출물의 출하를 허용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-da7404077a64ccb472449364",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include validation of the sterilization process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 멸균 공정의 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-dacff95e76f6bc4e1566a846",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 제어하는 데 사용되는 설비의 유지관리를 위한 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  }
+]

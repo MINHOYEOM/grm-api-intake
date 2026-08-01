@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-aeb9269ba55b9d3c1c7c8afc",
+    "finding_text": "Annual Product Reviews (APRs) are not completed in a timely manner.",
+    "finding_text_ko": "연간 제품 검토(APR)가 적시에 완료되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-af15ffe5e91053837b4c442c",
+    "finding_text": "Media fills were not performed that closely simulate aseptic production operations incorporating, as appropriate, worst case activities and conditions that provide a challenge to aseptic operations.",
+    "finding_text_ko": "무균 작업에 대한 도전을 제공하는 최악의 활동 및 조건을 적절히 포함하여 무균 생산 작업을 면밀히 모의하는 배지충전시험이 수행되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-afc33b98f09427c6bb08b879",
+    "finding_text": "T here is a lack of microbial reduction/control steps in the manufacturing process of sterile drug products.",
+    "finding_text_ko": "무균 완제의약품 제조 공정에 미생물 감소·관리 단계가 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b02cfcc58d3bcea9276e1324",
+    "finding_text": "Not all patient complaints are documented in a complaint log and/or investigated per requirements specified in Policy number PP-18, Title: Patient Grievance Procedures.",
+    "finding_text_ko": "모든 환자 불만이 불만 기록대장에 문서화되지 않거나 정책 번호 PP-18(제목: 환자 고충 처리 절차)에 명시된 요건에 따라 조사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b0c69d23058437cfcf3fe4b5",
+    "finding_text": "The conditions listed below were identified during the inspection in areas used for the preparation, filling, and/or storage of sterile drugs products.",
+    "finding_text_ko": "무균 의약품의 조제, 충전 및/또는 보관에 사용되는 구역에서 아래 조건들이 점검 중 확인되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b0e5132770dd236e9cceb851",
+    "finding_text": "There are no written procedures for receiving, investigating and correcting problems reported by employees ough the “ARC hotline.”",
+    "finding_text_ko": "“ARC hotline”을 통해 직원이 보고한 문제를 접수·조사·시정하기 위한 문서화된 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b166f09073f42e72bfc58f90",
+    "finding_text": "The firm failed to exclude the ingress of pests into the facility as follows: a.",
+    "finding_text_ko": "해당 업체는 다음과 같이 해충의 시설 유입을 차단하지 못했다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b1beb8c437158cc4835bbde2",
+    "finding_text": "Your firm did not perform appropriate environmental monitoring in your aseptic processing areas.",
+    "finding_text_ko": "귀사는 무균공정 구역에서 적절한 환경모니터링을 수행하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b2a607257d6d07eb70523841",
+    "finding_text": "The firm does not test the potency of the final drug product after numerous lots are further diluted as pan of the manufacturing process of sterile drug products for patient use.",
+    "finding_text_ko": "해당 업체는 환자용 무균 의약품 제조 공정의 일부로 다수의 로트가 추가 희석된 후 최종 의약품의 함량을 시험하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b2e2924a23f6385e78385d01",
+    "finding_text": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements.",
+    "finding_text_ko": "무균 및 무발열성임을 표방하는 각 의약품 배치는 그러한 요건 적합 여부를 확인하기 위한 시험실 시험을 거치지 않는다.",
+    "translation_method": "manual"
+  }
+]

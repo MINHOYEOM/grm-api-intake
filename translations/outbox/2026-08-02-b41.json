@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-886c9ed50137dadf12034580",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "완제의약품의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-88e7886eaf9231de3dcea648",
+    "finding_text": "On 10/17/17, an operator was observed sanitizing his gloved hands with non-sterilc(b) (4) and then resuming aseptic processing in the ISO 5 area.",
+    "finding_text_ko": "2017년 10월 17일 작업자가 비멸균 (b)(4)로 장갑 낀 손을 소독한 후 ISO 5 구역에서 무균공정을 재개하는 것이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-89f7286347af5496dc9ca5e6",
+    "finding_text": "Thehepparplieltie Smoke Testing conducted as part ofthe Operational Qualification Testing for theLaminar Air Flow Unit # VLF-0067/68 Room 113, Building 37 was inadequate in thet the simulated dynamic operations were described only as “personnel within units”.",
+    "finding_text_ko": "37동 113호실 층류공기흐름장치 #VLF-0067/68의 운전 적격성평가 시험의 일부로 실시한 HEPA 필터 연기시험은 모의 동적 작업을 “장치 내 인원”으로만 기술하여 부적절했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8a0c36b7d6335ae1b06361b8",
+    "finding_text": "Per SOP 030-.SOP-E-1 0 (7.0), \"Operating the Exterior Vial Washer\", your firm uses a vial washer on packaging lines n build f the south complex, to ensure that the exterior of vials are clean of any foreign material.",
+    "finding_text_ko": "SOP 030-.SOP-E-10(7.0) “외부 바이알 세척기 운전”에 따르면, 귀사는 바이알 외부에 이물이 없도록 남부 단지 건물의 포장 라인에서 바이알 세척기를 사용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8a61efd7b7f371604ed80626",
+    "finding_text": "A review of SIPGun on 9/28/00 was not completed and documented until 2/7/02.",
+    "finding_text_ko": "2000년 9월 28일 SIPGun에 대한 검토는 2002년 2월 7일까지 완료·문서화되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8a86b8607c1bec77b07ff868",
+    "finding_text": "The firm's procedures do not include requirements for analytical testing of incoming,commercially available drug products which are used in the production of sterile, finished drug products distributed to consignees.",
+    "finding_text_ko": "귀사의 절차에는 수령인에게 유통되는 무균 완제의약품 생산에 사용되는 입고 상용 의약품의 분석시험 요구사항이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8afbc87b0deb5ff1204ef9cd",
+    "finding_text": "During the ime of the extended implementation date (9/01!-12/01) for BSL 01-123 in SP #545, there were at least three additional occurrences of labeling errors that happened during the leuko-reduction process (BPDR # 2001- 042-002154, 2001-020-004254, and 2001-017-003996).",
+    "finding_text_ko": "SP #545에서 BSL 01-123의 연장된 시행일(9/01~12/01) 동안 백혈구감소 공정 중 발생한 라벨링 오류가 최소 3건 더 있었다(BPDR #2001-042-002154, 2001-020-004254 및 2001-017-003996).",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8bb231e56d3d3b58a380908d",
+    "finding_text": "Your facility design allows the influx of poor quality into a higher classified area.",
+    "finding_text_ko": "귀사의 시설 설계는 낮은 품질의 공기가 더 높은 등급 구역으로 유입되는 것을 허용한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8bba5ff8da2a7b3fcd7380cf",
+    "finding_text": "The environmental monitoring procedure requires sampling via personnel touch plates taken upon completion of sterile compounding and prior to cleaning.",
+    "finding_text_ko": "환경모니터링 절차는 무균 조제 완료 후 및 세척 전에 채취한 작업자 접촉 배지를 통한 검체 채취를 요구한다.",
+    "translation_method": "manual"
+  }
+]

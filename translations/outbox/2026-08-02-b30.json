@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-62c210e526c0264b3058371d",
+    "finding_text": "(b)(4 ) The plastic pouches REDACTED (b)(4) ) used to package the final compounded, REDACTED (b)(4).On 3/14/06, one bag of REDACTED (b)(4) currently in use was observed to be open and unsealed in the firm's drug container storage area which also operates as an employee lunchroom.",
+    "finding_text_ko": "최종 조제된 REDACTED (b)(4)를 포장하는 데 사용되는 플라스틱 파우치 REDACTED (b)(4)가 있습니다. 2006년 3월 14일, 현재 사용 중인 REDACTED (b)(4) 한 봉지가 직원 점심 식당으로도 운영되는 회사의 의약품 용기 보관 구역에서 개봉되고 밀봉되지 않은 채 관찰되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6338ea74f5d3dc45aa8a6117",
+    "finding_text": "Document 030-SOP-J-204, Dynamic and Static Environmental Monitoring Using Portable Non-Viable Particulate Counters, states that NVP monitoring during dynamic filling operations will be performed according to 030-LST-00033, Dynamic Non-Viable Particulate Sampling Locations.",
+    "finding_text_ko": "Document 030-SOP-J-204, 휴대용 비생존성 입자 계수기를 사용한 동적 및 정적 환경 모니터링은 동적 충전 작업 중 NVP 모니터링이 030-LST-00033, 동적 비생존성 입자 샘플링 위치에 따라 수행된다고 명시합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6388537d1051d7c591796874",
+    "finding_text": "BHQ does not provide adequate oversight ofinventory management deviations occurring in the regions.",
+    "finding_text_ko": "BHQ는 지역에서 발생하는 재고 관리 일탈에 대해 적절한 감독을 제공하지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-638fa62fd80c1b075229f8a1",
+    "finding_text": "A process whose results cannot be fully verified by subsequent inspection and test has not beenadequately validated and approved according to established procedures.",
+    "finding_text_ko": "후속 검사 및 시험으로 결과를 완전히 검증할 수 없는 공정이 확립된 절차에 따라 적절히 밸리데이션·승인되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-63d50e0020456941267e6e78",
+    "finding_text": "The identity of each component of a drug product is not verified by conducting at least one test to verify the identity, using specific identity tests if they exist.",
+    "finding_text_ko": "의약품 각 구성품의 동일성은 존재하는 경우 특정 동일성 시험을 사용하여 최소 한 가지 시험을 수행함으로써 확인되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-649ea158c432b612fbd206a5",
+    "finding_text": "The video observed during this inspection did not show the smoke flow pattern in the ISO 5 area .",
+    "finding_text_ko": "이번 조사 중 관찰된 비디오는 ISO 5 구역의 연기 흐름 패턴을 보여주지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-657d013894a77ed8e73c7a39",
+    "finding_text": "The firm has no change control SOP which describes the scope and procedure for the documentation, review and approval of changes in manufacturing .",
+    "finding_text_ko": "회사는 제조 변경의 문서화, 검토 및 승인 범위와 절차를 설명하는 변경관리 SOP가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-65aed28829afca5b11ca8cba",
+    "finding_text": "There are no written standards or specifications, methods of testing, methods of cleaning, and methods of sterilization to remove pyrogenic properties.",
+    "finding_text_ko": "발열성 특성을 제거하기 위한 서면 표준 또는 규격, 시험 방법, 세척 방법 및 멸균 방법이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-65e084040c6602832a89f016",
+    "finding_text": "In March 2001, BSL 01-043 only required the manual verification for a period of four months in order to determine the effectiveness of the software change related to CMV labeling delivered in NBCS version This BSL as issued despite the fact the regions had already identified the computer change as ineffective.",
+    "finding_text_ko": "2001년 3월 BSL 01-043은 지역에서 이미 컴퓨터 변경이 비효과적이라고 확인했음에도 NBCS 버전에서 제공된 CMV 라벨링 관련 소프트웨어 변경의 효과를 판단하기 위해 4개월 동안만 수동 확인을 요구했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-65f7f50e660e7242227fa0e2",
+    "finding_text": "The original effectiveness check designed for SP 616 and approved by QA in 3/02 is inadequate because QA expects only a “90% reduction in the number of components identified as exceeding timing guidelines.” This is an nacceptable practice for BHQ to expect nothing less than a 100% reduction.",
+    "finding_text_ko": "SP 616을 위해 설계되어 2002년 3월 QA가 승인한 원래 유효성 점검은 QA가 “시간 지침 초과로 식별된 구성품 수의 90% 감소”만 기대하기 때문에 부적절합니다. BHQ가 100% 감소 미만을 기대하는 것은 용납할 수 없는 관행입니다.",
+    "translation_method": "manual"
+  }
+]

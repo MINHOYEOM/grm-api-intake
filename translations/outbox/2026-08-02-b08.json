@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-0aac62a232aee1a2fb4780e3",
+    "finding_text": "The firm is not following their supplier qualification and audit procedures that require a audit of the supplier every two years.",
+    "finding_text_ko": "회사가 2년마다 공급업체 감사를 요구하는 공급업체 적격성평가 및 감사 절차를 준수하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0ad464c820c672ef4fb5159a",
+    "finding_text": "Y our firm has not established adequate written Standard Operating Procedures to ensure proper maint enance of aseptic processing areas and equipment used in those areas.",
+    "finding_text_ko": "귀사는 무균공정 구역 및 해당 구역에 사용되는 설비의 적절한 유지관리를 보장하는 적절한 문서화된 표준작업절차를 수립하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0aed8d9647442c30f667a689",
+    "finding_text": "Written procedures are lacking for the use of fumigating agents and cleaning and sanitizing agents designed to prevent the contamination of equipment, components, drug product containers, and drug products.",
+    "finding_text_ko": "설비, 구성품(원자재), 완제의약품 용기 및 완제의약품의 오염을 방지하도록 설계된 훈증제 및 세척·소독제 사용에 관한 문서화된 절차가 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0aefe3cab1f52cb8028da280",
+    "finding_text": "Personnel engaged in the making ofradiopharmaceuticals in the Nuclear Pharmacy failed to wear appropriate protective apparel to protect the drug product from contamination.",
+    "finding_text_ko": "핵약국에서 방사성의약품 제조에 종사하는 직원이 완제의약품을 오염으로부터 보호하기 위한 적절한 보호복을 착용하지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0b12de650dfe07f5a1d42ba5",
+    "finding_text": "The effectiveness check for SP 625 indicates an investigation will be initiated if the average response time om fractionators for “found” units is greater than 150 days and the number of “not found” units is not greater than 800 its.",
+    "finding_text_ko": "SP 625의 유효성 확인은 “발견됨” 단위체에 대한 분획기의 평균 응답 시간이 150일을 초과하고 “발견되지 않음” 단위체 수가 800개를 초과하지 않으면 조사가 시작됨을 나타낸다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0b48bef757f8bdb29347711d",
+    "finding_text": "Your firm's QA-approved Corrective actions and Effectiv eness Checks are not always c ompleted in the manner that they were designed and approved for.",
+    "finding_text_ko": "귀사 QA 승인 시정조치 및 유효성 확인이 설계되고 승인된 방식대로 항상 완료되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0b83e67dd709e392f396eb65",
+    "finding_text": "On 6/12/02, a region reported in Biological Product Deviation Report #2002-011-001692 the erroneous release of three components labeled incorrectly as CMV negative.",
+    "finding_text_ko": "2002-06-12에 한 지역은 생물학적 제품 일탈 보고서 #2002-011-001692에서 CMV 음성으로 잘못 표시된 3개 구성성분이 오류로 출하되었음을 보고했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0bc5b0d1685e7953194cdc9d",
+    "finding_text": "FDA laboratory analysis of lot 28-03-2014@44 (BUD 9/24/2014) of toltrazuril and pyrimethamine suspension la beled to contain 416 mg/ml toltrazuril and 17 mg/ml pyrimethamine and dispensed under Rx #294545 resulted in the f ollowing values: a.",
+    "finding_text_ko": "FDA 실험실이 Rx #294545에 따라 조제된, toltrazuril 416mg/ml 및 pyrimethamine 17mg/ml를 함유한다고 표시된 toltrazuril 및 pyrimethamine 현탁액 로트 28-03-2014@44(BUD 2014-09-24)을 분석한 결과 다음 값이 나왔다. a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0bef82e1792fda35713bf99f",
+    "finding_text": "SOP #0027777-018 ‘Viable Monitoring of Aseptic Manufacturing Areas” describes the frequency of monitoring, sampling methods, recording and analysis of data.",
+    "finding_text_ko": "SOP #0027777-018 “Viable Monitoring of Aseptic Manufacturing Areas”는 모니터링 빈도, 검체채취 방법, 데이터 기록 및 분석을 기술한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0cfd68219b4fa82a3f76d407",
+    "finding_text": "The firm's Quality Unit failed to identify, investigate, and implement permanent corrective actions after events that could impact the quality, safety, efficacy, and purity of sterile injectable drug products manufactured whether or not the batches has been already distributed.",
+    "finding_text_ko": "회사의 품질관리부서는 배치가 이미 유통되었는지 여부와 관계없이 제조된 무균 주사 완제의약품의 품질, 안전성, 유효성 및 순도에 영향을 미칠 수 있는 사건 후 영구적 시정조치를 식별·조사·시행하지 못했다.",
+    "translation_method": "manual"
+  }
+]

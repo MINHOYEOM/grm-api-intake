@@ -81,6 +81,7 @@ SINGLE_GOLDENS = [
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
+    ("findings/checklist/index.html", "checklist.expected.html"),
     ("findings/firm/index.html", "firm.expected.html"),
     ("findings/inspector/index.html", "inspector.expected.html"),
     ("library/index.html", "library.expected.html"),
@@ -4039,6 +4040,278 @@ class WebTrendsCfrRankingTest(unittest.TestCase):
         for forbidden in ("강화해야", "권고합니다", "해야 합니다", "해야 한다",
                           "준비해야", "대비하십시오"):
             self.assertNotIn(forbidden, self.html, f"금지 문구: {forbidden}")
+
+
+# ── [자가점검 체크리스트] /findings/checklist/ (042 순위 + 043 사례) ──────────
+class WebChecklistRenderTest(unittest.TestCase):
+    """트렌드의 조항 순위까지는 "읽는 자료"다. 자가점검은 회의실에 종이로 들고 가거나
+    엑셀에 붙여 넣어 채우는 **산출물**이라 화면 구성이 다르다 — 설정은 화면에만, 본문은
+    인쇄에도, 판정·근거란은 비어 있어야 한다.
+
+    여기선 셸 결정론·RPC 배선(2회 왕복)·층 분리(순위 정본은 042 하나)·내보내기 3종
+    (인쇄/TSV 복사/CSV)·공개 게이트 차이 고지를 검증한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_checklist_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "checklist" / "index.html").read_text(encoding="utf-8")
+        cls.trends = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "checklist.js").read_text(encoding="utf-8")
+        cls.html_src = (WEB_DIR / "templates" / "checklist.html").read_text(encoding="utf-8")
+        cls.sql_src = (WEB_DIR / "migrations" / "043_findings_checklist.sql").read_text(
+            encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _fn(self, name):
+        start = self.js_src.index("function " + name + "(")
+        return self.js_src[start:self.js_src.index("\n  }", start)]
+
+    # ── 페이지 생성·배선 ─────────────────────────────────────────────────────
+    def test_page_generated_with_canonical_and_description(self):
+        self.assertIn("자가점검 체크리스트", self.html)
+        self.assertIn("Self-Inspection", self.html)
+        self.assertIn(
+            f'<link rel="canonical" href="{render.SITE_BASE_URL}/findings/checklist/" />',
+            self.html)
+        self.assertIn('<meta name="description" content="', self.html)
+
+    def test_sitemap_includes_checklist(self):
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/checklist/</loc>", self.sitemap)
+
+    def test_not_added_to_nav_entry_is_from_trends_only(self):
+        """nav 과밀 금지 — 6탭 고정. 진입은 트렌드의 조항 섹션 링크 하나뿐이다."""
+        nav_m = _re_nav = None
+        import re as _re
+        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
+        self.assertIsNotNone(nav_m)
+        self.assertEqual(nav_m.group(1).count("<a "), 6)
+        self.assertNotIn("checklist", nav_m.group(1))
+        self.assertIn(
+            '<a href="../../findings/checklist/index.html">'
+            '이 조항들로 자가점검 체크리스트 만들기 &rarr;</a>',
+            self.trends)
+
+    def test_js_referenced_with_content_hash_and_copied_verbatim(self):
+        import re as _re
+        self.assertIsNotNone(
+            _re.search(r'assets/checklist\.js\?v=([0-9a-f]{8})"', self.html),
+            "checklist.js 캐시버스팅 해시 미발견")
+        built = (self.single / "assets" / "checklist.js").read_bytes()
+        self.assertEqual(built, (WEB_DIR / "assets" / "checklist.js").read_bytes())
+
+    def test_shell_deterministic_env_gated(self):
+        """env 미설정(테스트)에서도 템플릿 출력 byte 는 항상 동일 — cfg 는 빈 문자열."""
+        self.assertIn(
+            'id="grm-findings-cfg" data-url="" data-key="" data-root="../../" hidden',
+            self.html)
+        self.assertIn('<div class="cl-state" id="cl-loading"', self.html)
+        self.assertIn('<div class="cl-state cl-state-error" id="cl-error" hidden>', self.html)
+        self.assertIn('<div id="cl-doc" hidden>', self.html)
+        self.assertIn('<div class="cl-ctl-row cl-ctl-export" id="cl-export" hidden>', self.html)
+
+    def test_env_missing_ends_quietly_not_as_error(self):
+        self.assertIn('loadingEl.textContent = "체크리스트 서비스 준비 중입니다.";', self.js_src)
+
+    # ── 층 분리: 순위 정본은 042 하나 ────────────────────────────────────────
+    def test_two_round_trips_only_ranking_then_examples(self):
+        """조항마다 검색을 돌리면 N+1 왕복이 된다 — 042 로 순위를 받고 그 섹션 목록을
+        043 에 한 번에 넘긴다."""
+        fn = self.js_src[self.js_src.index("function build()"):]
+        self.assertIn('rpc("findings_cfr_ranking", { p_months: 12 })', fn)
+        self.assertIn('rpc("findings_checklist", { p_sections: sections, p_examples: examples })',
+                      fn)
+        # fetch 호출부는 공용 rpc() 한 곳뿐 — 조항마다 따로 fetch 하는 경로가 없어야 한다.
+        self.assertEqual(self.js_src.count("fetch("), 1)
+        self.assertEqual(self.js_src.count('rpc("'), 2)
+
+    def test_client_does_not_reimplement_ranking_filters(self):
+        """부 필터·보일러플레이트 제외·문서 수 집계는 042 의 몫이다. 클라이언트가 복제하면
+        트렌드 페이지와 체크리스트가 서로 다른 순위를 말하게 된다."""
+        # 보일러플레이트 조항 번호가 클라이언트에 박히면 042 와 갈라진다(제외 목록은
+        # 응답 scope.excluded_sections 를 그대로 표시만 한다).
+        for forbidden in ("211.34", "210.1(b)", "cfr_refs", "jsonb"):
+            self.assertNotIn(forbidden, self.js_src,
+                             f"클라이언트가 순위 필터를 복제하고 있다: {forbidden}")
+        self.assertIn("state.meta.excluded", self.js_src)   # 표시만 한다
+        # 클라이언트가 하는 일은 정렬 키 선택뿐이다.
+        self.assertIn('var sortKey = sortEl && sortEl.value === "recent" ? "recent_docs" : "docs";',
+                      self.js_src)
+
+    def test_sort_label_matches_the_key_actually_used(self):
+        """★실제 결함이었다: sortKey 는 응답 필드명("recent_docs")인데 라벨 분기가 셀렉트
+        값("recent")과 비교해 항상 거짓이 됐다 — 최근순으로 정렬한 표에도 인쇄물 머리에
+        "전체 누적 인용순"이 찍혔다(인쇄물이 자기 기준을 잘못 말하는 결함)."""
+        self.assertIn(
+            'sortLabel: sortKey === "recent_docs" ? "최근 12개월 인용순" : "전체 누적 인용순",',
+            self.js_src)
+        self.assertNotIn('sortKey === "recent" ?', self.js_src)
+
+    def test_sql_is_invoker_so_rls_gates_the_text(self):
+        """사례는 원문 문장이다 — definer 로 내보내면 미번역·비공개 행까지 샌다.
+        invoker 라 RLS(010)가 게이트를 강제한다(026 과 동일 이유, 042 와는 반대)."""
+        self.assertIn("security invoker", self.sql_src)
+        self.assertIn("findings 의 RLS(010 정책", self.sql_src)
+        self.assertNotIn("security definer", self.sql_src)
+
+    def test_sql_section_match_does_not_swallow_neighbours(self):
+        """접두 매치면 211.22 질의가 211.25·211.28 을 삼킨다 — 정확일치 또는 하위 항
+        괄호까지만 허용한다."""
+        self.assertIn("cr.ref_txt = '21 CFR ' || sec.section", self.sql_src)
+        self.assertIn("cr.ref_txt like '21 CFR ' || sec.section || '(%'", self.sql_src)
+        self.assertIn("삼킨다", self.sql_src)
+
+    def test_sql_input_is_validated_and_capped(self):
+        """클라이언트를 신뢰하지 않는다 — 조항 형식만 통과, 배열은 009 관례로 슬라이스."""
+        self.assertIn(r"s.section ~ '^21[01]\.[0-9]+$'", self.sql_src)
+        self.assertIn("(coalesce(p_sections, '{}'::text[]))[1:50]", self.sql_src)
+        self.assertIn("least(greatest(coalesce(p_examples, 2), 1), 5)", self.sql_src)
+
+    def test_sql_dedupes_by_firm_and_prefers_anchored_examples(self):
+        """같은 업체 사례 2건이면 "여러 곳에서 반복되는 지적"이라는 전제가 깨진다.
+        또 위반 블록 하나가 여러 조항을 인용하면 문장에 그 조항 번호가 없을 수 있어,
+        번호가 실제로 적힌 사례를 앞세운다(실측 결함이었다)."""
+        self.assertIn("partition by sec.section, f.firm_key", self.sql_src)
+        self.assertIn("as anchored", self.sql_src)
+        self.assertIn("order by c.anchored, c.published_date desc, c.finding_id", self.sql_src)
+        self.assertIn("21 CFR 211.22(a)를 인용", self.sql_src)   # 근거 실측 기록
+
+    # ── 산출물로서의 요건 ────────────────────────────────────────────────────
+    def test_verdict_and_note_fields_are_blank_for_humans(self):
+        """판정·근거는 사람이 채우는 칸이다 — 서버가 값을 지어내지 않는다."""
+        fn = self._fn("buildVerdictBox")
+        self.assertIn('["적합", "부적합", "해당없음"]', fn)
+        self.assertIn('input.type = "radio";', fn)
+        self.assertIn('input.name = "cl-v-" + idx;', fn)   # 항목별 배타 선택
+        item = self._fn("buildItem")
+        self.assertIn('el("span", "", "확인 결과 · 근거 문서")', item)
+        rows = self._fn("exportRows")
+        self.assertIn('line.push("", "");', rows)          # 내보내기에서도 빈 칸
+
+    def test_print_css_strips_screen_chrome_and_avoids_item_breaks(self):
+        """항목이 페이지 경계에서 잘리면 점검표로 못 쓴다."""
+        self.assertIn("@media print{", self.html_src)
+        for sel in (".nav", ".site", ".grm-pet", ".cl-screen-only"):
+            self.assertIn(sel, self.html_src)
+        self.assertIn("break-inside:avoid;page-break-inside:avoid", self.html_src)
+
+    def test_export_three_ways_share_one_table(self):
+        """인쇄·TSV 복사·CSV 는 같은 표를 세 경로로 낼 뿐이다(열 구성 분기 금지)."""
+        self.assertIn("function exportRows()", self.js_src)
+        self.assertIn("toTsv(exportRows())", self.js_src)
+        self.assertIn("toCsv(exportRows())", self.js_src)
+        self.assertIn("window.print()", self.js_src)
+
+    def test_csv_has_bom_for_excel_korean(self):
+        """BOM 이 없으면 엑셀이 UTF-8 을 자동 인식하지 못해 한글이 깨진다."""
+        self.assertIn('new Blob(["﻿" + toCsv(exportRows())]', self.js_src)
+        self.assertIn('type: "text/csv;charset=utf-8;"', self.js_src)
+        self.assertIn("a.download =", self.js_src)
+
+    def test_tsv_cells_strip_tabs_and_newlines(self):
+        """탭·개행은 셀 경계라 그대로 두면 엑셀 붙여넣기가 어긋난다."""
+        fn = self._fn("tsvCell")
+        self.assertIn(r'replace(/[\t\r\n]+/g, " ")', fn)
+        csv = self._fn("csvCell")
+        self.assertIn("""replace(/"/g, '""')""", csv)
+        self.assertIn(r'replace(/\r?\n/g, " ")', csv)
+
+    def test_copy_failure_is_explained_not_silent(self):
+        fn = self._fn("copyTable")
+        self.assertIn("navigator.clipboard", fn)
+        self.assertIn("CSV 내려받기를 이용해 주세요.", fn)
+
+    # ── 정직성: 무엇이 빠졌는지 문서에 남는다 ────────────────────────────────
+    def test_document_footer_discloses_scope_and_gate_difference(self):
+        """사례는 국문 번역이 끝난 지적만 나오므로(043 invoker+RLS) 인용 문서 수보다
+        적을 수 있다 — 인쇄물에 그 사실이 남아야 한다. 순위 범위 한계도 마찬가지."""
+        fn = self.js_src[self.js_src.index("function renderDoc()"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("사실상 Warning Letter 기준입니다.", fn)
+        self.assertIn("위반 인용이 아니라 제외했습니다.", fn)
+        self.assertIn("인용 문서 수보다 적을 수 있습니다.", fn)
+        self.assertIn("자료가 공개된 날입니다.", fn)
+        self.assertIn("state.meta.excluded", fn)   # 제외 목록은 응답에서(하드코딩 금지)
+        self.assertIn("state.meta.partFilter", fn)
+
+    def test_missing_examples_state_is_explicit(self):
+        item = self._fn("buildItem")
+        self.assertIn("국문으로 열람할 수 있는 사례가 아직 없습니다.", item)
+
+    def test_loose_example_is_flagged(self):
+        """anchored=false 면 같은 위반 블록이 여러 조항을 함께 인용한 경우다 — 문장에
+        그 조항 번호가 없다는 사실을 적어 오해를 막는다."""
+        item = self._fn("buildItem")
+        self.assertIn("if (f.anchored === false)", item)
+        self.assertIn("같은 지적에 여러 조항이 함께 인용됨", item)
+
+    # ── 공통 계약 ────────────────────────────────────────────────────────────
+    def test_no_innerhtml_data_injection(self):
+        for m in re.finditer(r'\w+\.innerHTML\s*=\s*(.+?);', self.js_src):
+            self.assertEqual(m.group(1).strip(), '""', f"innerHTML 데이터 삽입: {m.group(0)}")
+
+    def test_no_external_resources_or_chart_libs(self):
+        for forbidden in ("cdn.", "chart.js", "d3.", "echarts", "<canvas",
+                          '<script src="http'):
+            self.assertNotIn(forbidden, self.html_src, forbidden)
+            self.assertNotIn(forbidden, self.js_src, forbidden)
+        self.assertEqual(self.html_src.count("<script"), 1)
+
+    def test_css_scoped_to_page_not_grm_css(self):
+        for rule in (".cl-item{", ".cl-verdict{", ".cl-controls{"):
+            self.assertIn(rule, self.html_src)
+        css_path = WEB_DIR / "assets" / "grm.css"
+        if css_path.is_file():
+            self.assertNotIn(".cl-item", css_path.read_text(encoding="utf-8"))
+
+    def test_no_prescriptive_language(self):
+        for forbidden in ("강화해야", "권고합니다", "해야 합니다", "해야 한다", "준비해야"):
+            self.assertNotIn(forbidden, self.html, f"금지 문구: {forbidden}")
+
+
+# ── CFR_SECTION_LABELS 하드코딩 사본 전수 동기화 ──────────────────────────────
+class WebCfrSectionLabelsSyncTest(unittest.TestCase):
+    """trends.js 와 checklist.js 가 CFR_SECTION_LABELS 를 각자 하드코딩 복제한다(이 저장소의
+    확립된 방식 — CATEGORY_LABELS 와 동일). 수동 파일 목록은 새 복제본이 생기면 낡아
+    침묵 통과한다(PR#351·#366 이 정확히 그 실패였다) — web/assets/*.js 를 글롭으로 훑어
+    선언 파일을 **전부 자동 발견**해 서로 대조하고, 0건이면 선언 형식이 깨진 것으로 본다."""
+
+    _PAT = re.compile(r'"([0-9.]+)":\s*"((?:[^"\\]|\\.)*)"')
+
+    def _copies(self):
+        out = {}
+        for p in sorted((WEB_DIR / "assets").glob("*.js")):
+            src = p.read_text(encoding="utf-8")
+            if "var CFR_SECTION_LABELS = {" not in src:
+                continue
+            m = re.search(r"var CFR_SECTION_LABELS = \{(.*?)\n  \};", src, re.S)
+            self.assertIsNotNone(m, f"{p.name}: CFR_SECTION_LABELS 블록 파싱 실패")
+            out[p.name] = dict(self._PAT.findall(m.group(1)))
+        return out
+
+    def test_all_copies_identical_and_discovered(self):
+        copies = self._copies()
+        self.assertGreaterEqual(
+            len(copies), 2,
+            "CFR_SECTION_LABELS 선언 파일을 2개 미만 발견 — 글롭/선언 형식이 깨졌다")
+        names = sorted(copies)
+        base = copies[names[0]]
+        self.assertGreater(len(base), 30, "조항 요지 표가 비정상적으로 작다")
+        for name in names[1:]:
+            self.assertEqual(
+                copies[name], base,
+                f"{name} 의 CFR_SECTION_LABELS 가 {names[0]} 과 다르다(드리프트)")
+
+    def test_sections_are_part_210_or_211_only(self):
+        """042 가 21 CFR 210/211 만 세므로 요지 표에 다른 부의 조항이 있으면 드리프트다."""
+        for name, pairs in self._copies().items():
+            for sec in pairs:
+                self.assertRegex(sec, r"^21[01]\.[0-9]+$", f"{name}: 범위 밖 조항 {sec}")
 
 
 # ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────

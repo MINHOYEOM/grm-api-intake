@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
+<meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
+<title>자가점검 체크리스트 · GRM</title>
+<meta name="description" content="규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원." />
+<link rel="canonical" href="https://grm-solutions.com/findings/checklist/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Global Regulatory Monitor" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="자가점검 체크리스트 · GRM" />
+<meta property="og:description" content="규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원." />
+<meta property="og:url" content="https://grm-solutions.com/findings/checklist/" />
+<meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://grm-solutions.com/assets/og-image.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/fonts/tabler-icons.woff2?v3.7.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="/assets/grm.css?v=8a611777">
+<link rel="stylesheet" href="/assets/pet.css?v=6796f10e">
+</head>
+<body>
+<header class="nav" id="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html" class="on">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
+  <span class="sp"></span>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
+</div></header>
+
+<main>
+  <div class="wrap page-head cl-screen-only">
+    <span class="kick reveal" style="animation-delay:.02s">Self-Inspection</span>
+    <h1 class="reveal" style="animation-delay:.08s">자가점검 체크리스트</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">규제기관이 실제로 인용한 조항을 많이 인용된 순으로 뽑고, 조항마다 실제 지적 문장을 붙여 점검표로 만듭니다.</span> <span class="ln">인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰시면 됩니다.</span></p>
+  </div>
+  <div class="wrap">
+    <div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" hidden></div><div class="cl-controls cl-screen-only" id="cl-controls">
+      <div class="cl-ctl-row">
+        <label class="cl-ctl">
+          <span>조항 수</span>
+          <select id="cl-count">
+            <option value="10">10개</option>
+            <option value="15" selected>15개</option>
+            <option value="20">20개</option>
+          </select>
+        </label>
+        <label class="cl-ctl">
+          <span>기준</span>
+          <select id="cl-sort">
+            <option value="docs" selected>전체 누적 인용순</option>
+            <option value="recent">최근 12개월 인용순</option>
+          </select>
+        </label>
+        <label class="cl-ctl">
+          <span>조항당 사례</span>
+          <select id="cl-examples">
+            <option value="1">1건</option>
+            <option value="2" selected>2건</option>
+            <option value="3">3건</option>
+          </select>
+        </label>
+        <button class="cl-btn cl-btn-primary" id="cl-build" type="button">다시 만들기</button>
+      </div>
+      <div class="cl-ctl-row cl-ctl-export" id="cl-export" hidden>
+        <button class="cl-btn" id="cl-print" type="button">인쇄 / PDF로 저장</button>
+        <button class="cl-btn" id="cl-copy" type="button">표로 복사(엑셀 붙여넣기)</button>
+        <button class="cl-btn" id="cl-csv" type="button">CSV 내려받기</button>
+        <span class="cl-copy-msg" id="cl-copy-msg" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="cl-state" id="cl-loading" role="status" aria-live="polite">체크리스트를 만드는 중…</div>
+    <div class="cl-state cl-state-error" id="cl-error" hidden>체크리스트 서비스 준비 중입니다.</div>
+
+    <div id="cl-doc" hidden><div class="cl-doc-head">
+        <h2 class="cl-doc-title">GMP 자가점검 체크리스트</h2>
+        <p class="cl-doc-meta" id="cl-doc-meta"></p>
+        <p class="cl-doc-fields"><span>점검 대상(사업장/공정)</span><i></i></p>
+        <p class="cl-doc-fields"><span>점검자</span><i class="short"></i><span>점검일</span><i class="short"></i></p>
+      </div>
+      <div id="cl-items" class="cl-items"></div>
+      <p class="cl-doc-foot" id="cl-doc-foot"></p>
+    </div>
+  </div>
+</main>
+<style>
+/* [체크리스트] 한국어 어절 줄바꿈(§1 P0, findings/trends 와 동일 스코프). */
+main{word-break:keep-all;overflow-wrap:anywhere}
+/* 히어로 설명 — 트렌드와 동일하게 문장 경계에서만 줄바꿈(줄맞춤 관례). */
+.page-head p{max-width:none;text-wrap:pretty}
+.page-head p .ln{display:block}
+
+.cl-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+.cl-state-error{color:var(--coral-2)}
+
+/* ── 설정·내보내기 바(화면 전용) ──────────────────────────────────────────── */
+.cl-controls{margin:0 0 28px;padding:18px 20px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--soft)}
+.cl-ctl-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.cl-ctl-row + .cl-ctl-row{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.cl-ctl-export[hidden]{display:none}
+.cl-ctl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.cl-ctl select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--ink)}
+.cl-btn{font:inherit;font-size:13px;font-weight:500;padding:8px 16px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--body-s);cursor:pointer}
+.cl-btn:hover{border-color:var(--coral);color:var(--coral-2)}
+.cl-btn-primary{background:var(--coral);border-color:var(--coral);color:var(--on-coral)}
+.cl-btn-primary:hover{opacity:.92;color:var(--on-coral)}
+.cl-copy-msg{font-size:12px;color:var(--muted)}
+
+/* ── 인쇄물 본문 ─────────────────────────────────────────────────────────── */
+.cl-doc-head{margin:0 0 26px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.cl-doc-title{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.cl-doc-meta{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+.cl-doc-fields{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+.cl-doc-fields i{flex:1 1 auto;border-bottom:1px solid var(--line-2);height:16px}
+.cl-doc-fields i.short{flex:0 0 150px}
+
+.cl-items{display:flex;flex-direction:column;gap:0}
+.cl-item{padding:16px 0;border-bottom:1px solid var(--line)}
+.cl-item-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px}
+.cl-item-no{flex:0 0 22px;font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+.cl-item-id{flex:1 1 auto;min-width:0}
+.cl-item-sec{font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--coral-2)}
+.cl-item-name{font-size:14.5px;color:var(--ink);font-weight:500;margin-left:8px}
+.cl-item-cnt{display:block;font-size:11.5px;color:var(--muted-2);margin-top:4px;font-family:var(--mono)}
+/* 판정란 — 화면에서는 실제 체크박스, 인쇄에서도 네모로 찍힌다. */
+.cl-verdict{flex:0 0 auto;display:flex;gap:14px;font-size:12px;color:var(--body-s);white-space:nowrap}
+.cl-verdict label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.cl-verdict input{width:13px;height:13px;accent-color:var(--coral)}
+.cl-ex{margin:0 0 10px;padding:12px 14px;border-left:2px solid var(--coral-tint);background:var(--soft)}
+.cl-ex-h{font-size:11px;font-weight:600;color:var(--muted);margin:0 0 8px}
+.cl-ex-item{margin:0 0 9px}
+.cl-ex-item:last-child{margin-bottom:0}
+.cl-ex-meta{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin:0 0 3px}
+.cl-ex-text{font-size:12.5px;line-height:1.7;color:var(--body-s);margin:0}
+/* 같은 위반 블록이 여러 조항을 함께 인용한 사례 — 문장에 그 조항 번호가 없다는 사실을
+   적어 "왜 이게 이 조항 사례지?"에서 막히지 않게 한다(043 anchored 필드). */
+.cl-ex-loose{font-size:10.5px;color:var(--muted-2);margin-left:6px}
+.cl-note-line{display:flex;align-items:baseline;gap:10px;font-size:12px;color:var(--muted)}
+.cl-note-line i{flex:1 1 auto;border-bottom:1px solid var(--line-2);height:18px}
+.cl-doc-foot{margin:22px 0 0;font-size:11.5px;color:var(--muted-2);line-height:1.6}
+
+@media(max-width:640px){
+  .cl-item-head{flex-wrap:wrap}
+  .cl-verdict{width:100%;padding-left:36px}
+}
+
+/* ── 인쇄 ────────────────────────────────────────────────────────────────
+   화면 크롬(내비·푸터·펫 위젯·설정바·히어로)을 전부 걷어내고 본문만 남긴다.
+   항목이 페이지 경계에서 잘리면 점검표로 못 쓰므로 break-inside 를 막는다. */
+@media print{
+  .nav,.site,.grm-pet,.cl-screen-only,#backtotop{display:none !important}
+  .wrap{max-width:none;padding:0}
+  main{padding:0}
+  .cl-item{break-inside:avoid;page-break-inside:avoid;border-bottom:1px solid #ccc}
+  .cl-ex{background:transparent;border-left:2px solid #bbb}
+  .cl-doc-head{border-bottom:2px solid #000}
+  .cl-verdict input{-webkit-appearance:none;appearance:none;width:11px;height:11px;border:1px solid #333}
+  a[href]:after{content:""}
+}
+</style>
+<footer class="site"><div class="wrap">
+  <div class="foot">
+    <div class="b1"><b>Global Regulatory Monitor</b>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
+    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · MHRA · PIC/S</span><span>ICH · WHO · ECA</span><span>Health Canada · 식약처</span></div>
+    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
+  </div>
+  <div class="foot-legal">
+    <div class="foot-copy">
+      <span>© 2026 Global Regulatory Monitor</span>
+      <span class="prov">AI-generated from primary sources · verify against the original</span>
+    </div>
+    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+  </div>
+</div></footer>
+
+<script>
+// 스크롤 시 네비 하단 보더 노출(라이트 단일 — 다크 토글 없음, v6).
+const _nav=document.getElementById('nav');
+addEventListener('scroll',()=>_nav.classList.toggle('on',scrollY>8),{passive:true});
+// P2-2: 좁은 폭 햄버거 내비 토글(링크 선택 시 닫힘).
+const _nt=document.getElementById('navToggle'),_nm=document.getElementById('navmenu');
+if(_nt&&_nm){
+  _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
+  _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
+}
+</script>
+<div class="grm-pet" id="grm-pet" data-page="trends">
+  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">
+    <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
+    <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
+    <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
+    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>이동</span>
+  </button>
+  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>쉬는 중</b></span>
+  <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
+  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
+    <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
+    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
+    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
+    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
+    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="../../quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
+    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
+  </section>
+</div>
+<script src="/assets/pet.js?v=e2a1d586" defer></script>
+<script src="../../assets/checklist.js?v=93225b43" defer></script>
+<style>
+.grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
+body.grm-has-share .grm-card-actions{display:flex}
+.grm-ca{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.grm-ca:hover{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.grm-ca .ti{font-size:15px}
+.grm-ca.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-card-actions');
+  if(!rows.length) return;
+  document.body.classList.add('grm-has-share');
+  var isMobileOS=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  function done(btn){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent='복사됨'; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  for(var i=0;i<rows.length;i++){ (function(row){
+    var btn=row.querySelector('[data-share]'); if(!btn) return;
+    btn.addEventListener('click', function(){
+      var anchor=row.getAttribute('data-anchor')||'';
+      var url=location.origin+location.pathname+(anchor?('#'+anchor):'');
+      var art=row.closest('.card'), tEl=art&&art.querySelector('.c-title');
+      var title=tEl?tEl.textContent.trim():document.title;
+      if(isMobileOS&&navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); }
+      else if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){done(btn);}).catch(function(){fallback(url);}); }
+      else { fallback(url); }
+    });
+  })(rows[i]); }
+})();
+</script>
+</body>
+</html>

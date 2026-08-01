@@ -1,0 +1,50 @@
+[
+  {
+    "finding_id": "finding-7e7b5531553fe240025c7899",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7e9afe60d016939f2d839a5a",
+    "finding_text": "There is a lack of microbial reduction/control steps in the manufacturing process of sterile drug products.",
+    "finding_text_ko": "무균 의약품 제조공정에 미생물 감소/관리 단계가 부족합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7f6ee5c7b8feba1d687d0ef6",
+    "finding_text": "The firm’s procedure (or any associated document) for the transfer of“Ready To Use” stoppers sterilization does not contain provisions for requirements of transfer conditions.",
+    "finding_text_ko": "“Ready To Use” 마개의 멸균 이송에 대한 회사 절차(또는 관련 문서)에 이송 조건 요건에 관한 조항이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-803ae3c92e47f35a3fec5efa",
+    "finding_text": "The firm has released product without the documentation of a robust process that yields a high degree of assurance in the performance of the manufacturing process.",
+    "finding_text_ko": "귀사는 제조공정 성능에 높은 수준의 보증을 제공하는 견고한 공정의 문서화 없이 제품을 출하했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8065a610784288dc6f890eba",
+    "finding_text": "There is no mirrorin gowning room 48 to assure that employees comply with gowning procedures, .",
+    "finding_text_ko": "직원이 가운 착용 절차를 준수하는지 보장하기 위해 가운 착용실 48에 거울이 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-80c1c49febf4bba08157544b",
+    "finding_text": "Non-viable particle measurements are taken with the use ofaPParticie Counter.",
+    "finding_text_ko": "비생존성 입자 측정은 Particle Counter를 사용하여 수행됩니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8162bbdbf01b533a174c999d",
+    "finding_text": "You fail to have stability studies to justify extensive holding times ofyour oe | en products stored in bulk containers until packaged for release to distribution.",
+    "finding_text_ko": "귀사는 유통 출하를 위해 포장될 때까지 벌크 용기에 보관되는 제품의 광범위한 보관 시간을 정당화할 안정성 연구가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8182e5ad3e1f73f3554322c1",
+    "finding_text": "BHQ does not review the regional deviations associated with the donor file check to assess the reasons ineligible donors were not placed into the NDDR at the time the donor was found to be in either an : or @B category.",
+    "finding_text_ko": "BHQ는 공여자가 : 또는 @B 범주에 해당하는 것으로 확인된 시점에 부적격 공여자가 NDDR에 등록되지 않은 이유를 평가하기 위해 공여자 파일 확인과 관련된 지역 일탈을 검토하지 않습니다.",
+    "translation_method": "manual"
+  }
+]

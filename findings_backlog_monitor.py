@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""FIND-1 findings 백로그 모니터 — 번역 격차·검수 백로그 임계 감시(읽기 전용).
+"""FIND-1 findings 백로그 모니터 — 번역 격차·검수 백로그·**추출 격차** 임계 감시(읽기 전용).
+
+세 번째 검사(추출 격차, 2026-08-01 추가)는 앞의 둘과 성격이 다르다. 번역·검수 백로그는
+"할 일이 쌓였다"를 세지만, 추출 격차는 **"산출물이 아예 안 나온 입력"** 을 센다. 추출
+실패는 예외를 던지지 않고 정상 종료하며 빈손을 남기기 때문에, 실패 카운터·에러 로그·
+CI 초록 어디에도 흔적이 없다. 오직 입력 대비 산출물을 세야만 보인다.
+
 
 배경(2026-07-21 RCA, 원인 B-2/C-3): 미번역 격차(findings − public_findings)나
 needs_review 검수 백로그가 커져도 이를 붉게 실패시키는 소비자가 없었다. grm_health.py 는
@@ -47,18 +53,31 @@ _STATS_RPC = "findings_stats"
 DEFAULT_GAP_THRESHOLD = 300
 DEFAULT_NEEDS_REVIEW_THRESHOLD = 300
 
+# ★추출 격차 임계(2026-08-01 RCA 산물). "문서는 적재됐는데 findings 가 0건"인 비율.
+#   왜 필요한가: 추출 실패는 **예외를 던지지 않는다.** 정상 종료하고 빈손을 남긴다. 그래서
+#   실패 카운터·에러 로그로는 영원히 안 잡히고, 오직 "산출물이 0인 입력"을 세야 보인다.
+#   이 감시가 없어서 FDA 483 이 444건까지 조용히 쌓인 뒤에야 사람이 손으로 물어 발견됐고,
+#   원인을 세 번 연속 OCR 로 오진했다. 처음 돌리자마자 아무도 몰랐던 식약처 29건(25.7%)이
+#   같이 드러났다.
+#   임계 설계: 비율만 보면 소량 소스가 시끄럽고(6건 중 1건=16.7%), 절대수만 보면 대형
+#   소스의 만성 결손을 놓친다 → **둘 다 넘을 때만** breach.
+DEFAULT_EXTRACTION_GAP_PCT = 5.0
+DEFAULT_EXTRACTION_GAP_MIN_DOCS = 10
+_EXTRACTION_RPC = "extraction_gap_by_source"
+
 
 def _post_stats_rpc(
     base_url: str,
     service_key: str,
     *,
+    rpc: str = _STATS_RPC,
     timeout: int = _HTTP_TIMEOUT_SECONDS,
 ) -> tuple[int, Any, str]:
-    """POST rpc/findings_stats (인자 없음, body {}). service-role 키를 apikey+Bearer 로 싣되
+    """POST rpc/<rpc> (인자 없음, body {}). service-role 키를 apikey+Bearer 로 싣되
     키는 반환 error 문자열에 절대 넣지 않는다(timeout/http_{status}/예외타입명만).
     반환: (status_code, parsed_json_or_None, error_summary). error_summary 는 2xx 에서 "".
     """
-    url = f"{base_url}/rest/v1/rpc/{_STATS_RPC}"
+    url = f"{base_url}/rest/v1/rpc/{rpc}"
     headers = {
         "apikey": service_key,
         "Authorization": f"Bearer {service_key}",
@@ -104,6 +123,62 @@ def _review_status_count(stats: dict[str, Any], status: str) -> int:
         if isinstance(entry, dict) and entry.get("review_status") == status:
             total += _int(entry.get("cnt"))
     return total
+
+
+def _float(value: Any) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def evaluate_extraction_gap(
+    payload: dict[str, Any],
+    *,
+    pct_threshold: float,
+    min_docs: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """extraction_gap_by_source 페이로드 → (breaches, by_source 요약). 순수 함수.
+
+    한 소스라도 임계를 넘으면 breach 를 하나씩 낸다 — 합산하지 않는다. 합산은 이 사고의
+    원인이었던 바로 그 실수다(서로 다른 원인을 한 숫자에 넣으면 진단이 불가능해진다).
+    """
+    rows = payload.get("by_source")
+    summary: list[dict[str, Any]] = []
+    breaches: list[dict[str, Any]] = []
+    for entry in rows if isinstance(rows, list) else []:
+        if not isinstance(entry, dict):
+            continue
+        source = str(entry.get("source") or "")
+        docs = _int(entry.get("docs"))
+        zero = _int(entry.get("zero_findings"))
+        stored = _int(entry.get("zero_with_stored_text"))
+        pct = _float(entry.get("zero_pct"))
+        summary.append({
+            "source": source, "docs": docs, "zero_findings": zero,
+            "zero_with_stored_text": stored, "zero_pct": pct,
+        })
+        if zero >= min_docs and pct > pct_threshold:
+            hint = (
+                f" 그중 {stored}건은 본문으로 보이는 텍스트를 저장하고도 0건이므로 "
+                "수집·OCR 이 아니라 **추출 로직**을 먼저 보십시오."
+                if stored else
+                " 저장된 본문이 없어 수집 단계부터 확인이 필요합니다."
+            )
+            breaches.append({
+                "code": "extraction-gap-high",
+                "metric": "zero_findings",
+                "source": source,
+                "value": zero,
+                "threshold": min_docs,
+                "zero_pct": pct,
+                "pct_threshold": pct_threshold,
+                "message": (
+                    f"{source}: 적재 {docs}건 중 {zero}건({pct}%)이 지적사항 0건 — "
+                    f"임계({min_docs}건 & {pct_threshold}%) 초과.{hint}"
+                ),
+            })
+    return breaches, summary
 
 
 def evaluate_backlog(
@@ -161,8 +236,10 @@ def run_monitor(
     *,
     gap_threshold: int = DEFAULT_GAP_THRESHOLD,
     needs_review_threshold: int = DEFAULT_NEEDS_REVIEW_THRESHOLD,
+    extraction_pct_threshold: float = DEFAULT_EXTRACTION_GAP_PCT,
+    extraction_min_docs: int = DEFAULT_EXTRACTION_GAP_MIN_DOCS,
 ) -> dict[str, Any]:
-    """findings_stats 를 읽어 백로그를 판정한다. 네트워크/파싱 오류는 status='error'."""
+    """findings_stats + extraction_gap_by_source 를 읽어 판정. 오류는 status='error'."""
     report: dict[str, Any] = {
         "checked_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "ok",
@@ -170,7 +247,12 @@ def run_monitor(
         "untranslated_gap": 0,
         "needs_review": 0,
         "rejected": 0,
-        "thresholds": {"gap": gap_threshold, "needs_review": needs_review_threshold},
+        "extraction_gap": [],
+        "thresholds": {
+            "gap": gap_threshold, "needs_review": needs_review_threshold,
+            "extraction_pct": extraction_pct_threshold,
+            "extraction_min_docs": extraction_min_docs,
+        },
         "breaches": [],
         "errors": [],
     }
@@ -197,6 +279,34 @@ def run_monitor(
         needs_review_threshold=needs_review_threshold,
     )
     report.update(evaluated)
+    report.setdefault("errors", [])
+    report["thresholds"] = {
+        "gap": gap_threshold, "needs_review": needs_review_threshold,
+        "extraction_pct": extraction_pct_threshold,
+        "extraction_min_docs": extraction_min_docs,
+    }
+
+    # ★추출 격차는 별도 RPC. 이 호출이 실패하면 **조용히 넘어가지 않는다** — 감시가 꺼진
+    #   줄 모르고 초록을 믿는 것이 이 저장소가 이미 두 번 당한 함정이다(CI shim 표류).
+    ex_status, ex_data, ex_err = _post_stats_rpc(base, service_key, rpc=_EXTRACTION_RPC)
+    if ex_err:
+        report["status"] = "error"
+        report["errors"].append(f"{_EXTRACTION_RPC} RPC failed ({ex_err})")
+        return report
+    if not isinstance(ex_data, dict):
+        report["status"] = "error"
+        report["errors"].append(f"{_EXTRACTION_RPC} returned a non-object payload")
+        return report
+
+    ex_breaches, ex_summary = evaluate_extraction_gap(
+        ex_data,
+        pct_threshold=extraction_pct_threshold,
+        min_docs=extraction_min_docs,
+    )
+    report["extraction_gap"] = ex_summary
+    if ex_breaches:
+        report["breaches"] = list(report.get("breaches") or []) + ex_breaches
+        report["status"] = "failure"
     return report
 
 
@@ -235,6 +345,20 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_NEEDS_REVIEW_THRESHOLD,
         help=f"needs_review 백로그 임계(초과 시 breach). 기본 {DEFAULT_NEEDS_REVIEW_THRESHOLD}.",
     )
+    parser.add_argument(
+        "--extraction-pct-threshold",
+        type=float,
+        default=DEFAULT_EXTRACTION_GAP_PCT,
+        help=("소스별 '지적사항 0건' 비율 임계(%%). 절대건수 임계와 **둘 다** 넘어야 breach. "
+              f"기본 {DEFAULT_EXTRACTION_GAP_PCT}."),
+    )
+    parser.add_argument(
+        "--extraction-min-docs",
+        type=int,
+        default=DEFAULT_EXTRACTION_GAP_MIN_DOCS,
+        help=("소스별 '지적사항 0건' 최소 건수 임계. 소량 소스의 잡음을 막는다. "
+              f"기본 {DEFAULT_EXTRACTION_GAP_MIN_DOCS}."),
+    )
     parser.add_argument("--supabase-url", help="Supabase project URL (falls back to $SUPABASE_URL)")
     parser.add_argument(
         "--service-role-key",
@@ -258,6 +382,8 @@ def main(argv: list[str] | None = None) -> int:
         service_key,
         gap_threshold=args.gap_threshold,
         needs_review_threshold=args.needs_review_threshold,
+        extraction_pct_threshold=args.extraction_pct_threshold,
+        extraction_min_docs=args.extraction_min_docs,
     )
     _write_report(args.output, report)
 
@@ -268,6 +394,7 @@ def main(argv: list[str] | None = None) -> int:
 
 __all__ = [
     "evaluate_backlog",
+    "evaluate_extraction_gap",
     "run_monitor",
     "main",
 ]

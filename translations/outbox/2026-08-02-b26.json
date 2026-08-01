@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-4b57a5a3dec3481dda79e87f",
+    "finding_text": "On 12/19/01, a QA audit determined that one region had 508 records on registration hold because information on the blood donation record was discovered either to be missing or discrepant with the information currently inNBCS for the donors.",
+    "finding_text_ko": "2001년 12월 19일 QA 감사 결과, 한 지역에서 혈액공여기록 정보가 누락되었거나 공여자에 대해 현재 NBCS에 있는 정보와 불일치한 것으로 확인되어 등록 보류 중인 기록이 508건 있었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4bc2e26801c008900abaf375",
+    "finding_text": "Corrective Action Plans are not always reviewed by Q A within 5 days as required.",
+    "finding_text_ko": "시정조치 계획은 요구사항대로 항상 5일 이내에 QA의 검토를 받지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4c0eb949a49b506951dceed2",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4c228d7bfa38403f9e2e77c1",
+    "finding_text": "Your firm lacks adequate controls for issuing labels, examining issued labels, and reconciliation of used labels to prevent mix-ups.",
+    "finding_text_ko": "귀사는 혼동을 방지하기 위한 라벨 발행, 발행된 라벨 검사 및 사용 라벨 조정에 대한 적절한 관리가 부족합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4cb4ba66c50424a76d6fa887",
+    "finding_text": "Disinfecting agents used in the ISO 5 area are not sterile.",
+    "finding_text_ko": "ISO 5 구역에서 사용하는 소독제가 무균이 아닙니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4cfe167b4f7b2eaa12bc5fed",
+    "finding_text": "As part of your Master Corrective action plan established to test minerals under LIR commitment only 4 of 5 corrective actions were implemented.",
+    "finding_text_ko": "LIR 약정에 따라 미네랄을 시험하기 위해 수립한 마스터 시정조치 계획의 일부로서, 시정조치 5개 중 4개만 시행되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ddd43256cb59391ca787b3a",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4df43831f5f88c772c4bc7aa",
+    "finding_text": "Results of stability testing are not used in determining expiration dates.",
+    "finding_text_ko": "안정성 시험 결과가 유효기간 결정에 사용되지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4e7d7f27154441e6f40fb944",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring-environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4ec45416810bb4f83bb8b863",
+    "finding_text": "The Transaction History Report System does not provide accurate data.",
+    "finding_text_ko": "Transaction History Report System은 정확한 데이터를 제공하지 않습니다.",
+    "translation_method": "manual"
+  }
+]

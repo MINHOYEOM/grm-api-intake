@@ -1,0 +1,56 @@
+[
+  {
+    "finding_id": "finding-92e5a25ab30143a1f0f6737f",
+    "finding_text": "You produced beta-lactam drugs without providing adequate containment, segregation, cleaning of work surfaces, cleaning ofutensils and cleaning of personnel to prevent cross-contamination.",
+    "finding_text_ko": "교차오염을 방지하기 위한 충분한 격리, 분리, 작업 표면 세척, 기구 세척 및 작업자 세척을 제공하지 않은 채 베타락탐 의약품을 생산했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-93096c5ffc3227053dee0a79",
+    "finding_text": "Deviation 3324 was initiated due to a leak on the interior of the drywall in a column in the cell culture area redact ed (b)(4) A tent was constructed prior to cutting into the drywall to investigate the leak which was observed t o have caused mold on the column drywall interior.",
+    "finding_text_ko": "세포배양 구역 redacted (b)(4)의 기둥 내부 건식벽체에서 누수가 발생하여 일탈 3324가 개시되었다. 기둥 건식벽체 내부에 곰팡이를 유발한 것으로 관찰된 누수를 조사하기 위해 건식벽체를 절단하기 전에 텐트를 설치했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-93298ee9c4fccf0ac79678e6",
+    "finding_text": "Procedures describing the role and responsibilities of the quality control unit have not been adequately established and followed.",
+    "finding_text_ko": "품질관리부서의 역할과 책임을 기술한 절차가 충분히 수립·준수되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9384f8706ad920fcc9e83749",
+    "finding_text": "There is no procedure that describes system suitability requirement.s for the Gas Chro,matography (GC)system.",
+    "finding_text_ko": "기체크로마토그래피(GC) 시스템의 시스템 적합성 요건을 기술한 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9386d0d7bdb8da523cc0ee02",
+    "finding_text": "Portions of formulating the Fabrazyme Elution Buffer are aut.omated.",
+    "finding_text_ko": "Fabrazyme 용출 완충액 조제 과정의 일부가 자동화되어 있다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-940414e6adac197ec124858a",
+    "finding_text": "Aseptic processing areas are deficient-regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정 구역은 환경 조건 모니터링 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-946cf7db16ad5265218ed339",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality, and purity.",
+    "finding_text_ko": "시험실 관리는 구성품, 공정 중 물질 및 의약품이 동일성·함량·품질·순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9491b6b18d910cfa4fdd40ad",
+    "finding_text": "Drug product containers and closures were not clean and sterilized and processed to remove pyrogenic properties 10 assure that they are suitabie Tor their intended uss.",
+    "finding_text_ko": "완제의약품 용기와 마개가 청결·멸균되지 않았고, 의도된 용도에 적합함을 보장하기 위한 발열성 물질 제거 처리가 이루어지지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-94cf580e17bc0506c6b7cd8f",
+    "finding_text": "The establishment of laboratory control mechanisms including any changes thereto, are not drafted by the appropriate organizational unit.",
+    "finding_text_ko": "변경사항을 포함한 시험실 관리 기전의 수립은 적절한 조직 단위에서 작성하지 않는다.",
+    "translation_method": "manual"
+  }
+]

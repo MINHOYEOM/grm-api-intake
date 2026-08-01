@@ -1,0 +1,110 @@
+[
+  {
+    "finding_id": "finding-55834ee8fb724a96d1b6fa56",
+    "finding_text": "Disinfecting agents and used in the ISO 5 classified aseptic processing areas were note sterile.",
+    "finding_text_ko": "ISO 5 등급 무균 공정 구역에서 사용되는 소독제는 무균이 아니었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5593439e174d5bb7f7c4f63a",
+    "finding_text": "Personnel were observed increasing the risk of contamination in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에서 인력이 오염 위험을 증가시키는 것이 관찰되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-55ca60411ab4c81f3f646eb4",
+    "finding_text": "Fo llowing a confirmed Bacillus thuringtensis contamination in biore actor redacted (b)(4) for Soliris lot redacted (b)(4) on July 18, 2012, the decontamination of bioreactor redacted (b)(4) was executed, followed by a routine CIP cycle.",
+    "finding_text_ko": "2012년 7월 18일 Soliris 로트 redacted (b)(4)의 바이오리액터 redacted (b)(4)에서 Bacillus thuringiensis 오염이 확인된 후, 해당 바이오리액터의 제염이 수행되고 이어서 정기 CIP 사이클이 수행되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-56979606bc8cc99f931f1a94",
+    "finding_text": "The DCSC failed to ensure timely and accurate management of DRIRs.",
+    "finding_text_ko": "DCSC는 DRIR을 시기적절하고 정확하게 관리하도록 보장하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-57a163d849abd5480edfcdbd",
+    "finding_text": "The March 2009 BHQ audit of the Charlotte DCSC facility cited untimely management of problems.",
+    "finding_text_ko": "2009년 3월 Charlotte DCSC 시설에 대한 BHQ 감사에서 문제의 시기적절하지 않은 관리가 지적되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5874a6acc91f5e14722e2a22",
+    "finding_text": "The Process Verification signature was missing on 3 of the 4 available Component Status Change Records (CSCRs).",
+    "finding_text_ko": "사용 가능한 Component Status Change Record(CSCR) 4개 중 3개에 Process Verification 서명이 누락되었습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-58802b96e482be1e29a93860",
+    "finding_text": "The environmental monitoring and conditions ofthe aseptic core are deficient for the following reasons.: a.",
+    "finding_text_ko": "다음 사유로 무균 핵심 구역의 환경 모니터링 및 조건이 미흡합니다. a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-597f016ff582fca66cd1c58d",
+    "finding_text": "In the event that aseptic fill room operators leave the filling areas they are required to re-gown into the appropriate clean room attire prior to returning to the aseptic filling areas.",
+    "finding_text_ko": "무균 충전실 작업자가 충전 구역을 떠나는 경우 무균 충전 구역으로 돌아가기 전에 적절한 클린룸 복장으로 다시 가운을 착용해야 합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-59d759f98be413cf62153ca8",
+    "finding_text": "The collection of overweight units of whole blood was addressed during the April-June 2002 and September-January 2006 FDA inspections of this region.",
+    "finding_text_ko": "전혈 과체중 단위의 채혈은 이 지역에 대한 2002년 4월~6월 및 2006년 9월~2007년 1월 FDA 조사에서 다루어졌습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5b10069e47c4f98bb36dda69",
+    "finding_text": "SOP QC-033.00, Facility Bioburden, section 9.1.3 requires that \"All environmental isolates are sent out for identification, including alert and action level samples, routine bioburden samples, media fill samples and Class 100 samples, shall be identified to the species-level\".",
+    "finding_text_ko": "SOP QC-033.00, Facility Bioburden, 9.1.3항은 경보·조치 수준 검체, 일상 생균수 검체, 미디어 필 검체 및 Class 100 검체를 포함한 모든 환경 분리균을 종 수준까지 동정하기 위해 외부로 보내야 한다고 요구합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5bd5efbe8b478263af2d6f10",
+    "finding_text": "QA failed to perform a thorough assessment of this problém in a timely manner.",
+    "finding_text_ko": "QA는 이 문제에 대해 시기적절하게 철저한 평가를 수행하지 못했습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5c5b3ba13311d3cb906863ac",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에는 의약품이 적절한 동일성, 함량, 품질 및 순도 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5e31940245156841f7bf9ec9",
+    "finding_text": "Investigations ofelevated kick out/reject rates and Spoilage Reports have not been adequately described and documented, and no HOLD log is available to track and verify investigations ofsuch incidents.",
+    "finding_text_ko": "증가한 킥아웃/불합격률과 Spoilage Report에 대한 조사가 적절히 기술·문서화되지 않았으며, 그러한 사건 조사를 추적·검증할 HOLD 로그가 없습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5fbade4b192f19a8cf386014",
+    "finding_text": "Disinfecting agents, cleaning pads, and cleaning wipes used for sterile drug production were not always sterile or controlled in a manner as to maintain sterility.D isinfecting agents, cleaning pads, and cleaning wipes used for sterile drug production were not always sterile or controlled in a manner as to maintain sterility.",
+    "finding_text_ko": "무균 의약품 생산에 사용되는 소독제, 세척 패드 및 세척 와이프는 항상 무균이거나 무균성을 유지하는 방식으로 관리되지 않았습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5fbffa43fc5086a00f7136ae",
+    "finding_text": "The firm applies expiration dating to all compounded sterile injectable products.",
+    "finding_text_ko": "회사는 모든 조제 무균 주사용 제품에 유효기간을 적용합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5ffee82c448c396c177808c6",
+    "finding_text": "The yellow color shoe covers are required to be don by personzel prior to entering into the manufacturing area pre-gowning room.",
+    "finding_text_ko": "제조 구역 사전 가운착용실에 들어가기 전 인력은 노란색 신발 덮개를 착용해야 합니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-60c4a6d533d9775a72e04c25",
+    "finding_text": "Quality Assurance review ofbatch production records does not include an evaluation ofthe equipment sterilization records for sterile product contact equipment.",
+    "finding_text_ko": "품질보증의 배치 생산기록 검토에는 무균 제품 접촉 장비의 장비 멸균기록 평가가 포함되어 있지 않습니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-61bbbb6827b964d977b0efa7",
+    "finding_text": "The firm uses wet lines for their sprinkler system.",
+    "finding_text_ko": "회사는 스프링클러 시스템에 습식 배관을 사용합니다.",
+    "translation_method": "manual"
+  }
+]

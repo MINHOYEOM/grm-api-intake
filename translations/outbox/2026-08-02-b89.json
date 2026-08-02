@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-81480e677a1cff6dc0990d82",
+    "finding_text": "Drug product production and control records, are not reviewed and approved by the quality control unit to determine compliance with all established, approved written procedures before a batch is released or distributed.",
+    "finding_text_ko": "의약품 생산 및 관리 기록이 배치 출하 또는 유통 전에 수립되고 승인된 모든 문서화 절차의 준수 여부를 판단하도록 품질관리부서에서 검토 및 승인되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-83bbd3f11dbe04490c69d5e1",
+    "finding_text": "Established specifications, standards, sampling plans, test procedures, laboratory control mechanisms, are not followed, documented at the time of performance.",
+    "finding_text_ko": "수립된 규격, 기준, 검체 채취 계획, 시험 절차 및 시험실 관리 체계가 준수되지 않으며 수행 시점에 문서화되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-61d6d5787d18a1d71afc40d3",
+    "finding_text": "Clostridium botulinum spore containment in the drug substance manufacturing areas is inade uate to miti ate spore cross contamination risk of other manufacturing areas.",
+    "finding_text_ko": "원료의약품 제조 구역에서 보툴리눔균 포자를 격리하는 조치가 다른 제조 구역의 포자 교차오염 위험을 완화하기에 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e2690512d4df710f98771fe2",
+    "finding_text": "Environmental monitoring is insufficient to ensure that the drng product manufacturing areas are not contaminated with Clostridium botulinum spores as Clostridium spores are not monitored as paii of environmental monitoring (A WLS-FE-039-29).",
+    "finding_text_ko": "환경 모니터링의 일부로 클로스트리디움 포자를 모니터링하지 않으므로(A WLS-FE-039-29), 환경 모니터링은 의약품 제조 구역이 보툴리눔균 포자로 오염되지 않음을 보장하기에 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ec43111c06337c5aa6a0d653",
+    "finding_text": "Decontamination of Clostridium botulinum spores and toxin in the chug substance manufacturing areas is inadequate.",
+    "finding_text_ko": "원료의약품 제조 구역에서 보툴리눔균 포자와 독소를 제거하는 조치가 불충분하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4fabafb956e0f565fcc0e3db",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+    "finding_text_ko": "오염 또는 혼입을 방지하기 위한 분리 또는 지정 구역이 의약품 무균 공정 관련 작업 측면에서 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-63fc1a7a4e8c4ef3e8747626",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에는 의약품이 적절한 동일성, 함량, 품질 및 순도 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 검체 채취 계획의 수립이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0aafbd29d5439753c1abed00",
+    "finding_text": "Effectiveness Checks for corrective and preventative actions implemented in response to a deviation investigations are not always initiated.",
+    "finding_text_ko": "일탈 조사에 대응하여 시행된 시정 및 예방조치에 대한 유효성 확인이 항상 시작되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2a93322a6b833b4154332d6f",
+    "finding_text": "Corrective actions are not taken when data from critical quality attributes indicate a trend towards out of specification.",
+    "finding_text_ko": "중요 품질특성 데이터가 규격 이탈 경향을 나타낼 때 시정조치가 취해지지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3d1bf829d6f8c12d031410f9",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit for material suppliers are not fully followed.",
+    "finding_text_ko": "자재 공급업체에 관한 품질관리부서의 책임과 적용 절차가 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  }
+]

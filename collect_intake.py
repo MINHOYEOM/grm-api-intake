@@ -2573,8 +2573,39 @@ def _health_payload(
     }
 
 
+def _fda483_known_document_ids(
+    token: str, db_id: str, run_date: date, enf_start: date, end: date, *, enabled: bool,
+) -> set[str] | None:
+    """FDA 483 수집 **전에** 이미 저장된 문서 키를 조회한다(없으면 None → 종전 동작).
+
+    ★왜 별도 조회인가: 기존 dedup 조회(아래 "3) Notion 기존 row")는 수집이 **끝난 뒤**에
+      돈다. 그래서 483 수집기는 창(기본 30일) 안의 문서를 매일 전부 다시 받아 OCR 하고,
+      그 결과를 적재 시점에 버렸다 — 2026-08-01 실측: **신규 1건**을 위해 OCR 200쪽(예산
+      전량)을 태우고 17건을 예산 부족으로 건너뛰었으며, 3일 연속 같은 값이었다.
+      기존 조회를 앞당기지 않고 483 전용 조회를 하나 더 두는 이유는 **기존 dedup 흐름을
+      한 줄도 건드리지 않기 위해서**다(그 경로는 실패 시 중단이라 순서를 바꾸면 파급이 크다).
+
+    ★실패는 절대 수집을 막지 않는다 — 조회가 죽으면 None 을 돌려 **오늘과 똑같이** 동작한다.
+      건너뛰기는 비용 최적화이지 정합성 장치가 아니다(정합성은 적재 dedup 이 계속 책임진다).
+    """
+    if not enabled:
+        return None
+    window = max(1, (end - enf_start).days + 1)
+    try:
+        known = notion_query_existing_doc_ids(
+            token, db_id, run_date, window_days=window,
+            source_names={SOURCE_FDA_483})
+    except Exception as e:  # noqa: BLE001 — 어떤 실패도 수집을 멈추지 않는다
+        log("WARN", f"FDA 483 기보유 조회 실패 — 전량 재수집으로 진행(비용만 증가): {e}")
+        return None
+    log("INFO", f"FDA 483 기보유 {len(known)}건(최근 {window}일) — PDF·OCR 건너뛰기 대상")
+    return known
+
+
 def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
-                    start: date, end: date, enf_start: date) -> tuple[CollectionStats, tuple[list[IntakeItem], ...]]:
+                    start: date, end: date, enf_start: date,
+                    *, fda483_known_ids: set[str] | None = None,
+                    ) -> tuple[CollectionStats, tuple[list[IntakeItem], ...]]:
     """[배치6 Phase4] 소스별 수집 블록(flag→수집→stats)을 실행해 stats 와 18개 소스
     item 리스트를 반환한다. 소스별 env alias 는 cfg 에서 재바인딩(바디 무수정). 수집 블록
     자체는 소스별 window/키/health 추출이 상이해 bespoke 유지 — 새 소스는 여기 블록 1개 +
@@ -2906,7 +2937,8 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         try:
             import collect_fda_483 as fda483_module
             # 483 은 publish date 지연공개형 → enforcement 윈도우(MFDS_ENFORCEMENT_WINDOW_DAYS) 사용
-            fda483_items, fda483_err = fda483_module.collect_fda_483(enf_start, end)
+            fda483_items, fda483_err = fda483_module.collect_fda_483(
+                enf_start, end, skip_document_ids=fda483_known_ids)
             fda483_health = getattr(fda483_module, "LAST_HEALTH", {}) or {}
         except Exception as e:  # noqa: BLE001
             fda483_items, fda483_err = [], str(e)
@@ -3320,7 +3352,10 @@ def main() -> int:
      mfds_gmp_cert_items, mfds_safety_letter_items, mfds_gmp_inspection_items,
      ich_items, who_items, hc_items, fda483_items, ispe_items,
      eu_gmp_ncr_items, mhra_gmp_ncr_items) = _run_collection(
-        cfg, active, run_date, start, end, enf_start)
+        cfg, active, run_date, start, end, enf_start,
+        fda483_known_ids=_fda483_known_document_ids(
+            notion_token, notion_db, run_date, enf_start, end,
+            enabled=("fda483" in active) and not args.dry_run))
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장

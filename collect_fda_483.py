@@ -1968,8 +1968,19 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     )
 
 
-def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
+def collect_fda_483(
+    start: date, end: date, *, skip_document_ids: set[str] | None = None,
+) -> tuple[list[IntakeItem], str | None]:
     """FDA 483 수집 진입점. (items, error_msg).
+
+    ★`skip_document_ids` — **이미 저장소에 있는 문서의 PDF fetch·OCR 을 건너뛴다**
+      (2026-08-02 실측 결함). 종전에는 창(기본 30일) 안의 문서를 매일 전부 다시 받아
+      OCR 하고, 440줄 뒤 적재 시점에 dedup 으로 버렸다 — 08-01 실행은 **신규 문서 1건**을
+      위해 OCR 200쪽(예산 전량)을 태우고 17건을 예산 부족으로 넘겼다. 3일 연속 같은 값.
+      건너뛴 문서는 어차피 `insert_items` 가 같은 키로 버리므로 **산출물은 불변**이고,
+      handoff 의 `inmemory_raw` 도 과거 New row 는 Notion 에서 폴백 조회한다.
+      키 형식은 적재 dedup 과 **같은** `"{source}::{document_id}"` — 두 곳이 갈리면
+      건너뛴 문서가 되레 적재되거나 그 반대가 된다.
 
     전수 backbone = DataTables AJAX(1차) → 전수 JSON(2차). 둘 다 사망 시에만 정적 HTML
     폴백(부분) + warning.
@@ -2035,11 +2046,17 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
 
     items: list[IntakeItem] = []
     seen: set[str] = set()
+    known = skip_document_ids or set()
+    skipped_known = 0
     for nrow in in_window:
         media_id = nrow["media_id"]
         if not media_id or media_id in seen:
             continue
         seen.add(media_id)
+        # ★이미 저장된 문서는 PDF 를 아예 받지 않는다. 적재 dedup 과 **동일한 키**를 쓴다.
+        if known and f"{SOURCE_FDA_483}::fda483-{media_id}" in known:
+            skipped_known += 1
+            continue
 
         # 483 PDF 결함 excerpt + Observation 상세 + (deep on) 전문 보존(cap 내 시도).
         # 실패는 키 미기록 + warning(graceful — 결정론/deep 어느 층이 빠져도 요약카드는 유지).
@@ -2142,6 +2159,10 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         "source_degraded": source_degraded,
         "backbone": _LAST_BACKBONE,
         "fda_483_ocr": ocr_health(),
+        # 조용한 최적화를 만들지 않는다 — 몇 건을 안 받았는지 표면화한다. 이 값이 창 안
+        # 후보 수에 근접하는 것이 정상이고(신규는 하루 한두 건), 갑자기 0 이 되면 dedup
+        # 조회가 죽어 폴백했다는 뜻이다.
+        "fda483_skipped_known": skipped_known,
     }
     # [침묵 금지 2026-07-30] 엔진 부재는 문서 사정이 아니라 **환경 사정**이다 — 고치면
     # 되찾을 수 있는 결손이므로 건수와 사유를 로그에 올리고, health 경보로도 승격시킨다
@@ -2159,6 +2180,7 @@ def collect_fda_483(start: date, end: date) -> tuple[list[IntakeItem], str | Non
         log("WARN", f"FDA 483 OCR 페이지 예산({FDA483_OCR_PAGE_BUDGET}쪽) 소진 — "
                     "이후 스캔본은 OCR 없이 진행(FDA483_OCR_PAGE_BUDGET 로 상향 가능)")
     log("INFO", f"FDA 483 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
+                f"기보유 건너뜀 {skipped_known}, "
                 f"483 행 {len(keep_rows)}/{html_data_count}, "
                 f"source={_LAST_BACKBONE}{'·부분/동결의심' if source_degraded else ''}) "
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "

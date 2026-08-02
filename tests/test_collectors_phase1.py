@@ -188,3 +188,49 @@ class OpenFdaRecallCollectorTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Fda483KnownIdsPreQueryTest(unittest.TestCase):
+    """★2026-08-02. 기존 dedup 조회는 수집이 **끝난 뒤**(3349행)에 돌아, 483 수집기가
+    창 안의 문서를 매일 전부 다시 받아 OCR 하고 그 결과를 적재 시점에 버렸다.
+
+    실측 08-01: 신규 문서 1건을 위해 OCR 200쪽(예산 전량) 소진 · 17건 예산 부족 건너뜀.
+    3일 연속 같은 값(200/200 · ok=32 · 예산초과=17~18).
+
+    ★이 헬퍼의 계약은 "실패해도 절대 수집을 막지 않는다"이다 — 건너뛰기는 **비용
+      최적화**이지 정합성 장치가 아니고, 정합성은 적재 dedup 이 계속 책임진다.
+    """
+
+    RUN_DATE = date(2026, 8, 2)
+    ENF_START, END_D = date(2026, 7, 3), date(2026, 8, 2)
+
+    def _call(self, *, enabled=True, side_effect=None, result=None):
+        from unittest.mock import patch
+        with patch.object(ci, "notion_query_existing_doc_ids",
+                          side_effect=side_effect,
+                          return_value=result if result is not None else set()) as q:
+            got = ci._fda483_known_document_ids(
+                "tok", "db", self.RUN_DATE, self.ENF_START, self.END_D, enabled=enabled)
+        return got, q
+
+    def test_returns_the_known_key_set(self):
+        got, q = self._call(result={"FDA 483::fda483-1", "FDA 483::fda483-2"})
+        self.assertEqual(got, {"FDA 483::fda483-1", "FDA 483::fda483-2"})
+        self.assertEqual(q.call_args.kwargs["source_names"], {ci.SOURCE_FDA_483})
+
+    def test_window_covers_the_whole_collection_window(self):
+        """조회 창이 수집 창보다 좁으면 창 앞쪽 문서를 매일 다시 받는다."""
+        _got, q = self._call()
+        self.assertGreaterEqual(q.call_args.kwargs["window_days"],
+                                (self.END_D - self.ENF_START).days + 1)
+
+    def test_query_failure_degrades_to_todays_behaviour(self):
+        """★조회가 죽어도 None — 수집은 그대로 돌고 비용만 는다(중단하지 않는다)."""
+        got, _q = self._call(side_effect=RuntimeError("notion down"))
+        self.assertIsNone(got)
+
+    def test_disabled_never_queries(self):
+        """483 미활성·dry-run 이면 조회 자체를 하지 않는다."""
+        got, q = self._call(enabled=False)
+        self.assertIsNone(got)
+        q.assert_not_called()

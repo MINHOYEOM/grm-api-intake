@@ -120,6 +120,44 @@ class TestDeficiencyExcerpt(unittest.TestCase):
                 self.assertNotEqual(g._assess_deficiency(text), "present")
                 self.assertEqual(g._assess_deficiency(text), "unknown")
 
+    def test_premarket_pass_verdict_is_none_not_unknown(self):
+        """★2026-08-02 실측. 수입 **사전 GMP 평가** 보고서는 "지적(보완)사항" 섹션 자체가
+        없고 결론이 `❍ 실사 결과: 적합` 한 줄뿐이다. 그 어법을 몰라 7건이 `unknown`
+        (판정 불능)으로 적재됐다 — 원문이 "적합"이라고 명시했는데 우리가 "모르겠다"고
+        기록한 것이다. 그 결과 카드 본문에서 "지적사항 판정" 줄이 통째로 빠져, 적합
+        판정을 받은 실사인데 그 사실을 말하지 않는 카드가 나갔다."""
+        text = (
+            "- 1 - 의약품 사전 GMP 평가 실태조사 결과 1 제조소 현황 "
+            "❍ 제조소명: Baxter Oncology GmbH ❍ 소 재 지: Halle/Westfalen, Germany (독일) "
+            "2 실태조사 개요 ❍ 실사 방식: 현지실사 ❍ 실사 기간: 2024. 09. 23. ∼2024. 09. 27. "
+            "3 실태조사 결과 ❍ 실사 대상 품목 수입업체 제품명 비고 (주)박스터 케릭스주사 "
+            "무균/완제 ❍ 실사 결과: 적합")
+        self.assertEqual(g._assess_deficiency(text), "none")
+        self.assertEqual(g._extract_deficiency_excerpt(text), "실사 결과: 적합")
+
+    def test_pass_verdict_never_overrides_a_real_deficiency(self):
+        """★안전의 핵심. 지적사항이 실재하면 `적합` 문구가 있어도 present 를 유지한다 —
+        새 분기를 `_DEFICIENCY_PRESENT_RE` **뒤**에 두어 오늘 unknown 인 문서만 바뀐다."""
+        text = ("평가 결과 지적(보완)사항(Deficiencies) 3건 "
+                "품질경영 부적합 사항이 확인됨. 실사 결과: 적합 판정 보류")
+        self.assertEqual(g._assess_deficiency(text), "present")
+
+    def test_bare_pass_word_is_not_enough(self):
+        """★단순 문자열 `적합` 은 쓰지 않는다 — 실측상 '적합'을 포함한 문서 24건 중
+        17건이 실제 지적사항을 갖고 있다(부적합·적합성·적합하지 등). `실사 결과` 앵커에
+        붙은 형태만 본다."""
+        for text in ("제조소는 기준에 적합하게 관리되고 있는지 확인하였다.",
+                     "적합성 평가 절차를 검토하였다.",
+                     "실사 결과: 부적합",
+                     "실사 결과: 불적합"):
+            with self.subTest(text=text[:24]):
+                self.assertNotEqual(g._assess_deficiency(text), "none")
+
+    def test_pass_anchor_tolerates_colon_and_spacing(self):
+        for text in ("❍ 실사 결과: 적합", "실사결과 적합", "실사 결과 ： 적합"):
+            with self.subTest(text=text):
+                self.assertEqual(g._assess_deficiency(text), "none")
+
     def test_c4_encrypted_pdf_labeled_pdf_encrypted(self):
         """암호화 PDF → 'pdf-encrypted' 진단 (scan-no-text/parse-fail 오라벨 정정, C4).
 

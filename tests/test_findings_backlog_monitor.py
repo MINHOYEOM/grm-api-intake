@@ -222,21 +222,35 @@ class EvaluateExtractionGapTest(unittest.TestCase):
 
 
 class ExtractionGapMigrationContractTest(unittest.TestCase):
-    """046 의 **비대칭 설계**를 고정한다 — 거르는 단위는 (source, kind), 보고 단위는 source.
+    """`extraction_gap_by_source()` 의 **비대칭 설계**를 고정한다 — 거르는 단위는
+    (source, kind), 보고 단위는 source.
 
     되돌리면 둘 중 하나가 반드시 깨진다:
       · source 단위로 거르면 → 식약처가 영구 적색(가이던스 17건은 0건이 정상인데 섞인다).
       · kind 단위로 보고하면 → Warning Letter 가 감시에서 사라진다(kind 가 발행부서명이라
         49종으로 쪼개져 전부 소량 억제 임계에 걸린다).
+
+    ★검사 대상은 **함수를 정의하는 가장 최신 마이그레이션**을 자동으로 찾는다. 파일명을
+      손으로 적어 두면 다음 `create or replace` 때 테스트가 낡은 파일을 붙들고 초록으로
+      남는다 — 이 저장소가 이미 두 번 당한 표류(CI shim 손열거)와 같은 모양이다.
     """
 
     def _sql(self) -> str:
         import os
-        path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "web", "migrations", "046_extraction_gap_monitor.sql")
-        with open(path, encoding="utf-8") as fh:
-            return fh.read()
+        import re as _re
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "web", "migrations")
+        hits = []
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".sql"):
+                continue
+            with open(os.path.join(d, fn), encoding="utf-8") as fh:
+                body = fh.read()
+            if _re.search(r"create\s+or\s+replace\s+function\s+public\.extraction_gap_by_source",
+                          body, _re.I):
+                hits.append((fn, body))
+        self.assertTrue(hits, "extraction_gap_by_source 를 정의하는 마이그레이션이 없다")
+        return hits[-1][1]        # 번호가 가장 큰 것 = 프로덕션에 마지막으로 적용된 정본
 
     def test_producing_set_is_scoped_by_source_and_kind(self):
         sql = self._sql()
@@ -246,8 +260,22 @@ class ExtractionGapMigrationContractTest(unittest.TestCase):
                       "조인이 kind 까지 맞춰야 가이던스 문서가 제외된다")
 
     def test_reporting_is_grouped_by_source_only(self):
-        self.assertIn("group by d.source", self._sql(),
+        self.assertIn("group by s.source", self._sql(),
                       "보고는 source 단위여야 WL 49개 kind 가 한 덩어리로 남는다")
+
+    def test_source_declared_zero_is_excluded_from_the_population(self):
+        """★048. 원문이 '지적사항 없음'이라고 **명시한** 문서는 추출 실패가 아니다 —
+        감시 모집단에서 분자·분모 양쪽에서 빠져야 한다. 안 빼면 식약처가 영구 적색이 되고,
+        무시되는 알림은 진짜 신호를 가린다(식약처 12건 전수 확인 결과 누락 지적사항 0건).
+        판별은 소스별 키를 열거하지 않고 `…assessment = 'none'` 관례로 유도한다."""
+        sql = self._sql()
+        self.assertIn("kv.key like '%assessment' and kv.value = 'none'", sql)
+        self.assertIn("where not d.source_says_none", sql,
+                      "제외가 모집단(scoped) 단계에서 일어나야 분모에서도 빠진다")
+
+    def test_excluded_count_is_reported_not_hidden(self):
+        """조용한 축소 금지 — 몇 건을 뺐는지 리포트에 함께 실어야 한다."""
+        self.assertIn("'source_says_none'", self._sql())
 
     def test_contract_returns_counts_only(self):
         """원문 무반환 계약(007/041/042 동종) — 반환 키에 텍스트 필드가 없어야 한다."""

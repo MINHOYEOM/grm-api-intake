@@ -678,6 +678,62 @@
       "doc_type": "notice-final",
       "published_date": "2026-07-21",
       "official_url": "https://www.mfds.go.kr/brd/m_211/view.do?seq=14981"
+    },
+    {
+      "id": "data0011-15899",
+      "title_en": "신세포암 보조요법으로 의약품 개발 시 고려사항(민원인 안내서)",
+      "title_ko": "신세포암 보조요법으로 의약품 개발 시 고려사항(민원인 안내서)",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-31",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15899"
+    },
+    {
+      "id": "data0013-33722",
+      "title_en": "한약(생약)제제 전성분 분석 정보자료집",
+      "title_ko": "한약(생약)제제 전성분 분석 정보자료집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33722"
+    },
+    {
+      "id": "data0011-15898",
+      "title_en": "한약(생약) 품질관리를 위한 유전자 분석법 마련 표준절차",
+      "title_ko": "한약(생약) 품질관리를 위한 유전자 분석법 마련 표준절차",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15898"
+    },
+    {
+      "id": "data0010-15261",
+      "title_en": "신약 품목허가·심사 업무절차",
+      "title_ko": "신약 품목허가·심사 업무절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-07-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15261"
+    },
+    {
+      "id": "data0010-15260",
+      "title_en": "제형별 사전 GMP 평가 운영 지침",
+      "title_ko": "제형별 사전 GMP 평가 운영 지침",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-07-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15260"
+    },
+    {
+      "id": "data0010-15259",
+      "title_en": "바이오의약품 품목허가 등 민원 관련 접수, 검토 및 처리 업무절차",
+      "title_ko": "바이오의약품 품목허가 등 민원 관련 접수, 검토 및 처리 업무절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-07-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15259"
+    },
+    {
+      "id": "data0011-15895",
+      "title_en": "의료기기 소프트웨어 밸리데이션 가이드라인",
+      "title_ko": "의료기기 소프트웨어 밸리데이션 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-07-28",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15895"
     }
   ]
 }

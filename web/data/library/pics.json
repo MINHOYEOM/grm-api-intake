@@ -399,6 +399,14 @@
       "doc_type": "Guidance",
       "published_date": "2007-04-17",
       "official_url": "https://picscheme.org/docview/1951"
+    },
+    {
+      "id": "pics-pi-006-4",
+      "code": "PI 006-4",
+      "title_en": "PIC/S Recommendations on Qualification and Validation",
+      "doc_type": "Guidance",
+      "published_date": "2026-10-01",
+      "official_url": "https://picscheme.org/docview/11277"
     }
   ]
 }

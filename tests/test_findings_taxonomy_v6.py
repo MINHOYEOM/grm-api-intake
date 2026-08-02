@@ -325,10 +325,14 @@ class OutsourcingLookbehindTest(unittest.TestCase):
 class TaxonomyV6BoundedTest(unittest.TestCase):
     """v6 계약: 카테고리 집합·순서 불변, 버전 IN-list 만 확장."""
 
-    def test_taxonomy_v6_is_current_and_v1_through_v5_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v6")
+    def test_v6_is_still_an_accepted_taxonomy_version(self) -> None:
+        """v7(2026-08-02 접착 손상 -- v6 의 거울상)로 현재 버전이 올라갔다. 이 클래스가
+        지키는 것은 "v6 이 현재 버전"이 아니라 **v6 으로 저장된 기존 행이 계속 유효하다**는
+        계약이다(v4->v5 때와 동일한 additive 규율). 현재 버전 고정은
+        tests/test_findings_taxonomy_v7.py 로 이동."""
+        self.assertIn("grm-finding-taxonomy/v6", gf.TAXONOMY_VERSIONS)
         self.assertEqual(
-            gf.TAXONOMY_VERSIONS,
+            gf.TAXONOMY_VERSIONS[:6],
             (
                 "grm-finding-taxonomy/v1",
                 "grm-finding-taxonomy/v2",

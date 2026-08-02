@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-fa7299c0c887f95541d46e51",
+    "finding_text": "The establishment of test procedures, including any changes thereto, are not adequately reviewed and approved by the quality control unit.",
+    "finding_text_ko": "변경사항을 포함한 시험 절차의 수립이 품질관리부서에 의해 적절히 검토·승인되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-01e3e8d42e46175344312b11",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치를 철저히 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02e382e60fdc55c9b47438bb",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치와 배치 또는 그 구성품이 규격을 충족하지 못한 경우를 철저히 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02ee9f3c6ca03fbdbb9dc14b",
+    "finding_text": "Written procedures are not followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 장비의 세척 및 유지관리에 대한 서면 절차가 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0e06e0009e471024e407d372",
+    "finding_text": "An()(4) -Field Alert Report was not submitted within three working days ofreceipt of information concerning bacteriological contamination in a distributed drug product.",
+    "finding_text_ko": "유통된 의약품의 세균 오염에 관한 정보를 접수한 후 3영업일 이내에 삭제된 (4) 현장경보 보고서가 제출되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-183f6bdb1ecac3fb81233d86",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지와 관계없이 설명할 수 없는 불일치와 배치 또는 그 구성품이 규격을 충족하지 못한 경우를 철저히 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2071983c2af892bad3baea01",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-23f7363b63c255439c008c01",
+    "finding_text": "Routine calibration and inspection of electronic equipment is not performed according to a written program designed to assure proper performance.",
+    "finding_text_ko": "적절한 성능을 보장하도록 설계된 서면 프로그램에 따라 전자 장비의 정기 교정 및 검사가 수행되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-265c5ee0ad0083d41b519257",
+    "finding_text": "The written complaint record did not include the reason an investigation was found not to be necessary when an investigation into unexplained discrepancies was not conducted.",
+    "finding_text_ko": "설명할 수 없는 불일치에 대한 조사가 수행되지 않았을 때 불만 서면 기록에는 조사가 불필요하다고 판단된 사유가 포함되어 있지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3506d64e4bc072fc771ec34f",
+    "finding_text": "Routine calibration of electronic equipment is not performed according to a written program designed to assure proper performance.",
+    "finding_text_ko": "적절한 성능을 보장하도록 설계된 서면 프로그램에 따라 전자 장비의 정기 교정이 수행되지 않는다.",
+    "translation_method": "manual"
+  }
+]

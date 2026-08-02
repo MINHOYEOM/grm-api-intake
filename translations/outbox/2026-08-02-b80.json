@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-ff68ad3151d89f690ea8777c",
+    "finding_text": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamina- tion that would alter the safety, identity, strength, quality or purity ofthe drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하도록 장비와 기구를 적절한 간격으로 세척·유지관리하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1a1b786a6a364b8ba253375f",
+    "finding_text": "Adequate washing and toilet facilities are not provided.",
+    "finding_text_ko": "적절한 세면 및 화장실 시설이 제공되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6e258c5293f4911ff7e7e2be",
+    "finding_text": "Laboratory electronic raw data is not controlled and protected.",
+    "finding_text_ko": "시험실 전자 원시 데이터가 관리되고 보호되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8e07028bdbda27f1c7ebee5f",
+    "finding_text": "Deviations from critical control points are not investigated.",
+    "finding_text_ko": "중요 관리점에서의 일탈이 조사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c5a9ca57e3d2b2f98f450ed5",
+    "finding_text": "There is no assurance that software used to control critical processing equipment is capable of meeting user requirements for data security.",
+    "finding_text_ko": "중요 공정 장비를 제어하는 데 사용되는 소프트웨어가 데이터 보안에 대한 사용자 요구사항을 충족할 수 있다는 보장이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-49ddfb9f1ad8a5ed59025ca8",
+    "finding_text": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality and purity at the time of use.",
+    "finding_text_ko": "의약품에는 사용 시점에 적용 가능한 동일성, 함량, 품질 및 순도 기준을 충족함을 보장하는 적절한 안정성 데이터로 결정된 사용기한이 표시되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-593d233cb9984cccf4c1120b",
+    "finding_text": "Appropriate controls are not exercised to assure that changes to documents related to the manufacture of drug products are instituted only by authorized personnel.",
+    "finding_text_ko": "의약품 제조 관련 문서의 변경이 권한 있는 인력에 의해서만 이루어지도록 보장하기 위한 적절한 관리가 실시되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-786b5eaf433413e38908e88f",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9a82c62abeff9dca289fcd5f",
+    "finding_text": "Field Alert Reports were not submitted within three working days of receipt of information concerning bacteriological contamination and significant chemical, physical, or other change or deterioration in a distributed drug product.",
+    "finding_text_ko": "유통된 의약품의 세균 오염 및 중대한 화학적·물리적 또는 기타 변경이나 열화에 관한 정보를 접수한 후 3영업일 이내에 현장경보 보고서가 제출되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a50e5d2e7ff6d799197c6ad1",
+    "finding_text": "Changes to written procedures are not drafted, reviewed and approved by the appropriate organizational units.",
+    "finding_text_ko": "서면 절차의 변경이 적절한 조직 단위에 의해 작성·검토·승인되지 않는다.",
+    "translation_method": "manual"
+  }
+]

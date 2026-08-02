@@ -1,0 +1,119 @@
+name: GRM Findings Classification Audit
+
+# 분류 표류 상시 감사 -- **읽기 전용**. PATCH/POST/DELETE 도, git 쓰기도 없다.
+#
+# 왜: 2026-08-01~02 사이 같은 계열의 오분류가 세 번 나왔고(v5 역극성 · v6 단어분리 ·
+# v7 접착) 세 번 다 **사람이 화면을 보다가** 발견했다. 분류기는 언제나 유효한 카테고리를
+# 반환하므로 실패가 소리를 내지 않는다. 이 잡이 그 발견 경로를 자동화한다.
+#
+# 무엇을 보나(둘 다 차분이라 임계값이 없다):
+#   · twin  -- 영숫자만 남긴 키가 같은데(=같은 문장인데) 카테고리가 갈리는 클러스터.
+#              ★손상 종류를 **열거하지 않는다**. 아직 이름 붙이지 않은 손상도 잡힌다.
+#   · drift -- 저장된 category_code != 현재 분류기 판정. 재분류가 밀렸다는 신호.
+#
+# 첫 배포는 `continue-on-error: true` 로 둔다 -- 신호량을 2주 관찰한 뒤 red 전파를 켠다
+# (알람 피로로 아무도 안 보게 되는 것이 이런 잡의 실패 모드다).
+on:
+  schedule:
+    # 매주 월요일 22:40 UTC(= 화 07:40 KST). 정각을 피한다 -- 이 저장소의 크론이 정각
+    # 부하 피크에서 상시 지각한 이력이 있다.
+    - cron: "40 22 * * 1"
+  workflow_dispatch:
+    inputs:
+      fail_on_breach:
+        description: "true=의심 행이 있으면 워크플로를 red 로(관찰 기간 후 사용)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-classification-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Audit findings.category_code for silent misclassification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # SUPABASE_SERVICE_ROLE_KEY 는 grm-intake.yml·grm-findings-reclassify.yml 이 이미
+      # 쓰는 동일 secret 재사용 -- 신규 secret 등록 불요. 이 잡은 읽기만 한다.
+      - name: Run classification audit (read-only)
+        id: audit
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--output classification_audit.json"
+          if [ "${{ inputs.fail_on_breach }}" = "true" ]; then
+            ARGS="$ARGS --fail-on-breach"
+          fi
+          python findings_classification_audit.py $ARGS > /dev/null
+
+      - name: Upload full report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: classification-audit
+          path: classification_audit.json
+          if-no-files-found: warn
+
+      # 이슈 본문·요약에는 **집계와 상위 몇 건만** 싣는다. 전문은 artifact 로만 -- 원문
+      # 스팬이 공개 저장소 본문에 대량으로 남지 않게 한다(스팬은 스크립트가 이미 절단한다).
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Classification Audit"
+            echo ""
+            if [ ! -f classification_audit.json ]; then
+              echo "classification_audit.json 이 없습니다 — 스크립트가 조기 종료했을 수 있습니다"
+              echo "(SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 확인)."
+              exit 0
+            fi
+            python - <<'PY'
+          import json
+          r = json.load(open("classification_audit.json", encoding="utf-8"))
+          t = r["totals"]
+          print(f"- taxonomy: `{r['taxonomy_version']}` · 스캔 {r['rows_scanned']:,}행")
+          print(f"- 쌍둥이 불일치 클러스터 **{t['twin_clusters']}** (소수파 행 {t['twin_minority_rows']})")
+          print(f"- 분류기 표류 **{t['drift_rows']}**행")
+          if r["guard_failures"]:
+              print("")
+              print("> **가드 실패 — 감사기 자신이 고장났습니다. 0건 보고를 믿지 마십시오.**")
+              for g in r["guard_failures"]:
+                  print(f"> - {g}")
+          print("")
+          print(f"breach: **{r['breach']}**")
+          for cluster in r["twin_disagreements"][:10]:
+              cats = " vs ".join(f"{c['category_code']}({c['count']})" for c in cluster["categories"])
+              print("")
+              print(f"**클러스터 {cluster['cluster_size']}행** — {cats}")
+              for m in cluster["members"]:
+                  if m["is_minority"]:
+                      print(f"  - `{m['finding_id']}` [{m['scope_status']}] {m['snippet'][:90]}")
+          print("")
+          print("_전문은 이 실행의 `classification-audit` artifact 참조._")
+          PY
+          } >> "$GITHUB_STEP_SUMMARY"

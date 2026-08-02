@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-b1b9d4437b40e9fbe32846c3",
+    "finding_text": "Representative samples are not taken of each shipment of each lot of components, drug product containers, and closures for testing or examination.",
+    "finding_text_ko": "시험 또는 검사를 위해 구성품, 의약품 용기 및 마개의 각 로트별 각 출하분에서 대표 검체를 채취하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b36b5d1dee96c4ef92522bb0",
+    "finding_text": "There is no written testing program designed to assess the stability characteristics of drug products.",
+    "finding_text_ko": "의약품의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e096a9c793b8c85a6f4b5adf",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding ofdrug products is not of appropriate design to facilitate operations for its intended usc.",
+    "finding_text_ko": "의약품 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하는 적절한 설계가 아니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f9dfc4e451c3202a4c20b567",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정 구역은 무균 조건을 조성하기 위한 실내 및 장비의 세척·소독 시스템과 관련하여 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-17186b5f59895e94a79fde80",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in mas- ter production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 제조 및 관리 기록 또는 기타 기록의 변경이 권한 있는 인력에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 실시되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-691f1d20e1d66bc3354a4eeb",
+    "finding_text": "The written record or copy ofthe record of an investigation of a complaint conducted in relation to any unexplained discrepancy is not maintained at the establishment where the investigation occurred.",
+    "finding_text_ko": "설명할 수 없는 불일치와 관련하여 수행된 불만 조사에 대한 서면 기록 또는 그 사본이 조사가 이루어진 사업장에 유지되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7dd0bf9d30958aea39a6e73c",
+    "finding_text": "Deviations from production time limits are not documented.",
+    "finding_text_ko": "제조 시간 제한에서의 일탈이 문서화되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b3475ff87ba9a6a40099c264",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-be9e5bc6520bafa6a3a96543",
+    "finding_text": "Batch production and control records are not prepared for each batch ofdrug product produced and do not include complete information relating to the production and control ofeach batch Documentation pertaining to exhibit batches submitted to the Agency are incomplete and inaccurate.",
+    "finding_text_ko": "생산된 각 의약품 배치에 대한 배치 제조 및 관리 기록이 작성되지 않으며 각 배치의 제조 및 관리와 관련한 완전한 정보가 포함되어 있지 않다. 규제기관에 제출된 전시 배치 관련 문서는 불완전하고 부정확하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-d79c82279a30efd4a9ca0b9b",
+    "finding_text": "Written records of investigation ofa drug complaint do not include the findings ofthe investigation and the follow-up.",
+    "finding_text_ko": "의약품 불만 조사에 대한 서면 기록에는 조사 결과와 후속조치가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  }
+]

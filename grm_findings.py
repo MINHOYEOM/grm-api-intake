@@ -197,7 +197,37 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #        둔다 -- 순서 재조정은 이 변경의 범위가 아니다(별건 판단 필요).
 #   7) v1~v5-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all six.
 #      Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v6"
+#
+# grm-finding-taxonomy/v7 change log (2026-08-02 -- v6 의 **거울상** 손상. 카테고리 추가·삭제·
+# 재명명·재정렬 없음).
+#   1) 결함: 같은 텍스트층이 공백을 끼워넣기만 하는 게 아니라 **탈락**시키기도 한다. 앞 단어가
+#      신호어에 들러붙으면("rejection ofcomponents", "Clothing ofpersonnel", "materials
+#      ofequipment") `\b` 단어경계 키워드가 또 조용히 빗나간다. v5(극성)·v6(분리)에 이은
+#      **세 번째 같은 계열**이다 -- 셋 다 "신호어가 있는가"만 보고 "그 신호어가 보이는가·
+#      뜻이 뒤집혔는가"를 안 본 결과다.
+#   2) ★이 클래스가 앞의 둘보다 위험한 이유: **캐치올로 떨어지지 않는다.** 라이브 실측 109행
+#      중 캐치올은 34행뿐이고 나머지는 **엉뚱한 특정 카테고리**에 앉아 있다 -- 신호어 하나가
+#      가려지면 매치 순서상 다른 키워드가 대신 이기기 때문이다. 캐치올 비율·미분류 건수 같은
+#      지표로는 **영원히 안 보인다**. 실측 사례:
+#        · 21 CFR 211.192 "records **ofinvestigations** into unexplained discrepancies" 5건이
+#          material_supplier_control("components" 가 대신 매치) -> deviation_capa
+#        · 21 CFR 211.80  "approval, and rejection **ofcomponents**" 5건이
+#          stability_storage("storage" 가 대신 매치) -> material_supplier_control
+#        · 21 CFR 211.65  "materials and workmanship **ofequipment**" 3건이
+#          material_supplier_control -> equipment_facility
+#   3) 접두어는 `of` **하나로 못박는다**. 후보 15종 실측: of 109 · in 4 · and 1. in 의 4건은
+#      손상이 아니라 실제 영어 단어였다("in"+"stability"=instability, "in"+"validation"=
+#      invalidation). 일반화했으면 즉시 오탐이다 -- 측정이 규칙의 범위를 정했다.
+#   4) 어휘는 v6 와 **같은 파생 함수**(`_split_repair_vocabulary`)를 쓴다. 신호어가 추가되면
+#      분리 복원과 접착 복원이 함께 따라온다(v6 §4 의 표류 방지 원칙 유지).
+#   5) 순서: 분리 복원 -> 접착 복원 -> v5 중립화. 복원이 먼저여야 v5 가드("not required to be
+#      sterile" -- 온전한 단어로 쓰여 있다)를 손상으로 회피할 수 없다(v6 가 세운 근거 그대로).
+#   6) 알려진 한계(honesty over forcing a match): 접착과 분리가 겹친 원문("ofcompo nents")·
+#      글리프 병합("procedmes" = procedures, ur->m)·문자 오인식("quaJity"·"laborato1y")은
+#      범위 밖이다. 표시 텍스트도 여전히 손상된 채다(분류만 고친다 -- v6 와 동일).
+#   7) v1~v6-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all seven.
+#      Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v7"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
@@ -205,6 +235,7 @@ TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v4",
     "grm-finding-taxonomy/v5",
     "grm-finding-taxonomy/v6",
+    "grm-finding-taxonomy/v7",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -712,6 +743,56 @@ def _repair_split_words(haystack: str) -> str:
     return _SPLIT_WORD_RE.sub(lambda m: re.sub(r"\s+", "", m.group(0)), repaired)
 
 
+# ─── v7: 접착(adhesion) 복원 -- v6 의 **거울상** ────────────────────────────────
+# v6 는 "끼어든 공백"("laborator y")을 지웠다. 같은 텍스트층이 반대 손상도 만든다: 공백이
+# **탈락**해 앞 단어가 신호어에 들러붙는다("rejection ofcomponents", "Clothing ofpersonnel",
+# "materials ofequipment"). 이때도 `\b` 단어경계 키워드는 조용히 빗나가고, 지적은 캐치올이나
+# 엉뚱한 카테고리로 간다 -- v5(극성)·v6(분리)와 **같은 계열의 침묵 실패**다.
+#
+# 라이브 실측(2026-08-02, 14,944행): `of`+신호어 109행. 그중 캐치올 34행이고, 나머지는
+# **캐치올이 아니라 엉뚱한 카테고리**에 앉아 있어 캐치올 지표로는 영원히 안 보인다 --
+#   · 21 CFR 211.192 "Written records **ofinvestigations** into unexplained discrepancies"
+#     5건이 material_supplier_control("components" 가 대신 매치) → deviation_capa 로 가야 한다
+#   · 21 CFR 211.80 "receipt ... approval, and rejection **ofcomponents**"
+#     5건이 stability_storage("storage" 가 대신 매치) → material_supplier_control
+#   · 21 CFR 211.65 "materials and workmanship **ofequipment**"
+#     3건이 material_supplier_control → equipment_facility
+#
+# ★접두어를 `of` **하나로 못박는다**. 실측으로 후보 15종을 재보니 of 109 · in 4 · and 1 이었고,
+#   in 의 4건은 손상이 아니라 **실제 영어 단어**였다("in"+"stability"=instability,
+#   "in"+"validation"=invalidation). 접두어를 일반화했으면 즉시 오탐이 된다. 이건 "공백 탈락을
+#   전부 복원"하는 규칙이 아니라 **측정된 단일 접두어**만 다루는 규칙이다.
+_ADHESION_PREFIX = "of"
+# 어휘는 v6 와 **같은 파생 함수**를 쓴다(`_split_repair_vocabulary`) -- 신호어가 추가되면 분리
+# 복원과 접착 복원이 함께 따라온다. v6 change log §4 의 "하나씩 덧붙이기 재발 방지" 원칙 유지.
+#
+# 안전성: 파생 어휘는 전부 len>=6 이므로 `of`+어휘 = 8자 이상이고, 그렇게 분해되는 실제 영어
+# 단어는 없다(often/office/officer/official/offer/offset/offshore/offline 등은 뒤 조각이 신호어가
+# 아니다). 그래도 침묵 표류를 막으려 명시 제외 집합을 두고 테스트로 잠근다.
+_ADHESION_EXCLUDED: frozenset[str] = frozenset()
+
+
+def _build_adhesion_pattern() -> "re.Pattern[str]":
+    """`of` 가 신호어에 들러붙은 형태만 골라내는 정규식."""
+    words = [
+        word
+        for word in _split_repair_vocabulary()
+        if _ADHESION_PREFIX + word not in _ADHESION_EXCLUDED
+    ]
+    alternation = "|".join(re.escape(word) for word in sorted(words, key=len, reverse=True))
+    return re.compile(
+        r"\b" + _ADHESION_PREFIX + r"(?=(?:" + alternation + r")\b)", re.IGNORECASE
+    )
+
+
+_ADHESION_RE = _build_adhesion_pattern()
+
+
+def _repair_adhesion(haystack: str) -> str:
+    """매칭용 haystack 에서만 들러붙은 `of` 를 떼어낸다(저장 텍스트는 불변)."""
+    return _ADHESION_RE.sub(_ADHESION_PREFIX + " ", haystack)
+
+
 def classify_finding_category(text: str) -> str:
     """Deterministic v6 keyword+pattern classifier.
 
@@ -725,7 +806,9 @@ def classify_finding_category(text: str) -> str:
       1. v6 -- signal words that a scanned-PDF text layer split with a stray
          space ("laborator y") are re-joined, so a word-boundary keyword cannot
          silently miss them.
-      2. v5 -- reverse-polarity spans (text that names a signal word only to
+      2. v7 -- the mirror damage: a dropped space that glued "of" onto a signal
+         word ("ofcomponents") is un-glued, for the same reason.
+      3. v5 -- reverse-polarity spans (text that names a signal word only to
          negate it) are neutralised, so a category's signal word cannot be read
          with the opposite of its meaning.
 
@@ -740,6 +823,7 @@ def classify_finding_category(text: str) -> str:
     if not haystack:
         return "other_quality_system"
     haystack = _repair_split_words(haystack)
+    haystack = _repair_adhesion(haystack)
     haystack = _NEGATED_STERILE_RE.sub(_NEGATED_STERILE_PLACEHOLDER, haystack)
     for category in FINDING_TAXONOMY:
         if category.code == "other_quality_system":

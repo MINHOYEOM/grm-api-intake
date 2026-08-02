@@ -2032,6 +2032,156 @@ class Fda483PageHeaderFooterCutTest(unittest.TestCase):
         self.assertIsNotNone(f._FDA483_FOOTER_RE.search("DISTRICT OFFICE ADDRESS AND PHONE"))
 
 
+class Fda483GlyphNumberedHeadingTest(unittest.TestCase):
+    """★스캔 OCR 이 표제 번호 `1` 을 글자 `I`·`l`·`|` 로 읽는다.
+
+    기존 앵커 2종은 모두 `\\d` 를 요구해 이런 문서를 통째로 놓쳤다(실측 120702·129953·
+    142274·167686). 회수 경로가 결국 ⑤(번호 없는 단일 관찰)로 흘려보내 표제가
+    "OBSERVATION l You used…" 처럼 앞머리가 붙은 채 저장됐다 — 여기서 제대로 잡는다.
+    """
+
+    HINTS = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.HINTS)
+
+    def test_glyph_one_is_recognised_as_a_heading(self):
+        for glyph in ("l", "I", "|"):
+            with self.subTest(glyph=glyph):
+                rows = self._obs(
+                    "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+                    f"OBSERVATION {glyph} You used a non-pharmaceutical grade component "
+                    "in the formulation of a drug product. Specifically, the lot was "
+                    "sourced from an unqualified supplier.")
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["number"], "1")
+                self.assertTrue(rows[0]["deficiency"].startswith("You used a non-pharmaceutical"))
+
+    def test_plural_and_case_variants(self):
+        rows = self._obs(
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+            "Sterile, injectable liquid dosage form preparation OBSERVATIONS I "
+            "Procedures designed to prevent microbiological contamination of drug "
+            "products purporting to be sterile are not established, written or followed.")
+        self.assertEqual(len(rows), 1)
+        # ★제품 설명("Sterile, injectable liquid dosage form preparation")이 표제 앞에
+        #   있어도 표제부터 잘라야 한다 — 종전에는 그 설명이 지적사항 앞머리로 저장됐다.
+        self.assertTrue(rows[0]["deficiency"].startswith("Procedures designed"))
+        self.assertNotIn("dosage form preparation", rows[0]["deficiency"])
+
+    def test_prose_i_observed_is_not_a_heading(self):
+        """★오탐면. 산문 "OBSERVATION I observed the process…"(실측 106526)의 `I` 를
+        표제 번호로 오인하면 문장이 두 동강 난다. 글리프 뒤가 **대문자로 시작하는 단어**
+        여야 한다는 조건이 그 둘을 가른다."""
+        self.assertIsNone(f._OBS_GLYPH_NUM_RE.search(
+            "OBSERVATION I observed the process of producing non-sterile products"))
+        self.assertIsNotNone(f._OBS_GLYPH_NUM_RE.search(
+            "OBSERVATION I Procedures designed to prevent contamination are not followed"))
+
+    def test_digit_headings_still_win(self):
+        """숫자 표제가 있으면 정상 경로가 먼저 처리한다 — 글리프 앵커는 도달하지 않는다."""
+        rows = self._obs(
+            "WE OBSERVED: OBSERVATION 1 Equipment is not cleaned at appropriate intervals. "
+            "OBSERVATION 2 Laboratory records are incomplete.")
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+
+class Fda483SingleUnnumberedObservationTest(unittest.TestCase):
+    """★번호가 아예 없는 옛 양식(조제약국 위생불량 483 등) — 마커 바로 다음 줄이 곧
+    지적문인데 회수 사다리 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡았다(실측 36건).
+
+    ⑤ 는 번호라는 구조적 근거 없이 문장 하나를 관찰로 승격하므로, 구조 대신 **의미**로
+    문턱을 만든다 — 결함 주장 어휘가 없으면 올리지 않는다. 이게 없으면 마커 뒤에 오는
+    제품 설명이 그대로 지적사항이 된다.
+    """
+
+    HINTS = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.HINTS)
+
+    def test_unnumbered_single_observation_is_recovered(self):
+        rows = self._obs(
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+            "Sporicidal agents are not used in your facility's cleanrooms and/or ISO 5 "
+            "area. Specifically, while conducting a walkthrough we noted that your "
+            "facility does not currently use a sporicidal agent while cleaning.")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["number"], "1")
+        self.assertTrue(rows[0]["deficiency"].startswith("Sporicidal agents are not used"))
+        self.assertIn("walkthrough", rows[0]["detail"])
+
+    def test_product_description_after_marker_is_rejected(self):
+        """★⑤ 가 막아야 하는 바로 그 문장 — 실측으로 마커 뒤에 제품 설명만 오는 문서가
+        있다. 결함 주장 어휘가 없으므로 올리지 않는다(침묵이 잘못된 공개보다 낫다)."""
+        rows = self._obs(
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+            "Sterile, injectable liquid dosage form preparation for human use.")
+        self.assertEqual(rows, [])
+
+    def test_too_short_a_fragment_is_rejected(self):
+        rows = self._obs("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: Not clean.")
+        self.assertEqual(rows, [])
+
+    def test_form_boilerplate_after_marker_is_rejected(self):
+        rows = self._obs(
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+            "THIS DOCUMENT LISTS OBSERVATIONS MADE BY THE FDA REPRESENTATIVE(S) DURING "
+            "THE INSPECTION OF YOUR FACILITY AND DO NOT REPRESENT A FINAL DETERMINATION.")
+        self.assertEqual(rows, [])
+
+    def test_rung5_never_runs_when_an_earlier_rung_succeeds(self):
+        """★무회귀의 구조적 근거 — ⑤ 는 ②③④ 가 전부 0건일 때만 도달한다."""
+        rows = self._obs(
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED: "
+            "1. Written procedures are not followed by manufacturing employees. "
+            "2. Laboratory controls do not include scientifically sound procedures.")
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_no_marker_means_no_single_observation(self):
+        """마커조차 없으면 ⑤ 도 돌지 않는다 — 아무 산문이나 관찰이 되면 안 된다."""
+        self.assertEqual(self._obs(
+            "Equipment is not cleaned at appropriate intervals to prevent contamination "
+            "of drug products manufactured at this facility."), [])
+
+    def test_claim_vocabulary_covers_observed_shapes(self):
+        for claim in ("Sporicidal agents are not used in the ISO 5 area of this facility",
+                      "Your firm is producing sterile drugs under insanitary conditions",
+                      "Non-depyrogenated tools were used in sterile drug production here",
+                      "Personnel donned gowning apparel improperly during aseptic work",
+                      "Failure to generate a record showing compliance with requirements"):
+            with self.subTest(claim=claim[:32]):
+                self.assertIsNotNone(f._DEFICIENCY_CLAIM_RE.search(claim))
+        for neutral in ("Sterile, injectable liquid dosage form preparation for human use",
+                        "Oral solid dosage manufacturing and packaging operations site"):
+            with self.subTest(neutral=neutral[:32]):
+                self.assertIsNone(f._DEFICIENCY_CLAIM_RE.search(neutral))
+
+
+class Fda483ItemLabelStripTest(unittest.TestCase):
+    """양식 항목 라벨(`Item #1`)은 표제가 아니라 번호칸이다(실측 94344)."""
+
+    def test_item_label_is_stripped(self):
+        self.assertEqual(
+            f.strip_leading_observation_noise(
+                "Item #1 The designated quality control unit does not have the authority"),
+            "The designated quality control unit does not have the authority")
+
+    def test_item_label_variants(self):
+        for prefix in ("Item #2 ", "ITEM 3. ", "Item No. 4 "):
+            with self.subTest(prefix=prefix):
+                self.assertTrue(f.strip_leading_observation_noise(
+                    prefix + "Written procedures are not followed").startswith("Written"))
+
+    def test_bare_item_without_a_sentence_is_untouched(self):
+        self.assertEqual(f.strip_leading_observation_noise("Item #1"), "Item #1")
+
+    def test_real_heading_starting_with_item_is_untouched(self):
+        """'Items' 로 시작하는 진짜 문장은 건드리지 않는다(숫자 라벨이 아니다)."""
+        text = "Items stored in the warehouse are not protected from contamination"
+        self.assertEqual(f.strip_leading_observation_noise(text), text)
+
+
 class Fda483ArtifactOnlyTextLayerTest(unittest.TestCase):
     """★2026-08-02. **"글자가 있다 ≠ 본문이 있다."**
 

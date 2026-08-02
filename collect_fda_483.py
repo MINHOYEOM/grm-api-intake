@@ -374,6 +374,9 @@ _ALPHA_WITH_DIGIT_RE = re.compile(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$")
 # 실측 튜닝(49문서 표본): 0.10 이면 "Thl ttiliv director failed to ass~re"(1/12=0.083)가
 # 통과했다. 0.08 로 내리면 그 표제는 걸리고, 회수된 정상 표제 7건은 전부 0.0 이라 무영향이다.
 FDA483_DEFICIENCY_GARBLE_MAX = 0.08
+# ⑤(번호 없는 단일 관찰) 표제의 최소 길이. 번호라는 구조적 근거가 없는 경로라 한두 단어
+# 짜리 조각은 문장으로 보지 않는다. 실측 36건의 진짜 표제는 전부 40자를 넘었다.
+FDA483_SINGLE_OBS_MIN_CHARS = 40
 # FDA 483 페이지 하단 서명/양식 푸터 블록 시작 마커. 스캔 OCR 이 이 블록의 텍스트를 자주
 # 깨뜨리고(EMPLOYEE(S)→EMPI..OYEE(S)/EMPLOYEE($), SIGNATURE→SIGNAT\JRE, FORM FDA 483→
 # FORM FDA 4&3), 심지어 Observation 본문 자리로 흘려보내(본문을 통째로 대체) 서명블록이
@@ -454,6 +457,10 @@ _LEADING_SYMBOL_NOISE_RE = re.compile(r'^[^A-Za-z0-9"\'(<]+')
 # 관사 "A"/"a" 와 대명사 "I" 는 진짜 문장 시작일 수 있어 **제외**한다 — 소문자 낱자가
 # 대문자로 시작하는 다음 낱말 앞에 홀로 선 경우만 잡는다.
 _LEADING_STRAY_LETTER_RE = re.compile(r"^(?!a\b)[b-z][.)]?\s+(?=[A-Z])")
+# 양식 항목 라벨(`Item #1` · `ITEM 2.` · `Item No. 3`) — 표제가 아니라 번호칸이다.
+# 뒤에 **대문자로 시작하는 실제 문장**이 와야만 뗀다(단독 "Item 1" 은 건드리지 않는다).
+_LEADING_ITEM_LABEL_RE = re.compile(r"^\s*ITEM\s*(?:NO\.?\s*)?[#.:]?\s*\d{1,2}\s*[.):\-]?\s+(?=[A-Z])",
+                                    re.I)
 # 안전 상한 — 이보다 많이 깎이면 잡음 제거가 아니라 내용 절단이다(원본을 그대로 둔다).
 FDA483_LEADING_NOISE_MAX_STRIP = 12
 _DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으면 detail 을 비운다
@@ -1162,10 +1169,18 @@ def strip_leading_observation_noise(deficiency: str) -> str:
     ★결과가 비면 원본을 돌려준다 — 표제를 통째로 지우는 일은 없어야 한다.
     """
     original = deficiency or ""
-    text = _LEADING_SYMBOL_NOISE_RE.sub("", original)
+    # ⓪ 양식 항목 라벨(`Item #1` · `ITEM 2.`) — 표제가 아니라 번호칸이다. 상한 규칙 밖에
+    #   두어야 하므로(라벨이 길면 ①~③ 상한에 걸려 통째로 되돌아간다) 먼저 떼어낸다.
+    #   실측 94344: "Item #1 The designated quality control unit does not have the authority…"
+    text = _LEADING_ITEM_LABEL_RE.sub("", original, count=1)
+    stripped_label = len(original) - len(text)
+    text = _LEADING_SYMBOL_NOISE_RE.sub("", text)
     text = _LEADING_STRAY_LETTER_RE.sub("", text)
     text = _LEADING_SYMBOL_NOISE_RE.sub("", text)
     text = text.lstrip()
+    if stripped_label:
+        # 라벨 제거분은 상한 계산에서 제외한다 — 내용 절단이 아니라 정형 라벨이다.
+        return text or original
     if not text:
         return original
     if len(original) - len(text) > FDA483_LEADING_NOISE_MAX_STRIP:
@@ -1716,6 +1731,17 @@ def _run_recovery_ladder(
     if found:
         return found
 
+    # ②b 글리프 오인식 표제 — `OBSERVATION l` · `OBSERVATIONS I` · `OBSERVAnON 1`.
+    #    스캔 OCR 이 숫자 `1` 을 글자 `I`/`l`/`|` 로 읽는다. ② 는 `\d` 를 요구해 통째로
+    #    놓친다(실측 120702·129953·142274·83523·167686). ⑤ 로 흘려보내면 표제가
+    #    "OBSERVATION l ..." 처럼 앞머리가 붙은 채 저장되므로 여기서 제대로 잡는다.
+    found = _observations_from_anchors(
+        scoped, lambda s: list(_OBS_GLYPH_NUM_RE.finditer(s)), hints, gate=gate)
+    if found:
+        for row in found:
+            row["number"] = "1"      # 글리프는 언제나 1(2 이상은 ②가 이미 숫자로 잡는다)
+        return found
+
     # ③ 번호 목록 — 마커가 있는 문서로 한정(없으면 목차·별첨까지 관찰이 된다).
     if marker is None:
         return []
@@ -1726,8 +1752,77 @@ def _run_recovery_ladder(
 
     # ④ 닫는 괄호 번호(`1)` · `1.)`). ③ 이 0건일 때만 — 한 문서가 두 양식을 섞어 쓰지
     # 않으므로 순서대로 시도하면 충분하고, 서로의 오탐을 만들지 않는다.
-    return _observations_from_anchors(
+    found = _observations_from_anchors(
         scoped, lambda s: list(_PAREN_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+    if found:
+        return found
+
+    # ⑤ **번호가 아예 없는 단일 관찰**(옛 양식·조제약국 위생불량 483). 마커 바로 다음 줄이
+    #   곧 지적문인데 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡는다(실측 36건).
+    #   여기까지 왔다는 것은 정상 경로와 ①~④ 가 **모두 0건**이라는 뜻이다.
+    return _single_unnumbered_observation(scoped, hints, gate)
+
+
+# [글리프 오인식 표제] 스캔 OCR 이 표제 번호 `1` 을 글자 `I`·`l`·`|` 로 읽는다. 단어 자체도
+# 깨지므로(`OBSERVAnON`·`OBSERVATIONS`) 철자에 관용을 두되, **오탐면이 좁도록** 두 가지를
+# 요구한다:
+#   ① 글리프 뒤가 문장부호이거나 **대문자로 시작하는 다음 단어**일 것
+#      — 이게 없으면 산문 "OBSERVATION I observed the process…"(실측 106526)의 `I` 를
+#        표제 번호로 오인해 문장을 두 동강 낸다. 대문자 요구가 그 둘을 가른다.
+#   ② 단어 철자는 대소문자를 고정하지 않는다(OCR 이 섞는다) — 대신 ①이 문턱을 만든다.
+# ★★`(?-i:[A-Z])` 필수. 패턴 전체가 re.I 라 그냥 `[A-Z]` 라고 쓰면 **소문자도 매칭돼**
+#   조건이 무력화된다(이 파일에서 두 번째로 밟은 함정 — 리댁션 마커 정규식과 같다).
+_OBS_GLYPH_NUM_RE = re.compile(
+    r"\bO\s?B\s?S\s?E\s?R\s?V\s?A\s?[Tt]\s?[Ii]\s?[Oo]\s?[Nn]S?\s*[#.:\-]?\s*"
+    r"([Il|])(?=[\s.:)]*(?:(?-i:[A-Z])|$))",
+    re.I,
+)
+
+# 마커 뒤 첫 문장이 **결함 주장**인가. ⑤ 는 번호라는 구조적 근거 없이 문장 하나를 관찰로
+# 승격하므로, 구조 대신 **의미**로 문턱을 만든다. 이게 없으면 마커 뒤에 오는 제품 설명
+# ("Sterile, injectable liquid dosage form preparation" — 실측)이 그대로 지적사항이 된다.
+# 어휘는 실측 36건의 첫 문장에서 뽑았다(not·failure·insanitary·improperly·non-·falls below…).
+# ★거짓 음성(놓침)은 침묵으로 끝나지만 거짓 양성은 공개 DB 에 남는다 — 좁게 잡는다.
+_DEFICIENCY_CLAIM_RE = re.compile(
+    r"\bnot\b|\bno\b|\bnever\b|\bfail(?:ed|ure|s|ing)?\b|\binadequate(?:ly)?\b"
+    r"|\bdeficien(?:t|cy|cies)\b|\bins?anitary\b|\bunsanitary\b|\block(?:ing|s|ed)?\b"
+    r"|\black(?:ing|s|ed)?\b|\babsent\b|\bincomplete\b|\bimproper(?:ly)?\b|\bunable\b"
+    r"|\bwithout\b|\bcontaminat\w*\b|\bdeviat\w*\b|\bexpired\b|\bunvalidated\b"
+    r"|\buncalibrated\b|\bfalls?\s+below\b|\bdiffers?\s+from\b|\bnon-\w+",
+    re.I,
+)
+
+
+def _single_unnumbered_observation(
+    scoped: str, hints: dict[str, str], gate: Any,
+) -> list[dict[str, str]]:
+    """마커 뒤 본문 전체를 **관찰 1건**으로 승격한다(번호 없는 옛 양식 전용).
+
+    ★번호가 없으므로 "여기서 시작한다"는 구조적 근거가 마커 하나뿐이다. 그래서 통과
+      조건을 셋으로 둔다:
+        ① 기존 회수 게이트(_is_recovered_deficiency_publishable) — 양식 문구·깨짐 차단
+        ② **결함 주장 어휘**(_DEFICIENCY_CLAIM_RE) — 제품 설명·표제 나열을 배제
+        ③ 표제가 지나치게 짧지 않을 것 — 한두 단어짜리 조각은 문장이 아니다
+      셋 다 만족하지 못하면 **아무것도 내지 않는다**(오늘의 침묵이 잘못된 공개보다 낫다).
+    """
+    # ②③④ 와 **같은 조립 코드**를 쓴다(둘이 갈라지지 않게) — 앵커만 "본문 맨 앞"이다.
+    chunk = _clean_observation_chunk(scoped or "")
+    chunk = gf.strip_fda483_page_header(chunk, **hints)
+    deficiency, detail = _first_sentence(chunk)
+    deficiency = strip_leading_observation_noise(deficiency)
+    if len(deficiency) < FDA483_SINGLE_OBS_MIN_CHARS:
+        return []
+    if not _DEFICIENCY_CLAIM_RE.search(deficiency):
+        return []
+    if not gate(deficiency):
+        return []
+    clean_detail = _clean_observation_detail(detail)
+    clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)
+    return [{
+        "number": "1",
+        "deficiency": deficiency,
+        "detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
+    }]
 
 
 def _extract_483_observations(

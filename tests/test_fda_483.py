@@ -2032,6 +2032,168 @@ class Fda483PageHeaderFooterCutTest(unittest.TestCase):
         self.assertIsNotNone(f._FDA483_FOOTER_RE.search("DISTRICT OFFICE ADDRESS AND PHONE"))
 
 
+class Fda483ArtifactOnlyTextLayerTest(unittest.TestCase):
+    """★2026-08-02. **"글자가 있다 ≠ 본문이 있다."**
+
+    본문이 100% 스캔 이미지인데 텍스트층에 FOIA 리댁션 주석·페이지 라벨·접근성 고지만
+    실린 483 이 32건 있었다. 7자(`(b) (4)`)짜리 문서까지 `text.strip()` 이 참이라
+    `pdf-ok` 로 통과했고 OCR 을 **한 번도 안 돌렸다**.
+
+    ★고칠 곳이 두 군데다. `_needs_ocr` 만 고치면 페이지 루프의 `if native.strip()` 이
+      전 페이지를 건너뛰어 아무것도 달라지지 않는다(실측 175834 는 15쪽 전부, 193692 는
+      4쪽 전부가 그렇게 통과했다). 이 클래스가 두 곳을 함께 고정한다.
+
+    임계 근거(실측): 관찰문이 정상 산출되는 대조군 42문서의 텍스트 길이 **최소 1,841자**,
+    결손군 41문서는 최소 7자. 페이지 단위로는 결손군 252쪽 중 120쪽이 걸리고 대조군
+    263쪽 중 1쪽만 걸리는데, 그 1쪽도 `(b)(4)` 뿐인 진짜 이미지 페이지다(오탐 아님).
+    """
+
+    def test_redaction_markers_alone_are_not_a_body(self):
+        for text in ("(b) (4)",
+                     "(b) (4)\n" * 40,
+                     "(b)(6)\n(b)(6)\n(b)(6)",
+                     "redacted text",
+                     "Page 1 of 4\nPage 2 of 4\nPage 3 of 4\nPage 4 of 4"):
+            with self.subTest(text=text[:28]):
+                self.assertFalse(f._is_substantive_text(text))
+
+    def test_fda_accessibility_notice_is_not_a_body(self):
+        """FDA 가 스스로 '이 페이지는 대체텍스트를 제공할 수 없다'고 적은 고지 —
+        본문이 이미지라는 1차 사료적 증거다(102220·102644 실측)."""
+        text = ("Unfortunately, we cannot provide alternative text for this page. "
+                "Persons with disabilities having problems accessing this page may "
+                "call (301) 796-3634 for assistance.")
+        self.assertFalse(f._is_substantive_text(text))
+
+    def test_real_observation_text_is_substantive(self):
+        text = ("OBSERVATION 1 Procedures designed to prevent microbiological "
+                "contamination of drug products purporting to be sterile are not "
+                "established, written, or followed.")
+        self.assertTrue(f._is_substantive_text(text))
+
+    def test_redaction_marker_never_eats_the_surrounding_sentence(self):
+        """리댁션 마커가 섞인 **진짜 지적문**은 실질로 남아야 한다 — 마커만 걷어낸다."""
+        self.assertTrue(f._is_substantive_text(
+            "Equipment used by (b)(4) operators was not cleaned at appropriate intervals."))
+        self.assertEqual(
+            f._text_residue_after_artifacts("(b)(7)(C) equipment was dirty"),
+            "equipmentwasdirty")
+
+    def test_trailing_subletter_group_does_not_swallow_the_next_marker(self):
+        """★실측 함정. 꼬리 하위표기를 `[A-Za-z]` 로 두면 다음 마커의 `(b)` 를 먹어치워
+        그 뒤 `(4)` 가 잔여로 남는다 — 175834 의 2,133자가 잔여 132자(전부 '4')였다.
+        패턴 전체가 re.I 라 `[A-Z]` 만으로도 부족하고 `(?-i:...)` 가 필요하다."""
+        self.assertEqual(f._text_residue_after_artifacts("(b) (4)\n" * 30), "")
+
+    def test_needs_ocr_fires_on_artifact_only_text(self):
+        with patch.object(f, "_ocr_enabled", lambda: True):
+            self.assertTrue(f._needs_ocr("(b) (4)"))
+            self.assertTrue(f._needs_ocr("(b) (4)\n" * 40))
+            self.assertTrue(f._needs_ocr(""))
+            self.assertFalse(f._needs_ocr(
+                "OBSERVATION 1 Written procedures are not followed by employees "
+                "engaged in the manufacture of drug products at this facility."))
+
+    def test_ocr_disabled_still_short_circuits(self):
+        """플래그가 꺼져 있으면 어떤 텍스트에도 OCR 을 요구하지 않는다(기존 계약)."""
+        with patch.object(f, "_ocr_enabled", lambda: False):
+            self.assertFalse(f._needs_ocr(""))
+            self.assertFalse(f._needs_ocr("(b) (4)"))
+
+
+class Fda483ArtifactPageLoopTest(unittest.TestCase):
+    """페이지 루프가 아티팩트 페이지를 **빈 페이지처럼** 다루는지 고정한다.
+
+    ★여기가 32건을 실제로 막던 지점이다. 종전 조건 `if native.strip()` 은 `(b) (4)`
+      한 줄만 있어도 페이지를 건너뛰었다.
+    """
+
+    class _Page:
+        def __init__(self, native, ocr="", images=1):
+            self._native, self._ocr, self._images = native, ocr, images
+            self.ocr_called = False
+
+        def get_text(self, _kind, textpage=None):
+            return self._ocr if textpage is not None else self._native
+
+        def get_images(self, full=False):
+            return [object()] * self._images
+
+        def get_textpage_ocr(self, **_kw):
+            self.ocr_called = True
+            return object()
+
+    class _Doc:
+        needs_pass = False
+        is_encrypted = False
+
+        def __init__(self, pages):
+            self._pages = pages
+
+        def __iter__(self):
+            return iter(self._pages)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+
+    def _run(self, pages):
+        import types
+        fake = types.SimpleNamespace(open=lambda **_kw: self._Doc(pages))
+        with patch.dict("sys.modules", {"fitz": fake}), \
+             patch.object(f, "_ensure_tessdata_prefix", lambda: None), \
+             patch.object(f, "_tessdata_dir", lambda: "/x"), \
+             patch.dict(f._OCR_BUDGET, {"remaining": 50, "used": 0}):
+            return f._ocr_483_pdf_text_uncounted(b"%PDF", 200000)
+
+    def test_artifact_page_is_ocred_not_skipped(self):
+        page = self._Page("(b) (4)\n(b) (4)", ocr="OBSERVATION 1 Equipment was not cleaned.")
+        text, status = self._run([page])
+        self.assertTrue(page.ocr_called, "아티팩트 페이지가 건너뛰어졌다")
+        self.assertIn("Equipment was not cleaned", text)
+        self.assertEqual(status, "pdf-ok-ocr")
+
+    def test_substantive_page_is_never_overwritten_by_ocr(self):
+        """★가장 위험한 방향. 멀쩡한 텍스트 페이지를 OCR 결과로 덮어쓰면 안 된다."""
+        real = ("OBSERVATION 1 Written procedures are not followed by employees engaged "
+                "in the manufacture of drug products.")
+        page = self._Page(real, ocr="G4RBL3D 0CR 0UTPUT")
+        text, _status = self._run([page])
+        self.assertFalse(page.ocr_called)
+        self.assertIn("Written procedures are not followed", text)
+        self.assertNotIn("G4RBL3D", text)
+
+    def test_artifact_page_without_images_is_left_alone(self):
+        """아티팩트뿐인데 이미지도 없으면 OCR 이 살릴 것이 없다 — 예산을 쓰지 않는다."""
+        page = self._Page("(b) (4)", ocr="x", images=0)
+        text, _status = self._run([page])
+        self.assertFalse(page.ocr_called)
+        self.assertIn("(b) (4)", text)
+
+    def test_budget_exhaustion_never_shrinks_todays_output(self):
+        """★예산이 없어 OCR 을 못 해도 종전 산출을 줄이지 않는다 — 종전에는 이 페이지가
+        `if native.strip()` 분기에서 이미 append 됐다."""
+        page = self._Page("(b) (4)", ocr="x")
+        import types
+        fake = types.SimpleNamespace(open=lambda **_kw: self._Doc([page]))
+        with patch.dict("sys.modules", {"fitz": fake}), \
+             patch.object(f, "_ensure_tessdata_prefix", lambda: None), \
+             patch.object(f, "_tessdata_dir", lambda: "/x"), \
+             patch.dict(f._OCR_BUDGET, {"remaining": 1, "used": 0}), \
+             patch.object(f, "FDA483_OCR_MAX_PAGES", 0):
+            text, _status = f._ocr_483_pdf_text_uncounted(b"%PDF", 200000)
+        self.assertFalse(page.ocr_called)
+        self.assertIn("(b) (4)", text)
+
+    def test_empty_ocr_result_falls_back_to_native(self):
+        page = self._Page("(b) (4)", ocr="   ")
+        text, _status = self._run([page])
+        self.assertTrue(page.ocr_called)
+        self.assertIn("(b) (4)", text)
+
+
 class Fda483OcrReasonPropagationTest(unittest.TestCase):
     """`_fetch_fda483_pdf_text` 는 OCR 이 못 살렸을 때 **왜 못 살렸는지**를 하류에
     넘겨야 한다. 종전엔 `_is_notice_only(text)` 일 때만 OCR 사유로 바꿔 돌려줘서,

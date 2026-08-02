@@ -144,7 +144,12 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      주요 이동: contamination_control->aseptic 8(211.113(b) "purporting to be steril e"),
 #      other_quality_system->qc_lab_controls 6(211.165(b) "laborator y testing"),
 #      other->aseptic 5, other->environmental_monitoring 5.
-#      캐치올(other_quality_system)로 **내려간 행은 0건**이다(복원이 신호를 지우지 않음).
+#      캐치올(other_quality_system)로 내려간 행은 **공개 코퍼스 0건 / 전수(14,944행) 1건**이다.
+#      ★정정(2026-08-02 재분류 dry-run): 최초에 "0건 -- 복원은 신호를 지우지 않는다"고 적었으나
+#      그 불변식은 **틀렸다**. 공개 코퍼스에서만 0건이었고, 전수 매트릭스는 1건을 드러냈다
+#      (fda483-90268, scope_status=fragment 라 공개 스윕에 없던 행). 원인은 §6 의 lookbehind
+#      상호작용이다 -- 복원이 매치를 **활성화**만 하는 게 아니라 **제거**할 수도 있다.
+#      측정 모집단이 곧 결론의 한계다: 공개 게이트 밖 행은 공개 스윕으로 볼 수 없다.
 #   3) 수리 계층 판정 -- **분류기 haystack 정규화**(v5 의 _NEGATED_STERILE_RE 와 같은 층)이고
 #      추출/적재 시점 텍스트 수리가 아니다. 근거 셋:
 #      · 소급성: 이미 저장된 106건은 재분류(findings_reclassify_service.py)만으로 전부
@@ -176,6 +181,13 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #        분류기 키워드가 "cleanroom"/"recordkeeping" 이라 같은 메커니즘에 걸리는데, 실측
 #        전건(10/10, 1/1)이 명사 용법이고 조인 결과가 의미상 정확한 카테고리라 **의도적으로
 #        허용**한다(동사+목적어 오조인 사례 0건 확인).
+#      · ★복원은 **부정 lookbehind 를 활성화해 매치를 제거할 수도 있다**. equipment_facility
+#        의 v3 패턴은 `(?<!outsourcing )facilit(?:y|ies)` 로, "Outsourcing Facility"(FDA 업소
+#        유형 라벨 -- 물리적 시설 지적이 아니다)를 의도적으로 배제한다. 원문이 "Outsour cing
+#        Facility" 로 쪼개져 있으면 lookbehind 가 안 걸려 설비/시설로 잘못 잡히는데, 복원이
+#        되붙이면 v3 의 배제가 **비로소 정상 작동**한다(전수 1건 fda483-90268 -- 캐치올 이동이
+#        맞는 동작이다). 즉 복원의 효과는 "신호 추가" 한 방향이 아니다 -- 실측 전수에서 이
+#        경로는 1건이고 전부 정본 동작이지만, 불변식으로 오해하면 안 된다.
 #      · 48건 중 **3건**은 새 카테고리가 논쟁적이다 -- 복원된 신호어가 매치 순서상 더 앞선
 #        카테고리에 걸리기 때문이다: fda483-85460("batch r ecords" -> aseptic 에서
 #        documentation_records 로), fda483-112089("test met hods" -> stability_storage 에서

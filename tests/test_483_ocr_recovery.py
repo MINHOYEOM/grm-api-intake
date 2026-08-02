@@ -209,12 +209,26 @@ class RecoveryRunTest(unittest.TestCase):
         prose = ("This document lists observations made by the FDA representative(s) during "
                  "the inspection of your facility. They are inspectional observations, and do "
                  "not represent a final Agency determination regarding your compliance. ") * 4
-        report, _code, _upsert, _rid = _run(
-            dry_run=False, fetch_text=lambda url: (prose, "pdf-ok"))
-        self.assertEqual(report.observations_recovered, 0)
-        self.assertEqual(report.recovered, report.recovered_excerpt_only)
-        self.assertGreaterEqual(report.recovered_excerpt_only, 1,
-                                "발췌만 살아난 문서가 별도 카운터에 잡혀야 한다")
+        for dry in (True, False):
+            report, _code, _upsert, _rid = _run(
+                dry_run=dry, fetch_text=lambda url: (prose, "pdf-ok"))
+            self.assertEqual(report.observations_recovered, 0)
+            self.assertEqual(report.recovered, report.recovered_excerpt_only)
+            self.assertGreaterEqual(report.recovered_excerpt_only, 1,
+                                    f"발췌만 살아난 문서가 별도 카운터에 잡혀야 한다(dry={dry})")
+
+    def test_dry_run_and_apply_count_identically(self):
+        """★dry-run 과 apply 가 **같은 카운터 코드**를 쓴다. 두 경로에 복제해 두면 한쪽만
+        고치게 된다 — 실제로 그렇게 했다가 `recovered_excerpt_only` 가 dry-run 에서 항상
+        0 이 됐고, 하필 dry-run 이 진단에 쓰는 모드라 계기판이 처음부터 거짓말을 했다."""
+        prose = ("This document lists observations made by the FDA representative(s) "
+                 "during the inspection of your facility. ") * 4
+        for text in (_TEXT, prose):
+            dry, _c, _u, _r = _run(dry_run=True, fetch_text=lambda url: (text, "pdf-ok"))
+            app, _c2, _u2, _r2 = _run(dry_run=False, fetch_text=lambda url: (text, "pdf-ok"))
+            for field in ("recovered", "observations_recovered", "recovered_excerpt_only"):
+                self.assertEqual(getattr(dry, field), getattr(app, field),
+                                 f"{field} 가 dry-run 과 apply 에서 다르다")
 
     def test_id_mismatch_never_writes(self) -> None:
         """재구성이 다른 문서를 가리키면 떠돌이 행을 만들지 않는다."""

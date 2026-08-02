@@ -192,10 +192,13 @@ class DesignContractTest(unittest.TestCase):
         self.assertTrue(any("certif" in p for p in by_code["validation_qualification"].patterns))
         self.assertFalse(any("certif" in p for p in by_code["environmental_monitoring"].patterns))
 
-    def test_taxonomy_v8_is_current_and_v1_through_v7_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v8")
+    def test_v8_is_still_an_accepted_taxonomy_version(self) -> None:
+        """v9(503B 용기 표시정보)로 현재 버전이 올라갔다. 이 클래스가 지키는 것은
+        "v8 이 현재 버전"이 아니라 **v8 로 저장된 기존 행이 계속 유효하다**는 계약이다.
+        현재 버전 고정은 tests/test_findings_taxonomy_v9.py 로 이동."""
+        self.assertIn("grm-finding-taxonomy/v8", gf.TAXONOMY_VERSIONS)
         self.assertEqual(
-            gf.TAXONOMY_VERSIONS,
+            gf.TAXONOMY_VERSIONS[:8],
             tuple(f"grm-finding-taxonomy/v{n}" for n in range(1, 9)),
         )
         self.assertEqual(len(gf.FINDING_TAXONOMY), 20)

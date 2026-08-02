@@ -273,7 +273,31 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      12건은 범위밖(미승인약)이라 캐치올 잔류가 정직한 상태다.
 #  10) v1~v7-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all eight.
 #      Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v8"
+#
+# grm-finding-taxonomy/v9 change log (2026-08-02 -- v8 이 "별건"으로 남겨둔 503B(a)(10)(B)
+# 용기 표시정보. 카테고리 추가·삭제·재명명·재정렬 없음. labeling_packaging 에 패턴 1개 append).
+#   1) 결함: 같은 483 관찰의 (A)/(B) 짝이 **우연한 어휘 차이로 두 카테고리에 갈려** 있었다.
+#        (A) "The **labels** of your outsourcing facility's drug products do not include
+#            information required by section 503B(a)(10)(A)."  -> "label" 키워드로 표시/포장(17)
+#        (B) "The **containers** of your outsourcing facility's drug products do not include
+#            information required by section 503B(a)(10)(B)."  -> 문장에 "label" 이 없어 캐치올
+#      실측: (A)계열 121행이 labeling_packaging 에, (B)계열 16행이 other_quality_system 에.
+#      "표시/포장" 필터를 쓰는 사용자가 (B) 건을 영영 못 보는 상태였다.
+#   2) ★v8 이 이 16건을 **일부러 남긴** 이유와 이번에 처리하는 이유: v8 의 503B 규칙은
+#      regulatory_reporting(18)에 있었고, 거기로 끌어오면 표시 지적이 규제보고에 섞이는 데다
+#      "이 후보가 필요하다"는 신호(캐치올 잔류)까지 지워졌을 것이다. 정본 귀속처인
+#      labeling_packaging(17)에 별도 규칙을 세우는 것이 옳았고, v9 가 그 일을 한다.
+#   3) 규칙 형태는 v8 규율 그대로 -- 다단어 절 구절이고 `keywords` 가 아니라 `patterns` 다
+#      (keywords 는 `_split_repair_vocabulary()` 의 파생원이라 넣으면 v6/v7 복원 어휘가 넓어진다).
+#   4) ★인용 조항을 요구하지 **않는다**. 실측 16건의 인용이 전부 OCR 로 깨져 있다
+#      ("503B(a)(I0)(B)"·"(a)(lO){B}"·"(10)(8)"·"503B (a)(l0)(B)"). 인용에 의존하는 규칙이었다면
+#      이 16건 중 상당수를 놓쳤을 것이다 -- 손상된 부분이 아니라 **온전한 부분**에 규칙을 건다.
+#   5) 비용 실측(후보 3종 교차 측정, 전 15,096행): rescue 16(전량 공개) · collateral 0 ·
+#      이미 대상 카테고리 8 · 앞선 카테고리에 걸린 것 0. 캐치올의 비-503B 용기 지적 28건
+#      (container closure integrity 등 211.94 계열)은 조항 문맥 요구 덕에 걸리지 않는다.
+#   6) v1~v8-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all nine.
+#      Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v9"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
@@ -283,6 +307,7 @@ TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v6",
     "grm-finding-taxonomy/v7",
     "grm-finding-taxonomy/v8",
+    "grm-finding-taxonomy/v9",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -613,6 +638,23 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "표시/포장",
         "Labeling and packaging",
         ("labeling", "packaging", "label", "표시", "포장", "라벨"),
+        # v9: FDCA 503B(a)(10)**(B)** 용기 표시정보. v8 이 "별건으로 남긴다"고 적어둔 그 건이다.
+        # 같은 관찰의 형제인 (A)항("The **labels** of your outsourcing facility's ...")은 기존
+        # "label" 키워드에 걸려 이미 여기 있는데(실측 121행), (B)항은 문장에 "label" 이 한 번도
+        # 안 나와("The **containers** of ...") 캐치올로 떨어져 있었다. 같은 483 관찰의 (A)/(B)
+        # 짝이 우연한 어휘 차이로 두 카테고리에 갈려 있었다는 뜻이고, 이 패턴이 짝을 합친다.
+        #
+        # ★"container" 만으로 잡지 않고 조항 문맥을 함께 요구한다 -- 캐치올에는 용기 관련이지만
+        # 표시/포장이 아닌 지적이 28건 있다(container closure integrity 등 211.94 계열).
+        # `of\s*your` 의 `\s*` 는 v7 접착 손상("ofyour" 실측)을 받는다 -- "your" 는 taxonomy
+        # 어휘가 아니라 v7 복원 대상이 아니므로 여기서 직접 받아야 한다.
+        # 인용부는 요구하지 않는다: 실측 16건의 인용이 전부 OCR 로 깨져 있다
+        # ("503B(a)(I0)(B)"·"(a)(lO){B}"·"(10)(8)" 등) -- 인용에 의존하면 규칙이 깨진다.
+        # rescue 16(전량 공개) · collateral 0(후보 3종 교차 측정·전수).
+        patterns=(
+            r"\bcontainers?\s+of\s*your\s+outsourcing\s+facilit(?:y|ies)"
+            r"[^.]{0,120}\b(?:informations?|includ\w*|requir\w*)\b",
+        ),
     ),
     FindingCategory(
         "regulatory_reporting",

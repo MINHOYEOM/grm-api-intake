@@ -137,6 +137,67 @@ FDA483_OCR_DPI = min(max(_env_int("FDA483_OCR_DPI", 300), 72), 600)
 FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 은 10쪽 내외
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
+
+# ── [텍스트층 위장 2026-08-02] "글자가 있다 ≠ 본문이 있다" ────────────────────────
+# 실측 32건: 본문은 100% 스캔 이미지인데 텍스트층에 **FOIA 리댁션 주석·페이지 라벨·
+# 접근성 고지**만 들어 있다. 7자(`(b) (4)`)짜리 문서까지 `text.strip()` 이 참이라
+#   ① `_needs_ocr` 가 False → OCR 을 **한 번도 안 돌린다**
+#   ② 돌리더라도 페이지 루프의 `if native.strip()` 이 전 페이지를 "글자 있음"으로 보고
+#      건너뛴다(175834 는 15쪽 전부, 193692 는 4쪽 전부)
+# 두 곳을 같이 고쳐야 한다 — ①만 고치면 ②가 그대로 막는다.
+#
+# 판정은 **아티팩트를 걷어낸 잔여 문자수**로 한다. 실측 근거:
+#   · 관찰문이 정상 산출되는 대조군 42문서의 텍스트 길이 **최소 1,841자**
+#   · 결손군 41문서는 최소 7자·중앙 2,133자(대부분 마커 반복)
+#   · 페이지 단위로는 결손군 252쪽 중 120쪽이 걸리고 대조군 263쪽 중 **1쪽**만 걸린다
+#     (그 1쪽도 `(b)(4)` 뿐인 진짜 이미지 페이지 — 오탐이 아니다)
+_FDA483_TEXT_ARTIFACT_RES = (
+    # (b)(4) · (b) (6) · (b)(7)(C). ★꼬리 하위표기는 **대문자만** 허용한다 — `[A-Za-z]`
+    #   로 두면 다음 마커의 `(b)` 를 먹어치워 그 뒤 `(4)` 가 잔여로 남는다(실측: 175834
+    #   2,133자가 잔여 132자 = 전부 `4`). 마커가 줄바꿈으로 이어 붙는 문서에서만 드러난다.
+    #   ★`(?-i:...)` 로 그 그룹만 대소문자를 고정한다 — 패턴 전체가 re.I 라 그냥 `[A-Z]`
+    #     라고 쓰면 소문자 b 도 매칭돼 같은 함정에 그대로 빠진다.
+    re.compile(r"\(\s*b\s*\)\s*\(?\s*[0-9]\s*\)?(?:\s*\((?-i:[A-Z])\))?", re.I),
+    re.compile(r"\bredacted\s+text\b", re.I),
+    re.compile(r"\bpage\s+\d+\s+of\s+\d+\b", re.I),
+    # FDA 가 스스로 "이 페이지는 대체텍스트를 제공할 수 없다"고 적은 고지 — 본문이
+    # 이미지라는 **1차 사료적 증거**다(102220·102644 실측).
+    re.compile(r"unfortunately,?\s+we\s+cannot\s+provide\s+alternative\s+text.*?assistance\.",
+               re.I | re.S),
+    re.compile(r"\bFDA\s+form\b|\bform\s+page\s+\d+\b", re.I),
+)
+# 잔여 24자 미만 = 서너 단어도 안 남음. 대조군 실측 최소가 1,841자라 안전 여유가 크다.
+FDA483_SUBSTANTIVE_MIN_CHARS = 24
+# 잔여가 원문 영숫자의 이 비율 미만이어야 "아티팩트가 **대부분**"이라고 말할 수 있다.
+FDA483_ARTIFACT_DOMINANCE = 0.25
+
+
+def _text_residue_after_artifacts(text: str) -> str:
+    """리댁션 마커·페이지 라벨·접근성 고지를 걷어낸 뒤 남는 영숫자만 반환."""
+    s = re.sub(r"\s+", " ", text or "")
+    for pat in _FDA483_TEXT_ARTIFACT_RES:
+        s = pat.sub(" ", s)
+    return re.sub(r"[^A-Za-z0-9]+", "", s)
+
+
+def _is_substantive_text(text: str) -> bool:
+    """이 텍스트가 **읽을 본문**인가(마커·라벨 부스러기가 아니라).
+
+    ★이 판정이 느슨하면 멀쩡한 텍스트 페이지를 OCR 결과로 덮어쓴다 — 가장 위험한 방향이다.
+    그래서 두 조건을 **함께** 요구한다:
+      ① 남은 글자가 절대적으로 적고(<24자 — 서너 단어도 안 됨), **그리고**
+      ② 그 잔여가 원문 영숫자의 25% 미만 = 원문이 실제로 아티팩트 **덩어리**다.
+    ②가 없으면 짧지만 진짜인 문장("OBSERVATION 1 real")까지 비실질로 몰려 OCR 이 멀쩡한
+    글자를 덮어쓴다. 아티팩트뿐인 페이지는 잔여가 정확히 0 이라 두 조건을 늘 함께 만족한다
+    (실측: `(b) (4)` 40회 반복 → 잔여 0 / 원문 영숫자 80).
+    """
+    residue = len(_text_residue_after_artifacts(text))
+    if residue >= FDA483_SUBSTANTIVE_MIN_CHARS:
+        return True
+    raw_alnum = len(re.sub(r"[^A-Za-z0-9]+", "", text or ""))
+    if raw_alnum == 0:
+        return False
+    return residue >= raw_alnum * FDA483_ARTIFACT_DOMINANCE
 # 표지/머리말을 건너뛰고 관찰사항(findings) 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
 _FDA483_EXCERPT_PATTERNS = (
     r"observation\s+1\b",
@@ -863,10 +924,17 @@ def _is_notice_only(text: str) -> bool:
 
 
 def _needs_ocr(text: str) -> bool:
-    """OCR 폴백이 필요한가 — 텍스트층 부재 또는 고지문 전용(본문 이미지)."""
+    """OCR 폴백이 필요한가 — 텍스트층 부재·고지문 전용·**아티팩트 전용**(본문 이미지).
+
+    세 번째 조건이 2026-08-02 추가분이다. 종전 두 조건은 "글자가 하나라도 있으면 본문이
+    있다"고 가정했는데, FOIA 리댁션 주석만 실린 스캔본 32건이 그 가정을 깼다(7자짜리
+    `(b) (4)` 문서까지 `pdf-ok` 로 통과해 OCR 을 한 번도 안 돌렸다).
+    """
     if not _ocr_enabled():
         return False
-    return (not (text or "").strip()) or _is_notice_only(text)
+    if not (text or "").strip():
+        return True
+    return _is_notice_only(text) or not _is_substantive_text(text)
 
 
 def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
@@ -908,17 +976,33 @@ def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
                 return "", "pdf-encrypted"
             for page in doc:
                 native = page.get_text("text")
-                if native.strip():
+                if _is_substantive_text(native):
+                    parts.append(native)
+                    continue
+                # ★여기가 32건을 실제로 막던 지점이다. 종전 조건은 `native.strip()` 이라
+                #   `(b) (4)` 한 줄만 있어도 "글자 있음"으로 보고 건너뛰었다 — 175834 는
+                #   15쪽 전부, 193692 는 4쪽 전부가 그렇게 통과했다. `_needs_ocr` 만 고치고
+                #   여기를 두면 OCR 은 켜지되 **모든 페이지를 건너뛴다.**
+                has_artifact_text = bool(native.strip())
+                if has_artifact_text and not page.get_images(full=True):
+                    # 아티팩트뿐인데 이미지도 없다 = OCR 이 살릴 것이 없다. 예산을 쓰지
+                    # 않고 원문을 그대로 둔다(종전 산출과 동일).
                     parts.append(native)
                     continue
                 if ocr_pages >= FDA483_OCR_MAX_PAGES or _OCR_BUDGET["remaining"] <= 0:
+                    # ★예산이 없어 OCR 을 못 해도 **오늘의 산출을 줄이지는 않는다** —
+                    #   종전에는 이 페이지가 위 분기에서 이미 append 됐었다.
+                    if has_artifact_text:
+                        parts.append(native)
                     continue
                 ocr_pages += 1
                 _OCR_BUDGET["remaining"] -= 1
                 _OCR_BUDGET["used"] += 1
                 tp = page.get_textpage_ocr(language="eng", dpi=FDA483_OCR_DPI,
                                            full=True, tessdata=_tessdata_dir())
-                parts.append(page.get_text("text", textpage=tp))
+                ocr_native = page.get_text("text", textpage=tp)
+                # OCR 이 빈손이면 원문(아티팩트)이라도 보존 — 축소 금지 원칙.
+                parts.append(ocr_native if ocr_native.strip() else native)
     except RuntimeError as e:
         # PyMuPDF 는 tesseract 미설치/tessdata 미탐지를 RuntimeError 로 던진다.
         return "", f"scan-ocr-unavailable:{str(e)[:80]}"

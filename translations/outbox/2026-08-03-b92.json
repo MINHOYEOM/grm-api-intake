@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-5f7397ae868105c829f0b116",
+    "finding_text": "During the validation of insulin aspart in human serum (validation report #1000-2403020), the effect of lipemia for selectivity and matrix effect experiments was not evaluated.",
+    "finding_text_ko": "사람 혈청에서 인슐린 아스파트의 밸리데이션(밸리데이션 보고서 #1000-2403020) 중 선택성 및 매트릭스 효과 시험에 대한 고지혈증의 영향이 평가되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b6d48705897816bfd6d3b2b3",
+    "finding_text": "Source records for method validation experiments of long-term stability (validation report #1000-091480-2), dilution integrity, stability in matrix and ion suppression (validation report #1000-091480-1), do not document that lithium heparinized human lysed whole blood was utilized as the matrix.",
+    "finding_text_ko": "장기 안정성(밸리데이션 보고서 #1000-091480-2), 희석 완전성, 매트릭스 내 안정성 및 이온 억제(밸리데이션 보고서 #1000-091480-1) 방법 밸리데이션 시험의 원자료 기록에는 리튬 헤파린 처리된 사람 용혈 전혈이 매트릭스로 사용되었음이 문서화되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-eaaeb3c91d14c374bee0701a",
+    "finding_text": "Whole blood stability of insulin aspart was not assessed during method validation (validation report #1000-2403020).",
+    "finding_text_ko": "방법 밸리데이션(밸리데이션 보고서 #1000-2403020) 중 인슐린 아스파트의 전혈 안정성이 평가되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4c05a85d089dc2436e0c04bc",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, followed, or including adequate validation of the sterilization | process.",
+    "finding_text_ko": "무균 제품으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않으며 멸균 공정의 적절한 밸리데이션도 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e86d32e5246da5ae38939de9",
+    "finding_text": "Written procedures, including changes thereof, are not drafted, reviewed and approved by appropriate organization units, and approved by the quality control unit.",
+    "finding_text_ko": "변경 사항을 포함한 문서화된 절차가 적절한 조직 단위에서 작성·검토·승인되지 않으며 품질관리부서의 승인도 받지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3ae54d9b98006f1cc7b2e62d",
+    "finding_text": "Drug product has been prepared using a method of manufacture that does not assure it meets requirements as to the safety, identity, strength, quality, and/or purity characteristics which it is purported to possess.",
+    "finding_text_ko": "의약품이 표방하는 안전성, 동일성, 함량, 품질 및/또는 순도 특성에 관한 요구사항 충족을 보장하지 않는 제조 방법으로 제조되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-47bbc2d2aed03a6d6a10a975",
+    "finding_text": "Scientifically sound test procedures are not established and followed.",
+    "finding_text_ko": "과학적으로 타당한 시험 절차가 수립되어 있지 않으며 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6ae055ae5ca3d266f5d6a6fa",
+    "finding_text": "Control records do not contain complete data derived from all tests.",
+    "finding_text_ko": "관리 기록에 모든 시험에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8bc02a49ea5d22329d0850ce",
+    "finding_text": "Deviations from established procedures are not thoroughly investigated.",
+    "finding_text_ko": "수립된 절차로부터의 일탈이 철저히 조사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a0cb1453bffcb577b14f41a5",
+    "finding_text": "The quality unit did not ensure issuance of documents is controlled and original records are maintained.",
+    "finding_text_ko": "품질부서는 문서 발행이 관리되고 원본 기록이 유지되도록 보장하지 못했다.",
+    "translation_method": "manual"
+  }
+]

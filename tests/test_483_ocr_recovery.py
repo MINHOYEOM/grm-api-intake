@@ -172,6 +172,8 @@ class RecoveryRunTest(unittest.TestCase):
         report, code, upsert, _rid = _run(
             dry_run=False, fetch_text=lambda url: ("", "scan-ocr-unavailable:still no tessdata"))
         self.assertEqual(report.still_empty, 1)
+        self.assertEqual(report.no_text, 1)                  # ★수집/OCR 문제로 귀속
+        self.assertEqual(report.text_without_extraction, 0)
         self.assertEqual(report.recovered, 0)
         upsert.assert_not_called()
         self.assertEqual(code, 0)      # 실패가 아니라 '아직 안 됨'
@@ -180,8 +182,39 @@ class RecoveryRunTest(unittest.TestCase):
         report, _code, upsert, _rid = _run(
             dry_run=False, fetch_text=lambda url: ("....", "pdf-ok-ocr"))
         self.assertEqual(report.still_empty, 1)
+        self.assertEqual(report.text_without_extraction, 1)  # ★파서 문제로 귀속
+        self.assertEqual(report.no_text, 0)
         self.assertEqual(report.recovered, 0)
         upsert.assert_not_called()
+
+    def test_still_empty_is_the_sum_of_two_distinct_causes(self) -> None:
+        """★계기판 회귀 방어. `still_empty` 하나만 보면 수집 문제와 파서 문제가 같은
+        숫자로 보인다 — 실제로 이 혼동이 OCR 오진 3회(엔진 배선·DPI 300·DPI 400)를 낳았다.
+        두 원인은 처방이 정반대이므로 리포트는 반드시 분리해서 답해야 한다."""
+        no_text, _c, _u, _r = _run(
+            dry_run=False, fetch_text=lambda url: ("", "scan-no-text"))
+        parser, _c2, _u2, _r2 = _run(
+            dry_run=False, fetch_text=lambda url: ("....", "pdf-ok"))
+        self.assertEqual(no_text.still_empty, parser.still_empty)      # 합계는 구분 못 함
+        self.assertNotEqual(no_text.no_text, parser.no_text)           # 분리 필드는 구분함
+        for rep in (no_text, parser):
+            self.assertEqual(rep.still_empty, rep.no_text + rep.text_without_extraction)
+
+    def test_excerpt_without_observations_is_not_counted_as_full_recovery(self) -> None:
+        """발췌만 살고 지적사항이 0건이면 findings 는 한 건도 안 생긴다 — '복구'로 뭉뚱그리면
+        `recovered` 가 커 보여 파서 결함이 리포트에서 사라진다(07-31 DPI 실험에서 실제로
+        `recovered 60 / observations_recovered 0` 이 나왔는데 60 만 눈에 띄었다)."""
+        # 실제 사례와 같은 모양: 483 양식 보일러플레이트만 있고 지적사항 표제가 없다.
+        # excerpt 앵커(`this document lists observations`)에는 걸리므로 발췌는 나온다.
+        prose = ("This document lists observations made by the FDA representative(s) during "
+                 "the inspection of your facility. They are inspectional observations, and do "
+                 "not represent a final Agency determination regarding your compliance. ") * 4
+        report, _code, _upsert, _rid = _run(
+            dry_run=False, fetch_text=lambda url: (prose, "pdf-ok"))
+        self.assertEqual(report.observations_recovered, 0)
+        self.assertEqual(report.recovered, report.recovered_excerpt_only)
+        self.assertGreaterEqual(report.recovered_excerpt_only, 1,
+                                "발췌만 살아난 문서가 별도 카운터에 잡혀야 한다")
 
     def test_id_mismatch_never_writes(self) -> None:
         """재구성이 다른 문서를 가리키면 떠돌이 행을 만들지 않는다."""

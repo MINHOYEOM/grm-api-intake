@@ -71,7 +71,7 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483, log
 
 
-SCHEMA_VERSION = "grm-483-ocr-recovery/v1"
+SCHEMA_VERSION = "grm-483-ocr-recovery/v2"
 
 DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _DEFAULT_PAGE_SIZE = 1000
@@ -108,7 +108,15 @@ class OcrRecoveryReport:
     candidates: int = 0                 # 이번 실행에서 선택된 문서 수(doc-ids/limit 반영후)
     attempted: int = 0                  # 실제 PDF fetch 를 시도한 문서 수
     recovered: int = 0                  # 본문 확보(dry-run=교체 예정, apply=upsert 성공)
-    still_empty: int = 0                # OCR 재시도에도 본문 0 — 기존 행 그대로 둠
+    recovered_excerpt_only: int = 0     # 그 중 관찰문 0건 — 발췌만 살고 findings 는 0
+    still_empty: int = 0                # ↓ 두 사건의 합(하위호환 유지). 진단에는 쓰지 말 것.
+    # ★ still_empty 를 쪼갠 이유(재발 방지):
+    #   v1 은 "본문을 못 받았다"와 "본문은 받았는데 추출이 0건"을 한 칸에 더했다. 두 사건의
+    #   처방은 정반대다 — 전자는 수집/OCR 문제, 후자는 파서 문제. 합산된 숫자만 보고 세 번
+    #   연속 OCR 을 범인으로 지목했고(엔진 배선·DPI 300→400), 그동안 진짜 원인인 파서는
+    #   손대지 못했다. 계기판이 두 사건을 구분하지 못하면 진단은 반드시 틀린다.
+    no_text: int = 0                    # PDF 본문 확보 실패(fetch-fail·OCR 불가·빈 텍스트)
+    text_without_extraction: int = 0    # ★본문은 있는데 발췌·관찰문 모두 0 — **파서 문제**
     gate_dropped: int = 0               # _to_item None(도메인 게이트) — 손대지 않음
     id_mismatch: int = 0                # 재구성 id != 기존 id — 건너뜀(0 이어야 정상)
     failed: int = 0                     # fetch/재구성/upsert 실패
@@ -383,6 +391,7 @@ def run(
             # OCR 을 다시 돌려도 본문이 없다 — 기존 행을 그대로 둔다. 빈손을 다른 빈손으로
             # 덮어쓰지 않는다(엔진이 여전히 없다면 failure_reasons 에 그 사유가 쌓인다).
             report.still_empty += 1
+            report.no_text += 1
             _bump(report, status or "empty_text")
             continue
 
@@ -417,6 +426,7 @@ def run(
         if not (new_raw.get("fda483_excerpt") or observations):
             # 텍스트는 받았지만 결정론 층이 아무것도 못 뽑았다 — 교체 이득이 없다.
             report.still_empty += 1
+            report.text_without_extraction += 1
             _bump(report, "no_excerpt_or_observations")
             continue
 
@@ -453,15 +463,23 @@ def run(
 
         report.recovered += 1
         report.observations_recovered += len(observations)
+        if not observations:
+            # 발췌는 살렸지만 지적사항은 못 뽑았다. 이 문서는 findings 를 한 건도 만들지
+            # 못하므로 "복구"라고 부르면 과장이다 — 따로 세어 파서 결함을 드러낸다.
+            report.recovered_excerpt_only += 1
 
-    if dry_run:
-        log("INFO", f"[DRY] 대상 {report.candidates}건 중 복구 가능 {report.recovered}건"
-                    f"(관찰 {report.observations_recovered}건) · 여전히 빈손 {report.still_empty}건 "
-                    f"· 게이트드롭 {report.gate_dropped}건 · 실패 {report.failed}건")
-    else:
-        log("INFO", f"복구 upsert {report.recovered}건(관찰 {report.observations_recovered}건) "
-                    f"· 여전히 빈손 {report.still_empty}건 · 게이트드롭 {report.gate_dropped}건 "
-                    f"· 실패 {report.failed}건")
+    # ★진단 가능한 요약: "빈손"을 원인별로 쪼개 찍는다. 합계만 찍으면 수집 문제와 파서
+    #   문제가 같은 숫자로 보여 오진을 부른다(v1 에서 실제로 3회 발생).
+    head = f"[DRY] 대상 {report.candidates}건 중 복구 가능" if dry_run else "복구 upsert"
+    log("INFO", f"{head} {report.recovered}건(관찰 {report.observations_recovered}건"
+                f"·발췌만 {report.recovered_excerpt_only}건) "
+                f"· 본문확보실패 {report.no_text}건 "
+                f"· 본문있으나추출0 {report.text_without_extraction}건 "
+                f"· 게이트드롭 {report.gate_dropped}건 · 실패 {report.failed}건")
+    if report.text_without_extraction or report.recovered_excerpt_only:
+        log("INFO", f"↑ 파서 신호: 본문을 확보하고도 지적사항을 못 뽑은 문서 "
+                    f"{report.text_without_extraction + report.recovered_excerpt_only}건 "
+                    f"— OCR·해상도가 아니라 추출 로직을 봐야 한다.")
 
     exit_code = 1 if _is_broad_failure(report) else 0
     return report, exit_code

@@ -358,6 +358,14 @@ _FDA483_FOOTER_RE = re.compile(
     r"|PREVIOUS[\s.]*EDITION"
     r"|\bINSPECTIONAL\s+OBSERVATIONS?\b"
     r"|\bDEPARTMENT\s+OF\s+HEAL(?:TH)?"
+    r"|(?-i:OFFICE\s+ADDRESS)"                   # [2026-08-02] 페이지 머리말 블록의 **첫 줄**
+    #   (`DISTRICT OFFICE ADDRESS AND PHONE NUMBER`). 관찰문이 페이지 경계를 넘으면 이 블록이
+    #   문장 한가운데 삽입되는데, 블록 안의 다른 마커는 OCR 로 파괴돼 못 잡는 경우가 있다 —
+    #   실측 88475 obs#2: "…purporting to be sterile are not / OFFICE ADDRESS ANO NUMSER /
+    #   Dallas District Office / 4040 North Central Expressway…"("DEPARTMENT"가
+    #   "OEPARTIIENT"로 깨져 위 마커가 실패). 이 토큰은 블록 맨 앞이라 더 이르게 자른다.
+    #   대문자 고정 + 전 코퍼스 실측(137문서 중 46문서 112회) 결과 **전부 양식 라벨**이고
+    #   산문 용례가 0이라 오탐면이 없다.
     r"|\bDATE\s+ISSUED\b"
     r"|\bPAGE\s+\d+\s+OF\s+\d+\b"
     r"|\bAdd\s+Continuation\s+Page\b",           # Observation 별 연속페이지 마커(2026-07-12 실측)
@@ -1568,7 +1576,54 @@ def _recover_483_observations(
     # [OCR 마커 변형] 정상 경로 마커(`_WE_OBSERVED_RE`)가 못 잡은 문서라도 회수 경로에서는
     # 더 넓은 패턴으로 다시 찾는다 — `(I) (WE) OBSERVED` · `| OBSERVED:` 등. 실측상 회수
     # 실패의 최대 원인이었고, 이게 안 잡히면 아래 ③ 번호목록 폴백이 아예 켜지지 않는다.
-    marker = we_observed or _OBS_MARKER_RECOVERY_RE.search(body)
+    #
+    # ★★마커를 **두 번** 시도한다(2026-08-02). `_WE_OBSERVED_RE` 는 양식 마커
+    #   `(I) (WE) OBSERVED` 를 괄호 때문에 못 잡는 대신 **관찰문 본문 산문 속의
+    #   "we observed"** 를 잡는다. 그것을 무조건 우선하면 스코프가 문서 꼬리로 밀려 관찰
+    #   목록 전체가 잘린다 — 실측 151790 은 진짜 마커가 @1215 인데 산문이 @21993 에 걸려
+    #   23,366자 중 마지막 1,362자만 남았다(156917 @670 vs @7126 · 88475 · 83323 · 92680 ·
+    #   78991 동일). 관대한 마커를 만들어 놓고 낡은 마커에 가려 못 쓰던 배선 결함이다.
+    #
+    #   ★단, "더 이른 매치를 고른다"로 고치면 **회귀가 난다**. 스코프 시작점을 앞당기면
+    #     읽는 텍스트가 늘어나 오탐도 같이 는다 — 실측 82987(American Red Cross)이 8건에서
+    #     32건으로 부풀며 `REDACTION (b)(6) (entire last name)` 같은 리댁션 주석이 지적사항이
+    #     됐다. "방향이 한쪽이라 안전하다"는 추론은 틀렸다.
+    #   → 교체가 아니라 **폴백**으로 둔다: 기존 마커로 사다리를 끝까지 돌려 보고, 결과가
+    #     0건일 때만 다른 마커로 한 번 더 돈다. 지금 무언가를 내고 있는 문서는 첫 패스에서
+    #     그대로 반환되므로 **회귀가 구조적으로 불가능**하다(측정이 아니라 제어 흐름의 성질).
+    recovery = _OBS_MARKER_RECOVERY_RE.search(body)
+    for marker in _marker_candidates(we_observed, recovery):
+        found = _run_recovery_ladder(body, marker, hints, gate)
+        if found:
+            return found
+    return []
+
+
+def _marker_candidates(
+    we_observed: re.Match[str] | None, recovery: re.Match[str] | None,
+) -> list[re.Match[str] | None]:
+    """사다리를 돌릴 마커 후보를 **기존 우선순위 그대로** 첫 번째에 두고, 다른 위치의
+    마커가 있으면 두 번째 후보로 덧붙인다. 첫 후보는 종전과 동일하므로 첫 패스가 성공하는
+    문서의 결과는 바뀌지 않는다."""
+    first = we_observed or recovery
+    out: list[re.Match[str] | None] = [first]
+    for alt in (recovery, we_observed, None):
+        if alt is first:
+            continue
+        if alt is None:
+            # 마커 없이 전문 스코프로 도는 후보는 만들지 않는다 — 목차·별첨까지 관찰이
+            # 된다(③ 이 `marker is None` 을 막는 이유와 같다).
+            continue
+        if any(a is not None and alt.start() == a.start() for a in out):
+            continue
+        out.append(alt)
+    return out
+
+
+def _run_recovery_ladder(
+    body: str, marker: re.Match[str] | None, hints: dict[str, str], gate: Any,
+) -> list[dict[str, str]]:
+    """주어진 마커 하나로 ②→③→④ 를 순서대로 시도한다(처음 성공한 것을 쓴다)."""
     scoped = _cut_at_annotations(body[marker.end():] if marker is not None else body)
 
     # ② 느슨한 앵커(OCR 공백·`OBSERVATION #1`). 정상 앵커가 0건인 문서에서만 여기 온다.

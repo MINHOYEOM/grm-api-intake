@@ -135,6 +135,22 @@ def _bump(report: OcrRecoveryReport, reason: str) -> None:
     report.failure_reasons[reason] = report.failure_reasons.get(reason, 0) + 1
 
 
+def _count_recovered(report: OcrRecoveryReport, observations: list[Any]) -> None:
+    """복구 1건을 센다. **dry-run 과 apply 가 반드시 같은 함수를 쓴다.**
+
+    ★두 경로에 카운팅을 복제해 두면 한쪽만 고치게 된다 — 실제로 그렇게 했다가
+    `recovered_excerpt_only` 가 dry-run 에서 **항상 0** 이 됐고, 하필 dry-run 이 진단에
+    쓰는 모드라 새 계기판이 처음부터 거짓말을 했다. 계기판을 고치러 와서 같은 결함을
+    다시 만든 셈이라, 아예 한 곳으로 합쳐 재발 경로를 없앤다.
+    """
+    report.recovered += 1
+    report.observations_recovered += len(observations)
+    if not observations:
+        # 발췌는 살렸지만 지적사항은 못 뽑았다. 이 문서는 findings 를 한 건도 만들지
+        # 못하므로 "복구"라고 부르면 과장이다 — 따로 세어 파서 결함을 드러낸다.
+        report.recovered_excerpt_only += 1
+
+
 def _json_object(value: Any) -> dict[str, Any]:
     """raw_json(TEXT 컬럼) → dict. PostgREST 가 이미 dict 로 준 경우도 방어."""
     if isinstance(value, dict):
@@ -440,8 +456,7 @@ def run(
             })
 
         if dry_run:
-            report.recovered += 1
-            report.observations_recovered += len(observations)
+            _count_recovered(report, observations)
             continue
 
         try:
@@ -461,12 +476,7 @@ def run(
             log("WARN", f"483 raw_signals upsert 실패 {label}: {err}")
             continue
 
-        report.recovered += 1
-        report.observations_recovered += len(observations)
-        if not observations:
-            # 발췌는 살렸지만 지적사항은 못 뽑았다. 이 문서는 findings 를 한 건도 만들지
-            # 못하므로 "복구"라고 부르면 과장이다 — 따로 세어 파서 결함을 드러낸다.
-            report.recovered_excerpt_only += 1
+        _count_recovered(report, observations)
 
     # ★진단 가능한 요약: "빈손"을 원인별로 쪼개 찍는다. 합계만 찍으면 수집 문제와 파서
     #   문제가 같은 숫자로 보여 오진을 부른다(v1 에서 실제로 3회 발생).

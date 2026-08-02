@@ -227,7 +227,53 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      범위 밖이다. 표시 텍스트도 여전히 손상된 채다(분류만 고친다 -- v6 와 동일).
 #   7) v1~v6-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all seven.
 #      Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v7"
+#
+# grm-finding-taxonomy/v8 change log (2026-08-02 -- 캐치올 어휘 공백. 카테고리 추가·삭제·
+# 재명명·**재정렬 없음**. 기존 키워드·패턴 한 줄도 바꾸지 않고 `patterns` 에 9개 append 만).
+#   1) ★v5/v6/v7 과 **성질이 다른 변경**이다. 앞의 셋은 매칭 전 haystack 을 고치는 복원
+#      계층이라 없던 신호를 되살릴 뿐 기존 정분류를 빼앗을 수 없었다. 어휘 추가는
+#      first-match-wins 매칭 자체를 바꿔 **이미 올바른 행을 앞선 카테고리가 빼앗는다**.
+#      그래서 이번 위험은 "캐치올이 안 줄어드는 것"이 아니라 "멀쩡한 행을 망가뜨리는 것"이다.
+#   2) 배경 실측: 캐치올 2,497행(공개 1,576) 구성 = 파편/헤더잔해 296 · OCR손상 112 ·
+#      **범위밖 183**(donor·미승인약·DSCSA·임상) · **어휘공백 1,010** · 롱테일 948.
+#      ★파편과 범위밖은 손대지 않는다 -- 정답 카테고리가 존재하지 않는다. 캐치올을 0 으로
+#      만드는 것이 목표가 아니다.
+#   3) ★★**채택 게이트를 수치로 강제했다**(사람 판단 아님):
+#          rescue_ok >= 5  AND  collateral_harmful <= rescue_ok * 0.3
+#      이 게이트는 후보 9개를 통과시키고 기각군 6개(bare record(s) / written procedure(s) /
+#      bare specification(s) / purports·represented / SOP·work instruction / investigat- 어간)를
+#      전부 자동 차단한다. 기각군은 collateral 이 rescue 의 2.8~13.6배였다.
+#   4) ★★**규칙의 형태가 비용을 지배한다**(실측): 다단어 절 구절은 collateral 0~1, 단일
+#      명사는 rescue 의 2.8~13.6배. 그래서 v8 규칙은 전부 절 구절이다.
+#   5) ★★**순서를 자산으로 쓴다 -- 재정렬은 하지 않았다.** 동일 신호도 붙이는 위치가 비용을
+#      12.8배 바꾼다. 실사례: ISO 등급구역 규칙을 원안대로 environmental_monitoring(5번째)에
+#      붙이면 collateral 54, 같은 신호를 validation_qualification(15번째)로 옮기면 **0**.
+#      regulatory_reporting(18)·training_personnel(19) 뒤에는 캐치올뿐이라 구조적으로
+#      collateral 0 구간이고, 실제로 최대 무비용 회수(503B 53 + 보고 41)가 여기서 나왔다.
+#   6) ★**전부 `patterns` 에 넣고 `keywords` 에는 넣지 않는다.** `_split_repair_vocabulary()`
+#      는 keywords 에서만 어휘를 파생하므로, keywords 에 넣으면 v6 분리복원·v7 접착복원의
+#      대상 어휘까지 **조용히** 넓어져 이 변경의 폭발반경이 통제 불능이 된다.
+#   7) collateral 은 **건수로 판정하지 않았다** -- 이동하는 행의 원문을 읽어 개악/개선/무해를
+#      가른 뒤 개악만 셌다. 예: test method 규칙의 collateral 16건 중 13건은 오분류 복원
+#      (개선)이고 개악은 3건이다. 9개 규칙 합계 개악 6건.
+#   8) 채택 9종(귀속 카테고리 / rescue_ok / 개악):
+#        outsourcing facility 503B 의무      regulatory_reporting     53 / 0
+#        보고 의무 불이행                    regulatory_reporting     41 / 0
+#        건물·공조·해충·조명·환기            equipment_facility       60 / 0
+#        test method 표면형                  qc_lab_controls          55 / 3
+#        ISO 등급구역 인증                   validation_qualification 53 / 0
+#        시간 한도(211.111)                  process_validation       48 / 0
+#        안정성 배치수(211.166(a))           stability_storage        27 / 0
+#        규격 적합성 구절                    qc_lab_controls          16 / 3
+#        연차검토 어순역전(211.180(e))       quality_unit_oversight    7 / 0
+#   9) 알려진 한계(honesty over forcing a match): ①용기/표시 503B 16건은 정답이
+#      labeling_packaging(17)이라 별건으로 남긴다 -- 지금 18번으로 끌어오면 그 후보가
+#      필요하다는 신호(캐치올 잔류)까지 지운다 ②equipment_facility 룩비하인드가 안 걸려
+#      12번에 갇힌 503B 보고 지적 2건은 12번을 건드려야 해서 범위 밖 ③"essentially a copy"
+#      12건은 범위밖(미승인약)이라 캐치올 잔류가 정직한 상태다.
+#  10) v1~v7-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all eight.
+#      Category codes/labels/count (20) are unchanged.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v8"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
@@ -236,6 +282,7 @@ TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v5",
     "grm-finding-taxonomy/v6",
     "grm-finding-taxonomy/v7",
+    "grm-finding-taxonomy/v8",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -410,6 +457,10 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
             # OCR corruption ("annually" -> "aimually") that this literal pattern cannot
             # reach -- see the v4 change log and tests/fixtures/taxonomy_v4_audit_wrong9.json.
             r"\bannual\w*\b.{0,40}\b(?:review|evaluation)\b",
+            # v8: 같은 조항(211.180(e))의 **어순 역전** 문형 -- "records ... shall be
+            # reviewed at least annually". 위 v4 패턴은 annual 이 앞에 오는 순방향만 잡는다.
+            # rescue_ok 7 · collateral 0(전수 상계로 확정).
+            r"\breview\w*\b.{0,40}\bannual\w*\b",
         ),
     ),
     FindingCategory(
@@ -427,8 +478,22 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
             "시험성적",
             "품질관리",
         ),
-        # v4: 211.170 보류샘플 프로그램 -- audit case 8327eaeb.
-        patterns=(r"\breserve\s+samples?\b",),
+        patterns=(
+            # v4: 211.170 보류샘플 프로그램 -- audit case 8327eaeb.
+            r"\breserve\s+samples?\b",
+            # v8: 규격 적합성 확인 **구절**. bare "specification(s)" 는 기각군이다
+            # (실측 rescue 120 vs collateral 277) -- 구절이라야 비용이 닫힌다.
+            # rescue_ok 16 · collateral 8 중 개악 3.
+            r"\bconformance\s+(?:to|with)\s+(?:\w+\s+){0,3}specifications?\b"
+            r"|\bconform\w*\s+to\s+appropriate\s+standards?\b",
+            # v8: 이미 가진 "test method" 키워드의 **표면형 공백**.
+            # _ascii_keyword_pattern 이 뒤에 `s?` 만 허용해 "testing methods"·
+            # "test procedures" 를 못 잡는다. ★엔진을 고치지 않고 패턴으로 메운다 --
+            # 엔진을 고치면 20개 카테고리 전체에 파급된다. 선두 `of` 는 v7 접착
+            # 손상 잔재("oftest methods")를 함께 받는다.
+            # rescue_ok 55 · collateral 16 중 개악 3(13건은 오분류 복원=개선).
+            r"\b(?:of)?(?:test\s+(?:method|procedure)s?|testing\s+methods?)\b",
+        ),
     ),
     FindingCategory(
         "process_validation",
@@ -448,6 +513,10 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         # 공통 미해결).
         patterns=(
             r"\bmanufacturing\s+process(?:es)?\b.{0,60}\b(?:variability|monitor|output|validate)\b",
+            # v8: 21 CFR 211.111 시간 한도("appropriate time limits for the completion of
+            # each phase of production"). `lim\s?its` 는 v6 분리 손상("lim its")을 함께 받는다.
+            # rescue_ok 48 · collateral 0.
+            r"\btime\s+lim\s?its?\b.{0,80}\bproduction\b",
         ),
     ),
     FindingCategory(
@@ -455,7 +524,19 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "설비/시설",
         "Equipment and facility",
         ("equipment", "maintenance", "calibration", "building", "설비", "시설", "교정"),
-        patterns=(r"(?<!outsourcing )facilit(?:y|ies)",),
+        patterns=(
+            r"(?<!outsourcing )facilit(?:y|ies)",
+            # v8: 21 CFR 211.42~58 건물·공조·해충·조명·환기. 이 조항군에는 기존 키워드
+            # (equipment/maintenance/calibration/building)가 한 단어도 안 나오는 문형이 많다.
+            # 차압은 방/구역 문맥을 함께 요구해 일반 공정압력과 가른다.
+            # rescue_ok 60 · collateral 2(둘 다 조항 귀속상 개선, 개악 0).
+            r"\b(?:vermin|air\s+handling(?:\s+units?)?|air\s+filtration|air\s+suppl(?:y|ies)"
+            r"|hepa\s+(?:filter|unit)s?|ventilation|lighting)\b"
+            r"|(?:differential\s+(?:air\s+)?pressures?|pressures?\s+differentials?)"
+            r"[^.]{0,90}\b(?:rooms?|areas?|zones?|suites?|corridors?|classified|iso\s*\d)\b"
+            r"|\b(?:rooms?|areas?|zones?|suites?|corridors?|classified|iso\s*\d)\b"
+            r"[^.]{0,90}(?:differential\s+(?:air\s+)?pressures?|pressures?\s+differentials?)",
+        ),
     ),
     FindingCategory(
         "material_supplier_control",
@@ -507,12 +588,25 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "밸리데이션/적격성평가",
         "Validation and qualification",
         ("validation", "qualification", "qualified", "밸리데이션", "적격성", "검증"),
+        # v8: ISO 등급구역 **인증/적격성** 문형. ★귀속처 선택이 규칙 문구만큼 비쌌다 --
+        # 원안은 environmental_monitoring(5번째)이었는데 순서가 너무 앞이라 collateral 54 였다.
+        # 같은 신호를 15번째인 여기로 옮기니 collateral 0 이 된다("순서를 자산으로 쓴다").
+        # `certif` 를 함께 요구해 단순 등급 언급(환경모니터링 소관)과 가른다.
+        # OCR 변종 IS0·1SO·is05 를 문자클래스로 받는다. rescue_ok 53 · collateral 0.
+        patterns=(
+            r"(?:\b[i1l]s[o0][ \t]*-?[ \t]*(?:class[ \t]*-?[ \t]*)?[5-8]\b[\s\S]{0,80}certif\w*"
+            r"|certif[\s\S]{0,80}\b[i1l]s[o0][ \t]*-?[ \t]*(?:class[ \t]*-?[ \t]*)?[5-8]\b)",
+        ),
     ),
     FindingCategory(
         "stability_storage",
         "안정성/보관",
         "Stability and storage",
         ("stability", "storage", "temperature", "humidity", "안정성", "보관", "온도", "습도"),
+        # v8: 21 CFR 211.166(a) 안정성 시험 배치수. 후보 3구절 중 이것만 채택했다 --
+        # 나머지 둘("expiration date"·"stability program")은 기존 키워드와 겹치거나
+        # 비용이 열려 기각. rescue_ok 27 · collateral 0.
+        patterns=(r"\badequate\s+number\s+of\s*batch(?:es)?\b",),
     ),
     FindingCategory(
         "labeling_packaging",
@@ -525,6 +619,26 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
         "규제보고/변경관리",
         "Regulatory reporting and change control",
         ("change control", "submission", "reporting", "변경관리", "보고", "허가"),
+        # ★이 카테고리가 18번째라는 사실이 아래 두 규칙의 비용을 0 으로 만든다 -- 뒤에는
+        # training_personnel(19)·other_quality_system(20) 뿐이라 1~17번에 이미 앉은 행은
+        # first-match-wins 로 구조적으로 보호된다("순서를 자산으로 쓴다"의 최대 사례).
+        patterns=(
+            # v8: 보고 의무 불이행(MDR·field alert·3-day report 등). 능동/수동 양쪽 어순.
+            # rescue_ok 41 · collateral 0.
+            r"(?:\b(?:fail\w*\s+to|(?:did|do|does|ha[sd]|have|was|were|is|are)\s+not)"
+            r"\s+(?:been\s+)?(?:submit|sent|send|file|forward)\w*\b.{0,80}\breports?\b)"
+            r"|(?:\breports?\b.{0,80}\b(?:was|were|ha[sd]|have|is|are)\s+not"
+            r"\s+(?:been\s+)?(?:submit|sent|send|file|forward)\w*)",
+            # v8: FDCA 503B 위탁제조소(outsourcing facility)의 등록·보고 의무.
+            # ★bare "outsourcing facility" / bare "503B" 로 넓히지 **않는다** -- 읽어보니
+            # 셋을 끌어온다: ①483 양식 라벨값 파편(v6 가 캐치올로 내린 것을 되돌린다)
+            # ②"essentially a copy" 미승인약 12건(범위밖) ③용기/표시 16건(정답은
+            # labeling_packaging 이고 별건이다). 절 구절이라야 이 셋이 배제된다.
+            # rescue_ok 53 · collateral 0.
+            r"\boutsourcing\s+facilit(?:y|ies)\b"
+            r"(?:[\s\S]{0,140}?\b(?:submit\w*|report\w*|regist\w*)"
+            r"|[\s\S]{0,140}?\bcompound\w*[\s\S]{0,140}?\bsection\s*503)",
+        ),
     ),
     FindingCategory(
         "training_personnel",

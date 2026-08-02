@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-80f7c7396c35f5b03de7a6ff",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-960650b9433a698e3e89a302",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "시험실 기록에는 확립된 규격과 기준 준수를 보장하는 데 필요한 모든 시험, 검사 및 분석에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-13271d2a9c9fbd6752e40f7b",
+    "finding_text": "Procedures for cleaning of the equipment and facility are not established and followed.",
+    "finding_text_ko": "장비 및 시설의 세척 절차가 수립되어 있지 않으며 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1641c1ab2120e062e850dfc6",
+    "finding_text": "Failure to perform a thorough investigation into a discrepancy.",
+    "finding_text_ko": "불일치에 대한 철저한 조사를 수행하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5809acf2fd386878aa8cd86b",
+    "finding_text": "Facilities and equipment are not of a suitable design for their intended use.",
+    "finding_text_ko": "시설과 장비가 의도된 용도에 적합한 설계가 아니다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5ab3c95862ab41f1f1ba743e",
+    "finding_text": "Procedures to ensure reliable detection of particulate matter in parenteral products have not been established.",
+    "finding_text_ko": "비경구 제품에서 입자성 물질을 신뢰성 있게 검출하도록 보장하는 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a1b6bbbfaabbe02b5c36d9ff",
+    "finding_text": "Failure to establish separate areas to prevent cross contamination.",
+    "finding_text_ko": "교차오염을 방지하기 위한 분리 구역을 수립하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-b62b9e5a26fa7e6a87d7e85d",
+    "finding_text": "Failure to maintain and review all analytical data.",
+    "finding_text_ko": "모든 분석 데이터를 유지하고 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-c09e9dc753e9382749af0739",
+    "finding_text": "Failure to conduct thorough complaint investigations and extend the investigation to related batches.",
+    "finding_text_ko": "철저한 불만 조사를 수행하고 조사를 관련 배치로 확대하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f0d9738c3331c61e5a7f1073",
+    "finding_text": "Test procedures for analytical testing have not been established.",
+    "finding_text_ko": "분석 시험을 위한 시험 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  }
+]

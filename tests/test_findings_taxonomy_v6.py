@@ -264,9 +264,13 @@ class NoRegressionTest(unittest.TestCase):
         self.assertEqual(gf.classify_finding_category(""), "other_quality_system")
         self.assertEqual(gf.classify_finding_category("   "), "other_quality_system")
 
-    def test_repair_never_demotes_into_the_catch_all(self) -> None:
-        """실측 스윕에서 복원 때문에 캐치올로 **내려간 행은 0건**이었다. 복원은 신호를
-        만들 뿐 지우지 않는다는 성질을 대표 문형으로 고정한다."""
+    def test_repair_recovers_signal_in_damaged_text(self) -> None:
+        """쪼개진 신호어가 복원돼 캐치올을 벗어나는 대표 경로를 고정한다.
+
+        ★2026-08-02 정정: 이 테스트의 원래 이름은 test_repair_never_demotes_into_the_
+        catch_all 이었고 "복원은 신호를 지우지 않는다"는 **불변식**을 주장했다. 그 주장은
+        틀렸다 -- 아래 OutsourcingLookbehindTest 참조. 이름과 주장을 실제로 참인 것
+        (복원이 손상 텍스트에서 신호를 회수한다)으로 좁힌다."""
         for text in (
             "The audit trail was disabled for the labora tory system.",
             "Calibration records for the equ ipment were missing.",
@@ -274,6 +278,47 @@ class NoRegressionTest(unittest.TestCase):
             with self.subTest(text=text[:40]):
                 self.assertNotEqual(
                     gf.classify_finding_category(text), "other_quality_system"
+                )
+
+
+class OutsourcingLookbehindTest(unittest.TestCase):
+    """★복원이 부정 lookbehind 를 **활성화**해 매치를 제거하는 경로(전수 1건).
+
+    equipment_facility 의 v3 패턴은 `(?<!outsourcing )facilit(?:y|ies)` 로 "Outsourcing
+    Facility"(FDA 업소 유형 라벨 -- 물리적 시설 지적이 아니다)를 의도적으로 배제한다.
+    원문이 쪼개져 있으면 lookbehind 가 안 걸려 설비/시설로 잘못 잡히고, 복원이 되붙이면
+    v3 의 배제가 비로소 정상 작동한다. 라이브 전수 재분류 dry-run 에서 실제로 관측된
+    유일한 캐치올 강등이며(fda483-90268), **의도된 정본 동작**이다.
+
+    이 클래스가 존재하는 이유: 최초 v6 change log 는 "복원은 신호를 지우지 않는다"는
+    불변식을 적었는데 그것이 틀렸음을 이 경로가 보여준다. 동작을 테스트로 고정해
+    같은 오해가 다시 문서에 들어가지 않게 한다."""
+
+    def test_split_outsourcing_facility_is_excluded_after_repair(self) -> None:
+        """라이브 실측(fda483-90268) 성질 -- 483 표지 헤더 파편."""
+        self.assertNotEqual(
+            gf.classify_finding_category(
+                "TYPE ESTABLISHMENT INSPECTED Outsour cing Facility"
+            ),
+            "equipment_facility",
+        )
+
+    def test_undamaged_outsourcing_facility_was_already_excluded(self) -> None:
+        """v3 이래 온전한 표기는 이미 배제돼 있었다 -- v6 은 손상본을 같은 결론으로 맞춘 것."""
+        self.assertNotEqual(
+            gf.classify_finding_category("TYPE ESTABLISHMENT INSPECTED Outsourcing Facility"),
+            "equipment_facility",
+        )
+
+    def test_real_facility_findings_still_match(self) -> None:
+        """배제는 "outsourcing" 이 붙은 경우로 한정된다 -- 진짜 시설 지적은 그대로."""
+        for text in (
+            "The manufacturing facility roof leaked over the filling line.",
+            "Washing and toilet faci lities lack hot and cold water.",
+        ):
+            with self.subTest(text=text[:45]):
+                self.assertEqual(
+                    gf.classify_finding_category(text), "equipment_facility"
                 )
 
 

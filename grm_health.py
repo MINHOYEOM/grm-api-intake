@@ -530,7 +530,13 @@ def _evaluate_health(
             "본문 없이 처리됨(dedup 때문에 재시도 기회 없음)",
             f"pages_used={stats.fda483_ocr_pages_used} "
             f"budget_skipped={stats.fda483_ocr_budget_skipped} — "
-            "FDA483_OCR_PAGE_BUDGET 상향으로 조정 가능",
+            # ★처방 순서가 중요하다(2026-08-02 실측). 종전 문구는 "예산 상향"만 말했는데,
+            #   당시 실제 원인은 **이미 가진 문서를 매일 다시 OCR** 하는 것이었다(신규 1건에
+            #   OCR 200쪽 전량 소진). 예산을 올리면 낭비만 커진다. 먼저 기보유 건너뛰기가
+            #   살아 있는지 보고(로그의 `기보유 건너뜀 N` / LAST_HEALTH.fda483_skipped_known),
+            #   그게 0 이면 dedup 사전조회가 실패해 전량 재수집 폴백으로 돌고 있다는 뜻이다.
+            "① 로그의 `기보유 건너뜀` 이 0 이면 dedup 사전조회 실패(전량 재수집 폴백) — "
+            "그것부터 확인. ② 신규 유입이 실제로 많을 때만 FDA483_OCR_PAGE_BUDGET 상향",
         )
     if stats.fda483_observations_failed > 0:
         health.add_warning(

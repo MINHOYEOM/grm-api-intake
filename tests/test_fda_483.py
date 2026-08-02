@@ -2667,6 +2667,82 @@ class Fda483ParenNumberingTest(unittest.TestCase):
 
 
 # ── [렌더 DPI 실행별 조절 2026-08-02] ─────────────────────────────────────────
+class Fda483SkipKnownDocumentsTest(unittest.TestCase):
+    """★2026-08-02 실측 낭비. 483 수집기는 창(기본 30일) 안의 문서를 **매일 전부** 다시
+    받아 OCR 하고, 440줄 뒤 적재 시점에 dedup 으로 버렸다.
+
+    08-01 실행: 신규 문서 **1건**을 위해 OCR **200쪽(예산 전량)** 을 태우고 17건을 예산
+    부족으로 건너뛰었다. 07-30·07-31 도 같은 값(200/200 · ok=32 · 예산초과=17~18).
+    DB 에 `scan-ocr-budget` 상태 행이 한 건도 없다는 것이 "버려진 것은 신규가 아니라
+    중복"이라는 증거였다.
+
+    ★산출물 불변성이 이 최적화의 근거다 — 건너뛴 문서는 `insert_items` 가 **같은 키**로
+      어차피 버린다. 그래서 키 형식(`source::document_id`)이 두 곳에서 동일해야 한다.
+    """
+
+    @staticmethod
+    def _rows(n):
+        raw = [["04/17/2026", f"Firm {i}", f"100000{i}",
+                f'<a href="/media/{9100 + i}/download">483</a>', "Wisconsin", "",
+                "Drug Manufacturer", "05/27/2026", ""] for i in range(n)]
+        return f._datatable_norm_rows(raw)
+
+    def _run(self, rows, skip_ids):
+        fetched = []
+
+        def _fetch(url):
+            fetched.append(url)
+            return ("OBSERVATION 1 Equipment is not cleaned at appropriate intervals.",
+                    "pdf-ok")
+
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false",
+                                     "ENABLE_FDA_483_OCR": "false"}), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_fetch_fda483_pdf_text", _fetch), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), len(rows), False)):
+            items, err = f.collect_fda_483(START, END, skip_document_ids=skip_ids)
+        return items, err, fetched
+
+    def test_known_documents_never_reach_the_pdf_fetch(self):
+        rows = self._rows(4)
+        known = {f"{f.SOURCE_FDA_483}::fda483-9100", f"{f.SOURCE_FDA_483}::fda483-9101"}
+        items, err, fetched = self._run(rows, known)
+        self.assertIsNone(err)
+        self.assertEqual(len(fetched), 2, "기보유 문서의 PDF 를 받았다")
+        self.assertEqual({i.document_id for i in items}, {"fda483-9102", "fda483-9103"})
+        self.assertEqual(f.LAST_HEALTH["fda483_skipped_known"], 2)
+
+    def test_none_means_todays_behaviour_exactly(self):
+        """조회 실패 시 None 이 오며, 그때는 **오늘과 똑같이** 전량 수집한다."""
+        rows = self._rows(3)
+        _items, _err, fetched = self._run(rows, None)
+        self.assertEqual(len(fetched), 3)
+        self.assertEqual(f.LAST_HEALTH["fda483_skipped_known"], 0)
+
+    def test_skip_key_matches_the_insert_dedup_key(self):
+        """★두 곳의 키가 갈리면 건너뛴 문서가 되레 적재되거나 그 반대가 된다.
+        수집기가 만드는 item 의 적재 키가 곧 skip 키여야 한다."""
+        rows = self._rows(1)
+        items, _err, _fetched = self._run(rows, None)
+        self.assertEqual(len(items), 1)
+        insert_key = f"{items[0].source}::{items[0].document_id}"
+        _items2, _err2, fetched2 = self._run(rows, {insert_key})
+        self.assertEqual(fetched2, [], f"적재 키({insert_key})로 건너뛰지 못했다")
+
+    def test_unknown_ids_do_not_suppress_anything(self):
+        rows = self._rows(2)
+        _items, _err, fetched = self._run(rows, {"FDA 483::fda483-999999", "Other::x"})
+        self.assertEqual(len(fetched), 2)
+
+    def test_skipped_count_is_surfaced_in_health(self):
+        """조용한 최적화 금지 — 몇 건을 안 받았는지 health 에 남는다(0 이 되면 조회 폴백)."""
+        rows = self._rows(3)
+        self._run(rows, {f"{f.SOURCE_FDA_483}::fda483-9100"})
+        self.assertEqual(f.LAST_HEALTH["fda483_skipped_known"], 1)
+
+
 class Fda483OcrDpiKnobTest(unittest.TestCase):
     """잔여 회수 대상 52건의 PDF 를 직접 열어 본 결과 **원본 스캔이 대부분 ~163dpi** 였다
     (2026-08-01 실측: 10건 중 7건). 현재 코드는 300dpi 로 렌더해 OCR 하는데, 저해상도

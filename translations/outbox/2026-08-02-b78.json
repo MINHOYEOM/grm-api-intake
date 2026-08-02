@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-236346857c24b86af4642a46",
+    "finding_text": "Cleaning procedures or clean status is not established.",
+    "finding_text_ko": "세척 절차 또는 청결 상태가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-24662fb0e949b6071b336000",
+    "finding_text": "Control procedures are not established which validate the performance ofthose manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 자재와 의약품의 특성 변동을 유발할 수 있는 제조 공정의 성능을 밸리데이션하는 관리 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a0b8ac454bdc268ee97a98fe",
+    "finding_text": "Review of Analytical incident/excursion investigations as per your Atypical or out of trend results procedure (2- RA/OP/03) showed instances in which samples injection sequence was completed but results were not calculated and/or compared to specification to ensure OOS results were not obtained and sample result screening is not occurring prior to invalidating the run for system suitability or chromatograph issues.",
+    "finding_text_ko": "귀사의 비정형 또는 추세이탈 결과 절차(2-RA/OP/03)에 따른 분석 사건·이탈 조사 검토 결과, 검체 주입 순서는 완료되었으나 OOS 결과가 발생하지 않았는지 확인하기 위해 결과를 계산 및/또는 규격과 비교하지 않았고, 시스템 적합성 또는 크로마토그래프 문제로 실행을 무효화하기 전에 검체 결과 선별도 이루어지지 않은 사례가 확인되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e29ca4bb1c8f65ab98d7ec26",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시된 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 제조 및 공정관리 서면 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f0300e9112f459377c276c94",
+    "finding_text": "Procedures are not established or followed.",
+    "finding_text_ko": "절차가 수립되어 있지 않거나 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-f8b80055aa089a386c265720",
+    "finding_text": "Batch records are not always recorded contemporaneously at the completion of an operation.",
+    "finding_text_ko": "배치 기록이 작업 완료 시점에 항상 동시에 작성되지는 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-0bdaf583bff1c1c4892a4e90",
+    "finding_text": "Employees engaged in the manufacture and processing ofa drug product lack the training and experience required to perform their assigned functions.",
+    "finding_text_ko": "의약품 제조 및 가공에 종사하는 직원에게 배정된 기능을 수행하는 데 필요한 교육과 경험이 부족하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6151b6519e2de62f80668c80",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate specifications and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격과 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7e2cd804cabd89a344b8d22a",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "시험실 기록에는 확립된 규격과 기준 준수를 보장하는 데 필요한 모든 시험, 검사 및 분석에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-936ce5823b4f77414b9a0603",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile do not include adequate validation ofthe sterilization process.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에는 멸균공정의 충분한 밸리데이션이 포함되어 있지 않다.",
+    "translation_method": "manual"
+  }
+]

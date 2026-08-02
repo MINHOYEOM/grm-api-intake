@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-01c1b76ea585d01678fad769",
+    "finding_text": "Procedures for receiving, reviewing, and evaluating complaints by a formally designated unit have not been adequately established.",
+    "finding_text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4e2b8e7f22c542dc574daa9e",
+    "finding_text": "Procedures for design change have not been established.",
+    "finding_text_ko": "설계 변경 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-9bb31d4647301945ad785fa1",
+    "finding_text": "Procedures for acceptance of incoming product have not been adequately established.",
+    "finding_text_ko": "입고 제품의 수입 승인 절차가 적절하게 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-abb27a6153ca558a6ae65477",
+    "finding_text": "Procedures for corrective and preventive action have not been adequately established.",
+    "finding_text_ko": "시정 및 예방조치 절차가 적절하게 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ba7ba3f784216b220b399465",
+    "finding_text": "A correction or removal, conducted to reduce a risk to health posed by a device, was not reported in writing to FDA.",
+    "finding_text_ko": "기기가 초래하는 건강 위험을 줄이기 위해 시행한 시정 또는 회수가 FDA에 서면으로 보고되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-bd7c087da846a8ce216ac901",
+    "finding_text": "Procedures for receiving, reviewing, and evaluating complaints by a formally designated unit have not been adequately established.",
+    "finding_text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e741c27897cb265a628fabb4",
+    "finding_text": "A process whose results cannot be fully verified by subsequent inspection and test has not been validated according to established procedures.",
+    "finding_text_ko": "후속 검사 및 시험으로 결과를 완전히 검증할 수 없는 공정이 수립된 절차에 따라 밸리데이션되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-7b5ab38b1a242974b880ab6e",
+    "finding_text": "Procedures for receiving, reviewing, and evaluating complaints by a formally designated unit have not been adequately established.",
+    "finding_text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-02481ffc2131e4f44d3a7e27",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy, the failure of a batch or any of its components to meet any of its specifications, whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지 여부와 관계없이 설명되지 않은 모든 불일치 및 배치 또는 그 구성품의 규격 미충족을 철저히 검토하지 못했다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-5a5961f4a8cbedd2447df255",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역은 환경 조건 모니터링 시스템 측면에서 미흡하다.",
+    "translation_method": "manual"
+  }
+]

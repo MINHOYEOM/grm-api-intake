@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-f65349db0de299cc98a1c2e7",
+    "finding_text": "A document control system has not been established.",
+    "finding_text_ko": "문서 관리 시스템이 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-2cdab22f0fff8d2683596390",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-4558daa5c230abf0a56fb295",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-61f9ee3f7710b49785bbb7a2",
+    "finding_text": "The written stability testing program is not followed.",
+    "finding_text_ko": "서면 안정성 시험 프로그램이 준수되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-8d3ce66254f8749911937f29",
+    "finding_text": "An Field Alert Report was not submitted within three working days of receipt of information concerning an incident that caused a drug product or its labeling to be applied to another article.",
+    "finding_text_ko": "의약품 또는 그 라벨링이 다른 물품에 적용되게 한 사고에 관한 정보를 접수한 후 3영업일 이내에 현장경보 보고서가 제출되지 않았다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-de49c1ebb2131a402e0b1e49",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that components, labeling and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 구성품, 라벨링 및 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격과 시험 절차의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-15622eb85b10b9a989d012bd",
+    "finding_text": "Written procedures are not established for evaluations conducted at least annually to review records associated with a representative number of batches, whether approved or rejected.",
+    "finding_text_ko": "승인 또는 거부 여부와 관계없이 대표 수의 배치와 관련된 기록을 검토하기 위해 최소 연 1회 수행되는 평가에 대한 서면 절차가 수립되어 있지 않다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-15cc6ddc19016cf9566b434e",
+    "finding_text": "Reserve samples from representative sample lots or batches ofdrug products selected by acceptable statistical procedures are not examined visually at least once a year for evidence of deterioration.",
+    "finding_text_ko": "허용 가능한 통계 절차로 선정된 의약품 대표 검체 로트 또는 배치의 보존 검체가 열화 징후를 확인하기 위해 최소 연 1회 육안 검사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1a95cac1dd4851de7c88095a",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications designed to assure that components, drug product containers, and closures conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리는 구성품, 의약품 용기 및 마개가 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격의 수립을 포함하지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-236714b0fbfd40f0a2c98e53",
+    "finding_text": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+    "finding_text_ko": "의약품이 표방하거나 표시된 동일성, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 제조 및 공정관리 서면 절차가 없다.",
+    "translation_method": "manual"
+  }
+]

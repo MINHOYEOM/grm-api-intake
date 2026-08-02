@@ -1,0 +1,62 @@
+[
+  {
+    "finding_id": "finding-31d3097bc6df34c47cfc2b8d",
+    "finding_text": "Complaintfollow-up is deficient",
+    "finding_text_ko": "불만 후속조치가 미흡하다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-3f50bf94626b999817975ae5",
+    "finding_text": "During a walkthrough ofthe facility we observed within the personnel corridor (Note: corridor leads in- to the personnel entryways that lead into the controlled classified manufacturing areas) approximately 27-28 separate areas in the ceiling where water was either dripping, seeped and/or soaked through the building structural material.",
+    "finding_text_ko": "시설 순회 중 직원 복도(관리된 등급 제조 구역으로 이어지는 직원 출입구로 연결됨) 천장의 약 27~28개 구역에서 물이 떨어지거나 스며들거나 건물 구조 자재를 적실 정도로 침투한 것이 관찰되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-6ee295f526101686594cd200",
+    "finding_text": "Analytical method validationfor endotoxin testing via a kinetic turbidimetric method is deficient: There is no procedure for conducting analytical method validation pertaining to microbiological test methods.",
+    "finding_text_ko": "동역학적 탁도법을 통한 엔도톡신 시험의 분석법 밸리데이션이 미흡하다. 미생물 시험 방법과 관련된 분석법 밸리데이션 수행 절차가 없다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-872625784526943042efc0cc",
+    "finding_text": "The “Clean Room Monitoring” document #C1/QAD/004 establishes “two methods ofenvironmental monitoring” i.e., physical and microbial monitoring.",
+    "finding_text_ko": "‘클린룸 모니터링’ 문서 #C1/QAD/004는 물리적 모니터링과 미생물 모니터링, 즉 ‘두 가지 환경모니터링 방법’을 수립한다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-a2a8cff9ba939673702a0719",
+    "finding_text": "Nonviable monitoring is deficient: Non-viable particle (NVP) monitoring is deficient in that there is no record to support the effectiveness regarding the manual method that is used to obtain the NVP measurements: a.",
+    "finding_text_ko": "비생존성 모니터링이 미흡하다. 비생존성 입자(NVP) 측정값을 얻기 위해 사용하는 수동 방법의 유효성을 뒷받침하는 기록이 없어 NVP 모니터링이 미흡하다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-e0e042453b82b24b424c9523",
+    "finding_text": "The air flow pattern evaluations (aka smoke studies) are performed to “demonstrate and assure that the LAFs” in the ine and line “are capable enough to provide Unidirectional Air flow to the work station and there are not turbulence observed and/or any non-unidirectional movement ofthe air observed so as to maintain the laminarity of the air flow with the LAF work station.” Similar air flow pattern considerations and evaluation principles have been performed in support ofthe area qualification for the Line.",
+    "finding_text_ko": "기류 패턴 평가(스모크 스터디)는 해당 라인의 LAF가 작업대에 단방향 기류를 제공할 충분한 능력이 있고 난류나 비단방향 공기 이동이 관찰되지 않아 LAF 작업대의 층류성을 유지함을 입증·보장하기 위해 수행된다. 유사한 기류 패턴 고려사항과 평가 원칙이 해당 라인의 구역 적격성 평가를 뒷받침하기 위해 수행되었다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-ed36228a01eab0b720e6af60",
+    "finding_text": "Controlled documents are not appropriately controlled: a.",
+    "finding_text_ko": "관리 문서가 적절히 관리되지 않는다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-faeaef1e098e4401e802fa5e",
+    "finding_text": "Electronic records do not support the authenticity ofenvironmental monitoring: a.",
+    "finding_text_ko": "전자 기록은 환경모니터링의 진정성을 뒷받침하지 않는다: a.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-13c4c12a4a57168b156217a6",
+    "finding_text": "Laboratory failures are not thoroughly investigated.",
+    "finding_text_ko": "시험실 실패가 철저히 조사되지 않는다.",
+    "translation_method": "manual"
+  },
+  {
+    "finding_id": "finding-1cd211fff875f299e10f2647",
+    "finding_text": "Manually managed materials in the warehouse are not separated during storage.",
+    "finding_text_ko": "창고에서 수동으로 관리되는 자재가 보관 중 분리되지 않는다.",
+    "translation_method": "manual"
+  }
+]

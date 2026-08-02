@@ -1938,6 +1938,100 @@ class Fda483ObservationRecoveryTest(unittest.TestCase):
 
 
 # ── [OCR 사유 보존 2026-08-01] 텍스트층이 빈 스캔본의 실패 사유 ────────────────
+class Fda483RecoveryMarkerFallbackTest(unittest.TestCase):
+    """★2026-08-02 RCA. 회수 실패의 최대 단일 원인은 정규식이 아니라 **배선**이었다.
+
+    `_WE_OBSERVED_RE`(`\\bWE\\s+OBSERVED\\b`)는 양식 마커 `(I) (WE) OBSERVED` 를 괄호 때문에
+    못 잡는 대신 **관찰문 본문 산문 속의 "we observed"** 를 잡는다. 회수 경로가
+    `marker = we_observed or _OBS_MARKER_RECOVERY_RE.search(body)` 로 그것을 무조건
+    우선하는 바람에, 스코프가 문서 꼬리로 밀려 관찰 목록 전체가 잘려 나갔다. 즉 관대한
+    마커를 만들어 놓고 낡은 마커에 가려 못 쓰고 있었다.
+
+    실측(로컬 원문 95건): 151790 은 진짜 마커 @1215 vs 산문 @21993 로 23,366자 중 마지막
+    1,362자만 스코프가 됐다. 156917(@670/@7126)·88475·83323·92680·78991 도 같은 모양이며,
+    수리 후 6문서 19건이 회수됐다.
+
+    ★수리 방식이 핵심이다. "더 이른 매치를 고른다"로 고치면 **회귀가 난다** — 스코프를
+    앞당기면 읽는 텍스트가 늘어 오탐도 는다(실측 82987 American Red Cross 가 8→32건으로
+    부풀며 `REDACTION (b)(6) (entire last name)` 이 지적사항이 됐다). 그래서 교체가 아니라
+    **폴백**으로 둔다: 첫 후보는 종전과 완전히 동일하고, 그 사다리가 0건일 때만 두 번째
+    후보로 한 번 더 돈다. 회귀 불가능성이 측정이 아니라 제어 흐름의 성질로 보장된다.
+    """
+
+    HINTS = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def _obs(self, text):
+        return f._extract_483_observations_from_text(text, self.HINTS)
+
+    def test_prose_we_observed_no_longer_swallows_the_list(self):
+        """양식 마커가 앞, 산문 "we observed" 가 뒤 — 종전엔 뒤를 골라 목록 전체를 잃었다."""
+        text = (
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED:\n"
+            "1. Written procedures for cleaning and maintenance of equipment are not "
+            "followed. Specifically, cleaning logs were missing for two vessels.\n"
+            "2. Laboratory controls do not include scientifically sound test procedures. "
+            "During the walkthrough we observed that the balance was uncalibrated.\n")
+        rows = self._obs(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertIn("cleaning and maintenance", rows[0]["deficiency"])
+
+    def test_first_candidate_is_unchanged_so_working_docs_cannot_regress(self):
+        """★무회귀의 근거. 첫 후보는 `we_observed or recovery` 로 종전과 동일하다 —
+        첫 패스가 무언가를 내면 그대로 반환되고 두 번째 후보는 시도조차 되지 않는다."""
+        import re
+        we = re.search(r"\bWE\s+OBSERVED\b", "X WE OBSERVED Y")
+        rec = re.search(r"\bOBSERVED\b", "X WE OBSERVED Y")
+        self.assertIs(f._marker_candidates(we, rec)[0], we)
+        self.assertIs(f._marker_candidates(None, rec)[0], rec)
+        self.assertEqual(f._marker_candidates(None, None), [None])
+
+    def test_candidates_never_include_a_bare_whole_document_scope(self):
+        """마커 없이 전문을 훑는 후보는 만들지 않는다 — 목차·별첨까지 관찰이 된다."""
+        import re
+        we = re.search(r"\bWE\s+OBSERVED\b", "A WE OBSERVED B")
+        self.assertNotIn(None, f._marker_candidates(we, None))
+
+    def test_same_position_markers_are_not_retried(self):
+        """두 마커가 같은 자리를 가리키면 두 번 돌 이유가 없다(무의미한 재시도 방지)."""
+        import re
+        we = re.search(r"\bWE\s+OBSERVED\b", "A WE OBSERVED B")
+        rec = re.search(r"\bWE\s+OBSERVED\b", "A WE OBSERVED B")
+        self.assertEqual(len(f._marker_candidates(we, rec)), 1)
+
+
+class Fda483PageHeaderFooterCutTest(unittest.TestCase):
+    """관찰문이 페이지 경계를 넘으면 머리말 블록이 **문장 한가운데** 삽입된다.
+
+    실측 88475 obs#2: "…purporting to be sterile are not / OFFICE ADDRESS ANO NUMSER /
+    Dallas District Office / 4040 North Central Expressway, Suite 400 / Dallas, TX 75204…"
+    블록 안의 `DEPARTMENT OF HEALTH` 는 OCR 이 `OEPARTIIENT Of HEALTH` 로 깨뜨려 기존
+    마커가 실패했다. 블록 **첫 줄**인 `OFFICE ADDRESS` 를 마커로 넣어 더 이르게 자른다.
+    전 코퍼스 실측(137문서 중 46문서 112회) 전부 양식 라벨이고 산문 용례가 0이다.
+    """
+
+    HINTS = {"establishment_type": "", "fei_number": "", "firm_name": ""}
+
+    def test_page_header_block_is_cut_from_the_deficiency(self):
+        text = (
+            "DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED:\n"
+            "1. Procedures designed to prevent microbiological contamination of drug "
+            "products purporting to be sterile are not\n\n"
+            "OFFICE ADDRESS ANO\nNUMSER\nDallas District Office\n"
+            "4040 North Central Expressway, Suite 400\nDallas, TX 75204\n214-253-5200\n")
+        rows = f._extract_483_observations_from_text(text, self.HINTS)
+        self.assertEqual(len(rows), 1)
+        deficiency = rows[0]["deficiency"]
+        self.assertIn("purporting to be sterile", deficiency)
+        for leaked in ("Dallas District Office", "4040 North Central", "214-253-5200",
+                       "OFFICE ADDRESS"):
+            self.assertNotIn(leaked, deficiency, f"양식 머리말이 지적사항에 샜다: {leaked}")
+
+    def test_marker_is_case_fixed_so_prose_is_not_cut(self):
+        """대문자 고정 — 산문 속 소문자 'office address' 는 자르지 않는다."""
+        self.assertIsNone(f._FDA483_FOOTER_RE.search("mailed to the office address on file"))
+        self.assertIsNotNone(f._FDA483_FOOTER_RE.search("DISTRICT OFFICE ADDRESS AND PHONE"))
+
+
 class Fda483OcrReasonPropagationTest(unittest.TestCase):
     """`_fetch_fda483_pdf_text` 는 OCR 이 못 살렸을 때 **왜 못 살렸는지**를 하류에
     넘겨야 한다. 종전엔 `_is_notice_only(text)` 일 때만 OCR 사유로 바꿔 돌려줘서,

@@ -222,7 +222,7 @@ class EvaluateExtractionGapTest(unittest.TestCase):
 
 
 class ExtractionGapMigrationContractTest(unittest.TestCase):
-    """045 의 **비대칭 설계**를 고정한다 — 거르는 단위는 (source, kind), 보고 단위는 source.
+    """046 의 **비대칭 설계**를 고정한다 — 거르는 단위는 (source, kind), 보고 단위는 source.
 
     되돌리면 둘 중 하나가 반드시 깨진다:
       · source 단위로 거르면 → 식약처가 영구 적색(가이던스 17건은 0건이 정상인데 섞인다).
@@ -234,7 +234,7 @@ class ExtractionGapMigrationContractTest(unittest.TestCase):
         import os
         path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "web", "migrations", "045_extraction_gap_monitor.sql")
+            "web", "migrations", "046_extraction_gap_monitor.sql")
         with open(path, encoding="utf-8") as fh:
             return fh.read()
 

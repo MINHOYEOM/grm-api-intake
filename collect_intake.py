@@ -1166,6 +1166,42 @@ def _atom_link(entry: ET.Element) -> str:
 REASON_DEFAULT_FALLTHROUGH = "default_fallthrough"
 
 
+def _tier_kw_pattern(keyword: str) -> "re.Pattern[str]":
+    """tier 키워드 1개 → **복수형을 허용하는** 단어경계 패턴.
+
+    왜 tier 전용인가 — `_kw_match` 는 `compute_relevance` 의 **제외/구제 판정에도** 쓰인다.
+    거기서 매칭을 넓히면 식품·화장품 제외 게이트의 성격이 바뀐다(MFDS 쪽에서 같은 함정을
+    실측했다). 그래서 관련성 계층은 그대로 두고 **tier 계산에서만** 복수형을 흡수한다.
+    """
+    return re.compile(r"\b" + re.escape(keyword) + r"(?:e?s)?\b")
+
+
+_TIER_KW_CACHE: "dict[str, re.Pattern[str]]" = {}
+
+
+def _tier_kw_match(blob: str, keywords: "list[str] | tuple[str, ...]") -> int:
+    """tier 전용 키워드 매칭 수(복수형 허용).
+
+    실측 근거(findings 원문 코퍼스, 2026-08-03) — 규제 영문은 복수형이 더 흔하다:
+      `deviations` 141행 vs `deviation` 58행 · `media fills` 112 vs 52 ·
+      `warning letters` 40 · `recalls` 21 · `CAPAs` 18 · `audit trails` 7.
+    즉 `\\b키워드\\b` 만 쓰면 **가장 흔한 표기를 통째로 놓친다.** 개별 복수형을 손으로
+    나열하는 대신 매칭 층에서 흡수한다 — 앞으로 추가되는 키워드도 자동으로 커버된다.
+    """
+    count = 0
+    for kw in keywords:
+        pat = _TIER_KW_CACHE.get(kw)
+        if pat is None:
+            pat = _TIER_KW_CACHE[kw] = _tier_kw_pattern(kw)
+        if pat.search(blob):
+            count += 1
+    return count
+
+
+def _tier_kw_any(blob: str, keywords: "list[str] | tuple[str, ...]") -> bool:
+    return _tier_kw_match(blob, keywords) > 0
+
+
 def _relaxed_variants(keyword: str) -> "list[tuple[str, re.Pattern[str]]]":
     """키워드 하나에서 **완화 매칭** 정규식들을 만든다. (변형이름, 컴파일된 패턴)
 
@@ -1177,7 +1213,11 @@ def _relaxed_variants(keyword: str) -> "list[tuple[str, re.Pattern[str]]]":
     """
     variants: list[tuple[str, re.Pattern[str]]] = []
     esc = re.escape(keyword)
-    variants.append(("plural", re.compile(r"\b" + esc + r"e?s\b")))
+    # 규칙 복수형(-s/-es)은 `_tier_kw_match` 가 이미 흡수한다 → 여기서는 **불규칙 복수**만
+    # 남긴다(`impurity`→`impurities`). 이미 닫힌 공백을 계속 지목하면 리포트가 거짓 경보로
+    # 시끄러워지고, 그러면 아무도 안 본다.
+    if keyword.endswith("y"):
+        variants.append(("plural_irregular", re.compile(r"\b" + re.escape(keyword[:-1]) + r"ies\b")))
     m = re.match(r"^(.*?)(\d+)$", keyword)
     if m and m.group(1).strip():
         stem = re.escape(m.group(1).strip())
@@ -1220,8 +1260,10 @@ def near_miss_keywords(blob: str) -> "list[tuple[str, str]]":
         return []
     hits: list[tuple[str, str]] = []
     for kw, name, pat in _RELAXED_TABLE:
-        if _kw_match(text, [kw]):
-            continue  # 엄격 매칭이 이미 성공 — 근접미스가 아니다
+        # 판정에 실제로 쓰이는 매처(`_tier_kw_match`, 복수형 허용)로 확인한다.
+        # 여기서 엄격 매처를 쓰면 이미 닫힌 복수형 공백을 계속 지목해 거짓 경보가 된다.
+        if _tier_kw_match(text, [kw]):
+            continue  # 판정 매칭이 이미 성공 — 근접미스가 아니다
         if pat.search(text):
             hits.append((kw, name))
     return hits
@@ -1317,8 +1359,8 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
     is_class_ii = source == SOURCE_RECALL and re.search(r"\bclass ii\b", type_lc) is not None
     is_fr_rule = source == SOURCE_FR and "rule" in type_lc
 
-    t3_matches = _kw_match(blob, SIGNAL_TIER3_KEYWORDS)
-    t2_matches = _kw_match(blob, SIGNAL_TIER2_KEYWORDS)
+    t3_matches = _tier_kw_match(blob, SIGNAL_TIER3_KEYWORDS)
+    t2_matches = _tier_kw_match(blob, SIGNAL_TIER2_KEYWORDS)
     # 번호 표제(Annex N · ICH QN) 정규식 층 — 제약 도메인이 확정된 소스에서만
     # (ICAO Annex 15 같은 타 도메인 동형 표제를 승격시키지 않기 위해).
     if source in _TIER2_PATTERN_SOURCES:
@@ -1328,7 +1370,7 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
         return TierDecision(tier, reason, t2_matches=t2_matches, t3_matches=t3_matches)
 
     # ── Tier 3 ─────────────────────────────────────────────────────────────
-    if source == SOURCE_FDA_WL and _kw_any(
+    if source == SOURCE_FDA_WL and _tier_kw_any(
             blob, ["cgmp", "current good manufacturing practice"]):
         return _d("Tier 3", "wl_cgmp")
     if is_class_i:
@@ -1337,12 +1379,12 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
     # 외에는 키워드로 Tier 2/3 승격하지 않고 Tier 1 로 고정(handoff·통계 노이즈 방지).
     if qa_relevance == "Unrelated":
         return _d("Tier 1", "qa_unrelated")
-    if osd_relevance == "Direct" and _kw_any(
+    if osd_relevance == "Direct" and _tier_kw_any(
             blob, ["dissolution", "nitrosamine", "subpotent"]):
         return _d("Tier 3", "osd_direct_failure_mode")
     # 무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor)
     # 단, QA 관련성이 Unrelated(의료기기·식품 등 제외 도메인)인 항목은 승격하지 않는다.
-    if qa_relevance != "Unrelated" and _kw_any(blob, STERILE_BIO_TIER3_FLOOR):
+    if qa_relevance != "Unrelated" and _tier_kw_any(blob, STERILE_BIO_TIER3_FLOOR):
         return _d("Tier 3", "sterile_bio_floor")
     if t3_matches >= 2:
         return _d("Tier 3", "t3_keywords")

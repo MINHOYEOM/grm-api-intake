@@ -585,10 +585,24 @@ class TestKeywordMorphologyGuard(unittest.TestCase):
         """표에 '확장 변형 없음'이라 적은 것들이 실제 표기에서 매칭되는지 확인한다."""
         self.assertEqual(ci._kw_match("new edition of iso 14644-15 published", ["iso 14644"]), 1)
 
-    def test_relaxed_matcher_detects_the_three_known_traps(self):
-        """근접미스 탐지기가 실제 결함 3유형을 지목하는지(회귀 고정)."""
+    def test_regular_plural_is_matched_not_merely_detected(self):
+        """[2026-08-03] 규칙 복수형은 **탐지 대상이 아니라 매칭 대상**이 됐다.
+
+        실측(raw_signals 본문): `deviation` 엄격 매칭 **0행** vs `deviations` 71행 —
+        키워드가 사실상 죽어 있었다. 매칭 층에서 흡수했으므로 근접미스로 뜨면 안 된다
+        (이미 닫힌 공백을 계속 지목하면 리포트가 거짓 경보로 시끄러워진다).
+        """
+        for text in ("multiple deviations were observed",
+                      "media fills were not performed",
+                      "Several FDA Warning Letters and Untitled Letters on Talc"):
+            self.assertEqual(ci.near_miss_keywords(text), [], msg=text)
+            self.assertEqual(
+                ci.compute_signal_tier(ci.SOURCE_ECA, "news", "Pending", "N/A", text),
+                "Tier 2", msg=text)
+
+    def test_relaxed_matcher_still_detects_numbered_and_separator(self):
+        """복수형이 닫혀도 **번호·구분자** 계열은 여전히 탐지돼야 한다."""
         cases = [
-            ("Several FDA Warning Letters and Untitled Letters on Talc", "plural"),
             ("Corrigendum: Concept Paper on the Annex 15 Revision", "numbered"),
             ("FDA adopts updated ICH Q8/Q9/Q10 Questions and Answers", "numbered"),
         ]
@@ -637,14 +651,15 @@ class TestTierDecisionObservability(unittest.TestCase):
 
     def test_observer_counts_and_reports(self):
         obs = ci.TierObserver()
-        # "deviations" 는 `\bdeviation\b` 로 안 잡힌다 — 아직 남아 있는 복수형 공백.
+        # 근접미스 예시 = 번호 표제. 연방관보는 `_TIER2_PATTERN_SOURCES` 가 아니라
+        # 정규식 층이 적용되지 않아 기본값 낙하 + 근접미스가 된다.
         for text in ["New leadership team appointments",
-                      "multiple deviations were observed during the audit"]:
+                      "concept paper on the annex 15 revision"]:
             obs.record(
-                ci.compute_signal_tier_detail(ci.SOURCE_ECA, "news", "Pending", "N/A", text),
-                ci.SOURCE_ECA, text)
+                ci.compute_signal_tier_detail(ci.SOURCE_FR, "notice", "Pending", "N/A", text),
+                ci.SOURCE_FR, text)
         self.assertEqual(obs.default_fallthrough, 2)
-        self.assertEqual(obs.near_miss_count, 1)  # deviations 만 근접미스
+        self.assertEqual(obs.near_miss_count, 1)  # annex 15 만 근접미스
         joined = "\n".join(obs.summary_lines())
         self.assertIn("기본값 낙하", joined)
         self.assertIn("근접미스", joined)

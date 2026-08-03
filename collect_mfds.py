@@ -121,6 +121,23 @@ MFDS_KO_BOOST = [
     "우수의약품제조관리기준", "데이터 완전성", "자료 완전성",
     "밸리데이션", "무균", "멸균", "적합판정", "불순물", "니트로사민",
 ]
+# ── [한국어 tier 어휘 공백 2026-08-03] Tier **전용** 주제어 ───────────────────
+# 실측: Tier 1 로 떨어진 MFDS 30건 중 `MFDS_GMP_TERMS`·`MFDS_KO_BOOST` 에 걸리는 것이
+# **0건**이었다. 영어 목록은 같은 개념을 이미 알고 있는데(recall·stability·container
+# closure) 한국어 목록에만 없던 **어휘 비대칭**이다. 예: 「의약품등 회수·폐기 처리 운영
+# 지침」·「의약품등 안정성시험기준 질의응답집」.
+#
+# ★`MFDS_GMP_TERMS` 에 넣으면 안 된다 — 그 목록은 `_mfds_relevance` 의 제외 구제
+#   조건(`gmp_hits == 0`)에도 쓰여서, "식품 회수"·"화장품 용기·포장"·"의료기기 안정성시험"
+#   이 Pending(수집 제외)에서 Likely 로 **뒤집힌다**(실측 확인). 관련성 판정은 건드리지 않고
+#   tier 바닥만 올리기 위해 별도 층으로 분리한다.
+MFDS_QA_TOPIC_TERMS = [
+    "회수",        # 영어 TIER2 의 `recall` 대응 — 한국어 목록에만 없었다
+    "약사감시",     # `실태조사` 의 형제어(수입자 대상 규제 실사)인데 누락돼 있었다
+    "안정성시험",   # 영어 TIER2 의 `stability` 대응
+    "용기·포장",    # 영어 TIER2 의 `container closure` 대응
+]
+
 MFDS_KO_EXCLUDE_TERMS = [
     "의료기기", "체외진단의료기기", "화장품", "건강기능식품",
     "식품", "축산물", "수입식품",
@@ -199,14 +216,30 @@ def _mfds_tier(type_or_class: str, relevance: str, title: str, body: str) -> str
     """
     base = compute_signal_tier(SOURCE_MFDS, type_or_class, relevance, "N/A", title, body)
     rank = _TIER_RANK.get(base, 1)
-    gmp_hits, _pharma, ko_boost, _exclude, _rescue, _eng = _mfds_signal_counts(title, body)
+    gmp_hits, _pharma, ko_boost, exclude_hits, _rescue, _eng = _mfds_signal_counts(title, body)
     if type_or_class == TYPE_SAFETY_LETTER or ko_boost >= 1:
         rank = max(rank, 3)
     elif type_or_class in (TYPE_REGULATION_FINAL, TYPE_NOTICE_FINAL) and relevance != "Pending":
         rank = max(rank, 2)
     elif gmp_hits >= 1:
         rank = max(rank, 2)
+    elif _qa_topic_floor_applies(relevance, exclude_hits, title, body):
+        rank = max(rank, 2)
     return _RANK_TIER[rank]
+
+
+def _qa_topic_floor_applies(relevance: str, exclude_hits: int,
+                            title: str, body: str) -> bool:
+    """`MFDS_QA_TOPIC_TERMS` 로 Tier 2 바닥을 올릴지. **관련성 판정은 건드리지 않는다.**
+
+    두 겹으로 가둔다 — 이 어휘가 제외 도메인을 끌어올리면 안 되기 때문이다:
+      · `relevance == "Pending"` (=수집 제외 대상)이면 적용하지 않는다.
+      · 식품·화장품·의료기기 제외어가 하나라도 있으면 적용하지 않는다.
+    """
+    if relevance == "Pending" or exclude_hits > 0:
+        return False
+    blob = _content_blob(title, body)
+    return any(term in blob for term in MFDS_QA_TOPIC_TERMS)
 
 
 def _build_item(*, brd_id: str, type_or_class: str, feed_url: str,

@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-07-27T06:05:58+00:00",
+  "checked_at": "2026-08-03T05:58:51+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -25,11 +25,11 @@
     "who.json"
   ],
   "summary": {
-    "broken": 0,
-    "needs_review": 156,
-    "ok": 321,
-    "references": 599,
-    "unique_urls": 477
+    "broken": 1,
+    "needs_review": 163,
+    "ok": 322,
+    "references": 608,
+    "unique_urls": 486
   },
   "urls": {
     "https://database.ich.org/sites/default/files/ICH_M12_Step4_Guideline_2024_0521_0.pdf": {
@@ -1146,6 +1146,21 @@
         }
       ],
       "status": "needs_review"
+    },
+    "https://picscheme.org/docview/11277": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11277",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-006-4"
+        }
+      ],
+      "status": "ok"
     },
     "https://picscheme.org/docview/1947": {
       "attempts": 1,
@@ -3107,6 +3122,21 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/biosimilar-and-interchangeable-biosimilar-products-considerations-container-closure-systems-and": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/biosimilar-and-interchangeable-biosimilar-products-considerations-container-closure-systems-and",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-b5f522b7f1df"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/comparability-protocols-postapproval-changes-chemistry-manufacturing-and-controls-information-nda": {
       "attempts": 1,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/comparability-protocols-postapproval-changes-chemistry-manufacturing-and-controls-information-nda",
@@ -4947,6 +4977,51 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15259": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15259",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15259"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15260": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15260",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15260"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15261": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15261",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15261"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1",
@@ -6492,6 +6567,51 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15895": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15895",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15895"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15898": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15898",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15898"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15899": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15899",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15899"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 2,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -6882,6 +7002,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_218/view.do?seq=33722": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_218/view.do?seq=33722",
+      "http_status": null,
+      "method": "GET",
+      "reason": "network_or_tls:ConnectTimeout",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0013-33722"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.pmda.go.jp/files/000264540.pdf": {
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000264540.pdf",
@@ -6988,7 +7123,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266954.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -7003,11 +7138,11 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266955.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": 416,
+      "method": "GET",
+      "reason": "http_416",
       "references": [
         {
           "field": "official_url",
@@ -7015,10 +7150,10 @@
           "item_id": "pmda-000266955"
         }
       ],
-      "status": "ok"
+      "status": "broken"
     },
     "https://www.pmda.go.jp/files/000267517.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -7033,7 +7168,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000273637.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -7093,7 +7228,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
       "http_status": 200,
       "method": "HEAD",

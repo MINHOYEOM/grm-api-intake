@@ -6,8 +6,10 @@ compute_modality 가 '큰 틀'(원료 성격) 3분류 — 화학합성의약품(
 특정 제품 단위가 아닌 클래스 단위 분류임에 유의.
 """
 import os
+import re
 import sys
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -537,3 +539,129 @@ class TestTier1BlindSpotRecovery(unittest.TestCase):
                    "M8 Electronic Common Technical Document (eCTD)",
                    "False & Misleading Claims/Misbranded (Telehealth)"):
             self.assertEqual(self._tier(t), "Tier 1", msg=t)
+
+
+class TestKeywordMorphologyGuard(unittest.TestCase):
+    """[2026-08-03] 키워드 형태론 함정 재발 방지.
+
+    `_kw_match` 는 `\b키워드\b` 라, 키워드 뒤에 **단어문자가 붙는 변형**을 통째로 놓친다.
+    실측된 세 유형:
+      · 복수형   `warning letter`  vs "Warning Letters"   → 0
+      · 번호     `annex 1`         vs "Annex 15/19"       → 0
+      · 구분자   `ich q10`         vs "ICH Q8/Q9/Q10"     → 0
+    이 함정은 사람이 손으로 알아채야 했다(4번째 침묵실패). 여기서 **구조로** 막는다.
+    """
+
+    # 숫자로 끝나는 키워드는 `\b` 뒤에 숫자가 오면 매칭이 깨진다("annex 1" ✗ "Annex 15").
+    # 자동 판별(그럴듯한 변형인가?)은 휴리스틱이라 못 믿는다 — `iso 14644` 에 숫자를 덧붙인
+    # "iso 146445" 는 현실에 없는 문자열이다. 그래서 **사람이 한 번 판단하고 적어두는 표**로
+    # 강제한다. 새 번호 키워드를 추가하면 표에 없어서 CI 가 적색이 된다.
+    NUMBERED_DECISIONS = {
+        "annex 1": "정규식 층이 커버(제약 소스 한정)",
+        "ich q12": "TIER3 전용 — 번호 일반화는 Tier 3 인플레이션이라 의도적으로 안 함",
+        "ich q13": "TIER3 전용 — 상동",
+        "iso 14644": "전체 번호가 규격 식별자. 'ISO 14644-15' 는 뒤가 하이픈(비단어)이라 정상 매칭",
+    }
+
+    def test_every_numbered_keyword_has_a_recorded_decision(self):
+        """숫자로 끝나는 키워드는 **전부** 판단이 기록돼 있어야 한다(누락도 잔재도 금지)."""
+        numbered = {kw for kw in (*ci.SIGNAL_TIER2_KEYWORDS, *ci.SIGNAL_TIER3_KEYWORDS)
+                    if re.search(r"\d$", kw)}
+        self.assertTrue(numbered, "숫자 끝 키워드가 없다면 이 가드가 무의미하다")
+        missing = numbered - set(self.NUMBERED_DECISIONS)
+        self.assertFalse(
+            missing,
+            f"번호 키워드 {sorted(missing)} 에 대한 판단이 없다 — 정규식 층에 넣든 "
+            f"확장 변형이 없다고 단정하든 NUMBERED_DECISIONS 에 사유와 함께 적어라")
+        stale = set(self.NUMBERED_DECISIONS) - numbered
+        self.assertFalse(stale, f"NUMBERED_DECISIONS 에 잔재가 있다: {sorted(stale)}")
+
+    def test_annex_number_extension_is_actually_covered(self):
+        """표에 '정규식이 커버한다'고 적은 것이 실제로 커버되는지 실행으로 확인한다."""
+        for probe in ("annex 15", "annex 19", "annex 22"):
+            self.assertTrue(any(p.search(probe) for p in ci.SIGNAL_TIER2_PATTERNS), msg=probe)
+
+    def test_no_extension_claims_hold_in_real_world_forms(self):
+        """표에 '확장 변형 없음'이라 적은 것들이 실제 표기에서 매칭되는지 확인한다."""
+        self.assertEqual(ci._kw_match("new edition of iso 14644-15 published", ["iso 14644"]), 1)
+
+    def test_relaxed_matcher_detects_the_three_known_traps(self):
+        """근접미스 탐지기가 실제 결함 3유형을 지목하는지(회귀 고정)."""
+        cases = [
+            ("Several FDA Warning Letters and Untitled Letters on Talc", "plural"),
+            ("Corrigendum: Concept Paper on the Annex 15 Revision", "numbered"),
+            ("FDA adopts updated ICH Q8/Q9/Q10 Questions and Answers", "numbered"),
+        ]
+        for text, expected_kind in cases:
+            kinds = {kind for _kw, kind in ci.near_miss_keywords(text)}
+            self.assertIn(expected_kind, kinds, msg=text)
+
+    def test_near_miss_is_silent_when_strict_match_succeeds(self):
+        """엄격 매칭이 성공한 키워드는 근접미스로 보고하지 않는다(리포트 소음 방지)."""
+        hits = ci.near_miss_keywords("data integrity deviation in the aseptic core")
+        self.assertNotIn("data integrity", {kw for kw, _ in hits})
+        self.assertNotIn("deviation", {kw for kw, _ in hits})
+
+    def test_near_miss_empty_for_irrelevant_text(self):
+        self.assertEqual(ci.near_miss_keywords("New leadership team appointments"), [])
+        self.assertEqual(ci.near_miss_keywords(""), [])
+
+
+class TestTierDecisionObservability(unittest.TestCase):
+    """[2026-08-03] `Tier 1` 의 두 얼굴을 분리한다 — 판정한 Tier 1 vs 떨어진 Tier 1."""
+
+    def test_wrapper_returns_same_tier_as_detail(self):
+        """관측을 붙이면서 **판정을 바꾸지 않았음**을 고정한다."""
+        samples = [
+            (ci.SOURCE_ECA, "news", "Pending", "N/A", "Audit Trail: No Option to Add Comments"),
+            (ci.SOURCE_ECA, "news", "Pending", "N/A", "New leadership team appointments"),
+            (ci.SOURCE_FDA_WL, "Warning Letter", "Unrelated", "N/A", "medical device sterile"),
+            (ci.SOURCE_RECALL, "Class I", "Likely", "Direct", "tablet dissolution failure"),
+            (ci.SOURCE_EMA, "news", "Pending", "N/A", "sterility failure in line 3"),
+        ]
+        for args in samples:
+            self.assertEqual(ci.compute_signal_tier(*args),
+                              ci.compute_signal_tier_detail(*args).tier, msg=str(args))
+
+    def test_default_fallthrough_is_distinguishable_from_judged_tier1(self):
+        judged = ci.compute_signal_tier_detail(
+            ci.SOURCE_FDA_WL, "WL", "Unrelated", "N/A", "cosmetic labeling claims")
+        fell = ci.compute_signal_tier_detail(
+            ci.SOURCE_ECA, "news", "Pending", "N/A", "New leadership team appointments")
+        self.assertEqual(judged.tier, "Tier 1")
+        self.assertEqual(fell.tier, "Tier 1")
+        # 같은 Tier 1 이지만 이유가 다르다 — 이 구분이 이번 작업의 핵심이다.
+        self.assertEqual(judged.reason, "qa_unrelated")
+        self.assertTrue(fell.is_default_fallthrough)
+        self.assertFalse(judged.is_default_fallthrough)
+
+    def test_observer_counts_and_reports(self):
+        obs = ci.TierObserver()
+        # "deviations" 는 `\bdeviation\b` 로 안 잡힌다 — 아직 남아 있는 복수형 공백.
+        for text in ["New leadership team appointments",
+                      "multiple deviations were observed during the audit"]:
+            obs.record(
+                ci.compute_signal_tier_detail(ci.SOURCE_ECA, "news", "Pending", "N/A", text),
+                ci.SOURCE_ECA, text)
+        self.assertEqual(obs.default_fallthrough, 2)
+        self.assertEqual(obs.near_miss_count, 1)  # deviations 만 근접미스
+        joined = "\n".join(obs.summary_lines())
+        self.assertIn("기본값 낙하", joined)
+        self.assertIn("근접미스", joined)
+
+    def test_observer_never_breaks_collection(self):
+        """관측 실패가 수집을 죽이면 안 된다 — 래퍼가 예외를 밖으로 내보내지 않는다."""
+        broken = mock.Mock()
+        broken.record.side_effect = RuntimeError("observer exploded")
+        with mock.patch.object(ci, "TIER_OBSERVER", broken):
+            self.assertEqual(
+                ci.compute_signal_tier(ci.SOURCE_ECA, "news", "Pending", "N/A", "audit trail"),
+                "Tier 2")
+
+    def test_summary_includes_tier_observation(self):
+        ci.TIER_OBSERVER.reset()
+        try:
+            ci.compute_signal_tier(ci.SOURCE_ECA, "news", "Pending", "N/A", "random text")
+            self.assertIn("기본값 낙하", ci.CollectionStats().summary())
+        finally:
+            ci.TIER_OBSERVER.reset()

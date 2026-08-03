@@ -867,6 +867,10 @@ class CollectionStats:
             f"skip_dup={self.mhra_gmp_ncr_skipped_dup}  failed={self.mhra_gmp_ncr_insert_failed}  "
             f"error={self.mhra_gmp_ncr_error}",
         ]
+        # [tier 관측 2026-08-03] 소스별 건수 아래에 tier 판정 계기를 **항상** 붙인다.
+        # 별도 로그 라인으로 빼면 아무도 안 본다(warning 3일 방치 실사례) — 매 실행 요약에
+        # 섞어 두면 소스 건수를 볼 때 자연히 같이 읽힌다.
+        lines.extend(TIER_OBSERVER.summary_lines())
         return "\n".join(lines)
 
 
@@ -1157,21 +1161,153 @@ def _atom_link(entry: ET.Element) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
-                        osd_relevance: str, *text_parts: str) -> str:
-    """수집 항목의 Signal Tier (Tier 1/2/3) 1차 자동 분류.
+#: `Tier 1` 로 끝난 이유 중 **유일하게 위험한 값**. 나머지 이유는 "판정해서 Tier 1"이지만
+#: 이 값은 "어떤 규칙에도 안 걸려 기본값으로 떨어졌다"는 뜻이다 — 어휘 공백의 지표.
+REASON_DEFAULT_FALLTHROUGH = "default_fallthrough"
 
-    최종 판정은 Routine 에 위임하되, 고신호 항목을 우선 노출하기 위한 휴리스틱.
-        Tier 3 — 즉시 검토 가치가 높은 강제조치/핵심 GMP 신호
-        Tier 2 — GMP/품질 관련 신호
-        Tier 1 — 기본 (기타)
 
-    인자:
-        source         : SOURCE_* 상수
-        type_or_class  : Recall classification("Class I"…) / FR type("Rule"…) / 카테고리
-        qa_relevance   : compute_relevance 결과 ("Likely" 등)
-        osd_relevance  : compute_osd_relevance 결과 ("Direct" 등)
-        text_parts     : 키워드 매칭 대상 텍스트 (제목·본문·카테고리 등)
+def _relaxed_variants(keyword: str) -> "list[tuple[str, re.Pattern[str]]]":
+    """키워드 하나에서 **완화 매칭** 정규식들을 만든다. (변형이름, 컴파일된 패턴)
+
+    엄격 매칭(`\\b키워드\\b`)이 실패하는 **실제 유형**만 완화한다 — 2026-08-03 실측에서
+    나온 세 가지다:
+      · plural    — `\\bwarning letter\\b` 가 "Warning Letters" 를 못 잡는다(뒤가 \\w).
+      · numbered  — `\\bannex 1\\b` 가 "Annex 15"·"Annex 19" 를 못 잡는다(뒤가 숫자).
+      · separator — `ich q10` 이 "ICH Q8/Q9/Q10" 을 못 잡는다(구분자가 `/`).
+    """
+    variants: list[tuple[str, re.Pattern[str]]] = []
+    esc = re.escape(keyword)
+    variants.append(("plural", re.compile(r"\b" + esc + r"e?s\b")))
+    m = re.match(r"^(.*?)(\d+)$", keyword)
+    if m and m.group(1).strip():
+        stem = re.escape(m.group(1).strip())
+        variants.append(("numbered", re.compile(r"\b" + stem + r"\s*\d+")))
+    if " " in keyword:
+        loose = r"\s*[/\-\s]\s*".join(re.escape(tok) for tok in keyword.split())
+        variants.append(("separator", re.compile(r"\b" + loose)))
+    return variants
+
+
+def _build_relaxed_table() -> "tuple[tuple[str, str, re.Pattern[str]], ...]":
+    """완화 매칭용 사전 컴파일 테이블. 판정에는 **절대** 쓰지 않는다(관측 전용).
+
+    `warning letter` 처럼 TIER2·TIER3 양쪽에 있는 키워드가 중복 보고되지 않도록 (키워드,
+    변형) 쌍으로 dedup 한다 — 근접미스 리포트가 같은 말을 두 번 하면 사람이 안 본다.
+    """
+    seen: set[tuple[str, str]] = set()
+    out: list[tuple[str, str, re.Pattern[str]]] = []
+    for kw in (*SIGNAL_TIER3_KEYWORDS, *SIGNAL_TIER2_KEYWORDS):
+        for name, pat in _relaxed_variants(kw):
+            if (kw, name) in seen:
+                continue
+            seen.add((kw, name))
+            out.append((kw, name, pat))
+    return tuple(out)
+
+
+_RELAXED_TABLE: "tuple[tuple[str, str, re.Pattern[str]], ...]" = _build_relaxed_table()
+
+
+def near_miss_keywords(blob: str) -> "list[tuple[str, str]]":
+    """엄격 매칭은 실패했는데 **완화 매칭은 성공**한 (키워드, 변형) 목록.
+
+    이게 비어있지 않은 Tier 1 항목 = "한 글자 차이로 놓쳤을 수 있는 것". 판정을 바꾸지
+    않고 **지목만** 한다 — 완화 매칭은 오탐이 많아 자동 승격에 쓰면 티어 인플레이션이 된다.
+    2026-08-03 결함 중 Talc(복수형) 2 · Annex 3 · ICH 2 = 7건을 이 장치가 지목했을 것이다.
+    """
+    text = (blob or "").lower()
+    if not text.strip():
+        return []
+    hits: list[tuple[str, str]] = []
+    for kw, name, pat in _RELAXED_TABLE:
+        if _kw_match(text, [kw]):
+            continue  # 엄격 매칭이 이미 성공 — 근접미스가 아니다
+        if pat.search(text):
+            hits.append((kw, name))
+    return hits
+
+
+class TierObserver:
+    """tier 판정 근거를 세는 관측기. **판정에 영향을 주지 않는다.**
+
+    ⚠️ 지표를 늘려도 아무도 안 보면 warning 과 같은 운명이 된다(OCR 낭비가 warning 으로
+    3일간 방치된 실사례). 그래서 이 수치는 수집 요약(`CollectionStats.summary`)에
+    **항상 한 줄로** 찍히고, 근접미스는 상위 N건까지 제목과 함께 남긴다.
+    """
+
+    SAMPLE_CAP = 20
+
+    def __init__(self) -> None:
+        self.reset()
+
+    def reset(self) -> None:
+        self.reason_counts: dict[str, int] = {}
+        self.default_fallthrough: int = 0
+        self.near_miss_count: int = 0
+        self.near_miss_samples: list[tuple[str, str, str]] = []  # (source, kw:variant, 제목)
+
+    def record(self, decision: "TierDecision", source: str, blob: str) -> None:
+        self.reason_counts[decision.reason] = self.reason_counts.get(decision.reason, 0) + 1
+        if not decision.is_default_fallthrough:
+            return
+        self.default_fallthrough += 1
+        # 근접미스 탐지는 **기본값 낙하 항목에만** 돌린다 — 대상이 좁아 비용이 낮고,
+        # 다른 tier 에서 나온 근접미스는 이미 승격됐으므로 볼 이유가 없다.
+        hits = near_miss_keywords(blob)
+        if not hits:
+            return
+        self.near_miss_count += 1
+        if len(self.near_miss_samples) < self.SAMPLE_CAP:
+            label = ", ".join(f"{kw}:{name}" for kw, name in hits[:3])
+            self.near_miss_samples.append((source, label, (blob or "")[:110]))
+
+    def summary_lines(self) -> "list[str]":
+        total = sum(self.reason_counts.values())
+        if not total:
+            return []
+        pct = self.default_fallthrough / total * 100
+        lines = [
+            f"TIER 판정 {total}건 · 기본값 낙하(default_fallthrough) "
+            f"{self.default_fallthrough}건({pct:.1f}%) · 근접미스 {self.near_miss_count}건",
+        ]
+        if self.near_miss_samples:
+            lines.append("  ↓ 근접미스(엄격 실패·완화 성공) — 어휘/패턴 공백 후보")
+            for source, label, title in self.near_miss_samples:
+                lines.append(f"    · [{source}] {label} | {title}")
+        return lines
+
+
+#: 모듈 전역 관측기(수집 1회 = 프로세스 1회이므로 전역으로 충분).
+TIER_OBSERVER = TierObserver()
+
+
+@dataclass(frozen=True)
+class TierDecision:
+    """tier 와 **그 tier 가 된 이유**. 종전엔 문자열만 남아 둘을 구분할 수 없었다.
+
+    왜 필요한가 — `Tier 1` 은 "중요하지 않다"(판정)와 "판단 근거를 못 찾았다"(기본값 낙하)를
+    **같은 글자로** 저장한다. 그래서 어휘 공백이 생겨도 계기가 움직이지 않았고, 2026-08-03
+    사각지대 43건은 시스템이 아니라 **사람이 화면을 보다** 발견했다(분류 침묵실패 4번째 사례).
+    `reason` 을 함께 남기면 "떨어진 Tier 1"만 따로 셀 수 있다.
+    """
+
+    tier: str
+    reason: str
+    t2_matches: int = 0
+    t3_matches: int = 0
+
+    @property
+    def is_default_fallthrough(self) -> bool:
+        return self.reason == REASON_DEFAULT_FALLTHROUGH
+
+
+def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: str,
+                                osd_relevance: str, *text_parts: str) -> TierDecision:
+    """`compute_signal_tier` 의 판정 근거까지 돌려주는 **순수** 함수(부작용 없음).
+
+    판정 로직은 종전과 **완전히 동일**하다 — 각 `return` 지점에 이유 라벨만 붙였다.
+    (관측을 붙이면서 판정을 바꾸면, 나중에 지표가 움직였을 때 원인이 어휘인지 관측 변경인지
+     구분할 수 없다. 계기판을 고치러 와서 판정을 바꾸지 않는다.)
     """
     blob = " ".join(t for t in text_parts if t).lower()
     type_lc = (type_or_class or "").lower()
@@ -1188,39 +1324,70 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
     if source in _TIER2_PATTERN_SOURCES:
         t2_matches += sum(1 for pat in SIGNAL_TIER2_PATTERNS if pat.search(blob))
 
+    def _d(tier: str, reason: str) -> TierDecision:
+        return TierDecision(tier, reason, t2_matches=t2_matches, t3_matches=t3_matches)
+
     # ── Tier 3 ─────────────────────────────────────────────────────────────
     if source == SOURCE_FDA_WL and _kw_any(
             blob, ["cgmp", "current good manufacturing practice"]):
-        return "Tier 3"
+        return _d("Tier 3", "wl_cgmp")
     if is_class_i:
-        return "Tier 3"
+        return _d("Tier 3", "recall_class_i")
     # 제외 도메인(QA Unrelated: 의료기기·식품·화장품·수의 등)은 위 강제 예외(Class I·FDA WL cGMP)
     # 외에는 키워드로 Tier 2/3 승격하지 않고 Tier 1 로 고정(handoff·통계 노이즈 방지).
     if qa_relevance == "Unrelated":
-        return "Tier 1"
+        return _d("Tier 1", "qa_unrelated")
     if osd_relevance == "Direct" and _kw_any(
             blob, ["dissolution", "nitrosamine", "subpotent"]):
-        return "Tier 3"
+        return _d("Tier 3", "osd_direct_failure_mode")
     # 무균·바이오 치명적 단일 신호는 1개만 있어도 Tier 3 (floor)
     # 단, QA 관련성이 Unrelated(의료기기·식품 등 제외 도메인)인 항목은 승격하지 않는다.
     if qa_relevance != "Unrelated" and _kw_any(blob, STERILE_BIO_TIER3_FLOOR):
-        return "Tier 3"
+        return _d("Tier 3", "sterile_bio_floor")
     if t3_matches >= 2:
-        return "Tier 3"
+        return _d("Tier 3", "t3_keywords")
     if is_fr_rule and t3_matches >= 1:
-        return "Tier 3"
+        return _d("Tier 3", "fr_rule_t3")
 
     # ── Tier 2 ─────────────────────────────────────────────────────────────
     if qa_relevance == "Likely":
-        return "Tier 2"
+        return _d("Tier 2", "qa_likely")
     if is_class_ii:
-        return "Tier 2"
+        return _d("Tier 2", "recall_class_ii")
     if t2_matches >= 1:
-        return "Tier 2"
+        return _d("Tier 2", "t2_keywords")
     if osd_relevance == "Direct":
-        return "Tier 2"
+        return _d("Tier 2", "osd_direct")
 
-    return "Tier 1"
+    return _d("Tier 1", REASON_DEFAULT_FALLTHROUGH)
+
+
+def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
+                        osd_relevance: str, *text_parts: str) -> str:
+    """수집 항목의 Signal Tier (Tier 1/2/3) 1차 자동 분류.
+
+    최종 판정은 Routine 에 위임하되, 고신호 항목을 우선 노출하기 위한 휴리스틱.
+        Tier 3 — 즉시 검토 가치가 높은 강제조치/핵심 GMP 신호
+        Tier 2 — GMP/품질 관련 신호
+        Tier 1 — 기본 (기타)
+
+    인자:
+        source         : SOURCE_* 상수
+        type_or_class  : Recall classification("Class I"…) / FR type("Rule"…) / 카테고리
+        qa_relevance   : compute_relevance 결과 ("Likely" 등)
+        osd_relevance  : compute_osd_relevance 결과 ("Direct" 등)
+        text_parts     : 키워드 매칭 대상 텍스트 (제목·본문·카테고리 등)
+
+    ⚠️ 반환값·판정은 종전과 동일하다. 이 래퍼는 `TIER_OBSERVER` 에 판정 근거를 기록만 한다
+    (관측 실패가 수집을 죽이면 안 되므로 기록은 예외를 밖으로 내보내지 않는다).
+    """
+    decision = compute_signal_tier_detail(
+        source, type_or_class, qa_relevance, osd_relevance, *text_parts)
+    try:
+        TIER_OBSERVER.record(decision, source, " ".join(t for t in text_parts if t))
+    except Exception:  # noqa: BLE001 — 관측은 부수기능. 절대 수집을 중단시키지 않는다.
+        pass
+    return decision.tier
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -3237,6 +3404,18 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                     else:
                         f.write("- Routine handoff: not emitted (dry-run)\n")
                 f.write(f"- Dry run: `{args.dry_run}`\n")
+                # [tier 관측 2026-08-03] Actions 화면에도 남긴다 — 로그 깊숙이 있으면 안 본다.
+                # 근접미스는 "한 글자 차이로 놓쳤을 수 있는 것" 목록이라 사람이 훑어야 값이 있다.
+                _tier_lines = TIER_OBSERVER.summary_lines()
+                if _tier_lines:
+                    f.write("\n### Signal Tier 판정 계기\n\n")
+                    f.write(f"- {_tier_lines[0]}\n")
+                    if TIER_OBSERVER.near_miss_samples:
+                        f.write("\n<details><summary>근접미스(엄격 매칭 실패·완화 매칭 성공) — "
+                                "어휘/패턴 공백 후보</summary>\n\n")
+                        for _src, _label, _title in TIER_OBSERVER.near_miss_samples:
+                            f.write(f"- `{_src}` · **{_label}** · {_title}\n")
+                        f.write("\n</details>\n")
                 if stats.has_insert_failures():
                     total_fail = stats.total_insert_failures()
                     f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "

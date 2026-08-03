@@ -99,25 +99,23 @@ def _date_from_title(title: str) -> str:
     return ""
 
 
-def select_open_delta(token: str, db_id: str,
-                       publish_date: str | None = None) -> dict[str, Any] | None:
-    """Intake DB 에서 `Type or Class=web-delta ∧ Status=New` OPEN 페이지 1건을 고른다.
+def _query_open_pages(token: str, db_id: str,
+                       type_class: str) -> list[tuple[str, dict[str, Any]]]:
+    """Intake DB 에서 `Type or Class=<type_class> ∧ Status=New` 페이지를 (run_date, page)로.
 
-    `publish_date` 지정 시 그 날짜의 OPEN 페이지. 미지정 시 제목에서 파생한 날짜가
-    **가장 큰**(최신) 페이지 1건(K4-1 "최신 OPEN 이 입력" 동형 — '오늘'을 계산하지 않는다).
-    없으면 None(클린 skip 판단은 호출부 몫).
+    제목에서 날짜를 못 뽑는 페이지는 skip(WARN). 페이지네이션 상한 25(handoff 동형).
     """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     body: dict[str, Any] = {
         "filter": {"and": [
-            {"property": PROP_TYPE_CLASS, "select": {"equals": TYPE_WEB_DELTA}},
+            {"property": PROP_TYPE_CLASS, "select": {"equals": type_class}},
             {"property": PROP_STATUS, "select": {"equals": "New"}},
         ]},
         "page_size": 100,
     }
     candidates: list[tuple[str, dict[str, Any]]] = []
     start_cursor: str | None = None
-    for _ in range(25):  # OPEN web-delta 페이지는 소수 — 안전 상한(handoff 패턴과 동형)
+    for _ in range(25):  # OPEN 페이지는 소수 — 안전 상한(handoff 패턴과 동형)
         if start_cursor:
             body["start_cursor"] = start_cursor
         elif "start_cursor" in body:
@@ -127,15 +125,26 @@ def select_open_delta(token: str, db_id: str,
             title = _prop_title(page.get("properties", {}), PROP_NAME)
             run_date = _date_from_title(title)
             if not run_date:
-                log("WARN", f"web-delta 페이지 제목에서 날짜 파생 실패 — skip: {title!r}")
+                log("WARN", f"{type_class} 페이지 제목에서 날짜 파생 실패 — skip: {title!r}")
                 continue
             candidates.append((run_date, page))
         if not data.get("has_more"):
             break
         start_cursor = data.get("next_cursor")
     else:
-        log("WARN", "web-delta OPEN 조회 25페이지 상한 도달 — 일부 페이지 누락 가능")
+        log("WARN", f"{type_class} OPEN 조회 25페이지 상한 도달 — 일부 페이지 누락 가능")
+    return candidates
 
+
+def select_open_delta(token: str, db_id: str,
+                       publish_date: str | None = None) -> dict[str, Any] | None:
+    """Intake DB 에서 `Type or Class=web-delta ∧ Status=New` OPEN 페이지 1건을 고른다.
+
+    `publish_date` 지정 시 그 날짜의 OPEN 페이지. 미지정 시 제목에서 파생한 날짜가
+    **가장 큰**(최신) 페이지 1건(K4-1 "최신 OPEN 이 입력" 동형 — '오늘'을 계산하지 않는다).
+    없으면 None(클린 skip 판단은 호출부 몫).
+    """
+    candidates = _query_open_pages(token, db_id, TYPE_WEB_DELTA)
     if not candidates:
         return None
 
@@ -149,6 +158,35 @@ def select_open_delta(token: str, db_id: str,
 
     candidates.sort(key=lambda item: item[0])  # run_date(YYYY-MM-DD) 문자열 정렬 = 날짜순
     return candidates[-1][1]
+
+
+def select_open_deep_delta(token: str, db_id: str,
+                            publish_date: str) -> dict[str, Any] | None:
+    """`Type or Class=web-deep-delta ∧ Status=New` 중 **날짜가 정확히 일치**하는 1건.
+
+    **왜 별도 페이지를 조회하나(2026-08-03 사고).** 예치 규약(`GRM_Prompt_v16.md`,
+    `GRM_Routine_델타예치_스니펫.md`)은 deep 델타를 web-delta 페이지의 두 번째 코드블록
+    **또는** 별도 페이지 `OPEN GRM Web Deep Delta {date}`(`web-deep-delta`)로 예치하는 걸
+    허용한다. 그런데 브릿지는 `web-delta` 만 조회해, Routine 이 문서대로 별도 페이지를 쓴 주에
+    deep 이 **조용히 유실**됐다(브릿지는 exit 0 성공 + "deep 없음(정상)" 로그 — 진짜 정상과
+    유실이 같은 문장으로 나와 3주간 아무도 못 봤다). 상수 `TYPE_WEB_DEEP_DELTA` 는 정의만
+    돼 있고 선택 경로에 배선돼 있지 않았다.
+
+    ⚠️ `publish_date` 는 **필수**다(최신 1건 폴백 없음). deep 은 그 주 delta 의 카드 id 공간에
+    종속되므로, 지난 주 잔류 OPEN deep 페이지가 이번 주 delta 에 짝지어지면 카드 id 가 전부
+    빗나가 조용히 유실된다 — '최신'이 아니라 '같은 날짜'만 짝이다.
+    """
+    if not publish_date:
+        raise DeltaBridgeError("select_open_deep_delta: publish_date 필수(날짜 정확일치만 허용)")
+    matches = [pg for d, pg in _query_open_pages(token, db_id, TYPE_WEB_DEEP_DELTA)
+               if d == publish_date]
+    if not matches:
+        return None
+    if len(matches) > 1:
+        log("WARN", f"web-deep-delta OPEN 페이지가 {publish_date} 에 {len(matches)}건 — "
+                    "가장 최근 편집분 사용(비정상: 중복 예치 확인 필요)")
+    matches.sort(key=lambda p: p.get("last_edited_time", ""), reverse=True)
+    return matches[0]
 
 
 def _fetch_code_blocks(token: str, page_id: str) -> list[str]:
@@ -257,14 +295,8 @@ def normalize_card_key_namespace(delta: dict[str, Any],
         return 0
 
     delta["cards"] = {renamed.get(k, k): v for k, v in cards.items()}
-    if isinstance(deep, dict):
-        # deep 델타도 같은 키 공간이라 함께 맞춘다(안 맞추면 심층분석이 조용히 유실된다).
-        deep_renamed = {k: (k.split("::", 1)[1] if isinstance(k, str) and "::" in k else k)
-                        for k in deep}
-        if len(set(deep_renamed.values())) == len(deep):
-            for old, new in list(deep_renamed.items()):
-                if old != new:
-                    deep[new] = deep.pop(old)
+    # deep 델타도 같은 키 공간이라 함께 맞춘다(안 맞추면 심층분석이 조용히 유실된다).
+    normalize_deep_key_namespace(deep)
 
     sample = ", ".join(f"{k} → {renamed[k]}" for k in prefixed[:3])
     log("WARN", f"카드 키 네임스페이스 회귀 자동 정규화 {len(prefixed)}건 "
@@ -273,6 +305,31 @@ def normalize_card_key_namespace(delta: dict[str, Any],
     log("WARN", "원인 = Routine 이 handoff 의 `card_id`(source::document_id)를 델타 키로 "
                 "썼다. 정본은 `web_card_id`(=bare document_id) — 프롬프트 §B [출력] 참조.")
     return len(prefixed)
+
+
+def normalize_deep_key_namespace(deep: "dict[str, Any] | None") -> int:
+    """deep 델타 키가 `Source::document_id` 면 bare `document_id` 로 되돌린다. 반환=교정 건수.
+
+    delta 와 **분리된 함수인 이유**: deep 이 web-delta 블록2가 아니라 별도 `web-deep-delta`
+    페이지로 오면 `normalize_card_key_namespace(delta, deep)` 의 delta 경로를 타지 않는다
+    (delta 는 이미 정규화됐거나 애초에 접두사가 없어 조기 return 한다). 그러면 접두사 붙은
+    deep 키가 그대로 남아 조립 때 카드 id 가 전부 빗나가고 심층분석이 **조용히** 사라진다.
+    """
+    if not isinstance(deep, dict) or not deep:
+        return 0
+    renamed = {k: (k.split("::", 1)[1] if isinstance(k, str) and "::" in k else k) for k in deep}
+    changed = [k for k, v in renamed.items() if k != v]
+    if not changed:
+        return 0
+    # 무손실이 보장되지 않으면 손대지 않는다(delta 쪽 판단과 동형).
+    if len(set(renamed.values())) != len(deep):
+        log("WARN", "deep 키 네임스페이스 회귀 감지 — 접두사 제거 시 id 충돌이라 정규화 포기.")
+        return 0
+    for old in changed:
+        deep[renamed[old]] = deep.pop(old)
+    log("WARN", f"deep 키 네임스페이스 회귀 자동 정규화 {len(changed)}건 "
+                f"(Source::document_id → document_id)")
+    return len(changed)
 
 
 def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
@@ -412,6 +469,35 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
     return delta, deep, publish_date
 
 
+def extract_deep_page(page: dict[str, Any]) -> dict[str, Any]:
+    """별도 `web-deep-delta` 페이지 → deep 델타 맨몸 dict. fail-loud.
+
+    web-delta 페이지와 달리 envelope(cards+tldr)가 **없다** — 본문 전체가 deep dict 하나다.
+    `_fetch_code_blocks` 주석과 같은 이유로 Notion 이 긴 본문을 여러 code 블록으로 쪼갤 수
+    있으므로, 블록1 단독 → 전체 결합 순으로 시도한다(쪼개진 deep 을 통째로 버리지 않기 위해).
+    """
+    props = page.get("properties", {})
+    title = _prop_title(props, PROP_NAME)
+    texts = page.get("_code_blocks")
+    if texts is None:
+        raise DeltaBridgeError(
+            "extract_deep_page 는 page['_code_blocks'] 를 요구합니다 — _attach_code_blocks 선행.")
+    texts = [t for t in texts if isinstance(t, str) and t.strip()]
+    if not texts:
+        raise DeltaBridgeError(f"deep 페이지 {title!r}: 코드 블록(deep 델타 JSON) 없음")
+
+    first = _try_json_dict(texts[0])
+    if first is not None and not _is_envelope(first) and len(texts) == 1:
+        return _validate_deep(first)
+    joined = _try_json_dict("".join(texts))
+    if joined is not None:
+        return _validate_deep(joined)
+    if first is not None:
+        return _validate_deep(first)
+    raise DeltaBridgeError(
+        f"deep 페이지 {title!r}: deep 델타 JSON 파싱 실패(블록 {len(texts)}개, 단독·결합 모두)")
+
+
 def _attach_code_blocks(token: str, page: dict[str, Any]) -> dict[str, Any]:
     """select_open_delta 결과 page 에 본문 code 블록을 fetch 해 붙인다(extract_delta 입력)."""
     page = dict(page)
@@ -463,24 +549,44 @@ def write_delta(delta: dict[str, Any], deep: dict[str, Any] | None,
         wrote = True
         log("INFO", f"델타 기록: {path}")
 
-    if deep is not None:
-        deep_path = _deep_path(date_str)
-        new_deep_text = _dumps(deep)
-        if os.path.exists(deep_path):
-            with open(deep_path, "r", encoding="utf-8") as f:
-                existing_deep_text = f.read()
-            if existing_deep_text != new_deep_text:
-                raise DeltaBridgeError(
-                    f"deep 델타 {deep_path} 이미 존재하고 내용이 다릅니다 — 중복 가드.")
-            log("INFO", f"deep 델타 {deep_path} 이미 동일 내용 — no-op(멱등)")
-        else:
-            os.makedirs(os.path.dirname(deep_path), exist_ok=True)
-            with open(deep_path, "wb") as f:
-                f.write(new_deep_text.encode("utf-8"))
-            wrote = True
-            log("INFO", f"deep 델타 기록: {deep_path}")
+    if deep is not None and _write_deep_file(deep, date_str):
+        wrote = True
 
     return wrote
+
+
+def _write_deep_file(deep: dict[str, Any], date_str: str) -> bool:
+    """`web/data/deltas/deep_{date}.json` 결정론 기록. 반환=wrote. 멱등(동일 내용=no-op)."""
+    deep_path = _deep_path(date_str)
+    new_deep_text = _dumps(deep)
+    if os.path.exists(deep_path):
+        with open(deep_path, "r", encoding="utf-8") as f:
+            existing_deep_text = f.read()
+        if existing_deep_text != new_deep_text:
+            raise DeltaBridgeError(
+                f"deep 델타 {deep_path} 이미 존재하고 내용이 다릅니다 — 중복 가드.")
+        log("INFO", f"deep 델타 {deep_path} 이미 동일 내용 — no-op(멱등)")
+        return False
+    os.makedirs(os.path.dirname(deep_path), exist_ok=True)
+    with open(deep_path, "wb") as f:
+        f.write(new_deep_text.encode("utf-8"))
+    log("INFO", f"deep 델타 기록: {deep_path}")
+    return True
+
+
+def write_deep_only(deep: dict[str, Any], date_str: str) -> bool:
+    """delta 는 이미 커밋됐고 deep 만 뒤늦게 확보한 주의 **소급 기록**(2026-08-03 복구 경로).
+
+    ⚠️ 그 날짜의 `delta_{date}.json` 이 **이미 있을 때만** 쓴다 — delta 없는 deep 은 조립
+    입력이 될 수 없어(카드 id 짝이 없다) 고아 파일이 되고, 다음 주 브릿지의 중복 가드만
+    건드린다. '짝이 있는가'를 먼저 묻는 게 이 함수의 존재 이유다.
+    """
+    delta_path = _delta_path(date_str)
+    if not os.path.exists(delta_path):
+        raise DeltaBridgeError(
+            f"deep 단독 기록 거부: {delta_path} 가 없습니다 — deep 은 그 주 delta 의 카드 id "
+            f"공간에 종속됩니다(고아 deep 방지). delta 부터 브릿지하세요.")
+    return _write_deep_file(deep, date_str)
 
 
 def consume_delta(token: str, page: dict[str, Any]) -> None:
@@ -501,6 +607,90 @@ def consume_delta(token: str, page: dict[str, Any]) -> None:
             PROP_STATUS: _select("Processed"),
         }})
     log("INFO", f"web-delta 페이지 CONSUMED 처리 완료: {new_title} ({page_id})")
+
+
+def _merge_deep_from_separate_page(token: str, db_id: str, date_str: str,
+                                    deep: "dict[str, Any] | None") -> "dict[str, Any] | None":
+    """web-delta 본문에 deep 블록이 없으면 별도 `web-deep-delta` 페이지에서 가져온다.
+
+    두 경로 모두 예치 규약상 정당하므로 **블록2가 있으면 그쪽이 정본**이고, 이 함수는
+    그때 조회조차 하지 않는다(네트워크 절약이 아니라 우선순위를 코드로 못박는 것).
+    단, 둘 다 존재하면 조용히 덮지 않고 WARN 으로 표면화한다 — 내용이 다를 수 있는데
+    어느 쪽을 버렸는지 로그에 안 남으면 2026-08-03 과 같은 침묵 유실이 반복된다.
+
+    ⚠️ **이 경로의 실패는 delta 브릿지를 죽이지 않는다(WARN 후 deep=None).** deep 은 없어도
+    그 주가 6슬롯으로 발행되는 **선택 계층**이고, delta 기록은 주간 발행의 필수 경로다.
+    선택 기능의 파싱·네트워크 실패가 필수 경로를 인질로 잡으면, 고치려던 것(deep 유실)보다
+    더 큰 것(그 주 발행 전체)을 잃는다. 대신 침묵하지 않는다 — WARN 으로 사유를 남기고,
+    그 페이지는 CONSUMED 하지 않아 OPEN 인 채로 남는다(사람이 볼 수 있는 물증).
+    """
+    try:
+        deep_page = select_open_deep_delta(token, db_id, date_str)
+        if deep is not None:
+            if deep_page is not None:
+                log("WARN", f"deep 델타가 web-delta 블록2와 별도 페이지에 **둘 다** 있습니다"
+                            f"({date_str}) — 블록2를 정본으로 사용하고 별도 페이지는 OPEN 으로 "
+                            f"남깁니다(사람이 중복 예치를 확인할 것).")
+            return deep
+        if deep_page is None:
+            return None
+        log("INFO", f"deep 델타를 별도 web-deep-delta 페이지에서 확보: {date_str}")
+        deep_page = _attach_code_blocks(token, deep_page)
+        return extract_deep_page(deep_page)
+    except (DeltaBridgeError, NotionHandoffError) as e:
+        log("WARN", f"별도 web-deep-delta 페이지 처리 실패({date_str}) — 이번 주는 deep 없이 "
+                    f"6슬롯만 발행합니다(delta 는 정상 기록). 페이지는 OPEN 유지: {e}")
+        return None
+
+
+def _consume_deep_page_if_persisted(token: str, db_id: str,
+                                     delta_page: dict[str, Any]) -> None:
+    """별도 deep 페이지는 **그 deep 이 실제로 파일로 남았을 때만** CONSUMED 처리한다.
+
+    파일 존재를 조건으로 두는 이유 — 소비는 영구 처리라, 쓰지도 못한 deep 페이지를 닫으면
+    다음 실행에서 다시 주울 기회까지 사라진다(침묵 유실의 재생산). 조건 불충족이면 OPEN 으로
+    남겨 사람이 볼 수 있게 둔다.
+    """
+    date_str = _date_from_title(_prop_title(delta_page.get("properties", {}), PROP_NAME))
+    if not date_str:
+        return
+    # delta 페이지 소비는 이미 끝났다 — 여기서 예외가 나가면 워크플로가 실패로 뒤집혀
+    # "커밋·push·delta consume 은 됐는데 스텝은 red" 라는 오해를 만든다. 비차단.
+    try:
+        deep_page = select_open_deep_delta(token, db_id, date_str)
+        if deep_page is None:
+            return
+        if not os.path.exists(_deep_path(date_str)):
+            log("WARN", f"web-deep-delta 페이지({date_str})가 OPEN 이지만 "
+                        f"{_deep_path(date_str)} 가 없어 CONSUMED 처리하지 않습니다 — "
+                        f"deep 이 기록되지 않았습니다(원인 확인 필요).")
+            return
+        consume_delta(token, deep_page)
+    except (DeltaBridgeError, NotionHandoffError) as e:
+        log("WARN", f"web-deep-delta 페이지 CONSUMED 처리 실패({date_str}) — OPEN 유지: {e}")
+
+
+def _bridge_deep_only(token: str, db_id: str, publish_date: str,
+                       consume: bool) -> "int | None":
+    """OPEN web-delta 가 없을 때의 deep 단독 처리. 처리했으면 종료코드, 아니면 None."""
+    deep_page = select_open_deep_delta(token, db_id, publish_date)
+    if deep_page is None:
+        return None
+    if consume:
+        if not os.path.exists(_deep_path(publish_date)):
+            log("WARN", f"deep 단독 consume 거부: {_deep_path(publish_date)} 없음")
+            return None
+        consume_delta(token, deep_page)
+        return 0
+    log("INFO", f"OPEN web-delta 없음 · web-deep-delta 단독 확보 — 소급 기록: {publish_date}")
+    deep_page = _attach_code_blocks(token, deep_page)
+    deep = extract_deep_page(deep_page)
+    deep = _gate_deep_analysis(deep)
+    wrote = bool(deep) and write_deep_only(deep, publish_date)
+    _github_output("wrote", "true" if wrote else "false")
+    _github_output("date", publish_date)
+    print(f"브릿지 완료(deep 단독): date={publish_date} wrote={wrote}")
+    return 0
 
 
 def _github_output(key: str, value: str) -> None:
@@ -534,6 +724,20 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if page is None:
+        # [deep 소급 복구 2026-08-03] delta 는 이미 소비/커밋됐는데 deep 만 남은 주 —
+        # `--publish-date` 로 명시했을 때만 deep 단독 경로를 연다(스케줄 크론에서는 절대
+        # 발화하지 않는다). 이 경로가 없으면 08-03 같은 주는 브릿지로 **복구가 불가능**하다.
+        if args.publish_date:
+            try:
+                rc = _bridge_deep_only(token, args.db, args.publish_date, consume=args.consume)
+            except DeltaBridgeError as e:
+                print(f"ERROR: {e}", file=sys.stderr)
+                return 1
+            except NotionHandoffError as e:
+                print(f"ERROR: Notion 조회 실패: {e}", file=sys.stderr)
+                return 1
+            if rc is not None:
+                return rc
         log("INFO", "no OPEN web-delta — nothing to bridge")
         _github_output("wrote", "false")
         return 0
@@ -541,6 +745,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.consume:
         try:
             consume_delta(token, page)
+            _consume_deep_page_if_persisted(token, args.db, page)
         except NotionHandoffError as e:
             print(f"ERROR: consume 실패: {e}", file=sys.stderr)
             return 1
@@ -549,6 +754,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         page = _attach_code_blocks(token, page)
         delta, deep, date_str = extract_delta(page)
+        deep = _merge_deep_from_separate_page(token, args.db, date_str, deep)
         if deep is not None:
             deep = _gate_deep_analysis(deep)  # 클라우드 생성 deep 근거 검증(write 직전)
         wrote = write_delta(delta, deep, date_str)

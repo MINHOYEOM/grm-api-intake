@@ -95,6 +95,70 @@ class _FakeNotion:
         raise AssertionError(f"unexpected call: {method} {url}")
 
 
+class _TypeAwareNotion(_FakeNotion):
+    """`Type or Class` 필터를 **실제로 적용**하는 라우터.
+
+    기본 `_FakeNotion` 은 어떤 query 에도 같은 리스트를 돌려준다. 별도 deep 페이지 배선은
+    "web-delta 조회"와 "web-deep-delta 조회" 두 번을 하므로, 필터를 무시하는 fake 로는
+    delta 페이지가 deep 조회 결과로 되돌아와 실제와 다른 상황을 만든다.
+    """
+
+    def __call__(self, method, url, token, body=None, **kw):
+        if method == "POST" and url.endswith("/query"):
+            want = None
+            for cond in ((body or {}).get("filter", {}).get("and") or []):
+                if cond.get("property") == db.PROP_TYPE_CLASS:
+                    want = (cond.get("select") or {}).get("equals")
+            results = [p for p in self.query_results
+                       if want is None
+                       or (p["properties"]["Type or Class"]["select"]["name"] == want)]
+            return {"results": results, "has_more": False}
+        return super().__call__(method, url, token, body=body, **kw)
+
+
+def _deep_page(pid: str, date_str: str, **kw) -> dict:
+    return _delta_page(pid, date_str, title_prefix=db.TITLE_PREFIX_OPEN_DEEP,
+                        type_class=db.TYPE_WEB_DEEP_DELTA, **kw)
+
+
+_DEEP_PAYLOAD = {"mfds-1": {"deep_analysis": {"a": 1}, "source_text": "원문"}}
+
+
+class SelectOpenDeepDeltaTest(unittest.TestCase):
+    """[2026-08-03] 별도 web-deep-delta 페이지 조회 배선 — 예치 규약이 허용한 경로."""
+
+    def test_requires_publish_date(self) -> None:
+        fake = _TypeAwareNotion([])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            with self.assertRaises(db.DeltaBridgeError):
+                db.select_open_deep_delta("tok", "db", "")
+
+    def test_exact_date_match_only(self) -> None:
+        # 지난 주 잔류 OPEN deep 페이지가 이번 주에 짝지어지면 카드 id 가 전부 빗나간다.
+        stale = _deep_page("p-old", "2026-07-06")
+        fake = _TypeAwareNotion([stale])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            self.assertIsNone(db.select_open_deep_delta("tok", "db", "2026-07-13"))
+            self.assertEqual(db.select_open_deep_delta("tok", "db", "2026-07-06")["id"], "p-old")
+
+    def test_delta_page_is_not_returned_as_deep(self) -> None:
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            self.assertIsNone(db.select_open_deep_delta("tok", "db", "2026-07-13"))
+
+
+class DeepKeyNamespaceTest(unittest.TestCase):
+    def test_prefixed_deep_keys_normalized(self) -> None:
+        deep = {"MFDS::mfds-1": {"deep_analysis": {}}}
+        self.assertEqual(db.normalize_deep_key_namespace(deep), 1)
+        self.assertIn("mfds-1", deep)
+
+    def test_collision_aborts_normalization(self) -> None:
+        deep = {"MFDS::x": {}, "x": {}}
+        self.assertEqual(db.normalize_deep_key_namespace(deep), 0)
+        self.assertIn("MFDS::x", deep)  # 무손실 아니면 손대지 않는다
+
+
 class SelectOpenDeltaTest(unittest.TestCase):
     def test_no_open_returns_none(self) -> None:
         fake = _FakeNotion([])
@@ -362,6 +426,98 @@ class MainIntegrationTest(unittest.TestCase):
         self.assertEqual(outputs.get("wrote"), "true")
         self.assertEqual(outputs.get("date"), "2026-07-13")
         self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())
+
+    # ── [2026-08-03] 별도 web-deep-delta 페이지 배선 ────────────────────────────
+    def test_deep_from_separate_page_is_written(self) -> None:
+        """예치 규약이 허용한 별도 페이지 경로 — 이게 없어서 08-03 deep 이 침묵 유실됐다."""
+        fake = _TypeAwareNotion(
+            [_delta_page("p1", "2026-07-13"), _deep_page("p2", "2026-07-13")],
+            blocks={"p1": [_code_block(_valid_delta())],
+                    "p2": [_code_block(_DEEP_PAYLOAD)]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake), \
+             mock.patch.object(db, "_gate_deep_analysis", side_effect=lambda d: d):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())
+        self.assertTrue(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_broken_deep_page_does_not_block_delta(self) -> None:
+        """deep 은 **선택 계층** — 그 실패가 주간 발행(=delta)을 인질로 잡으면 안 된다."""
+        fake = _TypeAwareNotion(
+            [_delta_page("p1", "2026-07-13"), _deep_page("p2", "2026-07-13")],
+            blocks={"p1": [_code_block(_valid_delta())],
+                    "p2": [_code_block({"cards": {}, "tldr": []})]})  # deep 에 봉투 = 불량
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)  # delta 는 정상 기록
+        self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())
+        self.assertFalse(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_stale_deep_page_not_paired_with_other_week(self) -> None:
+        fake = _TypeAwareNotion(
+            [_delta_page("p1", "2026-07-13"), _deep_page("p-old", "2026-07-06")],
+            blocks={"p1": [_code_block(_valid_delta())],
+                    "p-old": [_code_block(_DEEP_PAYLOAD)]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        self.assertFalse(pathlib.Path("web/data/deltas/deep_2026_07_06.json").exists())
+        self.assertFalse(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_deep_only_recovery_requires_existing_delta(self) -> None:
+        """delta 없는 deep = 고아. 짝이 있는지부터 묻는다."""
+        fake = _TypeAwareNotion([_deep_page("p2", "2026-07-13")],
+                                 blocks={"p2": [_code_block(_DEEP_PAYLOAD)]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake), \
+             mock.patch.object(db, "_gate_deep_analysis", side_effect=lambda d: d), \
+             redirect_stderr(io.StringIO()):
+            rc = db.main(["--db", "dbid", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 1)
+        self.assertFalse(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_deep_only_recovery_backfills_when_delta_exists(self) -> None:
+        """08-03 실제 상황 — delta 는 이미 커밋·CONSUMED, deep 만 OPEN 으로 남은 주."""
+        os.makedirs("web/data/deltas", exist_ok=True)
+        pathlib.Path("web/data/deltas/delta_2026_07_13.json").write_text("{}", encoding="utf-8")
+        fake = _TypeAwareNotion([_deep_page("p2", "2026-07-13")],
+                                 blocks={"p2": [_code_block(_DEEP_PAYLOAD)]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake), \
+             mock.patch.object(db, "_gate_deep_analysis", side_effect=lambda d: d):
+            rc = db.main(["--db", "dbid", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "true")
+        self.assertTrue(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_deep_only_recovery_never_fires_without_publish_date(self) -> None:
+        """스케줄 크론(날짜 미지정)에서는 이 경로가 절대 열리지 않는다."""
+        os.makedirs("web/data/deltas", exist_ok=True)
+        pathlib.Path("web/data/deltas/delta_2026_07_13.json").write_text("{}", encoding="utf-8")
+        fake = _TypeAwareNotion([_deep_page("p2", "2026-07-13")],
+                                 blocks={"p2": [_code_block(_DEEP_PAYLOAD)]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "false")
+        self.assertFalse(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+    def test_consume_also_consumes_deep_page_when_persisted(self) -> None:
+        os.makedirs("web/data/deltas", exist_ok=True)
+        pathlib.Path("web/data/deltas/deep_2026_07_13.json").write_text("{}", encoding="utf-8")
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13"),
+                                  _deep_page("p2", "2026-07-13")])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--consume"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(fake.patches), 2)  # delta + deep 둘 다 CONSUMED
+
+    def test_consume_leaves_deep_page_open_when_not_persisted(self) -> None:
+        """쓰지도 못한 deep 페이지를 닫으면 다시 주울 기회까지 사라진다(침묵 유실 재생산)."""
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13"),
+                                  _deep_page("p2", "2026-07-13")])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--consume"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(fake.patches), 1)  # delta 만 CONSUMED
 
     def test_malformed_delta_fails_loud(self) -> None:
         page = _delta_page("p1", "2026-07-13")

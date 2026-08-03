@@ -338,6 +338,23 @@ class AdminGateTest(unittest.TestCase):
         self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("「약사법」 제38조제1항"), src).ok)
         self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("약사법 제38조제1항"), src).ok)
 
+    def test_halfwidth_corner_bracket_source_grounds_citation(self) -> None:
+        # [2026-08-03 실측] 식약처 원문은 전각 「」(U+300C/300D)와 반각 ｢｣(U+FF62/FF63)를
+        # 문서마다 섞어 쓴다. 반각 원문에서 조항이 실재하는데도 D2 가 날조로 FAIL 하던 오탐
+        # (admin-2026005914, FAIL 3건)의 회귀 방지. 전각 짝과 판정이 같아야 한다.
+        src = "｢약사법｣ 제38조제1항 위반. [별표8] 행정처분 기준."
+        self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("약사법 제38조제1항"), src).ok)
+        self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("｢약사법｣ 제38조제1항"), src).ok)
+        self.assertTrue(vda.run_deep_analysis_gate(self._admin_da("「약사법」 제38조제1항"), src).ok)
+
+    def test_halfwidth_bracket_cross_law_fabrication_still_blocks(self) -> None:
+        # 반각을 흡수해도 **교차 오인용 차단력은 유지**돼야 한다(정규화가 탐지를 죽이지 않음).
+        src = "｢약사법｣ 제38조제1항 위반. [별표8] 행정처분 기준."
+        result = vda.run_deep_analysis_gate(self._admin_da("｢화장품법｣ 제38조제1항"), src)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("화장품법" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
 
 # ── [FDA 483 분석층 2026-07-02] FDA 483 스키마 + D2 해석성 인용 WARN(비차단) ──────────────
 # 483 원문 = 실사 관찰사항 목록(영문). CFR 조항을 명시하지 않는 게 보통 — 분석가가 붙인 CFR 해석

@@ -439,7 +439,43 @@ SIGNAL_TIER2_KEYWORDS = [
     "media fill", "container closure integrity", "ccit", "biosimilar",
     "comparability", "immunogenicity", "lyophilized", "bioburden",
     "cold chain", "visible particulate",
+    # ── [Tier 1 사각지대 회수 2026-08-03] ──────────────────────────────────────
+    # Tier 1 전수 실측(450건)에서 확정된 미스는 **두 어휘 목록이 똑같이 비어 있던 영역**
+    # 에서 나왔다 — `QA_CATEGORY_KEYWORDS` 에도 없어서 qa_relevance 가 전부 "Pending" 이었다
+    # (확정 미스 26제목의 카테고리 매칭 = 0). 그래서 "두 목록의 분기를 메운다"는 접근으로는
+    # 한 건도 회수되지 않는다. 아래는 실측으로 회수가 확인된 어휘만 담는다.
+    #
+    # ★`warning letter(s)` 를 여기 넣는 이유 — 종전엔 TIER3(2개 매칭 요구)과
+    #   QA_LIKELY_BOOST(이미 매칭 있을 때만 가산)에만 있어, **"WL 해설" 하나가 유일한 신호인
+    #   제목은 구조적으로 Tier 1 확정**이었다. 복수형도 함께 넣는다 — `_kw_match` 는
+    #   `\bwarning letter\b` 라 "Warning Letters" 를 **못 잡는다**(실측 0).
+    "warning letter", "warning letters",
+    # 약전·공정서 — 규격 개정은 QA 직접 영향인데 어느 목록에도 없었다.
+    "ph. eur", "pharmacopoeia", "edqm",
+    # 실사 대응·데이터 신뢰성
+    "gxp", "audit trail", "refusal to provide access", "quality unit",
+    # 시험·검사
+    "visual inspection", "method validation",
+    # 오염관리·청정실
+    "contamination control", "iso 14644",
+    # 의약품 결함 공지(MHRA Class 1~4) — `recall` 로는 안 잡힌다.
+    "defect notification", "medicines defect",
 ]
+
+# 번호가 붙는 표제는 문자열 목록으로 감당이 안 된다 — `\bannex 1\b` 는 "Annex 15"·"Annex 19"
+# 를 못 잡고(뒤가 \w), `ich q10` 은 "ICH Q8/Q9/Q10"(구분자 `/`)을 못 잡는다. 둘 다 실측 0 이었다.
+# 그래서 **번호 패턴만 정규식으로 분리**한다(어휘 목록의 성격은 그대로 두고 층을 하나 더 얹는다).
+# ⚠️ `annex\s+\d+` 는 제약 밖에서도 쓰인다(예: ICAO Annex 15 = 항공정보업무). 그래서 이 패턴은
+#    **제약 도메인이 확정된 소스에서만** 적용한다(`_TIER2_PATTERN_SOURCES`).
+SIGNAL_TIER2_PATTERNS = (
+    re.compile(r"\bannex\s+\d+"),
+    re.compile(r"\bich\s*q\s*\d+"),
+)
+
+# 위 정규식 층을 적용할 소스 — 제약 전문 소스로 한정(범용 검색·연방관보 제외).
+_TIER2_PATTERN_SOURCES = frozenset({
+    SOURCE_ECA, SOURCE_EMA, SOURCE_PICS, SOURCE_ISPE, SOURCE_MHRA, SOURCE_WHO,
+})
 
 # 무균·바이오 '치명적' 단일 신호 — 1개만 출현해도 Tier 3 floor 적용 (제품군 확장)
 # (SIGNAL_TIER3_KEYWORDS 는 2개 매칭을 요구하므로, 단독 출현 시 누락되는 문제 보완)
@@ -1147,6 +1183,10 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
 
     t3_matches = _kw_match(blob, SIGNAL_TIER3_KEYWORDS)
     t2_matches = _kw_match(blob, SIGNAL_TIER2_KEYWORDS)
+    # 번호 표제(Annex N · ICH QN) 정규식 층 — 제약 도메인이 확정된 소스에서만
+    # (ICAO Annex 15 같은 타 도메인 동형 표제를 승격시키지 않기 위해).
+    if source in _TIER2_PATTERN_SOURCES:
+        t2_matches += sum(1 for pat in SIGNAL_TIER2_PATTERNS if pat.search(blob))
 
     # ── Tier 3 ─────────────────────────────────────────────────────────────
     if source == SOURCE_FDA_WL and _kw_any(

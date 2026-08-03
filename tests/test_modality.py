@@ -447,3 +447,93 @@ class TestModalityPreflight(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTier1BlindSpotRecovery(unittest.TestCase):
+    """[2026-08-03] Tier 1 사각지대 회수 — 실측 450건에서 확정된 미스 유형을 고정한다.
+
+    배경: Tier 1 은 "중요하지 않다"가 아니라 **판단 근거를 못 찾았다는 기본값**이라,
+    QA 가 봐야 할 항목이 조용히 떨어졌다. 확정 미스 26제목은 `QA_CATEGORY_KEYWORDS` 에도
+    전부 안 걸려(qa_relevance 전량 "Pending") — 두 목록이 **같이 비어 있던 영역**이었다.
+    """
+
+    def _tier(self, text, source=None, toc="news", qa="Pending"):
+        return ci.compute_signal_tier(source or ci.SOURCE_ECA, toc, qa, "N/A", text)
+
+    # ── ① warning letter 단독 신호 ────────────────────────────────────────────
+    def test_warning_letter_alone_now_tier2(self):
+        # 종전: `warning letter` 는 TIER3(2개 매칭 요구)·BOOST 에만 있어 **구조적으로 Tier 1**.
+        self.assertEqual(
+            self._tier("Quality Unit (QU) in the Focus of a Warning Letter"), "Tier 2")
+
+    def test_warning_letter_plural_matches(self):
+        # `_kw_match` 는 `\bwarning letter\b` 라 복수형을 **못 잡았다**(실측 0).
+        self.assertEqual(
+            self._tier("Several FDA Warning Letters and Untitled Letters on Talc"), "Tier 2")
+
+    def test_warning_letter_does_not_reach_tier3_alone(self):
+        # TIER2 로만 넣었으므로 단독으로 Tier 3 까지 올라가면 안 된다(티어 인플레이션 방지).
+        self.assertNotEqual(
+            self._tier("Quality Unit in the Focus of a Warning Letter"), "Tier 3")
+
+    # ── ② 번호 표제 정규식(Annex N · ICH QN) ──────────────────────────────────
+    def test_numbered_annex_matches(self):
+        # `\bannex 1\b` 는 "Annex 15"·"Annex 19" 를 못 잡는다(뒤가 \w).
+        for t in ("Corrigendum: Concept Paper on the Annex 15 Revision",
+                   "Revised Annex 19 on Reference and Retention Samples"):
+            self.assertEqual(self._tier(t), "Tier 2", msg=t)
+
+    def test_numbered_ich_q_matches_slash_separated(self):
+        # `ich q10` 은 "ICH Q8/Q9/Q10"(구분자 `/`)을 못 잡는다.
+        self.assertEqual(
+            self._tier("FDA adopts updated ICH Q8/Q9/Q10 Questions & Answers (R5)"), "Tier 2")
+
+    def test_annex_pattern_restricted_to_pharma_sources(self):
+        # ⚠️ ICAO **Annex 15** 는 항공정보업무다 — 범용 검색·연방관보에는 적용하지 않는다.
+        self.assertEqual(
+            self._tier("ICAO Annex 15 aeronautical information services",
+                        source=ci.SOURCE_FR), "Tier 1")
+
+    # ── ③ 어느 목록에도 없던 어휘 ─────────────────────────────────────────────
+    def test_recovered_vocabulary(self):
+        cases = [
+            "Audit Trail: No Option to Add Comments",
+            "Q&As on Automated Visual Inspection (AVI)",
+            "Ph. Eur. Glass Containers",
+            "EDQM publishes revised CEP Guideline",
+            "New Edition of ISO 14644-15 published",
+            "How to (not) use AI for GxP Inspection Responses",
+            "Warning Letter regarding Deficiencies in Contamination Control",
+            "FDA Warning Letter: Missing Method Validation",
+        ]
+        for t in cases:
+            self.assertEqual(self._tier(t), "Tier 2", msg=t)
+
+    def test_mhra_defect_notification_recovered(self):
+        # `recall` 로는 안 잡힌다 — MHRA 는 "Medicines Defect Notification" 으로 쓴다.
+        self.assertEqual(
+            self._tier("Class 4 Medicines Defect Notification: Xaggitin XL Tablets",
+                        source=ci.SOURCE_MHRA), "Tier 2")
+
+    def test_fda_wl_refusal_to_provide_access(self):
+        # 실사 거부는 최고 신호인데 어느 목록에도 없었다.
+        self.assertEqual(
+            self._tier("Refusal to Provide Access to and Copying of Records",
+                        source=ci.SOURCE_FDA_WL, toc="CDER"), "Tier 2")
+
+    # ── ④ 회귀 가드 — 제외 도메인은 여전히 Tier 1 ────────────────────────────
+    def test_excluded_domain_still_tier1(self):
+        # Unrelated 하드리턴이 신규 어휘보다 **먼저** 걸려야 한다.
+        for t in ("medical device audit trail deficiency",
+                   "cosmetic warning letters issued",
+                   "food safety visual inspection program"):
+            self.assertEqual(
+                self._tier(t, source=ci.SOURCE_FDA_WL, qa="Unrelated"), "Tier 1", msg=t)
+
+    def test_unrelated_headlines_stay_tier1(self):
+        # 이번 실측에서 correct(Tier 1) 로 확정된 유형은 승격되면 안 된다.
+        for t in ("New leadership team appointments",
+                   "Uzbekistan applies for PIC/S membership",
+                   "M8 Electronic Common Technical Document (eCTD)",
+                   "False & Misleading Claims/Misbranded (Telehealth)"):
+            self.assertEqual(self._tier(t), "Tier 1", msg=t)

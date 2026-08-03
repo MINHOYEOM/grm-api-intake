@@ -621,5 +621,69 @@
     "source_ref": "https://grm-solutions.com/briefs/2026-07-27/#9cadd9160225",
     "difficulty": "easy",
     "week": "202631"
+  },
+  {
+    "id": "q-202632-01",
+    "question_ko": "식약처가 원료 10개의 시험항목 일부를 실시하지 않고 시험성적서를 거짓으로 작성한 알파제약(주)에 대해 내린 처분은 무엇인가요?",
+    "choices": [
+      "해당 품목 제조업무정지 3개월",
+      "의약품 제조 및 품질관리기준 적합판정(내용고형제) 취소",
+      "해당 품목 판매업무정지 1개월",
+      "해당 품목 회수·판매중지 명령"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "식약처는 알파제약(주)이 히드록시프로필셀룰로오스 등 원료 10개에 대해 반복적으로 일부 시험을 실시하지 않고 거짓 시험성적서를 작성한 사실을 확인했습니다. 이에 따른 처분은 의약품 제조 및 품질관리기준 적합판정(내용고형제) 취소입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#admin-2026005894",
+    "difficulty": "normal",
+    "week": "202632"
+  },
+  {
+    "id": "q-202632-02",
+    "question_ko": "미국 FDA가 Wizcure Pharmaa Private Limited 무균 제조소 실사에서 한 번도 시행된 적이 없다고 지적한 항목은 무엇인가요?",
+    "choices": [
+      "무균 작업에 대한 인원 모니터링",
+      "완제품 확인·함량시험",
+      "안정성시험 검체의 보존조건 표시",
+      "제품 전환 시 설비 세척"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "FDA는 이 무균 제조소에서 무균 작업에 대한 인원 모니터링이 한 번도 시행되지 않았다고 지적했습니다. 관찰사항은 총 7건이 발부되었습니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#fda483-193868",
+    "difficulty": "easy",
+    "week": "202632"
+  },
+  {
+    "id": "q-202632-03",
+    "question_ko": "식약처가 (주)대일제약의 의약외품 클린방수밴드(1회용)와 관련해 작성하지 않은 것으로 확인한 기록은 무엇인가요?",
+    "choices": [
+      "원료 공급자의 시험성적서",
+      "안정성시험 결과보고서",
+      "제조단위별 제조관리기록서와 품질관리기록서",
+      "회수·폐기 처리 기록"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "(주)대일제약은 해당 품목을 제조·판매하면서 제조단위별 제조관리기록서와 품질관리기록서 일체를 작성하지 않았고, 이에 대해 해당 품목 제조업무정지 3개월 처분을 받았습니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#admin-2026005975",
+    "difficulty": "easy",
+    "week": "202632"
+  },
+  {
+    "id": "q-202632-04",
+    "question_ko": "일동제약(주)이 '일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염)'에 대해 영업자 회수를 실시한 사유는 무엇인가요?",
+    "choices": [
+      "함량시험 부적합",
+      "총호기성균수 규격 초과",
+      "안정성시험 기준 부적합",
+      "유통 중 포장불량 우려"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "해당 회수는 유통 중 포장불량 우려를 사유로 한 자진(영업자) 회수입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#recall-ada7ac9cbd75",
+    "difficulty": "easy",
+    "week": "202632"
   }
 ]

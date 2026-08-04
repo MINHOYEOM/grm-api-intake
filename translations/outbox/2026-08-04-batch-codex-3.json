@@ -1,0 +1,278 @@
+[
+  {
+    "finding_id": "finding-123e1fb65cb315b3e7007ba5",
+    "finding_text": "Each lot in shipment received was not identified with a distinctive code for each container or grouping of containers for components.",
+    "finding_text_ko": "수령한 각 출하분의 각 로트가 구성품의 각 용기 또는 용기군별 고유 코드로 식별되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-153c0fe553759d18fc8507bd",
+    "finding_text": "There was no record of stability samples stored in containers that simulate the market container.",
+    "finding_text_ko": "시장 용기를 모사한 용기에 보관된 안정성 검체의 기록이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-154d5b18154b0c349d8cd00d",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 의약품의 동일성, 함량, 품질 및 순도 기준 적합성을 보장하는 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-191913bc1e8b77c328749406",
+    "finding_text": "The written stability program for drug products does not include sample size based on statistical criteria for each attribute examined to assure valid estimates of stability.",
+    "finding_text_ko": "의약품 안정성 서면 프로그램에 유효한 안정성 추정을 보장하기 위해 검사하는 각 특성별 통계 기준에 따른 검체 수가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e343c87495f17b55f7511ff",
+    "finding_text": "Records associated with drug substance production and within the retention period for such records, were not made readily available for authorized inspection.",
+    "finding_text_ko": "의약품 원료 생산 관련 기록과 보존기간 내 기록을 권한 있는 검사에 즉시 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96ea671476a6a3b03634d777",
+    "finding_text": "Data is not recorded contemporaneously.",
+    "finding_text_ko": "데이터가 동시적으로 기록되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-73c4ee57813fc8416d5ce5d6",
+    "finding_text": "Invalidation ofout-of-specification results lacks adequate scientific justification.",
+    "finding_text_ko": "규격일탈(OOS) 결과의 무효화에 적절한 과학적 정당성이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-593969c41a25cf4a045fbe5c",
+    "finding_text": "Processing areas are deficient regarding the system for cleaning and disinfecting the equipment.",
+    "finding_text_ko": "공정 구역의 장비 세척 및 소독 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9968d52ca653b8e6382a2045",
+    "finding_text": "Failure to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality, and purity.",
+    "finding_text_ko": "의약품이 동일성, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하는 과학적으로 타당한 규격, 기준, 샘플링 계획 및 시험 절차를 포함한 시험실 관리를 수립하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14fff3988cda346c714a95ae",
+    "finding_text": "Written procedures designed to prevent contamination ofdrug products purporting to be sterile are not followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 오염 방지를 위해 설계된 서면 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d7cc065f7dfa7a3ef5b59a7",
+    "finding_text": "Appropriate controls are not implemented over Quality Control instruments to ensure the integrity of analytics] test- ing.",
+    "finding_text_ko": "분석 시험의 무결성을 보장하기 위한 품질관리(Quality Control) 기기에 대한 적절한 관리가 시행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d8828f9ee455483b57577f5",
+    "finding_text": "The quality control unit lacks responsibility to reject all procedures or specifications impacting on the quality of drug products.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 의약품 품질에 영향을 미치는 모든 절차 또는 규격을 거부할 책임이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e73b54e7b65beadbd5c6b2c",
+    "finding_text": "During the review of QC equipment logsheets, we observed your firm failed to document the time and temperature of release, stability, and reference standard samples during transfer between freezers.",
+    "finding_text_ko": "QC 장비 로그시트를 검토하는 동안, 귀사가 냉동고 간 이동 시 출하시료, 안정성 검체 및 표준품 검체의 시간과 온도를 문서화하지 않은 사실이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1305fb3316e81dcd255c5708",
+    "finding_text": "There is no assurance that the equipment used in the production of OO a are always maintained and/or kept in/under proper conditions for manufacturing operations and to prevent the contamination of the products handled and/or processed in the equipment.",
+    "finding_text_ko": "OO a 생산에 사용된 장비가 제조 작업과 장비에서 취급·가공된 제품의 오염 방지를 위한 적절한 상태로 항상 유지 및/또는 보관되었다는 보증이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-36957f5adc499b44782eb70e",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding laboratory controls and operations.",
+    "finding_text_ko": "오염 또는 혼동을 방지하기 위한 별도 또는 지정 구역이 시험실 관리 및 작업 측면에서 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8447feaf35482034c7fece06",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이 설명되지 않은 불일치 및 배치 또는 그 구성품의 규격 미충족을 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9863a95e559644d6e5fb1e89",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fecfc9110dbeabd813da79b1",
+    "finding_text": "Employees engaged in the processing, holding, and testing of a drug product lack the training and experience",
+    "finding_text_ko": "의약품의 가공, 보관 및 시험에 종사하는 직원이 필요한 교육과 경험이 부족했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7b0d92809a2e1630fb335b8a",
+    "finding_text": "An™® Field Alert Report was not submitted within three working days of receipt of information concerning a failure of one or more distributed batches of a drug to meet the specifications established for it in the application.",
+    "finding_text_ko": "출하된 하나 이상의 의약품 배치가 허가신청서에 설정된 규격을 충족하지 못했다는 정보를 수령한 날부터 3 근무일 이내에 Field Alert Report를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c8bbeb000258e9de0f623bb7",
+    "finding_text": "Written records of investigations into unexplained discrepancies and the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up.",
+    "finding_text_ko": "설명되지 않은 불일치 및 배치 또는 구성품의 규격 미충족에 대한 조사 서면기록에 결론과 후속조치가 항상 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-abe2aef5e94e3d0e15d13096",
+    "finding_text": "The calibration of instruments is not done at suitable intervals in accordance with an established written program and with provisions for remedial action in the event accuracy and/or precision limits are not met.",
+    "finding_text_ko": "기기의 교정이 수립된 서면 프로그램 및 정확도 및/또는 정밀도 한계 미충족 시 시정조치 규정에 따라 적절한 간격으로 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-867e1949f307117049b40acd",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-750c399871f10995b904f92e",
+    "finding_text": "The accuracy, sensitivity, specificity and reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험방법의 정확성, 감도, 특이성 및 재현성이 수립·문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67fdfeaedde99980ca4efc33",
+    "finding_text": "Written production and process control procedures are not followed in the execution of production and process control functions and documented at the time ofperformance.",
+    "finding_text_ko": "제조 및 공정 관리 기능 수행 시 서면 제조 및 공정 관리 절차가 준수되지 않았고 수행 시점에 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-445f4385810e520ad4f16c28",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in- process material and the drug product.",
+    "finding_text_ko": "공정 중 자재 및 의약품 특성의 변동을 유발할 수 있는 제조공정의 산출을 모니터링하고 성능을 밸리데이션하는 관리절차가 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3c92658a253b9fc456faeb82",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "유통용 의약품 시험 및 출하에 출하 전 최종 규격 적합성과 각 유효성분의 동일성 및 함량에 대한 적절한 시험실 판정이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-347c72f46dbafc611ece2d49",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이 설명되지 않은 불일치 및 배치 또는 구성품의 규격 미충족을 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-03820730576434c9547bfa6c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염 방지를 위해 설계된 절차가 수립·문서화·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb3cd3fd2b1f9ff52be1e20e",
+    "finding_text": "You failed to place on stability at least one batch per year ofmanufactured APIs and to test at least annually to confirm the stability characteristics ofthe APIs, appropriate storage conditions and confirm the expiry dates.",
+    "finding_text_ko": "귀사는 제조한 API 중 매년 최소 한 배치를 안정성 시험에 두고 API의 안정성 특성, 적절한 보관조건 및 사용기한을 확인하기 위해 최소 매년 시험하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db20753d2cd386e15a7d9ee8",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-86f44074e36e9f3e3a74d92e",
+    "finding_text": "Your APQR procedure is deficient such that: —_ a.",
+    "finding_text_ko": "귀사의 APQR 절차는 다음과 같이 미흡했다: —_ a.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51f4e1549ff1691b32982ef4",
+    "finding_text": "Your firm failed to conduct appropriate qualification (DQ, IQ, OQ & PQ) of critical equipment.",
+    "finding_text_ko": "귀사는 중요 장비의 적절한 적격성평가(DQ, IQ, OQ & PQ)를 수행하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b83d0a432bd1d956523b54db",
+    "finding_text": "You do not ensure product quality uniformity from batch to batch such that your Batch Manufacturing Records (BMR) does not conform to the Master Formula Record (MFR).",
+    "finding_text_ko": "귀사는 배치 간 제품 품질 균일성을 보장하지 않았으며, Batch Manufacturing Records (BMR)가 Master Formula Record (MFR)에 부합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-15e06782076eaace8981384d",
+    "finding_text": "Your firm failed to provide GMP training to your employees at the particular operations that the employee performs and GMP as it relates to the employee's functions.",
+    "finding_text_ko": "귀사는 직원이 수행하는 특정 작업 및 해당 직원의 기능과 관련된 GMP 교육을 직원에게 제공하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-143b29bdadb984fcacd500da",
+    "finding_text": "Your firm failed to use water that is suitable for manufacturing ofAPI, ahi Specifically, ; ; You manufacture water water) at your site from municipality water.",
+    "finding_text_ko": "귀사는 API 제조에 적합한 물을 사용하지 못했다. 구체적으로, 귀사는 현장에서 municipality water로부터 water water)을 제조한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-00ff2a193519a67c20794856",
+    "finding_text": "Your firm failed to (adequately) validate the analytical method for stability studies ofAPI, to support the intended commercialization period and expiry.",
+    "finding_text_ko": "귀사는 의도된 상업화 기간 및 사용기한을 뒷받침하기 위해 API 안정성 시험의 분석방법을 적절히 밸리데이션하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-404e3f3b3259c30e759e4408",
+    "finding_text": "Your firm failed to establish anappropriate equipment cleaning procedure to assure an adequate cleaning of equipment and its subsequent release for use in the manufacture ofintermediates and APIs.",
+    "finding_text_ko": "귀사는 장비의 적절한 세척과 이후 중간체 및 API 제조에 사용하기 위한 출하를 보장하는 적절한 장비 세척 절차를 수립하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-19793307708273e0db5ef9e0",
+    "finding_text": "Your firm failed to validate the analytical methods required for the trace analysis of API residue as part ofthe cleaning validation program.",
+    "finding_text_ko": "귀사는 세척 밸리데이션 프로그램의 일부로 API 잔류물 미량 분석에 필요한 분석방법을 밸리데이션하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-252732d654648d42adfe1d39",
+    "finding_text": "Your firm failed to place on stability at least one batch of manufactured APIs to monitor the stability characteristics of the API, and to test for appropriate storage conditions and confirm expiry dates.",
+    "finding_text_ko": "귀사는 API 안정성 특성을 모니터링하고 적절한 보관조건 및 사용기한을 확인하기 위해 제조한 API 중 최소 한 배치를 안정성 시험에 두지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2eedaaaaa3a9aeaac2bb6468",
+    "finding_text": "You failed to provide appropriate GMP and position specific training to personnel for the particular operations that each employee performs as it relates to the employee's functions.",
+    "finding_text_ko": "귀사는 각 직원이 수행하는 특정 작업과 직원 기능에 관련된 적절한 GMP 및 직무별 교육을 인원에게 제공하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3c4d1d156a5763af05ef92c7",
+    "finding_text": "Your annual product review procedure is deficient such that: a.",
+    "finding_text_ko": "귀사의 연간 제품 검토 절차는 다음과 같이 미흡했다: a.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-faffb6f36a9a7545babe7ac3",
+    "finding_text": "The accuracy, sensitivity, specificity and reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험방법의 정확성, 감도, 특이성 및 재현성이 수립·문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55806dc4c47d985344aeef07",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 동일성, 함량, 품질 및 순도의 적절한 기준 적합성을 보장하도록 설계된 과학적으로 타당하고 적절한 샘플링 계획의 수립이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6db23284894b598ba09c015d",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-80d909090b44e0a699de974d",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-116ce22bc7619742a0a38252",
+    "finding_text": "Your firm’s Product Quality Reviews (PQRs) are deficient.",
+    "finding_text_ko": "귀사의 Product Quality Reviews (PQRs)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -7916,6 +7916,77 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["overflow"], [0, 1, 2, 3])
 
 
+# ── 주간 퀴즈 학습 루프(13차) — 복원·완주 요약·오답노트·재도전·필터 ──────────────
+class WebQuizLearningLoopTest(unittest.TestCase):
+    """정적 계약만 고정한다(동작은 quiz.js 소관·브라우저 검증).
+
+    고정 대상은 "깨져도 화면이 멀쩡해 보이는 것"이다 — 필터가 참조하는 `data-source`가
+    빠지면 필터는 조용히 0건을 내고, 저장 키가 성장 정본과 같아지면 서버 동기화가
+    선택값을 0|1 로 납작하게 만들어 데이터가 조용히 사라진다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.quiz_js = (WEB_DIR / "assets" / "quiz.js").read_text(encoding="utf-8")
+        cls.growth_js = (WEB_DIR / "assets" / "growth.js").read_text(encoding="utf-8")
+        cls.golden = (GOLDEN_DIR / "quiz.expected.html").read_text(encoding="utf-8")
+
+    def test_every_card_exposes_source_type_for_the_filter(self):
+        bank = json.loads(render.QUIZ_FILE.read_text(encoding="utf-8"))
+        rendered = re.findall(r'data-source="([a-z]+)"', self.golden)
+        self.assertEqual(len(rendered), len(bank), "카드 수와 data-source 수가 다릅니다")
+        self.assertEqual(rendered, [q["source_type"] for q in bank])
+        # 필터 칩이 거는 값은 실제 렌더된 값 안에 있어야 한다(칩이 항상 0건이 되는 것 방지).
+        for value in ("glossary", "brief"):
+            self.assertIn(value, set(rendered), f"필터 칩 {value!r}가 걸릴 카드가 없습니다")
+
+    def test_result_panel_and_filters_ship_as_hidden_static_skeleton(self):
+        for marker in (
+            '<div class="qz-filters" id="grm-qz-filters"',
+            '<section class="qz-result" id="grm-qz-result"',
+            'id="grm-qz-result-score"',
+            'id="grm-qz-wrong-list"',
+            'id="grm-qz-retry"',
+            'id="grm-qz-share"',
+            'id="grm-qz-empty"',
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, self.golden)
+        # JS 미로드 시 빈 껍데기가 보이면 안 된다 — 전부 hidden 으로 나간다.
+        for block in ("grm-qz-filters", "grm-qz-result", "grm-qz-wrong", "grm-qz-empty"):
+            fragment = self.golden[self.golden.index(f'id="{block}"'):]
+            self.assertIn("hidden", fragment[:fragment.index(">") + 1], f"{block} 이 hidden 이 아닙니다")
+        # 점수·오답 목록은 런타임 주입 — 서버가 값을 굳혀 보내지 않는다(결정론 유지).
+        self.assertIn('id="grm-qz-result-score"></p>', self.golden)
+        self.assertIn('id="grm-qz-wrong-list"></ul>', self.golden)
+
+    def test_quiz_picks_never_share_the_growth_storage_key(self):
+        """복원 저장이 성장 정본 키를 건드리면 서버 동기화가 값을 납작하게 만든다.
+
+        growth-sync.js 의 sanitizeWeeks 가 `q[id]` 를 0|1 로 정규화하므로 "내가 고른 보기"를
+        그 스키마에 얹으면 동기화 한 번에 사라진다. 두 저장소의 분리를 정적으로 못 박는다.
+        """
+        # 따옴표까지 포함해 본다 — 키로 "쓰는" 것만 금지이고, 왜 분리했는지 설명하는
+        # 주석의 언급까지 막으면 검사가 실제 위험이 아닌 낱말을 쫓게 된다.
+        self.assertIn('"grm-quiz-picks-v1"', self.quiz_js)
+        self.assertNotIn('"grm-gurumi-growth"', self.quiz_js)
+        self.assertIn('"grm-gurumi-growth"', self.growth_js)    # 정본은 growth.js 한 곳
+
+    def test_unsolved_filter_uses_the_growth_read_window(self):
+        """quiz.js 는 localStorage 를 직접 뒤지지 않고 growth.js 의 조회창만 쓴다."""
+        self.assertIn("window.GRM_GROWTH", self.growth_js)
+        self.assertIn("solvedIds", self.growth_js)
+        self.assertIn("window.GRM_GROWTH", self.quiz_js)
+        # 조회창이 없거나 깨져도 화면은 살아야 한다(전건 숨김 금지).
+        self.assertIn("if (!solved) return true;", self.quiz_js)
+
+    def test_score_is_derived_from_card_state_not_accumulated(self):
+        """증가 카운터를 되살리면 복원·재도전에서 화면과 숫자가 다시 어긋난다."""
+        self.assertNotIn("answered++", self.quiz_js)
+        self.assertNotIn("correct++", self.quiz_js)
+        self.assertIn('data-correct', self.quiz_js)
+
+
 # ── 로그인/가입 마찰 개선(12차) ───────────────────────────────────────────────
 class WebLoginFrictionTest(unittest.TestCase):
     """가입 마찰 3종 개선의 정적 계약을 가드한다.

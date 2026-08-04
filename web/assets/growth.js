@@ -174,6 +174,25 @@
     return true;
   }
 
+  // ── 읽기 전용 조회창(quiz.js 의 "안 푼 문항만" 필터용) ────────────────────────
+  // quiz.js 가 localStorage 를 직접 뒤지면 두 파일이 같은 키 모양을 각자 알게 되어
+  // 스키마가 갈라진다.  적립 정본은 여기 하나로 두고 밖에는 질문만 받는다.
+  // 반환 = 주차 무관 "한 번이라도 푼" 문항 id 맵({qid:true}) — 값(정답 여부)은 주지
+  // 않는다(필터에 필요 없고, 정답 노출 경로를 만들지 않기 위해).
+  window.GRM_GROWTH = {
+    solvedIds: function () {
+      var out = {};
+      for (var k in data.weeks) {
+        if (!Object.prototype.hasOwnProperty.call(data.weeks, k)) continue;
+        var q = (data.weeks[k] || {}).q || {};
+        for (var id in q) {
+          if (Object.prototype.hasOwnProperty.call(q, id)) out[id] = true;
+        }
+      }
+      return out;
+    }
+  };
+
   // ── 성장 도감(신뢰된 정적 배열만 사용 — 사용자·외부 텍스트 주입 0) ──
   var stageCardsHtml = "";
   for (var stageNo = 0; stageNo < STAGES.length; stageNo++) {

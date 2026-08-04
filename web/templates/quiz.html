@@ -30,6 +30,14 @@
       <p class="qz-score" id="grm-qz-score" aria-live="polite">맞힌 문제 <b id="grm-qz-correct">0</b> · 푼 문제 <b id="grm-qz-answered">0</b></p>
       <button class="qz-toggle" id="grm-qz-toggle" type="button" aria-pressed="false">전체 {{ quiz.total }}문항 풀기</button>
     </div>
+    {#- 전체 보기 필터(13차) — 뱅크가 주 4문항씩 늘어 다 푼 문항을 다시 훑는 것 말고
+        할 게 없던 문제. 기본 숨김이고 전체 보기에서만 quiz.js 가 노출한다. -#}
+    <div class="qz-filters" id="grm-qz-filters" role="group" aria-label="문항 종류 고르기" hidden>
+      <button class="qz-chip" type="button" data-filter="all" aria-pressed="true">전체</button>
+      <button class="qz-chip" type="button" data-filter="glossary" aria-pressed="false">개념</button>
+      <button class="qz-chip" type="button" data-filter="brief" aria-pressed="false">사례</button>
+      <button class="qz-chip" type="button" data-filter="unsolved" aria-pressed="false">안 푼 문항만</button>
+    </div>
   </div>
 
   <div class="wrap qz-body">
@@ -37,7 +45,8 @@
     <article class="qz-card" id="{{ q.id }}"
              data-index="{{ loop.index0 }}"
              data-difficulty="{{ q.difficulty }}"
-             data-answer="{{ q.answer_index }}"{% if q.week %} data-week="{{ q.week }}"{% endif %}>
+             data-answer="{{ q.answer_index }}"
+             data-source="{{ q.source_type }}"{% if q.week %} data-week="{{ q.week }}"{% endif %}>
       <div class="qz-meta">
         <span class="qz-no">Q<span class="qz-no-n">{{ loop.index }}</span></span>
         {% if q.difficulty_label %}<span class="qz-diff qz-diff-{{ q.difficulty }}">{{ q.difficulty_label }}</span>{% endif %}
@@ -66,6 +75,23 @@
       </div>
     </article>
     {% endfor %}
+    {#- 완주 요약·오답노트(13차) — 정적 뼈대만 서버가 렌더하고(골든 고정) 점수·오답 목록은
+        quiz.js 가 이미 렌더된 DOM 값으로 채운다. 이번 주 세트를 다 풀었을 때만 노출. -#}
+    <section class="qz-result" id="grm-qz-result" role="status" aria-live="polite" hidden>
+      <h3 class="qz-result-title">이번 주 퀴즈 완주!</h3>
+      <p class="qz-result-score" id="grm-qz-result-score"></p>
+      <p class="qz-result-note" id="grm-qz-result-note"></p>
+      <div class="qz-wrong" id="grm-qz-wrong" hidden>
+        <h4 class="qz-wrong-title">다시 볼 문항</h4>
+        <ul class="qz-wrong-list" id="grm-qz-wrong-list"></ul>
+      </div>
+      <div class="qz-result-actions">
+        <button class="qz-result-btn is-primary" id="grm-qz-retry" type="button" hidden>틀린 문제만 다시 풀기</button>
+        <button class="qz-result-btn" id="grm-qz-share" type="button">결과 복사</button>
+      </div>
+    </section>
+    {#- 필터 결과가 0건일 때(예: 전체를 다 푼 뒤 "안 푼 문항만") — 빈 화면 대신 안내. -#}
+    <p class="qz-empty" id="grm-qz-empty" hidden>조건에 맞는 문항이 없어요. 다른 필터를 눌러보세요.</p>
   </div>
 </main>
 {% include "backtotop.html" %}
@@ -101,7 +127,9 @@
 .qz-choice:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
 .qz-choice:disabled{cursor:default}
 .qz-mark{flex:none;font-size:15px;color:var(--lo);line-height:1.5}
-.qz-choice-t{flex:1}
+/* min-width:0 + anywhere — 공백 없는 긴 한국어 토큰(예: "완전성·풍량·차압·기류방향·미생물·회복시험")이
+   375px 뷰포트에서 가로로 삐져나오던 문제. keep-all 은 유지하고 끊을 데가 없을 때만 끊는다. */
+.qz-choice-t{flex:1;min-width:0;overflow-wrap:anywhere}
 .qz-state{flex:none;font-family:var(--sans);font-size:12.5px;font-weight:600;line-height:1.5}
 /* 채점 후 상태 — 색 + 아이콘 텍스트(qz-state) 병행으로 색맹 접근성 확보(§2.5). */
 .qz-choice.is-correct{border-color:var(--ok,#3E7C5A);background:rgba(62,124,90,.08);color:var(--ink)}
@@ -119,7 +147,35 @@
 .qz-src-link{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);padding:8px 14px;border-radius:999px;text-decoration:none;transition:background .14s var(--ease),border-color .14s var(--ease)}
 .qz-src-link:hover{background:var(--soft);border-color:var(--coral)}
 .qz-src-link .ti{font-size:15px}
-@media (max-width:640px){ .qz-card{padding:18px 16px} .qz-bar{align-items:stretch} }
+/* ── 전체 보기 필터 칩(13차) ── */
+.qz-filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.qz-filters[hidden]{display:none}
+.qz-chip{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--muted);background:var(--canvas);border:1px solid var(--line-2);border-radius:999px;padding:6px 13px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
+.qz-chip:hover{color:var(--coral-2);border-color:var(--coral)}
+.qz-chip:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-chip[aria-pressed="true"]{color:#fff;background:var(--coral);border-color:var(--coral)}
+/* ── 완주 요약·오답노트(13차) ── */
+.qz-result{padding:22px 24px;background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:var(--rad);scroll-margin-top:88px}
+.qz-result[hidden]{display:none}
+.qz-result-title{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--coral-2);margin:0 0 6px}
+.qz-result-score{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);margin:0 0 4px}
+.qz-result-note{font-family:var(--sans);font-size:13.5px;line-height:1.7;color:var(--body);margin:0;word-break:keep-all}
+.qz-wrong{margin-top:14px}
+.qz-wrong[hidden]{display:none}
+.qz-wrong-title{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);margin:0 0 7px}
+.qz-wrong-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.qz-wrong-list a{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--coral-2);text-decoration:none;word-break:keep-all}
+.qz-wrong-list a:hover{text-decoration:underline}
+.qz-result-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.qz-result-btn{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 16px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
+.qz-result-btn[hidden]{display:none}
+.qz-result-btn:hover{color:var(--coral-2);border-color:var(--coral)}
+.qz-result-btn:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.qz-result-btn.is-primary{color:#fff;background:var(--coral);border-color:var(--coral)}
+.qz-result-btn.is-primary:hover{color:#fff;background:var(--coral-2);border-color:var(--coral-2)}
+.qz-empty{font-family:var(--sans);font-size:14px;color:var(--muted);text-align:center;padding:28px 0;margin:0}
+.qz-empty[hidden]{display:none}
+@media (max-width:640px){ .qz-card{padding:18px 16px} .qz-bar{align-items:stretch} .qz-result{padding:18px 16px} }
 {% include "growth_panel_style.html" %}
 </style>
 {% endblock %}

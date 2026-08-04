@@ -1,0 +1,164 @@
+name: GRM Quiz Freshness Monitor
+
+# [주간 퀴즈 · 2026-08-05] "이번 주 문항이 실제로 생성됐는가"를 클라우드에서 감시한다.
+#
+# 출제 파이프라인 `grm-monday-quiz-gen` 은 GitHub Actions 가 아니라 **운영자 데스크톱의
+# 로컬 Claude 예약 태스크**로 돈다(월 13·15·17·19시 KST 재시도). 데스크톱이 꺼져 있거나
+# 세션이 스킵하면 그 주 문항이 생기지 않는데, 지금까지 그 사실은 어디에도 남지 않았다 —
+# 사용자 화면은 legacy 복습 세트를 띄우고 저장소에는 커밋도 이슈도 남지 않는다.
+# **로컬에서 도는 자동화의 침묵은 로컬 밖에서 감시해야 한다.**
+#
+# ★읽기 전용: 커밋된 web/data/quiz_bank.json 만 읽는다. 네트워크·secret·write 권한 없음
+# (issues:write 는 알림 이슈용). 판정은 순수 파일 대조라 러너 상태에 흔들리지 않는다.
+on:
+  schedule:
+    # 화 04:10 UTC = 13:10 KST. 월요일 마지막 재시도(19시 KST)보다 하루 뒤에 본다 —
+    # 생성이 늦어진 주를 실패로 오인하지 않기 위한 여유다.
+    - cron: '10 4 * * 2'
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: 'KST 기준 검사일(YYYY-MM-DD). 비우면 오늘 — 과거 주차 재현용.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write        # 미생성 주 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: quiz-freshness
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: Check this week's quiz set exists
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+
+      # 미생성(exit 1)은 job 하드 실패가 아니라 이슈로 처리한다 — outcome 을 뒤에서 분기.
+      - name: Check quiz freshness (read-only)
+        id: monitor
+        continue-on-error: true
+        run: |
+          ARGS="--output quiz_freshness.json"
+          if [ -n "${{ inputs.as_of }}" ]; then
+            ARGS="$ARGS --as-of ${{ inputs.as_of }}"
+          fi
+          python quiz_freshness_check.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Quiz Freshness Monitor"
+            echo ""
+            if [ -f quiz_freshness.json ]; then
+              echo '```json'
+              cat quiz_freshness.json
+              echo '```'
+            else
+              echo "quiz_freshness.json 이 생성되지 않았습니다 (인자 오류로 조기 종료했을 수 있습니다)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update freshness issue
+        if: steps.monitor.outcome == 'failure'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('quiz_freshness.json', 'utf8')); }
+            catch (e) { report = { errors: ['quiz_freshness.json 파싱 실패'] }; }
+
+            const title = '[quiz-freshness] 이번 주 퀴즈 문항이 생성되지 않았습니다';
+            const label = 'quiz-freshness';
+
+            const lines = [];
+            if ((report.errors || []).length) {
+              lines.push('**감시 오류** — 이번 실행은 판정하지 못했습니다:');
+              for (const e of report.errors) lines.push(`- ${e}`);
+            } else {
+              lines.push(`- 이번 주(KST): **${report.current_week}** — 뱅크에 세트 없음`);
+              lines.push(`- 뱅크 최신 주차: \`${report.latest_week}\` (**${report.weeks_behind}주 밀림**, 총 ${report.week_count}주 생성)`);
+              lines.push('');
+              lines.push('**사용자에게 지금 보이는 것:** 이번 주 지정 세트가 없으므로 `/quiz/` 는');
+              lines.push('legacy pool(주차 없는 시드 문항)에서 뽑은 복습 세트를 보여주고, 제목도');
+              lines.push('"지난 문항으로 복습"으로 바뀝니다 — 잘못된 문항이 나가지는 않습니다.');
+              lines.push('');
+              lines.push('**확인할 것**');
+              lines.push('1. 운영자 데스크톱이 월요일 13~19시 KST 에 켜져 있었는가 (`grm-monday-quiz-gen`)');
+              lines.push('2. 세션이 `SKIP <reason>` 으로 끝났는가 — 근거 부족·소재 게이트·개념 문항 미확보는 정상 스킵이다');
+              lines.push('3. 2주 이상 밀렸다면 구조 문제 — 생성 규율(`docs/prompts/GRM_주간퀴즈생성_프롬프트_v1.md`)이 현실적으로 충족 가능한지 재검토');
+            }
+            const body = lines.join('\n')
+              + `\n\n검사일(KST): ${report.checked_date_kst || '?'} · 실행: ${context.runId}`
+              + `\n워크플로 \`grm-quiz-freshness.yml\` · 다음 주 세트가 생기면 자동으로 닫힙니다.`;
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'fbca04', '주간 퀴즈 문항이 그 주에 생성되지 않음');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close freshness issue on recovery
+        if: steps.monitor.outcome == 'success'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const title = '[quiz-freshness] 이번 주 퀴즈 문항이 생성되지 않았습니다';
+            const label = 'quiz-freshness';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `이번 주 세트가 생성되어 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }
+
+      # 미생성/오류면 run 도 red 로 남긴다(이슈와 별개의 2차 가시성).
+      - name: Propagate red on stale
+        if: steps.monitor.outcome == 'failure'
+        run: |
+          echo "이번 주 퀴즈 세트 미생성 또는 감시 오류 — 상세는 위 이슈/step summary 참조."
+          exit 1

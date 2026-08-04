@@ -50,6 +50,9 @@
             {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.term_ko }}</a>{% endfor %}
           </div>
           {% endif %}
+          {% if t.case_findings %}
+          <a class="gl-case-a" href="{{ rel_root }}{{ t.case_href }}">이 용어로 찾은 지적사례 <b>{{ t.case_count_label }}</b>건 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {% endif %}
         </article>
         {% endfor %}
       </div>
@@ -106,7 +109,12 @@
 .gl-refs-a{display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-size:12.5px;color:var(--muted);background:var(--soft);border:1px solid var(--line-2);padding:3px 9px;border-radius:999px;text-decoration:none;transition:border-color .14s var(--ease),color .14s var(--ease)}
 a.gl-refs-a:hover{color:var(--coral-2);border-color:var(--coral)}
 .gl-refs-a .ti{font-size:12px}
-@media (max-width:640px){ .gl-terms{grid-template-columns:1fr} .gl-tools{flex-direction:column;align-items:stretch} .gl-search{max-width:none} }
+.gl-case-a{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--coral-2);text-decoration:none}
+.gl-case-a b{font-weight:700}
+.gl-case-a:hover{text-decoration:underline}
+.gl-case-a .ti{font-size:14px;transition:transform .14s var(--ease)}
+.gl-case-a:hover .ti{transform:translateX(3px)}
+@media (max-width:640px){ .gl-terms{grid-template-columns:1fr} .gl-tools{flex-direction:column;align-items:stretch} .gl-search{max-width:none} .gl-case-a{white-space:normal} }
 </style>
 {% endblock %}
 {% block scripts %}

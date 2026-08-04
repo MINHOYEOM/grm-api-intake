@@ -52,6 +52,7 @@ LIBRARY_DIR = WEB_DIR / "data" / "library"      # [자료실] ICH/MFDS 참조 �
 LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 주간 자동 갱신 변경 이력
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
+GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
@@ -939,6 +940,43 @@ def load_glossary(path: Path = GLOSSARY_FILE) -> list[dict[str, Any]] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
+# RFC 3986 percent-encoding, byte-identical to urllib.parse.quote(s, safe="") — 표준
+# urllib 은 쓰지 않는다(WebRenderPurityTest.test_no_impure_imports 가 render.py 안의
+# `urllib` 루트 import 자체를 순수성 위반으로 차단 — urllib.parse 는 네트워크 0 이지만
+# 루트 이름만 보는 AST 가드라 서브모듈을 구분하지 않는다). CPython 의 `_ALWAYS_SAFE`
+# 상수와 동일한 미보호 문자 집합(ASCII 영숫자 + `_.-~`)을 그대로 재현한다.
+_URL_QUOTE_UNRESERVED = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-~"
+)
+
+
+def _url_quote(value: str, safe: str = "") -> str:
+    """[용어사전→사례] 검색어 → URL query 안전 인코딩(결정론·네트워크 0). UTF-8 인코딩 후
+    미보호 바이트만 %XX(대문자 hex)로 치환 — urllib.parse.quote(value, safe=safe) 와
+    동일 출력을 표준 라이브러리 없이 재현한다."""
+    safe_set = _URL_QUOTE_UNRESERVED | set(safe)
+    out: list[str] = []
+    for byte in value.encode("utf-8"):
+        ch = chr(byte)
+        if ch in safe_set:
+            out.append(ch)
+        else:
+            out.append(f"%{byte:02X}")
+    return "".join(out)
+
+
+def load_glossary_cases(path: Path = GLOSSARY_CASES_FILE) -> dict[str, dict[str, Any]] | None:
+    """[용어사전→사례] 용어별 findings 검색어/건수 커밋 데이터 로드(id → item 딕셔너리).
+
+    파일 부재 시 None → 기능이 조용히 꺼진다(load_glossary 와 동일 패턴). `excluded`
+    항목은 여기서 걸러진다(딕셔너리에 없는 용어 id 는 build_glossary_view 가 빈 값으로
+    렌더 — 링크 미표시)."""
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {it["id"]: it for it in (data.get("items") or [])}
+
+
 # ── [용어사전 심화 B2] 관련 조항 라벨 → 공식 원문 URL 해석기 ──────────────────────
 # URL 은 새로 수집하지 않는다 — 자료실(web/data/library/*.json) 커밋 데이터를 재사용
 # 한다(네트워크 0·결정론). 규칙은 R1→R7 순서로 적용, 첫 매치 채택, 매치 없으면 ""
@@ -1096,6 +1134,7 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
 def build_glossary_view(
     terms: list[dict[str, Any]],
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
+    cases: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
@@ -1106,8 +1145,17 @@ def build_glossary_view(
     선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로 정규화, reg_ref_catalogs 가 있으면
     B2 URL 해석기가 자료실 카탈로그로 링크를 채운다), 없으면 빈 값이라 기존 렌더와 byte
     동일(search 에도 잉여 공백 미추가). reg_ref_catalogs 미지정 시 URL 은 모두 ""(호출부
-    호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론."""
+    호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론.
+
+    cases(glossary_cases.json items, id→item)는 [C1] 사례 링크 심화 필드 — 있으면
+    case_q/case_findings/case_count_label/case_href 를 채운다(id 가 cases 에 없으면
+    빈 값 → 템플릿 {% if t.case_findings %} 게이트로 조용히 생략, 기존 렌더와 byte
+    동일). 숫자 포맷(천단위 쉼표)은 여기서 만든다(템플릿 필터는 로케일 영향을 받을 수
+    있다). URL 인코딩은 _url_quote(q, safe="")(urllib.parse.quote 와 byte-동일 출력을
+    자체 구현 — 순수성 게이트가 render.py 안의 urllib import 를 막는다. 결정론 — 한글
+    검색어 포함)."""
     label_by_id = {t["id"]: t["term_ko"] for t in terms}
+    cases = cases or {}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
         related = [{"id": r, "term_ko": label_by_id[r]}
@@ -1117,6 +1165,14 @@ def build_glossary_view(
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
             search_parts.append(detail_ko)
+        case = cases.get(t["id"]) or {}
+        case_q = str(case.get("q") or "")
+        try:
+            case_findings = int(case.get("findings") or 0)
+        except (TypeError, ValueError):
+            case_findings = 0
+        if case_findings < 0:
+            case_findings = 0
         return {
             "id": t["id"],
             "term_ko": t["term_ko"],
@@ -1131,6 +1187,12 @@ def build_glossary_view(
             # v3(8차 웨이브 A): 심화 필드 — 부재 시 ""/[] 라 템플릿 {% if %} 게이트로 조용히 생략.
             "detail_ko": detail_ko,
             "reg_refs": reg_refs,
+            # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
+            "case_q": case_q,
+            "case_findings": case_findings,
+            "case_count_label": f"{case_findings:,}" if case_findings else "",
+            "case_href": (f"findings/index.html?q={_url_quote(case_q, safe='')}"
+                          if case_q else ""),
         }
 
     views = [_term_view(t) for t in terms]
@@ -1873,7 +1935,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=GLOSSARY_DESCRIPTION,
             canonical=_abs_url("glossary/"),
             # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
-            glossary=build_glossary_view(glossary_terms, _load_reg_ref_catalogs()),
+            # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
+            glossary=build_glossary_view(glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases()),
         )
         _write(out_dir / "glossary" / "index.html", glossary_html)
         written.append("glossary/index.html")

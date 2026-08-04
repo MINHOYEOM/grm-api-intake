@@ -6321,6 +6321,194 @@ class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
                                  f"reg_ref URL 에 공백 포함: {c['label']!r} -> {url!r}")
 
 
+# [C2] 용어사전→사례 링크 렌더 문구 안의 내부 운영 개념어 노출 검사 대상(예시 나열,
+# CLAUDE.md "내부 운영 개념(Tier·QA칩·GRM 내부 용어)을 화면에 노출하지 마라" 불가침 규칙의
+# 이 링크 한정 적용). 단어 경계 매치라 "qa" 가 다른 한글/영문 단어 부분문자열에 오탐하지
+# 않는다(카드 텍스트 자체가 짧은 고정 문구+숫자라 애초에 오탐 여지가 거의 없다).
+_GLOSSARY_CASE_LINK_JARGON_TERMS = ("tier", "qa", "scope_status", "raw_signal", "findings", "signal_tier")
+
+
+class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
+    """[C2] 용어사전→사례 링크(glossary_cases.json → /glossary/ "이 용어로 찾은 지적사례
+    N건 보기" 링크) 가 거짓말하거나 조용히 사라지는 걸 막는 가드.
+
+    이 링크는 화면에 건수를 적는다("1,468건"). 링크를 눌렀을 때 다른 검색어로 가면 그
+    숫자는 거짓말이 된다. 데이터 파일이 비거나 용어 id 가 어긋나도 화면은 멀쩡해
+    보인다(링크만 조용히 사라진다) — 그래서 "몇 건 렌더됐다"는 사실 자체를 세어 데이터
+    (items/excluded) 와 정확히 대조한다(하한이 아니라 등식).
+
+    C1 이 병렬로 web/render.py·web/templates/glossary.html 을 고치는 중이므로 이 클래스는
+    두 파일을 절대 편집하지 않고 읽기만 한다(관측 전용). build_glossary_view 의
+    case_q/case_findings/case_count_label/case_href 계약(명세)을 신뢰해 그 필드를
+    직접 조회한다 — case_href 는 rel_root 접두 이전의 원시 필드값이라
+    "findings/index.html?q=" 로 시작해야 정상이다(템플릿은 그 앞에 rel_root 만 붙인다,
+    render.py build_glossary_view 참조)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cases_raw = json.loads(render.GLOSSARY_CASES_FILE.read_text(encoding="utf-8"))
+        cls.items = cases_raw.get("items") or []
+        cls.excluded = cases_raw.get("excluded") or []
+        cls.term_ids = [t["id"] for t in cls.terms]
+        cls.term_id_set = set(cls.term_ids)
+
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glcase_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "glossary" / "index.html").read_text(encoding="utf-8")
+
+        # 뷰모델(공개 경로): 프로덕션 호출부(render.py render_site)와 같은 함수를 같은
+        # 정본 데이터로 돌린다. reg_ref_catalogs 는 이 가드와 무관해 None(WebGlossaryDeepFieldsTest
+        # 관례와 동일 — 카탈로그 부재도 build_glossary_view 가 지원하는 정식 하위호환 경로).
+        cls.view = render.build_glossary_view(cls.terms, None, render.load_glossary_cases())
+        cls.view_by_id = {t["id"]: t for g in cls.view["groups"] for t in g["terms"]}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def setUp(self):
+        # 0건 가드(명세 8) — items(또는 excluded) 가 애초에 비어 있으면 아래 "모든 항목에
+        # 대해 X 다" 류 단언들은 빈 집합에 대한 전칭 단언이 되어 항상 참으로 조용히
+        # 통과해버린다(검사 대상 자체가 사라진 것을 "정상"으로 오판). 이 클래스의 모든
+        # 테스트 앞에 걸어 어떤 메서드도 그 함정을 피해가지 못하게 한다.
+        self.assertGreater(
+            len(self.items), 0,
+            "glossary_cases.json items 가 0건 — 사례 링크 검사 대상 자체가 없다"
+            "(빈 집합에 대한 단언은 항상 참이라 이 상태로는 가드가 무의미하다)")
+        self.assertGreater(
+            len(self.excluded), 0,
+            "glossary_cases.json excluded 가 0건 — 제외 판정 검사 대상 자체가 없다"
+            "(빈 집합에 대한 단언은 항상 참이라 이 상태로는 가드가 무의미하다)")
+
+    def _article_block(self, term_id: str) -> str:
+        marker = f'<article class="gl-term" id="{term_id}"'
+        start = self.html.index(marker, 0)
+        end = self.html.index("</article>", start)
+        return self.html[start:end]
+
+    def test_every_glossary_term_is_decided(self):
+        # glossary.json 200개 id 각각이 items 또는 excluded 에 정확히 한 번 나타나야 한다.
+        counts = collections.Counter(
+            [i["id"] for i in self.items] + [e["id"] for e in self.excluded])
+        missing = [tid for tid in self.term_ids if counts.get(tid, 0) == 0]
+        duplicated = sorted(tid for tid, c in counts.items() if c > 1 and tid in self.term_id_set)
+        self.assertEqual(
+            missing, [],
+            f"glossary.json 에는 있지만 glossary_cases.json 에 결정(items/excluded)이 없는 id "
+            f"{len(missing)}건: {missing}")
+        self.assertEqual(
+            duplicated, [],
+            f"glossary_cases.json items/excluded 에 중복 등장한 id {len(duplicated)}건: {duplicated}")
+
+    def test_case_items_reference_existing_terms(self):
+        # items·excluded 의 모든 id 가 glossary.json 에 실재해야 한다(고아 참조 0).
+        orphan_items = sorted(i["id"] for i in self.items if i["id"] not in self.term_id_set)
+        orphan_excluded = sorted(e["id"] for e in self.excluded if e["id"] not in self.term_id_set)
+        self.assertEqual(
+            orphan_items, [],
+            f"glossary_cases.json items 가 glossary.json 에 없는 id 를 참조(고아): {orphan_items}")
+        self.assertEqual(
+            orphan_excluded, [],
+            f"glossary_cases.json excluded 가 glossary.json 에 없는 id 를 참조(고아): {orphan_excluded}")
+
+    def test_case_items_are_wellformed(self):
+        # q 비어있지 않음 · findings >= 1 · documents >= 1. 0건짜리가 items 에 있으면 실패
+        # ("0건 보기" 링크는 만들지 않는다는 규칙의 강제 — build_glossary_view 는 이 게이트를
+        # 신뢰하고 findings==0 이면 case_href 를 만들지 않을 뿐, items 데이터 자체의 형식
+        # 위반은 여기서 잡는다).
+        bad = []
+        for it in self.items:
+            tid = it.get("id")
+            q = it.get("q")
+            findings = it.get("findings")
+            documents = it.get("documents")
+            if not (isinstance(q, str) and q.strip()):
+                bad.append((tid, f"q={q!r}"))
+            if not (isinstance(findings, int) and not isinstance(findings, bool) and findings >= 1):
+                bad.append((tid, f"findings={findings!r}"))
+            if not (isinstance(documents, int) and not isinstance(documents, bool) and documents >= 1):
+                bad.append((tid, f"documents={documents!r}"))
+        self.assertEqual(bad, [], f"items 형식 위반(q 비어있음/findings<1/documents<1): {bad}")
+
+    def test_case_links_render_at_expected_count(self):
+        # 렌더된 사례 링크 개수 == len(items). 상수 하한이 아니라 정확히 일치해야 한다
+        # (데이터에 있는데 안 그려지면 배선이 깨진 것이고, 데이터보다 더 그려지면 excluded
+        # 나 고아 id 에도 링크가 새는 것이다 — 등식만이 두 방향 결손을 동시에 잡는다).
+        rendered = self.html.count('class="gl-case-a"')
+        self.assertEqual(
+            rendered, len(self.items),
+            f"렌더된 사례 링크 {rendered}건 != glossary_cases.json items {len(self.items)}건 — "
+            "배선이 깨졌거나(적음) excluded/고아 id 로 링크가 샜다(많음)")
+
+    def test_case_link_href_is_encoded_search_url(self):
+        from urllib.parse import quote as _expected_quote
+
+        for it in self.items:
+            tid = it["id"]
+            t = self.view_by_id.get(tid)
+            self.assertIsNotNone(t, f"{tid} 가 build_glossary_view 뷰모델에 없음")
+            expected_href = f"findings/index.html?q={_expected_quote(it['q'], safe='')}"
+            self.assertTrue(
+                t["case_href"].startswith("findings/index.html?q="),
+                f"{tid} case_href 가 'findings/index.html?q=' 로 시작하지 않음: {t['case_href']!r}")
+            self.assertEqual(
+                t["case_href"], expected_href,
+                f"{tid} case_href 불일치(검색어가 링크와 어긋남 — 눌렀을 때 다른 결과가 나온다): "
+                f"{t['case_href']!r} != {expected_href!r}")
+            # 렌더된 HTML 에도 같은 href 값이 그대로 실렸는지(템플릿이 rel_root 만 앞에
+            # 붙이고 값 자체는 변형하지 않는지) — 뷰모델 대조만으론 배선 유실을 못 잡는다.
+            self.assertIn(
+                f'href="../{expected_href}"', self.html,
+                f"{tid} 의 사례 링크 href 가 렌더에 없음(값이 유실됐거나 변형됨): {expected_href!r}")
+
+        # 한글 검색어가 실제로 인코딩된 채 나가는지 최소 1건 이상 직접 확인(예: 품질관리).
+        korean_items = [it for it in self.items if any(ord(ch) > 0x7F for ch in it["q"])]
+        self.assertGreater(
+            len(korean_items), 0,
+            "items 에 한글 검색어 표본이 없어 인코딩 가드를 검증할 수 없다")
+        for it in korean_items:
+            raw_href_fragment = f'href="../findings/index.html?q={it["q"]}"'
+            self.assertNotIn(
+                raw_href_fragment, self.html,
+                f"{it['id']} 의 한글 검색어 '{it['q']}' 가 URL 인코딩되지 않은 채 href 에 그대로 나감")
+
+    def test_excluded_terms_have_no_case_link(self):
+        # excluded 에 있는 용어의 카드에는 사례 링크가 없어야 한다(id 앵커 기준 확인).
+        leaked = [e["id"] for e in self.excluded if "gl-case-a" in self._article_block(e["id"])]
+        self.assertEqual(
+            leaked, [],
+            f"excluded 판정을 받은 용어인데 사례 링크가 렌더됨(제외가 지켜지지 않음): {leaked}")
+
+    def test_excluded_entries_state_a_reason(self):
+        # excluded 의 모든 항목에 비어있지 않은 reason 이 있어야 한다(왜 뺐는지 기록 없이
+        # 조용히 빼는 걸 막는다).
+        bad = [e.get("id") for e in self.excluded
+               if not (isinstance(e.get("reason"), str) and e.get("reason").strip())]
+        self.assertEqual(bad, [], f"reason 이 비어있는(또는 공백뿐인) excluded 항목: {bad}")
+
+    def test_case_link_wording_has_no_internal_jargon(self):
+        # 렌더된 링크 문구(anchor 여는 태그의 '>' 다음부터 '</a>' 까지 — href 속성은 제외,
+        # href 에는 "findings/index.html?q=..." 가 정상적으로 들어있어 문자열 검사에
+        # 섞으면 오탐한다)에 Tier·QA·scope_status·raw_signal·findings·signal_tier 같은
+        # 내부 운영 개념어가 노출되지 않는지 확인한다.
+        anchors_inner = re.findall(
+            r'<a class="gl-case-a" href="[^"]*">(.*?)</a>', self.html, flags=re.S)
+        self.assertEqual(
+            len(anchors_inner), len(self.items),
+            f"gl-case-a 앵커 텍스트 추출 {len(anchors_inner)}건 != items {len(self.items)}건 "
+            "— 정규식이 실제 마크업과 어긋났을 수 있다(추출 자체가 못 미더우면 이하 단언이 무의미)")
+        offenders = []
+        for text in anchors_inner:
+            for term in _GLOSSARY_CASE_LINK_JARGON_TERMS:
+                if re.search(rf'(?<![\w-]){re.escape(term)}(?![\w-])', text, flags=re.I):
+                    offenders.append((term, text))
+        self.assertEqual(
+            offenders, [],
+            f"사례 링크 문구에 내부 운영 개념어가 노출됨(사용자에게 GRM 내부 용어가 보임): {offenders}")
+
+
 def freeze() -> None:
     GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_freeze_"))

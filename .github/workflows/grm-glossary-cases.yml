@@ -1,0 +1,165 @@
+name: GRM Glossary Cases Refresh
+
+# 용어사전 "이 용어로 찾은 지적사례 N건 보기" 링크의 건수를 주 1회 자동 재측정한다
+# (glossary_cases_refresh.py). 자료실 자동 갱신(grm-library-staging.yml, 일요일 18:23 UTC =
+# 월요일 03:23 KST)과 **다른 요일**에 잡는다 — 같은 시간대에 겹치면 두 워크플로우가 각자
+# web/tests/golden 을 재동결해 main 기준으로 순차 PR 을 만들 때 두 번째 PR 이 첫 번째의
+# 골든 변경을 못 본 채로 브랜치를 따서(둘 다 main 에서 분기) 머지 경합/충돌 가능성이 생긴다.
+# → 목요일 18:15 UTC(= 금요일 03:15 KST)로 분리한다. 자료실=일→월 새벽, 용어사전=목→금 새벽 —
+# 서로 다른 조용한 새벽 창이라 겹칠 일이 없고, 기존 크론 목록(전 워크플로우) 어디와도 안 겹친다.
+#
+# 흐름은 grm-library-staging.yml 과 같은 사상: refresh(항목별 격리 실패·게이트 판정) →
+# 변경 있으면 골든 재동결 → PR 생성 → 게이트 통과분만 CI 디스패치 후 자동 머지, 경고가 있으면
+# automation-warning 라벨을 붙여 사람 검토로 남긴다. 새 시크릿/변수 없음 — SUPABASE_URL·
+# SUPABASE_ANON_KEY(둘 다 repo Variables, grm-web-deploy.yml/grm-supabase-keepalive.yml 과
+# 공유)와 GH_TOKEN 시크릿 폴백 체인(grm-library-staging.yml 과 동일)을 그대로 재사용한다.
+
+on:
+  schedule:
+    - cron: '15 18 * * 4'
+  workflow_dispatch:
+    inputs:
+      large_change_percent:
+        description: '항목별 findings 변동 상한 %(초과 시 리포트에 표시 — 값은 반영됨)'
+        required: true
+        default: '50'
+      fail_abort_percent:
+        description: '전체 항목 중 재측정 실패 비율 상한 %(도달 시 전면 중단, 파일 미기록)'
+        required: true
+        default: '20'
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: grm-glossary-cases-auto-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LARGE_CHANGE_PCT: ${{ inputs.large_change_percent || '50' }}
+      FAIL_ABORT_PCT: ${{ inputs.fail_abort_percent || '20' }}
+      BRANCH: automation/glossary-cases-auto-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      REPORT_PATH: web/data/glossary_cases_refresh_report.json
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Create isolated candidate branch
+        run: git switch -c "$BRANCH"
+      # ── 재측정(항목별 격리 실패·0건 유지·±50% 표시). ≥fail_abort_percent% 실패면 이 스텝이
+      #    exit 1 로 하드 실패한다(library_staging_build.py 의 "과반 실패 시 전면 중단"과 같은
+      #    관례) — 파일은 이미 아무것도 못 썼으므로 아래 diff 스텝도 어차피 변경 0 이 되지만,
+      #    "실패로 끝낸다"를 잡 상태(빨강)로도 드러내기 위해 continue-on-error 를 두지 않는다.
+      - name: Refresh glossary case counts (findings_search RPC)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python glossary_cases_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY" \
+            --large-change-pct "$LARGE_CHANGE_PCT" \
+            --fail-abort-pct "$FAIL_ABORT_PCT" \
+            --report "$REPORT_PATH"
+      - name: Detect meaningful changes
+        id: changes
+        run: |
+          if git diff --quiet -- web/data/glossary_cases.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No glossary case count changes; no PR will be created." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Freeze renderer-produced goldens
+        if: steps.changes.outputs.changed == 'true'
+        run: python web/tests/test_render.py --freeze
+      - name: Read gate decision
+        if: steps.changes.outputs.changed == 'true'
+        id: gate
+        run: |
+          echo "allowed=$(jq -r '.gate.automatic_merge_allowed' "$REPORT_PATH")" >> "$GITHUB_OUTPUT"
+      - name: Commit and open candidate PR
+        if: steps.changes.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- web/data/glossary_cases.json "$REPORT_PATH" web/tests/golden
+          git commit -m "chore: refresh glossary case counts"
+          git push -u origin "$BRANCH"
+          COUNTS=$(jq -r '.counts | "갱신 \(.updated) · 무변동 \(.unchanged) · 0건유지 \(.zero_kept) · 변동큼 \(.large_change) · 실패 \(.failed)"' "$REPORT_PATH")
+          REASONS=$(jq -r 'if (.gate.review_reasons | length) == 0 then "- None (automatic merge eligible)" else .gate.review_reasons | map("- " + .) | join("\n") end' "$REPORT_PATH")
+          WARNINGS=$(jq -r 'if (.warnings | length) == 0 then "" else (.warnings | map("- " + .) | join("\n")) end' "$REPORT_PATH")
+          cat > /tmp/pr-body.md <<EOF
+          Automated weekly refresh of glossary case-count links (findings_search RPC, same function as /findings/).
+
+          ## Counts
+          $COUNTS
+
+          ## Safety gates
+          - Thresholds: large_change_pct=${LARGE_CHANGE_PCT}% (flagged, value still applied) · fail_abort_pct=${FAIL_ABORT_PCT}% (would abort with no write)
+          - \`q\` (search terms) and \`excluded\` are never modified by this script — human-curated.
+
+          ## Review reasons
+          $REASONS
+
+          ## Warnings
+          $WARNINGS
+
+          Live data and renderer-produced goldens are committed together. Automatic merge occurs only after the explicit GRM CI dispatch succeeds.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh glossary case counts" \
+            --body-file /tmp/pr-body.md
+          PR_NUMBER=$(gh pr view "$BRANCH" --json number -q .number)
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+      - name: Mark review-required candidate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed != 'true'
+        run: gh pr edit "${{ steps.pr.outputs.number }}" --add-label automation-warning
+      - name: Dispatch CI gate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        id: ci
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run grm-ci.yml --ref "$BRANCH"
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID=$(gh run list --workflow grm-ci.yml --branch "$BRANCH" \
+              --event workflow_dispatch --limit 10 \
+              --json databaseId,headSha,createdAt \
+              --jq ".[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$STARTED\") | .databaseId" \
+              | head -n 1)
+            [ -n "$RUN_ID" ] && break
+            sleep 5
+          done
+          [ -n "$RUN_ID" ] || { echo "CI dispatch run not found" >&2; exit 1; }
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          gh run watch "$RUN_ID" --exit-status
+      - name: Merge only after green CI
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "$REPORT_PATH" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi

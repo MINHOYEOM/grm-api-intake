@@ -40,6 +40,26 @@ OPTIONAL_FIELDS: dict[str, type] = {"week": str}
 ALLOWED_SOURCE_TYPES = frozenset({"glossary", "brief", "finding", "external"})
 ALLOWED_DIFFICULTIES = frozenset({"easy", "normal"})
 
+# ── 출제 품질 게이트(2026-08-04) ────────────────────────────────────────────────
+# 스키마·링크 실재만 보던 종전 게이트는 "형식은 맞지만 지문을 안 읽어도 풀리는" 문항을
+# 통과시켰다.  실측(45문항): "가장 긴 선택지 찍기" 전략의 기대 정답률이 전체 63.7%,
+# 주차 생성분 76.4%(무작위 25%).  아래 세 규칙은 그 새는 구멍을 기계로 막는다.
+#
+# 면제 주차 — 규율 신설 이전에 이미 공개된 주차다.  뱅크는 append-only 이고 공개된
+# 문항은 불변이므로(운영설계 addendum §2) 소급 수정 대신 명시 집합으로 면제한다.
+# 이 집합은 **줄어들기만 한다** — 신규 주차를 여기에 추가해 게이트를 우회하지 않는다.
+GRANDFATHERED_WEEKS = frozenset({"202630", "202631", "202632"})
+
+# 한 주차 세트의 문항 수 상한.  클라이언트(web/assets/quiz.js)가 이번 주 세트를
+# WEEKLY_QUIZ_COUNT 개로 slice 하므로 이 값을 넘겨 생성한 문항은 화면에 영영 뜨지
+# 않는다(조용한 유실).  web/render.py 의 WEEKLY_QUIZ_COUNT 와 같아야 하며 두 값의
+# 일치는 web/tests/test_render.py 가 고정한다.
+WEEKLY_QUIZ_COUNT = 4
+WEEKLY_QUIZ_MIN = 3
+
+# 정답이 오답 최장보다 이만큼(문자) 길면 길이만 보고 정답을 고를 수 있다고 본다.
+ANSWER_LENGTH_LEAD_MAX = 12
+
 # Machine-readable schema kept beside the dependency-free validator.  The manual
 # checks below implement this contract without adding jsonschema to requirements.
 QUIZ_BANK_SCHEMA: dict[str, Any] = {
@@ -407,6 +427,112 @@ def _validate_source(
         report.add("BRIEF_ANCHOR", location, f"{publish_date} 브리프에 카드 id {anchor!r}가 없습니다")
 
 
+def _choice_lengths(item: dict[str, Any]) -> tuple[int, int] | None:
+    """(정답 길이, 오답 중 최장 길이).  스키마가 이미 깨진 항목은 None(중복 보고 회피)."""
+    choices = item.get("choices")
+    answer_index = item.get("answer_index")
+    if not isinstance(choices, list) or len(choices) != 4:
+        return None
+    if type(answer_index) is not int or not 0 <= answer_index < len(choices):
+        return None
+    if not all(isinstance(choice, str) for choice in choices):
+        return None
+    lengths = [len(choice.strip()) for choice in choices]
+    others = [lengths[i] for i in range(len(lengths)) if i != answer_index]
+    return lengths[answer_index], max(others)
+
+
+def _is_gated(item: dict[str, Any]) -> bool:
+    """출제 품질 게이트 적용 대상인가 — week 를 가진 비면제 주차 문항만.
+
+    legacy pool(week 없음)과 GRANDFATHERED_WEEKS 는 규율 신설 이전 공개분이다.  신규
+    문항은 week 가 필수이므로(운영설계 addendum §2) 이 조건은 "앞으로 생성되는 모든
+    문항"과 같다 — 면제는 과거로 닫혀 있고 미래로 열려 있지 않다.
+    """
+    week = item.get("week")
+    return isinstance(week, str) and bool(week) and week not in GRANDFATHERED_WEEKS
+
+
+def _validate_answer_length(item: dict[str, Any], index: int, report: LintReport) -> None:
+    """문항 단위 길이 편향 — 정답만 유독 길면 지문을 안 읽어도 답이 드러난다."""
+    if not _is_gated(item):
+        return
+    lengths = _choice_lengths(item)
+    if lengths is None:
+        return
+    lead = lengths[0] - lengths[1]
+    if lead >= ANSWER_LENGTH_LEAD_MAX:
+        report.add(
+            "ANSWER_LENGTH_LEAD",
+            _item_location(index, item),
+            f"정답이 오답 최장보다 {lead}자 깁니다 — 길이만 보고 고를 수 있습니다 "
+            f"(허용 {ANSWER_LENGTH_LEAD_MAX - 1}자 이하)",
+        )
+
+
+def _validate_week_sets(data: list[Any], report: LintReport) -> None:
+    """주차 세트 단위 게이트 — 문항 수·출처 구성·난이도 구성·길이 편향 쏠림.
+
+    문항 하나하나는 멀쩡해도 세트로 묶였을 때 "그 주 브리프를 안 읽으면 전부 찍기"이거나
+    "가장 긴 것만 찍으면 과반"이 될 수 있다.  그 구멍은 세트 단위로만 보인다.
+    """
+    weeks: dict[str, list[dict[str, Any]]] = {}
+    for item in data:
+        if isinstance(item, dict) and _is_gated(item):
+            weeks.setdefault(item["week"], []).append(item)
+
+    for week in sorted(weeks):
+        entries = weeks[week]
+        location = f"week[{week}]"
+        count = len(entries)
+
+        if not WEEKLY_QUIZ_MIN <= count <= WEEKLY_QUIZ_COUNT:
+            report.add(
+                "WEEK_SIZE",
+                location,
+                f"주차 세트는 {WEEKLY_QUIZ_MIN}~{WEEKLY_QUIZ_COUNT}문항이어야 합니다 "
+                f"(현재 {count}문항 — {WEEKLY_QUIZ_COUNT}문항 초과분은 화면에 뜨지 않습니다)",
+            )
+
+        sources = Counter(
+            item["source_type"] for item in entries if isinstance(item.get("source_type"), str)
+        )
+        if not sources.get("glossary"):
+            report.add(
+                "WEEK_SOURCE_MIX",
+                location,
+                "주차 세트에 개념 문항(source_type=glossary)이 없습니다 — 그 주 브리프를 "
+                "읽지 않은 사람에게는 전 문항이 찍기가 됩니다",
+            )
+
+        difficulties = Counter(
+            item["difficulty"] for item in entries if isinstance(item.get("difficulty"), str)
+        )
+        easy, normal = difficulties.get("easy", 0), difficulties.get("normal", 0)
+        if not 1 <= normal <= 2:
+            report.add(
+                "WEEK_DIFFICULTY_MIX", location,
+                f"normal 은 1~2문항이어야 합니다 (현재 {normal}문항)",
+            )
+        if easy < normal:
+            report.add(
+                "WEEK_DIFFICULTY_MIX", location,
+                f"easy 가 normal 보다 적을 수 없습니다 (현재 easy={easy}, normal={normal})",
+            )
+
+        longest = sum(
+            1 for item in entries
+            if (lengths := _choice_lengths(item)) is not None and lengths[0] > lengths[1]
+        )
+        if longest * 2 > count:
+            report.add(
+                "WEEK_LONGEST_ANSWER",
+                location,
+                f"{count}문항 중 {longest}문항에서 정답이 유일 최장 선택지입니다 — "
+                '"가장 긴 것 찍기"로 과반이 풀립니다 (과반 미만이어야 합니다)',
+            )
+
+
 def lint_quiz_bank(
     quiz_bank: Path = DEFAULT_QUIZ_BANK,
     glossary: Path = DEFAULT_GLOSSARY,
@@ -458,6 +584,8 @@ def lint_quiz_bank(
             report.week_counts[week] += 1
         _validate_internal_concepts(item, index, report)
         _validate_source(item, index, report, glossary_ids, brief_index)
+        _validate_answer_length(item, index, report)
+    _validate_week_sets(data, report)
     return report
 
 

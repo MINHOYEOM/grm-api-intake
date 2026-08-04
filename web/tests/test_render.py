@@ -7889,9 +7889,13 @@ out.noweek = f(mk(), 4, 202629);                    // week 전무 → 기존 �
 var w = mk(); w[5].week = "202629"; w[10].week = "202629";
 out.week = f(w, 4, 202629);                         // 지정 2 + 회전 보충 2
 var o = mk(); o[5].week = "202629"; o[10].week = "202629"; o[3].week = "202630";
-out.other = f(o, 4, 202629);                        // 타 주차 지정은 rest 취급
+out.other = f(o, 4, 202629);                        // 타 주차 문항은 폴백에서도 제외
 var all = mk(); all.forEach(function (it) { it.week = "202629"; });
 out.overflow = f(all, 4, 202629);                   // 지정 초과 → 뱅크 순 상위 count
+var past = mk(); past.forEach(function (it, i) { if (i < 6) it.week = "202628"; });
+out.pastOnly = f(past, 4, 202629);                  // 이번 주 지정 0 → legacy 만으로 폴백
+var allPast = mk(); allPast.forEach(function (it) { it.week = "202628"; });
+out.allPast = f(allPast, 4, 202629);                // legacy 가 아예 없으면 빈 세트
 console.log(JSON.stringify(out));
 """
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_quizjs_"))
@@ -7910,10 +7914,22 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["noweek"], [0, 1, 7, 9])
         # 지정 2(5·10) + 보충: poolE 7건 baseE=mod(607887,7)=0 → idx0 · poolN 3건 baseN=0 → idx8.
         self.assertEqual(out["week"], [0, 5, 8, 10])
-        # 타 주차(202630) 지정 문항은 이번 주 선정에 영향 없음(rest 로만 참여).
-        self.assertEqual(out["other"], [0, 5, 8, 10])
+        # 타 주차(202630) 문항은 폴백 후보에서도 빠진다 — legacy pool 계약(addendum §3.2).
+        # poolE 는 idx3 이 빠져 6건이 되고 baseE=mod(607887,6)=3 → idx4 가 뽑힌다.
+        self.assertEqual(out["other"], [4, 5, 8, 10])
         # 전 문항 지정 → 뱅크 순 상위 4.
         self.assertEqual(out["overflow"], [0, 1, 2, 3])
+        # 이번 주 지정이 없는 주(생성 스킵·머지 전) — 과거 주차 문항이 "이번 주"로
+        # 재등장하지 않는다. 실제로 2026-08-03 오전 세트에 2주 전 q-202630-01 이 들어갔던
+        # 회귀를 여기서 고정한다.
+        # legacy = idx6~11(easy 6·7, normal 8~11) → baseE=mod(607887,2)=1 → 7,6 ·
+        # baseN=mod(202629,4)=1 → 9,10.
+        self.assertEqual(out["pastOnly"], [6, 7, 9, 10])
+        for idx in out["pastOnly"]:
+            self.assertGreaterEqual(idx, 6, "week 를 가진 과거 문항이 폴백에 섞였습니다")
+        # legacy pool 이 아예 비면 조용히 과거 문항으로 채우지 않고 빈 세트를 낸다
+        # (화면은 "지난 문항으로 복습" 문구 + 전체 보기로 안내 — 거짓 세트를 만들지 않는다).
+        self.assertEqual(out["allPast"], [])
 
 
 # ── 주간 퀴즈 학습 루프(13차) — 복원·완주 요약·오답노트·재도전·필터 ──────────────

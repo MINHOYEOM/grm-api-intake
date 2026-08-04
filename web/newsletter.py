@@ -234,6 +234,19 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     # 소식이므로 뒤에 붙이고, 그 안에서는 콘텐츠(자료 유입)가 제품 공지보다 앞이다.
     if library_html:
         parts.append(library_html)
+    # 주간 퀴즈 진입점 — 전 직원에게 매주 닿는 채널은 이 메일뿐인데 여기 링크가 없었다
+    # (랜딩 CTA·푸터·펫 위젯은 모두 "이미 사이트에 들어온 사람"만 본다). 정적 1줄·데이터
+    # 바인딩 0 이라 문항 수·주차를 여기서 단정하지 않는다(뱅크와 어긋날 여지 0).
+    parts.append(
+        '<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
+        'margin:0 0 24px;background:#FBF8F4">'
+        '<div style="font-size:13px;font-weight:600;color:#A14B30;letter-spacing:.02em;'
+        'margin-bottom:6px">이번 주 퀴즈</div>'
+        '<div style="font-size:14px;line-height:1.7;color:#3D3D3A">'
+        '이번 주 소식과 규제·품질 용어로 만든 짧은 퀴즈예요. 3분이면 충분합니다.</div>'
+        f'<a href="{e(base)}/quiz/" style="display:inline-block;margin-top:10px;color:#A14B30;'
+        'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
+        'border-radius:9999px;padding:7px 15px">퀴즈 풀어보기 →</a></div>')
     if updates_html:
         parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).

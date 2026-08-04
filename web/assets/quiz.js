@@ -20,9 +20,15 @@
   // [9차 G3] 주간 선택 — 순수 함수(DOM 무접촉·테스트 대상). items = [{index(뱅크순),
   // difficulty("easy"|"normal"), week("YYYYWW"|"")}]. 반환 = 선정 문항 index 오름차순.
   // 규칙: ① week===String(seed) 문항을 뱅크 순으로 최대 count 개 우선(초과분은 잘림 —
-  // 지정분 난이도 구성은 생성 파이프라인 책임) ② 부족분은 나머지 문항에서 기존 회전
-  // (normal 1~2 제한·easy 과반·seed 기반 결정론)으로 보충 ③ week 미보유 뱅크(현 데이터)는
+  // 지정분 난이도 구성은 생성 파이프라인 책임) ② 부족분은 **week 없는 legacy pool 에서만**
+  // 기존 회전(normal 1~2 제한·easy 과반·seed 기반 결정론)으로 보충 ③ week 미보유 뱅크는
   // ①이 공집합이라 기존 회전과 산식·결과 동일(무회귀).
+  //
+  // ②의 "legacy pool 에서만"이 핵심이다(운영설계 addendum §3.2). 종전에는 pinned 만
+  // 빼고 나머지를 전부 후보로 삼아, 생성이 걸러진 주에 **지난주·지지난주 문항이 "이번 주
+  // 퀴즈"로 다시 떴다** — 2026-08-03 오전(그 주 생성 머지 전) 세트에 2주 전 q-202630-01 이
+  // 실제로 들어갔다. 과거 주차 문항은 "전체 문항"에서 언제든 볼 수 있으므로 폴백에서
+  // 빼도 잃는 것이 없고, 대신 "이번 주"라는 말이 거짓이 되지 않는다.
   function pickWeeklyIndexes(items, weeklyCount, seed) {
     var count = Math.min(weeklyCount, items.length);
     var wk = String(seed);
@@ -32,8 +38,9 @@
     var chosen = pinned.slice();
     var need = count - pinned.length;
     if (need > 0) {
-      var poolE = items.filter(function (it) { return it.difficulty === "easy" && !inPinned[it.index]; });
-      var poolN = items.filter(function (it) { return it.difficulty !== "easy" && !inPinned[it.index]; });
+      var legacy = items.filter(function (it) { return !it.week && !inPinned[it.index]; });
+      var poolE = legacy.filter(function (it) { return it.difficulty === "easy"; });
+      var poolN = legacy.filter(function (it) { return it.difficulty !== "easy"; });
       var normalCount = Math.min(need >= 5 ? 2 : 1, poolN.length, need);
       var easyCount = Math.min(need - normalCount, poolE.length);
       normalCount = Math.min(need - easyCount, poolN.length);
@@ -94,6 +101,11 @@
   });
 
   var weekSeed = isoWeekSeed(new Date());
+  // 이번 주 지정 세트가 실제로 있는가. 없으면 아래는 legacy 복습 세트다 — ISO 주차는
+  // 월요일 00:00 에 넘어가는데 생성 머지는 그날 13시대라(3주 실측 13:18·13:15·15:24),
+  // 아침에 브리프를 보고 들어온 사람은 매주 이 구간에 들어온다. 그때 "이번 주에 뽑은
+  // 4문항이에요"라고 단언하면 오후 접속자와 다른 세트를 보면서도 같다고 듣게 된다.
+  var hasPinnedSet = items.some(function (it) { return it.week === String(weekSeed); });
   var weeklySet = {};
   pickWeeklyIndexes(items, weeklyCount, weekSeed).forEach(function (i) { weeklySet[i] = true; });
   var weekly = cards.filter(function (c) { return !!weeklySet[c.getAttribute("data-index")]; });
@@ -136,8 +148,12 @@
     }
     if (emptyEl) emptyEl.hidden = shown > 0;
     if (mode === "weekly") {
-      if (titleEl) titleEl.textContent = "이번 주 퀴즈";
-      if (subEl) subEl.textContent = "이번 주에 뽑은 " + weekly.length + "문항이에요. 같은 주에는 모두 같은 문제를 풀어요.";
+      if (titleEl) titleEl.textContent = hasPinnedSet ? "이번 주 퀴즈" : "지난 문항으로 복습";
+      if (subEl) {
+        subEl.textContent = hasPinnedSet
+          ? "이번 주에 뽑은 " + weekly.length + "문항이에요. 같은 주에는 모두 같은 문제를 풀어요."
+          : "이번 주 문항은 아직 준비 중이에요. 그동안 지난 " + weekly.length + "문항으로 복습해 보세요.";
+      }
       if (toggle) { toggle.textContent = "전체 " + cards.length + "문항 풀기"; toggle.setAttribute("aria-pressed", "false"); }
     } else {
       if (titleEl) titleEl.textContent = "전체 문항";
@@ -205,6 +221,8 @@
     resultEl.hidden = !complete;
     if (!complete) { resultShown = false; return; }
 
+    var titleNode = resultEl.querySelector(".qz-result-title");
+    if (titleNode) titleNode.textContent = hasPinnedSet ? "이번 주 퀴즈 완주!" : "복습 완주!";
     if (resultScoreEl) resultScoreEl.textContent = s.total + "문제 중 " + s.right + "개를 맞혔어요.";
     if (resultNoteEl) {
       resultNoteEl.textContent = s.wrong.length
@@ -329,7 +347,8 @@
   if (shareBtn) {
     shareBtn.addEventListener("click", function () {
       var s = weeklyStats();
-      var text = "이번 주 GRM 규제 퀴즈 " + s.right + "/" + s.total + " 🦉\n" +
+      var text = (hasPinnedSet ? "이번 주 GRM 규제 퀴즈 " : "GRM 규제 퀴즈 복습 ") +
+                 s.right + "/" + s.total + " 🦉\n" +
                  window.location.origin + window.location.pathname;
       function done() {
         shareBtn.textContent = "복사했어요";

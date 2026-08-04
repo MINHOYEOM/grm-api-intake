@@ -1131,6 +1131,19 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
     return None
 
 
+# ── [용어사전 A1] 동의어(aliases) 표시 중복판정 ─────────────────────────────────
+def _glossary_alias_norm(s: str) -> str:
+    """[용어사전 A1] 동의어 표시 중복판정 전용 정규화(소문자화 + 하이픈·공백 제거). 순수 함수.
+
+    표제어가 `Back-up` 인데 동의어 `backup` 을 화면에 "다른 표현"으로 나란히 보여주면
+    표기 차이(하이픈·띄어쓰기)만 있는 같은 말을 두 번 보여주는 잡음이다. 반대로
+    `Retention Sample` 에 대한 `reserve sample` 은 하이픈·공백을 지워도 표제어 안에
+    없는 진짜 다른 이름이라 감추면 안 된다 — FDA 문서에서 그 표현을 보고 온 사용자가
+    화면에서 알아볼 단서다. 이 정규화는 감춤 판정에만 쓰며 표시 텍스트 자체(term_en/
+    term_ko/aliases 원문)는 무변형으로 남는다."""
+    return re.sub(r"[-\s]+", "", s.lower())
+
+
 def build_glossary_view(
     terms: list[dict[str, Any]],
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
@@ -1139,13 +1152,20 @@ def build_glossary_view(
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
     related 는 데이터 순서 그대로 유지하며 존재하는 id 만 term_ko 라벨과 함께 통과(고아
-    참조는 조용히 제외). search 는 term_ko/term_en/easy_ko(+detail_ko 있을 때만)를 소문자
-    결합(클라이언트 필터 입력값 — 표시 텍스트 무변형, 검색 대상 문자열만 별도 파생).
-    detail_ko(실무 맥락 설명)·reg_refs(관련 조항 참조)는 병렬 작업자가 데이터에 추가할
-    선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로 정규화, reg_ref_catalogs 가 있으면
-    B2 URL 해석기가 자료실 카탈로그로 링크를 채운다), 없으면 빈 값이라 기존 렌더와 byte
-    동일(search 에도 잉여 공백 미추가). reg_ref_catalogs 미지정 시 URL 은 모두 ""(호출부
-    호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론.
+    참조는 조용히 제외). search 는 term_ko/term_en/easy_ko(+detail_ko 있을 때만, +aliases
+    있을 때만)를 소문자 결합(클라이언트 필터 입력값 — 표시 텍스트 무변형, 검색 대상
+    문자열만 별도 파생). detail_ko(실무 맥락 설명)·reg_refs(관련 조항 참조)는 병렬
+    작업자가 데이터에 추가할 선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로
+    정규화, reg_ref_catalogs 가 있으면 B2 URL 해석기가 자료실 카탈로그로 링크를 채운다),
+    없으면 빈 값이라 기존 렌더와 byte 동일(search 에도 잉여 공백 미추가). reg_ref_catalogs
+    미지정 시 URL 은 모두 ""(호출부 호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론.
+
+    aliases([A1] 동의어, glossary.json 정본 — 여기서 수정 안 함)는 검색용과 표시용이
+    다르다. search 에는 항상 전량 포함(사용자가 FDA 표현으로 검색해도 걸리도록).
+    뷰모델 "aliases" 키(표시용)는 _glossary_alias_norm 판정으로 표제어(term_ko 또는
+    term_en)와 하이픈·공백 차이만 있는 표현만 골라 제외한 나머지만 담는다(원본 순서
+    유지). aliases 없으면 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략,
+    search 도 기존과 byte 동일.
 
     cases(glossary_cases.json items, id→item)는 [C1] 사례 링크 심화 필드 — 있으면
     case_q/case_findings/case_count_label/case_href 를 채운다(id 가 cases 에 없으면
@@ -1165,6 +1185,16 @@ def build_glossary_view(
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
             search_parts.append(detail_ko)
+        aliases = list(t.get("aliases") or [])
+        if aliases:
+            search_parts.extend(aliases)
+        # [A1] 표시용: 표제어와 하이픈·공백 차이만 있는 동의어는 잡음이라 제외(감춤은
+        # 화면뿐 — search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
+        norm_ko = _glossary_alias_norm(t["term_ko"])
+        norm_en = _glossary_alias_norm(t["term_en"])
+        display_aliases = [a for a in aliases
+                            if _glossary_alias_norm(a) not in norm_ko
+                            and _glossary_alias_norm(a) not in norm_en]
         case = cases.get(t["id"]) or {}
         case_q = str(case.get("q") or "")
         try:
@@ -1187,6 +1217,9 @@ def build_glossary_view(
             # v3(8차 웨이브 A): 심화 필드 — 부재 시 ""/[] 라 템플릿 {% if %} 게이트로 조용히 생략.
             "detail_ko": detail_ko,
             "reg_refs": reg_refs,
+            # [A1] 표시용 동의어(표제어와 하이픈·공백만 다른 것 제외) — 부재/전량제외 시
+            # 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략.
+            "aliases": display_aliases,
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
             "case_q": case_q,
             "case_findings": case_findings,

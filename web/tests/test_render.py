@@ -118,6 +118,70 @@ def _classify_reg_ref_family(label: str) -> str | None:
     return None
 
 
+# ── [A3] FDA 표현 → 용어 도달 가드 — 탐침 표(실측치 근거) ─────────────────────────
+# 배경: 용어사전은 유럽·ICH 어휘로 쓰였는데 실제 지적사항은 미국 FDA 문서가 대부분이다.
+# 같은 개념을 다르게 불러서, 사용자가 FDA 문서에서 본 말로 검색하면 아무것도 안 나왔다.
+#
+# 구현 전 실측(2026-08-03/04, aliases 가 search 에 배선되기 전 — WebGlossaryAliasGuardTest
+# 와 동일한 판정 방법으로 직접 확인): 아래 15개 FDA 표현으로 검색했을 때 **도달 0/15**
+# 였다. 개념(retention-sample·quality-unit 등)은 이미 사전에 있었지만, 사용자가 FDA
+# 문서에서 본 이름으로는 하나도 찾을 수 없었다.
+#
+# 판정 방법은 클라이언트(assets/glossary.js)가 실제로 하는 것과 동일하다(파일 직접
+# 확인, 08-04):
+#   var q = input.value.trim().toLowerCase();
+#   var hit = q === "" || (terms[i].getAttribute("data-search") || "").indexOf(q) !== -1;
+# data-search 는 템플릿(glossary.html)이 `{{ t.search }}` 로 채우고, build_glossary_view
+# 가 만드는 t["search"] 는 이미 소문자 결합이다 — 그래서 이 파일에서도
+# "검색어.lower() in t['search']" 로 같은 부분일치 판정을 재현한다(단어경계 아님, JS
+# indexOf 와 동일 의미론).
+#
+# (검색어, 닿아야 할 용어 id) 쌍 — web/data/glossary.json 에 사람이 코퍼스 실측으로
+# 하나씩 판정해 커밋한 aliases 데이터가 근거다(이 파일은 그 데이터를 고치지 않는다).
+_FDA_ALIAS_PROBES: tuple[tuple[str, str], ...] = (
+    ("reserve sample", "retention-sample"),
+    ("method validation", "analytical-procedure-validation"),
+    ("annual product review", "product-quality-review"),
+    # ↓ 이 둘은 **동의어가 아니라 정식 표제어**로 닿는다(2026-08-04 용어 증설이
+    #   'Quality Control Unit (QCU)'·'Written Procedures' 를 표제어로 올렸다). 같은 말을
+    #   표제어와 동의어가 둘 다 주장하면 사용자가 틀린 카드를 보므로 quality-unit·sop
+    #   쪽 동의어는 뺐다. 검색 도달이라는 약속은 그대로 지켜지는지가 여기서 검증된다.
+    ("quality control unit", "quality-control-unit"),
+    ("written procedure", "written-procedure"),
+    ("qualified person", "authorized-person"),
+    ("active substance", "api"),
+    ("marketing authorisation", "marketing-authorization"),
+    ("batch production record", "batch-record"),
+    ("cGMP", "gmp"),
+    ("lyophilisation", "lyophilization"),
+    ("CCIT", "container-closure-integrity"),
+    ("out of trend", "oot"),
+    ("out of specification", "oos"),
+    ("backup", "backup"),
+)
+
+# [A3] 위 15건 중, 화면 표시 목록에서는 감춰지는 동의어 2건(실측 08-04 —
+# render.build_glossary_view 의 _glossary_alias_norm 판정을 직접 돌려 확인: "backup"→
+# backup id 는 term_en "Back-up" 과, "out of trend"→oot id 는 term_en "Out-of-Trend
+# (OOT) Result" 와 하이픈·공백 차이뿐이라 표시 목록(t["aliases"])에서 제외된다). 감춤은
+# 화면 전용 판정이고 검색 문자열(t["search"])에는 영향을 주지 않아야 한다.
+_HIDDEN_DISPLAY_ALIAS_PROBES: tuple[tuple[str, str], ...] = (
+    ("backup", "backup"),
+    ("out of trend", "oot"),
+)
+
+# [A3] 화면 카드에 실제로 그려져야 하는 표시 대상 동의어(표제어와 진짜 다른 이름) 대표
+# 3건 — 위 15건 중 표시 목록에서 감춰지지 않는 것들.
+_DISPLAYED_ALIAS_PROBES: tuple[tuple[str, str], ...] = (
+    ("retention-sample", "reserve sample"),
+    ("product-quality-review", "annual product review"),
+    # quality-unit 의 'quality control unit' 은 뺐다 — 용어 증설(2026-08-04)이 같은 말을
+    # 정식 표제어(quality-control-unit)로 올렸고, 표제어와 동의어가 같은 이름을 주장하면
+    # 사용자가 틀린 카드를 본다. 대신 다른 계열에서 하나 고른다.
+    ("authorized-person", "qualified person"),
+)
+
+
 # ── 빌드 헬퍼 (테스트·freeze 공용 — 동일 입력 보장) ───────────────────────────
 def _build_single(out: pathlib.Path) -> None:
     render.render_site(SINGLE_FIXTURES, out)
@@ -6519,6 +6583,138 @@ class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
         self.assertEqual(
             offenders, [],
             f"사례 링크 문구에 내부 운영 개념어가 노출됨(사용자에게 GRM 내부 용어가 보임): {offenders}")
+
+
+class WebGlossaryAliasGuardTest(unittest.TestCase):
+    """[A3] "FDA 표현으로 검색하면 그 용어에 닿는가" 가드.
+
+    용어사전은 유럽·ICH 어휘로 쓰였는데 실제 지적사항은 미국 FDA 문서가 대부분이다.
+    aliases([A1] 동의어, glossary.json 정본 — 이 클래스는 그 데이터를 수정하지 않는다)는
+    사람이 코퍼스 실측으로 하나씩 판정해 커밋한 값이다(58개 용어·95개 동의어, 2026-08-04).
+    이 가드는 "aliases 필드가 존재한다"가 아니라 "그 필드가 실제로 검색을 열어준다"를
+    검사한다 — 나중에 누가 동의어를 지우면 어떤 FDA 표현이 못 닿게 됐는지 이름을 대며
+    실패해야 한다(_FDA_ALIAS_PROBES 참조, 파일 상단).
+
+    A1/C1 이 병렬로 web/render.py·web/templates/glossary.html 을 고치는 중이므로 이
+    클래스는 두 파일을 절대 편집하지 않고 읽기만 한다(관측 전용 —
+    WebGlossaryCaseLinkGuardTest 와 동일한 관례). build_glossary_view 의 "aliases"
+    (표시용·화면 감춤 필터 적용)/"search"(검색용·동의어 전량 포함) 계약을 신뢰해 그
+    필드를 직접 조회한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.view = render.build_glossary_view(cls.terms)
+        cls.view_by_id = {t["id"]: t for g in cls.view["groups"] for t in g["terms"]}
+
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glalias_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "glossary" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def setUp(self):
+        # 0건 가드(명세 5) — glossary.json 에 aliases 를 가진 용어가 애초에 0개면 아래
+        # 테스트들은 빈 집합에 대한 전칭 단언이 되어 항상 참으로 조용히 통과해버린다
+        # (검사 대상 자체가 사라진 것을 "정상"으로 오판) — WebGlossaryCaseLinkGuardTest·
+        # WebGlossaryRegRefLinkGuardTest 와 동일한 관례. 이 클래스의 모든 테스트 앞에
+        # 걸어 어떤 메서드도 그 함정을 피해가지 못하게 한다.
+        alias_term_count = sum(1 for t in self.terms if t.get("aliases"))
+        self.assertGreater(
+            alias_term_count, 0,
+            "glossary.json 에 aliases 를 가진 용어가 0개 — FDA 표현 도달 가드 자체가 "
+            "검사할 대상이 없다(빈 집합에 대한 단언은 항상 참이라 이 상태로는 가드가 "
+            "무의미하다)")
+
+    def _article_block(self, term_id: str) -> str:
+        marker = f'<article class="gl-term" id="{term_id}"'
+        start = self.html.index(marker, 0)
+        end = self.html.index("</article>", start)
+        return self.html[start:end]
+
+    def test_fda_expressions_reach_their_terms(self):
+        # 구현 전 실측(2026-08-03/04): _FDA_ALIAS_PROBES 의 15개 FDA 표현으로 검색하면
+        # 도달 0/15 였다. 판정은 클라이언트(assets/glossary.js apply())와 같은 방식 —
+        # 검색어.lower() 가 t["search"] 의 부분문자열인지(단어경계 아님, JS indexOf 와
+        # 동일 의미론 — 파일 상단 주석에 근거 인용).
+        misses = []
+        for query, expected_id in _FDA_ALIAS_PROBES:
+            t = self.view_by_id.get(expected_id)
+            if t is None:
+                misses.append(f"{query!r} -> {expected_id!r}(용어 id 자체가 뷰모델에 없음)")
+                continue
+            if query.lower() not in t["search"]:
+                misses.append(f"{query!r} -> {expected_id!r}(search={t['search']!r})")
+        self.assertEqual(
+            misses, [],
+            "FDA 표현이 해당 용어에 안 닿는다(그 이름으로 검색해도 안 나온다) — 검색어와 "
+            "기대 용어 id:\n  " + "\n  ".join(misses))
+
+    def test_alias_is_searchable_even_when_hidden_from_display(self):
+        # backup·out of trend 는 표제어와 하이픈·공백 차이뿐이라 화면 표시 목록([A1]
+        # _glossary_alias_norm 판정)에서는 빠진다 — 하지만 감춤은 화면 전용이라 검색
+        # 문자열에는 항상 전량 남아 있어야 한다. 두 조건(표시 목록에 없음 + 검색엔 있음)을
+        # 다 확인해야 "정말 감춰진 채로도 검색되는지"가 증명된다 — display 확인 없이
+        # search 만 보면 애초에 감춰지지 않은 평범한 케이스를 검사하고 있을 수도 있다.
+        for query, term_id in _HIDDEN_DISPLAY_ALIAS_PROBES:
+            q = query.lower()
+            t = self.view_by_id[term_id]
+            self.assertNotIn(
+                q, [a.lower() for a in t["aliases"]],
+                f"{term_id} 의 {query!r} 이 표시 목록(aliases)에 남아 있다 — 이 테스트가 "
+                "전제하는 '화면에서 감춰진 케이스'가 아니게 됐다(프로브 테이블을 다른 "
+                "예시로 바꿔야 한다)")
+            self.assertIn(
+                q, t["search"],
+                f"{term_id} 의 {query!r} 이 화면에서는 감춰졌는데 검색 문자열에도 없다 — "
+                "감춤이 화면이 아니라 검색까지 막아버렸다(사용자가 이 표현으로 검색하면 "
+                "0건이 된다)")
+
+    def test_displayed_aliases_render_in_card(self):
+        # _DISPLAYED_ALIAS_PROBES 3건이 실제로 해당 용어 카드 HTML 에 그려지는지 —
+        # 뷰모델(t["aliases"])에 값이 있어도 템플릿이 안 그리면 사용자는 못 본다.
+        from markupsafe import escape as _esc_alias
+        for term_id, alias in _DISPLAYED_ALIAS_PROBES:
+            block = self._article_block(term_id)
+            self.assertIn(
+                str(_esc_alias(alias)), block,
+                f"{term_id} 카드 HTML 에 표시 대상 동의어 {alias!r} 가 안 보인다")
+
+    def test_no_alias_collides_with_another_term(self):
+        # glossary_lint.py(_validate_item_aliases, ALIAS_TERM_COLLISION/ALIAS_ALIAS_COLLISION)
+        # 에도 같은 규칙이 있지만, 렌더 산출물 기준으로 한 번 더 막는다 — 검색이 뒤섞이면
+        # 사용자가 틀린 답을 본다. 판정은 대소문자 무시 비교(클라이언트 필터가 검색어와
+        # data-search 를 둘 다 소문자화해 비교하므로, lint 의 글자 그대로(대소문자 구분)
+        # 비교보다 이쪽이 더 엄격하다 — lint 를 통과해도 여기서 걸릴 수 있는 의도된
+        # 이중 방어).
+        owners: dict[str, list[tuple[str, str]]] = collections.defaultdict(list)
+        for t in self.terms:
+            for field_name in ("term_ko", "term_en"):
+                v = t.get(field_name)
+                if isinstance(v, str) and v:
+                    owners[v.lower()].append((t["id"], field_name))
+            for a in t.get("aliases") or []:
+                if isinstance(a, str) and a:
+                    owners[a.lower()].append((t["id"], "aliases"))
+
+        collisions = []
+        for t in self.terms:
+            for a in t.get("aliases") or []:
+                if not (isinstance(a, str) and a):
+                    continue
+                key = a.lower()
+                for owner_id, owner_field in owners.get(key, []):
+                    if owner_id == t["id"]:
+                        continue
+                    collisions.append(f"{t['id']}.aliases({a!r}) == {owner_id}.{owner_field}")
+        self.assertEqual(
+            collisions, [],
+            "동의어가 다른 용어의 표제어(term_ko/term_en) 또는 동의어와 (대소문자 무시) "
+            "동일하다 — 검색이 두 용어 사이에서 뒤섞여 사용자가 틀린 답을 본다:\n  "
+            + "\n  ".join(collisions))
 
 
 def freeze() -> None:

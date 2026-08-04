@@ -1,0 +1,1173 @@
+{
+  "schema": "grm-glossary-cases/v1",
+  "source": "public.findings_search RPC (p_q=q) totals — /findings/?q=q 결과와 동일 함수",
+  "measured_on": "2026-08-04",
+  "curated_on": "2026-08-04",
+  "note": "q 는 사람이 실제 문장을 읽고 정한 값이다. 자동 갱신은 건수만 다시 센다(q 불변).",
+  "items": [
+    {
+      "id": "gmp",
+      "q": "GMP",
+      "findings": 620,
+      "documents": 476
+    },
+    {
+      "id": "active-ingredient",
+      "q": "Active Ingredient",
+      "findings": 597,
+      "documents": 578
+    },
+    {
+      "id": "api",
+      "q": "원료의약품",
+      "findings": 237,
+      "documents": 184,
+      "note": "'API' 343건 중 29%가 therAPIes·rAPId·업체명 Apicore 등 우연한 포함 — 국문으로 교체"
+    },
+    {
+      "id": "api-starting-material",
+      "q": "API Starting Material",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "drug-product",
+      "q": "완제의약품",
+      "findings": 327,
+      "documents": 237
+    },
+    {
+      "id": "batch",
+      "q": "Batch",
+      "findings": 1715,
+      "documents": 1199
+    },
+    {
+      "id": "batch-number",
+      "q": "Lot Number",
+      "findings": 18,
+      "documents": 18
+    },
+    {
+      "id": "batch-record",
+      "q": "Batch Records",
+      "findings": 66,
+      "documents": 62
+    },
+    {
+      "id": "bulk-product",
+      "q": "Bulk Product",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "intermediate",
+      "q": "중간체",
+      "findings": 72,
+      "documents": 54
+    },
+    {
+      "id": "intermediate-product",
+      "q": "중간제품",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "finished-product",
+      "q": "완제품",
+      "findings": 137,
+      "documents": 129
+    },
+    {
+      "id": "starting-material",
+      "q": "출발물질",
+      "findings": 16,
+      "documents": 14
+    },
+    {
+      "id": "raw-material",
+      "q": "Raw Material",
+      "findings": 93,
+      "documents": 88,
+      "note": "'원료' 470건 중 50%가 '원료의약품'(API) 문맥 — 두 개념이 섞여 영문으로 교체"
+    },
+    {
+      "id": "packaging-material",
+      "q": "Packaging Material",
+      "findings": 77,
+      "documents": 75
+    },
+    {
+      "id": "production",
+      "q": "생산",
+      "findings": 1589,
+      "documents": 1082
+    },
+    {
+      "id": "packaging",
+      "q": "포장",
+      "findings": 1158,
+      "documents": 894
+    },
+    {
+      "id": "manufacturer",
+      "q": "Manufacturer",
+      "findings": 139,
+      "documents": 125
+    },
+    {
+      "id": "marketing-authorization",
+      "q": "품목허가",
+      "findings": 38,
+      "documents": 38
+    },
+    {
+      "id": "authorized-person",
+      "q": "Authorized Person",
+      "findings": 101,
+      "documents": 100
+    },
+    {
+      "id": "batch-release",
+      "q": "Batch Release",
+      "findings": 21,
+      "documents": 21
+    },
+    {
+      "id": "quarantine",
+      "q": "Quarantine",
+      "findings": 43,
+      "documents": 39,
+      "note": "'격리' 86건 중 49%가 containment(물리적 구획) 번역 — 영문으로 교체"
+    },
+    {
+      "id": "reprocessing",
+      "q": "Reprocessing",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "reworking",
+      "q": "재작업",
+      "findings": 4,
+      "documents": 3
+    },
+    {
+      "id": "recall",
+      "q": "Recall",
+      "findings": 364,
+      "documents": 329
+    },
+    {
+      "id": "expiry-date",
+      "q": "Expiration Date",
+      "findings": 227,
+      "documents": 217
+    },
+    {
+      "id": "retest-date",
+      "q": "Retest Date",
+      "findings": 13,
+      "documents": 13
+    },
+    {
+      "id": "acceptance-criteria",
+      "q": "Acceptance Criteria",
+      "findings": 38,
+      "documents": 35
+    },
+    {
+      "id": "specification",
+      "q": "Specification",
+      "findings": 1641,
+      "documents": 1094
+    },
+    {
+      "id": "quality-assurance",
+      "q": "Quality Assurance",
+      "findings": 79,
+      "documents": 78
+    },
+    {
+      "id": "quality-control",
+      "q": "품질관리",
+      "findings": 2005,
+      "documents": 1277
+    },
+    {
+      "id": "quality-unit",
+      "q": "품질부서",
+      "findings": 866,
+      "documents": 743
+    },
+    {
+      "id": "pharmaceutical-quality-system",
+      "q": "Pharmaceutical Quality System",
+      "findings": 18,
+      "documents": 18
+    },
+    {
+      "id": "quality-manual",
+      "q": "Quality Manual",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "continual-improvement",
+      "q": "지속적 개선",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "state-of-control",
+      "q": "State of Control",
+      "findings": 23,
+      "documents": 23
+    },
+    {
+      "id": "quality-risk-management",
+      "q": "품질위험관리",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "risk",
+      "q": "위험",
+      "findings": 478,
+      "documents": 434
+    },
+    {
+      "id": "hazard",
+      "q": "Hazard",
+      "findings": 135,
+      "documents": 129
+    },
+    {
+      "id": "risk-analysis",
+      "q": "위험 분석",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "risk-evaluation",
+      "q": "위험 평가",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "risk-assessment",
+      "q": "Risk Assessment",
+      "findings": 38,
+      "documents": 36
+    },
+    {
+      "id": "risk-reduction",
+      "q": "위험 감소",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "severity",
+      "q": "Severity",
+      "findings": 49,
+      "documents": 49
+    },
+    {
+      "id": "capa",
+      "q": "CAPA",
+      "findings": 1030,
+      "documents": 822
+    },
+    {
+      "id": "corrective-action",
+      "q": "Corrective Action",
+      "findings": 404,
+      "documents": 364
+    },
+    {
+      "id": "preventive-action",
+      "q": "Preventive Action",
+      "findings": 148,
+      "documents": 146
+    },
+    {
+      "id": "root-cause-analysis",
+      "q": "root cause",
+      "findings": 94,
+      "documents": 92,
+      "note": "'RCA' 7건 전부 무관(lorcaserin·Onchocerca 등) — 규제 원문은 'root cause'로 풀어 씀"
+    },
+    {
+      "id": "deviation",
+      "q": "Deviation",
+      "findings": 981,
+      "documents": 791,
+      "note": "'일탈' 1,004건 중 79%가 본문 없이 카테고리 태그로만 매칭 — 영문으로 교체"
+    },
+    {
+      "id": "change-control",
+      "q": "변경관리",
+      "findings": 108,
+      "documents": 99
+    },
+    {
+      "id": "change-management",
+      "q": "Change Management",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "supplier-qualification",
+      "q": "Supplier Qualification",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "outsourced-activities",
+      "q": "Outsourced Activities",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "contract-manufacturer",
+      "q": "Contract Manufacturer",
+      "findings": 19,
+      "documents": 19
+    },
+    {
+      "id": "product-quality-review",
+      "q": "annual product review",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "product-complaint",
+      "q": "Product Complaint",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "sop",
+      "q": "written procedure",
+      "findings": 922,
+      "documents": 683
+    },
+    {
+      "id": "record",
+      "q": "기록",
+      "findings": 1441,
+      "documents": 979
+    },
+    {
+      "id": "raw-data",
+      "q": "원자료",
+      "findings": 28,
+      "documents": 26
+    },
+    {
+      "id": "electronic-record",
+      "q": "Electronic Record",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "data-integrity",
+      "q": "데이터 완전성",
+      "findings": 72,
+      "documents": 67
+    },
+    {
+      "id": "alcoa-plus",
+      "q": "ALCOA",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "audit-trail",
+      "q": "Audit Trail",
+      "findings": 22,
+      "documents": 20
+    },
+    {
+      "id": "computerised-system",
+      "q": "computerized system",
+      "findings": 21,
+      "documents": 20
+    },
+    {
+      "id": "validation",
+      "q": "Validation",
+      "findings": 1450,
+      "documents": 1066
+    },
+    {
+      "id": "validation-protocol",
+      "q": "Validation Protocol",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "validation-report",
+      "q": "Validation Report",
+      "findings": 12,
+      "documents": 10
+    },
+    {
+      "id": "qualification",
+      "q": "Qualification",
+      "findings": 224,
+      "documents": 203
+    },
+    {
+      "id": "installation-qualification",
+      "q": "설치적격성평가",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "operational-qualification",
+      "q": "Operational Qualification",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "performance-qualification",
+      "q": "Performance Qualification",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "process-validation",
+      "q": "Process Validation",
+      "findings": 98,
+      "documents": 96
+    },
+    {
+      "id": "revalidation",
+      "q": "재밸리데이션",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "cleaning-validation",
+      "q": "Cleaning Validation",
+      "findings": 52,
+      "documents": 52
+    },
+    {
+      "id": "analytical-procedure-validation",
+      "q": "method validation",
+      "findings": 19,
+      "documents": 18
+    },
+    {
+      "id": "calibration",
+      "q": "교정",
+      "findings": 152,
+      "documents": 149
+    },
+    {
+      "id": "worst-case",
+      "q": "Worst Case",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "analytical-procedure",
+      "q": "test method",
+      "findings": 169,
+      "documents": 162
+    },
+    {
+      "id": "accuracy",
+      "q": "Accuracy",
+      "findings": 141,
+      "documents": 133
+    },
+    {
+      "id": "precision",
+      "q": "Precision",
+      "findings": 27,
+      "documents": 15
+    },
+    {
+      "id": "repeatability",
+      "q": "Repeatability",
+      "findings": 2,
+      "documents": 1
+    },
+    {
+      "id": "specificity",
+      "q": "특이성",
+      "findings": 66,
+      "documents": 65
+    },
+    {
+      "id": "detection-limit",
+      "q": "검출한계",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "robustness",
+      "q": "Robustness",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "assay",
+      "q": "Assay",
+      "findings": 93,
+      "documents": 90
+    },
+    {
+      "id": "identification-test",
+      "q": "확인시험",
+      "findings": 259,
+      "documents": 225
+    },
+    {
+      "id": "impurity",
+      "q": "불순물",
+      "findings": 63,
+      "documents": 60
+    },
+    {
+      "id": "impurity-profile",
+      "q": "불순물 프로파일",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "reference-standard",
+      "q": "표준품",
+      "findings": 13,
+      "documents": 13
+    },
+    {
+      "id": "oos",
+      "q": "Out-of-Specification",
+      "findings": 71,
+      "documents": 71,
+      "note": "'OOS' 203건 중 44%가 bOOSt·lOOSe·tattOOS 등 — 전체 표기로 교체"
+    },
+    {
+      "id": "oot",
+      "q": "Out-of-Trend",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "stability-testing",
+      "q": "Stability Testing",
+      "findings": 194,
+      "documents": 187
+    },
+    {
+      "id": "cleanroom",
+      "q": "Cleanroom",
+      "findings": 134,
+      "documents": 106
+    },
+    {
+      "id": "cleanroom-classification",
+      "q": "Cleanroom Classification",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "airlock",
+      "q": "Airlock",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "bioburden",
+      "q": "Bioburden",
+      "findings": 19,
+      "documents": 15
+    },
+    {
+      "id": "endotoxin",
+      "q": "Endotoxin",
+      "findings": 54,
+      "documents": 46
+    },
+    {
+      "id": "pyrogen",
+      "q": "Pyrogen",
+      "findings": 224,
+      "documents": 203
+    },
+    {
+      "id": "aseptic-processing",
+      "q": "Aseptic Processing",
+      "findings": 1468,
+      "documents": 801
+    },
+    {
+      "id": "aseptic-process-simulation",
+      "q": "Media Fill",
+      "findings": 164,
+      "documents": 145
+    },
+    {
+      "id": "environmental-monitoring",
+      "q": "Environmental Monitoring",
+      "findings": 120,
+      "documents": 106
+    },
+    {
+      "id": "alert-limit",
+      "q": "Alert Limit",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "action-limit",
+      "q": "Action Limit",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "hepa-filter",
+      "q": "HEPA",
+      "findings": 156,
+      "documents": 139
+    },
+    {
+      "id": "isolator",
+      "q": "Isolator",
+      "findings": 5,
+      "documents": 4
+    },
+    {
+      "id": "rabs",
+      "q": "RABS",
+      "findings": 9,
+      "documents": 8
+    },
+    {
+      "id": "terminal-sterilization",
+      "q": "최종멸균",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "sterilization",
+      "q": "멸균",
+      "findings": 571,
+      "documents": 464
+    },
+    {
+      "id": "sterility",
+      "q": "무균성",
+      "findings": 44,
+      "documents": 43
+    },
+    {
+      "id": "sterility-assurance-level",
+      "q": "Sterility Assurance Level",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "sterility-test",
+      "q": "무균시험",
+      "findings": 60,
+      "documents": 50
+    },
+    {
+      "id": "contamination-control-strategy",
+      "q": "오염관리전략",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "contamination",
+      "q": "오염",
+      "findings": 2184,
+      "documents": 1377
+    },
+    {
+      "id": "cross-contamination",
+      "q": "교차오염",
+      "findings": 558,
+      "documents": 461
+    },
+    {
+      "id": "depyrogenation",
+      "q": "Depyrogenation",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "biological-indicator",
+      "q": "Biological Indicator",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "disinfection",
+      "q": "소독",
+      "findings": 818,
+      "documents": 698
+    },
+    {
+      "id": "line-clearance",
+      "q": "Line Clearance",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "self-inspection",
+      "q": "자율점검",
+      "findings": 6,
+      "documents": 6
+    },
+    {
+      "id": "site-master-file",
+      "q": "Site Master File",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "reference-sample",
+      "q": "시험용 검체",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "retention-sample",
+      "q": "reserve sample",
+      "findings": 40,
+      "documents": 38
+    },
+    {
+      "id": "first-air",
+      "q": "First Air",
+      "findings": 28,
+      "documents": 22
+    },
+    {
+      "id": "critical-zone",
+      "q": "critical area",
+      "findings": 29,
+      "documents": 26
+    },
+    {
+      "id": "unidirectional-airflow",
+      "q": "Unidirectional Airflow",
+      "findings": 51,
+      "documents": 44
+    },
+    {
+      "id": "airflow-visualization-study",
+      "q": "smoke study",
+      "findings": 51,
+      "documents": 46
+    },
+    {
+      "id": "critical-intervention",
+      "q": "Critical Intervention",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "personnel-monitoring",
+      "q": "Personnel Monitoring",
+      "findings": 17,
+      "documents": 16
+    },
+    {
+      "id": "non-viable-particle-monitoring",
+      "q": "비생균 입자 모니터링",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "closed-system",
+      "q": "Closed System",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "blow-fill-seal",
+      "q": "BFS",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "lyophilization",
+      "q": "동결건조",
+      "findings": 7,
+      "documents": 6
+    },
+    {
+      "id": "filter-integrity-test",
+      "q": "Filter Integrity Test",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "pupsit",
+      "q": "PUPSIT",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "container-closure-integrity",
+      "q": "Container Closure Integrity",
+      "findings": 6,
+      "documents": 6,
+      "note": "'CCI' 67건 중 97%가 vaCCIne·aCCIdent 등 — 전체 표기로 교체"
+    },
+    {
+      "id": "metadata",
+      "q": "메타데이터",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "data-governance",
+      "q": "데이터 거버넌스",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "true-copy",
+      "q": "True Copy",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "backup",
+      "q": "백업",
+      "findings": 21,
+      "documents": 21
+    },
+    {
+      "id": "archive",
+      "q": "archive",
+      "findings": 3,
+      "documents": 2
+    },
+    {
+      "id": "audit-trail-review",
+      "q": "Audit Trail Review",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "access-control",
+      "q": "Access Control",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "data-migration",
+      "q": "데이터 이관",
+      "findings": 2,
+      "documents": 2,
+      "note": "'이관'은 업무·검체 이전에도 쓰이는 범용어 — '데이터 이관'으로 좁힘"
+    },
+    {
+      "id": "hybrid-system",
+      "q": "paper and electronic",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "data-retention",
+      "q": "데이터 보존",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "business-continuity",
+      "q": "contingency plan",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "legible",
+      "q": "Legible",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "contemporaneous",
+      "q": "Contemporaneous",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "original-data",
+      "q": "원기록",
+      "findings": 8,
+      "documents": 8
+    },
+    {
+      "id": "detectability",
+      "q": "Detectability",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "harm",
+      "q": "위해성",
+      "findings": 28,
+      "documents": 28,
+      "note": "'위해' 1,980건 대부분이 '~하기 위해'라는 문법 표현 — 명사형으로 교체"
+    },
+    {
+      "id": "risk-based-decision-making",
+      "q": "위험기반 의사결정",
+      "findings": 1,
+      "documents": 1
+    }
+  ],
+  "excluded": [
+    {
+      "id": "manufacture",
+      "term_ko": "제조",
+      "reason": "'제조'는 이 DB 자체가 의약품 제조 위반 모음이라 17.6%에 걸림 — 주제 필터로 무의미"
+    },
+    {
+      "id": "quality",
+      "term_ko": "품질",
+      "reason": "'Quality'는 전체 공개 사례의 19%에 걸리는 도메인 상투어 — 표본 8/8이 품질 얘기지만 주제를 좁히지 못함"
+    },
+    {
+      "id": "quality-policy",
+      "term_ko": "품질방침",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "quality-objectives",
+      "term_ko": "품질목표",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "quality-planning",
+      "term_ko": "품질계획",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "knowledge-management",
+      "term_ko": "지식관리",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "control-strategy",
+      "term_ko": "관리전략",
+      "reason": "'관리전략' 7건 전부 '오염관리전략(CCS)'의 부분문자열 — 별도 용어와 결과가 100% 겹침"
+    },
+    {
+      "id": "risk-identification",
+      "term_ko": "위험 확인",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "risk-control",
+      "term_ko": "위험 통제",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "risk-acceptance",
+      "term_ko": "위험 허용",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "risk-communication",
+      "term_ko": "위험 소통",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "risk-review",
+      "term_ko": "위험 검토",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "procedure",
+      "term_ko": "절차·절차서",
+      "reason": "'절차'는 21 CFR 211.100 인용문에 거의 항상 붙는 말 — 서로 무관한 8개 카테고리에 고르게 분포"
+    },
+    {
+      "id": "documentation",
+      "term_ko": "문서화",
+      "reason": "'문서화'는 대부분 '문서화된 절차'라는 관형어 — 실제 문서화/기록관리 카테고리(349건)의 6배로 부풀려짐"
+    },
+    {
+      "id": "electronic-signature",
+      "term_ko": "전자서명",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "validation-master-plan",
+      "term_ko": "밸리데이션 종합계획서",
+      "reason": "'VMP'는 절반이 Veterinary Medicinal Product(수의약품). 대체어 'Validation Master Plan'은 1건뿐"
+    },
+    {
+      "id": "user-requirements-specification",
+      "term_ko": "사용자요구사항규격서",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "design-qualification",
+      "term_ko": "설계적격성평가",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "continued-process-verification",
+      "term_ko": "지속적 공정검증",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "linearity",
+      "term_ko": "직선성",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "range",
+      "term_ko": "범위",
+      "reason": "'범위' 126건 중 28%가 '광범위'(extensive) 부분일치, 다수가 scope 번역 — 진짜 range는 표본 20건 중 1건"
+    },
+    {
+      "id": "quantitation-limit",
+      "term_ko": "정량한계",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "purity-test",
+      "term_ko": "순도시험",
+      "reason": "'Purity Test' 6건 전부 'impurity testing' 속 부분일치 — 순도시험 단독 매치 0건"
+    },
+    {
+      "id": "viable-environmental-monitoring",
+      "term_ko": "생균 환경모니터링",
+      "reason": "'environmental monitoring' 검색 시 환경 모니터링 용어와 결과가 100%% 동일하다. 대안 'viable'(50건)은 표본 8건 중 5건이 'non-viable'(비생균 입자, 별도 용어로 존재)의 부분문자열이라 정반대 개념을 가리킨다 — 링크하지 않는다"
+    },
+    {
+      "id": "cleanroom-qualification",
+      "term_ko": "청정실 적격성평가",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "barrier-technology",
+      "term_ko": "배리어 기술",
+      "reason": "'RABS' 검색 시 접근제한형 배리어 시스템 용어와 결과가 100%% 동일하다. 대안 'barrier'(20건)는 표본 7건 중 4건이 용기 차단성·위산 화학적 장벽·피부 장벽(화장품 광고) 등 무관한 뜻 — 쓸 만한 검색어가 없어 링크하지 않는다"
+    },
+    {
+      "id": "form-fill-seal",
+      "term_ko": "폼-필-실",
+      "reason": "'FFS' 2건 전부 'puffs'(전자담배 퍼프) 속 부분일치"
+    },
+    {
+      "id": "sterilising-grade-filter",
+      "term_ko": "멸균등급 필터",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "d-value",
+      "term_ko": "D값",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "z-value",
+      "term_ko": "Z값",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "overkill-sterilisation",
+      "term_ko": "오버킬 멸균",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "data-lifecycle",
+      "term_ko": "데이터 수명주기",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "static-data",
+      "term_ko": "정적 데이터",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "dynamic-data",
+      "term_ko": "동적 데이터",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "system-owner",
+      "term_ko": "시스템 소유자",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "process-owner",
+      "term_ko": "프로세스 소유자",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "segregation-of-duties",
+      "term_ko": "직무분리",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "periodic-evaluation",
+      "term_ko": "주기적 평가",
+      "reason": "'periodic review' 5건 전부 임상 IRB 정기심사 — GMP 주기적 평가와 다른 개념. 대체어도 0건"
+    },
+    {
+      "id": "data-transfer",
+      "term_ko": "데이터 전송",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "disaster-recovery",
+      "term_ko": "재해복구",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "attributable",
+      "term_ko": "귀속성",
+      "reason": "'Attributable' 9건 중 3건이 '~에 기인하다'는 일반 영어 — ALCOA 맥락과 무관"
+    },
+    {
+      "id": "accurate",
+      "term_ko": "정확성",
+      "reason": "한국어 '정확성'이 분석법 accuracy 와 ALCOA accurate 를 구분하지 못함 — accuracy 표제어에만 링크"
+    },
+    {
+      "id": "exception-report",
+      "term_ko": "예외보고서",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "uncertainty",
+      "term_ko": "불확실성",
+      "reason": "'Uncertainty' 1건이 '처방 내용에 불확실성이 있으면'이라는 일반 표현"
+    },
+    {
+      "id": "stakeholder",
+      "term_ko": "이해관계자",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "residual-risk",
+      "term_ko": "잔여위험",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "formality",
+      "term_ko": "품질위험관리의 형식성",
+      "reason": "이 검색어로 공개 지적사례 0건 — 개념어라 지적문에 등장하지 않는 것이 정상"
+    },
+    {
+      "id": "subjectivity",
+      "term_ko": "주관성",
+      "reason": "'subjective' 1건이 허브추출물 광고의 '주관적 수면개선'"
+    }
+  ],
+  "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."
+}

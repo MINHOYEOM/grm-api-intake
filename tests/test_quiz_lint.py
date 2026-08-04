@@ -16,7 +16,9 @@ class CommittedQuizBankGateTest(unittest.TestCase):
         self.assertTrue(report.ok, report.format())
 
 
-class QuizLintTest(unittest.TestCase):
+class QuizLintFixture:
+    """임시 뱅크·용어집·브리프 픽스처 — 테스트 메서드는 없다(두 테스트 클래스가 공유)."""
+
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory(prefix="quiz_lint_")
         self.root = Path(self._tmp.name)
@@ -62,15 +64,28 @@ class QuizLintTest(unittest.TestCase):
     def _codes(report):
         return [issue.code for issue in report.issues]
 
+
+class QuizLintTest(QuizLintFixture, unittest.TestCase):
     def test_valid_bank_passes_and_reports_counts(self):
+        # 주차를 가진 문항은 세트로만 유효하다(출제 품질 게이트) — 개념 1 + 브리프 2,
+        # easy 2 · normal 1 의 최소 성립 세트로 구성한다.
         report = self._lint(
             [
                 self._item(),
+                self._item(id="q-202653-01", week="202653"),
                 self._item(
-                    id="q-202653-01",
+                    id="q-202653-02",
                     question_ko="카드에 명시된 조치는 무엇인가요?",
                     source_type="brief",
                     source_ref="https://grm-solutions.com/briefs/2026-07-12/#card-1",
+                    difficulty="easy",
+                    week="202653",
+                ),
+                self._item(
+                    id="q-202653-03",
+                    question_ko="카드에 명시된 다른 조치는 무엇인가요?",
+                    source_type="brief",
+                    source_ref="https://grm-solutions.com/briefs/2026-07-12/#카드-2",
                     difficulty="normal",
                     week="202653",
                 ),
@@ -89,9 +104,9 @@ class QuizLintTest(unittest.TestCase):
             ]
         )
         self.assertTrue(report.ok, report.format())
-        self.assertEqual(report.item_count, 4)
-        self.assertEqual(report.source_counts["glossary"], 1)
-        self.assertEqual(report.week_counts["202653"], 1)
+        self.assertEqual(report.item_count, 6)
+        self.assertEqual(report.source_counts["glossary"], 2)
+        self.assertEqual(report.week_counts["202653"], 3)
         self.assertIn("quiz_lint: PASS", report.format())
 
     def test_invalid_json_and_top_level_contract(self):
@@ -136,7 +151,10 @@ class QuizLintTest(unittest.TestCase):
         self.assertIn("DIFFICULTY", self._codes(report))
 
     def test_week_is_optional_but_must_be_a_real_iso_week(self):
-        self.assertTrue(self._lint([self._item(week="202653")]).ok)
+        # 형식 규칙만 본다 — 세트 구성(문항 수·출처·난이도)은 QuizQualityGateTest 소관이라
+        # 여기서는 WEEK 코드의 유무로만 판정한다(단건 주차는 세트 게이트에 따로 걸린다).
+        self.assertTrue(self._lint([self._item()]).ok)
+        self.assertNotIn("WEEK", self._codes(self._lint([self._item(week="202653")])))
         for week in ("202600", "202654", "202553", "2026-W29", "000001"):
             with self.subTest(week=week):
                 self.assertIn("WEEK", self._codes(self._lint([self._item(week=week)])))
@@ -228,6 +246,145 @@ class QuizLintTest(unittest.TestCase):
             exit_code = ql.main(["--unknown"])
         self.assertEqual(exit_code, 1)
         self.assertIn("ERROR [ARGUMENTS]", stdout.getvalue())
+
+
+class QuizQualityGateTest(QuizLintFixture, unittest.TestCase):
+    """출제 품질 게이트(2026-08-04) — 형식은 맞지만 지문을 안 읽어도 풀리는 문항 차단.
+
+    적용 대상은 `week` 를 가진 비면제 주차뿐이다(legacy pool·GRANDFATHERED_WEEKS 면제).
+    면제가 미래로 새지 않는지, 그리고 규율 신설의 계기가 된 실제 결함을 이 게이트가
+    실제로 잡는지(역적용)를 함께 고정한다.
+    """
+
+    NEW_WEEK = "202640"          # 면제 목록 밖 — 신규 파이프라인 산출물과 같은 취급
+
+    def _week_set(self, *items):
+        return [dict(item, week=self.NEW_WEEK) for item in items]
+
+    def _concept(self, **updates):
+        """세트를 성립시키는 개념 문항 1건(source_type=glossary)."""
+        base = self._item(id="q-concept", difficulty="easy")
+        base.update(updates)
+        return base
+
+    def _brief(self, n, **updates):
+        base = self._item(
+            id=f"q-brief-{n}",
+            source_type="brief",
+            source_ref="https://grm-solutions.com/briefs/2026-07-12/#card-1",
+            difficulty="easy",
+        )
+        base.update(updates)
+        return base
+
+    def _valid_week(self):
+        """게이트를 모두 통과하는 최소 세트 — 개념 1 + 브리프 3, easy 3 / normal 1."""
+        return self._week_set(
+            self._concept(),
+            self._brief(1),
+            self._brief(2),
+            self._brief(3, difficulty="normal"),
+        )
+
+    def test_balanced_week_set_passes(self):
+        report = self._lint(self._valid_week())
+        self.assertTrue(report.ok, report.format())
+
+    def test_week_without_concept_question_is_rejected(self):
+        # 그 주 브리프를 읽지 않은 사람에게 전 문항이 찍기가 되는 구성.
+        items = self._week_set(
+            self._brief(1), self._brief(2), self._brief(3),
+            self._brief(4, difficulty="normal"),
+        )
+        self.assertIn("WEEK_SOURCE_MIX", self._codes(self._lint(items)))
+
+    def test_answer_that_is_much_longer_than_distractors_is_rejected(self):
+        lead = ql.ANSWER_LENGTH_LEAD_MAX
+        long_answer = self._concept(choices=["가" * (10 + lead), "가" * 10, "나" * 9, "다" * 8])
+        self.assertIn("ANSWER_LENGTH_LEAD", self._codes(self._lint(self._week_set(long_answer))))
+        # 경계 바로 아래(허용 상한)는 통과해야 한다 — off-by-one 고정.
+        ok_answer = self._concept(choices=["가" * (9 + lead), "가" * 10, "나" * 9, "다" * 8])
+        self.assertNotIn(
+            "ANSWER_LENGTH_LEAD",
+            self._codes(self._lint(self._week_set(ok_answer, self._brief(1), self._brief(2),
+                                                 self._brief(3, difficulty="normal")))),
+        )
+
+    def test_week_where_longest_choice_is_usually_the_answer_is_rejected(self):
+        # 문항 하나하나는 길이 게이트를 통과해도(리드 < 상한) 세트로 보면
+        # "가장 긴 것 찍기"가 과반을 맞히는 구성 — 세트 단위로만 보이는 결함.
+        def longest_answer(item):
+            return dict(item, choices=["가" * 20, "나" * 12, "다" * 11, "라" * 10], answer_index=0)
+
+        items = self._week_set(
+            longest_answer(self._concept()),
+            longest_answer(self._brief(1)),
+            longest_answer(self._brief(2)),
+            self._brief(3, difficulty="normal"),
+        )
+        self.assertIn("WEEK_LONGEST_ANSWER", self._codes(self._lint(items)))
+
+    def test_week_size_and_difficulty_mix_are_enforced(self):
+        too_many = self._valid_week() + self._week_set(self._brief(9, id="q-brief-9"))
+        self.assertIn("WEEK_SIZE", self._codes(self._lint(too_many)))
+
+        too_few = self._week_set(self._concept(), self._brief(1, difficulty="normal"))
+        self.assertIn("WEEK_SIZE", self._codes(self._lint(too_few)))
+
+        all_easy = self._week_set(
+            self._concept(), self._brief(1), self._brief(2), self._brief(3),
+        )
+        self.assertIn("WEEK_DIFFICULTY_MIX", self._codes(self._lint(all_easy)))
+
+        mostly_normal = self._week_set(
+            self._concept(difficulty="normal"),
+            self._brief(1, difficulty="normal"),
+            self._brief(2, difficulty="normal"),
+            self._brief(3),
+        )
+        self.assertIn("WEEK_DIFFICULTY_MIX", self._codes(self._lint(mostly_normal)))
+
+    def test_legacy_pool_and_grandfathered_weeks_are_exempt(self):
+        # week 없는 legacy pool 은 세트 개념 자체가 없어 게이트 대상이 아니다.
+        legacy = [self._item(id=f"q2-{n}", source_type="brief",
+                             source_ref="https://grm-solutions.com/briefs/2026-07-12/#card-1",
+                             choices=["가" * 40, "나", "다", "라"])
+                  for n in range(4)]
+        self.assertTrue(self._lint(legacy).ok, "legacy pool 은 면제되어야 합니다")
+
+        # 면제 주차도 같은 이유로 통과한다(공개 후 불변 — 소급 수정 금지).
+        exempt_week = sorted(ql.GRANDFATHERED_WEEKS)[0]
+        items = [dict(item, week=exempt_week) for item in legacy]
+        self.assertTrue(self._lint(items).ok, "면제 주차는 통과해야 합니다")
+
+    def test_grandfathered_weeks_are_closed_to_the_past(self):
+        """면제 목록이 미래로 새면 게이트 전체가 무력해진다 — 상한을 고정한다."""
+        newest_exempt = max(ql.GRANDFATHERED_WEEKS)
+        self.assertLessEqual(newest_exempt, "202632", "신규 주차를 면제 목록에 넣지 않는다")
+
+    def test_committed_bank_weeks_would_be_caught_if_they_were_new(self):
+        """역적용 증명 — 규율의 계기가 된 실제 결함을 게이트가 실제로 잡는가.
+
+        커밋된 뱅크의 면제 주차 세트를 그대로 신규 주차로 옮기면 반드시 걸려야 한다.
+        (0건이면 게이트가 아무것도 막지 못한다는 뜻이므로 실패로 본다.)
+        """
+        bank = json.loads(ql.DEFAULT_QUIZ_BANK.read_text(encoding="utf-8"))
+        for week in sorted(ql.GRANDFATHERED_WEEKS):
+            entries = [q for q in bank if str(q.get("week", "")) == week]
+            self.assertTrue(entries, f"{week} 세트가 뱅크에 없습니다")
+            moved = [dict(q, week=self.NEW_WEEK) for q in entries]
+            report = ql.lint_quiz_bank(
+                self._materialise(moved), ql.DEFAULT_GLOSSARY, ql.DEFAULT_BRIEFS_DIR
+            )
+            self.assertIn(
+                "WEEK_SOURCE_MIX", self._codes(report),
+                f"{week}: 브리프 전용 세트를 게이트가 놓쳤습니다\n{report.format()}",
+            )
+
+    def _materialise(self, items) -> Path:
+        path = self.root / "moved_bank.json"
+        self._write(path, items)
+        return path
 
 
 if __name__ == "__main__":

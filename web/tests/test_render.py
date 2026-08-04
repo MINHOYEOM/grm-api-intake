@@ -7861,6 +7861,18 @@ class WebQuizWeekFieldTest(unittest.TestCase):
         # data-weekly-count(별개 속성)와 구분되도록 값까지 포함해 추출한다.
         self.assertEqual(set(re.findall(r'data-week="(\d+)"', golden)) - weeks, set())
 
+    def test_weekly_count_matches_the_lint_gate(self):
+        """노출 상한(render)과 생성 상한(quiz_lint)이 갈라지면 조용한 유실이 생긴다.
+
+        quiz.js 는 이번 주 세트를 render.WEEKLY_QUIZ_COUNT 개로 slice 한다.  lint 가 그보다
+        많은 문항을 통과시키면 초과분은 어떤 주에도 화면에 뜨지 않는다(사람이 만든 문항이
+        조용히 사라짐).  두 상수를 한 곳에 모을 수 없으므로(quiz_lint 는 무의존 정책) 값이
+        어긋나는 순간 CI 가 실패하게 고정한다.
+        """
+        import quiz_lint                                        # REPO_ROOT 는 sys.path 에 있다
+        self.assertEqual(quiz_lint.WEEKLY_QUIZ_COUNT, render.WEEKLY_QUIZ_COUNT)
+        self.assertLessEqual(quiz_lint.WEEKLY_QUIZ_MIN, quiz_lint.WEEKLY_QUIZ_COUNT)
+
     @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 선택 로직 경로 고정은 CI에서 수행")
     def test_pick_weekly_indexes_both_paths_pinned_via_node(self):
         import subprocess

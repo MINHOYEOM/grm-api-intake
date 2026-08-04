@@ -939,37 +939,180 @@ def load_glossary(path: Path = GLOSSARY_FILE) -> list[dict[str, Any]] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
-def _reg_ref_view(item: Any) -> dict[str, str] | None:
+# ── [용어사전 심화 B2] 관련 조항 라벨 → 공식 원문 URL 해석기 ──────────────────────
+# URL 은 새로 수집하지 않는다 — 자료실(web/data/library/*.json) 커밋 데이터를 재사용
+# 한다(네트워크 0·결정론). 규칙은 R1→R7 순서로 적용, 첫 매치 채택, 매치 없으면 ""
+# (무링크가 안전 — 억지 매칭보다 낫다). 라벨 prefix 가 서로 배타적이라 순서 충돌 없음.
+_REG_REF_EN_DASH = "–"  # 21 CFR 범위 표기(예: 211.160–211.194) — 특정 문서 1개를 못 가리킨다.
+
+# mfds.json 은 code 필드가 없어 title_ko 로 특정한다. "의약품 제조 및 품질관리에 관한
+# 규정"(K-GMP 고시) 자체는 카탈로그에 없다(있는 건 "의료기기 제조 및 품질관리..." 변형뿐
+# — 확인 완료, 08-04). 접두 일치 후 title_ko 정확 일치를 시도하되 0건이면 "" 로 남긴다.
+_MFDS_GMP_REG_PREFIX = "의약품 제조 및 품질관리에 관한 규정"
+
+# 자료실 카탈로그 중 항목 official_url 이 개별 문서가 아니라 공식 카탈로그 페이지로
+# 수렴하는 것(ICH) — library_catalog.html 제목 링크와 동일 우선순위(pdf_url 우선)를 쓴다.
+_REG_REF_LINK_LABEL_CATALOGS = {"ich"}
+
+
+def _reg_ref_norm(s: str) -> str:
+    """[용어사전 심화] 카탈로그 code 비교용 정규화 — 소문자화 + 영숫자만 남김.
+
+    공백·쉼표·마침표 등 구두점 차이(카탈로그 "Part I, Chapter 1" vs 라벨 "Part I
+    Chapter 1")를 흡수한다. 순수 함수."""
+    return "".join(ch for ch in s.lower() if ch.isalnum())
+
+
+def _reg_ref_catalog_link(item: dict[str, Any], catalog_key: str) -> str:
+    """[용어사전 심화] 매칭된 카탈로그 항목 1건 → 표시용 URL.
+
+    자료실 페이지(library_catalog.html)가 제목 링크에 쓰는 것과 동일한 우선순위:
+    link_label 있는 카탈로그(ICH)는 official_url 이 카탈로그 페이지로 수렴하므로
+    pdf_url 우선(없으면 무링크 — official_url 로 대체하지 않는다, 오인 방지). 그 외
+    카탈로그는 official_url 우선(이 저장소 데이터셋에서 pdf_url 과 대개 동일)."""
+    if catalog_key in _REG_REF_LINK_LABEL_CATALOGS:
+        return item.get("pdf_url") or ""
+    return item.get("official_url") or item.get("pdf_url") or ""
+
+
+def _load_reg_ref_catalogs(library_dir: Path = LIBRARY_DIR) -> dict[str, list[dict[str, Any]]]:
+    """[용어사전 심화] reg_refs URL 해석에 쓰는 자료실 카탈로그 원본 items 로드.
+
+    _catalog_view(자료실 페이지 뷰모델)를 재사용하지 않는 이유는 그쪽이 표시용 가공
+    (doc_type 라벨 치환·정렬·그룹핑)을 거치기 때문 — code·official_url·pdf_url 원본이
+    필요한 이 해석기는 raw items 를 직접 읽는 편이 더 안전하다. 파일 부재 카탈로그는
+    빈 리스트(무매치 → 무링크, 예외 아님). 결정론(파일 byte 파생, 네트워크 0)."""
+    files = {"ich": "ich.json", "eu_gmp": "eu_gmp.json", "pics": "pics.json",
+             "who": "who.json", "mfds": "mfds.json"}
+    catalogs: dict[str, list[dict[str, Any]]] = {}
+    for key, fname in files.items():
+        p = library_dir / fname
+        catalogs[key] = json.loads(p.read_text(encoding="utf-8"))["items"] if p.is_file() else []
+    return catalogs
+
+
+def _reg_ref_url(label: str, catalogs: dict[str, list[dict[str, Any]]]) -> str:
+    """[용어사전 심화 B2] 관련 조항 라벨 → 공식 원문 URL(자료실 카탈로그 재사용).
+
+    R1 21 CFR → eCFR(trends.js ecfrHref 와 동일 형태) · R2 ICH/R3 EU GMP/R4 PIC/S/
+    R5 WHO → 카탈로그 code 정확 일치(정확히 1건일 때만) · R6 국내(식약처) → title_ko
+    특정 시도 · R7 그 외 → "". 매치 없거나 모호(0건·2건 이상)하면 "" — 무링크이 안전
+    (틀린 링크가 무링크보다 나쁘다). 순수 함수(창작 0 — 라벨/카탈로그 값만 조회)."""
+    label = (label or "").strip()
+    if not label:
+        return ""
+
+    # R1: 21 CFR
+    if label.startswith("21 CFR"):
+        if _REG_REF_EN_DASH in label:
+            return ""
+        m = re.match(r"^21 CFR Part (\d+)$", label)
+        if m:
+            return f"https://www.ecfr.gov/current/title-21/part-{m.group(1)}"
+        m = re.match(r"^21 CFR (\d+\.\d+)", label)
+        if m:
+            return f"https://www.ecfr.gov/current/title-21/section-{m.group(1)}"
+        return ""
+
+    # R2: ICH — 문서코드 추출("Q9(R1)"→"Q9") 후 code 정확 일치.
+    if label.startswith("ICH "):
+        rest = label[len("ICH "):].strip()
+        first = rest.split()[0] if rest.split() else ""
+        code = re.sub(r"\(R\d+\)", "", first).strip()
+        matches = [it for it in catalogs.get("ich", []) if (it.get("code") or "") == code]
+        if len(matches) == 1:
+            return _reg_ref_catalog_link(matches[0], "ich")
+        return ""
+
+    # R3: EU GMP — "EU GMP " 접두·§ 이후 제거 후 정규화 정확 일치.
+    if label.startswith("EU GMP "):
+        doc_part = label[len("EU GMP "):].split("§", 1)[0].strip()
+        target = _reg_ref_norm(doc_part)
+        matches = [it for it in catalogs.get("eu_gmp", [])
+                   if _reg_ref_norm(it.get("code") or "") == target]
+        if len(matches) == 1:
+            return _reg_ref_catalog_link(matches[0], "eu_gmp")
+        return ""
+
+    # R4: PIC/S — "PIC/S " 접두·§ 이후 제거 후 code 정확 일치(공백 정리만, 대소문자 유지).
+    if label.startswith("PIC/S "):
+        doc_part = label[len("PIC/S "):].split("§", 1)[0].strip()
+        matches = [it for it in catalogs.get("pics", [])
+                   if (it.get("code") or "").strip() == doc_part]
+        if len(matches) == 1:
+            return _reg_ref_catalog_link(matches[0], "pics")
+        return ""
+
+    # R5: WHO — "TRS <report> Annex <n>" 형태로 정규화 후 code 정규화 정확 일치.
+    if label.startswith("WHO "):
+        m_trs = re.search(r"TRS\s+(\d+)", label) or re.search(
+            r"Technical Report Series No\.?\s*(\d+)", label)
+        m_annex = re.search(r"Annex\s+(\d+)", label)
+        if m_trs and m_annex:
+            target = _reg_ref_norm(f"TRS {m_trs.group(1)} Annex {m_annex.group(1)}")
+            matches = [it for it in catalogs.get("who", [])
+                       if _reg_ref_norm(it.get("code") or "") == target]
+            if len(matches) == 1:
+                return _reg_ref_catalog_link(matches[0], "who")
+        return ""
+
+    # R6: 국내(식약처) — code 필드가 없어 title_ko 로 특정 시도(대괄호 부표 표기 제거 후
+    # 정확 일치). 확실히 1건일 때만 링크 — 애매하면 "".
+    if label.startswith(_MFDS_GMP_REG_PREFIX):
+        base = re.sub(r"\s*\[[^\]]*\]\s*$", "", label).strip()
+        matches = [it for it in catalogs.get("mfds", [])
+                   if (it.get("title_ko") or "").strip() == base]
+        if len(matches) == 1:
+            return _reg_ref_catalog_link(matches[0], "mfds")
+        return ""
+
+    # R7: 그 외(MHRA 등) — 자료실에 해당 카탈로그가 없다.
+    return ""
+
+
+def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = None) -> dict[str, str] | None:
     """[용어사전 심화] reg_refs 항목 1건 → {"label","url"} 정규화(무변형·안전 URL 게이트만).
 
-    문자열이면 label=문자열·url="". dict 면 label/url 을 각각 strip/_safe_url 게이트만
-    거쳐 통과. label 이 빈 항목(빈 문자열·공백뿐)은 조용히 제외(None) — 호출부가 필터."""
+    문자열이면 label=문자열, url 은 _reg_ref_url 해석기로 채운다(B2). dict 면 label/url
+    을 각각 strip/_safe_url 게이트만 거쳐 통과하되, **데이터의 url 이 비어 있을 때만**
+    해석기로 보강한다(데이터가 코드를 이긴다 — 이미 명시된 url 은 그대로 우선). catalogs
+    미지정(None) 은 빈 카탈로그 취급(무매치 → ""·기존 호출부 호환). label 이 빈 항목
+    (빈 문자열·공백뿐)은 조용히 제외(None) — 호출부가 필터."""
+    cat = catalogs or {}
     if isinstance(item, str):
         label = item.strip()
-        return {"label": label, "url": ""} if label else None
+        return {"label": label, "url": _reg_ref_url(label, cat)} if label else None
     if isinstance(item, dict):
         label = (item.get("label") or "").strip()
         if not label:
             return None
-        return {"label": label, "url": _safe_url(item.get("url") or "")}
+        url = _safe_url(item.get("url") or "")
+        if not url:
+            url = _reg_ref_url(label, cat)
+        return {"label": label, "url": url}
     return None
 
 
-def build_glossary_view(terms: list[dict[str, Any]]) -> dict[str, Any]:
+def build_glossary_view(
+    terms: list[dict[str, Any]],
+    reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
+) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
     related 는 데이터 순서 그대로 유지하며 존재하는 id 만 term_ko 라벨과 함께 통과(고아
     참조는 조용히 제외). search 는 term_ko/term_en/easy_ko(+detail_ko 있을 때만)를 소문자
     결합(클라이언트 필터 입력값 — 표시 텍스트 무변형, 검색 대상 문자열만 별도 파생).
     detail_ko(실무 맥락 설명)·reg_refs(관련 조항 참조)는 병렬 작업자가 데이터에 추가할
-    선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로 정규화), 없으면 빈 값이라
-    기존 렌더와 byte 동일(search 에도 잉여 공백 미추가). 그룹·용어 정렬 결정론."""
+    선택 필드 — 있으면 통과(reg_refs 는 _reg_ref_view 로 정규화, reg_ref_catalogs 가 있으면
+    B2 URL 해석기가 자료실 카탈로그로 링크를 채운다), 없으면 빈 값이라 기존 렌더와 byte
+    동일(search 에도 잉여 공백 미추가). reg_ref_catalogs 미지정 시 URL 은 모두 ""(호출부
+    호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론."""
     label_by_id = {t["id"]: t["term_ko"] for t in terms}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
         related = [{"id": r, "term_ko": label_by_id[r]}
                    for r in (t.get("related") or []) if r in label_by_id]
-        reg_refs = [v for v in (_reg_ref_view(r) for r in (t.get("reg_refs") or [])) if v]
+        reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs) for r in (t.get("reg_refs") or [])) if v]
         search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
@@ -1729,7 +1872,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             latest_slug=latest_slug,
             description=GLOSSARY_DESCRIPTION,
             canonical=_abs_url("glossary/"),
-            glossary=build_glossary_view(glossary_terms),
+            # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
+            glossary=build_glossary_view(glossary_terms, _load_reg_ref_catalogs()),
         )
         _write(out_dir / "glossary" / "index.html", glossary_html)
         written.append("glossary/index.html")

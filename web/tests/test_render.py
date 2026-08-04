@@ -17,6 +17,7 @@ CI(`unittest discover -s tests`)는 `tests/test_web_render.py` shim 을 통해 �
 """
 from __future__ import annotations
 
+import collections
 import json
 import pathlib
 import re
@@ -47,6 +48,65 @@ REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 
 # CI shim(tests/test_web_render.py)은 이 모듈의 TestCase 하위클래스를 **전수 자동** 수집한다.
 # (예전엔 __all__ 수동 목록이라 새 클래스를 적는 걸 잊으면 CI 에서 조용히 실행되지 않았다.)
+
+
+# ── [B3] reg_refs 링크 조용한 소실 가드 — 실측 하한선/상한선 ─────────────────────
+# 배경: 용어사전(/glossary/)의 조항 링크(reg_refs[].url)는 자료실 카탈로그
+# (web/data/library/*.json)의 주소를 빌려 쓴다(render._reg_ref_url, B2). 자료실은
+# 매주 자동 갱신되고 그때 골든도 자동 재동결되어 커밋된다 — 그래서 카탈로그에서 문서
+# 코드가 사라지거나 이름이 바뀌면 용어사전 링크가 **아무 경고 없이** 사라지고, 골든은
+# 그 사라진 상태로 다시 도장 찍힌다. 화면은 멀쩡해 보이고 테스트도 통과한다. 이게 이
+# 저장소에서 반복돼 온 "조용한 실패" 패턴이다.
+#
+# 아래 숫자는 추측이 아니다 — 2026-08-04, 이 저장소에 커밋된 glossary.json 전 항목을
+# render.build_glossary_view(terms, render._load_reg_ref_catalogs()) 로 실제로 돌려
+# 얻은 실측치다(WebGlossaryRegRefLinkGuardTest.setUpClass 와 동일 호출). 이 숫자보다
+# **줄면** 링크가 사라진 것이고, 무링크 라벨이 이 숫자보다 **늘면** 새로운 결손이다.
+_REG_REF_RESOLVED_FLOOR = 377          # 실측: url 이 비어있지 않은 칩 377/408건
+_REG_REF_FAMILY_FLOORS = {             # 실측: 계열별 url 비어있지 않은 칩 개수
+    "cfr": 87, "ich": 98, "eu_gmp": 163, "pics": 22, "who": 7,
+}
+# 실측: 링크가 안 붙는 고유 라벨 13종(21 CFR 범위 표기·EU GMP Annex 19 두 판본 모호·
+# EU GMP Part III Site Master File(모호)·MHRA GxP Data Integrity Guidance(자료실
+# 카탈로그 없음)·국문 K-GMP 고시(자료실에 해당 문서 미보유) — R7 계열 밖이거나 라벨이
+# 카탈로그를 유일하게 특정하지 못하는 경우. _reg_ref_url 은 "틀린 링크보다 무링크가
+# 안전"이라 이런 경우 의도적으로 "" 를 반환한다(버그 아님).
+_REG_REF_KNOWN_UNRESOLVED_LABELS = frozenset({
+    "21 CFR 211.160–211.194",
+    "21 CFR 211.180–211.194",
+    "EU GMP Annex 19 §§1–4",
+    "EU GMP Annex 19 §§7–9",
+    "EU GMP Part III, Site Master File Explanatory Notes",
+    "MHRA GxP Data Integrity Guidance §6.13",
+    "MHRA GxP Data Integrity Guidance §6.17",
+    "MHRA GxP Data Integrity Guidance §6.8",
+    "MHRA GxP Data Integrity Guidance §§4.3, 6.17.1",
+    "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1",
+    "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1, 6.17.1",
+    "PIC/S PE 009-17 Annex 19",
+    "의약품 제조 및 품질관리에 관한 규정 [별표 1]",
+})
+_REG_REF_UNRESOLVED_LABEL_CAP = len(_REG_REF_KNOWN_UNRESOLVED_LABELS)  # 13, 실측
+
+
+def _classify_reg_ref_family(label: str) -> str | None:
+    """[B3] reg_ref 라벨 → 계열 키(render._reg_ref_url 의 R1~R5 접두 분기와 동일 규칙).
+
+    render.py 를 import 해서 내부 분기 로직을 재사용하지 않는 이유: 이 함수는 render.py
+    편집 금지 제약 아래 테스트 파일에서만 계열 집계용으로 쓰는 얕은 라벨 분류기라,
+    렌더러 내부 구현과 결합시키지 않는 편이 안전하다(테스트가 구현 세부에 뒤엉키지
+    않도록 접두 문자열만 본다 — R1~R5 가 상호 배타적 접두라 순서 무관)."""
+    if label.startswith("21 CFR"):
+        return "cfr"
+    if label.startswith("ICH "):
+        return "ich"
+    if label.startswith("EU GMP "):
+        return "eu_gmp"
+    if label.startswith("PIC/S "):
+        return "pics"
+    if label.startswith("WHO "):
+        return "who"
+    return None
 
 
 # ── 빌드 헬퍼 (테스트·freeze 공용 — 동일 입력 보장) ───────────────────────────
@@ -6005,11 +6065,19 @@ class WebGlossaryRenderTest(unittest.TestCase):
             self.assertIn(str(_esc2(t["definition_source"])), self.html)
 
     def test_related_crosslinks_resolve_to_existing_terms(self):
+        # 예전엔 `if r in ids:` 로 **존재하는 참조만** 검사해, orphan 참조(존재하지 않는
+        # id)가 생겨도 그 반복만 조용히 건너뛰어 단언이 아예 실행되지 않았다 — 통과하는
+        # 헛된 검사(항상 참). build_glossary_view 는 orphan 을 뷰에서 조용히 제외하므로
+        # (§related 필터), 렌더 결과만 보면 orphan 이 생겨도 화면은 멀쩡해 보인다. 원래
+        # 의도대로 뒤집는다: related 는 전부 실존 id 를 가리켜야 한다는 불변식을 먼저
+        # 직접 단언하고(orphan 이 있으면 즉시 실패), 그 다음에만 렌더 앵커를 확인한다.
         ids = {t["id"] for t in self.terms}
+        orphans = [(t["id"], r) for t in self.terms for r in t.get("related", []) if r not in ids]
+        self.assertEqual(orphans, [],
+                          f"related 가 존재하지 않는 용어 id 를 참조한다(고아 참조): {orphans}")
         for t in self.terms:
             for r in t.get("related", []):
-                if r in ids:  # 고아 참조는 렌더에서 제외(존재하는 것만 링크)
-                    self.assertIn(f'class="gl-rel-a" href="#{r}"', self.html)
+                self.assertIn(f'class="gl-rel-a" href="#{r}"', self.html)
 
     def test_chosung_grouping_deterministic_and_ordered(self):
         # 버킷 = 데이터 파생(term_ko 초성), 순서 = _GLOSSARY_BUCKET_ORDER 고정(가나다→A–Z→#).
@@ -6097,11 +6165,16 @@ class WebGlossaryDeepFieldsTest(unittest.TestCase):
                 {"label": "위험스킴", "url": "javascript:alert(1)"},   # 비안전 URL → ""로 게이트
             ],
         }
+        # 카탈로그 미지정(catalogs=None) 호출: build_glossary_view 는 이 경우도 지원한다
+        # (하위호환). R1(21 CFR)은 자료실 카탈로그 없이 정규식만으로 eCFR URL 을 조립하는
+        # 규칙(B2)이라 catalogs 를 안 실어도 "21 CFR 211.100" 은 resolve 된다 — R2~R6(ICH·
+        # EU GMP·PIC/S·WHO·국내)만 카탈로그 부재 시 "" 로 떨어진다(WebGlossaryRegRefLinkGuardTest
+        # 참조). "무링크 조항"(카탈로그 매치 대상 아닌 임의 라벨)은 R1~R7 어디에도 안 걸려 "".
         view = render.build_glossary_view([synthetic])
         t = view["groups"][0]["terms"][0]
         self.assertEqual(t["detail_ko"], "실무에서는 이렇게 씁니다")
         self.assertEqual(t["reg_refs"], [
-            {"label": "21 CFR 211.100", "url": ""},
+            {"label": "21 CFR 211.100", "url": "https://www.ecfr.gov/current/title-21/section-211.100"},
             {"label": "ICH Q7", "url": "https://ich.org/q7"},
             {"label": "무링크 조항", "url": ""},
             {"label": "위험스킴", "url": ""},
@@ -6164,6 +6237,88 @@ class WebGlossaryDeepFieldsTest(unittest.TestCase):
         block2 = block2[:block2.index("</article>")]
         self.assertNotIn('class="gl-detail"', block2)
         self.assertNotIn('class="gl-refs"', block2)
+
+
+class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
+    """[B3] reg_refs 링크 조용한 소실 가드 — WebGlossaryDeepFieldsTest 는 정규화 로직을
+    합성 데이터로 검증하고, 이 클래스는 **커밋된 정본 glossary.json 전 항목 + 실 자료실
+    카탈로그**를 render.build_glossary_view 의 공개 경로로 돌려 실제 링크 수를 잰다.
+
+    왜 필요한가: 자료실(web/data/library/*.json)은 매주 자동 갱신되고 그때 골든도 자동
+    재동결돼 커밋된다. 자료실에서 문서 코드가 사라지거나 이름이 바뀌면(_reg_ref_url 이
+    code 정확 일치만 신뢰하므로) 용어사전 링크가 **아무 경고 없이** 사라지고 골든은 그
+    상태로 다시 도장 찍힌다 — 화면은 멀쩡해 보이고 기존 테스트도 통과한다. 아래 하한선/
+    상한선은 파일 상단 상수(실측치, 2026-08-04) 참조. render.py·web/data/*·golden 은
+    이 클래스에서 절대 건드리지 않는다(읽기 전용 관측)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        # 프로덕션 호출부(render.py 의 render_site)와 동일한 경로: 실 자료실 카탈로그를
+        # 명시적으로 실어 build_glossary_view 를 돌린다(카탈로그 미지정이면 R2~R6 이
+        # 전부 "" 로 떨어져 이 가드 자체가 무의미해진다).
+        cls.catalogs = render._load_reg_ref_catalogs()
+        cls.view = render.build_glossary_view(cls.terms, cls.catalogs)
+        # 그룹→용어→reg_refs 평탄화. 같은 라벨이 여러 용어에서 반복 인용돼도 그대로 둔다
+        # — 화면은 용어 카드마다 칩을 새로 그리므로 "칩 개수"는 발생 건수 기준이어야
+        # 렌더와 일치한다(고유 라벨 집합으로 접으면 실제 화면 손실 규모를 과소평가한다).
+        cls.chips = [r for g in cls.view["groups"] for t in g["terms"] for r in t["reg_refs"]]
+
+    def setUp(self):
+        # 0건 가드(명세 5) — reg_refs 대상 칩이 애초에 0건이면 아래 "N 이상"·"계열별
+        # 최소" 단언들은 빈 집합에 대한 전칭 단언이 되어 항상 참으로 조용히 통과해버린다
+        # (위험). 이 클래스의 모든 테스트 앞에 걸어 어떤 메서드도 그 함정을 피해가지
+        # 못하게 한다.
+        self.assertGreater(
+            len(self.chips), 0,
+            "glossary.json 전 항목의 reg_refs 대상 칩이 0건 — 검사 대상 자체가 사라졌다"
+            "(빈 집합에 대한 링크 단언은 항상 참이라 이 상태로는 가드가 무의미하다)")
+
+    def test_reg_ref_links_resolve_above_floor(self):
+        resolved = [c for c in self.chips if c["url"]]
+        lost_labels = sorted({c["label"] for c in self.chips if not c["url"]})
+        self.assertGreaterEqual(
+            len(resolved), _REG_REF_RESOLVED_FLOOR,
+            f"reg_ref 링크 해석 {len(resolved)}건 < 하한 {_REG_REF_RESOLVED_FLOOR}건 — "
+            "자료실 카탈로그 변경(문서 코드 소실·개명)으로 용어사전 링크가 사라졌을 "
+            "가능성이 있다. 현재 무링크 라벨:\n  " + "\n  ".join(lost_labels))
+
+    def test_reg_ref_unresolved_labels_are_known(self):
+        unresolved = {c["label"] for c in self.chips if not c["url"]}
+        new_unresolved = sorted(unresolved - _REG_REF_KNOWN_UNRESOLVED_LABELS)
+        self.assertLessEqual(
+            len(unresolved), _REG_REF_UNRESOLVED_LABEL_CAP,
+            f"무링크 고유 라벨 {len(unresolved)}종 > 상한 {_REG_REF_UNRESOLVED_LABEL_CAP}종 "
+            "— 새로 무링크가 된 라벨:\n  " + "\n  ".join(new_unresolved))
+
+    def test_reg_ref_link_families_each_have_links(self):
+        # 전체 합계 하한(377) 만 보면 한 계열이 통째로 죽어도(예: eu_gmp.json 이 통째로
+        # 비거나 code 필드 형식이 바뀌어 EU GMP 조항이 전부 무매치가 돼도) 덩치 큰 다른
+        # 계열이 합계를 채워 통과해버릴 수 있다(eu_gmp 만 163/377 = 전체의 43%). 계열별로
+        # 따로 봐야 "한 계열 통째 손실"을 잡는다.
+        fam_resolved = collections.Counter()
+        for c in self.chips:
+            if not c["url"]:
+                continue
+            fam = _classify_reg_ref_family(c["label"])
+            if fam:
+                fam_resolved[fam] += 1
+        for fam, floor in sorted(_REG_REF_FAMILY_FLOORS.items()):
+            self.assertGreaterEqual(
+                fam_resolved[fam], floor,
+                f"{fam} 계열 reg_ref 링크 {fam_resolved[fam]}건 < 하한 {floor}건 — "
+                f"web/data/library/{fam}.json 카탈로그가 통째로 손상됐거나 code 형식이 "
+                "바뀌었을 가능성")
+
+    def test_reg_ref_urls_are_https_and_wellformed(self):
+        for c in self.chips:
+            url = c["url"]
+            if not url:
+                continue
+            self.assertTrue(url.startswith("https://"),
+                             f"reg_ref URL 이 https:// 로 시작하지 않음: {c['label']!r} -> {url!r}")
+            self.assertNotRegex(url, r"\s",
+                                 f"reg_ref URL 에 공백 포함: {c['label']!r} -> {url!r}")
 
 
 def freeze() -> None:

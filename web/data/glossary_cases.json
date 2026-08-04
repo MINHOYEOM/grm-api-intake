@@ -925,6 +925,162 @@
       "q": "위험기반 의사결정",
       "findings": 1,
       "documents": 1
+    },
+    {
+      "id": "written-procedure",
+      "q": "written procedure",
+      "findings": 932,
+      "documents": 692
+    },
+    {
+      "id": "quality-control-unit",
+      "q": "quality control unit",
+      "findings": 771,
+      "documents": 676
+    },
+    {
+      "id": "laboratory-controls",
+      "q": "laboratory controls",
+      "findings": 310,
+      "documents": 306
+    },
+    {
+      "id": "sampling-plan",
+      "q": "sampling plan",
+      "findings": 166,
+      "documents": 163
+    },
+    {
+      "id": "adverse-event",
+      "q": "adverse event",
+      "findings": 119,
+      "documents": 114
+    },
+    {
+      "id": "quality-system",
+      "q": "quality system",
+      "findings": 61,
+      "documents": 61,
+      "note": "미국 경고서한의 '귀사의 품질시스템이 부적절하다'와 유럽 실사보고의 PQS 지적이 함께 걸린다 — 둘 다 품질시스템 주제라 섞여도 오인이 아니다"
+    },
+    {
+      "id": "container-closure",
+      "q": "container closure",
+      "findings": 54,
+      "documents": 52
+    },
+    {
+      "id": "water-system",
+      "q": "water system",
+      "findings": 42,
+      "documents": 38
+    },
+    {
+      "id": "visual-inspection",
+      "q": "visual inspection",
+      "findings": 42,
+      "documents": 34
+    },
+    {
+      "id": "field-alert",
+      "q": "field alert",
+      "findings": 33,
+      "documents": 33
+    },
+    {
+      "id": "in-process-control",
+      "q": "in-process control",
+      "findings": 29,
+      "documents": 29
+    },
+    {
+      "id": "quality-agreement",
+      "q": "quality agreement",
+      "findings": 19,
+      "documents": 19
+    },
+    {
+      "id": "business-operator-recall",
+      "q": "영업자 회수",
+      "findings": 18,
+      "documents": 18
+    },
+    {
+      "id": "master-standard-documents",
+      "q": "기준서",
+      "findings": 31,
+      "documents": 31,
+      "note": "제조관리기준서·품질관리기준서·제품표준서·자사기준서가 모두 '기준서'를 포함해 한 검색어로 잡힌다"
+    },
+    {
+      "id": "shelf-life",
+      "q": "shelf life",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "preventive-maintenance",
+      "q": "preventive maintenance",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "equipment-qualification",
+      "q": "equipment qualification",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "laboratory-investigation",
+      "q": "laboratory investigation",
+      "findings": 14,
+      "documents": 13
+    },
+    {
+      "id": "non-conformance",
+      "q": "non-conformance",
+      "findings": 10,
+      "documents": 10,
+      "note": "붙여 쓴 'nonconformance' 4건은 별도 검색어라 이 숫자에 없다"
+    },
+    {
+      "id": "purified-water",
+      "q": "purified water",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "labeling-control",
+      "q": "labeling control",
+      "findings": 8,
+      "documents": 8,
+      "note": "8건 전부 21 CFR 211.188(b)(8) 배치기록의 표시자재 관리기록 누락 — 표현이 같은 것은 FDA 지적문 자체가 정형이기 때문"
+    },
+    {
+      "id": "complaint-handling",
+      "q": "complaint handling",
+      "findings": 6,
+      "documents": 6
+    },
+    {
+      "id": "good-documentation-practices",
+      "q": "good documentation practice",
+      "findings": 6,
+      "documents": 6,
+      "note": "단수형으로 검색해 practice·practices 를 함께 잡는다"
+    },
+    {
+      "id": "microbial-limits",
+      "q": "microbial limit",
+      "findings": 6,
+      "documents": 6,
+      "note": "단수형으로 검색해 limit·limits 를 함께 잡는다"
+    },
+    {
+      "id": "air-handling",
+      "q": "air handling",
+      "findings": 5,
+      "documents": 5
     }
   ],
   "excluded": [
@@ -1167,6 +1323,11 @@
       "id": "subjectivity",
       "term_ko": "주관성",
       "reason": "'subjective' 1건이 허브추출물 광고의 '주관적 수면개선'"
+    },
+    {
+      "id": "management-review",
+      "term_ko": "경영검토",
+      "reason": "'management review' 7건이 전부 경고서한 시정요구 상용구('…and improved systems for ongoing management review')에 걸린 것 — 지적 자체는 천장 도장 벗겨짐·배치기록 훼손 등 경영검토와 무관한 주제라 링크하면 경영검토 지적사례로 오인된다"
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

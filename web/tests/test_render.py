@@ -62,15 +62,21 @@ REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 # render.build_glossary_view(terms, render._load_reg_ref_catalogs()) 로 실제로 돌려
 # 얻은 실측치다(WebGlossaryRegRefLinkGuardTest.setUpClass 와 동일 호출). 이 숫자보다
 # **줄면** 링크가 사라진 것이고, 무링크 라벨이 이 숫자보다 **늘면** 새로운 결손이다.
-_REG_REF_RESOLVED_FLOOR = 377          # 실측: url 이 비어있지 않은 칩 377/408건
+_REG_REF_RESOLVED_FLOOR = 421          # 실측: url 이 비어있지 않은 칩 421/455건
 _REG_REF_FAMILY_FLOORS = {             # 실측: 계열별 url 비어있지 않은 칩 개수
-    "cfr": 87, "ich": 98, "eu_gmp": 163, "pics": 22, "who": 7,
+    "cfr": 115, "ich": 103, "eu_gmp": 169, "pics": 23, "who": 11,
 }
-# 실측: 링크가 안 붙는 고유 라벨 13종(21 CFR 범위 표기·EU GMP Annex 19 두 판본 모호·
+# 실측: 링크가 안 붙는 고유 라벨 16종(21 CFR 범위 표기·EU GMP Annex 19 두 판본 모호·
 # EU GMP Part III Site Master File(모호)·MHRA GxP Data Integrity Guidance(자료실
-# 카탈로그 없음)·국문 K-GMP 고시(자료실에 해당 문서 미보유) — R7 계열 밖이거나 라벨이
+# 카탈로그 없음)·국내 법령 4종(자료실에 해당 문서 미보유) — R7 계열 밖이거나 라벨이
 # 카탈로그를 유일하게 특정하지 못하는 경우. _reg_ref_url 은 "틀린 링크보다 무링크가
 # 안전"이라 이런 경우 의도적으로 "" 를 반환한다(버그 아님).
+#
+# 2026-08-04 용어 26개 추가(트랙③) 반영: 칩 408→455, 해석 377→421(+44). 새 용어의
+# reg_refs 는 21 CFR·ICH·EU GMP·PIC/S·WHO 라벨이라 전부 자료실 카탈로그로 해석되고,
+# 무링크로 남는 건 국내 법령 3종(약사법 제39조·의약품 등의 안전에 관한 규칙 [별표 1]·
+# 같은 규칙 제50조)뿐이다 — mfds.json 카탈로그가 고시·가이드라인만 보유하고 법률·
+# 총리령 본문은 담지 않기 때문(R6 접두 분기에도 걸리지 않아 R7 로 떨어진다).
 _REG_REF_KNOWN_UNRESOLVED_LABELS = frozenset({
     "21 CFR 211.160–211.194",
     "21 CFR 211.180–211.194",
@@ -84,9 +90,12 @@ _REG_REF_KNOWN_UNRESOLVED_LABELS = frozenset({
     "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1",
     "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1, 6.17.1",
     "PIC/S PE 009-17 Annex 19",
+    "약사법 제39조",
+    "의약품 등의 안전에 관한 규칙 [별표 1]",
+    "의약품 등의 안전에 관한 규칙 제50조",
     "의약품 제조 및 품질관리에 관한 규정 [별표 1]",
 })
-_REG_REF_UNRESOLVED_LABEL_CAP = len(_REG_REF_KNOWN_UNRESOLVED_LABELS)  # 13, 실측
+_REG_REF_UNRESOLVED_LABEL_CAP = len(_REG_REF_KNOWN_UNRESOLVED_LABELS)  # 16, 실측
 
 
 def _classify_reg_ref_family(label: str) -> str | None:
@@ -6088,7 +6097,10 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertEqual(buckets, sorted(expected_present, key=lambda b: (order.get(b, 99), b)))
         self.assertEqual(self.html.count('<section class="gl-group"'), len(buckets))
         self.assertEqual(view["total"], len(self.terms))
-        self.assertEqual(len(self.terms), 200)  # v3 200어(교체 정합 가드 — 9차 자율 런 G1)
+        # 총 어휘 수 가드(교체 정합 — 9차 자율 런 G1). 용어를 **교체**할 때 실수로
+        # 개수가 줄어드는 것을 잡는 장치라, 의도적 증설 때는 실측치로 갱신한다.
+        # 200(v3) → 226: 2026-08-04 트랙③ 미국 FDA 법문 표현 중심 26어 추가.
+        self.assertEqual(len(self.terms), 226)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

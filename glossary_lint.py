@@ -34,7 +34,10 @@ DEFAULT_GLOSSARY = REPO_ROOT / "web" / "data" / "glossary.json"
 DEFAULT_GLOSSARY_CASES = REPO_ROOT / "web" / "data" / "glossary_cases.json"
 
 # Allowed field set = the exact keys web/render.py's build_glossary_view reads
-# (_term_view, web/render.py ~L1160-1196). Anything outside this list is a
+# (_term_view, web/render.py ~L1160-1196), plus `aliases` — committed data (2026-08-04,
+# 58 terms / 95 synonyms) that render.py does not consume yet (search-wiring is a
+# separate, not-yet-done task). It is validated now so bad values can't get committed
+# silently while it waits to be wired in. Anything outside this list is a
 # typo waiting to be silently ignored by the renderer.
 REQUIRED_FIELDS: dict[str, type] = {
     "id": str,
@@ -48,6 +51,7 @@ OPTIONAL_FIELDS: dict[str, type] = {
     "related": list,
     "detail_ko": str,
     "reg_refs": list,
+    "aliases": list,
 }
 ALLOWED_FIELDS = set(REQUIRED_FIELDS) | set(OPTIONAL_FIELDS)
 
@@ -132,6 +136,25 @@ BASELINE_DETAIL_KO_SIMILAR_IDS = frozenset({
 SHORT_FIELD_MIN_LENGTH = 10
 BASELINE_SHORT_FIELD_COUNT = 0
 
+# aliases 0건 가드 — 방향이 위 W1~W3 과 반대다(저건 "늘면 ERROR", 이건 "줄면 ERROR").
+# aliases 를 가진 용어가 이 하한 밑으로 떨어지면(필드가 통째로 날아가는 등) ALIAS_SELF/
+# ALIAS_DUPLICATE/ALIAS_TERM_COLLISION/ALIAS_ALIAS_COLLISION 은 검사할 원소 자체가
+# 없어 전부 조용히 통과해버린다 — 그 상태를 명시적으로 막는다.
+# 실측(2026-08-04, python으로 web/data/glossary.json 226개 항목을 직접 순회해 카운트):
+#   aliases 가 비어 있지 않은 항목 56개, alias 원소 총합 91개.
+#   (처음 실측은 58개/95개였는데, 같은 날 병렬로 진행된 용어 증설(200→226어)이
+#    'Quality Control Unit'·'Non-conformance'·'Written Procedures' 를 **정식 표제어로**
+#    올리면서 같은 말을 동의어로도 갖고 있던 quality-unit·deviation·sop 에서 4건을
+#    뺐다. 표제어와 동의어가 같은 이름을 주장하면 사용자가 틀린 카드를 본다 —
+#    표제어가 이긴다.)
+#
+# 이 하한은 전체 코퍼스(term_count)가 이 하한 이상일 때만 적용한다(아래
+# _check_alias_floor) — term_count 자체가 58 미만이면 애초에 58개를 채우는 게
+# 구조적으로 불가능하고, 그런 축소 코퍼스는 다른 목적(tests/test_glossary_lint.py
+# 의 합성 픽스처 등)일 뿐 aliases 유실의 신호가 아니다. 그 규모 자체의 이상은
+# GLOSSARY_EMPTY(0건 가드) 등 별도 검사가 담당한다.
+ALIASES_MIN_TERM_COUNT = 56
+
 
 @dataclass(frozen=True)
 class LintIssue:
@@ -151,6 +174,7 @@ class LintReport:
     term_en_dup_pairs: int = 0
     detail_ko_similar_terms: int = 0
     short_field_count: int = 0
+    alias_term_count: int = 0
     issues: list[LintIssue] = field(default_factory=list)
     warnings: list[LintIssue] = field(default_factory=list)
     notices: list[str] = field(default_factory=list)
@@ -187,6 +211,7 @@ class LintReport:
             f"신규 {len(self.detail_ko_similar_ids - BASELINE_DETAIL_KO_SIMILAR_IDS)} · "
             f"해소 {len(BASELINE_DETAIL_KO_SIMILAR_IDS - self.detail_ko_similar_ids)})",
             f"short_field_count: {self.short_field_count} (baseline {BASELINE_SHORT_FIELD_COUNT})",
+            f"alias_term_count: {self.alias_term_count} (floor {ALIASES_MIN_TERM_COUNT})",
             f"errors: {len(self.issues)}",
             f"warnings: {len(self.warnings)}",
         ]
@@ -284,6 +309,16 @@ def _validate_item_schema(item: Any, index: int, report: LintReport) -> str | No
                     "related 항목은 비어 있지 않은 문자열이어야 합니다",
                 )
 
+    aliases = item.get("aliases")
+    if isinstance(aliases, list):
+        for aidx, a in enumerate(aliases):
+            if not isinstance(a, str) or not a.strip():
+                report.add(
+                    "ALIAS_ITEM_TYPE",
+                    f"{location}.aliases[{aidx}]",
+                    "aliases 항목은 비어 있지 않은 문자열이어야 합니다",
+                )
+
     reg_refs = item.get("reg_refs")
     if isinstance(reg_refs, list):
         for ridx, r in enumerate(reg_refs):
@@ -307,8 +342,105 @@ def _validate_item_schema(item: Any, index: int, report: LintReport) -> str | No
     return id_value if isinstance(id_value, str) and id_value.strip() else None
 
 
+_LABEL_PAREN_RE = re.compile(r"\([^)]*\)")
+
+
+def _label_key(value: str) -> str:
+    """이름 비교용 정규화 — 소문자 + 괄호 병기 제거 + 공백/하이픈/가운뎃점/슬래시 제거.
+
+    ★글자 그대로 비교하면 안 된다. 2026-08-04 실측으로 드러난 실패:
+    동의어 'non-conformance' 와 표제어 'Non-conformance' 를 **다른 것으로 보고 통과**시켰다.
+    동의어 'quality control unit' 과 표제어 'Quality Control Unit (QCU)' 도 마찬가지다.
+    화면 검색은 대소문자를 무시하는 부분일치라 사용자에게는 **같은 이름**인데 검사만
+    다르게 본 것이다 — 검사 기준이 사용자가 겪는 것과 어긋나면 그 검사는 헛돈다.
+
+    괄호 병기를 지우는 이유: 이 사전의 표제어는 'Quality Unit(s)'·'Adverse Event (AE)'
+    처럼 약어·복수형을 괄호로 덧붙이는 관례라, 괄호를 남기면 같은 이름이 안 맞는다.
+
+    한계(의도적으로 안 잡는다): 복수형 차이는 흡수하지 않는다('written procedure' vs
+    'Written Procedures'). 어간 추출은 규칙이 불안정해 오탐을 만든다 — 대신 그런 건
+    사람이 표제어/동의어 배정을 정할 때 판단한다."""
+    return re.sub(r"[\s\-·/]", "", _LABEL_PAREN_RE.sub("", value).lower())
+
+
+def _build_label_owners(data: list[Any]) -> dict[str, list[tuple[str, str]]]:
+    """정규화한 이름(_label_key) → 이 이름을 쓰는 (소유 id, 필드종류) 목록.
+    #6/#7 교차중복 탐지에 쓴다 — id 가 없거나 무효한 항목은 제외한다(스키마
+    검증에서 이미 REQUIRED_FIELD/ID_FORMAT 로 잡혔으니 여기서 또 잡을 필요가 없다)."""
+    owners: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        id_value = item.get("id")
+        if not (isinstance(id_value, str) and id_value.strip()):
+            continue
+        for field_name in ("term_ko", "term_en"):
+            value = item.get(field_name)
+            if isinstance(value, str) and value.strip():
+                owners[_label_key(value)].append((id_value, field_name))
+        aliases = item.get("aliases")
+        if isinstance(aliases, list):
+            for a in aliases:
+                if isinstance(a, str) and a.strip():
+                    owners[_label_key(a)].append((id_value, "aliases"))
+    return owners
+
+
+def _validate_item_aliases(
+    item: Any, location: str, id_value: str | None,
+    label_owners: dict[str, list[tuple[str, str]]], report: LintReport,
+) -> None:
+    """aliases 검사 4종: 위생(#3), 자기표제어 동일 금지(#5), 한 용어 안 중복(#4),
+    다른 용어의 표제어/동의어와 동일 금지(#6/#7 — 둘 다 ERROR). 비교는 '글자 그대로'
+    (대소문자 구분) — 기존 term_ko/term_en 중복 검사(W1)와 같은 관례를 따른다."""
+    aliases = item.get("aliases")
+    if not isinstance(aliases, list):
+        return
+    term_ko = item.get("term_ko") if isinstance(item.get("term_ko"), str) else None
+    term_en = item.get("term_en") if isinstance(item.get("term_en"), str) else None
+    seen: set[str] = set()
+    for aidx, a in enumerate(aliases):
+        if not isinstance(a, str) or not a.strip():
+            continue  # already flagged as ALIAS_ITEM_TYPE
+        aloc = f"{location}.aliases[{aidx}]"
+        _check_hygiene(a, aloc, report)
+
+        # ★비교 기준이 검사마다 다르다. 헷갈리기 쉬우니 이유를 남긴다.
+        #
+        # 자기 표제어·같은 용어 안 중복 → **글자 그대로**.
+        #   표제어가 'Back-up' 인데 동의어로 'backup' 을 두는 건 **정상이고 필요한 일**이다.
+        #   화면 검색은 정규화 없는 부분일치라, 이 동의어가 없으면 "backup" 으로 아무것도
+        #   못 찾는다. 정규화해서 비교하면 이런 표기 변형이 전부 "자기 자신과 동일"로
+        #   걸려버려, 정작 검색을 되살리는 데이터를 못 넣게 된다.
+        #
+        # 다른 용어와의 충돌 → **정규화**(_label_key).
+        #   여기서는 해가 반대다. 두 용어가 같은 이름을 주장하면 사용자가 틀린 카드를 본다.
+        #   'non-conformance'(동의어) 와 'Non-conformance'(표제어) 는 검색상 같은 이름이다.
+        if a == term_ko or a == term_en:
+            report.add("ALIAS_SELF", aloc, f"자기 자신의 표제어와 동일합니다: {a!r}")
+
+        if a in seen:
+            report.add("ALIAS_DUPLICATE", aloc, f"이 용어 안에서 중복된 동의어입니다: {a!r}")
+        seen.add(a)
+
+        for owner_id, owner_field in label_owners.get(_label_key(a), []):
+            if owner_id == id_value:
+                continue  # 자기 자신(표제어는 ALIAS_SELF, 동의어 자체중복은 위에서 처리)
+            if owner_field in ("term_ko", "term_en"):
+                report.add(
+                    "ALIAS_TERM_COLLISION", aloc,
+                    f"다른 용어 {owner_id!r}의 표제어({owner_field})와 동일한 동의어입니다: {a!r}",
+                )
+            else:
+                report.add(
+                    "ALIAS_ALIAS_COLLISION", aloc,
+                    f"다른 용어 {owner_id!r}의 동의어와 동일합니다: {a!r}",
+                )
+
+
 def _validate_item_refs_and_hygiene(
-    item: Any, index: int, report: LintReport, ids: set[str]
+    item: Any, index: int, report: LintReport, ids: set[str],
+    label_owners: dict[str, list[tuple[str, str]]],
 ) -> None:
     """related 참조(E7~E9)·URL(E10~E12)·문자열 위생(E13) — 전체 id 집합이 필요해서
     스키마 검증과 별도 패스로 돈다."""
@@ -332,6 +464,8 @@ def _validate_item_refs_and_hygiene(
                 report.add("RELATED_DUPLICATE", rloc, f"related 안에서 중복 참조입니다: {r!r}")
             seen.add(r)
             _check_hygiene(r, rloc, report)
+
+    _validate_item_aliases(item, location, id_value, label_owners, report)
 
     source_url = item.get("source_url")
     if isinstance(source_url, str) and source_url.strip():
@@ -519,6 +653,34 @@ def _check_short_fields(data: list[Any], report: LintReport) -> None:
     )
 
 
+def _check_alias_floor(data: list[Any], report: LintReport) -> None:
+    """#8 — aliases 0건 가드. ALIAS_SELF/ALIAS_DUPLICATE/ALIAS_TERM_COLLISION/
+    ALIAS_ALIAS_COLLISION 은 전부 aliases 원소가 있어야만 검사할 것이 생긴다 —
+    필드가 통째로 날아가면(리네임·직렬화 사고 등) 그 검사들은 조용히 전부 통과한다.
+    보유 용어 수가 실측 하한 밑으로 떨어지면 그 자체를 ERROR 로 명시한다.
+
+    전체 코퍼스가 하한보다 작으면(합성 테스트 픽스처 등) 애초에 하한을 채우는 게
+    구조적으로 불가능하므로 건너뛴다 — ALIASES_MIN_TERM_COUNT 상단 주석 참고."""
+    count = sum(
+        1 for item in data
+        if isinstance(item, dict)
+        and isinstance(item.get("aliases"), list)
+        and any(isinstance(a, str) and a.strip() for a in item.get("aliases"))
+    )
+    report.alias_term_count = count
+    if len(data) < ALIASES_MIN_TERM_COUNT:
+        return
+    if count < ALIASES_MIN_TERM_COUNT:
+        report.add(
+            "ALIASES_COUNT_FLOOR",
+            "glossary",
+            f"aliases를 가진 용어가 {count}개로 하한 {ALIASES_MIN_TERM_COUNT}개 밑으로 "
+            f"떨어졌습니다 (aliases 필드가 유실되지 않았는지 확인하십시오 — 이 상태에서는 "
+            f"ALIAS_SELF/ALIAS_DUPLICATE/ALIAS_TERM_COLLISION/ALIAS_ALIAS_COLLISION 검사가 "
+            f"조용히 전부 통과합니다)",
+        )
+
+
 def _validate_cases(
     path: Path, report: LintReport, glossary_ids: set[str] | None
 ) -> None:
@@ -663,12 +825,14 @@ def lint_glossary(
             )
         ids.add(id_value)
 
+    label_owners = _build_label_owners(data)
     for index, item in enumerate(data):
-        _validate_item_refs_and_hygiene(item, index, report, ids)
+        _validate_item_refs_and_hygiene(item, index, report, ids, label_owners)
 
     _check_term_duplicates(data, report)
     _check_detail_ko_similarity(data, report)
     _check_short_fields(data, report)
+    _check_alias_floor(data, report)
 
     _validate_cases(glossary_cases, report, ids)
     return report

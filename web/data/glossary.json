@@ -3,6 +3,10 @@
     "id": "gmp",
     "term_ko": "의약품 제조 및 품질관리기준",
     "term_en": "Good Manufacturing Practice (GMP)",
+    "aliases": [
+      "cGMP",
+      "current good manufacturing practice"
+    ],
     "easy_ko": "의약품이 허가된 용도와 품질기준에 맞게 일관되게 생산·관리되도록 하는 품질보증의 일부입니다.",
     "definition_source": "WHO Technical Report Series No. 986, Annex 2, WHO good manufacturing practices for pharmaceutical products: main principles, Glossary",
     "related": [
@@ -38,6 +42,9 @@
     "id": "api",
     "term_ko": "원료의약품",
     "term_en": "Active Pharmaceutical Ingredient (API) / Drug Substance",
+    "aliases": [
+      "active substance"
+    ],
     "easy_ko": "의약품 제조에 사용되며 완제품에서 유효성분이 되는 물질 또는 물질의 혼합물입니다.",
     "definition_source": "ICH Q7, Good Manufacturing Practice Guide for Active Pharmaceutical Ingredients, §20 Glossary, Active Pharmaceutical Ingredient",
     "related": [
@@ -128,6 +135,10 @@
     "id": "batch-record",
     "term_ko": "제조기록서·제조단위기록서",
     "term_en": "Batch Records",
+    "aliases": [
+      "batch production record",
+      "batch production and control record"
+    ],
     "easy_ko": "특정 배치의 제조 과정과 최종 품질에 관련된 상황을 보여 주는 모든 문서입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Batch records",
     "related": [
@@ -200,6 +211,9 @@
     "id": "finished-product",
     "term_ko": "완제품·최종제품",
     "term_en": "Finished Product",
+    "aliases": [
+      "finished pharmaceutical product"
+    ],
     "easy_ko": "최종 용기에 넣고 포장하는 단계를 포함해 모든 생산 단계를 마친 의약품입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Finished Product",
     "related": [
@@ -344,6 +358,9 @@
     "id": "marketing-authorization",
     "term_ko": "품목허가·판매승인",
     "term_en": "Marketing Authorization (Product Licence, Registration Certificate)",
+    "aliases": [
+      "marketing authorisation"
+    ],
     "easy_ko": "의약품의 조성, 제조, 시험, 표시 등 승인된 내용을 정한 규제당국의 공식 허가입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Marketing authorization",
     "related": [
@@ -362,6 +379,9 @@
     "id": "authorized-person",
     "term_ko": "출하승인책임자",
     "term_en": "Authorized Person",
+    "aliases": [
+      "qualified person"
+    ],
     "easy_ko": "각 배치가 법규에 따라 제조·시험되고 출하 승인되도록 책임지는 규제당국 인정 책임자입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Authorized person",
     "related": [
@@ -380,6 +400,9 @@
     "id": "batch-release",
     "term_ko": "배치 출하승인",
     "term_en": "Batch Release",
+    "aliases": [
+      "lot release"
+    ],
     "easy_ko": "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 16, Authorised Person and Batch Release",
     "related": [
@@ -437,6 +460,9 @@
     "id": "reworking",
     "term_ko": "재작업·재처리",
     "term_en": "Reworking",
+    "aliases": [
+      "rework"
+    ],
     "easy_ko": "규격에 맞지 않은 물질을 통상 공정과 다른 하나 이상의 처리단계에 투입해 품질을 적합하게 만드는 것입니다.",
     "definition_source": "ICH Q7, §20 Glossary, Reworking",
     "related": [
@@ -623,6 +649,9 @@
     "id": "pharmaceutical-quality-system",
     "term_ko": "의약품 품질시스템",
     "term_en": "Pharmaceutical Quality System (PQS)",
+    "aliases": [
+      "quality management system"
+    ],
     "easy_ko": "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계입니다.",
     "definition_source": "ICH Q10, Pharmaceutical Quality System, §§1.2–1.8 and Glossary",
     "related": [
@@ -713,6 +742,9 @@
     "id": "continual-improvement",
     "term_ko": "지속적 개선",
     "term_en": "Continual Improvement",
+    "aliases": [
+      "continuous improvement"
+    ],
     "easy_ko": "요구사항을 충족하는 능력을 높이기 위해 반복적으로 수행하는 개선 활동입니다.",
     "definition_source": "ICH Q10, §§1.5.3 and 3.2.4; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -929,6 +961,10 @@
     "id": "risk-reduction",
     "term_ko": "위험 감소",
     "term_en": "Risk Reduction",
+    "aliases": [
+      "risk mitigation",
+      "위험 완화"
+    ],
     "easy_ko": "위해 발생 가능성이나 심각성을 낮추기 위해 취하는 조치입니다.",
     "definition_source": "ICH Q9(R1), Glossary, Risk Reduction",
     "related": [
@@ -1019,6 +1055,9 @@
     "id": "capa",
     "term_ko": "시정 및 예방조치",
     "term_en": "Corrective and Preventive Action (CAPA)",
+    "aliases": [
+      "시정·예방조치"
+    ],
     "easy_ko": "발생한 문제의 재발과 잠재적 문제의 발생을 막기 위해 원인을 조사하고 조치를 실행·확인하는 체계입니다.",
     "definition_source": "ICH Q10, §3.2.2 Corrective Action and Preventive Action System",
     "related": [
@@ -1145,6 +1184,10 @@
     "id": "supplier-qualification",
     "term_ko": "공급업체 적격성평가",
     "term_en": "Supplier Qualification",
+    "aliases": [
+      "vendor qualification",
+      "공급자 적격성평가"
+    ],
     "easy_ko": "공급업체가 정한 품질요건에 맞는 자재나 서비스를 지속적으로 제공할 능력이 있는지 평가·승인하는 활동입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 5, Production, §§5.27–5.29 and 5.45",
     "related": [
@@ -1185,6 +1228,12 @@
     "id": "contract-manufacturer",
     "term_ko": "수탁제조업자",
     "term_en": "Contract Manufacturer",
+    "aliases": [
+      "contract manufacturing organization",
+      "CMO",
+      "위탁제조업체",
+      "수탁업체"
+    ],
     "easy_ko": "다른 제조업자와의 서면계약에 따라 일부 또는 전부의 제조 작업을 수행하는 제조업자입니다.",
     "definition_source": "ICH Q7, §20 Glossary, Contract Manufacturer; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -1205,6 +1254,9 @@
     "id": "product-quality-review",
     "term_ko": "제품품질평가",
     "term_en": "Product Quality Review (PQR)",
+    "aliases": [
+      "annual product review"
+    ],
     "easy_ko": "공정과 제품의 일관성, 규격의 적절성, 추세와 개선 필요성을 확인하기 위해 정기적으로 수행하는 품질 검토입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 1, Product Quality Review",
     "related": [
@@ -1225,6 +1277,11 @@
     "id": "product-complaint",
     "term_ko": "제품 품질불만",
     "term_en": "Product Complaint",
+    "aliases": [
+      "quality complaint",
+      "customer complaint",
+      "고객불만"
+    ],
     "easy_ko": "유통된 의약품의 품질, 포장 또는 표시 등에 결함이 있을 가능성을 제기하는 정보입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 8, Complaints, Quality Defects and Product Recalls",
     "related": [
@@ -1245,6 +1302,10 @@
     "id": "sop",
     "term_ko": "표준작업절차서",
     "term_en": "Standard Operating Procedure (SOP)",
+    "aliases": [
+      "표준작업지침서",
+      "표준운영절차"
+    ],
     "easy_ko": "특정 작업을 일관되게 수행하기 위해 승인된 방법과 순서를 적은 문서입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Standard operating procedure; WHO TRS 986 Annex 2, Glossary",
     "related": [
@@ -1317,6 +1378,10 @@
     "id": "raw-data",
     "term_ko": "원자료·기초자료",
     "term_en": "Raw Data",
+    "aliases": [
+      "source data",
+      "원시 데이터"
+    ],
     "easy_ko": "활동을 완전히 재구성하고 평가하는 데 필요한 최초 관찰과 그 후의 원본 기록·데이터입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Raw Data",
     "related": [
@@ -1353,6 +1418,9 @@
     "id": "data-integrity",
     "term_ko": "데이터 완전성",
     "term_en": "Data Integrity",
+    "aliases": [
+      "데이터 무결성"
+    ],
     "easy_ko": "데이터가 생성부터 폐기까지 완전하고 일관되며 정확하고 신뢰할 수 있는 상태를 유지하는 정도입니다.",
     "definition_source": "WHO Quality Assurance of Medicines Terminology Database; WHO guideline on data integrity",
     "related": [
@@ -1389,6 +1457,9 @@
     "id": "audit-trail",
     "term_ko": "감사추적기록",
     "term_en": "Audit Trail",
+    "aliases": [
+      "감사 추적"
+    ],
     "easy_ko": "전자기록의 생성·변경·삭제와 그 이유를 시간순으로 재구성할 수 있게 하는 보안된 기록입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 11, §9 Audit Trails and Glossary",
     "related": [
@@ -1407,6 +1478,10 @@
     "id": "computerised-system",
     "term_ko": "컴퓨터화 시스템",
     "term_en": "Computerised System",
+    "aliases": [
+      "computerized system",
+      "전산화 시스템"
+    ],
     "easy_ko": "특정 기능을 함께 수행하도록 구성된 소프트웨어와 하드웨어 요소의 집합입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 11, Principle and Glossary",
     "related": [
@@ -1533,6 +1608,9 @@
     "id": "user-requirements-specification",
     "term_ko": "사용자요구사항규격서",
     "term_en": "User Requirements Specification (URS)",
+    "aliases": [
+      "user requirements"
+    ],
     "easy_ko": "시설·설비·유틸리티 또는 시스템이 사용 목적에 맞게 충족해야 할 요구사항을 정한 규격서입니다.",
     "definition_source": "EU GMP Annex 15, §3.2 User Requirements Specification",
     "related": [
@@ -1699,6 +1777,13 @@
     "id": "analytical-procedure-validation",
     "term_ko": "분석절차 밸리데이션",
     "term_en": "Analytical Procedure Validation",
+    "aliases": [
+      "method validation",
+      "analytical method validation",
+      "test method validation",
+      "분석법 밸리데이션",
+      "시험방법 밸리데이션"
+    ],
     "easy_ko": "분석절차가 의도한 목적에 적합한 성능을 낸다는 점을 성능특성과 기준으로 입증하는 활동입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Analytical Procedure; ICH Q2, Validation of Analytical Procedures",
     "related": [
@@ -1756,6 +1841,10 @@
     "id": "analytical-procedure",
     "term_ko": "분석절차·시험방법",
     "term_en": "Analytical Procedure",
+    "aliases": [
+      "analytical method",
+      "test method"
+    ],
     "easy_ko": "시험분석을 수행하기 위해 상세히 기술한 일련의 작업과 조건입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Analytical Procedure",
     "related": [
@@ -1832,6 +1921,9 @@
     "id": "specificity",
     "term_ko": "특이성",
     "term_en": "Specificity",
+    "aliases": [
+      "selectivity"
+    ],
     "easy_ko": "불순물·분해산물·기질 같은 다른 성분이 있어도 분석대상을 정확히 평가하는 능력입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Specificity",
     "related": [
@@ -1946,6 +2038,9 @@
     "id": "assay",
     "term_ko": "함량·역가시험",
     "term_en": "Assay (Content or Potency)",
+    "aliases": [
+      "potency test"
+    ],
     "easy_ko": "검체에 존재하는 분석대상물질의 함량 또는 역가를 정확하게 측정하는 시험입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Assay: Content or Potency",
     "related": [
@@ -1964,6 +2059,9 @@
     "id": "identification-test",
     "term_ko": "확인시험",
     "term_en": "Identification Test",
+    "aliases": [
+      "identity test"
+    ],
     "easy_ko": "검체의 주성분이나 특정 성분이 의도한 물질인지 확인하는 시험입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Identification Test",
     "related": [
@@ -2054,6 +2152,9 @@
     "id": "oos",
     "term_ko": "규격이탈 결과",
     "term_en": "Out-of-Specification (OOS) Result",
+    "aliases": [
+      "out of specification"
+    ],
     "easy_ko": "허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어난 시험결과입니다.",
     "definition_source": "WHO TRS 1052, Annex 4, WHO good practices for pharmaceutical quality control laboratories, Glossary, Out-of-specification result",
     "related": [
@@ -2072,6 +2173,9 @@
     "id": "oot",
     "term_ko": "경향이탈 결과",
     "term_en": "Out-of-Trend (OOT) Result",
+    "aliases": [
+      "out of trend"
+    ],
     "easy_ko": "규격 안에 있더라도 과거 결과나 예상된 통계적 경향에서 벗어난 시험결과입니다.",
     "definition_source": "WHO TRS 1052, Annex 4, WHO good practices for pharmaceutical quality control laboratories, Glossary, Out-of-trend result",
     "related": [
@@ -2090,6 +2194,10 @@
     "id": "stability-testing",
     "term_ko": "안정성시험",
     "term_en": "Stability Testing",
+    "aliases": [
+      "stability study",
+      "stability studies"
+    ],
     "easy_ko": "시간과 온도·습도·빛 등의 영향에 따른 품질 변화를 평가해 재시험기간, 유효기간과 보관조건을 정하는 시험입니다.",
     "definition_source": "WHO Quality Assurance of Medicines Terminology Database, Stability studies; ICH Q1A(R2)",
     "related": [
@@ -2108,6 +2216,10 @@
     "id": "cleanroom",
     "term_ko": "청정실",
     "term_en": "Cleanroom",
+    "aliases": [
+      "clean room",
+      "클린룸"
+    ],
     "easy_ko": "공기 중 입자 농도를 관리하고 미생물·입자의 유입, 발생과 잔류를 줄이도록 설계·관리하는 방입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, Cleanroom",
     "related": [
@@ -2180,6 +2292,9 @@
     "id": "endotoxin",
     "term_ko": "엔도톡신·내독소",
     "term_en": "Endotoxin",
+    "aliases": [
+      "bacterial endotoxin"
+    ],
     "easy_ko": "그람음성균 세포벽의 지질다당류 성분으로, 의약품에 존재하면 발열 반응을 일으킬 수 있습니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, Endotoxin; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -2216,6 +2331,9 @@
     "id": "aseptic-processing",
     "term_ko": "무균공정·무균조작",
     "term_en": "Aseptic Processing",
+    "aliases": [
+      "aseptic manufacturing"
+    ],
     "easy_ko": "멸균된 제품·용기·기구를 다루는 동안 미생물, 엔도톡신과 입자 오염을 막도록 관리하는 공정입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary and §§2.1–2.7",
     "related": [
@@ -2273,6 +2391,9 @@
     "id": "alert-limit",
     "term_ko": "경고한계",
     "term_en": "Alert Limit",
+    "aliases": [
+      "alert level"
+    ],
     "easy_ko": "정상 운전조건에서 벗어날 가능성을 조기에 알리고 조사나 주의가 필요함을 나타내는 설정 수준입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, Alert level; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -2292,6 +2413,9 @@
     "id": "action-limit",
     "term_ko": "조치한계",
     "term_en": "Action Limit",
+    "aliases": [
+      "action level"
+    ],
     "easy_ko": "초과할 경우 원인조사와 적절한 시정조치를 즉시 수행해야 하는 설정 기준입니다.",
     "definition_source": "PIC/S PE 009-17, Glossary, Action limit; 식품의약품안전처, 「알기 쉬운 GMP 용어집」, Action level",
     "related": [
@@ -2368,6 +2492,9 @@
     "id": "terminal-sterilization",
     "term_ko": "최종멸균",
     "term_en": "Terminal Sterilisation",
+    "aliases": [
+      "terminal sterilization"
+    ],
     "easy_ko": "제품을 최종 용기에 넣어 밀봉한 뒤 멸균공정을 적용하는 방식입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, Terminal Sterilisation",
     "related": [
@@ -2499,6 +2626,9 @@
     "id": "cross-contamination",
     "term_ko": "교차오염",
     "term_en": "Cross-Contamination",
+    "aliases": [
+      "cross contamination"
+    ],
     "easy_ko": "한 물질 또는 제품이 다른 물질이나 제품에 의해 오염되는 것입니다.",
     "definition_source": "ICH Q7, §20 Glossary, Cross-Contamination; PIC/S PE 009-17 Glossary",
     "related": [
@@ -2555,6 +2685,9 @@
     "id": "disinfection",
     "term_ko": "소독",
     "term_en": "Disinfection",
+    "aliases": [
+      "sanitization"
+    ],
     "easy_ko": "표면이나 물체에 존재하는 미생물을 적절한 수준으로 줄이는 과정입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Disinfection; EU GMP Annex 1 §4",
     "related": [
@@ -2592,6 +2725,12 @@
     "id": "self-inspection",
     "term_ko": "자율점검",
     "term_en": "Self-Inspection",
+    "aliases": [
+      "internal audit",
+      "quality audit",
+      "자체점검",
+      "self inspection"
+    ],
     "easy_ko": "제조소가 자체적으로 GMP 준수와 품질시스템의 효과를 정기적으로 평가하는 점검입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 9, Self Inspection",
     "related": [
@@ -2646,6 +2785,9 @@
     "id": "retention-sample",
     "term_ko": "보관용 검체·보존품",
     "term_en": "Retention Sample",
+    "aliases": [
+      "reserve sample"
+    ],
     "easy_ko": "완제품 배치의 표시·포장 상태를 확인할 목적으로 보관하는 완전 포장 단위의 검체입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 19, Reference and Retention Samples",
     "related": [
@@ -2682,6 +2824,10 @@
     "id": "critical-zone",
     "term_ko": "임계구역",
     "term_en": "Critical Zone",
+    "aliases": [
+      "critical area",
+      "중요구역"
+    ],
     "easy_ko": "무균공정 중 제품과 중요 표면이 환경에 노출되는 구역입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Critical zone",
     "related": [
@@ -2699,6 +2845,12 @@
     "id": "unidirectional-airflow",
     "term_ko": "단일방향 기류",
     "term_en": "Unidirectional Airflow (UDAF)",
+    "aliases": [
+      "laminar flow",
+      "laminar airflow",
+      "laminar air flow",
+      "층류"
+    ],
     "easy_ko": "입자를 임계 작업구역에서 재현성 있게 쓸어내도록 한 방향으로 균일하게 흐르는 공기입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Unidirectional airflow",
     "related": [
@@ -2716,6 +2868,9 @@
     "id": "airflow-visualization-study",
     "term_ko": "기류가시화 연구·스모크 스터디",
     "term_en": "Airflow Visualization Study (Smoke Study)",
+    "aliases": [
+      "smoke test"
+    ],
     "easy_ko": "연무 등을 이용해 공기 흐름을 보이게 하여 오염원이 임계구역으로 이동하지 않는지 확인하는 연구입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§4.15, 4.30",
     "related": [
@@ -2767,6 +2922,11 @@
     "id": "viable-environmental-monitoring",
     "term_ko": "생균 환경모니터링",
     "term_en": "Viable Environmental Monitoring",
+    "aliases": [
+      "viable monitoring",
+      "microbial monitoring",
+      "microbiological monitoring"
+    ],
     "easy_ko": "공기·표면·인원에서 배양 가능한 미생물을 채취해 청정구역의 미생물 상태를 감시하는 활동입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§9.22–9.30",
     "related": [
@@ -2784,6 +2944,12 @@
     "id": "non-viable-particle-monitoring",
     "term_ko": "총입자·비생균 입자 모니터링",
     "term_en": "Total Particle (Non-viable) Monitoring",
+    "aliases": [
+      "non-viable particle monitoring",
+      "non-viable monitoring",
+      "non-viable particulate monitoring",
+      "NVP"
+    ],
     "easy_ko": "공기 중 전체 입자 농도를 연속 또는 정한 빈도로 측정해 청정상태를 감시하는 활동입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§9.15–9.21",
     "related": [
@@ -2801,6 +2967,9 @@
     "id": "cleanroom-qualification",
     "term_ko": "청정실 적격성평가",
     "term_en": "Cleanroom Qualification",
+    "aliases": [
+      "cleanroom certification"
+    ],
     "easy_ko": "분류된 청정실 또는 청정공기 설비가 의도된 용도에 적합한지 종합 평가하는 과정입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§4.24–4.32 and §11 Glossary",
     "related": [
@@ -2853,6 +3022,10 @@
     "id": "blow-fill-seal",
     "term_ko": "블로우-필-실",
     "term_en": "Blow-Fill-Seal (BFS)",
+    "aliases": [
+      "BFS",
+      "blow fill seal"
+    ],
     "easy_ko": "열가소성 수지로 용기를 성형하고 제품을 충전한 뒤 연속 자동 공정으로 밀봉하는 기술입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.105–8.110 and §11 Glossary",
     "related": [
@@ -2870,6 +3043,9 @@
     "id": "form-fill-seal",
     "term_ko": "폼-필-실",
     "term_en": "Form-Fill-Seal (FFS)",
+    "aliases": [
+      "form fill seal"
+    ],
     "easy_ko": "포장 필름으로 용기를 만들면서 제품을 충전하고 연속 공정으로 밀봉하는 자동화 기술입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.96–8.104 and §11 Glossary",
     "related": [
@@ -2887,6 +3063,9 @@
     "id": "lyophilization",
     "term_ko": "동결건조",
     "term_en": "Lyophilization (Freeze-drying)",
+    "aliases": [
+      "lyophilisation"
+    ],
     "easy_ko": "동결된 수분 또는 용매를 승화시켜 제품에서 제거하는 물리화학적 건조공정입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.117–8.126 and §11 Glossary",
     "related": [
@@ -2904,6 +3083,9 @@
     "id": "filter-integrity-test",
     "term_ko": "필터 완전성시험",
     "term_en": "Filter Integrity Test",
+    "aliases": [
+      "filter integrity testing"
+    ],
     "easy_ko": "필터가 손상되지 않고 요구된 보유 성능을 유지하는지 확인하는 비파괴 시험입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Filter integrity test",
     "related": [
@@ -2938,6 +3120,10 @@
     "id": "sterilising-grade-filter",
     "term_ko": "멸균등급 필터",
     "term_en": "Sterilising-grade Filter",
+    "aliases": [
+      "sterile filter",
+      "sterilizing filter"
+    ],
     "easy_ko": "적절히 검증되어 액체 또는 가스에서 미생물을 제거해 무균 여과 결과를 얻는 통상 최대 공칭공극 0.22 µm 필터입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§6.19, 8.79–8.95",
     "related": [
@@ -2989,6 +3175,9 @@
     "id": "overkill-sterilisation",
     "term_ko": "오버킬 멸균",
     "term_en": "Overkill Sterilisation",
+    "aliases": [
+      "overkill sterilization"
+    ],
     "easy_ko": "적절한 내성의 생물학적 지표에 대해 최소 12 log10 감소를 제공하도록 설정한 멸균공정입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Overkill sterilisation",
     "related": [
@@ -3006,6 +3195,10 @@
     "id": "container-closure-integrity",
     "term_ko": "용기밀봉 완전성",
     "term_en": "Container Closure Integrity (CCI)",
+    "aliases": [
+      "container closure integrity testing",
+      "CCIT"
+    ],
     "easy_ko": "용기와 마개 체계가 제품 수명주기 동안 미생물·가스·수분 등 외부 유입을 막는 능력입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.21–8.25",
     "related": [
@@ -3125,6 +3318,10 @@
     "id": "backup",
     "term_ko": "백업",
     "term_en": "Back-up",
+    "aliases": [
+      "backup",
+      "back up"
+    ],
     "easy_ko": "재해나 장애 후 복구를 위해 유지하는 현재 편집 가능한 데이터·메타데이터·시스템 설정의 복사본입니다.",
     "definition_source": "PIC/S PI 041-1 (2021), §13 Glossary: Back-up",
     "related": [
@@ -3143,6 +3340,9 @@
     "id": "archive",
     "term_ko": "아카이브·장기보관",
     "term_en": "Archiving / Archive",
+    "aliases": [
+      "archival"
+    ],
     "easy_ko": "완료된 데이터와 관련 메타데이터를 공정·활동 재구성을 위해 최종 형태로 장기 보존하는 것입니다.",
     "definition_source": "PIC/S PI 041-1 (2021), §13 Glossary: Archiving",
     "related": [
@@ -3559,6 +3759,9 @@
     "id": "risk-based-decision-making",
     "term_ko": "위험기반 의사결정",
     "term_en": "Risk-Based Decision-Making",
+    "aliases": [
+      "risk based decision making"
+    ],
     "easy_ko": "위험과 지식·불확실성을 근거로 통제·수용·소통·검토 방식을 정하는 의사결정입니다.",
     "definition_source": "ICH Q9(R1) (2022), §§5.2 and 7 Definitions",
     "related": [

@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.181` |
+| 문서 버전 | `v1.182` |
 | 최종 수정일 | 2026-08-05 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 11,791건·문서 2,776건·업체 2,120곳·2018~2026년**(2026-07-31 실측), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 9카탈로그 400건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -197,6 +197,8 @@ flowchart TD
 
 > **소스 15 상세(MHRA GMP Statement of Non-Compliance):** 소스 14(EudraGMDP)의 **영국판 쌍둥이**로, 동일하게 **News 카드(kind `mhra-gmp-ncr`·Evidence A·위반내용·당국조치 전문) + Findings 이중 편입**. `mhra_gmdp_client.py`가 MHRA GMDP 등록부의 비준수 필터(`/mhra/gmp?f[0]=gmp_compliance:Non Compliant` — Drupal Facets·**세션 불요**)에서 slug 목록을 파싱하고, 각 상세 페이지(`/mhra/gmp/<slug>`)를 GET 해 "Statement of Non-Compliance" 원문을 결정론 추출(`<b>` 마커 split — Part 3 액션 필드가 레코드마다 가변). **EudraGMDP 대비 구조적으로 단순**: 상세 페이지가 세션 독립 서버렌더라 그 URL 자체가 영속 official_url → **Supabase Storage PDF 아카이브·세션/쿠키/페이징 로직 없음**. **dedup 키 = report_no**(파싱 실패 시 slug 폴백). 발행일 = 성명서 서명일(`contact-details`·실사일과 별개). 성긴 소스(7년 6건)라 enforcement 윈도우(30일) 수집 — facet 이 전량 반환하므로 **별도 백필 스크립트 불필요**(go-live 시 wide-window 1회 dispatch 로 시딩). Findings 는 `grm_classify_483_scope` 우회 자동(EU NCR 과 동일). `agency_from_source` 는 `"mhra"→"MHRA"`.
 
+> **소스 8 상세(MFDS 과거분 딥백필, 2026-08-05):** 국내 소스는 매일 크론의 창이 짧아 과거분이 영영 안 들어온다(2026-08-05 실측: `admin-action` 은 2026-04-28 이전이 raw_signals 에 0건). data.go.kr 행정처분/회수 API 는 과거분 노출을 보장하지 않는 **소멸성 데이터**라 `collect_mfds_backfill.py`(+`grm-mfds-backfill.yml`)가 넓은 창을 1회 수집해 `append_intake_item_with_findings_to_supabase` 로 raw+findings 직행 적재한다(멱등·Notion 무접촉). **두 수집기 공용 배관** — `--source {admin-action,recall}` 로 갈아끼운다(둘 다 `(start, end, service_key) -> (items, err)` 동일 시그니처). ★**상한이 창보다 먼저 걸린다**: 두 수집기 모두 페이지 상한(admin 20 / recall 25 × 100행)이 있고 **날짜 필터가 서버측이 아니라 클라이언트측**이라 창만 넓히면 아무것도 더 안 들어온다 → `--max-pages` 로 수집기 모듈 전역을 런타임에 상향하고(수집기 자체 불변), 상한 도달(truncated)은 **exit 3** 으로 잡을 빨갛게 끝낸다. 수집기가 truncated 를 `(items, err)` 의 err 로 돌려주므로 EU NCR 템플릿처럼 err 만 보고 버리면 최대 2,000행을 통째로 잃는다. EU NCR 백필과 달리 **적재 후 번역 단계 없음**(MFDS findings 는 전건 `finding_language='KO'`). `ENABLE_MFDS_URL_VERIFY` 는 건별 nedrug 접속(해외 IP 차단)이라 스크립트가 켜진 채 실행되면 자체 중단한다.
+
 > **소스 12 상세(FDA 483 PDF 텍스트 확보 — 스캔본 OCR 폴백, 2026-07-27):** FOIA 열람실 483 의 **대다수가 스캔 이미지**다(2026-07-26 실측: PDF 시도 40건 중 텍스트층이 온전한 것은 5건뿐). 그런데 그 스캔본에도 **마지막 장**에는 FDA 정형 고지문("The observations of objectionable conditions…" ≈1133자)이 텍스트로 들어 있어서, 문서 단위로 "텍스트가 하나라도 있으면 정상"이라고 보던 종전 판정이 스캔본 21건을 **정상 텍스트 PDF 로 오분류**했다. 그 결과 관찰 0건 → `fda483_body_full` 미보존 → deep 델타에 `source_text` 없음 → 조립 시점 재추출도 불가 → 디제스트가 "원문이 제공되지 않아"로 발행(원문은 공개돼 있는데도). **수리 = 페이지 단위 판정 + OCR 폴백**: `collect_fda_483._ocr_483_pdf_text` 가 텍스트 없는 페이지만 PyMuPDF 내장 OCR(`get_textpage_ocr`)로 읽고, 텍스트가 있는 페이지는 그대로 쓴다(읽을 수 있는 글자에 OCR 오인식을 덧씌우지 않는다). 새 파이썬 의존성 0 — tesseract 바이너리만 `grm-intake.yml` 이 설치한다(`ENABLE_FDA_483_OCR` **기본 on**, 엔진 부재 시 `scan-ocr-unavailable` 로 무해 degrade). 문서당 OCR 상한 30쪽.
 
 > **NCR 상세 국문 병기(2026-07-27):** 소스 14·15 의 "비준수 상세" 블록은 도입 이래 **영문 verbatim 만** 렌더했다(483·WL 에는 `deficiency_ko`/`statement_ko` 병기 층이 있는데 NCR 만 없었다 — 원인은 문구가 아니라 파이프라인 부재로, NCR kind 는 `deep_body_key` 가 없어 fan-out 대상 자체가 아니었다). **번역 전용 층을 신설**: `CardScaffold.translation_fields()` 가 `ncr_translation_ready`/`ncr_translation_input`(결정론 상세와 **같은 producer** 산출 — 짝 안 맞는 번역 불가능)을 handoff 에 싣고, Routine §B[2단계]④ 가 `ncr_ko` 를 예치하고, `inject_slots._merge_ncr_translations` 가 원문을 보존한 채 `*_ko` 를 얹는다. 심층분석과 **독립** — NCR 은 4섹션 분석 대상이 아니므로 근거 게이트를 태우지 않고 짝 맞춤만 검사한다. `_ko` 없는 카드는 기존대로 영문 단독(additive).
@@ -336,6 +338,7 @@ grm-api-intake/
 ├─ collect_mhra_ncr_backfill.py    # MHRA GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
 ├─ collect_fda_backfill.py         # [FIND-1 F2] FDA 483·WL 외부 백필(Notion 우회, Supabase 직행)
 ├─ collect_eu_ncr_backfill.py      # [FIND-1] EU GMP NCR 과거분 딥백필(넓은 창 1회 수집→raw+findings 직행)
+├─ collect_mfds_backfill.py        # [FIND-1] MFDS data.go.kr 과거분 딥백필(--source admin-action|recall 공용 배관·MAX_PAGES 런타임 상향)
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
 ├─ backfill_483_ocr_recovery.py    # OCR 엔진 부재로 빈 본문 적재된 스캔 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert)
 ├─ grm_common.py                   # 공통 HTTP·유틸
@@ -394,6 +397,7 @@ grm-api-intake/
    ├─ grm-findings-backfill.yml          # [FIND-1 M12] 내부 소급 적재(workflow_dispatch 전용)
    ├─ grm-eu-ncr-backfill.yml            # [FIND-1] EU GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-mhra-ncr-backfill.yml          # [FIND-1] MHRA GMP NCR 과거분 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
+   ├─ grm-mfds-backfill.yml              # [FIND-1] MFDS data.go.kr 과거분 딥백필(workflow_dispatch·source 선택·dry_run 기본 true·max_pages 상향)
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-fda483-ocr-recovery.yml        # 엔진 부재로 빈 본문 적재된 스캔 483 소급 복구(workflow_dispatch 1회성·apply 기본 false·OCR 필수·M12 체인)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지

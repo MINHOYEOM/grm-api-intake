@@ -234,6 +234,65 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(findings[0]["review_status"], "needs_review")
         self.assertEqual(findings[0]["confidence"], 0.72)
 
+    # ── MFDS GMP 실사 정형문 게이트 (2026-08-05 전량 실측 626문서 기반) ────────────
+    # 옛 실사결과 PDF 는 지적 표의 헤더행이 표로 인식되지 않아 발췌 경로로 폴백하는데,
+    # 그때 남는 게 표 헤더 + 결재란 부서명뿐인 경우가 많다(실측 128건 중 89건).
+    # 서식은 지적사항이 아니다 — ★건수로는 절대 안 걸러진다(정상적인 1건으로 보인다).
+
+    def test_gmp_excerpt_of_only_table_header_is_not_a_finding(self) -> None:
+        fx = _load_input("gmp_inspection_biologic")
+        fx["raw"].pop("gmp_deficiencies", None)
+        fx["raw"]["attachment_deficiency_excerpt"] = (
+            "지적(보완)사항 분류 : 분야 구분 근거 법령 지적(보완)사항 요약 한약정책과")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
+    def test_gmp_excerpt_of_only_vertical_department_stamp_is_not_a_finding(self) -> None:
+        # 결재란 부서명은 세로쓰기라 한 글자씩 추출된다.
+        fx = _load_input("gmp_inspection_biologic")
+        fx["raw"].pop("gmp_deficiencies", None)
+        fx["raw"]["attachment_deficiency_excerpt"] = (
+            "평가 결과: 지적(보완)사항 요약 - 2 - 의 료 제 품 안 전 과")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
+    def test_gmp_excerpt_with_real_deficiency_survives_the_gate(self) -> None:
+        # ★역방향 보호: 헤더·부서명이 붙어 있어도 실질 지적이 있으면 반드시 남는다
+        # (라이브 117건 중 이 모양이 실제로 있다).
+        fx = _load_input("gmp_inspection_biologic")
+        fx["raw"].pop("gmp_deficiencies", None)
+        fx["raw"]["attachment_deficiency_excerpt"] = (
+            "평가 결과: 지적(보완)사항 있음 분야 구분 근거 법령 지적(보완)사항 요약 "
+            "제조 기타 [별표 1의2] 제6.1호 제조기록서를 작업과 동시에 작성하지 않았음 "
+            "보완완료 한 약 정 책 과")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        findings = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("제조기록서를 작업과 동시에 작성하지 않았음", findings[0]["finding_text"])
+
+    def test_gmp_table_row_with_empty_cells_is_skipped(self) -> None:
+        # 표에서 왔다는 사실이 내용을 보장하지 않는다(실측: summary 가 'b' / '-' 인 1글자
+        # finding 2건). 같은 실질내용 기준을 표 경로에도 적용한다.
+        fx = _load_input("gmp_inspection_periodic")
+        fx["raw"]["gmp_deficiencies"] = [
+            {"area": "", "severity": "", "legal_basis": "", "summary": "b"},
+            {"area": "", "severity": "", "legal_basis": "", "summary": "-"},
+            {"area": "시험실", "severity": "중요", "legal_basis": "[별표 1] 7.1",
+             "summary": "품질에 관한 기록은 사실대로 작성할 것"},
+        ]
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        findings = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("사실대로 작성할 것", findings[0]["finding_text"])
+
+    def test_gmp_boilerplate_predicate_is_content_based_not_length_based(self) -> None:
+        # 짧아도 내용이면 통과, 길어도 서식이면 차단 — 길이 컷이 아니라 실질내용 컷이다.
+        self.assertFalse(extractors._gmp_is_boilerplate(
+            "기타 시험방법에 대한 기준서를 마련할 것"))
+        self.assertTrue(extractors._gmp_is_boilerplate(
+            "평가 결과: 지적(보완)사항 분류 : 분야 구분 근거 법령 지적(보완)사항 요약 "
+            "- - - - - - - - 2 - [별표 1의2] 제4호 의 약 품 관 리 과"))
+
     def test_mfds_admin_action_becomes_accepted_finding(self) -> None:
         # [findings DB 구멍 수리 2026-07-12] MFDS 행정처분(admin-action) -- 지금까지
         # findings 로 안 나가던 소스. EXPOSE_CONT(위반사유 요약)가 원문 그대로 finding_text,

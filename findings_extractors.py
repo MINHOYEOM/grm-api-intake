@@ -298,6 +298,53 @@ def _from_mhra_gmp_ncr(
     )]
 
 
+# ── MFDS GMP 실사 결과 PDF 의 정형문·페이지 장식 ────────────────────────────────
+# 2026-08-05 전량 실측(626문서)에서 나온 문제: 옛 실사결과 PDF 는 PyMuPDF 가 지적 표의
+# 헤더행을 못 잡아(데이터는 PDF 안에 있는데 표로 인식이 안 된다) 표 경로가 0행을 내고,
+# 산문 발췌 경로로 폴백한다. 그때 발췌에 남는 건 **표 헤더 문자열 + 결재란 부서명**뿐인
+# 경우가 많다 — 실측 128건 중 89건(70%)이 여기 해당했다.
+#
+#   "지적(보완)사항 분류 : 분야 구분 근거 법령 지적(보완)사항 요약 한약정책과"
+#
+# 이건 지적사항이 아니라 서식이다. ★건수로는 절대 안 걸러진다(정상적인 1건으로 보인다) —
+# 같은 함정이 이 저장소에 이미 있다(용어사전 management review 7건 전부 경고서한 정형문).
+# 부서명은 세로쓰기 결재란이라 "의 료 제 품 안 전 과" 처럼 한 글자씩 추출되기도 해서,
+# 공백을 전부 지운 뒤 비교한다.
+_GMP_BOILERPLATE_PHRASES = (
+    "지적보완사항분류", "지적보완사항요약", "지적보완사항있음", "지적보완사항없음",
+    "지적사항분류", "지적사항요약", "지적사항있음", "지적사항없음",
+    "분야구분근거법령", "분야구분근거", "근거법령", "평가결과", "실사결과",
+    "중요Major", "기타Other", "중대Critical",
+    # 결재란 부서명(세로쓰기 → 한 글자씩 추출되는 경우 포함)
+    "한약정책과", "의료제품안전과", "의약품관리과", "의약품정책과", "의약품품질과",
+    "바이오의약품정책과", "바이오의약품품질과", "화장품정책과", "마약정책과",
+)
+# 정형문·기호·숫자를 걷어낸 뒤 남아야 하는 최소 실질 글자 수. 실측에서 살아남은 가장
+# 짧은 진짜 지적은 잔여 20자대였고, 정형문은 전부 한 자릿수였다 — 사이에 넉넉히 둔다.
+_GMP_MIN_SUBSTANTIVE_CHARS = 12
+
+
+def _gmp_substantive_residual(text: str) -> str:
+    """정형문·서식·기호·숫자를 걷어내고 남은 실질 문자열(판정 전용·부작용 없음).
+
+    ★기호·공백·괄호를 **먼저** 걷어내야 한다 — 정형문 자체가 '지적(보완)사항' 처럼
+    괄호를 품고 있고, 결재란 부서명은 '의 료 제 품 안 전 과' 로 한 글자씩 떨어져 나온다.
+    정규화 전에 문자열 비교를 하면 둘 다 안 맞는다.
+    """
+    compact = re.sub(r"[^0-9A-Za-z가-힣]", "", text or "")
+    # 별표/조항 번호 같은 근거 표기는 그 자체로 지적 '내용'이 아니다.
+    compact = re.sub(r"별표\d+(?:의\d+)?", "", compact)
+    compact = re.sub(r"제[0-9의]+호", "", compact)
+    for phrase in _GMP_BOILERPLATE_PHRASES:
+        compact = compact.replace(phrase, "")
+    return re.sub(r"[0-9]", "", compact)
+
+
+def _gmp_is_boilerplate(text: str) -> bool:
+    """지적 내용이 없는 서식/장식뿐인 텍스트인가."""
+    return len(_gmp_substantive_residual(text)) < _GMP_MIN_SUBSTANTIVE_CHARS
+
+
 def _from_mfds_gmp(
     raw_signal: dict[str, Any],
     raw: dict[str, Any],
@@ -309,6 +356,10 @@ def _from_mfds_gmp(
 
     excerpt = _compact(raw.get("attachment_deficiency_excerpt"))
     if not excerpt or _compact(raw.get("attachment_deficiency_assessment")).lower() == "none":
+        return []
+    # ★표 추출이 실패해 서식만 남은 발췌는 지적사항으로 발행하지 않는다. 무지적 문서를
+    # 억지로 findings 로 만들지 않는 것과 같은 원칙 — 없는 내용을 만들어내지 않는다.
+    if _gmp_is_boilerplate(excerpt):
         return []
 
     return [gf.finding_from_raw_signal(
@@ -343,6 +394,10 @@ def _from_mfds_gmp_table(
     for index, item in enumerate(table_rows, start=1):
         text = _gmp_table_text(item)
         if not text:
+            continue
+        # 표 경로에도 빈 셀만 남은 행이 온다(실측: summary 가 'b' / '-' 인 1글자 finding 2건).
+        # 같은 실질내용 기준을 적용한다 — 표에서 왔다는 사실이 내용을 보장하지 않는다.
+        if _gmp_is_boilerplate(text):
             continue
         legal_basis = _compact(item.get("legal_basis") or item.get("basis") or item.get("law_ref"))
         refs = [legal_basis] if legal_basis else _extract_mfds_refs(text)

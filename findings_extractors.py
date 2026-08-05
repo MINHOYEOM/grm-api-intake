@@ -13,6 +13,13 @@ import re
 from typing import Any
 
 import grm_findings as gf
+# [WL 절단 수리 · A-2] 문장 경계 절단은 새로 발명하지 않고 card_scaffold 의 기존 검증된
+# 절단기를 재사용한다(§12C admin EXPOSE_CONT 규칙과 동일 알고리즘). card_scaffold.py 는
+# stdlib 외 로컬 의존이 0(순수함수 모듈)이라 여기서 import 해도 순환 import 가 생기지
+# 않는다 -- collect_intake.py 가 grm_health 의 언더스코어 프리픽스 헬퍼(`_evaluate_health`
+# 등)를 그대로 재수출해 쓰는 선례가 이미 이 저장소에 있어, 모듈 간 프라이빗 헬퍼 재사용은
+# 낯선 패턴이 아니다.
+from card_scaffold import _truncate_at_sentence
 
 
 MFDS_GMP_LIST_URL = "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100"
@@ -516,11 +523,11 @@ def _from_warning_letter(
         # 통짜 1건(길이 상한도 적용하지 않는다 -- 회귀 0 이 우선). 문서 단위로 유효 위반이
         # 하나도 안 남는 경우의 안전망: 정당 위반을 통째로 잃지 않는다(needs_review 로 남아
         # 검수/승격 대상이 되고, 신호 없는 통짜는 P2 자동승격에서 accepted 되지 않는다).
-        payload = [(body, body)]
+        payload = [(body, body, body)]
 
     evidence_url = _evidence_url(raw_signal, raw, "url", "source_url")
     out: list[dict[str, Any]] = []
-    for ordinal, (full_block, finding_text) in enumerate(payload, start=1):
+    for ordinal, (full_block, finding_text, classify_src) in enumerate(payload, start=1):
         out.append(gf.finding_from_raw_signal(
             raw_signal,
             finding_text=finding_text,
@@ -529,6 +536,13 @@ def _from_warning_letter(
             evidence_url=evidence_url,
             finding_language=_language(row, "EN"),
             cfr_refs=_extract_us_legal_refs(full_block),
+            # [WL 절단 수리 · A-3 재설계] finding_from_raw_signal 은 category_code 를 안 주면
+            # finding_text 로 분류한다 -- 그런데 이 수리로 finding_text 가 480→6000자로
+            # 길어져, 가만 두면 **분류 입력이 통째로 바뀐다**(실측 1,282건·48.7% 재분류).
+            # 그래서 분류만 옛 480자 절단본에 묶어 둔다(_legacy_cap_for_classify).
+            # 이 수리의 범위는 **표시**이고 재분류는 별도 변경이다 -- 사유는 그 함수 주석에.
+            # 483/MFDS/EU NCR 등 다른 호출부는 category_code 를 안 넘기던 그대로라 무변경.
+            category_code=gf.classify_finding_category(classify_src),
             confidence=0.72,
             review_status="needs_review",
         ))
@@ -568,7 +582,25 @@ _WL_NUMBERED_BOUNDARY_OK = ("\n", ". ", ") ", ": ")
 # 헤딩으로 오탐해 서두가 첫 finding 이 돼 버린다(스펙: 서두는 반드시 버려야 함).
 _WL_HEADING_RE = re.compile(r"((?:[A-Z][A-Za-z]*\s+){2,5}Violations)(?=\s+[A-Z])")
 
-_WL_BLOCK_CHAR_CAP = 480
+# [WL 절단 수리 · A-1 · 2026-08-04] 480 은 도입 커밋(6a224484, M11)의 "벽텍스트 방지" 주석
+# 하나가 근거의 전부였다 -- 수치 근거·스펙·테스트 없이 그 뒤 한 번도 재검토되지 않았고,
+# 실측 78%(2,441건 중 1,913건)가 문장 중간 절단으로 이어졌다. 그 목적(벽텍스트 방지)은 이미
+# web/templates/findings.html 의 3줄 클램프+"자세히 보기" 토글이 화면에서 담당한다 -- 백엔드
+# 캡은 펼쳤을 때 잘린 토막이 나오게 만드는 역효과만 냈다.
+#
+# 6000 으로 올린 근거: 캡을 걷어내고 재현한 조각 길이 분포(_split_wl_violation_blocks +
+# _wl_block_parts, 실 raw_signals.raw_json.wl_body_full 1,295건)의 p90 이 6,119자다 -- 즉
+# 위반 문단의 90%가 6,000자 밑에서 자연히 끝난다. 그 위(최대 21,372자 사례 포함)는 실제로는
+# 제품별 인용이 길게 나열된 **미분해 블록**일 가능성이 크다(번호/헤딩 앵커가 성긴 편지에서
+# _split_wl_violation_blocks 가 여러 위반을 하나로 묶어 넘긴 경우). 그래서 캡을 아예 없애지
+# 않는다 -- 없애면 그런 미분해 덩어리가 "조각인 척" 그대로 들어온다. 이제 이 상한은
+# "벽텍스트 방지"가 아니라 "한 위반으로 보기엔 너무 길다"는 신호다.
+_WL_BLOCK_CHAR_CAP = 6000
+# [WL 절단 수리 · A-3 재설계] 분류기 전용 상한 -- **표시 상한과 일부러 분리한다.**
+# 480 은 옛 표시 상한값 그대로다(_legacy_cap_for_classify 주석에 이유를 길게 적었다):
+# 경고서한은 앞부분이 위반 서술·뒷부분이 FDA 표준 시정권고 정형문이라, 분류 입력을 넓히면
+# 분류기가 정형문을 집는다. 이 값을 올리는 것은 **재분류**이므로 측정·검토를 따로 거쳐야 한다.
+_WL_CLASSIFY_CHAR_CAP = 480
 _WL_FRAGMENT_MIN_CHARS = 40
 
 # [FIND-1 P1 A-S1 · 2026-07-21 RCA 원인 A] WL 블록 품질 게이트의 "규제 지적 신호". 화장품/OTC WL 이
@@ -721,16 +753,74 @@ def _wl_block_parts(raw_block: str) -> tuple[str, str] | None:
     ends_with_terminal = block[-1] in ".?!\""
     if not ends_with_terminal and len(block) < _WL_FRAGMENT_MIN_CHARS:
         return None
-    return block, _cap_wl_block_text(block, ends_with_terminal)
+    return (block,
+            _cap_wl_block_text(block, ends_with_terminal),
+            _legacy_cap_for_classify(block, ends_with_terminal))
+
+
+def _legacy_cap_for_classify(block: str, ends_with_terminal: bool) -> str:
+    """[WL 절단 수리 · A-3 재설계] **분류기에만** 주는 입력 -- 옛 480자·단어경계 절단을 그대로 재현.
+
+    이 함수의 존재 이유는 하나다: **표시를 고치면서 분류를 건드리지 않기 위해서**다.
+
+    처음엔 반대로 갔다 -- "분류기가 잘린 글을 보는 건 이상하니 전체 본문을 보게 하자"고
+    판단했다. 실측이 그 판단을 뒤집었다. 경고서한은 **앞부분이 실제 위반 서술이고 뒷부분이
+    FDA 표준 시정권고 정형문**이다("customer notifications and product recalls... CAPA",
+    "thorough review of production (e.g., batch manufacturing records...)", "Data Integrity
+    Remediation ..." 등이 편지마다 그대로 반복된다). 분류 입력을 넓히면 분류기가 위반문이
+    아니라 그 정형문을 집는다 -- 27건을 표본으로 읽어 확인했다(예: "failed to establish an
+    adequate quality control unit..."(품질부서 감독)이 "completion and efficacy of all
+    CAPAs..."(정형문) 때문에 deviation_capa 로 뒤집혔다).
+
+    ★규모(2026-08-05 전 조각 2,631건 실측): 분류 입력을 상한 6000 표시문자열로 바꾸면
+    **1,282건(48.7%)**, 전체 본문으로 바꾸면 1,288건의 카테고리가 달라진다. 즉 상한을
+    올리는 것만으로 WL 카테고리 통계의 절반이 조용히 뒤집힌다. 단순 앞 480자(prefix)도
+    옛 값과 127건 어긋난다 -- 옛 절단은 단어 경계로 되돌리고 꼬리 구두점을 떼기 때문이다.
+    그래서 "비슷한 것"이 아니라 **옛 알고리즘 그대로**를 쓴다(차이 0 을 구조로 보장).
+
+    즉 480 캡은 우연히 **정형문 차단기** 노릇을 하고 있었다. 그 효과를 잃지 않으려고
+    분류 경로만 옛 동작에 묶어 둔다. 제대로 된 해법은 정형문 자체를 걷어내고 분류하는
+    것이지만 그건 별도 작업이다 -- 이 수리의 범위는 **표시 절단**이고, 재분류는 측정·검토를
+    따로 거쳐야 할 변경이다.
+    """
+    if len(block) <= _WL_CLASSIFY_CHAR_CAP:
+        return block if ends_with_terminal else block.rstrip(" .,;:") + "…"
+    truncated = block[:_WL_CLASSIFY_CHAR_CAP]
+    cut = truncated.rfind(" ")
+    if cut > 0:
+        truncated = truncated[:cut]
+    return truncated.rstrip(" .,;:") + "…"
 
 
 def _cap_wl_block_text(block: str, ends_with_terminal: bool) -> str:
-    """표시용 상한(약 480자) -- 483 은 첫 문장만 쓰지만 WL 위반은 한 문단이 한 위반이라 문단
-    전체를 유지하는 게 자연스럽다. 다만 벽텍스트 방지를 위해 480자 근방에서 안전 절단한다.
-    문장부호 없이 끝나는(미완결) 블록은 짧아도 길어도 "…" 로 표시해 절단됐음을 드러낸다.
+    """표시용 상한(6000자) -- 483 은 첫 문장만 쓰지만 WL 위반은 한 문단이 한 위반이라 문단
+    전체를 유지하는 게 자연스럽다. 다만 미분해 초장문 블록에 대한 안전 절단으로 상한 근방에서
+    자른다. 문장부호 없이 끝나는(미완결) 블록은 짧아도 길어도 "…" 로 표시해 절단됐음을
+    드러낸다(§A-2 기존 동작 유지).
+
+    [WL 절단 수리 · A-2] 실제로 자를 때는 글자 수가 아니라 **문장 경계**에서 자른다 --
+    card_scaffold._truncate_at_sentence(§12C admin EXPOSE_CONT 규칙)를 그대로 재사용해
+    상한 이내 마지막 [.。!?] 까지 되돌린다. 재사용 못 한 부분 둘, 사유를 각각 적는다:
+      1) 종결부호 바로 뒤에 닫는 따옴표/괄호가 붙어 있으면(인용문 말미 `."` 등) 그것까지
+         포함해야 하는데, _truncate_at_sentence 는 그 확장을 하지 않는다(admin 필드는 인용을
+         다루지 않아 필요 없었다) -- 그래서 여기서 한 글자씩 앞으로 늘려 닫는 기호를 흡수한다.
+      2) 상한 이내에 문장 종결이 하나도 없을 때 _truncate_at_sentence 는 limit 에서 그냥
+         잘라 "…" 를 붙인다(단어 경계 무시) -- WL 은 이 안전망에서 기존 단어 경계 되돌림을
+         유지해야 하므로(스펙 요구), 그 한 갈래만 원래 rfind(" ") 로직을 직접 구현했다.
     """
     if len(block) <= _WL_BLOCK_CHAR_CAP:
         return block if ends_with_terminal else block.rstrip(" .,;:") + "…"
+
+    sentence_cut = _truncate_at_sentence(block, _WL_BLOCK_CHAR_CAP)
+    if sentence_cut and sentence_cut[-1] in ".。!?":
+        # 문장 종결을 찾았다 -- 종결부호 바로 뒤에 닫는 따옴표/괄호류가 이어지면 그것도
+        # 경계에 포함시킨다(인용문이 자연스럽게 닫히도록).
+        end = len(sentence_cut)
+        while end < len(block) and block[end] in "\"'”’)]":
+            end += 1
+        return block[:end] + "…"
+
+    # 상한 이내에 문장 종결이 전혀 없는 극단적 경우 -- 기존처럼 단어 경계로 되돌린다(안전망).
     truncated = block[:_WL_BLOCK_CHAR_CAP]
     cut = truncated.rfind(" ")
     if cut > 0:

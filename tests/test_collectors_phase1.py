@@ -6,10 +6,13 @@ pagination 진행·종료, truncation 상한 표면화, api_key 마스킹. http_
 
 테스트 전용 배치 — 프로덕션 로직 무변경.
 """
+import ast
 import os
 import sys
 import unittest
 from datetime import date
+from types import SimpleNamespace
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -234,3 +237,80 @@ class Fda483KnownIdsPreQueryTest(unittest.TestCase):
         got, q = self._call(enabled=False)
         self.assertIsNone(got)
         q.assert_not_called()
+
+
+class Fda483PrefetchGateTest(unittest.TestCase):
+    """★2026-08-05 회귀 — 사전조회 게이트가 **수집 게이트와 달랐다**.
+
+    #619 배선은 호출부에서 ``enabled=("fda483" in active) and not args.dry_run`` 이었다.
+    ``--sources`` 미지정(=일일 스케줄, GRM_SOURCES 빈 값)이면 active 는 ``_ALL_SOURCES``
+    (fr·recall·ema·mhra·pics·eca·wl)이고 fda483 은 **없다**. 483 은 ENABLE_FDA_483 env
+    로만 켜지므로 사전조회는 정기 실행에서 한 번도 돌지 않았고, #619 검증에 쓴 수동
+    dispatch(GRM_SOURCES=fda483)에서만 참이었다.
+
+    실측 3연속(2026-08-02·03·04 정기): 기보유 건너뜀 0   · OCR 200/200쪽 · 예산초과 24
+    같은 커밋 수동 --sources fda483  : 기보유 건너뜀 132 · OCR 14/200쪽  · 예산초과 0
+
+    ★기존 Fda483KnownIdsPreQueryTest 는 ``enabled=`` 를 직접 넘겨 호출한다 — 즉 **호출부의
+      게이트 식은 어떤 테스트도 검사하지 않았다.** 이 결함이 전건 green 을 통과한 이유다.
+    """
+
+    @staticmethod
+    def _args(*, sources=None, dry_run=False):
+        # RunConfig.from_env 가 읽는 args 는 sources/dry_run/window_days/
+        # handoff_window_days 4개뿐.
+        return SimpleNamespace(sources=sources, dry_run=dry_run,
+                               window_days=7, handoff_window_days=None)
+
+    @staticmethod
+    def _cfg(args, **env):
+        with patch.dict(os.environ, env, clear=False):
+            return ci.RunConfig.from_env(args)
+
+    def test_default_sources_do_not_contain_fda483(self):
+        """이 전제가 깨지면 아래 테스트의 의미가 사라진다(전제 자체를 잠근다)."""
+        self.assertNotIn("fda483", ci._ALL_SOURCES)
+
+    def test_env_only_activation_still_prefetches(self):
+        """★일일 스케줄의 실제 형태 — env 로만 켜진 483 도 사전조회가 돌아야 한다."""
+        args = self._args()
+        cfg = self._cfg(args, ENABLE_FDA_483="true")
+        self.assertTrue(cfg.enable_fda483)              # 수집은 돈다
+        self.assertNotIn("fda483", cfg.active)          # ★그런데 active 엔 없다
+        self.assertTrue(ci._fda483_prefetch_enabled(cfg, args.dry_run))
+
+    def test_explicit_source_activation_prefetches(self):
+        args = self._args(sources=["fda483"])
+        cfg = self._cfg(args, ENABLE_FDA_483="false")
+        self.assertTrue(ci._fda483_prefetch_enabled(cfg, args.dry_run))
+
+    def test_inactive_source_does_not_prefetch(self):
+        args = self._args(sources=["wl"])
+        cfg = self._cfg(args, ENABLE_FDA_483="false")
+        self.assertFalse(cfg.enable_fda483)
+        self.assertFalse(ci._fda483_prefetch_enabled(cfg, args.dry_run))
+
+    def test_dry_run_does_not_prefetch(self):
+        args = self._args(dry_run=True)
+        cfg = self._cfg(args, ENABLE_FDA_483="true")
+        self.assertFalse(ci._fda483_prefetch_enabled(cfg, args.dry_run))
+
+    def test_call_site_uses_the_shared_gate(self):
+        """호출부가 게이트를 다시 인라인으로 적으면 또 갈린다 — AST 로 잠근다."""
+        src_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "collect_intake.py")
+        with open(src_path, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
+        calls = [n for n in ast.walk(tree)
+                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                 and n.func.id == "_fda483_known_document_ids"]
+        self.assertEqual(len(calls), 1,
+                         "_fda483_known_document_ids 호출부는 main() 1곳이어야 한다")
+        kw = {k.arg: k.value for k in calls[0].keywords}
+        self.assertIn("enabled", kw)
+        self.assertIsInstance(
+            kw["enabled"], ast.Call,
+            "enabled= 는 _fda483_prefetch_enabled(...) 호출이어야 한다 — "
+            "인라인 식으로 되돌리면 수집 게이트와 다시 갈린다")
+        self.assertEqual(kw["enabled"].func.id, "_fda483_prefetch_enabled")

@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.182` |
+| 문서 버전 | `v1.183` |
 | 최종 수정일 | 2026-08-05 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 11,791건·문서 2,776건·업체 2,120곳·2018~2026년**(2026-07-31 실측), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 9카탈로그 400건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -349,7 +349,7 @@ grm-api-intake/
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ verify_published_sources.py     # 발행 카드 ↔ 원문 대조(네트워크 검증층 — 수집 실패로 인한 누락 탐지)
 ├─ grm_findings.py                 # [FIND-1] 스키마 계약·taxonomy·validator·SQLite DDL
-├─ findings_extractors.py          # raw_signal → findings 변환
+├─ findings_extractors.py          # raw_signal → findings 변환 (WL 조각: 표시 상한 6000·문장경계 절단 / **분류 상한 480 별도** — 아래 각주)
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
@@ -414,6 +414,8 @@ grm-api-intake/
 - **수집 진입점:** `collect_intake.py` (워크플로가 호출하는 유일 파일).
 - **Routine 프롬프트:** `docs/prompts/GRM_Prompt_v16.md` (내부 버전 v16).
 - **웹 렌더러:** `web/render.py` (순수·결정론, 골든 테스트로 고정).
+- **경고서한 조각 절단(2026-08-05 수리):** WL 은 편지를 위반 단위로 쪼개 finding 을 만드는데(`_split_wl_violation_blocks`), 표시 상한이 **480자 하드캡·단어 경계 절단**이라 조각 2,448건 중 **1,920건(78%)이 문장 중간에서 끊겨** 있었다(국문 번역까지 잘린 채로). 480 은 도입 커밋의 "벽텍스트 방지" 주석 한 줄이 근거의 전부였고, 그 목적은 이미 `findings.html` 의 3줄 클램프+"자세히 보기"가 화면에서 담당한다 — 백엔드 캡은 펼쳤을 때 토막이 나오게 만드는 역효과만 냈다. 수리 = 표시 상한 **6000**(캡 없는 조각 길이 분포의 p90=6,119 — 그 위는 위반 하나가 아니라 미분해 덩어리일 가능성이 커 신호로 남긴다) + **문장 경계 절단**(`card_scaffold._truncate_at_sentence` 재사용). 실측 문장중간절단 **2,033 → 197(90% 해소)**.
+  ★★**표시 상한과 분류 상한을 일부러 분리했다**(`_WL_BLOCK_CHAR_CAP=6000` vs `_WL_CLASSIFY_CHAR_CAP=480`, `_legacy_cap_for_classify`). 처음엔 "분류기가 잘린 글을 보는 건 이상하니 전체 본문을 보게 하자"고 설계했는데 **실측이 반증**했다 — 경고서한은 **앞부분이 위반 서술·뒷부분이 FDA 표준 시정권고 정형문**이라("customer notifications and product recalls… CAPA", "thorough review of production…", "Data Integrity Remediation…" 이 편지마다 반복) 분류 입력을 넓히면 분류기가 정형문을 집는다. 규모: 표시 상한만 올려도 2,631건 중 **1,282건(48.7%)** 재분류, 전체 본문이면 1,288건. 표본 27건을 읽어 확인(예: "failed to establish an adequate quality control unit…"(품질부서 감독)이 "completion and efficacy of all CAPAs…"(정형문) 때문에 뒤집힘). **즉 480 캡은 우연히 정형문 차단기였다** — 그 효과를 잃지 않으려 분류만 옛 알고리즘에 묶어 두고(수리 전후 분류 차이 **0건** 실측), 재분류는 측정·검토를 따로 거칠 별도 변경으로 남긴다. 가드 = `tests/test_wl_block_truncation.py`(두 상한을 서로 붙이면 실패·실제 경고서한 픽스처 포함).
 - **용어사전 검증 게이트:** `glossary_lint.py` — CLI(인자 없으면 커밋된 실 데이터, 종료코드 0/1, `--verbose`) + `tests/test_glossary_lint.py` 로 CI 자동 편입. **데이터를 고쳐 게이트를 통과시키지 말 것** — 위반이 나오면 데이터가 아니라 그 위반을 판단해야 한다. ★동의어 검사는 **비교 기준이 둘로 갈린다**(2026-08-04 실패에서 배움): **자기 표제어·같은 용어 안 중복은 글자 그대로**(표제어 `Back-up` 에 동의어 `backup` 은 정상이고 필요하다 — 검색이 정규화 없는 부분일치라 그게 없으면 못 찾는다), **다른 용어와의 충돌만 정규화**(`_label_key` = 소문자+괄호 병기 제거+공백·하이픈 제거. 처음엔 글자 그대로 비교라 동의어 `non-conformance` 와 표제어 `Non-conformance` 를 다른 것으로 보고 통과시켰다 — **검사 기준이 사용자가 겪는 것과 어긋나면 그 검사는 헛돈다**). 복수형 차이는 의도적으로 안 잡는다(어간 추출은 오탐을 만든다 — 표제어/동의어 배정은 사람이 정한다).
 - **자료실 자동 갱신:** `library_staging_build.py`(수집·게이트·스왑) + `library_updates.py`(변경 이력) — 워크플로 `grm-library-staging.yml`.
 - **용어사전 사례연결 갱신:** `glossary_cases_refresh.py` — 워크플로 `grm-glossary-cases.yml`(금 03:15 KST, 자료실 갱신과 요일 분리 = 골든 재동결 커밋 충돌 회피). `web/data/glossary_cases.json` 의 **건수(`findings`/`documents`)만** `findings_search` RPC(anon 권한 — service-role 은 과잉) 로 다시 세고 `measured_on` 을 갱신한다. **검색어 `q` 와 `excluded` 는 절대 건드리지 않는다**(사람이 지적 문장을 읽고 판정한 값). 게이트: 0건 전환 = 종전 값 유지 + 경고, ±50% 초과 변동 = 값 반영 + 경고, 항목별 실패는 그 항목만 종전 값 유지, **20% 이상 실패 시 전면 중단**(부분 갱신 상태로 커밋하지 않는다). `--dry-run` 지원.

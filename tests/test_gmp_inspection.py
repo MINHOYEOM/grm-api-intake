@@ -300,6 +300,30 @@ class TestInspectionTypeDetection(unittest.TestCase):
             g._detect_inspection_type("사전 GMP 평가 결과 — 정기실태조사 규정 준용"),
             "pre_market")
 
+    def test_overseas_onsite_inspection_is_periodic(self):
+        """★해외 제조소 현지실사 결과서도 국내 정기실사와 **같은 지적 표**를 싣는다.
+
+        2026-08-05 전량 실측(626문서)에서 발견: 이 표제가 두 정규식 어디에도 안 걸려
+        unknown 으로 떨어졌고, 표 추출이 **시도조차 안 된 채** skipped-type 으로 넘어갔다.
+        게시판 626문서 중 398건(64%)이 skipped-type 이었고, 그중 지적이 있어야 할
+        102문서가 findings 66건뿐(36문서는 0건). 표본을 열어 보니 지적 표는 전부 있었다 —
+        파서가 아니라 유형 게이트가 원인이었다.
+        """
+        for title in (
+            "의약품 해외 제조소 현지실사 결과",
+            "[붙임] 의약품 해외제조소 현지실사 결과",
+            "의약품 해외 제조소 현지실사(비대면 실사) 결과",
+            "의약품 해외제조소 실태조사(실사) 결과",
+        ):
+            with self.subTest(title=title):
+                self.assertEqual(g._detect_inspection_type(title), "periodic")
+
+    def test_overseas_pre_market_still_wins(self):
+        # 해외 제조소라도 사전평가 표지가 있으면 pre_market(표 없음) — 안전 쪽 유지.
+        self.assertEqual(
+            g._detect_inspection_type("의약품 해외 제조소 사전 GMP 평가 결과"),
+            "pre_market")
+
 
 class TestNormalizeDeficiencyTable(unittest.TestCase):
     _HEADER = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]

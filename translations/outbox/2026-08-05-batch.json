@@ -1,0 +1,596 @@
+[
+  {
+    "finding_id": "finding-06648f4a86c0400fba85af25",
+    "finding_text": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your quality unit (QU) failed to perform adequate oversight for the manufacture of your OTC drug products. For example, your QU failed to ensure the following: Establishment of adequate written responsibilities and procedures applicable to the…",
+    "finding_text_ko": "귀사의 품질관리부서는 제조되는 의약품이 CGMP를 준수하고 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)에 대해 설정된 기준규격에 적합하도록 보증할 책임을 이행하지 않았다(21 CFR 211.22). 귀사의 품질부서(QU)는 OTC 의약품 제조에 대하여 적절한 감독을 수행하지 않았다. 예를 들어 귀사의 QU는 다음 사항을 보증하지 못했다. 즉, 해당 업무에 적용되는 적절한 문서화된 책임과 절차의 수립…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-36d0c9bd90da9447e357d567",
+    "finding_text": "Your firm failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.67(b)). You failed to demonstrate that your cleaning practices are adequate to remove potential contaminants and to prevent drug product carry over in shared equipment used to manufacture your OTC drug products. For example, your cleaning validation program for the non-dedicated Unit (b)(4) Line (b)(4) relied exclusively on the visual inspection of…",
+    "finding_text_ko": "귀사는 설비의 세척 및 유지관리에 관한 적절한 문서화된 절차를 수립하고 준수하지 않았다(21 CFR 211.67(b)). 귀사는 OTC 의약품 제조에 사용되는 공용 설비에서, 귀사의 세척 방법이 잠재적 오염물질을 제거하고 의약품의 교차이월(carry over)을 방지하기에 적절하다는 점을 입증하지 못했다. 예를 들어 전용 설비가 아닌 Unit (b)(4) Line (b)(4)에 대한 귀사의 세척 밸리데이션 프로그램은 전적으로 육안검사(visual inspection)에만 의존하였다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-372278a07607f44994680c35",
+    "finding_text": "Specifically, your antiperspirant products are labeled to contain aluminum chlorohydrate 10%, and aluminum chloride 10%, as active ingredients. While each active ingredient is individually permitted by M019.10, these active ingredients are not permitted when used in this combination (or any other combination) in a single antiperspirant drug product. Thus, your syNeo antiperspirant products do not comply with the applicable conditions specified in M019 and have not otherwise been found GRASE. 3 Accordingly, these products are new drugs within the meaning of section 201(p) of the FD&C Act, 21 U.S.C. 321(p), and there is no basis under section 505G of the FD&C Act under which these products would be legally marketed without an approved application. Because there are no applications in effect for these products, these products are unapproved new drugs. The introduction or delivery for introduction of these unapproved new drug products into interstate commerce violates sections 505(a) and 301(d) of the FD&C Act, 21 U.S.C. 355(a) and 331(d). Misbranded Drug Violations Additionally, your syNeo antiperspirant products are misbranded under section 502(ee) of the FD&C Act, 21 U.S.C. 352(ee), because these products are nonprescription drugs subject to section 505G of the FD&C Act, 21 U.S.C. 355h, but do not comply with the requirements for marketing under that section and are not the subject of an application approved under section 505 of the FD&C Act, 21 U.S.C. 355. The introduction or delivery for introduction of a misbranded drug into interstate commerce violates section 301(a) of the FD&C Act, 21 U.S.C. 331(a). Consultant Based on the nature of the violations we identified at your firm, you should engage a consultant qualified as set forth in 21 CFR 211.34 to assist your firm in meeting CGMP requirements. Your use of a consultant does not relieve your firm’s obligation to comply with CGMP. Your firm’s executive management remains responsible for resolving all deficiencies and systemic flaws to ensure ongoing CGMP compliance. Quality Systems Your firm’s quality systems are inadequate. For help implementing quality systems and risk management approaches to meet the requirements of CGMP regulations 21 CFR, parts 210 and 211, see FDA’s guidance documents Quality Systems Approach to Pharmaceutical CGMP Regulations at https://www.fda.gov/media/71023/download; Q9(R1) Quality Risk Management at https://www.fda.gov/media/167721/download; and Q10 Pharmaceutical Quality System at https://www.fda.gov/media/71553/download.",
+    "finding_text_ko": "구체적으로, 귀사의 발한억제제(antiperspirant) 제품은 유효성분으로 aluminum chlorohydrate 10% 및 aluminum chloride 10%를 함유하는 것으로 표시되어 있다. 각 유효성분은 M019.10에 의해 개별적으로는 허용되나, 이들 유효성분을 단일 발한억제제 의약품에서 이러한 조합으로(또는 그 밖의 어떠한 조합으로도) 사용하는 것은 허용되지 않는다. 따라서 귀사의 syNeo 발한억제제 제품은 M019에 규정된 해당 조건을 준수하지 않으며, 그 밖의 방법으로 GRASE(일반적으로 안전하고 유효하다고 인정됨)로 인정된 바도 없다. 3 그러므로 이들 제품은 FD&C Act section 201(p), 21 U.S.C. 321(p)에서 정한 의미의 신약(new drug)에 해당하며, 승인된 신청 없이 이들 제품이 합법적으로 판매될 수 있는 근거는 FD&C Act section 505G에 존재하지 않는다. 이들 제품에 대하여 유효한 신청이 없으므로, 이들 제품은 미승인 신약(unapproved new drugs)이다. 이러한 미승인 신약 제품을 주간(interstate) 상거래에 반입하거나 반입을 위해 인도하는 행위는 FD&C Act sections 505(a) 및 301(d), 21 U.S.C. 355(a) 및 331(d)를 위반한다. 허위표시(misbranded) 의약품 위반 — 또한 귀사의 syNeo 발한억제제 제품은 FD&C Act section 502(ee), 21 U.S.C. 352(ee)에 따라 허위표시(misbranded) 의약품에 해당한다. 이들 제품은 FD&C Act section 505G, 21 U.S.C. 355h의 적용을 받는 비처방(nonprescription) 의약품이지만 해당 조항에 따른 판매 요건을 준수하지 않았고, FD&C Act section 505, 21 U.S.C. 355에 따라 승인된 신청의 대상도 아니기 때문이다. 허위표시 의약품을 주간 상거래에 반입하거나 반입을 위해 인도하는 행위는 FD&C Act section 301(a), 21 U.S.C. 331(a)를 위반한다. 컨설턴트 — 귀사에서 확인된 위반의 성격에 비추어, 귀사는 CGMP 요건 충족을 지원하도록 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 선임하여야 한다. 컨설턴트를 활용한다고 하여 CGMP를 준수할 귀사의 의무가 면제되지는 않는다. 지속적인 CGMP 준수를 보장하기 위해 모든 결함과 시스템적 결점을 해소할 책임은 여전히 귀사의 경영진에게 있다. 품질시스템 — 귀사의 품질시스템은 미흡하다. CGMP 규정 21 CFR parts 210 및 211의 요건을 충족하기 위한 품질시스템 및 위험관리 방식의 실행에 관하여는 FDA의 가이던스 문서를 참조하라. Quality Systems Approach to Pharmaceutical CGMP Regulations(https://www.fda.gov/media/71023/download), Q9(R1) Quality Risk Management(https://www.fda.gov/media/167721/download), Q10 Pharmaceutical Quality System(https://www.fda.gov/media/71553/download).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3f392f62eebc53b431358abe",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product (21 CFR 211.84(d)(1)). Your firm manufactures over-the-counter (OTC) (b)(4) drug products such as (b)(4) and ethanol- (b)(4) . You failed to perform adequate identity testing on each shipment of each lot of incoming components (e.g., glycerin, propylene glycol, ethanol) used in the manufacture of your OTC (b)(4) drug products. Moreover, you used nonpharmaceutical-grade…",
+    "finding_text_ko": "귀사는 의약품 각 구성원료의 확인(identity)을 검증하기 위한 시험을 최소 1회 이상 실시하지 않았다(21 CFR 211.84(d)(1)). 귀사는 (b)(4) 및 ethanol-(b)(4)와 같은 일반의약품(OTC) (b)(4) 제품을 제조한다. 귀사는 OTC (b)(4) 의약품 제조에 사용되는 입고 구성원료(예: 글리세린, 프로필렌글리콜, 에탄올)에 대하여 각 로트의 각 선적분마다 적절한 확인시험을 실시하지 않았다. 나아가 귀사는 비의약품등급(nonpharmaceutical-grade)…을 사용하였다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a5e170d8fff90d39cb17f15",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products and the authority to review production records to assure that no errors have occurred or, if errors have occurred, that they have been fully investigated (21 CFR 211.22(a)). Your firm manufactures over-the-counter drug products…",
+    "finding_text_ko": "귀사는 모든 구성원료, 의약품 용기, 마개, 공정중 물질, 포장재, 표시기재 및 완제의약품을 승인하거나 불합격 처리할 책임과 권한, 그리고 오류가 발생하지 않았음을 —또는 오류가 발생하였다면 그것이 충분히 조사되었음을— 보증하기 위해 생산기록을 검토할 권한을 가진 적절한 품질관리부서를 설치하지 않았다(21 CFR 211.22(a)). 귀사는 일반의약품(OTC)을 제조한다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6b1dab88da0594a4c1403efc",
+    "finding_text": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)). Your laboratory records did not include complete data to support the analyses performed. For example, your analytical notebooks documented approximately (b)(4) microbiology plates for finished drug products and approximately (b)(4) media plates for testing (b)(4) samples as…",
+    "finding_text_ko": "귀사는 설정된 기준규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험에서 도출된 완전한 데이터가 시험실 기록에 포함되도록 하지 않았다(21 CFR 211.194(a)). 귀사의 시험실 기록에는 수행된 분석을 뒷받침하는 완전한 데이터가 포함되어 있지 않았다. 예를 들어 귀사의 분석 노트에는 완제의약품에 대한 약 (b)(4)매의 미생물 배지평판과 (b)(4) 검체 시험을 위한 약 (b)(4)매의 배지평판이 기록되어 있었으나…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bf6f4d1180221604d7e2e752",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). Your firm failed to adequately validate the processes used to manufacture your OTC drug products. You have not performed process performance qualification (PPQ) studies, nor do you have an adequate ongoing program…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)를 갖추도록 보증하기 위해 설계된 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 않았다(21 CFR 211.100(a)). 귀사는 OTC 의약품 제조에 사용되는 공정을 적절히 밸리데이션하지 않았다. 귀사는 공정성능적격성평가(PPQ) 연구를 수행하지 않았으며, 적절한 지속적 프로그램도 갖추고 있지 않다…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e25f746c4846712af9fb802a",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm’s quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)). You failed to validate your manufacturing process for your OTC drug products. During the inspection, you…",
+    "finding_text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)를 갖추도록 보증하기 위해 설계된 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 않았고, 귀사의 품질관리부서는 변경사항을 포함하여 그러한 절차를 검토·승인하지 않았다(21 CFR 211.100(a)). 귀사는 OTC 의약품에 대한 제조공정을 밸리데이션하지 않았다. 실사 과정에서 귀사는…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-edc4228526cedff804380ecd",
+    "finding_text": "Specifically, Protocol (b)(4) required you to exclude subjects from the study if they were participating in another investigation (clinical trial) during the study. The protocol also prohibited the use of any other investigational product (IP) for the duration of the study. You failed to adhere to these requirements. Specifically, Subject (b)(6) Visit 1 Screening for Protocol (b)(4) occurred on November 6, 2024, and the subject was randomized on the study on November 13, 2024. The subject was dispensed study drug for Protocol (b)(4) between November 13 and December 16, 2024, and completed the study on January 14, 2025. However, this subject was simultaneously enrolled and randomized as Subject (b)(6) in another clinical investigation, Protocol (b)(4) , on June 24, 2024. Specifically, this subject was administered study drug for Protocol (b)(4) between August 7 and December 23, 2024, and completed the study on January 6, 2025. Therefore, Subject (b)(4) was participating in another clinical investigation, Protocol (b)(4) , while simultaneously participating in Protocol (b)(4) , and the subject received the IP for Protocol (b)(4) while enrolled in and receiving study drug for Protocol (b)(4) . In your August 4, 2025, written response to the Form FDA 483, you acknowledged that the subject was enrolled in both Protocol (b)(4) and Protocol (b)(4) . You stated that you understand that this constitutes a regulatory violation. You also stated that the exclusion criterion in Protocol (b)(4) was not followed for this subject. We emphasize that as the clinical investigator, it is your responsibility to ensure that studies are conducted in accordance with the investigational plan, both to protect the rights, safety, and welfare of subjects and to ensure the integrity of study data. Your failure to ensure that subjects met all protocol-required eligibility criteria before their enrollment in the study, and your failure to ensure that subjects were not taking prohibited medications during the study, raise significant concerns about the safety of study subjects enrolled at your site, and raise concerns about the reliability of the data collected at your site. 2. You failed to maintain adequate records of the disposition of the drug, including dates, quantity, and use by subjects [21 CFR 312.62(a)]. As a clinical investigator, you are required to maintain adequate records of the disposition of the drug, including dates, quantity, and use by subjects. You failed to adhere to these requirements. Specifically, for six subjects enrolled on Protocol (b)(4) , the following discrepancies were observed between the quantity of drug used by the subjects and the quantity of drug returned, as recorded on the site IP accountability record; the EDC records of subjects’ self-reported doses; and the EDC records of site-reported IP returned (used and unused): Subject ID # & Assigned IP Kit # Self-Reported IP Doses & Dates Administered Site IP Master Accountability EDC IP Accountability ID # (b)(6) Kit #34_MFWE March 6-19, 2025 March 21-24, 2025 18 doses administered 35 sachets returned (1 used & 34 unused) No sachets returned ID # (b)(6) Kit #34_PNBT March 6-17, 2025 March 19-24, 2025 18 doses administered 35 sachets returned (19 used & 16 unused) 35 sachets returned (0 used & 35 unused) ID # (b)(6) Kit #34_RJRF March 6-17, 2025 March 19-20, 2025 March 22-24, 2025 17 doses administered 35 sachets returned (0 used & 35 unused) No sachets returned ID # (b)(6) Kit #34_PUVN March 6-24, 2025 19 doses administered 35 sachets returned (19 used & 16 unused) No sachets returned ID # (b)(6) Kit #34_AHRG March 11-24, 2025 14 doses administered 35 sachets returned (14 used & 21 unused) No sachets returned ID # (b)(6) Kit #34_HPOP March 20-24, 2025 5 doses administered 35 sachets returned (5 used & 30 unused) No sachets returned In your August 4, 2025, written response to the Form FDA 483, you stated that sealed kits were provided to the subjects, and that the subjects were responsible for using them at home and returning them afterwards. You also stated that the kits were not used at the study site. While we acknowledge that the study drug was not administered at the study site and that subjects were to administer the study drug at home and return unused study drug to the study site, your response is inadequate because, as the clinical investigator, you are responsible for maintaining adequate records of the disposition of the drug, including dates, quantity, and use by subjects, in accordance with FDA regulations. Additionally, Protocol (b)(4) specifically stated that it is the investigator’s responsibility to ensure that accurate records of study-medication issuance and return are maintained. Finally, we note that in correspondence from the sponsor dated May 21, 2025, regarding a remote close-out visit, the sponsor observed that the above-referenced IP kits dispensed to subjects contained the tamper-resistant seals on both ends of the kits, although the kits were shown to have been dispensed in the EDC records, and the completed medication questionnaires document that nightly study doses were taken by the subjects. The sponsor further stated that they did not see how the dispensing records could be accurate, given that the IP kits had not been opened. Therefore, based on these observed discrepancies and the sponsor’s report concerning the physical condition of the IP kits and inaccurate dispensing records, the records of the disposition of the study drug at your site are inadequate. Your failure to maintain adequate drug-accountability records, including documents recording study drug used, unused, and returned, raises significant concerns about the adequacy of your oversight and control of investigational drug, and raises concerns about the validity and integrity of the data collected at your site. In addition, in your written response, you stated that the following corrective actions have been taken: (1) the study was closed; (2) the sponsor agreed not to use the clinical site’s data; and (3) all funds made to the site were returned. You further stated that no subjects were harmed. Finally, you stated that following the conclusion of the investigation, the site will be permanently closed, and you will no longer engage in any investigative activities, now or in the future. While we acknowledge the corrective actions that your site has taken and your statement that you do not intend to perform clinical investigations in the future, your written response is inadequate because you did not provide sufficient details about how you, as the clinical investigator, will prevent similar violations from occurring if you should change your mind and decide to conduct clinical investigations in the future. Without this information, we are unable to determine whether your corrective action plan is adequate to prevent similar violations in future clinical investigations. We emphasize that as the clinical investigator, you are ultimately responsible for compliance with all applicable FDA regulations governing the conduct of clinical investigations and the protection of human subjects, both to protect the rights, safety, and welfare of subjects and to ensure the integrity of study data. Your failure to conduct the clinical study in accordance with the protocol, and your failure to maintain adequate drug-accountability records, raise significant concerns about your protection of study subjects enrolled at your site and raise concerns about the reliability of the data generated at your site. This letter is not intended to be an all-inclusive list of deficiencies with your clinical study of an investigational drug. It is your responsibility to ensure adherence to each requirement of the law and relevant FDA regulations. You should address any deficiencies and establish procedures to ensure that any ongoing or future studies comply with FDA regulations. This letter notifies you of our findings and provides you with an opportunity to address the deficiencies noted above. Within 15 business days of your receipt of this letter, you should notify this office in writing of the actions you have taken to prevent similar violations in the future. Failure to address this matter adequately may lead to regulatory action without further notice to you. If you believe that you have complied with the FD&C Act and relevant regulations, please include your reasoning and any supporting information for our consideration. Your written response, as well as any questions or concerns about this letter or the inspection, should be sent by email to the FDA at CDER-OSI-Communications@fda.hhs.gov.",
+    "finding_text_ko": "구체적으로, Protocol (b)(4)는 시험대상자가 연구 기간 중 다른 임상시험(clinical trial)에 참여하는 경우 해당 대상자를 연구에서 제외하도록 요구하였다. 또한 이 프로토콜은 연구 기간 동안 다른 임상시험용의약품(IP)의 사용을 금지하였다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로, 대상자 (b)(6)의 Protocol (b)(4) Visit 1 스크리닝은 2024년 11월 6일에 이루어졌고 해당 대상자는 2024년 11월 13일에 무작위배정되었다. 이 대상자에게는 2024년 11월 13일부터 12월 16일 사이에 Protocol (b)(4)의 시험약이 불출되었으며 2025년 1월 14일에 연구를 완료하였다. 그러나 이 대상자는 2024년 6월 24일 다른 임상시험인 Protocol (b)(4)에 대상자 (b)(6)으로 동시에 등록·무작위배정되어 있었다. 구체적으로 이 대상자는 2024년 8월 7일부터 12월 23일 사이에 Protocol (b)(4)의 시험약을 투여받았고 2025년 1월 6일에 해당 연구를 완료하였다. 따라서 대상자 (b)(4)는 Protocol (b)(4)에 참여하는 동시에 다른 임상시험인 Protocol (b)(4)에도 참여하였으며, Protocol (b)(4)에 등록되어 시험약을 투여받는 중에 Protocol (b)(4)의 IP를 투여받았다. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 해당 대상자가 Protocol (b)(4)와 Protocol (b)(4) 양쪽에 등록되어 있었음을 인정하였다. 귀하는 이것이 규정 위반에 해당함을 이해한다고 진술하였다. 또한 귀하는 이 대상자에 대하여 Protocol (b)(4)의 제외기준이 준수되지 않았다고 진술하였다. FDA는 임상시험자로서 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 연구가 시험계획서에 따라 수행되도록 보증할 책임이 귀하에게 있음을 강조한다. 대상자가 연구에 등록되기 전에 프로토콜이 요구하는 모든 선정기준을 충족하도록 보증하지 못하고, 연구 기간 중 대상자가 금지된 약물을 복용하지 않도록 보증하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자의 안전에 대한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 신뢰성에 대한 우려도 제기한다. 2. 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분(disposition)에 관한 적절한 기록을 유지하지 않았다[21 CFR 312.62(a)]. 임상시험자로서 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지하여야 한다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로 Protocol (b)(4)에 등록된 6명의 대상자에 대하여, 대상자가 사용한 시험약의 수량과 반납된 수량 사이에서 시험기관의 IP 수불기록, 대상자의 자가보고 투여량에 관한 EDC 기록, 시험기관이 보고한 IP 반납분(사용분 및 미사용분)에 관한 EDC 기록 간에 다음과 같은 불일치가 관찰되었다. ID # (b)(6), Kit #34_MFWE — 자가보고 투여: 2025년 3월 6~19일 및 2025년 3월 21~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 1, 미사용 34) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PNBT — 자가보고 투여: 2025년 3월 6~17일 및 2025년 3월 19~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 35 sachets 반납(사용 0, 미사용 35). ID # (b)(6), Kit #34_RJRF — 자가보고 투여: 2025년 3월 6~17일, 2025년 3월 19~20일 및 2025년 3월 22~24일, 17회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 0, 미사용 35) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PUVN — 자가보고 투여: 2025년 3월 6~24일, 19회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_AHRG — 자가보고 투여: 2025년 3월 11~24일, 14회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 14, 미사용 21) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_HPOP — 자가보고 투여: 2025년 3월 20~24일, 5회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 5, 미사용 30) / EDC IP 수불기록: 반납된 sachet 없음. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 밀봉된 키트가 대상자에게 제공되었고 대상자가 자택에서 이를 사용한 뒤 반납할 책임이 있었다고 진술하였다. 또한 귀하는 해당 키트가 시험기관에서 사용되지 않았다고 진술하였다. 시험약이 시험기관에서 투여되지 않았고 대상자가 자택에서 시험약을 투여한 뒤 미사용 시험약을 시험기관에 반납하기로 되어 있었다는 점은 인정하나, 임상시험자로서 귀하는 FDA 규정에 따라 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지할 책임이 있으므로 귀하의 답변은 미흡하다. 또한 Protocol (b)(4)는 시험약의 불출 및 반납에 관한 정확한 기록을 유지하도록 보증하는 것이 시험자의 책임이라고 명시적으로 규정하고 있었다. 끝으로 FDA는 원격 종료방문(remote close-out visit)에 관한 의뢰자의 2025년 5월 21일자 서신에서, 위에 언급된 대상자 불출 IP 키트들이 양쪽 끝에 훼손방지 밀봉(tamper-resistant seal)이 그대로 부착된 상태였음을 의뢰자가 관찰하였다는 점에 주목한다. 반면 EDC 기록상 해당 키트는 불출된 것으로 나타나 있었고, 작성 완료된 투약 설문지에는 대상자가 매일 밤 연구 용량을 복용한 것으로 기록되어 있었다. 의뢰자는 나아가 IP 키트가 개봉되지 않은 점에 비추어 불출기록이 정확할 수 있는 방법을 알 수 없다고 진술하였다. 따라서 이러한 관찰된 불일치와 IP 키트의 물리적 상태 및 부정확한 불출기록에 관한 의뢰자의 보고에 근거할 때, 귀하의 시험기관에서 시험약의 처분에 관한 기록은 미흡하다. 사용·미사용·반납된 시험약을 기록한 문서를 포함하여 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 임상시험용의약품에 대한 귀하의 감독 및 통제의 적정성에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 타당성과 무결성에 관한 우려도 제기한다. 또한 귀하는 서면답변에서 다음과 같은 시정조치가 취해졌다고 진술하였다. (1) 연구가 종료되었다, (2) 의뢰자가 해당 시험기관의 데이터를 사용하지 않기로 동의하였다, (3) 시험기관에 지급된 모든 자금이 반환되었다. 귀하는 나아가 피해를 입은 대상자는 없다고 진술하였다. 끝으로 귀하는 조사 종료 후 해당 시험기관을 영구 폐쇄할 것이며 현재는 물론 장래에도 시험 관련 활동에 종사하지 않겠다고 진술하였다. FDA는 귀하의 시험기관이 취한 시정조치와 장래에 임상시험을 수행할 의사가 없다는 귀하의 진술을 인정하지만, 귀하가 생각을 바꾸어 장래에 임상시험을 수행하기로 결정할 경우 임상시험자로서 유사한 위반의 재발을 어떻게 방지할 것인지에 관하여 충분한 세부내용을 제시하지 않았으므로 귀하의 서면답변은 미흡하다. 이러한 정보가 없으면 FDA는 귀하의 시정조치 계획이 장래의 임상시험에서 유사한 위반을 방지하기에 적절한지 판단할 수 없다. FDA는 임상시험자로서 귀하가 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 임상시험 수행 및 인간대상자 보호를 규율하는 모든 관련 FDA 규정의 준수에 대해 궁극적인 책임을 진다는 점을 강조한다. 시험계획서에 따라 임상연구를 수행하지 못하고 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자 보호에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 생성된 데이터의 신뢰성에 관한 우려도 제기한다. 이 서한은 임상시험용의약품에 대한 귀하의 임상연구에서 발견된 결함을 모두 망라한 목록이 아니다. 법률 및 관련 FDA 규정의 각 요구사항을 준수하도록 보증할 책임은 귀하에게 있다. 귀하는 모든 결함을 해소하고 진행 중이거나 장래에 수행될 연구가 FDA 규정을 준수하도록 보증하는 절차를 수립하여야 한다. 이 서한은 FDA의 조사 결과를 귀하에게 통지하고 위에 적시된 결함을 해소할 기회를 제공하는 것이다. 귀하는 이 서한을 수령한 날부터 영업일 기준 15일 이내에 장래에 유사한 위반을 방지하기 위해 취한 조치를 서면으로 본 사무소에 통지하여야 한다. 이 사안을 적절히 해소하지 못할 경우 추가 통지 없이 규제조치가 취해질 수 있다. 귀하가 FD&C Act 및 관련 규정을 준수하였다고 판단한다면 FDA가 검토할 수 있도록 그 근거와 뒷받침하는 자료를 함께 제출하기 바란다. 서면답변과 이 서한 또는 실사에 관한 문의사항이나 우려사항은 이메일로 FDA(CDER-OSI-Communications@fda.hhs.gov)에 보내야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9e0e333baae0c479153d55a",
+    "finding_text": "<의약품 제조업자 등의 준수사항 위반 관련> ○ 의약품 제조업자는「약사법」제38조제1항 및「의약품안전규칙」제48조제9호가목 [별표1] 의약품 제조 및 품질관리기준을 준수하여, ① 자사 기준서 ‘품질관리 업무규정(문서번호: JW-Q-02)’에 따라 시험의뢰부서는 시험의뢰에 해당하는 모든 사항을 기록하여 의뢰부서의 팀장 결재를 득한 후 시험을 의뢰하여야 하나, - 동 업체는 ‘정우이진탕산(단미엑스혼합제)’, ‘정우대시호탕엑스과립’,‘소청룡탕산(단미엑스혼합제)‘의 반제품 대상 미생물 시험 시 관련 내용을 기록하지 않고, 시험의뢰 부서 팀장의 결재를 받지 않은 채 미생물 시험을 실시한 사실이 있음 ② 또한, 자사 기준서 ’제조지시 및 기록서 작성방법서(문서번호: JW-SOP-00-014)’에 따라, 제조지시 및 기록서는 작업 중 실시간으로 작성하여야 하나, - 현장 감시 시 ‘요로신정’의 타정 공정 준비 중 확인한 제조기록서에 타정 공정 이전 작업의 내용 및 실시사항, 작업시간 등이 기록되지 않았으며, 작업자 및 확인자의 서명이 없었음 <의약품 수탁자의 관리책임 등 위반 관련> ○ 의약품 수탁자는「약사법」제31조제1항,「의약품 등 제조업 및 수입자의 시설기준령」제4조, 같은 법 시행규칙 제11조제3항 및 「의약품안전규칙」제48조제9호[별표1] 의약품 제조 및 품질관리기준을 준수하여, ① 자사 기준서 ‘품질관리 업무규정(문서번호: JW-Q-02)’에 따라, 시험의뢰부서는 시험의뢰에 해당하는 모든 사항을 기록하여 의뢰부서의 팀장 결재를 득한 후 시험을 의뢰하여야 하나, - 동 업체는 ‘속엔쿨정’의 반제품 대상 미생물 시험 시 관련 내용을 기록하지 않고, 시험의뢰 부서 팀장의 결재를 받지 않은 채 미생물 시험을 실시한 사실이 있음 ② 또한, 자사 기준서 ‘로그북 관리규정(문서번호: JW-1-20)’에 따라 로그북 기록은 작업 후 즉시 작성하여야 하나, - 동 업체는 ‘토파제정’ 제품으로 수행한 ‘로타리타정기2 성능적격성 평가’에 사용한 저울, 경도계, 마손도계의 로그북(사용기록서)를 작성하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 제조업자 등의 준수사항 위반 관련 — 의약품 제조업자는 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호가목 [별표1] 의약품 제조 및 품질관리기준을 준수하여야 한다. 첫째, 자사 기준서 ‘품질관리 업무규정(문서번호: JW-Q-02)’에 따라 시험의뢰부서는 시험의뢰에 해당하는 모든 사항을 기록하고 의뢰부서 팀장의 결재를 받은 후 시험을 의뢰하여야 하나, 동 업체는 ‘정우이진탕산(단미엑스혼합제)’, ‘정우대시호탕엑스과립’, ‘소청룡탕산(단미엑스혼합제)’의 반제품 대상 미생물 시험 시 관련 내용을 기록하지 않고 시험의뢰 부서 팀장의 결재를 받지 않은 채 미생물 시험을 실시하였다. 둘째, 자사 기준서 ‘제조지시 및 기록서 작성방법서(문서번호: JW-SOP-00-014)’에 따라 제조지시 및 기록서는 작업 중 실시간으로 작성하여야 하나, 현장 감시 시 ‘요로신정’의 타정 공정 준비 중 확인한 제조기록서에는 타정 공정 이전 작업의 내용 및 실시사항, 작업시간 등이 기록되어 있지 않았고 작업자 및 확인자의 서명도 없었다. 의약품 수탁자의 관리책임 등 위반 관련 — 의약품 수탁자는 「약사법」 제31조제1항, 「의약품 등 제조업 및 수입자의 시설기준령」 제4조, 같은 법 시행규칙 제11조제3항 및 「의약품안전규칙」 제48조제9호 [별표1] 의약품 제조 및 품질관리기준을 준수하여야 한다. 첫째, 자사 기준서 ‘품질관리 업무규정(문서번호: JW-Q-02)’에 따라 시험의뢰부서는 시험의뢰에 해당하는 모든 사항을 기록하고 의뢰부서 팀장의 결재를 받은 후 시험을 의뢰하여야 하나, 동 업체는 ‘속엔쿨정’의 반제품 대상 미생물 시험 시 관련 내용을 기록하지 않고 시험의뢰 부서 팀장의 결재를 받지 않은 채 미생물 시험을 실시하였다. 둘째, 자사 기준서 ‘로그북 관리규정(문서번호: JW-1-20)’에 따라 로그북 기록은 작업 후 즉시 작성하여야 하나, 동 업체는 ‘토파제정’ 제품으로 수행한 ‘로타리타정기2 성능적격성 평가’에 사용한 저울, 경도계, 마손도계의 로그북(사용기록서)을 작성하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1404c84441f3193a003324d7",
+    "finding_text": "ㅇ잔류농약[프로사이미돈(mg/kg)] 시험 부적합: 형율차전자 - 기준: 0.1 이하 - 결과: 0.3 - 제조번호(사용기한): HY-26-1-01-05(2029. 1. 4.)",
+    "finding_text_ko": "‘형율차전자’의 잔류농약[프로사이미돈(mg/kg)] 시험이 부적합하였다. 기준은 0.1 이하이나 결과는 0.3으로 나타났다. 해당 제조번호는 HY-26-1-01-05이며 사용기한은 2029. 1. 4.이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a55b384e22dcb531d54431d3",
+    "finding_text": "￮ 상기 업체는 의약품 제조업자는 「약사법」제38조제1항,「의약품 등의 안전에 관한 규칙」제48조제9호에 따라 제조 및 품질관리기준을 준수하여야 하고 작성된 기준서의 내용을 준수하여야 하나, - 자사 기준서 ‘시정 및 예방 조치 관리 기준(문서번호 STD-SOP-015)에 따라 일탈, 제품불만 등의 문제에 대해 조사를 통해 근본원인을 파악하고 필요한 시정 및 예방조치를 수행하고 5.4 조치사항 검증에 따라 해당 조치사항이 완료되면 이를 통해 근본 원인과 잠재적인 원인을 제거하고, 최종적으로 제품 품질에 영향을 미치지 않는지 검토과정을 통해 제품 영향 평가, 효과성 검사, 확인, 일탈, 경향분석, 밸리데이션, 이외 효과성 검사가 필요한 사항들을 점검하여야 함에도 불구하고, · 동 업체는 ‘그로트로핀투주사액아이펜(소마트로핀)’(30IU, 제조번호 GP50363P2, 사용기한 2027. 3. 30.) 제품의 불만제기사항과 관련하여 그로트로핀투주사액카트리지(소마트로핀) 및 그로트로핀투주사액아이펜(소마트로핀) 품목에 대하여 동일한 불만사항이 접수(총 9건, QA 접수일자 2024.2.7., 2024.3.18., 2024.10.25., 2024.12.20. 등)된 바 있으며, 이에 대하여 시정 및 예방조치를 수행하여 조치사항을 완료하였으나 제품 영향 평가, 효과성 검사 등의 검토 과정을 통한 검증을 실시하지 않은 사실이 있음. - 자사 기준서 ‘완제품 출하방법(문서번호 STD-SOP-07)’ 5.2.2.2 항에 따라 출하 검토 및 승인 시 배치와 관련된 모든 일탈에 대해 적절한 조사와 추적성 및 승인/종결 여부를 확인하도록 규정하고 있음에도 불구하고, · 동 업체는 ‘그로트로핀투주사액아이펜(소마트로핀)’(30IU, 제조번호 GP50363P2)의 출하승인 시(출하승인일 2025.07.24.) 제조공정 중 무균충전 이후의 이물검사 공정 후 발생한 정품수율 관리기준을 벗어난 일탈(일탈관리번호 EVENT-2024-0098, 일탈조사일자 2025.07.29., 최종 승인일자 2025.08.01.)이 진행 중에 있었고 일탈 사항의 여부를 확인하였으나, 진행 중인 일탈에 대한 적절한 조사와 추적성 및 승인/종결 여부 등을 포함한 검토를 실시하지 아니한 사실이 있음.",
+    "finding_text_ko": "의약품 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호에 따라 제조 및 품질관리기준을 준수하고 작성된 기준서의 내용을 준수하여야 한다. 자사 기준서 ‘시정 및 예방 조치 관리 기준(문서번호 STD-SOP-015)’에 따르면 일탈, 제품불만 등의 문제에 대해 조사를 통해 근본원인을 파악하고 필요한 시정 및 예방조치를 수행하여야 하며, 5.4 조치사항 검증에 따라 해당 조치사항이 완료되면 이를 통해 근본 원인과 잠재적인 원인이 제거되었는지, 최종적으로 제품 품질에 영향을 미치지 않는지를 제품 영향 평가, 효과성 검사, 확인, 일탈, 경향분석, 밸리데이션 등 검토 과정을 통해 점검하여야 한다. 그럼에도 동 업체는 ‘그로트로핀투주사액아이펜(소마트로핀)’(30IU, 제조번호 GP50363P2, 사용기한 2027. 3. 30.) 제품의 불만제기사항과 관련하여 그로트로핀투주사액카트리지(소마트로핀) 및 그로트로핀투주사액아이펜(소마트로핀) 품목에 대해 동일한 불만사항이 총 9건 접수(QA 접수일자 2024.2.7., 2024.3.18., 2024.10.25., 2024.12.20. 등)되었음에도, 시정 및 예방조치를 수행하여 조치사항을 완료하였을 뿐 제품 영향 평가, 효과성 검사 등의 검토 과정을 통한 검증을 실시하지 않았다. 또한 자사 기준서 ‘완제품 출하방법(문서번호 STD-SOP-07)’ 5.2.2.2 항에 따라 출하 검토 및 승인 시 배치와 관련된 모든 일탈에 대해 적절한 조사와 추적성 및 승인·종결 여부를 확인하도록 규정하고 있음에도, 동 업체는 ‘그로트로핀투주사액아이펜(소마트로핀)’(30IU, 제조번호 GP50363P2)의 출하승인 시(출하승인일 2025.07.24.) 제조공정 중 무균충전 이후의 이물검사 공정 후 발생한 정품수율 관리기준 이탈 일탈(일탈관리번호 EVENT-2024-0098, 일탈조사일자 2025.07.29., 최종 승인일자 2025.08.01.)이 진행 중이었고 일탈 사항의 존재를 확인하였음에도, 진행 중인 일탈에 대한 적절한 조사와 추적성 및 승인·종결 여부 등을 포함한 검토를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-34971b3b1a1c253dbbd9f78b",
+    "finding_text": "○ ｢마약류 관리에 관한 법률｣ 제11조 및 같은 법 시행규칙 제21조에 따라 마약류취급자는 마약류의 구입·제조·판매 등 취급내역을 마약류통합관리시스템을 통해 식품의약품안전처장에게 보고하여야 하나, - 삼응 옥시코돈염의 낱개수량 오기 정정 및 삭제 등 보고를 보고기한내 보고하지 않고 지연 보고한 사실이 있음",
+    "finding_text_ko": "「마약류 관리에 관한 법률」 제11조 및 같은 법 시행규칙 제21조에 따라 마약류취급자는 마약류의 구입·제조·판매 등 취급내역을 마약류통합관리시스템을 통해 식품의약품안전처장에게 보고하여야 하나, 동 업체는 삼응 옥시코돈염의 낱개수량 오기 정정 및 삭제 등에 관한 보고를 보고기한 내에 하지 않고 지연 보고하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e89192cf5eff31f36021f94a",
+    "finding_text": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, ‘구미포비스왑스틱(포비돈요오드)’에 대하여 기준서를 준수하지 않은 사실이 있음(2차 위반) - 자사 기준서 ｢위생관리기준서｣(문서번호 SMS-03), ｢제조설비 관리 규정｣(문서번호 MEMP-09)에 따르면 스왑 스틱 자동 흡착 포장기 사용 후 세척 방법에 따라 세척하고, 제조설비 이력카드에 세척 내용 및 일자를 기록하여야 함에도 불구하고, ‘구미포비스왑스틱(포비돈요오드)’[(제조번호 202529(제조일자 2025.12.5.) ~ 202534(제조일자 2025.12.17.)] 제조 후 제조설비 이력카드에 세척 내용 및 일자를 기록하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고 작성된 기준서 및 지시서를 준수하여야 하나, ‘구미포비스왑스틱(포비돈요오드)’에 대하여 기준서를 준수하지 않았다(2차 위반). 자사 기준서 「위생관리기준서」(문서번호 SMS-03) 및 「제조설비 관리 규정」(문서번호 MEMP-09)에 따르면 스왑 스틱 자동 흡착 포장기는 사용 후 정해진 세척 방법에 따라 세척하고 제조설비 이력카드에 세척 내용 및 일자를 기록하여야 함에도, ‘구미포비스왑스틱(포비돈요오드)’[제조번호 202529(제조일자 2025.12.5.)부터 202534(제조일자 2025.12.17.)까지] 제조 후 제조설비 이력카드에 세척 내용 및 일자를 기록하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9116a24fe83b66e7556e44f",
+    "finding_text": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, ‘쎄파렉신캡슐(은교산)’, ‘소폐탕엑스과립(소청룡탕)’에 대하여 다음과 같이 기준서를 준수하지 않은 사실이 있음 - 제조관리기준서 ｢원료 칭량 관리｣(문서번호 PMN032, 승인일자 2025. 10. 23., 4.4.3. 원료 칭량 실시) 에 따라 칭량이 완료된 원료는 제조지시 및 기록서와 원료명, 수량 등을 재확인 후 ‘칭량 후 대기실(242호)’로 이동시켜야 하나, 의약품 보관 장소로 적합하지 아니한 장소에 상기 품목의 원료를 칭량하여 보관하였음 - 제조관리기준서 ｢제조(포장)지시 및 기록서 관리｣(문서번호 PMN002, 승인일자 2025. 12. 30., 9.제조지시 및 기록서의 기록)에 따라 작업 전에 작업실의 청소 상태, 사용 기기 및 기구의 상태를 점검한 후 기록하고, 모든 기록 사항은 작업과 동시에 기록할 수 있도록 하며, 공정 중에 발생하는 칭량표, 기록지, 청소표시서, 자재견본 등은 해당 페이지에 정해진 양식으로 부착하며 부착란이 부족할 시 제기서 뒷장에 부착하여야 하나, 상기 품목은 2026. 3. 16.자 원료칭량 작업이 완료된 상태임에도 불구하고 제조지시 및 기록서에 작업 전 기계, 기구 및 작업장 청소상태 등의 점검사항을 기록하지 아니하였고 원료칭량 공정 중에 발생하는 칭량표, 기록지 등을 부착하지 아니하는 등 모든 기록 사항을 작업과 동시에 기록하지 아니하여 해당 기준서를 준수하지 아니하였음",
+    "finding_text_ko": "의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고 작성된 기준서 및 지시서를 준수하여야 하나, ‘쎄파렉신캡슐(은교산)’ 및 ‘소폐탕엑스과립(소청룡탕)’에 대하여 다음과 같이 기준서를 준수하지 않았다. 첫째, 제조관리기준서 「원료 칭량 관리」(문서번호 PMN032, 승인일자 2025. 10. 23., 4.4.3. 원료 칭량 실시)에 따라 칭량이 완료된 원료는 제조지시 및 기록서와 원료명, 수량 등을 재확인한 후 ‘칭량 후 대기실(242호)’로 이동시켜야 하나, 의약품 보관 장소로 적합하지 아니한 장소에 해당 품목의 원료를 칭량하여 보관하였다. 둘째, 제조관리기준서 「제조(포장)지시 및 기록서 관리」(문서번호 PMN002, 승인일자 2025. 12. 30., 9. 제조지시 및 기록서의 기록)에 따라 작업 전에 작업실의 청소 상태와 사용 기기 및 기구의 상태를 점검한 후 기록하고, 모든 기록 사항은 작업과 동시에 기록하며, 공정 중에 발생하는 칭량표, 기록지, 청소표시서, 자재견본 등은 해당 페이지에 정해진 양식으로 부착하고 부착란이 부족할 경우 기록서 뒷장에 부착하여야 하나, 해당 품목은 2026. 3. 16.자 원료칭량 작업이 완료된 상태임에도 제조지시 및 기록서에 작업 전 기계·기구 및 작업장 청소상태 등의 점검사항을 기록하지 않았고 원료칭량 공정 중에 발생하는 칭량표, 기록지 등을 부착하지 않는 등 모든 기록 사항을 작업과 동시에 기록하지 아니하여 해당 기준서를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-86bbd751398cc9786204fde9",
+    "finding_text": "○ 의약외품(치약) 품질부적합 - 의약외품 제조업자는「약사법」제62조제3호 및 제66조에 따라, 제52조제1항에 따라 기준이 정하여진 의약외품으로 정한 기준에 맞지 아니한 의약외품은 제조하여 판매하여서는 아니되나, - 동 업체는 ‘크리오지오일사오공치약’의 품질이 부적합(pH 기준)한 제품을 판매한 사실이 있음 ※ (pH 기준) 6.0 이상 8.0 이하 / (시험결과) 9.1",
+    "finding_text_ko": "의약외품(치약) 품질부적합 사례이다. 의약외품 제조업자는 「약사법」 제62조제3호 및 제66조에 따라 제52조제1항에 따라 기준이 정하여진 의약외품으로서 정해진 기준에 맞지 아니한 의약외품을 제조하여 판매하여서는 아니 되나, 동 업체는 ‘크리오지오일사오공치약’의 품질이 pH 기준에 부적합한 제품을 판매하였다. pH 기준은 6.0 이상 8.0 이하이나 시험결과는 9.1이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d82c0f0ef0c1872014695a8a",
+    "finding_text": "○ 의약품 제조의 수탁자는 제품마다 제조관리기준서 및 품질관리기준서를 작성하고 그 기준서에 따라 제조 및 품질관리를 실시하여야 하나, 다음과 같이 기준서의 내용을 미준수 하였음 - 자사기준서 ｢문서관리규정(문서번호 VG-012)｣ 및 ｢제조(포장)지시 및 기록서 작성 및 운영규정(문서번호 VM-004)｣에 따라 문서의 기록은 작업과 동시에 이루어지며, 공정을 수행한 작업자가 직접 작성하고 확인자가 그 결과를 확인하여 성명 또는 서명을 기록하도록 규정하였음에도 불구하고, 의약품 ‘레푸로진시럽(레보드로프로피진)’(제조번호: 24011)[위탁자: 삼천당제약(주)]을 수탁 제조하면서 충전기, 액제 캡핑기, 자동중량 선별기의 설비가동 및 청소일지를 작업과 동시에 작성하지 않았고, 실제 공정을 수행한 작업자가 작성하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 제조의 수탁자는 제품마다 제조관리기준서 및 품질관리기준서를 작성하고 그 기준서에 따라 제조 및 품질관리를 실시하여야 하나, 다음과 같이 기준서의 내용을 준수하지 않았다. 자사기준서 「문서관리규정(문서번호 VG-012)」 및 「제조(포장)지시 및 기록서 작성 및 운영규정(문서번호 VM-004)」에 따라 문서의 기록은 작업과 동시에 이루어져야 하고 공정을 수행한 작업자가 직접 작성하며 확인자가 그 결과를 확인하여 성명 또는 서명을 기록하도록 규정하고 있음에도, 의약품 ‘레푸로진시럽(레보드로프로피진)’(제조번호: 24011)[위탁자: 삼천당제약(주)]을 수탁 제조하면서 충전기, 액제 캡핑기, 자동중량 선별기의 설비가동 및 청소일지를 작업과 동시에 작성하지 않았고 실제 공정을 수행한 작업자가 작성하지도 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1086083175c6e61598098fce",
+    "finding_text": "재평가에 필요한 자료를 기한(’26. 3. 17.) 내에 제출하지 아니함(3차 위반)",
+    "finding_text_ko": "재평가에 필요한 자료를 기한인 2026. 3. 17.까지 제출하지 않았다(3차 위반).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14c89cd62bad9966faf39f20",
+    "finding_text": "수입 의약품 ‘패스터텍주1.5밀리그램(라스부리카제)’의 허가받은 사항(제조방법)에 대하여 변경허가를 받지 아니하고, 허가사항과 다르게 제조된 제품을 수입하여 판매한 사실이 있음",
+    "finding_text_ko": "수입 의약품 ‘패스터텍주1.5밀리그램(라스부리카제)’의 허가받은 사항(제조방법)에 대하여 변경허가를 받지 않은 채, 허가사항과 다르게 제조된 제품을 수입하여 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c925b93ee7c4de1731d15e3",
+    "finding_text": "○ 유통한약재 품질검사 부적합(검사기관: 서울시 보건환경연구원) - 품목: 나음음양곽(사용기한 2028.1.19., 제조번호 NA2502137A01) - 부적합 항목: 정량법(이카리인) - 기준/결과: 0.3%이상/ 0.1%",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다(검사기관: 서울시 보건환경연구원). 해당 품목은 나음음양곽(사용기한 2028.1.19., 제조번호 NA2502137A01)이고, 부적합 항목은 정량법(이카리인)이며, 기준은 0.3% 이상이나 결과는 0.1%였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b292f8ce670bc683688d7be3",
+    "finding_text": "○ 의약품등의 제조업자 또는 품목허가를 받은 자는 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사를 철저히 하며, 품질에 적합한 제품만을 출고하여야 하나, - ‘생리식염키트주사’는 완제품 출하시험 중 확인시험, 순도시험(중금속, 비소)을 실시하지 아니하고, ‘5%포도당키트주사’는 완제품 출하시험 중 확인시험을 실시하지 아니한 사실이 있음",
+    "finding_text_ko": "의약품등의 제조업자 또는 품목허가를 받은 자는 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사를 철저히 하고 품질에 적합한 제품만을 출고하여야 하나, ‘생리식염키트주사’는 완제품 출하시험 중 확인시험과 순도시험(중금속, 비소)을 실시하지 않았고 ‘5%포도당키트주사’는 완제품 출하시험 중 확인시험을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38b588f5f3bbff157f64c37a",
+    "finding_text": "회수 및 폐기 등에 관한 준수사항 위반",
+    "finding_text_ko": "회수 및 폐기 등에 관한 준수사항을 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-502229a58aa5981593b67d24",
+    "finding_text": "<제조․관리 의무 미준수> 의약외품 제조업자는「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히하고 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며 이를 제조일로부터 3년이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나, ○ 의약외품인 닥터포켓퍼퓸손소독제액(에탄올)(블랙체리향)(제조번호: KP-DPBC-A24, 사용기한: 2027.06.18.)을 제조·판매함에 있어 - 제조관리기록서(칭량 제조 지시 및 제조 공정도)를 제대로 작성하지 아니한 사실이 있음 - 품목신고된 기준 및 시험방법에 따른 완제품 시험(성상, 확인시험, pH, 질량·용량시험, 함량시험) 일체와 제조에 투입된 주성분 원료[에탄올(95)]에 대해 원료 입고시험(성상, 확인, 비중, 순도시험) 일체를 실시하지 아니한 사실이 있음 <변경사항 미신고> 의약외품 제조업자는「약사법」제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항부터 제4항까지에 따라 허가받은 사항 또는 신고한 사항 중 총리령으로 정하는 사항을 변경하려는 때에는 총리령으로 정하는 바에 따라 변경허가를 받거나 변경신고를 하여야 하나, ○ 의약외품인 닥터포켓퍼퓸손소독제액(에탄올)(블랙체리향)(제조번호: KP-DPBC-A24, 사용기한: 2027.06.18.)을 제조·판매함에 있어 - 위 제품 제조(2024.6.19.) 시 사용한 주성분 원료[에탄올(95)] 제조원을 품목신고한 ‘Al-Abbas Sugar Mills Limited’이 아닌 ‘sasma’로 변경하였음에도 이에 대한 변경신고를 하지 아니하고 ‘sasma’에서 제조된 주성분 원료[에탄올(95)]를 사용하여 위 제품을 제조한 사실이 있음",
+    "finding_text_ko": "제조·관리 의무 미준수 — 의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어 제조일로부터 3년 이상 보존하여야 하며, 품질검사에 합격한 제품만을 출고하여야 한다. 그럼에도 동 업체는 의약외품인 닥터포켓퍼퓸손소독제액(에탄올)(블랙체리향)(제조번호: KP-DPBC-A24, 사용기한: 2027.06.18.)을 제조·판매하면서 제조관리기록서(칭량 제조 지시 및 제조 공정도)를 제대로 작성하지 않았고, 품목신고된 기준 및 시험방법에 따른 완제품 시험(성상, 확인시험, pH, 질량·용량시험, 함량시험) 일체와 제조에 투입된 주성분 원료[에탄올(95)]에 대한 원료 입고시험(성상, 확인, 비중, 순도시험) 일체를 실시하지 않았다. 변경사항 미신고 — 의약외품 제조업자는 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항부터 제4항까지에 따라 허가받은 사항 또는 신고한 사항 중 총리령으로 정하는 사항을 변경하려는 때에는 총리령으로 정하는 바에 따라 변경허가를 받거나 변경신고를 하여야 하나, 동 업체는 위 제품 제조(2024.6.19.) 시 사용한 주성분 원료[에탄올(95)]의 제조원을 품목신고한 ‘Al-Abbas Sugar Mills Limited’이 아닌 ‘sasma’로 변경하였음에도 이에 대한 변경신고를 하지 않고 ‘sasma’에서 제조된 주성분 원료[에탄올(95)]를 사용하여 위 제품을 제조하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-530bc77a40fa6ee69d70f81d",
+    "finding_text": "회수 및 폐기 등에 관한 준수사항 위반",
+    "finding_text_ko": "회수 및 폐기 등에 관한 준수사항을 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dae8932bd8083d119d190259",
+    "finding_text": "○ 2021년 1월부터 의약품 제조 및 품질관리기준 적합판정 취소 제도 시행(’22. 12. 11) 이후인 점검일(2023.11.28.~12.1)현재까지 지속적·반복적으로 제조기록서를 거짓으로 작성 - 의약품 ‘에페리손염산염’<제200500831-46-C156-03호>의 제조기록서를 작성함에 있어 허가(신고)된 원료약품 분량과 다르게 원료약품을 칭량하여 제조에 투입하였음에도 제조기록서에는 허가(신고)사항과 동일하게 제조한 것으로 거짓 작성한 사실이 있음 - - ‘삼화알렌드론산나트륨(원료)‘<제47호>, ‘삼화이토프리드염산염(원료)’<제98호>, ‘프란루카스트’<제20121128-171-I-280-01호>, ‘카르베딜롤’<제20050831-60-B-147-01호>, ‘삼화브롬화옥틸로늄’<제11호>에 대하여 제조 시 허가(신고)된 ‘합성’ 제조공정을 거치지 않고 수입한 원료의약품(완제품)을 단순 재포장(소분·포장)하여 출하하는 등 제조기록서의 제조방법에 따라 제조하지 않았음에도 불구하고 제조기록서에는 해당 제조방법과 동일하게 제조한 것으로 거짓 작성(또는 미작성)한 사실이 있음",
+    "finding_text_ko": "의약품 제조 및 품질관리기준 적합판정 취소 제도가 시행(2022. 12. 11.)된 이후인 점검일(2023.11.28.~12.1.) 현재까지, 2021년 1월부터 지속적·반복적으로 제조기록서를 거짓으로 작성하였다. 의약품 ‘에페리손염산염’<제200500831-46-C156-03호>의 제조기록서를 작성하면서 허가(신고)된 원료약품 분량과 다르게 원료약품을 칭량하여 제조에 투입하였음에도 제조기록서에는 허가(신고)사항과 동일하게 제조한 것으로 거짓 작성하였다. 또한 ‘삼화알렌드론산나트륨(원료)’<제47호>, ‘삼화이토프리드염산염(원료)’<제98호>, ‘프란루카스트’<제20121128-171-I-280-01호>, ‘카르베딜롤’<제20050831-60-B-147-01호>, ‘삼화브롬화옥틸로늄’<제11호>에 대하여 제조 시 허가(신고)된 ‘합성’ 제조공정을 거치지 않고 수입한 원료의약품(완제품)을 단순 재포장(소분·포장)하여 출하하는 등 제조기록서의 제조방법에 따라 제조하지 않았음에도, 제조기록서에는 해당 제조방법과 동일하게 제조한 것으로 거짓 작성하거나 이를 작성하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e09f7203ffcd0ec715362faa",
+    "finding_text": "○「약사법」제42조제5항 및 같은 법 제37조의3, 「의약품 등의 안전에 관한 규칙」제60조 및 [별표 4의3]에 따르면 의약품 등의 수입자는 위해성관리계획(RMP)에 따라 의약품의 시판 후 안전관리를 하여야 함에도 불구하고, - 상기 업체는 의약품 ‘티오스팔피주15밀리그램(티오테파), 티오스팔피주100밀리그램(티오테파)’를 병원에 공급함에 있어, 해당 품목의 규명된 위해성·잠재적 위해성·부족 정보 등에 관한 안내를 하지 않고, 해당 품목 투여·사용시 발생하는 부작용이나 이상사례를 보고할 것을 요청하지 않았으며, 환자용 사용설명서를 교부하지 않는 등 해당 품목의 위해성관리계획(RMP)에 따른 안전관리를 일부 실시하지 않은 사실이 있음",
+    "finding_text_ko": "「약사법」 제42조제5항 및 같은 법 제37조의3, 「의약품 등의 안전에 관한 규칙」 제60조 및 [별표 4의3]에 따르면 의약품 등의 수입자는 위해성관리계획(RMP)에 따라 의약품의 시판 후 안전관리를 하여야 한다. 그럼에도 상기 업체는 의약품 ‘티오스팔피주15밀리그램(티오테파)’ 및 ‘티오스팔피주100밀리그램(티오테파)’를 병원에 공급하면서 해당 품목의 규명된 위해성·잠재적 위해성·부족 정보 등에 관한 안내를 하지 않았고, 해당 품목 투여·사용 시 발생하는 부작용이나 이상사례를 보고할 것을 요청하지 않았으며, 환자용 사용설명서를 교부하지 않는 등 해당 품목의 위해성관리계획(RMP)에 따른 안전관리를 일부 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5bc7d824fcd80fc42ccff963",
+    "finding_text": "○ 원료시험 미실시 및 부적합 원료 사용 ○ 변경허가를 받지 않거나 신고를 하지 않고 주성분 제조원을 변경",
+    "finding_text_ko": "원료시험을 실시하지 않고 부적합 원료를 사용하였으며, 변경허가를 받거나 신고를 하지 않고 주성분 제조원을 변경하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aa3b8cbe4c18451f472650df",
+    "finding_text": "① 임의 맹검 해제 ② 미승인 모집공고 게재",
+    "finding_text_ko": "임의로 맹검을 해제하였고, 승인받지 않은 모집공고를 게재하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aef7a546691daad23cac3ef8",
+    "finding_text": "임상시험의 품질보증 및 임상시험자료의 품질관리 위반",
+    "finding_text_ko": "임상시험의 품질보증 및 임상시험자료의 품질관리에 관한 규정을 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e1f13f233e1ad275db89cdb1",
+    "finding_text": "○ 기준서 미준수 - 업체 기준서 ‘문서의 기록에 관한 규정(문서번호: G-004-A, 발효일자: 2021.8.11.)’의 ‘6. 절차 > 6.1 일반사항 > 4)항’에 따라 ‘제조관리 기록서, 시험성적서 및 시험일지, 기준서 및 표준작업방법서에 의거하여 규정된 기록은 행위가 이루어지는 즉시 작성되어야 한다.’라고 기재되어 있으며, - 업체 기준서 ‘시험기기 관리 규정(문서번호: Q-026, 발효일자: 2021.10.15.)’의 ‘6. 절차 > 2) 작동 및 유지 > 가) > ② 절차 > ㄴ.항’에 따라 “모든 시험자는 중요 시험기기 사용 시 그 사용 내역을 ’양식 2. 시험기기 사용일지‘에 기록한다.“라고 기재되어 있음에도 불구하고, - ‘펜디씬정’의 완제품 시험 항목인 ‘확인시험(포장융점)’ 측정 시 가열 장비로 사용되는 드라이오븐기를 사용한 후 드라이오븐기 사용 대장을 작업과 동시에 작성하지 않음",
+    "finding_text_ko": "기준서를 준수하지 않았다. 업체 기준서 ‘문서의 기록에 관한 규정(문서번호: G-004-A, 발효일자: 2021.8.11.)’의 ‘6. 절차 > 6.1 일반사항 > 4)항’에는 제조관리 기록서, 시험성적서 및 시험일지, 기준서 및 표준작업방법서에 의거하여 규정된 기록은 행위가 이루어지는 즉시 작성되어야 한다고 기재되어 있고, 업체 기준서 ‘시험기기 관리 규정(문서번호: Q-026, 발효일자: 2021.10.15.)’의 ‘6. 절차 > 2) 작동 및 유지 > 가) > ② 절차 > ㄴ.항’에는 모든 시험자가 중요 시험기기 사용 시 그 사용 내역을 ‘양식 2. 시험기기 사용일지’에 기록하도록 기재되어 있다. 그럼에도 ‘펜디씬정’의 완제품 시험 항목인 ‘확인시험(포장융점)’ 측정 시 가열 장비로 사용되는 드라이오븐기를 사용한 후 드라이오븐기 사용 대장을 작업과 동시에 작성하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4af4b05f889881d1513adaeb",
+    "finding_text": "○ 의약품 식별표시 미등록 -「약사법」제38조의6,「의약품 등의 안전에 관한 규칙」제49조의2 및 제49조의3에 따라, 식약처장이 고시하는 제형에 해당하는 의약품 품목허가를 받은 자는 해당 의약품이 다른 의약품과 구별될 수 있도록 표시하여야 하며 이를 등록한 후 시판하여야 하나, - 동 업체는 ‘로사칼정50밀리그램(로사르탄칼륨)’에 대하여 품목허가(‘19.8.28.) 이후 식별표시를 등록하지 않고, 2020년 12월부터 2026년 3월까지 상기 제품을 판매하였음 ※ ㈜서흥은 상기품목에 대하여 2026.4.21.자로 의약품 식별표시 등록을 완료하였음",
+    "finding_text_ko": "의약품 식별표시를 등록하지 않았다. 「약사법」 제38조의6, 「의약품 등의 안전에 관한 규칙」 제49조의2 및 제49조의3에 따라 식약처장이 고시하는 제형에 해당하는 의약품 품목허가를 받은 자는 해당 의약품이 다른 의약품과 구별될 수 있도록 표시하고 이를 등록한 후 시판하여야 하나, 동 업체는 ‘로사칼정50밀리그램(로사르탄칼륨)’에 대하여 품목허가(2019. 8. 28.) 이후 식별표시를 등록하지 않은 채 2020년 12월부터 2026년 3월까지 해당 제품을 판매하였다. 다만 ㈜서흥은 해당 품목에 대하여 2026. 4. 21.자로 의약품 식별표시 등록을 완료하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-327ae2c8ce08a04e861037d7",
+    "finding_text": "<회수절차 미준수> ○「약사법」제39조제1항 및「의약품안전규칙」제50조제3항에 따라 회수대상 의약품 등에 대하여 즉시 판매중지 등 필요한 조치를 하고, 문제가 있음을 안날로부터 5일 이내에 회수계획서를 관할 지방청으로 제출하여야 하나, - 동 업체는 2025. 12. 24.자로 약국에서 ‘올메텍플러스정20/12.5밀리그램’의 제품 혼입 관련 불만을 접수하여 상기 제품과 타 제품의 혼입 사실을 인지하였음에도 불구하고, 2026. 1. 8.자에 회수계획서를 대전식약청에 제출한 사실이 있음 <기준서 미준수> ○「약사법」제38조제1항 및「의약품안전규칙」제48조제9호에 따라, 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여, ① 자사 기준서 ‘Line Clearance 절차(A동)(문서번호: OPE05-148)’을 준수하여 각 공정 작업이 완료되면 다음 제품 또는 배치 생산 전 제품 및 부적합품 등을 정돈하도록 규정하고 있으나, - 동 업체는 ’올메텍정20밀리그램(올메사르탄메독소밀)‘의 포장 작업 종료 후, 일부 표시라벨을 부착하지 않은 반제품이 정리되지 않아, 상기 제품이 충진된 병에 ’올메텍플러스정20/12.5밀리그램‘ 라벨이 부착되어 출하된 사실이 있음 ② 또한, 자사 기준서 ’충전/포장 시 불량품 처리방법(문서번호: OPR05-004)‘을 준수하여 2차 포장 작업 중 불량품이 있는 경우, 확인자가 이중 점검 후 재투입하여야 하나, - 동 업체는 ’올메텍플러스정20/12.5밀리그램‘의 라벨링 작업 중 확인된 불량품을 확인자가 이중 점검하지 않고 공정을 진행하였으며 이에 대하여 포장기록서에 기록하지 않은 사실이 있음",
+    "finding_text_ko": "회수절차 미준수 — 「약사법」 제39조제1항 및 「의약품안전규칙」 제50조제3항에 따라 회수대상 의약품 등에 대하여 즉시 판매중지 등 필요한 조치를 하고 문제가 있음을 안 날로부터 5일 이내에 회수계획서를 관할 지방청에 제출하여야 하나, 동 업체는 2025. 12. 24.자로 약국에서 ‘올메텍플러스정20/12.5밀리그램’의 제품 혼입 관련 불만을 접수하여 해당 제품과 타 제품의 혼입 사실을 인지하였음에도 2026. 1. 8.자에 회수계획서를 대전식약청에 제출하였다. 기준서 미준수 — 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호에 따라 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여야 한다. 첫째, 자사 기준서 ‘Line Clearance 절차(A동)(문서번호: OPE05-148)’은 각 공정 작업이 완료되면 다음 제품 또는 배치 생산 전에 제품 및 부적합품 등을 정돈하도록 규정하고 있으나, 동 업체는 ‘올메텍정20밀리그램(올메사르탄메독소밀)’의 포장 작업 종료 후 일부 표시라벨을 부착하지 않은 반제품이 정리되지 않아 해당 제품이 충진된 병에 ‘올메텍플러스정20/12.5밀리그램’ 라벨이 부착된 채 출하되었다. 둘째, 자사 기준서 ‘충전/포장 시 불량품 처리방법(문서번호: OPR05-004)’에 따라 2차 포장 작업 중 불량품이 있는 경우 확인자가 이중 점검한 후 재투입하여야 하나, 동 업체는 ‘올메텍플러스정20/12.5밀리그램’의 라벨링 작업 중 확인된 불량품을 확인자가 이중 점검하지 않고 공정을 진행하였으며 이를 포장기록서에 기록하지도 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d5d7a082ff26344391012f4",
+    "finding_text": "○ 의약품 제조 또는 시험의 위탁자는 제조 또는 시험이 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 아래와 같이 수탁자가 제조관리를 적절하게 수행하지 않은 사실이 있음에도 불구하고, 수탁자에 대한 관리·감독을 철저히 하지 아니하였음 - 수탁자 위더스제약(주)는 의약품 ‘솔페나신정5밀리그램(솔리페나신숙신산염)’(제조번호: 25006001A 사용기한: 2026. 4. 28.)(제조번호: 25006001B 사용기한: 2028. 4. 28.)을 수탁 제조함에 있어 자사기준서 ‘포장작업 관리방법서(SOP-MC-0206)’에 따르면 포장공정 중 발생되는 폐기 자재나 포장 공정이 끝나고 남은 자재는 모두 폐기 처리하며, 제조번호 등 제조단위와 관련되어 인쇄한 라벨은 사용 후 남은 수량에 대해 모두 폐기하도록 규정되어 있으나, 2025. 6. 26.에 ‘미르토정40밀리그램(텔미사르탄)’(제조번호: 25005, 사용기한: 2028. 5. 18.)의 2차 포장 공정이 진행중이었음에도 불구하고, 이전 작업 품목인 ‘솔페나신정5밀리그램(솔리페나신숙신산염)’[제조번호(사용기한) 25006001A(2028. 4. 28.), 25006001B(2028. 4. 28.)]의 표시재료(라벨)가 폐기되지 않은 상태로 포장실(실번호 134)에서 발견된 사실이 있음",
+    "finding_text_ko": "의약품 제조 또는 시험의 위탁자는 제조 또는 시험이 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 아래와 같이 수탁자가 제조관리를 적절하게 수행하지 않았음에도 수탁자에 대한 관리·감독을 철저히 하지 않았다. 수탁자 위더스제약(주)는 의약품 ‘솔페나신정5밀리그램(솔리페나신숙신산염)’(제조번호: 25006001A 사용기한: 2026. 4. 28. / 제조번호: 25006001B 사용기한: 2028. 4. 28.)을 수탁 제조하면서, 자사기준서 ‘포장작업 관리방법서(SOP-MC-0206)’가 포장공정 중 발생되는 폐기 자재나 포장 공정이 끝나고 남은 자재를 모두 폐기 처리하며 제조번호 등 제조단위와 관련되어 인쇄한 라벨은 사용 후 남은 수량을 모두 폐기하도록 규정하고 있음에도, 2025. 6. 26. ‘미르토정40밀리그램(텔미사르탄)’(제조번호: 25005, 사용기한: 2028. 5. 18.)의 2차 포장 공정이 진행 중이던 상황에서 이전 작업 품목인 ‘솔페나신정5밀리그램(솔리페나신숙신산염)’[제조번호(사용기한) 25006001A(2028. 4. 28.), 25006001B(2028. 4. 28.)]의 표시재료(라벨)가 폐기되지 않은 상태로 포장실(실번호 134)에서 발견되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb74a1d2f78911779fec2121",
+    "finding_text": "○ 의약외품 제조업자는「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나, - 상기 업체는 의약외품인 ①이도스킨스왑(에탄올)(제조번호: A0124J15, 사용기한: 2027.10.14.), ②이도크린겔알파(에탄올)(제조번호: A7123I03, 사용기한: 2027.9.2.) 및 ③멸균아이두스왑에이(에탄올)(제조번호: A3025A08, 사용기한: 2028.1.7.)를 제조·판매함에 있어, 제조에 투입된 주성분 원료[에탄올(95), 제조원: 한국알콜산업(주)]에 대해 품목허가(신고)된 원료약품 및 분량 항의 대한민국약전(KP) 규격에 따라 원료 시험 일부(성상, 비중, 순도시험 일부)를 실시하지 아니한 사실이 있음",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어 제조일로부터 3년 이상 보존하여야 하며, 품질검사에 합격한 제품만을 출고하여야 한다. 그럼에도 상기 업체는 의약외품인 ①이도스킨스왑(에탄올)(제조번호: A0124J15, 사용기한: 2027.10.14.), ②이도크린겔알파(에탄올)(제조번호: A7123I03, 사용기한: 2027.9.2.) 및 ③멸균아이두스왑에이(에탄올)(제조번호: A3025A08, 사용기한: 2028.1.7.)를 제조·판매하면서, 제조에 투입된 주성분 원료[에탄올(95), 제조원: 한국알콜산업(주)]에 대하여 품목허가(신고)된 원료약품 및 분량 항의 대한민국약전(KP) 규격에 따른 원료 시험 일부(성상, 비중, 순도시험 일부)를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-093b99fed87f42366c508d69",
+    "finding_text": "수입 의약품 ‘발트렉스정500밀리그램(발라시클로비르염산염)’의 1차 및 2차 포장에 사용기한을 허가받은 사항과 다르게 기재하여 판매한 사실이 있음",
+    "finding_text_ko": "수입 의약품 ‘발트렉스정500밀리그램(발라시클로비르염산염)’의 1차 및 2차 포장에 사용기한을 허가받은 사항과 다르게 기재하여 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ea83090c249959c64e48fdb",
+    "finding_text": "○ 유통한약재 품질검사 부적합(검사기관: 서울시 보건환경연구원) - 품목: 농림자소엽 - 사용기한(제조번호): 2028. 4. 13.(농림자소엽-2501) - 부적합 항목: 순도시험 1)이물 가)줄기 - 기준/ 결과: 지름 3mm 이상의 줄기 3.0 % 미만/ 48.3%(부적합)",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다(검사기관: 서울시 보건환경연구원). 해당 품목은 농림자소엽이고 사용기한은 2028. 4. 13.(제조번호 농림자소엽-2501)이다. 부적합 항목은 순도시험 1) 이물 가) 줄기이며, 기준은 지름 3mm 이상의 줄기 3.0% 미만이나 결과는 48.3%로 부적합하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-23e6a3bacbd7c5639e2a3b71",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 이풀잎시호 - 사용기한(제조번호): 2028. 3. 26.(EPL2521-1) - 부적합 항목: 순도시험 1) 이물 가) 줄기 및 잎 - 기준/결과: 줄기 및 잎 10.0% 미만/ 19.8%(부적합)",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 이풀잎시호이고 사용기한은 2028. 3. 26.(제조번호 EPL2521-1)이다. 부적합 항목은 순도시험 1) 이물 가) 줄기 및 잎이며, 기준은 줄기 및 잎 10.0% 미만이나 결과는 19.8%로 부적합하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43ef2949bb87668fa1b4f528",
+    "finding_text": "1) 수입 의약품 ‘리그노스판스탠다드’ 및 ‘스칸도네스트3%주(염산메피바카인)’의 포장에 제품명을 허가받은 사항과 다르게 기재하여 판매한 사실이 있음 2) 수입 의약품 ‘리그노스판스탠다드’의 첨부문서에 「의약품 등의 안전에 관한 규칙」 제8조제3항제5호에 따라 추가된 사용상의 주의 사항*을 기재하지 않은 사실이 있음 * 관련: 의약품안전평가과-7844(2021. 12. 31.) ‘의약품 품목허가사항 변경 명령’",
+    "finding_text_ko": "첫째, 수입 의약품 ‘리그노스판스탠다드’ 및 ‘스칸도네스트3%주(염산메피바카인)’의 포장에 제품명을 허가받은 사항과 다르게 기재하여 판매하였다. 둘째, 수입 의약품 ‘리그노스판스탠다드’의 첨부문서에 「의약품 등의 안전에 관한 규칙」 제8조제3항제5호에 따라 추가된 사용상의 주의사항을 기재하지 않았다. 이는 의약품안전평가과-7844(2021. 12. 31.) ‘의약품 품목허가사항 변경 명령’과 관련된 사항이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-598e9a82618cb4041c058a84",
+    "finding_text": "수입 의약품 ‘에피네프린프리필드시린지주1:10,000’의 1차 및 2차 포장에 사용기한을 허가받은 사항과 다르게 기재하여 판매한 사실이 있음",
+    "finding_text_ko": "수입 의약품 ‘에피네프린프리필드시린지주1:10,000’의 1차 및 2차 포장에 사용기한을 허가받은 사항과 다르게 기재하여 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0febc07bc702b966b3105ce",
+    "finding_text": "○ 의약품 공급내역 보고 등 규정 위반 - 의약품 품목허가를 받은 자는「약사법」제47조의3 및 같은 법 시행규칙 제45조에 따라 의약품을 공급하는 경우 제품을 출하할 때 의약품관리종합정보센터의 장에게 보고하여야 하나, - 동 업체는 ‘안티스타나잘연고(무피로신칼슘수화물)’의 ‘25.11월 공급내역을 95%미만인 84.3%만 보고한 사실이 있음",
+    "finding_text_ko": "의약품 공급내역 보고 등에 관한 규정을 위반하였다. 의약품 품목허가를 받은 자는 「약사법」 제47조의3 및 같은 법 시행규칙 제45조에 따라 의약품을 공급하는 경우 제품을 출하할 때 의약품관리종합정보센터의 장에게 보고하여야 하나, 동 업체는 ‘안티스타나잘연고(무피로신칼슘수화물)’의 2025년 11월 공급내역을 95% 미만인 84.3%만 보고하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b8ab31b24b7e12b88aeaf18b",
+    "finding_text": "○ 유통한약재 품질검사 부적합(검사기관: 서울시 보건환경연구원) - 품목: 현진강황 - 사용기한(제조번호): 2028. 8. 21.(25411-01) - 부적합 항목: 정량법 (쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합) - 기준/ 결과: 3.2%이상/1.5%(부적합) ○ 유통한약재 품질검사 부적합(검사기관: 서울시 보건환경연구원) - 품목: 현진단삼 - 사용기한(제조번호): 2028. 7. 18.(25033-01) - 부적합 항목: 정량법(살비아놀산B) - 기준/결과: 4.1%이상/1.5%",
+    "finding_text_ko": "유통한약재 품질검사에서 두 건의 부적합 판정을 받았다(검사기관: 서울시 보건환경연구원). 첫째, 품목 현진강황(사용기한 2028. 8. 21., 제조번호 25411-01)은 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합) 항목에서 기준 3.2% 이상에 대하여 결과가 1.5%로 부적합하였다. 둘째, 품목 현진단삼(사용기한 2028. 7. 18., 제조번호 25033-01)은 정량법(살비아놀산B) 항목에서 기준 4.1% 이상에 대하여 결과가 1.5%였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d35ab1a2eb06a4ae048766e9",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 자연세상유백피 - 사용기한(제조번호): 2028. 12. 1.(330-223-2501) - 부적합 항목: 성상 - 기준/결과: 이 약은 왕느릅나무 Ulmus macrocarpa Hance (느릅나무과 Ulmaceae)의 주피를 제거한 수피이다. 이 약은 수피로 원통모양 ～ 판모양이고 두께 2 ～ 3 mm이다. 바깥면은 회록색 ～ 회갈색이고 회갈색의 코르크층이 있다. 꺾은면은 거칠고 연한 갈색이며, 섬유상의 가는 무늬가 뚜렷하고 질은 단단하며 흑황색의 가루가 있다. 이 약은 특유한 냄새가 약간 있고 맛은 약간 달다./ 유근피(뿌리껍질)임 (부적합)",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 자연세상유백피이고 사용기한은 2028. 12. 1.(제조번호 330-223-2501)이다. 부적합 항목은 성상이다. 기준은 ‘이 약은 왕느릅나무 Ulmus macrocarpa Hance (느릅나무과 Ulmaceae)의 주피를 제거한 수피이다. 이 약은 수피로 원통모양 ～ 판모양이고 두께 2 ～ 3 mm이다. 바깥면은 회록색 ～ 회갈색이고 회갈색의 코르크층이 있다. 꺾은면은 거칠고 연한 갈색이며, 섬유상의 가는 무늬가 뚜렷하고 질은 단단하며 흑황색의 가루가 있다. 이 약은 특유한 냄새가 약간 있고 맛은 약간 달다.’이나, 검사 결과 유근피(뿌리껍질)로 확인되어 부적합하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f319a4dacc4d29fa9f0413ab",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 엔탭허브천남성 - 사용기한(제조번호): 2027. 4. 3.(ETC23254-2) - 부적합 항목: 성상 - 기준/결과: 주피를 완전히 제거한 것/주피 미제거(부적합) ○ 유통한약재 품질검사 부적합 - 품목: 엔탭허브필발 - 사용기한(제조번호): 2028. 3. 23.(ETI221061-2) - 부적합 항목: 건조감량 - 기준/결과: 10.0% 이하/13.6%(부적합) ○ 유통한약재 품질검사 부적합 - 품목: 엔탭허브구기자 - 사용기한(제조번호): 2028. 2. 18.(ETC24841-1) - 부적합 항목: 잔류농약(뷰프로페진) - 기준/결과: 0.01mg/kg 이하/0.17mg/kg(부적합) ○ 유통한약재 품질검사 부적합 - 품목: 엔탭허브골쇄보 - 사용기한(제조번호): 2028. 2. 6.(ETM23531-2) - 부적합 항목: 성상 - 기준/결과: 기원식물 부적합",
+    "finding_text_ko": "유통한약재 품질검사에서 네 건의 부적합 판정을 받았다. 첫째, 엔탭허브천남성(사용기한 2027. 4. 3., 제조번호 ETC23254-2)은 성상 항목에서 기준이 주피를 완전히 제거한 것이나 주피가 제거되지 않아 부적합하였다. 둘째, 엔탭허브필발(사용기한 2028. 3. 23., 제조번호 ETI221061-2)은 건조감량 항목에서 기준 10.0% 이하에 대하여 결과가 13.6%로 부적합하였다. 셋째, 엔탭허브구기자(사용기한 2028. 2. 18., 제조번호 ETC24841-1)는 잔류농약(뷰프로페진) 항목에서 기준 0.01mg/kg 이하에 대하여 결과가 0.17mg/kg으로 부적합하였다. 넷째, 엔탭허브골쇄보(사용기한 2028. 2. 6., 제조번호 ETM23531-2)는 성상 항목에서 기원식물이 부적합하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f417210152b9d16c10ef5aa9",
+    "finding_text": "○ ｢마약류 관리에 관한 법률｣ 제9조제2항제1호나목에 따라 같은법 제4조제3항에 따라 승인(예외적)을 받은 마약류취급자에게 마약류를 양도하려는 경우 같은 법 시행규칙 제18조(마약류 양도승인의 신청)에 따라 마약류의 양도승인을 지방식품의약품안전청장에게 받아야 양도를 할 수 있음에도 불구하고, - 본 업체는 양도승인을 받지 아니하고 수입 허가 받은 품목, ‘바리움정5밀리그람(디아제팜)’을 마약류취급자 ㈜ 종근당에 품질관리 목적으로 시험을 위탁하기 위해 양도한 사실이 있음.",
+    "finding_text_ko": "「마약류 관리에 관한 법률」 제9조제2항제1호나목에 따라 같은 법 제4조제3항에 따라 예외적으로 승인을 받은 마약류취급자에게 마약류를 양도하려는 경우에는 같은 법 시행규칙 제18조(마약류 양도승인의 신청)에 따라 지방식품의약품안전청장으로부터 마약류의 양도승인을 받아야 양도할 수 있다. 그럼에도 본 업체는 양도승인을 받지 않고 수입 허가를 받은 품목인 ‘바리움정5밀리그람(디아제팜)’을 품질관리 목적의 시험을 위탁하기 위해 마약류취급자 ㈜종근당에 양도하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1be75ffc929678c1aa9adb6c",
+    "finding_text": "2021.9.16.경 의약품 원료 ‘아스코르브산(시험번호: R1091002)’의 입고 시험(시험항목: 건조감량, 강열잔분) 시 입고 대상 원료약품 칭량 후 그 칭량지를 품질관리기록서(원료시험성적서)에 첨부하여야 하나, 원료 칭량 후 칭량지 출력 시 걸림현상으로 인해 칭량지 내 중량 등 기록이 잘 보이지 않아 입고 대상 원료가 아닌 딱풀(원료와 동일한 중량으로 인위적으로 맞춤)을 재칭량 후 그 칭량지를 품질관리기록서에 첨부한 사실이 있음",
+    "finding_text_ko": "2021. 9. 16.경 의약품 원료 ‘아스코르브산(시험번호: R1091002)’의 입고 시험(시험항목: 건조감량, 강열잔분)을 실시하면서 입고 대상 원료약품을 칭량한 후 그 칭량지를 품질관리기록서(원료시험성적서)에 첨부하여야 하나, 원료 칭량 후 칭량지 출력 시 걸림현상으로 인해 칭량지 내 중량 등 기록이 잘 보이지 않자 입고 대상 원료가 아닌 딱풀을 원료와 동일한 중량으로 인위적으로 맞추어 재칭량한 뒤 그 칭량지를 품질관리기록서에 첨부하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43dcbdd561671d5dc9aa44d1",
+    "finding_text": "<변경 미허가> ○「약사법」제31조제9항 및「의약품 등의 안전에 관한 규칙」제8조제1항에 따라, 의약품 제조업자는 허가받은 사항의 변경이 있는 경우, 변경 허가를 받아야 하나, - 동 업체는 2025. 7. 16.자에 ‘파리에트정10밀리그램(제조번호: 25007)’ 제조 시 상기 품목의 필름코팅제의 변경 허가를 받지 않고 변경된 필름코팅제를 제조에 사용*한 사실이 있음 * (허가받은 필름코팅제) 에틸셀룰로오스 / (제조에 사용한 필름코딩제) 구형백당이 혼입된 에틸셀룰로오스 <기준서 미준수> ○ 「약사법」제38조제1항 및「의약품 등의 안전에 관한 규칙」제48조제9호 [별표1] 의약품 제조 및 품질관리기준을 준수하여 ① 자사 기준서 ‘일탈처리(문서번호: SOP-K1707-001)’에 따라 모든 직원은 일탈 발생 또는 발견 즉시(24시간 내) 확인자 및 팀장, QA팀에 일탈내용을 보고하고 일탈 발생 보고서를 작성하여야 하나, - 동 업체의 생산팀은 ‘파리에트정10밀리그램(제조번호: 25007)’ 제조 시 필름코딩제로 구형백당이 혼입된 에틸셀룰로오스가 사용된 일탈을 인지하였음에도 불구하고, 이를 QA팀에 보고하지 않고 일탈 발생보고서를 작성하지 않은 사실이 있음 ② 또한, 자사 기준서 ‘칭량관리(SOP-K1002-001)’에서 원료의 반입 및 잔량 원료의 관리 등에 관한 내용을 규정하고 있으나, 이를 따르지 않고, - 동 업체의 칭량 작업자는 ‘타미날서방캡슐0.4밀리그램’ 제조 시 원료인 ‘구형백당’을 칭량 후 잔량을 원래 용기에 보관하지 않고 직후 ‘에틸셀룰로오스’를 칭량하였으며, 작업 종료 후 ‘에틸셀룰로오스’의 용기에 ‘구형백당’의 잔량을 혼입하여 보관하였음",
+    "finding_text_ko": "변경 미허가 — 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항에 따라 의약품 제조업자는 허가받은 사항의 변경이 있는 경우 변경 허가를 받아야 하나, 동 업체는 2025. 7. 16.자에 ‘파리에트정10밀리그램(제조번호: 25007)’을 제조하면서 해당 품목의 필름코팅제에 대한 변경 허가를 받지 않고 변경된 필름코팅제를 제조에 사용하였다. 허가받은 필름코팅제는 에틸셀룰로오스이나 제조에 사용한 필름코팅제는 구형백당이 혼입된 에틸셀룰로오스였다. 기준서 미준수 — 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호 [별표1] 의약품 제조 및 품질관리기준을 준수하여야 한다. 첫째, 자사 기준서 ‘일탈처리(문서번호: SOP-K1707-001)’에 따라 모든 직원은 일탈 발생 또는 발견 즉시(24시간 내) 확인자 및 팀장, QA팀에 일탈내용을 보고하고 일탈 발생 보고서를 작성하여야 하나, 동 업체의 생산팀은 ‘파리에트정10밀리그램(제조번호: 25007)’ 제조 시 필름코팅제로 구형백당이 혼입된 에틸셀룰로오스가 사용된 일탈을 인지하였음에도 이를 QA팀에 보고하지 않았고 일탈 발생보고서도 작성하지 않았다. 둘째, 자사 기준서 ‘칭량관리(SOP-K1002-001)’가 원료의 반입 및 잔량 원료의 관리 등에 관한 내용을 규정하고 있음에도 이를 따르지 않아, 동 업체의 칭량 작업자는 ‘타미날서방캡슐0.4밀리그램’ 제조 시 원료인 ‘구형백당’을 칭량한 후 잔량을 원래 용기에 보관하지 않은 채 곧바로 ‘에틸셀룰로오스’를 칭량하였고, 작업 종료 후 ‘에틸셀룰로오스’ 용기에 ‘구형백당’의 잔량을 혼입하여 보관하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a7f94fcf02dceb2de7f86188",
+    "finding_text": "○ 의약외품 제조업자는「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나, - 상기 업체는 더클린손소독티슈(에탄올)(제조번호: 0152/SA, 사용기한: 2026.2.21.)를 제조·판매함에 있어, 제조에 투입된 주성분 원료[에탄올(95), 제조원: 한국알콜산업(주)]에 대해 품목허가(신고)된 원료약품 및 분량 항의 대한민국약전(KP) 규격에 따라 원료 시험 일부[확인시험, 순도시험(용해상태, 산 또는 알칼리, 기타의 불순물(흡광도), 증발잔류물)]를 실시하지 아니한 사실이 있음",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어 제조일로부터 3년 이상 보존하여야 하며, 품질검사에 합격한 제품만을 출고하여야 한다. 그럼에도 상기 업체는 더클린손소독티슈(에탄올)(제조번호: 0152/SA, 사용기한: 2026.2.21.)를 제조·판매하면서, 제조에 투입된 주성분 원료[에탄올(95), 제조원: 한국알콜산업(주)]에 대하여 품목허가(신고)된 원료약품 및 분량 항의 대한민국약전(KP) 규격에 따른 원료 시험 일부[확인시험, 순도시험(용해상태, 산 또는 알칼리, 기타의 불순물(흡광도), 증발잔류물)]를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f2c266e01938f9038af91752",
+    "finding_text": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, 다음과 같이 기준서를 미준수한 사실이 있음 - 자사기준서 ｢GMP 문서관리규정(문서번호 대한 GMP-105-23)｣에 따라 모든 기록 문서는 작업과 동시에 작성되어야 하며, 지울 수 없는 잉크로 작성하고 수정이 필요한 경우에는 수정에 대한 타당성을 해당 팀장에게 보고하여 수정 여부 결정 후 수정 절차에 따라 수정하도록 규정하고 있음에도 불구하고, ‘멀티플렉스페리주’(제조번호 A34EKE1, 제조일자 2025.4.9.)에 대한 제조지시기록서를 작성함에 있어 ‘충전공정 시 과잉충전 및 손실량, 포장공정 시 불량 수량’을 작업과 동시에 작성하지 않고 추후 기록한 사실이 있음 - 자사기준서 ｢대한관류용멸균생리식염수 제품표준서(문서번호 SM-249, 2026.02.06.승인)｣ 14.제조지시서(첨부5. 제조기록서)에 따라 작업 전 준비사항으로 작업자는 작업을 실시하기 전에 이전 작업의 자재 및 검체가 남아 있지 아니한지를 확인하고, 작업을 실시하여야 함에도 불구하고, ‘대한관류용멸균생리식염수’(제조번호 08Z8P61, 사용기한 2026.08.07)의 포장공정을 진행함에 있어 자사 품목 ‘대한관류용멸균증류수’의 혼입을 발생시킨 사실이 있음 ○ ‘의약품의 품목허가를 받은 자’ 등 회수의무자는 의약품등이 ‘회수대상의약품등’으로 의심이 되는 경우 즉시 판매중지 등의 필요한 조치를 하여야 함에도 불구하고, 다음과 같이 필요한 조치를 취하지 않은 사실이 있음 - ‘대한관류용멸균증류수’로 추정되는 제품 3개가 ‘대한관류용멸균생리식염수’(제조번호 08Z8P61)의 표시기재로 라벨 포장된 채로 출하되었음을 불만처리보고서(문서번호 2023-256, 2023.10.05. 승인)를 통해 확인하여 ‘대한관류용멸균생리식염수’(제조번호 08Z8P61, 사용기한 2026.08.07.)가 ‘회수대상의약품등’으로 의심되었으나 즉시 판매중지 등의 필요한 조치를 진행하지 않았음",
+    "finding_text_ko": "의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고 작성된 기준서 및 지시서를 준수하여야 하나, 다음과 같이 기준서를 준수하지 않았다. 첫째, 자사기준서 「GMP 문서관리규정(문서번호 대한 GMP-105-23)」에 따라 모든 기록 문서는 작업과 동시에 작성하고 지울 수 없는 잉크로 작성하며 수정이 필요한 경우 수정의 타당성을 해당 팀장에게 보고하여 수정 여부를 결정한 후 수정 절차에 따라 수정하도록 규정하고 있음에도, ‘멀티플렉스페리주’(제조번호 A34EKE1, 제조일자 2025.4.9.)의 제조지시기록서를 작성하면서 충전공정 시 과잉충전 및 손실량, 포장공정 시 불량 수량을 작업과 동시에 작성하지 않고 추후에 기록하였다. 둘째, 자사기준서 「대한관류용멸균생리식염수 제품표준서(문서번호 SM-249, 2026.02.06. 승인)」 14. 제조지시서(첨부5. 제조기록서)에 따라 작업자는 작업 전 준비사항으로 이전 작업의 자재 및 검체가 남아 있지 않은지 확인한 후 작업을 실시하여야 함에도, ‘대한관류용멸균생리식염수’(제조번호 08Z8P61, 사용기한 2026.08.07.)의 포장공정을 진행하면서 자사 품목 ‘대한관류용멸균증류수’의 혼입을 발생시켰다. 또한 ‘의약품의 품목허가를 받은 자’ 등 회수의무자는 의약품등이 ‘회수대상의약품등’으로 의심되는 경우 즉시 판매중지 등 필요한 조치를 하여야 함에도, ‘대한관류용멸균증류수’로 추정되는 제품 3개가 ‘대한관류용멸균생리식염수’(제조번호 08Z8P61)의 표시기재로 라벨 포장된 채 출하되었음을 불만처리보고서(문서번호 2023-256, 2023.10.05. 승인)를 통해 확인하여 해당 제품이 ‘회수대상의약품등’으로 의심되었음에도 즉시 판매중지 등 필요한 조치를 진행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0436d44e4e17d4f687147bc6",
+    "finding_text": "1.장성복부용패드 품질검사 미실시 ,기재사항 일부 미표시 2.“오늘그날면생리대(소형, 중형, 대형, 오버나이트형)”품목 기재사항 허가받은 사항과 다르게 표시",
+    "finding_text_ko": "첫째, 장성복부용패드에 대하여 품질검사를 실시하지 않았고 기재사항 일부를 표시하지 않았다. 둘째, ‘오늘그날면생리대(소형, 중형, 대형, 오버나이트형)’ 품목의 기재사항을 허가받은 사항과 다르게 표시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3722dd7f74e93321f57068e2",
+    "finding_text": "○ 원료의약품 ‘자하거추출물[등록번호 제20070504-01-HP-12-10호]’의 아래 제조번호를 수입·판매함에 있어, 원료의약품의 용기나 포장에 ‘사용기한’을 기재하지 않았으며, ‘제품명’ 및 ‘저장방법’을 한글로 기재하지 않은 사실이 있음 ○ 의약품 ‘자닥신주[허가번호 제8호]’의 일부 제조번호에 대한 품질검사를 실시함에 있어, 허가받은 ‘시험기준 및 시험방법’ 중 일부(주사제용 유리용기시험)의 세부시험항목을 누락*하여 시험한 후 판매한 사실이 있음 * 본품에 대해서는 ‘비소’ 항목을 누락, 첨부용제에 대해서는 ‘알칼리용출시험 및 비소’ 항목을 누락함",
+    "finding_text_ko": "원료의약품 ‘자하거추출물[등록번호 제20070504-01-HP-12-10호]’의 일부 제조번호를 수입·판매하면서 원료의약품의 용기나 포장에 ‘사용기한’을 기재하지 않았고, ‘제품명’ 및 ‘저장방법’을 한글로 기재하지 않았다. 또한 의약품 ‘자닥신주[허가번호 제8호]’의 일부 제조번호에 대한 품질검사를 실시하면서 허가받은 ‘시험기준 및 시험방법’ 중 일부(주사제용 유리용기시험)의 세부시험항목을 누락한 채 시험한 후 판매하였다. 구체적으로 본품에 대해서는 ‘비소’ 항목을, 첨부용제에 대해서는 ‘알칼리용출시험 및 비소’ 항목을 누락하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a38adaf25d79e05dfac416d",
+    "finding_text": "○ 의약품 제조의 수탁자는 제품마다 제조관리기준서 및 품질관리기준서를 작성하고 그 기준서에 따라 제조 및 품질관리를 실시하여야 함 - 의약품 ‘레보발사정2.5/160밀리그램’(제조번호: 25002)[위탁자: 안국뉴팜(주)]을 수탁 제조함에 있어 충전(포장) 공정을 진행하면서 자사기준서 ｢포장작업관리방법｣(문서번호 AMS04-005) 및 ｢자동계수기(DMC-60T) 운전 및 세척방법｣(문서번호 AMS05-116), ｢제조공정 관리규정｣(문서번호 AM-04)에 따라 포장작업 후 전 작업 제품의 잔량이나 오염이 없어야 함을 확인하고, 다음 포장 작업 전 작업장 내 이전 포장 작업과 관련된 모든 문서, 동일 작업대의 타제품 및 자재 잔류 여부 등을 확인하여 한 제품이 다른 제품에 혼입되거나 교차 오염되는 것을 방지해야 하며, 발생 가능한 일탈사항을 사전에 방지하도록 관리·감독하고, 제조공정이 본 규정에 따라 적합하게 관리되고 있는지 주기적으로 확인해야 하는 책임이 각각 제조공정관리책임자 및 제조부서책임자에 있음에도 불구하고, 자사 품목 ‘레보살탄정2.5/80밀리그램’(제조번호: 25005)의 혼입을 발생시킨 사실이 있음",
+    "finding_text_ko": "의약품 제조의 수탁자는 제품마다 제조관리기준서 및 품질관리기준서를 작성하고 그 기준서에 따라 제조 및 품질관리를 실시하여야 한다. 그럼에도 의약품 ‘레보발사정2.5/160밀리그램’(제조번호: 25002)[위탁자: 안국뉴팜(주)]을 수탁 제조하면서 충전(포장) 공정을 진행할 때, 자사기준서 「포장작업관리방법」(문서번호 AMS04-005), 「자동계수기(DMC-60T) 운전 및 세척방법」(문서번호 AMS05-116), 「제조공정 관리규정」(문서번호 AM-04)에 따라 포장작업 후 전 작업 제품의 잔량이나 오염이 없음을 확인하고, 다음 포장 작업 전에 작업장 내 이전 포장 작업과 관련된 모든 문서와 동일 작업대의 타제품 및 자재 잔류 여부 등을 확인하여 한 제품이 다른 제품에 혼입되거나 교차 오염되는 것을 방지하며, 발생 가능한 일탈사항을 사전에 방지하도록 관리·감독하고 제조공정이 해당 규정에 따라 적합하게 관리되고 있는지 주기적으로 확인할 책임이 각각 제조공정관리책임자 및 제조부서책임자에게 있음에도, 자사 품목 ‘레보살탄정2.5/80밀리그램’(제조번호: 25005)의 혼입을 발생시켰다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-65d1c5432300a21b1f5f5cb0",
+    "finding_text": "의약품을 판매할 수 있는 자 외의 자에게 의약품 판매",
+    "finding_text_ko": "의약품을 판매할 수 있는 자 외의 자에게 의약품을 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e573ddae3dd9565cb45d5ec9",
+    "finding_text": "<품질검사 미실시> ○「약사법」제38조제1항 및「의약품안전규칙」제48조제1호에 따라 의약품 제조업자는 의약품의 품질검사를 철저히 하고 합격한 제품만을 출고하여야 하나, ① 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 9개 품목’에 사용되는 원료*의 시험항목 중 일부 시험항목(확인시험, 함량시험, 순도(중금속) 시험, 미생물한도시험)의 품질검사를 실시하지 않고 제조에 사용한 사실이 있음 * 천궁연조엑스, 반하연조엑스, 복령연조엑스, 진피연조엑스, 청피연조엑스, 지각연조엑스, 백출연조엑스, 감초연조엑스, 생각연조엑스, 마황연조엑스, 작약연조엑스, 반하연조엑스, 오미자연조엑스, 웨지연조엑스, 세신연조엑스, 감초연조엑스, 건강연조엑스 ※ 원료 시험항목: 성상, 확인, 함량, 검조감량, 순도시험(중금속, 잔류농약), 미생물한도시험 ② 또한, ‘이바내정’의 주원료 ‘의이인건조엑스’의 일부 시험항목(확인시험, 중금속시험)의 품질검사를 실시하지 않고 제조에 사용하였음 ※ 원료 시험항목: 성상, 확인시험, 중금속시험, 잔류농약시험 <제조기록서 거짓작성> ○「약사법」제38조제1항 및「의약품안전규칙」제48조제9호나목에 따라, 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여 제조번호별 제조지시 및 기록서를 작성하여야 하나, ① 동 업체는 ‘보생원액(생맥산)’(제조번호(제조일자): 601(26.2.23.) 및 602(26.2.24.))의 제조기록서에서 일부 공정(세척, 추출 및 농축 공정)에 대한 작업일자 및 시간을 주원료인 ‘연조엑스(농축물)’ 칭량기록지의 칭량 작업일시 및 시간 이전으로 작성하는 등 실제 공정 순서와 다르게 제조기록서를 거짓으로 작성한 사실이 있음 ※ 보생원액(생맥산) 공정순서: 원료칭량(주원료)-세척-추출-농축-원료칭량(부원료)-조제-멸균-충전-포장 <기준서 미준수> ○「약사법」제38조제1항 및「의약품안전규칙」제48조제9호가목에 따라, 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여 자사 기준서 ‘공정검사 규정(문서번호: JW-P-05)’에 따라 공정검사를 실시하고 제조기록서에 공정검사 결과를 작성하고 관련 데이터를 첨부하여야 하나, ① 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 5개 품목’의 제조에 사용된 원료*의 제조기록서에 공정검사인 성상, 수분시험 결과를 작성하지 않고 관련 데이터 또한 첨부하지 않은 사실이 있음 * 천궁역조엑스, 진피연조엑스, 청피연조엑스, 마황연조엑스, 세신연조엑스 ② 또한, 자사 기준서 ‘문서 관리규정(문서번호: JW-1-07)’에 따라, 기록서를 각 작업 또는 점검을 실시하는 동시에 작성하여야 하나, - 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 7개 품목’에 사용한 원료*의 제조기록서에 공정(추출, 농축 공정) 작업 내용, 작업시간, 작업자 및 확인자의 서명을 작업과 동시에 작성하지 않은 사실이 있으며, * 천궁연조엑스, 백출연조엑스, 감초연조엑스, 생강연조엑스, 작약연조엑스, 오미자연조엑스, 감초연조엑스 - ‘생장환과",
+    "finding_text_ko": "품질검사 미실시 — 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제1호에 따라 의약품 제조업자는 의약품의 품질검사를 철저히 하고 합격한 제품만을 출고하여야 하나, 첫째, 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 9개 품목’에 사용되는 원료의 시험항목 중 일부 시험항목(확인시험, 함량시험, 순도(중금속) 시험, 미생물한도시험)의 품질검사를 실시하지 않고 제조에 사용하였다. 해당 원료는 천궁연조엑스, 반하연조엑스, 복령연조엑스, 진피연조엑스, 청피연조엑스, 지각연조엑스, 백출연조엑스, 감초연조엑스, 생각연조엑스, 마황연조엑스, 작약연조엑스, 반하연조엑스, 오미자연조엑스, 웨지연조엑스, 세신연조엑스, 감초연조엑스, 건강연조엑스이며, 원료 시험항목은 성상, 확인, 함량, 검조감량, 순도시험(중금속, 잔류농약), 미생물한도시험이다. 둘째, ‘이바내정’의 주원료 ‘의이인건조엑스’의 일부 시험항목(확인시험, 중금속시험)의 품질검사를 실시하지 않고 제조에 사용하였다. 해당 원료 시험항목은 성상, 확인시험, 중금속시험, 잔류농약시험이다. 제조기록서 거짓작성 — 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호나목에 따라 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여 제조번호별 제조지시 및 기록서를 작성하여야 하나, 동 업체는 ‘보생원액(생맥산)’(제조번호(제조일자): 601(26.2.23.) 및 602(26.2.24.))의 제조기록서에서 일부 공정(세척, 추출 및 농축 공정)의 작업일자 및 시간을 주원료인 ‘연조엑스(농축물)’ 칭량기록지의 칭량 작업일시 및 시간 이전으로 작성하는 등 실제 공정 순서와 다르게 제조기록서를 거짓으로 작성하였다. 보생원액(생맥산)의 공정순서는 원료칭량(주원료)-세척-추출-농축-원료칭량(부원료)-조제-멸균-충전-포장이다. 기준서 미준수 — 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호가목에 따라 의약품 제조업자는 의약품 제조 및 품질관리기준을 준수하여 자사 기준서 ‘공정검사 규정(문서번호: JW-P-05)’에 따라 공정검사를 실시하고 제조기록서에 공정검사 결과를 작성하며 관련 데이터를 첨부하여야 하나, 첫째, 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 5개 품목’의 제조에 사용된 원료(천궁역조엑스, 진피연조엑스, 청피연조엑스, 마황연조엑스, 세신연조엑스)의 제조기록서에 공정검사인 성상 및 수분시험 결과를 작성하지 않았고 관련 데이터도 첨부하지 않았다. 둘째, 자사 기준서 ‘문서 관리규정(문서번호: JW-1-07)’에 따라 기록서는 각 작업 또는 점검을 실시하는 동시에 작성하여야 하나, 동 업체는 ‘정우궁하탕연조엑스(단미엑스혼합제) 등 7개 품목’에 사용한 원료(천궁연조엑스, 백출연조엑스, 감초연조엑스, 생강연조엑스, 작약연조엑스, 오미자연조엑스, 감초연조엑스)의 제조기록서에 공정(추출, 농축 공정) 작업 내용, 작업시간, 작업자 및 확인자의 서명을 작업과 동시에 작성하지 않았으며, ‘생장환과…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c5a11626d2cd65bdd97d3433",
+    "finding_text": "임상시험 대상자의 동의 절차 위반",
+    "finding_text_ko": "임상시험 대상자의 동의 절차를 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6abc9c276094b4807d4fe87e",
+    "finding_text": "○ 품목허가증 제조방법 미변경",
+    "finding_text_ko": "품목허가증의 제조방법을 변경하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d08cf6cc2afb7d36fb8322af",
+    "finding_text": "○ 경인지방식품의약품안전청장의 시험검사 명령에 따라 식품의약품안전처장이 지정하는 의약품 등 시험·검사기관에서 의약품을 검사한 후 그 결과를 제출하여야 함에도 불구하고, ‘탄시나정’ 등 10품목*에 대하여 시험검사를 실시하지 않거나 그 결과를 제출하지 않은 사실이 있음 * 탄시나정, 하이드로핀정(펠로디핀), 트루액티비오정, 헤파코엔정, 싸이베린정, 헤파코엔플러스정, 하이타민골드정, 브이타민큐정, 멀티브큐골드정, 셀비다정",
+    "finding_text_ko": "경인지방식품의약품안전청장의 시험검사 명령에 따라 식품의약품안전처장이 지정하는 의약품 등 시험·검사기관에서 의약품을 검사한 후 그 결과를 제출하여야 함에도, ‘탄시나정’ 등 10품목에 대하여 시험검사를 실시하지 않거나 그 결과를 제출하지 않았다. 해당 품목은 탄시나정, 하이드로핀정(펠로디핀), 트루액티비오정, 헤파코엔정, 싸이베린정, 헤파코엔플러스정, 하이타민골드정, 브이타민큐정, 멀티브큐골드정, 셀비다정이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-09d47414036432fa6a779867",
+    "finding_text": "○ 수입 의약품 ‘노보콜100주(카트리지)’(제조번호 D04292A, 수입일자 2024. 1. 30.)의 2차 포장에 제품명을 허가받은 사항과 다르게 기재하고, 허가받은 용법·용량의 일부 내용을 기재하지 않은 사실이 있음 ○ 또한, 상기 업체는 수입 의약품 ‘노보콜100주(카트리지)’의 첨부문서에「의약품 등의 안전에 관한 규칙」 제8조제3항제5호에 따라 추가된 사용상의 주의 사항*을 기재하지 않았으며, 「약사법」제59조의 기재상의 주의사항을 준수하지 않은 사실이 있음",
+    "finding_text_ko": "수입 의약품 ‘노보콜100주(카트리지)’(제조번호 D04292A, 수입일자 2024. 1. 30.)의 2차 포장에 제품명을 허가받은 사항과 다르게 기재하였고, 허가받은 용법·용량의 일부 내용을 기재하지 않았다. 또한 상기 업체는 수입 의약품 ‘노보콜100주(카트리지)’의 첨부문서에 「의약품 등의 안전에 관한 규칙」 제8조제3항제5호에 따라 추가된 사용상의 주의사항을 기재하지 않았으며, 「약사법」 제59조의 기재상의 주의사항도 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-da54dafac4be48d41c801b46",
+    "finding_text": "- 상기 업체는 수입 의약품 ‘큐탄플라스트스폰지(정제된특수처치젤라틴)’(제조번호: 3697, 제조일자: 2024. 8. 8., 사용기한: 2024. 10. 17.)을 수입·판매함에 있어, 제품의 포장에 아래와 같이 제품명 및 사용기한을 허가받은 사항과 다르게 기재하여 판매한 사실이 있음 - 수입 의약품 ‘큐탄플라스트스폰지(정제된특수처치젤라틴)’의 2022년 1월부터 점검일(2025. 10. 27.)까지 발생한 일부 반품 건에 대하여 ‘적절한 조건에서 보관되었다는 것이 확인된 것’, ‘직접용기가 파손되지 않은 것’, ‘시험·검사 결과 품질기준에 맞다는 것이 확인된 것’을 확인하지 않고 재입고 후 재판매하는 등 의약품등의 입고부터 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하지 않은 사실이 있음 - 수입의약품 ‘큐탄플라스트스폰지(정제된특수처치젤라틴)’의 일부 수입 건(제조번호 3640, 수입일자 2024. 10. 21. 등)에 대한 보관검체를 보관하지 않아 ‘의약품등 수입관리 기준’을 준수하지 않은 사실이 있음",
+    "finding_text_ko": "상기 업체는 수입 의약품 ‘큐탄플라스트스폰지(정제된특수처치젤라틴)’(제조번호: 3697, 제조일자: 2024. 8. 8., 사용기한: 2024. 10. 17.)을 수입·판매하면서 제품의 포장에 제품명 및 사용기한을 허가받은 사항과 다르게 기재하여 판매하였다. 또한 해당 품목에 대하여 2022년 1월부터 점검일(2025. 10. 27.)까지 발생한 일부 반품 건에 대해 ‘적절한 조건에서 보관되었다는 것이 확인된 것’, ‘직접용기가 파손되지 않은 것’, ‘시험·검사 결과 품질기준에 맞다는 것이 확인된 것’을 확인하지 않고 재입고한 후 재판매하는 등 의약품등의 입고부터 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하지 않았다. 아울러 해당 품목의 일부 수입 건(제조번호 3640, 수입일자 2024. 10. 21. 등)에 대한 보관검체를 보관하지 않아 ‘의약품등 수입관리 기준’을 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b2c7006f1cbde4132d266769",
+    "finding_text": "유통한약재 품질검사 부적합 1) 엔탭허브절패모(제조번호 ETC24573-1, 사용기한 2027. 8. 26.) - 항목: 중금속(카드뮴) - 기준/결과: 0.3ppm이하/0.4ppm 2) 엔탭허브창출(제조번호 ETC24622-1, 사용기한 2027. 11. 14.) - 항목: 중금속(카드뮴) - 기준/ 결과: 0.7ppm 이하/ 3.0ppm 3) 엔탭허브천마(제조번호 ETC23841-1, 사용기한 2027. 5. 21.) - 항목: 이산화황 - 기준/결과: 30ppm 이하/52ppm 4) 엔탭허브육계(제조번호 ETV23731-1, 사용기한 2027. 3. 17.) - 항목: 이산화황 - 기준/결과: 30ppm 이하/ 47ppm",
+    "finding_text_ko": "유통한약재 품질검사에서 네 건의 부적합 판정을 받았다. 첫째, 엔탭허브절패모(제조번호 ETC24573-1, 사용기한 2027. 8. 26.)는 중금속(카드뮴) 항목에서 기준 0.3ppm 이하에 대하여 결과가 0.4ppm이었다. 둘째, 엔탭허브창출(제조번호 ETC24622-1, 사용기한 2027. 11. 14.)은 중금속(카드뮴) 항목에서 기준 0.7ppm 이하에 대하여 결과가 3.0ppm이었다. 셋째, 엔탭허브천마(제조번호 ETC23841-1, 사용기한 2027. 5. 21.)는 이산화황 항목에서 기준 30ppm 이하에 대하여 결과가 52ppm이었다. 넷째, 엔탭허브육계(제조번호 ETV23731-1, 사용기한 2027. 3. 17.)는 이산화황 항목에서 기준 30ppm 이하에 대하여 결과가 47ppm이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a53aae09e55a4d370fa92fae",
+    "finding_text": "○ 2024. 10. 17.자로 ‘해당제형(정제) 제조업무정지 15일(2024. 10. 31. ~ 2024. 11. 14.)’의 행정처분을 받았으나, 행정처분 기간 중에 의약품 ‘페노피정160밀리그램(페노피브레이트)’에 대한 원료칭량공정(2024. 11. 12.)을 실시하고, 제품 판매를 진행하는 등 업무정지 기간 중에 정지된 업무를 수행한 사실이 있음 * 상기 품목 ‘페노피정160밀리그램(페노피브레이트)’은 삼천당제약㈜에 위탁하여 제조하고 있음",
+    "finding_text_ko": "2024. 10. 17.자로 ‘해당제형(정제) 제조업무정지 15일(2024. 10. 31. ~ 2024. 11. 14.)’의 행정처분을 받았으나, 행정처분 기간 중에 의약품 ‘페노피정160밀리그램(페노피브레이트)’에 대한 원료칭량공정(2024. 11. 12.)을 실시하고 제품 판매를 진행하는 등 업무정지 기간 중에 정지된 업무를 수행하였다. 해당 품목 ‘페노피정160밀리그램(페노피브레이트)’은 삼천당제약㈜에 위탁하여 제조하고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c92e485c929bde5943863197",
+    "finding_text": "\"○ ｢마약류 관리에 관한 법률｣ 제14조 및 같은 법 시행규칙 제25조에 따라 마약류제조업자·마약류수출입업자는 품목허가를 받은 마약 또는 향정신성의약품을 의학ㆍ약학ㆍ수의학에 관한 전문가 등을 대상으로 하는 매체 또는 수단에 의한 경우에 한정하여 광고할 수 있으나, - 본 업체는 2025년 10월 24일부터 25일,「혈액종양학 분야에서의 최적 치료 전략과 암 환자의 삶의질(QoL) 향상」을 주제로 ‘제2회 힐링 심포지엄’을 개최하면서, 자사 마약류 ‘펜타칸설하정’의 명칭, 임상 연구결과 등이 포함된 보도자료를 의학, 약학에 관한 사항을 전문적으로 취급하는 데일리팜 등 인터넷 신문에 배포하고, 자사 홈페이지에 해당 기사를 링크한 사실이 있음\"",
+    "finding_text_ko": "「마약류 관리에 관한 법률」 제14조 및 같은 법 시행규칙 제25조에 따라 마약류제조업자·마약류수출입업자는 품목허가를 받은 마약 또는 향정신성의약품을 의학·약학·수의학에 관한 전문가 등을 대상으로 하는 매체 또는 수단에 의한 경우에 한정하여 광고할 수 있다. 그럼에도 본 업체는 2025년 10월 24일부터 25일까지 「혈액종양학 분야에서의 최적 치료 전략과 암 환자의 삶의질(QoL) 향상」을 주제로 ‘제2회 힐링 심포지엄’을 개최하면서, 자사 마약류 ‘펜타칸설하정’의 명칭과 임상 연구결과 등이 포함된 보도자료를 의학·약학에 관한 사항을 전문적으로 취급하는 데일리팜 등 인터넷 신문에 배포하고 자사 홈페이지에 해당 기사를 링크하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-53bfb7e7bad5813ab6905f66",
+    "finding_text": "○ 의약품등의 제조업자는 「약사법」제31조제9항 및 「의약품 등의 안전에 관한 규칙」제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우, 변경허가를 받거나 변경신고를 하여야 하나, - 상기 업체는 2024. 5. 24.경부터 2025. 1. 8.경까지 의약품(한약재) ‘유진녹용전체’를 제조·판매함에 있어, 의약품(한약재) 제조업자 이OO에게 제조위탁하고, 이OO이 허가받은 제조소가 아닌 무허가 장소에서 제조한 녹용절편을 총 4회에 걸쳐 무표시로 납품받아, 자사 제조소에서 제조한 것처럼 표시하여 판매한 사실이 있음 ○ 의약품등의 제조업자는 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」제48조제9호에 따라 한약재의 제조 및 품질관리기준을 준수하여야 하나, - 상기 업체는 2024. 5. 24.경부터 2025. 1. 8.경까지 의약품(한약재) ‘유진녹용전체’(제조번호: RU20240524, NZ20240801, NZ20250102, RU20250108)에 대한 제조지시서 및 제조기록서를 작성함에 있어, 상기 내용과 같이 무허가 장소에서 제조한 제품에 대한 내용(원료의 실투입량, 완제품 총 생산량 등)을 포함시켜, 자사에서 제조한 것처럼 거짓으로 작성한 사실이 있음",
+    "finding_text_ko": "의약품등의 제조업자는 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우 변경허가를 받거나 변경신고를 하여야 하나, 상기 업체는 2024. 5. 24.경부터 2025. 1. 8.경까지 의약품(한약재) ‘유진녹용전체’를 제조·판매하면서 의약품(한약재) 제조업자 이OO에게 제조를 위탁하고, 이OO이 허가받은 제조소가 아닌 무허가 장소에서 제조한 녹용절편을 총 4회에 걸쳐 무표시로 납품받아 자사 제조소에서 제조한 것처럼 표시하여 판매하였다. 또한 의약품등의 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호에 따라 한약재의 제조 및 품질관리기준을 준수하여야 하나, 상기 업체는 같은 기간 의약품(한약재) ‘유진녹용전체’(제조번호: RU20240524, NZ20240801, NZ20250102, RU20250108)에 대한 제조지시서 및 제조기록서를 작성하면서 위와 같이 무허가 장소에서 제조한 제품에 대한 내용(원료의 실투입량, 완제품 총 생산량 등)을 포함시켜 자사에서 제조한 것처럼 거짓으로 작성하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1d30c96add649ac699475c5",
+    "finding_text": "자사 기준서 ‘의약품 제품관리기준서(문서번호 DR-QMP-P)’ 및 ‘의약품 입·출고 및 보관·반품 관리(문서번호 DR-SOP-04)’에서는 반품된 제품에 대해 ‘의약품 제품관리기준서 제8항 반품관리’에서 정하는 사항을 모두 만족한 경우에 한하여 재입고 할 수 있다고 정하고 있음에도 불구하고, - 2022년 1월부터 점검일(2025. 7. 30.)까지 발생한 수입 의약품 ‘먹티빅무칼륨액’ 등 10개 품목에 대한 일부 반품 건에 대하여 자사 기준서에서 정하고 있는 재입고 조건(적절한 조건에서 보관되었다는 것, 시험 검사 결과가 품질기준에 맞다는 것)을 확인하지 않고 재판매하는 등 자사 기준서를 준수하지 않은 사실이 있음",
+    "finding_text_ko": "자사 기준서 ‘의약품 제품관리기준서(문서번호 DR-QMP-P)’ 및 ‘의약품 입·출고 및 보관·반품 관리(문서번호 DR-SOP-04)’는 반품된 제품에 대하여 ‘의약품 제품관리기준서 제8항 반품관리’에서 정하는 사항을 모두 만족한 경우에 한하여 재입고할 수 있다고 정하고 있음에도, 2022년 1월부터 점검일(2025. 7. 30.)까지 발생한 수입 의약품 ‘먹티빅무칼륨액’ 등 10개 품목의 일부 반품 건에 대하여 자사 기준서가 정한 재입고 조건(적절한 조건에서 보관되었다는 것, 시험 검사 결과가 품질기준에 맞다는 것)을 확인하지 않고 재판매하는 등 자사 기준서를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-595508eb8436319a3f0cccba",
+    "finding_text": "제조관리기록서를 작성하지 아니한 사실이 있음",
+    "finding_text_ko": "제조관리기록서를 작성하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd770e14b48b242a0d336a2d",
+    "finding_text": "전문의약품 ‘에프피씨아이티주사(플루오로프로필씨아이티(18F))’에 대한 2025년 2분기 의약품 공급내역 현황을 보고함에 있어 일련번호 정보를 누락하거나 기간 이내 보고를 하지 않은 사실이 있음",
+    "finding_text_ko": "전문의약품 ‘에프피씨아이티주사(플루오로프로필씨아이티(18F))’에 대한 2025년 2분기 의약품 공급내역 현황을 보고하면서 일련번호 정보를 누락하거나 기간 이내에 보고하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4de1755c9f80b31d0a1b4225",
+    "finding_text": "의약품 수입품목 ‘그라나텍점안액0.4%(리파스딜염산염수화물)’의 재심사를 신청하였으나, 재심사에 필요한 자료 전부를 제출하지 아니함[2차 위반] * 1차 행정처분(2025. 8. 27.): 해당 품목 판매업무정지 6개월(2025. 9. 11. ~ 2026. 3. 10.)",
+    "finding_text_ko": "의약품 수입품목 ‘그라나텍점안액0.4%(리파스딜염산염수화물)’의 재심사를 신청하였으나 재심사에 필요한 자료 전부를 제출하지 않았다[2차 위반]. 1차 행정처분(2025. 8. 27.)은 해당 품목 판매업무정지 6개월(2025. 9. 11. ~ 2026. 3. 10.)이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b2a9a8a60afc47e515abef1c",
+    "finding_text": "○ 상기 업체는 의약품 수입품목 ‘브리비액트정10밀리그램’, ‘브리비액트정25밀리그램’, ‘브리비액트정50밀리그램’, ‘브리비액트정100밀리그램’, ‘브리비액트액’에 대하여 재심사 품목 신청 기간 이내에 재심사 신청서를 제출하지 아니함[2차 위반] * 1차 행정처분(2025. 8. 27.): 해당 품목 판매업무정지 6개월(2025. 9. 11. ~ 2026. 3. 10.)",
+    "finding_text_ko": "상기 업체는 의약품 수입품목 ‘브리비액트정10밀리그램’, ‘브리비액트정25밀리그램’, ‘브리비액트정50밀리그램’, ‘브리비액트정100밀리그램’, ‘브리비액트액’에 대하여 재심사 품목 신청 기간 이내에 재심사 신청서를 제출하지 않았다[2차 위반]. 1차 행정처분(2025. 8. 27.)은 해당 품목 판매업무정지 6개월(2025. 9. 11. ~ 2026. 3. 10.)이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f4360973f28ed7d3093cb5ba",
+    "finding_text": "○ 의약품의 품목허가를 받은 자 등 의약품공급자는 약국등의 개설자, 다른 의약품 도매상, 그 밖에 약사법에 따라 의약품을 판매할 수 있는 자 외의 자에게 의약품을 판매해서는 아니되나, - ‘카사반정2.5밀리그램’, ‘카사반정10밀리그램’, ‘카사반정15밀리그램’, ‘카사반정20밀리그램’을 의약품 도매상 허가를 득하지 않은 ㈜이수앱지스(소재지: 경기도 성남시 분당구 대왕판교로712번길 22)에 2022년 10월부터 2025년 2월 기간 동안 판매한 사실이 있음",
+    "finding_text_ko": "의약품의 품목허가를 받은 자 등 의약품공급자는 약국등의 개설자, 다른 의약품 도매상, 그 밖에 약사법에 따라 의약품을 판매할 수 있는 자 외의 자에게 의약품을 판매해서는 아니 되나, ‘카사반정2.5밀리그램’, ‘카사반정10밀리그램’, ‘카사반정15밀리그램’, ‘카사반정20밀리그램’을 의약품 도매상 허가를 받지 않은 ㈜이수앱지스(소재지: 경기도 성남시 분당구 대왕판교로712번길 22)에 2022년 10월부터 2025년 2월까지 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-24cd59f79e93d1d3c4c45fff",
+    "finding_text": "○ 의약품 등 재평가 자료 미제출(2차 처분) -「약사법」제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우, 재평가에 필요한 자료를 제출하여야 하나, - 동 업체는 재평가에 필요한 자료를 제출기한(’25.9.2.) 내 제출하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 등 재평가 자료를 제출하지 않았다(2차 처분). 「약사법」 제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 제출하여야 하나, 동 업체는 재평가에 필요한 자료를 제출기한인 2025. 9. 2.까지 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3d065c89c4c7e4a322efc368",
+    "finding_text": "○ 의약품 등 재평가 자료 미제출(2차 처분) -「약사법」제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우, 재평가에 필요한 자료를 제출하여야 하나, - 동 업체는 재평가에 필요한 자료를 제출기한(’25.9.2.) 내 제출하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 등 재평가 자료를 제출하지 않았다(2차 처분). 「약사법」 제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 제출하여야 하나, 동 업체는 재평가에 필요한 자료를 제출기한인 2025. 9. 2.까지 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d0eb5d8d9ab78f4d7e7259c",
+    "finding_text": "○ 의약품 등 재평가 자료 미제출(2차 처분) -「약사법」제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우, 재평가에 필요한 자료를 제출하여야 하나, - 동 업체는 재평가에 필요한 자료를 제출기한(’25.9.2.) 내 제출하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 등 재평가 자료를 제출하지 않았다(2차 처분). 「약사법」 제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 제출하여야 하나, 동 업체는 재평가에 필요한 자료를 제출기한인 2025. 9. 2.까지 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7557d5519648d8212f2b00fd",
+    "finding_text": "허가받거나 신고한 소재지에 해당 시설이 전혀 없음",
+    "finding_text_ko": "허가받거나 신고한 소재지에 해당 시설이 전혀 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-991168efcbd918e5663b7b04",
+    "finding_text": "○「약사법」제47조제1항에 따르면 의약품공급자는 의약품의 소매행위 및 약국개설자, 안전상비의약품 판매자, 한약업사, 법률 제8365호 약사법 전부개정법률 부칙 제5조에 따른 약업사 또는 매약상, 다른 의약품 도매상, 그 밖에 이 법에 따라 의약품을 판매할 수 있는 자 외의 자에게의 의약품 판매행위를 할 수 없음에도 불구하고, - 상기 업체는 2022년 3월 16일경부터 2025년 2월 4일경까지 자사제조 의약품(한약재) ‘대원녹용’을 의약품을 판매할 수 있는 자 외의 자에게 판매한 사실이 있음",
+    "finding_text_ko": "「약사법」 제47조제1항에 따르면 의약품공급자는 의약품의 소매행위 및 약국개설자, 안전상비의약품 판매자, 한약업사, 법률 제8365호 약사법 전부개정법률 부칙 제5조에 따른 약업사 또는 매약상, 다른 의약품 도매상, 그 밖에 이 법에 따라 의약품을 판매할 수 있는 자 외의 자에 대한 의약품 판매행위를 할 수 없음에도, 상기 업체는 2022년 3월 16일경부터 2025년 2월 4일경까지 자사제조 의약품(한약재) ‘대원녹용’을 의약품을 판매할 수 있는 자 외의 자에게 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b56c64dbb88c682da2cc1eb6",
+    "finding_text": "허가받거나 신고한 소재지에 해당 시설이 전혀 없음",
+    "finding_text_ko": "허가받거나 신고한 소재지에 해당 시설이 전혀 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8006e7a9dc42927044bd7866",
+    "finding_text": "○ 의약품등의 제조업자는 「약사법」제31조제9항 및 「의약품 등의 안전에 관한 규칙」제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우, 변경허가를 받거나 변경신고를 하여야 하나, - 상기 업체는 2022. 3. 20.경부터 2025. 1. 20.경까지 의약품(한약재) ‘보제원녹용’을 제조·판매함에 있어, 허가받은 제조소가 아닌 무허가 장소(서울특별시 동대문구 약령서길 78(제기동))에서 제조한 녹용절편을 총 36회에 걸쳐 구입한 후, 자사 제조소에서 제조한 것처럼 ‘보제원녹용’ 규격으로 재포장하여 판매한 사실이 있음 ○ 의약품등의 제조업자는 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」제48조제9호에 따라 제조 및 품질관리를 위한 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도 불구하고, - 상기 업체는 2022. 3. 20.경부터 2025. 1. 20.경까지 의약품(한약재) ‘보제원녹용’을 상기 내용과 같이 제조함에 있어, 한약재의 제조관리와 품질관리를 위한 제조기록서를 작성하지 않았으며, 품질검사도 실시하지 않고 이를 판매한 사실이 있음",
+    "finding_text_ko": "의약품등의 제조업자는 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우 변경허가를 받거나 변경신고를 하여야 하나, 상기 업체는 2022. 3. 20.경부터 2025. 1. 20.경까지 의약품(한약재) ‘보제원녹용’을 제조·판매하면서 허가받은 제조소가 아닌 무허가 장소(서울특별시 동대문구 약령서길 78(제기동))에서 제조한 녹용절편을 총 36회에 걸쳐 구입한 후 자사 제조소에서 제조한 것처럼 ‘보제원녹용’ 규격으로 재포장하여 판매하였다. 또한 의약품등의 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호에 따라 제조 및 품질관리를 위한 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도, 상기 업체는 같은 기간 위와 같이 ‘보제원녹용’을 제조하면서 한약재의 제조관리와 품질관리를 위한 제조기록서를 작성하지 않았고 품질검사도 실시하지 않은 채 이를 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a384963d827ceaee9ab0d12e",
+    "finding_text": "① 의약품등의 제조업자는 「약사법」제31조제9항 및 「의약품 등의 안전에 관한 규칙」제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우, 변경허가를 받거나 변경신고를 하여야 하나, - 상기 업체는 2022. 3. 8.경부터 2025. 5. 13.경까지 의약품(한약재) ‘주연녹용’을 제조·판매함에 있어, 무허가 의약품 제조업자가 허가받은 제조소가 아닌 장소에서 제조한 녹용절편을 총 28회에 걸쳐 구입한 후, 자사 제조소에서 제조한 것처럼 거짓표시 및 재포장하여 판매한 사실이 있음 ② 의약품등의 제조업자는 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」제48조제9호에 따라 제조 및 품질관리기준을 준수하여 제품의 제조단위별로 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도 불구하고, - 상기 업체는 2022. 3. 8.경부터 2025. 5. 13.경까지 상기 내용과 같이 의약품(한약재) ‘주연녹용’을 제조함에 있어, 반복적으로 제조기록서를 작성하지 않았으며, 품질검사도 실시하지 않고 이를 판매한 사실이 있음 ③「약사법」제47조제1항에 따르면 의약품공급자는 의약품의 소매행위 및 약국개설자, 안전상비의약품 판매자, 한약업사, 법률 제8365호 약사법 전부개정 법률 부칙 제5조에 따른 약업사 또는 매약상, 다른 의약품 도매상, 그 밖에 이 법에 따라 의약품을 판매할 수 있는 자 외의 자에게의 의약품 판매행위를 할 수 없음에도 불구하고, - 상기 업체는 2022년 3월 8일경부터 2025년 5월 13일경까지 의약품(한약재) ‘주연녹용’을 의약품을 판매할 수 있는 자 외의 자에게 판매한 사실이 있음",
+    "finding_text_ko": "첫째, 의약품등의 제조업자는 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우 변경허가를 받거나 변경신고를 하여야 하나, 상기 업체는 2022. 3. 8.경부터 2025. 5. 13.경까지 의약품(한약재) ‘주연녹용’을 제조·판매하면서 무허가 의약품 제조업자가 허가받은 제조소가 아닌 장소에서 제조한 녹용절편을 총 28회에 걸쳐 구입한 후 자사 제조소에서 제조한 것처럼 거짓표시 및 재포장하여 판매하였다. 둘째, 의약품등의 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호에 따라 제조 및 품질관리기준을 준수하여 제품의 제조단위별로 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도, 상기 업체는 같은 기간 위와 같이 ‘주연녹용’을 제조하면서 반복적으로 제조기록서를 작성하지 않았고 품질검사도 실시하지 않은 채 이를 판매하였다. 셋째, 「약사법」 제47조제1항에 따르면 의약품공급자는 의약품의 소매행위 및 약국개설자, 안전상비의약품 판매자, 한약업사, 법률 제8365호 약사법 전부개정법률 부칙 제5조에 따른 약업사 또는 매약상, 다른 의약품 도매상, 그 밖에 이 법에 따라 의약품을 판매할 수 있는 자 외의 자에 대한 의약품 판매행위를 할 수 없음에도, 상기 업체는 2022년 3월 8일경부터 2025년 5월 13일경까지 의약품(한약재) ‘주연녹용’을 의약품을 판매할 수 있는 자 외의 자에게 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8fc09bc2045a550c6c24ab3",
+    "finding_text": "○ 의약품등의 제조업자는 「약사법」제31조제9항 및 「의약품 등의 안전에 관한 규칙」제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우, 변경허가를 받거나 변경신고를 하여야 하나, - 상기 업체는 2023. 5. 22.경부터 2025. 2. 5.경까지 의약품(한약재) ‘건향녹용’을 제조·판매함에 있어, 허가받은 제조소가 아닌 무허가 장소(서울특별시 동대문구 약령서길 78(제기동))에서 제조한 녹용절편을 총 14회에 걸쳐 구입한 후, 자사 제조소에서 제조한 것처럼 자사 규격으로 재포장하여 판매한 사실이 있음 ○ 의약품등의 제조업자는 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」제48조제9호에 따라 제조 및 품질관리를 위한 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도 불구하고, - 상기 업체는 2023. 5. 22.경부터 2025. 2. 5.경까지 의약품(한약재) ‘건향녹용’을 상기 내용과 같이 제조함에 있어, 한약재의 제조관리와 품질관리를 위한 제조기록서를 작성하지 않았으며, 품질검사도 실시하지 않고 이를 판매한 사실이 있음",
+    "finding_text_ko": "의약품등의 제조업자는 「약사법」 제31조제9항 및 「의약품 등의 안전에 관한 규칙」 제8조제1항에 따라 허가받거나 신고한 사항을 변경하려는 경우 변경허가를 받거나 변경신고를 하여야 하나, 상기 업체는 2023. 5. 22.경부터 2025. 2. 5.경까지 의약품(한약재) ‘건향녹용’을 제조·판매하면서 허가받은 제조소가 아닌 무허가 장소(서울특별시 동대문구 약령서길 78(제기동))에서 제조한 녹용절편을 총 14회에 걸쳐 구입한 후 자사 제조소에서 제조한 것처럼 자사 규격으로 재포장하여 판매하였다. 또한 의약품등의 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제9호에 따라 제조 및 품질관리를 위한 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 함에도, 상기 업체는 같은 기간 위와 같이 ‘건향녹용’을 제조하면서 한약재의 제조관리와 품질관리를 위한 제조기록서를 작성하지 않았고 품질검사도 실시하지 않은 채 이를 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f806dc161542db0a5bf12f4c",
+    "finding_text": "○ 기준서 미준수 - 품질관리기준서(문서번호 NJCQ-01)에 따른 시험기록 확인 미준수 - 문서관리규정(문서번호 NJGD-01)에 따른 문서 정기검토 미실시 - GMP 인사조직 및 업무분장(문서번호 NJGO-01)에 따른 위원회회의록 기록 미실시 ○ 의약품 제조 및 품질관리기준, 의료용 고압가스의 제조 및 품질관리 미준수",
+    "finding_text_ko": "기준서를 준수하지 않았다. 품질관리기준서(문서번호 NJCQ-01)에 따른 시험기록 확인을 준수하지 않았고, 문서관리규정(문서번호 NJGD-01)에 따른 문서 정기검토를 실시하지 않았으며, GMP 인사조직 및 업무분장(문서번호 NJGO-01)에 따른 위원회 회의록 기록을 실시하지 않았다. 또한 의약품 제조 및 품질관리기준과 의료용 고압가스의 제조 및 품질관리를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42c9982914ab1ec394760119",
+    "finding_text": "○ 의약품 용기 등의 기재사항 일부 미기재 - 의약품 제조업자는「약사법」제56조제1항제3호, 10호 및「의약품안전규칙」제69조제1항제9호에 따라, 의약품의 용기나 포장에 제조번호와 유효기간 또는 사용기한 및 식약처장과 협의하여 보건복지부장관이 정하는 바코드 또는 전자태그를 부착하여야 하나, - 동 업체는 ‘시너지아정(시트롤린말산염)’의 표시라벨에 제조번호, 사용기한, 표준바코드 등을 인쇄하여 용기(병)에 부착하였으나, 실제로 라벨에 상기 내용이 인쇄되지 않은 상태로 제품을 출하한 사실이 있음",
+    "finding_text_ko": "의약품 용기 등의 기재사항 일부를 기재하지 않았다. 의약품 제조업자는 「약사법」 제56조제1항제3호 및 제10호, 「의약품안전규칙」 제69조제1항제9호에 따라 의약품의 용기나 포장에 제조번호와 유효기간 또는 사용기한 및 식약처장과 협의하여 보건복지부장관이 정하는 바코드 또는 전자태그를 부착하여야 하나, 동 업체는 ‘시너지아정(시트롤린말산염)’의 표시라벨에 제조번호, 사용기한, 표준바코드 등을 인쇄하여 용기(병)에 부착하였다고 하였으나 실제로는 라벨에 해당 내용이 인쇄되지 않은 상태로 제품을 출하하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1a151b39f2d0e3fc6b959a00",
+    "finding_text": "○ 의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고, 작성된 기준서 및 지시서를 준수하여야 하나, 다음과 같이 기준서를 미준수한 사실이 있음(2차 위반) - 자사 기준서 “일탈 관리(문서번호: DP-QS010)” 4항, 5항에 따르면 일탈 발견자는 일탈 상황을 확인한 후 즉시 부서 팀장 및 QA팀에 통보하고 24시간 이내에 일탈 발생 통보서를 작성하여야 하나, 이오파미돌(제조번호 IOP325001) 제조 시 생산량 일탈이 발생하였지만 발견자는 일탈 처리를 진행하지 않은 사실이 있음 - 자사 기준서 “IOP-3 공정 반응기 표준운영지침서(문서번호: DP-PIA014)”, “IOP-2 공정 반응기 표준운영지침서(문서번호: DP-PIA012)”, “원심탈수기 표준운영지침서(문서번호 DP-PIA015)”에 따라 수시 세척 및 재 세척(작업 전 세척후 유지시간(Clean holding time)이 초과한 경우)을 진행하여야 함에도 불구하고, 이오파미돌(제조번호 IOP325003, IOP325004)에 대하여 수시 세척 및 재 세척이 절차대로 진행되지 않은 사실이 있음",
+    "finding_text_ko": "의약품 제조업자는 의약품을 제조하면서 제조관리기준서, 제품표준서 등에 따라 정확히 제조하여야 하고 작성된 기준서 및 지시서를 준수하여야 하나, 다음과 같이 기준서를 준수하지 않았다(2차 위반). 첫째, 자사 기준서 “일탈 관리(문서번호: DP-QS010)” 4항 및 5항에 따르면 일탈 발견자는 일탈 상황을 확인한 후 즉시 부서 팀장 및 QA팀에 통보하고 24시간 이내에 일탈 발생 통보서를 작성하여야 하나, 이오파미돌(제조번호 IOP325001) 제조 시 생산량 일탈이 발생하였음에도 발견자가 일탈 처리를 진행하지 않았다. 둘째, 자사 기준서 “IOP-3 공정 반응기 표준운영지침서(문서번호: DP-PIA014)”, “IOP-2 공정 반응기 표준운영지침서(문서번호: DP-PIA012)”, “원심탈수기 표준운영지침서(문서번호 DP-PIA015)”에 따라 수시 세척 및 재세척(작업 전 세척 후 유지시간(Clean holding time)이 초과한 경우)을 진행하여야 함에도, 이오파미돌(제조번호 IOP325003, IOP325004)에 대하여 수시 세척 및 재세척이 절차대로 진행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d3eec02cd8fb36cac3d2bd99",
+    "finding_text": "○ 의약품 위탁자의 위·수탁자에 대한 관리책임 등의 규정 위반 - 의약품 제조업자는 의약품 제조를 위탁하는 경우, 의약품 위탁자는 제조가 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, - 동 업체는 ‘안티푸라민한방카타플라스마’의 제조 수탁자((주)티디에스팜)에 대하여 관리·감독을 철저히 하지 않은 사실이 있음 * 수탁자 ㈜티디에스팜은 상기 품목을 제조하면서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않은 사실이 있음 ** 현장 점검 시 혼합공정을 진행 중이였으나, 제조지시 및 기록서에서 완료한 원료 칭량에 관한 기록을 확인할 수 없었고 작업 전 점검, 설비 점검 및 가동 기록, 공정 투입 원료 확인 등을 하지 않음",
+    "finding_text_ko": "의약품 위탁자의 위·수탁자에 대한 관리책임 등의 규정을 위반하였다. 의약품 제조업자가 의약품 제조를 위탁하는 경우 의약품 위탁자는 제조가 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 동 업체는 ‘안티푸라민한방카타플라스마’의 제조 수탁자인 (주)티디에스팜에 대하여 관리·감독을 철저히 하지 않았다. 수탁자 ㈜티디에스팜은 해당 품목을 제조하면서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않았다. 현장 점검 시 혼합공정이 진행 중이었으나 제조지시 및 기록서에서 완료된 원료 칭량에 관한 기록을 확인할 수 없었고, 작업 전 점검, 설비 점검 및 가동 기록, 공정 투입 원료 확인 등도 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-769bdffdf0457f4adf62eada",
+    "finding_text": "1. 완제품 품질검사 미실시 2. 제조지시 및 기록서 미작성 3. 제품표준서 미보유 4. 기준서 미준수 5. 수탁자 의무 위반",
+    "finding_text_ko": "완제품 품질검사를 실시하지 않았고, 제조지시 및 기록서를 작성하지 않았으며, 제품표준서를 보유하지 않았다. 또한 기준서를 준수하지 않았고 수탁자의 의무를 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9fc1393fcbbbb792640a7c2a",
+    "finding_text": "함량시험 부적합",
+    "finding_text_ko": "함량시험이 부적합하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c80667a24e7e5839d7ebe8c",
+    "finding_text": "○ 의약품등 수입관리 기준 미준수 ○ 수입관리자 폐지 미신고",
+    "finding_text_ko": "의약품등 수입관리 기준을 준수하지 않았고, 수입관리자 폐지를 신고하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e7e2ead0260f6769bd5042b",
+    "finding_text": "<허가(신고)받지 않은 성분(트리클로산) 검출> ○「약사법」제62조 및 제66조에 따라, 의약외품 수입업자는 허가받거나 신고된 내용과 다른 의약외품을 판매할 목적으로 수입하여서는 아니 되나, - 동 업체는 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’의 수거검사 결과*, 트리클로산이 최대 0.16%까지 검출된 제품을 ‘23.2월부터 수입하여 판매하였음 * 식약처가 애경산업(주)이 ’23.2월부터 해외제조원(Domy社)에서 수입한 상기 6종 제품 중 수거 가능한 870개 제조번호 제품 및 국내 제조한 2080치약 128종을 수거하여 검사한 결과, 수입 제품의 754개 제조번호에서 트리클로산이 검출되었고, 국내 제조 제품은 모두 검출되지 않았음 <회수절차 미준수> ○「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제50조제3항에 따라, 의약외품 수입업자는 의약외품의 안전성·유효성에 문제가 있음을 인지한 경우, 즉시 판매중지 등의 필요한 조치를 하고, 안전성·유효성에 문제가 있음을 안 날로부터 5일 이내에 회수계획서를 관할 지방청에 제출하여야 하나, - 동 업체는 2025. 12. 15.자에 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’에 “트리클로산”이 함유되어 있음을 인지하였음에도 불구하고, - 상기 6종 제품에 대하여 2025.1.5.자(22일 경과)에 대전지방식품의약품안전청에 최초로 회수계획서를 제출하였음 ※ 애경산업(주)은 상기 사실을 인지한 후 2025.12.15.자에 중국 제조원에 해당 제품 제조 중지 요청 및 2025.12.17.자에 출고되지 않도록 조치하였음 <수입업자의 준수사항 위반(품질 부적합)> ○「약사법」제42조제5항 및 제9항 및「의약품안전규칙」제60조제2항1호에 따라, 의약외품 수입업자는 의약외품의 품질검사를 철저히 하고 합격된 제품만을 판매하여야 하나, - 동 업체는 해외제조원(Domy(Zhongshan) Chemical Co. Ltd, 중국)에서 제조하여 수입한 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’에 “트리클로산”이 함유된 사실을 인지하지 못하는 등 해외제조원에 대한 품질관리를 철저히 하지 못한 사실이 있음 ※ 애경산업(주)는 해외제조원(Domy(Zhongshan) Chemical Co. Ltd, 중국)과 품질협약서 체결(‘22.1.10.) 시, “트리클로산”을 혼입할 수 없는 성분으로 명시하였으나, - 해외 제조원에서 2023. 4. 4.자로 자사기준서 ’치약생산설비의 세척절차(문서번호: SOP-WS-036-07)‘ 개정 시 “2080 치약” 제품에 한정하여 “설비 세척 소독제로 트리클로산”을 추가하여 사용하였으나, - 애경산업(주)는 2019년부터 점검일 현재까지 총 3회 해외제조원 실사를 진행하였음에도 불구하고, 이를 인지하지 못하였음",
+    "finding_text_ko": "허가(신고)받지 않은 성분(트리클로산) 검출 — 「약사법」 제62조 및 제66조에 따라 의약외품 수입업자는 허가받거나 신고된 내용과 다른 의약외품을 판매할 목적으로 수입하여서는 아니 되나, 동 업체는 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’의 수거검사 결과 트리클로산이 최대 0.16%까지 검출된 제품을 2023년 2월부터 수입하여 판매하였다. 식약처가 애경산업(주)이 2023년 2월부터 해외제조원(Domy社)에서 수입한 위 6종 제품 중 수거 가능한 870개 제조번호 제품 및 국내 제조한 2080치약 128종을 수거하여 검사한 결과, 수입 제품의 754개 제조번호에서 트리클로산이 검출되었고 국내 제조 제품에서는 모두 검출되지 않았다. 회수절차 미준수 — 「약사법」 제39조제1항 및 「의약품 등의 안전에 관한 규칙」 제50조제3항에 따라 의약외품 수입업자는 의약외품의 안전성·유효성에 문제가 있음을 인지한 경우 즉시 판매중지 등 필요한 조치를 하고 그 사실을 안 날부터 5일 이내에 회수계획서를 관할 지방청에 제출하여야 하나, 동 업체는 2025. 12. 15.자에 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’에 “트리클로산”이 함유되어 있음을 인지하였음에도 위 6종 제품에 대하여 2025.1.5.자(22일 경과)에 대전지방식품의약품안전청에 최초로 회수계획서를 제출하였다. 다만 애경산업(주)은 위 사실을 인지한 후 2025.12.15.자에 중국 제조원에 해당 제품의 제조 중지를 요청하고 2025.12.17.자에 출고되지 않도록 조치하였다. 수입업자의 준수사항 위반(품질 부적합) — 「약사법」 제42조제5항 및 제9항, 「의약품안전규칙」 제60조제2항제1호에 따라 의약외품 수입업자는 의약외품의 품질검사를 철저히 하고 합격된 제품만을 판매하여야 하나, 동 업체는 해외제조원(Domy(Zhongshan) Chemical Co. Ltd, 중국)에서 제조하여 수입한 ‘2080베이직치약 등 6개 제품[상세 붙임 참조]’에 “트리클로산”이 함유된 사실을 인지하지 못하는 등 해외제조원에 대한 품질관리를 철저히 하지 못하였다. 애경산업(주)은 해외제조원(Domy(Zhongshan) Chemical Co. Ltd, 중국)과 품질협약서를 체결(2022.1.10.)하면서 “트리클로산”을 혼입할 수 없는 성분으로 명시하였으나, 해외 제조원이 2023. 4. 4.자로 자사기준서 ‘치약생산설비의 세척절차(문서번호: SOP-WS-036-07)’를 개정하면서 “2080 치약” 제품에 한정하여 “설비 세척 소독제로 트리클로산”을 추가하여 사용하였고, 애경산업(주)은 2019년부터 점검일 현재까지 총 3회 해외제조원 실사를 진행하였음에도 이를 인지하지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-687b6db09b49635443cda614",
+    "finding_text": "○ 의약품 제조 또는 시험의 위탁자는 제조 또는 시험이 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 아래와 같이 수탁자가 제조관리를 적절하게 수행하지 않은 사실이 있음에도 불구하고, 수탁자에 대한 관리·감독을 철저히 하지 아니하였음 - 수탁자 안국약품(주)는 의약품 ‘레보발사정2.5/160밀리그램’(제조번호: 25002)을 수탁 제조함에 있어 충전(포장) 공정을 진행하면서 자사기준서 ‘포장작업관리방법’(문서번호 AMS04-005) 및 ‘자동계수기(DMC-60T) 운전 및 세척방법’(문서번호 AMS05-116)에 따라 포장작업 후 전 작업 제품의 잔량이나 오염이 없어야 함을 확인하고, 다음 포장 작업 전 작업장 내 이전 포장작업과 관련된 모든 문서, 동일 작업대의 타제품 및 자재 잔류 여부 등을 확인하여 한 제품이 다른 제품에 혼입되거나 교차 오염되는 것을 방지해야 하며, ’제조공정 관리규정‘(문서번호 AM-04)에 따라 발생 가능한 일탈사항을 사전에 방지하도록 관리·감독하고, 제조공정이 본 규정에 따라 적합하게 관리되고 있는지 주기적으로 확인해야 하는 책임이 각각 제조공정관리책임자 및 제조부서책임자에 있음에도 불구하고, 다른 품목 ‘레보살탄정2.5/80밀리그램’(제조번호: 25005)의 혼입을 발생시킨 사실이 있음",
+    "finding_text_ko": "의약품 제조 또는 시험의 위탁자는 제조 또는 시험이 적절하게 이루어지도록 수탁자에 대한 관리·감독을 철저히 하여야 하나, 아래와 같이 수탁자가 제조관리를 적절하게 수행하지 않았음에도 수탁자에 대한 관리·감독을 철저히 하지 않았다. 수탁자 안국약품(주)는 의약품 ‘레보발사정2.5/160밀리그램’(제조번호: 25002)을 수탁 제조하면서 충전(포장) 공정을 진행할 때, 자사기준서 ‘포장작업관리방법’(문서번호 AMS04-005) 및 ‘자동계수기(DMC-60T) 운전 및 세척방법’(문서번호 AMS05-116)에 따라 포장작업 후 전 작업 제품의 잔량이나 오염이 없음을 확인하고 다음 포장 작업 전에 작업장 내 이전 포장작업과 관련된 모든 문서와 동일 작업대의 타제품 및 자재 잔류 여부 등을 확인하여 한 제품이 다른 제품에 혼입되거나 교차 오염되는 것을 방지하여야 하며, ‘제조공정 관리규정’(문서번호 AM-04)에 따라 발생 가능한 일탈사항을 사전에 방지하도록 관리·감독하고 제조공정이 해당 규정에 따라 적합하게 관리되고 있는지 주기적으로 확인할 책임이 각각 제조공정관리책임자 및 제조부서책임자에게 있음에도, 다른 품목 ‘레보살탄정2.5/80밀리그램’(제조번호: 25005)의 혼입을 발생시켰다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cbfdb5fb23a753cac10ed325",
+    "finding_text": "○ 의약외품 제조업자는「약사법」 제37조제1항, 제38조제1항,「의약품 등의 안전에 관한 규칙」제43조제1항제5호 및 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나, -동 업체는 의약외품인 라셀턴토탈솔루션(벤잘코늄염화물)(제조번호: EF01, 사용기한: 2028.6.4.)을 제조·판매함에 있어, 품목신고증 상의 기준 및 시험방법에 따른 ‘확인시험’을 실시하지 아니한 사실이 있으며, ‘함량시험’에 대해 품목신고증 상의 기준 및 시험방법에 따른 시험방법에 따라 실시하지 아니한 사실이 있음 * 점검일 당일 상기 제품 제조·판매 시 작성한 완제품 시험의뢰 및 성적서 확인결과, ‘확인시험’에 대해서는 시험실시 기록 등을 확인할 수 없었으며, ‘함량시험’에 대해서는 품목신고증 상의 기준 및 시험방법에 따른 시험방법과 상이하게 실시하였음",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항, 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호 및 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어 제조일로부터 3년 이상 보존하여야 하며, 품질검사에 합격한 제품만을 출고하여야 한다. 그럼에도 동 업체는 의약외품인 라셀턴토탈솔루션(벤잘코늄염화물)(제조번호: EF01, 사용기한: 2028.6.4.)을 제조·판매하면서 품목신고증 상의 기준 및 시험방법에 따른 ‘확인시험’을 실시하지 않았고, ‘함량시험’도 품목신고증 상의 기준 및 시험방법에 따라 실시하지 않았다. 점검일 당일 해당 제품 제조·판매 시 작성한 완제품 시험의뢰 및 성적서를 확인한 결과, ‘확인시험’에 대해서는 시험실시 기록 등을 확인할 수 없었으며 ‘함량시험’은 품목신고증 상의 기준 및 시험방법과 상이하게 실시되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de0e780c387acc1dc47c1718",
+    "finding_text": "○ 의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항, 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호 및 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년 이상 보존해야 하고 품질검사에 합격한 제품만을 출고하여야 하나, - 동 업체는 의약외품 ‘식스방역용마스크(KF94)(특대형)(해당 제조번호: 604004, 제조일자: 2020.2.10.)’를 제조·판매함에 있어, 품목허가증 상의 기준 및 시험방법에 따른 ‘고정용 머리끈 접합부의 인장강도’, ‘순도시험’, ‘안면부 흡기저항’, ‘분진포집효율’ 에 대해 시험을 실시하지 아니한 사실이 있음 * 해당 제품의 완제품검사 성적서에서 상기 4개 시험항목에 대해 ‘외부 시험기관에 로트별 1회 시험’을 실시하는 것으로 되어 있으나, 2019.5~6월에 실시한 시험성적서로 대체하고 있었으며, 해당 제품(제조일자: 2020.2.10.)으로 실시한 시험성적서를 보유하고 있지 않음을 확인함",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항, 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호 및 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서와 품질관리기록서를 작성하여 갖추어 제조일로부터 3년 이상 보존하여야 하며, 품질검사에 합격한 제품만을 출고하여야 한다. 그럼에도 동 업체는 의약외품 ‘식스방역용마스크(KF94)(특대형)’(해당 제조번호: 604004, 제조일자: 2020.2.10.)를 제조·판매하면서 품목허가증 상의 기준 및 시험방법에 따른 ‘고정용 머리끈 접합부의 인장강도’, ‘순도시험’, ‘안면부 흡기저항’, ‘분진포집효율’ 시험을 실시하지 않았다. 해당 제품의 완제품검사 성적서에는 위 4개 시험항목에 대해 ‘외부 시험기관에 로트별 1회 시험’을 실시하는 것으로 되어 있으나 2019년 5~6월에 실시한 시험성적서로 대체하고 있었고, 해당 제품(제조일자: 2020.2.10.)으로 실시한 시험성적서는 보유하고 있지 않은 것으로 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0962c7e4d52428d9bcf5c3d1",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 조화목단피(제조번호 JH112-250414, 사용기한 2028. 4. 28.) - 항목: 이산화황 - 기준/결과: 30ppm 이하 / 170ppm",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 조화목단피(제조번호 JH112-250414, 사용기한 2028. 4. 28.)이고, 항목은 이산화황이며, 기준 30ppm 이하에 대하여 결과가 170ppm이었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-162b8765709bc9f2712943b8",
+    "finding_text": "○ 의약외품 제조업자는 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제1호에 따라 의약품등의 품질검사를 철저히 하고 합격한 제품만 출고하여야 하나, - 상기 업체는 의약외품 ‘에이스그립레빈반창고’ 등 5개 품목을 제조·판매함에 있어 완제품의 시험검사를 완료하지 않고 제품을 출하·판매한 사실이 있음",
+    "finding_text_ko": "의약외품 제조업자는 「약사법」 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제48조제1호에 따라 의약품등의 품질검사를 철저히 하고 합격한 제품만 출고하여야 하나, 상기 업체는 의약외품 ‘에이스그립레빈반창고’ 등 5개 품목을 제조·판매하면서 완제품의 시험검사를 완료하지 않은 채 제품을 출하·판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-727900989bf29413b7503090",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 푸른무약유백피(제조번호 PUJ03823091A, 사용기한 2026. 9. 24.) - 항목: 성상 - 기준/결과: 왕느릅나무의 주피를 제거한 수피이다 / 주피 미제거 및 근피 포함 ○ 유통한약재 품질검사 부적합 - 품목: 푸른무약용안육(제조번호 PUJ04524041A, 사용기한 2027. 3. 31.) - 항목: 건조감량 - 기준/결과: 15% 이하/ 18.7%",
+    "finding_text_ko": "유통한약재 품질검사에서 두 건의 부적합 판정을 받았다. 첫째, 푸른무약유백피(제조번호 PUJ03823091A, 사용기한 2026. 9. 24.)는 성상 항목에서 기준이 왕느릅나무의 주피를 제거한 수피이나 주피가 제거되지 않고 근피가 포함된 것으로 확인되었다. 둘째, 푸른무약용안육(제조번호 PUJ04524041A, 사용기한 2027. 3. 31.)은 건조감량 항목에서 기준 15% 이하에 대하여 결과가 18.7%였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-941c84d7bed3a66ef69bb533",
+    "finding_text": "유통한약재 품질검사 부적합 1) 올본구기자(제조번호 250110-32, 사용기한 2028. 1. 9.) - 항목: 잔류농약(뷰프로페진) - 기준/결과: 0.01mg/kg / 01.mg/kg 2) 올본두충(제조번호 250616-60, 사용기한 2028. 6. 15.) - 항목: 성상 - 기준/결과: 두충의 줄기껍질로서 주피를 제거한 것/ 두충의 포제품인두충염자임(부적합) 3) 올본음양곽(제조번호 240806-186, 제조번호 2027. 8. 5.) - 항목: 정량법(이카리인) - 기준/결과: 0.3%이상/ 0.1%",
+    "finding_text_ko": "유통한약재 품질검사에서 세 건의 부적합 판정을 받았다. 첫째, 올본구기자(제조번호 250110-32, 사용기한 2028. 1. 9.)는 잔류농약(뷰프로페진) 항목에서 기준 0.01mg/kg에 대하여 결과가 01.mg/kg이었다. 둘째, 올본두충(제조번호 250616-60, 사용기한 2028. 6. 15.)은 성상 항목에서 기준이 두충의 줄기껍질로서 주피를 제거한 것이나 두충의 포제품인 두충염자임으로 확인되어 부적합하였다. 셋째, 올본음양곽(제조번호 240806-186, 제조번호 2027. 8. 5.)은 정량법(이카리인) 항목에서 기준 0.3% 이상에 대하여 결과가 0.1%였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c22f98114070cd86fb04b9d2",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 동양허브인진호(제조번호 DY143S03H, 사용기한 2028. 8. 12.) - 항목: 산불용성회분 - 기준/결과: 2.0% 이하 / 3.9%",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 동양허브인진호(제조번호 DY143S03H, 사용기한 2028. 8. 12.)이고, 항목은 산불용성회분이며, 기준 2.0% 이하에 대하여 결과가 3.9%였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5758ca80b0b287f427c7e51",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 나음천남성(제조번호 NA2402175A01, 사용기한 2027. 6. 13.) - 항목: 이산화황관능(성상) - 기준/결과: 주피를 완전히 제거해야 함 / 주피가 완전히 제거되지 않음",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 나음천남성(제조번호 NA2402175A01, 사용기한 2027. 6. 13.)이고, 항목은 이산화황관능(성상)이며, 기준은 주피를 완전히 제거해야 하는 것이나 주피가 완전히 제거되지 않은 것으로 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ea428d19a8f8ae95d16ca450",
+    "finding_text": "○ 유통한약재 품질검사 부적합 - 품목: 현진골쇄보(제조번호 25022-01, 사용기한 2028. 5. 22.) - 항목: 확인시험 - 기준/결과: 검액에서 얻은 여러개의 반점 중 1개의 반점은 표준액에서 얻은 반점과 색상 및 Rf값이 같다 / 표준액에서 얻은 반점과 색상 및 Rf값이 다르다",
+    "finding_text_ko": "유통한약재 품질검사에서 부적합 판정을 받았다. 해당 품목은 현진골쇄보(제조번호 25022-01, 사용기한 2028. 5. 22.)이고, 항목은 확인시험이다. 기준은 검액에서 얻은 여러 개의 반점 중 1개의 반점이 표준액에서 얻은 반점과 색상 및 Rf값이 같아야 하나, 결과는 표준액에서 얻은 반점과 색상 및 Rf값이 다른 것으로 나타났다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-304715af8f33985b9c12ba71",
+    "finding_text": "○ 제품표준서 및 제조관리기록서 미작성 ○ 변경허가를 받지 않거나 신고를 하지 않고 제조방법을 변경",
+    "finding_text_ko": "제품표준서 및 제조관리기록서를 작성하지 않았고, 변경허가를 받거나 신고를 하지 않고 제조방법을 변경하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8e648990190c0f84b776cd7",
+    "finding_text": "“유성진멸균거즈3호”를 수입하면서 품질검사 항목이 대한약전“멸균거즈”항에 따라 무균시험을 실시하도록 정하고 있음에도 불구하고, 품질검사 항목 중 무균시험을 실시하지 아니하고 판매한 사실이 있음",
+    "finding_text_ko": "“유성진멸균거즈3호”를 수입하면서, 품질검사 항목이 대한약전 “멸균거즈” 항에 따라 무균시험을 실시하도록 정하고 있음에도 품질검사 항목 중 무균시험을 실시하지 않고 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a6f68a109a92b3342e9492d8",
+    "finding_text": "○ 2022. 3. 8.부터 2024. 10. 3.까지 의약품(한약재) ‘충남녹용’을 제조함에 있어 허가받은 제조소가 아닌 장소(서울특별시 동대문구 약령서길 78)에서 제조한 녹용절편을 총 98회에 걸쳐 구매한 후, 자사 제조소에서 재포장하여 판매한 사실이 있음 ○ 회수의무자는 회수대상의약품등에 대한 문제가 있음을 안 날로부터 5일 이내에 회수계획서를 지방청장에게 제출하여야 함에도 불구하고, - 경인지방식품의약품안전청장이 2025. 9. 19.에 의약품(한약재) ‘충남녹용’에 대한 ‘판매중지, 회수·폐기 등 명령’을 하였으나, 점검일인 2026. 1. 14. 현재까지 회수계획서를 제출하지 않은 사실이 있음",
+    "finding_text_ko": "2022. 3. 8.부터 2024. 10. 3.까지 의약품(한약재) ‘충남녹용’을 제조하면서 허가받은 제조소가 아닌 장소(서울특별시 동대문구 약령서길 78)에서 제조한 녹용절편을 총 98회에 걸쳐 구매한 후 자사 제조소에서 재포장하여 판매하였다. 또한 회수의무자는 회수대상의약품등에 대한 문제가 있음을 안 날부터 5일 이내에 회수계획서를 지방청장에게 제출하여야 함에도, 경인지방식품의약품안전청장이 2025. 9. 19. 의약품(한약재) ‘충남녹용’에 대하여 ‘판매중지, 회수·폐기 등 명령’을 하였으나 점검일인 2026. 1. 14. 현재까지 회수계획서를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-65754636dc5d17a056d2e8bf",
+    "finding_text": "재심사 자료 미제출",
+    "finding_text_ko": "재심사 자료를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

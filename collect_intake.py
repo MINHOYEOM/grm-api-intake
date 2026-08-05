@@ -2822,6 +2822,28 @@ def _health_payload(
     }
 
 
+def _fda483_prefetch_enabled(cfg: RunConfig, dry_run: bool) -> bool:
+    """483 기보유 사전조회를 돌릴지 — **수집 게이트와 반드시 같은 조건**이어야 한다.
+
+    ★2026-08-05 회귀. 종전 호출부 게이트는 ``("fda483" in active) and not dry_run`` 이었다.
+      그런데 ``--sources`` 미지정(=일일 스케줄, GRM_SOURCES 빈 값)이면 active 는
+      ``_ALL_SOURCES``(fr·recall·ema·mhra·pics·eca·wl)이고 **여기에 fda483 은 없다**.
+      483 수집 자체는 ``ENABLE_FDA_483`` env 로 켜지므로(``cfg.enable_fda483``,
+      RunConfig.from_env) 수집은 매일 돌면서 사전조회만 꺼져 있었다 — #619 가 넣은
+      PDF·OCR 건너뛰기가 **정기 실행에서 한 번도 동작한 적이 없다.**
+
+      실측 대조(같은 커밋):
+        정기 3연속(08-02·03·04): 기보유 건너뜀 0   · OCR 200/200쪽 · 예산초과 24 · 신규 0~1건
+        수동 --sources fda483  : 기보유 건너뜀 132 · OCR 14/200쪽  · 예산초과 0
+      #619 의 검증이 하필 후자 한 번뿐이었다. **측정에 쓴 호출 형태가 결론을 정했다.**
+
+    ★게이트가 갈리면 최적화는 소리 없이 사라진다(건수도 로그도 정상으로 보인다).
+      조건을 이 한 곳에만 둔다 — 호출부에서 다시 인라인 식으로 적지 말 것.
+      Fda483PrefetchGateTest 가 AST 로 호출부를 잠근다.
+    """
+    return cfg.enable_fda483 and not dry_run
+
+
 def _fda483_known_document_ids(
     token: str, db_id: str, run_date: date, enf_start: date, end: date, *, enabled: bool,
 ) -> set[str] | None:
@@ -3616,7 +3638,7 @@ def main() -> int:
         cfg, active, run_date, start, end, enf_start,
         fda483_known_ids=_fda483_known_document_ids(
             notion_token, notion_db, run_date, enf_start, end,
-            enabled=("fda483" in active) and not args.dry_run))
+            enabled=_fda483_prefetch_enabled(cfg, args.dry_run)))
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장

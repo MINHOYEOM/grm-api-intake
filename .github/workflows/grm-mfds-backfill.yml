@@ -25,28 +25,33 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: '백필 대상 data.go.kr 수집기.'
+        description: '백필 대상 국내 수집기.'
         type: choice
         options:
           - admin-action
           - recall
+          - gmp-inspection
         default: admin-action
       from_date:
-        description: '처분/공표일 창 시작(ISO).'
+        description: '처분/공표일(gmp-inspection 은 등록일) 창 시작(ISO).'
         type: string
         default: '2025-02-01'
       to_date:
-        description: '창 끝(ISO). 빈값이면 오늘.'
+        description: '창 끝(ISO). 빈값이면 오늘. ★gmp-inspection 은 창 안의 문서마다 첨부를 1초 간격으로 받으므로 창이 곧 실행시간이다 — 연 단위로 쪼개 실행할 것.'
         type: string
         default: ''
       max_pages:
-        description: '수집기 MAX_PAGES 덮어쓰기(0 = 기본값 admin 20 / recall 25). 창이 넓으면 반드시 올릴 것.'
+        description: '수집기 MAX_PAGES 덮어쓰기(0 = 기본값 admin 20 / recall 25 / gmp 10). 창이 넓으면 반드시 올릴 것.'
         type: string
         default: '0'
       dry_run:
         description: 'true = 수집만(Supabase 적재 없음). 먼저 이걸로 건수를 확정한다.'
         type: boolean
         default: true
+      allow_degraded_yield:
+        description: '수율 플래그(ENABLE_GMP_DEFICIENCY_TABLE)가 꺼진 채로도 진행. 기본 false = 정지.'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -60,7 +65,9 @@ jobs:
   backfill:
     name: Deep-backfill MFDS into findings (raw + findings, no git writes)
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # gmp-inspection 은 첨부를 1초 간격으로 받는다(연 단위 창 ≈ 200건 ≈ 5분+). 재시도까지
+    # 감안해 넉넉히 잡되, 창을 쪼개는 것이 정석이다.
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,11 +91,16 @@ jobs:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # ★일일 크론(grm-intake.yml)과 **같은 값**을 넘긴다. 이게 꺼지면 GMP 실사 문서의
+          # 지적사항 표 구조화가 죽어 문서당 findings 가 ~6건에서 최대 1건으로 떨어지는데
+          # 건수 기준으로는 '정상'으로 보인다 — 스크립트가 자체 가드로 정지시킨다.
+          ENABLE_GMP_DEFICIENCY_TABLE: ${{ vars.ENABLE_GMP_DEFICIENCY_TABLE || 'false' }}
           GRM_SOURCE: ${{ inputs.source }}
           GRM_FROM_DATE: ${{ inputs.from_date }}
           GRM_TO_DATE: ${{ inputs.to_date }}
           GRM_MAX_PAGES: ${{ inputs.max_pages }}
           GRM_DRY_RUN: ${{ inputs.dry_run }}
+          GRM_ALLOW_DEGRADED: ${{ inputs.allow_degraded_yield }}
         run: |
           ARGS=(--source "$GRM_SOURCE" --from-date "$GRM_FROM_DATE"
                 --max-pages "${GRM_MAX_PAGES:-0}" --output backfill_report.json)
@@ -97,6 +109,9 @@ jobs:
           fi
           if [ "$GRM_DRY_RUN" = "true" ]; then
             ARGS+=(--dry-run)
+          fi
+          if [ "$GRM_ALLOW_DEGRADED" = "true" ]; then
+            ARGS+=(--allow-degraded-yield)
           fi
           python collect_mfds_backfill.py "${ARGS[@]}"
 

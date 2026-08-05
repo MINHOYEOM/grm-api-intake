@@ -285,6 +285,35 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(len(findings), 1)
         self.assertIn("사실대로 작성할 것", findings[0]["finding_text"])
 
+    def test_gmp_table_labels_alone_are_not_content(self) -> None:
+        """★표가 비면 **칸 이름만** 줄줄이 남는다 — 분야·중대도는 열거형 라벨이지 지적이 아니다.
+
+        2026-08-05 실적재 후 실측에서 이 모양이 63건 살아 있었다(첫 게이트가 라벨을 실질
+        내용으로 셌다). 마스킹된 해외 실사분(`0000…`)도 같은 부류.
+        """
+        for text in (
+            "지적(보완)사항 분류 : 분야 구분 근거 법령 지적(보완)사항 요약 "
+            "품질경영 품질경영 시설장비 - 2 - 원자재 z 시험실 제조 의 료 제 품 안 전 과",
+            "평가 결과: 지적(보완)사항 있음 - 지적(보완)사항 분류 : 기타 분야 구분 근거 법령 "
+            "지적(보완)사항 요약 품질경영 기타 [별표 1의2] 제2.1호, 제2.4호 의 료 제 품 안 전 과",
+            "0000 0000 0000 0000000000000000 000000000000000 00000 00000000000000000000",
+        ):
+            with self.subTest(text=text[:40]):
+                self.assertTrue(extractors._gmp_is_boilerplate(text))
+
+    def test_gmp_label_removal_is_token_exact_not_substring(self) -> None:
+        """★부분문자열로 지우면 '제조'가 '제조기록서'를, '품질'이 '품질관리'를 갉아먹는다.
+
+        어절이 라벨과 **정확히 같을 때만** 버려야 진짜 지적이 살아남는다.
+        """
+        text = ("지적(보완)사항 분류 : 기타 3건 분야 구분 근거 법령 지적(보완)사항 요약 "
+                "품질 기타 [별표 1의2] 제6호 제조기록서 서식에 실제 공정사항 반영 필요 한약정책과")
+        self.assertFalse(extractors._gmp_is_boilerplate(text))
+        residual = extractors._gmp_substantive_residual(text)
+        self.assertIn("제조기록서", residual)
+        # 라벨로 쓰인 '품질'·'기타'·'분야'는 사라진다.
+        self.assertNotIn("분야", residual)
+
     def test_gmp_boilerplate_predicate_is_content_based_not_length_based(self) -> None:
         # 짧아도 내용이면 통과, 길어도 서식이면 차단 — 길이 컷이 아니라 실질내용 컷이다.
         self.assertFalse(extractors._gmp_is_boilerplate(

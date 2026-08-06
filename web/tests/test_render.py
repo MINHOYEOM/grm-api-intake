@@ -3626,6 +3626,8 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
                       ).read_text(encoding="utf-8")
         cls.sql052 = (WEB_DIR / "migrations" /
                       "052_findings_recent_window_category_source.sql").read_text(encoding="utf-8")
+        cls.sql053 = (WEB_DIR / "migrations" /
+                      "053_findings_recent_window_lane.sql").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
@@ -3908,18 +3910,21 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("from prv group by category_code, source", cross)
 
     def test_source_alignment_thresholds_declared_with_rationale(self):
-        """임계는 상수 + 근거 주석(ZONE_MIN_FOREIGN_SAMPLE 관례). 특히 배율 상한은
-        ★데이터가 움직이면 다시 재야 하는 값이라 그 사실 자체를 주석이 말해야 한다 —
-        설계 시점 실측(99.2배)에 맞춘 3 이었으면 백필 후 2.82 가 그대로 통과해
-        **이 정렬이 아무 일도 하지 않았다**(고쳤다고 믿는데 화면은 그대로)."""
+        """임계는 상수 + 근거 주석(ZONE_MIN_FOREIGN_SAMPLE 관례).
+
+        ★배율 상한은 **쫓지 말아야 하는 값**이고 주석이 그 사실을 말해야 한다. 하루에
+        두 번 낡았다 — 99.2배(상한 3 제안) → 2.82(상한 2 로 낮춤) → 1.572(게이트 통과).
+        세 번째에 값을 또 낮추는 것은 답이 아니었다: **문제는 임계값이 아니라 축의
+        입도**였고, 레인 축으로 낮추자 같은 상한 2 로 정확히 갈렸다."""
         for const, val in (("MOVER_SOURCE_MIN", "10"), ("MOVER_SOURCE_MAX_RATIO", "2")):
             decl = f"var {const} = {val};"
             self.assertIn(decl, self.js_src)
-            preceding = self.js_src[max(0, self.js_src.index(decl) - 900):self.js_src.index(decl)]
+            preceding = self.js_src[max(0, self.js_src.index(decl) - 1200):self.js_src.index(decl)]
             self.assertIn("//", preceding, f"{const} 근거 주석 누락")
         idx = self.js_src.index("var MOVER_SOURCE_MAX_RATIO = ")
-        self.assertIn("다시 재야 하는 값", self.js_src[max(0, idx - 900):idx],
-                      "배율 상한이 재측정 대상이라는 경고 누락")
+        why = self.js_src[max(0, idx - 1200):idx]
+        self.assertIn("축의 입도", why, "임계값이 아니라 축이 문제였다는 교훈 누락")
+        self.assertIn("비교 단위가 맞는지", why, "다음 사람에게 줄 지침 누락")
 
     def test_alignment_narrows_numerator_and_denominator_together(self):
         """★분모에서만 빼면 결함이 커진다(실측: 기타 품질시스템 +3.65 → +5.27, 없던
@@ -3928,7 +3933,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         fold = self._fn("foldCategorySource")
         for f in ("cur_cnt", "prev_cnt", "cur_docs", "prev_docs"):
             self.assertIn(f"e.{f} +=", fold, f"{f} 를 접지 않으면 툴팁이 본문과 어긋난다")
-        self.assertIn("if (!kept[r.source]) return;", fold)
+        self.assertIn("if (!kept[r.lane || r.source]) return;", fold)
         align = self._fn("alignSourceMix")
         self.assertIn("keptCur += c;", align)
         self.assertIn("keptPrev += p;", align)
@@ -3981,6 +3986,60 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("renderMoverSourceLine(d.by_source, curFindings, prevFindings, mix.dropped)",
                       fn)
         self.assertNotIn("renderMoverSourceLine(d.by_source, mix.", fn)
+
+    # ── [053] 비교 단위는 기관이 아니라 수집 채널(레인)이다 ────────────────────
+    #
+    # ★왜 축을 또 바꿨나: 052 를 적용한 당일 회수 백필(+914)이 들어오자 식약처 점유율
+    #   배율이 2.823 → 1.572 로 떨어져 게이트를 통과해 버렸고 유령이 그대로 남았다.
+    #   임계값을 또 낮추는 것은 답이 아니었다 — 식약처를 한 덩어리로 세면 성격이 전혀
+    #   다른 셋이 서로를 가린다(실측 증가율: 회수 1.22 · GMP실사 3.69 · 행정처분 67.0,
+    #   합치면 2.45라 "정상"으로 보인다). 레인 축으로 낮추자 **같은 상한 2** 로 갈렸다.
+
+    def test_migration_053_splits_only_channels_not_document_attributes(self):
+        """레인은 **수집 채널**이다. 식약처는 채널이 셋이라 쪼개고, 경고서한은
+        document_type 이 발신 부서(문서 속성)라 쪼개면 수십 종으로 갈라져 전부 표본
+        미달로 떨어진다 — 그래서 식약처만 쪼갠다."""
+        sql = self.sql053
+        self.assertIn("create or replace function public.findings_recent_window(p_months integer",
+                      sql)
+        self.assertIn("case when x.source = 'MFDS' then x.source || '/' || x.document_type",
+                      sql)
+        self.assertIn("else x.source end", sql)
+        self.assertIn("'lane',          ln,", sql)
+        # 묶음키가 lane 이어야 식약처 3채널이 갈린다(source 로 묶으면 다시 합쳐진다).
+        self.assertIn("from cur group by category_code, source, lane", sql)
+        self.assertIn("and p2.lane          = c.lane", sql)
+        # 041/052 안전 계약 승계 — 함수 본문 기준(헤더 주석은 계약을 설명하느라 이름을 적는다).
+        body = sql[sql.index("as $$"):sql.index("$$;")]
+        for leak in ("finding_text", "evidence_url", "raw_json"):
+            self.assertNotIn(leak, body, f"안전 계약 위반: {leak}")
+        self.assertIn("security definer", sql)
+        # raw_signals 조인 없이 findings.document_type 으로 파생한다(테이블 재스캔 0).
+        self.assertNotIn("raw_signals", body)
+
+    def test_lane_totals_come_from_the_cross_tab_not_by_source(self):
+        """★by_source 는 소스 축이라 식약처 3채널이 한 덩어리다 — 거기에 게이트를 걸면
+        레인을 못 가른다. 교차표는 카테고리 전수를 담으므로 카테고리로 합치면 그 레인의
+        창 합계가 정확히 나온다(라이브 검증: 접기 합계 2,989/1,914 = totals)."""
+        align = self._fn("alignSourceMix")
+        self.assertIn("laneTotals(grid).forEach", align)
+        self.assertNotIn("(d.by_source || []).forEach", align,
+                         "by_source 로 게이트를 걸면 식약처 3채널이 합쳐진다")
+        totals = self._fn("laneTotals")
+        self.assertIn("var k = r.lane || r.source;", totals)  # 053 미적용 폴백
+        self.assertIn("e.cur += Number(r.cur_cnt) || 0;", totals)
+        self.assertIn("e.prev += Number(r.prev_cnt) || 0;", totals)
+
+    def test_dropped_lane_names_are_human_readable(self):
+        """뺀 레인을 화면에 적을 때 내부 키(`MFDS/gmp-inspection`)를 그대로 노출하면
+        안 된다 — 사람이 읽는 이름으로 바꾼다(트랙C 품질 기준: 내부 개념 미노출)."""
+        self.assertIn('"MFDS/admin-action": "MFDS 행정처분"', self.js_src)
+        self.assertIn('"MFDS/gmp-inspection": "MFDS GMP 실사"', self.js_src)
+        self.assertIn('"MFDS/recall-quality": "MFDS 회수"', self.js_src)
+        align = self._fn("alignSourceMix")
+        self.assertEqual(align.count("source: laneLabel(s.lane)"), 2,
+                         "thin·skew 두 경로 모두 라벨을 거쳐야 한다")
+        self.assertNotIn("source: s.lane", align, "내부 키가 그대로 화면에 나간다")
 
     def test_in_progress_month_disclosed(self):
         """창의 마지막 달은 구조상 항상 진행 중이다 — 막대가 낮은 이유를 적지 않으면

@@ -3622,6 +3622,10 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
         cls.js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         cls.html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+        cls.sql041 = (WEB_DIR / "migrations" / "041_findings_recent_window.sql"
+                      ).read_text(encoding="utf-8")
+        cls.sql052 = (WEB_DIR / "migrations" /
+                      "052_findings_recent_window_category_source.sql").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
@@ -3759,9 +3763,15 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
         fn = fn[:fn.index("\n  }\n")]
         self.assertIn("var cc = c.cur_cnt || 0, pc = c.prev_cnt || 0;", fn)
+        # 052 이후 분모는 **소스 구성을 맞춘 뒤의** 창 합계(mix.curFindings)다. 지키는
+        # 성질은 그대로 — 분자·분모가 같은 모집단이라 각 창에서 합이 정확히 100%다.
+        # (변수 이름이 아니라 성질을 고정한다 — 이름으로 박아 두면 리팩터링이 의미 없는
+        #  실패를 낸다. 아래 test_source_mix_alignment_* 가 그 모집단의 정의를 따로 잠근다.)
         self.assertIn(
-            "deltaPp: (shareOf(cc, curFindings) - shareOf(pc, prevFindings)) * 100,", fn)
-        # 분모는 창 전체 지적 수여야 한다(문서 수 아님).
+            "deltaPp: (shareOf(cc, mix.curFindings) - shareOf(pc, mix.prevFindings)) * 100,", fn)
+        self.assertIn("curPct: pctText(cc, mix.curFindings),", fn)
+        self.assertIn("prevPct: pctText(pc, mix.prevFindings),", fn)
+        # 조정 전 원본 분모도 창 전체 지적 수여야 한다(문서 수 아님).
         self.assertIn("var curFindings = Number((totals.cur || {}).findings) || 0;", fn)
         self.assertIn("var prevFindings = Number((totals.prev || {}).findings) || 0;", fn)
         self.assertNotIn("docShare(", self.js_src)   # 되돌린 지표가 잔존하면 안 된다
@@ -3853,6 +3863,124 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         # 실측 수치가 리터럴로 박혀 있으면 안 된다(응답 의존 확인).
         for literal in ("682", "362", "1837", "1,837", "1421"):
             self.assertNotIn(literal, fn)
+
+    # ── [052] 소스 구성 정렬 — 각주로 적는 것에서 계산에서 빼는 것으로 ──────────
+    #
+    # ★왜 이 묶음이 생겼나(실측 2026-08-06, 041 과 같은 필터):
+    #   국내 백필로 식약처 점유율이 직전 10.63% → 최근 30.01%(2.82배)로 벌어지자, 표시
+    #   8행 중 5행이 유령이 되고 그중 3행은 **부호까지 반대**였다(기타 품질시스템
+    #   +3.75 → 정렬 후 −0.18 등). 진짜 신호인 컴퓨터화시스템(+1.18)은 임계 아래 가려졌다.
+    #   041 의 by_source 주석이 바로 이 상황을 예견하고 "화면에 나란히 적는다"로 대응했는데,
+    #   각주는 수동적이고 표제는 단정적이라 독자가 표를 먼저 믿는다. 그래서 계산에서 뺀다.
+
+    def test_migration_052_only_adds_a_key_and_keeps_041_contract(self):
+        """052 는 041 과 **같은 함수**의 create or replace 다. 기존 5개 키를 하나도
+        건드리지 않아야 한다 — 깨면 라이브 화면이 통째로 조용히 빈다."""
+        sql = self.sql052
+        self.assertIn("create or replace function public.findings_recent_window(p_months integer",
+                      sql)
+        for key in ("'scope'", "'totals'", "'by_month'", "'by_category'", "'by_source'"):
+            self.assertIn(key, sql, f"041 기존 키 {key} 소실")
+        self.assertIn("'by_category_source'", sql)
+        # 041 안전 계약 승계 — 원문 텍스트는 어떤 키로도 나가지 않는다.
+        # ★검사 범위는 **함수 본문**이다. 헤더 주석과 말미 검증 쿼리는 이 계약을 *설명*
+        #   하느라 같은 이름을 적으므로, 파일 전체를 보면 자기 설명에 자기가 걸린다.
+        body = sql[sql.index("as $$"):sql.index("$$;")]
+        for leak in ("finding_text", "evidence_url", "raw_json"):
+            self.assertNotIn(leak, body, f"안전 계약 위반: {leak}")
+        self.assertIn("security definer", sql)
+        self.assertIn("set search_path = public", sql)
+        self.assertIn("scope_status = 'ok'", sql)
+        # 041 의 by_source 키 이름 비대칭(cnt/docs)은 고치지 않는다(하위호환).
+        self.assertIn("'cnt',      cur_cnt,  'docs',      cur_docs,", sql)
+
+    def test_migration_052_reuses_the_single_scan_ctes(self):
+        """새 키가 테이블을 다시 훑으면 041 이 세운 '두 창을 한 번만 스캔' 계약이 깨지고,
+        필터·창 경계가 갈릴 여지가 생긴다. cur/prv CTE 를 그대로 재사용해야 한다."""
+        sql = self.sql052
+        start = sql.index("'by_category_source'")
+        # ★슬라이스를 **함수 본문 끝**에서 닫는다 — 파일 끝까지 자르면 뒤따르는
+        #   comment on / revoke / 검증 주석의 "public.findings" 가 섞여 들어와 오탐이 난다.
+        end = sql.index("$$;", start)
+        cross = sql[start:end]
+        self.assertNotIn("public.findings", cross, "새 키가 테이블을 재스캔한다")
+        self.assertIn("from cur group by category_code, source", cross)
+        self.assertIn("from prv group by category_code, source", cross)
+
+    def test_source_alignment_thresholds_declared_with_rationale(self):
+        """임계는 상수 + 근거 주석(ZONE_MIN_FOREIGN_SAMPLE 관례). 특히 배율 상한은
+        ★데이터가 움직이면 다시 재야 하는 값이라 그 사실 자체를 주석이 말해야 한다 —
+        설계 시점 실측(99.2배)에 맞춘 3 이었으면 백필 후 2.82 가 그대로 통과해
+        **이 정렬이 아무 일도 하지 않았다**(고쳤다고 믿는데 화면은 그대로)."""
+        for const, val in (("MOVER_SOURCE_MIN", "10"), ("MOVER_SOURCE_MAX_RATIO", "2")):
+            decl = f"var {const} = {val};"
+            self.assertIn(decl, self.js_src)
+            preceding = self.js_src[max(0, self.js_src.index(decl) - 900):self.js_src.index(decl)]
+            self.assertIn("//", preceding, f"{const} 근거 주석 누락")
+        idx = self.js_src.index("var MOVER_SOURCE_MAX_RATIO = ")
+        self.assertIn("다시 재야 하는 값", self.js_src[max(0, idx - 900):idx],
+                      "배율 상한이 재측정 대상이라는 경고 누락")
+
+    def test_alignment_narrows_numerator_and_denominator_together(self):
+        """★분모에서만 빼면 결함이 커진다(실측: 기타 품질시스템 +3.65 → +5.27, 없던
+        유령 2행 신규 발생). 052 교차표로 분자(카테고리별 건수)와 분모(창 합계)를
+        **같은 소스 집합**으로 함께 좁혀야 한다."""
+        fold = self._fn("foldCategorySource")
+        for f in ("cur_cnt", "prev_cnt", "cur_docs", "prev_docs"):
+            self.assertIn(f"e.{f} +=", fold, f"{f} 를 접지 않으면 툴팁이 본문과 어긋난다")
+        self.assertIn("if (!kept[r.source]) return;", fold)
+        align = self._fn("alignSourceMix")
+        self.assertIn("keptCur += c;", align)
+        self.assertIn("keptPrev += p;", align)
+        self.assertIn("foldCategorySource(grid, kept)", align)
+
+    def test_alignment_falls_back_when_response_lacks_cross_tab(self):
+        """052 미적용 라이브·구버전 캐시에서는 이 키가 없다 — 조정 없이 종전 경로로
+        가야 하고, 패널이 깨지면 안 된다(신·구 어느 조합에서도)."""
+        align = self._fn("alignSourceMix")
+        self.assertIn("var grid = d.by_category_source;", align)
+        self.assertIn("if (!grid || !grid.length) return raw;", align)
+        self.assertIn("cats: d.by_category || []", align)
+        self.assertIn("applied: false", align)
+
+    def test_alignment_never_shows_an_unadjusted_table_silently(self):
+        """★견줄 수 있는 소스가 하나도 없는 상황이 가장 못 믿을 상황이다. 그때 조정 전
+        표를 아무 고지 없이 내면 '캐치올이 정상 응답처럼 보인다'는 이 저장소의 반복
+        실패와 같은 형태가 된다 — usable=false 로 알리고 패널을 숨긴다."""
+        align = self._fn("alignSourceMix")
+        self.assertIn("raw.usable = false;", align)
+        self.assertIn("raw.dropped = dropped;", align)
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (!mix.usable) return;", fn)
+        # 조정 후 창이 얇아져도 비교하지 않는다.
+        self.assertIn("mix.curFindings < WINDOW_MIN_FINDINGS", fn)
+        # ★숨김은 early return 이어야 한다 — hidden=true 로 끄면 이전에 그린 표가 남는다.
+        self.assertNotIn("moveBlockEl.hidden = true", self.js_src)
+
+    def test_dropped_sources_are_named_with_the_reason_that_actually_fired(self):
+        """조용히 빼면 위 표가 전량 비교처럼 보인다. 그리고 ★사유 문구는 실제로 성립한
+        조건과 같아야 한다 — 표본 검사 조건은 OR 이므로 '두 기간 모두 적다'가 아니라
+        '한쪽 기간이 적다'다. (식약처는 807/174 라 표본이 아니라 배율로 걸린다.)"""
+        line = self._fn("renderMoverSourceLine")
+        self.assertIn("비교에서 뺀 소스: ", line)
+        self.assertIn('s.reason === "thin"', line)
+        self.assertIn("한쪽 기간이 ", line)
+        self.assertIn("두 기간 자료량 차이가 큼", line)
+        self.assertNotIn("두 기간 모두", line)
+        align = self._fn("alignSourceMix")
+        self.assertIn('reason: "thin"', align)
+        self.assertIn('reason: "skew"', align)
+
+    def test_source_mix_line_keeps_unadjusted_totals(self):
+        """★이 줄만은 조정 **전** 총량 기준이어야 한다 — 뺀 소스까지 포함한 전체 구성을
+        보여야 독자가 무엇을 뺐는지 대조할 수 있다. 조정 총량을 넘기면 정직성 고지 자체가
+        사라진다(오탐 수리가 새 침묵을 만드는 형태)."""
+        fn = self.js_src[self.js_src.index("function renderMovers(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("renderMoverSourceLine(d.by_source, curFindings, prevFindings, mix.dropped)",
+                      fn)
+        self.assertNotIn("renderMoverSourceLine(d.by_source, mix.", fn)
 
     def test_in_progress_month_disclosed(self):
         """창의 마지막 달은 구조상 항상 진행 중이다 — 막대가 낮은 이유를 적지 않으면

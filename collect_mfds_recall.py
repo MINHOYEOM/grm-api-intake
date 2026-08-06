@@ -43,6 +43,31 @@ REGION_MFDS = "Korea (MFDS)"
 PAGE_SIZE = 100
 MAX_PAGES = 25
 
+# [백필 관측 2026-08-05] 페이지 단위 실패는 1건이라도 수집했으면 `(items, None)` 으로
+# 돌아간다 — 매일 라인에서는 부분 수집이 옳지만(다음 날 다시 받는다), **1회성 백필에서는
+# 조용한 부분 수집이 가장 위험하다.** 반환값 규약은 그대로 두고(매일 라인 동작 불변)
+# 관측치만 모듈 전역에 남겨, 백필 스크립트가 읽어 리포트·종료코드로 표면화한다
+# (collect_mfds_gmp_inspection.LAST_HEALTH 와 동형).
+LAST_HEALTH: dict[str, Any] = {}
+
+
+def _set_last_health(
+    *,
+    collected: int,
+    total_count: int,
+    pages_seen: int,
+    truncated: bool,
+    page_warnings: list[str],
+) -> None:
+    global LAST_HEALTH
+    LAST_HEALTH = {
+        "collected": collected,
+        "total_count": total_count,
+        "pages_seen": pages_seen,
+        "truncated": truncated,
+        "page_warnings": list(page_warnings),
+    }
+
 
 _parse_int = parse_int_safe
 _text = text_field
@@ -146,6 +171,9 @@ def collect_mfds_recall(
 
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
+    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
+                     page_warnings=[])
+    pages_seen = 0
     # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다. 요청에 order
     # 미지정(admin 의 order:Y 와 달리 미검증)이므로 날짜 기반 조기중단을 쓰지 않고 datago_paginate
     # 의 totalCount/빈 페이지 종료에만 의존한다(page 1 의 과거 행으로 후속 페이지 최신 회수 누락 방지).
@@ -154,6 +182,7 @@ def collect_mfds_recall(
         http_get=http_get_json, max_pages=MAX_PAGES, page_size=PAGE_SIZE)
     try:
         for raw_items, masked_url in paginator:
+            pages_seen += 1
             for raw in raw_items:
                 date_iso = _item_date(raw)
                 if not _within_window(date_iso, start, end):
@@ -166,8 +195,13 @@ def collect_mfds_recall(
     except DatagoPageError as e:
         msg = f"MFDS recall API page={e.page_no} 실패: {e.cause}"
         if items:
+            # 매일 라인 계약 유지(부분 수집을 치명적으로 보지 않는다). 다만 흔적은 남긴다.
             log("WARN", msg)
+            _set_last_health(collected=len(items), total_count=paginator.total_count,
+                             pages_seen=pages_seen, truncated=False, page_warnings=[msg])
             return items, None
+        _set_last_health(collected=0, total_count=paginator.total_count,
+                         pages_seen=pages_seen, truncated=False, page_warnings=[msg])
         return [], msg
 
     total_count = paginator.total_count
@@ -184,4 +218,7 @@ def collect_mfds_recall(
         "MFDS recall 수집 완료: "
         f"{len(items)}건 (totalCount={total_count})",
     )
+    _set_last_health(collected=len(items), total_count=total_count,
+                     pages_seen=pages_seen, truncated=bool(paginator.truncated),
+                     page_warnings=[])
     return items, truncated_msg

@@ -81,5 +81,63 @@ class RecallPaginationTerminationTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
 
 
+class RecallHealthObservabilityTest(RecallPaginationTerminationTest):
+    """★페이지 실패는 `(items, None)` 으로 **성공처럼** 돌아온다.
+
+    매일 라인에서는 옳은 계약이다(다음 날 다시 받는다). 그러나 1회성 백필에서는
+    조용한 부분 수집이 가장 위험한 실패라, 반환값 규약은 그대로 두고 관측치를
+    모듈 전역 `LAST_HEALTH` 에 남겨 백필이 읽어 표면화하게 한다.
+    """
+
+    def setUp(self) -> None:
+        r.LAST_HEALTH = {}
+
+    def test_success_records_total_count_and_pages(self) -> None:
+        page1 = [
+            {"PRDUCT": "회수의약품", "ENTRPS": "회사", "RTRVL_RESN": "회수 사유",
+             "RECALL_COMMAND_DATE": "20260601"}
+        ]
+        items, err, _ = self._run_with_pages(
+            {1: page1}, total_count=1, start=date(2026, 1, 1), end=date(2026, 12, 31)
+        )
+        self.assertIsNone(err)
+        self.assertEqual(r.LAST_HEALTH["total_count"], 1)
+        self.assertEqual(r.LAST_HEALTH["collected"], 1)
+        self.assertEqual(r.LAST_HEALTH["pages_seen"], 1)
+        self.assertFalse(r.LAST_HEALTH["truncated"])
+        self.assertEqual(r.LAST_HEALTH["page_warnings"], [])
+
+    def test_page_failure_after_some_items_is_recorded_though_err_is_none(self) -> None:
+        page1 = [
+            {"PRDUCT": "회수의약품", "ENTRPS": "회사", "RTRVL_RESN": "회수 사유",
+             "RECALL_COMMAND_DATE": "20260601"}
+        ]
+
+        def fake_http_get_json(endpoint, params=None, timeout=None, retries=None):
+            if params["pageNo"] >= 2:
+                raise RuntimeError("HTTP GET final failure")
+            return {"_page": params["pageNo"]}
+
+        def fake_extract_items(data):
+            return page1, data["_page"], r.PAGE_SIZE, 500, "00:정상"
+
+        orig_http, orig_extract = r.http_get_json, r._extract_items
+        r.http_get_json = fake_http_get_json
+        r._extract_items = fake_extract_items
+        try:
+            items, err = r.collect_mfds_recall(
+                date(2026, 1, 1), date(2026, 12, 31), service_key="dummy")
+        finally:
+            r.http_get_json = orig_http
+            r._extract_items = orig_extract
+
+        # 계약 유지: 부분 수집이라도 err 는 None (매일 라인 동작 불변)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        # ★그러나 흔적은 남는다 — 백필이 이걸 읽어 exit 4 로 표면화한다.
+        self.assertTrue(r.LAST_HEALTH["page_warnings"])
+        self.assertIn("page=2", r.LAST_HEALTH["page_warnings"][0])
+
+
 if __name__ == "__main__":
     unittest.main()

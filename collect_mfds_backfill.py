@@ -44,6 +44,8 @@ exit code 규약:
   2 = 수집 자체 실패 / 인자·자격증명·가드 위반
   3 = 페이지 상한 도달(truncated) — 수집·적재는 수행했으나 창을 다 못 덮었을 수 있다.
       `--max-pages` 를 올려 재실행하라(멱등).
+  4 = 부분 수집(페이지 단위 실패) — 수집기는 성공처럼 `(items, None)` 을 돌려주지만
+      일부 페이지를 못 받았다. 그대로 두면 그 페이지는 영영 비어 있으므로 재실행하라.
 """
 
 from __future__ import annotations
@@ -104,12 +106,14 @@ SOURCE_SPECS: dict[str, SourceSpec] = {
         label="MFDS 행정처분",
         module=collect_mfds_admin_action,
         func_name="collect_mfds_admin_actions",
+        health_attr="LAST_HEALTH",
     ),
     "recall": SourceSpec(
         key="recall",
         label="MFDS 회수·판매중지",
         module=collect_mfds_recall,
         func_name="collect_mfds_recall",
+        health_attr="LAST_HEALTH",
     ),
     "gmp-inspection": SourceSpec(
         key="gmp-inspection",
@@ -141,6 +145,7 @@ class BackfillReport:
     partial: int = 0
     failed: int = 0
     truncated: bool = False
+    partial_collect: bool = False  # 페이지 단위 실패로 일부만 받았다(수집기는 성공처럼 반환)
     findings_inserted: int = 0
     findings_duplicate: int = 0
     findings_invalid: int = 0
@@ -180,7 +185,8 @@ def resolve_source(source: str) -> SourceSpec:
 
 
 _HEALTH_KEYS = (
-    "item_count", "parsed_rows", "pages_seen", "max_pages_reached",
+    "item_count", "collected", "parsed_rows", "pages_seen", "max_pages_reached",
+    "total_count", "truncated", "filtered",
     "parse_status_counts", "deficiency_counts", "manual_review_count",
     "page_warnings", "deficiency_table",
 )
@@ -277,12 +283,16 @@ def run(
     # `max_pages_reached` 와 WARN 로그로만 알린다 — 안 읽으면 완전히 침묵한다.
     # 같은 이유로 부분 페이지 실패(page_warnings)도 err=None 으로 돌아온다.
     report.source_health = read_health(spec)
-    if report.source_health.get("max_pages_reached"):
+    if report.source_health.get("max_pages_reached") or report.source_health.get("truncated"):
         report.truncated = True
         report.errors.append(
             f"collect_truncated:{spec.label} max_pages={report.max_pages} 도달(health)")
         log("WARN", f"{spec.label} 백필 상한 도달(truncated·health) — max_pages={report.max_pages}")
+    # ★페이지 단위 실패는 세 수집기 모두 `(items, None)` 으로 **성공처럼** 돌려준다.
+    # 매일 라인에서는 옳은 계약이지만(다음 날 다시 받는다), 1회성 백필에서 조용한 부분
+    # 수집은 가장 위험한 실패다 — 다시 안 돌리면 그 페이지는 영영 비어 있다.
     for warn in report.source_health.get("page_warnings") or ():
+        report.partial_collect = True
         report.errors.append(f"collect_page_warning:{warn}")
         log("WARN", f"{spec.label} 페이지 경고: {warn}")
 
@@ -354,6 +364,8 @@ def run(
         return report, 1
     if report.truncated:
         return report, 3
+    if report.partial_collect:
+        return report, 4
     return report, 0
 
 

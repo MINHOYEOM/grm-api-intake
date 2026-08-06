@@ -222,15 +222,16 @@ class TestGmpInspectionSource(unittest.TestCase):
         self.assertTrue(any("collect_truncated" in e for e in report.errors))
 
     def test_page_warnings_are_surfaced_not_swallowed(self):
-        """부분 페이지 실패도 err=None 으로 돌아온다 — 리포트에 남겨야 한다."""
+        """부분 페이지 실패도 err=None 으로 돌아온다 — 리포트에 남기고 exit 4 로 표면화."""
         collect_mfds_gmp_inspection.LAST_HEALTH = {
             "max_pages_reached": False,
             "page_warnings": ["page=3: HTML 실패"],
         }
         report, code = _run(source="gmp-inspection", dry_run=True,
                             collector=_collector2([_Item("a")]), appender=mock.Mock())
-        self.assertEqual(code, 0)
+        self.assertEqual(code, 4)
         self.assertFalse(report.truncated)
+        self.assertTrue(report.partial_collect)
         self.assertTrue(any("collect_page_warning" in e for e in report.errors))
 
     def test_health_is_carried_into_report(self):
@@ -272,6 +273,63 @@ class TestGmpInspectionSource(unittest.TestCase):
             _, code = _run(dry_run=True, collector=_collector([_Item("a")]),
                            appender=mock.Mock())
         self.assertEqual(code, 0)
+
+
+class TestPartialCollectIsNotSilent(unittest.TestCase):
+    """★data.go.kr 계열도 페이지 실패를 `(items, None)` 으로 성공처럼 돌려준다.
+
+    1회성 백필에서 조용한 부분 수집은 가장 위험한 실패다 — 다시 안 돌리면 그 페이지는
+    영영 비어 있는데, 리포트는 초록이고 건수도 그럴듯하다.
+    """
+
+    def setUp(self):
+        self._orig = dict(collect_mfds_recall.LAST_HEALTH)
+        self.addCleanup(setattr, collect_mfds_recall, "LAST_HEALTH", self._orig)
+
+    def test_page_warning_exits_4_and_still_appends(self):
+        collect_mfds_recall.LAST_HEALTH = {
+            "collected": 1, "total_count": 500, "pages_seen": 1, "truncated": False,
+            "page_warnings": ["MFDS recall API page=2 실패: timeout"],
+        }
+        appender = mock.Mock(return_value=_Res("inserted", findings_inserted=1))
+        report, code = _run(source="recall", collector=_collector([_Item("r1")]),
+                            appender=appender)
+        self.assertEqual(code, 4)
+        self.assertTrue(report.partial_collect)
+        self.assertEqual(report.appended, 1)  # 수집물은 버리지 않는다
+        self.assertTrue(any("collect_page_warning" in e for e in report.errors))
+
+    def test_health_total_count_reaches_report(self):
+        collect_mfds_recall.LAST_HEALTH = {
+            "collected": 3, "total_count": 1234, "pages_seen": 13, "truncated": False,
+            "page_warnings": [],
+        }
+        report, code = _run(source="recall", dry_run=True,
+                            collector=_collector([_Item("a")]), appender=mock.Mock())
+        self.assertEqual(code, 0)
+        self.assertEqual(report.source_health["total_count"], 1234)
+        self.assertFalse(report.partial_collect)
+
+    def test_health_truncated_flag_exits_3(self):
+        collect_mfds_recall.LAST_HEALTH = {
+            "collected": 2500, "total_count": 9999, "pages_seen": 25, "truncated": True,
+            "page_warnings": [],
+        }
+        report, code = _run(source="recall", dry_run=True,
+                            collector=_collector([_Item("a")]), appender=mock.Mock())
+        self.assertEqual(code, 3)
+        self.assertTrue(report.truncated)
+
+    def test_truncation_outranks_partial_collect(self):
+        collect_mfds_recall.LAST_HEALTH = {
+            "collected": 1, "total_count": 9999, "pages_seen": 25, "truncated": True,
+            "page_warnings": ["page=7 실패"],
+        }
+        report, code = _run(source="recall", dry_run=True,
+                            collector=_collector([_Item("a")]), appender=mock.Mock())
+        self.assertEqual(code, 3)
+        self.assertTrue(report.truncated)
+        self.assertTrue(report.partial_collect)
 
 
 class TestFindingsCounters(unittest.TestCase):

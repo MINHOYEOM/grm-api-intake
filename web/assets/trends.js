@@ -48,8 +48,11 @@
  *   ① 최근 12개월(renderRecentWindow) — 041 findings_recent_window. 월별 문서 수 막대
  *      24개월(최근/직전 2색) + 최근 창 카테고리 순위.
  *   ② 달라진 점(renderMovers) — 같은 041 응답에서 파생(추가 fetch 0). 최근 12개월 vs
- *      직전 12개월의 **문서 등장률** 차이(%p). 건수가 아닌 이유는 renderMovers 주석 참조.
- *      교란 요인인 소스 구성 변화는 by_source 의 cur/prev 로 화면에 함께 적는다.
+ *      직전 12개월의 **구성비**(그 창 지적 전체 중 이 영역의 비율) 차이(%p). 처음에
+ *      "문서 등장률"로 만들었다가 되돌린 이력과 그 이유는 renderMovers 위 주석 (1) 참조.
+ *      교란 요인인 소스 구성 변화는 화면에 적기만 하는 게 아니라 **계산에서 정렬한다** —
+ *      052 by_category_source 로 두 창에서 견줄 수 있는 소스만 남겨 분자·분모를 함께
+ *      좁히고, 뺀 소스는 구성 표기와 나란히 적는다(alignSourceMix).
  *   ③ 업체 찾기(runFirmFind) — 041 findings_firm_search. 이름으로 찾아 013 업체 프로파일
  *      페이지로 보낸다. 그리고 최근 창 카테고리 행을 누르면 **실제 지적 문장**을 펼친다.
  *
@@ -291,6 +294,26 @@
   var MOVER_MIN_PP = 1.0;
   // 각 방향(증가/감소) 최대 표시 개수.
   var MOVER_MAX_ROWS = 5;
+  // ── [소스 구성 정렬] 두 창의 모집단을 맞추는 기준 ─────────────────────────
+  // ★왜 필요한가(실측 2026-08-06, 최근 2025-09~2026-08 vs 직전 2024-09~2025-08):
+  //   국내 백필로 식약처 점유율이 직전 10.63% → 최근 30.01% 로 벌어졌다. 그 비대칭이
+  //   구성비에 그대로 실려, 표시 8행 중 **5행이 유령이고 그중 3행은 부호까지 반대**였다
+  //   (기타 품질시스템 +3.75 → 정렬 후 −0.18, 세척밸리데이션 +1.12 → −0.09,
+  //    품질부서 감독 −1.61 → +0.02). 진짜 신호인 컴퓨터화시스템(+1.18)은 임계 아래에
+  //   가려 안 보였다. 카테고리가 변한 게 아니라 모집단이 변한 것이다.
+  //   → 두 창에서 견줄 수 있는 소스만 남겨 **분자와 분모를 함께** 좁힌다.
+  //   ※ 분모에서만 빼면 결함이 커진다(실측: 기타 품질시스템 +3.65 → +5.27, 유령 2행 추가).
+  // 표본 하한 — 한쪽 창의 건수가 이보다 적으면 그 소스는 그 기간을 대표하지 못한다.
+  // (실측: MHRA GMP NCR 은 두 창 모두 1건 — 구성비를 말할 수 있는 표본이 아니다.)
+  var MOVER_SOURCE_MIN = 10;
+  // 점유율 배율 상한 — 두 창의 소스 점유율이 이 배수를 넘게 벌어졌으면 그 소스는
+  // 카테고리를 말하는 게 아니라 **자기 자신이 들어오거나 빠진 것**이다.
+  // ★이 값은 다시 재야 하는 값이다. 설계 시점 실측은 식약처 99.2배여서 상한 3 을
+  //   제안했었는데, 백필이 직전 창에도 자료를 넣으면서 배율이 2.82 로 떨어졌다 —
+  //   상한 3 이었으면 그대로 통과해 **이 정렬이 아무 일도 하지 않았다**(고쳤다고 믿는데
+  //   화면은 그대로인, 가장 나쁜 결과). 오늘 실측 간극(EU 1.305 ↔ 식약처 2.823)의
+  //   가운데인 2 로 잡았다. 소스 구성이 또 크게 바뀌면 이 값을 재확인할 것.
+  var MOVER_SOURCE_MAX_RATIO = 2;
   // 최근 12개월 카테고리 순위에 그리는 행 수.
   var RECENT_CAT_ROWS = 8;
   // 카테고리 사례 패널에 보여 줄 지적 문장 수 / 한 문장 표시 상한(글자).
@@ -1243,10 +1266,90 @@
     rows.forEach(function (r) { listEl.appendChild(buildMoverRow(r, isUp)); });
   }
 
+  // 052 by_category_source 를 남긴 소스로만 접어 by_category 모양으로 되돌린다.
+  // 문서 수(docs)도 함께 접는다 — raw_signal 은 소스 하나에만 속하므로 소스별 문서 수의
+  // 합이 그 카테고리의 문서 수와 정확히 같다(실측 20/20 카테고리, 두 창 모두 불일치 0).
+  // 건수만 좁히고 문서 수를 그대로 두면 행의 툴팁("문서 N건 → M건")이 본문과 어긋난다.
+  function foldCategorySource(grid, kept) {
+    var byCode = {};
+    (grid || []).forEach(function (r) {
+      if (!kept[r.source]) return;
+      var e = byCode[r.category_code];
+      if (!e) {
+        e = byCode[r.category_code] = {
+          category_code: r.category_code,
+          cur_cnt: 0, prev_cnt: 0, cur_docs: 0, prev_docs: 0,
+        };
+      }
+      e.cur_cnt += Number(r.cur_cnt) || 0;
+      e.prev_cnt += Number(r.prev_cnt) || 0;
+      e.cur_docs += Number(r.cur_docs) || 0;
+      e.prev_docs += Number(r.prev_docs) || 0;
+    });
+    return Object.keys(byCode).map(function (k) { return byCode[k]; });
+  }
+
+  // 두 창에서 견줄 수 있는 소스만 남긴 비교 모집단을 만든다.
+  //   · 052 by_category_source 가 없는 응답(041 만 배포된 라이브·구버전 캐시)에서는
+  //     조정하지 않고 by_category 를 그대로 돌려준다 — 신·구 어느 응답에서도 이 패널이
+  //     깨지면 안 된다.
+  //   · 뺄 소스가 없으면 역시 조정하지 않는다(접기 결과가 by_category 와 같다).
+  //   · ★남는 소스가 하나도 없으면 `usable=false` 로 알린다. 그 상태로 조정 전 표를
+  //     그대로 내면 **가장 못 믿을 상황에서 아무 고지 없이 유령 표가 나간다** — 이
+  //     저장소가 반복해 겪은 "캐치올이 정상 응답처럼 보인다" 와 같은 형태다.
+  function alignSourceMix(d, curFindings, prevFindings) {
+    var raw = {
+      applied: false, usable: true,
+      cats: d.by_category || [],
+      curFindings: curFindings, prevFindings: prevFindings,
+      dropped: [],
+    };
+    var grid = d.by_category_source;
+    if (!grid || !grid.length) return raw;
+
+    var kept = {}, dropped = [], keptCur = 0, keptPrev = 0;
+    (d.by_source || []).forEach(function (s) {
+      var c = Number(s.cnt) || 0, p = Number(s.prev_cnt) || 0;
+      // 표본이 얇으면 배율을 따지는 것 자체가 무의미하므로 이 검사가 먼저다.
+      // ★사유 문구는 실제로 성립한 조건과 같아야 한다 — 조건은 OR 이므로
+      //   "두 기간 모두 적다"가 아니라 "한쪽이 적다"로 적는다(한쪽만 적어도 걸린다).
+      if (c < MOVER_SOURCE_MIN || p < MOVER_SOURCE_MIN) {
+        dropped.push({ source: s.source, curCnt: c, prevCnt: p, reason: "thin" });
+        return;
+      }
+      var ratio = shareOf(c, curFindings) / shareOf(p, prevFindings);
+      // !(ratio <= MAX) 형태는 NaN·Infinity 를 전부 제외 쪽으로 떨어뜨린다.
+      if (!(ratio <= MOVER_SOURCE_MAX_RATIO) || ratio < 1 / MOVER_SOURCE_MAX_RATIO) {
+        dropped.push({ source: s.source, curCnt: c, prevCnt: p, reason: "skew" });
+        return;
+      }
+      kept[s.source] = true;
+      keptCur += c;
+      keptPrev += p;
+    });
+    if (!dropped.length) return raw;
+
+    var cats = foldCategorySource(grid, kept);
+    if (!cats.length) {
+      // 견줄 수 있는 소스가 하나도 없다 — 조정 전 표를 대신 내보내지 않는다.
+      raw.usable = false;
+      raw.dropped = dropped;
+      return raw;
+    }
+    return {
+      applied: true, usable: true,
+      cats: cats,
+      curFindings: keptCur, prevFindings: keptPrev,
+      dropped: dropped,
+    };
+  }
+
   // 두 창의 소스 구성을 나란히 적는다 — 증감 비교의 최대 교란 요인이라 감추지 않는다.
   // 분모는 위 증감과 **같은 단위(지적 건수)** 로 맞춘다(문서 기준으로 적으면 독자가 두
   // 수치를 같은 잣대로 견줄 수 없다). 어느 쪽 창에서든 1% 이상인 소스만 적는다.
-  function renderMoverSourceLine(bySource, curFindings, prevFindings) {
+  // ★이 줄만은 **조정 전 총량** 기준이다 — 뺀 소스까지 포함한 전체 구성을 보여야 독자가
+  //   무엇을 뺐는지 대조할 수 있다. 조정 총량으로 바꾸면 정직성 고지 자체가 사라진다.
+  function renderMoverSourceLine(bySource, curFindings, prevFindings, droppedSources) {
     if (!moveSourceEl) return;
     var parts = (bySource || []).map(function (s) {
       return {
@@ -1258,10 +1361,24 @@
       };
     }).filter(function (s) { return s.cur >= 0.01 || s.prev >= 0.01; })
       .sort(function (a, b) { return b.cur - a.cur; });
-    if (!parts.length) { moveSourceEl.textContent = ""; return; }
-    moveSourceEl.textContent = "두 기간의 소스 구성: " +
-      parts.map(function (s) { return s.source + " " + s.prevPct + " → " + s.curPct; }).join(" · ") +
-      ". 소스 구성이 달라지면 위 증감도 함께 움직입니다.";
+    var text = "";
+    if (parts.length) {
+      text = "두 기간의 소스 구성: " +
+        parts.map(function (s) { return s.source + " " + s.prevPct + " → " + s.curPct; }).join(" · ") +
+        ".";
+    }
+    // ★뺀 소스는 이름·건수·이유를 그대로 적는다 — 조용히 빼면 위 표가 전량 비교처럼 보인다.
+    var out = (droppedSources || []);
+    if (out.length) {
+      text += (text ? " " : "") + "비교에서 뺀 소스: " + out.map(function (s) {
+        return s.source + "(직전 " + fmtNum(s.prevCnt) + "건 → 최근 " + fmtNum(s.curCnt) + "건, " +
+          (s.reason === "thin" ? "한쪽 기간이 " + MOVER_SOURCE_MIN + "건 미만"
+                               : "두 기간 자료량 차이가 큼") + ")";
+      }).join(" · ") + ". 두 기간에 걸쳐 견줄 수 있는 소스만 남겨 위 증감을 계산했습니다.";
+    } else if (text) {
+      text += " 소스 구성이 달라지면 위 증감도 함께 움직입니다.";
+    }
+    moveSourceEl.textContent = text;
   }
 
   function renderMovers(data) {
@@ -1273,8 +1390,14 @@
     // 창이 얇으면 비교 자체를 하지 않는다 — 숨김 유지(억지 해석 금지).
     if (curFindings < WINDOW_MIN_FINDINGS || prevFindings < WINDOW_MIN_FINDINGS) return;
 
+    // 두 창의 소스 구성을 맞춘다. 견줄 수 있는 소스가 없거나, 맞추고 나니 창이 얇아지면
+    // 비교를 하지 않는다 — 조정 전 표를 대신 내보내지 않는다(숨김 유지).
+    var mix = alignSourceMix(d, curFindings, prevFindings);
+    if (!mix.usable) return;
+    if (mix.curFindings < WINDOW_MIN_FINDINGS || mix.prevFindings < WINDOW_MIN_FINDINGS) return;
+
     var dropped = 0;
-    var rows = (d.by_category || []).map(function (c) {
+    var rows = (mix.cats || []).map(function (c) {
       var label = CATEGORY_LABELS[c.category_code];
       var cc = c.cur_cnt || 0, pc = c.prev_cnt || 0;
       return {
@@ -1284,9 +1407,9 @@
         prevCnt: pc,
         curDocs: c.cur_docs || 0,
         prevDocs: c.prev_docs || 0,
-        curPct: pctText(cc, curFindings),
-        prevPct: pctText(pc, prevFindings),
-        deltaPp: (shareOf(cc, curFindings) - shareOf(pc, prevFindings)) * 100,
+        curPct: pctText(cc, mix.curFindings),
+        prevPct: pctText(pc, mix.prevFindings),
+        deltaPp: (shareOf(cc, mix.curFindings) - shareOf(pc, mix.prevFindings)) * 100,
       };
     }).filter(function (r) {
       if (r.curCnt + r.prevCnt >= MOVER_MIN_SAMPLE) return true;
@@ -1301,12 +1424,14 @@
     fillMoverList(moveUpEl, up, true);
     fillMoverList(moveDownEl, down, false);
 
-    renderMoverSourceLine(d.by_source, curFindings, prevFindings);
+    // 소스 구성 줄은 **조정 전 총량** 기준으로 넘긴다(위 함수 주석 참조).
+    renderMoverSourceLine(d.by_source, curFindings, prevFindings, mix.dropped);
     if (moveNoteEl) {
       // ★"비중이 줄었다 ≠ 건수가 줄었다" — 이 한 줄이 없으면 표가 오독된다.
       var note = "여기서 재는 것은 전체에서 차지하는 비중입니다. 건수가 늘어도 다른 영역이 " +
         "더 늘면 비중은 줄어듭니다 — 각 줄의 건수를 함께 보세요. 비교 기준: 최근 12개월 지적 " +
-        fmtNum(curFindings) + "건 vs 직전 12개월 " + fmtNum(prevFindings) + "건.";
+        fmtNum(mix.curFindings) + "건 vs 직전 12개월 " + fmtNum(mix.prevFindings) + "건" +
+        (mix.applied ? "(견줄 수 있는 소스만)" : "") + ".";
       if (dropped > 0) {
         note += " 두 기간 합이 " + MOVER_MIN_SAMPLE + "건 미만인 " + dropped +
           "개 영역은 비율이 흔들려 뺐습니다.";

@@ -306,13 +306,14 @@
   // 표본 하한 — 한쪽 창의 건수가 이보다 적으면 그 소스는 그 기간을 대표하지 못한다.
   // (실측: MHRA GMP NCR 은 두 창 모두 1건 — 구성비를 말할 수 있는 표본이 아니다.)
   var MOVER_SOURCE_MIN = 10;
-  // 점유율 배율 상한 — 두 창의 소스 점유율이 이 배수를 넘게 벌어졌으면 그 소스는
+  // 점유율 배율 상한 — 두 창의 레인 점유율이 이 배수를 넘게 벌어졌으면 그 레인은
   // 카테고리를 말하는 게 아니라 **자기 자신이 들어오거나 빠진 것**이다.
-  // ★이 값은 다시 재야 하는 값이다. 설계 시점 실측은 식약처 99.2배여서 상한 3 을
-  //   제안했었는데, 백필이 직전 창에도 자료를 넣으면서 배율이 2.82 로 떨어졌다 —
-  //   상한 3 이었으면 그대로 통과해 **이 정렬이 아무 일도 하지 않았다**(고쳤다고 믿는데
-  //   화면은 그대로인, 가장 나쁜 결과). 오늘 실측 간극(EU 1.305 ↔ 식약처 2.823)의
-  //   가운데인 2 로 잡았다. 소스 구성이 또 크게 바뀌면 이 값을 재확인할 것.
+  // ★★이 값을 쫓지 마라. 하루에 두 번 낡았다 — 설계 시점 식약처 99.2배(상한 3 제안)
+  //   → 세션2 적재 후 2.82(상한 2 로 낮춤) → 세션3 적재 후 **1.572 로 게이트 통과**.
+  //   임계값을 또 낮추는 것은 답이 아니었다. **문제는 임계값이 아니라 축의 입도였다** —
+  //   식약처를 한 덩어리로 세니 회수(1.22)·GMP실사(3.69)·행정처분(67.0)이 서로를 가려
+  //   합계가 "정상"으로 보였다. 축을 레인으로 낮추자 **같은 상한 2 로 정확히 갈렸다**.
+  //   그러니 다음에 이 게이트가 헛돌면 값을 만지기 전에 **비교 단위가 맞는지** 먼저 보라.
   var MOVER_SOURCE_MAX_RATIO = 2;
   // 최근 12개월 카테고리 순위에 그리는 행 수.
   var RECENT_CAT_ROWS = 8;
@@ -1266,14 +1267,41 @@
     rows.forEach(function (r) { listEl.appendChild(buildMoverRow(r, isUp)); });
   }
 
-  // 052 by_category_source 를 남긴 소스로만 접어 by_category 모양으로 되돌린다.
+  // ── [레인] 비교 단위는 기관이 아니라 **수집 채널**이다 ──────────────────────
+  // 식약처는 한 기관이지만 공개 채널 셋을 운영하고(행정처분 API·회수 API·nedrug 게시판)
+  // 채널마다 공개 이력 길이와 마스킹 정책이 다르다. 한 덩어리로 세면 극단적으로 다른
+  // 것들이 서로를 가린다 — 실측 증가율 회수 1.22 · GMP실사 3.69 · 행정처분 67.0 인데
+  // 합치면 2.45(점유율 배율 1.57 = "정상")로 보인다.
+  // ★화면에는 내부 키가 아니라 사람이 읽는 이름을 쓴다.
+  var LANE_LABELS = {
+    "MFDS/admin-action": "MFDS 행정처분",
+    "MFDS/gmp-inspection": "MFDS GMP 실사",
+    "MFDS/recall-quality": "MFDS 회수",
+  };
+  function laneLabel(lane) { return LANE_LABELS[lane] || lane; }
+
+  // 교차표에서 레인 단위 창 합계를 직접 만든다 — by_source 는 소스 축이라 식약처 3채널이
+  // 한 덩어리로 합쳐져 있어 여기에 게이트를 걸 수 없다. 교차표는 카테고리 전수를 담으므로
+  // (모든 finding 이 category_code 를 갖는다) 카테고리로 합치면 그 레인의 창 합계가 된다.
+  function laneTotals(grid) {
+    var t = {};
+    (grid || []).forEach(function (r) {
+      var k = r.lane || r.source;   // 053 미적용 응답은 lane 이 없다 → 소스 축으로 폴백
+      var e = t[k] || (t[k] = { lane: k, cur: 0, prev: 0 });
+      e.cur += Number(r.cur_cnt) || 0;
+      e.prev += Number(r.prev_cnt) || 0;
+    });
+    return Object.keys(t).map(function (k) { return t[k]; });
+  }
+
+  // 053 by_category_source 를 남긴 레인으로만 접어 by_category 모양으로 되돌린다.
   // 문서 수(docs)도 함께 접는다 — raw_signal 은 소스 하나에만 속하므로 소스별 문서 수의
   // 합이 그 카테고리의 문서 수와 정확히 같다(실측 20/20 카테고리, 두 창 모두 불일치 0).
   // 건수만 좁히고 문서 수를 그대로 두면 행의 툴팁("문서 N건 → M건")이 본문과 어긋난다.
   function foldCategorySource(grid, kept) {
     var byCode = {};
     (grid || []).forEach(function (r) {
-      if (!kept[r.source]) return;
+      if (!kept[r.lane || r.source]) return;
       var e = byCode[r.category_code];
       if (!e) {
         e = byCode[r.category_code] = {
@@ -1308,22 +1336,22 @@
     if (!grid || !grid.length) return raw;
 
     var kept = {}, dropped = [], keptCur = 0, keptPrev = 0;
-    (d.by_source || []).forEach(function (s) {
-      var c = Number(s.cnt) || 0, p = Number(s.prev_cnt) || 0;
+    laneTotals(grid).forEach(function (s) {
+      var c = s.cur, p = s.prev;
       // 표본이 얇으면 배율을 따지는 것 자체가 무의미하므로 이 검사가 먼저다.
       // ★사유 문구는 실제로 성립한 조건과 같아야 한다 — 조건은 OR 이므로
       //   "두 기간 모두 적다"가 아니라 "한쪽이 적다"로 적는다(한쪽만 적어도 걸린다).
       if (c < MOVER_SOURCE_MIN || p < MOVER_SOURCE_MIN) {
-        dropped.push({ source: s.source, curCnt: c, prevCnt: p, reason: "thin" });
+        dropped.push({ source: laneLabel(s.lane), curCnt: c, prevCnt: p, reason: "thin" });
         return;
       }
       var ratio = shareOf(c, curFindings) / shareOf(p, prevFindings);
       // !(ratio <= MAX) 형태는 NaN·Infinity 를 전부 제외 쪽으로 떨어뜨린다.
       if (!(ratio <= MOVER_SOURCE_MAX_RATIO) || ratio < 1 / MOVER_SOURCE_MAX_RATIO) {
-        dropped.push({ source: s.source, curCnt: c, prevCnt: p, reason: "skew" });
+        dropped.push({ source: laneLabel(s.lane), curCnt: c, prevCnt: p, reason: "skew" });
         return;
       }
-      kept[s.source] = true;
+      kept[s.lane] = true;
       keptCur += c;
       keptPrev += p;
     });

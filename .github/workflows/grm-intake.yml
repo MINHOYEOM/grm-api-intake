@@ -444,6 +444,25 @@ jobs:
             });
 
       - name: Open or update warning issue
+        # ★2026-08-06 수리 — 종전에는 "경고 코드 집합(서명)이 바뀔 때만" 코멘트를 달았다.
+        #   장애가 지속되면 그 집합은 불변이므로 **지속이야말로 침묵이 보장되는 상태**였다
+        #   (감쇠 논리가 거꾸로: 하루짜리 blip 은 울리고 3일·30일 장애는 조용하다).
+        #   실증 — apis.data.go.kr 간헐 timeout 으로 MFDS 가 08-02~08-05 **4연속** 0건이었는데
+        #   08-02 에 한 번 울린 뒤 나머지는 전부 `signature unchanged; no comment` 였다.
+        #   fda483 계열 경고 3종은 07-30 이후 서명 불변이라 6일 넘게 침묵했고, 그 안에
+        #   실제 결함(일일 dedup 사전조회 미동작, #655)이 숨어 있었다.
+        #
+        #   → 서명 대신 **코드별 최초 감지일 + 경과일 사다리**로 바꾼다. 상태는 이슈 본문의
+        #   HTML 주석에 싣는다(grm-library-staging.yml 의 `first-failed` 관용구와 동형 —
+        #   저장소 상태가 없으므로 이슈 자체가 유일 정본).
+        #
+        #   ★서명이 아니라 **코드 단위**로 세는 것이 핵심이다. 옆 코드가 깜빡이면 서명이
+        #   바뀌어 지속 코드의 시계가 매번 초기화되고, 그러면 7·14·30일 단계에 영영 도달하지
+        #   못한다. 코드마다 자기 시계를 갖는다.
+        #   ★fetched==0 자체는 경보로 만들지 않는다 — 정상 런에도 MHRA·MFDS-Law·WL 이 상시
+        #   0건이라 매일 4~5건 잡음이 된다("항상 울리는 경보는 경보가 아니다").
+        #   ★transient 를 failure 로 올리지도 않는다 — exit 1 이면 grm-web-publish 가
+        #   `--status success` 로 스캐폴드를 고르므로 월요일 발행이 막힌다(grm_health.py 주석).
         if: success() && github.event_name == 'schedule'
         uses: actions/github-script@v9.0.0
         with:
@@ -469,28 +488,46 @@ jobs:
               owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
             });
             const existing = issues.find((issue) => issue.title === title);
-            // 경고 구성 서명 = 정렬된 고유 code 집합 (휘발성 필드 제외 → 지속 차단 시 고정)
-            const sig = [...new Set(warnings.map((w) => w.code))].sort().join('|');
-            const SIG_RE = /<!--\s*grm-warn-sig:\s*(.*?)\s*-->/;
-            const prevSig = existing ? ((existing.body || '').match(SIG_RE)?.[1] ?? null) : null;
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-            function buildBody() {
-              return [
-                'GRM Intake 운영 경고 현황 — **이 본문은 매 scheduled run 마다 자동 갱신**되며, **알림(코멘트)은 경고 구성이 바뀔 때만** 발송됩니다.',
-                '',
-                `- 최신 Run: ${runUrl}`,
-                `- 최신 Run date (KST): ${health.run_date_kst || 'unknown'}`,
-                `- Health status: ${health?.health?.status || 'warning'}`,
-                '',
-                warnings.length ? '현재 경고:' : '현재 경고 없음.',
-                ...warnings.map((w) => `- [${w.code}] ${w.source}: ${w.message}${w.detail ? ` — ${w.detail}` : ''}`),
-                '',
-                `<!-- grm-warn-sig: ${sig} -->`,
-              ].join('\n');
+
+            // 오늘 = 파이프라인의 하루(KST). 형식이 깨졌으면 UTC 날짜로 폴백한다.
+            const todayRaw = String(health.run_date_kst || '');
+            const today = /^\d{4}-\d{2}-\d{2}$/.test(todayRaw)
+              ? todayRaw : new Date().toISOString().slice(0, 10);
+
+            // ── 상태: 코드별 { f: 최초 감지일, a: 마지막으로 알린 단계(일) } ──────────
+            // ★파싱 실패·주석 소실은 "상태 없음"으로 떨어뜨린다(→ 전 코드가 신규로 잡혀
+            //   1회 알림). 침묵으로 빠지는 폴백은 이 수리가 없애려는 결함 그 자체다.
+            const STATE_RE = /<!--\s*grm-warn-streak:\s*(.*?)\s*-->/s;
+            let prevState = {};
+            if (existing) {
+              const raw = ((existing.body || '').match(STATE_RE) || [])[1];
+              if (raw) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) prevState = parsed;
+                } catch (error) { console.log(`streak state parse failed (treated as empty): ${error}`); }
+              }
             }
-            // (A) 경고 0 → 해소 처리(직전에 경고가 있던 이슈만 1회 코멘트 후 close)
+
+            // 경과일 사다리 — 1·3·7·14·30일, 그 뒤로는 30일마다.
+            // 매 실행 알림(잡음)과 영구 침묵(현행 결함) 사이를 가른다.
+            const RUNGS = [1, 3, 7, 14, 30];
+            function dueRung(day, alerted) {
+              const crossed = RUNGS.filter((r) => r <= day && r > alerted);
+              if (crossed.length) return crossed[crossed.length - 1];
+              if (day >= 30) { const k = Math.floor(day / 30) * 30; if (k > alerted) return k; }
+              return 0;
+            }
+            function daysSince(from, to) {
+              const a = Date.parse(from), b = Date.parse(to);
+              if (!Number.isFinite(a) || !Number.isFinite(b)) return 1;
+              return Math.max(1, Math.round((b - a) / 86400000) + 1);
+            }
+
+            // ── (A) 경고 0 → 해소 처리(직전에 상태가 있던 이슈만 1회 코멘트 후 close) ──
             if (!warnings.length) {
-              if (existing && prevSig !== null) {
+              if (existing) {
                 await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
                   body: '✅ 최신 scheduled run 에서 경고가 모두 해소되었습니다. 이슈를 닫습니다.' });
                 await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
@@ -498,20 +535,69 @@ jobs:
               console.log('no warnings; nothing to alert');
               return;
             }
-            // (B) 최초 발생 → 이슈 생성(=1회 알림)
+
+            // ── 코드별 경과일·알림 단계 계산 ─────────────────────────────────────────
+            const codes = [...new Set(warnings.map((w) => w.code))].sort();
+            const state = {};
+            const due = [];
+            for (const code of codes) {
+              const prev = prevState[code] || null;
+              const first = (prev && /^\d{4}-\d{2}-\d{2}$/.test(prev.f)) ? prev.f : today;
+              const day = daysSince(first, today);
+              // ★alerted > day 는 있을 수 없는 상태다(손편집·오타). 그대로 두면 그 코드가
+              //   영영 침묵하므로 day 로 클램프한다 — 이미 지난 단계는 재발화하지 않는다.
+              const alerted = Math.min(Math.max(Number(prev && prev.a) || 0, 0), day);
+              const rung = dueRung(day, alerted);
+              if (rung > 0) due.push({ code, day, rung, isNew: !prev });
+              state[code] = { f: first, a: rung > 0 ? rung : alerted };
+            }
+
+            function buildBody() {
+              const lines = [
+                'GRM Intake 운영 경고 현황 — **이 본문은 매 scheduled run 마다 자동 갱신**되며,',
+                '**알림(코멘트)은 신규 발생 또는 지속 사다리(1·3·7·14·30일, 이후 30일마다) 도달 때만** 발송됩니다.',
+                '',
+                `- 최신 Run: ${runUrl}`,
+                `- 최신 Run date (KST): ${health.run_date_kst || 'unknown'}`,
+                `- Health status: ${health?.health?.status || 'warning'}`,
+                '',
+                '현재 경고:',
+                '',
+                '| 코드 | 소스 | 경과 | 내용 |',
+                '|---|---|---|---|',
+              ];
+              for (const w of warnings) {
+                const day = daysSince((state[w.code] || {}).f || today, today);
+                const msg = `${w.message}${w.detail ? ` — ${w.detail}` : ''}`.replace(/\|/g, '\\|');
+                lines.push(`| \`${w.code}\` | ${w.source} | **${day}일째** | ${msg} |`);
+              }
+              const longest = Math.max(...codes.map((c) => daysSince(state[c].f, today)));
+              if (longest >= 7) {
+                lines.splice(2, 0,
+                  `> 🚨 **최장 ${longest}일 연속** — 일시 장애가 아닙니다. 원인 규명이 필요합니다.`, '');
+              }
+              lines.push('', `<!-- grm-warn-streak: ${JSON.stringify(state)} -->`);
+              return lines.join('\n');
+            }
+
+            // ── (B) 최초 발생 → 이슈 생성(=1회 알림) ────────────────────────────────
             if (!existing) {
               await github.rest.issues.create({ owner, repo, title, body: buildBody(),
                 labels: ['grm-intake', 'automation-warning'] });
-              console.log('created warning issue');
+              console.log(`created warning issue (codes: ${codes.join(',')})`);
               return;
             }
-            // (C) 기존 이슈 → 본문 silent 갱신(편집=알림 없음)
+            // ── (C) 기존 이슈 → 본문 silent 갱신(편집=알림 없음) ────────────────────
             await github.rest.issues.update({ owner, repo, issue_number: existing.number, body: buildBody() });
-            // (D) 서명이 바뀐 경우에만 코멘트(=알림)
-            if (prevSig !== sig) {
+            // ── (D) 신규 발생·사다리 도달 코드가 있을 때만 코멘트(=알림) ─────────────
+            if (due.length) {
+              const what = due.map((d) => d.isNew
+                ? `\`${d.code}\` **신규 발생**`
+                : `\`${d.code}\` **${d.day}일 연속**(${d.rung}일 단계)`).join(' · ');
               await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
-                body: `⚠️ 경고 구성 변경: \`${prevSig ?? '없음'}\` → \`${sig}\`\n\n${buildBody()}` });
-              console.log(`signature changed (${prevSig} -> ${sig}); commented`);
+                body: `⚠️ ${what}\n\n${buildBody()}` });
+              console.log(`alerted: ${due.map((d) => `${d.code}@${d.day}d`).join(',')}`);
             } else {
-              console.log(`signature unchanged (${sig}); body updated silently, no comment`);
+              const ages = codes.map((c) => `${c}@${daysSince(state[c].f, today)}d`).join(',');
+              console.log(`no rung due (${ages}); body updated silently, no comment`);
             }

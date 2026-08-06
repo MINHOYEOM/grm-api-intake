@@ -49,6 +49,31 @@ REGION_MFDS = "Korea (MFDS)"
 PAGE_SIZE = 100
 MAX_PAGES = 20
 
+# [백필 관측 2026-08-05] recall 과 동형 — 페이지 실패는 1건이라도 수집했으면
+# `(items, None)` 으로 조용히 부분 성공한다. 반환값 규약(매일 라인)은 그대로 두고
+# 관측치만 모듈 전역에 남겨, 백필이 읽어 리포트·종료코드로 표면화한다.
+LAST_HEALTH: dict[str, Any] = {}
+
+
+def _set_last_health(
+    *,
+    collected: int,
+    total_count: int,
+    pages_seen: int,
+    truncated: bool,
+    filtered: int,
+    page_warnings: list[str],
+) -> None:
+    global LAST_HEALTH
+    LAST_HEALTH = {
+        "collected": collected,
+        "total_count": total_count,
+        "pages_seen": pages_seen,
+        "truncated": truncated,
+        "filtered": filtered,
+        "page_warnings": list(page_warnings),
+    }
+
 ADMIN_TIER3_TERMS = [
     "gmp",
     "우수의약품제조관리기준",
@@ -324,12 +349,16 @@ def collect_mfds_admin_actions(
     tier3_count = 0
     tier2_count = 0
     filtered_count = 0
+    pages_seen = 0
+    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
+                     filtered=0, page_warnings=[])
     paginator = datago_paginate(
         ADMIN_API_ENDPOINT, service_key=service_key, extract=_extract_items,
         http_get=http_get_json, max_pages=MAX_PAGES, page_size=PAGE_SIZE,
         extra_params={"order": "Y"})
     try:
         for raw_items, masked_url in paginator:
+            pages_seen += 1
             for raw in raw_items:
                 date_iso = _item_date(raw)
                 if not _within_window(date_iso, start, end):
@@ -350,7 +379,13 @@ def collect_mfds_admin_actions(
         msg = f"MFDS admin-action API page={e.page_no} 실패: {e.cause}"
         if items:
             log("WARN", msg)
+            _set_last_health(collected=len(items), total_count=paginator.total_count,
+                             pages_seen=pages_seen, truncated=False,
+                             filtered=filtered_count, page_warnings=[msg])
             return items, None
+        _set_last_health(collected=0, total_count=paginator.total_count,
+                         pages_seen=pages_seen, truncated=False,
+                         filtered=filtered_count, page_warnings=[msg])
         return [], msg
 
     total_count = paginator.total_count
@@ -367,4 +402,7 @@ def collect_mfds_admin_actions(
         f"{len(items)}건 (Tier 3={tier3_count}, Tier 2={tier2_count}, "
         f"filtered={filtered_count}, totalCount={total_count})",
     )
+    _set_last_health(collected=len(items), total_count=total_count,
+                     pages_seen=pages_seen, truncated=bool(paginator.truncated),
+                     filtered=filtered_count, page_warnings=[])
     return items, truncated_msg

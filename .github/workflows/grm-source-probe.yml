@@ -1,0 +1,72 @@
+name: GRM Source Reachability Probe
+
+# 후보 규제 소스에 **러너에서** 닿는지 1회 판정한다(수동 실행 전용, 부수효과 0).
+#
+# 배경: "로컬에서는 되는데 러너에서 되나"는 GRM 에서 반복해 나온 미결 질문이다
+#   (MFDS 해외 IP 차단 · FDA483 Akamai 봇차단 · 자료실 트랙 canada.ca 미판정).
+#   수집기를 다 만든 뒤에 막힌 걸 알면 그 작업이 통째로 낭비다 → 착수 전에 여기서 가른다.
+#
+# ★부수효과 없음: git 쓰기 없음 · Supabase/Notion 무접촉 · secret 미사용.
+#   순수하게 HTTP GET 만 쏘고 결과를 step summary 로 출력한다.
+#
+# 판정은 probe_source_reachability.py 가 낸다(기본 UA / 브라우저 UA 2회 → OPEN /
+# UA_GATED / BLOCKED). 대조군(이미 매주 브리프에 카드가 나오는 소스)이 죽으면 exit 2 —
+# 그건 타깃이 막힌 게 아니라 측정 자체가 무효라는 뜻이다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-reachability-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: Probe candidate sources from the runner (read-only, no secrets)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # exit 2 = 대조군 실패(측정 무효). 그 경우에도 리포트는 남겨야 하므로 여기서
+      # 죽이지 않고, 아래 summary 스텝이 항상 돌게 한 뒤 마지막에 상태를 반영한다.
+      - name: Run reachability probe
+        id: probe
+        continue-on-error: true
+        run: |
+          python probe_source_reachability.py --output probe_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Source Reachability Probe"
+            echo ""
+            if [ -f probe_report.json ]; then
+              echo '```json'
+              cat probe_report.json
+              echo '```'
+            else
+              echo "probe_report.json 미생성 — 프로브가 조기 종료했다(의존성/실행 오류 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if control target was unreachable
+        if: always() && steps.probe.outcome == 'failure'
+        run: |
+          echo "대조군 실패 또는 프로브 오류 — 판정을 신뢰하지 말 것." >&2
+          exit 1

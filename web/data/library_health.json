@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-03T05:58:51+00:00",
+  "checked_at": "2026-08-10T04:16:34+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -25,9 +25,9 @@
     "who.json"
   ],
   "summary": {
-    "broken": 1,
+    "broken": 2,
     "needs_review": 163,
-    "ok": 322,
+    "ok": 321,
     "references": 608,
     "unique_urls": 486
   },
@@ -395,7 +395,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)",
-      "http_status": 202,
+      "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -410,7 +410,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)",
-      "http_status": 202,
+      "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -2014,7 +2014,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/directives-guidance-documents-policies/annex-1-explanatory-notes-industry-preparation-site-master.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2074,7 +2074,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/forms/alternate-sample-retention-site-guidelines-0014.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/establishment-licences/forms/alternate-sample-retention-site-guidelines-0014.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2089,7 +2089,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-11-guide-computerized-systems-gui-0050.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-11-guide-computerized-systems-gui-0050.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2149,7 +2149,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-4-current-edition-guidelines-veterinary-drugs-0012.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2179,7 +2179,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/annex-manufacturing-practices-positiron-emitting-radiopharmaceuticals.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2269,7 +2269,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-validation-terminal-sterilization-process-drugs-gui-0074.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/guidance-documents/guide-validation-terminal-sterilization-process-drugs-gui-0074.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2344,7 +2344,7 @@
     },
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html": {
       "attempts": 1,
-      "final_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/compliance-enforcement/good-manufacturing-practices/validation/cleaning-validation-guidelines-guide-0028.html",
+      "final_url": "https://www.canada.ca/errors/404.html",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -7138,23 +7138,8 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266955.pdf": {
-      "attempts": 2,
-      "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
-      "http_status": 416,
-      "method": "GET",
-      "reason": "http_416",
-      "references": [
-        {
-          "field": "official_url",
-          "file": "pmda.json",
-          "item_id": "pmda-000266955"
-        }
-      ],
-      "status": "broken"
-    },
-    "https://www.pmda.go.jp/files/000267517.pdf": {
       "attempts": 1,
-      "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
+      "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -7162,13 +7147,28 @@
         {
           "field": "official_url",
           "file": "pmda.json",
-          "item_id": "pmda-000267517"
+          "item_id": "pmda-000266955"
         }
       ],
       "status": "ok"
     },
-    "https://www.pmda.go.jp/files/000273637.pdf": {
+    "https://www.pmda.go.jp/files/000267517.pdf": {
       "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
+      "http_status": 416,
+      "method": "GET",
+      "reason": "http_416",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000267517"
+        }
+      ],
+      "status": "broken"
+    },
+    "https://www.pmda.go.jp/files/000273637.pdf": {
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -7183,11 +7183,11 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000276919.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000276919.pdf",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": 416,
+      "method": "GET",
+      "reason": "http_416",
       "references": [
         {
           "field": "official_url",
@@ -7195,7 +7195,7 @@
           "item_id": "pmda-000276919"
         }
       ],
-      "status": "ok"
+      "status": "broken"
     },
     "https://www.pmda.go.jp/files/000280043.pdf": {
       "attempts": 1,

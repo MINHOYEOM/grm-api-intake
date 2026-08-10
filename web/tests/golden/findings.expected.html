@@ -75,15 +75,15 @@
       <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
       <div class="fnd-dash-grid" id="fnd-dash-grid">
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">카테고리 분포</h2>
+          <h2 class="fnd-dash-h">카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">월별 추이</h2>
+          <h2 class="fnd-dash-h">월별 추이<span class="fnd-dash-unit">문서 기준</span></h2>
           <div id="fnd-dash-month" class="fnd-dash-month"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">업체 상위 5</h2>
+          <h2 class="fnd-dash-h">업체 상위 5<span class="fnd-dash-unit">지적사항 기준</span></h2>
           <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
         </div>
       </div>
@@ -119,6 +119,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    카테고리 분포에 밀려 좁아지던 문제의 근본 원인). */
 .fnd-dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .fnd-dash-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 12px}
+/* [문서 축 054] 제목 옆 단위 표기 — 제목보다 한 단계 더 죽여서 "무엇을 세는가"만 조용히
+   알린다(제목과 경쟁하지 않는다). 좁은 화면에서 제목이 두 줄이 되면 자연스레 아래로 흐른다. */
+.fnd-dash-unit{margin-left:6px;font-weight:400;font-size:10.5px;color:var(--muted);opacity:.75}
 .fnd-dash-empty{font-size:12.5px;color:var(--muted);margin:0}
 /* 카테고리 분포 — 라벨(한국어, mono/자간 금지)+막대+건수 병기. [M14] 회색 트랙 제거,
    바 자체가 flex 셀을 채우고 transform:scaleX() 로 비율을 표현(레이아웃 폭은 불변). */
@@ -370,7 +373,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../assets/findings.js?v=16c3f51b" defer></script>
+<script src="../assets/findings.js?v=9a64544c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

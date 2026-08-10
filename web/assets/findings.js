@@ -391,18 +391,25 @@
 
   function renderDashStats(stats) {
     dashStatsEl.innerHTML = "";
-    dashStatsEl.appendChild(buildStatBlock(String(stats.total), "전체", false));
+    // [문서 축 054] 문서를 맨 앞에 세운다 — 바로 뒤의 기관 스탯이 문서 기준이라 그 기준선
+    // 역할을 한다. 옛 순서는 [전체][문서][FDA]… 였는데 "전체"가 무엇의 전체인지 말하지
+    // 않아 축 혼동의 출발점이었다(기관 숫자는 지적사항, 바로 옆 전체도 지적사항, 그 사이에
+    // 낀 문서만 다른 단위). 라벨을 "지적사항"으로 못박아 단위를 화면에 드러낸다.
     // 옵셔널 스탯 관례 유지 — 값이 없으면 블록 자체를 생략한다(레이아웃 깨짐 없음).
     if (stats.documents !== undefined && stats.documents !== null) {
       dashStatsEl.appendChild(buildStatBlock(String(stats.documents), "문서", false));
     }
+    dashStatsEl.appendChild(buildStatBlock(String(stats.total), "지적사항", false));
     stats.agencies.forEach(function (a) {
       var block = buildStatBlock(String(a.count), a.agency, false);
-      // stats.agenciesExact 가 아니면(RPC 미확보·필터 적용 중) 로드된 데이터 기준
-      // 추정치라는 것을 툴팁으로 시각적으로 구분한다(EVIDENCE_TITLE/STATUS_TITLE 와
-      // 동일한 title 속성 관례 — XSS 무관).
-      if (!stats.agenciesExact) {
-        block.title = "현재 로드된 데이터 기준(참고용)";
+      // 툴팁에 두 축을 병기한다 — "FDA 가 왜 이렇게 큰가"의 답이 문서당 지적 건수(483
+      // 6.01 vs MFDS 회수 1.00)라는 걸 화면에서 확인할 수 있어야 한다. 054 미적용
+      // RPC 면 문서 축이 없으므로 종전대로 지적사항 수를 그리되, 툴팁이 그 사실을
+      // 밝힌다(조용히 축이 뒤바뀌는 것만은 막는다 — title 관례는 XSS 무관).
+      if (a.unit === "documents") {
+        block.title = a.agency + " — 문서 " + a.docs + "건 · 지적사항 " + a.findings + "건";
+      } else {
+        block.title = a.agency + " — 지적사항 " + a.findings + "건(문서 기준 집계 미제공)";
       }
       dashStatsEl.appendChild(block);
     });
@@ -468,12 +475,15 @@
     var years = {};
     months.forEach(function (x) { years[x.month.slice(0, 4)] = true; });
     var multiYear = Object.keys(years).length > 1;
+    // [문서 축 054] 월 추이는 '유입량' 지표라 문서가 자연 단위다 — 지적사항으로 세면
+    // 483 대량 백필이 몰린 달이 다른 달을 전부 눌러버린다. 단위를 라벨에 적는다.
+    var monthUnit = stats.monthsUnit === "documents" ? "문서 " : "지적 ";
     var wrap = el("div", "fnd-dash-month-bars");
     months.forEach(function (x) {
       var col = document.createElement("div");
       col.className = "fnd-dash-month-col";
       if (state.month === x.month) col.classList.add("on");
-      var monthLabelText = x.month + " " + x.count + "건";
+      var monthLabelText = x.month + " " + monthUnit + x.count + "건";
       makeClickableRow(col, monthLabelText, function () {
         toggleMonthFilter(x.month);
       });
@@ -521,6 +531,32 @@
     return Array.isArray(axis) ? axis : [];
   }
 
+  // [문서 축 054] 기관 스탯 — **문서 수가 정본**이다. 문서당 지적 건수가 소스마다 구조적으로
+  // 다르기 때문이다(FDA 483 6.01 · 경고서한 2.53 · MFDS 회수/행정처분 1.00). 지적사항으로
+  // 기관을 비교하면 **추출 입도가 편중처럼 보인다** — 같은 코퍼스가 지적사항 축에서
+  // FDA:MFDS = 87:13, 문서 축에서 69:31 이다.
+  //
+  // 두 축을 모두 담아 돌려준다: count 는 그릴 값(문서), findings/docs 는 툴팁 병기용.
+  // 054 미적용 RPC(by_agency_docs 부재)면 지적사항 축으로 degrade 하고 unit 으로 그 사실을
+  // 명시한다 — 화면이 조용히 다른 단위를 같은 자리에 그리는 것만은 막는다.
+  function buildAgencyStats() {
+    var docsAxis = dashAxis("by_agency_docs");
+    var fndAxis = dashAxis("by_agency");
+    var fndBy = {};
+    fndAxis.forEach(function (e) { fndBy[e.v] = e.c; });
+    if (!docsAxis.length) {
+      return fndAxis.map(function (e) {
+        return { agency: e.v, count: e.c, unit: "findings", findings: e.c, docs: null };
+      });
+    }
+    return docsAxis.map(function (e) {
+      return {
+        agency: e.v, count: e.c, unit: "documents",
+        findings: fndBy[e.v] || 0, docs: e.c,
+      };
+    });
+  }
+
   // 검토 필요 건수 — LAST.dash 에는 review_status 축이 없다(027). facets.by_review_status
   // 로 유도하되, 파셋은 **자기 축을 뺀** 모집단이라 검토상태 필터가 걸리면 현재 결과보다
   // 넓은 집합을 센다. 그 경우엔 필터 자체가 답을 확정한다:
@@ -549,10 +585,7 @@
     var stats = {
       total: LAST.totals.findings,
       documents: LAST.totals.documents,
-      agencies: dashAxis("by_agency").map(function (e) {
-        return { agency: e.v, count: e.c };
-      }),
-      agenciesExact: true, // 서버 집계라 항상 exact — "로드된 데이터 기준" 툴팁이 붙지 않는다
+      agencies: buildAgencyStats(),
       needsReview: dashNeedsReview(),
       categories: dashAxis("by_category").map(function (e) {
         var cat = CATEGORY_LABELS[e.v];
@@ -564,7 +597,10 @@
       }),
     };
     // 월 추이는 최근 12개월만 — 서버는 오름차순 전량을 주므로 뒤에서 자른다(027 계약).
-    var months = dashAxis("by_month");
+    // [문서 축 054] by_month_docs 가 정본, 없으면 지적사항 축으로 degrade(기관 스탯과 동형).
+    var monthsDocs = dashAxis("by_month_docs");
+    var months = monthsDocs.length ? monthsDocs : dashAxis("by_month");
+    stats.monthsUnit = monthsDocs.length ? "documents" : "findings";
     if (months.length > 12) months = months.slice(months.length - 12);
     stats.months = months.map(function (e) { return { month: e.v, count: e.c }; });
     renderDashStats(stats);

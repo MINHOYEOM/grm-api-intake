@@ -56,6 +56,7 @@ _REACTIONS_TOP_PATH = _MIGRATIONS_DIR / "031_reactions_weekly_top.sql"
 _INSPECTOR_PATH = _MIGRATIONS_DIR / "036_findings_rpc_inspector_names.sql"
 # 040 = findings_search 만 다시 supersede 하는 현행 정본(검색 blob 에 실사관 이름 추가).
 _INSPECTOR_ALIAS_BLOB_PATH = _MIGRATIONS_DIR / "040_findings_search_inspector_blob.sql"
+_DOC_AXES_PATH = _MIGRATIONS_DIR / "054_findings_search_doc_axes.sql"
 _CLIENT_JS_PATH = Path(__file__).resolve().parent.parent / "web" / "assets" / "findings.js"
 
 # ⑬028 이 복원한, 클라이언트 카드 조립부가 읽는 필드 3종(회귀 고정용 명시 목록).
@@ -1398,6 +1399,82 @@ class SearchInspectorBlobProjectionCoversClientFieldsTest(unittest.TestCase):
 
     def test_inspector_names_still_projected_in_040(self) -> None:
         self.assertIn("'inspector_names',", self.search_rows)
+
+
+# ============================================================================
+# 054_findings_search_doc_axes.sql -- 대시보드에 문서 기준 축 2개 추가.
+#
+# supersede 체인: findings_search = 026 → 027 → 028 → 030 → 036 → 040 → **054(현행)**.
+# findings_document 는 054 가 재선언하지 않으므로 036 정의가 그 함수에 대해 현행 그대로다
+# (040 이 같은 처리를 한 전례 -- 위 SearchInspectorBlobMigrationFileTest 참조).
+#
+# ★이 섹션이 고정하는 것: 문서 축 추가가 **지적사항 축을 밀어내지 않는다**는 것. 카테고리
+# 분포처럼 지적사항이 자연 단위인 지표가 남아 있고, 툴팁 병기가 두 축을 모두 요구한다.
+# 옛 키를 지우면 구버전 findings.js 셸(캐시된 자산)이 기관 스탯을 통째로 잃는다.
+# ============================================================================
+
+
+class DocAxesMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_DOC_AXES_PATH.is_file(), f"missing {_DOC_AXES_PATH}")
+        self.sql = _DOC_AXES_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        # ★골든/마이그레이션 CRLF 함정(과거 전례) -- LF 고정.
+        self.assertNotIn(b"\r\n", _DOC_AXES_PATH.read_bytes())
+
+    def test_redeclares_only_findings_search(self) -> None:
+        self.assertIn(_FN_SEARCH_SIG, self.code)
+        self.assertNotIn("create or replace function public.findings_document(", self.code)
+
+
+class DocAxesDashBlockTest(unittest.TestCase):
+    """dash 블록은 6축이 된다 -- 기존 4축(agency/category/month/top_firms) + 문서 축 2개.
+    ★기존 축이 남아 있는지도 함께 검사한다: 새 축을 더하면서 옛 축을 갈아치우면 구버전
+    자산이 조용히 빈 화면을 그린다(캐시된 findings.js 는 by_agency 만 안다)."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_DOC_AXES_PATH.read_text(encoding="utf-8"))
+        self.block = _slice_between(self.code, "'dash', jsonb_build_object(", "'page',")
+
+    def test_dash_block_has_six_axes(self) -> None:
+        for key in (
+            "by_agency", "by_category", "by_month", "top_firms",
+            "by_agency_docs", "by_month_docs",
+        ):
+            self.assertIn(f"'{key}'", self.block)
+
+    def test_doc_axes_count_distinct_documents(self) -> None:
+        """★문서 축의 정의 자체 -- count(*) 가 아니라 count(distinct raw_signal_id) 여야
+        한다. count(*) 로 쓰면 이름만 문서 축이고 값은 지적사항이라 결함이 그대로 남는다."""
+        for cte in ("dash_agency_docs as (", "dash_month_docs as ("):
+            body = _slice_between(self.code, cte, "),")
+            self.assertIn("count(distinct f.raw_signal_id)", body, msg=cte)
+            self.assertNotIn("count(*)", body, msg=cte)
+
+    def test_findings_axes_still_count_findings(self) -> None:
+        """옛 축은 지적사항 건수 그대로 -- 툴팁 병기가 두 축의 차이를 보여주는 것이 요점이라
+        둘이 같은 값이 되면 화면이 아무것도 설명하지 못한다."""
+        for cte in ("dash_agency as (", "dash_month as ("):
+            body = _slice_between(self.code, cte, "),")
+            self.assertIn("count(*)::int", body, msg=cte)
+            self.assertNotIn("distinct", body, msg=cte)
+
+
+class DocAxesUseFilteredPopulationTest(unittest.TestCase):
+    """dash 축은 필터 전량 적용한 'filtered' 를 모집단으로 삼는다(027 계약) -- 새 축 2개도
+    같아야 한다. 'searched'(검색만 적용)를 쓰면 대시보드가 현재 결과가 아닌 더 넓은 집합을
+    센다."""
+
+    def setUp(self) -> None:
+        self.code = _strip_sql_comments(_DOC_AXES_PATH.read_text(encoding="utf-8"))
+
+    def test_doc_axis_ctes_use_filtered_base(self) -> None:
+        for cte in ("dash_agency_docs as (", "dash_month_docs as ("):
+            body = _slice_between(self.code, cte, "),")
+            self.assertIn("from filtered f", body, msg=cte)
+            self.assertNotIn("from searched", body, msg=cte)
 
 
 if __name__ == "__main__":  # pragma: no cover

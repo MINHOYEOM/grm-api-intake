@@ -21,6 +21,9 @@ JSON 과 그 카드의 `wl_body_full`(fan-out 입력 원문)만 받아, 산출�
   D2 인용 근거(citation grounding) — 산출물 안의 조항 번호류 토큰(21 CFR·FD&C Act 섹션·
       bare subsection 등)이 원문(wl_body_full)에 실제로 존재하는지 대조. 없으면 FAIL(날조
       의심) — brief_lint 의 MFDS 미근거 링크 FAIL 과 동형 취급(식별자성 사실은 하드 검증).
+      단 FD&C Act 인용은 **어순을 흡수**한다: `FD&C Act 201(p)` 와 원문의 자연 어순
+      `section 201(p) of the FD&C Act` 는 같은 인용이다(2026-08-10 과차단 수리 — 섹션 번호는
+      여전히 원문에 실재해야 하고, 주장한 법률명도 원문에 있어야 한다. 아래 `_citation_gap`).
   D3 원문 대비 과도한 신규 고유숫자(날짜·금액 등, 4자리 이상 숫자) — 원문에 없는 숫자가
       산출물에 등장하면 WARN(과알림 방지 — 완전 차단은 D2 만, 날짜류는 표기法 차이로 오탐
       가능성이 있어 결정적 FAIL 로 승격하지 않는다. brief_lint 의 WARN 등급과 동형 원칙).
@@ -266,6 +269,102 @@ def _normalize_citation(tok: str) -> str:
     return re.sub(r"[\s「」『』｢｣]+", "", tok).lower()
 
 
+# ─── [인용 어순 관용 2026-08-10] "FD&C Act 201(p)" ≡ "section 201(p) of the FD&C Act" ───
+# 실사고: 2026-08-10 WL 카드 5f27c3276af4 가 D2 FAIL 4건으로 deep 델타에서 drop 됐다. 인용
+# 4건(201(p)·505(a)·301(a)·801(a)(3))은 **원문에 전부 실재**했지만, 원문은 영어의 자연 어순
+# ("...are new drugs within the meaning of section 201(p) of the FD&C Act...")으로 썼고
+# 산출물은 "FD&C Act 201(p)" 로 적었다. `_normalize_citation` 이 공백을 지운 뒤 **연결된
+# 문자열**을 substring 대조하므로 `fd&cact201(p)` 는 `section201(p)ofthefd&cact` 안에서
+# 영원히 나오지 않는다 — 게이트가 어순맹(order-blind)이 아니라 **어순 종속**이었다(반각 브래킷
+# 2026-08-03 에 이은 같은 계열의 두 번째 과차단).
+#
+# 수리 원칙 — **날조 탐지력은 그대로 두고 어순만 흡수한다**:
+#   ① 인용 토큰을 (준거 법률명, 섹션 번호)로 분해하되 섹션 번호는 **여전히 원문에 verbatim
+#      으로 있어야** 한다(없으면 종전과 똑같이 FAIL — 지어낸 번호는 통과하지 못한다).
+#   ② 법률명을 앞세운 인용(`FD&C Act 201(p)`)은 그 **준거 법률명이 원문에 등장**해야 통과한다
+#      (없으면 여전히 FAIL — 다른 법의 조항 번호를 FD&C Act 로 옮겨 붙이는 오인용 차단).
+#      `section 201(p)` 처럼 법률을 주장하지 않는 형태는 대조할 법률명이 없으므로 번호만 본다
+#      (= bare `502(a)` 토큰에 이미 적용돼 온 기준과 동일 — 새로 푸는 것이 아니다).
+#   ③ 적용 범위는 **FD&C Act 계열 + section/§ 접두 토큰뿐**. `21 CFR 211.192`·한국 법령
+#      (「약사법」 제38조)·[별표N] 은 손대지 않는다 — 그쪽은 법령명까지 붙은 통짜 대조가 교차
+#      오인용 차단의 유일한 수단이라(설계문서 §5-1) 분해하면 실제로 약해진다.
+_FDC_ACT_ALIASES = (
+    "fd&cact", "fdcact", "ffdcact",
+    "federalfood,drug,andcosmeticact", "federalfooddrugandcosmeticact",
+    "federalfood,drugandcosmeticact",
+)
+_SECTION_TOKEN_RE = r"\d{3}[A-Za-z]?(?:\([A-Za-z0-9]{1,4}\))*"
+# 법률명 선행형: `FD&C Act 201(p)` · `FD&C Act, section 502(ee)`(사이 구분자에 마침표·숫자 제외).
+_ACT_PREFIXED_CITATION_RE = re.compile(
+    r"^(?:FD&C\s*Act|Federal\s+Food,?\s*Drug,?\s*and\s+Cosmetic\s+Act)"
+    r"[^.\d]{0,20}?(" + _SECTION_TOKEN_RE + r")$", re.I)
+# 섹션 접두형: `section 201(p)` · `§ 502(a)` · `섹션 505(a)` — 주장된 법률명이 없다.
+_SECTION_PREFIXED_CITATION_RE = re.compile(
+    r"^(?:섹션|section|sec\.?|§)\s*(" + _SECTION_TOKEN_RE + r")$", re.I)
+
+
+def _split_act_section(tok: str) -> "tuple[str, bool] | None":
+    """인용 토큰을 `(정규화된 섹션 번호, 법률명 대조 필요 여부)` 로 분해. 대상 아니면 None.
+
+    대상은 위 ③ 범위(FD&C Act 계열·section/§ 접두)뿐이다. CFR·한국 법령 토큰은 None 을 돌려
+    종전의 통짜 대조 경로로 그대로 흘려보낸다(분해하지 않으므로 약해지지 않는다)."""
+    t = re.sub(r"\s+", " ", tok or "").strip()
+    m = _ACT_PREFIXED_CITATION_RE.match(t)
+    if m:
+        return _normalize_citation(m.group(1)), True
+    m = _SECTION_PREFIXED_CITATION_RE.match(t)
+    if m:
+        return _normalize_citation(m.group(1)), False
+    return None
+
+
+def _contains_section(source_norm: str, sec_norm: str) -> bool:
+    """정규화 원문에 섹션 번호가 **숫자 경계**를 지켜 등장하는가.
+
+    맨 substring 이면 날조 `201(p)` 가 원문의 `1201(p)` 안에서, 날조 `192` 가 `211.192` 안에서
+    근거를 얻는다 — 어순을 흡수하려다 탐지력을 잃지 않도록, 앞뒤에 **숫자가 이어지는 자리**는
+    근거로 세지 않는다. 소수점은 `211.192` 처럼 **숫자가 뒤따를 때만** 이어짐으로 본다(문장을
+    끝내는 마침표 `...violates section 301(a).` 까지 막으면 그게 또 다른 과차단이 된다)."""
+    if not sec_norm:
+        return False
+
+    def _joined(text: str, idx: int, step: int) -> bool:
+        """idx 위치 문자가 조항 번호의 연장(숫자, 또는 숫자로 이어지는 `.`)인가."""
+        if not (0 <= idx < len(text)):
+            return False
+        ch = text[idx]
+        if ch.isdigit():
+            return True
+        nxt = idx + step
+        return ch == "." and 0 <= nxt < len(text) and text[nxt].isdigit()
+
+    start = 0
+    while True:
+        i = source_norm.find(sec_norm, start)
+        if i < 0:
+            return False
+        end = i + len(sec_norm)
+        if not _joined(source_norm, i - 1, -1) and not _joined(source_norm, end, 1):
+            return True
+        start = i + 1
+
+
+def _citation_gap(tok: str, key_norm: str, source_norm: str) -> "str | None":
+    """인용 1건의 미근거 사유. None=근거 있음 · `"number"`=번호 자체가 원문에 없음 ·
+    `"act"`=번호는 있으나 주장한 준거 법률명이 원문에 없음(오인용 의심)."""
+    if key_norm in source_norm:      # 어순이 같으면 종전 경로 그대로(판정 불변)
+        return None
+    parts = _split_act_section(tok)
+    if parts is None:
+        return "number"
+    sec_norm, act_claimed = parts
+    if not _contains_section(source_norm, sec_norm):
+        return "number"
+    if act_claimed and not any(a in source_norm for a in _FDC_ACT_ALIASES):
+        return "act"
+    return None
+
+
 def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,
                              sections: tuple[str, ...] = REQUIRED_SECTIONS,
                              severity: str = SEV_FAIL) -> list[Finding]:
@@ -289,16 +388,22 @@ def check_citation_grounding(deep_analysis: dict[str, Any], source_text: str,
             key_norm = _normalize_citation(tok)
             if key_norm in reported:
                 continue
-            if key_norm not in source_norm:
-                reported.add(key_norm)
-                if severity == SEV_WARN:
-                    detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(body_full)에 없음 — "
-                              "483 원문은 CFR 조항을 명시하지 않을 수 있어 해석성 인용은 차단하지 "
-                              "않으나 발행 전 수동 확인 권고.")
-                else:
-                    detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(wl_body_full)에 없음 — "
-                              "날조/오인용 의심. 원문에 실재하는 조항만 인용해야 함.")
-                findings.append(Finding(severity, "D2-CITATION-UNGROUNDED", detail))
+            gap = _citation_gap(tok, key_norm, source_norm)
+            if gap is None:
+                continue
+            reported.add(key_norm)
+            if gap == "act":
+                detail = (f"섹션 '{key}'의 조항 인용 '{tok}' — 섹션 번호는 원문에 있으나 "
+                          "주장한 준거 법률명(FD&C Act)이 원문에 없음. 다른 법률의 조항 번호를 "
+                          "FD&C Act 인용으로 옮겨 적은 오인용 의심.")
+            elif severity == SEV_WARN:
+                detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(body_full)에 없음 — "
+                          "483 원문은 CFR 조항을 명시하지 않을 수 있어 해석성 인용은 차단하지 "
+                          "않으나 발행 전 수동 확인 권고.")
+            else:
+                detail = (f"섹션 '{key}'의 조항 인용 '{tok}'가 원문(wl_body_full)에 없음 — "
+                          "날조/오인용 의심. 원문에 실재하는 조항만 인용해야 함.")
+            findings.append(Finding(severity, "D2-CITATION-UNGROUNDED", detail))
     return findings
 
 

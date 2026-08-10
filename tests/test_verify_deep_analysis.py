@@ -549,5 +549,157 @@ class KoreanSpecificGroundingTest(unittest.TestCase):
         self.assertTrue(result.ok, result.report)
 
 
+# ── [인용 어순 관용 2026-08-10] D2 가 어순 종속이라 실재 인용을 날조로 차단하던 과차단 ────────
+# 실사고: 2026-08-10 WL 카드 5f27c3276af4 가 D2 FAIL 4건으로 deep 델타에서 drop 됐다. 아래
+# 원문은 그 카드의 실제 문장 구조(영어 자연 어순: `section N of the FD&C Act`)를 옮긴 것이고,
+# 산출물은 `FD&C Act N` 어순으로 인용한다 — 같은 조항인데 옛 게이트는 FAIL 4건을 냈다.
+_WL_ORDER_SOURCE = (
+    "Your syNeo products are unapproved new drugs because they are new drugs within "
+    "the meaning of section 201(p) of the FD&C Act. Introducing such products into "
+    "interstate commerce violates sections 505(a) and 301(d) of the FD&C Act. "
+    "Marketing this misbranded product violates section 301(a). Products offered for "
+    "import into the United States under section 801(a)(3) may be refused admission. "
+    "Within 15 working days of receipt of this letter, respond in writing."
+)
+
+
+def _wl_order_da(citations: list, extra_admin: str = "") -> dict:
+    """어순 시험용 WL 산출물 — 인용만 갈아끼운다(나머지 4섹션 구조는 고정·D1 통과)."""
+    return {
+        "key_violations": [
+            {"citation": c, "description": "모노그래프가 허용하지 않는 유효성분 조합 사용",
+             "risk": "무허가 신약에 해당해 수입 거부·집행 위험"} for c in citations],
+        "fda_evaluation": "FDA 는 회사의 회신이 근본 원인을 다루지 않았다고 평가했다.",
+        "required_remediation": {
+            "deadline": "15영업일 이내 서면 회신",
+            "items": ["문제 제품의 유통을 중단하고 처방 조합의 모노그래프 적합성을 재검토"]},
+        "administrative_risks": (
+            "미이행 시 압류·금지명령 등 법적 조치가 뒤따를 수 있다. " + extra_admin),
+    }
+
+
+class CitationWordOrderTest(unittest.TestCase):
+    def test_act_first_citation_grounded_by_section_first_source(self) -> None:
+        # 회귀(본 사고): 산출물 `FD&C Act 201(p)` ↔ 원문 `section 201(p) of the FD&C Act`.
+        da = _wl_order_da(["FD&C Act 201(p)", "FD&C Act 505(a)", "FD&C Act 301(a)"],
+                          extra_admin="수입 시 FD&C Act 801(a)(3) 에 따라 거부될 수 있다.")
+        result = vda.run_deep_analysis_gate(da, _WL_ORDER_SOURCE)
+        self.assertTrue(result.ok, result.report)
+        self.assertEqual([f for f in result.findings
+                          if f.code == "D2-CITATION-UNGROUNDED"], [])
+
+    def test_section_first_citation_grounded_by_act_first_source(self) -> None:
+        # 반대 어순도 같은 판정이어야 한다(대칭) — 원문이 `FD&C Act 201(p)`, 산출물이
+        # `section 201(p) of the FD&C Act`. 옛 게이트는 이쪽도 FAIL 이었다.
+        source = ("This letter cites FD&C Act 201(p) and FD&C Act 505(a). "
+                  "Respond within 15 working days of receipt of this letter.")
+        da = _wl_order_da(["section 201(p) of the FD&C Act", "§ 505(a)"])
+        result = vda.run_deep_analysis_gate(da, source)
+        self.assertTrue(result.ok, result.report)
+
+    def test_fabricated_section_still_fails(self) -> None:
+        # ★불가침: 어순을 흡수해도 **원문에 없는 섹션 번호는 여전히 하드 FAIL**(날조 차단).
+        da = _wl_order_da(["FD&C Act 201(p)", "FD&C Act 999(z)"])
+        result = vda.run_deep_analysis_gate(da, _WL_ORDER_SOURCE)
+        self.assertFalse(result.ok)
+        fails = [f for f in result.findings if f.severity == vda.SEV_FAIL]
+        self.assertTrue(any(f.code == "D2-CITATION-UNGROUNDED" and "999(z)" in f.detail
+                            for f in fails))
+        self.assertFalse(any("201(p)" in f.detail for f in fails))  # 실재 인용은 통과
+
+    def test_fabricated_subsection_of_real_section_still_fails(self) -> None:
+        # 더 얇은 날조: 섹션 번호는 원문에 있으나(505) 하위항이 다른 것(505(z))도 FAIL.
+        da = _wl_order_da(["FD&C Act 505(z)"])
+        result = vda.run_deep_analysis_gate(da, _WL_ORDER_SOURCE)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("505(z)" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_act_name_absent_from_source_still_fails(self) -> None:
+        # ★교차 오인용 차단: 섹션 번호는 원문에 있지만 원문이 FD&C Act 를 전혀 언급하지 않으면
+        # `FD&C Act 351(a)` 주장은 근거가 없다 — 번호만 보고 통과시키지 않는다.
+        source = ("Your firm violated section 351(a) of the Public Health Service Act "
+                  "during the inspection of your licensed facility this year.")
+        da = _wl_order_da(["FD&C Act 351(a)"])
+        result = vda.run_deep_analysis_gate(da, source)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("법률명" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_longer_number_does_not_ground_shorter_citation(self) -> None:
+        # 숫자 경계: 원문의 `1201(p)` 가 날조 `201(p)` 의 근거가 되면 안 된다.
+        source = ("This notice concerns section 1201(p) of an unrelated statute. "
+                  "Respond within 15 working days of receipt of this letter. FD&C Act.")
+        da = _wl_order_da(["FD&C Act 201(p)"])
+        result = vda.run_deep_analysis_gate(da, source)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("201(p)" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_cfr_citation_matching_unchanged(self) -> None:
+        # ★범위 격리: CFR 은 분해하지 않는다 — 원문에 `211.192` 와 `21 CFR` 이 따로 있어도
+        # `21 CFR 610.13` 은 근거를 얻지 못하고 FAIL(통짜 대조 유지).
+        da = dict(_GOOD_DEEP_ANALYSIS)
+        da["key_violations"] = list(da["key_violations"]) + [
+            {"citation": "21 CFR 610.13", "description": "원문에 없는 조항", "risk": "-"}]
+        result = vda.run_deep_analysis_gate(da, _SOURCE)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("610.13" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_korean_cross_law_matching_unchanged(self) -> None:
+        # ★범위 격리: 한국 법령 토큰도 분해하지 않는다 — 「약사법」 원문에 「화장품법」 인용은
+        # 여전히 교차 오인용 FAIL(2026-07-02 설계 §5-1 불변).
+        src = "「약사법」 제38조제1항 위반. [별표8] 행정처분 기준."
+        da = {
+            "key_violations": [{"citation": "「화장품법」 제38조제1항",
+                                "description": "제조기록서를 사실과 다르게 작성 위반",
+                                "risk": "데이터 무결성 훼손 위험"}],
+            "disposition_basis": "[별표8] 행정처분 기준에 따라 제조업무정지 1개월이 부과되었다.",
+            "required_remediation": {"deadline": "처분 통지 후 90일 이내 이의신청",
+                                     "items": ["과징금 납부 및 CAPA 재수행"]},
+            "administrative_risks": "재위반 시 가중처분 및 품목허가 취소로 이어질 수 있다."}
+        result = vda.run_deep_analysis_gate(da, src)
+        self.assertFalse(result.ok)
+        self.assertTrue(any("화장품법" in f.detail for f in result.findings
+                            if f.severity == vda.SEV_FAIL))
+
+    def test_long_form_act_name_in_source_grounds_citation(self) -> None:
+        # 원문이 법률명을 풀어 쓴 경우(Federal Food, Drug, and Cosmetic Act)도 같은 법이다.
+        source = ("These are new drugs within the meaning of section 201(p) of the "
+                  "Federal Food, Drug, and Cosmetic Act. Respond within 15 working days.")
+        result = vda.run_deep_analysis_gate(_wl_order_da(["FD&C Act 201(p)"]), source)
+        self.assertTrue(result.ok, result.report)
+
+    def test_483_word_order_stays_warn_not_fail(self) -> None:
+        # 483 경로의 D2 강등(WARN)은 그대로 — 어순 관용이 심각도를 바꾸지 않는다.
+        da = dict(_GOOD_FDA483_DA)
+        da["administrative_risks"] = (
+            "미시정 시 FD&C Act 501(a)(2)(B) 위반으로 Warning Letter 로 이어질 수 있다.")
+        result = vda.run_deep_analysis_gate(da, _FDA483_SOURCE, card_type="fda-483")
+        self.assertTrue(result.ok)   # WARN 은 비차단
+        self.assertTrue(any(f.code == "D2-CITATION-UNGROUNDED" and f.severity == vda.SEV_WARN
+                            for f in result.findings))
+
+
+class CitationSplitUnitTest(unittest.TestCase):
+    def test_split_targets_only_fdc_and_section_forms(self) -> None:
+        self.assertEqual(vda._split_act_section("FD&C Act 201(p)"), ("201(p)", True))
+        self.assertEqual(vda._split_act_section("section 201(p)"), ("201(p)", False))
+        self.assertEqual(vda._split_act_section("§502(a)"), ("502(a)", False))
+        self.assertIsNone(vda._split_act_section("21 CFR 211.192"))
+        self.assertIsNone(vda._split_act_section("약사법 제38조제1항"))
+        self.assertIsNone(vda._split_act_section("[별표8]"))
+
+    def test_contains_section_respects_digit_boundary(self) -> None:
+        self.assertTrue(vda._contains_section("section201(p)ofthefd&cact", "201(p)"))
+        self.assertFalse(vda._contains_section("section1201(p)oftheact", "201(p)"))
+        self.assertFalse(vda._contains_section("21cfr211.192", "192"))
+        self.assertFalse(vda._contains_section("21cfr211.192", "211"))
+        self.assertTrue(vda._contains_section("fd&cact505(a)and301(d)", "505(a)"))
+        # 문장을 끝내는 마침표는 조항 번호의 연장이 아니다(막으면 그게 또 다른 과차단).
+        self.assertTrue(vda._contains_section("violatessection301(a).marketing", "301(a)"))
+
+
 if __name__ == "__main__":
     unittest.main()

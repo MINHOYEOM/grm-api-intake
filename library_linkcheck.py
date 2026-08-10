@@ -17,6 +17,8 @@ from urllib.parse import urlparse
 
 import requests
 
+from grm_common import proxies_for
+
 SCHEMA_VERSION = "grm-library-health/v1"
 URL_FIELDS = ("official_url", "pdf_url", "ko_url")
 DEFAULT_USER_AGENT = "GRM-Library-Linkcheck/1.0 (+https://github.com/MINHOYEOM/grm-api-intake)"
@@ -114,6 +116,12 @@ def _request(
     kwargs: dict[str, Any] = {"allow_redirects": True, "timeout": timeout}
     if method == "GET":
         kwargs.update({"stream": True, "headers": {"Range": "bytes=0-1023"}})
+    # MFDS 계열 호스트만 KR egress 프록시를 태운다. 이 모듈은 grm_common 의 HTTP 헬퍼를
+    # 쓰지 않고 requests 를 직접 잡으므로, 여기서 명시적으로 거치지 않으면 워크플로가
+    # MFDS_HTTP_PROXY 를 넘겨도 **아무 효과가 없다**(env 전달 ≠ 배선).
+    proxies = proxies_for(url)
+    if proxies:
+        kwargs["proxies"] = proxies
     return session.request(method, url, **kwargs)
 
 

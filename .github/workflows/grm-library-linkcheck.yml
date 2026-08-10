@@ -34,6 +34,9 @@ jobs:
       - name: Check every library URL
         env:
           CHECK_DELAY: ${{ inputs.delay || '1.0' }}
+          # MFDS 는 해외 러너 IP 를 거부한다 — 프록시 없이 재면 카탈로그의 mfds.go.kr
+          # 링크가 실제 상태와 무관하게 network_or_tls 로 찍힌다.
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
         run: python library_linkcheck.py --delay "$CHECK_DELAY"
       - name: Commit health snapshot only
         run: |

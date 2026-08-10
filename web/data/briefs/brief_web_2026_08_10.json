@@ -171,13 +171,45 @@
      },
      {
       "number": "3",
-      "statement": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
+      "statement": "Your firm's quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
       "citation": "21 CFR 211.22",
       "statement_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 대해 설정된 규격에 적합함을 보증할 책임을 이행하지 못하였다 (21 CFR 211.22)."
      }
     ]
    },
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.84(d)(1)",
+      "original": "Your firm manufactures over-the-counter (OTC) (b)(4) drug products such as (b)(4) and ethanol-(b)(4). You failed to perform adequate identity testing on each shipment of each lot of incoming components (e.g., glycerin, propylene glycol, ethanol) used in the manufacture of your OTC (b)(4) drug products. Moreover, you used nonpharmaceutical-grade propylene glycol to manufacture your drug products.\n\nProducts Containing Ingredients at Risk for Diethylene Glycol or Ethylene Glycol (DEG or EG) Contamination\n\nYou also failed to adequately test your incoming components at high risk of DEG or EG contamination for identity before using them to manufacture your drug products. This includes, but is not limited to, testing of glycerin to determine its appropriate identity before using it in manufacturing your OTC topical drug products.",
+      "description": "OTC 의약품 제조에 사용하는 입고 성분(글리세린, 프로필렌글리콜, 에탄올)에 대해 각 로트의 각 선적분마다 수행해야 할 확인(identity)시험을 적정하게 실시하지 않았다. 나아가 비의약품등급(nonpharmaceutical-grade) 프로필렌글리콜을 그대로 의약품 제조에 투입했고, 디에틸렌글리콜(DEG)·에틸렌글리콜(EG) 오염 고위험 성분에 대해서도 사용 전 확인시험을 적정하게 하지 않았으며 여기에는 OTC 외용제 제조에 쓰인 글리세린의 확인시험이 포함된다.",
+      "risk": "DEG·EG 오염 성분은 전 세계적으로 치명적 중독 사고를 일으켜 왔으므로, 확인시험 없이 투입된 성분은 규격 적합성에 대한 과학적 근거가 전혀 없는 상태로 완제품에 전이되어 환자 사망을 포함한 중대한 안전 위해와 전량 회수 사유가 된다."
+     },
+     {
+      "citation": "21 CFR 211.100(a)",
+      "original": "Your firm failed to adequately validate the processes used to manufacture your OTC drug products. You have not performed process performance qualification (PPQ) studies, nor do you have an adequate ongoing program for monitoring process control to ensure stable manufacturing operations and consistent drug quality. Your firm also failed to validate your cleaning processes for non-dedicated equipment used to manufacture your OTC drug products.",
+      "description": "OTC 의약품 제조공정을 적정하게 밸리데이션하지 않았다. 공정성능적격성평가(PPQ) 자체를 한 번도 수행하지 않았고, 안정적인 제조와 일관된 품질을 담보할 지속적 공정관리 모니터링 프로그램도 갖추지 못했다. 또한 여러 제품이 함께 사용하는 비전용(non-dedicated) 설비의 세척공정 밸리데이션도 실시하지 않았다.",
+      "risk": "공정이 관리상태(state of control)에 있음을 입증하지 못한 채 상업 유통이 이루어져 배치 간·배치 내 편차가 통제되지 않고, 공용 설비의 세척이 검증되지 않아 제품 간 교차오염 가능성이 남는다."
+     },
+     {
+      "citation": "21 CFR 211.22",
+      "original": "Your quality unit (QU) failed to perform adequate oversight for the manufacture of your OTC drug products. For example, your QU failed to ensure the following:\n\nEstablishment of adequate written responsibilities and procedures applicable to the QU and to follow such written procedures (21 CFR 211.22(d)).\nEstablishment of laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)).\nFor each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)).\nEstablishment of an appropriate written testing program designed to assess the stability characteristics of drug products and to use results of stability testing to determine appropriate storage conditions and expiration dates (21 CFR 211.166(a)).\nEstablishment of adequate batch production and control records that contain the accomplishment of each significant step in the manufacture, processing, packing, or holding of the batch, for each batch of drug product (21 CFR 211.188).",
+      "description": "품질부서(QU)가 OTC 의약품 제조 전반에 대한 감독 책임을 이행하지 못했다. 구체적으로 QU 자신의 책임·절차를 문서로 정하고 그 문서화된 절차를 준수하는 것, 성분·용기·마개·공정중 물질·표시재료·완제품이 확인·함량·품질·순도 기준에 적합함을 보증할 과학적으로 타당한 규격·표준·샘플링 계획·시험법 등 실험실 관리체계 수립, 출하 전 배치별로 유효성분의 확인 및 함량을 포함한 최종규격 적합 여부의 실험실적 판정, 안정성 시험 프로그램을 통한 보관조건·유효기간 설정, 각 배치의 주요 제조·포장·보관 단계 수행 사실이 기재된 배치생산관리기록의 구비를 모두 보증하지 못했다.",
+      "risk": "출하 판정의 최종 관문인 품질부서가 기능하지 못해 규격 미달·확인 미검증 제품이 걸러지지 않고 시장에 유통되며, 안정성 근거 없는 유효기간과 불완전한 배치기록으로 인해 문제 발생 시 원인추적과 회수 범위 산정 자체가 불가능해진다."
+     }
+    ],
+    "fda_evaluation": "FDA는 2026년 3월 5일자 Form FDA 483 응답과 이후 서신을 검토한 뒤 세 위반 모두에 대해 응답이 부적정하다고 판정했다. 성분 관리와 관련해 업체는 프로필렌글리콜 보관용 검체 9개 로트를 DEG/EG 시험했고 3개 로트는 검체가 없었다고 밝히면서 향후 프로필렌글리콜·글리세린에 대해 USP 확인 및 불순물 시험을 모두 수행하겠다고 약속했으나, FDA는 적정한 성분 확인시험을 담보할 절차적 관리수단이 제시되지 않았고 비의약품등급 성분 사용에 대한 조사도, 부적정하게 시험된 성분이 이미 시장에 나간 제품에 미친 영향에 대한 평가도 없다는 점을 들어 부적정하다고 보았다. 공정 밸리데이션에 대해서는 공용 설비 세척밸리데이션과 제형별 3개 배치 공정밸리데이션을 하겠다는 약속만 있을 뿐, 시정이 완료될 때까지의 잠정 대책(interim plan)이 없고 미밸리데이션 공정으로 제조한 것의 영향을 평가한 위해평가도, 이미 미국 시장에 유통된 배치의 품질·안전 위험에 대한 조치계획도 없다고 지적했다. 품질부서 항목 역시 QU 절차를 도입하겠다는 약속뿐 잠정 대책과 유통 배치 영향에 대한 위해평가가 빠져 있다고 평가했다. 또한 FDA는 업체가 반복(repeat) 위반을 시정하지 못했다고 보아 21 CFR 211.34 요건을 충족하는 자격 있는 컨설턴트를 고용할 것을 권고했으며, 경영진이 회사의 제조 운영 전반을 즉시 종합적으로 재평가해야 한다고 명시했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(15영업일 내 시정 완료가 불가하면 지연 사유와 완료 일정을 제시). 일부 시험 결과는 서한 일자로부터 30일 이내 별도 제출 요구.",
+     "items": [
+      "자재·공급업체 관리 체계를 전면 재정비할 것 — 성분·용기·마개의 모든 공급업체가 적격한지, 자재에 적절한 유효기간 또는 재시험일이 부여되는지, 입고 자재 관리가 부적합 자재의 사용을 막기에 충분한지를 포괄적·독립적으로 검토하고, 공급업체 선정·적격성 평가·자격박탈 규정을 포함한 적격성 프로그램 요약과 이를 개선할 CAPA, 각 제조원 시험성적서(COA)의 신뢰성을 평가한 전 성분 시험 결과와 COA 검증 프로그램 SOP를 제출하며, 모든 입고 성분 로트를 확인·함량·품질·순도 전 규격에 대해 시험하는 방법(공급업체 COA를 원용할 경우 초기 밸리데이션과 주기적 재밸리데이션으로 신뢰성을 확립하는 방법 포함)과 로트별 최소 1개 특이적 확인시험 상시 수행 확약, 알코올(에탄올)·글리세린·프로필렌글리콜 등 고위험 성분에 대한 USP 각조 파트 A·B·C 수행, 고위험 성분별 화학적 품질관리 규격을 함께 제시할 것.",
+      "고위험 성분 로트의 보관용 검체가 없는 경우 해당 완제품 배치 보관검체에 대한 DEG 및 EG 시험 결과를, 알코올 성분에 대해서는 유기 불순물을 포함한 보관검체 시험 결과를 각각 서한 일자로부터 30일 이내에 제출하고, 유효기간 내 제품 중 DEG·EG 오염 위험 성분이 함유된 제품 전체에 대한 전면 위해평가를 실시해 오염 로트에 대한 고객 통지와 회수를 포함한 신속·적절한 조치를 취하며 향후 공급망 확보를 위한 추가 CAPA를 제시할 것.",
+      "제품 수명주기 전반의 관리상태를 보증하는 밸리데이션 프로그램(PPQ 및 배치 내·배치 간 편차의 지속 모니터링, 설비·시설 적격성 프로그램) 요약과 시판 제품별 PPQ 수행 일정, 공정 밸리데이션 없이 유통된 제품에 대한 위해평가, 고독성·고역가·저용해도·세척 난이 설비·세척 난이 부위 스왑 위치·세척 전 최대 보관시간 등 최악조건을 반영한 세척 밸리데이션 개선안과 신규 설비·신제품 도입 전 변경관리 절차를 제출할 것.",
+      "품질부서가 실질적 권한과 자원을 갖고 기능하도록 하는 포괄적 평가와 개선계획을 제출하되, 사내 절차의 견고성·적절성 판정, 전 공정에 대한 QU 감독 체계, QU 출하 판정 전 배치별 완전·최종 검토, 일탈조사 감독·승인 등 QU 업무 전반의 이행 방안을 포함하고, 반복 위반 시정을 위해 21 CFR 211.34 요건을 충족하는 자격 있는 컨설턴트를 활용할 것."
+     ]
+    },
+    "administrative_risks": "제조 방법·시설·관리가 CGMP에 부합하지 않아 해당 의약품은 section 501(a)(2)(B) of the Federal Food, Drug, and Cosmetic Act (FD&C Act) 상 위조(adulterated) 의약품에 해당한다. 신속·적정하게 시정하지 않으면 추가 통지 없이 압류(seizure)와 사용금지명령(injunction)을 포함한 규제·법적 조치가 취해질 수 있고, 미해결 위반은 다른 연방기관의 계약 수주를 가로막을 수 있다. 또한 FDA는 수출증명서(Export Certificate) 발급을 보류할 수 있으며, 위반이 완전히 해소되고 CGMP 준수가 확인될 때까지 해당 업체를 제조소로 기재한 신규 허가신청 및 변경(supplement) 승인을 보류할 수 있고, 시정조치 완료 여부를 확인하기 위한 재실사가 이루어질 수 있다. 아울러 이 업체가 제조하는 일부 제품은 section 201(i) of the FD&C Act 상 화장품으로 규제될 수 있는데, section 301(a) of the FD&C Act 는 위조 또는 표시위반 화장품을 주간 통상에 유통시키는 행위를 금지행위로 규정하고 있고 2022년 화장품규제현대화법(MoCRA)의 신규 요건도 함께 적용된다."
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],
@@ -263,13 +295,53 @@
      },
      {
       "number": "4",
-      "statement": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm’s quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)).",
+      "statement": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm's quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)).",
       "citation": "21 CFR 211.100(a)",
       "statement_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인시험 적합성(동일성), 함량, 품질 및 순도를 갖추도록 보증하기 위하여 마련된 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 않았고, 귀사의 품질관리부서는 변경사항을 포함한 해당 절차를 검토·승인하지 않았다 (21 CFR 211.100(a))."
      }
     ]
    },
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.22(a)",
+      "original": "Your firm manufactures over-the-counter drug products including (b)(4) and (b)(4). Your quality unit (QU) failed to exercise its authority and responsibilities over your drug manufacturing operations, including ensuring the integrity of your production records.\n\nDuring the inspection, our investigator requested the equipment usage logbook for Unit (b)(4), Line (b)(4), which your management stated was dedicated exclusively to (b)(4) manufacturing. Your firm delayed providing this record for several days. When your firm finally produced the logbook, it appeared to have been newly created. Subsequently, our investigator discovered the original logbook in the document room. A comparison of the two logbooks revealed that the version provided to our investigator was falsified. The fraudulent logbook listed entries only for (b)(4). It deliberately omitted multiple U.S. marketed OTC drug products that were documented in the original logbook, including (b)(4).\n\nFurthermore, our investigator identified multiple discrepancies between the source data in your analytical data books and the final values reported in your batch manufacturing records or certificates of analysis. For multiple batches of (b)(4) and (b)(4), the reported values for quality attributes such as residue on ignition, melting range, pH, and viscosity did not match the original data. While these inaccuracies did not involve out-of-specification results, your QU signed off on these records without ensuring the consistency and accuracy of the data.",
+      "description": "품질부서(QU)가 생산기록의 무결성을 담보할 권한과 책임을 행사하지 못했다. 조사관이 Unit (b)(4), Line (b)(4)의 설비사용대장(equipment usage logbook)을 요구하자 회사는 며칠간 제출을 지연했고, 뒤늦게 내놓은 대장은 새로 작성된 것으로 보였다. 이후 조사관이 문서보관실에서 원본 대장을 발견해 대조한 결과 제출본은 위조된 것이었으며, 원본에 기재돼 있던 미국 시판 OTC 의약품 다수를 고의로 누락한 상태였다. 또한 분석 데이터북의 원 데이터와 배치제조기록서·시험성적서(certificates of analysis)에 최종 보고된 값 사이에 다수의 불일치가 확인됐는데, 강열잔분(residue on ignition)·융점범위(melting range)·pH·점도(viscosity) 같은 품질특성의 보고값이 원 데이터와 달랐고, QU 는 데이터의 일관성과 정확성을 확인하지 않은 채 이 기록들을 승인·서명했다.",
+      "risk": "생산기록 자체가 신뢰할 수 없게 되어 이미 미국에 유통된 OTC 의약품의 제조 이력과 품질을 사후에 검증할 방법이 없고, 대장 위조는 국소적 절차 결함이 아니라 조직적 데이터 무결성 붕괴의 신호로 평가되어 해당 시설에서 출하된 전 제품의 적합성이 의심받는다."
+     },
+     {
+      "citation": "21 CFR 211.194(a)",
+      "original": "Your laboratory records did not include complete data to support the analyses performed. For example, your analytical notebooks documented approximately (b)(4) microbiology plates for finished drug products and approximately (b)(4) media plates for testing (b)(4) samples as incubated, but the plates were physically absent from incubators with no documented explanation about their whereabouts or disposal. In addition, during the inspection you could not produce the test procedures, analytical workbooks, or test data sheets to support the reported certificate of analysis results for approximately (b)(4) batches of U.S. marketed drug products. You also failed to make the required entries in your equipment logbooks to reflect the use of multiple instruments for the specific batch release tests performed.",
+      "description": "시험실 기록이 수행된 분석을 뒷받침할 완전한 데이터를 담고 있지 않았다. 분석 노트에는 완제의약품용 미생물(microbiology) 배지와 시험용 media 배지가 배양 중인 것으로 기재돼 있었으나 실제 배지는 배양기(incubators)에서 사라진 상태였고 행방·폐기에 관한 어떤 기록도 없었다. 또한 실사 기간 중 미국 시판 의약품 상당수 배치(batches)에 대해 시험성적서에 보고된 결과를 뒷받침할 시험절차·분석 워크북·시험기록지를 제시하지 못했고, 배치 출하시험에 사용한 여러 기기의 사용 이력을 설비대장에 기재해야 하는 의무도 이행하지 않았다.",
+      "risk": "시험 근거자료 없이 출하된 배치는 미생물학적·이화학적 적합성을 입증할 수 없어 유효기간 내 제품에 대한 소비자 노출 위험이 남고, 시험성적서의 신뢰성이 무너지면 QU 의 적합판정 기능 자체가 성립하지 않는다."
+     },
+     {
+      "citation": "21 CFR 211.67(b)",
+      "original": "You failed to demonstrate that your cleaning practices are adequate to remove potential contaminants and to prevent drug product carry over in shared equipment used to manufacture your OTC drug products.\n\nFor example, your cleaning validation program for the non-dedicated Unit (b)(4) Line (b)(4) relied exclusively on the visual inspection of (b)(4) to determine adequate cleaning. Your cleaning validation program lacked scientifically determined maximum allowable carryover limits, quantitative residue testing, or direct surface sampling of difficult-to-clean areas. In addition, you did not perform any cleaning validation for Unit (b)(4) Line (b)(4) despite using it to manufacture at least (b)(4) different OTC drug products.",
+      "description": "공용 설비에서 잔류 오염물질을 제거하고 제품 이월(carry over)을 방지할 수 있음을 세척 관행으로 입증하지 못했다. 비전용(non-dedicated) Unit (b)(4) Line (b)(4)의 세척 밸리데이션은 오로지 육안 검사(visual inspection)에만 의존해 세척 적절성을 판정했고, 과학적으로 설정된 최대 허용 이월한도(carryover limits)나 정량적 잔류물 시험(residue testing), 세척이 어려운 부위에 대한 직접 표면 채취(surface sampling)가 전혀 없었다. 나아가 또 다른 Unit (b)(4) Line (b)(4)은 여러 종의 OTC 의약품을 제조하는 데 사용하면서도 세척 밸리데이션을 아예 수행하지 않았다.",
+      "risk": "비전용 설비 표면의 원료·제품 잔류물이 후속 제조 제품으로 이월되어 교차오염을 일으킬 수 있으며, 정량 한도 없이 육안 확인에만 의존한 탓에 오염이 발생해도 출하 전에 검출되지 않는다."
+     },
+     {
+      "citation": "21 CFR 211.100(a)",
+      "original": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and your firm's quality control unit did not review and approve those procedures, including any changes (21 CFR 211.100(a)).\n\nYou failed to validate your manufacturing process for your OTC drug products. During the inspection, you stated that you had not performed process validation for (b)(4) of the (b)(4) drug products you manufacture on Unit (b)(4) lines. You also stated you had not performed process validation for (b)(4) of the (b)(4) drug products you manufacture on Unit (b)(4) lines.",
+      "description": "OTC 의약품 제조공정에 대한 밸리데이션을 수행하지 않았다. 실사 중 회사는 Unit (b)(4) 라인에서 제조하는 의약품 가운데 상당수에 대해 공정 밸리데이션(process validation)을 실시하지 않았다고 진술했고, 또 다른 Unit (b)(4) 라인에서 제조하는 의약품에 대해서도 마찬가지로 공정 밸리데이션을 수행하지 않았다고 진술했다. 즉 표시된 확인시험·함량·품질·순도를 보증하도록 설계된 생산·공정관리 절차가 확립·준수되지 않았고 QU 의 검토·승인도 이뤄지지 않았다.",
+      "risk": "공정이 관리상태에 있음을 입증하지 못한 채 상업 유통이 이뤄져 배치 내·배치 간 변동이 통제되지 않으며, 표시된 함량·품질·순도를 보증할 수 없는 제품이 유효기간 내내 시장에 남는다."
+     }
+    ],
+    "fda_evaluation": "FDA 는 회사의 2026년 2월 4일자 Form FDA 483 회신을 상세히 검토한 뒤 네 항목 모두를 부적절(inadequate)로 판정했다. 데이터 무결성 항목에서는, 회사가 대장 위조를 '문서관리 미흡·감독 부족·견고한 거버넌스 부재' 탓으로 돌리고 나머지 부정확성을 전사(轉寫) 관행과 QU 인력 부족 탓으로 설명하면서 데이터 무결성 위반을 QU 감독의 체계적 붕괴와 미흡한 품질문화의 증거가 아니라 개별적 절차 공백으로 취급했다고 지적했다. 또 회신에 이미 미국 시장에 유통된 의약품 품질에 미친 잠재적 영향에 대한 적절한 평가와 QU 역량 전반에 대한 충분한 종합 평가가 빠져 있다고 평가했다. 시험실 항목에서는 미생물 담당자 재교육·재분석·신규 대장 도입만으로는 시험실 시스템의 중대한 결함을 다루지 못하며, 유효기간 내 영향 가능 제품 전체에 대한 포괄적 소급 위험평가와 완전한 시험이 없고 소비자 리스크의 평가·완화도 부족하다고 했다. 세척 항목에서는 시정 기간 중 교차오염을 억제할 잠정 관리 방안이 제시되지 않았고, 회사가 제안한 표본 한정 시험은 교차오염 가능성을 판단하기에 통계적으로 불충분하며, 미국에 출하돼 유효기간 내에 있는 전 제품에 대한 소급 검토가 빠졌다고 지적했다. 공정 밸리데이션 항목에서는 제품별 완료 일정·기한이 없고, 밸리데이션 완료 전에 제조·유통되는 의약품에 대한 잠정 대책(예: 완제품 시험 강화)과 유효기간 내 미국 유통품·진행 중 제조분에 대한 영향평가가 누락됐다고 했다. 아울러 FDA 는 시정을 지원할 독립적인 제3자 유자격 컨설턴트를 둘 것을 강력히 권고하고, 미국 시장용 제조를 재개하려면 유자격 컨설턴트가 전체 운영에 대한 six-system 감사를 수행해야 한다고 밝혔다.",
+    "required_remediation": {
+     "deadline": "이 서한 수령 후 15영업일 이내(within 15 working days)에 서면으로 회신하고, 위반 시정과 재발방지를 위해 무엇을 했는지 구체적으로 밝혀야 한다. 15영업일 내에 시정을 완료할 수 없으면 지연 사유와 완료 일정을 함께 제시해야 한다. 회신은 CDER-OC-OMQ-Communications@fda.hhs.gov 로 전자 제출한다.",
+     "items": [
+      "제조·시험실 전반의 문서화 시스템에 대한 포괄적 평가를 실시해 문서화 관행이 미흡한 지점을 규명하고, 전 공정에서 귀속성·가독성·완전성·원본성·정확성·동시성을 갖춘 기록이 유지되도록 문서화 관행을 근본적으로 시정하는 CAPA 계획을 제출한다.",
+      "QU 가 실질적으로 기능하도록 권한과 자원을 보장하는 평가·개선계획을 제출한다 — 사용 중인 절차의 견고성·적정성 판단, 전 공정에 걸친 QU 감독체계, QU 처분 결정 전 배치별 관련 정보의 완전한 최종 검토, 일탈조사 감독·승인 등 QU 의 전 업무 수행 방안을 포함한다.",
+      "데이터 부정확성의 범위를 규명하는 포괄적 조사를 수행한다 — 조사 프로토콜·방법론, 대상 시험실·제조공정·시스템 목록과 제외 범위에 대한 정당화, 유자격 제3자가 수행하는 현·전직 직원 인터뷰, 누락·변조·삭제·기록 파기·비동시적 기록작성 등 결함의 범위 평가와 유자격 제3자에 의한 소급 평가를 포함하고, 데이터 무결성 일탈 제품의 출하가 환자에게 초래한 위험과 진행 중인 운영의 위험을 분석한 현행 위험평가를 함께 제출한다.",
+      "글로벌 CAPA 를 담은 경영진 전략을 제출한다 — 분석데이터·제조기록·FDA 제출자료 전반의 신뢰성과 완전성 확보 방안, 근본원인 규명과 책임자들이 여전히 CGMP·허가 데이터에 영향을 미칠 수 있는지 여부 명시, 고객 통지·제품 회수·추가 시험·안정성시험 편입·불만 모니터링 강화 등 환자 보호를 위한 잠정 조치, 절차·시스템·관리감독·인력에 대한 장기 개선책, 시정 프로토콜 실행 후 최소 2년간 유자격 컨설턴트의 광범위한 연례 감사 실시 약속, 익명 제보를 접수·조사할 권한을 가진 Chief Integrity Officer 채용 여부 통보를 포함한다.",
+      "세척 유효성에 대한 독립적·포괄적 소급 평가를 실시한다 — 잔류물의 정체, 부적절하게 세척됐을 수 있는 다른 제조설비, 교차오염된 제품이 유통을 위해 출하됐는지 여부에 대한 판단을 포함하고, 2개 이상 품목을 제조하는 모든 설비를 대상으로 한다. 아울러 고독성·고역가·저용해도·난세척 특성 제품, 가장 세척이 어려운 스왑 채취 위치, 세척 전 최대 보관시간 등 최악조건을 반영해 세척 밸리데이션 프로그램을 개선하고 관련 SOP 를 갱신한다.",
+      "제품 수명주기 전반의 관리상태를 보증하는 밸리데이션 프로그램과 절차를 제출한다 — 시판 중인 각 제품에 대한 공정성능적격성평가 일정표, 공정성능 프로토콜과 설비·시설 적격성평가 절차, 배치 내·배치 간 변동을 지속 감시해 관리상태를 유지하는 프로그램을 포함한다."
+     ]
+    },
+    "administrative_risks": "미이행 시 행정·법적 조치가 이어질 수 있다. FDA 는 2026년 5월 13일 전화회의에서 미국 시장에 유통 중인 해당 제품 배치의 회수를 검토하도록 권고했고, 회사는 2026년 6월 2일 시설의 체계적 품질 실패를 이유로 자발적 회수를 실시했으나 일부 의약품은 아직 회수하지 않은 상태다. 이어 FDA 는 2026년 6월 5일 이 회사가 미국으로 수출하는 모든 의약품과 원료를 Import Alert 66-40 에 등재했다. 위반이 해소되지 않으면 FDA 는 Silvassa 소재 해당 시설에서 제조된 물품의 미국 반입을 section 801(a)(3) of the FD&C Act 에 근거해 계속 거부할 수 있고, 이 권한에 따라 제조 방법·관리가 CGMP 에 부합하지 않는 것으로 보이는 물품은 section 501(a)(2)(B) of the FD&C Act 상 불량의약품(adulterated)으로 억류되거나 반입이 거부될 수 있다. 또한 FDA 는 위반이 완전히 시정되고 CGMP 준수가 확인될 때까지 이 회사를 제조소로 기재한 신규 신청·보충 신청의 승인을 보류할 수 있으며, 시정조치 완료 여부를 확인하기 위해 재실사할 수 있다. 미국 시장용 의약품 제조를 재개하려면 유자격 컨설턴트를 선임해 전체 운영에 대한 six-system 감사와 시정조치의 완결성·효과성 평가를 받아야 하고, 컨설턴트 활용이 회사의 CGMP 준수 의무나 경영진의 결함 해소 책임을 면제하지 않는다. 이 서한의 위반사항은 전부가 아니며, 나머지 위반의 조사·원인규명·재발방지 책임은 회사에 있다."
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],
@@ -331,7 +403,54 @@
     "복수 모노그래프 동시 적용 여부와 그 근거",
     "무허가 신약 해당 시 505 신청 필요성 검토 기록"
    ],
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.165(a)",
+      "original": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)). The records and information you provided did not demonstrate that you adequately tested your finished drug products before their release and distribution. For example, the documentation you provided did not include an assay test for active ingredient content in your finished drug products.",
+      "description": "각 배치를 출하하기 전에 완제의약품이 최종 규격에 적합한지, 특히 유효성분의 확인시험(identity)과 함량(strength)이 규격에 맞는지 확인하는 시험을 수행하지 않았다. 회사가 제출한 문서에는 완제의약품의 유효성분 함량을 측정하는 assay 시험 자체가 포함돼 있지 않아, 출하·유통 전에 제품이 규격에 적합하다는 과학적 근거 없이 배치 출하 판정이 이뤄져 온 것으로 확인됐다.",
+      "risk": "유효성분이 미달·초과된 배치가 걸러지지 않고 그대로 미국에 유통될 수 있고, 이미 유통된 배치에 대해서도 품질을 사후에 입증할 시험 근거가 없어 회수 여부를 판단할 자료조차 없는 상태가 된다."
+     },
+     {
+      "citation": "21 CFR 211.100(a) and 211.67(b)",
+      "original": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess. Your firm also failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.100(a) and 211.67(b)). Based on records and information your firm provided, you did not demonstrate that you adequately validated your manufacturing and cleaning processes. Lack of Adequate Process Validation Your firm lacks adequate process validation studies. You failed to provide sufficient data to demonstrate that appropriate controls and critical parameters are applied to ensure reproducibility of your drug manufacturing procedures. Your response indicated that you consider processes to be suitable \"if the final inspection result is satisfactory,\" and that you perform no further validation activities. Moreover, the test reports provided in your response did not include an assay test for active ingredient content.",
+      "description": "제품이 표방하는 확인·함량·품질·순도를 보증하도록 설계된 제조 및 공정관리 문서화 절차를 확립하지 않았고, 설비 세척·유지관리에 대한 절차도 확립·준수하지 않았다. 회사는 답변에서 '최종 검사 결과가 만족스러우면(if the final inspection result is satisfactory)' 공정이 적합하다고 보며 그 밖의 밸리데이션 활동은 전혀 수행하지 않는다고 밝혔고, 함께 제출한 시험성적서에도 유효성분 함량 assay 가 빠져 있어 제조공정의 재현성을 뒷받침할 데이터가 없다.",
+      "risk": "공정 파라미터가 관리되고 있다는 근거가 없어 배치 간 품질 편차를 통제할 수 없고, 세척 밸리데이션이 없는 공용 설비에서는 앞선 제품의 유효성분·잔류물이 다음 제품에 교차오염될 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.84(d)(1) and 211.84(d)(2)",
+      "original": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality (21 CFR 211.84(d)(1) and 211.84(d)(2)). The records and information your firm provided did not demonstrate that you adequately tested the raw materials used to manufacture your drug products. Products Containing High-Risk Drug Components Your firm failed to test the identity of incoming components, such as glycerin, used to manufacture your drug products. Identity testing for glycerin and certain other high-risk drug components includes a limit test in the United States Pharmacopeia (USP) to ensure that the component meets the relevant safety limits for levels of diethylene glycol (DEG) and ethylene glycol (EG). Because you did not perform adequate identity testing on each shipment of each lot using the USP identification test that detects these hazardous impurities, you failed to ensure the acceptability of these components for use in the manufacturing of your drug product.",
+      "description": "제조에 쓰이는 원료 성분에 대해 확인시험과 순도·함량·품질 규격 적합성 시험을 수행하지 않았다. 특히 고위험 원료인 glycerin 에 대해 입고되는 로트·선적마다 디에틸렌글리콜(DEG)·에틸렌글리콜(EG) 한도를 확인하는 USP 확인시험을 수행하지 않아, 해당 원료를 의약품 제조에 사용해도 되는지 자체를 보증하지 못했다.",
+      "risk": "치명적 중독 사고를 일으켜 온 DEG·EG 오염 원료가 걸러지지 않은 채 제품에 들어갈 수 있으며, 공급업체 성적서에만 의존하는 입고 관리로는 오염 로트가 제조에 투입되는 것을 구조적으로 막지 못한다."
+     },
+     {
+      "citation": "21 CFR 211.166(a)",
+      "original": "Your firm failed to establish and follow a written testing program designed to assess the stability characteristics of drug products (21 CFR 211.166(a)). The records and information you provided did not demonstrate that the chemical and microbiological properties of your drug products remain acceptable throughout the labeled (b)(4) expiry period. For example, the stability data you provided includes only the results from a (b)(4) study performed between (b)(4) degrees Celsius, and a (b)(4) study at (b)(4) degrees Celsius. Moreover, the test methods do not appear to be stability-indicating.",
+      "description": "표시된 유효기간 전 구간에 걸쳐 제품의 화학적·미생물학적 특성이 허용 범위 안에 유지되는지를 평가하는 문서화된 안정성 시험 프로그램을 확립·운영하지 않았다. 제출된 안정성 자료는 일부 온도 조건에서 수행한 시험 결과뿐이었고, 사용한 시험법도 안정성 지시성(stability-indicating)이 있어 보이지 않는다.",
+      "risk": "표시된 유효기간까지 제품이 규격을 유지한다는 과학적 근거가 없어, 사용기한 내 제품이라도 함량 저하·미생물학적 품질 저하 상태로 환자에게 도달할 수 있고 유효기간 설정 자체의 타당성이 무너진다."
+     },
+     {
+      "citation": "section 505(a) of the FD&C Act",
+      "original": "As formulated, your syNeo antiperspirant products do not conform to the conditions of use set forth in M019. Specifically, your antiperspirant products are labeled to contain aluminum chlorohydrate 10%, and aluminum chloride 10%, as active ingredients. While each active ingredient is individually permitted by M019.10, these active ingredients are not permitted when used in this combination (or any other combination) in a single antiperspirant drug product.",
+      "description": "라벨링 검토 결과 syNeo antiperspirant 제품군은 발한억제제 일반의약품 모노그래프 M019 가 정한 사용조건에 부합하지 않는다. 이 제품들은 유효성분으로 aluminum chlorohydrate 10% 와 aluminum chloride 10% 를 함께 표시·배합했는데, 각 성분은 M019.10 에서 개별적으로는 허용되지만 하나의 발한억제제 제품에서 이 조합(또는 그 밖의 어떤 조합)으로 사용하는 것은 허용되지 않는다. 따라서 이 제품들은 모노그래프 조건을 충족하지 못해 승인된 신청 없이 판매될 근거가 없는 미승인 신약에 해당한다.",
+      "risk": "승인 절차도 모노그래프 요건도 거치지 않은 제품이 미국 시장에서 판매되고 있어 제품 자체가 즉시 판매 중단·회수 대상이 될 수 있으며, 표시 위반까지 겹쳐 주간거래 반입 자체가 금지되는 상태다."
+     }
+    ],
+    "fda_evaluation": "FDA 는 2025년 8월 12일 자 기록 제출 요구(704(a)(4))에 따라 회사가 제출한 기록과 이후 서신을 검토했으나, 제출된 기록·정보 어느 것도 완제품 출하시험·공정 및 세척 밸리데이션·원자재 시험·안정성 시험이 적절히 수행되고 있음을 입증하지 못했다고 평가했다. 특히 회사가 '최종 검사 결과가 만족스러우면' 공정이 적합하다고 보고 그 밖의 밸리데이션 활동을 하지 않는다고 답한 점, 제출한 시험성적서에 유효성분 함량 시험이 빠져 있는 점을 응답의 구체적 결함으로 지목했다. 결론적으로 FDA 는 회사의 품질시스템 자체가 부적절하다고 판단했고, 위반의 성격에 비춰 CGMP 요건 충족을 돕도록 21 CFR 211.34 에 정한 자격을 갖춘 컨설턴트를 고용할 것을 권고하면서도, 컨설턴트 사용이 회사의 준수 의무를 면제하지 않으며 모든 결함과 시스템적 결함의 해소 책임은 경영진에게 있다고 못박았다.",
+    "required_remediation": {
+     "deadline": "서한 수령일로부터 15영업일(fifteen (15) business days) 이내에 CDER 규제준수국 품질관리실 앞으로 서면 회신하고, 회신에는 FEI 3035784232 를 명시해야 한다. 고위험 원료의 DEG·EG 시험 결과는 서한 일자로부터 30일 이내 제출하겠다는 확약을 별도로 제출해야 한다.",
+     "items": [
+      "배치 출하 판정에 사용하는 화학·미생물 규격과 시험법 목록을 제출하고, 서한 일자 기준 유효기간이 남아 있는 미국 유통 전 배치의 보관검체에 대해 전면적인 화학·미생물 시험을 수행할 실행계획과 일정을 제시할 것. 시험 결과 품질 미달이 확인되면 고객 통보·회수 등 신속한 시정조치를 취해야 한다.",
+      "제품 수명주기 전반의 관리상태를 보증하는 밸리데이션 프로그램과 설비·시설 적격성평가 프로그램을 문서로 제출하고, 판매 중인 제품별 공정성능적격성평가 일정과 밸리데이션 없이 제조·유통된 제품에 대한 위험평가·후속조치를 제시할 것.",
+      "세척 밸리데이션 프로그램을 최악조건 기준으로 개선할 것 — 고독성·고역가 제품, 세척 용매에 대한 저용해도 제품, 세척이 어려운 특성, 세척 난이도가 가장 높은 부위의 스왑 위치, 세척 전 최대 보관시간을 식별·평가하고, 신규 설비·신규 제품 도입 전 변경관리 절차를 규정할 것.",
+      "고위험 원료(glycerin 포함) 보관검체에 대한 DEG·EG 시험 결과와 유효기간 내 제품 전반의 위험평가를 제출하고, 입고 로트마다 최소 1건의 특이적 확인시험을 항상 수행한다는 확약과 공급업체 적격성평가·입고 자재 관리 CAPA 를 함께 제시할 것.",
+      "제조용수의 적합성을 입증할 것 — 전도도·총유기탄소 시험 수행, 배치별 사용 적합성을 보증하는 정기 미생물 시험 절차, 총균수·유해균에 대한 조치·경고 한도, 용수 시스템의 지속적 관리·유지·모니터링 절차를 제출해야 한다.",
+      "안정성 프로그램 전반에 대한 독립적·포괄적 평가와 CAPA 계획을 제출할 것 — 안정성 지시성 시험법, 판매용 용기·마개 시스템에서 유통 개시 전 수행하는 제품별 안정성 시험, 매년 대표 배치를 편입하는 지속 프로그램, 시점별 시험항목 정의를 포함해야 한다.",
+      "시험실 운영(절차·시험법·장비·기록·분석자 역량)에 대한 독립적 종합평가와 개선·효과성 평가 계획, 자재 시스템(공급업체·용기·마개 적격성) 독립 검토 결과를 제출할 것."
+     ]
+    },
+    "administrative_risks": "미이행 시 FDA 는 이 회사를 제조원으로 기재한 신규 허가·변경 신청의 승인을 위반이 완전히 해소되고 CGMP 준수가 확인될 때까지 보류할 수 있으며, 시정 완료 여부를 확인하기 위한 실사를 실시할 수 있다. 또한 이 시설에서 제조된 제품은 section 801(a)(3) of the FD&C Act 에 따라 미국 반입이 억류·거부될 수 있고, 제조방법·관리가 CGMP 에 부합하지 않는다는 점에서 section 501(a)(2)(B) of the FD&C Act 의 의미에서 부적합(adulterated) 의약품으로, 모노그래프 요건 미준수 일반의약품이라는 점에서 section 502(ee) of the FD&C Act 에 따라 표시위반(misbranded) 의약품으로 취급된다. 미승인 신약과 표시위반 의약품을 주간거래에 반입하는 행위는 각각 505(a)·301(d) 위반과 301(a) 위반에 해당한다. 경고서한 본문은 FDA 웹사이트에 공개되므로, 고객·유통 파트너의 공급업체 실사와 계약 심사에서 즉시 노출된다."
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],
@@ -343,6 +462,32 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 4,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release (21 CFR 211.165(a)).",
+      "citation": "21 CFR 211.165(a)"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess. Your firm also failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.100(a) and 211.67(b)).",
+      "citation": "21 CFR 211.100(a)"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "citation": "21 CFR 211.84(d)(1)"
+     },
+     {
+      "number": "4",
+      "statement": "Your firm failed to establish and follow a written testing program designed to assess the stability characteristics of drug products (21 CFR 211.166(a)).",
+      "citation": "21 CFR 211.166(a)"
+     }
+    ]
    }
   },
   {

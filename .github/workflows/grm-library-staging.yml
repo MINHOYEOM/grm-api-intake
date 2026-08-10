@@ -1,9 +1,13 @@
 name: GRM Library Automatic Refresh
 
 on:
-  # 월요일 03:23 KST. 주간 cadence는 최신성/사이트 부하의 균형점이며 아래 게이트가 급변을 차단한다.
   schedule:
+    # 월요일 03:23 KST. 주간 cadence는 최신성/사이트 부하의 균형점이며 아래 게이트가 급변을 차단한다.
     - cron: '23 18 * * 0'
+    # 나머지 요일 같은 시각 — **격리가 열려 있을 때만** 도는 복구 모드다(decide 잡이 판정).
+    # 자료실은 주 1회라 한 번 실패하면 그대로 7일 결손이 된다. 2026-08-10 이 그랬다:
+    # 같은 간헐 장애를 매일 도는 intake 는 다음 날 흡수했고 자료실은 그대로 굳었다.
+    - cron: '23 18 * * 1-6'
   workflow_dispatch:
     inputs:
       max_change_count:
@@ -18,6 +22,15 @@ on:
         description: 'MFDS 수집 lookback 일수'
         required: true
         default: '120'
+      retry_attempt:
+        description: '자동 재시도 회차 — 사람이 넣지 않는다(격리 시 워크플로가 스스로 올린다)'
+        required: false
+        default: '0'
+
+# 격리 이슈의 제목은 **여기가 단일 정의**다. decide 잡과 이슈 관리 스텝이 같은 문자열을
+# 봐야 하는데, 양쪽에 따로 적으면 한쪽만 고쳐져 복구 모드가 조용히 안 도는 상태가 된다.
+env:
+  QUARANTINE_ISSUE_TITLE: 'GRM 자료실 수집기 실패 — 소스 격리'
 
 permissions:
   actions: write
@@ -30,15 +43,70 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 이번 실행이 돌아야 하는지만 판정한다. 평일 예약은 **격리 중일 때만** 통과시켜
+  # 복구 모드로 쓰고, 평상시엔 주 1회 그대로 유지한다(사이트 부하·PR 소음 방지).
+  decide:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+      reason: ${{ steps.check.outputs.reason }}
+    steps:
+      - name: Decide whether this run proceeds
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+          # github.* 는 env 로만 받는다(셸 본문 직접 삽입 금지 — 저장소 규약).
+          GRM_EVENT_NAME: ${{ github.event_name }}
+          GRM_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ "$GRM_EVENT_NAME" != "schedule" ]; then
+            printf 'run=true\nreason=수동 실행\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # cron 은 UTC 지만 운영 기준은 KST 다(18:23 UTC = 익일 03:23 KST).
+          if [ "$(TZ='Asia/Seoul' date +%u)" = "1" ]; then
+            printf 'run=true\nreason=주간 정기(월요일 03:23 KST)\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OPEN=$(gh issue list --repo "$GRM_REPO" --label automation-warning --state open \
+                   --json title \
+                   --jq "[.[] | select(.title == \"$QUARANTINE_ISSUE_TITLE\")] | length")
+          if [ "$OPEN" -gt 0 ]; then
+            printf 'run=true\nreason=복구 모드(격리 이슈 열림)\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'run=false\nreason=평일이고 격리 없음 — 건너뜀\n' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Summary
+        env:
+          DECISION: ${{ steps.check.outputs.run }}
+          DECISION_REASON: ${{ steps.check.outputs.reason }}
+        run: |
+          echo "판정: $DECISION — $DECISION_REASON" >> "$GITHUB_STEP_SUMMARY"
+
   refresh:
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       MAX_CHANGE_COUNT: ${{ inputs.max_change_count || '20' }}
       MAX_CHANGE_PERCENT: ${{ inputs.max_change_percent || '30' }}
       LOOKBACK_DAYS: ${{ inputs.days || '120' }}
+      RETRY_ATTEMPT: ${{ inputs.retry_attempt || '0' }}
       BRANCH: automation/library-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      # KR egress — **이게 이 워크플로가 MFDS 를 못 받던 진짜 이유다.** secret 은 2026-07-05
+      # 부터 있었지만 넘기는 워크플로가 grm-intake 하나뿐이었다(양끝이 갖춰져 있어서
+      # 배선된 줄 알았던 3주짜리 착시).
+      # 2026-08-10 실측: 이 secret 을 넘긴 intake 는 같은 RSS 를 피드당 2초에 받았고(3/3),
+      # 안 넘긴 이 워크플로는 7개 피드 × 재시도 3회가 전부 connect timeout 났다(0/21).
+      # 새 러너로 재디스패치해도 또 0/21 — 러너 복불복이 아니라 프록시 유무가 가른다.
+      # 자료실은 주 1회라 그 1회를 놓치면 곧바로 7일 결손이 된다.
+      # 보드 선택(MFDS_RSS_BOARD_MODE)은 **의도적으로 넘기지 않는다** — 자료실은 7개 보드
+      # 전부가 대상이고, intake 의 residual(3개)을 상속하면 커버리지가 조용히 좁아진다.
+      MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
     steps:
       - uses: actions/checkout@v6.0.2
         with:
@@ -183,7 +251,9 @@ jobs:
             const skipped = JSON.parse(fs.readFileSync(path, 'utf8')).skipped_sources || {};
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const title = 'GRM 자료실 수집기 실패 — 소스 격리';
+            // 제목은 워크플로 상단 env 가 단일 정의다 — decide 잡이 같은 문자열로 복구
+            // 모드를 판정하므로 여기서 따로 적으면 한쪽만 바뀌어 조용히 어긋난다.
+            const title = process.env.QUARANTINE_ISSUE_TITLE;
             const label = 'automation-warning';
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
                          + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
@@ -232,7 +302,12 @@ jobs:
               '```bash',
               `python library_staging_build.py --sources ${names.join(',')}`,
               '```',
-              '원문 페이지 구조가 바뀌었으면 해당 `library_collect_<source>.py` 파서를 고치고, 일시 장애면 다음 주 실행에서 자동 복구됩니다(복구되면 이 이슈는 자동으로 닫힙니다).',
+              '원문 페이지 구조가 바뀌었으면 해당 `library_collect_<source>.py` 파서를 고치세요.',
+              '',
+              '### 자동 복구',
+              '- 이 이슈가 열려 있는 동안 자료실 갱신은 **매일 03:23 KST** 재시도합니다(평상시 주 1회 → 복구 모드).',
+              '- 격리 감지 직후에도 **새 러너로 최대 2회** 즉시 재시도합니다(같은 프로세스의 HTTP 재시도는 같은 IP라 IP 거부에 무력).',
+              '- 복구되면 이 이슈는 자동으로 닫히고 주 1회로 돌아갑니다.',
             ];
             if (weeks >= 3) {
               lines.splice(1, 0,
@@ -254,6 +329,113 @@ jobs:
                 owner, repo, title, body, labels: [label],
               });
             }
+
+      - name: Retry on a fresh runner when a source was quarantined
+        # 같은 프로세스의 HTTP 재시도(3회·90초)는 **같은 IP** 라 IP 거부에는 무력하다.
+        # 새 러너를 뽑는 유일한 방법이 새 실행이라 여기서 자기 자신을 다시 디스패치한다.
+        #
+        # 다만 이건 **보조 방어층**이다 — 2026-08-10 실측상 MFDS 는 프록시 없이는 러너를
+        # 바꿔도 두 번 다 0/21 이었다. 진짜 수리는 위의 MFDS_HTTP_PROXY 배선이고, 이
+        # 재시도는 그 밖의 소스(ema·who·pics·health_canada 등)의 일시 장애를 흡수한다.
+        if: always() && steps.skipped.outputs.sources != '' && fromJSON(env.RETRY_ATTEMPT) < 2
+        env:
+          SKIPPED_SOURCES: ${{ steps.skipped.outputs.sources }}
+          RETRY_NEXT: ${{ fromJSON(inputs.retry_attempt || '0') + 1 }}
+        run: |
+          set -euo pipefail
+          echo "::warning title=자료실 재시도::격리($SKIPPED_SOURCES) — 새 러너로 재시도 $RETRY_NEXT/2"
+          echo "🔁 격리 \`$SKIPPED_SOURCES\` 감지 → 새 러너로 재시도 $RETRY_NEXT/2" >> "$GITHUB_STEP_SUMMARY"
+          gh workflow run grm-library-staging.yml \
+            -f max_change_count="$MAX_CHANGE_COUNT" \
+            -f max_change_percent="$MAX_CHANGE_PERCENT" \
+            -f days="$LOOKBACK_DAYS" \
+            -f retry_attempt="$RETRY_NEXT"
+
+      - name: Reconcile the published brief against the live catalogue
+        # 브리프(일일 intake)와 자료실(주간 갱신)은 **서로 다른 실행**이라 원리상 어긋난다.
+        # 2026-08-10 에는 그 어긋남을 잡는 층이 아예 없어서, 발행본을 눈으로 본 사람이
+        # 탐지자였다. 여기서 매 실행 대조해 격차를 이슈로 남긴다.
+        if: always()
+        id: reconcile
+        run: |
+          set -euo pipefail
+          python library_brief_reconcile.py --report /tmp/library-brief-gap.json > /dev/null
+          MISSING=$(jq -r '.missing_count' /tmp/library-brief-gap.json)
+          echo "missing=$MISSING" >> "$GITHUB_OUTPUT"
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::warning title=브리프-자료실 격차::발행 브리프에 있는 식약처 문서 ${MISSING}건이 자료실에 없다"
+            {
+              echo "### ⚠️ 브리프-자료실 격차 ${MISSING}건"
+              jq -r '.missing[] | "- `\(.id)` \(.title)"' /tmp/library-brief-gap.json
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "✅ 브리프-자료실 대조: 격차 없음" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Open or close the brief-catalogue gap issue
+        # 격리 이슈와 **분리한다** — 원인이 다르다. 격리는 "이번에 못 받았다"이고, 격차는
+        # "발행본에 있는데 자료실에 없다"라서 격리가 없는데도 남을 수 있다(수록 규칙·필터
+        # 문제 등). 한 이슈에 합치면 원인이 다른 사건이 한 카운터에 섞인다.
+        if: always()
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '/tmp/library-brief-gap.json';
+            if (!fs.existsSync(path)) {
+              core.warning('대조 리포트 없음 — 격차 판정 건너뜀(판정 불가이지 격차 0 아님)');
+              return;
+            }
+            const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM 브리프-자료실 격차 — 발행본에 있는 문서가 자료실에 없음';
+            const label = 'automation-warning';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label, per_page: 100,
+            });
+            const existing = issues.find(i => i.title === title);
+
+            if (!report.missing_count) {
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number,
+                  body: `✅ 해소 확인 — 발행 브리프의 식약처 문서가 모두 자료실에 있습니다. (${runUrl})`,
+                });
+                await github.rest.issues.update({
+                  owner, repo, issue_number: existing.number, state: 'closed',
+                });
+              }
+              return;
+            }
+
+            const body = [
+              `발행 브리프 \`${report.brief_file}\`(${report.publish_date}) 의 식약처 문서 **${report.missing_count}건** 이 자료실 카탈로그에 없습니다.`,
+              '',
+              '| 문서번호 | 제목 |',
+              '|---|---|',
+              ...report.missing.map(m => `| \`${m.id}\` | ${String(m.title || '').replace(/\|/g, '\\|')} |`),
+              '',
+              `- 대조 대상 보드: ${report.eligible_boards.map(b => '`' + b + '`').join(' · ')}`,
+              `- 자료실 수록 ${report.library_item_count}건 / 대조한 카드 ${report.checked_card_count}건`,
+              `- 최근 실행: ${runUrl}`,
+              '',
+              '### 왜 생기나',
+              '브리프는 **매일** 도는 intake 가, 자료실은 **주 1회** 도는 갱신이 만듭니다. 자료실 수집이 한 번 실패하면 그 주 신규분이 통째로 빠지고 발행본과 어긋납니다.',
+              '',
+              '### 확인 순서',
+              '1. 같은 실행의 격리 이슈가 열려 있는지 — 열려 있으면 원인은 수집 실패입니다(복구되면 자동 해소).',
+              '2. 격리가 없는데 격차가 남으면 **수록 규칙** 문제입니다. `library_staging_build.MFDS_TYPES` 와 카드의 보드 id 를 대조하세요.',
+            ].join('\n');
+
+            if (existing) {
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body, labels: [label] });
+            }
+
       - name: Summary
         if: always()
         run: |

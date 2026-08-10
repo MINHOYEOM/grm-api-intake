@@ -64,8 +64,13 @@ def retry_after_seconds(resp: requests.Response, attempt: int, *, max_sleep: int
         return min(2 ** attempt, max_sleep)
 
 
-def _proxies_for(url: str) -> dict[str, str] | None:
-    """Return an opt-in KR egress proxy only for MFDS/law.go.kr hosts."""
+def proxies_for(url: str) -> dict[str, str] | None:
+    """Return an opt-in KR egress proxy only for MFDS/law.go.kr hosts.
+
+    공개 API 다 — `requests` 를 직접 쓰는 모듈(예: library_linkcheck)도 이 함수를 거쳐야
+    한다. MFDS 는 해외 러너 IP 를 런 단위로 거부하므로, 프록시를 안 태운 경로는 같은
+    호스트를 같은 시각에 한쪽은 2초에 받고 한쪽은 9분 내내 못 받는다(2026-08-10 사고).
+    """
     proxy = os.environ.get("MFDS_HTTP_PROXY", "").strip()
     if not proxy:
         return None
@@ -73,6 +78,10 @@ def _proxies_for(url: str) -> dict[str, str] | None:
     if host in MFDS_EGRESS_HOSTS:
         return {"http": proxy, "https": proxy}
     return None
+
+
+# 옛 이름 — 기존 호출부·테스트 호환.
+_proxies_for = proxies_for
 
 
 def http_get_json(

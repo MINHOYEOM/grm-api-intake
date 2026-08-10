@@ -697,9 +697,14 @@ def verify_url_live(url: str, expect_terms: Iterable[str] = (),
     except Exception as exc:  # pragma: no cover
         return {"ok": False, "status": 0, "length": 0, "is_error_page": True,
                 "missing_terms": list(expect_terms), "error": f"requests 미설치: {exc}"}
+    # MFDS 계열은 KR egress 프록시를 태운다. 이 게이트가 판정하는 링크의 상당수가
+    # mfds.go.kr/nedrug 인데, 프록시 없이 러너에서 GET 하면 connect timeout 이 나고
+    # 그 결과가 ok=False 로 **살아있는 링크를 죽은 링크처럼** 보고한다.
+    from grm_common import proxies_for  # lazy — 위 requests lazy import 와 같은 이유
     try:
         r = requests.get(url, timeout=timeout,
-                         headers={"User-Agent": "Mozilla/5.0 GRM-URL-Audit/1.0"})
+                         headers={"User-Agent": "Mozilla/5.0 GRM-URL-Audit/1.0"},
+                         proxies=proxies_for(url))
     except Exception as exc:
         return {"ok": False, "status": 0, "length": 0, "is_error_page": True,
                 "missing_terms": list(expect_terms), "error": str(exc)[:200]}

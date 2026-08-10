@@ -22,7 +22,7 @@ from grm_common import proxies_for
 SCHEMA_VERSION = "grm-library-health/v1"
 URL_FIELDS = ("official_url", "pdf_url", "ko_url")
 DEFAULT_USER_AGENT = "GRM-Library-Linkcheck/1.0 (+https://github.com/MINHOYEOM/grm-api-intake)"
-BOT_SENSITIVE_HOSTS = ("fda.gov", "canada.ca")
+BOT_SENSITIVE_HOSTS = ("fda.gov", "canada.ca", "ecfr.gov")
 DEFAULT_WORKERS = 12
 
 
@@ -89,8 +89,46 @@ def _bot_sensitive(url: str) -> bool:
     return any(host == suffix or host.endswith("." + suffix) for suffix in BOT_SENSITIVE_HOSTS)
 
 
-def _classify(url: str, code: int | None, reason: str) -> tuple[str, str]:
+# ecfr.gov 실측(2026-08-11, 정찰): 봇으로 의심되는 요청은 사람용 페이지를 그대로 주는 게
+# 아니라 HTTP 200 을 유지한 채 다른 호스트(unblock.federalregister.gov, "Request Access")
+# 로 조용히 리다이렉트한다 — 상태코드만 보면 정상, 최종 URL/본문을 봐야 잡힌다.
+_BLOCK_BODY_MARKERS = (
+    "request access", "access denied", "are you a human", "captcha",
+    "verify you are a human", "unusual traffic", "automated access to this website",
+    "checking your browser before accessing", "bot detection",
+    "please enable javascript and cookies", "pardon our interruption",
+)
+
+
+def _looks_like_block_page(body_sample: str) -> bool:
+    lowered = (body_sample or "").lower()
+    return any(marker in lowered for marker in _BLOCK_BODY_MARKERS)
+
+
+def _suspected_disguised_block(url: str, final_url: str, body_sample: str) -> str | None:
+    """봇 민감 호스트가 200대를 돌려줘도 위장 차단일 수 있다 — 최종 리다이렉트가
+    다른 호스트로 튀었거나(예: ecfr.gov → unblock.federalregister.gov), 응답 본문에
+    차단 페이지 특유의 문구가 있으면 의심한다. 둘 다 없으면 None(진짜 정상)."""
+    orig_host = (urlparse(url).hostname or "").lower()
+    final_host = (urlparse(final_url).hostname or "").lower() if final_url else ""
+    if final_host and final_host != orig_host and not _bot_sensitive(final_url):
+        return f"redirected_off_host:{final_host}"
+    if _looks_like_block_page(body_sample):
+        return "content_block_page"
+    return None
+
+
+def _classify(
+    url: str, code: int | None, reason: str, *,
+    final_url: str = "", body_sample: str = "",
+) -> tuple[str, str]:
     if code is not None and 200 <= code < 400:
+        # 200~399 를 무조건 ok 로 단정하지 않는다 — 봇 민감 호스트는 위장 차단(200 인데
+        # 실제로는 차단 페이지)일 수 있어 최종 URL·본문을 추가로 본다.
+        if _bot_sensitive(url):
+            disguise = _suspected_disguised_block(url, final_url, body_sample)
+            if disguise:
+                return "needs_review", f"suspected_bot_block:{disguise}"
         return "ok", "reachable"
     if code in (404, 410):
         return "broken", f"http_{code}"
@@ -125,6 +163,16 @@ def _request(
     return session.request(method, url, **kwargs)
 
 
+def _read_body_sample(response: requests.Response) -> str:
+    """GET 응답 본문 일부를 안전하게 읽는다 — 실패해도 결과는 빈 문자열(예외는 안 올린다).
+
+    GET 요청 자체가 이미 Range: bytes=0-1023 헤더를 붙이므로 여기서 읽는 건 그 1KB 뿐."""
+    try:
+        return response.text or ""
+    except Exception:  # noqa: BLE001 - 본문을 못 읽어도 상태코드 기반 판정으로 폴백
+        return ""
+
+
 def probe_url(
     url: str,
     *,
@@ -137,6 +185,8 @@ def probe_url(
     last_method = "HEAD"
     last_reason = ""
     final_url = url
+    body_sample = ""
+    sensitive = _bot_sensitive(url)
     for attempt in range(1, 3):  # initial attempt + one retry
         for method in ("HEAD", "GET"):
             last_method = method
@@ -146,10 +196,15 @@ def probe_url(
                 )
                 last_code = response.status_code
                 final_url = str(response.url or url)
+                if method == "GET" and sensitive:
+                    body_sample = _read_body_sample(response)
                 response.close()
-                # HEAD success and definitive not-found do not need GET fallback.
-                if method == "HEAD" and (200 <= last_code < 400 or last_code in (404, 410)):
-                    break
+                if method == "HEAD" and last_code in (404, 410):
+                    break  # definitive not-found — no fallback needed regardless of host
+                if method == "HEAD" and not sensitive and 200 <= last_code < 400:
+                    break  # non-sensitive host: HEAD success is enough
+                # 봇 민감 호스트는 HEAD 가 200 대여도 GET 으로 넘어가 본문/리다이렉트를
+                # 확인한다(HEAD 만으로는 위장 차단을 못 잡는다 — 본문이 없다).
                 if method == "GET":
                     break
             except requests.RequestException as exc:
@@ -157,7 +212,9 @@ def probe_url(
                 last_reason = type(exc).__name__
                 # A failed HEAD still receives the required GET fallback.
                 continue
-        status, reason = _classify(url, last_code, last_reason)
+        status, reason = _classify(
+            url, last_code, last_reason, final_url=final_url, body_sample=body_sample,
+        )
         if status == "ok" or (status == "broken" and last_code in (404, 410)):
             return Probe(status, last_code, last_method, attempt, reason, final_url)
         if attempt == 2:

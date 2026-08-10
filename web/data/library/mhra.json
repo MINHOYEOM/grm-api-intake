@@ -1,0 +1,167 @@
+{
+  "items": [
+    {
+      "id": "mhra-re-inspection-of-site-under-compliance-management",
+      "title_en": "Re-inspection of site under Compliance Management",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a82273ce5274a2e87dc16b3/Re-inspection_of_site_under_Compliance_Management.pdf"
+    },
+    {
+      "id": "mhra-compliance-management-specials-manufacturers",
+      "title_en": "Compliance Management - Specials Manufacturers",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81e845ed915d74e3400b26/Compliance_Management_Specials_manufacturers.pdf"
+    },
+    {
+      "id": "mhra-compliance-management-mia-mia-imp-and-third-country-manufacture",
+      "title_en": "Compliance Management - MIA MIA(IMP) and third country manufacture",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a8237f1ed915d74e62366c4/Compliance_Management_MIA_MIA_IMP__and_third_country_manufacture.pdf"
+    },
+    {
+      "id": "mhra-compliance-management-contract-laboratory",
+      "title_en": "Compliance Management - Contract Laboratory",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81c30840f0b62302699061/Compliance_Management_Contract_Laboratory.pdf"
+    },
+    {
+      "id": "mhra-compliance-management-active-substance",
+      "title_en": "Compliance Management - Active Substance",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81f86d40f0b6230269a24c/Compliance_Management_Active_Substance.pdf"
+    },
+    {
+      "id": "mhra-regulatory-action-uk-wholesaler-converted",
+      "title_en": "Regulatory action – UK Wholesaler",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5c4f3156e5274a492645fd81/Regulatory_Action_-_UK_Wholesaler-converted.pdf"
+    },
+    {
+      "id": "mhra-re-inspection-of-site-under-regulatory-action",
+      "title_en": "Re-inspection of site under Regulatory Action",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81ea7140f0b62302699da4/Re-inspection_of_site_under_Regulatory_Action.pdf"
+    },
+    {
+      "id": "mhra-regulatory-action-specials-manufacturers",
+      "title_en": "Regulatory Action - Specials manufacturers",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81cb3640f0b6230269930e/Regulatory_Action_Specials_manufacturers.pdf"
+    },
+    {
+      "id": "mhra-regulatory-action-mia-mia-imp-and-third-country-manufacture",
+      "title_en": "Regulatory Action - MIA MIA(IMP) and Third Country manufacture",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a82ae6aed915d74e340306c/Regulatory_Action_MIA_MIA_IMP__and_Third_Country_manufacture.pdf"
+    },
+    {
+      "id": "mhra-regulatory-action-contract-laboratory",
+      "title_en": "Regulatory Action Contract Laboratory",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a82c56ce5274a2e8ab59445/Regulatory_Action_Contract_Laboratory.pdf"
+    },
+    {
+      "id": "mhra-regulatory-action-active-substance",
+      "title_en": "Regulatory Action - Active Substance",
+      "doc_type": "information-sheet",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a8213a3ed915d74e6235a90/Regulatory_Action_Active_Substance.pdf"
+    },
+    {
+      "id": "mhra-2019-deficiency-data-top-10-s",
+      "title_en": "MHRA GMP Deficiency Data 2019",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5f886e1fe90e07415cf2933f/2019_Deficiency_Data_Top_10_s.pdf"
+    },
+    {
+      "id": "mhra-gdp-2016-deficiency-data",
+      "title_en": "MHRA GDP Inspection Deficiency Data 2016",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a81e1c440f0b62302699ab8/GDP_2016_Deficiency_data.pdf"
+    },
+    {
+      "id": "mhra-mhra-gmp-inspection-deficiency-data-trend-2016",
+      "title_en": "Good manufacturing practice deficiencies 2016",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a82003de5274a2e8ab56f94/MHRA_GMP_Inspection_Deficiency_Data_Trend_2016.pdf"
+    },
+    {
+      "id": "mhra-mhra-gmp-inspection-deficiency-data-trending-2015",
+      "title_en": "Good manufacturing practice deficiencies 2015",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a80be59e5274a2e87dbb912/MHRA_GMP_Inspection_Deficiency_Data_Trending_2015.pdf"
+    },
+    {
+      "id": "mhra-good-manufacturing-practice-inspection-deficiencies-2013",
+      "title_en": "Good manufacturing practice inspection deficiencies 2013",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a80a828ed915d74e622fb46/Good_manufacturing_practice_inspection_deficiencies_2013.pdf"
+    },
+    {
+      "id": "mhra-good-manufacturing-practice-inspection-deficiencies-april-to-june-2012",
+      "title_en": "Good manufacturing practice inspection deficiencies April to June 2012",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a80710b40f0b6230269386e/Good_manufacturing_practice_inspection_deficiencies_April_to_June_2012.pdf"
+    },
+    {
+      "id": "mhra-good-manufacturing-practice-inspection-deficiencies-april-2011-to-march-2012",
+      "title_en": "Good manufacturing practice inspection deficiencies April 2011 to March 2012",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a80ac1140f0b62302694da5/Good_manufacturing_practice_inspection_deficiencies_April_2011_to_March_2012.pdf"
+    },
+    {
+      "id": "mhra-good-manufacturing-practice-inspection-deficiencies-april-2010-to-march-2011",
+      "title_en": "Good manufacturing practice inspection deficiencies April 2010 to March 2011",
+      "doc_type": "gmp-deficiency-statistics",
+      "official_url": "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf"
+    },
+    {
+      "id": "mhra-guidance-on-responding-to-a-gmpgdp-post-inspection-letter",
+      "title_en": "Responding to a GMP/GDP post inspection letter",
+      "doc_type": "detailed_guide",
+      "official_url": "https://www.gov.uk/guidance/guidance-on-responding-to-a-gmpgdp-post-inspection-letter",
+      "published_date": "2019-02-12"
+    },
+    {
+      "id": "mhra-decentralised-manufacture-uk-guideline-on-good-manufacturing-practice-gmp",
+      "title_en": "Decentralised manufacture: UK Guideline on Good Manufacturing Practice (GMP)",
+      "doc_type": "detailed_guide",
+      "official_url": "https://www.gov.uk/guidance/decentralised-manufacture-uk-guideline-on-good-manufacturing-practice-gmp",
+      "published_date": "2025-06-10"
+    },
+    {
+      "id": "mhra-access-consortium-good-manufacturing-practice-gmp-statement",
+      "title_en": "Access Consortium Good Manufacturing Practice (GMP) Statement",
+      "doc_type": "notice",
+      "official_url": "https://www.gov.uk/government/publications/access-consortium-good-manufacturing-practice-gmp-statement",
+      "published_date": "2022-11-15"
+    },
+    {
+      "id": "mhra-good-manufacturing-practice-conflicts-of-interests",
+      "title_en": "Good manufacturing practice: conflicts of interests",
+      "doc_type": "transparency",
+      "official_url": "https://www.gov.uk/government/publications/good-manufacturing-practice-conflicts-of-interests",
+      "published_date": "2020-12-31"
+    },
+    {
+      "id": "mhra-clinical-trials-for-medicines-good-manufacturing-practice-and-radiopharmaceutical-investigational-medicinal-products",
+      "title_en": "Clinical trials for medicines: good manufacturing practice and radiopharmaceutical investigational medicinal products",
+      "doc_type": "detailed_guide",
+      "official_url": "https://www.gov.uk/guidance/clinical-trials-for-medicines-good-manufacturing-practice-and-radiopharmaceutical-investigational-medicinal-products",
+      "published_date": "2026-03-09"
+    },
+    {
+      "id": "mhra-guidance-for-specials-manufacturers",
+      "title_en": "Guidance for 'specials' manufacturers",
+      "doc_type": "guidance",
+      "official_url": "https://www.gov.uk/government/publications/guidance-for-specials-manufacturers",
+      "published_date": "2015-01-30"
+    },
+    {
+      "id": "mhra-out-of-specification-investigations",
+      "title_en": "Out-of-specification investigations",
+      "doc_type": "guidance",
+      "official_url": "https://www.gov.uk/government/publications/out-of-specification-investigations",
+      "published_date": "2013-08-28"
+    }
+  ]
+}

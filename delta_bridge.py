@@ -332,6 +332,13 @@ def normalize_deep_key_namespace(deep: "dict[str, Any] | None") -> int:
     return len(changed)
 
 
+# deep 델타 항목이 `deep_analysis` 없이 실려도 **정상**인 키들(번역/재추출 입력 전용).
+# 새 번역층을 만들면 여기에 반드시 추가할 것 — 빠뜨리면 그 카드가 조용히 drop 된다.
+# 대응 병합층: observations_ko/violations_ko → inject_slots._merge_*_translations,
+# ncr_ko → _merge_ncr_translations, source_text → assemble._refresh_* 결정론 재추출.
+_TRANSLATION_ONLY_KEYS = ("observations_ko", "ncr_ko", "violations_ko", "source_text")
+
+
 def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
     """deep 델타 각 카드를 `verify_deep_analysis` 게이트에 통과시켜 **PASS 만** 남긴다.
 
@@ -349,12 +356,17 @@ def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
         if not isinstance(entry, dict):
             continue
         # [번역 전용 항목 통과 2026-07-27] `deep_analysis` 가 없고 번역/재추출 입력만 실린
-        # 항목(`observations_ko`·`ncr_ko`·`source_text`)은 **생성된 분석이 없어** 근거 게이트의
-        # 검증 대상이 아니다. 종전 코드는 이런 entry 를 통째로 `da` 로 보고 4섹션 게이트에
-        # 태워 전건 FAIL·drop 시켰다 — 관찰 국문 번역이 클라우드 경로에서 조용히 사라지는
-        # 구멍이었고, NCR 번역(`ncr_ko`)도 같은 자리에서 죽었을 것이다.
+        # 항목(`observations_ko`·`ncr_ko`·`violations_ko`·`source_text`)은 **생성된 분석이 없어**
+        # 근거 게이트의 검증 대상이 아니다. 종전 코드는 이런 entry 를 통째로 `da` 로 보고 4섹션
+        # 게이트에 태워 전건 FAIL·drop 시켰다 — 관찰 국문 번역이 클라우드 경로에서 조용히
+        # 사라지는 구멍이었고, NCR 번역(`ncr_ko`)도 같은 자리에서 죽었을 것이다.
+        #
+        # ★ [2026-08-10] 이 목록은 **손으로 열거한 허용목록이라 새 번역층이 생길 때마다 낡는다.**
+        #   `violations_ko`(WL 위반항목 국문)를 추가하며 그 함정을 실제로 밟았다 — 번역층을
+        #   새로 만들면 여기도 같이 늘려야 하고, 안 늘리면 그 카드는 "검증 대상 키 없음"으로
+        #   조용히 drop 된다(CI 허용목록 표류 계열: [[grm-ci-shim-silent-gap]]).
         if "deep_analysis" not in entry:
-            if any(k in entry for k in ("observations_ko", "ncr_ko", "source_text")):
+            if any(k in entry for k in _TRANSLATION_ONLY_KEYS):
                 kept[doc] = entry
                 continue
             log("WARN", f"deep 델타 항목에 검증 대상 키 없음 — 카드 drop: {doc}")

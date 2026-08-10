@@ -734,6 +734,30 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-07-28",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15895"
+    },
+    {
+      "id": "data0010-15270",
+      "title_en": "바이오의약품 사전 GMP 평가 지침",
+      "title_ko": "바이오의약품 사전 GMP 평가 지침",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-04",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15270"
+    },
+    {
+      "id": "data0011-15901",
+      "title_en": "합성 올리고뉴클레오티드 의약품의 임상시험 시 비임상시험 가이드라인",
+      "title_ko": "합성 올리고뉴클레오티드 의약품의 임상시험 시 비임상시험 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-08-03",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15901"
+    },
+    {
+      "id": "data0010-15264",
+      "title_en": "(GRP-MaPP-심사기준-01)의약품 임상시험계획(변경)승인 검토서 작성기준",
+      "title_ko": "(GRP-MaPP-심사기준-01)의약품 임상시험계획(변경)승인 검토서 작성기준",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-03",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15264"
     }
   ]
 }

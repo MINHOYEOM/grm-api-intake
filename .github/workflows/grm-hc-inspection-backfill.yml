@@ -1,0 +1,118 @@
+name: GRM Health Canada Inspection Deep Backfill (findings)
+
+# 캐나다 보건부 GMP 실사 리포트카드 과거분 findings 딥 백필 — 1회성 수동 실행.
+#
+# 배경: 이 소스는 **일일 크론에 붙어 있지 않다.** 일일 intake 로 붙이려면 수동 레지스트리
+#   6곳(INTAKE_SOURCE_SPECS / CollectionStats / _insert_items_map / card_scaffold._REGISTRY /
+#   grm_health.enabled_source_failures / transient 코드)을 전부 고쳐야 하고, 하나만 빠뜨리면
+#   "조용히 죽거나 월요일 발행을 멈추거나" 중 하나가 된다(둘 다 실사고 이력이 있다).
+#   백필 경로는 Notion 을 우회해 PostgREST 로 직행하므로 그 여섯 곳을 하나도 안 건드린다.
+#   HC 실사는 월 ~37건이라 일일 유입은 급하지 않다 — 백필 먼저, 일일 편입은 별건.
+#
+# ★핵심 제약(EU/MHRA NCR 백필과 동형):
+#   - git 쓰기 없음(checkout=read-only). Notion 무접촉 → 주간 브리프 파이프라인 무간섭.
+#   - 멱등: raw_signal_id / finding_id 는 (schema_version, source, document_id) 해시라
+#     재실행해도 중복 0. 실패 시 리포트의 failed_ins_numbers 로 잔여만 메우면 된다.
+#   - dry_run=true(기본값)로 먼저 실행해 건수를 확인한 뒤 apply 로 재실행한다.
+#   - ★적재 후 번역 필수(이 워크플로 밖): findings 공개 RLS 가 finding_text_ko 를 요구하고
+#     HC 관찰문은 영어다. 적재 완료 ≠ 공개 완료 — 두 숫자를 같은 것으로 보고하지 말 것.
+#
+# ★비용: 문서당 상세 1콜이다. 전량(1,824문서 × request_delay 0.4초) ≈ 13분.
+#   정부 단일 서버를 연타하므로 request_delay 를 함부로 낮추지 마라.
+on:
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: '실사시작일 창 시작(ISO). 기본 2021-01-01(최근 5년 = 채택 범위).'
+        type: string
+        default: '2021-01-01'
+      to_date:
+        description: '실사시작일 창 끝(ISO). 빈값이면 오늘.'
+        type: string
+        default: ''
+      limit:
+        description: '상세 fetch·적재 상한(0=무제한). ★재개 수단이 아니다 — 매번 앞쪽 N건만 다시 처리한다. 표본 확인용.'
+        type: string
+        default: '0'
+      dry_run:
+        description: 'true = 수집만(Supabase 적재 없음). 먼저 이걸로 검증.'
+        type: boolean
+        default: true
+      include_veterinary:
+        description: 'true = 비사람용 이름필터(수의·치과·기기·건기식)를 끈다. 기본 false(거른다).'
+        type: boolean
+        default: false
+      request_delay:
+        description: '상세 요청 간 지연(초). 낮추면 원천에 부담이 간다.'
+        type: string
+        default: '0.4'
+
+permissions:
+  contents: read
+
+concurrency:
+  # 자기 자신과만 직렬화한다(일일 크론에 HC 실사 채널이 없으므로 경합 대상이 없다).
+  group: hc-inspection-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Deep-backfill Health Canada GMP inspections (raw + findings, no git writes)
+    runs-on: ubuntu-latest
+    # 전량 1,824문서 × 0.4초 ≈ 13분 + 재시도 여유. 일일 intake 의 35분 예산과 무관한 별도 잡이다.
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # SUPABASE_* 는 grm-intake.yml 이 이미 쓰는 동일 secret/var 재사용 — 신규 등록 불필요.
+      - name: Run Health Canada inspection deep backfill
+        id: backfill
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=(--from-date "${{ inputs.from_date }}" --output backfill_report.json)
+          if [ -n "${{ inputs.to_date }}" ]; then
+            ARGS+=(--to-date "${{ inputs.to_date }}")
+          fi
+          ARGS+=(--limit "${{ inputs.limit }}")
+          ARGS+=(--request-delay "${{ inputs.request_delay }}")
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          else
+            ARGS+=(--apply)
+          fi
+          if [ "${{ inputs.include_veterinary }}" = "true" ]; then
+            ARGS+=(--include-veterinary)
+          fi
+          python collect_hc_inspection_backfill.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Health Canada Inspection Deep Backfill"
+            echo ""
+            echo "from_date: \`${{ inputs.from_date }}\` / to_date: \`${{ inputs.to_date }}\` / limit: \`${{ inputs.limit }}\` / dry_run: \`${{ inputs.dry_run }}\` / include_veterinary: \`${{ inputs.include_veterinary }}\`"
+            echo ""
+            if [ -f backfill_report.json ]; then
+              echo '```json'
+              cat backfill_report.json
+              echo '```'
+            else
+              echo "backfill_report.json 미생성 — 인자/인증/수집 실패로 조기 종료 가능"
+              echo "(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -680,6 +680,11 @@ class CollectionStats:
     whopir_excerpt_attempted: int = 0
     whopir_excerpt_failed: int = 0
     whopir_excerpt_capped: int = 0   # cap 도달 여부(0/1) — 이후 항목 excerpt 생략 신호
+    # [실사일 결손 2026-08-10] WHOPIR 목록에서 실사일을 못 뽑은 항목 수. 카드 날짜만의
+    # 문제가 아니다 — published_date 가 비면 findings raw_signals 가 아예 만들어지지 않는다
+    # (WHO raw_signals 0건이 3개월 산 이유). 전건 미추출은 수집기가 error 로 올리고,
+    # 부분 결손은 이 카운터가 warning 으로 표면화한다(항목 자체는 링크 카드로 유지).
+    whopir_dateless: int = 0
     # ── P1: Health Canada ──────────────────────────────────────────────────
     hc_fetched: int = 0
     hc_inserted: int = 0
@@ -3176,6 +3181,8 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.whopir_excerpt_attempted = int(whopir_excerpt_health.get("attempted") or 0)
         stats.whopir_excerpt_failed = int(whopir_excerpt_health.get("failed") or 0)
         stats.whopir_excerpt_capped = int(bool(whopir_excerpt_health.get("capped")))
+        # 실사일 미추출(부분 결손) — 그 항목은 findings raw_signals 가 생성되지 않는다.
+        stats.whopir_dateless = int((who_health.get("whopir_dates") or {}).get("dateless") or 0)
         if who_err:
             stats.who_error = True
             stats.who_error_msg = who_err

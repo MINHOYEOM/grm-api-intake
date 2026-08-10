@@ -56,7 +56,9 @@ class FindingsBackfillApplyTest(unittest.TestCase):
 
             report = result["report"]
             self.assertEqual(report["records_input"], 6)
-            self.assertEqual(report["findings_input"], 7)
+            # [WHOPIR 추출기 제거 2026-08-10] findings 7→6(raw_signals 6 은 불변 —
+            # WHO 문서는 계속 저장되고 findings 로만 세지 않는다).
+            self.assertEqual(report["findings_input"], 6)
             self.assertEqual(report["blocking_errors"], 0)
             self.assertTrue(report["ready_for_search_export"])
             self.assertEqual(report["preflight"]["m1i_transaction_dry_run"], "passed")
@@ -66,11 +68,12 @@ class FindingsBackfillApplyTest(unittest.TestCase):
             self.assertEqual(report["preflight"]["status_handoff"], "not_used")
 
             self.assertEqual(report["apply_pass"]["raw_signals_inserted"], 6)
-            self.assertEqual(report["apply_pass"]["findings_inserted"], 7)
-            self.assertEqual(report["apply_pass"]["result_statuses"], {"inserted": 5, "raw_signal_inserted": 1})
+            self.assertEqual(report["apply_pass"]["findings_inserted"], 6)
+            self.assertEqual(report["apply_pass"]["result_statuses"],
+                             {"inserted": 4, "raw_signal_inserted": 2})
             self.assertEqual(report["sqlite_counts"]["before"], {"raw_signals": 0, "findings": 0})
-            self.assertEqual(report["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 7})
-            self.assertEqual(_counts(db), {"raw_signals": 6, "findings": 7})
+            self.assertEqual(report["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 6})
+            self.assertEqual(_counts(db), {"raw_signals": 6, "findings": 6})
 
     def test_apply_is_idempotent_against_existing_sqlite_file(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -82,10 +85,10 @@ class FindingsBackfillApplyTest(unittest.TestCase):
             self.assertTrue(second["write_guard"]["database_existed_before"])
             self.assertTrue(second["write_guard"]["committed"])
             report = second["report"]
-            self.assertEqual(report["sqlite_counts"]["before"], {"raw_signals": 6, "findings": 7})
-            self.assertEqual(report["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 7})
+            self.assertEqual(report["sqlite_counts"]["before"], {"raw_signals": 6, "findings": 6})
+            self.assertEqual(report["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 6})
             self.assertEqual(report["apply_pass"]["raw_signals_duplicate"], 6)
-            self.assertEqual(report["apply_pass"]["findings_duplicate"], 7)
+            self.assertEqual(report["apply_pass"]["findings_duplicate"], 6)
             self.assertEqual(report["apply_pass"]["findings_inserted"], 0)
             self.assertEqual(report["apply_pass"]["result_statuses"], {"duplicate": 6})
 
@@ -122,11 +125,11 @@ class FindingsBackfillApplyTest(unittest.TestCase):
             ])
 
             self.assertEqual(rc, 0)
-            self.assertEqual(_counts(db), {"raw_signals": 6, "findings": 7})
+            self.assertEqual(_counts(db), {"raw_signals": 6, "findings": 6})
             with open(out, encoding="utf-8") as f:
                 report = json.load(f)
             self.assertEqual(report["schema_version"], apply_sqlite.SQLITE_BACKFILL_APPLY_SCHEMA_VERSION)
-            self.assertEqual(report["report"]["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 7})
+            self.assertEqual(report["report"]["sqlite_counts"]["after_commit"], {"raw_signals": 6, "findings": 6})
 
     def test_cli_rejects_missing_write_guard(self) -> None:
         manifest = os.path.join(FIXTURES, "findings_m1h_backfill_manifest.json")

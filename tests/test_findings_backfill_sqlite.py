@@ -29,9 +29,12 @@ class FindingsBackfillSqliteTest(unittest.TestCase):
         self.assertFalse(result["transaction"]["committed"])
         self.assertTrue(result["transaction"]["rollback_verified"])
 
+        # [WHOPIR 추출기 제거 2026-08-10] findings 7→6. raw_signals 6 은 그대로다 —
+        # WHO 문서는 계속 수집·저장되고 findings 로만 세지 않는다(그래서 findings 없는
+        # raw_signal 이 1→2건: `raw_signal_inserted` 상태가 1→2 로 늘어난다).
         report = result["report"]
         self.assertEqual(report["records_input"], 6)
-        self.assertEqual(report["findings_input"], 7)
+        self.assertEqual(report["findings_input"], 6)
         self.assertEqual(report["blocking_errors"], 0)
         self.assertTrue(report["ready_for_commit_review"])
         self.assertEqual(report["preflight"]["notion_api"], "not_used")
@@ -39,17 +42,17 @@ class FindingsBackfillSqliteTest(unittest.TestCase):
         self.assertEqual(report["preflight"]["supabase_write"], "not_used")
 
         self.assertEqual(report["first_pass"]["raw_signals_inserted"], 6)
-        self.assertEqual(report["first_pass"]["findings_inserted"], 7)
+        self.assertEqual(report["first_pass"]["findings_inserted"], 6)
         self.assertEqual(report["first_pass"]["findings_invalid"], 0)
-        self.assertEqual(report["first_pass"]["result_statuses"], {"inserted": 5, "raw_signal_inserted": 1})
+        self.assertEqual(report["first_pass"]["result_statuses"], {"inserted": 4, "raw_signal_inserted": 2})
 
         self.assertEqual(report["replay_pass"]["raw_signals_duplicate"], 6)
-        self.assertEqual(report["replay_pass"]["findings_duplicate"], 7)
+        self.assertEqual(report["replay_pass"]["findings_duplicate"], 6)
         self.assertEqual(report["replay_pass"]["findings_inserted"], 0)
         self.assertEqual(report["replay_pass"]["result_statuses"], {"duplicate": 6})
 
-        self.assertEqual(report["sqlite_counts"]["after_first_pass"], {"raw_signals": 6, "findings": 7})
-        self.assertEqual(report["sqlite_counts"]["after_replay_pass"], {"raw_signals": 6, "findings": 7})
+        self.assertEqual(report["sqlite_counts"]["after_first_pass"], {"raw_signals": 6, "findings": 6})
+        self.assertEqual(report["sqlite_counts"]["after_replay_pass"], {"raw_signals": 6, "findings": 6})
         self.assertEqual(report["sqlite_counts"]["after_rollback"], {"raw_signals": 0, "findings": 0})
 
     def test_exporter_metadata_fields_do_not_break_sqlite_insert(self) -> None:
@@ -59,7 +62,8 @@ class FindingsBackfillSqliteTest(unittest.TestCase):
         result = sqlite_dry_run.sqlite_transaction_dry_run(plan)
 
         self.assertEqual(result["report"]["blocking_errors"], 0)
-        self.assertEqual(result["report"]["sqlite_counts"]["after_first_pass"], {"raw_signals": 6, "findings": 7})
+        self.assertEqual(result["report"]["sqlite_counts"]["after_first_pass"],
+                         {"raw_signals": 6, "findings": 6})
 
     def test_orphan_finding_blocks_commit_review(self) -> None:
         plan = _plan()

@@ -45,6 +45,12 @@ EU_GMP_NCR_SEARCH_URL = (
 MHRA_GMP_NCR_SEARCH_URL = (
     "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant"
 )
+# Health Canada 실사 DB 검색 페이지(사람이 볼 수 있는 화면). 건별 리포트카드 링크가 raw 에
+# 없을 때만 쓰는 최후 폴백이다 -- MFDS 회수가 목록 인덱스로 degrade 하는 것과 같은 계층.
+# ★수집기가 쓰는 controller/*.ashx 엔드포인트(JSON 응답)를 여기 적지 않는다: evidence_url 은
+# "원문 확인" 링크라 사람이 열어 읽을 수 있어야 한다(MFDS 사고2 계열 -- API 엔드포인트가
+# 조용히 evidence_url 로 승격되던 경로).
+HC_INSPECTION_SEARCH_URL = "https://www.drug-inspections.canada.ca/gmp/"
 
 _CFR_RE = re.compile(r"\b21\s*CFR\s*(?:Part\s*)?\d+(?:\.\d+)?(?:\([a-z0-9]+\))*", re.I)
 
@@ -164,9 +170,11 @@ def findings_from_raw_signal_with_report(
     findings.extend(_from_mfds_admin_action(signal, raw, row))
     findings.extend(_from_mfds_recall(signal, raw, row))
     findings.extend(_from_warning_letter(signal, raw, row))
-    findings.extend(_from_whopir(signal, raw, row))
+    # WHOPIR(WHO 공개 실사보고서)은 여기에 없다 — 지적을 싣지 않는 문서다(근거는 아래
+    # `_from_whopir` 제거 주석). 다시 배선하기 전에 그 주석을 먼저 읽을 것.
     findings.extend(_from_eu_gmp_ncr(signal, raw, row))
     findings.extend(_from_mhra_gmp_ncr(signal, raw, row))
+    findings.extend(_from_hc_inspection(signal, raw, row))
     return _dedupe_valid_findings_with_report(findings)
 
 
@@ -296,6 +304,72 @@ def _from_mhra_gmp_ncr(
         confidence=0.9,
         review_status="accepted",
     )]
+
+
+def _from_hc_inspection(
+    raw_signal: dict[str, Any],
+    raw: dict[str, Any],
+    row: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Health Canada GMP 실사 리포트카드 → **관찰 1개 = finding 1건**(483 과 같은 산출 단위).
+
+    게이트 = raw.hc_inspection_observations. 형태는 수집기가 원천(fullReportCard 의
+    data[])을 정규화한 [{"no", "regulation", "summary"}, ...] -- 원천의 summaryList 는
+    배열이지만 raw 단계에서 공백 1칸으로 합쳐 문자열로 넣는 것이 계약이다.
+
+    ★finding_text = summary **원문 그대로**다. 조항(regulation, 예 "C.02.015 - Quality
+    control department")을 본문 앞에 붙이지 않는다 -- 이유 둘:
+      1) 원문 무결성(이 저장소 불가침 규율). 조항 제목은 원문 관찰문에 없는 문자열이다.
+      2) category_code 를 텍스트 분류기가 채우는데(아래 category_code 미전달), 조항 제목이
+         본문에 섞이면 분류기가 관찰 내용이 아니라 **조항 제목 어휘**에 반응해 분류가
+         오염된다(WL 정형문이 분류를 뒤집던 것과 같은 계열 -- _legacy_cap_for_classify 참조).
+    조항 자체는 raw_json 에 그대로 남으므로 잃지 않는다. 캐나다 조항(C.02.xxx)을 taxonomy 로
+    옮기는 조항맵은 도입하지 않기로 판정됐다(최빈 C.02.015 한 조항에 품질부서/불만조사/시험실이
+    함께 들어 있어 조항맵이 category_code 를 대체할 수 없다).
+
+    review_status 는 넘기지 않는다 = 기본값 accepted. 공식 API 에서 조항 태그까지 붙어 오는
+    구조화된 관찰이라 483 과 성격이 같고, needs_review 로 만들면 영구 적체한다 --
+    findings_review_promote_service._TARGET_SOURCES 는 FDA WL/483/MFDS 뿐이라 이 소스는
+    자동승격 대상이 아니다.
+    """
+    observations = _dicts(raw.get("hc_inspection_observations"))
+    if not observations:
+        return []
+
+    # 건별 리포트카드 링크는 수집기가 raw 에 실어주는 것이 정상 경로다(report_card_url/url).
+    # 없으면 raw_signal.official_url/source_url(_evidence_url 이 자동으로 뒤에 붙인다) → 실사
+    # DB 검색 페이지 순으로 degrade 한다.
+    evidence_url = _evidence_url(
+        raw_signal, raw, "report_card_url", "url", fallback=HC_INSPECTION_SEARCH_URL)
+    out: list[dict[str, Any]] = []
+    for index, observation in enumerate(observations, start=1):
+        summary = _hc_observation_summary(observation)
+        if not summary:
+            continue
+        out.append(gf.finding_from_raw_signal(
+            raw_signal,
+            finding_text=summary,
+            ordinal=_positive_int(observation.get("no"), default=index),
+            evidence_level="A",
+            evidence_url=evidence_url,
+            finding_language=_language(row, "EN"),
+            confidence=0.9,
+        ))
+    return out
+
+
+def _hc_observation_summary(observation: dict[str, Any]) -> str:
+    """관찰 요약 1건을 문자열로 정규화한다(배열이 그대로 와도 흡수).
+
+    수집기 계약은 "summaryList 를 공백 1칸으로 join 한 문자열"이지만, 계약이 깨져 배열이
+    그대로 저장되면 `_compact` 는 빈 값이 아니라 `"['a', 'b']"` 라는 **쓰레기 문자열**을
+    만들어 낸다 -- 게이트도 통과하고 건수도 정상이라 아무도 모르는 조용한 오염이 된다(이
+    저장소가 반복해 데인 계열). 그래서 여기서 같은 join 규칙으로 한 번 더 받아낸다.
+    """
+    value = observation.get("summary")
+    if isinstance(value, list):
+        return _compact(" ".join(part for part in value if isinstance(part, str)))
+    return _compact(value)
 
 
 # ── MFDS GMP 실사 결과 PDF 의 정형문·페이지 장식 ────────────────────────────────
@@ -849,25 +923,33 @@ def _cap_wl_block_text(block: str, ends_with_terminal: bool) -> str:
     return truncated.rstrip(" .,;:") + "…"
 
 
-def _from_whopir(
-    raw_signal: dict[str, Any],
-    raw: dict[str, Any],
-    row: dict[str, Any],
-) -> list[dict[str, Any]]:
-    text = _compact(raw.get("whopir_excerpt"))
-    if not text:
-        return []
-
-    return [gf.finding_from_raw_signal(
-        raw_signal,
-        finding_text=text,
-        ordinal=1,
-        evidence_level="B",
-        evidence_url=_evidence_url(raw_signal, raw, "pdf_url", "url", "list_page"),
-        finding_language=_language(row, "EN"),
-        confidence=0.72,
-        review_status="needs_review",
-    )]
+# ── WHOPIR 추출기(`_from_whopir`) 제거 2026-08-10 ────────────────────────────
+# 여기에는 `raw["whopir_excerpt"]` 를 게이트로 문서당 finding 1건을 만드는 추출기가 있었다.
+# 제거한다. 이유는 "품질이 낮아서"가 아니라 **그 소스에 지적이 없어서**다:
+#
+#   · WHOPIR(WHO Public Inspection Report)은 지적 목록을 싣지 않는 문서다. 25건 전수
+#     조사에서 지적 목록 표제는 0건이었고, WHO 는 결론부에서 비순응은 **비공개 full
+#     report** 에 있으며 "발행 전 모두 해소됐다"고 명시한다("All the non-compliances …
+#     were addressed by the manufacturer, to a satisfactory level, prior to the
+#     publication of the WHOPIR."). 즉 공개본에 남은 문장은 **지적이 없다는 진술**이다.
+#   · 그런데 게이트인 `whopir_excerpt` 는 `collect_who._WHOPIR_EXCERPT_PATTERNS` 가
+#     "deficiencies|non-compliance|conclusion|outcome" 앵커에서 잘라낸 구간이라, 실제로는
+#     저 해소 진술과 적합 판정문("… operating at an acceptable level of the WHO guideline
+#     on Good Manufacturing Practices (GMP) for finished pharmaceutical products.")을
+#     그대로 담는다. 문서당 1건씩, 내용은 전부 같은 보일러플레이트다.
+#   · 이 finding 은 `review_status="needs_review"` 로 들어오는데 승격 경로가 없다
+#     (`findings_review_promote_service` 의 승격 규칙은 지적 신호어를 요구한다) → 영구
+#     적체하며 백로그 임계만 갉는다. 즉 "지적이 없다"는 문장이 지적 DB 를 오염시킨다.
+#
+# 문구 탐지 가드(보일러플레이트 blocklist)를 두는 선택지도 있었으나 채택하지 않았다 —
+# 문구가 조금만 바뀌면 새고, 새는 방향이 "가짜 지적 유입"이라 실패가 조용하다. 이 소스에서
+# 지적을 뽑을 수 있다는 근거 자체가 없으므로 **게이트를 좁히는 게 아니라 배선을 끊는다**.
+#
+# WHOPIR 이 findings 에 기여할 게 아예 없다는 뜻은 아니다: 구조화 상세
+# (`collect_who.extract_whopir_report` → 카드 상세 슬롯)는 그대로 살아 있고, 카드·검색은
+# 계속 이 소스를 보여준다. 여기서 끊는 것은 **"지적사항 1건"으로 세는 경로**뿐이다.
+# 다시 배선하려면 먼저 실제 WHOPIR 본문에서 지적 목록을 찾아 그 근거를 제시할 것.
+# 회귀 가드 = `tests/test_findings_extractors.py::…::test_who_whopir_yields_no_findings`.
 
 
 def _json_object(value: Any) -> dict[str, Any]:

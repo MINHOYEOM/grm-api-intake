@@ -6,7 +6,7 @@
 </callout>
 
 <table>
-<tr><td>**발행일**</td><td>2026-05-06</td></tr>
+<tr><td>**실사일**</td><td>2026-05-06</td></tr>
 <tr><td>**문서번호**</td><td>`who-whopir-2026-11-ex`</td></tr>
 <tr><td>**주제**</td><td>WHOPIR: Site Z, India (FPP)</td></tr>
 <tr><td>**발행기관**</td><td>WHO</td></tr>

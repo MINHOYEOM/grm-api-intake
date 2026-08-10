@@ -481,6 +481,18 @@ def _evaluate_health(
             f"failed={stats.whopir_excerpt_failed} "
             f"capped={bool(stats.whopir_excerpt_capped)}",
         )
+    # [실사일 결손 2026-08-10] WHOPIR 실사일 미추출은 excerpt 결손과 성격이 다르다 —
+    # excerpt 는 카드가 얇아질 뿐이지만 실사일이 비면 published_date 필수 검증에 걸려
+    # **그 문서의 findings raw_signals 가 아예 안 생긴다**(조용한 소실). 다만 항목은 링크
+    # 카드로 남고 전건 미추출은 수집기가 error 로 올리므로 여기서는 warning-only.
+    if stats.whopir_dateless > 0:
+        health.add_warning(
+            "whopir-inspection-date-missing",
+            "WHO WHOPIR",
+            f"WHOPIR 실사일 {stats.whopir_dateless}건 미추출 — 카드 날짜 미확인 + "
+            "해당 건 findings raw_signals 미생성",
+            f"dateless={stats.whopir_dateless}",
+        )
     if stats.wl_body_failed > 0:
         health.add_warning(
             "wl-body-degraded",

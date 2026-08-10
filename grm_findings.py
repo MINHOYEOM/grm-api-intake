@@ -1274,6 +1274,138 @@ def normalize_firm_name(name: str) -> str:
     return text
 
 
+# ----------------------------------------------------------------------------
+# 국가 정규화(country_key) — web/migrations/055_findings_country_key.sql 의
+# public.grm_normalize_country 가 이 사전/함수의 SQL 복제본이다(순서는 무관하되 키
+# 집합·값은 반드시 일치 -- 파리티는 tests/test_findings_country_key.py 로 고정).
+#
+# 매핑 정본: 왼쪽 주석 = ISO 3166-1 alpha-2 코드, 오른쪽 = 소문자로 접힌 원문 변종.
+# 대소문자 변종(예: China/CHINA)은 별도 키가 필요 없다 -- normalize_country() 가 비교
+# 전에 항상 lower() 를 적용하므로 이미 하나의 키('china')로 수렴한다.
+_COUNTRY_CODE_MAP: dict[str, str] = {
+    # US
+    "united states": "US",
+    "usa": "US",
+    "미국": "US",
+    "united states of america (usa)": "US",
+    # PR -- 미국령. country_key 자체는 US 와 분리하되, zone 판정(해외/미국 이분, 예:
+    # findings_zone_category())에서는 US 로 합산한다(FDA 관할 미국령이자 제약 제조
+    # 거점 -- 합산 판단은 이 함수가 아니라 소비 측 책임).
+    "푸에르토리코": "PR",
+    # KR
+    "대한민국": "KR",
+    "republic of korea": "KR",
+    "south korea": "KR",
+    "the republic of korea": "KR",
+    "korea": "KR",
+    # IN / CN / JP / DE / CA / FR
+    "india": "IN",
+    "인도": "IN",
+    "china": "CN",
+    "중국": "CN",
+    "japan": "JP",
+    "일본": "JP",
+    "germany": "DE",
+    "독일": "DE",
+    "canada": "CA",
+    "캐나다": "CA",
+    "france": "FR",
+    "프랑스": "FR",
+    # GB / IS / IT / MY / ES / BE / HU
+    "united kingdom": "GB",
+    "영국": "GB",
+    "iceland": "IS",
+    "italy": "IT",
+    "이탈리아": "IT",
+    "malaysia": "MY",
+    "spain": "ES",
+    "스페인": "ES",
+    "belgium": "BE",
+    "벨기에": "BE",
+    "hungary": "HU",
+    # TW / CH / CY / AU / IE / SE / JO
+    "taiwan": "TW",
+    "대만": "TW",
+    "switzerland": "CH",
+    "cyprus": "CY",
+    "사이프러스": "CY",
+    "australia": "AU",
+    "호주": "AU",
+    "ireland": "IE",
+    "아일랜드": "IE",
+    "sweden": "SE",
+    "스웨덴": "SE",
+    "jordan": "JO",
+    # GR / DK / NL / MX / CZ / LT / PL / CL
+    "greece": "GR",
+    "그리스": "GR",
+    "denmark": "DK",
+    "덴마크": "DK",
+    "netherlands": "NL",
+    "네덜란드": "NL",
+    "mexico": "MX",
+    "멕시코": "MX",
+    "czechia": "CZ",
+    "lithuania": "LT",
+    "poland": "PL",
+    "chile": "CL",
+    # AT / RO / ZA / BD / ID / LB / PT / SK / LK / TR
+    "austria": "AT",
+    "오스트리아": "AT",
+    "romania": "RO",
+    "루마니아": "RO",
+    "south africa": "ZA",
+    "남아프리카 공화국": "ZA",
+    "bangladesh": "BD",
+    "indonesia": "ID",
+    "인도네시아": "ID",
+    "lebanon": "LB",
+    "portugal": "PT",
+    "포르투갈": "PT",
+    "slovakia": "SK",
+    "sri lanka": "LK",
+    "turkey": "TR",
+    "türkiye": "TR",
+    # NO / FI / VN / BY / SI / IL
+    "노르웨이": "NO",
+    "핀란드": "FI",
+    "vietnam": "VN",
+    "베트남": "VN",
+    "벨라루스": "BY",
+    "슬로베니아": "SI",
+    "이스라엘": "IL",
+}
+_COUNTRY_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def normalize_country(value: str) -> str:
+    """FIND-1 소재국 정규화(country_key) — 단일 정의.
+
+    실측(컨트롤 타워, 2026-08): findings.site_country 는 자유 텍스트다. distinct 85종
+    (빈값 제외)이 있고, 같은 나라가 영/한/전체대문자/정식국호로 최대 5중 분열돼 있다
+    (한국 5종: 대한민국/Republic of Korea/South Korea/The Republic of Korea/Korea,
+    미국 4종: United States/USA/미국/United States of America (USA), 중국 3종 등).
+    ISO 3166-1 alpha-2 코드로 수렴시킨다.
+
+    web/migrations/055_findings_country_key.sql 의 public.grm_normalize_country 가 이
+    함수의 SQL 복제본이며 반드시 동일 결과를 내야 한다(파리티는
+    tests/test_findings_country_key.py 로 고정).
+
+    처리: trim → 연속 공백 1칸 축약 → 소문자 비교 → 매핑 정본(_COUNTRY_CODE_MAP) 조회.
+
+    매핑에 없거나 빈 입력이면 빈 문자열을 반환한다(NULL 이 아니다 -- 추측 금지 규율:
+    모르는 나라를 임의 코드로 찍지 않는다. 값이 없으면 비워 둔다).
+
+    ★PR(푸에르토리코)은 별도 코드로 반환한다 -- 미국 zone 으로 합산할지는 이 함수가
+    아니라 호출 측(예: findings_zone_category())의 책임이다.
+    """
+    text = _text(value)
+    if not text:
+        return ""
+    normalized = _COUNTRY_WHITESPACE_RE.sub(" ", text).strip().lower()
+    return _COUNTRY_CODE_MAP.get(normalized, "")
+
+
 def validate_raw_signal(record: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for key in RAW_SIGNAL_REQUIRED_FIELDS:

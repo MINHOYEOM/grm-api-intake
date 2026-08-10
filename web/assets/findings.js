@@ -83,6 +83,36 @@
     other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
   };
 
+  // [동기화 규칙 — 056] ISO 3166-1 alpha-2 코드 → 한국어 국가명. 매핑 정본은
+  // web/migrations/055_findings_country_key.sql 의 public.grm_normalize_country() /
+  // grm_findings.py 의 _COUNTRY_CODE_MAP(47개 코드) — trends.js COUNTRY_LABELS_KO 와
+  // 동일 계약을 복제한다(다른 파일이라 import 불가, 계약만 복제하는 기존 관례).
+  // 매핑에 없는 코드는 코드 자체를 그대로 보여준다(빈칸/추측 번역 금지).
+  var COUNTRY_LABELS_KO = {
+    US: "미국", KR: "대한민국", PR: "푸에르토리코", IN: "인도", CN: "중국",
+    JP: "일본", DE: "독일", CA: "캐나다", FR: "프랑스", GB: "영국",
+    IS: "아이슬란드", IT: "이탈리아", MY: "말레이시아", ES: "스페인",
+    BE: "벨기에", HU: "헝가리", TW: "대만", CH: "스위스", CY: "키프로스",
+    AU: "호주", IE: "아일랜드", SE: "스웨덴", JO: "요르단", GR: "그리스",
+    DK: "덴마크", NL: "네덜란드", MX: "멕시코", CZ: "체코", LT: "리투아니아",
+    PL: "폴란드", CL: "칠레", AT: "오스트리아", RO: "루마니아",
+    ZA: "남아프리카공화국", BD: "방글라데시", ID: "인도네시아", LB: "레바논",
+    PT: "포르투갈", SK: "슬로바키아", LK: "스리랑카", TR: "튀르키예",
+    NO: "노르웨이", FI: "핀란드", VN: "베트남", BY: "벨라루스",
+    SI: "슬로베니아", IL: "이스라엘",
+  };
+
+  // country_key='' 버킷은 findings_search(056) 에서 sentinel 값 "UNKNOWN" 으로 필터링한다
+  // (p_country='' 는 이미 "필터 없음"을 뜻하므로 미확인을 빈 문자열로 표현할 수 없다 —
+  // 056 마이그레이션 주석 참조). 화면 라벨은 "미확인"으로 고정한다(추측 번역과 무관 —
+  // 이건 실제로 소재국을 모른다는 뜻이다).
+  var COUNTRY_UNKNOWN_VALUE = "UNKNOWN";
+
+  function countryLabelKo(code) {
+    if (code === COUNTRY_UNKNOWN_VALUE) return "미확인";
+    return COUNTRY_LABELS_KO[code] || code;
+  }
+
   // [PR-0 딥링크] /findings/?finding_id=finding-<24hex> 공유 URL. 형식은 grm_findings.py:706
   // "finding-" + stable_hash(...)[:24] (sha256 hexdigest 앞 24자, 항상 소문자 hex)와 일치해야
   // 한다 — 형식 불일치는 fetch 없이 곧장 "찾을 수 없음"으로 처리한다(§1).
@@ -103,6 +133,11 @@
     ["fnd-f-category", "category_code"],
     ["fnd-f-month", "month"],
   ];
+  // [056] #fnd-f-country 는 이 배열에 넣지 않는다 — SELECT_FACETS 는 LAST.facets(자기 축
+  // 제외 파셋)에서 옵션을 채우는데, 국가 축은 findings_search 가 facets.by_country 를
+  // 내려주지 않는다(임무서 지정: dash.by_country 만 신설). 대신 buildCountrySelect()/
+  // refreshCountrySelectUI() 가 LAST.dash.by_country(현재 결과 집합 분포, 자기 축 포함)로
+  // 별도 배선한다 — state/URL/칩 계약은 다른 필터와 동일(country 키로 참여).
   // [M15] 적용 필터 칩 행(#fnd-active) 라벨 — 정렬(sort)은 필터가 아니므로 대상에서
   // 제외한다. 값 포맷터는 selectOptionLabel 과 별개(칩엔 건수 병기가 필요 없다).
   // agency 는 M14 이후 화면 컨트롤이 없지만 URL(?agency=)로는 여전히 걸린다 — 보이지 않는
@@ -115,16 +150,17 @@
     ["review_status", "검토 상태", function (v) { return STATUS_LABEL[v] || v; }],
     ["category_code", "카테고리", function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
     ["month", "발행월", function (v) { return v; }],
+    ["country", "국가", function (v) { return countryLabelKo(v); }],
   ];
 
   var SORT_VALUES = ["date_desc", "date_asc", "firm_asc"];
   var DEFAULT_STATE = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
-    review_status: "", month: "", sort: "date_desc",
+    review_status: "", month: "", country: "", sort: "date_desc",
   };
   var state = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
-    review_status: "", month: "", sort: "date_desc",
+    review_status: "", month: "", country: "", sort: "date_desc",
   };
   var debounceTimer = null;
 
@@ -332,6 +368,50 @@
         opt.textContent = opt.dataset.label + " (" + count + ")";
         opt.disabled = count === 0 && sel.value !== opt.value;
       });
+    });
+  }
+
+  // [056] 국가 셀렉트 — SELECT_FACETS 의 5개와 달리 LAST.dash.by_country(현재 결과
+  // 집합, 자기 축 포함)에서 옵션을 채운다(임무서 지정 — 별도 facets.by_country 는 없다).
+  // country_key='' (미확인) 행은 <option value="UNKNOWN">(COUNTRY_UNKNOWN_VALUE) 로
+  // 대응한다 — value="" 는 이미 "전체"(필터 없음) 옵션이 쓰고 있어 재사용할 수 없다
+  // (056 findings_search 의 p_country 의미론과 동일: ''=필터 없음, 'UNKNOWN'=country_key='').
+  // buildFacetSkeleton() 과 동일하게 멱등(누적, 삭제 없음) — 국가 필터 자체가 선택되면
+  // dash 축이 그 나라 하나로 좁아지는데(filtered 기반이라 자기 축도 포함), 기존 <option>
+  // 을 지우지 않고 refreshCountrySelectUI() 가 count=0 인 것만 disabled 처리하므로 이미
+  // 봤던 다른 나라로 되돌아가는 경로는 남는다("전체" 클릭 없이 못 바꾸는 것보다 낫다).
+  function buildCountrySelect() {
+    var sel = document.getElementById("fnd-f-country");
+    if (!sel) return;
+    var existing = {};
+    Array.prototype.forEach.call(sel.options, function (opt) { existing[opt.value] = true; });
+    var axis = dashAxis("by_country"); // [{v, docs, findings}], v='' 는 미확인, 서버가 docs desc 로 정렬
+    axis.forEach(function (e) {
+      var value = e.v ? e.v : COUNTRY_UNKNOWN_VALUE;
+      if (existing[value]) return; // 재호출 시 이미 만든 옵션은 다시 만들지 않는다
+      var opt = document.createElement("option");
+      opt.value = value;
+      opt.dataset.label = countryLabelKo(value);
+      opt.textContent = opt.dataset.label; // 초기 라벨(건수는 첫 render()가 바로 병기)
+      sel.appendChild(opt);
+    });
+  }
+
+  // refreshFacetUI() 와 동형 — 건수는 항상 표시(문서 수, dash.by_country[].docs 축 —
+  // 054 이후 문서 축 우선 원칙과 동형).
+  function refreshCountrySelectUI() {
+    var sel = document.getElementById("fnd-f-country");
+    if (!sel) return;
+    var axis = dashAxis("by_country");
+    var counts = {};
+    axis.forEach(function (e) {
+      counts[e.v ? e.v : COUNTRY_UNKNOWN_VALUE] = e.docs || 0;
+    });
+    Array.prototype.forEach.call(sel.options, function (opt) {
+      if (!opt.value) return; // "전체" 옵션은 건수 병기 대상 아님
+      var count = counts[opt.value] || 0;
+      opt.textContent = opt.dataset.label + " (" + count + ")";
+      opt.disabled = count === 0 && sel.value !== opt.value;
     });
   }
 
@@ -1173,7 +1253,7 @@
   // 갱신한다(pushState 금지 — 뒤로가기 히스토리 오염 방지). render() 마다 호출.
   var URL_KEYS = {
     q: "q", agency: "agency", category_code: "cat", source: "src",
-    evidence_level: "ev", review_status: "status", month: "m", sort: "sort",
+    evidence_level: "ev", review_status: "status", month: "m", country: "country", sort: "sort",
   };
 
   function syncStateToUrl() {
@@ -1212,7 +1292,7 @@
     var params = new URLSearchParams(location.search);
     var qv = params.get(URL_KEYS.q);
     if (qv !== null) state.q = qv;
-    ["agency", "category_code", "source", "evidence_level", "review_status", "month"].forEach(function (k) {
+    ["agency", "category_code", "source", "evidence_level", "review_status", "month", "country"].forEach(function (k) {
       var raw = params.get(URL_KEYS[k]);
       if (raw !== null) state[k] = raw;
     });
@@ -1238,6 +1318,11 @@
       var sel = document.getElementById(def[0]);
       if (sel) sel.value = state[def[1]];
     });
+    // [056] country 는 SELECT_FACETS 밖이라 별도 대입 — buildCountrySelect() 가 만든
+    // <option> 이 없으면(예: URL 이 아직 응답 안 온 나라를 지정) 조용히 무시된다(다른
+    // 필드와 동일 관례 — 위 주석 readStateFromUrl 참조).
+    var countrySel = document.getElementById("fnd-f-country");
+    if (countrySel) countrySel.value = state.country;
     if (sortSel) sortSel.value = state.sort;
   }
 
@@ -1258,7 +1343,7 @@
     exitSimilarMode(); // [FIND-1 S1] 필터 전체 초기화 조작 → 유사검색 모드 종료(§6)
     state = {
       q: "", agency: "", category_code: "", source: "", evidence_level: "",
-      review_status: "", month: "", sort: "date_desc",
+      review_status: "", month: "", country: "", sort: "date_desc",
     };
     syncControlsFromState();
     currentPage = 1; // [페이지네이션] 전체 초기화 → 1페이지로 리셋
@@ -1738,8 +1823,10 @@
   // 전부 없다(서버가 이미 이 페이지의 문서만 잘라 보냈다).
   function render() {
     buildFacetSkeleton(); // 이번 응답에서 새로 드러난 파셋 값 반영(멱등)
+    buildCountrySelect(); // [056] 국가 옵션(LAST.dash.by_country, 멱등) 반영
     renderDash(); // [FIND-1 M7] 현재 결과 집합 기준 대시보드(LAST.dash, 결과 0건이면 hidden)
     refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
+    refreshCountrySelectUI(); // [056] 국가 셀렉트 건수 갱신
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     updateFiltersToggleBadge();
 
@@ -1824,6 +1911,17 @@
         goToPage(1);
       });
     });
+    // [056] 국가 셀렉트 — SELECT_FACETS 밖에서 개별 배선(buildCountrySelect 주석 참조).
+    var countrySel = document.getElementById("fnd-f-country");
+    if (countrySel) {
+      countrySel.addEventListener("change", function () {
+        exitDeepLinkMode(); // [PR-0 딥링크] 필터 조작 → 딥링크 모드 종료(§4)
+        exitSimilarMode(); // [FIND-1 S1] 필터 조작 → 유사검색 모드 종료(§6)
+        state.country = countrySel.value;
+        currentPage = 1; // [페이지네이션] 필터 변경 → 1페이지로 리셋
+        goToPage(1);
+      });
+    }
     if (sortSel) {
       sortSel.addEventListener("change", function () {
         exitDeepLinkMode(); // [PR-0 딥링크] 정렬 조작 → 딥링크 모드 종료(§4)
@@ -1893,6 +1991,10 @@
         p_sort: state.sort,
         p_page: page,
         p_docs_per_page: DOCS_PER_PAGE,
+        // [056] state.country 는 이미 서버 계약과 같은 값 3종을 그대로 담는다: ''(필터
+        // 없음) · 'UNKNOWN'(country_key='' 미확인 버킷, COUNTRY_UNKNOWN_VALUE) · ISO2 코드.
+        // 변환 없이 그대로 전달.
+        p_country: state.country,
       }),
     })
       .then(function (r) {
@@ -2175,6 +2277,7 @@
       if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
       LAST = data;
       buildFacetSkeleton();
+      buildCountrySelect(); // [056] 국가 옵션 골격 — syncControlsFromState() 보다 먼저(값 대입 전 옵션 존재 필요)
       syncControlsFromState();
       wire();
       rowsReady = true;

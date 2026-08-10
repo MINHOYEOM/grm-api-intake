@@ -155,48 +155,71 @@
     other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
   };
 
-  // [동기화 규칙] findings.site_country 실측값 23종(2026-07-31 기준) verbatim 매핑 —
-  // [해외 실사 구성] 패널(top_countries)이 영문 국가명을 그대로 노출하던 것을 한국어
-  // 사이트 표기로 바꾼다. 이 23개가 **데이터에 실제 존재하는 전부**다(web/tests/
-  // test_render.py 가 개수·한국 3표기 수렴을 대조) — 새 국가가 유입되면 이 표에 없으므로
-  // countryLabelKo() 가 영문 원문을 그대로 반환한다(빈칸·추측 번역 금지, 아래 참조).
-  // 한국 3표기(Republic of Korea/South Korea/The Republic of Korea)는 전부 "대한민국"으로
-  // 수렴한다 — 이는 **표시상** 의도된 동작이지 건수 합산이 아니다: 이 패널은 RPC
-  // (findings_zone_category, 038)가 내려준 top_countries 행을 country 당 그대로 1행씩
-  // 표시할 뿐이고, 여러 표기를 하나의 합계로 합치는 것은 서버 계약 변경이라 이 작업
-  // 범위 밖이다. ★한계: 한국 3표기 중 둘 이상이 동시에 top5 안에 들면 "대한민국"이
-  // 두 번(서로 다른 건수로) 표시될 수 있다 — 2026-07-31 기준 데이터에서 한국은 top5
-  // 밖이라 실제로는 발생하지 않지만, 이 매핑만으로는 막을 수 없는 한계로 남는다.
+  // [동기화 규칙 — 056] ISO 3166-1 alpha-2 코드 → 한국어 국가명. 이전(2026-07-31 이전)엔
+  // findings.site_country 원문 문자열 23종을 그대로 키로 썼는데, 원문은 자유 텍스트라
+  // 실측 85종(2026-08-11)으로 이미 낡아 있었다 — 문자열은 소스가 늘 때마다 새 변종이
+  // 생겨 반드시 낡는다. 코드는 유한(ISO2)하고 안정적이라 이 문제가 구조적으로 없다.
+  // web/migrations/055_findings_country_key.sql 의 public.grm_normalize_country() /
+  // grm_findings.py 의 _COUNTRY_CODE_MAP 이 매핑 정본이다(47개 코드) — 이 사전은 그
+  // 정본의 **모든 코드**를 커버해야 한다(web/tests/test_render.py 가 대조).
+  // findings_zone_category()(055)가 top_countries[].code 로 이 코드를 내려준다.
   var COUNTRY_LABELS_KO = {
-    "Australia": "호주",
-    "Belgium": "벨기에",
-    "Canada": "캐나다",
-    "China": "중국",
-    "Denmark": "덴마크",
-    "France": "프랑스",
-    "Germany": "독일",
-    "Hungary": "헝가리",
-    "Iceland": "아이슬란드",
-    "India": "인도",
-    "Italy": "이탈리아",
-    "Japan": "일본",
-    "Malaysia": "말레이시아",
-    "Mexico": "멕시코",
-    "Netherlands": "네덜란드",
-    "Spain": "스페인",
-    "Switzerland": "스위스",
-    "Taiwan": "대만",
-    "Turkey": "튀르키예",
-    "United Kingdom": "영국",
-    "Republic of Korea": "대한민국",
-    "South Korea": "대한민국",
-    "The Republic of Korea": "대한민국",
+    US: "미국",
+    KR: "대한민국",
+    PR: "푸에르토리코",
+    IN: "인도",
+    CN: "중국",
+    JP: "일본",
+    DE: "독일",
+    CA: "캐나다",
+    FR: "프랑스",
+    GB: "영국",
+    IS: "아이슬란드",
+    IT: "이탈리아",
+    MY: "말레이시아",
+    ES: "스페인",
+    BE: "벨기에",
+    HU: "헝가리",
+    TW: "대만",
+    CH: "스위스",
+    CY: "키프로스",
+    AU: "호주",
+    IE: "아일랜드",
+    SE: "스웨덴",
+    JO: "요르단",
+    GR: "그리스",
+    DK: "덴마크",
+    NL: "네덜란드",
+    MX: "멕시코",
+    CZ: "체코",
+    LT: "리투아니아",
+    PL: "폴란드",
+    CL: "칠레",
+    AT: "오스트리아",
+    RO: "루마니아",
+    ZA: "남아프리카공화국",
+    BD: "방글라데시",
+    ID: "인도네시아",
+    LB: "레바논",
+    PT: "포르투갈",
+    SK: "슬로바키아",
+    LK: "스리랑카",
+    TR: "튀르키예",
+    NO: "노르웨이",
+    FI: "핀란드",
+    VN: "베트남",
+    BY: "벨라루스",
+    SI: "슬로베니아",
+    IL: "이스라엘",
   };
 
-  // 매핑에 없는 국가는 영문 원문을 그대로 보여준다(빈칸/추측 번역 금지) — 데이터에
-  // 새 국가가 들어와도 화면이 비지 않고 최소한 영문으로라도 표시되게 하기 위해서다.
-  function countryLabelKo(country) {
-    return COUNTRY_LABELS_KO[country] || country;
+  // [코드 우선, 원문 폴백] code(ISO2)가 있으면 그 라벨(없는 코드는 코드 자체를 그대로
+  // 노출 — 빈칸/추측 번역 금지, 매핑 정본이 47개보다 더 낡아도 화면은 최소한 코드로는
+  // 읽힌다). code 가 아예 없으면(055 미적용 구버전 RPC 응답) country(원문 문자열)로
+  // 폴백한다 — 이 폴백이 없으면 055 미배포 상태에서 패널이 통째로 비게 된다.
+  function countryLabelKo(code, country) {
+    if (code) return COUNTRY_LABELS_KO[code] || code;
+    return country || "";
   }
 
   // [인용 조항] 21 CFR 210/211 조항 뿌리 → 국문 요지. 042_findings_cfr_ranking.sql 이
@@ -1072,7 +1095,7 @@
         top.forEach(function (c, i) {
           if (i > 0) zoneCountriesEl.appendChild(document.createTextNode(" · "));
           zoneCountriesEl.appendChild(
-            document.createTextNode(countryLabelKo(c.country) + " " + fmtNum(c.findings))
+            document.createTextNode(countryLabelKo(c.code, c.country) + " " + fmtNum(c.findings))
           );
         });
       }

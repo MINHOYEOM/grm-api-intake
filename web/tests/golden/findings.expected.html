@@ -66,7 +66,7 @@
         <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div><div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
@@ -201,6 +201,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 #fnd-f-status{width:120px}
 #fnd-f-category{width:230px}
 #fnd-f-month{width:110px}
+#fnd-f-country{width:150px}
 #fnd-sort{width:110px}
 /* [M15] 적용 필터 칩 행 — 셀렉트 행 아래, 활성 필터가 1개 이상일 때만 findings.js 가
    노출한다(hidden 토글). 모바일 필터 접기(#fnd-filters-toggle) 대상 밖에 둬 항상 보인다. */
@@ -217,7 +218,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-filters{display:none}
   .fnd-filters.open{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
   .fnd-field select{max-width:100%}
-  #fnd-f-source,#fnd-f-evidence,#fnd-f-status,#fnd-f-category,#fnd-f-month,#fnd-sort{width:100%}
+  #fnd-f-source,#fnd-f-evidence,#fnd-f-status,#fnd-f-category,#fnd-f-month,#fnd-f-country,#fnd-sort{width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
 }
@@ -373,7 +374,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../assets/findings.js?v=9a64544c" defer></script>
+<script src="../assets/findings.js?v=0fa0dff7" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

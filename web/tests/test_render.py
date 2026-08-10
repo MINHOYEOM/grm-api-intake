@@ -1309,10 +1309,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function readStateFromUrl()", js_src)
 
     def test_url_param_scheme_matches_spec(self):
-        """URL 파라미터 스킴 = q/agency/cat/src/ev/status/m/sort (state 키와 1:1 매핑)."""
+        """URL 파라미터 스킴 = q/agency/cat/src/ev/status/m/country/sort (state 키와
+        1:1 매핑, country 는 056 신설)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         for pair in ('q: "q"', 'agency: "agency"', 'category_code: "cat"', 'source: "src"',
-                     'evidence_level: "ev"', 'review_status: "status"', 'month: "m"', 'sort: "sort"'):
+                     'evidence_level: "ev"', 'review_status: "status"', 'month: "m"',
+                     'country: "country"', 'sort: "sort"'):
             self.assertIn(pair, js_src)
 
     def test_url_sync_sort_validated_but_filter_values_passed_through(self):
@@ -2081,12 +2083,14 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_deeplink_s1_hidepager_contracts_unchanged_by_025(self):
         """[§7 회귀] 025 이후 서버 canonical search 전환도 PR-0 딥링크(exitDeepLinkMode
-        3회 호출)·S1 토글(exitSimilarMode 2회 호출)·hidePager(pnav 포함 은닉) 계약을
-        훼손하지 않았는지 재확인한다(기존 계약과 동일 수치 — 회귀 0)."""
+        4회 호출 — SELECT_FACETS 공유 핸들러·국가(056)·정렬·검색어)·S1 토글(exitSimilarMode
+        3회 호출 — SELECT_FACETS·국가(056)·정렬)·hidePager(pnav 포함 은닉) 계약을
+        훼손하지 않았는지 재확인한다(056 이 국가 셀렉트를 추가하며 3→4/2→3 로 갱신 —
+        그 외 수치는 기존과 동일, 회귀 0)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
-        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3)
-        self.assertEqual(wire_fn.count("exitSimilarMode();"), 2)
+        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 4)
+        self.assertEqual(wire_fn.count("exitSimilarMode();"), 3)
         hidepager_fn = js_src[js_src.index("function hidePager() {"):]
         hidepager_fn = hidepager_fn[:hidepager_fn.index("\n  }\n") + 4]
         self.assertIn("if (pagerTopEl) pagerTopEl.hidden = true;", hidepager_fn)
@@ -2255,13 +2259,14 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_deeplink_exits_on_filter_search_sort_page_interaction(self):
         """[§4] 필터·검색·정렬·페이지 조작 시 exitDeepLinkMode() 가 호출돼 딥링크
-        모드를 종료해야 한다 — wire() 의 셀렉트 5개·정렬·검색어 핸들러, 적용 필터
-        칩 제거(clearActiveFilter/clearAllFilters), 대시보드 클릭(toggleXFilter),
+        모드를 종료해야 한다 — wire() 의 셀렉트 5개(SELECT_FACETS 공유 핸들러)·
+        국가(056, 개별 핸들러)·정렬·검색어 핸들러, 적용 필터 칩 제거
+        (clearActiveFilter/clearAllFilters), 대시보드 클릭(toggleXFilter),
         페이지네이션(goToPageFromPager) 전부가 진입점이다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
-        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 3,
-                          "셀렉트·정렬·검색어 3개 핸들러 모두 exitDeepLinkMode() 호출해야 함")
+        self.assertEqual(wire_fn.count("exitDeepLinkMode();"), 4,
+                          "셀렉트·국가·정렬·검색어 4개 핸들러 모두 exitDeepLinkMode() 호출해야 함")
         for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",
                          "function toggleCategoryFilter(code) {", "function toggleMonthFilter(month) {",
                          "function toggleFirmFilter(name) {", "function goToPageFromPager(n) {"):
@@ -2502,8 +2507,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         전부에 나란히 배선된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         wire_fn = js_src[js_src.index("function wire() {"):js_src.index("function fetchSearch(page)")]
-        self.assertEqual(wire_fn.count("exitSimilarMode();"), 2,
-                          "셀렉트·정렬 2개 핸들러 모두 exitSimilarMode() 호출해야 함")
+        self.assertEqual(wire_fn.count("exitSimilarMode();"), 3,
+                          "셀렉트·국가(056)·정렬 3개 핸들러 모두 exitSimilarMode() 호출해야 함")
         for fn_name in ("function clearActiveFilter(key) {", "function clearAllFilters() {",
                          "function toggleCategoryFilter(code) {", "function toggleMonthFilter(month) {",
                          "function toggleFirmFilter(name) {", "function goToPageFromPager(n) {"):
@@ -3561,55 +3566,68 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
         self.assertIn("(d.top_countries || []).slice(0, 5);", fn)
         self.assertIn('"해외 실사 구성: "', fn)
 
-    # ── 국가명 한글화(findings.site_country 실측 23종) ──────────────────────
-    def test_country_labels_ko_covers_all_23_and_korea_variants_converge(self):
-        """[동기화 규칙] COUNTRY_LABELS_KO — findings.site_country 실측값 23종
-        (2026-07-31) verbatim. 한국 3표기는 전부 "대한민국"으로 수렴해야 한다."""
+    # ── 국가명 한글화(ISO2 코드 기반, 056) ────────────────────────────────────
+    def test_country_labels_ko_covers_all_mapping_codes(self):
+        """[동기화 규칙 — 056] COUNTRY_LABELS_KO 는 원문 문자열이 아니라 ISO2 코드가
+        키다(문자열은 반드시 낡는다 — 2026-07-31 시점 23종이 2026-08-11 실측 85종으로
+        이미 낡아 있었다). 코드 **집합**은 grm_findings._COUNTRY_CODE_MAP(055 매핑
+        정본의 파이썬 파리티 사본)의 코드 전체와 정확히 일치해야 한다(기준선은 개수가
+        아니라 id 집합) — 한국어 라벨 값 자체는 이 저장소가 지정하는 고정 계약이라
+        하드코딩 대조한다."""
         m = re.search(r"var COUNTRY_LABELS_KO = \{(.*?)\n  \};", self.js_src, re.S)
         self.assertIsNotNone(m, "trends.js 에 COUNTRY_LABELS_KO 정의 미발견")
         body = m.group(1)
-        pairs = dict(re.findall(r'"([^"]+)":\s*"([^"]+)",?', body))
-        self.assertEqual(len(pairs), 23, f"23개국이 아님: {sorted(pairs)}")
-        expected_non_korea = {
-            "Australia": "호주", "Belgium": "벨기에", "Canada": "캐나다", "China": "중국",
-            "Denmark": "덴마크", "France": "프랑스", "Germany": "독일", "Hungary": "헝가리",
-            "Iceland": "아이슬란드", "India": "인도", "Italy": "이탈리아", "Japan": "일본",
-            "Malaysia": "말레이시아", "Mexico": "멕시코", "Netherlands": "네덜란드",
-            "Spain": "스페인", "Switzerland": "스위스", "Taiwan": "대만", "Turkey": "튀르키예",
-            "United Kingdom": "영국",
+        pairs = dict(re.findall(r'([A-Z]{2}):\s*"([^"]+)",?', body))
+
+        canon_codes = set(grm_findings._COUNTRY_CODE_MAP.values())
+        self.assertEqual(len(canon_codes), 47, "매핑 정본 코드 수가 47이 아님(전제 재확인 필요)")
+        self.assertEqual(
+            set(pairs), canon_codes,
+            f"COUNTRY_LABELS_KO 코드 집합이 매핑 정본과 다름 — "
+            f"누락: {sorted(canon_codes - set(pairs))} · 초과: {sorted(set(pairs) - canon_codes)}",
+        )
+
+        expected = {
+            "US": "미국", "KR": "대한민국", "PR": "푸에르토리코", "IN": "인도", "CN": "중국",
+            "JP": "일본", "DE": "독일", "CA": "캐나다", "FR": "프랑스", "GB": "영국",
+            "IS": "아이슬란드", "IT": "이탈리아", "MY": "말레이시아", "ES": "스페인",
+            "BE": "벨기에", "HU": "헝가리", "TW": "대만", "CH": "스위스", "CY": "키프로스",
+            "AU": "호주", "IE": "아일랜드", "SE": "스웨덴", "JO": "요르단", "GR": "그리스",
+            "DK": "덴마크", "NL": "네덜란드", "MX": "멕시코", "CZ": "체코", "LT": "리투아니아",
+            "PL": "폴란드", "CL": "칠레", "AT": "오스트리아", "RO": "루마니아",
+            "ZA": "남아프리카공화국", "BD": "방글라데시", "ID": "인도네시아", "LB": "레바논",
+            "PT": "포르투갈", "SK": "슬로바키아", "LK": "스리랑카", "TR": "튀르키예",
+            "NO": "노르웨이", "FI": "핀란드", "VN": "베트남", "BY": "벨라루스",
+            "SI": "슬로베니아", "IL": "이스라엘",
         }
-        for k, v in expected_non_korea.items():
-            self.assertEqual(pairs.get(k), v, f"{k} 매핑 불일치")
-        for k in ("Republic of Korea", "South Korea", "The Republic of Korea"):
-            self.assertEqual(pairs.get(k), "대한민국", f"{k} 가 대한민국으로 수렴하지 않음")
+        self.assertEqual(pairs, expected, "COUNTRY_LABELS_KO 값이 고정 계약과 다름")
 
-    def test_country_label_helper_falls_back_to_english_when_unmapped(self):
-        """매핑에 없는 국가는 영문 원문 그대로 -- 빈칸/추측 번역 금지(폴백 계약)."""
-        self.assertIn("function countryLabelKo(country)", self.js_src)
-        fn = self.js_src[self.js_src.index("function countryLabelKo(country)"):]
+    def test_country_label_helper_code_priority_with_raw_fallback(self):
+        """countryLabelKo(code, country) — code 가 있으면 매핑(없는 코드는 코드 그대로,
+        빈칸/추측 번역 금지)을, code 가 아예 없으면(055 미배포 구버전 RPC 응답 방어)
+        원문 country 문자열로 폴백한다."""
+        self.assertIn("function countryLabelKo(code, country)", self.js_src)
+        fn = self.js_src[self.js_src.index("function countryLabelKo(code, country)"):]
         fn = fn[:fn.index("\n  }")]
-        self.assertIn("COUNTRY_LABELS_KO[country] || country", fn)
+        self.assertIn("COUNTRY_LABELS_KO[code] || code", fn)
+        self.assertIn("return country || \"\";", fn)
 
-    def test_top_countries_render_uses_korean_label_not_raw_country(self):
-        """top_countries 렌더 루프가 원문 country 를 그대로 쓰지 않고
-        countryLabelKo() 를 거치는지(회귀 -- 실제 결함이었던 지점)."""
+    def test_top_countries_render_uses_code_then_falls_back_to_raw_country(self):
+        """top_countries 렌더 루프가 c.code 를 우선 거치는 countryLabelKo() 를 쓰는지
+        (055 findings_zone_category() 가 새로 주는 code 키 소비 확인 -- 배선 누락이
+        이 저장소의 가장 흔한 결함이라 사용처가 코드에 실제로 있는지 문자열로 대조)."""
         fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
         fn = fn[:fn.index("\n  }\n")]
         top_loop = fn[fn.index("top.forEach"):]
-        self.assertIn("countryLabelKo(c.country)", top_loop)
+        self.assertIn("countryLabelKo(c.code, c.country)", top_loop)
         self.assertNotIn("createTextNode(c.country ", top_loop)
 
-    def test_korea_findings_not_summed_across_variants(self):
-        """한국 3표기 통합은 표시 전용 -- 이 패널은 서버가 준 top_countries 행을 그대로
-        1행씩 표시할 뿐 건수를 합산하지 않는다(범위 밖 명시 주석 확인, 서버 계약
-        변경은 이 작업 범위 밖)."""
-        idx = self.js_src.index("var COUNTRY_LABELS_KO")
-        preceding_comment = self.js_src[max(0, idx - 1400):idx]
-        self.assertIn("건수 합산이 아니다", preceding_comment.replace("\n", ""))
-        self.assertIn("합계로 합치는 것은 서버 계약 변경", preceding_comment.replace("\n", ""))
+    def test_top_countries_loop_has_no_manual_summation(self):
+        """top_countries 행은 서버(055 findings_zone_category, country_key 축으로 이미
+        그룹화됨)가 준 값을 그대로 1행씩 표시할 뿐이다 -- 클라이언트가 다시 합산하지
+        않는다(단순 표시만)."""
         fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
         fn = fn[:fn.index("\n  }\n")]
-        # findings 합산 로직이 top_countries 루프 안에 없어야 한다(단순 표시만).
         top_loop = fn[fn.index("top.forEach"):]
         self.assertNotIn("+=", top_loop)
 

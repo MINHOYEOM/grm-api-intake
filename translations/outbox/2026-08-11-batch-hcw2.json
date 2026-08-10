@@ -1,0 +1,2996 @@
+[
+  {
+    "finding_id": "finding-96c9edb5d7629d31c4d6b1a2",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "의약품의 품질과 안전한 유통을 유지할 수 있는 보관 및/또는 운송 조건을 보장하기 위한 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9de88604aad1696a7f8112e5",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc6ba6926790eac579ad56ff",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd87bcc7b862cc7354f00bed",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "작업자의 직무기술서, 작업자에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ea1f231041644a3bb865668",
+    "finding_text": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약: 품질부적합 우려(프로폴리브이아이피홍삼향진치약)",
+    "finding_text_ko": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약 중 프로폴리브이아이피홍삼향진치약에 대한 품질부적합 우려.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1b38f2481fae6bd8cf44942e",
+    "finding_text": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약: 품질부적합 우려(마데바텔넥치약)",
+    "finding_text_ko": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약 중 마데바텔넥치약에 대한 품질부적합 우려.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c42933fb7b0897e3b2bb36b",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "해당 의약품에 대한 지속적 안정성시험(ongoing stability) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7b50d6c5228f6dfb21048d7e",
+    "finding_text": "The importer did not ensure that the foreign sites use to fabricate, package/label, or test drug products met the requirements described in Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080).",
+    "finding_text_ko": "수입자는 의약품의 제조, 포장/표시 또는 시험에 사용한 해외 제조소가 Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080)에 기술된 요건을 충족함을 보장하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0f9f176f620a34aefb04b9f",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a26ca3f7af44bcb21fdc102f",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품된 의약품의 재판매 검토를 위한 평가, 문서화 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cba22f4b5b05f43a5aa7301c",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e9f9c030d83729c2654ff87c",
+    "finding_text": "The written specifications were inadequate.",
+    "finding_text_ko": "문서화된 기준서(specifications)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fd0f4f27ef6a208e651b16f4",
+    "finding_text": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약: 품질부적합 우려(덴탈힐링프로폴치약)",
+    "finding_text_ko": "1.마데바텔넥치약, 2.덴탈힐링프로폴치약, 3.프로폴리브이아이피홍삼향진치약, 4.닥터하루오프리미엄치약 중 덴탈힐링프로폴치약에 대한 품질부적합 우려.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-36fe5668aa27e8babf13cb29",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38ef26bd84538ed56d7b03a1",
+    "finding_text": "The computerized system used to manage product inventory and distribution records to support recalls was not validated.",
+    "finding_text_ko": "회수(recall) 대응을 위해 제품 재고 및 유통 기록을 관리하는 데 사용된 컴퓨터화시스템이 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4ed2bfe54060a2e45d36b10b",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화, 평가 및/또는 승인되도록 보장하기 위한 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7b60490d74d0e81b7e25cdae",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "의약품의 품질과 안전한 유통을 유지할 수 있는 보관 및/또는 운송 조건을 보장하기 위한 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc16eb161a0f03f3913ffea8",
+    "finding_text": "The assessment to release finished products was inadequate. Investigations into deviations, reports, and/or follow-up actions were inadequate. The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다. 일탈(deviation), 보고 및/또는 후속조치에 대한 조사가 미흡했다. 불만 및/또는 결함 가능성이 있는 제품에 관한 기타 정보의 평가, 기록, 후속조치 및/또는 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-25d5944dc3d5580955bb9564",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented. The training, experience, and/or reporting structure of the individual responsible for packaging operations was inadequate.",
+    "finding_text_ko": "GMP에 대한 작업자 교육 및/또는 기록 관리가 미흡했다. 작업자의 직무기술서, 작업자에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다. 포장 작업 책임자의 교육, 경험 및/또는 보고체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-332844a261f38b8417d614e7",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다. 기록의 추적성, 가독성, 문서화, 서식 및/또는 정확성이 미흡했다. 기록의 생성, 수정, 검토, 보관 및/또는 검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-542dd53086da9d0a517f255d",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55c288cb54d3e89fdcf53f60",
+    "finding_text": "Senior management's ability to determine and/or provide adequate and/or appropriate resources to implement, maintain and/or improve the effectiveness of the quality management system was inadequate.",
+    "finding_text_ko": "품질경영시스템(quality management system)의 효과성을 실행, 유지 및/또는 개선하기 위한 적절하고 충분한 자원을 결정하고 제공하는 경영진의 역량이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-917a8cacd5a220fe0d06298b",
+    "finding_text": "The maintenance of the premises was inadequate.",
+    "finding_text_ko": "건물 및 시설(premises)의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b2f846c28fe4bb0eb383be53",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "의약품의 품질과 안전한 유통을 유지할 수 있는 보관 및/또는 운송 조건을 보장하기 위한 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c933a329861a295c2ddf59b5",
+    "finding_text": "리버만로라부스트액(L-아스파르트산-L-오르니틴): 안정성시험 일부항목(성상) 기준 일탈로 인한 영업자 회수",
+    "finding_text_ko": "리버만로라부스트액(L-아스파르트산-L-오르니틴): 안정성시험 일부 항목(성상)의 기준 일탈에 따른 영업자 회수(recall).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e2c52e4e70c1d2e3384ef607",
+    "finding_text": "The computerized system used to manage product inventory and distribution records to support recalls was not validated.",
+    "finding_text_ko": "회수(recall) 대응을 위해 제품 재고 및 유통 기록을 관리하는 데 사용된 컴퓨터화시스템이 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f4ee9cd37c6aa51a714867b6",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화, 평가 및/또는 승인되도록 보장하기 위한 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-045d9e9a66d0c59eddf8e516",
+    "finding_text": "기타 [별표 1] 6.2 무균공정 밸리데이션 후 배양용기 수에 대하여 평가할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 무균공정(aseptic) 밸리데이션 후 배양용기 수에 대하여 평가할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-136e2cfb667d5d6f287b9e77",
+    "finding_text": "기타 [별표 1] 6.4 제품과 접촉하는 모든 설비에 대하여 세척 검증할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 — 제품과 접촉하는 모든 설비에 대하여 세척 검증(cleaning validation)할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14e7dfea5b6f9c43f96aeb5c",
+    "finding_text": "기타 [별표 1] 6.4 세척 밸리데이션에서 적절한 검체 채취방법을 선정할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 — 세척 밸리데이션(cleaning validation)에서 적절한 검체 채취방법을 선정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-22a8233c587a88421cd1827c",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 있음 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 품질 기타 [별표 1] 제4호 제품 규격서를 적절하게 관리할 것 보완완료 시설장비 기타 [별표 1] 제2.1호 제조장비 적격성평가를 적절하게 수행할 것 보완완료 1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 제형 비고 비무균-일반제제-외용액제 완제",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies) 있음. [분야: 품질 / 구분: 기타 / 근거 법령: [별표 1] 제4호] 제품 규격서를 적절하게 관리할 것 — 보완완료. [분야: 시설장비 / 구분: 기타 / 근거 법령: [별표 1] 제2.1호] 제조장비 적격성평가(qualification)를 적절하게 수행할 것 — 보완완료. 주1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) PIC/S 정의에 따라 중대, 중요, 기타로 작성. 제형: 비무균-일반제제-외용액제, 완제.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-36232a85ff559e60db42ceac",
+    "finding_text": "기타 [별표 1] 6.2 제균필터 밸리데이션에 대한 제품별 영향 평가를 실시할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 제균필터 밸리데이션에 대한 제품별 영향 평가를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3f47e522ea988ee08dc68839",
+    "finding_text": "기타 [별표 1] 2.1 설비의 적격성평가 검증항목 및 기준에 대한 근거를 마련할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.1 — 설비의 적격성평가(qualification) 검증항목 및 기준에 대한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5a70f6e2aeb277a8979f5503",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 있음 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 허가관리 -* [별표 1] 제1의2호 원자재 시험 방법을 해외제조소와 일치시킬 것 시험실 기타 [별표 1] 제7.1호 주성분의 용기별 확인시험 생략 시 타당한 근거자료를 갖출 것 1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 * 수입업체의 지적(보완)사항을 포함하고 있어 구분 생략 제형 비고 비무균-일반제제-내용고형제 완제",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies) 있음. [분야: 허가관리 / 구분: -* / 근거 법령: [별표 1] 제1의2호] 원자재 시험 방법을 해외제조소와 일치시킬 것. [분야: 시험실 / 구분: 기타 / 근거 법령: [별표 1] 제7.1호] 주성분의 용기별 확인시험 생략 시 타당한 근거자료를 갖출 것. 주1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) PIC/S 정의에 따라 중대, 중요, 기타로 작성. * 수입업체의 지적(보완)사항을 포함하고 있어 구분 생략. 제형: 비무균-일반제제-내용고형제, 완제.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-69a70091903b61620284dbb2",
+    "finding_text": "기타 [별표 1] 2.2 데이터 입력(출력) 시 세부 정보가 기록될 수 있도록 보완할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.2 — 데이터 입력(출력) 시 세부 정보가 기록될 수 있도록 보완할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7555b1e7d7c2b01cb12f73ed",
+    "finding_text": "기타 [별표 1] 6.2 공정 밸리데이션 결과에 대하여 적절히 평가할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 공정 밸리데이션(process validation) 결과에 대하여 적절히 평가할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8facb5728688e380984e2951",
+    "finding_text": "기타 [별표 1] 8.1 반제품 보관 시 품질이 변하지 않도록 관리할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 — 반제품 보관 시 품질이 변하지 않도록 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93dc8a02ea49bcc2e38435ad",
+    "finding_text": "기타 [별표 1] 8.1 제조공정 작업내용에 대하여 상세히 기록할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 — 제조공정 작업내용에 대하여 상세히 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d49cf43d39e6e215182c53a",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 멸균 공정의 모든 적재 패턴에 대하여 검증할 것",
+    "finding_text_ko": "[시설장비 / 기타] [별표 1] 2.1 — 멸균 공정의 모든 적재 패턴에 대하여 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9e7c9bf6272b51ffc3b15561",
+    "finding_text": "기타 [별표 1의2] 12.5 질소제조장치 적격성평가에서 필요한 항목을 적절히 포함할 것",
+    "finding_text_ko": "[기타] [별표 1의2] 12.5 — 질소제조장치 적격성평가(qualification)에서 필요한 항목을 적절히 포함할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a965e69970870e9936e7fd22",
+    "finding_text": "기타 [별표 1] 2.1 설비의 실제 운전 조건을 반영하여 적격성평가를 실시할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.1 — 설비의 실제 운전 조건을 반영하여 적격성평가(qualification)를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b292175fdf200a306e3e38fd",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 있음 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 허가관리 -* [별표 1] 제1의2호 원자재 관련 허가(신고) 사항 기재방식을 해외제조소와 일치 시킬 것 1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 * 수입업체의 지적(보완)사항을 포함하고 있어 구분 생략 제형 비고 비무균-일반제제-내용고형제 완제",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies) 있음. [분야: 허가관리 / 구분: -* / 근거 법령: [별표 1] 제1의2호] 원자재 관련 허가(신고) 사항 기재방식을 해외제조소와 일치 시킬 것. 주1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) PIC/S 정의에 따라 중대, 중요, 기타로 작성. * 수입업체의 지적(보완)사항을 포함하고 있어 구분 생략. 제형: 비무균-일반제제-내용고형제, 완제.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b650360dff26373da607e514",
+    "finding_text": "제조 기타 [별표 1] 4.3 사용 전후 필터 완전성 시험 시 동일한 조건에서 수행할 것",
+    "finding_text_ko": "[제조 / 기타] [별표 1] 4.3 — 사용 전후 필터 완전성 시험은 동일한 조건에서 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bf98210fcc6fe66a6ebd0e12",
+    "finding_text": "품질경영 기타 [별표 1] 1의2 시험량 대비 시험에 필요한 적정인력 운영에 대하여 평가할 것",
+    "finding_text_ko": "[품질경영 / 기타] [별표 1] 1의2 — 시험량 대비 시험에 필요한 적정인력 운영에 대하여 평가할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ce625fd58df684c228d1bfa6",
+    "finding_text": "시설장비 기타 [별표 1] 2.3 청정도가 다른 구역간 반제품이 이동하는 경우 실시간으로 차압을 확인할 것",
+    "finding_text_ko": "[시설장비 / 기타] [별표 1] 2.3 — 청정도가 다른 구역 간 반제품이 이동하는 경우 실시간으로 차압을 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5843062afe77339f9e7b5b6",
+    "finding_text": "기타 [별표 1] 6.4 제조설비에 적용하는 모든 세척방법에 대하여 검증할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 — 제조설비에 적용하는 모든 세척방법에 대하여 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d64db838de209a0613f612e1",
+    "finding_text": "기타 [별표 1] 6.2 무균작업 중 조제부터 여과까지의 시간을 설정할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 무균작업(aseptic) 중 조제부터 여과까지의 시간을 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db0fd95aa968b3cb11f21e5b",
+    "finding_text": "기타 [별표 1] 6.2 무균공정 밸리데이션 배지성능시험에서 제조소 환경 균주를 포함할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 무균공정 밸리데이션 배지성능시험에서 제조소 환경 균주를 포함할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db92072190e89154208818d4",
+    "finding_text": "기타 [별표 1] 6.2 공정 밸리데이션에서 제조 장비의 공정변수를 확립할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 공정 밸리데이션(process validation)에서 제조 장비의 공정변수를 확립할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dcc3bbf5768aa5e46329d8fd",
+    "finding_text": "기타 [별표 1] 8.1 제조지시 및 기록서에 중요공정의 작업시간을 상세히 기록할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 — 제조지시 및 기록서에 중요공정의 작업시간을 상세히 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eaa66466a92dea2d5c8c3342",
+    "finding_text": "기타 [별표 1] 6.2 무균공정 밸리데이션을 최악 조건을 반영하여 실시할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.2 — 무균공정 밸리데이션을 최악 조건(worst case)을 반영하여 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-088c949ac5f5bde95886a3fb",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품된 의약품의 재판매 검토를 위한 평가, 문서화 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-252f2126d4a4efe466a42471",
+    "finding_text": "The confirmatory tests conducted on samples before or after they were received in Canada were inadequate.",
+    "finding_text_ko": "캐나다 반입 전 또는 반입 후 검체에 대해 수행한 확인시험(confirmatory test)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ae8fb568f5a67748452bce4",
+    "finding_text": "The importer did not ensure that the foreign sites use to fabricate, package/label, or test drug products met the requirements described in Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080).",
+    "finding_text_ko": "수입자는 의약품의 제조, 포장/표시 또는 시험에 사용한 해외 제조소가 Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080)에 기술된 요건을 충족함을 보장하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3f5d45de7347327e4b473a44",
+    "finding_text": "The maintenance of evidence was inadequate for manufacturing, packaging, labelling, required testing, storage, and/or distribution, including the respective conditions.",
+    "finding_text_ko": "제조, 포장, 표시, 요구되는 시험, 보관 및/또는 유통에 대한(각각의 조건을 포함) 증빙의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-661ab520a07ee6fc97177a81",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6cb6521aaad8ce8a78434c70",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation), 보고 및/또는 후속조치에 대한 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7469448748b479267d368cd3",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7f50974edb7788575631a031",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "GMP에 대한 작업자 교육 및/또는 기록 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aea31ca8c838234fdcf545e2",
+    "finding_text": "The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material. The operation of the water purification equipment was inadequate for ensuring a reliable source of water.",
+    "finding_text_ko": "설비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치, 설계, 운전, 보관 및/또는 유지관리되지 않았다. 신뢰할 수 있는 용수 공급을 보장하기 위한 정제수 설비의 운전이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e4190d1cc29de6d375d9ba99",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eaee04ee330612bb2aed203b",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate. As the manufacturing steps were completed, the information was not recorded in the manufacturing batch record.",
+    "finding_text_ko": "일탈(deviation), 보고 및/또는 후속조치에 대한 조사가 미흡했다. 제조 단계가 완료되었음에도 해당 정보가 제조기록서(batch record)에 기록되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ed87e1792a9aa91ce65186f6",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-121423544c5c4972fd4979cf",
+    "finding_text": "기타 [별표1] 2.1 중요 기계·설비에 대하여 적격성 평가를 실시할 것",
+    "finding_text_ko": "[기타] [별표1] 2.1 — 중요 기계·설비에 대하여 적격성 평가(qualification)를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-18f5246d84e2221085b23ed2",
+    "finding_text": "시설장비 기타 [별표1] 2.1 교정 대상 여부, 허용기준 및 범위를 설정하여 관리할 것",
+    "finding_text_ko": "[시설장비 / 기타] [별표1] 2.1 — 교정 대상 여부, 허용기준 및 범위를 설정하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-45faadd6c1eed8b5697b0c93",
+    "finding_text": "기타 [별표1] 6.4 세척제 변경이 세척 후 유지시간에 미치는 영향을 평가할 것",
+    "finding_text_ko": "[기타] [별표1] 6.4 — 세척제 변경이 세척 후 유지시간에 미치는 영향을 평가할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-47cbfc3ecd48f361979452eb",
+    "finding_text": "기타 [별표1] 6.4 세척 밸리데이션 계획서에 검체채취 위치와 선정 사유를 명시할 수 있도록 관련 절차를 마련할 것",
+    "finding_text_ko": "[기타] [별표1] 6.4 — 세척 밸리데이션 계획서에 검체채취 위치와 선정 사유를 명시할 수 있도록 관련 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51389bee16b61eb50b3c02d4",
+    "finding_text": "제조 기타 [별표1] 8.1 제조장비 및 부품의 멸균 수행주기에 대한 설정근거를 마련할 것",
+    "finding_text_ko": "[제조 / 기타] [별표1] 8.1 — 제조장비 및 부품의 멸균 수행주기에 대한 설정근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-533f9d20eced4eaa2c901ca2",
+    "finding_text": "시험실 기타 [별표1] 7.1 시험기기 기록대장을 마련하여 작업내용을 시간 순서에 따라 기록할 것",
+    "finding_text_ko": "[시험실 / 기타] [별표1] 7.1 — 시험기기 기록대장을 마련하여 작업내용을 시간 순서에 따라 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5d94a0079acffdf563a34db2",
+    "finding_text": "농림자소엽: 순도시험 1) 이물 가) 줄기",
+    "finding_text_ko": "농림자소엽 — 순도시험 중 1) 이물 가) 줄기 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61fa7cc5f1badc8ed1acf29c",
+    "finding_text": "현진단삼: 정량법(살비아놀산 B)",
+    "finding_text_ko": "현진단삼 — 정량법(살비아놀산 B) 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-799745c831f1dd5301d2cb8c",
+    "finding_text": "기타 [별표1] 8.1 최종 멸균기에 대하여 멸균 수행 전 성능을 점검할 것",
+    "finding_text_ko": "[기타] [별표1] 8.1 — 최종 멸균기에 대하여 멸균 수행 전 성능을 점검할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-da53cd03ee2a0663f056d568",
+    "finding_text": "기타 [별표1] 8.1 반제품 보관기간 검증 시 실제 반제품과 동일한 보관 조건에서 실시할 것",
+    "finding_text_ko": "[기타] [별표1] 8.1 — 반제품 보관기간 검증은 실제 반제품과 동일한 보관 조건에서 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-df26b4e7ed500912f0bd8d79",
+    "finding_text": "기타 [별표1] 6.4 캠페인 생산에 대한 세척 유효성 검증을 실시할 것",
+    "finding_text_ko": "[기타] [별표1] 6.4 — 캠페인 생산에 대한 세척 유효성 검증을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ed165400edac0154807d1191",
+    "finding_text": "구미포비스왑스틱(포비돈요오드)(수출명:포비딕): 이물 혼입으로 인한 영업자회수",
+    "finding_text_ko": "구미포비스왑스틱(포비돈요오드)(수출명:포비딕): 이물 혼입에 따른 영업자회수(recall).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f8832fc5951ebd76a48458de",
+    "finding_text": "기타 [별표1] 8.1 공정 중 시험결과에 대한 모든 기록을 보존할 것",
+    "finding_text_ko": "[기타] [별표1] 8.1 — 공정 중 시험결과에 대한 모든 기록을 보존할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-942ccada4f4bd5ca242ad309",
+    "finding_text": "The quality control department did not evaluate the results of the annual product quality review.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 연간 제품품질평가(annual product quality review) 결과를 평가하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d23a64d90186859a6f9f9024",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ecd4ac2855ca6300a9f50adc",
+    "finding_text": "The system for reviewing, revising, and approving standard operating procedures was inadequate.",
+    "finding_text_ko": "표준작업지침서(SOP)의 검토, 개정 및 승인 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14f72a2927c63cbfb154c7a8",
+    "finding_text": "The ongoing training of personnel was inadequate.",
+    "finding_text_ko": "작업자에 대한 지속적 교육이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f6e365cf5a2b289ea90baa5",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지, 처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9242796278a04ec1cffddf09",
+    "finding_text": "The validation of equipment or the planned maintenance of equipment was inadequate.",
+    "finding_text_ko": "설비의 밸리데이션(validation) 또는 계획된 설비 유지보수가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b8734a66a917258ea2539ea2",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리(sanitation) 프로그램이 오염 위험을 파악 및/또는 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1dcc4d5efd23b0d2ed81008",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조자, 시험자, 포장자, 표시자, 유통업자, 수입자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-da5d29f7c09100371218b846",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-576d6c7f5a8bb213cbfa8000",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "데이터 거버넌스(data governance) 계획의 수립 및/또는 유지가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99f55a4fd6906a705b6dc25a",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation), 보고 및/또는 후속조치에 대한 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d0c7c36c82e22def20003e76",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다. 변경이 적절히 문서화, 평가 및/또는 승인되도록 보장하기 위한 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-371e4486b44d58fa356ba26b",
+    "finding_text": "평위천프라임액: 카톤 포장 오류로 인한 영업자회수",
+    "finding_text_ko": "평위천프라임액: 카톤 포장 오류에 따른 영업자회수(recall).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5741f9b05cce34aa4e16b7ff",
+    "finding_text": "이트라펜정: 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "이트라펜정: 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수(recall).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-01614eb1c952a9cb824718ce",
+    "finding_text": "기타 [별표 1] 제12호 가목 주성분 제조원 추가에 따른 변경관리 관련하여 변경 검토의 적절성 미흡",
+    "finding_text_ko": "[기타] [별표 1] 제12호 가목 — 주성분 제조원 추가에 따른 변경관리 관련 변경 검토의 적절성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d02901c058072ea641ac15a",
+    "finding_text": "제조 기타 [별표 1의2] 5 적격성 평가 시 운전조건에서 동등하게 작동됨을 검증할 것",
+    "finding_text_ko": "[제조 / 기타] [별표 1의2] 5 — 적격성 평가(qualification) 시 운전조건에서 동등하게 작동됨을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e8aa4b0a0c490ded656c55c",
+    "finding_text": "원자재 기타 [별표 1의2] 10.1 원자재는 품질에 영향이 없는 조건에서 보관할 수 있도록 관리할 것",
+    "finding_text_ko": "[원자재 / 기타] [별표 1의2] 10.1 — 원자재는 품질에 영향이 없는 조건에서 보관할 수 있도록 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f929e92f701cfaf434bebaf",
+    "finding_text": "제조 기타 [별표 1] 6.2 무균공정 밸리데이션을 위한 배지성능시험 시 공장 내 환경에서 검출된 균주를 포함할 것",
+    "finding_text_ko": "[제조 / 기타] [별표 1] 6.2 — 무균공정 밸리데이션을 위한 배지성능시험 시 공장 내 환경에서 검출된 균주를 포함할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11438944ca43c82ff0bffad6",
+    "finding_text": "기타 [별표 1] 제9.3호 다목 장비별로 설정된 CHT, DHT 준수 여부 확인을 위한 세척 기록 방안 미흡",
+    "finding_text_ko": "[기타] [별표 1] 제9.3호 다목 — 장비별로 설정된 CHT, DHT 준수 여부 확인을 위한 세척 기록 방안이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1808a4432dddc5cd6e20bc9c",
+    "finding_text": "기타 [별표 1] 제5.1호 마목 문서의 정기 검토, 폐기 처리 절차 미흡",
+    "finding_text_ko": "[기타] [별표 1] 제5.1호 마목 — 문서의 정기 검토 및 폐기 처리 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2bf9aa40dde1edb67f34f133",
+    "finding_text": "품질경영 기타 [별표 1] 7.3 제품품질평가 후 개선이 필요한 사항에 대해 시정조치를 마련할 것",
+    "finding_text_ko": "[품질경영 / 기타] [별표 1] 7.3 — 제품품질평가 후 개선이 필요한 사항에 대해 시정조치(CAPA)를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2ca16df0d8b2c755bc5c3977",
+    "finding_text": "제조 기타 [별표 1] 6.2 공정밸리데이션 시 검증항목을 타당하게 마련할 것",
+    "finding_text_ko": "[제조 / 기타] [별표 1] 6.2 — 공정밸리데이션(process validation) 시 검증항목을 타당하게 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-395eea699f0e75cc34efb673",
+    "finding_text": "품질경영 기타 [별표 1] 2.2 정기적으로 백업된 데이터의 복구테스트를 실시할 것",
+    "finding_text_ko": "[품질경영 / 기타] [별표 1] 2.2 — 정기적으로 백업된 데이터의 복구테스트를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e024050499e1691e92294da",
+    "finding_text": "제조 기타 [별표 1]8.1 반제품 보관기간을 설정하여 관리할 것",
+    "finding_text_ko": "[분야: 제조 / 등급: 기타] [별표 1] 8.1 반제품 보관기간을 설정하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ea829bd14db6dccc2170846",
+    "finding_text": "제조 기타 [별표 1] 8.1 실제 작업 내용을 제조기록서에 반영하여 관리할 것",
+    "finding_text_ko": "[분야: 제조 / 등급: 기타] [별표 1] 8.1 실제 작업 내용을 제조기록서(batch record)에 반영하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-402e5569c8b75c12f879fcf7",
+    "finding_text": "제조 기타 [별표 1] 2.1 적격성 평가 시 사용범위를 고려하여 검증범위를 설정할 것",
+    "finding_text_ko": "[분야: 제조 / 등급: 기타] [별표 1] 2.1 적격성평가(qualification) 시 사용범위를 고려하여 검증범위를 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-66c0f676461a209642255bee",
+    "finding_text": "품질경영 기타 [별표 1] 제3.2호 나목 제품 기준 및 시험방법, 시험일지 오기 건에 대한 일탈 처리 절차 미흡",
+    "finding_text_ko": "[분야: 품질경영 / 등급: 기타] [별표 1] 제3.2호 나목 — 제품 기준 및 시험방법, 시험일지 오기 건에 대한 일탈(deviation) 처리 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ad6d987a27708efa77f30ebb",
+    "finding_text": "시설장비 기타 [별표 1] 제2.2호 다목 백업 관련하여 대상 장비 누락 확인을 위한 방안 마련 미흡",
+    "finding_text_ko": "[분야: 시설장비 / 등급: 기타] [별표 1] 제2.2호 다목 — 백업 관련하여 대상 장비 누락 확인을 위한 방안 마련이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c2e0d4c0b252d91e1e78749d",
+    "finding_text": "품질경영 기타 [별표 1] 3.1 DI 전담 조직을 구성하여 운영할 것",
+    "finding_text_ko": "[분야: 품질경영 / 등급: 기타] [별표 1] 3.1 DI(데이터 완전성, data integrity) 전담 조직을 구성하여 운영할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cdb09debd733224e53f8def9",
+    "finding_text": "제이리브현탁액(L-류신,L-발린,L-이소류신): 의약품 동등성 재평가 결과(유용성 미인정)에 따른 영업자 회수",
+    "finding_text_ko": "제이리브현탁액(L-류신,L-발린,L-이소류신): 의약품 동등성 재평가 결과 유용성이 미인정되어 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb96ce6e5df2f13622e87dbe",
+    "finding_text": "제조 기타 [별표 1의2] 12.4 제품과 접촉하는 설비 및 도구에 대해 세척밸리데이션을 실시할 것",
+    "finding_text_ko": "[분야: 제조 / 등급: 기타] [별표 1의2] 12.4 제품과 접촉하는 설비 및 도구에 대해 세척밸리데이션(cleaning validation)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0bbfd27ce96fd20c3f653481",
+    "finding_text": "엔시트라정(트라마돌염산염,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "엔시트라정(트라마돌염산염,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61bf922dd22456ceea5b6b56",
+    "finding_text": "부광미다졸람주사: 2차 포장 표시 오기에 따른 영업자 회수",
+    "finding_text_ko": "부광미다졸람주사: 2차 포장 표시 오기에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-066adac8b4bee468364f87c7",
+    "finding_text": "The quality control department's handling of complaints and/or information received about drug quality was inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit)의 불만 및/또는 의약품 품질 관련 접수 정보의 처리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d0890f4f81b30401f080d04",
+    "finding_text": "마데카솔케어연고: 포장재 불량(코팅 벗겨짐)에 따른 영업자 회수",
+    "finding_text_ko": "마데카솔케어연고: 포장재 불량(코팅 벗겨짐)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0fd03775209fd9f8be2dca91",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-100e43b1faf3c68bdac491cb",
+    "finding_text": "The electronic system was not validated for its intended use.",
+    "finding_text_ko": "전자 시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-112625e4c74679508f05f115",
+    "finding_text": "삼성로수바스타틴정20밀리그램(로수바스타틴칼슘): 바코드 오류에 따른 영업자 회수",
+    "finding_text_ko": "삼성로수바스타틴정20밀리그램(로수바스타틴칼슘): 바코드 오류에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11c44ddeb6a6ddec139566de",
+    "finding_text": "The ongoing stability program for a drug was inadequate. The stability program for a drug did not include a minimum of one batch of every strength of the drug for every year the drug was fabricated.",
+    "finding_text_ko": "의약품의 지속적 안정성시험 프로그램(ongoing stability program)이 미흡했다. 안정성시험 프로그램에 해당 의약품이 제조된 각 연도별로 모든 함량의 최소 1개 배치가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-204041253d1756f49da97cc6",
+    "finding_text": "엑스페인정: 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)의 일일 섭취허용량을 초과한 특정 제조단위에 대한 영업자회수",
+    "finding_text_ko": "엑스페인정: 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)이 일일 섭취허용량을 초과한 특정 제조단위에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-32df2945930f0fb2f3bd0891",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a0b44d6f138087e93659f3c",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 모든 업무를 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64540f120a7cff2e09da79ae",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "유틸리티 및/또는 지원 설비의 적격성평가(qualification) 및/또는 검증이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6a9c308959426473a335fc38",
+    "finding_text": "The written hygiene program was not being followed by plant personnel and/or visitors.",
+    "finding_text_ko": "문서화된 위생관리 프로그램을 제조소 직원 및/또는 방문자가 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6cfefc8356c0481dc7fbadab",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 모든 업무를 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7830e52dfbf9e7ac6e62d049",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material. The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures. Dust was inadequately contained during fabrication, packaging, and/or labelling.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다. 비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 유효성이 미흡했다. 장비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치, 설계, 운전, 보관 및/또는 유지관리되지 않았다. 위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차 및/또는 방충·방서 대책이 미흡했다. 제조, 포장 및/또는 표시 공정 중 분진 차단이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81acbe20861202e310592c16",
+    "finding_text": "The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material. The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "장비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치, 설계, 운전, 보관 및/또는 유지관리되지 않았다. 위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다. 비위생적 상태 방지를 위한 세척 절차의 실행, 유효성 및/또는 밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-af9d5e3ff3b30e122c51166c",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c688c255935cb9f01cdee22d",
+    "finding_text": "The control of quarantine areas was inadequate.",
+    "finding_text_ko": "격리구역(quarantine area)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c829545d9ac0af9e5c809f77",
+    "finding_text": "The premises were not laid out and/or designed for an optimal flow of personnel and/or materials to prevent cross-contamination and/or mix-ups between products.",
+    "finding_text_ko": "제조소가 제품 간 교차오염 및/또는 혼동을 방지하기 위한 최적의 인원 및/또는 자재 동선을 갖추도록 배치 및/또는 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9e1974ecb7ae22625f3e08c",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5cdc2ffe32ac28479aa4bd7",
+    "finding_text": "The usage logs for the equipment used for significant processing and/or testing operations were inadequate.",
+    "finding_text_ko": "주요 제조공정 및/또는 시험 작업에 사용되는 장비의 사용기록(usage log)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-efc12bc09d080a04d345e082",
+    "finding_text": "엑스페인세미정: 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)의 일일 섭취허용량을 초과한 특정 제조단위에 대한 영업자회수",
+    "finding_text_ko": "엑스페인세미정: 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)이 일일 섭취허용량을 초과한 특정 제조단위에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f01aff32d8814fb34d797ff5",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0df069f83c1255835e6455fb",
+    "finding_text": "뉴키토플러스원치약(수출명: Newchito Plus One Toothpaste), 아파타이트뉴키토플러스원치약(수출명:Apatite Newchito Plus One Toothpaste), 닥투스키토케어치약(Doctooth Chito Care Toothpaste), 뉴플치약: 품질부적합 우려(뉴키토플러스원치약)",
+    "finding_text_ko": "[품목] 뉴키토플러스원치약(수출명: Newchito Plus One Toothpaste), 아파타이트뉴키토플러스원치약(수출명:Apatite Newchito Plus One Toothpaste), 닥투스키토케어치약(Doctooth Chito Care Toothpaste), 뉴플치약 / [사유] 품질 부적합 우려(뉴키토플러스원치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-132b0f7cb85e3d1fa165bef4",
+    "finding_text": "자연세상유백피: 성상",
+    "finding_text_ko": "[품목] 자연세상유백피 / [지적 항목] 성상",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-28a0d6dd2578be53bce08be4",
+    "finding_text": "1.퓨어검덴탈케어치약, 2.아쉬세븐옐로프레쉬치약, 3.씨에이치올인원치약, 4.리브러쉬오랄케어솔루션습관치약, 5.덴탈더블케어치약, 6.이처럼토탈케어치약, 7.러버스올케어치약(모과향), 8.웰비네추럴밸런스치약, 9.리브러쉬오우트밀잇몸케어치약, 10.리브러쉬브레스케어치약, 11.리브러쉬검케어치약: 품질부적합 우려(리브러쉬브레스케어치약)",
+    "finding_text_ko": "[품목] 1.퓨어검덴탈케어치약, 2.아쉬세븐옐로프레쉬치약, 3.씨에이치올인원치약, 4.리브러쉬오랄케어솔루션습관치약, 5.덴탈더블케어치약, 6.이처럼토탈케어치약, 7.러버스올케어치약(모과향), 8.웰비네추럴밸런스치약, 9.리브러쉬오우트밀잇몸케어치약, 10.리브러쉬브레스케어치약, 11.리브러쉬검케어치약 / [사유] 품질 부적합 우려(리브러쉬브레스케어치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2bb04aed7bb13d533a6de0a9",
+    "finding_text": "1.굿모닝미소지은이프레쉬치약, 2.원투스클리닉치약, 3.라덴스포마덜치약, 4.티앤에스요즘치약, 5.뷔에르엔프리미엄오르셀치약, 6.튼튼맘스프레시치약(루이보스향), 7.코코시크치약, 8.블링투치약, 9.휘아푸카치약, 10.매스티키스청신케어매스틱치약, 11.매스티키스청결샤인매스틱치약, 12.매스티키스골드투치약, 13.허브씨드치약, 14.이센치약, 15.비앙투스치약, 16.매스티키즈투치약(딸기향), 17.퀀텀투스케어치약, 18.제이베럴즈치약(스피아민트향), 19.니써바퀀텀투스케어치약, 20.착한노력치약, 21.후하치약, 22.미미보프리미엄치약, 23.닥터클러브치약, 24.모닝브레스오션프레시치약, 25.사우나랩스멀티케어내추럴치약, 26.엔지일일공공치약, 27.성원프레쉬치약, 28.다온레드파인쿨치약, 29.라이프지프레쉬브레스치약, 30.더마레딕스치석케어치약, 31.엠비엘에스덴탈치약, 32.바니티스육공치약(사과향), 33.씨프레쉬플러스치약, 34.달시엔코리쎈치약, 35.엔트리구강케어치약, 36.드림구강엔비타치약, 37.뮤직스케치치약, 38.비코드데일리콜로치약: 품질부적합 우려(엔트리구강케어치약)",
+    "finding_text_ko": "[품목] 1.굿모닝미소지은이프레쉬치약, 2.원투스클리닉치약, 3.라덴스포마덜치약, 4.티앤에스요즘치약, 5.뷔에르엔프리미엄오르셀치약, 6.튼튼맘스프레시치약(루이보스향), 7.코코시크치약, 8.블링투치약, 9.휘아푸카치약, 10.매스티키스청신케어매스틱치약, 11.매스티키스청결샤인매스틱치약, 12.매스티키스골드투치약, 13.허브씨드치약, 14.이센치약, 15.비앙투스치약, 16.매스티키즈투치약(딸기향), 17.퀀텀투스케어치약, 18.제이베럴즈치약(스피아민트향), 19.니써바퀀텀투스케어치약, 20.착한노력치약, 21.후하치약, 22.미미보프리미엄치약, 23.닥터클러브치약, 24.모닝브레스오션프레시치약, 25.사우나랩스멀티케어내추럴치약, 26.엔지일일공공치약, 27.성원프레쉬치약, 28.다온레드파인쿨치약, 29.라이프지프레쉬브레스치약, 30.더마레딕스치석케어치약, 31.엠비엘에스덴탈치약, 32.바니티스육공치약(사과향), 33.씨프레쉬플러스치약, 34.달시엔코리쎈치약, 35.엔트리구강케어치약, 36.드림구강엔비타치약, 37.뮤직스케치치약, 38.비코드데일리콜로치약 / [사유] 품질 부적합 우려(엔트리구강케어치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-326363c0952a1d626ace60e0",
+    "finding_text": "1.굿모닝미소지은이프레쉬치약, 2.원투스클리닉치약, 3.라덴스포마덜치약, 4.티앤에스요즘치약, 5.뷔에르엔프리미엄오르셀치약, 6.튼튼맘스프레시치약(루이보스향), 7.코코시크치약, 8.블링투치약, 9.휘아푸카치약, 10.매스티키스청신케어매스틱치약, 11.매스티키스청결샤인매스틱치약, 12.매스티키스골드투치약, 13.허브씨드치약, 14.이센치약, 15.비앙투스치약, 16.매스티키즈투치약(딸기향), 17.퀀텀투스케어치약, 18.제이베럴즈치약(스피아민트향), 19.니써바퀀텀투스케어치약, 20.착한노력치약, 21.후하치약, 22.미미보프리미엄치약, 23.닥터클러브치약, 24.모닝브레스오션프레시치약, 25.사우나랩스멀티케어내추럴치약, 26.엔지일일공공치약, 27.성원프레쉬치약, 28.다온레드파인쿨치약, 29.라이프지프레쉬브레스치약, 30.더마레딕스치석케어치약, 31.엠비엘에스덴탈치약, 32.바니티스육공치약(사과향), 33.씨프레쉬플러스치약, 34.달시엔코리쎈치약, 35.엔트리구강케어치약, 36.드림구강엔비타치약, 37.뮤직스케치치약, 38.비코드데일리콜로치약: 품질부적합 우려(매스티키스골드투치약)",
+    "finding_text_ko": "[품목] 1.굿모닝미소지은이프레쉬치약, 2.원투스클리닉치약, 3.라덴스포마덜치약, 4.티앤에스요즘치약, 5.뷔에르엔프리미엄오르셀치약, 6.튼튼맘스프레시치약(루이보스향), 7.코코시크치약, 8.블링투치약, 9.휘아푸카치약, 10.매스티키스청신케어매스틱치약, 11.매스티키스청결샤인매스틱치약, 12.매스티키스골드투치약, 13.허브씨드치약, 14.이센치약, 15.비앙투스치약, 16.매스티키즈투치약(딸기향), 17.퀀텀투스케어치약, 18.제이베럴즈치약(스피아민트향), 19.니써바퀀텀투스케어치약, 20.착한노력치약, 21.후하치약, 22.미미보프리미엄치약, 23.닥터클러브치약, 24.모닝브레스오션프레시치약, 25.사우나랩스멀티케어내추럴치약, 26.엔지일일공공치약, 27.성원프레쉬치약, 28.다온레드파인쿨치약, 29.라이프지프레쉬브레스치약, 30.더마레딕스치석케어치약, 31.엠비엘에스덴탈치약, 32.바니티스육공치약(사과향), 33.씨프레쉬플러스치약, 34.달시엔코리쎈치약, 35.엔트리구강케어치약, 36.드림구강엔비타치약, 37.뮤직스케치치약, 38.비코드데일리콜로치약 / [사유] 품질 부적합 우려(매스티키스골드투치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3942958dc82127d30e5182be",
+    "finding_text": "엔탭허브골쇄보: 성상",
+    "finding_text_ko": "[품목] 엔탭허브골쇄보 / [지적 항목] 성상",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-659fcd4a5064f2ba1569334a",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시설장비 기타 [별표3의2] 2. 나목 제조공정(분배) 중 오염 방지를 위한 적절한 작 업환경 유지 방안 미흡 보완완료 [별표3의2] 2. 자목 제조실(청정도C) 천정 누수 발생 보완완료 [별표 1] 6.1 나목 클린벤치 적격성평가시 회복력 시험 관련 사항 일부 미흡 보완완료 제조 [별표 1] 6.4 약액 노출 장비 및 다 회용 자재에 대한 세척 보완완료 - 2 - 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서 발급함 밸리데이션 미실시 [별표1] 8.1 아목 제조에 사용되는 멸균 자재 조작 및 운반시 청정등급에 따른 관리 미흡 보완완료 의약품안전관리과",
+    "finding_text_ko": "평가 결과 — 지적(보완)사항(Deficiencies). [표 구성: 분야1) · 구분2) · 근거 법령 · 지적(보완)사항 요약3) · 비고] (1) 시설장비 / 기타 / [별표3의2] 2. 나목: 제조공정(분배) 중 오염 방지를 위한 적절한 작업환경 유지 방안이 미흡했다(비고: 보완완료). (2) [별표3의2] 2. 자목: 제조실(청정도C) 천정 누수가 발생했다(비고: 보완완료). (3) [별표 1] 6.1 나목: 클린벤치 적격성평가(qualification) 시 회복력 시험 관련 사항이 일부 미흡했다(비고: 보완완료). (4) 제조 / [별표 1] 6.4: 약액 노출 장비 및 다회용 자재에 대한 세척(비고: 보완완료). (5) 밸리데이션(validation) 미실시 / [별표1] 8.1 아목: 제조에 사용되는 멸균 자재 조작 및 운반 시 청정등급에 따른 관리가 미흡했다(비고: 보완완료). [주석] - 2 - 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함. 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨. ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서 발급함. [발행 부서] 의약품안전관리과",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7a37df7606af3e4217eb86e4",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e67a4bf70fad6aa2bf202c0",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e7420865b59e5993dce5a1c6",
+    "finding_text": "1.잇몸케어플러스치약, 2.성원잇몸케어플러스치약: 품질부적합 우려(성원잇몸케어플러스치약)",
+    "finding_text_ko": "[품목] 1.잇몸케어플러스치약, 2.성원잇몸케어플러스치약 / [사유] 품질 부적합 우려(성원잇몸케어플러스치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f41b6e81d69c4b409e227404",
+    "finding_text": "1.아딘폴거품세정액, 2.덴티오클렌저, 3.퓨리덴구강장치세정제, 4.스마일폼의치세정제, 5.파로덱스의치세정제, 6.덴탈비프로클리어구강장치세정제, 7.소피오티클리어구강장치세정제, 8.미라클구강장치세정폼, 9.닥트러스트리치폼구강장치세정제, 10.프로덴티브큐잇클리어구강장치세정폼, 11.퓨어덴티구강장치세정액, 12.닥터덴구강장치세정제: 아딘폴거품세정액 품질부적합(탄산수소나트륨 확인 및 함량시험)",
+    "finding_text_ko": "[품목] 1.아딘폴거품세정액, 2.덴티오클렌저, 3.퓨리덴구강장치세정제, 4.스마일폼의치세정제, 5.파로덱스의치세정제, 6.덴탈비프로클리어구강장치세정제, 7.소피오티클리어구강장치세정제, 8.미라클구강장치세정폼, 9.닥트러스트리치폼구강장치세정제, 10.프로덴티브큐잇클리어구강장치세정폼, 11.퓨어덴티구강장치세정액, 12.닥터덴구강장치세정제 / [사유] 아딘폴거품세정액 품질 부적합(탄산수소나트륨 확인 및 함량시험)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fc08fc714d237de6f0d73b8d",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d91a8b9a93670788110d524",
+    "finding_text": "프레벨액0.25%(프레드니카르베이트): 직접용기의 불량(누설)에 따른 영업자 회수",
+    "finding_text_ko": "프레벨액0.25%(프레드니카르베이트): 직접용기의 불량(누설)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cdcc780d908616171c520b1d",
+    "finding_text": "프로토픽연고0.1%(타크로리무스수화물): 2차 포장용기(카톤)의 표시기재 사항(효능효과) 오기에 따른 영업자 회수※ 0.03%의 효능효과로 표시함.",
+    "finding_text_ko": "프로토픽연고0.1%(타크로리무스수화물): 2차 포장용기(카톤)의 표시기재 사항(효능효과) 오기에 따라 영업자 회수(recall)를 실시했다. ※ 0.03%의 효능효과로 표시함.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0a4cc24ab6a824c6767c2fad",
+    "finding_text": "타나민정120밀리그람(은행엽건조엑스): 표시기재 일부 누락(바코드)에 따른 영업자 회수",
+    "finding_text_ko": "타나민정120밀리그람(은행엽건조엑스): 표시기재 일부 누락(바코드)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ce37d8c3fec82acf9f0a606",
+    "finding_text": "타나민정(은행엽건조엑스)<수출명:디멘탈정(은행엽건조엑스)>: 표시기재 일부 누락(바코드)에 따른 영업자 회수",
+    "finding_text_ko": "타나민정(은행엽건조엑스)<수출명:디멘탈정(은행엽건조엑스)>: 표시기재 일부 누락(바코드)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0f50b81d76bfcf4ef0d7485",
+    "finding_text": "타나민정80밀리그램(은행엽건조엑스): 표시기재 일부 누락(바코드)에 따른 영업자 회수",
+    "finding_text_ko": "타나민정80밀리그램(은행엽건조엑스): 표시기재 일부 누락(바코드)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0a8ff74dd3fb948e8063fb3c",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-21c95597e3f27c7582882c87",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-23c18e14e91201c47dce5fc3",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-290b544b863c79027c3ee20b",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2a70fd0a7bf97210ba82ad15",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-44faabf641d292508c38e531",
+    "finding_text": "Critical production processes were not validated.",
+    "finding_text_ko": "중요 제조공정에 대한 밸리데이션(validation)이 실시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-48f13a7daa3077b0dafdc6d7",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a597a5749b8d3354462aa6a",
+    "finding_text": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 GMP 문서 및/또는 표준작업지침서(SOP)를 승인, 서명 및/또는 날짜 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51ffb2ca9cd453df9bf17cd3",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-57618203cc743285e96785c3",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5f74da94c4bfececc870c79f",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64211e3341421d51acf986a1",
+    "finding_text": "The written self-inspection procedure was inadequate. The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "문서화된 자체점검(self-inspection) 절차가 미흡했다. 자체점검 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6968e9855e67e76531d52bb9",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품의 지속적 안정성시험 프로그램(ongoing stability program)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-909787ec7d25e7819f2597c9",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9432615154c9747b2152d915",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a14e62e6217149f5de9b693e",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조업자, 시험자, 포장업자, 표시업자, 유통업자, 수입자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c00372f527a5f5315ec0c06a",
+    "finding_text": "The written self-inspection procedure was inadequate. The implementation of a self-inspection program was inadequate. The written procedures for recalls were inadequate.",
+    "finding_text_ko": "문서화된 자체점검(self-inspection) 절차가 미흡했다. 자체점검 프로그램의 실행이 미흡했다. 회수(recall)에 관한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3fc164d269d030cb278ec8d",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented. The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "직원의 직무기술서, 직원에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다. 직원에 대한 GMP 교육훈련 및/또는 기록 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db60cdb4fca36f95624c2c3e",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f4975ffed8303614a902fa4a",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented. The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "직원의 직무기술서, 직원에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다. 직원에 대한 GMP 교육훈련 및/또는 기록 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b5b85cbec59ca2c935a054b",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8f7ed04117a31175afa64ea4",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b9a9f33440fdc20a7deadd3d",
+    "finding_text": "The written procedures and records for retaining samples were inadequate. The company did not retain a sample of each lot or batch of a drug, raw material, and/or an active ingredient for the required amount of time.",
+    "finding_text_ko": "보관용 검체(retention sample)에 관한 문서화된 절차와 기록이 미흡했다. 해당 업소는 의약품, 원자재 및/또는 원료의약품(active ingredient)의 각 로트 또는 배치 검체를 요구되는 기간 동안 보관하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c032e9ef6920a41ac0bf528d",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The maintenance of records was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다. 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e728147bc57aa0a287946628",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate. The controls put in place for electronic signatures were inadequate. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "데이터 거버넌스(data governance) 계획의 수립 및/또는 유지관리가 미흡했다. 전자서명에 대해 마련된 통제가 미흡했다. 기록의 생성, 수정, 검토, 보관 및/또는 검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1e0d93c2ff0878203d12e3bb",
+    "finding_text": "타나민정240밀리그램(은행엽건조엑스): 표시기재 일부누락(바코드)에 따른 영업자 회수",
+    "finding_text_ko": "타나민정240밀리그램(은행엽건조엑스): 표시기재 일부 누락(바코드)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6b8475e5d6f1201ab6e6d60e",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The recorded information or details were inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다. 기록된 정보 또는 세부 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eceff08a61e579d174c7cad3",
+    "finding_text": "소폐탕엑스과립(소청룡탕): 이물 혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "소폐탕엑스과립(소청룡탕): 이물 혼입 우려에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0352896fd68f3a287db773fc",
+    "finding_text": "뉴키토플러스원치약(수출명: Newchito Plus One Toothpaste), 아파타이트뉴키토플러스원치약(수출명:Apatite Newchito Plus One Toothpaste), 닥투스키토케어치약(Doctooth Chito Care Toothpaste), 뉴플치약: 품질부적합 우려(뉴키토플러스원치약)",
+    "finding_text_ko": "[품목] 뉴키토플러스원치약(수출명: Newchito Plus One Toothpaste), 아파타이트뉴키토플러스원치약(수출명:Apatite Newchito Plus One Toothpaste), 닥투스키토케어치약(Doctooth Chito Care Toothpaste), 뉴플치약 / [사유] 품질 부적합 우려(뉴키토플러스원치약)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1dfe53cb6f7913eb4ba0dc6f",
+    "finding_text": "The premises were not laid out and/or designed to ensure that production areas were adequately isolated and segregated.",
+    "finding_text_ko": "제조소가 제조구역이 적절히 격리 및 구획되도록 배치 및/또는 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1e05b6c541ae2a9e2886221d",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "해당 업소의 충전 용기에 대한 육안검사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-28100c091daedcb0db447b0a",
+    "finding_text": "Measures to ensure the compliance of the contracted test laboratories were inadequate.",
+    "finding_text_ko": "위탁 시험기관의 규정 준수를 보장하기 위한 조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2991d1eb751713d35eda81d5",
+    "finding_text": "에이스덴탈거즈: 품질부적합(형상)",
+    "finding_text_ko": "[품목] 에이스덴탈거즈 / [사유] 품질 부적합(형상)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42efa0e03effae09ce6f4360",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-560961c061f8ad433c7767f7",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-568ece47dd296f132dbda728",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조업자, 시험자, 포장업자, 표시업자, 유통업자, 수입자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5961065373f856444a01d0cf",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5e473431f978fcf979b05e9a",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "제조소가 오염을 방지하도록 설계, 시공, 운영 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-69fda7a1fbf6d51e95b55077",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-77642e90c8b8f6bffddceef2",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97551e3412379dbf3674a725",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d1a5055fb798470334238af",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다. 변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a00006966fc4031564c751d0",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 유효성이 미흡했다. 위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a22fb0d895ff84d3e2e723e8",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b19bf9475c3505dbb41652e4",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b57c17ee1d22a3575e223fe6",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사, 처리 및/또는 보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bb2728fa35cc1a512cb46b23",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate. The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다. 품질관리부서(quality control unit)가 요구되는 모든 업무를 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bbfafc5fd83b73bd88df46df",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic practice)이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c7dd73737fc2af366938495e",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조업자, 시험자, 포장업자, 표시업자, 유통업자, 수입자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e58398f90d326f84e8fe18ba",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지관리, 처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e7c2b803becc84e2a2d3c500",
+    "finding_text": "In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate. The company did not adequately demonstrate that air-flow patterns did not pose a risk of contamination. Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "무균공정(aseptic)이 수행되는 구역에서 모니터링 주기와 방법이 미흡했다. 해당 업소는 기류 패턴(air-flow pattern)이 오염 위험을 초래하지 않음을 충분히 입증하지 못했다. 제조공정, 장비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8648e5640a92901c4516d64",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate.",
+    "finding_text_ko": "품질관리부서 책임자가 시행 전에 제조, 포장, 표시, 시험, 보관 및/또는 운송 방법과 절차를 검토 및/또는 승인하는 것이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb0540fa2051128f9d48392e",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 대한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a1593718b4f767da1ecebf5e",
+    "finding_text": "울트라뉴정: 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "울트라뉴정: 불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c32c533f7db83bf8209aeb1d",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항(deficiency)이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f117166c84585704005495d",
+    "finding_text": "The health examinations of personnel (pre-employment and/or ongoing) were inadequate.",
+    "finding_text_ko": "작업자에 대한 건강진단(채용 전 및/또는 정기)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17bb51e268eab1ad33459346",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 업무를 모두 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-25464da72d0d423eb82d11d6",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-384fff8190979745cd62450e",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6fbf649757d5924275bcfc4e",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시설장비 기타 의약품 등의 안전에 관한 규칙 [별표1] 2.1 아목 검체채취구역 클린부스의 청정도 회복 관리 등 일부 미흡 보완완료 의약품 등의 안전에 관한 규칙 [별표 1] 2.3 가목 청정구역 일부 작업복의 세탁주기 및 교체주기 미흡 보완완료 의약품 제조 및 품질관리에 관한 규정 [별표1] 7. 사목 청정구역으로의 오염물질 유입을 최소화하기 위한 갱의절차 미흡 보완완료 - 2 - 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서 발급함 시험실 의약품 등의 안전에 관한 규칙 [별표1] 2.1 아목 품질관리용 배양기의 성능적격성평가시 일부 시험에 대한 평가 주기를 확인할 수 없었음. 보완완료 원자재 의약품 등의 안전에 관한 규칙 [별표1] 10.1 다목 동일 시험번호가 부여된 무균원료에 대해 용기별 검체채취를 하고 있으나, 관련 제조 및 시험기록서에서 용기 번호에 대한 관리 미흡. 보완완료 의약품 등의 안전에 관한 규칙 [별표1] 3.3 하목 원자재 제조업자 평가 절차 미흡 및 일부 시험 수탁자 평가 자료 미비 보완완료 의약품안전관리과",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies)\n[시설장비 / 기타] 의약품 등의 안전에 관한 규칙 [별표1] 2.1 아목 — 검체채취구역 클린부스의 청정도 회복 관리 등이 일부 미흡했다. (보완완료)\n[시설장비] 의약품 등의 안전에 관한 규칙 [별표 1] 2.3 가목 — 청정구역 일부 작업복의 세탁주기 및 교체주기가 미흡했다. (보완완료)\n[시설장비] 의약품 제조 및 품질관리에 관한 규정 [별표1] 7. 사목 — 청정구역으로의 오염물질 유입을 최소화하기 위한 갱의절차가 미흡했다. (보완완료)\n[시험실] 의약품 등의 안전에 관한 규칙 [별표1] 2.1 아목 — 품질관리용 배양기의 성능적격성평가 시 일부 시험에 대한 평가 주기를 확인할 수 없었다. (보완완료)\n[원자재] 의약품 등의 안전에 관한 규칙 [별표1] 10.1 다목 — 동일 시험번호가 부여된 무균원료에 대해 용기별 검체채취를 하고 있으나, 관련 제조 및 시험기록서에서 용기 번호에 대한 관리가 미흡했다. (보완완료)\n[원자재] 의약품 등의 안전에 관한 규칙 [별표1] 3.3 하목 — 원자재 제조업자 평가 절차가 미흡하고 일부 시험 수탁자 평가 자료가 미비했다. (보완완료)\n주1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) 구분은 PIC/S 정의에 따라 중대, 중요, 기타로 작성한다. 주3) 지적사항 중 ‘중대･중요’ 건은 행정처분을 부과하고, ‘기타’ 건은 시정·보완토록 한다. 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개된다. ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서를 발급한다. (담당: 의약품안전관리과)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-88417447022d9e9018240a63",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정, 설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c28d07de60e432b40f895515",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 방식이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cf9c0cdd057c9260c8a609f8",
+    "finding_text": "In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "무균공정(aseptic)이 수행되는 구역에서 모니터링 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-198940868668a25510c495c0",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 가독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-353a6bacd6cd869cc7680235",
+    "finding_text": "품질경영 기타 [별표 1] 제1의2호 제조소 총람에 의약품품질시스템, 출하절차, 품질위험관리, 제품품질평가 항목 미포함",
+    "finding_text_ko": "품질경영(기타) [별표 1] 제1의2호 — 제조소 총람에 의약품품질시스템, 출하절차, 품질위험관리, 제품품질평가 항목이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e50a638ae843c4fe8ea34cb",
+    "finding_text": "시험실 기타 [별표 1] 제6.6호 제조소 총람에 장비의 컴퓨터화 시스템 항목 미포함",
+    "finding_text_ko": "시험실(기타) [별표 1] 제6.6호 — 제조소 총람에 장비의 컴퓨터화 시스템 항목이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e67b96fa31dcf948c91a845",
+    "finding_text": "기타 [별표 1] 제3.3호 하목 제조소 총람에 공급자 및 계약자 항목 미포함",
+    "finding_text_ko": "기타 [별표 1] 제3.3호 하목 — 제조소 총람에 공급자 및 계약자 항목이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f361eb2e282a5c3aa1d3e54",
+    "finding_text": "시설장비 기타 [별표 1] 제9.3호 제조소 총람에 장비의 청소 및 소독 항목 미포함",
+    "finding_text_ko": "시설장비(기타) [별표 1] 제9.3호 — 제조소 총람에 장비의 청소 및 소독 항목이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-af6e4bd0cc0bcd54db05bfb9",
+    "finding_text": "Yields and/or the reconciled quantities were not checked at appropriate stages.",
+    "finding_text_ko": "수율 및/또는 대조(reconciliation) 수량을 적절한 단계에서 확인하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b9ed2d9af9b1c587e2a70a8f",
+    "finding_text": "글립타이드정200밀리그람(설글리코타이드): ‘설글리코타이드’ 제제에 대한 재평가 결과, 유용성 미입증",
+    "finding_text_ko": "글립타이드정200밀리그람(설글리코타이드): ‘설글리코타이드’ 제제에 대한 재평가 결과 유용성이 입증되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38a20e580df4094d9e659e8c",
+    "finding_text": "Packaging orders did not include the required information. Packaging operations were not performed in keeping with the written operating procedures or specifications.",
+    "finding_text_ko": "포장지시서에 요구되는 정보가 포함되지 않았다. 포장작업이 문서화된 작업절차 또는 기준서에 따라 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42846a08de474f00f47cd363",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e2843240feba6c5f4c1df2f",
+    "finding_text": "트리암시놀론주사40밀리그램(트리암시놀론아세토니드): 이물 혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "트리암시놀론주사40밀리그램(트리암시놀론아세토니드): 이물 혼입 우려에 따라 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a8d48e2c5f898d258ef9f226",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bceba85a69e1f0965d9637e9",
+    "finding_text": "The usage logs for the equipment used for significant processing and/or testing operations were inadequate. The preventative maintenance program was inadequate for the equipment used in significant processing and/or testing operations.",
+    "finding_text_ko": "주요 제조 및/또는 시험 작업에 사용되는 설비의 사용기록(usage log)이 미흡했다. 주요 제조 및/또는 시험 작업에 사용되는 설비에 대한 예방정비(preventive maintenance) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d930e25b6199d2dcc0e5d802",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de3cfabc90877a32c45d1a7e",
+    "finding_text": "씨오르브이라인핏보건용마스크(KF94)(대형,중형,소형)(흰색,검정색,진한회색,연한상아색,연분홍색): 이물 혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "씨오르브이라인핏보건용마스크(KF94)(대형,중형,소형)(흰색,검정색,진한회색,연한상아색,연분홍색): 이물 혼입 우려에 따라 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0c23a8c921f6c43be555e742",
+    "finding_text": "시설 장비 기타 [별표 1] 제2.1호, 제7.2호 안정성 검체보관실 관리에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "시설장비(기타) [별표 1] 제2.1호, 제7.2호 — 안정성 검체보관실 관리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e67f5c6e930fa7b48b61063",
+    "finding_text": "제조 기타 [별표 3의 3] 제6.2호 - 제조지시 및 기록서에 절차(예, 양압검사 등)에 대한 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "제조(기타) [별표 3의 3] 제6.2호 — 제조지시 및 기록서의 절차(예, 양압검사 등)에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1184ba2eb48e1ac2c8186852",
+    "finding_text": "제조 기타 [별표 1] 제6.4호 캠페인 생산에 대한 세척밸리데이션 관련 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "제조(기타) [별표 1] 제6.4호 — 캠페인 생산에 대한 세척밸리데이션(cleaning validation) 관련 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d503ecbc8a93a23a40308e8",
+    "finding_text": "기타 [별표 1] 제6.6호 컴퓨터시스템 밸리데이션에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제6.6호 — 컴퓨터시스템 밸리데이션(validation)에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-201ee1fcd9983387ef3e5c73",
+    "finding_text": "시설장비 기타 [별표 1] 제9.3호 일부 설비의 세척 결과에 대해 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "시설장비(기타) [별표 1] 제9.3호 — 일부 설비의 세척 결과에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-241ef9f0f4f6fc1e88fb877e",
+    "finding_text": "기타 [별표 1] 제5.2호 GMP 문서(예, 점검일지 등)와 관련된 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제5.2호 — GMP 문서(예, 점검일지 등)와 관련된 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-31d965a9cd2d0efb937d84d3",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 업무를 모두 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-45380bb60a750d2c42e5d755",
+    "finding_text": "시험실 기타 [별표 1] 제7.1호 확인시험에 대한 검토 절차에 대해 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "시험실(기타) [별표 1] 제7.1호 — 확인시험에 대한 검토 절차와 관련된 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-498ecf1e7961ba05164e54a9",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d8566d57263f3051e2b5445",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 가독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-53f8398434a3bc69c3fb87f3",
+    "finding_text": "영천약초도매시장건강: 정량법, 6-징게롤 시험 부적합",
+    "finding_text_ko": "영천약초도매시장건강: 정량법, 6-징게롤 시험에서 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6631045468a3eebe43a0fb8a",
+    "finding_text": "기타 [별표 1] 제11호 소비자 불만 처리에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제11호 — 소비자 불만 처리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ba0a536ac655ffc68997bc8",
+    "finding_text": "기타 [별표 1] 제2.1호, 제8.1호 작업실 출입관리에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제2.1호, 제8.1호 — 작업실 출입관리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6c8aa4d04575d088e6f31f79",
+    "finding_text": "위더셋정: 불순물(N-nitro-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "위더셋정: 불순물(N-nitro-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-70f8e7859cb73a3c796a32e2",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조원, 시험기관, 포장업자, 표시업자, 유통업자, 수입업자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e1ffef95b3b7015fa96b3a0",
+    "finding_text": "기타 [별표 1] 제11호 회수 관련 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제11호 — 회수(recall) 관련 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7eb1d712124bece04b20b7ab",
+    "finding_text": "풍산창출: 확인, 순도 시험 부적합",
+    "finding_text_ko": "풍산창출: 확인, 순도 시험에서 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-933b0f9b3ac43ceb5bab1cf5",
+    "finding_text": "The premises were not designed, constructed, and/or maintained to prevent the entry of pests and/or foreign material into the building.",
+    "finding_text_ko": "건물 내로 해충 및/또는 이물이 유입되는 것을 방지하도록 시설이 설계, 시공 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93e405a6ab23e650d2eaccc3",
+    "finding_text": "품질경영 중요 [별표 1] 제11호 라목 회수 관리에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "품질경영(중요) [별표 1] 제11호 라목 — 회수(recall) 관리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-995fbc27aa303bf59e13668f",
+    "finding_text": "기타 [별표 1] 제14호 GMP 교육 절차(예, 작업원 등)에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제14호 — GMP 교육 절차(예, 작업원 등)에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a88b64cb555cd084bcdcac5",
+    "finding_text": "제조 기타 [별표 1] 제6.4호 일부 설비 부품들에 대한 세척 관리 절차에 대해 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "제조(기타) [별표 1] 제6.4호 — 일부 설비 부품에 대한 세척 관리 절차와 관련된 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b02026049a25d3476b8e3c4",
+    "finding_text": "풍산시호: 순도, 이물 시험 부적합",
+    "finding_text_ko": "풍산시호: 순도, 이물 시험에서 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b65e675642b50a689b01015",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f50c8768b7d82535322a3a3",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a26fb17348198f937d603f9d",
+    "finding_text": "기타 [별표 1] 제3.3호 주성분 제조업체 평가와 관련된 자료를 제출할 것",
+    "finding_text_ko": "기타 [별표 1] 제3.3호 — 주성분 제조업체 평가와 관련된 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a59328ca49a6c9df9beaac50",
+    "finding_text": "평가 결과 지적(보완)사항(Deficiencies) 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) 지적사항은 PIC/S 정의에 따라 중대, 중요, 기타로 구분됨 - 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 - 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 - ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획의 타당성이 인정되는 경우 GMP 적합판정서를 발급함 3) 지적사항에 대한 후속조치 현황 등 참고사항 분야 구분 근거 법령 지적(보완)사항 요약 비고 품질경영 기타 [별표 1] 제14호 정기교육 관련 추가 설명 자료를 제출할 것. 보완 완료 기타 의약품 제조 및 품질관리에 관한 규정 [별표 18] 제조소 총람 관련 자료를 제출할 것. 보완 완료 시설장비 기타 [별표 1] 제2.1호 분석도구 관리에 대한 추가 설명 자료를 제출할 것. 보완 완료 의 료 제 품 안 전 과",
+    "finding_text_ko": "평가 결과 지적(보완)사항(Deficiencies)\n[품질경영 / 기타] [별표 1] 제14호 — 정기교육 관련 추가 설명 자료를 제출할 것. (보완 완료)\n[품질경영 / 기타] 의약품 제조 및 품질관리에 관한 규정 [별표 18] — 제조소 총람 관련 자료를 제출할 것. (보완 완료)\n[시설장비 / 기타] [별표 1] 제2.1호 — 분석도구 관리에 대한 추가 설명 자료를 제출할 것. (보완 완료)\n주1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) 지적사항은 PIC/S 정의에 따라 중대, 중요, 기타로 구분된다. - 지적사항 중 ‘중대･중요’ 건은 행정처분을 부과하고, ‘기타’ 건은 시정·보완토록 한다. - 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개된다. - ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획의 타당성이 인정되는 경우 GMP 적합판정서를 발급한다. 주3) 지적사항에 대한 후속조치 현황 등 참고사항. (담당: 의료제품안전과)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ca4e8fbade9ff347a15d77d9",
+    "finding_text": "The establishment of specifications was inadequate for packaging materials approved by the quality control department.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 승인한 포장자재에 대한 기준(specification) 설정이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d0eed1b41a4f5679943ff7b6",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사, 처리 및/또는 보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d7cc4d1f27f60d3b841f486e",
+    "finding_text": "기타 [별표 1] 제8.1호 일부 제형의 반제품 관리에 대해 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "기타 [별표 1] 제8.1호 — 일부 제형의 반제품 관리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dcd68292257cb1d559e88ae4",
+    "finding_text": "[별표 1] 제7.1호 일부 시험 결과의 처리 절차에 대해 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "[별표 1] 제7.1호 — 일부 시험 결과의 처리 절차에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e119970c42ca2d0b9bf7df06",
+    "finding_text": "품질 경영 기타 [별표 1] 제5.1호 GMP 문서(예, 별첨문서 등)의 관리에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "품질경영(기타) [별표 1] 제5.1호 — GMP 문서(예, 별첨문서 등)의 관리에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eb497fb1dd550a5dd08bf711",
+    "finding_text": "기타 [별표 1] 제1의2호 일부 데이터 완전성 관리 절차에 대한 추가 설명 자료를 제출할 것.",
+    "finding_text_ko": "기타 [별표 1] 제1의2호 — 일부 데이터 완전성(data integrity) 관리 절차에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f7def1ad9c3a83d79bfc1930",
+    "finding_text": "품질 경영 기타 [별표 1] 제3.3호 데이터 관리(예, 부유입자 데이터 등)에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "품질경영(기타) [별표 1] 제3.3호 — 데이터 관리(예, 부유입자 데이터 등)에 대한 추가 설명 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa62c3532cec5c1527f7325e",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d5d1ad0b9a2a961c0891329",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4c0daeb581e656a429e42802",
+    "finding_text": "The usage logs for the equipment used for significant processing and/or testing operations were inadequate. The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "주요 제조 및/또는 시험 작업에 사용되는 설비의 사용기록(usage log)이 미흡했다. 해당 설비의 예방정비(preventive maintenance) 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5f3126d5917a8eae2eb11bac",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 가독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4ad9172364cc5c5efe84a5c",
+    "finding_text": "Packaging orders did not include the required information. After packaging operations were completed, the destruction of unused batch-coded packaging materials was inadequate.",
+    "finding_text_ko": "포장지시서에 요구되는 정보가 포함되지 않았다. 포장작업 종료 후 사용하지 않은 배치코드 인쇄 포장자재의 폐기가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f1c28f5ab60da0a9a8e79bbd",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fe84c3cc4ed1fb44d521c2dc",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-02cb7586e4173e8b658dce9f",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항(deficiency)이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0952a898a7dc880d004a6e0b",
+    "finding_text": "The quality control department did not evaluate the results of the annual product quality review.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 연간 제품품질평가(annual product quality review) 결과를 평가하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d89326a98f9a693f40741aa",
+    "finding_text": "The master formula for packaged products did not include the required information. Packaging operations were not performed in keeping with the written operating procedures or specifications.",
+    "finding_text_ko": "포장제품에 대한 마스터 포뮬러(master formula)에 요구되는 정보가 포함되지 않았다. 포장작업이 문서화된 작업절차 또는 기준서에 따라 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-309a428fdfd3fd584fe048d3",
+    "finding_text": "The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures.",
+    "finding_text_ko": "위생관리(sanitation) 프로그램의 세척절차, 세척주기, 폐기물 처리절차 및/또는 방충·방서 대책이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-66b9927f6829446ad03a0a8c",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품된 의약품의 재판매 검토를 위한 평가, 문서화 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6ed6bf114887c67d2d640ff0",
+    "finding_text": "The handling of rejected materials and products was inadequate. The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate.",
+    "finding_text_ko": "부적합 판정된 자재 및 제품의 취급이 미흡했다. 원료, 포장자재, 중간제품, 벌크의약품 및/또는 완제품의 구획 보관, 재고 순환 및/또는 운송이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9e80b7b7c53a137fd53c06da",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조원, 시험기관, 포장업자, 표시업자, 유통업자, 수입업자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a06c07aae7af0ecae36fae75",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc0b83009fc87c9c719c5134",
+    "finding_text": "The validation and/or the documentation of test methods was inadequate.",
+    "finding_text_ko": "시험방법의 밸리데이션(validation) 및/또는 문서화가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d38ecf57e4eeadae538856b8",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug. The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다. 온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e159a9db2b1eaadb7a3a1881",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화 시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ecd1cc0882b0a49766e8aba6",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f5d81008e9daf0825d844a1a",
+    "finding_text": "The written specifications were inadequate.",
+    "finding_text_ko": "문서화된 기준서(specification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ff91d13783af5ec974246428",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "작업자의 직무기술서, 작업자에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0525abd6ee84e671725e9192",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1476623a55a7519cce95cbc3",
+    "finding_text": "The electronic system was not validated for its intended use.",
+    "finding_text_ko": "전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-15bf88cd6b39a936eb9060c7",
+    "finding_text": "듀오스탑캡슐: 표시기재 일부 누락(용법용량)에 따른 영업자 회수",
+    "finding_text_ko": "듀오스탑캡슐: 표시기재 일부 누락(용법용량)에 따라 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1dab1f201381ee054e4317ba",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3238ab0bedc1d5560a9da630",
+    "finding_text": "에이스이엔티거즈: 품질부적합 우려",
+    "finding_text_ko": "에이스이엔티거즈: 품질 부적합 우려가 있었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35ce53628dc86faa716bfdc5",
+    "finding_text": "The premises were not constructed and/or maintained to allow cleaning and/or prevent the accumulation of foreign material.",
+    "finding_text_ko": "시설이 청소가 가능하도록 및/또는 이물 축적을 방지하도록 시공 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5ce2221e14d775c5d59948eb",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화, 평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-70b666ae61a9b168f16957ab",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "기록의 생성, 수정, 검토, 보관 및/또는 검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-728ec738925f91dbba5f2684",
+    "finding_text": "Critical production processes were not validated.",
+    "finding_text_ko": "중요 제조공정이 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-730f1b0831b6835d5f822cf5",
+    "finding_text": "Printed packaging materials were not stored in an area with restricted access.",
+    "finding_text_ko": "인쇄된 포장자재가 출입이 제한된 구역에 보관되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-736d95fd9baa25a8e1ee8d33",
+    "finding_text": "제조 기타 [별표 1] 제15.1호 나목 ‘25년 품목별 제조실적 자료 미제출",
+    "finding_text_ko": "제조(기타) [별표 1] 제15.1호 나목 — ‘25년 품목별 제조실적 자료를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-760800f43cdae6b716edc977",
+    "finding_text": "현진강황: 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)",
+    "finding_text_ko": "현진강황 — 해당 시험항목: 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7db91ff0ba05cb5545a0961a",
+    "finding_text": "The sampling plan for raw materials was inadequate.",
+    "finding_text_ko": "원료에 대한 검체채취 계획이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7fb87d4838711bbcc03eea33",
+    "finding_text": "에이스멸균탈지면: 품질부적합 우려",
+    "finding_text_ko": "에이스멸균탈지면: 품질 부적합 우려가 있었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-826c543d77e8ff3ba55c90b9",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8649f34448f89e53aa9fca21",
+    "finding_text": "The procedures in place were inadequate for the storage, transportation, records, and/or testing of purchased media.",
+    "finding_text_ko": "구매한 배지(media)의 보관, 운송, 기록 및/또는 시험에 대한 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-893e730b65864c252bcb3799",
+    "finding_text": "이풀잎시호: 순도시험 1)이물 가) 줄기 및 잎",
+    "finding_text_ko": "이풀잎시호 — 해당 시험항목: 순도시험 1)이물 가) 줄기 및 잎.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8d875f7e09fb85faf537435b",
+    "finding_text": "The process was inadequate for the environmental classification of aseptic or clean areas. The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "무균구역 또는 청정구역의 환경 등급 분류 절차가 미흡했다. 유틸리티 및/또는 지원 시스템의 적격성평가(qualification) 및/또는 검증이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8dd2acf382c6ac6edcc4ca16",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit) 책임자가 실시 전에 제조, 포장, 표시, 시험, 보관 및/또는 운송 방법과 절차를 검토 및/또는 승인하는 것이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e3d79e271b25d7816e8e451",
+    "finding_text": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "세척절차의 실행, 유효성 및/또는 밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e5f2d830fc887d1b4e3ef94",
+    "finding_text": "The training, experience, and/or reporting structure of the individual responsible for packaging operations was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "포장작업 책임자의 교육훈련, 경력 및/또는 보고체계가 미흡했다. 작업자의 직무기술서, 작업자에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9661a474eed8732866b43f0e",
+    "finding_text": "품질경영 기타 [별표 1] 제1의2호 마목 제조소 총람에 품질위험관리(QRM) 항목 누락",
+    "finding_text_ko": "품질경영 분야 기타 지적: [별표 1] 제1의2호 마목 관련, 제조소 총람에 품질위험관리(QRM) 항목이 누락됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9acbfbaaa94ba8aba670456f",
+    "finding_text": "엔탭허브구기자: 잔류농약(뷰프로페진)",
+    "finding_text_ko": "엔탭허브구기자: 잔류농약(뷰프로페진) 관련 지적사항이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a29badb07569400aaaf40693",
+    "finding_text": "The sampling plan for raw materials was inadequate.",
+    "finding_text_ko": "원자재(raw materials)에 대한 검체채취 계획(sampling plan)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a5166183a6ebbde38eedb913",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램(sanitation program)의 실행 및/또는 효과성이 미흡했다. 비위생적 상태를 방지하기 위한 세척절차의 실행·효과성 및/또는 밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a68f2c1d529da6725718e0f1",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility. In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate. Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 관행이 무균성을 유지하기에 미흡했다. 무균작업이 수행되는 구역에서 모니터링의 주기와 방법이 미흡했다. 제조공정·설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ab0aba2e1efc722cccff2312",
+    "finding_text": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 세척절차의 실행·효과성 및/또는 밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b39634563000f5e92cf54691",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4b4a3bf239dc8652a120889",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c0038bb56611fd88d4f812af",
+    "finding_text": "나음음양곽: 정량법(이카리인)",
+    "finding_text_ko": "나음음양곽: 정량법(이카리인) 관련 지적사항이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4a3a10863b8220c19e06897",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리 및/또는 보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c54048bedf7eeb36cb3ec5be",
+    "finding_text": "Labels already cut, cartons, and other loose printed materials were not stored and transported in separate closed containers.",
+    "finding_text_ko": "이미 재단된 라벨, 카톤 및 기타 낱장 인쇄자재를 별도의 밀폐 용기에 보관·운반하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9840e00dd6cd73660675880",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d57b6581078579be4a92b71f",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db60726f1409b07728e4caf1",
+    "finding_text": "The validation of aseptic processing was inadequate. The samples taken for sterility testing were not representative of the whole batch.",
+    "finding_text_ko": "무균공정(aseptic processing)의 밸리데이션(validation)이 미흡했다. 무균시험을 위해 채취한 검체가 제조단위 전체를 대표하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e543ce874100874636d65435",
+    "finding_text": "The procedures in place were inadequate for the storage, transportation, records, and/or testing of purchased media.",
+    "finding_text_ko": "구매한 배지(media)의 보관·운송·기록 및/또는 시험에 대한 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e5a5a664745b26303fc31c17",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eb0adfe32d63a1da750f91ff",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 업체의 외관 육안검사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eb3f723c52bd302b2a8442ba",
+    "finding_text": "기타 [별표 1] 제7.3호 가목 제조소 총람에 제품품질평가 항목 누락",
+    "finding_text_ko": "기타 지적: [별표 1] 제7.3호 가목 관련, 제조소 총람에 제품품질평가 항목이 누락됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f4c31900f6e240e327caf448",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f648ad9d786f06ff84c2b396",
+    "finding_text": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 GMP 문서 및/또는 표준작업절차서(SOP)를 승인·서명 및/또는 일자 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa8f2558aacc5e920ccbb3c1",
+    "finding_text": "The maintenance of the premises was inadequate. The purified water system was inadequate with the potential for water not meeting the appropriate requirements for chemical and microbial purity.",
+    "finding_text_ko": "건물·시설의 유지관리가 미흡했다. 정제수 시스템이 미흡하여 용수가 화학적·미생물학적 순도에 관한 적절한 요건을 충족하지 못할 우려가 있었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f144fb3a4d55b1ddd3fcc1e",
+    "finding_text": "리피뎀주: 시판 후 안정성시험 결과 불용성미립자 기준 초과에 따른 영업자 회수",
+    "finding_text_ko": "리피뎀주: 시판 후 안정성시험 결과 불용성미립자 기준을 초과하여 영업자 회수(recall)가 이루어졌다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-09b5fa770cd67681cf0cf928",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0a904b735db27f82c15147ef",
+    "finding_text": "셀비다정: 품질부적합(주성분 함량미달)",
+    "finding_text_ko": "셀비다정: 품질 부적합(주성분 함량미달)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0bd4d354d65cfdafe2237851",
+    "finding_text": "헤파코엔플러스정: 품질부적합(주성분 함량미달)",
+    "finding_text_ko": "헤파코엔플러스정: 품질 부적합(주성분 함량미달)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e9853053dac2c138171409a",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-345017d400f4f5f0bf141778",
+    "finding_text": "The receipt, preparation, and/or handling of reagents and culture media was inadequate.",
+    "finding_text_ko": "시약 및 배지(culture media)의 수령·조제 및/또는 취급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3d222397c3b47741e176cfe9",
+    "finding_text": "유코빅포르테정: 품질부적합(주성분 함량미달)",
+    "finding_text_ko": "유코빅포르테정: 품질 부적합(주성분 함량미달)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55ec264944809e3ef2f15040",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5893ee79e14773a42771abe2",
+    "finding_text": "The company did not take precautions to minimize contamination during all processing prior to sterilization.",
+    "finding_text_ko": "업체는 멸균 전 모든 공정 단계에서 오염을 최소화하기 위한 예방조치를 취하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67dd4e11751b44a54d5ae2eb",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate. The operation of the water purification equipment was inadequate for ensuring a reliable source of water.",
+    "finding_text_ko": "유틸리티 및/또는 지원 설비의 적격성평가(qualification) 및/또는 검증이 미흡했다. 신뢰할 수 있는 용수 공급원을 보장하기에 정제수 설비의 운전이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6dd4381015c412d4ad32a3ea",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a4d090cbbee1e29dfd955f90",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c22fed352c8f2af8c9ba1006",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-13662b665c3416f7591a0ae0",
+    "finding_text": "1.미담황사방역마스크(KF94)(대형)(진한황녹색), 2.미담황사방역마스크(KF94)(대형)(연회색), 3.미담황사방역마스크(KF94)(대형)(연한황색): 품질 부적합 (분진포집효율)",
+    "finding_text_ko": "1.미담황사방역마스크(KF94)(대형)(진한황녹색), 2.미담황사방역마스크(KF94)(대형)(연회색), 3.미담황사방역마스크(KF94)(대형)(연한황색): 품질 부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17371c1f922f44e634b05b02",
+    "finding_text": "The suitability of the culture media was not verified. The expiry date of the prepared culture media was not supported by the growth-promotion testing.",
+    "finding_text_ko": "배지(culture media)의 적합성이 검증되지 않았다. 조제된 배지의 유효기한이 발육증진시험(growth-promotion testing)으로 뒷받침되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-21cac9cd73a2923c9a6a5733",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험 프로그램(ongoing stability program)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-24788ce2d453458f5894144a",
+    "finding_text": "The company's oversight of the contracted party was inadequate. The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "수탁업체에 대한 업체의 관리감독이 미흡했다. 공급자·제조업자·시험자·포장업자·표시업자·유통업자·수입업자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-287cfae256182d213a0d78e6",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-30ce0a4fbd232e538a91a971",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화·평가 및/또는 승인되도록 보장하기에 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3b595f64ad2ca16ab9d306b8",
+    "finding_text": "제조 기타 [별표 1] 8.1 제조공정 관련 유효숫자 기준을 마련할 것",
+    "finding_text_ko": "제조 분야 기타 지적: [별표 1] 8.1에 따라 제조공정 관련 유효숫자 기준을 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a5b4f7529c83b71a8b06b8f",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 안정성 챔버의 알람 통보 등 절차를 마련할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 2.1에 따라 안정성 챔버의 알람 통보 등에 관한 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4af7ed8a51cbd919c02729b0",
+    "finding_text": "The importer did not ensure that the foreign sites use to fabricate, package/label, or test drug products met the requirements described in Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080).",
+    "finding_text_ko": "수입업자는 의약품의 제조·포장/표시 또는 시험에 사용되는 해외 제조소가 Guidance on Evidence to Demonstrate Drug GMP Compliance of Foreign Sites (GUI-0080)에 기술된 요건을 충족하는지 확인하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5056d991613e90e235c40656",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5288e573a4235356147a9dba",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-531bc5ff032cfc0eed7f19f6",
+    "finding_text": "The training of personnel before new or revised standard operating procedures were implemented was inadequate.",
+    "finding_text_ko": "신규 또는 개정된 표준작업절차서(SOP) 시행 전 직원에 대한 교육이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5377146d4a109be75fadcc0a",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조업자·시험자·포장업자·표시업자·유통업자·수입업자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-557003d5afcc7aeeee14364b",
+    "finding_text": "리나틴정(리나글립틴): 시판후 안정성 시험에서 일부 항목(주성분 함량) 기준 일탈에 따른 영업자 회수",
+    "finding_text_ko": "리나틴정(리나글립틴): 시판 후 안정성시험에서 일부 항목(주성분 함량)이 기준을 일탈하여 영업자 회수(recall)가 이루어졌다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-675c4a420d94c321ca5db3b1",
+    "finding_text": "케이에이투디라이트황사방역마스크(KF94)(소형)(흰색): 품질 부적합 (분진포집효율)",
+    "finding_text_ko": "케이에이투디라이트황사방역마스크(KF94)(소형)(흰색): 품질 부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67bd92ff54c431e8be9233b2",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 컴퓨터화시스템은 사용자별 접근 권한을 부여할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 2.2에 따라 컴퓨터화시스템에 사용자별 접근 권한을 부여할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d733a18781b10f83b79fa47",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-79a1bf3bd5b1c3f031374cf6",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to allow clean and orderly conditions.",
+    "finding_text_ko": "건물·시설이 청결하고 정돈된 상태를 유지할 수 있도록 설계·건설·운영 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b0847e2998ae6fd440dac47",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업절차서(SOP)의 관리가 미흡했다. 기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8dd6851f2138c24dcd3abf35",
+    "finding_text": "시설장비 기타 [별표 1] 4.4 작업실 청소상태 등 평가방법을 관리할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 4.4에 따라 작업실 청소상태 등의 평가방법을 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96fdf87a08e20c0da4dc9044",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ab27fb0d0c07674c2f7e5dee",
+    "finding_text": "클라제투디황사방역마스크(KF94)(흰색): 품질 부적합 (분진포집효율)",
+    "finding_text_ko": "클라제투디황사방역마스크(KF94)(흰색): 품질 부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ae30e4d230157af980a3640c",
+    "finding_text": "The recorded information or details were inadequate. The assessment to release finished products was inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다. 완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-af1a933b7cb2b2abe093e5ae",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 타정기 적격성 평가 항목을 타당하게 반영할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 2.1에 따라 타정기 적격성평가(qualification) 항목을 타당하게 반영할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d95d933de7b7a1b5fccf42a0",
+    "finding_text": "The availability or the content of the authentic certificate of analysis was inadequate. The validation and/or the documentation of test methods was inadequate.",
+    "finding_text_ko": "정품 시험성적서(certificate of analysis)의 구비 또는 내용이 미흡했다. 시험방법의 밸리데이션(validation) 및/또는 문서화가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc6d0e5d2463d193c5392ecc",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e273d958763dff6f659cb4d5",
+    "finding_text": "The company did not store a sample from each lot or batch of a drug, raw material, and/or an active ingredient under the proper conditions. The written procedures and records for retaining samples were inadequate.",
+    "finding_text_ko": "업체는 의약품·원자재 및/또는 주성분의 각 로트 또는 제조단위(batch)별 검체를 적절한 조건에서 보관하지 않았다. 보관용 검체에 대한 문서화된 절차와 기록이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e809680ec2b073828efbc1cb",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리 프로그램(sanitation program)이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-02042b8cb2d2c6051d9952af",
+    "finding_text": "The procedures to prevent mix-ups between irradiated and non-irradiated materials were inadequate.",
+    "finding_text_ko": "방사선 조사(照射) 자재와 미조사 자재 간 혼동을 방지하기 위한 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-032eea71bb562b54bd858ff7",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-04d1469631882f47d54c038e",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records. The electronic system was not validated for its intended use.",
+    "finding_text_ko": "기록의 생성·수정·검토·보관 및/또는 검색에 대한 통제가 미흡했다. 전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e4b0a53607ecdb0dfef37e5",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate. The quality control department or the designated alternate did not sign and/or date quality control decisions.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다. 품질관리부서(quality control unit) 또는 지정 대리자가 품질관리 결정사항에 서명 및/또는 일자를 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-108032d5a552b1b0f0d8bd64",
+    "finding_text": "The procedures to identify the contents of each container were inadequate.",
+    "finding_text_ko": "각 용기의 내용물을 확인하기 위한 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1a41ffdb9f94c804f5c2a036",
+    "finding_text": "The availability and/or the content of the written agreement between the raw material vendor and the drug fabricator was inadequate.",
+    "finding_text_ko": "원자재 공급업체와 의약품 제조업자 간 문서화된 계약서의 구비 및/또는 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-27ccb8256391f9b0c91d3033",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5364d744fa2269c406fe754e",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-629e81bd988c37e3684d087c",
+    "finding_text": "The deviation investigations to reconcile bulk product or printed packaging materials were inadequate.",
+    "finding_text_ko": "벌크 제품 또는 인쇄 포장자재의 수량 대조(reconciliation)를 위한 일탈(deviation) 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8386925d88c0aff008b47d1d",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-976fdb5ccb9ac7bbac0eee52",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ca37e04a2c74eb97cc0da9d5",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records. The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "기록의 생성·수정·검토·보관 및/또는 검색에 대한 통제가 미흡했다. 데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cfde2f3f97f23f4991cd677e",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d533054c3d0f1c5a9b86c92b",
+    "finding_text": "The closure system for the sterile product container was inadequate.",
+    "finding_text_ko": "무균 제품 용기의 마개시스템(closure system)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d64c07f718394f62dd9717fa",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 업체의 외관 육안검사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e714c50b15ea6d0c0c6a415c",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa4ccb5ab15b8fb225746d04",
+    "finding_text": "The company did not adequately demonstrate that air-flow patterns did not pose a risk of contamination.",
+    "finding_text_ko": "업체는 기류 패턴(air-flow pattern)이 오염 위험을 초래하지 않음을 적절히 입증하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fdf19fb3422edbc96ece6a1c",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리 및/또는 검토가 미흡했다. 데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5e3b1be60340f5ba3e884fd2",
+    "finding_text": "트라톨주(트라마돌염산염): 불순물(N-nitro-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "트라톨주(트라마돌염산염): 불순물(N-nitro-desmethyl-tramadol)이 초과 검출될 우려에 따라 사전예방적 조치로 시중 유통품에 대한 영업자 회수(recall)가 이루어졌다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-874f3a43b69b1fbe996731a6",
+    "finding_text": "에스포린점안액0.05%(사이클로스포린)(1회용): 외부포장과 실제 내용물이 상이한 제품 발견에 따른 영업자 회수[외부포장: 에스포린점안액, 내용물:라타스트점안액]",
+    "finding_text_ko": "에스포린점안액0.05%(사이클로스포린)(1회용): 외부포장과 실제 내용물이 상이한 제품이 발견되어 영업자 회수(recall)가 이루어졌다[외부포장: 에스포린점안액, 내용물: 라타스트점안액].",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ccd3478826dc849903df904b",
+    "finding_text": "포장표시 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제8.2호 첨부문서에 허가 받은 사항을 반영할 것",
+    "finding_text_ko": "포장표시 분야 기타 지적: 의약품 등의 안전에 관한 규칙 [별표 1] 제8.2호에 따라 첨부문서에 허가받은 사항을 반영할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e3f9e45c99629a087a3223e3",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 있음 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 품질 기타 [별표 1의2] 제2호 데이터 완전성 관리 및 확보 방안을 마련할 것 품질 기타 [별표 1의2] 제2.3호 제조설비 적격성평가 자료를 제출할 것 제조 기타 [별표 1의2] 제12.2호 공정밸리데이션을 적절히 수행할 것 시험실 기타 [별표 1의2] 제12.3호 시험방법밸리데이션을 적절히 수행할 것 1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 제조방법 비고 비무균-일반제제-합성 원료 의약품관리과",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies) 있음. [분야/구분 - 근거 법령 - 지적(보완)사항 요약] ① 품질/기타 - [별표 1의2] 제2호: 데이터 완전성 관리 및 확보 방안을 마련할 것. ② 품질/기타 - [별표 1의2] 제2.3호: 제조설비 적격성평가 자료를 제출할 것. ③ 제조/기타 - [별표 1의2] 제12.2호: 공정밸리데이션을 적절히 수행할 것. ④ 시험실/기타 - [별표 1의2] 제12.3호: 시험방법밸리데이션을 적절히 수행할 것. 주1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) PIC/S 정의에 따라 중대, 중요, 기타로 작성. 제조방법: 비무균-일반제제-합성 원료. 담당: 의약품관리과.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e6ded88aeece1a530dc04819",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 있음 제형 비고 비무균-연고제 완제 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 제조 기타 [별표 1] 제2호 제조구역 및 제조·시험 장비의 명칭을 기록·관리할것 시험실 기타 [별표 1] 제7호 시험검체 재사용에 대한 근거자료를 마련할 것 제조 기타 [별표 1] 제6호 공정매개변수 설정 근거자료를 마련할 것 제조 기타 [별표 1] 제2호 제조 장비의 시계를 교정하는 절차를 마련할 것 시험실 기타 [별표 1] 제7호 포장자재의 시험규격서를 마련하고 결과를 문서화할 것 의 약 품 관 리 과 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 시험실 기타 [별표 1] 제7호 표준품의 유효기간 설정에 대한 근거자료를 마련할 것",
+    "finding_text_ko": "평가 결과: 지적(보완)사항(Deficiencies) 있음. 제형: 비무균-연고제 완제. [분야/구분 - 근거 법령 - 지적(보완)사항 요약] ① 제조/기타 - [별표 1] 제2호: 제조구역 및 제조·시험 장비의 명칭을 기록·관리할 것. ② 시험실/기타 - [별표 1] 제7호: 시험검체 재사용에 대한 근거자료를 마련할 것. ③ 제조/기타 - [별표 1] 제6호: 공정매개변수 설정 근거자료를 마련할 것. ④ 제조/기타 - [별표 1] 제2호: 제조 장비의 시계를 교정하는 절차를 마련할 것. ⑤ 시험실/기타 - [별표 1] 제7호: 포장자재의 시험규격서를 마련하고 결과를 문서화할 것. ⑥ 시험실/기타 - [별표 1] 제7호: 표준품의 유효기간 설정에 대한 근거자료를 마련할 것. 담당: 의약품관리과. 주1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시. 주2) PIC/S 정의에 따라 중대, 중요, 기타로 작성.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38189f633cae5ee66feb57d3",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-da3fe018cc199d8908c63af5",
+    "finding_text": "가스트로그라핀: 불순물(N-Nitroso-Meglumine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "가스트로그라핀: 불순물(N-Nitroso-Meglumine)이 초과 검출될 우려에 따라 사전예방적 조치로 시중 유통품에 대한 영업자 회수(recall)가 이루어졌다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-00899539641b5c3ec44edd99",
+    "finding_text": "[별표 1] 2.1 제조용수 및 환경 모니터링 연간 보고서에 경향 분석을 적절히 할 것",
+    "finding_text_ko": "[별표 1] 2.1에 따라 제조용수 및 환경모니터링 연간 보고서에 경향분석을 적절히 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-012d3224ffbef37b811ded8d",
+    "finding_text": "[별표 1의2] 8.1 제조공정에 투입하는 중간체의 사용량이 실제 기록과 다른 사유를 마련할 것",
+    "finding_text_ko": "[별표 1의2] 8.1에 따라 제조공정에 투입하는 중간체의 사용량이 실제 기록과 다른 사유를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-040d476452fb6adf4a65db4b",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 연고충전기 적격성 평가를 재실시할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 2.1에 따라 연고충전기 적격성평가(qualification)를 재실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-04dc89c233aa0f186c30ff81",
+    "finding_text": "기타 밸리데이션 되지 않은 제조단위의 타당성을 입증할 것",
+    "finding_text_ko": "기타 지적: 밸리데이션(validation)되지 않은 제조단위의 타당성을 입증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0575964165186e0a82d2c877",
+    "finding_text": "품질경영 기타 [별표 1] 7.3 제품품질평가에 따라 필요한 경우 후속조치를 수행할 것",
+    "finding_text_ko": "품질경영 분야 기타 지적: [별표 1] 7.3에 따라 제품품질평가 결과 필요한 경우 후속조치를 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-07ccc01e864e422e65e9228c",
+    "finding_text": "품질경영 중요 [별표 1] 3.2 자사 기준서에 따라 제조지시서 발행 시 발행대장에 내용을 기입할 것",
+    "finding_text_ko": "품질경영 분야 중요 지적: [별표 1] 3.2에 따라 자사 기준서대로 제조지시서 발행 시 발행대장에 내용을 기입할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0c5abcdccde7639893556754",
+    "finding_text": "제조 기타 [별표 1의2] 3.2 무균복 교체 주기에 대한 근거를 마련할 것",
+    "finding_text_ko": "제조 분야 기타 지적: [별표 1의2] 3.2에 따라 무균복 교체 주기에 대한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0c69307473a73ed60134f98f",
+    "finding_text": "기타 [별표1의2]12.4 진동선별기의 세척 전 유지시간(Dirty Hold Time)에 대한 설정 근거를 마련할 것",
+    "finding_text_ko": "기타 지적: [별표1의2]12.4에 따라 진동선별기의 세척 전 유지시간(Dirty Hold Time) 설정 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ceb84bf9275d4dc24ae1f13",
+    "finding_text": "원자재 기타 [별표 1] 3.3 공급업체 평가 계획을 수립할 것",
+    "finding_text_ko": "원자재 분야 기타 지적: [별표 1] 3.3에 따라 공급업체 평가 계획을 수립할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d557b5eb194c36ba9f587d5",
+    "finding_text": "시험실 기타 [별표 1] 6.6 시험 결과처리를 위한 엑셀 스프 레드시트에 대해 검증할 것",
+    "finding_text_ko": "시험실 분야 기타 지적: [별표 1] 6.6에 따라 시험 결과처리를 위한 엑셀 스프레드시트를 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1345e29eecd7fd0f4300b6c4",
+    "finding_text": "품질 기타 [별표 1] 3.2 제조부서책임자 관련 업무 등을 점검 및 확인할 것",
+    "finding_text_ko": "품질 분야 기타 지적: [별표 1] 3.2에 따라 제조부서책임자 관련 업무 등을 점검·확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-13b1925f8a88ea500c561e44",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 백업 데이터를 정기적으로 점검할 것",
+    "finding_text_ko": "시설장비 분야 기타 지적: [별표 1] 2.2에 따라 백업 데이터를 정기적으로 점검할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1453c03e832ad374429e1876",
+    "finding_text": "[별표 1] 7.1 출발물질의 용기별 확인시험을 생략하는 경우 타당한 근거를 마련할 것",
+    "finding_text_ko": "[별표 1] 7.1에 따라 출발물질의 용기별 확인시험을 생략하는 경우 타당한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14b264db8ca59e847279fd16",
+    "finding_text": "품질경영 기타 [별표 1] 5.1 정해진 양식에 문서를 기록할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 5.1 정해진 양식에 따라 문서를 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-15db40ea79600b34661c8358",
+    "finding_text": "시험실 기타 [별표 1] 7.1 기준일탈 처리 시 최초 시험 결과를 무효화하는 타당한 근거를 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 기준일탈(OOS) 처리 시 최초 시험 결과를 무효화하는 타당한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1a1e78b33ad08b4073e65596",
+    "finding_text": "시설장비 기타 [별표 1] 9.2 무균구역(Grade B)의 표면균 기준을 타당하게 설정할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 9.2 무균구역(aseptic area, Grade B)의 표면균 기준을 타당하게 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1a5bd5c207525601f101d368",
+    "finding_text": "기타 [별표1의2] 5 시험분석 관련 전자문서 시스템과 디지털 카메라에 대하여 백업 등의 방법으로 기록의 훼손 및 손실에 대 비할 것",
+    "finding_text_ko": "[기타] [별표1의2] 5 시험분석 관련 전자문서 시스템과 디지털 카메라에 대하여 백업 등의 방법으로 기록의 훼손 및 손실에 대비할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-20fbfea3bc143586ab936f51",
+    "finding_text": "시험실 기타 [별표 1] 6.1 고압증기멸균기 적격성평가의 최악조건 선정 근거를 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 6.1 고압증기멸균기(autoclave) 적격성평가(qualification)의 최악조건(worst case) 선정 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-21c92e7297dfa2e6196b4121",
+    "finding_text": "제조 기타 [별표 1] 6.4 세척 밸리데이션 검체 채취방법에 대한 효과성을 검증할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 6.4 세척 밸리데이션(cleaning validation) 검체 채취방법의 효과성을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-222ea1031dc170512b435ecf",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비(preventative maintenance) 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-22f27f5a401458379ce25f79",
+    "finding_text": "The procedure was inadequate for documenting quality control decisions by the person in charge of the quality control department.",
+    "finding_text_ko": "품질관리부서(quality control department) 책임자의 품질관리 관련 결정사항을 문서화하는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-23b31a0c42162edd94eefb80",
+    "finding_text": "기타 [별표1] 2.2 제품의 품질에 부정적인 영향을 주지 않 도록, 품질관리를 위한 적정인력이 운영 될 수 있도록 관리할 것",
+    "finding_text_ko": "[기타] [별표1] 2.2 제품의 품질에 부정적인 영향을 주지 않도록, 품질관리를 위한 적정 인력이 운영될 수 있도록 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2410ab5fac9e6109819e65cd",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 데이터 백업 및 복구테스트를 실시할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.2 데이터 백업 및 복구 테스트(restore test)를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-25d1ae8809ed6d49a9c88f2e",
+    "finding_text": "품질경영 기타 [별표1] 3.3 일탈에 대한 조사 및 예방조치를 실시하 고, 제품 품질에 미치는 영향 자료를 제출 할 것",
+    "finding_text_ko": "[품질경영·기타] [별표1] 3.3 일탈(deviation)에 대한 조사 및 예방조치를 실시하고, 제품 품질에 미치는 영향 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2b19ffcb3eb3ad8937391380",
+    "finding_text": "시험실 중요 [별표 1] 7.2 매년 품목별로 시판 후 안정성 시험을 실시할 것",
+    "finding_text_ko": "[시험실·중요] [별표 1] 7.2 매년 품목별로 시판 후 안정성시험(on-going stability)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c8512cf11aa98ab09250ad3",
+    "finding_text": "평가 결과지적보완사항 있음 분야1) 구분2) 근거 법령 지적보완사항 요약 ( ) 3) 비고 시설장비 기타 별표 의 [ 1 2] 4. 미생물한도시험실전실 갱의로 인한 오 (CNC) 염을 방지하기 위한 대 책청정도 상향 또는 작 ( 업복 갱의 절차 개선, 위험평가 등을 마련하 ) 고결과를 제출할 것 , 보완완료 시설장비 기타 별표 의 [ 1 2] 5. 시험에 사용되는 기계· 설비에 대하여 교정 및 적격성평가를 실시하고, 각 점검 항목에 대한 적 절한 주기를 설정할 것 보완완료 품질경영 기타 별표 의 [ 1 2] 6.1 무효화된 구본문서에 대 한 회수폐기 등의 관리 · 방안을 마련할 것 보완완료 - 2 - 감시 분야개 품질경영시설장비제조시험실원자재포장표시 정의에 따라 중대중요기타로 작성 지적사항 중 중대중요건은 행정처분 부과 기타건은 시정보완토록 함 행정처분 부과가 확정되면 의약품안전나라 행정처분정보를 통해 공개됨 중대중요지적사항은 보완 완료 후 기타지적사항은 이행계획 확인 후 타당성이 인정되는 경우 적합판정서 발급함 품질경영 기타 별표 의 [ 1 2] 6.1 문서의 개정 관련하여 개정 이력을 관리하고, 문서 개정 후 발효 시까 지의 절차를 구체적으로 포함할 것 보완완료 시험실 기타 별표 의 [ 1 2] 11.1 품질관리부서 분석 데이 터 무결성을 위한 위험 평가 보고서의 조치사항 을 실시하고 그 결과를 제출할 것 보완완료 의 료 제 품 안 전 과",
+    "finding_text_ko": "평가 결과: 지적·보완사항 있음. (분야 / 구분 / 근거 법령 / 지적·보완사항 요약 / 비고)\n1) [시설장비·기타] [별표 1의2] 4. 미생물한도시험실 전실(CNC) 갱의로 인한 오염을 방지하기 위한 대책(청정도 상향 또는 작업복 갱의 절차 개선, 위험평가 등)을 마련하고 그 결과를 제출할 것 — 보완완료\n2) [시설장비·기타] [별표 1의2] 5. 시험에 사용되는 기계·설비에 대하여 교정(calibration) 및 적격성평가(qualification)를 실시하고, 각 점검 항목에 대한 적절한 주기를 설정할 것 — 보완완료\n3) [품질경영·기타] [별표 1의2] 6.1 무효화된 구본문서에 대한 회수·폐기 등의 관리 방안을 마련할 것 — 보완완료\n4) [품질경영·기타] [별표 1의2] 6.1 문서의 개정과 관련하여 개정 이력을 관리하고, 문서 개정 후 발효 시까지의 절차를 구체적으로 포함할 것 — 보완완료\n5) [시험실·기타] [별표 1의2] 11.1 품질관리부서(quality control unit) 분석 데이터 무결성을 위한 위험평가 보고서의 조치사항을 실시하고 그 결과를 제출할 것 — 보완완료\n※ 원문 하단 안내문: 분야는 품질경영·시설장비·제조·시험실·원자재·포장표시로 구분하며, 구분은 감시 분야 정의에 따라 중대·중요·기타로 작성함. 지적사항 중 중대·중요 건은 행정처분을 부과하고 기타 건은 시정·보완토록 함. 행정처분 부과가 확정되면 의약품안전나라 행정처분정보를 통해 공개됨. 중대·중요 지적사항은 보완 완료 후, 기타 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 적합판정서를 발급함. (의료제품안전과)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2dedad3839b0966662f5f67e",
+    "finding_text": "제조 기타 [별표1의2] 5 제조설비 적격성평가 시 검증항목 및 기준에 대한 적절한 근거를 마련할 것",
+    "finding_text_ko": "[제조·기타] [별표1의2] 5 제조설비 적격성평가(qualification) 시 검증항목 및 기준에 대한 적절한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2e77dbf3ad0d46921c5dfa16",
+    "finding_text": "기타 [별표1] 8.1 반제품 사용기한 및 관리 절차를 마련할 것",
+    "finding_text_ko": "[기타] [별표1] 8.1 반제품의 사용기한 및 관리 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f7644ba1d3ba12508a094fa",
+    "finding_text": "에이스에스픽스: 품질부적합(점착력 시험)",
+    "finding_text_ko": "에이스에스픽스: 점착력 시험 결과 품질 부적합.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3035025f059108675ec8cfde",
+    "finding_text": "품질경영 기타 [별표 1] 1의2 데이터완전성 전담 조직을 구성하고 자율점검 및 교육을 실시할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 1의2 데이터완전성(data integrity) 전담 조직을 구성하고 자율점검(self-inspection) 및 교육을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-341e9934eaa4c42dbb2cc3be",
+    "finding_text": "기타 [별표 1] 2.1 데이터를 변경하거나 삭제할 때 해당 사유를 문서화할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.1 데이터를 변경하거나 삭제하는 경우 해당 사유를 문서화할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-348c44c0774c907066761bb7",
+    "finding_text": "시험실 기타 [별표 1] 7.1 표준가스 관리 상황을 기록할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 표준가스의 관리 상황을 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3625370f81f7ab962006170d",
+    "finding_text": "기타 [별표 1] 2.2 백업 데이터의 복구능력을 정기적으로 점검할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.2 백업 데이터의 복구 능력을 정기적으로 점검할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-36e35797bb2f43e45ae4855e",
+    "finding_text": "시험실 기타 [별표 1의2] 11.1 원료 입고 시험 시 일부 시험을 생략하는 경우, 타당한 근거를 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1의2] 11.1 원료 입고 시험 시 일부 시험을 생략하는 경우 타당한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-372d680f7136e8daf609f8c1",
+    "finding_text": "포장 표시 기타 [별표1의2] 9 포장작업 시 사용하는 자재의 인수 및 폐기 등 절차를 마련하고 자재 사용 용 도에 따른 수량을 상세히 기록할 것",
+    "finding_text_ko": "[포장표시·기타] [별표1의2] 9 포장작업 시 사용하는 자재의 인수 및 폐기 등 절차를 마련하고, 자재 사용 용도에 따른 수량을 상세히 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38f1f17c044806e75e94583d",
+    "finding_text": "품질경영 중요 [별표 1] 5.2 안정성시험 자료에 대해 정해진 기간 동안 보관할 것",
+    "finding_text_ko": "[품질경영·중요] [별표 1] 5.2 안정성시험 자료를 정해진 기간 동안 보관할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a249dada30e274d4f75e5cb",
+    "finding_text": "시설장비 [별표 1] 2.1 청정구역에 설치된 저울 점검에 사용하는 분동 관리를 적절히 할 것",
+    "finding_text_ko": "[시설장비] [별표 1] 2.1 청정구역(critical area)에 설치된 저울 점검에 사용하는 분동의 관리를 적절히 할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a36c468009fd16b143b9ffd",
+    "finding_text": "기타 [별표 1] 8.1 칭량 후 반제품 보관기간에 대하여 검증할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 칭량 후 반제품의 보관기간에 대하여 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3c4e8a9e78debccef4436107",
+    "finding_text": "시험실 기타 [별표 1] 7.1 제조용수 TOC 분석 시 시스템적합성시험을 주기적으로 실시할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 제조용수 TOC 분석 시 시스템적합성시험(system suitability)을 주기적으로 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3f673ee18914d7e049d117f6",
+    "finding_text": "제조 기타 [별표1] 2.1 제조설비 적격성평가 시 검증항목 및 기준에 대한 근거를 마련할 것",
+    "finding_text_ko": "[제조·기타] [별표1] 2.1 제조설비 적격성평가(qualification) 시 검증항목 및 기준에 대한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ff42f49ca5b5b7982f3c997",
+    "finding_text": "제조 기타 [별표 1] 8.2 의약품 포장 후 기밀 또는 밀봉 시험을 수행할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.2 의약품 포장 후 기밀 또는 밀봉 시험을 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-41c8c769b40571754b90f03a",
+    "finding_text": "기타 [별표1] 7.3 제품품질평가 결과에 따른 편향에 대해서 조사 수행 후 필요한 조치를 마련할 것",
+    "finding_text_ko": "[기타] [별표1] 7.3 제품품질평가(APR) 결과에 따른 편향에 대하여 조사를 수행한 후 필요한 조치를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-41ece331af728580cfb6f207",
+    "finding_text": "시험실 기타 [별표 1의2] 5 적격성평가 시 평가 항목을 적절히 설정하고 설정 근거를 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1의2] 5 적격성평가(qualification) 시 평가 항목을 적절히 설정하고 그 설정 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42e37e32da2e4b504369748e",
+    "finding_text": "시험실 기타 [별표 1] 7.1 시험장비 시스템 적합성을 적절한 주기로 실시할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 시험장비의 시스템적합성시험(system suitability)을 적절한 주기로 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43a86a3fa1e4cdab1ec2d9f4",
+    "finding_text": "제조 기타 [별표 1] 8.1 생산 구역의 설비 세척 및 사용기록 등을 관리할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.1 생산 구역 설비의 세척 및 사용기록 등을 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43aaec2f9b6d72102c300d1e",
+    "finding_text": "기타 [별표1의2]12.4 진동선별기 세척 밸리데이션 시 사용한 검 체 채취 방법의 회수율 및 주성분 잔류량 검증 시 사용한 시험방법을 검증할 것",
+    "finding_text_ko": "[기타] [별표1의2] 12.4 진동선별기 세척 밸리데이션(cleaning validation) 시 사용한 검체 채취 방법의 회수율 및 주성분 잔류량 검증에 사용한 시험방법을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43f0e4396268cd2fb7056286",
+    "finding_text": "품질경영 기타 [별표 1] 4.2 분석에 사용하는 시액의 사용기한을 설정할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 4.2 분석에 사용하는 시액의 사용기한을 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-482aa3cf57268b5c9a6691ea",
+    "finding_text": "품질경영 기타 [별표1] 3.3 원자재 제조업자 평가 시 평가 수행자에 대한 관리 사항을 규정할 것",
+    "finding_text_ko": "[품질경영·기타] [별표1] 3.3 원자재 제조업자 평가 시 평가 수행자에 대한 관리 사항을 규정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-48698c027d88e15d0eff8d1c",
+    "finding_text": "시험실 기타 [별표 1] 7.1 시험 결과의 기초자료는 작업과 동시에 품질시험기록서에 첨부 할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 시험 결과의 기초자료(raw data)는 작업과 동시에 품질시험기록서에 첨부할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-48e13ce8666a5a9c86763195",
+    "finding_text": "원자재 [별표 1] 10.2 표시재료를 구획된 장소에 구분·보관할 것",
+    "finding_text_ko": "[원자재] [별표 1] 10.2 표시재료를 구획된 장소에 구분하여 보관할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-491168f4c6425bfab3ce8655",
+    "finding_text": "[별표 1] 2.2 수식이 입력된 셀의 계산식이 정확하고 계산 결과가 적합함을 검증할 것",
+    "finding_text_ko": "[별표 1] 2.2 수식이 입력된 셀의 계산식이 정확하며 계산 결과가 적합함을 검증(validation)할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a0eb5e188f716192264eba9",
+    "finding_text": "시설장비 기타 [별표 1] 9.1 무균구역 작업업자는 갱의 적격성평가를 할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 9.1 무균구역 작업자에 대하여 갱의 적격성평가(gowning qualification)를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a24f9f8aae91a0811d8c7e5",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 시험에 사용되는 중요 기계·설비에 대하여 정기적으로 적격성평가를 실시할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.1 시험에 사용되는 중요 기계·설비에 대하여 정기적으로 적격성평가(qualification)를 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4b0608fad7e26d28654c3fdf",
+    "finding_text": "기타 [별표 1] 2.2 컴퓨터시스템에 사용자별로 유효한 전자 서명을 남길 것",
+    "finding_text_ko": "[기타] [별표 1] 2.2 컴퓨터시스템에 사용자별로 유효한 전자서명(electronic signature)을 남길 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4cf8d66edd85b2c2e490c10d",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 기록 변경은 권한 있는 자만 할 수 있도록 관리할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.2 기록의 변경은 권한 있는 자만 수행할 수 있도록 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4e45be1d80dd4090a6b14c3d",
+    "finding_text": "시설장비 [별표 1] 2.1 무균 작업 중 실시하는 일부 활동이 의약품에 부정적인 영향을 미치지 않음을 검증할 것",
+    "finding_text_ko": "[시설장비] [별표 1] 2.1 무균공정(aseptic) 작업 중 실시하는 일부 활동이 의약품에 부정적인 영향을 미치지 않음을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f41fc816e15043f9384bf07",
+    "finding_text": "시험실 기타 [별표 1] 7.1 조제시액의 사용기한을 설정할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 조제시액의 사용기한을 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-50a654ca3227a2f398640ec3",
+    "finding_text": "제조 기타 [별표 1] 제7.1호 육안으로 시험결과를 판단하는 경우 근거자료를 마련할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 제7.1호 육안으로 시험결과를 판단하는 경우 그 근거자료를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51d46169fffee5e06e03971f",
+    "finding_text": "기타 [별표 1] 6.4 제조설비별 세척 밸리데이션 방법의 적절한 근거를 마련할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 제조설비별 세척 밸리데이션(cleaning validation) 방법에 대한 적절한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51df779ca92d6e970b043e9f",
+    "finding_text": "제조 기타 [별표 1의2] 5 백업 데이터의 완전성, 정확성 및 데이터 복구 능력을 확인할 것",
+    "finding_text_ko": "[제조·기타] [별표 1의2] 5 백업 데이터의 완전성·정확성 및 데이터 복구 능력을 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-529050e03f07d52affcad7d6",
+    "finding_text": "기타 [별표 1] 6.4 설정된 세척방법의 효율성을 타당한 주기로 확인할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 설정된 세척방법의 효율성을 타당한 주기로 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-53790585875108c543586318",
+    "finding_text": "품질경영 기타 [별표 1] 7.3 제품품질평가는 완제품의 모든 제조단위별 제조기록서 및 시험 성적서를 조사한 후 평가할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 7.3 제품품질평가(APR)는 완제품의 모든 제조단위별 제조기록서(batch record) 및 시험성적서를 조사한 후 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-544e872f8063bc39367ced5e",
+    "finding_text": "원자재 [별표 1] 10.2 검체채취용 원료를 보관하는 장소에 대한 온도분포시험을 실시할 것",
+    "finding_text_ko": "[원자재] [별표 1] 10.2 검체채취용 원료를 보관하는 장소에 대하여 온도분포시험(temperature mapping)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55561c2b91e813d3ac49f780",
+    "finding_text": "품질경영 기타 [별표1] 3.3 어떤 제조단위에서 제품의 결함이 발견된다면 다른 제조단위에도 영향이 있는지 확인할 것",
+    "finding_text_ko": "[품질경영·기타] [별표1] 3.3 특정 제조단위에서 제품의 결함이 발견된 경우 다른 제조단위에도 영향이 있는지 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55ea8fe81269587e207dee65",
+    "finding_text": "기타 [별표 1] 3.1 약사법상 제조관리자의 업무 중 위임 불가능한 업무를 명시할 것",
+    "finding_text_ko": "[기타] [별표 1] 3.1 약사법상 제조관리자의 업무 중 위임이 불가능한 업무를 명시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55eeedd5808db2f1f88e171e",
+    "finding_text": "[별표 1] 4.2 조제시액 사용기한을 타당한 근거에 기반하여 설정할 것",
+    "finding_text_ko": "[별표 1] 4.2 조제시액의 사용기한을 타당한 근거에 기반하여 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-569cc1f7f8361f922677117f",
+    "finding_text": "기타 [별표 1] 6.4 제품과 접촉하는 모든 설비에 대하여 세척 검증할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 제품과 접촉하는 모든 설비에 대하여 세척 검증(cleaning validation)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-57908f1566de2d21bc17dcd6",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 주사용수 및 압축공기 시스템의 필터 적합성을 정기적으로 확인할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.1 주사용수(WFI) 및 압축공기 시스템의 필터 적합성을 정기적으로 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-592149974a5d81140ac1b1fe",
+    "finding_text": "기타 반제품 보관기간에 대한 설정근거를 마련할 것",
+    "finding_text_ko": "[기타] 반제품 보관기간에 대한 설정 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5965f834452cd0baee1eebe1",
+    "finding_text": "제조 기타 [별표 1] 8.1 장기간 제조공정 작업시간에 대한 영향성을 확인할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.1 장기간의 제조공정 작업시간에 대한 영향성을 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-59a317398e48729172540ca6",
+    "finding_text": "기타 [별표1] 2.2 자동화장치에서 생성되는 점검기록(audit trail)에 대하여 정기적으로 검토할 것",
+    "finding_text_ko": "[기타] [별표1] 2.2 자동화장치에서 생성되는 점검기록(audit trail)을 정기적으로 검토할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5a4ce4255454a44f62038442",
+    "finding_text": "[별표 1의2] 8.1 원료칭량에 대한 작업내용을 상세히 기록할 것",
+    "finding_text_ko": "[별표 1의2] 8.1 원료 칭량 작업내용을 상세히 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5aaae8ecc902802b78fb492b",
+    "finding_text": "기타 [별표1의2] 5 점검기록(Audit trail)이 생성되는 자 동화장치의 목록을 관리하고, 점검 기록(Audit trail)에 대한 검토를 주 기적으로 실시할 것",
+    "finding_text_ko": "[기타] [별표1의2] 5 점검기록(Audit trail)이 생성되는 자동화장치의 목록을 관리하고, 점검기록(Audit trail)에 대한 검토를 주기적으로 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5c87fd4fa0d71db0b8abac2d",
+    "finding_text": "시험실 기타 [별표 1] 7.1 시험에서 얻은 모든 기록을 보존할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 시험에서 얻은 모든 기록을 보존할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-60b1628cf143ef5ea12c016e",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 교정대상 계측기의 허용기준 및 사용 범위를 설정할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.1 교정(calibration) 대상 계측기의 허용기준 및 사용 범위를 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61be20ca6c665d32a5cdd15c",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 냉동고 교정 및 적격성평가를 적절히 수행할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.1 냉동고의 교정(calibration) 및 적격성평가(qualification)를 적절히 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62057ee0756a8a146f37a9dc",
+    "finding_text": "기타 [별표1의2] 14.3 회수한 용매를 재사용하기 전 해당기준에 부합할 수 있도록 회수 절차를 관리할 것",
+    "finding_text_ko": "[기타] [별표1의2] 14.3 회수한 용매를 재사용하기 전 해당 기준에 부합하도록 회수 절차를 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62dbf7debdeacaa86544071e",
+    "finding_text": "품질경영 [별표 1] 11 불만처리 시 조사의 정도 및 범위를 명확하게 설정할 것",
+    "finding_text_ko": "[품질경영] [별표 1] 11 불만처리(complaint) 시 조사의 정도 및 범위를 명확하게 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-660610630087dd7a6b757b5c",
+    "finding_text": "시설장비 기타 [별표1] 2.2 권한이 있는 작업원에게만 컴퓨터화 시스 템의 접근을 허용하고, 접근 권한의 생성, 변경 및 삭제를 기록할 것",
+    "finding_text_ko": "[시설장비·기타] [별표1] 2.2 권한이 있는 작업원에게만 컴퓨터화 시스템의 접근을 허용하고, 접근 권한의 생성·변경 및 삭제를 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-693cd635b92e9fbfeeade58a",
+    "finding_text": "시험실 기타 [별표 1] 2.2 품질 시험 관련 데이터 관리 절차를 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 2.2 품질시험 관련 데이터 관리 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-69c2dc2282675e9558f16ddf",
+    "finding_text": "제조 기타 [별표 1] 6.4 세척 밸리데이션에서 최악품목 또는 대표장비 선정 시 과학적 근거를 제시할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 6.4 세척 밸리데이션(cleaning validation)에서 최악품목(worst case) 또는 대표장비 선정 시 과학적 근거를 제시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-69f58c1d955b87f6b088bf19",
+    "finding_text": "제조 기타 [별표 1의 2] 12.4 제품과 접촉하는 설비에 대하여 세척 밸리데이션을 실시할 것",
+    "finding_text_ko": "[제조·기타] [별표 1의 2] 12.4 제품과 접촉하는 설비에 대하여 세척 밸리데이션(cleaning validation)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6be15517bbd544d493247448",
+    "finding_text": "제조 기타 [별표1] 4.1 제품표준서 및 제조기록서 작성 시 원료약 품의 분량과 제조단위당 실 사용량이 기준 량과 다를 경우에는 타당한 산출근거를 마 련할 것",
+    "finding_text_ko": "[제조·기타] [별표1] 4.1 제품표준서 및 제조기록서(batch record) 작성 시 원료약품의 분량과 제조단위당 실사용량이 기준량과 다를 경우에는 타당한 산출근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d0738928512dbf3cf9852de",
+    "finding_text": "원자재 기타 [별표 1의 2] 10.1 원료는 품질에 영향이 없는 조건 에서 보관할 수 있도록 관리할 것",
+    "finding_text_ko": "[원자재·기타] [별표 1의 2] 10.1 원료는 품질에 영향이 없는 조건에서 보관할 수 있도록 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6fa96acbbe751c31f6239b17",
+    "finding_text": "품질경영 기타 [별표 1] 12 진행중인 변경 건에 누락되지 않도록 관리하는 절차를 마련할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 12 진행 중인 변경관리(change control) 건이 누락되지 않도록 관리하는 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7192dfe4de8e5380625be49b",
+    "finding_text": "기타 [별표 1] 8.1 제조공정 작업내용에 대하여 상세히 기록할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 제조공정 작업내용을 상세히 기록할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7369ba53337c6587f056cfa8",
+    "finding_text": "기타 [별표1] 3.3 기준일탈 조사 및 처리 절차를 검토할 것",
+    "finding_text_ko": "[기타] [별표1] 3.3 기준일탈(OOS) 조사 및 처리 절차를 검토할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-74771bc993745d99a5c6671b",
+    "finding_text": "평가 결과지적보완사항 있음 분야1) 구분2) 근거 법령 지적보완사항 요약 ( ) 3) 비고 시험실 기타 별표 의 [ 1 2] 11.1 시험에서 얻은 모든 기 록을 보존할 것 보완완료 시험실 기타 별표 의 [ 1 2] 11.1 경향일탈 처리 시 최초 시험결과를 무효화하는 타당한 근거 및 관련 절 차를 마련할 것 보완완료 시설관리 기타 별표 의 [ 1 2] 4 고압증기멸균기 적격성 평가 시 적재 유형을 고 려하여 적절히 검증할 것 보완완료 시험실 기타 별표 의 [ 1 2] 12.6 시험 결과값 계산에 사 용하는 엑셀 스프레드시 트에 대한 밸리데이션을 실시할 필요가 있었음 보완완료 포장표시 기타 별표 의 [ 1 2] 9 표시재료는 작업 전 품 - 2 - 감시 분야개 품질경영시설장비제조시험실원자재포장표시 정의에 따라 중대중요기타로 작성 지적사항 중 중대중요건은 행정처분 부과 기타건은 시정보완토록 함 행정처분 부과가 확정되면 의약품안전나라 행정처분정보를 통해 공개됨 중대중요지적사항은 보완 완료 후 기타지적사항은 이행계획 확인 후 타당성이 인정되는 경우 적합판정서 발급함 질보증부서의 승인 여 ( ) 부를 확인 후 사용할 것 품질경영 기타 별표 의 [ 1 2] 13 변경 진행 시 수행되어 야 할 밸리데이션의 수 준을 적절히 결정하여 실시할 것 보완완료 품질경영 기타 별표 의 [ 1 2] 2.4 자율점검 시 자체적으로 계획을 수립하여 실시할 것 보완완료 의 료 제 품 안 전 과",
+    "finding_text_ko": "평가 결과: 지적·보완사항 있음. (분야 / 구분 / 근거 법령 / 지적·보완사항 요약 / 비고)\n1) [시험실·기타] [별표 1의2] 11.1 시험에서 얻은 모든 기록을 보존할 것 — 보완완료\n2) [시험실·기타] [별표 1의2] 11.1 경향일탈 처리 시 최초 시험결과를 무효화하는 타당한 근거 및 관련 절차를 마련할 것 — 보완완료\n3) [시설관리·기타] [별표 1의2] 4 고압증기멸균기(autoclave) 적격성평가(qualification) 시 적재 유형을 고려하여 적절히 검증할 것 — 보완완료\n4) [시험실·기타] [별표 1의2] 12.6 시험 결과값 계산에 사용하는 엑셀 스프레드시트에 대한 밸리데이션(validation)을 실시할 필요가 있었음 — 보완완료\n5) [포장표시·기타] [별표 1의2] 9 표시재료는 작업 전 품질보증부서의 승인 여부를 확인한 후 사용할 것\n6) [품질경영·기타] [별표 1의2] 13 변경 진행 시 수행되어야 할 밸리데이션(validation)의 수준을 적절히 결정하여 실시할 것 — 보완완료\n7) [품질경영·기타] [별표 1의2] 2.4 자율점검(self-inspection) 시 자체적으로 계획을 수립하여 실시할 것 — 보완완료\n※ 원문 하단 안내문: 분야는 품질경영·시설장비·제조·시험실·원자재·포장표시로 구분하며, 구분은 감시 분야 정의에 따라 중대·중요·기타로 작성함. 지적사항 중 중대·중요 건은 행정처분을 부과하고 기타 건은 시정·보완토록 함. 행정처분 부과가 확정되면 의약품안전나라 행정처분정보를 통해 공개됨. 중대·중요 지적사항은 보완 완료 후, 기타 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 적합판정서를 발급함. (의료제품안전과)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-74830ab6b7bbeceacf7b422a",
+    "finding_text": "제조 기타 [별표 1] 8.1 반제품 사용기간 설정 시 보관조건을 반영할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.1 반제품 사용기간 설정 시 보관조건을 반영할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-75471aab1afa149486eabe07",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 시스템 관리자 권한을 직접적인 이해관계자가 아닌자에게 부여할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.2 시스템 관리자(administrator) 권한은 직접적인 이해관계자가 아닌 자에게 부여할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-772430b2b120d5d806939e39",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 자동화장치 등의 사용범위 및 권한을 상세히 설정할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.2 자동화장치 등의 사용범위 및 권한을 상세히 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7855a27298cec40d36d30c7c",
+    "finding_text": "기타 [별표 1] 2.3 비청정구역과 청청구역 사이에 인터락 장치를 설치할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.3 비청정구역과 청정구역 사이에 인터락(interlock) 장치를 설치할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7be96ae8a31087832ef9050c",
+    "finding_text": "기타 [별표 1] 2.2 컴퓨터시스템으로 작성하는 제조기록서 수정 절차를 마련할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.2 컴퓨터시스템으로 작성하는 제조기록서(batch record)의 수정 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7bf1f2fe455471de5c786426",
+    "finding_text": "제조 기타 [별표 1] 6.2 공정 밸리데이션에서 기존 밸리 데이션 결과를 준용하는 경우 타당한 근거를 마련할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 6.2 공정 밸리데이션(process validation)에서 기존 밸리데이션 결과를 준용하는 경우 타당한 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7caaa4cc33590f07c1d9633e",
+    "finding_text": "시험실 기타 [별표 1] 7.1 시험에서 얻은 모든 기록을 보존할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 시험에서 얻은 모든 기록을 보존할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7ceeeeb51933d347387464ba",
+    "finding_text": "제조 기타 [별표 1] 8.1 제조 시 중요 작업 데이터를 관리할 것(raw data 등)",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.1 제조 시 중요 작업 데이터를 관리할 것(raw data 등).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7d02b5aa2e96a983786ba97c",
+    "finding_text": "품질 기타 [별표 1] 4.3 장비 적격성평가 시 적절한 평가항목을 설정할 것",
+    "finding_text_ko": "[품질·기타] [별표 1] 4.3 장비 적격성평가(qualification) 시 적절한 평가항목을 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7f31879c767736ebfad5c82e",
+    "finding_text": "제조 기타 [별표 1] 제8.1호 반제품 사용기한에 대한 설정근거를 마련할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 제8.1호 반제품 사용기한에 대한 설정 근거를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7f70ae90c502ee197fe280be",
+    "finding_text": "기타 [별표 1] 2.1 제조설비에 대하여 주기적으로 평가할 수 있는 절차를 마련할 것",
+    "finding_text_ko": "[기타] [별표 1] 2.1 제조설비에 대하여 주기적으로 평가할 수 있는 절차를 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-80165f4835a0f45a1f551feb",
+    "finding_text": "제조 기타 [별표 1] 6.2 배지충전 밸리데이션 수행 시 배지충전시험 용기에 대한 유효성을 평가할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 6.2 배지충전(media fill) 밸리데이션 수행 시 배지충전시험 용기에 대한 유효성을 평가할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81405d1dc18034a1bb3fd195",
+    "finding_text": "시험실 [별표 1] 7.1 개봉된 표준품의 사용기한을 타당한 근거에 기반하여 설정할 것",
+    "finding_text_ko": "[시험실] [별표 1] 7.1 개봉된 표준품(reference standard)의 사용기한을 타당한 근거에 기반하여 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81775eef605601b1971ca36d",
+    "finding_text": "제조 기타 [별표 1] 8.1 제조기록서는 공정별 작업 내용을 관리할 것",
+    "finding_text_ko": "[제조·기타] [별표 1] 8.1 제조기록서(batch record)는 공정별 작업 내용을 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81812360791ebba0569d15fc",
+    "finding_text": "시설 장비 기타 [별표1] 9.2 무균작업실 훈증 후 최악 위치의 소독제 잔류량을 검증할 것",
+    "finding_text_ko": "[시설장비·기타] [별표1] 9.2 무균작업실 훈증(fumigation) 후 최악 위치의 소독제 잔류량을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-81d4bba46dc2384f1b75c0a8",
+    "finding_text": "기타 [별표 1] 6.4 최악 조건을 고려하여 세척 밸리데이션을 실시할 것",
+    "finding_text_ko": "[기타] [별표 1] 6.4 최악 조건(worst case)을 고려하여 세척 밸리데이션(cleaning validation)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8238a0cffaec86fed3b4799f",
+    "finding_text": "시험실 기타 [별표1의2] 11.3 보관용 검체는 시판용 제품과 표시재료 를 포함하여 포장형태를 동일하게 관리 할 것",
+    "finding_text_ko": "[시험실·기타] [별표1의2] 11.3 보관용 검체는 표시재료를 포함하여 시판용 제품과 포장형태를 동일하게 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-82666abe7936331bb76d61d0",
+    "finding_text": "원자재 기타 [별표 1] 6.1 냉동 원료의 해동 및 재냉동과 관련한 안정성 등을 검증할 것",
+    "finding_text_ko": "[원자재·기타] [별표 1] 6.1 냉동 원료의 해동 및 재냉동과 관련한 안정성 등을 검증할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-84992ac22ff6be4acb756a08",
+    "finding_text": "기타 [별표 1] 8.1 작업소에서 사용하는 사진기에 대한 관리방법을 마련할 것",
+    "finding_text_ko": "[기타] [별표 1] 8.1 작업소에서 사용하는 사진기(카메라)에 대한 관리방법을 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-84f44c929bcd8b729bd92223",
+    "finding_text": "품질경영 중요 [별표 1] 5.2 모든 기록문서는 해당 제품의 유효 기한 또는 사용기한 경과 후 1년 간 보존할 것",
+    "finding_text_ko": "[품질경영·중요] [별표 1] 5.2 모든 기록문서는 해당 제품의 유효기한 또는 사용기한 경과 후 1년간 보존할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-85d9b7f5de97c81cb36a79c3",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 데이터 교환 후 전자데이터의 변경 여부를 확인할 것",
+    "finding_text_ko": "[시설장비·기타] [별표 1] 2.2 데이터 교환 후 전자데이터의 변경 여부를 확인할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-888cca234aaf78a961f30593",
+    "finding_text": "시험실 기타 [별표 1] 7.1 무균 원료에 대한 전 용기 확인시험 실시방안을 마련할 것",
+    "finding_text_ko": "[시험실·기타] [별표 1] 7.1 무균 원료에 대한 전(全) 용기 확인시험 실시방안을 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8a228c12e15505798a10ca80",
+    "finding_text": "시험실 중요 [별표 1] 6.2 품질에 큰 영향을 미치는 변경에 대해 공정 밸리데이션을 실시할 것",
+    "finding_text_ko": "[시험실·중요] [별표 1] 6.2 품질에 큰 영향을 미치는 변경에 대하여 공정 밸리데이션(process validation)을 실시할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8a91cec1d4613a74358b5a8a",
+    "finding_text": "시설장비 [별표 1] 2.2 정기적으로 백업 데이터의 복구 능력을 확인하고 점검할 것",
+    "finding_text_ko": "[시설장비] [별표 1] 2.2 백업 데이터의 복구 능력을 정기적으로 확인하고 점검할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b505396aed53c9dc56f045b",
+    "finding_text": "품질경영 기타 [별표 1] 3.1 제조관리자의 위임 불가능한 업무를 명시할 것",
+    "finding_text_ko": "[품질경영·기타] [별표 1] 3.1 제조관리자의 위임이 불가능한 업무를 명시할 것.",
+    "translation_method": "llm_assisted"
+  }
+]

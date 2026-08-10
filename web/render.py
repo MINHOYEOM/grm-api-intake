@@ -542,6 +542,24 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "intro": "미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요.",
      "desc": "FDA 의약품 GMP·품질 가이던스 문서 선별 목록 — 발행일·유형·공식 원문 링크.",
      "sort": "published_desc"},
+    # [자료실 배치 2026-08-11] 같은 관할은 붙여 둔다. 미국은 "가이던스(권고) → 21 CFR(법령)",
+    #   유럽은 "EudraLex Vol 4(기준서) → EMA(가이던스)" 로 이미 쌍을 이루고 있었는데, 신규
+    #   2종(cfr·mhra)을 registry 끝에 append 했더니 21 CFR 이 FDA 가이던스와 네 칸 떨어져
+    #   화면에서 "왜 FDA 자료가 두 군데냐"로 읽혔다(사용자 지적). 분리 자체는 유지한다 —
+    #   입도가 다르기 때문이다(가이던스 86건 = 문서 단위, 21 CFR 63건 = 조항 단위. 합치면
+    #   "FDA 149건"이 무엇을 센 숫자인지 알 수 없게 되고, findings 의 cfr_refs 가 조항으로
+    #   바로 갈 수 있는 조인 축도 사라진다). 배치와 상호 참조 문구로 관계를 밝힌다.
+    {"slug": "cfr", "short": "21 CFR", "file": "cfr.json", "unit": "개 조항", "kick": "US · 21 CFR",
+     "title": "미국 연방규정 21 CFR (GMP)",
+     "blurb": "미국 연방규정(CFR) 중 의약품 GMP 조항 원문. 가이드라인이 아니라 법령 그 자체 — Part 210(총칙)·Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 수록.",
+     "intro": "미국 연방규정집(Code of Federal Regulations) Title 21 가운데 의약품 현행 우수제조관리기준(CGMP)을 담은 Part 210(총칙)과 Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 정리했습니다. 자료실의 다른 컬렉션이 가이드라인·기준서인 것과 달리 이 컬렉션은 법적 구속력을 갖는 규정 원문 그 자체입니다. FDA가 권고 형태로 내는 문서는 바로 앞의 'FDA 가이던스 문서' 컬렉션에 있습니다. 각 조항은 공식 원문(eCFR)으로 바로 연결됩니다. 개정 이력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "미국 연방규정(21 CFR) Part 210(총칙)·Part 211(완제의약품 CGMP) 조항 목록 — 조번호·제목·공식 원문(eCFR) 링크.",
+     "public_base": "https://www.ecfr.gov/current/title-21",
+     "doc_type_labels": {"regulation-section": "규정 조항"},
+     "groups_by_url": [
+         {"contains": "/part-210/", "badge": "210", "label": "총칙", "label_en": "General Provisions"},
+         {"contains": "/part-211/", "badge": "211", "label": "완제의약품 CGMP", "label_en": "Finished Pharmaceuticals"},
+     ]},
     {"slug": "ema", "short": "EMA", "file": "ema.json", "unit": "건", "kick": "EMA · Guidance",
      "title": "EMA GMP·품질 가이드라인",
      "blurb": "유럽의약품청(EMA)이 공개한 GMP 관련 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록.",
@@ -552,6 +570,14 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "doc_type_labels": {"regulatory-procedural-guideline": "규제·절차 가이드라인",
                          "scientific-guideline": "과학 가이드라인",
                          "questions-and-answers": "질의응답(Q&A)"}},
+    {"slug": "mhra", "short": "MHRA", "file": "mhra.json", "unit": "건", "kick": "UK · MHRA",
+     "title": "MHRA GMP·GDP 가이던스",
+     "blurb": "영국 MHRA의 GMP·GDP 컴플라이언스 정보시트·실사 결함통계(2019년 이후 갱신 없음)·가이던스 문서 목록.",
+     "intro": "영국 의약품·의료제품규제청(MHRA)이 공개한 GMP·GDP 관련 문서를 정보시트·실사 결함통계·가이던스로 나누어 정리했습니다. 컴플라이언스 매니지먼트(Compliance Management)·규제조치(Regulatory Action) 절차를 설명하는 정보시트, 실사에서 반복 확인되는 결함 유형을 다룬 GMP 실사 결함통계, 실사 대응·분산형 제조 등 개별 주제를 다루는 가이던스·공지 문서를 포함합니다. GMP 실사 결함통계 시리즈는 2019년 자료 이후 갱신이 없습니다 — 오래된 통계이니 현재 실사 경향으로 그대로 참고하지 마세요. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
+     "desc": "MHRA(영국) GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록 — 제목·유형·공식 원문 링크.",
+     "doc_type_labels": {"information-sheet": "정보시트", "gmp-deficiency-statistics": "GMP 실사 결함통계",
+                         "detailed_guide": "가이던스", "notice": "공지",
+                         "transparency": "투명성 공개", "guidance": "가이던스 자료"}},
     {"slug": "health-canada", "short": "Health Canada", "file": "health_canada.json", "unit": "건",
      "kick": "Health Canada · GMP",
      "title": "Health Canada GMP 가이드",
@@ -573,25 +599,6 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
          {"doc_type": "annual-report", "label": "연차보고서", "label_en": "Annual Reports"},
      ],
      "doc_type_labels": {"inspection-observation": "실사 지적사례", "annual-report": "연차보고서"}},
-    {"slug": "cfr", "short": "21 CFR", "file": "cfr.json", "unit": "개 조항", "kick": "US · 21 CFR",
-     "title": "미국 연방규정 21 CFR (GMP)",
-     "blurb": "미국 연방규정(CFR) 중 의약품 GMP 조항 원문. 가이드라인이 아니라 법령 그 자체 — Part 210(총칙)·Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 수록.",
-     "intro": "미국 연방규정집(Code of Federal Regulations) Title 21 가운데 의약품 현행 우수제조관리기준(CGMP)을 담은 Part 210(총칙)과 Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 정리했습니다. 자료실의 다른 컬렉션이 가이드라인·기준서인 것과 달리 이 컬렉션은 법적 구속력을 갖는 규정 원문 그 자체입니다. 각 조항은 공식 원문(eCFR)으로 바로 연결됩니다. 개정 이력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "미국 연방규정(21 CFR) Part 210(총칙)·Part 211(완제의약품 CGMP) 조항 목록 — 조번호·제목·공식 원문(eCFR) 링크.",
-     "public_base": "https://www.ecfr.gov/current/title-21",
-     "doc_type_labels": {"regulation-section": "규정 조항"},
-     "groups_by_url": [
-         {"contains": "/part-210/", "badge": "210", "label": "총칙", "label_en": "General Provisions"},
-         {"contains": "/part-211/", "badge": "211", "label": "완제의약품 CGMP", "label_en": "Finished Pharmaceuticals"},
-     ]},
-    {"slug": "mhra", "short": "MHRA", "file": "mhra.json", "unit": "건", "kick": "UK · MHRA",
-     "title": "MHRA GMP·GDP 가이던스",
-     "blurb": "영국 MHRA의 GMP·GDP 컴플라이언스 정보시트·실사 결함통계(2019년 이후 갱신 없음)·가이던스 문서 목록.",
-     "intro": "영국 의약품·의료제품규제청(MHRA)이 공개한 GMP·GDP 관련 문서를 정보시트·실사 결함통계·가이던스로 나누어 정리했습니다. 컴플라이언스 매니지먼트(Compliance Management)·규제조치(Regulatory Action) 절차를 설명하는 정보시트, 실사에서 반복 확인되는 결함 유형을 다룬 GMP 실사 결함통계, 실사 대응·분산형 제조 등 개별 주제를 다루는 가이던스·공지 문서를 포함합니다. GMP 실사 결함통계 시리즈는 2019년 자료 이후 갱신이 없습니다 — 오래된 통계이니 현재 실사 경향으로 그대로 참고하지 마세요. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "MHRA(영국) GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록 — 제목·유형·공식 원문 링크.",
-     "doc_type_labels": {"information-sheet": "정보시트", "gmp-deficiency-statistics": "GMP 실사 결함통계",
-                         "detailed_guide": "가이던스", "notice": "공지",
-                         "transparency": "투명성 공개", "guidance": "가이던스 자료"}},
 ]
 
 

@@ -1417,11 +1417,15 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_dash_stat_blocks_replace_stat_chips(self):
         """[M14 §4] 대시보드 스탯 줄 → 스탯 블록(큰 숫자+라벨 가로 나열)으로 재작성됐다 —
         옛 총건수 span+칩(.fnd-dash-chip) 마크업은 제거되고, renderDashStats 가
-        전체→기관 순회→검토필요(>0) 순으로 블록을 만든다."""
+        문서→지적사항→기관 순회→검토필요(>0) 순으로 블록을 만든다.
+
+        (054 에서 순서가 전체→문서→기관 에서 바뀌고 "전체" 라벨이 "지적사항"이 됐다 —
+        단위 표기 계약 자체는 test_dash_stats_documents_first_and_findings_labeled 가
+        담당하고, 여기선 M14 의 블록 마크업 계약만 계속 고정한다.)"""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function renderDashStats(stats)", js_src)
         self.assertIn("function buildStatBlock(num, label, warn)", js_src)
-        self.assertIn('buildStatBlock(String(stats.total), "전체", false)', js_src)
+        self.assertIn('buildStatBlock(String(stats.total), "지적사항", false)', js_src)
         self.assertIn('buildStatBlock(String(a.count), a.agency, false)', js_src)
         self.assertIn('buildStatBlock(String(stats.needsReview), "검토 필요", true)', js_src)
         self.assertNotIn("fnd-dash-chip", js_src)
@@ -1992,18 +1996,69 @@ class WebFindingsRenderTest(unittest.TestCase):
     # 월·업체)를 통째로 반환하므로, 무필터일 때만 별도 findings_stats RPC 값을 조건부로
     # 끼워 넣거나 다음 청크를 미리 당겨올 필요가 없다(renderDash() 는 이제 인자도 없다).
 
-    def test_dash_stats_documents_and_agency_estimate_tooltip(self):
-        """[대시보드 실총수 M3] renderDashStats() 는 stats.documents 가 있을 때만 "문서"
-        스탯 카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), stats.agenciesExact
-        가 아니면 소스별 스탯 각각에 "로드된 데이터 기준" 툴팁을 달아 추정치임을 시각적으로
-        구분한다."""
+    def test_dash_stats_documents_first_and_findings_labeled(self):
+        """[문서 축 054] renderDashStats() 는 stats.documents 가 있을 때만 "문서" 스탯
+        카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), 그 **다음에** 총건수를
+        "지적사항" 라벨로 그린다.
+
+        ★순서와 라벨이 이 테스트의 본체다. 옛 화면은 [전체][문서][FDA]… 였는데 "전체"가
+        무엇의 전체인지 말하지 않아, 기관 숫자(지적사항)와 문서 숫자가 같은 줄에 단위 표시
+        없이 나란히 섰다. 문서당 지적 건수가 소스마다 6.01(483)~1.00(MFDS 회수)로 달라서
+        그 줄만 보면 편중이 실제의 두 배 넘게 보인다(지적사항 축 87:13 vs 문서 축 69:31)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDashStats(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
         self.assertIn('buildStatBlock(String(stats.documents), "문서", false)', fn)
-        self.assertIn("if (!stats.agenciesExact) {", fn)
-        self.assertIn('block.title = "현재 로드된 데이터 기준(참고용)";', fn)
+        self.assertIn('buildStatBlock(String(stats.total), "지적사항", false)', fn)
+        # 문서 블록이 총건수 블록보다 **앞**에 온다(라벨만 맞고 순서가 뒤집히면 무의미).
+        self.assertLess(
+            fn.index('String(stats.documents), "문서"'),
+            fn.index('String(stats.total), "지적사항"'),
+            "문서 스탯이 지적사항 스탯보다 앞에 와야 한다(기관 스탯의 기준선 역할)",
+        )
+        self.assertNotIn("agenciesExact", fn, "옛 추정치 툴팁 분기는 054 로 사라졌다")
+
+    def test_dash_agency_stats_declare_their_unit_in_tooltip(self):
+        """[문서 축 054] 기관 스탯은 문서 수로 그리되, 툴팁에 **두 축을 병기**한다 —
+        "FDA 가 왜 이렇게 큰가"의 답(문서당 지적 건수)이 화면에서 확인돼야 한다.
+
+        ★054 미적용 RPC(by_agency_docs 부재)면 지적사항 축으로 degrade 하는데, 그때도
+        툴팁이 단위를 밝힌다. 같은 자리에 조용히 다른 단위를 그리는 것이 이 결함의
+        본체였으므로, degrade 경로에 단위 표기가 없으면 결함이 그대로 남는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildAgencyStats()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('dashAxis("by_agency_docs")', fn)
+        self.assertIn('dashAxis("by_agency")', fn)
+        self.assertIn('unit: "documents"', fn)
+        self.assertIn('unit: "findings"', fn)
+        stats_fn = js_src[js_src.index("function renderDashStats(stats)"):]
+        stats_fn = stats_fn[:stats_fn.index("\n  }\n") + 4]
+        self.assertIn('if (a.unit === "documents") {', stats_fn)
+        self.assertIn("문서 기준 집계 미제공", stats_fn)
+
+    def test_dash_months_use_document_axis_with_unit_label(self):
+        """[문서 축 054] 월 추이는 '유입량' 지표라 문서가 자연 단위다 — 지적사항으로 세면
+        483 대량 백필이 몰린 달(2024년 한 해 832문서)이 다른 달을 전부 눌러버린다.
+        by_month_docs 를 정본으로 쓰고, 막대 툴팁 라벨에 단위를 적는다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('dashAxis("by_month_docs")', js_src)
+        self.assertIn('stats.monthsUnit = monthsDocs.length ? "documents" : "findings";', js_src)
+        fn = js_src[js_src.index("function renderDashMonths(stats)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('var monthUnit = stats.monthsUnit === "documents" ? "문서 " : "지적 ";', fn)
+        self.assertIn('x.month + " " + monthUnit + x.count + "건"', fn)
+
+    def test_dash_block_headings_declare_their_unit(self):
+        """[문서 축 054] 한 대시보드 안에 두 단위가 섞이는 건 피할 수 없다(카테고리는
+        지적사항이, 기관 비교는 문서가 자연 단위다). 섞이는 게 문제가 아니라 **어느 쪽인지
+        안 적는 것**이 문제였으므로, 세 블록 제목이 각자 단위를 밝힌다."""
+        html = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertIn('카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span>', html)
+        self.assertIn('월별 추이<span class="fnd-dash-unit">문서 기준</span>', html)
+        self.assertIn('업체 상위 5<span class="fnd-dash-unit">지적사항 기준</span>', html)
+        self.assertIn(".fnd-dash-unit{", html)
 
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
         """buildFacetSkeleton() 은 페이지 이동으로 청크가 추가 fetch 된 이후에도

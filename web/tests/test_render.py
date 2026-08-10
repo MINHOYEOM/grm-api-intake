@@ -227,6 +227,8 @@ SINGLE_GOLDENS = [
     ("library/ema/index.html", "library_ema.expected.html"),
     ("library/health-canada/index.html", "library_health_canada.expected.html"),
     ("library/pmda/index.html", "library_pmda.expected.html"),
+    ("library/cfr/index.html", "library_cfr.expected.html"),
+    ("library/mhra/index.html", "library_mhra.expected.html"),
     ("guide/index.html", "guide.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),

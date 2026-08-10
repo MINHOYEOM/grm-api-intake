@@ -1,0 +1,508 @@
+{
+  "items": [
+    {
+      "id": "cfr-210-1",
+      "code": "21 CFR 210.1",
+      "title_en": "Status of current good manufacturing practice regulations.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-210/section-210.1",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-210-2",
+      "code": "21 CFR 210.2",
+      "title_en": "Applicability of current good manufacturing practice regulations.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-210/section-210.2",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-210-3",
+      "code": "21 CFR 210.3",
+      "title_en": "Definitions.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-210/section-210.3",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-1",
+      "code": "21 CFR 211.1",
+      "title_en": "Scope.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.1",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-3",
+      "code": "21 CFR 211.3",
+      "title_en": "Definitions.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.3",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-22",
+      "code": "21 CFR 211.22",
+      "title_en": "Responsibilities of quality control unit.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.22",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-25",
+      "code": "21 CFR 211.25",
+      "title_en": "Personnel qualifications.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.25",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-28",
+      "code": "21 CFR 211.28",
+      "title_en": "Personnel responsibilities.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.28",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-34",
+      "code": "21 CFR 211.34",
+      "title_en": "Consultants.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.34",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-42",
+      "code": "21 CFR 211.42",
+      "title_en": "Design and construction features.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.42",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-44",
+      "code": "21 CFR 211.44",
+      "title_en": "Lighting.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.44",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-46",
+      "code": "21 CFR 211.46",
+      "title_en": "Ventilation, air filtration, air heating and cooling.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.46",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-48",
+      "code": "21 CFR 211.48",
+      "title_en": "Plumbing.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.48",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-50",
+      "code": "21 CFR 211.50",
+      "title_en": "Sewage and refuse.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.50",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-52",
+      "code": "21 CFR 211.52",
+      "title_en": "Washing and toilet facilities.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.52",
+      "published_date": "2025-05-28"
+    },
+    {
+      "id": "cfr-211-56",
+      "code": "21 CFR 211.56",
+      "title_en": "Sanitation.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.56",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-58",
+      "code": "21 CFR 211.58",
+      "title_en": "Maintenance.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.58",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-63",
+      "code": "21 CFR 211.63",
+      "title_en": "Equipment design, size, and location.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.63",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-65",
+      "code": "21 CFR 211.65",
+      "title_en": "Equipment construction.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.65",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-67",
+      "code": "21 CFR 211.67",
+      "title_en": "Equipment cleaning and maintenance.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.67",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-68",
+      "code": "21 CFR 211.68",
+      "title_en": "Automatic, mechanical, and electronic equipment.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.68",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-72",
+      "code": "21 CFR 211.72",
+      "title_en": "Filters.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.72",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-80",
+      "code": "21 CFR 211.80",
+      "title_en": "General requirements.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.80",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-82",
+      "code": "21 CFR 211.82",
+      "title_en": "Receipt and storage of untested components, drug product containers, and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.82",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-84",
+      "code": "21 CFR 211.84",
+      "title_en": "Testing and approval or rejection of components, drug product containers, and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.84",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-86",
+      "code": "21 CFR 211.86",
+      "title_en": "Use of approved components, drug product containers, and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.86",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-87",
+      "code": "21 CFR 211.87",
+      "title_en": "Retesting of approved components, drug product containers, and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.87",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-89",
+      "code": "21 CFR 211.89",
+      "title_en": "Rejected components, drug product containers, and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.89",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-94",
+      "code": "21 CFR 211.94",
+      "title_en": "Drug product containers and closures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.94",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-100",
+      "code": "21 CFR 211.100",
+      "title_en": "Written procedures; deviations.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.100",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-101",
+      "code": "21 CFR 211.101",
+      "title_en": "Charge-in of components.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.101",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-103",
+      "code": "21 CFR 211.103",
+      "title_en": "Calculation of yield.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.103",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-105",
+      "code": "21 CFR 211.105",
+      "title_en": "Equipment identification.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.105",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-110",
+      "code": "21 CFR 211.110",
+      "title_en": "Sampling and testing of in-process materials and drug products.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.110",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-111",
+      "code": "21 CFR 211.111",
+      "title_en": "Time limitations on production.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.111",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-113",
+      "code": "21 CFR 211.113",
+      "title_en": "Control of microbiological contamination.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.113",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-115",
+      "code": "21 CFR 211.115",
+      "title_en": "Reprocessing.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.115",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-122",
+      "code": "21 CFR 211.122",
+      "title_en": "Materials examination and usage criteria.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.122",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-125",
+      "code": "21 CFR 211.125",
+      "title_en": "Labeling issuance.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.125",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-130",
+      "code": "21 CFR 211.130",
+      "title_en": "Packaging and labeling operations.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.130",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-132",
+      "code": "21 CFR 211.132",
+      "title_en": "Tamper-evident packaging requirements for over-the-counter (OTC) human drug products.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.132",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-134",
+      "code": "21 CFR 211.134",
+      "title_en": "Drug product inspection.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.134",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-137",
+      "code": "21 CFR 211.137",
+      "title_en": "Expiration dating.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.137",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-142",
+      "code": "21 CFR 211.142",
+      "title_en": "Warehousing procedures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.142",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-150",
+      "code": "21 CFR 211.150",
+      "title_en": "Distribution procedures.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.150",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-160",
+      "code": "21 CFR 211.160",
+      "title_en": "General requirements.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.160",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-165",
+      "code": "21 CFR 211.165",
+      "title_en": "Testing and release for distribution.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.165",
+      "published_date": "2017-04-04"
+    },
+    {
+      "id": "cfr-211-166",
+      "code": "21 CFR 211.166",
+      "title_en": "Stability testing.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.166",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-167",
+      "code": "21 CFR 211.167",
+      "title_en": "Special testing requirements.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.167",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-170",
+      "code": "21 CFR 211.170",
+      "title_en": "Reserve samples.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.170",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-173",
+      "code": "21 CFR 211.173",
+      "title_en": "Laboratory animals.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.173",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-176",
+      "code": "21 CFR 211.176",
+      "title_en": "Penicillin contamination.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.176",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-180",
+      "code": "21 CFR 211.180",
+      "title_en": "General requirements.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.180",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-182",
+      "code": "21 CFR 211.182",
+      "title_en": "Equipment cleaning and use log.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.182",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-184",
+      "code": "21 CFR 211.184",
+      "title_en": "Component, drug product container, closure, and labeling records.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.184",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-186",
+      "code": "21 CFR 211.186",
+      "title_en": "Master production and control records.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.186",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-188",
+      "code": "21 CFR 211.188",
+      "title_en": "Batch production and control records.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.188",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-192",
+      "code": "21 CFR 211.192",
+      "title_en": "Production record review.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.192",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-194",
+      "code": "21 CFR 211.194",
+      "title_en": "Laboratory records.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.194",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-196",
+      "code": "21 CFR 211.196",
+      "title_en": "Distribution records.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.196",
+      "published_date": "2025-12-19"
+    },
+    {
+      "id": "cfr-211-198",
+      "code": "21 CFR 211.198",
+      "title_en": "Complaint files.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.198",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-204",
+      "code": "21 CFR 211.204",
+      "title_en": "Returned drug products.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.204",
+      "published_date": "2017-01-05"
+    },
+    {
+      "id": "cfr-211-208",
+      "code": "21 CFR 211.208",
+      "title_en": "Drug product salvaging.",
+      "doc_type": "regulation-section",
+      "official_url": "https://www.ecfr.gov/current/title-21/part-211/section-211.208",
+      "published_date": "2017-01-05"
+    }
+  ]
+}

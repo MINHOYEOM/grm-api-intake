@@ -1,0 +1,596 @@
+[
+  {
+    "finding_id": "finding-6eccecfac6b02f5cc3c99a16",
+    "finding_text": "① 임상시험계획 변경 보고 지연 ② 임상시험의 품질보증 및 임상시험자료의 품질관리 위반",
+    "finding_text_ko": "임상시험계획 변경 보고를 지연하였고, 임상시험의 품질보증 및 임상시험자료의 품질관리 규정을 위반하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f2a3ba4a2cd5c5c897b8e899",
+    "finding_text": "① 임상시험계획 변경 승인을 받지 않음 ② 임상시험계획 변경 보고를 하지 않음",
+    "finding_text_ko": "임상시험계획 변경에 대하여 승인을 받지 않았고, 임상시험계획 변경 보고도 하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a6b780be192e78c88176b15",
+    "finding_text": "셉타네스트주1/100,000: 첨부문서 누락(사용상의 주의사항 일부)에 따른 영업자 회수",
+    "finding_text_ko": "셉타네스트주1/100,000 제품에서 첨부문서 일부(사용상의 주의사항)가 누락되어 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb3273208760f76a38ce6905",
+    "finding_text": "During the inspection, multiple critical and major deficiencies were identified across the facility, particularly in areas directly associated with the aseptic manufacture of medicinal products. The nature and extent of these deficiencies demonstrate systemic weaknesses in contamination control, aseptic behaviour, equipment integrity, data governance, and quality control practices, which collectively pose a significant risk to the sterility, safety and overall quality of the products manufactured in Block A. Critical failures were observed in facility design and pressure cascade maintenance, including inadequate differential pressures between classified and non classified areas, reversed pressure gradients, and layout constraints that resulted in sterile API being exposed in Grade B. These issues undermine the fundamental environmental controls required for aseptic processing. Serious concerns were also identified regarding personnel behaviour and aseptic practices, with operators failing to comply with gowning requirements, aseptic discipline, RABS handling procedures, and environmental protection measures. Such behaviours directly compromise sterility assurance and indicate insufficient training and oversight. The inspection further revealed equipment in poor condition, including rusted pass box, unclean balance and step ladder, and the use of open containers for rejected materials and IPC samples within Grade B. These deficiencies represent unacceptable contamination risks within critical manufacturing areas. Significant weaknesses were found in the organisation and control of materials and GMP documentation, including the presence of operational documents, microbiology records, Petri dishes, and other materials stored in uncontrolled areas such as the expansion zone. The discovery of a deteriorated and unidentified gas cylinder connected to a pipeline used for aseptic filling further heightened concerns regarding uncontrolled substances potentially coming into contact with the product. Critical data integrity failures were identified, including missing records, inconsistent entries, unclear terminology, and analytical activities reported but not performed. These issues undermine the reliability of GMP documentation and raise concerns regarding the accuracy of batch release decisions. In the Quality Control laboratories, essential tests for APIs were not performed by the manufacturer, retention samples were improperly stored, finished product samples lacked proper identification, and sterility testing was conducted using unsuitable equipment. These deficiencies critically affect the validity of analytical results and the assurance of product quality. Major gaps were also identified in the Contamination Control Strategy (CCS), which was implemented late and failed to address several contamination risks, including API exposure in Grade B, environmental monitoring vulnerabilities, personnel limits, HEPA filter replacement rationale, and disinfectant approval. Finally, batch documentation lacked evidence of required sampling and incomplete line clearance verification, compromising batch traceability and readiness for aseptic operations.\n\nAction taken/proposed by the NCA: Others The Portuguese market is not impacted, as no medicinal products have been placed on the market by the manufacturer concerned, and alternative manufacturers with medicinal products containing the same active substance and strength are authorised in Portugal. It was decided that, for the manufacturer concerned, a Non-Compliance Report (NCR) was issued until all critical and major deficiencies have been adequately addressed and their implementation confirmed through a follow-up inspection.",
+    "finding_text_ko": "실사 기간 중 해당 시설 전반에서, 특히 의약품의 무균제조(aseptic manufacture)와 직접 관련된 영역에서 다수의 치명적(critical) 및 중대(major) 결함이 확인되었다. 이러한 결함의 성격과 범위는 오염관리, 무균 행위(aseptic behaviour), 설비 완전성, 데이터 거버넌스 및 품질관리 실무 전반의 시스템적 취약성을 보여주며, 이는 종합적으로 Block A에서 제조되는 제품의 무균성, 안전성 및 전반적 품질에 중대한 위험을 초래한다. 시설 설계 및 차압 체계(pressure cascade) 유지에서 치명적 결함이 관찰되었으며, 여기에는 청정등급 구역과 비청정등급 구역 간 차압 부족, 역전된 압력 구배, 그리고 무균 원료의약품(API)이 Grade B에서 노출되는 결과를 초래한 배치(layout) 제약이 포함된다. 이러한 문제는 무균공정(aseptic processing)에 요구되는 기본적인 환경관리를 저해한다. 작업자의 행위 및 무균 실무와 관련해서도 심각한 우려가 확인되었는데, 작업자들이 갱의(gowning) 요건, 무균 규율, RABS 취급 절차 및 환경 보호 조치를 준수하지 않았다. 이러한 행위는 무균성 보증을 직접적으로 훼손하며 교육훈련과 감독이 불충분함을 시사한다. 실사에서는 또한 녹슨 패스박스, 청결하지 않은 저울과 발판 사다리 등 상태가 불량한 설비와, Grade B 내에서 불합격 자재 및 IPC 검체에 개방형 용기를 사용하는 사례가 확인되었다. 이러한 결함은 중요 제조구역 내에서 허용될 수 없는 오염 위험에 해당한다. 자재 및 GMP 문서의 정리와 관리에서도 중대한 취약성이 발견되었으며, 여기에는 운영 문서, 미생물 기록, 페트리 접시 및 기타 자재가 증축구역(expansion zone) 등 관리되지 않는 구역에 보관되어 있던 사례가 포함된다. 무균 충전에 사용되는 배관에 연결된, 노후화되고 식별되지 않은 가스 실린더가 발견되어 관리되지 않는 물질이 제품과 접촉할 가능성에 대한 우려가 더욱 커졌다. 기록 누락, 일관성 없는 기재, 불명확한 용어 사용, 그리고 수행되지 않았음에도 보고된 분석 활동 등 치명적인 데이터 완전성(data integrity) 결함이 확인되었다. 이러한 문제는 GMP 문서의 신뢰성을 저해하고 배치 출하 결정의 정확성에 대한 우려를 야기한다. 품질관리 실험실에서는 원료의약품(API)에 대한 필수 시험이 제조업자에 의해 수행되지 않았고, 보관용 검체가 부적절하게 보관되었으며, 완제의약품 검체에 적절한 식별표시가 없었고, 무균시험이 부적합한 장비를 사용하여 수행되었다. 이러한 결함은 분석 결과의 타당성과 제품 품질 보증에 치명적인 영향을 미친다. 오염관리전략(CCS, Contamination Control Strategy)에서도 중대한 미비점이 확인되었는데, CCS는 뒤늦게 시행되었고 Grade B에서의 API 노출, 환경모니터링 취약성, 인원 제한, HEPA 필터 교체 근거, 소독제 승인 등 여러 오염 위험을 다루지 못하였다. 마지막으로, 배치 문서에는 요구되는 검체채취에 대한 증빙이 없고 라인 클리어런스(line clearance) 검증이 불완전하여 배치 추적성과 무균 작업 준비 상태가 훼손되었다.\n\nNCA가 취하였거나 제안한 조치: 기타. 해당 제조소가 시장에 출시한 의약품이 없고, 동일한 유효성분 및 함량을 함유한 의약품을 보유한 대체 제조소가 포르투갈에서 허가되어 있으므로 포르투갈 시장에는 영향이 없다. 해당 제조소에 대해서는 모든 치명적 및 중대 결함이 적절히 조치되고 그 이행이 후속 실사를 통해 확인될 때까지 비준수 보고서(NCR, Non-Compliance Report)를 발행하기로 결정되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f8affbe02de1dbc4243cb30",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(discrepancy)에 대한 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a42c6714874dc9019db64680",
+    "finding_text": "○ 품질부적합: 회분, 산불용성회분",
+    "finding_text_ko": "품질부적합 항목은 회분 및 산불용성회분이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b203f8d7688397d4d2dc5b65",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b232a56b13b5008509f49a0f",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, sampling plans and test procedures designed to assure that components, drug product containers, closures, in-process materials and drug products conform to appropriate sta...",
+    "finding_text_ko": "실험실 관리(laboratory controls)에, 구성품·의약품 용기·마개·공정 중 물질 및 완제의약품이 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 규격, 검체채취 계획 및 시험 절차의 수립이 포함되어 있지 않다...",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b69d45fa84a48dc727fa72b5",
+    "finding_text": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하는 동일성(identity), 함량, 순도 및 품질을 보증하기 위한 제조 및 공정관리 관련 문서화된 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b70490b6e206824b0059445e",
+    "finding_text": "Your firm failed to exercise sufficient controls over computerized systems to prevent unauthorized access or changes to data and failure to have adequate controls to prevent omission of data.",
+    "finding_text_ko": "귀사는 데이터에 대한 무단 접근 또는 변경을 방지하기 위한 전산화 시스템 관리를 충분히 수행하지 않았으며, 데이터 누락을 방지하기 위한 적절한 관리도 갖추지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c03f239660ead37f507967aa",
+    "finding_text": "The quality control unit lacks the responsibility and authority to approve and reject all components.",
+    "finding_text_ko": "품질관리부서(quality control unit)에 모든 구성품을 승인하거나 불합격 처리할 책임과 권한이 부여되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c55d104f6faf956e61c6b75a",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 제조·관리기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f87bb49193b1da0b435efe0",
+    "finding_text": "Investigations of an unexplained discrepancy did not extend to other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "설명되지 않는 불일치에 대한 조사가 해당 부적합 또는 불일치와 관련되었을 수 있는 다른 의약품까지 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-caaef70b2fb7496a6893bd5f",
+    "finding_text": "Your quality unit failed to review all critical deviations or non-conformances and related investigations for all API products.",
+    "finding_text_ko": "귀사의 품질부서는 모든 원료의약품(API) 제품에 대한 중요 일탈(deviation) 또는 부적합과 관련 조사 내용을 전부 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d936f56460ad8874ce32bb82",
+    "finding_text": "Failure to have adequate written procedures for the sampling of raw materials.",
+    "finding_text_ko": "원자재 검체채취에 대한 적절한 문서화된 절차를 갖추지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd0dd51014b27e317043dc15",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "실험실 기록에 설정된 규격 및 기준의 준수를 보증하는 데 필요한 모든 시험·검사 및 정량시험에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e15c8e4bb06fb05cec62267c",
+    "finding_text": "Your firm failed to thoroughly investigate critical deviations and/or the failure(s) of a batch to meet specifications.",
+    "finding_text_ko": "귀사는 중요 일탈 및/또는 배치의 규격 부적합에 대하여 철저히 조사하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ef46da3b9b4151225313cb1b",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1ac761132530882d30d2890",
+    "finding_text": "Aseptic processing areas are deficient in that floors and walls are not smooth and/or hard surfaces that are easily cleanable.",
+    "finding_text_ko": "무균공정(aseptic) 구역의 바닥과 벽이 평활하지 않거나 세척이 용이한 단단한 표면으로 되어 있지 않아 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ceabb3833258e0c57eb9d71",
+    "finding_text": "Failure to properly maintain buildings and facilities used in the manufacture of API.",
+    "finding_text_ko": "원료의약품(API) 제조에 사용되는 건물 및 시설을 적절히 유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b5816455937757eafeee9129",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 배치 또는 그 구성품이 규격에 적합하지 않은 사항에 대한 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-85d6f0b7c6e6574de09fa71c",
+    "finding_text": "Failure to follow and document laboratory controls at the time of performance and failure to document and explain any departures from laboratory procedures.",
+    "finding_text_ko": "실험실 관리를 수행 시점에 준수하고 문서화하지 않았으며, 실험실 절차에서 벗어난 사항을 문서화하고 설명하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-020c5c2186ce4ea0de6ae189",
+    "finding_text": "Employees engaged in the manufacture and processing of a drug product lack the training and experience required to perform their assigned functions.",
+    "finding_text_ko": "의약품 제조 및 가공에 종사하는 직원이 담당 업무를 수행하는 데 필요한 교육훈련과 경험을 갖추지 못하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0506a8c9d3b258640e3fb93b",
+    "finding_text": "Your quality unit failed to perform one of it's core responsibilities to ensure that critical deviations are investigated and resolved.",
+    "finding_text_ko": "귀사의 품질부서는 중요 일탈이 조사되고 해결되도록 보증하는 핵심 책무 중 하나를 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1de2e9936037b63040533488",
+    "finding_text": "Your production areas fail to provide adequate washing facilities for personnel.",
+    "finding_text_ko": "귀사의 제조구역은 작업자를 위한 적절한 세척시설을 갖추고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-238e0f44faa93a0dc5223512",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도에 맞게 작업이 원활히 이루어지도록 하는 적절한 설계로 되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2624810f130257461ca787b4",
+    "finding_text": "Changes to written procedures are not reviewed and approved by the quality control unit.",
+    "finding_text_ko": "문서화된 절차의 변경사항이 품질관리부서의 검토 및 승인을 거치지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-394c6e3d7384dd644b3f7442",
+    "finding_text": "The establishment of test procedures and laboratory control mechanisms including any changes thereto, are not drafted by the appropriate organizational unit and reviewed and approved by the quality control unit.",
+    "finding_text_ko": "시험 절차 및 실험실 관리체계의 수립과 그 변경사항이 적절한 조직 단위에 의해 작성되고 품질관리부서의 검토·승인을 거치지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4548a64bd55e7b5da8d47386",
+    "finding_text": "In-process materials are not tested for quality and approved or rejected by the quality control unit during the production process.",
+    "finding_text_ko": "공정 중 물질(in-process materials)이 제조 공정 중 품질에 대해 시험되고 품질관리부서에 의해 승인 또는 불합격 처리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4aef1711ecdce31eb526f8e0",
+    "finding_text": "Your firm failed to use validated and stability-indicating test procedures.",
+    "finding_text_ko": "귀사는 밸리데이션되고 안정성 지시성(stability-indicating)을 갖춘 시험 절차를 사용하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5eae4868b802126cb34c93f2",
+    "finding_text": "The written stability program for drug products does not include reliable, meaningful and specific test methods.",
+    "finding_text_ko": "의약품에 대한 문서화된 안정성시험 프로그램에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64049cade4698a2a2e60bfdf",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-70ae7ea8b43578015f61cf4e",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 제조·관리기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7cf7bd6d10f63bf183aff481",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the sterilization process.",
+    "finding_text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 멸균공정에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-82bbe044903729dbc1effc73",
+    "finding_text": "Procedures describing the handling of written and oral complaints related to drug products are not written or followed.",
+    "finding_text_ko": "의약품과 관련된 서면 및 구두 불만(complaint)의 처리를 규정한 절차가 문서화되어 있지 않거나 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8336f50e91c4cee8eab93be3",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에 의약품이 동일성(identity), 함량, 품질 및 순도의 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8bbd8d4276953cd406e6deba",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic) 구역의 환경조건 모니터링 체계가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f68b1790ed6627480f3dd19e",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(discrepancy)에 대한 철저한 검토가 이루어지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7fd5abfc11a4d9ea84d3ddca",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "실험실 관리에 의약품이 동일성(identity), 함량, 품질 및 순도의 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-194c974b984823adba33c583",
+    "finding_text": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-297a5712ff2d781cf4c40122",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하는 동일성(identity), 함량, 순도 및 품질을 보증하기 위한 제조 및 공정관리 관련 적절한 문서화된 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a98af78dda07138dba2da13",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리부서에 적용되는 책임사항과 절차가 완전히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1fe68d5c528cd4490827a3d",
+    "finding_text": "시설장비 기타 [별표 1] 제9호 노출된 제조공정에 대한 마스크 착용 기준 및 작업자 위생관리 기준을 명확히 할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9호에 따라 노출된 제조공정에 대한 마스크 착용 기준과 작업자 위생관리 기준을 명확히 하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6583ce2036d027dd3ff771f0",
+    "finding_text": "제조 기타 [별표 1] 제4.3호 다목 원료약품 등의 보관장소 및 방법을 기준서에 반영할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제4.3호 다목에 따라 원료약품 등의 보관장소 및 보관방법을 기준서에 반영하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fc41fa5683051c0faf5b796e",
+    "finding_text": "시설장비 기타 [별표 1] 제9.2호 마목 방충·방서 점검 결과에 따른 조치사항을 확인할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.2호 마목에 따라 방충·방서 점검 결과에 따른 조치사항을 확인하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb9aa4f8910a9c7580d1aa2e",
+    "finding_text": "시설장비 기타 [별표 1] 제9.3호 나목 세척한 제조설비는 다음 사용 시까지 오염되지 않도록 관리할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.3호 나목에 따라 세척한 제조설비가 다음 사용 시까지 오염되지 않도록 관리하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eeb37adcdf68c743038315a3",
+    "finding_text": "품질 기타 [별표 1] 제3.3호 하목 주성분 공급업체 평가방법을 타당하게 마련할 것",
+    "finding_text_ko": "품질 분야 기타 지적사항으로, [별표 1] 제3.3호 하목에 따라 주성분 공급업체 평가방법을 타당하게 마련하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc895fc738706a9acf1a46e6",
+    "finding_text": "제조 기타 [별표 1] 제6.5호 제조지원설비 적격성 평가 시 범위 설정 등 기준을 수립할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제6.5호에 따라 제조지원설비 적격성 평가 시 범위 설정 등의 기준을 수립하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c11ec4d45d2b911a7c23887e",
+    "finding_text": "제조 기타 [별표 1] 제6.4호 캠페인 생산에 대한 세척 유효성을 검증할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제6.4호에 따라 캠페인 생산에 대한 세척 유효성을 검증하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b319504055654bf47731f643",
+    "finding_text": "제조 기타 [별표 1] 제6.6호 컴퓨터시스템을 정기적으로 평가할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제6.6호에 따라 컴퓨터시스템을 정기적으로 평가하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b14ac1ea246ea168d0b67eb0",
+    "finding_text": "시설장비 기타 [별표 1] 제2.1호 제품의 교차오염 방지를 위한 제조시설을 운영할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.1호에 따라 제품의 교차오염 방지를 위한 제조시설을 운영하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8bace3b4209b33c43fa7ced9",
+    "finding_text": "시설장비 기타 [별표 1] 제2.1호 아목 설비(계측기)의 교정 관리 절차, 재적격성 평가 주기 설정 타당성을 마련할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.1호 아목에 따라 설비(계측기)의 교정 관리 절차와 재적격성 평가 주기 설정의 타당성을 마련하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-60ca4462fefae13e15c28211",
+    "finding_text": "시설장비 기타 [별표 1] 제2.3호 나목 다른 청정구역 간 오염되지 않도록 차압을 확인할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.3호 나목에 따라 서로 다른 청정구역 간에 오염되지 않도록 차압을 확인하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-348ffd6e0f63d98ee1bdfb39",
+    "finding_text": "제조 기타 [별표 1] 제8.1호 가목 제조기록서는 설비 정보, 공정 중 시험(근거), 원약분량 산출 근거 등을 포함하여 작성할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제8.1호 가목에 따라 제조기록서를 설비 정보, 공정 중 시험(근거), 원약분량 산출 근거 등을 포함하여 작성하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-386afd5b0eda6bdb29640e2e",
+    "finding_text": "제조 기타 [별표 1] 제4.3호 나목 시설 및 기기에 대한 정기적인 점검방법 등을 마련할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제4.3호 나목에 따라 시설 및 기기에 대한 정기적인 점검방법 등을 마련하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-374ab602577eae245f627f4a",
+    "finding_text": "시설장비 기타 [별표 1] 제9.2호 가목 작업소 청소는 청소 방법 및 주기, 확인 방법에 따라 실시할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.2호 가목에 따라 작업소 청소를 청소 방법 및 주기, 확인 방법에 따라 실시하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c5bb66cb65667482c103dd2",
+    "finding_text": "제조 기타 [별표 1] 제6.1호 나목 밸리데이션 규정을 반영하고, 밸리데이션을 실시할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제6.1호 나목에 따라 밸리데이션 규정을 반영하고 밸리데이션을 실시하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-246403d478ec0fb0b7b98df7",
+    "finding_text": "시설장비 기타 [별표 1] 제9.2호 라목 제조구역은 제품 품질에 영향을 미칠 수 있는 행위를 하지 않을 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.2호 라목에 따라 제조구역에서 제품 품질에 영향을 미칠 수 있는 행위를 하지 않도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-22906c77a95ff0e9e2ba1771",
+    "finding_text": "시설장비 기타 [별표 1] 제9.3호 다목 제조설비 세척 시 사용한 세척제, 세척기록 등을 작성할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.3호 다목에 따라 제조설비 세척 시 사용한 세척제와 세척기록 등을 작성하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1aec8e1e7e6da9314c276e6e",
+    "finding_text": "시설장비 기타 [별표 1] 제2.3호 기준서에 따른 압축공기 결과를 경향 분석할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.3호에 따라 기준서에 따른 압축공기 결과를 경향 분석하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-199a8ea9bd37152ab80eb883",
+    "finding_text": "제조 기타 [별표 1] 제4.3호 가목 제조관리 기준서에 실제 칭량 방법 등을 포함할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제4.3호 가목에 따라 제조관리 기준서에 실제 칭량 방법 등을 포함하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0538ee00540d1efeb5a30209",
+    "finding_text": "품질 기타 [별표 1] 제14호 나목 작업원이 맡은 업무를 수행할 수 있도록 교육 연간계획을 수립하여 실시할 것",
+    "finding_text_ko": "품질 분야 기타 지적사항으로, [별표 1] 제14호 나목에 따라 작업원이 맡은 업무를 수행할 수 있도록 교육 연간계획을 수립하여 실시하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5154246868895fd66e802dc0",
+    "finding_text": "품질 기타 [별표 1] 제7.3호 나목 평가결과에 따른 편향 조사 후 필요한 조치를 마련할 것",
+    "finding_text_ko": "품질 분야 기타 지적사항으로, [별표 1] 제7.3호 나목에 따라 평가결과에 따른 편향 조사 후 필요한 조치를 마련하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ce51bf0bdacd7c44bb25471a",
+    "finding_text": "현진몰약: 회분, 산불용성회분",
+    "finding_text_ko": "현진몰약 제품의 해당 항목은 회분 및 산불용성회분이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11764d78f354dbc167347c7e",
+    "finding_text": "나음당귀: 중금속(카드뮴)",
+    "finding_text_ko": "나음당귀 제품의 해당 항목은 중금속(카드뮴)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4bb7183de6210d396805823f",
+    "finding_text": "현진종대황: 회분",
+    "finding_text_ko": "현진종대황 제품의 해당 항목은 회분이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6295a8adb43e6797e9eb2c79",
+    "finding_text": "대성메디칼 탈지면: 사용기한 표기 오기재",
+    "finding_text_ko": "대성메디칼 탈지면 제품에서 사용기한 표기가 잘못 기재되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c084fe133f60dbcf5c5f909a",
+    "finding_text": "비에녹스주(클로스트리디움보툴리눔독소A형)(수출용): 국가출하승인없이 수출전용 의약품을 국내에 판매",
+    "finding_text_ko": "비에녹스주(클로스트리디움보툴리눔독소A형)(수출용) 제품을 국가출하승인 없이 수출전용 의약품으로서 국내에 판매하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f9d2545ed3a5f5f96c128692",
+    "finding_text": "판이실캡슐: 안정성시험 부적합(성상)에 따른 영업자 회수",
+    "finding_text_ko": "판이실캡슐 제품에서 안정성시험 결과 성상 항목이 부적합하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e3ea81dd82c125e8422f0a16",
+    "finding_text": "제조 기타 [별표 1] 제6.6호 컴퓨터시스템 밸리데이션 대상의 성능 검증을 타당하게 수행할 필요",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제6.6호에 따라 컴퓨터시스템 밸리데이션 대상의 성능 검증을 타당하게 수행할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c34249c1f1e21fa865148cf4",
+    "finding_text": "기타 [별표 1] 제3.4호 GMP 위원회 임시회의 소집 절차의 수립·관리 명확화 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.4호에 따라 GMP 위원회 임시회의 소집 절차의 수립·관리를 명확히 할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a3d33ba68db16620ed8f47f5",
+    "finding_text": "품질경영 기타 [별표 1] 제3.1호 다목 데이터 완전성 전담 조직 구성에 대한 업무분장 마련 미흡",
+    "finding_text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제3.1호 다목에 따른 데이터 완전성 전담 조직 구성에 대한 업무분장 마련이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91b700a26cd02de849e628cb",
+    "finding_text": "기타 [별표 1] 제3.2호 나목 제조 관련 일탈 건에 대한 일탈처리 절차 재검토 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.2호 나목에 따라 제조 관련 일탈(deviation) 건에 대한 일탈처리 절차를 재검토할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8a2bb3ea53dd3ed371d37afc",
+    "finding_text": "품질경영 기타 [별표 1] 제3.1호 다목 데이터완전성 담당자에 대한 업무분장 범위 문서화 미흡",
+    "finding_text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제3.1호 다목에 따른 데이터완전성 담당자에 대한 업무분장 범위 문서화가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-91322ec87af7098a5d3eb803",
+    "finding_text": "시설장비 기타 [별표 1] 제2.3호 나목 청정실, 청정공기장치의 재적격성평가 관련, ‘의약품 제조 및 품질관리에 관한 규정’ 개정사항 기준서 반영 필요",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.3호 나목과 관련하여 청정실 및 청정공기장치의 재적격성평가에 대해 '의약품 제조 및 품질관리에 관한 규정' 개정사항을 기준서에 반영할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-83138d3f1c71128fa183cc60",
+    "finding_text": "시설장비 기타 [별표 1] 제2.1호 다목 제조용수 제조장치 관리 사항 기록 관리 미흡 및 용수관리 기준서 현행화 필요",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.1호 다목에 따른 제조용수 제조장치 관리 사항의 기록 관리가 미흡하며, 용수관리 기준서를 현행화할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5fa2720c7142b2e3dd44a2ec",
+    "finding_text": "기타 [별표 1] 제12호 변경관리 건에 대한 종합적인 계획, 결과 기록 미흡",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제12호에 따른 변경관리 건에 대한 종합적인 계획 및 결과 기록이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-481a44e290edfe90c09ac75a",
+    "finding_text": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시험실 중요 [별표1] 제7.1호 ① 배지성능시험 관련 기준서 미준수 ② 배지 품질관리시 공 정서 일부 시험항목 미 실시 및 배지의 적합성 판정 보완완료 시설장비 기타 [별표1] 제2.3호 환경모니터링 관리기준 미흡 보완완료 제조 [별표1] 제6.4호 이송튜빙의 세척밸리 데이션 미흡 보완완료 시험실 [별표1] 제7.1호 배지성능시험 관련 문서별 시험조건 상이 보완완료 - 2 - 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서 발급함 의약품안전관리과",
+    "finding_text_ko": "평가 결과 확인된 지적(보완)사항은 다음과 같다. 시험실 분야에서는 [별표1] 제7.1호와 관련하여 '중요' 등급으로 ① 배지성능시험 관련 기준서 미준수, ② 배지 품질관리 시 공정서 일부 시험항목 미실시 및 배지의 적합성 판정에 관한 사항이 지적되었으며 보완완료되었다. 시설장비 분야에서는 [별표1] 제2.3호와 관련하여 '기타' 등급으로 환경모니터링 관리기준 미흡이 지적되어 보완완료되었다. 제조 분야에서는 [별표1] 제6.4호와 관련하여 이송튜빙의 세척밸리데이션 미흡이 지적되어 보완완료되었다. 시험실 분야에서는 [별표1] 제7.1호와 관련하여 배지성능시험 관련 문서별 시험조건 상이가 지적되어 보완완료되었다. 주석은 다음과 같다. 1) GMP 감시 분야(6개)는 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시이다. 2) 구분은 PIC/S 정의에 따라 중대, 중요, 기타로 작성한다. 3) 지적사항 중 '중대·중요' 건은 행정처분을 부과하고, '기타' 건은 시정·보완하도록 한다. 행정처분 부과가 확정되면 '의약품안전나라 행정처분정보'를 통해 공개된다. '중대·중요' 지적사항은 보완 완료 후, '기타' 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서를 발급한다. (의약품안전관리과)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43f76daf251f0fb446154e35",
+    "finding_text": "기타 [별표 1] 제9.3호 다목 칭량스쿠프 관련 세척 여부, 세척 유효기한 확인 방안 마련 미흡",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제9.3호 다목에 따른 칭량스쿠프의 세척 여부 및 세척 유효기한 확인 방안 마련이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2131b009c3517f7aeec02070",
+    "finding_text": "기타 [별표 1] 제3.3호 하목 주성분 제조업체 평가 수행자의 자격 요건 등을 상세히 마련하여 기준서 반영 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.3호 하목에 따라 주성분 제조업체 평가 수행자의 자격 요건 등을 상세히 마련하여 기준서에 반영할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-838bb84af84e628fde8f288d",
+    "finding_text": "시험실 기타 [별표 1] 6.1호 운송검증 시 운송 과정 영향성을 고려하여 평가할 것",
+    "finding_text_ko": "시험실 분야 기타 지적사항으로, [별표 1] 6.1호에 따라 운송검증 시 운송 과정의 영향성을 고려하여 평가하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a098da43a353d6f5f08ca2bf",
+    "finding_text": "시설장비 기타 [별표 1의2] 제4호 보관소 온습도 모니터링을 적절히 수행할 것",
+    "finding_text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1의2] 제4호에 따라 보관소 온습도 모니터링을 적절히 수행하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc05cbf0bb61479133744005",
+    "finding_text": "쿠파린정5밀리그램(와파린나트륨): 안정성 시험 부적합(용출)에 따른 영업자 회수",
+    "finding_text_ko": "쿠파린정5밀리그램(와파린나트륨) 제품에서 안정성 시험 결과 용출 항목이 부적합하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d4254b746a693d161aec0f81",
+    "finding_text": "제조 기타 [별표 1의2] 제12호 제조장비 세척 후 유지 시간을 적절히 검증할 것",
+    "finding_text_ko": "제조 분야 기타 지적사항으로, [별표 1의2] 제12호에 따라 제조장비 세척 후 유지 시간을 적절히 검증하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f1028a65d5d3fac9bbb9b923",
+    "finding_text": "로디엔티정40/5밀리그램(텔미사르탄, 에스암로디핀니코틴산염): 불순물(N-nitroso-meglumine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "로디엔티정40/5밀리그램(텔미사르탄, 에스암로디핀니코틴산염) 제품에서 불순물(N-nitroso-meglumine)이 초과 검출될 우려가 있어, 사전예방적 조치로 시중 유통품에 대한 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9fdba39ed9cc47b887b7a9f0",
+    "finding_text": "펠라스시럽(펠라고니움시도이데스11%에탄올추출물(1→8~10)ㆍ글리세린혼합액(8:2)): 품질부적합 우려(용기불량, 성상이상)에 따른 영업자 회수",
+    "finding_text_ko": "펠라스시럽(펠라고니움시도이데스11%에탄올추출물(1→8~10)ㆍ글리세린혼합액(8:2)) 제품에서 용기불량 및 성상이상에 따른 품질부적합 우려가 있어 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dbd50dd37ec752644e813b1f",
+    "finding_text": "허가관리 -* [별표 1] 제7.1호 원자재 시험 판정 기준을 적절히 설정할 것",
+    "finding_text_ko": "허가관리 분야 지적사항으로, [별표 1] 제7.1호에 따라 원자재 시험 판정 기준을 적절히 설정하도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4215b59ec7b2a67cbb3c7e7",
+    "finding_text": "허가관리 -* [별표 1] 제1호 원자재 관련 허가(신고)사항을 해외제조소와 일치시킬 것",
+    "finding_text_ko": "허가관리 분야 지적사항으로, [별표 1] 제1호에 따라 원자재 관련 허가(신고)사항을 해외제조소와 일치시키도록 요구되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-861cadff2623fe7a7f43c372",
+    "finding_text": "이코사연질캡슐300밀리그램(이코사펜트산에틸): 성상 이상에 따른 영업자 회수",
+    "finding_text_ko": "이코사연질캡슐300밀리그램(이코사펜트산에틸) 제품에서 성상 이상이 발생하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b3b6fd108764eb371c67017f",
+    "finding_text": "펠라고시럽(펠라고니움시도이데스11%에탄올추출물(1→8~10)·글리세린혼합액(8:2)): 품질부적합 우려(용기불량, 성상이상)에 따른 영업자 회수",
+    "finding_text_ko": "펠라고시럽(펠라고니움시도이데스11%에탄올추출물(1→8~10)·글리세린혼합액(8:2)) 제품에서 용기불량 및 성상이상에 따른 품질부적합 우려가 있어 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0358a15fc7b9a1ca5e4b3edb",
+    "finding_text": "기타 [별표 1] 제14호 나목 무균작업자 및 이물검사자의 교육 및 적격성평가에 관한 사항을 자사 기준서에 상세히 반영 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제14호 나목에 따라 무균작업자 및 이물검사자의 교육 및 적격성평가에 관한 사항을 자사 기준서에 상세히 반영할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17e572a39f5244780f7f87fb",
+    "finding_text": "기타 [별표 1] 제7.3호 가목 제품품질평가 항목에 제품에 사용된 포장자재 및 출발물질 검토, 제조지원설비 적격성평가 상태 등 포함 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제7.3호 가목에 따라 제품품질평가 항목에 제품에 사용된 포장자재 및 출발물질 검토, 제조지원설비 적격성평가 상태 등을 포함할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-21119f1c950db89ea6a49760",
+    "finding_text": "기타 [별표 1] 제3.3호 다목 시판 후 안정성시험 일부 성적서의 품질부서책임자 승인 미흡",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.3호 다목과 관련하여 시판 후 안정성시험 일부 성적서에 대한 품질부서책임자의 승인이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38e7aed0990453a38e546b3e",
+    "finding_text": "기타 [별표 1] 제3.3호 하목 자사 기준서에 시험 수탁자 평가방법, 원자재 공급업체 평가 및 관리방법을 명확히 반영 필요",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제3.3호 하목에 따라 자사 기준서에 시험 수탁자 평가방법과 원자재 공급업체 평가 및 관리방법을 명확히 반영할 필요가 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4150195f4460ac57c444d899",
+    "finding_text": "테이코신주(테이코플라닌): 시판후 안정성 시험에서 부적합(수분 시험 기준 초과)에 따른 영업자 회수",
+    "finding_text_ko": "테이코신주(테이코플라닌) 제품에서 시판 후 안정성 시험 결과 수분 시험이 기준을 초과하여 부적합하였고, 이에 따라 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4879ded0ab33b6c72d5fc62f",
+    "finding_text": "품질경영 기타 [별표 1] 제1.2호 의약품품질시스템 하에서의 오염관리전략 수립 미흡",
+    "finding_text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제1.2호에 따른 의약품품질시스템 하에서의 오염관리전략 수립이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b870a7872d6b5535eae54767",
+    "finding_text": "기타 [별표 1] 제12호 변경관리 건에 대한 변경시점, 변경등급 설정, 검토항목의 타당성 미흡",
+    "finding_text_ko": "기타 지적사항으로, [별표 1] 제12호에 따른 변경관리 건에 대한 변경시점, 변경등급 설정 및 검토항목의 타당성이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b350c23bb6e5389e3182d4bb",
+    "finding_text": "로바티탄정20/80밀리그램: 시판 후 안정성시험 일부 항목 기준 초과 및 사전예방적 조치에 따른 영업자 회수",
+    "finding_text_ko": "로바티탄정20/80밀리그램 제품에서 시판 후 안정성시험 일부 항목이 기준을 초과하였고, 사전예방적 조치에 따라 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4684294533e7166169b6544",
+    "finding_text": "로바티탄정10/160밀리그램: 시판 후 안정성시험 일부 항목 기준 초과 및 사전예방적 조치에 따른 영업자 회수",
+    "finding_text_ko": "로바티탄정10/160밀리그램 제품에서 시판 후 안정성시험 일부 항목이 기준을 초과하였고, 사전예방적 조치에 따라 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  }
+]

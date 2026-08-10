@@ -275,6 +275,7 @@ def inject_deep_analysis(brief: dict[str, Any],
         # 통째로 버려졌고 그대로 두면 `render.validate_483_observations` 가 발행을 막았다.
         _merge_observation_translations(card, payload.get("observations_ko"), report, doc_id)
         _merge_ncr_translations(card, payload.get("ncr_ko"), report, doc_id)
+        _merge_wl_violation_translations(card, payload.get("violations_ko"), report, doc_id)
         if "deep_analysis" not in payload:
             continue          # 결정론 재추출·번역 전용 항목(정상) — 심층분석 없음
         if "deep_analysis" not in card:
@@ -333,6 +334,47 @@ def _merge_observation_translations(card: dict[str, Any], obs_ko: Any,
             f"observations_ko[{doc_id!r}]: 관찰 국문 번역 {merged}건 병합(원문+국문 병기)")
 
 
+def _merge_wl_violation_translations(card: dict[str, Any], viol_ko: Any,
+                                     report: InjectionReport, doc_id: str) -> None:
+    """[WL 위반항목 국문 병기 2026-08-10] Warning Letter 조항별 위반 표제의 국문 번역을
+    deterministic_detail.violations 에 **번호(number)로 매칭** 병합(statement_ko).
+
+    왜 이제야 생겼나 — `statement_ko` 는 2026-07-20 블록 신설 때부터 스캐폴드
+    (`card_scaffold._detail_wl_violations`: "있을 때만 보존")와 렌더 템플릿
+    (`web/partials/card.html`: 있으면 원문→국문 병기)에 **양쪽 다 준비돼 있었는데, 그 값을
+    채워 넣는 층이 어디에도 없었다.** 그래서 WL 위반항목 상세는 도입 이래 줄곧 영문 단독으로
+    나갔다(07-20·07-27·08-10 발행본 전부 키 `{number, statement, citation}` 뿐 — 2026-08-10
+    사용자가 프리뷰에서 지적). 483 은 `render.validate_483_observations` 가 fail-closed 라
+    누락이 곧 발행 실패로 시끄럽게 드러나지만, WL 은 템플릿이 영문으로 **조용히 degrade** 해서
+    아무도 못 봤다 — 같은 결손인데 한쪽만 소리가 났다([[grm-absence-vocabulary-root-cause]] 계열).
+
+    `_merge_observation_translations` 와 **동형**이다: 결정론 English 표제(수집기 산출)는 그대로
+    두고 국문만 additive 로 얹는다. 번호가 안 맞거나 위반 블록이 없으면 조용히 건너뛴다(비차단).
+    조립 순서상 `_refresh_wl_violations`(원문 재추출로 블록을 통째 재생성) **뒤**에 이 병합이
+    돌아야 한다 — 앞이면 재생성이 국문을 지운다. 현재 assemble 호출 순서가 그 조건을 만족한다.
+    """
+    if not isinstance(viol_ko, list) or not viol_ko:
+        return
+    dd = card.get("deterministic_detail")
+    if not (isinstance(dd, dict) and dd.get("type") == "wl_violations"):
+        return
+    by_num = {str(v.get("number")): v for v in dd.get("violations", [])
+              if isinstance(v, dict)}
+    merged = 0
+    for t in viol_ko:
+        if not isinstance(t, dict):
+            continue
+        viol = by_num.get(str(t.get("number")))
+        if viol is None:
+            continue
+        if t.get("statement_ko"):
+            viol["statement_ko"] = str(t["statement_ko"])
+            merged += 1
+    if merged:
+        report.warnings.append(
+            f"violations_ko[{doc_id!r}]: WL 위반항목 국문 번역 {merged}건 병합(원문+국문 병기)")
+
+
 # EU/MHRA GMP NCR 상세 블록에서 국문 병기 대상이 되는 필드(원문 키 → 국문 키).
 _NCR_KO_FIELDS = ("nature", "action", "operations", "additional")
 _NCR_DETAIL_TYPES = ("eu_gmp_ncr_statement", "mhra_gmp_ncr_statement")
@@ -342,9 +384,13 @@ def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
                             report: InjectionReport, doc_id: str) -> None:
     """[NCR 국문 병기 2026-07-27] EU/MHRA GMP 비준수(NCR) 상세 전문의 국문 번역 병합.
 
-    왜 필요한가 — 이 블록은 도입 이래 EudraGMDP/MHRA **원문 영문만** 렌더했다. 483·WL 에는
-    `deficiency_ko`/`statement_ko` 병기가 있는데 NCR 만 빠져 있어서, 한국어 이용자가 정작
-    비준수의 **내용**(Nature)과 **당국 조치**(Action)를 읽을 수 없었다(2026-07-27 사용자 지적).
+    왜 필요한가 — 이 블록은 도입 이래 EudraGMDP/MHRA **원문 영문만** 렌더했다. 483 에는
+    `deficiency_ko` 병기가 있는데 NCR 만 빠져 있어서, 한국어 이용자가 정작 비준수의
+    **내용**(Nature)과 **당국 조치**(Action)를 읽을 수 없었다(2026-07-27 사용자 지적).
+
+    ⚠️ 종전 이 주석은 "483·WL 에는 병기가 있는데"라고 적었으나 **WL 은 사실이 아니었다** —
+    `statement_ko` 는 슬롯만 있고 채우는 층이 없었다(2026-08-10 확인). 준비된 슬롯을 보고
+    "배선돼 있다"고 읽은 착각이라 기록해 둔다. 지금은 `_merge_wl_violation_translations` 가 있다.
 
     `ncr_ko` = {"nature_ko": str, "action_ko": str, "operations_ko": str, "additional_ko": str}
     (전부 선택 — 있는 키만 병합). 결정론 영문 원문은 그대로 두고 국문만 additive 로 얹는다.

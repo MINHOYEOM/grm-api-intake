@@ -1,31 +1,27 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-08-02",
+  "generated_on": "2026-08-10",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 81,
-      "candidate_count": 88,
-      "new_count": 7,
+      "baseline_count": 88,
+      "candidate_count": 91,
+      "new_count": 3,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0010-15259",
-        "data0010-15260",
-        "data0010-15261",
-        "data0011-15895",
-        "data0011-15898",
-        "data0011-15899",
-        "data0013-33722"
+        "data0010-15264",
+        "data0010-15270",
+        "data0011-15901"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 50,
-      "derived_items": 37,
-      "dropped_items": 13,
+      "collector_items": 49,
+      "derived_items": 39,
+      "dropped_items": 10,
       "collector_error": null,
-      "change_count": 7,
-      "change_percent": 8.64
+      "change_count": 3,
+      "change_percent": 3.41
     },
     "ich": {
       "baseline_count": 31,
@@ -76,22 +72,20 @@
       "change_percent": 0.0
     },
     "fda_guidance": {
-      "baseline_count": 85,
+      "baseline_count": 86,
       "candidate_count": 86,
-      "new_count": 1,
+      "new_count": 0,
       "changed_count": 0,
       "removed_count": 0,
-      "new_ids": [
-        "fda-b5f522b7f1df"
-      ],
+      "new_ids": [],
       "changed_ids": [],
       "removed_ids": [],
       "collector_items": 86,
       "derived_items": 86,
       "dropped_items": 0,
       "collector_error": null,
-      "change_count": 1,
-      "change_percent": 1.18
+      "change_count": 0,
+      "change_percent": 0.0
     },
     "health_canada": {
       "baseline_count": 26,
@@ -110,22 +104,20 @@
       "change_percent": 0.0
     },
     "pics": {
-      "baseline_count": 46,
+      "baseline_count": 47,
       "candidate_count": 47,
-      "new_count": 1,
+      "new_count": 0,
       "changed_count": 0,
       "removed_count": 0,
-      "new_ids": [
-        "pics-pi-006-4"
-      ],
+      "new_ids": [],
       "changed_ids": [],
       "removed_ids": [],
       "collector_items": 47,
       "derived_items": 47,
       "dropped_items": 0,
       "collector_error": null,
-      "change_count": 1,
-      "change_percent": 2.17
+      "change_count": 0,
+      "change_percent": 0.0
     },
     "pmda": {
       "baseline_count": 15,

@@ -131,31 +131,35 @@ class FindingsExporterTest(unittest.TestCase):
         data = _load_fixture("findings_m1f_source_coverage_export.json")
         result = exporter.export_from_input(data, include_findings=True)
 
+        # [WHOPIR 추출기 제거 2026-08-10] WHO 2건은 **둘 다** findings 0건이다 — WHOPIR 은
+        # 지적을 싣지 않는 문서라 excerpt 가 있어도 지적으로 세지 않는다(사유는
+        # findings_extractors 의 `_from_whopir` 제거 주석). 종전 기대값은 excerpt 1건을
+        # needs_review finding 으로 세고 있었다: findings 6→5, 무-findings 1→2.
         report = result["report"]
         self.assertEqual(report["exported"], 5)
-        self.assertEqual(report["findings_exported"], 6)
-        self.assertEqual(len(report["raw_signals_without_findings"]), 1)
+        self.assertEqual(report["findings_exported"], 5)
         self.assertEqual(
-            report["raw_signals_without_findings"][0]["row_key"],
-            "WHO::who-whopir-link-only",
+            [entry["row_key"] for entry in report["raw_signals_without_findings"]],
+            ["WHO::who-whopir-2026-11-ex", "WHO::who-whopir-link-only"],
         )
 
         coverage = report["coverage"]
         self.assertEqual(coverage["raw_signals_total"], 5)
-        self.assertEqual(coverage["raw_signals_with_findings"], 4)
-        self.assertEqual(coverage["raw_signals_without_findings"], 1)
-        self.assertEqual(coverage["findings_total"], 6)
+        self.assertEqual(coverage["raw_signals_with_findings"], 3)
+        self.assertEqual(coverage["raw_signals_without_findings"], 2)
+        self.assertEqual(coverage["findings_total"], 5)
         self.assertEqual(
             coverage["raw_signals_by_source"],
             {"FDA 483": 1, "FDA Warning Letter": 1, "MFDS": 1, "WHO": 2},
         )
+        # WHO 는 raw_signals 에는 남고(카드·검색은 계속 이 소스를 보여준다) findings 에만 없다.
         self.assertEqual(
             coverage["findings_by_source"],
-            {"FDA 483": 1, "FDA Warning Letter": 1, "MFDS": 3, "WHO": 1},
+            {"FDA 483": 1, "FDA Warning Letter": 1, "MFDS": 3},
         )
-        self.assertEqual(coverage["findings_by_agency"], {"FDA": 2, "MFDS": 3, "WHO": 1})
-        self.assertEqual(coverage["findings_by_review_status"], {"accepted": 4, "needs_review": 2})
-        self.assertEqual(coverage["findings_by_evidence_level"], {"A": 4, "B": 2})
+        self.assertEqual(coverage["findings_by_agency"], {"FDA": 2, "MFDS": 3})
+        self.assertEqual(coverage["findings_by_review_status"], {"accepted": 4, "needs_review": 1})
+        self.assertEqual(coverage["findings_by_evidence_level"], {"A": 4, "B": 1})
         # v3 taxonomy: same 211.100(a)-style "written procedures for production and
         # process controls" fixture text as test_findings_extractors' WL case now
         # classifies as process_validation, not documentation_records (see
@@ -164,7 +168,7 @@ class FindingsExporterTest(unittest.TestCase):
             coverage["findings_by_category_code"],
             {
                 "contamination_control": 1,
-                "deviation_capa": 2,
+                "deviation_capa": 1,      # WHOPIR excerpt 가 빠지며 2→1
                 "process_validation": 1,
                 "material_supplier_control": 1,
                 "validation_qualification": 1,

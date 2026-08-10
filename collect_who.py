@@ -15,7 +15,8 @@ ENABLE_WHO=true 또는 --sources who 일 때 collect_intake.main() 에서 호출
 설계 역할:
   - RSS 는 날짜 기반 윈도우 수집(다른 RSS 소스와 동일).
   - WHOPIR/NOC 는 목록 스냅샷 + URL 기반 dedup → 새 보고서/공지가 새 후보로 표면화.
-    날짜를 단언하기 어려우면 date_iso="" (Run Date 기준 intake).
+    WHOPIR 의 date_iso 는 **실사 시작일**(목록의 inspection-dates 필드)이다 — WHO 는
+    보고서 게시일을 싣지 않는다. 날짜를 단언하기 어려우면 date_iso=""(Run Date 기준 intake).
   - official_url 은 항상 WHO 공식 PDF/페이지.
   - 핵심 목록 페이지가 0건이면 침묵하지 않고 error(구조 변경/렌더 변경 = 수동 확인).
 
@@ -110,7 +111,9 @@ _MONTHS = {m.lower(): i for i, m in enumerate(
     ["January", "February", "March", "April", "May", "June", "July",
      "August", "September", "October", "November", "December"], start=1)}
 
-_DATE_DMY_RE = re.compile(r"\b(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})\b")
+# "26 January, 2026" 처럼 월-연 사이 콤마가 들어가는 Drupal 렌더가 있어 콤마를 허용한다
+# (NOC 의 "(09 October 2020)" 는 그대로 매칭 — 상위집합 확장이라 기존 동작 불변).
+_DATE_DMY_RE = re.compile(r"\b(\d{1,2})\s+([A-Za-z]+),?\s+(\d{4})\b")
 _DATE_MY_RE = re.compile(r"\b([A-Za-z]+)\s+(\d{4})\b")
 
 
@@ -171,6 +174,156 @@ def _parse_text_date(text: str) -> str:
             except ValueError:
                 pass
     return ""
+
+
+# ── [WHOPIR 실사일 결손 수리 2026-08-10] ────────────────────────────────────
+# 종전 `date_iso=_parse_text_date(text)` 는 **시도는 있으나 대상이 틀린** 코드였다.
+# WHO Drupal 티저의 `<a>` 앵커 텍스트는 제조소명 한 줄뿐이고(실측 168행 전건 — 날짜가
+# 들어간 앵커는 0건), 날짜는 앵커 **바깥 형제 필드**
+# `field--name-field-whopir-inspection-dates` 안의 `<time datetime="…">`(시작·종료 2개)에 있다.
+# 그래서 WHOPIR 은 늘 date_iso="" 였고, 이 결손은 카드의 날짜 행에서 끝나지 않았다 —
+# `grm_findings.RAW_SIGNAL_REQUIRED_FIELDS` 가 `published_date` 를 요구해 raw_signals
+# **POST 자체가 발생하지 않았다**(WHO raw_signals 0건). 경보는 WARN 한 줄뿐이라 오래 살았다.
+# 그래서 여기서는 값만 고치지 않고 ①미추출 카운터(LAST_HEALTH["whopir_dates"])
+# ②전건 미추출 sentinel(= 마크업 변경 신호)까지 같이 둔다.
+#
+# 값의 의미는 **실사일**이지 보고서 게시일이 아니다(WHO 는 게시일을 목록에 싣지 않는다).
+# 카드 라벨은 `card_scaffold` 의 `SourceSpec.date_label` 로 "실사일"로 부른다.
+_WHOPIR_DATES_FIELD = "field--name-field-whopir-inspection-dates"
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# 유니코드 하이픈 계열(en/em-dash·minus) → ASCII '-'. 실측 표기가 섞여 있다("18 – 22 March 2024").
+_DASH_MAP = {ord(c): "-" for c in "‐‑‒–—―−"}
+# 범위 표기의 **앞머리**가 시작일이다. 두 형태를 구분해서 본다:
+#   · 일(day)만 앞선 형태  — "26 - 28 January 2026" / "From 7 to 11 April 2025"
+#   · 일+월이 앞선 형태    — "28 January - 2 February 2026"(달 넘김)
+_RANGE_HEAD_DAY_RE = re.compile(r"(\d{1,2})\s*(?:-|to|through|until)\s*$", re.I)
+_RANGE_HEAD_DM_RE = re.compile(r"(\d{1,2})\s+([A-Za-z]+),?\s*(?:-|to|through|until)\s*$", re.I)
+
+
+def _is_whopir_pdf(href: str) -> bool:
+    """WHOPIR 보고서 PDF 링크 판정.
+
+    C3-b: ".pdf?download=1"/"#…" 꼬리가 붙어도 PDF — path 만 검사한다(endswith 는 탈락시킴).
+    """
+    return "/whopir_files/" in (href or "").lower() and \
+        urlsplit(href or "").path.lower().endswith(".pdf")
+
+
+def _iso_or_empty(year: int, month: int, day: int) -> str:
+    """달력에 없는 조합(2월 30일 등)은 날조 대신 ""(호출부가 다음 후보로 넘어간다)."""
+    try:
+        return date(year, month, day).isoformat()
+    except ValueError:
+        return ""
+
+
+def _parse_inspection_dates_text(text: str) -> str:
+    """실사일 표기(범위 포함) → **시작일** ISO. 못 읽으면 ""(빈 값 = 미확인, 추정 금지).
+
+    `<time datetime>` 이 사라지는 마크업 드리프트용 폴백이자, 텍스트로만 실사일을 싣는
+    다른 경로(PDF 표지의 `Dates of inspection` 등)와 형태를 공유한다. 실측·채록된 형태:
+      · "26 - 28 January 2026"              (일 범위 + 월/연은 뒤에 한 번)
+      · "From 7 to 11 April 2025"           (전치사형)
+      · "15-17 July 2024 Bioanalytical site" (뒤에 꼬리말이 붙음)
+      · "18 – 22 March 2024"                (en-dash)
+      · "26 January, 2026 - 28 January, 2026" (Drupal 렌더 — 양끝 모두 완전한 날짜)
+      · "22 June, 2025"                     (단일일)
+      · "28 January - 2 February 2026"      (달 넘김 — 앞머리에 월이 있다)
+    """
+    s = _clean(text).translate(_DASH_MAP)
+    if not s:
+        return ""
+    for m in _DATE_DMY_RE.finditer(s):
+        month = _MONTHS.get(m.group(2).lower())
+        if not month:
+            continue                      # "15 Bioanalytical 2024" 류 우연 일치 배제
+        year, day, pre = int(m.group(3)), int(m.group(1)), s[:m.start()]
+        head_dm = _RANGE_HEAD_DM_RE.search(pre)
+        if head_dm:
+            head_month = _MONTHS.get(head_dm.group(2).lower())
+            head_day = int(head_dm.group(1))
+            if head_month:
+                # 달 넘김 범위는 시작이 종료보다 앞서야 한다 — "28 December - 3 January 2026"
+                # 의 시작은 전년도다(연도는 뒤쪽에만 적히므로 여기서 되돌린다).
+                head_year = year - 1 if (head_month, head_day) > (month, day) else year
+                iso = _iso_or_empty(head_year, head_month, head_day)
+                if iso:
+                    return iso
+        head_day_only = _RANGE_HEAD_DAY_RE.search(pre)
+        if head_day_only:
+            iso = _iso_or_empty(year, month, int(head_day_only.group(1)))
+            if iso:
+                return iso
+        iso = _iso_or_empty(year, month, day)
+        if iso:
+            return iso
+    return _parse_text_date(s)             # "January 2026" 처럼 일이 없는 표기까지 최후 폴백
+
+
+class _WhopirRowParser(HTMLParser):
+    """WHOPIR 목록 티저에서 [PDF 링크 → 실사일] 짝을 만든다(행 경계 = `<article>`).
+
+    앵커 텍스트만 보는 `_LinkParser` 로는 못 잡는다 — 날짜가 앵커 **형제 요소**에 있다.
+    1순위는 `<time datetime="2026-01-26T12:00:00Z">` 의 기계값(표시 텍스트 형식이 어떻게
+    바뀌든 안전하다). 그 속성이 사라지는 드리프트를 대비해 표시 텍스트도 함께 넘겨
+    호출부가 `_parse_inspection_dates_text` 로 폴백할 수 있게 한다.
+
+    현재 마크업은 [링크 → 날짜 필드] 순서지만 pending 을 두어 순서가 뒤집혀도 같은
+    `<article>` 안이면 짝지어진다 — 마크업 순서에 의존하지 않기 위해서다.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.rows: dict[str, tuple[str, str]] = {}   # href → (시작일 ISO, 표기 원문)
+        self._href = ""
+        self._depth = 0                              # 날짜 필드 div 중첩 깊이(0 = 필드 밖)
+        self._isos: list[str] = []
+        self._texts: list[str] = []
+        self._pending: tuple[str, str] | None = None
+
+    def handle_starttag(self, tag, attrs):
+        attr = dict(attrs)
+        if self._depth:
+            if tag == "time":
+                self._isos.append(str(attr.get("datetime") or "")[:10])
+            elif tag == "div":
+                self._depth += 1
+            return
+        if tag == "article":
+            self._href, self._pending = "", None      # 행 경계 — 앞 행 상태를 물려주지 않는다
+        elif tag == "a":
+            href = str(attr.get("href") or "").strip()
+            if _is_whopir_pdf(href):
+                self._href = href
+                if self._pending is not None:
+                    self.rows.setdefault(href, self._pending)
+                    self._pending = None
+        elif tag == "div" and _WHOPIR_DATES_FIELD in str(attr.get("class") or ""):
+            self._depth, self._isos, self._texts = 1, [], []
+
+    def handle_endtag(self, tag):
+        if not self._depth or tag != "div":
+            return
+        self._depth -= 1
+        if self._depth:
+            return
+        isos = sorted(i for i in self._isos if _ISO_DATE_RE.match(i))
+        value = (isos[0] if isos else "", _clean(" ".join(self._texts)))
+        if self._href:
+            self.rows.setdefault(self._href, value)
+        else:
+            self._pending = value
+
+    def handle_data(self, data):
+        if self._depth and data.strip():
+            self._texts.append(data.strip())
+
+
+def _whopir_row_dates(html_text: str) -> dict[str, tuple[str, str]]:
+    """목록 HTML → {PDF href: (실사 시작일 ISO, 실사일 표기 원문)}. 못 읽은 행은 키 부재."""
+    p = _WhopirRowParser()
+    p.feed(html_text)
+    return p.rows
 
 
 def _get_html(url: str, *, timeout: int = 30) -> str:
@@ -533,7 +686,9 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
         "structured": 0, "capped": False, "warnings": [],
     }
     global LAST_HEALTH
-    LAST_HEALTH = {"whopir_excerpt": health}
+    # 통째로 갈아끼우지 않는다 — `_collect_whopir` 가 넣어둔 다른 관측(whopir_dates)이
+    # 이 단계에서 사라지면 읽는 시점에 따라 계기가 조용히 비는 계열의 결함이 된다.
+    LAST_HEALTH = {**LAST_HEALTH, "whopir_excerpt": health}
     if not enabled:
         return health
     for item in items:
@@ -572,6 +727,7 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
 def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     items: list[IntakeItem] = []
     seen: set[str] = set()
+    dateless: list[str] = []               # 실사일 미추출 항목(침묵 금지 — 아래 health/sentinel)
     excerpt_enabled = _whopir_excerpt_enabled()
     excerpt_health: dict[str, Any] = {
         "enabled": excerpt_enabled, "attempted": 0, "ok": 0, "failed": 0,
@@ -587,12 +743,10 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 log("WARN", f"WHOPIR page={page} 실패(부분 수집 유지): {e}")
                 break
             return [], f"WHO WHOPIR 수집 실패: {e}"
-        # C3-b: ".pdf?download=1"/"#…" 꼬리가 붙어도 PDF — path 만 검사(endswith 는 탈락시킴).
-        page_links = [(h, t) for h, t in _links(html_text)
-                      if "/whopir_files/" in h.lower()
-                      and urlsplit(h).path.lower().endswith(".pdf")]
+        page_links = [(h, t) for h, t in _links(html_text) if _is_whopir_pdf(h)]
         if not page_links:
             break  # 더 이상 보고서 없음 → 페이지네이션 종료
+        row_dates = _whopir_row_dates(html_text)      # href → (실사 시작일, 표기 원문)
         new_on_page = 0
         for href, text in page_links:
             abs_url = urljoin(WHOPIR_MED_URL, href)   # 상대경로 → 절대 URL (Notion URL 속성 요건)
@@ -601,14 +755,26 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
             seen.add(abs_url)
             new_on_page += 1
             manuf = _clean(text) or abs_url.rsplit("/", 1)[-1]
+            # 실사일: ①행의 <time datetime> ②같은 필드의 표시 텍스트 ③앵커 텍스트(구 경로)
+            # 순으로 좁혀 내려간다. 전부 실패하면 ""(추정 금지) — 아래 dateless 로 집계된다.
+            date_iso, dates_text = row_dates.get(href, ("", ""))
+            if not date_iso:
+                date_iso = (_parse_inspection_dates_text(dates_text)
+                            or _parse_inspection_dates_text(text))
             raw_payload: dict[str, Any] = {
                 "channel": "whopir", "anchor_text": _clean(text),
                 "pdf_url": abs_url, "list_page": url,
             }
+            if dates_text:
+                # 카드에는 시작일만 싣지만(날짜 행은 단일 값), 원문 표기는 범위다 —
+                # 무엇을 읽어 그 값을 냈는지 남긴다(사후 대조용 provenance).
+                raw_payload["inspection_dates"] = dates_text
+            if not date_iso:
+                dateless.append(abs_url)
             items.append(IntakeItem(
                 source=SOURCE_WHO,
                 document_id="who-whopir-" + hashlib.sha1(abs_url.encode()).hexdigest()[:12],
-                date_iso=_parse_text_date(text),   # 본문에 날짜 있으면 사용, 없으면 ""(Run Date)
+                date_iso=date_iso,                 # = 실사 시작일(WHO 는 게시일을 싣지 않는다)
                 headline=f"[WHOPIR] {manuf}"[:MAX_TITLE_CHARS],
                 official_url=abs_url,              # WHO 공식 PDF (per-item, 절대 URL)
                 type_or_class=TYPE_WHO_INSPECTION,
@@ -631,10 +797,25 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
         # for-else: break 없이 WHOPIR_MAX_PAGES 소진 = cap 도달(이후 페이지 누락 가능)
         log("WARN", f"WHO WHOPIR 페이지 cap({WHOPIR_MAX_PAGES}) 도달 — 이후 보고서 누락 가능")
     global LAST_HEALTH
-    LAST_HEALTH = {"whopir_excerpt": excerpt_health}
+    dates_health = {
+        "total": len(items), "dated": len(items) - len(dateless),
+        "dateless": len(dateless), "samples": dateless[:3],
+    }
+    LAST_HEALTH = {"whopir_excerpt": excerpt_health, "whopir_dates": dates_health}
     if not items:
         return [], f"WHO WHOPIR 0건({WHOPIR_MED_URL}) — 구조/렌더 변경 의심(수동 확인 필요)"
-    log("INFO", f"WHO WHOPIR 완료: {len(items)}건")
+    if dateless:
+        # 부분 결손은 항목을 살린다(카드는 날짜 행이 "미확인"으로 나간다). 다만 그 항목은
+        # published_date 결측이라 findings raw_signals 가 만들어지지 않으므로 조용히 두지 않는다.
+        log("WARN", f"WHOPIR 실사일 미추출 {len(dateless)}/{len(items)}건 — 카드 날짜는 미확인, "
+                    f"raw_signals 미생성: {', '.join(dateless[:3])}")
+    if len(dateless) == len(items):
+        # 전건 미추출 = 값의 문제가 아니라 목록 마크업이 바뀐 것(실측 168행 전건에 날짜 있음).
+        # 종전엔 이 상태가 곧 "WHO raw_signals 0건"이었는데 아무 신호도 없었다 → error 로 올린다.
+        # 항목은 함께 돌려보내 링크 카드로는 살린다(수집 전체를 잃지 않는다).
+        return items, (f"WHO WHOPIR 실사일 전건 미추출({len(items)}건, {WHOPIR_MED_URL}) "
+                       f"— 목록 마크업 변경 의심(수동 확인 필요)")
+    log("INFO", f"WHO WHOPIR 완료: {len(items)}건(실사일 {dates_health['dated']}건)")
     return items, None
 
 

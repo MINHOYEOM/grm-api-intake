@@ -172,6 +172,9 @@ class SourceSpec:
       section               — 섹션 override. "" 면 source 기본(MFDS→domestic·else global).
                               str 또는 callable(row)->str(ich=consultation 판정용).
       deep_body_key         — deep_analysis fan-out 활성 raw 키("" 면 비대상).
+      date_label            — W2 첫 행(`row["date"]`)의 라벨. 기본 "발행일". 원천이 게시일이
+                              아닌 소스만 바꾼다(who-inspection=실사일 — WHO 목록은 게시일을
+                              싣지 않고 실사일만 준다. 같은 값을 "발행일"로 부르면 오보다).
     callable 필드(모두 순수·결정론)
       quote(raw)->str                 — W3 인용 소스(§12C). None → "".
       extra_rows(row,raw)->list[(l,v)] — W2 유형별 사실 행(발행일·문서번호 이후). None → 기본행.
@@ -186,6 +189,7 @@ class SourceSpec:
     normative: bool = False
     section: str | Callable[[dict[str, Any]], str] = ""
     deep_body_key: str = ""
+    date_label: str = "발행일"
     quote: Callable[[dict[str, Any]], str] | None = None
     extra_rows: Callable[[dict[str, Any], dict[str, Any]], list[tuple[str, str]]] | None = None
     official: Callable[[dict[str, Any], dict[str, Any]], tuple[str, bool]] | None = None
@@ -1225,13 +1229,18 @@ def _w2_extra_default(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[st
 
 
 def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list[tuple[str, str]]:
-    """W2 사실표(§3·§12B·§13.1-3): 발행일·문서번호 + 유형별 행(≤5). `SourceSpec.extra_rows` 디스패치."""
+    """W2 사실표(§3·§12B·§13.1-3): 날짜·문서번호 + 유형별 행(≤5). `SourceSpec.extra_rows` 디스패치.
+
+    첫 행 라벨은 `SourceSpec.date_label`(기본 "발행일"). 수집기가 게시일을 못 얻고 실사일만
+    싣는 소스(who-inspection)는 그 이름 그대로 부른다 — 값은 같아도 라벨이 틀리면 오보다.
+    """
     raw = raw or {}
+    spec = _spec(kind)
     rows: list[tuple[str, str]] = [
-        ("발행일", row.get("date", "") or VALUE_UNKNOWN),
+        (spec.date_label, row.get("date", "") or VALUE_UNKNOWN),
         ("문서번호", _doc_number(kind, row)),
     ]
-    rows += (_spec(kind).extra_rows or _w2_extra_default)(row, raw)
+    rows += (spec.extra_rows or _w2_extra_default)(row, raw)
     return rows[:5]
 
 
@@ -1295,6 +1304,8 @@ _REGISTRY: dict[str, SourceSpec] = {
         "🟧", "WHO", "WHO", normative=True, extra_rows=_w2_extra_who),
     "who-inspection": SourceSpec(
         "🟧", "WHO", "WHO", normative=True,
+        # WHOPIR 목록이 주는 날짜는 실사일뿐이다(게시일 미공개) → 라벨도 실사일.
+        date_label="실사일",
         extra_rows=_w2_extra_who, official=_official_who_inspection,
         detail=_detail_whopir_report),
     "who-news": SourceSpec(

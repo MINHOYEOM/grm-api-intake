@@ -666,5 +666,126 @@ class WhopirEnrichAfterDedupTest(unittest.TestCase):
         self.assertEqual(calls, [])
 
 
+# ── [WHOPIR 실사일 2026-08-10] ───────────────────────────────────────────────
+# 종전 `_parse_text_date(앵커 텍스트)` 는 대상이 틀려 늘 ""를 냈다(→ published_date 결측
+# → raw_signals POST 자체가 안 일어남). 아래 fixture 의 마크업은 2026-08-10 라이브
+# 목록에서 채록한 형태다(THEME DEBUG 주석·중첩 field div 포함).
+def _whopir_teaser(href: str, title: str, dates_html: str) -> str:
+    """라이브 티저 1행 축약 — <a> 는 제조소명만, 날짜는 앵커 **바깥 형제 필드**."""
+    return (
+        '<div class="views-row"><article data-history-node-id="37454" '
+        'class="node node--type-whopir node--view-mode-teaser">'
+        '<div class="node__content"><div class="file-teaser">'
+        f'<a href="{href}"><span class="field field--name-title '
+        f'field--label-hidden">{title}</span></a>'
+        '<div class="field field--name-field-whopir-inspection-dates '
+        f'field--type-daterange field--label-hidden field__item">{dates_html}</div>'
+        '<div class="country-city">China</div>'
+        '</div></div></article></div>'
+    )
+
+
+_WHOPIR_TIME_ROW = _whopir_teaser(
+    "/prequal/sites/default/files/whopir_files/I-05281-WHOPIR-Keming.pdf",
+    "Zhejiang Keming Biopharmaceuticals",
+    '<time datetime="2026-01-26T12:00:00Z" class="datetime">26  January,  2026</time>'
+    ' - <time datetime="2026-01-28T12:00:00Z" class="datetime">28  January,  2026</time>',
+)
+
+
+class WhopirInspectionDateTextTest(unittest.TestCase):
+    """_parse_inspection_dates_text — 관측된 표기 전 형태에서 **시작일**을 낸다."""
+
+    def test_observed_range_formats_yield_start_date(self) -> None:
+        cases = {
+            "26 - 28 January 2026": "2026-01-26",          # 일 범위 + 월/연 뒤에 한 번
+            "From 7 to 11 April 2025": "2025-04-07",       # 전치사형
+            "15-17 July 2024 Bioanalytical site": "2024-07-15",   # 꼬리말 동반
+            "18 – 22 March 2024": "2024-03-18",            # en-dash
+            "26  January,  2026 - 28  January,  2026": "2026-01-26",  # Drupal 렌더(양끝 완전)
+            "22 June, 2025": "2025-06-22",                 # 단일일
+            "28 January - 2 February 2026": "2026-01-28",  # 달 넘김(앞머리에 월)
+            "28 December - 3 January 2026": "2025-12-28",  # 해 넘김 → 시작은 전년도
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(w._parse_inspection_dates_text(text), expected)
+
+    def test_unreadable_text_returns_empty_not_a_guess(self) -> None:
+        # 못 읽으면 ""(추정 금지) — 호출부가 '미확인'으로 표기하고 health 에 집계한다.
+        for text in ("", "Not specified", "Bioanalytical site", "12/2026", "2026-01-26"):
+            with self.subTest(text=text):
+                self.assertEqual(w._parse_inspection_dates_text(text), "")
+
+    def test_day_less_text_degrades_to_month_precision(self) -> None:
+        # 일이 없는 표기("January 2026")는 `_parse_text_date`(NOC 와 공용)의 기존 관례대로
+        # 월 정밀도(1일)로 떨어진다. 실사일 필드는 daterange 라 라이브에선 안 나오지만,
+        # 앵커 텍스트 폴백 경로에는 남아 있어 계약을 명시해 둔다.
+        self.assertEqual(w._parse_inspection_dates_text("January 2026"), "2026-01-01")
+        self.assertEqual(w._parse_inspection_dates_text("32 January 2026"), "2026-01-01")
+
+
+class WhopirRowDateTest(unittest.TestCase):
+    """_collect_whopir — 실사일 추출(마크업 1순위·텍스트 폴백)·미추출 관측·전건 sentinel."""
+
+    def test_time_element_datetime_is_used_as_inspection_start(self) -> None:
+        with _Patched(_WHOPIR_TIME_ROW):
+            items, err = w._collect_whopir(RUN)
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0].date_iso, "2026-01-26")      # 범위의 시작일
+        # 카드에는 시작일만 싣지만 원문 표기(범위)는 provenance 로 남긴다.
+        self.assertIn("28", items[0].raw_payload["inspection_dates"])
+        self.assertEqual(w.LAST_HEALTH["whopir_dates"]["dateless"], 0)
+
+    def test_text_fallback_when_time_attribute_disappears(self) -> None:
+        # <time datetime> 이 사라지는 드리프트 — 같은 필드의 표시 텍스트로 살린다.
+        html = _whopir_teaser(
+            "/prequal/sites/default/files/whopir_files/maker-x.pdf",
+            "Maker X", "<span>15-17 July 2024 Bioanalytical site</span>")
+        with _Patched(html):
+            items, err = w._collect_whopir(RUN)
+        self.assertIsNone(err)
+        self.assertEqual(items[0].date_iso, "2024-07-15")
+
+    def test_row_without_date_field_is_counted_not_silently_empty(self) -> None:
+        # 날짜 필드가 없는 행(앵커 텍스트에도 날짜 없음) → date_iso=""(추정 금지) +
+        # health 에 집계. 이 항목은 raw_signals 가 만들어지지 않으므로 침묵하면 안 된다.
+        html = (_WHOPIR_TIME_ROW
+                + '<a href="/prequal/sites/default/files/whopir_files/maker-y.pdf">'
+                  'Maker Y</a>')
+        with _Patched(html):
+            items, err = w._collect_whopir(RUN)
+        self.assertIsNone(err)                                  # 부분 결손은 graceful
+        by_url = {it.official_url.rsplit("/", 1)[-1]: it for it in items}
+        self.assertEqual(by_url["maker-y.pdf"].date_iso, "")
+        self.assertNotIn("inspection_dates", by_url["maker-y.pdf"].raw_payload)
+        health = w.LAST_HEALTH["whopir_dates"]
+        self.assertEqual((health["total"], health["dated"], health["dateless"]), (2, 1, 1))
+        self.assertTrue(health["samples"])
+
+    def test_all_rows_dateless_is_an_error_not_a_silent_zero(self) -> None:
+        # 전건 미추출 = 목록 마크업 변경 신호(실측 168행은 전건에 날짜가 있다). 종전엔
+        # 이 상태가 곧 'WHO raw_signals 0건'이었는데 아무 경보도 없었다.
+        html = ('<a href="/prequal/sites/default/files/whopir_files/maker-y.pdf">'
+                'Maker Y</a>')
+        with _Patched(html):
+            items, err = w._collect_whopir(RUN)
+        self.assertEqual(len(items), 1)                         # 항목은 링크 카드로 유지
+        self.assertIsNotNone(err)
+        assert err is not None
+        self.assertIn("실사일 전건 미추출", err)
+        self.assertIn("수동 확인 필요", err)
+
+    def test_dates_health_survives_excerpt_enrichment(self) -> None:
+        # 보강 단계가 LAST_HEALTH 를 통째로 갈아끼우면 이 계기가 조용히 사라진다.
+        with _Patched(_WHOPIR_TIME_ROW):
+            items, _err = w._collect_whopir(RUN)
+        with patch.dict(os.environ, {"ENABLE_WHOPIR_EXCERPT": "false"}):
+            w.enrich_whopir_items(items)
+        self.assertIn("whopir_dates", w.LAST_HEALTH)
+        self.assertIn("whopir_excerpt", w.LAST_HEALTH)
+
+
 if __name__ == "__main__":
     unittest.main()

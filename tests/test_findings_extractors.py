@@ -24,6 +24,54 @@ def _raw_signal(name: str) -> dict:
     return gf.raw_signal_from_row(fx["row"], fx["raw"])
 
 
+def _hc_inspection_input() -> dict:
+    """Health Canada 실사 리포트카드 입력(골든 파일 대신 인라인 -- 이 소스는 아직 수집기가
+    없어 tests/golden 에 실측 fixture 를 둘 근거가 없다).
+
+    값은 실측 리포트카드(insNumber=88818)의 관찰 2건 그대로다: 조항 태그(regulation)와 요약
+    (summaryList 를 공백 1칸으로 합친 문자열)이 함께 온다.
+    """
+    return {
+        "row": {
+            "date": "2026-05-21",
+            "document_id": "88818",
+            "firm": "Sample Pharma Inc.",
+            "headline": "Sample Pharma Inc. — Health Canada GMP inspection (88818)",
+            "language": "EN",
+            "official_url": "https://www.drug-inspections.canada.ca/gmp/",
+            "site_country": "Canada",
+            "source": "Health Canada Inspection",
+            "type_or_class": "hc-inspection",
+        },
+        "raw": {
+            "insNumber": "88818",
+            "hc_inspection_observations": [
+                {
+                    "no": "1",
+                    "regulation": "C.02.015 - Quality control department",
+                    "summary": (
+                        "The investigation, handling, and/or reporting of test results that "
+                        "was out-of-specification was inadequate."
+                    ),
+                },
+                {
+                    "no": "2",
+                    "regulation": "C.02.020 - Records",
+                    "summary": (
+                        "The controls were inadequate for creating, modifying, reviewing, "
+                        "storing, and/or retrieving records."
+                    ),
+                },
+            ],
+        },
+    }
+
+
+def _hc_inspection_raw_signal() -> dict:
+    fx = _hc_inspection_input()
+    return gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+
 class FindingsExtractorsTest(unittest.TestCase):
     def assertValidFindings(self, findings: list[dict]) -> None:
         self.assertTrue(findings)
@@ -203,6 +251,108 @@ class FindingsExtractorsTest(unittest.TestCase):
         fx["raw"].pop("ncr_nature", None)
         raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
         self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
+
+    def test_hc_inspection_observations_become_accepted_findings(self) -> None:
+        raw_signal = _hc_inspection_raw_signal()
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 2)      # 관찰 1개 = finding 1건
+        self.assertValidFindings(findings)
+        for finding in findings:
+            # ★source 문자열은 불가침이다 -- raw_signal_id/finding_id 해시 입력이자
+            # card_scaffold.resolve_kind 가 SOURCE_HC("Health Canada")면 type_or_class 를
+            # 안 보고 hc-recall 로 단정하는 것을 피하는 값이다.
+            self.assertEqual(finding["source"], "Health Canada Inspection")
+            self.assertEqual(finding["agency"], "HC")
+            self.assertEqual(finding["document_type"], "hc-inspection")
+            self.assertEqual(finding["evidence_level"], "A")
+            self.assertEqual(finding["confidence"], 0.9)
+            self.assertEqual(finding["finding_language"], "EN")
+            # 신규 소스는 자동승격 대상이 아니다 -- needs_review 로 만들면 영구 적체한다.
+            self.assertEqual(finding["review_status"], "accepted")
+            self.assertEqual(gf.evidence_url_quality_error(finding["evidence_url"]), "")
+        self.assertEqual(findings[0]["firm_name"], "Sample Pharma Inc.")
+        self.assertEqual(findings[0]["published_date"], "2026-05-21")
+
+        again = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(
+            [f["finding_id"] for f in findings],
+            [f["finding_id"] for f in again],
+        )
+
+    def test_hc_inspection_finding_text_is_verbatim_summary_only(self) -> None:
+        # 조항(regulation)을 본문 앞에 붙이지 않는다: 원문 무결성 + 조항 제목 어휘가
+        # 텍스트 분류기를 오염시키는 것을 막기 위해서다(조항은 raw_json 에 남는다).
+        fx = _hc_inspection_input()
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        summaries = [obs["summary"] for obs in fx["raw"]["hc_inspection_observations"]]
+        self.assertEqual([f["finding_text"] for f in findings], summaries)
+        for finding in findings:
+            self.assertNotIn("C.02.", finding["finding_text"])
+            self.assertNotIn("Quality control department", finding["finding_text"])
+
+    def test_hc_inspection_without_observations_extracts_nothing(self) -> None:
+        # 게이트 = raw.hc_inspection_observations. 부재/빈 배열이면 0건(기존 관례).
+        fx = _hc_inspection_input()
+        fx["raw"].pop("hc_inspection_observations", None)
+        self.assertEqual(
+            extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], fx["raw"])),
+            [],
+        )
+
+        fx = _hc_inspection_input()
+        fx["raw"]["hc_inspection_observations"] = []
+        self.assertEqual(
+            extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], fx["raw"])),
+            [],
+        )
+
+    def test_hc_inspection_summary_list_contract_break_is_absorbed(self) -> None:
+        # 수집기 계약은 "summaryList 를 공백 1칸 join 한 문자열"이지만, 배열이 그대로 오면
+        # _compact 는 "['a', 'b']" 라는 쓰레기 문자열을 만든다(건수는 정상이라 침묵 오염).
+        # 같은 join 규칙으로 흡수하는지 검사한다.
+        fx = _hc_inspection_input()
+        fx["raw"]["hc_inspection_observations"] = [
+            {
+                "no": "1",
+                "regulation": "C.02.020 - Records",
+                "summary": ["The controls were inadequate.", "Records were not retrievable."],
+            }
+        ]
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+
+        findings = extractors.findings_from_raw_signal(raw_signal)
+
+        self.assertEqual(len(findings), 1)
+        self.assertValidFindings(findings)
+        self.assertEqual(
+            findings[0]["finding_text"],
+            "The controls were inadequate. Records were not retrievable.",
+        )
+
+    def test_hc_inspection_evidence_url_prefers_document_level_raw_link(self) -> None:
+        # 건별 리포트카드 링크가 raw 에 있으면 그것을, 없으면 raw_signal 레벨 링크로
+        # degrade 한다(어느 경로든 사람이 열 수 있는 화면이어야 한다).
+        fx = _hc_inspection_input()
+        fx["raw"]["report_card_url"] = (
+            "https://www.drug-inspections.canada.ca/gmp/#/inspection/88818"
+        )
+        with_link = extractors.findings_from_raw_signal(
+            gf.raw_signal_from_row(fx["row"], fx["raw"]))
+        self.assertEqual(
+            with_link[0]["evidence_url"],
+            "https://www.drug-inspections.canada.ca/gmp/#/inspection/88818",
+        )
+
+        fx = _hc_inspection_input()
+        degraded = extractors.findings_from_raw_signal(
+            gf.raw_signal_from_row(fx["row"], fx["raw"]))
+        self.assertEqual(
+            degraded[0]["evidence_url"], "https://www.drug-inspections.canada.ca/gmp/")
 
     def test_mfds_gmp_deficiency_table_becomes_accepted_findings(self) -> None:
         raw_signal = _raw_signal("gmp_inspection_periodic")
@@ -647,18 +797,32 @@ class FindingsExtractorsTest(unittest.TestCase):
             ["section 301(a)", "section 301(d)"],
         )
 
-    def test_who_whopir_excerpt_enters_needs_review_queue(self) -> None:
+    def test_who_whopir_yields_no_findings(self) -> None:
+        # [계약 변경 2026-08-10] 종전 이 테스트는 WHOPIR excerpt 가 needs_review finding
+        # 1건으로 들어오는 것을 고정했다(`test_who_whopir_excerpt_enters_needs_review_queue`).
+        # 그 계약을 뒤집는다 — WHOPIR 은 지적을 싣지 않는 문서라 excerpt 가 있어도 finding 은
+        # 0건이어야 한다(사유는 findings_extractors 의 `_from_whopir` 제거 주석).
         raw_signal = _raw_signal("who_inspection_excerpt")
 
-        findings = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
 
-        self.assertEqual(len(findings), 1)
-        self.assertValidFindings(findings)
-        self.assertEqual(findings[0]["agency"], "WHO")
-        self.assertEqual(findings[0]["category_code"], "deviation_capa")
-        self.assertEqual(findings[0]["evidence_level"], "B")
-        self.assertEqual(findings[0]["review_status"], "needs_review")
-        self.assertEqual(findings[0]["confidence"], 0.72)
+    def test_who_whopir_boilerplate_is_not_a_finding(self) -> None:
+        # 반례 고정 — 실제 WHOPIR 8건 표본에서 채록한 두 문장(비순응 해소 진술 + 적합 판정문).
+        # 이것이 종전 추출기가 문서당 1건씩 findings 로 올리던 바로 그 텍스트다.
+        fx = _load_input("who_inspection_excerpt")
+        for excerpt in (
+            "All the non-compliances observed during the inspection that were listed in "
+            "the full report as well as those reflected in the WHOPIR, were addressed by "
+            "the manufacturer, to a satisfactory level, prior to the publication of the "
+            "WHOPIR.",
+            "was considered to be operating at an acceptable level of the WHO guideline "
+            "on Good Manufacturing Practices (GMP) for finished pharmaceutical products.",
+        ):
+            with self.subTest(excerpt=excerpt[:40]):
+                raw = dict(fx["raw"], whopir_excerpt=excerpt)
+                raw_signal = gf.raw_signal_from_row(fx["row"], raw)
+
+                self.assertEqual(extractors.findings_from_raw_signal(raw_signal), [])
 
     def test_invalid_raw_signal_or_empty_payload_returns_no_findings(self) -> None:
         self.assertEqual(extractors.findings_from_raw_signal({}), [])

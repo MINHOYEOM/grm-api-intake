@@ -378,6 +378,26 @@ class EvaluateHealthExcerptDegradedTest(unittest.TestCase):
                        if w.code == "whopir-excerpt-degraded")
         self.assertIn("cap", warning.message)
 
+    def test_whopir_dateless_is_warning_naming_the_findings_loss(self) -> None:
+        # [실사일 결손 2026-08-10] 실사일이 비면 published_date 필수 검증에 걸려 그 문서의
+        # findings raw_signals 가 아예 안 생긴다 — 경고 문구가 그 사실을 말해야 한다
+        # (종전에는 WARN 로그 한 줄뿐이라 3개월간 아무도 몰랐다).
+        stats = ci.CollectionStats()
+        stats.whopir_dateless = 3
+        health = ci._evaluate_health(**_health_kwargs(stats=stats, enable_who=True))
+        self.assertIn("whopir-inspection-date-missing", _codes(health.warnings))
+        self.assertEqual(health.failures, [])           # failure 승격 0(항목은 카드로 유지)
+        self.assertEqual(health.exit_code, 0)
+        warning = next(w for w in health.warnings
+                       if w.code == "whopir-inspection-date-missing")
+        self.assertIn("3건", warning.message)
+        self.assertIn("raw_signals", warning.message)
+
+    def test_whopir_dateless_zero_emits_no_warning(self) -> None:
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=ci.CollectionStats(), enable_who=True))
+        self.assertNotIn("whopir-inspection-date-missing", _codes(health.warnings))
+
     def test_wl_body_failed_is_warning_not_failure(self) -> None:
         stats = ci.CollectionStats()
         stats.wl_body_attempted = 3

@@ -39,30 +39,35 @@ class FindingsBackfillTest(unittest.TestCase):
         self.assertEqual(report["raw_signals_exported"], 7)
         self.assertEqual(report["raw_signals_unique"], 6)
         self.assertEqual(report["raw_signal_duplicates"], 1)
-        self.assertEqual(report["findings_exported"], 8)
-        self.assertEqual(report["findings_unique"], 7)
+        # [WHOPIR 추출기 제거 2026-08-10] WHO 2건은 둘 다 findings 0건이다(사유는
+        # findings_extractors 의 `_from_whopir` 제거 주석). 종전 기대값은 WHOPIR excerpt
+        # 1건을 needs_review finding 으로 세고 있었다 → findings 8→7·unique 7→6.
+        self.assertEqual(report["findings_exported"], 7)
+        self.assertEqual(report["findings_unique"], 6)
         self.assertEqual(report["finding_duplicates"], 1)
         self.assertEqual(report["skipped_rows"], 0)
         self.assertEqual(report["preflight"]["blocking_errors"], 0)
         self.assertTrue(report["preflight"]["ready_for_sqlite_append_dry_run"])
 
-        self.assertEqual(len(report["raw_signals_without_findings"]), 1)
-        self.assertEqual(report["raw_signals_without_findings"][0]["row_key"], "WHO::who-whopir-link-only")
+        self.assertEqual(
+            [entry["row_key"] for entry in report["raw_signals_without_findings"]],
+            ["WHO::who-whopir-2026-11-ex", "WHO::who-whopir-link-only"],
+        )
         self.assertEqual(result["duplicates"]["raw_signals"][0]["first_batch"], "m1b-seed")
         self.assertEqual(result["duplicates"]["raw_signals"][0]["batch"], "m1f-source-coverage")
 
         coverage = report["coverage"]
         self.assertEqual(coverage["raw_signals_total"], 6)
-        self.assertEqual(coverage["raw_signals_with_findings"], 5)
-        self.assertEqual(coverage["raw_signals_without_findings"], 1)
-        self.assertEqual(coverage["findings_total"], 7)
+        self.assertEqual(coverage["raw_signals_with_findings"], 4)
+        self.assertEqual(coverage["raw_signals_without_findings"], 2)
+        self.assertEqual(coverage["findings_total"], 6)
         self.assertEqual(
             coverage["raw_signals_by_source"],
             {"FDA 483": 1, "FDA Warning Letter": 1, "MFDS": 2, "WHO": 2},
         )
         self.assertEqual(
             coverage["findings_by_review_status"],
-            {"accepted": 4, "needs_review": 3},
+            {"accepted": 4, "needs_review": 2},
         )
         for record in result["records"]:
             self.assertEqual(gf.validate_raw_signal(record), [])
@@ -99,7 +104,7 @@ class FindingsBackfillTest(unittest.TestCase):
             with open(out, encoding="utf-8") as f:
                 result = json.load(f)
             self.assertEqual(result["schema_version"], backfill.BACKFILL_DRY_RUN_SCHEMA_VERSION)
-            self.assertEqual(result["report"]["findings_unique"], 7)
+            self.assertEqual(result["report"]["findings_unique"], 6)   # WHOPIR 제거로 7→6
             self.assertEqual(result["report"]["preflight"]["sqlite_write"], "not_used")
 
     def test_cli_rejects_manifest_and_input_together(self) -> None:

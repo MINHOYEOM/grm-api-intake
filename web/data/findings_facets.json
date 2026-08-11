@@ -1,6 +1,6 @@
 {
   "schema_version": "grm-findings-facets/v1",
-  "measured_on": "2026-08-12",
+  "measured_on": "2026-08-11",
   "min_findings": 20,
   "totals": {
     "findings": 24797,

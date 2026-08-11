@@ -20,13 +20,17 @@ import requests
 from grm_common import (
     SOURCE_ECA,
     SOURCE_EMA,
+    SOURCE_EU_GMP_NCR,
+    SOURCE_FDA_483,
     SOURCE_FDA_WL,
     SOURCE_FR,
     SOURCE_HANDOFF,
     SOURCE_HC,
     SOURCE_ICH,
+    SOURCE_ISPE,
     SOURCE_MFDS,
     SOURCE_MHRA,
+    SOURCE_MHRA_GMP_NCR,
     SOURCE_PICS,
     SOURCE_RECALL,
     SOURCE_WHO,
@@ -457,6 +461,12 @@ def weekday_kst(run_date: date) -> str:
     return _KO_WEEKDAYS_FULL[run_date.weekday()]
 
 
+# ★[2026-08-12] known 소스는 **0건이어도 항상 표시**되고(조용한 주 가시화), 미등록 소스는
+# count>0 일 때만 끝에 덧붙는다(build_coverage_collected 참조). 즉 여기 빠진 소스는
+# **0이 된 주에 행 자체가 사라진다** — "0"으로 남지 않으니 사람이 사라진 걸 못 알아챈다.
+# 그런데 카드 수 1위인 FDA 483 을 포함해 나중에 붙인 소스 5종이 전부 빠져 있었다(손목록이
+# 낡은 전형). 이제 수집 토큰 레지스트리(_SOURCE_TOKEN_TO_NOTION) 전수를 담고,
+# 테스트가 두 목록의 일치를 잠근다.
 COVERAGE_SOURCE_LABELS: tuple[tuple[str, str], ...] = (
     (SOURCE_FR, "FR"),
     (SOURCE_RECALL, "Recall"),
@@ -469,6 +479,10 @@ COVERAGE_SOURCE_LABELS: tuple[tuple[str, str], ...] = (
     (SOURCE_ICH, "ICH"),
     (SOURCE_WHO, "WHO"),
     (SOURCE_HC, "HC"),
+    (SOURCE_FDA_483, "FDA 483"),
+    (SOURCE_ISPE, "ISPE"),
+    (SOURCE_EU_GMP_NCR, "EU NCR"),
+    (SOURCE_MHRA_GMP_NCR, "UK NCR"),
 )
 
 

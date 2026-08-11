@@ -580,6 +580,95 @@ class HealthFinalizeTest(unittest.TestCase):
         self.assertEqual(r3.exit_code, 1)
 
 
+class IntakeSourceGateCoverageTest(unittest.TestCase):
+    """★[손목록 재발 방지 2026-08-12] 소스별 오류 보고는 이제 INTAKE_SOURCE_SPECS 를
+    순회한다. 남은 손목록은 `_evaluate_health` 안의 `source_enabled`(소스 → "이번 실행에
+    켜졌나") 하나뿐이고, 그것이 레지스트리와 어긋나면 여기서 걸린다.
+
+    왜 필요한가 — 이 결함은 **두 번 났다**. 2026-07-27 ECA 7일 침묵을 고칠 때 빠진 5종을
+    손으로 덧붙였는데, 그 수리가 같은 손목록을 다시 만든 것이라 열흘 뒤 추가된 EU/영국
+    GMP NCR 에서 똑같이 재발했다(발행 중인 소스가 오류 보고 경로에 아예 없었다).
+    """
+
+    def _source_enabled_keys(self) -> set:
+        """`_evaluate_health` 소스에서 source_enabled dict 의 키를 뽑는다(AST 잠금)."""
+        import ast
+        import inspect as _inspect
+        import textwrap as _textwrap
+        src = _textwrap.dedent(_inspect.getsource(ci._evaluate_health))
+        tree = ast.parse(src)
+        for node in ast.walk(tree):
+            # `source_enabled: dict[str, bool] = {...}` 은 Assign 이 아니라 AnnAssign 이다.
+            targets = ([node.target] if isinstance(node, ast.AnnAssign)
+                       else list(node.targets) if isinstance(node, ast.Assign) else [])
+            value = getattr(node, "value", None)
+            if (targets and isinstance(targets[0], ast.Name)
+                    and targets[0].id == "source_enabled" and isinstance(value, ast.Dict)):
+                return {k.value for k in value.keys if isinstance(k, ast.Constant)}
+        self.fail("source_enabled dict 를 찾지 못함 — 파싱 기준이 낡았는지 확인할 것")
+
+    def test_every_registered_source_has_a_gate(self):
+        keys = self._source_enabled_keys()
+        registry = {s.prefix for s in ci.INTAKE_SOURCE_SPECS}
+        self.assertEqual(
+            registry - keys, set(),
+            "레지스트리에 있는데 활성 판정이 없는 소스 — 기본값 True 로 시끄럽게 보고되지만 "
+            "게이트를 명시할 것",
+        )
+        self.assertEqual(registry ^ keys, set(), f"레지스트리에 없는 유령 게이트: {keys - registry}")
+
+    def test_health_codes_are_unique_and_hyphenated(self):
+        codes = [s.health_code for s in ci.INTAKE_SOURCE_SPECS]
+        self.assertEqual(len(codes), len(set(codes)), f"health_code 중복: {codes}")
+        for s in ci.INTAKE_SOURCE_SPECS:
+            self.assertNotIn("_", s.health_code, f"{s.prefix}: health_code 는 `-` 표기")
+
+    def test_previously_silent_sources_now_report(self):
+        """★이 단언이 결함의 본질이다 — 아래 4종은 오류가 나도 완전 무음이었다."""
+        for prefix, code in (("eu_gmp_ncr", "eu-gmp-ncr"), ("mhra_gmp_ncr", "mhra-gmp-ncr"),
+                             ("ispe", "ispe"), ("mhra_alert", "mhra-alert")):
+            with self.subTest(prefix=prefix):
+                st = ci.CollectionStats()
+                setattr(st, f"{prefix}_error", True)
+                setattr(st, f"{prefix}_error_msg", "boom")
+                h = ci._evaluate_health(**_health_kwargs(
+                    stats=st, active={"mhra"},
+                    enable_ispe=True, enable_eu_gmp_ncr=True, enable_mhra_gmp_ncr=True))
+                self.assertIn(f"source-error:{code}", _codes(h.warnings))
+                self.assertEqual(h.exit_code, 0, "표면화는 하되 발행을 막지 않는다")
+
+    def test_single_phase1_failure_is_surfaced_but_not_red(self):
+        """fr/recall 단독 실패는 종전에 무음이었다(둘 다 죽어야 phase1-all-failed).
+        경고로 표면화하되 exit 0 — 적색이면 그 주 발행 스캐폴드가 배제된다."""
+        st = ci.CollectionStats()
+        st.fr_error, st.fr_error_msg = True, "boom"
+        h = ci._evaluate_health(**_health_kwargs(stats=st, active={"fr", "recall"}))
+        self.assertIn("source-error:fr", _codes(h.warnings))
+        self.assertNotIn("phase1-all-failed", _codes(h.failures))
+        self.assertEqual(h.exit_code, 0)
+
+
+class CoverageSourceLabelCoverageTest(unittest.TestCase):
+    """★[손목록 재발 방지 2026-08-12] coverage '수집' 열은 known 소스를 **0건이어도 항상**
+    표시하고(조용한 주 가시화), 미등록 소스는 count>0 일 때만 덧붙인다. 즉 라벨이 없는
+    소스는 **0이 된 주에 행 자체가 사라진다** — 카드 수 1위인 FDA 483 이 그 상태였다."""
+
+    def test_every_collectable_source_has_a_coverage_label(self):
+        import grm_handoff
+        known = {s for s, _ in grm_handoff.COVERAGE_SOURCE_LABELS}
+        collectable = set(ci._SOURCE_TOKEN_TO_NOTION.values())
+        self.assertEqual(collectable - known, set(),
+                         "수집되는데 coverage 라벨이 없는 소스 — 0건인 주에 행이 사라진다")
+        self.assertEqual(known - collectable, set(), "수집되지 않는 유령 라벨")
+
+    def test_zero_count_known_source_still_rendered(self):
+        import grm_handoff
+        out = grm_handoff.build_coverage_collected({})
+        labels = {it["source"] for it in out["items"]}
+        self.assertIn(ci.SOURCE_FDA_483, labels, "483 이 0건인 주에도 행이 남아야 한다")
+        self.assertEqual(out["total"], 0)
+
+
 class PublicFeedSourceErrorReportingTest(unittest.TestCase):
     """[2026-07-27] EMA·MHRA·PIC/S·ECA·WL 수집 오류가 **경고로 표면화**돼야 한다.
 

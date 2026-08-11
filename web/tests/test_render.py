@@ -333,6 +333,38 @@ class WebRenderGoldenTest(unittest.TestCase):
             with self.subTest(golden=name):
                 self._assert_golden(self.resources, rel, name)
 
+    def test_korean_line_breaking_is_a_global_default(self):
+        """★[한국어 어절 줄바꿈 2026-08-12] CSS 기본 `word-break:normal` 은 한글을 **음절
+        어디서나** 끊는다("디|에틸렌글리콜", "가이드라|인"). 이 규칙은 오래전부터 알고 있었는데
+        **선택자마다 손으로** 붙여 왔고(grm.css 15곳 + 템플릿 25곳), 손목록에서 빠진 곳은
+        전부 깨진 채였다 — 라이브 실측 브리프 본문 84건 · 용어사전 19건 · 자료실 8건.
+        (findings 계열만 `main{word-break:keep-all}` 을 둬서 0건이었다.)
+
+        모두가 개별로 적용하는 규칙은 **기본값**이어야 한다 → body 에 선언한다. 선언이
+        사라지면 다음 신규 페이지부터 조용히 깨지므로 여기서 잠근다.
+
+        overflow-wrap 은 `anywhere` 가 아니라 `break-word` 여야 한다 — anywhere 는
+        min-content 폭 계산까지 바꿔 flex/grid 트랙 폭을 흔든다(전역으로 걸면 레이아웃
+        회귀 반경이 사이트 전체가 된다)."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        m = re.search(r"\nbody\{([^}]*)\}", css)
+        self.assertIsNotNone(m, "grm.css body 규칙 미발견")
+        rule = m.group(1)
+        self.assertIn("word-break:keep-all", rule, "전역 한글 줄바꿈 기본값이 사라졌다")
+        self.assertIn("overflow-wrap:break-word", rule)
+        self.assertNotIn("overflow-wrap:anywhere", rule)
+
+    def test_page_head_paragraph_has_no_ch_cap(self):
+        """★[62ch 캡 폐기 2026-08-12] `ch` 는 숫자 `0` 의 폭이라 한글에는 62ch ≈ 31자다 —
+        컨테이너 1,180px 인데 609px 에서 접혔다. 그래서 **12개 템플릿 중 10개가 이미
+        `max-width:none` 으로 뒤집어 쓰고 있었고**, 그 손목록에서 빠진 archive 만 결함으로
+        남아 있었다. 모두가 뒤집는 기본값은 기본값이 틀린 것이다."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        m = re.search(r"\n\.page-head p\{([^}]*)\}", css)
+        self.assertIsNotNone(m, "grm.css .page-head p 규칙 미발견")
+        self.assertNotRegex(m.group(1), r"max-width:\s*\d+ch",
+                            "page-head 본문에 ch 기반 폭 상한이 되살아났다(한글에서 조기 줄바꿈)")
+
     def test_css_copied_verbatim(self):
         built = (self.single / "assets" / "grm.css").read_bytes()
         src = (WEB_DIR / "assets" / "grm.css").read_bytes()
@@ -3165,8 +3197,14 @@ class WebTrendsRenderTest(unittest.TestCase):
 
     def test_year_trend_caveat_note_present(self):
         self.assertIn("소스마다 거슬러 올라간 범위가 다르기 때문", self.html)
-        self.assertIn("캐나다 실사는 최근 5년치만", self.html)
         self.assertIn("하한치", self.html)
+        # ★[롤링 표현 금지 2026-08-12] 처음엔 "캐나다 실사는 최근 5년치만"이라고 썼는데,
+        # 실제 백필 시작점은 collect_hc_inspection_backfill.DEFAULT_FROM_DATE = 2021-01-01
+        # 고정이다. 시작점이 고정인데 "최근 N년"이라는 롤링 표현을 붙이면 해가 바뀔 때마다
+        # 1씩 어긋난다(작성 시점에 이미 5년 7개월). 고정 시작점은 고정 표현으로 적는다.
+        self.assertIn("캐나다 실사는 2021년 이후만", self.html)
+        self.assertNotRegex(self.html, r"캐나다 실사는 최근 \d+년",
+                            "고정 시작점에 롤링 표현('최근 N년')이 되살아났다")
         # 제목 자체가 "추이"(=규제 활동 변화)로 읽히지 않게 "공개량(참고)"로 강등했다.
         self.assertIn('<h2 class="tr-h">연도별 공개량(참고)</h2>', self.html)
         self.assertNotIn("연도별 추이</h2>", self.html)
@@ -8479,6 +8517,31 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
     """[재발 방지 가드 2026-07] 새 규제 소스를 추가할 때 코드(수집기·DB)만 고치고 사이트
     설명·마퀴 갱신을 빠뜨리던 문제를 CI 에서 잡는다 — EU/영국 GMP 비준수(EudraGMDP·MHRA)
     편입 후 findings 계열 카피에 소스가 누락됐던 사례(2026-07)의 회귀 잠금."""
+
+    def test_footer_sources_match_landing_marquee(self):
+        """[손목록 정합 2026-08-12] 수집 소스는 두 곳에 손으로 적혀 있다 — 랜딩 마퀴와 전
+        페이지 푸터. 푸터에는 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나
+        있었다(두 목록을 서로 검사하는 가드가 없어 아무 소리도 나지 않았다). 집합이
+        일치해야 한다 — 한쪽만 고치면 여기서 걸린다."""
+        # 마퀴는 영문 축약(MFDS), 푸터는 국문(식약처)으로 같은 기관을 적는다 — 표기 차이는
+        # 의도된 것이라 정규화하고 **집합**만 비교한다(별칭을 늘리려면 여기 한 줄).
+        ALIAS = {"MFDS": "식약처"}
+        # 마퀴는 줄바꿈 방지로 `Health&nbsp;Canada` 처럼 엔티티를 쓴다(템플릿 원문 문자열).
+        def norm(s):
+            s = s.replace("&nbsp;", " ").replace("\xa0", " ").strip()
+            return ALIAS.get(s, s)
+        landing = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        track = re.search(r'class="track">(.*?)</div>', landing, re.S)
+        self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
+        marquee = {norm(s.replace("\xa0", " ").strip()) for s in re.findall(r"<span>([^<]+)</span>", track.group(1))}
+        foot = re.search(r"<h5>수집 소스</h5>(.*?)</div>", base, re.S)
+        self.assertIsNotNone(foot, "푸터 '수집 소스' 블록을 찾지 못함")
+        footer = set()
+        for chunk in re.findall(r"<span>([^<]+)</span>", foot.group(1)):
+            footer.update(norm(x.strip()) for x in chunk.replace("\xa0", " ").split("·"))
+        self.assertEqual(marquee, footer,
+                         f"마퀴에만: {sorted(marquee - footer)} / 푸터에만: {sorted(footer - marquee)}")
 
     def test_marquee_source_count_matches_chips(self):
         """랜딩 마퀴 '수집 대상 — N sources' 의 N 이 실제 표기 소스 칩 수와 일치해야 한다

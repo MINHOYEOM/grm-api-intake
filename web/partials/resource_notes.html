@@ -20,7 +20,13 @@
 .res-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
 .res-link{font-weight:500;color:var(--ink)}
 a.res-link:hover{color:var(--coral)}
-.res-orig{color:var(--muted);font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ★[모바일 가로 넘침 2026-08-12] ellipsis 3종 세트(max-width:100%·overflow:hidden·nowrap)를
+   갖췄는데도 375px 폰에서 브리프 전체가 48px 넘쳐 가로 스크롤이 생겼다(프로덕션 실측
+   scrollWidth 423). 원인은 flex 아이템의 기본 `min-width:auto` — 최소폭이 min-content 로
+   잡히는데 nowrap 이라 min-content 가 **원제 전체 길이**다. 그래서 max-width:100% 가
+   가리키는 부모 자체를 이 아이템이 밀어내 100% 가 무의미해진다. min-width:0 으로 그 자동
+   최소폭을 없애야 비로소 ellipsis 가 작동한다(.fnd-dash-cat-label 과 같은 함정·같은 해법). */
+.res-orig{color:var(--muted);font-size:13px;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .res-sum{margin:5px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
 </style>
 <h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>전문지 브리핑 <span class="n">{{ brief.resources|length }}건</span></h2>

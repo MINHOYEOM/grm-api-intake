@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [검색 유입] 분류·국가·기관 모음 페이지 — /findings/{c|country|agency}/{slug}/.
+
+    `/findings/` 는 런타임 RPC 로 결과를 불러오는 검색 앱이라 HTML 에 지적 본문이 없다.
+    그래서 공개 24,797건 전체가 검색엔진에 색인 대상 0개였다. 이 페이지들이 축마다 정적
+    표면을 만들고, **최근 사례 본문이 곧 그 페이지의 색인 대상**이다.
+
+    데이터 = web/data/findings_facets.json(정본, findings_facets_refresh.py 가 anon RPC 로
+    주 1회 재측정). 값은 무변형 — 본문은 자르지 않는다(길이 조절은 CSS 의 일이다).
+
+    grm.css 프리즈 보존을 위해 스코프 <style>, 클래스 공간은 .fx-*.
+    §4 한글 안전 가드: 인라인 스타일에 letter-spacing/text-transform 문자열 금지 →
+    eyebrow 는 grm.css 전역 .kick 을 쓴다. -#}
+<style>
+  .fx-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fx-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .fx-crumb a:hover{color:var(--coral)}
+  .fx-crumb i{font-style:normal;color:var(--line-2)}
+  .fx-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .fx-sum{font-family:var(--sans);font-size:16.5px;line-height:1.7;color:var(--body);margin:14px 0 0;word-break:keep-all;max-width:760px}
+  .fx-sum b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .fx-cta{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none;margin-top:20px}
+  .fx-cta:hover{background:var(--coral-2)}
+  .fx-body{margin-top:36px;display:flex;flex-direction:column;gap:30px}
+  .fx-sec{border-top:1px solid var(--line);padding-top:24px}
+  .fx-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0 0 16px;font-weight:600}
+  .fx-mix{display:flex;flex-direction:column;gap:10px;max-width:640px}
+  .fx-mix-row{display:grid;grid-template-columns:132px 1fr 62px;gap:12px;align-items:center}
+  .fx-mix-l{font-family:var(--sans);font-size:13.5px;color:var(--body);word-break:keep-all}
+  .fx-mix-t{height:8px;background:var(--strong);border-radius:99px;overflow:hidden}
+  .fx-mix-t span{display:block;height:100%;background:var(--coral);border-radius:99px}
+  .fx-mix-v{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right}
+  .fx-firms{display:flex;flex-wrap:wrap;gap:8px}
+  .fx-firms span{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 14px}
+  .fx-firms span b{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+  .fx-cases{display:flex;flex-direction:column;gap:16px}
+  .fx-case{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .fx-case-m{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+  .fx-case-ag{font-family:var(--sans);font-size:12px;color:var(--on-coral);background:var(--coral);border-radius:var(--pill);padding:2px 10px}
+  .fx-case-f{font-family:var(--sans);font-size:13.5px;color:var(--ink);font-weight:500;word-break:keep-all}
+  .fx-case-d{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .fx-case-t{font-family:var(--sans);font-size:15px;line-height:1.75;color:var(--body);margin:0;word-break:keep-all}
+  .fx-case-a{font-family:var(--sans);font-size:13px;color:var(--coral);text-decoration:none;align-self:flex-start}
+  .fx-case-a:hover{color:var(--coral-2)}
+  .fx-sibs{display:flex;flex-wrap:wrap;gap:8px}
+  .fx-sibs a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .fx-sibs a:hover{border-color:var(--coral);color:var(--coral)}
+  .fx-sibs a.on{border-color:var(--coral);color:var(--coral);background:var(--coral-tint)}
+  .fx-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="fx-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/{{ axis.path }}/">{{ axis.title }}</a><i>&rsaquo;</i><span>{{ item.label_ko }}</span>
+    </nav>
+    <p class="kick">{{ axis.kick }}</p>
+    <h1 class="fx-h1">{{ item.label_ko }} {{ axis.headline_suffix }}</h1>
+    <p class="fx-sum">{{ axis.lede_prefix }} <b>{{ "{:,}".format(item.findings) }}</b>건의 지적사항을 <b>{{ "{:,}".format(item.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
+    <a class="fx-cta" href="{{ rel_root }}findings/index.html?{{ axis.query_key }}={{ item.key | urlencode }}">{{ item.label_ko }} 지적사항 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+  </div>
+
+  <div class="wrap fx-body">
+    {% if item.by_agency %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">어느 기관이 지적했나</h2>
+      <div class="fx-mix">
+        {%- for a in item.by_agency %}
+        <div class="fx-mix-row">
+          <span class="fx-mix-l">{{ agency_labels.get(a.v, a.v) }}</span>
+          <span class="fx-mix-t"><span style="width:{{ a.pct }}%"></span></span>
+          <span class="fx-mix-v">{{ "{:,}".format(a.c) }}</span>
+        </div>
+        {%- endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if item.top_firms %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">지적이 많았던 업체</h2>
+      <div class="fx-firms">
+        {%- for f in item.top_firms %}<span>{{ f.firm_name }}<b>{{ f.c }}</b></span>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if item.samples %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">최근 지적 사례</h2>
+      <div class="fx-cases">
+        {%- for s in item.samples %}
+        <article class="fx-case">
+          <div class="fx-case-m">
+            <span class="fx-case-ag">{{ agency_labels.get(s.agency, s.agency) }}</span>
+            <span class="fx-case-f">{{ s.firm_name }}</span>
+            <span class="fx-case-d">{{ s.published_date }}</span>
+          </div>
+          <p class="fx-case-t">{{ s.text_ko }}</p>
+          {%- if s.evidence_url %}
+          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if siblings %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">{{ axis.sibling_title }}</h2>
+      <div class="fx-sibs">
+        {%- for s in siblings %}<a href="{{ rel_root }}findings/{{ axis.path }}/{{ s.slug }}/"{% if s.slug == item.slug %} class="on" aria-current="page"{% endif %}>{{ s.label_ko }}</a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="fx-sec">
+      <p class="fx-note">건수는 {{ measured_on }} 기준 공개 데이터 실측값입니다. 지적사항은 규제기관이 공개한 원문에서 자동 추출·번역한 것이며, 최종 판단은 언제나 공식 원문을 확인하세요. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.</p>
+    </section>
+  </div>
+</main>
+{% endblock %}

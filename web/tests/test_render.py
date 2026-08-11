@@ -6713,6 +6713,137 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                          "비결정론 렌더")
 
 
+class WebFindingsFacetPageTest(unittest.TestCase):
+    """[검색 유입] /findings/{c|country|agency}/ 축 색인 + 항목 모음 페이지.
+
+    `/findings/` 는 런타임 RPC 검색 앱이라 HTML 에 지적 본문이 없어 공개 24,797건이
+    색인 대상 0개였다. 축별 정적 표면이 그 구멍을 메운다.
+
+    이 클래스는 **정본(web/data/findings_facets.json)에서 파생해** 검사한다 — 축 값을
+    손으로 적지 않는다. 데이터가 갱신돼 항목이 늘면 그 페이지의 부재를 자동으로 잡는다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_facet_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.data = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _axes(self):
+        for axis in self.data["axes"]:
+            yield axis, render.FACET_AXES[axis["axis"]]
+
+    def _page(self, path: str, slug: str) -> str:
+        return (self.single / "findings" / path / slug / "index.html").read_text(
+            encoding="utf-8")
+
+    def test_schema_version_is_pinned(self):
+        """모양이 바뀐 데이터를 옛 템플릿으로 렌더하면 빈 페이지가 라이브로 나간다."""
+        self.assertEqual(self.data["schema_version"], "grm-findings-facets/v1")
+
+    def test_every_item_has_a_page(self):
+        missing = []
+        for axis, meta in self._axes():
+            for item in axis["items"]:
+                p = self.single / "findings" / meta["path"] / item["slug"] / "index.html"
+                if not p.exists():
+                    missing.append(f'{axis["axis"]}/{item["slug"]}')
+        self.assertEqual(missing, [], f"모음 페이지 누락: {missing}")
+
+    def test_axis_index_exists_and_links_every_item(self):
+        for axis, meta in self._axes():
+            idx = (self.single / "findings" / meta["path"] / "index.html")
+            self.assertTrue(idx.exists(), f'축 색인 누락: {meta["path"]}')
+            html = idx.read_text(encoding="utf-8")
+            for item in axis["items"]:
+                self.assertIn(f'href="../../findings/{meta["path"]}/{item["slug"]}/"', html,
+                              f'축 색인이 {item["slug"]} 를 링크하지 않음')
+
+    def test_no_orphan_pages(self):
+        for axis, meta in self._axes():
+            known = {it["slug"] for it in axis["items"]}
+            root = self.single / "findings" / meta["path"]
+            orphans = sorted(d.name for d in root.iterdir()
+                             if d.is_dir() and d.name not in known)
+            self.assertEqual(orphans, [], f'정본에 없는 모음 페이지: {orphans}')
+
+    def test_sitemap_lists_index_and_every_item(self):
+        for axis, meta in self._axes():
+            self.assertIn(
+                f'<loc>{render.SITE_BASE_URL}/findings/{meta["path"]}/</loc>', self.sitemap)
+            for item in axis["items"]:
+                self.assertIn(
+                    f'<loc>{render.SITE_BASE_URL}/findings/{meta["path"]}/{item["slug"]}/</loc>',
+                    self.sitemap, f'sitemap 미등록: {item["slug"]}')
+
+    def test_counts_and_labels_verbatim(self):
+        from markupsafe import escape as _esc
+        for axis, meta in self._axes():
+            for item in axis["items"]:
+                html = self._page(meta["path"], item["slug"])
+                self.assertIn(str(_esc(item["label_ko"])), html)
+                self.assertIn(f'{item["findings"]:,}', html,
+                              f'건수 미표시: {item["slug"]}')
+                self.assertIn(f'{render.SITE_BASE_URL}/findings/{meta["path"]}/{item["slug"]}/',
+                              html, f'canonical 누락: {item["slug"]}')
+
+    def test_sample_text_is_not_truncated(self):
+        """지적 본문은 자르지 않는다 — 이 문장이 그 페이지의 색인 대상 본문이다.
+
+        저장소는 원문 절단으로 두 번 데였다(deep_analysis·경고서한 조각). 길이 조절은
+        표시층의 일이지 데이터·렌더의 일이 아니다.
+        """
+        from markupsafe import escape as _esc
+        checked = 0
+        for axis, meta in self._axes():
+            for item in axis["items"]:
+                html = self._page(meta["path"], item["slug"])
+                for sample in item["samples"]:
+                    text = (sample.get("text_ko") or "").strip()
+                    if not text:
+                        continue
+                    self.assertIn(str(_esc(text)), html,
+                                  f'본문이 무변형으로 실리지 않음: {sample["finding_id"]}')
+                    checked += 1
+        self.assertGreater(checked, 0, "사례 본문이 하나도 검사되지 않았다(배선 확인)")
+
+    def test_excluded_items_are_disclosed(self):
+        """상한을 조용히 걸면 '전부 다뤘다'로 읽힌다 — 뺀 것은 축 색인에 밝힌다."""
+        for axis, meta in self._axes():
+            if not axis["excluded"]:
+                continue
+            html = (self.single / "findings" / meta["path"] / "index.html").read_text(
+                encoding="utf-8")
+            self.assertIn("여기에 없는 것", html, f'{meta["path"]}: 제외 고지 누락')
+            for ex in axis["excluded"]:
+                if ex["key"]:
+                    self.assertIn(ex["key"], html,
+                                  f'제외 항목 미고지: {meta["path"]}/{ex["key"]}')
+
+    def test_filter_deeplink_uses_findings_query_key(self):
+        for axis, meta in self._axes():
+            for item in axis["items"][:3]:
+                html = self._page(meta["path"], item["slug"])
+                self.assertIn(f'findings/index.html?{meta["query_key"]}=', html,
+                              f'검색 딥링크 누락: {item["slug"]}')
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        axis, meta = next(self._axes())
+        slug = axis["items"][0]["slug"]
+        self.assertEqual(
+            (self.single / "findings" / meta["path"] / slug / "index.html").read_bytes(),
+            (out2 / "findings" / meta["path"] / slug / "index.html").read_bytes(),
+            "비결정론 렌더")
+
+
 class WebGlossaryDeepFieldsTest(unittest.TestCase):
     """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
     참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔

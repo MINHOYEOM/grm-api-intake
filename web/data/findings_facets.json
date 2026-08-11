@@ -1,0 +1,3788 @@
+{
+  "schema_version": "grm-findings-facets/v1",
+  "measured_on": "2026-08-12",
+  "min_findings": 20,
+  "totals": {
+    "findings": 24797,
+    "documents": 6116
+  },
+  "agency_labels": {
+    "FDA": "미국 FDA",
+    "HC": "캐나다 보건부",
+    "MFDS": "식품의약품안전처",
+    "EMA": "유럽 EMA",
+    "MHRA": "영국 MHRA"
+  },
+  "axes": [
+    {
+      "axis": "category",
+      "items": [
+        {
+          "key": "other_quality_system",
+          "slug": "other-quality-system",
+          "label_ko": "기타 품질시스템",
+          "findings": 4347,
+          "documents": 2661,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 2437
+            },
+            {
+              "v": "FDA",
+              "c": 1121
+            },
+            {
+              "v": "MFDS",
+              "c": 786
+            },
+            {
+              "v": "EMA",
+              "c": 3
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 64
+            },
+            {
+              "firm_name": "American National Red Cross/Biomedical Services",
+              "c": 46
+            },
+            {
+              "firm_name": "미래바이오제약(주)",
+              "c": 45
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 35
+            },
+            {
+              "firm_name": "(주)현진제약",
+              "c": 31
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-2285325e200981e87cceacc2",
+              "text_ko": "의약품 동등성 재평가에 필요한 자료를 기한(’26. 6. 30.) 내에 제출하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "명문제약(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006175"
+            },
+            {
+              "finding_id": "finding-24748e241e382215ea0f3084",
+              "text_ko": "의약품 등 재평가 자료를 제출하지 않았다(1차 처분). 「약사법」제33조 및 「의약품 재평가 실시에 관한 규정」에 따라 의약품 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 기한 내(‘26.6.30.) 제출하여야 하나, 해당 업체는 재평가에 필요한 자료를 제출 기한 내에 제출하지 않은 사실이 있었다.",
+              "agency": "MFDS",
+              "firm_name": "일양바이오팜(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006174"
+            },
+            {
+              "finding_id": "finding-d8ed8077a895dd3eedd15ed6",
+              "text_ko": "재심사 대상 ‘뉴아미노펜프리믹스주(아세트아미노펜)’에 대하여 그 밖에 식품의약품안전처장이 정한 재심사 기준을 위반했다.",
+              "agency": "MFDS",
+              "firm_name": "신라젠주식회사",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006194"
+            },
+            {
+              "finding_id": "finding-a42c6714874dc9019db64680",
+              "text_ko": "품질부적합 항목은 회분 및 산불용성회분이다.",
+              "agency": "MFDS",
+              "firm_name": "(주)바른한방제약",
+              "published_date": "2026-08-05",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006114"
+            },
+            {
+              "finding_id": "finding-468d6cbddd9347860d56e09f",
+              "text_ko": "기타 [별표1] 12. 진행 중인 변경 건이 누락되지 않도록 관리하는 절차를 마련할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-9b3ac74e02483989d695b42c",
+              "text_ko": "기타 [별표1] 7.3. 제품품질평가에서 중요한 공정관리에 대한 평가를 수행한 후, 개선이 필요한 사항에 대해서는 시정조치 기록을 포함하여 작성할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            }
+          ]
+        },
+        {
+          "key": "aseptic_sterility_assurance",
+          "slug": "aseptic-sterility-assurance",
+          "label_ko": "무균보증/무균공정",
+          "findings": 3608,
+          "documents": 1358,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 3290
+            },
+            {
+              "v": "HC",
+              "c": 265
+            },
+            {
+              "v": "MFDS",
+              "c": 39
+            },
+            {
+              "v": "EMA",
+              "c": 12
+            },
+            {
+              "v": "MHRA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 60
+            },
+            {
+              "firm_name": "PharMEDium Services, LLC",
+              "c": 37
+            },
+            {
+              "firm_name": "ProRx, LLC",
+              "c": 31
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc. (CAPS)",
+              "c": 25
+            },
+            {
+              "firm_name": "US Specialty Formulations, LLC",
+              "c": 25
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-64049cade4698a2a2e60bfdf",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-8bbd8d4276953cd406e6deba",
+              "text_ko": "무균공정(aseptic) 구역의 환경조건 모니터링 체계가 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-7cf7bd6d10f63bf183aff481",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 멸균공정에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-b203f8d7688397d4d2dc5b65",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-c1ac761132530882d30d2890",
+              "text_ko": "무균공정(aseptic) 구역의 바닥과 벽이 평활하지 않거나 세척이 용이한 단단한 표면으로 되어 있지 않아 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-ef46da3b9b4151225313cb1b",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            }
+          ]
+        },
+        {
+          "key": "equipment_facility",
+          "slug": "equipment-facility",
+          "label_ko": "설비/시설",
+          "findings": 2870,
+          "documents": 1928,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 1431
+            },
+            {
+              "v": "FDA",
+              "c": 1398
+            },
+            {
+              "v": "MFDS",
+              "c": 41
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 41
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 29
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 24
+            },
+            {
+              "firm_name": "Sun Pharmaceutical Industries Ltd.",
+              "c": 19
+            },
+            {
+              "firm_name": "Delta Pharma Inc.",
+              "c": 17
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-1de2e9936037b63040533488",
+              "text_ko": "귀사의 제조구역은 작업자를 위한 적절한 세척시설을 갖추고 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "MSN Life Sciences Private Limited, Unit II",
+              "published_date": "2026-08-05",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/194064/download"
+            },
+            {
+              "finding_id": "finding-238e0f44faa93a0dc5223512",
+              "text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 설비가 의도된 용도에 맞게 작업이 원활히 이루어지도록 하는 적절한 설계로 되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            },
+            {
+              "finding_id": "finding-9ceabb3833258e0c57eb9d71",
+              "text_ko": "원료의약품(API) 제조에 사용되는 건물 및 시설을 적절히 유지관리하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "SNJ Labs Private Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/194065/download"
+            },
+            {
+              "finding_id": "finding-194c974b984823adba33c583",
+              "text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-1fac1115f2b1fc59a52d7b4e",
+              "text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구(utensils)를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Cascade Specialty Pharmacy LLC",
+              "published_date": "2026-07-31",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/193964/download"
+            },
+            {
+              "finding_id": "finding-029c606bb1ac5a0891ad4bc6",
+              "text_ko": "기기, 장치, 게이지 및 기록장치에 대한 문서화된 교정(calibration) 절차에 구체적 지시사항, 일정, 정확성 및 정밀성 한도, 한도 미충족 시 시정조치 규정이 포함되어 있지 않아 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Gascó Industrial Corporation",
+              "published_date": "2026-07-28",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/193906/download"
+            }
+          ]
+        },
+        {
+          "key": "qc_lab_controls",
+          "slug": "qc-lab-controls",
+          "label_ko": "시험실/품질관리",
+          "findings": 2076,
+          "documents": 1542,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 1233
+            },
+            {
+              "v": "HC",
+              "c": 795
+            },
+            {
+              "v": "MFDS",
+              "c": 46
+            },
+            {
+              "v": "EMA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "PharMEDium Services, LLC",
+              "c": 23
+            },
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 19
+            },
+            {
+              "firm_name": "Chief Medical Supplies Ltd",
+              "c": 18
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 17
+            },
+            {
+              "firm_name": "US Specialty Formulations LLC",
+              "c": 13
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-4aef1711ecdce31eb526f8e0",
+              "text_ko": "귀사는 밸리데이션되고 안정성 지시성(stability-indicating)을 갖춘 시험 절차를 사용하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "SNJ Labs Private Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194065/download"
+            },
+            {
+              "finding_id": "finding-85d6f0b7c6e6574de09fa71c",
+              "text_ko": "실험실 관리를 수행 시점에 준수하고 문서화하지 않았으며, 실험실 절차에서 벗어난 사항을 문서화하고 설명하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "SNJ Labs Private Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194065/download"
+            },
+            {
+              "finding_id": "finding-5eae4868b802126cb34c93f2",
+              "text_ko": "의약품에 대한 문서화된 안정성시험 프로그램에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-b232a56b13b5008509f49a0f",
+              "text_ko": "실험실 관리(laboratory controls)에, 구성품·의약품 용기·마개·공정 중 물질 및 완제의약품이 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 규격, 검체채취 계획 및 시험 절차의 수립이 포함되어 있지 않다...",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-dd0dd51014b27e317043dc15",
+              "text_ko": "실험실 기록에 설정된 규격 및 기준의 준수를 보증하는 데 필요한 모든 시험·검사 및 정량시험에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-8336f50e91c4cee8eab93be3",
+              "text_ko": "실험실 관리에 의약품이 동일성(identity), 함량, 품질 및 순도의 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 시험 절차의 수립이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            }
+          ]
+        },
+        {
+          "key": "deviation_capa",
+          "slug": "deviation-capa",
+          "label_ko": "일탈/CAPA/조사",
+          "findings": 1836,
+          "documents": 1514,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 937
+            },
+            {
+              "v": "HC",
+              "c": 862
+            },
+            {
+              "v": "MFDS",
+              "c": 29
+            },
+            {
+              "v": "EMA",
+              "c": 7
+            },
+            {
+              "v": "MHRA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 20
+            },
+            {
+              "firm_name": "American National Red Cross/Biomedical Services",
+              "c": 17
+            },
+            {
+              "firm_name": "Care-Tech Labs Inc.",
+              "c": 14
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 13
+            },
+            {
+              "firm_name": "Lupin Limited",
+              "c": 13
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-0506a8c9d3b258640e3fb93b",
+              "text_ko": "귀사의 품질부서는 중요 일탈이 조사되고 해결되도록 보증하는 핵심 책무 중 하나를 수행하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "MSN Life Sciences Private Limited, Unit II",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194064/download"
+            },
+            {
+              "finding_id": "finding-caaef70b2fb7496a6893bd5f",
+              "text_ko": "귀사의 품질부서는 모든 원료의약품(API) 제품에 대한 중요 일탈(deviation) 또는 부적합과 관련 조사 내용을 전부 검토하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "MSN Life Sciences Private Limited, Unit II",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194064/download"
+            },
+            {
+              "finding_id": "finding-e15c8e4bb06fb05cec62267c",
+              "text_ko": "귀사는 중요 일탈 및/또는 배치의 규격 부적합에 대하여 철저히 조사하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "MSN Life Sciences Private Limited, Unit II",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194064/download"
+            },
+            {
+              "finding_id": "finding-9f87bb49193b1da0b435efe0",
+              "text_ko": "설명되지 않는 불일치에 대한 조사가 해당 부적합 또는 불일치와 관련되었을 수 있는 다른 의약품까지 확대되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-9f8affbe02de1dbc4243cb30",
+              "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(discrepancy)에 대한 철저한 검토가 이루어지지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-edc4228526cedff804380ecd",
+              "text_ko": "구체적으로, Protocol (b)(4)는 시험대상자가 연구 기간 중 다른 임상시험(clinical trial)에 참여하는 경우 해당 대상자를 연구에서 제외하도록 요구하였다. 또한 이 프로토콜은 연구 기간 동안 다른 임상시험용의약품(IP)의 사용을 금지하였다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로, 대상자 (b)(6)의 Protocol (b)(4) Visit 1 스크리닝은 2024년 11월 6일에 이루어졌고 해당 대상자는 2024년 11월 13일에 무작위배정되었다. 이 대상자에게는 2024년 11월 13일부터 12월 16일 사이에 Protocol (b)(4)의 시험약이 불출되었으며 2025년 1월 14일에 연구를 완료하였다. 그러나 이 대상자는 2024년 6월 24일 다른 임상시험인 Protocol (b)(4)에 대상자 (b)(6)으로 동시에 등록·무작위배정되어 있었다. 구체적으로 이 대상자는 2024년 8월 7일부터 12월 23일 사이에 Protocol (b)(4)의 시험약을 투여받았고 2025년 1월 6일에 해당 연구를 완료하였다. 따라서 대상자 (b)(4)는 Protocol (b)(4)에 참여하는 동시에 다른 임상시험인 Protocol (b)(4)에도 참여하였으며, Protocol (b)(4)에 등록되어 시험약을 투여받는 중에 Protocol (b)(4)의 IP를 투여받았다. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 해당 대상자가 Protocol (b)(4)와 Protocol (b)(4) 양쪽에 등록되어 있었음을 인정하였다. 귀하는 이것이 규정 위반에 해당함을 이해한다고 진술하였다. 또한 귀하는 이 대상자에 대하여 Protocol (b)(4)의 제외기준이 준수되지 않았다고 진술하였다. FDA는 임상시험자로서 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 연구가 시험계획서에 따라 수행되도록 보증할 책임이 귀하에게 있음을 강조한다. 대상자가 연구에 등록되기 전에 프로토콜이 요구하는 모든 선정기준을 충족하도록 보증하지 못하고, 연구 기간 중 대상자가 금지된 약물을 복용하지 않도록 보증하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자의 안전에 대한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 신뢰성에 대한 우려도 제기한다. 2. 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분(disposition)에 관한 적절한 기록을 유지하지 않았다[21 CFR 312.62(a)]. 임상시험자로서 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지하여야 한다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로 Protocol (b)(4)에 등록된 6명의 대상자에 대하여, 대상자가 사용한 시험약의 수량과 반납된 수량 사이에서 시험기관의 IP 수불기록, 대상자의 자가보고 투여량에 관한 EDC 기록, 시험기관이 보고한 IP 반납분(사용분 및 미사용분)에 관한 EDC 기록 간에 다음과 같은 불일치가 관찰되었다. ID # (b)(6), Kit #34_MFWE — 자가보고 투여: 2025년 3월 6~19일 및 2025년 3월 21~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 1, 미사용 34) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PNBT — 자가보고 투여: 2025년 3월 6~17일 및 2025년 3월 19~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 35 sachets 반납(사용 0, 미사용 35). ID # (b)(6), Kit #34_RJRF — 자가보고 투여: 2025년 3월 6~17일, 2025년 3월 19~20일 및 2025년 3월 22~24일, 17회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 0, 미사용 35) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PUVN — 자가보고 투여: 2025년 3월 6~24일, 19회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_AHRG — 자가보고 투여: 2025년 3월 11~24일, 14회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 14, 미사용 21) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_HPOP — 자가보고 투여: 2025년 3월 20~24일, 5회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 5, 미사용 30) / EDC IP 수불기록: 반납된 sachet 없음. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 밀봉된 키트가 대상자에게 제공되었고 대상자가 자택에서 이를 사용한 뒤 반납할 책임이 있었다고 진술하였다. 또한 귀하는 해당 키트가 시험기관에서 사용되지 않았다고 진술하였다. 시험약이 시험기관에서 투여되지 않았고 대상자가 자택에서 시험약을 투여한 뒤 미사용 시험약을 시험기관에 반납하기로 되어 있었다는 점은 인정하나, 임상시험자로서 귀하는 FDA 규정에 따라 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지할 책임이 있으므로 귀하의 답변은 미흡하다. 또한 Protocol (b)(4)는 시험약의 불출 및 반납에 관한 정확한 기록을 유지하도록 보증하는 것이 시험자의 책임이라고 명시적으로 규정하고 있었다. 끝으로 FDA는 원격 종료방문(remote close-out visit)에 관한 의뢰자의 2025년 5월 21일자 서신에서, 위에 언급된 대상자 불출 IP 키트들이 양쪽 끝에 훼손방지 밀봉(tamper-resistant seal)이 그대로 부착된 상태였음을 의뢰자가 관찰하였다는 점에 주목한다. 반면 EDC 기록상 해당 키트는 불출된 것으로 나타나 있었고, 작성 완료된 투약 설문지에는 대상자가 매일 밤 연구 용량을 복용한 것으로 기록되어 있었다. 의뢰자는 나아가 IP 키트가 개봉되지 않은 점에 비추어 불출기록이 정확할 수 있는 방법을 알 수 없다고 진술하였다. 따라서 이러한 관찰된 불일치와 IP 키트의 물리적 상태 및 부정확한 불출기록에 관한 의뢰자의 보고에 근거할 때, 귀하의 시험기관에서 시험약의 처분에 관한 기록은 미흡하다. 사용·미사용·반납된 시험약을 기록한 문서를 포함하여 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 임상시험용의약품에 대한 귀하의 감독 및 통제의 적정성에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 타당성과 무결성에 관한 우려도 제기한다. 또한 귀하는 서면답변에서 다음과 같은 시정조치가 취해졌다고 진술하였다. (1) 연구가 종료되었다, (2) 의뢰자가 해당 시험기관의 데이터를 사용하지 않기로 동의하였다, (3) 시험기관에 지급된 모든 자금이 반환되었다. 귀하는 나아가 피해를 입은 대상자는 없다고 진술하였다. 끝으로 귀하는 조사 종료 후 해당 시험기관을 영구 폐쇄할 것이며 현재는 물론 장래에도 시험 관련 활동에 종사하지 않겠다고 진술하였다. FDA는 귀하의 시험기관이 취한 시정조치와 장래에 임상시험을 수행할 의사가 없다는 귀하의 진술을 인정하지만, 귀하가 생각을 바꾸어 장래에 임상시험을 수행하기로 결정할 경우 임상시험자로서 유사한 위반의 재발을 어떻게 방지할 것인지에 관하여 충분한 세부내용을 제시하지 않았으므로 귀하의 서면답변은 미흡하다. 이러한 정보가 없으면 FDA는 귀하의 시정조치 계획이 장래의 임상시험에서 유사한 위반을 방지하기에 적절한지 판단할 수 없다. FDA는 임상시험자로서 귀하가 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 임상시험 수행 및 인간대상자 보호를 규율하는 모든 관련 FDA 규정의 준수에 대해 궁극적인 책임을 진다는 점을 강조한다. 시험계획서에 따라 임상연구를 수행하지 못하고 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자 보호에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 생성된 데이터의 신뢰성에 관한 우려도 제기한다. 이 서한은 임상시험용의약품에 대한 귀하의 임상연구에서 발견된 결함을 모두 망라한 목록이 아니다. 법률 및 관련 FDA 규정의 각 요구사항을 준수하도록 보증할 책임은 귀하에게 있다. 귀하는 모든 결함을 해소하고 진행 중이거나 장래에 수행될 연구가 FDA 규정을 준수하도록 보증하는 절차를 수립하여야 한다. 이 서한은 FDA의 조사 결과를 귀하에게 통지하고 위에 적시된 결함을 해소할 기회를 제공하는 것이다. 귀하는 이 서한을 수령한 날부터 영업일 기준 15일 이내에 장래에 유사한 위반을 방지하기 위해 취한 조치를 서면으로 본 사무소에 통지하여야 한다. 이 사안을 적절히 해소하지 못할 경우 추가 통지 없이 규제조치가 취해질 수 있다. 귀하가 FD&C Act 및 관련 규정을 준수하였다고 판단한다면 FDA가 검토할 수 있도록 그 근거와 뒷받침하는 자료를 함께 제출하기 바란다. 서면답변과 이 서한 또는 실사에 관한 문의사항이나 우려사항은 이메일로 FDA(CDER-OSI-Communications@fda.hhs.gov)에 보내야 한다.",
+              "agency": "FDA",
+              "firm_name": "Maria E. De La Torre Silva, M.D.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/maria-e-de-la-torre-silva-md-735690-07272026"
+            }
+          ]
+        },
+        {
+          "key": "stability_storage",
+          "slug": "stability-storage",
+          "label_ko": "안정성/보관",
+          "findings": 1370,
+          "documents": 1201,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 791
+            },
+            {
+              "v": "FDA",
+              "c": 514
+            },
+            {
+              "v": "MFDS",
+              "c": 65
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Voyant Beauty, Inc.",
+              "c": 11
+            },
+            {
+              "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "c": 8
+            },
+            {
+              "firm_name": "Kohl & Frisch Limited",
+              "c": 8
+            },
+            {
+              "firm_name": "West Penetone Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 7
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-20bd0548fd581bc736d593b9",
+              "text_ko": "의약품의 안정성(stability) 특성을 평가하기 위해 설계된 문서화된 시험 프로그램이 없었다.",
+              "agency": "FDA",
+              "firm_name": "Cascade Specialty Pharmacy LLC",
+              "published_date": "2026-07-31",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.fda.gov/media/193964/download"
+            },
+            {
+              "finding_id": "finding-3697fea9b84d9de39a7031a4",
+              "text_ko": "기타 지적사항으로, [별표 1] 제3.3호 및 [별표 1의2] 제2.2호에 따른 품질(보증) 부서 업무(안정성, 자율점검 등)에 대하여 추가 설명자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)유케이케미팜",
+              "published_date": "2026-07-30",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE47q1"
+            },
+            {
+              "finding_id": "finding-64521d8839531ccade6cfd96",
+              "text_ko": "의약품의 안정성 특성을 평가하기 위한 문서화된 시험 프로그램이 없다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-6938bf4357a88f1f8b1b3efe",
+              "text_ko": "의약품이 확인시험, 함량, 품질 및 순도가 영향을 받지 않도록 적절한 온도, 습도 및 광 조건에서 보관되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-9e5fc66c0dd35cb087f8726e",
+              "text_ko": "문서화된 안정성시험 프로그램이 준수되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Brio Pharmaceuticals Inc",
+              "published_date": "2026-07-28",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.fda.gov/media/193904/download"
+            },
+            {
+              "finding_id": "finding-a89e9e29a9d7047e17ac17d0",
+              "text_ko": "의약품에 사용 시점에 해당 확인시험, 함량, 품질 및 순도 기준에 적합함을 보증하는 적절한 안정성 데이터로 결정된 유효기한이 표시되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Veganic SKN Limited",
+              "published_date": "2026-07-28",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.fda.gov/media/193892/download"
+            }
+          ]
+        },
+        {
+          "key": "material_supplier_control",
+          "slug": "material-supplier-control",
+          "label_ko": "원자재/공급업체 관리",
+          "findings": 1308,
+          "documents": 1119,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 880
+            },
+            {
+              "v": "HC",
+              "c": 408
+            },
+            {
+              "v": "MFDS",
+              "c": 20
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 11
+            },
+            {
+              "firm_name": "Chief Medical Supplies Ltd",
+              "c": 10
+            },
+            {
+              "firm_name": "Dr. Reddy&#039;s Laboratories Ltd.",
+              "c": 10
+            },
+            {
+              "firm_name": "TJP Labs Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 7
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-b5816455937757eafeee9129",
+              "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 배치 또는 그 구성품이 규격에 적합하지 않은 사항에 대한 철저한 검토가 이루어지지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            },
+            {
+              "finding_id": "finding-d936f56460ad8874ce32bb82",
+              "text_ko": "원자재 검체채취에 대한 적절한 문서화된 절차를 갖추지 않았다.",
+              "agency": "FDA",
+              "firm_name": "SNJ Labs Private Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/194065/download"
+            },
+            {
+              "finding_id": "finding-3f392f62eebc53b431358abe",
+              "text_ko": "귀사는 의약품 각 구성원료의 확인(identity)을 검증하기 위한 시험을 최소 1회 이상 실시하지 않았다(21 CFR 211.84(d)(1)). 귀사는 (b)(4) 및 ethanol-(b)(4)와 같은 일반의약품(OTC) (b)(4) 제품을 제조한다. 귀사는 OTC (b)(4) 의약품 제조에 사용되는 입고 구성원료(예: 글리세린, 프로필렌글리콜, 에탄올)에 대하여 각 로트의 각 선적분마다 적절한 확인시험을 실시하지 않았다. 나아가 귀사는 비의약품등급(nonpharmaceutical-grade)…을 사용하였다…",
+              "agency": "FDA",
+              "firm_name": "Woodbine Products Company Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/woodbine-products-company-inc-729345-07272026"
+            },
+            {
+              "finding_id": "finding-18546288f9b242eb137f48a0",
+              "text_ko": "건강기능식품(dietary supplement) 제조에 사용되는 원료에 대해, 귀사는 확인시험 기준, 해당 건강기능식품의 순도·함량·조성 기준이 충족됨을 보증하는 데 필요한 기준, 그리고 품질을 보증하기 위한 오염 한도를 설정하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-5e08f3145310ad31b4798529",
+              "text_ko": "귀사는 원료(components)가 설정된 기준에 적합한지 판정하기 위해 적절한 시험 또는 검사를 실시하지 않았고, 시험성적서(certificate of analysis)에 근거하지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-dd7ecaf98d0bb0ece2ad51ea",
+              "text_ko": "공급업체의 시험성적서(report of analysis)에 근거하여 수령한 원료(components)에 대해 특정 확인시험(specific identification test)을 실시하지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            }
+          ]
+        },
+        {
+          "key": "complaint_recall",
+          "slug": "complaint-recall",
+          "label_ko": "불만/회수",
+          "findings": 1156,
+          "documents": 1062,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 461
+            },
+            {
+              "v": "MFDS",
+              "c": 433
+            },
+            {
+              "v": "FDA",
+              "c": 254
+            },
+            {
+              "v": "EMA",
+              "c": 7
+            },
+            {
+              "v": "MHRA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "환인제약(주)",
+              "c": 16
+            },
+            {
+              "firm_name": "British Columbia Centre for Disease Control and Prevention Society Branch",
+              "c": 9
+            },
+            {
+              "firm_name": "L. Perrigo Co",
+              "c": 9
+            },
+            {
+              "firm_name": "동화약품(주)",
+              "c": 9
+            },
+            {
+              "firm_name": "(주)유유제약",
+              "c": 8
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-3a6b780be192e78c88176b15",
+              "text_ko": "셉타네스트주1/100,000 제품에서 첨부문서 일부(사용상의 주의사항)가 누락되어 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "신원덴탈(주)",
+              "published_date": "2026-08-06",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+            },
+            {
+              "finding_id": "finding-82bbe044903729dbc1effc73",
+              "text_ko": "의약품과 관련된 서면 및 구두 불만(complaint)의 처리를 규정한 절차가 문서화되어 있지 않거나 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            },
+            {
+              "finding_id": "finding-945ec2643619375d6c7240dc",
+              "text_ko": "기타 [별표1] 11. 불만처리 규정과 관련하여 불만(complaint) 등급을 부여하고, 등급에 따른 처리기한을 설정하여 관리할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-d18d2df4fa6c3e7e98940d74",
+              "text_ko": "일동제약(주)의 '일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염)'에 대해 유통 중 포장불량 우려가 확인되어 영업자 회수가 실시되었다.",
+              "agency": "MFDS",
+              "firm_name": "일동제약(주)",
+              "published_date": "2026-07-29",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+            },
+            {
+              "finding_id": "finding-01c1b76ea585d01678fad769",
+              "text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Stille AB",
+              "published_date": "2026-07-28",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://www.fda.gov/media/193896/download"
+            },
+            {
+              "finding_id": "finding-bd7c087da846a8ce216ac901",
+              "text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Micro-X Ltd.",
+              "published_date": "2026-07-28",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://www.fda.gov/media/193897/download"
+            }
+          ]
+        },
+        {
+          "key": "quality_unit_oversight",
+          "slug": "quality-unit-oversight",
+          "label_ko": "품질부서 관리감독",
+          "findings": 996,
+          "documents": 872,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 810
+            },
+            {
+              "v": "HC",
+              "c": 181
+            },
+            {
+              "v": "MFDS",
+              "c": 4
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 11
+            },
+            {
+              "firm_name": "Linde Canada Inc.",
+              "c": 9
+            },
+            {
+              "firm_name": "Akorn, Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "Care-Tech Labs Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "Dabur India Limited",
+              "c": 8
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-6eccecfac6b02f5cc3c99a16",
+              "text_ko": "임상시험계획 변경 보고를 지연하였고, 임상시험의 품질보증 및 임상시험자료의 품질관리 규정을 위반하였다.",
+              "agency": "MFDS",
+              "firm_name": "한미약품(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005676"
+            },
+            {
+              "finding_id": "finding-2624810f130257461ca787b4",
+              "text_ko": "문서화된 절차의 변경사항이 품질관리부서의 검토 및 승인을 거치지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-c03f239660ead37f507967aa",
+              "text_ko": "품질관리부서(quality control unit)에 모든 구성품을 승인하거나 불합격 처리할 책임과 권한이 부여되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-394c6e3d7384dd644b3f7442",
+              "text_ko": "시험 절차 및 실험실 관리체계의 수립과 그 변경사항이 적절한 조직 단위에 의해 작성되고 품질관리부서의 검토·승인을 거치지 않았다.",
+              "agency": "FDA",
+              "firm_name": "C.A.T. Gmbh and Co. KG",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194067/download"
+            },
+            {
+              "finding_id": "finding-4548a64bd55e7b5da8d47386",
+              "text_ko": "공정 중 물질(in-process materials)이 제조 공정 중 품질에 대해 시험되고 품질관리부서에 의해 승인 또는 불합격 처리되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-06648f4a86c0400fba85af25",
+              "text_ko": "귀사의 품질관리부서는 제조되는 의약품이 CGMP를 준수하고 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)에 대해 설정된 기준규격에 적합하도록 보증할 책임을 이행하지 않았다(21 CFR 211.22). 귀사의 품질부서(QU)는 OTC 의약품 제조에 대하여 적절한 감독을 수행하지 않았다. 예를 들어 귀사의 QU는 다음 사항을 보증하지 못했다. 즉, 해당 업무에 적용되는 적절한 문서화된 책임과 절차의 수립…",
+              "agency": "FDA",
+              "firm_name": "Woodbine Products Company Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/woodbine-products-company-inc-729345-07272026"
+            }
+          ]
+        },
+        {
+          "key": "contamination_control",
+          "slug": "contamination-control",
+          "label_ko": "오염/교차오염 관리",
+          "findings": 720,
+          "documents": 610,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 484
+            },
+            {
+              "v": "HC",
+              "c": 188
+            },
+            {
+              "v": "MFDS",
+              "c": 47
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "주식회사 케이앤제이씨",
+              "c": 13
+            },
+            {
+              "firm_name": "제이케이제약(주)",
+              "c": 12
+            },
+            {
+              "firm_name": "Natco Pharma Limited",
+              "c": 11
+            },
+            {
+              "firm_name": "Unico Holdings, Inc.",
+              "c": 6
+            },
+            {
+              "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-00adffdca281734e59085f7b",
+              "text_ko": "오염 또는 혼동(mix-ups)을 방지하는 데 필요한 구획되거나 지정된 구역 및 관리 시스템이 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Gascó Industrial Corporation",
+              "published_date": "2026-07-28",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193906/download"
+            },
+            {
+              "finding_id": "finding-8947a4ec3d4d895843c18d7e",
+              "text_ko": "무균이 요구되지 않는 의약품에서 유해미생물(objectionable microorganisms)을 방지하기 위한 절차가 수립·문서화·준수되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Gascó Industrial Corporation",
+              "published_date": "2026-07-28",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193906/download"
+            },
+            {
+              "finding_id": "finding-2616b72680d43c7d0bd53e94",
+              "text_ko": "무균이 요구되지 않는 의약품에서 유해미생물을 방지하도록 설계된 적절한 문서화된 절차가 수립·준수되어야 한다.",
+              "agency": "FDA",
+              "firm_name": "Veganic SKN Limited",
+              "published_date": "2026-07-28",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193892/download"
+            },
+            {
+              "finding_id": "finding-548be2c57799f74a10d6f1f1",
+              "text_ko": "비무균으로 표방하는 제품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Aptuit Ltd",
+              "published_date": "2026-07-28",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193886/download"
+            },
+            {
+              "finding_id": "finding-62208d8ee5981aec10c63874",
+              "text_ko": "무균이 요구되지 않는 완제의약품에서 유해미생물(objectionable microorganisms)을 방지하기 위한 절차가 수립·문서화되거나 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sincerus Florida, LLC",
+              "published_date": "2026-07-22",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193727/download"
+            },
+            {
+              "finding_id": "finding-d9b8ee41bd3088b53236e2f9",
+              "text_ko": "작업소가 오염을 방지하도록 설계·건축·운영 및/또는 유지관리되지 않았다.",
+              "agency": "HC",
+              "firm_name": "Carbon Extracts Inc",
+              "published_date": "2026-07-14",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89300"
+            }
+          ]
+        },
+        {
+          "key": "labeling_packaging",
+          "slug": "labeling-packaging",
+          "label_ko": "표시/포장",
+          "findings": 707,
+          "documents": 638,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 441
+            },
+            {
+              "v": "HC",
+              "c": 221
+            },
+            {
+              "v": "MFDS",
+              "c": 45
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Dr Sankunni’s Ayurvedic Research Foundation Private Ltd.",
+              "c": 9
+            },
+            {
+              "firm_name": "PharMEDium Services, LLC.",
+              "c": 8
+            },
+            {
+              "firm_name": "Delta Pharma Inc.",
+              "c": 6
+            },
+            {
+              "firm_name": "QuVa Pharma, Inc.",
+              "c": 6
+            },
+            {
+              "firm_name": "Cantrell Drug Company",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-15decb12ccdf77d27a27b62a",
+              "text_ko": "보관용 의약품 검체가 적절히 식별되어 있지 않고, 각 로트 또는 배치를 대표하지 않으며, 제품 표시기재와 일치하는 조건에서 보관·유지되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Gascó Industrial Corporation",
+              "published_date": "2026-07-28",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://www.fda.gov/media/193906/download"
+            },
+            {
+              "finding_id": "finding-1a175f51c5723435cfa60c4e",
+              "text_ko": "귀사는 포장 기준(packaging specifications)을 설정하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-65cf91b07106141f39864863",
+              "text_ko": "의약품 표시기재 작업에 사용하기 위해 불출되는 라벨링에 대해 엄격한 관리가 이루어지지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-74eb8fd3fa13b0f05061c9af",
+              "text_ko": "귀사는 지정된 표시기재(label)를 적용하였음을 보증하기 위한 기준(specifications)을 설정하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-ee86f6fd80c25e24d2e41819",
+              "text_ko": "의약품 품목 허가를 받은 자는 의약품의 용기나 포장에 '제조번호와 유효기한 또는 사용기한'을 적어야 한다. 그러나 의약품 '콘센비타프리미엄800정'(제조번호 RWC009, 사용기한 2027. 11. 3.)의 직접 담는 용기에 '제조번호와 유효기한 또는 사용기한'을 기재하지 아니한 사실이 확인되었다.",
+              "agency": "MFDS",
+              "firm_name": "일동제약(주)",
+              "published_date": "2026-07-28",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005914"
+            },
+            {
+              "finding_id": "finding-9a1292a6870b5edc77eff69f",
+              "text_ko": "동 업체는 의약외품 '해피데이스왑(이소프로판올)'을 수입·판매하면서 다음 두 가지를 위반하였다. ① 신고한 제품명이 아닌, 거짓이거나 오해할 우려가 있는 다른 명칭을 용기 또는 포장에 기재·표시하여 판매하였다. ② 신고한 사항과 다른 효능·효과를 용기 또는 포장에 기재·표시하여 판매하였다.",
+              "agency": "MFDS",
+              "firm_name": "주식회사 만상",
+              "published_date": "2026-07-20",
+              "category_label_ko": "표시/포장",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026004294"
+            }
+          ]
+        },
+        {
+          "key": "computer_system_validation",
+          "slug": "computer-system-validation",
+          "label_ko": "컴퓨터화시스템",
+          "findings": 658,
+          "documents": 626,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 503
+            },
+            {
+              "v": "FDA",
+              "c": 144
+            },
+            {
+              "v": "EMA",
+              "c": 7
+            },
+            {
+              "v": "MFDS",
+              "c": 4
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "Eurofins CDMO Alphora Incorporated",
+              "c": 6
+            },
+            {
+              "firm_name": "Isologic Innovative Radiopharmaceuticals Ltd.",
+              "c": 6
+            },
+            {
+              "firm_name": "Apotex Inc",
+              "c": 5
+            },
+            {
+              "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-70ae7ea8b43578015f61cf4e",
+              "text_ko": "마스터 제조·관리기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 수행되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Emcure Pharmaceuticals Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/194060/download"
+            },
+            {
+              "finding_id": "finding-b70490b6e206824b0059445e",
+              "text_ko": "귀사는 데이터에 대한 무단 접근 또는 변경을 방지하기 위한 전산화 시스템 관리를 충분히 수행하지 않았으며, 데이터 누락을 방지하기 위한 적절한 관리도 갖추지 않았다.",
+              "agency": "FDA",
+              "firm_name": "SNJ Labs Private Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/194065/download"
+            },
+            {
+              "finding_id": "finding-c55d104f6faf956e61c6b75a",
+              "text_ko": "마스터 제조·관리기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 수행되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-b24886b2b77c2b1cc929cc31",
+              "text_ko": "귀사는 전산화된 제조설비에 대해, 승인된 인원만이 레시피를 생성·수정할 수 있고, 폐기되었거나 승인되지 않은 레시피가 상업용 제조에 선택될 수 없으며, 사업장의 전산시스템 전반에 걸쳐 정확한 데이터 입력이 유지되도록 하는 관리를 수행하지 못했다.",
+              "agency": "FDA",
+              "firm_name": "Strides Pharma Science Limited",
+              "published_date": "2026-07-28",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/193887/download"
+            },
+            {
+              "finding_id": "finding-82029d79c8d8d8a5e2125997",
+              "text_ko": "기준서(master production and control records) 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 수행되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Accura-Pac, Inc.",
+              "published_date": "2026-07-16",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/193663/download"
+            },
+            {
+              "finding_id": "finding-9ec75297e0991233848e346c",
+              "text_ko": "제조 및 관리 기준서 또는 기타 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 실시되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Allure Labs, LLC",
+              "published_date": "2026-07-15",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/193638/download"
+            }
+          ]
+        },
+        {
+          "key": "training_personnel",
+          "slug": "training-personnel",
+          "label_ko": "교육/작업자",
+          "findings": 654,
+          "documents": 625,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 398
+            },
+            {
+              "v": "HC",
+              "c": 241
+            },
+            {
+              "v": "MFDS",
+              "c": 15
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 6
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 6
+            },
+            {
+              "firm_name": "AnazaoHealth Corporation",
+              "c": 5
+            },
+            {
+              "firm_name": "Delta Pharma Inc.",
+              "c": 5
+            },
+            {
+              "firm_name": "Eli Lilly and Company",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-020c5c2186ce4ea0de6ae189",
+              "text_ko": "의약품 제조 및 가공에 종사하는 직원이 담당 업무를 수행하는 데 필요한 교육훈련과 경험을 갖추지 못하였다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-f157cc57bd1f8a730e5af05f",
+              "text_ko": "원료의약품(API)을 적절히 제조하고 시험하기에 인력 수가 충분하지 않다.",
+              "agency": "FDA",
+              "firm_name": "Smithfield Biosciencs, Inc.",
+              "published_date": "2026-07-27",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.fda.gov/media/193877/download"
+            },
+            {
+              "finding_id": "finding-23ff5327c546e09dcc9ce5ba",
+              "text_ko": "작업자가 임계구역(critical area) 또는 임계구역에 바로 인접한 구역에서 빠르게 움직여 일방향 기류(unidirectional airflow)를 교란할 가능성이 있는 것이 관찰되었다.",
+              "agency": "FDA",
+              "firm_name": "Lt Col Luke Weather Jr Veterans Affairs Medical Center",
+              "published_date": "2026-07-23",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.fda.gov/media/193769/download"
+            },
+            {
+              "finding_id": "finding-d1fe68d5c528cd4490827a3d",
+              "text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9호에 따라 노출된 제조공정에 대한 마스크 착용 기준과 작업자 위생관리 기준을 명확히 하도록 요구되었다.",
+              "agency": "MFDS",
+              "firm_name": "RECKITT BENCKISER HEALTHCARE INTERNATIONAL LIMITED",
+              "published_date": "2026-07-20",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Pzzvm8pprt"
+            },
+            {
+              "finding_id": "finding-3cc71fdce2e7e57451ff5945",
+              "text_ko": "품질경영 기타 [별표 1] 제14호 교육 및 훈련 시 평가 방법 등에 대한 추가 자료를 제출해야 한다.",
+              "agency": "MFDS",
+              "firm_name": "석전의료공업(주)",
+              "published_date": "2026-07-14",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-ORx"
+            },
+            {
+              "finding_id": "finding-580bb2c31d4d8fd27e49eeff",
+              "text_ko": "신규 또는 개정된 표준작업지침서(SOP) 시행 전 직원 교육훈련이 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Sun Bum Canada, Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89421"
+            }
+          ]
+        },
+        {
+          "key": "regulatory_reporting",
+          "slug": "regulatory-reporting",
+          "label_ko": "규제보고/변경관리",
+          "findings": 585,
+          "documents": 575,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 450
+            },
+            {
+              "v": "FDA",
+              "c": 75
+            },
+            {
+              "v": "MFDS",
+              "c": 60
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 15
+            },
+            {
+              "firm_name": "Voyant Beauty, Inc.",
+              "c": 9
+            },
+            {
+              "firm_name": "(주)엔엠제약",
+              "c": 6
+            },
+            {
+              "firm_name": "한국신텍스제약(주)",
+              "c": 6
+            },
+            {
+              "firm_name": "(주)삼화바이오팜",
+              "c": 4
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-f2a3ba4a2cd5c5c897b8e899",
+              "text_ko": "임상시험계획 변경에 대하여 승인을 받지 않았고, 임상시험계획 변경 보고도 하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "아주약품(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005675"
+            },
+            {
+              "finding_id": "finding-b19436430d9e209b1c4336be",
+              "text_ko": "기타 지적사항으로, [별표 1의2] 제13호 가목에 따른 변경관리(change control) 절차(제품 또는 공정에 미치는 영향 검토 등)에 대하여 추가설명자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "에스피씨(주)",
+              "published_date": "2026-07-30",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H"
+            },
+            {
+              "finding_id": "finding-7c5634a6306bba9e0d0f444b",
+              "text_ko": "의약품 공급내역 보고 의무 위반: 의약품 품목허가를 받은 자는 「약사법」 제47조의3 및 같은 법 시행규칙 제45조에 따라 의약품을 공급하는 경우 제품 출하 시 그 공급내역을 의약품관리종합정보센터의 장에게 보고하여야 합니다. 그러나 동 업체는 ‘니코스탑-10패치(니코틴) 등 4개 품목’의 공급내역을 기한 내 보고하지 않았습니다. 다만, 동 업체는 해당 품목의 공급내역을 보고기한이 지난 후 1개월 이내에 보고하였습니다.",
+              "agency": "MFDS",
+              "firm_name": "(주)삼양바이오팜",
+              "published_date": "2026-07-21",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005796"
+            },
+            {
+              "finding_id": "finding-0ac9beb2fad4c8085e88dca8",
+              "text_ko": "시판 후 약물이상반응을 FDA에 보고하기 위한 문서화된 절차가 마련되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Misemer Pharmaceutical, Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://www.fda.gov/media/193611/download"
+            },
+            {
+              "finding_id": "finding-5856d25ad8ad98afadd88dae",
+              "text_ko": "연차 보고서가 미국 기념일로부터 60일 이내에 제출되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Misemer Pharmaceutical, Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://www.fda.gov/media/193611/download"
+            },
+            {
+              "finding_id": "finding-60086c63c5e4a4ea68a2f2f3",
+              "text_ko": "시판 device가 오작동했고 해당 오작동이 재발할 경우 사망 또는 중대한 상해를 유발하거나 기여할 가능성이 있음을 합리적으로 시사하는 정보를 수령하거나 인지한 날부터 30일 이내에 MDR report가 제출되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://www.fda.gov/media/193603/download"
+            }
+          ]
+        },
+        {
+          "key": "process_validation",
+          "slug": "process-validation",
+          "label_ko": "공정밸리데이션",
+          "findings": 576,
+          "documents": 504,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 568
+            },
+            {
+              "v": "MFDS",
+              "c": 6
+            },
+            {
+              "v": "HC",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Care-Tech Labs Inc.",
+              "c": 12
+            },
+            {
+              "firm_name": "Hospira Inc.",
+              "c": 11
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 10
+            },
+            {
+              "firm_name": "Lupin Limited",
+              "c": 7
+            },
+            {
+              "firm_name": "McNeil Consumer Healthcare",
+              "c": 7
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-b69d45fa84a48dc727fa72b5",
+              "text_ko": "귀사는 의약품이 표방하는 동일성(identity), 함량, 순도 및 품질을 보증하기 위한 제조 및 공정관리 관련 문서화된 절차를 수립하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Zydus Lifesciences Limited",
+              "published_date": "2026-08-05",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/194061/download"
+            },
+            {
+              "finding_id": "finding-297a5712ff2d781cf4c40122",
+              "text_ko": "귀사는 의약품이 표방하는 동일성(identity), 함량, 순도 및 품질을 보증하기 위한 제조 및 공정관리 관련 적절한 문서화된 절차를 수립하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-bf6f4d1180221604d7e2e752",
+              "text_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)를 갖추도록 보증하기 위해 설계된 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 않았다(21 CFR 211.100(a)). 귀사는 OTC 의약품 제조에 사용되는 공정을 적절히 밸리데이션하지 않았다. 귀사는 공정성능적격성평가(PPQ) 연구를 수행하지 않았으며, 적절한 지속적 프로그램도 갖추고 있지 않다…",
+              "agency": "FDA",
+              "firm_name": "Woodbine Products Company Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/woodbine-products-company-inc-729345-07272026"
+            },
+            {
+              "finding_id": "finding-073b89ba758e6bb4fd8512d1",
+              "text_ko": "의약품의 품질을 보증하기 위해 필요한 경우 각 생산 단계의 완료에 대한 시간 제한(time limits)이 설정되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-be00a07d8ae380c3c43272b5",
+              "text_ko": "귀사는 의약품이 표방하거나 나타내는 확인시험, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 못했다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-32eacc59a5a4629e76123870",
+              "text_ko": "귀사는 의약품이 표방하거나 나타내는 확인시험, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 못했다.",
+              "agency": "FDA",
+              "firm_name": "Gascó Industrial Corporation",
+              "published_date": "2026-07-28",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/193906/download"
+            }
+          ]
+        },
+        {
+          "key": "documentation_records",
+          "slug": "documentation-records",
+          "label_ko": "문서화/기록관리",
+          "findings": 431,
+          "documents": 385,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 329
+            },
+            {
+              "v": "MFDS",
+              "c": 83
+            },
+            {
+              "v": "HC",
+              "c": 13
+            },
+            {
+              "v": "EMA",
+              "c": 6
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 9
+            },
+            {
+              "firm_name": "Care-Tech Labs Inc.",
+              "c": 5
+            },
+            {
+              "firm_name": "Qualgen LLC",
+              "c": 5
+            },
+            {
+              "firm_name": "QuVa Pharma, Inc.",
+              "c": 5
+            },
+            {
+              "firm_name": "Right Value Drug Stores, Inc.",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-43251caa869ec06faa317218",
+              "text_ko": "평가 결과 지적(보완)사항(Deficiencies)이 있었다. 제조 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제6.1호와 관련하여 제조기록서를 작업과 동시에 작성하지 않았다(보완완료). 시험실 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제11.1호와 관련하여 품질관리기록서에 시험 근거자료를 첨부하고 있지 않았으며(보완완료), 같은 규칙 [별표 1의2] 제6.2호와 관련하여 시약의 보관조건 관련 규정이 확인되지 않았다(보완완료). 담당 부서는 한약정책과이다.",
+              "agency": "MFDS",
+              "firm_name": "Qingdao Huazhong Pharmaceuticals Co., Ltd.",
+              "published_date": "2026-07-31",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rAodwYSY"
+            },
+            {
+              "finding_id": "finding-083d84e7f07ce20d8c424b61",
+              "text_ko": "의약외품 제조업자는 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제5호, 제48조제1호에 따라 원료 및 자재의 입고부터 완제품의 출고에 이르기까지 필요한 시험검사 또는 검정을 철저히 하고, 제조단위별 제조관리기록서(batch record)와 품질관리기록서를 작성하여 갖추어야 하며, 이를 제조일로부터 3년 이상 보존하고 품질검사에 합격한 제품만을 출고해야 한다. 그러나 의약외품인 클린방수밴드(1회용)(제조번호: HCA40001, 사용기한: 2028. 2. 2.)를 제조·판매하면서 제조단위별 제조관리기록서와 품질관리기록서 일체를 작성하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "(주)대일제약",
+              "published_date": "2026-07-28",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005975"
+            },
+            {
+              "finding_id": "finding-2c59d1be3b31794f09ad727f",
+              "text_ko": "귀사의 품질관리 담당자는 배치가 마스터제조기록서(master manufacturing record)에서 벗어났을 때 물질 검토(material review)를 수행하고 처리(disposition) 결정을 내리지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-57d219a66eb72ee734638034",
+              "text_ko": "귀사의 배치제조기록서에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-949f74535a325b6e9c92b620",
+              "text_ko": "배치제조·관리기록서에 생산된 각 의약품 배치에 사용된 원료 및 공정중간체(in-process material)의 각 배치에 대한 구체적 식별정보가 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            },
+            {
+              "finding_id": "finding-caae873e22da562b88b48526",
+              "text_ko": "귀사의 배치제조기록서(batch production record)에 요구되는 모든 정보가 포함되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Neeyaan LLC",
+              "published_date": "2026-07-28",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://www.fda.gov/media/193883/download"
+            }
+          ]
+        },
+        {
+          "key": "cleaning_validation",
+          "slug": "cleaning-validation",
+          "label_ko": "세척밸리데이션",
+          "findings": 379,
+          "documents": 347,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 180
+            },
+            {
+              "v": "MFDS",
+              "c": 101
+            },
+            {
+              "v": "FDA",
+              "c": 95
+            },
+            {
+              "v": "EMA",
+              "c": 3
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 8
+            },
+            {
+              "firm_name": "(주)엔탭허브",
+              "c": 6
+            },
+            {
+              "firm_name": "Delta Pharma Inc.",
+              "c": 5
+            },
+            {
+              "firm_name": "에이치케이이노엔(주)",
+              "c": 5
+            },
+            {
+              "firm_name": "(주)현진제약",
+              "c": 3
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-36d0c9bd90da9447e357d567",
+              "text_ko": "귀사는 설비의 세척 및 유지관리에 관한 적절한 문서화된 절차를 수립하고 준수하지 않았다(21 CFR 211.67(b)). 귀사는 OTC 의약품 제조에 사용되는 공용 설비에서, 귀사의 세척 방법이 잠재적 오염물질을 제거하고 의약품의 교차이월(carry over)을 방지하기에 적절하다는 점을 입증하지 못했다. 예를 들어 전용 설비가 아닌 Unit (b)(4) Line (b)(4)에 대한 귀사의 세척 밸리데이션 프로그램은 전적으로 육안검사(visual inspection)에만 의존하였다…",
+              "agency": "FDA",
+              "firm_name": "Dabur India Limited",
+              "published_date": "2026-08-04",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/dabur-india-limited-728828-07242026"
+            },
+            {
+              "finding_id": "finding-fd555f5fa65455986d5f33c4",
+              "text_ko": "기타 지적사항으로, [별표 1의2] 제12.4호에 따른 세척 밸리데이션(cleaning validation) 현황에 대한 추가자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "에스피씨(주)",
+              "published_date": "2026-07-30",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H"
+            },
+            {
+              "finding_id": "finding-dd77f48654bc273779d63987",
+              "text_ko": "제조 분야 기타 지적사항으로, [별표 1] 6.4에 따라 제품과 접촉하는 모든 기구 및 도구에 대하여 세척밸리데이션(cleaning validation)을 실시할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)서흥",
+              "published_date": "2026-07-29",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_iX9eOyBx"
+            },
+            {
+              "finding_id": "finding-a457b0897d2b94f596ee020f",
+              "text_ko": "중간체 및 원료의약품(API)의 품질을 공정서 또는 기타 설정된 규격을 벗어나 변경시킬 수 있는 물질의 오염 또는 교차반입(carry-over)을 방지하기 위해 장비를 세척하지 못함. 귀사는 최대 (b)(4) 종의 서로 다른 API를 제조하는 데 사용되는 비전용(non-dedicated) API 제조 장비를 적절히 세척·유지관리하지 못하였습니다. 예를 들어, 당사 조사관은 (b)(4) 의 뚜껑 및 (b)(4) 를 포함한 제품 접촉 표면에서 (b)(4) 및 (b)(4) 입자를 관찰하였습니다…",
+              "agency": "FDA",
+              "firm_name": "Almon Healthcare Private Limited",
+              "published_date": "2026-07-21",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/almon-healthcare-private-limited-729291-07132026"
+            },
+            {
+              "finding_id": "finding-ac045808357eec81f5b43374",
+              "text_ko": "세척 절차가 수립되어 있지 않다. 구체적으로,",
+              "agency": "FDA",
+              "firm_name": "Berkshire Sterile Manufacturing",
+              "published_date": "2026-07-15",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/193642/download"
+            },
+            {
+              "finding_id": "finding-22906c77a95ff0e9e2ba1771",
+              "text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제9.3호 다목에 따라 제조설비 세척 시 사용한 세척제와 세척기록 등을 작성하도록 요구되었다.",
+              "agency": "MFDS",
+              "firm_name": "(주)퍼슨",
+              "published_date": "2026-06-30",
+              "category_label_ko": "세척밸리데이션",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC"
+            }
+          ]
+        },
+        {
+          "key": "validation_qualification",
+          "slug": "validation-qualification",
+          "label_ko": "밸리데이션/적격성평가",
+          "findings": 248,
+          "documents": 224,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 121
+            },
+            {
+              "v": "HC",
+              "c": 70
+            },
+            {
+              "v": "MFDS",
+              "c": 55
+            },
+            {
+              "v": "MHRA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "(주)휴메딕스",
+              "c": 5
+            },
+            {
+              "firm_name": "Schering-Plough Products, LLC",
+              "c": 4
+            },
+            {
+              "firm_name": "Carolina Infusion",
+              "c": 3
+            },
+            {
+              "firm_name": "Inotiv Inc.",
+              "c": 3
+            },
+            {
+              "firm_name": "에이치케이이노엔(주)",
+              "c": 3
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-372278a07607f44994680c35",
+              "text_ko": "구체적으로, 귀사의 발한억제제(antiperspirant) 제품은 유효성분으로 aluminum chlorohydrate 10% 및 aluminum chloride 10%를 함유하는 것으로 표시되어 있다. 각 유효성분은 M019.10에 의해 개별적으로는 허용되나, 이들 유효성분을 단일 발한억제제 의약품에서 이러한 조합으로(또는 그 밖의 어떠한 조합으로도) 사용하는 것은 허용되지 않는다. 따라서 귀사의 syNeo 발한억제제 제품은 M019에 규정된 해당 조건을 준수하지 않으며, 그 밖의 방법으로 GRASE(일반적으로 안전하고 유효하다고 인정됨)로 인정된 바도 없다. 3 그러므로 이들 제품은 FD&C Act section 201(p), 21 U.S.C. 321(p)에서 정한 의미의 신약(new drug)에 해당하며, 승인된 신청 없이 이들 제품이 합법적으로 판매될 수 있는 근거는 FD&C Act section 505G에 존재하지 않는다. 이들 제품에 대하여 유효한 신청이 없으므로, 이들 제품은 미승인 신약(unapproved new drugs)이다. 이러한 미승인 신약 제품을 주간(interstate) 상거래에 반입하거나 반입을 위해 인도하는 행위는 FD&C Act sections 505(a) 및 301(d), 21 U.S.C. 355(a) 및 331(d)를 위반한다. 허위표시(misbranded) 의약품 위반 — 또한 귀사의 syNeo 발한억제제 제품은 FD&C Act section 502(ee), 21 U.S.C. 352(ee)에 따라 허위표시(misbranded) 의약품에 해당한다. 이들 제품은 FD&C Act section 505G, 21 U.S.C. 355h의 적용을 받는 비처방(nonprescription) 의약품이지만 해당 조항에 따른 판매 요건을 준수하지 않았고, FD&C Act section 505, 21 U.S.C. 355에 따라 승인된 신청의 대상도 아니기 때문이다. 허위표시 의약품을 주간 상거래에 반입하거나 반입을 위해 인도하는 행위는 FD&C Act section 301(a), 21 U.S.C. 331(a)를 위반한다. 컨설턴트 — 귀사에서 확인된 위반의 성격에 비추어, 귀사는 CGMP 요건 충족을 지원하도록 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 선임하여야 한다. 컨설턴트를 활용한다고 하여 CGMP를 준수할 귀사의 의무가 면제되지는 않는다. 지속적인 CGMP 준수를 보장하기 위해 모든 결함과 시스템적 결점을 해소할 책임은 여전히 귀사의 경영진에게 있다. 품질시스템 — 귀사의 품질시스템은 미흡하다. CGMP 규정 21 CFR parts 210 및 211의 요건을 충족하기 위한 품질시스템 및 위험관리 방식의 실행에 관하여는 FDA의 가이던스 문서를 참조하라. Quality Systems Approach to Pharmaceutical CGMP Regulations(https://www.fda.gov/media/71023/download), Q9(R1) Quality Risk Management(https://www.fda.gov/media/167721/download), Q10 Pharmaceutical Quality System(https://www.fda.gov/media/71553/download).",
+              "agency": "FDA",
+              "firm_name": "Thomas Brunner Hygiene GmbH",
+              "published_date": "2026-08-04",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/thomas-brunner-hygiene-gmbh-729018-07242026"
+            },
+            {
+              "finding_id": "finding-1100d854eba60636304134be",
+              "text_ko": "2026년 5월 5~8일(05 to 08 May 2026) 해당 제조소에 대한 실사가 수행되었다. GMP 관련 critical 결함 2건과 major 결함 3건이 지적되었다. critical 결함은 GMP와 QRM을 반영하여 포괄적으로 설계되고 올바르게 실행되는 PQS(의약품품질시스템)를 구현하지 못한 것에 관한 것으로, 견고하고 신뢰할 수 있는 배치 관리 절차가 마련되어 있음을 보장하지 못한 점과 Qualified Person이 각 배치가 GMP 요건에 따라 제조·확인되었음을 보장하지 못한 점에서 확인되었다.\n\nNCA의 조치/제안 사항: 조치/제안: 전면 정지(suspension in full). 현행 유효 GMP 인증서 철회: UK MIA(IMP) 322 INSP IMP 322/14798-0031[I]",
+              "agency": "MHRA",
+              "firm_name": "NORGINE LIMITED",
+              "published_date": "2026-08-03",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmpgdpimp-32214798-0032i"
+            },
+            {
+              "finding_id": "finding-4c43d318d20e6adba9adb592",
+              "text_ko": "2026년 5월 5~8일(05 to 08 May 2026) 해당 제조소에 대한 실사가 수행되었다. GMP 관련 critical 결함 2건과 major 결함 3건이 지적되었다. critical 결함은 GMP와 QRM을 반영하여 포괄적으로 설계되고 올바르게 실행되는 PQS(의약품품질시스템)를 구현하지 못한 것에 관한 것으로, 견고하고 신뢰할 수 있는 배치 관리 절차가 마련되어 있음을 보장하지 못한 점과 Qualified Person이 각 배치가 MA(품목허가) 및 GMP 요건에 따라 제조·확인되었음을 보장하지 못한 점에서 확인되었다. 본 부적합 확인서(Statement of Non Compliance)는 critical products의 제조는 포함하지 않는다. 해당 제품은 각국 규제당국(National Competent Authorities)과 서면으로 합의하여야 한다.\n\nNCA의 조치/제안 사항: 조치/제안: 부분 정지(suspension In part). 현행 유효 GMP 인증서 철회: UK MIA 322 INSP GMP 322/14798-0030[H] 공급 금지: 본 부적합 확인서가 유효한 동안 영국 시장에는 critical products의 배치만 공급할 수 있다.",
+              "agency": "MHRA",
+              "firm_name": "NORGINE LIMITED",
+              "published_date": "2026-08-03",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmpgdpimp-32214798-0032h"
+            },
+            {
+              "finding_id": "finding-4000accb1a39ddda520a6111",
+              "text_ko": "제조 분야 기타 지적사항으로, [별표 1의2] 제5호 아목에 따른 고압증기멸균기 적격성평가(qualification)와 관련한 추가자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "에스피씨(주)",
+              "published_date": "2026-07-30",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H"
+            },
+            {
+              "finding_id": "finding-8b579985b0489da18bff38c6",
+              "text_ko": "기타 지적사항으로, [별표 1의2] 제12.2호에 따른 공정 밸리데이션(process validation) 현황에 대한 추가자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "에스피씨(주)",
+              "published_date": "2026-07-30",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H"
+            },
+            {
+              "finding_id": "finding-e78d05e4ef0949549ee55565",
+              "text_ko": "직원 교육 및 적격성평가가 불충분하다.",
+              "agency": "FDA",
+              "firm_name": "Clongen Laboratories, LLC",
+              "published_date": "2026-07-24",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://www.fda.gov/media/193819/download"
+            }
+          ]
+        },
+        {
+          "key": "environmental_monitoring",
+          "slug": "environmental-monitoring",
+          "label_ko": "환경모니터링",
+          "findings": 150,
+          "documents": 127,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 129
+            },
+            {
+              "v": "MFDS",
+              "c": 14
+            },
+            {
+              "v": "HC",
+              "c": 6
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Vita Pharmacy, LLC dba Talon Pharmacy of Boerne",
+              "c": 5
+            },
+            {
+              "firm_name": "New England Life Care, Inc. dba Advanced Compounding Solutions",
+              "c": 3
+            },
+            {
+              "firm_name": "ProRx, LLC",
+              "c": 3
+            },
+            {
+              "firm_name": "Revive Rx LLC",
+              "c": 3
+            },
+            {
+              "firm_name": "Advanced Nutriceuticals, LLC dba The Guyer Institute of Molecular Medicine",
+              "c": 2
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-6ae23ec330c03f188d7d1264",
+              "text_ko": "환경모니터링 프로그램이 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Biotechnologines farmacijos centras Biotechpharma UAB",
+              "published_date": "2026-07-13",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://www.fda.gov/media/193580/download"
+            },
+            {
+              "finding_id": "finding-481a44e290edfe90c09ac75a",
+              "text_ko": "평가 결과 확인된 지적(보완)사항은 다음과 같다. 시험실 분야에서는 [별표1] 제7.1호와 관련하여 '중요' 등급으로 ① 배지성능시험 관련 기준서 미준수, ② 배지 품질관리 시 공정서 일부 시험항목 미실시 및 배지의 적합성 판정에 관한 사항이 지적되었으며 보완완료되었다. 시설장비 분야에서는 [별표1] 제2.3호와 관련하여 '기타' 등급으로 환경모니터링 관리기준 미흡이 지적되어 보완완료되었다. 제조 분야에서는 [별표1] 제6.4호와 관련하여 이송튜빙의 세척밸리데이션 미흡이 지적되어 보완완료되었다. 시험실 분야에서는 [별표1] 제7.1호와 관련하여 배지성능시험 관련 문서별 시험조건 상이가 지적되어 보완완료되었다. 주석은 다음과 같다. 1) GMP 감시 분야(6개)는 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시이다. 2) 구분은 PIC/S 정의에 따라 중대, 중요, 기타로 작성한다. 3) 지적사항 중 '중대·중요' 건은 행정처분을 부과하고, '기타' 건은 시정·보완하도록 한다. 행정처분 부과가 확정되면 '의약품안전나라 행정처분정보'를 통해 공개된다. '중대·중요' 지적사항은 보완 완료 후, '기타' 지적사항은 이행계획 확인 후 타당성이 인정되는 경우 GMP 적합판정서를 발급한다. (의약품안전관리과)",
+              "agency": "MFDS",
+              "firm_name": "서울대학교병원",
+              "published_date": "2026-06-25",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PxzwRCkCdX"
+            },
+            {
+              "finding_id": "finding-dbc7d596b5e697358ea247b2",
+              "text_ko": "귀사는 배치가 이미 출하되었는지 여부와 관계없이, 배치 또는 그 구성요소가 규격을 충족하지 못한 설명되지 않는 불일치(discrepancy)나 실패를 철저히 조사하지 못했다(21 CFR 211.192). 귀사는 충분하고 적시의 조사를 보장할 적절한 시스템을 갖추지 못했다. A. 귀사는 2025년 1월부터 6월 사이 ISO 5 및 7 구역에서 발생한 다수의 조치수준(action-level) 환경모니터링 이탈(excursion)을 조사하지 못했다. 귀사의…",
+              "agency": "FDA",
+              "firm_name": "Jubilant HollisterStier General Partnership",
+              "published_date": "2026-06-23",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/jubilant-hollisterstier-general-partnership-723537-05282026"
+            },
+            {
+              "finding_id": "finding-fa298248b3b3d0a324a6eb77",
+              "text_ko": "시설관리 분야 기타: [별표 1] 제2.3호 환경모니터링 경향분석과 관련한 추가 자료를 제출할 것.",
+              "agency": "MFDS",
+              "firm_name": "(주)프로톡스",
+              "published_date": "2026-06-01",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Pw1ukw_0E0"
+            },
+            {
+              "finding_id": "finding-d9a4c833c9c563bf6bf832e1",
+              "text_ko": "ISO 5 구역에서의 일상적 환경 모니터링(environmental monitoring)이 부적절하였다.",
+              "agency": "FDA",
+              "firm_name": "Central Alabama Veterans Health Care System",
+              "published_date": "2026-05-27",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://www.fda.gov/media/192438/download"
+            },
+            {
+              "finding_id": "finding-9f882ad242e12103bff38819",
+              "text_ko": "환경모니터링을 위해 채취한 시료 수가 충분하지 않았다.",
+              "agency": "HC",
+              "firm_name": "Montreal Neurological Institute",
+              "published_date": "2026-05-20",
+              "category_label_ko": "환경모니터링",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89021"
+            }
+          ]
+        },
+        {
+          "key": "data_integrity",
+          "slug": "data-integrity",
+          "label_ko": "데이터 완전성",
+          "findings": 122,
+          "documents": 112,
+          "by_agency": [
+            {
+              "v": "MFDS",
+              "c": 62
+            },
+            {
+              "v": "FDA",
+              "c": 33
+            },
+            {
+              "v": "EMA",
+              "c": 25
+            },
+            {
+              "v": "MHRA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "(주)킵스바이오파마",
+              "c": 3
+            },
+            {
+              "firm_name": "Intas Pharmaceuticals Limited",
+              "c": 3
+            },
+            {
+              "firm_name": "(주)대유코아",
+              "c": 2
+            },
+            {
+              "firm_name": "(주)씨티씨바이오",
+              "c": 2
+            },
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 2
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-fb3273208760f76a38ce6905",
+              "text_ko": "실사 기간 중 해당 시설 전반에서, 특히 의약품의 무균제조(aseptic manufacture)와 직접 관련된 영역에서 다수의 치명적(critical) 및 중대(major) 결함이 확인되었다. 이러한 결함의 성격과 범위는 오염관리, 무균 행위(aseptic behaviour), 설비 완전성, 데이터 거버넌스 및 품질관리 실무 전반의 시스템적 취약성을 보여주며, 이는 종합적으로 Block A에서 제조되는 제품의 무균성, 안전성 및 전반적 품질에 중대한 위험을 초래한다. 시설 설계 및 차압 체계(pressure cascade) 유지에서 치명적 결함이 관찰되었으며, 여기에는 청정등급 구역과 비청정등급 구역 간 차압 부족, 역전된 압력 구배, 그리고 무균 원료의약품(API)이 Grade B에서 노출되는 결과를 초래한 배치(layout) 제약이 포함된다. 이러한 문제는 무균공정(aseptic processing)에 요구되는 기본적인 환경관리를 저해한다. 작업자의 행위 및 무균 실무와 관련해서도 심각한 우려가 확인되었는데, 작업자들이 갱의(gowning) 요건, 무균 규율, RABS 취급 절차 및 환경 보호 조치를 준수하지 않았다. 이러한 행위는 무균성 보증을 직접적으로 훼손하며 교육훈련과 감독이 불충분함을 시사한다. 실사에서는 또한 녹슨 패스박스, 청결하지 않은 저울과 발판 사다리 등 상태가 불량한 설비와, Grade B 내에서 불합격 자재 및 IPC 검체에 개방형 용기를 사용하는 사례가 확인되었다. 이러한 결함은 중요 제조구역 내에서 허용될 수 없는 오염 위험에 해당한다. 자재 및 GMP 문서의 정리와 관리에서도 중대한 취약성이 발견되었으며, 여기에는 운영 문서, 미생물 기록, 페트리 접시 및 기타 자재가 증축구역(expansion zone) 등 관리되지 않는 구역에 보관되어 있던 사례가 포함된다. 무균 충전에 사용되는 배관에 연결된, 노후화되고 식별되지 않은 가스 실린더가 발견되어 관리되지 않는 물질이 제품과 접촉할 가능성에 대한 우려가 더욱 커졌다. 기록 누락, 일관성 없는 기재, 불명확한 용어 사용, 그리고 수행되지 않았음에도 보고된 분석 활동 등 치명적인 데이터 완전성(data integrity) 결함이 확인되었다. 이러한 문제는 GMP 문서의 신뢰성을 저해하고 배치 출하 결정의 정확성에 대한 우려를 야기한다. 품질관리 실험실에서는 원료의약품(API)에 대한 필수 시험이 제조업자에 의해 수행되지 않았고, 보관용 검체가 부적절하게 보관되었으며, 완제의약품 검체에 적절한 식별표시가 없었고, 무균시험이 부적합한 장비를 사용하여 수행되었다. 이러한 결함은 분석 결과의 타당성과 제품 품질 보증에 치명적인 영향을 미친다. 오염관리전략(CCS, Contamination Control Strategy)에서도 중대한 미비점이 확인되었는데, CCS는 뒤늦게 시행되었고 Grade B에서의 API 노출, 환경모니터링 취약성, 인원 제한, HEPA 필터 교체 근거, 소독제 승인 등 여러 오염 위험을 다루지 못하였다. 마지막으로, 배치 문서에는 요구되는 검체채취에 대한 증빙이 없고 라인 클리어런스(line clearance) 검증이 불완전하여 배치 추적성과 무균 작업 준비 상태가 훼손되었다.\n\nNCA가 취하였거나 제안한 조치: 기타. 해당 제조소가 시장에 출시한 의약품이 없고, 동일한 유효성분 및 함량을 함유한 의약품을 보유한 대체 제조소가 포르투갈에서 허가되어 있으므로 포르투갈 시장에는 영향이 없다. 해당 제조소에 대해서는 모든 치명적 및 중대 결함이 적절히 조치되고 그 이행이 후속 실사를 통해 확인될 때까지 비준수 보고서(NCR, Non-Compliance Report)를 발행하기로 결정되었다.",
+              "agency": "EMA",
+              "firm_name": "Ananta Medicare Limited",
+              "published_date": "2026-08-06",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186887.pdf"
+            },
+            {
+              "finding_id": "finding-16a8d5df83bbf1694227ac49",
+              "text_ko": "기타 [별표1] 1의2. 시험장비 이외에 제조설비에 대해서도 점검기록(Audit trail) 검토를 함께 수행할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-345f444c36c7c3bab86c8d0f",
+              "text_ko": "품질경영 분야 — 기타 [별표1] 1의2. 점검기록(Audit trail)에 대한 검토는 해당 작업과 관련 없는 부서에서 실시할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-c0db5b77e8d6ae0f8d109213",
+              "text_ko": "기타 [별표1] 13. 자율점검 시 데이터 완전성(data integrity)과 관련한 사항의 점검을 포함하여 실시하도록 절차를 마련할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-27d36fca5040c74ebf84d4a1",
+              "text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제1의2호에 따른 데이터 완전성(data integrity) 보증 절차에 대하여 추가설명자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "에스피씨(주)",
+              "published_date": "2026-07-30",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H"
+            },
+            {
+              "finding_id": "finding-870e3d5618d9c4da97b09238",
+              "text_ko": "기타 지적사항으로, [별표 1] 제3.3호 다목에 따른 데이터완전성(data integrity — 백업, 권한, 감사추적(audit trail) 등)과 관련한 추가 설명자료를 제출할 것을 요구했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)유케이케미팜",
+              "published_date": "2026-07-30",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE47q1"
+            }
+          ]
+        }
+      ],
+      "excluded": []
+    },
+    {
+      "axis": "country",
+      "items": [
+        {
+          "key": "CA",
+          "slug": "ca",
+          "label_ko": "캐나다",
+          "findings": 8576,
+          "documents": 1661,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 8523
+            },
+            {
+              "v": "FDA",
+              "c": 47
+            },
+            {
+              "v": "MFDS",
+              "c": 4
+            },
+            {
+              "v": "EMA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 189
+            },
+            {
+              "firm_name": "Chief Medical Supplies Ltd",
+              "c": 96
+            },
+            {
+              "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "c": 91
+            },
+            {
+              "firm_name": "Apotex Inc",
+              "c": 77
+            },
+            {
+              "firm_name": "Voyant Beauty, Inc.",
+              "c": 75
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-3cfee7d3409d60db9e40db31",
+              "text_ko": "지적사항이 기록되지 않았다.",
+              "agency": "HC",
+              "firm_name": "Neilmed Pharmaceuticals Inc",
+              "published_date": "2026-07-21",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89341"
+            },
+            {
+              "finding_id": "finding-011e97a2ae776c4e0d3b1ee7",
+              "text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 데 필요한 지침 및/또는 절차가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-1e3177e06dbd58e7576f6586",
+              "text_ko": "기록의 유지·관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-3107718e991a0732fc257219",
+              "text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-47a58f63934b5bafcc2c0f53",
+              "text_ko": "품질관리부서(quality control unit)가 요구되는 활동을 모두 수행하지 않았다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-9d57c38e9c4f6954001ae6ea",
+              "text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            }
+          ]
+        },
+        {
+          "key": "US",
+          "slug": "us",
+          "label_ko": "미국",
+          "findings": 8309,
+          "documents": 1342,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 8303
+            },
+            {
+              "v": "MFDS",
+              "c": 4
+            },
+            {
+              "v": "EMA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 150
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 137
+            },
+            {
+              "firm_name": "PharMEDium Services, LLC",
+              "c": 134
+            },
+            {
+              "firm_name": "Hospira, Inc.",
+              "c": 88
+            },
+            {
+              "firm_name": "American National Red Cross/Biomedical Services",
+              "c": 83
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-194c974b984823adba33c583",
+              "text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-297a5712ff2d781cf4c40122",
+              "text_ko": "귀사는 의약품이 표방하는 동일성(identity), 함량, 순도 및 품질을 보증하기 위한 제조 및 공정관리 관련 적절한 문서화된 절차를 수립하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-3a98af78dda07138dba2da13",
+              "text_ko": "품질관리부서에 적용되는 책임사항과 절차가 완전히 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-7fd5abfc11a4d9ea84d3ddca",
+              "text_ko": "실험실 관리에 의약품이 동일성(identity), 함량, 품질 및 순도의 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 시험 절차의 수립이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-f68b1790ed6627480f3dd19e",
+              "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(discrepancy)에 대한 철저한 검토가 이루어지지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Baxalta US Inc.",
+              "published_date": "2026-08-04",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194052/download"
+            },
+            {
+              "finding_id": "finding-1547b67bea72907db4100a78",
+              "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Cascade Specialty Pharmacy LLC",
+              "published_date": "2026-07-31",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/193964/download"
+            }
+          ]
+        },
+        {
+          "key": "IN",
+          "slug": "in",
+          "label_ko": "인도",
+          "findings": 1122,
+          "documents": 232,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 1085
+            },
+            {
+              "v": "EMA",
+              "c": 27
+            },
+            {
+              "v": "MFDS",
+              "c": 8
+            },
+            {
+              "v": "MHRA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Lupin Limited",
+              "c": 66
+            },
+            {
+              "firm_name": "Sun Pharmaceutical Industries Ltd.",
+              "c": 63
+            },
+            {
+              "firm_name": "Dr. Reddy's Laboratories Ltd.",
+              "c": 58
+            },
+            {
+              "firm_name": "Cipla Limited",
+              "c": 49
+            },
+            {
+              "firm_name": "Intas Pharmaceuticals Limited",
+              "c": 34
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-fb3273208760f76a38ce6905",
+              "text_ko": "실사 기간 중 해당 시설 전반에서, 특히 의약품의 무균제조(aseptic manufacture)와 직접 관련된 영역에서 다수의 치명적(critical) 및 중대(major) 결함이 확인되었다. 이러한 결함의 성격과 범위는 오염관리, 무균 행위(aseptic behaviour), 설비 완전성, 데이터 거버넌스 및 품질관리 실무 전반의 시스템적 취약성을 보여주며, 이는 종합적으로 Block A에서 제조되는 제품의 무균성, 안전성 및 전반적 품질에 중대한 위험을 초래한다. 시설 설계 및 차압 체계(pressure cascade) 유지에서 치명적 결함이 관찰되었으며, 여기에는 청정등급 구역과 비청정등급 구역 간 차압 부족, 역전된 압력 구배, 그리고 무균 원료의약품(API)이 Grade B에서 노출되는 결과를 초래한 배치(layout) 제약이 포함된다. 이러한 문제는 무균공정(aseptic processing)에 요구되는 기본적인 환경관리를 저해한다. 작업자의 행위 및 무균 실무와 관련해서도 심각한 우려가 확인되었는데, 작업자들이 갱의(gowning) 요건, 무균 규율, RABS 취급 절차 및 환경 보호 조치를 준수하지 않았다. 이러한 행위는 무균성 보증을 직접적으로 훼손하며 교육훈련과 감독이 불충분함을 시사한다. 실사에서는 또한 녹슨 패스박스, 청결하지 않은 저울과 발판 사다리 등 상태가 불량한 설비와, Grade B 내에서 불합격 자재 및 IPC 검체에 개방형 용기를 사용하는 사례가 확인되었다. 이러한 결함은 중요 제조구역 내에서 허용될 수 없는 오염 위험에 해당한다. 자재 및 GMP 문서의 정리와 관리에서도 중대한 취약성이 발견되었으며, 여기에는 운영 문서, 미생물 기록, 페트리 접시 및 기타 자재가 증축구역(expansion zone) 등 관리되지 않는 구역에 보관되어 있던 사례가 포함된다. 무균 충전에 사용되는 배관에 연결된, 노후화되고 식별되지 않은 가스 실린더가 발견되어 관리되지 않는 물질이 제품과 접촉할 가능성에 대한 우려가 더욱 커졌다. 기록 누락, 일관성 없는 기재, 불명확한 용어 사용, 그리고 수행되지 않았음에도 보고된 분석 활동 등 치명적인 데이터 완전성(data integrity) 결함이 확인되었다. 이러한 문제는 GMP 문서의 신뢰성을 저해하고 배치 출하 결정의 정확성에 대한 우려를 야기한다. 품질관리 실험실에서는 원료의약품(API)에 대한 필수 시험이 제조업자에 의해 수행되지 않았고, 보관용 검체가 부적절하게 보관되었으며, 완제의약품 검체에 적절한 식별표시가 없었고, 무균시험이 부적합한 장비를 사용하여 수행되었다. 이러한 결함은 분석 결과의 타당성과 제품 품질 보증에 치명적인 영향을 미친다. 오염관리전략(CCS, Contamination Control Strategy)에서도 중대한 미비점이 확인되었는데, CCS는 뒤늦게 시행되었고 Grade B에서의 API 노출, 환경모니터링 취약성, 인원 제한, HEPA 필터 교체 근거, 소독제 승인 등 여러 오염 위험을 다루지 못하였다. 마지막으로, 배치 문서에는 요구되는 검체채취에 대한 증빙이 없고 라인 클리어런스(line clearance) 검증이 불완전하여 배치 추적성과 무균 작업 준비 상태가 훼손되었다.\n\nNCA가 취하였거나 제안한 조치: 기타. 해당 제조소가 시장에 출시한 의약품이 없고, 동일한 유효성분 및 함량을 함유한 의약품을 보유한 대체 제조소가 포르투갈에서 허가되어 있으므로 포르투갈 시장에는 영향이 없다. 해당 제조소에 대해서는 모든 치명적 및 중대 결함이 적절히 조치되고 그 이행이 후속 실사를 통해 확인될 때까지 비준수 보고서(NCR, Non-Compliance Report)를 발행하기로 결정되었다.",
+              "agency": "EMA",
+              "firm_name": "Ananta Medicare Limited",
+              "published_date": "2026-08-06",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186887.pdf"
+            },
+            {
+              "finding_id": "finding-020c5c2186ce4ea0de6ae189",
+              "text_ko": "의약품 제조 및 가공에 종사하는 직원이 담당 업무를 수행하는 데 필요한 교육훈련과 경험을 갖추지 못하였다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-2624810f130257461ca787b4",
+              "text_ko": "문서화된 절차의 변경사항이 품질관리부서의 검토 및 승인을 거치지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-5eae4868b802126cb34c93f2",
+              "text_ko": "의약품에 대한 문서화된 안정성시험 프로그램에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-64049cade4698a2a2e60bfdf",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-8bbd8d4276953cd406e6deba",
+              "text_ko": "무균공정(aseptic) 구역의 환경조건 모니터링 체계가 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            }
+          ]
+        },
+        {
+          "key": "KR",
+          "slug": "kr",
+          "label_ko": "대한민국",
+          "findings": 756,
+          "documents": 179,
+          "by_agency": [
+            {
+              "v": "MFDS",
+              "c": 707
+            },
+            {
+              "v": "FDA",
+              "c": 49
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "이연제약(주)",
+              "c": 27
+            },
+            {
+              "firm_name": "(주)휴메딕스",
+              "c": 21
+            },
+            {
+              "firm_name": "(주)퍼슨",
+              "c": 20
+            },
+            {
+              "firm_name": "에이치케이이노엔(주)",
+              "c": 19
+            },
+            {
+              "firm_name": "일양약품(주)",
+              "c": 18
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-16a8d5df83bbf1694227ac49",
+              "text_ko": "기타 [별표1] 1의2. 시험장비 이외에 제조설비에 대해서도 점검기록(Audit trail) 검토를 함께 수행할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-345f444c36c7c3bab86c8d0f",
+              "text_ko": "품질경영 분야 — 기타 [별표1] 1의2. 점검기록(Audit trail)에 대한 검토는 해당 작업과 관련 없는 부서에서 실시할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-468d6cbddd9347860d56e09f",
+              "text_ko": "기타 [별표1] 12. 진행 중인 변경 건이 누락되지 않도록 관리하는 절차를 마련할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-945ec2643619375d6c7240dc",
+              "text_ko": "기타 [별표1] 11. 불만처리 규정과 관련하여 불만(complaint) 등급을 부여하고, 등급에 따른 처리기한을 설정하여 관리할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-9b3ac74e02483989d695b42c",
+              "text_ko": "기타 [별표1] 7.3. 제품품질평가에서 중요한 공정관리에 대한 평가를 수행한 후, 개선이 필요한 사항에 대해서는 시정조치 기록을 포함하여 작성할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            },
+            {
+              "finding_id": "finding-c0db5b77e8d6ae0f8d109213",
+              "text_ko": "기타 [별표1] 13. 자율점검 시 데이터 완전성(data integrity)과 관련한 사항의 점검을 포함하여 실시하도록 절차를 마련할 것을 지적했다.",
+              "agency": "MFDS",
+              "firm_name": "(주)킵스바이오파마",
+              "published_date": "2026-07-31",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l"
+            }
+          ]
+        },
+        {
+          "key": "JP",
+          "slug": "jp",
+          "label_ko": "일본",
+          "findings": 153,
+          "documents": 33,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 99
+            },
+            {
+              "v": "MFDS",
+              "c": 54
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Ohara Pharmaceutical Co., Ltd., Kami Factory,",
+              "c": 11
+            },
+            {
+              "firm_name": "Takeda Pharmaceutical Company Limited",
+              "c": 11
+            },
+            {
+              "firm_name": "Toyobo Co.",
+              "c": 11
+            },
+            {
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "c": 10
+            },
+            {
+              "firm_name": "OPHTECS Manufacturing Ltd.",
+              "c": 10
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-02035bf619d3f8b163f46e7a",
+              "text_ko": "원자재 기타: [별표 1] 10.2호 원자재의 사용(유효)기간 또는 재시험 일자를 적절하게 설정할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            },
+            {
+              "finding_id": "finding-13de0d8fc171789facfd4cde",
+              "text_ko": "제조 기타: [별표 1] 제8.1호 제조지시 및 기록서(batch record)를 적절히 작성할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            },
+            {
+              "finding_id": "finding-2a47e1f08eb63e44747ab785",
+              "text_ko": "시험실 기타: [별표 1] 제7.2호 안정성시험 검체를 적절한 조건에서 보관할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            },
+            {
+              "finding_id": "finding-37ee3738f0e71762e537f558",
+              "text_ko": "품질경영 기타: [별표 1] 제6.1호 공정밸리데이션(process validation)을 적절하게 실시할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            },
+            {
+              "finding_id": "finding-4aa7d728b4a64e74ee18cc5a",
+              "text_ko": "시험실 기타: [별표 1] 제7.1호 원자재 품질시험을 적절하게 실시할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            },
+            {
+              "finding_id": "finding-5b7d2b4960b8e1833f1ce8f1",
+              "text_ko": "품질경영 기타: [별표 1] 제3.3호 일탈(deviation) 발생에 대한 원인조사 및 재발방지대책을 제출할 것.",
+              "agency": "MFDS",
+              "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "published_date": "2026-05-15",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PufDyaRzTr"
+            }
+          ]
+        },
+        {
+          "key": "CN",
+          "slug": "cn",
+          "label_ko": "중국",
+          "findings": 150,
+          "documents": 48,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 117
+            },
+            {
+              "v": "MFDS",
+              "c": 24
+            },
+            {
+              "v": "EMA",
+              "c": 8
+            },
+            {
+              "v": "MHRA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "c": 25
+            },
+            {
+              "firm_name": "Wuxi Biologics",
+              "c": 15
+            },
+            {
+              "firm_name": "Nanchang Anobri Pharmaceutical Co., Ltd.",
+              "c": 10
+            },
+            {
+              "firm_name": "Hubei Guangchen Pharmaceutical Co., Ltd",
+              "c": 8
+            },
+            {
+              "firm_name": "Jiangsu Hengrui Pharmceuticals Co., Ltd",
+              "c": 8
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-43251caa869ec06faa317218",
+              "text_ko": "평가 결과 지적(보완)사항(Deficiencies)이 있었다. 제조 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제6.1호와 관련하여 제조기록서를 작업과 동시에 작성하지 않았다(보완완료). 시험실 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제11.1호와 관련하여 품질관리기록서에 시험 근거자료를 첨부하고 있지 않았으며(보완완료), 같은 규칙 [별표 1의2] 제6.2호와 관련하여 시약의 보관조건 관련 규정이 확인되지 않았다(보완완료). 담당 부서는 한약정책과이다.",
+              "agency": "MFDS",
+              "firm_name": "Qingdao Huazhong Pharmaceuticals Co., Ltd.",
+              "published_date": "2026-07-31",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rAodwYSY"
+            },
+            {
+              "finding_id": "finding-0b0e10ebe29f1d89b4c7ed50",
+              "text_ko": "실험실 기록에 확립된 규격 및 기준 준수를 보장하는 데 필요한 모든 시험, 검사 및 분석에서 도출된 완전한 데이터가 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/193577/download"
+            },
+            {
+              "finding_id": "finding-194abed18ac1495db75f924d",
+              "text_ko": "하드카피 또는 대체 시스템 보관을 통해 백업 데이터가 변경, 삭제 또는 손실로부터 정확하고 완전하며 안전하도록 보장되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/193577/download"
+            },
+            {
+              "finding_id": "finding-2bbc26eb9cf64dc98378875e",
+              "text_ko": "설비 및 기구가 완제의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변경할 수 있는 오염을 방지하기 위해 적절한 주기에 유지관리되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/193577/download"
+            },
+            {
+              "finding_id": "finding-59ca33ea41e7b9a7e1f162ca",
+              "text_ko": "실험실 관리에 구성품(원자재), 공정중 물질 및 완제의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준을 충족하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/193577/download"
+            },
+            {
+              "finding_id": "finding-6b4d49a5a5a43aab59665b0d",
+              "text_ko": "모든 주요 공정 파라미터가 관리되고 절차로부터의 모든 일탈이 정당화됨을 보장하고 문서화하기 위한 문서화된 절차 및 공정 관리 절차가 없다.",
+              "agency": "FDA",
+              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/193577/download"
+            }
+          ]
+        },
+        {
+          "key": "DE",
+          "slug": "de",
+          "label_ko": "독일",
+          "findings": 69,
+          "documents": 20,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 50
+            },
+            {
+              "v": "MFDS",
+              "c": 18
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Baxter Oncology GmbH",
+              "c": 16
+            },
+            {
+              "firm_name": "Rentschler Biopharma SE",
+              "c": 10
+            },
+            {
+              "firm_name": "Bayer AG Pharma",
+              "c": 9
+            },
+            {
+              "firm_name": "CSL Behring GmbH",
+              "c": 6
+            },
+            {
+              "firm_name": "Bayer Bitterfeld GmbH",
+              "c": 5
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-394c6e3d7384dd644b3f7442",
+              "text_ko": "시험 절차 및 실험실 관리체계의 수립과 그 변경사항이 적절한 조직 단위에 의해 작성되고 품질관리부서의 검토·승인을 거치지 않았다.",
+              "agency": "FDA",
+              "firm_name": "C.A.T. Gmbh and Co. KG",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194067/download"
+            },
+            {
+              "finding_id": "finding-2b98e03ac7937b346a3dac8d",
+              "text_ko": "장비와 기구가 의약품의 안전성, 확인시험, 함량, 품질 또는 순도를 변질시킬 수 있는 오염을 방지하기 위해 적절한 주기로 세척되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "CSL Behring GmbH",
+              "published_date": "2026-07-22",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/193763/download"
+            },
+            {
+              "finding_id": "finding-65a54c3b95811e2929076802",
+              "text_ko": "의약품에 관한 모든 서면 및 구두 불만(complaint)의 처리를 기술한 절차가 수립되고 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "CSL Behring GmbH",
+              "published_date": "2026-07-22",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://www.fda.gov/media/193763/download"
+            },
+            {
+              "finding_id": "finding-6e99e3ba02b3e68cb3ee7bdb",
+              "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "CSL Behring GmbH",
+              "published_date": "2026-07-22",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/193763/download"
+            },
+            {
+              "finding_id": "finding-86a47838a0c8e3b44dab3c9e",
+              "text_ko": "문서화된 절차의 변경사항이 품질관리부서(quality control unit)의 검토 및 승인을 받지 않았다.",
+              "agency": "FDA",
+              "firm_name": "CSL Behring GmbH",
+              "published_date": "2026-07-22",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/193763/download"
+            },
+            {
+              "finding_id": "finding-e7c87ff9f5de496b7887591a",
+              "text_ko": "생물학적 제제 일탈(biological deviation)을 보고하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "CSL Behring GmbH",
+              "published_date": "2026-07-22",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/193763/download"
+            }
+          ]
+        },
+        {
+          "key": "GB",
+          "slug": "gb",
+          "label_ko": "영국",
+          "findings": 43,
+          "documents": 13,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 36
+            },
+            {
+              "v": "MHRA",
+              "c": 4
+            },
+            {
+              "v": "MFDS",
+              "c": 3
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "CP Pharmaceuticals",
+              "c": 13
+            },
+            {
+              "firm_name": "Dr. Reddy&#039;s Laboratories",
+              "c": 7
+            },
+            {
+              "firm_name": "Aptuit Ltd",
+              "c": 6
+            },
+            {
+              "firm_name": "Symbiosis Pharmaceutical Services Limited",
+              "c": 6
+            },
+            {
+              "firm_name": "A. Nelson & Co. Ltd.",
+              "c": 4
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-1100d854eba60636304134be",
+              "text_ko": "2026년 5월 5~8일(05 to 08 May 2026) 해당 제조소에 대한 실사가 수행되었다. GMP 관련 critical 결함 2건과 major 결함 3건이 지적되었다. critical 결함은 GMP와 QRM을 반영하여 포괄적으로 설계되고 올바르게 실행되는 PQS(의약품품질시스템)를 구현하지 못한 것에 관한 것으로, 견고하고 신뢰할 수 있는 배치 관리 절차가 마련되어 있음을 보장하지 못한 점과 Qualified Person이 각 배치가 GMP 요건에 따라 제조·확인되었음을 보장하지 못한 점에서 확인되었다.\n\nNCA의 조치/제안 사항: 조치/제안: 전면 정지(suspension in full). 현행 유효 GMP 인증서 철회: UK MIA(IMP) 322 INSP IMP 322/14798-0031[I]",
+              "agency": "MHRA",
+              "firm_name": "NORGINE LIMITED",
+              "published_date": "2026-08-03",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmpgdpimp-32214798-0032i"
+            },
+            {
+              "finding_id": "finding-4c43d318d20e6adba9adb592",
+              "text_ko": "2026년 5월 5~8일(05 to 08 May 2026) 해당 제조소에 대한 실사가 수행되었다. GMP 관련 critical 결함 2건과 major 결함 3건이 지적되었다. critical 결함은 GMP와 QRM을 반영하여 포괄적으로 설계되고 올바르게 실행되는 PQS(의약품품질시스템)를 구현하지 못한 것에 관한 것으로, 견고하고 신뢰할 수 있는 배치 관리 절차가 마련되어 있음을 보장하지 못한 점과 Qualified Person이 각 배치가 MA(품목허가) 및 GMP 요건에 따라 제조·확인되었음을 보장하지 못한 점에서 확인되었다. 본 부적합 확인서(Statement of Non Compliance)는 critical products의 제조는 포함하지 않는다. 해당 제품은 각국 규제당국(National Competent Authorities)과 서면으로 합의하여야 한다.\n\nNCA의 조치/제안 사항: 조치/제안: 부분 정지(suspension In part). 현행 유효 GMP 인증서 철회: UK MIA 322 INSP GMP 322/14798-0030[H] 공급 금지: 본 부적합 확인서가 유효한 동안 영국 시장에는 critical products의 배치만 공급할 수 있다.",
+              "agency": "MHRA",
+              "firm_name": "NORGINE LIMITED",
+              "published_date": "2026-08-03",
+              "category_label_ko": "밸리데이션/적격성평가",
+              "evidence_url": "https://cms.mhra.gov.uk/mhra/gmp/insp-gmpgdpimp-32214798-0032h"
+            },
+            {
+              "finding_id": "finding-24e36de8338e3d4a71b8e9e3",
+              "text_ko": "원료의약품(drug substance)의 각 원료의 확인(identity)이, 특정 확인시험을 사용하여 최소 1회의 시험을 실시하는 방법으로 검증되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Aptuit Ltd",
+              "published_date": "2026-07-28",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/193886/download"
+            },
+            {
+              "finding_id": "finding-548be2c57799f74a10d6f1f1",
+              "text_ko": "비무균으로 표방하는 제품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Aptuit Ltd",
+              "published_date": "2026-07-28",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/193886/download"
+            },
+            {
+              "finding_id": "finding-57cb4617a8792a26b9255bf2",
+              "text_ko": "미생물학적 시험방법의 정확성, 감도, 특이성, 재현성 및 신뢰성이 설정되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Aptuit Ltd",
+              "published_date": "2026-07-28",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/193886/download"
+            },
+            {
+              "finding_id": "finding-9f854eeb6a953b751afce800",
+              "text_ko": "품질부서(quality unit)에 적용되는 책임이 완전히 준수되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Aptuit Ltd",
+              "published_date": "2026-07-28",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/193886/download"
+            }
+          ]
+        },
+        {
+          "key": "IT",
+          "slug": "it",
+          "label_ko": "이탈리아",
+          "findings": 39,
+          "documents": 11,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 29
+            },
+            {
+              "v": "MFDS",
+              "c": 6
+            },
+            {
+              "v": "EMA",
+              "c": 4
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Cosma SpA",
+              "c": 11
+            },
+            {
+              "firm_name": "Patheon Italia S.p.A.",
+              "c": 9
+            },
+            {
+              "firm_name": "NerPharMa S.r.l.",
+              "c": 8
+            },
+            {
+              "firm_name": "Bracco Imaging S.p.A.",
+              "c": 5
+            },
+            {
+              "firm_name": "Valpharma International S.p.A.",
+              "c": 2
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-758d0b12596d5654b7acfa0c",
+              "text_ko": "AIFA가 2026년 6월 22일부터 24일까지 실시한 실사에서, 비경구영양(parenteral nutrition) 제품의 무균 조제에 적용되는 의약품품질시스템(Pharmaceutical Quality System) 및 EU GMP 요건의 이행에 영향을 미치는 중대하고 시스템적인 결함이 확인되었다. 12건의 주요(major) 결함이 확인되었다. • 의약품품질시스템 결함. • 부적절한 문서화 및 데이터 완전성(data integrity) 관리. • 전산화 시스템 밸리데이션 및 전자 데이터 관리의 결함. • 부적절한 오염관리전략(Contamination Control Strategy). • 무균공정 모의시험(APS/배지충전(media fill))의 결함. • 환경 및 미생물 모니터링의 결함. • 부적절한 적격성평가(qualification) 및 밸리데이션 활동. • 직원 교육, 공급자 적격성평가 및 품질관리 감독의 결함. NCA가 취하거나 제안한 조치: 현재 유효한 GMP 인증서 No. IT/265/H/2024의 철회. 취해진 규제 조치로서 GMP 비준수 진술서(Statement of Non-Compliance with GMP)가 발행되었다. 제조 승인(manufacturing authorization) No. aM-194/2024의 정지. GMP 요건 비준수 상태가 확인되었으나, 실사팀은 해당 사업장에서 제조되는 의약품의 성격도 함께 고려하였는데, 이들은 비경구영양을 받는 환자를 위한 것으로 필수적이며 잠재적으로 생명 유지에 관여하는 치료제이다. 실사 결과에 근거할 때 이미 제조·유통된 배치와 관련하여 환자 건강에 대한 즉각적이고 구체적인 위험을 나타내는 증거는 발견되지 않았다. 따라서 이미 공급된 의약품의 지속 사용에 유리한 것으로 판단된 위해-이익 평가(risk-benefit assessment)에 따라, 실사팀은 현재 가용한 정보에 근거할 때 이미 제조·유통된 배치의 회수를 권고할 필요는 없다고 판단한다. 기타: 해당 사업장은 Directive 2001/83/EC 제5조(이탈리아 Legislative Decree No. 219/2006으로 국내법화됨)에 따라 오로지 의사 처방에 기초하여 멸균 비경구영양 조제물을 제조한다. 비경구영양 조제물은 의사 처방에 기초하여(Directive 2001/83/EC 제5조) 이탈리아 시장에만 공급된다. 다른 국가에 대한 조치는 필요하지 않다.",
+              "agency": "EMA",
+              "firm_name": "Avlab S.r.l.",
+              "published_date": "2026-07-23",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186598.pdf"
+            },
+            {
+              "finding_id": "finding-1b836c8a1bf34727d471053a",
+              "text_ko": "귀사의 멸균 의약품 육안검사 프로그램은 귀 시설에서 제조된 완제품이 입자성 물질이 본질적으로 없는 것을 포함하여 표방된 품질 특성을 보유한다는 충분한 보증을 제공하지 않는다.",
+              "agency": "FDA",
+              "firm_name": "Patheon Italia S.p.A.",
+              "published_date": "2026-04-09",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/191892/download"
+            },
+            {
+              "finding_id": "finding-428d4a9ec5566cf00dd464b4",
+              "text_ko": "품질부서(Quality Unit, QU)의 제조 공정 감독이 부적절했다.",
+              "agency": "FDA",
+              "firm_name": "Patheon Italia S.p.A.",
+              "published_date": "2026-04-09",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/191892/download"
+            },
+            {
+              "finding_id": "finding-a617f2bc333b21265b43f63a",
+              "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 완전히 수립되거나 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Patheon Italia S.p.A.",
+              "published_date": "2026-04-09",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/191892/download"
+            },
+            {
+              "finding_id": "finding-c792b417cfd63054b71c66d4",
+              "text_ko": "Grade A Cb><-O의 중요 지원 구역을 포함한 등급 구역의 환경관리 프로그램은 등급 구역을 적절히 세척 및/또는 소독하고 미생물 오염 수준을 검출할 수 있음을 보장하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Patheon Italia S.p.A.",
+              "published_date": "2026-04-09",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/191892/download"
+            },
+            {
+              "finding_id": "finding-cd5feed7cdfe84bf965b4f51",
+              "text_ko": "귀사가 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖도록 보장하기 위해 설계된 공정관리 및 시험을 수립하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Patheon Italia S.p.A.",
+              "published_date": "2026-04-09",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/191892/download"
+            }
+          ]
+        },
+        {
+          "key": "FR",
+          "slug": "fr",
+          "label_ko": "프랑스",
+          "findings": 38,
+          "documents": 7,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 33
+            },
+            {
+              "v": "MFDS",
+              "c": 4
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Excel Vision",
+              "c": 13
+            },
+            {
+              "firm_name": "Sanofi Winthrop Industrie",
+              "c": 11
+            },
+            {
+              "firm_name": "Fareva Amboise",
+              "c": 9
+            },
+            {
+              "firm_name": "Astrea Fontaine",
+              "c": 2
+            },
+            {
+              "firm_name": "Septodont",
+              "c": 2
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-254be2c37f7e5393ac3052ca",
+              "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션(validation)이 포함되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            },
+            {
+              "finding_id": "finding-272c1c69569d08cc61f30c6e",
+              "text_ko": "무균공정 구역이 무균 상태를 조성하기 위한 실내 및 설비의 세척·소독 시스템 측면에서 미흡하였다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            },
+            {
+              "finding_id": "finding-350cdbb9fb97e4bed7cecd15",
+              "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 확립되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            },
+            {
+              "finding_id": "finding-42a9812ead93a13cc181e8f5",
+              "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치 및 배치 또는 그 구성 성분이 규격을 충족하지 못한 사례를 철저히 검토하지 못하였다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            },
+            {
+              "finding_id": "finding-5ab992077bc68a25acea5edd",
+              "text_ko": "승인 또는 부적합 여부와 관계없이 대표성 있는 수의 배치와 관련된 기록을 검토하기 위해 최소 연 1회 수행하는 평가에 관한 문서화된 절차가 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            },
+            {
+              "finding_id": "finding-648323af727e3453c9478a98",
+              "text_ko": "기준 제조 및 관리 기록서 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Excel Vision",
+              "published_date": "2026-05-15",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://www.fda.gov/media/192522/download"
+            }
+          ]
+        },
+        {
+          "key": "ES",
+          "slug": "es",
+          "label_ko": "스페인",
+          "findings": 25,
+          "documents": 7,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 23
+            },
+            {
+              "v": "EMA",
+              "c": 2
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "c": 10
+            },
+            {
+              "firm_name": "Gadea Biopharma S.L.",
+              "c": 6
+            },
+            {
+              "firm_name": "Bioiberica, S.A.U",
+              "c": 5
+            },
+            {
+              "firm_name": "Rovi Pharma Industrial Services S.A.",
+              "c": 2
+            },
+            {
+              "firm_name": "Laboratorios Eurisko S.L.",
+              "c": 1
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-08580b4eeb53333a43875dea",
+              "text_ko": "실사 중 건물 3의 허가된 시설에서 EU 우수제조관리기준(GMP) 준수와 관련해 중대(critical) 및 주요(major) 결함이 관찰되었다. 전반적으로 이 결함들은 존재하지 않는 의약품품질시스템(PQS)과 관련되었으며, 그 결과 제조소의 모든 허가 활동에 영향을 미쳤다: 부실하거나 존재하지 않는 공급자 승인, 원자재의 관리 및 출하, 시설 유지관리 및 세척, 출입통제, 계획된 변경 및 일탈 관리, 인원 자격 및 교육, 적격성평가/교정 관리 및 장비 관리, 제조 작업, 교차오염 방지, 절차 준수, 문서 및 데이터 완전성 관리 등. 또한 실사 결과, 이전 실사에서 확인된 결함이 시정되지 않아 회사의 품질시스템 활동 검토 모니터링이 불충분하고 비효과적임이 드러났다. 이 결함들은 제조된 동물용 의약품의 품질 및 안전성에 위험을 초래한다. 회사는 이전 실사보고서에 따라 EU GMP 가이드라인 비준수 이력이 있음에 유의해야 한다. 제조허가(MIA)는 2021년 11월 실사에 따라 2022년 9월 정지되었으나, 2023년 7월 실사 후 정지가 해제되었다. 아울러 실사 마지막 날(6월 17일) 회사 LABORATORIOS EURISKO, S.L. 소유의 인접 건물(\"El Molí\" 산업단지 내 건물 1B)이 점검되었다. 이 건물은 Site Master File에 신고되지 않았으며 의약품 및 원료의약품의 제조 및/또는 보관에 대해 허가받지 않았다. 건물 1B에서 조사관들은 최종 포장 상태의 다량의 동물용 의약품(내복용 액제 및 경구용 산제), 중간체(벌크 용액), 원료의약품, 출발물질, 시료, 그리고 보충제 등 비의약품, 나아가 생산 장비와 동물용 의약품 및 원료의약품 관련 제조 문서(납품서, 송장, 생산 기록 포함)를 발견하였다. 이 모든 자재·문서·장비는 품질시스템의 통제 밖에 있었고, 식별이 부실하였으며, 적절한 추적성·완전성·보존을 보장하지 못하는 방식으로 관리되고 있었다. 건물 1B에서 GMP 준수에 필요한 어떠한 적용 가능한 품질 요건·관리 및 필수 보증도 충족하지 않은 채 동물용 의약품의 무허가 제조 활동이 수행되고 있었음이 입증되었다. 또한 해당 API 등록부(API Register)에 등록하지 않고 원료의약품의 유통 활동이 수행되고 있음이 확인되었다. 건물 1B에서 수행된 무허가 제조 활동은 이전 실사에서 적발되지 않았으나, 검토된 문서로 미루어 수년간 지속되어 온 것으로 확인되었다. 나아가 의약품의 표시 및 확보된 고객 송장에 근거할 때 대부분의 제품이 수출용임이 분명한데, 회사는 이에 필요한 허가를 보유하고 있지 않다.\n\n당국(NCA)이 취한/제안한 조치: 제조허가 No. 6558 전면 정지. 이미 출하된 배치의 회수. LABORATORIOS EURISKO, S.L.에서 제조된 모든 의약품의 회수가 제안된다. 공급 금지. 실사 중 확인된 결함을 고려할 때, LABORATORIOS EURISKO, S.L.이 제조한 모든 제품이 GMP 비준수의 영향을 받는 것으로 결론지어진다. 실사 중 내복용 액제 및 경구용 산제 제형의 다음 활성물질을 함유한 동물용 의약품이 발견되었다: Norfloxacin, Ciprofloxacin, Enrofloxacin, Kanamycin, Cephalexin, Tylosin, Doxycycline, Neomycin, Gentamicin, Erythromycin, Amoxicillin, Ivermectin, Amprolium, Albendazole, Sulfachloropyridazine, Acetylsalicylic acid, Florfenicol, Ampicillin, Piperazine(비망라적 목록). 건물 3에서는 Norfloxacin의 파일럿 배치 STI15012025 1개와 밸리데이션 배치 STI18122025A, STI18122025B, STI18122025C 3개가 2023년 이후 합법적으로 제조되었다. 파일럿 배치는 2025년 11월 3일 방글라데시로, 3개 밸리데이션 배치는 2026년 3월 1일 역시 방글라데시로 출하되었다. 무허가 시설에서 제조된 동물용 의약품은 그리스, 레바논, 방글라데시, 시리아, 오만, 예멘으로의 유통 및 수출을 목적으로 하였다. 검토된 문서에 따르면 이들 국가로의 의약품 수출이 실제로 이루어졌다. 기타 목적지 국가도 배제할 수 없다. 실사 중 검토된 문서에 따르면 회사는 원료의약품(Kanamycin, Cephalexin, Tylosin, Amoxicillin, Piperazine)을 다음 국가로 유통·수출하였다: 그리스, 레바논, 오만, 예멘. 기타 목적지 국가도 배제할 수 없다.",
+              "agency": "EMA",
+              "firm_name": "Laboratorios Eurisko S.L.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186339.pdf"
+            },
+            {
+              "finding_id": "finding-1366b66fe16e2aa39536dfca",
+              "text_ko": "완제의약품에 대한 서면 안정성 프로그램에는 신뢰할 수 있고 의미 있고 구체적인 시험 방법이 포함되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "published_date": "2025-06-20",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/186009/download"
+            },
+            {
+              "finding_id": "finding-2299fdba5e04b58b551b0b8b",
+              "text_ko": "공정 중 물질과 완제의약품 특성의 변동을 야기할 수 있는 제조 공정의 출력을 모니터링하고 성능을 밸리데이션하는 관리 절차가 확립되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "published_date": "2025-06-20",
+              "category_label_ko": "공정밸리데이션",
+              "evidence_url": "https://www.fda.gov/media/186009/download"
+            },
+            {
+              "finding_id": "finding-bd1bf192cfd487fce9047722",
+              "text_ko": "무균으로 표방되는 의약품의 미생물 오염 방지를 위한 절차가 확립되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "published_date": "2025-06-20",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/186009/download"
+            },
+            {
+              "finding_id": "finding-c04413221dae7c23e9a95a6c",
+              "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 문서화되어 있지 않거나 완전히 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "published_date": "2025-06-20",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/186009/download"
+            },
+            {
+              "finding_id": "finding-d852c1faff20da4d4da77a3b",
+              "text_ko": "무균으로 표방되는 의약품의 미생물 오염 방지를 위한 절차에 무균공정(aseptic process) 및 멸균공정의 적절한 밸리데이션이 포함되어 있지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "published_date": "2025-06-20",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/186009/download"
+            }
+          ]
+        },
+        {
+          "key": "TW",
+          "slug": "tw",
+          "label_ko": "대만",
+          "findings": 23,
+          "documents": 7,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 15
+            },
+            {
+              "v": "MFDS",
+              "c": 6
+            },
+            {
+              "v": "EMA",
+              "c": 1
+            },
+            {
+              "v": "MHRA",
+              "c": 1
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "PharmaEssentia Corp.",
+              "c": 9
+            },
+            {
+              "firm_name": "TEH SENG PHARMACEUTICAL MFG, CO., Ltd. Second factory",
+              "c": 5
+            },
+            {
+              "firm_name": "UBI Pharma Inc.",
+              "c": 5
+            },
+            {
+              "firm_name": "Chunghwa Chemical Synthesis &amp; Biotech Co., Ltd.",
+              "c": 1
+            },
+            {
+              "firm_name": "Genovior Biotech Corporation",
+              "c": 1
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-18910d6f7d1bfdfa02c87347",
+              "text_ko": "직접 및 간접 멸균 제품 접촉 품목의 멸균 밸리데이션이 무균보증을 입증하기에 충분하지 않다. a.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            },
+            {
+              "finding_id": "finding-29f05111fdc49271c4732b34",
+              "text_ko": "기류 패턴 시험 연구에 Class A 등급 제한접근차단시스템(RABS) 내 일방향 기류를 입증하기 위한 설치·조립, 정상·비정상 개입, 충전을 포함한 무보조 설비 운전을 비롯한 모든 작업이 포함되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            },
+            {
+              "finding_id": "finding-45850c413df51319b3cebda7",
+              "text_ko": "무균임을 표방하는 완제의약품의 미생물 오염을 방지하도록 설계된 절차가 수립되고 준수되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            },
+            {
+              "finding_id": "finding-4a9d22d58e987057f212a8cc",
+              "text_ko": "육안검사 절차가 결함 충전 완제의약품 추세를 다루기에 불충분하다.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            },
+            {
+              "finding_id": "finding-603e7471eb568e5f08c31fd7",
+              "text_ko": "입고 물질이 최종 시험 완료 전에 제조 작업을 위해 출하되어 해당 물질이 규격을 충족하고 제조에 적합하다는 보장이 없다.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "원자재/공급업체 관리",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            },
+            {
+              "finding_id": "finding-804df43f0b2c943fedb19d14",
+              "text_ko": "비적합 사건 또는 사고로 인한 일탈 및/또는 조사가 항상 개시되지 않으며 적절히 조사되지 않는다.",
+              "agency": "FDA",
+              "firm_name": "PharmaEssentia Corp.",
+              "published_date": "2026-07-10",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/193561/download"
+            }
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "key": "",
+          "findings": 5266,
+          "reason": "국가 미상(원문에 표기 없음)"
+        },
+        {
+          "key": "IS",
+          "findings": 31,
+          "reason": "한국어 표기 없음(정본 맵 미수록)"
+        },
+        {
+          "key": "MY",
+          "findings": 27,
+          "reason": "한국어 표기 없음(정본 맵 미수록)"
+        },
+        {
+          "key": "BE",
+          "findings": 19,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "HU",
+          "findings": 18,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "CH",
+          "findings": 15,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "CY",
+          "findings": 14,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "SE",
+          "findings": 13,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "AU",
+          "findings": 12,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "IE",
+          "findings": 11,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "JO",
+          "findings": 10,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "DK",
+          "findings": 9,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "GR",
+          "findings": 9,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "NL",
+          "findings": 8,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "MX",
+          "findings": 5,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "CZ",
+          "findings": 4,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "LT",
+          "findings": 4,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "PL",
+          "findings": 4,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "AT",
+          "findings": 2,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "RO",
+          "findings": 2,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "TR",
+          "findings": 2,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "ZA",
+          "findings": 2,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "BD",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "FI",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "ID",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "LB",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "LK",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "PT",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "SK",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        }
+      ]
+    },
+    {
+      "axis": "agency",
+      "items": [
+        {
+          "key": "FDA",
+          "slug": "fda",
+          "label_ko": "미국 FDA",
+          "findings": 13254,
+          "documents": 2895,
+          "by_agency": [
+            {
+              "v": "FDA",
+              "c": 13254
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "c": 200
+            },
+            {
+              "firm_name": "H & P Industries, Inc.",
+              "c": 137
+            },
+            {
+              "firm_name": "PharMEDium Services, LLC",
+              "c": 134
+            },
+            {
+              "firm_name": "Hospira, Inc.",
+              "c": 88
+            },
+            {
+              "firm_name": "American National Red Cross/Biomedical Services",
+              "c": 83
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-020c5c2186ce4ea0de6ae189",
+              "text_ko": "의약품 제조 및 가공에 종사하는 직원이 담당 업무를 수행하는 데 필요한 교육훈련과 경험을 갖추지 못하였다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "교육/작업자",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-2624810f130257461ca787b4",
+              "text_ko": "문서화된 절차의 변경사항이 품질관리부서의 검토 및 승인을 거치지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-5eae4868b802126cb34c93f2",
+              "text_ko": "의약품에 대한 문서화된 안정성시험 프로그램에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-64049cade4698a2a2e60bfdf",
+              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-8bbd8d4276953cd406e6deba",
+              "text_ko": "무균공정(aseptic) 구역의 환경조건 모니터링 체계가 미흡하다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            },
+            {
+              "finding_id": "finding-9f87bb49193b1da0b435efe0",
+              "text_ko": "설명되지 않는 불일치에 대한 조사가 해당 부적합 또는 불일치와 관련되었을 수 있는 다른 의약품까지 확대되지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Sentiss Pharma Pvt. Ltd.",
+              "published_date": "2026-08-05",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194066/download"
+            }
+          ]
+        },
+        {
+          "key": "HC",
+          "slug": "hc",
+          "label_ko": "캐나다 보건부",
+          "findings": 9505,
+          "documents": 1824,
+          "by_agency": [
+            {
+              "v": "HC",
+              "c": 9505
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Air Liquide Canada Inc.",
+              "c": 189
+            },
+            {
+              "firm_name": "Chief Medical Supplies Ltd",
+              "c": 96
+            },
+            {
+              "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "c": 91
+            },
+            {
+              "firm_name": "Voyant Beauty, Inc.",
+              "c": 75
+            },
+            {
+              "firm_name": "Linde Canada Inc.",
+              "c": 74
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-3cfee7d3409d60db9e40db31",
+              "text_ko": "지적사항이 기록되지 않았다.",
+              "agency": "HC",
+              "firm_name": "Neilmed Pharmaceuticals Inc",
+              "published_date": "2026-07-21",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89341"
+            },
+            {
+              "finding_id": "finding-011e97a2ae776c4e0d3b1ee7",
+              "text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 데 필요한 지침 및/또는 절차가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "안정성/보관",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-1e3177e06dbd58e7576f6586",
+              "text_ko": "기록의 유지·관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-3107718e991a0732fc257219",
+              "text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-47a58f63934b5bafcc2c0f53",
+              "text_ko": "품질관리부서(quality control unit)가 요구되는 활동을 모두 수행하지 않았다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "시험실/품질관리",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            },
+            {
+              "finding_id": "finding-9d57c38e9c4f6954001ae6ea",
+              "text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 관리가 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Deciem Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "설비/시설",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349"
+            }
+          ]
+        },
+        {
+          "key": "MFDS",
+          "slug": "mfds",
+          "label_ko": "식품의약품안전처",
+          "findings": 1955,
+          "documents": 1314,
+          "by_agency": [
+            {
+              "v": "MFDS",
+              "c": 1955
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "미래바이오제약(주)",
+              "c": 48
+            },
+            {
+              "firm_name": "(주)현진제약",
+              "c": 34
+            },
+            {
+              "firm_name": "(주)엔탭허브",
+              "c": 31
+            },
+            {
+              "firm_name": "이연제약(주)",
+              "c": 30
+            },
+            {
+              "firm_name": "씨케이(주)",
+              "c": 25
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-2285325e200981e87cceacc2",
+              "text_ko": "의약품 동등성 재평가에 필요한 자료를 기한(’26. 6. 30.) 내에 제출하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "명문제약(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006175"
+            },
+            {
+              "finding_id": "finding-24748e241e382215ea0f3084",
+              "text_ko": "의약품 등 재평가 자료를 제출하지 않았다(1차 처분). 「약사법」제33조 및 「의약품 재평가 실시에 관한 규정」에 따라 의약품 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 기한 내(‘26.6.30.) 제출하여야 하나, 해당 업체는 재평가에 필요한 자료를 제출 기한 내에 제출하지 않은 사실이 있었다.",
+              "agency": "MFDS",
+              "firm_name": "일양바이오팜(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006174"
+            },
+            {
+              "finding_id": "finding-6eccecfac6b02f5cc3c99a16",
+              "text_ko": "임상시험계획 변경 보고를 지연하였고, 임상시험의 품질보증 및 임상시험자료의 품질관리 규정을 위반하였다.",
+              "agency": "MFDS",
+              "firm_name": "한미약품(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "품질부서 관리감독",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005676"
+            },
+            {
+              "finding_id": "finding-d8ed8077a895dd3eedd15ed6",
+              "text_ko": "재심사 대상 ‘뉴아미노펜프리믹스주(아세트아미노펜)’에 대하여 그 밖에 식품의약품안전처장이 정한 재심사 기준을 위반했다.",
+              "agency": "MFDS",
+              "firm_name": "신라젠주식회사",
+              "published_date": "2026-08-10",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006194"
+            },
+            {
+              "finding_id": "finding-f2a3ba4a2cd5c5c897b8e899",
+              "text_ko": "임상시험계획 변경에 대하여 승인을 받지 않았고, 임상시험계획 변경 보고도 하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "아주약품(주)",
+              "published_date": "2026-08-10",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005675"
+            },
+            {
+              "finding_id": "finding-3a6b780be192e78c88176b15",
+              "text_ko": "셉타네스트주1/100,000 제품에서 첨부문서 일부(사용상의 주의사항)가 누락되어 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "신원덴탈(주)",
+              "published_date": "2026-08-06",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01"
+            }
+          ]
+        },
+        {
+          "key": "EMA",
+          "slug": "ema",
+          "label_ko": "유럽 EMA",
+          "findings": 75,
+          "documents": 75,
+          "by_agency": [
+            {
+              "v": "EMA",
+              "c": 75
+            }
+          ],
+          "top_firms": [
+            {
+              "firm_name": "Przedsiebiorstwo Farmaceutyczne Okoniewscy Vetos Farma Sp. z o.o.",
+              "c": 3
+            },
+            {
+              "firm_name": "Fagofarma s.r.o.",
+              "c": 2
+            },
+            {
+              "firm_name": "Swiss Parenterals Limited",
+              "c": 2
+            },
+            {
+              "firm_name": "VAKOS XT a.s.",
+              "c": 2
+            },
+            {
+              "firm_name": "Valpharma International S.p.A.",
+              "c": 2
+            }
+          ],
+          "samples": [
+            {
+              "finding_id": "finding-fb3273208760f76a38ce6905",
+              "text_ko": "실사 기간 중 해당 시설 전반에서, 특히 의약품의 무균제조(aseptic manufacture)와 직접 관련된 영역에서 다수의 치명적(critical) 및 중대(major) 결함이 확인되었다. 이러한 결함의 성격과 범위는 오염관리, 무균 행위(aseptic behaviour), 설비 완전성, 데이터 거버넌스 및 품질관리 실무 전반의 시스템적 취약성을 보여주며, 이는 종합적으로 Block A에서 제조되는 제품의 무균성, 안전성 및 전반적 품질에 중대한 위험을 초래한다. 시설 설계 및 차압 체계(pressure cascade) 유지에서 치명적 결함이 관찰되었으며, 여기에는 청정등급 구역과 비청정등급 구역 간 차압 부족, 역전된 압력 구배, 그리고 무균 원료의약품(API)이 Grade B에서 노출되는 결과를 초래한 배치(layout) 제약이 포함된다. 이러한 문제는 무균공정(aseptic processing)에 요구되는 기본적인 환경관리를 저해한다. 작업자의 행위 및 무균 실무와 관련해서도 심각한 우려가 확인되었는데, 작업자들이 갱의(gowning) 요건, 무균 규율, RABS 취급 절차 및 환경 보호 조치를 준수하지 않았다. 이러한 행위는 무균성 보증을 직접적으로 훼손하며 교육훈련과 감독이 불충분함을 시사한다. 실사에서는 또한 녹슨 패스박스, 청결하지 않은 저울과 발판 사다리 등 상태가 불량한 설비와, Grade B 내에서 불합격 자재 및 IPC 검체에 개방형 용기를 사용하는 사례가 확인되었다. 이러한 결함은 중요 제조구역 내에서 허용될 수 없는 오염 위험에 해당한다. 자재 및 GMP 문서의 정리와 관리에서도 중대한 취약성이 발견되었으며, 여기에는 운영 문서, 미생물 기록, 페트리 접시 및 기타 자재가 증축구역(expansion zone) 등 관리되지 않는 구역에 보관되어 있던 사례가 포함된다. 무균 충전에 사용되는 배관에 연결된, 노후화되고 식별되지 않은 가스 실린더가 발견되어 관리되지 않는 물질이 제품과 접촉할 가능성에 대한 우려가 더욱 커졌다. 기록 누락, 일관성 없는 기재, 불명확한 용어 사용, 그리고 수행되지 않았음에도 보고된 분석 활동 등 치명적인 데이터 완전성(data integrity) 결함이 확인되었다. 이러한 문제는 GMP 문서의 신뢰성을 저해하고 배치 출하 결정의 정확성에 대한 우려를 야기한다. 품질관리 실험실에서는 원료의약품(API)에 대한 필수 시험이 제조업자에 의해 수행되지 않았고, 보관용 검체가 부적절하게 보관되었으며, 완제의약품 검체에 적절한 식별표시가 없었고, 무균시험이 부적합한 장비를 사용하여 수행되었다. 이러한 결함은 분석 결과의 타당성과 제품 품질 보증에 치명적인 영향을 미친다. 오염관리전략(CCS, Contamination Control Strategy)에서도 중대한 미비점이 확인되었는데, CCS는 뒤늦게 시행되었고 Grade B에서의 API 노출, 환경모니터링 취약성, 인원 제한, HEPA 필터 교체 근거, 소독제 승인 등 여러 오염 위험을 다루지 못하였다. 마지막으로, 배치 문서에는 요구되는 검체채취에 대한 증빙이 없고 라인 클리어런스(line clearance) 검증이 불완전하여 배치 추적성과 무균 작업 준비 상태가 훼손되었다.\n\nNCA가 취하였거나 제안한 조치: 기타. 해당 제조소가 시장에 출시한 의약품이 없고, 동일한 유효성분 및 함량을 함유한 의약품을 보유한 대체 제조소가 포르투갈에서 허가되어 있으므로 포르투갈 시장에는 영향이 없다. 해당 제조소에 대해서는 모든 치명적 및 중대 결함이 적절히 조치되고 그 이행이 후속 실사를 통해 확인될 때까지 비준수 보고서(NCR, Non-Compliance Report)를 발행하기로 결정되었다.",
+              "agency": "EMA",
+              "firm_name": "Ananta Medicare Limited",
+              "published_date": "2026-08-06",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186887.pdf"
+            },
+            {
+              "finding_id": "finding-758d0b12596d5654b7acfa0c",
+              "text_ko": "AIFA가 2026년 6월 22일부터 24일까지 실시한 실사에서, 비경구영양(parenteral nutrition) 제품의 무균 조제에 적용되는 의약품품질시스템(Pharmaceutical Quality System) 및 EU GMP 요건의 이행에 영향을 미치는 중대하고 시스템적인 결함이 확인되었다. 12건의 주요(major) 결함이 확인되었다. • 의약품품질시스템 결함. • 부적절한 문서화 및 데이터 완전성(data integrity) 관리. • 전산화 시스템 밸리데이션 및 전자 데이터 관리의 결함. • 부적절한 오염관리전략(Contamination Control Strategy). • 무균공정 모의시험(APS/배지충전(media fill))의 결함. • 환경 및 미생물 모니터링의 결함. • 부적절한 적격성평가(qualification) 및 밸리데이션 활동. • 직원 교육, 공급자 적격성평가 및 품질관리 감독의 결함. NCA가 취하거나 제안한 조치: 현재 유효한 GMP 인증서 No. IT/265/H/2024의 철회. 취해진 규제 조치로서 GMP 비준수 진술서(Statement of Non-Compliance with GMP)가 발행되었다. 제조 승인(manufacturing authorization) No. aM-194/2024의 정지. GMP 요건 비준수 상태가 확인되었으나, 실사팀은 해당 사업장에서 제조되는 의약품의 성격도 함께 고려하였는데, 이들은 비경구영양을 받는 환자를 위한 것으로 필수적이며 잠재적으로 생명 유지에 관여하는 치료제이다. 실사 결과에 근거할 때 이미 제조·유통된 배치와 관련하여 환자 건강에 대한 즉각적이고 구체적인 위험을 나타내는 증거는 발견되지 않았다. 따라서 이미 공급된 의약품의 지속 사용에 유리한 것으로 판단된 위해-이익 평가(risk-benefit assessment)에 따라, 실사팀은 현재 가용한 정보에 근거할 때 이미 제조·유통된 배치의 회수를 권고할 필요는 없다고 판단한다. 기타: 해당 사업장은 Directive 2001/83/EC 제5조(이탈리아 Legislative Decree No. 219/2006으로 국내법화됨)에 따라 오로지 의사 처방에 기초하여 멸균 비경구영양 조제물을 제조한다. 비경구영양 조제물은 의사 처방에 기초하여(Directive 2001/83/EC 제5조) 이탈리아 시장에만 공급된다. 다른 국가에 대한 조치는 필요하지 않다.",
+              "agency": "EMA",
+              "firm_name": "Avlab S.r.l.",
+              "published_date": "2026-07-23",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186598.pdf"
+            },
+            {
+              "finding_id": "finding-08580b4eeb53333a43875dea",
+              "text_ko": "실사 중 건물 3의 허가된 시설에서 EU 우수제조관리기준(GMP) 준수와 관련해 중대(critical) 및 주요(major) 결함이 관찰되었다. 전반적으로 이 결함들은 존재하지 않는 의약품품질시스템(PQS)과 관련되었으며, 그 결과 제조소의 모든 허가 활동에 영향을 미쳤다: 부실하거나 존재하지 않는 공급자 승인, 원자재의 관리 및 출하, 시설 유지관리 및 세척, 출입통제, 계획된 변경 및 일탈 관리, 인원 자격 및 교육, 적격성평가/교정 관리 및 장비 관리, 제조 작업, 교차오염 방지, 절차 준수, 문서 및 데이터 완전성 관리 등. 또한 실사 결과, 이전 실사에서 확인된 결함이 시정되지 않아 회사의 품질시스템 활동 검토 모니터링이 불충분하고 비효과적임이 드러났다. 이 결함들은 제조된 동물용 의약품의 품질 및 안전성에 위험을 초래한다. 회사는 이전 실사보고서에 따라 EU GMP 가이드라인 비준수 이력이 있음에 유의해야 한다. 제조허가(MIA)는 2021년 11월 실사에 따라 2022년 9월 정지되었으나, 2023년 7월 실사 후 정지가 해제되었다. 아울러 실사 마지막 날(6월 17일) 회사 LABORATORIOS EURISKO, S.L. 소유의 인접 건물(\"El Molí\" 산업단지 내 건물 1B)이 점검되었다. 이 건물은 Site Master File에 신고되지 않았으며 의약품 및 원료의약품의 제조 및/또는 보관에 대해 허가받지 않았다. 건물 1B에서 조사관들은 최종 포장 상태의 다량의 동물용 의약품(내복용 액제 및 경구용 산제), 중간체(벌크 용액), 원료의약품, 출발물질, 시료, 그리고 보충제 등 비의약품, 나아가 생산 장비와 동물용 의약품 및 원료의약품 관련 제조 문서(납품서, 송장, 생산 기록 포함)를 발견하였다. 이 모든 자재·문서·장비는 품질시스템의 통제 밖에 있었고, 식별이 부실하였으며, 적절한 추적성·완전성·보존을 보장하지 못하는 방식으로 관리되고 있었다. 건물 1B에서 GMP 준수에 필요한 어떠한 적용 가능한 품질 요건·관리 및 필수 보증도 충족하지 않은 채 동물용 의약품의 무허가 제조 활동이 수행되고 있었음이 입증되었다. 또한 해당 API 등록부(API Register)에 등록하지 않고 원료의약품의 유통 활동이 수행되고 있음이 확인되었다. 건물 1B에서 수행된 무허가 제조 활동은 이전 실사에서 적발되지 않았으나, 검토된 문서로 미루어 수년간 지속되어 온 것으로 확인되었다. 나아가 의약품의 표시 및 확보된 고객 송장에 근거할 때 대부분의 제품이 수출용임이 분명한데, 회사는 이에 필요한 허가를 보유하고 있지 않다.\n\n당국(NCA)이 취한/제안한 조치: 제조허가 No. 6558 전면 정지. 이미 출하된 배치의 회수. LABORATORIOS EURISKO, S.L.에서 제조된 모든 의약품의 회수가 제안된다. 공급 금지. 실사 중 확인된 결함을 고려할 때, LABORATORIOS EURISKO, S.L.이 제조한 모든 제품이 GMP 비준수의 영향을 받는 것으로 결론지어진다. 실사 중 내복용 액제 및 경구용 산제 제형의 다음 활성물질을 함유한 동물용 의약품이 발견되었다: Norfloxacin, Ciprofloxacin, Enrofloxacin, Kanamycin, Cephalexin, Tylosin, Doxycycline, Neomycin, Gentamicin, Erythromycin, Amoxicillin, Ivermectin, Amprolium, Albendazole, Sulfachloropyridazine, Acetylsalicylic acid, Florfenicol, Ampicillin, Piperazine(비망라적 목록). 건물 3에서는 Norfloxacin의 파일럿 배치 STI15012025 1개와 밸리데이션 배치 STI18122025A, STI18122025B, STI18122025C 3개가 2023년 이후 합법적으로 제조되었다. 파일럿 배치는 2025년 11월 3일 방글라데시로, 3개 밸리데이션 배치는 2026년 3월 1일 역시 방글라데시로 출하되었다. 무허가 시설에서 제조된 동물용 의약품은 그리스, 레바논, 방글라데시, 시리아, 오만, 예멘으로의 유통 및 수출을 목적으로 하였다. 검토된 문서에 따르면 이들 국가로의 의약품 수출이 실제로 이루어졌다. 기타 목적지 국가도 배제할 수 없다. 실사 중 검토된 문서에 따르면 회사는 원료의약품(Kanamycin, Cephalexin, Tylosin, Amoxicillin, Piperazine)을 다음 국가로 유통·수출하였다: 그리스, 레바논, 오만, 예멘. 기타 목적지 국가도 배제할 수 없다.",
+              "agency": "EMA",
+              "firm_name": "Laboratorios Eurisko S.L.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186339.pdf"
+            },
+            {
+              "finding_id": "finding-f9299afced7e2bb0c3113c85",
+              "text_ko": "실사에서 중대(critical) 3건, 주요(major) 5건, 기타(others)로 분류된 2건의 결함이 확인되었다. 중대 결함으로는 다음이 확인되었다: • 생산 구역의 운영불가 및 품질관리/생산 구역에 대한 출입통제 부재, 구체적으로: - 생산 구역이 개보수 중이어서 내부에 장비가 전혀 없는 상태로 운영이 불가하였으며, 이를 규제당국에 통보하지 않음. - 제조단위에 속하지 않은 사람이 제조 및 품질관리 구역의 출입 홀에서 화장실로 진입할 수 있는 것으로 확인되는 등 품질관리/생산 구역에 대한 출입통제 부재. • 생산된 제품의 품질을 입증하기 위한 데이터/기록 상당수가 일관성이 없고 혼란스러우며 불완전한 것으로 드러나 제품 및 자재의 올바른 추적성을 저해함, 구체적으로: - CoA No.º 004/2025, BM0738.24001, Working Cell Bank_STA 75/12(2025년 1월 10일자)가 품질관리책임자의 서명이 없었고 일자가 불일치(분석 2024년 4월 1일, 제조 2024년 8월 27일)했으며 배치 제조일(2025년 3월 25일~27일)과도 부합하지 않음. - 로그북 기록이 항상 완전·정확하거나 작업 수행 시점에 기재되지 않았고 여러 결함이 확인됨. • TP-122 PSA Cocktail의 배치 FP 0481-25001 관련 배치문서(BPR-081)에 번호가 매겨지지 않은 페이지가 있었고, 번호가 매겨진 페이지의 번호는 수기로 기재되어 있었음. 주요(major) 결함으로는 다음이 확인되었다: • 품질경영시스템의 절차·기록 및 기타 문서가 항상 완전하지 않거나 활동을 온전히 기술하지 않았거나 정확하지 않았음: - 제조 및 승인 일자와 관련해 원료의약품 및 완제의약품 제조 배치 목록이 최신 상태가 아니었고 잘못된 일자(Working Bank Cell_STA 75/12의 배치 No.º BM0738.24001 제조일)가 확인됨. - EMM Rooms CL2(AL0.09, AL0.10, AL0.15, AL0.16, AL0.17, PB0.30, PB0.31)가 환경모니터링을 위해 아이솔레이터에서 시료채취해야 할 모든 위치를 포괄하지 않음. - 제조지시서 및 배치기록에서 결함이 확인됨(불완전한 제조지시서 BPR-088, TP-102-DP1 Cocktail FP0607, 배치 FP0607.25001), 규격 및 결과 미기재(배치문서 IP 0420.25002), TP-122 PSA Cocktail FP0481(BPR-081)의 배치문서 FP0481.25001에 다수의 삭제 흔적 존재. • 로그북 기재가 항상 완전·정확하게 또는 작업 수행 시점에 이루어지지 않았고, Double Agar Overlay Assay Bacteriophage titer 로그북에서 음성 대조군의 적합 결과의 의미가 식별되지 않았으며(로그북 No.282), 2025년 7월 8일자 결과가 아직 검증되지 않은 것으로 확인됨(로그북 No.287). • 원료의약품 CoA나 배치 분석 결과 없이 원료의약품 배치를 완제의약품 제조에 사용함(예: Phage 99/10의 배치 IP0420.25002). • 창고 작업에서 정보 누락이 확인됨: - 2025년 10월 23일 RE0788-Bocto Red Time PCR_격리 배치 25267의 접수 기록에서 자재가 냉장고에 있었는지 실온에 있었는지 식별되지 않음(QC만 언급됨). - EQ084(창고 냉장고)에 있는 각 원료의약품 또는 완제의약품의 수량 확인을 가능케 하는 쉽게 접근 가능한 재고가 없었음. - 문서 SOP-001-FR-002, DP0069 배치 25270 자재 접수 체크리스트에서 상태가 격리(Quarantine)여야 함에도 NA로 기재되었고 제조사 명칭·주소 확인이 포함되지 않음(공급자만 기재). • 자재(로트 FP0481.25001)의 멸균과 관련된 멸균 사이클 841에 대해 멸균 대상 자재의 준비 정보를 담은 증거가 제시되지 않음.\n\n당국(NCA)이 취한/제안한 조치: 제조허가 No. F068/001/2024 일부 정지. 현행 유효 GMP 인증서 No. F068/S1/ME/001/2024 철회. 현재 이미 만료된 GMP 인증서 No. F068/S1/ME/001/2024 철회. 이미 출하된 배치의 회수 — 각 NCA는 영향받은 배치의 회수 필요성을 평가·판단해야 한다. 공급 금지 — 제조사는 인체용 임상시험용의약품(Human Investigational Medicinal Products)의 제조 및 공급이 금지된다. 기타 — 인체용 임상시험용의약품에 관한 제조허가 No. F068/001/2024(ANNEX 2) 정지 — 제조허가의 ANNEX 2는 더 이상 유효하지 않다.",
+              "agency": "EMA",
+              "firm_name": "Technophage Investigacao E Desenvolvimento Em Biotecnologia S.A.",
+              "published_date": "2026-07-13",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186348.pdf"
+            },
+            {
+              "finding_id": "finding-5fdc11a0e469dc7edb5f8e92",
+              "text_ko": "2026년 4월, 원료의약품(API) Diosmin 제조에 대해 최초로 현장 GMP 실사가 수행되었다. 이는 Part II EU GMP 가이드라인 및 승인된 CEP 문서(CEP 2016-173)의 준수 여부를 평가하기 위한 EDQM 실사 프로그램의 일환이었다. 조사관들은 중대(critical) 1건, 주요(major) 8건, 기타(other) 17건의 결함 및 CEP 문서/CEP 소유자 책임 위반 4건을 확인하였다. 중대 결함은 HPLC 시스템을 사용해 QC 실험실에서 생성된 데이터의 유효성 및 완전성과 관련되었다. 유연물질(related substances) 및 함량(assay) 시험이 회사 내부 분석법이나 CEP 문서에 따라 항상 수행되지 않아 Diosmin API의 최종 출하 결과를 항상 신뢰할 수 없었다. 구체적으로, 다수 배치 분석의 시퀀스에 시스템적합성(system suitability) 및 표준품(reference standard (a)) 주입이 포함되지 않았다. 2023년 초 이후 유럽에 출하된 30개 배치 중 24개 배치가 시료 분석과 동일한 시퀀스 내 시스템적합성 및 표준품(a) 주입 없이 시험되었다. 이러한 분석은 시료 분석 전(예: 최대 14일 전) 또는 후(예: 최대 12일 후)에 수행된 다른 시퀀스의 시스템적합성 및 표준품 주입을 참조하였다. 따라서 이 데이터가 도출된 시퀀스는 제품 출하를 뒷받침할 유효한 것으로 볼 수 없었다. 누락된 시스템적합성 시험, 부재하거나 불완전한 시료 접수 기록, 특정 배치에 대한 추적성 결여 등 HPLC 관리에 상당한 공백이 확인되었다. 문서가 배치 분류(예: R&D 대 생산)를 뒷받침하지 못했고, 동일 배치의 중복 분석이 명확히 구분되지 않아 시료 혼동 위험을 초래하였다. 또한 데이터 백업 절차가 불완전했고, 시스템 접근 권한이 SOP에 따라 관리되지 않아 QP에게 부적절한 권한이 부여되었다. 주요 결함 8건은 자재 및 회수자재의 부적합 판정·재사용, 품질경영, 공정 장비, 문서 및 기록, 생산 및 공정중관리, 원료의약품 및 중간체의 포장·표시와 관련하여 확인되었다.\n\n당국(NCA)이 취한/제안한 조치: 시판허가 정지. 이미 출하된 배치의 회수. 2023~2025년 EU에 출하된 Diosmin 배치 목록: PXC03231109, PXC03231110, PXC03240438, PXC03240439, PXC03240440, PXC03240441, PXC03240442, PXC03240821, PXC03241219, PXC03250401, PXC03250508, PXC03250524, PXC03250624, PXC03250625, PXC03250809, PXC03250810, PXC03251023, PXC03251024, PXC03251025, PXC03251026, PXC03251027, PXC03251223, PXC03251224, PXC03251225. API Diosmin 공급 금지. CEP의 정지 또는 무효화(EDQM이 취할 조치): CEP 2016-173/Diosmin 및 CEP 2024-194/Diosmin, micronized; 두 CEP 모두 2026년 6월 11일 EDQM에 의해 정지되었다.",
+              "agency": "EMA",
+              "firm_name": "Sichuan New Hawk Biotechnology Co. Ltd.",
+              "published_date": "2026-07-03",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186143.pdf"
+            },
+            {
+              "finding_id": "finding-817444c3a4d9b1dc1e4a0133",
+              "text_ko": "본 NCR은 다음 4개 제품의 완제의약품 제조 활동에 한정된다: - Usymro®(Ustekinumab) 45 mg 및 90 mg 주사액과 Usymro®(Ustekinumab) 130 mg 주입용 농축액(바이알 및 프리필드 시린지 제형); - Avzivi®(Bevacizumab) 25 mg/mL 주입용 농축액(바이알 제형); - Tofidence®(Tocilizumab) 20 mg/mL 주입용 농축액(바이알 제형); - Gotenfia®(Golimumab) 50 mg 및 100 mg 주사액(프리필드 시린지 제형). 실사에서 완제의약품 제조 활동과 관련해 중대(critical) 1건, 주요(major) 8건을 포함한 총 33건의 결함이 제기되었다. 중대 결함 1건: 1) Grade A/B 청정실의 무균공정모의시험(APS) 실패 및 환경모니터링 이탈과 관련된 일탈을 포함하여, 일탈에 대한 조사 및 제품 영향 평가를 수행하지 않음. 주요 결함 8건: 1) 미생물 오염 최소화에 부적합한 관행을 사용하여 청정실 세척·소독 및 Grade A/B 구역으로의 물자 이송 공정이 효과적이지 못함; 2) 유럽약전(Eur. Pharmacopoeia) 요건 및 수동검사대 적격성평가 데이터에서 벗어나 충전 완료 단위에 대한 수동 육안검사 공정이 부적합함; 3) EU GMP Annex 1에 따라 프리필드 시린지 충전실 청정실을 재적격성평가하지 않음; 4) EU GMP Annex 1에 따라 청정실 환경모니터링 프로그램을 완전하게 이행하지 않음; 5) 최종 멸균여과(0.22 µm) 이후 3 µm 필터를 포함하도록 제조공정을 변경하여 200 L 일회용 저장백(Avzivi® 및 Tofidence® 바이알 충전 시 사용)의 입자 오염을 적절히 관리하지 못함; 6) 충전라인 작업자의 연간 재적격성평가를 위한 무균 개입(intervention)과 APS 판독을 위한 QC 직원 초기 적격성평가 시의 허용기준을 적절히 정의하지 않음; 7) EU GMP Annex 11 요건에 따라 QC 실험실의 전산화 시스템을 관리하지 않음; 8) 시판허가권자(MAH) 및 수입자와 승인된 품질계약을 체결하지 않음.\n\n당국(NCA)이 취한/제안한 조치: 현행 유효 GMP 인증서 No. 2024_HPF_PT_003_NA 철회 / 공급 금지. 본 NCR 발행 이전에 제조된 것과 본 NCR 유효기간 중 제조된 4개 제품의 어떠한 배치도 유럽에 공급되어서는 안 된다.",
+              "agency": "EMA",
+              "firm_name": "Bio-Thera Solutions Ltd.",
+              "published_date": "2026-06-12",
+              "category_label_ko": "컴퓨터화시스템",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/185690.pdf"
+            }
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "key": "MHRA",
+          "findings": 8,
+          "reason": "표본 미달(<20)"
+        }
+      ]
+    }
+  ]
+}

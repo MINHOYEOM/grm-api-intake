@@ -25,8 +25,17 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+/* ★[한국어 어절 줄바꿈 — 전역 기본값 2026-08-12] CSS 기본 `word-break:normal` 은 한글을
+ * **음절 어디서나** 끊는다. 그래서 "디|에틸렌글리콜", "가이드라|인", "업체·|기관" 처럼
+ * 단어 한가운데가 갈라진다. 이 규칙 자체는 오래전부터 알고 있었지만 **선택자마다 손으로**
+ * 붙여 왔고(grm.css 15곳 + 템플릿 25곳), 그 손목록에 들지 못한 곳은 전부 깨진 채였다 —
+ * 실측: 브리프 본문 84건 · 용어사전 19건 · 자료실 8건 · 모아보기/랜딩 각 2건(findings 계열만
+ * `main{word-break:keep-all}` 덕에 0건). **모두가 개별로 적용하는 규칙은 기본값이어야 한다.**
+ * overflow-wrap 은 `anywhere` 가 아니라 `break-word` — anywhere 는 min-content 폭 계산까지
+ * 바꿔 flex/grid 트랙을 흔든다. break-word 는 그 칸에 도저히 안 들어갈 때만 개입한다. */
 body{font-family:var(--sans);background:var(--canvas);color:var(--body);line-height:1.55;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-size:17px;letter-spacing:0}
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-size:17px;letter-spacing:0;
+  word-break:keep-all;overflow-wrap:break-word}
 a{color:inherit;text-decoration:none;transition:color var(--tr)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 36px}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
@@ -228,7 +237,13 @@ button{font-family:inherit;cursor:pointer}
 .page-head{padding-top:62px;padding-bottom:10px}
 .page-head .kick{display:block;margin-bottom:16px}
 .page-head h1{font-family:var(--serif);font-weight:400;font-size:50px;letter-spacing:-.02em;line-height:1.12;color:var(--ink)}
-.page-head p{color:var(--body);margin-top:16px;font-size:16.5px;max-width:62ch;line-height:1.65}
+/* ★[62ch 캡 폐기 2026-08-12] `ch` 는 숫자 `0` 의 폭이라 한글에는 62ch ≈ 31자밖에 안 된다 —
+   컨테이너가 1,180px 인데 609px 에서 접혔다. 그래서 **12개 템플릿 중 10개가 이미
+   `max-width:none` 으로 뒤집어 쓰고 있었다**(checklist·findings·firm·glossary·guide·
+   inspector·library·library_catalog·quiz·trends). 모두가 뒤집는 기본값은 기본값이 틀린
+   것이고, 그 손목록에서 빠진 곳(archive)만 결함으로 남아 있었다. 기본값을 고친다 —
+   남은 10개의 오버라이드는 무해한 중복이 된다. */
+.page-head p{color:var(--body);margin-top:16px;font-size:16.5px;max-width:none;line-height:1.65}
 
 /* 검색 + facet + 컨트롤(P4). progressive enhancement: 기본 숨김, JS 가 노출. */
 .searchbar,.panel,.bar{display:none}

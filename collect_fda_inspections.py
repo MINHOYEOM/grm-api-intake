@@ -28,8 +28,9 @@ upsert 한다.
      실패시키지만(fail-closed), 이 수집기는 그 전에 클라이언트에서 이미 걸러 애초에
      보내지 않는다.
 
-★페이지네이션: 상한 5000(20000 은 HTTP 400 실측) · 정렬은 `InspectionID`/`ASC` 로 안정
-페이징. "마지막 페이지 판정"은 서버 total 필드에 의존하지 않는다(이 엔드포인트가 total
+★페이지네이션: 상한 5000(20000 은 HTTP 400 실측) · **`start` 는 1-기반**(0 을 보내면
+HTTP 400 `"start parameter must be numeric and greater than 0"` — 2026-08-12 실장애로
+확인) · 정렬은 `InspectionID`/`ASC` 로 안정 페이징. "마지막 페이지 판정"은 서버 total 필드에 의존하지 않는다(이 엔드포인트가 total
 카운트를 body 어디에 주는지 확인된 바 없다) — **받은 행 수가 요청한 rows 보다 적으면
 마지막 페이지**로 판정한다(대다수 REST 페이지네이션의 안전한 최소 가정). 안전판으로
 `--max-pages`(기본 10, 현재 전량 11,104건=3페이지의 3배 이상 여유)를 두고, 이 상한을
@@ -365,7 +366,14 @@ def fetch_all_pages(
         "Content-Type": "application/json",
     }
     all_rows: list[dict[str, Any]] = []
-    start = 0
+    # ★start 는 **1-기반**이다(0-기반이 아니다). 라이브 실측(2026-08-12):
+    #   start=0 -> HTTP 400 `"start parameter must be numeric and greater than 0"`
+    #   start=1 -> [1251303, 1267171] · start=3 -> [1267356, 1269601]
+    #   start=5 -> [1277530, 1278916]   (rows=2 · 겹침 0 · 빠짐 0)
+    # 즉 `start += page_size` 증분은 그대로 맞고 **최초값만 1**이다. 첫 구현이 0 으로
+    # 시작해 첫 페이지에서 곧바로 실패했다 — 실측에 쓴 프로브는 1 을 보냈는데 구현이
+    # 0 을 보내, 프로브와 구현이 갈라진 전형적인 사례다(요란하게 실패해서 다행이다).
+    start = 1
     pages = 0
     while pages < max_pages:
         body = build_request_body(start, page_size, fiscal_years)

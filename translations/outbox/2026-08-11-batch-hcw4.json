@@ -1,0 +1,2996 @@
+[
+  {
+    "finding_id": "finding-9cb8f00d26b2925774ed4fa8",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "직원에 대한 GMP 교육훈련 또는 그 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a4269cb48ff1c6f128eafc89",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a914a716e00314fe984f8717",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다. 다른 의약품이나 이물에 의한 의약품 오염 가능성을 방지하도록 설비를 설치·설계·운전·보관·유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c0b52bc461765d43964ac030",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 업무를 모두 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c15e19dac605108a3bd313ce",
+    "finding_text": "The quality control department or the designated alternate did not sign and/or date quality control decisions.",
+    "finding_text_ko": "품질관리부서(quality control unit) 책임자 또는 지정된 대리인이 품질관리 결정사항에 서명하거나 일자를 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c38b3369590534eedf613f9f",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만사항 및 결함 가능성이 있는 제품에 관한 정보의 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e6bdf6e6fd1d60b6f71f7af6",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate. The electronic system was not validated for its intended use.",
+    "finding_text_ko": "데이터 거버넌스(data governance) 계획의 수립 및 유지관리가 미흡했다. 전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8ad9e7178d852c5e848e8f5",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자·도매상 간 품질계약서(quality agreement)의 보유·내용·유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f95cc01a6358f6569d8c4baf",
+    "finding_text": "The written hygiene program did not clearly define clothing requirements and/or hygiene procedures for personnel and/or visitors.",
+    "finding_text_ko": "문서화된 위생 프로그램에 직원 및 방문자에 대한 복장 요건과 위생 절차가 명확히 규정되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb4dc7d5b9c85a6a0edb0c98",
+    "finding_text": "The availability, implementation, and/or quality of the written sanitation program was inadequate. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "문서화된 위생관리 프로그램의 보유·시행·수준이 미흡했다. 비위생적 상태를 방지하기 위한 세척절차의 시행·실효성·밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fd6e19021d059a2e9fceff7e",
+    "finding_text": "The written specifications were inadequate.",
+    "finding_text_ko": "문서화된 기준규격이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-03b38f2cfa31b00d0e3a8563",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리·검토가 미흡했다. 기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2bd7f3fcafd7d83dd57457c5",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate. The master formulas to control the manufacturing process were inadequate.",
+    "finding_text_ko": "제조공정·설비·자재에 대한 평가가 미흡했다. 제조공정을 관리하기 위한 마스터 포뮬러(master formula)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f4e0c6fccb753ad129df921",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a8f066996776c00a15c6448",
+    "finding_text": "재평가에 필요한 자료를 기한(’25. 9. 2.) 내에 제출하지 아니함(2차 위반)",
+    "finding_text_ko": "재평가에 필요한 자료를 기한(’25. 9. 2.) 내에 제출하지 않았다(2차 위반).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aece1c864eadb2214a7fcb82",
+    "finding_text": "The drug fabricator's specifications for raw materials were inadequate.",
+    "finding_text_ko": "제조업자의 원료 기준규격이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c81f7bb69379b063576aca13",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "오염 위험을 파악하고 저감하도록 위생관리 프로그램이 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d536f33100d6cc5bf66054e9",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate. The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다. 설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8d98d58ab4d80b2f90a2b19",
+    "finding_text": "The control of quarantine areas was inadequate. Separate rooms were not provided and/or maintained to adequately protect equipment and control systems.",
+    "finding_text_ko": "격리보관구역(quarantine area) 관리가 미흡했다. 설비 및 제어시스템을 적절히 보호하기 위한 별도의 공간을 마련하거나 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e914216d2b3176d6d70a6a14",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0abf3b5d270085c9f96abfc7",
+    "finding_text": "The control of quarantine areas was inadequate.",
+    "finding_text_ko": "격리보관구역(quarantine area) 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1dda9ac521439d70e4eb8fd8",
+    "finding_text": "에어캅비말차단마스크(KF-AD)(흰색)(대형): 품질부적합(끈길이)",
+    "finding_text_ko": "에어캅비말차단마스크(KF-AD)(흰색)(대형): 품질 부적합(끈 길이)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-276ec7d3f78d27c6da6c99f3",
+    "finding_text": "The specifications were not in writing and/or approved by the person in charge of the quality control department or the designated alternative.",
+    "finding_text_ko": "기준규격이 문서화되지 않았거나 품질관리부서(quality control unit) 책임자 또는 지정된 대리인의 승인을 받지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8dea1bd51f94a7dfb4b45461",
+    "finding_text": "The maintenance of personnel records was inadequate.",
+    "finding_text_ko": "인사기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-93ef692077ae460b0e7d3920",
+    "finding_text": "푸른무약용안육: 건조감량",
+    "finding_text_ko": "푸른무약용안육: 건조감량(Loss on Drying)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a6ee113a86022e343af96669",
+    "finding_text": "The establishment of specifications was inadequate for packaging materials approved by the quality control department.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 승인한 포장자재에 대한 기준규격 설정이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f50df1cad1550370a9a3eefb",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-18c23aba0c30acd18efa01c3",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 관한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35a41c5717ec09343fa8a35e",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b7bd4b360f952dbfa52d141f",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경사항이 적절히 문서화·평가·승인되도록 보장하는 변경관리(change control) 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd85303a389d357a0cfb421a",
+    "finding_text": "시나파라정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "시나파라정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0060e37a9aca631e57081744",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 시행 및 실효성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0199781af8335ce495ed30ab",
+    "finding_text": "The company's monitoring of water testing was inadequate.",
+    "finding_text_ko": "용수 시험에 대한 모니터링이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0357c7d30f7d28011a13c968",
+    "finding_text": "The company's oversight of the contracted party was inadequate.",
+    "finding_text_ko": "수탁업체에 대한 관리·감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0bc794d45b55f6c16f9d0bcd",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0bffd111efffbe0a104ebbf5",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하판정을 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1288defd333a964028306484",
+    "finding_text": "Water treatment plants and distribution systems were not designed, constructed, or maintained to ensure a reliable and adequate source of water.",
+    "finding_text_ko": "신뢰할 수 있고 충분한 용수 공급을 보장하도록 용수처리설비 및 배관시스템을 설계·시공·유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d4bfd843b80ac842e43b437",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비·자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d4d7f3499b1ead11d4c7de7",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2092a58eeded0f96aa6e1707",
+    "finding_text": "The written clothing standards for each environmental grade were inadequate.",
+    "finding_text_ko": "환경 등급별 문서화된 복장 기준이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2925d7fafce4b5e924ee98ee",
+    "finding_text": "푸른무약유백피: 성상",
+    "finding_text_ko": "푸른무약유백피: 성상(Description)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-297aca9bbb137ba16189ae87",
+    "finding_text": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 세척절차의 시행·실효성·밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-30ff7a13793682dae805ad15",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-32a5407d5d9919ccbd1b0646",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4fd650884adc4ff1a8e56821",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비·자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5be20c8d12f460339ab4cb58",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6051d2db22cd9952b5b29541",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6152fb804c8c73facac0ea28",
+    "finding_text": "Critical processes and procedures were not evaluated on a regular basis. The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "중요 공정 및 절차를 정기적으로 평가하지 않았다. 연간제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64cc1624cd79668568b143d2",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경사항이 적절히 문서화·평가·승인되도록 보장하는 변경관리(change control) 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6adea5807e127d6f980b90db",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 표준작업절차서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7309b81f0b8f9ad3fbd1e7aa",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-75ecb1af3d42013f5ef43ef5",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-79d1a78fef4d331bcc3b6aed",
+    "finding_text": "In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "무균공정(aseptic) 작업이 수행되는 구역에서 모니터링 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-85ac38e1cfe6b13319d1b493",
+    "finding_text": "재평가에 필요한 자료를 기한(’25. 9. 2.) 내에 제출하지 아니함(2차 위반)",
+    "finding_text_ko": "재평가에 필요한 자료를 기한(’25. 9. 2.) 내에 제출하지 않았다(2차 위반).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-88320539c868143c4bf8093d",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 시행 및 실효성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8bf8b263565e1ad7254f0da5",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f5f594c472a6e19ea17b91a",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a10ecfc1ec5be4a1e0ee4a7c",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경사항이 적절히 문서화·평가·승인되도록 보장하는 변경관리(change control) 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a55673f033f83c50a590f2cd",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a717c25a02ee80a8aaffd7b6",
+    "finding_text": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 GMP 문서 및 표준작업절차서(SOP)를 승인하거나 서명·일자 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a84e810a840bb4d0bccb3ccb",
+    "finding_text": "코비안에스정: 불순물(N-nitroso-phenylephrine) 기준 초과 검출 및 발생 우려에 따른 영업자 회수",
+    "finding_text_ko": "코비안에스정: 불순물(N-nitroso-phenylephrine) 기준 초과 검출 및 발생 우려에 따른 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b17af040e6d1e237c7caa8f4",
+    "finding_text": "The master production documents were inadequate. The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate.",
+    "finding_text_ko": "제조기준서(master production document)가 미흡했다. 원료·포장자재·중간제품·벌크 의약품·완제품의 구획 보관, 재고 선입선출, 운송이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b740923dabdf29ac7a268b80",
+    "finding_text": "The availability or the content of the authentic certificate of analysis was inadequate.",
+    "finding_text_ko": "원본 시험성적서(certificate of analysis)의 보유 또는 그 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bdc85cd8e8263bdc97d34c37",
+    "finding_text": "The process was inadequate for the environmental classification of aseptic or clean areas.",
+    "finding_text_ko": "무균구역 또는 청정구역(critical area)의 환경 등급 분류 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4db14bcb4f658f87cf98c1b",
+    "finding_text": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 세척절차의 시행·실효성·밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c5a3b7075dd78ca638b3f514",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility. The company did not adequately protect sterilized material to prevent re-contamination after sterilization.",
+    "finding_text_ko": "작업자의 무균조작(aseptic practice)이 무균성을 유지하기에 미흡했다. 멸균 후 재오염을 방지하기 위해 멸균된 자재를 충분히 보호하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d2eec779cb8e843375ebe846",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리·검토가 미흡했다. 기록의 추적성·판독성·문서화·서식·정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ddb4e42d050d4ddd63d0b40f",
+    "finding_text": "Line clearance was not performed before starting new processing operations.",
+    "finding_text_ko": "새로운 공정 작업을 시작하기 전에 라인 클리어런스(line clearance)를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de1233126c4fabe5b96b43d1",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "오염을 방지하도록 시설을 설계·시공·운영·유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e7ef05b045466a6847146041",
+    "finding_text": "The sampling procedure was inadequate for microbiological monitoring in processing areas or aseptic areas. The company did not set appropriate alert and action limits for the results of particulate and microbiological monitoring.",
+    "finding_text_ko": "공정구역 또는 무균구역의 미생물 모니터링을 위한 검체채취 절차가 미흡했다. 부유입자 및 미생물 모니터링 결과에 대한 적절한 경보기준(alert limit)과 조치기준(action limit)을 설정하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ecb79984788f87f75a9d1196",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fada4b64d792c4d4fc613e02",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb116d9a35dc2341ca25d74f",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 외관검사(visual inspection)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fc593871cc39d1f1e5f3ee85",
+    "finding_text": "The company did not adequately demonstrate that air-flow patterns did not pose a risk of contamination. The process was inadequate for the environmental classification of aseptic or clean areas.",
+    "finding_text_ko": "기류 패턴(air-flow pattern)이 오염 위험을 초래하지 않는다는 점을 충분히 입증하지 않았다. 무균구역 또는 청정구역(critical area)의 환경 등급 분류 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f539f94b60f8cd722eb94e8",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "GMP 표준작업절차서(SOP)의 관리가 미흡했다. 불만사항 및 결함 가능성이 있는 제품에 관한 정보의 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-355d8a53e913fec25ac1f0b2",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "전산화 시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ff1e9f26901d39a5eff4942",
+    "finding_text": "Validation studies were not conducted in keeping with the predefined protocols.",
+    "finding_text_ko": "밸리데이션(validation) 시험을 사전에 정해진 프로토콜에 따라 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f75bcc4576be34b3710cb86e",
+    "finding_text": "에스오피엠정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합(정제 깨짐)에 따른 영업자 회수",
+    "finding_text_ko": "에스오피엠정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합(정제 깨짐)에 따른 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-037c1b0e64ba564e2d8e2f36",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자·도매상 간 품질계약서(quality agreement)의 보유·내용·유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0adba0167b56a93c15d95812",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17a4459e572d49608105b591",
+    "finding_text": "The quality control department did not undertake all of the required activities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 업무를 모두 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-832107ed16fb36f4c42892c0",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "직원에 대한 GMP 교육훈련 또는 그 기록의 유지관리가 미흡했다. 직원의 직무기술서, 직원에게 부여된 권한, 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9af106ab489ad27a590d19b2",
+    "finding_text": "The availability, implementation, and/or quality of the written sanitation program was inadequate.",
+    "finding_text_ko": "문서화된 위생관리 프로그램의 보유·시행·수준이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a152c52d5eae093e282dc65b",
+    "finding_text": "코린시럽: 불순물(N-nitroso-phenylephrine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자회수",
+    "finding_text_ko": "코린시럽: 불순물(N-nitroso-phenylephrine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c860d530bf131b32e56f686c",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 표준작업절차서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ddc7dffbd6dd0106ec3acab4",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 시행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e286f1f748782f387f2c2955",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. Documents were not available on the premises.",
+    "finding_text_ko": "기록의 추적성·판독성·문서화·서식·정확성이 미흡했다. 제조소 내에 문서가 비치되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-06baca428c6e305314011cc4",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "직원에 대한 GMP 교육훈련 또는 그 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-291f904b842970c7253c824a",
+    "finding_text": "- ｢약사법｣제31조제4항에 따라 의약외품의 제조를 업으로 하려는 자는 대통령령으로 정하는 시설기준에 따라 필요한 시설을 갖추고 식품의약품안전처장에게 제조업 신고를 하여야 하며 ｢의약품 등의 제조업 및 수입자의 시설기준령｣ 제3조제1항에 따라 의약외품 제조소에는 제조 작업을 하는 작업소, 원료·자재 및 제품의 품질을 관리하는 시험실, 원료·자재 및 제품을 보관하는 보관소, 제조 및 품질관리에 필요한 시설 및 기구를 갖추어야 하나, 동 업체는 현장점검(2025. 9. 9.) 당시 해당 업체가 신고한 소재지에 해당 시설이 전혀 없었음.",
+    "finding_text_ko": "｢약사법｣제31조제4항에 따라 의약외품의 제조를 업으로 하려는 자는 대통령령으로 정하는 시설기준에 따라 필요한 시설을 갖추고 식품의약품안전처장에게 제조업 신고를 하여야 하며 ｢의약품 등의 제조업 및 수입자의 시설기준령｣ 제3조제1항에 따라 의약외품 제조소에는 제조 작업을 하는 작업소, 원료·자재 및 제품의 품질을 관리하는 시험실, 원료·자재 및 제품을 보관하는 보관소, 제조 및 품질관리에 필요한 시설 및 기구를 갖추어야 하나, 동 업체는 현장점검(2025. 9. 9.) 당시 해당 업체가 신고한 소재지에 해당 시설이 전혀 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2a406cedb4c111ba42d4ff2f",
+    "finding_text": "올본음양곽: 정량법(이카리인)",
+    "finding_text_ko": "올본음양곽: 정량법(이카리인)(Assay)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e6152d057157c176f16a04c",
+    "finding_text": "Documents were not available on the premises.",
+    "finding_text_ko": "제조소 내에 문서가 비치되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-464709b64cc69b0fd29c0c59",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성·판독성·문서화·서식·정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61e3ef8904b937af8520e3fb",
+    "finding_text": "The evidence used to demonstrate the transportation and/or storage conditions of each lot or batch of the drug was inadequate.",
+    "finding_text_ko": "의약품 각 로트 또는 배치의 운송 및 보관 조건을 입증하는 근거자료가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-856920dde8546616db166933",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자·도매상 간 품질계약서(quality agreement)의 보유·내용·유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-87cd3c4826bf9b201b4badde",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자·도매상 간 품질계약서(quality agreement)의 보유·내용·유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b9d6f62ec68f4aa7f0b22ae",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경사항이 적절히 문서화·평가·승인되도록 보장하는 변경관리(change control) 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a113c7f7de3b1e73b266decc",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 표준작업절차서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a1c56fdd5dd8c329b44657a7",
+    "finding_text": "Complete testing was not performed according to the requirements. The availability or the content of the authentic certificate of analysis was inadequate.",
+    "finding_text_ko": "요구되는 시험을 전부 실시하지 않았다. 원본 시험성적서(certificate of analysis)의 보유 또는 그 내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a65fb247a25bd5bad65d0f35",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만사항 및 결함 가능성이 있는 제품에 관한 정보의 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a9bb70e7b21d4942a997fb80",
+    "finding_text": "The temperature and/or humidity control was inadequate. The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다. 보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ceccccbfe6182a942fd71d09",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험(ongoing stability) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cfaae8707d97b61202f53312",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ded9f3a485cad4b5e3a18d95",
+    "finding_text": "태극인식방풍: 건조함량(기준초과) 부적합",
+    "finding_text_ko": "태극인식방풍: 건조함량(기준초과)이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e75d3b2399ec0e2b528aefe8",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-104a16a55a9e15603d7fc486",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10cbe7b6a7a18fa3cb8e46d6",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(APQR) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1eed70c05995faffb0168a65",
+    "finding_text": "마리트롤주(트라마돌염산염): 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)의 초과 검출(영업자 회수)",
+    "finding_text_ko": "마리트롤주(트라마돌염산염): 니트로사민류 불순물(N-nitroso-desmethyl-tramadol)이 초과 검출되어 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2d9141c7790806804c4aca71",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The creation, maintenance, processing, and/or review of laboratory data was inadequate. The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다. 시험실 데이터의 생성, 유지, 처리 및/또는 검토가 미흡했다. 데이터 거버넌스 계획의 수립 및/또는 유지가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2e5b01f20080d77356c83297",
+    "finding_text": "The company did not design or maintain the premises and equipment to minimize microbial contamination and the number of airborne particles in clean areas.",
+    "finding_text_ko": "청정구역(clean area)의 미생물 오염과 부유입자 수를 최소화하도록 건물과 설비를 설계하거나 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2ec6897bbced8fac0341eb43",
+    "finding_text": "The sampling procedure was inadequate for microbiological monitoring in processing areas or aseptic areas.",
+    "finding_text_ko": "공정구역 또는 무균구역(aseptic area)의 미생물 모니터링을 위한 검체채취 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f0567d6c878f7b36ec73d82",
+    "finding_text": "The training of personnel before new or revised standard operating procedures were implemented was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "신규 또는 개정된 표준작업지침서(SOP) 시행 전 작업자 교육이 미흡했다. 작업자의 직무기술서, 부여된 권한 및/또는 업무 위임이 미흡했거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-371e91bb57a294bd0ab587aa",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "유틸리티 및/또는 지원설비의 적격성평가(qualification) 및/또는 검증이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38ab6521151a5b2b6f59c1b6",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화·평가 및/또는 승인되도록 보장하는 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-396e9433b6be684181713764",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지, 처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-39ba6398995a07641a47e7a9",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The usage logs for the equipment used for significant processing and/or testing operations were inadequate. The electronic system was not validated for its intended use.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지, 처리 및/또는 검토가 미흡했다. 주요 공정 및/또는 시험 작업에 사용된 설비의 사용기록이 미흡했다. 전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e6f3dc114b6b0969b1654a8",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented. The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "작업자의 직무기술서, 부여된 권한 및/또는 업무 위임이 미흡했거나 문서화되지 않았다. GMP에 대한 작업자 교육 및/또는 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-422a76a335a05c78bd3c1c51",
+    "finding_text": "The design, equipment, and/or maintenance of the testing laboratory was inadequate.",
+    "finding_text_ko": "시험실의 설계, 설비 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a1933bc49a586bdb79be998",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 외관검사(visual inspection)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f9c73ad26fd3ccd58c6fada",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다. 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-56a2cef5f9b42b93fc7961ff",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 그 효과성이 미흡했다. 위생관리 프로그램이 오염 위험을 식별 및/또는 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-59348a3a64663b83094c642a",
+    "finding_text": "Tests were not performed according to approved specifications.",
+    "finding_text_ko": "시험이 승인된 기준(specification)에 따라 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6568a1bc0e04f39b2fa2f37f",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험(ongoing stability) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d4f91d6208a780f39889089",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만 및/또는 결함 가능성이 있는 제품에 관한 기타 정보의 평가, 기록, 후속조치 및/또는 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-71bfc7c016927a199328e73d",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7a15345cb0d3cb535a7ec305",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate. The electronic system was not validated for its intended use.",
+    "finding_text_ko": "데이터 거버넌스 계획의 수립 및/또는 유지가 미흡했다. 전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-852ada56fc9c7190551a8d04",
+    "finding_text": "The maintenance of the premises was inadequate.",
+    "finding_text_ko": "건물·시설의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8a493c8023752e16d4b4f1f7",
+    "finding_text": "In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "무균조작(aseptic)이 수행되는 구역에서 모니터링의 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8bc784ef18d3d28839897064",
+    "finding_text": "The company did not adequately protect sterilized material to prevent re-contamination after sterilization.",
+    "finding_text_ko": "멸균 후 재오염을 방지하기 위해 멸균된 자재를 적절히 보호하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8fa6a058ac78218314463aa4",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 대한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0e609b8e154dd72d59de5db",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화·평가 및/또는 승인되도록 보장하는 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a46a2c49b17bf925b0b86747",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aeb39bce7bf4fcb1558c5a24",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba055b171b03871ce11137a4",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bdc06c81edb82511b7cf1552",
+    "finding_text": "The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate.",
+    "finding_text_ko": "원료, 포장재, 중간제품, 벌크 의약품 및/또는 완제품의 격리구분, 재고 순환 및/또는 운송이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4adf740e2e7b860488b973b",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate. The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "유틸리티 및/또는 지원설비의 적격성평가(qualification) 및/또는 검증이 미흡했다. 건물·시설이 오염을 방지하도록 설계·시공·운영 및/또는 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c5a471b7d70276f78dd2b097",
+    "finding_text": "The environmental sampling methods were inadequate. The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "환경 검체채취 방법이 미흡했다. 작업자의 무균조작(aseptic) 수행이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd61260962c2f9f6efd03e9f",
+    "finding_text": "The written clothing standards for each environmental grade were inadequate. The company did not design or maintain the premises and equipment to minimize microbial contamination and the number of airborne particles in clean areas.",
+    "finding_text_ko": "각 환경 등급별 복장 기준서가 미흡했다. 청정구역(clean area)의 미생물 오염과 부유입자 수를 최소화하도록 건물과 설비를 설계하거나 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d32f4361406468672e343f58",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화·평가 및/또는 승인되도록 보장하는 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-def35beacf8de18cbf3faa13",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate.",
+    "finding_text_ko": "제조, 포장, 표시, 시험, 보관 및/또는 운송 방법과 절차에 대해 품질관리부서(quality control unit) 책임자가 시행 전에 실시하는 검토 및/또는 승인이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e076139cca193a799e33763c",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e1cff4051c5b76a7569b0498",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정, 설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e1d475dd30094ad2736efc35",
+    "finding_text": "The evaluation was inadequate for cases where there was a deviation from the norm and/or where products were on the borderline of the acceptable range.",
+    "finding_text_ko": "기준에서 벗어난 일탈(deviation)이 있었던 경우 및/또는 제품이 허용범위 경계에 있었던 경우에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e31cbfdb1b9379f97275cafa",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 그 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e9959b526802b0891cfed94d",
+    "finding_text": "The design, equipment, and/or maintenance of the testing laboratory was inadequate.",
+    "finding_text_ko": "시험실의 설계, 설비 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ed88563004d29c3a2c8b69b7",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ef812364c01261e1fca13d10",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-efb2d16110327948ff033fb5",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험(ongoing stability) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3c1aa176a1c47fa1cb35523c",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-676744fa2feb73e81ff7a8a5",
+    "finding_text": "The maintenance of the premises was inadequate.",
+    "finding_text_ko": "건물·시설의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8fe1a29be4bd5cbe17430e7a",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a7e466ca07b36c693178eb32",
+    "finding_text": "The handling of raw materials, products, or packaging materials in keeping with pre-approved written procedures or instructions was inadequate. The recorded information or details were inadequate.",
+    "finding_text_ko": "사전 승인된 문서화된 절차 또는 지시에 따른 원료, 제품 또는 포장재의 취급이 미흡했다. 기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d4075671944af5540eee5d20",
+    "finding_text": "올로벨라0.2에스디점안액(올로파타딘염산염)(1회용): 점안제 관 라벨 유효기간 오기에 따른 영업자 회수",
+    "finding_text_ko": "올로벨라0.2에스디점안액(올로파타딘염산염)(1회용): 점안제 관 라벨의 유효기간 오기에 따라 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62f5df99ccff81835c320ed3",
+    "finding_text": "레파트진정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 한시적 허용기준 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "레파트진정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet)의 한시적 허용기준 초과 검출 우려에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd5745d72b744bd3f71b248f",
+    "finding_text": "1.뉴뽀로로는치카친구안심치약(천연딸기향,천연사과향), 2.동의장보고한방치약, 3.사니타덴티검케어치약, 4.,사니타덴티유아치약(딸기향,포도향), 5.블랑시크릿마더어드벤스드치약, 6.치이플러스치약, 7.사니타덴티스텝투치약(딸기향,포도향), 8.크린치약(체리피치향,블루베리향,레몬향,포도향), 9.동국덴탈프로젝트한방치약, 10.녹십초아마조나뿌리8010치약, 11.치이골드플러스치약, 12.닥터스마일아임맘, 13.사니타덴티유아치약(사과향), 14.사니타덴티스텝투치약(사과향), 15.루바스프리미엄치약, 16.브이티띵크유얼티스마더치약, 17.브이티띵크유얼티스차일드치약(망고향,딸기향,블루베리향,라즈베리향,), 18.올가맘키즈치약(천연딸기향), 19.임플랜75치약, 20.루안매스티프리미엄치약, 21.코엔셀에센셜치약, 22.판다그린허벌치약, 23.판다그린키즈치약(천연딸기향), 24.순한키즈치약(천연딸기향), 25.치이키즈젠피치약(천연바나나향,천연후르츠향), 26.엔비에프어드밴스드오랄앤진지발젤치약, 27.뷰에나베베키즈치약(오렌지향,포도향,딸기향), 28.디리밸런싱치약, 29.유우치약, 30.판다그린블루미아어린이치약(혼합과일향)(수출용), 31.치이골드이십삼치약: 이물 혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "1.뉴뽀로로는치카친구안심치약(천연딸기향,천연사과향), 2.동의장보고한방치약, 3.사니타덴티검케어치약, 4.,사니타덴티유아치약(딸기향,포도향), 5.블랑시크릿마더어드벤스드치약, 6.치이플러스치약, 7.사니타덴티스텝투치약(딸기향,포도향), 8.크린치약(체리피치향,블루베리향,레몬향,포도향), 9.동국덴탈프로젝트한방치약, 10.녹십초아마조나뿌리8010치약, 11.치이골드플러스치약, 12.닥터스마일아임맘, 13.사니타덴티유아치약(사과향), 14.사니타덴티스텝투치약(사과향), 15.루바스프리미엄치약, 16.브이티띵크유얼티스마더치약, 17.브이티띵크유얼티스차일드치약(망고향,딸기향,블루베리향,라즈베리향,), 18.올가맘키즈치약(천연딸기향), 19.임플랜75치약, 20.루안매스티프리미엄치약, 21.코엔셀에센셜치약, 22.판다그린허벌치약, 23.판다그린키즈치약(천연딸기향), 24.순한키즈치약(천연딸기향), 25.치이키즈젠피치약(천연바나나향,천연후르츠향), 26.엔비에프어드밴스드오랄앤진지발젤치약, 27.뷰에나베베키즈치약(오렌지향,포도향,딸기향), 28.디리밸런싱치약, 29.유우치약, 30.판다그린블루미아어린이치약(혼합과일향)(수출용), 31.치이골드이십삼치약: 이물 혼입 우려에 따라 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-03f50c7c9ade1a19c872df1d",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정, 설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-08f2599b4c8aec0916024bab",
+    "finding_text": "The preventative maintenance program was inadequate for the equipment used in significant processing and/or testing operations. The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "주요 공정 및/또는 시험 작업에 사용되는 설비에 대한 예방정비 프로그램이 미흡했다. 컴퓨터화시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2da4aa548530d9b7742c701a",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "유틸리티 및/또는 지원설비의 적격성평가(qualification) 및/또는 검증이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-368f283272af6649fba20e1c",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-477c0357a256b4f4dd86025d",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 그 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-487c7e9dc9b7c643b49b24a7",
+    "finding_text": "The aseptic process simulation study was not long enough to cover all routine manipulations, normal interventions, and worst case situations.",
+    "finding_text_ko": "무균공정 모의시험(aseptic process simulation)이 모든 통상적 조작, 정상적 개입 및 최악조건 상황을 포괄할 만큼 충분히 길게 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-588f963883c30ddb43623e39",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5f7b3a80ce4bfbecd4568e50",
+    "finding_text": "The evaluation was inadequate for cases where there was a deviation from the norm and/or where products were on the borderline of the acceptable range. The assessment to release finished products was inadequate.",
+    "finding_text_ko": "기준에서 벗어난 일탈(deviation)이 있었던 경우 및/또는 제품이 허용범위 경계에 있었던 경우에 대한 평가가 미흡했다. 완제품 출하판정을 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-602f2e9b78beb88831ed74f2",
+    "finding_text": "The condition of the clean area used to produce sterile products was inadequate. In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "무균제제 제조에 사용되는 청정구역(clean area)의 상태가 미흡했다. 무균조작(aseptic)이 수행되는 구역에서 모니터링의 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61b9759220a63c9e696695ce",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 수행이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6cc35abdecdc29d79c06090d",
+    "finding_text": "The validation of aseptic processing was inadequate.",
+    "finding_text_ko": "무균공정(aseptic processing) 밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-74a4bfbaeac6abc89f05a4c8",
+    "finding_text": "After equipment maintenance, the company did not adequately clean, disinfect, or sterilize the clean area. The operators'aseptic practices were inadequate to maintain sterility. Sterile disinfectants were not used in Grade A and B areas. The ongoing training of personnel was inadequate. In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "설비 정비 후 청정구역(clean area)을 적절히 세척·소독 또는 멸균하지 않았다. 작업자의 무균조작(aseptic) 수행이 무균성을 유지하기에 미흡했다. Grade A 및 B 구역에서 멸균 소독제를 사용하지 않았다. 작업자에 대한 지속적 교육이 미흡했다. 무균조작(aseptic)이 수행되는 구역에서 모니터링의 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-76a47e4e3e8c274dfb97e0f0",
+    "finding_text": "The \"Water for Injection\" was not produced, stored or distributed to prevent microbial growth.",
+    "finding_text_ko": "\"Water for Injection\"이 미생물 증식을 방지하도록 제조·보관 또는 공급되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8071c22baff8c305153ad40d",
+    "finding_text": "Senior management's ability to determine and/or provide adequate and/or appropriate resources to implement, maintain and/or improve the effectiveness of the quality management system was inadequate.",
+    "finding_text_ko": "품질경영시스템의 효과성을 실행·유지 및/또는 개선하는 데 필요한 적절한 자원을 결정 및/또는 제공하는 경영진의 역량이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b728add4dd237c02d0c81566",
+    "finding_text": "The quarantine, sampling, testing, release of raw material, and/or the packaging materials prior to use were inadequate.",
+    "finding_text_ko": "사용 전 원료 및/또는 포장재의 격리보관, 검체채취, 시험, 출고승인이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bdf3da84528dee05b7d8b4ad",
+    "finding_text": "나음천남성: 관능(성상)",
+    "finding_text_ko": "나음천남성: 관능(성상) 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4f0eb94e57283c4615f3822",
+    "finding_text": "A reduced retesting program for raw materials was in place without the raw material vendor certification. The establishment of specifications was inadequate for packaging materials approved by the quality control department. The procedures to prevent mix-ups between irradiated and non-irradiated materials were inadequate. The company did not adequately validate how the sterilizer was loaded.",
+    "finding_text_ko": "원료 공급업체 인증 없이 원료에 대한 축소 재시험 프로그램을 운영했다. 품질관리부서(quality control unit)가 승인한 포장재에 대한 기준(specification) 설정이 미흡했다. 방사선 조사 자재와 미조사 자재 간 혼동을 방지하기 위한 절차가 미흡했다. 멸균기의 적재 방식을 적절히 밸리데이션(validation)하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd36f69c10c9a5bfa5466d0d",
+    "finding_text": "The sampling procedure was inadequate for microbiological monitoring in processing areas or aseptic areas. The company's investigations of microbial contamination in critical areas were inadequate.",
+    "finding_text_ko": "공정구역 또는 무균구역(aseptic area)의 미생물 모니터링을 위한 검체채취 절차가 미흡했다. 청정구역(critical area)의 미생물 오염에 대한 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ecfae0fc5bd81d1ebf3191fa",
+    "finding_text": "The stability data did not demonstrate or justify the retention period of a reworked lot of a drug before it was marketed.",
+    "finding_text_ko": "안정성 자료가 재작업(rework)된 의약품 로트의 시판 전 보관기간을 입증하거나 정당화하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ed90ff4d2d971aa7e2741b0d",
+    "finding_text": "The specifications were not in writing and/or approved by the person in charge of the quality control department or the designated alternative.",
+    "finding_text_ko": "기준(specification)이 문서화되지 않았거나 품질관리부서(quality control unit) 책임자 또는 지정 대리인의 승인을 받지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f276576bccfdac22f1bfbe46",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급업체, 제조업체, 시험기관, 포장업체, 표시업체, 유통업체, 수입업체 및/또는 도매업체 간 품질협약서(quality agreement)의 보유, 내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-015f320317b6cfdf21b2b4f5",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경이 적절히 문서화·평가 및/또는 승인되도록 보장하는 변경관리(change control) 시스템이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-07125568d07c5121126a5195",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-34eb1fbbe5d1591fe9f1244a",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d60e4aef8c02b8bbc311650",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 그 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5de4395966994f266510c851",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "작업자의 직무기술서, 부여된 권한 및/또는 업무 위임이 미흡했거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d05af516d8d1845cab3fce6",
+    "finding_text": "The written procedures and records for retaining samples were inadequate.",
+    "finding_text_ko": "보관용 검체에 대한 문서화된 절차와 기록이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-77f122e69e806382df41fb42",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성, 판독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-89b8d8dab778396becf7cb20",
+    "finding_text": "밸리 데이 션 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제6호 운송밸리데이션을 적절하게 수행할 것",
+    "finding_text_ko": "밸리데이션 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제6호: 운송밸리데이션을 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9737a0c2ead6fe55a7e4fc97",
+    "finding_text": "The premises were not constructed and/or maintained to allow cleaning and/or prevent the accumulation of foreign material.",
+    "finding_text_ko": "건물·시설이 세척이 가능하도록 및/또는 이물 축적을 방지하도록 시공 및/또는 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d3fecd28480d08e12338408",
+    "finding_text": "제조 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제8호 최신의 국내 변경허가사항을 반영하여 표기작업을 적절하게 수행할 것",
+    "finding_text_ko": "제조 관리 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제8호: 최신의 국내 변경허가사항을 반영하여 표기작업을 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bb559a74fc1c2a653a88a5b6",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-28f0b266bf4f7b8f99ec6e97",
+    "finding_text": "The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material.",
+    "finding_text_ko": "설비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운전·보관 및/또는 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3e8eb777260a5b79e548a47a",
+    "finding_text": "아토스타젯정10/20밀리그램: 라벨내 일부 오기에 따른 영업자 회수",
+    "finding_text_ko": "아토스타젯정10/20밀리그램: 라벨 내 일부 오기에 따라 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-571ab262281e7ab3e8fcd8c7",
+    "finding_text": "케이에프황사마스크(KF94)(흰색,검정색,연한황색,회색,노란색,분홍색): 품질부적합(형상_머리끈길이) *흰색에 한함",
+    "finding_text_ko": "케이에프황사마스크(KF94)(흰색,검정색,연한황색,회색,노란색,분홍색): 품질부적합(형상_머리끈길이)이었다. *흰색에 한함",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd7c6149d9e2c79b40df5e60",
+    "finding_text": "The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures.",
+    "finding_text_ko": "위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차 및/또는 방충·방서 대책이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-074036273e08a1335ee1b1c6",
+    "finding_text": "제조 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제8호 코팅공정을 적절하게 수행할 것",
+    "finding_text_ko": "제조 관리 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제8호: 코팅공정을 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-481bba5927d76fc4238c7d4a",
+    "finding_text": "문서 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제5호 제조 관련 문서 작성·관리를 적절하게 수행할 것",
+    "finding_text_ko": "문서 관리 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제5호: 제조 관련 문서 작성·관리를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5fe1fc543a86f9891e3a4eaa",
+    "finding_text": "보관 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제10호 반제품 보관 관리를 적절하게 수행할 것",
+    "finding_text_ko": "보관 관리 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제10호: 반제품 보관 관리를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61fb7a80b6a17c13aff561a1",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "작업자의 직무기술서, 부여된 권한 및/또는 업무 위임이 미흡했거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-75224f8390c1833e697d295b",
+    "finding_text": "허가 관리 - 의약품 등의 안전에 관한 규칙 [별표 1] 제1의2호 완제의약품의 pH 시험 적합 기준을 해외제조소와 일치시킬 것",
+    "finding_text_ko": "허가 관리 - 의약품 등의 안전에 관한 규칙 [별표 1] 제1의2호: 완제의약품의 pH 시험 적합 기준을 해외제조소와 일치시킬 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-76e81c0501becfe42ea9beda",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9e5b8a7672719adb18699857",
+    "finding_text": "The temperature and/or humidity control was inadequate. The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다. 컴퓨터화시스템을 포함한 설비의 교정, 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b195f998fe04674c6070ae33",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The system for reviewing, revising, and approving standard operating procedures was inadequate.",
+    "finding_text_ko": "GMP 표준작업지침서(SOP)의 관리가 미흡했다. 표준작업지침서(SOP)의 검토·개정·승인 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b23ca96e75f9a6123d5afa3e",
+    "finding_text": "품질 경영 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제1의2호 데이터 완전성 관리를 적절하게 수행할 것",
+    "finding_text_ko": "품질 경영 기타 - 의약품 등의 안전에 관한 규칙 [별표 1] 제1의2호: 데이터 완전성 관리를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4b64149676840c5bda88817",
+    "finding_text": "제조 위생 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제9호 제조 위생 관리를 적절하게 수행할 것",
+    "finding_text_ko": "제조 위생 관리(기타): 의약품 등의 안전에 관한 규칙 [별표 1] 제9호에 따라 제조 위생 관리를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1242aa2418327841964cb7a",
+    "finding_text": "보위황정: 품질 부적합(붕해시험)",
+    "finding_text_ko": "보위황정: 붕해시험에서 품질 부적합이 확인됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d6d6f95201c021b9eebbc078",
+    "finding_text": "제조 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1] 제8호 2차 포장 관련 일탈사례를 적절하게 조치할 것",
+    "finding_text_ko": "제조 관리(기타): 의약품 등의 안전에 관한 규칙 [별표 1] 제8호에 따라 2차 포장 관련 일탈(deviation) 사례를 적절하게 조치할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-07fd1925b8807915e5f00c0b",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1244188057e5b65fbc0e8521",
+    "finding_text": "The electronic system was not validated for its intended use. The controls put in place for electronic signatures were inadequate.",
+    "finding_text_ko": "전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다. 전자서명에 대해 마련된 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-20cdba71e8a6c7718fa0a151",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-71a0d6f724fcc60f0a21f144",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c8bc1bccedfc63e77bcd3a5c",
+    "finding_text": "The training of personnel before new or revised standard operating procedures were implemented was inadequate.",
+    "finding_text_ko": "신규 또는 개정된 표준작업지침서(SOP) 시행 전 작업자 교육이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d3bae2909eb23241a5684ddf",
+    "finding_text": "The education, experience, and/or oversight of the individual in charge of the quality control department was inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit) 책임자의 학력·경력 및/또는 관리감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eea2aabf8555861a13573c44",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1084eb2a1f01c1275c885645",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "시설(premises)이 오염을 방지하도록 설계·시공·운영 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1320b4d2058ddad8f7c35f60",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1328cc30410e23f520de17ab",
+    "finding_text": "The written specifications were inadequate.",
+    "finding_text_ko": "문서화된 기준(specification)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1b2b6acb389be1c8596fdd46",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "GMP에 대한 작업자 교육 및/또는 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3025bc8c892f0f1f41992c77",
+    "finding_text": "품질 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1의2] 제11호 시험기록 관련 데이터 완전성 위험 평가를 적절하게 수행할 것",
+    "finding_text_ko": "품질 관리(기타): 의약품 등의 안전에 관한 규칙 [별표 1의2] 제11호에 따라 시험기록 관련 데이터 완전성(data integrity) 위험 평가를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-31bb47eae11db0e2d5882f87",
+    "finding_text": "품질 관리 기타 의약품 등의 안전에 관한 규칙 [별표 1의2] 제11호 품질관리 시 사용한 저울 칭량값의 근거자료를 갖출 것",
+    "finding_text_ko": "품질 관리(기타): 의약품 등의 안전에 관한 규칙 [별표 1의2] 제11호에 따라 품질관리 시 사용한 저울 칭량값의 근거자료를 갖출 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-37bba38a4b115780ff53469e",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "유틸리티 및/또는 지원설비의 적격성평가(qualification) 및/또는 검증이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-40d403b3ead12532747a6581",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "지침 및/또는 절차가 의약품의 품질과 안전한 유통을 유지할 수 있는 보관 및/또는 운송 조건을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f13ab7ad2743f354a5e1e11",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다. 기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다. 시험실 데이터의 생성·유지관리·처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51189f6f9f3720b1def5bef6",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-52c022f5a919cf87a707ef89",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5ac8adc079e6139e6463cd21",
+    "finding_text": "The written self-inspection procedure was inadequate.",
+    "finding_text_ko": "문서화된 자체점검(self-inspection) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-63cba8fba86c7a324940edce",
+    "finding_text": "The training of personnel before new or revised standard operating procedures were implemented was inadequate.",
+    "finding_text_ko": "신규 또는 개정된 표준작업지침서(SOP) 시행 전 작업자 교육이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67a18c501d33e0dccb5c9169",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6f269f4b0cdb820355a92aeb",
+    "finding_text": "The quality control department's handling of complaints and/or information received about drug quality was inadequate.",
+    "finding_text_ko": "의약품 품질에 관한 불만 및/또는 접수 정보에 대한 품질관리부서(quality control unit)의 처리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9757d5cf80dbbf106f503aa0",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate. The preventative maintenance program was inadequate for the equipment used in significant processing and/or testing operations.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다. 주요 제조 및/또는 시험 작업에 사용되는 설비에 대한 예방정비 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-afc40e9549a3c64064084fac",
+    "finding_text": "레파트진정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 한시적 허용기준 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "레파트진정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet)이 한시적 허용기준을 초과해 검출될 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b036279c6fed633252a98934",
+    "finding_text": "밸리 데이 션 기타 의약품 등의 안전에 관한 규칙 [별표 1의2] 제5호 배양기의 재적격성평가를 적절하게 수행할 것",
+    "finding_text_ko": "밸리데이션(기타): 의약품 등의 안전에 관한 규칙 [별표 1의2] 제5호에 따라 배양기의 재적격성평가(requalification)를 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c23c6bb38dd43dbcc6667ebd",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3ec11840920d7d83270ba6c",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통자·수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cdceb4de8a23497f92bbc1de",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-df176e479ea2d41621ee3d0f",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "결함 가능성이 있는 제품에 관한 불만 및/또는 기타 정보의 평가·기록·후속조치 및/또는 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e51255e155155bbd952488e1",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "시설(premises)이 오염을 방지하도록 설계·시공·운영 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8d415e307b163d45959beef",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 파악 및/또는 감소시키도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eaa3ea53849a55b70aed7055",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ecb4e3c2b17bf9d623d5bf12",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f1c0e673b65bcc4adbc147fa",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate. The controls put in place for electronic signatures were inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다. 전자서명에 대해 마련된 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3b52508a8e8f5e8421971d7",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa60353985bc548c0f7eccf9",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통자·수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-292d23ffb1deec2e7ccbdaf8",
+    "finding_text": "올본두충: 성상",
+    "finding_text_ko": "올본두충: 성상 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-03ca05f829cba3bbc28dc033",
+    "finding_text": "로스토정5밀리그램(로수바스타틴칼슘): 타제품(발라디핀정5/80mg)혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "로스토정5밀리그램(로수바스타틴칼슘): 타제품(발라디핀정5/80mg) 혼입 우려에 따라 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1d7ede933961b8fb74dbf208",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f396ac8258277ecbe251b80",
+    "finding_text": "The quality agreement outlining the responsibilities for fabricating, packaging or labelling, and/or testing was inadequate.",
+    "finding_text_ko": "제조·포장 또는 표시 및/또는 시험에 대한 책임을 규정한 품질계약서(quality agreement)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ebdd4aba00965df1398558a",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4ade4959f4f29c35319289f8",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-643422aba1bd8b67a1e4619e",
+    "finding_text": "The validation and/or the documentation of test methods was inadequate.",
+    "finding_text_ko": "시험방법의 밸리데이션(validation) 및/또는 문서화가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6f4b7e8a161f43571cacc988",
+    "finding_text": "The confirmatory tests conducted on samples before or after they were received in Canada were inadequate.",
+    "finding_text_ko": "캐나다 반입 전 또는 반입 후 검체에 대해 실시한 확인시험이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-76b76f58795ff6f57067e67a",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리 및/또는 보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aa95cd1314be86e8dd13f789",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-afbc61ca81bc2f1713c56a59",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc907ed00eb4ed29b2e84b4f",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f8c9ebbd9b67e591c28ffd8e",
+    "finding_text": "에스오피엠정20밀리그램(에스오메프라졸마그네슘삼수화물): 포장재 불량에 따른 성상 부적합 우려(정제 파손)로 영업자 회수",
+    "finding_text_ko": "에스오피엠정20밀리그램(에스오메프라졸마그네슘삼수화물): 포장재 불량에 따른 성상 부적합 우려(정제 파손)로 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9484b9c685532196f291908b",
+    "finding_text": "조화목단피: 이산화황",
+    "finding_text_ko": "조화목단피: 이산화황 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a157914f8364ada274a53f2e",
+    "finding_text": "인데놀정10mg(프로프라놀롤염산염): 불순물(N-nitroso-propranolol) 허용기준 초과 검출 우려에 따른 영업자 회수",
+    "finding_text_ko": "인데놀정10mg(프로프라놀롤염산염): 불순물(N-nitroso-propranolol)이 허용기준을 초과해 검출될 우려에 따라 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c284f35dcd444aa5c50903e",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-30fde373c5bc38cbbf21d4d5",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a34cc18daf8f98d0e55d3d8",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3d4361950fe9e20dfad9fb8d",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4150a9fb98fb44548a1f499b",
+    "finding_text": "The master production documents were inadequate.",
+    "finding_text_ko": "제조기준서(master production document)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5083238f7d361dfffaf9413a",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "결함 가능성이 있는 제품에 관한 불만 및/또는 기타 정보의 평가·기록·후속조치 및/또는 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-820cc8ca235db89817dc9f5c",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8f4ffea919bfc4e04611e231",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통자·수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비·내용 및/또는 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba91a755e9f410c16e1987aa",
+    "finding_text": "The company's oversight of the contracted party was inadequate.",
+    "finding_text_ko": "수탁업체에 대한 회사의 관리감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c80bc674f9b2148f296b70ac",
+    "finding_text": "The quality control department's handling of complaints and/or information received about drug quality was inadequate.",
+    "finding_text_ko": "의약품 품질에 관한 불만 및/또는 접수 정보에 대한 품질관리부서(quality control unit)의 처리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ddf8a559ac4d59f3764866a1",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e669199e70f2b9f6124a7ef1",
+    "finding_text": "The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate. The control of quarantine areas was inadequate.",
+    "finding_text_ko": "원료·포장재·중간제품·벌크의약품 및/또는 완제품의 구획 분리·재고 순환 및/또는 운송이 미흡했다. 격리보관구역(quarantine area)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3eeb265c5614129e28fadc0",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35b0f331ca544ac7b53bf8c6",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품 의약품의 재판매 검토를 위한 평가·문서화 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-45f41674a60848aa478bdcae",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit) 책임자가 시행 전에 수행하는 제조·포장·표시·시험·보관 및/또는 운송 방법 및 절차에 대한 검토 및/또는 승인이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a4ebafc54d12111bdd2dd711",
+    "finding_text": "The electronic system was not validated for its intended use. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "전자시스템이 의도된 용도에 대해 밸리데이션(validation)되지 않았다. 기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다. 기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aa47df00e5c8b97e84e6662e",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-15cead6b8180432224a65794",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-32262e90e8d02afe7a43ffd1",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 관행이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-327aeec774eed822e6fea3d1",
+    "finding_text": "The company's cleaning of the premises and the equipment in aseptic areas was inadequate.",
+    "finding_text_ko": "무균구역 내 시설 및 설비에 대한 회사의 청소가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3d4101455a665b19bdc28e17",
+    "finding_text": "씨티엘황사방역마스크(KF94)(대형, 중형, 소형): 품질부적합(형상)",
+    "finding_text_ko": "씨티엘황사방역마스크(KF94)(대형, 중형, 소형): 품질 부적합(형상)이 확인됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-569208d85928ac2de36feaf7",
+    "finding_text": "The design, location, and/or maintenance of the equipment was inadequate for allowing the equipment to serve its intended purpose The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "설비의 설계·위치 및/또는 유지관리가 설비가 의도된 목적을 수행하도록 하기에 미흡했다. 컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-58db904e7c30b0bc36e53c0d",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전 용기에 대한 회사의 외관검사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-858ccd9fd26d98c3862243e4",
+    "finding_text": "The number of samples taken for environmental monitoring was insufficient.",
+    "finding_text_ko": "환경모니터링을 위해 채취한 검체 수가 불충분했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aed8ab57472e642c910d91be",
+    "finding_text": "Warning systems did not alert personnel when air pressure fell below established limits.",
+    "finding_text_ko": "공기압이 설정된 한계 미만으로 떨어졌을 때 경보 시스템이 작업자에게 경고하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d46413b402034990afdad2fe",
+    "finding_text": "○ 상기 업체는 의약품 ‘펠라스정(펠라고니움시도이데스11%에탄올건조엑스(5.5~6.6→1))’의 ‘한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가’에 필요한 자료를 제출기한 (‘25. 9. 2.) 내에 제출하지 아니한 사실이 있음 [2차 위반] * 관련: 식품의약품안전처 공고 제2024-562호(2024. 12. 11.)",
+    "finding_text_ko": "해당 업체는 의약품 ‘펠라스정(펠라고니움시도이데스11%에탄올건조엑스(5.5~6.6→1))’의 ‘한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가’에 필요한 자료를 제출기한(‘25. 9. 2.) 내에 제출하지 않았다. [2차 위반] * 관련: 식품의약품안전처 공고 제2024-562호(2024. 12. 11.)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d869884a9b3fb69548f09394",
+    "finding_text": "웰클린네오황사방역마스크(KF94)(대형, 중형, 소형)(흰색, 검은색, 회색, 노란색, 연황색, 연분홍색, 산호색): 분진포집효율 부적합",
+    "finding_text_ko": "웰클린네오황사방역마스크(KF94)(대형, 중형, 소형)(흰색, 검은색, 회색, 노란색, 연황색, 연분홍색, 산호색): 분진포집효율 부적합이 확인됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e93d2c2ab23289886a11cb98",
+    "finding_text": "The quality control department's access to adequate facilities, trained personnel, materials, and/or equipment was inadequate to fulfill its duties and responsibilities.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 그 임무와 책임을 수행하기에 적절한 시설·교육받은 인력·자재 및/또는 설비를 이용할 수 있는 여건이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-013d74c86a50b8ac8930241f",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-058b4161660f3f2a79ffa5f8",
+    "finding_text": "The establishment and/or the maintenance of a data governance plan was inadequate. The maintenance of records was inadequate.",
+    "finding_text_ko": "데이터 거버넌스 계획의 수립 및/또는 유지관리가 미흡했다. 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-09b4f6565a9954518c9db8d9",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0b1cc1f59acad0c5e1094b5a",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material. The monitoring procedures for microbial and/or environmental conditions were inadequate.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 파악 및/또는 감소시키도록 적절히 설계되지 않았다. 세척 절차의 실행·효과성 및/또는 밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다. 설비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운영·보관 및/또는 유지관리되지 않았다. 미생물 및/또는 환경 조건에 대한 모니터링 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-177febf61659a8dc6616c31a",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-185bc0fbbbf28277549f900a",
+    "finding_text": "퍼슨시나칼셋정25밀리그램(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자회수",
+    "finding_text_ko": "퍼슨시나칼셋정25밀리그램(시나칼세트염산염): 불순물(N-nitroso-cinacalcet)이 초과 검출될 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-26670ba3606d398e4adbc4e8",
+    "finding_text": "The preventative maintenance program was inadequate for the equipment used in significant processing and/or testing operations. The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "주요 제조 및/또는 시험 작업에 사용되는 설비에 대한 예방정비 프로그램이 미흡했다. 컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2fc2e6dbe7dbb6fa04ad91c1",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35e626d1a2bf0f1ba781587f",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가 및/또는 승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-408fc2879c1df3d60970686d",
+    "finding_text": "The design, equipment, and/or maintenance of the testing laboratory was inadequate. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "시험실의 설계·설비 및/또는 유지관리가 미흡했다. 기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-43a8e79022e5fcad0d24f712",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검 및/또는 적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-510e061b2307dd0701ccd4a9",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지관리·처리 및/또는 검토가 미흡했다. 기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-634db653e1ba43d89aa78ef9",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하를 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-72d20b19b6660d1648039bc1",
+    "finding_text": "The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate. The control of quarantine areas was inadequate.",
+    "finding_text_ko": "원료·포장재·중간제품·벌크의약품 및/또는 완제품의 구획 분리·재고 순환 및/또는 운송이 미흡했다. 격리보관구역(quarantine area)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-77b37663cde7ec0186e19b0a",
+    "finding_text": "The company's oversight of the contracted party was inadequate.",
+    "finding_text_ko": "수탁업체에 대한 회사의 관리감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8cc0dcb260d8db8fc1de1eb6",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지관리·처리 및/또는 검토가 미흡했다. 기록의 추적성·가독성·문서화·서식 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e5c559ed68d6bd569122e4d",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리 및/또는 보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9219c1740ee90bd717d94854",
+    "finding_text": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "세척 절차의 실행·효과성 및/또는 밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-986cdc97efc08d817d1f7093",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material. The monitoring procedures for microbial and/or environmental conditions were inadequate.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 파악하거나 저감하도록 적절히 설계되지 않았다. 세척 절차의 실행·효과성·밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다. 설비가 다른 의약품 또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운전·보관·유지관리되지 않았다. 미생물 및 환경 조건에 대한 모니터링 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ca935f6fe0d034efb79c9ef",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비·자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a617296ac216fd1c87f7727e",
+    "finding_text": "The evidence required to demonstrate compliance with finished product specifications was inadequate.",
+    "finding_text_ko": "완제품 기준(specification) 적합성을 입증하는 데 필요한 근거자료가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1897606b1b26792fb9a4bcb",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d41d8346c3b6b598c140bc2d",
+    "finding_text": "Reworked or reprocessed drug lots were not included in the ongoing stability program.",
+    "finding_text_ko": "재작업 또는 재처리된 의약품 로트가 지속 안정성시험 프로그램에 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5256ed3851ab386c13ab485",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d83045b6108d8a5fae56c9a4",
+    "finding_text": "The quality control department did not undertake all of the required activities. Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 요구되는 활동을 모두 수행하지 않았다. 일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d9ff0b3e2f15d66db378d733",
+    "finding_text": "Reworked or reprocessed drug lots were not included in the ongoing stability program.",
+    "finding_text_ko": "재작업 또는 재처리된 의약품 로트가 지속 안정성시험 프로그램에 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dbcf6d1ce7c1359bbf1d13be",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e5a4fd7ff16ebdce664a4575",
+    "finding_text": "풍산방풍: 성상(관능)부적합",
+    "finding_text_ko": "풍산방풍: 성상(관능) 시험 부적합으로 판정됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e8e66449237d4324ef342ea6",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e97122a89e8d93eaf8966c2c",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-565c913f60a66e20443029cc",
+    "finding_text": "아트라펜정: 불순물(N-nitroso-desmethyl-tramadol) 허용기준 초과 검출에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "아트라펜정: 불순물(N-nitroso-desmethyl-tramadol)이 허용기준을 초과해 검출됨에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-77ffdcb9993127730133fdca",
+    "finding_text": "아트라펜세미정: 불순물(N-nitroso-desmethyl-tramadol) 허용기준 초과 검출에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "아트라펜세미정: 불순물(N-nitroso-desmethyl-tramadol)이 허용기준을 초과해 검출됨에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90106e3f83d5e11bec08f05b",
+    "finding_text": "○ 의약품 등 재평가 자료 미제출 -「약사법」제33조에 따라 의약품 동등성 재평가 대상 품목에 해당하는 경우, 재평가에 필요한 자료를 제출하여야 하나, - 동 업체는 재평가에 필요한 자료를 제출기한(’25.10.12.) 내 제출하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 등 재평가 자료를 제출하지 않았다. 「약사법」제33조에 따라 의약품 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 제출해야 하나, 동 업체는 재평가에 필요한 자료를 제출기한(’25.10.12.) 내에 제출하지 않은 사실이 확인됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c099241d90f4badd2c04f6cb",
+    "finding_text": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반 - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나, - 동 업체는 ‘로수탄메트정500/5밀리그램’ 등 4품목의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음 ※ 의약품안전평가과에서 동 자료의 제출을 25.5.7.까지 요청하였으나, 제출하지 않았음",
+    "finding_text_ko": "의약품 제조업자의 신약 등 재심사 규정을 위반했다. 의약품 제조업자가 품목허가를 받은 의약품이 「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사를 받아야 하나, 동 업체는 ‘로수탄메트정500/5밀리그램’ 등 4품목의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 확인됐다. ※ 의약품안전평가과에서 동 자료의 제출을 25.5.7.까지 요청했으나 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d249927566c4f9a4ffad41f5",
+    "finding_text": "트라스펜정(트라마돌,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol) 기준 초과 검출에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "트라스펜정(트라마돌,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol)이 기준을 초과해 검출됨에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de4ee7608f26b7121bd3d96c",
+    "finding_text": "트라스펜세미정(트라마돌,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol) 기준 초과 검출에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "트라스펜세미정(트라마돌,아세트아미노펜): 불순물(N-nitroso-desmethyl-tramadol)이 기준을 초과해 검출됨에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1b096ea3fe35c2a28f4b3327",
+    "finding_text": "The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate. The control of quarantine areas was inadequate.",
+    "finding_text_ko": "원료·포장재·중간제품·벌크 의약품·완제품의 구획 분리, 재고 회전, 운송이 미흡했다. 격리(quarantine) 구역에 대한 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2cf748ada37ba12652199781",
+    "finding_text": "에소펠정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수",
+    "finding_text_ko": "에소펠정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2d41d3b8c63c4321bd2ff0cc",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f8ce976b1d48302ec73e197",
+    "finding_text": "The preventative maintenance and repair of the equipment was inadequate.",
+    "finding_text_ko": "설비의 예방정비 및 수리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-50b066119b9de141468d9cfd",
+    "finding_text": "The company's oversight of the contracted party was inadequate.",
+    "finding_text_ko": "수탁업체에 대한 회사의 관리감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3d06f9c91b1c3806c3d9df9",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f6588e394af936aefb53aadb",
+    "finding_text": "The recorded information or details were inadequate.",
+    "finding_text_ko": "기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0af732c80b7947b10c1c83f7",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품의 지속 안정성시험 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0c5096f704d6732285e8484b",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3bde9b8f56cc6fda6264d103",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64e7b21bd6db46a7a88c4d95",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9618b26cfc2c4239f8d41213",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc848a20056c219627cebb0e",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1a34cd0b50945cce698a0b0",
+    "finding_text": "The assessment to release finished products was inadequate.",
+    "finding_text_ko": "완제품 출하 판정을 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f0ccca8510be1c877a17e8ad",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조자·시험자·포장자·표시자·유통업자·수입자·도매업자 간 품질계약서(quality agreement)의 구비·내용·유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-17818dde9518e3b9b00fe6c5",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate.",
+    "finding_text_ko": "제조·포장·표시·시험·보관·운송 방법 및 절차에 대해 시행 전 품질관리부서(quality control unit) 책임자가 수행하는 검토·승인이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2c3a890a16a1d120e46f9001",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-558f6801cf6e0581771d9aee",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6cd45c322748b2a319e50385",
+    "finding_text": "The specifications for any packaging materials were incomplete or inadequate.",
+    "finding_text_ko": "포장재에 대한 기준(specification)이 불완전하거나 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7a11872fcbd626395bba6476",
+    "finding_text": "Critical production processes were not validated. The recorded information or details were inadequate.",
+    "finding_text_ko": "중요 제조공정이 밸리데이션(validation)되지 않았다. 기록된 정보 또는 세부내용이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7c6af8a0db63c953a312d3c2",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination. The doors, windows, walls, ceilings, and/or floors were inadequate. The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "건물·시설이 오염을 방지하도록 설계·시공·운영·유지관리되지 않았다. 문·창문·벽·천장·바닥이 미흡했다. 온도 및 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8f87da142cc6aeac09b84bad",
+    "finding_text": "Senior management's ability to determine and/or provide adequate and/or appropriate resources to implement, maintain and/or improve the effectiveness of the quality management system was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "품질경영시스템의 실행·유지·효과성 개선에 필요한 적절한 자원을 결정하고 제공하는 최고경영진의 역량이 미흡했다. 기록의 추적성·판독성·문서화·서식·정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c85068218797c179466ee253",
+    "finding_text": "Dedicated production equipment (used solely for specific purposes) was not provided where appropriate and/or required.",
+    "finding_text_ko": "필요하거나 요구되는 경우에 전용 제조설비(특정 용도로만 사용하는 설비)가 구비되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f0553fa91c060f6d6aee8283",
+    "finding_text": "바른진피: 품질 부적합(정량법-헤스페리딘)",
+    "finding_text_ko": "바른진피: 품질 부적합(정량법-헤스페리딘)으로 판정됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f673d36fac01fbb225ec26c2",
+    "finding_text": "The education, experience, and/or oversight of the individual in charge of the quality control department was inadequate.",
+    "finding_text_ko": "품질관리부서(quality control unit) 책임자의 학력·경력·관리감독이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-050e6eb2ba68205a0f1a63f5",
+    "finding_text": "The availability, implementation, and/or quality of the written sanitation program was inadequate. The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures.",
+    "finding_text_ko": "문서화된 위생관리 프로그램의 구비·실행·수준이 미흡했다. 위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차, 방충·방서 조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-16dea5b1cf34bfa830532cc1",
+    "finding_text": "The master formulas to control the manufacturing process were inadequate. The master production documents were inadequate.",
+    "finding_text_ko": "제조공정을 관리하기 위한 마스터 포뮬러(master formula)가 미흡했다. 제조 기준문서(master production document)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-19f4148e8d25e5e6afbfe250",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate. Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다. 일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1f66f0bf8747d0da92e8ae63",
+    "finding_text": "The design, construction, and/or location of the equipment did not allow adequate cleaning, sanitizing, and/or inspection of the equipment. The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "설비의 설계·구조·설치 위치가 설비의 적절한 세척·소독·점검을 허용하지 않았다. 컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1fadbed22ddc5dd62fdb992e",
+    "finding_text": "The written hygiene program did not clearly define clothing requirements and/or hygiene procedures for personnel and/or visitors.",
+    "finding_text_ko": "문서화된 위생 프로그램이 작업자 및 방문자의 복장 요건과 위생 절차를 명확히 규정하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-382868447ea971efa529b289",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved. Changes to production processes, systems, equipment, materials, and/or suppliers were not validated before they were implemented.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다. 제조공정·시스템·설비·자재·공급업체의 변경이 시행 전에 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-421eb2532de6d89f1ec63a20",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate. The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records. The maintenance of records was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·유지·처리·검토가 미흡했다. 기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다. 기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4760ec5739c119102c1f18ec",
+    "finding_text": "The specifications for any packaging materials were incomplete or inadequate. The quality control department's release of packaging materials for use in packaging or labelling was inadequate.",
+    "finding_text_ko": "포장재에 대한 기준(specification)이 불완전하거나 미흡했다. 포장 또는 표시 공정에 사용할 포장재에 대한 품질관리부서(quality control unit)의 사용 승인이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7cc7fc9d91dc5484c4354084",
+    "finding_text": "리그노스판스탠다드: 표시기재 일부 누락(사용상의 주의사항)에 따른 영업자 회수",
+    "finding_text_ko": "리그노스판스탠다드: 표시기재 일부 누락(사용상의 주의사항)에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7dbf1615f1b0a3764acca7d6",
+    "finding_text": "오메플정20mg(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수",
+    "finding_text_ko": "오메플정20mg(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e8719e5dcbda32961aa1334",
+    "finding_text": "The sampling plan for raw materials was inadequate. The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "원료에 대한 검체 채취 계획이 미흡했다. 기록의 추적성·판독성·문서화·서식·정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8c0aca15fa1c9bfa0dca73e0",
+    "finding_text": "셀비나정(테르비나핀염산염): 시판후 안정성 시험에서 불순물(N-nitroso-desmethyl terbinafine) 허용기준 초과 검출에 따른 영업자회수",
+    "finding_text_ko": "셀비나정(테르비나핀염산염): 시판 후 안정성시험에서 불순물(N-nitroso-desmethyl terbinafine)이 허용기준을 초과해 검출됨에 따라 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e22beb7302f428aa033370e4",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e245e6fd3917db2f9ab3ac55",
+    "finding_text": "The maintenance of personnel records was inadequate.",
+    "finding_text_ko": "인사기록의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eccd842d95ea5923753c0aab",
+    "finding_text": "영천약초도매시장애엽: 순도(줄기)시험 부적합",
+    "finding_text_ko": "영천약초도매시장애엽: 순도(줄기)시험 부적합으로 판정됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2a301710a09e1ea5f959b239",
+    "finding_text": "칼세파라정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet)초과검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자회수",
+    "finding_text_ko": "칼세파라정25mg(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 초과 검출 우려에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8104489a53e11583a0646f89",
+    "finding_text": "올본구기자: 잔류농약",
+    "finding_text_ko": "올본구기자 — 사유: 잔류농약",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc0ba59519083f5e9db370b5",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0010a4b6a50aefa8af3d4a0a",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-05005e0899afa1a63d924a69",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만 및 결함 가능성이 있는 제품에 관한 그 밖의 정보에 대한 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0eb2b2b65b5f924c979e4c58",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비·자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10c87f19ded0f9088ad7bf5d",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-16bc1e5893e993f8b8207c7b",
+    "finding_text": "The quality agreement outlining the responsibilities for fabricating, packaging or labelling, and/or testing was inadequate.",
+    "finding_text_ko": "제조, 포장 또는 표시, 시험에 대한 책임을 규정한 품질계약서(quality agreement)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-26adbcef5775efef58ce25b6",
+    "finding_text": "The design, equipment, and/or maintenance of the testing laboratory was inadequate. The establishment and/or the maintenance of a data governance plan was inadequate.",
+    "finding_text_ko": "시험실의 설계·설비·유지관리가 미흡했다. 데이터 거버넌스(data governance) 계획의 수립 및 유지가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2f024503c91e99f90ce124b5",
+    "finding_text": "The company did not monitor the steam used for sterilization for suitable quality.",
+    "finding_text_ko": "회사는 멸균에 사용되는 스팀의 품질 적합성을 모니터링하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-45a3cb14ba036c89b77042ae",
+    "finding_text": "The suitability of the culture media was not verified.",
+    "finding_text_ko": "배지의 적합성이 검증되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a6743eb01192b8ed447676e",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 수행이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6564d889267fd9792745f66f",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 회사의 외관 검사(visual inspection)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-687bb576fb7931086bdb10a8",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate. The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다. 기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-73b5f64b5ba247ef7eb518a2",
+    "finding_text": "The master production documents were inadequate.",
+    "finding_text_ko": "제조 기준문서(master production document)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7bb330264362e5ee7e621c69",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 실행이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7f56ac96f1fb80c9773b26f7",
+    "finding_text": "The company did not justify the hold time for sterilized components, containers, or equipment.",
+    "finding_text_ko": "회사는 멸균된 부품·용기·설비의 보관기간(hold time)을 정당화하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a5a1f4694c0a968d60f0e5aa",
+    "finding_text": "The company did not adequately demonstrate that air-flow patterns did not pose a risk of contamination.",
+    "finding_text_ko": "회사는 기류 패턴이 오염 위험을 초래하지 않음을 충분히 입증하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b916710e9d95f9087cbb0e5a",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품의 지속 안정성시험 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bb7f37d6293ba81c991ee8ca",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c35e20c05d6e6a1011290005",
+    "finding_text": "The number of samples taken for environmental monitoring was insufficient. The environmental sampling methods were inadequate.",
+    "finding_text_ko": "환경모니터링을 위한 검체 채취 수가 불충분했다. 환경 검체 채취 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3b26897c6673ac25b3e4f56",
+    "finding_text": "The company did not design or maintain the premises and equipment to minimize microbial contamination and the number of airborne particles in clean areas.",
+    "finding_text_ko": "회사는 청정구역의 미생물 오염과 부유입자 수를 최소화하도록 건물·설비를 설계하거나 유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de3142c2fd79b70e0c891135",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e93d0f21975a37465fede4f9",
+    "finding_text": "The availability, implementation, and/or quality of the written sanitation program was inadequate. The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination. The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions.",
+    "finding_text_ko": "문서화된 위생관리 프로그램의 구비·실행·수준이 미흡했다. 위생관리 프로그램이 오염 위험을 파악하거나 저감하도록 적절히 설계되지 않았다. 비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및 효과성이 미흡했다. 세척 절차의 실행·효과성·밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-018ad3fb2f50384e66691392",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate. The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다. 기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10799d333eb35c442d0f03bb",
+    "finding_text": "The validation of aseptic processing was inadequate.",
+    "finding_text_ko": "무균공정(aseptic processing)에 대한 밸리데이션(validation)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-187ea5ceedf25d0a8e21c723",
+    "finding_text": "The maintenance of the premises was inadequate.",
+    "finding_text_ko": "건물·시설의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-286ae9cba5d226fe4af0d43f",
+    "finding_text": "In areas where aseptic operations were performed, the frequency and the methods of monitoring were inadequate.",
+    "finding_text_ko": "무균조작(aseptic)이 수행되는 구역에서 모니터링의 주기와 방법이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38a67daf4bf6e2136fdf2a4c",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균조작(aseptic) 수행이 무균성을 유지하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-414039156deed00a2a420b4b",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4794afa01825ff19b70efc21",
+    "finding_text": "The quarantine, sampling, testing, release of raw material, and/or the packaging materials prior to use were inadequate. The assessment to release finished products was inadequate.",
+    "finding_text_ko": "사용 전 원료 및 포장재의 격리(quarantine)·검체 채취·시험·사용 승인이 미흡했다. 완제품 출하 판정을 위한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-862f15ae6efc716a11c3037f",
+    "finding_text": "Periodic confirmatory testing was not conducted.",
+    "finding_text_ko": "주기적 확인시험이 실시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e60af7b8053508f9c01c4a6",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ecaa51fa776d13d939b6e74",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 회사의 외관 검사(visual inspection)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f016d988352408425c4a17e",
+    "finding_text": "The receipt, preparation, and/or handling of reagents and culture media was inadequate.",
+    "finding_text_ko": "시약 및 배지의 입고·조제·취급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a190afb340364502ddf9122c",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate. Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다. 일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a88b2e370bad935ee83806ef",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b567f56b5c59c227e2a574c7",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품 의약품의 재판매 검토를 위한 평가·문서화·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba30b69cd1cc392b87cb0486",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 파악하거나 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc6b880051d70086b87d4029",
+    "finding_text": "오메스정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수",
+    "finding_text_ko": "오메스정20밀리그램(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bdcb9660413d5b989bac3661",
+    "finding_text": "Precautions were not taken to ensure that containers were free from contamination by foreign material.",
+    "finding_text_ko": "용기가 이물에 의해 오염되지 않도록 하는 예방조치가 취해지지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c51aada28fa9c2ebaa5051b2",
+    "finding_text": "칼레그나정25밀리그램(시나칼세트염산염): 불순물(N-nitroso-cinacalcet) 한시적 허용기준 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "칼레그나정25밀리그램(시나칼세트염산염): 불순물(N-nitroso-cinacalcet)이 한시적 허용기준을 초과해 검출될 우려에 따라 사전예방적 조치로 시중 유통품에 대해 영업자 회수(recall)를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-df62636b1f21fc83170085f6",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e1a7689c1283dbafa13e2b8b",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만 및/또는 결함 가능성이 있는 제품에 관한 정보의 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1514ca54c7405cfaa45b863b",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1e5b550d19dc76112fae1201",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6339709b2a98ac4757781035",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사·보고·후속조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-753f3f8dc955ab78cd8fa2ef",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품 의약품의 재판매 검토에 관한 평가·문서화·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-79b78ab2c917b246fef8844a",
+    "finding_text": "The usage logs for the equipment used for significant processing and/or testing operations were inadequate.",
+    "finding_text_ko": "주요 제조 및/또는 시험 작업에 사용되는 설비의 사용기록(usage log)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8126d38fe04e19dbf3e16639",
+    "finding_text": "The electronic system was not validated for its intended use.",
+    "finding_text_ko": "해당 전자시스템은 의도된 용도에 대해 밸리데이션(validation)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-830aa80dcc6bf44706d79a6a",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9975daca43def055ee8ffe0d",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "GMP에 대한 직원 교육 및/또는 그 기록의 관리가 미흡했다. 직원의 직무기술서, 직원에게 부여된 권한, 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ada0b5b449ccd27eabd7deba",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ae71d877b20c84fa5acb4274",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만 및/또는 결함 가능성이 있는 제품에 관한 정보의 평가·기록·후속조치·조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b7970623272d2369be2f64e0",
+    "finding_text": "디펜콜에이캡슐: 안정성시험 일부항목(함량) 기준 일탈로 인한 영업자 회수",
+    "finding_text_ko": "디펜콜에이캡슐: 안정성시험 일부 항목(함량)의 기준일탈로 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0a6289b04bf206077e5cdfb5",
+    "finding_text": "하이드로핀정(펠로디핀): 유통제품 품질부적합 우려",
+    "finding_text_ko": "하이드로핀정(펠로디핀): 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1919690781e6a525c2588ffe",
+    "finding_text": "싸이베린정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "싸이베린정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1c44a2b5ec32d753848ffcf2",
+    "finding_text": "하이타민골드정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "하이타민골드정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2eeede09fc6dbbb98c50195e",
+    "finding_text": "탄시나정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "탄시나정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ad37e277f1c7aba39d78f41",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42313bc6124c28d3641abe54",
+    "finding_text": "브이타민큐정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "브이타민큐정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-496e9b21bc52168dec7ba9e8",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4c9d1372dd01afea564779e8",
+    "finding_text": "셀비다정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "셀비다정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-742cf221a27b439367cbf197",
+    "finding_text": "헤파코엔플러스정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "헤파코엔플러스정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8f8abd306d1371a507ee9653",
+    "finding_text": "듀오셋정: 불순물(N-nitroso-desmethyl-tramadol) 허용기준 초과 검출에 따른 사전예방적 조치로 시중 유통품에 대해 영업자 회수",
+    "finding_text_ko": "듀오셋정: 불순물(N-nitroso-desmethyl-tramadol)이 허용기준을 초과 검출되어, 사전예방적 조치로 시중 유통품에 대해 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-908e76199b6723bac27de959",
+    "finding_text": "트루액티비오정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "트루액티비오정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aae1441000277df7a03e74df",
+    "finding_text": "헤파코엔정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "헤파코엔정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d619616ebbbaab11c3bc5d1c",
+    "finding_text": "멀티브큐골드정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "멀티브큐골드정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-decbd5a42030f2800df381ac",
+    "finding_text": "로이디펜큐캡슐: 유통제품 품질부적합 우려",
+    "finding_text_ko": "로이디펜큐캡슐: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e05e1ad39a3521c564a5d08d",
+    "finding_text": "힙스브이파워정: 유통제품 품질부적합 우려",
+    "finding_text_ko": "힙스브이파워정: 유통 제품의 품질 부적합이 우려됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ea670265313d9588540041e0",
+    "finding_text": "리쥬비넥스크림(폴리데옥시리보뉴클레오티드나트륨): 이물 혼입 우려에 따른 영업자 회수",
+    "finding_text_ko": "리쥬비넥스크림(폴리데옥시리보뉴클레오티드나트륨): 이물 혼입 우려로 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-191fe3ea8d4f60e14c58566e",
+    "finding_text": "Senior management's ability to determine and/or provide adequate and/or appropriate resources to implement, maintain and/or improve the effectiveness of the quality management system was inadequate.",
+    "finding_text_ko": "품질경영시스템의 실행·유지 및/또는 효과성 개선에 필요한 적절한 자원을 결정하고 제공하는 최고경영진의 역량이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62debfe6e5c86af8eb314e72",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 관한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-65a1c483be51b21679cc28c1",
+    "finding_text": "노보콜100주(카트리지): 표시기재 일부 누락에 따른 영업자 회수",
+    "finding_text_ko": "노보콜100주(카트리지): 표시기재 일부가 누락되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a2328ac3387b010f1881afea",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조업자·시험업자·포장업자·표시업자·유통업자·수입업자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비·내용 및/또는 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ca22e8d77c881207818fc2ee",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품 의약품의 재판매 검토에 관한 평가·문서화·절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dbcba3f761884a162f59ff85",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f8188069ef2ed9865a9f60c3",
+    "finding_text": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate.",
+    "finding_text_ko": "GMP에 대한 직원 교육 및/또는 그 기록의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1f15fde9535d5e0c5b263504",
+    "finding_text": "엔탭허브천남성: 관능(성상)",
+    "finding_text_ko": "엔탭허브천남성: 관능(성상) 항목.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-72afe3ac33a5ff1b822ddf5f",
+    "finding_text": "리피뎀주: 시판 후 안정성시험 결과 불용성미립자 기준 초과에 따른 영업자 회수",
+    "finding_text_ko": "리피뎀주: 시판 후 안정성시험 결과 불용성미립자가 기준을 초과하여 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8397b34e1d3f7098726f0ec5",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및/또는 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b39ad2ec3a490e85c16e2c85",
+    "finding_text": "에드플렉스-에스아이: 의약외품을 의료기기로 오인하게 할 우려가 있는 사항 기재",
+    "finding_text_ko": "에드플렉스-에스아이: 의약외품을 의료기기로 오인하게 할 우려가 있는 사항을 기재했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e044b74237904ac5bce3ce96",
+    "finding_text": "The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented.",
+    "finding_text_ko": "직원의 직무기술서, 직원에게 부여된 권한 및/또는 업무 위임이 미흡하거나 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10fdd5503af516d6fa1f4adb",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 효과성이 미흡했다. 설비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운전·보관·유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-11a920548d4523a52114c5cf",
+    "finding_text": "The maintenance of records was inadequate.",
+    "finding_text_ko": "기록의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-24ec864255d24a128e80969f",
+    "finding_text": "The handling and/or storage of samples was inadequate for raw materials, drugs being processed, bulk drugs, and/or finished products.",
+    "finding_text_ko": "원료, 제조 중 의약품, 벌크 의약품 및/또는 완제품의 검체 취급 및/또는 보관이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3aea4c3ddde6335518b23bc8",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6114f5d71790b596473f0064",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성·관리·처리 및/또는 검토가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9249bed63cdb7ec92dbc8725",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "제조소 건물이 오염을 방지하도록 설계·건축·운영 및/또는 유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4b445a478afe314761196304",
+    "finding_text": "라피덤정(테르비나핀염산염): 불순물(N-nitroso-desmethyl terbinafine) 허용기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "라피덤정(테르비나핀염산염): 불순물(N-nitroso-desmethyl terbinafine)이 허용기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ac928dcb3a93233c305fba81",
+    "finding_text": "나눔울금: 관능(성상) 부적합",
+    "finding_text_ko": "나눔울금: 관능(성상)이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-13e292b30616dc09edafd0ff",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2901d0334a85ec58432be651",
+    "finding_text": "Yields and/or the reconciled quantities were not checked at appropriate stages.",
+    "finding_text_ko": "수율 및/또는 수불 대조 수량을 적절한 단계에서 확인하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-54d72f8634a94897dd391c01",
+    "finding_text": "The specifications for raw materials used to produce drugs did not meet pharmacopoeial standards.",
+    "finding_text_ko": "의약품 제조에 사용된 원료의 기준규격이 공정서(pharmacopoeia) 기준에 부합하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-740fd289bd2aed921606ffba",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c0b4c72e37dd600feaa6c06f",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ee9dc4b049ba0ac58d112582",
+    "finding_text": "The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures.",
+    "finding_text_ko": "위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차 및/또는 방충·방서 대책이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-27c7156bb92c52248371be66",
+    "finding_text": "○의약품 수입품목 ‘스테글라트로정5밀리그램’, ‘스테글루잔정5/100밀리그램’, ‘스테글루잔정15/100밀리그램’의 재심사 신청서를 제출하였으나, 재심사에 필요한 일부 자료를 제출하지 아니함 [3차 위반]",
+    "finding_text_ko": "의약품 수입품목 ‘스테글라트로정5밀리그램’, ‘스테글루잔정5/100밀리그램’, ‘스테글루잔정15/100밀리그램’의 재심사 신청서를 제출했으나, 재심사에 필요한 일부 자료를 제출하지 않았다. [3차 위반]",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-01823cbb9a1f39b8500c9d4e",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 관한 문서화된 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-178cc7b08d834909389c4be1",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자·제조업자·시험업자·포장업자·표시업자·유통업자·수입업자 및/또는 도매업자 간 품질계약서(quality agreement)의 구비·내용 및/또는 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-588fef5b47b30da17c574cb5",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b704ce7ecd7d77941c09a458",
+    "finding_text": "The implementation of a self-inspection program was inadequate.",
+    "finding_text_ko": "자체점검(self-inspection) 프로그램의 운영이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-028aaef125a75d84fb8c2e28",
+    "finding_text": "The maintenance of detailed plans or specifications was inadequate for each building where drugs are fabricated, packaged, labelled, and/or tested.",
+    "finding_text_ko": "의약품을 제조·포장·표시 및/또는 시험하는 각 건물에 대한 상세 도면 또는 시방서의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-02abe95095124bba8323fe56",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-09944373db08e5f8782b665e",
+    "finding_text": "The validation and/or the documentation of test methods was inadequate.",
+    "finding_text_ko": "시험방법의 밸리데이션(validation) 및/또는 문서화가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ce5537dc7386b563d42ebf9",
+    "finding_text": "The quality control department's handling of complaints and/or information received about drug quality was inadequate.",
+    "finding_text_ko": "의약품 품질에 관해 접수된 불만 및/또는 정보에 대한 품질관리부서(quality control department)의 처리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-44e200593a1d2fca24d49326",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4e3df5341f9b442dfbce8490",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-61ca71ed280d7745bbafef5c",
+    "finding_text": "The health examinations of personnel (pre-employment and/or ongoing) were inadequate.",
+    "finding_text_ko": "직원에 대한 건강진단(채용 전 및/또는 정기)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8d7cff14b0b1f74c4de85bd4",
+    "finding_text": "The quality control department's documentation, labelling, and/or quarantining of raw materials, packaging materials, in-process drugs, and/or bulk drugs was inadequate.",
+    "finding_text_ko": "원료·포장재·공정 중 의약품 및/또는 벌크 의약품에 대한 품질관리부서의 문서화·표시 및/또는 격리보관이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b46fe06f7db0a322c0511371",
+    "finding_text": "The receipt, preparation, and/or handling of reagents and culture media was inadequate.",
+    "finding_text_ko": "시약 및 배지의 입고·조제 및/또는 취급이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b6128211e712b0288c632daa",
+    "finding_text": "Periodic confirmatory testing was not conducted.",
+    "finding_text_ko": "주기적 확인시험을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b7f8a36fe8c21a109007fede",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-00023b027f9b6332821cc6eb",
+    "finding_text": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination.",
+    "finding_text_ko": "위생관리 프로그램이 오염 위험을 파악하고 저감하도록 적절히 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-132feb850b8ddd8caf6a0281",
+    "finding_text": "The company's monitoring and documentation of moist heat sterilization cycles was inadequate.",
+    "finding_text_ko": "습열멸균(moist heat sterilization) 사이클에 대한 회사의 모니터링과 문서화가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1b88591b86990a424a3c8d04",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate. The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다. 설비가 다른 의약품 및/또는 이물에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운전·보관·유지관리되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1e5934645a44a1e77db740fd",
+    "finding_text": "The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures. The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차 및/또는 방충·방서 대책이 미흡했다. 비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2ae51f29691bdb5dbf9abcf3",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(OOS) 시험결과의 조사·처리·보고가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f8488e8d95828ff4bcb48f8",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate.",
+    "finding_text_ko": "제조공정·설비 및/또는 자재에 대한 평가가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-52f98662fe850c1d81c85068",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5302d5c8264a482600ae9ccc",
+    "finding_text": "The company's visual inspection of filled containers was inadequate.",
+    "finding_text_ko": "충전된 용기에 대한 회사의 외관검사(visual inspection)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6562de9a31c4873b1b6af3de",
+    "finding_text": "The company did not adequately protect sterilized material to prevent re-contamination after sterilization.",
+    "finding_text_ko": "멸균 후 재오염을 방지하기 위해 멸균물을 적절히 보호하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6c23db5b46b5ab3409dfadbd",
+    "finding_text": "The protection of products and/or materials from contamination was inadequate.",
+    "finding_text_ko": "오염으로부터 제품 및/또는 자재를 보호하는 조치가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e640bf3ab1211aa964a41c6",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c260a564aa36c73a888a180a",
+    "finding_text": "The validation of aseptic processing was inadequate.",
+    "finding_text_ko": "무균공정(aseptic processing)의 밸리데이션이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c54a8cd233109b6a6ea7caf6",
+    "finding_text": "The sanitation program was inadequate in its cleaning procedures, frequency of cleaning, procedures for waste disposal, and/or pest control measures.",
+    "finding_text_ko": "위생관리 프로그램의 세척 절차, 세척 주기, 폐기물 처리 절차 및/또는 방충·방서 대책이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d660c2d1351933d9764e136a",
+    "finding_text": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate.",
+    "finding_text_ko": "컴퓨터화시스템을 포함한 설비의 교정·점검·적격성평가(qualification)가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f306b2da07d1a2e2efac01c7",
+    "finding_text": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records.",
+    "finding_text_ko": "기록의 생성·수정·검토·보관·검색에 대한 통제가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa960a447bdca707d8a41837",
+    "finding_text": "The implementation and/or the effectiveness of the sanitation program in preventing unsanitary conditions was inadequate.",
+    "finding_text_ko": "비위생적 상태를 방지하기 위한 위생관리 프로그램의 실행 및/또는 효과성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4e70b42143ac98198bff28a3",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f770c701655e348905aff95",
+    "finding_text": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures.",
+    "finding_text_ko": "품질관리부서가 GMP 문서 및/또는 표준작업지침서(SOP)를 승인·서명 및/또는 날짜 기재하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fa90ca7325d4b2a40bd6daa5",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-333da1e537b964747f144917",
+    "finding_text": "에스오엠정20mg(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)에 따른 영업자 회수",
+    "finding_text_ko": "에스오엠정20mg(에스오메프라졸마그네슘삼수화물): 성상 부적합 우려(정제 깨짐)로 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4af66c82730fc5eadff30091",
+    "finding_text": "아트라센정: 불순물(N-nitroso-desmethyl tramadol) 1일 섭취 허용량 기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "아트라센정: 불순물(N-nitroso-desmethyl tramadol)이 1일 섭취 허용량 기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-04882a505aaeccb921d9a220",
+    "finding_text": "환인아토목세틴캡슐60밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine) 한시적 허용기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "환인아토목세틴캡슐60밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine)이 한시적 허용기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e2e6f77b899d30e6467b8f3",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항의 적절한 문서화·평가·승인을 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3014c5a8d063a9ace07456a4",
+    "finding_text": "환인아토목세틴캡슐10밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine) 한시적 허용기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "환인아토목세틴캡슐10밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine)이 한시적 허용기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ab805aec6e8de69418dec5a",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품에 대한 지속적 안정성시험 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3b87eaa6e0fb78554fa07a2a",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 지적사항이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-46e1e467ef32aecca2b451c5",
+    "finding_text": "The temperature and/or humidity control was inadequate.",
+    "finding_text_ko": "온도 및/또는 습도 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-50243f85f963e1b6f3777f58",
+    "finding_text": "환인아토목세틴캡슐25밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine) 한시적 허용기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "환인아토목세틴캡슐25밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine)이 한시적 허용기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-976ace47b4892a3dda062a40",
+    "finding_text": "환인아토목세틴캡슐18밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine) 한시적 허용기준 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "환인아토목세틴캡슐18밀리그램(아토목세틴염산염): 불순물(N-nitroso-Atomoxetine)이 한시적 허용기준을 초과 검출되어 영업자 회수가 실시됐다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -1630,12 +1630,12 @@ SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한�
                     "기관별 정렬·시사점·점검까지 정리하는 규제뉴스.")
 ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
                        "주차별로 모아 기관·기간으로 검색·필터.")
-FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 식약처 · EU/영국 GMP 비준수 "
-                        "지적사항을 원문에서 자동 추출해 검색·필터.")
-TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 식약처 · EU/영국 GMP 비준수 지적사항 전량 집계 통계 — "
-                      "카테고리 순위·연도별 구성비·업체 랭킹으로 보는 규제 지적 트렌드.")
-FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·식약처·EU/영국 GMP 비준수 지적사항 누적 이력을 "
-                    "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
+FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
+                        "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터.")
+TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항 "
+                      "전량 집계 통계 — 카테고리 순위·연도별 구성비·업체 랭킹으로 보는 규제 지적 트렌드.")
+FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
+                    "누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
 CHECKLIST_DESCRIPTION = ("규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 "
                          "지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원.")
 INSPECTOR_DESCRIPTION = ("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 "

@@ -503,19 +503,26 @@
     // [그리드 균형 M2a] 상위 8개만 개별 바로, 나머지는 "그 외 N건" 한 줄로 합산한다(기존
     // 6개 → 8개 — 겹침의 실제 원인은 항목 수가 아니라 라벨 CSS 였지만(buildCatRow 의
     // .fnd-dash-cat-label 참조), 그래도 목록이 과도하게 길어지지 않도록 8개로 상향).
-    var top = stats.categories.slice(0, 8);
+    //
+    // ★[스케일 기준 M2c] 그릴 행을 **먼저 다 모으고**, maxCount 를 그 배열에서 뽑는다.
+    // 옛 코드는 상위 8개에서만 max 를 구한 뒤 합산행("그 외")까지 같은 축으로 그렸다 —
+    // 꼬리의 합은 머리의 최댓값을 얼마든지 넘을 수 있으므로 비율이 1을 초과한다(실측:
+    // 그 외 6,226 > 최대 4,347 → scaleX(1.43) → 막대가 건수 글자를 68px 침범).
+    // "스케일은 실제로 그리는 행들에서만 나온다"를 구조로 못박아, 앞으로 합산행을 더
+    // 붙이거나 상위 N 을 바꿔도 같은 결함이 되살아날 수 없게 한다.
+    var rows = stats.categories.slice(0, 8).map(function (c) {
+      return { label: c.ko, count: c.count, code: c.code };
+    });
     var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);
-    if (!top.length) {
+    if (restCount > 0) rows.push({ label: "그 외", count: restCount, code: null });
+    if (!rows.length) {
       dashCatEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
       return;
     }
-    var maxCount = top.reduce(function (m, c) { return Math.max(m, c.count); }, 0) || 1;
-    top.forEach(function (c) {
-      dashCatEl.appendChild(buildCatRow(c.ko, c.count, maxCount, c.code));
+    var maxCount = rows.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;
+    rows.forEach(function (r) {
+      dashCatEl.appendChild(buildCatRow(r.label, r.count, maxCount, r.code));
     });
-    if (restCount > 0) {
-      dashCatEl.appendChild(buildCatRow("그 외", restCount, maxCount, null));
-    }
   }
 
   // [M14 §4] 회색 트랙 제거 — 바 자체가 flex 셀(flex:1 1 auto)을 채우고, 비율은
@@ -536,10 +543,16 @@
     var labelEl = el("span", "fnd-dash-cat-label", label);
     labelEl.title = label;
     row.appendChild(labelEl);
+    // [막대 침범 방지 M2c] 막대는 overflow:hidden 트랙 안에 넣는다(CSS .fnd-dash-cat-track).
+    // 비율은 [0.02, 1] 로 클램프 — 하한은 0에 가까운 항목도 보이게, ★상한은 호출부가 잘못된
+    // maxCount 를 넘겨도 막대가 트랙을 넘지 못하게. 트랙(렌더층)+클램프(산술층)+호출부에서
+    // 그릴 행으로부터 maxCount 를 뽑는 것(renderDashCategories)이 3중 방어다.
+    var track = el("div", "fnd-dash-cat-track");
     var bar = el("div", "fnd-dash-cat-bar");
     var ratio = maxCount > 0 ? count / maxCount : 0;
-    bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
-    row.appendChild(bar);
+    bar.style.transform = "scaleX(" + Math.min(1, Math.max(0.02, ratio)) + ")";
+    track.appendChild(bar);
+    row.appendChild(track);
     row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
     return row;
   }

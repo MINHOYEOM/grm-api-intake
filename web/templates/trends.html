@@ -38,7 +38,7 @@
         서로 다른 줄로 갈라졌다. 문장마다 span 을 씌워 블록으로 흘리면 줄바꿈 지점이 **문장
         경계**로 고정된다 — 좁은 뷰포트에서는 각 span 이 자기 안에서 다시 접히므로 반응형도
         그대로다(고정 <br> 이 아니다). -#}
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
   </div>
   <div class="wrap">
     {#- data-root 는 카테고리 순위 바 클릭 시 이동할 검색 페이지(findings/index.html) 상대
@@ -164,7 +164,7 @@
           같은 페이지의 두 수치가 어긋나 보이는 오독의 대부분이 여기서 생긴다. -#}
       <div class="tr-divider">
         <h2>전체 기간 누적</h2>
-        <p>아래 수치는 2016년 이후 모아 둔 전량이 분모입니다. 그중 47%가 2024년에 공개된 자료라, 위 &lsquo;최근 12개월&rsquo;과는 다른 그림이 나오는 것이 정상입니다.</p>
+        <p>아래 수치는 2016년 이후 모아 둔 전량이 분모입니다. 연도마다 확보한 문서 양이 크게 달라 위 &lsquo;최근 12개월&rsquo;과는 다른 그림이 나오는 것이 정상입니다 &mdash; 연도별 확보량은 아래 &lsquo;연도별 공개량(참고)&rsquo;에서 바로 확인할 수 있습니다.</p>
       </div>
 
       <section class="tr-block" aria-label="카테고리 순위">
@@ -195,7 +195,7 @@
         <h2 class="tr-h">연도별 공개량(참고)</h2>
         <p class="tr-read">그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 우리가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, 그 해에 지적이 많아졌다는 뜻이 아닙니다.</p>
         <div id="tr-year" class="tr-year"></div>
-        <p class="tr-note">과거 연도는 아직 채워 넣는 중입니다 — 특히 Warning Letter 는 이제 막 수집을 시작해, 지난 연도 수치는 실제보다 적은 하한치로 보셔야 합니다.</p>
+        <p class="tr-note">연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 — 캐나다 실사는 최근 5년치만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.</p>
       </section>
 
       <section class="tr-block" aria-label="업체 랭킹">
@@ -207,7 +207,7 @@
 
       <section class="tr-block" aria-label="소스 구성">
         <h2 class="tr-h">소스 구성</h2>
-        <p class="tr-read">지금은 FDA 483이 대부분입니다. Warning Letter·식약처·EU·영국 GMP 비준수는 수집을 시작한 지 얼마 되지 않아, 이 페이지의 경향은 사실상 FDA 483의 경향으로 읽으셔야 합니다.</p>
+        <p class="tr-read">FDA 483과 캐나다 실사보고서가 큰 두 축이고, Warning Letter·식약처가 그 뒤를 잇습니다. EU·영국 GMP 비준수는 아직 표본이 적어 따로 경향을 읽기는 어렵습니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 아래 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.</p>
         <div id="tr-source" class="tr-source"></div>
       </section>
 

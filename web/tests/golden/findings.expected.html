@@ -10,13 +10,13 @@
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
 <title>규제 지적사항 검색 · GRM</title>
-<meta name="description" content="FDA 483 Observation · Warning Letter · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
+<meta name="description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
 <link rel="canonical" href="https://grm-solutions.com/findings/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
 <meta property="og:title" content="규제 지적사항 검색 · GRM" />
-<meta property="og:description" content="FDA 483 Observation · Warning Letter · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
+<meta property="og:description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
 <meta property="og:url" content="https://grm-solutions.com/findings/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
@@ -45,7 +45,7 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
-    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 식약처 · EU·영국 GMP 비준수 지적사항을 원문에서 추출해 검색합니다.</p>
+    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문에서 추출해 검색합니다.</p>
     <a class="fnd-trends-link reveal" style="animation-delay:.18s" href="../findings/trends/index.html">전체 트렌드 보기 →</a>
   </div>
   <div class="wrap">
@@ -67,7 +67,7 @@
         <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div><div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
+        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
@@ -101,6 +101,13 @@
 <style>
 /* M14 — 한국어 어절 줄바꿈(§1 P0). 이 페이지 범위(main)에만 적용 — grm.css 는 불가침. */
 main{word-break:keep-all;overflow-wrap:anywhere}
+/* [부제 1줄 M2c] grm.css 의 .page-head p{max-width:62ch} 는 `ch`(숫자 0 의 폭) 기준이라
+   한글에는 지나치게 좁다 — 62ch = 609px 인데 한 문장이 666px 라 컨테이너(1,180px)에 폭이
+   한참 남는데도 두 줄로 접혔다. trends.html 이 같은 이유로 이미 쓰는 페이지 스코프
+   오버라이드를 그대로 따른다(grm.css 는 건드리지 않는다 — 전 페이지 골든 재동결 회피).
+   balance 가 아니라 pretty: balance 는 두 줄 길이를 맞추려고 한 줄로 들어갈 문장도 굳이
+   쪼갠다. */
+.page-head p{max-width:none;text-wrap:pretty}
 /* [F3b] 트렌드 대시보드로 가는 절제된 텍스트 링크(page-head 하단, 새 버튼/박스 0). */
 .fnd-trends-link{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .fnd-trends-link:hover{color:var(--coral)}
@@ -136,7 +143,15 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    최소폭 자체를 없애고 overflow:hidden+ellipsis 로 잘라, 막대·건수 트랙과 절대 겹치지
    않게 한다. title 로 잘린 전체 라벨을 계속 확인할 수 있다(findings.js buildCatRow 참조). */
 .fnd-dash-cat-label{flex:0 0 110px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--body);line-height:1.3}
-.fnd-dash-cat-bar{flex:1 1 auto;height:6px;border-radius:99px;background:var(--coral);opacity:.85;transform-origin:left}
+/* ★[막대 침범 방지 — 렌더층 M2c] 막대는 transform:scaleX() 로 비율을 그리는데, transform 은
+   레이아웃 박스를 벗어나 **그려진다**(레이아웃은 그대로, 픽셀만 넘어간다). 비율이 1을 넘으면
+   막대가 오른쪽 건수 글자 위를 덮는다 — 실제로 "그 외" 합계(6,226)가 상위 8개 최댓값(4,347)을
+   넘어 scaleX(1.43) 이 나왔고 막대가 건수 열을 68px 침범했다(라이브 실측).
+   산술을 고치는 것(findings.js renderDashCategories)과 **별개로**, 막대를 overflow:hidden
+   트랙 안에 가두어 어떤 값이 들어와도 트랙 밖을 칠할 수 없게 한다. 이게 재발 방지의 본체다 —
+   앞선 수리(M2a)는 겹침의 다른 원인(라벨 min-content)만 고치고 스케일 상한은 열어 뒀다. */
+.fnd-dash-cat-track{flex:1 1 auto;min-width:0;height:6px;overflow:hidden}
+.fnd-dash-cat-bar{width:100%;height:6px;border-radius:99px;background:var(--coral);opacity:.85;transform-origin:left}
 .fnd-dash-cat-count{flex:0 0 auto;min-width:20px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 /* 월별 추이 — 세로 미니 막대 + 월 라벨. [M14] 바 하단 baseline 보더. */
 .fnd-dash-month-bars{display:flex;align-items:flex-end;gap:6px}
@@ -183,26 +198,33 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-filters-toggle{display:none;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 14px;cursor:pointer;margin-bottom:14px}
 .fnd-filters-toggle .ti{font-size:15px;color:var(--coral)}
 .fnd-filters-badge{font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
-/* [M15] 균일 셀렉트 행 — 소스/증거등급/검토상태/카테고리/발행월/정렬 6개가 전부 동일
-   컴포넌트(select+라벨 위)를 쓴다. align-items:flex-start 로 라벨 시작 높이를 통일. */
-.fnd-filters{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start}
+/* [M15] 균일 셀렉트 행 — 소스/증거등급/검토상태/카테고리/발행월/국가/정렬 7개가 전부 동일
+   컴포넌트(select+라벨 위)를 쓴다. align-items:flex-start 로 라벨 시작 높이를 통일.
+   ★[툴바 1행 고정 M2c] 옛 구조는 flex-wrap + 필드별 고정폭이었다. 고정폭 합
+   150+110+120+230+110+150+110 = 980px 에 gap 28×6 = 168px 이 붙어 1,148px — 컨테이너
+   1,108px 를 40px 넘겨 **정렬 하나만 둘째 줄로 밀려나** 있었다(라이브 실측). 고정폭 합이
+   컨테이너를 넘는 순간 줄이 갈라지는 구조라, 필드를 하나 더 붙이거나(국가 필터가 실제로
+   그랬다) 폰트가 조금만 커져도 같은 일이 재발한다.
+   → 폭을 **fr 비중**으로 바꿔 남는 폭을 나눠 갖게 하면 합이 컨테이너를 넘을 수 없다.
+   비중은 옛 고정폭의 상대비를 그대로 옮긴 값이라 화면 비례는 유지된다.
+   ★minmax(0,…) 필수 — 맨 fr 은 자식의 min-content 를 하한으로 삼는데, <select> 의
+   min-content 는 **가장 긴 option 텍스트**다. 카테고리·소스 옵션은 findings.js 가 런타임에
+   채우므로(예: "기타 품질시스템 (4,347)") 정적 폭 계산이 맞아도 데이터가 길어지면 트랙이
+   밀려 다시 넘칠 수 있다. .fnd-dash-grid 와 같은 함정·같은 해법이다. */
+.fnd-filters{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(0,.92fr) minmax(0,1fr) minmax(0,1.95fr) minmax(0,.92fr) minmax(0,1.28fr) minmax(0,1.05fr);gap:14px 16px;align-items:flex-start}
 .fnd-field{display:flex;flex-direction:column;max-width:100%;min-width:0}
 /* §4 한글 안전(불가침, WebKoreanSafetyTest) — 스펙 원안의 자간 지정은 한글 라벨(소스/증거
    등급/검토 상태/카테고리/발행월/정렬)에 적용돼 사이트 전역 "한글 자간 금지" 계약을 깬다.
    시각 위계는 font-weight(600)+size(11px)만으로 낸다(디자인 원칙: 무게로 위계, coral 은
    주의 신호 전용 — 자간 남용도 같은 취지로 배제). */
 .fnd-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0 0 6px}
-/* [M15] 전 셀렉트 동일 높이/폰트(height 36px·font-size 13px), 필드별 고정 폭은 아래
-   #fnd-f-* 로 지정(모바일은 미디어쿼리에서 100%). */
-.fnd-field select{height:36px;box-sizing:border-box;border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:0 10px;font:inherit;font-size:13px;color:var(--ink);max-width:100%}
+/* [M15] 전 셀렉트 동일 높이/폰트(height 36px·font-size 13px). [M2c] 폭은 그리드 트랙이
+   정하고 셀렉트는 그 트랙을 꽉 채운다(width:100%) — 필드별 고정 px 지정은 폐기했다. */
+.fnd-field select{width:100%;height:36px;box-sizing:border-box;border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:0 10px;font:inherit;font-size:13px;color:var(--ink);max-width:100%}
 .fnd-field select:focus{outline:none;border-color:var(--coral)}
-#fnd-f-source{width:150px}
-#fnd-f-evidence{width:110px}
-#fnd-f-status{width:120px}
-#fnd-f-category{width:230px}
-#fnd-f-month{width:110px}
-#fnd-f-country{width:150px}
-#fnd-sort{width:110px}
+/* [M2c] 정렬 필드 구분선 — 필터(무엇을 볼까) 6개와 정렬(어떻게 늘어놓을까)의 경계.
+   1행이 유지되는 폭에서만 의미가 있어 아래 미디어쿼리에서 해제한다. */
+.fnd-field--sort{padding-left:16px;border-left:1px solid var(--line)}
 /* [M15] 적용 필터 칩 행 — 셀렉트 행 아래, 활성 필터가 1개 이상일 때만 findings.js 가
    노출한다(hidden 토글). 모바일 필터 접기(#fnd-filters-toggle) 대상 밖에 둬 항상 보인다. */
 .fnd-active{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
@@ -213,12 +235,21 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
 .fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
 .fnd-active-clearall:hover{color:var(--coral)}
+/* [M2c] 1행이 좁아지면 열 수를 줄여 접는다 — 7개를 억지로 한 줄에 눌러 담으면 셀렉트가
+   글자를 자른다. 4열/3열 모두 트랙이 균등해 옛 flex-wrap 처럼 마지막 항목만 덩그러니
+   남는 모양이 나오지 않는다. 구분선은 1행일 때만 뜻이 있으므로 함께 해제. */
+@media (max-width:1020px){
+  .fnd-filters{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .fnd-field--sort{padding-left:0;border-left:0}
+}
+@media (max-width:820px){
+  .fnd-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 @media (max-width:700px){
   .fnd-filters-toggle{display:inline-flex}
   .fnd-filters{display:none}
-  .fnd-filters.open{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+  .fnd-filters.open{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
   .fnd-field select{max-width:100%}
-  #fnd-f-source,#fnd-f-evidence,#fnd-f-status,#fnd-f-category,#fnd-f-month,#fnd-f-country,#fnd-sort{width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
 }
@@ -318,7 +349,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   <span class="kick">AI Disclosure</span>
   <h2>콘텐츠 생성 방식 및 유의사항</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.</p></div>
+    <div class="disc-sec"><p>본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.</p></div>
     <div class="disc-sec"><p>국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
     <div class="disc-sec"><p>각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.</p></div>
     <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
@@ -374,7 +405,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../assets/findings.js?v=0fa0dff7" defer></script>
+<script src="../assets/findings.js?v=d1c1cd6c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

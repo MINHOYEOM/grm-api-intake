@@ -952,16 +952,59 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_dash_category_top8_and_rest_row(self):
         """[그리드 균형 M2a] 카테고리 분포는 상위 8개만 개별 바로 그리고, 나머지는
-        "그 외 N건" 한 줄로 합산한다(옛 top6 에서 상향)."""
+        "그 외 N건" 한 줄로 합산한다(옛 top6 에서 상향).
+
+        ★[스케일 기준 M2c] 옛 코드는 상위 8개에서만 maxCount 를 구한 뒤 합산행까지 같은
+        축으로 그렸다 — 꼬리의 합이 머리의 최댓값을 넘으면 비율이 1을 초과한다(실측 6,226
+        > 4,347 → scaleX(1.43) → 막대가 건수 글자를 68px 침범). 이 테스트의 옛 버전은
+        `buildCatRow("그 외", restCount, maxCount, null)` 만 확인해 **maxCount 가 어디서
+        왔는지는 검사하지 않았고**, 그래서 결함을 그대로 잠근 채 통과했다. 지금은 "그릴
+        행을 먼저 모으고 그 배열에서 max 를 뽑는다"는 불변식 자체를 검사한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDashCategories(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var top = stats.categories.slice(0, 8);", fn)
+        self.assertIn("var rows = stats.categories.slice(0, 8).map(", fn)
         self.assertIn(
             "var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
             fn,
         )
-        self.assertIn('buildCatRow("그 외", restCount, maxCount, null)', fn)
+        self.assertIn('rows.push({ label: "그 외", count: restCount, code: null });', fn)
+        # ★핵심 불변식 — maxCount 는 rows(=실제로 그리는 행)에서만 나온다.
+        self.assertIn(
+            "var maxCount = rows.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;",
+            fn,
+        )
+        self.assertNotIn("top.reduce(", fn)
+        # maxCount 계산이 rows 조립보다 뒤에 와야 한다(합산행이 스케일에 반영되려면).
+        self.assertLess(fn.index('rows.push({ label: "그 외"'), fn.index("var maxCount ="))
+
+    def test_dash_category_bar_cannot_overflow_count_column(self):
+        """[막대 침범 방지 M2c] 가로 막대가 오른쪽 건수 글자를 덮는 결함이 두 번 났다.
+        transform:scaleX() 는 레이아웃 박스를 벗어나 **그려지므로**, 비율이 1을 넘는 순간
+        건수 열 위에 픽셀이 얹힌다. 산술 한 곳만 고치면 같은 계열이 또 새므로 3중으로 막는다:
+
+          (1) 호출부  — maxCount 를 실제로 그리는 행에서 뽑는다(위 테스트).
+          (2) 산술층  — buildCatRow 가 비율을 [0.02, 1] 로 클램프(상한이 핵심).
+          (3) 렌더층  — 막대를 overflow:hidden 트랙에 가둬, 값이 무엇이든 트랙 밖을 못 칠한다.
+
+        (3)이 재발 방지의 본체다 — (1)(2)는 산술이고 (3)만이 산술과 무관하게 성립한다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        # (2) 상한 클램프 — Math.max 하한만 있던 옛 코드가 정확히 이 결함의 통로였다.
+        self.assertIn(
+            'bar.style.transform = "scaleX(" + Math.min(1, Math.max(0.02, ratio)) + ")";', fn
+        )
+        # (3) 막대는 트랙 안에 들어가고, 행에 직접 붙지 않는다.
+        self.assertIn('var track = el("div", "fnd-dash-cat-track");', fn)
+        self.assertIn("track.appendChild(bar);", fn)
+        self.assertIn("row.appendChild(track);", fn)
+        self.assertNotIn("row.appendChild(bar);", fn)
+        anchor = "\n.fnd-dash-cat-track{"
+        css = self.html[self.html.index(anchor) + 1:]
+        css = css[:css.index("}") + 1]
+        self.assertIn("overflow:hidden", css)
+        self.assertIn("min-width:0", css)
 
     def test_dash_category_label_track_separated_from_bar(self):
         """[라벨·바 트랙 분리 M2a] 카테고리 라벨은 고정폭(110px)+ellipsis 로 잘려 막대·
@@ -1181,15 +1224,60 @@ class WebFindingsRenderTest(unittest.TestCase):
         positions = [self.html.index(f'id="{fid}"') for fid in order]
         self.assertEqual(positions, sorted(positions), "필터 셀렉트 순서가 스펙과 다름")
 
-    def test_select_field_widths_match_spec(self):
-        """[M15] 필드별 고정 폭: 소스 150 · 증거 110 · 검토 120 · 카테고리 230 · 발행월 110 ·
-        정렬 110(px, 모바일 100%)."""
-        widths = {
-            "fnd-f-source": "150px", "fnd-f-evidence": "110px", "fnd-f-status": "120px",
-            "fnd-f-category": "230px", "fnd-f-month": "110px", "fnd-sort": "110px",
-        }
-        for fid, width in widths.items():
-            self.assertIn(f"#{fid}{{width:{width}}}", self.html, f"{fid} 폭 규칙 미발견")
+    def test_filter_row_uses_fractional_grid_so_it_cannot_wrap(self):
+        """[툴바 1행 M2c] 옛 구조는 flex-wrap + 필드별 고정 px 폭이었다. 고정폭 합
+        150+110+120+230+110+150+110 = 980px 에 gap 28×6 = 168px 이 붙어 1,148px — 컨테이너
+        1,108px 를 넘겨 **정렬 하나만 둘째 줄로** 밀려나 있었다(라이브 실측). 고정폭 합이
+        컨테이너를 넘는 순간 줄이 갈라지는 구조라 필드를 하나 더 붙이면(국가 필터가 실제로
+        그랬다) 반드시 재발한다 → 폭을 fr 비중으로 바꿔 **합이 컨테이너를 넘을 수 없게** 한다.
+
+        ★minmax(0,…) 이 함께 있어야 한다 — 맨 fr 은 자식의 min-content 를 하한으로 삼고,
+        <select> 의 min-content 는 가장 긴 option 텍스트다. 옵션은 findings.js 가 런타임에
+        채우므로(카테고리명·소스명) 정적 폭이 맞아도 데이터가 길어지면 다시 넘칠 수 있다."""
+        import re as _re
+        m = _re.search(r"\.fnd-filters\{([^}]*)\}", self.html)
+        self.assertIsNotNone(m, ".fnd-filters CSS 규칙 미발견")
+        rule = m.group(1)
+        self.assertIn("display:grid", rule)
+        self.assertNotIn("flex-wrap", rule)
+        self.assertEqual(7, rule.count("minmax(0,"), "7개 트랙 전부 minmax(0,…) 이어야 한다")
+        # 필드별 고정 px 폭은 폐기 — 하나라도 남으면 합이 다시 컨테이너를 넘을 수 있다.
+        for fid in ("fnd-f-source", "fnd-f-evidence", "fnd-f-status", "fnd-f-category",
+                    "fnd-f-month", "fnd-f-country", "fnd-sort"):
+            self.assertNotIn(f"#{fid}{{width:", self.html, f"{fid} 고정폭 규칙이 남아 있다")
+        # 셀렉트는 자기 트랙을 꽉 채운다(트랙이 폭의 단일 정본).
+        sm = _re.search(r"\.fnd-field select\{([^}]*)\}", self.html)
+        self.assertIsNotNone(sm)
+        self.assertIn("width:100%", sm.group(1))
+
+    def test_sort_field_separated_from_filters(self):
+        """[M2c] 정렬은 결과를 좁히지 않고 순서만 바꾼다 — 같은 행에 두되 세로 구분선으로
+        성격 차이를 드러낸다. 1행이 깨지는 폭에서는 구분선이 뜻을 잃으므로 해제한다."""
+        self.assertIn('class="fnd-field fnd-field--sort"', self.html)
+        self.assertIn(".fnd-field--sort{padding-left:16px;border-left:1px solid var(--line)}",
+                      self.html)
+        self.assertIn(".fnd-field--sort{padding-left:0;border-left:0}", self.html)
+
+    def test_page_head_paragraph_not_capped_by_ch_width(self):
+        """[부제 1줄 M2c] grm.css 의 .page-head p{max-width:62ch} 는 `ch`(숫자 0 의 폭)
+        기준이라 한글에는 지나치게 좁다 — 62ch = 609px 인데 부제 한 문장이 666px 라
+        컨테이너(1,180px)에 폭이 남는데도 두 줄로 접혔다. trends.html 이 같은 이유로 이미
+        쓰는 페이지 스코프 오버라이드를 따른다(grm.css 불가침).
+        balance 가 아니라 pretty — balance 는 두 줄 길이를 맞추려 한 줄짜리 문장도 쪼갠다."""
+        html_src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertIn(".page-head p{max-width:none;text-wrap:pretty}", html_src)
+        self.assertNotIn(".page-head p{max-width:none;text-wrap:balance}", html_src)
+        # 고정 줄바꿈(<br>)으로 때우지 않았는지 — 반응형이 깨지는 방식이다.
+        head = self.html[self.html.index('class="wrap page-head"'):]
+        head = head[:head.index("</div>")]
+        self.assertNotIn("<br", head)
+
+    def test_source_list_copy_includes_health_canada(self):
+        """[운용 정합] 캐나다(Health Canada) 실사는 문서 기준 2위(1,824/6,116)다 — 이 페이지의
+        두 노출 지점(부제·AI 고지)에 실제로 실렸는지 확인한다. 전 페이지 범위의 정합은
+        WebSourceCopyConsistencyTest 가 추출기 배선에서 파생해 검증한다."""
+        self.assertIn("캐나다 실사", self.html)                        # 페이지 부제
+        self.assertIn("캐나다 실사보고서(Health Canada)", self.html)   # AI 고지
 
     def test_uniform_select_style(self):
         """[M15] 전 셀렉트 동일 컴포넌트 — height 36px, font-size 13px."""
@@ -3021,7 +3109,7 @@ class WebTrendsRenderTest(unittest.TestCase):
                              "각 연도를 100%로 놓고",
                              "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
                              "품질이 나쁜 순서가 아닙니다.",
-                             "FDA 483의 경향으로 읽으셔야 합니다.",
+                             "문서 형식의 차이도 함께 반영합니다.",
                              "해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다.",
                              "막대는 그 달에 공개된 문서 수입니다.",
                              "각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다.",
@@ -3036,7 +3124,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         놓았다. 고정 <br> 이 아니라 블록 span 이라 좁은 뷰포트에서는 각 문장이 자기
         안에서 다시 접힌다(반응형 유지)."""
         self.assertIn(
-            '<span class="ln">FDA 483 · Warning Letter · 식약처 · '
+            '<span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · '
             'EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.'
             '</span>',
             self.html,
@@ -3066,13 +3154,18 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.", self.html)
 
     def test_source_mix_skew_disclosed(self):
-        """소스 편중(FDA 483 압도)은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성
-        섹션에서 명시하고, 각 행에 구성비를 병기한다."""
-        self.assertIn("지금은 FDA 483이 대부분입니다.", self.html)
-        self.assertIn("수집을 시작한 지 얼마 되지 않아", self.html)
+        """소스 구성 편중은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성 섹션에서
+        명시한다. [2026-08-11] 옛 문구 "지금은 FDA 483이 대부분입니다 … 사실상 FDA 483의
+        경향으로 읽으셔야 합니다"는 캐나다 실사 9,505건 편입으로 **사실이 아니게 됐다**
+        (FDA 483 41% vs 캐나다 38%). 새 문구는 특정 비율을 박지 않는다 — 바로 아래 막대가
+        실제 값을 그리므로, 숫자를 문장에 박으면 그 문장만 낡는다."""
+        self.assertIn("FDA 483과 캐나다 실사보고서가 큰 두 축이고", self.html)
+        self.assertIn("문서 형식의 차이도 함께 반영합니다", self.html)
+        self.assertNotIn("사실상 FDA 483의 경향으로 읽으셔야 합니다", self.html)
 
     def test_year_trend_caveat_note_present(self):
-        self.assertIn("과거 연도는 아직 채워 넣는 중입니다", self.html)
+        self.assertIn("소스마다 거슬러 올라간 범위가 다르기 때문", self.html)
+        self.assertIn("캐나다 실사는 최근 5년치만", self.html)
         self.assertIn("하한치", self.html)
         # 제목 자체가 "추이"(=규제 활동 변화)로 읽히지 않게 "공개량(참고)"로 강등했다.
         self.assertIn('<h2 class="tr-h">연도별 공개량(참고)</h2>', self.html)
@@ -3755,7 +3848,15 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         무관하게 정적 텍스트로 존재해야 한다(골든 리뷰 가능)."""
         self.assertIn("<h2>전체 기간 누적</h2>", self.html)
         self.assertIn("2016년 이후 모아 둔 전량이 분모입니다.", self.html)
-        self.assertIn("47%가 2024년에 공개된 자료라", self.html)
+        self.assertIn("연도마다 확보한 문서 양이 크게 달라", self.html)
+        # ★[낡는 숫자 금지 2026-08-11] 옛 문구는 "그중 47%가 2024년에 공개된 자료라"였다.
+        # 캐나다 실사 9,505건이 2021~2026 에 걸쳐 들어오면서 실제 값은 33.7% 가 됐는데,
+        # 정적 문장이라 아무도 모르는 채 1년 가까이 틀린 수치를 보여줬다. 분포는 바로 아래
+        # '연도별 공개량(참고)' 차트가 실시간으로 그리므로 문장에 비율을 박지 않는다.
+        self.assertNotIn("47%가 2024년", self.html)
+        divider = self.html[self.html.index('class="tr-divider"'):]
+        divider = divider[:divider.index("</div>")]
+        self.assertNotRegex(divider, r"\d+%", "누적 안내문에 고정 비율이 다시 박혔다(낡는다)")
 
     def test_firm_find_form_shell_present_without_action(self):
         """form 에 action 이 없어야 041 미배포 라이브에서 눌러도 페이지 이동이 없다
@@ -8393,12 +8494,44 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         self.assertEqual(declared, len(chips),
                          f"마퀴 카운트({declared}) ≠ 실제 칩 수({len(chips)}): {chips}")
 
+    # ★[가드가 낡는 것을 막는 가드 2026-08-11] 아래 매핑은 findings 추출기 → 그 소스를
+    # 가리키는 사이트 카피 키워드다. 옛 버전은 REQUIRED 를 손으로 적은 리스트로 뒀는데,
+    # Health Canada 실사(문서 기준 2위)를 편입할 때 아무도 리스트를 갱신하지 않아 **가드가
+    # 초록인 채로 카피만 낡았다**. 손으로 적은 목록은 반드시 낡는다 → 이제 목록을
+    # findings_extractors.py 의 실제 배선에서 파생시키고, 매핑에 없는 추출기가 배선되면
+    # 그 자체로 실패시킨다. 새 소스를 붙이면 여기 한 줄을 추가하기 전엔 CI 가 통과하지 않는다.
+    EXTRACTOR_COPY_KEYWORDS = {
+        "_from_fda_483_observations": "FDA 483",
+        "_from_warning_letter": "Warning Letter",
+        "_from_mfds_gmp": "식약처",
+        "_from_mfds_admin_action": "식약처",
+        "_from_mfds_recall": "식약처",
+        "_from_eu_gmp_ncr": "GMP 비준수",      # EU(EudraGMDP) NCR
+        "_from_mhra_gmp_ncr": "GMP 비준수",    # 영국(MHRA) NCR
+        "_from_hc_inspection": "캐나다",       # Health Canada 실사
+    }
+
+    def test_extractor_dispatch_all_mapped_to_copy_keyword(self):
+        """findings_extractors.py 에 배선된 추출기가 전부 카피 키워드에 매핑돼 있어야 한다 —
+        새 소스를 붙이고 사이트 설명을 안 고치면 여기서 먼저 걸린다(아래 카피 검증의 입력)."""
+        src = (WEB_DIR.parent / "findings_extractors.py").read_text(encoding="utf-8")
+        wired = set(re.findall(r"findings\.extend\((_from_\w+)\(signal, raw, row\)\)", src))
+        self.assertTrue(wired, "추출기 배선을 찾지 못함 — 파싱 패턴이 낡았는지 확인할 것")
+        missing = wired - set(self.EXTRACTOR_COPY_KEYWORDS)
+        self.assertFalse(
+            missing,
+            f"새 findings 추출기 {sorted(missing)} 가 배선됐는데 카피 키워드 매핑이 없다 — "
+            "EXTRACTOR_COPY_KEYWORDS 에 대표 키워드를 추가하고 사이트 설명 6곳을 갱신할 것",
+        )
+        stale = set(self.EXTRACTOR_COPY_KEYWORDS) - wired
+        self.assertFalse(stale, f"배선이 사라진 추출기가 매핑에 남아 있다: {sorted(stale)}")
+
     def test_findings_source_keywords_present_in_all_copy(self):
         """findings 계열(검색·업체·트렌드)의 소스 설명이 서로·메타와 어긋나지 않게 강제한다.
-        새 findings 소스를 추가하면 아래 REQUIRED 에 대표 키워드를 넣어야 하고, 그러면 6개
-        카피 위치(3 인트로/고지 + 3 메타 설명)가 전부 그 소스를 언급하는지 개별 검증된다 —
+        검사 대상 키워드는 EXTRACTOR_COPY_KEYWORDS(실제 배선에서 파생)에서 나오고, 6개
+        카피 위치(3 인트로/고지 + 3 메타 설명)가 전부 그 소스를 언급하는지 개별 검증한다 —
         소스 추가 시 수집기·DB 만 고치고 설명을 빠뜨리던 재발 방지."""
-        REQUIRED = ["FDA 483", "Warning Letter", "식약처", "GMP 비준수"]   # 마지막 = EU/영국 NCR 대표
+        REQUIRED = sorted(set(self.EXTRACTOR_COPY_KEYWORDS.values()))
         # ① 템플릿(인트로·고지) — 파일 전체 텍스트에 전부 존재해야 한다.
         for label, rel in (("findings 템플릿", "findings.html"),
                            ("firm 템플릿", "firm.html"),

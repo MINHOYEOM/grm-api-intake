@@ -57,7 +57,7 @@ GRM(Global Regulatory Monitor)은 FDA·EMA·MHRA·PIC/S·ICH·WHO·Health Canada
 
 ## 찾아보기(findings) 검색, 실전처럼
 
-찾아보기에서는 FDA 483 관찰사항, Warning Letter, 식약처 GMP 실태조사 등에서 추출한 개별 지적사항을 키워드로 검색합니다.
+찾아보기에서는 FDA 483 관찰사항, Warning Letter, 캐나다(Health Canada) 실사보고서, 식약처 GMP 실태조사, EU·영국 GMP 비준수 보고서에서 추출한 개별 지적사항을 키워드로 검색합니다.
 
 ### 이런 검색어로 시작해 보세요
 

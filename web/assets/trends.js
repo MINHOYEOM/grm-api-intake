@@ -96,6 +96,17 @@
   var zoneSubEl = document.getElementById("tr-zone-sub");
   var zoneEl = document.getElementById("tr-zone");
   var zoneCountriesEl = document.getElementById("tr-zone-countries");
+  // [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats() 전용
+  // 신규 엘리먼트(임무3) — zoneBlockEl 등과 동일하게 아래 하드 게이트에는 넣지 않는다.
+  // 넣으면 이 블록이 없는 구버전 셸(캐시 스큐)을 만났을 때 스크립트 전체가 조기
+  // 리턴되어 이미 정상 동작하는 다른 패널까지 함께 죽는다 — 이 패널의 실패 반경은
+  // 이 패널 자신으로만 한정해야 한다.
+  var fdaBlockEl = document.getElementById("tr-fda-block");
+  var fdaScopeEl = document.getElementById("tr-fda-scope");
+  var fdaStatsEl = document.getElementById("tr-fda-stats");
+  var fdaYearEl = document.getElementById("tr-fda-year");
+  var fdaCountryEl = document.getElementById("tr-fda-country");
+  var fdaNoteEl = document.getElementById("tr-fda-note");
   // [최근 12개월 · 달라진 점] 041_findings_recent_window 전용 엘리먼트. zone/heatmap 과
   // 동일하게 아래 하드 게이트에는 넣지 않는다 — 구버전 셸(캐시 스큐)을 만나도 실패
   // 반경이 이 패널들로만 한정되어야 한다.
@@ -162,9 +173,14 @@
   // 실측 85종(2026-08-11)으로 이미 낡아 있었다 — 문자열은 소스가 늘 때마다 새 변종이
   // 생겨 반드시 낡는다. 코드는 유한(ISO2)하고 안정적이라 이 문제가 구조적으로 없다.
   // web/migrations/055_findings_country_key.sql 의 public.grm_normalize_country() /
-  // grm_findings.py 의 _COUNTRY_CODE_MAP 이 매핑 정본이다(47개 코드) — 이 사전은 그
-  // 정본의 **모든 코드**를 커버해야 한다(web/tests/test_render.py 가 대조).
-  // findings_zone_category()(055)가 top_countries[].code 로 이 코드를 내려준다.
+  // grm_findings.py 의 _COUNTRY_CODE_MAP 이 매핑 정본이다(057_grm_normalize_country_
+  // ddapi.sql 이 FDA Data Dashboard API CountryName 27종을 추가해 47→68개 코드로
+  // 확장했다 — 이 사전은 그 정본의 **모든 코드**를 커버해야 한다(web/tests/
+  // test_render.py 가 대조. country_key 정본 함수가 findings/fda_inspections 양쪽에서
+  // 공유되므로 코드 집합이 늘면 이 사전도 함께 늘어야 한다 — "사전은 반드시 낡는다"
+  // 규율). findings_zone_category()(055)와 fda_inspection_stats()(058, 임무3)
+  // 둘 다 top_countries/by_country[].code 로 이 코드를 내려준다 — 새 정규화 사전을
+  // 만들지 않고 이 사전을 그대로 재사용한다(임무서 지시).
   var COUNTRY_LABELS_KO = {
     US: "미국",
     KR: "대한민국",
@@ -213,6 +229,32 @@
     BY: "벨라루스",
     SI: "슬로베니아",
     IL: "이스라엘",
+    // [057] FDA Data Dashboard API CountryName 확장분(21개 신규 코드 — SG/BR/TH/MT/
+    // AR/HR/HK/CO/NZ/BG/DO/LV/OM/CR/EG/MO/PH/UY/AW/EE/AE. KR/CZ/FI/IL/SI/NO 는
+    // 위 47개 안에 이미 있으므로 여기서 다시 추가하지 않는다 — 같은 나라의 DDAPI
+    // 표기가 다른 코드로 오추가되지 않도록 057 확장분 중 기존 코드 재사용 6개는
+    // 의도적으로 생략했다).
+    SG: "싱가포르",
+    BR: "브라질",
+    TH: "태국",
+    MT: "몰타",
+    AR: "아르헨티나",
+    HR: "크로아티아",
+    HK: "홍콩",
+    CO: "콜롬비아",
+    NZ: "뉴질랜드",
+    BG: "불가리아",
+    DO: "도미니카공화국",
+    LV: "라트비아",
+    OM: "오만",
+    CR: "코스타리카",
+    EG: "이집트",
+    MO: "마카오",
+    PH: "필리핀",
+    UY: "우루과이",
+    AW: "아루바",
+    EE: "에스토니아",
+    AE: "아랍에미리트",
   };
 
   // [코드 우선, 원문 폴백] code(ISO2)가 있으면 그 라벨(없는 코드는 코드 자체를 그대로
@@ -1110,6 +1152,130 @@
     zoneBlockEl.hidden = false;
   }
 
+  // ── [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats() ──────
+  // findings 계열 RPC(findings_stats/findings_category_matrix/findings_zone_category/
+  // findings_recent_window)와 완전히 독립된 별도 소스다. findings 는 문서에서 뽑은
+  // "지적사항"(문장) 단위고, 이 RPC 는 FDA Data Dashboard API 실사 "건"(등급 하나)
+  // 단위라 서로 다른 잣대다 — 그래서 이 섹션은 findings 총계를 나누는 분모로 계산해
+  // 쓰지 않는다(임무서: "findings 는 분자만 말한다"의 답은 findings 수치 옆에 이
+  // 모집단의 크기·구성을 나란히 보여주는 것이지, 두 수치를 나누는 것이 아니다 — 실사
+  // 한 건에서 지적이 여러 개 나올 수 있어 나누면 의미가 없다).
+  //
+  // ★scope 는 하드코딩하지 않고 RPC 응답을 그대로 읽어 화면에 적는다(054 "축을 바꾸지
+  // 말고 밝혀라") — 이 표는 ProjectArea='Drug Quality Assurance'(GMP 제조소 실사)
+  // 단일 모집단만 담고, 성격이 다른 Bioresearch Monitoring 등은 애초에 표에 없다
+  // (058 마이그레이션 헤더 실측: 합치면 OAI 비율이 14.9%→8.6%로 무의미해진다).
+  //
+  // ★비율은 서버가 안 준다(007/038 계약과 동일 — 서버는 센다, 나누기는 클라이언트가
+  // 한다) — OAI 비율/연도별 등급 구성/국가별 OAI 비중 전부 여기서 계산한다.
+  //
+  // ★데이터가 아직 없을 때(058 미적용 라이브·0건)는 섹션을 그리지 않는다(빈 껍데기
+  // 금지) — totals.inspections 가 0 이하면 조용히 return 하고 정적 셸의 기본값인
+  // hidden 상태를 그대로 둔다.
+  var FDA_GRADE_LABELS = { nai: "NAI(적합)", vai: "VAI(경미)", oai: "OAI(중대)" };
+
+  function buildFdaYearRow(y) {
+    var nai = y.nai || 0, vai = y.vai || 0, oai = y.oai || 0;
+    var total = nai + vai + oai;
+    var row = el("div", "tr-fda-y-row");
+    row.appendChild(el("span", "tr-fda-y-label", "FY" + y.fiscal_year));
+    var track = document.createElement("div");
+    track.className = "tr-fda-y-track";
+    ["nai", "vai", "oai"].forEach(function (k) {
+      var seg = document.createElement("div");
+      seg.className = "tr-fda-y-seg " + k;
+      var cnt = k === "nai" ? nai : k === "vai" ? vai : oai;
+      var share = total > 0 ? cnt / total : 0;
+      seg.style.flex = "0 0 " + (share * 100) + "%";
+      seg.title = "FY" + y.fiscal_year + " " + FDA_GRADE_LABELS[k] + " " + fmtNum(cnt) + "건";
+      track.appendChild(seg);
+    });
+    row.appendChild(track);
+    row.appendChild(el("span", "tr-fda-y-oai-pct", "OAI " + pctText(oai, total)));
+    row.appendChild(el("span", "tr-fda-y-total", fmtNum(total) + "건"));
+    return row;
+  }
+
+  // 상위 몇 개국을 그릴지 — findings_zone_category 의 top_countries.slice(0,5) 보다
+  // 넉넉히 둔다(이 RPC 는 by_country 를 절단 없이 전량 반환하므로, 화면 표시 상한은
+  // trends.js 소관이고 RPC 잘림이 아니다 — 058 헤더 참조).
+  var FDA_COUNTRY_ROWS = 12;
+
+  function buildFdaCountryRow(c, isKorea) {
+    var row = el("div", "tr-fda-c-row" + (isKorea ? " is-kr" : ""));
+    var label = c.code ? countryLabelKo(c.code, c.country) : "국가명 미확인";
+    row.appendChild(el("span", "tr-fda-c-label", label));
+    var track = document.createElement("div");
+    track.className = "tr-fda-c-track";
+    var bar = document.createElement("div");
+    bar.className = "tr-fda-c-bar";
+    var oaiShare = c.total > 0 ? (c.oai || 0) / c.total : 0;
+    bar.style.transform = "scaleX(" + Math.max(0.02, oaiShare) + ")";
+    track.appendChild(bar);
+    row.appendChild(track);
+    row.appendChild(el("span", "tr-fda-c-count", fmtNum(c.total) + "건"));
+    row.appendChild(el("span", "tr-fda-c-oai", "OAI " + fmtNum(c.oai) + "건(" + pctText(c.oai, c.total) + ")"));
+    return row;
+  }
+
+  // data 는 fda_inspection_stats() 응답 verbatim. 구버전 캐시 셸(엘리먼트 없음)·0건·
+  // fetch 실패는 전부 조용히 숨김 유지로 처리한다(zoneBlockEl 과 동일 원칙 — 패널을
+  // 명시적으로 hidden=true 로 되돌리지 않는다, 정적 셸 기본값을 그대로 두는 편이 안전).
+  function renderFdaInspections(data) {
+    if (!fdaBlockEl || !fdaStatsEl || !fdaYearEl || !fdaCountryEl) return;
+    var d = data || {};
+    var totals = d.totals || {};
+    var total = totals.inspections || 0;
+    if (!(total > 0)) return;   // 미적용/빈 응답 → 빈 껍데기를 그리지 않는다
+
+    var scope = d.scope || {};
+    if (fdaScopeEl) {
+      var scopeText = (scope.project_area || "GMP 실사") + " 한정";
+      var excluded = scope.excluded_project_areas || [];
+      if (excluded.length) scopeText += " · " + excluded.join("·") + " 등 다른 모집단 제외";
+      if (typeof scope.fiscal_year_min === "number" && typeof scope.fiscal_year_max === "number") {
+        scopeText += " · FY" + scope.fiscal_year_min + "~FY" + scope.fiscal_year_max;
+      }
+      scopeText += " · 출처: " + (scope.source || "FDA Data Dashboard API");
+      fdaScopeEl.textContent = scopeText;
+    }
+
+    fdaStatsEl.innerHTML = "";
+    fdaStatsEl.appendChild(buildStat(fmtNum(total), "FDA 의약품 GMP 실사"));
+    fdaStatsEl.appendChild(buildStat(fmtNum(totals.oai) + "건(" + pctText(totals.oai, total) + ")", "중대 지적 OAI"));
+    fdaStatsEl.appendChild(buildStat(fmtNum(totals.vai) + "건(" + pctText(totals.vai, total) + ")", "경미 지적 VAI"));
+    fdaStatsEl.appendChild(buildStat(fmtNum(totals.nai) + "건(" + pctText(totals.nai, total) + ")", "적합 NAI"));
+
+    fdaYearEl.innerHTML = "";
+    (d.by_year || []).forEach(function (y) { fdaYearEl.appendChild(buildFdaYearRow(y)); });
+
+    fdaCountryEl.innerHTML = "";
+    var countries = d.by_country || [];
+    var top = countries.slice(0, FDA_COUNTRY_ROWS);
+    var korea = null;
+    for (var i = 0; i < countries.length; i++) {
+      if (countries[i].code === "KR") { korea = countries[i]; break; }
+    }
+    var koreaInTop = korea && top.indexOf(korea) !== -1;
+    top.forEach(function (c) { fdaCountryEl.appendChild(buildFdaCountryRow(c, c === korea)); });
+    // [한국 강조] 상위 목록 밖에 있어도 한국은 항상 보이게 별도로 덧붙인다(임무서
+    // "한국을 눈에 띄게" 요구 — top N 절단으로 한국이 가려지면 안 된다).
+    if (korea && !koreaInTop) fdaCountryEl.appendChild(buildFdaCountryRow(korea, true));
+
+    if (fdaNoteEl) {
+      var shownTotal = top.reduce(function (s, c) { return s + (c.total || 0); }, 0);
+      var note = "국가 " + countries.length + "종 중 건수 상위 " + top.length +
+        "곳(전체의 " + pctText(shownTotal, total) + ")만 표시" +
+        (korea && !koreaInTop ? " · 한국은 목록 밖이라 따로 덧붙임" : "") + ".";
+      if (typeof scope.unmapped_country_count === "number" && scope.unmapped_country_count > 0) {
+        note += " 국가명 미확인 " + fmtNum(scope.unmapped_country_count) + "건 포함.";
+      }
+      fdaNoteEl.textContent = note;
+    }
+
+    fdaBlockEl.hidden = false;
+  }
+
   // ── [최근 12개월] 041_findings_recent_window ─────────────────────────────
   // findings_stats/findings_category_matrix/findings_zone_category 와 독립된 별개 RPC.
   // 실패해도(041 미배포 라이브 포함) 이 섹션만 조용히 숨겨진 채로 남고 다른 섹션엔 전혀
@@ -1836,6 +2002,20 @@
     });
   }
 
+  // 058_fda_inspections.sql — findings 계열 RPC 전부와 별개 소스(파라미터 없음).
+  // 058 미적용 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다
+  // (fetchZoneCategory 와 동일 원칙).
+  function fetchFdaInspectionStats() {
+    return fetch(rpcEndpoint("fda_inspection_stats"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    }).then(function (r) {
+      if (!r.ok) throw new Error("fda_inspection_stats " + r.status);
+      return r.json();
+    });
+  }
+
   // 041_findings_recent_window.sql — findings_stats 와 별개 RPC. 041 미적용 라이브에서
   // 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다(fetchCategoryMatrix/
   // fetchZoneCategory 와 동일 원칙).
@@ -1949,6 +2129,15 @@
   fetchZoneCategory()
     .then(function (data) {
       renderZonePanel(data);
+    })
+    .catch(function () { /* 조용히 숨김 유지 */ });
+
+  // [FDA 의약품 GMP 실사 등급] 위 체인들과 완전히 독립적으로 병렬 fetch(다른 소스 —
+  // fda_inspections 표) — 실패해도(058 미적용 라이브·0건 포함) tr-fda-block 은 정적
+  // 셸의 기본값인 hidden 상태 그대로 남고, 다른 섹션엔 전혀 영향이 없다.
+  fetchFdaInspectionStats()
+    .then(function (data) {
+      renderFdaInspections(data);
     })
     .catch(function () { /* 조용히 숨김 유지 */ });
 

@@ -60,7 +60,19 @@
         <span class="lab">먼저 알아두세요</span>
         <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
         <p id="tr-coverage-text"></p>
-      </div><section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
+      </div><section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="FDA 의약품 GMP 실사 등급" hidden>
+        <h2 class="tr-h">FDA 의약품 GMP 실사 등급</h2>
+        <p class="tr-read">FDA가 의약품 제조소를 직접 실사하고 매긴 등급입니다. <b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다. 위 지적사항 집계와는 단위가 달라 — 실사 한 건에서 지적이 여러 개 나올 수 있어 — 두 수치를 서로 나누지 마세요.</p>
+        <p class="tr-fda-scope" id="tr-fda-scope"></p>
+        <div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>
+        <h3 class="tr-sub-h">연도별 등급 구성</h3>
+        <div id="tr-fda-year" class="tr-fda-year"></div>
+        <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
+        <h3 class="tr-sub-h">국가별 등급 구성</h3>
+        <p class="tr-read">건수가 많은 국가 순입니다. 한국은 목록 밖이어도 따로 표시합니다.</p>
+        <div id="tr-fda-country" class="tr-fda-country"></div>
+        <p class="tr-note" id="tr-fda-note"></p>
+      </section><section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
         <h2 class="tr-h">최근 12개월</h2>
         <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요 — 아래 순위와 &lsquo;달라진 점&rsquo;은 이 두 구간을 견준 결과입니다.</p>
         <p class="tr-recent-sub" id="tr-recent-sub"></p>
@@ -231,6 +243,42 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .tr-ex-foot{margin:12px 0 0;font-size:12.5px}
 .tr-ex-more{font-weight:500;color:var(--coral-2)}
 .tr-ex-more:hover{color:var(--coral)}
+
+/* ── [FDA 의약품 GMP 실사 등급] 058_fda_inspection_stats() 전용 ──────────────
+   findings 계열과 다른 소스라 새 톤을 만들지 않는다 — .tr-stats/.tr-cat-* 색·간격
+   토큰을 그대로 재사용(신규 팔레트 0). NAI/VAI/OAI 3색은 채도 단계만 다르다
+   (OAI=coral 진함, VAI=coral 옅음, NAI=line — coral 은 "문제"를 가리키는 이 페이지의
+   기존 관례라 등급이 나쁠수록 coral 을 진하게 쓴다). */
+.tr-fda-scope{font-size:12px;color:var(--muted);margin:0 0 18px;line-height:1.6}
+.tr-fda-stats{margin:0 0 26px;padding-bottom:0;border-bottom:none}
+.tr-fda-year{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.tr-fda-y-row{display:flex;align-items:center;gap:10px;padding:6px 2px}
+.tr-fda-y-label{flex:0 0 58px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tr-fda-y-track{flex:1 1 auto;display:flex;height:11px;border-radius:99px;overflow:hidden;background:var(--line)}
+.tr-fda-y-seg{height:100%}
+.tr-fda-y-seg.nai{background:var(--line-2)}
+.tr-fda-y-seg.vai{background:var(--coral);opacity:.42}
+.tr-fda-y-seg.oai{background:var(--coral)}
+.tr-fda-y-oai-pct{flex:0 0 78px;text-align:right;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--coral-2)}
+.tr-fda-y-total{flex:0 0 58px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+.tr-fda-y-legend{display:flex;gap:16px;margin:6px 2px 0;font-size:11px;color:var(--muted)}
+.tr-fda-y-key{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tr-fda-y-key.nai{background:var(--line-2)}
+.tr-fda-y-key.vai{background:var(--coral);opacity:.42}
+.tr-fda-y-key.oai{background:var(--coral)}
+.tr-fda-country{display:flex;flex-direction:column;gap:0}
+.tr-fda-c-row{display:flex;align-items:center;gap:12px;padding:7px 8px;border-bottom:1px solid var(--line);border-radius:6px}
+.tr-fda-c-row.is-kr{background:var(--coral-tint);border-bottom-color:transparent}
+.tr-fda-c-label{flex:0 0 130px;max-width:130px;font-size:13px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-fda-c-row.is-kr .tr-fda-c-label{font-weight:600;color:var(--ink)}
+.tr-fda-c-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
+.tr-fda-c-bar{height:100%;border-radius:99px;background:var(--coral);transform-origin:left}
+.tr-fda-c-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tr-fda-c-oai{flex:0 0 auto;min-width:126px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
+@media(max-width:640px){
+  .tr-fda-c-label{flex-basis:90px;max-width:90px}
+  .tr-fda-c-oai{min-width:96px}
+}
 
 /* ── [달라진 점] 증감 2열 ────────────────────────────────────────────────── */
 .tr-move-cols{display:grid;grid-template-columns:1fr 1fr;gap:26px 40px}
@@ -472,7 +520,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/trends.js?v=b0083899" defer></script>
+<script src="../../assets/trends.js?v=59185ebb" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

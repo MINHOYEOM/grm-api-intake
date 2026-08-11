@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """FIND-1 국가 정규화(country_key) tests (055_findings_country_key.sql +
-grm_findings.normalize_country).
+057_grm_normalize_country_ddapi.sql + grm_findings.normalize_country).
 
 Offline source-text / pure-function checks only -- no network, no real
 Postgres/sqlite connection. Mirrors the style of test_findings_firm_key.py
@@ -15,6 +15,17 @@ lowercasing, matching how the SQL folds case via `lower(...)` before the
 CASE), against grm_findings._COUNTRY_CODE_MAP. A live Postgres dry-run
 (control tower) is the only way to prove byte-identical runtime output; that
 is out of scope here.
+
+★2026-08-12: 057 supersedes 055's public.grm_normalize_country body via a
+fresh `create or replace` (same signature, 27 more `when` pairs -- FDA Data
+Dashboard API CountryName coverage for the new fda_inspections table, 058).
+055's own copy of the function is left untouched as a historical snapshot
+(the repo's supersede convention -- see 010/013/029 headers), so it is no
+longer the *live* definition. `SqlPythonParityTest` below therefore parses
+057 (the current source of truth), not 055, for the parity check against
+grm_findings._COUNTRY_CODE_MAP. `Ddapi057ExtensionTest` separately pins the
+055→057 relationship (27 additive pairs, no removals, no other object
+touched) and the Python dict's DDAPI-block shape.
 """
 
 from __future__ import annotations
@@ -28,6 +39,7 @@ import grm_findings
 
 _MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _COUNTRY_KEY_MIGRATION_PATH = _MIGRATIONS_DIR / "055_findings_country_key.sql"
+_COUNTRY_KEY_EXT_MIGRATION_PATH = _MIGRATIONS_DIR / "057_grm_normalize_country_ddapi.sql"
 _ZONE_CATEGORY_MIGRATION_PATH = _MIGRATIONS_DIR / "038_findings_zone_category.sql"
 
 
@@ -231,20 +243,28 @@ class NormalizeCountryParityTest(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------------
-# Part 2: 055_findings_country_key.sql <-> grm_findings._COUNTRY_CODE_MAP parity.
+# Part 2: 057_grm_normalize_country_ddapi.sql (the *live* grm_normalize_country
+# body -- 055 superseded, see module docstring) <-> grm_findings._COUNTRY_CODE_MAP
+# parity.
 # ----------------------------------------------------------------------------
 
 
 class SqlPythonParityTest(unittest.TestCase):
     """The SQL CASE/WHEN mapping and the Python _COUNTRY_CODE_MAP dict must
-    encode the exact same (lowercased variant -> ISO2 code) pairs."""
+    encode the exact same (lowercased variant -> ISO2 code) pairs.
+
+    Parses 057 (not 055) because 057's `create or replace` is what actually
+    runs in production now -- 055's copy of the function body is a frozen
+    historical snapshot (see module docstring / 010-style supersede
+    convention), no longer the live definition.
+    """
 
     def setUp(self) -> None:
         self.assertTrue(
-            _COUNTRY_KEY_MIGRATION_PATH.is_file(),
-            f"missing {_COUNTRY_KEY_MIGRATION_PATH}",
+            _COUNTRY_KEY_EXT_MIGRATION_PATH.is_file(),
+            f"missing {_COUNTRY_KEY_EXT_MIGRATION_PATH}",
         )
-        self.sql = _COUNTRY_KEY_MIGRATION_PATH.read_text(encoding="utf-8")
+        self.sql = _COUNTRY_KEY_EXT_MIGRATION_PATH.read_text(encoding="utf-8")
         match = re.search(
             r"create or replace function public\.grm_normalize_country\(p_raw text\)"
             r".*?\$\$(.*?)\$\$;",
@@ -261,13 +281,11 @@ class SqlPythonParityTest(unittest.TestCase):
         )
 
     def test_sql_has_expected_pair_count(self) -> None:
-        # 84개 원문 변종(part 1의 _FIXTURES 개수) 중 4개는 대소문자만 다른 중복
-        # (CHINA/China, INDIA/India, TAIWAN/Taiwan, UNITED KINGDOM/United Kingdom)이라
-        # lower() 폴딩 이후에는 이미 같은 when 절 하나로 커버된다 -- 그래서 SQL 의
-        # 고유 when 절 수는 84 가 아니라 80 이다(47 개 코드, 코드당 1~5개 고유
-        # 소문자 변종). SqlPythonParityTest.test_sql_and_python_map_are_identical
-        # 이 이 80개가 파이썬 사전과 정확히 일치하는지 별도로 고정한다.
-        self.assertEqual(len(self.sql_pairs), 80)
+        # 055 시절 80개 고유 when 절(47 코드) + 057 이 추가한 27개 DDAPI 변종
+        # (6개는 기존 코드 재사용, 21개는 신규 코드) = 107개 고유 when 절, 68개
+        # 고유 코드. SqlPythonParityTest.test_sql_and_python_map_are_identical
+        # 이 이 107개가 파이썬 사전과 정확히 일치하는지 별도로 고정한다.
+        self.assertEqual(len(self.sql_pairs), 107)
 
     def test_sql_and_python_map_are_identical(self) -> None:
         sql_map = dict(self.sql_pairs)
@@ -278,13 +296,263 @@ class SqlPythonParityTest(unittest.TestCase):
         sql_codes = {code for _, code in self.sql_pairs}
         py_codes = set(grm_findings._COUNTRY_CODE_MAP.values())
         self.assertEqual(sql_codes, py_codes)
-        self.assertEqual(len(sql_codes), 47)
+        self.assertEqual(len(sql_codes), 68)
 
     def test_else_branch_returns_empty_string(self) -> None:
         self.assertIn("else ''", self.body)
 
+    def test_055_pairs_are_a_strict_subset_of_057_pairs(self) -> None:
+        # Regression guard: 057 must not have dropped or altered any of 055's
+        # original 80 pairs while appending the 27 new ones (a pure additive
+        # `create or replace`, never a narrowing one).
+        old_sql = _COUNTRY_KEY_MIGRATION_PATH.read_text(encoding="utf-8")
+        old_match = re.search(
+            r"create or replace function public\.grm_normalize_country\(p_raw text\)"
+            r".*?\$\$(.*?)\$\$;",
+            old_sql,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(old_match)
+        old_pairs = dict(
+            re.findall(r"when\s+'((?:[^'])*)'\s+then\s+'([A-Z]{2})'", old_match.group(1))
+        )
+        self.assertEqual(len(old_pairs), 80)
+        new_pairs = dict(self.sql_pairs)
+        for variant, code in old_pairs.items():
+            with self.subTest(variant=variant):
+                self.assertEqual(new_pairs.get(variant), code)
+
     def test_case_subject_lowercases_trims_and_collapses_whitespace(self) -> None:
         self.assertIn("lower(regexp_replace(trim(coalesce(p_raw, '')), '\\s+', ' ', 'g'))", self.body)
+
+
+# ----------------------------------------------------------------------------
+# Part 2b: 057_grm_normalize_country_ddapi.sql -- the 27-variant DDAPI
+# extension itself (offline text-contract checks + the Python function
+# against the 27 new fixtures + an offline snapshot of the full 62-country
+# DDAPI coverage that motivated this file).
+# ----------------------------------------------------------------------------
+
+# The 27 raw CountryName variants named in the task brief (== the migration's
+# (A) DDAPI block), each with its expected ISO2 code. 6 reuse an existing code
+# (KR/CZ/FI/IL/SI/NO); 21 are brand new.
+_DDAPI_NEW_FIXTURES: tuple[tuple[str, str], ...] = (
+    ("Korea (the Republic of)", "KR"),
+    ("Singapore", "SG"),
+    ("Czech Republic", "CZ"),
+    ("Finland", "FI"),
+    ("Israel", "IL"),
+    ("Brazil", "BR"),
+    ("Slovenia", "SI"),
+    ("Thailand", "TH"),
+    ("Malta", "MT"),
+    ("Argentina", "AR"),
+    ("Croatia", "HR"),
+    ("Hong Kong SAR", "HK"),
+    ("Norway", "NO"),
+    ("Colombia", "CO"),
+    ("New Zealand", "NZ"),
+    ("Bulgaria", "BG"),
+    ("Dominican Republic (the)", "DO"),
+    ("Latvia", "LV"),
+    ("Oman", "OM"),
+    ("Costa Rica", "CR"),
+    ("Egypt", "EG"),
+    ("Macao", "MO"),
+    ("Philippines", "PH"),
+    ("Uruguay", "UY"),
+    ("Aruba", "AW"),
+    ("Estonia", "EE"),
+    ("United Arab Emirates", "AE"),
+)
+
+# Offline snapshot (2026-08-11, control-tower fixture capture -- scratchpad
+# ddapi_gmp.json, POST inspections_classifications, ProductType=Drugs,
+# ProjectArea=='Drug Quality Assurance' filtered client-side, 6,417 rows) of
+# the full distinct CountryName set (62 names). 35 of these already matched
+# 055's original 80 pairs verbatim (no new mapping needed); the other 27 are
+# exactly _DDAPI_NEW_FIXTURES above. This constant pins that real-world
+# coverage claim without a live API call in CI.
+_DDAPI_ALL_62_COUNTRY_NAMES: frozenset[str] = frozenset(
+    {
+        "United States", "India", "China", "Germany", "Italy", "France",
+        "Canada", "Japan", "United Kingdom", "Spain", "Switzerland",
+        "Korea (the Republic of)", "Ireland", "Belgium", "Netherlands",
+        "Mexico", "Taiwan", "Denmark", "Sweden", "Australia", "Singapore",
+        "Czech Republic", "Austria", "Finland", "Israel", "Portugal",
+        "Brazil", "Greece", "Poland", "Turkey", "Slovenia", "Thailand",
+        "Malaysia", "Hungary", "Malta", "Argentina", "South Africa",
+        "Romania", "Croatia", "Norway", "Hong Kong SAR", "Colombia",
+        "New Zealand", "Bangladesh", "Vietnam", "Lithuania", "Oman",
+        "Dominican Republic (the)", "Latvia", "Bulgaria", "Egypt",
+        "Costa Rica", "Uruguay", "Philippines", "Macao", "Cyprus",
+        "United Arab Emirates", "Jordan", "Aruba", "Slovakia", "Estonia",
+        "Iceland",
+    }
+)
+
+
+class Ddapi057ExtensionTest(unittest.TestCase):
+    """057's 27-variant addition -- Python function behavior + the real-world
+    62-country coverage claim it exists to satisfy."""
+
+    def test_fixture_count_is_27(self) -> None:
+        self.assertEqual(len(_DDAPI_NEW_FIXTURES), 27)
+
+    def test_new_fixtures_map_correctly(self) -> None:
+        for raw, expected in _DDAPI_NEW_FIXTURES:
+            with self.subTest(raw=raw):
+                self.assertEqual(grm_findings.normalize_country(raw), expected)
+
+    def test_six_reused_codes_match_existing_055_variants(self) -> None:
+        # These 6 DDAPI names must resolve to the *same* code as an existing
+        # 055-era variant of the same country (proves "reuse", not a
+        # collision with an unrelated code).
+        reused = {
+            "Korea (the Republic of)": grm_findings.normalize_country("Korea"),
+            "Czech Republic": grm_findings.normalize_country("Czechia"),
+            "Finland": grm_findings.normalize_country("핀란드"),
+            "Israel": grm_findings.normalize_country("이스라엘"),
+            "Slovenia": grm_findings.normalize_country("슬로베니아"),
+            "Norway": grm_findings.normalize_country("노르웨이"),
+        }
+        for name, expected_code in reused.items():
+            with self.subTest(name=name):
+                self.assertEqual(grm_findings.normalize_country(name), expected_code)
+
+    def test_offline_country_name_snapshot_has_62_entries(self) -> None:
+        self.assertEqual(len(_DDAPI_ALL_62_COUNTRY_NAMES), 62)
+
+    def test_all_62_ddapi_country_names_map(self) -> None:
+        # The claim this whole migration exists to satisfy: 0 unmapped names
+        # left after the 27-variant extension.
+        unmapped = [
+            name
+            for name in _DDAPI_ALL_62_COUNTRY_NAMES
+            if grm_findings.normalize_country(name) == ""
+        ]
+        self.assertEqual(unmapped, [])
+
+    def test_62_names_split_is_35_preexisting_plus_27_new(self) -> None:
+        new_names = {raw for raw, _ in _DDAPI_NEW_FIXTURES}
+        preexisting = _DDAPI_ALL_62_COUNTRY_NAMES - new_names
+        self.assertEqual(len(preexisting), 35)
+        self.assertEqual(new_names, _DDAPI_ALL_62_COUNTRY_NAMES - preexisting)
+
+
+class Ddapi057MigrationFileTest(unittest.TestCase):
+    """057_grm_normalize_country_ddapi.sql -- offline text-contract checks."""
+
+    def setUp(self) -> None:
+        self.assertTrue(
+            _COUNTRY_KEY_EXT_MIGRATION_PATH.is_file(),
+            f"missing {_COUNTRY_KEY_EXT_MIGRATION_PATH}",
+        )
+        self.sql = _COUNTRY_KEY_EXT_MIGRATION_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _COUNTRY_KEY_EXT_MIGRATION_PATH.read_bytes())
+
+    def test_signature_unchanged_from_055(self) -> None:
+        # Same (schema, name, arg types) as 055 -- proves this is a body-only
+        # `create or replace`, not a new overload (the exact failure mode the
+        # MEMORY warns about: "create or replace 로 파라미터를 추가하면 오버로드").
+        self.assertIn(
+            "create or replace function public.grm_normalize_country(p_raw text)\n"
+            "returns text\nlanguage sql\nimmutable\nset search_path = public",
+            self.sql,
+        )
+
+    def test_documents_pg_depend_oid_verification(self) -> None:
+        # This migration's header must show its work: it claims to have
+        # directly verified (not assumed) that the generated column survives
+        # a body-only replace, via pg_depend / OID inspection on the live DB.
+        #
+        # ★2026-08-12: this test used to pin "17792" as "the actual OID
+        # observed live" -- but 17792 is the OID of the *findings table*
+        # (pg_class), not of the function (pg_proc, oid 30300). The header
+        # misread its own pg_depend output and this test froze the wrong
+        # number permanently. Verified live:
+        #   select oid from pg_proc  where proname='grm_normalize_country' -> 30300
+        #   select relname from pg_class where oid=17792                   -> 'findings'
+        # The conclusion (same signature => OID preserved => no column
+        # rebuild) is unchanged; only the cited evidence was wrong.
+        self.assertIn("pg_depend", self.sql)
+        self.assertIn("30300", self.sql)  # pg_proc OID, verified live 2026-08-12
+        self.assertIn("deptype='n'", self.sql.replace(" ", ""))
+        # And the correction itself must stay in the header so the next reader
+        # does not "re-discover" 17792 from an old transcript and re-add it.
+        self.assertIn("17792", self.sql)
+        self.assertIn("pg_class", self.sql)
+
+    def test_documents_zero_row_backfill_measurement(self) -> None:
+        # The header must state the measured (not assumed) backfill impact.
+        self.assertIn("0건", self.sql)
+        self.assertIn("26,499", self.sql)
+
+    def test_no_regrant_statements(self) -> None:
+        # Signature unchanged -> grants from 055 carry over; this file must
+        # not re-declare revoke/grant (and must say so, so a reviewer doesn't
+        # mistake the omission for a gap).
+        self.assertNotIn("revoke all on function public.grm_normalize_country", self.sql)
+        self.assertNotIn("grant execute on function public.grm_normalize_country", self.sql)
+        self.assertIn("재부여 불필요", self.sql)
+
+    def test_backfill_touch_update_present_and_scoped(self) -> None:
+        self.assertIn(
+            "update public.findings\n"
+            "   set site_country = site_country\n"
+            " where site_country <> ''\n"
+            "   and country_key = '';",
+            self.sql,
+        )
+
+    def test_does_not_touch_other_055_objects(self) -> None:
+        # 057 must be a pure function-body replace + backfill -- it must not
+        # redefine findings_zone_category, findings_country_unmapped, or
+        # findings_search (those stay owned by 055/056).
+        for fn in (
+            "findings_zone_category(",
+            "findings_country_unmapped(",
+            "findings_search(",
+        ):
+            self.assertNotIn(f"create or replace function public.{fn}", self.sql)
+
+    def test_no_plpgsql_do_blocks_or_declared_variables(self) -> None:
+        self.assertNotIn("do $$", self.code.lower())
+        self.assertNotIn("declare", self.code.lower())
+
+    def test_no_array_slice_syntax(self) -> None:
+        self.assertNotIn("[1:", self.code)
+
+    def test_supersede_chain_documented(self) -> None:
+        self.assertIn("grm_normalize_country = 055 → **이 파일(057)**", self.sql)
+
+
+class SupersedeNoteAddedTo055Test(unittest.TestCase):
+    """055's own file must carry a short pointer to 057 (010/013/029
+    convention: never edit the superseded body, just add a header note)."""
+
+    def setUp(self) -> None:
+        self.sql = _COUNTRY_KEY_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_055_header_points_to_057(self) -> None:
+        self.assertIn("057_grm_normalize_country_ddapi.sql", self.sql)
+        self.assertIn("supersede", self.sql.lower())
+
+    def test_055_original_80_pair_function_body_still_present_verbatim(self) -> None:
+        # 055's own copy of the (now-superseded) function body must be
+        # untouched -- git-history / rollback record, per repo convention.
+        match = re.search(
+            r"create or replace function public\.grm_normalize_country\(p_raw text\)"
+            r".*?\$\$(.*?)\$\$;",
+            self.sql,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(match)
+        pairs = re.findall(r"when\s+'((?:[^'])*)'\s+then\s+'([A-Z]{2})'", match.group(1))
+        self.assertEqual(len(pairs), 80)
 
 
 # ----------------------------------------------------------------------------

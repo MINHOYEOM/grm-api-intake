@@ -294,6 +294,8 @@ flowchart TD
 ### 4.5 트렌드 대시보드 (`/findings/trends/`, F3b·H1)
 `web/templates/trends.html` + `web/assets/trends.js`가 집계 RPC를 직접 fetch해 그리는 통계 페이지입니다. 렌더러는 빈 셸만 결정론적으로 출력하고 실데이터는 클라이언트 JS가 채웁니다(env 미설정 시 "준비 중" 안내로 조용히 종료). 각 RPC는 **독립 promise 체인**이라 하나가 실패해도(미적용 라이브의 404 포함) 그 섹션만 hidden 으로 남고 나머지는 정상 렌더됩니다.
 
+"먼저 알아두세요" 노트 바로 뒤, ①보다 앞에 **FDA 의약품 GMP 실사 등급**(058, 임무3) 맥락 섹션이 하나 더 있습니다. `fda_inspection_stats()`(파라미터 없음)는 findings 계열 RPC 전부와 무관한 별도 소스(`public.fda_inspections` — FDA Data Dashboard API `inspections_classifications`를 원본 그대로 옮긴 표, ProjectArea='Drug Quality Assurance' GMP 실사만·임상시험 감시 등 성격이 다른 모집단은 제외)입니다. findings 는 "지적사항"(문장) 단위, 이 RPC 는 "실사 건"(NAI/VAI/OAI 등급 하나) 단위라 findings 총계를 나누는 분모로 계산하지 않고, FDA 의약품 GMP 실사 모집단 자체의 크기·중대(OAI) 비중·연도별 등급 구성·국가별 구성(한국 강조)을 findings 옆에 나란히 보여주는 맥락으로 둡니다. 범위 고지(project_area/excluded_project_areas/fiscal_year 범위)는 하드코딩하지 않고 RPC 응답 `scope`를 그대로 읽어 화면에 적습니다. 0건·058 미적용 라이브에서는 섹션 자체를 그리지 않습니다(빈 껍데기 금지).
+
 페이지는 두 구간으로 나뉩니다.
 
 **① 최근 12개월(041)** — 누적 분모의 47%가 2024년 한 해 공개분(FOIA 대량 배치)이라, 전 기간 순위는 사실상 그 배치의 그림자였습니다. `findings_recent_window(p_months)`(041)가 최근 N개월 창과 **직전 동일 길이 창**을 월 경계로 잘라 카테고리/소스/월별 집계를 함께 돌려줍니다. 이 응답 하나로 세 가지를 그립니다.

@@ -75,9 +75,42 @@ jobs:
                    --jq "[.[] | select(.title == \"$QUARANTINE_ISSUE_TITLE\")] | length")
           if [ "$OPEN" -gt 0 ]; then
             printf 'run=true\nreason=복구 모드(격리 이슈 열림)\n' >> "$GITHUB_OUTPUT"
-          else
-            printf 'run=false\nreason=평일이고 격리 없음 — 건너뜀\n' >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          # ★주간 결손 복구(2026-08-11 신설). 위 격리 복구는 "수집기가 **실패**했을 때"만
+          #   돈다. 그런데 자료실이 한 주를 통째로 거르는 더 흔한 경로는 실패가 아니라
+          #   **월요일 정기 실행이 아예 안 도는 것**이다:
+          #     · 월요일 크론이 늦게 떠 KST 로 화요일이 돼버림(이 저장소는 "월요일 크론 수
+          #       시간 지각"을 이미 겪었다) → 위 요일 검사에 안 걸림
+          #     · 러너 장애·워크플로 취소 등으로 실행 자체가 없음
+          #   둘 다 격리 이슈를 남기지 않으므로 종전 로직은 그대로 7일을 굳혔다. 실제로
+          #   2026-08-11 에 이 경로로 한 주가 빌 뻔했고 사람이 손으로 돌려 메웠다.
+          #
+          #   판정 근거 = `web/data/library_staging_diff.json` 의 `generated_on`. 이 파일은
+          #   **갱신이 실제로 돌 때마다 커밋**되므로(무변경 주에도 generated_on 이 바뀌어
+          #   커밋된다) "마지막으로 갱신이 돈 날"의 신뢰할 수 있는 표식이다. 별도 상태
+          #   파일을 새로 만들지 않는다.
+          DOW=$(TZ='Asia/Seoul' date +%u)
+          MONDAY=$(TZ='Asia/Seoul' date -d "-$((DOW - 1)) days" +%F)
+          # gh 내장 --jq 를 쓴다(외부 jq 의존 없음 — 테스트에서 gh 만 스텁하면 된다).
+          LAST=$(gh api "repos/$GRM_REPO/contents/web/data/library_staging_diff.json" \
+                   -H "Accept: application/vnd.github.raw" \
+                   --jq '.generated_on // ""' 2>/dev/null || true)
+          if [ -z "$LAST" ]; then
+            # ★읽기 실패를 "결손"으로 단정하지 않는다 — 그러면 매일 돌아 PR 소음이 된다.
+            #   다만 조용히 넘기지도 않는다(침묵 실패 금지): 경고를 남기고 건너뛴다.
+            #   월요일 정기 실행은 이 판정과 무관하게 그대로 돌므로 최악이어도 종전 동작이다.
+            echo "::warning title=자료실 주간 결손 판정 불가::library_staging_diff.json 의 generated_on 을 읽지 못했습니다 — 안전하게 건너뜁니다(월요일 정기 실행은 그대로)."
+            printf 'run=false\nreason=주간 갱신 이력 확인 실패 — 안전하게 건너뜀\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$LAST" < "$MONDAY" ]]; then
+            printf 'run=true\nreason=주간 결손 복구(마지막 갱신 %s < 이번 주 월요일 %s)\n' \
+              "$LAST" "$MONDAY" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          printf 'run=false\nreason=평일·격리 없음·이번 주 갱신 완료(%s) — 건너뜀\n' \
+            "$LAST" >> "$GITHUB_OUTPUT"
       - name: Summary
         env:
           DECISION: ${{ steps.check.outputs.run }}

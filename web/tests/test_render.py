@@ -6622,6 +6622,97 @@ class WebGlossaryRenderTest(unittest.TestCase):
                          (out2 / "glossary" / "index.html").read_bytes(), "비결정론 렌더")
 
 
+class WebGlossaryTermPageTest(unittest.TestCase):
+    """[용어사전 낱개 — 검색 유입 트랙] /glossary/{id}/ 용어당 1 페이지.
+
+    색인 1페이지만 있으면 226 어가 URL 하나에 묶여 "OOS 뜻" 같은 실제 검색어에 걸릴
+    대상이 없다. 이 클래스는 **정본(glossary.json)에서 파생해** 검사한다 — 용어 목록을
+    손으로 적지 않는다(손목록은 반드시 낡는다). 정본에 용어가 추가되면 이 테스트가 그
+    페이지의 부재를 자동으로 잡는다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glossterm_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.root = cls.single / "glossary"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _page(self, term_id: str) -> str:
+        return (self.root / term_id / "index.html").read_text(encoding="utf-8")
+
+    def test_every_term_has_a_page(self):
+        missing = [t["id"] for t in self.terms
+                   if not (self.root / t["id"] / "index.html").exists()]
+        self.assertEqual(missing, [], f"용어 페이지 누락: {missing}")
+
+    def test_no_orphan_pages(self):
+        """정본에 없는 페이지가 남아 있으면 안 된다(삭제된 용어의 유령 페이지 차단)."""
+        known = {t["id"] for t in self.terms}
+        orphans = sorted(d.name for d in self.root.iterdir()
+                         if d.is_dir() and d.name not in known)
+        self.assertEqual(orphans, [], f"정본에 없는 용어 페이지: {orphans}")
+
+    def test_headword_and_canonical_verbatim(self):
+        from markupsafe import escape as _esc
+        for t in self.terms:
+            html = self._page(t["id"])
+            self.assertIn(str(_esc(t["term_ko"])), html, f'표제어 누락: {t["id"]}')
+            self.assertIn(f'{render.SITE_BASE_URL}/glossary/{t["id"]}/', html,
+                          f'canonical 누락: {t["id"]}')
+
+    def test_sitemap_lists_every_term(self):
+        for t in self.terms:
+            self.assertIn(
+                f'<loc>{render.SITE_BASE_URL}/glossary/{t["id"]}/</loc>', self.sitemap,
+                f'sitemap 미등록: {t["id"]}')
+
+    def test_json_ld_is_defined_term(self):
+        """검색엔진에 '사전 항목'임을 알리는 구조화데이터 — 파싱 가능한 JSON 이어야 한다."""
+        for t in self.terms[:12]:            # 전수는 느리다 — 스키마 형태만 표본 검증
+            node = json.loads(render.build_glossary_term_json_ld(t))
+            self.assertEqual(node["@type"], "DefinedTerm")
+            self.assertEqual(node["name"], t["term_ko"])
+            self.assertEqual(node["inLanguage"], "ko")
+            self.assertEqual(node["url"],
+                             f'{render.SITE_BASE_URL}/glossary/{t["id"]}/')
+
+    def test_description_derived_from_easy_ko(self):
+        """description 은 생성하지 않고 정본을 자른다 — 상한 준수 + 접두 일치."""
+        for t in self.terms:
+            desc = render.glossary_term_description(t)
+            self.assertTrue(desc, f'description 비어 있음: {t["id"]}')
+            self.assertLessEqual(len(desc), render._GLOSSARY_META_MAX + 1,
+                                 f'description 상한 초과: {t["id"]}')
+            self.assertTrue(" ".join(t["easy_ko"].split()).startswith(desc[:20]),
+                            f'description 이 정본 접두가 아님: {t["id"]}')
+
+    def test_related_links_point_to_term_pages(self):
+        """관련 용어는 색인 앵커(#id)가 아니라 낱개 페이지로 가야 한다(내부 링크 = 색인 경로)."""
+        checked = 0
+        for t in self.terms:
+            for rid in t.get("related", []):
+                if any(x["id"] == rid for x in self.terms):
+                    self.assertIn(f'href="../../glossary/{rid}/"', self._page(t["id"]),
+                                  f'{t["id"]} → {rid} 관련 링크가 낱개 페이지를 가리키지 않음')
+                    checked += 1
+        self.assertGreater(checked, 0, "관련 용어 링크가 하나도 검사되지 않았다(배선 확인)")
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        sample = self.terms[0]["id"]
+        self.assertEqual((self.root / sample / "index.html").read_bytes(),
+                         (out2 / "glossary" / sample / "index.html").read_bytes(),
+                         "비결정론 렌더")
+
+
 class WebGlossaryDeepFieldsTest(unittest.TestCase):
     """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
     참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔

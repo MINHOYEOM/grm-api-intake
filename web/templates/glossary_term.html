@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 용어사전 낱개 페이지(검색 유입 트랙) — /glossary/{id}/ 하나당 한 용어.
+    목적은 색인이다: `/glossary/` 한 페이지에 226어가 묶여 있으면 검색엔진이 볼 수 있는
+    URL 이 1개뿐이라 "OOS 뜻"·"CAPA 란" 같은 실제 검색어에 걸릴 대상이 없다.
+
+    값은 무변형 — 뷰모델(build_glossary_view)이 색인 페이지에 주는 것과 **같은 객체**를
+    쓴다(별도 가공 0). 파생은 링크 조립뿐. 색인 페이지가 정본이고 여기는 그 투영이다.
+
+    grm.css 프리즈 보존을 위해 스코프 <style>(색인 페이지 .gl-* 와 클래스 공간 분리 —
+    여기 것은 .gt-*). §4 한글 안전 가드는 **인라인 스타일에 letter-spacing/text-transform
+    문자열 자체를 금지**한다(선택자가 ASCII 전용인지 판별하지 않는다 — 판별을 허용하면
+    가드가 무력해진다). eyebrow 는 그래서 자체 스타일을 만들지 않고 grm.css 전역 `.kick`
+    을 그대로 쓴다(색인 페이지 glossary.html 과 동일). -#}
+<style>
+  .gt-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .gt-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .gt-crumb a:hover{color:var(--coral)}
+  .gt-crumb i{font-style:normal;color:var(--line-2)}
+  .gt-head{margin-top:14px}
+  .gt-h1{font-family:var(--serif);font-size:clamp(28px,4.2vw,42px);line-height:1.22;color:var(--ink);margin:10px 0 0;word-break:keep-all}
+  .gt-en{display:block;font-family:var(--mono);font-size:14.5px;color:var(--muted);margin-top:12px}
+  .gt-alias{margin:12px 0 0;display:flex;gap:7px;flex-wrap:wrap}
+  .gt-alias b{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;align-self:center}
+  .gt-alias span{font-family:var(--sans);font-size:12.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:2px 11px}
+  .gt-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
+  .gt-lede{font-family:var(--serif);font-size:19.5px;line-height:1.62;color:var(--ink);margin:0;word-break:keep-all}
+  .gt-sec{border-top:1px solid var(--line);padding-top:22px}
+  .gt-sec-h{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500}
+  .gt-detail{font-family:var(--sans);font-size:16px;line-height:1.78;color:var(--body);margin:0;word-break:keep-all}
+  .gt-links{display:flex;flex-wrap:wrap;gap:8px}
+  .gt-links a,.gt-links span{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .gt-links a:hover{border-color:var(--coral);color:var(--coral)}
+  .gt-src a{font-family:var(--sans);font-size:14px;color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:break-word}
+  .gt-src a:hover{color:var(--coral)}
+  .gt-case{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
+  .gt-case:hover{background:var(--coral-2)}
+  .gt-case b{font-weight:600}
+  .gt-foot{margin-top:40px;border-top:1px solid var(--line);padding-top:20px}
+  .gt-foot a{font-family:var(--sans);font-size:14px;color:var(--coral);text-decoration:none}
+  .gt-foot a:hover{color:var(--coral-2)}
+</style>
+<main>
+  <div class="wrap gt-head">
+    <nav class="gt-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}glossary/">규제 용어사전</a><i>&rsaquo;</i><span>{{ term.term_ko }}</span>
+    </nav>
+    <p class="kick">Glossary</p>
+    <h1 class="gt-h1">{{ term.term_ko }}<span class="gt-en">{{ term.term_en }}</span></h1>
+    {% if term.aliases %}
+    <p class="gt-alias"><b>다른 표기</b>{% for a in term.aliases %}<span>{{ a }}</span>{% endfor %}</p>
+    {% endif %}
+  </div>
+
+  <div class="wrap gt-body">
+    <p class="gt-lede">{{ term.easy_ko }}</p>
+
+    {% if term.detail_ko %}
+    <section class="gt-sec">
+      <h2 class="gt-sec-h">자세히</h2>
+      <p class="gt-detail">{{ term.detail_ko }}</p>
+    </section>
+    {% endif %}
+
+    {% if term.reg_refs %}
+    <section class="gt-sec">
+      <h2 class="gt-sec-h">관련 조항</h2>
+      <div class="gt-links">
+        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span>{{ r.label }}</span>{% endif %}{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if term.related %}
+    <section class="gt-sec">
+      <h2 class="gt-sec-h">함께 보면 좋은 용어</h2>
+      <div class="gt-links">
+        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}</a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if term.case_href %}
+    <section class="gt-sec">
+      <h2 class="gt-sec-h">실제 지적 사례</h2>
+      <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">이 용어로 찾은 지적사례 <b>{{ term.case_count_label }}</b>건 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+    </section>
+    {% endif %}
+
+    <section class="gt-sec gt-src">
+      <h2 class="gt-sec-h">출처</h2>
+      {%- if term.source_url %}
+      <a href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
+      {%- else %}
+      <span class="gt-detail">{{ term.definition_source }}</span>
+      {%- endif %}
+    </section>
+
+    <div class="gt-foot">
+      <a href="{{ rel_root }}glossary/">&larr; 규제 용어사전 전체 보기</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

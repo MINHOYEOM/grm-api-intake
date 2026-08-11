@@ -1272,6 +1272,31 @@ def build_glossary_view(
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
 
 
+# ── [용어사전 낱개] 검색 유입용 per-term 페이지의 SEO 파생(결정론 — 값 무변형 절단·조립) ──
+# 색인 페이지 1건으로는 226 어가 URL 하나에 묶여 "OOS 뜻" 같은 실제 검색어에 걸릴 대상이
+# 없다. 용어당 페이지를 내고 각각에 description·JSON-LD 를 준다. 문구는 **생성하지 않고**
+# 정본(easy_ko)을 자른다 — LLM 슬롯 아님.
+_GLOSSARY_META_MAX = 155
+
+
+def glossary_term_description(term: dict[str, Any]) -> str:
+    """meta description — easy_ko 를 어절 경계에서 절단(정본 무변형·now()/난수 0).
+
+    155 자를 넘으면 마지막 공백까지만 남기고 말줄임표를 붙인다. 공백이 없으면(붙여쓴 긴
+    한 덩어리) 그냥 자른다 — 한글은 어절이 짧아 실제로는 거의 항상 공백이 있다.
+    """
+    text = " ".join((term.get("easy_ko") or "").split())
+    if len(text) <= _GLOSSARY_META_MAX:
+        return text
+    cut = text[:_GLOSSARY_META_MAX]
+    head, sep, _ = cut.rpartition(" ")
+    return (head if sep else cut).rstrip(" ,·") + "…"
+
+
+# build_glossary_term_json_ld 는 SITE_BASE_URL 정의 이후(SEO 섹션)에 있다 — 기본 인자로
+# 모듈 상수를 쓰기 때문에 정의 순서가 강제된다.
+
+
 # ── [주간 퀴즈] 문항 뱅크 로드·뷰모델(결정론 — 값 무변형, 파생은 근거 링크/라벨뿐) ────
 # "이번 주" 문항 선택은 렌더러가 하지 않는다(now() 금지·결정론 불가침). 렌더러는 정본
 # 뱅크 전 문항을 순서 그대로 페이지에 embed 하고, 클라이언트(assets/quiz.js)가 ISO 주차
@@ -1548,7 +1573,8 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
 
 
 def build_sitemap_xml(briefs: list[dict[str, Any]],
-                      base_url: str = SITE_BASE_URL) -> str:
+                      base_url: str = SITE_BASE_URL,
+                      glossary_term_ids: "list[str] | None" = None) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
@@ -1580,6 +1606,11 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # 분리된 상설 참조 콘텐츠라 lastmod 는 생략(정적 커밋 데이터).
         f"  <url><loc>{base_url}/guide/</loc></url>",
         f"  <url><loc>{base_url}/glossary/</loc></url>",
+        # [용어사전 낱개] 색인 페이지 1건만 등록하면 226 어가 URL 하나에 묶여 검색 대상이
+        # 되지 못한다("OOS 뜻"·"CAPA 란"). 용어당 URL 을 등록해 각 용어가 독립 색인 대상이
+        # 되게 한다. id 는 glossary.json 정본의 slug(ASCII·검증됨)라 XML 무변형 결합.
+        *(f"  <url><loc>{base_url}/glossary/{tid}/</loc></url>"
+          for tid in (glossary_term_ids or [])),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
     ]
@@ -1588,6 +1619,31 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
             f"  <url><loc>{base_url}/briefs/{pub}/</loc><lastmod>{pub}</lastmod></url>")
     lines.append("</urlset>")
     return "\n".join(lines) + "\n"
+
+
+def build_glossary_term_json_ld(term: dict[str, Any],
+                                base_url: str = SITE_BASE_URL) -> str:
+    """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
+
+    inLanguage=ko. `name` 은 한글 표제어, `alternateName` 은 영문 표제어(+동의어).
+    값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
+    """
+    alt = [term["term_en"], *term.get("aliases", [])]
+    node: dict[str, Any] = {
+        "@context": "https://schema.org",
+        "@type": "DefinedTerm",
+        "name": term["term_ko"],
+        "alternateName": [a for a in alt if a],
+        "description": term.get("easy_ko") or "",
+        "inLanguage": "ko",
+        "url": f"{base_url}/glossary/{term['id']}/",
+        "inDefinedTermSet": {
+            "@type": "DefinedTermSet",
+            "name": "GRM 규제 용어사전",
+            "url": f"{base_url}/glossary/",
+        },
+    }
+    return json.dumps(node, ensure_ascii=False, sort_keys=True)
 
 
 # ── SEO 메타·구조화데이터(description·canonical·OG·JSON-LD — 정적·결정론·한글안전) ──
@@ -1989,7 +2045,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.
     # nav_active="glossary"(8차 웨이브 A 2026-07-18 — nav 에 용어사전 전용 탭 신설).
     glossary_terms = load_glossary()
+    glossary_term_ids: list[str] = []
     if glossary_terms:
+        # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
+        # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
+        glossary_view = build_glossary_view(
+            glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases())
         glossary_html = env.get_template("glossary.html").render(
             page_title="규제 용어사전 · GRM",
             rel_root="../",
@@ -1997,12 +2058,31 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             latest_slug=latest_slug,
             description=GLOSSARY_DESCRIPTION,
             canonical=_abs_url("glossary/"),
-            # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
-            # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
-            glossary=build_glossary_view(glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases()),
+            glossary=glossary_view,
         )
         _write(out_dir / "glossary" / "index.html", glossary_html)
         written.append("glossary/index.html")
+
+        # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
+        # 재사용한다(별도 가공 0 → 두 화면이 갈라질 수 없다). 정렬은 뷰모델 순서 그대로라
+        # 결정론이고, sitemap 도 이 순서를 쓴다.
+        #   · title 은 "{한글}({영문}) 뜻" — 실제 검색어 형태("OOS 뜻")에 맞춘다.
+        #   · rel_root 는 두 단계 위(`/glossary/{id}/` → 사이트 루트).
+        for group in glossary_view["groups"]:
+            for term in group["terms"]:
+                term_html = env.get_template("glossary_term.html").render(
+                    page_title=f"{term['term_ko']}({term['term_en']}) 뜻 · GRM 규제 용어사전",
+                    rel_root="../../",
+                    nav_active="glossary",
+                    latest_slug=latest_slug,
+                    description=glossary_term_description(term),
+                    canonical=_abs_url(f"glossary/{term['id']}/"),
+                    json_ld=build_glossary_term_json_ld(term),
+                    term=term,
+                )
+                _write(out_dir / "glossary" / term["id"] / "index.html", term_html)
+                written.append(f"glossary/{term['id']}/index.html")
+                glossary_term_ids.append(term["id"])
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
@@ -2084,7 +2164,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
-    _write(out_dir / "sitemap.xml", build_sitemap_xml(briefs))
+    _write(out_dir / "sitemap.xml",
+           build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids))
     written.append("sitemap.xml")
 
     return {"out_dir": str(out_dir), "written": written,

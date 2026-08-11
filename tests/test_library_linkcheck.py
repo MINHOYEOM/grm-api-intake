@@ -71,19 +71,28 @@ class LibraryLinkcheckTest(unittest.TestCase):
         self.assertEqual(result.attempts, 2)
         self.assertEqual(sleeps, [2, 2, 2, 2])
 
-    def test_fda_403_and_network_failure_are_review_not_broken(self):
-        for side_effect in (
-            [_Response(403), _Response(403), _Response(403), _Response(403)],
-            [requests.Timeout(), requests.Timeout(), requests.Timeout(), requests.Timeout()],
-        ):
-            session = mock.MagicMock()
-            session.request.side_effect = side_effect
-            result = lc.probe_url(
-                "https://www.fda.gov/a", session=session, delay=0, timeout=3,
-                sleeper=lambda _x: None,
-            )
-            self.assertEqual(result.status, "needs_review")
-            self.assertIn("suspected_bot_block", result.reason)
+    def test_fda_403_is_blocked_and_network_failure_is_review(self):
+        """★403 과 타임아웃은 **다른 사실**이다. 403 은 차단의 적극적 증거라 blocked,
+        타임아웃은 그냥 못 닿은 것이라 needs_review — 후자를 blocked 에 넣으면 '확인 못 한 게
+        정상'이라는 통에 진짜 네트워크 장애가 섞여 묻힌다."""
+        session = mock.MagicMock()
+        session.request.side_effect = [_Response(403)] * 4
+        blocked = lc.probe_url(
+            "https://www.fda.gov/a", session=session, delay=0, timeout=3,
+            sleeper=lambda _x: None,
+        )
+        self.assertEqual(blocked.status, "blocked")
+        self.assertIn("suspected_bot_block", blocked.reason)
+
+        session = mock.MagicMock()
+        session.request.side_effect = [requests.Timeout()] * 4
+        flaky = lc.probe_url(
+            "https://www.fda.gov/a", session=session, delay=0, timeout=3,
+            sleeper=lambda _x: None,
+        )
+        self.assertEqual(flaky.status, "needs_review")
+        self.assertIn("network_or_tls", flaky.reason)
+        self.assertNotIn("suspected_bot_block", flaky.reason)
 
     def test_404_is_broken_even_on_canada(self):
         session = mock.MagicMock()
@@ -110,7 +119,7 @@ class LibraryLinkcheckTest(unittest.TestCase):
         self.assertEqual(result.status, "ok")
         self.assertEqual(session.request.call_count, 2)  # HEAD + GET, HEAD 단독 종료 금지
 
-    def test_disguised_block_via_off_host_redirect_is_needs_review(self):
+    def test_disguised_block_via_off_host_redirect_is_blocked(self):
         """ecfr.gov 실측 그대로: HEAD/GET 모두 200 이지만 최종 URL 이 완전히 다른
         호스트(unblock.federalregister.gov)로 튄다 — ok 로 단정하면 안 된다."""
         session = mock.MagicMock()
@@ -121,11 +130,11 @@ class LibraryLinkcheckTest(unittest.TestCase):
             "https://www.ecfr.gov/current/title-21/part-211/section-211.192",
             session=session, delay=0, timeout=3, sleeper=lambda _x: None,
         )
-        self.assertEqual(result.status, "needs_review")
+        self.assertEqual(result.status, "blocked")
         self.assertIn("suspected_bot_block", result.reason)
         self.assertIn("redirected_off_host", result.reason)
 
-    def test_disguised_block_via_body_markers_same_host_is_needs_review(self):
+    def test_disguised_block_via_body_markers_same_host_is_blocked(self):
         """호스트는 안 바뀌어도(같은 호스트) 본문이 전형적 차단 페이지 문구면 의심한다."""
         session = mock.MagicMock()
         session.request.return_value = _Response(
@@ -136,7 +145,7 @@ class LibraryLinkcheckTest(unittest.TestCase):
             "https://www.fda.gov/a", session=session, delay=0, timeout=3,
             sleeper=lambda _x: None,
         )
-        self.assertEqual(result.status, "needs_review")
+        self.assertEqual(result.status, "blocked")
         self.assertIn("content_block_page", result.reason)
 
     def test_genuine_bot_sensitive_200_with_body_stays_ok(self):
@@ -155,3 +164,68 @@ class LibraryLinkcheckTest(unittest.TestCase):
 
     def test_bot_sensitive_host_registry_includes_ecfr(self):
         self.assertIn("ecfr.gov", lc.BOT_SENSITIVE_HOSTS)
+
+
+class BlockedStatusSeparationTest(unittest.TestCase):
+    """★2026-08-11 신설. `blocked`("검사기가 막혀 확인 못 함")를 `needs_review`("링크가
+    수상하니 사람이 보라")에서 분리했다. 계기: 21 CFR 63건이 러너에서 전부
+    unblock.federalregister.gov 로 리다이렉트됐는데, 사람이 브라우저로 누르면 정상이고
+    수집기도 eCFR API 로 63건을 정상 수집한다 — 링크는 멀쩡하고 검사기만 못 본다.
+    합쳐 두면 매주 63건이 진짜 신호(MFDS 5xx 90건)를 덮는다."""
+
+    def _probe(self, url, response):
+        session = mock.MagicMock()
+        session.request.return_value = response
+        return lc.probe_url(url, session=session, delay=0, timeout=3, sleeper=lambda _x: None)
+
+    def test_four_distinct_statuses_exist(self):
+        """네 값은 서로 다른 사실이고 조치도 다르다 — 어휘가 줄어들면 진단이 뭉개진다."""
+        ok = self._probe("https://example.test/a", _Response(200))
+        broken = self._probe("https://example.test/a", _Response(404))
+        blocked = self._probe(
+            "https://www.ecfr.gov/current/x",
+            _Response(200, url="https://unblock.federalregister.gov/"))
+        review = self._probe("https://example.test/a", _Response(503))
+        self.assertEqual(
+            [ok.status, broken.status, blocked.status, review.status],
+            ["ok", "broken", "blocked", "needs_review"])
+
+    def test_summary_reports_blocked_separately_from_needs_review(self):
+        """report.summary 가 두 축을 따로 센다 — 합산하면 분리한 의미가 사라진다."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "cfr.json").write_text(json.dumps({"items": [
+                {"id": "cfr-211-192", "official_url": "https://www.ecfr.gov/current/a"},
+            ]}), encoding="utf-8")
+            (root / "x.json").write_text(json.dumps({"items": [
+                {"id": "x1", "official_url": "https://example.test/flaky"},
+            ]}), encoding="utf-8")
+
+            def fake_probe(url, **_kw):
+                if "ecfr.gov" in url:
+                    return lc.Probe("blocked", 206, "GET", 1,
+                                    "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
+                                    "https://unblock.federalregister.gov")
+                return lc.Probe("needs_review", 503, "GET", 2,
+                                "transient_or_access_control:http_503", url)
+
+            with mock.patch.object(lc, "probe_url", side_effect=fake_probe):
+                report = lc.build_report(root, delay=0, timeout=3, max_workers=2)
+
+        summary = report["summary"]
+        self.assertEqual(summary["blocked"], 1)
+        self.assertEqual(summary["needs_review"], 1)
+        self.assertEqual(summary["broken"], 0)
+        # 봇차단 1건이 needs_review 에 섞여 들어가지 않았는지(합산 금지)를 못 박는다.
+        self.assertNotEqual(summary["needs_review"], 2)
+
+    def test_schema_version_declares_the_new_vocabulary(self):
+        """옛 스냅샷과 needs_review 카운트를 직접 비교하면 안 되므로 버전으로 알린다."""
+        self.assertEqual(lc.SCHEMA_VERSION, "grm-library-health/v2")
+
+    def test_blocked_never_hides_a_dead_link(self):
+        """봇 민감 호스트라도 404/410 은 blocked 가 아니라 broken 이다 — 죽은 링크가
+        '차단이라 확인 못 함'으로 위장되면 영영 안 고쳐진다."""
+        for code in (404, 410):
+            result = self._probe("https://www.ecfr.gov/current/gone", _Response(code))
+            self.assertEqual(result.status, "broken", code)

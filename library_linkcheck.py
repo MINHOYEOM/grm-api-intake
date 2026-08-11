@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""Polite, non-destructive health check for the GRM library catalogue URLs."""
+"""Polite, non-destructive health check for the GRM library catalogue URLs.
+
+상태 어휘(`urls[].status`) — 네 값은 **서로 다른 사실**이고 조치도 다르다:
+  ok           도달 확인. 조치 없음.
+  broken       404/410 등 링크가 실제로 죽음. **이것만 운영 이슈를 연다**(워크플로가 필터).
+  needs_review 일시 오류·접근 제어(5xx·타임아웃 등). 사람이 보고 판단할 것.
+  blocked      **검사기가 봇 방어에 막혀 확인 자체를 못 함.** 링크가 나쁘다는 뜻이 아니다.
+
+★`blocked` 를 2026-08-11 에 `needs_review` 에서 분리했다. 계기: 21 CFR 63건이 GitHub
+  Actions 러너에서 전부 `unblock.federalregister.gov` 로 리다이렉트됐다(미국 정부가 러너
+  IP 를 봇으로 차단). 그런데 사람이 브라우저로 누르면 정상이고, 수집기도 eCFR **API** 로
+  63건을 정상 수집한다 — 링크는 멀쩡한데 **검사기만** 못 본다. 이걸 needs_review 에 합쳐
+  두면 매주 63건이 "검토 필요"로 쌓여 진짜 신호(MFDS 5xx 같은 일시 오류 90건)를 덮는다.
+  무시되는 알림은 진짜 신호를 가린다.
+"""
 
 from __future__ import annotations
 
@@ -19,7 +33,10 @@ import requests
 
 from grm_common import proxies_for
 
-SCHEMA_VERSION = "grm-library-health/v1"
+# v2(2026-08-11): status 어휘에 `blocked` 추가(모듈 docstring 참조). summary 에 동명 키 신설.
+# 기존 키(ok/broken/needs_review)는 이름·의미 그대로 — 다만 봇차단 건이 needs_review 에서
+# blocked 로 옮겨가므로 needs_review 카운트가 줄어든다(옛 스냅샷과 직접 비교 금지).
+SCHEMA_VERSION = "grm-library-health/v2"
 URL_FIELDS = ("official_url", "pdf_url", "ko_url")
 DEFAULT_USER_AGENT = "GRM-Library-Linkcheck/1.0 (+https://github.com/MINHOYEOM/grm-api-intake)"
 BOT_SENSITIVE_HOSTS = ("fda.gov", "canada.ca", "ecfr.gov")
@@ -128,12 +145,16 @@ def _classify(
         if _bot_sensitive(url):
             disguise = _suspected_disguised_block(url, final_url, body_sample)
             if disguise:
-                return "needs_review", f"suspected_bot_block:{disguise}"
+                return "blocked", f"suspected_bot_block:{disguise}"
         return "ok", "reachable"
     if code in (404, 410):
         return "broken", f"http_{code}"
-    if _bot_sensitive(url) and (code in (None, 401, 403, 429)):
-        return "needs_review", f"suspected_bot_block:{reason or ('http_' + str(code))}"
+    # ★`blocked` 는 **차단의 적극적 증거**가 있을 때만 쓴다(401/403/429, 또는 위 위장차단
+    #   판정). 타임아웃·TLS 실패(code is None)는 차단의 증거가 아니라 그냥 못 닿은 것이므로
+    #   needs_review 로 남긴다 — 이걸 blocked 에 넣으면 "확인 못 한 게 정상"이라는 통에
+    #   진짜 네트워크 장애가 섞여 묻힌다(분리의 목적을 스스로 무너뜨린다).
+    if _bot_sensitive(url) and code in (401, 403, 429):
+        return "blocked", f"suspected_bot_block:http_{code}"
     if code is None:
         return "needs_review", f"network_or_tls:{reason or 'unknown'}"
     if code >= 500 or code in (401, 403, 405, 408, 429):
@@ -282,6 +303,14 @@ def build_report(
             "ok": counts["ok"],
             "broken": counts["broken"],
             "needs_review": counts["needs_review"],
+            # [2026-08-11] "검사기가 막혀 확인 못 함"은 "링크가 수상함"과 다른 사실이다.
+            #   ★실측 계기: 21 CFR 63건이 러너에서 전부 unblock.federalregister.gov 로
+            #   리다이렉트됐다(미국 정부가 GitHub Actions IP 를 봇으로 차단). 사람이
+            #   브라우저로 누르면 정상이고 수집기도 eCFR **API** 로 63건을 정상 수집한다
+            #   — 즉 링크는 멀쩡한데 **검사기만** 못 본다. 이걸 needs_review 에 합치면
+            #   매주 63건이 "검토 필요"로 쌓여 진짜 신호(MFDS 5xx 같은 일시 오류)를 덮는다.
+            #   무시되는 알림은 진짜 신호를 가린다(048 규율) → 별도 축으로 분리한다.
+            "blocked": counts["blocked"],
         },
         "urls": results,
     }

@@ -398,27 +398,36 @@ class CoverageCollectedTest(unittest.TestCase):
         cov = ci.build_coverage_collected(
             {"MFDS": 30, "Federal Register": 2, "OpenFDA Recall": 1, "FDA Warning Letter": 3})
         labels = [it["label"] for it in cov["items"]]
-        # 11종 known 라벨이 프롬프트 callout 순서대로 전부(0건 포함) 나온다.
+        # known 라벨이 프롬프트 callout 순서대로 전부(0건 포함) 나온다.
+        # [2026-08-12] 11종 → 15종: FDA 483·ISPE·EU NCR·UK NCR 이 빠져 있어 그 소스가
+        # 0이 된 주에 행 자체가 사라졌다(카드 수 1위인 483 포함).
         self.assertEqual(labels, ["FR", "Recall", "EMA", "MHRA", "PIC/S", "ECA",
-                                  "FDA WL", "MFDS", "ICH", "WHO", "HC"])
+                                  "FDA WL", "MFDS", "ICH", "WHO", "HC",
+                                  "FDA 483", "ISPE", "EU NCR", "UK NCR"])
         self.assertEqual(cov["total"], 36)
         self.assertTrue(cov["md"].startswith("Intake row 36건 (FR 2 · Recall 1 · EMA 0 · "))
         self.assertIn("MFDS 30", cov["md"])
 
     def test_unknown_source_appended_only_when_nonzero(self) -> None:
-        cov = ci.build_coverage_collected({"FDA 483": 4, "MFDS": 1})
+        # [2026-08-12] FDA 483 은 이제 known 이라 미정의 소스 예시로 쓸 수 없다 — 실제로
+        # 라벨이 없는 소스(레거시 RAPS)로 바꿨다. 계약 자체는 그대로: 미정의 소스는
+        # count>0 일 때만 끝에 덧붙는다(조용한 유실 금지).
+        cov = ci.build_coverage_collected({"RAPS": 4, "MFDS": 1})
         labels = [it["label"] for it in cov["items"]]
-        self.assertEqual(labels[-1], "FDA 483")        # 미정의 소스는 끝에 덧붙임(조용한 유실 금지)
+        self.assertEqual(labels[-1], "RAPS")
         self.assertEqual(cov["total"], 5)
         # count 0 인 미정의 소스는 생략(클러터 방지)
-        cov0 = ci.build_coverage_collected({"FDA 483": 0, "MFDS": 1})
-        self.assertNotIn("FDA 483", [it["label"] for it in cov0["items"]])
+        cov0 = ci.build_coverage_collected({"RAPS": 0, "MFDS": 1})
+        self.assertNotIn("RAPS", [it["label"] for it in cov0["items"]])
+        # 반면 known 소스는 0건이어도 남는다 — 이게 '조용한 주 가시화'의 본체다.
+        self.assertIn("FDA 483", [it["label"] for it in cov0["items"]])
 
     def test_empty_counts(self) -> None:
         cov = ci.build_coverage_collected({})
         self.assertEqual(cov["total"], 0)
         self.assertEqual(cov["md"], "Intake row 0건 (FR 0 · Recall 0 · EMA 0 · MHRA 0 · "
-                         "PIC/S 0 · ECA 0 · FDA WL 0 · MFDS 0 · ICH 0 · WHO 0 · HC 0)")
+                         "PIC/S 0 · ECA 0 · FDA WL 0 · MFDS 0 · ICH 0 · WHO 0 · HC 0 · "
+                         "FDA 483 0 · ISPE 0 · EU NCR 0 · UK NCR 0)")
 
     def test_source_counts_from_rows_matches_payload(self) -> None:
         # 발행 후 탐지가 rows 로 재집계한 값 == build_payload 의 source_counts(동일 산식).

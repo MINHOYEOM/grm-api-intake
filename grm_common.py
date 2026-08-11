@@ -472,18 +472,37 @@ class IntakeSourceSpec:
     prefix: str          # CollectionStats 필드 프리픽스 & health row key
     health_label: str    # _source_health_rows 의 "label"
     has_truncated: bool = False   # fr/recall 만 health row 에 "truncated" 노출
+    # ★[소스 오류 보고 레지스트리화 2026-08-12] 아래 두 필드는 grm_health 의 소스별 오류
+    # 보고(`enabled_source_failures`)가 쓴다. 종전엔 그 리스트가 **손으로 적은 17줄**이었고,
+    # 레지스트리가 23종으로 늘어도 아무도 갱신하지 않아 **발행 중인 EU/영국 GMP NCR·ISPE·
+    # MHRA Alert 가 오류 보고 경로에 아예 없었다**(수집기가 죽어도 무음 — 2026-07-27 ECA
+    # 7일 침묵과 같은 계열, 그때도 같은 리스트가 원인이었다). 이제 이 레지스트리 하나만
+    # 고치면 오류 보고까지 따라온다.
+    health_code_override: str = ""   # 비우면 prefix 의 `_`→`-`. 관례를 벗어난 3종만 지정
+    warn_only: bool = False          # True = 오류를 경고로만(run 을 적색으로 만들지 않음)
+
+    @property
+    def health_code(self) -> str:
+        """health finding 코드(`source-error:{code}` 등). 기본은 prefix 의 `_`→`-`."""
+        return self.health_code_override or self.prefix.replace("_", "-")
 
 
 INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
-    IntakeSourceSpec("fr", "Federal Register", has_truncated=True),
-    IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True),
-    IntakeSourceSpec("ema", "EMA RSS"),
-    IntakeSourceSpec("mhra", "MHRA RSS"),
-    IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts"),
-    IntakeSourceSpec("pics", "PIC/S RSS"),
-    IntakeSourceSpec("eca", "ECA Academy RSS"),
-    IntakeSourceSpec("wl", "FDA Warning Letters"),
-    IntakeSourceSpec("mfds", "MFDS RSS"),
+    # warn_only 판정 기준(2026-07-27 확립, 2026-08-12 확장): `add_failure` 는 exit 1 →
+    # intake run 적색인데, `grm-web-publish.yml` 이 스캐폴드를 `--status success` 로 고른다.
+    # 즉 **부차 피드 하나가 죽으면 월요일 발행이 통째로 막힌다**. 목적은 차단이 아니라
+    # 표면화이므로, "이 소스가 죽어도 그 주 발행은 나가야 한다"면 warn_only=True 다.
+    # fr/recall 은 둘 다 죽을 때만 `phase1-all-failed`(failure)로 남겨 두고, 단독 실패는
+    # 여기서 경고로 표면화한다(종전엔 단독 실패가 완전 무음이었다).
+    IntakeSourceSpec("fr", "Federal Register", has_truncated=True, warn_only=True),
+    IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True, warn_only=True),
+    IntakeSourceSpec("ema", "EMA RSS", warn_only=True),
+    IntakeSourceSpec("mhra", "MHRA RSS", warn_only=True),
+    IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts", warn_only=True),
+    IntakeSourceSpec("pics", "PIC/S RSS", warn_only=True),
+    IntakeSourceSpec("eca", "ECA Academy RSS", warn_only=True),
+    IntakeSourceSpec("wl", "FDA Warning Letters", warn_only=True),
+    IntakeSourceSpec("mfds", "MFDS RSS", health_code_override="mfds-rss"),
     IntakeSourceSpec("mfds_law", "MFDS Law/Admrul"),
     IntakeSourceSpec("mfds_recall", "MFDS Recall"),
     IntakeSourceSpec("mfds_admin", "MFDS Admin"),
@@ -492,12 +511,13 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("mfds_gmp_inspection", "MFDS GMP Inspection"),
     IntakeSourceSpec("ich", "ICH"),
     IntakeSourceSpec("who", "WHO"),
-    IntakeSourceSpec("hc", "Health Canada"),
+    IntakeSourceSpec("hc", "Health Canada", health_code_override="health-canada"),
     IntakeSourceSpec("fda483", "FDA 483"),
-    IntakeSourceSpec("ispe", "ISPE iSpeak RSS"),
-    IntakeSourceSpec("search", "Brave Search"),
-    IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)"),
-    IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR"),
+    # 전문지·NCR 3종은 주당 카드가 한 자릿수라 죽어도 발행을 막을 이유가 없다 → 경고.
+    IntakeSourceSpec("ispe", "ISPE iSpeak RSS", warn_only=True),
+    IntakeSourceSpec("search", "Brave Search", health_code_override="brave-search"),
+    IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True),
+    IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True),
 )
 
 

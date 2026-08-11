@@ -121,7 +121,9 @@ _GLOBAL_PUBLIC_SOURCE_CODES = {"ich", "who", "health-canada", "fda483"}
 #   · 선례와 일관: `aged-unconsumed-new` 도 같은 이유로 warning(exit 0)이다.
 # 네트워크성 일시 오류와 구조적 오류를 문구로 구분하지 않는다 — 둘 다 경고로 올리되
 # detail 에 원문 오류를 실어 사람이 판단한다(오분류로 침묵하는 것보다 낫다).
-_WARN_ONLY_SOURCE_CODES = {"ema", "mhra", "pics", "eca", "wl"}
+# ★[2026-08-12] 손으로 적던 집합을 레지스트리 파생으로 바꿨다 — 새 소스를 추가할 때
+# `IntakeSourceSpec(..., warn_only=True)` 한 곳만 정하면 여기까지 따라온다.
+_WARN_ONLY_SOURCE_CODES = frozenset(s.health_code for s in INTAKE_SOURCE_SPECS if s.warn_only)
 _TRANSIENT_ELIGIBLE_SOURCE_CODES = _MFDS_FEATURE_SOURCE_CODES | _GLOBAL_PUBLIC_SOURCE_CODES
 # 403 transient 적격: 키 없는 공개 endpoint 만(WAF/IP 차단성). data.go.kr API 403 은
 # 키/서비스 권한 문제 가능성이 높아 failure 유지.
@@ -194,6 +196,11 @@ def _evaluate_health(
     enable_who: bool,
     enable_hc: bool,
     enable_fda483: bool,
+    # [2026-08-12] 이 셋은 IntakeConfig 에는 있었는데 여기까지 넘어오지 않아, 소스별 오류
+    # 보고에서 통째로 빠져 있었다(발행 중인 EU/영국 GMP NCR 이 무음이던 직접 원인).
+    enable_ispe: bool = False,
+    enable_eu_gmp_ncr: bool = False,
+    enable_mhra_gmp_ncr: bool = False,
     enable_moleg_api: bool,
     enable_scrape: bool,
     event_name: str,
@@ -299,42 +306,55 @@ def _evaluate_health(
                 "핵심 공식 API 2개가 모두 실패해 workflow fail로 처리합니다.",
             )
 
+        # ★[레지스트리 파생 2026-08-12] 종전엔 여기가 **손으로 적은 17줄**이었다. 수집
+        # 레지스트리가 23종으로 늘어도 아무도 이 리스트를 갱신하지 않아, **발행 중인
+        # EU/영국 GMP NCR·ISPE·MHRA Alert 가 오류 보고 경로에 아예 없었다** — 수집기가
+        # 죽어도 run 은 success 고 경고 이슈에도 한 줄 안 올라온다. 2026-07-27 ECA 7일
+        # 침묵을 고칠 때 5종을 손으로 덧붙였는데, 그 수리가 **같은 손목록을 다시 만든
+        # 것**이라 열흘 뒤 추가된 NCR 2종에서 똑같이 재발했다.
+        #
+        # 이제 INTAKE_SOURCE_SPECS 를 순회한다 — 레지스트리에 소스를 넣으면 오류 보고가
+        # 자동으로 따라온다. 각 소스의 "이번 실행에서 켜져 있었나"만 아래에서 매핑한다.
+        source_enabled: dict[str, bool] = {
+            # feature flag 로 켜지는 소스(플래그가 이미 `or "<token>" in active` 를 포함한다)
+            "search": enable_search,
+            "mfds": enable_mfds,
+            "mfds_law": enable_mfds_law,
+            "mfds_recall": enable_mfds_recall,
+            "mfds_admin": enable_mfds_admin,
+            "mfds_gmp_cert": enable_mfds_gmp_cert,
+            "mfds_safety_letter": enable_mfds_safety_letter,
+            "mfds_gmp_inspection": enable_mfds_gmp_inspection,
+            "ich": enable_ich,
+            "who": enable_who,
+            "hc": enable_hc,
+            "fda483": enable_fda483,
+            "ispe": enable_ispe,
+            "eu_gmp_ncr": enable_eu_gmp_ncr,
+            "mhra_gmp_ncr": enable_mhra_gmp_ncr,
+            # `--sources` 토큰으로만 켜지는 소스
+            "fr": "fr" in active,
+            "recall": "recall" in active,
+            "ema": "ema" in active,
+            "mhra": "mhra" in active,
+            # MHRA 회수 채널은 별도 토큰이 없다 — "mhra" 하나로 RSS 와 함께 수집된다
+            # (collect_intake 의 `if "mhra" in active:` 블록 참조).
+            "mhra_alert": "mhra" in active,
+            "pics": "pics" in active,
+            "eca": "eca" in active,
+            "wl": "wl" in active,
+        }
+        # ★기본값이 True 인 것이 의도다 — 레지스트리에 소스를 넣고 위 매핑을 깜빡하면
+        # **조용히 빠지는 게 아니라 시끄럽게 보고된다**(가짜 경고 1건 > 무음 실패).
+        # 정확한 커버리지는 테스트가 잠근다(IntakeSourceGateCoverageTest).
         enabled_source_failures = [
-            (enable_search and stats.search_error, "brave-search", "Brave Search", stats.search_error_msg),
-            (enable_mfds and stats.mfds_error, "mfds-rss", "MFDS RSS", stats.mfds_error_msg),
-            (enable_mfds_law and stats.mfds_law_error, "mfds-law", "MFDS Law/Admrul", stats.mfds_law_error_msg),
-            (enable_mfds_recall and stats.mfds_recall_error, "mfds-recall", "MFDS Recall", stats.mfds_recall_error_msg),
-            (enable_mfds_admin and stats.mfds_admin_error, "mfds-admin", "MFDS Admin", stats.mfds_admin_error_msg),
             (
-                enable_mfds_gmp_cert and stats.mfds_gmp_cert_error,
-                "mfds-gmp-cert",
-                "MFDS GMP Certificate",
-                stats.mfds_gmp_cert_error_msg,
-            ),
-            (
-                enable_mfds_safety_letter and stats.mfds_safety_letter_error,
-                "mfds-safety-letter",
-                "MFDS Safety Letter",
-                stats.mfds_safety_letter_error_msg,
-            ),
-            (
-                enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_error,
-                "mfds-gmp-inspection",
-                "MFDS GMP Inspection",
-                stats.mfds_gmp_inspection_error_msg,
-            ),
-            (enable_ich and stats.ich_error, "ich", "ICH", stats.ich_error_msg),
-            (enable_who and stats.who_error, "who", "WHO", stats.who_error_msg),
-            (enable_hc and stats.hc_error, "health-canada", "Health Canada", stats.hc_error_msg),
-            (enable_fda483 and stats.fda483_error, "fda483", "FDA 483", stats.fda483_error_msg),
-            # [2026-07-27] 공개 RSS/HTML 5종 — 종전엔 이 리스트에 없어 오류가 나도 보고 경로가
-            # 없었다(ECA 7일 침묵). 게이팅은 phase2 와 동일하게 `active` 기준.
-            # 등급은 _WARN_ONLY_SOURCE_CODES 로 항상 warning — 이유는 그 상수 주석 참조.
-            ("ema" in active and stats.ema_error, "ema", "EMA RSS", stats.ema_error_msg),
-            ("mhra" in active and stats.mhra_error, "mhra", "MHRA RSS", stats.mhra_error_msg),
-            ("pics" in active and stats.pics_error, "pics", "PIC/S RSS", stats.pics_error_msg),
-            ("eca" in active and stats.eca_error, "eca", "ECA Academy RSS", stats.eca_error_msg),
-            ("wl" in active and stats.wl_error, "wl", "FDA Warning Letters", stats.wl_error_msg),
+                source_enabled.get(spec.prefix, True) and getattr(stats, f"{spec.prefix}_error"),
+                spec.health_code,
+                spec.health_label,
+                getattr(stats, f"{spec.prefix}_error_msg"),
+            )
+            for spec in INTAKE_SOURCE_SPECS
         ]
 
         if not phase1_fr_active and not phase1_recall_active:

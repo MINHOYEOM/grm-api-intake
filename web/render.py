@@ -53,6 +53,7 @@ LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
+FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
@@ -1297,6 +1298,94 @@ def glossary_term_description(term: dict[str, Any]) -> str:
 # 모듈 상수를 쓰기 때문에 정의 순서가 강제된다.
 
 
+# ── [검색 유입] 분류·국가·기관 모음 페이지 — 커밋 데이터 로드·뷰모델 ─────────────────
+# `/findings/` 는 런타임 RPC 로 결과를 불러오는 검색 앱이라 HTML 에 지적 본문이 없다.
+# 그래서 공개 24,797건 전체가 검색엔진에 색인 대상 0개였다(2026-08-12 실측). 축마다 정적
+# 표면을 만들어 각 축이 색인 대상이 되게 한다. 데이터는 `findings_facets_refresh.py` 가
+# anon RPC(=공개 RLS 그대로)로 떠서 커밋한 정본이고, 렌더러는 네트워크를 타지 않는다.
+#
+# 축 메타(제목·경로·검색 파라미터)는 여기가 정본이다 — 축은 셋 고정이고 URL 경로를
+# 정하는 층이 여기뿐이라, 데이터에 실으면 오히려 두 곳이 갈라진다.
+FACET_AXES: dict[str, dict[str, str]] = {
+    "category": {
+        "path": "c",
+        "kick": "By Category",
+        "title": "분류별 지적사항",
+        "query_key": "cat",
+        "headline_suffix": "지적사항",
+        "lede_prefix": "이 분류로",
+        "sibling_title": "다른 분류 보기",
+        "index_lede": "규제기관이 지적한 내용을 주제별로 묶었습니다. 무균공정·시험실 관리·일탈 조사처럼 실사에서 반복되는 축이라, 우리 현장의 취약 지점과 대조해 보실 수 있습니다.",
+    },
+    "country": {
+        "path": "country",
+        "kick": "By Country",
+        "title": "국가별 지적사항",
+        "query_key": "country",
+        "headline_suffix": "제조소 지적사항",
+        "lede_prefix": "이 나라에 있는 제조소에서",
+        "sibling_title": "다른 국가 보기",
+        "index_lede": "지적을 받은 제조소가 어느 나라에 있는지로 묶었습니다. 위탁 제조·원료 공급을 맡긴 지역의 규제 동향을 확인하실 때 쓰실 수 있습니다.",
+    },
+    "agency": {
+        "path": "agency",
+        "kick": "By Agency",
+        "title": "규제기관별 지적사항",
+        "query_key": "agency",
+        "headline_suffix": "지적사항",
+        "lede_prefix": "이 기관이",
+        "sibling_title": "다른 기관 보기",
+        "index_lede": "어느 규제기관이 공개한 지적인지로 묶었습니다. 기관마다 문서 형식과 지적의 결이 달라, 대응 준비도 기관 단위로 갈립니다.",
+    },
+}
+
+
+def load_findings_facets(path: Path = FINDINGS_FACETS_FILE) -> "dict[str, Any] | None":
+    """모음 페이지 정본 로드. 파일 부재 시 None → 섹션이 조용히 꺼진다(load_glossary 동형).
+
+    스키마 버전이 다르면 **조용히 넘어가지 않고 실패**한다 — 모양이 바뀐 데이터를 옛
+    템플릿으로 렌더하면 빈 페이지 36장이 라이브로 나가고, 그건 없느니만 못하다.
+    """
+    if not path.exists():
+        return None
+    obj = json.loads(path.read_text(encoding="utf-8"))
+    got = obj.get("schema_version")
+    if got != "grm-findings-facets/v1":
+        raise SystemExit(f"findings_facets 스키마 불일치: {got!r} (기대: grm-findings-facets/v1)")
+    return obj
+
+
+def build_facet_item_view(item: dict[str, Any]) -> dict[str, Any]:
+    """항목 1건의 표시용 투영 — 값 무변형, 파생은 막대 비율뿐.
+
+    `pct` 는 그 항목 안에서 가장 큰 기관 건수를 100 으로 둔 상대값이다(전체 대비가 아니다
+    — 한 기관이 압도적인 축에서 나머지가 전부 0px 로 뭉개지는 것을 막는다).
+    """
+    agencies = list(item.get("by_agency") or [])
+    top = max((int(a.get("c") or 0) for a in agencies), default=0)
+    view = dict(item)
+    view["by_agency"] = [
+        {**a, "pct": round(int(a.get("c") or 0) * 100 / top, 1) if top else 0}
+        for a in agencies
+    ]
+    return view
+
+
+def facet_description(axis_key: str, item: dict[str, Any],
+                      agency_labels: dict[str, str]) -> str:
+    """meta description — 데이터에서 조립한다(문구 생성 0·now()/난수 0).
+
+    "무엇이 몇 건, 어느 기관에서" 를 앞세운다. 검색 결과에 그대로 노출되는 문장이라
+    수식어보다 숫자와 기관명이 클릭을 만든다.
+    """
+    meta = FACET_AXES[axis_key]
+    names = [agency_labels.get(a["v"], a["v"]) for a in (item.get("by_agency") or [])[:3]]
+    who = "·".join(n for n in names if n)
+    tail = f" {who} 공개 문서 기준." if who else ""
+    return (f"{item['label_ko']} {meta['headline_suffix']} {item['findings']:,}건"
+            f"(문서 {item['documents']:,}건)을 우리말로 정리했습니다.{tail}")
+
+
 # ── [주간 퀴즈] 문항 뱅크 로드·뷰모델(결정론 — 값 무변형, 파생은 근거 링크/라벨뿐) ────
 # "이번 주" 문항 선택은 렌더러가 하지 않는다(now() 금지·결정론 불가침). 렌더러는 정본
 # 뱅크 전 문항을 순서 그대로 페이지에 embed 하고, 클라이언트(assets/quiz.js)가 ISO 주차
@@ -1574,7 +1663,8 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
 
 def build_sitemap_xml(briefs: list[dict[str, Any]],
                       base_url: str = SITE_BASE_URL,
-                      glossary_term_ids: "list[str] | None" = None) -> str:
+                      glossary_term_ids: "list[str] | None" = None,
+                      facet_paths: "list[str] | None" = None) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
@@ -1611,6 +1701,11 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # 되게 한다. id 는 glossary.json 정본의 slug(ASCII·검증됨)라 XML 무변형 결합.
         *(f"  <url><loc>{base_url}/glossary/{tid}/</loc></url>"
           for tid in (glossary_term_ids or [])),
+        # [분류·국가·기관 모음] `/findings/` 는 런타임 RPC 검색 앱이라 그 자체로는 지적
+        # 본문이 색인되지 않는다. 축별 정적 표면(축 색인 3 + 항목 N)을 등록해 24,797건이
+        # 주제·국가·기관 단위로는 검색 대상이 되게 한다. 경로는 렌더가 실제로 쓴 것과
+        # 같은 리스트라(손으로 다시 적지 않는다) 페이지와 sitemap 이 갈라질 수 없다.
+        *(f"  <url><loc>{base_url}/{p}</loc></url>" for p in (facet_paths or [])),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
     ]
@@ -2084,6 +2179,49 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 written.append(f"glossary/{term['id']}/index.html")
                 glossary_term_ids.append(term["id"])
 
+    # [검색 유입] 분류·국가·기관 모음 페이지 — 축 색인 3장 + 항목 페이지 N장.
+    # 축 색인을 함께 내는 이유: 항목 페이지가 sitemap 에만 있으면 사이트 구조에서 그
+    # 페이지들에 닿는 내부 링크가 없다(내부 링크가 곧 색인 경로다).
+    facets = load_findings_facets()
+    facet_paths: list[str] = []
+    if facets:
+        agency_labels = facets.get("agency_labels") or {}
+        measured_on = facets.get("measured_on") or ""
+        for axis in facets.get("axes") or []:
+            axis_key = axis["axis"]
+            meta = FACET_AXES[axis_key]                 # 모르는 축 = KeyError(조용한 누락 금지)
+            items = [build_facet_item_view(it) for it in axis.get("items") or []]
+            siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
+
+            index_html = env.get_template("findings_facet_index.html").render(
+                page_title=f"{meta['title']} · GRM",
+                rel_root="../../",
+                nav_active="findings",
+                latest_slug=latest_slug,
+                description=meta["index_lede"],
+                canonical=_abs_url(f"findings/{meta['path']}/"),
+                axis=meta, items=items, excluded=axis.get("excluded") or [],
+            )
+            _write(out_dir / "findings" / meta["path"] / "index.html", index_html)
+            written.append(f"findings/{meta['path']}/index.html")
+            facet_paths.append(f"findings/{meta['path']}/")
+
+            for item in items:
+                page_html = env.get_template("findings_facet.html").render(
+                    page_title=f"{item['label_ko']} {meta['headline_suffix']} · GRM",
+                    rel_root="../../../",
+                    nav_active="findings",
+                    latest_slug=latest_slug,
+                    description=facet_description(axis_key, item, agency_labels),
+                    canonical=_abs_url(f"findings/{meta['path']}/{item['slug']}/"),
+                    axis=meta, item=item, siblings=siblings,
+                    agency_labels=agency_labels, measured_on=measured_on,
+                )
+                _write(out_dir / "findings" / meta["path"] / item["slug"] / "index.html",
+                       page_html)
+                written.append(f"findings/{meta['path']}/{item['slug']}/index.html")
+                facet_paths.append(f"findings/{meta['path']}/{item['slug']}/")
+
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
     # 선택한다(같은 주 = 전 직원 동일 세트). 파일 부재 시 조용히 생략.
@@ -2165,7 +2303,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
     _write(out_dir / "sitemap.xml",
-           build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids))
+           build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
+                             facet_paths=facet_paths))
     written.append("sitemap.xml")
 
     return {"out_dir": str(out_dir), "written": written,

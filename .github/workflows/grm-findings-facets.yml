@@ -1,0 +1,189 @@
+name: GRM Findings Facets Refresh
+
+# [검색 유입] 분류·국가·기관 모음 페이지(/findings/{c|country|agency}/)의 정본 데이터를
+# 주 1회 재측정한다(findings_facets_refresh.py). 페이지에 박히는 건수·최근 사례가 이 파일에서
+# 오므로, 갱신이 멈추면 화면이 조용히 낡는다(틀린 숫자가 검색 결과 설명문에 그대로 나간다).
+#
+# 크론 분리: 자료실=일요일 18:23 UTC, 용어사전 사례연결=목요일 18:15 UTC 를 이미 쓴다. 같은
+# 창에 겹치면 둘 다 web/tests/golden 을 재동결해 main 기준 순차 PR 이 서로의 골든 변경을
+# 못 본 채 분기하므로 머지 경합이 난다. → 화요일 18:20 UTC(= 수요일 03:20 KST), 기존 크론
+# 어디와도 안 겹치는 조용한 새벽 창.
+#
+# 새 시크릿/변수 없음 — SUPABASE_URL·SUPABASE_ANON_KEY(repo Variables)를 그대로 재사용한다.
+# ★anon 키를 쓴다(service-role 금지): RLS 가 공개 집합을 정의하므로 anon 으로 세야 화면에
+#   실제로 보이는 수와 같다. service-role 은 비공개 행까지 세어 없는 건수를 광고하게 된다.
+
+on:
+  schedule:
+    - cron: '20 18 * * 2'
+  workflow_dispatch:
+    inputs:
+      min_findings:
+        description: '페이지를 만들 최소 지적 건수(미만은 제외·사유 기록)'
+        required: true
+        default: '20'
+      shrink_review_percent:
+        description: '항목 수가 이 비율(%) 이상 줄면 자동 머지 대신 사람 검토로 남김'
+        required: true
+        default: '20'
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-findings-facets-auto-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MIN_FINDINGS: ${{ inputs.min_findings || '20' }}
+      SHRINK_PCT: ${{ inputs.shrink_review_percent || '20' }}
+      BRANCH: automation/findings-facets-auto-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/findings_facets.json
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Create isolated candidate branch
+        run: git switch -c "$BRANCH"
+
+      # 갱신 전 항목 수를 기억해 둔다 — 축소 감지는 "갱신 후"만 봐서는 못 한다.
+      - name: Record pre-refresh page counts
+        id: before
+        run: |
+          set -euo pipefail
+          if [ -f "$DATA_PATH" ]; then
+            echo "items=$(jq '[.axes[].items[]] | length' "$DATA_PATH")" >> "$GITHUB_OUTPUT"
+          else
+            echo "items=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 스크립트가 0건 가드·표본 미달 제외·모르는 기관 코드·실패율 상한을 스스로 판정하고,
+      # 위반이면 아무것도 쓰지 않은 채 exit 1 한다(잡 상태 빨강으로 드러난다).
+      - name: Refresh facet data (findings_search RPC, anon)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python findings_facets_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY" \
+            --min-findings "$MIN_FINDINGS"
+
+      - name: Detect meaningful changes
+        id: changes
+        run: |
+          if git diff --quiet -- "$DATA_PATH"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "모음 페이지 데이터 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 페이지가 크게 줄면 자동 머지하지 않는다. 축소는 정상일 수도 있으나(임계값 상향),
+      # RPC 부분 장애로 축이 얇아진 것일 수도 있고 그 둘은 숫자만 봐서는 구분되지 않는다.
+      # 사람이 한 번 보게 만드는 편이 라이브에서 페이지 수십 장이 사라지는 것보다 낫다.
+      - name: Gate on page-count shrink
+        if: steps.changes.outputs.changed == 'true'
+        id: gate
+        run: |
+          set -euo pipefail
+          AFTER=$(jq '[.axes[].items[]] | length' "$DATA_PATH")
+          BEFORE='${{ steps.before.outputs.items }}'
+          echo "after=$AFTER" >> "$GITHUB_OUTPUT"
+          # GHA 표현식에는 산술이 없다 — 계산은 전부 셸에서 한다.
+          if [ "$BEFORE" -eq 0 ]; then
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          elif [ $(( (BEFORE - AFTER) * 100 )) -ge $(( BEFORE * SHRINK_PCT )) ]; then
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+            echo "페이지 수 ${BEFORE} → ${AFTER} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Freeze renderer-produced goldens
+        if: steps.changes.outputs.changed == 'true'
+        run: python web/tests/test_render.py --freeze
+
+      - name: Commit and open candidate PR
+        if: steps.changes.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH" web/tests/golden
+          git commit -m "chore: refresh findings facet pages"
+          git push -u origin "$BRANCH"
+          SUMMARY=$(jq -r '.axes[] | "- \(.axis): 페이지 \(.items | length)개 · 제외 \(.excluded | length)개"' "$DATA_PATH")
+          EXCLUDED=$(jq -r '[.axes[].excluded[]] | if length == 0 then "- 없음" else map("- \(.key // "(빈 값)") \(.findings)건 — \(.reason)") | join("\n") end' "$DATA_PATH")
+          TOTALS=$(jq -r '.totals | "공개 지적 \(.findings)건 · 문서 \(.documents)건"' "$DATA_PATH")
+          cat > /tmp/pr-body.md <<EOF
+          분류·국가·기관 모음 페이지 데이터 주간 재측정(\`findings_search\` RPC · anon 키 = 공개 RLS 그대로).
+
+          ## 실측
+          $TOTALS
+
+          $SUMMARY
+
+          ## 제외된 항목 (침묵시키지 않는다)
+          $EXCLUDED
+
+          ## 게이트
+          - 0건 가드 · 표본 미달(<${MIN_FINDINGS}건) 제외 · 모르는 기관 코드 = 실패 · 항목 실패율 20% 초과 시 전면 중단
+          - 페이지 수 ${SHRINK_PCT}% 이상 축소 시 자동 머지 대신 사람 검토
+
+          정본 데이터와 렌더 산출 골든을 함께 커밋합니다. 자동 머지는 명시적 GRM CI 디스패치가 green 일 때만 일어납니다.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh findings facet pages" \
+            --body-file /tmp/pr-body.md
+          echo "number=$(gh pr view "$BRANCH" --json number -q .number)" >> "$GITHUB_OUTPUT"
+
+      - name: Mark review-required candidate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed != 'true'
+        run: gh pr edit "${{ steps.pr.outputs.number }}" --add-label automation-warning
+
+      - name: Dispatch CI gate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run grm-ci.yml --ref "$BRANCH"
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID=$(gh run list --workflow grm-ci.yml --branch "$BRANCH" \
+              --event workflow_dispatch --limit 10 \
+              --json databaseId,headSha,createdAt \
+              --jq ".[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$STARTED\") | .databaseId" \
+              | head -n 1)
+            [ -n "$RUN_ID" ] && break
+            sleep 5
+          done
+          [ -n "$RUN_ID" ] || { echo "CI dispatch run not found" >&2; exit 1; }
+          gh run watch "$RUN_ID" --exit-status
+
+      - name: Merge only after green CI
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "$DATA_PATH" ]; then
+            jq -r '"측정일 \(.measured_on) · 공개 지적 \(.totals.findings)건", (.axes[] | "\(.axis): 페이지 \(.items | length) · 제외 \(.excluded | length)")' \
+              "$DATA_PATH" >> "$GITHUB_STEP_SUMMARY"
+          fi

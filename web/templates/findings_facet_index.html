@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [검색 유입] 축 색인 — /findings/{c|country|agency}/.
+
+    낱개 모음 페이지 36장이 sitemap 에만 있으면 크롤러가 사이트 구조에서 그 페이지들에
+    닿는 경로가 없다. 축마다 색인을 두어 **내부 링크로도 닿게** 한다(내부 링크가 곧 색인
+    경로다 — 용어사전 낱개 페이지와 같은 판단).
+
+    제외 항목도 숨기지 않고 사유와 함께 밝힌다. 상한을 조용히 걸면 "전부 다뤘다"로 읽힌다. -#}
+<style>
+  .fi-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fi-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .fi-crumb a:hover{color:var(--coral)}
+  .fi-crumb i{font-style:normal;color:var(--line-2)}
+  .fi-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .fi-lede{font-family:var(--sans);font-size:16.5px;line-height:1.7;color:var(--body);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .fi-grid{margin-top:32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+  .fi-card{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
+  .fi-card:hover{border-color:var(--coral)}
+  .fi-card-t{font-family:var(--serif);font-size:17.5px;color:var(--ink);word-break:keep-all}
+  .fi-card:hover .fi-card-t{color:var(--coral)}
+  .fi-card-n{font-family:var(--sans);font-size:13px;color:var(--muted)}
+  .fi-card-n b{font-family:var(--mono);color:var(--body);font-weight:500;font-variant-numeric:tabular-nums}
+  .fi-tail{margin-top:34px;border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
+  .fi-tail-h{font-family:var(--sans);font-size:14px;color:var(--ink);margin:0;font-weight:500}
+  .fi-tail-p{font-family:var(--sans);font-size:13.5px;line-height:1.7;color:var(--muted);margin:0;max-width:760px;word-break:keep-all}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="fi-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><span>{{ axis.title }}</span>
+    </nav>
+    <p class="kick">{{ axis.kick }}</p>
+    <h1 class="fi-h1">{{ axis.title }}</h1>
+    <p class="fi-lede">{{ axis.index_lede }}</p>
+
+    <div class="fi-grid">
+      {%- for it in items %}
+      <a class="fi-card" href="{{ rel_root }}findings/{{ axis.path }}/{{ it.slug }}/">
+        <span class="fi-card-t">{{ it.label_ko }}</span>
+        <span class="fi-card-n">지적 <b>{{ "{:,}".format(it.findings) }}</b>건 · 문서 <b>{{ "{:,}".format(it.documents) }}</b>건</span>
+      </a>
+      {%- endfor %}
+    </div>
+
+    {% if excluded %}
+    <div class="fi-tail">
+      <p class="fi-tail-h">여기에 없는 것</p>
+      <p class="fi-tail-p">{% for ex in excluded %}{{ ex.key or "국가 미상" }} {{ "{:,}".format(ex.findings) }}건({{ ex.reason }}){% if not loop.last %} · {% endif %}{% endfor %}. 표본이 적은 항목은 별도 페이지를 만들지 않지만 <a href="{{ rel_root }}findings/">지적사항 검색</a>에서는 모두 찾아보실 수 있습니다.</p>
+    </div>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

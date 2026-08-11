@@ -17,13 +17,12 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-
-import yaml
 
 WORKFLOW = Path(__file__).resolve().parents[1] / ".github" / "workflows" / "grm-library-staging.yml"
 _BASH = shutil.which("bash")
@@ -59,13 +58,39 @@ _REAL_DATE = _probe_gnu_date()
 
 
 def _decide_script() -> str:
-    """워크플로에서 decide 스텝의 run 본문을 그대로 꺼낸다(복사본을 두지 않는다)."""
-    data = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
-    steps = data["jobs"]["decide"]["steps"]
-    for step in steps:
-        if step.get("id") == "check":
-            return step["run"]
-    raise AssertionError("decide 잡에서 id=check 스텝을 찾지 못했다")
+    """워크플로에서 decide 스텝의 run 본문을 그대로 꺼낸다(복사본을 두지 않는다).
+
+    ★PyYAML 을 쓰지 않는다 — **CI 테스트 환경에 PyYAML 이 없다**(requirements.txt 미포함).
+    로컬에는 있어서 통과하고 CI 에서만 ImportError 로 터진다(실제로 그렇게 터졌다).
+    `tests/test_workflow_flag_resolution.py` 가 같은 이유로 자체 파서를 쓰는 선례이고,
+    아래 PyYamlParityTest 가 PyYAML 이 있는 환경에서 결과를 대조한다(파서가 틀리면 이
+    테스트 전체가 조용히 무력해지므로).
+    """
+    lines = WORKFLOW.read_text(encoding="utf-8").splitlines()
+    try:
+        anchor = next(i for i, ln in enumerate(lines) if ln.strip() == "id: check")
+        start = next(i for i in range(anchor, len(lines))
+                     if lines[i].strip() in ("run: |", "run: |-"))
+    except StopIteration:  # pragma: no cover - 구조가 바뀌면 즉시 실패시킨다
+        raise AssertionError("decide 잡에서 id=check 의 run 블록을 찾지 못했다") from None
+    key_indent = len(lines[start]) - len(lines[start].lstrip())
+    body: list[str] = []
+    for line in lines[start + 1:]:
+        if not line.strip():
+            body.append("")
+            continue
+        if len(line) - len(line.lstrip()) <= key_indent:
+            break
+        body.append(line)
+    widths = [len(ln) - len(ln.lstrip()) for ln in body if ln.strip()]
+    cut = min(widths) if widths else 0
+    return "\n".join(ln[cut:] if ln.strip() else "" for ln in body)
+
+
+def _crons() -> set[str]:
+    """schedule 의 cron 목록(자체 파서 — 위와 같은 이유로 PyYAML 미사용)."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+    return set(re.findall(r"^\s*-\s*cron:\s*['\"]([^'\"]+)['\"]", text, re.M))
 
 
 @unittest.skipUnless(_BASH and _REAL_DATE, "bash/GNU date 필요")
@@ -191,10 +216,17 @@ class DecideGateContractTest(unittest.TestCase):
         self.assertNotIn("| jq", script)
 
     def test_recovery_cron_covers_the_non_monday_days(self):
-        data = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
-        crons = {entry["cron"] for entry in data[True]["schedule"]}
+        crons = _crons()
         self.assertIn("23 18 * * 0", crons, "주간 정기(일 18:23 UTC = 월 03:23 KST)")
         self.assertIn("23 18 * * 1-6", crons, "복구 모드(나머지 요일)")
+
+    def test_no_module_level_pyyaml_dependency(self):
+        """★CI 에는 PyYAML 이 없다. 모듈 최상단에서 import 하면 **CI 에서만** ImportError 로
+        터지고 로컬은 통과한다(실제로 그렇게 터졌다). 자체 파서를 쓰는 규율을 못 박는다."""
+        src = Path(__file__).read_text(encoding="utf-8")
+        top_level = [ln for ln in src.splitlines()
+                     if re.match(r"^(import yaml|from yaml\b)", ln)]
+        self.assertEqual(top_level, [], "모듈 최상단 PyYAML import 금지")
 
     def test_execution_suite_is_not_silently_skipped_on_linux(self):
         """★skip 은 초록으로 보인다. CI(리눅스)에서 실행 스위트가 통째로 건너뛰어지면
@@ -205,6 +237,34 @@ class DecideGateContractTest(unittest.TestCase):
             self.skipTest("POSIX 아님 — CI(ubuntu)에서 강제된다")
         self.assertTrue(_BASH, "리눅스인데 bash 를 못 찾았다")
         self.assertTrue(_REAL_DATE, "리눅스인데 GNU date 로 날짜 계산을 못 했다")
+
+
+class PyYamlParityTest(unittest.TestCase):
+    """자체 파서가 PyYAML 과 같은 결과를 내는지 — PyYAML 이 있는 환경에서만 돈다.
+
+    CI 는 PyYAML 이 없어 자체 파서 단독으로 검사한다. 그래서 **파서가 틀리면 이 파일의
+    가드 전체가 조용히 무력해진다**. 개발 환경(로컬)에는 PyYAML 이 있으므로 여기서 붙잡는다.
+    (`tests/test_workflow_flag_resolution.StdlibParserAgreesWithPyYamlTest` 와 같은 관례.)
+    """
+
+    def setUp(self):
+        try:
+            import yaml  # noqa: F401
+        except ImportError:
+            self.skipTest("PyYAML 없음(CI) — 자체 파서 단독 동작")
+
+    def test_run_block_matches_pyyaml(self):
+        import yaml
+        data = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+        step = next(s for s in data["jobs"]["decide"]["steps"] if s.get("id") == "check")
+        self.assertEqual(_decide_script().strip(), str(step["run"]).strip())
+
+    def test_cron_list_matches_pyyaml(self):
+        import yaml
+        data = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+        # PyYAML 은 YAML 1.1 이라 `on:` 키를 boolean True 로 읽는다(알려진 함정).
+        schedule = (data.get("on") or data.get(True))["schedule"]
+        self.assertEqual(_crons(), {entry["cron"] for entry in schedule})
 
 
 if __name__ == "__main__":

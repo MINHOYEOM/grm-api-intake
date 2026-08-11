@@ -106,8 +106,15 @@ class EvaluateBacklogTest(unittest.TestCase):
 class RunMonitorTest(unittest.TestCase):
     def test_happy_path_reads_stats_and_reports(self):
         payload = _stats(11548, 9187, needs_review=181, rejected=52)
+        # run_monitor 는 RPC 3개를 순서대로 부른다: findings_stats → extraction_gap_by_source
+        # → findings_country_unmapped(배열 반환). 마지막은 배열이어야 하므로 return_value 로
+        # 한 응답을 돌려쓸 수 없다.
         with mock.patch.object(
-            mon.requests, "post", return_value=_FakePostResponse(200, payload)
+            mon.requests, "post", side_effect=[
+                _FakePostResponse(200, payload),
+                _FakePostResponse(200, _gap([])),
+                _FakePostResponse(200, []),
+            ]
         ) as posted:
             report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
         self.assertEqual(report["status"], "failure")
@@ -285,8 +292,10 @@ class ExtractionGapMigrationContractTest(unittest.TestCase):
 
 
 class RunMonitorExtractionGapTest(unittest.TestCase):
-    def _posts(self, stats_payload, gap_payload):
-        return [_FakePostResponse(200, stats_payload), _FakePostResponse(200, gap_payload)]
+    def _posts(self, stats_payload, gap_payload, unmapped_payload=None):
+        return [_FakePostResponse(200, stats_payload),
+                _FakePostResponse(200, gap_payload),
+                _FakePostResponse(200, unmapped_payload if unmapped_payload is not None else [])]
 
     def test_extraction_breach_turns_report_red(self):
         with mock.patch.object(mon.requests, "post", side_effect=self._posts(
@@ -320,6 +329,147 @@ class RunMonitorExtractionGapTest(unittest.TestCase):
         urls = [c.args[0] if c.args else c.kwargs["url"] for c in posted.call_args_list]
         self.assertTrue(urls[0].endswith("/rpc/findings_stats"), urls)
         self.assertTrue(urls[1].endswith("/rpc/extraction_gap_by_source"), urls)
+        self.assertTrue(urls[2].endswith("/rpc/findings_country_unmapped"), urls)
+
+
+def _unmapped(rows):
+    """findings_country_unmapped RPC 반환 형태 — `[{site_country, findings}]` 배열."""
+    return [{"site_country": name, "findings": cnt} for name, cnt in rows]
+
+
+class EvaluateCountryUnmappedTest(unittest.TestCase):
+    """★2026-08-11 국가 축(055)의 짝. 정규화 사전은 반드시 낡는다 — 새 표기가 들어오면
+    country_key='' 로 조용히 떨어져 그 나라가 국가 축에서 통째로 빠진다. 추출 격차와 달리
+    **비율이 아니라 존재 자체가 신호**다."""
+
+    def test_no_unmapped_is_green(self):
+        breaches, summary = mon.evaluate_country_unmapped([], min_rows=1)
+        self.assertEqual(breaches, [])
+        self.assertEqual(summary, [])
+
+    def test_single_new_variant_breaches_at_one_row(self):
+        breaches, summary = mon.evaluate_country_unmapped(
+            _unmapped([("Korea, Republic of", 1)]), min_rows=1)
+        self.assertEqual([b["code"] for b in breaches], ["country-unmapped"])
+        self.assertEqual(breaches[0]["site_country"], "Korea, Republic of")
+        self.assertEqual(breaches[0]["value"], 1)
+        self.assertEqual(summary[0]["findings"], 1)
+
+    def test_breaches_are_per_variant_never_summed(self):
+        """변종마다 수리(매핑 추가)가 따로다 — 합산하면 무엇을 고칠지 알 수 없다."""
+        breaches, _ = mon.evaluate_country_unmapped(
+            _unmapped([("Viet Nam", 4), ("Korea, Republic of", 2)]), min_rows=1)
+        self.assertEqual(len(breaches), 2)
+        self.assertEqual([b["site_country"] for b in breaches],
+                         ["Viet Nam", "Korea, Republic of"])  # 건수 내림차순
+
+    def test_threshold_can_suppress_low_volume_noise(self):
+        breaches, summary = mon.evaluate_country_unmapped(
+            _unmapped([("XX-garbage", 1)]), min_rows=5)
+        self.assertEqual(breaches, [])
+        self.assertEqual(len(summary), 1, "임계 미달이어도 요약에는 남아야 한다")
+
+    def test_mass_event_is_capped_but_never_silently(self):
+        """★조용한 절단 금지 — 잘라낸 개수를 마지막 메시지에 적는다."""
+        rows = _unmapped([(f"Country {i:02d}", 100 - i) for i in range(25)])
+        breaches, summary = mon.evaluate_country_unmapped(rows, min_rows=1)
+        self.assertEqual(len(breaches), mon._MAX_COUNTRY_UNMAPPED_BREACHES)
+        self.assertEqual(len(summary), 25)
+        self.assertIn("15종이 더 있습니다", breaches[-1]["message"])
+
+    def test_malformed_payload_is_tolerated(self):
+        breaches, summary = mon.evaluate_country_unmapped(
+            [None, "x", {}, {"site_country": "", "findings": 9},
+             {"site_country": "Norge", "findings": 3}], min_rows=1)
+        self.assertEqual([b["site_country"] for b in breaches], ["Norge"])
+        self.assertEqual(len(summary), 1, "빈 site_country 는 요약에서도 제외")
+
+    def test_message_names_both_implementations_to_fix(self):
+        """SQL 함수와 Python 사전 **양쪽**을 고쳐야 파리티가 유지된다 — 메시지가 그걸 말해야
+        수리하는 사람이 한쪽만 고치고 끝내지 않는다."""
+        breaches, _ = mon.evaluate_country_unmapped(_unmapped([("Norge", 3)]), min_rows=1)
+        msg = breaches[0]["message"]
+        self.assertIn("grm_normalize_country", msg)
+        self.assertIn("_COUNTRY_CODE_MAP", msg)
+
+
+class RunMonitorCountryUnmappedTest(unittest.TestCase):
+    def _posts(self, unmapped_payload):
+        return [_FakePostResponse(200, _stats(100, 100)),
+                _FakePostResponse(200, _gap([])),
+                _FakePostResponse(200, unmapped_payload)]
+
+    def test_unmapped_variant_turns_report_red(self):
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts(
+                _unmapped([("Korea, Republic of", 12)]))):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "failure")
+        self.assertEqual([b["code"] for b in report["breaches"]], ["country-unmapped"])
+        self.assertEqual(report["country_unmapped"][0]["site_country"], "Korea, Republic of")
+
+    def test_clean_mapping_keeps_report_green(self):
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts([])):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "ok")
+        self.assertEqual(report["breaches"], [])
+        self.assertEqual(report["country_unmapped"], [])
+
+    def test_country_rpc_failure_is_never_silent(self):
+        """★감시가 꺼진 줄 모르고 초록을 믿지 않는다 — 세 번째 RPC 가 죽어도 red.
+
+        5xx 는 _MAX_ATTEMPTS 만큼 재시도하므로 응답을 그만큼 준비한다(재시도 계약도 함께 고정).
+        """
+        with mock.patch.object(mon.requests, "post", side_effect=[
+                _FakePostResponse(200, _stats(100, 100)),
+                _FakePostResponse(200, _gap([])),
+                *([_FakePostResponse(500, None)] * mon._MAX_ATTEMPTS)]) as posted:
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertIn("findings_country_unmapped", repr(report["errors"]))
+        self.assertNotIn(_SERVICE_KEY, repr(report))
+        self.assertEqual(posted.call_count, 2 + mon._MAX_ATTEMPTS)
+
+    def test_country_rpc_hard_error_does_not_retry(self):
+        """4xx 는 재시도 대상이 아니다 — 한 번 만에 red."""
+        with mock.patch.object(mon.requests, "post", side_effect=[
+                _FakePostResponse(200, _stats(100, 100)),
+                _FakePostResponse(200, _gap([])),
+                _FakePostResponse(404, None)]) as posted:
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertIn("findings_country_unmapped", repr(report["errors"]))
+        self.assertEqual(posted.call_count, 3)
+
+    def test_non_array_payload_is_error(self):
+        """RPC 는 배열을 준다. dict 가 오면 계약 위반이므로 조용히 0건 처리하지 않는다."""
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts({"oops": 1})):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertIn("non-array", repr(report["errors"]))
+
+    def test_threshold_is_reported_for_traceability(self):
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts([])):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["thresholds"]["country_unmapped_min_rows"],
+                         mon.DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS)
+
+
+class CountryUnmappedWiringTest(unittest.TestCase):
+    """★이 RPC 는 055 에서 만들어졌지만 2026-08-11 검증 전까지 **호출자가 0건**이었다
+    (만들어만 두고 아무도 안 보는 슬롯). 그 상태로 되돌아가지 않도록 배선을 고정한다."""
+
+    def test_monitor_declares_the_rpc(self):
+        self.assertEqual(mon._COUNTRY_UNMAPPED_RPC, "findings_country_unmapped")
+
+    def test_run_monitor_actually_calls_it(self):
+        with mock.patch.object(mon.requests, "post", side_effect=[
+                _FakePostResponse(200, _stats(1, 1)),
+                _FakePostResponse(200, _gap([])),
+                _FakePostResponse(200, [])]) as posted:
+            mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        urls = [c.args[0] if c.args else c.kwargs["url"] for c in posted.call_args_list]
+        self.assertEqual(len(urls), 3, "RPC 3개를 모두 불러야 한다")
+        self.assertTrue(any(u.endswith("/rpc/findings_country_unmapped") for u in urls), urls)
 
 
 if __name__ == "__main__":

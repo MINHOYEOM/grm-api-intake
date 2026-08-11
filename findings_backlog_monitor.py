@@ -65,6 +65,22 @@ DEFAULT_EXTRACTION_GAP_PCT = 5.0
 DEFAULT_EXTRACTION_GAP_MIN_DOCS = 10
 _EXTRACTION_RPC = "extraction_gap_by_source"
 
+# ★국가 미매핑 감시(2026-08-11, 055 국가 축의 짝). 055 의 grm_normalize_country() 는
+#   **그날 실측한 84개 원문 변종 / 47개 코드로 고정된 사전**이다. 사전은 반드시 낡는다 —
+#   실제로 trends.js 의 국가 라벨이 "23종 verbatim"으로 박혀 있다가 실측 84종 대비 낡은
+#   전적이 있다. 새 소스나 새 표기(`Korea, Republic of` 같은)가 들어오면 매핑에 없어서
+#   country_key='' 로 **조용히** 떨어지고, 화면에서는 그냥 "미확인"에 섞여 구분되지 않는다.
+#   그게 이 저장소가 반복해 당한 침묵 실패다.
+#   055 는 그 대비로 findings_country_unmapped() 를 함께 신설했지만 **호출자가 0건**이었다
+#   — 만들어만 두고 아무도 안 보는 슬롯이었다(2026-08-11 검증에서 발견). 여기에 배선한다.
+#   임계 설계: 추출 격차와 달리 **비율이 아니라 존재 자체가 신호**다. 미매핑 변종이 하나라도
+#   있으면 그건 "국가 축에서 통째로 빠지는 나라가 있다"는 뜻이라 1건부터 본다. 다만 변종이
+#   대량으로 쏟아질 때 breach 를 무한정 만들지 않도록 상위 N개만 싣고 **잘랐다는 사실을
+#   함께 적는다**(조용한 절단 금지).
+DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS = 1
+_MAX_COUNTRY_UNMAPPED_BREACHES = 10
+_COUNTRY_UNMAPPED_RPC = "findings_country_unmapped"
+
 
 def _post_stats_rpc(
     base_url: str,
@@ -181,6 +197,59 @@ def evaluate_extraction_gap(
     return breaches, summary
 
 
+def evaluate_country_unmapped(
+    payload: Any,
+    *,
+    min_rows: int,
+    max_breaches: int = _MAX_COUNTRY_UNMAPPED_BREACHES,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """findings_country_unmapped 페이로드 → (breaches, 변종 요약). 순수 함수.
+
+    RPC 는 `[{site_country, findings}]` 배열을 그대로 돌려준다(055 (D)). 한 변종이
+    breach 하나다 — 합산하지 않는다(extraction_gap 과 같은 규율: 서로 다른 원인을 한
+    숫자에 넣으면 진단이 불가능해진다). 각 변종은 "어느 나라를 코드로 못 바꿨는가"라는
+    서로 다른 사실이고, 수리도 변종별로 매핑을 추가하는 일이다.
+
+    ★상위 max_breaches 개만 breach 로 싣되, 잘라낸 개수를 마지막 breach 메시지에 적는다.
+      조용한 절단은 "전부 봤다"는 착시를 만든다.
+    """
+    rows = payload if isinstance(payload, list) else []
+    summary: list[dict[str, Any]] = []
+    for entry in rows:
+        if not isinstance(entry, dict):
+            continue
+        raw = str(entry.get("site_country") or "")
+        count = _int(entry.get("findings"))
+        if not raw:
+            # site_country 가 빈 값인 행은 RPC 가 애초에 제외한다(055). 방어적으로 한 번 더.
+            continue
+        summary.append({"site_country": raw, "findings": count})
+
+    summary.sort(key=lambda item: (-item["findings"], item["site_country"]))
+    over = [item for item in summary if item["findings"] >= min_rows]
+
+    breaches: list[dict[str, Any]] = []
+    for item in over[:max_breaches]:
+        breaches.append({
+            "code": "country-unmapped",
+            "metric": "unmapped_site_country",
+            "site_country": item["site_country"],
+            "value": item["findings"],
+            "threshold": min_rows,
+            "message": (
+                f"국가 미매핑: site_country={item['site_country']!r} {item['findings']}건이 "
+                "ISO 코드로 정규화되지 않아 '미확인'으로 떨어졌습니다. "
+                "web/migrations 의 grm_normalize_country() 와 grm_findings._COUNTRY_CODE_MAP "
+                "양쪽에 이 표기를 추가하십시오(두 구현의 파리티는 "
+                "tests/test_findings_country_key.py 가 고정합니다)."
+            ),
+        })
+    dropped = len(over) - len(breaches)
+    if dropped > 0 and breaches:
+        breaches[-1]["message"] += f" (이 외 미매핑 변종 {dropped}종이 더 있습니다 — 전체는 report.country_unmapped 참조)"
+    return breaches, summary
+
+
 def evaluate_backlog(
     stats: dict[str, Any],
     *,
@@ -238,8 +307,12 @@ def run_monitor(
     needs_review_threshold: int = DEFAULT_NEEDS_REVIEW_THRESHOLD,
     extraction_pct_threshold: float = DEFAULT_EXTRACTION_GAP_PCT,
     extraction_min_docs: int = DEFAULT_EXTRACTION_GAP_MIN_DOCS,
+    country_unmapped_min_rows: int = DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS,
 ) -> dict[str, Any]:
-    """findings_stats + extraction_gap_by_source 를 읽어 판정. 오류는 status='error'."""
+    """findings_stats + extraction_gap_by_source + findings_country_unmapped 판정.
+
+    오류는 status='error'.
+    """
     report: dict[str, Any] = {
         "checked_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "ok",
@@ -248,10 +321,12 @@ def run_monitor(
         "needs_review": 0,
         "rejected": 0,
         "extraction_gap": [],
+        "country_unmapped": [],
         "thresholds": {
             "gap": gap_threshold, "needs_review": needs_review_threshold,
             "extraction_pct": extraction_pct_threshold,
             "extraction_min_docs": extraction_min_docs,
+            "country_unmapped_min_rows": country_unmapped_min_rows,
         },
         "breaches": [],
         "errors": [],
@@ -284,6 +359,7 @@ def run_monitor(
         "gap": gap_threshold, "needs_review": needs_review_threshold,
         "extraction_pct": extraction_pct_threshold,
         "extraction_min_docs": extraction_min_docs,
+        "country_unmapped_min_rows": country_unmapped_min_rows,
     }
 
     # ★추출 격차는 별도 RPC. 이 호출이 실패하면 **조용히 넘어가지 않는다** — 감시가 꺼진
@@ -306,6 +382,26 @@ def run_monitor(
     report["extraction_gap"] = ex_summary
     if ex_breaches:
         report["breaches"] = list(report.get("breaches") or []) + ex_breaches
+        report["status"] = "failure"
+
+    # ★국가 미매핑도 별도 RPC. 추출 격차와 같은 이유로 **실패를 조용히 넘기지 않는다** —
+    #   감시가 꺼진 줄 모르고 초록을 믿는 것이 이 저장소가 이미 두 번 당한 함정이다.
+    #   반환은 배열(`[{site_country, findings}]`)이라 dict 가 아니다 — 형 검사를 다르게 한다.
+    cu_status, cu_data, cu_err = _post_stats_rpc(base, service_key, rpc=_COUNTRY_UNMAPPED_RPC)
+    if cu_err:
+        report["status"] = "error"
+        report["errors"].append(f"{_COUNTRY_UNMAPPED_RPC} RPC failed ({cu_err})")
+        return report
+    if not isinstance(cu_data, list):
+        report["status"] = "error"
+        report["errors"].append(f"{_COUNTRY_UNMAPPED_RPC} returned a non-array payload")
+        return report
+
+    cu_breaches, cu_summary = evaluate_country_unmapped(
+        cu_data, min_rows=country_unmapped_min_rows)
+    report["country_unmapped"] = cu_summary
+    if cu_breaches:
+        report["breaches"] = list(report.get("breaches") or []) + cu_breaches
         report["status"] = "failure"
     return report
 
@@ -359,6 +455,14 @@ def main(argv: list[str] | None = None) -> int:
         help=("소스별 '지적사항 0건' 최소 건수 임계. 소량 소스의 잡음을 막는다. "
               f"기본 {DEFAULT_EXTRACTION_GAP_MIN_DOCS}."),
     )
+    parser.add_argument(
+        "--country-unmapped-min-rows",
+        type=int,
+        default=DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS,
+        help=("국가 미매핑 변종의 최소 건수 임계(이상이면 breach). 추출 격차와 달리 "
+              "**존재 자체가 신호**라 기본값이 1이다 — 미매핑 변종 1건은 그 나라가 국가 축에서 "
+              f"통째로 빠진다는 뜻이다. 기본 {DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS}."),
+    )
     parser.add_argument("--supabase-url", help="Supabase project URL (falls back to $SUPABASE_URL)")
     parser.add_argument(
         "--service-role-key",
@@ -384,6 +488,7 @@ def main(argv: list[str] | None = None) -> int:
         needs_review_threshold=args.needs_review_threshold,
         extraction_pct_threshold=args.extraction_pct_threshold,
         extraction_min_docs=args.extraction_min_docs,
+        country_unmapped_min_rows=args.country_unmapped_min_rows,
     )
     _write_report(args.output, report)
 

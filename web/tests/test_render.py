@@ -3135,8 +3135,11 @@ class WebTrendsRenderTest(unittest.TestCase):
         [인용 조항] 섹션까지 10개가 됐다(WebTrendsRecentWindowTest·WebTrendsCfrRankingTest
         가 세부 계약을 별도로 검증한다). 최근 창 카테고리 순위의 읽는 법
         (#tr-recent-cats-read)은 순위가 실제로 그려질 때만 노출되므로 hidden 속성을 달고
-        있어 이 카운트에 잡히지 않는다."""
-        self.assertEqual(self.html.count('<p class="tr-read">'), 10)
+        있어 이 카운트에 잡히지 않는다.
+        [FDA 의약품 GMP 실사 등급] 임무3 신규 섹션이 .tr-read 2개(등급 설명 + 국가별
+        표 읽는 법)를 더해 12개가 됐다(WebTrendsFdaInspectionsTest 가 세부 계약을 별도로
+        검증한다)."""
+        self.assertEqual(self.html.count('<p class="tr-read">'), 12)
         for section_cue in ("전체 기간을 합친 순위입니다.",
                              "각 연도를 100%로 놓고",
                              "그 해에 지적이 많아졌다는 뜻이 아닙니다.",
@@ -3146,7 +3149,9 @@ class WebTrendsRenderTest(unittest.TestCase):
                              "막대는 그 달에 공개된 문서 수입니다.",
                              "각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다.",
                              "거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요.",
-                             "규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다."):
+                             "규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다.",
+                             "실사 한 건에서 지적이 여러 개 나올 수 있어",
+                             "한국은 목록 밖이어도 따로 표시합니다."):
             self.assertIn(section_cue, self.html)
 
     def test_hero_paragraph_breaks_at_sentence_boundary(self):
@@ -3529,6 +3534,125 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('if (name) params.set("firm", name); else params.delete("firm");', js_src)
 
 
+# ── [FDA 의약품 GMP 실사 등급] fda_inspection_stats() RPC(058, 임무3) 신규 섹션 ─────
+class WebTrendsFdaInspectionsTest(unittest.TestCase):
+    """트렌드 대시보드 신규 섹션 — fda_inspection_stats() RPC(058, 파라미터 없음)를
+    findings 계열 RPC 전부와 독립적으로 fetch 한다(실패해도 다른 섹션에 영향 0, zone/
+    heatmap 과 동일 원칙). 여기선 셸 결정론·RPC 배선·scope 비하드코딩·비율 클라이언트
+    계산(007/038 관례)·한국 강조·0건일 때 빈 껍데기 미생성을 검증한다(실제 집계 렌더
+    자체는 비골든 — trends.js 소관, WebTrendsRenderTest 와 동일 원칙)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_trendsfda_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+        cls.html_src = (WEB_DIR / "templates" / "trends.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 셸 결정론 ────────────────────────────────────────────────────────────
+    def test_panel_shell_present_hidden_between_coverage_note_and_recent_block(self):
+        self.assertIn(
+            '<section class="tr-block tr-fda-block" id="tr-fda-block" '
+            'aria-label="FDA 의약품 GMP 실사 등급" hidden>',
+            self.html,
+        )
+        self.assertIn('<h2 class="tr-h">FDA 의약품 GMP 실사 등급</h2>', self.html)
+        self.assertIn('<p class="tr-fda-scope" id="tr-fda-scope"></p>', self.html)
+        self.assertIn('<div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>', self.html)
+        self.assertIn('<div id="tr-fda-year" class="tr-fda-year"></div>', self.html)
+        self.assertIn('<div id="tr-fda-country" class="tr-fda-country"></div>', self.html)
+        self.assertIn('<p class="tr-note" id="tr-fda-note"></p>', self.html)
+        coverage_idx = self.html.index('id="tr-coverage-note"')
+        fda_idx = self.html.index('id="tr-fda-block"')
+        recent_idx = self.html.index('id="tr-recent-block"')
+        self.assertTrue(coverage_idx < fda_idx < recent_idx,
+                         "FDA 실사 섹션이 먼저 알아두세요와 최근 12개월 사이에 있지 않음")
+
+    def test_fda_elements_defensively_queried_not_in_hard_gate(self):
+        """구버전 캐시 셸에 이 신규 블록이 없어도 페이지 전체(다른 패널)가 죽으면
+        안 된다 — coverageNoteEl/zoneBlockEl 관례와 동형으로 하드 게이트(if 문)에
+        tr-fda-* 엘리먼트를 넣지 않는다."""
+        for elid in ("tr-fda-block", "tr-fda-scope", "tr-fda-stats", "tr-fda-year",
+                     "tr-fda-country", "tr-fda-note"):
+            self.assertIn(f'document.getElementById("{elid}")', self.js_src)
+        gate = self.js_src[self.js_src.index("if (!cfg || !loadingEl"):]
+        gate = gate[:gate.index("return;") + len("return;")]
+        for forbidden in ("fdaBlockEl", "fdaScopeEl", "fdaStatsEl", "fdaYearEl",
+                           "fdaCountryEl", "fdaNoteEl"):
+            self.assertNotIn(forbidden, gate)
+
+    # ── RPC 배선 · 독립 fetch ────────────────────────────────────────────────
+    def test_rpc_endpoint_present_with_no_params(self):
+        self.assertIn('rpcEndpoint("fda_inspection_stats")', self.js_src)
+        self.assertIn("function fetchFdaInspectionStats()", self.js_src)
+        fn = self.js_src[self.js_src.index("function fetchFdaInspectionStats()"):]
+        fn = fn[:fn.index("\n  }")]
+        self.assertIn('method: "POST"', fn)
+        self.assertIn('body: "{}",', fn)  # 058 계약 — 파라미터 없음
+
+    def test_independent_fetch_chain_silent_fallback(self):
+        """findings 계열 fetch 체인들과 별개 promise 체인 — 실패해도 errorEl/contentEl
+        을 건드리지 않고 조용히 숨김 유지되어야 한다."""
+        chain = self.js_src[self.js_src.index("fetchFdaInspectionStats()\n    .then"):]
+        self.assertIn("renderFdaInspections(data)", chain[:200])
+        self.assertNotIn("errorEl.hidden", chain[:300])
+        self.assertIn("조용히 숨김 유지", chain[:300])
+
+    # ── 빈 껍데기 금지 ───────────────────────────────────────────────────────
+    def test_zero_total_renders_nothing(self):
+        fn = self.js_src[self.js_src.index("function renderFdaInspections(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (!(total > 0)) return;", fn)
+
+    # ── scope 비하드코딩 — RPC 응답을 그대로 읽어 화면에 적는다(054) ───────────
+    def test_scope_text_derived_from_rpc_not_hardcoded(self):
+        fn = self.js_src[self.js_src.index("function renderFdaInspections(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("scope.project_area", fn)
+        self.assertIn("scope.excluded_project_areas", fn)
+        self.assertIn("scope.fiscal_year_min", fn)
+        self.assertIn("scope.fiscal_year_max", fn)
+        self.assertNotIn("Drug Quality Assurance", fn)
+        self.assertNotIn("Bioresearch Monitoring", fn)
+
+    # ── 비율은 클라이언트가 계산한다(007/038 관례: 서버는 센다) ────────────────
+    def test_oai_share_computed_client_side(self):
+        fn = self.js_src[self.js_src.index("function renderFdaInspections(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("pctText(totals.oai, total)", fn)
+        self.assertIn("pctText(totals.vai, total)", fn)
+        self.assertIn("pctText(totals.nai, total)", fn)
+
+    def test_year_row_composition_from_counts_not_server_ratio(self):
+        fn = self.js_src[self.js_src.index("function buildFdaYearRow(y)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("var total = nai + vai + oai;", fn)
+        self.assertIn("var share = total > 0 ? cnt / total : 0;", fn)
+
+    # ── 한국 강조 — top N 절단으로 가려지면 안 된다 ─────────────────────────────
+    def test_korea_always_shown_even_outside_top_n(self):
+        fn = self.js_src[self.js_src.index("function renderFdaInspections(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn('countries[i].code === "KR"', fn)
+        self.assertIn("if (korea && !koreaInTop) fdaCountryEl.appendChild(buildFdaCountryRow(korea, true));", fn)
+        # is-kr 강조 클래스가 CSS 에 실제로 존재해야 한다.
+        self.assertIn(".tr-fda-c-row.is-kr{", self.html_src)
+
+    # ── COUNTRY_LABELS_KO 재사용 — 새 정규화 사전을 만들지 않는다(임무서 지시) ────
+    def test_reuses_existing_country_labels_dict(self):
+        fn = self.js_src[self.js_src.index("function buildFdaCountryRow(c, isKorea)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("countryLabelKo(c.code, c.country)", fn)
+        self.assertEqual(self.js_src.count("var COUNTRY_LABELS_KO = {"), 1,
+                          "국가 라벨 사전이 새로 하나 더 생겼다 — 기존 COUNTRY_LABELS_KO 를 재사용해야 한다")
+
+
 # ── [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 패널(038) ────────────────
 class WebFindingsZoneComparisonTest(unittest.TestCase):
     """트렌드 대시보드 신규 패널 — findings_zone_category() RPC(038, 파라미터 없음)를
@@ -3701,19 +3825,25 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
 
     # ── 국가명 한글화(ISO2 코드 기반, 056) ────────────────────────────────────
     def test_country_labels_ko_covers_all_mapping_codes(self):
-        """[동기화 규칙 — 056] COUNTRY_LABELS_KO 는 원문 문자열이 아니라 ISO2 코드가
-        키다(문자열은 반드시 낡는다 — 2026-07-31 시점 23종이 2026-08-11 실측 85종으로
-        이미 낡아 있었다). 코드 **집합**은 grm_findings._COUNTRY_CODE_MAP(055 매핑
-        정본의 파이썬 파리티 사본)의 코드 전체와 정확히 일치해야 한다(기준선은 개수가
-        아니라 id 집합) — 한국어 라벨 값 자체는 이 저장소가 지정하는 고정 계약이라
-        하드코딩 대조한다."""
+        """[동기화 규칙 — 056, 확장 057] COUNTRY_LABELS_KO 는 원문 문자열이 아니라
+        ISO2 코드가 키다(문자열은 반드시 낡는다 — 2026-07-31 시점 23종이 2026-08-11
+        실측 85종으로 이미 낡아 있었다). 코드 **집합**은 grm_findings._COUNTRY_CODE_MAP
+        (055/057 매핑 정본의 파이썬 파리티 사본)의 코드 전체와 정확히 일치해야 한다
+        (기준선은 개수가 아니라 id 집합) — 한국어 라벨 값 자체는 이 저장소가 지정하는
+        고정 계약이라 하드코딩 대조한다.
+
+        057 이 FDA Data Dashboard API(inspections_classifications) CountryName 27종
+        (21개 신규 코드 + 기존 코드 6개 재사용)을 매핑 정본에 추가해 47→68개 코드로
+        늘렸다 — 이 사전(그리고 아래 expected 고정 계약)도 함께 늘려야 이 테스트가
+        "사전은 반드시 낡는다"를 실제로 지킨다(코드만 추가하고 라벨을 안 늘리면 이
+        테스트가 그 침묵 실패를 즉시 잡는다)."""
         m = re.search(r"var COUNTRY_LABELS_KO = \{(.*?)\n  \};", self.js_src, re.S)
         self.assertIsNotNone(m, "trends.js 에 COUNTRY_LABELS_KO 정의 미발견")
         body = m.group(1)
         pairs = dict(re.findall(r'([A-Z]{2}):\s*"([^"]+)",?', body))
 
         canon_codes = set(grm_findings._COUNTRY_CODE_MAP.values())
-        self.assertEqual(len(canon_codes), 47, "매핑 정본 코드 수가 47이 아님(전제 재확인 필요)")
+        self.assertEqual(len(canon_codes), 68, "매핑 정본 코드 수가 68이 아님(전제 재확인 필요)")
         self.assertEqual(
             set(pairs), canon_codes,
             f"COUNTRY_LABELS_KO 코드 집합이 매핑 정본과 다름 — "
@@ -3732,6 +3862,14 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
             "PT": "포르투갈", "SK": "슬로바키아", "LK": "스리랑카", "TR": "튀르키예",
             "NO": "노르웨이", "FI": "핀란드", "VN": "베트남", "BY": "벨라루스",
             "SI": "슬로베니아", "IL": "이스라엘",
+            # [057] FDA Data Dashboard API CountryName 확장분 -- 21개 신규 코드
+            # (KR/CZ/FI/IL/SI/NO 6개는 재사용이라 위 47개 안에 이미 있다).
+            "SG": "싱가포르", "BR": "브라질", "TH": "태국", "MT": "몰타",
+            "AR": "아르헨티나", "HR": "크로아티아", "HK": "홍콩", "CO": "콜롬비아",
+            "NZ": "뉴질랜드", "BG": "불가리아", "DO": "도미니카공화국", "LV": "라트비아",
+            "OM": "오만", "CR": "코스타리카", "EG": "이집트", "MO": "마카오",
+            "PH": "필리핀", "UY": "우루과이", "AW": "아루바", "EE": "에스토니아",
+            "AE": "아랍에미리트",
         }
         self.assertEqual(pairs, expected, "COUNTRY_LABELS_KO 값이 고정 계약과 다름")
 

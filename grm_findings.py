@@ -1374,6 +1374,43 @@ _COUNTRY_CODE_MAP: dict[str, str] = {
     "벨라루스": "BY",
     "슬로베니아": "SI",
     "이스라엘": "IL",
+    # ------------------------------------------------------------------
+    # [057] FDA Data Dashboard API(inspections_classifications) CountryName
+    # 확장분 -- web/migrations/057_grm_normalize_country_ddapi.sql 이 이 27개를
+    # 동일하게 SQL 함수 본문에 추가한다(파리티 대상). 6개(KR/CZ/FI/IL/SI/NO)는
+    # 기존 코드를 재사용하고(같은 나라의 미국 정부 공식 영문 국호가 findings
+    # 소스들의 표기와 달랐을 뿐), 21개는 이 확장 전까지 findings.site_country
+    # 축에 전혀 없던 신규 코드다. DDAPI 실측 62개국 중 35개는 기존 47개 코드
+    # 매핑으로 이미 커버되고(예: "United States"/"India"/"China" 등은 변형 없이
+    # 그대로 매치), 아래 27개가 그 나머지 전부다(35+27=62, 잔여 미매핑 0 --
+    # tests/test_findings_country_key.py DdapiCountryCoverageTest 로 고정).
+    "korea (the republic of)": "KR",  # DDAPI 공식 표기(기존 KR 5변종에 추가)
+    "singapore": "SG",
+    "czech republic": "CZ",           # 기존 "czechia" 와 별도 표기(같은 CZ)
+    "finland": "FI",                  # 기존 "핀란드" 의 영문 표기
+    "israel": "IL",                   # 기존 "이스라엘" 의 영문 표기
+    "brazil": "BR",
+    "slovenia": "SI",                 # 기존 "슬로베니아" 의 영문 표기
+    "thailand": "TH",
+    "malta": "MT",
+    "argentina": "AR",
+    "croatia": "HR",
+    "hong kong sar": "HK",
+    "norway": "NO",                   # 기존 "노르웨이" 의 영문 표기
+    "colombia": "CO",
+    "new zealand": "NZ",
+    "bulgaria": "BG",
+    "dominican republic (the)": "DO",
+    "latvia": "LV",
+    "oman": "OM",
+    "costa rica": "CR",
+    "egypt": "EG",
+    "macao": "MO",
+    "philippines": "PH",
+    "uruguay": "UY",
+    "aruba": "AW",
+    "estonia": "EE",
+    "united arab emirates": "AE",
 }
 _COUNTRY_WHITESPACE_RE = re.compile(r"\s+")
 
@@ -1387,8 +1424,11 @@ def normalize_country(value: str) -> str:
     미국 4종: United States/USA/미국/United States of America (USA), 중국 3종 등).
     ISO 3166-1 alpha-2 코드로 수렴시킨다.
 
-    web/migrations/055_findings_country_key.sql 의 public.grm_normalize_country 가 이
-    함수의 SQL 복제본이며 반드시 동일 결과를 내야 한다(파리티는
+    web/migrations/055_findings_country_key.sql 이 원본 47코드 매핑을 만들었고
+    057_grm_normalize_country_ddapi.sql 이 FDA Data Dashboard API(inspections_
+    classifications) CountryName 표기 27종을 추가했다(47→68 코드로 확장). 두 SQL
+    파일의 public.grm_normalize_country 정의(057 이 055 를 create or replace 로
+    완전히 대체)가 이 함수의 SQL 복제본이며 반드시 동일 결과를 내야 한다(파리티는
     tests/test_findings_country_key.py 로 고정).
 
     처리: trim → 연속 공백 1칸 축약 → 소문자 비교 → 매핑 정본(_COUNTRY_CODE_MAP) 조회.

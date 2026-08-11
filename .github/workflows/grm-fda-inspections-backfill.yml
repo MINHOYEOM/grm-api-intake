@@ -1,0 +1,102 @@
+name: GRM FDA GMP Inspection Classifications Backfill
+
+# FDA Data Dashboard API(inspections_classifications) GMP 실사 등급(NAI/VAI/OAI) 백필 —
+# 1회성 수동 실행. public.fda_inspections(058, 사람이 SQL Editor 로 057 -> 058 순서 적용
+# 완료 후에만 --apply 로 돌릴 것) 에 직행 upsert 한다.
+#
+# ★핵심 제약:
+#   - git 쓰기 없음(checkout=read-only). Notion 무접촉 -- findings 파이프라인과 무관한
+#     별도 평평한 집계표라 주간 브리프에 영향 없음.
+#   - 멱등: PostgREST upsert(on_conflict=inspection_id, resolution=merge-duplicates) --
+#     재실행마다 최신 원천값으로 갱신된다. 실패분만 골라 재실행할 필요 없이 전량
+#     재실행이 항상 안전하다.
+#   - dry_run=true(기본값)로 먼저 실행해 리포트의 gmp_candidates/received_total/
+#     excluded_by_project_area 가 실측치(수신 11,104 / GMP 6,417 / 제외 4,687)와 맞는지
+#     확인한 뒤 apply 로 재실행한다. ★dry-run 도 DDAPI 는 실제로 호출한다(Supabase 적재만
+#     생략) -- FDA_API_USER/FDA_DDAPI_KEY 는 dry-run 에도 필요하다.
+#   - ProjectArea 는 DDAPI filters 로 걸 수 없는 반환 전용 컬럼이라(413 invalid_filters),
+#     ProductType=Drugs 전량을 받아 클라이언트에서 Drug Quality Assurance 만 골라 싣는다
+#     -- 058 마이그레이션 헤더/collect_fda_inspections.py 모듈독스트링 참고.
+#
+# ★비용: POST 3콜(페이지 5000×2 + 1104) + upsert 최대 7청크(1000행/청크). 수 분 내 완료 예상.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true = DDAPI 수집만(Supabase 적재 없음). 먼저 이걸로 검증.'
+        type: boolean
+        default: true
+      max_pages:
+        description: '안전판 페이지 상한. 꽉 찬 페이지로 소진하면 조용히 자르지 않고 실패한다.'
+        type: string
+        default: '10'
+      chunk_size:
+        description: 'upsert POST 당 행 수.'
+        type: string
+        default: '1000'
+
+permissions:
+  contents: read
+
+concurrency:
+  # 자기 자신과만 직렬화한다(일일 크론에 이 소스가 붙어 있지 않으므로 경합 대상이 없다).
+  group: fda-inspections-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Backfill FDA GMP inspection classifications (no git writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # SUPABASE_URL 은 grm-intake.yml 이 이미 쓰는 동일 var 재사용(신규 등록 불필요).
+      # FDA_API_USER/FDA_DDAPI_KEY/SUPABASE_SERVICE_ROLE_KEY 는 secrets 3개.
+      - name: Run FDA GMP inspection classifications backfill
+        id: backfill
+        env:
+          FDA_API_USER: ${{ secrets.FDA_API_USER }}
+          FDA_DDAPI_KEY: ${{ secrets.FDA_DDAPI_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=(--output backfill_report.json)
+          ARGS+=(--max-pages "${{ inputs.max_pages }}")
+          ARGS+=(--chunk-size "${{ inputs.chunk_size }}")
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          else
+            ARGS+=(--apply)
+          fi
+          python collect_fda_inspections.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM FDA GMP Inspection Classifications Backfill"
+            echo ""
+            echo "dry_run: \`${{ inputs.dry_run }}\` / max_pages: \`${{ inputs.max_pages }}\` / chunk_size: \`${{ inputs.chunk_size }}\`"
+            echo ""
+            if [ -f backfill_report.json ]; then
+              echo '```json'
+              cat backfill_report.json
+              echo '```'
+            else
+              echo "backfill_report.json 미생성 -- 인자/자격증명/수집 실패로 조기 종료 가능"
+              echo "(FDA_API_USER/FDA_DDAPI_KEY, --apply 시 SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

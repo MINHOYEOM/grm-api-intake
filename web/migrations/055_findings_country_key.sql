@@ -28,6 +28,12 @@
 --   (D) public.findings_country_unmapped() 신설 — 매핑 밖으로 새는 변종을 관측한다.
 --
 -- supersede 체인: findings_zone_category = 038 → **이 파일(055)**.
+-- ★2026-08-12: 이 파일의 (A) public.grm_normalize_country 는
+-- 057_grm_normalize_country_ddapi.sql 이 create or replace 로 27개 변종(FDA Data
+-- Dashboard API CountryName)을 추가해 supersede 한다 -- 시그니처는 그대로이고
+-- 본문(when/then 매핑)만 늘어난다. 프로덕션 현행 매핑 정본은 057 을 봐야 한다.
+-- 이 파일의 (A) 바디는 git 히스토리·원복용 원본으로 그대로 남긴다. (B)(C)(D)는
+-- 057 이 건드리지 않으므로 이 파일이 계속 프로덕션 현행 정의다.
 --
 -- ============================================================================
 -- ★004/009 함정 해당 없음(013 관례 계승): 이 파일은 plpgsql DO 블록/선언 변수를 전혀

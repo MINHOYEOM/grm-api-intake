@@ -650,7 +650,23 @@ class TestNormalizeRow(unittest.TestCase):
 
 class _FakePagedHttpPost:
     """Slices an in-memory row list by (start, rows) from the POST body --
-    stands in for the live DDAPI paginated POST endpoint."""
+    stands in for the live DDAPI paginated POST endpoint.
+
+    ★`start` is **1-based**, and this fake enforces that, because the live API
+    does. Measured 2026-08-12 against api-datadashboard.fda.gov:
+
+        start=0 -> HTTP 400 "start parameter must be numeric and greater than 0"
+        start=1, rows=2 -> ['1251303', '1267171']
+        start=3, rows=2 -> ['1267356', '1269601']
+        start=5, rows=2 -> ['1277530', '1278916']
+
+    This fake used to slice `all_rows[start:start+rows]` -- i.e. 0-based -- and
+    so it **reproduced the production bug rather than catching it**: the
+    collector started at 0, the fake happily returned page 1, every test passed,
+    and the first live run died on its first request. A fake that is wrong in
+    the same direction as the code under test proves nothing. Same failure
+    shape as the FiscalYear defect earlier in this file: the test froze the bug.
+    """
 
     def __init__(self, all_rows: list[dict], *, page_error_on_start: dict | None = None,
                 errors_are_list: bool = False):
@@ -666,7 +682,12 @@ class _FakePagedHttpPost:
             if self.errors_are_list:
                 return [{"error": self.page_error_on_start[start]}]
             raise RuntimeError(self.page_error_on_start[start])
-        page = self.all_rows[start:start + rows]
+        if not isinstance(start, int) or start < 1:
+            # Mirrors the live 400 -- a 0-based caller must fail here, loudly.
+            raise RuntimeError(
+                "HTTP 400: Request body start parameter must be numeric and "
+                f"greater than 0. (got start={start!r})")
+        page = self.all_rows[start - 1:start - 1 + rows]
         return {"statuscode": 200, "message": "Success.", "result": page}
 
 
@@ -690,7 +711,37 @@ class TestFetchAllPages(unittest.TestCase):
         # 2 + 2 + 1 = 3 pages, mirrors the real 5000+5000+1104 shape.
         self.assertEqual(result.pages_fetched, 3)
         self.assertEqual(len(result.rows), 5)
-        self.assertEqual([c["start"] for c in http.calls], [0, 2, 4])
+        # 1-based: page N starts at 1 + (N-1)*page_size. No overlap, no gap --
+        # verified live (see _FakePagedHttpPost docstring).
+        self.assertEqual([c["start"] for c in http.calls], [1, 3, 5])
+
+    def test_first_page_start_is_one_not_zero(self) -> None:
+        """★회귀 가드: 첫 페이지 start 가 0 이면 라이브에서 HTTP 400 으로 **첫 요청부터**
+        죽는다(2026-08-12 실장애). 이 단언이 없으면 0-기반 픽스처와 0-기반 구현이
+        서로를 통과시킨다."""
+        rows = [{"InspectionID": str(i)} for i in range(3)]
+        http = _FakePagedHttpPost(rows)
+        result = mod.fetch_all_pages(api_user="u", api_key="k", http_post=http, page_size=10)
+        self.assertEqual(result.error, "")
+        self.assertEqual(http.calls[0]["start"], 1)
+
+    def test_fake_rejects_zero_start_like_the_live_api(self) -> None:
+        """픽스처 자신의 가드 — 픽스처가 0 을 조용히 받아 주면 위 가드가 무의미해진다."""
+        http = _FakePagedHttpPost([{"InspectionID": "1"}])
+        with self.assertRaises(RuntimeError) as ctx:
+            http("u", headers={}, body={"start": 0, "rows": 2})
+        self.assertIn("greater than 0", str(ctx.exception))
+
+    def test_pages_do_not_overlap_or_skip_rows(self) -> None:
+        """경계 산술 자체를 검사한다 — 겹치면 중복 적재, 비면 조용한 결손이다."""
+        rows = [{"InspectionID": str(i)} for i in range(7)]
+        http = _FakePagedHttpPost(rows)
+        result = mod.fetch_all_pages(api_user="u", api_key="k", http_post=http,
+                                     page_size=3, max_pages=10)
+        self.assertEqual(result.error, "")
+        got = [r["InspectionID"] for r in result.rows]
+        self.assertEqual(got, [str(i) for i in range(7)])
+        self.assertEqual(len(set(got)), 7)
 
     def test_max_pages_exhausted_with_full_last_page_is_truncated(self) -> None:
         # Exactly 4 rows at page_size=2 means both pages come back full --
@@ -706,7 +757,9 @@ class TestFetchAllPages(unittest.TestCase):
 
     def test_page_level_transport_exception_is_surfaced_not_swallowed(self) -> None:
         rows = [{"InspectionID": str(i)} for i in range(5)]
-        http = _FakePagedHttpPost(rows, page_error_on_start={2: "boom"})
+        # start=3 is the **second** page at page_size=2 under 1-based paging
+        # (pages start at 1, 3, 5...) -- so page 1 succeeds and page 2 blows up.
+        http = _FakePagedHttpPost(rows, page_error_on_start={3: "boom"})
         result = mod.fetch_all_pages(api_user="u", api_key="k", http_post=http,
                                      page_size=2, max_pages=10)
         self.assertIn("page_fetch_failed", result.error)
@@ -714,7 +767,8 @@ class TestFetchAllPages(unittest.TestCase):
 
     def test_error_response_shaped_as_list_stops_pagination(self) -> None:
         rows = [{"InspectionID": str(i)} for i in range(5)]
-        http = _FakePagedHttpPost(rows, page_error_on_start={0: "invalid_filters"},
+        # start=1 is the first page under 1-based paging.
+        http = _FakePagedHttpPost(rows, page_error_on_start={1: "invalid_filters"},
                                   errors_are_list=True)
         result = mod.fetch_all_pages(api_user="u", api_key="k", http_post=http,
                                      page_size=2, max_pages=10)

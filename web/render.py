@@ -1396,6 +1396,46 @@ def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | Non
     return obj
 
 
+def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
+    """문서 페이지 `<title>` — 슬러그별로 **유일**하게 만든다.
+
+    ★기본형 "{업체} {문서종류} 지적사항 ({발행일})" 은 문서를 유일하게 식별하지 못한다.
+    같은 업체·같은 기관·같은 공개일로 나뉜 실사 보고서가 실재하기 때문이다(실측 362장이
+    141개 군집으로 겹쳤고 최대 군집은 8장). 제목은 검색 결과의 1차 식별자라, 겹치면
+    구글이 하나만 고르고 나머지를 중복으로 떨어뜨린다.
+
+    그래서 겹칠 때만 단계적으로 넓힌다 — ①분류(사람이 읽어 뜻이 있는 구분) → ②문서번호
+    (마지막 수단, 반드시 유일). 겹치지 않는 문서의 제목은 건드리지 않는다.
+    """
+    def base(d: dict[str, Any]) -> str:
+        return f"{d['firm_name']} {d['source']} 지적사항 ({d['published_date']})"
+
+    counts: dict[str, int] = {}
+    for d in documents:
+        counts[base(d)] = counts.get(base(d), 0) + 1
+
+    out: dict[str, str] = {}
+    second: dict[str, list[dict[str, Any]]] = {}
+    for d in documents:
+        key = base(d)
+        if counts[key] == 1:
+            out[d["slug"]] = key
+            continue
+        cats = d.get("categories") or []
+        widened = f"{key} · {cats[0]}" if cats else key
+        second.setdefault(widened, []).append(d)
+
+    for widened, group in second.items():
+        if len(group) == 1:
+            out[group[0]["slug"]] = widened
+            continue
+        for d in group:
+            # 문서번호 = document_id 의 마지막 마디(hc-insp-82408 → 82408). id 자체가
+            # 유일하므로 이 단계는 반드시 충돌을 해소한다.
+            out[d["slug"]] = f"{widened} · 문서 {d['document_id'].rsplit('-', 1)[-1]}"
+    return out
+
+
 def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> str:
     """meta description — 누가·언제·몇 건·어떤 주제. 데이터 조립뿐(문구 생성 0).
 
@@ -2051,10 +2091,44 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "archive" / "index.html", archive_html)
     written.append("archive/index.html")
 
+    # [검색 유입] 정본을 여기서 미리 읽는다 — 아래 findings 셸이 정적 표면으로 가는
+    # **유일한 진입 간선**을 렌더해야 하고(홈 BFS 도달 28/3,520 이던 고립을 메운다),
+    # 모음 페이지의 사례가 문서 페이지로 이어지려면 "그 문서에 페이지가 있는가"도 알아야
+    # 하기 때문이다. 파일 로드일 뿐이라 렌더 비용이 아니다.
+    facets = load_findings_facets()
+    docs_data = load_findings_docs()
+    doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+
+    # 진입 카드는 **데이터가 있는 축만** 만든다 — 없는 페이지로 보내는 링크는 무링크보다
+    # 나쁘다. 문서 축은 렌더 스위치가 꺼진 테스트 빌드에서 페이지가 없으므로 함께 건다.
+    _axis_blurb = {
+        "category": "무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다.",
+        "country": "제조소가 어느 나라에 있는지로 묶어 봅니다.",
+        "agency": "FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다.",
+    }
+    browse_axes = []
+    for _axis in (facets.get("axes") if facets else []) or []:
+        _meta = FACET_AXES.get(_axis["axis"])
+        if not _meta or not _axis.get("items"):
+            continue
+        browse_axes.append({"href": f"findings/{_meta['path']}/",
+                            "title": _meta["title"],
+                            "blurb": _axis_blurb.get(_axis["axis"], "")})
+    # ★sitemap 과 같은 규칙: **데이터에서 파생**하지 렌더 결과에서 파생하지 않는다.
+    # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게 되어
+    # (골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
+    if docs_data and docs_data.get("documents"):
+        browse_axes.append({
+            "href": "findings/docs/", "title": "문서로 찾기",
+            "blurb": (f"실사 문서 {docs_data['totals']['documents']:,}건을 기관·연도로"
+                      " 묶어 봅니다."),
+        })
+
     # 지적사항 검색(FIND-1 M3c) — 라이브 데이터(Supabase PostgREST)라 빌드시 목록을 고정할
     # 수 없다. 서버는 셸(로딩 상태)만 렌더 — env 미설정이면 findings.js 가 "준비 중" 안내로
     # 조용히 종료한다(cfg data 속성은 위 reactions_enabled 와 무관하게 항상 주입).
     findings_html = env.get_template("findings.html").render(
+        browse_axes=browse_axes,
         page_title="규제 지적사항 검색 · GRM",
         rel_root="../",
         nav_active="findings",
@@ -2233,11 +2307,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [검색 유입] 분류·국가·기관 모음 페이지 — 축 색인 3장 + 항목 페이지 N장.
     # 축 색인을 함께 내는 이유: 항목 페이지가 sitemap 에만 있으면 사이트 구조에서 그
     # 페이지들에 닿는 내부 링크가 없다(내부 링크가 곧 색인 경로다).
-    facets = load_findings_facets()
-    # 문서 정본을 **모음 페이지보다 먼저** 읽는다 — 모음 페이지의 사례가 문서 페이지로
-    # 이어지려면 "그 문서에 페이지가 있는가"를 렌더 시점에 알아야 하기 때문이다.
-    docs_data = load_findings_docs()
-    doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+    # facets·docs_data·doc_slugs 는 findings 셸 렌더 직전에 이미 읽어 두었다(진입 간선
+    # 카드가 그 데이터를 필요로 한다) — 여기서 다시 읽지 않는다.
     facet_paths: list[str] = []
     if facets:
         agency_labels = facets.get("agency_labels") or {}
@@ -2298,6 +2369,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 cat_slug_by_label[it["label_ko"]] = it["slug"]
 
         documents = docs_data.get("documents") or []
+        # 제목은 슬러그별로 유일해야 한다 — 겹치면 검색 결과에서 서로 구분되지 않는다.
+        doc_titles = build_doc_page_titles(documents)
 
         # ── 내부 링크 구조 ───────────────────────────────────────────────────
         # 문서 페이지 3천 장을 sitemap 에만 올려두면 사이트 구조에서 그 페이지에 닿는
@@ -2395,8 +2468,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
             doc_html = env.get_template("findings_doc.html").render(
-                page_title=(f"{doc['firm_name']} {doc['source']} 지적사항"
-                            f" ({doc['published_date']}) · GRM"),
+                page_title=f"{doc_titles[doc['slug']]} · GRM",
                 rel_root="../../../",
                 nav_active="findings",
                 latest_slug=latest_slug,

@@ -181,15 +181,20 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
         if not key:
             excluded.append({"key": "", "findings": n, "reason": "국가 미상(원문에 표기 없음)"})
             continue
-        if n < min_findings:
-            excluded.append({"key": key, "findings": n,
-                             "reason": f"표본 미달(<{min_findings})"})
-            continue
 
+        # ★라벨 게이트를 **표본 미달보다 먼저** 본다. 순서가 반대면 새 규제기관이 편입돼도
+        # 초기 건수가 적은 동안에는 "표본 미달"로 조용히 제외되고, 건수가 임계값을 넘는
+        # 순간에야 처음 터진다 — 그때는 이미 그 기관이 여러 주 동안 축에서 빠져 있었다.
+        # 게이트의 목적은 "모르는 기관이 있다"를 즉시 알리는 것이지 노출을 막는 게 아니다.
         if axis == "agency" and key not in AGENCY_LABELS_KO:
             raise SystemExit(
                 f"모르는 기관 코드: {key!r} — AGENCY_LABELS_KO 에 한국어 표기를 추가하세요."
                 " 코드로 폴백하지 않습니다(새 기관이 조용히 영문 코드로 노출되는 것을 막습니다).")
+
+        if n < min_findings:
+            excluded.append({"key": key, "findings": n,
+                             "reason": f"표본 미달(<{min_findings})"})
+            continue
 
         label = (labels or {}).get(key, "")
         if labels is not None and not label:
@@ -204,6 +209,9 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
         except Exception as exc:                       # noqa: BLE001 — 항목별 격리
             failures += 1
             log(f"  ! {axis}/{key} 조회 실패: {exc}")
+            # ★실패도 excluded 에 남긴다. log 로만 흘리면 "왜 이 축이 사라졌나"가
+            # 화면에도 PR 본문에도 안 남아, 표본 미달로 빠진 것과 구분되지 않는다.
+            excluded.append({"key": key, "findings": n, "reason": "조회 실패"})
             continue
 
         totals = resp.get("totals") or {}

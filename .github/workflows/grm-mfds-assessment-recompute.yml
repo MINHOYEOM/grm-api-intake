@@ -1,0 +1,81 @@
+name: GRM MFDS GMP Assessment Recompute (backfill)
+
+# 식약처 GMP 실사 `attachment_deficiency_assessment` 소급 재판정 — 수동 1회성.
+#
+# 배경: 판정 앵커를 넓혀도(PR#731) **이미 적재된 행은 바뀌지 않는다.** 수집기는 등록일
+# 창 기반이라 과거분을 다시 훑지 않고, 딥 백필조차 `resolution=ignore-duplicates` 라
+# 재실행해도 기존 행을 안 건드린다. 그래서 원문이 "적합"이라고 명시했는데 우리가
+# `unknown`(판정 불능)으로 적어 둔 행이 그대로 남아 추출격차 감시를 붉게 만든다.
+#
+# ★네트워크 없음: 판정 입력인 `attachment_text` 가 이미 raw_signals 에 있다. PDF 를 다시
+#   받지 않는다(nedrug 는 해외 IP 차단이라 러너에서 받을 수도 없다). 따라서 이 잡이
+#   고치는 것은 판정·인용문뿐이고, 지적 **표**(gmp_deficiencies)는 PDF 바이트가 있어야
+#   하므로 신규 수집분에서만 채워진다.
+#
+# ★git 쓰기 없음(checkout read-only) · Notion 무접촉 · 발행 파이프라인 무간섭.
+# ★dry_run=true(기본)로 먼저 돌려 transitions 를 확인한 뒤 false 로 재실행할 것.
+# ★강등 판정(present→unknown 등)이 하나라도 있으면 **적용하지 않고 exit 1** 로 끝난다 —
+#   그건 소급 대상이 아니라 판정 규칙이 바뀌었다는 신호라 사람이 봐야 한다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true = 계산만 하고 쓰지 않음(기본). false = 실제 반영.'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-mfds-assessment-recompute
+  cancel-in-progress: false
+
+jobs:
+  recompute:
+    name: Recompute deficiency assessment from stored text
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 의존성
+        run: pip install -q requests
+
+      - name: 재판정
+        id: recompute
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -o pipefail
+          ARGS="--json mfds-assessment-recompute.json"
+          if [ "${{ inputs.dry_run }}" != "true" ]; then
+            ARGS="$ARGS --apply"
+          fi
+          python backfill_mfds_gmp_assessment.py $ARGS
+
+      - name: 잡 요약
+        if: always()
+        run: |
+          {
+            echo "### MFDS GMP 판정 재계산 (dry_run=${{ inputs.dry_run }})"
+            echo ""
+            if [ -f mfds-assessment-recompute.json ]; then
+              echo '```json'
+              cat mfds-assessment-recompute.json
+              echo '```'
+            else
+              echo "리포트 없음 — 위 단계 로그 확인."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 결과 아티팩트
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mfds-assessment-recompute
+          path: mfds-assessment-recompute.json
+          if-no-files-found: warn

@@ -1762,7 +1762,7 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
 def build_sitemap_xml(briefs: list[dict[str, Any]],
                       base_url: str = SITE_BASE_URL,
                       glossary_term_ids: "list[str] | None" = None,
-                      facet_paths: "list[str] | None" = None) -> str:
+                      facet_paths: "list[tuple[str, str]] | None" = None) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
@@ -1803,7 +1803,14 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # 본문이 색인되지 않는다. 축별 정적 표면(축 색인 3 + 항목 N)을 등록해 24,797건이
         # 주제·국가·기관 단위로는 검색 대상이 되게 한다. 경로는 렌더가 실제로 쓴 것과
         # 같은 리스트라(손으로 다시 적지 않는다) 페이지와 sitemap 이 갈라질 수 없다.
-        *(f"  <url><loc>{base_url}/{p}</loc></url>" for p in (facet_paths or [])),
+        # ★lastmod 는 **진짜 날짜가 있을 때만** 넣는다. 지어낸 수정일은 없느니만 못하다 —
+        # 구글은 신뢰할 수 없는 lastmod 를 무시하기 시작한다(사이트 전체가 손해). 그래서
+        # 문서·목록·모음처럼 데이터에 실제 날짜가 있는 것만 달고, 용어사전처럼 날짜 개념이
+        # 없는 페이지는 비운다.
+        *(f"  <url><loc>{base_url}/{path}</loc>"
+          + (f"<lastmod>{mod}</lastmod>" if mod else "")
+          + "</url>"
+          for path, mod in (facet_paths or [])),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
     ]
@@ -2416,7 +2423,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 페이지들에 닿는 내부 링크가 없다(내부 링크가 곧 색인 경로다).
     # facets·docs_data·doc_slugs 는 findings 셸 렌더 직전에 이미 읽어 두었다(진입 간선
     # 카드가 그 데이터를 필요로 한다) — 여기서 다시 읽지 않는다.
-    facet_paths: list[str] = []
+    # (경로, lastmod) — lastmod 는 데이터에 실제 날짜가 있을 때만 채운다.
+    facet_paths: list[tuple[str, str]] = []
     if facets:
         agency_labels = facets.get("agency_labels") or {}
         measured_on = facets.get("measured_on") or ""
@@ -2441,7 +2449,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             )
             _write(out_dir / "findings" / meta["path"] / "index.html", index_html)
             written.append(f"findings/{meta['path']}/index.html")
-            facet_paths.append(f"findings/{meta['path']}/")
+            # 축 색인의 갱신일 = 그 축 항목들이 실은 가장 최근 사례의 공개일.
+            axis_mod = max((s.get("published_date") or ""
+                            for it in items for s in it.get("samples") or []),
+                           default="")
+            facet_paths.append((f"findings/{meta['path']}/", axis_mod))
 
             for item in items:
                 page_html = env.get_template("findings_facet.html").render(
@@ -2457,7 +2469,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 _write(out_dir / "findings" / meta["path"] / item["slug"] / "index.html",
                        page_html)
                 written.append(f"findings/{meta['path']}/{item['slug']}/index.html")
-                facet_paths.append(f"findings/{meta['path']}/{item['slug']}/")
+                item_mod = max((s.get("published_date") or ""
+                                for s in item.get("samples") or []), default="")
+                facet_paths.append(
+                    (f"findings/{meta['path']}/{item['slug']}/", item_mod))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(지적 3건 이상).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지
@@ -2510,10 +2525,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       for y in sorted({yy for aa, yy in by_ay if aa == a}, reverse=True)],
         } for a in doc_agencies]
 
-        facet_paths.append("findings/docs/")
+        newest_doc = max((d["published_date"] for d in documents), default="")
+        facet_paths.append(("findings/docs/", newest_doc))
         for g in index_groups:
             for y in g["years"]:
-                facet_paths.append(f"findings/docs/{g['slug']}/{y['year']}/")
+                bucket_mod = max(
+                    (d["published_date"]
+                     for d in by_ay[(g["slug"].upper(), y["year"])]), default="")
+                facet_paths.append(
+                    (f"findings/docs/{g['slug']}/{y['year']}/", bucket_mod))
 
         # ★목록·색인 21장은 **스위치와 무관하게 항상** 낸다. 비싼 것은 개별 문서 3,202장뿐
         # (한 번에 ~27초)이고, 목록을 함께 끄면 sitemap·진입 카드·404 페이지가 가리키는
@@ -2563,7 +2583,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
             # sitemap 과 프로덕션 sitemap 이 달라져 골든 대조가 의미를 잃는다.
-            facet_paths.append(f"findings/doc/{doc['slug']}/")
+            facet_paths.append(
+                (f"findings/doc/{doc['slug']}/", doc["published_date"]))
             if not render_doc_pages:
                 continue
             related = [{"slug": cat_slug_by_label[label], "label_ko": label}

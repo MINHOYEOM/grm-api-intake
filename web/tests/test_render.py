@@ -7098,6 +7098,97 @@ class WebFindingsDocPageTest(unittest.TestCase):
             self.assertIn(f'{render.SITE_BASE_URL}/findings/doc/{doc["slug"]}/', html)
             self.assertIn(f'href="../../../findings/agency/{doc["agency"].lower()}/"', html)
 
+    # ── 내부 링크 구조 ──────────────────────────────────────────────────────
+    # sitemap 에만 있는 페이지는 사이트 구조에서 닿는 경로가 없어 크롤이 느리고 중요도
+    # 신호도 안 붙는다. 용어사전·모음 페이지에는 축 색인을 함께 냈으면서 문서 페이지에만
+    # 빠뜨렸던 것을 #723 에서 메웠다 — 그 불변식을 여기서 지킨다.
+
+    def test_no_document_page_is_an_orphan(self):
+        """★모든 문서 페이지가 목록 페이지에서 링크되어야 한다.
+
+        이 검사가 이 클래스에서 가장 중요하다. 문서가 늘어 새 기관·연도 조합이 생겼는데
+        목록 생성이 그것을 놓치면, 그 문서들은 sitemap 에만 남아 조용히 고아가 된다.
+        """
+        import re as _re
+        docs_root = self.out / "findings" / "docs"
+        self.assertTrue(docs_root.exists(), "문서 목록 디렉터리 누락")
+        linked: set[str] = set()
+        for p in docs_root.rglob("index.html"):
+            linked |= set(_re.findall(r"findings/doc/([A-Za-z0-9._-]+)/",
+                                      p.read_text(encoding="utf-8")))
+        orphans = sorted({d["slug"] for d in self.data["documents"]} - linked)
+        self.assertEqual(orphans, [],
+                         f"목록에서 못 닿는 문서 {len(orphans)}건: {orphans[:5]}")
+
+    def test_doc_index_links_every_agency_year_bucket(self):
+        buckets = {(d["agency"].lower(), d["published_date"][:4])
+                   for d in self.data["documents"]}
+        index = (self.out / "findings" / "docs" / "index.html").read_text(encoding="utf-8")
+        for agency, year in sorted(buckets):
+            self.assertIn(f'href="../../findings/docs/{agency}/{year}/"', index,
+                          f"색인이 {agency}/{year} 를 링크하지 않음")
+            self.assertTrue(
+                (self.out / "findings" / "docs" / agency / year / "index.html").exists(),
+                f"목록 페이지 누락: {agency}/{year}")
+
+    def test_listing_pages_are_in_sitemap(self):
+        buckets = {(d["agency"].lower(), d["published_date"][:4])
+                   for d in self.data["documents"]}
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/docs/</loc>", self.sitemap)
+        for agency, year in sorted(buckets):
+            self.assertIn(
+                f"<loc>{render.SITE_BASE_URL}/findings/docs/{agency}/{year}/</loc>",
+                self.sitemap, f"sitemap 미등록: docs/{agency}/{year}")
+
+    def test_same_firm_links_exclude_self_and_exist(self):
+        """같은 업체 링크는 자기 자신을 빼고, 실제 페이지만 가리켜야 한다."""
+        import re as _re
+        by_key: dict[str, list[str]] = {}
+        for d in self.data["documents"]:
+            if d.get("firm_key"):
+                by_key.setdefault(d["firm_key"], []).append(d["slug"])
+        multi = [d for d in self.data["documents"]
+                 if len(by_key.get(d.get("firm_key") or "", [])) > 1][:15]
+        self.assertTrue(multi, "문서 2건 이상 업체가 없다(배선 확인)")
+        for doc in multi:
+            html = self._page(doc["slug"])
+            self.assertIn("같은 업체의 다른 기록", html, doc["slug"])
+            section = html.split("같은 업체의 다른 기록", 1)[1].split("</section>", 1)[0]
+            targets = _re.findall(r"findings/doc/([A-Za-z0-9._-]+)/", section)
+            self.assertTrue(targets, f"같은 업체 링크 0건: {doc['slug']}")
+            self.assertNotIn(doc["slug"], targets, "자기 자신을 링크했다")
+            for t in targets:
+                self.assertIn(t, by_key[doc["firm_key"]],
+                              f"다른 업체 문서를 같은 업체로 링크: {t}")
+                self.assertTrue(
+                    (self.root / t / "index.html").exists(), f"없는 페이지로 링크: {t}")
+
+    def test_facet_samples_link_only_to_existing_doc_pages(self):
+        """지적 3건 미만 문서는 페이지가 없다 — 그런 사례에는 링크를 만들면 안 된다."""
+        import re as _re
+        facets = render.load_findings_facets()
+        if not facets:
+            self.skipTest("findings_facets.json 미존재")
+        known = {d["slug"] for d in self.data["documents"]}
+        checked = linked = 0
+        for axis in facets["axes"]:
+            meta = render.FACET_AXES[axis["axis"]]
+            for item in axis["items"]:
+                page = (self.out / "findings" / meta["path"] / item["slug"] /
+                        "index.html").read_text(encoding="utf-8")
+                targets = set(_re.findall(r"findings/doc/([A-Za-z0-9._-]+)/", page))
+                for t in targets:
+                    self.assertIn(t, known, f"없는 문서 페이지로 링크: {t}")
+                    self.assertTrue((self.root / t / "index.html").exists())
+                for s in item["samples"]:
+                    checked += 1
+                    if (s.get("document_id") or "") in known:
+                        linked += 1
+                        self.assertIn(s["document_id"], targets,
+                                      f'문서 페이지가 있는데 링크 안 함: {s["document_id"]}')
+        self.assertGreater(checked, 0)
+        self.assertGreater(linked, 0, "사례→문서 링크가 하나도 없다(배선 확인)")
+
 
 class WebGlossaryDeepFieldsTest(unittest.TestCase):
     """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항

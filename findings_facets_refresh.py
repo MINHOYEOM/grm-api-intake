@@ -142,6 +142,10 @@ def _sample_view(doc: dict[str, Any], finding: dict[str, Any]) -> dict[str, Any]
         "published_date": finding.get("published_date") or doc.get("published_date") or "",
         "category_label_ko": finding.get("category_label_ko") or "",
         "evidence_url": finding.get("evidence_url") or doc.get("evidence_url") or "",
+        # 이 사례가 속한 문서 — 렌더가 문서 페이지(/findings/doc/{id}/)로 잇는 데 쓴다.
+        # 그 문서에 페이지가 없을 수도 있으므로(지적 3건 미만) **링크 여부는 렌더가
+        # findings_docs.json 과 대조해 정한다** — 없는 페이지로 보내는 링크는 무링크보다 나쁘다.
+        "document_id": doc.get("document_id") or "",
     }
 
 

@@ -97,6 +97,12 @@
             <span class="fx-case-d">{{ s.published_date }}</span>
           </div>
           <p class="fx-case-t">{{ s.text_ko }}</p>
+          {#- 문서 페이지가 있는 사례만 잇는다(지적 3건 미만이면 페이지가 없다) —
+              렌더가 findings_docs.json 과 대조해 `doc_slug` 를 채운다. 없는 페이지로 보내는
+              링크는 무링크보다 나쁘다. -#}
+          {%- if s.doc_slug %}
+          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">이 문서의 지적 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {%- endif %}
           {%- if s.evidence_url %}
           <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
           {%- endif %}

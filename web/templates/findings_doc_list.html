@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [검색 유입] 문서 목록 — /findings/docs/ (색인) 과 /findings/docs/{agency}/{year}/ (목록).
+
+    ★이 페이지들이 존재하는 이유는 **내부 링크**다. 문서 페이지 3천 장을 sitemap 에만
+    올려두면 사이트 구조에서 그 페이지에 닿는 경로가 없어 크롤이 느리고 중요도 신호도
+    붙지 않는다. 용어사전·모음 페이지에는 축 색인을 함께 냈으면서 문서 페이지에만
+    빠뜨렸던 것을 메운다.
+
+    한 템플릿이 두 모드를 그린다(`mode`) — 색인은 기관×연도 격자, 목록은 문서 행.
+    데이터는 web/data/findings_docs.json 하나에서 파생하므로 두 화면이 갈라질 수 없다.
+
+    grm.css 프리즈 보존을 위해 스코프 <style>, 클래스 공간 .dl-*.
+    §4 한글 안전 가드: 인라인 스타일에 letter-spacing/text-transform 금지 → eyebrow 는 .kick. -#}
+<style>
+  .dl-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .dl-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .dl-crumb a:hover{color:var(--coral)}
+  .dl-crumb i{font-style:normal;color:var(--line-2)}
+  .dl-h1{font-family:var(--serif);font-size:clamp(26px,3.8vw,38px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .dl-lede{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--body);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .dl-lede b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+  .dl-grid{margin-top:30px;display:flex;flex-direction:column;gap:26px}
+  .dl-ag{display:flex;flex-direction:column;gap:12px}
+  .dl-ag-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
+  .dl-years{display:flex;flex-wrap:wrap;gap:8px}
+  .dl-year{display:inline-flex;align-items:baseline;gap:8px;font-family:var(--sans);font-size:14px;color:var(--body);background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:8px 14px;text-decoration:none}
+  .dl-year:hover{border-color:var(--coral);color:var(--coral)}
+  .dl-year b{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+
+  .dl-rows{margin-top:26px;display:flex;flex-direction:column;gap:1px;background:var(--line-2);border:1px solid var(--line-2);border-radius:var(--rad);overflow:hidden}
+  .dl-row{background:var(--card);padding:14px 18px;display:grid;grid-template-columns:1fr 108px 74px;gap:14px;align-items:baseline;text-decoration:none}
+  .dl-row:hover{background:var(--soft)}
+  @media (max-width:640px){ .dl-row{grid-template-columns:1fr;gap:5px} }
+  .dl-firm{font-family:var(--sans);font-size:14.5px;color:var(--ink);word-break:keep-all}
+  .dl-row:hover .dl-firm{color:var(--coral)}
+  .dl-cats{display:block;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:3px;word-break:keep-all}
+  .dl-date{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .dl-n{font-family:var(--mono);font-size:12.5px;color:var(--body);text-align:right;font-variant-numeric:tabular-nums}
+  @media (max-width:640px){ .dl-n{text-align:left} }
+
+  .dl-nav{margin-top:28px;border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;gap:8px}
+  .dl-nav a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .dl-nav a:hover{border-color:var(--coral);color:var(--coral)}
+  .dl-nav a.on{border-color:var(--coral);color:var(--coral);background:var(--coral-tint)}
+  .dl-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:20px 0 0;max-width:760px;word-break:keep-all}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="dl-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i>
+      {%- if mode == 'list' %}<a href="{{ rel_root }}findings/docs/">문서로 찾기</a><i>&rsaquo;</i><span>{{ heading }}</span>
+      {%- else %}<span>문서로 찾기</span>{% endif %}
+    </nav>
+    <p class="kick">By Document</p>
+    <h1 class="dl-h1">{{ heading }}</h1>
+    <p class="dl-lede">{{ lede }}</p>
+  </div>
+
+  <div class="wrap">
+    {%- if mode == 'index' %}
+    <div class="dl-grid">
+      {%- for g in groups %}
+      <section class="dl-ag">
+        <h2 class="dl-ag-h">{{ g.label_ko }} <span class="dl-date">{{ "{:,}".format(g.total) }}건</span></h2>
+        <div class="dl-years">
+          {%- for y in g.years %}
+          <a class="dl-year" href="{{ rel_root }}findings/docs/{{ g.slug }}/{{ y.year }}/">{{ y.year }}년 <b>{{ "{:,}".format(y.count) }}</b></a>
+          {%- endfor %}
+        </div>
+      </section>
+      {%- endfor %}
+    </div>
+    {%- else %}
+    <div class="dl-rows">
+      {%- for d in documents %}
+      <a class="dl-row" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
+        <span class="dl-firm">{{ d.firm_name }}{% if d.categories %}<span class="dl-cats">{{ d.categories | join(' · ') }}</span>{% endif %}</span>
+        <span class="dl-date">{{ d.published_date }}</span>
+        <span class="dl-n">지적 {{ d.findings | length }}건</span>
+      </a>
+      {%- endfor %}
+    </div>
+    <nav class="dl-nav" aria-label="다른 연도·기관">
+      {%- for y in sibling_years %}<a href="{{ rel_root }}findings/docs/{{ agency_slug }}/{{ y.year }}/"{% if y.year == year %} class="on" aria-current="page"{% endif %}>{{ y.year }}년</a>{% endfor %}
+      <a href="{{ rel_root }}findings/docs/">전체 기관·연도</a>
+      <a href="{{ rel_root }}findings/agency/{{ agency_slug }}/">{{ agency_label }} 지적사항 요약</a>
+    </nav>
+    {%- endif %}
+    <p class="dl-note">지적 3건 이상이 우리말로 정리된 문서만 목록에 넣었습니다. 그 밖의 문서는 <a href="{{ rel_root }}findings/">지적사항 검색</a>에서 찾아보실 수 있습니다. 각 문서는 규제기관이 공개한 원문으로 바로 연결됩니다.</p>
+  </div>
+</main>
+{% endblock %}

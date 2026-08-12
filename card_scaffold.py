@@ -1604,11 +1604,29 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
 
 # 원문 본문 확보를 뜻하는 raw 키 — 소스별 이름이 다르므로 한곳에 모은다. 새 소스에서 본문을
 # 확보하는 키를 추가하면 여기에도 넣어야 한다(안 넣으면 그 소스만 신호가 꺼져 있다).
+#
+# ★[2026-08-12] 그 경고가 그대로 현실이 됐다 — 나중에 붙은 소스 3종(EU/영국 GMP NCR·
+# WHOPIR 구조화 보고서)의 본문 키가 목록에 없어 **그 소스들만 신호가 꺼져 있었다**.
+# 증상이 고약한 이유: 이 카드들은 `deterministic_detail` 에 위반내용·당국조치 **전문을
+# verbatim 으로 싣고 있는데**, LLM 에게 가는 `source_body_captured` 는 False 라
+# "원문을 못 받았다"로 읽힌다 — 이 신호를 만든 2026-07-20 사고(LLM 이 원문 존재를
+# 추측해 "원문에 명시되지 않았다"는 거짓 요약을 냄)와 정확히 같은 조건이다.
+# 라이브 실측(발행분 8호): whopir_report 11/11 · eu_gmp_ncr_statement 10/10 ·
+# mhra_gmp_ncr_statement 1/1 이 전부 신호 부재.
+#
+# 재발 방지는 골든 쌍(`tests/golden/*.input.json` ↔ `*.expected.webcard.json`)으로
+# 잠갔다 — **결정론 상세를 실은 카드는 반드시 source_body_captured 가 True** 라는
+# 불변식을 실데이터로 검사한다(손목록을 손목록으로 검사하지 않는다).
 _SOURCE_BODY_KEYS = (
     "wl_body_excerpt", "wl_body_full", "wl_violations",
     "fda483_excerpt", "fda483_body_full", "fda_483_observations",
     "whopir_excerpt", "gmp_deficiencies", "attachment_deficiency_excerpt",
     "admin_body_full", "eca_article_excerpt", "article_excerpt",
+    # WHO WHOPIR 구조화 보고서(결론·항목별 요약) — 구 `whopir_excerpt` 의 후속 경로.
+    "whopir_report",
+    # EU(EudraGMDP)·영국(MHRA) GMP 비준수 성명서 전문. nature=위반내용, action=당국조치가
+    # 본체이고 operations/additional 은 함께 실리는 원문 구간이다.
+    "ncr_nature", "ncr_action", "ncr_operations", "ncr_additional",
 )
 
 

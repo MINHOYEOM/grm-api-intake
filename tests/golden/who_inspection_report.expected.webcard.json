@@ -1,0 +1,69 @@
+{
+  "agency": "WHO",
+  "card_type": "WHO",
+  "category": "Other",
+  "checks": [],
+  "deterministic_detail": {
+    "outcome": "Based on the areas inspected, the manufacturer was considered to be operating at an acceptable level of compliance with WHO GMP.",
+    "report_kind": "findings",
+    "sections": [
+      {
+        "no": 1,
+        "text": "The quality manual was reviewed and found to be current.",
+        "title": "Quality System"
+      },
+      {
+        "no": 2,
+        "text": "Line clearance was observed during the inspection.",
+        "title": "Production System"
+      }
+    ],
+    "type": "whopir_report"
+  },
+  "evidence_basis": "공식 인덱스 + 보조 출처",
+  "evidence_level": "B",
+  "facts": [
+    {
+      "label": "실사일",
+      "value": "2026-05-06"
+    },
+    {
+      "label": "문서번호",
+      "value": "who-whopir-2026-11-rep"
+    },
+    {
+      "label": "주제",
+      "value": "WHOPIR: Site Z, India (FPP)"
+    },
+    {
+      "label": "발행기관",
+      "value": "WHO"
+    }
+  ],
+  "group": "글로벌",
+  "group_label": null,
+  "headline_target": "WHOPIR — Site R",
+  "id": "who-whopir-2026-11-rep",
+  "implication": "",
+  "key_facts": [],
+  "merged_count": 1,
+  "merged_items": [],
+  "modality": null,
+  "quotes": [],
+  "render_order": null,
+  "signal_label": "Med",
+  "signal_tier": 2,
+  "source_body_captured": true,
+  "sources": {
+    "info_url": "https://extranet.who.int/pqweb/inspection/whopir-site-r",
+    "link_check": {
+      "info": "pending",
+      "official": "pending"
+    },
+    "official_is_pdf": true,
+    "official_url": "https://extranet.who.int/pqweb/sites/default/files/whopir-z.pdf"
+  },
+  "summary": "",
+  "title_issue": "",
+  "type_tag": "WHO"
+}

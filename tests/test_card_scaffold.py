@@ -57,6 +57,13 @@ WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
     # [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 — EU NCR 의 영국판. Evidence A + 결정론
     # 상세슬롯(mhra_gmp_ncr_statement) + 세션독립 상세페이지 official(아카이브 없음).
     "mhra_gmp_ncr",
+    # ★[상세 커버리지 2026-08-12] 아래 둘은 **결함이 숨은 자리를 메우려고** 추가했다.
+    # `who-inspection`·`warning-letter` 는 결정론 상세 producer 가 있는데 그 상세를 실은
+    # 골든이 하나도 없어, 그 경로가 어떤 테스트에서도 렌더된 적이 없었다. 그래서
+    # `whopir_report` 본문 키가 `_SOURCE_BODY_KEYS` 에서 빠진 것을 아무도 못 잡았고,
+    # WHOPIR 11장이 "세부 내용은 확보하지 못해"라는 거짓 문장을 달고 실제로 발행됐다.
+    # web-card 전용(FIXTURES 미포함 → brief golden·intake_total 불변 — eu_gmp_ncr 선례 동형).
+    "who_inspection_report", "warning_letter_violations",
 ]
 
 # assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).
@@ -1803,6 +1810,97 @@ class FrDetailTest(unittest.TestCase):
                 wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
                 self.assertNotIn("deterministic_detail", wc)
                 self.assertNotIn("detail", wc)
+
+
+class SourceBodySignalInvariantTest(unittest.TestCase):
+    """★[2026-08-12] **결정론 상세를 실은 카드는 `source_body_captured` 가 True 여야 한다.**
+
+    `_SOURCE_BODY_KEYS` 는 "원문 본문을 확보했다"를 뜻하는 raw 키의 손목록이고, 그 위
+    주석이 이미 "새 소스의 본문 키를 안 넣으면 그 소스만 신호가 꺼진다"고 경고해 뒀다.
+    그 경고가 그대로 현실이 됐다 — 나중에 붙은 EU/영국 GMP NCR·WHOPIR 구조화 보고서의
+    본문 키가 빠져 **카드가 위반내용 전문을 verbatim 으로 싣고 있는데 LLM 입력은
+    `source_body_captured=False`**(= "원문을 못 받았다")였다. 이 신호를 만든 2026-07-20
+    사고(LLM 이 원문 존재를 추측해 "원문에 명시되지 않았다"는 거짓 요약을 냄)와 정확히
+    같은 조건이다. 라이브 발행분 실측: whopir_report 11/11 · eu_gmp_ncr 10/10 ·
+    mhra_gmp_ncr 1/1 이 전부 신호 부재였다.
+
+    ★손목록을 손목록으로 검사하지 않는다 — **골든 쌍(실데이터)** 으로 불변식을 건다.
+    `tests/golden/*.input.json`(수집기 raw) ↔ `*.expected.webcard.json`(렌더 결과)을
+    전수 글롭으로 짝지어, 상세 블록이 실린 카드마다 같은 raw 로 `_has_source_body` 가
+    True 인지 본다. 새 상세 유형 fixture 가 추가되면 자동으로 검사 대상이 된다."""
+
+    def _pairs(self):
+        import glob as _glob
+        out = []
+        for path in sorted(_glob.glob(os.path.join(GOLDEN, "*.input.json"))):
+            stem = os.path.basename(path)[: -len(".input.json")]
+            webcard = os.path.join(GOLDEN, f"{stem}.expected.webcard.json")
+            if not os.path.isfile(webcard):
+                continue
+            with open(path, encoding="utf-8") as fh:
+                fixture = json.load(fh)
+            with open(webcard, encoding="utf-8") as fh:
+                card = json.load(fh)
+            out.append((stem, fixture.get("raw") or {}, card))
+        return out
+
+    def test_every_detail_kind_has_a_golden_carrying_that_detail(self):
+        """★상세 producer 가 있는 kind 는 **그 상세를 실은 골든**을 가져야 한다.
+
+        WHOPIR 구멍이 왜 안 잡혔는가의 답이 이것이다 — `who-inspection` 골든은
+        `whopir_excerpt`(구 경로)만 있었고 `whopir_report`(구조화 경로)를 실은 골든이
+        하나도 없어, 그 상세 경로가 **어떤 테스트에서도 한 번도 렌더되지 않았다.**
+        상세를 실은 골든이 없으면 위 불변식 검사도 그 유형을 못 본다(빈 검사).
+
+        대상 kind 는 `_REGISTRY` 에서 파생하므로, 새 소스에 상세를 배선하면 골든을
+        만들 때까지 적색이다(손목록으로 대상을 세지 않는다)."""
+        expected = {k for k, s in cs._REGISTRY.items() if s.detail}
+        self.assertGreaterEqual(len(expected), 5, "파생 대상 0~소수 — 레지스트리 파싱이 깨졌다")
+        covered = set()
+        for name in WEBCARD_FIXTURES:
+            fx = _load_input(name)
+            card = cs.build_card_scaffold(fx["row"], fx["raw"])
+            if cs._deterministic_detail(card.kind, fx["row"], fx["raw"]):
+                covered.add(card.kind)
+        self.assertEqual(
+            sorted(expected - covered), [],
+            "결정론 상세 producer 는 있는데 그 상세를 실은 골든이 없다 — 미검사 경로다")
+
+    def test_pairs_discovered(self):
+        """0건은 성공이 아니다 — 글롭·명명 규약이 깨지면 이 가드가 침묵한다."""
+        pairs = self._pairs()
+        self.assertGreaterEqual(len(pairs), 5, f"골든 쌍 {len(pairs)}건 — 글롭이 깨졌다")
+        with_detail = [s for s, _, c in pairs if c.get("deterministic_detail")]
+        self.assertGreaterEqual(
+            len(with_detail), 3,
+            f"결정론 상세를 가진 골든이 {len(with_detail)}건뿐 — 검사 대상이 사라졌다")
+
+    def test_detail_implies_source_body_captured(self):
+        violations = []
+        for stem, raw, card in self._pairs():
+            detail = card.get("deterministic_detail")
+            if not detail:
+                continue
+            if not cs._has_source_body(raw):
+                violations.append(f"{stem}(detail={detail.get('type')})")
+        self.assertEqual(
+            violations, [],
+            "상세 전문을 싣고도 source_body_captured=False 인 카드 — LLM 이 '원문을 못 받았다'로 "
+            f"읽어 거짓 부재 서술이 나갈 수 있다: {violations}")
+
+    def test_known_body_keys_are_recognized(self):
+        """골든이 없는 유형(WHOPIR 구조화 보고서)까지 직접 확인 — 골든 커버리지의 구멍 보완."""
+        for key, value in (("whopir_report", {"sections": [{"t": "x"}]}),
+                           ("ncr_nature", "Serious GMP deficiencies were found."),
+                           ("ncr_action", "Products were recalled."),
+                           ("whopir_excerpt", "text"),
+                           ("wl_violations", ["a"])):
+            with self.subTest(key=key):
+                self.assertTrue(cs._has_source_body({key: value}),
+                                f"{key}: 본문을 확보했는데 신호가 꺼져 있다")
+        self.assertFalse(cs._has_source_body({}), "빈 raw 가 True 면 신호가 무의미하다")
+        self.assertFalse(cs._has_source_body({"site_name": "ACME"}),
+                         "본문이 아닌 메타 키가 신호를 켜면 안 된다")
 
 
 if __name__ == "__main__":

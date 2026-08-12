@@ -54,6 +54,7 @@
   "render_order": null,
   "signal_label": "High",
   "signal_tier": 3,
+  "source_body_captured": true,
   "sources": {
     "info_url": "https://cms.mhra.gov.uk/mhra/gmp?f%5B0%5D=gmp_compliance%3ANon%20Compliant",
     "link_check": {

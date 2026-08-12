@@ -24,13 +24,23 @@ from dataclasses import dataclass
 from typing import Any
 
 
-# 감시 대상 = 주(week) 단위로 사실상 항상 데이터가 있는 고volume 소스.
-# 값 = 이력이 얇을 때 쓰는 보수적 주간 floor(감사 실측 기반, 실제 평균의 한참 아래).
+# ★[감시 확대 2026-08-12] 이 표는 **감시 대상 목록이 아니다** — 이력이 얇을 때만 쓰는
+# 보수적 주간 floor 다. 감시 대상은 `detect_coverage_anomalies` 가 관측된 소스에서
+# 파생한다(아래 참조).
+#
+# 종전엔 이 dict 의 **키가 곧 감시 대상**이었다. 그래서 07-08 이후 붙은 소스 10종
+# (ECA Academy·EMA·Federal Register·Health Canada·Health Canada Inspection·ISPE·
+# PIC/S·MHRA Inspectorate·EU GMP NCR·MHRA GMP NCR)이 판정 루프에 **진입조차 못 했다** —
+# 손으로 적은 목록이 소스 추가를 따라가지 못한 것(2026-07-27 ECA 침묵·#715 와 같은 계열).
+# 실측(08-12): 그 상태에서 PIC/S 가 13일, MHRA Inspectorate 가 20일 무음인데 무발화였다.
+#
+# 값의 근거(감사 실측 기반, 실제 평균의 한참 아래):
 #   OpenFDA Recall: 60건/30일 ≈ 14/주 → floor 3
 #   MFDS(회수+행정처분+GMP 합산): totalCount 회수 958·행정 607 → 주 수십건, floor 5
 #   FDA 483: 윈도우당 수십건 → floor 2
 #   FDA Warning Letter: 주 수건 → floor 1
-# 조용한 게 정상인 소스(EMA·MHRA 블로그·PIC/S·ECA·FR)는 여기 넣지 않는다(무발화).
+# 여기 없는 소스는 floor 폴백이 없을 뿐이고, 이력이 3주 이상 쌓이면 중앙값으로 감시된다.
+# 원래 조용한 소스는 중앙값이 0 이라 `_baseline_for` 가 skip 하므로 과잉경보가 안 난다.
 MONITORED_FLOORS: dict[str, int] = {
     "OpenFDA Recall": 3,
     "MFDS": 5,
@@ -88,11 +98,16 @@ def detect_coverage_anomalies(
 
     current:  {source: 이번 주 수집 건수}
     history:  {source: [직전주, 그 전주, ...]} — 없으면 floor 기반 판정.
-    monitored: 감시 대상 소스 집합(기본 MONITORED_FLOORS 키).
+    monitored: 감시 대상 소스 집합. **기본값은 관측된 전 소스**(current ∪ history) —
+        손목록이 아니라 데이터에서 파생하므로 소스를 추가해도 갱신할 곳이 없다.
+        과잉경보는 목록이 아니라 `_baseline_for` 가 막는다(중앙값 0·이력 얇고 floor 없음
+        → skip). 명시적으로 좁히려면 집합을 넘긴다(테스트·특수 감사용).
     반환: severity 내림차순(silent_drop 먼저) Anomaly 리스트.
     """
     history = history or {}
-    monitored = monitored if monitored is not None else set(MONITORED_FLOORS)
+    # ★fail-open: 새 소스는 "감시 안 함"이 아니라 "감시함"이 기본이어야 한다. 목록에서
+    # 빠져 조용히 안 보이는 것보다, 발화한 뒤 baseline 이 걸러내는 쪽이 안전하다(#715).
+    monitored = monitored if monitored is not None else (set(current) | set(history))
     out: list[Anomaly] = []
 
     for source in sorted(monitored):

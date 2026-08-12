@@ -4994,6 +4994,63 @@ class WebCfrSectionLabelsSyncTest(unittest.TestCase):
 
 
 # ── CATEGORY_LABELS 하드코딩 사본 전수 동기화 ────────────────────────────────
+class WebCountryLabelsSyncTest(unittest.TestCase):
+    """★[2026-08-12] `COUNTRY_LABELS_KO`(ISO2 → 한국어 국가명)도 findings.js·trends.js 가
+    각자 하드코딩 복제한다(CFR_SECTION_LABELS·CATEGORY_LABELS 와 같은 관례). 그런데 그
+    둘과 달리 **이 상수만 전수 글롭 가드를 못 받았고**, 검사하던 테스트는 trends.js 한
+    파일만 로드하고 있었다 — 그 결과 실제로 어긋났다:
+
+        canon(`grm_findings._COUNTRY_CODE_MAP` 고유 코드) 68
+        trends.js   68  (동기)
+        findings.js 47  ← 21개 누락(AE·AR·AW·BG·BR·CO·CR·DO·EE·EG·HK·HR·LV·MO·MT·
+                          NZ·OM·PH·SG·TH·UY)
+
+    라이브 국가 축이 마침 41종이라 **지금 화면에 보이는 것은 전부 커버돼 잠재 상태**였지만,
+    매핑에 없는 코드는 코드 자체를 그대로 노출하는 계약이라(추측 번역 금지) 새 국가가
+    한 건이라도 들어오는 순간 `/findings/` 필터에 `SG`·`TH` 같은 원시 코드가 뜬다.
+    057(FDA DDAPI 국가명 27종 정규화)로 새 코드 유입 가능성이 막 커진 참이었다.
+
+    형제 가드와 동일하게 **web/assets/*.js 를 글롭으로 훑어 선언 파일을 전부 자동 발견**
+    하고, 0건이면 선언 형식이 깨진 것으로 본다(수동 파일 목록 금지)."""
+
+    _PAT = re.compile(r'([A-Z]{2}):\s*"((?:[^"\\]|\\.)*)"')
+
+    def _copies(self):
+        out = {}
+        for p in sorted((WEB_DIR / "assets").glob("*.js")):
+            src = p.read_text(encoding="utf-8")
+            if "var COUNTRY_LABELS_KO = {" not in src:
+                continue
+            m = re.search(r"var COUNTRY_LABELS_KO = \{(.*?)\n  \};", src, re.S)
+            self.assertIsNotNone(m, f"{p.name}: COUNTRY_LABELS_KO 블록 파싱 실패")
+            out[p.name] = dict(self._PAT.findall(m.group(1)))
+        return out
+
+    def test_all_copies_discovered_and_identical(self):
+        copies = self._copies()
+        self.assertGreaterEqual(
+            len(copies), 2,
+            "COUNTRY_LABELS_KO 선언 파일을 2개 미만 발견 — 글롭/선언 형식이 깨졌다")
+        names = sorted(copies)
+        base = copies[names[0]]
+        for name in names[1:]:
+            self.assertEqual(copies[name], base,
+                             f"{name} 의 COUNTRY_LABELS_KO 가 {names[0]} 과 다르다(드리프트)")
+
+    def test_copies_cover_canonical_country_codes(self):
+        """정본은 `grm_findings._COUNTRY_CODE_MAP`(055/057 의 grm_normalize_country 와 짝).
+        코드가 여러 국가명 변형에 걸리므로 **값(코드) 집합**이 비교 대상이다."""
+        import grm_findings
+        canon = set(grm_findings._COUNTRY_CODE_MAP.values())
+        self.assertGreater(len(canon), 40, "정본 코드 집합이 비정상적으로 작다")
+        for name, m in self._copies().items():
+            self.assertEqual(canon - set(m), set(),
+                             f"{name}: 정본에 있는데 라벨이 없는 코드 — 화면에 원시 ISO2 가 뜬다")
+            self.assertEqual(set(m) - canon, set(), f"{name}: 정본에 없는 유령 코드")
+            for code, label in m.items():
+                self.assertTrue(label.strip(), f"{name}: {code} 라벨이 비었다")
+
+
 class WebCategoryLabelsSyncTest(unittest.TestCase):
     """findings.js/trends.js/firm.js/inspector.js 는 각자 CATEGORY_LABELS 를 독립
     하드코딩 사본으로 복제한다(이 저장소의 확립된 방식 — 공유 파일로 빼지 않는다). 예전엔

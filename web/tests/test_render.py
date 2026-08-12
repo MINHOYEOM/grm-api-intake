@@ -6915,6 +6915,55 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                          "비결정론 렌더")
 
 
+class WebNotFoundPageTest(unittest.TestCase):
+    """[검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 404 를 준다.
+
+    ★없으면 매칭되지 않는 모든 경로에 루트 index.html 을 **200 으로** 돌려준다(soft 404).
+    실측으로 `/findings/doc/zzz-does-not-exist/` 가 랜딩 페이지를 200 으로 주고 있었다.
+    검색엔진에게 이것은 ①없는 페이지가 있다고 말하고 ②같은 랜딩 본문이 무한한 URL 로
+    중복돼 있다고 말하는 것이라 색인 품질을 직접 깎는다. 문서 페이지 3천 장이 매주
+    재생성돼 낡은 URL 이 계속 생기는 구조라 특히 중요하다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_404_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out)
+        cls.html = (cls.out / "404.html").read_bytes().decode("utf-8") \
+            if (cls.out / "404.html").exists() else ""
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_file_exists_at_dist_root(self):
+        """경로가 정확히 `/404.html` 이어야 Pages 가 인식한다."""
+        self.assertTrue((self.out / "404.html").exists(), "404.html 누락")
+
+    def test_is_noindex(self):
+        self.assertIn('<meta name="robots" content="noindex">', self.html)
+
+    def test_not_in_sitemap(self):
+        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/404.html</loc>", sitemap)
+        self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/404</loc>", sitemap)
+
+    def test_offers_ways_back(self):
+        """막다른 길로 두지 않는다 — 주요 표면으로 되돌려 보낸다."""
+        for href in ('href="findings/"', 'href="archive/"', 'href="library/"',
+                     'href="glossary/"'):
+            self.assertIn(href, self.html, f"복귀 링크 누락: {href}")
+
+    def test_links_resolve_to_real_pages(self):
+        """404 페이지의 링크가 또 404 면 안 된다 — rel_root 는 dist 루트 기준이다."""
+        import re as _re
+        for href in _re.findall(r'class="nf-card" href="([^"]*)"', self.html):
+            target = self.out / (href + "index.html" if href.endswith("/") or not href
+                                 else href)
+            self.assertTrue(target.exists(), f"404 페이지가 없는 곳으로 보낸다: {href!r}")
+
+
 class WebFindingsFacetPageTest(unittest.TestCase):
     """[검색 유입] /findings/{c|country|agency}/ 축 색인 + 항목 모음 페이지.
 

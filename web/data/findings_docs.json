@@ -3,13 +3,13 @@
  "measured_on": "2026-08-12",
  "min_findings": 3,
  "totals": {
-  "documents": 3204,
-  "findings": 21354
+  "documents": 3202,
+  "findings": 21347
  },
  "by_agency": [
   {
    "v": "FDA",
-   "c": 1753
+   "c": 1751
   },
   {
    "v": "HC",
@@ -28,6 +28,10 @@
   {
    "reason": "국문 지적 3건 미만",
    "documents": 2909
+  },
+  {
+   "reason": "업체명 없음(숫자뿐이거나 빈 값)",
+   "documents": 2
   }
  ],
  "documents": [
@@ -68720,38 +68724,6 @@
    ]
   },
   {
-   "document_id": "fda483-82060",
-   "slug": "fda483-82060",
-   "agency": "FDA",
-   "source": "FDA 483",
-   "firm_name": "1021343",
-   "firm_key": "1021343",
-   "published_date": "2024-01-17",
-   "evidence_url": "https://www.fda.gov/media/82060/download",
-   "categories": [
-    "원자재/공급업체 관리",
-    "시험실/품질관리",
-    "품질부서 관리감독"
-   ],
-   "findings": [
-    {
-     "finding_id": "finding-6cf39ab39f8ea41b57471260",
-     "text_ko": "배치 또는 그 구성성분이 규격을 충족하지 못한 사실에 대해, 해당 배치의 유통 여부와 관계없이 철저히 검토하지 않았다.",
-     "category_label_ko": "원자재/공급업체 관리"
-    },
-    {
-     "finding_id": "finding-9668c6d7c70fef4fcb51aef9",
-     "text_ko": "실험실 관리는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립을 포함하지 않았다.",
-     "category_label_ko": "시험실/품질관리"
-    },
-    {
-     "finding_id": "finding-c9aabc7e62696bb8f64ed4fa",
-     "text_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
-     "category_label_ko": "품질부서 관리감독"
-    }
-   ]
-  },
-  {
    "document_id": "fda483-82185",
    "slug": "fda483-82185",
    "agency": "FDA",
@@ -75156,44 +75128,6 @@
      "finding_id": "finding-f0a06d10883d3db0d8ea95c7",
      "text_ko": "무균임을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화·준수되지 않는다.",
      "category_label_ko": "무균보증/무균공정"
-    }
-   ]
-  },
-  {
-   "document_id": "fda483-87540",
-   "slug": "fda483-87540",
-   "agency": "FDA",
-   "source": "FDA 483",
-   "firm_name": "1950222",
-   "firm_key": "1950222",
-   "published_date": "2024-01-17",
-   "evidence_url": "https://www.fda.gov/media/87540/download",
-   "categories": [
-    "공정밸리데이션",
-    "무균보증/무균공정",
-    "원자재/공급업체 관리",
-    "시험실/품질관리"
-   ],
-   "findings": [
-    {
-     "finding_id": "finding-230237b006b56e5dc73a9cde",
-     "text_ko": "생산 및 공정관리 업무 수행 시 문서화된 생산 및 공정관리 절차가 준수되지 않았고, 수행 시점에 문서화되지 않았다.",
-     "category_label_ko": "공정밸리데이션"
-    },
-    {
-     "finding_id": "finding-73d9292158eaff653dd99057",
-     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 문서화 및 준수되지 않았다.",
-     "category_label_ko": "무균보증/무균공정"
-    },
-    {
-     "finding_id": "finding-ab1225dce6bfdcf2424467ff",
-     "text_ko": "원자재 취급에 대한 서면 절차가 준수되지 않았다.",
-     "category_label_ko": "원자재/공급업체 관리"
-    },
-    {
-     "finding_id": "finding-b80183180aae008edf7c5f3b",
-     "text_ko": "확립된 실험실 관리 메커니즘이 준수되지 않았다.",
-     "category_label_ko": "시험실/품질관리"
     }
    ]
   },

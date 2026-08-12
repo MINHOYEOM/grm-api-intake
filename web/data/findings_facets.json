@@ -2182,7 +2182,8 @@
           ]
         }
       ],
-      "excluded": []
+      "excluded": [],
+      "samples_skipped_absence": 0
     },
     {
       "axis": "country",
@@ -2235,16 +2236,6 @@
           ],
           "samples": [
             {
-              "finding_id": "finding-3cfee7d3409d60db9e40db31",
-              "text_ko": "지적사항이 기록되지 않았다.",
-              "agency": "HC",
-              "firm_name": "Neilmed Pharmaceuticals Inc",
-              "published_date": "2026-07-21",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89341",
-              "document_id": "hc-insp-89341"
-            },
-            {
               "finding_id": "finding-011e97a2ae776c4e0d3b1ee7",
               "text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 데 필요한 지침 및/또는 절차가 미흡했다.",
               "agency": "HC",
@@ -2293,6 +2284,16 @@
               "category_label_ko": "설비/시설",
               "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349",
               "document_id": "hc-insp-89349"
+            },
+            {
+              "finding_id": "finding-2a2b10523eaacc9732956782",
+              "text_ko": "문서화된 기준규격(specification)이 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Sun Bum Canada, Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89421",
+              "document_id": "hc-insp-89421"
             }
           ]
         },
@@ -3598,7 +3599,8 @@
           "findings": 1,
           "reason": "표본 미달(<20)"
         }
-      ]
+      ],
+      "samples_skipped_absence": 1
     },
     {
       "axis": "agency",
@@ -3736,16 +3738,6 @@
           ],
           "samples": [
             {
-              "finding_id": "finding-3cfee7d3409d60db9e40db31",
-              "text_ko": "지적사항이 기록되지 않았다.",
-              "agency": "HC",
-              "firm_name": "Neilmed Pharmaceuticals Inc",
-              "published_date": "2026-07-21",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89341",
-              "document_id": "hc-insp-89341"
-            },
-            {
               "finding_id": "finding-011e97a2ae776c4e0d3b1ee7",
               "text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 데 필요한 지침 및/또는 절차가 미흡했다.",
               "agency": "HC",
@@ -3794,6 +3786,16 @@
               "category_label_ko": "설비/시설",
               "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89349",
               "document_id": "hc-insp-89349"
+            },
+            {
+              "finding_id": "finding-2a2b10523eaacc9732956782",
+              "text_ko": "문서화된 기준규격(specification)이 미흡했다.",
+              "agency": "HC",
+              "firm_name": "Sun Bum Canada, Inc.",
+              "published_date": "2026-07-14",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89421",
+              "document_id": "hc-insp-89421"
             }
           ]
         },
@@ -3998,7 +4000,8 @@
           "findings": 8,
           "reason": "표본 미달(<20)"
         }
-      ]
+      ],
+      "samples_skipped_absence": 1
     }
   ]
 }

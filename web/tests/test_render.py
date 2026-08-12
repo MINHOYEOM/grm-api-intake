@@ -7256,6 +7256,34 @@ class WebFindingsDocPageTest(unittest.TestCase):
                    if "시점의 기록" not in p.read_bytes().decode("utf-8")]
         self.assertEqual(missing, [], f"시점 고지 누락 {len(missing)}장: {missing[:5]}")
 
+    def test_agency_code_is_not_shown_as_a_document_type(self):
+        """★없는 문서종류를 단정하지 않는다.
+
+        식약처 문서 121장은 `source` 가 기관 코드 그대로 `"MFDS"` 라, 그대로 쓰면 제목이
+        "(주)태준제약 — MFDS 지적사항"이 되어 실재하지 않는 문서종류를 주장하게 된다.
+        지어내지도(예: "GMP 실사 보고서") 코드를 노출하지도 않는 유일한 답은 생략이다.
+        """
+        checked = 0
+        for doc in self.data["documents"]:
+            if (doc.get("source") or "").upper() != (doc.get("agency") or "").upper():
+                continue
+            checked += 1
+            self.assertEqual(render.doc_source_label(doc), "", doc["slug"])
+            html = self._page(doc["slug"])
+            title = html.split("<title>", 1)[1].split("</title>", 1)[0]
+            self.assertNotIn(doc["agency"], title,
+                             f'제목이 기관 코드를 문서종류로 쓴다: {doc["slug"]}')
+            self.assertIn(f'{doc["firm_name"]} 지적사항', title, doc["slug"])
+        self.assertGreater(checked, 0, "기관 코드가 source 인 문서가 없다(배선 확인)")
+
+    def test_real_document_types_are_kept(self):
+        for doc in self._sample_docs(6):
+            src = (doc.get("source") or "")
+            if src.upper() == (doc.get("agency") or "").upper():
+                continue
+            self.assertEqual(render.doc_source_label(doc), src)
+            self.assertIn(src, self._page(doc["slug"]))
+
     def test_titles_are_unique(self):
         """★제목은 검색 결과의 1차 식별자다 — 겹치면 구글이 하나만 고르고 나머지를 버린다.
 

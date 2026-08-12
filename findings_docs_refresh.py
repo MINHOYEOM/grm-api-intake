@@ -95,6 +95,14 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         reject["발행일 없음"] += 1
         return None
 
+    firm = (doc.get("firm_name") or doc.get("firm_key") or "").strip()
+    if not firm or firm.isdigit():
+        # 업체명이 비었거나 숫자뿐이면(실측 FDA 2건 — 수집 원천의 결손) 제목이
+        # "1021343 — FDA 483 지적사항"이 된다. 누구에 대한 기록인지 말할 수 없는
+        # 페이지는 만들지 않는다.
+        reject["업체명 없음(숫자뿐이거나 빈 값)"] += 1
+        return None
+
     evidence = (doc.get("evidence_url") or "").strip()
     if not evidence.startswith(("http://", "https://")):
         # 원문으로 못 보내는 페이지는 우리 주장만 남는다.
@@ -128,7 +136,7 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         "slug": doc_id,
         "agency": doc.get("agency") or "",
         "source": doc.get("source") or "",
-        "firm_name": doc.get("firm_name") or doc.get("firm_key") or "",
+        "firm_name": firm,
         # 같은 업체의 다른 기록을 잇는 데 쓴다. **표시명이 아니라 정규화 키로 묶는다** —
         # "Intas Pharmaceuticals Limited"와 "Intas Pharmaceuticals Ltd."는 표시명이 다르지만
         # 같은 업체이고, 그 정규화는 이미 FIND-FIRM-ALIAS 가 `firm_key` 로 해 두었다.

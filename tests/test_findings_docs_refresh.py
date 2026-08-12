@@ -81,6 +81,21 @@ class DocumentViewGateTest(unittest.TestCase):
             self.assertIsNone(self._view(_doc(doc_id=bad)), bad)
             self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1, bad)
 
+
+    def test_rejects_numeric_or_empty_firm_name(self):
+        """★누구에 대한 기록인지 말할 수 없는 페이지는 만들지 않는다.
+
+        실측 FDA 2건이 `firm_name` 이 7자리 숫자뿐이라(수집 원천의 결손) 제목이
+        "1021343 — FDA 483 지적사항"이 되고 있었다.
+        """
+        for bad in ("1021343", "  ", ""):
+            self.reject.clear()
+            self.assertIsNone(self._view(_doc(firm_name=bad)), repr(bad))
+            self.assertEqual(self.reject["업체명 없음(숫자뿐이거나 빈 값)"], 1)
+
+    def test_keeps_names_that_merely_contain_digits(self):
+        self.assertIsNotNone(self._view(_doc(firm_name="3M Health Care")))
+
     def test_rejects_below_threshold(self):
         self.assertIsNone(self._view(_doc(n=2)))
         self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
@@ -168,6 +183,8 @@ class CommittedDataTest(unittest.TestCase):
     def test_every_document_meets_the_gates(self):
         floor = self.data["min_findings"]
         for d in self.data["documents"]:
+            self.assertFalse(d["firm_name"].strip().isdigit(),
+                             f'업체명이 숫자뿐: {d["slug"]}')
             self.assertRegex(d["slug"], r"^[A-Za-z0-9._-]{1,120}$")
             self.assertRegex(d["published_date"], r"^\d{4}-\d{2}-\d{2}$")
             self.assertTrue(d["evidence_url"].startswith(("http://", "https://")))

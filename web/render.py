@@ -1396,6 +1396,20 @@ def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | Non
     return obj
 
 
+def doc_source_label(doc: dict[str, Any]) -> str:
+    """문서종류 표시값 — 문서종류가 아닌 값이면 **빈 문자열**(= 표기 생략).
+
+    ★식약처 문서 121장은 `source` 가 기관 코드 그대로 `"MFDS"` 다. 그대로 쓰면 제목이
+    "명문제약(주) — MFDS 지적사항"이 되어 실재하지 않는 문서종류를 단정하게 된다.
+    없는 것을 지어내지도(예: "GMP 실사 보고서") 않고 코드를 노출하지도 않는 유일한 답은
+    **말하지 않는 것**이다 — "명문제약(주) 지적사항".
+    """
+    src = (doc.get("source") or "").strip()
+    if not src or src.upper() == (doc.get("agency") or "").strip().upper():
+        return ""
+    return src
+
+
 def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
     """문서 페이지 `<title>` — 슬러그별로 **유일**하게 만든다.
 
@@ -1408,7 +1422,9 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
     (마지막 수단, 반드시 유일). 겹치지 않는 문서의 제목은 건드리지 않는다.
     """
     def base(d: dict[str, Any]) -> str:
-        return f"{d['firm_name']} {d['source']} 지적사항 ({d['published_date']})"
+        src = doc_source_label(d)
+        head = f"{d['firm_name']} {src}".strip() if src else d["firm_name"]
+        return f"{head} 지적사항 ({d['published_date']})"
 
     counts: dict[str, int] = {}
     for d in documents:
@@ -1445,8 +1461,10 @@ def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> 
     agency = agency_labels.get(doc["agency"], doc["agency"])
     cats = " · ".join(doc.get("categories") or [])
     tail = f" 주요 분류: {cats}." if cats else ""
-    return (f"{agency}가 {doc['published_date']}에 공개한 {doc['firm_name']} "
-            f"{doc['source']} 지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
+    src = doc_source_label(doc)
+    subject = f"{doc['firm_name']} {src}".strip() if src else doc["firm_name"]
+    return (f"{agency}가 {doc['published_date']}에 공개한 {subject} "
+            f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
 
 
 def facet_description(axis_key: str, item: dict[str, Any],
@@ -2475,6 +2493,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=doc_page_description(doc, doc_agency_labels),
                 canonical=_abs_url(f"findings/doc/{doc['slug']}/"),
                 doc=doc, agency_labels=doc_agency_labels,
+                source_label=doc_source_label(doc),
                 related_categories=related, same_firm=same_firm,
             )
             _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)

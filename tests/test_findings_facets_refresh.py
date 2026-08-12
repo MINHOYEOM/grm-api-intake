@@ -229,5 +229,69 @@ class CommittedDataParityTest(unittest.TestCase):
                 self.assertRegex(slug, r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
+class AbsenceDeclarationTest(unittest.TestCase):
+    """★"지적이 없었다"는 선언은 지적 사례가 아니다.
+
+    캐나다 보건부 실사보고서 중 관찰이 없는 건은 그 사실이 한 건의 finding 으로 적재된다
+    (실측 138건·문서당 1건). 코퍼스에 남는 것은 옳지만, "최근 지적 사례" 칸에 뜨면 제목과
+    정면으로 모순된다 — 실제로 캐나다·HC 축 대표 사례가 "지적사항이 기록되지 않았다."였다.
+    """
+
+    KNOWN = [
+        "기록된 지적사항이 없었다.",      # 115건
+        "기록된 지적사항이 없다.",        # 12건
+        "지적사항이 기록되지 않았다.",    # 7건
+        "기재된 지적사항이 없었다.",      # 4건
+    ]
+    # 같은 표현을 품고 있지만 진짜 지적인 문장 — 부분일치로 걸러버리면 안 된다.
+    REAL = [
+        "서면 실험실 체계로부터의 deviation(일탈)이 기록되지 않았다.",
+        "데이터가 동시적으로 기록되지 않았다.",
+        "환경모니터링 프로그램이 미흡하다.",
+        "나음죽여: 카드뮴 항목 관련 지적사항이다.",
+        "귀사는 지적사항이 반복되지 않도록 조치하지 않았다.",
+    ]
+
+    def test_known_variants_are_detected(self):
+        for t in self.KNOWN:
+            self.assertTrue(ffr.is_absence_declaration(t), t)
+
+    def test_real_findings_are_kept(self):
+        for t in self.REAL:
+            self.assertFalse(ffr.is_absence_declaration(t), t)
+
+    def test_samples_skip_them_and_count_them(self):
+        resp = _resp(3, 1, docs=[{"document_id": "d1", "agency": "HC",
+                                  "firm_name": "X", "published_date": "2026-01-01",
+                                  "evidence_url": "https://e/x", "findings": [
+                                      _finding("a", text_ko=self.KNOWN[0]),
+                                      _finding("b", text_ko="세척 절차가 수립되어 있지 않다."),
+                                  ]}])
+        skipped = []
+        got = ffr.collect_samples(resp, 5, skipped)
+        self.assertEqual([g["finding_id"] for g in got], ["b"])
+        self.assertEqual(skipped, ["a"])
+
+
+class CommittedSamplesTest(unittest.TestCase):
+    def setUp(self):
+        import json
+        path = ROOT / "web" / "data" / "findings_facets.json"
+        if not path.exists():
+            self.skipTest("findings_facets.json 미존재")
+        self.data = json.loads(path.read_text(encoding="utf-8"))
+
+    def test_no_absence_declaration_survives_in_samples(self):
+        bad = [(a["axis"], i["slug"], s["text_ko"])
+               for a in self.data["axes"] for i in a["items"] for s in i["samples"]
+               if ffr.is_absence_declaration(s["text_ko"])]
+        self.assertEqual(bad, [], f"사례에 남은 '지적 없음' 선언: {bad[:3]}")
+
+    def test_skip_count_is_recorded(self):
+        """조용히 지우지 않는다 — 몇 건을 걸렀는지 데이터에 남아야 한다."""
+        for axis in self.data["axes"]:
+            self.assertIn("samples_skipped_absence", axis, axis["axis"])
+
+
 if __name__ == "__main__":                                       # pragma: no cover
     unittest.main()

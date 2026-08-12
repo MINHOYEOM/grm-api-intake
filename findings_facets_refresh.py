@@ -149,15 +149,41 @@ def _sample_view(doc: dict[str, Any], finding: dict[str, Any]) -> dict[str, Any]
     }
 
 
-def collect_samples(resp: dict[str, Any], limit: int) -> list[dict[str, Any]]:
-    """응답 문서들에서 지적을 평탄화해 최근 `limit` 건. 국문 본문이 없는 건은 싣지 않는다.
+# ── "지적이 없었다"는 선언은 지적 사례가 아니다 ──────────────────────────────────
+# 캐나다 보건부 실사보고서 중 관찰이 하나도 없는 건은, 그 사실 자체가 한 건의 finding
+# 행으로 적재된다(실측 138건·138문서, 문서당 정확히 1건). 코퍼스에 남는 것은 옳다 —
+# "관찰 없음"도 실사 결과다. 다만 **"최근 지적 사례" 칸에 그것이 뜨면 제목과 정면으로
+# 모순**된다(실제로 캐나다·HC 축 대표 사례가 "지적사항이 기록되지 않았다."였다).
+#
+# ★문구 전체가 그 선언일 때만 걸러낸다(부분일치 금지) — "…일탈이 기록되지 않았다" 처럼
+#   진짜 지적 안에 같은 표현이 들어 있는 문장을 함께 떨어뜨리면 안 된다.
+# ★건수(totals)에서는 빼지 않는다. 표시에서만 제외하고, 몇 건을 걸렀는지 보고한다 —
+#   조용히 지우면 다음 사람이 "왜 6건이 아니라 5건이지"를 데이터에서 알 수 없다.
+_ABSENCE_DECLARATION = re.compile(
+    r"^\s*(기록된|기재된)?\s*지적사항이\s*(기록되지\s*않았|없었|없)다\.?\s*$")
 
-    RPC 기본 정렬이 `date_desc` 라 "최근 사례"가 되고, 같은 입력이면 같은 결과다(난수 0).
+
+def is_absence_declaration(text: str) -> bool:
+    """이 문장이 '지적이 없었다'는 선언 자체인가(= 지적 사례가 아님)."""
+    return bool(_ABSENCE_DECLARATION.match(text or ""))
+
+
+def collect_samples(resp: dict[str, Any], limit: int,
+                    skipped: "list[str] | None" = None) -> list[dict[str, Any]]:
+    """응답 문서들에서 지적을 평탄화해 최근 `limit` 건.
+
+    국문 본문이 없는 건과 **'지적 없음' 선언**은 싣지 않는다. RPC 기본 정렬이 `date_desc`
+    라 "최근 사례"가 되고, 같은 입력이면 같은 결과다(난수 0).
     """
     out: list[dict[str, Any]] = []
     for doc in resp.get("documents", []):
         for finding in doc.get("findings", []):
-            if not (finding.get("finding_text_ko") or "").strip():
+            text = (finding.get("finding_text_ko") or "").strip()
+            if not text:
+                continue
+            if is_absence_declaration(text):
+                if skipped is not None:
+                    skipped.append(finding["finding_id"])
                 continue
             out.append(_sample_view(doc, finding))
             if len(out) >= limit:
@@ -172,6 +198,7 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
     """축 하나(분류/국가/기관)의 항목·제외 목록을 만든다."""
     items: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
+    skipped_absence: list[str] = []
     failures = 0
 
     for entry in values:
@@ -227,7 +254,7 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
             "top_firms": [{"firm_name": f.get("firm_name") or f.get("firm_key") or "",
                            "c": int(f.get("c") or 0)}
                           for f in (dash.get("top_firms") or [])[:5]],
-            "samples": collect_samples(resp, samples),
+            "samples": collect_samples(resp, samples, skipped_absence),
         })
 
     attempted = len(items) + failures
@@ -239,7 +266,9 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
 
     items.sort(key=lambda it: (-it["findings"], it["key"]))
     excluded.sort(key=lambda ex: (-ex["findings"], ex["key"]))
-    return {"axis": axis, "items": items, "excluded": excluded}
+    # 표시에서 뺀 "지적 없음" 선언 수 — 조용히 지우지 않는다(건수 자체는 그대로다).
+    return {"axis": axis, "items": items, "excluded": excluded,
+            "samples_skipped_absence": len(set(skipped_absence))}
 
 
 def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: int,

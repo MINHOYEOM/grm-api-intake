@@ -7352,6 +7352,53 @@ class WebFindingsDocPageTest(unittest.TestCase):
                 (self.out / "findings" / "docs" / agency / year / "index.html").exists(),
                 f"목록 페이지 누락: {agency}/{year}")
 
+    # ── sitemap lastmod ──────────────────────────────────────────────────
+    # 구글은 lastmod 로 재크롤 우선순위를 정한다. 3,500장이 한꺼번에 생긴 상태에서 이 값이
+    # 없으면 무엇부터 볼지 판단할 근거가 없다. 다만 ★지어낸 수정일은 없느니만 못하다 —
+    # 신뢰할 수 없는 lastmod 를 만나면 구글은 그 사이트의 lastmod 를 통째로 무시하기
+    # 시작한다. 그래서 "데이터에 실제 날짜가 있는 곳에만, 그 값 그대로" 가 유일한 규칙이다.
+
+    def _sitemap_lastmods(self) -> dict:
+        import re as _re
+        out = {}
+        for m in _re.finditer(r"<loc>([^<]+)</loc>(?:<lastmod>([^<]+)</lastmod>)?",
+                              self.sitemap):
+            out[m.group(1)] = m.group(2) or ""
+        return out
+
+    def test_document_lastmod_is_the_publish_date(self):
+        mods = self._sitemap_lastmods()
+        for doc in self.data["documents"]:
+            url = f'{render.SITE_BASE_URL}/findings/doc/{doc["slug"]}/'
+            self.assertEqual(mods.get(url), doc["published_date"],
+                             f'문서 lastmod 가 공개일과 다르다: {doc["slug"]}')
+
+    def test_listing_lastmod_is_the_newest_document_in_that_bucket(self):
+        from collections import defaultdict
+        newest = defaultdict(str)
+        for d in self.data["documents"]:
+            k = (d["agency"].lower(), d["published_date"][:4])
+            newest[k] = max(newest[k], d["published_date"])
+        mods = self._sitemap_lastmods()
+        for (agency, year), want in newest.items():
+            url = f"{render.SITE_BASE_URL}/findings/docs/{agency}/{year}/"
+            self.assertEqual(mods.get(url), want, f"목록 lastmod: {agency}/{year}")
+        self.assertEqual(
+            mods.get(f"{render.SITE_BASE_URL}/findings/docs/"),
+            max(d["published_date"] for d in self.data["documents"]))
+
+    def test_no_fabricated_lastmod_where_there_is_no_date(self):
+        """★날짜 개념이 없는 페이지에는 lastmod 를 달지 않는다(용어사전 등)."""
+        mods = self._sitemap_lastmods()
+        dated = [u for u, m in mods.items() if m and "/glossary/" in u]
+        self.assertEqual(dated, [], f"없는 날짜를 지어냈다: {dated[:3]}")
+
+    def test_every_lastmod_is_a_plain_date(self):
+        import re as _re
+        for url, mod in self._sitemap_lastmods().items():
+            if mod:
+                self.assertRegex(mod, r"^\d{4}-\d{2}-\d{2}$", url)
+
     def test_listing_pages_are_in_sitemap(self):
         buckets = {(d["agency"].lower(), d["published_date"][:4])
                    for d in self.data["documents"]}

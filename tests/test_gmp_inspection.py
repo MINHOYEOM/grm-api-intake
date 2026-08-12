@@ -158,6 +158,84 @@ class TestDeficiencyExcerpt(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(g._assess_deficiency(text), "none")
 
+    def test_evaluation_result_pass_is_also_a_verdict(self):
+        """★[앵커 확장 2026-08-12] `실사 결과` 는 실제로 **소수 어법**이었다.
+
+        2026-08-02 에 이 앵커를 만들 때 모집단이 7건뿐이라 그게 전부인 줄 알았는데,
+        전수 실측(08-12)에서 findings 0건 + assessment≠none 인 사전평가 87건 중
+        `실사 결과: 적합` 은 7건뿐이고 **`평가 결과: 적합` 이 42건**이었다. 원문이
+        "적합"이라고 명시했는데 우리가 "모르겠다"로 적어 둔 상태가 3개월 남아 있었다.
+        """
+        for text in ("평가 결과: 적합", "평가결과 : 적합", "❍ 평가 결과 ： 적합"):
+            with self.subTest(text=text):
+                self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_evaluation_result_anchor_does_not_touch_periodic_conclusions(self):
+        """★안전의 핵심 — `평가 결과` 는 periodic 결론 어법과 **접두어가 같다**.
+
+        `적합` 이 바로 뒤에 붙는 형태만 보므로 사이에 '지적(보완)사항' 이 끼면 매칭되지
+        않는다. 전수 실측 검증: 이 앵커는 findings 를 가진 251건(present 146 +
+        unknown 105) 중 **0건**을 잡고 `평가 결과: 부적합` 형태도 0건이다.
+        """
+        periodic = ("평가 결과: 지적(보완)사항 있음 - 지적(보완)사항 분류 : 중요 3건, 기타 20건 "
+                    "분야 구분 근거 법령 지적(보완)사항 요약 품질경영 중요 [별표 1] 제3.2호")
+        self.assertEqual(g._assess_deficiency(periodic), "present")
+        for text in ("평가 결과: 부적합", "평가 결과: 불적합", "적합성 평가 결과를 검토하였다"):
+            with self.subTest(text=text):
+                self.assertNotEqual(g._assess_deficiency(text), "none")
+
+    def test_widened_present_is_a_superset_never_a_downgrade(self):
+        """★회귀 불가능성을 **성질**로 잠근다 — 넓힌 present 는 옛 패턴의 상위집합이다.
+
+        옛 `지적\\s*\\(?보완\\)?\\s*사항` 에 걸리던 문자열은 새 패턴에도 반드시 걸린다
+        (`보완` 그룹 전체가 선택이 됐을 뿐). present 는 pass 앵커보다 **먼저** 판정되고
+        none 은 그보다 더 먼저이므로, `present → unknown` 강등은 구조적으로 불가능하다.
+        """
+        import re as _re
+        old = _re.compile(r"지적\s*\(?보완\)?\s*사항\s*(?:\(Deficiencies\))?")
+        new = _re.compile(r"지적\s*(?:\(?\s*보완\s*\)?)?\s*사항\s*(?:\(Deficiencies\))?")
+        for text in ("지적(보완)사항", "지적 (보완) 사항", "지적보완사항",
+                     "지적(보완)사항(Deficiencies)", "지적 (보완)사항 있음"):
+            with self.subTest(text=text):
+                self.assertTrue(old.search(text))
+                self.assertTrue(new.search(text), "넓힌 패턴이 옛 매칭을 잃었다(강등 위험)")
+        # 판정 순서도 함께 고정 — present 가 pass 앵커보다 먼저다.
+        both = "평가 결과: 적합 그리고 지적(보완)사항 2건"
+        self.assertEqual(g._assess_deficiency(both), "present")
+
+    def test_pass_anchor_tolerates_broken_bullet_glyph(self):
+        """★실측 43건이 `실사 涫 결과적합` — 글머리표(❍)가 깨진 글리프로 남아 앵커를 갈랐다.
+
+        비한글·비영숫자 3자까지만 건너뛴다. `결과 적합` 만으로 느슨하게 잡으면 2026-08-02
+        에 금지한 '단순 적합' 함정으로 되돌아간다. 전수 실측: 관대형도 findings 보유
+        251건 중 0건이고 회수는 58→96(/128).
+        """
+        for text in ("비무균/DMF 실사 涫 결과적합",
+                     "무균완제 / 실사 涫 결과적합",
+                     "❍ 실사 ○ 결과: 적합"):
+            with self.subTest(text=text):
+                self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_conditional_pass_with_deficiencies_is_present_not_none(self):
+        """★`보완적합` = 조건부 적합(지적 있음) — 통과로 읽으면 지적사항을 잃는다.
+
+        실측: `평가결과 : 보완적합 - 지적사항 분류 : 기타 1건`. 종전엔
+        ①`_INSPECTION_PASS_RE` 가 못 잡고(정상) ②`_DEFICIENCY_PRESENT_RE` 도 `보완` 을
+        필수로 요구해 "지적사항"(보완 없는 표기)을 못 잡아 **unknown** 이었다.
+        """
+        text = ("○의약품 제조 및 품질관리 기준(GMP) 실시상황 평가결과 : 보완적합 "
+                "- 지적사항 분류 : 기타 1건 분야 구분 근거법령")
+        self.assertEqual(g._assess_deficiency(text), "present")
+        # 앵커가 `보완적합` 을 통과로 읽지 않는다(`(?<![부불완])`).
+        self.assertIsNone(g._INSPECTION_PASS_RE.search("평가결과 : 보완적합"))
+
+    def test_evaluation_result_excerpt_does_not_shift_periodic_documents(self):
+        # excerpt 앵커도 **맨 뒤**라 periodic 문서는 1번 앵커가 먼저 잡는다(기존 값 불변).
+        periodic = "평가 결과: 지적(보완)사항 있음 - 분류 : 중요 1건"
+        self.assertTrue(g._extract_deficiency_excerpt(periodic).startswith("평가 결과: 지적"))
+        self.assertEqual(g._extract_deficiency_excerpt("2 실태조사 개요 평가 결과: 적합"),
+                         "평가 결과: 적합")
+
     def test_c4_encrypted_pdf_labeled_pdf_encrypted(self):
         """암호화 PDF → 'pdf-encrypted' 진단 (scan-no-text/parse-fail 오라벨 정정, C4).
 

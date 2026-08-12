@@ -426,6 +426,62 @@ class TestParseDeficiencyTableGate(unittest.TestCase):
                 data, "pdf", "의약품 사전 GMP 평가 실태조사 결과 적합", "none", "doc2")
         self.assertEqual((rows, status), ([], "skipped-type"))
 
+    def test_pdf_page_count_is_recorded(self):
+        """★[얇은 텍스트층 관측 2026-08-12] `pdf-ok` 는 "본문을 다 읽었다"가 아니다.
+
+        `scan-no-text` 는 **완전히 빈** 경우만 잡아서, 본문이 스캔 이미지이고 텍스트층엔
+        표지 몇 줄만 있는 PDF 도 `pdf-ok` 로 통과한다(실측 08-12: findings 0건인 128건이
+        전부 `pdf-ok`·평균 517자, 정상군은 1,051~1,248자). 문서당 밀도를 사후에 재려면
+        페이지 수가 필요한데 여태 기록하지 않았다. **판정은 아직 바꾸지 않는다** —
+        임계를 실측 없이 세우면 멀쩡한 글자를 덮어쓰는 쪽으로 틀린다.
+        """
+        data = _build_pdf(self._PERIODIC_TITLE, self._ROWS)
+        text, status = g._extract_pdf_text(data)
+        self.assertEqual(status, "pdf-ok")               # 동작 무변경
+        self.assertTrue(text)
+        self.assertGreaterEqual(g._pdf_page_count(data), 1)   # 재료는 남는다
+
+    def test_pdf_page_count_never_raises(self):
+        # 관측 실패가 수집 실패가 되면 안 된다 — 손상 입력은 0 을 돌려준다.
+        self.assertEqual(g._pdf_page_count(b"not a pdf"), 0)
+        self.assertEqual(g._pdf_page_count(b""), 0)
+
+    def test_shared_pdf_engine_still_returns_two_tuple(self):
+        """★회귀 가드: `_extract_pdf_text` 는 483·WHO 가 공유하는 엔진이다.
+
+        반환값을 3-튜플로 바꾸면 `collect_fda_483`(2곳)·`collect_who`(3곳)가 런타임에
+        깨지는데, 그 테스트들은 이 함수를 스텁으로 갈아끼워 **CI 는 초록인 채 프로덕션만
+        죽는다**. 페이지 수는 별도 `_pdf_page_count` 로 뽑는다.
+        """
+        import inspect as _inspect
+        sig = str(_inspect.signature(g._extract_pdf_text))
+        self.assertIn("tuple[str, str]", sig)
+        self.assertNotIn("tuple[str, str, int]", sig)
+
+    def test_unknown_title_is_attempted_not_skipped(self):
+        """★[기본값 반전 2026-08-12] 표제를 몰라도 표 추출을 **시도**한다.
+
+        실측(08-12): 국내 "의약품 제조소 실태조사 결과"(제목에 '정기'가 없는 형태) 8건이
+        `unknown` 으로 떨어져 `skipped-type` 으로 넘어갔다 — 08-05 에 해외 현지실사 3종을
+        손으로 덧붙여 고친 그 손목록이 **열흘 만에 또 낡은** 것이다. 목록을 늘리는 대신
+        pre_market 만 차단하도록 기본을 뒤집었다.
+        """
+        title = "- 1 - 의약품 제조소 실태조사 결과 1 제조소 현황 ❍ 제조소명: 주식회사큐러블"
+        self.assertEqual(g._detect_inspection_type(title), "unknown")   # 표제는 여전히 미상
+        data = _build_pdf(title, self._ROWS)
+        with _FlagCtx("true"):
+            rows, status = g._parse_deficiency_table(data, "pdf", title, "present", "doc-unk")
+        self.assertEqual(status, "extracted")       # 종전엔 ([], "skipped-type") 이었다
+        self.assertEqual(len(rows), 1)
+
+    def test_unknown_title_without_table_degrades_quietly(self):
+        # 반전의 안전성: 표가 없으면 종전과 똑같이 조용히 요약카드로 강등된다(오탐 없음).
+        title = "무관한 공지문"
+        data = _build_pdf(title, None)
+        with _FlagCtx("true"):
+            rows, status = g._parse_deficiency_table(data, "pdf", title, "none", "doc-unk2")
+        self.assertEqual((rows, status), ([], "empty"))
+
     def test_gate_degraded_when_present_but_no_table(self):
         # periodic·지적사항 present 인데 표가 안 잡히면 조용히 강등(요약카드 유지) + gate-degraded.
         data = _build_pdf(self._PERIODIC_TITLE, None)  # 표 없음

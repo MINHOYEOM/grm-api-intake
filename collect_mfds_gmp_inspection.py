@@ -157,6 +157,10 @@ class _AttachmentParse:
     deficiency: str = "unknown"
     deficiency_excerpt: str = ""   # 표지 너머 '지적(보완)사항' 결론 섹션(카드 인용용)
     bytes_downloaded: int = 0
+    # [얇은 텍스트층 관측 2026-08-12] PDF 페이지 수. `pdf-ok` 가 "본문을 다 읽었다"를
+    # 뜻하지 않으므로(표지만 읽힌 스캔본도 pdf-ok) 문서당 텍스트 밀도를 사후에 잴 수
+    # 있도록 남긴다. 판정에는 아직 쓰지 않는다 — 실측 분포가 쌓이면 임계를 세운다.
+    pages: int = 0
     error: str = ""
     # [상세보기 결정론 승격 2026-07-02] periodic PDF 지적 표 구조 추출 결과 + 관측 상태.
     deficiencies: list[dict[str, str]] = field(default_factory=list)
@@ -352,8 +356,11 @@ def _deficiency_table_enabled() -> bool:
 def _detect_inspection_type(text: str) -> str:
     """제목 문자열로 문서 유형 분기: periodic(국내 정기실태조사)·pre_market(수입 사전평가)·unknown.
 
-    periodic 만 지적 표를 공개한다 → periodic 일 때만 표 추출을 시도(사전평가 B형에 강제하면
-    표 없음 → 오탐/빈블록). 결정론·LLM 없음.
+    ★반환값의 **역할이 바뀌었다**(2026-08-12): 종전엔 "periodic 만 표 추출"이라 이 함수가
+    사실상 허용목록이었고, 표제가 낯설면 `unknown` → 추출 미시도였다. 지금은 `pre_market`
+    만 차단하고 나머지는 전부 시도한다(호출부 주석 참조). 즉 `periodic` 과 `unknown` 은
+    동작이 같고, 구분은 **관측용**으로만 남는다 — 새 표제가 늘고 있는지 볼 수 있게.
+    결정론·LLM 없음.
     """
     compact = re.sub(r"\s+", " ", text or "")
     if not compact:
@@ -452,6 +459,23 @@ def _extract_deficiency_table(data: bytes) -> list[dict[str, str]]:
     return out
 
 
+def _pdf_page_count(data: bytes) -> int:
+    """PDF 페이지 수(못 세면 0). 순수 관측용 — 실패해도 수집을 막지 않는다.
+
+    ★`_extract_pdf_text` 에 얹지 않고 별도 함수로 둔 이유: 그 함수는 **공유 엔진**이다.
+    `collect_fda_483`(2곳)·`collect_who`(3곳)가 `text, status = ...` 로 2-튜플 언팩하고
+    있어서 반환값을 3-튜플로 바꾸면 그 호출부들이 런타임에 깨진다. 그런데 그 테스트들은
+    이 함수를 **스텁으로 갈아끼우기 때문에** CI 는 초록인 채 프로덕션만 죽는다
+    (#619/#655 와 같은 계열 — 테스트가 함수를 직접 호출하면 호출부 스코프는 미검사).
+    """
+    try:
+        import fitz  # type: ignore[import-not-found]
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            return int(doc.page_count)
+    except Exception:      # noqa: BLE001 — 관측 실패는 수집 실패가 아니다
+        return 0
+
+
 def _extract_pdf_text(data: bytes, max_chars: int = MAX_ATTACHMENT_TEXT_CHARS) -> tuple[str, str]:
     try:
         import fitz  # type: ignore[import-not-found]
@@ -472,6 +496,23 @@ def _extract_pdf_text(data: bytes, max_chars: int = MAX_ATTACHMENT_TEXT_CHARS) -
     text = _normalize_extracted_text(text)
     if not text:
         return "", "scan-no-text"
+    # ★[얇은 텍스트층 관측 2026-08-12] `scan-no-text` 는 **완전히 빈** 경우만 잡는다. 그래서
+    # 본문이 스캔 이미지이고 텍스트층엔 표지 몇 줄만 있는 PDF 가 `pdf-ok` 로 통과한다 —
+    # 483 에서 이미 겪은 "글자가 있다 ≠ 본문이 있다"([[grm-ocr-engine-wiring-drift]] 의
+    # found > shown)와 같은 구조다. 실측(08-12): findings 0건인 gmp-inspection 128건이
+    # 전부 `pdf-ok` 인데 평균 517자(정상군 1,051~1,248자)였다.
+    #
+    # ★그런데 여기서 임계를 세워 `pdf-ok-thin` 같은 새 status 를 내보내지는 **않는다**.
+    # 두 가지 이유다:
+    #   ① status 문자열은 하류 계약이다 — `manual_review_required` 가
+    #      `status not in ("pdf-ok","hwpx-ok")` 로 판정하므로 새 값을 내는 순간 128건이
+    #      한꺼번에 수동확인 대기로 뒤집힌다(동작 변경).
+    #   ② "얇다"의 임계를 실측으로 방어할 수 없다. 페이지 수를 여태 기록하지 않아
+    #      문서당 밀도 분포를 모르고, 임계를 잘못 잡으면 483 에서 경고해 둔 **가장 위험한
+    #      방향**(멀쩡한 글자를 OCR 로 덮어쓰기)으로 틀린다.
+    # 그래서 이번에는 **판정의 재료만 남긴다** — 페이지 수를 payload 에 싣고(아래
+    # `attachment_pages`), 다음 수집분의 실측 분포로 임계를 정한다. 근거 없는 임계보다
+    # 근거를 모으는 게 먼저다.
     return text[:max_chars], "pdf-ok"
 
 
@@ -518,8 +559,10 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
         return _AttachmentParse(status="download-fail", error=str(e)[:200])
 
     file_format = _detect_attachment_format(data)
+    pages = 0
     if file_format == "pdf":
         text, status = _extract_pdf_text(data)
+        pages = _pdf_page_count(data)
     elif file_format == "zip":
         text, status = _extract_hwpx_text(data)
         if status == "hwpx-ok":
@@ -539,6 +582,7 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
         deficiency=deficiency,
         deficiency_excerpt=_extract_deficiency_excerpt(text),
         bytes_downloaded=len(data),
+        pages=pages,
         deficiencies=deficiencies,
         deficiency_table_status=table_status,
     )
@@ -555,8 +599,19 @@ def _parse_deficiency_table(
     if not (_deficiency_table_enabled() and file_format == "pdf" and text):
         return [], ""
     itype = _detect_inspection_type(text)
-    if itype != "periodic":
-        return [], "skipped-type"  # pre_market/unknown → 요약보강(적합/부적합 배지)
+    # ★[유형 게이트 기본값 반전 2026-08-12] 종전엔 `itype != "periodic"` 이라 **표제를 아는
+    # 문서만** 표 추출을 시도했다. 그 손목록은 두 번 낡았다 — 08-05 에 해외 현지실사 3종을
+    # 덧붙였는데, 실측(08-12) 결과 이번엔 국내 **"의약품 제조소 실태조사 결과"**(제목에
+    # '정기'가 없는 형태) 8건이 또 `unknown` 으로 떨어져 시도조차 안 됐다.
+    # **손목록으로 고친 손목록은 반드시 재발한다** → 목록을 늘리지 않고 기본을 뒤집는다.
+    #
+    # 안전한 이유: 표가 없으면 `_normalize_deficiency_table` 이 [] 를 돌려주고 아래에서
+    # 조용히 요약카드로 degrade 한다(동작 무변경). 오탐도 구조적으로 막혀 있다 — 헤더행에
+    # **분야·근거·지적 세 토큰이 전부** 있어야 지적 표로 채택하고, 각 데이터행도 근거법령
+    # 또는 지적내용이 있어야 살아남는다(제조소 현황 표 등은 통과 못 한다).
+    # 비용은 문서당 find_tables 호출 한 번뿐이다.
+    if itype == "pre_market":
+        return [], "skipped-type"  # 사전평가 B형은 판정만 있고 지적 표가 없다(설계)
     try:
         rows = _extract_deficiency_table(data)
     except Exception as e:  # noqa: BLE001 — 파싱 붕괴는 degrade(요약카드 유지)
@@ -710,6 +765,7 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
         "attachment_parse_status": attachment.status,
         "attachment_file_format": attachment.file_format,
         "attachment_bytes": attachment.bytes_downloaded,
+        "attachment_pages": attachment.pages,
         "attachment_deficiency_assessment": attachment.deficiency,
         "manual_review_required": manual_review,
     }

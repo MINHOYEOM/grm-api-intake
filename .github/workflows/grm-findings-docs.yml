@@ -1,0 +1,187 @@
+name: GRM Findings Doc Pages Refresh
+
+# [검색 유입] 문서 단위 페이지(/findings/doc/{id}/)의 정본을 주 1회 재측정한다
+# (findings_docs_refresh.py). 실사 기록은 발행되면 바뀌지 않으므로 실제 변경분은 신규분뿐이고,
+# 스크립트가 문서 id 오름차순으로 쓰기 때문에 주간 diff 는 삽입분만 잡힌다(정본 8MB 대비 작다).
+#
+# 크론 분리: 자료실=일 18:23 UTC · 모음 페이지=화 18:20 · 용어사전 사례연결=목 18:15 을 이미
+# 쓴다. 같은 창에 겹치면 서로의 골든 재동결을 못 본 채 main 에서 분기해 머지 경합이 난다.
+# → 토요일 18:25 UTC(= 일요일 03:25 KST).
+#
+# ★anon 키를 쓴다(service-role 금지) — RLS 가 공개 집합을 정의한다. service-role 로 뽑으면
+#   비공개 행이 **실명 업체 페이지로 공개**된다(다른 갱신기보다 사고의 무게가 크다).
+
+on:
+  schedule:
+    - cron: '25 18 * * 6'
+  workflow_dispatch:
+    inputs:
+      min_findings:
+        description: '페이지를 만들 최소 지적 건수(미만은 제외·사유 기록)'
+        required: true
+        default: '3'
+      shrink_review_percent:
+        description: '문서 수가 이 비율(%) 이상 줄면 자동 머지 대신 사람 검토'
+        required: true
+        default: '10'
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-findings-docs-auto-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MIN_FINDINGS: ${{ inputs.min_findings || '3' }}
+      SHRINK_PCT: ${{ inputs.shrink_review_percent || '10' }}
+      BRANCH: automation/findings-docs-auto-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/findings_docs.json
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Create isolated candidate branch
+        run: git switch -c "$BRANCH"
+
+      - name: Record pre-refresh document count
+        id: before
+        run: |
+          set -euo pipefail
+          if [ -f "$DATA_PATH" ]; then
+            echo "docs=$(jq '.documents | length' "$DATA_PATH")" >> "$GITHUB_OUTPUT"
+          else
+            echo "docs=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 스크립트가 0건 가드·발행일/원문링크 필수·표본 미달·페이지 실패율 상한을 스스로
+      # 판정하고, 위반이면 아무것도 쓰지 않은 채 exit 1 한다.
+      - name: Refresh document data (findings_search RPC, anon)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python findings_docs_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY" \
+            --min-findings "$MIN_FINDINGS"
+
+      - name: Detect meaningful changes
+        id: changes
+        run: |
+          if git diff --quiet -- "$DATA_PATH"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "문서 페이지 데이터 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 실사 기록은 사라지지 않는다 — 문서 수가 줄면 수집이 덜 된 것이지 세상이 바뀐 게
+      # 아니다. 그래서 모음 페이지(20%)보다 빡빡한 10% 로 잡는다. 여기서 잘못 머지하면
+      # 라이브에서 실명 업체 페이지 수백 장이 한꺼번에 사라진다(링크·색인 모두 깨진다).
+      - name: Gate on document-count shrink
+        if: steps.changes.outputs.changed == 'true'
+        id: gate
+        run: |
+          set -euo pipefail
+          AFTER=$(jq '.documents | length' "$DATA_PATH")
+          BEFORE='${{ steps.before.outputs.docs }}'
+          echo "after=$AFTER" >> "$GITHUB_OUTPUT"
+          if [ "$BEFORE" -eq 0 ]; then
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          elif [ $(( (BEFORE - AFTER) * 100 )) -ge $(( BEFORE * SHRINK_PCT )) ]; then
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+            echo "문서 수 ${BEFORE} → ${AFTER} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 문서 페이지는 테스트 빌드에서 꺼지지만 **sitemap 에는 항상 들어간다**(render_site 가
+      # 데이터에서 파생). 그래서 데이터가 바뀌면 sitemap 골든도 반드시 다시 언다.
+      - name: Freeze renderer-produced goldens
+        if: steps.changes.outputs.changed == 'true'
+        run: python web/tests/test_render.py --freeze
+
+      - name: Commit and open candidate PR
+        if: steps.changes.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH" web/tests/golden
+          git commit -m "chore: refresh findings document pages"
+          git push -u origin "$BRANCH"
+          TOTALS=$(jq -r '.totals | "문서 \(.documents)건 · 지적 \(.findings)건"' "$DATA_PATH")
+          BYAG=$(jq -r '.by_agency | map("- \(.v): \(.c)건") | join("\n")' "$DATA_PATH")
+          EXCL=$(jq -r '.excluded | if length == 0 then "- 없음" else map("- \(.reason): \(.documents)건") | join("\n") end' "$DATA_PATH")
+          cat > /tmp/pr-body.md <<EOF
+          문서 단위 페이지 정본 주간 재측정(\`findings_search\` RPC · anon 키 = 공개 RLS 그대로).
+
+          ## 실측
+          $TOTALS
+
+          $BYAG
+
+          ## 제외 (침묵시키지 않는다)
+          $EXCL
+
+          ## 게이트
+          - 0건 가드 · 발행일/원문 링크 필수 · 지적 ${MIN_FINDINGS}건 미만 제외 · 페이지 실패율 20% 초과 시 전면 중단
+          - 문서 수 ${SHRINK_PCT}% 이상 축소 시 자동 머지 대신 사람 검토
+
+          정본과 sitemap 골든을 함께 커밋합니다. 자동 머지는 GRM CI 디스패치가 green 일 때만.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh findings document pages" \
+            --body-file /tmp/pr-body.md
+          echo "number=$(gh pr view "$BRANCH" --json number -q .number)" >> "$GITHUB_OUTPUT"
+
+      - name: Mark review-required candidate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed != 'true'
+        run: gh pr edit "${{ steps.pr.outputs.number }}" --add-label automation-warning
+
+      - name: Dispatch CI gate
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run grm-ci.yml --ref "$BRANCH"
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID=$(gh run list --workflow grm-ci.yml --branch "$BRANCH" \
+              --event workflow_dispatch --limit 10 \
+              --json databaseId,headSha,createdAt \
+              --jq ".[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$STARTED\") | .databaseId" \
+              | head -n 1)
+            [ -n "$RUN_ID" ] && break
+            sleep 5
+          done
+          [ -n "$RUN_ID" ] || { echo "CI dispatch run not found" >&2; exit 1; }
+          gh run watch "$RUN_ID" --exit-status
+
+      - name: Merge only after green CI
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "$DATA_PATH" ]; then
+            jq -r '"측정일 \(.measured_on) · 문서 \(.totals.documents)건 · 지적 \(.totals.findings)건"' \
+              "$DATA_PATH" >> "$GITHUB_STEP_SUMMARY"
+          fi

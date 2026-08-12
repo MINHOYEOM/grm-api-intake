@@ -54,6 +54,7 @@ GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
+FINDINGS_DOCS_FILE = WEB_DIR / "data" / "findings_docs.json"      # [검색 유입] 문서 단위 페이지 정본(findings_docs_refresh.py · 지적 3건 이상)
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
@@ -1371,6 +1372,34 @@ def build_facet_item_view(item: dict[str, Any]) -> dict[str, Any]:
     return view
 
 
+def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | None":
+    """문서 단위 페이지 정본 로드. 부재 시 None → 섹션이 조용히 꺼진다.
+
+    스키마 버전 불일치는 실패시킨다 — 모양이 바뀐 데이터를 옛 템플릿으로 렌더하면 실명
+    업체 페이지 수천 장이 빈 채로 라이브에 나간다(없느니만 못하다).
+    """
+    if not path.exists():
+        return None
+    obj = json.loads(path.read_text(encoding="utf-8"))
+    got = obj.get("schema_version")
+    if got != "grm-findings-docs/v1":
+        raise SystemExit(f"findings_docs 스키마 불일치: {got!r} (기대: grm-findings-docs/v1)")
+    return obj
+
+
+def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> str:
+    """meta description — 누가·언제·몇 건·어떤 주제. 데이터 조립뿐(문구 생성 0).
+
+    ★날짜를 반드시 넣는다. 검색 결과 스니펫에 연도가 없으면 몇 년 전 지적이 현재 상태로
+    읽힌다 — 실명 업체 페이지에서 그건 사실 왜곡이다.
+    """
+    agency = agency_labels.get(doc["agency"], doc["agency"])
+    cats = " · ".join(doc.get("categories") or [])
+    tail = f" 주요 분류: {cats}." if cats else ""
+    return (f"{agency}가 {doc['published_date']}에 공개한 {doc['firm_name']} "
+            f"{doc['source']} 지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
+
+
 def facet_description(axis_key: str, item: dict[str, Any],
                       agency_labels: dict[str, str]) -> str:
     """meta description — 데이터에서 조립한다(문구 생성 0·now()/난수 0).
@@ -1880,8 +1909,21 @@ def _write_json(path: Path, obj: Any) -> None:
 
 
 def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
-                assets_dir: Path = ASSETS_DIR) -> dict[str, Any]:
-    """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환."""
+                assets_dir: Path = ASSETS_DIR,
+                render_doc_pages: bool = True) -> dict[str, Any]:
+    """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환.
+
+    `render_doc_pages=False` 는 **테스트 전용 속도 스위치**다. 문서 단위 페이지는 3천 장이
+    넘어 한 번 렌더에 ~27초가 드는데, 테스트 스위트는 사이트를 51번 다시 짓는다(= 23분).
+    그래서 대부분의 테스트는 이 부분을 건너뛰고, **전용 테스트 클래스 하나만** 켠 채로 지어
+    전수 검증한다(`WebFindingsDocPageTest`).
+
+    ★기본값은 True 다 — 프로덕션 경로(CLI)는 아무것도 넘기지 않으므로 항상 렌더한다.
+      기본값을 False 로 두면 배포가 조용히 sitemap 에만 있는 유령 URL 3천 개를 광고하게 된다.
+    ★끄더라도 **sitemap 에는 문서 URL 을 그대로 넣는다** — sitemap 은 데이터에서 파생되지
+      렌더 결과에서 파생되지 않으므로, 켜고 끄는 것이 골든을 흔들지 않는다(테스트가 보는
+      sitemap 과 프로덕션 sitemap 이 같아야 대조가 의미 있다).
+    """
     env = _make_env()
     # 소유권 인증 메타(env-param) — 전 페이지 <head> 공통(미설정 시 미출력). 아래 전역들
     # (SITE_BASE_URL·NEWSLETTER_FORM_ACTION·*_SITE_VERIFICATION)은 import 시점에 os.environ
@@ -2221,6 +2263,46 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                        page_html)
                 written.append(f"findings/{meta['path']}/{item['slug']}/index.html")
                 facet_paths.append(f"findings/{meta['path']}/{item['slug']}/")
+
+    # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(지적 3건 이상).
+    # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지
+    # 않는다. 여기가 그 구멍을 메운다.
+    #   ★분류 라벨 → 모음 페이지 슬러그는 **facets 데이터에서 파생**한다(사본 금지). facets
+    #     가 없거나 그 분류가 표본 미달로 페이지가 없으면 링크를 만들지 않는다 — 없는 페이지로
+    #     보내는 링크가 무링크보다 나쁘다(자료실 조항 링크와 같은 판단).
+    docs_data = load_findings_docs()
+    if docs_data:
+        doc_agency_labels = docs_data.get("agency_labels") or (
+            facets.get("agency_labels") if facets else {}) or {}
+        cat_slug_by_label: dict[str, str] = {}
+        for axis in (facets.get("axes") if facets else []) or []:
+            if axis["axis"] != "category":
+                continue
+            for it in axis.get("items") or []:
+                cat_slug_by_label[it["label_ko"]] = it["slug"]
+
+        for doc in docs_data.get("documents") or []:
+            # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
+            # sitemap 과 프로덕션 sitemap 이 달라져 골든 대조가 의미를 잃는다.
+            facet_paths.append(f"findings/doc/{doc['slug']}/")
+            if not render_doc_pages:
+                continue
+            related = [{"slug": cat_slug_by_label[label], "label_ko": label}
+                       for label in (doc.get("categories") or [])
+                       if label in cat_slug_by_label]
+            doc_html = env.get_template("findings_doc.html").render(
+                page_title=(f"{doc['firm_name']} {doc['source']} 지적사항"
+                            f" ({doc['published_date']}) · GRM"),
+                rel_root="../../../",
+                nav_active="findings",
+                latest_slug=latest_slug,
+                description=doc_page_description(doc, doc_agency_labels),
+                canonical=_abs_url(f"findings/doc/{doc['slug']}/"),
+                doc=doc, agency_labels=doc_agency_labels,
+                related_categories=related,
+            )
+            _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)
+            written.append(f"findings/doc/{doc['slug']}/index.html")
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

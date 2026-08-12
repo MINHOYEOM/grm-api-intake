@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+"""findings_docs_refresh.py — 문서 단위 페이지 정본 생성기.
+
+무네트워크. 이 스크립트가 만드는 것은 **실명 업체의 규제 기록 페이지 3천 장**이라, 조용히
+틀리면 피해가 우리 사이트에 그치지 않는다. 그래서 게이트를 값으로 고정한다:
+
+  · 발행일 없는 문서는 페이지를 만들지 않는다(언제인지 모르는 지적은 현재 상태로 오독된다).
+  · 원문 링크 없는 문서는 만들지 않는다(원문으로 못 보내면 우리 주장만 남는다).
+  · 본문을 자르지 않는다(원문 절단은 이미 두 번 데인 자리다).
+  · 제외 사유를 센다(침묵하면 "전부 다뤘다"로 읽힌다).
+"""
+from __future__ import annotations
+
+import json
+import sys
+import unittest
+from collections import Counter
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import findings_docs_refresh as fdr  # noqa: E402
+
+
+def _finding(fid="f1", text_ko="지적 본문입니다.", label="일탈/CAPA/조사"):
+    return {"finding_id": fid, "finding_text_ko": text_ko,
+            "category_code": "deviation_capa", "category_label_ko": label}
+
+
+def _doc(doc_id="abc123", n=3, **kw):
+    base = {
+        "document_id": doc_id,
+        "agency": "FDA",
+        "source": "FDA 483",
+        "firm_name": "Acme Pharma",
+        "published_date": "2026-01-15",
+        "evidence_url": "https://www.fda.gov/x",
+        "findings": [_finding(f"f{i}") for i in range(n)],
+    }
+    base.update(kw)
+    return base
+
+
+class DocumentViewGateTest(unittest.TestCase):
+    def setUp(self):
+        self.reject: Counter = Counter()
+
+    def _view(self, doc, min_findings=3):
+        return fdr.document_view(doc, min_findings=min_findings, reject=self.reject)
+
+    def test_accepts_well_formed_document(self):
+        view = self._view(_doc())
+        self.assertIsNotNone(view)
+        self.assertEqual(view["slug"], "abc123")
+        self.assertEqual(len(view["findings"]), 3)
+        self.assertEqual(view["categories"], ["일탈/CAPA/조사"])
+
+    def test_rejects_missing_published_date(self):
+        """언제인지 모르는 지적은 현재 상태로 오독된다."""
+        self.assertIsNone(self._view(_doc(published_date="")))
+        self.assertEqual(self.reject["발행일 없음"], 1)
+
+    def test_rejects_malformed_date(self):
+        self.assertIsNone(self._view(_doc(published_date="2026/01/15")))
+        self.assertEqual(self.reject["발행일 없음"], 1)
+
+    def test_rejects_missing_evidence_url(self):
+        """원문으로 못 보내는 페이지는 우리 주장만 남는다."""
+        self.assertIsNone(self._view(_doc(evidence_url="")))
+        self.assertEqual(self.reject["원문 링크 없음"], 1)
+
+    def test_rejects_non_http_evidence_url(self):
+        self.assertIsNone(self._view(_doc(evidence_url="javascript:alert(1)")))
+        self.assertEqual(self.reject["원문 링크 없음"], 1)
+
+    def test_rejects_unsafe_document_id(self):
+        for bad in ("a/b", "a b", "../etc", "한글아이디", ""):
+            self.reject.clear()
+            self.assertIsNone(self._view(_doc(doc_id=bad)), bad)
+            self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1, bad)
+
+    def test_rejects_below_threshold(self):
+        self.assertIsNone(self._view(_doc(n=2)))
+        self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
+
+    def test_findings_without_korean_text_do_not_count(self):
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a"), _finding("b", text_ko=""),
+                           _finding("c", text_ko="  ")]
+        self.assertIsNone(self._view(doc))
+        self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
+
+    def test_text_is_verbatim(self):
+        long_text = "무균공정 " * 400
+        doc = _doc(n=0)
+        doc["findings"] = [_finding(str(i), text_ko=long_text) for i in range(3)]
+        view = self._view(doc)
+        self.assertEqual(view["findings"][0]["text_ko"], long_text.strip())
+
+    def test_categories_are_deduped_in_order(self):
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", label="설비/시설"),
+                           _finding("b", label="일탈/CAPA/조사"),
+                           _finding("c", label="설비/시설")]
+        self.assertEqual(self._view(doc)["categories"], ["설비/시설", "일탈/CAPA/조사"])
+
+
+class CollectDocumentsTest(unittest.TestCase):
+    def setUp(self):
+        self._real = fdr.post_search
+
+    def tearDown(self):
+        fdr.post_search = self._real
+
+    def _stub(self, pages, docs_by_page, fail_pages=()):
+        def fake(base_url, anon_key, payload, timeout=120):
+            page = payload["p_page"]
+            if page in fail_pages:
+                raise RuntimeError("boom")
+            return {"pages": pages, "documents": docs_by_page.get(page, [])}
+        fdr.post_search = fake
+
+    def test_zero_documents_aborts(self):
+        """RPC 장애를 '문서가 없다'로 커밋하면 다음 렌더가 페이지 수천 장을 지운다."""
+        self._stub(1, {1: [_doc(n=1)]})
+        with self.assertRaises(SystemExit):
+            fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                  log=lambda m: None)
+
+    def test_sorted_by_document_id_for_small_diffs(self):
+        self._stub(1, {1: [_doc("zzz"), _doc("aaa"), _doc("mmm")]})
+        docs, _ = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                        log=lambda m: None)
+        self.assertEqual([d["document_id"] for d in docs], ["aaa", "mmm", "zzz"])
+
+    def test_page_failure_is_isolated(self):
+        self._stub(5, {p: [_doc(f"doc{p}")] for p in range(1, 6)}, fail_pages={3})
+        docs, _ = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                        log=lambda m: None)
+        self.assertEqual(len(docs), 4)
+
+    def test_too_many_page_failures_aborts(self):
+        self._stub(4, {p: [_doc(f"doc{p}")] for p in range(1, 5)},
+                   fail_pages={2, 3, 4})
+        with self.assertRaises(SystemExit):
+            fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                  log=lambda m: None)
+
+
+class CommittedDataTest(unittest.TestCase):
+    """커밋된 정본이 게이트를 실제로 지키는지 — 손으로 고친 데이터가 섞이면 잡힌다."""
+
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / "web" / "data" / "findings_docs.json"
+        if not path.exists():
+            raise unittest.SkipTest("findings_docs.json 미존재")
+        cls.data = json.loads(path.read_text(encoding="utf-8"))
+
+    def test_schema_and_totals(self):
+        self.assertEqual(self.data["schema_version"], fdr.SCHEMA_VERSION)
+        self.assertEqual(self.data["totals"]["documents"], len(self.data["documents"]))
+        self.assertEqual(self.data["totals"]["findings"],
+                         sum(len(d["findings"]) for d in self.data["documents"]))
+
+    def test_every_document_meets_the_gates(self):
+        floor = self.data["min_findings"]
+        for d in self.data["documents"]:
+            self.assertRegex(d["slug"], r"^[A-Za-z0-9._-]{1,120}$")
+            self.assertRegex(d["published_date"], r"^\d{4}-\d{2}-\d{2}$")
+            self.assertTrue(d["evidence_url"].startswith(("http://", "https://")))
+            self.assertGreaterEqual(len(d["findings"]), floor, d["slug"])
+            self.assertTrue(d["firm_name"].strip(), d["slug"])
+
+    def test_slugs_unique_and_sorted(self):
+        slugs = [d["slug"] for d in self.data["documents"]]
+        self.assertEqual(len(slugs), len(set(slugs)), "문서 슬러그 중복")
+        self.assertEqual(slugs, sorted(slugs), "정렬이 흐트러지면 주간 diff 가 전 파일이 된다")
+
+    def test_exclusions_are_recorded(self):
+        """제외를 침묵시키지 않는다 — 사유별 건수가 남아 있어야 한다."""
+        self.assertTrue(self.data["excluded"], "제외 기록이 비어 있다")
+        for ex in self.data["excluded"]:
+            self.assertTrue(ex["reason"].strip())
+            self.assertGreater(ex["documents"], 0)
+
+    # ★상류(수집·번역 단계)에 남아 있는 480자 절단의 잔존분 기준선.
+    #
+    # 이 스크립트는 본문을 자르지 않는다(위 test_text_is_verbatim 이 그것을 고정한다).
+    # 그런데 커밋 데이터에는 말줄임표로 끝나는 본문이 1,337건 있고, 전수 확인 결과 **전부
+    # FDA 경고서한**이며 영문 원문 길이가 470~485자에 몰려 문장 중간에서 끊긴다 — 즉
+    # `grm-wl-fragment-truncation`(#653)에서 고친 그 결함의 **소급되지 않은 잔존분**이다
+    # (#653 은 소급을 26건에만 적용했다). 483 은 10,162건 중 4건뿐이라 사실상 깨끗하다.
+    #
+    # 여기서 0 을 요구하면 이 PR 이 남의 결함에 발목 잡히고, 검사를 지우면 그 결함이 다시
+    # 조용해진다. 그래서 **기준선으로 고정해 표면화**한다 — 늘면 실패하고, 상류가 고쳐지면
+    # 이 숫자를 내리라고 알려준다.
+    BASELINE_UPSTREAM_TRUNCATED = 1337
+
+    def test_upstream_truncation_does_not_grow(self):
+        bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]
+               if f["text_ko"].rstrip().endswith(("…", "..."))]
+        self.assertLessEqual(
+            len(bad), self.BASELINE_UPSTREAM_TRUNCATED,
+            f"상류 절단이 늘었다({len(bad)} > {self.BASELINE_UPSTREAM_TRUNCATED}): {bad[:5]}")
+        if len(bad) < self.BASELINE_UPSTREAM_TRUNCATED:
+            print(f"\n[NOTICE] 상류 절단 {len(bad)}건 — 기준선"
+                  f"({self.BASELINE_UPSTREAM_TRUNCATED})을 내리세요.")
+
+
+if __name__ == "__main__":                                       # pragma: no cover
+    unittest.main()

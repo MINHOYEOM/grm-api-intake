@@ -221,10 +221,62 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
 
     def test_report_lists_mismatches(self):
         out = vps.format_report([
-            {"date": "2026_07_20", "id": "fda483-1", "shown": 0, "found": 2, "status": "pdf-ok"}])
+            {"date": "2026_07_20", "id": "fda483-1", "shown": 0, "found": 2,
+             "status": "pdf-ok", "db_total": 2, "db_ok": 2, "verdict": "publish-gap"}])
         self.assertIn("**1건**", out)
         self.assertIn("fda483-1", out)
         self.assertIn("source_text", out)          # 조치 안내가 붙는다
+
+    # ── 원인 분해(2026-08-12, 이슈 #638) ────────────────────────────────────────
+    # `원문 > 카드표시` 하나에 처방이 정반대인 세 사건이 섞여 있었다. 아래 픽스처는
+    # **라이브 실측값**이다(2026-08-03 발행분).
+
+    def test_scope_excluded_is_not_a_defect(self):
+        # fda483-193695 Americord Registry: 원문 15건이 전부 non_pharma(제대혈은행) →
+        # 카드가 0 을 보여준 게 맞다. 종전 판정은 이걸 결함 15건으로 보고했다.
+        row = {"shown": 0, "found": 15, "db_total": 15, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "scope-excluded")
+
+    def test_publish_gap_when_in_scope_findings_not_shown(self):
+        # fda483-193663: 원문 5건·전부 scope ok 인데 카드는 0 → 진짜 발행 격차.
+        row = {"shown": 0, "found": 5, "db_total": 5, "db_ok": 5}
+        self.assertEqual(vps.classify(row), "publish-gap")
+
+    def test_extraction_gap_when_db_has_nothing(self):
+        # fda483-193696 Biograft: findings 자체가 0건 → 수집 시점 추출 실패.
+        row = {"shown": 0, "found": 2, "db_total": 0, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+
+    def test_no_db_credentials_degrades_but_does_not_go_silent(self):
+        # DB 를 못 보면 **조용히 통과시키지 않는다** — 판정 불가로 남겨 알림에 싣는다.
+        row = {"shown": 0, "found": 2, "db_total": None, "db_ok": None}
+        self.assertEqual(vps.classify(row), "unknown-no-db")
+
+    def test_matching_counts_are_ok_regardless_of_db(self):
+        self.assertEqual(vps.classify({"shown": 3, "found": 3,
+                                       "db_total": None, "db_ok": None}), "ok")
+
+    def test_scope_excluded_rows_are_reported_not_silently_dropped(self):
+        # 조용한 축소 금지: 불일치 0 이어도 걸러낸 건수를 보고서에 남긴다.
+        rows = [{"date": "d", "id": "fda483-193695", "shown": 0, "found": 15,
+                 "status": "pdf-ok", "db_total": 15, "db_ok": 0,
+                 "verdict": "scope-excluded"}]
+        out = vps.format_report([], rows)
+        self.assertIn("불일치 0", out)
+        self.assertIn("fda483-193695", out)
+        self.assertIn("의도대로 제외", out)
+
+    def test_report_groups_by_verdict(self):
+        rows = [
+            {"date": "d", "id": "a", "shown": 0, "found": 2, "status": "s",
+             "db_total": 0, "db_ok": 0, "verdict": "extraction-gap"},
+            {"date": "d", "id": "b", "shown": 0, "found": 5, "status": "s",
+             "db_total": 5, "db_ok": 5, "verdict": "publish-gap"},
+        ]
+        out = vps.format_report(rows, rows)
+        self.assertIn("### extraction-gap", out)
+        self.assertIn("### publish-gap", out)
+        self.assertIn("extraction-gap 1건", out)
 
 
 class UnverifiedAbsenceLabelTest(unittest.TestCase):

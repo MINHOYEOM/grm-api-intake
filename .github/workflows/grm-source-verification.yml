@@ -54,6 +54,14 @@ jobs:
       - name: 원문 대조
         id: verify
         continue-on-error: true      # 불일치(exit 1)는 job 실패가 아니라 이슈로 처리한다
+        # [원인 분해 2026-08-12] `원문 > 카드표시` 만으로는 **의도대로 감춘 것**(scope_status
+        # 가 'ok' 가 아닌 findings)과 진짜 결손을 못 가른다 — 이슈 #638 이 실제로 그 셋을
+        # 한 표에 섞어 보고했다. findings 의 scope 분포를 읽어 갈라내기 위해 자격증명을
+        # 넘긴다(읽기 전용 조회만). 없으면 스크립트가 종전 판정으로 degrade 하면서 그
+        # 사실을 보고서에 명시한다.
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -o pipefail
           python verify_published_sources.py \

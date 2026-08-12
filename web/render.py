@@ -1356,7 +1356,8 @@ def load_findings_facets(path: Path = FINDINGS_FACETS_FILE) -> "dict[str, Any] |
     return obj
 
 
-def build_facet_item_view(item: dict[str, Any]) -> dict[str, Any]:
+def build_facet_item_view(item: dict[str, Any],
+                          doc_slugs: "set[str] | None" = None) -> dict[str, Any]:
     """항목 1건의 표시용 투영 — 값 무변형, 파생은 막대 비율뿐.
 
     `pct` 는 그 항목 안에서 가장 큰 기관 건수를 100 으로 둔 상대값이다(전체 대비가 아니다
@@ -1368,6 +1369,14 @@ def build_facet_item_view(item: dict[str, Any]) -> dict[str, Any]:
     view["by_agency"] = [
         {**a, "pct": round(int(a.get("c") or 0) * 100 / top, 1) if top else 0}
         for a in agencies
+    ]
+    # 사례 → 문서 페이지 연결. `doc_slugs` 에 있는 것만 잇는다 — 지적 3건 미만 문서는
+    # 페이지가 없고, 없는 페이지로 보내는 링크는 무링크보다 나쁘다.
+    known = doc_slugs or set()
+    view["samples"] = [
+        {**s, "doc_slug": (s.get("document_id") or "")
+         if (s.get("document_id") or "") in known else ""}
+        for s in (item.get("samples") or [])
     ]
     return view
 
@@ -2225,6 +2234,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 축 색인을 함께 내는 이유: 항목 페이지가 sitemap 에만 있으면 사이트 구조에서 그
     # 페이지들에 닿는 내부 링크가 없다(내부 링크가 곧 색인 경로다).
     facets = load_findings_facets()
+    # 문서 정본을 **모음 페이지보다 먼저** 읽는다 — 모음 페이지의 사례가 문서 페이지로
+    # 이어지려면 "그 문서에 페이지가 있는가"를 렌더 시점에 알아야 하기 때문이다.
+    docs_data = load_findings_docs()
+    doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
     facet_paths: list[str] = []
     if facets:
         agency_labels = facets.get("agency_labels") or {}
@@ -2232,7 +2245,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for axis in facets.get("axes") or []:
             axis_key = axis["axis"]
             meta = FACET_AXES[axis_key]                 # 모르는 축 = KeyError(조용한 누락 금지)
-            items = [build_facet_item_view(it) for it in axis.get("items") or []]
+            items = [build_facet_item_view(it, doc_slugs) for it in axis.get("items") or []]
             siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
 
             index_html = env.get_template("findings_facet_index.html").render(
@@ -2243,6 +2256,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=meta["index_lede"],
                 canonical=_abs_url(f"findings/{meta['path']}/"),
                 axis=meta, items=items, excluded=axis.get("excluded") or [],
+                # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
+                # 보내는 링크는 무링크보다 나쁘다).
+                doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
+                if render_doc_pages else 0,
             )
             _write(out_dir / "findings" / meta["path"] / "index.html", index_html)
             written.append(f"findings/{meta['path']}/index.html")
@@ -2270,7 +2287,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   ★분류 라벨 → 모음 페이지 슬러그는 **facets 데이터에서 파생**한다(사본 금지). facets
     #     가 없거나 그 분류가 표본 미달로 페이지가 없으면 링크를 만들지 않는다 — 없는 페이지로
     #     보내는 링크가 무링크보다 나쁘다(자료실 조항 링크와 같은 판단).
-    docs_data = load_findings_docs()
     if docs_data:
         doc_agency_labels = docs_data.get("agency_labels") or (
             facets.get("agency_labels") if facets else {}) or {}
@@ -2281,7 +2297,87 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for it in axis.get("items") or []:
                 cat_slug_by_label[it["label_ko"]] = it["slug"]
 
-        for doc in docs_data.get("documents") or []:
+        documents = docs_data.get("documents") or []
+
+        # ── 내부 링크 구조 ───────────────────────────────────────────────────
+        # 문서 페이지 3천 장을 sitemap 에만 올려두면 사이트 구조에서 그 페이지에 닿는
+        # 경로가 없다(크롤이 느리고 중요도 신호도 안 붙는다). 용어사전·모음 페이지에는
+        # 축 색인을 함께 냈으면서 문서 페이지에만 빠뜨렸던 것을 메운다:
+        #   ① 기관×연도 목록 `/findings/docs/{agency}/{year}/` 와 그 색인 `/findings/docs/`
+        #   ② 같은 업체의 다른 기록(문서끼리 직접 연결)
+        #   ③ 모음 페이지의 사례 → 그 문서 페이지(build_facet_item_view 가 doc_slug 를 채움)
+        by_firm: dict[str, list[dict[str, Any]]] = {}
+        for d in documents:
+            key = d.get("firm_key") or ""
+            if key:
+                by_firm.setdefault(key, []).append(d)
+
+        # 기관×연도 그룹. 정렬은 전부 결정론(연도 내림차순·같은 연도 안은 날짜 내림차순).
+        by_ay: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for d in documents:
+            by_ay.setdefault((d["agency"], d["published_date"][:4]), []).append(d)
+        for bucket in by_ay.values():
+            bucket.sort(key=lambda x: (x["published_date"], x["slug"]), reverse=True)
+
+        doc_agencies = sorted({a for a, _ in by_ay},
+                              key=lambda a: -sum(len(v) for (aa, _), v in by_ay.items()
+                                                 if aa == a))
+        index_groups = [{
+            "slug": a.lower(),
+            "label_ko": doc_agency_labels.get(a, a),
+            "total": sum(len(v) for (aa, _), v in by_ay.items() if aa == a),
+            "years": [{"year": y, "count": len(by_ay[(a, y)])}
+                      for y in sorted({yy for aa, yy in by_ay if aa == a}, reverse=True)],
+        } for a in doc_agencies]
+
+        facet_paths.append("findings/docs/")
+        for g in index_groups:
+            for y in g["years"]:
+                facet_paths.append(f"findings/docs/{g['slug']}/{y['year']}/")
+
+        if render_doc_pages:
+            _write(out_dir / "findings" / "docs" / "index.html",
+                   env.get_template("findings_doc_list.html").render(
+                       page_title="문서로 찾기 · GRM",
+                       rel_root="../../", nav_active="findings", latest_slug=latest_slug,
+                       description=("규제기관이 공개한 실사 문서를 기관과 연도로 묶어"
+                                    " 찾아보실 수 있습니다. 지적 3건 이상이 우리말로"
+                                    " 정리된 문서 "
+                                    f"{docs_data['totals']['documents']:,}건입니다."),
+                       canonical=_abs_url("findings/docs/"),
+                       mode="index", heading="문서로 찾기",
+                       lede=(f"규제기관이 공개한 실사 문서 "
+                             f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
+                             " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
+                             " 우리말로 보실 수 있습니다."),
+                       groups=index_groups))
+            written.append("findings/docs/index.html")
+
+            for g in index_groups:
+                for y in g["years"]:
+                    bucket = by_ay[(g["slug"].upper(), y["year"])]
+                    _write(out_dir / "findings" / "docs" / g["slug"] / y["year"] / "index.html",
+                           env.get_template("findings_doc_list.html").render(
+                               page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
+                               rel_root="../../../../", nav_active="findings",
+                               latest_slug=latest_slug,
+                               description=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사"
+                                            f" 문서 {y['count']:,}건의 지적사항을 우리말로"
+                                            " 정리했습니다."),
+                               canonical=_abs_url(
+                                   f"findings/docs/{g['slug']}/{y['year']}/"),
+                               mode="list",
+                               heading=f"{g['label_ko']} · {y['year']}년",
+                               lede=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사 문서"
+                                     f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
+                                     " 지적을 모두 보실 수 있습니다."),
+                               documents=bucket, agency_slug=g["slug"],
+                               agency_label=g["label_ko"], year=y["year"],
+                               sibling_years=g["years"]))
+                    written.append(
+                        f"findings/docs/{g['slug']}/{y['year']}/index.html")
+
+        for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
             # sitemap 과 프로덕션 sitemap 이 달라져 골든 대조가 의미를 잃는다.
             facet_paths.append(f"findings/doc/{doc['slug']}/")
@@ -2290,6 +2386,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             related = [{"slug": cat_slug_by_label[label], "label_ko": label}
                        for label in (doc.get("categories") or [])
                        if label in cat_slug_by_label]
+            # 같은 업체의 다른 기록 — 표시명이 아니라 정규화 키로 묶는다. 최신 6건만
+            # 보여준다(30건짜리 업체가 있어 전부 실으면 목록이 본문을 덮는다).
+            siblings = [s for s in by_firm.get(doc.get("firm_key") or "", [])
+                        if s["slug"] != doc["slug"]]
+            siblings.sort(key=lambda x: (x["published_date"], x["slug"]), reverse=True)
+            same_firm = [{"slug": s["slug"], "published_date": s["published_date"],
+                          "agency": s["agency"], "count": len(s["findings"])}
+                         for s in siblings[:6]]
             doc_html = env.get_template("findings_doc.html").render(
                 page_title=(f"{doc['firm_name']} {doc['source']} 지적사항"
                             f" ({doc['published_date']}) · GRM"),
@@ -2299,7 +2403,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=doc_page_description(doc, doc_agency_labels),
                 canonical=_abs_url(f"findings/doc/{doc['slug']}/"),
                 doc=doc, agency_labels=doc_agency_labels,
-                related_categories=related,
+                related_categories=related, same_firm=same_firm,
             )
             _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)
             written.append(f"findings/doc/{doc['slug']}/index.html")

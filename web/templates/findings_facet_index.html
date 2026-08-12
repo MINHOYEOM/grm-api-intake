@@ -43,6 +43,15 @@
       {%- endfor %}
     </div>
 
+    {% if doc_index_total %}
+    <div class="fi-tail">
+      {#- 문서 목록으로 가는 입구. 문서 페이지 3천 장이 sitemap 에만 있으면 사이트
+          구조에서 닿는 경로가 없다 — 축 색인이 그 입구 역할을 함께 한다. -#}
+      <p class="fi-tail-h">문서 하나를 통째로 보고 싶다면</p>
+      <p class="fi-tail-p">실사 문서 <a href="{{ rel_root }}findings/docs/">{{ "{:,}".format(doc_index_total) }}건을 기관·연도로 묶어</a> 두었습니다. 문서를 열면 그 실사에서 나온 지적을 모두 우리말로 보실 수 있습니다.</p>
+    </div>
+    {% endif %}
+
     {% if excluded %}
     <div class="fi-tail">
       <p class="fi-tail-h">여기에 없는 것</p>

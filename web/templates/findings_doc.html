@@ -86,8 +86,20 @@
       <p>번역과 분류는 기계로 처리한 것이라 원문과 뉘앙스가 다를 수 있습니다.</p>
     </section>
 
+    {% if same_firm %}
+    <section class="fd-sec">
+      {#- 같은 업체의 다른 기록. 묶는 기준은 표시명이 아니라 정규화 키(firm_key)다 —
+          "… Limited"와 "… Ltd."는 표시명이 달라도 같은 업체이기 때문. -#}
+      <h2 class="fd-sec-h">같은 업체의 다른 기록</h2>
+      <div class="fd-rel" style="border-top:0;padding-top:0">
+        {%- for s in same_firm %}<a href="{{ rel_root }}findings/doc/{{ s.slug }}/">{{ s.published_date }} · {{ agency_labels.get(s.agency, s.agency) }} · 지적 {{ s.count }}건</a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="fd-rel">
       <a href="{{ rel_root }}findings/agency/{{ doc.agency | lower }}/">{{ agency_labels.get(doc.agency, doc.agency) }} 지적사항 전체</a>
+      <a href="{{ rel_root }}findings/docs/{{ doc.agency | lower }}/{{ doc.published_date[:4] }}/">{{ doc.published_date[:4] }}년 {{ agency_labels.get(doc.agency, doc.agency) }} 문서 목록</a>
       {%- for c in related_categories %}<a href="{{ rel_root }}findings/c/{{ c.slug }}/">{{ c.label_ko }} 지적사항</a>{% endfor %}
       <a href="{{ rel_root }}findings/">지적사항 검색으로</a>
     </section>

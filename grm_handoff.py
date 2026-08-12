@@ -581,14 +581,18 @@ def _enable_handoff_idempotency_v2() -> bool:
     return env_flag("ENABLE_HANDOFF_IDEMPOTENCY_V2")
 
 
-_HANDOFF_V2_ROW_KEEP = (
-    "page_id", "page_url", "title", "source", "document_id", "date", "headline",
-    "official_url", "source_url", "type_or_class", "firm", "body", "distribution",
-    "comments_close", "run_date", "collected_at", "api_query", "search_query",
-    "raw_excerpt", "qa_relevance", "osd_relevance", "modality", "source_type",
-    "signal_tier", "evidence_candidate", "language", "region_jurisdiction",
-    "site_country", "status",
-)
+# v2 row 에 보존할 v1 호환 필드(whitelist) — **`_intake_page_snapshot()` 스키마에서 파생**한다.
+# blacklist 대신 whitelist 인 이유(Codex P2): raw·Stage B 부착 bookkeeping(raw_fetch_ok·
+# raw_source·status_hint·evidence_hint) 같은 내부/대형 필드가 payload 로 새지 않도록 보장.
+#
+# ★[2026-08-12] 종전엔 같은 29키를 **손으로 다시 적어** 뒀다. 원천(`_intake_page_snapshot`)과
+# 우연히 일치하고 있었을 뿐이고, 어긋나도 아무도 몰랐다 — Notion 속성을 하나 추가해
+# 스냅샷에만 넣으면 **v2 payload 에서 그 필드가 경고 0건·테스트 0건으로 조용히 탈락**한다
+# (v1 은 row 를 통째로 넘기므로 v1 에서는 보이고 v2 에서만 사라져 원인 추적이 어렵다).
+# 게다가 이 상수의 설명 주석은 모듈 분리 때 `collect_intake.py` 에 고아로 남아, 정의 지점엔
+# 한 줄도 없었다. 이제 스냅샷 스키마를 그대로 파생시킨다 — 새 속성은 자동으로 실린다.
+# (빈 dict 로 호출해 **키 집합만** 얻는다. 스냅샷은 순수 dict 연산이라 부작용이 없다.)
+_HANDOFF_V2_ROW_KEEP = tuple(_intake_page_snapshot({}))
 
 
 def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,

@@ -617,6 +617,40 @@ class IntakeSourceGateCoverageTest(unittest.TestCase):
         )
         self.assertEqual(registry ^ keys, set(), f"레지스트리에 없는 유령 게이트: {keys - registry}")
 
+    def test_every_source_has_a_severity_policy(self):
+        """★[2026-08-12] 레지스트리의 모든 소스는 warn_only 이거나 transient 강등 자격이
+        있어야 한다 — 둘 다 아니면 **어떤 오류든 곧바로 exit 1** 이고, 그러면
+        `grm-web-publish.yml` 이 그 run 을 스캐폴드 후보에서 빼 그 주 발행이 막힌다.
+
+        실측상 23종 중 `brave-search` 하나만 그 상태였다(요율 제한이 일상인 3rd-party API
+        인데 `http 429` 마커조차 강등되지 않았다). `ENABLE_SEARCH` 기본값이 false 라 피해는
+        0 이었지만, **코드 리뷰를 거치지 않는 repo 변수 하나**가 뒤집히면 터지는 지뢰였다."""
+        codes = {s.health_code for s in ci.INTAKE_SOURCE_SPECS}
+        self.assertGreaterEqual(len(codes), 20, "레지스트리 파생이 비었다 — 가드 침묵")
+        import grm_health
+        unpolicied = codes - set(grm_health._WARN_ONLY_SOURCE_CODES) \
+            - set(grm_health._TRANSIENT_ELIGIBLE_SOURCE_CODES)
+        self.assertEqual(
+            unpolicied, set(),
+            f"등급 정책이 없는 소스 {sorted(unpolicied)} — 오류 한 번에 exit 1 이 되어 "
+            "그 주 발행이 막힌다. warn_only=True 로 두거나 transient 강등 자격을 줄 것")
+
+    def test_brave_search_error_surfaces_without_blocking_publish(self):
+        """Brave 는 warn_only 로 푼다 — 오류 종류와 무관하게 표면화하되 적색은 아니다.
+
+        `_is_transient_source_error` 의 화이트리스트를 넓히는 대신 warn_only 를 쓴 이유:
+        그 경계는 이미 `test_whitelist_outside_codes_are_never_transient` 가 못박은 계약이라,
+        건드리면 **테스트가 지키던 의미를 내가 바꾸는 것**이 된다. ECA·WL 이 2026-07-27 에
+        쓴 것과 같은 기구를 쓴다(등급 판단은 소스 레지스트리 한 곳에서)."""
+        for msg in ("HTTP 429 Too Many Requests", "Read timed out",
+                    "BRAVE_API_KEY 환경변수 필요"):
+            with self.subTest(msg=msg):
+                st = ci.CollectionStats()
+                st.search_error, st.search_error_msg = True, msg
+                h = ci._evaluate_health(**_health_kwargs(stats=st, enable_search=True))
+                self.assertIn("source-error:brave-search", _codes(h.warnings))
+                self.assertEqual(h.exit_code, 0, "부차 검색 실패가 그 주 발행을 막으면 안 된다")
+
     def test_health_codes_are_unique_and_hyphenated(self):
         codes = [s.health_code for s in ci.INTAKE_SOURCE_SPECS]
         self.assertEqual(len(codes), len(set(codes)), f"health_code 중복: {codes}")

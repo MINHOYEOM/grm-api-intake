@@ -31,7 +31,11 @@
         {% for t in g.terms %}
         <article class="gl-term" id="{{ t.id }}" data-search="{{ t.search }}">
           <div class="gl-term-h">
-            <h3 class="gl-term-ko">{{ t.term_ko }}<a class="gl-anchor" href="#{{ t.id }}" aria-label="이 용어로 바로가기">#</a></h3>
+            {#- 표제어는 **낱개 페이지로 가는 링크**다. 이 색인은 사이트에서 인바운드를
+                가장 많이 받는 허브인데, 종전에는 자식 226장을 하나도 가리키지 않아(전부
+                `#` 프래그먼트) 낱개 페이지가 sitemap 전용 고아였다 — 45개 용어는 인바운드가
+                0이었다. `#` 앵커는 그대로 둔다(퀴즈의 `glossary/#id` 딥링크가 쓴다). -#}
+            <h3 class="gl-term-ko"><a class="gl-term-link" href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a><a class="gl-anchor" href="#{{ t.id }}" aria-label="이 용어로 바로가기">#</a></h3>
             <span class="gl-term-en">{{ t.term_en }}</span>
             {% if t.aliases %}<p class="gl-alias"><span class="gl-alias-k">다른 표현</span><span class="gl-alias-v">{{ t.aliases|join(' · ') }}</span></p>{% endif %}
           </div>
@@ -89,6 +93,8 @@
 .gl-term:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
 .gl-term-h{display:flex;flex-direction:column;gap:2px}
 .gl-term-ko{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.3;color:var(--ink);margin:0}
+.gl-term-link{color:inherit;text-decoration:none}
+.gl-term-link:hover{color:var(--coral)}
 .gl-anchor{margin-left:7px;font-family:var(--mono);font-size:13px;font-weight:400;color:var(--line-2);text-decoration:none;opacity:0;transition:opacity .14s var(--ease),color .14s var(--ease)}
 .gl-term:hover .gl-anchor{opacity:1}
 .gl-anchor:hover{color:var(--coral)}

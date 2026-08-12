@@ -163,6 +163,9 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
         except Exception as exc:                          # noqa: BLE001 — 페이지별 격리
             failures += 1
             log(f"  ! page {page}/{pages} 실패: {exc}")
+            # ★실패도 사유로 센다. log 로만 흘리면 그 페이지에 있던 문서 100건이 조용히
+            # 사라지고, 축소 게이트(10%)를 넘지 않으면 그대로 자동 머지된다.
+            reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1
         if page % 10 == 0:
             log(f"  · {page}/{pages} 페이지 · 채택 {len(out)}건")
 

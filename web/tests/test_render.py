@@ -7076,7 +7076,24 @@ class WebFindingsDocPageTest(unittest.TestCase):
             shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _page(self, slug: str) -> str:
-        return (self.root / slug / "index.html").read_text(encoding="utf-8")
+        # ★read_text 를 쓰면 안 된다 — 텍스트 모드가 CRLF 를 LF 로 바꿔버려, 본문에
+        # CR 이 섞인 문서(실측 FDA 5건)에서 "무변형" 단언이 거짓으로 통과/실패한다.
+        # 렌더가 실제로 쓴 바이트를 그대로 본다.
+        return (self.root / slug / "index.html").read_bytes().decode("utf-8")
+
+    def _sample_docs(self, per_agency: int = 12) -> list[dict]:
+        """기관별로 고르게 뽑는다 — `documents[:40]` 은 문서 id 정렬 탓에 **전부 FDA** 였다.
+
+        그 슬라이스로는 HC·MFDS 경로가 한 번도 검사되지 않는다(기관마다 source 문자열·
+        업체명 표기·본문 형태가 다르다).
+        """
+        out, seen = [], {}
+        for d in self.data["documents"]:
+            n = seen.get(d["agency"], 0)
+            if n < per_agency:
+                seen[d["agency"]] = n + 1
+                out.append(d)
+        return out
 
     def test_default_renders_doc_pages(self):
         """기본값이 False 로 뒤집히면 배포가 유령 URL 만 광고한다 — 시그니처로 고정."""
@@ -7110,7 +7127,7 @@ class WebFindingsDocPageTest(unittest.TestCase):
     def test_headline_facts_present(self):
         """업체명·발행일·원문 링크 — 실명 기록 페이지에서 빠지면 안 되는 셋."""
         from markupsafe import escape as _esc
-        for doc in self.data["documents"][:40]:
+        for doc in self._sample_docs():
             html = self._page(doc["slug"])
             self.assertIn(str(_esc(doc["firm_name"])), html, doc["slug"])
             self.assertIn(doc["published_date"], html, f'발행일 누락: {doc["slug"]}')
@@ -7120,7 +7137,7 @@ class WebFindingsDocPageTest(unittest.TestCase):
     def test_finding_text_is_verbatim(self):
         from markupsafe import escape as _esc
         checked = 0
-        for doc in self.data["documents"][:25]:
+        for doc in self._sample_docs(8):
             html = self._page(doc["slug"])
             for f in doc["findings"]:
                 self.assertIn(str(_esc(f["text_ko"])), html,
@@ -7134,7 +7151,7 @@ class WebFindingsDocPageTest(unittest.TestCase):
         실명 업체의 지적 이력을 색인시키는 페이지다. 날짜 맥락과 후속 절차 가능성을 빼면
         몇 년 전 지적이 현재 상태로 읽힌다 — 그건 사실 왜곡이다.
         """
-        for doc in self.data["documents"][:20]:
+        for doc in self._sample_docs(7):
             html = self._page(doc["slug"])
             self.assertIn("이 기록에 대하여", html)
             self.assertIn("그 시점의 기록", html)
@@ -7144,13 +7161,13 @@ class WebFindingsDocPageTest(unittest.TestCase):
     def test_description_carries_the_date(self):
         """검색 스니펫에 연도가 없으면 옛 지적이 현재로 읽힌다."""
         labels = self.data.get("agency_labels") or {}
-        for doc in self.data["documents"][:30]:
+        for doc in self._sample_docs(10):
             desc = render.doc_page_description(doc, labels)
             self.assertIn(doc["published_date"], desc)
             self.assertIn(doc["firm_name"], desc)
 
     def test_canonical_and_related_links(self):
-        for doc in self.data["documents"][:20]:
+        for doc in self._sample_docs(7):
             html = self._page(doc["slug"])
             self.assertIn(f'{render.SITE_BASE_URL}/findings/doc/{doc["slug"]}/', html)
             self.assertIn(f'href="../../../findings/agency/{doc["agency"].lower()}/"', html)
@@ -7219,6 +7236,68 @@ class WebFindingsDocPageTest(unittest.TestCase):
                               f"다른 업체 문서를 같은 업체로 링크: {t}")
                 self.assertTrue(
                     (self.root / t / "index.html").exists(), f"없는 페이지로 링크: {t}")
+
+    def test_every_page_printing_firm_names_carries_the_time_disclosure(self):
+        """★실명 업체를 인쇄하는 **모든** 페이지에 시점 고지가 붙어야 한다.
+
+        종전에는 문서 페이지에만 있었다. 모음·목록 페이지도 같은 업체명을 같은 무게로
+        노출하는데 한쪽만 맥락을 주면, 몇 년 전 지적이 현재 상태로 읽힌다.
+        """
+        facets = render.load_findings_facets()
+        targets = [self.out / "findings" / "docs" / "index.html"]
+        for axis in (facets or {}).get("axes", []):
+            meta = render.FACET_AXES[axis["axis"]]
+            targets += [self.out / "findings" / meta["path"] / it["slug"] / "index.html"
+                        for it in axis["items"]]
+        targets += list((self.out / "findings" / "docs").rglob("index.html"))
+        targets += [self.root / d["slug"] / "index.html"
+                    for d in self._sample_docs(4)]
+        missing = [p.relative_to(self.out).as_posix() for p in targets
+                   if "시점의 기록" not in p.read_bytes().decode("utf-8")]
+        self.assertEqual(missing, [], f"시점 고지 누락 {len(missing)}장: {missing[:5]}")
+
+    def test_titles_are_unique(self):
+        """★제목은 검색 결과의 1차 식별자다 — 겹치면 구글이 하나만 고르고 나머지를 버린다.
+
+        같은 업체·같은 기관·같은 공개일로 나뉜 실사 보고서가 실재해서(최대 8장) 기본형
+        제목만으로는 유일해지지 않는다. `build_doc_page_titles` 가 겹칠 때만 분류·문서번호로
+        넓히는데, 그 결과가 실제로 유일한지를 렌더 산출물에서 확인한다.
+        """
+        import re as _re
+        from collections import Counter as _C
+        titles = _C()
+        for doc in self.data["documents"]:
+            m = _re.search(r"<title>(.*?)</title>",
+                           self._page(doc["slug"]), _re.S)
+            self.assertIsNotNone(m, f'<title> 없음: {doc["slug"]}')
+            titles[m.group(1)] += 1
+        dupes = {t: n for t, n in titles.items() if n > 1}
+        self.assertEqual(dupes, {}, f"중복 제목 {len(dupes)}종: {list(dupes)[:3]}")
+
+    def test_korean_safety_on_document_pages(self):
+        """★§4 한글 안전 가드는 문서 페이지를 못 본다 — 스위트가 문서 렌더를 끄기 때문이다.
+
+        그 구멍으로 `.fd-chip.dt{font-family:var(--mono)}` + "공개"(한글)가 3천 장에
+        실제로 나갔다. 속도 스위치를 둔 대가로 생긴 사각지대이므로, 켠 채로 짓는 이
+        클래스가 같은 규칙을 직접 검사한다.
+        """
+        import re as _re
+        sample = [d["slug"] for d in self.data["documents"][:5]]
+        sample += [d["slug"] for d in self.data["documents"][-5:]]
+        for slug in sample:
+            html = self._page(slug)
+            style = "\n".join(_re.findall(r"<style>(.*?)</style>", html, _re.S))
+            self.assertNotIn("letter-spacing", style, f"§4 위반(자간): {slug}")
+            self.assertNotIn("text-transform", style, f"§4 위반(대문자): {slug}")
+            mono = {m.group(1) for m in
+                    _re.finditer(r"\.([a-z0-9-]+)\{[^}]*var\(--mono\)", style)}
+            for cls in mono:
+                for m in _re.finditer(
+                        r'class="[^"]*\b' + _re.escape(cls) + r'\b[^"]*"[^>]*>([^<]*)',
+                        html):
+                    self.assertIsNone(
+                        _re.search(r"[가-힣]", m.group(1)),
+                        f"§4 위반(한글에 모노): {slug} .{cls} → {m.group(1)[:30]!r}")
 
     def test_facet_samples_link_only_to_existing_doc_pages(self):
         """지적 3건 미만 문서는 페이지가 없다 — 그런 사례에는 링크를 만들면 안 된다."""

@@ -36,8 +36,12 @@
   .dl-firm{font-family:var(--sans);font-size:14.5px;color:var(--ink);word-break:keep-all}
   .dl-row:hover .dl-firm{color:var(--coral)}
   .dl-cats{display:block;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:3px;word-break:keep-all}
+  /* §4: 한글에 모노 금지 — 날짜(ASCII)만 모노. 한글이 섞이는 자리는 .dl-cnt 를 쓴다. */
   .dl-date{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .dl-n{font-family:var(--mono);font-size:12.5px;color:var(--body);text-align:right;font-variant-numeric:tabular-nums}
+  .dl-cnt{font-size:12.5px;color:var(--muted)}
+  .dl-cnt b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
+  .dl-n{font-size:12.5px;color:var(--body);text-align:right}
+  .dl-n b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
   @media (max-width:640px){ .dl-n{text-align:left} }
 
   .dl-nav{margin-top:28px;border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;gap:8px}
@@ -63,7 +67,7 @@
     <div class="dl-grid">
       {%- for g in groups %}
       <section class="dl-ag">
-        <h2 class="dl-ag-h">{{ g.label_ko }} <span class="dl-date">{{ "{:,}".format(g.total) }}건</span></h2>
+        <h2 class="dl-ag-h">{{ g.label_ko }} <span class="dl-cnt"><b>{{ "{:,}".format(g.total) }}</b>건</span></h2>
         <div class="dl-years">
           {%- for y in g.years %}
           <a class="dl-year" href="{{ rel_root }}findings/docs/{{ g.slug }}/{{ y.year }}/">{{ y.year }}년 <b>{{ "{:,}".format(y.count) }}</b></a>
@@ -78,7 +82,7 @@
       <a class="dl-row" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
         <span class="dl-firm">{{ d.firm_name }}{% if d.categories %}<span class="dl-cats">{{ d.categories | join(' · ') }}</span>{% endif %}</span>
         <span class="dl-date">{{ d.published_date }}</span>
-        <span class="dl-n">지적 {{ d.findings | length }}건</span>
+        <span class="dl-n">지적 <b>{{ d.findings | length }}</b>건</span>
       </a>
       {%- endfor %}
     </div>
@@ -88,7 +92,7 @@
       <a href="{{ rel_root }}findings/agency/{{ agency_slug }}/">{{ agency_label }} 지적사항 요약</a>
     </nav>
     {%- endif %}
-    <p class="dl-note">지적 3건 이상이 우리말로 정리된 문서만 목록에 넣었습니다. 그 밖의 문서는 <a href="{{ rel_root }}findings/">지적사항 검색</a>에서 찾아보실 수 있습니다. 각 문서는 규제기관이 공개한 원문으로 바로 연결됩니다.</p>
+    <p class="dl-note"><b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 — 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 지적 3건 이상이 우리말로 정리된 문서만 목록에 넣었습니다. 그 밖의 문서는 <a href="{{ rel_root }}findings/">지적사항 검색</a>에서 찾아보실 수 있습니다. 각 문서는 규제기관이 공개한 원문으로 바로 연결됩니다.</p>
   </div>
 </main>
 {% endblock %}

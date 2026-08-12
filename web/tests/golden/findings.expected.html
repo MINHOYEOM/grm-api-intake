@@ -95,6 +95,22 @@
       <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div><nav class="fnd-pager" id="fnd-pager-top" aria-label="검색 결과 페이지 이동" hidden></nav>
       <div id="fnd-results" class="fnd-results"></div>
       <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>
+    </section>    <section class="fnd-browse" aria-label="다르게 찾아보기">
+      <h2 class="fnd-browse-h">다르게 찾아보기</h2>
+      <p class="fnd-browse-p">검색어가 떠오르지 않으면 축을 골라 둘러보실 수 있습니다. 각 페이지는 실제 지적 문장과 함께 정리돼 있습니다.</p>
+      <div class="fnd-browse-grid">        <a class="fnd-browse-card" href="../findings/c/">
+          <span class="fnd-browse-t">분류별 지적사항</span>
+          <span class="fnd-browse-d">무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/country/">
+          <span class="fnd-browse-t">국가별 지적사항</span>
+          <span class="fnd-browse-d">제조소가 어느 나라에 있는지로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/agency/">
+          <span class="fnd-browse-t">규제기관별 지적사항</span>
+          <span class="fnd-browse-d">FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/docs/">
+          <span class="fnd-browse-t">문서로 찾기</span>
+          <span class="fnd-browse-d">실사 문서 3,204건을 기관·연도로 묶어 봅니다.</span>
+        </a>      </div>
     </section>
   </div>
 </main>
@@ -111,6 +127,16 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* [F3b] 트렌드 대시보드로 가는 절제된 텍스트 링크(page-head 하단, 새 버튼/박스 0). */
 .fnd-trends-link{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .fnd-trends-link:hover{color:var(--coral)}
+/* [검색 유입] 정적 표면 진입 블록 — 검색 도구를 밀어내지 않도록 결과 아래에 둔다. */
+.fnd-browse{margin:40px 0 0;border-top:1px solid var(--line);padding-top:26px}
+.fnd-browse-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
+.fnd-browse-p{font-size:14px;line-height:1.7;color:var(--muted);margin:8px 0 0;max-width:760px;word-break:keep-all}
+.fnd-browse-grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:12px}
+.fnd-browse-card{display:flex;flex-direction:column;gap:5px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:16px 18px;text-decoration:none}
+.fnd-browse-card:hover{border-color:var(--coral)}
+.fnd-browse-t{font-family:var(--serif);font-size:16.5px;color:var(--ink)}
+.fnd-browse-card:hover .fnd-browse-t{color:var(--coral)}
+.fnd-browse-d{font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */

@@ -24,7 +24,9 @@
   .fd-meta{margin:16px 0 0;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
   .fd-chip{font-family:var(--sans);font-size:12.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:4px 12px}
   .fd-chip.ag{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
-  .fd-chip.dt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  /* §4: 한글에 모노 금지 — 칩 자체는 sans 로 두고 날짜(ASCII)만 모노. */
+  .fd-chip.dt{font-size:12px;color:var(--muted)}
+  .fd-chip.dt b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
   .fd-src{margin-top:22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
   .fd-src a{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
   .fd-src a:hover{background:var(--coral-2)}
@@ -53,7 +55,7 @@
     <h1 class="fd-h1">{{ doc.firm_name }} &mdash; {{ doc.source }} 지적사항</h1>
     <p class="fd-meta">
       <span class="fd-chip ag">{{ agency_labels.get(doc.agency, doc.agency) }}</span>
-      <span class="fd-chip dt">{{ doc.published_date }} 공개</span>
+      <span class="fd-chip dt"><b>{{ doc.published_date }}</b> 공개</span>
       <span class="fd-chip">지적 {{ doc.findings | length }}건</span>
       {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
     </p>

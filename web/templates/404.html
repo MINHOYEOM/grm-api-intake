@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block meta_robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+{#- [검색 유입] 404 페이지 — Cloudflare Pages 는 매칭되는 파일이 없을 때 **`/404.html` 이
+    있으면 그것을 404 상태로** 돌려주고, 없으면 루트 `index.html` 을 **200 으로** 돌려준다.
+
+    ★그래서 이 파일이 없던 동안 사이트의 모든 오타·낡은 URL 이 "랜딩 페이지 200"이었다
+    (soft 404). 검색엔진에게 이것은 ①없는 페이지가 존재한다고 말하고 ②같은 랜딩 본문이
+    무한히 많은 URL 로 중복돼 있다고 말하는 것이라, 색인 품질을 직접 깎는다.
+
+    특히 이 사이트는 문서 페이지 3천 장이 **매주 재생성**된다 — 지적 3건 미만으로 내려가거나
+    업체명이 결손된 문서는 페이지가 사라지므로, 낡은 URL 은 앞으로도 계속 생긴다.
+
+    본문은 막다른 길로 두지 않는다 — 주요 표면으로 되돌려 보낸다. noindex 는 이 페이지
+    자체가 색인되지 않게 한다(404 상태와 별개로 명시). -#}
+<style>
+  .nf{padding:64px 0 40px}
+  .nf-code{font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .nf-h1{font-family:var(--serif);font-size:clamp(28px,4vw,40px);line-height:1.25;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .nf-p{font-family:var(--sans);font-size:16px;line-height:1.75;color:var(--body);margin:16px 0 0;max-width:640px;word-break:keep-all}
+  .nf-grid{margin-top:32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;max-width:760px}
+  .nf-card{display:flex;flex-direction:column;gap:5px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:16px 18px;text-decoration:none}
+  .nf-card:hover{border-color:var(--coral)}
+  .nf-t{font-family:var(--serif);font-size:16.5px;color:var(--ink)}
+  .nf-card:hover .nf-t{color:var(--coral)}
+  .nf-d{font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all}
+</style>
+<main>
+  <div class="wrap nf">
+    <p class="nf-code">404</p>
+    <h1 class="nf-h1">찾으시는 페이지가 없습니다</h1>
+    <p class="nf-p">주소가 바뀌었거나, 더 이상 제공하지 않는 자료일 수 있습니다. 지적사항 문서 페이지는 매주 새로 정리되기 때문에 예전 주소가 사라지기도 합니다. 아래에서 다시 찾아보세요.</p>
+    <div class="nf-grid">
+      <a class="nf-card" href="{{ rel_root }}findings/">
+        <span class="nf-t">지적사항 검색</span>
+        <span class="nf-d">규제기관 공개 지적사항을 검색합니다.</span>
+      </a>
+      <a class="nf-card" href="{{ rel_root }}findings/docs/">
+        <span class="nf-t">문서로 찾기</span>
+        <span class="nf-d">실사 문서를 기관·연도로 묶어 봅니다.</span>
+      </a>
+      <a class="nf-card" href="{{ rel_root }}archive/">
+        <span class="nf-t">주간 브리프 모아보기</span>
+        <span class="nf-d">매주 발행한 규제 소식을 모았습니다.</span>
+      </a>
+      <a class="nf-card" href="{{ rel_root }}library/">
+        <span class="nf-t">자료실</span>
+        <span class="nf-d">ICH·식약처·EU GMP 등 참조 자료.</span>
+      </a>
+      <a class="nf-card" href="{{ rel_root }}glossary/">
+        <span class="nf-t">규제 용어사전</span>
+        <span class="nf-d">GMP·규제 용어를 쉬운 우리말로.</span>
+      </a>
+      <a class="nf-card" href="{{ rel_root }}">
+        <span class="nf-t">홈으로</span>
+        <span class="nf-d">이번 주 브리프부터 다시 보기.</span>
+      </a>
+    </div>
+  </div>
+</main>
+{% endblock %}

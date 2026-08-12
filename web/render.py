@@ -2426,47 +2426,50 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for y in g["years"]:
                 facet_paths.append(f"findings/docs/{g['slug']}/{y['year']}/")
 
-        if render_doc_pages:
-            _write(out_dir / "findings" / "docs" / "index.html",
-                   env.get_template("findings_doc_list.html").render(
-                       page_title="문서로 찾기 · GRM",
-                       rel_root="../../", nav_active="findings", latest_slug=latest_slug,
-                       description=("규제기관이 공개한 실사 문서를 기관과 연도로 묶어"
-                                    " 찾아보실 수 있습니다. 지적 3건 이상이 우리말로"
-                                    " 정리된 문서 "
-                                    f"{docs_data['totals']['documents']:,}건입니다."),
-                       canonical=_abs_url("findings/docs/"),
-                       mode="index", heading="문서로 찾기",
-                       lede=(f"규제기관이 공개한 실사 문서 "
-                             f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
-                             " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
-                             " 우리말로 보실 수 있습니다."),
-                       groups=index_groups))
-            written.append("findings/docs/index.html")
+        # ★목록·색인 21장은 **스위치와 무관하게 항상** 낸다. 비싼 것은 개별 문서 3,202장뿐
+        # (한 번에 ~27초)이고, 목록을 함께 끄면 sitemap·진입 카드·404 페이지가 가리키는
+        # 곳이 테스트 빌드에서만 없어져 **링크 무결성 검사가 프로덕션과 다른 것을 보게 된다**
+        # (실제로 404 링크 검사가 이걸 잡았다).
+        _write(out_dir / "findings" / "docs" / "index.html",
+               env.get_template("findings_doc_list.html").render(
+                   page_title="문서로 찾기 · GRM",
+                   rel_root="../../", nav_active="findings", latest_slug=latest_slug,
+                   description=("규제기관이 공개한 실사 문서를 기관과 연도로 묶어"
+                                " 찾아보실 수 있습니다. 지적 3건 이상이 우리말로"
+                                " 정리된 문서 "
+                                f"{docs_data['totals']['documents']:,}건입니다."),
+                   canonical=_abs_url("findings/docs/"),
+                   mode="index", heading="문서로 찾기",
+                   lede=(f"규제기관이 공개한 실사 문서 "
+                         f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
+                         " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
+                         " 우리말로 보실 수 있습니다."),
+                   groups=index_groups))
+        written.append("findings/docs/index.html")
 
-            for g in index_groups:
-                for y in g["years"]:
-                    bucket = by_ay[(g["slug"].upper(), y["year"])]
-                    _write(out_dir / "findings" / "docs" / g["slug"] / y["year"] / "index.html",
-                           env.get_template("findings_doc_list.html").render(
-                               page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
-                               rel_root="../../../../", nav_active="findings",
-                               latest_slug=latest_slug,
-                               description=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사"
-                                            f" 문서 {y['count']:,}건의 지적사항을 우리말로"
-                                            " 정리했습니다."),
-                               canonical=_abs_url(
-                                   f"findings/docs/{g['slug']}/{y['year']}/"),
-                               mode="list",
-                               heading=f"{g['label_ko']} · {y['year']}년",
-                               lede=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사 문서"
-                                     f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
-                                     " 지적을 모두 보실 수 있습니다."),
-                               documents=bucket, agency_slug=g["slug"],
-                               agency_label=g["label_ko"], year=y["year"],
-                               sibling_years=g["years"]))
-                    written.append(
-                        f"findings/docs/{g['slug']}/{y['year']}/index.html")
+        for g in index_groups:
+            for y in g["years"]:
+                bucket = by_ay[(g["slug"].upper(), y["year"])]
+                _write(out_dir / "findings" / "docs" / g["slug"] / y["year"] / "index.html",
+                       env.get_template("findings_doc_list.html").render(
+                           page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
+                           rel_root="../../../../", nav_active="findings",
+                           latest_slug=latest_slug,
+                           description=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사"
+                                        f" 문서 {y['count']:,}건의 지적사항을 우리말로"
+                                        " 정리했습니다."),
+                           canonical=_abs_url(
+                               f"findings/docs/{g['slug']}/{y['year']}/"),
+                           mode="list",
+                           heading=f"{g['label_ko']} · {y['year']}년",
+                           lede=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사 문서"
+                                 f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
+                                 " 지적을 모두 보실 수 있습니다."),
+                           documents=bucket, agency_slug=g["slug"],
+                           agency_label=g["label_ko"], year=y["year"],
+                           sibling_years=g["years"]))
+                written.append(
+                    f"findings/docs/{g['slug']}/{y['year']}/index.html")
 
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
@@ -2576,6 +2579,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         written.append(f"briefs/{pub}/index.html")
 
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
+    # [검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 매칭되지 않는
+    # 경로에 404 를 돌려준다. 없으면 루트 index.html 을 **200 으로** 준다(soft 404) — 실측으로
+    # `/findings/doc/zzz-does-not-exist/` 가 랜딩 페이지를 200 으로 돌려주고 있었다.
+    # 문서 페이지 3천 장이 매주 재생성되며 낡은 URL 이 계속 생기는 구조라 특히 중요하다.
+    _write(out_dir / "404.html", env.get_template("404.html").render(
+        page_title="페이지를 찾을 수 없습니다 · GRM",
+        rel_root="", nav_active="", latest_slug=latest_slug,
+        description="찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요.",
+        canonical="",
+    ))
+    written.append("404.html")
+
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")

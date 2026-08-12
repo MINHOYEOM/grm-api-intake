@@ -178,6 +178,76 @@ class ScanSanityTest(unittest.TestCase):
                            "빈 결과를 통과로 읽으면 가드가 침묵한다.")
 
 
+class EnvExampleCoverageTest(unittest.TestCase):
+    """★[2026-08-12] `.env.example` 이 **코드가 실제로 읽는** ENABLE_* 를 전부 담아야 한다.
+
+    왜 필요한가 — 이 저장소는 워크플로 쪽에는 이미 손열거 없는 전수 스캔 가드를 걸어 뒀는데
+    (`_flag_lines()`·0건 가드) `.env.example` 쪽에는 아무 가드가 없었다. 그래서 **가드 걸린
+    쪽만 최신이고 안 걸린 쪽은 2026-07-08 에 얼어붙었다** — 이후 추가된 소스 3종
+    (ISPE·EU GMP NCR·MHRA GMP NCR)을 포함해 12개가 문서에서 빠졌고, 로컬에서 이 파일을
+    복사해 `.env` 를 만든 사람은 그 소스들을 켜는 방법을 발견할 수 없었다.
+
+    자동 경로 피해는 없다(이 파일을 파싱하는 코드는 없고 프로덕션 정본은 워크플로다) —
+    그래서 심각도는 낮지만, 저장소 자체 관례(docs/specs 4곳이 신규 소스마다 `.env.example`
+    갱신을 산출물로 못박는다)를 지키는 유일한 방법이 이 가드다."""
+
+    #: 코드는 읽지만 `.env.example` 에 **일부러 안 싣는** 플래그 — 사유를 반드시 남긴다.
+    #: (fail-open 이 아니라 명시 예외다. 새로 추가하려면 왜 사람이 켜면 안 되는지 적을 것.)
+    INTENTIONAL_OMISSIONS = {
+        "ENABLE_BRIEF_AUTOFIX":
+            "발행 후 URL self-heal — verify_published_brief.py docstring 이 '기본 off, "
+            "사람 게이트 후에만 활성화한다'고 못박았고 어떤 워크플로도 넘기지 않는다. "
+            "예시 파일에 실으면 로컬에서 무심코 켤 수 있다.",
+    }
+
+    _LOOKUP = re.compile(
+        r'(?:env_flag|os\.getenv|os\.environ\.get)\(\s*["\'](ENABLE_\w+)["\']'
+        r'|os\.environ\[\s*["\'](ENABLE_\w+)["\']\]'
+    )
+
+    def _code_flags(self) -> set:
+        """루트 `*.py` 에서 **실제로 조회**하는 ENABLE_* 전수(전수 글롭 — 손열거 금지).
+        문자열이 리포트 dict 키로만 쓰인 곳은 잡지 않는다(조회 호출 형태만 매칭)."""
+        out = set()
+        for name in sorted(os.listdir(REPO)):
+            if not name.endswith(".py"):
+                continue
+            with open(os.path.join(REPO, name), encoding="utf-8") as fh:
+                for m in self._LOOKUP.finditer(fh.read()):
+                    out.add(m.group(1) or m.group(2))
+        return out
+
+    def _documented(self) -> set:
+        path = os.path.join(REPO, ".env.example")
+        self.assertTrue(os.path.isfile(path), ".env.example 이 없다")
+        with open(path, encoding="utf-8") as fh:
+            return set(re.findall(r"^(ENABLE_\w+)=", fh.read(), re.M))
+
+    def test_scan_is_alive(self):
+        """0건은 성공이 아니라 정규식이 낡았다는 뜻이다(이 파일의 다른 가드와 같은 원칙)."""
+        self.assertGreater(len(self._code_flags()), 20, "ENABLE_* 조회 0~소수 — 스캔이 깨졌다")
+
+    def test_every_code_flag_is_documented(self):
+        missing = self._code_flags() - self._documented() - set(self.INTENTIONAL_OMISSIONS)
+        self.assertEqual(
+            missing, set(),
+            f"코드가 읽는데 .env.example 에 없는 플래그: {sorted(missing)} — "
+            "예시 파일에 추가하거나, 일부러 뺀 것이면 INTENTIONAL_OMISSIONS 에 사유와 함께 넣을 것",
+        )
+
+    def test_no_ghost_entries(self):
+        ghosts = self._documented() - self._code_flags()
+        self.assertEqual(ghosts, set(), f"어떤 코드도 읽지 않는 유령 플래그: {sorted(ghosts)}")
+
+    def test_omission_allowlist_is_still_needed(self):
+        """예외 목록도 낡는다 — 이미 문서에 실렸거나 코드에서 사라진 항목은 지워야 한다."""
+        code, doc = self._code_flags(), self._documented()
+        for flag, reason in self.INTENTIONAL_OMISSIONS.items():
+            self.assertTrue(reason.strip(), f"{flag}: 제외 사유가 비었다")
+            self.assertIn(flag, code, f"{flag}: 코드가 더는 읽지 않는다 — 예외에서 제거할 것")
+            self.assertNotIn(flag, doc, f"{flag}: 이미 .env.example 에 있다 — 예외에서 제거할 것")
+
+
 class BannedIdiomTest(unittest.TestCase):
     """알려진 결함 관용구가 어디에도 없어야 한다(주석 포함 — 주석이 남으면 다시 퍼진다)."""
 

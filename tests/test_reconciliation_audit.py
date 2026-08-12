@@ -74,5 +74,42 @@ class BucketByWeekTest(unittest.TestCase):
         self.assertEqual(parsed.tzinfo, timezone.utc)
 
 
+class ReportCoversExpectedSourcesTest(unittest.TestCase):
+    """★[행이 사라지는 사각지대 2026-08-12] 창(9주) 전체가 0건인 소스는 raw 행이 하나도
+    없어 `current`·`history` 어디에도 키가 안 생긴다 — 종전 리포트는 두 dict 의 합집합만
+    돌아서 **그 소스의 행 자체가 표에서 사라졌다.** 사람이 봐도 "원래 없던 소스인지,
+    죽어서 사라졌는지" 구별할 수 없다(가장 오래 사는 침묵이 이 모양이다).
+
+    #727 이 감시 대상과 0-메움을 고쳤지만 그건 **행이 하나라도 있는** 소스 이야기고,
+    이 사각지대는 남아 있었다. 기대 소스는 손목록이 아니라 수집 토큰 레지스트리 파생인
+    `COVERAGE_SOURCE_LABELS` 에서 온다 — 소스를 추가하면 여기까지 자동으로 따라온다."""
+
+    # ★실제 프로덕션 함수를 부른다 — 테스트가 리포트 로직을 복제하면 호출부는 영영
+    #   미검사로 남는다(이 저장소가 #619/#655·#715 에서 반복해 당한 함정).
+    _report = staticmethod(lambda current, history: ra.coverage_report_lines(current, history))
+
+    def test_expected_sources_derived_from_registry(self):
+        """0건 가드 — 파생이 비면 이 검사는 아무것도 지키지 못한다."""
+        self.assertGreaterEqual(
+            len({s for s, _ in ra.COVERAGE_SOURCE_LABELS}), 10,
+            "기대 소스 파생이 비었다 — COVERAGE_SOURCE_LABELS 배선을 확인할 것")
+
+    def test_source_silent_for_whole_window_still_gets_a_row(self):
+        lines = self._report({"FDA 483": 40}, {"FDA 483": [38, 41, 39]})
+        for source, _ in ra.COVERAGE_SOURCE_LABELS:
+            with self.subTest(source=source):
+                self.assertTrue(any(line.startswith(f"- {source}:") for line in lines),
+                                f"{source} 행이 리포트에서 사라졌다")
+        silent = [ln for ln in lines if "창 전체 0건" in ln]
+        self.assertTrue(silent, "창 전체 0건 소스에 표시가 붙지 않았다")
+        self.assertFalse([ln for ln in lines if ln.startswith("- FDA 483:") and "창 전체 0건" in ln],
+                         "관측된 소스에 '창 전체 0건' 표시가 붙었다")
+
+    def test_unregistered_observed_source_still_listed(self):
+        """레지스트리에 없는 소스가 관측되면 그것도 빠지지 않는다(합집합)."""
+        lines = self._report({"Mystery Source": 3}, {})
+        self.assertTrue(any(ln.startswith("- Mystery Source:") for ln in lines))
+
+
 if __name__ == "__main__":
     unittest.main()

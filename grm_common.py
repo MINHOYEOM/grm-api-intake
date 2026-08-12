@@ -515,7 +515,15 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("fda483", "FDA 483"),
     # 전문지·NCR 3종은 주당 카드가 한 자릿수라 죽어도 발행을 막을 이유가 없다 → 경고.
     IntakeSourceSpec("ispe", "ISPE iSpeak RSS", warn_only=True),
-    IntakeSourceSpec("search", "Brave Search", health_code_override="brave-search"),
+    # ★[2026-08-12] Brave Search 는 23종 중 **유일하게** warn_only 도 transient 강등 자격도
+    # 없어, 오류 한 번에 exit 1 = 그 주 발행 스캐폴드 배제였다. 요율 제한이 일상인 3rd-party
+    # 보조 검색이고 카드 생성의 필수 경로도 아니다 — 죽어도 그 주 발행은 나가야 한다.
+    # (`ENABLE_SEARCH` 기본 false 라 피해는 0 이었지만, 코드 리뷰를 안 거치는 repo 변수
+    #  하나가 뒤집히면 터지는 지뢰였다.) transient 강등이 아니라 warn_only 로 푸는 이유:
+    # 그쪽은 `_is_transient_source_error` 의 화이트리스트 의미를 바꾸는데, 그 경계는 이미
+    # 테스트가 못박아 둔 계약이다(ECA·WL 선례와 같은 기구를 쓴다).
+    IntakeSourceSpec("search", "Brave Search", health_code_override="brave-search",
+                     warn_only=True),
     IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True),
     IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True),
 )

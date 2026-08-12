@@ -2636,12 +2636,10 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 # 발행물 숫자를 대조한다(W2). 06-17 검증: 발행=실제 카드수는 확인됐으나 수집/스킵은 LLM
 # 집계라 무보증 클래스(요일 오산과 동형) → 수집은 코드가 산출·감사 가능하게 한다.
 # ─────────────────────────────────────────────────────────────────────────────
-# (source 문자열, 발행 callout 라벨) — 고정 순서. 상시 수집기 11종(프롬프트 callout 동일).
-
-
-# v2 row 에 보존할 v1 호환 필드(whitelist) — _intake_page_snapshot() 스키마.
-# blacklist 대신 whitelist 로(Codex P2): raw·Stage B 부착 bookkeeping(raw_fetch_ok·
-# raw_source·status_hint·evidence_hint) 같은 내부/대형 필드가 새지 않도록 보장.
+# (source 문자열, 발행 callout 라벨) — 고정 순서. 실제 정의·설명은 grm_handoff 에 있다
+# (COVERAGE_SOURCE_LABELS / _HANDOFF_V2_ROW_KEEP — 배치5 Phase2 모듈 분리 때 이전).
+# 여기 남아 있던 `_HANDOFF_V2_ROW_KEEP` 설명 주석은 상수를 따라가지 못한 고아였고, 그 탓에
+# 정의 지점에는 설명이 한 줄도 없었다 — 2026-08-12 에 정의 지점으로 옮겼다.
 
 
 # ─────────────────────────────────────────────────────────────────────────────

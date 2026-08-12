@@ -1401,10 +1401,41 @@ class MhraRecallPositionTest(unittest.TestCase):
         self.assertEqual(wc["type_tag"], "Recall")
 
 
-class CategoryMappingTest(unittest.TestCase):
-    """Codex 보정 #1 — _category 전 발현 kind 망라 + 휴면 gmp-guideline 가드(죽은 매핑 금지)."""
+def _emergeable_kinds() -> tuple[frozenset, tuple]:
+    """`resolve_kind` 소스를 AST 로 훑어 **실제 발현 가능한 내부 kind 전집합**을 파생한다.
 
-    # resolve_kind 가 실제 낼 수 있는 전 내부 kind → 기대 Notion 카테고리.
+    반환 `(kinds, opaque)` — `opaque` 는 문자열 리터럴이 아닌 return 의 줄번호. 비어 있어야
+    수확이 완전하므로 호출측이 이를 적색 처리한다(수확기가 조용히 과소계수하지 않게).
+
+    ★원천이 `_REGISTRY` 가 **아닌** 이유: `_CATEGORY_MAP` 이 이미 레지스트리 파생이고
+    `_category(kind)` == `_spec(kind).category` 다. 레지스트리에서 파생하면 아래 값 검사도
+    죽은-키 가드도 구성상 **항진명제**가 되어 가드가 통째로 소멸한다. AST 수확이 그 커플링
+    밖에 있는 유일한 원천이다.
+    """
+    import ast
+    tree = ast.parse(_read(cs.__file__))
+    fns = [n for n in ast.walk(tree)
+           if isinstance(n, ast.FunctionDef) and n.name == "resolve_kind"]
+    assert len(fns) == 1, f"resolve_kind 정의 {len(fns)}개 — 수확 대상이 모호하다"
+    kinds, opaque = set(), []
+    for node in ast.walk(fns[0]):
+        if not isinstance(node, ast.Return):
+            continue
+        if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+            kinds.add(node.value.value)
+        else:
+            opaque.append(node.lineno)
+    return frozenset(kinds), tuple(sorted(opaque))
+
+
+class CategoryMappingTest(unittest.TestCase):
+    """Codex 보정 #1 — _category 전 발현 kind 망라(커버리지는 `resolve_kind` AST 파생으로
+    잠금) + 휴면 gmp-guideline 가드(죽은 매핑 금지)."""
+
+    # `resolve_kind` 가 실제 낼 수 있는 전 내부 kind → 기대 Notion 카테고리.
+    # ★이 표는 **의도적 복식부기**다(값은 파생 금지) — `_category(kind)` == `_spec(kind).category`
+    #   이므로 `_REGISTRY` 에서 파생하면 아래 값 검사가 항진명제가 된다. **커버리지만**
+    #   AST 파생으로 잠근다 → test_expected_covers_every_emergeable_kind.
     _EXPECTED = {
         "warning-letter": "Warning Letter",
         "guidance": "Guidance", "mfds-notice": "Guidance",
@@ -1412,11 +1443,27 @@ class CategoryMappingTest(unittest.TestCase):
         "ich": "Guideline",
         "openfda-recall": "Other", "hc-recall": "Other", "mhra-recall": "Other",
         "fda-483": "Other",
+        # [2026-08-12] EudraGMDP·MHRA GMP 비준수. #426(07-23)이 resolve_kind 분기와 _REGISTRY·
+        # 골든은 넣었지만 이 표는 남겨둬 **21종 중 19종만 선언**돼 있었다("전 발현 kind 망라"
+        # 라는 주석이 그 시점부터 거짓이었다). 값 "Other" 는 두 SourceSpec 이 category= 를
+        # 지정하지 않은 기본값이며 webcard 골든 2종이 이미 동결한 현재값이다.
+        "eu-gmp-ncr": "Other", "mhra-gmp-ncr": "Other",
         "who-noc": "Other", "who-inspection": "Other", "who-news": "Other",
         "admin-action": "Other", "recall-quality": "Other",
         "gmp-inspection": "Other", "gmp-certificate": "Other",
         "safety-letter": "Other", "rss-news": "Other",
     }
+
+    def test_expected_covers_every_emergeable_kind(self) -> None:
+        """커버리지 잠금 — resolve_kind 에 분기가 늘면 이 표에 선언하기 전까지 적색."""
+        kinds, opaque = _emergeable_kinds()
+        self.assertEqual(opaque, (),
+                         f"resolve_kind 에 리터럴 아닌 return(줄 {opaque}) — "
+                         "발현집합 수확기 `_emergeable_kinds` 를 함께 갱신하라")
+        self.assertGreaterEqual(len(kinds), 15, "발현집합 수확이 비정상적으로 작다")
+        self.assertEqual(kinds, frozenset(self._EXPECTED),
+                         f"미선언 발현 kind={sorted(kinds - set(self._EXPECTED))} / "
+                         f"발현 불가 선언={sorted(set(self._EXPECTED) - kinds)}")
 
     def test_all_emergeable_kinds_map_to_notion_set(self) -> None:
         for kind, expected in self._EXPECTED.items():
@@ -1438,8 +1485,12 @@ class CategoryMappingTest(unittest.TestCase):
 
     def test_category_keys_subset_of_emergeable_kinds(self) -> None:
         # _CATEGORY_MAP 의 모든 키는 실제 발현 가능한 kind 여야 한다(죽은 키 0).
+        # ★대조 원천은 `_EXPECTED`(손목록)가 아니라 `resolve_kind` 파생이다 — 손목록으로 재면
+        #   "발현하는데 표에 없는" kind(08-12 이전의 eu-gmp-ncr·mhra-gmp-ncr)에 비-Other
+        #   카테고리를 배선하는 **정당한 변경**이 사실과 정반대인 "발현 불가" 메시지로 죽는다.
+        emergeable, _ = _emergeable_kinds()
         for k in cs._CATEGORY_MAP:
-            self.assertIn(k, self._EXPECTED, f"발현 불가 kind 가 _CATEGORY_MAP 에: {k}")
+            self.assertIn(k, emergeable, f"발현 불가 kind 가 _CATEGORY_MAP 에: {k}")
 
 
 class OfficialIsPdfTest(unittest.TestCase):

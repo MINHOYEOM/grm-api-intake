@@ -550,5 +550,49 @@ class HandoffDeepInputTest(unittest.TestCase):
             self.assertNotIn("raw", r)
 
 
+class HandoffV2RowKeepDerivationTest(unittest.TestCase):
+    """★[2026-08-12] `_HANDOFF_V2_ROW_KEEP`(v2 payload 에 실을 v1 호환 필드)는
+    `_intake_page_snapshot()` 스키마와 짝이어야 하는데, 종전엔 **같은 29키를 손으로 다시
+    적어** 뒀고 두 목록의 일치를 검사하는 테스트가 저장소에 하나도 없었다.
+
+    어긋나면 조용히 샌다 — Notion 속성을 추가해 스냅샷에만 넣으면 그 필드가 v2 payload 에서
+    **경고 0건·테스트 0건으로 탈락**한다. v1 은 row 를 통째로 넘기므로 v1 에서는 보이고
+    v2 에서만 사라져 원인 추적이 어렵다.
+
+    이제 파생이므로 집합이 어긋날 수 없다. 여기서는 **파생 상태 자체**를 잠근다 —
+    누군가 다시 리터럴로 되돌리면(손목록으로 고친 손목록 = 이 저장소의 재발 패턴) 적색."""
+
+    def test_keep_matches_snapshot_schema(self):
+        snap = tuple(grm_handoff._intake_page_snapshot({}))
+        self.assertGreaterEqual(len(snap), 20, "스냅샷 스키마가 비정상적으로 작다 — 파싱/계약 확인")
+        self.assertEqual(grm_handoff._HANDOFF_V2_ROW_KEEP, snap,
+                         "v2 보존 목록이 스냅샷 스키마와 다르다 — payload 에서 필드가 조용히 샌다")
+
+    def test_keep_is_derived_not_a_literal(self):
+        """AST 로 **대입식이 `_intake_page_snapshot` 을 참조하는지**만 본다.
+        필터를 낀 파생형은 통과하고, 키를 다시 손으로 나열한 리터럴만 적색이 된다
+        (주석에 함수명을 적어도 통과하지 못한다 — 주석은 AST 노드가 아니다)."""
+        import ast
+        src = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           "grm_handoff.py")
+        with open(src, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
+        values = [n.value for n in ast.walk(tree)
+                  if isinstance(n, ast.Assign)
+                  for t in n.targets
+                  if isinstance(t, ast.Name) and t.id == "_HANDOFF_V2_ROW_KEEP"]
+        self.assertEqual(len(values), 1, "_HANDOFF_V2_ROW_KEEP 대입이 1개가 아니다 — 가드 전제가 깨졌다")
+        names = {n.id for n in ast.walk(values[0]) if isinstance(n, ast.Name)}
+        self.assertIn("_intake_page_snapshot", names,
+                      "_HANDOFF_V2_ROW_KEEP 이 원천 파생이 아니다 — 손목록으로 되돌아가면 "
+                      "스냅샷에 키가 늘 때 조용한 탈락이 재발한다")
+
+    def test_internal_bookkeeping_still_excluded(self):
+        """whitelist 의 목적(내부/대형 필드 차단)이 파생 후에도 유지되는지 — 원래 계약."""
+        keep = set(grm_handoff._HANDOFF_V2_ROW_KEEP)
+        for leaked in ("raw", "raw_fetch_ok", "raw_source", "status_hint", "evidence_hint"):
+            self.assertNotIn(leaked, keep, f"내부 bookkeeping '{leaked}' 가 payload 로 샌다")
+
+
 if __name__ == "__main__":
     unittest.main()

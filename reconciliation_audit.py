@@ -18,6 +18,7 @@ from typing import Any
 
 import requests
 
+from grm_handoff import COVERAGE_SOURCE_LABELS
 from reconciliation_service import detect_coverage_anomalies, summarize_url_contamination
 
 _TIMEOUT = 30
@@ -139,6 +140,35 @@ def _parse_iso(value: str) -> datetime | None:
     return dt
 
 
+def coverage_report_lines(current: dict[str, int],
+                          history: dict[str, list[int]]) -> list[str]:
+    """소스별 주간 카운트 표 — 사람이 STEP_SUMMARY 에서 읽는 줄들.
+
+    ★[행이 사라지는 사각지대 2026-08-12] 종전엔 `set(current) | set(history)` 만 돌았다.
+    #727 이 감시 대상과 0-메움을 고쳤지만 그건 **행이 하나라도 있는** 소스 이야기다.
+    창(9주) **전체가 0건**인 소스는 raw 행이 하나도 없어 두 dict 어디에도 키가 안 생기고,
+    그래서 **표에서 행 자체가 사라졌다** — 사람이 봐도 "원래 없던 소스인지, 죽어서
+    사라졌는지" 구별할 수 없다. 가장 오래 사는 침묵이 정확히 이 모양이다.
+
+    기대 소스는 손으로 적지 않고 **수집 토큰 레지스트리 파생**인 COVERAGE_SOURCE_LABELS
+    에서 가져온다(`CoverageSourceLabelCoverageTest` 가 `_SOURCE_TOKEN_TO_NOTION` 과의
+    양방향 일치를 잠근다 — 소스를 추가하면 여기까지 자동으로 따라온다).
+
+    ※ 자동 경보(`detect_coverage_anomalies`)의 판정 집합은 건드리지 않는다 — 이건 **사람이
+      보는 표**의 문제이고, 창 전체 0건은 baseline 산정 자체가 불가능해 경보 대상이 아니다.
+    ※ main() 이 인라인으로 돌던 루프를 순수 함수로 뽑았다 — 인라인이면 네트워크 없이
+      검사할 수 없어 테스트가 같은 로직을 복제하게 되고, 그러면 **호출부는 미검사**로 남는다.
+    """
+    expected = {source for source, _ in COVERAGE_SOURCE_LABELS}
+    lines: list[str] = []
+    for src in sorted(expected | set(current) | set(history)):
+        base = history.get(src, [])
+        observed = src in current or src in history
+        note = "" if observed else "  ← 창 전체 0건(수집 경로 점검)"
+        lines.append(f"- {src}: 이번주 {current.get(src, 0)}건 (과거주 {base}){note}")
+    return lines
+
+
 def _emit(line: str) -> None:
     print(line, flush=True)
 
@@ -165,10 +195,8 @@ def main() -> int:
 
     _emit(f"# 수집 reconciliation ({now.date()} 기준, 최근 7일 vs 과거 {_LOOKBACK_WEEKS}주)")
     _emit(f"- raw_signals 조회 행수: {len(rows)}")
-    monitored = sorted(set(current) | set(history))
-    for src in monitored:
-        base = history.get(src, [])
-        _emit(f"- {src}: 이번주 {current.get(src, 0)}건 (과거주 {base})")
+    for line in coverage_report_lines(current, history):
+        _emit(line)
 
     if not anomalies:
         _emit("\n✅ 이상 낙차 없음 — 감시 대상 소스 정상 수집.")

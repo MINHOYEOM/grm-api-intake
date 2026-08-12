@@ -6915,6 +6915,104 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                          "비결정론 렌더")
 
 
+class WebRssFeedTest(unittest.TestCase):
+    """[검색 유입] RSS 피드 — 네이버 서치어드바이저가 사이트맵과 **별개 채널로** 받는다.
+
+    사이트맵이 "우리 페이지 전부"라면 RSS 는 "새로 나온 것"이다. 주간 브리프가 정확히 그
+    성격이라 피드 내용은 브리프로 한정한다(지적사항 문서는 시간순 발행물이 아니다).
+    피드 리더·사내 그룹웨어 위젯에도 그대로 쓰인다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_rss_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out)
+        cls.xml = (cls.out / "rss.xml").read_bytes().decode("utf-8")
+        cls.briefs = render.load_briefs(SINGLE_FIXTURES)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_is_well_formed_xml(self):
+        """한국어 산문이 들어가므로 이스케이프가 틀리면 피드 전체가 깨진다."""
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(self.xml)
+        self.assertEqual(root.tag, "rss")
+        self.assertEqual(root.get("version"), "2.0")
+
+    def test_one_item_per_brief(self):
+        import xml.etree.ElementTree as ET
+        items = ET.fromstring(self.xml).findall("./channel/item")
+        self.assertEqual(len(items), len(self.briefs))
+
+    def test_items_are_newest_first_and_link_to_real_pages(self):
+        import xml.etree.ElementTree as ET
+        items = ET.fromstring(self.xml).findall("./channel/item")
+        dates = [i.findtext("pubDate") for i in items]
+        self.assertEqual(dates, sorted(dates, key=_rfc822_key, reverse=True),
+                         "최신순이 아니다")
+        for i in items:
+            link = i.findtext("link")
+            self.assertTrue(link.startswith(f"{render.SITE_BASE_URL}/briefs/"))
+            slug = link.rstrip("/").rsplit("/", 1)[-1]
+            self.assertTrue((self.out / "briefs" / slug / "index.html").exists(),
+                            f"피드가 없는 페이지를 가리킨다: {link}")
+
+    def test_pubdate_is_rfc822_with_correct_weekday(self):
+        """★`strftime('%a')` 는 로케일을 타서 한국어 Windows 에서 '월' 이 나온다.
+
+        사양이 정한 영어 약어 표를 쓰는지, 그리고 요일이 실제 날짜와 맞는지 본다.
+        """
+        import datetime as dt
+        for b in self.briefs:
+            pub = b["brief"]["publish_date"]
+            got = render.rfc822_date(pub)
+            self.assertRegex(
+                got, r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} "
+                     r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) "
+                     r"\d{4} \d{2}:\d{2}:\d{2} \+0900$", pub)
+            want_day = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+                        "Sun")[dt.date.fromisoformat(pub).weekday()]
+            self.assertTrue(got.startswith(want_day + ","),
+                            f"{pub} 요일이 틀렸다: {got}")
+
+    def test_description_is_the_brief_tldr_verbatim(self):
+        """설명문을 지어내지 않는다 — 그 호의 tldr 을 그대로 잇는다."""
+        import xml.etree.ElementTree as ET
+        by_date = {b["brief"]["publish_date"]: b["brief"] for b in self.briefs}
+        for i in ET.fromstring(self.xml).findall("./channel/item"):
+            slug = i.findtext("link").rstrip("/").rsplit("/", 1)[-1]
+            for t in (by_date[slug].get("tldr") or []):
+                self.assertIn(str(t).strip(), i.findtext("description"),
+                              f"tldr 이 무변형으로 실리지 않음: {slug}")
+
+    def test_autodiscovery_link_in_head(self):
+        """피드 리더와 수집기가 이 선언으로 피드를 찾는다."""
+        landing = (self.out / "index.html").read_bytes().decode("utf-8")
+        self.assertIn('type="application/rss+xml"', landing)
+        self.assertIn('href="/rss.xml"', landing)
+
+    def test_not_in_sitemap(self):
+        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertNotIn("/rss.xml</loc>", sitemap)
+
+    def test_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        self.assertEqual((self.out / "rss.xml").read_bytes(),
+                         (out2 / "rss.xml").read_bytes(), "비결정론 렌더")
+
+
+def _rfc822_key(s: str) -> tuple:
+    import datetime as dt
+    months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    parts = s.split()
+    return (int(parts[3]), months.index(parts[2]) + 1, int(parts[1]))
+
+
 class WebNotFoundPageTest(unittest.TestCase):
     """[검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 404 를 준다.
 

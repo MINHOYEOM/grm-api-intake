@@ -40,6 +40,8 @@ from pathlib import Path
 from typing import Any
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from xml.sax.saxutils import escape as _x
+
 from markupsafe import Markup, escape as _escape
 
 # ── 경로(이 파일 기준 — cwd 무관) ──────────────────────────────────────────────
@@ -1812,6 +1814,90 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
     return "\n".join(lines) + "\n"
 
 
+
+# ── [검색 유입] RSS 피드 — 네이버 서치어드바이저는 사이트맵과 **별개 채널로 RSS 를 받는다** ─
+# 사이트맵이 "우리 페이지 전부"라면 RSS 는 "새로 나온 것"이다. 주간 브리프가 정확히 그
+# 성격이라(주 1회·시간순·편집된 글) 피드의 내용은 브리프로 한정한다 — 지적사항 문서는
+# 시간순 발행물이 아니라 참조 자료라 sitemap 의 몫이다.
+#
+# 피드는 사람에게도 쓸모가 있다(피드 리더·사내 그룹웨어 RSS 위젯).
+#
+# ★RFC-822 날짜의 요일·월 약어는 **영어 고정**이다. `strftime("%a")` 는 로케일을 타서
+#   한국어 Windows 에서 "월" 이 나올 수 있으므로 쓰지 않는다(사양이 정한 표라 낡지 않는다).
+# Sakamoto 는 0=일요일을 돌려준다 — 표 순서를 그 규약에 맞춘다.
+_RFC822_DAYS = ("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+_RFC822_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+# 브리프는 매주 월요일 07:30 KST 에 발행된다(grm-intake.yml). now() 를 쓰지 않는 고정값이다.
+_BRIEF_PUBLISH_TIME = "07:30:00 +0900"
+
+
+def rfc822_date(iso_date: str) -> str:
+    """`2026-08-10` → `Mon, 10 Aug 2026 07:30:00 +0900`. 로케일 무관·결정론.
+
+    ★`datetime` 을 쓰지 않는다 — 렌더러의 순수성 가드(`test_no_impure_imports`)가 그 모듈의
+      **import 자체**를 막는다. `now()` 를 가능하게 만드는 문을 아예 닫아 두는 규율이고,
+      요일 하나 때문에 그 문을 열 이유가 없다. 그래서 Sakamoto 알고리즘으로 직접 센다
+      (그레고리력 요일 공식 — 사양이지 손목록이 아니라서 낡지 않는다).
+      독립 검증은 테스트가 `datetime` 으로 대조해 준다(테스트는 가드 대상이 아니다).
+    """
+    y, m, d = int(iso_date[0:4]), int(iso_date[5:7]), int(iso_date[8:10])
+    if not (1 <= m <= 12 and 1 <= d <= 31):
+        raise SystemExit(f"발행일 형식이 아니다: {iso_date!r}")
+    shift = (0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4)[m - 1]
+    yy = y - 1 if m < 3 else y
+    dow = (yy + yy // 4 - yy // 100 + yy // 400 + shift + d) % 7   # 0 = Sunday
+    return (f"{_RFC822_DAYS[dow]}, {d:02d} {_RFC822_MONTHS[m - 1]} "
+            f"{y} {_BRIEF_PUBLISH_TIME}")
+
+
+def build_rss_xml(briefs: list[dict[str, Any]],
+                  base_url: str = SITE_BASE_URL) -> str:
+    """주간 브리프 RSS 2.0. 발행일 내림차순·생성시각 0(byte 고정).
+
+    본문(tldr)은 한국어 산문이라 XML 메타문자가 실재한다 — `escape()` 로 반드시 감싼다
+    (sitemap 은 URL·날짜뿐이라 무변형 결합이 성립하지만 여기는 다르다).
+    """
+    nums = assign_issue_numbers(briefs)
+    ordered = sorted(briefs, key=lambda b: b["brief"].get("publish_date", ""),
+                     reverse=True)
+    latest = ordered[0]["brief"].get("publish_date", "") if ordered else ""
+
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+        "  <channel>",
+        f"    <title>{_x(RSS_TITLE)}</title>",
+        f"    <link>{base_url}/</link>",
+        f"    <description>{_x(RSS_DESCRIPTION)}</description>",
+        "    <language>ko</language>",
+        f'    <atom:link href="{base_url}/rss.xml" rel="self" type="application/rss+xml" />',
+    ]
+    if latest:
+        lines.append(f"    <lastBuildDate>{rfc822_date(latest)}</lastBuildDate>")
+
+    for b in ordered:
+        bm = b["brief"]
+        pub = bm.get("publish_date", "")
+        if not pub:
+            continue
+        url = f"{base_url}/briefs/{pub}/"
+        tldr = [t for t in (bm.get("tldr") or []) if str(t).strip()]
+        # 설명은 지어내지 않는다 — 그 호의 tldr 을 그대로 잇는다(값 무변형).
+        desc = " · ".join(str(t).strip() for t in tldr)
+        lines += [
+            "    <item>",
+            f"      <title>{_x(f'GRM 주간 브리프 Vol.{nums.get(pub, 0)} ({pub})')}</title>",
+            f"      <link>{url}</link>",
+            f'      <guid isPermaLink="true">{url}</guid>',
+            f"      <pubDate>{rfc822_date(pub)}</pubDate>",
+            f"      <description>{_x(desc)}</description>",
+            "    </item>",
+        ]
+    lines += ["  </channel>", "</rss>"]
+    return "\n".join(lines) + "\n"
+
+
 def build_glossary_term_json_ld(term: dict[str, Any],
                                 base_url: str = SITE_BASE_URL) -> str:
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
@@ -1895,6 +1981,9 @@ LIBRARY_DESCRIPTION = ("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내외
                        "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
 GUIDE_DESCRIPTION = ("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
                      "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
+RSS_TITLE = "GRM 주간 브리프 · 글로벌 규제 인텔리전스"
+RSS_DESCRIPTION = ("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
+                   "FDA·EMA·식약처·캐나다 보건부 등의 공개 자료가 원천입니다.")
 GLOSSARY_DESCRIPTION = ("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
                         "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
 QUIZ_DESCRIPTION = ("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 "
@@ -2583,6 +2672,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 경로에 404 를 돌려준다. 없으면 루트 index.html 을 **200 으로** 준다(soft 404) — 실측으로
     # `/findings/doc/zzz-does-not-exist/` 가 랜딩 페이지를 200 으로 돌려주고 있었다.
     # 문서 페이지 3천 장이 매주 재생성되며 낡은 URL 이 계속 생기는 구조라 특히 중요하다.
+    # [검색 유입] RSS — 네이버 서치어드바이저가 사이트맵과 **별개로 받는 채널**이고,
+    # 피드 리더·사내 그룹웨어 위젯에도 그대로 쓰인다. 내용은 주간 브리프로 한정한다
+    # (지적사항 문서는 시간순 발행물이 아니라 참조 자료라 sitemap 의 몫이다).
+    _write(out_dir / "rss.xml", build_rss_xml(briefs))
+    written.append("rss.xml")
+
     _write(out_dir / "404.html", env.get_template("404.html").render(
         page_title="페이지를 찾을 수 없습니다 · GRM",
         rel_root="", nav_active="", latest_slug=latest_slug,

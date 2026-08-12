@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [검색 유입] 문서 단위 페이지 — /findings/doc/{document_id}/.
+
+    실사 보고서 한 건을 통째로 담는다. 모음 페이지(findings_facet.html)가 축마다 최근 6건만
+    싣기 때문에 나머지 본문은 여전히 어디에도 정적으로 존재하지 않았고, 이 페이지가 그 구멍을
+    메운다. 데이터 = web/data/findings_docs.json(findings_docs_refresh.py, 지적 3건 이상).
+
+    ★이 페이지는 실명 업체의 규제 기록이다. 그래서 문구 규율을 템플릿에 못박는다:
+      · 원문이 권위다 — 규제기관 공개 원문 링크를 머리와 꼬리 양쪽에 둔다.
+      · 발행일을 제목 옆에 둔다 — 지적은 시점의 기록이고, 날짜 없이 읽히면 현재 상태로 오독된다.
+      · 후속 시정 가능성을 밝힌다 — 483·실사 지적은 대개 시정 절차가 뒤따른다. 우리가 그
+        결과를 알지 못한다는 사실까지 함께 적는다(모르는 것을 아는 척하지 않는다).
+      · 우리 판단을 덧붙이지 않는다 — 요약·논평 슬롯이 아예 없다(데이터에도 없다).
+
+    grm.css 프리즈 보존을 위해 스코프 <style>, 클래스 공간 .fd-*.
+    §4 한글 안전 가드: 인라인 스타일에 letter-spacing/text-transform 금지 → eyebrow 는 .kick. -#}
+<style>
+  .fd-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fd-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .fd-crumb a:hover{color:var(--coral)}
+  .fd-crumb i{font-style:normal;color:var(--line-2)}
+  .fd-h1{font-family:var(--serif);font-size:clamp(25px,3.6vw,37px);line-height:1.26;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .fd-meta{margin:16px 0 0;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+  .fd-chip{font-family:var(--sans);font-size:12.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:4px 12px}
+  .fd-chip.ag{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
+  .fd-chip.dt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .fd-src{margin-top:22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .fd-src a{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
+  .fd-src a:hover{background:var(--coral-2)}
+  .fd-src span{font-family:var(--sans);font-size:13px;color:var(--muted);word-break:keep-all}
+  .fd-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
+  .fd-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
+  .fd-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+  .fd-item{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;display:flex;flex-direction:column;gap:9px}
+  .fd-item-h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+  .fd-no{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .fd-cat{font-family:var(--sans);font-size:12.5px;color:var(--coral-2)}
+  .fd-text{font-family:var(--sans);font-size:15.5px;line-height:1.8;color:var(--body);margin:0;word-break:keep-all}
+  .fd-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
+  .fd-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
+  .fd-about b{color:var(--body);font-weight:500}
+  .fd-rel{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+  .fd-rel a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .fd-rel a:hover{border-color:var(--coral);color:var(--coral)}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="fd-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/agency/">규제기관별</a><i>&rsaquo;</i><span>{{ doc.firm_name }}</span>
+    </nav>
+    <p class="kick">Inspection Record</p>
+    <h1 class="fd-h1">{{ doc.firm_name }} &mdash; {{ doc.source }} 지적사항</h1>
+    <p class="fd-meta">
+      <span class="fd-chip ag">{{ agency_labels.get(doc.agency, doc.agency) }}</span>
+      <span class="fd-chip dt">{{ doc.published_date }} 공개</span>
+      <span class="fd-chip">지적 {{ doc.findings | length }}건</span>
+      {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
+    </p>
+    <p class="fd-src">
+      <a href="{{ doc.evidence_url }}" target="_blank" rel="noopener">규제기관 공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
+      <span>판단의 근거는 언제나 원문입니다.</span>
+    </p>
+  </div>
+
+  <div class="wrap fd-body">
+    <section>
+      <h2 class="fd-sec-h">지적 내용</h2>
+      <div class="fd-list">
+        {%- for f in doc.findings %}
+        <article class="fd-item" id="{{ f.finding_id }}">
+          <div class="fd-item-h">
+            <span class="fd-no">{{ loop.index }}</span>
+            {%- if f.category_label_ko %}<span class="fd-cat">{{ f.category_label_ko }}</span>{% endif %}
+          </div>
+          <p class="fd-text">{{ f.text_ko }}</p>
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+
+    <section class="fd-about">
+      <h2 class="fd-sec-h">이 기록에 대하여</h2>
+      <p>{{ agency_labels.get(doc.agency, doc.agency) }}가 <b>{{ doc.published_date }}</b>에 공개한 문서에서 자동으로 추출해 우리말로 옮긴 내용입니다. 원문은 위 링크에서 확인하실 수 있습니다.</p>
+      <p><b>이것은 그 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만, 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다. 현재 상태로 읽지 마시고, 최신 현황은 해당 규제기관의 공식 발표를 확인하세요.</p>
+      <p>번역과 분류는 기계로 처리한 것이라 원문과 뉘앙스가 다를 수 있습니다.</p>
+    </section>
+
+    <section class="fd-rel">
+      <a href="{{ rel_root }}findings/agency/{{ doc.agency | lower }}/">{{ agency_labels.get(doc.agency, doc.agency) }} 지적사항 전체</a>
+      {%- for c in related_categories %}<a href="{{ rel_root }}findings/c/{{ c.slug }}/">{{ c.label_ko }} 지적사항</a>{% endfor %}
+      <a href="{{ rel_root }}findings/">지적사항 검색으로</a>
+    </section>
+  </div>
+</main>
+{% endblock %}

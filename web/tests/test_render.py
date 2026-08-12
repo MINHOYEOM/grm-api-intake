@@ -183,8 +183,15 @@ _DISPLAYED_ALIAS_PROBES: tuple[tuple[str, str], ...] = (
 
 
 # ── 빌드 헬퍼 (테스트·freeze 공용 — 동일 입력 보장) ───────────────────────────
-def _build_single(out: pathlib.Path) -> None:
-    render.render_site(SINGLE_FIXTURES, out)
+# ★문서 단위 페이지(3천 장 초과)는 기본으로 끈다. 스위트는 사이트를 51번 다시 짓는데
+#   한 번에 ~27초가 들어 그대로 두면 CI 가 23분 늘어난다. 끄더라도 **sitemap 에는 문서
+#   URL 이 그대로 들어가므로**(render_site 가 데이터에서 파생) 골든 대조는 프로덕션과
+#   동일하다. 실제 HTML 렌더는 `WebFindingsDocPageTest` 가 켠 채로 지어 전수 검증한다.
+_DOC_PAGES_IN_TESTS = False
+
+
+def _build_single(out: pathlib.Path, *, doc_pages: bool = _DOC_PAGES_IN_TESTS) -> None:
+    render.render_site(SINGLE_FIXTURES, out, render_doc_pages=doc_pages)
 
 
 def _build_multi(out: pathlib.Path, scratch: pathlib.Path) -> None:
@@ -194,12 +201,12 @@ def _build_multi(out: pathlib.Path, scratch: pathlib.Path) -> None:
     for fp in sorted(MULTI_FIXTURES.glob("*.json")):
         shutil.copyfile(fp, data / fp.name)
     shutil.copyfile(REAL_FIXTURE, data / REAL_FIXTURE.name)
-    render.render_site(data, out)
+    render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
 
 
 def _build_resources(out: pathlib.Path) -> None:
     """[업계 브리핑 노트] 격리 픽스처(1건) 단독 빌드 — single/multi 와 완전 분리."""
-    render.render_site(RESOURCE_FIXTURES, out)
+    render.render_site(RESOURCE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
 
 
 # (built_relpath, golden_filename)
@@ -264,7 +271,7 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
     def setUpClass(cls):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_live_"))
         cls.out = cls._tmp / "live"
-        render.render_site(DATA_DIR, cls.out)
+        render.render_site(DATA_DIR, cls.out, render_doc_pages=_DOC_PAGES_IN_TESTS)
 
     @classmethod
     def tearDownClass(cls):
@@ -5471,7 +5478,7 @@ class WebFirmWatchlistTest(unittest.TestCase):
             render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
             render.SUPABASE_ANON_KEY = "anon-key"
             out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             me = (out / "me" / "index.html").read_text(encoding="utf-8")
         finally:
             render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
@@ -5535,7 +5542,7 @@ class WebMePageTest(unittest.TestCase):
             render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
             render.SUPABASE_ANON_KEY = "anon-key"
             out = cls._tmp / "on"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             cls.me = (out / "me" / "index.html").read_text(encoding="utf-8")
             cls.landing_on = (out / "index.html").read_text(encoding="utf-8")
         finally:
@@ -5717,7 +5724,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             pub = br["brief"]["publish_date"]
             (data / f"brief_web_{pub}.json").write_text(
                 json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         return out
 
     def _render_detail(self, brief: dict) -> str:
@@ -5824,7 +5831,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             (data / f"{name}.json").write_text(
                 json.dumps(_minimal_brief("2026-06-01"), ensure_ascii=False), encoding="utf-8")
         with self.assertRaises(SystemExit):
-            render.render_site(data, out)
+            render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
 
     def test_verification_meta_conditional(self):
         # 소유권 인증 메타는 토큰 있을 때만 출력(빈 값이면 미출력). 모듈 전역을 호출
@@ -5904,7 +5911,7 @@ class WebAdminRenderTest(unittest.TestCase):
         data.mkdir(parents=True, exist_ok=True)
         (data / f"brief_web_{pub}.json").write_text(
             json.dumps(_minimal_brief(pub), ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         return out
 
     def test_admin_console_env_gated(self):
@@ -6982,6 +6989,116 @@ class WebFindingsFacetPageTest(unittest.TestCase):
             "비결정론 렌더")
 
 
+class WebFindingsDocPageTest(unittest.TestCase):
+    """[검색 유입] /findings/doc/{document_id}/ 문서 단위 페이지.
+
+    ★스위트에서 **유일하게** 문서 페이지를 켠 채로 짓는 클래스다(다른 클래스는 속도 때문에
+    끈다 — 51번 재빌드 × 27초). 그래서 여기서 전수로 본다: 켜고 끄는 스위치가 있는 한,
+    실제 렌더 경로를 밟는 자리가 하나는 있어야 한다.
+
+    ★특히 **sitemap ↔ 파일 대조**가 이 클래스의 핵심이다. sitemap 은 데이터에서 파생되고
+    HTML 은 렌더에서 나오므로, 둘이 갈라지면 구글에 유령 URL 3천 개를 광고하게 된다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.data = render.load_findings_docs()
+        if not cls.data:
+            raise unittest.SkipTest("findings_docs.json 미존재")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_docs_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out, doc_pages=True)
+        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.root = cls.out / "findings" / "doc"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(getattr(cls, "_tmp", pathlib.Path(tempfile.gettempdir())) /
+                      "__never__", ignore_errors=True)
+        if hasattr(cls, "_tmp"):
+            shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _page(self, slug: str) -> str:
+        return (self.root / slug / "index.html").read_text(encoding="utf-8")
+
+    def test_default_renders_doc_pages(self):
+        """기본값이 False 로 뒤집히면 배포가 유령 URL 만 광고한다 — 시그니처로 고정."""
+        import inspect
+        sig = inspect.signature(render.render_site)
+        self.assertIs(sig.parameters["render_doc_pages"].default, True)
+
+    def test_schema_version_is_pinned(self):
+        self.assertEqual(self.data["schema_version"], "grm-findings-docs/v1")
+
+    def test_every_document_has_a_page(self):
+        missing = [d["slug"] for d in self.data["documents"]
+                   if not (self.root / d["slug"] / "index.html").exists()]
+        self.assertEqual(missing, [], f"문서 페이지 누락 {len(missing)}건: {missing[:5]}")
+
+    def test_no_orphan_pages(self):
+        known = {d["slug"] for d in self.data["documents"]}
+        orphans = sorted(p.name for p in self.root.iterdir()
+                         if p.is_dir() and p.name not in known)
+        self.assertEqual(orphans, [], f"정본에 없는 문서 페이지: {orphans[:5]}")
+
+    def test_sitemap_and_files_agree(self):
+        """유령 URL 금지 — sitemap 에 있는 문서 URL 은 전부 실제 파일이어야 한다."""
+        import re as _re
+        urls = _re.findall(r"<loc>[^<]*/findings/doc/([^<]+?)/</loc>", self.sitemap)
+        self.assertEqual(len(urls), len(self.data["documents"]),
+                         "sitemap 문서 URL 수가 정본과 다르다")
+        ghosts = [u for u in urls if not (self.root / u / "index.html").exists()]
+        self.assertEqual(ghosts, [], f"sitemap 에만 있는 유령 URL: {ghosts[:5]}")
+
+    def test_headline_facts_present(self):
+        """업체명·발행일·원문 링크 — 실명 기록 페이지에서 빠지면 안 되는 셋."""
+        from markupsafe import escape as _esc
+        for doc in self.data["documents"][:40]:
+            html = self._page(doc["slug"])
+            self.assertIn(str(_esc(doc["firm_name"])), html, doc["slug"])
+            self.assertIn(doc["published_date"], html, f'발행일 누락: {doc["slug"]}')
+            self.assertIn(str(_esc(doc["evidence_url"])), html,
+                          f'원문 링크 누락: {doc["slug"]}')
+
+    def test_finding_text_is_verbatim(self):
+        from markupsafe import escape as _esc
+        checked = 0
+        for doc in self.data["documents"][:25]:
+            html = self._page(doc["slug"])
+            for f in doc["findings"]:
+                self.assertIn(str(_esc(f["text_ko"])), html,
+                              f'본문이 무변형으로 실리지 않음: {f["finding_id"]}')
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_record_context_disclosure(self):
+        """★이 기록이 '그 시점의 것'이고 후속 시정을 우리가 모른다는 사실을 반드시 적는다.
+
+        실명 업체의 지적 이력을 색인시키는 페이지다. 날짜 맥락과 후속 절차 가능성을 빼면
+        몇 년 전 지적이 현재 상태로 읽힌다 — 그건 사실 왜곡이다.
+        """
+        for doc in self.data["documents"][:20]:
+            html = self._page(doc["slug"])
+            self.assertIn("이 기록에 대하여", html)
+            self.assertIn("그 시점의 기록", html)
+            self.assertIn("시정", html)
+            self.assertIn("기계로 처리", html)
+
+    def test_description_carries_the_date(self):
+        """검색 스니펫에 연도가 없으면 옛 지적이 현재로 읽힌다."""
+        labels = self.data.get("agency_labels") or {}
+        for doc in self.data["documents"][:30]:
+            desc = render.doc_page_description(doc, labels)
+            self.assertIn(doc["published_date"], desc)
+            self.assertIn(doc["firm_name"], desc)
+
+    def test_canonical_and_related_links(self):
+        for doc in self.data["documents"][:20]:
+            html = self._page(doc["slug"])
+            self.assertIn(f'{render.SITE_BASE_URL}/findings/doc/{doc["slug"]}/', html)
+            self.assertIn(f'href="../../../findings/agency/{doc["agency"].lower()}/"', html)
+
+
 class WebGlossaryDeepFieldsTest(unittest.TestCase):
     """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
     참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔
@@ -7054,7 +7171,7 @@ class WebGlossaryDeepFieldsTest(unittest.TestCase):
         try:
             render.load_glossary = lambda *a, **kw: terms
             out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             html = (out / "glossary" / "index.html").read_text(encoding="utf-8")
         finally:
             render.load_glossary = orig_load
@@ -7543,7 +7660,7 @@ class WebDeterministicDetailTest(unittest.TestCase):
         base["cards"] = base["cards"] + [card]
         (data / "brief_web_2026_06_08.json").write_text(
             json.dumps(base, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, cls._tmp / "out")
+        render.render_site(data, cls._tmp / "out", render_doc_pages=_DOC_PAGES_IN_TESTS)
         cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
             encoding="utf-8")
 
@@ -7611,7 +7728,7 @@ class WebFda483DeterministicDetailTest(unittest.TestCase):
         base["cards"] = base["cards"] + [card]
         (data / "brief_web_2026_06_08.json").write_text(
             json.dumps(base, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, cls._tmp / "out")
+        render.render_site(data, cls._tmp / "out", render_doc_pages=_DOC_PAGES_IN_TESTS)
         cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
             encoding="utf-8")
 
@@ -7668,7 +7785,7 @@ class WebFda483DeepAnalysisTest(unittest.TestCase):
         base["cards"] = base["cards"] + [card]
         (data / "brief_web_2026_06_08.json").write_text(
             json.dumps(base, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, cls._tmp / "out")
+        render.render_site(data, cls._tmp / "out", render_doc_pages=_DOC_PAGES_IN_TESTS)
         cls.html = (cls._tmp / "out" / "briefs/2026-06-08/index.html").read_text(
             encoding="utf-8")
 
@@ -8325,7 +8442,7 @@ class WebPopularCardsTest(unittest.TestCase):
             render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
             render.SUPABASE_ANON_KEY = "anon-key"
             out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             landing_on = (out / "index.html").read_text(encoding="utf-8")
         finally:
             render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
@@ -8491,7 +8608,7 @@ class WebGurumiGrowthSyncTest(unittest.TestCase):
             render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
             render.SUPABASE_ANON_KEY = "anon-key"
             out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             landing_on = (out / "index.html").read_text(encoding="utf-8")
         finally:
             render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
@@ -8600,7 +8717,7 @@ class WebQuizWeekFieldTest(unittest.TestCase):
         try:
             render.load_quiz_bank = lambda *a, **k: synthetic
             out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out)
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             html = (out / "quiz" / "index.html").read_text(encoding="utf-8")
         finally:
             render.load_quiz_bank = orig
@@ -9049,7 +9166,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
         br = self._brief()
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         return out, (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
 
     def test_eu_gmp_ncr_detail_block_rendered_verbatim(self):
@@ -9105,7 +9222,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
             "text_source": "ocr"}
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
         self.assertIn("원문 · FDA 483 · OCR 판독", html)
         self.assertIn("스캔 원문 OCR 판독", html)
@@ -9122,7 +9239,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
             "type": "fda_483_observations", "count": 1, "observations": obs}
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
         self.assertIn("원문 · FDA 483", html)
         self.assertNotIn("OCR 판독", html)
@@ -9152,7 +9269,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
         br["cards"][1]["deterministic_detail"] = {**self.MHRA_DETAIL, **mhra_ko}
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
         for ko in list(eu_ko.values()) + list(mhra_ko.values()):
             self.assertIn(ko, html, f"국문 번역이 렌더에서 빠졌다: {ko!r}")
@@ -9183,7 +9300,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
         br["cards"][0]["deterministic_detail"] = detail
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out)
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
         return (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
 
     def test_whopir_report_block_renders_outcome_and_sections(self):

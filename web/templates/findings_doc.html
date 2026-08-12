@@ -52,7 +52,9 @@
       <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/agency/">규제기관별</a><i>&rsaquo;</i><span>{{ doc.firm_name }}</span>
     </nav>
     <p class="kick">Inspection Record</p>
-    <h1 class="fd-h1">{{ doc.firm_name }} &mdash; {{ doc.source }} 지적사항</h1>
+    {#- source 가 문서종류가 아니면(식약처 121장의 "MFDS") 표기하지 않는다 —
+        없는 문서종류를 단정하느니 말하지 않는 편이 정확하다. -#}
+    <h1 class="fd-h1">{{ doc.firm_name }}{% if source_label %} &mdash; {{ source_label }}{% endif %} 지적사항</h1>
     <p class="fd-meta">
       <span class="fd-chip ag">{{ agency_labels.get(doc.agency, doc.agency) }}</span>
       <span class="fd-chip dt"><b>{{ doc.published_date }}</b> 공개</span>

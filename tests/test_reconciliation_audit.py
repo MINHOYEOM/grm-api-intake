@@ -23,6 +23,26 @@ class BucketByWeekTest(unittest.TestCase):
         self.assertEqual(current, {"MFDS": 3})
         self.assertEqual(history, {"MFDS": [10, 12]})
 
+    def test_silent_week_recorded_as_zero_not_dropped(self):
+        # ★[침묵의 0 2026-08-12] 수집 0건인 주는 raw 행이 없다. 종전 구현은 그 주를
+        # 이력에서 **통째로 빼서** 중앙값을 부풀렸다(활동한 주들만의 중앙값).
+        rows = (
+            [{"source": "ISPE", "ingested_at": _d(1)}] * 2      # week 0
+            + [{"source": "ISPE", "ingested_at": _d(15)}] * 6   # week 2 (week 1 은 무음)
+            + [{"source": "ISPE", "ingested_at": _d(22)}] * 4   # week 3
+        )
+        current, history = ra._bucket_by_week(rows, _NOW)
+        self.assertEqual(current, {"ISPE": 2})
+        # week 1 이 0 으로 보존돼야 한다 — [6, 4] 가 아니라 [0, 6, 4].
+        self.assertEqual(history, {"ISPE": [0, 6, 4]})
+
+    def test_weeks_before_first_observation_are_not_zero_filled(self):
+        # 반대쪽 과잉: 수집 시작 **전**까지 0 으로 세면 신생 소스가 매주 발화한다.
+        # 관측된 가장 오래된 주까지만 메운다.
+        rows = [{"source": "MHRA GMP NCR", "ingested_at": _d(8)}] * 5   # week 1 뿐
+        _current, history = ra._bucket_by_week(rows, _NOW)
+        self.assertEqual(history, {"MHRA GMP NCR": [5]})
+
     def test_junk_rows_dropped(self):
         rows = [
             {"source": "", "ingested_at": _d(1)},          # 빈 source

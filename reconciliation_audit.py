@@ -110,9 +110,17 @@ def _bucket_by_week(rows: list[dict[str, Any]], now: datetime
         elif 1 <= week_index <= _LOOKBACK_WEEKS:
             weeks = per_week.setdefault(source, {})
             weeks[week_index] = weeks.get(week_index, 0) + 1
+    # ★[침묵의 0 2026-08-12] 종전엔 `[weeks[i] for i in sorted(weeks)]` 였다 — 수집이 0건인
+    # 주는 애초에 행이 없으니 dict 에 키가 없고, 그래서 **무음 주가 이력에서 통째로 빠졌다**.
+    # 결과는 두 방향으로 나쁘다: ①중앙값이 "활동한 주들"만의 중앙값이라 기대치가 부풀고
+    # ②관측 주 수가 모자라 `_MIN_HISTORY_WEEKS` 미만으로 떨어지면 floor 폴백/skip 으로
+    # 새 나간다. 2026-07-13 ISPE '침묵의 0'이 바로 이 모양이었다.
+    # 관측이 시작된 주(max)까지만 0 으로 메운다 — 수집 시작 **전**을 0 으로 세면 거꾸로
+    # 신생 소스가 매주 발화한다.
     history: dict[str, list[int]] = {}
     for source, weeks in per_week.items():
-        history[source] = [weeks[i] for i in sorted(weeks)]
+        first_observed = max(weeks)
+        history[source] = [weeks.get(i, 0) for i in range(1, first_observed + 1)]
     return current, history
 
 

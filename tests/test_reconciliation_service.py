@@ -43,15 +43,38 @@ class ReconciliationServiceTest(unittest.TestCase):
                 current, history, monitored={"FDA Warning Letter"}),
             [])
 
-    def test_no_alert_for_unmonitored_source(self):
-        # EMA·PIC/S 등은 기본 monitored 집합에 없으므로 0건이어도 무발화.
-        current = {"EMA": 0, "PIC/S": 0, "MHRA Inspectorate": 0}
-        history = {"EMA": [3, 2, 4], "PIC/S": [1, 0, 2]}
-        # 완전한 current(모든 고volume 소스 정상)면 기본 monitored 로도 무발화여야 함
-        current.update({"OpenFDA Recall": 12, "MFDS": 26,
-                        "FDA 483": 14, "FDA Warning Letter": 3})
-        history.update({"OpenFDA Recall": [12, 12], "MFDS": [26, 26],
-                        "FDA 483": [14, 14], "FDA Warning Letter": [3, 3]})
+    # ── 기본 monitored = 관측된 전 소스 (2026-08-12 감시 확대) ────────────────────
+    # 종전 이 자리엔 test_no_alert_for_unmonitored_source 가 있었고 "EMA·PIC/S 는 기본
+    # 집합에 없으니 0건이어도 무발화"를 **정상 동작으로 고정**하고 있었다. 그게 바로
+    # 결함이었다 — 손목록에 없는 소스는 죽어도 아무도 모른다. 실측(08-12) PIC/S 13일·
+    # MHRA Inspectorate 20일 무음이 그렇게 무발화였다.
+
+    def test_source_absent_from_floors_is_still_monitored(self):
+        # ★회귀 가드: MONITORED_FLOORS 에 없는 소스도 이력이 충분하면 감시된다.
+        self.assertNotIn("EMA", MONITORED_FLOORS)
+        current = {"EMA": 0}
+        history = {"EMA": [3, 2, 4]}          # median 3 >= _SILENT_MIN_BASELINE
+        anomalies = detect_coverage_anomalies(current, history)  # monitored 미지정
+        self.assertEqual([(a.source, a.severity) for a in anomalies],
+                         [("EMA", "silent_drop")])
+
+    def test_new_source_with_thin_history_and_no_floor_is_skipped(self):
+        # 과잉경보 방지의 반대쪽: 갓 붙은 소스(이력 얇음 + floor 없음)는 무발화.
+        current = {"어떤 신규 소스": 0}
+        history = {"어떤 신규 소스": [4]}      # < _MIN_HISTORY_WEEKS, floor 없음
+        self.assertEqual(detect_coverage_anomalies(current, history), [])
+
+    def test_quiet_source_still_silent_when_monitored_by_default(self):
+        # 기본 감시가 넓어져도 "원래 조용한 소스"는 여전히 무발화(중앙값 0 → skip).
+        current = {"PIC/S": 0}
+        history = {"PIC/S": [0, 0, 1]}         # median 0
+        self.assertEqual(detect_coverage_anomalies(current, history), [])
+
+    def test_healthy_week_no_alert_across_all_observed_sources(self):
+        # 모든 관측 소스가 정상이면 기본 monitored 가 넓어도 무발화여야 한다.
+        current = {"OpenFDA Recall": 12, "MFDS": 26, "FDA 483": 14,
+                   "FDA Warning Letter": 3, "EMA": 3, "PIC/S": 2}
+        history = {k: [v, v, v] for k, v in current.items()}
         self.assertEqual(detect_coverage_anomalies(current, history), [])
 
     def test_healthy_week_no_alert(self):

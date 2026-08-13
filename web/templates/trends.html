@@ -84,13 +84,20 @@
           애초에 표에 적재하지 않는다 — 그 사실을 trends.js 가 RPC 응답의 scope(하드코딩
           아님)를 그대로 읽어 #tr-fda-scope 에 적는다.
 
-          058 미적용 라이브·fetch 실패·0건이면 trends.js 가 이 블록만 조용히 숨긴 채로
+          ★기준일 고지(059_fda_inspection_stats_freshness.sql) — #tr-fda-asof 는 059 가
+          scope 에 더한 신선도 2키(last_ingested_date_kst / latest_inspection_end_date)를
+          적는 자리다. 두 날짜는 뜻이 다르므로(우리가 받아온 날 vs FDA 실사가 끝난 날)
+          trends.js 가 라벨을 각각 붙여 적고, 값이 없으면(059 미적용 라이브·구버전 캐시)
+          그 항목만 빠진다 — 오늘 날짜·빌드 시각으로 지어내지 않는다.
+
+          058/059 미적용 라이브·fetch 실패·0건이면 trends.js 가 이 블록만 조용히 숨긴 채로
           두고 나머지 섹션엔 손대지 않는다(zone/heatmap 과 동일 원칙, 골든 결정론 —
           RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는 항상 동일). -#}
       <section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="FDA 의약품 GMP 실사 등급" hidden>
         <h2 class="tr-h">FDA 의약품 GMP 실사 등급</h2>
         <p class="tr-read">FDA가 의약품 제조소를 직접 실사하고 매긴 등급입니다. <b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다. 위 지적사항 집계와는 단위가 달라 — 실사 한 건에서 지적이 여러 개 나올 수 있어 — 두 수치를 서로 나누지 마세요.</p>
         <p class="tr-fda-scope" id="tr-fda-scope"></p>
+        <p class="tr-fda-asof" id="tr-fda-asof"></p>
         <div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>
         <h3 class="tr-sub-h">연도별 등급 구성</h3>
         <div id="tr-fda-year" class="tr-fda-year"></div>
@@ -363,7 +370,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    토큰을 그대로 재사용(신규 팔레트 0). NAI/VAI/OAI 3색은 채도 단계만 다르다
    (OAI=coral 진함, VAI=coral 옅음, NAI=line — coral 은 "문제"를 가리키는 이 페이지의
    기존 관례라 등급이 나쁠수록 coral 을 진하게 쓴다). */
-.tr-fda-scope{font-size:12px;color:var(--muted);margin:0 0 18px;line-height:1.6}
+.tr-fda-scope{font-size:12px;color:var(--muted);margin:0 0 5px;line-height:1.6}
+/* [기준일] 059 의 scope 신선도 2키. 범위 고지(.tr-fda-scope)보다 한 톤 진하게 둔다 —
+   "언제 기준 숫자인가"가 먼저 눈에 들어와야 한다. 059 미적용 라이브에서는 trends.js 가
+   아무 문구도 넣지 않아 빈 문단으로 남는다(높이 0, 위아래 여백만 유지). */
+.tr-fda-asof{font-size:12px;color:var(--body-s);margin:0 0 18px;line-height:1.6}
 .tr-fda-stats{margin:0 0 26px;padding-bottom:0;border-bottom:none}
 .tr-fda-year{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
 .tr-fda-y-row{display:flex;align-items:center;gap:10px;padding:6px 2px}

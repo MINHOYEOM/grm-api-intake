@@ -45,6 +45,14 @@
 --   먼저 적용되어 있어야 한다 — country_key generated 컬럼이 그 확장된 정의를
 --   가정한다(확장 전에 이 표를 만들어도 컬럼 자체는 생성되지만 27종이 매핑 밖으로
 --   샌다 -- 반드시 057 다음에 적용).
+--
+-- ★2026-08-12: 이 파일의 (C) public.fda_inspection_stats() 는
+--   059_fda_inspection_stats_freshness.sql 이 create or replace 로 supersede 한다
+--   (같은 무인자 시그니처 · scope 에 신선도 2키 last_ingested_date_kst /
+--   latest_inspection_end_date 를 **추가만** 한다 -- 기존 7키와 totals/by_year/
+--   by_country 는 바이트 동일). **프로덕션 현행 정의의 정본은 059 를 봐야 한다.**
+--   이 파일의 (C) 바디는 git 히스토리·원복용 원본으로 그대로 남긴다(055 31~36행 선례).
+--   (A) 표 DDL 과 (B) RLS 는 059 가 건드리지 않으므로 이 파일이 계속 정본이다.
 -- ============================================================================
 -- ★004/009 함정 해당 없음(013/055 관례 계승): plpgsql DO 블록·선언 변수·배열 슬라이스
 -- 전혀 없음 — (A)(C) 모두 language sql 순수 정의다(트리거·백필 없음 -- 신규 테이블

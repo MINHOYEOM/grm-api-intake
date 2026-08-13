@@ -434,6 +434,7 @@ def run(
     http_post: HttpPost | None = None,
     poster: Poster | None = None,
     fiscal_years: list[str] | None = None,
+    allow_zero_rows: bool = False,
 ) -> tuple[BackfillReport, int]:
     # 지연 바인딩 -- 테스트가 인자로 갈아끼운다.
     http_post = http_post or ddapi_post
@@ -505,6 +506,35 @@ def run(
             report.upserted += len(chunk)
         log("INFO", f"적재 {report.upserted}건 / 청크실패 {report.upsert_chunk_failed}")
 
+    # ★★0건 하한 -- 무인 월간 크론으로 승격하면서 신설(2026-08-12).
+    #
+    # 종전에는 `gmp_candidates == 0` 이 **exit 0(초록)** 이었다. 수동 실행에서는
+    # 사람이 리포트를 읽고 6,417 과 대조하니 무해했지만, 크론이 돌기 시작하면 그
+    # 안전장치가 사라진다. 그리고 이 소스에는 0건으로 끝나는 조용한 경로가 둘 있다
+    # (둘 다 적대적 검증에서 **실제로 실행해** 재현했다):
+    #   ① DDAPI 가 200 + `result: []` 를 준다 -> received_total=0, exit 0.
+    #      `parse_response` 는 빈 배열을 성공으로 보고, `fetch_all_pages` 는
+    #      `len(rows) < page_size` 라 정상 종료한다.
+    #   ② FDA 가 ProjectArea 라벨 문자열을 바꾼다(예: 뒤에 단어 하나 추가)
+    #      -> `split_by_project_area` 가 **전량을 조용히 제외 버킷으로** 보내
+    #      gmp_candidates=0, exit 0. 이 배제는 설계상 "모르는 값은 제외"라 소리가 안 난다.
+    # 둘 다 초록으로 끝나면 실패 이슈가 안 열릴 뿐 아니라, 워크플로가 **열려 있던
+    # 실패 이슈까지 '복구됨'으로 닫아** 알람을 스스로 꺼 버린다.
+    #
+    # 이 수집기가 한 건도 싣지 않고 성공하는 것은 어떤 경우에도 정상이 아니다
+    # (회계연도 창 7년에 실사가 0건일 수 없다). 그래서 수집 실패와 같은 등급인
+    # **exit 2** 로 요란하게 끝낸다. `--allow-zero-rows` 는 픽스처가 0건인 테스트·
+    # 진단 실행 전용 탈출구다(운영 경로에서는 쓰지 않는다).
+    if not allow_zero_rows and report.gmp_candidates == 0:
+        report.errors.append(
+            "zero_gmp_rows:적재 대상이 0건이다 -- DDAPI 응답이 비었거나 "
+            "ProjectArea 라벨이 상류에서 바뀌어 전량이 제외됐을 수 있다"
+            f"(received_total={report.received_total}, "
+            f"excluded_by_project_area={dict(report.excluded_by_project_area)})")
+        log("ERROR", f"적재 대상 0건 -- 조용히 성공으로 끝내지 않는다"
+                     f"(수신 {report.received_total}건 / 제외 {report.excluded_by_project_area})")
+        return report, 2
+
     exit_code = 1 if (report.normalize_failed or report.upsert_chunk_failed
                       or report.duplicate_inspection_ids) else 0
     return report, exit_code
@@ -525,6 +555,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help=("수집할 최근 회계연도 수(기본 %d). 사용자가 승인한 범위가 7년이다 — "
                          "전체 기간은 39,783건으로 3.5배다. 연도는 실행일에서 계산하므로 "
                          "해가 바뀌어도 낡지 않는다." % DEFAULT_FISCAL_YEARS))
+    p.add_argument("--allow-zero-rows", dest="allow_zero_rows", action="store_true",
+                   default=False,
+                   help=("적재 대상 0건을 정상 종료로 허용한다(기본 금지 -- 0건이면 exit 2). "
+                         "0건은 DDAPI 빈 응답이나 상류 ProjectArea 라벨 변경 같은 조용한 "
+                         "열화의 신호라, 무인 크론에서는 반드시 요란하게 실패해야 한다. "
+                         "픽스처가 0건인 테스트·진단 실행 전용 탈출구다."))
     p.add_argument("--page-size", type=int, default=PAGE_SIZE,
                    help=f"페이지당 rows(상한 5000 -- 20000 은 HTTP 400). 기본 {PAGE_SIZE}.")
     p.add_argument("--max-pages", type=int, default=MAX_PAGES,
@@ -571,6 +607,7 @@ def main(argv: list[str] | None = None) -> int:
         fiscal_years=fiscal_year_window(date.today(), args.fiscal_years),
         page_size=args.page_size, max_pages=args.max_pages, chunk_size=args.chunk_size,
         timeout=args.timeout, retries=args.retries,
+        allow_zero_rows=args.allow_zero_rows,
     )
 
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)

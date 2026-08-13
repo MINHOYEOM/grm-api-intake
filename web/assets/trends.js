@@ -97,12 +97,15 @@
   var zoneEl = document.getElementById("tr-zone");
   var zoneCountriesEl = document.getElementById("tr-zone-countries");
   // [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats() 전용
-  // 신규 엘리먼트(임무3) — zoneBlockEl 등과 동일하게 아래 하드 게이트에는 넣지 않는다.
+  // 신규 엘리먼트(임무3·기준일은 059) — zoneBlockEl 등과 동일하게 아래 하드 게이트에는 넣지 않는다.
   // 넣으면 이 블록이 없는 구버전 셸(캐시 스큐)을 만났을 때 스크립트 전체가 조기
   // 리턴되어 이미 정상 동작하는 다른 패널까지 함께 죽는다 — 이 패널의 실패 반경은
   // 이 패널 자신으로만 한정해야 한다.
   var fdaBlockEl = document.getElementById("tr-fda-block");
   var fdaScopeEl = document.getElementById("tr-fda-scope");
+  // [기준일] 059_fda_inspection_stats_freshness.sql 이 scope 에 더한 신선도 2키 전용.
+  // 059 미적용 라이브에서는 키가 없으므로 이 문단은 비어 있는 채로 남는다(:empty 로 숨김).
+  var fdaAsOfEl = document.getElementById("tr-fda-asof");
   var fdaStatsEl = document.getElementById("tr-fda-stats");
   var fdaYearEl = document.getElementById("tr-fda-year");
   var fdaCountryEl = document.getElementById("tr-fda-country");
@@ -1238,6 +1241,27 @@
       }
       scopeText += " · 출처: " + (scope.source || "FDA Data Dashboard API");
       fdaScopeEl.textContent = scopeText;
+    }
+
+    // [기준일] 059 가 scope 에 더한 신선도 2키. **두 날짜는 뜻이 다르다** —
+    //   · last_ingested_date_kst    = 우리가 새 실사를 마지막으로 받아온 날(우리 쪽 시각)
+    //   · latest_inspection_end_date = 표에 담긴 실사 중 가장 최근 종료일(FDA 쪽 날짜)
+    // 둘을 한 문장으로 뭉치면 "2026-07-16까지 최신"처럼 읽혀 오도한다. 라벨을 각각 붙여
+    // 무엇을 재는 날짜인지 문장 안에서 갈라 적는다.
+    //
+    // ★없는 날짜를 지어내지 않는다. 위 project_area/source 처럼 `|| "..."` 폴백을 쓰면
+    // 059 미적용 라이브·구버전 캐시에서 **최신인 척하는 거짓 날짜**가 화면에 나간다.
+    // fiscal_year_min/max 와 같은 방식(값의 타입을 확인하고, 없으면 그 항목을 통째로
+    // 생략)만 쓴다. 둘 다 없으면 문단이 빈 채로 남고(높이 0) 위아래 여백만 유지된다.
+    if (fdaAsOfEl) {
+      var asOf = [];
+      if (typeof scope.last_ingested_date_kst === "string" && scope.last_ingested_date_kst) {
+        asOf.push("새 실사를 마지막으로 받아온 날 " + scope.last_ingested_date_kst);
+      }
+      if (typeof scope.latest_inspection_end_date === "string" && scope.latest_inspection_end_date) {
+        asOf.push("담긴 실사 중 가장 최근 종료일 " + scope.latest_inspection_end_date);
+      }
+      fdaAsOfEl.textContent = asOf.length ? "숫자 기준일 — " + asOf.join(" · ") : "";
     }
 
     fdaStatsEl.innerHTML = "";

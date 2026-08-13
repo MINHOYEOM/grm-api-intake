@@ -3571,6 +3571,7 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         )
         self.assertIn('<h2 class="tr-h">FDA 의약품 GMP 실사 등급</h2>', self.html)
         self.assertIn('<p class="tr-fda-scope" id="tr-fda-scope"></p>', self.html)
+        self.assertIn('<p class="tr-fda-asof" id="tr-fda-asof"></p>', self.html)
         self.assertIn('<div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>', self.html)
         self.assertIn('<div id="tr-fda-year" class="tr-fda-year"></div>', self.html)
         self.assertIn('<div id="tr-fda-country" class="tr-fda-country"></div>', self.html)
@@ -3585,13 +3586,13 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         """구버전 캐시 셸에 이 신규 블록이 없어도 페이지 전체(다른 패널)가 죽으면
         안 된다 — coverageNoteEl/zoneBlockEl 관례와 동형으로 하드 게이트(if 문)에
         tr-fda-* 엘리먼트를 넣지 않는다."""
-        for elid in ("tr-fda-block", "tr-fda-scope", "tr-fda-stats", "tr-fda-year",
-                     "tr-fda-country", "tr-fda-note"):
+        for elid in ("tr-fda-block", "tr-fda-scope", "tr-fda-asof", "tr-fda-stats",
+                     "tr-fda-year", "tr-fda-country", "tr-fda-note"):
             self.assertIn(f'document.getElementById("{elid}")', self.js_src)
         gate = self.js_src[self.js_src.index("if (!cfg || !loadingEl"):]
         gate = gate[:gate.index("return;") + len("return;")]
-        for forbidden in ("fdaBlockEl", "fdaScopeEl", "fdaStatsEl", "fdaYearEl",
-                           "fdaCountryEl", "fdaNoteEl"):
+        for forbidden in ("fdaBlockEl", "fdaScopeEl", "fdaAsOfEl", "fdaStatsEl",
+                           "fdaYearEl", "fdaCountryEl", "fdaNoteEl"):
             self.assertNotIn(forbidden, gate)
 
     # ── RPC 배선 · 독립 fetch ────────────────────────────────────────────────
@@ -3627,6 +3628,59 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         self.assertIn("scope.fiscal_year_max", fn)
         self.assertNotIn("Drug Quality Assurance", fn)
         self.assertNotIn("Bioresearch Monitoring", fn)
+
+    # ── 기준일 고지(059_fda_inspection_stats_freshness.sql) ────────────────────
+    def _render_fn(self):
+        fn = self.js_src[self.js_src.index("function renderFdaInspections(data)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        # ★함수 슬라이싱 자기검사 — 2칸으로 닫히는 블록이 새로 들어오면 그 뒤 코드가
+        # 조용히 미검사 구간이 된다("초록인데 안 본다"의 재발 경로). 함수의 마지막 줄이
+        # 잘린 조각 안에 실제로 들어 있는지 매번 확인한다.
+        self.assertIn("fdaBlockEl.hidden = false;", fn,
+                      "renderFdaInspections 슬라이싱이 함수 끝까지 닿지 않는다")
+        return fn
+
+    def test_as_of_dates_read_from_rpc_scope_not_fabricated(self):
+        """★059 가 scope 에 실어 준 두 날짜를 그대로 적는다. 클라이언트가 날짜를 만들면
+        ('오늘'·빌드 시각·FY 로 유추) 그 문장은 데이터가 낡을수록 더 그럴듯한 거짓이 된다."""
+        fn = self._render_fn()
+        self.assertIn("scope.last_ingested_date_kst", fn)
+        self.assertIn("scope.latest_inspection_end_date", fn)
+        for forbidden in ("new Date(", "toLocaleDateString", "Date.now("):
+            self.assertNotIn(forbidden, fn, f"날짜를 클라이언트가 만들고 있다: {forbidden}")
+        # 리터럴 날짜를 박으면 즉시 낡는다(054 "축을 바꾸지 말고 밝혀라"의 날짜판).
+        # 주석은 제외한다 — 근거를 적으려면 실측 날짜를 인용해야 하고, 화면에 나가는 것은
+        # 코드 줄뿐이다.
+        code = "\n".join(ln for ln in fn.splitlines() if not ln.strip().startswith("//"))
+        self.assertNotRegex(code, r"\d{4}-\d{2}-\d{2}")
+
+    def test_as_of_degrades_by_omission_not_by_inventing_a_fallback(self):
+        """★값이 없으면(059 미적용 라이브·구버전 캐시) **그 항목만 빠져야** 한다.
+
+        같은 함수 안의 project_area/source 는 `|| "..."` 폴백을 쓰는데, 날짜에 그 패턴을
+        복사하면 '최신인 척하는 낡은 날짜'가 라이브로 나간다. fiscal_year_min/max 와 같은
+        방식(타입 확인 후 없으면 항목 자체를 생략)이어야 한다."""
+        fn = self._render_fn()
+        block = fn[fn.index("if (fdaAsOfEl)"):]
+        block = block[:block.index("\n    }")]
+        self.assertIn('typeof scope.last_ingested_date_kst === "string"', block)
+        self.assertIn('typeof scope.latest_inspection_end_date === "string"', block)
+        self.assertNotIn('|| "', block, "날짜 항목에 문자열 폴백이 들어갔다")
+
+    def test_as_of_labels_keep_the_two_dates_distinguishable(self):
+        """★두 날짜는 뜻이 다르다(우리가 받아온 날 vs FDA 실사가 끝난 날). 라벨 없이
+        나란히 적으면 '2026-07-16까지 최신'처럼 읽혀 오도한다."""
+        fn = self._render_fn()
+        self.assertIn("새 실사를 마지막으로 받아온 날 ", fn)
+        self.assertIn("담긴 실사 중 가장 최근 종료일 ", fn)
+
+    def test_as_of_style_exists_and_stays_korean_safe(self):
+        self.assertIn(".tr-fda-asof{", self.html_src)
+        # §4 한글 안전 — 이 문단에 var(--mono)/letter-spacing 을 쓰지 않는다.
+        rule = self.html_src[self.html_src.index(".tr-fda-asof{"):]
+        rule = rule[:rule.index("}")]
+        self.assertNotIn("--mono", rule)
+        self.assertNotIn("letter-spacing", rule)
 
     # ── 비율은 클라이언트가 계산한다(007/038 관례: 서버는 센다) ────────────────
     def test_oai_share_computed_client_side(self):

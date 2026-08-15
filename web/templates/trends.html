@@ -292,7 +292,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .page-head p .ln{display:block}
 
 /* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
-.tr-state{padding:14px 0}
+{#- min-height 예약(CLS): 통계 본문(#tr-content)은 hidden 으로 시작해 trends.js 가 데이터
+    수신 후 공개한다. 예약 없이는 공개 전 구독밴드·푸터가 첫 화면 안(실측 ~420px)에 있다가
+    공개 순간 수천 px 아래로 밀려 RUM CLS Poor(0.687)를 만들었다 — 로딩/에러 셸이 뷰포트
+    잔여 높이(콘텐츠 시작 실측 ~307px + 여유)를 차지해 아래 요소를 처음부터 화면 밖에 둔다. -#}
+.tr-state{padding:14px 0;min-height:max(320px,calc(100vh - 200px))}
 .tr-state-error{padding:60px 20px;text-align:center;color:var(--coral-2);font-size:14px}
 .tr-skel-row{height:16px;border-radius:6px;background:var(--strong);margin-bottom:12px;animation:trPulse 1.7s ease-in-out infinite}
 .tr-skel-row.w1{width:60%}

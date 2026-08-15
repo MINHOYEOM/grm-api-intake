@@ -300,6 +300,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}
+{#- min-height 예약(CLS): 결과 목록·대시보드는 findings.js 데이터 수신 후에야 채워진다.
+    예약 없이는 공개 전 구독밴드·푸터가 첫 화면 하단에 걸쳐 있다가 공개 순간 수천 px 밀려
+    RUM CLS Poor(0.452)를 만들었다 — 초기 로드 경로의 두 상태(로딩·로드실패)만 뷰포트 잔여
+    높이를 예약한다(#fnd-empty 는 필터 조작 후 상태라 제외·콘텐츠 시작 실측 ~520px). -#}
+#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}
 .fnd-results{display:flex;flex-direction:column;gap:14px}
 /* [문서 중심 열람] 문서 카드 — 기존 .fnd-card 스타일 계열(보더/라운드/배경) 재사용,
    내부에 소속 observation 카드(.fnd-card, 무변경)를 그대로 담는다. */

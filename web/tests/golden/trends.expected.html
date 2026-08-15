@@ -171,8 +171,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .page-head p{max-width:none;text-wrap:pretty}
 .page-head p .ln{display:block}
 
-/* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
-.tr-state{padding:14px 0}
+/* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */.tr-state{padding:14px 0;min-height:max(320px,calc(100vh - 200px))}
 .tr-state-error{padding:60px 20px;text-align:center;color:var(--coral-2);font-size:14px}
 .tr-skel-row{height:16px;border-radius:6px;background:var(--strong);margin-bottom:12px;animation:trPulse 1.7s ease-in-out infinite}
 .tr-skel-row.w1{width:60%}

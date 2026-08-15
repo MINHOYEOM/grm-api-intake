@@ -177,7 +177,8 @@
         막다른 화면이라(firm.html) CTA 는 검색 페이지로 보낸다. 수치 미기재(하드코딩
         금지 원칙)·§4 한글안전: letter-spacing/text-transform/mono 미사용. -#}
     {% if reactions_enabled %}
-    <div class="quiz-cta watch-cta">
+    {#- id=watchlist: 뉴스레터 사다리(newsletter.py)가 이 앵커로 직링크한다(성장 3차). -#}
+    <div class="quiz-cta watch-cta" id="watchlist">
       <div class="quiz-cta-txt">
         <span class="kick">Firm Watchlist</span>
         <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>

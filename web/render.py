@@ -2761,6 +2761,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         _write(out_dir / "briefs" / pub / "index.html", html)
         written.append(f"briefs/{pub}/index.html")
+        # [성장 3차] 링크드인/커뮤니티 공유 초안 — tldr(큐레이션된 핵심)+절대 URL 을 고정
+        # 경로(briefs/{pub}/share.txt)로 낸다. 운영 루틴: 발행 후 이 URL 을 열어 복사·
+        # 다듬어 게시(주 5분). 내용이 공개 브리프 요약뿐이라 공개 무해·sitemap 비등록.
+        # tldr 이 비면 불릿 없이 헤더+링크만 남는다(파일 존재는 항상 — 경로 예측 가능성).
+        share_lines = [f"[GRM 주간 규제뉴스 · {ctx['title_dateform']}]", ""]
+        share_lines += [f"· {t}" for t in (ctx.get("tldr") or [])]
+        share_lines += ["", f"이번 주 전체 보기: {_abs_url(f'briefs/{pub}/')}", "",
+                        "#GMP #제약규제 #품질관리 #RegulatoryIntelligence"]
+        _write(out_dir / "briefs" / pub / "share.txt",
+               "\n".join(share_lines) + "\n")
+        written.append(f"briefs/{pub}/share.txt")
 
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
     # [검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 매칭되지 않는

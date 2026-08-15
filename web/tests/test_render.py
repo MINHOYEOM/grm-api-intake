@@ -244,6 +244,7 @@ SINGLE_GOLDENS = [
     ("assets/search-index.json", "search-index.expected.json"),
     ("robots.txt", "robots.expected.txt"),
     ("llms.txt", "llms.expected.txt"),
+    ("briefs/2026-06-26/share.txt", "brief_share.expected.txt"),
     ("sitemap.xml", "sitemap.expected.xml"),
     ("site.webmanifest", "site.expected.webmanifest"),
 ]
@@ -595,6 +596,20 @@ class WebRenderStructureTest(unittest.TestCase):
         self.assertIn(f'data-url="{render.SITE_BASE_URL}/briefs/2026-06-08/"', h)
         self.assertIn('hidden><i class="ti ti-copy"', h)
         self.assertNotIn('id="tldrCopy"', self.detail)   # tldr 빈 브리프(06-22)엔 버튼도 없다
+
+    def test_brief_share_txt(self):
+        """[성장 3차] 공유 초안 share.txt — 브리프마다 고정 경로에 tldr verbatim + 절대
+        URL. tldr 빈 브리프(06-22)도 파일은 있되 불릿 없이 헤더+링크만(경로 예측 가능성)."""
+        s = (self.multi / "briefs/2026-06-08/share.txt").read_text(encoding="utf-8")
+        self.assertIn("[GRM 주간 규제뉴스 · ", s)
+        self.assertIn(f"이번 주 전체 보기: {render.SITE_BASE_URL}/briefs/2026-06-08/", s)
+        brief_json = json.loads(
+            (MULTI_FIXTURES / "brief_web_2026_06_08.json").read_text(encoding="utf-8"))
+        for t in brief_json["brief"]["tldr"]:
+            self.assertIn(f"· {t}", s)
+        empty = (self.multi / "briefs/2026-06-22/share.txt").read_text(encoding="utf-8")
+        self.assertNotIn("\n· ", empty)
+        self.assertIn(f"{render.SITE_BASE_URL}/briefs/2026-06-22/", empty)
 
     def test_relative_paths_per_depth(self):
         landing = (self.single / "index.html").read_text(encoding="utf-8")
@@ -9062,6 +9077,8 @@ class WebPopularCardsTest(unittest.TestCase):
         self.assertIn("watch-cta", landing_on)
         self.assertIn("관심 업체의 새 지적사항, 메일로 받아보세요.", landing_on)
         self.assertIn('findings/index.html">업체 검색하러 가기', landing_on)
+        # 뉴스레터 사다리(newsletter.py)가 이 앵커로 직링크한다 — 파일 간 계약을 여기서 고정.
+        self.assertIn('id="watchlist"', landing_on)
 
     def test_popular_js_copied_to_dist(self):
         built = (self.single / "assets" / "popular.js").read_bytes()

@@ -247,6 +247,23 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         f'<a href="{e(base)}/quiz/" style="display:inline-block;margin-top:10px;color:#A14B30;'
         'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
         'border-radius:9999px;padding:7px 15px">퀴즈 풀어보기 →</a></div>')
+    # 구독→회원 사다리(성장 3차) — 매주 구독자 전원에게 닿는 채널은 이 메일뿐인데,
+    # 회원 간판 기능(관심 업체 주간 알림)의 진입점이 없었다(랜딩 배너는 사이트에 이미
+    # 들어온 사람만 본다). 정적 카피·데이터 바인딩 0. 링크는 랜딩 배너 앵커(#watchlist)
+    # 하나뿐 — 추적 파라미터 0 정책 준수. 배너는 reactions 게이트라 env-off 배포에선
+    # 앵커가 없지만 랜딩 상단으로 자연 폴백(무해). 퀴즈 카드와 동일 골격, 한글에 자간 없음.
+    parts.append(
+        '<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
+        'margin:0 0 24px;background:#FBF8F4">'
+        '<div style="font-size:13px;font-weight:600;color:#A14B30;'
+        'margin-bottom:6px">관심 업체 알림</div>'
+        '<div style="font-size:14px;line-height:1.7;color:#3D3D3A">'
+        '협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 메일로 모아 '
+        '알려드려요. 무료 회원이면 바로 쓸 수 있습니다.</div>'
+        f'<a href="{e(base)}/#watchlist" style="display:inline-block;margin-top:10px;'
+        'color:#A14B30;text-decoration:none;font-size:14px;font-weight:500;'
+        'border:1px solid #DCD3C7;border-radius:9999px;padding:7px 15px">'
+        '관심 업체 등록하기 →</a></div>')
     if updates_html:
         parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).

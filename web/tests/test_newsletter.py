@@ -85,6 +85,16 @@ class NewsletterTeaserTest(unittest.TestCase):
             self.assertIn(f'#sec-{quote(g, safe="")}', self.html)
         self.assertEqual(self.t["section_count"], 3)
 
+    def test_watchlist_ladder_block(self):
+        """[성장 3차] 구독→회원 사다리 — 메일 안 유일한 워치리스트 진입점.
+
+        링크는 우리 랜딩 앵커(#watchlist) 하나뿐(추적 파라미터 0 정책·카드 출처 URL
+        불포함 원칙과 동일 계열). 앵커 실재는 test_render 의 워치리스트 배너 테스트가
+        landing.html 쪽에서 고정한다(파일 간 계약의 양끝을 각자 잠근다)."""
+        self.assertIn("관심 업체 알림", self.html)
+        self.assertIn("관심 업체 등록하기 →", self.html)
+        self.assertIn(f'href="{BASE}/#watchlist"', self.html)
+
     def test_no_card_source_urls_in_mail(self):
         # 무변형/provenance — 카드 출처 URL(보호 대상)은 메일에 들어가지 않는다(우리 페이지만).
         for c in self.brief["cards"]:

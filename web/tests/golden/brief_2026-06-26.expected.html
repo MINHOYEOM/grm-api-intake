@@ -51,7 +51,7 @@
       <span>발행일 <b class="mono">2026-06-26</b></span>
       <span>수집 <b>27</b>건 · 카드 <b>27</b>장</span>
       <span>Evidence <b class="mono">A 23 · B 4 · C 0</b></span>
-    </div>    <div class="tldr"><div class="l">이번 주 핵심</div><ul>      <li>국내 N-nitroso-meglumine 불순물 회수 2건 — 텔미사르탄·리나글립틴 복합정 4품목 영업자 회수</li>      <li>FDA, DOXOrubicin 리포솜 주사제 유리 이물 Class I 회수 — 무균 주사제 이물 관리 재점검 신호</li>      <li>FDA Warning Letter Huons Co., Ltd.(국내) — 완제의약품 CGMP 위반 집행 확인</li>    </ul></div>    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>AI 자동 생성 안내</b><p>요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.</p><a href="#ai-notice">전문 보기 ↓</a></div></div>  </div>
+    </div><div class="tldr"><div class="l">이번 주 핵심</div><button class="tldr-copy" id="tldrCopy" type="button" data-title="2026년 6월 4주차" data-url="https://grm-solutions.com/briefs/2026-06-26/" hidden><i class="ti ti-copy" aria-hidden="true"></i><span class="tldr-copy-t">요약 복사</span></button><ul>      <li>국내 N-nitroso-meglumine 불순물 회수 2건 — 텔미사르탄·리나글립틴 복합정 4품목 영업자 회수</li>      <li>FDA, DOXOrubicin 리포솜 주사제 유리 이물 Class I 회수 — 무균 주사제 이물 관리 재점검 신호</li>      <li>FDA Warning Letter Huons Co., Ltd.(국내) — 완제의약품 CGMP 위반 집행 확인</li>    </ul></div>    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>AI 자동 생성 안내</b><p>요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.</p><a href="#ai-notice">전문 보기 ↓</a></div></div>  </div>
   <div class="wrap layout"><aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>      <details class="toc-grp" data-slug="글로벌">
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">글로벌</span><span class="n">4</span></summary>        <a href="#eb5152bfcf02">Huons Co., Ltd.</a>        <a href="#fda483-193232">Pharmaneek Inc</a>        <a href="#82657c278940">Reduced Testing a Matter of GMP or Specification? <span class="toc-sub">· 시험 생략 기준 GMP vs. 규격 논의</span></a>        <a href="#47ea6a0dde35">Reduced Testing a Matter of GMP or Specification? <span class="toc-sub">· 시험 감소 기준 GMP/규격 경계</span></a>      </details>      <details class="toc-grp" data-slug="국내">
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">국내</span><span class="n">10</span></summary>        <a href="#gmpinspect-1Pxznco5TX7">화순전남대학병원 화순군</a>        <a href="#gmpinspect-1Pxznco5UBw">(주)셀릭스</a>        <a href="#gmpinspect-1PxtsjZTS6w">Shanghai Ethypharm Pharmaceuticals Co., Ltd.</a>        <a href="#admin-2026004594">구미제약(주)</a>        <a href="#gmpinspect-1Px_jsc10ws">(주)에이치에스바이오</a>        <a href="#gmpinspect-1Px_jsc118o">동아제약(주)</a>        <a href="#gmpinspect-1PxzwRCkCdX">서울대학교병원</a>        <a href="#admin-2026004034">유니메드제약(주)</a>        <a href="#gmpinspect-1PxteXRZ-ht">Kowa Company, Ltd., Fuji Factory</a>        <a href="#gmpinspect-1PxtsjZTGIp">Cyndea Pharma S.L.</a>      </details>      <details class="toc-grp" data-slug="Recall">
@@ -276,6 +276,15 @@
 .toc-grp-chev{font-size:14px;color:var(--coral);flex:none;transition:var(--tr);transform:rotate(-90deg)}
 .toc-grp[open] .toc-grp-chev{transform:rotate(0deg)}
 @media(prefers-reduced-motion:reduce){.toc-grp-chev{transition:none}}
+/* [성장 2차] 요약 복사 버튼 — .tldr 우상단 절대배치(기존 흐름 무변형·grm.css 무접촉).
+   position:static→relative 는 단독으론 시각 무변형이라 안전하다. */
+.detail-head .tldr{position:relative}
+.tldr-copy{position:absolute;top:6px;right:0;display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;
+  border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);
+  padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.tldr-copy:hover,.tldr-copy.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.tldr-copy .ti{font-size:14px}
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
@@ -510,6 +519,27 @@ if(_nt&&_nm){
     });
   }).catch(function(){
     /* RPC 404(014 미배선)·network 실패 — 링크 없이 기존과 완전 동일(방어). */
+  });
+})();
+/* [성장 2차] 요약 복사 — tldr(li)+절대 URL 을 클립보드로. 실패는 prompt 폴백(S0 선례). */
+(function(){
+  var b=document.getElementById('tldrCopy'); if(!b) return;
+  var lis=document.querySelectorAll('.detail-head .tldr ul li'); if(!lis.length) return;
+  b.hidden=false;
+  b.addEventListener('click',function(){
+    var lines=['[GRM 주간 규제뉴스 · '+(b.getAttribute('data-title')||'')+']'];
+    for(var i=0;i<lis.length;i++) lines.push('· '+lis[i].textContent.trim());
+    lines.push('전체 보기: '+(b.getAttribute('data-url')||location.href));
+    var text=lines.join('\n');
+    function done(){
+      var t=b.querySelector('.tldr-copy-t'); if(!t) return;
+      var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+      t.textContent='복사됨'; b.classList.add('is-done');
+      setTimeout(function(){t.textContent=o;b.classList.remove('is-done');},1600);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){window.prompt('아래 내용을 복사하세요', text);});
+    } else { window.prompt('아래 내용을 복사하세요', text); }
   });
 })();
 </script>

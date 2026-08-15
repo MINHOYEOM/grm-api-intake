@@ -12,7 +12,13 @@
       <span>Evidence <b class="mono">A {{ brief.coverage.evidence.A }} · B {{ brief.coverage.evidence.B }} · C {{ brief.coverage.evidence.C }}</b></span>
     </div>
     {%- if brief.tldr %}
-    <div class="tldr"><div class="l">이번 주 핵심</div><ul>
+    {#- [성장 2차] 요약 복사 — 실무자의 실제 공유 형태는 사내 메신저/단톡방 텍스트
+        붙여넣기다(RUM 실측: 데스크톱 95%·Edge+Windows 사내 PC 프로파일). 이미 큐레이션된
+        tldr + 절대 URL 을 그대로 클립보드에 담는다. 텍스트는 DOM(li)에서 읽어 이중
+        원천을 만들지 않고, JS 미실행이면 hidden 유지(정적 열람 무영향 — S0 공유 버튼
+        선례). 버튼은 .tldr 기준 절대배치라 기존 레이아웃 흐름 무변형. §4 한글안전:
+        letter-spacing/text-transform/mono 미사용. -#}
+    <div class="tldr"><div class="l">이번 주 핵심</div><button class="tldr-copy" id="tldrCopy" type="button" data-title="{{ brief.title_dateform }}" data-url="{{ canonical }}" hidden><i class="ti ti-copy" aria-hidden="true"></i><span class="tldr-copy-t">요약 복사</span></button><ul>
       {%- for t in brief.tldr %}
       <li>{{ t }}</li>
       {%- endfor %}
@@ -88,6 +94,15 @@
 .toc-grp-chev{font-size:14px;color:var(--coral);flex:none;transition:var(--tr);transform:rotate(-90deg)}
 .toc-grp[open] .toc-grp-chev{transform:rotate(0deg)}
 @media(prefers-reduced-motion:reduce){.toc-grp-chev{transition:none}}
+/* [성장 2차] 요약 복사 버튼 — .tldr 우상단 절대배치(기존 흐름 무변형·grm.css 무접촉).
+   position:static→relative 는 단독으론 시각 무변형이라 안전하다. */
+.detail-head .tldr{position:relative}
+.tldr-copy{position:absolute;top:6px;right:0;display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;
+  border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);
+  padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
+.tldr-copy:hover,.tldr-copy.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
+.tldr-copy .ti{font-size:14px}
 </style>
 {% endblock %}
 {% block ai_disclosure %}
@@ -278,6 +293,27 @@
     });
   }).catch(function(){
     /* RPC 404(014 미배선)·network 실패 — 링크 없이 기존과 완전 동일(방어). */
+  });
+})();
+/* [성장 2차] 요약 복사 — tldr(li)+절대 URL 을 클립보드로. 실패는 prompt 폴백(S0 선례). */
+(function(){
+  var b=document.getElementById('tldrCopy'); if(!b) return;
+  var lis=document.querySelectorAll('.detail-head .tldr ul li'); if(!lis.length) return;
+  b.hidden=false;
+  b.addEventListener('click',function(){
+    var lines=['[GRM 주간 규제뉴스 · '+(b.getAttribute('data-title')||'')+']'];
+    for(var i=0;i<lis.length;i++) lines.push('· '+lis[i].textContent.trim());
+    lines.push('전체 보기: '+(b.getAttribute('data-url')||location.href));
+    var text=lines.join('\n');
+    function done(){
+      var t=b.querySelector('.tldr-copy-t'); if(!t) return;
+      var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+      t.textContent='복사됨'; b.classList.add('is-done');
+      setTimeout(function(){t.textContent=o;b.classList.remove('is-done');},1600);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){window.prompt('아래 내용을 복사하세요', text);});
+    } else { window.prompt('아래 내용을 복사하세요', text); }
   });
 })();
 </script>{% endblock %}

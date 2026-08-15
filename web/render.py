@@ -1288,13 +1288,28 @@ def glossary_term_description(term: dict[str, Any]) -> str:
 
     155 자를 넘으면 마지막 공백까지만 남기고 말줄임표를 붙인다. 공백이 없으면(붙여쓴 긴
     한 덩어리) 그냥 자른다 — 한글은 어절이 짧아 실제로는 거의 항상 공백이 있다.
+
+    [SERP 차별화] 뷰모델 입력(term 에 case_findings>0, glossary_cases.json 실측치)이면
+    사례 건수 문장을 뒤에 덧붙인다 — "X 뜻" 검색 결과에서 정의만 있는 사전류와 달리
+    실제 지적사례가 연결된 사전임이 스니펫에 드러나야 클릭을 딴다(GSC 실측: 평균 순위
+    9.4·CTR 2%). 정의부가 항상 앞이라 기존 접두 계약이 유지되고, 전체 길이는 접미사를
+    포함해 상한을 지킨다. 원본 glossary.json(raw)에는 case_findings 가 없으므로 raw
+    입력에서는 기존과 byte 동일하다. DefinedTerm JSON-LD 의 description 은 이 함수를
+    쓰지 않는다 — 구조화 데이터의 정의문은 순수 정의(easy_ko)로 남아야 한다.
     """
     text = " ".join((term.get("easy_ko") or "").split())
-    if len(text) <= _GLOSSARY_META_MAX:
-        return text
-    cut = text[:_GLOSSARY_META_MAX]
-    head, sep, _ = cut.rpartition(" ")
-    return (head if sep else cut).rstrip(" ,·") + "…"
+    try:
+        case_findings = int(term.get("case_findings") or 0)
+    except (TypeError, ValueError):
+        case_findings = 0
+    suffix = (f" 실제 지적사례 {case_findings:,}건과 공식 출처를 함께 정리했습니다."
+              if case_findings > 0 else "")
+    budget = _GLOSSARY_META_MAX - len(suffix)
+    if len(text) > budget:
+        cut = text[:budget]
+        head, sep, _ = cut.rpartition(" ")
+        text = (head if sep else cut).rstrip(" ,·") + "…"
+    return text + suffix
 
 
 # build_glossary_term_json_ld 는 SITE_BASE_URL 정의 이후(SEO 섹션)에 있다 — 기본 인자로
@@ -1755,6 +1770,65 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
     lines += [
         "",
         f"Sitemap: {base_url}/sitemap.xml",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def build_llms_txt(briefs: list[dict[str, Any]],
+                   base_url: str = SITE_BASE_URL,
+                   *,
+                   glossary_term_ids: "list[str] | None" = None,
+                   facet_paths: "list[tuple[str, str]] | None" = None) -> str:
+    """llms.txt(llmstxt.org 관례) — AI 어시스턴트·AI 검색용 사이트 안내.
+
+    RUM 실측(2026-08 30일)에서 AI 유입(chatgpt+gemini 합 30)이 이미 네이버(20)를
+    넘었다 — AI 가 서비스 구조를 이해하고 정확한 페이지를 인용할 수 있게 핵심 URL 과
+    데이터 규모를 한 파일로 안내한다. 숫자는 전부 렌더 입력(briefs·glossary_term_ids·
+    facet_paths)에서 파생한다 — 문장에 박은 숫자는 낡는다. facet_paths 는 문서 렌더
+    스위치와 무관하게 데이터에서 파생되므로(sitemap 과 같은 원천) 테스트 빌드와
+    프로덕션의 llms.txt 가 같다. 생성시각/난수 0(byte 고정).
+    """
+    pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
+                  reverse=True)
+    latest_pub = pubs[0] if pubs else ""
+    n_terms = len(glossary_term_ids or [])
+    n_docs = sum(1 for path, _ in (facet_paths or [])
+                 if path.startswith("findings/doc/"))
+    lines = [
+        "# GRM · Global Regulatory Monitor",
+        "",
+        "> 전 세계 제약 GMP·품질 규제 소식을 매주 한국어로 정리하는 무료 규제 정보 서비스.",
+        "> FDA·EMA·MHRA·Health Canada·WHO·PIC/S·식약처(MFDS) 등 1차 출처에서 매일 자동",
+        "> 수집한 실사 지적사항과 규제 문서를 한국어 번역·분류와 함께 공개한다.",
+        "",
+        "모든 페이지는 공식 1차 출처 문서에서 AI 로 자동 생성·번역된다. 인용하거나 판단에",
+        "쓸 때는 각 페이지가 링크한 공식 원문을 확인해야 하며, 답변에 인용할 때는 해당",
+        "페이지 URL 을 출처로 남겨 달라. 아래 URL 은 전부 로그인 없는 공개 페이지다.",
+        "",
+        "## 주간 브리프",
+    ]
+    if latest_pub:
+        lines.append(f"- [최신 브리프]({base_url}/briefs/{latest_pub}/): "
+                     "이번 주 글로벌·국내 규제 동향 (매주 월요일 발행)")
+    lines += [
+        f"- [모아보기]({base_url}/archive/): 지금까지 발행한 주간 브리프 {len(pubs)}건",
+        "",
+        "## 규제 지적사항 데이터",
+        f"- [지적사항 검색]({base_url}/findings/): FDA 483 · Warning Letter · EU/영국"
+        " GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색",
+        f"- [문서로 찾기]({base_url}/findings/docs/): 실사 문서 단위 한국어 정리"
+        f" {n_docs:,}건 — 기관·연도별 색인",
+        f"- [트렌드]({base_url}/findings/trends/): 지적 영역·기관·연도별 자동 집계",
+        f"- [자가점검 체크리스트]({base_url}/findings/checklist/): 빈발 지적 기반 자가"
+        " 점검 문항",
+        "",
+        "## 참조 자료",
+        f"- [규제 용어사전]({base_url}/glossary/): GMP·품질 용어 {n_terms}어 — 쉬운"
+        " 한국어 풀이·공식 출처·실제 지적사례 연결",
+        f"- [자료실]({base_url}/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인"
+        " 공식 원문 링크",
+        f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
+        f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
     ]
     return "\n".join(lines) + "\n"
 
@@ -2710,6 +2784,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
+    # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
+    _write(out_dir / "llms.txt",
+           build_llms_txt(briefs, glossary_term_ids=glossary_term_ids,
+                          facet_paths=facet_paths))
+    written.append("llms.txt")
     _write(out_dir / "sitemap.xml",
            build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
                              facet_paths=facet_paths))

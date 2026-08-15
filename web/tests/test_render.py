@@ -243,6 +243,7 @@ SINGLE_GOLDENS = [
     ("briefs/2026-06-26/index.html", "brief_2026-06-26.expected.html"),
     ("assets/search-index.json", "search-index.expected.json"),
     ("robots.txt", "robots.expected.txt"),
+    ("llms.txt", "llms.expected.txt"),
     ("sitemap.xml", "sitemap.expected.xml"),
     ("site.webmanifest", "site.expected.webmanifest"),
 ]
@@ -279,7 +280,8 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
 
     def test_landing_and_aggregates_built(self):
         for rel in ("index.html", "archive/index.html",
-                    "assets/search-index.json", "sitemap.xml", "robots.txt"):
+                    "assets/search-index.json", "sitemap.xml", "robots.txt",
+                    "llms.txt"):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
 
     def test_every_live_brief_has_a_page(self):
@@ -6940,7 +6942,11 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                              f'{render.SITE_BASE_URL}/glossary/{t["id"]}/')
 
     def test_description_derived_from_easy_ko(self):
-        """description 은 생성하지 않고 정본을 자른다 — 상한 준수 + 접두 일치."""
+        """description 은 생성하지 않고 정본을 자른다 — 상한 준수 + 접두 일치.
+
+        raw glossary.json 입력에는 case_findings 가 없어 사례 접미사 경로가 발화하지
+        않는다 — 이 테스트는 접미사 도입 전과 byte 동일한 기존 계약을 그대로 지킨다.
+        """
         for t in self.terms:
             desc = render.glossary_term_description(t)
             self.assertTrue(desc, f'description 비어 있음: {t["id"]}')
@@ -6948,6 +6954,37 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                                  f'description 상한 초과: {t["id"]}')
             self.assertTrue(" ".join(t["easy_ko"].split()).startswith(desc[:20]),
                             f'description 이 정본 접두가 아님: {t["id"]}')
+            self.assertNotIn("실제 지적사례", desc,
+                             f'raw 입력에 사례 접미사가 붙음: {t["id"]}')
+
+    def test_description_case_suffix_reaches_pages(self):
+        """[SERP 차별화] 사례 접미사 — 뷰모델 경로에서 발화하고 **실제 페이지까지** 실린다.
+
+        producer 만 검사하면 렌더 배선 누락이 침묵한다(#729 교훈: 그 경로를 지나는
+        픽스처가 없어 거짓 문장이 3주 살았다) — 커밋 실측치(glossary_cases.json)로
+        만든 뷰모델과, 그 뷰모델로 지은 페이지 HTML 을 함께 검사한다.
+        """
+        view = render.build_glossary_view(
+            self.terms, None, render.load_glossary_cases())
+        with_cases = [t for g in view["groups"] for t in g["terms"]
+                      if t["case_findings"] > 0]
+        self.assertGreater(len(with_cases), 0,
+                           "사례 연결 용어 0건 — glossary_cases.json 적재 확인")
+        for t in with_cases:
+            desc = render.glossary_term_description(t)
+            self.assertIn(f'실제 지적사례 {t["case_findings"]:,}건', desc,
+                          f'사례 접미사 누락: {t["id"]}')
+            self.assertLessEqual(len(desc), render._GLOSSARY_META_MAX + 1,
+                                 f'접미사 포함 상한 초과: {t["id"]}')
+            base = desc.split(" 실제 지적사례 ")[0]
+            probe = base[:20].rstrip("…")
+            self.assertTrue(" ".join(t["easy_ko"].split()).startswith(probe),
+                            f'접미사가 정의부 접두 계약을 깼다: {t["id"]}')
+        sample = with_cases[0]
+        self.assertIn(
+            f'실제 지적사례 {sample["case_findings"]:,}건',
+            self._page(sample["id"]),
+            f'렌더된 페이지에 접미사 미배선: {sample["id"]}')
 
     def test_related_links_point_to_term_pages(self):
         """관련 용어는 색인 앵커(#id)가 아니라 낱개 페이지로 가야 한다(내부 링크 = 색인 경로)."""
@@ -8096,6 +8133,46 @@ class WebGlossaryAliasGuardTest(unittest.TestCase):
             "동의어가 다른 용어의 표제어(term_ko/term_en) 또는 동의어와 (대소문자 무시) "
             "동일하다 — 검색이 두 용어 사이에서 뒤섞여 사용자가 틀린 답을 본다:\n  "
             + "\n  ".join(collisions))
+
+
+class WebLlmsTxtTest(unittest.TestCase):
+    """llms.txt — AI 어시스턴트·AI 검색용 안내 파일.
+
+    계약: ① 숫자는 렌더 입력에서 파생(문장에 박은 숫자는 낡는다 — sitemap 파생 원칙과
+    동일) ② 링크는 전부 절대 URL 공개 페이지(admin 부재) ③ 최신 브리프 링크는 sitemap
+    에도 있는 실제 발행본. byte 회귀는 SINGLE_GOLDENS 의 llms.expected.txt 가 지킨다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_llms_"))
+        out = cls._tmp / "single"
+        _build_single(out)
+        cls.txt = (out / "llms.txt").read_text(encoding="utf-8")
+        cls.sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_counts_derive_from_render_inputs(self):
+        terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        self.assertIn(f"용어 {len(terms)}어", self.txt,
+                      "용어 수가 glossary.json 정본과 어긋남")
+        n_docs = self.sitemap.count(f"<loc>{render.SITE_BASE_URL}/findings/doc/")
+        self.assertIn(f"{n_docs:,}건 — 기관·연도별", self.txt,
+                      "문서 수가 sitemap(같은 원천 facet_paths)과 어긋남")
+
+    def test_links_are_absolute_public_and_valid(self):
+        for path in ("/findings/", "/findings/docs/", "/findings/trends/",
+                     "/glossary/", "/library/", "/guide/", "/quiz/", "/archive/"):
+            self.assertIn(f"]({render.SITE_BASE_URL}{path})", self.txt,
+                          f"핵심 링크 누락: {path}")
+        self.assertNotIn("/admin/", self.txt)
+        m = re.search(r"\]\((\S+?/briefs/\d{4}-\d{2}-\d{2}/)\)", self.txt)
+        self.assertIsNotNone(m, "최신 브리프 링크 부재")
+        self.assertIn(f"<loc>{m.group(1)}</loc>", self.sitemap,
+                      "llms.txt 의 최신 브리프가 sitemap 에 없는 유령 URL")
 
 
 def freeze() -> None:

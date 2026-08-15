@@ -168,6 +168,24 @@
       <a class="btn lg" href="{{ rel_root }}library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
     </div>
     {% endif %}
+    {#- 관심 업체 워치리스트 진입 배너(성장 2차 2026-08-15) — 완성돼 라이브인 회원 간판
+        기능(015/016 + 주간 알림 잡)이 공개 표면 어디에도 소개되지 않아 사용자 1명이었다
+        (실측: 회원 4·랜딩 워치리스트 언급 0). 퀴즈·자료실 배너와 같은 .quiz-cta 재사용,
+        확정 섹션 순서·브리프행 CTA 2개 불가침 유지(이 CTA 는 /findings/ 행). 회원 기능
+        이라 reactions 게이트에 묶는다(/me 푸터 링크 선례 — env-off 빌드에 죽은 기능
+        홍보가 남지 않게·게이트 off 골든 byte-diff 0). 업체 프로파일은 key 없이 열면
+        막다른 화면이라(firm.html) CTA 는 검색 페이지로 보낸다. 수치 미기재(하드코딩
+        금지 원칙)·§4 한글안전: letter-spacing/text-transform/mono 미사용. -#}
+    {% if reactions_enabled %}
+    <div class="quiz-cta watch-cta">
+      <div class="quiz-cta-txt">
+        <span class="kick">Firm Watchlist</span>
+        <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>
+        <p>협력사·경쟁사·검토 중인 위탁제조소를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 바로 쓸 수 있어요 — 지적사항 검색에서 업체 이름을 찾아 프로파일에서 등록하세요.</p>
+      </div>
+      <a class="btn lg" href="{{ rel_root }}findings/index.html">업체 검색하러 가기 <i class="ti ti-arrow-right"></i></a>
+    </div>
+    {% endif %}
   </div></section>
 
   {#- This Week 콜아웃(#this-week) — 마감 CTA 로 뉴스레터 직전 배치(디자인 유지·하단 이동).

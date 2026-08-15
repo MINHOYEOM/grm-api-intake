@@ -587,6 +587,15 @@ class WebRenderStructureTest(unittest.TestCase):
         self.assertIn('class="tldr"', h)
         self.assertIn(' — <b>데이터 무결성 결함</b>', h)        # title_issue 분리 표기
 
+    def test_tldr_copy_button_wired(self):
+        """[성장 2차] 요약 복사 — tldr 있는 브리프에만 버튼이 실리고, 절대 URL(canonical)
+        을 데이터 속성으로 가진다(hidden 은 JS 미실행 폴백 — 정적 열람 무영향)."""
+        h = (self.multi / "briefs/2026-06-08/index.html").read_text(encoding="utf-8")
+        self.assertIn('id="tldrCopy"', h)
+        self.assertIn(f'data-url="{render.SITE_BASE_URL}/briefs/2026-06-08/"', h)
+        self.assertIn('hidden><i class="ti ti-copy"', h)
+        self.assertNotIn('id="tldrCopy"', self.detail)   # tldr 빈 브리프(06-22)엔 버튼도 없다
+
     def test_relative_paths_per_depth(self):
         landing = (self.single / "index.html").read_text(encoding="utf-8")
         archive = (self.single / "archive/index.html").read_text(encoding="utf-8")
@@ -9032,6 +9041,27 @@ class WebPopularCardsTest(unittest.TestCase):
         self.assertIsNotNone(m, "popular.js 캐시버스팅 해시 미발견(활성 렌더)")
         # 활성 렌더에서도 정적 빈 상태 마크업은 그대로(런타임 교체는 popular.js 소관).
         self.assertIn('id="grm-popular"', landing_on)
+
+    def test_watchlist_banner_env_gated(self):
+        """[성장 2차] 워치리스트 진입 배너 — 회원 기능이라 reactions 게이트 안(/me 푸터
+        링크 선례). env-off(기본 테스트 빌드·골든)엔 무흔적, env-on 렌더에서만 나타나며
+        CTA 는 검색 페이지로 간다(업체 프로파일은 key 없이 열면 막다른 화면)."""
+        self.assertNotIn("watch-cta", self.landing)
+        self.assertNotIn("관심 업체의 새 지적사항", self.landing)
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_watchcta_on_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertIn("watch-cta", landing_on)
+        self.assertIn("관심 업체의 새 지적사항, 메일로 받아보세요.", landing_on)
+        self.assertIn('findings/index.html">업체 검색하러 가기', landing_on)
 
     def test_popular_js_copied_to_dist(self):
         built = (self.single / "assets" / "popular.js").read_bytes()

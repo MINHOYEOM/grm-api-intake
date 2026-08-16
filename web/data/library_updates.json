@@ -2,6 +2,31 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-08-16",
+      "sources": {
+        "fda_guidance": {
+          "new_ids": [
+            "fda-30f431b3965e",
+            "fda-74934b4b2d80"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 88,
+          "truncated": false
+        },
+        "mfds": {
+          "new_ids": [
+            "data0010-15276",
+            "data0011-15910"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 93,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-08-10",
       "sources": {
         "mfds": {

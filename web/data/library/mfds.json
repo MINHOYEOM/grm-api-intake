@@ -758,6 +758,22 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-08-03",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15264"
+    },
+    {
+      "id": "data0011-15910",
+      "title_en": "의약품용 한약재 수입 업무 가이드라인",
+      "title_ko": "의약품용 한약재 수입 업무 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-08-14",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15910"
+    },
+    {
+      "id": "data0010-15276",
+      "title_en": "수입요건확인 면제대상 물품 중 의약품등의 추천요령 업무처리 지침",
+      "title_ko": "수입요건확인 면제대상 물품 중 의약품등의 추천요령 업무처리 지침",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-13",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15276"
     }
   ]
 }

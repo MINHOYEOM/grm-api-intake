@@ -644,6 +644,21 @@
       "doc_type": "Draft guidance",
       "published_date": "2026-07-31",
       "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/biosimilar-and-interchangeable-biosimilar-products-considerations-container-closure-systems-and"
+    },
+    {
+      "id": "fda-30f431b3965e",
+      "title_en": "Container Closure Systems for Human Drugs and Biological Products",
+      "doc_type": "Draft guidance",
+      "published_date": "2026-08-13",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-human-drugs-and-biological-products"
+    },
+    {
+      "id": "fda-74934b4b2d80",
+      "code": "Q3C(R8)",
+      "title_en": "Q3C(R8) Impurities: Guidance for Residual Solvents",
+      "doc_type": "Final guidance",
+      "published_date": "2021-12-10",
+      "official_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents"
     }
   ]
 }

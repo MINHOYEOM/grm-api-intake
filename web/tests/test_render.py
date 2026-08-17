@@ -6035,6 +6035,59 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
 
+    def test_engage_banner_is_gated_and_non_intrusive(self):
+        """[성장 4차] 하단 참여 배너 — 같은 env 게이트 · 전면 모달이 아닐 것.
+
+        구독 밴드는 base.html 구조상 읽기 종료 지점에 있어 끝까지 스크롤하지 않는 방문자
+        에게는 한 번도 보이지 않는다. 그 사각을 메우는 배너인데, **전면 팝업이 되면 구글의
+        침입형 인터스티셜 페널티**를 받아 지금 올리는 중인 순위와 정면 충돌한다. 그래서
+        형태(하단 고정·화면 일부)와 노출 조건(즉시 아님)을 계약으로 잠근다.
+        """
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            h_off = self._render_detail(_minimal_brief("2026-06-11"))
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            h_on = self._render_detail(_minimal_brief("2026-06-12"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        # 게이트 — off 면 흔적 0(전 페이지 골든 byte-diff 0 의 근거).
+        self.assertNotIn('id="grm-cta"', h_off)
+        self.assertNotIn("grm-cta-form", h_off)
+        self.assertIn('id="grm-cta"', h_on)
+
+        # 배너 블록 = 스코프 <style> 시작부터 그 뒤 첫 </script> 까지(스타일도 계약 대상).
+        banner = h_on[h_on.index(".grm-cta{"):]
+        banner = banner[:banner.index("</script>") + 9]
+        # 형태: 하단 고정 배너지 화면을 덮는 모달이 아니다.
+        self.assertIn("position:fixed", banner)
+        self.assertIn("bottom:0", banner)
+        for bad in ("position:fixed;top:0", "height:100vh", "width:100vw",
+                    "backdrop", "role=\"dialog\"", "aria-modal"):
+            self.assertNotIn(bad, banner, f"전면 모달 신호가 들어왔다: {bad}")
+        # 노출 조건: 즉시 뜨지 않는다(스크롤 깊이 또는 지연) + 닫기 두 종류가 있다.
+        self.assertIn("scroll", banner)
+        self.assertIn("0.55", banner)
+        self.assertIn('id="grm-cta-today"', banner)     # 오늘 하루 보지 않기
+        self.assertIn('id="grm-cta-close"', banner)     # 닫기
+        self.assertIn("864e5", banner)                  # 24시간
+        self.assertIn("grm-sub-ok", banner)             # 이미 구독한 사람에겐 안 뜬다
+        # 폼 계약은 구독 밴드와 동일(Brevo 필드·허니팟·PII 추가 0·URLSearchParams 인코딩).
+        self.assertIn('type="email" name="EMAIL"', banner)
+        self.assertIn('name="email_address_check"', banner)
+        self.assertIn('name="locale"', banner)
+        self.assertIn("URLSearchParams", banner)
+        for bad in ('type="password"', 'name="password"', 'name="name"'):
+            self.assertNotIn(bad, banner, f"배너가 추가 PII 를 받는다: {bad}")
+        # 추적 0 — 외부 호스트로 나가는 것은 구독 endpoint 하나뿐.
+        import re as _re
+        hosts = set(_re.findall(r"https?://([^/\"'\s]+)", banner))
+        self.assertLessEqual(hosts, {"newsletter.example.com"},
+                             f"배너에 외부 호스트가 늘었다: {hosts}")
+        # §4 한글 안전.
+        self.assertNotIn("letter-spacing", banner)
+        self.assertNotIn("text-transform", banner)
+
 
 class WebAdminRenderTest(unittest.TestCase):
     def setUp(self):

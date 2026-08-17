@@ -112,6 +112,8 @@
     var fd=new FormData(f),body=new URLSearchParams();
     fd.forEach(function(v,k){body.append(k,v);});
     fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
+    // 하단 참여 배너가 이 표시를 보고 다시 뜨지 않는다(구독한 사람에게 또 권하지 않는다).
+    try{localStorage.setItem('grm-sub-ok','1');}catch(_){}
     var dest=document.getElementById('grm-sub-dest');
     if(dest)dest.textContent=email.value;
     var intro=document.getElementById('grm-sub-intro');
@@ -326,6 +328,130 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-pet-sync-s{font-family:var(--sans);font-size:12px;color:var(--muted);margin:0}
 </style>
 <script src="/assets/growth-sync.js?v={{ growthsyncjs_ver }}" defer></script>
+{% endif %}
+{# ── 하단 참여 배너(성장 4차) ─────────────────────────────────────────────────
+   구독 밴드는 base.html 구조상 **읽기 종료 지점**에 있어서, 끝까지 스크롤하지 않는 방문자
+   에게는 구독 경로가 한 번도 보이지 않는다. 그 사각을 메우는 배너다.
+
+   ★전면 모달이 아니라 **하단 배너**인 이유: 구글은 모바일에서 콘텐츠를 덮는 팝업
+   (intrusive interstitial)에 순위 페널티를 준다. 지금 우리는 순위를 올리려고 고치는
+   중이라 정면 충돌한다. 화면 일부만 쓰는 배너는 구글이 명시적으로 허용하는 형태다.
+
+   짜증을 줄이는 규칙 — 전부 클라이언트, 서버·추적 0:
+     · 첫 화면에 바로 뜨지 않는다. **스크롤 55% 또는 45초** 이후에만(읽을 의사 확인).
+     · `오늘 하루 보지 않기` = 24시간, `닫기`(×) = 이번 세션. localStorage/sessionStorage.
+     · 구독을 마친 방문자에겐 다시 뜨지 않는다(구독 밴드와 같은 키를 본다).
+     · 구독 밴드가 이미 화면에 보이는 동안에는 숨는다(같은 요청을 두 번 하지 않는다).
+   env-off(테스트·기본 빌드)면 블록 전체가 생략돼 골든 byte-diff 0 — 게이트가 그 증명이다.
+   §4 한글안전: letter-spacing/text-transform/mono 미사용. 결정론: now()/난수 0. #}
+{% if newsletter_form_action %}
+<style>
+.grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
+.grm-cta.on{transform:translateY(0)}
+.grm-cta-in{max-width:1180px;margin:0 auto;padding:13px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.grm-cta-txt{flex:1 1 300px;min-width:0}
+.grm-cta-txt b{display:block;font-family:var(--sans);font-size:15px;font-weight:600;word-break:keep-all}
+.grm-cta-txt span{display:block;font-family:var(--sans);font-size:13px;opacity:.72;margin-top:3px;word-break:keep-all}
+.grm-cta-form{display:flex;gap:8px;flex:0 1 auto}
+.grm-cta-form input{font-family:var(--sans);font-size:14px;padding:9px 13px;border:1px solid rgba(255,255,255,.28);border-radius:var(--rad-s,8px);background:rgba(255,255,255,.08);color:#fff;min-width:200px}
+.grm-cta-form input::placeholder{color:rgba(255,255,255,.5)}
+.grm-cta-form button{font-family:var(--sans);font-size:14px;font-weight:600;padding:9px 20px;border:0;border-radius:var(--rad-s,8px);background:var(--coral,#B9542F);color:#fff;cursor:pointer;white-space:nowrap}
+.grm-cta-form button:hover{background:var(--coral-2,#9E4526)}
+.grm-cta-side{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+.grm-cta-side a,.grm-cta-side button{font-family:var(--sans);font-size:12.5px;color:rgba(255,255,255,.66);background:none;border:0;padding:0;cursor:pointer;text-decoration:none;white-space:nowrap}
+.grm-cta-side a:hover,.grm-cta-side button:hover{color:#fff}
+.grm-cta-x{font-size:20px!important;line-height:1;padding:0 2px!important}
+.grm-cta-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+@media(max-width:720px){
+  .grm-cta-in{padding:12px 16px;gap:10px}
+  .grm-cta-form{flex:1 1 100%}
+  .grm-cta-form input{min-width:0;flex:1}
+  .grm-cta-txt span{display:none}
+}
+</style>
+<aside class="grm-cta" id="grm-cta" role="complementary" aria-label="뉴스레터 구독 안내" hidden>
+  <div class="grm-cta-in">
+    <div class="grm-cta-txt">
+      <b>매주 새로운 규제소식을 메일로 받아보세요</b>
+      <span>FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료</span>
+    </div>
+    <form class="grm-cta-form" id="grm-cta-form" action="{{ newsletter_form_action }}" method="post">
+      <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="이메일 주소" placeholder="you@company.com" />
+      <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input type="hidden" name="locale" value="en" />
+      <button type="submit">구독</button>
+    </form>
+    <div class="grm-cta-side">
+      {% if reactions_enabled %}<a href="{{ rel_root }}index.html#watchlist">관심 업체 알림</a>{% endif %}
+      <button type="button" id="grm-cta-today">오늘 하루 보지 않기</button>
+      <button type="button" id="grm-cta-close" class="grm-cta-x" aria-label="닫기">&times;</button>
+    </div>
+  </div>
+</aside>
+<script>
+(function(){
+  var el=document.getElementById('grm-cta');
+  if(!el||!window.localStorage)return;
+  var KEY='grm-cta-until', DONE='grm-sub-ok', SESS='grm-cta-off';
+  function hidden(){
+    try{
+      if(localStorage.getItem(DONE))return true;                 // 이미 구독한 방문자
+      if(sessionStorage.getItem(SESS))return true;               // 이번 세션 닫음
+      var u=+(localStorage.getItem(KEY)||0);
+      return u>Date.now();                                       // 오늘 하루 보지 않기
+    }catch(e){return true;}
+  }
+  if(hidden())return;
+  el.hidden=false;
+  var shown=false, band=document.querySelector('.subscribe');
+  function bandVisible(){
+    if(!band)return false;
+    var r=band.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;                  // 구독 밴드가 화면에 있으면 겹치지 않는다
+  }
+  function tick(){
+    if(hidden()){el.classList.remove('on');return;}
+    if(bandVisible()){el.classList.remove('on');return;}
+    if(!shown)return;
+    el.classList.add('on');
+  }
+  function arm(){ shown=true; tick(); }
+  // 읽을 의사가 확인된 뒤에만 — 스크롤 55% 또는 45초.
+  var timer=setTimeout(arm,45000);
+  addEventListener('scroll',function(){
+    var h=document.documentElement;
+    var depth=(h.scrollTop+innerHeight)/Math.max(h.scrollHeight,1);
+    if(depth>=0.55){clearTimeout(timer);arm();}
+    else tick();
+  },{passive:true});
+  function dismiss(persist){
+    el.classList.remove('on');
+    try{ persist ? localStorage.setItem(KEY, String(Date.now()+864e5))
+                 : sessionStorage.setItem(SESS,'1'); }catch(e){}
+    setTimeout(function(){el.hidden=true;},300);
+  }
+  document.getElementById('grm-cta-today').addEventListener('click',function(){dismiss(true);});
+  document.getElementById('grm-cta-close').addEventListener('click',function(){dismiss(false);});
+  // 제출은 구독 밴드와 같은 방식(백그라운드 POST → 페이지 이동 없음). fetch 없으면 네이티브 POST 로 폴백.
+  var f=document.getElementById('grm-cta-form');
+  if(f&&window.fetch){
+    f.addEventListener('submit',function(e){
+      if(!f.checkValidity())return;
+      e.preventDefault();
+      // 인코딩은 구독 밴드와 동일해야 한다 — Brevo 로 실제 전송이 검증된 형태가 그쪽이다
+      // (FormData 는 multipart 로 나가 밴드와 다른 경로가 된다).
+      var fd=new FormData(f),body=new URLSearchParams();
+      fd.forEach(function(v,k){body.append(k,v);});
+      fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
+      try{ localStorage.setItem(DONE,'1'); }catch(_){}
+      var t=el.querySelector('.grm-cta-txt');
+      if(t){t.innerHTML='<b>확인 메일을 보냈습니다</b><span>메일에서 구독 확인 버튼을 눌러 주세요.</span>';}
+      f.hidden=true;
+      setTimeout(function(){dismiss(true);},4000);
+    });
+  }
+})();
+</script>
 {% endif %}
 </body>
 </html>

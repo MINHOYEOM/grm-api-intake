@@ -6904,6 +6904,13 @@ class WebGlossaryRenderTest(unittest.TestCase):
                          (out2 / "glossary" / "index.html").read_bytes(), "비결정론 렌더")
 
 
+# [SERP 절단 예산] 구글 제목 절단은 픽셀 폭 기준이라 글자수로는 근사만 가능하다. 45 자를
+# 경계로 두고, 약어가 없어 접을 수 없는 용어(`분석절차 밸리데이션(Analytical Procedure
+# Validation)` 등)만 예산 안에서 허용한다. 실측 18 건에 여유 2 — 새 장문 제목이 늘면 발화한다.
+_GLOSSARY_TITLE_MAX = 45
+_GLOSSARY_TITLE_OVER_BUDGET = 20
+
+
 class WebGlossaryTermPageTest(unittest.TestCase):
     """[용어사전 낱개 — 검색 유입 트랙] /glossary/{id}/ 용어당 1 페이지.
 
@@ -7009,6 +7016,56 @@ class WebGlossaryTermPageTest(unittest.TestCase):
             f'실제 지적사례 {sample["case_findings"]:,}건',
             self._page(sample["id"]),
             f'렌더된 페이지에 접미사 미배선: {sample["id"]}')
+
+    def test_title_keeps_query_token_inside_serp_cut(self):
+        """[SERP 절단] 제목은 검색어 토큰이 잘려나가지 않을 길이여야 한다.
+
+        초기 형식(`{한글}({영문 정식명}) 뜻 · GRM 규제 용어사전`)은 영문 정식명 안 약어가
+        괄호로 들어간 용어에서 이중 괄호 + 장문이 돼(최대 94 자) 사용자가 실제로 친
+        토큰("CAPA"·"뜻")이 구글 절단선 뒤로 밀렸다. 이 테스트는 그 형태로 되돌아가는 것을
+        막는다 — 손목록이 아니라 **정본 전수**로 검사한다.
+        """
+        over, nested = [], []
+        for t in self.terms:
+            title = render.glossary_term_page_title(t)
+            self.assertTrue(title.endswith(" 뜻 · GRM 용어사전"),
+                            f'제목 꼬리 계약 위반: {t["id"]} → {title}')
+            self.assertTrue(title.startswith(t["term_ko"]),
+                            f'제목이 한글 표제어로 시작하지 않음: {t["id"]} → {title}')
+            if len(title) > _GLOSSARY_TITLE_MAX:
+                over.append((len(title), t["id"], title))
+            if title.count("(") > 1:
+                nested.append((t["id"], title))
+        self.assertEqual(nested, [], f"제목 이중 괄호: {nested}")
+        self.assertLessEqual(
+            len(over), _GLOSSARY_TITLE_OVER_BUDGET,
+            f"절단 위험 제목 {len(over)}건(허용 {_GLOSSARY_TITLE_OVER_BUDGET}): {over[:5]}")
+
+    def test_title_short_en_prefers_acronym(self):
+        """약어가 있으면 약어를, 일반어 괄호는 배제 — 판정 규칙 자체를 고정한다."""
+        cases = [
+            ("시정 및 예방조치", "Corrective and Preventive Action (CAPA)", "CAPA"),
+            ("규격이탈 결과", "Out-of-Specification (OOS) Result", "OOS"),
+            ("무균공정 모의시험·배지충전", "Aseptic Process Simulation (APS, Media Fill)", "APS"),
+            ("제조단위·배치·로트", "Batch (or Lot)", "Batch"),          # 일반어 괄호 → 제거
+            ("총입자·비생균 입자 모니터링", "Total Particle (Non-viable) Monitoring",
+             "Total Particle Monitoring"),                              # 괄호구만 제거
+            ("품질부서", "Quality Unit(s)", "Quality Unit"),
+            ("원료의약품", "Active Pharmaceutical Ingredient (API) / Drug Substance", "API"),
+            ("가독성", "Legible", "Legible"),                            # 괄호 없음 → 원문
+            ("품질관리부서(QCU)", "Quality Control Unit (QCU)", ""),     # 한글에 이미 괄호
+            ("공조(공기처리)", "Air Handling", ""),
+        ]
+        for term_ko, term_en, expected in cases:
+            self.assertEqual(render.glossary_title_en(term_ko, term_en), expected,
+                             f"짧은 영문 판정 어긋남: {term_ko} / {term_en}")
+
+    def test_title_reaches_rendered_page(self):
+        """producer 만 맞고 렌더 배선이 빠지는 사고를 막는다(#729 교훈)."""
+        from markupsafe import escape as _esc
+        for t in self.terms[:8]:
+            self.assertIn(f'<title>{_esc(render.glossary_term_page_title(t))}</title>',
+                          self._page(t["id"]), f'제목 미배선: {t["id"]}')
 
     def test_related_links_point_to_term_pages(self):
         """관련 용어는 색인 앵커(#id)가 아니라 낱개 페이지로 가야 한다(내부 링크 = 색인 경로)."""

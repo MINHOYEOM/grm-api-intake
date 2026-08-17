@@ -1312,6 +1312,46 @@ def glossary_term_description(term: dict[str, Any]) -> str:
     return text + suffix
 
 
+# [SERP 절단] 구글은 제목을 픽셀 폭으로 자른다. 초기 제목은 영문 정식명을 통째로 넣어
+# `{한글}({영문 정식명}) 뜻 · GRM 규제 용어사전` 이었는데, 영문 정식명 안에 약어가 괄호로
+# 들어 있는 용어가 226 중 51 개라 제목이 **이중 괄호 + 장문**이 됐다(최대 94 자·45 자 초과
+# 69 개). 그 결과 사용자가 실제로 친 검색어 토큰이 절단선 뒤로 밀린다 — 예:
+#   "capa 뜻" → 시정 및 예방조치(Corrective and Preventive Action (CAPA)) 뜻 · GRM 규제…
+#                                                          ^^^^ 여기가 잘려 CAPA 가 안 보인다
+# 그래서 제목에는 **검색어가 되는 짧은 형태**(약어가 있으면 약어)만 남긴다. 영문 정식명은
+# h1·본문·JSON-LD 에 그대로 있으므로 정보 손실이 아니라 제목에서만 접는 것이다.
+_GLOSSARY_ACRONYM = re.compile(r"^[A-Z][A-Za-z0-9./-]{1,9}$")
+
+
+def glossary_title_en(term_ko: str, term_en: str) -> str:
+    """제목 괄호에 넣을 짧은 영문 — 없으면 빈 문자열(괄호 자체를 생략).
+
+    ① 한글 용어에 이미 괄호가 있으면(`품질관리부서(QCU)`·`공조(공기처리)`) 아무것도 붙이지
+       않는다 — 붙이면 `A(B)(C)` 꼴 이중 괄호가 된다.
+    ② 영문 안 괄호가 약어면(`… (CAPA)`·`… (APS, Media Fill)`) 그 약어를 쓴다. 약어 판정은
+       대문자로 시작하고 **첫 글자 뒤에도 대문자가 있는** 짧은 토큰 — `(or Lot)`·
+       `(Non-viable)` 같은 일반어 괄호를 배제한다.
+    ③ 그 외에는 괄호구를 제거한 본문을 쓴다(`Total Particle (Non-viable) Monitoring`
+       → `Total Particle Monitoring`). 뒤에 `/` 이형이 붙으면 첫 이름만 남긴다.
+    """
+    if "(" in term_ko:
+        return ""
+    for inner in re.findall(r"\(([^()]*)\)", term_en):
+        head = inner.split(",")[0].strip()
+        if _GLOSSARY_ACRONYM.match(head) and any(c.isupper() for c in head[1:]):
+            return head
+    base = re.sub(r"\s*\([^()]*\)", "", term_en).split("/")[0].strip()
+    return base or term_en.strip()
+
+
+def glossary_term_page_title(term: dict[str, Any]) -> str:
+    """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
+    term_ko = term.get("term_ko") or ""
+    short_en = glossary_title_en(term_ko, term.get("term_en") or "")
+    head = f"{term_ko}({short_en})" if short_en else term_ko
+    return f"{head} 뜻 · GRM 용어사전"
+
+
 # build_glossary_term_json_ld 는 SITE_BASE_URL 정의 이후(SEO 섹션)에 있다 — 기본 인자로
 # 모듈 상수를 쓰기 때문에 정의 순서가 강제된다.
 
@@ -2474,12 +2514,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
         # 재사용한다(별도 가공 0 → 두 화면이 갈라질 수 없다). 정렬은 뷰모델 순서 그대로라
         # 결정론이고, sitemap 도 이 순서를 쓴다.
-        #   · title 은 "{한글}({영문}) 뜻" — 실제 검색어 형태("OOS 뜻")에 맞춘다.
+        #   · title 은 `glossary_term_page_title` — 실제 검색어 형태("OOS 뜻")에 맞추고
+        #     SERP 절단선 안에 들어가도록 영문은 약어로 접는다.
         #   · rel_root 는 두 단계 위(`/glossary/{id}/` → 사이트 루트).
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 term_html = env.get_template("glossary_term.html").render(
-                    page_title=f"{term['term_ko']}({term['term_en']}) 뜻 · GRM 규제 용어사전",
+                    page_title=glossary_term_page_title(term),
                     rel_root="../../",
                     nav_active="glossary",
                     latest_slug=latest_slug,

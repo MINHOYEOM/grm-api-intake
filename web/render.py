@@ -1344,6 +1344,140 @@ def glossary_title_en(term_ko: str, term_en: str) -> str:
     return base or term_en.strip()
 
 
+# ── [용어사전 낱개 — 순위] 실제 지적사항 인용 ────────────────────────────────────
+# 용어 페이지 본문이 390~530 자뿐이라 "정의 한 줄짜리 사전"과 구별되지 않는다(GSC 실측
+# 2026-08-17: 용어 쿼리 평균순위 9~11). 우리에게만 있는 자산 — 실제 규제 지적 문장 —
+# 은 정작 "N 건 보기" 링크의 **숫자로만** 실려 있었다. 그 문장을 본문에 싣는다.
+#
+# 정직성 규율(이게 이 기능의 전부다):
+#   · 표시 문구는 "이 용어가 등장한 실제 지적사항" — **이 용어에 관한** 지적이라고 하지
+#     않는다. 인용문 안에 토큰이 그대로 보이므로 독자가 즉시 검증할 수 있는 주장만 한다.
+#   · 업체명은 싣지 않는다. 용어 페이지는 용어를 설명하는 곳이고, 업체는 링크로 잇는
+#     문서 페이지의 주제다 — 실명 기록 표면을 127 장 더 만들지 않는다.
+#   · 원천은 커밋된 `findings_docs.json` 이다. 렌더러는 네트워크를 타지 않는다.
+#
+# 후보를 그냥 상위 N 개 뽑으면 안 되는 이유(실측으로 셋 다 발생했다):
+#   ① 문서 단위 검색 상위가 최신순이라 **OOS·CAPA·시정조치·가독성·GMP 다섯 용어에서
+#      같은 문서가 1 위**였다 → 123 장에 같은 본문이 깔린다.
+#   ② `21 CFR 211.22` 류 규제 상용구가 문서마다 반복돼 **한 용어에 똑같은 문장 3 개**가
+#      뽑혔다 → 여러 문서에 반복되는 문장형을 보일러플레이트로 보고 배제한다.
+#   ③ `제조, 가공, 포장 또는 보관` 열거에 걸린 설비 조항이 `포장` 사례로 뽑혔다 →
+#      토큰이 **열거 안에만** 있으면 우연한 언급이라 배제한다.
+_GLOSSARY_CASE_MIN = 2          # 2 건도 못 채우면 섹션 자체를 내지 않는다(빈약한 것보다 없는 게 낫다)
+_GLOSSARY_CASE_MAX = 3
+_GLOSSARY_QUOTE_MIN = 60
+_GLOSSARY_QUOTE_MAX = 300
+_GLOSSARY_BOILER_DOCS = 4       # 문장형이 이 수 이상의 문서에 반복되면 규제 상용구
+_GLOSSARY_SENT_SPLIT = re.compile(r"(?<=다\.)\s*|(?<=[.!?])\s+")
+_GLOSSARY_SHAPE_STRIP = re.compile(r"[\d(){}\[\]§·,．、\s]+")
+_GLOSSARY_ENUM_L = re.compile(r"(?:[,·]|또는|및)\s*$")
+_GLOSSARY_ENUM_R = re.compile(r"^\s*(?:[,·]|또는|및)")
+
+
+def _glossary_sentences(text: str) -> list[str]:
+    return [s.strip() for s in _GLOSSARY_SENT_SPLIT.split(text or "") if s.strip()]
+
+
+def _glossary_shape(sentence: str) -> str:
+    """상용구 판정 키 — 숫자·괄호·조문기호·공백을 지운 앞부분(번역 차이는 남는다)."""
+    return _GLOSSARY_SHAPE_STRIP.sub("", sentence)[:80]
+
+
+def _glossary_incidental(sentence: str, token: str) -> bool:
+    """토큰이 열거(`제조, 가공, 포장 또는 보관`) 안에만 있으면 우연한 언급이다."""
+    for m in re.finditer(re.escape(token), sentence):
+        left = sentence[max(0, m.start() - 8):m.start()]
+        right = sentence[m.end():m.end() + 8]
+        if not (_GLOSSARY_ENUM_L.search(left) and _GLOSSARY_ENUM_R.match(right)):
+            return False
+    return True
+
+
+def glossary_case_probes(term: dict[str, Any], case_q: str = "") -> list[str]:
+    """인용문에서 **눈으로 확인 가능한** 토큰만 — 사람이 검수한 q, 한글 표제어 분절, 약어."""
+    out: list[str] = []
+    for cand in [case_q, *(term.get("term_ko") or "").split("·")]:
+        cand = (cand or "").strip()
+        if len(cand) >= 2 and cand not in out:
+            out.append(cand)
+    m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", term.get("term_en") or "")
+    if m and m.group(1) not in out:
+        out.append(m.group(1))
+    return out
+
+
+def build_glossary_case_excerpts(
+    terms: list[dict[str, Any]],
+    docs_payload: "dict[str, Any] | None",
+    cases: "dict[str, dict[str, Any]] | None" = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """{term_id: [인용 …]} — 결정론(입력 순서 고정·now()/난수 0·네트워크 0).
+
+    희소한 용어부터 배정한다. 흔한 용어가 먼저 집어가면 사례가 몇 건뿐인 용어가 빈손이
+    되는데, 반대로 하면 양쪽 다 채워진다(finding 은 용어 간 중복 배정하지 않는다 —
+    같은 문장이 여러 페이지에 실리면 중복 본문이다).
+    """
+    documents = (docs_payload or {}).get("documents") or []
+    if not documents:
+        return {}
+
+    # 문장 분할은 **한 번만** 한다. 용어마다 다시 쪼개면 21,347 건 × 226 어라 렌더·테스트가
+    # 폭발한다(대량 페이지가 테스트 시간을 터뜨린 전례가 있다).
+    shape_docs: dict[str, set[str]] = {}
+    index: list[tuple[dict[str, Any], str, list[str]]] = []   # (doc, finding_id, 문장들)
+    for doc in documents:
+        for finding in doc.get("findings") or []:
+            sents = [s for s in _glossary_sentences(finding.get("text_ko") or "")
+                     if _GLOSSARY_QUOTE_MIN <= len(s) <= _GLOSSARY_QUOTE_MAX]
+            if not sents:
+                continue
+            for sent in sents:
+                shape_docs.setdefault(_glossary_shape(sent), set()).add(doc["document_id"])
+            index.append((doc, finding.get("finding_id") or "", sents))
+    boiler = {k for k, v in shape_docs.items() if len(v) >= _GLOSSARY_BOILER_DOCS}
+    index = [(doc, fid, [s for s in sents if _glossary_shape(s) not in boiler])
+             for doc, fid, sents in index]
+
+    def _candidates(term: dict[str, Any]) -> list[dict[str, Any]]:
+        probes = glossary_case_probes(term, ((cases or {}).get(term["id"]) or {}).get("q", ""))
+        found: list[dict[str, Any]] = []
+        seen_docs: set[str] = set()
+        for doc, fid, sents in index:              # 문서당 최대 1 건 — 한 문서로 도배 금지
+            if doc["document_id"] in seen_docs:
+                continue
+            for sent in sents:
+                tok = next((p for p in probes
+                            if p in sent and not _glossary_incidental(sent, p)), None)
+                if tok:
+                    found.append({"quote": sent, "token": tok,
+                                  "agency": doc.get("agency") or "",
+                                  "source": doc.get("source") or "",
+                                  "published_date": doc.get("published_date") or "",
+                                  "doc_href": f"findings/doc/{doc['slug']}/",
+                                  "finding_id": fid})
+                    seen_docs.add(doc["document_id"])
+                    break
+        return found
+
+    pool = {t["id"]: _candidates(t) for t in terms}
+    used: set[str] = set()
+    used_quotes: set[str] = set()      # finding 이 달라도 문장이 같을 수 있다(실측) — 문장으로도 막는다
+    out: dict[str, list[dict[str, Any]]] = {}
+    for tid in sorted(pool, key=lambda k: (len(pool[k]), k)):
+        picked: list[dict[str, Any]] = []
+        for cand in pool[tid]:
+            if cand["finding_id"] in used or cand["quote"] in used_quotes:
+                continue
+            used.add(cand["finding_id"])
+            used_quotes.add(cand["quote"])
+            picked.append(cand)
+            if len(picked) == _GLOSSARY_CASE_MAX:
+                break
+        if len(picked) >= _GLOSSARY_CASE_MIN:
+            out[tid] = picked
+    return out
+
+
 def glossary_term_page_title(term: dict[str, Any]) -> str:
     """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
     term_ko = term.get("term_ko") or ""
@@ -2517,6 +2651,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         #   · title 은 `glossary_term_page_title` — 실제 검색어 형태("OOS 뜻")에 맞추고
         #     SERP 절단선 안에 들어가도록 영문은 약어로 접는다.
         #   · rel_root 는 두 단계 위(`/glossary/{id}/` → 사이트 루트).
+        #   · case_excerpts 는 커밋된 문서 정본에서 파생한 실제 지적 문장(순위 트랙).
+        case_excerpts = build_glossary_case_excerpts(
+            glossary_terms, docs_data, load_glossary_cases())
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 term_html = env.get_template("glossary_term.html").render(
@@ -2528,6 +2665,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     canonical=_abs_url(f"glossary/{term['id']}/"),
                     json_ld=build_glossary_term_json_ld(term),
                     term=term,
+                    case_excerpts=case_excerpts.get(term["id"]) or [],
                 )
                 _write(out_dir / "glossary" / term["id"] / "index.html", term_html)
                 written.append(f"glossary/{term['id']}/index.html")

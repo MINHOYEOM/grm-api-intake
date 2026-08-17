@@ -183,5 +183,180 @@
    "nature_ko": "해당 제조소에 대한 실사가 2026년 5월 5일부터 8일까지 수행되었다. GMP 관련 중대(critical) 결함 2건과 주요(major) 결함 3건이 지적되었다. 중대결함은 GMP 와 QRM 을 포함해 종합적으로 설계되고 올바르게 구현된 PQS 를 갖추지 못한 점에 관한 것으로, 견고하고 신뢰할 수 있는 배치 관리 절차가 마련되어 있지 않았다는 점과 Qualified Person 이 각 배치가 GMP 요건에 따라 제조·점검되었음을 보증하지 못했다는 점으로 확인되었다.",
    "operations_ko": "[ 1.1 ] 무균 제품; [ 1.1.3 ] 배치 인증; [ 1.2 ] 비무균 제품; [ 1.2.1 ] 비무균 제품(아래 제형에 대한 공정 작업); [ 1.2.1.1 ] 경질 캡슐; [ 1.2.1.5 ] 외용 액제; [ 1.2.1.6 ] 내용 액제; [ 1.2.1.8 ] 그 밖의 고형 제형 별도로 명시되지 않은 모든 고형 제형; [ 1.2.1.12 ] 좌제; [ 1.5 ] 포장; [ 1.5.1 ] 1차 포장; [ 1.5.1.1 ] 경질 캡슐; [ 1.5.1.2 ] 연질 캡슐; [ 1.5.1.5 ] 외용 액제; [ 1.5.1.6 ] 내용 액제; [ 1.5.1.8 ] 그 밖의 고형 제형 별도로 명시되지 않은 모든 고형 제형; [ 1.5.1.11 ] 반고형제; [ 1.5.1.13 ] 정제; [ 1.5.1.17 ] 그 밖의 비무균 의약품 페사리, 산제; [ 1.5.2 ] 2차 포장; [ 1.6 ] 품질관리 시험; [ 1.6.3 ] 화학적/물리적; 2. 의약품 수입; [ 2.1 ] 수입 의약품의 품질관리 시험; [ 2.1.3 ] 화학적/물리적; [ 2.2 ] 수입 의약품의 배치 인증; [ 2.2.1 ] 무균 제품; [ 2.2.1.1 ] 무균 조작법으로 제조된 제품; [ 2.2.1.2 ] 최종 멸균 제품; [ 2.2.2 ] 비무균 제품; [ 2.2.4 ] 그 밖의 수입 활동; [ 2.2.4.6 ] 그 밖의 승인 목록 국가로부터의 QP 인증 IMP 수입"
   }
+ },
+ "fda483-193549": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "불만(complaint) 처리 절차가 미흡하게 작성·준수되었다. 품질부서는 해당 의약품 불만 건수를 줄이고 해소하기 위한 근본원인을 규명하지 못했고 시정조치를 실행하지 못했으며, 2024년 이후 미국 유통 배치와 관련해 접수된 약 845건의 불만 중 약 50%가 오작동(malfunction) 유형으로 확인되었음에도 이에 대한 실효적 조치가 이루어지지 않았다.",
+     "citation": "21 CFR 211.198",
+     "risk": "반복 불만이 근본원인 제거 없이 누적되어 동일 결함 제품이 계속 미국 시장에 유통되고, 사용자 오작동으로 인한 투약 실패·환자 위해가 지속될 수 있다."
+    },
+    {
+     "observation": "무균 표방 제품의 미생물 오염 방지 절차에 무균공정의 적절한 밸리데이션이 포함되지 않았다. 전 제품 생산에 사용되는 무균 충전 라인의 기류 가시화 연구(VALQ - 8900 - L3-2b) 영상에서, 미개봉 스토퍼 백 투입 개입 시 충전 유닛에서 스토퍼 적재 스테이션으로 흐르는 기류가 백 위에 정체 공간(void)을 만들어 1차 기류가 백에 도달하지 못하는 것으로 나타났고, 스토퍼 백은 개봉 전 추가 소독도 하지 않는다.",
+     "citation": "21 CFR 211.113(b)",
+     "risk": "제품과 직접 접촉하는 스토퍼가 보호되지 않은 기류 환경에서 노출·개봉되어 무균성이 훼손될 수 있으며, 무균 보증 실패는 주사제 오염으로 직결되는 환자안전 리스크다."
+    },
+    {
+     "observation": "실험실 관리에 과학적으로 타당한 시험 절차 수립이 결여되었다. 이물 100% 육안검사 수행 직원의 재적격성 평가가 실제 검사 물량 수준을 반영하지 못한 채 제한적으로만 수행되고, 원문에 기재된 특정 검사 조건 이후에는 최초 적격성 평가도 재적격성 평가도 실시되지 않아 검사자가 해당 작업을 적절히 수행할 수 있음을 입증하지 못했다.",
+     "citation": "21 CFR 211.160(b)",
+     "risk": "검사자 능력이 검증되지 않은 상태의 육안검사는 이물 함유 바이알을 걸러내지 못해, 결함 제품이 합격 판정으로 출하될 수 있다."
+    },
+    {
+     "observation": "품질부서에 적용되는 책임과 절차가 완전히 준수되지 않았다. 품질부서는 SOP-0509(환경모니터링 데이터의 경향분석)가 요구하는 환경모니터링 경향 보고서가 작성되도록 보증하지 못했다.",
+     "citation": "21 CFR 211.22",
+     "risk": "환경모니터링 경향분석이 산출되지 않으면 무균 구역의 미생물 오염 추세 악화를 조기에 감지하지 못하고, 품질부서의 감독 기능 자체가 작동하지 않는 상태가 된다."
+    }
+   ],
+   "inspectional_significance": "이 483 은 불만처리(품질부서의 근본원인 규명·시정 실패), 무균공정 밸리데이션(기류 가시화에서 확인된 스토퍼 백 상부 기류 정체), 육안검사자 적격성 평가, 환경모니터링 경향분석 미생성 등 서로 다른 4개 영역에 걸쳐 있어 단발성(isolated) 결함이라기보다 품질시스템 전반의 체계적(systemic) 취약으로 볼 수 있다. 특히 관찰 1·5 가 모두 품질부서(quality unit)의 책임 불이행을 지적하고 있어, 품질부서의 감독·의사결정 기능 자체가 지적 대상이 된 점이 중대하다. 관찰 2 는 무균 표방 제품의 무균공정 밸리데이션 결함이고 관찰 3 은 무균 제품의 이물 육안검사 적격성 결함으로, 환자에게 직접 위해가 갈 수 있는 무균/외관 품질 영역에 집중되어 있다. 또한 미국으로 유통된 배치에서 2024년 이후 약 845건의 불만이 접수되었고 그 절반가량이 동일 유형이었다는 점은 시장에 이미 영향이 발현되었음을 시사한다. 원문에서 기록 조작·백데이팅 등 명시적 데이터 무결성(data integrity) 지적은 확인되지 않으나, SOP 가 요구하는 경향 보고서가 생성되지 않은 것은 기록·데이터 관리 통제의 약화로 평가될 소지가 있다. 무균공정 밸리데이션 결함과 품질부서 책임 불이행이 결합된 483 은 응답이 불충분할 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소인 경우 Import Alert 66-40 등재로 이어질 가능성도 배제할 수 없다.",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "2024년 이후 접수된 약 845건의 불만을 유형별로 재분류하고, 약 50%를 차지하는 오작동 유형에 대해 과학적 근거를 갖춘 근본원인 조사를 수행한 뒤 제품·공정 설계 수준의 시정조치와 그 효과성 검증 계획을 문서화한다.",
+     "무균 충전 라인의 기류 가시화(스모크) 연구를 미개봉 스토퍼 백 투입 개입을 포함한 최악조건으로 재수행하여 스토퍼 적재 스테이션 상부의 기류 정체(void)를 제거하고, 스토퍼 백의 개봉 전 소독·투입 방식을 재설계·재밸리데이션한다.",
+     "이물 100% 육안검사자에 대한 최초 적격성 평가 및 재적격성 평가 주기를 실제 검사 물량·근무 조건을 반영해 재설정하고, 미평가 상태에서 수행된 기존 검사 로트에 대한 소급 품질영향평가를 실시한다.",
+     "SOP-0509 에 따른 환경모니터링 경향 보고서의 미작성 범위와 기간을 전수 확인해 소급 작성하고, 보고서 생성·검토·승인이 누락되지 않도록 품질부서 감독 절차와 이행 점검(CAPA)을 수립한다."
+    ]
+   },
+   "administrative_risks": "15영업일 내 회신이 없거나 근본원인·소급 검토·재밸리데이션 계획이 구체성을 결여한 경우, 해당 실사는 OAI(Official Action Indicated) 로 분류될 가능성이 있다. 무균공정 밸리데이션 결함(관찰 2)과 품질부서 책임 불이행(관찰 1·5)이 함께 지적된 점을 고려하면 Warning Letter 발부로 이어질 가능성이 있으며, 해외 제조소일 경우 무균 보증 미흡을 사유로 한 Import Alert 등재로 미국 수출이 차단될 가능성도 있다. 또한 불만 건수 자체가 시장에서 이미 발현된 문제를 가리키므로 회수(recall) 검토 요구나 후속 재실사(follow-up inspection) 로 이어질 수 있고, 반복·미시정이 확인되면 consent decree 등 사법적 조치로 확대될 가능성도 배제할 수 없다."
+  },
+  "source_text": "OBSERVATION 1\n\nProcedures describing the handling of written and oral complaints related to drug products are deficiently written or followed.\n\nSpecifically, the quality unit failed to identify appropriate root causes and to implement corrections to reduce and adequately address the number of complaints for ©@® drug product, oa For example, Since 2024, the site received approximately 845 complaints related to9) drug product batches distributed to the US. The complaint review indicated significant number (approximately 50%) of the complaints were related toy) _ malfunction such as ae )(4) ©©® as follows\n\nOBSERVATION 2\n\nProcedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process.\n\nSpecifically, in the video for airflow visualization studies ofthe aseptic _ filling line used to produce all drug products (VALQ - 8900 - L3-2b, performed on August 1 Sth, 2023), the qualification of the 9)4» @@ intervention to add unopened stopped bags showed that airflow from the 4, _ filling unit into the stopper loading station causes a void over the unopened stopper bags, preventing first-pass airflow from reaching the bags while the, 4» The stopper bags are not further disinfected before they are opened tO &\n\nOBSERVATION 3\n\nLaboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure drug products conform to appropriate standards of identity, strength, quality, and purity.\n\nSpecifically, requalification for employees performing 100% visual inspection for particulates on (uy Ba is performed ome after each employee has completed inspection of O@ despite the fact that the employees will inspect up to 4)» during 4«) There has been no initial or requalification afterg, 45 ) inspection to demonstrate that the employees can perform the operation adequately 9)\n\nOBSERVATION 5\n\nThe responsibilities and procedures applicable to the quality unit are not fully followed.\n\nSpecifically, the quality unit failed to ensure environmental monitoring trend reports are generated as required under SOP-0509, Trending of environmental monitoring data. For example,",
+  "observations_ko": [
+   {
+    "number": "1",
+    "deficiency_ko": "의약품과 관련된 서면 및 구두 불만(complaint)의 처리를 기술한 절차가 미흡하게 작성되었거나 준수되지 않았다.",
+    "detail_ko": "구체적으로, 품질부서(quality unit)는 (비공개) 의약품에 대한 불만 건수를 줄이고 적절히 해소하기 위한 적합한 근본원인을 규명하지 못했고 시정조치를 실행하지 못했다. (비공개) 예를 들어, 2024년 이후 해당 사업장은 미국으로 유통된 (비공개) 의약품 배치와 관련하여 약 845건의 불만을 접수하였다. 불만 검토 결과 상당수(약 50%)의 불만이 (비공개) 오작동(malfunction) 과 관련된 것으로 나타났으며, 예를 들어 (비공개) 다음과 같다"
+   },
+   {
+    "number": "2",
+    "deficiency_ko": "무균(sterile)이라고 표방하는 의약품의 미생물학적 오염을 방지하기 위해 마련된 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+    "detail_ko": "구체적으로, 모든 의약품 생산에 사용되는 무균 (비공개) 충전 라인의 기류 가시화(airflow visualization) 연구 영상(VALQ - 8900 - L3-2b, 실시일 원문 표기 'August 1 Sth, 2023')에서, 미개봉 스토퍼(마개) 백을 투입하는 (비공개) 개입(intervention)에 대한 적격성 평가 결과, (비공개) 충전 유닛에서 스토퍼 적재 스테이션으로 유입되는 기류가 미개봉 스토퍼 백 위에 공기 정체 공간(void)을 형성하여, (비공개) 하는 동안 1차 기류(first-pass airflow)가 해당 백에 도달하지 못하게 하는 것으로 나타났다. 스토퍼 백은 (비공개) 개봉되기 전에 추가로 소독되지 않는다"
+   },
+   {
+    "number": "3",
+    "deficiency_ko": "실험실 관리(laboratory controls)에 의약품이 확인시험(identity)·함량(strength)·품질(quality)·순도(purity)의 적절한 기준에 적합함을 보증하도록 마련된, 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+    "detail_ko": "구체적으로, (비공개)에 대한 이물(particulate) 100% 육안검사를 수행하는 직원에 대한 재적격성 평가(requalification)는 각 직원이 (비공개)의 검사를 완료한 후 (비공개) 수행되고 있으며, 이는 해당 직원들이 (비공개) 동안 최대 (비공개)까지 검사하게 된다는 사실에도 불구하고 그러하다. (비공개) 검사 이후에 직원들이 해당 작업을 적절히 수행할 수 있음을 입증하기 위한 최초 적격성 평가나 재적격성 평가는 실시된 바 없다 (비공개)"
+   },
+   {
+    "number": "5",
+    "deficiency_ko": "품질부서(quality unit)에 적용되는 책임과 절차가 완전히 준수되지 않고 있다.",
+    "detail_ko": "구체적으로, 품질부서는 SOP-0509 「환경모니터링 데이터의 경향분석(Trending of environmental monitoring data)」에서 요구하는 대로 환경모니터링 경향 보고서가 작성되도록 보증하지 못했다. 예를 들어,"
+   }
+  ]
+ },
+ "fda483-194143": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "생산 구역 및 그에 인접한 구역에서 오염이 관찰되었다. 비분류(non-classified) 아목시실린 보관실에 흰색 분말층으로 덮이고 일부는 황색 잔류물이 묻은 사용 후 조제 설비 팔레트가 약 1.5~2년간 방치되어 있었고, 이 팔레트는 아목시실린 완제품 조제·포장이 이루어지는 방의 출입문 바로 옆에 있었다.",
+     "citation": "21 CFR 211.58",
+     "risk": "청소·보관 상태가 관리되지 않은 사용 후 설비와 분말 잔류물이 조제실 출입 동선 바로 옆에 장기간 놓여 있어 아목시실린 완제품에 대한 교차오염·미생물오염 경로가 상시 열려 있다."
+    },
+    {
+     "observation": "아목시실린 취급 구역의 도장 석고보드 벽면이 광범위하게 파손되어 있었다. 문 손잡이에 눌려 길이 약 6인치·깊이 약 3인치로 뚫린 구멍, 1~6인치 범위의 다수 긁힘, 바닥 세라믹 몰딩 파손이 확인되었으며, 이 파손부는 아목시실린 캡슐이 용기로 개방 이송되는 슈트에서 약 10피트 거리에 있었다.",
+     "citation": "21 CFR 211.42",
+     "risk": "파손된 벽·몰딩은 청소·소독이 불가능한 표면을 만들고 석고 분진 등 입자를 발생시키며, 개방 이송 지점 인근이라 완제품에 이물이 유입될 위험이 직접적이다."
+    },
+    {
+     "observation": "무균 조제 공정을 최악·최고난도 조건으로 근접 모사하는 배지충전(media fill)이 수행되지 않았다. 배지충전과 이를 규정한 SOP CR-02 는 완제품 용기 크기, 단위 수, 조제 중 발생 가능한 worst-case 조건을 모사하지 않으며, 실제 조제 기록상 2000 mL 백 규격의 Iron 20%(200 mg/mL) 로트(Lot #V20030526, 2026-03-05 조제)가 생산되어 2026-03-11 고객에게 출하되었고 2026-03-04~03-10 기록에도 2000 mL 백 배치들이 확인되었다.",
+     "citation": "21 CFR 211.113",
+     "risk": "실제 생산의 용기 크기·배치 규모·부하 조건을 모사하지 않은 무균 공정 검증은 무균성 보증 근거가 될 수 없으며, 이미 환자에게 출하된 정맥주사용 제품의 무균성이 검증되지 않은 상태로 남는다."
+    },
+    {
+     "observation": "금지명령(decree of injunction)의 절차적 요구사항을 준수하지 않고 이탈하였다.",
+     "risk": "이미 법원 명령의 통제를 받는 사업장에서 명령상 절차가 지켜지지 않은 것으로, 통상적인 cGMP 지적을 넘어 법적 집행 절차로 직결될 수 있다."
+    }
+   ],
+   "inspectional_significance": "중대도가 매우 높은 483 이다. 지적은 시설·환경 관리(오염된 사용 후 설비 장기 방치, 광범위한 벽면 파손), 무균 공정 검증(실제 용기 크기·배치 규모를 모사하지 않는 배지충전과 이를 규정한 SOP CR-02 의 결함), 그리고 법원 금지명령 절차 미준수까지 서로 다른 세 영역에 걸쳐 있어 단발성(isolated) 이라기보다 품질시스템 전반의 체계적(systemic) 결함으로 볼 여지가 크다. 특히 오염된 팔레트가 약 1.5~2년간 방치되었다는 점은 일시적 실수가 아니라 일상적 감시·자체점검 기능이 작동하지 않았음을 시사한다. 원문 관찰만으로는 기록 위·변조 등 전형적인 데이터 무결성(data integrity) 지적은 확인되지 않으나, Form CR-37 이 무균 작업자 적격성 평가에 필요한 항목을 문서화하지 않는다는 지적은 기록의 완전성(불충분한 기록) 측면의 문제로 볼 수 있다. 무균 조제 제품이 검증되지 않은 조건으로 실제 환자에게 출하된 정황이 원문에 적시되어 있고, 이미 금지명령의 적용을 받는 사업장에서의 명령 이탈이 함께 지적된 만큼, 향후 Warning Letter 나 그보다 강한 법적 집행 조치로 승격될 가능성이 있다(해외 제조소일 경우에는 Import Alert 로 이어질 가능성도 배제할 수 없다).",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "비분류 아목시실린 보관실의 사용 후 설비 팔레트를 즉시 제거하고, 흰색 분말·황색 잔류물의 정체와 발생 원인을 조사한 뒤 해당 구역과 인접 조제실에 대한 오염 영향 평가(제품 영향 평가 포함)를 문서화한다.",
+     "아목시실린 취급 구역의 벽면 구멍·긁힘·파손된 바닥 몰딩을 청소·소독이 가능한 표면으로 복구하고, 개방 이송 지점(슈트) 주변 시설 상태에 대한 정기 점검·유지보수 및 재발 방지 CAPA 를 수립·문서화한다.",
+     "SOP CR-02 와 배지충전 프로그램을 개정하여 실제 완제품 용기 크기(2000 mL 백 포함)·단위 수·배치 규모·worst-case 조건을 모사하도록 재설계하고, 개정된 조건으로 무균 공정 재검증(재밸리데이션)을 수행한다.",
+     "검증되지 않은 조건으로 조제·출하된 배치(Lot #V20030526 및 2026-03-04~03-10 기간 조제 배치 포함)에 대한 소급 품질 검토를 실시하고, 무균성 보증이 불충분할 경우 회수 등 시장 조치 필요성을 평가한다.",
+     "Form CR-37 등 무균 작업자 적격성 평가 기록의 기재 항목을 보완하여 평가 내용이 완전히 문서화되도록 하고, 금지명령상 절차 요구사항 대비 준수 여부를 전면 재점검하여 이탈 항목과 시정 계획을 함께 제출한다."
+    ]
+   },
+   "administrative_risks": "483 에 대한 회신이 미흡하거나 시정이 지연되면 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 가 발부될 가능성이 있다. 무균 조제 제품의 무균성 보증이 확립되지 않은 상태이므로 자발적 회수 요구나 제품 출하 중단 압박으로 이어질 수 있고, 해외 제조소인 경우 Import Alert 등재로 미국 내 반입이 차단될 가능성도 있다. 특히 이 사업장은 이미 금지명령(decree of injunction)의 적용을 받고 있고 그 절차 요구사항 이탈이 직접 지적되었으므로, 통상적인 행정 경로를 넘어 법원 명령 위반에 따른 집행 조치(민사 제재, consent decree 조건 강화, 생산 중단 명령 등)로 확대될 위험이 상대적으로 크다. 후속 재실사(follow-up inspection) 를 통해 시정 이행 여부가 확인될 가능성도 높다."
+  },
+  "source_text": "OBSERVATION 1\n\nContamination was observed in your production area and areas adjacent to production areas.\n\nSpecifically, A) A pallet of used compounding equipment was observed in the non-classified Amoxicillin storage room. Items on this pallet included, but were not limited to, used process <Redacted B4> which were coated with yellow residue, metal fittings, and hoses. All equipment on this pallet appeared to be coated with a layer of white powder. Your staff stated that this pallet of used equipment had been present in this location for approximately 1.5 to 2 years. This pallet is located immediately adjacent to the door leading to Amoxicillin Room <Redacted B4> where finished product compounding and packaging of Amoxicillin products takes place. B) Widespread and extensive damage was observed on the painted drywall walls in the Amoxicillin processing area. This damage included an approximately 6-inch long and 3-inch deep hole punched in a wall from the handle of an over-extended door, multiple scrapes in paint and drywall ranging from 1 to 6 inches, and broken floor ceramic molding. This damage was noted approximately 10 feet from the chute where Amoxicillin capsules were <Redacted B4> openly into <Redacted B4> container <Redacted B4> an <Redacted B4> C) Black stains were observed on\n\nOBSERVATION 2\n\nFailure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions.\n\nSpecifically, Aseptic process simulations (media fills), along with the governing procedure SOP CR-02 -Aseptic Technique & Gloved Fingertip Thumb Test-are deficient in that they do not simulate the finished product container size, number of units, or worst-case conditions that may arise during compounding activities. Media fills conducted by your <Redacted B4> simulate aspetic processes utilized <Redacted B4> which contain a total of <Redacted B4> IV bags and associated equipment. <Redacted B4> is used by each sterile compounding technician as part pf their <Redacted B4> aseptic process simulation evaluation. During a review of your sterile compounding records for March 4, 2026, a lot size <Redacted B4> 2000 ml bags of Iron 20% (200 mg/ml) was noted in the compounding of Lot #V20030526 on 05MAR2026. This batch was compounded to fulfill Rx <Redacted B4> and shipped to your customer on 3/11/2026. Additional batch sizes on <Redacted B4> an <Redacted B4> 2000 mL bags were also noted in compounding records from 04MAR2026 -10MAR2026. Additionally, Form CR-37 -Periodic Cleanroom Aseptic Evaluation -which is used to <Redacted B4> qualify your sterile technicians, does not document the amou\n\nOBSERVATION 3\n\nDeviation from the procedural requirements of a decree of injunction.",
+  "observations_ko": [
+   {
+    "number": "1",
+    "deficiency_ko": "귀사의 생산 구역 및 생산 구역과 인접한 구역에서 오염이 관찰되었다.",
+    "detail_ko": "구체적으로, A) 비분류(non-classified) 아목시실린 보관실에서 사용 후 조제 설비가 실린 팔레트 1개가 관찰되었다. 이 팔레트 위의 물품에는 황색 잔류물로 덮여 있던 사용된 공정 (비공개), 금속 피팅류, 호스 등이 포함되어 있었으나 이에 한정되지 않는다. 이 팔레트 위의 모든 설비는 흰색 분말층으로 덮여 있는 것으로 보였다. 귀사 직원은 이 사용 후 설비 팔레트가 약 1.5~2년간 이 위치에 있었다고 진술하였다. 이 팔레트는 아목시실린 완제품의 조제 및 포장이 이루어지는 아목시실린 룸 (비공개) 으로 통하는 문 바로 옆에 위치해 있다. B) 아목시실린 처리 구역의 도장된 석고보드 벽면에서 광범위하고 대규모의 파손이 관찰되었다. 이 파손에는 과도하게 열린 문의 손잡이에 의해 벽에 뚫린 길이 약 6인치·깊이 약 3인치의 구멍, 1인치에서 6인치에 이르는 다수의 페인트 및 석고보드 긁힘, 그리고 파손된 바닥 세라믹 몰딩이 포함된다. 이 파손은 아목시실린 캡슐이 (비공개) 용기 (비공개) 안으로 개방된 상태로 (비공개) 되는 슈트로부터 약 10피트 떨어진 지점에서 확인되었다. C) 검은색 얼룩이 관찰된 곳은 (원문 중단)"
+   },
+   {
+    "number": "2",
+    "deficiency_ko": "최악의 조건(worst-case), 가장 까다롭고 부하가 큰 조건에서 무균 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+    "detail_ko": "구체적으로, 무균 공정 모사(배지충전)와 이를 규정하는 절차인 SOP CR-02 「Aseptic Technique & Gloved Fingertip Thumb Test」는, 완제품 용기 크기, 단위 수, 또는 조제 작업 중 발생할 수 있는 worst-case 조건을 모사하지 않는다는 점에서 미흡하다. 귀사 (비공개) 이(가) 실시한 배지충전은 총 (비공개) 개의 IV 백 및 관련 설비를 포함하는 (비공개) 을(를) 이용한 무균 공정을 모사한다. (비공개) 은(는) 각 무균 조제 기술자가 자신의 (비공개) 무균 공정 모사 평가의 일부로 사용한다. 2026년 3월 4일자 무균 조제 기록을 검토하는 과정에서, Iron 20%(200 mg/ml) 2000 ml 백 (비공개) 의 로트 규모가 2026년 3월 5일자 Lot #V20030526 의 조제에서 확인되었다. 이 배치는 처방 (비공개) 을(를) 충족하기 위해 조제되었고 2026년 3월 11일에 귀사의 고객에게 출하되었다. 2026년 3월 4일부터 3월 10일까지의 조제 기록에서도 (비공개) 및 (비공개) 2000 mL 백의 추가 배치 규모가 확인되었다. 또한 귀사의 무균 조제 기술자를 (비공개) 적격성 평가하는 데 사용되는 Form CR-37 「Periodic Cleanroom Aseptic Evaluation」은 (원문 중단) 의 양을 문서화하지 않는다."
+   },
+   {
+    "number": "3",
+    "deficiency_ko": "금지명령(decree of injunction)의 절차적 요구사항으로부터의 일탈."
+   }
+  ]
+ },
+ "fda483-193531": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "observation": "2024년 3월부터 2026년 2월까지의 시험 결과 검토에서 엔도톡신 규격초과(OOS) 결과가 4건 확인됐으나, 이 OOS 결과를 조사한 문서가 전혀 없고 제품 영향평가(product impact assessment)도 수행하지 않았다. 원문에는 0.430·1.508·0.439·17.589·0.418 EU/mL 등 개별 결과가 열거돼 있으며, MIDL-SOP-307(2024년 1월 1일 시행)의 엔도톡신 규격 수치는 비공개 처리돼 있다.",
+     "risk": "엔도톡신 오염이 조사·평가 없이 방치되면 오염원(설비·시스템)이 특정되지 않은 채 지속되고, 영향받은 배치의 출하 적합성 판단 근거가 없어 환자 안전 리스크가 그대로 시장에 전달될 수 있다."
+    },
+    {
+     "observation": "엔도톡신 시험 검체 일부가 권장 온도범위를 벗어난 상태로 시험실에 접수됐다고 시험성적서에 기재돼 있으나, 접수 온도도 권장 온도범위도 성적서에 기재되지 않았고 이 문제에 대한 평가도 없었다.",
+     "risk": "검체 보관·수송 조건이 기록되지 않아 시험 결과의 신뢰성(데이터 무결성)을 확인할 수 없고, OOS 결과의 진위 판단 자체가 불가능해진다."
+    },
+    {
+     "observation": "품질부서(Quality Unit)가 감독 책임을 이행하지 않았다. CAPA(MIDL-SOP-124)가 자사 절차대로 문서화되지 않고 적시에 종결되지도 않아, CP25-014·CP25-010·CP25-019·CP24-12·CP24-13 이 효과성 확인(effectiveness check) 문서가 없거나 불충분하며, CP24-12·CP24-13·CP25-019 는 완료 서명·품질부서 검토조차 이뤄지지 않았다. 또한 제조·시험 기록에 쓰이는 낱장(loose-leaf) 양식의 발행·사용·수불 대조에 관한 문서화된 절차가 없고, 품질 관련 문서 전부에 대한 검토·승인이 이뤄지지 않고 있다.",
+     "risk": "CAPA 가 미종결·미검증 상태로 누적되면 동일 결함이 재발해도 걸러지지 않고, 낱장 양식의 발행·수불 통제가 없으면 기록의 완결성·추적성이 보장되지 않아 데이터 무결성 문제로 확대될 수 있다."
+    },
+    {
+     "observation": "API 에 대한 2024년도 연간 제품품질평가(annual product quality review)를 수행하지 않았다. 2025년 8월 6일 일탈 보고서를 개시했으나 미완료 사유나 완료 예정 시점에 관한 내용이 전혀 기재되지 않았고, 해당 일탈은 실사 시점까지 여전히 미종결 상태였다.",
+     "risk": "연간 품질평가가 누락되면 공정 경향·재발성 일탈을 주기적으로 포착하는 상위 통제가 사라지고, 그 누락에 대한 일탈조차 내용 없이 열려 있어 품질시스템의 자기교정 기능이 작동하지 않음을 보여준다."
+    },
+    {
+     "observation": "생산 및 QC 실험실에서 사용되는 자재/유틸리티(원문 비공개)에 대한 시험을 수행하지 않았다.",
+     "risk": "생산과 시험에 투입되는 대상의 적합성이 시험으로 확인되지 않아, 제조 공정과 시험 결과 양쪽의 신뢰 기반이 동시에 무너질 수 있다."
+    }
+   ],
+   "inspectional_significance": "이 483 은 단일 공정의 단발성(isolated) 결함이 아니라 품질시스템 전반의 체계적(systemic) 결함을 지적한다. 엔도톡신 OOS 4건 미조사(관찰 2), 품질부서의 감독 실패·CAPA 미종결·낱장 양식 통제 절차 부재·품질문서 미검토(관찰 3), 2024년 연간 제품품질평가 미실시와 그 일탈의 무내용·미종결(관찰 4), 생산·QC 실험실 사용 대상의 시험 미실시(관찰 5)가 서로 다른 축(시험·문서·감독·주기적 검토)에서 동시에 발견돼, 품질부서의 상위 통제 기능 자체가 작동하지 않고 있음을 시사한다. 특히 엔도톡신 규격초과가 조사도 제품 영향평가도 없이 넘어갔고 그 중 한 건(17.589 EU/mL)은 다른 결과들과 자릿수가 다른 값인 점, 그리고 검체가 권장 온도범위를 벗어나 접수됐는데 온도·범위·평가가 모두 기록에 없는 점은 환자안전 직결 사안이자 기록 신뢰성(데이터 무결성) 측면의 우려로 볼 수 있다. CAPA 효과성 확인 미문서화·미서명, 낱장 양식 발행·수불 절차 부재 역시 기록 통제의 취약성을 보여주므로, 미시정 또는 응답이 불충분할 경우 Warning Letter 로 승격될 가능성이 있으며, 해외 제조소인 경우 Import Alert 로 이어질 가능성도 배제할 수 없다.",
+   "required_remediation": {
+    "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+    "items": [
+     "엔도톡신 OOS 4건(2024-05-29, 2024-09-25 2건, 2025-03-31, 2025-05-27 검체) 각각에 대해 소급 조사를 실시하고, 근본원인 규명과 함께 영향받은 배치에 대한 제품 영향평가·출하 적합성 재판정 결과를 문서화한다.",
+     "엔도톡신 시험 검체의 권장 보관·수송 온도범위를 규정하고, 접수 시 실제 온도와 범위 이탈 여부를 시험성적서에 기록·평가하도록 시험실 절차와 양식을 개정한다.",
+     "MIDL-SOP-124 에 따른 CAPA 전건을 소급 검토해 미종결·효과성 확인 미문서화 건(CP25-014·CP25-010·CP25-019·CP24-12·CP24-13 포함)을 종결하고, 품질부서의 검토·승인 서명과 적시 종결을 강제하는 관리 체계를 수립한다.",
+     "제조·시험 기록에 사용되는 낱장 양식의 발행·사용·회수·수불 대조 절차를 문서화하고, 품질 관련 문서 전량에 대한 검토·승인 경로를 규정해 시행한다.",
+     "미실시된 2024년도 API 연간 제품품질평가를 완료하고 관련 일탈을 사유·완료일정과 함께 종결하며, 이후 연간 평가가 기한 내 수행되도록 일정·책임을 절차에 반영한다.",
+     "생산 및 QC 실험실에서 사용되는 해당 대상의 시험 항목·주기·규격을 정하고 시험을 실시해 그 결과를 문서화한다."
+    ]
+   },
+   "administrative_risks": "15영업일 내 회신이 없거나 시정계획이 근본원인·소급범위를 다루지 못하면 이 실사는 OAI(Official Action Indicated)로 분류될 가능성이 있고, 그 경우 Warning Letter 발부로 이어질 수 있다. 엔도톡신 OOS 미조사와 제품 영향평가 부재는 이미 출하된 배치의 품질 보증 여부를 문제 삼게 하므로 자발적 회수 요구나 출하 보류로 확대될 가능성이 있으며, 해외 제조소일 경우 Import Alert 66-40 계열의 수입경보 등재로 대미 선적이 차단될 가능성도 있다. 또한 CAPA 미종결·문서 통제 부재가 품질시스템 전반의 문제로 판단되면 후속 재실사(follow-up inspection)와 개선 확인 실사가 뒤따를 수 있고, 반복·장기 미시정 시 consent decree 등 사법적 조치로 발전할 가능성도 배제할 수 없다."
+  },
+  "source_text": "OBSERVATION 2\n\nFailure to investigate all out of specification test results.\n\nSpecifically, a review of(b) (4) test results from March 2024 to February 2026 revealed four (4) instances where your firm received an out of specification test result for endotoxins. Your firm has no documentation to show that these out of specification test results were investigated nor did you perform any product impact assessment. Per MIDL-SOP-307 (b) (4) , effective January 1, 2024, the specification for endotoxin is (6) (4) EU/mL. * Sample from © system collected 05/29/2024 - test result was 0.430 EU/mL * Sample from© system collected 09/25/2024 - test result was 1.508 EU/mL * Sample from© system — QC Laboratory collected 09/25/2024 - test result was 0.439 EU/mL * Sample from© system — QC Laboratory collected 03/3 1/2025 - test result was 17.589 EU/mL * Sample from © system collected 05/27/2025 - test result was 0.418 EU/mL In addition, several of the lab reports for the testing of the (b) (4) _ indicate that the sample for endotoxin testing was received outside of the recommended temperature range. The laboratory report does not state the temperature the samples were received at nor does it state what the recommended temperature range is. There is no evaluation of this issue\n\nOBSERVATION 3\n\nFailure of the Quality Unit to fulfill its oversight responsibilities.\n\nSpecifically, a) CAPAs are not fully documented in accordance with your established procedure entitled Corrective and Preventative Actions (MIDL-SOP-124) effective January 1, 2024; they also are not closed out in a timely manner. For example: * CP25-014 (initiated 8/15/2025), CP25-010 (initiated 7/01/2025), CP25-019 (initiated 11/17/2025), CP24-12 (initiated 10/11/2024), and CP24-13 (initiated 9/24/204), either lack or have insufficient documentation of an effectiveness check. * CP24-12, CP24-13 and CP25-019 have not been finalized and signed off as completed or reviewed by quality. b) Your firm does not have written procedures for the issuance, use and reconciliation of loose-leaf forms used for documentation of manufacturing (e.g. batch record) and laboratory testing. Examples of these forms include: - All forms and documents that are part ofthe batch record * Form 239A Reagent/Solution Preparation Log * Form 120A Label Control Form * Form 121A Label Issuance ¢ Form 112B ©)@) Pre-Shipment Review Log ¢ Form 133D Total Unacceptable (b) (4) Count c) There is a failure to review and approve all quality-related documents. The analytical testing lab books (data collection form) used fo\n\nOBSERVATION 4\n\nYour firm failed to conduct an annual product quality review of your API.\n\nDuring the current inspection ofyour facility we observed that you had not conducted your 2024 annual product quality review for your API (b) (4) , USP. On August 6, 2025, your firm initiated a deviation report however, no content was provided in the report explaining why the 2024 review had not been completed or when it would be finalized. The deviation is still open.\n\nOBSERVATION 5\n\nFailure to perform testing of the (b) (4) used in production and in the QC Laboratory.",
+  "observations_ko": [
+   {
+    "number": "2",
+    "deficiency_ko": "모든 규격초과(out of specification) 시험 결과를 조사하지 않았다.",
+    "detail_ko": "구체적으로, 2024년 3월부터 2026년 2월까지의 (비공개) 시험 결과를 검토한 결과, 귀사가 엔도톡신에 대해 규격초과(OOS) 시험 결과를 받은 사례가 4건 확인되었다. 귀사에는 이러한 규격초과 시험 결과가 조사되었음을 보여주는 문서가 없으며, 제품 영향평가(product impact assessment)도 수행하지 않았다. 2024년 1월 1일 시행된 MIDL-SOP-307 (비공개) 에 따르면 엔도톡신 규격은 (비공개) EU/mL 이다. * (비공개) 시스템에서 2024년 5월 29일 채취한 검체 - 시험 결과 0.430 EU/mL * (비공개) 시스템에서 2024년 9월 25일 채취한 검체 - 시험 결과 1.508 EU/mL * (비공개) 시스템 - QC 실험실에서 2024년 9월 25일 채취한 검체 - 시험 결과 0.439 EU/mL * (비공개) 시스템 - QC 실험실에서 2025년 3월 31일 채취한 검체 - 시험 결과 17.589 EU/mL * (비공개) 시스템에서 2025년 5월 27일 채취한 검체 - 시험 결과 0.418 EU/mL 또한 (비공개) 시험에 관한 여러 시험성적서에는 엔도톡신 시험용 검체가 권장 온도범위를 벗어난 상태로 접수되었다고 기재되어 있다. 해당 시험성적서에는 검체가 접수된 온도도, 권장 온도범위가 무엇인지도 기재되어 있지 않다. 이 문제에 대한 평가는 없다."
+   },
+   {
+    "number": "3",
+    "deficiency_ko": "품질부서(Quality Unit)가 감독 책임을 이행하지 않았다.",
+    "detail_ko": "구체적으로, a) CAPA 가 2024년 1월 1일 시행된 귀사의 확립된 절차 「Corrective and Preventative Actions」(MIDL-SOP-124)에 따라 완전하게 문서화되어 있지 않으며, 적시에 종결되지도 않는다. 예를 들면 다음과 같다. * CP25-014(2025년 8월 15일 착수), CP25-010(2025년 7월 1일 착수), CP25-019(2025년 11월 17일 착수), CP24-12(2024년 10월 11일 착수), CP24-13(9/24/204 착수, 원문 표기 그대로)은 효과성 확인(effectiveness check)에 대한 문서가 없거나 불충분하다. * CP24-12, CP24-13, CP25-019 는 완료로 최종 처리되어 서명되지 않았거나 품질부서의 검토를 받지 않았다. b) 귀사에는 제조(예: 배치기록) 및 실험실 시험의 문서화에 사용되는 낱장(loose-leaf) 양식의 발행·사용·수불 대조에 관한 문서화된 절차가 없다. 이러한 양식의 예는 다음과 같다. - 배치기록의 일부를 이루는 모든 양식 및 문서 * Form 239A 시약/용액 조제 기록(Reagent/Solution Preparation Log) * Form 120A 라벨 관리 양식(Label Control Form) * Form 121A 라벨 발행 양식(Label Issuance) * Form 112B (비공개) 출하 전 검토 기록(Pre-Shipment Review Log) * Form 133D 총 부적합 (비공개) 수(Total Unacceptable Count) c) 모든 품질 관련 문서를 검토·승인하지 않는 문제가 있다. 사용되는 분석시험 실험노트(데이터 수집 양식)는 (원문이 여기서 중단됨)"
+   },
+   {
+    "number": "4",
+    "deficiency_ko": "귀사는 API 에 대한 연간 제품품질평가(annual product quality review)를 수행하지 않았다.",
+    "detail_ko": "이번 실사 중 귀사 시설에서 확인한 바에 따르면, 귀사는 API (비공개), USP 에 대한 2024년도 연간 제품품질평가를 수행하지 않았다. 2025년 8월 6일 귀사는 일탈 보고서를 개시하였으나, 2024년도 평가가 왜 완료되지 않았는지 또는 언제 완료될 것인지를 설명하는 내용이 보고서에 전혀 기재되어 있지 않았다. 해당 일탈은 여전히 미종결(open) 상태이다."
+   },
+   {
+    "number": "5",
+    "deficiency_ko": "생산 및 QC 실험실에서 사용되는 (비공개)에 대한 시험을 수행하지 않았다."
+   }
+  ]
  }
 }

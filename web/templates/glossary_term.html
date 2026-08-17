@@ -33,6 +33,13 @@
   .gt-links a:hover{border-color:var(--coral);color:var(--coral)}
   .gt-src a{font-family:var(--sans);font-size:14px;color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:break-word}
   .gt-src a:hover{color:var(--coral)}
+  .gt-case-lede{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:0 0 14px;word-break:keep-all}
+  .gt-case-lede b{color:var(--body);font-weight:600}
+  .gt-cases{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:14px}
+  .gt-case-item{border-left:3px solid var(--line-2);padding:2px 0 2px 16px}
+  .gt-quote{font-family:var(--sans);font-size:15px;line-height:1.75;color:var(--body);margin:0 0 7px;word-break:keep-all}
+  .gt-case-meta{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);text-decoration:none}
+  .gt-case-meta:hover{color:var(--coral)}
   .gt-case{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
   .gt-case:hover{background:var(--coral-2)}
   .gt-case b{font-weight:600}
@@ -83,6 +90,20 @@
     {% if term.case_href %}
     <section class="gt-sec">
       <h2 class="gt-sec-h">실제 지적 사례</h2>
+      {#- 문구 규율: "이 용어가 등장한" 이지 "이 용어에 관한" 이 아니다. 인용문 안에 그
+          토큰이 그대로 보이므로 독자가 눈으로 검증할 수 있는 주장만 한다. 업체명은 싣지
+          않는다 — 업체는 링크로 잇는 문서 페이지의 주제다. #}
+      {%- if case_excerpts %}
+      <p class="gt-case-lede">규제기관 실사 문서에서 <b>이 용어가 등장한</b> 지적사항입니다.</p>
+      <ol class="gt-cases">
+        {%- for c in case_excerpts %}
+        <li class="gt-case-item">
+          <blockquote class="gt-quote">{{ c.quote }}</blockquote>
+          <a class="gt-case-meta" href="{{ rel_root }}{{ c.doc_href }}">{{ c.agency }} · {{ c.source }} · {{ c.published_date }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+        </li>
+        {%- endfor %}
+      </ol>
+      {%- endif %}
       <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">이 용어로 찾은 지적사례 <b>{{ term.case_count_label }}</b>건 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </section>
     {% endif %}

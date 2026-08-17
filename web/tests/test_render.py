@@ -6928,6 +6928,9 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
         cls.root = cls.single / "glossary"
+        # 사례 인용은 전 코퍼스를 훑어 비싸다 — 클래스 1회만 짓고 각 테스트가 재사용한다.
+        cls.excerpts = render.build_glossary_case_excerpts(
+            cls.terms, render.load_findings_docs(), render.load_glossary_cases())
 
     @classmethod
     def tearDownClass(cls):
@@ -7066,6 +7069,107 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         for t in self.terms[:8]:
             self.assertIn(f'<title>{_esc(render.glossary_term_page_title(t))}</title>',
                           self._page(t["id"]), f'제목 미배선: {t["id"]}')
+
+    def test_case_excerpt_quote_contains_its_token(self):
+        """[정직성 계약] 인용문에는 판정에 쓴 토큰이 **그대로 보여야** 한다.
+
+        페이지가 하는 주장은 "이 용어가 등장한 지적사항"뿐이고, 그 근거는 독자가 인용문
+        안에서 토큰을 직접 보는 것이다. 토큰이 안 보이는 인용문이 하나라도 실리면 페이지가
+        검증 불가능한 주장을 하게 된다.
+        """
+        ex = self.excerpts
+        self.assertGreater(len(ex), 0, "사례 인용이 한 용어도 안 붙었다(배선 확인)")
+        for tid, items in ex.items():
+            for c in items:
+                self.assertIn(c["token"], c["quote"],
+                              f'인용문에 토큰이 없다: {tid} / {c["token"]}')
+                self.assertFalse(render._glossary_incidental(c["quote"], c["token"]),
+                                 f'열거 안 우연 언급이 실렸다: {tid} / {c["quote"][:60]}')
+                self.assertTrue(c["agency"] and c["published_date"] and c["doc_href"],
+                                f'출처 메타 결손: {tid}')
+                self.assertTrue(c["doc_href"].startswith("findings/doc/"),
+                                f'문서 링크 형식 어긋남: {tid} / {c["doc_href"]}')
+
+    def test_incidental_rule_is_pinned_by_fixtures(self):
+        """[비순환 가드] 열거 배제 규칙 자체를 실제 문장으로 고정한다.
+
+        `test_case_excerpt_quote_contains_its_token` 은 `_glossary_incidental` 로 판정하므로
+        그 함수가 망가지면 **함께 망가져 조용히 통과한다**(변이 테스트로 확인). 규칙은 여기서
+        고정 입력으로 잠근다 — 아래 문장들은 전부 실제 코퍼스에서 뽑은 것이다.
+        """
+        cases = [
+            # 토큰이 열거(`제조, 가공, 포장 또는 보관`) 안에만 있다 → 우연한 언급
+            ("귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도, 세척 및 "
+             "유지관리를 용이하게 하도록 적절한 설계를 갖추도록 하지 못하였다(21 CFR 211.63).",
+             "포장", True),
+            ("확인, 함량, 품질 및 순도에 관한 수립된 규격에 부합하도록 보장하는 책임을 "
+             "이행하지 못하였습니다(21 CFR 211.22).", "품질", True),
+            # 열거가 아닌 위치에 있다 → 유효한 사례
+            ("실사 중 조사관들은 '세척 상태'로 보관된 정제 포장용 비전용 설비의 제품 접촉 "
+             "표면에서 정체불명의 백색 분말 잔류물을 관찰했습니다.", "포장", False),
+            ("귀사 시설은 낮은 품질의 공기가 더 높은 품질의 공기 구역으로 유입될 수 있는 "
+             "방식으로 설계되고 운영됩니다.", "품질", False),
+            ("귀사는 무균 주사제 제조 중 바이알 파손의 재발을 방지하기 위한 효과적인 시정 및 "
+             "예방조치(CAPA)를 시행하지 않았습니다.", "CAPA", False),
+        ]
+        for sent, tok, expected in cases:
+            self.assertEqual(render._glossary_incidental(sent, tok), expected,
+                             f"열거 판정 어긋남: «{tok}» {sent[:40]}…")
+
+    def test_case_excerpts_are_not_duplicated_across_terms(self):
+        """같은 문장이 여러 용어 페이지에 실리면 그건 중복 본문이다(순위에 역효과)."""
+        ex = self.excerpts
+        seen: dict[str, str] = {}
+        for tid, items in ex.items():
+            docs_here = [c["doc_href"] for c in items]
+            self.assertEqual(len(docs_here), len(set(docs_here)),
+                             f'한 용어가 같은 문서에서 2건 이상: {tid}')
+            for c in items:
+                prev = seen.get(c["quote"])
+                self.assertIsNone(prev, f'인용문 중복: {tid} 와 {prev}')
+                seen[c["quote"]] = tid
+            self.assertGreaterEqual(len(items), render._GLOSSARY_CASE_MIN,
+                                    f'최소 건수 미만인데 섹션이 생겼다: {tid}')
+            self.assertLessEqual(len(items), render._GLOSSARY_CASE_MAX,
+                                 f'상한 초과: {tid}')
+
+    def test_case_excerpts_reach_pages_with_honest_wording(self):
+        """[문구 규율] "등장한" 이라고만 쓴다 — "관한/에 대한 지적"으로 단정하지 않는다.
+
+        업체명은 용어 페이지에 싣지 않는다(업체는 링크로 잇는 문서 페이지의 주제다).
+        producer 만 검사하면 렌더 배선 누락이 침묵하므로 실제 HTML 로 확인한다(#729 교훈).
+        """
+        ex = self.excerpts
+        docs = render.load_findings_docs() or {}
+        firms = {d.get("firm_name") for d in docs.get("documents", []) if d.get("firm_name")}
+        checked = 0
+        for tid, items in list(ex.items())[:10]:
+            html = self._page(tid)
+            self.assertIn("이 용어가 등장한", html, f'문구 규율 위반/미배선: {tid}')
+            for bad in ("이 용어에 관한 지적", "이 용어에 대한 지적"):
+                self.assertNotIn(bad, html, f'단정 문구가 실렸다: {tid} / {bad}')
+            for c in items:
+                self.assertIn(str(_esc(c["quote"]))[:40], html, f'인용문 미배선: {tid}')
+                checked += 1
+            leaked = sorted(f for f in firms if f and f in html)
+            self.assertEqual(leaked, [], f'용어 페이지에 업체명이 실렸다: {tid} / {leaked[:3]}')
+        self.assertGreater(checked, 0, "인용문이 하나도 검사되지 않았다(배선 확인)")
+
+    def test_case_excerpts_are_deterministic(self):
+        a = render.build_glossary_case_excerpts(
+            self.terms, render.load_findings_docs(), render.load_glossary_cases())
+        b = render.build_glossary_case_excerpts(
+            self.terms, render.load_findings_docs(), render.load_glossary_cases())
+        self.assertEqual(a, b, "사례 선정이 비결정론")
+
+    def test_case_section_absent_when_no_excerpts(self):
+        """[음성 검사] 사례를 못 채운 용어에는 인용 블록이 아예 없어야 한다."""
+        ex = self.excerpts
+        empty = [t["id"] for t in self.terms if t["id"] not in ex]
+        self.assertGreater(len(empty), 0, "전 용어가 사례를 채웠다면 이 가드는 무의미하다")
+        for tid in empty[:8]:
+            self.assertNotIn("이 용어가 등장한", self._page(tid),
+                             f'사례 0건인데 인용 리드가 떴다: {tid}')
 
     def test_related_links_point_to_term_pages(self):
         """관련 용어는 색인 앵커(#id)가 아니라 낱개 페이지로 가야 한다(내부 링크 = 색인 경로)."""

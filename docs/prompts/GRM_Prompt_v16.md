@@ -554,12 +554,19 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
      `GRM_Prompt_DeepFda483_v1.md` §2. **다른 4섹션이 D1/D2 게이트에서 FAIL 해 그 카드 심층분석이
      drop 되더라도 `observations_ko` 는 별도 층으로 살아 병합된다** — 그러니 분석이 자신 없는
      카드라도 `observations_ko` 만은 반드시 채운다(관찰 번역이 빠지는 것이 훨씬 큰 사고다).
-  ③ 생성한 카드들을 **deep 델타 dict** 로 모은다 — 각 카드마다 반드시 `source_text` 에 **그 카드의
-     `body_full` 원문을 그대로** 넣는다(브릿지가 이 `source_text` 로 인용 근거대조를 하므로, 빠지면
-     그 카드는 근거 미검증으로 drop 된다):
-       `{"<web_card_id>": {"deep_analysis": {...위 4섹션...}, "source_text": "<그 카드 body_full>"}}`
+  ③ 생성한 카드들을 **deep 델타 dict** 로 모은다:
+       `{"<web_card_id>": {"deep_analysis": {...위 4섹션...}}}`
      (키는 6슬롯 델타와 **같은 키 공간** — `web_card_id` 그대로, `card_id` 금지. 위 [출력] envelope 규칙 동일)
      이 dict 를 [산출물 예치]의 **두 번째 코드 블록**(deep 델타)으로 예치한다(아래 예치 규약).
+     ⛔ **`source_text`(=`body_full` 전사)를 넣지 마라 — 2026-08-17 개정.** 종전엔 카드마다
+     `body_full` 원문을 **그대로 옮겨 적어** 함께 예치하라고 했다. 그런데 그 문자열은 장식이 아니라
+     **근거 대조의 기준선**이라(브릿지 게이트의 인용·verbatim 검사 + 조립 시점 결정론 재추출),
+     옮겨 적다 흘린 만큼이 그대로 "원문에 없음"이 된다. 2026-08-17 실측에서 예치된 6건이 **6건 전부**
+     원문과 달랐다(각 51~241자, 말미 블록이 통째로 누락). 무인 실행에는 대조할 사람이 없다.
+     이제 **델타 브릿지가 그 주 handoff 페이지의 `deep_analysis_input.body_full` 을 `web_card_id` 로
+     직접 읽어** 채운다 — 네가 옮겨 적을 필요가 없어졌고, 옮겨 적으면 브릿지가 원문으로 덮어쓴다.
+     483 처럼 12~14k자짜리 원문을 다시 뱉지 않아도 되므로 그만큼을 분석 품질에 쓴다.
+     (호환: 넣어도 발행은 되지만 브릿지 로그에 드리프트 경고가 남는다.)
   ④ **[상세 국문 병기]** `ncr_translation_ready=true` 카드(EU/UK GMP 비준수 · WHO 실사보고서)는
      심층분석 대상이 아니다 — `ncr_translation_input` 에 **실린 키 전부**(유형이 키를 정한다)에
      `_ko` 를 붙여 **번역만** 하고 ③의 deep 델타에 같은 키 공간으로 담는다(카드당 한 항목):
@@ -600,8 +607,9 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
   - 본문에 **코드 블록 1개**로 네 [산출물] 슬롯 델타 JSON 을 그대로 붙여넣는다(형태 불변 —
     `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}`, `publish_date` 키를 최상위에 추가해도 무방).
   - [2단계] 심층분석(deep_analysis)을 수행했다면, **같은 페이지에 두 번째 코드 블록**으로
-    `{"<web_card_id>":{"deep_analysis":{...4섹션...},"source_text":"..."}}` 델타를 추가로 붙인다
+    `{"<web_card_id>":{"deep_analysis":{...4섹션...}}}` 델타를 추가로 붙인다
     (별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
+    `source_text`(원문 전사)는 **넣지 않는다** — 브릿지가 handoff 에서 직접 읽는다([2단계] ③).
     심층분석이 없으면(대다수 주) 이 블록은 생략 — 정상.
   - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
     **기존 `OPEN GRM Web Delta {date}` 페이지 본문을 덮어쓴다**(handoff 의 upsert 규약과 동형).
@@ -655,3 +663,4 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 | 2026-07-02 | **fan-out 절 행정처분 반영(카드 유형별 프롬프트 DeepWL/DeepAdmin·스키마 자동선택). 6슬롯·코드 불변.** `ENABLE_MFDS_ADMIN_BODY_FULL=true` 활성으로 MFDS 행정처분 카드도 `deep_analysis_ready=true` 로 fan-out 에 유입 → `[2단계]` 절을 WL 전용→유형인식으로 수정: ②단계 생성 프롬프트를 카드 유형별 분기(WL=`GRM_Prompt_DeepWL_v1.md`·행정처분=`GRM_Prompt_DeepAdmin_v1.md`), 4섹션 스키마·한글 섹션명은 `verify_deep_analysis.resolve_required_sections` 가 카드 유형으로 자동선택(행정처분 ②섹션=`disposition_basis`). 절차 정본 `GRM_DeepWL_fanout_실행프롬프트.md` 은 이미 행정처분 분기 반영(무변경). 순수 doc 문구 수정 — 6슬롯 규칙·나머지 절·코드·테스트·골든 불변. 7/6 자동 Routine 반영 목표. |
 | 2026-07-02 | **fan-out 절 FDA 483 반영(§B `[2단계]` 절 유형 추가 — 6슬롯·나머지 절 무접촉)**: `ENABLE_FDA_483_DEEP=true` 활성 시 FDA 483 카드(`fda483-…`)도 `deep_analysis_ready=true` 로 fan-out 에 유입 → 대상 목록에 **FDA 483** 추가, ②단계 생성 프롬프트 매핑에 **483=`GRM_Prompt_DeepFda483_v1.md`**(신규) 추가, 스키마 자동선택에 483 ②섹션=`inspectional_significance`(WL/Import Alert 승격 가능성) 추가. 483 은 실사 종료 문서라 응답 평가 없음. ★483 D2 = CFR 인용이 원문(관찰사항)에 없어도 **WARN(비차단)** — 정당한 규제 해석 허용(WL 하드 FAIL 과 다름). build-jobs 가 job 에 `card_type`(kind) 동봉해 오케스트레이터가 유형별 프롬프트 선택. 483 = 결정론 Observation 상세 + 분석층 둘 다(층 혼용). 지시 `GRM_CC지시문_FDA483_분석층_2026-07-02.md`. 순수 doc 문구 수정 — 6슬롯 규칙·코드·골든 불변. 7/6 자동 Routine 반영 목표(머지+`ENABLE_FDA_483_DEEP=true`+운영 Routine 프롬프트 재-붙여넣기). |
 | 2026-07-07 | **클라우드 델타 브릿지 연동 — 델타 Notion 예치 지시 추가(§B `[산출물]` 절 순수 추가 — 기존 6슬롯·[출력]·[2단계] 지시문 무접촉)**: "카드는 만들어졌지만 웹사이트에 자동으로 올라가지 못한" 근본 원인(Routine 산출 델타를 git 으로 옮기는 다리의 부재) 해소 — 클라우드 Routine 은 git 에 못 쓰므로, 완성한 슬롯 델타 JSON 을 Notion Intake DB 페이지(`OPEN GRM Web Delta {date}`, `Type or Class`=`web-delta`, handoff 예치와 동형)에 남기면 신규 자동화(`grm-delta-bridge.yml`+`delta_bridge.py`, GitHub Actions·매주 월 09:30 KST)가 그 반대편에서 읽어 `web/data/deltas/delta_{date}.json` 을 git 커밋하고 발행 파이프(`grm-web-publish.yml`)를 자동 기동한다(사람 컴퓨터가 꺼져 있어도 발행 준비 진행). [산출물] 절에 "델타 Notion 예치" 지시 블록만 추가(본문 코드 블록 1개=슬롯 델타·심층분석 있으면 2번째 블록=deep 델타·같은 주 재실행은 페이지 덮어쓰기). 6슬롯 계약·코드 verbatim 필드·[출력]/[2단계]/기존 [산출물] 운영 흐름 불변(예치는 additive 후행 단계일 뿐). 무인 라이브 0 불변 — 브릿지는 델타 커밋까지만, 사람 승인(Admin 머지 버튼, 별도 트랙)이 유일한 라이브 게이트. 설계 `GRM_웹발행_클라우드자동화_설계_2026-07-07.md` §2(Fix A). 코드=`delta_bridge.py`·`.github/workflows/grm-delta-bridge.yml`·`tests/test_delta_bridge.py`. branch `feat/web-publish-cloud-bridge-2026-07-07`. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영). |
+| 2026-08-17 | **deep 델타에서 `source_text` 전사 요구 제거 — 브릿지가 handoff 원문을 직접 읽는다(§B `[2단계]` ③ · `[산출물 예치]` deep 블록 줄만 · 6슬롯·[출력]·4섹션 스키마·`observations_ko` 규칙 불변)**: 종전 계약은 카드마다 `body_full` 원문(483 은 12~14k자)을 **그대로 옮겨 적어** deep 델타의 `source_text` 로 예치하라고 요구했다. 그 문자열은 장식이 아니라 **근거 대조의 기준선**이다 — `verify_deep_analysis` 의 D2(조항 인용)·D4(원문 verbatim)·D5b(483 절단)가 전부 그 안에서 근거를 찾고, 조립 단계의 `assemble_publish_brief._refresh_483_observations`·`_refresh_wl_violations` 가 그 문자열을 **다시 파싱**해 발행 카드의 결정론 블록을 만든다. 즉 옮겨 적다 흘린 만큼이 그대로 '원문에 없음'이 된다. **실측(2026-08-17)**: Routine 이 예치한 6건이 **6건 전부** handoff `body_full` 과 달랐다(각 51~241자 누락 — 말미 업체주소·업체번호·사업자등록번호 블록이 통째로 빠짐). 같은 주 483 3장은 아예 산출되지 않아 사람이 백필했고, 그때 합성한 `source_text` 가 조립 재파싱에서 관찰 4건→1건으로 잘려 **발행본에 관찰 3건이 빠진 채 나갔다**(#749). 무인 실행에는 대조할 사람이 없다. → `body_full` 은 애초에 **같은 Notion DB 의 그 주 handoff 페이지**에 `rows[].deep_analysis_input.body_full` 로 이미 있으므로(Routine 이 그걸 읽고 분석했다), 브릿지가 `web_card_id` 로 조회해 채운다 — **전사 경로 자체가 사라진다**. 게이트가 보는 원문 = **분석기가 실제로 받은 입력**이 되어 판정도 정확해진다. 프롬프트는 `source_text` 를 **넣지 말라**로 개정(넣어도 브릿지가 원문으로 덮어쓰고 드리프트 WARN 을 남긴다 — 호환 유지). 코드=`delta_bridge.fetch_handoff_body_full`·`apply_handoff_source_text`(+`grm_handoff.handoff_id_for` 산식 단일화), 비차단(handoff 조회 실패 시 예치본 폴백으로 종전 동작). **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영 — 반영 전에도 브릿지가 정본화하므로 발행은 막히지 않는다). |

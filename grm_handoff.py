@@ -98,6 +98,19 @@ HANDOFF_SCHEMA_VERSION = "grm-routine-handoff/v1"
 HANDOFF_SCHEMA_VERSION_V2 = "grm-routine-handoff/v2"  # K2 단계 D (additive)
 
 
+def handoff_id_for(run_date: "date | str") -> str:
+    """handoff page 의 `Document ID` 정본 산식 — `routine-handoff::{run_date}`.
+
+    ★[2026-08-17] 종전엔 이 f-string 이 payload 빌더 두 곳과 emit 에 각각 박혀 있었다.
+    쓰는 쪽만 셋이라 사본이 어긋나도 티가 안 났는데, **읽는 쪽**(`delta_bridge` 가 그 주
+    handoff 에서 `deep_analysis_input.body_full` 을 되찾아 온다)이 생기면서 얘기가 달라졌다 —
+    한쪽 산식만 바뀌면 조회가 예외 없이 **0건**이 되고, 브릿지는 "handoff 없음"으로 정상
+    degrade 해 버려 아무 소리도 나지 않는다. 산식을 한 곳으로 모아 그 표류를 구조적으로 막는다.
+    """
+    day = run_date.isoformat() if isinstance(run_date, date) else str(run_date)
+    return f"{TYPE_ROUTINE_HANDOFF}::{day}"
+
+
 def _plain_text(parts: list[dict[str, Any]] | None) -> str:
     if not parts:
         return ""
@@ -535,7 +548,7 @@ def build_routine_handoff_payload(rows: list[dict[str, Any]], run_date: date,
         source_counts[row["source"]] = source_counts.get(row["source"], 0) + 1
     return {
         "schema_version": HANDOFF_SCHEMA_VERSION,
-        "handoff_id": f"routine-handoff::{run_date.isoformat()}",
+        "handoff_id": handoff_id_for(run_date),
         "run_date_kst": run_date.isoformat(),
         "window_start": start.isoformat(),
         "window_end": run_date.isoformat(),
@@ -659,7 +672,7 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
     return {
         "schema_version": HANDOFF_SCHEMA_VERSION_V2,
-        "handoff_id": f"routine-handoff::{run_date.isoformat()}",
+        "handoff_id": handoff_id_for(run_date),
         "run_date_kst": run_date.isoformat(),
         "weekday_kst": weekday_kst(run_date),  # 발행 요일 결정론 산출 — LLM 산술 금지(D-1)
         "window_start": start.isoformat(),
@@ -794,8 +807,18 @@ def _handoff_blocks(payload: dict[str, Any], compact: bool = False) -> list[dict
     return blocks
 
 
-def notion_find_handoff_page(token: str, db_id: str,
-                             handoff_id: str) -> dict[str, Any] | None:
+def notion_find_handoff_page(token: str, db_id: str, handoff_id: str,
+                             request: "Any | None" = None) -> dict[str, Any] | None:
+    """`Document ID = handoff_id` 인 handoff page 1건(최근 편집분 우선). 없으면 None.
+
+    `request` — HTTP 호출부 주입(기본 = 이 모듈의 `notion_api_request`). ★[2026-08-17]
+    `delta_bridge` 가 이 함수를 재사용하게 되면서 필요해졌다: 각 모듈은 `from grm_notion import
+    notion_api_request` 로 **자기 이름**을 따로 들고 있어서, 호출부 테스트가 자기 모듈의 그
+    이름만 mock 하면 이 함수는 그 그물을 빠져나가 **실제 Notion 으로 나간다**(delta_bridge
+    테스트에서 실측). 쿼리를 복사하는 대신 호출부를 주입받아, 조회 로직은 여기 하나로 두고
+    경계는 호출부가 막게 한다.
+    """
+    req = request or notion_api_request
     body = {
         "filter": {
             "property": PROP_DOC_ID,
@@ -803,8 +826,7 @@ def notion_find_handoff_page(token: str, db_id: str,
         },
         "page_size": 5,
     }
-    data = notion_api_request("POST", NOTION_DB_QUERY_URL_TPL.format(db_id=db_id),
-                              token, body=body)
+    data = req("POST", NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
     results = data.get("results", [])
     if not results:
         return None
@@ -1159,7 +1181,7 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
     # 된 handoff 의 row 가 하루 늦게 재투입된다. upsert 내부의 K4-1 가드는 그대로
     # 두되(여기서 이미 봉인됐으므로 no-op), v1(flag off)은 이 블록 전체를 건너뛴다.
     idem_v2 = _enable_handoff_idempotency_v2()
-    handoff_id = f"routine-handoff::{run_date.isoformat()}"
+    handoff_id = handoff_id_for(run_date)
     current_handoff_open = True
     if idem_v2:
         notion_stale_prior_open_handoffs(

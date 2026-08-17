@@ -27,6 +27,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import delta_bridge as db  # noqa: E402
+import grm_handoff as gh  # noqa: E402
 
 
 def _code_block(payload: dict) -> dict:
@@ -119,6 +120,85 @@ class _TypeAwareNotion(_FakeNotion):
 def _deep_page(pid: str, date_str: str, **kw) -> dict:
     return _delta_page(pid, date_str, title_prefix=db.TITLE_PREFIX_OPEN_DEEP,
                         type_class=db.TYPE_WEB_DEEP_DELTA, **kw)
+
+
+def _handoff_payload(bodies: dict[str, str], *, run_date: str = "2026-07-13") -> dict:
+    """handoff v2 payload(실 producer 스키마의 최소 형태) — deep 대상 row + 비대상 row 혼재."""
+    rows: list[dict] = [{"web_card_id": "plain-1", "section": "news"}]  # deep 비대상
+    for card_id, body in bodies.items():
+        rows.append({
+            "web_card_id": card_id,
+            "card_id": f"MFDS::{card_id}",
+            "deep_analysis_ready": True,
+            "deep_analysis_input": {"body_full": body},
+            "kind": "admin-action",
+        })
+    return {"schema_version": gh.HANDOFF_SCHEMA_VERSION_V2,
+            "handoff_id": gh.handoff_id_for(run_date),
+            "run_date_kst": run_date, "row_count": len(rows), "rows": rows}
+
+
+def _chunked_code_blocks(payload: dict, size: int = 1900) -> list[dict]:
+    """payload JSON 을 `_handoff_blocks` 와 동형으로 1,900자 code 블록에 쪼개 담는다.
+
+    handoff payload 는 실측 175~230 블록으로 쪼개져 실린다 — 블록 단위로 파싱하면 전량
+    실패하므로, 결합해서 읽는지를 이 픽스처가 강제한다.
+    """
+    text = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return [_code_block_text(text[i:i + size]) for i in range(0, len(text), size)]
+
+
+def _code_block_text(text: str) -> dict:
+    return {"type": "code", "code": {"language": "json", "rich_text": [{"plain_text": text}]}}
+
+
+def _handoff_page(pid: str = "h1") -> dict:
+    return {"id": pid, "url": f"https://app.notion.com/p/{pid}",
+            "last_edited_time": "2026-07-13T00:00:00.000Z",
+            "properties": {"Name": {"title": [{"plain_text": "CONSUMED GRM Routine Handoff"}]}}}
+
+
+class _HandoffNotion(_TypeAwareNotion):
+    """handoff 페이지 조회(`Document ID` rich_text equals)까지 흉내내는 라우터.
+
+    handoff 는 web-delta/web-deep-delta 와 **필터 모양이 다르다**(select 가 아니라 rich_text).
+    필터를 무시하는 fake 로는 delta 페이지가 handoff 로 되돌아와 실제와 다른 상황이 된다.
+    `handoff_queries` 로 **어떤 handoff_id 를 물었는지** 검사한다 — id 산식이 어긋나면 조회가
+    조용히 0건이 되므로, 그 산식 자체를 테스트가 고정해야 한다.
+    """
+
+    def __init__(self, query_results: list[dict], blocks: dict[str, list[dict]] | None = None,
+                 handoff_pages: dict[str, dict] | None = None):
+        super().__init__(query_results, blocks)
+        self.handoff_pages = handoff_pages or {}
+        self.handoff_queries: list[str] = []
+
+    def __call__(self, method, url, token, body=None, **kw):
+        flt = (body or {}).get("filter") or {}
+        if method == "POST" and url.endswith("/query") and flt.get("property") == gh.PROP_DOC_ID:
+            handoff_id = (flt.get("rich_text") or {}).get("equals")
+            self.handoff_queries.append(handoff_id)
+            page = self.handoff_pages.get(handoff_id)
+            return {"results": [page] if page else [], "has_more": False}
+        return super().__call__(method, url, token, body=body, **kw)
+
+
+# 2026-08-17 실측 드리프트의 최소 재현: Routine 이 예치한 source_text 에서 **말미 블록이 통째로
+# 빠졌고**, 하필 그 안에 심층분석이 인용한 조항이 있었다(실측 6/6 카드가 51~241자씩 누락).
+_BODY_FULL_ADMIN = "기준서 미준수. 적용법령: 약사법 제38조제1항. [별표8] 개별기준."
+_DRIFTED_SOURCE = "기준서 미준수."
+_GROUNDED_DA = {
+    "key_violations": [{
+        "citation": "약사법 제38조제1항",
+        "original": "기준서 미준수",
+        "description": "제조·품질관리기준서를 준수하지 않았다는 지적이 확인됨.",
+        "risk": "제품 품질 일관성 저하 위험이 있다.",
+    }],
+    "disposition_basis": "기준서 미준수를 사유로 제조업무정지 1개월이 부과됐다([별표8] 근거).",
+    "required_remediation": {"deadline": "제조업무정지 기간 이행",
+                              "items": ["기준서와 실제 작업기록 일치 여부 점검"]},
+    "administrative_risks": "재위반 시 가중처분으로 이어질 수 있는 리스크가 있다.",
+}
 
 
 _DEEP_PAYLOAD = {"mfds-1": {"deep_analysis": {"a": 1}, "source_text": "원문"}}
@@ -611,6 +691,225 @@ class HandoffWebCardIdTest(unittest.TestCase):
         # 두 필드가 나란히 있고 **서로 다르다** — 이름으로 구분해야 한다는 사실 자체를 고정.
         self.assertEqual(row["card_id"], "FDA Warning Letter::WL-CMS-660124")
         self.assertNotEqual(row["web_card_id"], row["card_id"])
+
+
+# ── [2026-08-17] deep `source_text` 정본 = handoff `deep_analysis_input.body_full` ──────────
+#
+# 종전 계약은 클라우드 Routine 이 카드 원문(483 은 12~14k자)을 델타에 **옮겨 적게** 했다.
+# 그 문자열은 장식이 아니라 근거 대조의 기준선이라(D2/D4/D5b + 조립 시점 결정론 재추출),
+# 옮겨 적다 흘린 만큼이 그대로 "원문에 없음"이 된다. 2026-08-17 실측에서 예치된 6건이
+# **6건 전부** body_full 과 달랐다. 무인 실행에는 대조할 사람이 없으므로 전사 경로를 없앤다.
+
+
+class ExtractHandoffBodyFullTest(unittest.TestCase):
+    """payload → {web_card_id: body_full} 순수 추출."""
+
+    def test_deep_rows_extracted_by_web_card_id(self) -> None:
+        bodies = db.extract_handoff_body_full(_handoff_payload({"admin-1": "원문A", "x-2": "원문B"}))
+        self.assertEqual(bodies, {"admin-1": "원문A", "x-2": "원문B"})
+
+    def test_non_deep_rows_ignored(self) -> None:
+        """deep 비대상 row(`plain-1`)는 body_full 이 없다 — 섞여 들어오면 안 된다."""
+        self.assertNotIn("plain-1", db.extract_handoff_body_full(_handoff_payload({"a": "b"})))
+
+    def test_v1_payload_yields_empty(self) -> None:
+        """v1 payload·심층분석 없는 주는 그 키가 아예 없다 — 버전 문자열이 아니라 **키**로 판정."""
+        v1 = {"schema_version": gh.HANDOFF_SCHEMA_VERSION, "rows": [{"document_id": "a"}]}
+        self.assertEqual(db.extract_handoff_body_full(v1), {})
+        self.assertEqual(db.extract_handoff_body_full({}), {})
+
+    def test_blank_body_is_not_harvested(self) -> None:
+        """빈 body_full 을 주우면 예치된 진짜 원문을 공백으로 덮어 카드를 죽인다."""
+        p = _handoff_payload({"a": "   "})
+        self.assertEqual(db.extract_handoff_body_full(p), {})
+
+    def test_card_id_prefixed_key_is_not_used(self) -> None:
+        """`card_id`(source::document_id)를 주우면 델타 키 공간과 어긋나 전건 미스가 된다."""
+        bodies = db.extract_handoff_body_full(_handoff_payload({"admin-1": "원문"}))
+        self.assertEqual(list(bodies), ["admin-1"])
+
+
+class ApplyHandoffSourceTextTest(unittest.TestCase):
+    """정본화 규약 — 채움/교체/동일/미보유, 그리고 **하지 않는 것들**."""
+
+    def test_drifted_source_text_is_replaced(self) -> None:
+        deep = {"admin-1": {"deep_analysis": {}, "source_text": _DRIFTED_SOURCE}}
+        stats = db.apply_handoff_source_text(deep, {"admin-1": _BODY_FULL_ADMIN})
+        self.assertEqual(deep["admin-1"]["source_text"], _BODY_FULL_ADMIN)
+        self.assertEqual(stats["replaced"], 1)
+
+    def test_missing_source_text_is_filled(self) -> None:
+        """프롬프트가 예치를 그만두면 이 경로가 정상 경로가 된다."""
+        deep = {"admin-1": {"deep_analysis": {}}}
+        stats = db.apply_handoff_source_text(deep, {"admin-1": _BODY_FULL_ADMIN})
+        self.assertEqual(deep["admin-1"]["source_text"], _BODY_FULL_ADMIN)
+        self.assertEqual(stats["filled"], 1)
+
+    def test_identical_is_noop(self) -> None:
+        deep = {"admin-1": {"source_text": _BODY_FULL_ADMIN}}
+        stats = db.apply_handoff_source_text(deep, {"admin-1": _BODY_FULL_ADMIN})
+        self.assertEqual((stats["identical"], stats["replaced"], stats["filled"]), (1, 0, 0))
+
+    def test_card_absent_from_handoff_keeps_deposited_text(self) -> None:
+        """소급 복구 경로(`fda483_ocr_backfill` OCR 판독본)는 handoff 에 짝이 없다 — 지우면 안 된다."""
+        deep = {"fda483-1": {"source_text": "OCR 판독본", "source_text_status": "pdf-ok-ocr"}}
+        stats = db.apply_handoff_source_text(deep, {"admin-9": _BODY_FULL_ADMIN})
+        self.assertEqual(deep["fda483-1"]["source_text"], "OCR 판독본")
+        self.assertEqual(stats["absent"], 1)
+
+    def test_does_not_create_cards(self) -> None:
+        """분석 없는 카드에 원문만 실으면 조립이 '원문은 있는데 분석이 없는 카드'를 새로 본다."""
+        deep = {"admin-1": {"deep_analysis": {}}}
+        db.apply_handoff_source_text(deep, {"admin-1": "a", "admin-2": "b", "admin-3": "c"})
+        self.assertEqual(set(deep), {"admin-1"})
+
+    def test_other_keys_untouched(self) -> None:
+        deep = {"fda483-1": {"source_text": "옛것", "source_text_status": "pdf-ok",
+                             "observations_ko": [{"number": "1"}], "deep_analysis": {"a": 1}}}
+        db.apply_handoff_source_text(deep, {"fda483-1": _BODY_FULL_ADMIN})
+        self.assertEqual(deep["fda483-1"]["source_text_status"], "pdf-ok")
+        self.assertEqual(deep["fda483-1"]["observations_ko"], [{"number": "1"}])
+        self.assertEqual(deep["fda483-1"]["deep_analysis"], {"a": 1})
+
+
+class FetchHandoffBodyFullTest(unittest.TestCase):
+    def test_chunked_payload_is_joined_and_parsed(self) -> None:
+        """payload 는 1,900자 code 블록으로 쪼개져 실린다 — 결합하지 않으면 전량 유실."""
+        payload = _handoff_payload({"admin-1": "가" * 4000})
+        fake = _HandoffNotion([], blocks={"h1": _chunked_code_blocks(payload)},
+                              handoff_pages={"routine-handoff::2026-07-13": _handoff_page()})
+        self.assertGreater(len(fake.blocks["h1"]), 1)  # 픽스처가 실제로 쪼개졌는지부터 확인
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            bodies = db.fetch_handoff_body_full("tok", "dbid", "2026-07-13")
+        self.assertEqual(bodies, {"admin-1": "가" * 4000})
+
+    def test_queries_exact_handoff_id(self) -> None:
+        """`routine-handoff::{publish_date}` 정확일치 — 산식이 어긋나면 조회가 조용히 0건."""
+        fake = _HandoffNotion([], handoff_pages={})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            db.fetch_handoff_body_full("tok", "dbid", "2026-07-13")
+        self.assertEqual(fake.handoff_queries, ["routine-handoff::2026-07-13"])
+
+    def test_missing_page_returns_empty(self) -> None:
+        fake = _HandoffNotion([], handoff_pages={})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            self.assertEqual(db.fetch_handoff_body_full("tok", "dbid", "2026-07-13"), {})
+
+    def test_unparseable_payload_returns_empty(self) -> None:
+        fake = _HandoffNotion([], blocks={"h1": [_code_block_text("{망가진")]},
+                              handoff_pages={"routine-handoff::2026-07-13": _handoff_page()})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            self.assertEqual(db.fetch_handoff_body_full("tok", "dbid", "2026-07-13"), {})
+
+
+class HandoffSourceTextIntegrationTest(unittest.TestCase):
+    """main() 경로 — 정본화가 **게이트보다 먼저** 걸리는지(순서 불가침)."""
+
+    def setUp(self) -> None:
+        self._cwd = os.getcwd()
+        self._tmp = tempfile.TemporaryDirectory()
+        os.chdir(self._tmp.name)
+        self._env = mock.patch.dict(os.environ, {"NOTION_TOKEN": "tok"})
+        self._env.start()
+
+    def tearDown(self) -> None:
+        self._env.stop()
+        os.chdir(self._cwd)
+        self._tmp.cleanup()
+
+    def _run(self, handoff_pages, deep_payload):
+        fake = _HandoffNotion(
+            [_delta_page("p1", "2026-07-13"), _deep_page("p2", "2026-07-13")],
+            blocks={"p1": [_code_block(_valid_delta())],
+                    "p2": [_code_block(deep_payload)],
+                    "h1": _chunked_code_blocks(_handoff_payload({"admin-1": _BODY_FULL_ADMIN}))},
+            handoff_pages=handoff_pages)
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        path = pathlib.Path("web/data/deltas/deep_2026_07_13.json")
+        written = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+        return rc, written, fake
+
+    def test_drifted_deposit_is_healed_before_the_gate(self) -> None:
+        """★발화 확인용 — 인용 조항이 **전사에서 잘려나간 말미**에만 있는 카드.
+
+        정본화가 없으면 D2 가 "원문에 없는 조항"으로 보고 그 카드를 drop 한다(= 심층분석
+        침묵 유실). handoff 원문으로 맞춘 뒤 게이트를 돌려야 통과한다.
+        """
+        deposited = {"admin-1": {"deep_analysis": _GROUNDED_DA, "source_text": _DRIFTED_SOURCE}}
+        rc, written, _ = self._run({"routine-handoff::2026-07-13": _handoff_page()}, deposited)
+        self.assertEqual(rc, 0)
+        self.assertIsNotNone(written, "정본화가 걸리지 않아 D2 FAIL 로 카드가 drop 됐다")
+        self.assertEqual(written["admin-1"]["source_text"], _BODY_FULL_ADMIN)
+
+    def test_without_handoff_the_same_card_is_dropped(self) -> None:
+        """대조군 — handoff 가 없으면 예치본 그대로라 종전 동작(drop)과 동일하다.
+
+        이 대조군이 있어야 위 테스트가 '정본화 덕분에' 통과한 것임이 증명된다(순환 방지).
+        """
+        deposited = {"admin-1": {"deep_analysis": _GROUNDED_DA, "source_text": _DRIFTED_SOURCE}}
+        with redirect_stderr(io.StringIO()):
+            rc, written, _ = self._run({}, deposited)
+        self.assertEqual(rc, 0)                       # delta 는 정상 기록(비차단)
+        self.assertIsNone(written)                    # deep 은 전건 drop
+        self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())
+
+    def test_handoff_failure_never_blocks_the_delta(self) -> None:
+        """deep 은 선택 계층 — 그 조회 실패가 주간 발행(=delta)을 인질로 잡으면 안 된다."""
+        class _Boom(_HandoffNotion):
+            def __call__(self, method, url, token, body=None, **kw):
+                flt = (body or {}).get("filter") or {}
+                if method == "POST" and flt.get("property") == gh.PROP_DOC_ID:
+                    raise db.NotionHandoffError("Notion 500")
+                return super().__call__(method, url, token, body=body, **kw)
+
+        fake = _Boom([_delta_page("p1", "2026-07-13"), _deep_page("p2", "2026-07-13")],
+                     blocks={"p1": [_code_block(_valid_delta())],
+                             "p2": [_code_block({"admin-1": {"deep_analysis": _GROUNDED_DA,
+                                                             "source_text": _BODY_FULL_ADMIN}})]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        self.assertTrue(pathlib.Path("web/data/deltas/delta_2026_07_13.json").exists())
+        # 예치본이 근거로 남아 있으므로 deep 도 종전대로 기록된다(폴백이 실제로 산다).
+        self.assertTrue(pathlib.Path("web/data/deltas/deep_2026_07_13.json").exists())
+
+
+class DeepKeyNamespaceWiringTest(unittest.TestCase):
+    """[2026-08-17] `normalize_deep_key_namespace` 가 **정의만 되고 배선이 없던** 두 경로.
+
+    이 함수의 docstring 은 "별도 페이지로 온 deep 은 delta 경로를 타지 않는다"고 위험을
+    정확히 적어두고도 정작 그 경로에서 호출되지 않았다. 접두사 키가 남으면 카드 id 가 전부
+    빗나가 심층분석이 조용히 사라지고, handoff 원문 조회(`web_card_id` = bare)도 전건 미스가 된다.
+    """
+
+    def test_separate_deep_page_keys_are_normalized(self) -> None:
+        page = _deep_page("p2", "2026-07-13")
+        page["_code_blocks"] = [_j({"MFDS::admin-1": {"deep_analysis": {}, "source_text": "x"}})]
+        self.assertEqual(set(db.extract_deep_page(page)), {"admin-1"})
+
+    def test_clean_delta_with_prefixed_deep_keys_is_normalized(self) -> None:
+        """delta 키가 깨끗하면 `normalize_card_key_namespace` 는 조기 return 한다 — 그때가 사각."""
+        page = _delta_page("p1", "2026-07-13")
+        page["_code_blocks"] = [_j(_valid_delta()),
+                                _j({"MFDS::mfds-1": {"deep_analysis": {}, "source_text": "x"}})]
+        _delta, deep, _date = db.extract_delta(page)
+        self.assertEqual(set(deep), {"mfds-1"})
+
+
+class HandoffIdFormulaTest(unittest.TestCase):
+    """`handoff_id` 산식 단일화 — 쓰는 쪽(emit)과 읽는 쪽(브릿지)이 같은 문자열을 봐야 한다."""
+
+    def test_write_and_read_sides_agree(self) -> None:
+        from datetime import date, datetime
+        payload = gh.build_routine_handoff_payload_v2(
+            [], date(2026, 7, 13), 7, datetime(2026, 7, 13, 3, 17))
+        self.assertEqual(payload["handoff_id"], gh.handoff_id_for("2026-07-13"))
+        self.assertEqual(payload["handoff_id"], "routine-handoff::2026-07-13")
+
+    def test_accepts_date_and_str(self) -> None:
+        from datetime import date
+        self.assertEqual(gh.handoff_id_for(date(2026, 7, 13)), gh.handoff_id_for("2026-07-13"))
 
 
 if __name__ == "__main__":

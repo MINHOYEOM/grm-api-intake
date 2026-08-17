@@ -20,6 +20,11 @@ handoff 를 Notion 에 남기는 것과 정확히 대칭(`grm_handoff.py` 의 �
 OPEN 델타 페이지가 없으면 클린 skip(exit 0). 구조 불량 델타는 fail-loud(exit 1) — 조용히
 빈 델타를 커밋하지 않는다. 같은 publish_date 파일이 이미 있고 내용이 다르면 exit 1(재발행은
 사람 판단). 내용이 같으면 wrote=false(멱등 no-op).
+
+[2026-08-17] deep 델타의 `source_text`(근거 대조 기준선)는 **Routine 이 옮겨 적은 것을 믿지
+않고** 그 주 handoff 페이지의 `deep_analysis_input.body_full` 에서 직접 읽어 맞춘다
+(`fetch_handoff_body_full`→`apply_handoff_source_text`). 전사 경로가 사라져 무인 실행에서
+사람 대조가 필요 없어진다. handoff 를 못 읽으면 예치본으로 종전과 동일하게 진행(비차단).
 """
 from __future__ import annotations
 
@@ -53,6 +58,12 @@ try:
     import verify_deep_analysis as _vda
 except ImportError:  # pragma: no cover — 항상 동봉되지만 방어적으로.
     _vda = None  # type: ignore[assignment]
+
+try:
+    from grm_handoff import handoff_id_for, notion_find_handoff_page
+except ImportError:  # pragma: no cover — 항상 동봉되지만 방어적으로.
+    handoff_id_for = None  # type: ignore[assignment]
+    notion_find_handoff_page = None  # type: ignore[assignment]
 
 
 TYPE_WEB_DELTA = "web-delta"
@@ -216,6 +227,12 @@ def _fetch_code_blocks(token: str, page_id: str) -> list[str]:
         if not data.get("has_more"):
             break
         start_cursor = data.get("next_cursor")
+    else:
+        # [2026-08-17] 상한 도달을 **말은 하게** 한다. 델타 페이지는 블록이 몇 개뿐이라 이 상한이
+        # 걸릴 일이 없었지만, handoff 페이지는 payload 전문이 1,900자씩 쪼개져 실려 실측 175~230
+        # 블록(2~3 API 페이지)이다. 조용히 잘리면 뒤이은 json 파싱이 실패해 "handoff 없음"으로
+        # degrade 하는데, 그 로그만 봐서는 페이지가 없는 건지 잘린 건지 구별할 수 없다.
+        log("WARN", f"코드블록 조회 25페이지 상한 도달(page={page_id}) — 본문 일부 누락 가능")
     return texts
 
 
@@ -345,9 +362,14 @@ def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
     [클라우드화 2026-07-13] 심층분석 생성은 클라우드 Routine 의 LLM 이(python·서브에이전트
     없이) 하고, **근거 검증(D1 구조·D2 조항 근거대조·D3 숫자)은 python 이 도는 이 브릿지가**
     담당한다 — 근거 없는(날조·미근거) 분석의 발행을 차단한다(생성=클라우드·검증=여기). 각 카드
-    entry 는 `{"deep_analysis": {...4섹션...}, "source_text": "<그 카드 원문>", ...}`(예치 규약);
+    entry 는 `{"deep_analysis": {...4섹션...}, "source_text": "<그 카드 원문>", ...}`;
     `source_text` 로 D2/D4 근거대조를 한다. 게이트 FAIL 카드는 조용히 drop(그 카드만 6슬롯으로
-    graceful degrade). 게이트 모듈 부재 시(방어) 구조검증만 하고 원본 통과. PASS 0건이면 None."""
+    graceful degrade). 게이트 모듈 부재 시(방어) 구조검증만 하고 원본 통과. PASS 0건이면 None.
+
+    ★ 이 함수가 보는 `source_text` 는 호출 직전 `_authoritative_source_text` 가 그 주 handoff 의
+    `deep_analysis_input.body_full` 로 맞춰 놓은 값이다(2026-08-17). 즉 **분석기가 실제로 받은
+    입력**과 대조한다 — 예치된 전사본과 대조하던 종전 방식은 옮겨 적다 흘린 만큼이 그대로
+    '원문에 없음'이 됐다."""
     if _vda is None:  # pragma: no cover — 항상 동봉
         log("WARN", "verify_deep_analysis 미탑재 — deep 게이트 skip(구조검증만 적용됨)")
         return deep
@@ -387,6 +409,153 @@ def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
         return None
     log("INFO", f"deep 게이트 통과 {len(kept)}/{len(deep)} 카드 병합")
     return kept
+
+
+def extract_handoff_body_full(payload: dict[str, Any]) -> dict[str, str]:
+    """handoff v2 payload → `{web_card_id: deep_analysis_input.body_full}`(순수 함수).
+
+    v1 payload·심층분석 비대상 주에는 그런 키가 아예 없으므로 자연히 빈 dict 다 —
+    `schema_version` 문자열로 분기하지 않는다(**데이터에서 파생**한다. 스키마 이름이 바뀌어도
+    키가 있으면 읽고, 키가 없으면 안 읽는 게 정확한 판정이다).
+    """
+    bodies: dict[str, str] = {}
+    dupes = 0
+    for row in payload.get("rows", []):
+        if not isinstance(row, dict):
+            continue
+        card_id = row.get("web_card_id")
+        body = (row.get("deep_analysis_input") or {}).get("body_full") \
+            if isinstance(row.get("deep_analysis_input"), dict) else None
+        if not (isinstance(card_id, str) and card_id and isinstance(body, str) and body.strip()):
+            continue
+        if card_id in bodies:
+            if bodies[card_id] != body:
+                dupes += 1
+            continue  # 먼저 만난 것이 정본(rows 는 상류에서 이미 dedupe 된다)
+        bodies[card_id] = body
+    if dupes:
+        log("WARN", f"handoff 에 같은 web_card_id 의 서로 다른 body_full 이 {dupes}건 — "
+                    "첫 행을 사용(비정상: 상류 dedupe 확인 필요)")
+    return bodies
+
+
+def fetch_handoff_body_full(token: str, db_id: str, publish_date: str) -> dict[str, str]:
+    """그 주 Routine handoff 페이지에서 카드별 심층분석 입력 원문을 되찾아 온다.
+
+    **왜 되찾아 오나(2026-08-17).** 종전 계약은 deep 델타의 `source_text` 에 그 카드의
+    `body_full`(483 은 12~14k자)을 **클라우드 Routine 이 그대로 옮겨 적어** 예치하라고 요구했다.
+    그런데 `source_text` 는 장식이 아니라 **근거 대조의 기준선**이다 — `verify_deep_analysis` 의
+    D2(조항 인용)·D4(원문 verbatim)·D5b(483 절단)가 전부 이 문자열 안에서 근거를 찾고,
+    조립 단계의 `_refresh_483_observations`·`_refresh_wl_violations` 는 이 문자열을 **다시
+    파싱**해 발행 카드의 결정론 블록을 만든다. 즉 LLM 이 옮겨 적다 흘린 만큼이 그대로
+    "원문에 없는 것"이 된다.
+    2026-08-17 실측: Routine 이 예치한 6건이 **6건 전부** body_full 과 달랐다(각 51~241자,
+    말미 업체주소·업체번호·사업자등록번호 블록이 통째로 누락). 무인 실행에는 대조할 사람이 없다.
+
+    `body_full` 은 애초에 **같은 Notion DB 의 그 주 handoff 페이지 안에**
+    `rows[].deep_analysis_input.body_full` 로 이미 있다(Routine 이 그걸 읽고 분석했다).
+    그러니 옮겨 적게 하지 말고 브릿지가 직접 읽는다 — 전사 경로 자체가 없어진다.
+
+    ★ 여기서 가져오는 값이 **정확히 분석기가 본 입력**이라는 점이 핵심이다. 게이트는 "LLM 이
+    받은 원문"과 대조해야 맞다. 더 풍부한 텍스트로 대조하면 게이트가 과하게 관대해지고,
+    더 빈약한 텍스트로 대조하면 멀쩡한 인용이 거짓 FAIL 난다.
+
+    짝은 **날짜 정확일치**만이다(`routine-handoff::{publish_date}`) — 예치 규약이
+    `publish_date` = 그 handoff 의 `run_date_kst` 로 못박고 있다. '최신 handoff' 폴백을 두면
+    지난 주 원문으로 이번 주 분석을 대조하게 되고, 그건 조용한 오염이다
+    (`select_open_deep_delta` 의 판단과 동형).
+
+    반환: `{web_card_id: body_full}`. 페이지 없음·구조 불량은 빈 dict(호출부가 폴백).
+    """
+    if notion_find_handoff_page is None or handoff_id_for is None:  # pragma: no cover
+        log("WARN", "grm_handoff 미탑재 — handoff 원문 정본화 skip(예치된 source_text 사용)")
+        return {}
+    handoff_id = handoff_id_for(publish_date)
+    # `request=` 로 **이 모듈의** notion_api_request 를 넘긴다 — 그래야 브릿지의 Notion I/O 가
+    # 전부 한 이름을 지나가고, 호출부 테스트가 그 하나만 막으면 실제 네트워크로 새지 않는다.
+    page = notion_find_handoff_page(token, db_id, handoff_id, request=notion_api_request)
+    if page is None:
+        log("WARN", f"handoff 페이지 미발견({handoff_id}) — 예치된 source_text 를 그대로 사용")
+        return {}
+    texts = [t for t in _fetch_code_blocks(token, page.get("id", ""))
+             if isinstance(t, str) and t.strip()]
+    # payload 는 JSON 하나가 1,900자 단위 code 블록으로 쪼개져 실린다(`_handoff_blocks`) —
+    # 결합해야 파싱된다. 블록 단위 선-파싱은 전량 실패한다(_fetch_code_blocks 주석 동형).
+    payload = _try_json_dict("".join(texts))
+    if payload is None:
+        log("WARN", f"handoff payload JSON 파싱 실패({handoff_id}, 블록 {len(texts)}개) — "
+                    "예치된 source_text 를 그대로 사용")
+        return {}
+    bodies = extract_handoff_body_full(payload)
+    log("INFO", f"handoff 심층분석 입력 원문 {len(bodies)}건 확보({handoff_id})")
+    return bodies
+
+
+def apply_handoff_source_text(deep: dict[str, Any],
+                              bodies: dict[str, str]) -> dict[str, int]:
+    """deep 델타 각 카드의 `source_text` 를 handoff `body_full` 로 **정본화**한다(순수 함수).
+
+    규약:
+      · handoff 에 그 카드의 비어있지 않은 `body_full` 이 있을 때만 손댄다.
+      · 없으면 예치된 값을 **그대로 둔다** — 폴백이 곧 안전망이다. 소급 복구 경로가 실제로
+        존재한다(`fda483_ocr_backfill` 의 OCR 판독본은 `fda483_body_full` 이 애초에 없어서
+        만든 것이라 handoff 에 짝이 없다). 그런 값을 지우면 그 카드는 원문을 잃는다.
+      · 값이 다르면 **조용히 고치지 않는다** — 건수·표본을 WARN 으로 남긴다(전사 드리프트
+        자체가 계속 보여야 프롬프트를 언제 손봐야 할지 알 수 있다).
+      · `source_text_status`(OCR 출처 표기) 등 다른 키는 건드리지 않는다.
+
+    ⚠️ 카드를 **새로 만들지는 않는다.** handoff 에 body_full 이 있어도 deep 델타에 그 카드
+    항목이 없으면 분석 자체가 없다는 뜻이라, 원문만 실은 유령 항목을 만들면 조립이 "원문은
+    있는데 분석이 없는 카드"를 새로 보게 된다.
+
+    Returns: {"filled","replaced","identical","absent"} 건수.
+    """
+    stats = {"filled": 0, "replaced": 0, "identical": 0, "absent": 0}
+    drifted: list[str] = []
+    for doc, entry in deep.items():
+        if not isinstance(entry, dict):
+            continue
+        body = bodies.get(doc)
+        if not body:
+            stats["absent"] += 1
+            continue
+        current = entry.get("source_text")
+        if not (isinstance(current, str) and current.strip()):
+            entry["source_text"] = body
+            stats["filled"] += 1
+        elif current == body:
+            stats["identical"] += 1
+        else:
+            entry["source_text"] = body
+            stats["replaced"] += 1
+            drifted.append(f"{doc}({len(current) - len(body):+d}자)")
+    if stats["replaced"]:
+        log("WARN", f"예치된 source_text 가 handoff body_full 과 다릅니다 {stats['replaced']}건 "
+                    f"— handoff 원문으로 교체(전사 드리프트): {', '.join(drifted[:5])}"
+                    + (" …" if len(drifted) > 5 else ""))
+        log("WARN", "원인 = Routine 이 body_full 을 델타에 **옮겨 적는** 계약(프롬프트 §B ③). "
+                    "브릿지가 handoff 에서 직접 읽으므로 예치는 더 이상 필요하지 않다.")
+    if any(stats.values()):
+        log("INFO", f"handoff 원문 정본화: 채움 {stats['filled']} · 교체 {stats['replaced']} · "
+                    f"동일 {stats['identical']} · handoff 미보유 {stats['absent']}")
+    return stats
+
+
+def _authoritative_source_text(token: str, db_id: str, date_str: str,
+                               deep: dict[str, Any]) -> None:
+    """deep 델타의 `source_text` 를 그 주 handoff 원문으로 맞춘다(얇은 I/O·**비차단**).
+
+    `_merge_deep_from_separate_page` 와 같은 이유로 실패가 delta 브릿지를 죽이면 안 된다 —
+    이건 선택 계층(deep)의 품질 개선이고, delta 기록은 주간 발행의 필수 경로다. 실패하면
+    예치된 `source_text` 로 종전과 100% 동일하게 진행한다(WARN 만 남긴다).
+    """
+    try:
+        bodies = fetch_handoff_body_full(token, db_id, date_str)
+    except (DeltaBridgeError, NotionHandoffError) as e:
+        log("WARN", f"handoff 원문 조회 실패({date_str}) — 예치된 source_text 로 계속: {e}")
+        return
+    if bodies:
+        apply_handoff_source_text(deep, bodies)
 
 
 def _try_json_dict(text: str) -> dict[str, Any] | None:
@@ -462,6 +631,12 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
             f"publish_date 형식 오류: {publish_date!r} — ^\\d{{4}}-\\d{{2}}-\\d{{2}}$ 필요")
 
     normalize_card_key_namespace(delta, deep)
+    # ★[2026-08-17] deep 정규화를 **무조건** 한 번 더 부른다(멱등 — 정상 키면 0 반환).
+    # 위 호출은 delta 카드 키에 접두사가 없으면 조기 return 하므로, "delta 는 깨끗한데 deep 만
+    # 접두사"인 조합에서 deep 이 전혀 정규화되지 않았다. 그러면 카드 id 가 전부 빗나가 심층분석이
+    # 조용히 사라지고, 아래 handoff 원문 정본화도 `web_card_id`(bare) 로 조회하므로 전건 미스가
+    # 된다 — 잃는 것이 겹치는 자리라 delta 쪽 상태에 의존시키지 않는다.
+    normalize_deep_key_namespace(deep)
 
     if inject_slots is not None:
         try:
@@ -487,6 +662,11 @@ def extract_deep_page(page: dict[str, Any]) -> dict[str, Any]:
     web-delta 페이지와 달리 envelope(cards+tldr)가 **없다** — 본문 전체가 deep dict 하나다.
     `_fetch_code_blocks` 주석과 같은 이유로 Notion 이 긴 본문을 여러 code 블록으로 쪼갤 수
     있으므로, 블록1 단독 → 전체 결합 순으로 시도한다(쪼개진 deep 을 통째로 버리지 않기 위해).
+
+    ★[2026-08-17] 키 정규화(`normalize_deep_key_namespace`)를 **여기서** 건다.
+    `normalize_deep_key_namespace` 의 docstring 은 "별도 페이지로 온 deep 은 delta 경로를 타지
+    않는다"고 그 위험을 정확히 적어두고도, 정작 이 경로에서 그 함수를 부르는 곳이 없었다
+    (정의만 있고 배선이 없는 슬롯 — 이 저장소의 상습 결함 계열).
     """
     props = page.get("properties", {})
     title = _prop_title(props, PROP_NAME)
@@ -500,14 +680,21 @@ def extract_deep_page(page: dict[str, Any]) -> dict[str, Any]:
 
     first = _try_json_dict(texts[0])
     if first is not None and not _is_envelope(first) and len(texts) == 1:
-        return _validate_deep(first)
+        return _normalized_deep(first)
     joined = _try_json_dict("".join(texts))
     if joined is not None:
-        return _validate_deep(joined)
+        return _normalized_deep(joined)
     if first is not None:
-        return _validate_deep(first)
+        return _normalized_deep(first)
     raise DeltaBridgeError(
         f"deep 페이지 {title!r}: deep 델타 JSON 파싱 실패(블록 {len(texts)}개, 단독·결합 모두)")
+
+
+def _normalized_deep(obj: Any) -> dict[str, Any]:
+    """구조 검증 + 키 네임스페이스 정규화를 한 묶음으로(별도 deep 페이지 전용 진입점)."""
+    deep = _validate_deep(obj)
+    normalize_deep_key_namespace(deep)
+    return deep
 
 
 def _attach_code_blocks(token: str, page: dict[str, Any]) -> dict[str, Any]:
@@ -697,6 +884,7 @@ def _bridge_deep_only(token: str, db_id: str, publish_date: str,
     log("INFO", f"OPEN web-delta 없음 · web-deep-delta 단독 확보 — 소급 기록: {publish_date}")
     deep_page = _attach_code_blocks(token, deep_page)
     deep = extract_deep_page(deep_page)
+    _authoritative_source_text(token, db_id, publish_date, deep)  # 게이트 **전에** 정본화
     deep = _gate_deep_analysis(deep)
     wrote = bool(deep) and write_deep_only(deep, publish_date)
     _github_output("wrote", "true" if wrote else "false")
@@ -768,6 +956,9 @@ def main(argv: list[str] | None = None) -> int:
         delta, deep, date_str = extract_delta(page)
         deep = _merge_deep_from_separate_page(token, args.db, date_str, deep)
         if deep is not None:
+            # [2026-08-17] 근거 대조의 기준선(`source_text`)을 그 주 handoff 원문으로 맞춘 **뒤**
+            # 게이트를 돌린다 — 순서 불가침. 게이트가 보는 원문이 곧 판정이다.
+            _authoritative_source_text(token, args.db, date_str, deep)
             deep = _gate_deep_analysis(deep)  # 클라우드 생성 deep 근거 검증(write 직전)
         wrote = write_delta(delta, deep, date_str)
     except DeltaBridgeError as e:

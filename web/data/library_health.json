@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-11T04:07:55+00:00",
+  "checked_at": "2026-08-17T03:31:10+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -13,7 +13,7 @@
     "max_workers": 12,
     "request_delay_seconds": 1.0
   },
-  "schema_version": "grm-library-health/v1",
+  "schema_version": "grm-library-health/v2",
   "source_files": [
     "cfr.json",
     "ema.json",
@@ -28,11 +28,12 @@
     "who.json"
   ],
   "summary": {
-    "broken": 3,
-    "needs_review": 155,
-    "ok": 420,
-    "references": 700,
-    "unique_urls": 578
+    "blocked": 63,
+    "broken": 1,
+    "needs_review": 94,
+    "ok": 424,
+    "references": 704,
+    "unique_urls": 582
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -683,7 +684,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52015XC0321(02)",
-      "http_status": 200,
+      "http_status": 202,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -698,7 +699,7 @@
     "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)": {
       "attempts": 1,
       "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52015XC0321(02)",
-      "http_status": 200,
+      "http_status": 202,
       "method": "HEAD",
       "reason": "reachable",
       "references": [
@@ -2703,7 +2704,7 @@
           "item_id": "cfr-210-1"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-210/section-210.2": {
       "attempts": 2,
@@ -2718,7 +2719,7 @@
           "item_id": "cfr-210-2"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-210/section-210.3": {
       "attempts": 2,
@@ -2733,7 +2734,7 @@
           "item_id": "cfr-210-3"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.1": {
       "attempts": 2,
@@ -2748,7 +2749,7 @@
           "item_id": "cfr-211-1"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.100": {
       "attempts": 2,
@@ -2763,7 +2764,7 @@
           "item_id": "cfr-211-100"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.101": {
       "attempts": 2,
@@ -2778,7 +2779,7 @@
           "item_id": "cfr-211-101"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.103": {
       "attempts": 2,
@@ -2793,7 +2794,7 @@
           "item_id": "cfr-211-103"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.105": {
       "attempts": 2,
@@ -2808,7 +2809,7 @@
           "item_id": "cfr-211-105"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.110": {
       "attempts": 2,
@@ -2823,7 +2824,7 @@
           "item_id": "cfr-211-110"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.111": {
       "attempts": 2,
@@ -2838,7 +2839,7 @@
           "item_id": "cfr-211-111"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.113": {
       "attempts": 2,
@@ -2853,7 +2854,7 @@
           "item_id": "cfr-211-113"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.115": {
       "attempts": 2,
@@ -2868,7 +2869,7 @@
           "item_id": "cfr-211-115"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.122": {
       "attempts": 2,
@@ -2883,7 +2884,7 @@
           "item_id": "cfr-211-122"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.125": {
       "attempts": 2,
@@ -2898,7 +2899,7 @@
           "item_id": "cfr-211-125"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.130": {
       "attempts": 2,
@@ -2913,7 +2914,7 @@
           "item_id": "cfr-211-130"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.132": {
       "attempts": 2,
@@ -2928,7 +2929,7 @@
           "item_id": "cfr-211-132"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.134": {
       "attempts": 2,
@@ -2943,7 +2944,7 @@
           "item_id": "cfr-211-134"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.137": {
       "attempts": 2,
@@ -2958,7 +2959,7 @@
           "item_id": "cfr-211-137"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.142": {
       "attempts": 2,
@@ -2973,7 +2974,7 @@
           "item_id": "cfr-211-142"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.150": {
       "attempts": 2,
@@ -2988,7 +2989,7 @@
           "item_id": "cfr-211-150"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.160": {
       "attempts": 2,
@@ -3003,7 +3004,7 @@
           "item_id": "cfr-211-160"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.165": {
       "attempts": 2,
@@ -3018,7 +3019,7 @@
           "item_id": "cfr-211-165"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.166": {
       "attempts": 2,
@@ -3033,7 +3034,7 @@
           "item_id": "cfr-211-166"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.167": {
       "attempts": 2,
@@ -3048,7 +3049,7 @@
           "item_id": "cfr-211-167"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.170": {
       "attempts": 2,
@@ -3063,7 +3064,7 @@
           "item_id": "cfr-211-170"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.173": {
       "attempts": 2,
@@ -3078,7 +3079,7 @@
           "item_id": "cfr-211-173"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.176": {
       "attempts": 2,
@@ -3093,7 +3094,7 @@
           "item_id": "cfr-211-176"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.180": {
       "attempts": 2,
@@ -3108,7 +3109,7 @@
           "item_id": "cfr-211-180"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.182": {
       "attempts": 2,
@@ -3123,7 +3124,7 @@
           "item_id": "cfr-211-182"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.184": {
       "attempts": 2,
@@ -3138,7 +3139,7 @@
           "item_id": "cfr-211-184"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.186": {
       "attempts": 2,
@@ -3153,7 +3154,7 @@
           "item_id": "cfr-211-186"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.188": {
       "attempts": 2,
@@ -3168,7 +3169,7 @@
           "item_id": "cfr-211-188"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.192": {
       "attempts": 2,
@@ -3183,7 +3184,7 @@
           "item_id": "cfr-211-192"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.194": {
       "attempts": 2,
@@ -3198,7 +3199,7 @@
           "item_id": "cfr-211-194"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.196": {
       "attempts": 2,
@@ -3213,7 +3214,7 @@
           "item_id": "cfr-211-196"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.198": {
       "attempts": 2,
@@ -3228,7 +3229,7 @@
           "item_id": "cfr-211-198"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.204": {
       "attempts": 2,
@@ -3243,7 +3244,7 @@
           "item_id": "cfr-211-204"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.208": {
       "attempts": 2,
@@ -3258,7 +3259,7 @@
           "item_id": "cfr-211-208"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.22": {
       "attempts": 2,
@@ -3273,7 +3274,7 @@
           "item_id": "cfr-211-22"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.25": {
       "attempts": 2,
@@ -3288,7 +3289,7 @@
           "item_id": "cfr-211-25"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.28": {
       "attempts": 2,
@@ -3303,7 +3304,7 @@
           "item_id": "cfr-211-28"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.3": {
       "attempts": 2,
@@ -3318,7 +3319,7 @@
           "item_id": "cfr-211-3"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.34": {
       "attempts": 2,
@@ -3333,7 +3334,7 @@
           "item_id": "cfr-211-34"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.42": {
       "attempts": 2,
@@ -3348,7 +3349,7 @@
           "item_id": "cfr-211-42"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.44": {
       "attempts": 2,
@@ -3363,7 +3364,7 @@
           "item_id": "cfr-211-44"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.46": {
       "attempts": 2,
@@ -3378,7 +3379,7 @@
           "item_id": "cfr-211-46"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.48": {
       "attempts": 2,
@@ -3393,7 +3394,7 @@
           "item_id": "cfr-211-48"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.50": {
       "attempts": 2,
@@ -3408,7 +3409,7 @@
           "item_id": "cfr-211-50"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.52": {
       "attempts": 2,
@@ -3423,7 +3424,7 @@
           "item_id": "cfr-211-52"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.56": {
       "attempts": 2,
@@ -3438,7 +3439,7 @@
           "item_id": "cfr-211-56"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.58": {
       "attempts": 2,
@@ -3453,7 +3454,7 @@
           "item_id": "cfr-211-58"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.63": {
       "attempts": 2,
@@ -3468,7 +3469,7 @@
           "item_id": "cfr-211-63"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.65": {
       "attempts": 2,
@@ -3483,7 +3484,7 @@
           "item_id": "cfr-211-65"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.67": {
       "attempts": 2,
@@ -3498,7 +3499,7 @@
           "item_id": "cfr-211-67"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.68": {
       "attempts": 2,
@@ -3513,7 +3514,7 @@
           "item_id": "cfr-211-68"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.72": {
       "attempts": 2,
@@ -3528,7 +3529,7 @@
           "item_id": "cfr-211-72"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.80": {
       "attempts": 2,
@@ -3543,7 +3544,7 @@
           "item_id": "cfr-211-80"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.82": {
       "attempts": 2,
@@ -3558,7 +3559,7 @@
           "item_id": "cfr-211-82"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.84": {
       "attempts": 2,
@@ -3573,7 +3574,7 @@
           "item_id": "cfr-211-84"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.86": {
       "attempts": 2,
@@ -3588,7 +3589,7 @@
           "item_id": "cfr-211-86"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.87": {
       "attempts": 2,
@@ -3603,7 +3604,7 @@
           "item_id": "cfr-211-87"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.89": {
       "attempts": 2,
@@ -3618,7 +3619,7 @@
           "item_id": "cfr-211-89"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.94": {
       "attempts": 2,
@@ -3633,7 +3634,7 @@
           "item_id": "cfr-211-94"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ema.europa.eu/en/documents/other/questions-and-answers-design-space-verification_en.pdf": {
       "attempts": 1,
@@ -4411,6 +4412,21 @@
           "field": "official_url",
           "file": "fda_guidance.json",
           "item_id": "fda-842f4ac92ef6"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-human-drugs-and-biological-products": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/container-closure-systems-human-drugs-and-biological-products",
+      "http_status": 206,
+      "method": "GET",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-30f431b3965e"
         }
       ],
       "status": "ok"
@@ -5210,9 +5226,24 @@
       ],
       "status": "ok"
     },
+    "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents": {
+      "attempts": 1,
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents",
+      "http_status": 206,
+      "method": "GET",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "fda_guidance.json",
+          "item_id": "fda-74934b4b2d80"
+        }
+      ],
+      "status": "ok"
+    },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents-guidance-industry": {
       "attempts": 1,
-      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents-guidance-industry",
+      "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3cr8-impurities-guidance-residual-solvents",
       "http_status": 206,
       "method": "GET",
       "reason": "reachable",
@@ -6386,6 +6417,21 @@
           "field": "official_url",
           "file": "mfds.json",
           "item_id": "data0010-15270"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15276": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15276",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15276"
         }
       ],
       "status": "needs_review"
@@ -7995,6 +8041,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15910": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15910",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15910"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8506,7 +8567,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266954.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8551,7 +8612,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000273637.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8583,9 +8644,9 @@
     "https://www.pmda.go.jp/files/000280043.pdf": {
       "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000280043.pdf",
-      "http_status": 416,
-      "method": "GET",
-      "reason": "http_416",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -8593,7 +8654,7 @@
           "item_id": "pmda-000280043"
         }
       ],
-      "status": "broken"
+      "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280045.pdf": {
       "attempts": 2,
@@ -8613,9 +8674,9 @@
     "https://www.pmda.go.jp/files/000280046.pdf": {
       "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
-      "http_status": 416,
-      "method": "GET",
-      "reason": "http_416",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -8623,7 +8684,7 @@
           "item_id": "pmda-000280046"
         }
       ],
-      "status": "broken"
+      "status": "ok"
     },
     "https://www.who.int/publications/m/item/Annex-8-trs-1010": {
       "attempts": 1,

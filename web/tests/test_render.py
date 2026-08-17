@@ -7558,15 +7558,102 @@ class WebFindingsDocPageTest(unittest.TestCase):
                           f'원문 링크 누락: {doc["slug"]}')
 
     def test_finding_text_is_verbatim(self):
-        from markupsafe import escape as _esc
+        """본문 무변형 — 용어 자동 링크가 들어온 뒤에도 **글자는 하나도 바뀌지 않는다**.
+
+        예전에는 escape 한 원문이 HTML 안에 통째로 들어 있는지만 봤는데, 본문 안에 `<a>` 가
+        끼워지면서 그 단언이 성립하지 않는다. 계약을 더 세게 다시 세운다 — 렌더된 `<p
+        class="fd-text">` 에서 **태그만 벗기면 원문과 완전히 같아야** 한다(부분일치가 아니라
+        전체 일치라 절단·치환·중복이 전부 잡힌다).
+        """
+        import html as _html
         checked = 0
         for doc in self._sample_docs(8):
-            html = self._page(doc["slug"])
-            for f in doc["findings"]:
-                self.assertIn(str(_esc(f["text_ko"])), html,
-                              f'본문이 무변형으로 실리지 않음: {f["finding_id"]}')
+            page = self._page(doc["slug"])
+            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', page, re.S)
+            self.assertEqual(len(bodies), len(doc["findings"]),
+                             f'본문 개수 불일치: {doc["slug"]}')
+            for f, body in zip(doc["findings"], bodies):
+                plain = _html.unescape(re.sub(r"<[^>]+>", "", body))
+                self.assertEqual(plain, f["text_ko"],
+                                 f'본문이 무변형이 아님: {f["finding_id"]}')
                 checked += 1
         self.assertGreater(checked, 0)
+
+    def test_term_autolinks_point_to_real_pages_once_each(self):
+        """[내부 링크] 문서 본문 → 용어 페이지. 존재하는 용어로, 페이지당 용어 1 회만.
+
+        용어 페이지 인바운드가 평균 4 개·45 개는 색인 1 개뿐이었는데 문서 3,202 장은 용어로
+        가는 링크가 0 이었다. 여기서 검사하는 건 "링크가 있다"가 아니라 **가리키는 곳이
+        실재하고, 같은 말에 반복 링크가 붙지 않는다**는 것이다.
+        """
+        term_ids = {t["id"] for t in json.loads(
+            render.GLOSSARY_FILE.read_text(encoding="utf-8"))}
+        total = 0
+        for doc in self._sample_docs(10):
+            page = self._page(doc["slug"])
+            hrefs = re.findall(r'<a class="fd-term" href="\.\./\.\./\.\./glossary/([^/]+)/"',
+                               page)
+            for tid in hrefs:
+                self.assertIn(tid, term_ids, f'없는 용어로 링크: {doc["slug"]} → {tid}')
+                self.assertTrue((self.out / "glossary" / tid / "index.html").is_file(),
+                                f'링크 대상 페이지 부재: {tid}')
+            self.assertEqual(len(hrefs), len(set(hrefs)),
+                             f'한 페이지에서 같은 용어에 반복 링크: {doc["slug"]}')
+            self.assertLessEqual(len(hrefs), render._DOC_TERM_LINK_MAX,
+                                 f'링크 상한 초과: {doc["slug"]}')
+            total += len(hrefs)
+        self.assertGreater(total, 0, "용어 링크가 하나도 안 붙었다(배선 확인)")
+
+    def test_term_autolink_skips_verb_and_purposive_usage(self):
+        """[비순환 가드] 명사가 아닌 자리에는 링크하지 않는다 — 규칙을 실제 문장으로 고정.
+
+        한글은 낱말 경계가 없어 `…하기 위해` 의 '위해' 가 용어 `위해(harm)` 로, `기록하고`
+        의 '기록' 이 용어 `기록` 으로 걸린다(실측). 선정 함수로 선정 결과를 검사하면 함께
+        망가져 조용히 통과하므로(용어 사례에서 겪었다) 규칙 자체를 고정 입력으로 잠근다.
+        """
+        cases = [
+            ("동일성을 확인하기 위해 최소 1건의 시험을 실시하지", "위해", True),
+            ("체계로부터의 일탈을 기록하고 정당화하지 않았습니다", "기록", True),
+            ("귀사의 품질관리부서는 제조된 의약품이", "제조", True),
+            ("장비가 적절히 교정되지 않았습니다", "교정", True),
+            ("오염 위험으로부터 적절히 보호되지", "위험", False),
+            ("귀사는 각 의약품 배치를 출하하기 전에", "배치", False),
+            ("귀사는 의약품의 제조, 가공, 포장 및 보관에", "제조", False),
+            ("정기적으로 교정, 검사 또는 점검하지", "교정", False),
+        ]
+        for text, surface, verbish in cases:
+            i = text.find(surface)
+            self.assertEqual(
+                render._doc_term_is_verbish(text, i, i + len(surface)), verbish,
+                f'명사/동사 판정 어긋남: «{surface}» {text[:32]}…')
+            # find 는 동사 자리를 건너뛰어야 한다(그 자리 하나뿐이면 -1).
+            if verbish and text.count(surface) == 1:
+                self.assertEqual(render._doc_term_find(text, surface), -1,
+                                 f'동사 자리를 링크 후보로 잡았다: «{surface}»')
+
+    def test_term_autolink_prefers_rare_terms(self):
+        """희소 우선 — 링크가 필요한 건 인바운드가 없는 롱테일 용어지 `품질`·`제조` 가 아니다."""
+        terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        docs = (self.data or {}).get("documents") or []
+        index = render.build_doc_term_link_index(terms)
+        freq = render.build_doc_term_doc_freq(index, docs)
+        picked_any = False
+        for doc in docs[:60]:
+            selected = render.select_doc_term_links(doc, index, freq)
+            if len(selected) < 2:
+                continue
+            picked_any = True
+            dfs = [freq[tid] for _, tid in selected]
+            self.assertEqual(dfs, sorted(dfs), f'희소 우선 정렬이 깨졌다: {doc["slug"]}')
+            # 이 문서에 등장하지만 뽑히지 않은 용어는 뽑힌 것보다 흔해야 한다.
+            blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+            present = {tid for surface, tid in index
+                       if render._doc_term_find(blob, surface) >= 0}
+            dropped = present - {tid for _, tid in selected}
+            if dropped:
+                self.assertLessEqual(max(dfs), min(freq[t] for t in dropped),
+                                     f'더 흔한 용어가 희소 용어를 밀어냈다: {doc["slug"]}')
+        self.assertTrue(picked_any, "선택이 검사된 문서가 없다")
 
     def test_record_context_disclosure(self):
         """★이 기록이 '그 시점의 것'이고 후속 시정을 우리가 모른다는 사실을 반드시 적는다.

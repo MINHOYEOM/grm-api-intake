@@ -1478,6 +1478,131 @@ def build_glossary_case_excerpts(
     return out
 
 
+# ── [내부 링크] 문서 본문 → 용어 페이지 자동 링크 ────────────────────────────────
+# 용어 페이지 인바운드가 평균 4 개고 **45 개는 색인 페이지 1 개뿐**이다(2026-08-17 실측).
+# 문서 페이지 3,202 장은 용어로 가는 링크를 하나도 갖고 있지 않았다 — 사이트에서 가장 많은
+# 페이지 무리가 가장 얇은 페이지 무리로 권위를 전혀 흘려보내지 않고 있었다.
+#
+# 다만 본문에 링크를 뿌리면 안 된다. 규칙은 **희소한 용어 우선**이다:
+#   · 페이지에 등장한 용어를 코퍼스 문서빈도(df) 오름차순으로 세워 상위 N 개만 링크한다.
+#   · 그러면 `PUPSIT`·`CCIT` 같은 특수 용어가 먼저 걸리고 `품질`·`제조` 처럼 어디에나 있는
+#     말은 자연히 밀린다 — 손으로 불용어 목록을 적을 필요가 없다(손목록은 반드시 낡는다).
+#   · 링크가 필요한 건 인바운드 1 개짜리 롱테일 용어들인데, 희소 우선이 정확히 그 쪽이다.
+#   · 한 페이지에서 한 용어는 **첫 등장 1 회만** 링크한다(같은 말에 반복 링크는 잡음).
+#
+# 원문 무결성: 텍스트는 한 글자도 바뀌지 않는다. escape 한 조각들 사이에 `<a>` 만 끼우고
+# `Markup` 으로 돌려준다 — 태그를 벗기면 입력과 byte 동일이어야 한다(테스트가 검사).
+_DOC_TERM_LINK_MAX = 8          # 한 문서 페이지에서 링크할 용어 수 상한
+_DOC_TERM_MIN_LEN = 2
+_LATIN_TOKEN = re.compile(r"^[A-Za-z0-9/-]+$")
+
+
+def build_doc_term_link_index(terms: list[dict[str, Any]]) -> list[tuple[str, str]]:
+    """[(표면형, term_id)] — 긴 표면형 우선(`시정 및 예방조치` 가 `예방조치` 를 이긴다)."""
+    surfaces: dict[str, str] = {}
+    for t in terms:
+        cands = [p.strip() for p in (t.get("term_ko") or "").split("·")]
+        m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", t.get("term_en") or "")
+        if m:
+            cands.append(m.group(1))
+        for c in cands:
+            if len(c) >= _DOC_TERM_MIN_LEN and c not in surfaces:
+                surfaces[c] = t["id"]
+    return sorted(surfaces.items(), key=lambda kv: (-len(kv[0]), kv[0]))
+
+
+def build_doc_term_doc_freq(
+    index: list[tuple[str, str]], documents: list[dict[str, Any]],
+) -> dict[str, int]:
+    """term_id → 그 용어가 등장한 문서 수. 희소도 판정의 유일한 근거(사람 목록 0)."""
+    freq: dict[str, int] = {tid: 0 for _, tid in index}
+    for doc in documents:
+        blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+        hit: set[str] = set()
+        for surface, tid in index:
+            if tid not in hit and _doc_term_find(blob, surface) >= 0:
+                hit.add(tid)
+        for tid in hit:
+            freq[tid] += 1
+    return freq
+
+
+# [오탐 차단] 한글은 낱말 경계가 없어 표면형이 **명사가 아닌 자리**에도 걸린다. 27 개
+# 짧은 한글 표면형을 실제 문맥과 함께 전수로 읽어 보니 위험은 두 갈래뿐이었고, 둘 다
+# 손목록 없이 규칙으로 잡힌다(손목록은 반드시 낡는다):
+#   ① 목적구·목적어 — `…하기 위해`(위해=harm 아님)·`…을 기록`·`…를 제조`
+#   ② 동사 용법 — `기록하고`·`제조된`·`교정되지`(대부분의 한자어 명사가 `하다/되다` 를 붙는다)
+# 조사 결합률로 가르려던 시도는 실패했다(`품질관리` 0.7%·`일탈` 8.4% — 복합명사라 조사가
+# 안 붙는다). 앞뒤 두 글자만 보는 이 규칙이 실측 11/11 정확했다.
+_DOC_TERM_PRE_VERBISH = re.compile(r"(?:기|을|를)\s$")
+_DOC_TERM_POST_VERBISH = re.compile(r"^(?:하|되|한|된|할|합|됩)")
+
+
+def _doc_term_is_verbish(text: str, start: int, end: int) -> bool:
+    """그 자리가 명사가 아니라 목적구/동사 용법이면 True(링크하지 않는다)."""
+    return bool(_DOC_TERM_PRE_VERBISH.search(text[max(0, start - 2):start])
+                or _DOC_TERM_POST_VERBISH.match(text[end:end + 2]))
+
+
+def _doc_term_find(text: str, surface: str, start: int = 0) -> int:
+    """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다)."""
+    if _LATIN_TOKEN.match(surface):
+        m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])").search(
+            text, start)
+        return m.start() if m else -1
+    pos = text.find(surface, start)
+    while pos >= 0 and _doc_term_is_verbish(text, pos, pos + len(surface)):
+        pos = text.find(surface, pos + 1)
+    return pos
+
+
+def select_doc_term_links(
+    doc: dict[str, Any],
+    index: list[tuple[str, str]],
+    doc_freq: dict[str, int],
+    limit: int = _DOC_TERM_LINK_MAX,
+) -> list[tuple[str, str]]:
+    """이 문서에서 링크할 [(표면형, term_id)] — 희소(df 낮은) 용어 우선, 용어당 1 개."""
+    blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+    best: dict[str, str] = {}
+    for surface, tid in index:                     # index 가 긴 표면형 우선이라 첫 매치가 최장
+        if tid not in best and _doc_term_find(blob, surface) >= 0:
+            best[tid] = surface
+    ranked = sorted(best.items(), key=lambda kv: (doc_freq.get(kv[0], 0), kv[0]))
+    return [(surface, tid) for tid, surface in ranked[:limit]]
+
+
+def link_terms_in_text(
+    text: str, selected: list[tuple[str, str]], rel_root: str, used: set[str],
+) -> Markup:
+    """본문 1 조각에 용어 링크를 끼운다 — 텍스트 무변형(escape 후 `<a>` 만 삽입).
+
+    `used` 는 **페이지 단위**로 공유한다(지적 5 건에 같은 용어가 나와도 링크는 첫 곳 하나).
+    """
+    spans: list[tuple[int, int, str]] = []
+    for surface, tid in selected:
+        if tid in used:
+            continue
+        pos = _doc_term_find(text, surface)
+        while pos >= 0 and any(s < pos + len(surface) and pos < e for s, e, _ in spans):
+            pos = _doc_term_find(text, surface, pos + 1)
+        if pos >= 0:
+            spans.append((pos, pos + len(surface), tid))
+            used.add(tid)
+    if not spans:
+        return Markup(str(_escape(text)))
+    spans.sort()
+    out: list[str] = []
+    cursor = 0
+    for start, end, tid in spans:
+        out.append(str(_escape(text[cursor:start])))
+        out.append(f'<a class="fd-term" href="{rel_root}glossary/{tid}/">'
+                   f'{_escape(text[start:end])}</a>')
+        cursor = end
+    out.append(str(_escape(text[cursor:])))
+    return Markup("".join(out))
+
+
 def glossary_term_page_title(term: dict[str, Any]) -> str:
     """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
     term_ko = term.get("term_ko") or ""
@@ -2747,6 +2872,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 제목은 슬러그별로 유일해야 한다 — 겹치면 검색 결과에서 서로 구분되지 않는다.
         doc_titles = build_doc_page_titles(documents)
 
+        # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 용어 정본이 없으면 조용히 꺼진다.
+        term_link_index = build_doc_term_link_index(glossary_terms) if glossary_terms else []
+        term_doc_freq = (build_doc_term_doc_freq(term_link_index, documents)
+                         if term_link_index and render_doc_pages else {})
+
         # ── 내부 링크 구조 ───────────────────────────────────────────────────
         # 문서 페이지 3천 장을 sitemap 에만 올려두면 사이트 구조에서 그 페이지에 닿는
         # 경로가 없다(크롤이 느리고 중요도 신호도 안 붙는다). 용어사전·모음 페이지에는
@@ -2851,6 +2981,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             same_firm = [{"slug": s["slug"], "published_date": s["published_date"],
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
+            # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라 같은
+            # 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다.
+            selected = (select_doc_term_links(doc, term_link_index, term_doc_freq)
+                        if term_link_index else [])
+            linked_used: set[str] = set()
+            finding_bodies = [
+                link_terms_in_text(f.get("text_ko") or "", selected, "../../../", linked_used)
+                for f in doc.get("findings") or []
+            ]
             doc_html = env.get_template("findings_doc.html").render(
                 page_title=f"{doc_titles[doc['slug']]} · GRM",
                 rel_root="../../../",
@@ -2861,6 +3000,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 doc=doc, agency_labels=doc_agency_labels,
                 source_label=doc_source_label(doc),
                 related_categories=related, same_firm=same_firm,
+                finding_bodies=finding_bodies,
             )
             _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)
             written.append(f"findings/doc/{doc['slug']}/index.html")

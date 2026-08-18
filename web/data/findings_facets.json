@@ -1,10 +1,10 @@
 {
   "schema_version": "grm-findings-facets/v1",
-  "measured_on": "2026-08-12",
+  "measured_on": "2026-08-18",
   "min_findings": 20,
   "totals": {
-    "findings": 24811,
-    "documents": 6121
+    "findings": 24819,
+    "documents": 6127
   },
   "agency_labels": {
     "FDA": "미국 FDA",
@@ -21,8 +21,8 @@
           "key": "other_quality_system",
           "slug": "other-quality-system",
           "label_ko": "기타 품질시스템",
-          "findings": 4351,
-          "documents": 2663,
+          "findings": 4352,
+          "documents": 2664,
           "by_agency": [
             {
               "v": "HC",
@@ -34,7 +34,7 @@
             },
             {
               "v": "MFDS",
-              "c": 790
+              "c": 791
             },
             {
               "v": "EMA",
@@ -64,6 +64,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-81c01e1a91d14229aa00e9ee",
+              "text_ko": "의약품 동등성 재평가에 필요한 자료를 기한(’26. 6. 30.) 내에 제출하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "케이엠에스제약(주)",
+              "published_date": "2026-08-12",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006218",
+              "document_id": "admin-2026006218"
+            },
             {
               "finding_id": "finding-068c4c2d584fa0e7401bb6c9",
               "text_ko": "시험실 분야 [별표 1] 7.1 항 관련 지적사항이다. 입고되는 원료에 대하여 주기적으로 전수검사를 실시할 것이 요구되었다.",
@@ -113,16 +123,6 @@
               "category_label_ko": "기타 품질시스템",
               "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006175",
               "document_id": "admin-2026006175"
-            },
-            {
-              "finding_id": "finding-24748e241e382215ea0f3084",
-              "text_ko": "의약품 등 재평가 자료를 제출하지 않았다(1차 처분). 「약사법」제33조 및 「의약품 재평가 실시에 관한 규정」에 따라 의약품 동등성 재평가 대상 품목에 해당하는 경우 재평가에 필요한 자료를 기한 내(‘26.6.30.) 제출하여야 하나, 해당 업체는 재평가에 필요한 자료를 제출 기한 내에 제출하지 않은 사실이 있었다.",
-              "agency": "MFDS",
-              "firm_name": "일양바이오팜(주)",
-              "published_date": "2026-08-10",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006174",
-              "document_id": "admin-2026006174"
             }
           ]
         },
@@ -130,12 +130,12 @@
           "key": "aseptic_sterility_assurance",
           "slug": "aseptic-sterility-assurance",
           "label_ko": "무균보증/무균공정",
-          "findings": 3608,
-          "documents": 1358,
+          "findings": 3609,
+          "documents": 1359,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 3290
+              "c": 3291
             },
             {
               "v": "HC",
@@ -177,6 +177,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-77d8d1818dc933e491367af9",
+              "text_ko": "최악의 조건(worst-case), 가장 부하가 크고 도전적인 조건에서 무균공정(aseptic) 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
             {
               "finding_id": "finding-64049cade4698a2a2e60bfdf",
               "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
@@ -226,16 +236,6 @@
               "category_label_ko": "무균보증/무균공정",
               "evidence_url": "https://www.fda.gov/media/194061/download",
               "document_id": "fda483-194061"
-            },
-            {
-              "finding_id": "finding-ef46da3b9b4151225313cb1b",
-              "text_ko": "무균제제로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되어 있지 않고 준수되지도 않았다.",
-              "agency": "FDA",
-              "firm_name": "Emcure Pharmaceuticals Limited",
-              "published_date": "2026-08-05",
-              "category_label_ko": "무균보증/무균공정",
-              "evidence_url": "https://www.fda.gov/media/194060/download",
-              "document_id": "fda483-194060"
             }
           ]
         },
@@ -457,12 +457,12 @@
           "key": "deviation_capa",
           "slug": "deviation-capa",
           "label_ko": "일탈/CAPA/조사",
-          "findings": 1836,
-          "documents": 1514,
+          "findings": 1837,
+          "documents": 1515,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 937
+              "c": 938
             },
             {
               "v": "HC",
@@ -504,6 +504,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-0881ffc67ac791bab7f36d43",
+              "text_ko": "금지명령(decree of injunction)의 절차적 요구사항을 준수하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
             {
               "finding_id": "finding-0506a8c9d3b258640e3fb93b",
               "text_ko": "귀사의 품질부서는 중요 일탈이 조사되고 해결되도록 보증하는 핵심 책무 중 하나를 수행하지 않았다.",
@@ -553,16 +563,6 @@
               "category_label_ko": "일탈/CAPA/조사",
               "evidence_url": "https://www.fda.gov/media/194061/download",
               "document_id": "fda483-194061"
-            },
-            {
-              "finding_id": "finding-edc4228526cedff804380ecd",
-              "text_ko": "구체적으로, Protocol (b)(4)는 시험대상자가 연구 기간 중 다른 임상시험(clinical trial)에 참여하는 경우 해당 대상자를 연구에서 제외하도록 요구하였다. 또한 이 프로토콜은 연구 기간 동안 다른 임상시험용의약품(IP)의 사용을 금지하였다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로, 대상자 (b)(6)의 Protocol (b)(4) Visit 1 스크리닝은 2024년 11월 6일에 이루어졌고 해당 대상자는 2024년 11월 13일에 무작위배정되었다. 이 대상자에게는 2024년 11월 13일부터 12월 16일 사이에 Protocol (b)(4)의 시험약이 불출되었으며 2025년 1월 14일에 연구를 완료하였다. 그러나 이 대상자는 2024년 6월 24일 다른 임상시험인 Protocol (b)(4)에 대상자 (b)(6)으로 동시에 등록·무작위배정되어 있었다. 구체적으로 이 대상자는 2024년 8월 7일부터 12월 23일 사이에 Protocol (b)(4)의 시험약을 투여받았고 2025년 1월 6일에 해당 연구를 완료하였다. 따라서 대상자 (b)(4)는 Protocol (b)(4)에 참여하는 동시에 다른 임상시험인 Protocol (b)(4)에도 참여하였으며, Protocol (b)(4)에 등록되어 시험약을 투여받는 중에 Protocol (b)(4)의 IP를 투여받았다. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 해당 대상자가 Protocol (b)(4)와 Protocol (b)(4) 양쪽에 등록되어 있었음을 인정하였다. 귀하는 이것이 규정 위반에 해당함을 이해한다고 진술하였다. 또한 귀하는 이 대상자에 대하여 Protocol (b)(4)의 제외기준이 준수되지 않았다고 진술하였다. FDA는 임상시험자로서 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 연구가 시험계획서에 따라 수행되도록 보증할 책임이 귀하에게 있음을 강조한다. 대상자가 연구에 등록되기 전에 프로토콜이 요구하는 모든 선정기준을 충족하도록 보증하지 못하고, 연구 기간 중 대상자가 금지된 약물을 복용하지 않도록 보증하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자의 안전에 대한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 신뢰성에 대한 우려도 제기한다. 2. 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분(disposition)에 관한 적절한 기록을 유지하지 않았다[21 CFR 312.62(a)]. 임상시험자로서 귀하는 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지하여야 한다. 귀하는 이러한 요구사항을 준수하지 않았다. 구체적으로 Protocol (b)(4)에 등록된 6명의 대상자에 대하여, 대상자가 사용한 시험약의 수량과 반납된 수량 사이에서 시험기관의 IP 수불기록, 대상자의 자가보고 투여량에 관한 EDC 기록, 시험기관이 보고한 IP 반납분(사용분 및 미사용분)에 관한 EDC 기록 간에 다음과 같은 불일치가 관찰되었다. ID # (b)(6), Kit #34_MFWE — 자가보고 투여: 2025년 3월 6~19일 및 2025년 3월 21~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 1, 미사용 34) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PNBT — 자가보고 투여: 2025년 3월 6~17일 및 2025년 3월 19~24일, 18회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 35 sachets 반납(사용 0, 미사용 35). ID # (b)(6), Kit #34_RJRF — 자가보고 투여: 2025년 3월 6~17일, 2025년 3월 19~20일 및 2025년 3월 22~24일, 17회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 0, 미사용 35) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_PUVN — 자가보고 투여: 2025년 3월 6~24일, 19회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 19, 미사용 16) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_AHRG — 자가보고 투여: 2025년 3월 11~24일, 14회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 14, 미사용 21) / EDC IP 수불기록: 반납된 sachet 없음. ID # (b)(6), Kit #34_HPOP — 자가보고 투여: 2025년 3월 20~24일, 5회 투여 / 시험기관 IP 수불대장: 35 sachets 반납(사용 5, 미사용 30) / EDC IP 수불기록: 반납된 sachet 없음. 귀하는 Form FDA 483에 대한 2025년 8월 4일자 서면답변에서 밀봉된 키트가 대상자에게 제공되었고 대상자가 자택에서 이를 사용한 뒤 반납할 책임이 있었다고 진술하였다. 또한 귀하는 해당 키트가 시험기관에서 사용되지 않았다고 진술하였다. 시험약이 시험기관에서 투여되지 않았고 대상자가 자택에서 시험약을 투여한 뒤 미사용 시험약을 시험기관에 반납하기로 되어 있었다는 점은 인정하나, 임상시험자로서 귀하는 FDA 규정에 따라 날짜, 수량 및 대상자별 사용 내역을 포함하여 시험약의 처분에 관한 적절한 기록을 유지할 책임이 있으므로 귀하의 답변은 미흡하다. 또한 Protocol (b)(4)는 시험약의 불출 및 반납에 관한 정확한 기록을 유지하도록 보증하는 것이 시험자의 책임이라고 명시적으로 규정하고 있었다. 끝으로 FDA는 원격 종료방문(remote close-out visit)에 관한 의뢰자의 2025년 5월 21일자 서신에서, 위에 언급된 대상자 불출 IP 키트들이 양쪽 끝에 훼손방지 밀봉(tamper-resistant seal)이 그대로 부착된 상태였음을 의뢰자가 관찰하였다는 점에 주목한다. 반면 EDC 기록상 해당 키트는 불출된 것으로 나타나 있었고, 작성 완료된 투약 설문지에는 대상자가 매일 밤 연구 용량을 복용한 것으로 기록되어 있었다. 의뢰자는 나아가 IP 키트가 개봉되지 않은 점에 비추어 불출기록이 정확할 수 있는 방법을 알 수 없다고 진술하였다. 따라서 이러한 관찰된 불일치와 IP 키트의 물리적 상태 및 부정확한 불출기록에 관한 의뢰자의 보고에 근거할 때, 귀하의 시험기관에서 시험약의 처분에 관한 기록은 미흡하다. 사용·미사용·반납된 시험약을 기록한 문서를 포함하여 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 임상시험용의약품에 대한 귀하의 감독 및 통제의 적정성에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 수집된 데이터의 타당성과 무결성에 관한 우려도 제기한다. 또한 귀하는 서면답변에서 다음과 같은 시정조치가 취해졌다고 진술하였다. (1) 연구가 종료되었다, (2) 의뢰자가 해당 시험기관의 데이터를 사용하지 않기로 동의하였다, (3) 시험기관에 지급된 모든 자금이 반환되었다. 귀하는 나아가 피해를 입은 대상자는 없다고 진술하였다. 끝으로 귀하는 조사 종료 후 해당 시험기관을 영구 폐쇄할 것이며 현재는 물론 장래에도 시험 관련 활동에 종사하지 않겠다고 진술하였다. FDA는 귀하의 시험기관이 취한 시정조치와 장래에 임상시험을 수행할 의사가 없다는 귀하의 진술을 인정하지만, 귀하가 생각을 바꾸어 장래에 임상시험을 수행하기로 결정할 경우 임상시험자로서 유사한 위반의 재발을 어떻게 방지할 것인지에 관하여 충분한 세부내용을 제시하지 않았으므로 귀하의 서면답변은 미흡하다. 이러한 정보가 없으면 FDA는 귀하의 시정조치 계획이 장래의 임상시험에서 유사한 위반을 방지하기에 적절한지 판단할 수 없다. FDA는 임상시험자로서 귀하가 대상자의 권리·안전·복지를 보호하고 연구 데이터의 무결성을 보증하기 위하여 임상시험 수행 및 인간대상자 보호를 규율하는 모든 관련 FDA 규정의 준수에 대해 궁극적인 책임을 진다는 점을 강조한다. 시험계획서에 따라 임상연구를 수행하지 못하고 적절한 시험약 수불기록을 유지하지 못한 귀하의 실패는 귀하의 시험기관에 등록된 연구 대상자 보호에 관한 중대한 우려를 제기하며, 귀하의 시험기관에서 생성된 데이터의 신뢰성에 관한 우려도 제기한다. 이 서한은 임상시험용의약품에 대한 귀하의 임상연구에서 발견된 결함을 모두 망라한 목록이 아니다. 법률 및 관련 FDA 규정의 각 요구사항을 준수하도록 보증할 책임은 귀하에게 있다. 귀하는 모든 결함을 해소하고 진행 중이거나 장래에 수행될 연구가 FDA 규정을 준수하도록 보증하는 절차를 수립하여야 한다. 이 서한은 FDA의 조사 결과를 귀하에게 통지하고 위에 적시된 결함을 해소할 기회를 제공하는 것이다. 귀하는 이 서한을 수령한 날부터 영업일 기준 15일 이내에 장래에 유사한 위반을 방지하기 위해 취한 조치를 서면으로 본 사무소에 통지하여야 한다. 이 사안을 적절히 해소하지 못할 경우 추가 통지 없이 규제조치가 취해질 수 있다. 귀하가 FD&C Act 및 관련 규정을 준수하였다고 판단한다면 FDA가 검토할 수 있도록 그 근거와 뒷받침하는 자료를 함께 제출하기 바란다. 서면답변과 이 서한 또는 실사에 관한 문의사항이나 우려사항은 이메일로 FDA(CDER-OSI-Communications@fda.hhs.gov)에 보내야 한다.",
-              "agency": "FDA",
-              "firm_name": "Maria E. De La Torre Silva, M.D.",
-              "published_date": "2026-08-04",
-              "category_label_ko": "일탈/CAPA/조사",
-              "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/maria-e-de-la-torre-silva-md-735690-07272026",
-              "document_id": "7644cd467dc1"
             }
           ]
         },
@@ -675,12 +675,12 @@
           "key": "material_supplier_control",
           "slug": "material-supplier-control",
           "label_ko": "원자재/공급업체 관리",
-          "findings": 1310,
-          "documents": 1120,
+          "findings": 1311,
+          "documents": 1121,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 880
+              "c": 881
             },
             {
               "v": "HC",
@@ -780,8 +780,8 @@
           "key": "complaint_recall",
           "slug": "complaint-recall",
           "label_ko": "불만/회수",
-          "findings": 1157,
-          "documents": 1063,
+          "findings": 1158,
+          "documents": 1064,
           "by_agency": [
             {
               "v": "HC",
@@ -789,7 +789,7 @@
             },
             {
               "v": "MFDS",
-              "c": 433
+              "c": 434
             },
             {
               "v": "FDA",
@@ -827,6 +827,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-c80384045a42ececc3a0bde6",
+              "text_ko": "글리미드정2mg(글리메피리드)에 대하여 이물 혼입 우려에 따라 영업자 회수가 실시되었다.",
+              "agency": "MFDS",
+              "firm_name": "구주제약(주)",
+              "published_date": "2026-08-13",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-8bd9bd12b54d"
+            },
             {
               "finding_id": "finding-b5e42ad7bf7eaff9b3998428",
               "text_ko": "2026년 1월 29일 및 2026년 2월 26일에 정기 GMP 실사가 실시되었다. 치명적(critical) 2건, 중대(major) 4건, 기타(other) 3건의 결함이 확인되었다. 2건의 치명적 결함은 다음과 같다. 1. 진행 중인 안정성시험(ongoing stability study) 결과와 관련하여 인증된 동물용의약품의 품질을 보증할 수 없다. 진행 중인 안정성시험에서 다수의 규격외(out of specification) 결과가 보고되었으며, 그중 최소 4건은 Belgica de Weerd의 내부 규격을 벗어났다. 그럼에도 해당 배치를 회수하지 않고 당국에 보고하지 않은 근거는 불충분하였다. 진행 중인 안정성시험 배치의 규격외 결과를 수용한 근거는 항생제의 항균 범위(spectrum of action), 안전성, 치료역(therapeutic window), 서로 다른 유효성분의 상승작용, 항균제 내성(antimicrobial resistance)의 발현을 고려하지 않았다. 이는 동물의 안전과 공중보건에 위험을 초래한다. 또한 Belgica de Weerd는 진행 중인 안정성시험에서 유효성분 함량 규격으로 표시량(label claim)의 90%~110%를 사용하고 있다. 이 기준의 설정 근거에서도 항생제의 항균 범위, 안전성, 치료역, 상승작용, 항균제 내성의 발현이 고려되지 않았다. 이 기준은 제품별 조성의 차이를 고려한 근거 없이 모든 제품에 대하여 동일하게 설정되어 있다. 진행 중인 안정성시험의 규격외 결과에 대한 위험평가에서는 해당 결과가 시장에 유통된 배치에는 적용되지 않는다고 기술하고 있으나, 안정성시험 배치는 시장에 유통된 배치를 대표한다. 이는 시장에서 동물의 안전과 공중보건에 위험을 초래한다. 2. Belgica de Weerd는 GMP annex 16을 준수하지 않으며, 시장에 유통된 인증 제품의 품질을 충분히 보증할 수 없다. QP(품질책임자)는 허가 서류(registration dossier)에 접근할 수 없었으므로, 허가 서류상의 어떤 규격에 따라 배치를 인증하였는지 명확히 하지 못하였다. 이는 치명적인 규정 준수 위험을 초래한다. 여러 제품에서 배치 문서가 허가 서류상의 출하 규격에 부합하지 않았고, 위탁제조업체(CMO) 변경에 대한 변경허가(variation)가 관할 당국에 제출되지 않았음에도 새로운 위탁제조업체가 생산한 배치가 시장에 출하되었다. 위탁제조업체의 GMP 증명서가 취소된 이후에도 QP는 생산된 배치를 계속 출하하였다. 관할 당국(NCA)이 취하였거나 제안한 조치: 현재 유효한 GMP 증명서 No. NL/V 23/0006 의 취소. 관할 당국은 2026년 2월 실사에서 네덜란드 실사기관이 확인한 GMP 부적합(GMP NC)을 이유로 새로운 GMP 증명서를 발급하지 않는다. 이 결정은 2026년 7월 29일 공식 결정문으로 해당 업체에 통보되었다. 이 결정에 따라 네덜란드 관할 당국이 EudraGMDP에 부적합 보고서(NCS)를 등재하며, 이로써 현재의 GMP 증명서는 EudraGMDP에서 삭제된다. 이미 출하된 배치의 회수: 해당 제품들은 네덜란드(NL)와 루마니아(RO)에만 국가별로 허가되어 있다. 해당 의약품이 잠재적으로 필수(critical) 의약품인 경우, 판매허가권자(MAH)는 이를 관할 당국에 보고하여야 한다. 관할 당국은 특정 동물용의약품(VMP)이 해당 시장에 필수적인지 판단할 수 있으며, 위험평가에 근거하여 공급부족이 발생하는 경우 시장에 출하되도록 할 수 있다. 네덜란드 시장에 대해서는 이 정보가 아직 확보되지 않았다. 해당 동물용의약품이 필수 의약품으로 평가되는 경우 회수는 개시되지 않는다.",
@@ -876,16 +886,6 @@
               "category_label_ko": "불만/회수",
               "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
               "document_id": "recall-ada7ac9cbd75"
-            },
-            {
-              "finding_id": "finding-01c1b76ea585d01678fad769",
-              "text_ko": "공식적으로 지정된 부서가 불만을 접수·검토·평가하기 위한 절차가 적절하게 수립되어 있지 않다.",
-              "agency": "FDA",
-              "firm_name": "Stille AB",
-              "published_date": "2026-07-28",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://www.fda.gov/media/193896/download",
-              "document_id": "fda483-193896"
             }
           ]
         },
@@ -1002,12 +1002,12 @@
           "key": "contamination_control",
           "slug": "contamination-control",
           "label_ko": "오염/교차오염 관리",
-          "findings": 720,
-          "documents": 610,
+          "findings": 721,
+          "documents": 611,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 484
+              "c": 485
             },
             {
               "v": "HC",
@@ -1045,6 +1045,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-85fe1a82ad7d14196c70151f",
+              "text_ko": "제조구역 및 제조구역에 인접한 구역에서 오염(contamination)이 관찰되었다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
             {
               "finding_id": "finding-00adffdca281734e59085f7b",
               "text_ko": "오염 또는 혼동(mix-ups)을 방지하는 데 필요한 구획되거나 지정된 구역 및 관리 시스템이 미흡하다.",
@@ -1094,16 +1104,6 @@
               "category_label_ko": "오염/교차오염 관리",
               "evidence_url": "https://www.fda.gov/media/193727/download",
               "document_id": "fda483-193727"
-            },
-            {
-              "finding_id": "finding-d9b8ee41bd3088b53236e2f9",
-              "text_ko": "작업소가 오염을 방지하도록 설계·건축·운영 및/또는 유지관리되지 않았다.",
-              "agency": "HC",
-              "firm_name": "Carbon Extracts Inc",
-              "published_date": "2026-07-14",
-              "category_label_ko": "오염/교차오염 관리",
-              "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89300",
-              "document_id": "hc-insp-89300"
             }
           ]
         },
@@ -1430,8 +1430,8 @@
           "key": "regulatory_reporting",
           "slug": "regulatory-reporting",
           "label_ko": "규제보고/변경관리",
-          "findings": 586,
-          "documents": 576,
+          "findings": 587,
+          "documents": 577,
           "by_agency": [
             {
               "v": "HC",
@@ -1443,7 +1443,7 @@
             },
             {
               "v": "MFDS",
-              "c": 61
+              "c": 62
             }
           ],
           "top_firms": [
@@ -1480,6 +1480,16 @@
               "document_id": "gmpinspect-1P-j3DfJpwb"
             },
             {
+              "finding_id": "finding-178f3282a5eb46ca2c6458d6",
+              "text_ko": "의약외품 제조업자는 허가받은 사항 또는 신고한 사항을 변경하려는 때에는 총리령으로 정하는 바에 따라 변경허가를 받거나 변경신고를 하여야 한다. 그러나 위 업체는 의약외품 제조업 소재지를 기존 신고 소재지인 ‘경기도 화성시 팔탄면 시청로940번길 47 A동 2층’에서 ‘경기도 화성시 효행구 봉담읍 마당바위로 229 4층(화성공장)’으로 이전하였음에도, 이에 대한 의약외품 제조업 변경신고를 하지 아니하였다.",
+              "agency": "MFDS",
+              "firm_name": "주식회사시디코유에스에이",
+              "published_date": "2026-08-10",
+              "category_label_ko": "규제보고/변경관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006189",
+              "document_id": "admin-2026006189"
+            },
+            {
               "finding_id": "finding-f2a3ba4a2cd5c5c897b8e899",
               "text_ko": "임상시험계획 변경에 대하여 승인을 받지 않았고, 임상시험계획 변경 보고도 하지 않았다.",
               "agency": "MFDS",
@@ -1512,16 +1522,6 @@
             {
               "finding_id": "finding-0ac9beb2fad4c8085e88dca8",
               "text_ko": "시판 후 약물이상반응을 FDA에 보고하기 위한 문서화된 절차가 마련되어 있지 않다.",
-              "agency": "FDA",
-              "firm_name": "Misemer Pharmaceutical, Inc.",
-              "published_date": "2026-07-14",
-              "category_label_ko": "규제보고/변경관리",
-              "evidence_url": "https://www.fda.gov/media/193611/download",
-              "document_id": "fda483-193611"
-            },
-            {
-              "finding_id": "finding-5856d25ad8ad98afadd88dae",
-              "text_ko": "연차 보고서가 미국 기념일로부터 60일 이내에 제출되지 않았다.",
               "agency": "FDA",
               "firm_name": "Misemer Pharmaceutical, Inc.",
               "published_date": "2026-07-14",
@@ -1640,8 +1640,8 @@
           "key": "documentation_records",
           "slug": "documentation-records",
           "label_ko": "문서화/기록관리",
-          "findings": 432,
-          "documents": 386,
+          "findings": 433,
+          "documents": 387,
           "by_agency": [
             {
               "v": "FDA",
@@ -1649,7 +1649,7 @@
             },
             {
               "v": "MFDS",
-              "c": 83
+              "c": 84
             },
             {
               "v": "HC",
@@ -1683,6 +1683,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-c6f01a5f03fc6191f9761467",
+              "text_ko": "가. 기준서를 준수하지 않았다. 나. 행정지시 사항을 이행하지 않았다. 다. 품질관리에 필요한 시험검사기구를 갖추지 않았다. 라. 품질관리기록서를 거짓으로 작성하고 제조기록서(batch record)를 작성하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "알파제약(주)",
+              "published_date": "2026-08-12",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006188",
+              "document_id": "admin-2026006188"
+            },
             {
               "finding_id": "finding-74b6beec40674b97bb4e548f",
               "text_ko": "CGMP 위반사항. 1. 귀사는 의약품의 제조·가공·포장·보관에 사용되는 건물에 대하여 혼동(mix-up)과 오염을 방지하기 위한 설비 및 자재의 정돈된 배치에 필요한 충분한 공간을 확보하지 못하였고, 오염이나 혼동을 방지하는 데 필요한 분리된 구역 또는 정해진 구역이나 그 밖의 관리 시스템을 갖추지 못하였다(21 CFR 211.42(b) and 21 CFR 211.42(c)). 귀사는 일반의약품(OTC) 완제의약품과 의약품이 아닌 제품을 함께 수탁 제조하고 있다. 귀사는 의약품 제조에서 혼동과 오염을 방지하기 위한 설비 및 자재용 공간과 정해진 구역을 충분히 확보하지 못하였다. 예를 들어 당국 조사관들은 귀사 시설 전반에서 자재 보관이 미흡함을 관찰하였는데, 구성 성분과 원료가 바닥, 벽면을 따라, 그리고 의약품 제조에 사용되는 포장 라인 사이의 통로에 무질서하게 보관되어 있었다. 또한 자재에는 내용물, 지정 상태(예: 격리, 승인, 부적합), 사용 목적, 해당 생산 배치와의 연계에 대한 명확한 표시가 없었다. 귀사 시설에는 입고 자재를 격리하고 승인 자재와 부적합 자재를 구분하기 위한 지정 구역도 없었다. 지정 구역의 부재는 재고 관리를 더욱 저해하고 혼동과 오염의 위험을 높인다. 또한 귀사는 의약품 제조에 적합하지 않은 창고 환경에서 의약품 제조 작업을 수행하고 있다. 예를 들어 귀사의 의약품 제조 환경은 콘크리트 바닥, 시멘트 블록 벽 위의 금속 시트, 노출된 천장 통풍구, 노출된 배관, 노출된 장선(joist), 천장 선풍기로 구성되어 있었다. 아울러 의약품 제조 구역에 적절한 환기 시스템이 갖추어져 있지 않은 점은 완제의약품의 미생물 오염 및 미립자 오염 위험을 초래할 수 있다. 귀사는 추가 공간 확보를 위하여 2026년 가을까지 새로운 창고를 확보할 계획이라고 진술하였으나, 현재의 환경은 의약품 제조 작업에 필요한 적절한 세척과 유지관리가 가능하도록 하는 적합한 구조나 설계를 갖추고 있지 않다. 본 서한에 대한 답변으로 다음을 제출하라. 귀사의 제조·보관·포장·표시 작업 및 시설의 의약품 제조 적합성에 대한 종합적·독립적 평가. 다음 요소를 포함하되 이에 한정되지 않는 분석을 제출할 것. o 배치에 대한 소급 검토(즉, 결함의 유형과 빈도, 일탈, 불만, 관련 조사) o 시설 배치도 및 인원·자재 동선 o 설비 설계, 유지관리 및 수리 이력, 사용 목적에의 적합성 o 현재의 기반 구조(예: 바닥, 벽, 천장)가 적절히 개선될 수 있는지, 아니면 확장·개보수·이전이 필요한지에 대한 평가 o 공기 중 미립자 및 미생물 오염에 대한 적절한 관리를 포함하여, 모든 제조 및 포장 구역의 환기 및 공조 시스템의 적정성 o 의약품 제조 작업을 뒷받침할 수 있도록 시설 표면이 적절히 세척·소독될 수 있는 능력. 귀사의 자재 관리 및 구분 관행에 대한 종합적·독립적 평가. 다음 요소를 포함하되 이에 한정되지 않는 분석을 제출할 것. o 격리·승인·부적합 구성 성분 및 공정 중 자재를 위한 적절히 지정된 구역 o 해당 교육을 포함하여, 시설 전반에서의 자재 식별·구분·상태 관리 절차. 2. 귀사는 완제의약품의 안전성·확인시험·함량·품질·순도를 공정서 또는 그 밖에 정해진 요건을 벗어나도록 변경시킬 수 있는 오작동이나 오염을 방지하기 위하여, 적절한 주기로 설비와 기구를 세척·유지관리하고 의약품의 특성에 따라 적절히 소독 및/또는 멸균하지 못하였으며, 설비의 세척 및 유지관리에 관한 적절한 문서화된 절차를 수립하고 준수하지 못하였다(21 CFR 211.67(a) and 21 CFR 211.67(b)). 귀사는 의약품 제조에 사용되는 설비의 세척 및 유지관리에 대하여 적절한 절차가 수립되고 준수되도록 보장하지 못하였다. 구체적으로 귀사의 세척 및 유지관리 절차에는 세척제의 종류, 세척제의 농도 또는 희석배수, 접촉 시간, 검체 채취 요건, 시험 규격 등 핵심적인 세부사항이 누락되어 있었다. 귀사가 의약품이 아닌 제품의 제조에 사용하는 것과 동일한 비전용(non-dedicated) 설비에서 일반의약품(OTC) 완제의약품을 제조하고 있다는 점에서 이 결함은 특히 우려된다. 또한 귀사의 세척 절차에 따르면 설비 세척은 지정된 기록부에 문서화되고 감독자에 의해 확인되어야 한다. 그러나 귀사는 설비에 대한 세척이 수행되었음을 입증할 어떠한 세척 또는 소독 기록도 제시하지 못하였다. 아울러 귀사의 배치기록에는 설비 세척을 문서화하는 지정 단계가 있었음에도, 다수의 완제의약품 로트에서 이 단계가 완료되지 않았다. 귀사에는 세척이 언제, 누구에 의해 수행되었는지, 설비에서 어떤 제품을 세척하였는지를 포함하여 세척이 수행되었거나 확인되었다는 적절한 증거가 없었다. 나아가 귀사의 세척 관행은 미흡하였다. 예를 들어 귀사가 설비 세척에 사용한 (b)(4)는 정기 검체 채취에서 계수 불가능한 수준(too-numerous-to-count)의 생균수(bioburden) 결과를 반복적으로 나타내었다. 이러한 반복적인 기준 초과 생균수 결과에도 불구하고 귀사는 적절한 시정조치를 취하지 않았고, 시정 없이 해당 (b)(4)를 설비 세척에 계속 사용하였다. 미흡한 세척 절차와 미생물학적으로 오염된 (b)(4)의 설비 세척 사용은 해당 설비에서 이후 제조되는 완제의약품의 미생물 오염 및 교차오염의 중대한 위험을 초래한다. 본 서한에 대한 답변으로 다음을 제출하라. 귀사의 의약품 제조 작업에서 최악의 조건(worst case)으로 확인된 조건의 반영에 특히 중점을 둔, 세척 밸리데이션 프로그램의 적절한 개선. 여기에는 다음의 모든 최악 조건에 대한 확인 및 평가가 포함되어야 하나 이에 한정되지 않는다. o 독성이 높은 의약품 o 역가가 높은 의약품 o 세척 용매에 대한 용해도가 낮은 의약품 o 세척이 어려운 특성을 가진 의약품 o 세척이 가장 어려운 부위에 대한 면봉 채취(swabbing) 위치 o 세척 전 최대 보류 시간(hold time). 아울러 새로운 제조설비 또는 새로운 제품을 도입하기 전에 귀사의 변경관리 시스템에서 취하여야 할 조치를 기술할 것. 제품·공정·설비에 대한 세척 절차의 검증(verification) 및 밸리데이션을 위한 적절한 프로그램이 마련되도록 보장하는, 갱신된 표준작업지침서(SOP)의 요약. 세척 프로그램에 대한 소급 평가에 근거하여, 세척 공정 및 관행에 대한 적절한 시정조치와 완료 일정을 포함하는 시정 및 예방조치(CAPA) 계획. 설비 세척의 생애주기 관리 프로세스상 취약점에 대한 상세 요약을 제출할 것. 세척 유효성의 향상, 모든 제품 및 설비에 대한 적절한 세척 수행의 지속적 검증 개선, 그 밖에 필요한 모든 시정조치를 포함하여 세척 프로그램의 개선사항을 기술할 것. (b)(4) 시스템의 설계·관리·유지관리에 대한 종합적 시정 계획. (b)(4) 시스템 설계 및 관리의 취약점에 대한 종합적 평가를 포함하고, 해당 시스템에서 발견된 모든 결함을 요약할 것. 이 요약에는 최소한 적정성 평가가 이루어진 시스템의 여러 특성((b)(4) 시스템, 재질, 경사, 확인된 사배관(dead-leg), 정체 구간, 비위생적 이음쇠, 유속 등)이 기술되어야 한다. 귀사가 생산하는 완제의약품의 각 배치에 사용하기에 적합한지 보장하기 위하여 (b)(4)에 대한 정기적 미생물시험을 규정하는 (b)(4) 시스템 모니터링 절차. 귀사의 (b)(4) 시스템에 사용되는 총균수 및 유해균(objectionable organisms)에 대한 현행 조치기준·경보기준을 포함할 것. 시정된 시스템이 (b)(4), USP 각조 규격 및 적절한 미생물 한도에 적합한 (b)(4)를 일관되게 생산하도록 보장하는 지속적 관리·유지관리·모니터링 프로그램에 관한 절차. 3. 귀사의 품질관리부서는 제조되는 완제의약품이 CGMP를 준수하고 확인시험·함량·품질·순도에 관하여 설정된 규격에 적합하도록 보장할 책임을 이행하지 못하였다(21 CFR 211.22). 귀사는 의약품 제조를 감독할 책임과 권한을 갖춘 적절한 품질부서(QU)를 확립하지 못하였다. 예를 들어 귀사의 품질부서는 다음 사항을 보장하지 못하였다. 의약품 제조에 대한 적절한 생산 및 공정 관리와 의약품 제조에 사용되는 설비의 적격성평가를 보장하는 적절한 절차(21 CFR 211.100(a)). 적절하고 지속적인 안정성 프로그램의 수립(21 CFR 211.166(a)). 품질관리부서에 적용되는 적절한 문서화된 책임 및 절차의 수립(21 CFR 211.22(d)). 귀사의 품질시스템은 미흡하다. CGMP 규정 21 CFR parts 210 및 211의 요건을 충족하기 위한 품질시스템 및 리스크 관리 접근법의 이행에 관하여는 FDA 가이던스 문서 Quality Systems Approach to Pharmaceutical CGMP Regulations (https://www.fda.gov/media/71023/download) 및 ICH Q10 Pharmaceutical Quality System (https://www.fda.gov/media/71553/download)을 참조하라. 본 서한에 대한 답변으로 다음을 제출하라. 귀사의 품질부서가 효과적으로 기능하도록 권한과 자원을 부여받는 것을 보장하기 위한 종합적 평가 및 시정 계획. 해당 평가에는 다음이 포함되어야 하나 이에 한정되지 않는다. o 귀사가 사용하는 절차가 견고하고 적절한지에 대한 판단 o 적절한 관행의 준수를 평가하기 위한 운영 전반의 품질부서 감독 조항 o 품질부서의 처리(disposition) 결정 전 각 배치 및 관련 정보에 대한 완전하고 최종적인 검토 o 모든 제품의 확인시험·함량·품질·순도를 보장하기 위한 일탈조사의 감독·승인 및 그 밖의 모든 품질부서 업무 수행 o 아울러 최고경영진이 품질보증과 신뢰성 있는 운영을 어떻게 지원하는지 기술할 것. 여기에는 새롭게 발생하는 제조·품질 문제에 선제적으로 대응하고 지속적인 관리 상태를 보장하기 위한 자원의 시의적절한 제공이 포함되어야 하나 이에 한정되지 않는다. 공정 밸리데이션의 적절한 요소로 FDA가 고려하는 일반 원칙과 접근법에 관하여는 FDA 가이던스 문서 Process Validation: General Principles and Practices (https://www.fda.gov/media/71021/download)를 참조하라. 귀사가 판매하는 각 완제의약품에 대한 공정성능적격성평가(process performance qualification) 수행 일정. 아울러 어떠한 공정 밸리데이션 연구도 수행하지 않고 생산되어 유통된 완제의약품에 대한 위험평가와 취할 후속 조치를 제출할 것. 귀사 안정성 프로그램의 적정성을 보장하기 위한 종합적·독립적 평가 및 CAPA 계획. 시정된 프로그램에는 다음이 포함되어야 하나 이에 한정되지 않는다. o 안정성 지시 시험법(stability-indicating method) o 유통이 허용되기 전, 판매되는 용기·마개 시스템에 담긴 각 완제의약품에 대한 안정성시험 o 유효기간 주장이 계속 유효한지 판단하기 위하여 매년 각 제품의 대표 배치를 프로그램에 추가하는 지속적 프로그램 o 각 시험 시점(timepoint)에서 시험할 구체적 항목에 대한 상세한 정의 o 이러한 사항 및 시정된 안정성 프로그램의 그 밖의 요소를 기술하는 모든 절차. 연방 식품·의약품·화장품법(Federal Food, Drug, and Cosmetic Act) 위반사항. 다음은 당국의 검토 과정에서 확인된 위반사항이다. 다시 말하지만 이는 해당 제품 또는 작업과 관련하여 존재할 수 있는 위반사항을 모두 열거한 목록이 아니다. 미승인 신약 위반. 제품 라벨 및 표시에 대한 검토에 근거할 때 \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\", \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\", \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\"은 질병의 진단·치유·완화·치료·예방에 사용될 것을 의도하거나 신체의 구조 또는 기능에 영향을 미칠 것을 의도하고 있으므로 FD&C Act section 201(g)(1), 21 U.S.C. 321(g)(1)에 따른 의약품에 해당한다. 이들 제품이 의약품으로서 의도된 용도(21 CFR 201.128에 정의됨)를 가진다는 증거가 되는 제품 표시의 예는 다음을 포함하나 이에 한정되지 않는다. FROYA, Instant Rosacea, Acne & Redness Stopper: \"... Instant Rosacea, Acne ... Stopper\" [제품 상자에서 인용]. [Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM: \"ACNE SCARS HEALER & PREVENTER ... FACE BALM\" [제품 상자에서 인용]. [Norse], BODY ACNE KILLER, BODY BALM: \"BODY ACNE KILLER....\" [제품 상자에서 인용]. FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face: \"... Hyper Fast Eczema & Psoriasis Stopper for Body & Face\" [제품 표시에서 인용]. PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM: \"... ULTIMATE JOINT & MUSCLE REPAIR BALM\" [제품 상자에서 인용]. 위 표시상의 증거에 근거할 때 \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\", \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\", \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\"은 여러 비처방 의약품 용도로 의도된 것이다. 아래에서 기술하는 바와 같이 이들 완제의약품은 FD&C Act sections 505(a) and 301(d), 21 U.S.C 355(a) and 331(d)를 위반하여 판매되는 미승인 신약이다. 완제의약품은 그 표시에서 지시·권고·제안된 조건에서의 사용에 대하여 일반적으로 안전하고 유효하다고 인정(GRASE)되지 않는 경우 FD&C Act section 201(p), 21 U.S.C. 321(p)의 의미에서 \"신약\"에 해당한다. 여기에 해당되지 않는 일부 예외를 제외하고, 신약은 FD&C Act section 505(a), 21 U.S.C. 355(a)에 기술된 바와 같이 FDA의 승인된 신청서가 유효하지 않으면 주간(州間) 거래에 도입되거나 도입을 위하여 인도될 수 없다. 위에서 확인된 이들 완제의약품에 대하여는 FD&C Act section 505, 21 U.S.C. 355에 따른 FDA 승인 신청서가 유효하게 존재하지 않는다. FD&C Act section 505G에 따라 승인된 신청서 없이 판매되는 일부 비처방 의약품(일반적으로 \"OTC 모노그래프 의약품\"이라 함)은 해당 요건을 충족하는 경우 적법하게 판매될 수 있다. 그러나 \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\", \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\", \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\"은 아래에서 기술하는 이유로 각각의 모노그래프에 규정된 조건에 부합하지 않는다. 여드름 의약품. 위 표시상의 주장에 근거할 때 \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\"은 일반의약품(OTC) 여드름 의약품으로 사용될 것을 의도하고 있으므로, GRASE로 인정되어 신약에 해당하지 않으려면 OTC Monograph M006: Topical Acne Drug Products for OTC Human Use (M006)에 부합하여야 한다. 1 그러나 이들 여드름 의약품은 처방 및 표시된 상태로는 M006에 규정된 조건을 준수하지 않는다. 구체적으로 이들 제품에 표시된 성분 중 어느 것도 M006에 따른 OTC 국소 여드름 의약품의 허용 유효성분이 아니다. 피부보호제 및 비듬·지루성 피부염·건선 관리용 의약품. 위 표시상의 주장에 근거할 때 \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\"는 OTC 피부보호제 및 건선 관리용으로 사용될 것을 의도하고 있으므로, GRASE로 인정되어 신약에 해당하지 않으려면 OTC Monograph M016: Skin Protectant Drug Products for Over-the-Counter Human Use 및 OTC Monograph M032: Drug Products for the Control of Dandruff, Seborrheic Dermatitis, and Psoriasis for OTC Use에 부합하여야 한다. 2 그러나 이 완제의약품은 처방 및 표시된 상태로는 M016 및 M032에 규정된 조건을 준수하지 않는다. 구체적으로 \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\"에 표시된 성분 중 어느 것도 OTC 건선 의약품 및/또는 습진 완화용 OTC 피부보호제 의약품의 허용 유효성분이 아니다. 외용 진통제. 위 표시상의 주장에 근거할 때 \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\"은 OTC 외용 진통제로 사용될 것을 의도하고 있으므로, GRASE로 인정되어 신약에 해당하지 않으려면 OTC Monograph M017: External Analgesic Drug Products for OTC Human Use에 부합하여야 한다. 3 그러나 이 완제의약품은 처방 및 표시된 상태로는 M017에 규정된 조건을 준수하지 않는다. 구체적으로 제품 표시에는 M017에서 OTC 외용 진통제에 허용되지 않는 의도된 용도가 포함되어 있다. \"joint & muscle repair\"와 같은 주장은 OTC 외용 진통제의 일반적인 의도된 용도를 넘어서며 M017에 규정된 허용 용도에 부합하지 않는다. 따라서 \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\", \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\", \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\" 제품은 각각에 해당하는 모노그래프에 규정된 적용 조건을 준수하지 않으며, 달리 GRASE로 인정된 바도 없다. 4 따라서 이들 제품은 FD&C Act section 201(p), 21 U.S.C. 321(p)의 의미에서 신약에 해당하며, FD&C Act section 505G에 따라 승인된 신청서 없이 이들 제품이 적법하게 판매될 수 있는 근거는 존재하지 않는다. 이들 제품에 대하여 유효한 신청서가 없으므로 이들 제품은 미승인 신약이다. 이러한 미승인 신약을 주간 거래에 도입하거나 도입을 위하여 인도하는 것은 FD&C Act sections 505(a) and 301(d), 21 U.S.C. 355(a) and 331(d)를 위반한다. 허위표시 의약품 위반. \"FROYA, Instant Rosacea, Acne & Redness Stopper\", \"[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM\", \"[Norse], BODY ACNE KILLER, BODY BALM\", \"FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face\", \"PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM\"은 FD&C Act section 505G, 21 U.S.C. 355h의 적용을 받는 비처방 의약품이면서도 해당 조항에 따른 판매 요건을 준수하지 않고 FD&C Act section 505, 21 U.S.C. 355에 따라 승인된 신청서의 대상도 아니므로, FD&C Act section 502(ee), 21 U.S.C. 352(ee)에 따른 허위표시(misbranded) 의약품에 해당한다. 허위표시 의약품을 주간 거래에 도입하거나 도입을 위하여 인도하는 것은 FD&C Act section 301(a), 21 U.S.C. 331(a)를 위반한다. CGMP 컨설턴트 권고. 귀사에서 확인된 위반사항의 성격에 비추어, 귀사는 CGMP 요건 충족을 지원할 수 있도록 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 선임하여야 한다. 해당 자격을 갖춘 컨설턴트는 또한 귀사가 FDA와의 규정 준수 상태 해소를 추진하기 전에 귀사 전체 운영에 대한 CGMP 준수 여부의 종합적인 6대 시스템 감사를 수행하고 귀사 CAPA의 완료 여부와 유효성을 평가하여야 한다. 컨설턴트의 활용이 귀사의 CGMP 준수 의무를 면제하지는 않는다. 귀사의 최고경영진은 지속적인 CGMP 준수를 보장하기 위하여 모든 결함과 시스템적 결점을 해결할 책임을 계속 부담한다.",
@@ -1726,16 +1736,6 @@
             {
               "finding_id": "finding-57d219a66eb72ee734638034",
               "text_ko": "귀사의 배치제조기록서에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
-              "agency": "FDA",
-              "firm_name": "Neeyaan LLC",
-              "published_date": "2026-07-28",
-              "category_label_ko": "문서화/기록관리",
-              "evidence_url": "https://www.fda.gov/media/193883/download",
-              "document_id": "fda483-193883"
-            },
-            {
-              "finding_id": "finding-949f74535a325b6e9c92b620",
-              "text_ko": "배치제조·관리기록서에 생산된 각 의약품 배치에 사용된 원료 및 공정중간체(in-process material)의 각 배치에 대한 구체적 식별정보가 포함되어 있지 않다.",
               "agency": "FDA",
               "firm_name": "Neeyaan LLC",
               "published_date": "2026-07-28",
@@ -2301,12 +2301,12 @@
           "key": "US",
           "slug": "us",
           "label_ko": "미국",
-          "findings": 8309,
-          "documents": 1342,
+          "findings": 8312,
+          "documents": 1343,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 8303
+              "c": 8306
             },
             {
               "v": "MFDS",
@@ -2341,6 +2341,36 @@
           ],
           "samples": [
             {
+              "finding_id": "finding-0881ffc67ac791bab7f36d43",
+              "text_ko": "금지명령(decree of injunction)의 절차적 요구사항을 준수하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
+            {
+              "finding_id": "finding-77d8d1818dc933e491367af9",
+              "text_ko": "최악의 조건(worst-case), 가장 부하가 크고 도전적인 조건에서 무균공정(aseptic) 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
+            {
+              "finding_id": "finding-85fe1a82ad7d14196c70151f",
+              "text_ko": "제조구역 및 제조구역에 인접한 구역에서 오염(contamination)이 관찰되었다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
+            {
               "finding_id": "finding-194c974b984823adba33c583",
               "text_ko": "의약품의 제조·가공·포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않다.",
               "agency": "FDA",
@@ -2369,36 +2399,6 @@
               "category_label_ko": "품질부서 관리감독",
               "evidence_url": "https://www.fda.gov/media/194052/download",
               "document_id": "fda483-194052"
-            },
-            {
-              "finding_id": "finding-7fd5abfc11a4d9ea84d3ddca",
-              "text_ko": "실험실 관리에 의약품이 동일성(identity), 함량, 품질 및 순도의 적절한 기준에 적합함을 보증하기 위한 과학적으로 타당하고 적합한 시험 절차의 수립이 포함되어 있지 않다.",
-              "agency": "FDA",
-              "firm_name": "Baxalta US Inc.",
-              "published_date": "2026-08-04",
-              "category_label_ko": "시험실/품질관리",
-              "evidence_url": "https://www.fda.gov/media/194052/download",
-              "document_id": "fda483-194052"
-            },
-            {
-              "finding_id": "finding-f68b1790ed6627480f3dd19e",
-              "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않는 불일치(discrepancy)에 대한 철저한 검토가 이루어지지 않았다.",
-              "agency": "FDA",
-              "firm_name": "Baxalta US Inc.",
-              "published_date": "2026-08-04",
-              "category_label_ko": "일탈/CAPA/조사",
-              "evidence_url": "https://www.fda.gov/media/194052/download",
-              "document_id": "fda483-194052"
-            },
-            {
-              "finding_id": "finding-1547b67bea72907db4100a78",
-              "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
-              "agency": "FDA",
-              "firm_name": "Cascade Specialty Pharmacy LLC",
-              "published_date": "2026-07-31",
-              "category_label_ko": "품질부서 관리감독",
-              "evidence_url": "https://www.fda.gov/media/193964/download",
-              "document_id": "fda483-193964"
             }
           ]
         },
@@ -3456,7 +3456,7 @@
       "excluded": [
         {
           "key": "",
-          "findings": 5269,
+          "findings": 5274,
           "reason": "국가 미상(원문에 표기 없음)"
         },
         {
@@ -3609,12 +3609,12 @@
           "key": "FDA",
           "slug": "fda",
           "label_ko": "미국 FDA",
-          "findings": 13257,
-          "documents": 2897,
+          "findings": 13261,
+          "documents": 2899,
           "by_agency": [
             {
               "v": "FDA",
-              "c": 13257
+              "c": 13261
             }
           ],
           "top_firms": [
@@ -3640,6 +3640,36 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-0881ffc67ac791bab7f36d43",
+              "text_ko": "금지명령(decree of injunction)의 절차적 요구사항을 준수하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "일탈/CAPA/조사",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
+            {
+              "finding_id": "finding-77d8d1818dc933e491367af9",
+              "text_ko": "최악의 조건(worst-case), 가장 부하가 크고 도전적인 조건에서 무균공정(aseptic) 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "무균보증/무균공정",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
+            {
+              "finding_id": "finding-85fe1a82ad7d14196c70151f",
+              "text_ko": "제조구역 및 제조구역에 인접한 구역에서 오염(contamination)이 관찰되었다.",
+              "agency": "FDA",
+              "firm_name": "Veterinary Pharmacy Corporation",
+              "published_date": "2026-08-12",
+              "category_label_ko": "오염/교차오염 관리",
+              "evidence_url": "https://www.fda.gov/media/194143/download",
+              "document_id": "fda483-194143"
+            },
             {
               "finding_id": "finding-1a75ab650aeceb448f9fa68c",
               "text_ko": "귀사는 적절한 품질부서(quality unit)를 확립하지 못하였고, 품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지도 않았다(21 CFR 211.22(a) and (d)). 귀사의 품질부서(QU)는 (b)(4) 일반의약품(OTC) 완제의약품(예: (b)(4))의 제조·포장·보관·검토·출하를 적절히 감독할 권한을 확립하고 행사하지 못하였다. 귀사의 미흡한 품질 감독은 문서화 관행, 배치기록 검토, 일탈조사, 그리고 CGMP 요건 준수를 보장하기 위한 품질시스템 관리에서 중대한 결함을 초래하였다. 예를 들어 귀사의 품질부서는 다음 사항을 보장하지 못하였다. 배치 또는 그 구성 성분이 규격에 적합하지 않거나 설명되지 않는 불일치가 발생한 경우의 조사(21 CFR 211.192). 적합한 품질 감독 절차(예: 원료 취급, 제조기록 검토, 회수)의 수립(21 CFR 211.22(a)). 완제의약품의 각 배치에 대하여 제조·가공·포장·보관의 각 중요 단계 수행을 문서화한 배치 제조 및 관리 기록(21 CFR 211.188(b)). 의약품에 관한 모든 서면 및 구두 불만의 처리를 기술한 문서화된 절차의 수립(21 CFR 211.198(a)). 귀사는 답변에서 수정액(white-out) 사용 중단 및 온도 모니터링 관행 개선 등 배치기록과 관련한 절차 변경을 약속하였다. 그러나 귀사의 답변은 CGMP 기록의 정확성·무결성·검토·승인을 보장하여야 할 품질부서의 책임과 권한 행사 실패를 적절히 인정하거나 다루지 않았으므로 미흡하다. 구체적으로 귀사의 답변은 귀사 시설에서 문서로 확인된 중대한 데이터 무결성(data integrity) 결함, 즉 품질 출하 라벨의 소급 기재(backdating), 온도계가 작동하지 않는 상태에서의 온도 데이터 기재, 완제의약품 제조활동을 문서화한 배치기록의 부재를 다루지 않았다. 귀사의 품질시스템은 미흡하다. CGMP 규정 21 CFR parts 210 및 211의 요건을 충족하기 위한 품질시스템 및 리스크 관리 접근법의 이행에 관하여는 다음 FDA 가이던스 문서를 참조하라. Quality Systems Approach to Pharmaceutical CGMP Regulations (https://www.fda.gov/media/71023/download), Q9(R1) Quality Risk Management (https://www.fda.gov/media/167721/download), ICH Q10 Pharmaceutical Quality System (https://www.fda.gov/media/71553/download). 본 서한에 대한 답변으로 다음을 제출하라. 문서화 관행이 미흡한 지점을 파악하기 위하여 제조 및 시험실 운영 전반에 사용되는 문서화 시스템에 대한 종합적 평가. 여기에는 운영 전반에 걸쳐 귀속성·가독성·완전성·원본성·정확성·동시성(attributable, legible, complete, original, accurate, contemporaneous)을 갖춘 기록을 보유하도록 귀사의 문서화 관행을 포괄적으로 시정하는 상세한 시정 및 예방조치(CAPA) 계획을 포함할 것. 귀사의 품질부서가 효과적으로 기능하도록 권한과 자원을 부여받는 것을 보장하기 위한 종합적 평가 및 시정 계획. 해당 평가에는 다음이 포함되어야 하나 이에 한정되지 않는다. o 귀사가 사용하는 절차가 견고하고 적절한지에 대한 판단. o 적절한 관행의 준수를 평가하기 위한 운영 전반의 품질부서 감독 조항. o 품질부서의 처리(disposition) 결정 전 각 배치 및 관련 정보에 대한 완전하고 최종적인 검토. o 모든 제품의 확인시험·함량·품질·순도를 보장하기 위한 일탈조사의 감독·승인 및 그 밖의 모든 품질부서 업무 수행. 일탈, 불일치, 불만, 규격외(OOS) 결과 및 실패를 조사하는 귀사의 전반적 시스템에 대한 종합적 평가. 이 시스템을 시정하기 위한 상세한 실행계획을 제출할 것. 실행계획에는 조사 역량, 조사 범위 결정, 근본원인 평가, CAPA 유효성, 품질부서 감독, 문서화된 절차의 중대한 개선이 포함되어야 하나 이에 한정되지 않는다. 귀사가 조사의 모든 단계를 적절히 수행하도록 보장할 방법을 기술할 것.",
@@ -3669,36 +3699,6 @@
               "category_label_ko": "문서화/기록관리",
               "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/fairygene-inc-726976-07312026",
               "document_id": "999cad7bcb61"
-            },
-            {
-              "finding_id": "finding-020c5c2186ce4ea0de6ae189",
-              "text_ko": "의약품 제조 및 가공에 종사하는 직원이 담당 업무를 수행하는 데 필요한 교육훈련과 경험을 갖추지 못하였다.",
-              "agency": "FDA",
-              "firm_name": "Sentiss Pharma Pvt. Ltd.",
-              "published_date": "2026-08-05",
-              "category_label_ko": "교육/작업자",
-              "evidence_url": "https://www.fda.gov/media/194066/download",
-              "document_id": "fda483-194066"
-            },
-            {
-              "finding_id": "finding-2624810f130257461ca787b4",
-              "text_ko": "문서화된 절차의 변경사항이 품질관리부서의 검토 및 승인을 거치지 않았다.",
-              "agency": "FDA",
-              "firm_name": "Sentiss Pharma Pvt. Ltd.",
-              "published_date": "2026-08-05",
-              "category_label_ko": "품질부서 관리감독",
-              "evidence_url": "https://www.fda.gov/media/194066/download",
-              "document_id": "fda483-194066"
-            },
-            {
-              "finding_id": "finding-5eae4868b802126cb34c93f2",
-              "text_ko": "의약품에 대한 문서화된 안정성시험 프로그램에 신뢰성 있고 유의미하며 구체적인 시험방법이 포함되어 있지 않다.",
-              "agency": "FDA",
-              "firm_name": "Sentiss Pharma Pvt. Ltd.",
-              "published_date": "2026-08-05",
-              "category_label_ko": "시험실/품질관리",
-              "evidence_url": "https://www.fda.gov/media/194066/download",
-              "document_id": "fda483-194066"
             }
           ]
         },
@@ -3803,12 +3803,12 @@
           "key": "MFDS",
           "slug": "mfds",
           "label_ko": "식품의약품안전처",
-          "findings": 1965,
-          "documents": 1316,
+          "findings": 1969,
+          "documents": 1320,
           "by_agency": [
             {
               "v": "MFDS",
-              "c": 1965
+              "c": 1969
             }
           ],
           "top_firms": [
@@ -3834,6 +3834,36 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-c80384045a42ececc3a0bde6",
+              "text_ko": "글리미드정2mg(글리메피리드)에 대하여 이물 혼입 우려에 따라 영업자 회수가 실시되었다.",
+              "agency": "MFDS",
+              "firm_name": "구주제약(주)",
+              "published_date": "2026-08-13",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-8bd9bd12b54d"
+            },
+            {
+              "finding_id": "finding-81c01e1a91d14229aa00e9ee",
+              "text_ko": "의약품 동등성 재평가에 필요한 자료를 기한(’26. 6. 30.) 내에 제출하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "케이엠에스제약(주)",
+              "published_date": "2026-08-12",
+              "category_label_ko": "기타 품질시스템",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006218",
+              "document_id": "admin-2026006218"
+            },
+            {
+              "finding_id": "finding-c6f01a5f03fc6191f9761467",
+              "text_ko": "가. 기준서를 준수하지 않았다. 나. 행정지시 사항을 이행하지 않았다. 다. 품질관리에 필요한 시험검사기구를 갖추지 않았다. 라. 품질관리기록서를 거짓으로 작성하고 제조기록서(batch record)를 작성하지 않았다.",
+              "agency": "MFDS",
+              "firm_name": "알파제약(주)",
+              "published_date": "2026-08-12",
+              "category_label_ko": "문서화/기록관리",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006188",
+              "document_id": "admin-2026006188"
+            },
             {
               "finding_id": "finding-00f54e37f02375c2118bc2d2",
               "text_ko": "[별표 1] 6.4 항 관련 지적사항이다. 캠페인 생산(campaign production)에 대한 세척 유효성 검증(cleaning validation)을 수행할 것이 요구되었다.",
@@ -3863,36 +3893,6 @@
               "category_label_ko": "밸리데이션/적격성평가",
               "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P-j3DfJpj_",
               "document_id": "gmpinspect-1P-j3DfJpj_"
-            },
-            {
-              "finding_id": "finding-9b82e05d5adfac92830a2ba8",
-              "text_ko": "시험실 분야 [별표 1] 7.3 항 관련 지적사항이다. 제품품질평가(product quality review) 결과에 따른 편향을 조사하고, 필요시 후속조치를 수행할 것이 요구되었다.",
-              "agency": "MFDS",
-              "firm_name": "(주)휴비스트제약",
-              "published_date": "2026-08-11",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P-j3DfJpj_",
-              "document_id": "gmpinspect-1P-j3DfJpj_"
-            },
-            {
-              "finding_id": "finding-f20b16a1208e435d5f9d0269",
-              "text_ko": "[별표 1] 2.1 항 관련 지적사항이다. 보관 중인 의약품의 온도 관리를 철저히 할 것이 요구되었다.",
-              "agency": "MFDS",
-              "firm_name": "(주)휴비스트제약",
-              "published_date": "2026-08-11",
-              "category_label_ko": "안정성/보관",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P-j3DfJpj_",
-              "document_id": "gmpinspect-1P-j3DfJpj_"
-            },
-            {
-              "finding_id": "finding-068c4c2d584fa0e7401bb6c9",
-              "text_ko": "시험실 분야 [별표 1] 7.1 항 관련 지적사항이다. 입고되는 원료에 대하여 주기적으로 전수검사를 실시할 것이 요구되었다.",
-              "agency": "MFDS",
-              "firm_name": "삼성산소(주)",
-              "published_date": "2026-08-11",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P-j3DfJpwb",
-              "document_id": "gmpinspect-1P-j3DfJpwb"
             }
           ]
         },

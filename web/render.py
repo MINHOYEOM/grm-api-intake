@@ -1667,8 +1667,10 @@ def load_findings_facets(path: Path = FINDINGS_FACETS_FILE) -> "dict[str, Any] |
         return None
     obj = json.loads(path.read_text(encoding="utf-8"))
     got = obj.get("schema_version")
-    if got != "grm-findings-facets/v1":
-        raise SystemExit(f"findings_facets 스키마 불일치: {got!r} (기대: grm-findings-facets/v1)")
+    # v2 = 분류×기관 조합(`combos`) 추가. v1 을 계속 받으면 조합 페이지가 **조용히 0장**
+    # 이 되므로 받지 않는다 — 이 로더가 실패를 말하지 않으면 아무도 안 만들어진 걸 모른다.
+    if got != "grm-findings-facets/v2":
+        raise SystemExit(f"findings_facets 스키마 불일치: {got!r} (기대: grm-findings-facets/v2)")
     return obj
 
 
@@ -1781,6 +1783,23 @@ def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> 
     subject = f"{doc['firm_name']} {src}".strip() if src else doc["firm_name"]
     return (f"{agency}가 {doc['published_date']}에 공개한 {subject} "
             f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
+
+
+def combo_description(combo: dict[str, Any]) -> str:
+    """분류 × 기관 조합 페이지의 meta description — 데이터에서 조립(문구 생성 0).
+
+    단일 축(facet_description)은 "어느 기관들이" 를 뒤에 붙이지만, 조합은 기관이 이미
+    확정돼 제목에 있다. 대신 **업체 수**를 넣는다 — 검색 결과에서 이 페이지가 목록형
+    이라는 신호가 되고, 같은 분류의 다른 기관 페이지와 문장이 겹치지 않는다.
+
+    ★조사(가/이)를 기관명에 붙이지 않는다 — 한국어 조사는 앞말의 받침으로 갈리는데
+    기관명에는 영문 약어(FDA·EMA·MHRA)가 섞여 있어 규칙이 성립하지 않는다.
+    """
+    firms = len(combo.get("top_firms") or [])
+    tail = f" 지적이 많았던 업체 {firms}곳도 함께 보실 수 있습니다." if firms else ""
+    return (f"{combo['agency_label_ko']} 공개 문서에서 {combo['category_label_ko']} "
+            f"지적사항 {combo['findings']:,}건(문서 {combo['documents']:,}건)을 "
+            f"우리말로 정리했습니다.{tail}")
 
 
 def facet_description(axis_key: str, item: dict[str, Any],
@@ -2812,6 +2831,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if facets:
         agency_labels = facets.get("agency_labels") or {}
         measured_on = facets.get("measured_on") or ""
+        # 분류 슬러그 → 그 분류의 조합(기관) 목록. 분류 페이지가 진입 간선을 걸 때와
+        # 조합 페이지를 쓸 때 같은 원천을 본다(두 곳에서 따로 세면 갈라진다).
+        combos_by_category: dict[str, list[dict[str, Any]]] = {}
+        for combo in ((facets.get("combos") or {}).get("items") or []):
+            combos_by_category.setdefault(combo["category_slug"], []).append(combo)
         for axis in facets.get("axes") or []:
             axis_key = axis["axis"]
             meta = FACET_AXES[axis_key]                 # 모르는 축 = KeyError(조용한 누락 금지)
@@ -2840,6 +2864,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             facet_paths.append((f"findings/{meta['path']}/", axis_mod))
 
             for item in items:
+                # 조합 페이지(분류 × 기관)로 가는 진입 간선 — 분류 축에서만, 그리고 그
+                # 분류에 실제로 만들어진 조합에만 건다(없는 페이지로 보내는 링크 금지).
+                narrow = [
+                    {"href": f"findings/{meta['path']}/{item['slug']}/{c['slug']}/",
+                     "label": c["agency_label_ko"], "findings": c["findings"]}
+                    for c in combos_by_category.get(item["slug"], [])
+                ] if axis_key == "category" else []
                 page_html = env.get_template("findings_facet.html").render(
                     page_title=f"{item['label_ko']} {meta['headline_suffix']} · GRM",
                     rel_root="../../../",
@@ -2849,6 +2880,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     canonical=_abs_url(f"findings/{meta['path']}/{item['slug']}/"),
                     axis=meta, item=item, siblings=siblings,
                     agency_labels=agency_labels, measured_on=measured_on,
+                    crumb_mid=[{"href": f"findings/{meta['path']}/",
+                                "label": meta["title"]}],
+                    crumb_last=item["label_ko"],
+                    headline=f"{item['label_ko']} {meta['headline_suffix']}",
+                    lede_prefix=meta["lede_prefix"],
+                    # 값 인코딩은 템플릿의 `| urlencode` 가 한다 — 렌더러는 urllib 을
+                    # import 할 수 없다(순수성 가드가 비결정/네트워크 모듈의 **문 자체**를
+                    # 닫아 둔다). 조립만 여기서 하고 인코딩 규칙은 옮기지 않는다.
+                    cta_params=[(meta["query_key"], item["key"])],
+                    cta_label=f"{item['label_ko']} 지적사항 전체 보기",
+                    sibling_title=meta["sibling_title"],
+                    sibling_base=f"findings/{meta['path']}/",
+                    narrow_links=narrow,
                 )
                 _write(out_dir / "findings" / meta["path"] / item["slug"] / "index.html",
                        page_html)
@@ -2857,6 +2901,53 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                 for s in item.get("samples") or []), default="")
                 facet_paths.append(
                     (f"findings/{meta['path']}/{item['slug']}/", item_mod))
+
+        # ── [검색 유입 2차] 분류 × 기관 조합 페이지 ─────────────────────────────
+        # 사람들이 치는 말은 주제 하나가 아니라 "기관 + 주제"다("FDA 무균 지적사항").
+        # 부모는 언제나 분류 페이지 하나뿐이라 URL 도 그 밑에 둔다 — 위 루프가 그
+        # 부모에 진입 간선을 이미 걸었으므로 이 페이지들은 고립되지 않는다.
+        cat_meta = FACET_AXES["category"]
+        for cat_slug, combo_items in combos_by_category.items():
+            sibs = [{"slug": c["slug"], "label_ko": c["agency_label_ko"]}
+                    for c in combo_items]
+            for combo in combo_items:
+                view = build_facet_item_view(combo, doc_slugs)
+                # by_agency 막대는 조합에선 뜻이 없다(기관이 하나뿐이라 100% 한 줄) —
+                # 데이터에 아예 넣지 않아 템플릿의 {% if %} 가 섹션을 지운다.
+                view["by_agency"] = []
+                label = f"{combo['agency_label_ko']} {combo['category_label_ko']}"
+                base = f"findings/{cat_meta['path']}/{cat_slug}/"
+                page_html = env.get_template("findings_facet.html").render(
+                    page_title=f"{label} 지적사항 · GRM",
+                    rel_root="../../../../",
+                    nav_active="findings",
+                    latest_slug=latest_slug,
+                    description=combo_description(combo),
+                    canonical=_abs_url(f"{base}{combo['slug']}/"),
+                    axis=cat_meta, item=view, siblings=sibs,
+                    agency_labels=agency_labels, measured_on=measured_on,
+                    crumb_mid=[{"href": f"findings/{cat_meta['path']}/",
+                                "label": cat_meta["title"]},
+                               {"href": base, "label": combo["category_label_ko"]}],
+                    crumb_last=combo["agency_label_ko"],
+                    headline=f"{label} 지적사항",
+                    # 기관명에 조사를 붙이지 않는다 — 한국어 조사는 앞말의 받침에
+                    # 따라 갈리는데 기관명은 영문 약어가 섞여 있어(FDA·EMA·MHRA)
+                    # 규칙이 성립하지 않는다. 이름은 제목이 이미 말하고 있다.
+                    lede_prefix="이 기관이 이 분류로",
+                    cta_params=[(cat_meta["query_key"], combo["category_key"]),
+                                ("agency", combo["agency_key"])],
+                    cta_label=f"{label} 지적사항 전체 보기",
+                    sibling_title="다른 기관 보기",
+                    sibling_base=base,
+                    narrow_links=[],
+                )
+                _write(out_dir / "findings" / cat_meta["path"] / cat_slug
+                       / combo["slug"] / "index.html", page_html)
+                written.append(f"{base}{combo['slug']}/index.html")
+                combo_mod = max((s.get("published_date") or ""
+                                 for s in view.get("samples") or []), default="")
+                facet_paths.append((f"{base}{combo['slug']}/", combo_mod))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(지적 3건 이상).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지

@@ -297,6 +297,86 @@ class CommittedSamplesTest(unittest.TestCase):
             self.assertIn("samples_skipped_absence", axis, axis["axis"])
 
 
+class ComboGateTest(unittest.TestCase):
+    """분류 × 기관 조합 게이트 — 무네트워크(post_search 스텁)."""
+
+    def setUp(self):
+        self._real = ffr.post_search
+
+    def tearDown(self):
+        ffr.post_search = self._real
+
+    # 대조군(`ctrl`)을 늘 함께 둔다 — 검사 대상 하나만 넣으면 그것이 제외되는 순간
+    # 0건 가드(SystemExit)가 먼저 터져 정작 보려던 제외 사유를 볼 수 없다.
+    _CTRL = {"key": "cat_ctrl", "slug": "cat-ctrl", "label_ko": "대조군",
+             "findings": 1000, "by_agency": [{"v": "FDA", "c": 400}]}
+
+    def _stub(self, measured_by_cat: dict):
+        def fake(base_url, anon_key, payload, timeout=60):
+            n = measured_by_cat.get(payload.get("p_category"), 400)
+            return _resp(n, max(n // 3, 1), agencies=[{"v": "FDA", "c": n}],
+                         docs=[_doc(_finding("f1"))])
+        ffr.post_search = fake
+
+    def _build(self, parent_findings, agency_c, measured, agency="FDA"):
+        self._stub({"cat_ctrl": 400, "cat_a": measured})
+        axis = {"axis": "category", "items": [
+            dict(self._CTRL),
+            {"key": "cat_a", "slug": "cat-a", "label_ko": "분류A",
+             "findings": parent_findings, "by_agency": [{"v": agency, "c": agency_c}]},
+        ]}
+        return ffr.build_category_agency_combos(
+            "u", "k", category_axis=axis, min_findings=20, samples=3,
+            log=lambda m: None)
+
+    def _excluded_for(self, out, prefix="cat-a/"):
+        return [e for e in out["excluded"] if e["key"].startswith(prefix)]
+
+    def test_below_threshold_is_excluded_before_any_query(self):
+        """후보 선별이 조회보다 먼저 — 표본 미달 조합에 RPC 를 쏘지 않는다."""
+        seen: list = []
+        real_stub = {"cat_ctrl": 400}
+
+        def fake(base_url, anon_key, payload, timeout=60):
+            seen.append(payload.get("p_category"))
+            n = real_stub.get(payload.get("p_category"), 400)
+            return _resp(n, 10, agencies=[{"v": "FDA", "c": n}],
+                         docs=[_doc(_finding("f1"))])
+        ffr.post_search = fake
+        axis = {"axis": "category", "items": [
+            dict(self._CTRL),
+            {"key": "cat_a", "slug": "cat-a", "label_ko": "분류A",
+             "findings": 100, "by_agency": [{"v": "FDA", "c": 3}]},
+        ]}
+        out = ffr.build_category_agency_combos(
+            "u", "k", category_axis=axis, min_findings=20, samples=3,
+            log=lambda m: None)
+        self.assertNotIn("cat_a", seen, "표본 미달인데 RPC 를 쐈다")
+        self.assertIn("표본 미달", self._excluded_for(out)[0]["reason"])
+
+    def test_dominant_agency_is_excluded_as_parent_clone(self):
+        """★부모 분류를 사실상 독점하는 조합은 부모의 복제본이다 — 만들지 않는다."""
+        out = self._build(parent_findings=578, agency_c=570, measured=570)
+        self.assertNotIn("cat_a|FDA", [i["key"] for i in out["items"]])
+        self.assertIn("분류 독점", self._excluded_for(out)[0]["reason"])
+
+    def test_normal_share_is_kept(self):
+        out = self._build(parent_findings=2080, agency_c=1237, measured=1237)
+        got = next(i for i in out["items"] if i["key"] == "cat_a|FDA")
+        self.assertEqual(got["slug"], "fda")
+        self.assertEqual(got["agency_label_ko"], "미국 FDA")
+        self.assertEqual(got["category_slug"], "cat-a")
+
+    def test_measured_count_overrides_stale_by_agency(self):
+        """by_agency 는 분류 축을 뜬 시점의 수다 — 실측이 임계값 아래면 만들지 않는다."""
+        out = self._build(parent_findings=500, agency_c=300, measured=5)
+        self.assertNotIn("cat_a|FDA", [i["key"] for i in out["items"]])
+        self.assertIn("실측 표본 미달", self._excluded_for(out)[0]["reason"])
+
+    def test_unknown_agency_code_fails_instead_of_falling_back(self):
+        with self.assertRaises(SystemExit):
+            self._build(parent_findings=500, agency_c=300, measured=300, agency="XXX")
+
 class NarrowConsoleEncodingTest(unittest.TestCase):
     """좁은 콘솔 인코딩(cp949)에서 요약 출력이 죽어 산출물을 통째로 잃지 않는다.
 
@@ -326,6 +406,12 @@ class NarrowConsoleEncodingTest(unittest.TestCase):
             # 제외 1건 — 이 줄의 요약이 em-dash 를 찍는다.
             "axes": [{"axis": "country", "items": [{"key": "US"}],
                       "excluded": [{"key": "IS", "findings": 3, "reason": "표본 미달"}]}],
+            # 조합 축(v2) — build_payload 의 반환 계약이라 스텁도 함께 갖는다. 요약
+            # 루프가 이것까지 찍으므로 여기서도 em-dash 가 한 번 더 지나간다.
+            "combos": {"axis": "category_agency",
+                       "items": [{"key": "cat_a|FDA"}],
+                       "excluded": [{"key": "cat-b/EMA", "findings": 1,
+                                     "reason": "표본 미달(<20)"}]},
         }
 
     def _stub(self, payload=None):

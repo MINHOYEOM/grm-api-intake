@@ -455,8 +455,10 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 {# 구독 깔때기 계측(무PII) — 표면 노출/제출/닫힘의 익명 카운터만 Supabase RPC(funnel_bump)로
    증가시킨다(키 문자열 하나, 폼 값·이메일 절대 미탑재). 기존 밴드·배너 스크립트는 무수정 —
    submit 은 preventDefault 와 무관하게 추가 리스너에도 전달되고, 배너 표시는 class 변이로
-   관찰한다. reactions cfg(#grm-reactions-cfg) 미설정이면 런타임 전체 no-op. 이 블록은
-   newsletter 게이트 안이라 env-off 빌드는 출력 0(전 페이지 골든 byte-diff 0 유지). #}
+   관찰한다. reactions cfg(#grm-reactions-cfg) 미설정이면 런타임 전체 no-op. 운영자 브라우저
+   (localStorage 'grm-op'='1' — 아래 RUM 게이트·admin.js 가 세우는 그 플래그)는 bump 전송
+   직전에 제외한다. storage 예외는 fail-open(측정) — 확실한 운영자만 제외, #763 과 동일 규칙.
+   이 블록은 newsletter 게이트 안이라 env-off 빌드는 출력 0(전 페이지 골든 byte-diff 0 유지). #}
 <script>
 (function(){
   var cfg=document.getElementById('grm-reactions-cfg');
@@ -465,6 +467,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   if(!u||!k)return;
   var sent={};
   function bump(key,once){
+    try{if(localStorage.getItem('grm-op')==='1')return;}catch(_){}
     if(once){if(sent[key])return;sent[key]=1;}
     try{
       fetch(u+'/rest/v1/rpc/funnel_bump',{method:'POST',keepalive:true,

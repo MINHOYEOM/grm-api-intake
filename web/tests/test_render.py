@@ -6095,7 +6095,8 @@ class WebRenderHardeningTest(unittest.TestCase):
         하나만 보내는 RPC(funnel_bump) 호출이 전부이고 폼 값(이메일)은 절대 싣지 않는다.
         기존 밴드·배너 스크립트는 무수정 — 바깥 리스너/옵저버로만 관찰한다. reactions
         cfg 미설정이면 런타임 전체 no-op, newsletter 게이트 off 면 출력 자체가 0
-        (전 페이지 골든 byte-diff 0 의 근거).
+        (전 페이지 골든 byte-diff 0 의 근거). 운영자 브라우저는 RUM 게이트(#763)와
+        같은 'grm-op' 플래그로 bump 전송 직전에 제외한다 — 판정은 fetch 보다 앞.
         """
         a0 = render.NEWSLETTER_FORM_ACTION
         try:
@@ -6117,6 +6118,14 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 노출 카운트는 1회 게이트(중복 노출 집계 방지) + 기존 스크립트 무수정 관찰.
         self.assertIn("IntersectionObserver", block)
         self.assertIn("MutationObserver", block)
+        # 운영자 제외 — RUM 게이트(#763)와 같은 'grm-op' 플래그를 bump 전송 직전에 검사.
+        # block 슬라이스는 fetch URL 에서 시작하므로 <script> 여는 태그까지 넓혀서 본다.
+        fs = h_on.rindex("<script>", 0, h_on.index("rpc/funnel_bump"))
+        fscript = h_on[fs:h_on.index("</script>", fs)]
+        self.assertIn("localStorage.getItem('grm-op')==='1'", fscript,
+                      "깔때기 bump 에 운영자(grm-op) 제외 게이트가 없다")
+        self.assertLess(fscript.index("grm-op"), fscript.index("rpc/funnel_bump"),
+                        "운영자 판정이 전송(fetch)보다 뒤다 — 카운트가 먼저 새 나간다")
 
 
 class WebAdminRenderTest(unittest.TestCase):

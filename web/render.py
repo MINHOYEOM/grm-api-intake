@@ -2469,6 +2469,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
+    # RUM 비콘 게이트(base.html)의 프로덕션 호스트 허용목록 — SITE_BASE_URL 파생(단일원천:
+    # 커스텀 도메인 교체 시 SITE_BASE_URL 한 줄만 바꾸면 게이트도 따라온다).
+    env.globals["site_host"] = SITE_BASE_URL.split("://", 1)[-1].split("/", 1)[0]
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)

@@ -453,5 +453,41 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 })();
 </script>
 {% endif %}
+{# ── Cloudflare Web Analytics(RUM) 비콘 — 운영자 세션 제외 게이트 ─────────────────
+   엣지 Automatic setup(무조건 주입)을 대체하는 수동 주입. 자동 주입은 분기가 불가능해
+   운영자 방문까지 전부 집계됐다(2026-08-19 실측: 30일 방문 430 중 /admin 뷰 50 + 직접
+   유입 다수가 운영자). 판정은 반드시 주입 코드보다 앞 — WebCloudflareBeaconGateTest 가
+   잠근다. 규칙:
+     · localStorage 'grm-op'='1' 브라우저(운영자)는 주입 0. 플래그는 /admin 방문 시 이
+       게이트가 즉시 세우고 admin.js 도 세운다 — 운영자는 admin 을 반드시 지나므로 첫
+       admin 방문 이후 그 브라우저는 전 페이지에서 영구 제외된다.
+     · /admin 경로 자체는 플래그·스토리지와 무관하게 주입 0(운영 화면은 측정 대상 아님).
+     · 프로덕션 호스트(site_host=SITE_BASE_URL 파생·www 변형) 밖 — localhost 프리뷰·
+       *.pages.dev 미리보기·file:// — 은 주입 0. 엣지 주입 시절엔 없던 오염 경로가 수동
+       주입으로 새로 생기는 것을 막는다.
+     · storage 예외는 fail-open(측정) — 확실한 운영자만 제외한다.
+   env 게이트 밖(무조건 출력) — env-off 골든에도 전 페이지 탑재. 정적 <script src> 태그로
+   바꾸면 게이트가 무력화되므로 금지(동적 삽입만). fetch/sendBeacon 미사용이라 §9 네트워크
+   API 금지 가드(pet.js·growth.js 파일 한정 스코프)에는 애초에 걸리지 않는다.
+   ★토큰 주의: WA 사이트는 식별자가 둘이다 — 대시보드 URL 의 siteTag(aa495e04…)와 비콘
+   에 싣는 site token(아래 값). 엣지 자동 주입이 쓰던 토큰을 실측(2026-08-19, DOM)해서
+   그대로 잇는다 — siteTag 를 실으면 데이터가 다른(없는) 사이트로 흘러 연속성이 끊긴다. #}
+<script>
+(function(){
+  var p=location.pathname,h=location.hostname;
+  var admin=p==='/admin'||p.indexOf('/admin/')===0;
+  var op=false;
+  try{
+    if(admin)localStorage.setItem('grm-op','1');
+    op=localStorage.getItem('grm-op')==='1';
+  }catch(e){}
+  if(admin||op)return;
+  if(h!=='{{ site_host }}'&&h!=='www.{{ site_host }}')return;
+  var s=document.createElement('script');
+  s.src='https://static.cloudflareinsights.com/beacon.min.js';
+  s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
+  document.head.appendChild(s);
+})();
+</script>
 </body>
 </html>

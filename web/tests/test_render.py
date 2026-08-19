@@ -6088,6 +6088,36 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("letter-spacing", banner)
         self.assertNotIn("text-transform", banner)
 
+    def test_subscribe_funnel_metrics_wired_and_gated(self):
+        """[성장 5차] 구독 깔때기 계측 — 노출/제출/닫힘 카운터.
+
+        "전환 0" 의 원인 분해(노출이 없나·제출이 없나)가 목적. 무PII 계약: 키 문자열
+        하나만 보내는 RPC(funnel_bump) 호출이 전부이고 폼 값(이메일)은 절대 싣지 않는다.
+        기존 밴드·배너 스크립트는 무수정 — 바깥 리스너/옵저버로만 관찰한다. reactions
+        cfg 미설정이면 런타임 전체 no-op, newsletter 게이트 off 면 출력 자체가 0
+        (전 페이지 골든 byte-diff 0 의 근거).
+        """
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            h_off = self._render_detail(_minimal_brief("2026-06-13"))
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            h_on = self._render_detail(_minimal_brief("2026-06-14"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertNotIn("funnel_bump", h_off)
+        self.assertIn("rpc/funnel_bump", h_on)
+        block = h_on[h_on.index("rpc/funnel_bump"):]
+        block = block[:block.index("</script>")]
+        for key in ("band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"):
+            self.assertIn(f"'{key}'", block, f"깔때기 키 {key} 배선 누락")
+        # 무PII — 페이로드는 p_key 하나. 폼 값이 계측으로 새지 않는다.
+        self.assertIn("JSON.stringify({p_key:key})", block)
+        self.assertNotIn("EMAIL", block)
+        # 노출 카운트는 1회 게이트(중복 노출 집계 방지) + 기존 스크립트 무수정 관찰.
+        self.assertIn("IntersectionObserver", block)
+        self.assertIn("MutationObserver", block)
+
 
 class WebAdminRenderTest(unittest.TestCase):
     def setUp(self):

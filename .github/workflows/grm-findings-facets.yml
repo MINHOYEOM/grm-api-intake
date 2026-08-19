@@ -60,12 +60,14 @@ jobs:
         run: git switch -c "$BRANCH"
 
       # 갱신 전 항목 수를 기억해 둔다 — 축소 감지는 "갱신 후"만 봐서는 못 한다.
+      # ★조합(`combos.items`)도 함께 센다. 단일 축만 세면 조합 51장이 통째로 사라져도
+      #   숫자가 36 그대로라 가드가 침묵하고 자동 머지된다(라이브 페이지가 조용히 증발).
       - name: Record pre-refresh page counts
         id: before
         run: |
           set -euo pipefail
           if [ -f "$DATA_PATH" ]; then
-            echo "items=$(jq '[.axes[].items[]] | length' "$DATA_PATH")" >> "$GITHUB_OUTPUT"
+            echo "items=$(jq '[.axes[].items[], (.combos.items // [])[]] | length' "$DATA_PATH")" >> "$GITHUB_OUTPUT"
           else
             echo "items=0" >> "$GITHUB_OUTPUT"
           fi
@@ -100,7 +102,7 @@ jobs:
         id: gate
         run: |
           set -euo pipefail
-          AFTER=$(jq '[.axes[].items[]] | length' "$DATA_PATH")
+          AFTER=$(jq '[.axes[].items[], (.combos.items // [])[]] | length' "$DATA_PATH")
           BEFORE='${{ steps.before.outputs.items }}'
           echo "after=$AFTER" >> "$GITHUB_OUTPUT"
           # GHA 표현식에는 산술이 없다 — 계산은 전부 셸에서 한다.

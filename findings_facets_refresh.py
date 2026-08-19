@@ -60,7 +60,7 @@ import requests
 from grm_cli import normalize_supabase_url as _normalize_supabase_url
 import grm_findings
 
-SCHEMA_VERSION = "grm-findings-facets/v1"
+SCHEMA_VERSION = "grm-findings-facets/v2"
 RPC_NAME = "findings_search"
 DEFAULT_OUT = Path(__file__).resolve().parent / "web" / "data" / "findings_facets.json"
 
@@ -70,6 +70,12 @@ DEFAULT_MIN_FINDINGS = 20
 DEFAULT_SAMPLES = 6
 # 항목 조회 실패 허용 비율 — 넘으면 아무것도 쓰지 않는다.
 MAX_FAILURE_RATIO = 0.20
+# 분류 × 기관 조합이 그 분류에서 차지하는 비율의 상한. 한 기관이 분류를 사실상 독점하면
+# 조합 페이지는 부모 분류 페이지의 **복제본**이 된다 — 건수도 거의 같고, 색인 대상 본문인
+# "최근 사례" 6건이 통째로 겹친다(2026-08-19 실측: FDA × 공정밸리데이션 = 570/578 = 98.6%,
+# 사례 6/6 동일). 그런 페이지를 따로 내면 같은 질의에 두 페이지가 경쟁해 검색엔진이 하나를
+# 버리고, 중복으로 판정되면 둘 다 손해다. 그 분류는 부모 페이지가 이미 답이다.
+MAX_COMBO_SHARE = 0.95
 
 # 기관 코드 → 한국어 표기. 저장소에 정본이 없어 여기가 사실상 정본이다(게이트 4가
 # 드리프트를 실패로 만든다). 새 기관이 편입되면 여기에 추가해야 스크립트가 통과한다.
@@ -271,6 +277,111 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
             "samples_skipped_absence": len(set(skipped_absence))}
 
 
+# ── [검색 유입 2차] 분류 × 기관 조합 ─────────────────────────────────────────────
+# 단일 축 페이지가 검색에서 실제로 이겼다(2026-08-19 실측: 네이버 "무균공정 밸리데이션
+# 지적" → /findings/c/process-validation/ 웹문서 1위). 그런데 사람들이 치는 말은 대개
+# 주제 하나가 아니라 **기관 + 주제**다("FDA 무균 지적사항", "식약처 회수 사례").
+# 단일 축 60장으로는 그 조합을 받을 표면이 없다.
+#
+# ★조합 후보는 새로 조회하지 않는다 — 분류 축이 이미 갖고 있는 `by_agency` 건수가 곧
+#   조합 건수다. 여기서 한 번 더 세면 같은 수를 두 곳에서 재게 되고, 그 둘은 반드시
+#   갈라진다. 후보 선별은 그 값으로 하고, RPC 는 **페이지를 실제로 만들 조합에만** 쏜다.
+# ★임계값은 단일 축과 같은 `min_findings` 를 쓴다. 조합만 낮추면 얇은 페이지가 수십 장
+#   생겨 사이트 전체 평가를 깎는다(단일 축에서 이미 내린 판단을 뒤집지 않는다).
+def build_category_agency_combos(base_url: str, anon_key: str, *,
+                                 category_axis: dict[str, Any],
+                                 min_findings: int, samples: int,
+                                 log) -> dict[str, Any]:
+    """분류 × 기관 조합 페이지 데이터. 후보는 분류 축의 by_agency 에서 파생한다."""
+    items: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    skipped_absence: list[str] = []
+    failures = 0
+
+    for cat in category_axis.get("items") or []:
+        for entry in cat.get("by_agency") or []:
+            agency = (entry.get("v") or "").strip()
+            n = int(entry.get("c") or 0)
+            label_key = f"{cat['slug']}/{agency or '(빈 값)'}"
+
+            if not agency:
+                excluded.append({"key": label_key, "findings": n,
+                                 "reason": "기관 미상(원문에 표기 없음)"})
+                continue
+
+            # 라벨 게이트를 표본 미달보다 먼저 — build_axis 와 같은 순서다(새 기관이
+            # 건수가 적은 동안 "표본 미달"로 조용히 숨는 것을 막는다).
+            if agency not in AGENCY_LABELS_KO:
+                raise SystemExit(
+                    f"모르는 기관 코드: {agency!r} — AGENCY_LABELS_KO 에 한국어 표기를"
+                    " 추가하세요(조합 축).")
+
+            if n < min_findings:
+                excluded.append({"key": label_key, "findings": n,
+                                 "reason": f"표본 미달(<{min_findings})"})
+                continue
+
+            try:
+                resp = post_search(base_url, anon_key,
+                                   {"p_q": "", "p_category": cat["key"],
+                                    "p_agency": agency, "p_page": 1,
+                                    "p_docs_per_page": max(samples, 10)})
+            except Exception as exc:                   # noqa: BLE001 — 항목별 격리
+                failures += 1
+                log(f"  ! combo/{label_key} 조회 실패: {exc}")
+                excluded.append({"key": label_key, "findings": n, "reason": "조회 실패"})
+                continue
+
+            totals = resp.get("totals") or {}
+            dash = resp.get("dash") or {}
+            got = int(totals.get("findings") or 0)
+            # 실측이 임계값 아래로 내려오면 만들지 않는다. by_agency 는 분류 축을 뜬
+            # 시점의 수라, 그 사이 재분류로 줄어든 조합이 있을 수 있다.
+            if got < min_findings:
+                excluded.append({"key": label_key, "findings": got,
+                                 "reason": f"실측 표본 미달(<{min_findings})"})
+                continue
+
+            # 부모 분류를 사실상 독점하는 조합은 만들지 않는다(MAX_COMBO_SHARE 주석 참조).
+            # 판정은 실측값끼리 비교한다 — by_agency 는 분류 축을 뜬 시점의 수라 분모와
+            # 분자의 시점이 어긋난다.
+            parent = int(cat.get("findings") or 0)
+            if parent and got / parent >= MAX_COMBO_SHARE:
+                excluded.append({
+                    "key": label_key, "findings": got,
+                    "reason": (f"분류 독점({got}/{parent}="
+                               f"{got / parent * 100:.1f}%) — 부모 페이지의 복제본")})
+                continue
+
+            items.append({
+                "key": f"{cat['key']}|{agency}",
+                "category_key": cat["key"],
+                "category_slug": cat["slug"],
+                "category_label_ko": cat["label_ko"],
+                "agency_key": agency,
+                "agency_label_ko": AGENCY_LABELS_KO[agency],
+                "slug": agency.lower(),
+                "findings": got,
+                "documents": int(totals.get("documents") or 0),
+                "top_firms": [{"firm_name": f.get("firm_name") or f.get("firm_key") or "",
+                               "c": int(f.get("c") or 0)}
+                              for f in (dash.get("top_firms") or [])[:5]],
+                "samples": collect_samples(resp, samples, skipped_absence),
+            })
+
+    attempted = len(items) + failures
+    if attempted and failures / attempted > MAX_FAILURE_RATIO:
+        raise SystemExit(
+            f"조합 축 조회 실패 {failures}/{attempted} — 허용치 초과. 아무것도 쓰지 않습니다.")
+    if not items:
+        raise SystemExit("조합 축 항목 0개 — 0건 가드. 아무것도 쓰지 않습니다.")
+
+    items.sort(key=lambda it: (-it["findings"], it["key"]))
+    excluded.sort(key=lambda ex: (-ex["findings"], ex["key"]))
+    return {"axis": "category_agency", "items": items, "excluded": excluded,
+            "samples_skipped_absence": len(set(skipped_absence))}
+
+
 def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: int,
                   measured_on: str, log) -> dict[str, Any]:
     root = post_search(base_url, anon_key, {"p_q": "", "p_page": 1, "p_docs_per_page": 1})
@@ -302,6 +413,13 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
                     item["label_ko"] = sample["category_label_ko"]
                     break
 
+    # 조합은 분류 축의 **확정된 라벨**을 물려받아야 한다 — 위 루프가 label_ko 를 DB
+    # 정본으로 덮어쓴 뒤에 만들어야 조합 제목이 코드가 아닌 한국어로 나온다.
+    category_axis = next(a for a in axes if a["axis"] == "category")
+    combos = build_category_agency_combos(
+        base_url, anon_key, category_axis=category_axis,
+        min_findings=min_findings, samples=samples, log=log)
+
     return {
         "schema_version": SCHEMA_VERSION,
         "measured_on": measured_on,
@@ -313,6 +431,11 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
         # 적게 되고 그 사본은 반드시 갈라진다(게이트 4가 지키는 것은 이 맵 하나뿐이다).
         "agency_labels": dict(AGENCY_LABELS_KO),
         "axes": axes,
+        # 조합은 `axes` 와 나란히 두지 않고 별도 키로 낸다 — 렌더의 축 루프는
+        # `FACET_AXES[axis_key]` 로 메타를 찾고 모르는 축이면 KeyError 로 죽는다(조용한
+        # 누락 금지). 조합은 URL 구조가 2단(분류 밑 기관)이라 그 메타 표에 들어갈 수
+        # 없으므로, 같은 목록에 섞으면 그 가드를 억지로 느슨하게 만들어야 한다.
+        "combos": combos,
     }
 
 
@@ -340,7 +463,7 @@ def main(argv: "list[str] | None" = None) -> int:
                             measured_on=args.measured_on or date.today().isoformat(),
                             log=log)
 
-    for axis in payload["axes"]:
+    for axis in [*payload["axes"], payload["combos"]]:
         log(f"{axis['axis']}: 페이지 {len(axis['items'])}개"
             f" · 제외 {len(axis['excluded'])}개")
         for ex in axis["excluded"]:

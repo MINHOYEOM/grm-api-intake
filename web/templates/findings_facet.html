@@ -52,12 +52,14 @@
 <main>
   <div class="wrap">
     <nav class="fx-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/{{ axis.path }}/">{{ axis.title }}</a><i>&rsaquo;</i><span>{{ item.label_ko }}</span>
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i>{% for c in crumb_mid %}<a href="{{ rel_root }}{{ c.href }}">{{ c.label }}</a><i>&rsaquo;</i>{% endfor %}<span>{{ crumb_last }}</span>
     </nav>
     <p class="kick">{{ axis.kick }}</p>
-    <h1 class="fx-h1">{{ item.label_ko }} {{ axis.headline_suffix }}</h1>
-    <p class="fx-sum">{{ axis.lede_prefix }} <b>{{ "{:,}".format(item.findings) }}</b>건의 지적사항을 <b>{{ "{:,}".format(item.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
-    <a class="fx-cta" href="{{ rel_root }}findings/index.html?{{ axis.query_key }}={{ item.key | urlencode }}">{{ item.label_ko }} 지적사항 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+    <h1 class="fx-h1">{{ headline }}</h1>
+    <p class="fx-sum">{{ lede_prefix }} <b>{{ "{:,}".format(item.findings) }}</b>건의 지적사항을 <b>{{ "{:,}".format(item.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
+    {#- 값 인코딩은 여기(Jinja `urlencode`)가 정본이다 — 렌더러는 순수성 가드 때문에
+        urllib 을 import 할 수 없다. 구분자는 속성값이므로 `&amp;` 로 적는다. -#}
+    <a class="fx-cta" href="{{ rel_root }}findings/index.html?{% for k, v in cta_params %}{% if not loop.first %}&amp;{% endif %}{{ k }}={{ v | urlencode }}{% endfor %}">{{ cta_label }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
   </div>
 
   <div class="wrap fx-body">
@@ -112,11 +114,23 @@
     </section>
     {% endif %}
 
+    {#- [검색 유입 2차] 기관별로 좁힌 조합 페이지로 가는 **진입 간선**. sitemap 에만 있고
+        내부 링크가 없는 페이지는 색인이 안 된다(문서 3,202장이 실제로 그렇게 떠 있었다).
+        조합 페이지의 유일한 부모가 이 분류 페이지라, 이 목록이 곧 그 경로다. -#}
+    {% if narrow_links %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">기관별로 좁혀 보기</h2>
+      <div class="fx-sibs">
+        {%- for n in narrow_links %}<a href="{{ rel_root }}{{ n.href }}">{{ n.label }}<b>&nbsp;{{ "{:,}".format(n.findings) }}</b></a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     {% if siblings %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">{{ axis.sibling_title }}</h2>
+      <h2 class="fx-sec-h">{{ sibling_title }}</h2>
       <div class="fx-sibs">
-        {%- for s in siblings %}<a href="{{ rel_root }}findings/{{ axis.path }}/{{ s.slug }}/"{% if s.slug == item.slug %} class="on" aria-current="page"{% endif %}>{{ s.label_ko }}</a>{% endfor %}
+        {%- for s in siblings %}<a href="{{ rel_root }}{{ sibling_base }}{{ s.slug }}/"{% if s.slug == item.slug %} class="on" aria-current="page"{% endif %}>{{ s.label_ko }}</a>{% endfor %}
       </div>
     </section>
     {% endif %}

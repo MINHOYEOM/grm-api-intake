@@ -7533,7 +7533,7 @@ class WebFindingsFacetPageTest(unittest.TestCase):
 
     def test_schema_version_is_pinned(self):
         """모양이 바뀐 데이터를 옛 템플릿으로 렌더하면 빈 페이지가 라이브로 나간다."""
-        self.assertEqual(self.data["schema_version"], "grm-findings-facets/v1")
+        self.assertEqual(self.data["schema_version"], "grm-findings-facets/v2")
 
     def test_every_item_has_a_page(self):
         missing = []
@@ -7630,6 +7630,200 @@ class WebFindingsFacetPageTest(unittest.TestCase):
             (self.single / "findings" / meta["path"] / slug / "index.html").read_bytes(),
             (out2 / "findings" / meta["path"] / slug / "index.html").read_bytes(),
             "비결정론 렌더")
+
+
+class WebFindingsComboPageTest(unittest.TestCase):
+    """[검색 유입 2차] 분류 × 기관 조합 페이지 — /findings/c/{분류}/{기관}/.
+
+    단일 축이 검색에서 실제로 이겼지만(2026-08-19 실측: 네이버 "무균공정 밸리데이션
+    지적" → /findings/c/process-validation/ 웹문서 1위), 사람들이 치는 말은 대개 주제
+    하나가 아니라 **기관 + 주제**다. 이 페이지들이 그 조합을 받는 표면이다.
+
+    이 클래스도 **정본에서 파생해** 검사한다 — 조합 값을 손으로 적지 않는다. 조합이
+    늘거나 줄면 그 페이지의 부재·잔존을 자동으로 잡는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_combo_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.data = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
+        cls.combos = (cls.data.get("combos") or {}).get("items") or []
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _rel(self, combo) -> str:
+        return f"findings/c/{combo['category_slug']}/{combo['slug']}/"
+
+    def _page(self, combo) -> str:
+        return (self.single / self._rel(combo) / "index.html").read_text(encoding="utf-8")
+
+    def test_combos_exist_at_all(self):
+        """0건 가드 — 배선이 끊기면 조합이 조용히 사라진다(그러면 이 스위트 전체가
+        아무것도 검사하지 않고 초록이 된다)."""
+        self.assertGreater(len(self.combos), 0, "조합 정본이 비었다(배선 확인)")
+
+    def test_every_combo_has_a_page(self):
+        missing = [self._rel(c) for c in self.combos
+                   if not (self.single / self._rel(c) / "index.html").exists()]
+        self.assertEqual(missing, [], f"조합 페이지 누락: {missing}")
+
+    def test_no_orphan_combo_pages(self):
+        """정본에 없는 조합 디렉터리가 남아 있지 않다(분류 페이지 밑 하위 디렉터리)."""
+        known = {(c["category_slug"], c["slug"]) for c in self.combos}
+        cat_slugs = {c["category_slug"] for c in self.combos}
+        orphans = []
+        for cat in cat_slugs:
+            root = self.single / "findings" / "c" / cat
+            for d in root.iterdir():
+                if d.is_dir() and (cat, d.name) not in known:
+                    orphans.append(f"{cat}/{d.name}")
+        self.assertEqual(sorted(orphans), [], f"정본에 없는 조합 페이지: {orphans}")
+
+    def test_parent_category_page_links_every_combo(self):
+        """★진입 간선 — sitemap 에만 있고 내부 링크가 없는 페이지는 색인되지 않는다.
+        문서 3,202장이 실제로 그렇게 떠 있었다(#723). 조합의 부모는 분류 페이지뿐이라
+        그 페이지의 링크가 유일한 경로다."""
+        for combo in self.combos:
+            parent = (self.single / "findings" / "c" / combo["category_slug"]
+                      / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f'href="../../../{self._rel(combo)}"', parent,
+                          f'분류 페이지가 조합을 링크하지 않음: {self._rel(combo)}')
+
+    def test_every_combo_is_reachable_from_home(self):
+        """★★고아 검사를 클러스터 안에서만 하면 섬 전체가 떠 있는 걸 못 본다.
+
+        부모가 자식을 링크한다는 것(test_parent_category_page_links_every_combo)은
+        그 부모가 홈에서 닿을 때만 뜻이 있다. 2026-08-12 에 문서 3,490장이 정확히
+        그렇게 sitemap 전용 고립 섬이었다(#723·#725) — 클러스터 내부 링크는 완벽했다.
+        그래서 **홈에서 BFS** 로 잰다."""
+        import re as _re
+        from collections import deque
+        start = (self.single / "index.html").resolve()
+        seen, q = {start}, deque([start])
+        while q:
+            cur = q.popleft()
+            try:
+                html = cur.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for href in _re.findall(r'href="([^"#?]+)', html):
+                if href.startswith(("http", "mailto:", "//")):
+                    continue
+                target = (cur.parent / href).resolve()
+                if target.is_dir():
+                    target = (target / "index.html").resolve()
+                if target.suffix != ".html" or target in seen or not target.exists():
+                    continue
+                seen.add(target)
+                q.append(target)
+        unreached = [self._rel(c) for c in self.combos
+                     if (self.single / self._rel(c) / "index.html").resolve() not in seen]
+        self.assertEqual(unreached, [],
+                         f"홈에서 닿지 않는 조합 페이지(고립 섬) {len(unreached)}장: "
+                         f"{unreached[:5]}")
+
+    def test_sitemap_lists_every_combo(self):
+        for combo in self.combos:
+            self.assertIn(f'<loc>{render.SITE_BASE_URL}/{self._rel(combo)}</loc>',
+                          self.sitemap, f'sitemap 미등록: {self._rel(combo)}')
+
+    def test_counts_and_labels_verbatim(self):
+        from markupsafe import escape as _esc
+        for combo in self.combos:
+            html = self._page(combo)
+            self.assertIn(str(_esc(combo["category_label_ko"])), html)
+            self.assertIn(str(_esc(combo["agency_label_ko"])), html)
+            self.assertIn(f'{combo["findings"]:,}', html)
+            self.assertIn(f'{render.SITE_BASE_URL}/{self._rel(combo)}', html,
+                          f'canonical 누락: {self._rel(combo)}')
+
+    def test_sample_text_is_not_truncated(self):
+        from markupsafe import escape as _esc
+        checked = 0
+        for combo in self.combos:
+            html = self._page(combo)
+            for sample in combo["samples"]:
+                text = (sample.get("text_ko") or "").strip()
+                if not text:
+                    continue
+                self.assertIn(str(_esc(text)), html,
+                              f'본문이 무변형으로 실리지 않음: {sample["finding_id"]}')
+                checked += 1
+        self.assertGreater(checked, 0, "사례 본문이 하나도 검사되지 않았다(배선 확인)")
+
+    def test_deeplink_carries_both_filters(self):
+        """조합 페이지의 CTA 는 분류·기관 **둘 다** 건 검색으로 가야 한다 — 하나만
+        걸면 화면이 제목보다 넓은 결과를 보여준다."""
+        for combo in self.combos:
+            html = self._page(combo)
+            self.assertIn(f'findings/index.html?cat={combo["category_key"]}'
+                          f'&amp;agency={combo["agency_key"]}', html,
+                          f'조합 딥링크가 두 필터를 함께 걸지 않음: {self._rel(combo)}')
+
+    def test_titles_are_unique_across_combos(self):
+        """제목이 겹치면 검색 결과에서 서로 구분되지 않는다(문서 페이지에서 362장이
+        실제로 그랬다)."""
+        seen: dict[str, str] = {}
+        for combo in self.combos:
+            html = self._page(combo)
+            title = re.search(r"<title>(.*?)</title>", html, re.S).group(1)
+            self.assertNotIn(title, seen,
+                             f'제목 중복: {self._rel(combo)} vs {seen.get(title)}')
+            seen[title] = self._rel(combo)
+
+    def test_no_combo_is_a_near_clone_of_its_parent(self):
+        """★한 기관이 분류를 사실상 독점하면 조합 페이지는 부모의 복제본이 된다 —
+        건수도 거의 같고 색인 대상 본문인 '최근 사례' 6건이 통째로 겹친다(2026-08-19
+        실측: FDA × 공정밸리데이션 570/578 = 98.6%, 사례 6/6 동일). 같은 질의에 두
+        페이지가 경쟁하면 검색엔진이 하나를 버리고, 중복 판정이면 둘 다 손해다.
+
+        건수만 보면 정상이라 이 결함은 숫자로 안 드러난다 — 부모와의 **비율**로 잡는다."""
+        parents = {i["slug"]: i for a in self.data["axes"] if a["axis"] == "category"
+                   for i in a["items"]}
+        offenders = []
+        for combo in self.combos:
+            parent = parents.get(combo["category_slug"])
+            if not parent or not parent["findings"]:
+                continue
+            share = combo["findings"] / parent["findings"]
+            if share >= 0.95:
+                offenders.append(f'{self._rel(combo)} {share * 100:.1f}%')
+        self.assertEqual(offenders, [],
+                         f"부모 분류를 독점하는 조합 페이지(복제본): {offenders}")
+
+    def test_excluded_combos_are_disclosed_in_data(self):
+        """상한을 조용히 걸면 '전부 다뤘다'로 읽힌다 — 뺀 조합은 사유와 함께 정본에
+        남긴다(축 색인의 '여기에 없는 것' 고지와 같은 규율)."""
+        excluded = (self.data.get("combos") or {}).get("excluded")
+        self.assertIsNotNone(excluded, "조합 제외 목록 자체가 없다")
+        for ex in excluded:
+            self.assertTrue(ex.get("reason"), f"제외 사유 누락: {ex}")
+
+    def test_agency_mix_bar_is_omitted(self):
+        """기관이 하나뿐인 페이지에 '어느 기관이 지적했나' 막대는 뜻이 없다."""
+        for combo in self.combos[:5]:
+            self.assertNotIn("어느 기관이 지적했나", self._page(combo))
+
+    def test_no_particle_glued_to_agency_name(self):
+        """★기관명에 한국어 조사(가/이)를 붙이지 않는다 — 조사는 앞말의 받침으로
+        갈리는데 기관명엔 영문 약어(FDA·EMA·MHRA)가 섞여 규칙이 성립하지 않는다.
+        지금은 5개 라벨이 우연히 전부 받침이 없어 '가'가 맞지만, 그 우연에 기대면
+        받침 있는 기관이 편입되는 순간 전 페이지가 비문이 된다."""
+        for combo in self.combos:
+            html = self._page(combo)
+            for bad in (f'{combo["agency_label_ko"]}가 ', f'{combo["agency_label_ko"]}이 '):
+                self.assertNotIn(bad, html, f'기관명에 조사가 붙었다: {bad!r}')
+
+    def test_render_is_deterministic(self):
+        out2 = self._tmp / "single2"
+        _build_single(out2)
+        rel = self._rel(self.combos[0])
+        self.assertEqual((self.single / rel / "index.html").read_bytes(),
+                         (out2 / rel / "index.html").read_bytes(), "비결정론 렌더")
 
 
 class WebFindingsDocPageTest(unittest.TestCase):

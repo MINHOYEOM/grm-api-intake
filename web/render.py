@@ -2059,10 +2059,13 @@ SITE_BASE_URL = os.environ.get(
 
 
 def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = False) -> str:
-    """robots.txt — 공개 페이지 허용 + sitemap 포인터. Admin 은 비색인."""
+    """robots.txt — 공개 페이지 허용 + sitemap 포인터. Admin 은 비색인, /cdn-cgi/ 는 크롤 차단."""
     lines = [
         "User-agent: *",
         "Allow: /",
+        # Cloudflare 가 이메일 난독화용 가상 경로(/cdn-cgi/l/email-protection)를 페이지에
+        # 삽입한다 — 우리 콘텐츠가 아니고 크롤 시 404 라 차단(GSC 404 보고 소음 방지).
+        "Disallow: /cdn-cgi/",
     ]
     if disallow_admin:
         lines.append("Disallow: /admin/")

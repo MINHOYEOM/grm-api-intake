@@ -458,11 +458,21 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
    관찰한다. reactions cfg(#grm-reactions-cfg) 미설정이면 런타임 전체 no-op. 운영자 브라우저
    (localStorage 'grm-op'='1' — 아래 RUM 게이트·admin.js 가 세우는 그 플래그)는 bump 전송
    직전에 제외한다. storage 예외는 fail-open(측정) — 확실한 운영자만 제외, #763 과 동일 규칙.
+   ★프로덕션 호스트 밖(localhost·*.pages.dev 프리뷰·file://)도 제외한다 — 배포 워크플로가
+   모든 브랜치/PR 을 같은 repo var(SUPABASE_URL·ANON_KEY)로 프리뷰 배포하므로 프리뷰가
+   **프로덕션 funnel_counts 를 직접 증가시킨다**(2026-08-19 실측: PR 프리뷰 페이지가 prod
+   Supabase URL 을 실은 채 계측 탑재). 운영자 플래그로는 못 막는다 — localStorage 는 origin
+   스코프라 grm-solutions.com 에서 세운 'grm-op' 이 *.pages.dev 에는 없다. RUM 은 #763 이
+   같은 이유로 이미 호스트를 막았고 깔때기만 열려 있었다. 호스트는 페이지 수명 동안 안
+   변하므로 IIFE 진입 1회 검사(전송마다 재검사하는 grm-op 과 다르다 — 그쪽은 다른 탭에서
+   /admin 을 지나면 세션 중간에 켜질 수 있다).
    이 블록은 newsletter 게이트 안이라 env-off 빌드는 출력 0(전 페이지 골든 byte-diff 0 유지). #}
 <script>
 (function(){
   var cfg=document.getElementById('grm-reactions-cfg');
   if(!cfg||!window.fetch)return;
+  var hn=location.hostname;
+  if(hn!=='{{ site_host }}'&&hn!=='www.{{ site_host }}')return;
   var u=cfg.getAttribute('data-url')||'',k=cfg.getAttribute('data-key')||'';
   if(!u||!k)return;
   var sent={};

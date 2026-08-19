@@ -6097,6 +6097,9 @@ class WebRenderHardeningTest(unittest.TestCase):
         cfg 미설정이면 런타임 전체 no-op, newsletter 게이트 off 면 출력 자체가 0
         (전 페이지 골든 byte-diff 0 의 근거). 운영자 브라우저는 RUM 게이트(#763)와
         같은 'grm-op' 플래그로 bump 전송 직전에 제외한다 — 판정은 fetch 보다 앞.
+        프로덕션 호스트 밖(프리뷰 *.pages.dev·localhost)도 제외 — 배포 워크플로가 모든
+        브랜치를 같은 repo var 로 프리뷰 배포해 프리뷰가 prod funnel_counts 를 올린다.
+        grm-op 으로는 못 막는다(localStorage 는 origin 스코프).
         """
         a0 = render.NEWSLETTER_FORM_ACTION
         try:
@@ -6126,6 +6129,14 @@ class WebRenderHardeningTest(unittest.TestCase):
                       "깔때기 bump 에 운영자(grm-op) 제외 게이트가 없다")
         self.assertLess(fscript.index("grm-op"), fscript.index("rpc/funnel_bump"),
                         "운영자 판정이 전송(fetch)보다 뒤다 — 카운트가 먼저 새 나간다")
+        # 프로덕션 호스트 밖 제외 — 프리뷰(*.pages.dev)가 prod 카운터를 올리는 경로를 막는다.
+        # RUM 게이트(#763)와 같은 site_host 단일원천을 쓰되, 판정은 이 블록 자신이 해야 한다
+        # (RUM 게이트의 검사는 그쪽 IIFE 안이라 이 블록에 효력이 없다).
+        self.assertIn("hn!=='grm-solutions.com'&&hn!=='www.grm-solutions.com'", fscript,
+                      "깔때기에 프로덕션 호스트 게이트가 없다 — 프리뷰가 prod 카운터를 올린다")
+        self.assertLess(fscript.index("hn!=='grm-solutions.com'"),
+                        fscript.index("rpc/funnel_bump"),
+                        "호스트 판정이 전송(fetch)보다 뒤다")
 
 
 class WebAdminRenderTest(unittest.TestCase):

@@ -7,7 +7,11 @@
 """
 from __future__ import annotations
 
+import io
+import json
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -372,6 +376,117 @@ class ComboGateTest(unittest.TestCase):
     def test_unknown_agency_code_fails_instead_of_falling_back(self):
         with self.assertRaises(SystemExit):
             self._build(parent_findings=500, agency_c=300, measured=300, agency="XXX")
+
+class NarrowConsoleEncodingTest(unittest.TestCase):
+    """좁은 콘솔 인코딩(cp949)에서 요약 출력이 죽어 산출물을 통째로 잃지 않는다.
+
+    2026-08-19 실측 결함: 제외 항목 요약의 em-dash 한 글자가 Windows 로컬(cp949)에서
+    `UnicodeEncodeError` 를 냈고, **파일 쓰기가 그 로그 다음이라** RPC 90여 회(수 분)를
+    다 돌고도 findings_facets.json 이 갱신되지 않았다(EXIT=1). ubuntu CI 는 UTF-8 이라
+    초록이어서 아무도 몰랐다 — 그래서 이 검사는 인코딩을 **명시적으로 좁혀서** 잰다.
+
+    cp949 는 한글·`·`·`→`·`★` 는 찍고 `—`·`•`·`✓` 는 못 찍는다. "한글이 되니 괜찮다"가
+    아니라 **그 글자 하나**가 문제다.
+    """
+
+    def setUp(self):
+        self._real = ffr.build_payload
+        self.tmp = tempfile.mkdtemp()
+        self.out = Path(self.tmp) / "sub" / "findings_facets.json"
+
+    def tearDown(self):
+        ffr.build_payload = self._real
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _payload(self):
+        return {
+            "schema_version": ffr.SCHEMA_VERSION, "measured_on": "2026-08-19",
+            "min_findings": 20, "totals": {"findings": 24797, "documents": 3202},
+            "agency_labels": dict(ffr.AGENCY_LABELS_KO),
+            # 제외 1건 — 이 줄의 요약이 em-dash 를 찍는다.
+            "axes": [{"axis": "country", "items": [{"key": "US"}],
+                      "excluded": [{"key": "IS", "findings": 3, "reason": "표본 미달"}]}],
+            # 조합 축(v2) — build_payload 의 반환 계약이라 스텁도 함께 갖는다. 요약
+            # 루프가 이것까지 찍으므로 여기서도 em-dash 가 한 번 더 지나간다.
+            "combos": {"axis": "category_agency",
+                       "items": [{"key": "cat_a|FDA"}],
+                       "excluded": [{"key": "cat-b/EMA", "findings": 1,
+                                     "reason": "표본 미달(<20)"}]},
+        }
+
+    def _stub(self, payload=None):
+        data = payload if payload is not None else self._payload()
+
+        def fake(base_url, anon_key, *, min_findings, samples, measured_on, log):
+            return data
+        ffr.build_payload = fake
+
+    def _run_with_stdout(self, stream):
+        real = sys.stdout
+        sys.stdout = stream
+        try:
+            return ffr.main(["--supabase-url", "https://x.supabase.co",
+                             "--supabase-anon-key", "k", "--out", str(self.out)])
+        finally:
+            sys.stdout = real
+
+    def test_summary_survives_cp949_stdout_and_file_is_written(self):
+        self._stub()
+        buf = io.BytesIO()
+        # 실제 결함 조건 그대로: 인코딩 cp949 · errors=strict(파이프로 리다이렉트된 stdout).
+        stream = io.TextIOWrapper(buf, encoding="cp949", errors="strict")
+        rc = self._run_with_stdout(stream)
+        stream.flush()
+
+        self.assertEqual(rc, 0)
+        self.assertTrue(self.out.exists(), "요약 출력이 죽어 산출물이 유실됐다")
+        written = json.loads(self.out.read_text(encoding="utf-8"))
+        self.assertEqual(written["totals"]["findings"], 24797)
+        printed = buf.getvalue().decode("utf-8", "replace")
+        self.assertIn("표본 미달", printed, "제외 사유를 침묵시키면 안 된다(게이트 3)")
+
+    def test_em_dash_specifically_is_what_cp949_rejects(self):
+        """가드가 지키는 대상을 못박는다 — 이게 깨지면 위 검사는 무의미해진다."""
+        for ok in "한글·→★":
+            ok.encode("cp949")                      # 예외 없음 = 통과
+        for bad in "—•✓":
+            with self.assertRaises(UnicodeEncodeError, msg=f"{bad!r} 는 cp949 불가여야"):
+                bad.encode("cp949")
+
+    def test_file_is_written_before_the_summary_log(self):
+        """출력 실패가 데이터 유실로 번지지 않는다 — 인코딩 말고 어떤 이유로 죽든.
+
+        요약 로그를 강제로 터뜨려도 산출물은 이미 디스크에 있어야 한다. 이 검사가
+        빨개지면 쓰기가 다시 로그 뒤로 밀린 것이다.
+        """
+        self._stub()
+
+        class Exploding(io.StringIO):
+            def write(self, s):                      # noqa: D102
+                if "제외" in s or "-" in s:
+                    raise RuntimeError("요약 출력 실패")
+                return super().write(s)
+
+        with self.assertRaises(RuntimeError):
+            self._run_with_stdout(Exploding())
+        self.assertTrue(self.out.exists(),
+                        "요약이 죽자 산출물이 함께 사라졌다 — 쓰기가 로그보다 뒤에 있다")
+
+    def test_dry_run_still_writes_nothing(self):
+        """순서를 바꾸면서 --dry-run 이 파일을 쓰게 되면 안 된다."""
+        self._stub()
+        real = sys.stdout
+        sys.stdout = io.StringIO()
+        try:
+            rc = ffr.main(["--supabase-url", "https://x.supabase.co",
+                           "--supabase-anon-key", "k", "--out", str(self.out),
+                           "--dry-run"])
+            printed = sys.stdout.getvalue()
+        finally:
+            sys.stdout = real
+        self.assertEqual(rc, 0)
+        self.assertFalse(self.out.exists(), "dry-run 인데 파일을 썼다")
+        self.assertIn("dry-run", printed)
 
 
 if __name__ == "__main__":                                       # pragma: no cover

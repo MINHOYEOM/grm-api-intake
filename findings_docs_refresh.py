@@ -190,6 +190,14 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
 
 
 def main(argv: "list[str] | None" = None) -> int:
+    # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — 아래 요약의 em-dash
+    # 한 글자가 cp949 에서 UnicodeEncodeError 를 낸다. findings_facets_refresh.py 와 동형.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
     ap = argparse.ArgumentParser(description="문서 단위 페이지 정본 재측정")
     ap.add_argument("--supabase-url", default=os.environ.get("SUPABASE_URL", ""))
     ap.add_argument("--supabase-anon-key", default=os.environ.get("SUPABASE_ANON_KEY", ""))
@@ -226,20 +234,26 @@ def main(argv: "list[str] | None" = None) -> int:
         "documents": docs,
     }
 
+    # 산출물을 요약 로그보다 **먼저** 쓴다(findings_facets_refresh.py 와 같은 이유).
+    # 여기도 수천 건을 페이지네이션으로 긁은 뒤라, 출력 한 줄의 실패가 그 작업을 통째로
+    # 버리게 두면 안 된다.
+    wrote: "Path | None" = None
+    if not args.dry_run:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
+                            encoding="utf-8")
+        wrote = args.out
+
     log(f"문서 {len(docs):,}건 · 지적 {payload['totals']['findings']:,}건")
     for a, c in sorted(by_agency.items()):
         log(f"  {a}: {c:,}건")
     for r, c in sorted(reject.items()):
         log(f"  제외 — {r}: {c:,}건")
 
-    if args.dry_run:
+    if wrote is None:
         log("dry-run — 파일을 쓰지 않았습니다.")
         return 0
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
-                        encoding="utf-8")
-    log(f"기록: {args.out}")
+    log(f"기록: {wrote}")
     return 0
 
 

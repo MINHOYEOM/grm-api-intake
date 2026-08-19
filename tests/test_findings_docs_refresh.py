@@ -11,8 +11,11 @@
 """
 from __future__ import annotations
 
+import io
 import json
+import shutil
 import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -225,6 +228,60 @@ class CommittedDataTest(unittest.TestCase):
         if len(bad) < self.BASELINE_UPSTREAM_TRUNCATED:
             print(f"\n[NOTICE] 상류 절단 {len(bad)}건 — 기준선"
                   f"({self.BASELINE_UPSTREAM_TRUNCATED})을 내리세요.")
+
+
+class NarrowConsoleEncodingTest(unittest.TestCase):
+    """요약 출력이 죽어도 수천 건을 긁은 산출물을 잃지 않는다.
+
+    findings_facets_refresh.py 와 같은 계열의 결함(제외 요약의 em-dash + 뒤에 오는
+    파일 쓰기)이 이 파일에도 그대로 있었다. 형제 스크립트는 함께 고치고 함께 잠근다.
+    """
+
+    def setUp(self):
+        self._real = fdr.collect_documents
+        self.tmp = tempfile.mkdtemp()
+        self.out = Path(self.tmp) / "sub" / "findings_docs.json"
+
+        def fake(base_url, anon_key, *, min_findings, page_size, log):
+            # 제외 사유에 em-dash 가 붙어 나가는 경로를 그대로 태운다.
+            return ([_doc(n=3)], Counter({"발행일 없음": 2}))
+        fdr.collect_documents = fake
+
+    def tearDown(self):
+        fdr.collect_documents = self._real
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _run(self, stream, extra=()):
+        real = sys.stdout
+        sys.stdout = stream
+        try:
+            return fdr.main(["--supabase-url", "https://x.supabase.co",
+                             "--supabase-anon-key", "k", "--out", str(self.out), *extra])
+        finally:
+            sys.stdout = real
+
+    def test_summary_survives_cp949_stdout_and_file_is_written(self):
+        buf = io.BytesIO()
+        rc = self._run(io.TextIOWrapper(buf, encoding="cp949", errors="strict"))
+        self.assertEqual(rc, 0)
+        self.assertTrue(self.out.exists(), "요약 출력이 죽어 산출물이 유실됐다")
+
+    def test_file_is_written_before_the_summary_log(self):
+        class Exploding(io.StringIO):
+            def write(self, s):                      # noqa: D102
+                if "제외" in s:
+                    raise RuntimeError("요약 출력 실패")
+                return super().write(s)
+
+        with self.assertRaises(RuntimeError):
+            self._run(Exploding())
+        self.assertTrue(self.out.exists(),
+                        "요약이 죽자 산출물이 함께 사라졌다 — 쓰기가 로그보다 뒤에 있다")
+
+    def test_dry_run_still_writes_nothing(self):
+        rc = self._run(io.StringIO(), extra=["--dry-run"])
+        self.assertEqual(rc, 0)
+        self.assertFalse(self.out.exists(), "dry-run 인데 파일을 썼다")
 
 
 if __name__ == "__main__":                                       # pragma: no cover

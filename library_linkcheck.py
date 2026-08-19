@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import threading
 import time
 from collections import Counter
@@ -317,6 +318,15 @@ def build_report(
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — cp949 는 한글은
+    # 찍어도 em-dash/불릿 같은 글자를 못 찍어 UnicodeEncodeError 로 죽는다. ubuntu CI 는
+    # UTF-8 이라 이 결함이 초록으로 숨는다. brief_lint.py 등과 동형.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--library-dir", type=Path, default=Path("web/data/library"))
     parser.add_argument("--output", type=Path, default=Path("web/data/library_health.json"))

@@ -440,6 +440,16 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
 
 
 def main(argv: "list[str] | None" = None) -> int:
+    # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다. 아래 요약 로그에는
+    # em-dash 가 있는데 cp949 는 그 글자를 못 찍는다 — 한글·`·`·`→`·`★` 는 되고
+    # `—`·`•`·`✓` 는 안 된다. ubuntu CI 는 UTF-8 이라 초록이어서 아무도 몰랐다.
+    # brief_lint.py·deep_analysis_fanout.py·probe_*.py 와 동형.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
     ap = argparse.ArgumentParser(description="분류·국가·기관 모음 페이지 데이터 재측정")
     ap.add_argument("--supabase-url", default=os.environ.get("SUPABASE_URL", ""))
     ap.add_argument("--supabase-anon-key", default=os.environ.get("SUPABASE_ANON_KEY", ""))
@@ -463,20 +473,28 @@ def main(argv: "list[str] | None" = None) -> int:
                             measured_on=args.measured_on or date.today().isoformat(),
                             log=log)
 
+    # 산출물을 요약 로그보다 **먼저** 쓴다. payload 는 RPC 90여 회(수 분)의 결과인데
+    # 종전에는 요약 출력이 먼저였다 — 출력 한 줄이 실패하면 그 수 분이 통째로 버려졌다
+    # (2026-08-19 실측: cp949 stdout 에서 EXIT=1, findings_facets.json 미갱신). 위 인코딩
+    # 가드와 이중 방어다 — 인코딩 아닌 이유로 요약이 죽어도 데이터는 남는다.
+    wrote: "Path | None" = None
+    if not args.dry_run:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                            encoding="utf-8")
+        wrote = args.out
+
+    # 조합 축도 함께 요약한다 — 단일 축만 찍으면 조합 51장의 제외 사유가 어디에도 안 남는다.
     for axis in [*payload["axes"], payload["combos"]]:
         log(f"{axis['axis']}: 페이지 {len(axis['items'])}개"
             f" · 제외 {len(axis['excluded'])}개")
         for ex in axis["excluded"]:
             log(f"    - {ex['key'] or '(빈 값)'} {ex['findings']}건 — {ex['reason']}")
 
-    if args.dry_run:
+    if wrote is None:
         log("dry-run — 파일을 쓰지 않았습니다.")
         return 0
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-                        encoding="utf-8")
-    log(f"기록: {args.out}")
+    log(f"기록: {wrote}")
     return 0
 
 

@@ -1,7 +1,7 @@
 name: GRM CI (compile + tests)
 
 # push/PR 마다 py_compile + unittest 실행 — 회귀 게이트.
-# 수집/Notion 호출 없음(네트워크 불필요), 1분 내 종료.
+# 수집/Notion 호출 없음(네트워크 불필요), 정상 실행 ~5분(스위트 성장, 2026-08 실측 4m40s).
 on:
   push:
     branches: ['**']
@@ -14,7 +14,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

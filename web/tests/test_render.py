@@ -6111,7 +6111,9 @@ class WebAdminRenderTest(unittest.TestCase):
             render.SUPABASE_ANON_KEY = ""
             out_off = self._render_site("2026-06-01")
             self.assertFalse((out_off / "admin" / "index.html").exists())
-            self.assertNotIn("Disallow: /admin/", (out_off / "robots.txt").read_text(encoding="utf-8"))
+            robots_off = (out_off / "robots.txt").read_text(encoding="utf-8")
+            self.assertNotIn("Disallow: /admin/", robots_off)
+            self.assertIn("Disallow: /cdn-cgi/", robots_off)
 
             render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
             render.SUPABASE_ANON_KEY = "anon-key"
@@ -6193,6 +6195,7 @@ class WebAdminRenderTest(unittest.TestCase):
         self.assertIn("<th>요청</th><th>실행(요청 시점)</th>", h)
         self.assertIn('/assets/admin.js?v=', h)
         self.assertIn('Disallow: /admin/', robots)
+        self.assertIn('Disallow: /cdn-cgi/', robots)
 
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────

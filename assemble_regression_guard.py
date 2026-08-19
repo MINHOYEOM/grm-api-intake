@@ -126,6 +126,15 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — cp949 는 한글은
+    # 찍어도 em-dash/불릿 같은 글자를 못 찍어 UnicodeEncodeError 로 죽는다. ubuntu CI 는
+    # UTF-8 이라 이 결함이 초록으로 숨는다. brief_lint.py 등과 동형.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
     ap = argparse.ArgumentParser(description="발행본 대비 조립본 회귀 검사")
     ap.add_argument("--published", required=True,
                     help="이미 발행된 브리프 JSON (없으면 최초 발행으로 보고 통과)")

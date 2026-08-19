@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  // 운영자 브라우저 표식 — base.html 의 RUM 비콘 게이트가 'grm-op' 를 읽어 이 브라우저를
+  // Cloudflare Web Analytics 집계에서 영구 제외한다(운영자는 admin 을 반드시 지난다).
+  // 게이트 자신도 /admin 방문 시 같은 플래그를 세운다 — 여기는 이중 안전벨트.
+  try { localStorage.setItem("grm-op", "1"); } catch (e) { /* storage 불가 = 측정 fail-open */ }
+
   var root = document.getElementById("grm-admin");
   var cfg = document.getElementById("grm-admin-cfg");
   if (!root || !cfg) return;

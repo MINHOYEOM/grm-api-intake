@@ -6226,6 +6226,74 @@ class WebAdminRenderTest(unittest.TestCase):
         self.assertIn('/assets/admin.js?v=', h)
         self.assertIn('Disallow: /admin/', robots)
         self.assertIn('Disallow: /cdn-cgi/', robots)
+        # RUM 게이트 — admin 페이지(base 상속)에도 실리고(경로 분기가 주입 0 + 플래그 세팅),
+        # admin.js 는 이중 안전벨트로 같은 플래그를 세운다(WebCloudflareBeaconGateTest 상세).
+        self.assertIn("static.cloudflareinsights.com/beacon.min.js", h)
+        self.assertIn('localStorage.setItem("grm-op", "1")', admin_js)
+
+
+# ── Cloudflare Web Analytics(RUM) 비콘 — 운영자 세션 제외 게이트 ─────────────────
+class WebCloudflareBeaconGateTest(unittest.TestCase):
+    """RUM 비콘은 base.html 인라인 게이트가 동적 주입한다(2026-08-19 — 엣지 Automatic
+    setup 대체. 자동 주입은 분기가 불가능해 운영자 방문까지 전부 집계됐다). 계약:
+      1) 게이트는 env 게이트 밖(무조건) — env-off 기본 빌드(=골든)의 전 페이지에 탑재.
+      2) 판정(grm-op 플래그 · /admin 경로 · 프로덕션 호스트)이 주입 코드보다 앞.
+      3) 주입은 동적(createElement)만 — 정적 <script src=…beacon.min.js> 태그는 게이트를
+         우회하므로 금지.
+      4) admin.js 도 grm-op 를 세운다 — 운영자는 admin 을 반드시 지나므로 첫 admin 방문
+         이후 그 브라우저는 영구 제외.
+    §9 네트워크 API 금지 가드는 pet.js·growth.js 파일 한정 스코프라 이 게이트(base.html
+    인라인 · fetch/sendBeacon 미사용 · 스크립트 요소 삽입뿐)에는 애초에 걸리지 않는다 —
+    허용목록 조정 불요(2026-08-19 스코프 확인)."""
+
+    # Cloudflare WA site token(공개값 — 전 HTML 노출). ★siteTag(대시보드 URL 의
+    # aa495e04…)가 아니다 — 비콘에 siteTag 를 실으면 데이터가 다른 사이트로 흘러 기존
+    # 타임라인과 끊긴다. 이 값은 엣지 자동 주입이 쓰던 토큰의 실측(2026-08-19 DOM).
+    TOKEN = "b6f8cfa4058b4cfd864d743f79a5e05e"
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_cfbeacon_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.admin_js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_gate_on_every_page_even_env_off(self):
+        # 뉴스레터/reactions 게이트와 달리 무조건 출력 — env-off 빌드 전 HTML 에 실린다.
+        pages = sorted(self.single.rglob("*.html"))
+        self.assertTrue(pages, "빌드 산출 HTML 0건 — 빌드가 무너졌다")
+        for p in pages:
+            html = p.read_text(encoding="utf-8")
+            with self.subTest(page=p.relative_to(self.single).as_posix()):
+                self.assertIn("static.cloudflareinsights.com/beacon.min.js", html)
+                self.assertIn(f'"token": "{self.TOKEN}"', html)
+
+    def test_gate_decides_before_injecting(self):
+        # 판정 3종이 전부 주입 URL 보다 앞 — 게이트를 주입 뒤로 옮기면(=무력화) 여기서 red.
+        inject = self.landing.index("static.cloudflareinsights.com/beacon.min.js")
+        self.assertLess(self.landing.index("if(admin||op)return;"), inject)
+        self.assertLess(
+            self.landing.index("if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;"),
+            inject)
+        self.assertLess(self.landing.index("p==='/admin'||p.indexOf('/admin/')===0"), inject)
+        # 운영자 판정 재료 — 플래그 조회 + /admin 방문 즉시 세팅(첫 admin 방문도 비집계).
+        self.assertIn("localStorage.getItem('grm-op')==='1'", self.landing)
+        self.assertIn("localStorage.setItem('grm-op','1')", self.landing)
+
+    def test_beacon_injection_is_dynamic_only(self):
+        # 정적 태그(엣지 자동 주입과 같은 형태)로 "단순화"하면 게이트가 통째로 우회된다 —
+        # <script …cloudflareinsights…> 여는 태그 자체가 금지다(따옴표·속성 순서 불문).
+        self.assertIsNone(re.search(r"<script[^>]*cloudflareinsights", self.landing))
+        self.assertIn("document.createElement('script')", self.landing)
+
+    def test_admin_js_sets_operator_flag(self):
+        # 이중 안전벨트 — 게이트(/admin 분기)와 admin.js 양쪽이 같은 플래그를 세운다.
+        self.assertIn('localStorage.setItem("grm-op", "1")', self.admin_js)
 
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────

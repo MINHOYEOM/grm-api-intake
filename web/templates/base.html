@@ -452,6 +452,50 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   }
 })();
 </script>
+{# 구독 깔때기 계측(무PII) — 표면 노출/제출/닫힘의 익명 카운터만 Supabase RPC(funnel_bump)로
+   증가시킨다(키 문자열 하나, 폼 값·이메일 절대 미탑재). 기존 밴드·배너 스크립트는 무수정 —
+   submit 은 preventDefault 와 무관하게 추가 리스너에도 전달되고, 배너 표시는 class 변이로
+   관찰한다. reactions cfg(#grm-reactions-cfg) 미설정이면 런타임 전체 no-op. 이 블록은
+   newsletter 게이트 안이라 env-off 빌드는 출력 0(전 페이지 골든 byte-diff 0 유지). #}
+<script>
+(function(){
+  var cfg=document.getElementById('grm-reactions-cfg');
+  if(!cfg||!window.fetch)return;
+  var u=cfg.getAttribute('data-url')||'',k=cfg.getAttribute('data-key')||'';
+  if(!u||!k)return;
+  var sent={};
+  function bump(key,once){
+    if(once){if(sent[key])return;sent[key]=1;}
+    try{
+      fetch(u+'/rest/v1/rpc/funnel_bump',{method:'POST',keepalive:true,
+        headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
+        body:JSON.stringify({p_key:key})}).catch(function(){});
+    }catch(_){}
+  }
+  var band=document.querySelector('.subscribe');
+  if(band&&window.IntersectionObserver){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){if(en.isIntersecting){bump('band_view',true);io.disconnect();}});
+    },{threshold:0.33});
+    io.observe(band);
+  }
+  var bf=document.getElementById('grm-sub-form');
+  if(bf)bf.addEventListener('submit',function(){bump('band_submit');});
+  var cta=document.getElementById('grm-cta');
+  if(cta&&window.MutationObserver){
+    var mo=new MutationObserver(function(){
+      if(cta.classList.contains('on')){bump('cta_view',true);mo.disconnect();}
+    });
+    mo.observe(cta,{attributes:true,attributeFilter:['class']});
+  }
+  var cf=document.getElementById('grm-cta-form');
+  if(cf)cf.addEventListener('submit',function(){bump('cta_submit');});
+  ['grm-cta-today','grm-cta-close'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b)b.addEventListener('click',function(){bump('cta_dismiss');});
+  });
+})();
+</script>
 {% endif %}
 </body>
 </html>

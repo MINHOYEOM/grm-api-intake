@@ -774,6 +774,22 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-08-13",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15276"
+    },
+    {
+      "id": "data0011-15917",
+      "title_en": "세포치료제 세포은행 평가 가이드라인",
+      "title_ko": "세포치료제 세포은행 평가 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-08-21",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15917"
+    },
+    {
+      "id": "data0010-15280",
+      "title_en": "허가외 사용 의약품 평가 절차",
+      "title_ko": "허가외 사용 의약품 평가 절차",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-21",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15280"
     }
   ]
 }

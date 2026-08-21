@@ -1,26 +1,26 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-08-16",
+  "generated_on": "2026-08-21",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 91,
-      "candidate_count": 93,
+      "baseline_count": 93,
+      "candidate_count": 95,
       "new_count": 2,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0010-15276",
-        "data0011-15910"
+        "data0010-15280",
+        "data0011-15917"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 48,
+      "collector_items": 50,
       "derived_items": 37,
-      "dropped_items": 11,
+      "dropped_items": 13,
       "collector_error": null,
       "change_count": 2,
-      "change_percent": 2.2
+      "change_percent": 2.15
     },
     "ich": {
       "baseline_count": 31,
@@ -87,23 +87,20 @@
       "change_percent": 0.0
     },
     "fda_guidance": {
-      "baseline_count": 86,
+      "baseline_count": 88,
       "candidate_count": 88,
-      "new_count": 2,
+      "new_count": 0,
       "changed_count": 0,
       "removed_count": 0,
-      "new_ids": [
-        "fda-30f431b3965e",
-        "fda-74934b4b2d80"
-      ],
+      "new_ids": [],
       "changed_ids": [],
       "removed_ids": [],
       "collector_items": 87,
       "derived_items": 87,
       "dropped_items": 0,
       "collector_error": null,
-      "change_count": 2,
-      "change_percent": 2.33
+      "change_count": 0,
+      "change_percent": 0.0
     },
     "health_canada": {
       "baseline_count": 26,

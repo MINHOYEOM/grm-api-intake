@@ -2,6 +2,21 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-08-21",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0010-15280",
+            "data0011-15917"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 95,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-08-16",
       "sources": {
         "fda_guidance": {

@@ -14,7 +14,7 @@
 
 ## 규제 지적사항 데이터
 - [지적사항 검색](https://grm-solutions.com/findings/): FDA 483 · Warning Letter · EU/영국 GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색
-- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,202건 — 기관·연도별 색인
+- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,145건 — 기관·연도별 색인
 - [트렌드](https://grm-solutions.com/findings/trends/): 지적 영역·기관·연도별 자동 집계
 - [자가점검 체크리스트](https://grm-solutions.com/findings/checklist/): 빈발 지적 기반 자가 점검 문항
 

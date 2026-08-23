@@ -1,0 +1,32 @@
+[
+  {
+    "finding_id": "finding-85c9f8fc374614d7bafb1a57",
+    "finding_text": "During the inspection of the manufacturing site, in the frame of EDQM’s inspection progamme, 21 deficiencies against EU GMP were identified. One deficiency was classified as critical due to inadequate control of contamination and cross-contamination risk in shared facilities. The risk assessments and contamination control strategy for Workshop 2 and the dispensing area were insufficiently robust, specific, justified, and effectively implemented, notably for exposed product operations, gowning, area and equipment cleanliness, material entry, dispensing activities, and the use of shared equipment for potentially highly potent products. Furthermore, absence of contraindications between APIs manufactured in the shared facility was not evaluated consistently. These represent a potential risk to patient safety. Five deficiencies were classified as major and were related to the following areas: cleaning validation and cleaning procedures, preventive maintenance and equipment condition, data integrity, change control management, and batch release and compliance to CEP. In addition, 15 other deficiencies were found (i.e. records, quality system, personnel training, calibration, labelling management, equipment qualification).\n\nAction taken/proposed by the NCA: Requested Variation of the marketing authorisation(s) For medicinal products containing APIs manufactured by LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD. in Workshop 2, assessment of the MA to remove or substitute this manufacturer of active substances and intermediates should be considered. In addition, no new MAs should be granted for products relying on this API source while the statement of non-compliance remains in force. Recall of batches already released If there are alternative suppliers and there is no risk of shortage, recall of medicinal product should be evaluated by the involved NCAs following assessment conducted in conjunction with MAHs. Prohibition of supply Due to the nature of the non-compliance, prohibition of supply is recommended, unless there are no alternative suppliers and there is a risk of shortage. Suspension or voiding of CEP (action to be taken by EDQM) The EDQM had taken the decision to suspend all granted CEPs from LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD. CEP 2013-019 Atracurium besilate CEP 2021-236 Cisatracurium besilate CEP 2017-271 Entecavir monohydrate (intermediate)",
+    "finding_text_ko": "EDQM 실사 프로그램의 일환으로 제조소를 실사한 결과, EU GMP에 대한 지적사항 21건이 확인되었다. 이 중 1건은 공용 시설에서의 오염 및 교차오염 위험 관리가 미흡하여 critical(치명적)로 분류되었다. Workshop 2 및 칭량·분배구역(dispensing area)에 대한 위험평가와 오염관리전략(contamination control strategy)은 충분히 견고하지 않았고, 구체적이지 않았으며, 정당한 근거가 부족하고 실효적으로 이행되지 않았다. 특히 제품이 노출되는 작업, 갱의(gowning), 구역 및 설비 청결도, 자재 반입, 칭량·분배 작업, 잠재적 고역가(highly potent) 제품에 대한 공용 설비 사용에서 그러하였다. 또한 공용 시설에서 제조되는 원료의약품(API) 간 병용금기(contraindications)의 부재 여부가 일관되게 평가되지 않았다. 이는 환자 안전에 대한 잠재적 위험에 해당한다. 5건은 major(중대)로 분류되었으며 다음 영역과 관련되었다: 세척밸리데이션 및 세척 절차, 예방정비 및 설비 상태, 데이터 완전성(data integrity), 변경관리(change control), 배치 출하 및 CEP 적합성. 이 외에 15건의 기타 지적사항이 확인되었다(기록, 품질시스템, 인력 교육훈련, 교정, 표시기재 관리, 설비 적격성평가 등).\n\nNCA가 취했거나 제안한 조치: 품목허가 변경 요청 — LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.의 Workshop 2에서 제조된 API를 함유한 의약품에 대해서는, 해당 원료의약품 및 중간체 제조원을 삭제하거나 대체하기 위한 품목허가 평가를 검토하여야 한다. 아울러 본 GMP 부적합 확인서(statement of non-compliance)가 유효한 동안에는 해당 API 공급원에 의존하는 제품에 대해 신규 품목허가를 부여해서는 안 된다. 이미 출하된 배치의 회수 — 대체 공급원이 있고 공급부족 위험이 없는 경우, 관련 NCA는 MAH와 공동으로 수행한 평가에 따라 해당 의약품의 회수를 검토하여야 한다. 공급 금지 — 부적합의 성격을 고려할 때, 대체 공급원이 없고 공급부족 위험이 있는 경우를 제외하고는 공급 금지를 권고한다. CEP의 정지 또는 무효화(EDQM이 취할 조치) — EDQM은 LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.에 부여된 모든 CEP를 정지하기로 결정하였다. CEP 2013-019 Atracurium besilate, CEP 2021-236 Cisatracurium besilate, CEP 2017-271 Entecavir monohydrate (중간체).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aa060d47757cf7e79eb8ca45",
+    "finding_text": "파록시주(팔로노세트론염산염): 시판 후 안정성시험 함량시험 결과 부적합에 따른 영업자 회수",
+    "finding_text_ko": "파록시주(주성분 팔로노세트론염산염)의 시판 후 안정성시험 중 함량시험 결과가 부적합으로 확인됨에 따라, 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7bfb26267c0be045927b0f34",
+    "finding_text": "레파넘정1밀리그램(레파글리니드): 불순물(N-nitroso-melumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정1밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d17616142919c0ac08e38cd",
+    "finding_text": "레파넘정2밀리그람(레파글리니드): 불순물(N-nitroso-melumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정2밀리그람(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-10e4e6eb434af9852ff89e50",
+    "finding_text": "레파넘정0.5밀리그램(레파글리니드): 불순물(N-nitroso-melumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정0.5밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  }
+]

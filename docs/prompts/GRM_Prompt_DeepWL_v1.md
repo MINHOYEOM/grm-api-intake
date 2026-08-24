@@ -36,6 +36,11 @@
 - 4개 키(`key_violations`·`fda_evaluation`·`required_remediation`·`administrative_risks`)가
   **모두** 있어야 한다. 하나라도 비면 게이트 D1 FAIL → 이 카드는 심층분석 없이 발행된다.
 - **`overview` 키는 없다**(§2.5 로 삭제 — 표·핵심사실과 중복이라 6슬롯 요약이 흡수).
+- **`violations_ko`(위반 표제문 국문)는 이 출력에 넣지 않는다**(2026-08-24) — 그 번역은 handoff
+  번역 채널이 별도로 나른다: `wl_violation_translation_input`(`[{number, statement}]`) →
+  deep 델타 **항목 최상위** `violations_ko`(`GRM_Prompt_v16.md` §B [2단계] ⑤ · fanout 세션은
+  `deep_analysis_fanout.build_wl_translation_jobs`/`assemble_wl_translation_deltas`). 4섹션 dict
+  안에 중첩하면 정본 위치가 아니다(브릿지가 방어적으로 끌어올리긴 한다).
 - 산문(description·risk·fda_evaluation·administrative_risks·items)은 **한국어**로 쓴다.
 - **`original`(원문 병기)은 영어 그대로** 둔다(번역하지 마라) — 아래 ① 참조.
 - 출력은 **순수 평문**이다 — `&`·`<`·`>` 를 HTML 엔티티(`&amp;`·`&lt;`)로 이스케이프하지 마라
@@ -124,4 +129,5 @@ Alert) 등). 원문이 경고한 조치를 근거로 쓴다.
 | 2026-07-01 | 최초(CC). §2.5 확정 스키마(4섹션·`required_remediation` 객체·Overview 제거) + §2 인용-verbatim 게이트 교훈 반영. `verify_deep_analysis` D1/D2/D3 와 정합. |
 | 2026-07-08 | 원문·국문 병기(CC). `key_violations` 각 항목에 **`original`(원문 verbatim 발췌·선택 필드)** 추가 — 웹 카드가 원문↔국문 해석을 나란히 렌더(랜딩 "원문 항상 함께" 약속을 상세층까지 이행). 게이트 D4(`check_original_grounding`)가 `original` 이 `body_full` 부분문자열인지 대조(미근거=WARN·비차단). 발췌할 원문 없으면 생략(D1 FAIL 아님). |
 | 2026-07-13 | **원문↔국문 정합 하드 룰 추가(CC).** 483 프롬프트에서 드러난 결함(`original` 절단→국문이 언급하는 구체 사실이 병기된 영어에 없어 "지어낸 것처럼" 보임)의 재발을 막기 위해, `description` 이 여러 문장·사실을 묶었을 때 그 근거 문장을 **전부** 발췌하라는 하드 룰 명시(기존 "핵심 위반 문장 하나만 짧게" 지시를 대체 — 그 지시가 바로 이 결함의 원인이었다). `original` 에 없는 구체적 사실이 국문에 등장해선 안 된다는 불변식 명시. [[GRM_Prompt_DeepFda483_v1]] 동형 수정. |
+| 2026-08-24 | **`violations_ko` 비포함 명시(CC).** 위반 표제문 국문 병기는 이 per-card 출력이 아니라 handoff 번역 채널(`wl_violation_translation_input` → deep 델타 항목 최상위 `violations_ko`, v16 §B [2단계] ⑤)이 나른다 — 483 의 `observations_ko`(출력 내 포함)와 **다른 배선**이라 혼동 방지 겸 4섹션 중첩 예치를 막는다. |
 | 2026-08-24 | **표제문 단독 발췌 금지 + D5c 하드 게이트(CC).** 08-24 발행분 WL 6장·19개 항목 전건이 `original` 로 번호 매긴 표제문 한 문장만 발췌해 원문↔국문 병기쌍이 파손된 채 발행됐다(D4/D5a 는 WARN 이라 차단 못 함). `original` 은 표제문에서 `description` 의 근거 본문 문장들까지 이어지는 연속 구간이어야 하며, `verify_deep_analysis.check_heading_only_original`(D5c)이 결정론 표제문과 대조해 표제문 범위를 못 벗어난 발췌를 FAIL 로 drop 한다. |

@@ -401,6 +401,15 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 드러났다(lint_unverified_absence_labels docstring 참고).
     report.errors.extend(lint_unverified_absence_labels(out.get("cards") or []))
 
+    # 게이트 6: WL 위반항목 블록의 국문 병기 결손 — 발행 차단(2026-08-24).
+    # 483 게이트 4와 짝이다 — WL 은 템플릿이 영문 단독으로 조용히 degrade 해서, 병합층(#670)이
+    # 생긴 뒤에도 라우틴이 `violations_ko` 를 안 채운 채 3주가 지나갔다(08-10 은 손 백필,
+    # 08-17 은 WL 0장, 08-24 는 5장 14건 전건 영문 단독 발행). WARN 은 아무도 안 읽는다 —
+    # 결손은 여기서 소리 나게 막고, 배포 단계 `web/render.validate_wl_violations` 가 한 번 더
+    # fail-closed 로 잡는다(과거 발행분은 2026-08-24 소급 백필로 전건 병기 완료 — 소급 검사
+    # 예외가 필요 없다).
+    report.errors.extend(_lint_wl_violation_ko(out.get("cards") or []))
+
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
     agencies = _distinct_in_order(
@@ -635,6 +644,30 @@ def _lint_483_observation_ko(cards: list[dict[str, Any]],
                 errs.append(f"카드 {c.get('id')!r} 관찰 #{num}: deficiency_ko 없음")
             if str(obs.get("detail") or "").strip() and not str(obs.get("detail_ko") or "").strip():
                 errs.append(f"카드 {c.get('id')!r} 관찰 #{num}: detail 이 있는데 detail_ko 없음")
+    return errs
+
+
+def _lint_wl_violation_ko(cards: list[dict[str, Any]]) -> list[str]:
+    """WL 위반항목 블록의 국문 병기 결손을 조립 단계에서 잡는다(발행 차단 사유 목록 반환).
+
+    [게이트 6, 2026-08-24] `_lint_483_observation_ko`(게이트 4)의 WL 판이다. 다른 점 둘:
+      · **무조건 검사**(`only_ids` 스코프 없음) — 483 은 병기 요구(2026-07-09) 이전 발행분이
+        미백필 상태라 소급 예외가 필요했지만, WL 은 이 게이트와 함께 과거 발행분 전건
+        (06-26~08-24, 14카드 44표제문)을 소급 백필했으므로 예외를 둘 이유가 없다. 예외 스코프는
+        곧 사각이다 — 라우틴이 카드 하나를 통째로 빠뜨리면(델타 항목 자체가 없으면) 델타 스코프
+        게이트는 침묵한다.
+      · 검사 필드가 `statement_ko` 하나다(위반 표제 블록은 statement 단층 구조).
+    복구 경로: deep 델타 항목에 `violations_ko: [{number, statement_ko}]` 를 채워 재조립
+    (라우틴 재예치 또는 `backfill_wl_violation_ko.py` — 발행본 직접 병합용)."""
+    errs: list[str] = []
+    for c in cards:
+        dd = c.get("deterministic_detail")
+        if not (isinstance(dd, dict) and dd.get("type") == "wl_violations"):
+            continue
+        for v in dd.get("violations") or []:
+            if not str(v.get("statement_ko") or "").strip():
+                errs.append(f"카드 {c.get('id')!r} 위반 #{v.get('number', '?')}: "
+                            f"statement_ko 없음 (WL 위반항목 국문 병기 결손)")
     return errs
 
 

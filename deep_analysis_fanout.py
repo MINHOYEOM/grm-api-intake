@@ -190,6 +190,95 @@ def _as_translation_jobs(jobs: Any) -> list[TranslationJob]:
     return out
 
 
+@dataclass(frozen=True)
+class WlTranslationJob:
+    """[WL 위반항목 국문 병기 2026-08-24] WL 위반 표제 번역 전용 작업 1건 = 카드 1건.
+
+    NCR `TranslationJob` 과 형제이나 입력이 평면 필드맵이 아니라 **번호 목록**이다 —
+    `violations` = `[{number, statement}]` (handoff `wl_violation_translation_input`,
+    발행 카드의 `deterministic_detail.violations` 와 같은 producer 산출이라 글자 단위 동일).
+    서브에이전트는 번호를 보존한 `[{number, statement_ko}]` 로 돌려준다.
+    """
+    document_id: str
+    violations: tuple[dict[str, str], ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"document_id": self.document_id,
+                "violations": [dict(v) for v in self.violations]}
+
+
+def build_wl_translation_jobs(handoff: Any) -> list[WlTranslationJob]:
+    """`wl_violation_translation_ready=True` 카드만 번역 작업으로 변환(결정론·순서 보존).
+
+    `build_translation_jobs`(NCR/WHOPIR)와 동형 — WL 은 위반 표제가 번호 목록이라 채널을
+    나눈다. 입력이 비었거나 document_id 를 못 얻으면 조용히 건너뛴다(그 카드는 영문 단독
+    발행 — 단, 조립 게이트 `_lint_wl_violation_ko` 가 결손을 발행 차단으로 끌어올린다).
+    """
+    jobs: list[WlTranslationJob] = []
+    seen: set[str] = set()
+    for card in _cards(handoff):
+        if not card.get("wl_violation_translation_ready"):
+            continue
+        src = card.get("wl_violation_translation_input")
+        rows = tuple(
+            {"number": str(v.get("number") or ""), "statement": str(v.get("statement") or "")}
+            for v in src if isinstance(v, dict) and str(v.get("statement") or "").strip()
+        ) if isinstance(src, list) else ()
+        doc = _document_id(card)
+        if not doc or not rows or doc in seen:
+            continue
+        seen.add(doc)
+        jobs.append(WlTranslationJob(document_id=doc, violations=rows))
+    return jobs
+
+
+def assemble_wl_translation_deltas(jobs: Any,
+                                   responses: dict[str, Any] | None) -> dict[str, Any]:
+    """WL 번역 작업 + 응답({doc: [{number, statement_ko}]}) → `{doc: {"violations_ko": [...]}}`.
+
+    게이트는 **짝 맞춤 하나**다 — 작업에 없는 번호의 번역은 버린다(근거 없는 국문 차단,
+    `assemble_translation_deltas` 와 동일 원칙). 번호별 첫 응답만 취한다(중복 방어)."""
+    responses = responses or {}
+    out: dict[str, Any] = {}
+    for job in _as_wl_translation_jobs(jobs):
+        resp = responses.get(job.document_id)
+        if not isinstance(resp, list):
+            continue
+        valid_numbers = {v["number"] for v in job.violations}
+        ko: list[dict[str, str]] = []
+        seen_numbers: set[str] = set()
+        for item in resp:
+            if not isinstance(item, dict):
+                continue
+            num = str(item.get("number") or "")
+            text = item.get("statement_ko")
+            if num not in valid_numbers or num in seen_numbers:
+                continue
+            if not (isinstance(text, str) and text.strip()):
+                continue
+            seen_numbers.add(num)
+            ko.append({"number": num,
+                       "statement_ko": _unescape_entities(text).strip()})
+        if ko:
+            out[job.document_id] = {"violations_ko": ko}
+    return out
+
+
+def _as_wl_translation_jobs(jobs: Any) -> list[WlTranslationJob]:
+    """WlTranslationJob 목록 또는 jobs.json dict 목록을 정규화."""
+    out: list[WlTranslationJob] = []
+    for j in jobs or []:
+        if isinstance(j, WlTranslationJob):
+            out.append(j)
+        elif isinstance(j, dict) and j.get("document_id") and isinstance(j.get("violations"), list):
+            out.append(WlTranslationJob(
+                document_id=str(j["document_id"]),
+                violations=tuple({"number": str(v.get("number") or ""),
+                                  "statement": str(v.get("statement") or "")}
+                                 for v in j["violations"] if isinstance(v, dict))))
+    return out
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # assemble_deltas — 서브에이전트 응답 → 게이트 → inject 델타
 # ─────────────────────────────────────────────────────────────────────────────

@@ -23,10 +23,13 @@
     (옵션이 없으면 Notion 이 자동 생성 — handoff 페이지 생성 규약과 동형).
   - 본문에 **코드 블록 1개**로 네 [산출물] 슬롯 델타 JSON 을 그대로 붙여넣는다(형태 불변 —
     `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}`, `publish_date` 키를 최상위에 추가해도 무방).
-  - [2단계] 심층분석(deep_analysis)을 수행했다면, **같은 페이지에 두 번째 코드 블록**으로
-    `{"<card.id>":{"deep_analysis":{...4섹션...},"source_text":"..."}}` 델타를 추가로 붙인다
-    (별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
-    심층분석이 없으면(대다수 주) 이 블록은 생략 — 정상.
+  - [2단계] 심층분석(deep_analysis)·상세 국문 병기(④ `ncr_ko` · ⑤ `violations_ko`)를 수행했다면,
+    **같은 페이지에 두 번째 코드 블록**으로
+    `{"<web_card_id>":{"deep_analysis":{...4섹션...},"violations_ko":[...]}, "<다른 id>":{"ncr_ko":{...}}}`
+    델타를 추가로 붙인다(번역층은 항목 최상위 — `deep_analysis` 안에 중첩 금지.
+    별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
+    `source_text`(원문 전사)는 **넣지 않는다** — 브릿지가 handoff 에서 직접 읽는다(2026-08-17 개정).
+    심층분석·번역 대상이 없으면(그런 주) 이 블록은 생략 — 정상.
   - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
     **기존 `OPEN GRM Web Delta {date}` 페이지 본문을 덮어쓴다**(handoff 의 upsert 규약과 동형).
   - 이 예치는 [Status 갱신]·handoff CONSUMED 처리와 **별개**다 — 델타 페이지의 CONSUMED 전환은

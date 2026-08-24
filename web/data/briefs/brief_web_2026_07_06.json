@@ -297,22 +297,26 @@
      {
       "number": "1",
       "statement": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)).",
-      "citation": "21 CFR 211.194(a)"
+      "citation": "21 CFR 211.194(a)",
+      "statement_ko": "귀사는 설정된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험으로부터 도출된 완전한 데이터가 시험기록에 포함되도록 하지 않았다 (21 CFR 211.194(a))."
      },
      {
       "number": "2",
       "statement": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10).",
-      "citation": "21 CFR 211.42(c)(10)"
+      "citation": "21 CFR 211.42(c)(10)",
+      "statement_ko": "귀사는 무균 작업구역에서 오염 또는 혼동을 방지하는 데 필요한, 충분한 크기의 명확히 구획된 구역 안에서 작업을 수행하지 않았고 분리·구획된 구역 또는 그에 상응하는 관리 시스템을 갖추지 않았다 (21 CFR 211.42(c)(10))."
      },
      {
       "number": "3",
       "statement": "Your firm failed to follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
-      "citation": "21 CFR 211.113(b)"
+      "citation": "21 CFR 211.113(b)",
+      "statement_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균공정 및 멸균공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 준수하지 않았다 (21 CFR 211.113(b))."
      },
      {
       "number": "4",
       "statement": "Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements (21 CFR 211.67(a)).",
-      "citation": "21 CFR 211.67(a)"
+      "citation": "21 CFR 211.67(a)",
+      "statement_ko": "귀사는 의약품의 안전성(safety)·확인(identity)·함량(strength)·품질(quality)·순도(purity)가 공정서 또는 그 밖에 설정된 요건을 벗어나 변질되게 할 수 있는 오작동이나 오염을 방지하기 위하여, 설비와 기구를 적절한 주기로 세척·유지관리하고 의약품의 특성에 맞게 소독 및/또는 멸균하지 않았다 (21 CFR 211.67(a))."
      }
     ]
    }
@@ -420,22 +424,26 @@
      {
       "number": "1",
       "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
-      "citation": "21 CFR 211.192"
+      "citation": "21 CFR 211.192",
+      "statement_ko": "귀사는 배치의 출하 여부와 관계없이, 배치 또는 그 구성원료가 규격에 부적합하거나 원인불명의 불일치가 발생한 경우 이를 철저히 조사하지 않았다 (21 CFR 211.192)."
      },
      {
       "number": "2",
       "statement": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
-      "citation": "21 CFR 211.113(b)"
+      "citation": "21 CFR 211.113(b)",
+      "statement_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균공정 및 멸균공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립·준수하지 않았다 (21 CFR 211.113(b))."
      },
      {
       "number": "3",
       "statement": "Your firm failed to maintain floors, walls, and ceilings of smooth, hard surfaces that are easily cleanable in aseptic processing areas and establish an adequate system for maintaining equipment used to control the aseptic conditions (21 CFR 211.42(c)(10)(i) and 211.42(c)(10)(vi)).",
-      "citation": "21 CFR 211.42(c)(10)(i)"
+      "citation": "21 CFR 211.42(c)(10)(i)",
+      "statement_ko": "귀사는 무균 작업구역의 바닥·벽·천장을 세척이 용이한 매끄럽고 단단한 표면으로 유지하지 않았고, 무균 조건을 관리하는 데 사용되는 설비의 유지관리를 위한 적절한 시스템을 수립하지 않았다 (21 CFR 211.42(c)(10)(i) 및 211.42(c)(10)(vi))."
      },
      {
       "number": "4",
       "statement": "Your firm failed to establish an adequate system for cleaning and disinfecting the room and equipment to produce aseptic conditions (21 CFR 211.42(c)(10)(v)).",
-      "citation": "21 CFR 211.42(c)(10)(v)"
+      "citation": "21 CFR 211.42(c)(10)(v)",
+      "statement_ko": "귀사는 무균 조건을 조성하기 위한 작업실 및 설비의 세척·소독을 위한 적절한 시스템을 수립하지 않았다 (21 CFR 211.42(c)(10)(v))."
      }
     ]
    }
@@ -537,7 +545,8 @@
      {
       "number": "1",
       "statement": "Your firm’s quality control unit failed to exercise its responsibility to ensure that drug products are manufactured in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity, as required by 21 CFR 211.22. Specifically, your quality unit failed to exercise its responsibility to ensure compliance with the following CGMP requirements: a. Failure to ensure that laboratory records include complete data derived from all tests necessary to assure compliance with established specifications and standards, as required by 21 CFR 211.194(a).",
-      "citation": "21 CFR 211.22 · 21 CFR 211.194(a)"
+      "citation": "21 CFR 211.22 · 21 CFR 211.194(a)",
+      "statement_ko": "귀사의 품질관리부서는 의약품이 CGMP를 준수하여 제조되고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 대해 설정된 규격에 적합함을 보증할 책임을 이행하지 못하였다 (21 CFR 211.22). 구체적으로, 귀사의 품질부서는 다음 CGMP 요건의 준수를 보증할 책임을 이행하지 못하였다: a. 설정된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험으로부터 도출된 완전한 데이터가 시험기록에 포함되도록 하지 못함 (21 CFR 211.194(a))."
      }
     ]
    }

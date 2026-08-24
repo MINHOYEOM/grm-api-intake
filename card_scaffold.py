@@ -322,6 +322,16 @@ class CardScaffold:
         키(`ncr_translation_*`)는 Routine 프롬프트가 이미 참조하고 있어 유지하되, 채널의
         의미는 **NCR 전용이 아니라 결정론 상세 일반**이다(필드명은 상세 타입이 정한다).
 
+        ★ [WL 위반항목 국문 2026-08-24] Warning Letter 의 결정론 위반 표제(`wl_violations`)도
+        같은 원리의 번역 입력을 방출한다 — 단, 산출 형태가 번호 목록이라 와이어 키를 나눈다:
+          · `wl_violation_translation_ready` — 대상 표시
+          · `wl_violation_translation_input` — `[{number, statement}]` (발행 카드의
+            `deterministic_detail.violations` 와 같은 producer → 글자 단위 동일).
+        Routine 은 이걸 번역해 deep 델타 항목에 `violations_ko: [{number, statement_ko}]` 로
+        싣고, `inject_slots._merge_wl_violation_translations` 가 번호로 병합한다. 이 채널이
+        없던 것이 "슬롯·병합층은 있는데 라우틴이 안 채우는"(#670 이후 3주 연속 영문 단독)
+        결손의 원인이었다 — 병합층(소비자)은 2026-08-10 에 생겼는데 생산 지시·입력이 없었다.
+
         `deep_fields()` 와 같은 이유로 **방출 지점을 이 함수 하나로** 묶는다(두 직렬화기가
         같은 함수를 부른다 — 한쪽만 갱신되는 표류 구조적 차단).
         """
@@ -333,6 +343,17 @@ class CardScaffold:
                        if str(detail.get(k) or "").strip()}
         elif detail.get("type") == "whopir_report":
             payload = whopir_translation_input(detail)
+        elif detail.get("type") == "wl_violations":
+            rows = [{"number": str(v.get("number") or ""), "statement": v["statement"]}
+                    for v in detail.get("violations") or []
+                    if isinstance(v, dict) and str(v.get("statement") or "").strip()]
+            if not rows:
+                return {}
+            return {
+                "wl_violation_translation_ready": True,
+                "wl_violation_translation_input": rows,
+                "kind": self.kind,
+            }
         else:
             return {}
         if not payload:

@@ -13,15 +13,40 @@ citation}` 뿐). 483 은 `render.validate_483_observations` 가 fail-closed 라 
   4. `delta_bridge._gate_deep_analysis` 가 `violations_ko` 단독 항목을 drop 하지 않는다.
   5. 렌더가 실제로 원문+국문을 함께 낸다(슬롯만 있고 안 나오던 게 이 결함의 본질이라
      데이터 병합만 검사하면 같은 함정을 또 밟는다).
+
+[라우틴 생산 채널 2026-08-24] 병합층(위 1~5)만으로는 부족했다 — **라우틴에 산출 지시·입력이
+없어** 채널이 세 주 연속(08-10~08-24) 비었고, WL 템플릿의 조용한 영문 degrade 가 결손을
+가렸다(08-24 발행분 5카드·14표제문 전건 영문 단독). 추가로 고정하는 것:
+  6. `translation_fields()` 가 WL 카드에 `wl_violation_translation_ready`/`_input` 을 방출하고,
+     그 입력이 발행 카드 결정론 블록과 글자 단위로 같다(같은 producer — 짝 어긋남 불가능).
+  7. fanout `build_wl_translation_jobs`/`assemble_wl_translation_deltas` — 번호 짝 맞춤 게이트.
+  8. 브릿지가 4섹션 안에 중첩 예치된 번역층을 entry 층으로 끌어올리고, 분석 게이트 FAIL 시에도
+     번역/원문 층을 보존한다(종전엔 entry 통째 drop — "번역은 별도 층으로 산다"는 프롬프트
+     약속이 이 경로에서 거짓이었다).
+  9. 결손이 소리 나게 막힌다 — 조립 게이트 6(`_lint_wl_violation_ko`) + 배포 fail-closed
+     (`render.validate_wl_violations`). WARN 은 아무도 안 읽는다.
 """
 import json
+import os
 import pathlib
 import sys
 import tempfile
 import unittest
+from datetime import date, datetime
 
+import card_scaffold as cs
+import deep_analysis_fanout as fan
 import delta_bridge as db
+import grm_handoff as gh
 import inject_slots as inj
+from assemble_publish_brief import _lint_wl_violation_ko
+
+GOLDEN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "golden")
+
+
+def _load_golden(name):
+    with open(os.path.join(GOLDEN, f"{name}.input.json"), encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 def _wl_card():
@@ -106,6 +131,188 @@ class BridgeGateAllowsViolationsKoTest(unittest.TestCase):
 
     def test_empty_entry_still_dropped(self):
         self.assertIsNone(db._gate_deep_analysis({"x": {"nonsense": 1}}))
+
+
+class WlTranslationEmissionTest(unittest.TestCase):
+    """§6 — handoff 방출: WL 카드만, 발행 카드 결정론 블록과 같은 원문을."""
+
+    def _scaffold(self, name):
+        data = _load_golden(name)
+        return cs.build_card_scaffold(data["row"], data["raw"])
+
+    def test_wl_card_emits_translation_input(self):
+        card = self._scaffold("warning_letter_violations")
+        fields = card.translation_fields()
+        self.assertTrue(fields.get("wl_violation_translation_ready"))
+        self.assertEqual(fields.get("kind"), card.kind)
+        rows = fields["wl_violation_translation_input"]
+        self.assertTrue(rows)
+        for r in rows:
+            self.assertEqual(set(r), {"number", "statement"})
+
+    def test_input_matches_published_detail_verbatim(self):
+        """번역 입력 = 발행 카드 결정론 블록과 글자 단위 동일(같은 producer 확인)."""
+        card = self._scaffold("warning_letter_violations")
+        detail = card.to_web_card()["deterministic_detail"]
+        rows = card.translation_fields()["wl_violation_translation_input"]
+        self.assertEqual(
+            [(r["number"], r["statement"]) for r in rows],
+            [(v["number"], v["statement"]) for v in detail["violations"]])
+
+    def test_non_wl_cards_do_not_emit(self):
+        for name in ("fda_483_observations", "eu_gmp_ncr"):
+            with self.subTest(name=name):
+                fields = self._scaffold(name).translation_fields()
+                self.assertNotIn("wl_violation_translation_ready", fields)
+
+    def test_both_serializers_carry_the_fields(self):
+        """`to_dict()` 와 실제 Notion handoff v2 빌더가 둘 다 싣는다(직렬화기 분열 재발 방지)."""
+        data = _load_golden("warning_letter_violations")
+        card = cs.build_card_scaffold(data["row"], data["raw"])
+        self.assertTrue(card.to_dict().get("wl_violation_translation_ready"))
+        row = dict(data["row"], raw=data["raw"])
+        payload = gh.build_routine_handoff_payload_v2(
+            [row], date(2026, 8, 24), 7, datetime(2026, 8, 24, 7, 30))
+        rows = payload.get("rows") or []
+        self.assertTrue(rows, "handoff v2 행이 비었다")
+        self.assertTrue(rows[0].get("wl_violation_translation_ready"),
+                        "handoff v2 에 WL 번역 입력이 실리지 않았다")
+        self.assertTrue(rows[0].get("wl_violation_translation_input"))
+
+
+class WlTranslationJobsTest(unittest.TestCase):
+    """§7 — fanout 작업 변환 + 번호 짝 맞춤 게이트."""
+
+    HANDOFF = {"cards": [
+        {"card_id": "FDA WL::wl-1", "kind": "warning-letter",
+         "wl_violation_translation_ready": True,
+         "wl_violation_translation_input": [
+             {"number": "1", "statement": "Your firm failed A."},
+             {"number": "2", "statement": "Your firm failed B."}]},
+        {"card_id": "EudraGMDP::186339", "kind": "eu-gmp-ncr",
+         "ncr_translation_ready": True,
+         "ncr_translation_input": {"nature": "Critical deficiencies."}},
+    ]}
+
+    def test_build_picks_only_wl(self):
+        jobs = fan.build_wl_translation_jobs(self.HANDOFF)
+        self.assertEqual([j.document_id for j in jobs], ["wl-1"])
+        self.assertEqual([v["number"] for v in jobs[0].violations], ["1", "2"])
+
+    def test_ncr_jobs_unaffected(self):
+        jobs = fan.build_translation_jobs(self.HANDOFF)
+        self.assertEqual([j.document_id for j in jobs], ["186339"])
+
+    def test_assemble_produces_violations_ko(self):
+        jobs = fan.build_wl_translation_jobs(self.HANDOFF)
+        out = fan.assemble_wl_translation_deltas(jobs, {"wl-1": [
+            {"number": "2", "statement_ko": "국문 B."},
+            {"number": "1", "statement_ko": "국문 A."}]})
+        self.assertEqual(out, {"wl-1": {"violations_ko": [
+            {"number": "2", "statement_ko": "국문 B."},
+            {"number": "1", "statement_ko": "국문 A."}]}})
+
+    def test_assemble_drops_numbers_without_source(self):
+        """작업에 없는 번호의 번역은 버린다 — 근거 없는 국문 차단(NCR 게이트와 동형)."""
+        jobs = fan.build_wl_translation_jobs(self.HANDOFF)
+        out = fan.assemble_wl_translation_deltas(jobs, {"wl-1": [
+            {"number": "1", "statement_ko": "국문 A."},
+            {"number": "9", "statement_ko": "지어낸 문장."},
+            {"number": "2", "statement_ko": "   "}]})
+        self.assertEqual(out["wl-1"]["violations_ko"],
+                         [{"number": "1", "statement_ko": "국문 A."}])
+
+    def test_missing_response_is_not_an_error(self):
+        jobs = fan.build_wl_translation_jobs(self.HANDOFF)
+        self.assertEqual(fan.assemble_wl_translation_deltas(jobs, {}), {})
+
+    def test_jobs_roundtrip_through_json(self):
+        jobs = fan.build_wl_translation_jobs(self.HANDOFF)
+        raw = json.loads(json.dumps([j.to_dict() for j in jobs]))
+        out = fan.assemble_wl_translation_deltas(
+            raw, {"wl-1": [{"number": "1", "statement_ko": "국문 A."}]})
+        self.assertIn("wl-1", out)
+
+
+class BridgeTranslationSurvivalTest(unittest.TestCase):
+    """§8 — 중첩 예치 리프팅 + 분석 게이트 FAIL 시 번역/원문 층 보존."""
+
+    _BAD_DEEP = {"key_violations": []}   # 4섹션 미충족 — D1 FAIL 확정
+
+    def test_nested_violations_ko_lifted_and_survives_gate_fail(self):
+        deep = {"wl-1": {"deep_analysis": dict(
+            self._BAD_DEEP, violations_ko=[{"number": "1", "statement_ko": "국문."}]),
+            "source_text": "Your firm failed A."}}
+        kept = db._gate_deep_analysis(deep)
+        self.assertIsNotNone(kept)
+        self.assertNotIn("deep_analysis", kept["wl-1"])
+        self.assertEqual(kept["wl-1"]["violations_ko"],
+                         [{"number": "1", "statement_ko": "국문."}])
+        self.assertEqual(kept["wl-1"]["source_text"], "Your firm failed A.")
+
+    def test_entry_level_translation_survives_gate_fail(self):
+        deep = {"wl-1": {"deep_analysis": dict(self._BAD_DEEP),
+                         "violations_ko": [{"number": "1", "statement_ko": "국문."}]}}
+        kept = db._gate_deep_analysis(deep)
+        self.assertEqual(kept, {"wl-1": {"violations_ko":
+                                         [{"number": "1", "statement_ko": "국문."}]}})
+
+    def test_observations_ko_survives_gate_fail_too(self):
+        """483 도 같은 결함이었다 — 프롬프트의 "별도 층으로 산다" 약속이 이 경로에서 거짓이면
+        render fail-closed 게이트가 그 주 브리프 전체를 막는 데까지 번진다."""
+        deep = {"fda483-1": {"deep_analysis": dict(self._BAD_DEEP),
+                             "observations_ko": [{"number": "1", "deficiency_ko": "국문."}]}}
+        kept = db._gate_deep_analysis(deep)
+        self.assertIn("observations_ko", kept["fda483-1"])
+        self.assertNotIn("deep_analysis", kept["fda483-1"])
+
+    def test_analysis_only_fail_entry_still_dropped(self):
+        deep = {"wl-1": {"deep_analysis": dict(self._BAD_DEEP)}}
+        self.assertIsNone(db._gate_deep_analysis(deep))
+
+
+class WlViolationKoGateTest(unittest.TestCase):
+    """§9 — 결손은 소리 나게: 조립 게이트 6 + 배포 fail-closed."""
+
+    def test_assemble_gate_flags_missing_ko(self):
+        errs = _lint_wl_violation_ko([_wl_card()])
+        self.assertEqual(len(errs), 2)
+        self.assertTrue(all("statement_ko 없음" in e for e in errs))
+
+    def test_assemble_gate_passes_when_complete(self):
+        card = _wl_card()
+        for v in card["deterministic_detail"]["violations"]:
+            v["statement_ko"] = "국문 해석."
+        self.assertEqual(_lint_wl_violation_ko([card]), [])
+
+    def test_assemble_gate_ignores_non_wl_and_blockless(self):
+        cards = [
+            {"id": "a", "deterministic_detail": {"type": "fda_483_observations",
+                                                 "observations": [{"number": "1"}]}},
+            {"id": "b", "card_type": "Warning Letter"},   # 위반 블록 없는 WL(추출 0건)
+        ]
+        self.assertEqual(_lint_wl_violation_ko(cards), [])
+
+    def _render_mod(self):
+        web_dir = pathlib.Path(__file__).resolve().parent.parent / "web"
+        sys.path.insert(0, str(web_dir))
+        import render  # noqa: E402
+        return render
+
+    def test_render_validate_flags_missing_ko(self):
+        render = self._render_mod()
+        brief = {"brief": {"publish_date": "2026-08-24"}, "cards": [_wl_card()]}
+        out = render.validate_wl_violations([brief])
+        self.assertEqual(len(out), 2)
+        self.assertTrue(all("MISSING_STATEMENT_KO" in v for v in out))
+        self.assertIn("2026-08-24", out[0])
+
+    def test_render_validate_passes_when_complete(self):
+        render = self._render_mod()
+        card = _wl_card()
+        for v in card["deterministic_detail"]["violations"]:
+            v["statement_ko"] = "국문 해석."
+        self.assertEqual(render.validate_wl_violations([card]), [])
 
 
 class WlViolationRenderSmokeTest(unittest.TestCase):

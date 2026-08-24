@@ -536,7 +536,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
      handoff `kind` 가 `admin-action`=행정처분 · `warning-letter`=WL). 섹션 상세 규칙은 각 정본
      프롬프트를 따른다(WL=`docs/prompts/GRM_Prompt_DeepWL_v1.md` · 행정처분=`GRM_Prompt_DeepAdmin_v1.md` ·
      483=`GRM_Prompt_DeepFda483_v1.md`). ②번 섹션 키가 유형을 결정한다(브릿지가 그 키로 스키마 자동판별):
-     · WL       : `{key_violations:[{citation,original,description,risk}], fda_evaluation, required_remediation:{deadline,items[]}, administrative_risks}`
+     · WL       : `{key_violations:[{citation,original,description,risk}], fda_evaluation, required_remediation:{deadline,items[]}, administrative_risks}` (+ 카드별 `violations_ko` ★필수 — 4섹션 밖·아래 ⑤)
      · 행정처분  : `{key_violations:[{citation,original,description,risk}], disposition_basis, required_remediation:{deadline,items[]}, administrative_risks}`
      · FDA 483  : `{key_violations:[{observation,original,citation(선택),risk}], inspectional_significance, required_remediation:{deadline,items[]}, administrative_risks, observations_ko(★필수)}`
      ⚠️ **근거 규칙(브릿지 게이트가 검사)**: `citation`(WL·행정처분)은 그 카드 `body_full` 에 **글자
@@ -577,6 +577,22 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
        `{"<web_card_id>": {"ncr_ko": {"<실린 키>_ko": "...", ...}}}`
      ⚠️ 새 사실·해석 금지. 기관명·제품명·조항번호·운영항목 번호(`1.1.1.4` 등)는 원문 표기 유지.
      원문에 없는 필드는 만들지 않는다. 대상 카드가 있으면 반드시 채운다(빠지면 영문 단독 발행).
+  ⑤ **[WL 위반항목 국문 병기]** `wl_violation_translation_ready=true` 카드(FDA Warning Letter —
+     결정론 위반 표제 블록 보유)는 `wl_violation_translation_input` 의 표제문 `[{number, statement}]`
+     **각각을 번역만** 하고(새 사실·해석 금지), ③의 deep 델타에서 **그 카드의 항목 안에**
+     `violations_ko` 로 담는다 — `deep_analysis`(4섹션) **안에 중첩 금지**, 나란히 둔다:
+       `{"<web_card_id>": {"deep_analysis": {...4섹션...}, "violations_ko": [{"number": "1", "statement_ko": "..."}, ...]}}`
+     `number` 는 입력값 그대로 보존한다(병합이 **번호로 1:1 매칭** — 순서가 아니다). 조항 인용은
+     원문 표기 그대로 문장 끝 괄호로(예: "…절차를 수립하지 않았다 (21 CFR 211.100(a)).").
+     확인(identity)·함량(strength)·품질(quality)·순도(purity) 등 핵심 GMP 용어는 국문(영문) 병기.
+     ⛔ **`violations_ko` 는 필수다 — 빠지면 그 주 브리프 "전체"가 발행되지 않는다**(2026-08-24
+     신설: 병합층 #670 이후에도 이 지시가 없어 08-24 발행분 WL 5카드·14표제문이 영문 단독으로
+     나갔다). 483 `observations_ko` 와 동일한 2겹 브리프 단위 차단이다:
+       · `web/render.py: validate_wl_violations` — 배포 빌드 fail-closed. 어느 위반이든
+         `statement_ko` 누락이면 **사이트 빌드 전체가 FAIL**.
+       · `assemble_publish_brief: _lint_wl_violation_ko`(게이트 6) — 조립 단계에서 같은 규약 선행 검출.
+     심층분석 4섹션이 게이트에서 FAIL 해 drop 되더라도 `violations_ko` 는 별도 층으로 살아
+     병합된다 — 분석이 자신 없는 카드라도 위반 표제 번역만은 반드시 채운다.
 브릿지 게이트에서 FAIL 한 카드는 심층분석 없이 6슬롯만으로 발행된다(카드 단위 graceful degrade —
 브리프는 안 막힌다). 이 단계는 6슬롯 산출물·규칙을 전혀 바꾸지 않는다(순수 additive).
 (참고: python·서브에이전트가 있는 Claude Code 세션이라면 격리 fan-out CLI
@@ -610,11 +626,13 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
     설정한 뒤 다시 쿼리해 확인한다. **DB 쿼리에 잡히는 것을 확인하기 전에는 이 단계를 끝내지 않는다.**
   - 본문에 **코드 블록 1개**로 네 [산출물] 슬롯 델타 JSON 을 그대로 붙여넣는다(형태 불변 —
     `{"cards":{"<card.id>":{...슬롯...}},"tldr":[...]}`, `publish_date` 키를 최상위에 추가해도 무방).
-  - [2단계] 심층분석(deep_analysis)을 수행했다면, **같은 페이지에 두 번째 코드 블록**으로
-    `{"<web_card_id>":{"deep_analysis":{...4섹션...}}}` 델타를 추가로 붙인다
-    (별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
+  - [2단계] 심층분석(deep_analysis)·상세 국문 병기(④ `ncr_ko` · ⑤ `violations_ko`)를 수행했다면,
+    **같은 페이지에 두 번째 코드 블록**으로
+    `{"<web_card_id>":{"deep_analysis":{...4섹션...},"violations_ko":[...]}, "<다른 id>":{"ncr_ko":{...}}}`
+    델타를 추가로 붙인다(번역층은 항목 최상위 — `deep_analysis` 안에 중첩 금지.
+    별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
     `source_text`(원문 전사)는 **넣지 않는다** — 브릿지가 handoff 에서 직접 읽는다([2단계] ③).
-    심층분석이 없으면(대다수 주) 이 블록은 생략 — 정상.
+    심층분석·번역 대상이 없으면(그런 주) 이 블록은 생략 — 정상.
   - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
     **기존 `OPEN GRM Web Delta {date}` 페이지 본문을 덮어쓴다**(handoff 의 upsert 규약과 동형).
   - 이 예치는 [Status 갱신]·handoff CONSUMED 처리와 **별개**다 — 델타 페이지의 CONSUMED 전환은
@@ -643,6 +661,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 ### 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-08-24 | **WL 위반항목 국문 병기 단계 ⑤ 신설(§B `[2단계]` WL 스키마 줄 표시·⑤·`[산출물 예치]` deep 블록 예시만 · 6슬롯·4섹션 규칙·코드 산출 형태 불변)**: 웹 카드의 WL "위반항목 상세" 블록은 `statement_ko` 병기 슬롯·병합층(`inject_slots._merge_wl_violation_translations`, #670)이 2026-08-10 부터 있었는데, **이 프롬프트가 산출을 지시한 적이 없어** 라우틴이 채널을 한 번도 채우지 않았다(08-10 은 손 백필 2/3카드, 08-24 발행분 5카드·14표제문 전건 영문 단독 — 세 주 연속 `violations_ko` 미생산의 근본 원인). 수리 = handoff 가 `wl_violation_translation_ready`/`wl_violation_translation_input`(`[{number, statement}]` — 발행 카드 결정론 블록과 같은 producer)을 싣고(코드), ⑤ 가 `violations_ko: [{number, statement_ko}]` 를 deep 델타 항목 최상위에 예치하도록 지시하며, 2겹 게이트(`assemble_publish_brief._lint_wl_violation_ko` 게이트 6 + `web/render.validate_wl_violations` 배포 fail-closed)가 결손을 **브리프 단위 차단**으로 끌어올린다(WL 템플릿의 조용한 영문 degrade 가 결손을 5주 살렸다 — 483 과 동일 구조로 정렬). 과거 발행분(06-26~08-24, 14카드 44표제문)은 결정론 백필 CLI(`backfill_wl_violation_ko.py`)로 소급 병기 완료. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영 — 반영 전 첫 월요일 발행은 게이트 6 에 막힐 수 있으니 재-붙여넣기를 머지 직후 수행할 것). |
 | 2026-07-27 | **델타 카드 키를 `web_card_id` 로 명시(§B [출력] envelope 규칙·예시·[2단계] deep 키·[산출물 예치] 표기만 · 6슬롯 규칙·코드 불변)**: 카드 키 회귀가 2026-07-13·07-27 **두 번** 발생해 발행이 전건 거부됐다(07-27 = 103장 전량, 사람이 순수 rename 패치로 수습). 원인은 Routine 의 실수가 아니라 **명명 충돌**이다 — handoff row 에 `card_id` 라는 필드가 있고 그 값이 `Source::document_id`(예: `FDA 483::fda483-193813`)인데, 프롬프트는 "카드 키 = `card.id`(=`document_id`)"라고만 적어 눈앞의 `card_id` 를 쓰는 독법이 자연스러웠다. 수리 = handoff 가 **모호하지 않은 `web_card_id`(=bare document_id)를 별도 필드로 노출**하고(코드), 프롬프트가 **그 필드명을 그대로 지시**한다 + `card_id` 금지를 예시와 함께 명시. 안전망으로 델타 브릿지가 `::` 접두사 키를 자동 정규화(무손실·충돌 시 포기·WARN 로그로 회귀 가시화)하므로, 이 프롬프트 반영 전에도 발행은 막히지 않는다. 순수 doc 문구 — 슬롯 의미·가드·수명주기 불변. **사람 운영 routine 재-붙여넣기 후 적용**. |
 | 2026-07-25 | **483 `observations_ko` 를 `(선택)`→`★필수` 로 정정(§B `[2단계]` FDA 483 스키마 줄만 · 6슬롯·[출력]·코드·골든 불변)**: 2026-07-14 에 `render.py` fail-closed 발행 게이트(`validate_483_observations`)가 배포되면서 이 필드는 **사실상 필수**가 됐고 483 정본 프롬프트(`GRM_Prompt_DeepFda483_v1.md` §2)도 "필수·게이트 검증 대상"으로 고쳐졌으나, **클라우드 Routine 이 실제로 실행하는 이 v16 프롬프트만 `(선택)` 인 채 남아 있었다** — 2026-07-20 주간발행 3중 차단 중 하나(deep 백필이 분석 4섹션만 만들어 관찰 번역 누락 → 그 주 브리프 전체 발행 차단)의 잔여 원인. 2026-07-25 발행 리허설에서 재현 확인(관찰 20건 누락 시 사이트 빌드 전체 FAIL). 정정 내용 = 스키마 표기 `★필수` + 두 게이트(`render.py` 배포 fail-closed · `assemble_publish_brief._lint_483_observation_ko` 조립 선행)가 **카드 단위 degrade 가 아니라 브리프 단위 차단**임을 명시 + 형식(`number` 1:1 매칭 `[{number,deficiency_ko,detail_ko}]`) + **4섹션이 D1/D2 로 drop 돼도 `observations_ko` 는 별도 층으로 병합되므로 분석이 자신 없어도 관찰 번역은 반드시 채울 것** 명시. 순수 doc 문구 — 코드·테스트·골든 불변. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영). |
 | 2026-06-05 | G3 초안 작성(Cowork). 카드별 6슬롯 루프 + A안 조립(render_order/group_label) + 검색 카드 미니 템플릿 + 🔮 표 비카드 전용 + K4 경계 고지. 검색/Fetch 기계는 v15.8 이관. Codex 판정 플래그 F-1(Tier 1 생략)·F-2(Watch 비중복) |

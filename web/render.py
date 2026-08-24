@@ -3299,6 +3299,46 @@ def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str
     return violations
 
 
+class WlViolationValidationError(ValueError):
+    """WL 위반항목 국문 병기 게이트 위반 — fail-closed. main() 전용(하단 참조)."""
+
+
+def validate_wl_violations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
+    """WL 위반항목 블록 발행 게이트 — `validate_483_observations` 의 WL 판(순수 함수).
+
+    [2026-08-24] WL 은 템플릿이 영문 단독으로 조용히 degrade 해서, 국문 병기 결손이 5주를
+    살았다(병합층 #670 신설 후에도 라우틴 미생산 — 08-24 발행분 5카드 14표제문 전건 영문).
+    483 과 같은 2겹으로 끌어올린다: 조립 선행검출(`assemble_publish_brief._lint_wl_violation_ko`)
+    + 여기 배포 fail-closed. 과거 발행분은 2026-08-24 소급 백필로 전건 병기 완료 상태라
+    전 브리프 무조건 검사가 안전하다.
+
+    검사 대상 = deterministic_detail.type == "wl_violations" 인 카드의 violations 각 건:
+      1. statement_ko 비어있음 → MISSING_STATEMENT_KO
+    """
+    violations: list[str] = []
+
+    def _check_card(card: dict[str, Any], brief_label: str) -> None:
+        dd = card.get("deterministic_detail")
+        if not isinstance(dd, dict) or dd.get("type") != "wl_violations":
+            return
+        card_id = card.get("id") or card.get("render_order") or "?"
+        for v in (dd.get("violations") or []):
+            num = v.get("number", "?")
+            if not (isinstance(v.get("statement_ko"), str) and v.get("statement_ko").strip()):
+                violations.append(
+                    f"{brief_label} / card {card_id} / violation #{num}: MISSING_STATEMENT_KO")
+
+    for item in cards_or_briefs:
+        if "brief" in item and "cards" in item:
+            label = item["brief"].get("publish_date") or item["brief"].get("run_date_kst") or "?"
+            for card in (item.get("cards") or []):
+                _check_card(card, label)
+        else:
+            _check_card(item, "?")
+
+    return violations
+
+
 def _validate_briefs_or_raise(data_dir: Path) -> None:
     """main() 전용 fail-closed 게이트 호출부. 실제 배포 대상(`--data`) 브리프를 로드해
     검증하고, 위반이 하나라도 있으면 즉시 raise(빌드 전체 실패 → CI red)."""
@@ -3308,6 +3348,12 @@ def _validate_briefs_or_raise(data_dir: Path) -> None:
         raise Fda483ObservationValidationError(
             "483 Observation 발행 게이트 위반 — 발행 차단(brief file / card id / "
             "observation number / fail code):\n" + "\n".join(f"  · {v}" for v in violations)
+        )
+    wl_violations = validate_wl_violations(briefs)
+    if wl_violations:
+        raise WlViolationValidationError(
+            "WL 위반항목 국문 병기 게이트 위반 — 발행 차단(brief file / card id / "
+            "violation number / fail code):\n" + "\n".join(f"  · {v}" for v in wl_violations)
         )
 
 

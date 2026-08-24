@@ -356,6 +356,22 @@ def normalize_deep_key_namespace(deep: "dict[str, Any] | None") -> int:
 _TRANSLATION_ONLY_KEYS = ("observations_ko", "ncr_ko", "violations_ko", "source_text")
 
 
+_TRANSLATION_LAYER_KEYS = ("observations_ko", "ncr_ko", "violations_ko")
+
+
+def _keep_translation_residue(kept: dict[str, Any], doc: str, entry: dict[str, Any]) -> bool:
+    """분석 게이트 FAIL/오류 entry 에서 번역층(+동반 `source_text`)만 추려 살린다. 살렸으면 True.
+
+    번역(`_TRANSLATION_LAYER_KEYS`)은 결정론 원문의 국문 병기라 분석과 독립이고, 함께 실린
+    `source_text` 는 조립의 결정론 재추출(`_refresh_*`)·병합 짝의 기준선이라 같이 남긴다.
+    **번역층이 하나도 없으면 종전대로 통째 drop**(False) — source_text 만 남기면 어느 계층도
+    소비하지 않는 빈 껍데기 항목이 deep 파일에 쌓이고 "PASS 0건 → None" 계약도 깨진다."""
+    if not any(k in entry for k in _TRANSLATION_LAYER_KEYS):
+        return False
+    kept[doc] = {k: entry[k] for k in _TRANSLATION_ONLY_KEYS if k in entry}
+    return True
+
+
 def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
     """deep 델타 각 카드를 `verify_deep_analysis` 게이트에 통과시켜 **PASS 만** 남긴다.
 
@@ -394,16 +410,38 @@ def _gate_deep_analysis(deep: dict[str, Any]) -> "dict[str, Any] | None":
             log("WARN", f"deep 델타 항목에 검증 대상 키 없음 — 카드 drop: {doc}")
             continue
         da = entry.get("deep_analysis")
+        # [중첩 예치 방어 2026-08-24] 번역층(`observations_ko`/`violations_ko`)이 4섹션 dict
+        # **안에** 실려 오면 entry 층으로 끌어올린다 — 프롬프트 스키마 줄이 483 의
+        # `observations_ko` 를 4섹션과 나란히 나열하고 있어 중첩 예치가 자연스러운 오독이고,
+        # 중첩된 채로는 inject(`payload.get(...)` — entry 층만 본다)가 못 봐 번역이 조용히
+        # 죽는다(fanout 경로의 `da.pop("observations_ko")` 리프팅과 동형 방어).
+        if isinstance(da, dict):
+            for t_key in ("observations_ko", "violations_ko"):
+                nested = da.pop(t_key, None)
+                if nested and t_key not in entry:
+                    entry[t_key] = nested
         source = entry.get("source_text", "")
         try:
             gate = _vda.run_deep_analysis_gate(da, source, card_type=None)
         except Exception as e:  # noqa: BLE001 — 게이트 자체 오류는 그 카드만 drop(브리프 비차단)
-            log("WARN", f"deep 게이트 실행 오류 — 카드 drop: {doc} ({e})")
+            if _keep_translation_residue(kept, doc, entry):
+                log("WARN", f"deep 게이트 실행 오류 — 분석 drop·번역/원문 층은 보존: {doc} ({e})")
+            else:
+                log("WARN", f"deep 게이트 실행 오류 — 카드 drop: {doc} ({e})")
             continue
         if getattr(gate, "ok", False):
             kept[doc] = entry
         else:
-            log("WARN", f"deep 게이트 FAIL — 카드 drop: {doc}\n{getattr(gate, 'report', '')}")
+            # [번역층 독립 2026-08-24] 분석이 FAIL 해도 번역/원문 층(`_TRANSLATION_ONLY_KEYS`)은
+            # 살린다 — 종전엔 entry 통째 drop 이라, 프롬프트가 약속한 "4섹션이 drop 되더라도
+            # `observations_ko` 는 별도 층으로 살아 병합된다"가 이 경로에서 거짓이었다(483 은
+            # 그대로 render fail-closed 게이트에 걸려 **그 주 브리프 전체 차단**으로 번졌을
+            # 결함). 번역은 결정론 원문의 국문 병기일 뿐이라 분석 게이트의 검증 대상이 아니다.
+            if _keep_translation_residue(kept, doc, entry):
+                log("WARN", f"deep 게이트 FAIL — 분석 drop·번역/원문 층은 보존: {doc}\n"
+                            f"{getattr(gate, 'report', '')}")
+            else:
+                log("WARN", f"deep 게이트 FAIL — 카드 drop: {doc}\n{getattr(gate, 'report', '')}")
     if not kept:
         log("INFO", "deep 게이트 통과 카드 0건 — deep 델타 없음 처리(6슬롯만 발행)")
         return None

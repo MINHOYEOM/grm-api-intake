@@ -4232,13 +4232,140 @@
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Lupin Ltd",
-    "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
+    "확인 상태: 실사 결론·항목별 요약 17건 수록 — WHO 완제의약품 GMP 적합 판정"
    ],
    "implication": "WHOPIR 은 공급처의 GMP 실사 결과를 외부에서 직접 확인할 수 있는 몇 안 되는 공개 문서다. 해당 제조소에서 원료나 완제를 공급받는다면 보고서 본문의 지적 영역을 공급자 평가에 반영해 둘 필요가 있다.",
    "checks": [
     "WHOPIR 본문의 지적 영역 확인",
     "해당 제조소 공급 품목의 공급자 평가 갱신"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "FINAL CONCLUSION – INSPECTION OUTCOME Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Lupin Ltd (Chikalthana) located at A-28/1 MIDC Industrial Area, Chikalthana, Chhatrapati Sambhajinagar, 431210, India was considered to be operating at an acceptable level of the WHO guideline on Good Manufacturing Practices (GMP) for finished pharmaceutical products. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Pharmaceutical quality system (PQS)",
+      "text": "At Lupin Limited (Chikalthana), in general, there was a comprehensively designed and correctly implemented pharmaceutical quality system (PQS) incorporating GMP and QRM. Lupin Limited (Chikalthana) assumed responsibility for the quality of the pharmaceutical products and ensured that they are fit for their intended use, comply with the requirements of the marketing authorization and did not place patients at risk due to inadequate safety, quality or efficacy. The attainment of this quality objective was the responsibility of senior management. …",
+      "text_ko": "Lupin Limited(Chikalthana)에는 전반적으로 GMP 와 품질위험관리(QRM)를 아우르는, 포괄적으로 설계되고 올바르게 구현된 의약품 품질시스템(PQS)이 있었다. 회사는 의약품 품질에 대한 책임을 지고, 제품이 의도된 용도에 적합하며 품목허가 요건을 준수하고 안전성·품질·유효성 미비로 환자를 위험에 빠뜨리지 않도록 보증했다. 이 품질 목표의 달성은 최고경영진의 책임이었다. …",
+      "title_ko": "의약품 품질시스템(PQS)"
+     },
+     {
+      "no": 2,
+      "title": "Good manufacturing practices for pharmaceutical products",
+      "text": "In general, Lupin Limited (Chikalthana) applied the main concepts and principles of GMP aiming primarily at managing and minimizing the risks inherent in pharmaceutical manufacture to ensure the quality, safety and efficacy of products. Under GMP, the following activities were implemented: • all manufacturing processes were clearly defined, systematically reviewed for associated risks in the light of scientific knowledge and experience, and shown to be capable of consistently manufacturing pharmaceutical products of the required quality that comply with their specifications; • qualification an …",
+      "text_ko": "전반적으로 회사는 의약품 제조에 내재된 위험을 관리·최소화해 제품의 품질·안전성·유효성을 확보하는 것을 최우선으로 GMP 의 핵심 개념과 원칙을 적용하고 있었다. GMP 하에서 모든 제조 공정이 명확히 정의되고 과학적 지식과 경험에 비추어 관련 위험을 체계적으로 검토받았으며, 규격에 적합한 품질의 의약품을 일관되게 제조할 수 있음이 입증돼 있었다. …",
+      "title_ko": "의약품 GMP 일반"
+     },
+     {
+      "no": 3,
+      "title": "Sanitation and hygiene",
+      "text": "In general, a high level of sanitation and hygiene was practised in every aspect of the manufacture of pharmaceutical products at Lupin Limited (Chikalthana). The scope of sanitation and hygiene covered personnel, premises, equipment and apparatus, production materials and containers, products for cleaning and disinfection, and anything that could become a source of contamination to the product. Potential sources of contamination were eliminated through an integrated comprehensive programme of sanitation and hygiene. …",
+      "text_ko": "전반적으로 의약품 제조의 전 영역에서 높은 수준의 위생 관리가 실천되고 있었다. 위생 관리의 범위는 인력, 시설, 설비·기구, 생산 자재와 용기, 세척·소독용 제품 등 제품의 오염원이 될 수 있는 모든 것을 포괄했다. 잠재적 오염원은 통합적·포괄적 위생 프로그램을 통해 제거됐다. …",
+      "title_ko": "위생 관리"
+     },
+     {
+      "no": 4,
+      "title": "Qualification and validation",
+      "text": "Lupin Limited (Chikalthana) identified what qualification and validation work was required to prove that the critical aspects of their particular operation were controlled. A validation master plan (VMP) documented and clearly defined the key elements of a qualification and validation programme of Lupin Limited (Chikalthana). The VMP included a commitment to maintain continued validation status as well as clear roles and responsibilities to undertake the qualification and validation activities. …",
+      "text_ko": "회사는 운영의 중요 측면이 관리되고 있음을 입증하기 위해 어떤 적격성평가·밸리데이션 작업이 필요한지 식별했다. 밸리데이션 마스터플랜(VMP)이 적격성평가·밸리데이션 프로그램의 핵심 요소를 문서화하고 명확히 정의했으며, 밸리데이션 상태를 지속 유지한다는 약속과 수행 역할·책임을 담고 있었다. …",
+      "title_ko": "적격성평가 및 밸리데이션"
+     },
+     {
+      "no": 5,
+      "title": "Complaints",
+      "text": "All complaints and other information concerning potentially defective products were carefully reviewed by quality unit in accordance with written procedures. Corrective actions were taken where applicable. Written procedures describing the action to be taken, including the need to consider a recall, in the case of a complaint concerning a possible product defect were in place. A person was designated as being responsible for handling the complaints and deciding the measures to be taken. …",
+      "text_ko": "잠재적 결함 제품에 관한 모든 불만과 기타 정보는 문서화된 절차에 따라 품질부서가 신중히 검토했고, 해당되는 경우 시정조치가 취해졌다. 제품 결함 가능성이 있는 불만의 경우 회수 필요성 검토를 포함해 취할 조치를 기술한 문서화된 절차가 갖춰져 있었다. 불만 처리와 조치 결정을 책임지는 담당자가 지정돼 있었다. …",
+      "title_ko": "불만 처리"
+     },
+     {
+      "no": 6,
+      "title": "Product recalls",
+      "text": "This subject was not covered during the inspection due to time constraint.",
+      "text_ko": "이 항목은 시간 제약으로 이번 실사에서 다뤄지지 않았다.",
+      "title_ko": "제품 회수"
+     },
+     {
+      "no": 7,
+      "title": "Contract production, analysis and other activities",
+      "text": "This subject was not covered during the inspection due to time constraint. It was noted, though, that no production activities and few testing activities were contracted out by Lupin Limited (Chikalthana).",
+      "text_ko": "이 항목은 시간 제약으로 이번 실사에서 다뤄지지 않았다. 다만 회사는 생산 활동을 외부에 위탁하지 않았고 시험 활동도 소수만 위탁하고 있는 것으로 확인됐다.",
+      "title_ko": "수탁 생산·분석 및 기타 활동"
+     },
+     {
+      "no": 8,
+      "title": "Self-inspection, quality audits, and suppliers’ audits and approval",
+      "text": "This subject was not covered during the inspection due to time constraint.",
+      "text_ko": "이 항목은 시간 제약으로 이번 실사에서 다뤄지지 않았다.",
+      "title_ko": "자체점검·품질감사·공급업체 감사 및 승인"
+     },
+     {
+      "no": 9,
+      "title": "Personnel",
+      "text": "Lupin Limited (Chikalthana) had a well-established organization chart along with adequate number of personnel. Key posts, including heads of production, the heads of quality, comprising the quality assurance and quality control functions, as well as the authorized person, were occupied by full-time personnel. The heads of production and quality were independent of each other. Personnel at Lupin Limited (Chikalthana) had the necessary qualifications and practical experience to carry out all the manufacturing, including production and control, tasks. …",
+      "text_ko": "회사는 잘 정비된 조직도와 충분한 인력을 갖추고 있었다. 생산 책임자, 품질보증·품질관리를 아우르는 품질 책임자, 출하승인권자(authorized person) 등 핵심 직위는 전임 인력이 맡고 있었고, 생산 책임자와 품질 책임자는 서로 독립적이었다. 인력은 생산·관리를 포함한 제조 업무 전반을 수행하는 데 필요한 자격과 실무 경험을 갖추고 있었다. …",
+      "title_ko": "인력"
+     },
+     {
+      "no": 10,
+      "title": "Training",
+      "text": "This subject was not covered during the inspection due to time constraints.",
+      "text_ko": "이 항목은 시간 제약으로 이번 실사에서 다뤄지지 않았다.",
+      "title_ko": "교육훈련"
+     },
+     {
+      "no": 11,
+      "title": "Personal hygiene",
+      "text": "Personnel underwent health examinations prior to and during employment including periodic eye check of personnel conducting visual inspections. Training in personal hygiene was provided to all personnel, and high level of personal hygiene was observed by all those concerned with manufacturing processes. Personnel was instructed to wash their hands before entering production areas. Instructions and pictograms to this effect were posted and complied with. …",
+      "text_ko": "인력은 채용 전과 재직 중 건강검진을 받았고, 육안검사 수행 인력에 대한 정기 시력검사도 포함됐다. 전 인력에게 개인 위생 교육이 제공됐으며 제조 공정 관련자 전원이 높은 수준의 개인 위생을 지키고 있었다. 생산 구역 입장 전 손 씻기가 지시돼 있었고, 관련 지침과 픽토그램이 게시·준수되고 있었다. …",
+      "title_ko": "개인 위생"
+     },
+     {
+      "no": 12,
+      "title": "Premises",
+      "text": "In general, the premises were appropriately located, designed, constructed, adapted, and maintained to suit the operations being carried out. The layout, design, and construction of the premises minimized the risk of errors, enabled effective cleaning, sanitation, and maintenance, and thereby helped prevent cross-contamination and reduced the accumulation of dust or dirt. Where dust was generated (e.g. …",
+      "text_ko": "전반적으로 시설은 수행 작업에 맞게 적절히 배치·설계·건축·개조·유지되고 있었다. 시설의 배치·설계·구조는 오류 위험을 최소화하고 효과적인 세척·위생·유지보수를 가능하게 해 교차오염을 방지하고 먼지·오물의 축적을 줄였다. …",
+      "title_ko": "시설"
+     },
+     {
+      "no": 13,
+      "title": "Equipment",
+      "text": "Equipment was located, designed, constructed, adapted and maintained to suit the operations to be carried out. The layout and design of equipment aimed to minimize the risk of errors and permit effective cleaning and maintenance in order to avoid cross-contamination, build-up of dust or dirt, and, in general, any adverse effect on the quality of products. Non-dedicated equipment was cleaned according to validated cleaning procedures between being used for production of different pharmaceutical products to prevent cross-contamination. …",
+      "text_ko": "설비는 수행 작업에 맞게 배치·설계·제작·개조·유지되고 있었다. 설비의 배치와 설계는 오류 위험을 최소화하고 효과적인 세척·유지보수를 가능하게 해 교차오염과 먼지·오물 축적, 그리고 제품 품질에 대한 악영향 일반을 방지하는 것을 목표로 했다. 비전용 설비는 서로 다른 의약품의 생산 사이에 밸리데이션된 세척 절차에 따라 세척돼 교차오염을 방지했다. …",
+      "title_ko": "설비"
+     },
+     {
+      "no": 14,
+      "title": "Materials",
+      "text": "Materials were properly managed at Lupin Limited (Chikalthana) in terms of receipt, quarantine, testing, storage, release and dispensing. An enterprise resource management programme (SAP) was used for materials management, including provisions for quarantine and release. Dedicated materials sampling areas were available at the raw materials warehouse while dispensing was performed at dedicated dispensing areas at the production suite.",
+      "text_ko": "자재는 입고·격리·시험·보관·출하승인·불출 전반에 걸쳐 적절히 관리되고 있었다. 자재 관리에는 격리·출하승인 조항을 포함해 전사적 자원관리 프로그램(SAP)이 사용됐다. 원자재 창고에 전용 검체 채취 구역이 있었고, 불출(칭량)은 생산동의 전용 구역에서 수행됐다.",
+      "title_ko": "자재"
+     },
+     {
+      "no": 15,
+      "title": "Documentation",
+      "text": "Documentation was covered as part of the inspection of other GMP elements/subjects. In general, good documentation practices were implemented at Lupin Limited (Chikalthana). Documents in the form of specifications and testing procedures of starting materials, intermediates and finished products; master formulae; packaging instructions; batch manufacturing records; batch packaging records and SOPs were approved, signed and dated by the appropriate responsible persons with unambiguous contents. Documents were regularly reviewed and kept up to date.",
+      "text_ko": "문서화는 다른 GMP 요소 실사의 일부로 다뤄졌다. 전반적으로 우수 문서화 관행이 구현돼 있었다. 출발물질·중간체·완제품의 규격과 시험 절차, 마스터 처방, 포장 지시서, 배치 제조기록, 배치 포장기록, 표준작업지침서 등의 문서가 해당 책임자에 의해 승인·서명되고 일자가 기재됐으며 내용이 명확했다. 문서는 정기적으로 검토되고 최신 상태로 유지됐다.",
+      "title_ko": "문서화"
+     },
+     {
+      "no": 16,
+      "title": "Good practices in production",
+      "text": "Production operations, including receipt and cleaning, quarantine, sampling, storage, dispensing and labelling, processing and packaging followed clearly defined procedures in accordance with the applicable manufacturing and marketing authorizations as well as WHO prequalification provisions and commitments. Deviations from instructions or procedures were documented, investigated and decided upon, including provisions to extend the investigation to other batches of the same product and other products that might have been associated with the specific deviation. …",
+      "text_ko": "입고·세척, 격리, 검체 채취, 보관, 불출·표시, 가공, 포장을 포함한 생산 작업은 해당 제조·품목허가 및 WHO 사전적격성 조건·약속에 부합하는, 명확히 정의된 절차를 따랐다. 지시·절차로부터의 일탈은 문서화·조사·판정됐으며, 같은 제품의 다른 배치와 해당 일탈에 연관됐을 수 있는 다른 제품으로 조사를 확장하는 조항을 포함했다. …",
+      "title_ko": "생산 우수 실무"
+     },
+     {
+      "no": 17,
+      "title": "Good practices in quality control",
+      "text": "The quality control was independent from production at Lupin Limited (Chikalthana). The QC operations were under the authority of a person (Head QC) with appropriate qualifications and experience. QC was in charge of sampling, inspecting, and testing starting materials, packaging materials, and intermediate, bulk, and finished products, and for monitoring environmental conditions for GMP purposes. …",
+      "text_ko": "품질관리(QC)는 생산으로부터 독립돼 있었다. QC 운영은 적절한 자격과 경험을 갖춘 책임자(Head QC)의 권한 아래 있었으며, QC 는 출발물질·포장자재·중간체·벌크·완제품의 검체 채취·검사·시험과 GMP 목적의 환경 모니터링을 담당했다. …",
+      "title_ko": "품질관리 우수 실무"
+     }
+    ],
+    "outcome_ko": "최종 결론 — 실사 결과: 실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 인도 Chhatrapati Sambhajinagar 시 Chikalthana 소재 Lupin Ltd(Chikalthana)는 WHO 완제의약품 GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -4290,13 +4417,20 @@
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Zhejiang Keming Biopharmaceuticals",
-    "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
+    "확인 상태: 실사 결론 수록 — WHO GMP 적합 판정(항목별 요약은 원문 참조)"
    ],
    "implication": "WHO 사전적격성 경로를 통해 공급되는 제조소는 실사 결과가 공개돼 상시 검증이 가능하다. 바이오 원료·중간체를 이 제조소에서 도입한다면 보고서에서 실사 범위와 대상 품목을 확인해 둘 필요가 있다.",
    "checks": [
     "WHOPIR 에 기재된 실사 범위·대상 품목 확인",
     "바이오 원료 공급처 평가 자료 갱신"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Zhejiang Keming Biopharmaceuticals Co. Ltd located at 1 Dingshan Road, Yulin Subdistrict, Xinchang, Zhejiang, R.P. China was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for three years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [],
+    "outcome_ko": "실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 중국 저장성 신창 소재 Zhejiang Keming Biopharmaceuticals Co. Ltd 는 WHO GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -4348,13 +4482,30 @@
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site)",
-    "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
+    "확인 상태: 결론·인용 실사(TGA·USFDA) 수록 — SRA 실사증거 기반 평가"
    ],
    "implication": "이 보고서는 기업 단위가 아니라 특정 사업장(site) 단위로 실사가 이뤄지고 공개된다는 점을 보여준다. 복수 사업장을 가진 공급처를 평가할 때는 실제 공급 사업장이 실사 대상과 일치하는지 확인해 둘 필요가 있다.",
    "checks": [
     "공급 사업장과 실사 대상 사업장의 일치 여부",
     "사업장별 실사 이력 관리"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection 3-7 July 2023 Brief summary of manufacturing activities The manufacturing activities include the production of APIs (corticoids, progestogens, muscle relaxants) along with their testing, labeling, packaging, storage, and distribution. General information about the company and manufacturing site Taizhou Xianju Pharmaceutical Co. Ltd, is a subsidiary of Zhejiang Xianju Pharmaceutical Co., Ltd. Zhejiang Xianju Pharmaceutical Co., Ltd. was founded in 1972. It is a professional manufacturer of steroid products in China. Xianju Pharma is a comprehensive manufacturer of both APIs and finished pharmaceutical products (FPPs). Xianju Pharma has four production sites: (1) FPP Site (Formulation Business Division): the production site for finished pharmaceutical products (FPPs); (2) Yangfu API Site: the production site for APIs and intermediates; (3) Taizhou Xianju Site: the production site for APIs and intermediates. During the last WHO onsite inspection it was noted that Taizhou Xianju Pharmaceutical Co., Ltd was separated into four sections based on their function. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "Australian Government Department of Health TGA",
+      "dates": "30/01/2024 to 02/02/2024"
+     },
+     {
+      "authority": "United States Food and Drug Administration USFDA",
+      "dates": "11/11/2024 to 15/11/2024"
+     }
+    ],
+    "outcome_ko": "최근 WHO 실사 요약 — 일자 및 결론: 2023년 7월 3~7일. 제조 활동 요약: 원료의약품(코르티코이드, 프로게스토겐, 근이완제)의 생산과 그 시험·표시·포장·보관·유통. 회사·제조소 일반 정보: Taizhou Xianju Pharmaceutical Co. Ltd 는 Zhejiang Xianju Pharmaceutical Co., Ltd. 의 자회사다. Zhejiang Xianju Pharmaceutical 은 1972년 설립된 중국의 스테로이드 전문 제조사로, 원료의약품과 완제의약품을 모두 제조한다. 생산 사이트는 (1) 완제 사업부의 FPP 사이트, (2) 원료·중간체의 Yangfu API 사이트, (3) 원료·중간체의 Taizhou Xianju 사이트 등 4곳이다. 직전 WHO 현장 실사에서 Taizhou Xianju 사이트는 기능에 따라 4개 구역으로 구분돼 있는 것으로 확인됐다. …"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -4406,13 +4557,30 @@
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Strides Pharma Science Limited",
-    "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
+    "확인 상태: 결론·인용 실사(IGJ Netherlands·Anvisa) 수록 — SRA 실사증거 기반 평가"
    ],
    "implication": "국제조달용 공급처에 대한 실사 결과가 공개 문서로 계속 축적되고 있다. 국제조달·수출용 품목을 위탁 생산한다면 위탁처의 WHOPIR 공개 여부와 최신 판을 정기적으로 확인해 둘 필요가 있다.",
    "checks": [
     "위탁처 WHOPIR 최신 판 확인",
     "국제조달용 품목의 위탁처 실사 이력 정리"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Comments/observations on the scope and comprehensiveness of the inspection report and on the appropriateness of the CAPAs in lieu of an onsite inspection by WHO: Date and conclusion of most recent WHO inspection The site was last inspected onsite by WHO PQ from 13 to 17 06 2016. The conclusion was that the site is compliant. This site has since undergone several changes as described in the Netherland’s inspection report and variations were also submitted for the prequalified products manufactured by this site. Summary of key information about the site According to the Site Master File (SMF): STRIDES PHARMA SCIENCE LIMITED, is global pharmaceutical Company headquartered in Bangalore, India. The Company has two business verticals, viz., Regulated Markets and Emerging Markets. The Company has a global manufacturing footprint with 7 manufacturing facilities spread across four continents. Strides is involved in the development and manufacture of a wide range of nutritional and pharmaceutical products. The Plant located at Suragajakkanahalli, near Bangalore is described by the company as a state-of-the-art facility in India. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "Health and Youth Care Inspectorate (IGJ Netherlands)",
+      "dates": "15 to 18 April 2024"
+     },
+     {
+      "authority": "Anvisa",
+      "dates": "18 to 22 November 2024"
+     }
+    ],
+    "outcome_ko": "WHO 현장 실사를 갈음하는 실사보고서의 범위·포괄성 및 CAPA 적정성에 대한 코멘트: 최근 WHO 실사 일자 및 결론 — 이 제조소는 2016년 6월 13~17일 WHO PQ 의 현장 실사를 마지막으로 받았고 결론은 적합이었다. 이후 네덜란드 당국의 실사보고서에 기술된 여러 변경이 이 제조소에 있었고, 여기서 제조되는 사전적격성 품목에 대한 변경(variation)도 제출됐다. 제조소 핵심 정보 요약 — Site Master File 에 따르면 STRIDES PHARMA SCIENCE LIMITED 는 인도 방갈로르에 본사를 둔 글로벌 제약사로, 규제시장과 신흥시장의 두 사업 부문을 두고 4개 대륙에 7개 제조시설을 운영한다. 다양한 영양·의약품의 개발과 제조에 관여하며, 방갈로르 인근 Suragajakkanahalli 공장을 회사는 인도의 최신 설비 시설로 소개한다. …"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

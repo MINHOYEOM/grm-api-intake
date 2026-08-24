@@ -353,9 +353,13 @@ class InjectDeepAnalysisTest(unittest.TestCase):
         self.assertIsNone(card["deep_analysis"])   # 병합 보류 — 6슬롯만 발행
 
         # 같은 카드라도 original 이 표제문을 넘어 본문까지 발췌하면 병합된다.
+        # (description 은 D5d 완역 하한을 만족하는 원문 완역으로 — 요약이면 D5d 가 막는다.)
         ok_da = dict(_GOOD_DELTA_DA)
         ok_da["key_violations"] = [
-            dict(_GOOD_DELTA_DA["key_violations"][0], original=stmt + " " + body)]
+            dict(_GOOD_DELTA_DA["key_violations"][0], original=stmt + " " + body,
+                 description=("귀사는 배치가 규격에 미달한 불일치를 철저히 조사하지 "
+                              "않았다(21 CFR 211.192). 조사관은 미생물 시험기록 검토 중 "
+                              "원자료 기록지의 공란들을 확인했다."))]
         report2 = inj.inject_deep_analysis(
             self.brief, {self.doc_id: {"deep_analysis": ok_da, "source_text": source}})
         self.assertEqual(report2.errors, [])

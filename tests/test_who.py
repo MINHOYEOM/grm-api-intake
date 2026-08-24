@@ -787,5 +787,32 @@ class WhopirRowDateTest(unittest.TestCase):
         self.assertIn("whopir_excerpt", w.LAST_HEALTH)
 
 
+class WhopirRawIsBareTest(unittest.TestCase):
+    """[보강본 가림 방지 2026-08-24] bare 재수집분 판정 — inmemory 캐시 제외 대상.
+
+    재수집된 WHOPIR 항목의 bare raw 가 inmemory 캐시로 Notion 의 보강본(whopir_report)을
+    가려 주간 스캐폴드 상세가 통째로 비던 결함(08-03 이후 발행분 전수)의 판정 함수."""
+
+    _BARE = {"channel": "whopir", "anchor_text": "Some Site",
+             "pdf_url": "https://extranet.who.int/x.pdf", "list_page": "https://x"}
+
+    def test_bare_whopir_payload_is_bare(self) -> None:
+        self.assertTrue(w.whopir_raw_is_bare(dict(self._BARE)))
+
+    def test_enriched_report_not_bare(self) -> None:
+        raw = dict(self._BARE, whopir_report={"type": "whopir_report"})
+        self.assertFalse(w.whopir_raw_is_bare(raw))
+
+    def test_excerpt_only_not_bare(self) -> None:
+        # 보강은 시도했으나 구조화가 안 된 항목(excerpt 만) — Notion 저장본과 같으므로 캐시 안전.
+        raw = dict(self._BARE, whopir_excerpt="deficiencies …")
+        self.assertFalse(w.whopir_raw_is_bare(raw))
+
+    def test_non_whopir_channels_not_bare(self) -> None:
+        self.assertFalse(w.whopir_raw_is_bare({"channel": "rss", "guid": "x"}))
+        self.assertFalse(w.whopir_raw_is_bare(None))
+        self.assertFalse(w.whopir_raw_is_bare("not-a-dict"))
+
+
 if __name__ == "__main__":
     unittest.main()

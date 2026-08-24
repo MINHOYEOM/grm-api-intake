@@ -542,7 +542,11 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
      ⚠️ **근거 규칙(브릿지 게이트가 검사)**: `citation`(WL·행정처분)은 그 카드 `body_full` 에 **글자
      그대로 있는 조항/법령/[별표N]만** 인용한다(원문에 없는 조항·다른 법령 = D2 하드 FAIL → 그
      카드 심층분석 통째 drop). 483 의 CFR `citation` 은 원문에 없어도 WARN(비차단·정당한 해석 허용).
-     `original` 은 `body_full` 문장을 verbatim 발췌(없으면 생략). 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
+     `original` 은 `body_full` 에서 **국문 `description` 이 요약한 모든 구체 사실의 근거 문장을 전부
+     담는 연속 구간**을 verbatim 발췌한다(없으면 생략). ⛔ **번호 매긴 위반 표제문 한 문장만 발췌 금지**
+     — 표제문은 결정론 위반항목 상세가 이미 원문 그대로 보여주며, 표제문만 발췌하면 화면의 원문↔국문
+     해석 쌍이 서로 다른 내용이 된다(2026-08-24 발행 사고: 19개 항목 전건). 이제 D5c 하드 FAIL —
+     original 이 표제문 범위를 못 벗어나면 그 카드 심층분석 통째 drop. 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
      `required_remediation` 은 반드시 `{deadline, items[]}` 객체(문자열 금지·items 비면 FAIL). 산문은 한국어.
      ⛔ **483 `observations_ko` 는 필수다 — 빠지면 그 주 브리프 "전체"가 발행되지 않는다**(2026-07-20
      실장애·2026-07-25 재현 확인). 아래 두 게이트가 카드 단위 degrade 가 아니라 **브리프 단위 차단**이다:

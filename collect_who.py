@@ -663,6 +663,23 @@ def _fetch_whopir_detail(pdf_url: str) -> tuple[str, "dict[str, Any] | None", st
     return excerpt, None, ("no-structure" if excerpt else "no-excerpt")
 
 
+def whopir_raw_is_bare(raw: Any) -> bool:
+    """[보강본 가림 방지 2026-08-24] 이 raw_payload 가 '보강 안 된 WHOPIR 재수집분'인지 판정.
+
+    WHOPIR 목록은 매일 전량 재수집되지만 PDF 보강(enrich_whopir_items)은 **신규 항목에만**
+    돈다. 그래서 기존 항목의 당일 raw 는 bare(channel/anchor_text/pdf_url/list_page)다 —
+    이것이 `grm_handoff.build_inmemory_raw` 를 타고 inmemory 캐시에 오르면
+    `attach_raw_to_rows` 의 메모리 우선 규칙이 Notion children 에 저장된 보강본
+    (whopir_report·whopir_excerpt)을 가려, 주간 스캐폴드의 WHOPIR 결정론 상세가 통째로
+    비었다(실측: 08-03 이후 발행 WHOPIR 카드 전수 "보고서 확인 필요" — 07-27 첫 발행 11장은
+    같은 런 보강 + #475 소급 복구로만 살았다). bare 판정된 항목은 캐시에서 빼서 fetch
+    폴백(=Notion 보강본)으로 흐르게 하는 것이 이 함수의 존재 이유다. 보강을 시도했지만
+    구조화가 안 된 항목(excerpt 만 보유)은 bare 가 아니다 — Notion 저장본과 같으므로
+    캐시해도 안전하다."""
+    return (isinstance(raw, dict) and raw.get("channel") == "whopir"
+            and "whopir_report" not in raw and "whopir_excerpt" not in raw)
+
+
 def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
     """[중복 제거 후 보강 2026-07-27] 넘겨받은 WHOPIR 항목만 PDF 를 받아 raw_payload 를 채운다.
 

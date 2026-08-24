@@ -597,6 +597,53 @@ def check_fda483_original_truncation(deep_analysis: dict[str, Any],
     return findings
 
 
+def check_heading_only_original(deep_analysis: dict[str, Any],
+                                wl_statements: "list[str] | None") -> list[Finding]:
+    """D5c(FAIL·WL 전용): original 이 결정론 위반 **표제문**(deterministic_detail.violations[]
+    .statement)의 범위를 벗어나지 못하면 병기쌍 파손으로 차단한다.
+
+    [2026-08-24 실사고] 발행본 WL 6장·19개 항목 전부가 original 로 번호 매긴 표제문(법조문
+    보일러플레이트) 한 문장만 발췌하고, 국문 description 은 표제 아래 본문 단락(구체 사실)을
+    요약했다 — 화면의 "원문 · 규제 원어" ↔ "국문 해석" 쌍이 서로 다른 내용이 됐다(사용자
+    지적: "국문 해석이 영문과 상이"). D4(WARN)·D5a(WARN)는 이를 보고도 차단하지 않아 그대로
+    발행됐다. 표제문은 결정론 층(위반항목 상세)이 이미 verbatim 으로 렌더하므로, deep 의
+    original 이 표제문 안에 머무는 발췌는 정보가 0 이면서 병기쌍만 깨뜨린다.
+
+    판정: 정규화한 original 이 어느 표제문(정규화)의 **부분문자열**이면 FAIL. 근거 있는
+    과거 정상 산출(07-27 16건·08-10 12건, 평균 715~854자)에는 단문·표제문 발췌가 0건이라
+    오탐 근거가 없다. 정당하게 표제문뿐인 항목은 프롬프트 계약대로 original 을 **생략**하면
+    된다(D5c 는 original 보유 항목만 본다 — 생략은 D1 FAIL 아님).
+
+    `wl_statements` 가 없으면(결정론 위반 블록 미보유 카드 — 예: "Failure to…" 서식) 대조
+    기준이 없으므로 검사하지 않는다(비교 불가를 위반으로 만들지 않는다)."""
+    findings: list[Finding] = []
+    if not wl_statements:
+        return findings
+    kv = deep_analysis.get("key_violations")
+    if not isinstance(kv, list):
+        return findings
+    statements_norm = [_normalize_original(s).lower()
+                       for s in wl_statements if isinstance(s, str) and s.strip()]
+    if not statements_norm:
+        return findings
+    for i, v in enumerate(kv):
+        if not isinstance(v, dict):
+            continue
+        orig = v.get("original")
+        if not isinstance(orig, str) or len(orig.strip()) < _MIN_ORIGINAL_LEN:
+            continue
+        orig_norm = _normalize_original(orig).lower()
+        if any(orig_norm in s for s in statements_norm):
+            snippet = orig.strip()[:60] + ("…" if len(orig.strip()) > 60 else "")
+            findings.append(Finding(
+                SEV_FAIL, "D5C-ORIGINAL-HEADING-ONLY",
+                f"key_violations[{i}]의 원문 병기(original) '{snippet}'가 결정론 위반 표제문 "
+                "범위를 벗어나지 못함 — 표제문은 위반항목 상세 블록이 이미 원문 그대로 보여주므로, "
+                "original 은 국문 해석(description)이 요약한 본문 문장들을 포함하는 연속 발췌여야 "
+                "한다(발췌할 본문이 없으면 original 을 생략)."))
+    return findings
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 게이트 실행
 # ─────────────────────────────────────────────────────────────────────────────
@@ -634,7 +681,8 @@ def format_report(findings: list[Finding]) -> str:
 
 
 def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
-                           card_type: "str | None" = None) -> GateResult:
+                           card_type: "str | None" = None,
+                           wl_statements: "list[str] | None" = None) -> GateResult:
     """카드 1건의 deep_analysis 를 원문(source_text=body_full)과 대조해 병합 가부 판정.
 
     FAIL 이 하나라도 있으면 이 카드의 deep_analysis 는 최종 브리프에 병합하지 않는다
@@ -643,6 +691,11 @@ def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
 
     `card_type` 미전달 시 산출물 키로 WL/admin 섹션 집합을 자동판별(resolve_required_sections)
     → 기존 WL 호출부(card_type 없음·fda_evaluation 보유)는 동작 완전 불변.
+
+    `wl_statements` = 그 카드 결정론 위반항목(deterministic_detail.violations[].statement)
+    목록(선택). 주면 D5c(표제문 단독 발췌 = FAIL)를 추가 검사한다 — 2026-08-24 발행 사고
+    (19개 항목 전부 표제문만 발췌 → 원문·국문 병기쌍 파손) 재발 방지. 미전달 시 기존 동작
+    완전 불변(additive).
     """
     sections = resolve_required_sections(deep_analysis, card_type)
     # FDA 483 은 CFR 인용이 원문에 없어도 정당한 해석일 수 있어 D2 를 WARN(비차단)으로 강등한다
@@ -661,6 +714,10 @@ def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
         # D5b: FDA 483 전용 original 절단 하드검증(FAIL) — WL/admin 은 이 절단 패턴이 구조적으로 없음.
         if sections is REQUIRED_SECTIONS_FDA483:
             findings.extend(check_fda483_original_truncation(deep_analysis, source_text))
+        # D5c: WL 전용 표제문 단독 발췌 하드검증(FAIL) — 결정론 표제문 목록을 받은 경우만
+        # (2026-08-24 원문·국문 병기쌍 파손 사고 재발 방지 · wl_statements 미전달 시 무영향).
+        if sections is REQUIRED_SECTIONS:
+            findings.extend(check_heading_only_original(deep_analysis, wl_statements))
     return GateResult(ok=not has_failures(findings), findings=findings,
                       report=format_report(findings))
 

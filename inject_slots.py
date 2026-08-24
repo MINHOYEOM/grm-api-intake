@@ -288,7 +288,15 @@ def inject_deep_analysis(brief: dict[str, Any],
         if not isinstance(da, dict):
             report.errors.append(f"deep_analysis[{doc_id!r}]: 'deep_analysis' 키가 dict 아님")
             continue
-        gate = vda.run_deep_analysis_gate(da, source_text)
+        # [D5c 배선 2026-08-24] WL 카드의 결정론 위반 표제문을 게이트에 넘긴다 — deep 의
+        # original 이 표제문 안에 머무는 발췌(=본문 근거 0)를 FAIL 로 차단(병기쌍 파손 사고
+        # 재발 방지). wl_violations 블록이 없는 카드는 None → 게이트 동작 기존과 동일.
+        dd = card.get("deterministic_detail")
+        wl_statements = None
+        if isinstance(dd, dict) and dd.get("type") == "wl_violations":
+            wl_statements = [str(r.get("statement") or "")
+                             for r in (dd.get("violations") or []) if isinstance(r, dict)]
+        gate = vda.run_deep_analysis_gate(da, source_text, wl_statements=wl_statements)
         if not gate.ok:
             report.errors.append(
                 f"deep_analysis[{doc_id!r}]: 게이트 FAIL {gate.fail_count}건(병합 보류) — "

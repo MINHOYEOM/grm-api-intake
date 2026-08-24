@@ -3890,11 +3890,22 @@ def main() -> int:
                 handoff_doc_ids = set(args.handoff_doc_ids or []) or None
                 # G2 와이어링: 당일 수집분 raw 를 메모리로 전달(과거 New row 만 fetch 폴백).
                 # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
+                # [WHOPIR 보강본 가림 방지 2026-08-24] WHOPIR 는 목록 전량을 매일 재수집하지만
+                # PDF 보강(enrich_whopir_items)은 신규 항목에만 돈다 — 재수집분의 bare raw 를
+                # 캐시에 올리면 메모리 우선 규칙이 Notion children 의 보강본(whopir_report)을
+                # 가려 주간 스캐폴드 WHOPIR 상세가 통째로 비었다(08-03 이후 발행분 전수).
+                # bare 항목만 빼서 fetch 폴백(=Notion 보강본)으로 흐르게 한다.
+                try:
+                    from collect_who import whopir_raw_is_bare as _whopir_bare
+                    who_items_cacheable = [
+                        it for it in who_items if not _whopir_bare(it.raw_payload)]
+                except ImportError:      # 수집기 부재 환경 — 종전 동작 유지(비차단)
+                    who_items_cacheable = who_items
                 inmemory_raw = build_inmemory_raw(
                     fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
                     wl_items, mfds_items, mfds_law_items, mfds_recall_items,
                     mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
-                    mfds_gmp_inspection_items, ich_items, who_items, hc_items,
+                    mfds_gmp_inspection_items, ich_items, who_items_cacheable, hc_items,
                     fda483_items, search_items, ispe_items, eu_gmp_ncr_items,
                     mhra_gmp_ncr_items)
                 # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가

@@ -332,6 +332,35 @@ class InjectDeepAnalysisTest(unittest.TestCase):
         card = self.brief["cards"][0]
         self.assertIsNone(card["deep_analysis"])   # 병합 보류 — 카드는 6슬롯만으로 발행
 
+    def test_heading_only_original_blocked_when_card_has_statements(self) -> None:
+        # [D5c 배선 2026-08-24] 카드의 결정론 표제문(wl_violations.statement)을 게이트에 넘겨,
+        # deep original 이 표제문 안에 머무는 발췌(=본문 근거 0·병기쌍 파손)를 차단한다.
+        stmt = ("Your firm failed to thoroughly investigate discrepancies of a batch "
+                "to meet any of its specifications (21 CFR 211.192).")
+        body = ("Our investigator observed blank spaces on raw data sheets during the "
+                "review of microbial testing records.")
+        source = _WL_SOURCE_TEXT + " " + stmt + " " + body
+        card = self.brief["cards"][0]
+        card["deterministic_detail"] = {
+            "type": "wl_violations", "count": 1,
+            "violations": [{"number": "1", "statement": stmt, "citation": "21 CFR 211.192"}],
+        }
+        da = dict(_GOOD_DELTA_DA)
+        da["key_violations"] = [dict(_GOOD_DELTA_DA["key_violations"][0], original=stmt)]
+        report = inj.inject_deep_analysis(
+            self.brief, {self.doc_id: {"deep_analysis": da, "source_text": source}})
+        self.assertTrue(any("D5C-ORIGINAL-HEADING-ONLY" in e for e in report.errors))
+        self.assertIsNone(card["deep_analysis"])   # 병합 보류 — 6슬롯만 발행
+
+        # 같은 카드라도 original 이 표제문을 넘어 본문까지 발췌하면 병합된다.
+        ok_da = dict(_GOOD_DELTA_DA)
+        ok_da["key_violations"] = [
+            dict(_GOOD_DELTA_DA["key_violations"][0], original=stmt + " " + body)]
+        report2 = inj.inject_deep_analysis(
+            self.brief, {self.doc_id: {"deep_analysis": ok_da, "source_text": source}})
+        self.assertEqual(report2.errors, [])
+        self.assertEqual(card["deep_analysis"], ok_da)
+
     def test_admin_delta_merges_via_autodetect(self) -> None:
         # [소스확장] 행정처분 카드 — card_type 미전달이나 disposition_basis 키로 admin 게이트 자동판별.
         brief, doc_id = _admin_deep_brief()

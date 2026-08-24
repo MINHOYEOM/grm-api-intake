@@ -701,5 +701,64 @@ class CitationSplitUnitTest(unittest.TestCase):
         self.assertTrue(vda._contains_section("violatessection301(a).marketing", "301(a)"))
 
 
+class HeadingOnlyOriginalTest(unittest.TestCase):
+    """D5c — original 이 결정론 표제문 범위를 못 벗어나면 FAIL(2026-08-24 병기쌍 파손 사고).
+
+    발행 실사고: WL 6장·19개 항목 전부가 original 로 번호 매긴 표제문 한 문장만 발췌하고
+    국문 description 은 본문 단락을 요약 → 화면의 원문↔국문 해석이 서로 다른 내용이 됐는데
+    D4/D5a 는 WARN(비차단)이라 그대로 발행됐다. 표제문은 위반항목 상세 블록이 이미 보여주므로
+    표제문 안에 머무는 발췌는 정보 0 + 병기쌍 파손 뿐이다."""
+
+    _STATEMENT = ("Your firm failed to conduct appropriate laboratory testing, as "
+                  "necessary, for each batch of drug product required to be free of "
+                  "objectionable microorganisms (21 CFR 211.165(b)).")
+    _BODY = ("Specifically, you lacked appropriate incubation times, lacked appropriate "
+             "method suitability, and lacked positive and negative controls.")
+
+    def _da_with_original(self, original: str) -> dict:
+        da = {k: v for k, v in _GOOD_DEEP_ANALYSIS.items()}
+        kv = [dict(v) for v in da["key_violations"]]
+        kv[0] = dict(kv[0], original=original)
+        da["key_violations"] = kv
+        return da
+
+    def test_heading_only_original_fails(self) -> None:
+        findings = vda.check_heading_only_original(
+            self._da_with_original(self._STATEMENT), [self._STATEMENT])
+        self.assertTrue(any(f.code == "D5C-ORIGINAL-HEADING-ONLY"
+                            and f.severity == vda.SEV_FAIL for f in findings))
+
+    def test_heading_prefix_original_fails(self) -> None:
+        # 표제문의 앞부분만 잘라 발췌해도(부분문자열) 본문 근거는 여전히 0 — 같은 파손.
+        prefix = self._STATEMENT[:90]
+        findings = vda.check_heading_only_original(
+            self._da_with_original(prefix), [self._STATEMENT])
+        self.assertTrue(any(f.code == "D5C-ORIGINAL-HEADING-ONLY" for f in findings))
+
+    def test_original_extending_into_body_passes(self) -> None:
+        findings = vda.check_heading_only_original(
+            self._da_with_original(self._STATEMENT + " " + self._BODY), [self._STATEMENT])
+        self.assertEqual(findings, [])
+
+    def test_no_statements_no_check(self) -> None:
+        # 결정론 표제문이 없는 카드(예: "Failure to…" 서식)는 대조 기준이 없어 검사하지 않는다.
+        findings = vda.check_heading_only_original(
+            self._da_with_original(self._STATEMENT), None)
+        self.assertEqual(findings, [])
+
+    def test_missing_original_not_flagged(self) -> None:
+        # original 생략은 프롬프트 계약상 정당한 경로(발췌할 본문이 없으면 생략) — D5c 무관.
+        findings = vda.check_heading_only_original(_GOOD_DEEP_ANALYSIS, [self._STATEMENT])
+        self.assertEqual(findings, [])
+
+    def test_gate_blocks_merge_with_statements(self) -> None:
+        source = _SOURCE + " " + self._STATEMENT
+        da = self._da_with_original(self._STATEMENT)
+        without = vda.run_deep_analysis_gate(da, source)
+        self.assertTrue(without.ok)   # wl_statements 미전달 = 기존 동작 불변(additive)
+        with_stmts = vda.run_deep_analysis_gate(da, source, wl_statements=[self._STATEMENT])
+        self.assertFalse(with_stmts.ok)
+
+
 if __name__ == "__main__":
     unittest.main()

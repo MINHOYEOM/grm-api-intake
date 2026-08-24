@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-17T03:31:10+00:00",
+  "checked_at": "2026-08-24T03:35:56+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -29,11 +29,11 @@
   ],
   "summary": {
     "blocked": 63,
-    "broken": 1,
-    "needs_review": 94,
-    "ok": 424,
-    "references": 704,
-    "unique_urls": 582
+    "broken": 0,
+    "needs_review": 96,
+    "ok": 425,
+    "references": 706,
+    "unique_urls": 584
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -6436,6 +6436,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15280": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15280",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15280"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1",
@@ -8056,6 +8071,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15917": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15917",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15917"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8582,7 +8612,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266955.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8612,7 +8642,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000273637.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8657,11 +8687,11 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280045.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280045.pdf",
-      "http_status": 416,
-      "method": "GET",
-      "reason": "http_416",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -8669,7 +8699,7 @@
           "item_id": "pmda-000280045"
         }
       ],
-      "status": "broken"
+      "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
       "attempts": 2,

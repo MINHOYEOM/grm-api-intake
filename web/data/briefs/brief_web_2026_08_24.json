@@ -354,25 +354,25 @@
     "key_violations": [
      {
       "citation": "21 CFR 211.84(d)(1)",
-      "original": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality.",
+      "original": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm contract manufactures over-the-counter (OTC) (b)(4) containing the active pharmaceutical ingredient (API) (b)(4) . You failed to conduct adequate identity testing of incoming components, including the API, used in the manufacturing of your drug product. Additionally, you relied on your suppliers’ certificates of analyses (COA) without establishing the reliability of each of your component suppliers’ analyses at appropriate intervals.",
       "description": "OTC 의약품 수탁제조 과정에서 원료의약품을 포함한 입고 성분에 대해 적절한 확인시험을 수행하지 않았고, 공급업체 시험성적서(COA)에 의존하면서 그 분석 결과의 신뢰성을 적절한 주기로 검증하지 않았다.",
       "risk": "입고 성분이 사용 전에 규격에 적합하다는 과학적 근거가 없어, 규격 부적합 원료가 완제품에 그대로 반영될 수 있다."
      },
      {
       "citation": "21 CFR 211.165(b)",
-      "original": "Your firm failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(b)).",
+      "original": "Your firm failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(b)). You failed to ensure adequate microbiological testing for each batch of your drug product prior to release. Your non-compendial test method used to determine microbiological attributes (e.g., total count, objectionable microorganisms) for your finished OTC drug product was inadequate. Specifically, you lacked appropriate incubation times, lacked appropriate method suitability, and lacked positive and negative controls. In addition, you did not validate this non-compendial method.",
       "description": "완제 OTC 의약품의 미생물 시험에 사용한 비공정서 시험법이 적절한 배양시간·시험법 적합성(method suitability)·양성 및 음성 대조를 갖추지 못했고 밸리데이션도 수행되지 않았다.",
       "risk": "출하 전 미생물학적 품질을 확인할 수 없어, 오염된 제품이 시장에 유통될 수 있다."
      },
      {
       "citation": "21 CFR 211.192",
-      "original": "Your quality unit (QU) failed to thoroughly investigate multiple microbial count results that exceeded (b)(4) colony forming units/milliliters from your (b)(4) system.",
+      "original": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your quality unit (QU) failed to thoroughly investigate multiple microbial count results that exceeded (b)(4) colony forming units/milliliters from your (b)(4) system. You use (b)(4) from this system as a component to manufacture your drug products. Instead, you continued to use (b)(4) from this system with out-of-limit (OOL) test results to manufacture drug products that were ultimately released, distributing potentially contaminated drug products to market.",
       "description": "제조에 사용하는 계통에서 반복적으로 관리기준을 초과한 미생물 수 결과가 나왔음에도 품질부서가 이를 충분히 조사하지 않았고, 초과 결과가 나온 상태에서 계속 제조·출하했다.",
       "risk": "근본원인이 규명되지 않아 시정조치가 실효를 갖지 못하며, 오염 가능성이 있는 제품이 이미 유통된 상태가 된다."
      },
      {
       "citation": "21 CFR 211.22",
-      "original": "Your firm failed to establish an adequate QU with the responsibilities and authority to oversee the manufacturing of drug products.",
+      "original": "Your firm failed to establish an adequate QU with the responsibilities and authority to oversee the manufacturing of drug products. For example, the QU failed to ensure: Establishment of appropriate written procedures for production and process controls, including appropriate qualification of the (b)(4) system (21 CFR 211.100(a)). Establishment of an appropriate written testing program designed to assess the stability characteristics of drug products and to use results of stability testing to determine appropriate storage conditions and expiration dates (21 CFR 211.166(a)). Establishment of adequate written procedures defining QU responsibilities and controls (21 CFR 211.22(d)). An adequate number of qualified personnel to perform and supervise the manufacturing, processing, packing, or holding of each drug product (21 CFR 211.25(c)).",
       "description": "품질부서가 제조·공정관리 절차 확립, 안정성시험 프로그램 운영, 품질부서 책임·권한 문서화, 충분한 자격 인력 확보를 보증하지 못했다.",
       "risk": "품질시스템 전반의 감독 기능이 작동하지 않아 개별 위반이 반복적으로 재발할 구조가 된다."
      }
@@ -477,13 +477,13 @@
     "key_violations": [
      {
       "citation": "21 CFR 211.42(c)(10)",
-      "original": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10)).",
+      "original": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10)). Inadequate Design of Facility and Equipment You manufacture sterile injectable drug products produced primarily through aseptic processing including, but not limited to, (b)(4) products for (b)(4) . Aseptic processing lines (b)(4) and (b)(4) were intended to be “ (b)(4) restricted access barrier systems.” However, segments of the line lacked sufficient restricted access barrier system (RABS) design elements (e.g., proper ergonomics, proper (b)(4) placement, and appropriate physical separation from the surrounding environment). These features are essential for minimizing or eliminating direct operator intervention into the critical (ISO 5) area during batch manufacturing. More specifically, portions of the line (b)(4) from aseptic processing on lines (b)(4) and (b)(4) are not RABS. These lines failed to provide appropriate separation and protection of the ISO 5 areas during equipment setup and routine production. Operators were allowed to physically enter the (b)(4) lifting area of the aseptic line on a frequent basis (e.g., permitted up to (b)(4) times per batch) to perform manually intensive interventions. When (b)(4) , the (b)(4) partially folded over the processing line. Appropriate ISO 5 conditions were not reliably maintained during these activities. In addition, within the RABS portion of the line, the positioning of (b)(4) disrupted unidirectional airflow to open vials during interventions. This included, but was not limited to, the removal of empty vials from the (b)(4) , which occurred up to (b)(4) times per batch. Furthermore, product contact equipment on each line was insufficiently protected or otherwise exposed to contamination hazards. For example, the processing lines lacked robust physical separation between ISO 5 and surrounding ISO 7 areas. These design flaws compromised your ability to maintain aseptic conditions. Inadequate Environmental Monitoring You failed to ensure adequate environmental monitoring (EM) of classified areas used for aseptic production. For example, you did not hold extended ISO 5 areas of processing line (b)(4) , where critical aseptic connections occurred, to ISO 5 limits.",
       "description": "무균 조작 라인이 RABS 로 의도됐으나 인체공학적 설계·차단 배치·주변 환경으로부터의 물리적 분리 같은 필수 요소를 갖추지 못했고, 일부 구간은 RABS 가 아니었다. 작업자가 배치당 다수 회 무균라인 내부로 진입해 수작업 개입을 수행했으며, ISO 5 와 주변 ISO 7 구역 사이의 견고한 물리적 분리가 없었다. 중요 무균 연결이 이뤄지는 확장 ISO 5 구역을 ISO 5 기준으로 관리하지 않는 등 환경모니터링도 미흡했다.",
       "risk": "무균 조건 유지 능력이 설계 단계에서부터 훼손되어, 개입 시마다 임계구역으로 오염이 유입될 수 있다."
      },
      {
       "citation": "21 CFR 211.113(b)",
-      "original": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "original": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Poor Aseptic Technique and Cleanroom Behavior We observed your operators using poor aseptic practices during line setup and routine production on processing lines (b)(4) and (b)(4) . These deviations included, but were not limited to: During (b)(4) installation, operators touched sterile portions of the RABS (b)(4) and brushed their gown sleeves against open (b)(4) . Operators did not typically further disinfect the (b)(4) following installation of the (b)(4) . The (b)(4) may be used for up to (b)(4) prior to (b)(4) . During production of (b)(4) injection, batch (b)(4) , on line (b)(4) : o Operators reached their upper body (e.g., head and shoulders) over an open transfer hose while executing an aseptic connection in the extended ISO 5 area. o Operators left RABS (b)(4) on opposing sides of the production line open, exposing sections of the vial conveyor to ISO 7 conditions for at least (b)(4) . During this time, the operator opened a nearby cleanroom (b)(4) into an ISO 7 corridor, creating an unnecessary heightened risk of exposing the ISO 5 area to lower quality air. Furthermore, you configured Line (b)(4) similarly, creating significant risks associated with the non-RABS sections of the line and excessive exposure of the line to multiple personnel during setup. Inadequate Process Simulation Your process simulations failed to adequately evaluate critical interventions performed during aseptic manufacturing. For example, your firm failed to include all critical interventions in the line (b)(4) process simulation requalification, such as the aseptic connection of the (b)(4) used in bulk (b)(4) of (b)(4) . You manufactured at least (b)(4) batches of (b)(4) injection since the (b)(4) requalification of this intervention.",
       "description": "라인 설치 및 정상 생산 중 무균조작 기술 불량이 관찰됐다. 작업자가 RABS 의 무균 부위를 접촉하거나 개방된 부위에 가운 소매를 스쳤고, 개방된 이송 호스 위로 상체를 넘겨 무균 연결을 수행했으며, 라인 양측 RABS 를 개방한 상태로 바이알 컨베이어를 ISO 7 조건에 노출시켰다. 또한 공정 모의시험(배지충진)에 벌크 이송용 무균 연결 등 중요 개입이 포함되지 않았다.",
       "risk": "실제 생산에서 발생하는 최악 조건이 배지충진으로 검증되지 않아, 무균성 보증의 근거가 실제 공정을 대표하지 못한다."
      }
@@ -584,13 +584,13 @@
     "key_violations": [
      {
       "citation": "21 CFR 211.194(a)",
-      "original": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)).",
+      "original": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)). Your firm is a contract testing laboratory that conducts testing of various application and nonapplication drug products for the US market. Your laboratory records lacked complete and original data demonstrating that you performed the required testing. You did not accurately complete laboratory records contemporaneously at the time you performed the laboratory activities. Our investigator observed (b)(4) microbial test samples that lacked complete documentation on raw data test sheets (e.g., the test sheets had blank spaces where entries should have been recorded). While your summary reports included final plate counts, your raw data test sheets for some of the samples covered in these reports lacked complete documentation of plate counts.",
       "description": "미국 시장용 의약품을 포함해 각종 의약품을 시험하는 수탁시험소로서, 시험기록에 수행 사실을 입증하는 완전한 원자료가 없었고 시험 시점에 동시 기록되지 않았다. 조사관은 미생물 시험 검체의 원자료 기록지에 기재돼야 할 항목이 공란으로 남아 있고 요약보고서에는 최종 집락수가 기재된 반면 원자료에는 집락수 기록이 누락된 사례를 확인했다.",
       "risk": "시험 결과와 시험 조건의 완전·정확한 기록이 남지 않아 데이터 완전성이 근본적으로 훼손되고, 품질부서가 규격 적합 여부를 판단할 근거를 상실한다."
      },
      {
       "citation": "21 CFR 211.22(d)",
-      "original": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit (21 CFR 211.22(d)).",
+      "original": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit (21 CFR 211.22(d)). Your QU is inadequate as demonstrated through its oversight of investigations. Your QU reviewed and approved investigations that did not thoroughly investigate unexplained discrepancies or failures of a drug product to meet any of its specifications. For example, your QU failed to adequately ensure root causes were appropriately supported and CAPA were justified and implemented for the following: Concerning an out-of-specification (OOS) investigation for assay of (b)(4) , after failing the initial test, hypothesis and two repeat tests, you changed your autotitrator instrument and reported passing results. You failed to scientifically justify the root cause, electrode sensing issue, and your investigation failed to include a CAPA. Concerning an OOS investigation for assay of (b)(4) after failing the initial test, hypothesis, and five repeat tests, you invalidated all these results. You failed to scientifically justify the root cause, which you attributed as a sample weighing error and insufficient electrode saturation. Your preventive action was inadequate as you only verbally made “concerned analysts” aware. Concerning an OOS investigation for a specified impurity, (b)(4) , in stability samples, you accepted passing results by testing retain samples in triplicate. You failed to scientifically justify the root cause, which you attributed as contamination of the “MS source.” Your preventive action was inadequate as you only instructed the analyst to clean the source before the initiation of the analysis without revising your procedure. This strategy of using repeated testing until you obtain a passing result, then disregarding the OOS results without scientific justification (“testing into compliance”) is unscientific and objectionable under CGMP.",
       "description": "품질부서가 근본원인이 과학적으로 뜻받침되지 않고 CAPA 도 정당화·이행되지 않은 OOS 조사를 검토·승인했다. 함량 OOS 에서 초기시험과 가설시험, 반복시험이 모두 실패한 뒤 적정 장비를 교체해 적합 결과를 보고하면서 전극 감도 문제라는 근본원인을 과학적으로 정당화하지 못했고 CAPA 도 없었다. 다른 함량 OOS 에서는 5회 반복시험 실패 후 전 결과를 무효화하고 예방조치를 관련 분석자에 대한 구두 고지로 갈음했으며, 안정성 검체의 특정 불순물 OOS 에서는 보관용 검체 3회 시험으로 적합 결과를 채택했다.",
       "risk": "적합 결과가 나올 때까지 반복 시험하는 이른바 testing into compliance 관행이 고착되어, 실제 품질 문제가 시험 단계에서 은폐된 채 의뢰사에 전달된다."
      }
@@ -706,25 +706,25 @@
     "key_violations": [
      {
       "citation": "21 CFR 211.113(b)",
-      "original": "Your firm continued to manufacture and release sterile drug products manufactured by aseptic processing following media fill failures on June 21, 2024, September 4, 2024, and November 4, 2024 as well as inconclusive media fill results and other significant quality events.",
+      "original": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Media Fills Your firm continued to manufacture and release sterile drug products manufactured by aseptic processing following media fill failures on June 21, 2024, September 4, 2024, and November 4, 2024 as well as inconclusive media fill results and other significant quality events. Your firm lacked timely and adequate media fill investigations. For instance, your root causes were unsupported and lacked effective corrective actions. Following the inspection, you committed to recalling (b)(4) batches of drug products made from (b)(4) which reflects the timeframe between the failing media fills. In addition, you commit to improving your quality unit (QU) escalation procedures to ensure proper awareness and to engaging an outside consultant to provide oversight of your QU for six months. Your response is inadequate. You did not provide a retrospective review of all media fills to ensure additional deviations, atypical events, and unexpected results during commercial manufacturing were adequately represented in your media fill programs. Poor Practices in the Aseptic Processing Areas We observed poor practices and behaviors in ISO 5 areas during commercial operations and media fills. These poor practices, included but are not limited to: Operators inserting their upper torso into the (b)(4) restricted access barrier system ( (b)(4) RABS) during interventions, breaching the ISO 5 barrier. An operator performing a (b)(4) RABS intervention directly with the (b)(4) RABS (b)(4) instead of using forceps. Shorter operators opening the (b)(4) RABS (b)(4) and bypassing the (b)(4) during difficult-to-reach interventions, while taller operators used the (b)(4) RABS (b)(4) . In your response, you commit to retraining the operators on appropriate aseptic behaviors. Also, you commit to revising procedures and engaging outside consultants to review practices. Your response is inadequate. You do not address how you plan to ensure operators follow appropriate procedures in the future, including supervisory and quality assurance oversight. Additionally, these poor aseptic practices were not investigated to determine the impact to sterile drug products manufactured under these conditions and distributed to the U.S. market. Your response also fails to reevaluate your aseptic processing design. Specifically, you do not identify and evaluate hazards posed by various manual activities (e.g., planned interventions, unplanned interventions, (b)(4) ) or address the risks that insufficient design poses. Airflow Visualization Studies (AVS) and Process Design Our inspection identified aseptic processing design deficiencies which pose significant hazards to drug product sterility, as well as multiple inadequacies in your airflow visualization studies (i.e., smoke studies). For example, unidirectional airflow could not be evaluated in certain AVS. There were interventions performed in which the camera is placed behind the operator and the impact of the intervention on the airflow cannot be visualized. Our inspection also noted other AVS deficiencies. For example, the smoke source was not always positioned at the HEPA filter face to confirm unidirectional airflow and uniform velocity.",
       "description": "배지충진 실패와 판정 불가 결과, 기타 중대한 품질 사건이 있었음에도 무균 조작으로 제조한 무균제제를 계속 제조·출하했고, 배지충진 조사가 적시에 충분히 이뤄지지 않아 근본원인이 뜻받침되지 않고 시정조치도 실효를 갖지 못했다. ISO 5 구역에서 작업자가 상체를 RABS 내부로 넣어 차단을 훼손하거나 겸자 대신 직접 개입을 수행하는 등 불량한 무균조작이 관찰됐으며, 기류가시화 시험도 카메라 위치와 스모크 발생 지점이 부적절해 단방향 기류를 평가할 수 없었다.",
       "risk": "무균성 보증 체계가 검증·감시·시정 어느 단계에서도 작동하지 않아, 무균성이 담보되지 않은 제품이 장기간 시장에 유통된다."
      },
      {
       "citation": "21 CFR 211.100(a)",
-      "original": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)).",
+      "original": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). Your post-fill visual inspection of aseptically filled over-the-counter (OTC) (b)(4) drug products was insufficient to identify particulate matter and defects which may be present in each unit. Your drug product containers are (b)(4) , and only very slightly (b)(4) , and particulates can be seen through them readily, which does not meet the criteria for “difficult to inspect.” For example, your firm only conducted subvisible particulate testing on a sample of units based on your assertion that the bottles were (b)(4) and not suitable for visual inspection. Further, your Acceptable Quality Limit (AQL) testing was designed to examine for filling, labeling, and packaging defects only, and did not include defect categories for particulates or foreign matter. Your firm’s inadequate visual inspection program provides insufficient assurance to prevent release of (b)(4) drug products with particulate matter or foreign material defects. In your response, you acknowledge that 100% visual inspection is not performed and that you lack the proper procedures and/or equipment. You commit to modifying your visual inspection program to include the reliable detection of particulate contamination and other visible defects prior to resuming production operations. Your response is inadequate. Although you commit to evaluating the visual inspection program and replacing the (b)(4) , you did not consider a combination of (b)(4) inspection methods to ensure detection of the wide array of potential visible product defects. Also, you did not consider the impact of particulates or foreign matter in (b)(4) drug products that were distributed to the U.S. market. We encourage the use of suitable (b)(4) visual inspection for particulates to augment the 100% (b)(4) visual inspection program. (b)(4) methods should be rigorously studied, and qualified, to assess their capability and robustness under various conditions, machine settings, container-closure sizes, defect types, product characteristic, and other variables. In addition, any use of (b)(4) particulate inspection as an adjunct method does not supplant the need for 100% (b)(4) visual inspection, for various other attributes (e.g., cracks, deformities, closure issues, volume, insufficient crimping, leaks, (b)(4) , discoloration, turbidity, other appearance defects). In addition, your firm failed to provide adequate data to demonstrate manufacturing systems were adequately maintained, operated, and monitored. For example, you lacked a formalized process and procedure for responding to your (b)(4) alarms. Alarms occurred at multiple timepoints from 2024 to 2026 without documented evidence of a systematic or appropriate response.",
       "description": "무균 충전 후 육안검사가 각 용기의 이물과 결함을 확인하기에 불충분했다. 용기가 검사하기 어렵다는 기준에 해당하지 않음에도 전수 육안검사를 하지 않고 표본에 대한 미세이물 시험만 수행했으며, AQL 검사는 충전·표시·포장 결함만 대상으로 하고 이물이나 이종물질 결함 분류를 포함하지 않았다. 또한 설비 경보가 2024년부터 2026년까지 여러 시점에 발생했으나 체계적·적절한 대응 기록이 없었다.",
       "risk": "이물이나 이종물질이 포함된 제품이 검출되지 않은 채 출하될 수 있고, 설비 이상이 제품 품질에 미친 영향을 사후에 확인할 수 없다."
      },
      {
       "citation": "21 CFR 211.166(a)",
-      "original": "Your firm failed to establish and follow an adequate written testing program designed to assess the stability characteristics of drug products (21 CFR 211.166(a)).",
+      "original": "Your firm failed to establish and follow an adequate written testing program designed to assess the stability characteristics of drug products (21 CFR 211.166(a)). Your firm has not established stability indicating methods for the OTC (b)(4) drug products you distribute to the U.S. market. For example, the validation protocol for the assay of Naphazoline HCl (NPZ) in the (b)(4) formulation detailed a stress study; however, the report stated that the stress study would be performed later and reported separately. Assay for NPZ is a test conducted for stability studies of the (b)(4) formulation. Without forced degradations studies to establish specificity, the accuracy of the test assay results cannot be assured throughout the shelf-life of the product during stability.",
       "description": "미국에 유통하는 OTC 제품에 대해 안정성 지표시험법을 확립하지 않았다. Naphazoline HCl 함량시험 밸리데이션 프로토콜에는 강제분해 시험이 규정돼 있었으나 보고서에는 해당 시험을 추후 별도로 수행한다고만 기재됐다.",
       "risk": "특이성이 입증되지 않은 시험법으로 안정성 결과를 산출해 유효기간 전 기간에 걸친 함량 결과의 정확성을 보증할 수 없다."
      },
      {
       "citation": "21 CFR 211.22(d)",
-      "original": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit and to follow written procedures applicable to the quality control unit (21 CFR 211.22(d)).",
+      "original": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit and to follow written procedures applicable to the quality control unit (21 CFR 211.22(d)). Complaint Handling Your QU did not adequately ensure procedures were established and followed. For example, your procedure for customer complaints and inquiries is inadequate. Your approach to determining severity and adverse events resulted in delayed and incomplete investigations. Additionally, investigations were based on the client and not the severity of the complaint. Also, adequate complaint investigations were not completed in a timely manner. In your response, you commit to revising your procedure and reviewing past complaints to ensure serious events are properly investigated. Your response is inadequate. You did not provide the status of open complaint investigations or whether additional complaints have been received since the close of the inspection. Stability Program Your QU failed to ensure stability testing was conducted according to your program procedures. Your firm missed stability time points, missed stability tests, or performed incorrect tests on batches placed into your stability program.",
       "description": "고객 불만 처리 절차가 부적절해 중대도 및 이상사례 판단이 지연·불완전했고, 조사가 불만의 중대도가 아니라 거래처 기준으로 수행됐다. 안정성시험에서도 시험 시점 누락, 시험 항목 누락, 잘못된 시험 수행이 발생했으나 품질부서가 이를 통제하지 못했다.",
       "risk": "시장에서 들어오는 품질 신호와 유효기간 근거 자료 양쪽이 모두 신뢰할 수 없게 되어, 문제 제품의 조기 인지가 불가능해진다."
      }
@@ -827,13 +827,13 @@
     "key_violations": [
      {
       "citation": "21 CFR 211.22(a)",
-      "original": "Your firm failed to establish an adequate quality unit and the responsibilities and procedures applicable to the quality unit are not in writing and fully followed (21 CFR 211.22(a) and 21 CFR 211.22(d)).",
+      "original": "Your firm failed to establish an adequate quality unit and the responsibilities and procedures applicable to the quality unit are not in writing and fully followed (21 CFR 211.22(a) and 21 CFR 211.22(d)). Your firm, which holds, labels 1 , releases, and distributes over the counter (OTC) drug products under your own label (b)(4) , lacks adequate quality unit (QU) oversight and procedures for the drug products you distribute. During the inspection, you stated that no QU oversight is performed for your suppliers and contract manufacturers, including packagers. Specific failures observed during the inspection include but are not limited to the following: The absence of procedures describing how you ensure that the drug products you receive meet quality specifications, and the roles and responsibilities of each party for each of your suppliers (for example, quality agreements). Also, you do not request, receive, or maintain Certificates of Analysis (CoAs) for incoming bulk and finished OTC drug products. Notably, one of your contract manufacturers, (b)(4) , has been considered noncompliant with CGMP across multiple FDA inspections.",
       "description": "자사 상표로 OTC 의약품을 보관·표시·출하·유통하는 업체로서 유통 제품에 대한 품질부서 감독과 절차가 미비했다. 실사 중 공급자와 수탁제조소(포장업체 포함)에 대해 품질부서 감독을 전혀 수행하지 않는다고 진술했고, 입고 벌크 및 완제품의 시험성적서(CoA)를 요청·수령·보관하지 않았으며 품질계약 등 당사자별 역할·책임을 규정한 절차도 없었다. 수탁제조소 중 한 곳은 여러 차례의 FDA 실사에서 CGMP 부적합으로 판정된 이력이 있었다.",
       "risk": "입고 제품이 품질 규격을 충족하는지 확인할 수단이 없고, 수탁제조소의 CGMP 미준수를 인지·감시할 체계도 없어 부적합 제품이 그대로 자사 상표로 유통된다."
      },
      {
       "citation": "21 CFR 211.42",
-      "original": "Your firm has no written procedures describing how finished drug products are to be received, quarantined before release, stored under appropriate conditions, and approved for distribution.",
+      "original": "Improper segregation of drug products throughout your warehouse to prevent mix-ups. For example, boxes of finished drug products designated as “Unlabeled, No Lot, No Exp” were observed to contain unlabeled, filled product containers stored in the same general area as labeled drug products. Your firm has no written procedures describing how finished drug products are to be received, quarantined before release, stored under appropriate conditions, and approved for distribution. This is also a violation of 21 CFR 211.42. A lack of procedures by which the distribution of each lot of drug product can be readily determined, to facilitate its recall if necessary.",
       "description": "완제품의 입고·출하 전 보류·적정 조건 보관·유통 승인 절차가 문서로 존재하지 않았고, 표시되지 않은 충전 완료 용기가 담긴 상자가 표시 완료 제품과 같은 구역에 보관되는 등 혼동 방지를 위한 구분이 이뤄지지 않았다. 또한 각 로트의 유통 경로를 즉시 확인해 필요 시 회수할 수 있는 절차가 없었다.",
       "risk": "제품 혼동과 오출하 위험이 상존하고, 문제 발생 시 로트 단위로 회수 범위를 특정할 수 없다."
      }
@@ -996,31 +996,31 @@
     "key_violations": [
      {
       "citation": "section 501(a)(2)(B) of the FD&C Act",
-      "original": "Failure to demonstrate that your manufacturing process can reproducibly manufacture an API meeting its predetermined quality attributes.",
+      "original": "Failure to demonstrate that your manufacturing process can reproducibly manufacture an API meeting its predetermined quality attributes. Your response to our request for records or other information pursuant to section 704(a)(4) indicates that you manufactured and distributed (b)(4) APIs to the United States (U.S.) without adequate process validation, which is critical to ensure the quality and purity of the API. For example, in response to our request on July 7, 2025, that you provide the process validation summary report for all U.S.-marketed APIs, you indicated that these APIs were still in development and were not commercial products. Therefore, formal documents such as standard operating procedures had not been finalized. However, FDA data shows that your (b)(4) APIs were distributed to 503A compounding pharmacies.",
       "description": "704(a)(4) 기록 요구에 대한 회신 결과, 적절한 공정 밸리데이션 없이 원료의약품을 제조해 미국에 유통한 것으로 확인됐다. 업체는 해당 원료가 아직 개발 단계이며 상업 제품이 아니어서 표준작업지침서 등 공식 문서가 확정되지 않았다고 답변했으나, FDA 자료에 따르면 해당 원료는 503A 조제약국에 공급되고 있었다.",
       "risk": "공정이 규격에 맞는 원료를 재현성 있게 생산한다는 기본적인 보증이 없어, 품질이 확인되지 않은 원료가 조제 의약품에 그대로 사용된다."
      },
      {
       "citation": "section 501(a)(2)(B) of the FD&C Act",
-      "original": "Failure to prepare and use master production and control records.",
+      "original": "Failure to prepare and use master production and control records. Your batch record for (b)(4) lacked some of the critical processing information necessary to ensure consistent manufacturing and product quality. For example, you did not list (b)(4) and major equipment used in the manufacturing process. You did not provide a batch record for (b)(4) , despite being asked to provide this documentation multiple times.",
       "description": "제조기록서에 일관된 제조와 품질 확보에 필요한 중요 공정 정보가 누락돼 있었고, 사용 주요 설비 등이 기재되지 않았다. 일부 품목은 반복 요구에도 제조기록서를 제출하지 못했다.",
       "risk": "배치 내·배치 간 변동을 감시·분석할 수 없어 제조 공정이 관리 상태에 있는지 확인할 방법이 없다."
      },
      {
       "citation": "section 501(a)(2)(B) of the FD&C Act",
-      "original": "Failure to validate and verify the suitability of analytical methods.",
+      "original": "Failure to validate and verify the suitability of analytical methods. Based on the records and information you provided, your firm failed to perform test method validation (or verification if compendial testing is used) for each test method used for drugs distributed to the United States. Test methods must be validated to show that they are suitable for their intended use or verified to show, at a minimum, equivalence with United States Pharmacopeia (USP) compendial methods. Method validation and verification are necessary to support reliable determinations of identity, strength, quality, purity, and potency of drugs.",
       "description": "미국에 유통한 의약품에 사용한 각 시험법에 대해 밸리데이션(공정서 시험법의 경우 검증)을 수행하지 않았다.",
       "risk": "고객에게 제공한 시험 데이터가 실제 품질을 반영한다는 근거가 없어, 확인·함량·순도·역가 판정 전체가 신뢰할 수 없게 된다."
      },
      {
       "citation": "section 501(a)(2)(B) of the FD&C Act",
-      "original": "Failure to design a documented, ongoing stability testing program to monitor the stability characteristics of APIs and to use the results to confirm the appropriate storage conditions and the retest or expiry dates.",
+      "original": "Failure to design a documented, ongoing stability testing program to monitor the stability characteristics of APIs and to use the results to confirm the appropriate storage conditions and the retest or expiry dates. Based on the records and information you provided, your firm failed to perform routine stability testing to demonstrate that the quality attributes of your APIs remain acceptable throughout the labeled expiry period. For example, your firm did not provide stability test data for (b)(4) manufactured at your facility.",
       "description": "표시된 사용기한 동안 품질 특성이 유지되는지 입증하는 정기 안정성시험을 수행하지 않았고, 자사 제조 원료에 대한 안정성 시험 자료를 제출하지 못했다.",
       "risk": "보관조건과 재시험기일·사용기한 설정을 뜻받침하는 과학적 근거가 없어, 사용기한 내 품질 유지가 담보되지 않는다."
      },
      {
       "citation": "21 CFR 207.41",
-      "original": "You did not provide drug listing information for demecarium bromide and chlorambucil under your own labeler code, yet you manufactured and shipped these drugs into the United States.",
+      "original": "You did not provide drug listing information for demecarium bromide and chlorambucil under your own labeler code, yet you manufactured and shipped these drugs into the United States. Although these drugs are listed in FDA’s drug listing database, they are listed under a different company’s labeler code, not your own.",
       "description": "demecarium bromide 와 chlorambucil 을 제조해 미국으로 선적하면서 자사 labeler code 로 품목신고를 하지 않았고, 해당 품목은 다른 회사의 labeler code 로만 등재돼 있었다.",
       "risk": "FDA 의 실사 대상 선정, 공급망 보안, 시판 후 감시 등 등록·품목신고 정보에 의존하는 프로그램이 실제 제조자를 식별하지 못하게 된다."
      }
@@ -1222,13 +1222,26 @@
    "key_facts": [
     "대상: Farmabios (Corp) 제조소",
     "실사일: 2026-06-16",
-    "발행: WHO 공개 실사보고서(WHOPIR) — 보고서 본문은 원문 확인 필요"
+    "발행: WHO 공개 실사보고서(WHOPIR) — 결론·인용 실사(AIFA) 수록"
    ],
    "implication": "WHO 사전적격성 실사 결과가 공개되면서 원료 공급처의 실사 이력을 외부에서 확인할 수 있는 범위가 넓어지고 있다. Farmabios (Corp) 를 공급망에 두고 있다면 이번 WHOPIR 본문의 지적 항목을 공급자 평가 자료로 확보해 둘 필요가 있다.",
    "checks": [
     "해당 제조소의 WHOPIR 본문 입수 및 지적사항 검토",
     "공급자 평가 자료에 WHO 실사 이력 반영 여부"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection The site was not previously inspected onsite by WHO. A desk assessment was performed in 2020 on the basis of SRA reports. Summary of manufacturing activities - Manufacturing of API by chemical synthesis - Manufacturing of Sterile API aseptically prepared and gamma irradiated - Extraction of Active Substances from sources: purification, modification and extraction of substance from plant or animal - General finishing steps: drying, micronisation, primary and secondary packaging - - Quality control testing - Importation of API General information about the company and manufacturing site Farmabios manufactures API of different markets, both human and veterinary use. It is authorized by AIFA to produce and import APIs for human use. Focus of the last WHO inspection Not applicable. Areas inspected Not applicable. Out of scope and restrictions (last WHO inspection) Not applicable. WHO products covered by the last WHO inspection The last desk assessment also focused on the medroxyprogesterone acetate API. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "(AIFA)",
+      "dates": "10th 14 March 2025"
+     }
+    ],
+    "outcome_ko": "최근 WHO 실사 요약 — 일자 및 결론: 이 제조소는 이전에 WHO 의 현장 실사를 받은 적이 없다. 2020년에 SRA(엄격규제당국) 보고서를 근거로 서면평가(desk assessment)가 수행됐다. 제조 활동 요약: 화학 합성에 의한 원료의약품 제조, 무균 조제 후 감마선 조사하는 무균 원료의약품 제조, 식물·동물 유래 물질의 정제·변형·추출, 건조·미분화·1차 및 2차 포장 등 일반 마무리 공정, 품질관리 시험, 원료의약품 수입. 회사·제조소 일반 정보: Farmabios 는 인체용과 동물용 시장의 원료의약품을 제조하며, AIFA 로부터 인체용 원료의약품의 제조·수입을 인가받았다. 최근 WHO 실사의 초점, 실사 구역, 범위 제외 및 제한: 해당 없음. 최근 WHO 실사가 다룬 WHO 품목: 최근 서면평가는 medroxyprogesterone acetate 원료의약품도 대상으로 했다. …"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1280,13 +1293,30 @@
    "key_facts": [
     "대상: Neuland Labs (Corp and Unit 1) 제조소",
     "실사일: 2026-06-08",
-    "발행: WHO 공개 실사보고서(WHOPIR) — 보고서 본문은 원문 확인 필요"
+    "발행: WHO 공개 실사보고서(WHOPIR) — 결론·인용 실사(USFDA·EDQM/ANSM) 수록"
    ],
    "implication": "본사와 개별 유닛을 함께 대상으로 한 실사 결과가 공개되면서 같은 회사라도 사업장 단위로 결과를 구분해 볼 필요가 생긴다. Neuland Labs 원료를 사용하는 국내 품목은 실제 제조 사업장이 이번 보고서 범위에 포함되는지 대조해 둘 필요가 있다.",
    "checks": [
     "사용 중인 원료의 실제 제조 사업장과 보고서 범위 대조",
     "동일 회사 내 사업장별 실사 결과 구분 관리"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "reliance",
+    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection Neuland Unit 1 had been inspected by the WHO PQT Inspection Services Team on 6-9 February 2018 and was found to be GMP compliant for the manufacture of levofloxacin hemihydrate API. It was desk-assessed in 2022 with a conclusion that the site is GMP compliant for the manufacture of levofloxacin hemihydrate API. Brief summary of manufacturing activities The site manufactures a broad portfolio of diverse active pharmaceutical ingredients and intermediates. Internal General information about the company and manufacturing site The firm operates from three manufacturing facilities – Unit-1 (Bonthapally), Unit-2, (Pashamylaram), Unit-3 (Gaddapotharam) and one R&D facility (Bonthapally). Unit 1 was established in 1984 for the manufacture of Active Pharmaceutical Ingredients (APIs) and intermediates. It is authorized by the local authority for the manufacture of non-beta lactam and non-penicillin APIs and intermediates only. Its area is approximately 16.2 acres and comprises eight production blocks dedicated to API and intermediate manufacturing. …",
+    "sections": [],
+    "reliance": [
+     {
+      "authority": "USFDA",
+      "dates": "18–22 March 2024"
+     },
+     {
+      "authority": "EDQM/ ANSM",
+      "dates": "7-9 June 2023"
+     }
+    ],
+    "outcome_ko": "최근 WHO 실사 요약 — 일자 및 결론: Neuland Unit 1 은 2018년 2월 6~9일 WHO PQT 실사팀의 실사에서 levofloxacin hemihydrate 원료의약품 제조에 대해 GMP 적합 판정을 받았고, 2022년 서면평가에서도 같은 품목 제조에 대해 GMP 적합 결론이 내려졌다. 제조 활동 요약: 다양한 원료의약품과 중간체를 폭넓게 제조한다. 회사·제조소 일반 정보: 회사는 세 개 제조시설 Unit-1(Bonthapally)·Unit-2(Pashamylaram)·Unit-3(Gaddapotharam)과 R&D 시설 1개(Bonthapally)를 운영한다. Unit 1 은 1984년 원료의약품과 중간체 제조를 위해 설립됐으며, 현지 당국으로부터 비베타락탐·비페니실린 원료의약품과 중간체의 제조만 인가받았다. 부지는 약 16.2에이커로, 원료의약품·중간체 제조 전용 생산동 8개로 구성된다. …"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1396,13 +1426,35 @@
    "key_facts": [
     "대상: Chongqing Huapont Shengchem",
     "실사일: 2026-03-30",
-    "발행: WHO 공개 실사보고서(WHOPIR) — 보고서 본문은 원문 확인 필요"
+    "발행: WHO 공개 실사보고서(WHOPIR) — 결론·항목 요약 2건 수록"
    ],
    "implication": "중국 소재 공급처에 대한 국제기구 실사 결과가 공개되면서 현지 실사를 직접 수행하기 어려운 업체도 참고 근거를 확보할 수 있게 됐다. 중국 원료 공급처를 두고 있다면 WHOPIR 공개 목록을 정기 확인 대상에 포함할 필요가 있다.",
    "checks": [
     "중국 소재 공급처의 WHOPIR 공개 여부 정기 확인",
     "현지 실사 대체 근거로서 공개 보고서 활용 기준"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Chongqing Huapont Shengchem Pharmaceutical Co., Ltd, Changshou Site, located at No.6, Huanan 1st Road, Yanjia Avenue, Changshou District, Chongqing, 401221, P.R. China was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for three years, provided that the outcome of any inspection conducted during this period is positive.",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "Quality Management system The documented system for quality assurance was established, with procedures covering key quality elements in place. The Quality Department was divided into QA and QC and was separate from the Production Department. Operations were specified in written form, and critical GMP requirements were essentially being met. An authorized person for the release of APIs was designated. Annual Product Quality Review The preparation of the APQRs was governed by the SOP “Annual Product Quality Review”. …",
+      "text_ko": "품질경영 시스템 — 품질보증을 위한 문서화된 시스템이 확립돼 있었고, 주요 품질 요소를 다루는 절차가 갖춰져 있었다. 품질부서는 QA 와 QC 로 나뉘어 생산부서와 분리돼 있었다. 운영 사항은 문서로 규정돼 있었고 중요한 GMP 요구사항이 대체로 충족되고 있었다. 원료의약품 출하 승인 권한자가 지정돼 있었다. 연간 품질평가 — APQR 작성은 표준작업지침서 「Annual Product Quality Review」에 따라 관리되고 있었다. …",
+      "title_ko": "품질경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "An organization charts were available. The Changshou site has 207 employees at the time of inspection. The Quality department operated independently from Production department. The reporting lines and accountability were defined. The key personnel of the various departments had pharmaceutical qualifications and were experienced in pharmaceutical manufacturing. Job descriptions Staff members had defined roles and responsibilities, that were documented in job descriptions. The job descriptions of key personnel responsible for qulity and production were checked. …",
+      "text_ko": "조직도가 갖춰져 있었다. 실사 시점에 창서우 사업장의 인원은 207명이었다. 품질부서는 생산부서로부터 독립적으로 운영됐고, 보고 체계와 책임이 정의돼 있었다. 각 부서의 핵심 인력은 약학 관련 자격을 갖추고 의약품 제조 경험이 있었다. 직무기술서 — 직원들의 역할과 책임이 직무기술서에 문서화돼 있었고, 품질·생산을 책임지는 핵심 인력의 직무기술서를 확인했다. …",
+      "title_ko": "인력"
+     }
+    ],
+    "outcome_ko": "실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 중국 충칭시 창서우구 소재 Chongqing Huapont Shengchem Pharmaceutical Co., Ltd 창서우 사업장은 WHO GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1454,13 +1506,126 @@
    "key_facts": [
     "대상: MSN Labs (Rudraram)",
     "실사일: 2026-03-17",
-    "발행: WHO 공개 실사보고서(WHOPIR) — 보고서 본문은 원문 확인 필요"
+    "발행: WHO 공개 실사보고서(WHOPIR) — 결론·항목 요약 15건 수록"
    ],
    "implication": "실사일과 보고서 공개 시점 사이에 수개월의 시차가 있어 공개 시점의 정보가 현재 상태를 그대로 반영하지 않을 수 있다. MSN Labs 원료를 사용하는 국내 품목은 보고서 지적사항의 조치 완료 여부를 공급자에게 별도로 확인할 필요가 있다.",
    "checks": [
     "보고서 지적사항의 조치 완료 여부 공급자 확인",
     "실사일과 공개 시점 간 시차를 고려한 공급자 평가 주기"
    ],
+   "deterministic_detail": {
+    "type": "whopir_report",
+    "report_kind": "findings",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report xxx, located at MSN Laboratories Private Limited, located at Sy. No. 317, 320, 321, 322, 323, 604 & 605, Rudraram (Village), Patancheru (Mandal), Sangareddy District, Telangana, Pincode: 502 329; India, was considered to be operating at an acceptable level of compliance with WHO good manufacturing practices for active pharmaceutical ingredients guidelines. The deficiencies observed during the inspection, as listed in the full report, were addressed by the manufacturing site to a satisfactory level before the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive",
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "A detailed presentation of MSN Laboratories Private Limited was provided, outlining its establishment in 2003 and its subsequent expansion into a multi-unit pharmaceutical group with facilities across India. The company specialized in the manufacture of APIs and formulations, supported by dedicated R&D, QC, and regulatory functions. Its operations were governed by established quality management systems aligned with international standards, including WHO GMP, US FDA, and EU GMP. …",
+      "text_ko": "MSN Laboratories Private Limited 에 대한 상세한 소개가 제공됐다. 2003년 설립 이후 인도 전역에 시설을 둔 다중 사업장 제약 그룹으로 확장했으며, 전담 R&D·QC·규제 부서의 지원 아래 원료의약품과 완제의약품 제조를 전문으로 한다. 운영은 WHO GMP, 미국 FDA, EU GMP 등 국제 기준에 정렬된 품질경영시스템에 따라 관리되고 있었다. …",
+      "title_ko": "품질경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "Personnel qualification An adequate number of personnel, qualified by appropriate education, training, and/or experience, were available to perform and supervise the manufacture of intermediates and APIs. The responsibilities of personnel engaged in the manufacture of intermediates and APIs were defined in their respective job descriptions, which were reviewed on a sampling basis. Training was regularly conducted by qualified individuals and covered, at a minimum, the specific operations performed by the employee. …",
+      "text_ko": "인력 적격성 — 적절한 학력·교육훈련·경력으로 자격을 갖춘 충분한 수의 인력이 중간체와 원료의약품의 제조를 수행·감독할 수 있도록 확보돼 있었다. 중간체·원료의약품 제조에 종사하는 인력의 책임은 각자의 직무기술서에 정의돼 있었고, 표본 방식으로 검토됐다. 교육훈련은 자격 있는 인원이 정기적으로 수행했으며, 최소한 해당 직원이 수행하는 특정 작업을 다루고 있었다. …",
+      "title_ko": "인력"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "Design and construction Buildings and facilities used in the manufacture of intermediates and APIs were generally located, designed, and constructed to facilitate cleaning, maintenance, and operations appropriate to the type and stage of manufacture. Facilities were designed to minimize the risk of contamination. In areas classified as ISO 8, facilities were also designed and monitored to limit exposure to objectionable microbiological contaminants, as appropriate. …",
+      "text_ko": "설계 및 건축 — 중간체·원료의약품 제조에 사용되는 건물과 시설은 대체로 세척·유지보수·운영이 용이하도록 제조의 유형과 단계에 맞게 배치·설계·건축돼 있었다. 시설은 오염 위험을 최소화하도록 설계됐다. ISO 8 등급 구역의 시설은 필요에 따라 유해 미생물 오염원에 대한 노출을 제한하도록 설계·모니터링되고 있었다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Design and construction Equipment used in the manufacture of intermediates and APIs was of appropriate design, adequate size, and suitably located to facilitate its intended use, cleaning, sanitization (where appropriate), and maintenance. Equipment was constructed so that surfaces in contact with raw materials, intermediates, or APIs did not adversely affect product quality beyond established specifications. Production equipment was inspected during the inspection to verify that it was operated within its qualified operating ranges and conditions. …",
+      "text_ko": "설계 및 건축 — 중간체·원료의약품 제조에 사용되는 설비는 적절한 설계와 충분한 크기를 갖추고, 의도된 용도와 세척·소독(해당 시)·유지보수가 용이한 위치에 설치돼 있었다. 원자재·중간체·원료의약품과 접촉하는 표면이 설정된 규격을 벗어나 제품 품질에 악영향을 주지 않도록 제작돼 있었다. 실사 중 생산 설비가 적격성평가된 운전 범위와 조건 내에서 운용되는지 확인했다. …",
+      "title_ko": "공정 설비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "Original documents were prepared on A4-size white paper and, following approval, were retained by QA. Controlled copies were issued to user departments as photocopies of the original, with “QA CONTROLLED COPY” stamped on all pages. Document changes were managed through the change control system and identified by version number. Superseded documents were retrieved and destroyed, except for executed documents. Original copies were retrieved and stamped as “OBSOLETE COPY” on all pages. Document control activities were performed in accordance with the applicable SOP. …",
+      "text_ko": "원본 문서는 A4 백색 용지에 작성되고 승인 후 QA 가 보관했다. 관리본은 원본의 사본으로 사용 부서에 배포되며 전 페이지에 \"QA CONTROLLED COPY\" 도장이 찍혔다. 문서 변경은 변경관리 시스템으로 관리되고 판번호로 식별됐다. 폐지된 문서는 회수·폐기됐으며(작성 완료된 문서는 예외), 원본은 회수해 전 페이지에 \"OBSOLETE COPY\" 도장을 찍었다. 문서 관리 활동은 해당 표준작업지침서에 따라 수행되고 있었다. …",
+      "title_ko": "문서화 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "The warehouse was designed to ensure a unidirectional flow of materials, from receipt of starting materials to dispatch of finished products. The warehouse included defined areas for receipt, identification, quarantine, storage, handling, sampling, dispensing, and rejection of materials. Receipt and inspection of raw and packing materials were performed in accordance with the applicable SOPs. Storage and handling of raw and packing materials were carried out in accordance with the respective SOP. A system was established for the evaluation of suppliers of critical materials. …",
+      "text_ko": "창고는 출발물질 입고부터 완제품 출하까지 자재가 일방향으로 흐르도록 설계돼 있었다. 창고에는 자재의 입고·식별·격리·보관·취급·검체 채취·불출·불합격 처리를 위한 구역이 구분돼 있었다. 원자재·포장자재의 입고와 검사는 해당 표준작업지침서에 따라 수행됐고, 보관과 취급도 각 지침서에 따랐다. 중요 자재 공급업체에 대한 평가 시스템이 확립돼 있었다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "The production process comprised two stages: intermediate stage (MOP1) and final stage (MOP2). In Stage 1 (MOP1), the key starting material Cytidine was used. Manufacturing activities were performed in Blocks N, P, S, and R. In Stage 2 (MOP2), MOP1 was used as input. Operations were carried out in the V Block intermediate area and Clean Room II. No batches had been manufactured since 2022. The manufacturing process involved controlled reaction steps under a Nitrogen atmosphere in glass- lined reactors, with monitoring of reaction progress by TLC. …",
+      "text_ko": "생산 공정은 중간체 단계(MOP1)와 최종 단계(MOP2)의 2단계로 구성됐다. 1단계(MOP1)에서는 핵심 출발물질 Cytidine 이 사용되며 제조는 N·P·S·R 동에서 수행됐다. 2단계(MOP2)는 MOP1 을 투입물로 사용하며 V 동 중간체 구역과 Clean Room II 에서 작업이 이뤄졌다. 2022년 이후 제조된 배치는 없었다. 제조 공정은 유리 라이닝 반응기에서 질소 분위기하에 진행되는 관리된 반응 단계들로 구성되며, 반응 진행은 TLC 로 모니터링됐다. …",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "General: An SOP was established, describing the receipt, identification, quarantine, sampling, examination and/or testing, release, and handling of packaging and labelling materials. Packaging and labelling materials conformed to established specifications. Materials not meeting these specifications were rejected to prevent their use in operations for which they were unsuitable. Labels were stored under lock and key in the QC laboratory. …",
+      "text_ko": "일반 — 포장·표시 자재의 입고·식별·격리·검체 채취·검사 및/또는 시험·출하 승인·취급을 기술한 표준작업지침서가 확립돼 있었다. 포장·표시 자재는 설정된 규격에 적합했고, 규격에 맞지 않는 자재는 부적합한 용도에 사용되지 않도록 불합격 처리됐다. 라벨은 QC 시험실에 잠금 보관됐다. …",
+      "title_ko": "원료의약품·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution of API",
+      "text": "APIs were released for distribution to third parties only after approval by the Quality Unit. Intermediates were transferred under quarantine to other units under the company’s control when authorized by the Quality Unit. Appropriate controls and documentation were in place. SOP for solvent tanker receipt, inspection, storage, and handling (effective 15 June 2024) was available and was reviewed. Solvents used for MOP1 and MOP2 included methanol, toluene, acetone, methyl tert-butyl ether (in drums), dichloromethane, and IPA. Solvents were delivered by tanker to the tank yard. …",
+      "text_ko": "원료의약품은 품질부서의 승인 후에만 제3자 유통 목적으로 출하됐다. 중간체는 품질부서가 승인한 경우 회사가 관리하는 다른 사업장으로 격리 상태로 이송됐으며, 적절한 관리와 문서화가 이뤄졌다. 용매 탱크로리의 입고·검사·보관·취급 표준작업지침서(2024년 6월 15일 시행)가 갖춰져 있어 검토했다. MOP1·MOP2 에 사용되는 용매는 메탄올, 톨루엔, 아세톤, 메틸 tert-부틸 에테르(드럼), 디클로로메탄, IPA 였다. 용매는 탱크로리로 탱크 야드에 납품됐다. …",
+      "title_ko": "원료의약품 보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "The independent Quality Unit had adequate laboratory facilities. Written procedures, including SOP for sampling and handling, covered sampling, testing, approval or rejection of materials, and storage of laboratory data. Laboratory records were maintained in accordance with established requirements. The analytical raw data issue and checklist for a selected batch were reviewed. The batch was tested on 8 Mar 2022, and the analysis was completed on 22 Mar 2022. …",
+      "text_ko": "독립된 품질부서가 충분한 시험실 시설을 갖추고 있었다. 검체 채취·취급 표준작업지침서를 포함한 문서화된 절차가 자재의 검체 채취, 시험, 적합·부적합 판정, 시험 데이터의 보관을 다루고 있었다. 시험실 기록은 정해진 요건에 따라 유지됐다. 선정된 배치의 분석 원자료 발행 내역과 점검표를 검토했다. 해당 배치는 2022년 3월 8일 시험됐고 분석은 2022년 3월 22일 완료됐다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "Validation documentation The Validation Master Plan described the company’s approach and intentions regarding validation activities. Validation was performed for all relevant activities in accordance with the defined Validation Policy and SOP (Master Validation Plan). Revalidation, where required, was performed in accordance with the current version of the Validation Master Plan and the Process Validation SOP. …",
+      "text_ko": "밸리데이션 문서 — 밸리데이션 마스터플랜이 밸리데이션 활동에 대한 회사의 접근법과 계획을 기술하고 있었다. 밸리데이션은 정의된 밸리데이션 정책과 표준작업지침서(마스터 밸리데이션 플랜)에 따라 모든 관련 활동에 대해 수행됐다. 재밸리데이션이 필요한 경우 밸리데이션 마스터플랜 최신판과 공정 밸리데이션 표준작업지침서에 따라 수행됐다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control",
+      "text": "A formal change control system was established through the respective SOP to evaluate all changes that could impact the production and control of APIs, as well as related SOPs and computerized systems. The SOP defines the process for identification, documentation, review, and approval of such changes. Selected change control requests were randomly selected and reviewed. Separate register logbooks were maintained for each product. The register for Molnupiravir for the years 2025 and 2026 was available and was reviewed. …",
+      "text_ko": "원료의약품의 생산·관리에 영향을 줄 수 있는 모든 변경과 관련 표준작업지침서·전산화 시스템을 평가하는 공식 변경관리 시스템이 해당 지침서로 확립돼 있었다. 지침서는 변경의 식별·문서화·검토·승인 프로세스를 정의한다. 무작위로 선정한 변경관리 요청 건들을 검토했다. 제품별로 별도의 등록 대장이 유지됐으며, Molnupiravir 의 2025년·2026년 대장이 갖춰져 있어 검토했다. …",
+      "title_ko": "변경 관리"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Rejection APIs that did not meet established specifications were identified and placed under quarantine. Reprocessing and reworking SOP for reprocessing and reworking (effective 1 June 2023) was available and was reviewed. The SOP defined requirements for reprocessing and reworking of intermediates and APIs that did not conform to established specifications and was applicable to MOP1 and MOP2. Reprocessing and reworking were clearly defined in the SOP. Where reprocessing was performed, the resulting batch was required to be included in both accelerated and long-term stability studies. …",
+      "text_ko": "불합격 처리 — 설정된 규격에 맞지 않는 원료의약품은 식별해 격리 보관했다. 재처리 및 재가공 — 재처리·재가공 표준작업지침서(2023년 6월 1일 시행)가 갖춰져 있어 검토했다. 지침서는 규격에 적합하지 않은 중간체·원료의약품의 재처리·재가공 요건을 정의하며 MOP1·MOP2 에 적용됐다. 재처리와 재가공은 지침서에 명확히 정의돼 있었고, 재처리를 수행한 경우 해당 배치를 가속·장기 안정성시험에 모두 포함하도록 요구됐다. …",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and recalls",
+      "text": "Complaints SOP for Market Complaint Management (effective 1 June 2023) was available and was reviewed. The SOP defined procedures to ensure that complaints were recorded, investigated, and reviewed within defined timelines to prevent recurrence. Complaints were classified as Critical, Major, or Minor, with definitions provided. Responsibilities of the respective departments and timelines for each stage of complaint handling were defined. Preliminary investigation timelines were established as 7 days for critical complaints and 15 days for major and minor complaints. …",
+      "text_ko": "불만 — 시장 불만 관리 표준작업지침서(2023년 6월 1일 시행)가 갖춰져 있어 검토했다. 지침서는 재발 방지를 위해 불만이 정해진 기한 내에 기록·조사·검토되도록 하는 절차를 정의했다. 불만은 정의와 함께 중대(Critical)·주요(Major)·경미(Minor)로 분류됐다. 각 부서의 책임과 불만 처리 단계별 기한이 정의돼 있었으며, 예비조사 기한은 중대 불만 7일, 주요·경미 불만 15일로 설정돼 있었다. …",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contract manufacturers (including laboratories)",
+      "text": "The qualification of contractors, manufacturers of APIs, and other critical material suppliers, as well as the use of external scientific, analytical, or technical services, was defined in the current version of Supplier Qualification. The company utilized external laboratories for activities not available in-house. A list of contractors was available and discussed. Contract manufacturers were evaluated by Corporate QA to ensure GMP compliance for the specific operations performed at the contract sites. …",
+      "text_ko": "수탁업체, 원료의약품 제조업체, 기타 중요 자재 공급업체의 적격성 평가와 외부의 과학·분석·기술 서비스 이용은 공급업체 적격성평가 최신판에 정의돼 있었다. 회사는 사내에서 수행할 수 없는 활동에 외부 시험실을 이용했다. 수탁업체 목록이 갖춰져 있어 논의됐다. 수탁 제조업체는 수탁 사업장에서 수행되는 특정 작업에 대한 GMP 준수를 보증하기 위해 본사 QA 가 평가했다. …",
+      "title_ko": "수탁 제조업체(시험실 포함)"
+     }
+    ],
+    "outcome_ko": "실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서 xxx에 열거된 관찰사항 포함)을 종합할 때, 인도 텔랑가나주 Sangareddy 지역 Rudraram 소재 MSN Laboratories Private Limited 는 WHO 원료의약품 GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 결함은 전체 보고서에 열거된 대로 WHOPIR 발행 전에 제조소가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

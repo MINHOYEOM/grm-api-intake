@@ -205,7 +205,9 @@ from grm_notion import (
     notion_api_request,
     notion_create_page,
     notion_headers,
+    canonical_url_key,
     notion_query_existing_doc_ids,
+    notion_query_existing_keys,
     notion_verify_handoff_ref_property,
     notion_verify_modality_property,
 )
@@ -1670,6 +1672,24 @@ class RssFeedSpec:
     keep_item: Callable[["_RssItemFields"], bool] | None = None
 
 
+# ── [기사 permalink 2차 dedup 2026-08-24] ────────────────────────────────────
+# `official_url` 이 **기사 하나를 가리키는 permalink** 인 소스만. 여기 든 소스는
+# doc_id 외에 정규화 URL 로도 중복을 막는다(`canonical_url_key`).
+#
+# ⛔ **넓히기 전에 반드시 실측하라 — 잘못 넣으면 그 소스가 통째로 사라진다.**
+# `official_url` 을 **공용 목록/API 주소**로 쓰는 소스가 있고, 그런 소스에 이 dedup 을 걸면
+# 두 번째 행부터 전부 "중복"이 되어 수집이 사실상 0 이 된다. 2026-08-24 전수 실측:
+#     MFDS           1,760행 / 고유 URL   27  ← 공용 목록 URL. 넣으면 98.5% 유실
+#     OpenFDA Recall   120행 / 고유 URL    1  ← API 엔드포인트. 넣으면 99.2% 유실
+#     EMA               46행 / 고유 URL   43  ← 3건은 **문서 개정**(같은 PDF 재발행)이라
+#                                              중복이 아니다 — 지우면 개정 신호가 죽는다
+#     ECA Academy      126행 / 고유 URL   75  ← 진짜 중복 40.5%(간격 1~2일이 압도적)
+#     ISPE              19행 / 고유 URL   19  ← 현재 중복 0. ECA 와 동일한 기사 permalink
+#                                              구조라 예방적으로 포함(동작 변화 없음)
+# 나머지(FDA WL·483·HC·PIC/S·MHRA·EU NCR)는 실측 중복 0 이라 손대지 않는다.
+_CANONICAL_URL_DEDUP_SOURCES = frozenset({SOURCE_ECA, SOURCE_ISPE})
+
+
 def collect_rss_feed(spec: RssFeedSpec, start: date,
                      end: date) -> tuple[list[IntakeItem], str | None]:
     """RssFeedSpec 하나로 RSS/Atom 피드를 수집해 IntakeItem 리스트를 반환한다(배치6 Phase3)."""
@@ -2650,6 +2670,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
                  existing_ids: set[str], dry_run: bool, *,
+                 existing_url_keys: set[str] | None = None,
                  modality_enabled: bool | None = None,
                  findings_sqlite_path: str | None = None,
                  findings_sqlite_include_findings: bool = False,
@@ -2659,6 +2680,10 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
 
     [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
     row 당 env 재독해 없이 그대로 build_notion_properties 로 흐른다(미지정 시 env 폴백).
+
+    [기사 permalink 2차 dedup 2026-08-24] existing_url_keys 를 주면
+    `_CANONICAL_URL_DEDUP_SOURCES` 소스에 한해 정규화 URL 로도 중복을 막는다. 미지정(None)이면
+    종전과 완전히 동일하게 동작한다 — 이 인자를 넘기지 않는 호출부는 영향받지 않는다.
     """
     inserted = 0
     skipped = 0
@@ -2672,11 +2697,23 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
         if dedup_key in existing_ids:
             skipped += 1
             continue
+        # 2차: 같은 기사가 날짜만 바꿔 다시 온 경우(doc_id 가 달라져 위 검사를 빠져나간다).
+        # 누적(insert 후 add)이라 **배치 안 중복**과 **실행 간 중복**을 한자리에서 함께 막는다.
+        url_key = ""
+        if existing_url_keys is not None and item.source in _CANONICAL_URL_DEDUP_SOURCES:
+            url_key = canonical_url_key(item.source, item.official_url)
+            if url_key and url_key in existing_url_keys:
+                log("INFO", f"기사 permalink 중복 skip source={item.source} "
+                            f"id={item.document_id} url={truncate(item.official_url, 90)}")
+                skipped += 1
+                continue
         if dry_run:
             log("INFO", f"[DRY] insert source={item.source} id={item.document_id} "
                        f"date={item.date_iso} rel={item.qa_relevance} head={truncate(item.headline, 60)}")
             inserted += 1
             existing_ids.add(dedup_key)
+            if url_key:
+                existing_url_keys.add(url_key)
             continue
         # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
         time.sleep(0.34)
@@ -2685,6 +2722,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
         if ok:
             inserted += 1
             existing_ids.add(dedup_key)
+            if url_key:
+                existing_url_keys.add(url_key)
             if findings_sqlite_path:
                 try:
                     if findings_sqlite_include_findings:
@@ -3676,10 +3715,13 @@ def main() -> int:
 
     if args.dry_run:
         existing: set[str] = set()
+        existing_url_keys: set[str] = set()
     else:
         try:
-            existing = notion_query_existing_doc_ids(notion_token, notion_db, run_date,
-                                                     window_days=dedup_window_days)
+            _keys = notion_query_existing_keys(notion_token, notion_db, run_date,
+                                               window_days=dedup_window_days)
+            existing = _keys.doc_ids
+            existing_url_keys = _keys.url_keys
         except NotionDedupeQueryError as e:
             # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
             log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
@@ -3778,6 +3820,7 @@ def main() -> int:
         ins, sk, fail = insert_items(
             notion_token, notion_db, _insert_items_map[spec.prefix],
             run_date, collected_at, existing, args.dry_run,
+            existing_url_keys=existing_url_keys,
             modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,
@@ -3808,6 +3851,7 @@ def main() -> int:
         src_in, src_sk, src_fail = insert_items(
             notion_token, notion_db, search_items,
             run_date, collected_at, existing, args.dry_run,
+            existing_url_keys=existing_url_keys,
             modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,

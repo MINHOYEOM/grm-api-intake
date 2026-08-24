@@ -15,7 +15,8 @@ from __future__ import annotations
 import json
 import time
 from datetime import date, datetime, timedelta
-from typing import Any
+from typing import Any, NamedTuple
+from urllib.parse import urlsplit, urlunsplit
 
 import requests
 
@@ -275,9 +276,53 @@ def notion_verify_handoff_ref_property(token: str, db_id: str) -> bool:
     return True
 
 
+def canonical_url_key(source: str, url: str) -> str:
+    """`source::정규화URL` — **기사 단위 permalink** 를 쓰는 소스의 2차 dedup 키.
+
+    ⚠️ 이 키는 `document_id` 키를 **대체하지 않는다**(그건 불가침이다 — 바꾸면 기존 전 row 의
+    id 가 달라져 일제히 신규로 재유입된다). 같은 기사가 **날짜만 바꿔 다시 오는** 경우를 잡는
+    **추가 층**일 뿐이다: `_stable_doc_id` 가 `date_iso` 를 키에 넣으므로 RSS 가 기사를 재게시하면
+    doc_id 자체가 달라져 doc_id 기반 dedup 으로는 구조적으로 잡을 수 없다(2026-08-24 실측:
+    ECA 126행 중 고유 기사 75개 — 중복 40.5%, 간격은 1~2일이 압도적).
+
+    정규화는 **보수적**으로만 한다 — scheme·host 소문자화, fragment 제거, 말미 슬래시 1개 제거.
+    query 는 **보존**한다(`?id=123` 처럼 query 가 문서를 가르는 사이트가 있어, 지우면 서로 다른
+    문서가 한 키로 뭉쳐 조용히 유실된다). 정규화가 과하면 dedup 은 곧 데이터 손실이 된다.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return ""
+    try:
+        parts = urlsplit(raw)
+    except ValueError:
+        return f"{source}::{raw.lower()}"
+    path = parts.path
+    if len(path) > 1 and path.endswith("/"):
+        path = path[:-1]
+    normalized = urlunsplit((
+        parts.scheme.lower(), parts.netloc.lower(), path, parts.query, ""))
+    return f"{source}::{normalized}"
+
+
+class ExistingKeys(NamedTuple):
+    """dedup 대조용 기존 키 집합 — 같은 조회 1패스에서 함께 모은다(추가 API 비용 0)."""
+
+    doc_ids: set[str]   # "{source}::{document_id}"
+    url_keys: set[str]  # "{source}::{정규화 official_url}"
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                                   window_days: int = 7,
                                   source_names: set[str] | None = None) -> set[str]:
+    """`notion_query_existing_keys(...).doc_ids` — 기존 호출부 호환 래퍼(반환 불변)."""
+    return notion_query_existing_keys(
+        token, db_id, run_date, window_days=window_days,
+        source_names=source_names).doc_ids
+
+
+def notion_query_existing_keys(token: str, db_id: str, run_date: date,
+                               window_days: int = 7,
+                               source_names: set[str] | None = None) -> ExistingKeys:
     """최근 window_days 일(KST Run Date 기준) row 의 'source::document_id' key set 반환.
 
     daily 수집 전환(Phase 1)으로 dedupe 윈도우를 '당일' → '최근 window_days 일'로 확장.
@@ -293,6 +338,7 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
     """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     existing: set[str] = set()
+    url_keys: set[str] = set()
     window_start = (run_date - timedelta(days=window_days)).isoformat()
     and_filters: list[dict[str, Any]] = [
         {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
@@ -350,6 +396,14 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                 doc_id = "".join(rt.get("plain_text", "") for rt in doc_id_arr).strip()
                 if src and doc_id:
                     existing.add(f"{src}::{doc_id}")
+                # Official URL — 같은 패스에서 2차 dedup 키도 모은다(추가 요청 없음).
+                # 소비는 `_CANONICAL_URL_DEDUP_SOURCES` 에 든 소스에 한정되므로, 여기서
+                # 전 소스를 모아도 다른 소스의 판정에는 영향이 없다.
+                official = (props.get(PROP_OFFICIAL_URL, {}) or {}).get("url") or ""
+                if src and official:
+                    key = canonical_url_key(src, official)
+                    if key:
+                        url_keys.add(key)
             if not data.get("has_more"):
                 break
             start_cursor = data.get("next_cursor")
@@ -367,8 +421,9 @@ def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
         raise NotionDedupeQueryError(
             f"Notion 중복 조회 실패 (RunDate={run_date}): {e}"
         ) from e
-    log("INFO", f"Notion 기존 row {len(existing)} 건 (최근 {window_days}일, ~{run_date})")
-    return existing
+    log("INFO", f"Notion 기존 row {len(existing)} 건 (최근 {window_days}일, ~{run_date}) "
+                f"· URL 키 {len(url_keys)} 건")
+    return ExistingKeys(doc_ids=existing, url_keys=url_keys)
 
 
 def _rich_text(text: str) -> list[dict[str, Any]]:

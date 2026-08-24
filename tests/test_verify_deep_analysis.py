@@ -754,10 +754,59 @@ class HeadingOnlyOriginalTest(unittest.TestCase):
     def test_gate_blocks_merge_with_statements(self) -> None:
         source = _SOURCE + " " + self._STATEMENT
         da = self._da_with_original(self._STATEMENT)
+        # D5d(완역 하한)와 분리해 D5c 게이팅만 검증 — description 을 원문 완역 수준으로 채운다.
+        da["key_violations"][0]["description"] = (
+            "귀사는 유해 미생물이 없어야 하는 의약품의 각 배치에 대해 필요한 "
+            "적절한 시험실 시험을 수행하지 않았다(21 CFR 211.165(b)).")
         without = vda.run_deep_analysis_gate(da, source)
-        self.assertTrue(without.ok)   # wl_statements 미전달 = 기존 동작 불변(additive)
+        self.assertTrue(without.ok)   # wl_statements 미전달 = D5c 무영향(additive)
         with_stmts = vda.run_deep_analysis_gate(da, source, wl_statements=[self._STATEMENT])
         self.assertFalse(with_stmts.ok)
+
+
+class DescriptionCoverageTest(unittest.TestCase):
+    """D5d — 국문 해석의 완역 하한(2026-08-24 2차 사고: 긴 영문 발췌 vs 두 줄 국문 요약).
+
+    사이트의 다른 모든 원문↔국문 병기(statement_ko·NCR *_ko·WHOPIR text_ko)는 완역인데
+    deep kv 쌍만 요약이라 독자에게 '번역 안 된' 화면이 됐다 — 완역 계약의 결정론 하한선."""
+
+    _ORIGINAL = ("Your firm failed to conduct appropriate laboratory testing, as "
+                 "necessary, for each batch of drug product required to be free of "
+                 "objectionable microorganisms (21 CFR 211.165(b)). Specifically, you "
+                 "lacked appropriate incubation times, lacked appropriate method "
+                 "suitability, and lacked positive and negative controls.")
+
+    def _da(self, description: str) -> dict:
+        da = {k: v for k, v in _GOOD_DEEP_ANALYSIS.items()}
+        kv = [dict(v) for v in da["key_violations"]]
+        kv[0] = dict(kv[0], original=self._ORIGINAL, description=description)
+        da["key_violations"] = kv
+        return da
+
+    def test_summary_description_fails(self) -> None:
+        findings = vda.check_description_coverage(self._da("미생물 시험이 부적절했다."))
+        self.assertTrue(any(f.code == "D5D-DESCRIPTION-UNDERTRANSLATED"
+                            and f.severity == vda.SEV_FAIL for f in findings))
+
+    def test_full_translation_passes(self) -> None:
+        full = ("귀사는 유해 미생물이 없어야 하는 의약품의 각 배치에 대해 필요한 적절한 "
+                "시험실 시험을 수행하지 않았다(21 CFR 211.165(b)). 구체적으로 적절한 "
+                "배양시간이 없었고, 적절한 시험법 적합성이 없었으며, 양성·음성 대조도 없었다.")
+        self.assertEqual(vda.check_description_coverage(self._da(full)), [])
+
+    def test_no_original_skipped(self) -> None:
+        # original 미보유 kv(국문 단독 발행)는 완역 대조 대상이 아니다.
+        self.assertEqual(vda.check_description_coverage(_GOOD_DEEP_ANALYSIS), [])
+
+    def test_admin_sections_not_checked_by_gate(self) -> None:
+        # 처분문(한국어 원문) 카드는 원문을 그대로 읽을 수 있어 요약이 정당 — WL 섹션 집합이
+        # 아닐 때는 게이트가 D5d 를 부르지 않는다.
+        da = self._da("요약 한 줄.")
+        da["disposition_basis"] = da.pop("fda_evaluation")
+        source = _SOURCE + " " + self._ORIGINAL
+        result = vda.run_deep_analysis_gate(da, source)
+        self.assertTrue(all(f.code != "D5D-DESCRIPTION-UNDERTRANSLATED"
+                            for f in result.findings))
 
 
 if __name__ == "__main__":

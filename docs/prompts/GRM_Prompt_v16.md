@@ -542,11 +542,14 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
      ⚠️ **근거 규칙(브릿지 게이트가 검사)**: `citation`(WL·행정처분)은 그 카드 `body_full` 에 **글자
      그대로 있는 조항/법령/[별표N]만** 인용한다(원문에 없는 조항·다른 법령 = D2 하드 FAIL → 그
      카드 심층분석 통째 drop). 483 의 CFR `citation` 은 원문에 없어도 WARN(비차단·정당한 해석 허용).
-     `original` 은 `body_full` 에서 **국문 `description` 이 요약한 모든 구체 사실의 근거 문장을 전부
-     담는 연속 구간**을 verbatim 발췌한다(없으면 생략). ⛔ **번호 매긴 위반 표제문 한 문장만 발췌 금지**
+     `original` 은 `body_full` 에서 **국문 `description` 의 근거 문장을 전부 담는 연속 구간**을
+     verbatim 발췌한다(없으면 생략). ⛔ **번호 매긴 위반 표제문 한 문장만 발췌 금지**
      — 표제문은 결정론 위반항목 상세가 이미 원문 그대로 보여주며, 표제문만 발췌하면 화면의 원문↔국문
      해석 쌍이 서로 다른 내용이 된다(2026-08-24 발행 사고: 19개 항목 전건). 이제 D5c 하드 FAIL —
-     original 이 표제문 범위를 못 벗어나면 그 카드 심층분석 통째 drop. 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
+     original 이 표제문 범위를 못 벗어나면 그 카드 심층분석 통째 drop.
+     ⛔ WL 의 `description` 은 **병기된 original 전체를 충실히 옮긴 완역**이어야 한다(요약 금지 —
+     D5d 하드 FAIL: 국문/원문 정규화 길이 비율 0.28 미만 차단. 2026-08-24 2차 사고: original 만
+     늘리자 "긴 영문 vs 두 줄 국문"이 발행됐다. 완역 실측 비율 0.39~0.53). 4섹션 전부 채운다(빈 섹션 = D1 FAIL).
      `required_remediation` 은 반드시 `{deadline, items[]}` 객체(문자열 금지·items 비면 FAIL). 산문은 한국어.
      ⛔ **483 `observations_ko` 는 필수다 — 빠지면 그 주 브리프 "전체"가 발행되지 않는다**(2026-07-20
      실장애·2026-07-25 재현 확인). 아래 두 게이트가 카드 단위 degrade 가 아니라 **브리프 단위 차단**이다:
@@ -661,6 +664,7 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 ### 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-08-24 | **WL deep `description` 완역 계약 + D5c/D5d 하드 게이트(§B `[2단계]` ⚠️ 근거 규칙 문구만 · 코드 산출 형태 불변)**: 08-24 발행분 WL 19개 항목 전건이 ① original 로 표제문 한 문장만 발췌해 원문↔국문 쌍이 파손됐고(1차), ② 발췌를 본문까지 늘리자 description 이 1~2문장 요약 그대로라 "긴 영문 vs 두 줄 국문"이 됐다(2차·사용자 지적). 수리 = original 은 description 근거 문장 전부를 담는 연속 발췌(D5c: 표제문 범위 내 발췌 FAIL, `verify_deep_analysis.check_heading_only_original`) + description 은 병기 original 전체의 충실한 완역(D5d: 국문/원문 길이 비율 0.28 미만 FAIL, `check_description_coverage`). 정본 상세는 `GRM_Prompt_DeepWL_v1.md` 2026-08-24 항. 08-24 발행분 19개 항목 원문 재발췌+완역 재기록 완료. **사람 운영 routine 재-붙여넣기 후 적용**. |
 | 2026-08-24 | **WL 위반항목 국문 병기 단계 ⑤ 신설(§B `[2단계]` WL 스키마 줄 표시·⑤·`[산출물 예치]` deep 블록 예시만 · 6슬롯·4섹션 규칙·코드 산출 형태 불변)**: 웹 카드의 WL "위반항목 상세" 블록은 `statement_ko` 병기 슬롯·병합층(`inject_slots._merge_wl_violation_translations`, #670)이 2026-08-10 부터 있었는데, **이 프롬프트가 산출을 지시한 적이 없어** 라우틴이 채널을 한 번도 채우지 않았다(08-10 은 손 백필 2/3카드, 08-24 발행분 5카드·14표제문 전건 영문 단독 — 세 주 연속 `violations_ko` 미생산의 근본 원인). 수리 = handoff 가 `wl_violation_translation_ready`/`wl_violation_translation_input`(`[{number, statement}]` — 발행 카드 결정론 블록과 같은 producer)을 싣고(코드), ⑤ 가 `violations_ko: [{number, statement_ko}]` 를 deep 델타 항목 최상위에 예치하도록 지시하며, 2겹 게이트(`assemble_publish_brief._lint_wl_violation_ko` 게이트 6 + `web/render.validate_wl_violations` 배포 fail-closed)가 결손을 **브리프 단위 차단**으로 끌어올린다(WL 템플릿의 조용한 영문 degrade 가 결손을 5주 살렸다 — 483 과 동일 구조로 정렬). 과거 발행분(06-26~08-24, 14카드 44표제문)은 결정론 백필 CLI(`backfill_wl_violation_ko.py`)로 소급 병기 완료. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영 — 반영 전 첫 월요일 발행은 게이트 6 에 막힐 수 있으니 재-붙여넣기를 머지 직후 수행할 것). |
 | 2026-07-27 | **델타 카드 키를 `web_card_id` 로 명시(§B [출력] envelope 규칙·예시·[2단계] deep 키·[산출물 예치] 표기만 · 6슬롯 규칙·코드 불변)**: 카드 키 회귀가 2026-07-13·07-27 **두 번** 발생해 발행이 전건 거부됐다(07-27 = 103장 전량, 사람이 순수 rename 패치로 수습). 원인은 Routine 의 실수가 아니라 **명명 충돌**이다 — handoff row 에 `card_id` 라는 필드가 있고 그 값이 `Source::document_id`(예: `FDA 483::fda483-193813`)인데, 프롬프트는 "카드 키 = `card.id`(=`document_id`)"라고만 적어 눈앞의 `card_id` 를 쓰는 독법이 자연스러웠다. 수리 = handoff 가 **모호하지 않은 `web_card_id`(=bare document_id)를 별도 필드로 노출**하고(코드), 프롬프트가 **그 필드명을 그대로 지시**한다 + `card_id` 금지를 예시와 함께 명시. 안전망으로 델타 브릿지가 `::` 접두사 키를 자동 정규화(무손실·충돌 시 포기·WARN 로그로 회귀 가시화)하므로, 이 프롬프트 반영 전에도 발행은 막히지 않는다. 순수 doc 문구 — 슬롯 의미·가드·수명주기 불변. **사람 운영 routine 재-붙여넣기 후 적용**. |
 | 2026-07-25 | **483 `observations_ko` 를 `(선택)`→`★필수` 로 정정(§B `[2단계]` FDA 483 스키마 줄만 · 6슬롯·[출력]·코드·골든 불변)**: 2026-07-14 에 `render.py` fail-closed 발행 게이트(`validate_483_observations`)가 배포되면서 이 필드는 **사실상 필수**가 됐고 483 정본 프롬프트(`GRM_Prompt_DeepFda483_v1.md` §2)도 "필수·게이트 검증 대상"으로 고쳐졌으나, **클라우드 Routine 이 실제로 실행하는 이 v16 프롬프트만 `(선택)` 인 채 남아 있었다** — 2026-07-20 주간발행 3중 차단 중 하나(deep 백필이 분석 4섹션만 만들어 관찰 번역 누락 → 그 주 브리프 전체 발행 차단)의 잔여 원인. 2026-07-25 발행 리허설에서 재현 확인(관찰 20건 누락 시 사이트 빌드 전체 FAIL). 정정 내용 = 스키마 표기 `★필수` + 두 게이트(`render.py` 배포 fail-closed · `assemble_publish_brief._lint_483_observation_ko` 조립 선행)가 **카드 단위 degrade 가 아니라 브리프 단위 차단**임을 명시 + 형식(`number` 1:1 매칭 `[{number,deficiency_ko,detail_ko}]`) + **4섹션이 D1/D2 로 drop 돼도 `observations_ko` 는 별도 층으로 병합되므로 분석이 자신 없어도 관찰 번역은 반드시 채울 것** 명시. 순수 doc 문구 — 코드·테스트·골든 불변. **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영). |

@@ -644,6 +644,44 @@ def check_heading_only_original(deep_analysis: dict[str, Any],
     return findings
 
 
+# D5d(WL 전용) — 국문 해석이 병기 원문의 완역이어야 한다는 계약의 하한선.
+# [2026-08-24 실사고 2차] D5c 수리로 original 을 본문까지 늘렸더니 이번엔 "영문은 엄청 긴데
+# 국문은 꼴랑 2줄"(사용자 지적)이 됐다 — description 이 종전 1~2문장 요약 그대로였기 때문.
+# 사이트의 다른 모든 원문↔국문 병기(WL 표제 statement_ko·NCR *_ko·WHOPIR text_ko·483
+# deficiency_ko)는 전부 **완역**인데 deep kv 쌍만 요약이라, 독자에게는 "번역이 안 된" 화면이
+# 된다. 프롬프트 계약을 완역으로 올리고(DeepWL v1 2026-08-24), 이 게이트가 그 하한선을 잡는다.
+# 임계 0.28 = 실측 근거: 결함 상태 19쌍의 비율 0.07~0.25 · 완역 재작성본 0.32~0.47(최소 0.32).
+# 영문 규제문은 중복 관용구가 많아 충실 완역도 0.5 를 넘기 어렵다 — 0.28 은 요약을 자르고
+# 완역을 통과시키는 사이값이다. 원문이 한국어인 admin(처분문)은 원문을 그대로 읽을 수 있어
+# 요약이 정당하므로 대상이 아니다(호출부가 WL 섹션 집합일 때만 부른다).
+_MIN_KO_EN_RATIO = 0.28
+
+
+def check_description_coverage(deep_analysis: dict[str, Any]) -> list[Finding]:
+    """D5d: WL kv 의 국문 해석(description)이 병기 original 대비 완역 하한 비율 미달이면 FAIL."""
+    findings: list[Finding] = []
+    kv = deep_analysis.get("key_violations")
+    if not isinstance(kv, list):
+        return findings
+    for i, v in enumerate(kv):
+        if not isinstance(v, dict):
+            continue
+        orig = v.get("original")
+        desc = v.get("description")
+        if not (isinstance(orig, str) and len(orig.strip()) >= _MIN_ORIGINAL_LEN
+                and isinstance(desc, str) and desc.strip()):
+            continue
+        ratio = len(_normalize_original(desc)) / max(1, len(_normalize_original(orig)))
+        if ratio < _MIN_KO_EN_RATIO:
+            findings.append(Finding(
+                SEV_FAIL, "D5D-DESCRIPTION-UNDERTRANSLATED",
+                f"key_violations[{i}]의 국문 해석이 병기 원문 대비 {ratio:.2f}"
+                f"(<{_MIN_KO_EN_RATIO}) — 원문↔국문 병기는 완역 계약이다. description 을 "
+                "original 의 모든 문장 내용을 옮기는 충실한 국문으로 다시 쓰거나, original 을 "
+                "국문이 실제로 옮긴 범위로 좁혀라."))
+    return findings
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 게이트 실행
 # ─────────────────────────────────────────────────────────────────────────────
@@ -716,8 +754,11 @@ def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
             findings.extend(check_fda483_original_truncation(deep_analysis, source_text))
         # D5c: WL 전용 표제문 단독 발췌 하드검증(FAIL) — 결정론 표제문 목록을 받은 경우만
         # (2026-08-24 원문·국문 병기쌍 파손 사고 재발 방지 · wl_statements 미전달 시 무영향).
+        # D5d: WL 전용 완역 하한(FAIL) — 국문 해석이 병기 원문 대비 요약 수준이면 차단
+        # (2026-08-24 2차 사고: original 만 늘리자 "긴 영문 vs 두 줄 국문" 비대칭이 발행됐다).
         if sections is REQUIRED_SECTIONS:
             findings.extend(check_heading_only_original(deep_analysis, wl_statements))
+            findings.extend(check_description_coverage(deep_analysis))
     return GateResult(ok=not has_failures(findings), findings=findings,
                       report=format_report(findings))
 

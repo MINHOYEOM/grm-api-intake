@@ -410,6 +410,13 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 예외가 필요 없다).
     report.errors.extend(_lint_wl_violation_ko(out.get("cards") or []))
 
+    # 게이트 7: WHOPIR 상세 블록의 국문 병기 결손 — 발행 차단(2026-08-25).
+    # 게이트 6의 WHOPIR 판이다. 상세를 확보하고도(수집 유실은 #777/#784 로 수리) 라우틴이
+    # `ncr_ko` 를 안 채우면 영문 단독으로 조용히 degrade 하던 마지막 구멍을 막는다 — 과거
+    # 발행분(07-27 #475 · 08-03 #779 · 08-24 #778/#784)은 전건 병기 완료 실측이라 무조건
+    # 검사가 안전하고, 배포 단계 `web/render.validate_whopir_ko` 가 한 번 더 fail-closed.
+    report.errors.extend(_lint_whopir_ko(out.get("cards") or []))
+
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
     agencies = _distinct_in_order(
@@ -668,6 +675,34 @@ def _lint_wl_violation_ko(cards: list[dict[str, Any]]) -> list[str]:
             if not str(v.get("statement_ko") or "").strip():
                 errs.append(f"카드 {c.get('id')!r} 위반 #{v.get('number', '?')}: "
                             f"statement_ko 없음 (WL 위반항목 국문 병기 결손)")
+    return errs
+
+
+def _lint_whopir_ko(cards: list[dict[str, Any]]) -> list[str]:
+    """WHOPIR 상세 블록의 국문 병기 결손을 조립 단계에서 잡는다(발행 차단 사유 목록 반환).
+
+    [게이트 7, 2026-08-25] 게이트 6(`_lint_wl_violation_ko`)의 WHOPIR 판 — 무조건 검사
+    (과거 발행분 전건 병기 완료 실측·소급 예외 불요). 검사 필드는 상세 구조를 따른다:
+    `outcome`↔`outcome_ko` · 섹션 `text`↔`text_ko` · 섹션 `title`↔`title_ko`.
+    reliance 인용 행(기관명·일자)은 verbatim 설계라 국문 요구가 없고, 상세 블록이 없는
+    링크 카드(구조화 실패의 정직한 degrade)는 대상이 아니다.
+    복구 경로: deep 델타 항목에 `ncr_ko: {outcome_ko, s<번호>_ko, s<번호>_title_ko}` 를
+    채워 재조립(라우틴 재예치 — `card_scaffold.whopir_translation_input` 이 키 계약의
+    단일 정의처)."""
+    errs: list[str] = []
+    for c in cards:
+        dd = c.get("deterministic_detail")
+        if not (isinstance(dd, dict) and dd.get("type") == "whopir_report"):
+            continue
+        cid = c.get("id")
+        if str(dd.get("outcome") or "").strip() and not str(dd.get("outcome_ko") or "").strip():
+            errs.append(f"카드 {cid!r} outcome: outcome_ko 없음 (WHOPIR 상세 국문 병기 결손)")
+        for s in dd.get("sections") or []:
+            no = s.get("no", "?")
+            if str(s.get("text") or "").strip() and not str(s.get("text_ko") or "").strip():
+                errs.append(f"카드 {cid!r} 항목 #{no}: text_ko 없음 (WHOPIR 상세 국문 병기 결손)")
+            if str(s.get("title") or "").strip() and not str(s.get("title_ko") or "").strip():
+                errs.append(f"카드 {cid!r} 항목 #{no}: title_ko 없음 (WHOPIR 상세 국문 병기 결손)")
     return errs
 
 

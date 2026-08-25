@@ -861,7 +861,38 @@
      }
     ]
    },
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "무균 완제에서 포유류 모발 등 이물이 반복 검출됐으나 조사가 적시에 완료되지 않았고 근본원인 규명·시정이 입증되지 않았다.",
+      "original": "Written records of investigations into the failure of a batch or any of its components to meet specifications do not always include the conclusions and follow-up. Specifically, A. Extrinsic biological particulates (mammalian hair) have continued to be identified in finished sterile drug products. However, investigations into these events have not been completed in a timely manner and do not demonstrate that the root cause has been adequately identified and corrected. From approximately 08/30/2025 to present, you have identified mammalian hair in finished units in at least <Redacted B4> batches, including three identified in 2026, representing a recurring contamination issue (approximately <Redacted B4>) <Redacted B4> batches out of <Redacted B4> inspected in 2026). Probable root cause has been attributed to stopper components; however, this conclusion is based on an ongoing, aggregated trend investigation (REC 1093464), that was opened on 08/28/2025, and has not been substantiated through complete, batch specific investigations. All <Redacted B4> deviations are currently open. You stated that closure of those deviations is pending completion of this trend investigation. Despite implementation of multiple corrective and preventative actions, you continue to observe mammalian hair in finished drug products.",
+      "citation": "21 CFR 211.192",
+      "risk": "반복 이물 혼입에 대한 근본원인 미규명은 무균성·제품품질의 지속적 위해를 방치하는 결과가 된다."
+     },
+     {
+      "observation": "육안검사의 검출 민감도·결함 검출성이 적절히 적격성평가되지 않아 공정 변동을 감시·검증하는 관리절차가 미비했다.",
+      "original": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in­process material and the drug product. Specifically, A. Visual inspection methods have been implemented without adequately qualifying inspection sensitivity, defect detectability, or comparability between methods. For example: Your threshold <Redacted B4> studies failed to generate <Redacted B4> across the full visible range of defects and failed to establish <Redacted B4> based on defect size at which defects become reliably detectable. Without establishing <Redacted B4> supported by <Redacted B4> you have not demonstrated that inspection sensitivity has been adequately qualified or that the visual inspection process is capable of consistently detecting and rejecting critical defects. Additionally, MVI studies were conducted using aggregated \"particulate\" defect categories that combined multiple particulate defect types (ex: glass, metal, rubber, fibers). Further, defect units were characterized by using broad size ranges rather than actual measured particle sizes, which does not allow for evaluation of detection capability as function of particle size. Review of your threshold studies supporting the manual baseline demonstrated that certain particulate defect types, such as glass, black fiber, and hair, exhibited low",
+      "citation": "21 CFR 211.110",
+      "risk": "검사 신뢰성이 입증되지 않아 불량 유출 위험이 커진다."
+     },
+     {
+      "observation": "무균 표방 제품의 미생물 오염 방지 절차에 무균·멸균 공정의 적절한 밸리데이션이 포함되지 않았다.",
+      "original": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization processes.",
+      "citation": "21 CFR 211.113",
+      "risk": "무균공정 밸리데이션 미흡은 최종 제품 무균성 보증의 근거를 약화시킨다."
+     }
+    ],
+    "inspectional_significance": "반복 이물 혼입에 대한 조사 완결성 부족, 검사 적격성평가·환경모니터링·품질부서 책임 문서화 미흡 등 품질시스템 전반의 체계적 결함을 지적한다. 반복성·근본원인 미규명은 데이터·품질 신뢰성 문제로 확대될 수 있어 중대도가 높고, Warning Letter 로 승격될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "반복 이물(모발) 혼입에 대한 조사를 결론·후속조치까지 완결하고 근본원인 규명·시정을 입증한다.",
+      "육안검사 등 검사 방법의 검출 민감도·결함 검출성을 적격성평가하고 재검증한다.",
+      "무균·멸균 공정 밸리데이션과 환경모니터링·트렌드 분석 체계를 보강하고 CAPA 를 문서화한다."
+     ]
+    },
+    "administrative_risks": "품질시스템 전반의 체계적 결함과 반복성은 미시정 시 Warning Letter, OAI 분류, 후속 재실사로 이어질 수 있으며, 무균제제 공급의 규제 리스크를 높인다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -985,7 +1016,37 @@
      }
     ]
    },
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "ISO 5 무균구역에서 작업자의 손 위치가 HEPA 필터로부터의 단일방향 first air 를 가로막아 무균조작의 핵심 보호를 무력화했다.",
+      "original": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted. Specifically, On 05/05/2026, a compounding technician was observed preparing the following prescription in Buffer Room lH-ll0A: R R X <Redacted B4> TPN, 2000 mL IV Bag During the preparation of RX# <Redacted B4> the following deficiency was observed: While injecting components into the 2000mL IV bag, the technician's hand placement was observed blocking the bag port and needle. The technician's hands were positioned in a manner that obstructed the unidirectional first air between the HEPA filter face and the critical work surface, thereby compromising the sterility assurance of the critical area.",
+      "citation": "21 CFR 211.42",
+      "risk": "임계 작업면의 무균 보증이 훼손돼 무균 완제(TPN 등)의 오염 위험이 직접 커진다."
+     },
+     {
+      "observation": "작업자가 눈·이마 등 피부를 노출한 채 ISO 5 무균조작을 수행했다.",
+      "original": "Personnel performed aseptic manipulations with exposed hair or skin. Specifically, a. The compounding technician was observed leaning into the ISO 5 Laminar Airflow Workbench (LAFW). with exposed skin around the eyes and forehead while performing aseptic manipulations of <Redacted B4> TPN, 2000 mL IV Bag, increasing the risk of contamination to the critical work surface.",
+      "risk": "인체 유래 입자·미생물이 임계 구역으로 유입돼 무균성이 저하될 수 있다."
+     },
+     {
+      "observation": "동적(작업 재현) 조건에서 스모크 스터디(기류 가시화)가 수행되지 않았다.",
+      "original": "Smoke studies were not performed under dynamic conditions.",
+      "citation": "21 CFR 211.113",
+      "risk": "실제 작업 동작 하의 단일방향 기류 유지가 입증되지 않아 무균공정 설계의 타당성 근거가 부족하다."
+     }
+    ],
+    "inspectional_significance": "무균조작 동선·기류·소독·설비 청결에 걸친 다수(8건) 관찰이 확인된 체계적(systemic) 무균보증 결함으로, 개별 단발성 실수가 아니라 무균공정 관리 전반의 취약성을 시사한다. 조사관이 실제 조제 장면을 반복 관찰해 기록한 만큼 중대도가 높으며, 시정이 불충분할 경우 Warning Letter 로 승격될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "ISO 5 구역 작업자 동선·손 위치가 first air 를 차단하지 않도록 무균조작 절차·훈련을 개정하고 재자격을 실시한다.",
+      "동적 조건 스모크 스터디를 재수행해 단일방향 기류 유지를 입증하고 기록화한다.",
+      "구역 전환 시 소독·설비 청결 절차의 적정성을 재검증하고 CAPA 를 문서화한다."
+     ]
+    },
+    "administrative_risks": "미시정·불충분 응답 시 Warning Letter, OAI(Official Action Indicated) 분류, 후속 재실사로 이어질 수 있으며, 무균보증 결함의 성격상 해당 제조소 무균제제의 공급 신뢰성에 영향을 줄 수 있다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1124,7 +1185,37 @@
      }
     ]
    },
-   "deep_analysis": null,
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "베타락탐 의약품을 비베타락탐 무균 제품과 동일한 ISO 5 후드에서 생산해 교차오염 방지를 위한 격리·전용화가 미흡했다.",
+      "original": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination. Specifically, Beta-Lactam drug products are produced in the same ISO 5 hoods as non-beta-lactam drug products intended to be sterile. The following beta-lactam drugs were observed being produced in your LAFH hood include, but are not limited to: - - - - - - ceftaroline fosamil 300 mg in D5W 100 mL ampicillin 2 gm in Normal Saline Mini-Bag 100 mL ampicillin/sulbactam 3 gm in Normal Saline Mini-Bag I00 mL ertapenem I gm in Normal Saline Mini-Bag 50 mL meropenem 1000 mg in Normal Saline Mini-Bag 50 mL meropenem 2000 mg in Normal Saline 100 mL Your firm performs cleaning with only '(bl <41 between the production ofbeta-lactam and non-beta lactam drug products intended to be sterile in the same ISO 5 area and uses[(I:)) (4) I, with a [(I:)) (4) I~ time, as the cleaning/sanitizing agent to inactivate beta-lactam residues only[(I:)) (4) Ion[(I:)) (4) Iin the non-hazardous production area. This frequency is inadequate to prevent cross-contamination.",
+      "citation": "21 CFR 211.42",
+      "risk": "베타락탐 교차오염은 과민반응 위험이 커 환자안전에 직접적 위해가 된다."
+     },
+     {
+      "observation": "ISO 5 비위해 생산 후드의 HEPA 필터에서 원인 불명의 갈색 얼룩이 관찰됐고 출처·필터 건전성 영향 여부를 규명하지 못했다.",
+      "original": "unidentified brown staining was observed on the HEPA filter in the ISO 5 non-hazardous LAFH production hood",
+      "citation": "21 CFR 211.42",
+      "risk": "필터 건전성·공기질에 대한 보증이 불확실해 무균 환경 신뢰성이 저하된다."
+     },
+     {
+      "observation": "무균조작 중 만료된(2022-01 제조) 멸균 장갑을 착용해 장갑의 무균성 보증이 없었다.",
+      "original": "Operators were observed using expired sterile gloves (manufactured in 01/2022) during aseptic production of bortezomib 2.7mg",
+      "risk": "장갑 무균성 미보증으로 임계 조작 중 오염 유입 가능성이 커진다."
+     }
+    ],
+    "inspectional_significance": "베타락탐 교차오염 방지 미흡, HEPA 오염 미규명, 소독·동선·복장 등 무균실무 전반에 걸친 다수(10건) 관찰로, 무균제제 제조소의 오염관리전략(CCS)이 체계적으로 취약함을 보여준다. 베타락탐 교차오염은 규제상 특히 중대하게 다뤄져 Warning Letter·후속 조치로 승격될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "베타락탐과 비베타락탐 무균 제품의 생산 설비·구역을 전용화·격리하고 세척 검증을 재수립한다.",
+      "HEPA 필터 얼룩의 원인을 조사하고 필터 건전성·공기질 영향에 대한 소급 위해평가를 실시한다.",
+      "멸균 장갑 등 무균 소모품의 유효기한 관리·사용 통제를 강화하고 CAPA 를 문서화한다."
+     ]
+    },
+    "administrative_risks": "베타락탐 교차오염 관련 지적은 규제 당국이 엄격히 보는 항목으로, 미시정 시 Warning Letter, Import Alert(해당 시), OAI 분류, 재실사로 이어질 수 있다."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

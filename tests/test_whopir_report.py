@@ -204,5 +204,64 @@ class MergeTest(unittest.TestCase):
         self.assertFalse(rep.errors)
 
 
+class WhopirKoGateTest(unittest.TestCase):
+    """[게이트 7 + 배포 fail-closed, 2026-08-25] 상세를 확보하고도 국문 병기가 빠진 채
+    영문 단독으로 조용히 degrade 하던 마지막 구멍 — 483·WL 과 같은 2겹으로 소리 나게 막는다."""
+
+    def _incomplete_card(self):
+        return {"id": "who-whopir-abc", "deterministic_detail": _detail()}
+
+    def _complete_card(self):
+        dd = _detail()
+        dd["outcome_ko"] = "적합 수준으로 판정됐다."
+        for s in dd["sections"]:
+            s["text_ko"] = "국문 요약."
+            s["title_ko"] = "국문 표제"
+        return {"id": "who-whopir-abc", "deterministic_detail": dd}
+
+    def test_assemble_gate_flags_missing_ko(self):
+        import assemble_publish_brief as apb
+        errs = apb._lint_whopir_ko([self._incomplete_card()])
+        # outcome_ko 1 + 섹션 2개 × (text_ko·title_ko) = 5건
+        self.assertEqual(len(errs), 5)
+        self.assertTrue(all("국문 병기 결손" in e for e in errs))
+
+    def test_assemble_gate_passes_when_complete(self):
+        import assemble_publish_brief as apb
+        self.assertEqual(apb._lint_whopir_ko([self._complete_card()]), [])
+
+    def test_assemble_gate_ignores_link_cards_and_reliance_rows(self):
+        import assemble_publish_brief as apb
+        rel = cs._detail_whopir_report({}, {"whopir_report": _RELIANCE})
+        rel["outcome_ko"] = "인용 실사에 근거한 판정."
+        cards = [
+            {"id": "a", "card_type": "WHO"},                       # 상세 없는 링크 카드
+            {"id": "b", "deterministic_detail": rel},              # reliance 행은 국문 요구 없음
+        ]
+        self.assertEqual(apb._lint_whopir_ko(cards), [])
+
+    def _render_mod(self):
+        import pathlib
+        web_dir = pathlib.Path(__file__).resolve().parent.parent / "web"
+        sys.path.insert(0, str(web_dir))
+        import render  # noqa: E402
+        return render
+
+    def test_render_validate_flags_missing_ko(self):
+        render = self._render_mod()
+        brief = {"brief": {"publish_date": "2026-08-24"},
+                 "cards": [self._incomplete_card()]}
+        out = render.validate_whopir_ko([brief])
+        self.assertEqual(len(out), 5)
+        self.assertTrue(any("MISSING_OUTCOME_KO" in v for v in out))
+        self.assertTrue(any("MISSING_SECTION_TEXT_KO" in v for v in out))
+        self.assertTrue(any("MISSING_SECTION_TITLE_KO" in v for v in out))
+        self.assertIn("2026-08-24", out[0])
+
+    def test_render_validate_passes_when_complete(self):
+        render = self._render_mod()
+        self.assertEqual(render.validate_whopir_ko([self._complete_card()]), [])
+
+
 if __name__ == "__main__":
     unittest.main()

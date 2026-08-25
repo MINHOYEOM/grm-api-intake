@@ -3339,6 +3339,59 @@ def validate_wl_violations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
     return violations
 
 
+class WhopirKoValidationError(ValueError):
+    """WHOPIR 상세 국문 병기 게이트 위반 — fail-closed. main() 전용(하단 참조)."""
+
+
+def validate_whopir_ko(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
+    """WHOPIR 상세 블록 발행 게이트 — `validate_wl_violations` 의 WHOPIR 판(순수 함수).
+
+    [2026-08-25] WHOPIR 는 상세를 확보하고도 두 계층에서 조용히 빈약해질 수 있었다:
+    수집 유실(#777 inmemory 가림·#784 섹션 회수율)과 **번역 미생산**(ncr_ko 는 프롬프트
+    지시뿐, 빠지면 영문 단독으로 degrade). 483 `observations_ko`·WL `statement_ko` 와 같은
+    2겹으로 끌어올린다: 조립 선행검출(`assemble_publish_brief._lint_whopir_ko` 게이트 7)
+    + 여기 배포 fail-closed. 과거 발행분(07-27 #475 · 08-03 #779 · 08-24 #778/#784)은
+    전건 병기 완료 실측(20카드 missing 0)이라 전 브리프 무조건 검사가 안전하다.
+
+    검사 대상 = deterministic_detail.type == "whopir_report" 인 카드:
+      1. outcome 이 있는데 outcome_ko 없음 → MISSING_OUTCOME_KO
+      2. 섹션 text 가 있는데 text_ko 없음 → MISSING_SECTION_TEXT_KO
+      3. 섹션 title 이 있는데 title_ko 없음 → MISSING_SECTION_TITLE_KO
+    (reliance 인용 행은 기관명·일자 verbatim 설계라 국문 요구가 없다. 상세 블록이 없는
+    링크 카드는 검사 대상이 아니다 — 구조화 실패의 정직한 degrade 는 허용.)
+    """
+    violations: list[str] = []
+
+    def _ok(v: Any) -> bool:
+        return isinstance(v, str) and bool(v.strip())
+
+    def _check_card(card: dict[str, Any], brief_label: str) -> None:
+        dd = card.get("deterministic_detail")
+        if not isinstance(dd, dict) or dd.get("type") != "whopir_report":
+            return
+        card_id = card.get("id") or card.get("render_order") or "?"
+        if _ok(dd.get("outcome")) and not _ok(dd.get("outcome_ko")):
+            violations.append(f"{brief_label} / card {card_id} / outcome: MISSING_OUTCOME_KO")
+        for s in (dd.get("sections") or []):
+            no = s.get("no", "?")
+            if _ok(s.get("text")) and not _ok(s.get("text_ko")):
+                violations.append(
+                    f"{brief_label} / card {card_id} / section #{no}: MISSING_SECTION_TEXT_KO")
+            if _ok(s.get("title")) and not _ok(s.get("title_ko")):
+                violations.append(
+                    f"{brief_label} / card {card_id} / section #{no}: MISSING_SECTION_TITLE_KO")
+
+    for item in cards_or_briefs:
+        if "brief" in item and "cards" in item:
+            label = item["brief"].get("publish_date") or item["brief"].get("run_date_kst") or "?"
+            for card in (item.get("cards") or []):
+                _check_card(card, label)
+        else:
+            _check_card(item, "?")
+
+    return violations
+
+
 def _validate_briefs_or_raise(data_dir: Path) -> None:
     """main() 전용 fail-closed 게이트 호출부. 실제 배포 대상(`--data`) 브리프를 로드해
     검증하고, 위반이 하나라도 있으면 즉시 raise(빌드 전체 실패 → CI red)."""
@@ -3354,6 +3407,12 @@ def _validate_briefs_or_raise(data_dir: Path) -> None:
         raise WlViolationValidationError(
             "WL 위반항목 국문 병기 게이트 위반 — 발행 차단(brief file / card id / "
             "violation number / fail code):\n" + "\n".join(f"  · {v}" for v in wl_violations)
+        )
+    whopir_missing = validate_whopir_ko(briefs)
+    if whopir_missing:
+        raise WhopirKoValidationError(
+            "WHOPIR 상세 국문 병기 게이트 위반 — 발행 차단(brief file / card id / "
+            "field / fail code):\n" + "\n".join(f"  · {v}" for v in whopir_missing)
         )
 
 

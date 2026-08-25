@@ -519,6 +519,105 @@ class Fda483TruncationTest(unittest.TestCase):
         self.assertTrue(any(f.code == "D4-ORIGINAL-UNGROUNDED" for f in result.findings))
 
 
+class Fda483TruncationRepairTest(unittest.TestCase):
+    """★[D5b 결정론 수리 2026-08-25] 잘린 원문 병기를 **버리지 말고 이어붙인다.**
+
+    D5b(FAIL) 판정은 옳지만 결과가 entry 통째 보류라, 절단 하나 때문에 카드가 심층분석
+    4섹션을 통째로 잃었다(실측: 2026-07-12 발행분 3장 — 델타에는 멀쩡한 분석이 있었다).
+    잘려나간 부분은 이미 `source_text` 안에 verbatim 으로 있으므로 LLM 재호출 없이 원문
+    slice 를 붙이면 된다. 수리 조건은 D5b 판정 조건과 같은 상수·같은 정규화를 쓴다."""
+
+    # 관찰 2개 — 두 번째 표제가 첫 관찰의 경계가 된다(마커 폴백 경로 검증용).
+    _SRC_TWO_OBS = (
+        _483_TRUNC_SOURCE
+        + " OBSERVATION 2: Control procedures are not established which monitor "
+          "the output of manufacturing processes. Specifically, visual inspection "
+          "methods were not qualified."
+    )
+
+    def _obs_rows(self):
+        """카드의 결정론 관찰 분해(정본 경로 입력) — deficiency + detail 쌍."""
+        return [{"number": "1",
+                 "deficiency": _483_TRUNC_ORIGINAL_DEFICIENCY_ONLY,
+                 "detail": ("Specifically, A. Extrinsic biological particulates "
+                            "(mammalian hair) were identified in Lot 12345 during "
+                            "microscopic examination.")}]
+
+    def test_repair_extends_original_and_gate_then_passes(self):
+        """수리 전 FAIL → 수리 후 PASS. 게이트를 직접 돌려 확인한다(라벨을 믿지 않는다)."""
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        before = vda.run_deep_analysis_gate(da, _483_TRUNC_SOURCE, card_type="fda-483")
+        self.assertFalse(before.ok)
+        fixed, n, unrepaired = vda.repair_fda483_original_truncation(
+            da, _483_TRUNC_SOURCE, self._obs_rows())
+        self.assertEqual((n, unrepaired), (1, []))
+        after = vda.run_deep_analysis_gate(fixed, _483_TRUNC_SOURCE, card_type="fda-483")
+        self.assertTrue(after.ok, after.report)
+        self.assertNotIn("D5-483-ORIGINAL-TRUNCATED",
+                         [f.code for f in after.findings])
+
+    def test_repaired_text_is_verbatim_from_source(self):
+        """★이어붙인 텍스트는 전부 원문 slice 여야 한다 — 생성 0 이 이 수리의 안전 근거다."""
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        fixed, _, _ = vda.repair_fda483_original_truncation(
+            da, _483_TRUNC_SOURCE, self._obs_rows())
+        repaired = fixed["key_violations"][0]["original"]
+        self.assertIn(vda._normalize_original(repaired),
+                      vda._normalize_original(_483_TRUNC_SOURCE))
+        self.assertIn("Specifically", repaired)
+        self.assertTrue(repaired.startswith(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY))
+
+    def test_marker_fallback_when_observation_row_missing(self):
+        """★결정론 관찰 목록에 그 항목이 없어도 원문 표제로 경계를 잡는다.
+
+        실측 사고(193455): 원문에 OBSERVATION 2 가 있는데 카드의 결정론 목록엔 1·3~8 만
+        있었다 — 정본 경로만 있으면 이 항목은 영영 수리 불가다."""
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        fixed, n, unrepaired = vda.repair_fda483_original_truncation(
+            da, self._SRC_TWO_OBS, observations=None)   # 관찰 분해 없음
+        self.assertEqual((n, unrepaired), (1, []))
+        repaired = fixed["key_violations"][0]["original"]
+        self.assertIn("Specifically", repaired)
+        self.assertNotIn("OBSERVATION 2", repaired)     # 다음 관찰을 삼키지 않는다
+
+    def test_no_boundary_leaves_item_unrepaired_and_gate_still_fails(self):
+        """★★경계를 못 정하면 **수리하지 않는다** — 조용히 통과시키지 않는 것이 핵심이다.
+
+        관찰 분해도 없고 다음 표제도 없으면 어디서 끊을지 알 수 없다. 임의 길이로 자르면
+        그건 근거가 아니라 추측이다."""
+        src_no_marker = _483_TRUNC_SOURCE.replace("OBSERVATION 1: ", "")
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        fixed, n, unrepaired = vda.repair_fda483_original_truncation(
+            da, src_no_marker, observations=None)
+        self.assertEqual((n, unrepaired), (0, [0]))
+        self.assertIs(fixed, da)                        # 사본조차 만들지 않는다
+        after = vda.run_deep_analysis_gate(fixed, src_no_marker, card_type="fda-483")
+        self.assertFalse(after.ok)                      # FAIL 이 유지된다
+
+    def test_untruncated_original_is_left_alone(self):
+        """★음성 검사 — 멀쩡한 original 은 건드리지 않는다(수리기가 과잉 개입하지 않는다)."""
+        da = _make_483_da(_483_TRUNC_ORIGINAL_FULL)
+        fixed, n, unrepaired = vda.repair_fda483_original_truncation(
+            da, _483_TRUNC_SOURCE, self._obs_rows())
+        self.assertEqual((n, unrepaired), (0, []))
+        self.assertIs(fixed, da)
+
+    def test_original_absent_from_source_is_left_alone(self):
+        """원문에서 아예 안 찾아지는 항목은 D4 의 영역 — 수리기가 관여하지 않는다."""
+        da = _make_483_da("This exact phrase does not appear anywhere in the source.")
+        fixed, n, unrepaired = vda.repair_fda483_original_truncation(
+            da, _483_TRUNC_SOURCE, self._obs_rows())
+        self.assertEqual((n, unrepaired), (0, []))
+
+    def test_missing_source_text_is_a_noop(self):
+        da = _make_483_da(_483_TRUNC_ORIGINAL_DEFICIENCY_ONLY)
+        for empty in ("", None):
+            with self.subTest(source=empty):
+                fixed, n, _ = vda.repair_fda483_original_truncation(da, empty or "")
+                self.assertEqual(n, 0)
+                self.assertIs(fixed, da)
+
+
 class KoreanSpecificGroundingTest(unittest.TestCase):
     def test_ungrounded_latin_specific_warns_not_blocks(self) -> None:
         # 3) WL 카드: 국문 해석에 원문(original) 밖 라틴 단어("Alternaria")가 등장 → D5a WARN,

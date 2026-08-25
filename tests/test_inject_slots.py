@@ -390,6 +390,45 @@ class InjectDeepAnalysisTest(unittest.TestCase):
         self.assertEqual(report.errors, [])
         self.assertTrue(any("브리프에 없는 카드" in w for w in report.warnings))
 
+    def test_truncated_483_original_is_repaired_then_merged(self) -> None:
+        """★[D5b 결정론 수리 2026-08-25] 절단 하나로 카드가 심층분석을 통째로 잃지 않는다.
+
+        종전엔 D5b FAIL → entry 통째 보류라, 델타에 멀쩡한 4섹션이 있어도 카드가 빈 채로
+        발행됐다(실측: 2026-07-12 발행분 3장). 잘려나간 부분은 `source_text` 안에 있으므로
+        병합 직전에 원문에서 이어붙인다 — 이 테스트가 **배선**을 고정한다(수리 함수 단위
+        테스트만 있으면 호출이 빠져도 초록이다)."""
+        fx = _load_input("fda_483_observations")
+        card = cs.build_card_scaffold(fx["row"], fx["raw"])
+        brief = cs.assemble_web_brief([card], {
+            "run_date_kst": "2026-07-12", "window": "2026-07-05 ~ 2026-07-12",
+            "publish_date": "2026-07-12", "intake_total": 1,
+        })
+        doc_id = brief["cards"][0]["id"]
+        brief["cards"][0]["deep_analysis"] = None      # fan-out 대상 표시(placeholder)
+        deficiency = ("Personnel were observed conducting aseptic manipulations where "
+                      "the movement of first air in the ISO 5 area is blocked.")
+        detail = ("Specifically, on 05/05/2026 a compounding technician was observed "
+                  "blocking the bag port and needle during preparation.")
+        source = f"OBSERVATION 1: {deficiency}\n{detail}\n\nOBSERVATION 2: Smoke studies."
+        da = {
+            "key_violations": [{"citation": "21 CFR 211.42",
+                                "observation": "무균조작 중 first air 차단이 관찰됐다.",
+                                "original": deficiency,        # ← 절단본
+                                "risk": "오염 위험이 증가한다."}],
+            "inspectional_significance": "무균보증 체계 결함으로 볼 수 있는 관찰이다.",
+            "required_remediation": {"deadline": "15영업일", "items": ["동선 재교육"]},
+            "administrative_risks": "미시정 시 Warning Letter 로 이어질 수 있다.",
+        }
+        report = inj.inject_deep_analysis(
+            brief, {doc_id: {"deep_analysis": da, "source_text": source}})
+        merged = brief["cards"][0]["deep_analysis"]
+        self.assertIsNotNone(merged, f"수리 배선이 빠져 병합이 보류됐다: {report.errors}")
+        repaired = merged["key_violations"][0]["original"]
+        self.assertIn("Specifically", repaired)         # 상세가 붙었다
+        self.assertNotIn("OBSERVATION 2", repaired)     # 다음 관찰을 삼키지 않았다
+        self.assertTrue(any("결정론 복원" in w for w in report.warnings),
+                        f"수리 사실이 보고되지 않았다: {report.warnings}")
+
     def test_card_not_deep_analysis_ready_warns_not_errors(self) -> None:
         # deep_analysis_ready=False 카드(전문 미확보)에 델타를 보내면 무시(경고만).
         fx = _load_input("mfds_notice")

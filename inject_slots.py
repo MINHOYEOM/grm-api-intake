@@ -296,6 +296,22 @@ def inject_deep_analysis(brief: dict[str, Any],
         if isinstance(dd, dict) and dd.get("type") == "wl_violations":
             wl_statements = [str(r.get("statement") or "")
                              for r in (dd.get("violations") or []) if isinstance(r, dict)]
+        # [D5b 결정론 수리 2026-08-25] 잘린 483 원문 병기는 **버리지 말고 이어붙인다.**
+        # D5b(FAIL) 판정 자체는 옳지만 그 결과가 entry 통째 보류라, 절단 하나 때문에 카드가
+        # 심층분석 4섹션을 통째로 잃는다(실측: 07-12 발행분 3장이 이 경로로 죽었고 델타에는
+        # 멀쩡한 분석이 그대로 있었다). 잘려나간 부분은 이미 `source_text` 안에 verbatim 으로
+        # 있으므로 LLM 재호출 없이 원문 slice 를 붙이면 된다(생성 0 → 환각 0). 경계를 확정
+        # 못 하는 항목은 수리하지 않고 남겨 게이트가 그대로 FAIL 시킨다 — 조용한 통과 없음.
+        obs_rows = None
+        if isinstance(dd, dict) and dd.get("type") == "fda_483_observations":
+            obs_rows = [r for r in (dd.get("observations") or []) if isinstance(r, dict)]
+        da_repaired, n_repaired, _unrepaired = vda.repair_fda483_original_truncation(
+            da, source_text, obs_rows)
+        if n_repaired:
+            da = da_repaired
+            report.warnings.append(
+                f"deep_analysis[{doc_id!r}]: 원문 병기 절단 {n_repaired}건을 원문에서 "
+                "결정론 복원(생성 0 — source_text verbatim)")
         gate = vda.run_deep_analysis_gate(da, source_text, wl_statements=wl_statements)
         if not gate.ok:
             report.errors.append(

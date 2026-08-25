@@ -597,6 +597,90 @@ def check_fda483_original_truncation(deep_analysis: dict[str, Any],
     return findings
 
 
+# ── D5b 결정론 수리(2026-08-25) ───────────────────────────────────────────────
+# `OBSERVATION <n>:` 표제 — 483 원문 본문의 관찰 경계. 전 코퍼스에 있는 형식은 **아니고**
+# (실측 109건 중 14건), 그래서 경계 확정 실패 시 수리를 포기하는 폴백으로만 쓴다.
+_483_OBSERVATION_MARKER_RE = re.compile(r"\bOBSERVATION\s+\d+\s*:")
+
+
+def _repair_end_offset(source_norm: str, idx: int, orig_norm: str,
+                       obs_norm: "list[tuple[str, str]]") -> "int | None":
+    """잘린 original 을 어디까지 이어붙일지 — 정본 경로 우선, 마커 폴백, 실패 시 None.
+
+    ① **정본**: 카드의 결정론 관찰 분해(`deterministic_detail.observations[]` 의
+       `deficiency` + `detail`)가 곧 "결함문 + Specifically 상세"다. 같은 원문에서 저장소
+       파서가 이미 뽑아 둔 경계이므로 이걸 쓰면 새 파서를 만들지 않아 드리프트가 0 이다.
+    ② **폴백**: 정본이 없을 때(관찰 목록에서 그 항목이 누락된 경우가 실재한다 — 193455 는
+       원문에 OBSERVATION 2 가 있는데 결정론 목록엔 1·3~8 만 있다) 원문의 다음 관찰 표제
+       직전까지.
+    ③ 둘 다 못 정하면 **None** — 어디서 끊을지 모르는 채 임의 길이로 자르지 않는다."""
+    for deficiency, detail in obs_norm:
+        if not detail or not deficiency.lower().startswith(orig_norm.lower()):
+            continue
+        block = f"{deficiency} {detail}"
+        if source_norm[idx:idx + len(block)].lower() == block.lower():
+            return idx + len(block)
+    marker = _483_OBSERVATION_MARKER_RE.search(source_norm, idx + len(orig_norm))
+    return marker.start() if marker else None
+
+
+def repair_fda483_original_truncation(
+        deep_analysis: dict[str, Any], source_text: str,
+        observations: "list[dict[str, Any]] | None" = None,
+) -> "tuple[dict[str, Any], int, list[int]]":
+    """D5b 가 잡는 절단을 **결정론으로** 되돌린다 — 원문에서 잘린 자리부터 이어붙인다.
+
+    D5b(FAIL)는 옳은 판정이지만, 그 결과가 **entry 통째 보류**라 카드가 심층분석을 통째로
+    잃는다(실측: 2026-07-12 발행분 3장). 그런데 잘려나간 부분은 이미 `source_text` 안에
+    verbatim 으로 있다 — 즉 **LLM 을 다시 부를 필요 없이 붙이기만 하면 되는 결손**이다.
+    이어붙인 텍스트는 전부 원문 slice 라 생성이 0 이고, 따라서 환각 위험도 0 이다.
+
+    수리 조건은 D5b 의 판정 조건과 **글자 그대로 같다**(원문에서 발견됨 + 바로 뒤가
+    "Specifically"). 조건을 복제하지 않고 같은 상수·같은 정규화를 쓴다 — 한쪽만 바뀌면
+    "게이트는 FAIL 인데 수리는 대상 아님"이라는 교착이 생기기 때문이다.
+
+    반환 = (수리본 사본, 수리 건수, 경계 확정 실패로 **미수리된** 인덱스). 미수리가 남으면
+    게이트는 여전히 FAIL 이고 그게 맞다 — 조용히 통과시키지 않는다.
+    """
+    kv = deep_analysis.get("key_violations")
+    if not isinstance(kv, list) or not source_text:
+        return deep_analysis, 0, []
+    source_norm = _normalize_original(source_text)
+    source_lower = source_norm.lower()
+    obs_norm: list[tuple[str, str]] = []
+    for o in (observations or []):
+        if isinstance(o, dict):
+            deficiency = _normalize_original(str(o.get("deficiency") or ""))
+            if deficiency:
+                obs_norm.append((deficiency, _normalize_original(str(o.get("detail") or ""))))
+
+    new_kv = list(kv)
+    repaired = 0
+    unrepaired: list[int] = []
+    for i, v in enumerate(kv):
+        if not isinstance(v, dict):
+            continue
+        orig = v.get("original")
+        if not isinstance(orig, str) or len(orig.strip()) < _MIN_ORIGINAL_LEN:
+            continue
+        orig_norm = _normalize_original(orig)
+        idx = source_lower.find(orig_norm.lower())
+        if idx == -1:
+            continue                       # D4 의 영역(근거 자체가 불명) — 손대지 않는다
+        tail = source_norm[idx + len(orig_norm):].lstrip(" .:;,-")
+        if tail[:len(_483_TRUNCATION_FOLLOW_WORD)].lower() != _483_TRUNCATION_FOLLOW_WORD:
+            continue                       # 절단 아님 — 멀쩡한 original 을 건드리지 않는다
+        end = _repair_end_offset(source_norm, idx, orig_norm, obs_norm)
+        if end is None:
+            unrepaired.append(i)
+            continue
+        new_kv[i] = {**v, "original": source_norm[idx:end].strip()}
+        repaired += 1
+    if not repaired:
+        return deep_analysis, 0, unrepaired
+    return {**deep_analysis, "key_violations": new_kv}, repaired, unrepaired
+
+
 def check_heading_only_original(deep_analysis: dict[str, Any],
                                 wl_statements: "list[str] | None") -> list[Finding]:
     """D5c(FAIL·WL 전용): original 이 결정론 위반 **표제문**(deterministic_detail.violations[]

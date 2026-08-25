@@ -653,6 +653,15 @@ def _parse_deficiency_table(
     if deficiency == "present":
         log("WARN", "MFDS GMP 지적 표 0행(지적사항 present) — 요약카드 유지: " f"{doc_id}")
         return [], "gate-degraded"
+    # ★[침묵 사각지대 가드 2026-08-25] assess=`unknown` + 표 0행은 "표가 없는 게 정상"이
+    # 아니라 **판정 불능과 추출 실패가 겹친** 상태다 — 원문에 표가 실재하는데 파서가 0행을
+    # 낸 문서(실측: 서울대병원)가 여태 소리 없이 empty 로 흘렀다(WARN 은 present 조합만).
+    # status 는 "empty" 그대로 둔다: raw_payload 값·health 카운터(attempted/failed) 등
+    # 기존 산출물 byte 불변이 목표고, 이 가드는 WARN 로그와 health 관측 항목만 더한다
+    # (관측은 _tally_deficiency_table_health 가 raw_payload 의 같은 조합으로 기록).
+    if deficiency == "unknown":
+        log("WARN", "MFDS GMP 지적 표 0행(지적사항 unknown) — 판정 불능이라 표 실재 시 "
+                    f"유실일 수 있음: {doc_id}")
     return [], "empty"  # '지적사항 없음' 정상(적합 배지) — 표 없음이 맞음
 
 
@@ -845,6 +854,12 @@ def _tally_deficiency_table_health(health: dict[str, Any], item: IntakeItem) -> 
     elif status in ("gate-degraded", "parse-fail"):
         health["failed"] += 1
         health["warnings"].append(f"{status}: {item.firm}")
+    elif status == "empty" and str(
+            item.raw_payload.get("attachment_deficiency_assessment") or "") == "unknown":
+        # ★[침묵 사각지대 가드 2026-08-25] empty + assess=unknown 조합의 health 관측.
+        # 카운터(attempted/extracted/failed)는 종전 그대로 — 실패 단정이 아니라 "표가
+        # 실재하면 유실일 수 있는" 후보의 가시화라, warnings 항목만 더한다.
+        health["warnings"].append(f"empty-unknown: {item.firm}")
 
 
 def collect_mfds_gmp_inspections(

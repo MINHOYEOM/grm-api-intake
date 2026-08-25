@@ -4758,7 +4758,7 @@
    "deterministic_detail": {
     "type": "whopir_report",
     "report_kind": "reliance",
-    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection The most recent WHO onsite inspection was performed from 14 to 18 November 2022 and was closed as compliant. Before this, the site was inspected by WHO 18-21 April 2016 and was also closed as compliant. Summary of key information about the site According to the site master file: Senador Laboratories Private Limited, Ahmedabad, is engaged in the manufacture of medicinal products, including solid oral dosage forms (hormonal and non-hormonal tablets) and injectable hormonal formulations (terminally sterilised suspensions). It is located in a so called “Pharma zone”, surrounded by other pharmaceutical companies. The Ahmedabad facility was commissioned in 2009 as part of Famy Care Limited. In May 2015, Famy Care demerged its female contraceptive business into a separate entity, Jai Pharma Limited. In November 2015, Mylan Laboratories Limited (a Viatris Company) acquired Famy Care’s female contraceptive business. On 20 November 2015, Jai Pharma Limited formally became part of Mylan Laboratories Limited. …",
+    "outcome": "Based on the GMP evidence received and reviewed, it is considered that a desk assessment may be performed in lieu of a WHO Inspection. The site Senador (Matoda), located at Senador Laboratories Private Limited, Plot No. 20 & 21, PHARMEZ, Pharmaceutical SEZ, Sarkhej- Bavla NH No. 8A, Near Village Matoda, Taluka Sanand, Ahmedabad – 382213, Gujarat, India, is considered to be operating at an acceptable level of compliance with WHO GMP guidelines. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
     "sections": [],
     "reliance": [
      {
@@ -4770,7 +4770,7 @@
       "dates": "17-24 November 2025"
      }
     ],
-    "outcome_ko": "최근 WHO 실사 요약 — 가장 최근 WHO 현장실사는 2022년 11월 14~18일에 수행됐고 적합(compliant)으로 종결됐다. 그 이전에는 2016년 4월 18~21일에 WHO 실사를 받았고 역시 적합으로 종결됐다. 사이트 개요(Site Master File 기준): 인도 아메다바드 소재 Senador Laboratories Private Limited 는 고형 경구제(호르몬·비호르몬 정제)와 주사제 호르몬 제제(최종멸균 현탁액)를 포함한 의약품을 제조한다. 다른 제약사들에 둘러싸인 이른바 \"Pharma zone\"에 위치한다. 아메다바드 시설은 2009년 Famy Care Limited 의 일부로 가동을 시작했다. 2015년 5월 Famy Care 는 여성 피임제 사업을 별도 법인 Jai Pharma Limited 로 분할했고, 2015년 11월 Mylan Laboratories Limited(Viatris 계열)가 이를 인수했다. 2015년 11월 20일 Jai Pharma Limited 는 공식적으로 Mylan Laboratories Limited 의 일부가 됐다."
+    "outcome_ko": "접수되어 검토된 GMP 증빙에 근거할 때, WHO 실사를 갈음하여 서면평가(desk assessment)를 수행할 수 있는 것으로 판단됐다. 인도 구자라트주 아메다바드(382213) 사난드 탈루카 마토다 마을 인근 Sarkhej-Bavla NH 8A 도로변 제약 특별경제구역(Pharmaceutical SEZ) PHARMEZ 내 Plot No. 20 & 21, Senador Laboratories Private Limited 에 위치한 Senador (Matoda) 사이트는 WHO GMP 가이드라인을 허용 가능한 수준으로 준수하며 운영 중인 것으로 판단된다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {
@@ -5632,7 +5632,7 @@
    "deterministic_detail": {
     "type": "whopir_report",
     "report_kind": "reliance",
-    "outcome": "Summary of the last WHO inspection Date and conclusion of most recent WHO inspection No onsite WHO inspection has been conducted at this manufacturing site. In the absence of recent WHO onsite inspection data, reliance was placed on the January 2024 GMP inspection performed by a stringent regulatory authority (AEMPS), together with the associated GMP certificate and the follow‑up CAPA documentation and also with other supporting documents. Summary of key information about the site Laboratorios León Farma S.A. is a pharmaceutical manufacturing site located at Polígono Industrial Navatejera, C/ La Vallina s/n, 24193 Villaquilambre, León, Spain, operating under AEMPS registration number 4208‑E. The site belongs to the CHEMO / INSUD PHARMA Group, with corporate headquarters located in Madrid, Spain. The facility has been operating under a validated and continuously updated Site Master File, with the current version SMF‑MT‑53 dated March 2026. The site is authorized for the manufacture of human medicinal products, including investigational medicinal products (IMPs), and for importation of intermediates followed by further processing for export to third countries. …",
+    "outcome": "Based on the GMP evidence received and reviewed, it is considered that a desk assessment is acceptable in lieu of a WHO onsite inspection. The site Laboratorios León Farma S.A. located at, C/ La Vallina s/n, Polígono Industrial Navatejera, 24193 Villaquilambre, León, Spain, is considered to be operating at an acceptable level of compliance with WHO GMP guidelines. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
     "sections": [],
     "reliance": [
      {
@@ -5644,7 +5644,7 @@
       "dates": "15–17 January 2024"
      }
     ],
-    "outcome_ko": "최근 WHO 실사 요약 — 이 제조소에 대한 WHO 현장실사는 수행된 바 없다. 최근 WHO 현장실사 자료가 없는 상황에서, 엄격규제기관(SRA)인 AEMPS 가 2024년 1월에 수행한 GMP 실사와 그에 따른 GMP 증명서·후속 CAPA 문서 및 기타 뒷받침 자료에 의존(reliance)했다. 사이트 개요: Laboratorios León Farma S.A. 는 스페인 레온주 비야킬람브레(24193) Polígono Industrial Navatejera, C/ La Vallina s/n 소재 제약 제조소로 AEMPS 등록번호 4208-E 로 운영된다. 스페인 마드리드에 본사를 둔 CHEMO / INSUD PHARMA 그룹 소속이다. 검증되고 지속적으로 갱신되는 Site Master File(현행판 SMF-MT-53, 2026년 3월)에 따라 운영해 왔다. 이 사이트는 임상시험용 의약품(IMP)을 포함한 인체용 의약품 제조와, 중간체를 수입해 추가 가공 후 제3국으로 수출하는 활동에 대해 허가를 받았다."
+    "outcome_ko": "접수되어 검토된 GMP 증빙에 근거할 때, WHO 현장실사를 갈음하는 서면평가(desk assessment)가 수용 가능한 것으로 판단됐다. 스페인 레온주 비야킬람브레(24193) 나바테헤라 산업단지 C/ La Vallina s/n 소재 Laboratorios León Farma S.A. 사이트는 WHO GMP 가이드라인을 허용 가능한 수준으로 준수하며 운영 중인 것으로 판단된다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
    }
   },
   {

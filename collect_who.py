@@ -427,17 +427,26 @@ def _extract_whopir_excerpt(text: str) -> str:
 # 스캔이 아니라 완전한 텍스트이고(실측 11건: 14~19쪽·3.5~5.3만자) WHO 표준 서식이라
 # 483 스캔본보다 **훨씬 쉽게** 읽어낼 수 있는 자료였다.
 #
-# 서식은 두 종류다(실측 11건 = findings 9 · reliance 2):
+# 서식은 세 종류다(실측 11건 = findings 9 · reliance 2 + 2026-08-24 CRO/BE 1):
 #   · findings — Part 2 "Summary of the findings and comments" + 번호 매긴 GMP 항목
 #     (원료 15항목 / 시스템 6항목 / QC시험실 5항목 등 템플릿마다 다름 → 개수 고정 금지)
 #   · reliance — Part 2 "Summary of SRA/NRA inspection evidence considered"
 #     (WHO 자체 실사가 아니라 타 규제기관 실사 결과를 인용). 항목 대신 인용 실사 목록.
-# 두 종류 모두 Part 3 이 결론(적합 판정 문장)이라, **결론은 항상** 확보한다.
+#   · CRO/BE(GCP·생동성시험 기관) — Part 2 뒤에 **Part 3 이 없고** 결론이 Part 4,
+#     참고 가이드라인 목록이 Part 5 다(실측 ACDIMA 26쪽·항목 21개). 종전 "Part 3 필수"
+#     전제가 이 서식에서 구조화 전체를 포기하게 했다 — 경계를 "Part 2 뒤 첫 마커(3 또는 4)"
+#     로 일반화한다.
 _WHOPIR_PART2_RE = re.compile(r"Part\s*2\b", re.I)
 _WHOPIR_PART3_RE = re.compile(r"Part\s*3\b", re.I)
 _WHOPIR_PART4_RE = re.compile(r"Part\s*4\b", re.I)
+_WHOPIR_PART5_RE = re.compile(r"Part\s*5\b", re.I)
 _WHOPIR_RELIANCE_RE = re.compile(r"SRA\s*/\s*NRA\s+inspection\s+evidence", re.I)
-_WHOPIR_HEAD_RE = re.compile(r"^[ \t]*(\d{1,2})[.)]\s+([A-Z][^\n]{2,70}?)\s*$", re.M)
+# 번호 구분자 `[.)]` 는 **선택**이다 — Keming(2026-08-03 실측)은 1번 표제만 "1 Quality
+# management" 로 점 없이 적혀 있었고, 구분자 필수 규칙이 1번을 못 잡자 연속 번호 사슬이
+# 시작조차 못 해 15개 전 항목이 유실됐다(발행 카드가 결론만 실림). 점 없는 숫자 시작 줄이
+# 표제로 오인될 위험은 제목 형태 제약(대문자 시작·한 줄·≤70자)과 아래 빈 줄/본문 길이/사슬
+# 연속성 가드가 막는다(9개 PDF 전수 재검에서 오탐 0 실측).
+_WHOPIR_HEAD_RE = re.compile(r"^[ \t]*(\d{1,2})[.)]?\s+([A-Z][^\n]{2,70}?)\s*$", re.M)
 # 표제 판별의 1순위 신호 = **앞에 빈 줄**. 항목 본문 안의 중첩 번호 목록은 앞 줄에 바로
 # 붙는다(실측 Tianjin: 진짜 항목 앞은 "…WHOPIR. \n \n", 문서목록 항목 앞은
 # "…Specification \n"). 번호 순서만으로는 이 둘을 못 가른다 — 중첩 "4. WMS Validation PQ
@@ -535,20 +544,30 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
              "outcome": str, "sections":[{"no","title","text"}],
              "reliance":[{"authority","dates"}]}`
 
-    Part 2/Part 3 경계를 못 찾으면 None — 호출부가 키를 안 쓰고 링크 카드로 유지한다
-    (구조를 못 읽었으면 읽은 척하지 않는다).
+    Part 2 와 그 뒤의 결론 마커(Part 3 — CRO/BE 서식은 Part 4)를 못 찾으면 None —
+    호출부가 키를 안 쓰고 링크 카드로 유지한다(구조를 못 읽었으면 읽은 척하지 않는다).
     """
     # PDF 서브셋 폰트 합자(ﬂow·qualiﬁed·identiﬁcation)를 먼저 되돌린다 — 483 과 같은 정규화기를
     # 공유한다. 발행물 게이트(`test_no_ligature_artifacts`)가 잡는 잔재라 파싱 전에 처리해야 한다.
     t = _WHOPIR_FOOTER_RE.sub("\n\n", _normalize_ligatures(text or ""))
     m2 = _WHOPIR_PART2_RE.search(t)
-    m3 = _WHOPIR_PART3_RE.search(t, m2.end()) if m2 else None
-    if not (m2 and m3):
+    if not m2:
         return None
-    m4 = _WHOPIR_PART4_RE.search(t, m3.end())
-    body = t[m2.end():m3.start()]
+    # 본문 종료 = Part 2 뒤 **첫** 마커. 표준 서식은 Part 3(결론), CRO/BE 서식은 Part 3 이
+    # 없고 Part 4 가 결론이다(실측 ACDIMA — 종전 "Part 3 필수"가 항목 21개를 통째로 버렸다).
+    # outcome 종료 경계도 같은 규칙으로 한 칸씩 민다(표준 = Part 4, CRO/BE = Part 5).
+    m3 = _WHOPIR_PART3_RE.search(t, m2.end())
+    m4 = _WHOPIR_PART4_RE.search(t, (m3.end() if m3 else m2.end()))
+    concl = m3 or m4
+    if not concl:
+        return None
+    if concl is m3:
+        nxt = m4
+    else:
+        nxt = _WHOPIR_PART5_RE.search(t, m4.end())
+    body = t[m2.end():concl.start()]
     outcome = _WHOPIR_CONCL_LEAD_RE.sub(
-        "", _whopir_squeeze(t[m3.end():(m4.start() if m4 else len(t))]))
+        "", _whopir_squeeze(t[concl.end():(nxt.start() if nxt else len(t))]))
     kind = "reliance" if _WHOPIR_RELIANCE_RE.search(body[:400]) else "findings"
 
     sections: list[dict[str, str]] = []
@@ -564,8 +583,27 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
 
         kept: list[tuple[int, str, int, int]] = []
         expect, start_at = 1, 0
+        # 1번 표제가 후보에 아예 없는 서식(표제 형태 특이 등)은 최소 번호에서 사슬을 시작한다
+        # — 종전엔 expect=1 고정이라 1번 미검출이 곧 **전 항목 유실**이었다(실측 Keming 15→0).
+        if cands and not any(c[0] == 1 for c in cands):
+            expect = min(c[0] for c in cands)
         while True:
             pool = [i for i in range(start_at, len(cands)) if cands[i][0] == expect]
+            renumber = False
+            if not pool:
+                # 원문 오기재 관용 — WHO 가 쓴 PDF 자체가 번호를 반복하거나(실측 Chongqing:
+                # 3장을 "2."로 두 번) 하나를 건너뛴 경우, 연속 번호 요구가 그 지점에서 사슬을
+                # 끊어 나머지 전부를 버렸다(15→2). 빈 줄 선행(강신호) 후보에 한해 ±1 을
+                # 허용한다. 반복 번호는 표시 번호를 사슬 값(expect)으로 보정한다 — 원문 그대로
+                # 두면 번역 키(s<번호>)가 충돌해 국문 병기가 서로를 덮어쓴다.
+                for delta in (-1, +1):
+                    pool = [i for i in range(start_at, len(cands))
+                            if cands[i][0] == expect + delta and cands[i][4]]
+                    if pool:
+                        renumber = (delta == -1)
+                        if delta == +1:
+                            expect += 1
+                        break
             if not pool:
                 break
             # ① 빈 줄이 앞선 후보 우선(중첩 목록 배제) ② 없으면 본문 길이로 폴백
@@ -573,11 +611,16 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
             if idx is None:
                 idx = next((i for i in pool
                             if _body_len(i) >= _WHOPIR_SECTION_MIN_BODY), None)
+            if idx is None and len(kept) >= 2:
+                # ③ 사슬이 이미 2개 이상 이어졌다면 정확한 다음 번호 자체가 강한 증거다 —
+                # 빈 줄도 없고 본문도 짧은 진짜 항목(실측 ACDIMA "4. Archive facilities" 249자,
+                # 21개 중 18개가 빈 줄 없음)이 여기서 끊기면 나머지 전부를 잃는다.
+                idx = pool[0]
             if idx is None:
                 break
             n, title, s, e, _strict = cands[idx]
-            kept.append((n, title, s, e))
-            expect, start_at = expect + 1, idx + 1
+            kept.append(((expect if renumber else n), title, s, e))
+            expect, start_at = (expect if renumber else n) + 1, idx + 1
         for i, (n, title, _s, e) in enumerate(kept):
             end = kept[i + 1][2] if i + 1 < len(kept) else len(body)
             seg = _whopir_cut(body[e:end], WHOPIR_SECTION_MAX_CHARS)

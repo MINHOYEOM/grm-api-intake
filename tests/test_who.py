@@ -492,6 +492,76 @@ class WhopirReportStructureTest(unittest.TestCase):
         self.assertIsNone(w.extract_whopir_report("본문에 Part 경계가 없는 문서"))
         self.assertIsNone(w.extract_whopir_report(""))
 
+    # ── [섹션 회수율 2026-08-24] 실측 3서식 회귀 — MSN 급 상세가 다른 카드에서 비던 원인 ──
+    def test_duplicate_source_numbering_does_not_break_the_chain(self) -> None:
+        """실측 회귀(Chongqing): WHO PDF 자체가 3장을 "2."로 오기재 — 연속 번호 요구가
+        그 지점에서 사슬을 끊어 15개 중 2개만 남겼다. ±1 관용(빈 줄 선행 한정)으로 잇고,
+        반복 번호는 사슬 값으로 보정한다(번역 키 s<번호> 충돌 방지)."""
+        text = ("Part 2\n\nSummary.\n"
+                "\n1. Quality management\n" + ("Reviewed in detail. " * 8) + "\n"
+                "\n2. Personnel\n" + ("Staffing was adequate. " * 8) + "\n"
+                "\n2. Buildings and facilities\n" + ("Premises were suitable. " * 8) + "\n"
+                "\n4. Process equipment\n" + ("Equipment was qualified. " * 8) + "\n"
+                "\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual([(s["no"], s["title"]) for s in rep["sections"]],
+                         [("1", "Quality management"), ("2", "Personnel"),
+                          ("3", "Buildings and facilities"), ("4", "Process equipment")])
+
+    def test_dotless_first_heading_is_recognized(self) -> None:
+        """실측 회귀(Keming): 1번 표제만 "1 Quality management"(점 없음)로 적혀 있어
+        사슬이 시작조차 못 했다(15→0 — 발행 카드가 결론만 실림)."""
+        text = ("Part 2\n\nSummary of the findings and comments (where applicable)\n"
+                "1 Quality management\n" + ("A quality system was in place. " * 12) + "\n"
+                "\n2. Personnel\n" + ("Personnel were qualified. " * 8) + "\n"
+                "\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual([(s["no"], s["title"]) for s in rep["sections"]],
+                         [("1", "Quality management"), ("2", "Personnel")])
+
+    def test_cro_template_without_part3_uses_part4_conclusion(self) -> None:
+        """실측 회귀(ACDIMA·CRO/BE 서식): Part 3 이 없고 결론이 Part 4, 참고문헌이 Part 5 —
+        "Part 3 필수" 전제가 항목 21개짜리 보고서의 구조화를 통째로 포기하게 했다."""
+        text = ("Part 2\nSUMMARY OF THE FINDINGS AND COMMENTS\n"
+                "\n1. Organization and management\n" + ("The CRO was organized. " * 8) + "\n"
+                "\n2. Computer systems\n" + ("Systems were validated. " * 8) + "\n"
+                "\nPart 4\nConclusion – Inspection outcome\n"
+                "The CRO was considered to be operating at an acceptable level.\n"
+                "\nPart 5\nList of guidelines referenced in the inspection report.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "findings")
+        self.assertEqual(len(rep["sections"]), 2)
+        self.assertIn("acceptable level", rep["outcome"])
+        self.assertNotIn("List of guidelines", rep["outcome"])
+
+    def test_chain_continuity_keeps_short_unblanked_section(self) -> None:
+        """실측 회귀(ACDIMA "4. Archive facilities" 249자·빈 줄 없음): 사슬이 2개 이상
+        이어졌으면 정확한 다음 번호 자체가 증거 — 여기서 끊으면 나머지 전부를 잃는다."""
+        text = ("Part 2\n\nSummary.\n"
+                "\n1. Quality management\n" + ("Reviewed in detail. " * 8) + "\n"
+                "\n2. Personnel\n" + ("Staffing was adequate. " * 8) + "\n"
+                "3. Archive facilities\nAccess control was in place.\n"
+                "\n4. Premises\n" + ("Premises were suitable. " * 8) + "\n"
+                "\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual([s["title"] for s in rep["sections"]],
+                         ["Quality management", "Personnel", "Archive facilities", "Premises"])
+
+    def test_chain_starts_at_min_number_when_first_heading_missing(self) -> None:
+        """1번 표제가 후보에 아예 없는 서식 — 최소 번호에서 시작한다(종전 expect=1 고정은
+        1번 미검출 = 전 항목 유실이었다)."""
+        text = ("Part 2\n\nSummary.\n"
+                "\n2. Personnel\n" + ("Staffing was adequate. " * 8) + "\n"
+                "\n3. Premises\n" + ("Premises were suitable. " * 8) + "\n"
+                "\nPart 3\nOutcome text.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual([s["no"] for s in rep["sections"]], ["2", "3"])
+
 
 class WhopirFetchDetailTest(unittest.TestCase):
     """_fetch_whopir_detail — PDF 를 **한 번만** 받아 excerpt + 구조를 함께 낸다."""

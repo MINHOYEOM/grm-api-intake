@@ -719,6 +719,149 @@ class WhopirReportStructureTest(unittest.TestCase):
         self.assertEqual([s["no"] for s in rep["sections"]], ["2", "3"])
 
 
+class WhopirHeadingAnchorTest(unittest.TestCase):
+    """[2026-08-25 후속] #793 이 남긴 잔여 — 표제를 '정의'만 하고 앵커로 못 쓴 자리들.
+
+    #793 은 excerpt 를 문장 시작으로 되감아 **문법**을 고쳤다. 그런데 172건 전수에서
+    findings 132건은 여전히 낱말 앵커에 끌려가 보고서마다 똑같은 마무리 보일러플레이트에서
+    시작했다 — 문장으로 시작하지만 어느 사이트인지 알 수 없는 300자다. 여기서는 그 구간이
+    **실제 지적 항목**을 담는지를 검사한다(형식이 아니라 내용).
+    """
+
+    def test_findings_excerpt_carries_findings_not_closing_boilerplate(self) -> None:
+        """지적 요약 표제 뒤가 곧 번호 매긴 항목이다 — 거기서 시작해야 근거가 된다.
+
+        낱말 앵커는 문서 어디든 먼저 나오는 `non-compliance`/`deficiencies` 에 걸린다.
+        실측 172건에서 53건이 "All the non-compliances observed during the inspection…
+        will remain valid for 3 years"(전 보고서 공통 마무리)에서 시작했다.
+        """
+        text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                "Name of manufacturer: Example Pharma Ltd\n"
+                "All the non-compliances observed during the inspection were "
+                "addressed to a satisfactory level prior to publication.\n"
+                "\nPart 2\nSummary of the findings and comments\n"
+                "\n1. Pharmaceutical quality system\n"
+                "The site had a quality system that met WHO GMP requirements.\n")
+        ex = w._extract_whopir_excerpt(text)
+        self.assertTrue(ex.startswith("Summary of the findings and comments"), ex[:70])
+        self.assertIn("quality system that met WHO GMP", ex)
+        self.assertNotIn("Example Pharma Ltd", ex)          # 표지 유입 금지
+
+    def test_lowercase_conclusion_bait_is_not_taken_as_a_heading(self) -> None:
+        """Part 3 표 셀이 평탄화되면 "conclusion of" 라는 줄이 생긴다(172건 중 24건 보유).
+
+        `_WHOPIR_CONCL_HEAD_RE` 가 re.I 면 이 미끼가 표제로 인정돼 진짜 결론보다 앞서
+        걸린다 — Farmabios 의 excerpt 가 과거 실사 요약 한가운데서 시작한 원인이다.
+        실측 표제 변형 12종은 전부 대문자로 시작하고 미끼 4종은 전부 소문자다.
+
+        픽스처에서 `deficiencies`·`non-compliance` 를 **일부러 뺐다**. 그 낱말이 있으면
+        낱말 앵커가 먼저 걸려 이 검사가 대조군에서도 통과해 버린다(발화하지 않는 가드).
+        """
+        self.assertFalse(w._WHOPIR_CONCL_HEAD_RE.match("conclusion of"))
+        self.assertTrue(w._WHOPIR_CONCL_HEAD_RE.match("Conclusion – inspection"))
+        text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                "\nPart 2\nSummary of SRA/NRA inspection evidence considered\n"
+                "\nPart 3\nSummary of the last WHO inspection\n"
+                "Date and\nconclusion of\nmost recent\nWHO\ninspection\n"
+                "The site was not previously inspected onsite by WHO.\n"
+                "\nPart 5\nConclusion – Desk assessment outcome\n"
+                "Based on the GMP evidence received and reviewed, a desk assessment "
+                "is acceptable in lieu of a WHO onsite inspection.\n")
+        ex = w._extract_whopir_excerpt(text)
+        self.assertTrue(ex.startswith("Conclusion – Desk assessment outcome"), ex[:60])
+        self.assertNotIn("not previously inspected onsite", ex)
+
+    def test_desk_conclusion_still_wins_over_the_findings_heading(self) -> None:
+        """표제 앵커를 새로 추가할 때 **깨지기 쉬운 것은 이미 맞던 쪽**이다.
+
+        #793 이 세운 성질 — reliance 39/39 가 desk 결론에 착지한다 — 를 회귀로 박는다.
+        findings 표제 앵커가 desk 결론보다 먼저 걸리면 그 39건이 통째로 과거 실사 요약
+        쪽으로 되돌아간다. 그래서 desk 판정을 **첫 번째** 순위에 두고, 두 표제가 한
+        문서에 같이 있는 픽스처로 우선순위 자체를 고정한다.
+        """
+        text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                "\nPart 2\nSummary of SRA/WLA inspection evidence considered\n"
+                "\nPart 3\nSummary of the findings and comments\n"
+                "The previous SRA inspection findings were reviewed.\n"
+                "\nPart 5\nConclusion – Desk assessment outcome\n"
+                "Based on the GMP evidence received and reviewed, a desk assessment "
+                "is acceptable in lieu of a WHO onsite inspection.\n")
+        ex = w._extract_whopir_excerpt(text)
+        self.assertTrue(ex.startswith("Conclusion – Desk assessment outcome"), ex[:60])
+        self.assertNotIn("previous SRA inspection findings were reviewed", ex)
+
+    def test_gmp_qualified_guideline_list_also_triggers_the_fallback(self) -> None:
+        """서지 표제의 한정어는 실측 3종이다 — WHO / GMP / 없음.
+
+        WHO 만 열어 두면 `List of GMP Guidelines referenced` 서식에서 이 폴백이 침묵해
+        서지가 결론 자리에 그대로 남는다(#793 이 AnaCipher 한 건으로만 확인해 생긴 사각).
+        """
+        self.assertTrue(w._WHOPIR_BIBLIO_RE.match(
+            "List of GMP Guidelines referenced in the inspection report"))
+        self.assertTrue(w._WHOPIR_BIBLIO_RE.match(
+            "List of guidelines referenced in the inspection report"))
+        text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                "\nPart 2\nSummary of the findings and comments\n"
+                "\n1. Organization and management\n"
+                + ("The organization was reviewed in detail. " * 8) + "\n"
+                "\nPart\nConclusion – inspection\n"
+                "Based on the areas inspected, the CRO was considered to be operating "
+                "at an acceptable level of compliance.\n"
+                "\nPart 4\nList of GMP Guidelines referenced in the inspection report\n"
+                "1. WHO good practices for pharmaceutical quality control laboratories.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertTrue(rep["outcome"].startswith("Based on the areas inspected"))
+        self.assertNotIn("good practices for pharmaceutical", rep["outcome"])
+
+    def test_conclusion_heading_never_rides_into_the_outcome_body(self) -> None:
+        """표제는 카드가 따로 붙인다 — outcome 본문이 표제로 시작하면 중복이다.
+
+        벗김 규칙이 `Conclusion – (Desk assessment|Inspection) outcome` 한 형태만 알아서
+        172건 중 20건(발행 4장 포함)이 표제를 본문에 이고 있었다 — 카드 결론이 "Initial
+        conclusion – Inspection outcome Based on the areas inspected…" 로 시작한다.
+        """
+        for head in ("Conclusion – Inspection outcome",      # en dash(실측 다수)
+                     "Conclusion - Inspection outcome",      # ASCII 하이픈(실측 1건)
+                     "Conclusion — Inspection outcome",      # em dash
+                     "Initial conclusion – Inspection outcome",
+                     "Final conclusion – Inspection outcome",
+                     "FINAL CONCLUSION – INSPECTION OUTCOME",   # 전대문자(실측 1건)
+                     "Conclusion – Desk assessment outcome",
+                     "Conclusion – inspection",
+                     "Conclusion"):
+            text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                    "\nPart 2\nSummary of the findings and comments\n"
+                    "\n1. Quality management\n"
+                    + ("The team reviewed the quality manual. " * 8) + "\n"
+                    "\nPart 3\n" + head + "\n"
+                    "Based on the areas inspected, the manufacturer was considered to "
+                    "be operating at an acceptable level of compliance with WHO GMP.\n")
+            rep = w.extract_whopir_report(text)
+            assert rep is not None
+            with self.subTest(head=head):
+                self.assertTrue(rep["outcome"].startswith("Based on the areas"),
+                                "%r -> %r" % (head, rep["outcome"][:60]))
+
+    def test_conclusion_word_in_prose_is_not_stripped(self) -> None:
+        """안전장치의 음성 검사 — 표제가 아니라 **산문 첫 낱말**이면 건드리지 않는다.
+
+        접두·꼬리를 전부 선택으로 열면 "Conclusion of the inspection team was…" 의 첫
+        낱말까지 잘라 문장을 망가뜨릴 수 있다. 그래서 뒤가 대문자일 때만 벗기는데, 그
+        조건은 `(?=[A-Z])` 로만 쓰면 re.I 때문에 **작동하지 않는다** — 실제로 첫 구현이
+        이 문장을 잘랐고 그것을 잡은 것이 이 검사다.
+        """
+        text = ("WHO Public Inspection Report\n\nPart 1\nGeneral information\n"
+                "\nPart 2\nSummary of the findings and comments\n"
+                "\n1. Quality management\n"
+                + ("The team reviewed the quality manual. " * 8) + "\n"
+                "\nPart 3\nConclusion of the inspection team was recorded in full.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertIn("of the inspection team was recorded", rep["outcome"])
+        self.assertFalse(rep["outcome"].startswith("of the "), rep["outcome"][:50])
+
+
 class WhopirFetchDetailTest(unittest.TestCase):
     """_fetch_whopir_detail — PDF 를 **한 번만** 받아 excerpt + 구조를 함께 낸다."""
 

@@ -432,6 +432,13 @@ def _extract_whopir_excerpt(text: str) -> str:
 #     (원료 15항목 / 시스템 6항목 / QC시험실 5항목 등 템플릿마다 다름 → 개수 고정 금지)
 #   · reliance — Part 2 "Summary of SRA/NRA inspection evidence considered"
 #     (WHO 자체 실사가 아니라 타 규제기관 실사 결과를 인용). 항목 대신 인용 실사 목록.
+#     골격은 6-Part 다(2026-08-25 발행 6건 전수 실측): Part 3 과거 WHO 실사 요약 /
+#     Part 4 제출문서 평가 / **Part 5 "Conclusion – Desk assessment outcome"(진짜 결론)** /
+#     Part 6 참고 가이드라인. findings 규칙(결론 = Part 2 뒤 첫 마커)을 그대로 쓰면
+#     outcome 에 Part 3(과거 실사 요약)이 실려 1,200자에서 중간 절단되고 진짜 결론은
+#     통째로 유실된다 — 발행 6/6 재현된 실사고. 결론 마커는 번호가 아니라 **표제**
+#     (Conclusion 으로 시작)로 찾는다. Part 6 본문에 "… Part 2: Interpretation of
+#     Guidelines …" 같은 가짜 마커가 있어 결론 뒤 첫 마커(Part 6)에서 반드시 끊는다.
 #   · CRO/BE(GCP·생동성시험 기관) — Part 2 뒤에 **Part 3 이 없고** 결론이 Part 4,
 #     참고 가이드라인 목록이 Part 5 다(실측 ACDIMA 26쪽·항목 21개). 종전 "Part 3 필수"
 #     전제가 이 서식에서 구조화 전체를 포기하게 했다 — 경계를 "Part 2 뒤 첫 마커(3 또는 4)"
@@ -441,6 +448,10 @@ _WHOPIR_PART3_RE = re.compile(r"Part\s*3\b", re.I)
 _WHOPIR_PART4_RE = re.compile(r"Part\s*4\b", re.I)
 _WHOPIR_PART5_RE = re.compile(r"Part\s*5\b", re.I)
 _WHOPIR_RELIANCE_RE = re.compile(r"SRA\s*/\s*NRA\s+inspection\s+evidence", re.I)
+# reliance 결론 탐색용 — 임의 번호의 Part 마커 + "결론 표제로 시작하는가" 판별.
+# Final/Initial 접두는 findings 실측 변형(Final/Initial conclusion – …)에서 온 관용.
+_WHOPIR_PART_ANY_RE = re.compile(r"Part\s*\d\b", re.I)
+_WHOPIR_RELIANCE_CONCL_RE = re.compile(r"^(?:Final\s+|Initial\s+)?Conclusion\b", re.I)
 # 번호 구분자 `[.)]` 는 **선택**이다 — Keming(2026-08-03 실측)은 1번 표제만 "1 Quality
 # management" 로 점 없이 적혀 있었고, 구분자 필수 규칙이 1번을 못 잡자 연속 번호 사슬이
 # 시작조차 못 해 15개 전 항목이 유실됐다(발행 카드가 결론만 실림). 점 없는 숫자 시작 줄이
@@ -458,7 +469,7 @@ _WHOPIR_BLANK_BEFORE_RE = re.compile(r"\n[ \t]*\n[ \t]*$")
 _WHOPIR_DATES_RE = re.compile(
     r"Dates?\s+of\s*\n?\s*inspection\s*:?\s*\n?\s*([^\n]{4,60})", re.I)
 _WHOPIR_CONCL_LEAD_RE = re.compile(
-    r"^\s*Conclusion\s*[-–—]?\s*Inspection\s+outcome\s*", re.I)
+    r"^\s*Conclusion\s*[-–—]?\s*(?:Desk\s+assessment|Inspection)\s+outcome\s*", re.I)
 # 항목 본문 상한 — 카드는 근거를 보여주는 자리이고 전문은 공식 PDF 링크가 담당한다.
 # (상한이 없으면 브리프 JSON 이 카드 1장당 2~7만자씩 불어난다 — 실측 Kaygee 68,520자.)
 WHOPIR_SECTION_MAX_CHARS = 600
@@ -537,6 +548,27 @@ def _whopir_authority_before(pre: str) -> str:
     return auth if 0 < len(auth) <= _WHOPIR_AUTH_MAX_CHARS else ""
 
 
+def _whopir_reliance_conclusion(
+    t: str, first: "re.Match[str]",
+) -> "tuple[re.Match[str] | None, re.Match[str] | None]":
+    """reliance 서식의 결론 마커 = **표제가 Conclusion 으로 시작하는 첫 Part 마커**.
+
+    reliance 골격(6-Part)에서 결론은 Part 5 지만 번호를 박아두지 않는다 — CRO/BE 서식이
+    "Part 3 필수" 전제를 무너뜨렸듯 번호 고정은 다음 변형에서 또 깨진다. 진짜 신호는
+    표제다(발행 6건 전수 "Conclusion – Desk assessment outcome" 실측). 합성/축약 변형
+    (Part 3 이 곧 "Conclusion - Inspection outcome")도 같은 규칙으로 잡힌다.
+
+    반환 (결론 마커, 그 뒤 첫 Part 마커) — 결론 표제를 못 찾으면 (None, None) 이고
+    호출부는 outcome 을 비운다(과거 실사 요약을 결론이라 싣느니 안 싣는다).
+    """
+    markers = [first] + list(_WHOPIR_PART_ANY_RE.finditer(t, first.end()))
+    for i, mk in enumerate(markers):
+        lead = _whopir_squeeze(t[mk.end():mk.end() + 80])
+        if _WHOPIR_RELIANCE_CONCL_RE.match(lead):
+            return mk, (markers[i + 1] if i + 1 < len(markers) else None)
+    return None, None
+
+
 def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     """WHOPIR PDF 평탄화 텍스트 → 구조화 상세(순수 함수·LLM 0). 실패 시 None.
 
@@ -546,6 +578,7 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
 
     Part 2 와 그 뒤의 결론 마커(Part 3 — CRO/BE 서식은 Part 4)를 못 찾으면 None —
     호출부가 키를 안 쓰고 링크 카드로 유지한다(구조를 못 읽었으면 읽은 척하지 않는다).
+    reliance 서식만 결론 마커를 표제 기반으로 다시 찾는다(6-Part 골격 — 위 주석 참조).
     """
     # PDF 서브셋 폰트 합자(ﬂow·qualiﬁed·identiﬁcation)를 먼저 되돌린다 — 483 과 같은 정규화기를
     # 공유한다. 발행물 게이트(`test_no_ligature_artifacts`)가 잡는 잔재라 파싱 전에 처리해야 한다.
@@ -566,9 +599,13 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     else:
         nxt = _WHOPIR_PART5_RE.search(t, m4.end())
     body = t[m2.end():concl.start()]
-    outcome = _WHOPIR_CONCL_LEAD_RE.sub(
-        "", _whopir_squeeze(t[concl.end():(nxt.start() if nxt else len(t))]))
     kind = "reliance" if _WHOPIR_RELIANCE_RE.search(body[:400]) else "findings"
+    if kind == "reliance":
+        # findings 규칙(결론 = Part 2 뒤 첫 마커)을 reliance 에 그대로 쓰면 Part 3
+        # (과거 WHO 실사 요약)이 결론 자리에 실린다 — 발행 6/6 재현된 실사고.
+        concl, nxt = _whopir_reliance_conclusion(t, concl)
+    outcome = "" if concl is None else _WHOPIR_CONCL_LEAD_RE.sub(
+        "", _whopir_squeeze(t[concl.end():(nxt.start() if nxt else len(t))]))
 
     sections: list[dict[str, str]] = []
     reliance: list[dict[str, str]] = []

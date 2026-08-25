@@ -483,10 +483,58 @@ class WhopirReportStructureTest(unittest.TestCase):
                 "to last) and comments\n"
                 "the scope was comprehensive overall.\n"
                 "Dates of inspection:\n1 January 2025\n"
-                "\nPart 3\nOutcome.\n")
+                "\nPart 3\nConclusion – Desk assessment outcome\nOutcome.\n")
         rep = w.extract_whopir_report(text)
         assert rep is not None
         self.assertNotIn("reliance", rep)
+        self.assertEqual(rep["outcome"], "Outcome.")   # Desk assessment 표제도 벗긴다
+
+    # ── [reliance 결론 슬롯 2026-08-25] 실측 회귀 — 발행 6/6 이 Part 3 을 결론으로 실었다 ──
+    def test_reliance_outcome_comes_from_part5_conclusion_not_part3(self) -> None:
+        """실측 회귀(2026-08-25·발행 reliance 6/6): reliance 골격은 6-Part 다 —
+        findings 규칙(결론 = Part 2 뒤 첫 마커)을 그대로 쓰면 outcome 에 Part 3
+        (과거 WHO 실사 요약)이 실려 1,200자 중간 절단되고, 진짜 결론(Part 5
+        "Conclusion – Desk assessment outcome")은 통째로 유실된다. 결론은 번호가
+        아니라 표제로 찾고, Part 6(가이드라인 목록) 앞에서 끊는다."""
+        text = (
+            "WHO Public Inspection Report\n\nPart 1  General information\n"
+            "\nPart 2  Summary of SRA/NRA inspection evidence considered\n"
+            "Inspecting authority   EDQM\nDates of\ninspection: 12-15 March 2025\n"
+            "\nPart 3  Summary of the last WHO inspection\n"
+            "Date and conclusion of most recent WHO inspection. This decoy summary "
+            "must not be published as the outcome.\n"
+            "\nPart 4  Summary of the assessment of supporting documentation\n"
+            "a) List of all regulatory inspections in the last five years.\n"
+            "\nPart 5  Conclusion – Desk assessment outcome\n"
+            "Based on the GMP evidence received and reviewed, the manufacturer is "
+            "considered to be operating at an acceptable level of compliance with "
+            "WHO GMP guidelines.\n"
+            "\nPart 6  List of guidelines referenced in this inspection report\n"
+            "1. WHO good manufacturing practices, TRS No. 986, Annex 2: Part 2: "
+            "Interpretation of Guidelines on heating, ventilation and "
+            "air-conditioning systems.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "reliance")
+        self.assertTrue(rep["outcome"].startswith("Based on the GMP evidence"),
+                        rep["outcome"][:80])
+        self.assertIn("acceptable level of compliance", rep["outcome"])
+        for junk in ("last WHO inspection", "supporting documentation",
+                     "List of guidelines"):
+            self.assertNotIn(junk, rep["outcome"], f"결론 아닌 Part 가 샜다: {junk}")
+        self.assertEqual(rep["reliance"][0]["dates"], "12-15 March 2025")
+
+    def test_reliance_without_conclusion_heading_publishes_no_outcome(self) -> None:
+        """결론 표제를 못 찾으면 outcome 은 빈다 — 과거 실사 요약을 결론이라 싣던 것이
+        이번 사고다(읽은 척 금지). 인용 실사 목록만으로 카드는 산다."""
+        text = (
+            "Part 2\nSummary of SRA/NRA inspection evidence considered\n"
+            "Inspecting authority   EDQM\nDates of\ninspection: 12-15 March 2025\n"
+            "\nPart 3  Summary of the last WHO inspection\nDecoy narrative only.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertEqual(rep["outcome"], "")
+        self.assertEqual(len(rep["reliance"]), 1)
 
     def test_missing_part_boundaries_returns_none(self) -> None:
         self.assertIsNone(w.extract_whopir_report("본문에 Part 경계가 없는 문서"))

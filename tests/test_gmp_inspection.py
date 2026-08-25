@@ -7,6 +7,8 @@ GMP 실사 결과 PDF 는 [표지 → 제조소 현황 → 실태조사 개요 �
 import os
 import sys
 import unittest
+from types import SimpleNamespace
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -585,6 +587,83 @@ class TestParseDeficiencyTableGate(unittest.TestCase):
             self.assertEqual(
                 g._parse_deficiency_table(b"%PDF", "pdf", "", "present", "d"),
                 ([], ""))
+
+    def test_warn_fires_when_unknown_and_no_table(self):
+        """★[침묵 사각지대 가드 2026-08-25] empty + assess=unknown 은 WARN 이 울린다.
+
+        종전엔 WARN 이 present 조합만이라, 원문에 표가 실재하는데 파서가 0행을 낸 문서
+        (실측: 서울대병원)가 판정 불능(unknown)이면 소리 없이 empty 로 흘렀다. 가드는
+        로그만 더한다 — status 는 "empty" 그대로(raw_payload 등 산출물 byte 불변)."""
+        data = _build_pdf(self._PERIODIC_TITLE, None)  # 표 없음
+        captured: list[tuple[str, str]] = []
+        with _FlagCtx("true"), mock.patch.object(
+                g, "log", side_effect=lambda lvl, msg: captured.append((lvl, msg))):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._PERIODIC_TITLE, "unknown", "doc-unk-warn")
+        self.assertEqual((rows, status), ([], "empty"))   # 산출 status 불변
+        self.assertTrue(
+            any(lvl == "WARN" and "doc-unk-warn" in msg for lvl, msg in captured),
+            f"empty+unknown 조합인데 WARN 미발화: {captured}")
+
+    def test_no_warn_when_none_and_no_table(self):
+        # 비발화 대조군: '지적사항 없음'(none) + 표 없음은 정상 — 경고가 없어야 한다.
+        data = _build_pdf(self._PERIODIC_TITLE, None)
+        captured: list[tuple[str, str]] = []
+        with _FlagCtx("true"), mock.patch.object(
+                g, "log", side_effect=lambda lvl, msg: captured.append((lvl, msg))):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._PERIODIC_TITLE, "none", "doc-none-quiet")
+        self.assertEqual((rows, status), ([], "empty"))
+        self.assertEqual([c for c in captured if c[0] == "WARN"], [])
+
+    def test_extracted_with_unknown_assess_stays_quiet(self):
+        # 비발화 대조군 2: unknown 이어도 표가 잡히면 정상 추출 — 경고가 없어야 한다.
+        data = _build_pdf(self._PERIODIC_TITLE, self._ROWS)
+        captured: list[tuple[str, str]] = []
+        with _FlagCtx("true"), mock.patch.object(
+                g, "log", side_effect=lambda lvl, msg: captured.append((lvl, msg))):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._PERIODIC_TITLE, "unknown", "doc-unk-ok")
+        self.assertEqual(status, "extracted")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual([c for c in captured if c[0] == "WARN"], [])
+
+
+class TestDeficiencyTableHealthTally(unittest.TestCase):
+    """★[침묵 사각지대 가드 2026-08-25] empty+unknown 조합의 health 관측(순수 dict 로직)."""
+
+    @staticmethod
+    def _item(status: str, assess: str, firm: str = "테스트제약") -> SimpleNamespace:
+        return SimpleNamespace(
+            raw_payload={"gmp_deficiency_table_status": status,
+                         "attachment_deficiency_assessment": assess},
+            firm=firm)
+
+    @staticmethod
+    def _fresh() -> dict:
+        return {"enabled": True, "attempted": 0, "extracted": 0, "failed": 0, "warnings": []}
+
+    def test_empty_unknown_records_observation(self):
+        h = self._fresh()
+        g._tally_deficiency_table_health(h, self._item("empty", "unknown"))
+        self.assertEqual(h["attempted"], 1)     # 카운터는 종전 그대로
+        self.assertEqual(h["failed"], 0)
+        self.assertEqual(h["warnings"], ["empty-unknown: 테스트제약"])
+
+    def test_empty_none_stays_silent(self):
+        # 비발화: '지적사항 없음' + 표 없음은 정상이라 관측 항목도 없다.
+        h = self._fresh()
+        g._tally_deficiency_table_health(h, self._item("empty", "none"))
+        self.assertEqual(h["attempted"], 1)
+        self.assertEqual(h["warnings"], [])
+
+    def test_gate_degraded_path_unchanged(self):
+        # 기존 present 경로 회귀 가드: failed 카운트·경고 형식 종전 그대로.
+        h = self._fresh()
+        g._tally_deficiency_table_health(h, self._item("gate-degraded", "present"))
+        self.assertEqual(h["attempted"], 1)
+        self.assertEqual(h["failed"], 1)
+        self.assertEqual(h["warnings"], ["gate-degraded: 테스트제약"])
 
 
 class TestAnchorColonForm(unittest.TestCase):

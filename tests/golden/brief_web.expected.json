@@ -731,6 +731,12 @@
       "card_type": "Recall(HC)",
       "category": "Other",
       "checks": [],
+      "deterministic_detail": {
+        "action": "Contact the recalling firm if you have any questions about the recall.",
+        "dosage_form": "Solution",
+        "ingredient": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL",
+        "type": "hc_recall_detail"
+      },
       "evidence_basis": "Intake raw",
       "evidence_level": "A",
       "facts": [
@@ -773,6 +779,7 @@
       "render_order": 14,
       "signal_label": "Med",
       "signal_tier": 2,
+      "source_body_captured": true,
       "sources": {
         "info_url": "https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos",
         "link_check": {
@@ -791,6 +798,13 @@
       "card_type": "회수·판매중지",
       "category": "Other",
       "checks": [],
+      "deterministic_detail": {
+        "bizrno": "1234512345",
+        "enforcement": "자진회수",
+        "item_seq": "200812345",
+        "std_cd": "8806123400101,8806123400102",
+        "type": "mfds_recall_detail"
+      },
       "evidence_basis": "Intake raw",
       "evidence_level": "A",
       "facts": [
@@ -829,6 +843,7 @@
       "render_order": 15,
       "signal_label": "Med",
       "signal_tier": 2,
+      "source_body_captured": true,
       "sources": {
         "info_url": "",
         "link_check": {
@@ -847,6 +862,51 @@
       "card_type": "Recall",
       "category": "Other",
       "checks": [],
+      "deterministic_detail": {
+        "code_info": "Lot #: A26-0412, A26-0418, Exp. Date 04/2028",
+        "distribution": "Nationwide within the United States",
+        "firm_location": "Madison, WI, United States",
+        "initiation": "Voluntary: Firm initiated",
+        "initiation_ko": "자진회수 (업체 착수)",
+        "notification": "Letter",
+        "notification_ko": "서한",
+        "product": [
+          {
+            "label": "브랜드명",
+            "value": "ZESTRIL"
+          },
+          {
+            "label": "성분명",
+            "value": "LISINOPRIL"
+          },
+          {
+            "label": "투여경로",
+            "value": "ORAL"
+          },
+          {
+            "label": "허가번호",
+            "value": "ANDA076123"
+          }
+        ],
+        "quantity": "12,480 bottles",
+        "status": "Ongoing",
+        "status_ko": "진행 중",
+        "timeline": [
+          {
+            "date": "2026-04-28",
+            "label": "회수 착수"
+          },
+          {
+            "date": "2026-05-08",
+            "label": "FDA 등급 확정"
+          },
+          {
+            "date": "2026-05-15",
+            "label": "FDA 공표"
+          }
+        ],
+        "type": "openfda_recall_detail"
+      },
       "evidence_basis": "Intake raw",
       "evidence_level": "A",
       "facts": [
@@ -889,6 +949,7 @@
       "render_order": 16,
       "signal_label": "Med",
       "signal_tier": 2,
+      "source_body_captured": true,
       "sources": {
         "info_url": "https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026",
         "link_check": {
@@ -907,6 +968,10 @@
       "card_type": "Recall(HC)",
       "category": "Other",
       "checks": [],
+      "deterministic_detail": {
+        "action": "Stop using the affected lots and consult your pharmacist.",
+        "type": "hc_recall_detail"
+      },
       "evidence_basis": "Intake raw",
       "evidence_level": "A",
       "facts": [
@@ -949,6 +1014,7 @@
       "render_order": 17,
       "signal_label": "Med",
       "signal_tier": 2,
+      "source_body_captured": true,
       "sources": {
         "info_url": "https://recalls-rappels.canada.ca/en/alert-recall/88421",
         "link_check": {

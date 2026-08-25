@@ -397,6 +397,11 @@ class CardScaffold:
                     if (self.modality and not _spec(kind).normative) else None)
         headline_target = (self.merged_target if (merged and self.merged_target)
                            else _headline_target(row))
+        # [회수 병합 범위 표기 2026-08-25] 병합 대표 카드의 결정론 상세는 **대표 레코드 하나의**
+        # 사실이다(로트·수량·타임라인이 전부 그렇다). `merge_recall_cards` 는 멤버의 raw 를
+        # 보존하지 않으므로 나머지 품목의 로트를 만들어낼 수 없고, 만들어서도 안 된다 —
+        # 범위 표기는 렌더가 카드 최상위 `merged_count` 를 읽어 붙인다(상세 안에 복제하면
+        # 소급 병합 CLI 가 두 값을 맞춰 줘야 하는 두 번째 원천이 생긴다).
         detail = _deterministic_detail(kind, row, raw)
 
         return {
@@ -928,6 +933,206 @@ def _detail_whopir_report(row: dict[str, Any], raw: dict[str, Any]) -> dict[str,
     return detail
 
 
+# ── 회수 계열 결정론 상세(2026-08-25) ────────────────────────────────────────
+# 회수 4종(openfda-recall·recall-quality·hc-recall·mhra-recall)은 발행 카드 114장(10주
+# 누적 26%)을 차지하면서 부가층이 W3 인용 한 줄뿐이었다 — `detail`·`deep_body_key` 둘 다
+# 미배선. 그런데 수집기는 이미 **원천 레코드를 통째로** `raw_payload` 에 넣어 두고 있었다
+# (openfda `raw_payload=r` · MFDS `**raw` · HC `**rec`). 즉 원천이 천장이 아니라 **발행이
+# 천장**이었고, 수집기 변경·재수집·마이그레이션 0으로 층 하나를 되살릴 수 있다.
+#
+# 여기서 LLM 심층분석(deep_analysis)이 아니라 결정론 상세를 쓰는 이유: 회수 레코드의 값진
+# 부분은 전부 이미 구조화된 사실(진행상태·자진/명령·로트·수량·유통범위·처리 타임라인)이라
+# 생성할 것이 없다. 생성 0 → 환각 0 → 근거대조 게이트 불필요.
+#
+# `mhra-recall` 은 배선하지 않는다 — gov.uk Atom 피드가 주는 5개 키(title·summary·
+# category·id·published)를 카드가 이미 전부 쓰고 있어 **미사용 원천이 실제로 없다**.
+# 늘리려면 알림 상세 페이지를 수집해야 하므로 수집기 변경 과제로 남긴다(10주 1장).
+
+_OPENFDA_ABSENT = {"", "N/A"}        # 원천이 "값 없음"을 적는 방식 — 필드 자체를 안 싣는다
+
+# 통제어휘 → 국문. 값 집합은 전체 코퍼스 count 집계(약 17,900건)로 확정했다 — 표본 몇 건으로
+# 만든 매핑은 "Two or more of the following: …" 같은 다수 어법을 통째로 놓친다.
+# 미등재 값은 **fail-open**(원문 그대로 노출) — 손목록이 낡아도 값이 사라지지 않는다.
+_OPENFDA_STATUS_KO = {
+    "Ongoing": "진행 중", "Completed": "완료", "Terminated": "종결",
+}
+_OPENFDA_INITIATION_KO = {
+    "Voluntary: Firm initiated": "자진회수 (업체 착수)", "FDA Mandated": "FDA 회수명령",
+}
+_OPENFDA_NOTIFICATION_KO = {
+    "Letter": "서한", "Telephone": "전화", "Press Release": "보도자료",
+    "E-Mail": "이메일", "FAX": "팩스", "Visit": "방문", "Other": "기타",
+    "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit":
+        "2가지 이상 병행",
+}
+# 처리 타임라인 — OpenFDA 가 주는 3개 날짜의 의미와 순서(회수 착수 → FDA 등급 확정 → 공표).
+_OPENFDA_TIMELINE = (
+    ("recall_initiation_date", "회수 착수"),
+    ("center_classification_date", "FDA 등급 확정"),
+    ("report_date", "FDA 공표"),
+)
+# openfda 하위 제품식별 — 브랜드명만으론 무엇이 회수됐는지 알 수 없다(성분·투여경로 필요).
+_OPENFDA_PRODUCT_FIELDS = (
+    ("brand_name", "브랜드명"),
+    ("generic_name", "성분명"),
+    ("substance_name", "주성분"),
+    ("route", "투여경로"),
+    ("application_number", "허가번호"),
+)
+
+
+def _yyyymmdd_to_iso(value: Any) -> str:
+    """OpenFDA 날짜(`YYYYMMDD`) → ISO. 형식·범위를 벗어나면 "" — 추측해 만들지 않는다."""
+    s = str(value or "").strip()
+    if len(s) != 8 or not s.isdigit():
+        return ""
+    if not ("01" <= s[4:6] <= "12" and "01" <= s[6:8] <= "31"):
+        return ""
+    return f"{s[:4]}-{s[4:6]}-{s[6:8]}"
+
+
+def _openfda_text(raw: dict[str, Any], key: str) -> str:
+    """원천이 "값 없음"으로 쓰는 표기(""·"N/A")를 부재로 접는다(빈 라벨 방지)."""
+    value = str(raw.get(key) or "").strip()
+    return "" if value in _OPENFDA_ABSENT else value
+
+
+def _openfda_list(sub: dict[str, Any], key: str) -> str:
+    """`openfda` 하위 값은 항상 리스트다 — 문자열/스칼라로 와도 안전하게 접는다."""
+    value = sub.get(key)
+    if isinstance(value, list):
+        parts = [str(v).strip() for v in value if str(v or "").strip()]
+    else:
+        parts = [str(value).strip()] if str(value or "").strip() else []
+    seen: list[str] = []
+    for p in parts:                                  # 중복 제거(순서 보존)
+        if p not in seen:
+            seen.append(p)
+    return ", ".join(seen)
+
+
+def _detail_openfda_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """OpenFDA enforcement 레코드의 미사용 사실층 — 결정론 상세슬롯.
+
+    카드는 24개 top-level 필드 중 5개(등급·제품·사유·업체·발행일)만 써 왔다. 나머지는
+    수집기가 원본 레코드를 그대로 저장해 두고도 발행에서 버려졌다 — 회수 진행상태,
+    자진/명령 구분, 최초 통지수단, 로트번호·유효기한, 회수 수량, 유통범위, 업체 소재지,
+    FDA 처리 타임라인, 성분·투여경로·허가번호가 전부 그 안에 있다.
+
+    통제어휘(status·voluntary_mandated·initial_firm_notification)만 국문을 병기한다 —
+    값 집합이 닫혀 있어 결정론 매핑이 가능하기 때문. 자유서술(로트·유통범위·수량)은
+    원문 그대로 싣고 번역하지 않는다(옮겨 적으면 흘린다)."""
+    detail: dict[str, Any] = {"type": "openfda_recall_detail"}
+
+    for key, out_key, ko_map in (
+        ("status", "status", _OPENFDA_STATUS_KO),
+        ("voluntary_mandated", "initiation", _OPENFDA_INITIATION_KO),
+        ("initial_firm_notification", "notification", _OPENFDA_NOTIFICATION_KO),
+    ):
+        value = _openfda_text(raw, key)
+        if not value:
+            continue
+        detail[out_key] = value
+        ko = ko_map.get(value)
+        if ko:                                       # 미등재는 fail-open(원문만) — 값 유실 0
+            detail[f"{out_key}_ko"] = ko
+
+    for key, out_key in (("product_quantity", "quantity"),
+                         ("distribution_pattern", "distribution")):
+        value = _openfda_text(raw, key)
+        if value:
+            detail[out_key] = value
+
+    # 로트/유효기한 — 실무자가 자사 재고와 대조하는 유일한 칸. more_code_info 는 이어붙인다.
+    code_info = " ".join(p for p in (_openfda_text(raw, "code_info"),
+                                     _openfda_text(raw, "more_code_info")) if p)
+    if code_info:
+        detail["code_info"] = code_info
+
+    location = ", ".join(p for p in (_openfda_text(raw, "city"), _openfda_text(raw, "state"),
+                                     _openfda_text(raw, "country")) if p)
+    if location:
+        detail["firm_location"] = location
+
+    timeline = [{"label": label, "date": iso}
+                for key, label in _OPENFDA_TIMELINE
+                if (iso := _yyyymmdd_to_iso(raw.get(key)))]
+    if timeline:
+        detail["timeline"] = timeline
+
+    sub = raw.get("openfda")
+    if isinstance(sub, dict):
+        product: list[dict[str, str]] = []
+        generic = _openfda_list(sub, "generic_name")
+        for key, label in _OPENFDA_PRODUCT_FIELDS:
+            value = _openfda_list(sub, key)
+            # 주성분(substance_name)은 성분명과 사실상 같은 값일 때가 많다 — 같으면 생략.
+            if key == "substance_name" and value.lower() == generic.lower():
+                continue
+            if value:
+                product.append({"label": label, "value": value})
+        if product:
+            detail["product"] = product
+
+    return detail if len(detail) > 1 else None       # type 만 남으면 부재(블록 미렌더)
+
+
+def _detail_recall_quality(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """MFDS 회수·판매중지 레코드의 미사용 사실층 — 결정론 상세슬롯.
+
+    data.go.kr 15059114 가 주는 키는 9개다(`PRDUCT·ENTRPS·RTRVL_RESN·ENFRC_YN·
+    RECALL_COMMAND_DATE·RTRVL_CMMND_DT·ITEM_SEQ·BIZRNO·STD_CD` — 수집기 spec probe 확정).
+    카드는 앞의 3개만 썼고, 그중 **`ENFRC_YN`(강제여부)** 은 자진회수와 회수명령을 가르는
+    규제 신호인데도 10주 43장 내내 한 번도 발행되지 않았다.
+
+    `RECALL_COMMAND_DATE` 는 이미 카드 발행일이라 중복이므로 싣지 않는다. `RTRVL_CMMND_DT`
+    는 수집기 spec 이 "회수명령일시"로, `collect_mfds_recall._body` 가 "승인일자"로 서로 다르게
+    부르고 있어 **의미가 확정되기 전까지 싣지 않는다** — 라벨을 못 붙이는 날짜는 없는 날짜보다
+    나쁘다. `nedrug_item_candidate_url` 도 수집기가 스스로 "미검증 후보"라 적어 둔 링크라 제외."""
+    detail: dict[str, Any] = {"type": "mfds_recall_detail"}
+
+    enforced = str(raw.get("ENFRC_YN") or "").strip().upper()
+    if enforced == "Y":
+        detail["enforcement"] = "회수명령 (강제)"
+    elif enforced == "N":
+        detail["enforcement"] = "자진회수"
+    elif enforced:                                   # Y/N 밖의 값은 원문 그대로(fail-open)
+        detail["enforcement"] = str(raw.get("ENFRC_YN")).strip()
+
+    for key, out_key in (("ITEM_SEQ", "item_seq"), ("STD_CD", "std_cd"), ("BIZRNO", "bizrno")):
+        value = str(raw.get(key) or "").strip()
+        if value:
+            detail[out_key] = value
+
+    return detail if len(detail) > 1 else None
+
+
+def _detail_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """Health Canada 회수 레코드의 미사용 사실층 — 결정론 상세슬롯.
+
+    HC 오픈데이터 피드는 필드가 11개뿐이고 카드가 이미 10개를 쓴다(천장이 낮다). 다만
+    **`What you should do`(권고 조치)** 는 `_quote_hc_recall` 의 *폴백* 이라 `Issue` 가 있는
+    한 화면에 안 나온다 — 실측 19장 전부가 그 경우였다. 상세 페이지 보강분(유효성분·함량,
+    제형)도 `raw` 에는 있으나 W2 4행 상한에 밀려 미표시였다.
+
+    영문 자유서술은 원문으로 싣고 `action_ko` 슬롯만 열어 둔다(NCR·WHOPIR 형제와 동형 —
+    번역층이 붙으면 병기로 렌더된다). 여기서 옮겨 적지 않는다."""
+    detail: dict[str, Any] = {"type": "hc_recall_detail"}
+
+    for key, out_key in (("medicinal_ingredient", "ingredient"),
+                         ("dosage_form_detail", "dosage_form"),
+                         ("What you should do", "action")):
+        value = str(raw.get(key) or "").strip()
+        if value:
+            detail[out_key] = value
+
+    action_ko = str(raw.get("what_you_should_do_ko") or "").strip()
+    if detail.get("action") and action_ko:           # 있을 때만 — 없으면 키 미추가(골든 불변)
+        detail["action_ko"] = action_ko
+
+    return detail if len(detail) > 1 else None
+
+
 def _deterministic_detail(kind: str, row: dict[str, Any],
                           raw: dict[str, Any] | None) -> dict[str, Any] | None:
     """결정론 상세 슬롯(펼침 상세보기용). `SourceSpec.detail` 디스패치. 없으면 None(요약카드 유지)."""
@@ -1284,16 +1489,17 @@ _REGISTRY: dict[str, SourceSpec] = {
         "🟦", "회수·판매중지", "회수",
         a_eligible=True, section="recall_table",
         quote=_quote_recall_quality, extra_rows=_w2_extra_recall_quality,
-        official=_official_recall_quality),
+        official=_official_recall_quality, detail=_detail_recall_quality),
     "openfda-recall": SourceSpec(
         "🟧", "Recall", "Recall",
         a_eligible=True, section="recall_table",
         quote=_quote_openfda_recall, extra_rows=_w2_extra_openfda_recall,
-        official=_official_openfda_recall),
+        official=_official_openfda_recall, detail=_detail_openfda_recall),
     "hc-recall": SourceSpec(
         "🟧", "Recall(HC)", "Recall",
         a_eligible=True, section="recall_table",
-        quote=_quote_hc_recall, extra_rows=_w2_extra_hc_recall),
+        quote=_quote_hc_recall, extra_rows=_w2_extra_hc_recall,
+        detail=_detail_hc_recall),
     "mhra-recall": SourceSpec(
         "🟧", "Recall(UK)", "Recall",
         a_eligible=True, section="recall_table",
@@ -1648,6 +1854,14 @@ _SOURCE_BODY_KEYS = (
     # EU(EudraGMDP)·영국(MHRA) GMP 비준수 성명서 전문. nature=위반내용, action=당국조치가
     # 본체이고 operations/additional 은 함께 실리는 원문 구간이다.
     "ncr_nature", "ncr_action", "ncr_operations", "ncr_additional",
+    # ★[회수 계열 2026-08-25] 회수 4종은 **Evidence A(= 원문 인용 가능)** 인데 이 신호는
+    # 줄곧 False 였다(발행분 114장 전건). 즉 카드는 원문을 인용해 싣고 있는데 LLM 입력은
+    # "원문을 못 받았다"고 말하는, 2026-07-20 사고와 같은 조건이 회수 계열에 그대로 남아
+    # 있었다. 이 유형들은 원천 레코드의 사유 필드가 곧 본문이다(별도 장문 본문이 없다).
+    #   openfda-recall  : reason_for_recall  (FDA enforcement 사유 원문)
+    #   recall-quality  : RTRVL_RESN         (식약처 회수사유내용)
+    #   hc-recall       : Issue / What you should do (HC 사유·권고조치 원문)
+    "reason_for_recall", "RTRVL_RESN", "Issue", "What you should do",
 )
 
 

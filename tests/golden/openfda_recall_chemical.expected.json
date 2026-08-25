@@ -31,7 +31,7 @@
     "regulator": "OpenFDA Recall",
     "signal": "Tier 2",
     "source_body_absent_reason": "",
-    "source_body_captured": false,
+    "source_body_captured": true,
     "w2_facts": {
       "Class": "Class II",
       "문서번호": "`Z-1234-2026`",
@@ -40,7 +40,7 @@
       "제품": "Lisinopril Tablets USP 10 mg, 100-count bottle"
     }
   },
-  "recall_group_key": "RECALL|Acme Pharmaceuticals, Inc.|Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+  "recall_group_key": "RECALL|event|99120",
   "section": "recall_table",
   "signal_tier": "Tier 2"
 }

@@ -3,6 +3,12 @@
   "card_type": "Recall(HC)",
   "category": "Other",
   "checks": [],
+  "deterministic_detail": {
+    "action": "Contact the recalling firm if you have any questions about the recall.",
+    "dosage_form": "Solution",
+    "ingredient": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL",
+    "type": "hc_recall_detail"
+  },
   "evidence_basis": "Intake raw",
   "evidence_level": "A",
   "facts": [
@@ -45,6 +51,7 @@
   "render_order": null,
   "signal_label": "Med",
   "signal_tier": 2,
+  "source_body_captured": true,
   "sources": {
     "info_url": "https://recalls-rappels.canada.ca/en/alert-recall/hizentra-oos",
     "link_check": {

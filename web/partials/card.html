@@ -276,6 +276,81 @@
     {%- endfor %}
     {%- for s in dd.sections or [] %}{{ ncr_field(s.no ~ '. ' ~ (s.title_ko or s.title), 'WHOPIR', s.text, s.text_ko, '') }}{% endfor %}
   </details>
+  {%- elif card.deterministic_detail.type == 'openfda_recall_detail' %}
+  {#- [회수 상세 2026-08-25] OpenFDA enforcement 레코드가 줄곧 주고 있던 사실층. 수집기는
+      원본 레코드를 통째로 저장해 왔는데(`raw_payload=r`) 카드는 24개 필드 중 5개만 썼다 —
+      진행상태·자진/명령·최초 통지수단·로트·수량·유통범위·소재지·FDA 처리 타임라인·성분이
+      전부 버려지고 있었다. 전부 원천에 실재하는 값이라 LLM 0·환각 0.
+      통제어휘(진행상태·개시구분·통지수단)만 국문 병기 — 값 집합이 닫혀 있어 결정론 매핑이
+      가능하다. 자유서술(로트·수량·유통범위)은 원문 verbatim 으로 두고 옮겨 적지 않는다.
+      483/NCR 블록과 같은 클래스만 써 CSS 추가 0. -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · OpenFDA{% if card.merged %} · 대표 품목 기준{% endif %}</span></summary>
+    {%- if card.merged %}
+    {#- 병합 대표 카드의 로트·수량·타임라인은 **대표 레코드 1건**의 값이다. 멤버 raw 는
+        병합 시 보존되지 않아 나머지 품목의 로트를 알 수 없고, 지어내서도 안 된다. -#}
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>이 카드는 {{ card.merged_count }}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다(로트·수량·처리 경과 포함).</p>
+    {%- endif %}
+    {%- if dd.status or dd.initiation or dd.notification %}
+    <div class="dt-sev">{% if dd.status %}<span class="dt-chip">진행상태 · {{ dd.status_ko or dd.status }}</span>{% endif %}{% if dd.initiation %}<span class="dt-chip">{{ dd.initiation_ko or dd.initiation }}</span>{% endif %}{% if dd.notification %}<span class="dt-chip">최초 통지 · {{ dd.notification_ko or dd.notification }}</span>{% endif %}</div>
+    {%- endif %}
+    {%- if dd.timeline %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">처리 경과</span></div>
+      <div class="dt-sev">{% for t in dd.timeline %}<span class="dt-chip">{{ t.label }} · {{ t.date }}</span>{% endfor %}</div>
+    </div>
+    {%- endif %}
+    {%- if dd.code_info %}
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">대상 로트·유효기한</span></div>
+      <div class="obs-orig"><span class="viol-lang">원문 · OpenFDA</span><p class="obs-en">{{ dd.code_info }}</p></div>
+    </div>
+    {%- endif %}
+    {%- if dd.quantity or dd.distribution or dd.firm_location %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">회수 규모·범위</span></div>
+      {%- if dd.quantity %}<p class="dt-sum">회수 수량 — {{ dd.quantity }}</p>{% endif %}
+      {%- if dd.distribution %}<p class="dt-sum">유통 범위 — {{ dd.distribution }}</p>{% endif %}
+      {%- if dd.firm_location %}<p class="dt-sum">업체 소재지 — {{ dd.firm_location }}</p>{% endif %}
+    </div>
+    {%- endif %}
+    {%- if dd.product %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">제품 식별</span></div>
+      {%- for p in dd.product %}<p class="dt-sum">{{ p.label }} — {{ p.value }}</p>{% endfor %}
+    </div>
+    {%- endif %}
+  </details>
+  {%- elif card.deterministic_detail.type == 'mfds_recall_detail' %}
+  {#- [회수 상세 2026-08-25] 식약처 회수·판매중지 레코드의 미사용 사실층. data.go.kr 15059114
+      가 주는 9개 키 중 카드는 3개만 썼고, **`ENFRC_YN`(강제여부)** — 자진회수와 회수명령을
+      가르는 규제 신호 — 는 10주 43장 동안 한 번도 발행되지 않았다. 나머지는 품목·업체
+      식별코드로, 실무자가 자사 품목 코드와 대조하는 칸이다. 전부 국문 원천이라 병기 불필요. -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · 식약처{% if card.merged %} · 대표 품목 기준{% endif %}</span></summary>
+    {%- if card.merged %}
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>이 카드는 {{ card.merged_count }}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다.</p>
+    {%- endif %}
+    {%- if dd.enforcement %}
+    <div class="dt-sev"><span class="dt-chip">{{ dd.enforcement }}</span></div>
+    {%- endif %}
+    {%- if dd.item_seq or dd.std_cd or dd.bizrno %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">품목·업체 식별코드</span></div>
+      {%- if dd.item_seq %}<p class="dt-sum">품목기준코드 — {{ dd.item_seq }}</p>{% endif %}
+      {%- if dd.std_cd %}<p class="dt-sum">표준코드 — {{ dd.std_cd }}</p>{% endif %}
+      {%- if dd.bizrno %}<p class="dt-sum">사업자등록번호 — {{ dd.bizrno }}</p>{% endif %}
+    </div>
+    {%- endif %}
+  </details>
+  {%- elif card.deterministic_detail.type == 'hc_recall_detail' %}
+  {#- [회수 상세 2026-08-25] Health Canada 회수의 미사용 사실층. HC 피드는 필드가 11개뿐이라
+      천장이 낮지만, **`What you should do`(권고 조치)** 는 W3 인용의 *폴백* 이라 `Issue` 가
+      있는 한 화면에 안 나왔다 — 실측 19장 전부가 그 경우였다. 상세 페이지 보강분(유효성분·
+      제형)도 W2 4행 상한에 밀려 미표시였다. 권고 조치는 NCR 형제와 동형으로 원문→국문 병기
+      슬롯(`action_ko`)을 열어 둔다(현재 미보유 → 영문 단독 렌더·additive). -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · Health Canada</span></summary>
+    {%- if dd.ingredient or dd.dosage_form %}
+    <div class="dt-sev">{% if dd.ingredient %}<span class="dt-chip">유효성분 · {{ dd.ingredient }}</span>{% endif %}{% if dd.dosage_form %}<span class="dt-chip">제형 · {{ dd.dosage_form }}</span>{% endif %}</div>
+    {%- endif %}
+    {%- if dd.action %}{{ ncr_field('권고 조치 (What you should do)', 'Health Canada', dd.action, dd.action_ko, '') }}{% endif %}
+  </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}

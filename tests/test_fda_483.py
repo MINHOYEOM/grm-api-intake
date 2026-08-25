@@ -1387,6 +1387,97 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class ObservationRecoveryRegressionTest(unittest.TestCase):
+    """★[관찰 소실 3결함 수리 2026-08-25] 발행 483 카드 121장 중 **17장에서 관찰 33개**가
+    원문에 있는데도 카드에 실리지 않았다(파서 자신의 앵커 정규식 `_OBS_RE` 기준 전수 실측).
+
+    기각 규칙 ①②③은 전부 실사고에서 나온 것이라(193490 4조각 분열·193583 번호 중복)
+    완화하면 그 사고가 재발한다. 그래서 세 결함 각각을 **양성 신호 하나로만** 좁혀 고쳤고,
+    아래 테스트는 (a)회수되는 것 (b)사고가 여전히 막히는 것을 쌍으로 고정한다.
+    """
+
+    def _numbers(self, text):
+        return [r["number"] for r in f._extract_483_observations_from_text(text)]
+
+    # ── A. `WE OBSERVED` 스코프 절단 ──────────────────────────────────────────
+    def test_observations_before_we_observed_are_not_discarded(self):
+        """★A: `WE OBSERVED` 가 목록 **중간**에 나타나면 앞쪽 관찰이 통째로 잘렸다.
+
+        스캔 483 은 페이지마다 양식 헤더가 반복 인쇄되고 OCR 이 페이지를 원순서대로 붙이지
+        못하는 일이 있다. 실측 소실: 193906 13개 전부·193883 5개·193759 4개·193868 3개."""
+        text = (
+            "OBSERVATION 1: Written records of investigations do not include conclusions.\n"
+            "Specifically, the batch failure investigation was closed without a conclusion.\n\n"
+            "OBSERVATION 2: Control procedures are not established which monitor output.\n"
+            "Specifically, visual inspection was not qualified.\n\n"
+            "DURING AN INSPECTION OF YOUR FIRM I/WE OBSERVED:\n\n"
+            "OBSERVATION 3: Aseptic control practices are inadequate for the filling line.\n"
+            "Specifically, an operator disrupted first air during setup.\n\n"
+        )
+        self.assertEqual(self._numbers(text), ["1", "2", "3"])
+
+    def test_we_observed_still_trims_preamble_when_no_observation_precedes(self):
+        """★A 음성: 앞쪽에 관찰이 없으면 종전대로 자른다(표지·주소·양식문 제거 효과 유지)."""
+        text = (
+            "FOOD AND DRUG ADMINISTRATION\nSTREET ADDRESS\n19701 Fairchild\n"
+            "DURING AN INSPECTION OF YOUR FIRM I/WE OBSERVED:\n\n"
+            "OBSERVATION 1: Written records of investigations do not include conclusions.\n"
+            "Specifically, the batch failure investigation was closed without a conclusion.\n\n"
+        )
+        scoped = f._scope_to_observation_list(text)
+        self.assertNotIn("19701 Fairchild", scoped)
+        self.assertEqual(self._numbers(text), ["1"])
+
+    # ── B. 대문자 SEE 오판 ────────────────────────────────────────────────────
+    def test_uppercase_form_print_see_is_not_a_cross_reference(self):
+        """★B: 페이지 하단 서명란("EMPLOYEE(S) SIGNATURE … SEE")이 OCR 로 깨져 앵커 앞이
+        대문자 `SEE` 로 끝나면, 그 뒤 진짜 표제가 상호참조로 오판돼 통째로 버려졌다
+        (실측 193455 관찰 2 · 193886 관찰 7)."""
+        text = (
+            "OBSERVATION 1: Written records of investigations do not include conclusions.\n"
+            "Specifically, mammalian hair was found in finished drug products.\n"
+            "EMPLOYEE(S) SIGNATURE /I SEE\n\n"
+            "OBSERVATION 2: Control procedures are not established which monitor output.\n"
+            "Specifically, visual inspection methods were not qualified.\n\n"
+        )
+        self.assertEqual(self._numbers(text), ["1", "2"])
+
+    def test_lowercase_see_reference_is_still_rejected(self):
+        """★B 음성: 산문 속 소문자 참조("see OBSERVATION 3")는 종전대로 기각된다."""
+        text = (
+            "I/WE OBSERVED:\n\n"
+            "OBSERVATION 1: The quality unit did not follow its responsibilities here.\n"
+            "Specifically, corrective actions were not implemented; see\n\n"
+            "OBSERVATION 3: .\nb. Root-cause analyses were not conducted for excursions.\n\n"
+        )
+        self.assertEqual(self._numbers(text), ["1"])
+
+    # ── C. OCR 오독 소문자 ────────────────────────────────────────────────────
+    def test_lowercase_ocr_typo_after_sentence_boundary_is_kept(self):
+        """★C: ③(소문자 시작) 규칙은 **문장 중간에 낀 참조**를 잡으려는 것인데, 스캔본에서는
+        진짜 표제 첫 글자를 OCR 이 오독해 소문자가 되기도 한다(실측 193759 관찰 7:
+        "Facility" → "eacitity"). 앵커 앞이 문장 경계면 소문자여도 표제로 본다."""
+        text = (
+            "I/WE OBSERVED:\n\n"
+            "OBSERVATION 6: Equipment used in manufacturing is not maintained properly.\n"
+            "Specifically, visible condensation surrounded the edges and the floor.\n"
+            "OBSERVATION 7: | eacitity cleaning validation and disinfectant efficacy "
+            "studies are inadequate for the classified areas.\n\n"
+        )
+        self.assertEqual(self._numbers(text), ["6", "7"])
+
+    def test_mid_sentence_reference_with_lowercase_tail_is_still_rejected(self):
+        """★C 음성: 193583 사고 형태(문장이 안 끝난 채 이어지는 참조)는 여전히 기각된다."""
+        text = (
+            "I/WE OBSERVED:\n\n"
+            "OBSERVATION 1: There is a failure to thoroughly review discrepancies here.\n"
+            "Specifically, the investigation was discussed in the Form FDA 483, "
+            "OBSERVATION 1 and the Discussion Items, had already been discussed with the "
+            "quality unit management before the close-out meeting was held.\n\n"
+        )
+        self.assertEqual(self._numbers(text), ["1"])   # 중복 번호가 생기지 않는다
+
+
 class ObservationLegibilityTest(unittest.TestCase):
     """[OCR 판독 잡음 2026-07-27] 스캔 여백 파편이 관찰 1건으로 발행되던 구멍.
 

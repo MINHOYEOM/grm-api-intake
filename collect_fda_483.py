@@ -469,12 +469,34 @@ _DETAIL_MIN_ALPHA = 25  # 'Specifically,' 뒤 실질 내용이 이보다 적으�
 # 끼는 실측 형태("Please refer to OBSERVATlON 2 and" — OCR 로 깨진 것은 앵커로 안 잡힌다)까지
 # 흡수하도록 참조 대상 나열을 옵션으로 둔다.
 _XREF_LOOKBEHIND = 60
+# ★[대문자 SEE 오판 수리 2026-08-25] `see`·`per` 는 짧아서 **양식 인쇄물에도 나온다.** 483
+# 페이지 하단 서명란("EMPLOYEE(S) SIGNATURE … SEE REVERSE OF THIS PAGE")이 OCR 로 깨지면
+# 앵커 바로 앞이 대문자 `SEE` 로 끝나고, 그 뒤 진짜 관찰 표제가 상호참조로 오판돼 통째로
+# 버려졌다(실측: 193455 관찰 2 · 193886 관찰 7 — before 가 각각
+# `"…EMPi.OY1:E($) SIGJ'IAl\lRE /I SEE"` · `"…| a a raw material … | SEE"`).
+# 산문 속 참조는 소문자이거나 문장 첫 글자만 대문자다("see Observation 3" / "Please refer to").
+# 그래서 **전부 대문자인 `SEE`/`PER` 는 참조로 보지 않는다** — `refer to` 계열은 양식 인쇄물에
+# 나오지 않으므로 대소문자 무관하게 종전대로 잡는다. 원래 사고(193490 "Please refer to
+# Observation 3.")는 소문자라 그대로 걸리고, 그마저 실패해도 ②(뒤따르는 실질 문장 없음)가
+# 같은 항목을 잡는 2겹이다.
 _XREF_PREFIX_RE = re.compile(
     r"(?:refer(?:red|ring)?\s+to|see|per)\s*"
     r"(?:OBSERVAT\w*\s*\d*\s*(?:and|,|&)?\s*)*$",
     re.I,
 )
+# 양식 인쇄물 잔재 = 참조어가 **전부 대문자**인 경우("… SIGNATURE /I SEE"). `refer to` 계열은
+# 양식에 나오지 않으므로 이 예외의 대상이 아니다(대소문자 무관 종전 동작 유지).
+_XREF_FORMPRINT_RE = re.compile(
+    r"\b(?:SEE|PER)\s*(?:OBSERVAT\w*\s*\d*\s*(?:and|,|&)?\s*)*$")
 _HEADING_MIN_ALPHA = 6   # 표제 뒤 첫 문장의 최소 알파벳 수(참조문 잔재 '.' 는 0)
+# ★[③규칙 OCR 오독 수리 2026-08-25] ③("뒤따르는 첫 문장이 소문자로 시작")은 **문장 중간에 낀
+# 참조**를 잡으려는 규칙이다(193583: "…the Form FDA 483, OBSERVATION 1 and the Discussion
+# Items…" — before 가 쉼표로 끝나고 뒤가 소문자 연결어). 그런데 스캔본에서는 진짜 표제 뒤
+# 첫 글자를 OCR 이 오독해 소문자가 되기도 한다(실측 193759 관찰 7: "Facility" → "eacitity",
+# 앞에 표 문자 `|` 까지 붙었다). 둘을 가르는 신호는 **앵커 앞이 문장 경계인가**다 —
+# 진짜 표제는 앞 문장이 끝난 뒤 줄을 바꿔 시작하고("…the floor.\n"), 문장 속 참조는 문장이
+# 안 끝난 채 이어진다("…FDA 483, "). 문장 경계 뒤라면 소문자여도 표제로 본다.
+_SENTENCE_BOUNDARY_RE = re.compile(r"[.!?:]\s*$|\n\s*$")
 _BAD_CHAR_RE = re.compile(r"[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 # \u2500\u2500 [PDF \ub9ac\uac00\ucc98 \ubcf5\uc6d0 2026-07-20] \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -1548,14 +1570,15 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
     selected: list[re.Match[str]] = []
     for i, m in enumerate(matches):
         before = body[max(0, m.start() - _XREF_LOOKBEHIND):m.start()]
-        if _XREF_PREFIX_RE.search(before):
+        if _XREF_PREFIX_RE.search(before) and not _XREF_FORMPRINT_RE.search(before):
             continue                                   # ① 문장 속 상호참조
         nxt = matches[i + 1].start() if i + 1 < len(matches) else len(body)
         head, _ = _first_sentence(body[m.end():nxt].lstrip(" :\t\r\n"))
         if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
             continue                                   # ② 뒤따르는 실질 문장 없음
         first_alpha = next((c for c in head if c.isalpha()), "")
-        if first_alpha and first_alpha.islower():
+        if (first_alpha and first_alpha.islower()
+                and not _SENTENCE_BOUNDARY_RE.search(before)):
             continue                                   # ③ 문장 중간에 낀 참조
         selected.append(m)
     return selected
@@ -1581,7 +1604,7 @@ def _extract_483_observations_from_text(
     hints = _header_hint_kwargs(header_hints)
     body = normalize_pdf_ligatures(text)   # [2026-07-20] 커밋된 낡은 source_text 도 여기서 복원
     m = _WE_OBSERVED_RE.search(body)
-    scoped = body[m.end():] if m else body
+    scoped = _scope_to_observation_list(body)
     primary = _observations_from_anchors(
         _cut_at_annotations(scoped),
         lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
@@ -1594,6 +1617,31 @@ def _extract_483_observations_from_text(
     # 오늘 관찰이 **0건인 문서에만** 도달한다(위에서 1건이라도 나오면 그대로 반환했다) —
     # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
     return _recover_483_observations(body, m, hints)
+
+
+def _scope_to_observation_list(body: str) -> str:
+    """`WE OBSERVED` 이후로 좁히되, **그 앞에 이미 관찰 표제가 있으면 좁히지 않는다.**
+
+    `WE OBSERVED`("DURING AN INSPECTION OF YOUR FIRM (I/WE) OBSERVED:")는 관찰 목록의 시작
+    표지라, 그 앞(주소·양식문·표지)을 버리는 것이 원래 의도다. 그런데 이 문구는 483 양식에서
+    **페이지마다 반복 인쇄**되고, 스캔본 OCR 은 페이지를 원순서대로 붙이지 못하는 일이 있다.
+    그래서 첫 매치가 목록 **중간**에 떨어지면 앞쪽 관찰이 통째로 잘렸다.
+
+    실측(112문서 코퍼스): `WE OBSERVED` 매치 43건 중 **7건**에서 앞쪽 관찰이 잘렸다 —
+    193906 13개 전부 · 193883 5개 · 193759 4개 · 193868 3개 · 192194 2개 · 193531 1개 ·
+    193865 1개. 잘린 문서는 회수 경로로 빠지거나(0건) 앞 번호가 통째로 빈 카드가 됐다.
+
+    판정 신호는 하나이고 **양성 검출**이다 — 잘려나갈 구간에 관찰 표제가 있으면 자르지
+    않는다. 표제가 없으면 종전 그대로 자른다(표지·주소·양식문 제거 효과 유지). 자르지 않아도
+    앞쪽 잡텍스트가 섞이지는 않는다 — 분할은 `OBSERVATION` 앵커가 하므로 첫 앵커 앞은 어차피
+    버려진다.
+    """
+    m = _WE_OBSERVED_RE.search(body)
+    if not m:
+        return body
+    if _OBS_RE.search(body[:m.start()]):
+        return body                        # 앞쪽에 관찰이 있다 — 자르면 그게 곧 유실이다
+    return body[m.end():]
 
 
 def _cut_at_annotations(body: str) -> str:

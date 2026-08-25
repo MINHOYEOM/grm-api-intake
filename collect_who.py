@@ -434,16 +434,37 @@ def _extract_whopir_excerpt(text: str) -> str:
     "실사 결과"라 쓰고, 존재하지 않는 "지적 항목"을 확보하라고 적은 원인). desk assessment
     는 결론이 곧 "왜"이므로 결론 표제를 최우선 앵커로 둔다. ② 낱말 앵커는 문장 한가운데
     떨어지므로 문장 시작으로 되감는다(위 헬퍼).
+
+    [2026-08-25 후속] ②는 **문법만** 고쳤고 내용은 못 고쳤다. 172건 전수에서 findings
+    132건의 excerpt 가 여전히 낱말 앵커에 끌려가 보고서마다 똑같은 마무리 보일러플레이트
+    ("All the non-compliances observed during the inspection… will remain valid for 3
+    years" 53건 · "The deficiencies raised in this section…" 25건)에서 시작했다 — 문장으로
+    시작하지만 **어느 사이트인지 알 수 없는 300자**라 LLM 근거창으로는 빈손이다.
+    그래서 앵커를 **표제 기반**으로 올린다: 지적 요약 표제 바로 뒤가 곧 번호 매긴 지적
+    항목이다. 표제 정의는 구조화 층과 **같은 상수를 공유**한다 — 두 층이 "결론 표제가
+    무엇인가"를 따로 정의하면 한쪽만 낡는다. 낱말 앵커는 표제가 없는 서식용 폴백으로만
+    남긴다(실측 172건 중 1건). 결과: 표제 시작 39 → 171건.
     """
     # 페이지 푸터(주소줄~쪽번호)는 평탄화가 본문 한가운데로 밀어 넣는다 — 구조화 경로가
     # 이미 쓰는 정규화를 excerpt 에도 똑같이 적용한다(안 하면 excerpt 가 러닝헤더 중간에서
-    # 시작하는 사례가 남는다). 정규화는 줄 구조를 보는 정규식이라 squeeze 앞에 와야 한다.
-    compact = re.sub(r"\s+", " ", _WHOPIR_FOOTER_RE.sub("\n\n", text or "")).strip()
-    if not compact:
+    # 시작하는 사례가 남는다). 표제 앵커는 **줄 구조를 보므로** squeeze 하지 않고 들고 간다
+    # (종전엔 여기서 바로 한 줄로 뭉개 표제라는 신호 자체를 잃었다). 합자 정규화도 구조화
+    # 층과 맞춘다 — 같은 원문을 두 층이 다르게 읽을 이유가 없다.
+    t = _WHOPIR_FOOTER_RE.sub("\n\n", _normalize_ligatures(text or ""))
+    if not t.strip():
         return ""
-    m = _WHOPIR_DESK_CONCL_RE.search(compact)
+
+    def _from(i: int) -> str:
+        return _whopir_squeeze(t[i:])[:WHOPIR_EXCERPT_MAX_CHARS].strip()
+
+    m = _WHOPIR_DESK_CONCL_RE.search(t)
     if m:                                             # desk assessment → 결론이 근거다
-        return compact[m.start():][:WHOPIR_EXCERPT_MAX_CHARS].strip()
+        return _from(m.start())
+    for rx in (_WHOPIR_FINDINGS_HEAD_RE, _WHOPIR_CONCL_HEAD_RE):
+        m = rx.search(t)                              # findings → 지적 요약 → 결론 순
+        if m:
+            return _from(m.start())
+    compact = _whopir_squeeze(t)                      # 표제가 없는 서식만 낱말 앵커로
     for pat in _WHOPIR_EXCERPT_PATTERNS:
         m = re.search(pat, compact, re.I)
         if m:
@@ -495,12 +516,28 @@ _WHOPIR_RELIANCE_CONCL_RE = re.compile(r"^(?:Final\s+|Initial\s+)?Conclusion\b",
 # 참고문헌 목록 표제 — **결론이 아니다**. Part 3 이 없는 서식에서 Part 4 를 결론으로 잡는
 # 폴백이 이 목록을 결론 자리에 실었다(실측 AnaCipher CRO: outcome 이 가이드라인 서지
 # 1,134자·진짜 결론은 번호 없는 "Conclusion – inspection" 표제로 뒤에 따로 있었다).
+# 한정어는 실측 3종이다 — WHO / GMP / 없음("List of guidelines referenced").
+# WHO 만 열어 두면 `List of GMP Guidelines referenced` 서식에서 이 폴백이 침묵한다.
 _WHOPIR_BIBLIO_RE = re.compile(
-    r"^\s*List\s+of\s+(?:WHO\s+)?[Gg]uidelines\s+referenced", re.I)
+    r"^\s*List\s+of\s+(?:\S+\s+)?guidelines\s+referenced", re.I)
 # 번호 없는 결론 표제(서식 변형) — 줄 시작의 "Conclusion …". Part 마커가 결론을 못 가리킬 때
-# 문서 안에서 결론을 직접 찾는 최후 경로.
+# 문서 안에서 결론을 직접 찾는 최후 경로이자, 아래 excerpt 앵커가 공유하는 표제 정의다.
+#
+# ★ **대문자 시작을 요구하는 것이 이 정규식의 핵심**이다. Part 3(과거 WHO 실사 요약)의 표
+# 셀이 평탄화되면 `conclusion of` / `conclusion of most` 라는 줄이 생긴다(172건 중 24건
+# 보유). re.I 로 두면 이 미끼가 진짜 결론보다 **앞서** 걸린다 — Farmabios 의 excerpt 가
+# 과거 실사 요약 한가운데서 시작한 원인이 정확히 이것이었다. 172건 전수에서 진짜 표제
+# 변형 12종(Conclusion – Inspection outcome 88 · Conclusion – Desk assessment outcome 39 ·
+# Final/Initial 접두 13 · 전대문자 4 · ASCII 하이픈 1 · 단독 "Conclusion" 3)은 전부
+# 대문자로 시작하고 미끼 4종은 전부 소문자다. 이 한 글자가 신호와 잡음을 가른다.
 _WHOPIR_CONCL_HEAD_RE = re.compile(
-    r"^[ \t]*(?:Final\s+|Initial\s+)?Conclusion\b[^\n]{0,60}$", re.I | re.M)
+    r"^[ \t]*(?:(?:Final|Initial|FINAL|INITIAL)\s+)?(?:Conclusion|CONCLUSION)\b"
+    r"[^\n]{0,60}$", re.M)
+# findings 서식의 지적 요약 표제(실측 변형 5종 — the 유무·(where applicable)·전대문자).
+# excerpt 앵커가 쓴다: 이 표제 바로 뒤가 곧 번호 매긴 지적 항목이다.
+_WHOPIR_FINDINGS_HEAD_RE = re.compile(
+    r"^[ \t]*Summary\s+of\s+(?:the\s+)?findings\s+and\s+(?:comments|recommendations)"
+    r"[^\n]{0,40}$", re.I | re.M)
 # 번호 구분자 `[.)]` 는 **선택**이다 — Keming(2026-08-03 실측)은 1번 표제만 "1 Quality
 # management" 로 점 없이 적혀 있었고, 구분자 필수 규칙이 1번을 못 잡자 연속 번호 사슬이
 # 시작조차 못 해 15개 전 항목이 유실됐다(발행 카드가 결론만 실림). 점 없는 숫자 시작 줄이
@@ -517,8 +554,22 @@ _WHOPIR_HEAD_RE = re.compile(r"^[ \t]*(\d{1,2})[.)]?\s+([A-Z][^\n]{2,70}?)\s*$",
 _WHOPIR_BLANK_BEFORE_RE = re.compile(r"\n[ \t]*\n[ \t]*$")
 _WHOPIR_DATES_RE = re.compile(
     r"Dates?\s+of\s*\n?\s*inspection\s*:?\s*\n?\s*([^\n]{4,60})", re.I)
+# 결론 표제가 outcome 본문 머리에 그대로 남는 것을 벗긴다(표제는 카드가 따로 붙인다).
+# [2026-08-25 전수 실측] 종전 규칙은 `Conclusion – (Desk assessment|Inspection) outcome`
+# **한 형태만** 벗겨서 172건 중 20건이 표제를 본문에 이고 있었다 — 카드 결론이 "Initial
+# conclusion – Inspection outcome Based on the areas inspected…" 로 시작한다(발행 4장 포함).
+# 놓친 변형 셋: ① Final/Initial 접두 13건 ② "outcome" 이 없는 `Conclusion – inspection`
+# 6건 ③ 뒤가 통째로 없는 단독 `Conclusion` 2건.
+# 접두·꼬리를 모두 선택으로 열되 **뒤가 대문자로 시작할 때만** 벗긴다 — "Conclusion of the
+# inspection team was…" 같은 산문 첫 낱말을 잘라 문장을 망가뜨리지 않기 위한 안전장치다
+# (172건 중 outcome 이 소문자로 시작하는 문서는 0건이라 정상 건을 막지 않는다).
+# ★ 그 안전장치는 `(?=[A-Z])` 로만 쓰면 **작동하지 않는다** — re.I 가 lookahead 의 문자
+# 클래스에도 걸려 소문자까지 통과시킨다(음성 검사가 이 과잉 절단을 잡아냈다). 대소문자
+# 구분이 필요한 자리만 `(?-i:…)` 로 플래그를 되돌린다.
 _WHOPIR_CONCL_LEAD_RE = re.compile(
-    r"^\s*Conclusion\s*[-–—]?\s*(?:Desk\s+assessment|Inspection)\s+outcome\s*", re.I)
+    r"^\s*(?:Final\s+|Initial\s+)?Conclusion\b"
+    r"(?:\s*[-–—]?\s*(?:Desk\s+assessment|Inspection))?"
+    r"(?:\s+outcome)?\s*(?-i:(?=[A-Z]))", re.I)
 # 항목 본문 상한 — 카드는 근거를 보여주는 자리이고 전문은 공식 PDF 링크가 담당한다.
 # (상한이 없으면 브리프 JSON 이 카드 1장당 2~7만자씩 불어난다 — 실측 Kaygee 68,520자.)
 WHOPIR_SECTION_MAX_CHARS = 600

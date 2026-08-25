@@ -4417,7 +4417,7 @@
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Zhejiang Keming Biopharmaceuticals",
-    "확인 상태: 실사 결론 수록 — WHO GMP 적합 판정(항목별 요약은 원문 참조)"
+    "확인 상태: 실사 결론·항목별 요약 15건 수록 — WHO GMP 적합 판정"
    ],
    "implication": "WHO 사전적격성 경로를 통해 공급되는 제조소는 실사 결과가 공개돼 상시 검증이 가능하다. 바이오 원료·중간체를 이 제조소에서 도입한다면 보고서에서 실사 범위와 대상 품목을 확인해 둘 필요가 있다.",
    "checks": [
@@ -4428,7 +4428,113 @@
     "type": "whopir_report",
     "report_kind": "findings",
     "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Zhejiang Keming Biopharmaceuticals Co. Ltd located at 1 Dingshan Road, Yulin Subdistrict, Xinchang, Zhejiang, R.P. China was considered to be operating at an acceptable level of compliance with WHO GMP Guidelines. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for three years, provided that the outcome of any inspection conducted during this period is positive.",
-    "sections": [],
+    "sections": [
+     {
+      "no": 1,
+      "title": "Quality management",
+      "text": "A system for managing quality that involved participation of management and appropriate manufacturing personnel was in place. Quality-related activities were defined and documented. The quality department was independent of production department. Staff authorized to release intermediates and APIs were specified. Quality-related activities were recorded at the time they were performed. Deviations from established procedures were documented and investigated. Regular internal audits were performed in accordance with an approved schedule. A risk assessment procedure was in place. …",
+      "text_ko": "경영진과 관련 제조 인력이 참여하는 품질경영 시스템이 갖춰져 있었다. 품질 관련 활동이 정의·문서화돼 있었고, 품질부서는 생산부서로부터 독립적이었다. 중간체·원료의약품의 출하를 승인할 권한 인력이 지정돼 있었다. 품질 관련 활동은 수행 시점에 기록됐고, 확립된 절차로부터의 일탈은 문서화·조사됐다. 승인된 일정에 따라 정기 내부감사가 수행됐으며, 위험평가 절차가 갖춰져 있었다. …",
+      "title_ko": "품질경영"
+     },
+     {
+      "no": 2,
+      "title": "Personnel",
+      "text": "The company maintained an organization chart that clearly distinguished the duties and reporting lines of its quality and production departments. Job descriptions were identified and available. The job descriptions of the following key personnel were reviewed: • Quality Director, Quality Management Department • Deputy Quality Director and Quality Manager • Head of Quality Assurance and Responsible person for product Release The Company employed 700 employees according to the company’s SMF at the time of inspection. The number of personnel appeared adequate to the present activities. …",
+      "text_ko": "회사는 품질부서와 생산부서의 직무·보고 체계를 명확히 구분한 조직도를 유지하고 있었다. 직무기술서가 식별·구비돼 있었고, 품질경영부 품질 디렉터, 부디렉터 겸 품질 매니저, 품질보증 책임자 겸 제품 출하 책임자 등 핵심 인력의 직무기술서를 검토했다. 실사 시점 회사 SMF 기준 임직원은 700명으로, 현재 활동에 충분한 인원으로 보였다. …",
+      "title_ko": "인력"
+     },
+     {
+      "no": 3,
+      "title": "Buildings and facilities",
+      "text": "Buildings and facilities for manufacturing intermediates were designed and constructed for easy cleaning, maintenance, and operation suitable to each production stage. They were properly maintained and kept clean throughout the manufacture of intermediates and APIs. The production blocks for Rifamycin S Sodium included Workshop 3016A, Workshop 3016B, Workshop 3016, Workshop 3026 and Workshop 3036 which formed the basis of the inspection. Water system Drinking water and deionized water were used in the production of Rifamycin S Sodium. …",
+      "text_ko": "중간체 제조용 건물과 시설은 각 생산 단계에 맞게 세척·유지보수·운영이 용이하도록 설계·건축돼 있었고, 중간체·원료의약품 제조 전 기간에 걸쳐 적절히 유지되고 청결하게 관리됐다. Rifamycin S Sodium 생산동은 3016A·3016B·3016·3026·3036 작업동으로 구성돼 실사의 기본 범위가 됐다. 용수 시스템 — Rifamycin S Sodium 생산에는 음용수와 탈이온수가 사용됐다. …",
+      "title_ko": "건물 및 시설"
+     },
+     {
+      "no": 4,
+      "title": "Process equipment",
+      "text": "Equipment for intermediate and API manufacturing was properly designed, sized, and located for use, cleaning, and maintenance. Materials in contact did not affect product quality. All equipment was dedicated to Rifamycin S Sodium production. Equipment Qualification Equipment qualification was performed following written procedures which included: • SOP “Procedure for DQ” • SOP “Procedure for OQ” • SOP “Procedure for PQ” The qualification of an autoclave was checked and discussed. …",
+      "text_ko": "중간체·원료의약품 제조 설비는 사용·세척·유지보수에 맞게 적절히 설계·크기 산정·배치돼 있었다. 접촉 자재가 제품 품질에 영향을 주지 않았고, 전 설비는 Rifamycin S Sodium 생산 전용이었다. 설비 적격성평가 — 설계적격성(DQ)·운전적격성(OQ)·성능적격성(PQ) 절차 등 문서화된 절차에 따라 설비 적격성평가가 수행됐다. 고압증기멸균기의 적격성평가를 확인하고 논의했다. …",
+      "title_ko": "공정 설비"
+     },
+     {
+      "no": 5,
+      "title": "Documentation and records",
+      "text": "The site's documentation system was primarily paper based. Documents for manufacturing intermediates or APIs were drafted, reviewed, approved, and distributed per written procedures, with issuance and revision history tracked according to SOP “Good document practices”. The SOP “Quality related documents management” established document retention procedures. Laboratory control records included complete data derived from all tests conducted to ensure compliance with established specifications and standards, including examinations and assays. …",
+      "text_ko": "사업장의 문서화 시스템은 주로 종이 기반이었다. 중간체·원료의약품 제조 문서는 문서화된 절차에 따라 작성·검토·승인·배포됐고, 발행·개정 이력은 「Good document practices」 지침서에 따라 추적됐다. 「Quality related documents management」 지침서가 문서 보존 절차를 정하고 있었다. 시험실 관리 기록에는 검사와 정량시험을 포함해 설정된 규격·기준과의 적합성을 보증하는 데 필요한 모든 시험에서 도출된 완전한 데이터가 포함돼 있었다. …",
+      "title_ko": "문서화 및 기록"
+     },
+     {
+      "no": 6,
+      "title": "Materials management",
+      "text": "Materials were stored in warehouses based on temperature needs and material type. The storage facilities were intended for production materials, encompassing raw and auxiliary materials, finished products, packaging components, labels, and hazardous chemicals. The area and capacity of the storage spaces were appropriately matched to the current scale of production, with designated zones allocated for material sampling. Ample space was provided for materials, items pending testing, and finished goods, ensuring compliance with specific storage requirements. …",
+      "text_ko": "자재는 온도 요건과 자재 유형에 따라 창고에 보관됐다. 보관 시설은 원자재·보조자재, 완제품, 포장 부자재, 라벨, 유해화학물질 등 생산 자재를 대상으로 했다. 보관 공간의 면적과 용량은 현재 생산 규모에 적절히 부합했고, 자재 검체 채취를 위한 전용 구역이 지정돼 있었다. 자재·시험 대기품·완제품을 위한 충분한 공간이 확보돼 특정 보관 요건의 준수가 보장됐다. …",
+      "title_ko": "자재 관리"
+     },
+     {
+      "no": 7,
+      "title": "Production and in-process controls",
+      "text": "The production workshops were not dedicated to Rifamycin S Sodium manufacturing. Raw materials were weighed and measured using appropriately accurate devices. Written procedures were established to monitor the progress and control the performance of processing steps that cause variability in the quality characteristics of the intermediate. In-process controls and their acceptance criteria were defined. All production steps were in operation during the WHO inspection. The relevant production areas were visited. Manufacturing processes were generally adequately defined. …",
+      "text_ko": "생산 작업동은 Rifamycin S Sodium 전용이 아니었다. 원자재는 적절한 정확도의 기기로 칭량·계량됐다. 중간체의 품질 특성에 변동을 일으키는 공정 단계의 진행을 감시하고 수행을 관리하는 문서화된 절차가 확립돼 있었고, 공정 중 관리 항목과 허용기준이 정의돼 있었다. WHO 실사 기간 중 전 생산 단계가 가동 중이었고 관련 생산 구역을 방문했다. 제조 공정은 대체로 적절히 정의돼 있었다. …",
+      "title_ko": "생산 및 공정 중 관리"
+     },
+     {
+      "no": 8,
+      "title": "Packaging and identification labelling of APIs and intermediates",
+      "text": "During the visit to the production workshop, packaging/labelling operations were not carried out. According to the BMR reviewed during the inspection, line clearance was documented before and after labelling/packaging procedures.",
+      "text_ko": "생산 작업동 방문 시 포장·표시 작업은 수행되고 있지 않았다. 실사 중 검토한 배치 제조기록(BMR)에 따르면 표시·포장 절차 전후로 라인 클리어런스가 문서화돼 있었다.",
+      "title_ko": "원료의약품·중간체의 포장 및 식별 표시"
+     },
+     {
+      "no": 9,
+      "title": "Storage and distribution",
+      "text": "Facilities were available for the storage of materials under appropriate conditions. Records were maintained of these conditions. A system was in place by which the distribution of each batch of intermediate and/or API can be readily determined to permit its recall.",
+      "text_ko": "자재를 적절한 조건에서 보관할 수 있는 시설이 있었고 보관 조건의 기록이 유지됐다. 각 중간체·원료의약품 배치의 유통 경로를 즉시 확인해 회수할 수 있는 시스템이 갖춰져 있었다.",
+      "title_ko": "보관 및 유통"
+     },
+     {
+      "no": 10,
+      "title": "Laboratory controls",
+      "text": "Physicochemical laboratory Adequate quality control facilities were provided. Procedures were in place describing sampling, testing, approval or rejection of materials and recording and storage of laboratory data. Specifications, sampling plans, and test procedures were documented and accessible. Laboratory controls were followed and documented at the time of performance. Any departures from procedures were documented and explained. OOS results obtained were investigated and documented according to a procedure. …",
+      "text_ko": "이화학 시험실 — 충분한 품질관리 시설이 제공돼 있었다. 자재의 검체 채취, 시험, 적합·부적합 판정, 시험 데이터의 기록·보관을 기술한 절차가 갖춰져 있었다. 규격·검체 채취 계획·시험 절차가 문서화돼 접근 가능했고, 시험실 관리는 수행 시점에 준수·문서화됐다. 절차로부터의 이탈은 문서화되고 설명됐으며, 발생한 규격외(OOS) 결과는 절차에 따라 조사·문서화됐다. …",
+      "title_ko": "시험실 관리"
+     },
+     {
+      "no": 11,
+      "title": "Validation",
+      "text": "VMP The SOP Validation master plan was reviewed. It described the validation policy and specified that VMP should be periodically reviewed. Annual VMP plan should be established in December of the year and reviewed the following January. The Validation master Plan for 2025 was available. Process validation Process validation was performed following written procedures. The procedures indicated that at least three consecutive batches in commercial batch size should be engaged in the process validation. Holding time study was required. Process validation for Rifamycin S Sodium were verified. …",
+      "text_ko": "밸리데이션 마스터플랜(VMP) — VMP 지침서를 검토했다. 지침서는 밸리데이션 정책을 기술하고 VMP 의 정기 검토를 규정했으며, 연간 계획은 당해 12월에 수립해 이듬해 1월에 검토하도록 했다. 2025년 VMP 가 갖춰져 있었다. 공정 밸리데이션 — 공정 밸리데이션은 문서화된 절차에 따라 수행됐다. 절차는 상업 배치 규모의 연속 3배치 이상을 공정 밸리데이션에 투입하고 보관시간(holding time) 연구를 요구했다. Rifamycin S Sodium 의 공정 밸리데이션을 확인했다. …",
+      "title_ko": "밸리데이션"
+     },
+     {
+      "no": 12,
+      "title": "Change control (CC)",
+      "text": "The SOP “Change control procedure” and flow chart were checked. The Quality Department oversaw the change request, supervise implementation, and approve the change. Changes were classified as minor, moderate and major based on nature, scope and impact on safety, effectiveness, and quality of the product. Following the change, some development work might be required such as stability studies, validation, regulatory approval, etc. The Change Control register for 2025 was available. Changes related to Rifamycin S Sodium were checked.",
+      "text_ko": "「Change control procedure」 지침서와 흐름도를 확인했다. 품질부서가 변경 요청을 관장하고 이행을 감독하며 변경을 승인했다. 변경은 성격·범위와 제품의 안전성·유효성·품질에 미치는 영향에 따라 경미·중등도·중대로 분류됐다. 변경 후에는 안정성시험·밸리데이션·규제 승인 등 후속 작업이 요구될 수 있었다. 2025년 변경관리 대장이 갖춰져 있었고 Rifamycin S Sodium 관련 변경들을 확인했다.",
+      "title_ko": "변경 관리(CC)"
+     },
+     {
+      "no": 13,
+      "title": "Rejection and re-use of materials",
+      "text": "Rejection, reprocessing and reworking The procedures to handle non-confirming products were available. The SOP “Nonconforming product handling procedure” and SOP “Nonconforming product handling procedure” were verified. Reprocessing and Reworks Non-compliant intermediates or products were allowed one reprocessing or reworking according to the company SOP. Regulatory approval for reworked product was discussed. Recovery of Solvents Solvent recovery and its process validation related to Rifamycin S Sodium production were checked and discussed.",
+      "text_ko": "불합격·재처리·재가공 — 부적합품 처리 절차가 갖춰져 있었고 「Nonconforming product handling procedure」 지침서를 확인했다. 재처리 및 재가공 — 부적합 중간체·제품은 회사 지침서에 따라 1회의 재처리 또는 재가공이 허용됐고, 재가공품의 규제 승인에 대해 논의했다. 용매 회수 — Rifamycin S Sodium 생산 관련 용매 회수와 그 공정 밸리데이션을 확인하고 논의했다.",
+      "title_ko": "자재의 불합격 처리 및 재사용"
+     },
+     {
+      "no": 14,
+      "title": "Complaints and Recalls",
+      "text": "The complaint management process stipulated that staff receiving complaints need to promptly inform the Quality Assurance (QA) team. QA was responsible for recording, categorizing, and investigating each complaint, as well as preparing reports as required. Following an investigation, appropriate preventive and corrective actions were implemented when necessary. So far, there have been no recorded product complaints up to inspection dates, noting that only one customer from the ZMC group has been served. …",
+      "text_ko": "불만 관리 프로세스는 불만을 접수한 직원이 품질보증(QA)팀에 즉시 알리도록 규정했다. QA 는 각 불만의 기록·분류·조사와 필요한 보고서 작성을 책임졌고, 조사 후 필요 시 적절한 예방·시정조치가 이행됐다. 실사일까지 기록된 제품 불만은 없었으며, 현재까지 ZMC 그룹 고객 1곳에만 공급한 점이 언급됐다. …",
+      "title_ko": "불만 및 회수"
+     },
+     {
+      "no": 15,
+      "title": "Contracts",
+      "text": "Quality agreements were spot checked. Contracts permitted the contract giver to audit the contract acceptor’s facilities for compliance with GMP. Subcontracting was not allowed. Contract acceptor and contract giver responsibilities were clearly defined. Examples of contracts with vendor and/or service provider were checked and discussed.",
+      "text_ko": "품질계약을 표본 확인했다. 계약은 위탁자가 수탁자 시설의 GMP 준수를 감사할 수 있도록 허용했고, 재위탁은 허용되지 않았다. 수탁자와 위탁자의 책임이 명확히 정의돼 있었다. 공급업체·서비스 제공자와의 계약 사례를 확인하고 논의했다.",
+      "title_ko": "계약"
+     }
+    ],
     "outcome_ko": "실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 중국 저장성 신창 소재 Zhejiang Keming Biopharmaceuticals Co. Ltd 는 WHO GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
    },
    "merged_count": 1,

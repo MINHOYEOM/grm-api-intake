@@ -1,12 +1,33 @@
 {
   "raw": {
+    "center_classification_date": "20260508",
+    "city": "Madison",
     "classification": "Class II",
+    "code_info": "Lot #: A26-0412, A26-0418, Exp. Date 04/2028",
+    "country": "United States",
+    "distribution_pattern": "Nationwide within the United States",
+    "event_id": "99120",
+    "initial_firm_notification": "Letter",
+    "openfda": {
+      "application_number": ["ANDA076123"],
+      "brand_name": ["ZESTRIL"],
+      "generic_name": ["LISINOPRIL"],
+      "manufacturer_name": ["Acme Pharmaceuticals, Inc."],
+      "product_ndc": ["12345-678"],
+      "route": ["ORAL"],
+      "substance_name": ["LISINOPRIL"]
+    },
     "product_description": "Lisinopril Tablets USP 10 mg, 100-count bottle",
+    "product_quantity": "12,480 bottles",
     "product_type": "Drug",
     "reason_for_recall": "Subpotent (out-of-specification) assay results at the 12-month stability time point.",
+    "recall_initiation_date": "20260428",
     "recall_number": "Z-1234-2026",
     "recalling_firm": "Acme Pharmaceuticals, Inc.",
-    "report_date": "20260515"
+    "report_date": "20260515",
+    "state": "WI",
+    "status": "Ongoing",
+    "voluntary_mandated": "Voluntary: Firm initiated"
   },
   "row": {
     "api_query": "https://api.fda.gov/drug/enforcement.json?search=recall_number:Z-1234-2026",

@@ -9119,6 +9119,110 @@ class WebFda483InspectorLineTest(unittest.TestCase):
         self.assertNotIn("실사관:", h)
 
 
+class WebRecallDetailRenderTest(unittest.TestCase):
+    """[회수 계열 결정론 상세 2026-08-25] 회수 3종 상세 블록의 렌더 계약.
+
+    회수 4종은 발행 카드의 26%(114장)를 차지하면서 부가층이 W3 인용 한 줄뿐이었다.
+    수집기가 원천 레코드를 통째로 저장해 두고도 발행이 5개 필드만 쓰던 것이라, 상세는
+    전부 **원천에 실재하는 값**이다(LLM 0·환각 0). 기존 483/NCR 블록과 같은 클래스만
+    쓰므로 grm.css 추가는 없다 — 새 클래스가 새면 이 검사가 잡는다."""
+
+    def _render(self, detail: dict, card_type: str = "Recall",
+                merged_count: int = 1) -> str:
+        env = render._make_env()
+        card = {"id": "rc-1", "render_order": 1, "evidence_level": "A",
+                "headline_target": "Acme Pharma", "agency": "FDA",
+                "card_type": card_type, "deterministic_detail": detail,
+                "merged_count": merged_count, "merged_items": []}
+        return env.get_template("partials/card.html").render(card=render._card_view(card))
+
+    def test_openfda_block_renders_korean_for_controlled_vocabulary(self):
+        h = self._render({
+            "type": "openfda_recall_detail",
+            "status": "Ongoing", "status_ko": "진행 중",
+            "initiation": "Voluntary: Firm initiated", "initiation_ko": "자진회수 (업체 착수)",
+            "code_info": "Lot #: A26-0412",
+            "timeline": [{"label": "회수 착수", "date": "2026-04-28"}]})
+        self.assertIn("회수 상세", h)
+        self.assertIn("진행상태 · 진행 중", h)
+        self.assertIn("자진회수 (업체 착수)", h)
+        self.assertIn("회수 착수 · 2026-04-28", h)
+        self.assertIn("Lot #: A26-0412", h)
+
+    def test_openfda_falls_back_to_original_when_no_korean(self):
+        """통제어휘 미등재 값은 원문이 그대로 보인다 — 매핑이 낡아도 값이 안 사라진다."""
+        h = self._render({"type": "openfda_recall_detail", "status": "Under Review"})
+        self.assertIn("진행상태 · Under Review", h)
+
+    def test_absent_fields_render_no_empty_labels(self):
+        """★음성 검사 — 값이 없는 칸은 라벨째 안 나온다(빈 라벨 금지)."""
+        h = self._render({"type": "openfda_recall_detail", "status": "Ongoing"})
+        for label in ("처리 경과", "대상 로트", "회수 규모·범위", "제품 식별", "최초 통지"):
+            self.assertNotIn(label, h)
+
+    def test_merged_card_states_representative_scope(self):
+        """병합 대표의 값이 사건 전체로 읽히면 그게 곧 오보다 — 범위를 문장으로 밝힌다."""
+        h = self._render({"type": "openfda_recall_detail", "status": "Ongoing",
+                          "code_info": "Lot #: A26-0412"}, merged_count=7)
+        self.assertIn("7개 품목을 한 건으로 묶었다", h)
+        self.assertIn("대표 품목 1건", h)
+        self.assertIn("대표 품목 기준", h)          # summary 라벨에도 표기
+        # 비병합 카드에는 안내문 자체가 없다.
+        solo = self._render({"type": "openfda_recall_detail", "status": "Ongoing"})
+        self.assertNotIn("한 건으로 묶었다", solo)
+
+    def test_mfds_block_shows_enforcement(self):
+        """`ENFRC_YN` — 자진회수와 회수명령을 가르는 신호. 43장 내내 발행된 적이 없었다."""
+        h = self._render({"type": "mfds_recall_detail", "enforcement": "회수명령 (강제)",
+                          "item_seq": "200812345"}, card_type="회수·판매중지")
+        self.assertIn("회수명령 (강제)", h)
+        self.assertIn("품목기준코드 — 200812345", h)
+
+    def test_hc_block_renders_action_bilingual_slot(self):
+        en = "Stop using the affected lots."
+        h = self._render({"type": "hc_recall_detail", "action": en},
+                         card_type="Recall(HC)")
+        self.assertIn("권고 조치 (What you should do)", h)
+        self.assertIn("원문 · Health Canada", h)
+        self.assertIn(en, h)
+        self.assertNotIn("국문 해석", h)            # `action_ko` 없으면 국문 열 미생성
+        h_ko = self._render({"type": "hc_recall_detail", "action": en,
+                             "action_ko": "해당 로트 사용을 중지한다."}, card_type="Recall(HC)")
+        self.assertIn("국문 해석", h_ko)
+        self.assertIn("해당 로트 사용을 중지한다.", h_ko)
+
+    def test_recall_blocks_introduce_no_new_css_classes(self):
+        """★상세 블록이 쓰는 클래스는 전부 grm.css 에 이미 있다.
+
+        483/NCR 형제와 같은 마크업을 재사용한다는 설계 전제를 검사로 고정한다 — 새 클래스가
+        섞이면 스타일 없는 요소가 조용히 발행된다(초록 CI 뒤의 시각 결함)."""
+        css = pathlib.Path(render.ASSETS_DIR, "grm.css").read_text(encoding="utf-8")
+        defined = set(re.findall(r"\.([A-Za-z][\w-]*)", css))
+        blocks = [
+            {"type": "openfda_recall_detail", "status": "Ongoing", "status_ko": "진행 중",
+             "code_info": "x", "quantity": "y", "firm_location": "z",
+             "timeline": [{"label": "회수 착수", "date": "2026-04-28"}],
+             "product": [{"label": "성분명", "value": "LISINOPRIL"}]},
+            {"type": "mfds_recall_detail", "enforcement": "자진회수", "item_seq": "1",
+             "std_cd": "2", "bizrno": "3"},
+            {"type": "hc_recall_detail", "ingredient": "a", "dosage_form": "b",
+             "action": "c", "action_ko": "d"},
+        ]
+        for detail in blocks:
+            with self.subTest(detail=detail["type"]):
+                # 병합 안내문까지 포함해 검사한다(그 문단도 기존 클래스만 써야 한다).
+                h = self._render(detail, merged_count=3)
+                start = h.find('<details class="block detail">')
+                self.assertGreaterEqual(start, 0, "상세 블록이 렌더되지 않았다")
+                block = h[start:h.find("</details>", start)]
+                used = set()
+                for m in re.finditer(r'class="([^"]+)"', block):
+                    used.update(m.group(1).split())
+                missing = sorted(c for c in used
+                                 if c not in defined and not c.startswith("ti"))
+                self.assertEqual(missing, [], f"grm.css 에 없는 클래스: {missing}")
+
+
 class WebSanitizeInspectorNamesUnitTest(unittest.TestCase):
     """render._sanitize_inspector_names() 순수 함수 단위 테스트 — findings.js
     sanitizeInspectorNames() 계약 복제본(리스트가 아니면 무시·비문자열/공백 제거·strip·

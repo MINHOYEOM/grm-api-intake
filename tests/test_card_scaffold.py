@@ -1817,15 +1817,22 @@ class DeterministicDetailTest(unittest.TestCase):
         self.assertNotIn("deterministic_detail",
                          cs.build_card_scaffold(fx["row"], raw2).to_web_card())
 
-    def test_non_gmp_kind_never_emits_detail(self):
-        # 방어적 입력(다른 유형 raw 에 gmp_deficiencies) — gmp-inspection 만 산출.
+    def test_gmp_detail_never_leaks_into_another_kind(self):
+        """방어적 입력 — 다른 유형 raw 에 `gmp_deficiencies` 를 꽂아도 그 상세는 안 난다.
+
+        종전엔 `recall_quality_chemical` 카드에 상세가 **아예 없다**로 검사했는데, 회수
+        계열에 자체 상세를 배선한 2026-08-25 부터 그 전제가 깨졌다(카드가 자기 상세를 낸다).
+        검사하려던 것은 "상세가 없다"가 아니라 **"gmp 상세가 다른 유형으로 새지 않는다"**
+        이므로 type 을 직접 본다 — 유형이 늘어도 낡지 않는다."""
         fx = _load_input("recall_quality_chemical")
         raw = dict(fx["raw"])
         raw["gmp_deficiencies"] = [{"area": "제조", "severity": "중대",
                                     "legal_basis": "[별표1] 1호",
                                     "summary": "x", "followup": ""}]
-        self.assertNotIn("deterministic_detail",
-                         cs.build_card_scaffold(fx["row"], raw).to_web_card())
+        detail = cs.build_card_scaffold(fx["row"], raw).to_web_card().get(
+            "deterministic_detail") or {}
+        self.assertEqual(detail.get("type"), "mfds_recall_detail")
+        self.assertNotIn("rows", detail)          # gmp 상세의 표가 새지 않았다
 
     def test_deterministic_detail_row_keys_exact(self):
         fx = _load_input("gmp_inspection_periodic")
@@ -1853,14 +1860,192 @@ class FrDetailTest(unittest.TestCase):
         wc = cs.build_card_scaffold(fx["row"], raw).to_web_card({})
         self.assertNotIn("deterministic_detail", wc)
 
-    def test_non_guidance_non_gmp_cards_have_no_detail(self) -> None:
-        for name in ("mfds_notice", "ich_guideline", "openfda_recall_chemical",
-                     "warning_letter_chemical", "admin_action_chemical"):
+    def test_detail_appears_only_for_kinds_wired_in_registry(self) -> None:
+        """★상세 블록은 `_REGISTRY` 에 `detail=` 이 배선된 kind 에서만 난다.
+
+        종전 이 검사는 **fixture 이름 손목록**이었다("mfds_notice·ich_guideline·
+        openfda_recall_chemical·warning_letter_chemical·admin_action_chemical 은 상세가
+        없다"). 손목록이라 회수 계열에 상세를 배선한 2026-08-25 에 곧바로 낡아 적색이 됐고,
+        더 나쁘게는 목록에 든 `warning_letter_chemical` 이 **이미 detail 이 배선된 kind**
+        인데도 그 fixture 의 raw 에 위반항목이 없어서 우연히 통과하고 있었다 — 검사가
+        뜻하던 바("이 유형엔 상세가 없다")와 실제로 재던 바("이 픽스처엔 값이 없다")가
+        달랐다. 이제 레지스트리에서 파생한다: 배선을 늘리면 자동으로 대상이 되고, 배선
+        없는 kind 에서 상세가 새면 그 즉시 적색이다."""
+        wired = {k for k, s in cs._REGISTRY.items() if s.detail}
+        self.assertGreaterEqual(len(wired), 5, "파생 대상이 소수 — 레지스트리 파싱이 깨졌다")
+        leaked = []
+        for name in WEBCARD_FIXTURES:
+            fx = _load_input(name)
+            card = cs.build_card_scaffold(fx["row"], fx["raw"])
+            wc = card.to_web_card({})
+            if "deterministic_detail" in wc and card.kind not in wired:
+                leaked.append((name, card.kind))
+            self.assertNotIn("detail", wc, f"{name}: 옛 `detail` 키가 부활했다")
+        self.assertEqual(leaked, [], "레지스트리에 배선이 없는 kind 에서 상세 블록이 났다")
+
+
+class RecallDetailTest(unittest.TestCase):
+    """[회수 계열 결정론 상세 2026-08-25] 회수 4종의 상세 producer 분기 검사.
+
+    회수 4종은 발행 카드 114장(10주 26%)을 차지하면서 부가층이 W3 인용 한 줄뿐이었다.
+    수집기가 원천 레코드를 통째로 저장해 두고도(openfda `raw_payload=r`·MFDS `**raw`·
+    HC `**rec`) 발행이 5개 필드만 쓰던 것 — 원천이 아니라 **발행이 천장**이었다.
+
+    골든은 "정상 레코드 1건"만 태우므로, 여기서는 골든이 못 보는 경계를 판다:
+    통제어휘 미등재(fail-open)·값 없음 표기(N/A)·깨진 날짜·중복 성분·병합 범위 표기.
+    ★음성 검사(값이 없으면 블록 자체가 안 난다)를 함께 둔다 — 가드가 실제로 발화하는지
+    확인하지 않으면 "항상 통과하는 검사"가 된다."""
+
+    _OPENFDA_MIN = {"status": "Ongoing"}
+
+    def test_controlled_vocabulary_gets_korean(self):
+        detail = cs._detail_openfda_recall({}, {
+            "status": "Terminated",
+            "voluntary_mandated": "FDA Mandated",
+            "initial_firm_notification": "Press Release"})
+        self.assertEqual(detail["status_ko"], "종결")
+        self.assertEqual(detail["initiation_ko"], "FDA 회수명령")
+        self.assertEqual(detail["notification_ko"], "보도자료")
+
+    def test_unknown_vocabulary_fails_open(self):
+        """미등재 값은 원문 그대로 남고 `_ko` 키만 없다 — 손목록이 낡아도 값이 안 사라진다."""
+        detail = cs._detail_openfda_recall({}, {
+            "status": "Under Review",                     # 코퍼스에 없던 새 값
+            "initial_firm_notification": "Carrier pigeon"})
+        self.assertEqual(detail["status"], "Under Review")
+        self.assertNotIn("status_ko", detail)
+        self.assertEqual(detail["notification"], "Carrier pigeon")
+        self.assertNotIn("notification_ko", detail)
+
+    def test_na_and_blank_are_treated_as_absent(self):
+        """원천은 "값 없음"을 ""·"N/A" 로 쓴다(실측 각각 91·197건) — 빈 라벨을 만들지 않는다."""
+        detail = cs._detail_openfda_recall({}, {
+            "status": "Ongoing", "voluntary_mandated": "N/A",
+            "initial_firm_notification": "", "product_quantity": "N/A"})
+        self.assertNotIn("initiation", detail)
+        self.assertNotIn("notification", detail)
+        self.assertNotIn("quantity", detail)
+
+    def test_timeline_order_and_malformed_dates_dropped(self):
+        detail = cs._detail_openfda_recall({}, {
+            **self._OPENFDA_MIN,
+            "recall_initiation_date": "20260706",
+            "center_classification_date": "2026-07-14",   # 형식 위반 → 제외
+            "report_date": "20261332"})                   # 월/일 범위 위반 → 제외
+        self.assertEqual(detail["timeline"],
+                         [{"label": "회수 착수", "date": "2026-07-06"}])
+
+    def test_timeline_absent_when_no_valid_date(self):
+        detail = cs._detail_openfda_recall({}, {**self._OPENFDA_MIN,
+                                                "recall_initiation_date": "n/a"})
+        self.assertNotIn("timeline", detail)
+
+    def test_substance_dropped_when_same_as_generic_kept_when_not(self):
+        same = cs._detail_openfda_recall({}, {**self._OPENFDA_MIN, "openfda": {
+            "generic_name": ["LISINOPRIL"], "substance_name": ["lisinopril"]}})
+        self.assertEqual([p["label"] for p in same["product"]], ["성분명"])
+        diff = cs._detail_openfda_recall({}, {**self._OPENFDA_MIN, "openfda": {
+            "generic_name": ["CLEVIPIDINE"], "substance_name": ["CLEVIDIPINE"]}})
+        self.assertEqual([p["label"] for p in diff["product"]], ["성분명", "주성분"])
+
+    def test_openfda_list_values_dedupe_and_join(self):
+        detail = cs._detail_openfda_recall({}, {**self._OPENFDA_MIN, "openfda": {
+            "brand_name": ["ZESTRIL", "ZESTRIL", "PRINIVIL"]}})
+        self.assertEqual(detail["product"][0]["value"], "ZESTRIL, PRINIVIL")
+
+    def test_code_info_appends_more_code_info(self):
+        detail = cs._detail_openfda_recall({}, {
+            **self._OPENFDA_MIN,
+            "code_info": "Lot #: A26-0412", "more_code_info": "Exp. Date 04/2028"})
+        self.assertEqual(detail["code_info"], "Lot #: A26-0412 Exp. Date 04/2028")
+
+    def test_mfds_enforcement_branches(self):
+        base = {"PRDUCT": "x", "ENTRPS": "y", "RTRVL_RESN": "z"}
+        self.assertEqual(
+            cs._detail_recall_quality({}, {**base, "ENFRC_YN": "Y"})["enforcement"],
+            "회수명령 (강제)")
+        self.assertEqual(
+            cs._detail_recall_quality({}, {**base, "ENFRC_YN": "n"})["enforcement"],
+            "자진회수")
+        # Y/N 밖의 값은 원문 그대로(fail-open) — 원천이 어휘를 바꿔도 값이 안 사라진다.
+        self.assertEqual(
+            cs._detail_recall_quality({}, {**base, "ENFRC_YN": "보류"})["enforcement"],
+            "보류")
+
+    def test_mfds_detail_excludes_ambiguous_and_unverified_fields(self):
+        """라벨을 못 붙이는 날짜·미검증 링크는 싣지 않는다.
+
+        `RTRVL_CMMND_DT` 는 수집기 spec 이 "회수명령일시", `_body` 가 "승인일자"로 서로
+        다르게 부른다. `nedrug_item_candidate_url` 은 수집기가 스스로 "미검증 후보"라
+        적어 둔 링크다. 둘 다 상세에 실리면 안 된다."""
+        detail = cs._detail_recall_quality({}, {
+            "PRDUCT": "x", "ENTRPS": "y", "RTRVL_RESN": "z", "ENFRC_YN": "N",
+            "RECALL_COMMAND_DATE": "20260602", "RTRVL_CMMND_DT": "20260602093000",
+            "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/x"})
+        self.assertEqual(set(detail), {"type", "enforcement"})
+
+    def test_hc_action_ko_only_when_present(self):
+        base = {"What you should do": "Stop using the affected lots."}
+        self.assertNotIn("action_ko", cs._detail_hc_recall({}, base))
+        with_ko = cs._detail_hc_recall({}, {**base,
+                                            "what_you_should_do_ko": "해당 로트 사용을 중지한다."})
+        self.assertEqual(with_ko["action_ko"], "해당 로트 사용을 중지한다.")
+
+    def test_no_usable_field_means_no_block(self):
+        """★음성 검사 — 쓸 값이 하나도 없으면 `type` 만 남기지 않고 블록 자체가 없다."""
+        for fn, raw in ((cs._detail_openfda_recall, {"recall_number": "Z-1", "classification": "Class II"}),
+                        (cs._detail_recall_quality, {"PRDUCT": "x", "ENTRPS": "y", "RTRVL_RESN": "z"}),
+                        (cs._detail_hc_recall, {"Issue": "x", "Recall class": "Type II"})):
+            with self.subTest(producer=fn.__name__):
+                self.assertIsNone(fn({}, raw))
+
+    def test_mhra_recall_stays_unwired(self):
+        """MHRA 회수는 배선하지 않는다 — Atom 피드 5개 키를 카드가 이미 전부 쓴다.
+
+        늘리려면 gov.uk 알림 상세 페이지를 수집해야 한다(수집기 과제). 여기에 상세가
+        생겼다면 원천 없이 슬롯만 만든 것이므로 적색이어야 한다."""
+        self.assertIsNone(cs._REGISTRY["mhra-recall"].detail)
+        fx = _load_input("mhra_recall_chemical")
+        self.assertNotIn("deterministic_detail",
+                         cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({}))
+
+    def test_merged_representative_carries_detail_of_one_record(self):
+        """병합 대표의 상세는 **대표 레코드 1건**의 사실이고, 범위 표기의 입력은 최상위
+        `merged_count` 다(상세 안에 복제하지 않는다 — 두 번째 원천을 만들면 소급 병합
+        CLI 가 둘을 맞춰 줘야 한다). 화면 문구는 렌더 테스트가 검사한다."""
+        fx = _load_input("recall_merged")
+        cards = [cs.build_card_scaffold(r["row"], {**r["raw"], "ENFRC_YN": "Y"})
+                 for r in fx["rows"]]
+        rep = [c for c in cs.merge_recall_cards(cards) if not c.merged_into][0]
+        wc = rep.to_web_card({})
+        self.assertEqual(wc["merged_count"], len(fx["rows"]))
+        self.assertEqual(wc["deterministic_detail"]["type"], "mfds_recall_detail")
+        self.assertNotIn("merged_count", wc["deterministic_detail"])
+
+    def test_api_recall_kinds_now_carry_source_body_signal(self):
+        """★API 회수 3종은 Evidence A(원문 인용 가능)인데 `source_body_captured` 가 False 였다.
+
+        카드는 원문을 인용해 싣는데 LLM 입력은 "원문을 못 받았다"고 말하던 상태 —
+        2026-07-20 거짓 요약 사고와 같은 조건이 발행분에 남아 있었다. 이 셋은 API 레코드
+        자체가 정본이라(별도 본문 문서가 없다) 사유 필드 확보 = 원문 확보다."""
+        for name in ("openfda_recall_chemical", "recall_quality_chemical",
+                     "hc_recall_chemical"):
             with self.subTest(fixture=name):
                 fx = _load_input(name)
-                wc = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
-                self.assertNotIn("deterministic_detail", wc)
-                self.assertNotIn("detail", wc)
+                self.assertTrue(cs._has_source_body(fx["raw"]),
+                                f"{name}: 인용 가능한 원문을 갖고도 신호가 꺼져 있다")
+
+    def test_mhra_recall_source_body_stays_off_on_purpose(self):
+        """★MHRA 회수만 신호가 꺼진 채로 남는 것이 **맞다** — 형제와 처지가 다르다.
+
+        위 3종은 API 레코드가 정본이지만, MHRA 회수의 raw 는 gov.uk Atom 피드의
+        `summary` 한 문장이고 알림 전문은 우리가 안 받은 상세 페이지에 있다. 즉 여기서는
+        "원문 미확보"가 참이다. `summary` 를 `_SOURCE_BODY_KEYS` 에 넣으면 같은 키를 쓰는
+        RSS 뉴스(티저 문장·Evidence B)까지 "원문 확보"로 뒤집혀 신호가 거짓이 된다.
+        전문을 실으려면 상세 페이지를 수집해야 한다(수집기 과제)."""
+        fx = _load_input("mhra_recall_chemical")
+        self.assertFalse(cs._has_source_body(fx["raw"]))
+        self.assertNotIn("summary", cs._SOURCE_BODY_KEYS)
 
 
 class SourceBodySignalInvariantTest(unittest.TestCase):

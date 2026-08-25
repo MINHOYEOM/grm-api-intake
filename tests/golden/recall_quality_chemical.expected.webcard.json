@@ -3,6 +3,13 @@
   "card_type": "회수·판매중지",
   "category": "Other",
   "checks": [],
+  "deterministic_detail": {
+    "bizrno": "1234512345",
+    "enforcement": "자진회수",
+    "item_seq": "200812345",
+    "std_cd": "8806123400101,8806123400102",
+    "type": "mfds_recall_detail"
+  },
   "evidence_basis": "Intake raw",
   "evidence_level": "A",
   "facts": [
@@ -41,6 +48,7 @@
   "render_order": null,
   "signal_label": "Med",
   "signal_tier": 2,
+  "source_body_captured": true,
   "sources": {
     "info_url": "",
     "link_check": {

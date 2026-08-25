@@ -257,6 +257,32 @@ class WhopirExcerptExtractTest(unittest.TestCase):
         big = "GMP deficiencies " + ("x" * (w.WHOPIR_EXCERPT_MAX_CHARS + 500))
         self.assertLessEqual(len(w._extract_whopir_excerpt(big)), w.WHOPIR_EXCERPT_MAX_CHARS)
 
+    # ── [앵커 수리 2026-08-25] 172건 전수 실측 회귀 ─────────────────────────────
+    def test_desk_assessment_excerpt_starts_at_conclusion_not_document_list(self) -> None:
+        """실측 회귀(reliance 39건 전수): desk assessment 에는 결함 섹션이 없는데 앵커
+        목록이 findings 전제라 `deficiencies` 낱말이 Part 4 **제출문서 목록**에서 먼저
+        걸렸다. 그 서류 체크리스트가 LLM 근거창(issue_or_reason·body_excerpt 300자)이
+        되어, 발행 카드가 desk assessment 를 "실사 결과"라 쓰고 존재하지도 않는
+        "지적 항목"을 확보하라고 적었다. desk assessment 는 결론이 곧 근거다."""
+        text = (
+            "Part 4 Summary of the assessment of supporting documentation\n"
+            "a) SRA inspection report, including deficiencies; b) GMP certificate;\n"
+            "Part 5\nConclusion – Desk assessment outcome\n"
+            "Based on the GMP evidence received and reviewed, the site is considered "
+            "to be operating at an acceptable level of compliance with WHO GMP.\n")
+        ex = w._extract_whopir_excerpt(text)
+        self.assertTrue(ex.startswith("Conclusion – Desk assessment outcome"), ex[:70])
+        self.assertNotIn("GMP certificate", ex.split("Conclusion")[0])
+
+    def test_excerpt_backs_up_to_sentence_start(self) -> None:
+        """낱말 앵커는 문장 한가운데 떨어진다 — 172건 중 161건이 주어 없이 시작했다
+        ("deficiencies observed in last inspection were verified…"). 근거창이 잘린 채
+        요약이 쓰이므로 문장 시작으로 되감는다."""
+        text = ("Part 2 Summary of the inspection. The inspection was closed. "
+                "Outstanding deficiencies were addressed by the firm within 30 days.")
+        ex = w._extract_whopir_excerpt(text)
+        self.assertTrue(ex.startswith("Outstanding deficiencies"), ex[:60])
+
 
 class WhopirFetchExcerptTest(unittest.TestCase):
     """_fetch_whopir_excerpt — P6 PDF 엔진(_extract_pdf_text) 재사용 + graceful."""
@@ -523,6 +549,88 @@ class WhopirReportStructureTest(unittest.TestCase):
                      "List of guidelines"):
             self.assertNotIn(junk, rep["outcome"], f"결론 아닌 Part 가 샜다: {junk}")
         self.assertEqual(rep["reliance"][0]["dates"], "12-15 March 2025")
+
+    # ── [잔존 결함 3종 2026-08-25] WHO 목록 172건 전수 실측 회귀 ────────────────
+    def _wla_text(self, evidence_phrase: str) -> str:
+        return (
+            "WHO Public Inspection Report\n\nPart 1  General information\n"
+            "\nPart 2  " + evidence_phrase + "\n"
+            "Inspecting authority   US FDA\nDates of\ninspection: 3-7 June 2025\n"
+            "\nPart 3  Summary of the last WHO inspection\n"
+            "The site was not subject to an onsite inspection by WHO in the last 5 years. "
+            "Abbreviations Meaning BMR Batch Manufacturing Record\n"
+            "\nPart 4  Summary of the assessment of supporting documentation\n"
+            "a) Manufacturing authorization and GMP certificate.\n"
+            "\nPart 5  Conclusion – Desk assessment outcome\n"
+            "Based on the previous USFDA inspection and the GMP evidence received and "
+            "reviewed, the site is considered to be operating at an acceptable level of "
+            "compliance with WHO GMP guidelines.\n"
+            "\nPart 6  List of guidelines referenced in this inspection report\n"
+            "1. WHO good manufacturing practices, TRS No. 986.\n")
+
+    def test_sra_wla_wording_is_recognized_as_reliance(self) -> None:
+        """실측 회귀(ShaanxiHanjiang·SymedLabs): WHO 는 같은 자리에 **SRA/WLA**
+        (WLA = WHO-Listed Authority — SRA/NRA 를 대체하는 현행 용어)도 쓴다. 어구 하나에만
+        걸었더니 kind 가 findings 로 오판돼 reliance 결론 탐색이 아예 안 돌았고, outcome 에
+        Part 3(과거 실사 요약 + 약어표)이 실렸다. 172건 전수: SRA/NRA 37 · SRA/WLA 2."""
+        rep = w.extract_whopir_report(
+            self._wla_text("Summary of SRA/WLA inspection evidence considered"))
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "reliance")
+        self.assertTrue(rep["outcome"].startswith("Based on the previous USFDA"),
+                        rep["outcome"][:70])
+        self.assertNotIn("Abbreviations", rep["outcome"])
+
+    def test_desk_conclusion_heading_alone_signals_reliance(self) -> None:
+        """kind 판정을 Part 2 어구 **하나**에 걸면 용어가 또 바뀔 때 같은 사고가 난다.
+        desk assessment 결론 표제의 실재를 두 번째 신호로 둔다 — 어구가 어떻게 바뀌든
+        "desk assessment 로 결론냈다"는 사실 자체가 곧 reliance 다."""
+        rep = w.extract_whopir_report(
+            self._wla_text("Summary of regulatory inspection evidence considered"))
+        assert rep is not None
+        self.assertEqual(rep["report_kind"], "reliance")
+        self.assertTrue(rep["outcome"].startswith("Based on the previous USFDA"))
+
+    def test_cross_reference_part_marker_is_not_taken_as_conclusion(self) -> None:
+        """실측 회귀(Dalian Institute): 본문의 "…as described in Part 3 below." 라는
+        상호참조를 결론 마커로 채택해 outcome 이 "below. All toxic/hazardous reagents…"
+        로 시작했고, 본문도 그 지점에서 잘려 섹션 13개를 잃었다(7 vs 20). 진짜 표제 뒤엔
+        대문자가 오고 상호참조 뒤엔 소문자로 문장이 이어진다."""
+        text = ("Part 2\nSummary of the findings and comments\n"
+                "\n1. Quality management\n"
+                + ("The system was reviewed. " * 8)
+                + "Waste handling is described in Part 3 below. "
+                + ("Further detail was verified. " * 6) + "\n"
+                "\n2. Personnel\n" + ("Staffing was adequate. " * 8) + "\n"
+                "\nPart 3\nConclusion – Inspection outcome\n"
+                "Based on the areas inspected, the site was considered to be operating "
+                "at an acceptable level of compliance with WHO GMP.\n"
+                "\nPart 4\nList of guidelines referenced in the inspection report\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertTrue(rep["outcome"].startswith("Based on the areas inspected"),
+                        rep["outcome"][:60])
+        self.assertEqual([s["title"] for s in rep["sections"]],
+                         ["Quality management", "Personnel"])
+
+    def test_guideline_list_is_not_published_as_the_conclusion(self) -> None:
+        """실측 회귀(AnaCipher CRO): Part 3 이 없어 Part 4 를 결론으로 잡는 폴백이
+        **참고문헌 목록**을 결론 자리에 실었다(1,134자 서지). 진짜 결론은 번호가 평탄화로
+        사라진 "Conclusion – inspection" 표제로 뒤에 따로 있었다."""
+        text = ("Part 2\nSUMMARY OF THE FINDINGS AND COMMENTS\n"
+                "\n1. Organization and management\n" + ("The CRO was organized. " * 8) + "\n"
+                "\nPart 4\nList of guidelines referenced in the inspection report\n"
+                "1. Guidance for organizations performing in vivo bioequivalence studies.\n"
+                "\nPart\nConclusion – inspection\n\n"
+                "Based on the areas inspected, the studies were considered to have been "
+                "conducted at an acceptable level of compliance with WHO GCP/GLP/BE "
+                "guidelines.\n")
+        rep = w.extract_whopir_report(text)
+        assert rep is not None
+        self.assertTrue(rep["outcome"].startswith("Based on the areas inspected"),
+                        rep["outcome"][:60])
+        self.assertNotIn("Guidance for organizations", rep["outcome"])
+        self.assertEqual(len(rep["sections"]), 1)
 
     def test_reliance_without_conclusion_heading_publishes_no_outcome(self) -> None:
         """결론 표제를 못 찾으면 outcome 은 빈다 — 과거 실사 요약을 결론이라 싣던 것이

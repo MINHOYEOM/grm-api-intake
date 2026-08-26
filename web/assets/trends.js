@@ -128,10 +128,6 @@
   // [최근 12개월 · 달라진 점] 041_findings_recent_window 전용 엘리먼트. zone/heatmap 과
   // 동일하게 아래 하드 게이트에는 넣지 않는다 — 구버전 셸(캐시 스큐)을 만나도 실패
   // 반경이 이 패널들로만 한정되어야 한다.
-  var recentBlockEl = document.getElementById("tr-recent-block");
-  var recentSubEl = document.getElementById("tr-recent-sub");
-  var recentMonthsEl = document.getElementById("tr-recent-months");
-  var recentNoteEl = document.getElementById("tr-recent-note");
   var recentCatsEl = document.getElementById("tr-recent-cats");
   // [존 재편 2026-08-26] 순위 보기 전환 — 재편 전에는 같은 축(카테고리별 지적 순위)을
   // 재는 표가 분모만 다른 채로 **세 개의 별개 섹션**으로 흩어져 있었다(최근 12개월 /
@@ -144,11 +140,11 @@
   //   없애려던 바로 그 오독을 코드가 저지르게 된다.
   var rankBlockEl = document.getElementById("tr-rank-block");
   var rankReadEl = document.getElementById("tr-rank-read");
-  var rankTabEls = {
-    recent: document.getElementById("tr-rank-tab-recent"),
-    all: document.getElementById("tr-rank-tab-all"),
-    zone: document.getElementById("tr-rank-tab-zone"),
-  };
+  var rankSubEl = document.getElementById("tr-rank-sub");
+  var rankNoteEl = document.getElementById("tr-rank-note");
+  // [컨셉 재정의] 기관 선택 — 아래 모든 수치의 **분모를 정하는** 컨트롤이라 화면 맨 위다.
+  var agencyEl = document.getElementById("tr-agency");
+  var agencyBtnsEl = document.getElementById("tr-agency-btns");
   var moveBlockEl = document.getElementById("tr-move-block");
   var moveSummaryEl = document.getElementById("tr-move-summary");
   var moveUpEl = document.getElementById("tr-move-up");
@@ -157,6 +153,8 @@
   var moveNoteEl = document.getElementById("tr-move-note");
   // [인용 조항] 042_findings_cfr_ranking 전용.
   var cfrBlockEl = document.getElementById("tr-cfr-block");
+  // [컨셉 재정의] 조항 순위의 읽는 법 — 고른 기관에 따라 문장이 달라져야 한다.
+  var cfrReadEl = document.getElementById("tr-cfr-read");
   var cfrSubEl = document.getElementById("tr-cfr-sub");
   var cfrEl = document.getElementById("tr-cfr");
   var cfrNoteEl = document.getElementById("tr-cfr-note");
@@ -378,13 +376,11 @@
   // 행과 그 사례 패널. 사례 패널은 비동기로 도착하므로 노드를 state 에 들고 있다가
   // renderRecentCats() 가 매번 같은 자리에 다시 끼워 넣는다(별도 저장소 난립 금지).
   var state = {
-    // [존 재편] 순위 보기 전환. rankView 는 **사용자가 탭을 눌러 고른 보기**이고
-    // 빈 값이 기본이다("아직 안 골랐다") — 여기에 초기 기본값을 박아 두면 fetch 도착
-    // 순서에 따라 fallback 이 이 값을 덮어써 기본 보기가 엉뚱하게 굳는다(activeRankView
-    // 주석의 실측 사고). 기본 보기는 값이 아니라 RANK_VIEWS 의 선언 순서가 정한다.
-    // rankReady 는 각 보기의 데이터 도착 여부(도착한 보기만 탭으로 노출한다).
-    rankView: "",
-    rankReady: {},
+    // [컨셉 재정의] 기관 선택. 저장된 값이 있으면 그것, 없으면 식약처(기본).
+    // ★fetch 응답을 통째로 들고 있는다 — 기관을 바꿀 때마다 다시 받지 않고 같은
+    //   응답을 다시 접는다(추가 네트워크 호출 0). 041 한 번이 세 기관을 모두 담는다.
+    agency: "",
+    recentData: null,
     openFirm: "", openFirmKey: "", lastFirms: [],
     openCat: "", recentCats: [], recentCurFindings: 0, exampleNode: null,
     openCfr: "", cfrItems: [], cfrExampleNode: null,
@@ -599,83 +595,204 @@
     coverageNoteEl.hidden = false;
   }
 
-  // ── [순위 보기 전환] 존 재편 2026-08-26 ──────────────────────────────────
-  // 세 보기는 **서로 다른 RPC·서로 다른 분모**다. 그래서 하나의 데이터 모델로 합치지
-  // 않고, 각 렌더러가 다 그린 뒤 "내 보기는 준비됐다"고 알리면(markRankReady) 그때
-  // 탭이 나타난다. 데이터가 오지 않은 보기는 탭 자체가 없다 — 041/038 미배포 라이브나
-  // fetch 실패에서 빈 탭을 누르는 일이 생기지 않는다.
+  // ── [기관 선택] 컨셉 재정의 2026-08-26 ───────────────────────────────────
+  // ★왜 합산을 기본값으로 두지 않는가(실측): '기타'를 빼고 기관별로 최근 12개월 상위 5를
+  //   세면 **FDA 와 식약처가 하나도 겹치지 않는다** —
+  //     FDA   : 무균보증 319 · 설비/시설 204 · 시험실 199 · 표시/포장 174 · 품질부서 167
+  //     식약처: 불만/회수 187 · 세척밸리 69 · 문서화 68 · 밸리데이션 51 · 안정성 50
+  //   합산 순위는 세 개의 다른 규제 현실을 평균 낸 값이고, 그 평균은 **어느 기관의
+  //   현실도 아니다**. 그것을 기본 화면으로 두는 것은 오답을 기본값으로 두는 것이다.
+  //   이 저장소가 052/053/054 에서 세 번 겪은 "성격이 다른 모집단을 한 축에 합치면
+  //   진단이 반드시 틀린다"를 표시 계층에서 반복하지 않는다.
   //
-  // 각 보기가 무엇을 재는지는 탭 아래 한 줄(tr-rank-read)이 매번 다시 적는다. 이게
-  // 이 전환의 핵심이다 — 재편 전에는 분모 설명이 섹션마다 따로 붙은 고정 문장이라,
-  // 독자가 스크롤로 두 표를 오가는 동안 어느 설명이 어느 표의 것인지 흐려졌다.
-  var RANK_VIEWS = ["recent", "all", "zone"];
-  var RANK_PANES = {
-    recent: function () { return recentCatsEl; },
-    all: function () { return catEl; },
-    zone: function () { return zoneBlockEl; },
-  };
-  var RANK_READ = {
-    recent: "최근 12개월에 공개된 지적사항만 셉니다. 오른쪽 %는 그 기간 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.",
-    all: "2016년 이후 모아 둔 전량이 분모입니다. 연도마다 확보한 문서 양이 크게 달라 최근 12개월과는 다른 그림이 나오는 것이 정상이에요.",
-    zone: "FDA 483 만 대상으로, 미국 밖 실사와 미국 내 실사를 각자 안에서 100%로 놓고 견줍니다. 미국 쪽 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요.",
-  };
+  // ★기본값이 식약처인 이유: 독자가 국내 제약 실무자다. FDA 는 수출하는 사람에게만
+  //   걸리지만 식약처는 전원에게 걸린다. 한 번 고르면 브라우저가 기억한다.
+  //
+  // ★레인 매칭은 **접두 문자열**이다(정규식 아님) — 053 의 lane 은
+  //   'MFDS/gmp-inspection' 처럼 채널까지 쪼개져 있고, 새 채널이 생겨도 접두가 같으면
+  //   자동으로 편입된다. 반대로 정규식을 쓰면 이스케이프 실수 하나가 조용히 0건을 만든다.
+  var AGENCY_VIEWS = [
+    { key: "mfds", label: "식약처", prefix: "MFDS" },
+    { key: "fda", label: "FDA", prefix: "FDA" },
+    { key: "all", label: "전체", prefix: "" },
+  ];
+  var AGENCY_STORE_KEY = "grm-trends-agency";
 
-  function readyRankViews() {
-    return RANK_VIEWS.filter(function (v) { return state.rankReady[v]; });
-  }
-
-  // 지금 보여줄 보기를 고른다.
-  // ★state.rankView 는 **사용자가 직접 고른 보기**이고, 여기서 절대 덮어쓰지 않는다.
-  //   처음엔 이 값을 초기 기본값("recent")으로 두고 fallback 이 이를 덮어쓰게 했는데,
-  //   세 fetch 가 **도착 순서가 제각각**이라 038(zone)이 041(recent)보다 먼저 오면
-  //   fallback 이 state.rankView 를 "zone" 으로 바꿔 버렸다 — 그 뒤 recent 가 도착해도
-  //   "이미 고른 보기가 준비돼 있으니 그대로"가 되어 **기본 보기가 해외vs미국으로 굳었다**
-  //   (로컬 프리뷰 실측으로 잡았다). 선택과 표시를 분리해 그 경로를 없앤다.
-  function activeRankView() {
-    if (state.rankView && state.rankReady[state.rankView]) return state.rankView;
-    // 아직 안 골랐거나 고른 보기가 준비 전이면 **선호 순서**(RANK_VIEWS 선언 순서 =
-    // 최근 12개월 > 전체 기간 > 해외vs미국)로 준비된 첫 보기를 쓴다. 도착 순서와 무관하다.
-    for (var i = 0; i < RANK_VIEWS.length; i += 1) {
-      if (state.rankReady[RANK_VIEWS[i]]) return RANK_VIEWS[i];
+  function agencyView(key) {
+    for (var i = 0; i < AGENCY_VIEWS.length; i += 1) {
+      if (AGENCY_VIEWS[i].key === key) return AGENCY_VIEWS[i];
     }
-    return "";
+    return AGENCY_VIEWS[0];
   }
 
-  // 보기를 실제 화면에 반영한다. 탭 클릭·렌더 완료 양쪽에서 불린다(멱등).
-  function applyRankView() {
-    if (!rankBlockEl) return;
-    var ready = readyRankViews();
-    if (!ready.length) return;              // 아직 아무 보기도 못 그렸다 → 블록 숨김 유지
-    var active = activeRankView();
-    if (!active) return;
-    RANK_VIEWS.forEach(function (v) {
-      var pane = RANK_PANES[v]();
-      if (pane) pane.hidden = (v !== active) || !state.rankReady[v];
-      var tab = rankTabEls[v];
-      if (!tab) return;
-      tab.hidden = !state.rankReady[v];
-      tab.setAttribute("aria-selected", v === active ? "true" : "false");
+  // 저장된 선택 읽기 — 사생활 모드·저장 차단 브라우저에서 접근 자체가 던지므로 감싼다.
+  function readStoredAgency() {
+    try {
+      var v = window.localStorage.getItem(AGENCY_STORE_KEY);
+      return v && agencyView(v).key === v ? v : "";
+    } catch (e) { return ""; }
+  }
+
+  function storeAgency(key) {
+    try { window.localStorage.setItem(AGENCY_STORE_KEY, key); } catch (e) { /* 무시 */ }
+  }
+
+  // 교차표에서 이 기관에 속하는 레인만 골라 kept 맵을 만든다(foldCategorySource 입력).
+  function agencyKept(grid, view) {
+    var kept = {};
+    (grid || []).forEach(function (r) {
+      var lane = r.lane || r.source;      // 053 미적용 응답은 lane 이 없다 → 소스 축 폴백
+      if (!lane) return;
+      if (!view.prefix || lane.indexOf(view.prefix) === 0) kept[lane] = true;
     });
-    if (rankReadEl) rankReadEl.textContent = RANK_READ[active] || "";
+    return kept;
+  }
+
+  // 고른 기관의 순위 행을 만든다.
+  // ★'기타 품질시스템'은 **순위에서 빼되 분모에는 남긴다**. 빼면서 분모까지 줄이면
+  //   나머지 항목의 비율이 부풀어 "무균보증이 12%"가 "무균보증이 15%"로 보인다 —
+  //   분류 실패를 감추려다 다른 수치를 거짓말하게 만드는 흔한 실수다.
+  function buildAgencyRanking(data, view) {
+    var grid = (data && data.by_category_source) || [];
+    if (!grid.length) return null;        // 052/053 미적용 → 기관 선택 자체가 불가
+    var kept = agencyKept(grid, view);
+    if (!Object.keys(kept).length) return null;
+    var folded = foldCategorySource(grid, kept);
+    var total = 0, excluded = 0;
+    folded.forEach(function (c) {
+      var n = Number(c.cur_cnt) || 0;
+      total += n;                          // 분모 = 기타 포함 전량
+      if (c.category_code === "other_quality_system") excluded += n;
+    });
+    if (!(total > 0)) return null;
+    var rows = folded.filter(function (c) {
+      return c.category_code !== "other_quality_system" && (Number(c.cur_cnt) || 0) > 0;
+    }).map(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      return {
+        code: c.category_code,
+        ko: label ? label.ko : c.category_code,
+        docs: c.cur_docs || 0,
+        cnt: Number(c.cur_cnt) || 0,
+      };
+    }).sort(function (a, b) {
+      return b.cnt - a.cnt || a.code.localeCompare(b.code);
+    }).slice(0, RECENT_CAT_ROWS);
+    return { rows: rows, total: total, excluded: excluded, lanes: Object.keys(kept) };
+  }
+
+  // 읽는 법은 **고른 기관에 맞춰 다시 적는다** — 분모가 바뀌면 설명도 바뀌어야 한다.
+  function agencyReadText(view) {
+    if (view.key === "all")
+      // ★"전체"가 무엇을 합친 것인지 말한다 — 안 적으면 독자가 자기와 관련 있는 기관만
+      //   들어 있다고 가정한다(실제로는 캐나다 실사가 이 창의 32%를 차지한다).
+      return "식약처·FDA 에 캐나다 실사와 EU·영국 GMP 비준수까지 합쳐 센 순위입니다. " +
+        "기관마다 많이 지적하는 영역이 크게 달라(식약처와 FDA 는 상위 항목이 겹치지 않습니다) " +
+        "실사를 준비하신다면 해당 기관을 골라 보세요.";
+    // ★기관명에 한국어 조사를 붙이지 않는다 — 조사는 앞말의 받침으로 갈리는데 기관명엔
+    //   영문 약어(FDA)가 섞여 규칙이 성립하지 않는다("FDA이(가)"). 명사구로만 잇는다.
+    return "최근 12개월 " + view.label + " 문서에서만 셉니다. 오른쪽 %는 그 기간 " +
+      view.label + " 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.";
+  }
+
+  // 선택을 화면에 반영한다(버튼 상태 + 순위 + 달라진 점). 클릭·최초 렌더 양쪽에서 호출.
+  function applyAgency() {
+    if (!rankBlockEl) return;
+    var data = state.recentData;
+    if (!data) return;
+    var view = agencyView(state.agency);
+    var built = buildAgencyRanking(data, view);
+    if (!built) {
+      // 레인을 가를 수 없는 응답(052/053 미적용) — 기관 선택을 숨기고 종전 합산으로 후퇴.
+      if (agencyEl) agencyEl.hidden = true;
+      built = fallbackRanking(data);
+      if (!built) return;
+      view = agencyView("all");
+    }
+    if (agencyBtnsEl) {
+      var kids = agencyBtnsEl.children;
+      for (var i = 0; i < kids.length; i += 1) {
+        var on = kids[i].getAttribute("data-agency") === view.key;
+        kids[i].setAttribute("aria-pressed", on ? "true" : "false");
+      }
+    }
+    state.recentCats = built.rows;
+    state.recentCurFindings = built.total;
+    state.openCat = "";                    // 기관을 바꾸면 펼쳐 둔 사례 패널을 닫는다
+    state.exampleNode = null;
+    renderRecentCats();
+    if (rankReadEl) rankReadEl.textContent = agencyReadText(view);
+    if (rankSubEl) {
+      var scope = (data.scope || {});
+      rankSubEl.textContent = monthLabelKo(scope.cur_from) + " ~ " + monthLabelKo(scope.cur_to) +
+        " · " + view.label + " 지적 " + fmtNum(built.total) + "건";
+    }
+    if (rankNoteEl) {
+      var note = "";
+      if (built.excluded > 0) {
+        // 규율 2 — 감추지 않고 크기를 밝힌다. 분모에는 남아 있다는 사실도 함께 적는다.
+        note = "이 기간 " + view.label + " 지적의 " + pctText(built.excluded, built.total) +
+          "(" + fmtNum(built.excluded) + "건)는 아직 세부 분류가 되지 않아 순위에서 뺐습니다 — " +
+          "위 비율의 분모에는 그대로 들어 있습니다.";
+      }
+      rankNoteEl.textContent = note;
+      rankNoteEl.hidden = !note;
+    }
+    renderMovers(data, view);
+    applyAgencyToCfr(view);
     rankBlockEl.hidden = false;
   }
 
-  function markRankReady(view) {
-    if (!rankBlockEl) return;               // 이 면엔 통합 순위 섹션이 없다(조용히 no-op)
-    state.rankReady[view] = true;
-    applyRankView();
+  // 조항 순위는 042 가 21 CFR 만 센다(식약처 조항 축은 아직 없다). 식약처를 고른
+  // 사용자에게 이 순위는 **다른 나라 규정**이므로, 그 사실을 읽는 법이 먼저 말한다 —
+  // 말없이 그대로 두면 "식약처 기준"으로 읽히고, 그게 이 재정의가 없애려는 오독이다.
+  function applyAgencyToCfr(view) {
+    if (!cfrReadEl) return;
+    var tail = "줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.";
+    cfrReadEl.textContent = view && view.key === "mfds"
+      // 식약처를 고른 사람에게 21 CFR 은 다른 나라 규정이다. 말없이 두면 "식약처 기준"으로
+      // 읽히므로 그 사실을 먼저 말하되, 버리라는 뜻이 아니라는 것도 함께 말한다.
+      ? "아래는 미국 21 CFR 조항 순위입니다 — 식약처 지적서에는 이 조항이 인용되지 않습니다. " +
+        "다만 요구사항 자체는 GMP 공통이라 무엇을 확인해야 하는지의 목록으로는 그대로 쓸 수 있어요. " + tail
+      : "규제기관이 지적서에 실제로 적은 조항 순위입니다. 카테고리보다 한 단계 구체적이라 " +
+        "사내 절차서와 바로 맞대어 볼 수 있어요 — " + tail;
   }
 
-  function wireRankTabs() {
-    if (!rankBlockEl) return;
-    RANK_VIEWS.forEach(function (v) {
-      var tab = rankTabEls[v];
-      if (!tab) return;
-      tab.addEventListener("click", function () {
-        if (!state.rankReady[v]) return;
-        state.rankView = v;
-        applyRankView();
+  // 052/053 미적용 라이브용 후퇴 경로 — by_category(합산)로 종전처럼 그린다.
+  function fallbackRanking(data) {
+    var byCat = (data && data.by_category) || [];
+    var cur = ((data.totals || {}).cur) || {};
+    if (!byCat.length || !(Number(cur.findings) > 0)) return null;
+    var rows = byCat.map(function (c) {
+      var label = CATEGORY_LABELS[c.category_code];
+      return {
+        code: c.category_code,
+        ko: label ? label.ko : c.category_code,
+        docs: c.cur_docs || 0,
+        cnt: Number(c.cur_cnt) || 0,
+      };
+    }).filter(function (c) { return c.cnt > 0; })
+      .sort(function (a, b) { return b.cnt - a.cnt || a.code.localeCompare(b.code); })
+      .slice(0, RECENT_CAT_ROWS);
+    return { rows: rows, total: Number(cur.findings) || 0, excluded: 0, lanes: [] };
+  }
+
+  function wireAgency() {
+    if (!agencyBtnsEl) return;
+    agencyBtnsEl.innerHTML = "";
+    AGENCY_VIEWS.forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tr-agency-btn";
+      b.setAttribute("data-agency", v.key);
+      b.setAttribute("aria-pressed", v.key === state.agency ? "true" : "false");
+      b.textContent = v.label;
+      b.addEventListener("click", function () {
+        state.agency = v.key;
+        storeAgency(v.key);
+        applyAgency();
       });
+      agencyBtnsEl.appendChild(b);
     });
   }
 
@@ -715,7 +832,6 @@
     }
     var maxCnt = cats[0].cnt || 1;
     cats.forEach(function (c, i) { catEl.appendChild(buildCatRow(c, i, maxCnt, total)); });
-    markRankReady("all");
   }
 
   // ── 연도별 구성비 히트맵(H1) ─────────────────────────────────────────────
@@ -1290,10 +1406,10 @@
       }
     }
 
-    // [존 재편] 재편 전에는 여기서 자기 섹션을 직접 폈다(zoneBlockEl.hidden = false).
-    // 이제 이 패널은 통합 순위의 세 번째 **보기**라, 자기를 펴는 대신 "준비됐다"만
-    // 알린다 — 실제로 보일지는 사용자가 고른 탭이 정한다.
-    markRankReady("zone");
+    // [컨셉 재정의] 이 패널은 '데이터 현황' 면의 독립 섹션으로 돌아갔다(지적 경향
+    // 면에서는 뺐다 — "해외"가 인도 61%인 덩어리라 국내 사용자가 "해외=우리"로 읽기
+    // 쉽고, 보고 끝나는 블록이라 규율 3 을 못 지킨다). 그래서 자기를 직접 편다.
+    zoneBlockEl.hidden = false;
   }
 
   // ── [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats() ──────
@@ -1615,49 +1731,6 @@
     return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%p";
   }
 
-  function buildMonthColumn(row, maxDocs, isPrev, showYear) {
-    var col = el("div", "tr-rm-col" + (isPrev ? " is-prev" : "") + (showYear ? " is-year" : ""));
-    var barwrap = el("div", "tr-rm-barwrap");
-    var bar = el("div", "tr-rm-bar");
-    var docs = row.docs || 0;
-    bar.style.height = Math.max(3, Math.round((docs / maxDocs) * 100)) + "%";
-    barwrap.appendChild(bar);
-    col.appendChild(barwrap);
-    var mm = String(Number(String(row.month || "0000-00").slice(5, 7)));
-    col.appendChild(el("span", "tr-rm-lbl",
-      showYear ? "'" + String(row.month).slice(2, 4) + "." + mm : mm));
-    // 건수도 툴팁에 함께 둔다 — 막대는 문서 수지만 원 수치를 숨기지 않는다.
-    col.title = monthLabelKo(row.month) + " · 문서 " + fmtNum(docs) + "건 · 지적 " +
-      fmtNum(row.cnt || 0) + "건";
-    return col;
-  }
-
-  function renderRecentMonths(months, prevTo) {
-    recentMonthsEl.innerHTML = "";
-    var maxDocs = months.reduce(function (m, r) { return Math.max(m, r.docs || 0); }, 0) || 1;
-    var bars = el("div", "tr-rm-bars");
-    months.forEach(function (r, i) {
-      var isPrev = String(r.month || "") <= String(prevTo || "");
-      // 연도 표기는 1월과 첫 막대에만 — 24개 전부에 붙이면 라벨이 서로 겹친다.
-      var showYear = i === 0 || String(r.month || "").slice(5, 7) === "01";
-      bars.appendChild(buildMonthColumn(r, maxDocs, isPrev, showYear));
-    });
-    recentMonthsEl.appendChild(bars);
-
-    var legend = el("div", "tr-rm-legend");
-    [["tr-rm-key-cur", "최근 12개월"], ["tr-rm-key-prev", "직전 12개월"]].forEach(function (pair) {
-      var item = el("span", "");
-      item.appendChild(el("span", "tr-rm-key " + pair[0]));
-      item.appendChild(document.createTextNode(pair[1]));
-      legend.appendChild(item);
-    });
-    recentMonthsEl.appendChild(legend);
-  }
-
-  // 최근 창 카테고리 순위 — 행을 누르면 그 영역의 실제 지적 문장이 아래로 펼쳐진다.
-  // 단위는 아래 누적 순위(renderCategoryRanking)와 같은 **건수 + 구성비**로 맞춘다 —
-  // 같은 페이지에서 두 순위가 서로 다른 잣대를 쓰면 비교 자체가 불가능해진다. 문서 수는
-  // 툴팁으로 함께 준다(한 문서에 지적이 여러 개라는 사실을 잃지 않도록).
   function buildRecentCatRow(entry, idx, maxCnt, curFindings) {
     var row = el("div", "tr-rc-row" + (state.openCat === entry.code ? " on" : ""));
     makeClickableRow(row, entry.ko + " 실제 지적 사례 보기", function () {
@@ -1692,49 +1765,23 @@
         recentCatsEl.appendChild(state.exampleNode || el("p", "tr-empty", "불러오는 중…"));
       }
     });
-    markRankReady("recent");
   }
 
+  // [컨셉 재정의] 이 함수는 이제 **응답을 보관하고 기관 선택을 적용**하기만 한다.
+  // 월별 막대(24개)는 삭제했다 — 그 막대가 세는 것은 "그 달에 공개된 문서 수"이고,
+  // 그건 FDA·식약처의 공개 행정 리듬이지 규제 신호가 아니다. 우리도 알고 있었다:
+  // "마지막 막대는 아직 진행 중인 달이라 낮게 보입니다"라는 주석이 그 사실을 인정하는
+  // 문장이었다. 보고 나서 할 일이 없는 블록은 싣지 않는다(규율 3).
   function renderRecentWindow(data) {
-    if (!recentBlockEl || !recentMonthsEl) return;
+    if (!rankBlockEl) return;              // 이 면엔 순위 섹션이 없다(조용히 no-op)
     var d = data || {};
-    var scope = d.scope || {};
-    var totals = d.totals || {};
-    var cur = totals.cur || {};
-    var months = d.by_month || [];
-    if (!months.length || !(Number(cur.findings) > 0)) return;   // 빈 응답 → 숨김 유지
-
-    if (recentSubEl) {
-      recentSubEl.textContent =
-        monthLabelKo(scope.cur_from) + " ~ " + monthLabelKo(scope.cur_to) + " · 문서 " +
-        fmtNum(cur.documents) + "건 · 지적 " + fmtNum(cur.findings) + "건 · 업체 " +
-        fmtNum(cur.firms) + "곳";
-    }
-    renderRecentMonths(months, scope.prev_to);
-    if (recentNoteEl) {
-      // 마지막 달은 구조상 항상 진행 중이다(창의 끝 = 이번 달) — 막대가 낮은 이유를
-      // 화면에 적지 않으면 "최근에 줄었다"로 오독된다.
-      recentNoteEl.textContent =
-        "마지막 막대(" + monthLabelKo(scope.cur_to) + ")는 아직 진행 중인 달이라 낮게 보입니다.";
-    }
-
-    var byCat = d.by_category || [];
-    state.recentCurFindings = Number(cur.findings) || 0;
-    state.recentCats = byCat.map(function (c) {
-      var label = CATEGORY_LABELS[c.category_code];
-      return {
-        code: c.category_code,
-        ko: label ? label.ko : c.category_code,
-        docs: c.cur_docs || 0,
-        cnt: c.cur_cnt || 0,
-      };
-    }).filter(function (c) { return c.cnt > 0; })
-      .sort(function (a, b) { return b.cnt - a.cnt || a.code.localeCompare(b.code); })
-      .slice(0, RECENT_CAT_ROWS);
-    renderRecentCats();
-
-    recentBlockEl.hidden = false;
+    var cur = (d.totals || {}).cur || {};
+    if (!(Number(cur.findings) > 0)) return;   // 빈 응답 → 숨김 유지
+    state.recentData = d;
+    if (agencyEl && (d.by_category_source || []).length) agencyEl.hidden = false;
+    applyAgency();
   }
+
 
   // ── [달라진 점] 최근 창 vs 직전 창 구성비 차이 ─────────────────────────────
   // 각 행은 구성비 변화(%p)와 **건수**를 함께 적는다 — 둘을 같이 보여 주지 않으면
@@ -1820,18 +1867,27 @@
   //   · ★남는 소스가 하나도 없으면 `usable=false` 로 알린다. 그 상태로 조정 전 표를
   //     그대로 내면 **가장 못 믿을 상황에서 아무 고지 없이 유령 표가 나간다** — 이
   //     저장소가 반복해 겪은 "캐치올이 정상 응답처럼 보인다" 와 같은 형태다.
-  function alignSourceMix(d, curFindings, prevFindings) {
+  // [컨셉 재정의] `scope` = 고른 기관의 레인 맵. 이 함수가 두 창의 소스 구성을 맞추는
+  // 일은 그대로이되, **그 기관 안에서만** 한다. 기관을 골랐는데 정렬 대상이 전 기관이면
+  // 조정 결과가 그 기관의 것이 아니게 된다.
+  // ★scope 가 비었으면(기관 선택 불가 응답) 종전처럼 전 레인을 본다 — 후퇴 경로.
+  function alignSourceMix(d, curFindings, prevFindings, scope) {
+    var grid = d.by_category_source;
+    var scoped = scope && Object.keys(scope).length ? scope : null;
     var raw = {
       applied: false, usable: true,
-      cats: d.by_category || [],
+      // 후퇴 시 기준 표: 기관을 가를 수 있으면 그 기관으로 접은 표, 아니면 합산 by_category.
+      cats: (scoped && grid && grid.length)
+        ? foldCategorySource(grid, scoped)
+        : (d.by_category || []),
       curFindings: curFindings, prevFindings: prevFindings,
       dropped: [],
     };
-    var grid = d.by_category_source;
     if (!grid || !grid.length) return raw;
 
     var kept = {}, dropped = [], keptCur = 0, keptPrev = 0;
     laneTotals(grid).forEach(function (s) {
+      if (scoped && !scoped[s.lane]) return;   // 다른 기관의 레인은 아예 보지 않는다
       var c = s.cur, p = s.prev;
       // 표본이 얇으면 배율을 따지는 것 자체가 무의미하므로 이 검사가 먼저다.
       // ★사유 문구는 실제로 성립한 조건과 같아야 한다 — 조건은 OR 이므로
@@ -1904,18 +1960,36 @@
     moveSourceEl.textContent = text;
   }
 
-  function renderMovers(data) {
+  // [컨셉 재정의] 두 번째 인자로 **고른 기관**을 받는다. 기관을 바꾸면 이 표도 그
+  // 기관 안에서 다시 계산되어야 한다 — 순위는 식약처인데 증감은 합산이면 두 표가 서로
+  // 다른 모집단을 말하게 되고, 그것이 이 재정의가 없애려는 바로 그 혼동이다.
+  function renderMovers(data, view) {
     if (!moveBlockEl || !moveUpEl || !moveDownEl) return;
+    moveBlockEl.hidden = true;             // 기관을 바꿀 때마다 다시 판정한다(잔상 금지)
     var d = data || {};
     var totals = d.totals || {};
-    var curFindings = Number((totals.cur || {}).findings) || 0;
-    var prevFindings = Number((totals.prev || {}).findings) || 0;
+    var v = view || agencyView(state.agency);
+    var grid = d.by_category_source || [];
+    // [컨셉 재정의] 창 합계도 **고른 기관 안에서** 센다. 전 기관 합계로 문턱을 넘겨
+    // 놓고 표만 기관별로 그리면, 얇은 기관에서 한두 건짜리 변화가 크게 보인다.
+    var scope = grid.length ? agencyKept(grid, v) : null;
+    var curFindings = 0, prevFindings = 0;
+    if (scope && Object.keys(scope).length) {
+      laneTotals(grid).forEach(function (t) {
+        if (!scope[t.lane]) return;
+        curFindings += t.cur;
+        prevFindings += t.prev;
+      });
+    } else {
+      curFindings = Number((totals.cur || {}).findings) || 0;
+      prevFindings = Number((totals.prev || {}).findings) || 0;
+    }
     // 창이 얇으면 비교 자체를 하지 않는다 — 숨김 유지(억지 해석 금지).
     if (curFindings < WINDOW_MIN_FINDINGS || prevFindings < WINDOW_MIN_FINDINGS) return;
 
     // 두 창의 소스 구성을 맞춘다. 견줄 수 있는 소스가 없거나, 맞추고 나니 창이 얇아지면
     // 비교를 하지 않는다 — 조정 전 표를 대신 내보내지 않는다(숨김 유지).
-    var mix = alignSourceMix(d, curFindings, prevFindings);
+    var mix = alignSourceMix(d, curFindings, prevFindings, scope);
     if (!mix.usable) return;
     if (mix.curFindings < WINDOW_MIN_FINDINGS || mix.prevFindings < WINDOW_MIN_FINDINGS) return;
 
@@ -2346,9 +2420,12 @@
   // ★각 면의 **주 데이터**가 로딩 해제를 책임진다(revealContent). 부 데이터는 실패해도
   //   자기 블록만 숨긴 채로 남는다 — 기존 "실패 반경은 자기 자신뿐" 원칙 그대로다.
   var WANT = ({
-    trends: { stats: true, recent: true, cfr: true, zone: true },
+    // [컨셉 재정의] 지적 경향 면에서 zone 이 빠지고(→ 데이터 현황) stats 도 빠졌다
+    // (핵심 통계 5개 삭제 — 누적 총량은 사용자 질문이 아니다). 이 면이 치는 RPC 는
+    // **041(최근 창)과 042(조항) 둘**뿐이다.
+    trends: { recent: true, cfr: true },
     inspections: { fda: true },
-    coverage: { stats: true, matrix: true },
+    coverage: { stats: true, matrix: true, zone: true },
   })[page] || { stats: true, recent: true, cfr: true, zone: true };
 
   function revealContent() {
@@ -2368,9 +2445,15 @@
     return;
   }
 
-  wireRankTabs();
+  // [컨셉 재정의] 기관 선택 초기값 — 저장된 값이 있으면 그것, 없으면 식약처.
+  // ★기본이 '전체'가 아닌 이유는 AGENCY_VIEWS 위 주석 참조(합산은 어느 기관의
+  //   현실도 아니라, 그것을 기본 화면으로 두면 오답을 기본값으로 두는 것이 된다).
+  state.agency = readStoredAgency() || "mfds";
+  wireAgency();
 
-  // [주 데이터 · 지적 경향/데이터 현황] 007 findings_stats.
+  // [주 데이터 · 데이터 현황] 007 findings_stats.
+  // ★지적 경향 면은 더 이상 이 RPC 를 치지 않는다(핵심 통계 5개를 걷어냈다) —
+  //   그 면의 주 데이터는 041 이고, 로딩 해제도 041 이 책임진다.
   if (WANT.stats) {
     fetchStats()
       .then(function (data) {
@@ -2406,12 +2489,12 @@
       .catch(function () { /* 조용히 숨김 유지 */ });
   }
 
-  // [부 데이터] 038 해외 vs 미국 — 통합 순위의 세 번째 보기. 실패하면 그 탭이 아예
-  // 나타나지 않는다(빈 탭 금지, applyRankView).
+  // [부 데이터] 038 해외 vs 미국 — '데이터 현황' 면의 독립 섹션(FDA 483 코퍼스의
+  // 지리적 구성). 실패해도 그 블록만 hidden 으로 남는다.
   if (WANT.zone) {
     fetchZoneCategory()
       .then(function (data) { renderZonePanel(data); })
-      .catch(function () { /* 조용히 탭 미노출 */ });
+      .catch(function () { /* 조용히 숨김 유지 */ });
   }
 
   // [부 데이터] 041 최근 12개월 — 한 번의 응답으로 월별 막대·최근 순위 보기·달라진 점
@@ -2419,10 +2502,16 @@
   if (WANT.recent) {
     fetchRecentWindow()
       .then(function (data) {
+        // 지적 경향 면에서는 이것이 **주 데이터**다 — 순위가 그려지면 로딩을 푼다.
+        // renderMovers 는 renderRecentWindow → applyAgency 안에서 기관과 함께 불린다
+        // (여기서 따로 부르면 기관 없이 합산으로 한 번 그려졌다가 덮이는 깜빡임이 난다).
         renderRecentWindow(data);
-        renderMovers(data);
+        if (!WANT.stats) {
+          if (rankBlockEl && !rankBlockEl.hidden) revealContent();
+          else failContent();
+        }
       })
-      .catch(function () { /* 조용히 숨김 유지 */ });
+      .catch(function () { if (!WANT.stats) failContent(); });
   }
 
   // [부 데이터] 042 인용 조항 — 실패해도 tr-cfr-block 은 hidden 그대로.

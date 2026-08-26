@@ -2384,8 +2384,9 @@ FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실�
 # [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
 # 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
 # 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
-TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 "
-                      "지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향.")
+TRENDS_DESCRIPTION = ("식약처·FDA 중 기관을 골라 최근 12개월에 가장 많이 지적된 영역과 조항을 확인하고 "
+                      "자가점검 체크리스트까지 — 기관마다 상위 지적이 다릅니다. "
+                      "FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계.")
 INSPECTIONS_DESCRIPTION = ("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
                            "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
 COVERAGE_DESCRIPTION = ("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
@@ -2706,15 +2707,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "findings" / "inspections" / "index.html", inspections_html)
     written.append("findings/inspections/index.html")
 
-    # 데이터 현황(트렌드 존 3면) — 소스 구성·연도별 공개량·연도별 구성비·수집량 상위
-    # 업체. 재편 전 트렌드 페이지 12섹션 중 이 넷은 "규제가 어떻게 변하나"가 아니라
-    # "우리가 무엇을 얼마나 모았나"였고, 다른 두 면에 반복되던 커버리지 해설
-    # (실측 22개 2,589자 = 본문 글자의 32%)의 목적지이기도 하다.
+    # 데이터 현황 — 소스 구성·연도별 공개량·연도별 구성비·수집량 상위 업체 +
+    # (컨셉 재정의로 넘어온) 전 기간 누적 순위·해외vs미국. 전부 "규제가 어떻게 변하나"가
+    # 아니라 **"우리가 무엇을 얼마나 모았나"**에 답하는 블록이다.
+    # ★[컨셉 재정의 2026-08-26] **세그먼트에서 내렸다**(seg_active 를 넘기지 않는다) —
+    #   이 면이 답하는 것은 사용자가 하려는 일이 아니라 우리가 신뢰를 얻으려는 일이라
+    #   nav 여섯 탭 어느 job 에도 속하지 않는다. 라우트·sitemap·footer 도구 열은 그대로
+    #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
     coverage_html = env.get_template("coverage.html").render(
         page_title="데이터 현황 · GRM",
         rel_root="../../",
         nav_active="trends",
-        seg_active="coverage",
+        seg_active="",
         latest_slug=latest_slug,
         description=COVERAGE_DESCRIPTION,
         canonical=_abs_url("findings/coverage/"),

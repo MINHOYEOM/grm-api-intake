@@ -10,13 +10,13 @@
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
 <title>규제 지적사항 트렌드 · GRM</title>
-<meta name="description" content="FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향." />
+<meta name="description" content="식약처·FDA 중 기관을 골라 최근 12개월에 가장 많이 지적된 영역과 조항을 확인하고 자가점검 체크리스트까지 — 기관마다 상위 지적이 다릅니다. FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계." />
 <link rel="canonical" href="https://grm-solutions.com/findings/trends/" /><link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
 <meta property="og:title" content="규제 지적사항 트렌드 · GRM" />
-<meta property="og:description" content="FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향." />
+<meta property="og:description" content="식약처·FDA 중 기관을 골라 최근 12개월에 가장 많이 지적된 영역과 조항을 확인하고 자가점검 체크리스트까지 — 기관마다 상위 지적이 다릅니다. FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계." />
 <meta property="og:url" content="https://grm-solutions.com/findings/trends/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
@@ -44,13 +44,13 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1><p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">기관을 고르면 최근 12개월 동안 그 기관이 가장 많이 지적한 영역과 조항을 보여드립니다.</span> <span class="ln">줄을 누르면 실제 지적 문장으로, 마지막에는 자가점검 체크리스트로 이어집니다.</span></p>
   </div>
   <div class="wrap">
 <nav class="tr-seg" aria-label="트렌드 면 전환">
   <a href="../../findings/trends/index.html" class="on" aria-current="page">지적 경향</a>
   <a href="../../findings/inspections/index.html">실사 결과</a>
-  <a href="../../findings/coverage/index.html">데이터 현황</a>
 </nav>
 <div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" data-page="trends" hidden></div>
 
@@ -61,31 +61,15 @@
     </div>
     <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
 
-    <div id="tr-content" hidden>
-      <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section><div class="imp" id="tr-coverage-note" hidden>
-        <span class="lab">먼저 알아두세요</span>
-        <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
-        <p id="tr-coverage-text"></p>
-        <p class="tr-more">소스별로 어디까지 거슬러 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="../../findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
-      </div><section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
-        <h2 class="tr-h">최근 12개월</h2>
-        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요.</p>
-        <p class="tr-recent-sub" id="tr-recent-sub"></p>
-        <div id="tr-recent-months" class="tr-recent-months"></div>
-        <p class="tr-note" id="tr-recent-note"></p>
-      </section><section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
+    <div id="tr-content" hidden><div class="tr-agency" id="tr-agency" role="group" aria-label="기관 선택" hidden>
+        <span class="tr-agency-lab">어느 기관 기준으로 볼까요?</span>
+        <div class="tr-agency-btns" id="tr-agency-btns"></div>
+      </div><section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
         <h2 class="tr-h">가장 많이 지적된 영역</h2>
-        <div class="tr-rank-tabs" id="tr-rank-tabs" role="tablist" aria-label="순위 기간 선택">
-          <button class="tr-rank-tab" id="tr-rank-tab-recent" type="button" role="tab" aria-selected="true" aria-controls="tr-recent-cats" hidden>최근 12개월</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-all" type="button" role="tab" aria-selected="false" aria-controls="tr-cat" hidden>전체 기간</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-zone" type="button" role="tab" aria-selected="false" aria-controls="tr-zone-block" hidden>해외 vs 미국</button>
-        </div>
-        <p class="tr-read tr-rank-read" id="tr-rank-read"></p><div class="tr-pane tr-recent-cats" id="tr-recent-cats" role="tabpanel" aria-labelledby="tr-rank-tab-recent" hidden></div><div class="tr-pane tr-cat" id="tr-cat" role="tabpanel" aria-labelledby="tr-rank-tab-all" hidden></div><div class="tr-pane tr-zone-block" id="tr-zone-block" role="tabpanel" aria-labelledby="tr-rank-tab-zone" hidden>
-          <p class="tr-zone-sub" id="tr-zone-sub"></p>
-          <div id="tr-zone" class="tr-zone"></div>
-          <p class="tr-note" id="tr-zone-countries"></p>
-          <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
-        </div>
+        <p class="tr-read" id="tr-rank-read"></p>
+        <p class="tr-rank-sub" id="tr-rank-sub"></p>
+        <div class="tr-recent-cats" id="tr-recent-cats"></div>
+        <p class="tr-note" id="tr-rank-note"></p>
       </section><section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
         <details class="tr-fold" id="tr-move-fold">
           <summary>
@@ -111,9 +95,10 @@
         </details>
       </section><section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
         <h2 class="tr-h">많이 인용된 조항</h2>
-        <p class="tr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
+        <p class="tr-read" id="tr-cfr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
         <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
-        <div id="tr-cfr" class="tr-cfr"></div><div class="tr-cta">
+        <div id="tr-cfr" class="tr-cfr"></div>
+        <div class="tr-cta">
           <span class="tr-cta-b">
             <span class="tr-cta-t">자가점검 체크리스트 만들기</span>
             <span class="tr-cta-d">위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.</span>
@@ -121,7 +106,7 @@
           <a class="tr-cta-go" href="../../findings/checklist/index.html">체크리스트 만들기 &rarr;</a>
         </div>
         <p class="tr-note" id="tr-cfr-note"></p>
-      </section>
+      </section><p class="tr-more">모으는 곳은 FDA 483 · Warning Letter · 식약처 · 캐나다 실사 · EU·영국 GMP 비준수입니다 &mdash; &lsquo;전체&rsquo;는 이 다섯을 합친 값이에요. 날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다. 어느 기관에서 얼마나 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="../../findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
     </div>
   </div>
 </main>
@@ -177,18 +162,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* ── [최근 12개월] 월별 문서 수 막대(24개월) ──────────────────────────────
    최근 12개월은 coral, 직전 12개월은 ink 저채도로 같은 축 위에 나란히 둔다 —
    신규 팔레트 없이 두 구간을 구분한다(zone 패널의 2시리즈 관례와 동형). */
-.tr-recent-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
-.tr-rm-bars{display:flex;align-items:flex-end;gap:4px}
-.tr-rm-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.tr-rm-barwrap{height:96px;width:100%;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
-.tr-rm-bar{width:100%;background:var(--coral)}
-.tr-rm-col.is-prev .tr-rm-bar{background:var(--ink);opacity:.28}
-.tr-rm-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);white-space:nowrap}
-.tr-rm-col.is-year .tr-rm-lbl{color:var(--muted);font-weight:600}
-.tr-rm-legend{display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)}
-.tr-rm-key{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.tr-rm-key-cur{background:var(--coral)}
-.tr-rm-key-prev{background:var(--ink);opacity:.28}
 
 /* 최근 12개월 카테고리 순위 — 행 클릭 시 실제 지적 사례가 아래로 펼쳐진다. */
 .tr-recent-cats{display:flex;flex-direction:column;gap:0}
@@ -411,8 +384,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .tr-stats{gap:28px}
   .tr-stat-num{font-size:26px}
   /* 24개 막대는 좁은 화면에서 라벨이 겹친다 — 막대만 남기고 눈금은 범례·툴팁으로. */
-  .tr-rm-lbl{display:none}
-  .tr-rm-bars{gap:2px}
   /* 남은 폭이 20px 남짓이라 막대가 눈금 없는 조각이 된다 — 숫자만 남긴다. */
   .tr-rc-track{display:none}
   .tr-cf-track{display:none}
@@ -448,12 +419,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    보기를 바꾸게 하면 두 수치가 나란히 보이지 않으므로 오독 자체가 사라진다 —
    해설로 막던 것을 구조로 막는다. '해외 vs 미국'도 같은 축(카테고리 순위)이라
    세 번째 보기로 흡수했다. */
-.tr-rank-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
-.tr-rank-tab{padding:7px 14px;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--pill);transition:all var(--tr)}
-.tr-rank-tab:hover{color:var(--ink);border-color:var(--muted)}
-.tr-rank-tab[aria-selected="true"]{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
-.tr-rank-tab[hidden]{display:none}
-.tr-pane[hidden]{display:none}
 .tr-rank-read{margin-top:12px}
 
 /* ── 달라진 점 — 접힘 ─────────────────────────────────────────────────────
@@ -511,6 +476,27 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 
 /* 한국 슬라이스 — 연도별 막대는 .tr-fda-y-* 를 그대로 재사용한다(신규 컴포넌트 0). */
 .tr-kr-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+
+/* ── [컨셉 재정의 2026-08-26] 기관 선택 ───────────────────────────────────────
+   아래 모든 수치의 **분모를 정하는** 컨트롤이라 화면 맨 위에 서고, 라벨이 질문
+   형태다("어느 기관 기준으로 볼까요?") — 통계 필터가 아니라 시작 질문이라는 뜻을
+   모양으로도 전한다. 선택은 aria-pressed 로 표현한다(탭이 아니라 토글 버튼 묶음 —
+   URL 을 바꾸지 않고 같은 페이지의 보기를 바꾸므로 tablist 가 아니다). */
+.tr-agency{margin:0 0 30px;padding:18px 20px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--soft)}
+.tr-agency[hidden]{display:none}
+.tr-agency-lab{display:block;font-size:13px;color:var(--muted);margin-bottom:11px}
+.tr-agency-btns{display:flex;flex-wrap:wrap;gap:8px}
+.tr-agency-btn{
+  padding:9px 20px;font-family:var(--sans);font-size:14px;color:var(--body-s);
+  background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--pill);
+  transition:all var(--tr);
+}
+.tr-agency-btn:hover{border-color:var(--muted);color:var(--ink)}
+.tr-agency-btn[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
+.tr-agency-btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+
+/* 순위 섹션의 창·분모 한 줄 — 어느 기관 몇 건이 분모인지 항상 보인다. */
+.tr-rank-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
 </style>
 <style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
 <footer class="site"><div class="wrap">
@@ -564,7 +550,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/trends.js?v=8ecd9557" defer></script>
+<script src="../../assets/trends.js?v=7c9c64ae" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

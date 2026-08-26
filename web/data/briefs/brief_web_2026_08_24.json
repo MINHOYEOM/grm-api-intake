@@ -1212,7 +1212,7 @@
    "type_tag": "WHO",
    "headline_target": "Farmabios (Corp)",
    "title_issue": "WHOPIR 공개 실사보고서",
-   "summary": "WHO 가 Farmabios (Corp) 제조소에 대한 2026년 6월 16일 실사 결과를 공개 실사보고서(WHOPIR)로 게시했다.",
+   "summary": "WHO 가 Farmabios (Corp) 제조소에 대한 2026년 6월 16일자 서면평가(desk assessment) 결과를 공개 실사보고서(WHOPIR)로 게시했다.",
    "facts": [
     {
      "label": "실사일",
@@ -1235,10 +1235,10 @@
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
     "대상: Farmabios (Corp) 제조소",
-    "실사일: 2026-06-16",
+    "서면평가일: 2026-06-16",
     "발행: WHO 공개 실사보고서(WHOPIR) — 결론·인용 실사(AIFA) 수록"
    ],
-   "implication": "WHO 사전적격성 실사 결과가 공개되면서 원료 공급처의 실사 이력을 외부에서 확인할 수 있는 범위가 넓어지고 있다. Farmabios (Corp) 를 공급망에 두고 있다면 이번 WHOPIR 본문의 지적 항목을 공급자 평가 자료로 확보해 둘 필요가 있다.",
+   "implication": "WHO 사전적격성 평가 결과가 공개되면서 원료 공급처의 GMP 이력을 외부에서 확인할 수 있는 범위가 넓어지고 있다. 이번 건은 현장실사 없이 타 규제기관(AIFA) 실사 증거로 결론낸 서면평가로, Farmabios (Corp) 를 공급망에 두고 있다면 보고서의 결론과 인용 실사 내역을 공급자 평가 자료로 확보해 둘 필요가 있다.",
    "checks": [
     "해당 제조소의 WHOPIR 본문 입수 및 지적사항 검토",
     "공급자 평가 자료에 WHO 실사 이력 반영 여부"
@@ -1283,7 +1283,7 @@
    "type_tag": "WHO",
    "headline_target": "Neuland Labs (Corp and Unit 1)",
    "title_issue": "WHOPIR 공개 실사보고서",
-   "summary": "WHO 가 Neuland Labs (Corp and Unit 1) 제조소에 대한 2026년 6월 8일 실사 결과를 공개 실사보고서(WHOPIR)로 게시했다.",
+   "summary": "WHO 가 Neuland Labs (Corp and Unit 1) 제조소에 대한 2026년 6월 8일자 서면평가(desk assessment) 결과를 공개 실사보고서(WHOPIR)로 게시했다.",
    "facts": [
     {
      "label": "실사일",
@@ -1306,10 +1306,10 @@
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
     "대상: Neuland Labs (Corp and Unit 1) 제조소",
-    "실사일: 2026-06-08",
+    "서면평가일: 2026-06-08",
     "발행: WHO 공개 실사보고서(WHOPIR) — 결론·인용 실사(USFDA·EDQM/ANSM) 수록"
    ],
-   "implication": "본사와 개별 유닛을 함께 대상으로 한 실사 결과가 공개되면서 같은 회사라도 사업장 단위로 결과를 구분해 볼 필요가 생긴다. Neuland Labs 원료를 사용하는 국내 품목은 실제 제조 사업장이 이번 보고서 범위에 포함되는지 대조해 둘 필요가 있다.",
+   "implication": "본사와 개별 유닛을 함께 대상으로 한 서면평가 결과가 공개되면서 같은 회사라도 사업장 단위로 결과를 구분해 볼 필요가 생긴다. Neuland Labs 원료를 사용하는 국내 품목은 실제 제조 사업장이 이번 보고서 범위에 포함되는지 대조해 둘 필요가 있다.",
    "checks": [
     "사용 중인 원료의 실제 제조 사업장과 보고서 범위 대조",
     "동일 회사 내 사업장별 실사 결과 구분 관리"

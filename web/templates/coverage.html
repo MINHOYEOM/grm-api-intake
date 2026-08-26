@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [존 재편 2026-08-26] 데이터 현황 — 트렌드 존 세 번째 면.
+
+    ══ 왜 별도 면인가 ═════════════════════════════════════════════════════════════
+    재편 전 트렌드 페이지의 12섹션 중 넷(연도별 공개량 · 소스 구성 · 연도별 구성비 ·
+    업체 랭킹 Top 30)은 "규제가 어떻게 변하나"가 아니라 **"우리가 무엇을 얼마나
+    모았나"**, 즉 수집 커버리지였다. 트렌드로 읽히는 자리에 있으니 매번 "이건 트렌드가
+    아닙니다"라는 주석을 달아야 했다 — 실제로 '연도별 공개량'은 제목에 이미 (참고)가
+    붙어 있었고, '업체 랭킹 Top 30'은 **자기 설명문에서 "품질이 나쁜 순서가 아닙니다"라고
+    스스로를 부인**하면서 30행을 싣고 있었다.
+
+    이 면은 그 넷을 모으고, 동시에 **다른 두 면에 흩어져 있던 커버리지 해설의 목적지**가
+    된다(재편 전 실측: 트렌드 한 페이지에 '읽는 법'·주석이 22개 2,589자 = 본문 글자의
+    32%). 각 차트에는 한 줄만 남기고 이 면으로 링크한다.
+
+    ★업체 순위는 이름부터 바로잡았다 — 'Top 30'은 등급처럼 읽히지만 실제로는 공개된
+    문서가 많은 순이다. '수집량 상위 업체'로 부르고 10행으로 줄인다(trends.js
+    FIRM_ROWS). 순위 자체를 지우지는 않는다 — 이 면의 주제가 바로 "우리 데이터가 어느
+    쪽으로 기울어 있나"이므로, 여기서는 그 기울기가 정보다.
+
+    ★이 면의 렌더러는 전부 007 findings_stats / 008 findings_category_matrix 로,
+    재편 전과 같은 RPC·같은 코드다. 옮긴 것은 자리뿐이고 수치 계산은 손대지 않았다. -#}
+<main>
+  <div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Data Coverage</span>
+    <h1 class="reveal" style="animation-delay:.08s">데이터 현황</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">트렌드 수치를 어디까지 믿어도 되는지 판단하는 데 필요한 것들입니다.</span> <span class="ln">무엇을 어느 기관에서 얼마나 모았고, 연도마다 확보량이 얼마나 다른지를 그대로 보여줍니다.</span></p>
+  </div>
+  <div class="wrap">
+    {% include "partials/trends_seg.html" %}
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-page="coverage" hidden></div>
+
+    <div class="tr-state" id="tr-loading" role="status" aria-live="polite">
+      <div class="tr-skel-row w1"></div>
+      <div class="tr-skel-row w2"></div>
+      <div class="tr-skel-row w3"></div>
+    </div>
+    <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
+
+    <div id="tr-content" hidden>
+      <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
+
+      {#- [읽기 전에] 다른 두 면에서 각 차트 밑에 반복되던 해설을 여기 한 번만 적는다.
+          이 세 문장은 데이터와 무관한 사실이라 정적 텍스트로 둔다(골든에 남아 리뷰
+          가능) — 숫자가 들어가는 줄만 trends.js 가 totals 로 채운다. -#}
+      <div class="imp" id="tr-coverage-note" hidden>
+        <span class="lab">읽기 전에</span>
+        <p>날짜는 <b>실사한 날이 아니라 자료가 공개된 날</b>입니다. 원문 문서가 실사일을 주지 않기 때문이며, 소스가 늘어도 이 한계는 바뀌지 않습니다.</p>
+        <p id="tr-coverage-text"></p>
+        <p>연도별 확보량이 10배 넘게 차이나므로, 연도 간 비교는 건수가 아니라 <b>구성비(%)</b>로만 하셔야 합니다. 건수 비교는 규제 활동이 아니라 저희 수집 이력을 비교하는 것이 됩니다.</p>
+      </div>
+
+      <section class="tr-block" aria-label="소스 구성">
+        <h2 class="tr-h">소스 구성</h2>
+        <p class="tr-read">지적사항이 어느 기관 문서에서 왔는지입니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 이 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.</p>
+        <div id="tr-source" class="tr-source"></div>
+      </section>
+
+      <section class="tr-block" aria-label="연도별 공개량">
+        <h2 class="tr-h">연도별 공개량</h2>
+        <p class="tr-read">그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 저희가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, <b>그 해에 지적이 많아졌다는 뜻이 아닙니다</b>.</p>
+        <div id="tr-year" class="tr-year"></div>
+        <p class="tr-note">연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 &mdash; 캐나다 실사는 2021년 이후만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.</p>
+      </section>
+
+      {#- FIND-1 H1 — findings_category_matrix() RPC(008) 전용 섹션. 008 미적용 라이브·
+          fetch 실패 시 trends.js 가 이 블록만 조용히 숨긴 채로 두고 나머지 섹션엔 손대지
+          않는다(골든 결정론).
+
+          [13차] 셀 값은 건수가 아니라 **그 해 안에서의 비율(%)** 이다. 연도별 확보량이
+          10배 넘게 차이나서 건수 히트맵은 사실상 "어느 해에 문서가 많이 공개됐는가"
+          지도였다. 표본이 너무 적은 연도는 trends.js 가 열 자체를 빼고 그 사실을
+          tr-heatmap-note 에 적는다(억지 해석 금지). -#}
+      <section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="연도별 구성비" hidden>
+        <h2 class="tr-h">연도별 구성비</h2>
+        <p class="tr-read">각 연도를 100%로 놓고, 그 해 지적이 어떤 영역에 몰렸는지를 봅니다. 연도마다 확보한 문서 양이 크게 달라 건수로는 비교가 안 되기 때문이에요 &mdash; 색이 진할수록 그 해에서 비중이 큰 영역입니다.</p>
+        <div id="tr-heatmap" class="tr-heatmap"></div>
+        <p class="tr-note" id="tr-heatmap-note" hidden></p>
+      </section>
+
+      <section class="tr-block" aria-label="수집량 상위 업체">
+        <h2 class="tr-h">수집량 상위 업체</h2>
+        <p class="tr-read"><b>품질이 나쁜 순서가 아닙니다.</b> 저희가 확보한 공개 문서가 많은 업체일수록 위에 옵니다 &mdash; 실사를 여러 번 받았거나 문서가 긴 업체가 올라오며, 문서 한 건에 지적이 여러 개 담기기 때문입니다. 특정 업체의 이력을 보시려면 순위가 아니라 <a href="{{ rel_root }}findings/firm/index.html">업체 조회</a>를 쓰세요.</p>
+        <div id="tr-firms" class="tr-firms"></div>
+        <div id="tr-firm-detail" class="tr-firm-detail" hidden></div>
+      </section>
+    </div>
+  </div>
+</main>
+{% include "partials/trends_style.html" %}
+{% endblock %}
+{% block scripts %}<script src="{{ rel_root }}assets/trends.js?v={{ trendsjs_ver }}" defer></script>{% endblock %}

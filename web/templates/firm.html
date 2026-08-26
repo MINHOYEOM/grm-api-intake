@@ -37,6 +37,29 @@
       <a class="fp-search-link" href="{{ rel_root }}findings/index.html">검색 페이지로 이동 →</a>
     </div>
 
+    {#- [존 재편 2026-08-26] 이름으로 찾는 랜딩 — ?key= 없이 들어왔을 때.
+
+        재편 전 이 페이지는 **정적 인바운드 링크가 0개**였다(홈에서 링크만 따라가는
+        도달성 감사 실측: findings/ 6,774 · 트렌드 3,517 · 자료실 3,518 인데 이
+        페이지는 0). 진입로가 문서 카드의 업체명 링크와 트렌드 페이지 일곱 번째
+        블록의 폼뿐이었고, 키가 없으면 "찾을 수 없습니다"만 띄우고 끝났다 —
+        **페이지가 스스로 진입로가 되지 못했다.**
+        이제 키가 없으면 검색 랜딩을 보여 준다. 그래서 nav·찾아보기·데이터 현황에서
+        이 URL 을 그냥 링크하면 그대로 쓸 만한 도구가 된다.
+
+        ★폼은 정적 셸에 그대로 둔다(JS 없이도 마크업은 온전). submit 은 firm.js 가
+        가로채 041 findings_firm_search 를 친다 — action 이 없으므로 041 미배포
+        라이브에서 눌러도 페이지 이동은 일어나지 않고 안내 문구만 남는다. -#}
+    <div class="fp-state tr-look" id="fp-lookup" hidden>
+      <p class="tr-look-hint">거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요. 영문 상호의 일부만 넣어도 찾아집니다(예: Lupin, Catalent). 이름 표기가 조금씩 다른 사업장은 따로 나옵니다.</p>
+      <form class="tr-look-form" id="fp-look-form" role="search">
+        <label class="sr-only" for="fp-look-input">업체명</label>
+        <input class="tr-look-input" id="fp-look-input" type="search" name="q" placeholder="예: Lupin" autocomplete="off" spellcheck="false" />
+        <button class="tr-look-btn" id="fp-look-btn" type="submit">찾기</button>
+      </form>
+      <div id="fp-look-res" class="tr-look-res" aria-live="polite"></div>
+    </div>
+
     <div id="fp-content" hidden>
       <div class="fp-head">
         <h2 class="fp-firm-name" id="fp-firm-name"></h2>
@@ -64,9 +87,29 @@
         <h2 class="fp-h">문서 이력</h2>
         <div id="fp-docs" class="fp-docs"></div>
       </section>
+
+      {#- [062] FDA GMP 실사 이력 — fda_inspection_firm(p_firm_key).
+
+          위 지적 이력과 **단위가 다르다**(지적 문장 vs 실사 건의 등급). 그래서 별도
+          섹션으로 두고 서로 나누지 않는다 — 실사 존을 세 면으로 가른 것과 같은 규율을
+          한 페이지 안에서는 섹션 경계로 지킨다.
+
+          ★"기록 없음"에는 반드시 범위를 함께 적는다(firm.js 가 RPC scope 에서 채움) —
+          이 표는 FY2020 이후 Drug Quality Assurance 실사만 담으므로, 범위 없는
+          "실사 기록 없음"은 거짓이 된다(부재 어휘 규율).
+          062 미적용 라이브·fetch 실패면 이 블록만 조용히 숨긴 채로 남는다(프로파일
+          본기능 무장애 — 워치리스트와 같은 격리). -#}
+      <section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>
+        <h2 class="fp-h">FDA GMP 실사 이력</h2>
+        <p class="fp-insp-read">위 지적 이력과는 <b>단위가 다릅니다</b> &mdash; 여기는 FDA 가 실사 한 건을 어떻게 판정했는지(NAI 적합 · VAI 경미 · OAI 중대)입니다. 사업장 표기는 FDA 공개 원문 그대로라 위 업체명과 다를 수 있습니다.</p>
+        <p class="fp-insp-sub" id="fp-insp-sub"></p>
+        <div id="fp-insp" class="fp-insp"></div>
+        <p class="fp-insp-note" id="fp-insp-note"></p>
+      </section>
     </div>
   </div>
 </main>
+{% include "partials/lookup_style.html" %}
 <style>
 /* 한국어 어절 줄바꿈(§1 P0, findings/trends 페이지와 동일 스코프). */
 main{word-break:keep-all;overflow-wrap:anywhere}
@@ -155,6 +198,25 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fp-stat-num{font-size:22px}
   .fp-doc-date{flex-basis:76px}
 }
+
+/* ── [062] FDA GMP 실사 이력 ─────────────────────────────────────────────────
+   등급은 색이 아니라 **글자 배지**로 구분한다(색맹 안전 + 인쇄 안전). OAI 만
+   코럴로 무게를 주고 NAI/VAI 는 저채도 — 이 목록에서 눈이 멈춰야 하는 곳은
+   중대 지적 하나다. */
+.fp-insp-read{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 6px;text-wrap:pretty}
+.fp-insp-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+.fp-insp{display:flex;flex-direction:column;gap:0}
+.fp-insp-row{display:flex;align-items:baseline;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.fp-insp-date{flex:0 0 92px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.fp-insp-grade{flex:0 0 auto;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--line-2);color:var(--muted)}
+.fp-insp-grade.oai{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
+.fp-insp-grade.vai{color:var(--coral-2);background:var(--coral-tint);border-color:var(--coral-tint)}
+.fp-insp-site{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s);line-height:1.5}
+.fp-insp-site .loc{color:var(--muted);font-size:12px}
+.fp-insp-cit{flex:0 0 auto;font-size:11.5px;color:var(--muted-2)}
+.fp-insp-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6;text-wrap:pretty}
+.fp-insp-note[hidden]{display:none}
+@media(max-width:640px){.fp-insp-cit{display:none}.fp-insp-date{flex-basis:78px}}
 </style>
 {% endblock %}
 {% block ai_disclosure %}

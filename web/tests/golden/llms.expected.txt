@@ -15,7 +15,10 @@
 ## 규제 지적사항 데이터
 - [지적사항 검색](https://grm-solutions.com/findings/): FDA 483 · Warning Letter · EU/영국 GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색
 - [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,145건 — 기관·연도별 색인
-- [트렌드](https://grm-solutions.com/findings/trends/): 지적 영역·기관·연도별 자동 집계
+- [지적 경향](https://grm-solutions.com/findings/trends/): 최근 12개월 지적 영역 순위 · 많이 인용된 조항
+- [FDA 실사 결과](https://grm-solutions.com/findings/inspections/): FDA GMP 실사 등급(NAI·VAI·OAI) 연도별·국가별 집계
+- [데이터 현황](https://grm-solutions.com/findings/coverage/): 소스 구성 · 연도별 확보량 · 수집 범위와 한계
+- [업체 조회](https://grm-solutions.com/findings/firm/): 업체명으로 그 업체의 지적 이력 조회
 - [자가점검 체크리스트](https://grm-solutions.com/findings/checklist/): 빈발 지적 기반 자가 점검 문항
 
 ## 참조 자료

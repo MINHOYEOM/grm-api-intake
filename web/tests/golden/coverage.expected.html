@@ -9,15 +9,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>규제 지적사항 트렌드 · GRM</title>
-<meta name="description" content="FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향." />
-<link rel="canonical" href="https://grm-solutions.com/findings/trends/" /><link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
+<title>데이터 현황 · GRM</title>
+<meta name="description" content="GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, 연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다." />
+<link rel="canonical" href="https://grm-solutions.com/findings/coverage/" /><link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="규제 지적사항 트렌드 · GRM" />
-<meta property="og:description" content="FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향." />
-<meta property="og:url" content="https://grm-solutions.com/findings/trends/" />
+<meta property="og:title" content="데이터 현황 · GRM" />
+<meta property="og:description" content="GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, 연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다." />
+<meta property="og:url" content="https://grm-solutions.com/findings/coverage/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -43,16 +43,17 @@
 
 <main>
   <div class="wrap page-head">
-    <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1><p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
+    <span class="kick reveal" style="animation-delay:.02s">Data Coverage</span>
+    <h1 class="reveal" style="animation-delay:.08s">데이터 현황</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">트렌드 수치를 어디까지 믿어도 되는지 판단하는 데 필요한 것들입니다.</span> <span class="ln">무엇을 어느 기관에서 얼마나 모았고, 연도마다 확보량이 얼마나 다른지를 그대로 보여줍니다.</span></p>
   </div>
   <div class="wrap">
 <nav class="tr-seg" aria-label="트렌드 면 전환">
-  <a href="../../findings/trends/index.html" class="on" aria-current="page">지적 경향</a>
+  <a href="../../findings/trends/index.html">지적 경향</a>
   <a href="../../findings/inspections/index.html">실사 결과</a>
-  <a href="../../findings/coverage/index.html">데이터 현황</a>
+  <a href="../../findings/coverage/index.html" class="on" aria-current="page">데이터 현황</a>
 </nav>
-<div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" data-page="trends" hidden></div>
+    <div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" data-page="coverage" hidden></div>
 
     <div class="tr-state" id="tr-loading" role="status" aria-live="polite">
       <div class="tr-skel-row w1"></div>
@@ -63,64 +64,35 @@
 
     <div id="tr-content" hidden>
       <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section><div class="imp" id="tr-coverage-note" hidden>
-        <span class="lab">먼저 알아두세요</span>
-        <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
+        <span class="lab">읽기 전에</span>
+        <p>날짜는 <b>실사한 날이 아니라 자료가 공개된 날</b>입니다. 원문 문서가 실사일을 주지 않기 때문이며, 소스가 늘어도 이 한계는 바뀌지 않습니다.</p>
         <p id="tr-coverage-text"></p>
-        <p class="tr-more">소스별로 어디까지 거슬러 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="../../findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
-      </div><section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
-        <h2 class="tr-h">최근 12개월</h2>
-        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요.</p>
-        <p class="tr-recent-sub" id="tr-recent-sub"></p>
-        <div id="tr-recent-months" class="tr-recent-months"></div>
-        <p class="tr-note" id="tr-recent-note"></p>
-      </section><section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
-        <h2 class="tr-h">가장 많이 지적된 영역</h2>
-        <div class="tr-rank-tabs" id="tr-rank-tabs" role="tablist" aria-label="순위 기간 선택">
-          <button class="tr-rank-tab" id="tr-rank-tab-recent" type="button" role="tab" aria-selected="true" aria-controls="tr-recent-cats" hidden>최근 12개월</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-all" type="button" role="tab" aria-selected="false" aria-controls="tr-cat" hidden>전체 기간</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-zone" type="button" role="tab" aria-selected="false" aria-controls="tr-zone-block" hidden>해외 vs 미국</button>
-        </div>
-        <p class="tr-read tr-rank-read" id="tr-rank-read"></p><div class="tr-pane tr-recent-cats" id="tr-recent-cats" role="tabpanel" aria-labelledby="tr-rank-tab-recent" hidden></div><div class="tr-pane tr-cat" id="tr-cat" role="tabpanel" aria-labelledby="tr-rank-tab-all" hidden></div><div class="tr-pane tr-zone-block" id="tr-zone-block" role="tabpanel" aria-labelledby="tr-rank-tab-zone" hidden>
-          <p class="tr-zone-sub" id="tr-zone-sub"></p>
-          <div id="tr-zone" class="tr-zone"></div>
-          <p class="tr-note" id="tr-zone-countries"></p>
-          <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
-        </div>
-      </section><section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
-        <details class="tr-fold" id="tr-move-fold">
-          <summary>
-            <span class="tr-fold-t">달라진 점</span>
-            <span class="tr-fold-c" id="tr-move-summary">최근 12개월과 직전 12개월의 비중 차이</span>
-            <span class="tr-fold-caret" aria-hidden="true">&#9660;</span>
-          </summary>
-          <div class="tr-fold-body">
-            <p class="tr-read">각 영역이 전체에서 차지하는 <b>비중</b>이 두 기간 사이에 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.</p>
-            <div class="tr-move-cols">
-              <div>
-                <h3 class="tr-sub-h">비중이 커진 영역</h3>
-                <div id="tr-move-up" class="tr-move-list"></div>
-              </div>
-              <div>
-                <h3 class="tr-sub-h">비중이 줄어든 영역</h3>
-                <div id="tr-move-down" class="tr-move-list"></div>
-              </div>
-            </div>
-            <p class="tr-note" id="tr-move-source"></p>
-            <p class="tr-note" id="tr-move-note"></p>
-          </div>
-        </details>
-      </section><section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
-        <h2 class="tr-h">많이 인용된 조항</h2>
-        <p class="tr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
-        <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
-        <div id="tr-cfr" class="tr-cfr"></div><div class="tr-cta">
-          <span class="tr-cta-b">
-            <span class="tr-cta-t">자가점검 체크리스트 만들기</span>
-            <span class="tr-cta-d">위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.</span>
-          </span>
-          <a class="tr-cta-go" href="../../findings/checklist/index.html">체크리스트 만들기 &rarr;</a>
-        </div>
-        <p class="tr-note" id="tr-cfr-note"></p>
+        <p>연도별 확보량이 10배 넘게 차이나므로, 연도 간 비교는 건수가 아니라 <b>구성비(%)</b>로만 하셔야 합니다. 건수 비교는 규제 활동이 아니라 저희 수집 이력을 비교하는 것이 됩니다.</p>
+      </div>
+
+      <section class="tr-block" aria-label="소스 구성">
+        <h2 class="tr-h">소스 구성</h2>
+        <p class="tr-read">지적사항이 어느 기관 문서에서 왔는지입니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 이 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.</p>
+        <div id="tr-source" class="tr-source"></div>
+      </section>
+
+      <section class="tr-block" aria-label="연도별 공개량">
+        <h2 class="tr-h">연도별 공개량</h2>
+        <p class="tr-read">그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 저희가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, <b>그 해에 지적이 많아졌다는 뜻이 아닙니다</b>.</p>
+        <div id="tr-year" class="tr-year"></div>
+        <p class="tr-note">연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 &mdash; 캐나다 실사는 2021년 이후만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.</p>
+      </section><section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="연도별 구성비" hidden>
+        <h2 class="tr-h">연도별 구성비</h2>
+        <p class="tr-read">각 연도를 100%로 놓고, 그 해 지적이 어떤 영역에 몰렸는지를 봅니다. 연도마다 확보한 문서 양이 크게 달라 건수로는 비교가 안 되기 때문이에요 &mdash; 색이 진할수록 그 해에서 비중이 큰 영역입니다.</p>
+        <div id="tr-heatmap" class="tr-heatmap"></div>
+        <p class="tr-note" id="tr-heatmap-note" hidden></p>
+      </section>
+
+      <section class="tr-block" aria-label="수집량 상위 업체">
+        <h2 class="tr-h">수집량 상위 업체</h2>
+        <p class="tr-read"><b>품질이 나쁜 순서가 아닙니다.</b> 저희가 확보한 공개 문서가 많은 업체일수록 위에 옵니다 &mdash; 실사를 여러 번 받았거나 문서가 긴 업체가 올라오며, 문서 한 건에 지적이 여러 개 담기기 때문입니다. 특정 업체의 이력을 보시려면 순위가 아니라 <a href="../../findings/firm/index.html">업체 조회</a>를 쓰세요.</p>
+        <div id="tr-firms" class="tr-firms"></div>
+        <div id="tr-firm-detail" class="tr-firm-detail" hidden></div>
       </section>
     </div>
   </div>

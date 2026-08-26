@@ -1,50 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
-{#- FIND-1 F3b — 규제 지적사항 트렌드 대시보드(라이브 집계, Supabase RPC
-    findings_stats/findings_firm_stats 직접 fetch). findings/index.html 과 동일한 이유로
-    빌드시 수치를 고정할 수 없다 → 서버는 셸(로딩 스켈레톤)만 렌더하고, trends.js 가 fetch
-    성공 시 결과를 채운다. env(SUPABASE_URL/ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열
-    → JS 가 "준비 중" 안내로 조용히 종료(오류 아님, 골든 결정론 — env 값과 무관하게 이
-    템플릿 출력 byte 는 항상 동일). 집계 RPC 는 공개 게이트(006)를 우회해 전량 통계를
-    반환하지만 원문 텍스트는 어떤 경로로도 내려주지 않는다(007_findings_stats_rpc.sql
-    안전 계약 — 집계 RPC 가 다루는 값은 카운트·서지 메타뿐).
+{#- FIND-1 F3b — 규제 지적사항 트렌드(라이브 집계, Supabase RPC 직접 fetch).
+    findings/index.html 과 동일한 이유로 빌드시 수치를 고정할 수 없다 → 서버는 셸(로딩
+    스켈레톤)만 렌더하고, trends.js 가 fetch 성공 시 결과를 채운다. env(SUPABASE_URL/
+    ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열 → JS 가 "준비 중" 안내로 조용히
+    종료한다(오류 아님, 골든 결정론 — env 값과 무관하게 이 템플릿 출력 byte 는 항상 동일).
 
-    [트렌드 고도화 2026-07] 집계만으로는 "그래서 무엇을 보라는 것인가"에 답하지 못해
-    세 가지를 더한다:
-      ① 최근 12개월 창(041_findings_recent_window) — 누적 분모의 47%가 2024년 한 해
-         공개분이라, 전 기간 순위는 사실상 그 배치의 그림자였다.
-      ② 달라진 점 — 최근 12개월 vs 직전 12개월의 구성비 차이(같은 041 응답에서
-         파생, 추가 fetch 0).
-      ③ 업체 찾기(041_findings_firm_search) + 카테고리별 실제 지적 사례.
-    ★③의 사례 문장만은 집계 RPC 가 아니라 026 findings_search(security invoker + RLS)로
-      가져온다 — /findings/ 검색 페이지가 이미 쓰는 공개 경로 그대로이며, 공개 게이트
-      (010 정책)를 통과한 행만 나온다. 집계층의 "원문 무반환" 계약과 서로 다른 층이다.
+    ══ [존 재편 2026-08-26] 한 페이지 12섹션 → 세 면 ═══════════════════════════════
+    이 페이지는 섹션 12개·데스크톱 10.9화면(9,770px)·모바일 15.9화면까지 자라 있었고,
+    본문 글자의 32%(2,589자)가 차트를 오독하지 말라는 주석이었다. 원인은 분량이 아니라
+    **한 페이지가 분모가 다른 세 질문에 동시에 답하고 있었다는 것**이다 —
+      · 실사 6,417건(실사 단위)
+      · 최근 12개월 지적 4,557건(12개월 창)
+      · 누적 지적 24,884건(전 기간)
+    서로 나누면 안 되는 수치가 한 스크롤에 이어져 있으니 섹션마다 경고문이 붙었고, 그
+    경고문이 다시 페이지를 늘렸다. 주석 32%는 증상이지 원인이 아니었다.
 
-    [13차 정직화] 이 페이지의 날짜(published_date)는 **실사 발생일이 아니라 FDA 공개일**이고,
-    외부 백필이 진행 중이라 연도별 보유량 자체가 편향돼 있다(2024년에 대량 공개 배치가 몰려
-    있다). 그래서 연도 간 비교는 절대 건수가 아니라 **구성비(%)** 를 기본 축으로 삼고, 각
-    차트에 "읽는 법"(.tr-read)을 한두 문장 붙인다. 데이터가 결론을 지지하지 못하는 차트는
-    렌더하지 않는다 — 옛 "증거 등급 구성" 섹션(실데이터가 A 등급 99% 이상인 단일값 분포)은
-    이 원칙으로 제거했다. 분포로서 정보가 0인 데다, 등급 체계 자체가 내부 QA 개념이라
-    노출 대상이 아니다(트랙C 품질 기준). 함께 있던 2열 그리드 .tr-bottom 도 사라졌다.
+    그래서 분모를 **페이지 단위로** 갈랐다(면 전환은 partials/trends_seg.html):
+      · 이 파일 /findings/trends/      — 지적 경향   "지금 무엇이 지적되나"
+      · inspections.html               — 실사 결과   "실사는 어떻게 끝나고 있나"
+      · coverage.html                  — 데이터 현황 "이 숫자를 어디까지 믿나"
+
+    이 면에서 나간 것: FDA 실사 등급(→실사 결과) · 연도별 구성비/연도별 공개량/
+    수집량 상위 업체/소스 구성(→데이터 현황) · 업체 찾기(→/findings/firm/ 랜딩).
+    이 면에서 합친 것: '카테고리 순위(누적)'와 '해외 vs 미국'을 최근 12개월 순위와
+    **같은 자리의 보기 전환**으로 흡수했다 — 분모가 다른 두 표가 한 화면에 나란히
+    보이지 않으면 그 오독은 애초에 생기지 않는다(해설로 막던 것을 구조로 막는다).
+
+    ★trends.js 는 세 면이 공유하는 단일 스크립트다. 각 렌더러는 자기 엘리먼트가 이
+      면에 없으면 조용히 no-op 하고, fetch 도 그 면이 그릴 수 있는 것만 호출한다
+      (cfg data-page). 그래서 이 파일에서 섹션을 빼도 스크립트는 손대지 않아도 된다.
+
+    [13차 정직화] 이 페이지의 날짜(published_date)는 **실사 발생일이 아니라 공개일**이고
+    외부 백필이 진행 중이다. 그래서 연도 간 비교는 절대 건수가 아니라 **구성비(%)** 를
+    기본 축으로 삼고, 데이터가 결론을 지지하지 못하는 차트는 렌더하지 않는다.
     ※ 이 근거는 jinja 주석이라 렌더 출력에 실리지 않는다 — 스코프 <style> 안의 CSS 주석은
       사용자에게 그대로 전달되므로 제거된 UI 이야기를 거기 남기지 않는다. -#}
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
-    {#- [줄맞춤] 히어로 설명은 문장 2개다. text-wrap:balance 에 맡기면 두 줄 길이를 맞추려고
-        첫 문장 한가운데("…확인된 지적사항을 / 매일 자동으로 모아…")를 끊어, 목적어와 서술어가
-        서로 다른 줄로 갈라졌다. 문장마다 span 을 씌워 블록으로 흘리면 줄바꿈 지점이 **문장
-        경계**로 고정된다 — 좁은 뷰포트에서는 각 span 이 자기 안에서 다시 접히므로 반응형도
+    {#- [줄맞춤] 문장마다 span 을 씌워 블록으로 흘리면 줄바꿈 지점이 **문장 경계**로
+        고정된다 — 좁은 뷰포트에서는 각 span 이 자기 안에서 다시 접히므로 반응형도
         그대로다(고정 <br> 이 아니다). -#}
     <p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
   </div>
   <div class="wrap">
+    {% include "partials/trends_seg.html" %}
     {#- data-root 는 카테고리 순위 바 클릭 시 이동할 검색 페이지(findings/index.html) 상대
-        경로 계산용(reactions.js 의 data-root 관례와 동형) — findings.js 의 cfg 계약(url/key)
-        은 그대로 유지하고 속성만 추가한다. -#}
-    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
+        경로 계산용(reactions.js 의 data-root 관례와 동형). data-page 는 [존 재편]이 더한
+        속성으로, 세 면이 공유하는 trends.js 가 **이 면이 그릴 수 있는 것만 fetch** 하도록
+        분기하는 데 쓴다(엘리먼트 유무만으로 판정하면 로딩 해제 시점을 정할 수 없다). -#}
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-page="trends" hidden></div>
 
     <div class="tr-state" id="tr-loading" role="status" aria-live="polite">
       <div class="tr-skel-row w1"></div>
@@ -56,109 +63,122 @@
     <div id="tr-content" hidden>
       <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
 
-      {#- [먼저 알아두세요] 이 페이지를 오독하게 만드는 두 가지(① 날짜=공개일 ② 백필 진행
-          중)를 본문 위에서 먼저 밝힌다. 첫 줄(날짜 의미)은 데이터와 무관한 사실이라 정적
-          텍스트로 두고(골든에 남아 리뷰 가능), 둘째 줄만 trends.js 가 이미 보유한
-          fetchStats() 응답(totals)으로 채운다(추가 네트워크 호출 0). 기존 .imp(시사점
-          노트) 토큰 재사용 — 신규 CSS 0. -#}
+      {#- [먼저 알아두세요] 이 페이지를 오독하게 만드는 것(날짜=공개일)을 본문 위에서 먼저
+          밝힌다. 첫 줄은 데이터와 무관한 사실이라 정적 텍스트로 두고(골든에 남아 리뷰
+          가능), 둘째 줄만 trends.js 가 이미 보유한 fetchStats() 응답(totals)으로 채운다
+          (추가 네트워크 호출 0). [존 재편] 세 번째 줄로 '데이터 현황' 면 링크를 둔다 —
+          섹션마다 반복하던 커버리지 해설의 목적지다. -#}
       <div class="imp" id="tr-coverage-note" hidden>
         <span class="lab">먼저 알아두세요</span>
         <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
         <p id="tr-coverage-text"></p>
+        <p class="tr-more">소스별로 어디까지 거슬러 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
       </div>
 
       {#- ────────────────────────────────────────────────────────────────────
-          [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats()
-          전용 신규 섹션(임무3, 파라미터 없음) — findings_stats 등 findings 계열 RPC와는
-          완전히 독립된 별도 소스다. findings 는 문서에서 뽑은 "지적사항"(문장) 단위고,
-          이 RPC 는 FDA Data Dashboard API 에서 받은 "실사 건"(등급 하나) 단위라 서로
-          다른 잣대다 — 그래서 이 섹션은 findings 수치를 나누는 분모로 계산해 쓰지 않고,
-          "FDA 의약품 GMP 실사라는 모집단 자체가 얼마나 크고 그중 중대(OAI) 비중이
-          얼마인가"를 보여주는 별도 맥락 섹션이다(임무서: "그게 많은지 적은지 말할
-          기준이 없었다"에 대한 답).
+          [최근 12개월] 041_findings_recent_window.sql 전용 섹션.
 
-          ★범위 고지 필수(054 "축을 바꾸지 말고 밝혀라") — 이 표는 ProjectArea=
-          'Drug Quality Assurance'(GMP 제조소 실사) 단일 모집단만 담는다. 같은 FDA
-          "Drugs" 안에 있는 Bioresearch Monitoring(임상시험 감시) 등은 058 마이그레이션
-          헤더가 실측한 대로 성격이 달라 합치면 OAI 비율이 14.9%→8.6%로 무의미해져서
-          애초에 표에 적재하지 않는다 — 그 사실을 trends.js 가 RPC 응답의 scope(하드코딩
-          아님)를 그대로 읽어 #tr-fda-scope 에 적는다.
+          ★왜 이 섹션이 페이지 맨 앞인가: 누적 분모는 2016년부터의 전량인데 특정 연도의
+          대량 공개 배치에 크게 치우쳐 있다. 그래서 "카테고리 순위"는 사실상 그 배치의
+          그림자였고, 정작 "지금 무엇이 지적되는가"는 페이지 어디에서도 답하지 않았다.
+          최근 12개월 창을 앞에 두어 그 질문을 먼저 답한다.
 
-          ★기준일 고지(059_fda_inspection_stats_freshness.sql) — #tr-fda-asof 는 059 가
-          scope 에 더한 신선도 2키(last_ingested_date_kst / latest_inspection_end_date)를
-          적는 자리다. 두 날짜는 뜻이 다르므로(우리가 받아온 날 vs FDA 실사가 끝난 날)
-          trends.js 가 라벨을 각각 붙여 적고, 값이 없으면(059 미적용 라이브·구버전 캐시)
-          그 항목만 빠진다 — 오늘 날짜·빌드 시각으로 지어내지 않는다.
-
-          058/059 미적용 라이브·fetch 실패·0건이면 trends.js 가 이 블록만 조용히 숨긴 채로
-          두고 나머지 섹션엔 손대지 않는다(zone/heatmap 과 동일 원칙, 골든 결정론 —
-          RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는 항상 동일). -#}
-      <section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="FDA 의약품 GMP 실사 등급" hidden>
-        <h2 class="tr-h">FDA 의약품 GMP 실사 등급</h2>
-        <p class="tr-read">FDA가 의약품 제조소를 직접 실사하고 매긴 등급입니다. <b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다. 위 지적사항 집계와는 단위가 달라 — 실사 한 건에서 지적이 여러 개 나올 수 있어 — 두 수치를 서로 나누지 마세요.</p>
-        <p class="tr-fda-scope" id="tr-fda-scope"></p>
-        <p class="tr-fda-asof" id="tr-fda-asof"></p>
-        <div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>
-        <h3 class="tr-sub-h">연도별 등급 구성</h3>
-        <div id="tr-fda-year" class="tr-fda-year"></div>
-        <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
-        <h3 class="tr-sub-h">국가별 등급 구성</h3>
-        <p class="tr-read">건수가 많은 국가 순입니다. 한국은 목록 밖이어도 따로 표시합니다.</p>
-        <div id="tr-fda-country" class="tr-fda-country"></div>
-        <p class="tr-note" id="tr-fda-note"></p>
-      </section>
-
-      {#- ────────────────────────────────────────────────────────────────────
-          [최근 12개월] 041_findings_recent_window.sql 전용 섹션(findings_stats/
-          findings_category_matrix/findings_zone_category 와 별개 엔드포인트).
-
-          ★왜 이 섹션이 페이지 맨 앞인가: 아래 누적 섹션들의 분모는 2016년부터의 전량인데
-          그 47%가 2024년 한 해에 몰려 있다(FOIA 대량 공개 배치). 그래서 "카테고리 순위"는
-          사실상 그 배치의 그림자였고, 정작 "지금 무엇이 지적되는가"는 페이지 어디에서도
-          답하지 않았다. 최근 12개월 창을 앞에 두어 그 질문을 먼저 답한다.
+          [존 재편] 이 블록은 이제 **월별 막대까지만** 담는다 — 카테고리 순위는 아래
+          통합 섹션(tr-rank-block)의 첫 번째 보기로 옮겼다.
 
           041 미적용 라이브·fetch 실패 시 trends.js 가 이 블록만 조용히 숨긴 채로 두고
-          나머지 섹션엔 손대지 않는다(히트맵·zone 과 동일 원칙, 골든 결정론 — env/RPC
-          존재 여부와 무관하게 이 마크업 자체의 byte 는 항상 동일). -#}
+          나머지 섹션엔 손대지 않는다(골든 결정론 — env/RPC 존재 여부와 무관하게 이
+          마크업 자체의 byte 는 항상 동일). -#}
       <section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
         <h2 class="tr-h">최근 12개월</h2>
-        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요 — 아래 순위와 &lsquo;달라진 점&rsquo;은 이 두 구간을 견준 결과입니다.</p>
+        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요.</p>
         <p class="tr-recent-sub" id="tr-recent-sub"></p>
         <div id="tr-recent-months" class="tr-recent-months"></div>
         <p class="tr-note" id="tr-recent-note"></p>
-        <h3 class="tr-sub-h" id="tr-recent-cats-h" hidden>최근 12개월에 가장 많이 지적된 영역</h3>
-        <p class="tr-read" id="tr-recent-cats-read" hidden>오른쪽 %는 최근 12개월 지적사항 중 그 영역이 차지하는 비율입니다(아래 &lsquo;전체 기간 누적&rsquo;의 순위와 같은 잣대라 나란히 비교할 수 있어요). <b>줄을 누르면 실제 지적 문장을 볼 수 있습니다.</b></p>
-        <div id="tr-recent-cats" class="tr-recent-cats"></div>
+      </section>
+
+      {#- ────────────────────────────────────────────────────────────────────
+          [가장 많이 지적된 영역] — 존 재편 2026-08-26 신설 통합 섹션.
+
+          재편 전에는 같은 축(카테고리별 지적 순위)을 재는 표가 이 페이지에 **셋**
+          있었고, 서로 멀리 떨어진 별개 섹션이었다:
+            · 최근 12개월 순위      (분모 = 최근 12개월 창)
+            · 카테고리 순위          (분모 = 전 기간 누적)
+            · 해외 vs 미국 내 실사   (분모 = FDA 483 의 zone 별 합)
+          분모가 다른 표 셋이 한 스크롤에 이어져 있으니 "왜 숫자가 다르냐"는 오독이
+          구조적으로 생겼고, 그걸 막으려고 두 섹션 사이에 구분선 + 해설 문단(.tr-divider)
+          까지 두고 있었다. **같은 자리에서 보기를 바꾸면 두 수치가 나란히 보이지 않으므로
+          오독 자체가 사라진다** — 그래서 셋을 탭 하나로 합치고 구분선은 삭제했다.
+
+          ★세 pane 은 기존 렌더러의 컨테이너를 **그대로** 옮겨 온 것이다(tr-recent-cats /
+          tr-cat / tr-zone-block). 렌더러를 다시 쓰지 않았다 — 데이터 모델을 합치는
+          리팩터는 세 RPC 의 분모를 하나로 뭉개려는 유혹을 낳는데, 그건 정확히 이 재편이
+          없애려는 오독이다. 보기 전환은 표시 계층에서만 한다.
+          ★탭은 데이터가 실제로 도착한 보기만 노출한다(trends.js applyRankView) —
+          041/038 미배포 라이브에서 빈 탭이 남지 않는다. -#}
+      <section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
+        <h2 class="tr-h">가장 많이 지적된 영역</h2>
+        <div class="tr-rank-tabs" id="tr-rank-tabs" role="tablist" aria-label="순위 기간 선택">
+          <button class="tr-rank-tab" id="tr-rank-tab-recent" type="button" role="tab" aria-selected="true" aria-controls="tr-recent-cats" hidden>최근 12개월</button>
+          <button class="tr-rank-tab" id="tr-rank-tab-all" type="button" role="tab" aria-selected="false" aria-controls="tr-cat" hidden>전체 기간</button>
+          <button class="tr-rank-tab" id="tr-rank-tab-zone" type="button" role="tab" aria-selected="false" aria-controls="tr-zone-block" hidden>해외 vs 미국</button>
+        </div>
+        <p class="tr-read tr-rank-read" id="tr-rank-read"></p>
+
+        {#- pane ①: 최근 12개월(041). 행을 누르면 실제 지적 문장이 아래로 펼쳐진다
+            (026 findings_search — 집계 RPC 가 아니라 공개 게이트를 통과한 행). -#}
+        <div class="tr-pane tr-recent-cats" id="tr-recent-cats" role="tabpanel" aria-labelledby="tr-rank-tab-recent" hidden></div>
+
+        {#- pane ②: 전 기간 누적(007 findings_stats.by_agency_category). -#}
+        <div class="tr-pane tr-cat" id="tr-cat" role="tabpanel" aria-labelledby="tr-rank-tab-all" hidden></div>
+
+        {#- pane ③: 해외 vs 미국(038 findings_zone_category, FDA 483 한정 — site_country 가
+            실제로 채워지는 소스가 483 뿐이다). 부제·국가 구성은 RPC 응답에서 채운다
+            (하드코딩 금지). 038 미배포·빈 응답이면 이 pane 과 탭이 함께 숨은 채로 남는다. -#}
+        <div class="tr-pane tr-zone-block" id="tr-zone-block" role="tabpanel" aria-labelledby="tr-rank-tab-zone" hidden>
+          <p class="tr-zone-sub" id="tr-zone-sub"></p>
+          <div id="tr-zone" class="tr-zone"></div>
+          <p class="tr-note" id="tr-zone-countries"></p>
+          <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
+        </div>
       </section>
 
       {#- [달라진 점] 같은 041 응답(by_category 의 cur/prev)에서 파생 — 추가 fetch 0.
-          이 페이지가 "트렌드"라는 이름값을 하는 유일한 섹션이다: 최근 12개월과 직전
-          12개월의 **구성비**(그 창 지적 전체 중 이 영역의 비율) 차이(%p)를 잰다.
+          최근 12개월과 직전 12개월의 **구성비** 차이(%p)를 잰다.
           · 처음엔 "문서 등장률"로 만들었다가 되돌렸다 — 합이 100%로 닫히지 않아 창마다
-            문서당 지적 수가 달라지면 전 영역이 한 방향으로 쏠렸다. 이력은 trends.js
-            renderMovers 위 주석 (1).
+            문서당 지적 수가 달라지면 전 영역이 한 방향으로 쏠렸다.
           · 최대 교란 요인인 **소스 구성 변화**는 적기만 하지 않고 **계산에서 정렬한다**
-            (052, 2026-08-06). 각주는 수동적인데 표제는 단정적이라 독자가 표를 먼저 믿는다 —
-            실제로 국내 백필 뒤 표시 8행 중 5행이 유령이었고 그중 3행은 부호까지 반대였다.
-            052 by_category_source 로 두 창에서 견줄 수 있는 소스만 남겨 분자·분모를 함께
-            좁히고, **뺀 소스는 이름·건수·사유를 아래 tr-move-source 에 적는다**
-            (trends.js alignSourceMix). 판단은 읽는 사람 몫이되, 견줄 수 없는 것을
-            견준 표를 먼저 보여 주지는 않는다(트랙C 품질 기준). -#}
+            (052). 052 by_category_source 로 두 창에서 견줄 수 있는 소스만 남기고, 뺀
+            소스는 이름·건수·사유를 tr-move-source 에 적는다(alignSourceMix).
+
+          [존 재편] **기본 접힘**으로 바꿨다. 라이브 실측에서 이 섹션이 산출하는 행은
+          증가 1행·감소 0행이다(비교 가능한 소스만 남기느라 세 소스를 제외한 결과).
+          정직한 설계지만 한 화면을 상시 차지할 근거는 없다 — 삭제하지 않고 접어 두어,
+          변화가 실제로 생기면 그때 펼쳐 보게 한다. summary 의 요약 수치는 trends.js 가
+          채우므로 열기 전에 내용의 유무를 알 수 있다. -#}
       <section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
-        <h2 class="tr-h">달라진 점</h2>
-        <p class="tr-read">최근 12개월과 그 직전 12개월을 견줘, 각 영역이 전체에서 차지하는 <b>비중</b>이 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.</p>
-        <div class="tr-move-cols">
-          <div>
-            <h3 class="tr-sub-h">비중이 커진 영역</h3>
-            <div id="tr-move-up" class="tr-move-list"></div>
+        <details class="tr-fold" id="tr-move-fold">
+          <summary>
+            <span class="tr-fold-t">달라진 점</span>
+            <span class="tr-fold-c" id="tr-move-summary">최근 12개월과 직전 12개월의 비중 차이</span>
+            <span class="tr-fold-caret" aria-hidden="true">&#9660;</span>
+          </summary>
+          <div class="tr-fold-body">
+            <p class="tr-read">각 영역이 전체에서 차지하는 <b>비중</b>이 두 기간 사이에 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.</p>
+            <div class="tr-move-cols">
+              <div>
+                <h3 class="tr-sub-h">비중이 커진 영역</h3>
+                <div id="tr-move-up" class="tr-move-list"></div>
+              </div>
+              <div>
+                <h3 class="tr-sub-h">비중이 줄어든 영역</h3>
+                <div id="tr-move-down" class="tr-move-list"></div>
+              </div>
+            </div>
+            <p class="tr-note" id="tr-move-source"></p>
+            <p class="tr-note" id="tr-move-note"></p>
           </div>
-          <div>
-            <h3 class="tr-sub-h">비중이 줄어든 영역</h3>
-            <div id="tr-move-down" class="tr-move-list"></div>
-          </div>
-        </div>
-        <p class="tr-note" id="tr-move-source"></p>
-        <p class="tr-note" id="tr-move-note"></p>
+        </details>
       </section>
 
       {#- [인용 조항] 042_findings_cfr_ranking.sql 전용 섹션.
@@ -166,7 +186,6 @@
           ★왜 이 섹션이 필요한가: 카테고리("무균보증/무균공정")는 우리가 붙인 분류라
           그 자체로는 자가점검 항목이 되지 못한다. 규제기관이 실제로 인용한 **조항**은
           사내 SOP 와 1:1로 붙는 단위라, "무엇을 확인해야 하는가"에 가장 가깝다.
-          그래서 각 행이 조문(eCFR) 원문과 실제 지적 문장 양쪽으로 이어진다.
 
           보일러플레이트 제외 근거·범위 한계(사실상 Warning Letter 전용)는 전부 042
           응답(scope)에서 채운다 — 하드코딩 금지. 042 미적용 라이브·fetch 실패 시
@@ -176,428 +195,22 @@
         <p class="tr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
         <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
         <div id="tr-cfr" class="tr-cfr"></div>
-        {#- 이 순위를 받아 쓰는 산출물로 넘어가는 유일한 진입로(체크리스트는 nav 에 없다). -#}
-        <p class="tr-cfr-cta"><a href="{{ rel_root }}findings/checklist/index.html">이 조항들로 자가점검 체크리스트 만들기 &rarr;</a></p>
+        {#- [존 재편] 이 순위를 받아 쓰는 산출물로 넘어가는 진입로. 재편 전에는 이것이
+            체크리스트로 가는 **유일한** 링크였고(nav·footer 어디에도 없었다) 텍스트 한
+            줄이라 사실상 보이지 않았다. 카드로 키우고, 동시에 footer 둘러보기와
+            /findings/ 도구 카드에도 링크를 두어 진입로를 셋으로 늘렸다. -#}
+        <div class="tr-cta">
+          <span class="tr-cta-b">
+            <span class="tr-cta-t">자가점검 체크리스트 만들기</span>
+            <span class="tr-cta-d">위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.</span>
+          </span>
+          <a class="tr-cta-go" href="{{ rel_root }}findings/checklist/index.html">체크리스트 만들기 &rarr;</a>
+        </div>
         <p class="tr-note" id="tr-cfr-note"></p>
-      </section>
-
-      {#- [업체 찾기] 041 findings_firm_search 전용. 바로 아래 "업체 랭킹 Top 30" 은
-          공개 문서가 많은 순이라 사실상 미국 대형 컴파운딩 약국 목록이고, 실무 질문
-          ("우리 CMO·공급업체가 지적받은 이력이 있나")에는 답하지 못한다. 이름으로 찾는
-          경로를 열어, 이미 존재하지만 Top 30 을 거치지 않으면 도달할 수 없던 업체
-          프로파일 페이지(/findings/firm/?key=)로 곧장 보낸다.
-          form 은 정적 셸에 그대로 두되(자바스크립트 없이도 마크업은 온전) submit 은
-          trends.js 가 가로채 RPC 를 호출한다 — action 이 없으므로 041 미적용 라이브에서
-          눌러도 페이지 이동은 일어나지 않고 안내 문구만 남는다. -#}
-      <section class="tr-block" aria-label="업체 찾기">
-        <h2 class="tr-h">업체 찾기</h2>
-        <p class="tr-read">거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요. 영문 상호 일부만 넣어도 찾아집니다(예: Lupin, Catalent). 이름 표기가 조금씩 다른 사업장은 따로 나옵니다.</p>
-        <form class="tr-ff-form" id="tr-ff-form" role="search">
-          <label class="tr-ff-label" for="tr-ff-input">업체명</label>
-          <input class="tr-ff-input" id="tr-ff-input" type="search" name="firmq" placeholder="예: Lupin" autocomplete="off" spellcheck="false" />
-          <button class="tr-ff-btn" id="tr-ff-btn" type="submit">찾기</button>
-        </form>
-        <div id="tr-ff-result" class="tr-ff-result" aria-live="polite"></div>
-      </section>
-
-      {#- 여기서부터는 전 기간 누적 집계다(findings_stats/findings_category_matrix).
-          위 최근 12개월 섹션과 분모가 다르다는 사실을 화면에서 한 번 끊어 알린다 —
-          같은 페이지의 두 수치가 어긋나 보이는 오독의 대부분이 여기서 생긴다. -#}
-      <div class="tr-divider">
-        <h2>전체 기간 누적</h2>
-        <p>아래 수치는 2016년 이후 모아 둔 전량이 분모입니다. 연도마다 확보한 문서 양이 크게 달라 위 &lsquo;최근 12개월&rsquo;과는 다른 그림이 나오는 것이 정상입니다 &mdash; 연도별 확보량은 아래 &lsquo;연도별 공개량(참고)&rsquo;에서 바로 확인할 수 있습니다.</p>
-      </div>
-
-      <section class="tr-block" aria-label="카테고리 순위">
-        <h2 class="tr-h">카테고리 순위</h2>
-        <p class="tr-read">전체 기간을 합친 순위입니다. 오른쪽 %는 전체 지적사항 중 그 영역이 차지하는 비율이에요. 특정 해에 몰려서 생긴 순위인지는 바로 아래 &lsquo;연도별 구성비&rsquo;에서 확인할 수 있습니다.</p>
-        <div id="tr-cat" class="tr-cat"></div>
-      </section>
-
-      {#- FIND-1 H1 — findings_category_matrix() RPC(008, findings_stats 와 별개
-          엔드포인트) 전용 섹션. 정적 셸에서는 hidden — 008 미적용 라이브·fetch 실패
-          시 trends.js 가 이 블록만 조용히 숨긴 채로 두고 나머지 섹션엔 손대지 않는다
-          (골든 결정론 — env/RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는 항상
-          동일).
-
-          [13차] 셀 값을 건수 → **그 해 안에서의 비율(%)** 로 바꿨다. 연도별 확보량이
-          10배 넘게 차이나서(공개 배치 편중) 건수 히트맵은 사실상 "어느 해에 문서가 많이
-          공개됐는가" 지도였고, 정작 알고 싶은 "어떤 영역에 몰렸는가"는 2024년 열 하나에
-          가려 보이지 않았다. 표본이 너무 적은 연도는 trends.js 가 열 자체를 빼고 그
-          사실을 tr-heatmap-note 에 적는다(억지 해석 금지). -#}
-      <section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="연도별 구성비" hidden>
-        <h2 class="tr-h">연도별 구성비</h2>
-        <p class="tr-read">각 연도를 100%로 놓고, 그 해 지적이 어떤 영역에 몰렸는지를 봅니다. 연도마다 확보한 문서 양이 크게 달라 건수로는 비교가 안 되기 때문이에요 — 색이 진할수록 그 해에서 비중이 큰 영역입니다.</p>
-        <div id="tr-heatmap" class="tr-heatmap"></div>
-        <p class="tr-note" id="tr-heatmap-note" hidden></p>
-      </section>
-
-      <section class="tr-block" aria-label="연도별 공개량">
-        <h2 class="tr-h">연도별 공개량(참고)</h2>
-        <p class="tr-read">그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 우리가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, 그 해에 지적이 많아졌다는 뜻이 아닙니다.</p>
-        <div id="tr-year" class="tr-year"></div>
-        <p class="tr-note">연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 — 캐나다 실사는 2021년 이후만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.</p>
-      </section>
-
-      <section class="tr-block" aria-label="업체 랭킹">
-        <h2 class="tr-h">업체 랭킹 Top 30</h2>
-        <p class="tr-read">공개된 문서가 많은 업체일수록 위에 옵니다 — 품질이 나쁜 순서가 아닙니다. 문서 한 건에 지적이 여러 개 담기기 때문에, 실사를 여러 번 받았거나 문서가 긴 업체가 위로 올라옵니다.</p>
-        <div id="tr-firms" class="tr-firms"></div>
-        <div id="tr-firm-detail" class="tr-firm-detail" hidden></div>
-      </section>
-
-      <section class="tr-block" aria-label="소스 구성">
-        <h2 class="tr-h">소스 구성</h2>
-        <p class="tr-read">FDA 483과 캐나다 실사보고서가 큰 두 축이고, Warning Letter·식약처가 그 뒤를 잇습니다. EU·영국 GMP 비준수는 아직 표본이 적어 따로 경향을 읽기는 어렵습니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 아래 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.</p>
-        <div id="tr-source" class="tr-source"></div>
-      </section>
-
-      {#- [해외 vs 미국 내 실사] findings_zone_category() RPC(038, 파라미터 없음) 전용
-          섹션. findings_stats/findings_category_matrix 와 별개 엔드포인트라 정적
-          셸에서는 hidden — 038 미배포 라이브·fetch 실패·빈 응답 시 trends.js 가 이
-          블록만 조용히 숨긴 채로 두고 나머지 섹션엔 손대지 않는다(히트맵과 동일
-          원칙, 골든 결정론 — env/RPC 존재 여부와 무관하게 이 마크업 자체의 byte 는
-          항상 동일).
-
-          이 RPC 는 FDA 483 으로 범위를 한정한다 — site_country 가 실제로 채워지는
-          소스가 483 뿐이라서다(Warning Letter 는 전량 미상). 부제는 RPC 응답
-          (totals/scope)에서 채운 숫자로 trends.js 가 채운다(하드코딩 금지).
-
-          비율은 RPC 가 안 준다 — 각 zone 카테고리 합으로 나눈 zone 내 점유율을
-          trends.js 가 계산한다. 해석·권고 문구는 넣지 않는다 — 관측된 분포만
-          보여준다(트랙C 품질 기준: 판단은 읽는 사람 몫). -#}
-      <section class="tr-block tr-zone-block" id="tr-zone-block" aria-label="해외 실사 vs 미국 내 실사" hidden>
-        <h2 class="tr-h">해외 실사 vs 미국 내 실사</h2>
-        <p class="tr-read">두 그룹을 각자 안에서 100%로 놓고 비율을 비교합니다 — 미국 쪽 지적 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요. 해외 실사에서 상대적으로 더 자주 지적된 항목이 위로 옵니다.</p>
-        <p class="tr-zone-sub" id="tr-zone-sub"></p>
-        <div id="tr-zone" class="tr-zone"></div>
-        <p class="tr-note" id="tr-zone-countries"></p>
-        <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
       </section>
     </div>
   </div>
 </main>
-<style>
-/* [F3b] 한국어 어절 줄바꿈(§1 P0, findings.html 과 동일 스코프). */
-main{word-break:keep-all;overflow-wrap:anywhere}
-/* [F3c] 히어로 설명 — grm.css .page-head p 의 62ch 캡(영문 기준 가독폭)을 이 페이지
-   스코프에서만 해제. 한글은 음절당 폭이 넓어 62ch 이 실제로는 한 줄에 다 안 들어가는
-   길이라 뷰포트 우측에 여백이 남는데도 불필요하게 2줄로 접혔다 — .wrap 폭까지 그대로
-   펴지게 한다.
-   [줄맞춤] balance 는 쓰지 않는다: 두 줄 길이를 맞추려고 첫 문장 한가운데를 끊어
-   목적어와 서술어를 갈라 놓았다. 대신 문장마다 .ln 블록을 두어 줄바꿈을 문장 경계에
-   고정하고, 한 문장이 한 줄에 안 들어가는 좁은 뷰포트에서는 그 문장 안에서만 접히게
-   한다(pretty — 마지막 줄에 한 어절만 남는 고아 줄 방지). */
-.page-head p{max-width:none;text-wrap:pretty}
-.page-head p .ln{display:block}
-
-/* 로딩 스켈레톤 — 은은한 펄스(절제), reduce-motion 존중. */
-{#- min-height 예약(CLS): 통계 본문(#tr-content)은 hidden 으로 시작해 trends.js 가 데이터
-    수신 후 공개한다. 예약 없이는 공개 전 구독밴드·푸터가 첫 화면 안(실측 ~420px)에 있다가
-    공개 순간 수천 px 아래로 밀려 RUM CLS Poor(0.687)를 만들었다 — 로딩/에러 셸이 뷰포트
-    잔여 높이(콘텐츠 시작 실측 ~307px + 여유)를 차지해 아래 요소를 처음부터 화면 밖에 둔다. -#}
-.tr-state{padding:14px 0;min-height:max(320px,calc(100vh - 200px))}
-.tr-state-error{padding:60px 20px;text-align:center;color:var(--coral-2);font-size:14px}
-.tr-skel-row{height:16px;border-radius:6px;background:var(--strong);margin-bottom:12px;animation:trPulse 1.7s ease-in-out infinite}
-.tr-skel-row.w1{width:60%}
-.tr-skel-row.w2{width:88%}
-.tr-skel-row.w3{width:72%}
-@keyframes trPulse{0%,100%{opacity:.55}50%{opacity:.92}}
-@media(prefers-reduced-motion:reduce){.tr-skel-row{animation:none;opacity:.7}}
-
-/* 스탯 스트립 — 큰 세리프 숫자 + 산세리프 muted 라벨. */
-.tr-stats{display:flex;flex-wrap:wrap;gap:44px;margin:6px 0 30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
-.tr-stat{display:flex;flex-direction:column;gap:4px;position:relative}
-.tr-stat-num{display:block;font-family:var(--serif);font-size:32px;font-weight:600;color:var(--ink);line-height:1.05;font-variant-numeric:lining-nums}
-.tr-stat-lbl{display:block;font-size:12.5px;color:var(--muted)}
-.tr-stat-note{display:block;font-size:11px;color:var(--muted-2);margin-top:3px;white-space:nowrap}
-/* 콜아웃('먼저 알아두세요')과 첫 섹션(카테고리 순위) 사이 간격 — 예전 헤드라인이 하던
-   역할을 대신한다(.imp 는 하단 margin 이 없어 헤드라인 제거 후 바짝 붙었다). */
-#tr-coverage-note{margin-bottom:40px}
-
-/* 한눈 요약 헤드라인 — 세리프 풀쿼트 톤. */
-
-.tr-block{margin:0 0 46px}
-.tr-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:0 0 6px}
-.tr-empty{font-size:12.5px;color:var(--muted);margin:0}
-.tr-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.55;text-wrap:balance}
-.tr-note[hidden]{display:none}
-/* [13차] "이 그래프를 읽는 법" — 제목과 차트 사이 한두 문장. 전 직원 대상이라 전문용어를
-   쓰지 않고, 폭 캡(ch)은 두지 않는다(한글 조기 wrap 방지 — §1 P0 관례). */
-.tr-read{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 18px;text-wrap:pretty}
-.tr-read[hidden]{display:none}
-/* 섹션 안의 소제목(최근 12개월 순위·증감 2열) — .tr-h 와 같은 톤이되 한 단계 아래. */
-.tr-sub-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:28px 0 6px}
-.tr-sub-h[hidden]{display:none}
-.tr-move-cols .tr-sub-h{margin-top:0}
-
-/* ── [최근 12개월] 월별 문서 수 막대(24개월) ──────────────────────────────
-   최근 12개월은 coral, 직전 12개월은 ink 저채도로 같은 축 위에 나란히 둔다 —
-   신규 팔레트 없이 두 구간을 구분한다(zone 패널의 2시리즈 관례와 동형). */
-.tr-recent-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
-.tr-rm-bars{display:flex;align-items:flex-end;gap:4px}
-.tr-rm-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.tr-rm-barwrap{height:96px;width:100%;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
-.tr-rm-bar{width:100%;background:var(--coral)}
-.tr-rm-col.is-prev .tr-rm-bar{background:var(--ink);opacity:.28}
-.tr-rm-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);white-space:nowrap}
-.tr-rm-col.is-year .tr-rm-lbl{color:var(--muted);font-weight:600}
-.tr-rm-legend{display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)}
-.tr-rm-key{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.tr-rm-key-cur{background:var(--coral)}
-.tr-rm-key-prev{background:var(--ink);opacity:.28}
-
-/* 최근 12개월 카테고리 순위 — 행 클릭 시 실제 지적 사례가 아래로 펼쳐진다. */
-.tr-recent-cats{display:flex;flex-direction:column;gap:0}
-.tr-rc-row{display:flex;align-items:center;gap:14px;padding:10px 8px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
-.tr-rc-row:hover,.tr-rc-row:focus-visible{background:var(--strong);outline:none}
-.tr-rc-row.on{background:var(--coral-tint)}
-.tr-rc-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
-.tr-rc-label{flex:0 0 190px;max-width:190px;font-size:14px;color:var(--body-s);line-height:1.35}
-.tr-rc-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-rc-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-rc-docs{flex:0 0 auto;min-width:124px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tr-rc-caret{flex:0 0 14px;text-align:center;font-size:10px;color:var(--muted-2)}
-
-/* 실제 지적 사례 패널 — 026 findings_search(공개 게이트 RLS 통과분)로만 채운다. */
-.tr-ex{margin:2px 0 10px;padding:16px 18px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--soft)}
-.tr-ex-item{padding:11px 0;border-bottom:1px solid var(--line)}
-.tr-ex-item:last-of-type{border-bottom:none}
-.tr-ex-meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 5px}
-.tr-ex-text{font-size:13px;line-height:1.75;color:var(--body-s);margin:0}
-.tr-ex-foot{margin:12px 0 0;font-size:12.5px}
-.tr-ex-more{font-weight:500;color:var(--coral-2)}
-.tr-ex-more:hover{color:var(--coral)}
-
-/* ── [FDA 의약품 GMP 실사 등급] 058_fda_inspection_stats() 전용 ──────────────
-   findings 계열과 다른 소스라 새 톤을 만들지 않는다 — .tr-stats/.tr-cat-* 색·간격
-   토큰을 그대로 재사용(신규 팔레트 0). NAI/VAI/OAI 3색은 채도 단계만 다르다
-   (OAI=coral 진함, VAI=coral 옅음, NAI=line — coral 은 "문제"를 가리키는 이 페이지의
-   기존 관례라 등급이 나쁠수록 coral 을 진하게 쓴다). */
-.tr-fda-scope{font-size:12px;color:var(--muted);margin:0 0 5px;line-height:1.6}
-/* [기준일] 059 의 scope 신선도 2키. 범위 고지(.tr-fda-scope)보다 한 톤 진하게 둔다 —
-   "언제 기준 숫자인가"가 먼저 눈에 들어와야 한다. 059 미적용 라이브에서는 trends.js 가
-   아무 문구도 넣지 않아 빈 문단으로 남는다(높이 0, 위아래 여백만 유지). */
-.tr-fda-asof{font-size:12px;color:var(--body-s);margin:0 0 18px;line-height:1.6}
-.tr-fda-stats{margin:0 0 26px;padding-bottom:0;border-bottom:none}
-.tr-fda-year{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
-.tr-fda-y-row{display:flex;align-items:center;gap:10px;padding:6px 2px}
-.tr-fda-y-label{flex:0 0 58px;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tr-fda-y-track{flex:1 1 auto;display:flex;height:11px;border-radius:99px;overflow:hidden;background:var(--line)}
-.tr-fda-y-seg{height:100%}
-.tr-fda-y-seg.nai{background:var(--line-2)}
-.tr-fda-y-seg.vai{background:var(--coral);opacity:.42}
-.tr-fda-y-seg.oai{background:var(--coral)}
-.tr-fda-y-oai-pct{flex:0 0 78px;text-align:right;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--coral-2)}
-.tr-fda-y-total{flex:0 0 58px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
-.tr-fda-y-legend{display:flex;gap:16px;margin:6px 2px 0;font-size:11px;color:var(--muted)}
-.tr-fda-y-key{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.tr-fda-y-key.nai{background:var(--line-2)}
-.tr-fda-y-key.vai{background:var(--coral);opacity:.42}
-.tr-fda-y-key.oai{background:var(--coral)}
-.tr-fda-country{display:flex;flex-direction:column;gap:0}
-.tr-fda-c-row{display:flex;align-items:center;gap:12px;padding:7px 8px;border-bottom:1px solid var(--line);border-radius:6px}
-.tr-fda-c-row.is-kr{background:var(--coral-tint);border-bottom-color:transparent}
-.tr-fda-c-label{flex:0 0 130px;max-width:130px;font-size:13px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr-fda-c-row.is-kr .tr-fda-c-label{font-weight:600;color:var(--ink)}
-.tr-fda-c-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-fda-c-bar{height:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-fda-c-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tr-fda-c-oai{flex:0 0 auto;min-width:126px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--coral-2)}
-@media(max-width:640px){
-  .tr-fda-c-label{flex-basis:90px;max-width:90px}
-  .tr-fda-c-oai{min-width:96px}
-}
-
-/* ── [달라진 점] 증감 2열 ────────────────────────────────────────────────── */
-.tr-move-cols{display:grid;grid-template-columns:1fr 1fr;gap:26px 40px}
-@media(max-width:760px){.tr-move-cols{grid-template-columns:1fr}}
-.tr-mv-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
-.tr-mv-row:last-child{border-bottom:none}
-.tr-mv-label{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s)}
-/* 건수 병기 — "비중이 줄었다"가 "건수가 줄었다"로 읽히는 오독을 막는 자리다. */
-.tr-mv-cnt{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:3px}
-.tr-mv-shift{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);white-space:nowrap}
-.tr-mv-badge{flex:0 0 auto;min-width:54px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted)}
-.tr-mv-up .tr-mv-badge{color:var(--coral-2)}
-
-/* ── [인용 조항] 조항 순위 — 행 클릭 시 사례 + 조문 링크가 펼쳐진다 ───────── */
-.tr-cfr-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
-.tr-cfr{display:flex;flex-direction:column;gap:0}
-.tr-cf-row{display:flex;align-items:center;gap:14px;padding:10px 8px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
-.tr-cf-row:hover,.tr-cf-row:focus-visible{background:var(--strong);outline:none}
-.tr-cf-row.on{background:var(--coral-tint)}
-.tr-cf-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
-/* 조항 번호는 mono 로 고정폭 — 목록에서 세로로 자릿수가 맞아야 훑어진다. */
-.tr-cf-sec{flex:0 0 86px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--coral-2)}
-.tr-cf-name{flex:0 0 250px;max-width:250px;font-size:13.5px;color:var(--body-s);line-height:1.35}
-.tr-cf-track{flex:1 1 auto;height:9px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-cf-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-cf-docs{flex:0 0 auto;min-width:138px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tr-cf-recent{display:block;font-size:10.5px;color:var(--muted-2);margin-top:2px}
-.tr-cf-caret{flex:0 0 14px;text-align:center;font-size:10px;color:var(--muted-2)}
-/* 조문 링크 줄 — 사례 패널 머리에 둔다(사례보다 조문이 먼저 필요한 경우가 많다). */
-.tr-cf-links{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:12.5px}
-.tr-cf-link{font-weight:500;color:var(--coral-2)}
-.tr-cf-link:hover{color:var(--coral)}
-.tr-cf-variants{display:block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--muted-2)}
-/* 체크리스트 진입 — 순위(읽는 자료)에서 산출물(받아 쓰는 표)로 넘어가는 자리. */
-.tr-cfr-cta{margin:16px 0 0;font-size:13px}
-.tr-cfr-cta a{font-weight:500;color:var(--coral-2)}
-.tr-cfr-cta a:hover{color:var(--coral)}
-
-/* ── [업체 찾기] 검색 상자 + 결과 목록 ───────────────────────────────────── */
-.tr-ff-form{display:flex;gap:8px;margin:0 0 10px;max-width:520px}
-.tr-ff-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.tr-ff-input{flex:1 1 auto;min-width:0;font:inherit;font-size:14px;padding:9px 13px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:var(--canvas);color:var(--ink)}
-.tr-ff-input:focus{outline:none;border-color:var(--coral)}
-.tr-ff-btn{font:inherit;font-size:13.5px;font-weight:500;padding:9px 20px;border:0;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral);cursor:pointer}
-.tr-ff-btn:hover{opacity:.92}
-.tr-ff-msg{font-size:12.5px;color:var(--muted);margin:0}
-.tr-ff-row{display:flex;align-items:center;gap:14px;padding:11px 8px;border-bottom:1px solid var(--line);border-radius:6px;text-decoration:none}
-.tr-ff-row:hover,.tr-ff-row:focus-visible{background:var(--strong);outline:none}
-.tr-ff-name{flex:1 1 auto;min-width:0;font-size:14px;color:var(--body-s);line-height:1.4}
-.tr-ff-row:hover .tr-ff-name{color:var(--coral-2)}
-.tr-ff-sub{display:block;font-size:11.5px;color:var(--muted-2);margin-top:3px}
-.tr-ff-meta{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
-.tr-ff-meta span{display:block}
-.tr-ff-span{font-size:10.5px;color:var(--muted-2);margin-top:3px}
-@media(max-width:640px){.tr-ff-meta{display:none}}
-
-/* 전 기간 누적 구간 시작을 알리는 구분선 — 위 최근 12개월과 분모가 다르다는 사실을
-   화면에서 한 번 끊어 알린다. */
-.tr-divider{margin:6px 0 36px;padding-top:28px;border-top:1px solid var(--line-2)}
-.tr-divider h2{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 6px}
-.tr-divider p{font-size:13px;color:var(--muted);margin:0;line-height:1.65;text-wrap:pretty}
-
-/* 카테고리 순위 — 상위 10, coral 단색 순위별 농도(opacity, JS 계산). */
-.tr-cat{display:flex;flex-direction:column;gap:2px}
-.tr-cat-row{display:flex;align-items:center;gap:14px;padding:9px 6px;border-radius:8px;text-decoration:none}
-.tr-cat-row:hover,.tr-cat-row:focus-visible{background:var(--strong);outline:none}
-.tr-cat-row:hover .tr-cat-label,.tr-cat-row:focus-visible .tr-cat-label{color:var(--coral-2)}
-.tr-cat-rank{flex:0 0 20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
-.tr-cat-label{flex:0 0 200px;max-width:200px;font-size:14px;color:var(--body-s);line-height:1.35}
-.tr-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-cat-count{flex:0 0 auto;min-width:66px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
-/* [13차] 구성비(%) — 절대 건수 옆에 항상 병기해 "전체에서 얼마나"를 바로 읽게 한다. */
-.tr-cat-share{flex:0 0 auto;min-width:44px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--coral-2)}
-
-/* 연도별 구성비 히트맵(H1) — coral 농도 테이블, 가로 스크롤(모바일 대응), 첫 열
-   고정폭 좌측정렬(카테고리 라벨은 sticky 로 스크롤 시에도 식별 가능하게 유지). */
-.tr-heatmap-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--rad-s)}
-.tr-heatmap-table{border-collapse:collapse;width:100%;min-width:560px}
-.tr-heatmap-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.tr-heatmap-corner,.tr-heatmap-rowhead{position:sticky;left:0;background:var(--canvas);z-index:1}
-.tr-heatmap-corner{width:168px;min-width:168px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--line-2)}
-/* 연도 헤더는 연도 + 그 해 총건수(분모)를 함께 적는다 — %만 보면 표본 크기를 알 수 없어
-   적은 표본의 큰 %를 과대해석하게 된다. */
-.tr-heatmap-yearhead{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--muted);text-align:center;padding:8px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
-.tr-heatmap-yearhead span{display:block}
-.tr-heatmap-yearbase{font-size:9.5px;font-weight:400;color:var(--muted-2);margin-top:2px}
-.tr-heatmap-rowhead{width:168px;min-width:168px;max-width:168px;text-align:left;font-size:13px;color:var(--body-s);font-weight:400;padding:8px 14px;border-right:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tr-heatmap-cell{min-width:44px;height:34px;text-align:center;font-family:var(--mono);font-size:11.5px;border:1px solid var(--canvas)}
-.tr-heatmap-cell-empty{background:var(--line)}
-.tr-heatmap tbody tr:nth-child(odd) .tr-heatmap-rowhead{background:var(--canvas)}
-.tr-heatmap tbody tr:nth-child(even) .tr-heatmap-rowhead{background:var(--soft)}
-
-/* 연도별 공개량 — 세로 미니 바(트랙+coral 채움). 건수 아래 전체 대비 비중을 병기해
-   "한 해가 전체의 몇 %를 차지하는지"(=공개 배치 편중)를 숨기지 않는다. */
-.tr-year-bars{display:flex;align-items:flex-end;gap:8px}
-.tr-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:6px}
-.tr-year-barwrap{height:120px;width:100%;max-width:36px;display:flex;align-items:flex-end;border-radius:6px 6px 0 0;background:var(--coral-tint);overflow:hidden}
-.tr-year-bar{width:100%;background:var(--coral)}
-.tr-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.tr-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s);margin-top:-2px}
-.tr-year-share{font-family:var(--mono);font-size:10px;color:var(--muted-2);margin-top:-3px}
-
-/* 업체 랭킹 Top 30 — 2열 반응형. */
-.tr-firms{display:grid;grid-template-columns:1fr 1fr;gap:2px 30px}
-.tr-firm-row{display:flex;align-items:center;gap:12px;padding:9px 6px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
-.tr-firm-row:hover,.tr-firm-row:focus-visible{background:var(--strong);outline:none}
-.tr-firm-row.on{background:var(--coral-tint)}
-.tr-firm-rank{flex:0 0 24px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
-.tr-firm-name{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr-firm-bar{flex:0 0 64px;height:6px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-firm-bar-fill{height:100%;background:var(--coral)}
-.tr-firm-count{flex:0 0 42px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-@media(max-width:860px){.tr-firms{grid-template-columns:1fr}}
-
-/* 업체 상세 패널 — 랭킹 아래 삽입, 닫기 가능. */
-.tr-firm-detail{margin-top:22px;padding:24px 26px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas)}
-/* [업체 프로파일 진입] 패널 최상단 링크 — findings.html 의 .fnd-trends-link 관례와
-   동일한 절제된 텍스트 링크(신규 CSS, grm.css 는 무변경 — 이 페이지 스코프 <style> 에만
-   추가). 017_findings_stats_firm_key.sql 미적용 라이브에서는 렌더 자체가 생략된다. */
-.tr-fd-profile-link{display:inline-block;margin-bottom:16px;font-size:12.5px;font-weight:500;color:var(--coral-2)}
-.tr-fd-profile-link:hover{color:var(--coral)}
-.tr-firm-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
-.tr-firm-detail-name{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin:0 0 4px}
-.tr-firm-detail-meta{font-size:12.5px;color:var(--muted)}
-.tr-firm-detail-close{font:inherit;font-size:20px;line-height:1;color:var(--muted);background:transparent;border:0;cursor:pointer;padding:2px 6px}
-.tr-firm-detail-close:hover{color:var(--coral)}
-.tr-firm-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:20px}
-@media(max-width:640px){.tr-firm-detail-grid{grid-template-columns:1fr}}
-.tr-fd-h{font-size:11px;font-weight:600;color:var(--muted);margin:0 0 12px}
-.tr-fd-row{display:flex;align-items:center;gap:10px;padding:5px 0}
-.tr-fd-label{flex:0 0 130px;max-width:130px;font-size:12.5px;color:var(--body-s)}
-.tr-fd-track{flex:1 1 auto;height:7px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-fd-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-fd-count{flex:0 0 auto;min-width:34px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-.tr-fd-year-bars{display:flex;align-items:flex-end;gap:6px}
-.tr-fd-year-col{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:4px}
-.tr-fd-year-barwrap{height:64px;width:100%;max-width:20px;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
-.tr-fd-year-bar{width:100%;background:var(--coral)}
-.tr-fd-year-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.tr-fd-src-list{font-size:12.5px;color:var(--body-s);line-height:1.6;margin:0}
-
-/* 소스 구성 — 3~4행짜리 목록이라 전폭으로 늘이지 않고 읽기 좋은 폭에서 끊는다
-   (13차에 옆 칸이 비면서 2열 그리드 해제). */
-.tr-source{max-width:660px}
-.tr-src-row{display:flex;align-items:center;gap:12px;padding:6px 0}
-.tr-src-label{flex:0 0 150px;max-width:150px;font-size:13px;color:var(--body-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr-src-track{flex:1 1 auto;height:8px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-src-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);opacity:.75;transform-origin:left}
-.tr-src-count{flex:0 0 auto;min-width:52px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.tr-src-share{flex:0 0 auto;min-width:48px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--coral-2)}
-
-/* [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 — 한 행에 해외/미국 점유율
-   막대를 세로로 나란히 둔다. 신규 팔레트 없이 기존 coral(해외) + ink 저채도(미국)
-   opacity 로만 두 시리즈를 구분한다. */
-.tr-zone-sub{font-size:12.5px;color:var(--muted);margin:0 0 18px;line-height:1.6}
-.tr-zone{display:flex;flex-direction:column;gap:14px}
-.tr-zone-row{padding:10px 0;border-bottom:1px solid var(--line)}
-.tr-zone-row:last-child{border-bottom:none}
-.tr-zone-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.tr-zone-label{font-size:14px;color:var(--body-s);font-weight:500}
-/* [해외 상대비 배지] 1.5배 이상 · foreign_cnt 20건 이상인 카테고리에만 붙는다
-   (trends.js ZONE_BADGE_RATIO/ZONE_MIN_FOREIGN_SAMPLE 참조). */
-.tr-zone-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--coral-2);background:var(--coral-tint);padding:2px 8px;border-radius:99px}
-.tr-zone-bars{display:flex;flex-direction:column;gap:6px}
-.tr-zone-barline{display:flex;align-items:center;gap:10px}
-.tr-zone-tag{flex:0 0 32px;font-size:11px;color:var(--muted)}
-.tr-zone-track{flex:1 1 auto;height:9px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
-.tr-zone-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
-.tr-zone-bar-us{background:var(--ink);opacity:.35}
-.tr-zone-pct{flex:0 0 auto;min-width:44px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
-
-@media(max-width:640px){
-  .tr-cat-label{flex-basis:120px;max-width:120px}
-  .tr-rc-label{flex-basis:120px;max-width:120px}
-  .tr-rc-docs{min-width:84px}
-  .tr-stats{gap:28px}
-  .tr-stat-num{font-size:26px}
-  /* 24개 막대는 좁은 화면에서 라벨이 겹친다 — 막대만 남기고 눈금은 범례·툴팁으로. */
-  .tr-rm-lbl{display:none}
-  .tr-rm-bars{gap:2px}
-  /* 남은 폭이 20px 남짓이라 막대가 눈금 없는 조각이 된다 — 숫자만 남긴다. */
-  .tr-rc-track{display:none}
-  .tr-cf-track{display:none}
-  /* 고정폭(250px)이면 좁은 화면에서 행 안쪽이 잘린다 — 줄여서 접히게 한다
-     (min-width:0 이 없으면 flex 항목이 콘텐츠 폭 아래로 줄지 않는다). */
-  .tr-cf-name{flex:1 1 auto;min-width:0;max-width:none}
-  .tr-cf-sec{flex:0 0 72px}
-  .tr-cf-docs{min-width:76px}
-}
-</style>
+{% include "partials/trends_style.html" %}
 {% endblock %}
 {% block scripts %}<script src="{{ rel_root }}assets/trends.js?v={{ trendsjs_ver }}" defer></script>{% endblock %}

@@ -1,0 +1,18 @@
+{#- [존 재편 2026-08-26] 트렌드 존 면 전환 세그먼트.
+
+    왜 nav 탭을 늘리지 않고 여기서 나누는가: base.html 에 'nav 과밀 금지' 원칙이
+    명시돼 있고(마이페이지 링크를 footer 에만 둔 근거) nav 는 이미 6탭이다. 그래서
+    **URL 은 셋으로 나누되 nav 탭은 '트렌드' 하나로 유지**하고, 존 안에서 면을 바꾼다.
+    색인 가능한 URL 이 늘어나는 것은 이 사이트에선 이득이다(#716 계열 — 색인할 URL
+    자체가 병목이었다).
+
+    ★실제 <a> 여야 한다 — JS 없이도 세 면을 오갈 수 있어야 하고(progressive
+    enhancement), 크롤러가 두 신설 면을 발견하는 경로이기도 하다.
+    ★seg_active 는 render.py 가 넘긴다. 값이 없으면 아무 탭도 활성이 아니다(빈
+    문자열 폴백 — 예외 없음).
+-#}
+<nav class="tr-seg" aria-label="트렌드 면 전환">
+  <a href="{{ rel_root }}findings/trends/index.html"{% if seg_active == 'trends' %} class="on" aria-current="page"{% endif %}>지적 경향</a>
+  <a href="{{ rel_root }}findings/inspections/index.html"{% if seg_active == 'inspections' %} class="on" aria-current="page"{% endif %}>실사 결과</a>
+  <a href="{{ rel_root }}findings/coverage/index.html"{% if seg_active == 'coverage' %} class="on" aria-current="page"{% endif %}>데이터 현황</a>
+</nav>

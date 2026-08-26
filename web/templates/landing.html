@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-{#- 랜딩 = v6 크림 에디토리얼 정적 카피. 데이터 바인딩은 히어로 다크 이슈카드(.issuecard)와
-    코럴 콜아웃(.callout) 수치·CTA 링크뿐(spec §3.2). 카피는 v6 기반 + 2026-06-29 카피 정리
-    (나열·중복·표기 일관성) — 포커스는 기관 집약·기관별 정렬·시사점/점검(한국어 강조 최소화).
-    섹션 순서(확정 재배치 2026-07-18 — 10차, 사용자 확정): 히어로 → #why → 기능 6종(soft) →
-    Card Anatomy → 참여 존(#engage: 인기 카드 + 퀴즈 CTA) → This Week 콜아웃(#this-week:
-    마감 CTA, 뉴스레터 직전) → 뉴스레터 → AI 고지. 브리프행 CTA 는 히어로("이번 주 소식
-    읽기")·하단 콜아웃("이번 주 소식 보기") 2개뿐(불가침) — 인기 카드 빈 상태의 이동 버튼은
-    제거하고 유도 문구만 유지한다. 콜아웃 수치 문구는 유지(하단이라 히어로와 화면상 분리). -#}
+{#- 랜딩 = v6 크림 에디토리얼 정적 카피. 데이터 바인딩은 히어로 다크 이슈카드(.issuecard)
+    수치·CTA 링크·자료실 수치뿐(spec §3.2). 카피는 v6 기반 + 2026-06-29 카피 정리.
+    섹션 순서(11차 정리 2026-08-26, 사용자 요청 "홈 과밀 정리"): 히어로 → 기능 3종(#why,
+    soft) → Card Anatomy → 참여 존(#engage: 인기 카드 + 퀴즈 CTA + 보조 카드 2종) →
+    뉴스레터 → AI 고지. 10차 대비 걷어낸 것 — ①단독 WHY 섹션(히어로 lede 와 동일 메시지,
+    #why 앵커는 기능 섹션이 승계해 footer '소개' 무단절) ②기능 03·05·06(원문 연결·번역
+    병기·체크리스트 — 바로 아래 Card Anatomy 범례·실카드가 같은 내용을 시각적으로 보여줌)
+    ③This Week 콜아웃(히어로 CTA·이슈카드 수치의 3번째 반복 — 헤더 상시 '이번 주 소식'
+    버튼이 마감 CTA 역할). 브리프행 CTA 는 히어로("이번 주 소식 읽기") 1개뿐(불가침 상한 —
+    늘리지 말 것). 인기 카드 빈 상태의 이동 버튼도 두지 않는다(유도 문구만). -#}
 <main>
   <div class="wrap hero">
     <div class="hero-top"><span>제약 GMP · 품질 규제소식</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
@@ -58,36 +60,27 @@
     </div>
   </div>
 
-  <section class="section" id="why"><div class="wrap lead">
-    <div><span class="kick">Why GRM</span><h2>기관별 사이트 방문 없이,<br>한곳에서 확인합니다.</h2></div>
-    <p>국내외 제약 규제 동향을 파악하기 위해 FDA, EMA, 식약처 등 여러 사이트를 일일이 찾아다닐 필요가 없습니다. GRM은 분산된 규제 정보를 한데 모아
-      <span class="em">기관별로 정렬</span>해 드립니다. 원문 링크는 물론, 실무에 즉시 적용할 수 있는 사안별 시사점과 점검 포인트까지 한눈에 확인하세요.</p>
-  </div></section>
-
-  <section class="section soft"><div class="wrap">
+  {#- 기능 3종(11차 정리) — 시스템 차원 가치 3개(수집·사실/해석 분리·등급화)만 남긴다.
+      걷어낸 03·05·06(원문 연결·번역 병기·체크리스트)은 카드 안에서 보이는 속성이라 바로
+      아래 Card Anatomy 범례·실카드가 대신 보여준다. id=why 는 구 WHY 섹션에서 승계 —
+      footer '소개'(about_href)가 이 앵커로 온다(base.html P0-4). 각 카드는 hover(데스크톱)
+      시 설명 아래 미니 미리보기가 펼쳐짐 — 01·02 미리보기는 장식(aria-hidden), 03 의 등급
+      뱃지만 의미 정보를 담아 aria-label/title 로 노출. 터치(hover:none)에선 상시 노출(CSS).
+      순수 CSS — JS 없음. -#}
+  <section class="section soft" id="why"><div class="wrap">
     <span class="kick">What it does</span><h2 class="sec-title">데이터 수집에서 점검 항목까지.</h2>
-    {#- 각 카드는 hover(데스크톱) 시 설명 아래 미니 미리보기가 펼쳐짐. 미리보기는 카드 카피의
-        시각 예시일 뿐이라 1·2·3·5·6 은 aria-hidden(장식). 04 의 등급 뱃지만 의미 정보를
-        담아 aria-label/title 로 노출(점·막대 인코딩 + hover/focus 캡션 툴팁). 터치(hover:none)
-        에선 미리보기 상시 노출(CSS). 순수 CSS — JS 없음. -#}
     <div class="feats">
       <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>글로벌 소스 자동 수집</h3><p>FDA 경고장·483, OpenFDA(공개 데이터)·회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada 등 국내외 핵심 규제 소식을 매일 자동으로 수집합니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-chips" aria-hidden="true"><span class="fchip mono">FDA 483</span><span class="fchip mono">EMA</span><span class="fchip mono">MFDS</span><span class="fchip mono">PIC/S</span><span class="fchip mono">ICH</span></div></div></div>
       <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>사실과 해석의 분리</h3><p>객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">사실 <span class="en">Fact</span></span><span class="fblock insight">시사점 <span class="en">Insight</span></span></div></div></div>
-      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-link"></i></div><h3>원문·출처 직접 연결</h3><p>모든 카드에 정보 출처와 공식 원문 링크를 함께 제공하여, 요약본에서 1차 자료(Raw Data)까지 막힘없이 접근할 수 있습니다.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-links" aria-hidden="true"><span class="flink"><i class="ti ti-database"></i>정보출처</span><span class="flink"><i class="ti ti-file-text"></i>공식 페이지</span></div></div></div>
-      <div class="feat"><span class="no">04</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
+      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-grades">
           <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=2차 보도, C=추정·미확인)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 2차 보도, C는 추정·미확인."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
           <span class="grade sig" tabindex="0" title="신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)" aria-label="신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
           <span class="grade-tip t-ev" aria-hidden="true"><b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=2차 보도, C=추정·미확인.</span></span>
           <span class="grade-tip t-sig" aria-hidden="true"><b>신호 T3 (최상)</b> — 업무 영향도 높음, 즉시 점검 권장. <span class="dim">T2=중간, T1=참고.</span></span>
         </div></div></div>
-      <div class="feat"><span class="no">05</span><div class="ic"><i class="ti ti-language"></i></div><h3>원문 대비 한국어 번역</h3><p>영문 핵심 문장은 원문 인용과 한국어 번역을 나란히 매칭하여 가독성과 대조 편의성을 높였습니다.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-trans" aria-hidden="true"><span class="t-en">“Data integrity deficiencies were observed.”</span><span class="t-ko">데이터 완전성 미비가 관찰되었다.</span></div></div></div>
-      <div class="feat"><span class="no">06</span><div class="ic"><i class="ti ti-checklist"></i></div><h3>실무 맞춤형 점검 리스트</h3><p>각 이슈마다 담당 실무자가 현장에서 즉시 활용할 수 있는 실행 체크리스트를 제공합니다.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-checks" aria-hidden="true"><span class="fcheck">제조관리기준서 준수 여부 자가 점검</span><span class="fcheck">원료 칭량 기록과 실제 작업 일치 확인</span></div></div></div>
     </div>
   </div></section>
 
@@ -153,59 +146,44 @@
       </div>
       <a class="btn coral lg" href="{{ rel_root }}quiz/index.html">퀴즈 풀어보기 <i class="ti ti-arrow-right"></i></a>
     </div>
-    {#- 자료실 진입 카드(2026-07-25) — 퀴즈 배너와 같은 형태(.quiz-cta 재사용)로 #engage
-        존 안에 둔다. 확정 섹션 순서(히어로→why→기능→Anatomy→#engage→#this-week→뉴스레터)는
-        건드리지 않고, 브리프행 CTA 도 늘리지 않는다(히어로·콜아웃 2개 불가침 — 이 CTA 는
-        /library/ 행). 수치는 render 가 카탈로그에서 계산해 넘긴다(하드코딩 금지 — 손으로
-        적으면 카탈로그가 늘 때 반드시 낡는다). 데이터가 없으면 카드 자체를 렌더하지 않는다. -#}
-    {% if library and library.catalog_count %}
-    <div class="quiz-cta lib-cta">
-      <div class="quiz-cta-txt">
-        <span class="kick">Reference Library</span>
-        <h3>찾아볼 자료는 자료실에 상시 있어요.</h3>
-        <p>FDA·EMA·식약처·ICH·PIC/S·WHO 등 국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 {{ library.catalog_count }}종, 총 {{ library.item_count }}건으로 모았습니다. 전 항목이 공식 원문으로 바로 연결되고, <b>매주 월요일 자동으로 갱신</b>됩니다.</p>
+    {#- 보조 진입 카드 2종(11차 정리) — 자료실(2026-07-25)·워치리스트(성장 2차 2026-08-15)
+        배너를 세로 나열 대신 반폭 카드 한 줄(.mini-ctas)로 압축한다(참여 존 꼬리 과밀 해소).
+        계약 불변: ①자료실 수치는 render 가 카탈로그에서 계산(하드코딩 금지 — 손으로 적으면
+        반드시 낡는다)·데이터 없으면 카드 미렌더 ②워치리스트는 회원 기능이라 reactions
+        게이트 안(/me 푸터 링크 선례 — env-off 빌드 골든 byte-diff 0)·CTA 는 검색 페이지로
+        (업체 프로파일은 key 없이 열면 막다른 화면) ③id=watchlist 는 뉴스레터 사다리
+        (newsletter.py)가 직링크하는 앵커(파일 간 계약) ④브리프행 CTA 불증가(자료실 CTA 는
+        /library/ 행·워치리스트 CTA 는 /findings/ 행). §4 한글안전: letter-spacing/
+        text-transform/mono 미사용. -#}
+    {% if (library and library.catalog_count) or reactions_enabled %}
+    <div class="mini-ctas">
+      {% if library and library.catalog_count %}
+      <div class="quiz-cta lib-cta">
+        <div class="quiz-cta-txt">
+          <span class="kick">Reference Library</span>
+          <h3>찾아볼 자료는 자료실에 상시 있어요.</h3>
+          <p>국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 {{ library.catalog_count }}종, 총 {{ library.item_count }}건으로 모았습니다. 전 항목이 공식 원문으로 연결되고 매주 월요일 자동 갱신됩니다.</p>
+        </div>
+        <a class="btn" href="{{ rel_root }}library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
       </div>
-      <a class="btn lg" href="{{ rel_root }}library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
+      {% endif %}
+      {% if reactions_enabled %}
+      <div class="quiz-cta watch-cta" id="watchlist">
+        <div class="quiz-cta-txt">
+          <span class="kick">Firm Watchlist</span>
+          <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>
+          <p>협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 지적사항 검색에서 바로 등록할 수 있어요.</p>
+        </div>
+        <a class="btn" href="{{ rel_root }}findings/index.html">업체 검색하러 가기 <i class="ti ti-arrow-right"></i></a>
+      </div>
+      {% endif %}
     </div>
     {% endif %}
-    {#- 관심 업체 워치리스트 진입 배너(성장 2차 2026-08-15) — 완성돼 라이브인 회원 간판
-        기능(015/016 + 주간 알림 잡)이 공개 표면 어디에도 소개되지 않아 사용자 1명이었다
-        (실측: 회원 4·랜딩 워치리스트 언급 0). 퀴즈·자료실 배너와 같은 .quiz-cta 재사용,
-        확정 섹션 순서·브리프행 CTA 2개 불가침 유지(이 CTA 는 /findings/ 행). 회원 기능
-        이라 reactions 게이트에 묶는다(/me 푸터 링크 선례 — env-off 빌드에 죽은 기능
-        홍보가 남지 않게·게이트 off 골든 byte-diff 0). 업체 프로파일은 key 없이 열면
-        막다른 화면이라(firm.html) CTA 는 검색 페이지로 보낸다. 수치 미기재(하드코딩
-        금지 원칙)·§4 한글안전: letter-spacing/text-transform/mono 미사용. -#}
-    {% if reactions_enabled %}
-    {#- id=watchlist: 뉴스레터 사다리(newsletter.py)가 이 앵커로 직링크한다(성장 3차). -#}
-    <div class="quiz-cta watch-cta" id="watchlist">
-      <div class="quiz-cta-txt">
-        <span class="kick">Firm Watchlist</span>
-        <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>
-        <p>협력사·경쟁사·검토 중인 위탁제조소를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 바로 쓸 수 있어요 — 지적사항 검색에서 업체 이름을 찾아 프로파일에서 등록하세요.</p>
-      </div>
-      <a class="btn lg" href="{{ rel_root }}findings/index.html">업체 검색하러 가기 <i class="ti ti-arrow-right"></i></a>
-    </div>
-    {% endif %}
-  </div></section>
-
-  {#- This Week 콜아웃(#this-week) — 마감 CTA 로 뉴스레터 직전 배치(디자인 유지·하단 이동).
-      수치 문구 유지(하단이라 히어로와 화면상 분리 — 중복감 없음). -#}
-  <section class="section" id="this-week"><div class="wrap">
-    <div class="callout">
-      <span class="kick">This Week</span>
-      <h2>이번 주, 무엇이 바뀌었을까요?</h2>
-      <p>{{ cover.title_dateform }} — 수집 {{ cover.intake_total }}건, 카드 {{ cover.rendered }}장, <span style="white-space:nowrap">Evidence A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</span>. 글로벌·국내 규제 소식을 이번 주에 모두 담았습니다.</p>
-      <a class="btn cream lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 보기 <i class="ti ti-arrow-right"></i></a>
-    </div>
   </div></section>
 </main>
 <style>
-/* 참여 존(#engage)·This Week 콜아웃(#this-week) — grm.css 토큰만(프리즈 보존). 스코프 한정.
-   .section 이 이미 96px 상하 패딩+상단 보더를 주므로 .callout 자체 margin(96px 0)은 0 으로
-   정리(겹쳐서 여백이 과대해지는 문제 방지). 퀴즈 배너는 인기 카드와 28px 로 근접 배치해
-   한 존으로 읽히게 한다. */
-#this-week .callout{margin:0}
+/* 참여 존(#engage) — grm.css 토큰만(프리즈 보존). 스코프 한정. 퀴즈 배너는 인기 카드와
+   28px 로 근접 배치해 한 존으로 읽히게 한다. */
 .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}
 .popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
 .popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px;word-break:keep-all}
@@ -225,10 +203,13 @@
 .quiz-cta-txt{flex:1;min-width:260px}
 .quiz-cta-txt h3{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink);margin:6px 0 8px}
 .quiz-cta-txt p{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--body);margin:0}
-/* 자료실 카드 — 퀴즈 배너와 같은 틀(.quiz-cta)에 배경만 캔버스로 바꿔 두 패널이 붙어도
-   같은 덩어리로 뭉쳐 보이지 않게. CTA 는 아웃라인 버튼(.btn) — 강조는 퀴즈가 갖는다. */
-.lib-cta{background:var(--canvas);margin-top:16px}
-.lib-cta .quiz-cta-txt p b{font-weight:600;color:var(--ink)}
+/* 보조 진입 카드 2종(자료실·워치리스트, 11차 정리) — 배너 세로 나열 대신 반폭 카드 한 줄.
+   퀴즈 배너와 같은 틀(.quiz-cta)에 세로 배치·캔버스 배경으로 위계를 낮춘다(강조는 퀴즈).
+   한쪽만 렌더되면(auto-fit) 남은 카드가 전폭을 차지한다. */
+.mini-ctas{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px}
+.mini-ctas .quiz-cta{flex-direction:column;align-items:flex-start;margin-top:0;background:var(--canvas)}
+.mini-ctas .quiz-cta-txt{min-width:0}
+.mini-ctas .quiz-cta-txt h3{font-size:19px}
 @media (max-width:640px){ .quiz-cta{padding:22px 20px} }
 </style>
 {% if reactions_enabled %}<script src="/assets/popular.js?v={{ popularjs_ver }}" defer></script>{% endif %}

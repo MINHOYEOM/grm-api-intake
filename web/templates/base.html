@@ -53,7 +53,8 @@
 {% endif %}
 </head>
 <body>
-{# P0-4: '소개' = 홈의 WHY 섹션(#why). nav 탭에서는 제거(8차 웨이브 A 2026-07-18)했지만
+{# P0-4: '소개' = 홈의 기능 소개 섹션(#why — 11차 정리에서 단독 WHY 섹션을 걷어내며 앵커를
+   기능 섹션으로 옮김·footer 링크 무단절). nav 탭에서는 제거(8차 웨이브 A 2026-07-18)했지만
    footer 둘러보기·notice_href 배선에는 여전히 쓰여 변수 정의는 유지한다. 홈에선 순수
    프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}
 {% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
@@ -225,7 +226,7 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 {% if reactions_enabled %}
 {# 웹 카드 반응 계층 S1(하트·스크랩·회원) — env-gated(SUPABASE_URL/ANON_KEY 설정 시에만 출력·미설정이면 전 페이지 골든 byte-diff 0, 뉴스레터 form_action 선례 동형). 브라우저가 supabase-js 로 Supabase 직접 호출(뉴스레터 Brevo 직접 POST 선례 동형)·RLS 로 본인 반응만. anon key 는 publishable(RLS 보호)이라 data-속성 주입 안전. reactions.js 는 비골든(런타임 카운트/상태 주입→콘텐츠 골든/결정론 불침범). progressive enhancement: 로드/로그인/네트워크 실패해도 정적 카드 열람·공유(S0) 무영향. grm.css 무편집(프리즈) 위해 스코프 스타일 인라인. §4 한글안전: letter-spacing/text-transform/class=mono 미사용. #}
-<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-index="/assets/search-index.json" hidden></div>
+<div id="grm-reactions-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-index="/assets/search-index.json" data-host="{{ site_host }}" hidden></div>
 <style>
 .grm-ca-react{display:none;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
 body.grm-reactions-on .grm-ca-react{display:inline-flex}
@@ -328,6 +329,47 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-pet-sync-s{font-family:var(--sans);font-size:12px;color:var(--muted);margin:0}
 </style>
 <script src="/assets/growth-sync.js?v={{ growthsyncjs_ver }}" defer></script>
+{# [문의 및 제안] 진입 링크(푸터 '안내' 열)·모달은 feedback.js 가 전부 런타임 주입(JS 미실행이면 흔적 0 — share 버튼 선례·죽은 링크 금지). 제출은 061 RPC(feedback_submit)로만(anon 직접 insert 불가·060 관례) — raw PostgREST fetch(popular.js 동형, supabase-js 비의존)·RPC 가 접수번호를 돌려준다. 이메일은 회신 동의 체크가 있을 때만 전송하고(개인정보보호법) 동의 없는 이메일은 RPC 가 폐기한다. 운영자('grm-op')·비프로덕션 호스트(cfg data-host 대조) 제출은 p_operator 로 표식만 한다(#763 판독 잡음 분리·제출은 막지 않음). 접수분은 /admin 문의 탭에서 확인. 스타일은 reactions 관례대로 게이트 안 인라인(골든·grm.css 무변형). §4 한글안전: letter-spacing/text-transform/mono 미사용 + 전 문안 word-break:keep-all(어절 중간 줄바꿈 금지). #}
+<style>
+.grm-fb-pop{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(26,24,21,.42);padding:20px}
+.grm-fb-pop.show{display:flex}
+.grm-fb-card{position:relative;background:var(--canvas,#fff);max-width:460px;width:100%;max-height:calc(100vh - 40px);overflow-y:auto;border-radius:14px;padding:24px 22px;box-shadow:0 20px 50px -18px rgba(0,0,0,.5)}
+.grm-fb-card h3{font-family:var(--serif);font-size:19px;color:var(--ink,#141413);margin:0 0 8px;word-break:keep-all}
+.grm-fb-lede{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 16px;word-break:keep-all}
+.grm-fb-x{position:absolute;top:10px;right:12px;font-size:22px;line-height:1;color:var(--muted);background:transparent;border:0;cursor:pointer}
+.grm-fb-x:hover{color:var(--ink,#141413)}
+.grm-fb-form{display:flex;flex-direction:column;gap:14px}
+.grm-fb-form[hidden]{display:none}
+.grm-fb-field{display:flex;flex-direction:column;gap:6px}
+.grm-fb-field>label,.grm-fb-labelrow label{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink,#141413);word-break:keep-all}
+.grm-fb-labelrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.grm-fb-count{font-family:var(--sans);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.grm-fb-opt{font-weight:400;color:var(--muted)}
+.grm-fb-field select,.grm-fb-field textarea,.grm-fb-field input[type=email]{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:14px;line-height:1.5;color:var(--ink,#141413);padding:10px 12px;border:1px solid var(--line-2,rgba(26,24,21,.18));border-radius:var(--rad-s,8px);background:var(--canvas,#fff)}
+.grm-fb-field textarea{resize:vertical;min-height:120px;line-height:1.65;word-break:keep-all}
+.grm-fb-field select:focus,.grm-fb-field textarea:focus,.grm-fb-field input[type=email]:focus{outline:none;border-color:var(--coral,#C2603F);box-shadow:0 0 0 3px var(--coral-tint,#F4E7DF)}
+.grm-fb-consent{display:flex;align-items:flex-start;gap:8px;margin-top:2px;font-family:var(--sans);font-size:12px;line-height:1.6;color:var(--muted);word-break:keep-all;cursor:pointer}
+.grm-fb-consent[hidden]{display:none}
+.grm-fb-consent input{flex:none;margin:2px 0 0;width:14px;height:14px;accent-color:var(--coral,#C2603F)}
+.grm-fb-meta{font-family:var(--sans);font-size:11.5px;line-height:1.6;color:var(--muted);margin:0;word-break:keep-all}
+.grm-fb-submit{width:100%;font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:var(--coral,#C2603F);border:0;border-radius:var(--rad-s,8px);padding:11px 13px;cursor:pointer;transition:background .15s ease}
+.grm-fb-submit:hover{background:var(--coral-2,#A14B30)}
+.grm-fb-submit[disabled]{opacity:.7;cursor:default}
+.grm-fb-status{font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);margin:10px 0 0;word-break:keep-all}
+.grm-fb-status:empty{margin:0}
+.grm-fb-status.is-err{color:var(--coral-2,#A14B30)}
+/* display:flex 는 hidden 속성을 이긴다(구독 밴드 주석의 그 함정) — [hidden] 을 명시로 잠근다. */
+.grm-fb-done{display:flex;flex-direction:column;align-items:center;gap:7px;padding:16px 4px 4px;text-align:center}
+.grm-fb-done[hidden]{display:none}
+.grm-fb-done-ic{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--coral-tint,#F4E7DF);color:var(--coral-2,#A14B30);margin-bottom:4px}
+.grm-fb-done b{font-family:var(--serif);font-size:17px;color:var(--ink,#141413)}
+.grm-fb-done span{font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.grm-fb-ticket{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--coral-2,#A14B30);font-variant-numeric:tabular-nums}
+.grm-fb-ticket:empty{display:none}
+.grm-fb-doneclose{margin-top:10px;font-family:var(--sans);font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2,rgba(26,24,21,.18));border-radius:var(--rad-s,8px);padding:8px 18px;cursor:pointer}
+.grm-fb-doneclose:hover{color:var(--coral,#C2603F);border-color:var(--coral,#C2603F)}
+</style>
+<script src="/assets/feedback.js?v={{ feedbackjs_ver }}" defer></script>
 {% endif %}
 {# ── 하단 참여 배너(성장 4차) ─────────────────────────────────────────────────
    구독 밴드는 base.html 구조상 **읽기 종료 지점**에 있어서, 끝까지 스크롤하지 않는 방문자

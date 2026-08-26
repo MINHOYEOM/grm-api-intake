@@ -172,6 +172,10 @@
 .admin-inline-form input,.admin-toolbar input,.admin-toolbar select{border:1px solid var(--line-2);background:var(--canvas);border-radius:var(--rad-s);padding:9px 11px;font:inherit;font-size:13.5px;color:var(--ink)}
 .admin-inline-form input{min-width:240px;flex:1}
 .admin-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.admin-check-inline{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--body);cursor:pointer}
+.admin-check-inline input{width:14px;height:14px;accent-color:var(--coral)}
+.admin-fb-msg{display:block;max-width:520px;line-height:1.6;word-break:keep-all}
+.admin-fb-mail{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
 .admin-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:var(--rad-s)}
 .admin-table{width:100%;border-collapse:collapse;min-width:760px;font-size:13px}
 .admin-table th,.admin-table td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
@@ -228,6 +232,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
         <button type="button" data-tab="users"><i class="ti ti-users"></i>회원</button>
+        <button type="button" data-tab="feedback"><i class="ti ti-message-report"></i>문의·제안</button>
         <button type="button" data-tab="insights"><i class="ti ti-chart-bar"></i>인사이트</button>
         <button type="button" data-tab="system"><i class="ti ti-shield-check"></i>시스템</button>
       </nav>
@@ -443,6 +448,27 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </table>
           </div>
           <div class="admin-status" id="grm-users-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="feedback" hidden>
+          <div class="admin-panel-head">
+            <div><h2>문의 및 제안</h2><p class="sub">사이트 '문의 및 제안'으로 접수된 이용 불편·수정 요청·기능 제안입니다. 처리 상태를 바꿔 두면 신규 건만 남아 다음 확인이 짧아집니다. 회신 이메일이 있는 건은 답장 후 완료로 두세요.</p></div>
+            <div class="admin-head-actions">
+              <span class="admin-pill" id="grm-feedback-new">신규 확인 중</span>
+              <button class="btn" type="button" id="grm-feedback-refresh"><i class="ti ti-refresh"></i>새로고침</button>
+            </div>
+          </div>
+          <div class="admin-toolbar">
+            <input type="search" id="grm-feedback-filter" placeholder="내용·이메일 검색" aria-label="문의 검색">
+            <label class="admin-check-inline"><input type="checkbox" id="grm-feedback-open-only" checked> 미처리만 보기</label>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>접수</th><th>유형</th><th>내용</th><th>회신</th><th>페이지</th><th>상태</th><th>작업</th></tr></thead>
+              <tbody id="grm-feedback-body"><tr><td colspan="7"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="admin-status" id="grm-feedback-status" role="status" aria-live="polite"></div>
         </section>
 
         <section class="admin-panel" data-panel="insights" hidden>

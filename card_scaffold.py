@@ -1107,6 +1107,27 @@ def _detail_recall_quality(row: dict[str, Any], raw: dict[str, Any]) -> dict[str
     return detail if len(detail) > 1 else None
 
 
+def _detail_mhra_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
+    """MHRA 회수 알림 전문(`raw.mhra_alert_body`) — 결정론 상세슬롯.
+
+    회수 4종 중 이 유형만 상세가 없었다. Atom 피드가 주는 것이 제목·요약 한 문장이라
+    실을 원천이 없었기 때문이다(2026-08-25 판단: "미사용 원천이 실재하지 않는다"). 그런데
+    gov.uk **Content API** 가 알림 전문을 JSON 으로 준다 — DMRC 참조번호·판매허가권자·
+    의약품 상세(PL 번호·성분)·영향 배치/유효기한·회수 배경이 담긴 2천자대 본문이다.
+    수집기가 `mhra_alert_body` 로 실어 오면 여기서 verbatim 으로 싣는다(생성 0 → 환각 0).
+
+    영문 자유서술이므로 `body_ko` 슬롯만 열어 둔다(NCR·HC 형제와 동형 — 번역층이 붙으면
+    병기로 렌더된다). 여기서 옮겨 적지 않는다."""
+    body = str(raw.get("mhra_alert_body") or "").strip()
+    if not body:
+        return None
+    detail: dict[str, Any] = {"type": "mhra_recall_alert", "body": body}
+    body_ko = str(raw.get("mhra_alert_body_ko") or "").strip()
+    if body_ko:                                      # 있을 때만 — 없으면 키 미추가(골든 불변)
+        detail["body_ko"] = body_ko
+    return detail
+
+
 def _detail_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
     """Health Canada 회수 레코드의 미사용 사실층 — 결정론 상세슬롯.
 
@@ -1503,7 +1524,8 @@ _REGISTRY: dict[str, SourceSpec] = {
     "mhra-recall": SourceSpec(
         "🟧", "Recall(UK)", "Recall",
         a_eligible=True, section="recall_table",
-        quote=_quote_mhra_recall, extra_rows=_w2_extra_mhra_recall),
+        quote=_quote_mhra_recall, extra_rows=_w2_extra_mhra_recall,
+        detail=_detail_mhra_recall),
     "gmp-inspection": SourceSpec(
         "🟦", "GMP실사", "GMP실사",
         a_eligible=True,
@@ -1862,6 +1884,10 @@ _SOURCE_BODY_KEYS = (
     #   recall-quality  : RTRVL_RESN         (식약처 회수사유내용)
     #   hc-recall       : Issue / What you should do (HC 사유·권고조치 원문)
     "reason_for_recall", "RTRVL_RESN", "Issue", "What you should do",
+    # [MHRA 알림 본문 2026-08-26] gov.uk Content API 가 주는 알림 전문. 피드 요약
+    # 한 문장과 달리 회수 배경·영향 배치가 담긴 원문이라 "원문 확보"가 참이 된다
+    # (2026-08-25 시점엔 이 키가 없어 이 유형만 신호가 꺼진 것이 맞았다).
+    "mhra_alert_body",
 )
 
 

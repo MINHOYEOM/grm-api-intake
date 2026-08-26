@@ -338,6 +338,16 @@
     </div>
     {%- endif %}
   </details>
+  {%- elif card.deterministic_detail.type == 'mhra_recall_alert' %}
+  {#- [MHRA 회수 알림 본문 2026-08-26] 회수 4종 중 이 유형만 상세가 없었다 — Atom 피드가
+      제목·요약 한 문장만 줘서 실을 원천이 없었기 때문이다. gov.uk **Content API** 가 알림
+      전문을 JSON 으로 주므로(DMRC 참조번호·판매허가권자·의약품 상세·영향 배치/유효기한·
+      회수 배경) 그것을 verbatim 으로 싣는다(LLM 0·환각 0). NCR 형제와 같은 매크로를 써
+      원문→국문 병기 슬롯(`body_ko`)을 열어 둔다 — 없으면 영문 단독(additive). -#}
+  {%- set dd = card.deterministic_detail %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · MHRA</span></summary>
+    {{ ncr_field('알림 전문 (Drug Alert)', 'MHRA', dd.body, dd.body_ko, '') }}
+  </details>
   {%- elif card.deterministic_detail.type == 'hc_recall_detail' %}
   {#- [회수 상세 2026-08-25] Health Canada 회수의 미사용 사실층. HC 피드는 필드가 11개뿐이라
       천장이 낮지만, **`What you should do`(권고 조치)** 는 W3 인용의 *폴백* 이라 `Issue` 가

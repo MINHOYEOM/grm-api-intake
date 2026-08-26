@@ -1086,6 +1086,13 @@
     "텔미사르탄·메글루민 함유 제제의 N-nitroso-meglumine 위험평가 및 확인시험 여부",
     "니트로소아민 OOS 처리 절차 및 시장 유통품 모니터링 체계"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202104294",
+    "std_cd": "8806453065700,8806453065717",
+    "bizrno": "1358102638"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1212,6 +1219,13 @@
     "안정성 시험(장기·가속) OOS 발생 시 시장 회수 결정 기준 및 절차",
     "와파린 등 NTI 약물의 용출 규격 및 안정성 시험 주기 적정성"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "200502107",
+    "std_cd": "8806578019107,8806578019114",
+    "bizrno": "1248137632"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1275,6 +1289,13 @@
     "용기·마개 밀봉 적합성 시험 및 용기 이상 모니터링 절차",
     "액상 제제 출하 전 성상·용기 이상 확인 기준"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201109893",
+    "std_cd": "8806409023402,8806409023419",
+    "bizrno": "1328101004"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1887,6 +1908,46 @@
     "비무균 비강·구강·피부 적용 액제의 미생물 한도 규격 설정 타당성",
     "비무균 제제 제조 환경 및 원료·포장재의 미생물 오염 방지 관리 체계"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot # 506033, Exp Date: 11/30/2026.",
+    "firm_location": "South Beloit, IL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-14"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "성분명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204438"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

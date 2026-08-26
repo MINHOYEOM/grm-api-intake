@@ -2472,6 +2472,13 @@
     "원료 회분·산불용성회분 시험성적 확인",
     "원료 세척·정선 공정 관리 기록 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201606023",
+    "std_cd": "8800631014504,8800631014511,8800631014528,8800631014535,8800631014542,8800631014559,8800631014566",
+    "bizrno": "2338107882"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2535,6 +2542,13 @@
     "원료 이산화황 잔류 시험성적 확인",
     "건조·보존 처리 공정 관리 기록 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201105333",
+    "std_cd": "8800616029905,8800616029912,8800616029929",
+    "bizrno": "3128137170"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2598,6 +2612,13 @@
     "포장 표시사항(수량 등) 최종 검수 절차 점검",
     "동일 품목 타 제조번호의 표시사항 재확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201506800",
+    "std_cd": "8806416061503,8806416061510,8806416061527,8806416061534",
+    "bizrno": "1248601143"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2661,6 +2682,13 @@
     "정제 성상(외관) 검사 기준 및 이상 시 대응 절차 점검",
     "동일 제조번호 보관·유통 조건 이력 확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202500644",
+    "std_cd": "8800791000300,8800791000317",
+    "bizrno": "1358135444"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2724,6 +2752,13 @@
     "원료 중금속(카드뮴 등) 시험성적 확인",
     "원료 공급처 품질관리 협약·감사 이력 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200901891",
+    "std_cd": "8800687000803,8800687000810,8800687000827,8800687000834,8800687000841",
+    "bizrno": "2048181939"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2787,6 +2822,13 @@
     "표시기재 항목 체크리스트 최신성 확인",
     "출하 전 라벨 최종 검수 절차 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202401612",
+    "std_cd": "8806429068902,8806429068919",
+    "bizrno": "6828500435"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2850,6 +2892,13 @@
     "2차 포장재 표시사항 인쇄·검수 절차 점검",
     "포장재 교체·개정 시 표시 최종 확인 프로세스 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201400174",
+    "std_cd": "8806437037808,8806437037815,8806437037822,8806437042703,8806437042710,8806437042802,8806437042819,8806437042901,8806437042918,8806437042925,8806437042932,8806437043007,8806437043014,8806437043106,8806437043113,8806437043120,8806437050609,8806437050616,8806437050623",
+    "bizrno": "2078100309"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2917,6 +2966,33 @@
     "니트로사민류(N-nitroso) 불순물 위해평가·관리한도 재검토",
     "동일 유효성분 제제의 최신 불순물 시험 결과 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "263 Bottles",
+    "distribution": "U.S. Nationwide",
+    "code_info": "Lot: a) 09JA2530, 31JA2507, expires: 04/30/2027; b) Lot: 09DE2412, 09JA2528, 29JA2511, expires: 04/30/2027.",
+    "firm_location": "Dawsonville, GA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-22"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2984,6 +3060,12 @@
     "용출시험 성적 및 안정성 데이터 재검토",
     "동일 유효성분(클로르탈리돈) 제제의 용출 규격 적합성 확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Chlorthalidone 12.5 mg",
+    "dosage_form": "Tablet",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3051,6 +3133,51 @@
     "함량시험 성적 및 안정성 데이터 재검토",
     "동일 제조번호 출하시험 기록 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "790 Cartons.",
+    "distribution": "U.S. Nationwide.",
+    "code_info": "Lots: N02327, expires: 09/2026; N02740, expires: 12/2026; N03069, expires: 08/2027.",
+    "firm_location": "Dublin, OH, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-16"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-22"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "METHYLERGONOVINE MALEATE"
+     },
+     {
+      "label": "성분명",
+      "value": "METHYLERGONOVINE MALEATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA210424"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3118,6 +3245,49 @@
     "FDA 공식 회수 공고에서 구체 일탈 사유 확인",
     "인도 위탁제조처 CGMP 준수 현황 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "quantity": "3648 bottles",
+    "distribution": "U.S. Nationwide",
+    "code_info": "Lot # PA02216; Exp. 12/2029",
+    "firm_location": "Bridgewater, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-28"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-22"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "FENOFIBRATE"
+     },
+     {
+      "label": "성분명",
+      "value": "FENOFIBRATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA210705"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3185,6 +3355,55 @@
     "포장 공정 이물 관리(육안검사·자동검출) 체계 점검",
     "동일 라인 타 품목의 이물 혼입 이력 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "934577 bottles",
+    "distribution": "Nationwide within the United States",
+    "code_info": "a) Lot # 1138901, Exp. Date 08/31/2026; 1149846, Exp. Date 04/30/2027 b) Lot #1138201, 1138202,  08/31/2026, 1138900, 1141143, Exp. Date 08/31/2026; 1140280, 1140281, 1142063, Exp. Date 10/31/2026; 1142062, 1142942, 1142943, Exp. Date 11/30/2026; 1144081, 1144104, Exp. Date 12/31/2026; 1146373, 1146374, Exp. Date 01/31/2027; 1147491, 1147492, 1149843, Exp. Date 03/31/2027; 1151113, 1151890, 1153401, Exp. Date 07/31/2027; 1151114, 1151115, Exp. Date 09/30/2027; 1152412, 1153399, 1153400, Exp. Date 06/30/2027; 1155834, 1155835, Exp. Date 04/30/2027; 1155836, Exp. Date 09/30/2027; 1158480, 1158481, 1158482, Exp. Date 10/31/2027; 1160354, 1160355, Exp. Date 03/31/2028; 1161593, 1161594, 1161595, Exp. Date 04/30/2028; 1164097, 1164098, 1164099, Exp. Date 06/30/2028; 1165078, 1165079, Exp Date 07/31/2028; 1165080, Exp. Date 02/29/2028;1168005, 1168006, 1168007, Exp. Date 09/30/2028; 1169288, 1169289, Exp. Date 10/31/2028; 1172885, Exp. Date 12/31/2028.",
+    "firm_location": "Thousand Oaks, CA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CORLANOR"
+     },
+     {
+      "label": "성분명",
+      "value": "IVABRADINE"
+     },
+     {
+      "label": "주성분",
+      "value": "IVABRADINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "NDA206143"
+     }
+    ]
+   },
    "merged_count": 5,
    "merged_items": [
     "Corlanor (ivabradine) tablets, 5 mg, packaged in a) 14 tablets bottles (NDC 55513-800-99), and b) 60 tablet bottles (NDC 55513-800-60), Rx Only, Amgen Inc., Thousand Oaks, CA 92130 Made In Italy.",
@@ -3258,6 +3477,31 @@
     "맞춤형 조제 처방-조제 이중 검수 절차 점검",
     "성분 첨가 여부 최종 확인 체크리스트 운영 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "quantity": "One (1) patient-specific TPN prescription.",
+    "distribution": "MA",
+    "code_info": "24-1269856-0-1",
+    "firm_location": "Woburn, MA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-02"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-24"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3325,6 +3569,31 @@
     "무균공정 밸리데이션(APS) 최신 이력 확인",
     "최종 제품 무균시험 성적 재검토"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "quantity": "approximate 50 to 60 bottles",
+    "distribution": "CO",
+    "code_info": "All lots within expiry",
+    "firm_location": "Wheat Ridge, CO, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-18"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-24"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3392,6 +3661,54 @@
     "포장 실링 완결성 검사(리크테스트) 이력 점검",
     "동일 포장 자재·라인 타 품목 실링 결함 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "Nationwide inthe USA, as well as other foreign distribution.",
+    "code_info": "Lot # 3201277, Exp Date: 06/30/2026; Lot # 3213912, 3214206, 3214914, 3215710, 3227485, Exp Date: 07/31/2026; Lot # 3234036, 3234037, 3236460, 3237244, 3243095, 3263576, 3263580, 3264318, Exp Date: 08/31/2026; Lot # 3266655, 3266657, 3270586, 3278714, 3279949, 3282215, 3282956, Exp Date: 09/30/2026; Lot #  3299094, 3299684, 3302529, 3301463, 3309836, 3310556, 3312230, 3314562, Exp Date: 10/31/2026; Lot # 3321426, Exp Date: 11/30/2026; Lot # 3350974, 3352268, 3354120, 3354127, 3356911, 4003299, 4013168, Exp Date: 12/31/2026; Lot # 4023898, 4024208, 4024754, 4030686, 4031689, 4032182, 4032183, 4038825, 4038826, 4043641, 4045863, 4046559, Exp Date: 1/31/2027; Lot # 4049128, 4060484, 4061622, 4062534, Exp Date: 02/28/2027; Lot # 4072323, 4081465, 4092172, 4092053, 4092057, 4093448, 4096267, 4099351, Exp Date: 03/31/2027; Lot # 4106830, 4106833, 4106834, 4123769, 4123637, 4124547, 4123599, 4131749, Exp Date: 04/30/2027; Lot # 4137704, 4139447, Exp Date: 05/31/2027",
+    "firm_location": "El Paso, TX, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-28"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-25"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CHLORAPREP ONE-STEP"
+     },
+     {
+      "label": "성분명",
+      "value": "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "주성분",
+      "value": "CHLORHEXIDINE GLUCONATE, ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "NDA020832"
+     }
+    ]
+   },
    "merged_count": 4,
    "merged_items": [
     "BD ChloraPrep Clear, (2% w/v chlorhexidine gluconate (CHG) and 70% v/v isopropyl alcohol (IPA) 1 mL Applicator, 60 Applicators, Sterile Solution, Care Fusion 213, LLC, El Paso, TX 79912, subsidiary of Beckton, Dickinson and Co., NDC 54365-400-31.",
@@ -3464,6 +3781,51 @@
     "포장 라인 전환 시 라인클리어런스 기록 점검",
     "동일 라인에서 취급되는 타 품목과의 물리적 분리 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "quantity": "31,392 60-count bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot: A253999, A254000, Expires: 09/30/2027.",
+    "firm_location": "Hyderabad, India",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-25"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "LACOSAMIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "LACOSAMIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204787"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3531,6 +3893,55 @@
     "유효성분(포비돈요오드) 함량시험 성적 재검토",
     "안정성 시험 데이터 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "8132 6-packs & 2262 2-packs",
+    "distribution": "Nationwide",
+    "code_info": "Lots PO062402, Exp Date 6/30/2026, PO072401, Exp Date 7/30/2026, PO092401,    Exp Date 9/30/2026, PO102401,    Exp Date 10/31/2026 & PO102402, Exp Date 10/31/2026.",
+    "firm_location": "West Palm Beach, FL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-25"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "POVI-ONE"
+     },
+     {
+      "label": "성분명",
+      "value": "POVIDONE-IODINE 10% TOPICAL"
+     },
+     {
+      "label": "주성분",
+      "value": "POVIDONE-IODINE"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "M022"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -3598,6 +4009,51 @@
     "다규격 정제 포장 라인 분리·전환 검증 절차 점검",
     "동일 라인 타 규격 정제와의 물리적 분리 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "3,456 30-count bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot AE01763, Expires 9/30/2027.",
+    "firm_location": "Princeton, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-17"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-26"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-01"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "PERAMPANEL"
+     },
+     {
+      "label": "성분명",
+      "value": "PERAMPANEL"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209538"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

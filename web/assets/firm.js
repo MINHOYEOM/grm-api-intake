@@ -40,7 +40,7 @@
   // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩. 하드 게이트에는 넣지
   // 않는다 — 이 블록이 없는 구버전 셸(캐시 스큐)에서도 프로파일 본기능은 살아야 한다.
   var lookupEl = document.getElementById("fp-lookup");
-  // [062] FDA 실사 이력 — 워치리스트와 같은 격리: 미적용 라이브·구버전 셸·fetch 실패
+  // [063] FDA 실사 이력 — 워치리스트와 같은 격리: 미적용 라이브·구버전 셸·fetch 실패
   // 전부 이 블록만 hidden 으로 남고 프로파일 본기능은 무장애.
   var inspBlockEl = document.getElementById("fp-insp-block");
   var inspSubEl = document.getElementById("fp-insp-sub");
@@ -536,7 +536,7 @@
     });
   }
 
-  // ── [062] FDA GMP 실사 이력 ─────────────────────────────────────────────────
+  // ── [063] FDA GMP 실사 이력 ─────────────────────────────────────────────────
   // fda_inspection_firm(p_firm_key) — 지적 이력과 **단위가 다른**(실사 건의 등급)
   // 별도 소스라 별도 섹션에 그린다. 서로 나누지 않는다.
   var INSP_GRADE_KO = { NAI: "적합", VAI: "경미", OAI: "중대" };
@@ -647,7 +647,7 @@
         // 워치리스트는 프로파일 로드 성공 후에만 배선(실패해도 본기능 무장애 — 내부에서
         // env/lib/세션/015 미적용을 각각 방어하고 조용히 hidden 유지).
         initWatchlist(firmKeyParam, data.display_name || "");
-        // [062] FDA 실사 이력 — 본기능과 독립 promise 체인. 실패(미적용 라이브의
+        // [063] FDA 실사 이력 — 본기능과 독립 promise 체인. 실패(미적용 라이브의
         // 404 포함)해도 이 블록만 hidden 으로 남는다.
         fetchInspectionHistory(firmKeyParam)
           .then(function (insp) { renderInspections(insp); })

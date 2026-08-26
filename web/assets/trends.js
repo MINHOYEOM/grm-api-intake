@@ -115,8 +115,8 @@
   var fdaYearEl = document.getElementById("tr-fda-year");
   var fdaCountryEl = document.getElementById("tr-fda-country");
   var fdaNoteEl = document.getElementById("tr-fda-note");
-  // [061] 실사일 축(by_quarter) · 한국 슬라이스(korea) — 다른 신규 블록과 같은 원칙으로
-  // 하드 게이트 밖에 둔다. 061 미적용 라이브에서 이 두 블록이 없어도(구버전 셸) 이 면의
+  // [062] 실사일 축(by_quarter) · 한국 슬라이스(korea) — 다른 신규 블록과 같은 원칙으로
+  // 하드 게이트 밖에 둔다. 062 미적용 라이브에서 이 두 블록이 없어도(구버전 셸) 이 면의
   // 주 데이터(등급 구성)는 그대로 그려져야 한다.
   var fqBlockEl = document.getElementById("tr-fq-block");
   var fqEl = document.getElementById("tr-fq");
@@ -1441,12 +1441,12 @@
     fdaBlockEl.hidden = false;
   }
 
-  // ── [061] 실사일 기준 분기 추이 ─────────────────────────────────────────────
+  // ── [062] 실사일 기준 분기 추이 ─────────────────────────────────────────────
   // ★이 섹션이 재는 날짜는 위 by_year 와 **다르다**(회계연도 vs 실사 종료일). 같은
   //   데이터인데 FY 축에서는 OAI 비율이 크게 출렁이는 것처럼 보이고 실사일 분기로
   //   다시 재면 최근 2년이 안정이다 — 그래서 **비율을 주 축으로** 그린다.
   //
-  // ★미완 분기 판정을 여기서 하는 이유: 서버(061)는 세기만 한다(임계는 반드시 낡는다는
+  // ★미완 분기 판정을 여기서 하는 이유: 서버(062)는 세기만 한다(임계는 반드시 낡는다는
   //   007/038/058/059 공통 계약). 대신 059 가 이미 주는 scope.latest_inspection_end_date
   //   = **데이터의 전선**에서 파생한다 — 전선보다 한 분기 이내에 끝난 분기는 FDA 등급
   //   확정·공개가 아직 진행 중이라 낮게 보인다. 상수(예: "마지막 2개")를 박지 않는
@@ -1486,7 +1486,7 @@
   function renderFdaQuarters(data) {
     if (!fqBlockEl || !fqEl) return;
     var rows = (data && data.by_quarter) || [];
-    if (!rows.length) return;                       // 061 미적용 라이브 → 숨김 유지
+    if (!rows.length) return;                       // 062 미적용 라이브 → 숨김 유지
     var frontier = ((data.scope || {}).latest_inspection_end_date) || "";
     var shown = rows.slice(-FQ_ROWS);
     fqEl.innerHTML = "";
@@ -1514,7 +1514,7 @@
     fqBlockEl.hidden = false;
   }
 
-  // ── [061] 한국 소재 제조소 ──────────────────────────────────────────────────
+  // ── [062] 한국 소재 제조소 ──────────────────────────────────────────────────
   // 연도별 등급 구성은 위 buildFdaYearRow 와 **같은 모양**이라 그 컴포넌트를 그대로
   // 쓴다(라벨만 FY → 달력연도). 신규 CSS 0.
   function buildKrYearRow(y) {
@@ -1539,7 +1539,7 @@
   function renderKorea(data) {
     if (!krBlockEl || !krYearEl) return;
     var kr = (data && data.korea) || null;
-    if (!kr) return;                                // 061 미적용 라이브 → 숨김 유지
+    if (!kr) return;                                // 062 미적용 라이브 → 숨김 유지
     var t = kr.totals || {};
     var years = kr.by_year || [];
     if (!(Number(t.inspections) > 0) || !years.length) return;
@@ -2388,7 +2388,7 @@
     fetchFdaInspectionStats()
       .then(function (data) {
         renderFdaInspections(data);
-        // [061] 같은 응답에서 파생 — 추가 네트워크 호출 0. 061 미적용 라이브에서는
+        // [062] 같은 응답에서 파생 — 추가 네트워크 호출 0. 062 미적용 라이브에서는
         // 두 키가 없어 각 렌더러가 조용히 no-op 한다(주 데이터는 059 만으로 그려진다).
         renderFdaQuarters(data);
         renderKorea(data);

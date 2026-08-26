@@ -1,5 +1,5 @@
 -- ============================================================================
--- 062_fda_inspection_firm.sql — 업체 프로파일에 **FDA 실사 이력**을 붙인다.
+-- 063_fda_inspection_firm.sql — 업체 프로파일에 **FDA 실사 이력**을 붙인다.
 --   (A) public.fda_inspections.firm_key  GENERATED STORED (013 정본 함수 재사용)
 --   (B) public.fda_inspection_firm(p_firm_key text)  집계 RPC
 --
@@ -136,7 +136,7 @@ as $$
 $$;
 
 -- ============================================================================
--- (C) 권한 — revoke 가 grant 보다 **먼저**(058/059/061 과 같은 순서).
+-- (C) 권한 — revoke 가 grant 보다 **먼저**(058/059/062 과 같은 순서).
 -- ============================================================================
 revoke all on function public.fda_inspection_firm(text) from public;
 grant execute on function public.fda_inspection_firm(text) to anon, authenticated;

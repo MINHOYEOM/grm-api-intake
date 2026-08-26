@@ -3802,9 +3802,9 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
 
 # ── [해외 vs 미국 내 실사] 카테고리별 지적 패턴 비교 패널(038) ────────────────
 
-    # ── [061] 실사일 축 + 한국 슬라이스 ──────────────────────────────────────
+    # ── [062] 실사일 축 + 한국 슬라이스 ──────────────────────────────────────
     def test_quarter_and_korea_shells_present_hidden(self):
-        """061 미적용 라이브·빈 응답에서 trends.js 가 그대로 두는 상태(hidden)가 정적
+        """062 미적용 라이브·빈 응답에서 trends.js 가 그대로 두는 상태(hidden)가 정적
         셸의 기본값이어야 한다 — 이 면의 주 데이터(등급 구성)는 059 만으로 그려지므로
         두 신설 섹션이 안 채워져도 페이지는 정상이다."""
         self.assertIn(
@@ -3834,7 +3834,7 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         self.assertIn("회계연도", self.html)
         self.assertIn("실사가 실제로 끝난 날", self.html)
         sql = (WEB_DIR / "migrations" /
-               "061_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
+               "062_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
         self.assertIn("date_trunc('quarter', inspection_end_date)", sql)
 
     def test_partial_quarter_marking_derives_from_data_frontier(self):
@@ -3851,7 +3851,7 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         self.assertIn("setUTCMonth", fn)
         # 서버가 완결성을 판정하지 않는다 — 마이그레이션에 임계 컬럼이 없어야 한다.
         sql = (WEB_DIR / "migrations" /
-               "061_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
+               "062_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
         for forbidden in ("'is_partial'", "'complete'", "'is_complete'"):
             self.assertNotIn(forbidden, sql,
                              "서버가 완결성을 판정하고 있다(임계는 반드시 낡는다)")
@@ -3876,12 +3876,12 @@ class WebTrendsFdaInspectionsTest(unittest.TestCase):
         # 표본이 작다는 사실을 먼저 말한다(비율을 앞세우지 않는다).
         self.assertIn("비율보다 건수로 보셔야 합니다", fn)
 
-    def test_migration_061_is_pure_addition_and_keeps_no_arg_signature(self):
+    def test_migration_062_is_pure_addition_and_keeps_no_arg_signature(self):
         """★파라미터를 하나라도 붙이면 새 오버로드가 생겨 기존 무인자 호출이 PostgREST
         404 가 되고, 새 함수는 058 의 revoke 를 물려받지 못해 PUBLIC EXECUTE 로 태어난다
         (059 헤더의 근거). 그리고 059 의 기존 4키는 한 글자도 바뀌면 안 된다."""
         sql = (WEB_DIR / "migrations" /
-               "061_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
+               "062_fda_inspection_stats_inspection_date.sql").read_text(encoding="utf-8")
         self.assertIn("create or replace function public.fda_inspection_stats()", sql)
         self.assertNotIn("fda_inspection_stats(p_", sql)
         # revoke 가 grant 보다 먼저(순서가 뒤집히면 PUBLIC EXECUTE 가 남는다).
@@ -5567,10 +5567,10 @@ class WebFirmRenderTest(unittest.TestCase):
 
 # ── 실사관 프로파일 (FDA 483 서명 실사관 집계 — firm.html/firm.js 의 미러링) ────────
 
-    # ── [062] FDA GMP 실사 이력 ──────────────────────────────────────────────
+    # ── [063] FDA GMP 실사 이력 ──────────────────────────────────────────────
     def test_inspection_history_shell_present_hidden(self):
-        """062 미적용 라이브·fetch 실패에서 firm.js 가 그대로 두는 상태(hidden)가 정적
-        셸의 기본값이어야 한다 — 프로파일 본기능(지적 이력)은 062 없이도 온전하다."""
+        """063 미적용 라이브·fetch 실패에서 firm.js 가 그대로 두는 상태(hidden)가 정적
+        셸의 기본값이어야 한다 — 프로파일 본기능(지적 이력)은 063 없이도 온전하다."""
         self.assertIn(
             '<section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>',
             self.html)
@@ -5610,11 +5610,11 @@ class WebFirmRenderTest(unittest.TestCase):
         for text in (self.html, src):
             self.assertNotIn("실사 기록이 없습니다", text.replace("FDA 의약품 GMP 실사 기록이 없습니다", ""))
 
-    def test_migration_062_reuses_canonical_firm_key(self):
+    def test_migration_063_reuses_canonical_firm_key(self):
         """★정규화 정본은 하나다 — 013 grm_normalize_firm_name 을 GENERATED STORED 로
         재사용해야 findings.firm_key 와 같은 키 공간에 산다. 새 정규화 함수를 만들면
         정본이 둘이 되고 반드시 갈라진다(055/058 country_key 와 같은 구조)."""
-        sql = (WEB_DIR / "migrations" / "062_fda_inspection_firm.sql").read_text(encoding="utf-8")
+        sql = (WEB_DIR / "migrations" / "063_fda_inspection_firm.sql").read_text(encoding="utf-8")
         self.assertIn("generated always as (public.grm_normalize_firm_name(legal_name)) stored", sql)
         self.assertNotIn("create or replace function public.grm_normalize", sql)
         # RPC 계약: 0건도 null 이 아니라 0건 구조("미배포"와 "기록 없음"의 구분).

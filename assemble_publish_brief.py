@@ -77,7 +77,11 @@ _FALSE_ABSENCE_RE = re.compile(
     r"(?:미기재|미공개|명시되(?:어\s*있)?지\s*않|기재되(?:어\s*있)?지\s*않|"
     r"공개되(?:어\s*있)?지\s*않|나와\s*있지\s*않|없)"
     r"|"                                        # ↓ 우리 쪽 결손 어휘
-    r"(?:확보|확인|수집|추출)[^.\n]{0,6}?(?:못했|못한|않았|않은|불가|실패)"
+    # ★ `못해` 가 빠져 있었다 — 라이브 결함 문구가 "확보하지 **못해** 원문 확인이 필요하다"
+    # 였고, 어미 하나 차이로 이 게이트를 통째로 빠져나갔다(발행 11장). 활용형은 추측이 아니라
+    # 발행 코퍼스 474장 실측 분포로 넓혔다: 못했·못한·못해 가 실제로 쓰였다. `못하` 는 그
+    # 어간이라 못하고/못하여/못하는 을 함께 덮는다(모두 부정형이라 오탐이 없다).
+    r"(?:확보|확인|수집|추출)[^.\n]{0,6}?(?:못했|못한|못해|못하|않았|않은|불가|실패)"
     r"|미확보|미확인"
     r")")
 # 검사 대상 산문 슬롯(코드 verbatim 필드인 facts 는 제외 — 거기서의 "원문 미기재"는
@@ -522,10 +526,49 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
             f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
 
 
+# ── 결정론 상세 유형 분류 — "원문 서사를 손에 쥐었는가" ────────────────────────
+# 판정 단위가 **키가 아니라 유형**인 이유: 같은 키 이름이 유형마다 다른 것을 뜻한다.
+# `action` 은 NCR 에서 당국 조치 **전문**이지만 hc_recall_detail 에서는 "이렇게 하세요" 한
+# 줄이다. 키로 판정하면 이 둘을 못 가른다.
+#
+# 서사 본문(원문 문장)을 싣는 유형 — 이 카드가 "원문에 없다"고 말하면 거짓이다.
+_BODY_DETAIL_TYPES = frozenset({
+    "fda_483_observations",      # observations[].deficiency/detail
+    "gmp_deficiencies",          # rows[] 지적 전문
+    "wl_violations",             # violations[] 조항별 위반 전문
+    "whopir_report",             # outcome + sections[].text
+    "eu_gmp_ncr_statement",      # nature/action/operations 전문
+    "mhra_gmp_ncr_statement",
+})
+# 구조화 **사실표**만 싣는 유형 — 로트·수량·유통범위·처리경과처럼 값이 짧은 통제어휘다.
+# 이런 카드는 상세를 싣고도 "당국이 세부 일탈 사유를 공개하지 않았다"가 **여전히 참**이라
+# 부재 서술을 막으면 안 된다(실측: 회수 카드 3장이 그렇게 잘못 걸렸다).
+_FACTS_DETAIL_TYPES = frozenset({
+    "openfda_recall_detail", "mfds_recall_detail", "hc_recall_detail",
+})
+# 미분류 유형은 **fail-open**(부재 서술을 막지 않는다) — 새 상세 유형이 생겼다고 발행이
+# 갑자기 막히면 안 된다. 대신 CI 가 `tests/test_published_briefs_integrity.py` 의
+# 완전성 검사로 "분류되지 않은 유형이 발행분에 있다"를 실패로 알린다(조용한 표류 차단).
+
+
 def _card_has_source_body(card: dict[str, Any]) -> bool:
-    """이 카드가 원문 본문을 실제로 확보했는가(결정론 상세 블록 또는 심층분석 보유)."""
+    """이 카드가 원문 본문을 실제로 확보했는가(결정론 상세 블록 또는 심층분석 보유).
+
+    [2026-08-26] 종전 판정은 `deterministic_detail.count` **하나만** 봤다. 그런데 count 를
+    쓰는 상세는 표 형태 셋뿐(fda_483_observations·gmp_deficiencies·wl_violations)이고,
+    **본문 전문을 싣고도 count 가 없는** 유형이 있다 — whopir_report(outcome·sections·
+    reliance) · eu/mhra_gmp_ncr_statement(nature·action). 발행분 실측으로 그런 카드가 35장
+    이었고, 그 결과 게이트 3(`lint_false_absence_claims`)이 이들을 **아예 검사하지 않았다**.
+    실제 피해: 07-27 WHOPIR 11장이 결론(+항목별 요약)을 카드에 싣고서도 "실사 결과 세부
+    내용은 확보하지 못해 원문 확인이 필요하다"고 적힌 채 발행됐다.
+
+    ★ 첫 수리는 "메타 키 말고 값이 하나라도 있으면 본문"으로 넓혔는데 **과잉이었다** —
+    회수 상세(#796 로 발행분 102장에 추가)는 로트·수량·처리경과 같은 **사실표**라, 그 카드가
+    "당국이 세부 일탈 사유를 공개하지 않았다"고 적은 것은 여전히 참인데도 차단됐다(CI 가
+    잡았다·실측 3장). 그래서 판정 단위를 **유형**으로 바꾼다 — 위 두 집합 참조.
+    """
     dd = card.get("deterministic_detail")
-    if isinstance(dd, dict) and dd.get("count"):
+    if isinstance(dd, dict) and dd.get("type") in _BODY_DETAIL_TYPES:
         return True
     return isinstance(card.get("deep_analysis"), dict) and bool(card["deep_analysis"])
 
